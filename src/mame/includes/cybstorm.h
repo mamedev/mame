@@ -14,6 +14,7 @@
 #include "machine/bankdev.h"
 #include "video/atarivad.h"
 #include "screen.h"
+#include "tilemap.h"
 
 
 class cybstorm_state : public driver_device
@@ -29,7 +30,7 @@ public:
 		, m_gfxdecode(*this, "gfxdecode")
 	{ }
 
-	DECLARE_DRIVER_INIT(cybstorm);
+	void init_cybstorm();
 	void cybstorm(machine_config &config);
 
 protected:

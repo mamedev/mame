@@ -26,18 +26,9 @@ DEFINE_DEVICE_TYPE(ELECTRON_EXPANSION_SLOT, electron_expansion_slot_device, "ele
 //-------------------------------------------------
 
 device_electron_expansion_interface::device_electron_expansion_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device)
+	: device_interface(device, "electronexp")
 {
 	m_slot = dynamic_cast<electron_expansion_slot_device *>(device.owner());
-}
-
-
-//-------------------------------------------------
-//  ~device_electron_expansion_interface - destructor
-//-------------------------------------------------
-
-device_electron_expansion_interface::~device_electron_expansion_interface()
-{
 }
 
 
@@ -51,19 +42,10 @@ device_electron_expansion_interface::~device_electron_expansion_interface()
 
 electron_expansion_slot_device::electron_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ELECTRON_EXPANSION_SLOT, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_electron_expansion_interface>(mconfig, *this),
 	m_card(nullptr),
 	m_irq_handler(*this),
 	m_nmi_handler(*this)
-{
-}
-
-
-//-------------------------------------------------
-//  expansion_slot_device - destructor
-//-------------------------------------------------
-
-electron_expansion_slot_device::~electron_expansion_slot_device()
 {
 }
 
@@ -74,7 +56,7 @@ electron_expansion_slot_device::~electron_expansion_slot_device()
 
 void electron_expansion_slot_device::device_start()
 {
-	m_card = dynamic_cast<device_electron_expansion_interface *>(get_card_device());
+	m_card = get_card_device();
 
 	// resolve callbacks
 	m_irq_handler.resolve_safe();
@@ -93,11 +75,13 @@ void electron_expansion_slot_device::device_reset()
 //  expbus_r - expansion data read
 //-------------------------------------------------
 
-uint8_t electron_expansion_slot_device::expbus_r(address_space &space, offs_t offset, uint8_t data)
+uint8_t electron_expansion_slot_device::expbus_r(offs_t offset)
 {
+	uint8_t data = 0xff;
+
 	if (m_card != nullptr)
 	{
-		data = m_card->expbus_r(space, offset, data);
+		data = m_card->expbus_r(offset);
 	}
 
 	return data;
@@ -107,11 +91,11 @@ uint8_t electron_expansion_slot_device::expbus_r(address_space &space, offs_t of
 //  expbus_w - expansion data write
 //-------------------------------------------------
 
-void electron_expansion_slot_device::expbus_w(address_space &space, offs_t offset, uint8_t data)
+void electron_expansion_slot_device::expbus_w(offs_t offset, uint8_t data)
 {
 	if (m_card != nullptr)
 	{
-		m_card->expbus_w(space, offset, data);
+		m_card->expbus_w(offset, data);
 	}
 }
 
@@ -125,24 +109,31 @@ void electron_expansion_slot_device::expbus_w(address_space &space, offs_t offse
 #include "fbjoy.h"
 //#include "fbprint.h"
 //#include "jafamode7.h"
+//#include "lebox.h"
 #include "plus1.h"
+#include "plus2.h"
 #include "plus3.h"
 #include "pwrjoy.h"
 #include "rombox.h"
 #include "romboxp.h"
+#include "sidewndr.h"
 #include "m2105.h"
 //#include "voxbox.h"
 
 
-SLOT_INTERFACE_START( electron_expansion_devices )
-	SLOT_INTERFACE("fbjoy", ELECTRON_FBJOY)
-	//SLOT_INTERFACE("fbprint", ELECTRON_FBPRINT)
-	//SLOT_INTERFACE("jafamode7", ELECTRON_JAFAMODE7)
-	SLOT_INTERFACE("plus1", ELECTRON_PLUS1)
-	SLOT_INTERFACE("plus3", ELECTRON_PLUS3)
-	SLOT_INTERFACE("pwrjoy", ELECTRON_PWRJOY)
-	SLOT_INTERFACE("rombox", ELECTRON_ROMBOX)
-	SLOT_INTERFACE("romboxp", ELECTRON_ROMBOXP)
-	SLOT_INTERFACE("m2105", ELECTRON_M2105)
-	//SLOT_INTERFACE("voxbox", ELECTRON_VOXBOX)
-SLOT_INTERFACE_END
+void electron_expansion_devices(device_slot_interface &device)
+{
+	device.option_add("fbjoy", ELECTRON_FBJOY);
+	//device.option_add("fbprint", ELECTRON_FBPRINT);
+	//device.option_add("jafamode7", ELECTRON_JAFAMODE7);
+	//device.option_add("lebox", ELECTRON_LEBOX);
+	device.option_add("plus1", ELECTRON_PLUS1);
+	device.option_add("plus2", ELECTRON_PLUS2);
+	device.option_add("plus3", ELECTRON_PLUS3);
+	device.option_add("pwrjoy", ELECTRON_PWRJOY);
+	device.option_add("rombox", ELECTRON_ROMBOX);
+	device.option_add("romboxp", ELECTRON_ROMBOXP);
+	device.option_add("sidewndr", ELECTRON_SIDEWNDR);
+	device.option_add("m2105", ELECTRON_M2105);
+	//device.option_add("voxbox", ELECTRON_VOXBOX);
+}

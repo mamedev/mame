@@ -72,9 +72,9 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual uint32_t execute_min_cycles() const override { return 1; }
-	virtual uint32_t execute_max_cycles() const override { return 1; }
-	virtual uint32_t execute_input_lines() const override { return 4; }
+	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 1; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 4; }
 	virtual void execute_run() override;
 
 	virtual space_config_vector memory_space_config() const override;
@@ -89,7 +89,7 @@ private:
 	address_space_config m_rf_config;
 
 	address_space        *m_program, *m_data, *m_io, *m_rf;
-	direct_read_data<-2> *m_direct;
+	memory_access_cache<2, -2, ENDIANNESS_LITTLE> *m_cache;
 	int m_icount;
 
 	u32 m_st, m_a, m_b, m_d, m_p;

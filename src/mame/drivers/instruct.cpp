@@ -47,7 +47,6 @@
 #include "cpu/s2650/s2650.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
-#include "sound/wave.h"
 #include "speaker.h"
 
 #include "instruct.lh"
@@ -66,6 +65,10 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void instruct(machine_config &config);
+
+private:
+
 	DECLARE_READ8_MEMBER(port_r);
 	DECLARE_READ8_MEMBER(portfc_r);
 	DECLARE_READ8_MEMBER(portfd_r);
@@ -76,13 +79,12 @@ public:
 	DECLARE_WRITE8_MEMBER(portf8_w);
 	DECLARE_WRITE8_MEMBER(portf9_w);
 	DECLARE_WRITE8_MEMBER(portfa_w);
-	DECLARE_QUICKLOAD_LOAD_MEMBER(instruct);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	INTERRUPT_GEN_MEMBER(t2l_int);
-	void instruct(machine_config &config);
 	void data_map(address_map &map);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	virtual void machine_reset() override;
 	virtual void machine_start() override { m_digits.resolve(); }
 	uint16_t m_lar;
@@ -90,7 +92,7 @@ private:
 	bool m_valid_digit;
 	bool m_cassin;
 	bool m_irqstate;
-	required_device<cpu_device> m_maincpu;
+	required_device<s2650_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_p_ram;
 	required_shared_ptr<uint8_t> m_p_smiram;
 	required_shared_ptr<uint8_t> m_p_extram;
@@ -211,12 +213,12 @@ INTERRUPT_GEN_MEMBER( instruct_state::t2l_int )
 
 		// Check INT sw & key
 		if (BIT(switches, 1))
-			device.execute().set_input_line_and_vector(0, BIT(hwkeys, 1) ? ASSERT_LINE : CLEAR_LINE, vector);
+			device.execute().set_input_line_and_vector(0, BIT(hwkeys, 1) ? ASSERT_LINE : CLEAR_LINE, vector); // S2650
 		else
 		// process ac input
 		{
 			m_irqstate ^= 1;
-			device.execute().set_input_line_and_vector(0, m_irqstate ? ASSERT_LINE : CLEAR_LINE, vector);
+			device.execute().set_input_line_and_vector(0, m_irqstate ? ASSERT_LINE : CLEAR_LINE, vector); // S2650
 		}
 	}
 }
@@ -225,7 +227,7 @@ void instruct_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x0ffe).ram().share("mainram");
-	map(0x0fff, 0x0fff).rw(this, FUNC(instruct_state::port_r), FUNC(instruct_state::port_w));
+	map(0x0fff, 0x0fff).rw(FUNC(instruct_state::port_r), FUNC(instruct_state::port_w));
 	map(0x1780, 0x17ff).ram().share("smiram");
 	map(0x1800, 0x1fff).rom().region("roms", 0);
 	map(0x2000, 0x7fff).ram().share("extram");
@@ -234,19 +236,19 @@ void instruct_state::mem_map(address_map &map)
 void instruct_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x07, 0x07).rw(this, FUNC(instruct_state::port_r), FUNC(instruct_state::port_w));
-	map(0xf8, 0xf8).w(this, FUNC(instruct_state::portf8_w));
-	map(0xf9, 0xf9).w(this, FUNC(instruct_state::portf9_w));
-	map(0xfa, 0xfa).w(this, FUNC(instruct_state::portfa_w));
-	map(0xfc, 0xfc).r(this, FUNC(instruct_state::portfc_r));
-	map(0xfd, 0xfd).r(this, FUNC(instruct_state::portfd_r));
-	map(0xfe, 0xfe).r(this, FUNC(instruct_state::portfe_r));
+	map(0x07, 0x07).rw(FUNC(instruct_state::port_r), FUNC(instruct_state::port_w));
+	map(0xf8, 0xf8).w(FUNC(instruct_state::portf8_w));
+	map(0xf9, 0xf9).w(FUNC(instruct_state::portf9_w));
+	map(0xfa, 0xfa).w(FUNC(instruct_state::portfa_w));
+	map(0xfc, 0xfc).r(FUNC(instruct_state::portfc_r));
+	map(0xfd, 0xfd).r(FUNC(instruct_state::portfd_r));
+	map(0xfe, 0xfe).r(FUNC(instruct_state::portfe_r));
 }
 
 void instruct_state::data_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(S2650_DATA_PORT, S2650_DATA_PORT).rw(this, FUNC(instruct_state::port_r), FUNC(instruct_state::port_w));
+	map(S2650_DATA_PORT, S2650_DATA_PORT).rw(FUNC(instruct_state::port_r), FUNC(instruct_state::port_w));
 }
 
 /* Input ports */
@@ -337,7 +339,7 @@ void instruct_state::machine_reset()
 	m_maincpu->set_state_int(S2650_PC, 0x1800);
 }
 
-QUICKLOAD_LOAD_MEMBER( instruct_state, instruct )
+QUICKLOAD_LOAD_MEMBER(instruct_state::quickload_cb)
 {
 	uint16_t i, exec_addr, quick_length, read_;
 	image_init_result result = image_init_result::FAIL;
@@ -418,28 +420,30 @@ QUICKLOAD_LOAD_MEMBER( instruct_state, instruct )
 	return result;
 }
 
-MACHINE_CONFIG_START(instruct_state::instruct)
+void instruct_state::instruct(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",S2650, XTAL(3'579'545) / 4)
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_DATA_MAP(data_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(instruct_state, t2l_int, 120)
-	MCFG_S2650_SENSE_INPUT(READLINE(instruct_state, sense_r))
-	MCFG_S2650_FLAG_OUTPUT(WRITELINE(instruct_state, flag_w))
+	S2650(config, m_maincpu, XTAL(3'579'545) / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &instruct_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &instruct_state::io_map);
+	m_maincpu->set_addrmap(AS_DATA, &instruct_state::data_map);
+	m_maincpu->set_periodic_int(FUNC(instruct_state::t2l_int), attotime::from_hz(120));
+	m_maincpu->sense_handler().set(FUNC(instruct_state::sense_r));
+	m_maincpu->flag_handler().set(FUNC(instruct_state::flag_w));
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_instruct)
+	config.set_default_layout(layout_instruct);
 
 	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", instruct_state, instruct, "pgm", 1)
+	QUICKLOAD(config, "quickload", "pgm", attotime::from_seconds(1)).set_load_callback(FUNC(instruct_state::quickload_cb));
+
+	SPEAKER(config, "mono").front_center();
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	CASSETTE(config, m_cass);
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
+}
 
 /* ROM definition */
 ROM_START( instruct )
@@ -453,5 +457,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME       PARENT   COMPAT   MACHINE    INPUT     STATE           INIT  COMPANY      FULLNAME                   FLAGS
-COMP( 1978, instruct,  0,       0,       instruct,  instruct, instruct_state, 0,    "Signetics", "Signetics Instructor 50", 0 )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY      FULLNAME                   FLAGS
+COMP( 1978, instruct, 0,      0,      instruct, instruct, instruct_state, empty_init, "Signetics", "Signetics Instructor 50", 0 )

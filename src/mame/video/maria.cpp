@@ -392,7 +392,7 @@ void atari_maria_device::startdma(int lines)
 
 	if (m_nmi)
 	{
-		m_cpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_cpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 		m_nmi = 0;
 	}
 }

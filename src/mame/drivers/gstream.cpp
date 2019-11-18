@@ -136,6 +136,7 @@ RAM4 is HMC HM6264LP-70
 #include "cpu/e132xs/e132xs.h"
 #include "sound/okim6295.h"
 #include "machine/nvram.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -154,6 +155,17 @@ public:
 		m_toggle = 0;
 	}
 
+	void x2222(machine_config &config);
+	void gstream(machine_config &config);
+
+	void init_gstream();
+	void init_x2222();
+
+	DECLARE_READ_LINE_MEMBER(mirror_service_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(gstream_mirror_r);
+	DECLARE_READ_LINE_MEMBER(x2222_toggle_r);
+
+private:
 	/* devices */
 	required_device<e132xt_device> m_maincpu;
 	optional_device_array<okim6295_device, 2> m_oki;
@@ -181,11 +193,6 @@ public:
 	DECLARE_READ32_MEMBER(gstream_speedup_r);
 	DECLARE_READ32_MEMBER(x2222_speedup_r);
 	DECLARE_READ32_MEMBER(x2222_speedup2_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(gstream_mirror_service_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(gstream_mirror_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(x2222_toggle_r);
-	DECLARE_DRIVER_INIT(gstream);
-	DECLARE_DRIVER_INIT(x2222);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -199,22 +206,20 @@ public:
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void x2222(machine_config &config);
-	void gstream(machine_config &config);
 	void gstream_32bit_map(address_map &map);
 	void gstream_io(address_map &map);
 	void x2222_32bit_map(address_map &map);
 	void x2222_io(address_map &map);
 };
 
-CUSTOM_INPUT_MEMBER(gstream_state::x2222_toggle_r) // or the game hangs when starting, might be a status flag for the sound?
+READ_LINE_MEMBER(gstream_state::x2222_toggle_r) // or the game hangs when starting, might be a status flag for the sound?
 {
 	m_toggle ^= 0xffff;
 	return m_toggle;
 }
 
 
-CUSTOM_INPUT_MEMBER(gstream_state::gstream_mirror_service_r)
+READ_LINE_MEMBER(gstream_state::mirror_service_r)
 {
 	int result;
 
@@ -265,15 +270,15 @@ void gstream_state::gstream_32bit_map(address_map &map)
 {
 	map(0x00000000, 0x003fffff).ram().share("workram"); // work ram
 //  map(0x40000000, 0x40ffffff).ram(); // ?? lots of data gets copied here if present, but game runs without it??
-	map(0x80000000, 0x80003fff).ram().w(this, FUNC(gstream_state::vram_w)).share("vram"); // video ram
+	map(0x80000000, 0x80003fff).ram().w(FUNC(gstream_state::vram_w)).share("vram"); // video ram
 	map(0x4E000000, 0x4e1fffff).rom().region("maindata", 0); // main game rom
-	map(0x4f000000, 0x4f000003).w(this, FUNC(gstream_state::scrollx_w<2>)).umask32(0xffff0000).cswidth(32);
-	map(0x4f200000, 0x4f200003).w(this, FUNC(gstream_state::scrolly_w<2>)).umask32(0xffff0000).cswidth(32);
+	map(0x4f000000, 0x4f000003).w(FUNC(gstream_state::scrollx_w<2>)).umask32(0xffff0000).cswidth(32);
+	map(0x4f200000, 0x4f200003).w(FUNC(gstream_state::scrolly_w<2>)).umask32(0xffff0000).cswidth(32);
 	map(0x4f400000, 0x4f406fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
-	map(0x4f800000, 0x4f800003).w(this, FUNC(gstream_state::scrollx_w<0>)).umask32(0xffff0000).cswidth(32);
-	map(0x4fa00000, 0x4fa00003).w(this, FUNC(gstream_state::scrolly_w<0>)).umask32(0xffff0000).cswidth(32);
-	map(0x4fc00000, 0x4fc00003).w(this, FUNC(gstream_state::scrollx_w<1>)).umask32(0xffff0000).cswidth(32);
-	map(0x4fe00000, 0x4fe00003).w(this, FUNC(gstream_state::scrolly_w<1>)).umask32(0xffff0000).cswidth(32);
+	map(0x4f800000, 0x4f800003).w(FUNC(gstream_state::scrollx_w<0>)).umask32(0xffff0000).cswidth(32);
+	map(0x4fa00000, 0x4fa00003).w(FUNC(gstream_state::scrolly_w<0>)).umask32(0xffff0000).cswidth(32);
+	map(0x4fc00000, 0x4fc00003).w(FUNC(gstream_state::scrollx_w<1>)).umask32(0xffff0000).cswidth(32);
+	map(0x4fe00000, 0x4fe00003).w(FUNC(gstream_state::scrolly_w<1>)).umask32(0xffff0000).cswidth(32);
 	map(0xffc00000, 0xffc01fff).ram().share("nvram"); // Backup RAM
 	map(0xfff80000, 0xffffffff).rom().region("maincpu", 0); // boot rom
 }
@@ -348,8 +353,8 @@ void gstream_state::gstream_io(address_map &map)
 	map(0x4000, 0x4003).portr("IN0");
 	map(0x4010, 0x4013).portr("IN1");
 	map(0x4020, 0x4023).portr("IN2");    // extra coin switches etc
-	map(0x4030, 0x4033).w(this, FUNC(gstream_state::gstream_oki_banking_w));    // oki banking
-	map(0x4040, 0x4043).w(this, FUNC(gstream_state::gstream_oki_4040_w));   // some clocking?
+	map(0x4030, 0x4033).w(FUNC(gstream_state::gstream_oki_banking_w));    // oki banking
+	map(0x4040, 0x4043).w(FUNC(gstream_state::gstream_oki_4040_w));   // some clocking?
 	map(0x4053, 0x4053).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // music and samples
 	map(0x4063, 0x4063).rw(m_oki[1], FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // music and samples
 }
@@ -359,16 +364,16 @@ void gstream_state::x2222_32bit_map(address_map &map)
 {
 	map(0x00000000, 0x003fffff).ram().share("workram"); // work ram
 	map(0x40000000, 0x403fffff).ram(); // ?? data gets copied here if present, but game runs without it??
-	map(0x80000000, 0x80003fff).ram().w(this, FUNC(gstream_state::vram_w)).share("vram"); // video ram
+	map(0x80000000, 0x80003fff).ram().w(FUNC(gstream_state::vram_w)).share("vram"); // video ram
 
-	map(0x4fc00000, 0x4fc00003).w(this, FUNC(gstream_state::scrolly_w<1>)).umask32(0xffff0000).cswidth(32);
-	map(0x4fd00000, 0x4fd00003).w(this, FUNC(gstream_state::scrollx_w<1>)).umask32(0xffff0000).cswidth(32);
+	map(0x4fc00000, 0x4fc00003).w(FUNC(gstream_state::scrolly_w<1>)).umask32(0xffff0000).cswidth(32);
+	map(0x4fd00000, 0x4fd00003).w(FUNC(gstream_state::scrollx_w<1>)).umask32(0xffff0000).cswidth(32);
 
-	map(0x4fa00000, 0x4fa00003).w(this, FUNC(gstream_state::scrolly_w<2>)).umask32(0xffff0000).cswidth(32);
-	map(0x4fb00000, 0x4fb00003).w(this, FUNC(gstream_state::scrollx_w<2>)).umask32(0xffff0000).cswidth(32);
+	map(0x4fa00000, 0x4fa00003).w(FUNC(gstream_state::scrolly_w<2>)).umask32(0xffff0000).cswidth(32);
+	map(0x4fb00000, 0x4fb00003).w(FUNC(gstream_state::scrollx_w<2>)).umask32(0xffff0000).cswidth(32);
 
-	map(0x4fe00000, 0x4fe00003).w(this, FUNC(gstream_state::scrolly_w<0>)).umask32(0xffff0000).cswidth(32);
-	map(0x4ff00000, 0x4ff00003).w(this, FUNC(gstream_state::scrollx_w<0>)).umask32(0xffff0000).cswidth(32);
+	map(0x4fe00000, 0x4fe00003).w(FUNC(gstream_state::scrolly_w<0>)).umask32(0xffff0000).cswidth(32);
+	map(0x4ff00000, 0x4ff00003).w(FUNC(gstream_state::scrollx_w<0>)).umask32(0xffff0000).cswidth(32);
 
 	map(0xffc00000, 0xffc01fff).ram().share("nvram"); // Backup RAM (maybe)
 	map(0xfff00000, 0xffffffff).rom().region("maincpu", 0); // boot rom
@@ -387,7 +392,7 @@ void gstream_state::x2222_io(address_map &map)
 	map(0x4004, 0x4007).portr("P2");
 	map(0x4008, 0x400b).portr("SYS");
 	map(0x4010, 0x4013).portr("DSW");
-	map(0x4028, 0x402b).w(this, FUNC(gstream_state::x2222_sound_w));
+	map(0x4028, 0x402b).w(FUNC(gstream_state::x2222_sound_w));
 	map(0x4034, 0x4037).portr("IN4");
 }
 
@@ -422,10 +427,10 @@ static INPUT_PORTS_START( gstream )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_SERVICE2 )
 	PORT_BIT( 0x7000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_CUSTOM )  PORT_CUSTOM_MEMBER(DEVICE_SELF, gstream_state,gstream_mirror_service_r, nullptr)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(gstream_state, mirror_service_r)
 
 	PORT_START("IN2")
-	PORT_BIT( 0x004f, IP_ACTIVE_LOW, IPT_CUSTOM )  PORT_CUSTOM_MEMBER(DEVICE_SELF, gstream_state,gstream_mirror_r, nullptr)
+	PORT_BIT( 0x004f, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(gstream_state, gstream_mirror_r)
 	PORT_BIT( 0xffb0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -517,7 +522,7 @@ static INPUT_PORTS_START( x2222 )
 	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_CUSTOM )  PORT_CUSTOM_MEMBER(DEVICE_SELF, gstream_state,x2222_toggle_r, nullptr)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(gstream_state, x2222_toggle_r)
 INPUT_PORTS_END
 
 
@@ -544,7 +549,7 @@ static const gfx_layout layout32x32 =
 	32*32*8,
 };
 
-static GFXDECODE_START( gstream )
+static GFXDECODE_START( gfx_gstream )
 	GFXDECODE_ENTRY( "gfx2", 0, layout32x32, 0x1000, 4 )
 	GFXDECODE_ENTRY( "gfx3", 0, layout32x32, 0x1400, 4 )
 	GFXDECODE_ENTRY( "gfx4", 0, layout32x32, 0x1800, 4 )
@@ -552,7 +557,7 @@ static GFXDECODE_START( gstream )
 GFXDECODE_END
 
 
-static GFXDECODE_START( x2222 )
+static GFXDECODE_START( gfx_x2222 )
 	GFXDECODE_ENTRY( "gfx2", 0, layout32x32, 0, 0x80 )
 	GFXDECODE_ENTRY( "gfx3", 0, layout32x32, 0, 0x80 )
 	GFXDECODE_ENTRY( "gfx4", 0, layout32x32, 0, 0x80 )
@@ -823,68 +828,63 @@ void gstream_state::machine_reset()
 	m_oki_bank[0] = m_oki_bank[1] = 0;
 }
 
-MACHINE_CONFIG_START(gstream_state::gstream)
-
+void gstream_state::gstream(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", E132XT, 16000000*4) /* 4x internal multiplier */
-	MCFG_CPU_PROGRAM_MAP(gstream_32bit_map)
-	MCFG_CPU_IO_MAP(gstream_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gstream_state,  irq0_line_hold)
+	E132XT(config, m_maincpu, 16000000*4); /* 4x internal multiplier */
+	m_maincpu->set_addrmap(AS_PROGRAM, &gstream_state::gstream_32bit_map);
+	m_maincpu->set_addrmap(AS_IO, &gstream_state::gstream_io);
+	m_maincpu->set_vblank_int("screen", FUNC(gstream_state::irq0_line_hold));
 
-
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(gstream_state, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(320, 240);
+	screen.set_visarea_full();
+	screen.set_screen_update(FUNC(gstream_state::screen_update));
 
-	MCFG_PALETTE_ADD("palette", 0x1000 + 0x400 + 0x400 + 0x400) // sprites + 3 bg layers
-	MCFG_PALETTE_FORMAT(BBBBBGGGGGGRRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::BGR_565, 0x1000 + 0x400 + 0x400 + 0x400); // sprites + 3 bg layers
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gstream)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gstream);
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki1", 1000000, PIN7_HIGH) /* 1 Mhz? */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	OKIM6295(config, m_oki[0], 1000000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.00); /* 1 Mhz? */
 
-	MCFG_OKIM6295_ADD("oki2", 1000000, PIN7_HIGH) /* 1 Mhz? */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki[1], 1000000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.00); /* 1 Mhz? */
+}
 
-MACHINE_CONFIG_START(gstream_state::x2222)
-
+void gstream_state::x2222(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", E132XT, 16000000*4) /* 4x internal multiplier */
-	MCFG_CPU_PROGRAM_MAP(x2222_32bit_map)
-	MCFG_CPU_IO_MAP(x2222_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gstream_state,  irq0_line_hold)
+	E132XT(config, m_maincpu, 16000000*4); /* 4x internal multiplier */
+	m_maincpu->set_addrmap(AS_PROGRAM, &gstream_state::x2222_32bit_map);
+	m_maincpu->set_addrmap(AS_IO, &gstream_state::x2222_io);
+	m_maincpu->set_vblank_int("screen", FUNC(gstream_state::irq0_line_hold));
 
-//  MCFG_NVRAM_ADD_1FILL("nvram")
+//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(gstream_state, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(320, 240);
+	screen.set_visarea_full();
+	screen.set_screen_update(FUNC(gstream_state::screen_update));
 
-	MCFG_PALETTE_ADD_BBBBBGGGGGGRRRRR("palette")
+	PALETTE(config, m_palette, palette_device::BGR_565);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", x2222)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_x2222);
 
 	// unknown sound hw (no sound roms dumped)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki1", 1000000, PIN7_HIGH) /* 1 Mhz? */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki[0], 1000000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.00); /* 1 Mhz? */
+}
 
 
 ROM_START( gstream )
@@ -1086,9 +1086,9 @@ READ32_MEMBER(gstream_state::x2222_speedup2_r)
 }
 
 
-DRIVER_INIT_MEMBER(gstream_state,gstream)
+void gstream_state::init_gstream()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd1ee0, 0xd1ee3, read32_delegate(FUNC(gstream_state::gstream_speedup_r), this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd1ee0, 0xd1ee3, read32_delegate(*this, FUNC(gstream_state::gstream_speedup_r)));
 
 	m_xoffset = 2;
 }
@@ -1114,10 +1114,10 @@ void gstream_state::rearrange_sprite_data(uint8_t* ROM, uint32_t* NEW, uint32_t*
 	}
 }
 
-DRIVER_INIT_MEMBER(gstream_state,x2222)
+void gstream_state::init_x2222()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x7ffac, 0x7ffaf, read32_delegate(FUNC(gstream_state::x2222_speedup_r), this)); // older
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x84e3c, 0x84e3f, read32_delegate(FUNC(gstream_state::x2222_speedup2_r), this)); // newer
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x7ffac, 0x7ffaf, read32_delegate(*this, FUNC(gstream_state::x2222_speedup_r))); // older
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x84e3c, 0x84e3f, read32_delegate(*this, FUNC(gstream_state::x2222_speedup2_r))); // newer
 
 	rearrange_sprite_data(memregion("sprites")->base(), (uint32_t*)memregion("gfx1")->base(), (uint32_t*)memregion("gfx1_lower")->base()  );
 	rearrange_tile_data(memregion("bg1")->base(), (uint32_t*)memregion("gfx2")->base(), (uint32_t*)memregion("gfx2_lower")->base());
@@ -1128,6 +1128,6 @@ DRIVER_INIT_MEMBER(gstream_state,x2222)
 }
 
 
-GAME( 2002, gstream, 0,     gstream, gstream, gstream_state, gstream, ROT270, "Oriental Soft Japan",    "G-Stream G2020",            MACHINE_SUPPORTS_SAVE )
-GAME( 2000, x2222,   0,     x2222,   x2222,   gstream_state, x2222,   ROT270, "Oriental Soft / Promat", "X2222 (final debug?)",      MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )
-GAME( 2000, x2222o,  x2222, x2222,   x2222,   gstream_state, x2222,   ROT270, "Oriental Soft / Promat", "X2222 (5-level prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+GAME( 2002, gstream, 0,     gstream, gstream, gstream_state, init_gstream, ROT270, "Oriental Soft Japan",    "G-Stream G2020",            MACHINE_SUPPORTS_SAVE )
+GAME( 2000, x2222,   0,     x2222,   x2222,   gstream_state, init_x2222,   ROT270, "Oriental Soft / Promat", "X2222 (final debug?)",      MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )
+GAME( 2000, x2222o,  x2222, x2222,   x2222,   gstream_state, init_x2222,   ROT270, "Oriental Soft / Promat", "X2222 (5-level prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )

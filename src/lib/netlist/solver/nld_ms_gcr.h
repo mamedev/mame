@@ -1,461 +1,262 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * nld_ms_gcr.h
- *
- * Gaussian elimination using compressed row format.
- *
- */
 
 #ifndef NLD_MS_GCR_H_
 #define NLD_MS_GCR_H_
 
-#include <algorithm>
+///
+/// \file  nld_ms_gcr.h
+///
+/// Gaussian elimination using compressed row format.
+///
 
-#include "../plib/pdynlib.h"
-#include "mat_cr.h"
+#include "plib/mat_cr.h"
+
 #include "nld_ms_direct.h"
 #include "nld_solver.h"
-#include "vector_base.h"
-#include "../plib/pstream.h"
+#include "plib/pdynlib.h"
+#include "plib/pstream.h"
+#include "plib/vector_ops.h"
+
+#include <algorithm>
 
 namespace netlist
 {
-	namespace devices
-	{
-template <std::size_t m_N, std::size_t storage_N>
-class matrix_solver_GCR_t: public matrix_solver_t
+namespace solver
 {
-public:
 
-	matrix_solver_GCR_t(netlist_t &anetlist, const pstring &name,
+	template <typename FT, int SIZE>
+	class matrix_solver_GCR_t: public matrix_solver_ext_t<FT, SIZE>
+	{
+	public:
+
+		using mat_type = plib::pGEmatrix_cr_t<plib::pmatrix_cr_t<FT, SIZE>>;
+
+		matrix_solver_GCR_t(netlist_state_t &anetlist, const pstring &name,
+			const analog_net_t::list_t &nets,
 			const solver_parameters_t *params, const std::size_t size)
-		: matrix_solver_t(anetlist, name, matrix_solver_t::ASCENDING, params)
-		, m_dim(size)
-		, mat(size)
+		: matrix_solver_ext_t<FT, SIZE>(anetlist, name, nets, params, size)
+		, mat(static_cast<typename mat_type::index_type>(size))
 		, m_proc()
 		{
-		}
+			const std::size_t iN = this->size();
 
-	virtual ~matrix_solver_GCR_t() override
-	{
-	}
+			// build the final matrix
 
-	constexpr std::size_t N() const { return (m_N == 0) ? m_dim : m_N; }
+			std::vector<std::vector<unsigned>> fill(iN);
 
-	virtual void vsetup(analog_net_t::list_t &nets) override;
-	virtual unsigned vsolve_non_dynamic(const bool newton_raphson) override;
+			std::size_t raw_elements = 0;
 
-	virtual std::pair<pstring, pstring> create_solver_code() override;
-
-private:
-
-	//typedef typename mat_cr_t<storage_N>::type mattype;
-	typedef typename mat_cr_t<storage_N>::index_type mattype;
-
-	void csc_private(plib::putf8_fmt_writer &strm);
-
-	using extsolver = void (*)(double * RESTRICT m_A, double * RESTRICT RHS, double * RESTRICT V);
-
-	pstring static_compile_name();
-
-	const std::size_t m_dim;
-	std::vector<unsigned> m_term_cr[storage_N];
-	mat_cr_t<storage_N> mat;
-
-	//extsolver m_proc;
-	plib::dynproc<void, double * RESTRICT, double * RESTRICT, double * RESTRICT> m_proc;
-
-};
-
-// ----------------------------------------------------------------------------------------
-// matrix_solver - GCR
-// ----------------------------------------------------------------------------------------
-
-template <std::size_t m_N, std::size_t storage_N>
-void matrix_solver_GCR_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
-{
-	setup_base(nets);
-
-	mattype nz = 0;
-	const std::size_t iN = this->N();
-
-	/* build the final matrix */
-
-	bool touched[storage_N][storage_N] = { { false } };
-	for (std::size_t k = 0; k < iN; k++)
-	{
-		for (auto &j : this->m_terms[k]->m_nz)
-			touched[k][j] = true;
-	}
-
-	unsigned fc = 0;
-
-	unsigned ops = 0;
-
-	for (std::size_t k = 0; k < iN; k++)
-	{
-		ops++; // 1/A(k,k)
-		for (std::size_t row = k + 1; row < iN; row++)
-		{
-			if (touched[row][k])
+			for (std::size_t k = 0; k < iN; k++)
 			{
-				ops++;
-				fc++;
-				for (std::size_t col = k + 1; col < iN; col++)
-					if (touched[k][col])
-					{
-						touched[row][col] = true;
-						ops += 2;
-					}
-			}
-		}
-	}
-
-
-	for (mattype k=0; k<iN; k++)
-	{
-		mat.ia[k] = nz;
-
-		for (mattype j=0; j<iN; j++)
-		{
-			if (touched[k][j])
-			{
-				mat.ja[nz] = j;
-				if (j == k)
-					mat.diag[k] = nz;
-				nz++;
-			}
-		}
-
-		m_term_cr[k].clear();
-		/* build pointers into the compressed row format matrix for each terminal */
-		for (std::size_t j=0; j< this->m_terms[k]->m_railstart;j++)
-		{
-			int other = this->m_terms[k]->connected_net_idx()[j];
-			for (auto i = mat.ia[k]; i < nz; i++)
-				if (other == static_cast<int>(mat.ja[i]))
+				fill[k].resize(iN, decltype(mat)::FILL_INFINITY);
+				for (auto &j : this->m_terms[k].m_nz)
 				{
-					m_term_cr[k].push_back(i);
-					break;
+					fill[k][j] = 0;
+					raw_elements++;
 				}
-		}
-		nl_assert(m_term_cr[k].size() == this->m_terms[k]->m_railstart);
-	}
 
-	mat.ia[iN] = nz;
-	mat.nz_num = nz;
+			}
 
-	this->log().verbose("Ops: {1}  Occupancy ratio: {2}\n", ops,
-			static_cast<double>(nz) / static_cast<double>(iN * iN));
+			auto gr = mat.gaussian_extend_fill_mat(fill);
 
-	// FIXME: Move me
+			this->log_fill(fill, mat);
 
-	if (netlist().lib().isLoaded())
-	{
-		pstring symname = static_compile_name();
-#if 0
-		m_proc = this->netlist().lib().template getsym<extsolver>(symname);
-		if (m_proc != nullptr)
-			this->log().verbose("External static solver {1} found ...", symname);
-		else
-			this->log().warning("External static solver {1} not found ...", symname);
-#else
-		m_proc.load(this->netlist().lib(), symname);
-		if (m_proc.resolved())
-			this->log().warning("External static solver {1} found ...", symname);
-		else
-			this->log().warning("External static solver {1} not found ...", symname);
-#endif
-	}
+			mat.build_from_fill_mat(fill);
 
-}
-#if 0
-template <std::size_t m_N, std::size_t storage_N>
-void matrix_solver_GCR_t<m_N, storage_N>::csc_private(plib::putf8_fmt_writer &strm)
-{
-	const std::size_t iN = N();
-	for (std::size_t i = 0; i < iN - 1; i++)
-	{
-		const auto &nzbd = this->m_terms[i]->m_nzbd;
-
-		if (nzbd.size() > 0)
-		{
-			std::size_t pi = mat.diag[i];
-
-			//const nl_double f = 1.0 / m_A[pi++];
-			strm("const double f{1} = 1.0 / m_A[{2}];\n", i, pi);
-			pi++;
-			const std::size_t piie = mat.ia[i+1];
-
-			//for (auto & j : nzbd)
-			for (std::size_t j : nzbd)
+			for (mat_index_type k=0; k<iN; k++)
 			{
-				// proceed to column i
-				std::size_t pj = mat.ia[j];
-
-				while (mat.ja[pj] < i)
-					pj++;
-
-				//const nl_double f1 = - m_A[pj++] * f;
-				strm("\tconst double f{1}_{2} = -f{3} * m_A[{4}];\n", i, j, i, pj);
-				pj++;
-
-				// subtract row i from j */
-				for (std::size_t pii = pi; pii<piie; )
+				std::size_t cnt(0);
+				// build pointers into the compressed row format matrix for each terminal
+				for (std::size_t j=0; j< this->m_terms[k].railstart();j++)
 				{
-					while (mat.ja[pj] < mat.ja[pii])
-						pj++;
-					//m_A[pj++] += m_A[pii++] * f1;
-					strm("\tm_A[{1}] += m_A[{2}] * f{3}_{4};\n", pj, pii, i, j);
-					pj++; pii++;
+					int other = this->m_terms[k].m_connected_net_idx[j];
+					for (auto i = mat.row_idx[k]; i <  mat.row_idx[k+1]; i++)
+						if (other == static_cast<int>(mat.col_idx[i]))
+						{
+							this->m_mat_ptr[k][j] = &mat.A[i];
+							cnt++;
+							break;
+						}
 				}
-				//RHS[j] += f1 * RHS[i];
-				strm("\tRHS[{1}] += f{2}_{3} * RHS[{4}];\n", j, i, j, i);
+				nl_assert(cnt == this->m_terms[k].railstart());
+				this->m_mat_ptr[k][this->m_terms[k].railstart()] = &mat.A[mat.diag[k]];
+			}
+
+			anetlist.log().verbose("maximum fill: {1}", gr.first);
+			anetlist.log().verbose("Post elimination occupancy ratio: {2} Ops: {1}", gr.second,
+					static_cast<nl_fptype>(mat.nz_num) / static_cast<nl_fptype>(iN * iN));
+			anetlist.log().verbose(" Pre elimination occupancy ratio: {2}",
+					static_cast<nl_fptype>(raw_elements) / static_cast<nl_fptype>(iN * iN));
+
+			// FIXME: Move me
+			//
+
+			// During extended validation there is no reason to check for
+			// differences in the generated code since during
+			// extended validation this will be different (and non-functional)
+			if (!anetlist.is_extended_validation() && anetlist.lib().isLoaded())
+			{
+				pstring symname = static_compile_name();
+				m_proc.load(anetlist.lib(), symname);
+				if (m_proc.resolved())
+				{
+					anetlist.log().info("External static solver {1} found ...", symname);
+				}
+				else
+				{
+					anetlist.log().warning("External static solver {1} not found ...", symname);
+				}
 			}
 		}
-	}
 
-	//new_V[iN - 1] = RHS[iN - 1] / mat.A[mat.diag[iN - 1]];
-	strm("\tV[{1}] = RHS[{2}] / m_A[{3}];\n", iN - 1, iN - 1, mat.diag[iN - 1]);
-	for (std::size_t j = iN - 1; j-- > 0;)
+		unsigned vsolve_non_dynamic(const bool newton_raphson) override;
+
+		std::pair<pstring, pstring> create_solver_code() override;
+
+	private:
+
+		using mat_index_type = typename plib::pmatrix_cr_t<FT, SIZE>::index_type;
+
+		void generate_code(plib::putf8_fmt_writer &strm);
+
+		pstring static_compile_name();
+
+		mat_type mat;
+
+		plib::dynproc<void, FT * , FT * , FT * > m_proc;
+
+	};
+
+	// ----------------------------------------------------------------------------------------
+	// matrix_solver - GCR
+	// ----------------------------------------------------------------------------------------
+
+	template <typename FT, int SIZE>
+	void matrix_solver_GCR_t<FT, SIZE>::generate_code(plib::putf8_fmt_writer &strm)
 	{
-		strm("\tdouble tmp{1} = 0.0;\n", j);
-		const std::size_t e = mat.ia[j+1];
-		for (std::size_t pk = mat.diag[j] + 1; pk < e; pk++)
-		{
-			strm("\ttmp{1} += m_A[{2}] * V[{3}];\n", j, pk, mat.ja[pk]);
-		}
-		strm("\tV[{1}] = (RHS[{1}] - tmp{1}) / m_A[{4}];\n", j, j, j, mat.diag[j]);
-	}
-}
-#else
-template <std::size_t m_N, std::size_t storage_N>
-void matrix_solver_GCR_t<m_N, storage_N>::csc_private(plib::putf8_fmt_writer &strm)
-{
-	const std::size_t iN = N();
+		const std::size_t iN = this->size();
+		pstring fptype(fp_constants<FT>::name());
+		pstring fpsuffix(fp_constants<FT>::suffix());
 
-	for (std::size_t i = 0; i < mat.nz_num; i++)
-		strm("double m_A{1} = m_A[{2}];\n", i, i);
+		for (std::size_t i = 0; i < mat.nz_num; i++)
+			strm("{1} m_A{2} = m_A[{3}];\n", fptype, i, i);
 
-	for (std::size_t i = 0; i < iN - 1; i++)
-	{
-		const auto &nzbd = this->m_terms[i]->m_nzbd;
-
-		if (nzbd.size() > 0)
-		{
-			std::size_t pi = mat.diag[i];
-
-			//const nl_double f = 1.0 / m_A[pi++];
-			strm("const double f{1} = 1.0 / m_A{2};\n", i, pi);
-			pi++;
-			const std::size_t piie = mat.ia[i+1];
-
-			//for (auto & j : nzbd)
-			for (std::size_t j : nzbd)
-			{
-				// proceed to column i
-				std::size_t pj = mat.ia[j];
-
-				while (mat.ja[pj] < i)
-					pj++;
-
-				//const nl_double f1 = - m_A[pj++] * f;
-				strm("\tconst double f{1}_{2} = -f{3} * m_A{4};\n", i, j, i, pj);
-				pj++;
-
-				// subtract row i from j */
-				for (std::size_t pii = pi; pii<piie; )
-				{
-					while (mat.ja[pj] < mat.ja[pii])
-						pj++;
-					//m_A[pj++] += m_A[pii++] * f1;
-					strm("\tm_A{1} += m_A{2} * f{3}_{4};\n", pj, pii, i, j);
-					pj++; pii++;
-				}
-				//RHS[j] += f1 * RHS[i];
-				strm("\tRHS[{1}] += f{2}_{3} * RHS[{4}];\n", j, i, j, i);
-			}
-		}
-	}
-
-	//new_V[iN - 1] = RHS[iN - 1] / mat.A[mat.diag[iN - 1]];
-	strm("\tV[{1}] = RHS[{2}] / m_A{3};\n", iN - 1, iN - 1, mat.diag[iN - 1]);
-	for (std::size_t j = iN - 1; j-- > 0;)
-	{
-		strm("\tdouble tmp{1} = 0.0;\n", j);
-		const std::size_t e = mat.ia[j+1];
-		for (std::size_t pk = mat.diag[j] + 1; pk < e; pk++)
-		{
-			strm("\ttmp{1} += m_A{2} * V[{3}];\n", j, pk, mat.ja[pk]);
-		}
-		strm("\tV[{1}] = (RHS[{1}] - tmp{1}) / m_A{4};\n", j, j, j, mat.diag[j]);
-	}
-}
-#endif
-
-template <std::size_t m_N, std::size_t storage_N>
-pstring matrix_solver_GCR_t<m_N, storage_N>::static_compile_name()
-{
-	plib::postringstream t;
-	plib::putf8_fmt_writer w(t);
-	csc_private(w);
-	std::hash<pstring> h;
-
-	return plib::pfmt("nl_gcr_{1:x}_{2}")(h( t.str() ))(mat.nz_num);
-}
-
-template <std::size_t m_N, std::size_t storage_N>
-std::pair<pstring, pstring> matrix_solver_GCR_t<m_N, storage_N>::create_solver_code()
-{
-	plib::postringstream t;
-	plib::putf8_fmt_writer strm(t);
-	pstring name = static_compile_name();
-
-	strm.writeline(plib::pfmt("extern \"C\" void {1}(double * __restrict m_A, double * __restrict RHS, double * __restrict V)\n")(name));
-	strm.writeline("{\n");
-	csc_private(strm);
-	strm.writeline("}\n");
-	return std::pair<pstring, pstring>(name, t.str());
-}
-
-
-template <std::size_t m_N, std::size_t storage_N>
-unsigned matrix_solver_GCR_t<m_N, storage_N>::vsolve_non_dynamic(const bool newton_raphson)
-{
-	const std::size_t iN = this->N();
-
-	nl_double RHS[storage_N];
-	nl_double new_V[storage_N];
-
-	mat.set_scalar(0.0);
-
-	for (std::size_t k = 0; k < iN; k++)
-	{
-		terms_for_net_t *t = this->m_terms[k].get();
-		nl_double gtot_t = 0.0;
-		nl_double RHS_t = 0.0;
-
-		const std::size_t term_count = t->count();
-		const std::size_t railstart = t->m_railstart;
-		const nl_double * const RESTRICT gt = t->gt();
-		const nl_double * const RESTRICT go = t->go();
-		const nl_double * const RESTRICT Idr = t->Idr();
-		const nl_double * const * RESTRICT other_cur_analog = t->connected_net_V();
-		const unsigned * const RESTRICT tcr = m_term_cr[k].data();
-
-#if 0
-		for (std::size_t i = 0; i < term_count; i++)
-		{
-			gtot_t += gt[i];
-			RHS_t += Idr[i];
-		}
-
-		for (std::size_t i = railstart; i < term_count; i++)
-			RHS_t += go[i] * *other_cur_analog[i];
-
-		RHS[k] = RHS_t;
-
-		// add diagonal element
-		mat.A[mat.diag[k]] = gtot_t;
-
-		for (std::size_t i = 0; i < railstart; i++)
-			mat.A[tcr[i]] -= go[i];
-	}
-#else
-		for (std::size_t i = 0; i < railstart; i++)
-			mat.A[tcr[i]] -= go[i];
-
-		for (std::size_t i = 0; i < railstart; i++)
-		{
-			gtot_t        += gt[i];
-			RHS_t         += Idr[i];
-		}
-
-		for (std::size_t i = railstart; i < term_count; i++)
-		{
-			RHS_t += (Idr[i] + go[i] * *other_cur_analog[i]);
-			gtot_t += gt[i];
-		}
-
-		RHS[k] = RHS_t;
-		mat.A[mat.diag[k]] += gtot_t;
-	}
-#endif
-	mat.ia[iN] = static_cast<mattype>(mat.nz_num);
-
-	/* now solve it */
-
-	//if (m_proc != nullptr)
-	if (m_proc.resolved())
-	{
-		//static_solver(m_A, RHS);
-		m_proc(&mat.A[0], &RHS[0], &new_V[0]);
-	}
-	else
-	{
 		for (std::size_t i = 0; i < iN - 1; i++)
 		{
-			const auto &nzbd = this->m_terms[i]->m_nzbd;
+			const auto &nzbd = this->m_terms[i].m_nzbd;
 
 			if (nzbd.size() > 0)
 			{
 				std::size_t pi = mat.diag[i];
-				const nl_double f = 1.0 / mat.A[pi++];
-				const std::size_t piie = mat.ia[i+1];
 
-				for (std::size_t j : nzbd) // for (std::size_t j = i + 1; j < iN; j++)
+				//const FT f = 1.0 / m_A[pi++];
+				strm("const {1} f{2} = 1.0{3} / m_A{4};\n", fptype, i, fpsuffix, pi);
+				pi++;
+				const std::size_t piie = mat.row_idx[i+1];
+
+				//for (auto & j : nzbd)
+				for (std::size_t j : nzbd)
 				{
 					// proceed to column i
-					//__builtin_prefetch(&m_A[mat.diag[j+1]], 1);
-					std::size_t pj = mat.ia[j];
+					std::size_t pj = mat.row_idx[j];
 
-					while (mat.ja[pj] < i)
+					while (mat.col_idx[pj] < i)
 						pj++;
 
-					const nl_double f1 = - mat.A[pj++] * f;
+					//const FT f1 = - m_A[pj++] * f;
+					strm("\tconst {1} f{2}_{3} = -f{4} * m_A{5};\n", fptype, i, j, i, pj);
+					pj++;
 
-					// subtract row i from j */
+					// subtract row i from j
 					for (std::size_t pii = pi; pii<piie; )
 					{
-						while (mat.ja[pj] < mat.ja[pii])
+						while (mat.col_idx[pj] < mat.col_idx[pii])
 							pj++;
-						mat.A[pj++] += mat.A[pii++] * f1;
+						//m_A[pj++] += m_A[pii++] * f1;
+						strm("\tm_A{1} += m_A{2} * f{3}_{4};\n", pj, pii, i, j);
+						pj++; pii++;
 					}
-					RHS[j] += f1 * RHS[i];
+					//RHS[j] += f1 * RHS[i];
+					strm("\tRHS[{1}] += f{2}_{3} * RHS[{4}];\n", j, i, j, i);
 				}
 			}
 		}
-		/* backward substitution
-		 *
-		 */
 
-		/* row n-1 */
-		new_V[iN - 1] = RHS[iN - 1] / mat.A[mat.diag[iN - 1]];
-
+		//new_V[iN - 1] = RHS[iN - 1] / mat.A[mat.diag[iN - 1]];
+		strm("\tV[{1}] = RHS[{2}] / m_A{3};\n", iN - 1, iN - 1, mat.diag[iN - 1]);
 		for (std::size_t j = iN - 1; j-- > 0;)
 		{
-			//__builtin_prefetch(&new_V[j-1], 1);
-			//if (j>0)__builtin_prefetch(&m_A[mat.diag[j-1]], 0);
-			double tmp = 0;
-			auto jdiag = mat.diag[j];
-			const std::size_t e = mat.ia[j+1];
-			for (std::size_t pk = jdiag + 1; pk < e; pk++)
+			strm("\t{1} tmp{2} = 0.0{3};\n", fptype, j, fpsuffix);
+			const std::size_t e = mat.row_idx[j+1];
+			for (std::size_t pk = mat.diag[j] + 1; pk < e; pk++)
 			{
-				tmp += mat.A[pk] * new_V[mat.ja[pk]];
+				strm("\ttmp{1} += m_A{2} * V[{3}];\n", j, pk, mat.col_idx[pk]);
 			}
-			new_V[j] = (RHS[j] - tmp) / mat.A[jdiag];
+			strm("\tV[{1}] = (RHS[{1}] - tmp{1}) / m_A{4};\n", j, j, j, mat.diag[j]);
 		}
 	}
 
-	this->m_stat_calculations++;
+	template <typename FT, int SIZE>
+	pstring matrix_solver_GCR_t<FT, SIZE>::static_compile_name()
+	{
+		std::stringstream t;
+		t.imbue(std::locale::classic());
+		plib::putf8_fmt_writer w(&t);
+		generate_code(w);
+		std::hash<typename std::remove_const<std::remove_reference<decltype(t.str())>::type>::type> h;
+		return plib::pfmt("nl_gcr_{1:x}_{2}")(h( t.str() ))(mat.nz_num);
+	}
 
-	const nl_double err = (newton_raphson ? delta(new_V) : 0.0);
-	store(new_V);
-	return (err > this->m_params.m_accuracy) ? 2 : 1;
-}
+	template <typename FT, int SIZE>
+	std::pair<pstring, pstring> matrix_solver_GCR_t<FT, SIZE>::create_solver_code()
+	{
+		std::stringstream t;
+		t.imbue(std::locale::classic());
+		plib::putf8_fmt_writer strm(&t);
+		pstring name = static_compile_name();
+		pstring fptype(fp_constants<FT>::name());
 
-	} //namespace devices
+		strm.writeline(plib::pfmt("extern \"C\" void {1}({2} * __restrict m_A, {2} * __restrict RHS, {2} * __restrict V)\n")(name, fptype));
+		strm.writeline("{\n");
+		generate_code(strm);
+		strm.writeline("}\n");
+		// some compilers (_WIN32, _WIN64, mac osx) need an explicit cast
+		return std::pair<pstring, pstring>(name, pstring(t.str()));
+	}
+
+	template <typename FT, int SIZE>
+	unsigned matrix_solver_GCR_t<FT, SIZE>::vsolve_non_dynamic(const bool newton_raphson)
+	{
+		// populate matrix
+		mat.set_scalar(plib::constants<FT>::zero());
+		this->fill_matrix_and_rhs();
+
+		// now solve it
+
+		if (m_proc.resolved())
+		{
+			m_proc(&mat.A[0], &this->m_RHS[0], &this->m_new_V[0]);
+		}
+		else
+		{
+			// parallel is slow -- very slow
+			// mat.gaussian_elimination_parallel(RHS);
+			mat.gaussian_elimination(this->m_RHS);
+			// backward substitution
+			mat.gaussian_back_substitution(this->m_new_V, this->m_RHS);
+		}
+
+		this->m_stat_calculations++;
+
+		bool err(false);
+		if (newton_raphson)
+			err = this->check_err();
+		this->store();
+		return (err) ? 2 : 1;
+	}
+
+} // namespace solver
 } // namespace netlist
 
-#endif /* NLD_MS_GCR_H_ */
+#endif // NLD_MS_GCR_H_

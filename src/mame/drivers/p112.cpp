@@ -35,6 +35,7 @@ Some of the parts:
 
 #include "emu.h"
 #include "cpu/z180/z180.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -42,14 +43,17 @@ class p112_state : public driver_device
 {
 public:
 	p112_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+	{ }
 
+	void p112(machine_config &config);
+
+private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_p112(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
-	void p112(machine_config &config);
 	void p112_io(address_map &map);
 	void p112_mem(address_map &map);
 };
@@ -86,49 +90,48 @@ uint32_t p112_state::screen_update_p112(screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-MACHINE_CONFIG_START(p112_state::p112)
+void p112_state::p112(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z180, XTAL(16'000'000))
-	MCFG_CPU_PROGRAM_MAP(p112_mem)
-	MCFG_CPU_IO_MAP(p112_io)
-
+	Z80182(config, m_maincpu, XTAL(16'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &p112_state::p112_mem);
+	m_maincpu->set_addrmap(AS_IO, &p112_state::p112_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(240, 320)
-	MCFG_SCREEN_VISIBLE_AREA(0, 240-1, 0, 320-1)
-	MCFG_SCREEN_UPDATE_DRIVER(p112_state, screen_update_p112)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(240, 320);
+	screen.set_visarea(0, 240-1, 0, 320-1);
+	screen.set_screen_update(FUNC(p112_state::screen_update_p112));
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
-
-MACHINE_CONFIG_END
+	PALETTE(config, "palette", palette_device::MONOCHROME);
+}
 
 /* ROM definition */
 ROM_START( p112 )
 	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "960513", "ver 13-05-1996" )
-	ROMX_LOAD( "960513.bin",  0x00000, 0x8000, CRC(077c1c40) SHA1(c1e6b4b0de50bba90f0d4667f9344815bb578b9b), ROM_BIOS(1))
+	ROMX_LOAD( "960513.bin",  0x00000, 0x8000, CRC(077c1c40) SHA1(c1e6b4b0de50bba90f0d4667f9344815bb578b9b), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "970308", "ver 08-03-1997" )
-	ROMX_LOAD( "970308.bin",  0x00000, 0x8000, CRC(15e61f0d) SHA1(66ba1af7da0450b69650086ab20230390ba23e17), ROM_BIOS(2))
+	ROMX_LOAD( "970308.bin",  0x00000, 0x8000, CRC(15e61f0d) SHA1(66ba1af7da0450b69650086ab20230390ba23e17), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 2, "4b1", "ver 4b1" )
-	ROMX_LOAD( "romv4b1.bin", 0x00000, 0x8000, CRC(15d79beb) SHA1(f971f75a717e3f6d59b257eb3af369d4d2e0f301), ROM_BIOS(3))
+	ROMX_LOAD( "romv4b1.bin", 0x00000, 0x8000, CRC(15d79beb) SHA1(f971f75a717e3f6d59b257eb3af369d4d2e0f301), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS( 3, "4b2", "ver 4b2" )
-	ROMX_LOAD( "romv4b2.bin", 0x00000, 0x8000, CRC(9b9a8a5e) SHA1(c40151ee654008b9f803d6a05d692a5a3619a726), ROM_BIOS(4))
+	ROMX_LOAD( "romv4b2.bin", 0x00000, 0x8000, CRC(9b9a8a5e) SHA1(c40151ee654008b9f803d6a05d692a5a3619a726), ROM_BIOS(3))
 	ROM_SYSTEM_BIOS( 4, "4b3", "ver 4b3" )
-	ROMX_LOAD( "romv4b3.bin", 0x00000, 0x8000, CRC(734031ea) SHA1(2e5e5ac6bd17d15cab24a36bc3da42ca49cbde92), ROM_BIOS(5))
+	ROMX_LOAD( "romv4b3.bin", 0x00000, 0x8000, CRC(734031ea) SHA1(2e5e5ac6bd17d15cab24a36bc3da42ca49cbde92), ROM_BIOS(4))
 	ROM_SYSTEM_BIOS( 5, "4b4", "ver 4b4" )
-	ROMX_LOAD( "romv4b4.bin", 0x00000, 0x8000, CRC(cd419c40) SHA1(6002130d874387c9ec23b4363fe9f0ca78208878), ROM_BIOS(6))
+	ROMX_LOAD( "romv4b4.bin", 0x00000, 0x8000, CRC(cd419c40) SHA1(6002130d874387c9ec23b4363fe9f0ca78208878), ROM_BIOS(5))
 	ROM_SYSTEM_BIOS( 6, "5", "ver 5" )
-	ROMX_LOAD( "051103.bin",  0x00000, 0x8000, CRC(6c47ec13) SHA1(24f5bf1524425186fe10e1d29d05f6efbd3366d9), ROM_BIOS(7))
+	ROMX_LOAD( "051103.bin",  0x00000, 0x8000, CRC(6c47ec13) SHA1(24f5bf1524425186fe10e1d29d05f6efbd3366d9), ROM_BIOS(6))
 	ROM_SYSTEM_BIOS( 7, "5b1", "ver 5b1" )
-	ROMX_LOAD( "romv5b1.bin", 0x00000, 0x8000, CRC(047296f7) SHA1(380f8e4237525636c605b7e37d989ace8437beb4), ROM_BIOS(8))
+	ROMX_LOAD( "romv5b1.bin", 0x00000, 0x8000, CRC(047296f7) SHA1(380f8e4237525636c605b7e37d989ace8437beb4), ROM_BIOS(7))
 ROM_END
 
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE        INIT  COMPANY        FULLNAME  FLAGS */
-COMP( 1996, p112,   0,      0,       p112,      p112,  p112_state,  0,    "Dave Brooks", "P112",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY        FULLNAME  FLAGS */
+COMP( 1996, p112, 0,      0,      p112,    p112,  p112_state, empty_init, "Dave Brooks", "P112",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

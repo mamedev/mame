@@ -17,8 +17,8 @@ void gstriker_state::video_start()
 
 	m_buffered_spriteram = std::make_unique<uint16_t[]>(0x2000);
 	m_buffered_spriteram2 = std::make_unique<uint16_t[]>(0x2000);
-	save_pointer(NAME(m_buffered_spriteram.get()), 0x2000);
-	save_pointer(NAME(m_buffered_spriteram2.get()), 0x2000);
+	save_pointer(NAME(m_buffered_spriteram), 0x2000);
+	save_pointer(NAME(m_buffered_spriteram2), 0x2000);
 }
 
 WRITE_LINE_MEMBER(gstriker_state::screen_vblank)

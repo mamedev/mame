@@ -145,7 +145,7 @@ static const discrete_mixer_desc starshp1_final_mix =
 };
 
 
-DISCRETE_SOUND_START( starshp1 )
+DISCRETE_SOUND_START( starshp1_discrete )
 	/************************************************
 	 * Input register mapping
 	 ************************************************/

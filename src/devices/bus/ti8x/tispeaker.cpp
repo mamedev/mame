@@ -26,15 +26,15 @@ stereo_speaker_device::stereo_speaker_device(
 }
 
 
-MACHINE_CONFIG_START(stereo_speaker_device::device_add_mconfig)
-	MCFG_SPEAKER_STANDARD_STEREO("outl", "outr")
+void stereo_speaker_device::device_add_mconfig(machine_config &config)
+{
+	SPEAKER(config, "outl").front_left();
+	SPEAKER(config, "outr").front_right();
 
-	MCFG_SOUND_ADD("lspkr", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "outl", 0.50)
+	SPEAKER_SOUND(config, m_left_speaker, 0).add_route(ALL_OUTPUTS, "outl", 0.50);
 
-	MCFG_SOUND_ADD("rspkr", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "outr", 0.50)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_right_speaker, 0).add_route(ALL_OUTPUTS, "outr", 0.50);
+}
 
 
 void stereo_speaker_device::device_start()
@@ -69,12 +69,12 @@ mono_speaker_device::mono_speaker_device(
 }
 
 
-MACHINE_CONFIG_START(mono_speaker_device::device_add_mconfig)
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+void mono_speaker_device::device_add_mconfig(machine_config &config)
+{
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("spkr", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker, 0).add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
 void mono_speaker_device::device_start()

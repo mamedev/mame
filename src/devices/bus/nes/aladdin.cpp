@@ -39,7 +39,7 @@
 //-------------------------------------------------
 
 aladdin_cart_interface::aladdin_cart_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device)
+	: device_interface(device, "aladdincart")
 	, m_rom(nullptr)
 	, m_rom_size(0)
 	, m_lobank(0)
@@ -52,7 +52,7 @@ aladdin_cart_interface::~aladdin_cart_interface()
 {
 }
 
-READ8_MEMBER(aladdin_cart_interface::read)
+uint8_t aladdin_cart_interface::read(offs_t offset)
 {
 	if (offset < 0x4000)
 		return m_rom[(m_lobank * 0x4000) + (offset & 0x3fff)];
@@ -69,7 +69,7 @@ DEFINE_DEVICE_TYPE(NES_ALADDIN_SLOT, nes_aladdin_slot_device, "nes_ade_slot", "N
 nes_aladdin_slot_device::nes_aladdin_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, NES_ALADDIN_SLOT, tag, owner, clock)
 	, device_image_interface(mconfig, *this)
-	, device_slot_interface(mconfig, *this)
+	, device_single_card_slot_interface<aladdin_cart_interface>(mconfig, *this)
 	, m_cart(nullptr)
 {
 }
@@ -81,13 +81,13 @@ nes_aladdin_slot_device::~nes_aladdin_slot_device()
 
 void nes_aladdin_slot_device::device_start()
 {
-	m_cart = dynamic_cast<aladdin_cart_interface *>(get_card_device());
+	m_cart = get_card_device();
 }
 
-READ8_MEMBER(nes_aladdin_slot_device::read)
+uint8_t nes_aladdin_slot_device::read(offs_t offset)
 {
 	if (m_cart)
-		return m_cart->read(space, offset, mem_mask);
+		return m_cart->read(offset);
 
 	return 0xff;
 }
@@ -296,19 +296,19 @@ void nes_aladdin_device::pcb_reset()
 
  -------------------------------------------------*/
 
-READ8_MEMBER(nes_aladdin_device::read_h)
+uint8_t nes_aladdin_device::read_h(offs_t offset)
 {
 	LOG_MMC(("aladdin read_h, offset: %04x\n", offset));
 	// this shall be the proper code, but it's a bit slower, so we access directly the subcart below
-	//return m_subslot->read(space, offset, mem_mask);
+	//return m_subslot->read(offset);
 
 	if (m_subslot->m_cart)
-		return m_subslot->m_cart->read(space, offset, mem_mask);
+		return m_subslot->m_cart->read(offset);
 	else    // this is "fake" in the sense that we fill CPU space with 0xff if no Aladdin cart is loaded
 		return hi_access_rom(offset);
 }
 
-WRITE8_MEMBER(nes_aladdin_device::write_h)
+void nes_aladdin_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("aladdin write_h, offset: %04x, data: %02x\n", offset, data));
 	m_subslot->write_prg(offset, data);
@@ -318,12 +318,14 @@ WRITE8_MEMBER(nes_aladdin_device::write_h)
 //  CART SLOT
 //-------------------------------------------------
 
-static SLOT_INTERFACE_START(ade_cart)
-	SLOT_INTERFACE_INTERNAL("algn", NES_ALGN_ROM)
-	SLOT_INTERFACE_INTERNAL("algq", NES_ALGQ_ROM)
-SLOT_INTERFACE_END
+static void ade_cart(device_slot_interface &device)
+{
+	device.option_add_internal("algn", NES_ALGN_ROM);
+	device.option_add_internal("algq", NES_ALGQ_ROM);
+}
 
 
-MACHINE_CONFIG_START(nes_aladdin_device::device_add_mconfig)
-	MCFG_ALADDIN_MINICART_ADD("ade_slot", ade_cart)
-MACHINE_CONFIG_END
+void nes_aladdin_device::device_add_mconfig(machine_config &config)
+{
+	NES_ALADDIN_SLOT(config, m_subslot, ade_cart);
+}

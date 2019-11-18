@@ -26,34 +26,32 @@ public:
 
 	struct road_info
 	{
-		uint8_t           index;                          /* index of this structure */
-		uint8_t           type;                           /* type of road system (see segaic16.h for details) */
-		uint8_t           control;                        /* control register value */
-		uint16_t          colorbase1;                     /* color base for road ROM data */
-		uint16_t          colorbase2;                     /* color base for road background data */
-		uint16_t          colorbase3;                     /* color base for sky data */
-		int32_t           xoffs;                          /* X scroll offset */
-		void            (*draw)(struct road_info *info, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
-		uint16_t *        roadram;                        /* pointer to roadram pointer */
-		std::unique_ptr<uint16_t[]>        buffer;                         /* buffered roadram pointer */
-		std::unique_ptr<uint8_t[]>          gfx;                            /* expanded road graphics */
+		u8           index;                          /* index of this structure */
+		u8           type;                           /* type of road system (see segaic16.h for details) */
+		u8           control;                        /* control register value */
+		u16          colorbase1;                     /* color base for road ROM data */
+		u16          colorbase2;                     /* color base for road background data */
+		u16          colorbase3;                     /* color base for sky data */
+		s32          xoffs;                          /* X scroll offset */
+		void         (*draw)(struct road_info *info, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
+		u16 *        roadram;                        /* pointer to roadram pointer */
+		std::unique_ptr<u16[]> buffer;               /* buffered roadram pointer */
+		std::unique_ptr<u8[]>  gfx;                  /* expanded road graphics */
 	};
 
 
+	segaic16_road_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	segaic16_road_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	uint16_t *segaic16_roadram_0;
-	void segaic16_road_hangon_decode(running_machine &machine, struct road_info *info);
-	void segaic16_road_outrun_decode(running_machine &machine, struct road_info *info);
+	void segaic16_road_hangon_decode(struct road_info *info);
+	void segaic16_road_outrun_decode(struct road_info *info);
 
 	struct road_info segaic16_road[MAX_ROADS];
-	void segaic16_road_init(running_machine &machine, int which, int type, int colorbase1, int colorbase2, int colorbase3, int xoffs);
+	void segaic16_road_init(int which, int type, int colorbase1, int colorbase2, int colorbase3, int xoffs);
 
 	void segaic16_road_draw(int which, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
 
-	DECLARE_READ16_MEMBER( segaic16_road_control_0_r );
-	DECLARE_WRITE16_MEMBER( segaic16_road_control_0_w );
+	u16 segaic16_road_control_0_r();
+	void segaic16_road_control_0_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 
 protected:
@@ -63,11 +61,10 @@ protected:
 
 private:
 	// internal state
+	required_region_ptr<u8> m_gfx_region;
+	required_shared_ptr<u16> m_roadram;
 };
 
 DECLARE_DEVICE_TYPE(SEGAIC16_ROAD, segaic16_road_device)
-
-#define MCFG_SEGAIC16_ROAD_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, SEGAIC16_ROAD, 0)
 
 #endif // MAME_VIDEO_SEGAIC16_ROAD_H

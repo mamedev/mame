@@ -46,7 +46,7 @@ void portfolio_rom_card_device::device_start()
 //  nrdi_r - read
 //-------------------------------------------------
 
-uint8_t portfolio_rom_card_device::nrdi_r(address_space &space, offs_t offset)
+uint8_t portfolio_rom_card_device::nrdi_r(offs_t offset)
 {
 	return m_rom[offset];
 }

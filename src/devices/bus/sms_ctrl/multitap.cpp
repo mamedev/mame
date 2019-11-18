@@ -123,21 +123,19 @@ void sms_multitap_device::peripheral_w(uint8_t data)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-READ32_MEMBER( sms_multitap_device::pixel_r )
+void sms_multitap_device::device_add_mconfig(machine_config &config)
 {
-	return m_port->pixel_r();
-}
-
-
-MACHINE_CONFIG_START(sms_multitap_device::device_add_mconfig)
 	// Controller subports setup, without the TH callback declaration,
 	// because the circuit scheme shows TH of subports without connection.
-	MCFG_SMS_CONTROL_PORT_ADD("ctrl1", sms_control_port_devices, "joypad")
-	MCFG_SMS_CONTROL_PORT_PIXEL_HANDLER(READ32(sms_multitap_device, pixel_r))
-	MCFG_SMS_CONTROL_PORT_ADD("ctrl2", sms_control_port_devices, "joypad")
-	MCFG_SMS_CONTROL_PORT_PIXEL_HANDLER(READ32(sms_multitap_device, pixel_r))
-	MCFG_SMS_CONTROL_PORT_ADD("ctrl3", sms_control_port_devices, "joypad")
-	MCFG_SMS_CONTROL_PORT_PIXEL_HANDLER(READ32(sms_multitap_device, pixel_r))
-	MCFG_SMS_CONTROL_PORT_ADD("ctrl4", sms_control_port_devices, "joypad")
-	MCFG_SMS_CONTROL_PORT_PIXEL_HANDLER(READ32(sms_multitap_device, pixel_r))
-MACHINE_CONFIG_END
+	SMS_CONTROL_PORT(config, m_subctrl1_port, sms_control_port_devices, "joypad");
+	SMS_CONTROL_PORT(config, m_subctrl2_port, sms_control_port_devices, "joypad");
+	SMS_CONTROL_PORT(config, m_subctrl3_port, sms_control_port_devices, "joypad");
+	SMS_CONTROL_PORT(config, m_subctrl4_port, sms_control_port_devices, "joypad");
+	if (m_port != nullptr)
+	{
+		m_subctrl1_port->set_screen_tag(m_port->m_screen);
+		m_subctrl2_port->set_screen_tag(m_port->m_screen);
+		m_subctrl3_port->set_screen_tag(m_port->m_screen);
+		m_subctrl4_port->set_screen_tag(m_port->m_screen);
+	}
+}

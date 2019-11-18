@@ -26,11 +26,13 @@ Splendor Blast            1985   8303 (post)
 Gekisou                   1985   8304 (post)
 The Koukou Yakyuu         1985   8304 (post)
 High Voltage              1985   8304?(post says 8404, but readme says 8304)
+unknown CLS bingo game    1986   8505
 
 ALPHA-8201: "44801A75" -> HD44801, ROM code = A75
 ALPHA-8302: "44801B35" -> HD44801, ROM code = B35
 ALPHA-8303: "44801B42" -> HD44801, ROM code = B42
 ALPHA-8304: ?
+ALPHA-8505: "44801C57" -> HD44801, ROM code = C57
 
 
 package / pin assign
@@ -272,7 +274,6 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/hmcs40/hmcs40.h"
 #include "alpha8201.h"
 
 /**************************************************************************/
@@ -305,7 +306,7 @@ void alpha_8201_device::device_start()
 	memset(m_mcu_r, 0, sizeof(m_mcu_r));
 
 	// register for savestates
-	save_pointer(NAME(m_shared_ram.get()), 0x400);
+	save_pointer(NAME(m_shared_ram), 0x400);
 	save_item(NAME(m_bus));
 	save_item(NAME(m_mcu_address));
 	save_item(NAME(m_mcu_d));
@@ -316,17 +317,17 @@ void alpha_8201_device::device_start()
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(alpha_8201_device::device_add_mconfig)
-
-	MCFG_CPU_ADD("mcu", HD44801, DERIVED_CLOCK(1,1)) // 8H
-	MCFG_HMCS40_READ_R_CB(0, READ8(alpha_8201_device, mcu_data_r))
-	MCFG_HMCS40_READ_R_CB(1, READ8(alpha_8201_device, mcu_data_r))
-	MCFG_HMCS40_WRITE_R_CB(0, WRITE8(alpha_8201_device, mcu_data_w))
-	MCFG_HMCS40_WRITE_R_CB(1, WRITE8(alpha_8201_device, mcu_data_w))
-	MCFG_HMCS40_WRITE_R_CB(2, WRITE8(alpha_8201_device, mcu_data_w))
-	MCFG_HMCS40_WRITE_R_CB(3, WRITE8(alpha_8201_device, mcu_data_w))
-	MCFG_HMCS40_WRITE_D_CB(WRITE16(alpha_8201_device, mcu_d_w))
-MACHINE_CONFIG_END
+void alpha_8201_device::device_add_mconfig(machine_config &config)
+{
+	HD44801(config, m_mcu, DERIVED_CLOCK(1,1)); // 8H
+	m_mcu->read_r<0>().set(FUNC(alpha_8201_device::mcu_data_r));
+	m_mcu->read_r<1>().set(FUNC(alpha_8201_device::mcu_data_r));
+	m_mcu->write_r<0>().set(FUNC(alpha_8201_device::mcu_data_w));
+	m_mcu->write_r<1>().set(FUNC(alpha_8201_device::mcu_data_w));
+	m_mcu->write_r<2>().set(FUNC(alpha_8201_device::mcu_data_w));
+	m_mcu->write_r<3>().set(FUNC(alpha_8201_device::mcu_data_w));
+	m_mcu->write_d().set(FUNC(alpha_8201_device::mcu_d_w));
+}
 
 //-------------------------------------------------
 //  device_reset - device-specific reset
@@ -369,7 +370,7 @@ READ8_MEMBER(alpha_8201_device::mcu_data_r)
 	else
 		logerror("%s: MCU side invalid read\n", tag());
 
-	if (offset == hmcs40_cpu_device::PORT_R0X)
+	if (offset == 0)
 		ret >>= 4;
 	return ret & 0xf;
 }

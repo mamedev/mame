@@ -56,21 +56,21 @@ void clowndwn_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(clowndwn_state::clowndwn)
-
+void clowndwn_state::clowndwn(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6802, 8000000) // unknown type and clock
-	MCFG_CPU_PROGRAM_MAP(clowndwn_map)
+	M6802(config, m_maincpu, 8000000); // unknown type and clock
+	m_maincpu->set_addrmap(AS_PROGRAM, &clowndwn_state::clowndwn_map);
 
-	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_DEVICE_ADD("pia2", PIA6821, 0)
-	MCFG_DEVICE_ADD("pia3", PIA6821, 0)
-	MCFG_DEVICE_ADD("pia4", PIA6821, 0)
+	PIA6821(config, "pia0", 0);
+	PIA6821(config, "pia1", 0);
+	PIA6821(config, "pia2", 0);
+	PIA6821(config, "pia3", 0);
+	PIA6821(config, "pia4", 0);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-MACHINE_CONFIG_END
+	SPEAKER(config, "mono").front_center();
+}
 
 
 // has
@@ -83,4 +83,4 @@ ROM_START( clowndwn )
 	ROM_LOAD( "clwnroll.z9", 0x1000, 0x1000, CRC(aeef885e) SHA1(bc6805b638625a347e1288a927ce30e030afe9e3) )
 ROM_END
 
-GAME( 1987, clowndwn,  0,    clowndwn, clowndwn, clowndwn_state,  0, ROT0, "Elwood Electronics", "Clown Roll Down (Elwood)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1987, clowndwn, 0, clowndwn, clowndwn, clowndwn_state, empty_init, ROT0, "Elwood Electronics", "Clown Roll Down (Elwood)", MACHINE_IS_SKELETON_MECHANICAL )

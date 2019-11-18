@@ -65,7 +65,7 @@
 
 // ======================> device_z88cart_interface
 
-class device_z88cart_interface : public device_slot_card_interface
+class device_z88cart_interface : public device_interface
 {
 public:
 	// construction/destruction
@@ -86,28 +86,35 @@ protected:
 
 class z88cart_slot_device : public device_t,
 							public device_image_interface,
-							public device_slot_interface
+							public device_single_card_slot_interface<device_z88cart_interface>
 {
 public:
 	// construction/destruction
-	z88cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual ~z88cart_slot_device();
+	template <typename T>
+	z88cart_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
+		: z88cart_slot_device(mconfig, tag, owner, 0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
+	z88cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	template <class Object> devcb_base &set_out_flp_callback(Object &&cb) { return m_out_flp_cb.set_callback(std::forward<Object>(cb)); }
+	auto out_flp_callback() { return m_out_flp_cb.bind(); }
 
 	// image-level overrides
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
-	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
-	virtual iodevice_t image_type() const override { return IO_CARTSLOT; }
-	virtual bool is_readable()  const override { return 1; }
-	virtual bool is_writeable() const override { return 1; }
-	virtual bool is_creatable() const override { return 1; }
-	virtual bool must_be_loaded() const override { return 0; }
-	virtual bool is_reset_on_load() const override { return 0; }
-	virtual const char *image_interface() const override { return "z88_cart"; }
-	virtual const char *file_extensions() const override { return "epr,bin"; }
+	virtual iodevice_t image_type() const noexcept override { return IO_CARTSLOT; }
+	virtual bool is_readable()  const noexcept override { return true; }
+	virtual bool is_writeable() const noexcept override { return true; }
+	virtual bool is_creatable() const noexcept override { return true; }
+	virtual bool must_be_loaded() const noexcept override { return false; }
+	virtual bool is_reset_on_load() const noexcept override { return false; }
+	virtual const char *image_interface() const noexcept override { return "z88_cart"; }
+	virtual const char *file_extensions() const noexcept override { return "epr,bin"; }
 
 	// slot interface overrides
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
@@ -122,24 +129,19 @@ protected:
 	virtual void device_start() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
+	// device_image_interface implementation
+	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
+
 private:
 	static constexpr device_timer_id TIMER_FLP_CLEAR = 0;
 
-	devcb_write_line               m_out_flp_cb;
-	device_z88cart_interface*       m_cart;
-	emu_timer *                     m_flp_timer;
+	devcb_write_line            m_out_flp_cb;
+	device_z88cart_interface*   m_cart;
+	emu_timer *                 m_flp_timer;
 };
 
 
 // device type definition
 DECLARE_DEVICE_TYPE(Z88CART_SLOT, z88cart_slot_device)
-
-
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-#define MCFG_Z88CART_SLOT_OUT_FLP_CB(_devcb) \
-	devcb = &downcast<z88cart_slot_device &>(*device).set_out_flp_callback(DEVCB_##_devcb);
 
 #endif // MAME_BUS_Z88_Z88_H

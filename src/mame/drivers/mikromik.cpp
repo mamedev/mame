@@ -54,13 +54,16 @@
 
 #include "emu.h"
 #include "includes/mikromik.h"
+#include "machine/74259.h"
 #include "softlist.h"
+
+//#define VERBOSE 1
+#include "logmacro.h"
+
 
 //**************************************************************************
 //  MACROS / CONSTANTS
 //**************************************************************************
-
-#define LOG 0
 
 #define MMU_IOEN    0x01
 #define MMU_RAMEN   0x02
@@ -87,43 +90,7 @@ READ8_MEMBER( mm1_state::read )
 
 	if (mmu & MMU_IOEN)
 	{
-		switch ((offset >> 4) & 0x07)
-		{
-		case 0:
-			data = m_dmac->read(space, offset & 0x0f);
-			break;
-
-		case 1:
-			data = m_mpsc->cd_ba_r(space, offset & 0x03);
-			break;
-
-		case 2:
-			data = m_crtc->read(space, offset & 0x01);
-			break;
-
-		case 3:
-			data = m_pit->read(space, offset & 0x03);
-			break;
-
-		case 4:
-			data = m_iop->read(space, 0);
-			break;
-
-		case 5:
-			if (BIT(offset, 0))
-			{
-				data = m_fdc->fifo_r(space, 0, 0xff);
-			}
-			else
-			{
-				data = m_fdc->msr_r(space, 0, 0xff);
-			}
-			break;
-
-		case 7:
-			data = m_hgdc->read(space, offset & 0x01);
-			break;
-		}
+		data = m_io->read8(offset & 0x7f);
 	}
 	else
 	{
@@ -156,43 +123,7 @@ WRITE8_MEMBER( mm1_state::write )
 
 	if (mmu & MMU_IOEN)
 	{
-		switch ((offset >> 4) & 0x07)
-		{
-		case 0:
-			m_dmac->write(space, offset & 0x0f, data);
-			break;
-
-		case 1:
-			m_mpsc->cd_ba_w(space, offset & 0x03, data);
-			break;
-
-		case 2:
-			m_crtc->write(space, offset & 0x01, data);
-			break;
-
-		case 3:
-			m_pit->write(space, offset & 0x03, data);
-			break;
-
-		case 4:
-			m_iop->write(space, 0, data);
-			break;
-
-		case 5:
-			if (BIT(offset, 0))
-			{
-				m_fdc->fifo_w(space, 0, data, 0xff);
-			}
-			break;
-
-		case 6:
-			ls259_w(space, offset & 0x07, data);
-			break;
-
-		case 7:
-			m_hgdc->write(space, offset & 0x01, data);
-			break;
-		}
+		m_io->write8(offset & 0x7f, data);
 	}
 	else
 	{
@@ -205,53 +136,88 @@ WRITE8_MEMBER( mm1_state::write )
 
 
 //-------------------------------------------------
-//  ls259_w -
+//  a8_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( mm1_state::ls259_w )
+WRITE_LINE_MEMBER( mm1_state::a8_w )
 {
-	int d = BIT(data, 0);
+	LOG("IC24 A8 %u\n", state);
+	m_a8 = state;
+}
 
-	switch (offset)
-	{
-	case 0: // IC24 A8
-		if (LOG) logerror("IC24 A8 %u\n", d);
-		m_a8 = d;
-		break;
 
-	case 1: // RECALL
-		if (LOG) logerror("RECALL %u\n", d);
-		m_recall = d;
-		if (d) m_fdc->soft_reset();
-		break;
+//-------------------------------------------------
+//  recall_w -
+//-------------------------------------------------
 
-	case 2: // _RV28/RX21
-		m_rx21 = d;
-		break;
+WRITE_LINE_MEMBER( mm1_state::recall_w )
+{
+	LOG("RECALL %u\n", state);
+	m_recall = state;
+	if (state) m_fdc->soft_reset();
+}
 
-	case 3: // _TX21
-		m_tx21 = d;
-		break;
 
-	case 4: // _RCL
-		m_rcl = d;
-		break;
+//-------------------------------------------------
+//  rx21_w -
+//-------------------------------------------------
 
-	case 5: // _INTC
-		m_intc = d;
-		break;
+WRITE_LINE_MEMBER( mm1_state::rx21_w )
+{
+	m_rx21 = state;
+}
 
-	case 6: // LLEN
-		if (LOG) logerror("LLEN %u\n", d);
-		m_llen = d;
-		break;
 
-	case 7: // MOTOR ON
-		if (LOG) logerror("MOTOR %u\n", d);
-		m_floppy0->mon_w(!d);
-		m_floppy1->mon_w(!d);
-		break;
-	}
+//-------------------------------------------------
+//  tx21_w -
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( mm1_state::tx21_w )
+{
+	m_tx21 = state;
+}
+
+
+//-------------------------------------------------
+//  rcl_w -
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( mm1_state::rcl_w )
+{
+	m_rcl = state;
+}
+
+
+//-------------------------------------------------
+//  intc_w -
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( mm1_state::intc_w )
+{
+	m_intc = state;
+}
+
+
+//-------------------------------------------------
+//  llen_w -
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( mm1_state::llen_w )
+{
+	LOG("LLEN %u\n", state);
+	m_llen = state;
+}
+
+
+//-------------------------------------------------
+//  motor_on_w -
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( mm1_state::motor_on_w )
+{
+	LOG("MOTOR %u\n", state);
+	m_floppy0->mon_w(!state);
+	m_floppy1->mon_w(!state);
 }
 
 
@@ -266,7 +232,19 @@ WRITE8_MEMBER( mm1_state::ls259_w )
 
 void mm1_state::mm1_map(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(mm1_state::read), FUNC(mm1_state::write));
+	map(0x0000, 0xffff).rw(FUNC(mm1_state::read), FUNC(mm1_state::write));
+}
+
+void mm1_state::mmu_io_map(address_map &map)
+{
+	map(0x00, 0x0f).rw(m_dmac, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
+	map(0x10, 0x13).mirror(0x0c).rw(m_mpsc, FUNC(upd7201_device::cd_ba_r), FUNC(upd7201_device::cd_ba_w));
+	map(0x20, 0x21).mirror(0x0e).rw(m_crtc, FUNC(i8275_device::read), FUNC(i8275_device::write));
+	map(0x30, 0x33).mirror(0x0c).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0x40, 0x40).mirror(0x0f).rw(m_iop, FUNC(i8212_device::read), FUNC(i8212_device::write));
+	map(0x50, 0x51).mirror(0x0e).m(m_fdc, FUNC(upd765a_device::map));
+	map(0x60, 0x67).mirror(0x08).w("outlatch", FUNC(ls259_device::write_d0));
+	map(0x70, 0x71).mirror(0x0e).rw(m_hgdc, FUNC(upd7220_device::read), FUNC(upd7220_device::write));
 }
 
 
@@ -407,9 +385,10 @@ FLOPPY_FORMATS_MEMBER( mm2_state::floppy_formats )
     FLOPPY_MM2_FORMAT
 FLOPPY_FORMATS_END
 */
-static SLOT_INTERFACE_START( mm1_floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void mm1_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
 
 //**************************************************************************
@@ -434,14 +413,6 @@ void mm1_state::machine_start()
 
 void mm1_state::machine_reset()
 {
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-
-	// reset LS259
-	for (int i = 0; i < 8; i++)
-	{
-		ls259_w(program, i, 0);
-	}
-
 	// reset FDC
 	m_fdc->reset();
 }
@@ -453,97 +424,113 @@ void mm1_state::machine_reset()
 //**************************************************************************
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( mm1 )
+//  machine_config( mm1 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(mm1_state::mm1)
+void mm1_state::mm1(machine_config &config)
+{
 	// basic system hardware
-	MCFG_CPU_ADD(I8085A_TAG, I8085A, 6.144_MHz_XTAL)
-	MCFG_CPU_PROGRAM_MAP(mm1_map)
-	MCFG_I8085A_SID(READLINE(mm1_state, dsra_r))
-	MCFG_I8085A_SOD(DEVWRITELINE(KB_TAG, mm1_keyboard_device, bell_w))
-	MCFG_QUANTUM_PERFECT_CPU(I8085A_TAG)
+	I8085A(config, m_maincpu, 6.144_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mm1_state::mm1_map);
+	m_maincpu->in_sid_func().set(FUNC(mm1_state::dsra_r));
+	m_maincpu->out_sod_func().set(KB_TAG, FUNC(mm1_keyboard_device::bell_w));
+
+	config.set_perfect_quantum(m_maincpu);
 
 	// peripheral hardware
-	MCFG_DEVICE_ADD(I8212_TAG, I8212, 0)
-	MCFG_I8212_INT_CALLBACK(INPUTLINE(I8085A_TAG, I8085_RST65_LINE))
-	MCFG_I8212_DI_CALLBACK(DEVREAD8(KB_TAG, mm1_keyboard_device, read))
+	ADDRESS_MAP_BANK(config, m_io);
+	m_io->set_addrmap(0, &mm1_state::mmu_io_map);
+	m_io->set_data_width(8);
+	m_io->set_addr_width(7);
 
-	MCFG_DEVICE_ADD(I8237_TAG, AM9517A, 6.144_MHz_XTAL/2)
-	MCFG_I8237_OUT_HREQ_CB(WRITELINE(mm1_state, dma_hrq_w))
-	MCFG_I8237_OUT_EOP_CB(WRITELINE(mm1_state, dma_eop_w))
-	MCFG_I8237_IN_MEMR_CB(READ8(mm1_state, read))
-	MCFG_I8237_OUT_MEMW_CB(WRITE8(mm1_state, write))
-	MCFG_I8237_IN_IOR_2_CB(READ8(mm1_state, mpsc_dack_r))
-	MCFG_I8237_IN_IOR_3_CB(DEVREAD8(UPD765_TAG, upd765_family_device, mdma_r))
-	MCFG_I8237_OUT_IOW_0_CB(DEVWRITE8(I8275_TAG, i8275_device, dack_w))
-	MCFG_I8237_OUT_IOW_1_CB(WRITE8(mm1_state, mpsc_dack_w))
-	MCFG_I8237_OUT_IOW_3_CB(DEVWRITE8(UPD765_TAG, upd765_family_device, mdma_w))
-	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(mm1_state, dack3_w))
+	I8212(config, m_iop, 0);
+	m_iop->int_wr_callback().set_inputline(m_maincpu, I8085_RST65_LINE);
+	m_iop->di_rd_callback().set(KB_TAG, FUNC(mm1_keyboard_device::read));
 
-	MCFG_DEVICE_ADD(I8253_TAG, PIT8253, 0)
-	MCFG_PIT8253_CLK0(6.144_MHz_XTAL/2/2)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(mm1_state, itxc_w))
-	MCFG_PIT8253_CLK1(6.144_MHz_XTAL/2/2)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(mm1_state, irxc_w))
-	MCFG_PIT8253_CLK2(6.144_MHz_XTAL/2/2)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(mm1_state, auxc_w))
+	ls259_device &outlatch(LS259(config, "outlatch"));
+	outlatch.q_out_cb<0>().set(FUNC(mm1_state::a8_w)); // IC24 A8
+	outlatch.q_out_cb<1>().set(FUNC(mm1_state::recall_w)); // RECALL
+	outlatch.q_out_cb<2>().set(FUNC(mm1_state::rx21_w)); // _RV28/RX21
+	outlatch.q_out_cb<3>().set(FUNC(mm1_state::tx21_w)); // _TX21
+	outlatch.q_out_cb<4>().set(FUNC(mm1_state::rcl_w)); // _RCL
+	outlatch.q_out_cb<5>().set(FUNC(mm1_state::intc_w)); // _INTC
+	outlatch.q_out_cb<6>().set(FUNC(mm1_state::llen_w)); // LLEN
+	outlatch.q_out_cb<7>().set(FUNC(mm1_state::motor_on_w)); // MOTOR ON
 
-	MCFG_UPD765A_ADD(UPD765_TAG, /* 16_MHz_XTAL/2/2 */ true, true)
-	MCFG_UPD765_INTRQ_CALLBACK(INPUTLINE(I8085A_TAG, I8085_RST55_LINE))
-	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE(I8237_TAG, am9517a_device, dreq3_w))
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", mm1_floppies, "525qd", mm1_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", mm1_floppies, "525qd", mm1_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	AM9517A(config, m_dmac, 6.144_MHz_XTAL/2);
+	m_dmac->out_hreq_callback().set(FUNC(mm1_state::dma_hrq_w));
+	m_dmac->out_eop_callback().set(FUNC(mm1_state::dma_eop_w));
+	m_dmac->in_memr_callback().set(FUNC(mm1_state::read));
+	m_dmac->out_memw_callback().set(FUNC(mm1_state::write));
+	m_dmac->in_ior_callback<2>().set(FUNC(mm1_state::mpsc_dack_r));
+	m_dmac->in_ior_callback<3>().set(m_fdc, FUNC(upd765_family_device::dma_r));
+	m_dmac->out_iow_callback<0>().set(m_crtc, FUNC(i8275_device::dack_w));
+	m_dmac->out_iow_callback<1>().set(FUNC(mm1_state::mpsc_dack_w));
+	m_dmac->out_iow_callback<3>().set(m_fdc, FUNC(upd765_family_device::dma_w));
+	m_dmac->out_dack_callback<3>().set(FUNC(mm1_state::dack3_w));
 
-	MCFG_DEVICE_ADD(UPD7201_TAG, UPD7201, 6.144_MHz_XTAL/2)
-	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
-	MCFG_Z80DART_OUT_RXDRQA_CB(WRITELINE(mm1_state, drq2_w))
-	MCFG_Z80DART_OUT_TXDRQA_CB(WRITELINE(mm1_state, drq1_w))
+	PIT8253(config, m_pit, 0);
+	m_pit->set_clk<0>(6.144_MHz_XTAL/2/2);
+	m_pit->out_handler<0>().set(FUNC(mm1_state::itxc_w));
+	m_pit->set_clk<1>(6.144_MHz_XTAL/2/2);
+	m_pit->out_handler<1>().set(FUNC(mm1_state::irxc_w));
+	m_pit->set_clk<2>(6.144_MHz_XTAL/2/2);
+	m_pit->out_handler<2>().set(FUNC(mm1_state::auxc_w));
 
-	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(UPD7201_TAG, z80dart_device, rxa_w))
-	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_PORT_ADD(RS232_C_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(UPD7201_TAG, z80dart_device, ctsb_w))
+	UPD765A(config, m_fdc, 16_MHz_XTAL/2, true, true);
+	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, I8085_RST55_LINE);
+	m_fdc->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq3_w));
+	FLOPPY_CONNECTOR(config, UPD765_TAG ":0", mm1_floppies, "525qd", mm1_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, UPD765_TAG ":1", mm1_floppies, "525qd", mm1_state::floppy_formats).enable_sound(true);
 
-	MCFG_DEVICE_ADD(KB_TAG, MM1_KEYBOARD, 2500) // actual KBCLK is 6.144_MHz_XTAL/2/16
-	MCFG_MM1_KEYBOARD_KBST_CALLBACK(DEVWRITELINE(I8212_TAG, i8212_device, stb_w))
+	UPD7201(config, m_mpsc, 6.144_MHz_XTAL/2);
+	m_mpsc->out_txda_callback().set(m_rs232a, FUNC(rs232_port_device::write_txd));
+	m_mpsc->out_dtra_callback().set(m_rs232a, FUNC(rs232_port_device::write_dtr));
+	m_mpsc->out_rtsa_callback().set(m_rs232a, FUNC(rs232_port_device::write_rts));
+	m_mpsc->out_rxdrqa_callback().set(FUNC(mm1_state::drq2_w));
+	m_mpsc->out_txdrqa_callback().set(FUNC(mm1_state::drq1_w));
+
+	RS232_PORT(config, m_rs232a, default_rs232_devices, nullptr);
+	m_rs232a->cts_handler().set(m_mpsc, FUNC(z80dart_device::rxa_w));
+	RS232_PORT(config, m_rs232b, default_rs232_devices, nullptr);
+	RS232_PORT(config, m_rs232c, default_rs232_devices, nullptr);
+	m_rs232c->cts_handler().set(m_mpsc, FUNC(z80dart_device::ctsb_w));
+
+	mm1_keyboard_device &kb(MM1_KEYBOARD(config, KB_TAG, 2500)); // actual KBCLK is 6.144_MHz_XTAL/2/16
+	kb.kbst_wr_callback().set(m_iop, FUNC(i8212_device::stb_w));
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "mm1_flop")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "flop_list").set_original("mm1_flop");
+}
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( mm1m6 )
+//  machine_config( mm1m6 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(mm1_state::mm1m6)
+void mm1_state::mm1m6(machine_config &config)
+{
 	mm1(config);
 	// video hardware
 	mm1m6_video(config);
-MACHINE_CONFIG_END
+}
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( mm1m7 )
+//  machine_config( mm1m7 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(mm1_state::mm1m7)
+void mm1_state::mm1m7(machine_config &config)
+{
 	mm1(config);
 	// video hardware
 	mm1m6_video(config);
 
 	// TODO hard disk
-MACHINE_CONFIG_END
+}
 
 
 
@@ -579,6 +566,6 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT  STATE       INIT    COMPANY           FULLNAME                FLAGS
-COMP( 1981, mm1m6,      0,      0,      mm1m6,      mm1,   mm1_state,  0,      "Nokia Data",     "MikroMikko 1 M6",      MACHINE_SUPPORTS_SAVE )
-COMP( 1981, mm1m7,      mm1m6,  0,      mm1m7,      mm1,   mm1_state,  0,      "Nokia Data",     "MikroMikko 1 M7",      MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY       FULLNAME           FLAGS
+COMP( 1981, mm1m6, 0,      0,      mm1m6,   mm1,   mm1_state, empty_init, "Nokia Data", "MikroMikko 1 M6", MACHINE_SUPPORTS_SAVE )
+COMP( 1981, mm1m7, mm1m6,  0,      mm1m7,   mm1,   mm1_state, empty_init, "Nokia Data", "MikroMikko 1 M7", MACHINE_SUPPORTS_SAVE )

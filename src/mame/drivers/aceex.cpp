@@ -56,10 +56,13 @@ public:
 		: driver_device(mconfig, type, tag)
 		,m_maincpu(*this, "maincpu")
 	{ }
+
+	void aceex2814(machine_config &config);
+
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
-	void aceex2814(machine_config &config);
 	void aceex2814_map(address_map &map);
 };
 
@@ -81,17 +84,18 @@ void aceex2814_state::machine_reset()
 
 #define Y1_CLOCK 40320000
 #define Y2_CLOCK 45342720
-MACHINE_CONFIG_START(aceex2814_state::aceex2814)
+void aceex2814_state::aceex2814(machine_config &config)
+{
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80C31, Y2_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(aceex2814_map)
-MACHINE_CONFIG_END
+	I80C31(config, m_maincpu, Y2_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &aceex2814_state::aceex2814_map);
+}
 
 ROM_START( aceex2814 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dm2814u16-194.bin", 0x00000, 0x10000, CRC(36dc423d) SHA1(0f350b7c533eb5270a72587ab3e050e5fe453006) )
 ROM_END
 
-//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT      CLASS            INIT        COMPANY              FULLNAME      FLAGS
-COMP( 1995, aceex2814,  0,          0,      aceex2814,  aceex2814, aceex2814_state, 0,          "Aceex Corporation", "Aceex 2814", MACHINE_IS_SKELETON )
+//    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY              FULLNAME      FLAGS
+COMP( 1995, aceex2814, 0,      0,      aceex2814, aceex2814, aceex2814_state, empty_init, "Aceex Corporation", "Aceex 2814", MACHINE_IS_SKELETON )

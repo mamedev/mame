@@ -16,9 +16,16 @@
 DEFINE_DEVICE_TYPE(ADC1038, adc1038_device, "adc1038", "ADC1038")
 
 adc1038_device::adc1038_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ADC1038, tag, owner, clock),
-		m_cycle(0), m_clk(0), m_adr(0), m_data_in(0), m_data_out(0), m_adc_data(0), m_sars(0),
-		m_gticlub_hack(0)
+	: device_t(mconfig, ADC1038, tag, owner, clock)
+	, m_cycle(0)
+	, m_clk(0)
+	, m_adr(0)
+	, m_data_in(0)
+	, m_data_out(0)
+	, m_adc_data(0)
+	, m_sars(0)
+	, m_gticlub_hack(false)
+	, m_input_cb(*this)
 {
 }
 
@@ -28,7 +35,7 @@ adc1038_device::adc1038_device(const machine_config &mconfig, const char *tag, d
 
 void adc1038_device::device_start()
 {
-	m_input_cb.bind_relative_to(*owner());
+	m_input_cb.resolve();
 
 	save_item(NAME(m_cycle));
 	save_item(NAME(m_clk));

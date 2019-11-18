@@ -26,6 +26,8 @@ public:
 	virtual ioport_constructor device_input_ports() const override;
 
 	virtual uint8_t* get_cart_base() override;
+	virtual uint32_t get_cart_size() override;
+	virtual memory_region* get_cart_memregion() override;
 
 protected:
 	coco_pak_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -33,10 +35,11 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual DECLARE_READ8_MEMBER(cts_read) override;
 
 	// internal state
 	device_image_interface *m_cart;
-
+	required_memory_region m_eprom;
 	optional_ioport m_autostart;
 };
 
@@ -58,6 +61,7 @@ protected:
 	virtual void device_reset() override;
 	virtual uint8_t *get_cart_base() override;
 	virtual uint32_t get_cart_size() override;
+	virtual DECLARE_READ8_MEMBER(cts_read) override;
 	virtual DECLARE_WRITE8_MEMBER(scs_write) override;
 
 private:

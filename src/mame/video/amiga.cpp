@@ -108,11 +108,9 @@ const uint16_t delay[256] =
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(amiga_state,amiga)
+void amiga_state::amiga_palette(palette_device &palette) const
 {
-	int i;
-
-	for (i = 0; i < 0x1000; i++)
+	for (int i = 0; i < 0x1000; i++)
 		palette.set_pen_color(i, pal4bit(i >> 8), pal4bit(i >> 4), pal4bit(i));
 }
 
@@ -219,7 +217,7 @@ int amiga_state::copper_execute_next(int xpos)
 	{
 		if (LOG_COPPER)
 			logerror("%02X.%02X: Write to %s = %04x\n", m_last_scanline, xpos / 2, s_custom_reg_names[m_copper_pending_offset & 0xff], m_copper_pending_data);
-		custom_chip_w(m_copper_pending_offset, m_copper_pending_data);
+		write_custom_chip(m_copper_pending_offset, m_copper_pending_data);
 		m_copper_pending_offset = 0;
 	}
 
@@ -250,12 +248,12 @@ int amiga_state::copper_execute_next(int xpos)
 	}
 
 	/* fetch the first data word */
-	word0 = chip_ram_r(m_copper_pc);
+	word0 = read_chip_ram(m_copper_pc);
 	m_copper_pc += 2;
 	xpos += COPPER_CYCLES_TO_PIXELS(1);
 
 	/* fetch the second data word */
-	word1 = chip_ram_r(m_copper_pc);
+	word1 = read_chip_ram(m_copper_pc);
 	m_copper_pc += 2;
 	xpos += COPPER_CYCLES_TO_PIXELS(1);
 
@@ -275,7 +273,7 @@ int amiga_state::copper_execute_next(int xpos)
 			{
 				if (LOG_COPPER)
 					logerror("%02X.%02X: Write to %s = %04x\n", m_last_scanline, xpos / 2, s_custom_reg_names[word0 & 0xff], word1);
-				custom_chip_w(word0, word1);
+				write_custom_chip(word0, word1);
 			}
 			else    // additional 2 cycles needed for non-Agnus registers
 			{
@@ -387,8 +385,8 @@ void amiga_state::sprite_enable_comparitor(int which, int enable)
 
 void amiga_state::fetch_sprite_data(int scanline, int sprite)
 {
-	CUSTOM_REG(REG_SPR0DATA + 4 * sprite) = chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 0);
-	CUSTOM_REG(REG_SPR0DATB + 4 * sprite) = chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 2);
+	CUSTOM_REG(REG_SPR0DATA + 4 * sprite) = read_chip_ram(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 0);
+	CUSTOM_REG(REG_SPR0DATB + 4 * sprite) = read_chip_ram(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 2);
 	CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) += 4;
 	if (LOG_SPRITE_DMA) logerror("%3d:sprite %d fetch: data=%04X-%04X\n", scanline, sprite, CUSTOM_REG(REG_SPR0DATA + 4 * sprite), CUSTOM_REG(REG_SPR0DATB + 4 * sprite));
 }
@@ -417,8 +415,8 @@ void amiga_state::update_sprite_dma(int scanline)
 			m_sprite_dma_reload_mask &= ~bitmask;
 
 			/* fetch data into the control words */
-			CUSTOM_REG(REG_SPR0POS + 4 * num) = chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) + 0);
-			CUSTOM_REG(REG_SPR0CTL + 4 * num) = chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) + 2);
+			CUSTOM_REG(REG_SPR0POS + 4 * num) = read_chip_ram(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) + 0);
+			CUSTOM_REG(REG_SPR0CTL + 4 * num) = read_chip_ram(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) + 2);
 			CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) += 4;
 			if (LOG_SPRITE_DMA) logerror("%3d:sprite %d fetch: pos=%04X ctl=%04X\n", scanline, num, CUSTOM_REG(REG_SPR0POS + 4 * num), CUSTOM_REG(REG_SPR0CTL + 4 * num));
 		}
@@ -592,7 +590,7 @@ uint8_t amiga_state::assemble_even_bitplanes(int planes, int ebitoffs)
 
 void amiga_state::fetch_bitplane_data(int plane)
 {
-	CUSTOM_REG(REG_BPL1DAT + plane) = chip_ram_r(CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2));
+	CUSTOM_REG(REG_BPL1DAT + plane) = read_chip_ram(CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2));
 	CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2) += 2;
 }
 
@@ -667,7 +665,7 @@ void amiga_state::update_display_window()
  *
  *************************************/
 
-void amiga_state::render_scanline(bitmap_ind16 &bitmap, int scanline)
+void amiga_state::render_scanline(bitmap_rgb32 &bitmap, int scanline)
 {
 	uint16_t save_color0 = CUSTOM_REG(REG_COLOR00);
 	int ddf_start_pixel = 0, ddf_stop_pixel = 0;
@@ -675,7 +673,7 @@ void amiga_state::render_scanline(bitmap_ind16 &bitmap, int scanline)
 	int pf1pri = 0, pf2pri = 0;
 	int planes = 0;
 
-	uint16_t *dst = nullptr;
+	uint32_t *dst = nullptr;
 	int ebitoffs = 0, obitoffs = 0;
 	int ecolmask = 0, ocolmask = 0;
 	int edelay = 0, odelay = 0;
@@ -707,7 +705,7 @@ void amiga_state::render_scanline(bitmap_ind16 &bitmap, int scanline)
 		if ((scanline & 1) ^ lof)
 		{
 			// lof matches? then render this scanline
-			dst = &bitmap.pix16(scanline);
+			dst = &bitmap.pix32(scanline);
 		}
 		else
 		{
@@ -717,7 +715,7 @@ void amiga_state::render_scanline(bitmap_ind16 &bitmap, int scanline)
 			// otherwise just render the contents of the previous frame's scanline
 			int shift = (m_previous_lof == lof) ? 1 : 0;
 
-			memcpy(&bitmap.pix16(scanline), &m_flickerfixer.pix16(scanline - shift), amiga_state::SCREEN_WIDTH * 2);
+			std::copy_n(&m_flickerfixer.pix32(scanline - shift), amiga_state::SCREEN_WIDTH, &bitmap.pix32(scanline));
 			return;
 		}
 	}
@@ -782,7 +780,7 @@ void amiga_state::render_scanline(bitmap_ind16 &bitmap, int scanline)
 		/* clear the target pixels to the background color as a starting point */
 		if (dst != nullptr)
 			dst[x*2+0] =
-			dst[x*2+1] = CUSTOM_REG(REG_COLOR00);
+			dst[x*2+1] = m_palette->pen(CUSTOM_REG(REG_COLOR00));
 
 		/* if we hit the first fetch pixel, reset the counters and latch the delays */
 		if (x == ddf_start_pixel)
@@ -817,7 +815,7 @@ void amiga_state::render_scanline(bitmap_ind16 &bitmap, int scanline)
 		/* to render, we must have bitplane DMA enabled, at least 1 plane, and be within the */
 		/* vertical display window */
 		if ((CUSTOM_REG(REG_DMACON) & (DMACON_BPLEN | DMACON_DMAEN)) == (DMACON_BPLEN | DMACON_DMAEN) &&
-			planes > 0 && scanline >= m_diw.min_y && scanline < m_diw.max_y)
+			planes > 0 && scanline >= m_diw.top() && scanline < m_diw.bottom())
 		{
 			int pfpix0 = 0, pfpix1 = 0, collide;
 
@@ -922,7 +920,7 @@ void amiga_state::render_scanline(bitmap_ind16 &bitmap, int scanline)
 				CUSTOM_REG(REG_CLXDAT) |= 0x001;
 
 			/* if we are within the display region, render */
-			if (dst != nullptr && x >= m_diw.min_x && x < m_diw.max_x)
+			if (dst != nullptr && x >= m_diw.left() && x < m_diw.right())
 			{
 				int pix, pri;
 
@@ -939,14 +937,14 @@ void amiga_state::render_scanline(bitmap_ind16 &bitmap, int scanline)
 					if (sprpix && pf1pri > pri)
 					{
 						dst[x*2+0] =
-						dst[x*2+1] = CUSTOM_REG(REG_COLOR00 + pix);
+						dst[x*2+1] = m_palette->pen(CUSTOM_REG(REG_COLOR00 + pix));
 					}
 
 					/* playfield has priority */
 					else
 					{
 						dst[x*2+0] =
-						dst[x*2+1] = pfpix0;
+						dst[x*2+1] = m_palette->pen(pfpix0);
 					}
 				}
 
@@ -966,9 +964,9 @@ void amiga_state::render_scanline(bitmap_ind16 &bitmap, int scanline)
 
 					/* write out the left pixel */
 					if (pix)
-						dst[x*2+0] = CUSTOM_REG(REG_COLOR00 + pix);
+						dst[x*2+0] = m_palette->pen(CUSTOM_REG(REG_COLOR00 + pix));
 					else
-						dst[x*2+0] = CUSTOM_REG(REG_COLOR00 + m_separate_bitplanes[(CUSTOM_REG(REG_BPLCON2) >> 6) & 1][pfpix0]);
+						dst[x*2+0] = m_palette->pen(CUSTOM_REG(REG_COLOR00 + m_separate_bitplanes[(CUSTOM_REG(REG_BPLCON2) >> 6) & 1][pfpix0]));
 
 					/* mask out the sprite if it doesn't have priority */
 					pix = sprpix & 0x1f;
@@ -982,9 +980,9 @@ void amiga_state::render_scanline(bitmap_ind16 &bitmap, int scanline)
 
 					/* write out the right pixel */
 					if (pix)
-						dst[x*2+1] = CUSTOM_REG(REG_COLOR00 + pix);
+						dst[x*2+1] = m_palette->pen(CUSTOM_REG(REG_COLOR00 + pix));
 					else
-						dst[x*2+1] = CUSTOM_REG(REG_COLOR00 + m_separate_bitplanes[(CUSTOM_REG(REG_BPLCON2) >> 6) & 1][pfpix1]);
+						dst[x*2+1] = m_palette->pen(CUSTOM_REG(REG_COLOR00 + m_separate_bitplanes[(CUSTOM_REG(REG_BPLCON2) >> 6) & 1][pfpix1]));
 				}
 
 				/* single playfield mode */
@@ -997,14 +995,14 @@ void amiga_state::render_scanline(bitmap_ind16 &bitmap, int scanline)
 					if (sprpix && pf1pri > pri)
 					{
 						dst[x*2+0] =
-						dst[x*2+1] = CUSTOM_REG(REG_COLOR00 + pix);
+						dst[x*2+1] = m_palette->pen(CUSTOM_REG(REG_COLOR00 + pix));
 					}
 
 					/* playfield has priority */
 					else
 					{
-						dst[x*2+0] = CUSTOM_REG(REG_COLOR00 + pfpix0);
-						dst[x*2+1] = CUSTOM_REG(REG_COLOR00 + pfpix1);
+						dst[x*2+0] = m_palette->pen(CUSTOM_REG(REG_COLOR00 + pfpix0));
+						dst[x*2+1] = m_palette->pen(CUSTOM_REG(REG_COLOR00 + pfpix1));
 					}
 				}
 			}
@@ -1012,7 +1010,7 @@ void amiga_state::render_scanline(bitmap_ind16 &bitmap, int scanline)
 	}
 
 	// end of the line: time to add the modulos
-	if (scanline >= m_diw.min_y && scanline < m_diw.max_y)
+	if (scanline >= m_diw.top() && scanline < m_diw.bottom())
 	{
 		// update odd planes
 		for (pl = 0; pl < planes; pl += 2)
@@ -1028,7 +1026,7 @@ void amiga_state::render_scanline(bitmap_ind16 &bitmap, int scanline)
 
 	// save
 	if (dst != nullptr)
-		memcpy(&m_flickerfixer.pix16(save_scanline), dst, amiga_state::SCREEN_WIDTH * 2);
+		std::copy_n(dst, amiga_state::SCREEN_WIDTH, &m_flickerfixer.pix32(save_scanline));
 
 #if GUESS_COPPER_OFFSET
 	if (m_screen->frame_number() % 64 == 0 && scanline == 0)
@@ -1049,16 +1047,15 @@ void amiga_state::render_scanline(bitmap_ind16 &bitmap, int scanline)
  *
  *************************************/
 
-/* TODO: alg.c requires that this uses RGB32 */
-uint32_t amiga_state::screen_update_amiga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t amiga_state::screen_update_amiga(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// sometimes the core tells us to render a bunch of lines to keep up (resolution change, for example)
 	// this causes trouble for us since it can happen at any time
-	if (cliprect.min_y != cliprect.max_y)
+	if (cliprect.top() != cliprect.bottom())
 		return 0;
 
 	// render each scanline in the visible region
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 		render_scanline(bitmap, y);
 
 	return 0;
@@ -1096,26 +1093,26 @@ void amiga_state::update_screenmode()
 //  MACHINE DRIVER FRAGMENTS
 //**************************************************************************
 
-MACHINE_CONFIG_START(amiga_state::pal_video)
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS
+void amiga_state::pal_video(machine_config &config)
+{
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw
 	(
 		(amiga_state::CLK_28M_PAL / 4) * 2 * 2,
 		amiga_state::SCREEN_WIDTH, amiga_state::HBLANK, amiga_state::SCREEN_WIDTH,
 		amiga_state::SCREEN_HEIGHT_PAL, amiga_state::VBLANK_PAL, amiga_state::SCREEN_HEIGHT_PAL
-	)
-	MCFG_SCREEN_UPDATE_DRIVER(amiga_state, screen_update_amiga)
-	MCFG_SCREEN_PALETTE("palette")
-MACHINE_CONFIG_END
+	);
+	m_screen->set_screen_update(FUNC(amiga_state::screen_update_amiga));
+}
 
-MACHINE_CONFIG_START(amiga_state::ntsc_video)
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS
+void amiga_state::ntsc_video(machine_config &config)
+{
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw
 	(
 		(amiga_state::CLK_28M_NTSC / 4) * 2 * 2,
 		amiga_state::SCREEN_WIDTH, amiga_state::HBLANK, amiga_state::SCREEN_WIDTH,
 		amiga_state::SCREEN_HEIGHT_NTSC, amiga_state::VBLANK_NTSC, amiga_state::SCREEN_HEIGHT_NTSC
-	)
-	MCFG_SCREEN_UPDATE_DRIVER(amiga_state, screen_update_amiga)
-	MCFG_SCREEN_PALETTE("palette")
-MACHINE_CONFIG_END
+	);
+	m_screen->set_screen_update(FUNC(amiga_state::screen_update_amiga));
+}

@@ -12,7 +12,7 @@
 #include "emu.h"
 #include "8530scc.h"
 
-DEFINE_DEVICE_TYPE(SCC8530, scc8530_t, "scc8530l", "Zilog 8530 SCC (legacy)")
+DEFINE_DEVICE_TYPE(SCC8530, scc8530_legacy_device, "scc8530l", "Zilog 8530 SCC (legacy)")
 
 
 /***************************************************************************
@@ -25,7 +25,7 @@ DEFINE_DEVICE_TYPE(SCC8530, scc8530_t, "scc8530l", "Zilog 8530 SCC (legacy)")
     IMPLEMENTATION
 ***************************************************************************/
 
-scc8530_t::scc8530_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+scc8530_legacy_device::scc8530_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SCC8530, tag, owner, clock),
 	mode(0), reg(0), status(0), IRQV(0), MasterIRQEnable(0), lastIRQStat(0), IRQType(),
 	intrq_cb(*this)
@@ -37,7 +37,7 @@ scc8530_t::scc8530_t(const machine_config &mconfig, const char *tag, device_t *o
     scc_updateirqs
 -------------------------------------------------*/
 
-void scc8530_t::updateirqs()
+void scc8530_legacy_device::updateirqs()
 {
 	int irqstat;
 
@@ -90,7 +90,7 @@ void scc8530_t::updateirqs()
 /*-------------------------------------------------
     scc_initchannel
 -------------------------------------------------*/
-void scc8530_t::initchannel(int ch)
+void scc8530_legacy_device::initchannel(int ch)
 {
 	channel[ch].syncHunt = 1;
 }
@@ -98,7 +98,7 @@ void scc8530_t::initchannel(int ch)
 /*-------------------------------------------------
     scc_resetchannel
 -------------------------------------------------*/
-void scc8530_t::resetchannel(int ch)
+void scc8530_legacy_device::resetchannel(int ch)
 {
 	emu_timer *timersave = channel[ch].baudtimer;
 
@@ -114,7 +114,7 @@ void scc8530_t::resetchannel(int ch)
     scc8530_baud_expire - baud rate timer expiry
 -------------------------------------------------*/
 
-void scc8530_t::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void scc8530_legacy_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	Chan *pChan = &channel[id];
 	int brconst = pChan->reg_val[13]<<8 | pChan->reg_val[14];
@@ -158,7 +158,7 @@ void scc8530_t::device_timer(emu_timer &timer, device_timer_id id, int param, vo
     device_start - device-specific startup
 -------------------------------------------------*/
 
-void scc8530_t::device_start()
+void scc8530_legacy_device::device_start()
 {
 	intrq_cb.resolve();
 
@@ -180,7 +180,7 @@ void scc8530_t::device_start()
 /*-------------------------------------------------
     device_reset - device-specific reset
 -------------------------------------------------*/
-void scc8530_t::device_reset()
+void scc8530_legacy_device::device_reset()
 {
 	IRQType = IRQ_NONE;
 	MasterIRQEnable = 0;
@@ -196,7 +196,7 @@ void scc8530_t::device_reset()
     scc_set_status
 -------------------------------------------------*/
 
-void scc8530_t::set_status(int _status)
+void scc8530_legacy_device::set_status(int _status)
 {
 	status = _status;
 }
@@ -205,7 +205,7 @@ void scc8530_t::set_status(int _status)
     scc_acknowledge
 -------------------------------------------------*/
 
-void scc8530_t::acknowledge()
+void scc8530_legacy_device::acknowledge()
 {
 	if(!intrq_cb.isnull())
 		intrq_cb(0);
@@ -215,7 +215,7 @@ void scc8530_t::acknowledge()
     scc_getareg
 -------------------------------------------------*/
 
-uint8_t scc8530_t::getareg()
+uint8_t scc8530_legacy_device::getareg()
 {
 	/* Not yet implemented */
 	#if LOG_SCC
@@ -247,7 +247,7 @@ uint8_t scc8530_t::getareg()
     scc_getareg
 -------------------------------------------------*/
 
-uint8_t scc8530_t::getbreg()
+uint8_t scc8530_legacy_device::getbreg()
 {
 	#if LOG_SCC
 	printf("SCC: port B reg %i read 0x%02x\n", reg, channel[1].reg_val[reg]);
@@ -286,7 +286,7 @@ uint8_t scc8530_t::getbreg()
     scc_putreg
 -------------------------------------------------*/
 
-void scc8530_t::putreg(int ch, uint8_t data)
+void scc8530_legacy_device::putreg(int ch, uint8_t data)
 {
 	Chan *pChan = &channel[ch];
 
@@ -418,7 +418,7 @@ void scc8530_t::putreg(int ch, uint8_t data)
     scc8530_get_reg_a
 -------------------------------------------------*/
 
-uint8_t scc8530_t::get_reg_a(int reg)
+uint8_t scc8530_legacy_device::get_reg_a(int reg)
 {
 	return channel[0].reg_val[reg];
 }
@@ -429,7 +429,7 @@ uint8_t scc8530_t::get_reg_a(int reg)
     scc8530_get_reg_b
 -------------------------------------------------*/
 
-uint8_t scc8530_t::get_reg_b(int reg)
+uint8_t scc8530_legacy_device::get_reg_b(int reg)
 {
 	return channel[1].reg_val[reg];
 }
@@ -440,7 +440,7 @@ uint8_t scc8530_t::get_reg_b(int reg)
     scc8530_set_reg_a
 -------------------------------------------------*/
 
-void scc8530_t::set_reg_a(int reg, uint8_t data)
+void scc8530_legacy_device::set_reg_a(int reg, uint8_t data)
 {
 	channel[0].reg_val[reg] = data;
 }
@@ -451,7 +451,7 @@ void scc8530_t::set_reg_a(int reg, uint8_t data)
     scc8530_set_reg_b
 -------------------------------------------------*/
 
-void scc8530_t::set_reg_b(int reg, uint8_t data)
+void scc8530_legacy_device::set_reg_b(int reg, uint8_t data)
 {
 	channel[1].reg_val[reg] = data;
 }
@@ -463,7 +463,7 @@ void scc8530_t::set_reg_b(int reg, uint8_t data)
 //  getter
 //-------------------------------------------------
 
-READ8_MEMBER(scc8530_t::reg_r)
+READ8_MEMBER(scc8530_legacy_device::reg_r)
 {
 	return read_reg(offset & 3);
 }
@@ -475,7 +475,7 @@ READ8_MEMBER(scc8530_t::reg_r)
 //  port for either SCC channel.
 //-------------------------------------------------
 
-uint8_t scc8530_t::read_reg(int offset)
+uint8_t scc8530_legacy_device::read_reg(int offset)
 {
 	uint8_t result = 0;
 
@@ -507,7 +507,7 @@ uint8_t scc8530_t::read_reg(int offset)
 //  setter
 //-------------------------------------------------
 
-WRITE8_MEMBER( scc8530_t::reg_w )
+WRITE8_MEMBER( scc8530_legacy_device::reg_w )
 {
 	write_reg(offset & 3, data);
 }
@@ -519,7 +519,7 @@ WRITE8_MEMBER( scc8530_t::reg_w )
 //  port for either SCC channel.
 //-------------------------------------------------
 
-void scc8530_t::write_reg(int offset, uint8_t data)
+void scc8530_legacy_device::write_reg(int offset, uint8_t data)
 {
 	//offset & 3;
 

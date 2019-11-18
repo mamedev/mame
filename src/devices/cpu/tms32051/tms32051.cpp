@@ -57,14 +57,14 @@ DEFINE_DEVICE_TYPE(TMS32053, tms32053_device, "tms32053", "Texas Instruments TMS
 
 void tms32051_device::tms32051_internal_pgm(address_map &map)
 {
-//  AM_RANGE(0x0000, 0x1fff) AM_ROM                         // ROM          TODO: is off-chip if MP/_MC = 0
+//  map(0x0000, 0x1fff).rom();                       // ROM          TODO: is off-chip if MP/_MC = 0
 	map(0x2000, 0x23ff).ram().share("saram");       // SARAM        TODO: is off-chip if RAM bit = 0
 	map(0xfe00, 0xffff).ram().share("daram_b0");    // DARAM B0     TODO: is off-chip if CNF = 0
 }
 
 void tms32051_device::tms32051_internal_data(address_map &map)
 {
-	map(0x0000, 0x005f).rw(this, FUNC(tms32051_device::cpuregs_r), FUNC(tms32051_device::cpuregs_w));
+	map(0x0000, 0x005f).rw(FUNC(tms32051_device::cpuregs_r), FUNC(tms32051_device::cpuregs_w));
 	map(0x0060, 0x007f).ram();                         // DARAM B2
 	map(0x0100, 0x02ff).ram().share("daram_b0");    // DARAM B0     TODO: is unconnected if CNF = 1
 	map(0x0300, 0x04ff).ram();                         // DARAM B1
@@ -101,14 +101,14 @@ device_memory_interface::space_config_vector tms32051_device::memory_space_confi
 
 void tms32053_device::tms32053_internal_pgm(address_map &map)
 {
-//  AM_RANGE(0x0000, 0x3fff) AM_ROM                         // ROM          TODO: is off-chip if MP/_MC = 0
+//  map(0x0000, 0x3fff).rom();                       // ROM          TODO: is off-chip if MP/_MC = 0
 	map(0x4000, 0x4bff).ram().share("saram");       // SARAM        TODO: is off-chip if RAM bit = 0
 	map(0xfe00, 0xffff).ram().share("daram_b0");    // DARAM B0     TODO: is off-chip if CNF = 0
 }
 
 void tms32053_device::tms32053_internal_data(address_map &map)
 {
-	map(0x0000, 0x005f).rw(this, FUNC(tms32053_device::cpuregs_r), FUNC(tms32053_device::cpuregs_w));
+	map(0x0000, 0x005f).rw(FUNC(tms32053_device::cpuregs_r), FUNC(tms32053_device::cpuregs_w));
 	map(0x0060, 0x007f).ram();                         // DARAM B2
 	map(0x0100, 0x02ff).ram().share("daram_b0");    // DARAM B0     TODO: is unconnected if CNF = 1
 	map(0x0300, 0x04ff).ram();                         // DARAM B1
@@ -130,7 +130,7 @@ std::unique_ptr<util::disasm_interface> tms32051_device::create_disassembler()
 
 #define CYCLES(x)       (m_icount -= x)
 
-#define ROPCODE()       m_direct->read_word(m_pc++)
+#define ROPCODE()       m_cache->read_word(m_pc++)
 
 void tms32051_device::CHANGE_PC(uint16_t new_pc)
 {
@@ -187,7 +187,7 @@ void tms32051_device::delay_slot(uint16_t startpc)
 void tms32051_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<-1>();
+	m_cache = m_program->cache<1, -1, ENDIANNESS_LITTLE>();
 	m_data = &space(AS_DATA);
 	m_io = &space(AS_IO);
 

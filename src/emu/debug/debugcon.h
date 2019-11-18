@@ -28,6 +28,7 @@
 /* flags for command parsing */
 #define CMDFLAG_NONE                        (0x0000)
 #define CMDFLAG_KEEP_QUOTES                 (0x0001)
+#define CMDFLAG_CUSTOM_HELP                 (0x0002)
 
 /* values for the error code in a command error */
 #define CMDERR_NONE                         (0)
@@ -80,6 +81,8 @@ public:
 	CMDERR          execute_command(const std::string &command, bool echo);
 	CMDERR          validate_command(const char *command);
 	void            register_command(const char *command, u32 flags, int ref, int minparams, int maxparams, std::function<void(int, const std::vector<std::string> &)> handler);
+	void            source_script(const char *file);
+	void            process_source_file();
 
 	/* console management */
 	void            vprintf(util::format_argument_pack<std::ostream> const &args);
@@ -109,6 +112,8 @@ public:
 private:
 	void exit();
 
+	void execute_help_custom(int ref, const std::vector<std::string> &params);
+
 	void trim_parameter(char **paramptr, bool keep_quotes);
 	CMDERR internal_execute_command(bool execute, int params, char **param);
 	CMDERR internal_parse_command(const std::string &original_command, bool execute);
@@ -132,6 +137,8 @@ private:
 	text_buffer     *m_errorlog_textbuf;
 
 	debug_command   *m_commandlist;
+
+	std::unique_ptr<std::istream> m_source_file;        // script source file
 };
 
 #endif // MAME_EMU_DEBUG_DEBUGCON_H

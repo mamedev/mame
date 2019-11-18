@@ -12,17 +12,6 @@
 #pragma once
 
 
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_QIMI_EXTINT_CALLBACK(_write) \
-	devcb = &downcast<qimi_device &>(*device).set_exting_wr_callback(DEVCB_##_write);
-
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -35,13 +24,13 @@ public:
 	// construction/destruction
 	qimi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_exting_wr_callback(Object &&cb) { return m_write_extint.set_callback(std::forward<Object>(cb)); }
+	auto extint_wr_callback() { return m_write_extint.bind(); }
 
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;
 
-	uint8_t read(address_space &space, offs_t offset, uint8_t data);
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset, uint8_t data);
+	void write(offs_t offset, uint8_t data);
 
 	DECLARE_INPUT_CHANGED_MEMBER( mouse_x_changed );
 	DECLARE_INPUT_CHANGED_MEMBER( mouse_y_changed );

@@ -45,7 +45,11 @@
 -- See the docs for configuration() for more information about the terms.
 --
 
-	function premake.getactiveterms()
+	function premake.getactiveterms(obj)
+		-- While the `obj` argument is not used in this function, it should
+		-- remain accepted so users can override this function if need be, and
+		-- still have access to the context (solution/project).
+
 		local terms = { _action = _ACTION:lower(), os = os.get() }
 
 		-- add option keys or values
@@ -328,7 +332,7 @@
 
 		-- build a set of configuration filter terms; only those configuration blocks
 		-- with a matching set of keywords will be included in the merged results
-		local terms = premake.getactiveterms()
+		local terms = premake.getactiveterms(obj)
 
 		-- build a project-level configuration.
 		merge(result, obj, basis, terms)--this adjusts terms
@@ -767,7 +771,10 @@
 		end
 
 		-- adjust the kind as required by the target system
-		if cfg.kind == "Bundle" and not _ACTION:match("xcode[0-9]") then
+		if cfg.kind == "Bundle"
+			and _ACTION ~= "gmake"
+			and (_ACTION ~= "ninja" and (not prj.options or not prj.options.SkipBundling))
+			and not _ACTION:match("xcode[0-9]") then
 			cfg.kind = "SharedLib"
 		end
 
@@ -799,11 +806,13 @@
 		-- un-duplify it
 		local allfiles = {}
 		local allfilesDict = {}
-		for _, fname in ipairs(cfg.allfiles) do
-			if allfilesDict[fname] == nil then
-				if removefilesDict[fname] == nil then
-					allfilesDict[fname] = true
-					table.insert(allfiles, fname)
+		if cfg.allfiles ~= nil then
+			for _, fname in ipairs(cfg.allfiles) do
+				if allfilesDict[fname] == nil then
+					if removefilesDict[fname] == nil then
+						allfilesDict[fname] = true
+						table.insert(allfiles, fname)
+					end
 				end
 			end
 		end

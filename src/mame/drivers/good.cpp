@@ -35,15 +35,17 @@ voice.rom - VOICE ROM
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class good_state : public driver_device
 {
 public:
-	good_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	good_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_fg_tilemapram(*this, "fg_tilemapram"),
 		m_bg_tilemapram(*this, "bg_tilemapram"),
 		m_maincpu(*this, "maincpu"),
@@ -51,10 +53,15 @@ public:
 	{
 	}
 
+	void good(machine_config &config);
+
+protected:
+	virtual void video_start() override;
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_fg_tilemapram;
 	required_shared_ptr<uint16_t> m_bg_tilemapram;
-	uint16_t *  m_sprites;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
@@ -63,11 +70,9 @@ public:
 	DECLARE_WRITE16_MEMBER(bg_tilemapram_w);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void video_start() override;
 	uint32_t screen_update_good(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
-	void good(machine_config &config);
 	void good_map(address_map &map);
 };
 
@@ -102,8 +107,8 @@ TILE_GET_INFO_MEMBER(good_state::get_bg_tile_info)
 
 void good_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(good_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(good_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(good_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(good_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 	m_fg_tilemap->set_transparent_pen(0xf);
 }
 
@@ -118,7 +123,7 @@ void good_state::good_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom();
 
-	//AM_RANGE(0x270000, 0x270007) AM_RAM // scroll?
+	//map(0x270000, 0x270007).ram(); // scroll?
 	map(0x270001, 0x270001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 
 	map(0x280000, 0x280001).portr("IN0");
@@ -127,8 +132,8 @@ void good_state::good_map(address_map &map)
 
 	map(0x800000, 0x8007ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 
-	map(0x820000, 0x820fff).ram().w(this, FUNC(good_state::fg_tilemapram_w)).share("fg_tilemapram");
-	map(0x822000, 0x822fff).ram().w(this, FUNC(good_state::bg_tilemapram_w)).share("bg_tilemapram");
+	map(0x820000, 0x820fff).ram().w(FUNC(good_state::fg_tilemapram_w)).share("fg_tilemapram");
+	map(0x822000, 0x822fff).ram().w(FUNC(good_state::bg_tilemapram_w)).share("bg_tilemapram");
 
 	map(0xff0000, 0xffefff).ram();
 }
@@ -281,38 +286,37 @@ static const gfx_layout good_layout2 =
 };
 
 
-static GFXDECODE_START( good )
+static GFXDECODE_START( gfx_good )
 	GFXDECODE_ENTRY( "gfx1", 0, good_layout2,  0x100, 16  ) /* fg tiles */
 	GFXDECODE_ENTRY( "gfx1", 0, good_layout2,  0x200, 16  ) /* fg tiles */
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(good_state::good)
+void good_state::good(machine_config &config)
+{
+	M68000(config, m_maincpu, 16000000 /2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &good_state::good_map);
+	m_maincpu->set_vblank_int("screen", FUNC(good_state::irq2_line_hold));
 
-	MCFG_CPU_ADD("maincpu", M68000, 16000000 /2)
-	MCFG_CPU_PROGRAM_MAP(good_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", good_state,  irq2_line_hold)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_good);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", good)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*16, 32*16);
+	screen.set_visarea(1*16, 23*16-1, 0*16, 14*16-1);
+	screen.set_screen_update(FUNC(good_state::screen_update_good));
+	screen.set_palette("palette");
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*16, 32*16)
-	MCFG_SCREEN_VISIBLE_AREA(1*16, 23*16-1, 0*16, 14*16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(good_state, screen_update_good)
-	MCFG_SCREEN_PALETTE("palette")
+	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x400);
 
-	MCFG_PALETTE_ADD("palette", 0x400)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
-	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
-MACHINE_CONFIG_END
+	okim6295_device &oki(OKIM6295(config, "oki", 1000000, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
+	oki.add_route(ALL_OUTPUTS, "lspeaker", 0.47);
+	oki.add_route(ALL_OUTPUTS, "rspeaker", 0.47);
+}
 
 
 ROM_START( good )
@@ -330,4 +334,4 @@ ROM_START( good )
 	ROM_LOAD16_BYTE( "grp-04", 0x40001, 0x20000, CRC(83dbbb52) SHA1(e597f3cbb54b5cdf2230ea6318f970319061e31b) )
 ROM_END
 
-GAME( 1998, good,   0,   good,   good, good_state,   0,  ROT0,  "<unknown>", "Good (Korea)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, good, 0, good, good, good_state, empty_init, ROT0,  "<unknown>", "Good (Korea)", MACHINE_SUPPORTS_SAVE )

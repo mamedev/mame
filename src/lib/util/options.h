@@ -130,6 +130,7 @@ public:
 		virtual void set_default_value(std::string &&newvalue);
 		void set_description(const char *description) { m_description = description; }
 		void set_value_changed_handler(std::function<void(const char *)> &&handler) { m_value_changed_handler = std::move(handler); }
+		virtual void revert(int priority_hi, int priority_lo) { }
 
 	protected:
 		virtual void internal_set_value(std::string &&newvalue) = 0;
@@ -147,9 +148,9 @@ public:
 	// construction/destruction
 	core_options();
 	core_options(const core_options &) = delete;
-	core_options(core_options &&) = delete;
+	core_options(core_options &&) = default;
 	core_options& operator=(const core_options &) = delete;
-	core_options& operator=(core_options &&) = delete;
+	core_options& operator=(core_options &&) = default;
 	virtual ~core_options();
 
 	// getters
@@ -171,6 +172,7 @@ public:
 	void set_description(const char *name, const char *description);
 	void remove_entry(entry &delentry);
 	void set_value_changed_handler(const std::string &name, std::function<void(const char *)> &&handler);
+	void revert(int priority_hi = OPTION_PRIORITY_MAXIMUM, int priority_lo = OPTION_PRIORITY_DEFAULT);
 
 	// parsing/input
 	void parse_command_line(const std::vector<std::string> &args, int priority, bool ignore_unknown_options = false);
@@ -217,6 +219,7 @@ private:
 		virtual const char *minimum() const override;
 		virtual const char *maximum() const override;
 		virtual const std::string &default_value() const override;
+		virtual void revert(int priority_hi, int priority_lo) override;
 
 		virtual void set_default_value(std::string &&newvalue) override;
 
@@ -245,7 +248,7 @@ private:
 	void throw_options_exception_if_appropriate(condition_type condition, std::ostringstream &error_stream);
 
 	// internal state
-	std::vector<entry::shared_ptr>                      m_entries;              // cannonical list of entries
+	std::vector<entry::shared_ptr>                      m_entries;              // canonical list of entries
 	std::unordered_map<std::string, entry::weak_ptr>    m_entrymap;             // map for fast lookup
 	std::string                                         m_command;              // command found
 	std::vector<std::string>                            m_command_arguments;    // command arguments

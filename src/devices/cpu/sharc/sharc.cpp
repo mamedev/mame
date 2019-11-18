@@ -58,23 +58,23 @@ DEFINE_DEVICE_TYPE(ADSP21062, adsp21062_device, "adsp21062", "Analog Devices ADS
 
 void adsp21062_device::internal_pgm(address_map &map)
 {
-	map(0x20000, 0x24fff).rw(this, FUNC(adsp21062_device::pm0_r), FUNC(adsp21062_device::pm0_w));
-	map(0x28000, 0x2cfff).rw(this, FUNC(adsp21062_device::pm1_r), FUNC(adsp21062_device::pm1_w));
-	map(0x30000, 0x34fff).rw(this, FUNC(adsp21062_device::pm1_r), FUNC(adsp21062_device::pm1_w));
-	map(0x38000, 0x3cfff).rw(this, FUNC(adsp21062_device::pm1_r), FUNC(adsp21062_device::pm1_w));
+	map(0x20000, 0x24fff).rw(FUNC(adsp21062_device::pm0_r), FUNC(adsp21062_device::pm0_w));
+	map(0x28000, 0x2cfff).rw(FUNC(adsp21062_device::pm1_r), FUNC(adsp21062_device::pm1_w));
+	map(0x30000, 0x34fff).rw(FUNC(adsp21062_device::pm1_r), FUNC(adsp21062_device::pm1_w));
+	map(0x38000, 0x3cfff).rw(FUNC(adsp21062_device::pm1_r), FUNC(adsp21062_device::pm1_w));
 }
 
 void adsp21062_device::internal_data(address_map &map)
 {
-	map(0x00000, 0x000ff).rw(this, FUNC(adsp21062_device::iop_r), FUNC(adsp21062_device::iop_w));
+	map(0x00000, 0x000ff).rw(FUNC(adsp21062_device::iop_r), FUNC(adsp21062_device::iop_w));
 	map(0x20000, 0x27fff).ram().share("block0");
 	map(0x28000, 0x2ffff).ram().share("block1");
 	map(0x30000, 0x37fff).ram().share("block1");
 	map(0x38000, 0x3ffff).ram().share("block1");
-	map(0x40000, 0x4ffff).rw(this, FUNC(adsp21062_device::dmw0_r), FUNC(adsp21062_device::dmw0_w));
-	map(0x50000, 0x5ffff).rw(this, FUNC(adsp21062_device::dmw1_r), FUNC(adsp21062_device::dmw1_w));
-	map(0x60000, 0x6ffff).rw(this, FUNC(adsp21062_device::dmw1_r), FUNC(adsp21062_device::dmw1_w));
-	map(0x70000, 0x7ffff).rw(this, FUNC(adsp21062_device::dmw1_r), FUNC(adsp21062_device::dmw1_w));
+	map(0x40000, 0x4ffff).rw(FUNC(adsp21062_device::dmw0_r), FUNC(adsp21062_device::dmw0_w));
+	map(0x50000, 0x5ffff).rw(FUNC(adsp21062_device::dmw1_r), FUNC(adsp21062_device::dmw1_w));
+	map(0x60000, 0x6ffff).rw(FUNC(adsp21062_device::dmw1_r), FUNC(adsp21062_device::dmw1_w));
+	map(0x70000, 0x7ffff).rw(FUNC(adsp21062_device::dmw1_r), FUNC(adsp21062_device::dmw1_w));
 }
 
 adsp21062_device::adsp21062_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -88,6 +88,10 @@ adsp21062_device::adsp21062_device(const machine_config &mconfig, const char *ta
 	, m_block0(*this, "block0")
 	, m_block1(*this, "block1")
 	, m_enable_drc(false)
+{
+}
+
+adsp21062_device::~adsp21062_device()
 {
 }
 

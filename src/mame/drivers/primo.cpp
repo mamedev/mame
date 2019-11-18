@@ -110,7 +110,7 @@ Interrupts:
 #include "includes/primo.h"
 
 #include "cpu/z80/z80.h"
-#include "sound/wave.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -120,16 +120,16 @@ Interrupts:
 void primo_state::primoa_port(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x3f).rw(this, FUNC(primo_state::primo_be_1_r), FUNC(primo_state::primo_ki_1_w));
-	map(0xfd, 0xfd).w(this, FUNC(primo_state::primo_FD_w));
+	map(0x00, 0x3f).rw(FUNC(primo_state::primo_be_1_r), FUNC(primo_state::primo_ki_1_w));
+	map(0xfd, 0xfd).w(FUNC(primo_state::primo_FD_w));
 }
 
 void primo_state::primob_port(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x3f).rw(this, FUNC(primo_state::primo_be_1_r), FUNC(primo_state::primo_ki_1_w));
-	map(0x40, 0x7f).rw(this, FUNC(primo_state::primo_be_2_r), FUNC(primo_state::primo_ki_2_w));
-	map(0xfd, 0xfd).w(this, FUNC(primo_state::primo_FD_w));
+	map(0x00, 0x3f).rw(FUNC(primo_state::primo_be_1_r), FUNC(primo_state::primo_ki_1_w));
+	map(0x40, 0x7f).rw(FUNC(primo_state::primo_be_2_r), FUNC(primo_state::primo_ki_2_w));
+	map(0xfd, 0xfd).w(FUNC(primo_state::primo_FD_w));
 }
 
 void primo_state::primo32_mem(address_map &map)
@@ -245,93 +245,90 @@ static const struct CassetteOptions primo_cassette_options = {
 	22050   /* sample frequency */
 };
 
-MACHINE_CONFIG_START(primo_state::primoa32)
+void primo_state::primoa32(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", Z80, 2500000 )
-	MCFG_CPU_PROGRAM_MAP( primo32_mem)
-	MCFG_CPU_IO_MAP( primoa_port)
+	Z80(config, m_maincpu, 2500000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &primo_state::primo32_mem);
+	m_maincpu->set_addrmap(AS_IO, &primo_state::primoa_port);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE( 50 )
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE( 256, 192 )
-	MCFG_SCREEN_VISIBLE_AREA( 0, 256-1, 0, 192-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(primo_state, screen_update_primo)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(primo_state, vblank_irq))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(50);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(256, 192);
+	m_screen->set_visarea(0, 256-1, 0, 192-1);
+	m_screen->set_screen_update(FUNC(primo_state::screen_update_primo));
+	m_screen->set_palette("palette");
+	m_screen->screen_vblank().set(FUNC(primo_state::vblank_irq));
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* snapshot/quickload */
-	MCFG_SNAPSHOT_ADD("snapshot", primo_state, primo, "pss", 0)
-	MCFG_QUICKLOAD_ADD("quickload", primo_state, primo, "pp", 0)
+	SNAPSHOT(config, "snapshot", "pss").set_load_callback(FUNC(primo_state::snapshot_cb));
+	QUICKLOAD(config, "quickload", "pp").set_load_callback(FUNC(primo_state::quickload_cb));
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(primo_ptp_format)
-	MCFG_CASSETTE_CREATE_OPTS(&primo_cassette_options)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(primo_ptp_format);
+	m_cassette->set_create_opts(&primo_cassette_options);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* floppy from serial bus */
-	MCFG_CBM_IEC_ADD(nullptr)
+	cbm_iec_slot_device::add(config, m_iec, nullptr);
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot1", generic_plain_slot, nullptr)
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot2", generic_plain_slot, nullptr)
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
-MACHINE_CONFIG_END
+	GENERIC_CARTSLOT(config, m_cart1, generic_plain_slot, nullptr, "bin,rom");
+	GENERIC_CARTSLOT(config, m_cart2, generic_plain_slot, nullptr, "bin,rom");
+}
 
-MACHINE_CONFIG_START(primo_state::primoa48)
+void primo_state::primoa48(machine_config &config)
+{
 	primoa32(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(primo48_mem)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &primo_state::primo48_mem);
+}
 
-MACHINE_CONFIG_START(primo_state::primoa64)
+void primo_state::primoa64(machine_config &config)
+{
 	primoa32(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(primo64_mem)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &primo_state::primo64_mem);
+}
 
-MACHINE_CONFIG_START(primo_state::primob32)
+void primo_state::primob32(machine_config &config)
+{
 	primoa32(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(primob_port)
+	m_maincpu->set_addrmap(AS_IO, &primo_state::primob_port);
 
 	MCFG_MACHINE_RESET_OVERRIDE(primo_state, primob)
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(primo_state::primob48)
+void primo_state::primob48(machine_config &config)
+{
 	primoa48(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(primob_port)
+	m_maincpu->set_addrmap(AS_IO, &primo_state::primob_port);
 
 	MCFG_MACHINE_RESET_OVERRIDE(primo_state, primob)
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(primo_state::primob64)
+void primo_state::primob64(machine_config &config)
+{
 	primoa64(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(primob_port)
+	m_maincpu->set_addrmap(AS_IO, &primo_state::primob_port);
 
 	MCFG_MACHINE_RESET_OVERRIDE(primo_state, primob)
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(primo_state::primoc64)
+void primo_state::primoc64(machine_config &config)
+{
 	primoa64(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(primob_port)
+	m_maincpu->set_addrmap(AS_IO, &primo_state::primob_port);
 
 	MCFG_MACHINE_RESET_OVERRIDE(primo_state, primob)
-MACHINE_CONFIG_END
+}
 
 ROM_START( primoa32 )
 	ROM_REGION( 0x14000, "maincpu", ROMREGION_ERASEFF )
@@ -371,9 +368,9 @@ ROM_END
 ROM_START( primob64 )
 	ROM_REGION( 0x14000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "standard", "Standard")
-	ROMX_LOAD( "b64.rom",     0x10000, 0x4000, CRC(cea28188) SHA1(a77e42e97402e601b78ab3751eac1e85d0bbb4a0), ROM_BIOS(1) )
+	ROMX_LOAD( "b64.rom",     0x10000, 0x4000, CRC(cea28188) SHA1(a77e42e97402e601b78ab3751eac1e85d0bbb4a0), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS(1, "cdos", "CDOS")
-	ROMX_LOAD( "b64cdos.rom", 0x10000, 0x4000, CRC(73305e4d) SHA1(c090c3430cdf19eed8363377b981e1c21a4ed169), ROM_BIOS(2) )
+	ROMX_LOAD( "b64cdos.rom", 0x10000, 0x4000, CRC(73305e4d) SHA1(c090c3430cdf19eed8363377b981e1c21a4ed169), ROM_BIOS(1) )
 ROM_END
 
 ROM_START( primoc64 )
@@ -384,11 +381,11 @@ ROM_START( primoc64 )
 	ROM_LOAD( "c64_4.rom", 0x13000, 0x1000, CRC(3770e3e6) SHA1(792cc71d8f89eb447f94aded5afc70d626a26030) )
 ROM_END
 
-//     YEAR  NAME      PARENT    COMPAT MACHINE   INPUT  STATE        INIT     COMPANY     FULLNAME       FLAGS
-COMP ( 1984, primoa32, 0,        0,     primoa32, primo, primo_state, primo32, "Microkey", "Primo A-32" , 0 )
-COMP ( 1984, primoa48, primoa32, 0,     primoa48, primo, primo_state, primo48, "Microkey", "Primo A-48" , 0 )
-COMP ( 1984, primoa64, primoa32, 0,     primoa64, primo, primo_state, primo64, "Microkey", "Primo A-64" , 0 )
-COMP ( 1984, primob32, primoa32, 0,     primob32, primo, primo_state, primo32, "Microkey", "Primo B-32" , 0 )
-COMP ( 1984, primob48, primoa32, 0,     primob48, primo, primo_state, primo48, "Microkey", "Primo B-48" , 0 )
-COMP ( 1984, primob64, primoa32, 0,     primob64, primo, primo_state, primo64, "Microkey", "Primo B-64" , 0 )
-COMP ( 1984, primoc64, primoa32, 0,     primoc64, primo, primo_state, primo64, "Microkey", "Primo C-64" , MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT  CLASS        INIT          COMPANY     FULLNAME      FLAGS
+COMP( 1984, primoa32, 0,        0,      primoa32, primo, primo_state, init_primo32, "Microkey", "Primo A-32", 0 )
+COMP( 1984, primoa48, primoa32, 0,      primoa48, primo, primo_state, init_primo48, "Microkey", "Primo A-48", 0 )
+COMP( 1984, primoa64, primoa32, 0,      primoa64, primo, primo_state, init_primo64, "Microkey", "Primo A-64", 0 )
+COMP( 1984, primob32, primoa32, 0,      primob32, primo, primo_state, init_primo32, "Microkey", "Primo B-32", 0 )
+COMP( 1984, primob48, primoa32, 0,      primob48, primo, primo_state, init_primo48, "Microkey", "Primo B-48", 0 )
+COMP( 1984, primob64, primoa32, 0,      primob64, primo, primo_state, init_primo64, "Microkey", "Primo B-64", 0 )
+COMP( 1984, primoc64, primoa32, 0,      primoc64, primo, primo_state, init_primo64, "Microkey", "Primo C-64", MACHINE_NOT_WORKING )

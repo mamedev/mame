@@ -28,7 +28,7 @@ DEFINE_DEVICE_TYPE(COMPIS_GRAPHICS_SLOT, compis_graphics_slot_device, "compisgfx
 //-------------------------------------------------
 
 device_compis_graphics_card_interface::device_compis_graphics_card_interface(const machine_config &mconfig, device_t &device) :
-	device_slot_card_interface(mconfig, device)
+	device_interface(device, "compisgfx")
 {
 	m_slot = dynamic_cast<compis_graphics_slot_device *>(device.owner());
 }
@@ -40,7 +40,7 @@ device_compis_graphics_card_interface::device_compis_graphics_card_interface(con
 
 compis_graphics_slot_device::compis_graphics_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, COMPIS_GRAPHICS_SLOT, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_compis_graphics_card_interface>(mconfig, *this),
 	m_write_dma_request(*this),
 	m_card(nullptr)
 {
@@ -53,7 +53,7 @@ compis_graphics_slot_device::compis_graphics_slot_device(const machine_config &m
 
 void compis_graphics_slot_device::device_start()
 {
-	m_card = dynamic_cast<device_compis_graphics_card_interface *>(get_card_device());
+	m_card = get_card_device();
 
 	// resolve callbacks
 	m_write_dma_request.resolve_safe();
@@ -67,7 +67,8 @@ void compis_graphics_slot_device::device_start()
 // slot devices
 #include "hrg.h"
 
-SLOT_INTERFACE_START( compis_graphics_cards )
-	SLOT_INTERFACE("hrg", COMPIS_HRG)
-	SLOT_INTERFACE("uhrg", COMPIS_UHRG)
-SLOT_INTERFACE_END
+void compis_graphics_cards(device_slot_interface &device)
+{
+	device.option_add("hrg", COMPIS_HRG);
+	device.option_add("uhrg", COMPIS_UHRG);
+}

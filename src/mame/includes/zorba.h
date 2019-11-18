@@ -9,12 +9,16 @@
 
 #include "bus/ieee488/ieee488.h"
 
+#include "imagedev/floppy.h"
+
 #include "machine/6821pia.h"
 #include "machine/i8251.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80dma.h"
 
 #include "video/i8275.h"
+
+#include "emupal.h"
 
 
 class zorba_state : public driver_device
@@ -45,7 +49,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(printer_type);
 	void zorba(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -85,7 +89,6 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(printer_fault_w);
 	DECLARE_WRITE_LINE_MEMBER(printer_select_w);
 
-private:
 	required_ioport                     m_config_port;
 
 	required_memory_bank                m_read_bank;

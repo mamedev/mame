@@ -15,20 +15,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_CRT_NUM_LEVELS(_lev) \
-	downcast<crt_device &>(*device).set_num_levels(_lev);
-
-#define MCFG_CRT_OFFSETS(_xoffs, _yoffs) \
-	downcast<crt_device &>(*device).set_offsets(_xoffs, _yoffs);
-
-#define MCFG_CRT_SIZE(_width, _height) \
-	downcast<crt_device &>(*device).set_size(_width, _height);
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -69,7 +55,7 @@ private:
 		int next = 0;       /* index of next pixel in list */
 	};
 
-	crt_point *m_list; /* array of (crt_window_width*crt_window_height) point */
+	std::unique_ptr<crt_point[]> m_list; /* array of (crt_window_width*crt_window_height) point */
 	std::unique_ptr<int[]> m_list_head;  /* head of the list of lit pixels (index in the array) */
 						/* keep a separate list for each display line (makes the video code slightly faster) */
 

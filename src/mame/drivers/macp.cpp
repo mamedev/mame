@@ -53,32 +53,34 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( cicplay )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(macp_state::macp)
+void macp_state::macp(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 2500000)
-	MCFG_CPU_PROGRAM_MAP(macp_map)
-	MCFG_CPU_IO_MAP(macp_io)
+	Z80(config, m_maincpu, 2500000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &macp_state::macp_map);
+	m_maincpu->set_addrmap(AS_IO, &macp_state::macp_io);
 
 	/* video hardware */
-	//MCFG_DEFAULT_LAYOUT()
+	//config.set_default_layout();
 
 	//I8279
 
 	/* sound hardware */
 	//2x AY8910
 	genpin_audio(config);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(macp_state::macp0)
+void macp_state::macp0(machine_config &config)
+{
 	macp(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(macp0_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &macp_state::macp0_map);
+}
 
-MACHINE_CONFIG_START(macp_state::macpmsm)
+void macp_state::macpmsm(machine_config &config)
+{
 	macp(config);
 	// MSM5205
-MACHINE_CONFIG_END
+}
 
 ROM_START(macgalxy)
 	ROM_REGION(0x4000, "maincpu", 0)
@@ -148,15 +150,15 @@ ROM_START(glxplay2)
 ROM_END
 
 // MAC S.A. pinballs
-GAME( 1986, macgalxy, 0, macp0,   macp, macp_state, 0, ROT0, "MAC S.A.", "MAC's Galaxy",             MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1987, macjungl, 0, macp0,   macp, macp_state, 0, ROT0, "MAC S.A.", "MAC Jungle",               MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1987, spctrain, 0, macp,    macp, macp_state, 0, ROT0, "MAC S.A.", "Space Train (Pinball)",    MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1988, spcpnthr, 0, macpmsm, macp, macp_state, 0, ROT0, "MAC S.A.", "Space Panther",            MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 19??, mac_1808, 0, macpmsm, macp, macp_state, 0, ROT0, "MAC S.A.", "unknown game (MAC #1808)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1995, macjungn, 0, macpmsm, macp, macp_state, 0, ROT0, "MAC S.A.", "MAC Jungle (New version)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1996, nbamac,   0, macpmsm, macp, macp_state, 0, ROT0, "MAC S.A.", "NBA MAC",                  MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1986, macgalxy, 0, macp0,   macp,    macp_state, empty_init, ROT0, "MAC S.A.", "MAC's Galaxy",             MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1987, macjungl, 0, macp0,   macp,    macp_state, empty_init, ROT0, "MAC S.A.", "MAC Jungle",               MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1987, spctrain, 0, macp,    macp,    macp_state, empty_init, ROT0, "MAC S.A.", "Space Train (Pinball)",    MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1988, spcpnthr, 0, macpmsm, macp,    macp_state, empty_init, ROT0, "MAC S.A.", "Space Panther",            MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 19??, mac_1808, 0, macpmsm, macp,    macp_state, empty_init, ROT0, "MAC S.A.", "unknown game (MAC #1808)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1995, macjungn, 0, macpmsm, macp,    macp_state, empty_init, ROT0, "MAC S.A.", "MAC Jungle (New version)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1996, nbamac,   0, macpmsm, macp,    macp_state, empty_init, ROT0, "MAC S.A.", "NBA MAC",                  MACHINE_IS_SKELETON_MECHANICAL )
 
 // CICPlay pinballs
-GAME( 1985, glxplay,  0, macp0,  cicplay, macp_state, 0, ROT0, "CICPlay", "Galaxy Play",   MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1986, kidnap,   0, macp0,  cicplay, macp_state, 0, ROT0, "CICPlay", "Kidnap",        MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1987, glxplay2, 0, macp0,  cicplay, macp_state, 0, ROT0, "CICPlay", "Galaxy Play 2", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1985, glxplay,  0, macp0,   cicplay, macp_state, empty_init, ROT0, "CICPlay", "Galaxy Play",   MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1986, kidnap,   0, macp0,   cicplay, macp_state, empty_init, ROT0, "CICPlay", "Kidnap",        MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1987, glxplay2, 0, macp0,   cicplay, macp_state, empty_init, ROT0, "CICPlay", "Galaxy Play 2", MACHINE_IS_SKELETON_MECHANICAL )

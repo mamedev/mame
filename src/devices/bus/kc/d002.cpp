@@ -11,6 +11,8 @@
 #include "emu.h"
 #include "d002.h"
 
+#include "machine/input_merger.h"
+
 #include "ram.h"
 #include "rom.h"
 #include "d004.h"
@@ -46,8 +48,9 @@ static INPUT_PORTS_START( kc_d002 )
 INPUT_PORTS_END
 
 // defined in drivers/kc.c
-SLOT_INTERFACE_EXTERN(kc85_cart);
-SLOT_INTERFACE_EXTERN(kc85_exp);
+// FIXME: if src/devices depends on src/mame, you're doing it wrong!
+void kc85_cart(device_slot_interface &device);
+void kc85_exp(device_slot_interface &device);
 
 WRITE_LINE_MEMBER(kc_d002_device::out_irq_w)
 {
@@ -108,40 +111,42 @@ void kc_d002_device::device_reset()
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(kc_d002_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("m0", KCCART_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(kc85_cart, nullptr, false)
-	MCFG_KCCART_SLOT_NEXT_SLOT("m4")
-	MCFG_KCCART_SLOT_OUT_IRQ_CB(WRITELINE(kc_d002_device, out_irq_w))
-	MCFG_KCCART_SLOT_OUT_NMI_CB(WRITELINE(kc_d002_device, out_nmi_w))
-	MCFG_KCCART_SLOT_OUT_HALT_CB(WRITELINE(kc_d002_device, out_halt_w))
-	MCFG_DEVICE_ADD("m4", KCCART_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(kc85_cart, nullptr, false)
-	MCFG_KCCART_SLOT_NEXT_SLOT("m8")
-	MCFG_KCCART_SLOT_OUT_IRQ_CB(WRITELINE(kc_d002_device, out_irq_w))
-	MCFG_KCCART_SLOT_OUT_NMI_CB(WRITELINE(kc_d002_device, out_nmi_w))
-	MCFG_KCCART_SLOT_OUT_HALT_CB(WRITELINE(kc_d002_device, out_halt_w))
-	MCFG_DEVICE_ADD("m8", KCCART_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(kc85_cart, nullptr, false)
-	MCFG_KCCART_SLOT_NEXT_SLOT("mc")
-	MCFG_KCCART_SLOT_OUT_IRQ_CB(WRITELINE(kc_d002_device, out_irq_w))
-	MCFG_KCCART_SLOT_OUT_NMI_CB(WRITELINE(kc_d002_device, out_nmi_w))
-	MCFG_KCCART_SLOT_OUT_HALT_CB(WRITELINE(kc_d002_device, out_halt_w))
-	MCFG_DEVICE_ADD("mc", KCCART_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(kc85_cart, nullptr, false)
-	MCFG_KCCART_SLOT_NEXT_SLOT("exp")
-	MCFG_KCCART_SLOT_OUT_IRQ_CB(WRITELINE(kc_d002_device, out_irq_w))
-	MCFG_KCCART_SLOT_OUT_NMI_CB(WRITELINE(kc_d002_device, out_nmi_w))
-	MCFG_KCCART_SLOT_OUT_HALT_CB(WRITELINE(kc_d002_device, out_halt_w))
+void kc_d002_device::device_add_mconfig(machine_config &config)
+{
+	INPUT_MERGER_ANY_HIGH(config, "irq").output_handler().set(FUNC(kc_d002_device::out_irq_w));
+	INPUT_MERGER_ANY_HIGH(config, "nmi").output_handler().set(FUNC(kc_d002_device::out_nmi_w));
+	INPUT_MERGER_ANY_HIGH(config, "halt").output_handler().set(FUNC(kc_d002_device::out_halt_w));
+
+	KCCART_SLOT(config, m_expansions[0], kc85_cart, nullptr);
+	m_expansions[0]->set_next_slot(m_expansions[1]);
+	m_expansions[0]->irq().set("irq", FUNC(input_merger_device::in_w<0>));
+	m_expansions[0]->nmi().set("nmi", FUNC(input_merger_device::in_w<0>));
+	m_expansions[0]->halt().set("halt", FUNC(input_merger_device::in_w<0>));
+
+	KCCART_SLOT(config, m_expansions[1], kc85_cart, nullptr);
+	m_expansions[1]->set_next_slot(m_expansions[2]);
+	m_expansions[1]->irq().set("irq", FUNC(input_merger_device::in_w<1>));
+	m_expansions[1]->nmi().set("nmi", FUNC(input_merger_device::in_w<1>));
+	m_expansions[1]->halt().set("halt", FUNC(input_merger_device::in_w<1>));
+
+	KCCART_SLOT(config, m_expansions[2], kc85_cart, nullptr);
+	m_expansions[2]->set_next_slot(m_expansions[3]);
+	m_expansions[2]->irq().set("irq", FUNC(input_merger_device::in_w<2>));
+	m_expansions[2]->nmi().set("nmi", FUNC(input_merger_device::in_w<2>));
+	m_expansions[2]->halt().set("halt", FUNC(input_merger_device::in_w<2>));
+
+	KCCART_SLOT(config, m_expansions[3], kc85_cart, nullptr);
+	m_expansions[3]->set_next_slot(m_expansions[4]);
+	m_expansions[3]->irq().set("irq", FUNC(input_merger_device::in_w<3>));
+	m_expansions[3]->nmi().set("nmi", FUNC(input_merger_device::in_w<3>));
+	m_expansions[3]->halt().set("halt", FUNC(input_merger_device::in_w<3>));
 
 	// expansion interface
-	MCFG_DEVICE_ADD("exp", KCCART_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(kc85_exp, nullptr, false)
-	MCFG_KCEXP_SLOT_NEXT_SLOT(nullptr)
-	MCFG_KCEXP_SLOT_OUT_IRQ_CB(WRITELINE(kc_d002_device, out_irq_w))
-	MCFG_KCEXP_SLOT_OUT_NMI_CB(WRITELINE(kc_d002_device, out_nmi_w))
-	MCFG_KCEXP_SLOT_OUT_HALT_CB(WRITELINE(kc_d002_device, out_halt_w))
-MACHINE_CONFIG_END
+	KCCART_SLOT(config, m_expansions[4], kc85_exp, nullptr);
+	m_expansions[4]->irq().set("irq", FUNC(input_merger_device::in_w<4>));
+	m_expansions[4]->nmi().set("nmi", FUNC(input_merger_device::in_w<4>));
+	m_expansions[4]->halt().set("halt", FUNC(input_merger_device::in_w<4>));
+}
 
 //-------------------------------------------------
 //  input_ports - device-specific input ports

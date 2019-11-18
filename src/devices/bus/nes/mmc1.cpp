@@ -219,7 +219,7 @@ void nes_sxrom_device::update_regs(int reg)
 	}
 }
 
-WRITE8_MEMBER( nes_sxrom_device::write_h )
+void nes_sxrom_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("sxrom write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -265,7 +265,7 @@ WRITE8_MEMBER( nes_sxrom_device::write_h )
 	}
 }
 
-WRITE8_MEMBER(nes_sxrom_device::write_m)
+void nes_sxrom_device::write_m(offs_t offset, uint8_t data)
 {
 	uint8_t bank = (m_reg[1] >> 2) & 3;
 	LOG_MMC(("sxrom write_m, offset: %04x, data: %02x\n", offset, data));
@@ -279,7 +279,7 @@ WRITE8_MEMBER(nes_sxrom_device::write_m)
 	}
 }
 
-READ8_MEMBER(nes_sxrom_device::read_m)
+uint8_t nes_sxrom_device::read_m(offs_t offset)
 {
 	uint8_t bank = (m_reg[1] >> 2) & 3;
 	LOG_MMC(("sxrom read_m, offset: %04x\n", offset));
@@ -292,11 +292,11 @@ READ8_MEMBER(nes_sxrom_device::read_m)
 			return m_prgram[((bank * 0x2000) + offset) & (m_prgram.size() - 1)];
 	}
 
-	return m_open_bus;   // open bus
+	return get_open_bus();   // open bus
 }
 
 // SOROM has two RAM banks, the first is not battery backed up, the second is.
-WRITE8_MEMBER(nes_sorom_device::write_m)
+void nes_sorom_device::write_m(offs_t offset, uint8_t data)
 {
 	uint8_t type = BIT(m_reg[0], 4) ? BIT(m_reg[1], 4) : BIT(m_reg[1], 3);
 	LOG_MMC(("sorom write_m, offset: %04x, data: %02x\n", offset, data));
@@ -310,7 +310,7 @@ WRITE8_MEMBER(nes_sorom_device::write_m)
 	}
 }
 
-READ8_MEMBER(nes_sorom_device::read_m)
+uint8_t nes_sorom_device::read_m(offs_t offset)
 {
 	uint8_t type = BIT(m_reg[0], 4) ? BIT(m_reg[1], 4) : BIT(m_reg[1], 3);
 	LOG_MMC(("sorom read_m, offset: %04x\n", offset));
@@ -323,11 +323,11 @@ READ8_MEMBER(nes_sorom_device::read_m)
 			return m_prgram[offset & (m_prgram.size() - 1)];
 	}
 
-	return m_open_bus;   // open bus
+	return get_open_bus();   // open bus
 }
 
 // MMC1A boards have no wram enable/disable bit
-WRITE8_MEMBER(nes_sxrom_a_device::write_m)
+void nes_sxrom_a_device::write_m(offs_t offset, uint8_t data)
 {
 	uint8_t bank = (m_reg[1] >> 2) & 3;
 	LOG_MMC(("sxrom_a write_m, offset: %04x, data: %02x\n", offset, data));
@@ -338,7 +338,7 @@ WRITE8_MEMBER(nes_sxrom_a_device::write_m)
 		m_prgram[((bank * 0x2000) + offset) & (m_prgram.size() - 1)] = data;
 }
 
-READ8_MEMBER(nes_sxrom_a_device::read_m)
+uint8_t nes_sxrom_a_device::read_m(offs_t offset)
 {
 	uint8_t bank = (m_reg[1] >> 2) & 3;
 	LOG_MMC(("sxrom_a read_m, offset: %04x\n", offset));
@@ -348,10 +348,10 @@ READ8_MEMBER(nes_sxrom_a_device::read_m)
 	if (!m_prgram.empty())
 		return m_prgram[((bank * 0x2000) + offset) & (m_prgram.size() - 1)];
 
-	return m_open_bus;   // open bus
+	return get_open_bus();   // open bus
 }
 
-WRITE8_MEMBER(nes_sorom_a_device::write_m)
+void nes_sorom_a_device::write_m(offs_t offset, uint8_t data)
 {
 	uint8_t type = BIT(m_reg[0], 4) ? BIT(m_reg[1], 4) : BIT(m_reg[1], 3);
 	LOG_MMC(("sorom_a write_m, offset: %04x, data: %02x\n", offset, data));
@@ -362,7 +362,7 @@ WRITE8_MEMBER(nes_sorom_a_device::write_m)
 		m_prgram[offset & (m_prgram.size() - 1)] = data;
 }
 
-READ8_MEMBER(nes_sorom_a_device::read_m)
+uint8_t nes_sorom_a_device::read_m(offs_t offset)
 {
 	uint8_t type = BIT(m_reg[0], 4) ? BIT(m_reg[1], 4) : BIT(m_reg[1], 3);
 	LOG_MMC(("sorom_a read_m, offset: %04x\n", offset));

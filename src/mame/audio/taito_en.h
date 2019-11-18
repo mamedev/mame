@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Bryan McPhail, Aaron Giles, R. Belmont, hap, Philip Bennett
+// copyright-holders:Bryan McPhail, Aaron Giles, R. Belmont, Philip Bennett
 /***************************************************************************
 
     Taito Ensoniq ES5505-based sound hardware
@@ -31,7 +31,6 @@ public:
 
 	void set_bank(int bank, int entry) { m_cpubank[bank]->set_entry(entry); }
 
-	void en_sound_map(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -39,6 +38,9 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
+	void en_sound_map(address_map &map);
+	void fc7_map(address_map &map);
+
 	// inherited devices/pointers
 	required_device<cpu_device> m_audiocpu;
 	required_device<es5505_device> m_ensoniq;
@@ -54,10 +56,11 @@ private:
 
 	uint32_t m_bankmask;
 
-	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
+	IRQ_CALLBACK_MEMBER(duart_iack);
 	DECLARE_WRITE8_MEMBER(duart_output);
 
 	DECLARE_WRITE8_MEMBER(mb87078_gain_changed);
+	void es5505_clock_changed(u32 data);
 };
 
 DECLARE_DEVICE_TYPE(TAITO_EN, taito_en_device)

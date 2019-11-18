@@ -47,7 +47,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(junior_reset);
 	void junior(machine_config &config);
 
-protected:
+private:
 	DECLARE_READ8_MEMBER(junior_riot_a_r);
 	DECLARE_READ8_MEMBER(junior_riot_b_r);
 	DECLARE_WRITE8_MEMBER(junior_riot_a_w);
@@ -59,7 +59,6 @@ protected:
 
 	void junior_mem(address_map &map);
 
-private:
 	required_device<mos6532_new_device> m_riot;
 	uint8_t m_port_a;
 	uint8_t m_port_b;
@@ -125,7 +124,7 @@ PORT_START("LINE0")         /* IN0 keys row 0 */
 	PORT_START("LINE3")         /* IN3 STEP and RESET keys, MODE switch */
 	PORT_BIT( 0x80, 0x00, IPT_UNUSED )
 	PORT_BIT( 0x40, 0x40, IPT_KEYBOARD ) PORT_NAME("sw1: ST") PORT_CODE(KEYCODE_F7)
-	PORT_BIT( 0x20, 0x20, IPT_KEYBOARD ) PORT_NAME("sw2: RST") PORT_CODE(KEYCODE_F3) PORT_CHANGED_MEMBER(DEVICE_SELF, junior_state, junior_reset, nullptr)
+	PORT_BIT( 0x20, 0x20, IPT_KEYBOARD ) PORT_NAME("sw2: RST") PORT_CODE(KEYCODE_F3) PORT_CHANGED_MEMBER(DEVICE_SELF, junior_state, junior_reset, 0)
 	PORT_DIPNAME(0x10, 0x10, "sw3: SS (NumLock)") PORT_CODE(KEYCODE_NUMLOCK) PORT_TOGGLE
 	PORT_DIPSETTING( 0x00, "single step")
 	PORT_DIPSETTING( 0x10, "run")
@@ -226,25 +225,26 @@ void junior_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(junior_state::junior)
+void junior_state::junior(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M6502, 1_MHz_XTAL)
-	MCFG_CPU_PROGRAM_MAP(junior_mem)
-	MCFG_QUANTUM_TIME(attotime::from_hz(50))
+	M6502(config, m_maincpu, 1_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &junior_state::junior_mem);
+	config.set_maximum_quantum(attotime::from_hz(50));
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT( layout_junior )
+	config.set_default_layout(layout_junior);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("riot", MOS6532_NEW, 1_MHz_XTAL)
-	MCFG_MOS6530n_IN_PA_CB(READ8(junior_state, junior_riot_a_r))
-	MCFG_MOS6530n_OUT_PA_CB(WRITE8(junior_state, junior_riot_a_w))
-	MCFG_MOS6530n_IN_PB_CB(READ8(junior_state, junior_riot_b_r))
-	MCFG_MOS6530n_OUT_PB_CB(WRITE8(junior_state, junior_riot_b_w))
-	MCFG_MOS6530n_IRQ_CB(INPUTLINE("maincpu", M6502_IRQ_LINE))
+	MOS6532_NEW(config, m_riot, 1_MHz_XTAL);
+	m_riot->pa_rd_callback().set(FUNC(junior_state::junior_riot_a_r));
+	m_riot->pa_wr_callback().set(FUNC(junior_state::junior_riot_a_w));
+	m_riot->pb_rd_callback().set(FUNC(junior_state::junior_riot_b_r));
+	m_riot->pb_wr_callback().set(FUNC(junior_state::junior_riot_b_w));
+	m_riot->irq_wr_callback().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("led_timer", junior_state, junior_update_leds, attotime::from_hz(50))
-MACHINE_CONFIG_END
+	TIMER(config, "led_timer").configure_periodic(FUNC(junior_state::junior_update_leds), attotime::from_hz(50));
+}
 
 
 /* ROM definition */
@@ -253,16 +253,16 @@ ROM_START( junior )
 	ROM_DEFAULT_BIOS("orig")
 
 	ROM_SYSTEM_BIOS( 0, "orig", "Original ESS503" )
-	ROMX_LOAD( "ess503.ic2", 0x1c00, 0x0400, CRC(9e804f8c) SHA1(181bdb69fb4711cb008e7966747d4775a5e3ef69), ROM_BIOS(1))
+	ROMX_LOAD( "ess503.ic2", 0x1c00, 0x0400, CRC(9e804f8c) SHA1(181bdb69fb4711cb008e7966747d4775a5e3ef69), ROM_BIOS(0))
 
 	ROM_SYSTEM_BIOS( 1, "mod-orig", "Mod-Original (2708)" )
-	ROMX_LOAD( "junior-mod.ic2", 0x1c00, 0x0400, CRC(ee8aa69d) SHA1(a132a51603f1a841c354815e6d868b335ac84364), ROM_BIOS(2))
+	ROMX_LOAD( "junior-mod.ic2", 0x1c00, 0x0400, CRC(ee8aa69d) SHA1(a132a51603f1a841c354815e6d868b335ac84364), ROM_BIOS(1))
 
 	ROM_SYSTEM_BIOS( 2, "2732", "Just monitor (2732)" )
-	ROMX_LOAD( "junior27321a.ic2", 0x1c00, 0x0400, CRC(e22f24cc) SHA1(a6edb52a9eea5e99624c128065e748e5a3fb2e4c), ROM_BIOS(3))
+	ROMX_LOAD( "junior27321a.ic2", 0x1c00, 0x0400, CRC(e22f24cc) SHA1(a6edb52a9eea5e99624c128065e748e5a3fb2e4c), ROM_BIOS(2))
 ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   STATE          INIT   COMPANY                FULLNAME           FLAGS */
-COMP( 1980, junior, 0,      0,       junior,    junior, junior_state,  0,     "Elektor Electronics", "Junior Computer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW)
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY                FULLNAME           FLAGS */
+COMP( 1980, junior, 0,      0,      junior,  junior, junior_state, empty_init, "Elektor Electronics", "Junior Computer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW)

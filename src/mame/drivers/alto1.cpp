@@ -18,20 +18,21 @@ class alto1_state : public driver_device
 public:
 	alto1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-//      , m_maincpu(*this, "maincpu")
+		//      , m_maincpu(*this, "maincpu")
 	{ }
 
-void alto1(machine_config &config);
+	void alto1(machine_config &config);
 private:
-//  required_device<cpu_device> m_maincpu;
+	//  required_device<cpu_device> m_maincpu;
 };
 
 
 static INPUT_PORTS_START( alto1 )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(alto1_state::alto1)
-MACHINE_CONFIG_END
+void alto1_state::alto1(machine_config &config)
+{
+}
 
 ROM_START( alto1 )
 	ROM_REGION( 0x4000, "roms", 0 )
@@ -76,4 +77,4 @@ ROM_START( alto1 )
 	ROM_LOAD( "pram.bin",     0x2600, 0x0100, CRC(8087140e) SHA1(e17d9756150d41d6ff614afa86808a9c77516749) )
 ROM_END
 
-COMP( 1973, alto1, 0, 0, alto1, alto1, alto1_state, 0, "Xerox", "Alto I", MACHINE_IS_SKELETON )
+COMP( 1973, alto1, 0, 0, alto1, alto1, alto1_state, empty_init, "Xerox", "Alto I", MACHINE_IS_SKELETON )

@@ -18,7 +18,7 @@
 #include "cpu/m6800/m6800.h"
 #include "imagedev/cassette.h"
 #include "sound/beep.h"
-#include "sound/wave.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -44,7 +44,7 @@ public:
 	DECLARE_READ8_MEMBER(tape_stop_r);
 	DECLARE_READ8_MEMBER(tape_start_r);
 	DECLARE_WRITE8_MEMBER(xor_display_w);
-	DECLARE_DRIVER_INIT(bmjr);
+	void init_bmjr();
 	u32 screen_update_bmjr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void bmjr(machine_config &config);
@@ -173,18 +173,18 @@ void bmjr_state::bmjr_mem(address_map &map)
 	map(0x0000, 0xafff).ram().share("wram");
 	map(0xb000, 0xdfff).rom();
 	map(0xe000, 0xe7ff).rom();
-//  AM_RANGE(0xe890, 0xe890) W MP-1710 tile color
-//  AM_RANGE(0xe891, 0xe891) W MP-1710 background color
-//  AM_RANGE(0xe892, 0xe892) W MP-1710 monochrome / color setting
-	map(0xee00, 0xee00).r(this, FUNC(bmjr_state::tape_stop_r)); //R stop tape
-	map(0xee20, 0xee20).r(this, FUNC(bmjr_state::tape_start_r)); //R start tape
-	map(0xee40, 0xee40).w(this, FUNC(bmjr_state::xor_display_w)); //W Picture reverse
-	map(0xee80, 0xee80).rw(this, FUNC(bmjr_state::tape_r), FUNC(bmjr_state::tape_w));//RW tape input / output
-	map(0xeec0, 0xeec0).rw(this, FUNC(bmjr_state::key_r), FUNC(bmjr_state::key_w));//RW keyboard
-	map(0xef00, 0xef00).r(this, FUNC(bmjr_state::ff_r)); //R timer
-	map(0xef40, 0xef40).r(this, FUNC(bmjr_state::ff_r)); //R unknown
-	map(0xef80, 0xef80).r(this, FUNC(bmjr_state::unk_r)); //R unknown
-//  AM_RANGE(0xefe0, 0xefe0) W screen mode
+//  map(0xe890, 0xe890) W MP-1710 tile color
+//  map(0xe891, 0xe891) W MP-1710 background color
+//  map(0xe892, 0xe892) W MP-1710 monochrome / color setting
+	map(0xee00, 0xee00).r(FUNC(bmjr_state::tape_stop_r)); //R stop tape
+	map(0xee20, 0xee20).r(FUNC(bmjr_state::tape_start_r)); //R start tape
+	map(0xee40, 0xee40).w(FUNC(bmjr_state::xor_display_w)); //W Picture reverse
+	map(0xee80, 0xee80).rw(FUNC(bmjr_state::tape_r), FUNC(bmjr_state::tape_w));//RW tape input / output
+	map(0xeec0, 0xeec0).rw(FUNC(bmjr_state::key_r), FUNC(bmjr_state::key_w));//RW keyboard
+	map(0xef00, 0xef00).r(FUNC(bmjr_state::ff_r)); //R timer
+	map(0xef40, 0xef40).r(FUNC(bmjr_state::ff_r)); //R unknown
+	map(0xef80, 0xef80).r(FUNC(bmjr_state::unk_r)); //R unknown
+//  map(0xefe0, 0xefe0) W screen mode
 	map(0xf000, 0xffff).rom();
 }
 
@@ -321,7 +321,7 @@ static const gfx_layout bmjr_charlayout =
 	8*8
 };
 
-static GFXDECODE_START( bmjr )
+static GFXDECODE_START( gfx_bmjr )
 	GFXDECODE_ENTRY( "chargen", 0x0000, bmjr_charlayout, 0, 4 )
 GFXDECODE_END
 
@@ -336,35 +336,34 @@ void bmjr_state::machine_reset()
 	m_cass->change_state(CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
 }
 
-MACHINE_CONFIG_START(bmjr_state::bmjr)
+void bmjr_state::bmjr(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M6800, XTAL(4'000'000)/4) //unknown clock / divider
-	MCFG_CPU_PROGRAM_MAP(bmjr_mem)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bmjr_state,  irq0_line_hold)
+	M6800(config, m_maincpu, XTAL(4'000'000)/4); //unknown clock / divider
+	m_maincpu->set_addrmap(AS_PROGRAM, &bmjr_state::bmjr_mem);
+	m_maincpu->set_vblank_int("screen", FUNC(bmjr_state::irq0_line_hold));
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(256, 192)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 192-1)
-	MCFG_SCREEN_UPDATE_DRIVER(bmjr_state, screen_update_bmjr)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(256, 192);
+	screen.set_visarea_full();
+	screen.set_screen_update(FUNC(bmjr_state::screen_update_bmjr));
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD_3BIT_BRG("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bmjr)
+	PALETTE(config, "palette", palette_device::BRG_3BIT);
+	GFXDECODE(config, "gfxdecode", "palette", gfx_bmjr);
 
 	/* Audio */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 1200) // guesswork
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	BEEP(config, "beeper", 1200).add_route(ALL_OUTPUTS, "mono", 0.50); // guesswork
 
 	/* Devices */
-	MCFG_CASSETTE_ADD( "cassette" )
-MACHINE_CONFIG_END
+	CASSETTE(config, m_cass);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
+}
 
 /* ROM definition */
 ROM_START( bmjr )
@@ -378,9 +377,9 @@ ROM_START( bmjr )
 ROM_END
 
 /* Driver */
-DRIVER_INIT_MEMBER(bmjr_state,bmjr)
+void bmjr_state::init_bmjr()
 {
 }
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE        INIT   COMPANY    FULLNAME           FLAGS */
-COMP( 1982, bmjr,   0,      0,       bmjr,      bmjr,  bmjr_state,  bmjr,  "Hitachi", "Basic Master Jr", MACHINE_NOT_WORKING)
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT       COMPANY    FULLNAME           FLAGS */
+COMP( 1982, bmjr, 0,      0,      bmjr,    bmjr,  bmjr_state, init_bmjr, "Hitachi", "Basic Master Jr", MACHINE_NOT_WORKING)

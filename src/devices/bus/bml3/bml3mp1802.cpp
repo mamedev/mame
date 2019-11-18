@@ -23,14 +23,17 @@
 
 DEFINE_DEVICE_TYPE(BML3BUS_MP1802, bml3bus_mp1802_device, "bml3mp1802", "Hitachi MP-1802 Floppy Controller Card")
 
-static SLOT_INTERFACE_START( mp1802_floppies )
-	SLOT_INTERFACE("dd", FLOPPY_525_DD)
-SLOT_INTERFACE_END
+static void mp1802_floppies(device_slot_interface &device)
+{
+	device.option_add("dd", FLOPPY_525_DD);
+}
 
 WRITE_LINE_MEMBER( bml3bus_mp1802_device::bml3_wd17xx_intrq_w )
 {
-	if (state) {
-		m_bml3bus->set_nmi_line(PULSE_LINE);
+	if (state)
+	{
+		raise_slot_nmi();
+		lower_slot_nmi();
 	}
 }
 
@@ -51,15 +54,18 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(bml3bus_mp1802_device::device_add_mconfig)
-	MCFG_MB8866_ADD("fdc", XTAL(1'000'000))
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(bml3bus_mp1802_device, bml3_wd17xx_intrq_w))
+void bml3bus_mp1802_device::device_add_mconfig(machine_config &config)
+{
+	constexpr auto CLK16M = 32.256_MHz_XTAL / 2;
 
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", mp1802_floppies, "dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", mp1802_floppies, "dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:2", mp1802_floppies, "", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:3", mp1802_floppies, "", floppy_image_device::default_floppy_formats)
-MACHINE_CONFIG_END
+	MB8866(config, m_fdc, CLK16M / 16); // 16MCLK divided by IC628 (HD74LS93P)
+	m_fdc->intrq_wr_callback().set(FUNC(bml3bus_mp1802_device::bml3_wd17xx_intrq_w));
+
+	FLOPPY_CONNECTOR(config, m_floppy0, mp1802_floppies, "dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy1, mp1802_floppies, "dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy2, mp1802_floppies, nullptr, floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy3, mp1802_floppies, nullptr, floppy_image_device::default_floppy_formats);
+}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -119,15 +125,12 @@ bml3bus_mp1802_device::bml3bus_mp1802_device(const machine_config &mconfig, cons
 
 void bml3bus_mp1802_device::device_start()
 {
-	// set_bml3bus_device makes m_slot valid
-	set_bml3bus_device();
-
 	m_rom = memregion(MP1802_ROM_REGION)->base();
 
 	// install into memory
-	address_space &space_prg = m_bml3bus->space();
-	space_prg.install_readwrite_handler(0xff00, 0xff03, read8_delegate(FUNC(mb8866_device::read),(mb8866_device*)m_fdc), write8_delegate(FUNC(mb8866_device::write),(mb8866_device*)m_fdc));
-	space_prg.install_readwrite_handler(0xff04, 0xff04, read8_delegate(FUNC(bml3bus_mp1802_device::bml3_mp1802_r), this), write8_delegate(FUNC(bml3bus_mp1802_device::bml3_mp1802_w), this));
+	address_space &space_prg = space();
+	space_prg.install_readwrite_handler(0xff00, 0xff03, read8sm_delegate(*m_fdc, FUNC(mb8866_device::read)), write8sm_delegate(*m_fdc, FUNC(mb8866_device::write)));
+	space_prg.install_readwrite_handler(0xff04, 0xff04, read8_delegate(*this, FUNC(bml3bus_mp1802_device::bml3_mp1802_r)), write8_delegate(*this, FUNC(bml3bus_mp1802_device::bml3_mp1802_w)));
 	// overwriting the main ROM (rather than using e.g. install_rom) should mean that bank switches for RAM expansion still work...
 	uint8_t *mainrom = device().machine().root_device().memregion("maincpu")->base();
 	memcpy(mainrom + 0xf800, m_rom + 0xf800, 0x800);

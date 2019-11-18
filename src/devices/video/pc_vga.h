@@ -110,8 +110,10 @@ protected:
 	}
 
 
-	struct
+	struct vga_t
 	{
+		vga_t(device_t &owner) : read_dipswitch(owner) { }
+
 		read8_delegate read_dipswitch;
 		struct
 		{
@@ -184,6 +186,7 @@ protected:
 	/**/    uint8_t map13;
 	/**/    uint8_t irq_clear;
 	/**/    uint8_t irq_disable;
+			uint8_t no_wrap;
 		} crtc;
 
 		struct
@@ -278,8 +281,8 @@ class ibm8514a_device : public device_t
 public:
 	ibm8514a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void set_vga(const char* tag) { m_vga_tag.assign(tag); }
-	void set_vga_owner() { m_vga = dynamic_cast<svga_device*>(owner()); }
+	template <typename T> void set_vga(T &&tag) { m_vga.set_tag(std::forward<T>(tag)); }
+	void set_vga_owner() { m_vga.set_tag(DEVICE_SELF); }
 
 	void enabled();
 
@@ -395,13 +398,11 @@ protected:
 	ibm8514a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override;
-	virtual void device_config_complete() override;
 	void ibm8514_write(uint32_t offset, uint32_t src);
 	void ibm8514_write_fg(uint32_t offset);
 	void ibm8514_write_bg(uint32_t offset);
 
-	svga_device* m_vga;  // for pass-through
-	std::string m_vga_tag;  // pass-through device tag
+	required_device<svga_device> m_vga;  // for pass-through
 private:
 	void ibm8514_draw_vector(uint8_t len, uint8_t dir, bool draw);
 	void ibm8514_wait_draw_ssv();
@@ -415,14 +416,6 @@ private:
 
 // device type definition
 DECLARE_DEVICE_TYPE(IBM8514A, ibm8514a_device)
-
-#define MCFG_8514A_ADD(_tag, _param) \
-		MCFG_DEVICE_ADD(_tag, IBM8514A, 0) \
-		downcast<ibm8514a_device*>(device)->set_vga(_param);
-
-#define MCFG_8514A_ADD_OWNER(_tag) \
-		MCFG_DEVICE_ADD(_tag, IBM8514A, 0) \
-		downcast<ibm8514a_device*>(device)->set_vga_owner();
 
 
 class mach8_device : public ibm8514a_device
@@ -497,13 +490,6 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(MACH8, mach8_device)
 
-#define MCFG_MACH8_ADD(_tag, _param) \
-		MCFG_DEVICE_ADD(_tag, MACH8, 0) \
-		downcast<mach8_device*>(device)->set_vga(_param);
-
-#define MCFG_MACH8_ADD_OWNER(_tag) \
-		MCFG_DEVICE_ADD(_tag, MACH8, 0) \
-		downcast<mach8_device*>(device)->set_vga_owner();
 
 // ======================> tseng_vga_device
 
@@ -636,6 +622,7 @@ protected:
 		uint8_t cr3a;
 		uint8_t cr42;
 		uint8_t cr43;
+		uint8_t cr51;
 		uint8_t cr53;
 		uint8_t id_high;
 		uint8_t id_low;

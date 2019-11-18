@@ -40,7 +40,6 @@
  Speed Race Twin (04/1976)                                                          UNKNOWN
  Speed Race GP-5 (03/1980)                                                          UNKNOWN
  Super Block (02/1978)                                                              UNKNOWN
- Super High-Way (10/1977)?                                                          UNKNOWN
  Super Speed Race (12/1977)                                                         UNKNOWN
  Super Speed Race V (07/1978)                                                       UNKNOWN
  Super Speed Race GP-V (??/1980)                                                    UNKNOWN
@@ -95,21 +94,18 @@ public:
 	{
 	}
 
+	void taitottl(machine_config &config);
+
+private:
 	// devices
 	required_device<netlist_mame_device> m_maincpu;
 	required_device<fixedfreq_device> m_video;
-
-	void taitottl(machine_config &config);
-protected:
 
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	virtual void video_start() override;
-
-private:
-
 };
 
 
@@ -140,20 +136,20 @@ void taitottl_state::video_start()
 {
 }
 
-MACHINE_CONFIG_START(taitottl_state::taitottl)
-
+void taitottl_state::taitottl(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)
-	MCFG_NETLIST_SETUP(taitottl)
+	NETLIST_CPU(config, m_maincpu, NETLIST_CLOCK).set_source(netlist_taitottl);
 
 	/* video hardware */
-	MCFG_FIXFREQ_ADD("fixfreq", "screen")
-	MCFG_FIXFREQ_MONITOR_CLOCK(MASTER_CLOCK)
-	MCFG_FIXFREQ_HORZ_PARAMS(H_TOTAL-67,H_TOTAL-40,H_TOTAL-8,H_TOTAL)
-	MCFG_FIXFREQ_VERT_PARAMS(V_TOTAL-22,V_TOTAL-19,V_TOTAL-12,V_TOTAL)
-	MCFG_FIXFREQ_FIELDCOUNT(1)
-	MCFG_FIXFREQ_SYNC_THRESHOLD(0.30)
-MACHINE_CONFIG_END
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	FIXFREQ(config, m_video).set_screen("screen");
+	m_video->set_monitor_clock(MASTER_CLOCK);
+	m_video->set_horz_params(H_TOTAL-67,H_TOTAL-40,H_TOTAL-8,H_TOTAL);
+	m_video->set_vert_params(V_TOTAL-22,V_TOTAL-19,V_TOTAL-12,V_TOTAL);
+	m_video->set_fieldcount(1);
+	m_video->set_threshold(0.30);
+}
 
 
 /***************************************************************************
@@ -365,9 +361,9 @@ ROM_START( zzblock )
 ROM_END
 
 
-GAME( 1977, fisco400,  0,       taitottl, 0, taitottl_state,  0, ROT0, "Taito", "Cisco/Fisco 400 [TTL]",     MACHINE_IS_SKELETON )
-GAME( 1977, gunman,    0,       taitottl, 0, taitottl_state,  0, ROT0, "Taito", "Gunman [TTL]",              MACHINE_IS_SKELETON )
-GAME( 1977, missilex,  0,       taitottl, 0, taitottl_state,  0, ROT0, "Taito", "Missile-X [TTL]",           MACHINE_IS_SKELETON )
-GAME( 1977, ttblock,   0,       taitottl, 0, taitottl_state,  0, ROT0, "Taito", "T.T Block [TTL]",           MACHINE_IS_SKELETON )
-GAME( 1978, ttsracec,  0,       taitottl, 0, taitottl_state,  0, ROT0, "Taito", "T.T. Speed Race CL [TTL]",  MACHINE_IS_SKELETON )
-GAME( 1979, zzblock,   0,       taitottl, 0, taitottl_state,  0, ROT0, "Taito", "Zun Zun Block [TTL]",       MACHINE_IS_SKELETON )
+GAME( 1977, fisco400,  0,       taitottl, 0, taitottl_state, empty_init, ROT0, "Taito", "Cisco/Fisco 400 [TTL]",     MACHINE_IS_SKELETON )
+GAME( 1977, gunman,    0,       taitottl, 0, taitottl_state, empty_init, ROT0, "Taito", "Gunman [TTL]",              MACHINE_IS_SKELETON )
+GAME( 1977, missilex,  0,       taitottl, 0, taitottl_state, empty_init, ROT0, "Taito", "Missile-X [TTL]",           MACHINE_IS_SKELETON )
+GAME( 1977, ttblock,   0,       taitottl, 0, taitottl_state, empty_init, ROT0, "Taito", "T.T Block [TTL]",           MACHINE_IS_SKELETON )
+GAME( 1978, ttsracec,  0,       taitottl, 0, taitottl_state, empty_init, ROT0, "Taito", "T.T. Speed Race CL [TTL]",  MACHINE_IS_SKELETON )
+GAME( 1979, zzblock,   0,       taitottl, 0, taitottl_state, empty_init, ROT0, "Taito", "Zun Zun Block [TTL]",       MACHINE_IS_SKELETON )

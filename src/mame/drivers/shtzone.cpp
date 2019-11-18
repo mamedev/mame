@@ -51,6 +51,7 @@ Notes:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "emupal.h"
 #include "screen.h"
 
 class shtzone_state : public driver_device
@@ -58,11 +59,14 @@ class shtzone_state : public driver_device
 public:
 	shtzone_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
+
+	void shtzone(machine_config &config);
+
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_shtzone(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void shtzone(machine_config &config);
 	void shtzone_map(address_map &map);
 };
 
@@ -96,27 +100,26 @@ uint32_t shtzone_state::screen_update_shtzone(screen_device &screen, bitmap_ind1
 }
 
 
-MACHINE_CONFIG_START(shtzone_state::shtzone)
-
+void shtzone_state::shtzone(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("timercpu", Z80,10738000/4)
-	MCFG_CPU_PROGRAM_MAP(shtzone_map)
+	z80_device &timercpu(Z80(config, "timercpu", 10738000/4));
+	timercpu.set_addrmap(AS_PROGRAM, &shtzone_state::shtzone_map);
 
 	/* + SMS CPU */
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(shtzone_state, screen_update_shtzone)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 256-1, 0, 256-1);
+	screen.set_screen_update(FUNC(shtzone_state::screen_update_shtzone));
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 0x100)
-
-MACHINE_CONFIG_END
+	PALETTE(config, "palette").set_entries(0x100);
+}
 
 
 ROM_START( shtzone )
@@ -124,4 +127,4 @@ ROM_START( shtzone )
 	ROM_LOAD( "epr10894a.20", 0x00000, 0x04000, CRC(ea8901d9) SHA1(43fd8bfc395e3b2e3fbe9645d692a5eb04783d9c) )
 ROM_END
 
-GAME( 1987, shtzone,  0,    shtzone, shtzone, shtzone_state,  0, ROT0, "Sega", "Shooting Zone System BIOS", MACHINE_IS_SKELETON | MACHINE_IS_BIOS_ROOT )
+GAME( 1987, shtzone, 0, shtzone, shtzone, shtzone_state, empty_init, ROT0, "Sega", "Shooting Zone System BIOS", MACHINE_IS_SKELETON | MACHINE_IS_BIOS_ROOT )

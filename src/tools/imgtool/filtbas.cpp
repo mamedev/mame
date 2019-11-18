@@ -116,6 +116,8 @@ static imgtoolerr_t basic_readfile(const basictokens *tokens,
 		destf.printf("%u ", (unsigned) line_number);
 		shift = 0x00;
 
+		in_string = false; // in case the last line didn't terminate a string
+
 		while((mem_stream->read(&b, 1) > 0) && (b != 0x00))
 		{
 			if (b == 0x22)
@@ -275,6 +277,7 @@ static imgtoolerr_t basic_writefile(const basictokens *tokens,
 				{
 					for (i = 0; (token == nullptr) && (i < tokens->num_entries); i++)
 					{
+						bool found = false;
 						token_table = &tokens->entries[i];
 						for (j = 0; (token == nullptr) && (j < token_table->num_tokens); j++)
 						{
@@ -284,8 +287,12 @@ static imgtoolerr_t basic_writefile(const basictokens *tokens,
 								token_shift = token_table->shift;
 								token_value = token_table->base + j;
 								pos += strlen(token);
+								found = true;
+								break;
 							}
 						}
+						if (found)
+							break;
 					}
 				}
 

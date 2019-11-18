@@ -12,25 +12,29 @@
 #include "cpu/mcs51/mcs51.h"
 //#include "machine/mc68681.h"
 #include "machine/ram.h"
+#include "emupal.h"
 #include "screen.h"
 
 
 class vt520_state : public driver_device
 {
 public:
-	vt520_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+	vt520_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu"),
-		m_rom(*this, "maincpu") { }
+		m_rom(*this, "maincpu")
+	{ }
 
+	void vt520(machine_config &config);
+	void vt420(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(vt520_some_r);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_vt520(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<uint8_t> m_rom;
-	void vt520(machine_config &config);
-	void vt420(machine_config &config);
 	void vt520_io(address_map &map);
 	void vt520_mem(address_map &map);
 };
@@ -57,7 +61,7 @@ READ8_MEMBER( vt520_state::vt520_some_r )
 void vt520_state::vt520_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x7ffb, 0x7ffb).r(this, FUNC(vt520_state::vt520_some_r));
+	map(0x7ffb, 0x7ffb).r(FUNC(vt520_state::vt520_some_r));
 }
 
 /* Input ports */
@@ -81,47 +85,48 @@ uint32_t vt520_state::screen_update_vt520(screen_device &screen, bitmap_ind16 &b
 	return 0;
 }
 
-MACHINE_CONFIG_START(vt520_state::vt420)
+void vt520_state::vt420(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80C31, XTAL(43'320'000) / 3) // SCN8031HCFN40 (divider not verified)
-	MCFG_CPU_PROGRAM_MAP(vt520_mem)
-	MCFG_CPU_IO_MAP(vt520_io)
+	I80C31(config, m_maincpu, XTAL(43'320'000) / 3); // SCN8031HCFN40 (divider not verified)
+	m_maincpu->set_addrmap(AS_PROGRAM, &vt520_state::vt520_mem);
+	m_maincpu->set_addrmap(AS_IO, &vt520_state::vt520_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(802, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 802-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_DRIVER(vt520_state, screen_update_vt520)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(802, 480);
+	screen.set_visarea(0, 802-1, 0, 480-1);
+	screen.set_screen_update(FUNC(vt520_state::screen_update_vt520));
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
-MACHINE_CONFIG_END
+	PALETTE(config, "palette", palette_device::MONOCHROME);
+}
 
-MACHINE_CONFIG_START(vt520_state::vt520)
+void vt520_state::vt520(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80C32, XTAL(20'000'000)) // Philips P80C32IBPN
-	MCFG_CPU_PROGRAM_MAP(vt520_mem)
-	MCFG_CPU_IO_MAP(vt520_io)
+	I80C32(config, m_maincpu, XTAL(20'000'000)); // Philips P80C32IBPN
+	m_maincpu->set_addrmap(AS_PROGRAM, &vt520_state::vt520_mem);
+	m_maincpu->set_addrmap(AS_IO, &vt520_state::vt520_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(802, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 802-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_DRIVER(vt520_state, screen_update_vt520)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(802, 480);
+	screen.set_visarea(0, 802-1, 0, 480-1);
+	screen.set_screen_update(FUNC(vt520_state::screen_update_vt520));
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	// On the board there are two M5M44256BJ-7 chips
 	// Which are DRAM 256K x 4bit
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("256K")
-MACHINE_CONFIG_END
+	RAM(config, RAM_TAG).set_default_size("256K");
+}
 
 /**************************************************************************************************************
 
@@ -143,7 +148,7 @@ ROM_END
 
 /* Driver */
 
-COMP( 1990, vt420,  0,      0,       vt420,    vt520, vt520_state,   0,    "Digital Equipment Corporation", "VT420 Video Terminal", MACHINE_IS_SKELETON )
-//COMP( 1993, vt510,  0,      0,       vt520,    vt520, vt520_state,   0,    "Digital Equipment Corporation", "VT510 Video Terminal",  MACHINE_IS_SKELETON)
-COMP( 1994, vt520,  0,      0,       vt520,    vt520, vt520_state,   0,    "Digital Equipment Corporation", "VT520 Video Terminal",  MACHINE_IS_SKELETON)
-//COMP( 1994, vt525,  0,      0,       vt520,    vt520, vt520_state,   0,    "Digital Equipment Corporation", "VT525 Video Terminal",  MACHINE_IS_SKELETON)
+COMP( 1990, vt420, 0, 0, vt420, vt520, vt520_state, empty_init, "Digital Equipment Corporation", "VT420 Video Terminal", MACHINE_IS_SKELETON )
+//COMP( 1993, vt510, 0, 0, vt520, vt520, vt520_state, empty_init, "Digital Equipment Corporation", "VT510 Video Terminal",  MACHINE_IS_SKELETON)
+COMP( 1994, vt520, 0, 0, vt520, vt520, vt520_state, empty_init, "Digital Equipment Corporation", "VT520 Video Terminal",  MACHINE_IS_SKELETON)
+//COMP( 1994, vt525, 0, 0, vt520, vt520, vt520_state, empty_init, "Digital Equipment Corporation", "VT525 Video Terminal",  MACHINE_IS_SKELETON)

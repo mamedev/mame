@@ -35,12 +35,12 @@
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(subs_state, subs)
+void subs_state::subs_palette(palette_device &palette) const
 {
-	palette.set_pen_color(0,rgb_t(0x00,0x00,0x00)); /* BLACK - modified on video invert */
-	palette.set_pen_color(1,rgb_t(0xff,0xff,0xff)); /* WHITE - modified on video invert */
-	palette.set_pen_color(2,rgb_t(0x00,0x00,0x00)); /* BLACK - modified on video invert */
-	palette.set_pen_color(3,rgb_t(0xff,0xff,0xff)); /* WHITE - modified on video invert*/
+	palette.set_pen_color(0, rgb_t(0x00, 0x00, 0x00)); // BLACK - modified on video invert
+	palette.set_pen_color(1, rgb_t(0xff, 0xff, 0xff)); // WHITE - modified on video invert
+	palette.set_pen_color(2, rgb_t(0x00, 0x00, 0x00)); // BLACK - modified on video invert
+	palette.set_pen_color(3, rgb_t(0xff, 0xff, 0xff)); // WHITE - modified on video invert
 }
 
 
@@ -54,15 +54,16 @@ PALETTE_INIT_MEMBER(subs_state, subs)
 void subs_state::main_map(address_map &map)
 {
 	map.global_mask(0x3fff);
-	map(0x0000, 0x01ff).ram();
-	map(0x0000, 0x0000).w(this, FUNC(subs_state::noise_reset_w));
-	map(0x0000, 0x0007).r(this, FUNC(subs_state::control_r));
-	map(0x0020, 0x0020).w(this, FUNC(subs_state::steer_reset_w));
-	map(0x0020, 0x0027).r(this, FUNC(subs_state::coin_r));
-//  AM_RANGE(0x0040, 0x0040) AM_WRITE(timer_reset_w)
-	map(0x0060, 0x0063).r(this, FUNC(subs_state::options_r));
+	map(0x0000, 0x008f).ram();
+	map(0x0000, 0x0000).w(FUNC(subs_state::noise_reset_w));
+	map(0x0000, 0x0007).r(FUNC(subs_state::control_r));
+	map(0x0020, 0x0020).w(FUNC(subs_state::steer_reset_w));
+	map(0x0020, 0x0027).r(FUNC(subs_state::coin_r));
+//  map(0x0040, 0x0040).w(FUNC(subs_state::timer_reset_w));
+	map(0x0060, 0x0063).r(FUNC(subs_state::options_r));
 	map(0x0060, 0x006f).w("latch", FUNC(ls259_device::write_a0));
-	map(0x0090, 0x009f).share("spriteram");
+	map(0x0090, 0x009f).ram().share("spriteram");
+	map(0x00a0, 0x01ff).ram();
 	map(0x0800, 0x0bff).ram().share("videoram");
 	map(0x2000, 0x3fff).rom();
 }
@@ -161,7 +162,7 @@ static const gfx_layout motion_layout =
 };
 
 
-static GFXDECODE_START( subs )
+static GFXDECODE_START( gfx_subs )
 	GFXDECODE_ENTRY( "gfx1", 0, playfield_layout, 0, 2 )    /* playfield graphics */
 	GFXDECODE_ENTRY( "gfx2", 0, motion_layout,    0, 2 )    /* motion graphics */
 GFXDECODE_END
@@ -173,58 +174,55 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(subs_state::subs)
-
+void subs_state::subs(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502,12096000/16)      /* clock input is the "4H" signal */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(subs_state, interrupt, 4*57)
+	M6502(config, m_maincpu, 12096000/16);      /* clock input is the "4H" signal */
+	m_maincpu->set_addrmap(AS_PROGRAM, &subs_state::main_map);
+	m_maincpu->set_periodic_int(FUNC(subs_state::interrupt), attotime::from_hz(4*57));
 
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", subs)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_subs);
 
-	MCFG_PALETTE_ADD("palette", 4)
-	MCFG_PALETTE_INIT_OWNER(subs_state, subs)
+	PALETTE(config, m_palette, FUNC(subs_state::subs_palette), 4);
 
-	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
+	config.set_default_layout(layout_dualhsxs);
 
-	MCFG_SCREEN_ADD("lscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(subs_state, screen_update_left)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
+	lscreen.set_refresh_hz(57);
+	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	lscreen.set_size(32*8, 32*8);
+	lscreen.set_visarea(0*8, 32*8-1, 0*8, 28*8-1);
+	lscreen.set_screen_update(FUNC(subs_state::screen_update_left));
+	lscreen.set_palette(m_palette);
 
-	MCFG_SCREEN_ADD("rscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(subs_state, screen_update_right)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
+	rscreen.set_refresh_hz(57);
+	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	rscreen.set_size(32*8, 32*8);
+	rscreen.set_visarea(0*8, 32*8-1, 0*8, 28*8-1);
+	rscreen.set_screen_update(FUNC(subs_state::screen_update_right));
+	rscreen.set_palette(m_palette);
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(subs)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	DISCRETE(config, m_discrete, subs_discrete).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("latch", LS259, 0) // C9
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(OUTPUT("led0")) MCFG_DEVCB_INVERT // START LAMP 1
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(OUTPUT("led1")) MCFG_DEVCB_INVERT // START LAMP 2
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<SUBS_SONAR2_EN>))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<SUBS_SONAR1_EN>))
+	ls259_device &latch(LS259(config, "latch")); // C9
+	latch.q_out_cb<0>().set_output("led0").invert(); // START LAMP 1
+	latch.q_out_cb<1>().set_output("led1").invert(); // START LAMP 2
+	latch.q_out_cb<2>().set(m_discrete, FUNC(discrete_device::write_line<SUBS_SONAR2_EN>));
+	latch.q_out_cb<3>().set(m_discrete, FUNC(discrete_device::write_line<SUBS_SONAR1_EN>));
 	// Schematics show crash and explode reversed.  But this is proper.
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<SUBS_EXPLODE_EN>))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(DEVWRITELINE("discrete", discrete_device, write_line<SUBS_CRASH_EN>))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(subs_state, invert1_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(subs_state, invert2_w))
-MACHINE_CONFIG_END
+	latch.q_out_cb<4>().set(m_discrete, FUNC(discrete_device::write_line<SUBS_EXPLODE_EN>));
+	latch.q_out_cb<5>().set(m_discrete, FUNC(discrete_device::write_line<SUBS_CRASH_EN>));
+	latch.q_out_cb<6>().set(FUNC(subs_state::invert1_w));
+	latch.q_out_cb<7>().set(FUNC(subs_state::invert2_w));
+}
 
 
 
@@ -260,4 +258,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1977, subs, 0, subs, subs, subs_state, 0, ROT0, "Atari", "Subs", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1977, subs, 0, subs, subs, subs_state, empty_init, ROT0, "Atari", "Subs", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -35,17 +35,18 @@ void lckydraw_state::maincpu_map(address_map &map)
 static INPUT_PORTS_START( lckydraw )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(lckydraw_state::lckydraw)
+void lckydraw_state::lckydraw(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8035, 6000000)
-	MCFG_CPU_PROGRAM_MAP(maincpu_map)
+	I8035(config, m_maincpu, 6000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &lckydraw_state::maincpu_map);
 
 	/* video hardware */
-	//MCFG_DEFAULT_LAYOUT()
+	//config.set_default_layout();
 
 	/* sound hardware */
 	genpin_audio(config);
-MACHINE_CONFIG_END
+}
 
 
 ROM_START(lckydraw)
@@ -57,4 +58,4 @@ ROM_START(lckydraw)
 ROM_END
 
 
-GAME( 1979, lckydraw, 0, lckydraw, lckydraw, lckydraw_state, 0, ROT0, "Mirco", "Lucky Draw (Pinball)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1979, lckydraw, 0, lckydraw, lckydraw, lckydraw_state, empty_init, ROT0, "Mirco", "Lucky Draw (Pinball)", MACHINE_IS_SKELETON_MECHANICAL )

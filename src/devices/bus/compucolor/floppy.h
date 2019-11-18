@@ -16,17 +16,6 @@
 #include "imagedev/floppy.h"
 
 
-
-//**************************************************************************
-//  INTERFACE MACROS
-//**************************************************************************
-
-#define MCFG_COMPUCOLOR_FLOPPY_PORT_ADD(_tag, _slot_intf, _def_slot) \
-	MCFG_DEVICE_ADD(_tag, COMPUCOLOR_FLOPPY_PORT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
-
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -50,6 +39,15 @@ protected:
 class compucolor_floppy_port_device : public rs232_port_device
 {
 public:
+	template <typename T>
+	compucolor_floppy_port_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
+		: rs232_port_device(mconfig, tag, owner, 0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
 	compucolor_floppy_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_WRITE_LINE_MEMBER( rw_w ) { if (m_dev) m_dev->rw_w(state); }
@@ -93,7 +91,7 @@ protected:
 private:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
-	required_device<floppy_image_device> m_floppy;
+	required_device<floppy_connector> m_floppy;
 
 	bool read_bit();
 	void write_bit(bool bit);
@@ -116,6 +114,6 @@ DECLARE_DEVICE_TYPE(COMPUCOLOR_FLOPPY,      compucolor_floppy_device)
 
 
 // slot devices
-SLOT_INTERFACE_EXTERN( compucolor_floppy_port_devices );
+void compucolor_floppy_port_devices(device_slot_interface &device);
 
 #endif // MAME_BUS_COMPUCOLOR_FLOPPY_H

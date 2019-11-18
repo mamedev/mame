@@ -10,7 +10,7 @@ Atari Sprint 8 video emulation
 #include "includes/sprint8.h"
 
 
-PALETTE_INIT_MEMBER(sprint8_state, sprint8)
+void sprint8_state::sprint8_palette(palette_device &palette) const
 {
 	for (int i = 0; i < 0x10; i++)
 	{
@@ -31,25 +31,25 @@ void sprint8_state::set_pens()
 	{
 		if (m_team)
 		{
-			m_palette->set_indirect_color(i + 0, rgb_t(0xff, 0x00, 0x00)); /* red     */
-			m_palette->set_indirect_color(i + 1, rgb_t(0x00, 0x00, 0xff)); /* blue    */
-			m_palette->set_indirect_color(i + 2, rgb_t(0xff, 0xff, 0x00)); /* yellow  */
-			m_palette->set_indirect_color(i + 3, rgb_t(0x00, 0xff, 0x00)); /* green   */
-			m_palette->set_indirect_color(i + 4, rgb_t(0xff, 0x00, 0xff)); /* magenta */
-			m_palette->set_indirect_color(i + 5, rgb_t(0xe0, 0xc0, 0x70)); /* puce    */
-			m_palette->set_indirect_color(i + 6, rgb_t(0x00, 0xff, 0xff)); /* cyan    */
-			m_palette->set_indirect_color(i + 7, rgb_t(0xff, 0xaa, 0xaa)); /* pink    */
+			m_palette->set_indirect_color(i + 0, rgb_t(0xff, 0x00, 0x00)); // red
+			m_palette->set_indirect_color(i + 1, rgb_t(0x00, 0x00, 0xff)); // blue
+			m_palette->set_indirect_color(i + 2, rgb_t(0xff, 0xff, 0x00)); // yellow
+			m_palette->set_indirect_color(i + 3, rgb_t(0x00, 0xff, 0x00)); // green
+			m_palette->set_indirect_color(i + 4, rgb_t(0xff, 0x00, 0xff)); // magenta
+			m_palette->set_indirect_color(i + 5, rgb_t(0xe0, 0xc0, 0x70)); // puce
+			m_palette->set_indirect_color(i + 6, rgb_t(0x00, 0xff, 0xff)); // cyan
+			m_palette->set_indirect_color(i + 7, rgb_t(0xff, 0xaa, 0xaa)); // pink
 		}
 		else
 		{
-			m_palette->set_indirect_color(i + 0, rgb_t(0xff, 0x00, 0x00)); /* red     */
-			m_palette->set_indirect_color(i + 1, rgb_t(0x00, 0x00, 0xff)); /* blue    */
-			m_palette->set_indirect_color(i + 2, rgb_t(0xff, 0x00, 0x00)); /* red     */
-			m_palette->set_indirect_color(i + 3, rgb_t(0x00, 0x00, 0xff)); /* blue    */
-			m_palette->set_indirect_color(i + 4, rgb_t(0xff, 0x00, 0x00)); /* red     */
-			m_palette->set_indirect_color(i + 5, rgb_t(0x00, 0x00, 0xff)); /* blue    */
-			m_palette->set_indirect_color(i + 6, rgb_t(0xff, 0x00, 0x00)); /* red     */
-			m_palette->set_indirect_color(i + 7, rgb_t(0x00, 0x00, 0xff)); /* blue    */
+			m_palette->set_indirect_color(i + 0, rgb_t(0xff, 0x00, 0x00)); // red
+			m_palette->set_indirect_color(i + 1, rgb_t(0x00, 0x00, 0xff)); // blue
+			m_palette->set_indirect_color(i + 2, rgb_t(0xff, 0x00, 0x00)); // red
+			m_palette->set_indirect_color(i + 3, rgb_t(0x00, 0x00, 0xff)); // blue
+			m_palette->set_indirect_color(i + 4, rgb_t(0xff, 0x00, 0x00)); // red
+			m_palette->set_indirect_color(i + 5, rgb_t(0x00, 0x00, 0xff)); // blue
+			m_palette->set_indirect_color(i + 6, rgb_t(0xff, 0x00, 0x00)); // red
+			m_palette->set_indirect_color(i + 7, rgb_t(0x00, 0x00, 0xff)); // blue
 		}
 	}
 
@@ -111,8 +111,8 @@ void sprint8_state::video_start()
 	m_screen->register_screen_bitmap(m_helper1);
 	m_screen->register_screen_bitmap(m_helper2);
 
-	m_tilemap1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sprint8_state::get_tile_info1),this), TILEMAP_SCAN_ROWS, 16, 8, 32, 32);
-	m_tilemap2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sprint8_state::get_tile_info2),this), TILEMAP_SCAN_ROWS, 16, 8, 32, 32);
+	m_tilemap1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sprint8_state::get_tile_info1)), TILEMAP_SCAN_ROWS, 16, 8, 32, 32);
+	m_tilemap2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sprint8_state::get_tile_info2)), TILEMAP_SCAN_ROWS, 16, 8, 32, 32);
 
 	m_tilemap1->set_scrolly(0, +24);
 	m_tilemap2->set_scrolly(0, +24);
@@ -170,12 +170,12 @@ WRITE_LINE_MEMBER(sprint8_state::screen_vblank)
 
 		draw_sprites(m_helper1, visarea);
 
-		for (int y = visarea.min_y; y <= visarea.max_y; y++)
+		for (int y = visarea.top(); y <= visarea.bottom(); y++)
 		{
 			const uint16_t* p1 = &m_helper1.pix16(y);
 			const uint16_t* p2 = &m_helper2.pix16(y);
 
-			for (int x = visarea.min_x; x <= visarea.max_x; x++)
+			for (int x = visarea.left(); x <= visarea.right(); x++)
 				if (p1[x] != 0x20 && p2[x] == 0x23)
 					m_collision_timer->adjust(m_screen->time_until_pos(y + 24, x), m_palette->pen_indirect(p1[x]));
 		}

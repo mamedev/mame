@@ -10,9 +10,11 @@
   - 1996 Sharp Microcomputer Databook
   - KB1013VK1-2/KB1013VK4-2 manual
 
+  Default external frequency of these is 32.768kHz, forwarding a clockrate in the
+  MAME machine config is optional. Newer revisions can have an internal oscillator.
+
   TODO:
   - source organiziation between files is a mess
-  - LCD bs pin blink mode via Y register (0.5s off, 0.5s on)
   - wake up after CEND doesn't work right
 
   for more, see the *core.cpp file notes
@@ -47,11 +49,7 @@ void sm510_base_device::device_start()
 	m_read_b.resolve_safe(1);
 	m_write_s.resolve_safe();
 	m_write_r.resolve_safe();
-
-	m_write_sega.resolve_safe();
-	m_write_segb.resolve_safe();
-	m_write_segbs.resolve_safe();
-	m_write_segc.resolve_safe();
+	m_write_segs.resolve_safe();
 
 	// init/zerofill
 	memset(m_stack, 0, sizeof(m_stack));
@@ -63,6 +61,7 @@ void sm510_base_device::device_start()
 	m_acc = 0;
 	m_bl = 0;
 	m_bm = 0;
+	m_sbl = false;
 	m_sbm = false;
 	m_c = 0;
 	m_skip = false;
@@ -75,7 +74,7 @@ void sm510_base_device::device_start()
 	m_l = 0;
 	m_x = 0;
 	m_y = 0;
-	m_bp = false;
+	m_bp = 0;
 	m_bc = false;
 	m_halt = false;
 	m_melody_rd = 0;
@@ -95,6 +94,7 @@ void sm510_base_device::device_start()
 	save_item(NAME(m_acc));
 	save_item(NAME(m_bl));
 	save_item(NAME(m_bm));
+	save_item(NAME(m_sbl));
 	save_item(NAME(m_sbm));
 	save_item(NAME(m_c));
 	save_item(NAME(m_skip));
@@ -149,13 +149,14 @@ void sm510_base_device::device_reset()
 	// ACL
 	m_skip = false;
 	m_halt = false;
+	m_sbl = false;
 	m_sbm = false;
 	m_op = m_prev_op = 0;
 	reset_vector();
 	m_prev_pc = m_pc;
 
 	// lcd is on (Bp on, BC off, bs(y) off)
-	m_bp = true;
+	m_bp = 1;
 	m_bc = false;
 	m_y = 0;
 
@@ -196,13 +197,14 @@ void sm510_base_device::lcd_update()
 	for (int h = 0; h < 4; h++)
 	{
 		// 16 segments per row from upper part of RAM
-		m_write_sega(h | SM510_PORT_SEGA, get_lcd_row(h, m_lcd_ram_a), 0xffff);
-		m_write_segb(h | SM510_PORT_SEGB, get_lcd_row(h, m_lcd_ram_b), 0xffff);
-		m_write_segc(h | SM510_PORT_SEGC, get_lcd_row(h, m_lcd_ram_c), 0xffff);
+		m_write_segs(h | SM510_PORT_SEGA, get_lcd_row(h, m_lcd_ram_a), 0xffff);
+		m_write_segs(h | SM510_PORT_SEGB, get_lcd_row(h, m_lcd_ram_b), 0xffff);
+		m_write_segs(h | SM510_PORT_SEGC, get_lcd_row(h, m_lcd_ram_c), 0xffff);
 
 		// bs output from L/X and Y regs
-		u8 bs = (m_l >> h & 1) | ((m_x*2) >> h & 2);
-		m_write_segbs(h | SM510_PORT_SEGBS, (m_bc || !m_bp) ? 0 : bs, 0xffff);
+		u8 blink = (m_div & 0x4000) ? m_y : 0;
+		u8 bs = ((m_l & ~blink) >> h & 1) | ((m_x*2) >> h & 2);
+		m_write_segs(h | SM510_PORT_SEGBS, (m_bc || !m_bp) ? 0 : bs, 0xffff);
 	}
 }
 
@@ -215,7 +217,7 @@ void sm510_base_device::init_lcd_driver()
 {
 	// note: in reality, this timer runs at high frequency off the main divider, strobing one segment at a time
 	m_lcd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sm510_base_device::lcd_timer_cb), this));
-	attotime period = attotime::from_ticks(0x200, unscaled_clock()); // 64hz default
+	attotime period = attotime::from_ticks(0x20, unscaled_clock()); // default 1kHz
 	m_lcd_timer->adjust(period, 0, period);
 }
 

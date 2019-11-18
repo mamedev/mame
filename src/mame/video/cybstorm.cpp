@@ -129,12 +129,12 @@ uint32_t cybstorm_state::screen_update_cybstorm(screen_device &screen, bitmap_in
 	/* draw and merge the MO */
 	bitmap_ind16 &mobitmap = m_vad->mob().bitmap();
 	for (const sparse_dirty_rect *rect = m_vad->mob().first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
-		for (int y = rect->min_y; y <= rect->max_y; y++)
+		for (int y = rect->top(); y <= rect->bottom(); y++)
 		{
 			uint16_t *mo = &mobitmap.pix16(y);
 			uint16_t *pf = &bitmap.pix16(y);
 			uint8_t *pri = &priority_bitmap.pix8(y);
-			for (int x = rect->min_x; x <= rect->max_x; x++)
+			for (int x = rect->left(); x <= rect->right(); x++)
 				if (mo[x])
 				{
 					int mopriority = mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT;
@@ -175,12 +175,12 @@ uint32_t cybstorm_state::screen_update_cybstorm(screen_device &screen, bitmap_in
 
 	/* now go back and process the upper bit of MO priority */
 	for (const sparse_dirty_rect *rect = m_vad->mob().first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
-		for (int y = rect->min_y; y <= rect->max_y; y++)
+		for (int y = rect->top(); y <= rect->bottom(); y++)
 		{
 			uint16_t *mo = &mobitmap.pix16(y);
 			uint16_t *pf = &bitmap.pix16(y);
 			int count = 0;
-			for (int x = rect->min_x; x <= rect->max_x || (count && x < bitmap.width()); x++)
+			for (int x = rect->left(); x <= rect->right() || (count && x < bitmap.width()); x++)
 			{
 				const uint16_t START_MARKER = ((4 << atari_motion_objects_device::PRIORITY_SHIFT) | 3);
 				const uint16_t END_MARKER =   ((4 << atari_motion_objects_device::PRIORITY_SHIFT) | 7);

@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Peter Trauner
+#ifndef MAME_MACHINE_PCSHARE_H
+#define MAME_MACHINE_PCSHARE_H
+
+#pragma once
+
 #include "machine/am9517a.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
@@ -9,8 +14,8 @@
 class pcat_base_state : public driver_device
 {
 public:
-	pcat_base_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	pcat_base_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_dma8237_1(*this, "dma8237_1"),
 		m_dma8237_2(*this, "dma8237_2"),
@@ -21,15 +26,6 @@ public:
 		m_kbdc(*this, "kbdc")
 	{
 	}
-
-	required_device<cpu_device> m_maincpu;
-	required_device<am9517a_device> m_dma8237_1;
-	required_device<am9517a_device> m_dma8237_2;
-	required_device<pic8259_device> m_pic8259_1;
-	required_device<pic8259_device> m_pic8259_2;
-	required_device<pit8254_device> m_pit8254;
-	optional_device<mc146818_device> m_mc146818;
-	required_device<kbdc8042_device> m_kbdc;
 
 	DECLARE_WRITE_LINE_MEMBER(pc_dma_hrq_changed);
 	DECLARE_READ8_MEMBER(pc_dma_read_byte);
@@ -43,10 +39,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( pc_dack3_w );
 	DECLARE_READ8_MEMBER( get_slave_ack );
 	DECLARE_WRITE_LINE_MEMBER( at_pit8254_out2_changed );
-	int m_dma_channel;
-	uint8_t m_dma_offset[2][4];
-	uint8_t m_at_pages[0x10];
-	int m_pit_out2;
+
+protected:
 	void pcat_common(machine_config &config);
 	void pcvideo_vga(machine_config &config);
 	void pcvideo_trident_vga(machine_config &config);
@@ -55,4 +49,20 @@ public:
 	void pcvideo_cirrus_gd5430(machine_config &config);
 
 	void pcat32_io_common(address_map &map);
+
+	required_device<cpu_device> m_maincpu;
+	required_device<am9517a_device> m_dma8237_1;
+	required_device<am9517a_device> m_dma8237_2;
+	required_device<pic8259_device> m_pic8259_1;
+	required_device<pic8259_device> m_pic8259_2;
+	required_device<pit8254_device> m_pit8254;
+	optional_device<mc146818_device> m_mc146818;
+	required_device<kbdc8042_device> m_kbdc;
+
+	int m_dma_channel;
+	uint8_t m_dma_offset[2][4];
+	uint8_t m_at_pages[0x10];
+	int m_pit_out2;
 };
+
+#endif // MAME_MACHINE_PCSHARE_H

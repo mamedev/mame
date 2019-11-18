@@ -8,10 +8,12 @@ Skeleton driver for Qume QVT-201 & QVT-202 display terminals.
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "bus/rs232/rs232.h"
 #include "machine/input_merger.h"
 #include "machine/mc68681.h"
 #include "machine/nvram.h"
 #include "video/scn2674.h"
+#include "emupal.h"
 #include "screen.h"
 
 class qvt201_state : public driver_device
@@ -20,6 +22,8 @@ public:
 	qvt201_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_mainnmi(*this, "mainnmi")
+		, m_eia(*this, "eia")
 		, m_screen(*this, "screen")
 		, m_p_chargen(*this, "chargen")
 		, m_dataram(*this, "dataram")
@@ -33,10 +37,13 @@ private:
 	DECLARE_WRITE8_MEMBER(offset_w);
 	DECLARE_WRITE8_MEMBER(keyboard_w);
 	DECLARE_READ8_MEMBER(keyboard_r);
+	DECLARE_WRITE8_MEMBER(duart_out_w);
 
 	void mem_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
+	required_device<input_merger_device> m_mainnmi;
+	required_device<rs232_port_device> m_eia;
 	required_device<screen_device> m_screen;
 	required_region_ptr<u8> m_p_chargen;
 	required_shared_ptr<u8> m_dataram;
@@ -61,15 +68,31 @@ READ8_MEMBER(qvt201_state::keyboard_r)
 	return 1;
 }
 
+WRITE8_MEMBER(qvt201_state::duart_out_w)
+{
+	// OP0 = RTS (EIA pin 4)
+	// OP1 = DTR (EIA pin 20)
+	// OP2 not used?
+	// OP3 = 132/_80
+	// OP4 = SRV
+	// OP5 = BLOCK/_UL
+	// OP6 = preset MBC NMI flipflop
+	// OP7 = _DATA/TALK (EIA pin 14)
+
+	m_eia->write_rts(BIT(data, 0));
+	m_eia->write_dtr(BIT(data, 1));
+	m_mainnmi->in_w<1>(!BIT(data, 6));
+}
+
 void qvt201_state::mem_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().region("maincpu", 0);
 	map(0x8800, 0x8fff).ram().share("nvram");
 	map(0x9000, 0x9007).rw("crtc", FUNC(scn2672_device::read), FUNC(scn2672_device::write));
 	map(0x9800, 0x980f).rw("duart", FUNC(scn2681_device::read), FUNC(scn2681_device::write));
-	map(0xa000, 0xa000).w(this, FUNC(qvt201_state::offset_w));
-	map(0xa800, 0xa800).w(this, FUNC(qvt201_state::keyboard_w));
-	map(0xb000, 0xb000).r(this, FUNC(qvt201_state::keyboard_r));
+	map(0xa000, 0xa000).w(FUNC(qvt201_state::offset_w));
+	map(0xa800, 0xa800).w(FUNC(qvt201_state::keyboard_w));
+	map(0xb000, 0xb000).r(FUNC(qvt201_state::keyboard_r));
 	map(0xc000, 0xdfff).ram().share("dataram");
 	map(0xe000, 0xffff).ram().share("attram");
 }
@@ -77,28 +100,81 @@ void qvt201_state::mem_map(address_map &map)
 static INPUT_PORTS_START( qvt201 )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(qvt201_state::qvt201)
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(3'686'400))
-	MCFG_CPU_PROGRAM_MAP(mem_map) // IORQ is not used at all
+static const gfx_layout char_layout =
+{
+	8,10,
+	RGN_FRAC(1,1), // 256
+	1,
+	{ 0 },
+	{ STEP8(0,1) },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8 },
+	8*16
+};
 
-	MCFG_INPUT_MERGER_ANY_HIGH("mainint") // open collector
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", 0))
+// ascii control code chars
+// those are also at 0x80 to 0x9f in the normal char decode
+// don't know why they are duplicated here
+static const gfx_layout ctrl_char_layout =
+{
+	8,10,
+	RGN_FRAC(1,4), // 32
+	1,
+	{ 0 },
+	{ STEP8(0,1) },
+	{ 10*8, 11*8, 12*8, 13*8, 14*8, 16*8+10*8, 16*8+11*8, 16*8+12*8, 16*8+13*8, 16*8+14*8 },
+	8*32
+};
 
-	MCFG_DEVICE_ADD("duart", SCN2681, XTAL(3'686'400)) // XTAL not directly connected
-	MCFG_MC68681_IRQ_CALLBACK(DEVWRITELINE("mainint", input_merger_device, in_w<1>))
+// 64 bytes of data remain undecoded
+// byte 10 and 11 from 0x400 to 0x7ff in the rom
+// (0x000 to 0x3ff are the control chars above, 0x800 to 0xfff is 0xff)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+static GFXDECODE_START(chars)
+	GFXDECODE_ENTRY("chargen", 0, char_layout, 0, 1)
+	GFXDECODE_ENTRY("chargen", 0, ctrl_char_layout, 0, 1)
+GFXDECODE_END
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(48'654'000) / 3, 102 * 10, 0, 80 * 10, 265, 0, 250)
-	//MCFG_SCREEN_RAW_PARAMS(XTAL(48'654'000) / 2, 170 * 9, 0, 132 * 9, 265, 0, 250)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", scn2672_device, screen_update)
+void qvt201_state::qvt201(machine_config &config)
+{
+	Z80(config, m_maincpu, 3.6864_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &qvt201_state::mem_map); // IORQ is not used at all
 
-	MCFG_DEVICE_ADD("crtc", SCN2672, XTAL(48'654'000) / 30)
-	MCFG_SCN2672_CHARACTER_WIDTH(10) // 9 in 132-column mode
-	MCFG_SCN2672_INTR_CALLBACK(DEVWRITELINE("mainint", input_merger_device, in_w<0>))
-	MCFG_VIDEO_SET_SCREEN("screen")
-MACHINE_CONFIG_END
+	input_merger_device &mainint(INPUT_MERGER_ANY_HIGH(config, "mainint")); // open collector
+	mainint.output_handler().set_inputline("maincpu", INPUT_LINE_IRQ0);
+
+	input_merger_device &mainnmi(INPUT_MERGER_ALL_HIGH(config, "mainnmi"));
+	mainnmi.output_handler().set_inputline("maincpu", INPUT_LINE_NMI);
+
+	scn2681_device &duart(SCN2681(config, "duart", 3.6864_MHz_XTAL)); // XTAL not directly connected
+	duart.irq_cb().set("mainint", FUNC(input_merger_device::in_w<1>));
+	duart.a_tx_cb().set(m_eia, FUNC(rs232_port_device::write_txd));
+	duart.b_tx_cb().set("aux", FUNC(rs232_port_device::write_txd));
+	duart.outport_cb().set(FUNC(qvt201_state::duart_out_w));
+
+	RS232_PORT(config, m_eia, default_rs232_devices, nullptr);
+	m_eia->rxd_handler().set("duart", FUNC(scn2681_device::rx_a_w));
+
+	rs232_port_device &aux(RS232_PORT(config, "aux", default_rs232_devices, nullptr));
+	aux.rxd_handler().set("duart", FUNC(scn2681_device::rx_b_w));
+	aux.dsr_handler().set("duart", FUNC(scn2681_device::ip4_w));
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // TC5516APL-2 or uPD446C-2 + battery
+
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(48.654_MHz_XTAL / 3, 102 * 10, 0, 80 * 10, 265, 0, 250);
+	//screen.set_raw(48.654_MHz_XTAL / 2, 170 * 9, 0, 132 * 9, 265, 0, 250);
+	screen.set_screen_update("crtc", FUNC(scn2672_device::screen_update));
+
+	PALETTE(config, "palette", palette_device::MONOCHROME_HIGHLIGHT);
+
+	GFXDECODE(config, "gfxdecode", "palette", chars);
+
+	scn2672_device &crtc(SCN2672(config, "crtc", 48.654_MHz_XTAL / 30));
+	crtc.set_character_width(10); // 9 in 132-column mode
+	crtc.intr_callback().set("mainint", FUNC(input_merger_device::in_w<0>));
+	crtc.breq_callback().set("mainnmi", FUNC(input_merger_device::in_w<0>));
+	crtc.set_screen("screen");
+}
 
 
 /**************************************************************************************************************
@@ -121,4 +197,4 @@ ROM_START( qvt201 )
 	ROM_LOAD( "301847-01.u42",  0x0000, 0x1000, CRC(546ed236) SHA1(312d57a7012f50327310bd11bda000149f13342e) )
 ROM_END
 
-COMP( 1986, qvt201, 0, 0, qvt201, qvt201, qvt201_state, 0, "Qume", "QVT-201 (Rev. T201VE)", MACHINE_IS_SKELETON )
+COMP( 1986, qvt201, 0, 0, qvt201, qvt201, qvt201_state, empty_init, "Qume", "QVT-201 (Rev. T201VE)", MACHINE_IS_SKELETON )

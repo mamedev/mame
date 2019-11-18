@@ -105,6 +105,7 @@
 
 #include "emu.h"
 #include "998board.h"
+#include "cpu/tms9900/tms99com.h"
 
 #define LOG_DETAIL      (1U<<1)     // More detail
 #define LOG_CRU         (1U<<2)     // CRU logging
@@ -121,8 +122,9 @@
 #define LOG_CPURY       (1U<<13)    // Combined ready line
 #define LOG_GROM        (1U<<14)    // GROM operation
 #define LOG_PUNMAP      (1U<<15)    // Unmapped physical addresss
+#define LOG_WARN        (1U<<31)    // Warnings
 
-#define VERBOSE ( LOG_GENERAL )
+#define VERBOSE ( LOG_WARN )
 
 #include "logmacro.h"
 
@@ -157,6 +159,7 @@ mainboard8_device::mainboard8_device(const machine_config &mconfig, const char *
 	m_mofetta(*this, TI998_MOFETTA_TAG),
 	m_amigo(*this, TI998_AMIGO_TAG),
 	m_oso(*this, TI998_OSO_TAG),
+	m_maincpu(*owner, "maincpu"),
 	m_video(*owner, TI_VDP_TAG),               // subdevice of main class
 	m_sound(*owner, TI_SOUNDCHIP_TAG),
 	m_speech(*owner, TI998_SPEECHSYN_TAG),
@@ -164,6 +167,28 @@ mainboard8_device::mainboard8_device(const machine_config &mconfig, const char *
 	m_ioport(*owner, TI99_IOPORT_TAG),
 	m_sram(*owner, TI998_SRAM_TAG),
 	m_dram(*owner, TI998_DRAM_TAG),
+	m_sgrom0(*owner, TI998_SYSGROM0_TAG),
+	m_sgrom1(*owner, TI998_SYSGROM1_TAG),
+	m_sgrom2(*owner, TI998_SYSGROM2_TAG),
+	m_tsgrom0(*owner, TI998_GLIB10_TAG),
+	m_tsgrom1(*owner, TI998_GLIB11_TAG),
+	m_tsgrom2(*owner, TI998_GLIB12_TAG),
+	m_tsgrom3(*owner, TI998_GLIB13_TAG),
+	m_tsgrom4(*owner, TI998_GLIB14_TAG),
+	m_tsgrom5(*owner, TI998_GLIB15_TAG),
+	m_tsgrom6(*owner, TI998_GLIB16_TAG),
+	m_tsgrom7(*owner, TI998_GLIB17_TAG),
+	m_p8grom0(*owner, TI998_GLIB20_TAG),
+	m_p8grom1(*owner, TI998_GLIB21_TAG),
+	m_p8grom2(*owner, TI998_GLIB22_TAG),
+	m_p8grom3(*owner, TI998_GLIB23_TAG),
+	m_p8grom4(*owner, TI998_GLIB24_TAG),
+	m_p8grom5(*owner, TI998_GLIB25_TAG),
+	m_p8grom6(*owner, TI998_GLIB26_TAG),
+	m_p8grom7(*owner, TI998_GLIB27_TAG),
+	m_p3grom0(*owner, TI998_GLIB30_TAG),
+	m_p3grom1(*owner, TI998_GLIB31_TAG),
+	m_p3grom2(*owner, TI998_GLIB32_TAG),
 	m_sgrom_idle(true),
 	m_tsgrom_idle(true),
 	m_p8grom_idle(true),
@@ -174,7 +199,7 @@ mainboard8_device::mainboard8_device(const machine_config &mconfig, const char *
 // Debugger support
 // The memory accesses by the debugger are routed around the custom chip logic
 
-READ8_MEMBER( mainboard8_device::debugger_read )
+uint8_t mainboard8_device::debugger_read(offs_t offset)
 {
 	int logical_address = offset;
 	bool compat_mode = (m_crus_debug==ASSERT_LINE);
@@ -219,7 +244,7 @@ READ8_MEMBER( mainboard8_device::debugger_read )
 		if (m_mofetta->hexbus_access_debug()) return m_rom1[(physical_address & 0x1fff) | 0x6000];
 		if (m_mofetta->intdsr_access_debug()) return m_rom1[(physical_address & 0x1fff) | 0x4000];
 		m_ioport->memen_in(ASSERT_LINE);
-		m_ioport->readz(space, physical_address & 0xffff, &value);
+		m_ioport->readz(physical_address & 0xffff, &value);
 		m_ioport->memen_in(CLEAR_LINE);
 		return value;
 	}
@@ -227,7 +252,7 @@ READ8_MEMBER( mainboard8_device::debugger_read )
 	{
 		// Cartridge space lower 8
 		m_gromport->romgq_line(ASSERT_LINE);
-		m_gromport->readz(space, physical_address & 0x1fff, &value);
+		m_gromport->readz(physical_address & 0x1fff, &value);
 		m_gromport->romgq_line(CLEAR_LINE);
 		return value;
 	}
@@ -235,7 +260,7 @@ READ8_MEMBER( mainboard8_device::debugger_read )
 	{
 		// Cartridge space upper 8
 		m_gromport->romgq_line(ASSERT_LINE);
-		m_gromport->readz(space, (physical_address & 0x1fff) | 0x2000, &value);
+		m_gromport->readz((physical_address & 0x1fff) | 0x2000, &value);
 		m_gromport->romgq_line(CLEAR_LINE);
 		return value;
 	}
@@ -252,7 +277,7 @@ READ8_MEMBER( mainboard8_device::debugger_read )
 	return 0;
 }
 
-WRITE8_MEMBER( mainboard8_device::debugger_write )
+void mainboard8_device::debugger_write(offs_t offset, uint8_t data)
 {
 	int logical_address = offset;
 	bool compat_mode = (m_crus_debug==ASSERT_LINE);
@@ -300,14 +325,14 @@ WRITE8_MEMBER( mainboard8_device::debugger_write )
 		if (m_mofetta->hexbus_access_debug()) return;
 		if (m_mofetta->intdsr_access_debug()) return;
 		m_ioport->memen_in(ASSERT_LINE);
-		m_ioport->write(space, physical_address & 0xffff, data & 0xff);
+		m_ioport->write(physical_address & 0xffff, data & 0xff);
 		m_ioport->memen_in(CLEAR_LINE);     return;
 	}
 	if ((physical_address & 0x00ffe000)==0x00ff6000)
 	{
 		// Cartridge space lower 8
 		m_gromport->romgq_line(ASSERT_LINE);
-		m_gromport->write(space, physical_address & 0x1fff, data & 0xff);
+		m_gromport->write(physical_address & 0x1fff, data & 0xff);
 		m_gromport->romgq_line(CLEAR_LINE);
 		return;
 	}
@@ -315,7 +340,7 @@ WRITE8_MEMBER( mainboard8_device::debugger_write )
 	{
 		// Cartridge space upper 8
 		m_gromport->romgq_line(ASSERT_LINE);
-		m_gromport->write(space, (physical_address & 0x1fff) | 0x2000, data & 0xff);
+		m_gromport->write((physical_address & 0x1fff) | 0x2000, data & 0xff);
 		m_gromport->romgq_line(CLEAR_LINE);
 		return;
 	}
@@ -328,27 +353,23 @@ WRITE8_MEMBER( mainboard8_device::debugger_write )
 
 READ8Z_MEMBER(mainboard8_device::crureadz)
 {
-	m_ioport->crureadz(space, offset, value);
+	m_ioport->crureadz(offset, value);
 }
 
 /*
     CRU handling. Mofetta is the only chip that bothers to handle it, beside the PEB
 */
-WRITE8_MEMBER(mainboard8_device::cruwrite)
+void mainboard8_device::cruwrite(offs_t offset, uint8_t data)
 {
-	m_mofetta->cruwrite(space, offset, data);
-	m_ioport->cruwrite(space, offset, data);
+	m_mofetta->cruwrite(offset, data);
+	m_ioport->cruwrite(offset, data);
 }
 
 // =============== Memory bus access ==================
 
-WRITE_LINE_MEMBER( mainboard8_device::dbin_in )
+void mainboard8_device::setaddress(offs_t offset, uint8_t busctrl)
 {
-	m_dbin_level = (line_state)state;
-}
-
-SETOFFSET_MEMBER( mainboard8_device::setoffset )
-{
+	m_dbin_level = ((busctrl & TMS99xx_BUS_DBIN)!=0);
 	LOGMASKED(LOG_ADDRESS, "set %s %04x\n", (m_dbin_level==ASSERT_LINE)? "R" : "W", offset);
 
 	// No data is waiting on the data bus
@@ -366,7 +387,7 @@ SETOFFSET_MEMBER( mainboard8_device::setoffset )
 	m_A14_set = ((m_logical_address & 2)!=0); // Needed for clock_in
 
 	// Check for match in logical space
-	m_vaquerro->set_address(space, m_logical_address, m_dbin_level);
+	m_vaquerro->set_address(m_logical_address, m_dbin_level);
 
 	// Select GROMs if addressed
 	select_groms();
@@ -381,7 +402,7 @@ SETOFFSET_MEMBER( mainboard8_device::setoffset )
 	m_mofetta->lascs_in(lasreq);
 
 	// Need to set the address in any case so that the lines can be cleared
-	m_amigo->set_address(space, m_logical_address);
+	m_amigo->set_address(m_logical_address);
 
 	// AMIGO is the one to control the READY line to the CPU
 	// MOFETTA does not contribute to READY
@@ -444,34 +465,52 @@ WRITE_LINE_MEMBER( mainboard8_device::clock_in )
 		// Yields about 25% in bench (hoped for more, but well)
 		if (!m_sgrom_idle)
 		{
-			for (int i=0; i < 3; i++) m_sgrom[i]->gclock_in(gromclk);
+			m_sgrom0->gclock_in(gromclk);
+			m_sgrom1->gclock_in(gromclk);
+			m_sgrom2->gclock_in(gromclk);
 			m_gromport->gclock_in(gromclk);
-			m_sgrom_idle = m_sgrom[0]->idle();
+			m_sgrom_idle = m_sgrom0->idle();
 		}
 
 		if (!m_tsgrom_idle)
 		{
-			for (int i=0; i < 8; i++) m_tsgrom[i]->gclock_in(gromclk);
-			m_tsgrom_idle = m_tsgrom[0]->idle();
+			m_tsgrom0->gclock_in(gromclk);
+			m_tsgrom1->gclock_in(gromclk);
+			m_tsgrom2->gclock_in(gromclk);
+			m_tsgrom3->gclock_in(gromclk);
+			m_tsgrom4->gclock_in(gromclk);
+			m_tsgrom5->gclock_in(gromclk);
+			m_tsgrom6->gclock_in(gromclk);
+			m_tsgrom7->gclock_in(gromclk);
+			m_tsgrom_idle = m_tsgrom0->idle();
 		}
 		if (!m_p8grom_idle)
 		{
-			for (int i=0; i < 8; i++) m_p8grom[i]->gclock_in(gromclk);
-			m_p8grom_idle = m_p8grom[0]->idle();
+			m_p8grom0->gclock_in(gromclk);
+			m_p8grom1->gclock_in(gromclk);
+			m_p8grom2->gclock_in(gromclk);
+			m_p8grom3->gclock_in(gromclk);
+			m_p8grom4->gclock_in(gromclk);
+			m_p8grom5->gclock_in(gromclk);
+			m_p8grom6->gclock_in(gromclk);
+			m_p8grom7->gclock_in(gromclk);
+			m_p8grom_idle = m_p8grom0->idle();
 		}
 
 		if (!m_p3grom_idle)
 		{
-			for (int i=0; i < 3; i++) m_p3grom[i]->gclock_in(gromclk);
-			m_p3grom_idle = m_p3grom[0]->idle();
+			m_p3grom0->gclock_in(gromclk);
+			m_p3grom1->gclock_in(gromclk);
+			m_p3grom2->gclock_in(gromclk);
+			m_p3grom_idle = m_p3grom0->idle();
 		}
 	}
 
 	// Check video for writing
 	if (m_pending_write && m_vaquerro->vdpwt_out()==ASSERT_LINE)
 	{
-		if (m_A14_set) m_video->register_write(*m_space, 0, m_latched_data);
-		else m_video->vram_write(*m_space, 0, m_latched_data);
+		if (m_A14_set) m_video->register_write(m_latched_data);
+		else m_video->vram_write(m_latched_data);
 		m_pending_write = false;
 		LOGMASKED(LOG_MEM, "Write %04x (video) <- %02x\n", m_logical_address, m_latched_data);
 		cycle_end();
@@ -495,7 +534,7 @@ WRITE_LINE_MEMBER( mainboard8_device::clock_in )
 
 		if (m_mofetta->alccs_out()==ASSERT_LINE)
 		{
-			m_oso->write(*m_space, m_physical_address>>1, m_latched_data);
+			m_oso->write(m_physical_address>>1, m_latched_data);
 			m_pending_write = false;
 			LOGMASKED(LOG_MEM, "Write %04x (phys %06x, OSO) <- %02x\n", m_logical_address, m_physical_address, m_latched_data);
 		}
@@ -503,7 +542,7 @@ WRITE_LINE_MEMBER( mainboard8_device::clock_in )
 		if (m_mofetta->cmas_out()==ASSERT_LINE)
 		{
 			m_gromport->romgq_line(ASSERT_LINE);
-			m_gromport->write(*m_space, m_physical_address & 0x3fff, m_latched_data);
+			m_gromport->write(m_physical_address & 0x3fff, m_latched_data);
 			m_pending_write = false;
 			LOGMASKED(LOG_MEM, "Write %04x (phys %06x, cartridge) <- %02x\n", m_logical_address, m_physical_address, m_latched_data);
 		}
@@ -514,7 +553,7 @@ WRITE_LINE_MEMBER( mainboard8_device::clock_in )
 
 		if (m_mofetta->dbc_out()==ASSERT_LINE)
 		{
-			m_ioport->write(*m_space, m_physical_address, m_latched_data);
+			m_ioport->write(m_physical_address, m_latched_data);
 			m_pending_write = false;
 			LOGMASKED(LOG_MEM, "Write %04x (phys %06x, PEB) <- %02x\n", m_logical_address, m_physical_address, m_latched_data);
 		}
@@ -537,29 +576,47 @@ void mainboard8_device::select_groms()
 	if (select != m_prev_grom)
 	{
 		m_prev_grom = select;
-		int lines = (m_dbin_level==ASSERT_LINE)? GROM_M_LINE : 0;
-		if (m_A14_set) lines |= GROM_MO_LINE;
+		line_state a14 = m_A14_set? ASSERT_LINE : CLEAR_LINE;
 
 		if (select & SGMSEL) m_sgrom_idle = false;
 		if (select & TSGSEL) m_tsgrom_idle = false;
 		if (select & P8GSEL) m_p8grom_idle = false;
 		if (select & P3GSEL) m_p3grom_idle = false;
 
-		for (int i=0; i < 3; i++)
-			m_sgrom[i]->set_lines(*m_space, lines, select & SGMSEL);
+		line_state ssel = (select & SGMSEL)? ASSERT_LINE : CLEAR_LINE;
+		line_state tsel = (select & TSGSEL)? ASSERT_LINE : CLEAR_LINE;
+		line_state p8sel = (select & P8GSEL)? ASSERT_LINE : CLEAR_LINE;
+		line_state p3sel = (select & P3GSEL)? ASSERT_LINE : CLEAR_LINE;
 
-		for (int i=0; i < 8; i++)
-			m_tsgrom[i]->set_lines(*m_space, lines, select & TSGSEL);
+		m_sgrom0->set_lines((line_state)m_dbin_level, a14, ssel);
+		m_sgrom1->set_lines((line_state)m_dbin_level, a14, ssel);
+		m_sgrom2->set_lines((line_state)m_dbin_level, a14, ssel);
 
-		for (int i=0; i < 8; i++)
-			m_p8grom[i]->set_lines(*m_space, lines, select & P8GSEL);
+		m_tsgrom0->set_lines((line_state)m_dbin_level, a14, tsel);
+		m_tsgrom1->set_lines((line_state)m_dbin_level, a14, tsel);
+		m_tsgrom2->set_lines((line_state)m_dbin_level, a14, tsel);
+		m_tsgrom3->set_lines((line_state)m_dbin_level, a14, tsel);
+		m_tsgrom4->set_lines((line_state)m_dbin_level, a14, tsel);
+		m_tsgrom5->set_lines((line_state)m_dbin_level, a14, tsel);
+		m_tsgrom6->set_lines((line_state)m_dbin_level, a14, tsel);
+		m_tsgrom7->set_lines((line_state)m_dbin_level, a14, tsel);
 
-		for (int i=0; i < 3; i++)
-			m_p3grom[i]->set_lines(*m_space, lines, select & P3GSEL);
+		m_p8grom0->set_lines((line_state)m_dbin_level, a14, p8sel);
+		m_p8grom1->set_lines((line_state)m_dbin_level, a14, p8sel);
+		m_p8grom2->set_lines((line_state)m_dbin_level, a14, p8sel);
+		m_p8grom3->set_lines((line_state)m_dbin_level, a14, p8sel);
+		m_p8grom4->set_lines((line_state)m_dbin_level, a14, p8sel);
+		m_p8grom5->set_lines((line_state)m_dbin_level, a14, p8sel);
+		m_p8grom6->set_lines((line_state)m_dbin_level, a14, p8sel);
+		m_p8grom7->set_lines((line_state)m_dbin_level, a14, p8sel);
+
+		m_p3grom0->set_lines((line_state)m_dbin_level, a14, p3sel);
+		m_p3grom1->set_lines((line_state)m_dbin_level, a14, p3sel);
+		m_p3grom2->set_lines((line_state)m_dbin_level, a14, p3sel);
 
 		// Write to the cartridge port. The GROMs on cartridges are accessed as system GROMs
 		if (select & SGMSEL) m_gromport->romgq_line(CLEAR_LINE);
-		m_gromport->set_gromlines(*m_space, lines, select & SGMSEL);
+		m_gromport->set_gromlines((line_state)m_dbin_level, a14, ssel);
 	}
 
 	// If we're planning to write to the GROMs, let's do it right now
@@ -569,40 +626,46 @@ void mainboard8_device::select_groms()
 		switch (select)
 		{
 		case SGMSEL:
-			for (int i=0; i < 3; i++)
-			{
-				m_sgrom[i]->write(*m_space, 0, m_latched_data);
-			}
+			m_sgrom0->write(m_latched_data);
+			m_sgrom1->write(m_latched_data);
+			m_sgrom2->write(m_latched_data);
 			LOGMASKED(LOG_MEM, "Write GS <- %02x\n", m_latched_data);
-			m_gromport->write(*m_space, 0, m_latched_data);
+			m_gromport->write(0, m_latched_data);
 			break;
 
 		case TSGSEL:
-			for (int i=0; i < 8; i++)
-			{
-				m_tsgrom[i]->write(*m_space, 0, m_latched_data);
-			}
+			m_tsgrom0->write(m_latched_data);
+			m_tsgrom1->write(m_latched_data);
+			m_tsgrom2->write(m_latched_data);
+			m_tsgrom3->write(m_latched_data);
+			m_tsgrom4->write(m_latched_data);
+			m_tsgrom5->write(m_latched_data);
+			m_tsgrom6->write(m_latched_data);
+			m_tsgrom7->write(m_latched_data);
 			LOGMASKED(LOG_MEM, "Write GT <- %02x\n", m_latched_data);
 			break;
 
 		case P8GSEL:
-			for (int i=0; i < 8; i++)
-			{
-				m_p8grom[i]->write(*m_space, 0, m_latched_data);
-			}
+			m_p8grom0->write(m_latched_data);
+			m_p8grom1->write(m_latched_data);
+			m_p8grom2->write(m_latched_data);
+			m_p8grom3->write(m_latched_data);
+			m_p8grom4->write(m_latched_data);
+			m_p8grom5->write(m_latched_data);
+			m_p8grom6->write(m_latched_data);
+			m_p8grom7->write(m_latched_data);
 			LOGMASKED(LOG_MEM, "Write G8 <- %02x\n", m_latched_data);
 			break;
 
 		case P3GSEL:
-			for (int i=0; i < 3; i++)
-			{
-				m_p3grom[i]->write(*m_space, 0, m_latched_data);
-			}
+			m_p3grom0->write(m_latched_data);
+			m_p3grom1->write(m_latched_data);
+			m_p3grom2->write(m_latched_data);
 			LOGMASKED(LOG_MEM, "Write G3 <- %02x\n", m_latched_data);
 			break;
 
 		default:
-			logerror("Error: Multiple GROM libs selected: SGM=%d TSG=%d P8G=%d P3G=%d\n", (select & SGMSEL)!=0, (select & TSGSEL)!=0, (select & P8GSEL)!=0, (select & P3GSEL)!=0);
+			LOGMASKED(LOG_WARN, "Error: Multiple GROM libs selected: SGM=%d TSG=%d P8G=%d P3G=%d\n", (select & SGMSEL)!=0, (select & TSGSEL)!=0, (select & P8GSEL)!=0, (select & P3GSEL)!=0);
 			break;
 		}
 	}
@@ -614,8 +677,8 @@ void mainboard8_device::set_paddress(int address)
 	m_physical_address = (m_physical_address << 16) | address;
 	LOGMASKED(LOG_DETAIL, "Setting physical address %06x\n", m_physical_address);
 
-	m_mofetta->set_address(*m_space, address, m_dbin_level);
-	m_ioport->setaddress_dbin(*m_space, address, m_dbin_level);
+	m_mofetta->set_address(address, m_dbin_level);
+	m_ioport->setaddress_dbin(address, m_dbin_level);
 }
 
 WRITE_LINE_MEMBER( mainboard8_device::msast_in )
@@ -633,14 +696,14 @@ WRITE_LINE_MEMBER( mainboard8_device::msast_in )
 }
 
 
-READ8_MEMBER( mainboard8_device::read )
+uint8_t mainboard8_device::read(offs_t offset)
 {
 	uint8_t value = 0;
 	const char* what;
 
 	if (machine().side_effects_disabled())
 	{
-		return debugger_read(space, offset);
+		return debugger_read(offset);
 	}
 
 	// =================================================
@@ -648,7 +711,7 @@ READ8_MEMBER( mainboard8_device::read )
 	// =================================================
 	if (m_amigo->mapper_accessed())
 	{
-		value = m_amigo->read(space, 0);
+		value = m_amigo->read();
 		what = "mapper";
 		goto readdone;
 	}
@@ -665,7 +728,7 @@ READ8_MEMBER( mainboard8_device::read )
 		// VDP access
 		if (m_vaquerro->vdprd_out()==ASSERT_LINE)
 		{
-			value = m_A14_set? m_video->register_read(space, 0) : m_video->vram_read(space, 0);
+			value = m_A14_set? m_video->register_read() : m_video->vram_read();
 			what = "video";
 			goto readdone;
 		}
@@ -681,7 +744,7 @@ READ8_MEMBER( mainboard8_device::read )
 		// Speech
 		if (m_vaquerro->sprd_out()==ASSERT_LINE)
 		{
-			value = m_speech->status_r(space, 0) & 0xff;
+			value = m_speech->status_r() & 0xff;
 			what = "speech";
 			goto readdone;
 		}
@@ -691,42 +754,48 @@ READ8_MEMBER( mainboard8_device::read )
 		{
 		case SGMSEL:
 			m_sgrom_idle = false;
-			for (int i=0; i < 3; i++)
-			{
-				m_sgrom[i]->readz(space, 0, &value);
-			}
-			m_gromport->readz(space, 0, &value);
-			if (!m_A14_set) LOGMASKED(LOG_GROM, "GS>%04x\n", m_sgrom[0]->debug_get_address()-1);
+			m_sgrom0->readz(&value);
+			m_sgrom1->readz(&value);
+			m_sgrom2->readz(&value);
+			m_gromport->readz(0, &value);
+			if (!m_A14_set) LOGMASKED(LOG_GROM, "GS>%04x\n", m_sgrom0->debug_get_address()-1);
 			what = "system GROM";
 			goto readdone;
 
 		case TSGSEL:
 			m_tsgrom_idle = false;
-			for (int i=0; i < 8; i++)
-			{
-				m_tsgrom[i]->readz(space, 0, &value);
-			}
-			if (!m_A14_set) LOGMASKED(LOG_GROM, "GT>%04x\n", m_tsgrom[0]->debug_get_address()-1);
+			m_tsgrom0->readz(&value);
+			m_tsgrom1->readz(&value);
+			m_tsgrom2->readz(&value);
+			m_tsgrom3->readz(&value);
+			m_tsgrom4->readz(&value);
+			m_tsgrom5->readz(&value);
+			m_tsgrom6->readz(&value);
+			m_tsgrom7->readz(&value);
+			if (!m_A14_set) LOGMASKED(LOG_GROM, "GT>%04x\n", m_tsgrom0->debug_get_address()-1);
 			what = "TTS GROM";
 			goto readdone;
 
 		case P8GSEL:
 			m_p8grom_idle = false;
-			for (int i=0; i < 8; i++)
-			{
-				m_p8grom[i]->readz(space, 0, &value);
-			}
-			if (!m_A14_set) LOGMASKED(LOG_GROM, "G8>%04x\n", m_p8grom[0]->debug_get_address()-1);
+			m_p8grom0->readz(&value);
+			m_p8grom1->readz(&value);
+			m_p8grom2->readz(&value);
+			m_p8grom3->readz(&value);
+			m_p8grom4->readz(&value);
+			m_p8grom5->readz(&value);
+			m_p8grom6->readz(&value);
+			m_p8grom7->readz(&value);
+			if (!m_A14_set) LOGMASKED(LOG_GROM, "G8>%04x\n", m_p8grom0->debug_get_address()-1);
 			what = "P8 GROM";
 			goto readdone;
 
 		case P3GSEL:
 			m_p3grom_idle = false;
-			for (int i=0; i < 3; i++)
-			{
-				m_p3grom[i]->readz(space, 0, &value);
-			}
-			if (!m_A14_set) LOGMASKED(LOG_GROM, "G3>%04x\n", m_p3grom[0]->debug_get_address()-1);
+			m_p3grom0->readz(&value);
+			m_p3grom1->readz(&value);
+			m_p3grom2->readz(&value);
+			if (!m_A14_set) LOGMASKED(LOG_GROM, "G3>%04x\n", m_p3grom0->debug_get_address()-1);
 			what = "P3 GROM";
 			goto readdone;
 		default:
@@ -737,7 +806,7 @@ READ8_MEMBER( mainboard8_device::read )
 		// an immediate value to a write-only address (like 9400) because the
 		// GPL interpreter always tries to load the value from the provided memory address first
 
-		logerror("Read %04x (unmapped) ignored\n", m_logical_address);
+		LOGMASKED(LOG_WARN, "Read %04x (unmapped) ignored\n", m_logical_address);
 
 		// Memory cycle ends
 		cycle_end();
@@ -769,7 +838,7 @@ READ8_MEMBER( mainboard8_device::read )
 
 		if (m_mofetta->alccs_out()==ASSERT_LINE)
 		{
-			value = m_oso->read(*m_space, m_physical_address>>1);
+			value = m_oso->read(m_physical_address>>1);
 			what = "OSO";
 			goto readdonephys;
 		}
@@ -784,14 +853,14 @@ READ8_MEMBER( mainboard8_device::read )
 		if (m_mofetta->cmas_out()==ASSERT_LINE)
 		{
 			m_gromport->romgq_line(ASSERT_LINE);
-			m_gromport->readz(*m_space, m_physical_address & 0x3fff, &value);
+			m_gromport->readz(m_physical_address & 0x3fff, &value);
 			what = "Cartridge";
 			goto readdonephys;
 		}
 
 		if (m_mofetta->dbc_out()==ASSERT_LINE)
 		{
-			m_ioport->readz(*m_space, m_physical_address & 0xffff, &value);
+			m_ioport->readz(m_physical_address & 0xffff, &value);
 			what = "PEB";
 			goto readdonephys;
 		}
@@ -831,14 +900,14 @@ void mainboard8_device::cycle_end()
     If the READY line is pulled down due to the mapping process, we must
     store the data bus value until the physical address is available.
 */
-WRITE8_MEMBER( mainboard8_device::write )
+void mainboard8_device::write(offs_t offset, uint8_t data)
 {
 	m_latched_data = data;
 	m_pending_write = true;
 
 	if (machine().side_effects_disabled())
 	{
-		return debugger_write(space, offset, data);
+		return debugger_write(offset, data);
 	}
 
 	// Some logical space devices can be written immediately
@@ -846,7 +915,7 @@ WRITE8_MEMBER( mainboard8_device::write )
 	if (m_amigo->mapper_accessed())
 	{
 		LOGMASKED(LOG_MEM, "Write %04x (mapper) <- %02x\n", m_logical_address, data);
-		m_amigo->write(space, 0, data);
+		m_amigo->write(data);
 		m_pending_write = false;
 	}
 
@@ -855,7 +924,7 @@ WRITE8_MEMBER( mainboard8_device::write )
 	if (m_vaquerro->sccs_out()==ASSERT_LINE)
 	{
 		LOGMASKED(LOG_MEM, "Write %04x (sound) <- %02x\n", m_logical_address, data);
-		m_sound->write(space, 0, data);         // Sound chip will lower READY after this access
+		m_sound->write(data);         // Sound chip will lower READY after this access
 		m_pending_write = false;
 	}
 	else
@@ -873,7 +942,7 @@ WRITE8_MEMBER( mainboard8_device::write )
 	if (m_vaquerro->spwt_out()==ASSERT_LINE)
 	{
 		LOGMASKED(LOG_MEM, "Write %04x (speech) <- %02x\n", m_logical_address, data);
-		m_speech->data_w(space, 0, data);
+		m_speech->data_w(data);
 		m_pending_write = false;
 	}
 
@@ -949,30 +1018,12 @@ WRITE_LINE_MEMBER( mainboard8_device::ggrdy_in )
 	m_amigo->srdy_in((state==ASSERT_LINE && m_speech_ready && m_sound_ready && m_pbox_ready)? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const char *const glib0[] = { TI998_SYSGROM0_TAG, TI998_SYSGROM1_TAG, TI998_SYSGROM2_TAG };
-static const char *const glib1[] = { TI998_GLIB10_TAG, TI998_GLIB11_TAG, TI998_GLIB12_TAG, TI998_GLIB13_TAG, TI998_GLIB14_TAG, TI998_GLIB15_TAG, TI998_GLIB16_TAG, TI998_GLIB17_TAG };
-static const char *const glib2[] = { TI998_GLIB20_TAG, TI998_GLIB21_TAG, TI998_GLIB22_TAG, TI998_GLIB23_TAG, TI998_GLIB24_TAG, TI998_GLIB25_TAG, TI998_GLIB26_TAG, TI998_GLIB27_TAG };
-static const char *const glib3[] = { TI998_GLIB30_TAG, TI998_GLIB31_TAG, TI998_GLIB32_TAG };
-
 void mainboard8_device::device_start()
 {
-	logerror("Starting main board\n");
 	// Lines going to the main driver class, then to the CPU
 	m_ready.resolve_safe();         // READY
 	m_console_reset.resolve_safe(); // RESET
 	m_hold_line.resolve_safe();     // HOLD
-
-	// Setting up the links to the GROMs
-	for (int i=0; i < 8; i++)
-	{
-		if (i < 3)
-		{
-			m_sgrom[i] = downcast<tmc0430_device*>(machine().device(glib0[i]));
-			m_p3grom[i] = downcast<tmc0430_device*>(machine().device(glib3[i]));
-		}
-		m_tsgrom[i] = downcast<tmc0430_device*>(machine().device(glib1[i]));
-		m_p8grom[i] = downcast<tmc0430_device*>(machine().device(glib2[i]));
-	}
 
 	m_rom0  = machine().root_device().memregion(TI998_ROM0_REG)->base();
 	m_rom1  = machine().root_device().memregion(TI998_ROM1_REG)->base();
@@ -999,7 +1050,6 @@ void mainboard8_device::device_start()
 
 void mainboard8_device::device_reset()
 {
-	logerror("Resetting main board\n");
 	m_last_ready = CLEAR_LINE;
 	m_speech_ready = true;
 	m_sound_ready = true;
@@ -1009,19 +1059,15 @@ void mainboard8_device::device_reset()
 	m_A14_set = false;
 	// Configure RAM and AMIGO
 	m_amigo->connect_sram(m_sram->pointer());
-
-	// Get the pointer to the address space; we need it outside of the
-	// usual memory functions.
-	cpu_device* cpu = downcast<cpu_device*>(machine().device("maincpu"));
-	m_space = &cpu->space(AS_PROGRAM);
 }
 
-MACHINE_CONFIG_START(mainboard8_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(TI998_VAQUERRO_TAG, TI99_VAQUERRO, 0)
-	MCFG_DEVICE_ADD(TI998_MOFETTA_TAG, TI99_MOFETTA, 0)
-	MCFG_DEVICE_ADD(TI998_AMIGO_TAG, TI99_AMIGO, 0)
-	MCFG_DEVICE_ADD(TI998_OSO_TAG, TI99_OSO, 0)
-MACHINE_CONFIG_END
+void mainboard8_device::device_add_mconfig(machine_config &config)
+{
+	TI99_VAQUERRO(config, TI998_VAQUERRO_TAG, 0);
+	TI99_MOFETTA(config, TI998_MOFETTA_TAG, 0);
+	TI99_AMIGO(config, TI998_AMIGO_TAG, 0);
+	TI99_OSO(config, TI998_OSO_TAG, 0);
+}
 
 /***************************************************************************
   ===== VAQUERRO: Logical Address Space decoder =====
@@ -1680,7 +1726,7 @@ bool mofetta_device::intdsr_access_debug()
 	return m_txspg;
 }
 
-WRITE8_MEMBER(mofetta_device::cruwrite)
+void mofetta_device::cruwrite(offs_t offset, uint8_t data)
 {
 	if ((offset & 0xff00)==0x2700)
 	{
@@ -1945,7 +1991,7 @@ WRITE_LINE_MEMBER( amigo_device::lascs_in )
     3. Set the physical address bus with the second 16 bits of the physical
        address. Clear the MSAST line. Forward any incoming READY=0 to the CPU.
 */
-SETOFFSET_MEMBER( amigo_device::set_address )
+uint8_t amigo_device::set_address(offs_t offset)
 {
 	// Check whether the mapper itself is accessed
 	int mapaddr = (m_crus==ASSERT_LINE)? 0x8810 : 0xf870;
@@ -1991,12 +2037,14 @@ SETOFFSET_MEMBER( amigo_device::set_address )
 		m_ready_out = m_srdy;
 		LOGMASKED(LOG_CPURY, "Setting CPURY = %d (LAS)\n", m_ready_out);
 	}
+
+	return 0;
 }
 
 /*
     Read the mapper status bits
 */
-READ8_MEMBER( amigo_device::read )
+uint8_t amigo_device::read()
 {
 	// Read the protection status bits and reset them
 	uint8_t value = m_protflag;
@@ -2007,7 +2055,7 @@ READ8_MEMBER( amigo_device::read )
 /*
     Configure the mapper. This is the only reason to write to the AMIGO.
 */
-WRITE8_MEMBER( amigo_device::write )
+void amigo_device::write(uint8_t data)
 {
 	// Load or save map file
 	if ((data & 0xf0)==0x00)
@@ -2020,7 +2068,7 @@ WRITE8_MEMBER( amigo_device::write )
 		m_mapvalue = 0;
 		m_mainboard->hold_cpu(ASSERT_LINE);
 	}
-	else logerror("Invalid value written to Amigo: %02x\n", data);
+	else LOGMASKED(LOG_WARN, "Invalid value written to Amigo: %02x\n", data);
 }
 
 WRITE_LINE_MEMBER( amigo_device::clock_in )
@@ -2057,7 +2105,7 @@ WRITE_LINE_MEMBER( amigo_device::clock_in )
 			break;
 
 		default:
-			logerror("Invalid state in mapper: %d\n", m_amstate);
+			LOGMASKED(LOG_WARN, "Invalid state in mapper: %d\n", m_amstate);
 		}
 	}
 }
@@ -2216,6 +2264,7 @@ void amigo_device::device_reset()
 oso_device::oso_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	bus::hexbus::hexbus_chained_device(mconfig, TI99_OSO, tag, owner, clock),
 	m_int(*this),
+	m_hexbusout(*this, ":" TI_HEXBUS_TAG),
 	m_data(0),
 	m_status(0xff),
 	m_control(0),
@@ -2237,7 +2286,7 @@ oso_device::oso_device(const machine_config &mconfig, const char *tag, device_t 
 	m_hexbus_outbound = nullptr;
 }
 
-READ8_MEMBER( oso_device::read )
+uint8_t oso_device::read(offs_t offset)
 {
 	int value = 0;
 	offset &= 0x03;
@@ -2273,7 +2322,7 @@ READ8_MEMBER( oso_device::read )
 	return value;
 }
 
-WRITE8_MEMBER( oso_device::write )
+void oso_device::write(offs_t offset, uint8_t data)
 {
 	offset &= 0x03;
 	switch (offset)
@@ -2687,7 +2736,8 @@ void oso_device::device_start()
 	m_status = m_xmit = m_control = m_data = 0;
 	m_int.resolve_safe();
 
-	m_hexbus_outbound = dynamic_cast<bus::hexbus::hexbus_device*>(machine().device(TI_HEXBUS_TAG));
+	// Establish the downstream link in the parent class hexbus_chained_device
+	set_outbound_hexbus(m_hexbusout);
 
 	// Establish callback for inbound propagations
 	m_hexbus_outbound->set_chain_element(this);

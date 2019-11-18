@@ -7,13 +7,15 @@
     TIKI 100 disk image format
 
 *********************************************************************/
+#ifndef MAME_FORMATS_TIKI100_DSK_H
+#define MAME_FORMATS_TIKI100_DSK_H
 
-#ifndef TIKI100_DSK_H_
-#define TIKI100_DSK_H_
+#pragma once
 
 #include "wd177x_dsk.h"
 
-class tiki100_format : public wd177x_format {
+class tiki100_format : public wd177x_format
+{
 public:
 	tiki100_format();
 
@@ -27,4 +29,4 @@ private:
 
 extern const floppy_format_type FLOPPY_TIKI100_FORMAT;
 
-#endif
+#endif // MAME_FORMATS_TIKI100_DSK_H

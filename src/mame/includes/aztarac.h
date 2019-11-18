@@ -6,7 +6,9 @@
 
 *************************************************************************/
 
+#include "cpu/m68000/m68000.h"
 #include "machine/gen_latch.h"
+#include "machine/x2212.h"
 #include "video/vector.h"
 #include "screen.h"
 
@@ -17,28 +19,28 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_nvram(*this, "nvram"),
 		m_vector(*this, "vector"),
 		m_screen(*this, "screen"),
 		m_soundlatch(*this, "soundlatch"),
-		m_nvram(*this, "nvram") ,
 		m_vectorram(*this, "vectorram") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<x2212_device> m_nvram;
 	required_device<vector_device> m_vector;
 	required_device<screen_device> m_screen;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	required_shared_ptr<uint16_t> m_nvram;
 	required_shared_ptr<uint16_t> m_vectorram;
 
 	int m_sound_status;
 	int m_xcenter;
 	int m_ycenter;
 
-	DECLARE_READ16_MEMBER(nvram_r);
+	void nvram_store_w(uint16_t data);
 	DECLARE_READ16_MEMBER(joystick_r);
-	DECLARE_WRITE16_MEMBER(ubr_w);
+	void ubr_w(uint8_t data);
 	DECLARE_READ16_MEMBER(sound_r);
 	DECLARE_WRITE16_MEMBER(sound_w);
 	DECLARE_READ8_MEMBER(snd_command_r);
@@ -46,10 +48,11 @@ public:
 	DECLARE_WRITE8_MEMBER(snd_status_w);
 
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	virtual void video_start() override;
 
+	DECLARE_WRITE_LINE_MEMBER(video_interrupt);
 	INTERRUPT_GEN_MEMBER(snd_timed_irq);
-	IRQ_CALLBACK_MEMBER(irq_callback);
 
 	inline void read_vectorram(uint16_t *vectorram, int addr, int *x, int *y, int *c);
 	void aztarac(machine_config &config);

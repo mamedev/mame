@@ -42,6 +42,8 @@ to do:
 #include "emu.h"
 #include "ym2413.h"
 
+#include <algorithm>
+
 #define FREQ_SH         16  /* 16.16 fixed point (frequency calculations) */
 #define EG_SH           16  /* 16.16 fixed point (EG timing)              */
 #define LFO_SH          24  /*  8.24 fixed point (LFO calculations)       */
@@ -131,7 +133,7 @@ const uint32_t ym2413_device::sl_tab[16] = {
 };
 #undef SC
 
-const unsigned char ym2413_device::eg_inc[15*RATE_STEPS] = {
+const uint8_t ym2413_device::eg_inc[15*RATE_STEPS] = {
 	/*cycle:0 1  2 3  4 5  6 7*/
 
 	/* 0 */ 0,1, 0,1, 0,1, 0,1, /* rates 00..12 0 (increment by 0 or 1) */
@@ -158,7 +160,7 @@ const unsigned char ym2413_device::eg_inc[15*RATE_STEPS] = {
 #define O(a) (a*RATE_STEPS)
 
 /*note that there is no O(13) in this table - it's directly in the code */
-const unsigned char ym2413_device::eg_rate_select[16+64+16] = {   /* Envelope Generator rates (16 + 64 rates + 16 RKS) */
+const uint8_t ym2413_device::eg_rate_select[16+64+16] = {   /* Envelope Generator rates (16 + 64 rates + 16 RKS) */
 	/* 16 infinite time rates */
 	O(14),O(14),O(14),O(14),O(14),O(14),O(14),O(14),
 	O(14),O(14),O(14),O(14),O(14),O(14),O(14),O(14),
@@ -199,7 +201,7 @@ const unsigned char ym2413_device::eg_rate_select[16+64+16] = {   /* Envelope Ge
 /*mask  8191, 4095, 2047, 1023, 511, 255, 127, 63, 31, 15, 7,  3,  1,  0,  0,  0 */
 
 #define O(a) (a*1)
-const unsigned char ym2413_device::eg_rate_shift[16+64+16] = {    /* Envelope Generator counter shifts (16 + 64 rates + 16 RKS) */
+const uint8_t ym2413_device::eg_rate_shift[16+64+16] = {    /* Envelope Generator counter shifts (16 + 64 rates + 16 RKS) */
 	/* 16 infinite time rates */
 	O(0),O(0),O(0),O(0),O(0),O(0),O(0),O(0),
 	O(0),O(0),O(0),O(0),O(0),O(0),O(0),O(0),
@@ -350,9 +352,10 @@ const int8_t ym2413_device::lfo_pm_table[8*8] = {
  - waveform DC and DM select are 100% correct
 */
 
-const unsigned char ym2413_device::table[19][8] = {
+const uint8_t ym2413_device::table[19][8] = {
 /* MULT  MULT modTL DcDmFb AR/DR AR/DR SL/RR SL/RR */
 /*   0     1     2     3     4     5     6    7    */
+/* These YM2413(OPLL) patch dumps are done via audio analysis (and a/b testing?) from Jarek and are known to be inaccurate */
 	{0x49, 0x4c, 0x4c, 0x12, 0x00, 0x00, 0x00, 0x00 },  //0
 
 	{0x61, 0x61, 0x1e, 0x17, 0xf0, 0x78, 0x00, 0x17 },  //1
@@ -385,9 +388,45 @@ const unsigned char ym2413_device::table[19][8] = {
 /* drum instruments definitions */
 /* MULTI MULTI modTL  xxx  AR/DR AR/DR SL/RR SL/RR */
 /*   0     1     2     3     4     5     6    7    */
-	{0x01, 0x01, 0x16, 0x00, 0xfd, 0xf8, 0x2f, 0x6d },/* BD(multi verified, modTL verified, mod env - verified(close), carr. env verifed) */
-	{0x01, 0x01, 0x00, 0x00, 0xd8, 0xd8, 0xf9, 0xf8 },/* HH(multi verified), SD(multi not used) */
-	{0x05, 0x01, 0x00, 0x00, 0xf8, 0xba, 0x49, 0x55 },/* TOM(multi,env verified), TOP CYM(multi verified, env verified) */
+/* old dumps via audio analysis (and a/b testing?) from Jarek */
+//{0x01, 0x01, 0x16, 0x00, 0xfd, 0xf8, 0x2f, 0x6d },/* BD(multi verified, modTL verified, mod env - verified(close), carr. env verifed) */
+//{0x01, 0x01, 0x00, 0x00, 0xd8, 0xd8, 0xf9, 0xf8 },/* HH(multi verified), SD(multi not used) */
+//{0x05, 0x01, 0x00, 0x00, 0xf8, 0xba, 0x49, 0x55 },/* TOM(multi,env verified), TOP CYM(multi verified, env verified) */
+/* Drums dumped from the VRC7 using debug mode, these are likely also correct for ym2413(OPLL) but need verification */
+	{0x01, 0x01, 0x18, 0x0f, 0xdf, 0xf8, 0x6a, 0x6d },/* BD */
+	{0x01, 0x01, 0x00, 0x00, 0xc8, 0xd8, 0xa7, 0x68 },/* HH, SD */
+	{0x05, 0x01, 0x00, 0x00, 0xf8, 0xaa, 0x59, 0x55 },/* TOM, TOP CYM */
+};
+
+// VRC7 Instruments : Dumped from internal ROM
+// reference : https://siliconpr0n.org/archive/doku.php?id=vendor:yamaha:opl2
+const uint8_t vrc7snd_device::vrc7_table[19][8] = {
+/* MULT  MULT modTL DcDmFb AR/DR AR/DR SL/RR SL/RR */
+/*   0     1     2     3     4     5     6    7    */
+	{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },  //0 (This is the user-defined instrument, should this default to anything?)
+
+	{0x03, 0x21, 0x05, 0x06, 0xe8, 0x81, 0x42, 0x27 },  //1
+	{0x13, 0x41, 0x14, 0x0d, 0xd8, 0xf6, 0x23, 0x12 },  //2
+	{0x11, 0x11, 0x08, 0x08, 0xfa, 0xb2, 0x20, 0x12 },  //3
+	{0x31, 0x61, 0x0c, 0x07, 0xa8, 0x64, 0x61, 0x27 },  //4
+	{0x32, 0x21, 0x1e, 0x06, 0xe1, 0x76, 0x01, 0x28 },  //5
+	{0x02, 0x01, 0x06, 0x00, 0xa3, 0xe2, 0xf4, 0xf4 },  //6
+	{0x21, 0x61, 0x1d, 0x07, 0x82, 0x81, 0x11, 0x07 },  //7
+	{0x23, 0x21, 0x22, 0x17, 0xa2, 0x72, 0x01, 0x17 },  //8
+	{0x35, 0x11, 0x25, 0x00, 0x40, 0x73, 0x72, 0x01 },  //9
+	{0xb5, 0x01, 0x0f, 0x0f, 0xa8, 0xa5, 0x51, 0x02 },  //A
+	{0x17, 0xc1, 0x24, 0x07, 0xf8, 0xf8, 0x22, 0x12 },  //B
+	{0x71, 0x23, 0x11, 0x06, 0x65, 0x74, 0x18, 0x16 },  //C
+	{0x01, 0x02, 0xd3, 0x05, 0xc9, 0x95, 0x03, 0x02 },  //D
+	{0x61, 0x63, 0x0c, 0x00, 0x94, 0xc0, 0x33, 0xf6 },  //E
+	{0x21, 0x72, 0x0d, 0x00, 0xc1, 0xd5, 0x56, 0x06 },  //F
+
+/* Drums (silent due to no RO output pin(?) on VRC7, but present internally; these are probably shared with YM2413) */
+/* MULTI MULTI modTL  xxx  AR/DR AR/DR SL/RR SL/RR */
+/*   0     1     2     3     4     5     6    7    */
+	{0x01, 0x01, 0x18, 0x0f, 0xdf, 0xf8, 0x6a, 0x6d },/* BD */
+	{0x01, 0x01, 0x00, 0x00, 0xc8, 0xd8, 0xa7, 0x68 },/* HH, SD */
+	{0x05, 0x01, 0x00, 0x00, 0xf8, 0xaa, 0x59, 0x55 },/* TOM, TOP CYM */
 };
 
 /* work table */
@@ -823,21 +862,21 @@ void ym2413_device::rhythm_calc( OPLL_CH *CH, unsigned int noise )
 		*/
 
 		/* base frequency derived from operator 1 in channel 7 */
-		unsigned char bit7 = ((SLOT7_1->phase>>FREQ_SH)>>7)&1;
-		unsigned char bit3 = ((SLOT7_1->phase>>FREQ_SH)>>3)&1;
-		unsigned char bit2 = ((SLOT7_1->phase>>FREQ_SH)>>2)&1;
+		uint8_t bit7 = ((SLOT7_1->phase>>FREQ_SH)>>7)&1;
+		uint8_t bit3 = ((SLOT7_1->phase>>FREQ_SH)>>3)&1;
+		uint8_t bit2 = ((SLOT7_1->phase>>FREQ_SH)>>2)&1;
 
-		unsigned char res1 = (bit2 ^ bit7) | bit3;
+		uint8_t res1 = (bit2 ^ bit7) | bit3;
 
 		/* when res1 = 0 phase = 0x000 | 0xd0; */
 		/* when res1 = 1 phase = 0x200 | (0xd0>>2); */
 		uint32_t phase = res1 ? (0x200|(0xd0>>2)) : 0xd0;
 
 		/* enable gate based on frequency of operator 2 in channel 8 */
-		unsigned char bit5e= ((SLOT8_2->phase>>FREQ_SH)>>5)&1;
-		unsigned char bit3e= ((SLOT8_2->phase>>FREQ_SH)>>3)&1;
+		uint8_t bit5e= ((SLOT8_2->phase>>FREQ_SH)>>5)&1;
+		uint8_t bit3e= ((SLOT8_2->phase>>FREQ_SH)>>3)&1;
 
-		unsigned char res2 = (bit3e | bit5e);
+		uint8_t res2 = (bit3e | bit5e);
 
 		/* when res2 = 0 pass the phase from calculation above (res1); */
 		/* when res2 = 1 phase = 0x200 | (0xd0>>2); */
@@ -868,7 +907,7 @@ void ym2413_device::rhythm_calc( OPLL_CH *CH, unsigned int noise )
 	if( env < ENV_QUIET )
 	{
 		/* base frequency derived from operator 1 in channel 7 */
-		unsigned char bit8 = ((SLOT7_1->phase>>FREQ_SH)>>8)&1;
+		uint8_t bit8 = ((SLOT7_1->phase>>FREQ_SH)>>8)&1;
 
 		/* when bit8 = 0 phase = 0x100; */
 		/* when bit8 = 1 phase = 0x200; */
@@ -894,21 +933,21 @@ void ym2413_device::rhythm_calc( OPLL_CH *CH, unsigned int noise )
 	if( env < ENV_QUIET )
 	{
 		/* base frequency derived from operator 1 in channel 7 */
-		unsigned char bit7 = ((SLOT7_1->phase>>FREQ_SH)>>7)&1;
-		unsigned char bit3 = ((SLOT7_1->phase>>FREQ_SH)>>3)&1;
-		unsigned char bit2 = ((SLOT7_1->phase>>FREQ_SH)>>2)&1;
+		uint8_t bit7 = ((SLOT7_1->phase>>FREQ_SH)>>7)&1;
+		uint8_t bit3 = ((SLOT7_1->phase>>FREQ_SH)>>3)&1;
+		uint8_t bit2 = ((SLOT7_1->phase>>FREQ_SH)>>2)&1;
 
-		unsigned char res1 = (bit2 ^ bit7) | bit3;
+		uint8_t res1 = (bit2 ^ bit7) | bit3;
 
 		/* when res1 = 0 phase = 0x000 | 0x100; */
 		/* when res1 = 1 phase = 0x200 | 0x100; */
 		uint32_t phase = res1 ? 0x300 : 0x100;
 
 		/* enable gate based on frequency of operator 2 in channel 8 */
-		unsigned char bit5e= ((SLOT8_2->phase>>FREQ_SH)>>5)&1;
-		unsigned char bit3e= ((SLOT8_2->phase>>FREQ_SH)>>3)&1;
+		uint8_t bit5e= ((SLOT8_2->phase>>FREQ_SH)>>5)&1;
+		uint8_t bit3e= ((SLOT8_2->phase>>FREQ_SH)>>3)&1;
 
-		unsigned char res2 = (bit3e | bit5e);
+		uint8_t res2 = (bit3e | bit5e);
 		/* when res2 = 0 pass the phase from calculation above (res1); */
 		/* when res2 = 1 phase = 0x200 | 0x100; */
 		if (res2)
@@ -1616,6 +1655,14 @@ void ym2413_device::device_start()
 }
 
 //-------------------------------------------------
+//  device_clock_changed
+//-------------------------------------------------
+void ym2413_device::device_clock_changed()
+{
+	m_stream->set_sample_rate(clock() / 72);
+}
+
+//-------------------------------------------------
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
@@ -1627,11 +1674,14 @@ void ym2413_device::device_reset()
 	noise_rng = 1;    /* noise shift register */
 
 	/* setup instruments table */
-	for (int i=0; i<19; i++)
+	if (m_inst_table != nullptr)
 	{
-		for (int c=0; c<8; c++)
+		for (int i=0; i<19; i++)
 		{
-			inst_tab[i][c] = table[i][c];
+			for (int c=0; c<8; c++)
+			{
+				inst_tab[i][c] = m_inst_table[i][c];
+			}
 		}
 	}
 
@@ -1656,20 +1706,20 @@ void ym2413_device::device_reset()
 }
 
 
-WRITE8_MEMBER( ym2413_device::write )
+void ym2413_device::write(offs_t offset, u8 data)
 {
 	if (offset)
-		data_port_w(space, offset, data);
+		data_port_w(data);
 	else
-		register_port_w(space, offset, data);
+		register_port_w(data);
 }
 
-WRITE8_MEMBER( ym2413_device::register_port_w )
+void ym2413_device::register_port_w(u8 data)
 {
 	address = data;
 }
 
-WRITE8_MEMBER( ym2413_device::data_port_w )
+void ym2413_device::data_port_w(u8 data)
 {
 	m_stream->update();
 	write_reg(address, data);
@@ -1678,7 +1728,37 @@ WRITE8_MEMBER( ym2413_device::data_port_w )
 DEFINE_DEVICE_TYPE(YM2413, ym2413_device, "ym2413", "Yamaha YM2413 OPLL")
 
 ym2413_device::ym2413_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, YM2413, tag, owner, clock)
+	: ym2413_device(mconfig, YM2413, tag, owner, clock)
+{
+	for (int i = 0; i < 19; i++)
+	{
+		for (int c = 0; c < 8; c++)
+		{
+			m_inst_table[i][c] = table[i][c];
+		}
+	}
+}
+
+ym2413_device::ym2413_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 {
+	for (int i = 0; i < 19; i++)
+	{
+		std::fill_n(&m_inst_table[i][0], 8, 0);
+	}
+}
+
+DEFINE_DEVICE_TYPE(VRC7, vrc7snd_device, "vrc7snd", "Konami VRC7 (Sound)")
+
+vrc7snd_device::vrc7snd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: ym2413_device(mconfig, VRC7, tag, owner, clock)
+{
+	for (int i = 0; i < 19; i++)
+	{
+		for (int c = 0; c < 8; c++)
+		{
+			m_inst_table[i][c] = vrc7_table[i][c];
+		}
+	}
 }

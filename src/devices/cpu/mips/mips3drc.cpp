@@ -28,6 +28,7 @@
 #include "mips3com.h"
 #include "mips3fe.h"
 #include "mips3dsm.h"
+#include "ps2vu.h"
 #include "cpu/drcfe.h"
 #include "cpu/drcuml.h"
 #include "cpu/drcumlsh.h"
@@ -72,6 +73,7 @@
 static void cfunc_printf_exception(void *param);
 static void cfunc_get_cycles(void *param);
 static void cfunc_printf_probe(void *param);
+static void cfunc_debug_break(void *param);
 
 
 /***************************************************************************
@@ -162,7 +164,7 @@ void mips3_device::clear_fastram(uint32_t select_start)
 {
 	m_fastram_select=select_start;
 	// Set cache to dirty so that re-mapping occurs
-	m_cache_dirty = true;
+	m_drc_cache_dirty = true;
 }
 
 /*-------------------------------------------------
@@ -183,7 +185,7 @@ void mips3_device::add_fastram(offs_t start, offs_t end, uint8_t readonly, void 
 		m_fastram[m_fastram_select].offset_base32 = (uint32_t*)((uint8_t*)base - start);
 		m_fastram_select++;
 		// Set cache to dirty so that re-mapping occurs
-		m_cache_dirty = true;
+		m_drc_cache_dirty = true;
 	}
 }
 
@@ -246,6 +248,7 @@ void mips3_device::code_flush_cache()
 		static_generate_exception(EXCEPTION_BADCOP,        true,  "exception_badcop");
 		static_generate_exception(EXCEPTION_OVERFLOW,      true,  "exception_overflow");
 		static_generate_exception(EXCEPTION_TRAP,          true,  "exception_trap");
+		static_generate_exception(EXCEPTION_FPE,           true,  "exception_fpe");
 
 		/* add subroutines for memory accesses */
 		for (mode = 0; mode < 3; mode++)
@@ -317,8 +320,9 @@ void mips3_device::code_compile_block(uint8_t mode, offs_t pc)
 
 				/* if we don't have a hash for this mode/pc, or if we are overriding all, add one */
 				if (override || !m_drcuml->hash_exists(mode, seqhead->pc))
+				{
 					UML_HASH(block, mode, seqhead->pc);                                     // hash    mode,pc
-
+				}
 				/* if we already have a hash, and this is the first sequence, assume that we */
 				/* are recompiling due to being out of sync and allow future overrides */
 				else if (seqhead == desclist)
@@ -331,8 +335,7 @@ void mips3_device::code_compile_block(uint8_t mode, offs_t pc)
 				else
 				{
 					UML_LABEL(block, seqhead->pc | 0x80000000);                             // label   seqhead->pc | 0x80000000
-					UML_HASHJMP(block, m_core->mode, seqhead->pc, *m_nocode);
-																							// hashjmp <mode>,seqhead->pc,nocode
+					UML_HASHJMP(block, m_core->mode, seqhead->pc, *m_nocode);               // hashjmp <mode>,seqhead->pc,nocode
 					continue;
 				}
 
@@ -342,11 +345,15 @@ void mips3_device::code_compile_block(uint8_t mode, offs_t pc)
 
 				/* label this instruction, if it may be jumped to locally */
 				if (seqhead->flags & OPFLAG_IS_BRANCH_TARGET)
+				{
 					UML_LABEL(block, seqhead->pc | 0x80000000);                             // label   seqhead->pc | 0x80000000
+				}
 
 				/* iterate over instructions in the sequence and compile them */
 				for (curdesc = seqhead; curdesc != seqlast->next(); curdesc = curdesc->next())
+				{
 					generate_sequence_instruction(block, compiler, curdesc);
+				}
 
 				/* if we need to return to the start, do it */
 				if (seqlast->flags & OPFLAG_RETURN_TO_START)
@@ -361,11 +368,13 @@ void mips3_device::code_compile_block(uint8_t mode, offs_t pc)
 
 				/* if the last instruction can change modes, use a variable mode; otherwise, assume the same mode */
 				if (seqlast->flags & OPFLAG_CAN_CHANGE_MODES)
-					UML_HASHJMP(block, mem(&m_core->mode), nextpc, *m_nocode);
-																							// hashjmp <mode>,nextpc,nocode
+				{
+					UML_HASHJMP(block, mem(&m_core->mode), nextpc, *m_nocode);              // hashjmp <mode>,nextpc,nocode
+				}
 				else if (seqlast->next() == nullptr || seqlast->next()->pc != nextpc)
-					UML_HASHJMP(block, m_core->mode, nextpc, *m_nocode);
-																							// hashjmp <mode>,nextpc,nocode
+				{
+					UML_HASHJMP(block, m_core->mode, nextpc, *m_nocode);                    // hashjmp <mode>,nextpc,nocode
+				}
 			}
 
 			/* end the sequence */
@@ -522,6 +531,20 @@ static void cfunc_printf_probe(void *param)
 }
 
 /*-------------------------------------------------
+    func_debug_break - debugger break
+-------------------------------------------------*/
+
+void mips3_device::func_debug_break()
+{
+	machine().debug_break();
+}
+
+static void cfunc_debug_break(void *param)
+{
+	((mips3_device *)param)->func_debug_break();
+}
+
+/*-------------------------------------------------
     cfunc_unimplemented - handler for
     unimplemented opcdes
 -------------------------------------------------*/
@@ -650,7 +673,10 @@ void mips3_device::static_generate_tlb_mismatch()
 	alloc_handle(*m_drcuml, m_tlb_mismatch, "tlb_mismatch");
 	UML_HANDLE(block, *m_tlb_mismatch);                                         // handle  tlb_mismatch
 	UML_RECOVER(block, I0, MAPVAR_PC);                                          // recover i0,PC
-	UML_MOV(block, mem(&m_core->pc), I0);                                       // mov     <pc>,i0
+	// Need the current PC address for the instruction to do the TLB lookup
+	// so need to adjust I0 so it points to the true PC address in case this is a delay slot
+	UML_ADD(block, I0, I0, 3);                                                  // add     i1,i0,3
+	UML_AND(block, I0, I0, ~3);                                                 // and     i0,i0,~3
 	UML_SHR(block, I1, I0, 12);                                                 // shr     i1,i0,12
 	UML_LOAD(block, I1, (void *)vtlb_table(), I1, SIZE_DWORD, SCALE_x4);        // load    i1,[vtlb_table],i1,dword
 	if (PRINTF_MMU)
@@ -670,9 +696,11 @@ void mips3_device::static_generate_tlb_mismatch()
 	save_fast_iregs(block);
 
 	// the saved PC may be set 1 instruction back with the low bit set to indicate
-	// a delay slot; in this path we want the original instruction address, so recover it
-	UML_ADD(block, I0, mem(&m_core->pc), 3);                             // add     i0,<pc>,3
-	UML_AND(block, mem(&m_core->pc), I0, ~3);                                // and     <pc>,i0,~3
+	// a delay slot; in this path we want the previous instruction address, so recover it
+	UML_RECOVER(block, I0, MAPVAR_PC);                                          // recover i0,PC
+	UML_AND(block, I0, I0, ~3);                                                 // and     i0,i0,~3
+	UML_MOV(block, mem(&m_core->pc), I0);                                       // mov     i0,[pc]
+
 	UML_EXIT(block, EXECUTE_MISSING_CODE);                                      // exit    EXECUTE_MISSING_CODE
 
 	block.end();
@@ -710,8 +738,7 @@ void mips3_device::static_generate_exception(uint8_t exception, int recover, con
 	{
 		/* set BadVAddr to the fault address */
 		UML_GETEXP(block, I0);                                                  // getexp  i0
-		UML_TEST(block, CPR032(COP0_Status), SR_EXL);                           // test    [Status],SR_EXL
-		UML_MOVc(block, COND_Z, CPR032(COP0_BadVAddr), I0);                     // mov     [BadVAddr],i0,Z
+		UML_MOV(block, CPR032(COP0_BadVAddr), I0);                              // mov     [BadVAddr],i0
 	}
 
 	if (exception == EXCEPTION_TLBLOAD || exception == EXCEPTION_TLBSTORE)
@@ -719,6 +746,14 @@ void mips3_device::static_generate_exception(uint8_t exception, int recover, con
 		/* set the upper bits of EntryHi and the lower bits of Context to the fault page */
 		UML_ROLINS(block, CPR032(COP0_EntryHi), I0, 0, 0xffffe000); // rolins  [EntryHi],i0,0,0xffffe000
 		UML_ROLINS(block, CPR032(COP0_Context), I0, 32-9, 0x7ffff0);    // rolins  [Context],i0,32-9,0x7ffff0
+	}
+
+	if (exception == EXCEPTION_FPE)
+	{
+		/* set the flag and cause */
+		UML_GETEXP(block, I0);                                      // getexp  i0
+		UML_ROLINS(block, CCR132(31), I0, FCR31_FLAGS, 0x0000007c); // rolins  [CCR31],i0,FCR31_FLAGS,0x0000007c
+		UML_ROLINS(block, CCR132(31), I0, FCR31_CAUSE, 0x0003f000); // rolins  [CCR31],i0,FCR31_CAUSE,0x0003f000
 	}
 
 	/* set the EPC and Cause registers */
@@ -757,6 +792,7 @@ void mips3_device::static_generate_exception(uint8_t exception, int recover, con
 		(PRINTF_MMU && (exception == EXCEPTION_TLBLOAD || exception == EXCEPTION_TLBSTORE)))
 	{
 		UML_CALLC(block, cfunc_printf_exception, this);                            // callc   cfunc_printf_exception,nullptr
+		//UML_CALLC(block, cfunc_debug_break, this);                            // callc   cfunc_debug_break,nullptr
 	}
 
 	/* choose our target PC */
@@ -1057,7 +1093,6 @@ void mips3_device::generate_update_cycles(drcuml_block &block, compiler_state &c
 	compiler.cycles = 0;
 }
 
-
 /*-------------------------------------------------
     generate_checksum_block - generate code to
     validate a sequence of opcodes
@@ -1075,16 +1110,18 @@ void mips3_device::generate_checksum_block(drcuml_block &block, compiler_state &
 		if (!(seqhead->flags & OPFLAG_VIRTUAL_NOOP))
 		{
 			uint32_t sum = seqhead->opptr.l[0];
-			void *base = m_direct->read_ptr(seqhead->physpc);
-			UML_LOAD(block, I0, base, 0, SIZE_DWORD, SCALE_x4);         // load    i0,base,0,dword
+			const void *base = m_prptr(seqhead->physpc);
+			uint32_t low_bits = (seqhead->physpc & (m_data_bits == 64 ? 4 : 0)) ^ m_dword_xor;
+			UML_LOAD(block, I0, base, low_bits, SIZE_DWORD, SCALE_x1);         // load    i0,base,0,dword
 
 			if (seqhead->delay.first() != nullptr
 				&& !(seqhead->delay.first()->flags & OPFLAG_VIRTUAL_NOOP)
 				&& seqhead->physpc != seqhead->delay.first()->physpc)
 			{
-				base = m_direct->read_ptr(seqhead->delay.first()->physpc);
+				uint32_t low_bits = (seqhead->delay.first()->physpc & (m_data_bits == 64 ? 4 : 0)) ^ m_dword_xor;
+				base = m_prptr(seqhead->delay.first()->physpc);
 				assert(base != nullptr);
-				UML_LOAD(block, I1, base, 0, SIZE_DWORD, SCALE_x4);                 // load    i1,base,dword
+				UML_LOAD(block, I1, base, low_bits, SIZE_DWORD, SCALE_x1);                 // load    i1,base,dword
 				UML_ADD(block, I0, I0, I1);                     // add     i0,i0,i1
 
 				sum += seqhead->delay.first()->opptr.l[0];
@@ -1102,22 +1139,25 @@ void mips3_device::generate_checksum_block(drcuml_block &block, compiler_state &
 		for (curdesc = seqhead->next(); curdesc != seqlast->next(); curdesc = curdesc->next())
 			if (!(curdesc->flags & OPFLAG_VIRTUAL_NOOP))
 			{
-				void *base = m_direct->read_ptr(seqhead->physpc);
-				UML_LOAD(block, I0, base, 0, SIZE_DWORD, SCALE_x4);     // load    i0,base,0,dword
+				const void *base = m_prptr(seqhead->physpc);
+				UML_LOAD(block, I0, base, m_dword_xor, SIZE_DWORD, SCALE_x1);     // load    i0,base,0,dword
 				UML_CMP(block, I0, curdesc->opptr.l[0]);                    // cmp     i0,opptr[0]
 				UML_EXHc(block, COND_NE, *m_nocode, epc(seqhead));   // exne    nocode,seqhead->pc
 			}
 #else
 		uint32_t sum = 0;
-		void *base = m_direct->read_ptr(seqhead->physpc);
-		UML_LOAD(block, I0, base, 0, SIZE_DWORD, SCALE_x4);             // load    i0,base,0,dword
+		const void *base = m_prptr(seqhead->physpc);
+		uint32_t low_bits = (seqhead->physpc & (m_data_bits == 64 ? 4 : 0)) ^ m_dword_xor;
+		UML_LOAD(block, I0, base, low_bits, SIZE_DWORD, SCALE_x1);             // load    i0,base,0,dword
 		sum += seqhead->opptr.l[0];
 		for (curdesc = seqhead->next(); curdesc != seqlast->next(); curdesc = curdesc->next())
+		{
 			if (!(curdesc->flags & OPFLAG_VIRTUAL_NOOP))
 			{
-				base = m_direct->read_ptr(curdesc->physpc);
+				base = m_prptr(curdesc->physpc);
 				assert(base != nullptr);
-				UML_LOAD(block, I1, base, 0, SIZE_DWORD, SCALE_x4);     // load    i1,base,dword
+				uint32_t low_bits = (curdesc->physpc & (m_data_bits == 64 ? 4 : 0)) ^ m_dword_xor;
+				UML_LOAD(block, I1, base, low_bits, SIZE_DWORD, SCALE_x1);     // load    i1,base,dword
 				UML_ADD(block, I0, I0, I1);                         // add     i0,i0,i1
 				sum += curdesc->opptr.l[0];
 
@@ -1125,13 +1165,15 @@ void mips3_device::generate_checksum_block(drcuml_block &block, compiler_state &
 					&& !(curdesc->delay.first()->flags & OPFLAG_VIRTUAL_NOOP)
 					&& (curdesc == seqlast || (curdesc->next() != nullptr && curdesc->next()->physpc != curdesc->delay.first()->physpc)))
 				{
-					base = m_direct->read_ptr(curdesc->delay.first()->physpc);
+					base = m_prptr(curdesc->delay.first()->physpc);
 					assert(base != nullptr);
-					UML_LOAD(block, I1, base, 0, SIZE_DWORD, SCALE_x4); // load    i1,base,dword
+					uint32_t low_bits = (curdesc->delay.first()->physpc & (m_data_bits == 64 ? 4 : 0)) ^ m_dword_xor;
+					UML_LOAD(block, I1, base, low_bits, SIZE_DWORD, SCALE_x1); // load    i1,base,dword
 					UML_ADD(block, I0, I0, I1);                     // add     i0,i0,i1
 					sum += curdesc->delay.first()->opptr.l[0];
 				}
 			}
+		}
 		UML_CMP(block, I0, sum);                                            // cmp     i0,sum
 		UML_EXHc(block, COND_NE, *m_nocode, epc(seqhead));           // exne    nocode,seqhead->pc
 #endif
@@ -1199,7 +1241,7 @@ void mips3_device::generate_sequence_instruction(drcuml_block &block, compiler_s
 	{
 		if (PRINTF_MMU)
 		{
-			static const char text[] = "Compiler page fault @ %08X";
+			static const char text[] = "Compiler page fault @ %08X\n";
 			UML_MOV(block, mem(&m_core->format), (uintptr_t)text);          // mov     [format],text
 			UML_MOV(block, mem(&m_core->arg0), desc->pc);              // mov     [arg0],desc->pc
 			UML_CALLC(block, cfunc_printf_debug, this);                            // callc   printf_debug
@@ -1290,17 +1332,18 @@ void mips3_device::generate_delay_slot_and_branch(drcuml_block &block, compiler_
 	{
 		generate_update_cycles(block, compiler_temp, desc->targetpc, true); // <subtract cycles>
 		if (desc->flags & OPFLAG_INTRABLOCK_BRANCH)
+		{
 			UML_JMP(block, desc->targetpc | 0x80000000);                            // jmp     desc->targetpc | 0x80000000
+		}
 		else
-			UML_HASHJMP(block, m_core->mode, desc->targetpc, *m_nocode);
-																					// hashjmp <mode>,desc->targetpc,nocode
+		{
+			UML_HASHJMP(block, m_core->mode, desc->targetpc, *m_nocode);            // hashjmp <mode>,desc->targetpc,nocode
+		}
 	}
 	else
 	{
-		generate_update_cycles(block, compiler_temp, uml::mem(&m_core->jmpdest), true);
-																					// <subtract cycles>
-		UML_HASHJMP(block, m_core->mode, mem(&m_core->jmpdest), *m_nocode);
-																					// hashjmp <mode>,<rsreg>,nocode
+		generate_update_cycles(block, compiler_temp, uml::mem(&m_core->jmpdest), true); // <subtract cycles>
+		UML_HASHJMP(block, m_core->mode, mem(&m_core->jmpdest), *m_nocode);         // hashjmp <mode>,<rsreg>,nocode
 	}
 
 	/* update the label */
@@ -1487,12 +1530,15 @@ bool mips3_device::generate_opcode(drcuml_block &block, compiler_state &compiler
 
 		case 0x30:  /* LL - MIPS II */
 			UML_ADD(block, I0, R32(RSREG), SIMMVAL);                        // add     i0,<rsreg>,SIMMVAL
-			UML_CALLH(block, *m_read32[m_core->mode >> 1]); // callh   read32
+			UML_MOV(block, mem(&m_core->cpr[0][COP0_LLAddr]), I0);          // mov     [LLAddr],i0
+			UML_CALLH(block, *m_read32[m_core->mode >> 1]);                 // callh   read32
 			if (RTREG != 0)
-				UML_DSEXT(block, R64(RTREG), I0, SIZE_DWORD);                       // dsext   <rtreg>,i0
-			UML_MOV(block, mem(&m_core->llbit), 1);                              // mov     [llbit],1
+				UML_DSEXT(block, R64(RTREG), I0, SIZE_DWORD);               // dsext   <rtreg>,i0
+			UML_MOV(block, mem(&m_core->llbit), 1);                         // mov     [llbit],1
 			if (!in_delay_slot)
 				generate_update_cycles(block, compiler, desc->pc + 4, true);
+			if LL_BREAK
+				UML_CALLC(block, cfunc_debug_break, this);                  // callc   cfunc_debug_break,nullptr
 			return true;
 
 		case 0x24:  /* LBU - MIPS I */
@@ -1533,12 +1579,15 @@ bool mips3_device::generate_opcode(drcuml_block &block, compiler_state &compiler
 
 		case 0x34:  /* LLD - MIPS III */
 			UML_ADD(block, I0, R32(RSREG), SIMMVAL);                        // add     i0,<rsreg>,SIMMVAL
-			UML_CALLH(block, *m_read64[m_core->mode >> 1]); // callh   read64
+			UML_MOV(block, mem(&m_core->cpr[0][COP0_LLAddr]), I0);          // mov     [LLAddr],i0
+			UML_CALLH(block, *m_read64[m_core->mode >> 1]);                 // callh   read64
 			if (RTREG != 0)
-				UML_DMOV(block, R64(RTREG), I0);                                // dmov    <rtreg>,i0
-			UML_MOV(block, mem(&m_core->llbit), 1);                              // mov     [llbit],1
+				UML_DMOV(block, R64(RTREG), I0);                            // dmov    <rtreg>,i0
+			UML_MOV(block, mem(&m_core->llbit), 1);                         // mov     [llbit],1
 			if (!in_delay_slot)
 				generate_update_cycles(block, compiler, desc->pc + 4, true);
+			if LL_BREAK
+				UML_CALLC(block, cfunc_debug_break, this);                  // callc   cfunc_debug_break,nullptr
 			return true;
 
 		case 0x22:  /* LWL - MIPS I */
@@ -1680,13 +1729,16 @@ bool mips3_device::generate_opcode(drcuml_block &block, compiler_state &compiler
 			return true;
 
 		case 0x38:  /* SC - MIPS II */
-			UML_CMP(block, mem(&m_core->llbit), 0);                              // cmp     [llbit],0
-			UML_JMPc(block, COND_E, skip = compiler.labelnum++);                       // je      skip
-			UML_ADD(block, I0, R32(RSREG), SIMMVAL);                        // add     i0,<rsreg>,SIMMVAL
 			UML_MOV(block, I1, R32(RTREG));                                 // mov     i1,<rtreg>
-			UML_CALLH(block, *m_write32[m_core->mode >> 1]);    // callh   write32
-			UML_LABEL(block, skip);                                             // skip:
-			UML_DSEXT(block, R64(RTREG), mem(&m_core->llbit), SIZE_DWORD);               // dsext   <rtreg>,[llbit],dword
+			UML_MOV(block, R32(RTREG), 0);                                  // mov     <rtreg>, 0
+			UML_CMP(block, mem(&m_core->llbit), 0);                         // cmp     [llbit],0
+			UML_JMPc(block, COND_E, skip = compiler.labelnum++);            // je      skip
+			UML_ADD(block, I0, R32(RSREG), SIMMVAL);                        // add     i0,<rsreg>,SIMMVAL
+			UML_CMP(block, mem(&m_core->cpr[0][COP0_LLAddr]), I0);          // cmp [LLADDR], RSREG + SIMMVAL
+			UML_JMPc(block, COND_NE, skip);                                 // jne      skip
+			UML_CALLH(block, *m_write32[m_core->mode >> 1]);                // callh   write32
+			UML_MOV(block, R32(RTREG), 1);                                  // mov     <rtreg>, 0
+			UML_LABEL(block, skip);                                         // skip:
 			if (!in_delay_slot)
 				generate_update_cycles(block, compiler, desc->pc + 4, true);
 			return true;
@@ -1700,13 +1752,16 @@ bool mips3_device::generate_opcode(drcuml_block &block, compiler_state &compiler
 			return true;
 
 		case 0x3c:  /* SCD - MIPS III */
-			UML_CMP(block, mem(&m_core->llbit), 0);                              // cmp     [llbit],0
-			UML_JMPc(block, COND_E, skip = compiler.labelnum++);                       // je      skip
-			UML_ADD(block, I0, R32(RSREG), SIMMVAL);                        // add     i0,<rsreg>,SIMMVAL
 			UML_DMOV(block, I1, R64(RTREG));                                    // dmov    i1,<rtreg>
-			UML_CALLH(block, *m_write64[m_core->mode >> 1]);    // callh   write64
+			UML_DMOV(block, R64(RTREG), 0);                                     // dmov   <rtreg>,0
+			UML_CMP(block, mem(&m_core->llbit), 0);                             // cmp     [llbit],0
+			UML_JMPc(block, COND_E, skip = compiler.labelnum++);                // je      skip
+			UML_ADD(block, I0, R32(RSREG), SIMMVAL);                            // add     i0,<rsreg>,SIMMVAL
+			UML_CMP(block, mem(&m_core->cpr[0][COP0_LLAddr]), I0);              // cmp [LLADDR], RSREG + SIMMVAL
+			UML_JMPc(block, COND_NE, skip);                                     // jne      skip
+			UML_CALLH(block, *m_write64[m_core->mode >> 1]);                    // callh   write64
+			UML_DMOV(block, R64(RTREG), 1);                                     // dmov   <rtreg>,1
 			UML_LABEL(block, skip);                                             // skip:
-			UML_DSEXT(block, R64(RTREG), mem(&m_core->llbit), SIZE_DWORD);               // dsext   <rtreg>,[llbit],dword
 			if (!in_delay_slot)
 				generate_update_cycles(block, compiler, desc->pc + 4, true);
 			return true;
@@ -2614,10 +2669,8 @@ bool mips3_device::generate_cop0(drcuml_block &block, compiler_state &compiler, 
 					UML_MOV(block, CPR032(COP0_Status), I0);                    // mov     [Status],i0
 					generate_update_mode(block);
 					compiler.checkints = true;
-					generate_update_cycles(block, compiler, CPR032(COP0_ErrorPC), true);
-																				// <subtract cycles>
-					UML_HASHJMP(block, mem(&m_core->mode), CPR032(COP0_ErrorPC), *m_nocode);
-																				// hashjmp <mode>,[EPC],nocode
+					generate_update_cycles(block, compiler, CPR032(COP0_ErrorPC), true); // <subtract cycles>
+					UML_HASHJMP(block, mem(&m_core->mode), CPR032(COP0_ErrorPC), *m_nocode); // hashjmp <mode>,[EPC],nocode
 					return true;
 
 				case 0x20:  /* WAIT */
@@ -2766,11 +2819,21 @@ bool mips3_device::generate_cop1(drcuml_block &block, compiler_state &compiler, 
 				case 0x03:
 					if (IS_SINGLE(op))  /* DIV.S - MIPS I */
 					{
-						UML_FSDIV(block, FPR32(FDREG), FPR32(FSREG), FPR32(FTREG));       // fsdiv   <fdreg>,<fsreg>,<ftreg>
+						UML_TEST(block, FPR32(FTREG), 0xffffffff);                              // test    <ftreg>,-1
+						UML_JMPc(block, COND_NZ, skip = compiler.labelnum++);                   // jmp     skip,NZ
+						UML_TEST(block, CCR132(31), 1 << (FCR31_ENABLE + FPE_DIV0));            // test    [FCR31], 1 << DIV0_EN
+						UML_EXHc(block, COND_NZ, *m_exception[EXCEPTION_FPE], 1 << FPE_DIV0);   // exh     FPE,cop,FPE_DIV0
+						UML_LABEL(block, skip);                                                 // skip:
+						UML_FSDIV(block, FPR32(FDREG), FPR32(FSREG), FPR32(FTREG));             // fsdiv   <fdreg>,<fsreg>,<ftreg>
 					}
 					else                /* DIV.D - MIPS I */
 					{
-						UML_FDDIV(block, FPR64(FDREG), FPR64(FSREG), FPR64(FTREG));       // fddiv   <fdreg>,<fsreg>,<ftreg>
+						UML_DTEST(block, FPR64(FTREG), 0xffffffff'ffffffffull);                 // dtest    <ftreg>,-1
+						UML_JMPc(block, COND_NZ, skip = compiler.labelnum++);                   // jmp     skip,NZ
+						UML_TEST(block, CCR132(31), 1 << (FCR31_ENABLE + FPE_DIV0));            // test    [FCR31], 1 << DIV0_EN
+						UML_EXHc(block, COND_NZ, *m_exception[EXCEPTION_FPE], 1 << FPE_DIV0);   // exh     FPE,cop,FPE_DIV0
+						UML_LABEL(block, skip);                                                 // skip:
+						UML_FDDIV(block, FPR64(FDREG), FPR64(FSREG), FPR64(FTREG));             // fddiv   <fdreg>,<fsreg>,<ftreg>
 					}
 					return true;
 

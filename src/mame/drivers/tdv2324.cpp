@@ -103,6 +103,7 @@
 #include "emu.h"
 #include "includes/tdv2324.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 
@@ -137,8 +138,8 @@ void tdv2324_state::tdv2324_mem(address_map &map)
 	map(0x0000, 0x07ff).mirror(0x0800).rom().region(P8085AH_0_TAG, 0);
 	/* when copying code to 4000 area it runs right off the end of rom;
 	 * I'm not sure if its supposed to mirror or read as open bus */
-//  AM_RANGE(0x4000, 0x5fff) AM_RAM // 0x4000 has the boot code copied to it, 5fff and down are the stack
-//  AM_RANGE(0x6000, 0x6fff) AM_RAM // used by the relocated boot code; shared?
+//  map(0x4000, 0x5fff).ram(); // 0x4000 has the boot code copied to it, 5fff and down are the stack
+//  map(0x6000, 0x6fff).ram(); // used by the relocated boot code; shared?
 	map(0x0800, 0xffff).ram();
 }
 
@@ -149,16 +150,16 @@ void tdv2324_state::tdv2324_mem(address_map &map)
 
 void tdv2324_state::tdv2324_io(address_map &map)
 {
-	//ADDRESS_MAP_GLOBAL_MASK(0xff)
+	//map.global_mask(0xff);
 	/* 0x30 is read by main code and if high bit isn't set at some point it will never get anywhere */
 	/* e0, e2, e8, ea are written to */
 	/* 30, e6 and e2 are readable */
-	map(0x30, 0x30).r(this, FUNC(tdv2324_state::tdv2324_main_io_30));
-//  AM_RANGE(0xe2, 0xe2) AM_WRITE(tdv2324_main_io_e2) console output
-	map(0xe6, 0xe6).r(this, FUNC(tdv2324_state::tdv2324_main_io_e6));
-//  AM_RANGE(0x, 0x) AM_DEVREADWRITE(P8253_5_0_TAG, pit8253_device, read, write)
-//  AM_RANGE(0x, 0x) AM_DEVREADWRITE(MK3887N4_TAG, z80dart_device, ba_cd_r, ba_cd_w)
-//  AM_RANGE(0x, 0x) AM_DEVREADWRITE(P8259A_TAG, pic8259_device, read, write)
+	map(0x30, 0x30).r(FUNC(tdv2324_state::tdv2324_main_io_30));
+//  map(0xe2, 0xe2).w(FUNC(tdv2324_state::tdv2324_main_io_e2)); console output
+	map(0xe6, 0xe6).r(FUNC(tdv2324_state::tdv2324_main_io_e6));
+//  map(0x, 0x).rw(P8253_5_0_TAG, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+//  map(0x, 0x).rw(MK3887N4_TAG, FUNC(z80dart_device::ba_cd_r), FUNC(z80dart_device::ba_cd_w));
+//  map(0x, 0x).rw(P8259A_TAG, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 }
 
 
@@ -181,7 +182,7 @@ void tdv2324_state::tdv2324_sub_mem(address_map &map)
 
 void tdv2324_state::tdv2324_sub_io(address_map &map)
 {
-	//ADDRESS_MAP_GLOBAL_MASK(0xff)
+	//map.global_mask(0xff);
 	/* 20, 23, 30-36, 38, 3a, 3c, 3e, 60, 70 are written to */
 	map(0x20, 0x23).rw(m_pit1, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x30, 0x3f).rw(m_tms, FUNC(tms9927_device::read), FUNC(tms9927_device::write)); // TODO: this is supposed to be a 9937, which is not quite the same as 9927
@@ -195,10 +196,10 @@ void tdv2324_state::tdv2324_sub_io(address_map &map)
 void tdv2324_state::tdv2324_fdc_mem(address_map &map)
 {
 	// the following two are probably enabled/disabled via the JP2 jumper block next to the fdc cpu
-	//AM_RANGE(0x0000, 0x001f) AM_RAM // on-6802-die ram (optionally battery backed)
-	//AM_RANGE(0x0020, 0x007f) AM_RAM // on-6802-die ram
+	//map(0x0000, 0x001f).ram(); // on-6802-die ram (optionally battery backed)
+	//map(0x0020, 0x007f).ram(); // on-6802-die ram
 	map(0x0000, 0x07ff).ram(); // TMM2016AP-12 @ U14, tested with A5,5A pattern
-	//AM_RANGE(0x1000, 0x17ff) AM_RAM // TMM2016AP-12 @ U80, address is wrong
+	//map(0x1000, 0x17ff).ram(); // TMM2016AP-12 @ U80, address is wrong
 	// the 3xxx area appears to be closely involved in fdc or other i/o
 	// in particular, reads from 30xx, 38xx, 3Cxx may be actually writes to certain fdc registers with data xx?
 	// 0x2101 is something writable
@@ -248,9 +249,10 @@ uint32_t tdv2324_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 //  SLOT_INTERFACE( tdv2324_floppies )
 //-------------------------------------------------
 
-static SLOT_INTERFACE_START( tdv2324_floppies )
-	SLOT_INTERFACE( "8dsdd", FLOPPY_8_DSDD )
-SLOT_INTERFACE_END
+static void tdv2324_floppies(device_slot_interface &device)
+{
+	device.option_add("8dsdd", FLOPPY_8_DSDD);
+}
 
 
 
@@ -259,54 +261,53 @@ SLOT_INTERFACE_END
 //**************************************************************************
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( tdv2324 )
+//  machine_config( tdv2324 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(tdv2324_state::tdv2324)
+void tdv2324_state::tdv2324(machine_config &config)
+{
 	// basic system hardware
-	MCFG_CPU_ADD(P8085AH_0_TAG, I8085A, 8700000/2) // ???
-	MCFG_CPU_PROGRAM_MAP(tdv2324_mem)
-	MCFG_CPU_IO_MAP(tdv2324_io)
+	I8085A(config, m_maincpu, 8700000/2); // ???
+	m_maincpu->set_addrmap(AS_PROGRAM, &tdv2324_state::tdv2324_mem);
+	m_maincpu->set_addrmap(AS_IO, &tdv2324_state::tdv2324_io);
 
-	MCFG_CPU_ADD(P8085AH_1_TAG, I8085A, 8000000/2) // ???
-	MCFG_CPU_PROGRAM_MAP(tdv2324_sub_mem)
-	MCFG_CPU_IO_MAP(tdv2324_sub_io)
+	I8085A(config, m_subcpu, 8000000/2); // ???
+	m_subcpu->set_addrmap(AS_PROGRAM, &tdv2324_state::tdv2324_sub_mem);
+	m_subcpu->set_addrmap(AS_IO, &tdv2324_state::tdv2324_sub_io);
 
-	MCFG_CPU_ADD(MC68B02P_TAG, M6802, 8000000/2) // ???
-	MCFG_CPU_PROGRAM_MAP(tdv2324_fdc_mem)
+	M6802(config, m_fdccpu, 8000000/2); // ???
+	m_fdccpu->set_addrmap(AS_PROGRAM, &tdv2324_state::tdv2324_fdc_mem);
 
 	// video hardware
-	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_UPDATE_DRIVER(tdv2324_state, screen_update)
-	MCFG_SCREEN_SIZE(800, 400)
-	MCFG_SCREEN_VISIBLE_AREA(0, 800-1, 0, 400-1)
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen.set_refresh_hz(50);
+	screen.set_screen_update(FUNC(tdv2324_state::screen_update));
+	screen.set_size(800, 400);
+	screen.set_visarea(0, 800-1, 0, 400-1);
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	MCFG_DEVICE_ADD(TMS9937NL_TAG, TMS9927, XTAL(25'398'360) / 8)
-	MCFG_TMS9927_CHAR_WIDTH(8)
+	TMS9927(config, m_tms, 25.39836_MHz_XTAL / 8).set_char_width(8);
 
 	// devices
-	MCFG_DEVICE_ADD(P8259A_TAG, PIC8259, 0)
+	PIC8259(config, m_pic, 0);
 
-	MCFG_DEVICE_ADD(P8253_5_0_TAG, PIT8253, 0)
+	PIT8253(config, m_pit0, 0);
 
-	MCFG_DEVICE_ADD(P8253_5_1_TAG, PIT8253, 0)
+	PIT8253(config, m_pit1, 0);
 
-	MCFG_DEVICE_ADD(MK3887N4_TAG, Z80SIO2, 8000000/2)
+	Z80SIO2(config, MK3887N4_TAG, 8000000/2);
 
-	MCFG_FD1797_ADD(FD1797PL02_TAG, 8000000/4)
-	MCFG_FLOPPY_DRIVE_ADD(FD1797PL02_TAG":0", tdv2324_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FD1797PL02_TAG":1", tdv2324_floppies, "8dsdd", floppy_image_device::default_floppy_formats)
+	FD1797(config, FD1797PL02_TAG, 8000000/4);
+	FLOPPY_CONNECTOR(config, FD1797PL02_TAG":0", tdv2324_floppies, "8dsdd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, FD1797PL02_TAG":1", tdv2324_floppies, "8dsdd", floppy_image_device::default_floppy_formats);
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "tdv2324")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "flop_list").set_original("tdv2324");
+}
 
 
 
@@ -354,5 +355,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT    STATE          INIT  COMPANY     FULLNAME    FLAGS
-COMP( 1983, tdv2324,  0,      0,      tdv2324,  tdv2324, tdv2324_state, 0,    "Tandberg", "TDV 2324", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY     FULLNAME    FLAGS
+COMP( 1983, tdv2324, 0,      0,      tdv2324, tdv2324, tdv2324_state, empty_init, "Tandberg", "TDV 2324", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

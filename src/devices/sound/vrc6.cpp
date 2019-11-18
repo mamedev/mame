@@ -2,7 +2,7 @@
 // copyright-holders:R. Belmont
 /***************************************************************************
 
-    vrc6.c
+    vrc6.cpp
     Konami VRC6 additional sound channels
 
     Emulation by R. Belmont
@@ -16,8 +16,6 @@
 #include "emu.h"
 #include "vrc6.h"
 
-#define DISABLE_VRC6_SOUND      // not ready yet
-
 // device type definition
 DEFINE_DEVICE_TYPE(VRC6, vrc6snd_device, "vrc6snd", "Konami VRC6 (Sound)")
 
@@ -29,10 +27,10 @@ DEFINE_DEVICE_TYPE(VRC6, vrc6snd_device, "vrc6snd", "Konami VRC6 (Sound)")
 //  vrc6snd_device - constructor
 //-------------------------------------------------
 
-vrc6snd_device::vrc6snd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+vrc6snd_device::vrc6snd_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, VRC6, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
-	, m_freqctrl(0), m_pulsectrl{ 0, 0 }, m_sawrate(0)
+	, m_freqctrl(0), m_pulsectrl{ 0, 0 }, m_sawrate(0), m_master_freq(0)
 	, m_pulsefrql{ 0, 0 }, m_pulsefrqh{ 0, 0 }, m_pulseduty{ 0, 0 }
 	, m_sawfrql(0), m_sawfrqh(0), m_sawclock(0), m_sawaccum(0)
 	, m_ticks{ 0, 0, 0 }
@@ -55,10 +53,12 @@ void vrc6snd_device::device_start()
 	m_ticks[0] = m_ticks[1] = m_ticks[2] = 0;
 	m_output[0] = m_output[1] = m_output[2] = 0;
 	m_pulseduty[0] = m_pulseduty[1] = 15;
+	m_master_freq = 0;
 
 	save_item(NAME(m_freqctrl));
 	save_item(NAME(m_pulsectrl));
 	save_item(NAME(m_sawrate));
+	save_item(NAME(m_master_freq));
 	save_item(NAME(m_sawaccum));
 	save_item(NAME(m_pulsefrql));
 	save_item(NAME(m_pulsefrqh));
@@ -85,6 +85,7 @@ void vrc6snd_device::device_reset()
 	m_output[0] = m_output[1] = m_output[2] = 0;
 	m_pulseduty[0] = m_pulseduty[1] = 15;
 	m_pulsefrqh[0] = m_pulsefrqh[1] = m_sawfrqh = 0;
+	m_master_freq = 0;
 }
 
 //-------------------------------------------------
@@ -94,27 +95,22 @@ void vrc6snd_device::device_reset()
 
 void vrc6snd_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	stream_sample_t *out = outputs[0];
-	int16_t tmp;
-	int i;
+	std::fill_n(&outputs[0][0], samples, 0);
 
 	// check global halt bit
 	if (m_freqctrl & 1)
-	{
 		return;
-	}
 
-	for (i = 0; i < samples; i++)
+	for (int i = 0; i < samples; i++)
 	{
 		// update pulse1
 		if (m_pulsefrqh[0] & 0x80)
 		{
-			m_ticks[0]--;
 			if (m_ticks[0] == 0)
 			{
-				m_ticks[0] = m_pulsefrql[0] | (m_pulsefrqh[0] & 0xf)<<4;
+				m_ticks[0] = (m_pulsefrql[0] | ((m_pulsefrqh[0] & 0xf) << 8)) >> m_master_freq;
 
-				m_pulseduty[0]--;
+				m_pulseduty[0] = (m_pulseduty[0] - 1) & 0xf;
 				if (m_pulsectrl[0] & 0x80)
 				{
 					m_output[0] = m_pulsectrl[0] & 0xf;
@@ -130,12 +126,9 @@ void vrc6snd_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 						m_output[0] = 0;
 					}
 				}
-
-				if (m_pulseduty[0] == 0)
-				{
-					m_pulseduty[0] = 15;
-				}
 			}
+			else
+				m_ticks[0]--;
 		}
 		else
 		{
@@ -145,12 +138,11 @@ void vrc6snd_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 		// update pulse2
 		if (m_pulsefrqh[1] & 0x80)
 		{
-			m_ticks[1]--;
 			if (m_ticks[1] == 0)
 			{
-				m_ticks[1] = m_pulsefrql[1] | (m_pulsefrqh[1] & 0xf)<<4;
+				m_ticks[1] = (m_pulsefrql[1] | ((m_pulsefrqh[1] & 0xf) << 8)) >> m_master_freq;
 
-				m_pulseduty[1]--;
+				m_pulseduty[1] = (m_pulseduty[1] - 1) & 0xf;
 				if (m_pulsectrl[1] & 0x80)
 				{
 					m_output[1] = m_pulsectrl[1] & 0xf;
@@ -166,12 +158,9 @@ void vrc6snd_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 						m_output[1] = 0;
 					}
 				}
-
-				if (m_pulseduty[1] == 0)
-				{
-					m_pulseduty[1] = 15;
-				}
 			}
+			else
+				m_ticks[1]--;
 		}
 		else
 		{
@@ -181,10 +170,9 @@ void vrc6snd_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 		// update saw
 		if (m_sawfrqh & 0x80)
 		{
-			m_ticks[2]--;
 			if (m_ticks[2] == 0)
 			{
-				m_ticks[2] = m_sawfrql | (m_sawfrqh & 0xf)<<4;
+				m_ticks[2] = (m_sawfrql | ((m_sawfrqh & 0xf) << 8)) >> m_master_freq;
 
 				// only update on even steps
 				if ((m_sawclock > 0) && (!(m_sawclock & 1)))
@@ -200,6 +188,8 @@ void vrc6snd_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 					m_output[2] = 0;
 				}
 			}
+			else
+				m_ticks[2]--;
 		}
 		else
 		{
@@ -207,10 +197,10 @@ void vrc6snd_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 		}
 
 		// sum 2 4-bit pulses, 1 5-bit saw = unsigned 6 bit output
-		tmp = (int16_t)(uint8_t)(m_output[0] + m_output[1] + m_output[2]);
+		s16 tmp = (s16)(u8)(m_output[0] + m_output[1] + m_output[2]);
 		tmp <<= 8;
 
-		out[i] = tmp;
+		outputs[0][i] = tmp;
 	}
 }
 
@@ -218,7 +208,7 @@ void vrc6snd_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 //  write - write to the chip's registers
 //---------------------------------------
 
-WRITE8_MEMBER( vrc6snd_device::write )
+void vrc6snd_device::write(offs_t offset, u8 data)
 {
 	switch (offset >> 8)
 	{
@@ -232,28 +222,43 @@ WRITE8_MEMBER( vrc6snd_device::write )
 
 				case 1:
 					m_pulsefrql[0] = data;
-					if (!(m_pulsefrqh[1] & 0x80))
+					if (!(m_pulsefrqh[0] & 0x80))
 					{
-						m_ticks[0] &= ~0xff;
-						m_ticks[0] |= m_pulsefrql[0];
+						m_ticks[0] = (m_pulsefrql[0] | ((m_pulsefrqh[0] & 0xf) << 8)) >> m_master_freq;
 					}
 					break;
 
 				case 2:
-					#ifndef DISABLE_VRC6_SOUND
 					m_pulsefrqh[0] = data;
 					// if disabling channel, reset phase
 					if (!(data & 0x80))
 					{
 						m_pulseduty[0] = 15;
-						m_ticks[0] &= 0xff;
-						m_ticks[0] |= (m_pulsefrqh[0] & 0xf)<<4;
+						m_ticks[0] = (m_pulsefrql[0] | ((m_pulsefrqh[0] & 0xf) << 8)) >> m_master_freq;
 					}
-					#endif
 					break;
 
 				case 3:
 					m_freqctrl = data;
+					if (m_freqctrl & 4)
+						m_master_freq = 0x8;
+					else if (m_freqctrl & 2)
+						m_master_freq = 0x4;
+					else
+						m_master_freq = 0;
+
+					if (!(m_pulsefrqh[0] & 0x80))
+					{
+						m_ticks[0] = (m_pulsefrql[0] | ((m_pulsefrqh[0] & 0xf) << 8)) >> m_master_freq;
+					}
+					if (!(m_pulsefrqh[1] & 0x80))
+					{
+						m_ticks[1] = (m_pulsefrql[1] | ((m_pulsefrqh[1] & 0xf) << 8)) >> m_master_freq;
+					}
+					if (!(m_sawfrqh & 0x80))
+					{
+						m_ticks[2] = (m_sawfrql | ((m_sawfrqh & 0xf) << 8)) >> m_master_freq;
+					}
 					break;
 			}
 			break;
@@ -270,22 +275,18 @@ WRITE8_MEMBER( vrc6snd_device::write )
 					m_pulsefrql[1] = data;
 					if (!(m_pulsefrqh[1] & 0x80))
 					{
-						m_ticks[1] &= ~0xff;
-						m_ticks[1] |= m_pulsefrql[1];
+						m_ticks[1] = (m_pulsefrql[1] | ((m_pulsefrqh[1] & 0xf) << 8)) >> m_master_freq;
 					}
 					break;
 
 				case 2:
-					#ifndef DISABLE_VRC6_SOUND
 					m_pulsefrqh[1] = data;
 					// if disabling channel, reset phase
 					if (!(data & 0x80))
 					{
 						m_pulseduty[1] = 15;
-						m_ticks[1] &= 0xff;
-						m_ticks[1] |= (m_pulsefrqh[1] & 0xf)<<4;
+						m_ticks[1] = (m_pulsefrql[1] | ((m_pulsefrqh[1] & 0xf) << 8)) >> m_master_freq;
 					}
-					#endif
 					break;
 			}
 			break;
@@ -302,22 +303,18 @@ WRITE8_MEMBER( vrc6snd_device::write )
 					m_sawfrql = data;
 					if (!(m_sawfrqh & 0x80))
 					{
-						m_ticks[2] &= ~0xff;
-						m_ticks[2] |= m_sawfrql;
+						m_ticks[2] = (m_sawfrql | ((m_sawfrqh & 0xf) << 8)) >> m_master_freq;
 					}
 					break;
 
 				case 2:
-					#ifndef DISABLE_VRC6_SOUND
 					m_sawfrqh = data;
 					// if disabling channel, reset phase
 					if (!(data & 0x80))
 					{
 						m_sawaccum = 0;
-						m_ticks[2] &= 0xff;
-						m_ticks[2] |= (m_sawfrqh & 0xf)<<4;
+						m_ticks[2] = (m_sawfrql | ((m_sawfrqh & 0xf) << 8)) >> m_master_freq;
 					}
-					#endif
 					break;
 			}
 			break;

@@ -44,7 +44,7 @@ WRITE8_MEMBER(sidearms_state::c804_w)
 	/* bit 4 resets the sound CPU */
 	if (data & 0x10)
 	{
-		m_audiocpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	}
 
 	/* bit 5 enables starfield */
@@ -142,17 +142,17 @@ void sidearms_state::video_start()
 
 	if (!m_gameid)
 	{
-		m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sidearms_state::get_sidearms_bg_tile_info),this), tilemap_mapper_delegate(FUNC(sidearms_state::tilemap_scan),this),
+		m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sidearms_state::get_sidearms_bg_tile_info)), tilemap_mapper_delegate(*this, FUNC(sidearms_state::tilemap_scan)),
 				32, 32, 128, 128);
 
 		m_bg_tilemap->set_transparent_pen(15);
 	}
 	else
 	{
-		m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sidearms_state::get_philko_bg_tile_info),this), tilemap_mapper_delegate(FUNC(sidearms_state::tilemap_scan),this), 32, 32, 128, 128);
+		m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sidearms_state::get_philko_bg_tile_info)), tilemap_mapper_delegate(*this, FUNC(sidearms_state::tilemap_scan)), 32, 32, 128, 128);
 	}
 
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sidearms_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sidearms_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS,
 			8, 8, 64, 64);
 
 	m_fg_tilemap->set_transparent_pen(3);

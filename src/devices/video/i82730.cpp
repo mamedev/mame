@@ -58,15 +58,32 @@ i82730_device::i82730_device(const machine_config &mconfig, const char *tag, dev
 	device_t(mconfig, I82730, tag, owner, clock),
 	device_video_interface(mconfig, *this),
 	m_sint_handler(*this),
-	m_cpu_tag(nullptr), m_program(nullptr),
+	m_update_row_cb(*this),
+	m_cpu(*this, finder_base::DUMMY_TAG),
+	m_program(nullptr),
 	m_row_timer(nullptr),
-	m_initialized(false), m_mode_set(false),
+	m_initialized(false),
+	m_mode_set(false),
 	m_ca(0),
-	m_sysbus(0x00), m_ibp(0x0000), m_cbp(0x0000), m_intmask(0xffff), m_status(0x0000),
-	m_list_switch(0), m_auto_line_feed(0), m_max_dma_count(0),
-	m_lptr(0), m_sptr(0),
-	m_dma_burst_space(0), m_dma_burst_length(0),
-	m_hfldstrt(0), m_margin(0), m_lpr(0), m_field_attribute_mask(0), m_vsyncstp(0), m_vfldstrt(0), m_vfldstp(0),
+	m_sysbus(0x00),
+	m_ibp(0x0000),
+	m_cbp(0x0000),
+	m_intmask(0xffff),
+	m_status(0x0000),
+	m_list_switch(0),
+	m_auto_line_feed(0),
+	m_max_dma_count(0),
+	m_lptr(0),
+	m_sptr(0),
+	m_dma_burst_space(0),
+	m_dma_burst_length(0),
+	m_hfldstrt(0),
+	m_margin(0),
+	m_lpr(0),
+	m_field_attribute_mask(0),
+	m_vsyncstp(0),
+	m_vfldstrt(0),
+	m_vfldstp(0),
 	m_frame_int_count(0),
 	m_row_index(0)
 {
@@ -85,7 +102,7 @@ void i82730_device::device_start()
 	m_sint_handler.resolve_safe();
 
 	// bind delegates
-	m_update_row_cb.bind_relative_to(*owner());
+	m_update_row_cb.resolve();
 
 	// allocate row timer
 	m_row_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(i82730_device::row_update), this));
@@ -97,8 +114,7 @@ void i82730_device::device_start()
 
 void i82730_device::device_reset()
 {
-	cpu_device *cpu = owner()->subdevice<cpu_device>(m_cpu_tag);
-	m_program = &cpu->space(AS_PROGRAM);
+	m_program = &m_cpu->space(AS_PROGRAM);
 
 	m_initialized = false;
 	m_mode_set = false;

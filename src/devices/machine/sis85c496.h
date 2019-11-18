@@ -11,7 +11,7 @@
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 
-#include "machine/ataintf.h"
+#include "bus/ata/ataintf.h"
 #include "machine/at_keybc.h"
 
 #include "sound/spkrdev.h"
@@ -25,10 +25,10 @@
 #include "cpu/i386/i386.h"
 #include "machine/at.h"
 
-#define MCFG_SIS85C496_ADD(_tag, _cpu_tag, _ram_size)    \
-	MCFG_PCI_HOST_ADD(_tag, SIS85C496, 0x10390496, 0x03, 0x00000000) \
-	downcast<sis85c496_host_device *>(device)->set_cpu_tag(_cpu_tag); \
-	downcast<sis85c496_host_device *>(device)->set_ram_size(_ram_size);
+#define SIS85C496_HOST(_config, _tag, _cpu_tag, _ram_size)  \
+	pci_host_device &pcihost(PCI_HOST(_config, _tag, SIS85C496, 0x10390496, 0x03, 0x00000000)); \
+	pcihost.set_cpu_tag(_cpu_tag); \
+	pcihost.set_ram_size(_ram_size);
 
 class sis85c496_host_device : public pci_host_device {
 public:
@@ -78,9 +78,7 @@ private:
 	uint8_t m_channel_check;
 	uint8_t m_nmi_enabled;
 
-	const char *cpu_tag;
 	int ram_size;
-	cpu_device *cpu;
 	std::vector<uint32_t> ram;
 	uint32_t m_mailbox;
 	uint8_t m_bios_config, m_dram_config, m_isa_decoder;
@@ -148,6 +146,9 @@ private:
 	DECLARE_WRITE8_MEMBER(pc_dma_write_byte);
 	DECLARE_READ8_MEMBER(pc_dma_read_word);
 	DECLARE_WRITE8_MEMBER(pc_dma_write_word);
+	DECLARE_WRITE_LINE_MEMBER(cpu_int_w);
+	DECLARE_WRITE_LINE_MEMBER(cpu_a20_w);
+	DECLARE_WRITE_LINE_MEMBER(cpu_reset_w);
 };
 
 DECLARE_DEVICE_TYPE(SIS85C496, sis85c496_host_device)

@@ -37,7 +37,7 @@ Encryption PAL 16R4 on CPU board
 */
 
 
-DRIVER_INIT_MEMBER(stfight_state, empcity)
+void stfight_state::init_empcity()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -64,12 +64,12 @@ DRIVER_INIT_MEMBER(stfight_state, empcity)
 
 }
 
-DRIVER_INIT_MEMBER(stfight_state, stfight)
+void stfight_state::init_stfight()
 {
-	DRIVER_INIT_CALL(empcity);
+	init_empcity();
 }
 
-DRIVER_INIT_MEMBER(stfight_state, cshooter)
+void stfight_state::init_cshooter()
 {
 }
 
@@ -122,17 +122,17 @@ void stfight_state::device_timer(emu_timer &timer, device_timer_id id, int param
 	{
 	case TIMER_STFIGHT_INTERRUPT_1:
 		// Do a RST08
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7); // Z80
 		break;
 	default:
-		assert_always(false, "Unknown id in stfight_state::device_timer");
+		throw emu_fatalerror("Unknown id in stfight_state::device_timer");
 	}
 }
 
 INTERRUPT_GEN_MEMBER(stfight_state::stfight_vb_interrupt)
 {
 	// Do a RST10
-	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xcf);
+	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xcf); // Z80
 	m_int1_timer->adjust(attotime::from_hz(120));
 }
 
@@ -168,6 +168,9 @@ WRITE8_MEMBER(stfight_state::stfight_coin_w)
 
 WRITE_LINE_MEMBER(stfight_state::stfight_adpcm_int)
 {
+	if (!state)
+		return;
+
 	// Falling edge triggered interrupt at half the rate of /VCK?
 	m_mcu->set_input_line(M68705_IRQ_LINE, m_vck2 ? ASSERT_LINE : CLEAR_LINE);
 	m_vck2 = !m_vck2;
@@ -180,7 +183,7 @@ WRITE_LINE_MEMBER(stfight_state::stfight_adpcm_int)
 			adpcm_data >>= 4;
 		++m_adpcm_data_offs;
 
-		m_msm->data_w(adpcm_data & 0x0f);
+		m_msm->write_data(adpcm_data & 0x0f);
 	}
 }
 

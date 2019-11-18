@@ -27,26 +27,19 @@
 #ifndef MAME_MACHINE_AM9519_H
 #define MAME_MACHINE_AM9519_H
 
-
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-#define MCFG_AM9519_OUT_INT_CB(_devcb) \
-	devcb = &downcast<am9519_device &>(*device).static_set_out_int_callback(DEVCB_##_devcb);
-
+#pragma once
 
 class am9519_device : public device_t
 {
 public:
 	am9519_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	template <class Object> devcb_base &static_set_out_int_callback(Object &&cb) { return m_out_int_func.set_callback(std::forward<Object>(cb)); }
+	auto out_int_callback() { return m_out_int_func.bind(); }
 
-	DECLARE_READ8_MEMBER( stat_r );
-	DECLARE_READ8_MEMBER( data_r );
-	DECLARE_WRITE8_MEMBER( cmd_w );
-	DECLARE_WRITE8_MEMBER( data_w );
+	u8 stat_r();
+	u8 data_r();
+	void cmd_w(u8 data);
+	void data_w(u8 data);
 	u32 acknowledge();
 
 	DECLARE_WRITE_LINE_MEMBER( ireq0_w ) { set_irq_line(0, state); }

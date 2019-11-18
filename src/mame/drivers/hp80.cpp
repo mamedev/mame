@@ -8,6 +8,7 @@
 // This is WIP: lot of things still missing
 
 #include "emu.h"
+#include "emupal.h"
 #include "screen.h"
 #include "cpu/capricorn/capricorn.h"
 #include "speaker.h"
@@ -16,7 +17,7 @@
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "machine/1ma6.h"
-#include "bus/hp80_optroms/hp80_optrom.h"
+#include "machine/hp80_optrom.h"
 #include "softlist.h"
 #include "machine/bankdev.h"
 #include "bus/hp80_io/hp80_io.h"
@@ -126,6 +127,9 @@ class hp85_state : public driver_device
 public:
 	hp85_state(const machine_config &mconfig, device_type type, const char *tag);
 
+	void hp85(machine_config &config);
+
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -165,10 +169,9 @@ public:
 	DECLARE_WRITE8_MEMBER(irl_w);
 	DECLARE_WRITE8_MEMBER(halt_w);
 
-	void hp85(machine_config &config);
 	void cpu_mem_map(address_map &map);
 	void rombank_mem_map(address_map &map);
-protected:
+
 	required_device<capricorn_cpu_device> m_cpu;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -181,7 +184,7 @@ protected:
 	required_ioport m_io_key1;
 	required_ioport m_io_key2;
 	required_ioport m_io_modkeys;
-	required_device_array<hp80_optrom_slot_device , 6> m_rom_drawers;
+	required_device_array<hp80_optrom_device , 6> m_rom_drawers;
 	required_device<address_map_bank_device> m_rombank;
 	required_device_array<hp80_io_slot_device , IOP_COUNT> m_io_slots;
 	required_device<bitbanger_device> m_prt_graph_out;
@@ -1305,20 +1308,20 @@ void hp85_state::cpu_mem_map(address_map &map)
 	map(0x0000, 0x5fff).rom();
 	map(0x6000, 0x7fff).m(m_rombank, FUNC(address_map_bank_device::amap8));
 	map(0x8000, 0xbfff).ram();
-	map(0xff00, 0xff00).w(this, FUNC(hp85_state::ginten_w));
-	map(0xff01, 0xff01).w(this, FUNC(hp85_state::gintdis_w));
-	map(0xff02, 0xff02).rw(this, FUNC(hp85_state::keysts_r), FUNC(hp85_state::keysts_w));
-	map(0xff03, 0xff03).rw(this, FUNC(hp85_state::keycod_r), FUNC(hp85_state::keycod_w));
-	map(0xff04, 0xff07).rw(this, FUNC(hp85_state::crtc_r), FUNC(hp85_state::crtc_w));
+	map(0xff00, 0xff00).w(FUNC(hp85_state::ginten_w));
+	map(0xff01, 0xff01).w(FUNC(hp85_state::gintdis_w));
+	map(0xff02, 0xff02).rw(FUNC(hp85_state::keysts_r), FUNC(hp85_state::keysts_w));
+	map(0xff03, 0xff03).rw(FUNC(hp85_state::keycod_r), FUNC(hp85_state::keycod_w));
+	map(0xff04, 0xff07).rw(FUNC(hp85_state::crtc_r), FUNC(hp85_state::crtc_w));
 	map(0xff08, 0xff09).rw("tape", FUNC(hp_1ma6_device::reg_r), FUNC(hp_1ma6_device::reg_w));
-	map(0xff0a, 0xff0a).rw(this, FUNC(hp85_state::clksts_r), FUNC(hp85_state::clksts_w));
-	map(0xff0b, 0xff0b).rw(this, FUNC(hp85_state::clkdat_r), FUNC(hp85_state::clkdat_w));
-	map(0xff0c, 0xff0c).w(this, FUNC(hp85_state::prtlen_w));
-	map(0xff0d, 0xff0d).rw(this, FUNC(hp85_state::prchar_r), FUNC(hp85_state::prchar_w));
-	map(0xff0e, 0xff0e).rw(this, FUNC(hp85_state::prtsts_r), FUNC(hp85_state::prtctl_w));
-	map(0xff0f, 0xff0f).w(this, FUNC(hp85_state::prtdat_w));
-	map(0xff18, 0xff18).w(this, FUNC(hp85_state::rselec_w));
-	map(0xff40, 0xff40).rw(this, FUNC(hp85_state::intrsc_r), FUNC(hp85_state::intrsc_w));
+	map(0xff0a, 0xff0a).rw(FUNC(hp85_state::clksts_r), FUNC(hp85_state::clksts_w));
+	map(0xff0b, 0xff0b).rw(FUNC(hp85_state::clkdat_r), FUNC(hp85_state::clkdat_w));
+	map(0xff0c, 0xff0c).w(FUNC(hp85_state::prtlen_w));
+	map(0xff0d, 0xff0d).rw(FUNC(hp85_state::prchar_r), FUNC(hp85_state::prchar_w));
+	map(0xff0e, 0xff0e).rw(FUNC(hp85_state::prtsts_r), FUNC(hp85_state::prtctl_w));
+	map(0xff0f, 0xff0f).w(FUNC(hp85_state::prtdat_w));
+	map(0xff18, 0xff18).w(FUNC(hp85_state::rselec_w));
+	map(0xff40, 0xff40).rw(FUNC(hp85_state::intrsc_r), FUNC(hp85_state::intrsc_w));
 }
 
 void hp85_state::rombank_mem_map(address_map &map)
@@ -1328,80 +1331,67 @@ void hp85_state::rombank_mem_map(address_map &map)
 	map(0x0000, 0x1fff).rom();
 }
 
-MACHINE_CONFIG_START(hp85_state::hp85)
-	MCFG_CPU_ADD("cpu" , HP_CAPRICORN , MASTER_CLOCK / 16)
-	MCFG_CPU_PROGRAM_MAP(cpu_mem_map)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(hp85_state , irq_callback)
+void hp85_state::hp85(machine_config &config)
+{
+	HP_CAPRICORN(config, m_cpu, MASTER_CLOCK / 16);
+	m_cpu->set_addrmap(AS_PROGRAM, &hp85_state::cpu_mem_map);
+	m_cpu->set_irq_acknowledge_callback(FUNC(hp85_state::irq_callback));
 
-	MCFG_DEVICE_ADD("rombank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(rombank_mem_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(21)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(HP80_OPTROM_SIZE)
+	ADDRESS_MAP_BANK(config, "rombank").set_map(&hp85_state::rombank_mem_map).set_options(ENDIANNESS_LITTLE, 8, 21, HP80_OPTROM_SIZE);
 
-	MCFG_SCREEN_ADD("screen" , RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK / 2 , 312 , 0 , 256 , 256 , 0 , 192)
-	MCFG_SCREEN_UPDATE_DRIVER(hp85_state , screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(hp85_state, vblank_w))
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
-	MCFG_TIMER_DRIVER_ADD("vm_timer", hp85_state, vm_timer)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(MASTER_CLOCK / 2 , 312 , 0 , 256 , 256 , 0 , 192);
+	m_screen->set_screen_update(FUNC(hp85_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(hp85_state::vblank_w));
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
+	TIMER(config, m_vm_timer).configure_generic(FUNC(hp85_state::vm_timer));
 
 	// No idea at all about the actual keyboard scan frequency
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("kb_timer" , hp85_state , kb_scan , attotime::from_hz(100))
+	TIMER(config, "kb_timer").configure_periodic(FUNC(hp85_state::kb_scan), attotime::from_hz(100));
 
 	// Hw timers are updated at 1 kHz rate
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("hw_timer" , hp85_state , timer_update , attotime::from_hz(1000))
-	MCFG_TIMER_DRIVER_ADD("clk_busy_timer", hp85_state, clk_busy_timer)
-	MCFG_TIMER_DRIVER_ADD("prt_busy_timer", hp85_state, prt_busy_timer)
+	TIMER(config, "hw_timer").configure_periodic(FUNC(hp85_state::timer_update), attotime::from_hz(1000));
+	TIMER(config, m_clk_busy_timer).configure_generic(FUNC(hp85_state::clk_busy_timer));
+	TIMER(config, m_prt_busy_timer).configure_generic(FUNC(hp85_state::prt_busy_timer));
 
 	// Beeper
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("dac" , DAC_1BIT , 0)
-	MCFG_MIXER_ROUTE(ALL_OUTPUTS , "mono" , 0.5 , 0)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0)
-	MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ADD("beeper" , BEEP , MASTER_CLOCK / 8192)
-	MCFG_MIXER_ROUTE(ALL_OUTPUTS , "mono" , 0.5 , 0)
+	SPEAKER(config, "mono").front_center();
+	DAC_1BIT(config, m_dac , 0).add_route(ALL_OUTPUTS, "mono", 0.5, AUTO_ALLOC_INPUT, 0);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	BEEP(config, m_beep, MASTER_CLOCK / 8192).add_route(ALL_OUTPUTS, "mono", 0.5, AUTO_ALLOC_INPUT, 0);
 
 	// Tape drive
-	MCFG_DEVICE_ADD("tape" , HP_1MA6 , 0)
+	HP_1MA6(config, "tape", 0);
 
 	// Optional ROMs
-	MCFG_DEVICE_ADD("drawer1", HP80_OPTROM_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(hp80_optrom_slot_device, NULL, false)
-	MCFG_DEVICE_ADD("drawer2", HP80_OPTROM_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(hp80_optrom_slot_device, NULL, false)
-	MCFG_DEVICE_ADD("drawer3", HP80_OPTROM_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(hp80_optrom_slot_device, NULL, false)
-	MCFG_DEVICE_ADD("drawer4", HP80_OPTROM_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(hp80_optrom_slot_device, NULL, false)
-	MCFG_DEVICE_ADD("drawer5", HP80_OPTROM_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(hp80_optrom_slot_device, NULL, false)
-	MCFG_DEVICE_ADD("drawer6", HP80_OPTROM_SLOT, 0)
-	MCFG_DEVICE_SLOT_INTERFACE(hp80_optrom_slot_device, NULL, false)
+	HP80_OPTROM(config, m_rom_drawers[0]);
+	HP80_OPTROM(config, m_rom_drawers[1]);
+	HP80_OPTROM(config, m_rom_drawers[2]);
+	HP80_OPTROM(config, m_rom_drawers[3]);
+	HP80_OPTROM(config, m_rom_drawers[4]);
+	HP80_OPTROM(config, m_rom_drawers[5]);
 
 	// I/O slots
-	MCFG_HP80_IO_SLOT_ADD("slot1" , 0)
-	MCFG_HP80_IO_IRL_CB(WRITE8(hp85_state , irl_w))
-	MCFG_HP80_IO_HALT_CB(WRITE8(hp85_state , halt_w))
-	MCFG_HP80_IO_SLOT_ADD("slot2" , 1)
-	MCFG_HP80_IO_IRL_CB(WRITE8(hp85_state , irl_w))
-	MCFG_HP80_IO_HALT_CB(WRITE8(hp85_state , halt_w))
-	MCFG_HP80_IO_SLOT_ADD("slot3" , 2)
-	MCFG_HP80_IO_IRL_CB(WRITE8(hp85_state , irl_w))
-	MCFG_HP80_IO_HALT_CB(WRITE8(hp85_state , halt_w))
-	MCFG_HP80_IO_SLOT_ADD("slot4" , 3)
-	MCFG_HP80_IO_IRL_CB(WRITE8(hp85_state , irl_w))
-	MCFG_HP80_IO_HALT_CB(WRITE8(hp85_state , halt_w))
+	HP80_IO_SLOT(config, m_io_slots[0]).set_slot_no(0);
+	m_io_slots[0]->irl_cb().set(FUNC(hp85_state::irl_w));
+	m_io_slots[0]->halt_cb().set(FUNC(hp85_state::halt_w));
+	HP80_IO_SLOT(config, m_io_slots[1]).set_slot_no(1);
+	m_io_slots[1]->irl_cb().set(FUNC(hp85_state::irl_w));
+	m_io_slots[1]->halt_cb().set(FUNC(hp85_state::halt_w));
+	HP80_IO_SLOT(config, m_io_slots[2]).set_slot_no(2);
+	m_io_slots[2]->irl_cb().set(FUNC(hp85_state::irl_w));
+	m_io_slots[2]->halt_cb().set(FUNC(hp85_state::halt_w));
+	HP80_IO_SLOT(config, m_io_slots[3]).set_slot_no(3);
+	m_io_slots[3]->irl_cb().set(FUNC(hp85_state::irl_w));
+	m_io_slots[3]->halt_cb().set(FUNC(hp85_state::halt_w));
 
 	// Printer output
-	MCFG_DEVICE_ADD("prt_graphic", BITBANGER, 0)
-	MCFG_DEVICE_ADD("prt_alpha", BITBANGER, 0)
+	BITBANGER(config, m_prt_graph_out, 0);
+	BITBANGER(config, m_prt_alpha_out, 0);
 
-	MCFG_SOFTWARE_LIST_ADD("optrom_list" , "hp85_rom")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "optrom_list").set_original("hp85_rom");
+}
 
 ROM_START(hp85)
 	ROM_REGION(0x6000 , "cpu" , 0)
@@ -1419,4 +1409,4 @@ ROM_START(hp85)
 	ROM_LOAD("prt_chrgen.bin" , 0 , 0x400 , CRC(abeaba27) SHA1(fbf6bdd5d96df6aa5963f8cdfdeb180402b1cc85))
 ROM_END
 
-COMP(1980 , hp85 , 0 , 0 , hp85 , hp85 , hp85_state , 0 , "HP" , "HP 85" , 0)
+COMP( 1980, hp85, 0, 0, hp85, hp85, hp85_state, empty_init, "HP", "HP 85", 0)

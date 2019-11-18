@@ -350,6 +350,7 @@ Components:
 #include "machine/6850acia.h"
 #include "machine/i8214.h"
 #include "machine/mc6854.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -363,12 +364,14 @@ public:
 	{
 	}
 
+	void anzterm(machine_config &config);
+
+private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 	{
 		return 0;
 	}
-	void anzterm(machine_config &config);
-	void anzterm(address_map &map);
+	void anzterm_mem(address_map &map);
 };
 
 
@@ -395,13 +398,13 @@ gfx_layout const printfont =
 	64                                          // stride
 };
 
-GFXDECODE_START( anzterm )
+GFXDECODE_START( gfx_anzterm )
 	GFXDECODE_ENTRY("crtc", 0x0000, screenfont, 0, 1)
 	GFXDECODE_ENTRY("prnt", 0x0000, printfont,  0, 1)
 GFXDECODE_END
 
 
-void anzterm_state::anzterm(address_map &map)
+void anzterm_state::anzterm_mem(address_map &map)
 {
 	// There are two battery-backed 2kB SRAM chips with a 4kb SRAM chip for parity
 	// There are two 64kB DRAM banks (with parity)
@@ -411,25 +414,26 @@ void anzterm_state::anzterm(address_map &map)
 }
 
 
-MACHINE_CONFIG_START(anzterm_state::anzterm)
-	MCFG_CPU_ADD("maincpu", M6809, 15974400/4)
-	MCFG_CPU_PROGRAM_MAP(anzterm)
+void anzterm_state::anzterm(machine_config &config)
+{
+	m6809_device &maincpu(M6809(config, "maincpu", 15974400/4));
+	maincpu.set_addrmap(AS_PROGRAM, &anzterm_state::anzterm_mem);
 
-	MCFG_DEVICE_ADD("pic.ic39", I8214, 0)
-	MCFG_DEVICE_ADD("adlc.ic16", MC6854, 0)
-	MCFG_DEVICE_ADD("adlc.1c19", MC6854, 0)
-	MCFG_DEVICE_ADD("acia.ic17", ACIA6850, 0)
-	MCFG_DEVICE_ADD("acia.ic18", ACIA6850, 0)
+	I8214(config, "pic.ic39", 0);
+	MC6854(config, "adlc.ic16", 0);
+	MC6854(config, "adlc.1c19", 0);
+	ACIA6850(config, "acia.ic17", 0);
+	ACIA6850(config, "acia.ic18", 0);
 
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_UPDATE_DRIVER(anzterm_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_RAW_PARAMS(15974400/4, 1024, 0, 104*8, 260, 0, 24*10) // this is totally wrong, it just stops a validation error
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen.set_screen_update(FUNC(anzterm_state::screen_update));
+	screen.set_palette("palette");
+	screen.set_raw(15974400/4, 1024, 0, 104*8, 260, 0, 24*10); // this is totally wrong, it just stops a validation error
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", anzterm)
-MACHINE_CONFIG_END
+	GFXDECODE(config, "gfxdecode", "palette", gfx_anzterm);
+}
 
 
 INPUT_PORTS_START( anzterm )
@@ -481,4 +485,4 @@ ROM_START( anzterm )
 	ROM_LOAD( "ebb-fea-v96-9-23-83-f43a.u11", 0x4000, 0x1000, CRC(0e572470) SHA1(966e5eeb0114589a7cab3c29a1db48cdd8634be5) )
 ROM_END
 
-COMP( 1986?, anzterm, 0, 0, anzterm, anzterm, anzterm_state, 0, "Burroughs", "EF315-I220 Teller Terminal (ANZ)", MACHINE_IS_SKELETON ) // year comes from sticker on bottom of case, it's more likely a 1983 revision
+COMP( 1986?, anzterm, 0, 0, anzterm, anzterm, anzterm_state, empty_init, "Burroughs", "EF315-I220 Teller Terminal (ANZ)", MACHINE_IS_SKELETON ) // year comes from sticker on bottom of case, it's more likely a 1983 revision

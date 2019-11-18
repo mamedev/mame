@@ -45,18 +45,6 @@
 #define VIP_BYTEIO_PORT_TAG     "byteio"
 
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_VIP_BYTEIO_PORT_ADD(_tag, _slot_intf, _def_slot, _inst) \
-	MCFG_DEVICE_ADD(_tag, VIP_BYTEIO_PORT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
-	downcast<vip_byteio_port_device *>(device)->set_inst_callback(DEVCB_##_inst);
-
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -65,14 +53,23 @@
 
 class device_vip_byteio_port_interface;
 
-class vip_byteio_port_device : public device_t,
-								public device_slot_interface
+class vip_byteio_port_device : public device_t, public device_single_card_slot_interface<device_vip_byteio_port_interface>
 {
 public:
 	// construction/destruction
-	vip_byteio_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T>
+	vip_byteio_port_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
+		: vip_byteio_port_device(mconfig, tag, owner, 0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
 
-	template<class _inst> void set_inst_callback(_inst inst) { m_write_inst.set_callback(inst); }
+	vip_byteio_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+	auto inst_callback() { return m_write_inst.bind(); }
 
 	// computer interface
 	uint8_t in_r();
@@ -98,7 +95,7 @@ protected:
 // ======================> device_vip_byteio_port_interface
 
 // class representing interface-specific live c64_expansion card
-class device_vip_byteio_port_interface : public device_slot_card_interface
+class device_vip_byteio_port_interface : public device_interface
 {
 public:
 	virtual uint8_t vip_in_r() { return 0xff; }
@@ -124,6 +121,6 @@ DECLARE_DEVICE_TYPE(VIP_BYTEIO_PORT, vip_byteio_port_device)
 // slot devices
 #include "vp620.h"
 
-SLOT_INTERFACE_EXTERN( vip_byteio_cards );
+void vip_byteio_cards(device_slot_interface &device);
 
 #endif // MAME_BUS_VIP_BYTEIO_H

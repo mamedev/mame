@@ -53,9 +53,9 @@ Grndtour:
 #include "includes/iqblock.h"
 
 #include "cpu/z80/z80.h"
-#include "cpu/z180/z180.h"
 #include "machine/i8255.h"
 #include "sound/ym2413.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -86,7 +86,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(iqblock_state::irq)
 	if((scanline % 32) == 16)
 		m_maincpu->set_input_line(0, HOLD_LINE);
 	else if ((scanline % 32) == 0)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -124,10 +124,10 @@ void iqblock_state::main_portmap(address_map &map)
 	map(0x5090, 0x5090).portr("SW0");
 	map(0x50a0, 0x50a0).portr("SW1");
 	map(0x50b0, 0x50b1).w("ymsnd", FUNC(ym2413_device::write)); // UM3567_data_port_0_w
-	map(0x50c0, 0x50c0).w(this, FUNC(iqblock_state::irqack_w));
-	map(0x6000, 0x603f).w(this, FUNC(iqblock_state::fgscroll_w));
-	map(0x6800, 0x69ff).w(this, FUNC(iqblock_state::fgvideoram_w)).share("fgvideoram"); /* initialized up to 6fff... bug or larger tilemap? */
-	map(0x7000, 0x7fff).ram().w(this, FUNC(iqblock_state::bgvideoram_w)).share("bgvideoram");
+	map(0x50c0, 0x50c0).w(FUNC(iqblock_state::irqack_w));
+	map(0x6000, 0x603f).w(FUNC(iqblock_state::fgscroll_w));
+	map(0x6800, 0x69ff).w(FUNC(iqblock_state::fgvideoram_w)).share("fgvideoram"); /* initialized up to 6fff... bug or larger tilemap? */
+	map(0x7000, 0x7fff).ram().w(FUNC(iqblock_state::bgvideoram_w)).share("bgvideoram");
 	map(0x8000, 0xffff).rom().region("user1", 0);
 }
 
@@ -332,46 +332,44 @@ static const gfx_layout tilelayout3 =
 };
 #endif
 
-static GFXDECODE_START( iqblock )
+static GFXDECODE_START( gfx_iqblock )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout1, 0, 16 )    /* only odd color codes are used */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout2, 0,  4 )    /* only color codes 0 and 3 used */
 GFXDECODE_END
 
 
 
-MACHINE_CONFIG_START(iqblock_state::iqblock)
-
+void iqblock_state::iqblock(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,12000000/2) /* 6 MHz */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_portmap)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", iqblock_state, irq, "screen", 0, 1)
+	Z80(config, m_maincpu, 12000000/2); /* 6 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &iqblock_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &iqblock_state::main_portmap);
+	TIMER(config, "scantimer").configure_scanline(FUNC(iqblock_state::irq), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("P1"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("P2"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("EXTRA"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(iqblock_state, port_C_w))
+	i8255_device &ppi(I8255A(config, "ppi8255"));
+	ppi.in_pa_callback().set_ioport("P1");
+	ppi.in_pb_callback().set_ioport("P2");
+	ppi.in_pc_callback().set_ioport("EXTRA");
+	ppi.out_pc_callback().set(FUNC(iqblock_state::port_C_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(iqblock_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 64*8-1, 0*8, 30*8-1);
+	screen.set_screen_update(FUNC(iqblock_state::screen_update));
+	screen.set_palette("palette");
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", iqblock)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_iqblock);
+	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 1024);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, 3579545)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	YM2413(config, "ymsnd", 3'579'545).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 
@@ -478,41 +476,37 @@ ROM_START( grndtour )
 	ROM_LOAD( "grand5.u24",        0x4000, 0x4000, CRC(f896efb2) SHA1(8dc8546e363b4ff80983e3b8e2a19ebb7ff30c7b) )
 ROM_END
 
-DRIVER_INIT_MEMBER(iqblock_state,iqblock)
+void iqblock_state::init_iqblock()
 {
 	uint8_t *rom = memregion("maincpu")->base();
-	int i;
-
 	/* decrypt the program ROM */
-	for (i = 0;i < 0xf000;i++)
+	for (int i = 0; i < 0xf000; i++)
 	{
 		if ((i & 0x0282) != 0x0282) rom[i] ^= 0x01;
 		if ((i & 0x0940) == 0x0940) rom[i] ^= 0x02;
 		if ((i & 0x0090) == 0x0010) rom[i] ^= 0x20;
 	}
 
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xfe26, 0xfe26, write8_delegate(FUNC(iqblock_state::iqblock_prot_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xfe26, 0xfe26, write8_delegate(*this, FUNC(iqblock_state::iqblock_prot_w)));
 	m_video_type=1;
 }
 
-DRIVER_INIT_MEMBER(iqblock_state,grndtour)
+void iqblock_state::init_grndtour()
 {
 	uint8_t *rom = memregion("maincpu")->base();
-	int i;
-
 	/* decrypt the program ROM */
-	for (i = 0;i < 0xf000;i++)
+	for (int i = 0; i < 0xf000; i++)
 	{
 		if ((i & 0x0282) != 0x0282) rom[i] ^= 0x01;
 		if ((i & 0x0940) == 0x0940) rom[i] ^= 0x02;
 		if ((i & 0x0060) == 0x0040) rom[i] ^= 0x20;
 	}
 
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xfe39, 0xfe39, write8_delegate(FUNC(iqblock_state::grndtour_prot_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xfe39, 0xfe39, write8_delegate(*this, FUNC(iqblock_state::grndtour_prot_w)));
 	m_video_type=0;
 }
 
 
 
-GAME( 1993, iqblock,  0, iqblock,  iqblock, iqblock_state, iqblock,  ROT0, "IGS", "IQ-Block (V100U)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1993, grndtour, 0, iqblock,  grndtour,iqblock_state, grndtour, ROT0, "IGS", "Grand Tour (V100U)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, iqblock,  0, iqblock, iqblock,  iqblock_state, init_iqblock,  ROT0, "IGS", "IQ-Block (V100U)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1993, grndtour, 0, iqblock, grndtour, iqblock_state, init_grndtour, ROT0, "IGS", "Grand Tour (V100U)", MACHINE_SUPPORTS_SAVE )

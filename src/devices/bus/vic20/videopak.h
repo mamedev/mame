@@ -15,6 +15,7 @@
 
 #include "exp.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 
 
 
@@ -41,13 +42,13 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	// device_vic20_expansion_card_interface overrides
-	virtual uint8_t vic20_cd_r(address_space &space, offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3) override;
-	virtual void vic20_cd_w(address_space &space, offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3) override;
+	virtual uint8_t vic20_cd_r(offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3) override;
+	virtual void vic20_cd_w(offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3) override;
 
 private:
 	MC6845_UPDATE_ROW( crtc_update_row );
 
-	required_device<h46505_device> m_crtc;
+	required_device<mc6845_device> m_crtc;
 	required_device<palette_device> m_palette;
 	required_memory_region m_char_rom;
 	optional_shared_ptr<uint8_t> m_videoram;

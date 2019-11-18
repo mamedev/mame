@@ -13,9 +13,9 @@
 
 
 // supported devices
-SLOT_INTERFACE_EXTERN( p1_isa8_cards );
-SLOT_INTERFACE_EXTERN( mc1502_isa8_cards );
-SLOT_INTERFACE_EXTERN( ec184x_isa8_cards );
-SLOT_INTERFACE_EXTERN( iskr103x_isa8_cards );
+void p1_isa8_cards(device_slot_interface &device);
+void mc1502_isa8_cards(device_slot_interface &device);
+void ec184x_isa8_cards(device_slot_interface &device);
+void iskr103x_isa8_cards(device_slot_interface &device);
 
 #endif // MAME_BUS_ISA_XSU_CARDS_H

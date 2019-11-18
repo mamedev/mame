@@ -42,7 +42,7 @@ void ym2612_device::device_timer(emu_timer &timer, device_timer_id id, int param
 
 void ym2612_device::timer_handler(int c,int count,int clock)
 {
-	if( count == 0 )
+	if( count == 0 || clock == 0 )
 	{   /* Reset FM Timer */
 		m_timer[c]->enable(false);
 	}
@@ -91,7 +91,8 @@ void ym2612_device::device_start()
 
 	/**** initialize YM2612 ****/
 	m_chip = ym2612_init(this,clock(),rate,&ym2612_device::static_timer_handler,&ym2612_device::static_irq_handler);
-	assert_always(m_chip != nullptr, "Error creating YM2612 chip");
+	if (!m_chip)
+		throw emu_fatalerror("ym2612_device(%s): Error creating YM2612 chip", tag());
 }
 
 void ym2612_device::device_clock_changed()
@@ -129,12 +130,12 @@ void ym2612_device::device_reset()
 }
 
 
-READ8_MEMBER( ym2612_device::read )
+u8 ym2612_device::read(offs_t offset)
 {
 	return ym2612_read(m_chip, offset & 3);
 }
 
-WRITE8_MEMBER( ym2612_device::write )
+void ym2612_device::write(offs_t offset, u8 data)
 {
 	ym2612_write(m_chip, offset & 3, data);
 }

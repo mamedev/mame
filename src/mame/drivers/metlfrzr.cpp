@@ -25,6 +25,7 @@
 
 #include "cpu/z80/z80.h"
 #include "machine/timer.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -32,8 +33,8 @@
 class metlfrzr_state : public driver_device
 {
 public:
-	metlfrzr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	metlfrzr_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_decrypted_opcodes(*this, "decrypted_opcodes"),
 		m_work_ram(*this, "wram"),
@@ -43,6 +44,11 @@ public:
 		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
+	void metlfrzr(machine_config &config);
+
+	void init_metlfrzr();
+
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -58,12 +64,10 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	DECLARE_DRIVER_INIT(metlfrzr);
 	DECLARE_WRITE8_MEMBER(output_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 	uint8_t m_fg_tilebank;
 	bool m_rowscroll_enable;
-	void metlfrzr(machine_config &config);
 	void decrypted_opcodes_map(address_map &map);
 	void metlfrzr_map(address_map &map);
 };
@@ -195,7 +199,7 @@ void metlfrzr_state::metlfrzr_map(address_map &map)
 	map(0xd604, 0xd604).portr("DSW2");
 	map(0xd600, 0xd61f).writeonly().share("vregs");
 
-	map(0xd700, 0xd700).w(this, FUNC(metlfrzr_state::output_w));
+	map(0xd700, 0xd700).w(FUNC(metlfrzr_state::output_w));
 	map(0xd710, 0xd710).w("t5182", FUNC(t5182_device::sound_irq_w));
 	map(0xd711, 0xd711).r("t5182", FUNC(t5182_device::sharedram_semaphore_snd_r));
 	// following two do swapped access compared to darkmist
@@ -343,7 +347,7 @@ static const gfx_layout sprite_layout =
 };
 
 
-static GFXDECODE_START(metlfrzr)
+static GFXDECODE_START(gfx_metlfrzr)
 	GFXDECODE_ENTRY("gfx1", 0, tile_layout, 0x100, 16)
 	GFXDECODE_ENTRY("gfx2", 0, tile_layout, 0x100, 16)
 	GFXDECODE_ENTRY("gfx3", 0, sprite_layout, 0, 16)
@@ -355,47 +359,44 @@ TIMER_DEVICE_CALLBACK_MEMBER(metlfrzr_state::scanline)
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0x10); /* RST 10h */
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xd7); /* Z80 - RST 10h */
 
 	// TODO: check this irq.
 	if(scanline == 0) // vblank-in irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0x08); /* RST 08h */
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xcf); /* Z80 - RST 08h */
 }
 
-MACHINE_CONFIG_START(metlfrzr_state::metlfrzr)
-
+void metlfrzr_state::metlfrzr(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(metlfrzr_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", metlfrzr_state, scanline, "screen", 0, 1)
+	Z80(config, m_maincpu, XTAL(12'000'000) / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &metlfrzr_state::metlfrzr_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &metlfrzr_state::decrypted_opcodes_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(metlfrzr_state::scanline), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("t5182", T5182, 0)
+	T5182(config, "t5182", 0);
 
-	MCFG_PALETTE_ADD("palette", 0x200)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256*2)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 0x200).set_indirect_entries(256 * 2);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", metlfrzr)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_metlfrzr);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256 - 1, 16, 256 - 16 - 1)
-	MCFG_SCREEN_UPDATE_DRIVER(metlfrzr_state, screen_update_metlfrzr)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 256 - 1, 16, 256 - 16 - 1);
+	screen.set_screen_update(FUNC(metlfrzr_state::screen_update_metlfrzr));
+	screen.set_palette(m_palette);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(14'318'181) / 4)    /* 3.579545 MHz */
-	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("t5182", t5182_device, ym2151_irq_handler))
-	MCFG_SOUND_ROUTE(0, "mono", 1.0)
-	MCFG_SOUND_ROUTE(1, "mono", 1.0)
-
-MACHINE_CONFIG_END
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(14'318'181) / 4));    /* 3.579545 MHz */
+	ymsnd.irq_handler().set("t5182", FUNC(t5182_device::ym2151_irq_handler));
+	ymsnd.add_route(0, "mono", 1.0);
+	ymsnd.add_route(1, "mono", 1.0);
+}
 
 
 
@@ -434,7 +435,7 @@ ROM_END
 
 
 
-DRIVER_INIT_MEMBER(metlfrzr_state, metlfrzr)
+void metlfrzr_state::init_metlfrzr()
 {
 	// same as cshooter.cpp
 	uint8_t *rom = memregion("maincpu")->base();
@@ -467,4 +468,4 @@ DRIVER_INIT_MEMBER(metlfrzr_state, metlfrzr)
 
 
 
-GAME( 1989, metlfrzr,  0,    metlfrzr, metlfrzr, metlfrzr_state,  metlfrzr, ROT270, "Seibu Kaihatsu", "Metal Freezer (Japan)", MACHINE_NO_COCKTAIL )
+GAME( 1989, metlfrzr,  0,    metlfrzr, metlfrzr, metlfrzr_state, init_metlfrzr, ROT270, "Seibu Kaihatsu", "Metal Freezer (Japan)", MACHINE_NO_COCKTAIL )

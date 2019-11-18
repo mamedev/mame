@@ -31,7 +31,8 @@ PCB markings:"DE-0407-2 MADE IN JAPAN"
 -----------------------------------
 
 Thanks to DOX, the "mystery chip" has been identified (and verified) as a PIC.
-Unfortunately it's read protected.
+It's read protected, but has been decapped and read out. Unfortunately it doesn't
+help with figuring out the encryption on the coin-op parts of the program.
 
 */
 
@@ -98,7 +99,7 @@ INPUT_PORTS_END
 
 
 ROM_START( hshavoc )
-	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "d-25.11a", 0x000000, 0x080000, CRC(6a155060) SHA1(ecb47bd428786e50e300a062b5038f943419a389) )
 	ROM_LOAD16_BYTE( "d-26.9a",  0x000001, 0x080000, CRC(1afa84fe) SHA1(041296e0360b7747aedc2d948c39e06ba03a7d08) )
 
@@ -111,7 +112,7 @@ ROM_START( hshavoc )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(md_boot_state,hshavoc)
+void md_boot_state::init_hshavoc()
 {
 	uint16_t *src = (uint16_t *)memregion("maincpu")->base();
 
@@ -127,7 +128,6 @@ DRIVER_INIT_MEMBER(md_boot_state,hshavoc)
 	   code in RAM.. but as of yet we can't know */
 
 	int rom_size = 0xe8000;
-
 	for (int x = 0; x < rom_size / 2; x++)
 	{
 		src[x] = bitswap<16>(src[x],
@@ -216,10 +216,10 @@ DRIVER_INIT_MEMBER(md_boot_state,hshavoc)
 		space.nop_write(0x200000, 0x201fff);
 	}
 
-	DRIVER_INIT_CALL(megadriv);
+	init_megadriv();
 
 	m_vdp->stop_timers();
 }
 
 
-GAME( 1993, hshavoc, 0, md_bootleg, hshavoc, md_boot_state, hshavoc, ROT0, "Data East", "High Seas Havoc", MACHINE_NOT_WORKING )
+GAME( 1993, hshavoc, 0, md_bootleg, hshavoc, md_boot_state, init_hshavoc, ROT0, "Data East", "High Seas Havoc", MACHINE_NOT_WORKING )

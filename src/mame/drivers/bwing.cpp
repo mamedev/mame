@@ -89,7 +89,7 @@ WRITE8_MEMBER(bwing_state::bwp1_ctrl_w)
 				m_subcpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE); // SNMI
 			else
 			{
-				m_soundlatch->write(space, 0, data);
+				m_soundlatch->write(data);
 				m_audiocpu->set_input_line(DECO16_IRQ_LINE, HOLD_LINE); // SNDREQ
 			}
 		break;
@@ -125,17 +125,17 @@ void bwing_state::bwp1_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram().share("sharedram");
 	map(0x0800, 0x0fff).ram();
-	map(0x1000, 0x13ff).ram().w(this, FUNC(bwing_state::videoram_w)).share("videoram");
+	map(0x1000, 0x13ff).ram().w(FUNC(bwing_state::videoram_w)).share("videoram");
 	map(0x1400, 0x17ff).ram();
 	map(0x1800, 0x19ff).ram().share("spriteram");
-	map(0x1a00, 0x1aff).ram().w(this, FUNC(bwing_state::paletteram_w)).share("paletteram");
+	map(0x1a00, 0x1aff).ram().w(FUNC(bwing_state::paletteram_w)).share("paletteram");
 	map(0x1b00, 0x1b00).portr("DSW0");
 	map(0x1b01, 0x1b01).portr("DSW1");
 	map(0x1b02, 0x1b02).portr("IN0");
 	map(0x1b03, 0x1b03).portr("IN1");
 	map(0x1b04, 0x1b04).portr("IN2");
-	map(0x1b00, 0x1b07).w(this, FUNC(bwing_state::scrollreg_w));
-	map(0x1c00, 0x1c07).ram().w(this, FUNC(bwing_state::bwp1_ctrl_w));
+	map(0x1b00, 0x1b07).w(FUNC(bwing_state::scrollreg_w));
+	map(0x1c00, 0x1c07).ram().w(FUNC(bwing_state::bwp1_ctrl_w));
 	map(0x2000, 0x3fff).m(m_vrambank, FUNC(address_map_bank_device::amap8));
 	map(0x4000, 0xffff).rom(); // "B-Wings US" writes to 9631-9632(debug?)
 }
@@ -143,9 +143,9 @@ void bwing_state::bwp1_map(address_map &map)
 // Banked video RAM
 void bwing_state::bank_map(address_map &map)
 {
-	map(0x0000, 0x0fff).ram().w(this, FUNC(bwing_state::fgscrollram_w)).share("fgscrollram");
-	map(0x1000, 0x1fff).ram().w(this, FUNC(bwing_state::bgscrollram_w)).share("bgscrollram");
-	map(0x2000, 0x7fff).ram().w(this, FUNC(bwing_state::gfxram_w)).share("gfxram");
+	map(0x0000, 0x0fff).ram().w(FUNC(bwing_state::fgscrollram_w)).share("fgscrollram");
+	map(0x1000, 0x1fff).ram().w(FUNC(bwing_state::bgscrollram_w)).share("bgscrollram");
+	map(0x2000, 0x7fff).ram().w(FUNC(bwing_state::gfxram_w)).share("gfxram");
 }
 
 // Sub CPU
@@ -153,7 +153,7 @@ void bwing_state::bwp2_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram().share("sharedram");
 	map(0x0800, 0x0fff).ram();
-	map(0x1800, 0x1803).w(this, FUNC(bwing_state::bwp2_ctrl_w));
+	map(0x1800, 0x1803).w(FUNC(bwing_state::bwp2_ctrl_w));
 	map(0xa000, 0xffff).rom();
 }
 
@@ -162,21 +162,21 @@ void bwing_state::bwp2_map(address_map &map)
 void bwing_state::bwp3_map(address_map &map)
 {
 	map(0x0000, 0x01ff).ram();
-	map(0x0200, 0x0200).w("dac", FUNC(dac_byte_interface::write));
-	map(0x1000, 0x1000).w(this, FUNC(bwing_state::bwp3_nmiack_w));
+	map(0x0200, 0x0200).w("dac", FUNC(dac_byte_interface::data_w));
+	map(0x1000, 0x1000).w(FUNC(bwing_state::bwp3_nmiack_w));
 	map(0x2000, 0x2000).w("ay1", FUNC(ay8912_device::data_w));
 	map(0x4000, 0x4000).w("ay1", FUNC(ay8912_device::address_w));
 	map(0x6000, 0x6000).w("ay2", FUNC(ay8912_device::data_w));
 	map(0x8000, 0x8000).w("ay2", FUNC(ay8912_device::address_w));
 	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0xd000, 0xd000).w(this, FUNC(bwing_state::bwp3_nmimask_w));
+	map(0xd000, 0xd000).w(FUNC(bwing_state::bwp3_nmimask_w));
 	map(0xe000, 0xffff).rom().region("audiocpu", 0);
 }
 
 
 void bwing_state::bwp3_io_map(address_map &map)
 {
-	map(0x00, 0x00).portr("VBLANK").w(this, FUNC(bwing_state::bwp3_u8F_w));
+	map(0x00, 0x00).portr("VBLANK").w(FUNC(bwing_state::bwp3_u8F_w));
 }
 
 //****************************************************************************
@@ -325,7 +325,7 @@ static const gfx_layout ram_tilelayout =
 	32*8
 };
 
-static GFXDECODE_START( bwing )
+static GFXDECODE_START( gfx_bwing )
 	GFXDECODE_ENTRY( "gfx1",      0, charlayout,     0x00, 1 ) // chars
 	GFXDECODE_ENTRY( "gfx2",      0, spritelayout,   0x20, 2 ) // sprites
 	GFXDECODE_RAM( "gfxram",      0, ram_tilelayout, 0x10, 2 ) // foreground tiles
@@ -363,58 +363,52 @@ void bwing_state::bwing_postload()
 }
 
 
-MACHINE_CONFIG_START(bwing_state::bwing)
-
+void bwing_state::bwing(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", MC6809E, 2000000)
-	MCFG_CPU_PROGRAM_MAP(bwp1_map)
+	MC6809E(config, m_maincpu, 2000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &bwing_state::bwp1_map);
 
-	MCFG_CPU_ADD("sub", MC6809E, 2000000)
-	MCFG_CPU_PROGRAM_MAP(bwp2_map)
+	MC6809E(config, m_subcpu, 2000000);
+	m_subcpu->set_addrmap(AS_PROGRAM, &bwing_state::bwp2_map);
 
-	MCFG_CPU_ADD("audiocpu", DECO16, 2000000)
-	MCFG_CPU_PROGRAM_MAP(bwp3_map)
-	MCFG_CPU_IO_MAP(bwp3_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(bwing_state, bwp3_interrupt,  1000)
+	DECO16(config, m_audiocpu, 2000000);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &bwing_state::bwp3_map);
+	m_audiocpu->set_addrmap(AS_IO, &bwing_state::bwp3_io_map);
+	m_audiocpu->set_periodic_int(FUNC(bwing_state::bwp3_interrupt), attotime::from_hz(1000));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(18000))     // high enough?
+	config.set_maximum_quantum(attotime::from_hz(18000));     // high enough?
 
-	MCFG_DEVICE_ADD("vrambank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(bank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(15)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
+	ADDRESS_MAP_BANK(config, "vrambank").set_map(&bwing_state::bank_map).set_options(ENDIANNESS_BIG, 8, 15, 0x2000);
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(600))   // must be long enough for polling
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(bwing_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(600));   // must be long enough for polling
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(bwing_state::screen_update));
+	screen.set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bwing)
-	MCFG_PALETTE_ADD("palette", 64)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bwing);
+	PALETTE(config, m_palette).set_entries(64);
 
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_SOUND_ADD("ay1", AY8912, XTAL(24'000'000) / 2 / 8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	AY8912(config, "ay1", XTAL(24'000'000) / 2 / 8).add_route(ALL_OUTPUTS, "speaker", 0.5);
 
-	MCFG_SOUND_ADD("ay2", AY8912, XTAL(24'000'000) / 2 / 8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	AY8912(config, "ay2", XTAL(24'000'000) / 2 / 8).add_route(ALL_OUTPUTS, "speaker", 0.5);
 
-	MCFG_SOUND_ADD("dac", DAC08, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	DAC08(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.1);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
 //****************************************************************************
 // ROM Maps
@@ -556,7 +550,7 @@ ROM_END
 //****************************************************************************
 // Initializations
 
-DRIVER_INIT_MEMBER(bwing_state,bwing)
+void bwing_state::init_bwing()
 {
 	uint8_t *rom = memregion("audiocpu")->base();
 	int j = memregion("audiocpu")->bytes();
@@ -573,9 +567,9 @@ DRIVER_INIT_MEMBER(bwing_state,bwing)
 //****************************************************************************
 // Game Entries
 
-GAME( 1984, bwings,       0, bwing, bwing, bwing_state, bwing, ROT90, "Data East Corporation", "B-Wings (Japan new Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, bwingso, bwings, bwing, bwing, bwing_state, bwing, ROT90, "Data East Corporation", "B-Wings (Japan old Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, bwingsa, bwings, bwing, bwing, bwing_state, bwing, ROT90, "Data East Corporation", "B-Wings (Alt Ver.?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, bwings,       0, bwing, bwing, bwing_state, init_bwing, ROT90, "Data East Corporation", "B-Wings (Japan new Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, bwingso, bwings, bwing, bwing, bwing_state, init_bwing, ROT90, "Data East Corporation", "B-Wings (Japan old Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, bwingsa, bwings, bwing, bwing, bwing_state, init_bwing, ROT90, "Data East Corporation", "B-Wings (Alt Ver.?)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1984, zaviga,       0, bwing, bwing, bwing_state, bwing, ROT90, "Data East Corporation", "Zaviga", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, zavigaj, zaviga, bwing, bwing, bwing_state, bwing, ROT90, "Data East Corporation", "Zaviga (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, zaviga,       0, bwing, bwing, bwing_state, init_bwing, ROT90, "Data East Corporation", "Zaviga", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, zavigaj, zaviga, bwing, bwing, bwing_state, init_bwing, ROT90, "Data East Corporation", "Zaviga (Japan)", MACHINE_SUPPORTS_SAVE )

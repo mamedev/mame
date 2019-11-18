@@ -20,21 +20,6 @@
 #pragma once
 
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_MM5837_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, MM5837, 0)
-
-#define MCFG_MM5837_VDD(_voltage) \
-	downcast<mm5837_device &>(*device).set_vdd_voltage(_voltage);
-
-#define MCFG_MM5837_OUTPUT_CB(_devcb) \
-	devcb = &downcast<mm5837_device &>(*device).set_output_callback(DEVCB_##_devcb);
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -43,11 +28,11 @@ class mm5837_device : public device_t
 {
 public:
 	// construction/destruction
-	mm5837_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mm5837_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// configuration
 	void set_vdd_voltage(int voltage) { m_vdd = voltage; }
-	template <class Object> devcb_base &set_output_callback(Object &&cb) { return m_output_cb.set_callback(std::forward<Object>(cb)); }
+	auto output_callback() { return m_output_cb.bind(); }
 
 protected:
 	// device-level overrides

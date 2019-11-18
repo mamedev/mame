@@ -26,9 +26,6 @@ sed -e 's/#define \(.*\)"\(.*\)"[ \t]*,[ \t]*\(.*\)/NET_ALIAS(\1,\2.\3)/' src/ma
 
 #ifndef NL_CONVERT_CPP
 #include "devices/net_lib.h"
-#include "analog/nld_twoterm.h"
-
-#include <cmath>
 #endif
 
 
@@ -71,48 +68,48 @@ sed -e 's/#define \(.*\)"\(.*\)"[ \t]*,[ \t]*\(.*\)/NET_ALIAS(\1,\2.\3)/' src/ma
 struct Mono555Desc
 {
 public:
-		nl_double r, c;
+		nl_fptype r, c;
 
-		Mono555Desc(nl_double res, nl_double cap) : r(res), c(cap) { }
+		Mono555Desc(nl_fptype res, nl_fptype cap) : r(res), c(cap) { }
 };
 
 struct Astable555Desc
 {
 public:
-		nl_double r1, r2, c;
+		nl_fptype r1, r2, c;
 
-		Astable555Desc(nl_double res1, nl_double res2, nl_double cap) : r1(res1), r2(res2), c(cap) { }
+		Astable555Desc(nl_fptype res1, nl_fptype res2, nl_fptype cap) : r1(res1), r2(res2), c(cap) { }
 };
 
 struct Mono9602Desc
 {
 public:
-		nl_double r1, c1, r2, c2;
+		nl_fptype r1, c1, r2, c2;
 
-		Mono9602Desc(nl_double res1, nl_double cap1, nl_double res2, nl_double cap2)
+		Mono9602Desc(nl_fptype res1, nl_fptype cap1, nl_fptype res2, nl_fptype cap2)
 		: r1(res1), c1(cap1), r2(res2), c2(cap2) { }
 };
 
 struct SeriesRCDesc
 {
 public:
-		nl_double r, c;
+		nl_fptype r, c;
 
-		SeriesRCDesc(nl_double res, nl_double cap) : r(res), c(cap) { }
+		SeriesRCDesc(nl_fptype res, nl_fptype cap) : r(res), c(cap) { }
 };
 
 struct CapacitorDesc : public SeriesRCDesc
 {
 public:
-	CapacitorDesc(nl_double cap) : SeriesRCDesc(0.0, cap) { }
+	CapacitorDesc(nl_fptype cap) : SeriesRCDesc(0.0, cap) { }
 };
 
 #else
 #define CHIP(n, t) TTL_ ## t ## _DIP(n)
 
 #define OHM(x) x
-#define K_OHM(x) RES_K(X)
-#define M_OHM(x) RES_M(X)
+#define K_OHM(x) RES_K(x)
+#define M_OHM(x) RES_M(x)
 #define U_FARAD(x) CAP_U(x)
 #define N_FARAD(x) CAP_N(x)
 #define P_FARAD(x) CAP_P(x)
@@ -126,14 +123,14 @@ public:
 #define CHIP_555_Mono(name,  pdesc)   \
 	NE555_DIP(name) \
 	NET_C(name.6, name.7) \
-	RES(name ## _R, (pdesc)->r) \
-	CAP(name ## _C, (pdesc)->c) \
+	RES(name ## _R, pdesc ## _R) \
+	CAP(name ## _C, pdesc ## _C) \
 	NET_C(name.6, name ## _R.1) \
 	NET_C(name.6, name ## _C.1) \
 	NET_C(name ## _R.2, V5) \
-	NET_CSTR(# name "_C.2", "GND") \
+	NET_C(name ## _C.2, GND) \
 	NET_C(name.8, V5) \
-	NET_CSTR(# name ".1", "GND")
+	NET_C(name.1, GND)
 
 #define CHIP_555_Astable(name,  pdesc)   \
 	NE555_DIP(name) \
@@ -146,9 +143,9 @@ public:
 	NET_C(name.6, name ## _C.1) \
 	NET_C(name.2, name ## _C.1) \
 	NET_C(name ## _R1.2, V5) \
-	NET_CSTR(# name "_C.2", "GND") \
+	NET_C(name ## _C.2, GND) \
 	NET_C(name.8, V5) \
-	NET_CSTR(# name ".1", "GND")
+	NET_C(name.1, GND)
 
 #define CHIP_9602_Mono(name,  pdesc)   \
 	CHIP(# name, 9602) \
@@ -168,8 +165,8 @@ public:
 	NET_C(name.14, name ## _R2.2) \
 	NET_C(VCC,     name ## _R2.1)
 #define CHIP_SERIES_RC(name,  pdesc)   \
-	RES(name ## _R, (pdesc)->r) \
-	CAP(name ## _C, (pdesc)->c) \
+	RES(name ## _R, pdesc ## _R) \
+	CAP(name ## _C, pdesc ## _C) \
 	NET_C(name ## _R.1, name ## _C.2) \
 	ALIAS(name.3, name ## _R.1) \
 	ALIAS(name.2, name ## _R.2) \
@@ -178,13 +175,13 @@ public:
 #define CHIP_INPUT_ACTIVE_LOW(name)   \
 	SWITCH2(name ## _SW) \
 	NET_C(name ## _SW.1, V5) \
-	NET_CSTR(# name "_SW.2", "GND") \
+	NET_C(name ## _SW.2, GND) \
 	ALIAS(name.1, name ## _SW.Q)
 
 #define CHIP_INPUT_ACTIVE_HIGH(name)   \
 	SWITCH2(name ## _SW) \
 	NET_C(name ## _SW.2, V5) \
-	NET_CSTR(# name "_SW.1", "GND") \
+	NET_C(name ## _SW.1, GND) \
 	ALIAS(name.1, name ## _SW.Q)
 
 #define CHIP_LATCH(name)   \
@@ -203,7 +200,7 @@ inline int CAPACITOR_tc_hl(const double c, const double r)
 	 * Vt = (VH-VL)*exp(-t/RC)
 	 * ln(Vt/(VH-VL))*RC = -t
 	 */
-	static const double TIME_CONSTANT = -std::log(0.8 / (4.0-0.1));
+	static const double TIME_CONSTANT = -plib::log(0.8 / (4.0-0.1));
 	int ret = (int) (TIME_CONSTANT * (1.0 + r) * c * 1e9);
 	return ret;
 }
@@ -214,7 +211,7 @@ inline int CAPACITOR_tc_lh(const double c, const double r)
 	 * Vt = (VH-VL)*(1-exp(-t/RC))
 	 * -t=ln(1-Vt/(VH-VL))*RC
 	 */
-	static const double TIME_CONSTANT = -std::log(1.0 - 2.0 / (4.0-0.1));
+	static const double TIME_CONSTANT = -plib::log(1.0 - 2.0 / (4.0-0.1));
 	int ret = (int) (TIME_CONSTANT * (130.0 + r) * c * 1e9);
 	return ret;
 }

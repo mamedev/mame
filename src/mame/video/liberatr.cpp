@@ -42,6 +42,7 @@ WRITE8_MEMBER( liberatr_state::bitmap_w )
 
 	m_bitmapram[offset] = data;
 
+	offset += 3;
 	x = (offset & 0x3f) << 2;
 	y = offset >> 6;
 
@@ -51,12 +52,6 @@ WRITE8_MEMBER( liberatr_state::bitmap_w )
 	m_videoram[(y << 8) | x | 1] = data;
 	m_videoram[(y << 8) | x | 2] = data;
 	m_videoram[(y << 8) | x | 3] = data;
-}
-
-
-WRITE_LINE_MEMBER(liberatr_state::planet_select_w)
-{
-	m_planet_select = state;
 }
 
 

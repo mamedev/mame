@@ -247,7 +247,8 @@ device_memory_interface::space_config_vector spc700_device::memory_space_config(
 /* ======================================================================== */
 
 /* Use up clock cycles */
-#define CLK(A) CLOCKS -= (A)
+#define CLK_DIVIDER 2
+#define CLK(A) CLOCKS -= ((A)*(CLK_DIVIDER))
 #define CLK_ALL() CLOCKS = 0
 
 

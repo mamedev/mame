@@ -8,7 +8,6 @@
 #include "bus/msx_cart/cartridge.h"
 #include "machine/wd_fdc.h"
 #include "machine/upd765.h"
-#include "imagedev/flopdrv.h"
 #include "imagedev/floppy.h"
 
 
@@ -46,8 +45,8 @@ protected:
 class msx_cart_disk_type1_device : public msx_cart_disk_wd_device
 {
 public:
-	virtual DECLARE_READ8_MEMBER(read_cart) override;
-	virtual DECLARE_WRITE8_MEMBER(write_cart) override;
+	virtual uint8_t read_cart(offs_t offset) override;
+	virtual void write_cart(offs_t offset, uint8_t data) override;
 
 protected:
 	msx_cart_disk_type1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -55,9 +54,9 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_post_load() override;
 
-	void post_load();
-
+	output_finder<> m_led;
 	uint8_t m_side_control;
 	uint8_t m_control;
 
@@ -69,8 +68,8 @@ protected:
 class msx_cart_disk_type2_device : public msx_cart_disk_wd_device
 {
 public:
-	virtual DECLARE_READ8_MEMBER(read_cart) override;
-	virtual DECLARE_WRITE8_MEMBER(write_cart) override;
+	virtual uint8_t read_cart(offs_t offset) override;
+	virtual void write_cart(offs_t offset, uint8_t data) override;
 
 protected:
 	msx_cart_disk_type2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -78,9 +77,9 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_post_load() override;
 
-	void post_load();
-
+	output_finder<> m_led;
 	uint8_t m_control;
 
 	void set_control(uint8_t data);
@@ -138,8 +137,8 @@ protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	virtual DECLARE_READ8_MEMBER(read_cart) override;
-	virtual DECLARE_WRITE8_MEMBER(write_cart) override;
+	virtual uint8_t read_cart(offs_t offset) override;
+	virtual void write_cart(offs_t offset, uint8_t data) override;
 };
 
 

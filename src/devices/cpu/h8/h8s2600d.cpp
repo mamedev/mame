@@ -12,6 +12,6 @@
 #include "h8s2600d.h"
 #include "cpu/h8/h8s2600d.hxx"
 
-h8s2600_disassembler::h8s2600_disassembler() : h8_disassembler(disasm_entries)
+h8s2600_disassembler::h8s2600_disassembler() : h8_disassembler(disasm_entries, true)
 {
 }

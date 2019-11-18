@@ -15,7 +15,7 @@
 
 #include "imi7000.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 
@@ -74,7 +74,7 @@ private:
 		LED_READY
 	};
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
 	required_ioport m_lsi11;
 	required_ioport m_mux;

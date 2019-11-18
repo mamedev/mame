@@ -253,9 +253,9 @@ void fga002_device::trigger_interrupt(uint8_t data)
 	m_out_int_cb(ASSERT_LINE);
 }
 
-IRQ_CALLBACK_MEMBER(fga002_device::iack)
+u16 fga002_device::iack()
 {
-	int vec = M68K_INT_ACK_AUTOVECTOR;
+	int vec = 0x18; // Spurious interrupt
 	int vec_found = 0;
 	int level;
 
@@ -295,7 +295,7 @@ IRQ_CALLBACK_MEMBER(fga002_device::iack)
 						default: break; /* Since we need the vector for the switch statement the default job is already done */
 						}
 						LOGVEC("dev:%02x ", vec);
-						if (vec == INT_ACK_AUTOVECTOR) vec = INT_EMPTY;
+						if (vec == 0x18) vec = INT_EMPTY;
 						LOGVEC("avec:%02x ", vec);
 
 						// Add vector page bits and return vector

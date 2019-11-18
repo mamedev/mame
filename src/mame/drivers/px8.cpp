@@ -526,11 +526,10 @@ void px8_state::px8_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0x0f);
-	map(0x00, 0x07).rw(this, FUNC(px8_state::gah40m_r), FUNC(px8_state::gah40m_w));
-	map(0x0c, 0x0c).rw(I8251_TAG, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x0d, 0x0d).rw(I8251_TAG, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-//  AM_RANGE(0x0e, 0x0e) AM_DEVREADWRITE(SED1320_TAG, sed1330_device, status_r, data_w)
-//  AM_RANGE(0x0f, 0x0f) AM_DEVREADWRITE(SED1320_TAG, sed1330_device, data_r, command_w)
+	map(0x00, 0x07).rw(FUNC(px8_state::gah40m_r), FUNC(px8_state::gah40m_w));
+	map(0x0c, 0x0d).rw(I8251_TAG, FUNC(i8251_device::read), FUNC(i8251_device::write));
+//  map(0x0e, 0x0e).rw(SED1320_TAG, FUNC(sed1330_device::status_r), FUNC(sed1330_device::data_w));
+//  map(0x0f, 0x0f).rw(SED1320_TAG, FUNC(sed1330_device::data_r), FUNC(sed1330_device::command_w));
 }
 
 /*-------------------------------------------------
@@ -540,25 +539,12 @@ void px8_state::px8_io(address_map &map)
 void px8_state::px8_slave_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0020, 0x0023).rw(this, FUNC(px8_state::gah40s_r), FUNC(px8_state::gah40s_w));
-//  AM_RANGE(0x0024, 0x0027) AM_DEVREADWRITE_LEGACY(SED1320_TAG, )
-	map(0x0028, 0x0028).w(this, FUNC(px8_state::gah40s_ier_w));
+	map(0x0020, 0x0023).rw(FUNC(px8_state::gah40s_r), FUNC(px8_state::gah40s_w));
+//  map(0x0024, 0x0027).rw(SED1320_TAG, FUNC(sed1330_device::), FUNC(sed1330_device::));
+	map(0x0028, 0x0028).w(FUNC(px8_state::gah40s_ier_w));
 	map(0x8000, 0x97ff).ram().share("video_ram");
 	map(0x9800, 0xefff).noprw();
 	map(0xf000, 0xffff).rom().region(HD6303_TAG, 0); /* internal mask rom */
-}
-
-/*-------------------------------------------------
-    ADDRESS_MAP( px8_slave_io )
--------------------------------------------------*/
-
-void px8_state::px8_slave_io(address_map &map)
-{
-	map.unmap_value_high();
-	map(M6801_PORT1, M6801_PORT1);
-	map(M6801_PORT2, M6801_PORT2);
-	map(M6801_PORT3, M6801_PORT3);
-	map(M6801_PORT4, M6801_PORT4);
 }
 
 /***************************************************************************
@@ -680,7 +666,7 @@ INPUT_PORTS_END
     VIDEO
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(px8_state, px8)
+void px8_state::px8_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, 0xa5, 0xad, 0xa5);
 	palette.set_pen_color(1, 0x31, 0x39, 0x10);
@@ -712,7 +698,7 @@ static const gfx_layout px8_charlayout =
     GFXDECODE( px8 )
 -------------------------------------------------*/
 
-static GFXDECODE_START( px8 )
+static GFXDECODE_START( gfx_px8 )
 	GFXDECODE_ENTRY( SED1320_TAG, 0x0000, px8_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -733,6 +719,10 @@ void px8_state::machine_start()
 	save_item(NAME(m_bk2));
 	save_item(NAME(m_sio));
 	save_item(NAME(m_ksc));
+
+	// not used yet
+	(void)m_icr;
+	(void)m_frc;
 }
 
 void px8_state::machine_reset()
@@ -747,63 +737,58 @@ void px8_state::machine_reset()
     MACHINE DRIVERS
 ***************************************************************************/
 
-MACHINE_CONFIG_START(px8_state::px8)
+void px8_state::px8(machine_config &config)
+{
 	/* main cpu (uPD70008) */
-	MCFG_CPU_ADD(UPD70008_TAG, Z80, XTAL_CR1 / 4) /* 2.45 MHz */
-	MCFG_CPU_PROGRAM_MAP(px8_mem)
-	MCFG_CPU_IO_MAP(px8_io)
+	Z80(config, m_maincpu, XTAL_CR1 / 4); /* 2.45 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &px8_state::px8_mem);
+	m_maincpu->set_addrmap(AS_IO, &px8_state::px8_io);
 
 	/* slave cpu (HD6303) */
-	MCFG_CPU_ADD(HD6303_TAG, M6803, XTAL_CR1 / 4) /* 614 kHz */
-	MCFG_CPU_PROGRAM_MAP(px8_slave_mem)
-	MCFG_CPU_IO_MAP(px8_slave_io)
-	MCFG_DEVICE_DISABLE()
+	m6803_cpu_device &slave(M6803(config, HD6303_TAG, XTAL_CR1 / 4)); /* 614 kHz */
+	slave.set_addrmap(AS_PROGRAM, &px8_state::px8_slave_mem);
+	slave.set_disable();
 
 	/* sub CPU (uPD7508) */
-//  MCFG_CPU_ADD(UPD7508_TAG, UPD7508, 200000) /* 200 kHz */
-//  MCFG_CPU_IO_MAP(px8_sub_io)
-//  MCFG_DEVICE_DISABLE()
+//  upd7508_device &sub(UPD7508(config, UPD7508_TAG, 200000)); /* 200 kHz */
+//  sub.set_addrmap(AS_IO, &px8_state::px8_sub_io);
+//  sub.set_disable();
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_px8)
+	config.set_default_layout(layout_px8);
 
-	MCFG_SCREEN_ADD(SCREEN_TAG, LCD)
-	MCFG_SCREEN_REFRESH_RATE(72)
-	MCFG_SCREEN_UPDATE_DRIVER(px8_state, screen_update)
-	MCFG_SCREEN_SIZE(480, 64)
-	MCFG_SCREEN_VISIBLE_AREA(0, 479, 0, 63)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(72);
+	screen.set_screen_update(FUNC(px8_state::screen_update));
+	screen.set_size(480, 64);
+	screen.set_visarea(0, 479, 0, 63);
+	screen.set_palette("palette");
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", px8)
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(px8_state, px8)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_px8);
+	PALETTE(config, "palette", FUNC(px8_state::px8_palette), 2);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(0, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("capsule1", generic_plain_slot, "px8_cart")
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
+	GENERIC_CARTSLOT(config, "capsule1", generic_plain_slot, "px8_cart", "bin,rom");
 
-	MCFG_GENERIC_CARTSLOT_ADD("capsule2", generic_plain_slot, "px8_cart")
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
+	GENERIC_CARTSLOT(config, "capsule2", generic_plain_slot, "px8_cart", "bin,rom");
 
 	/* devices */
-	MCFG_DEVICE_ADD(I8251_TAG, I8251, 0)
+	I8251(config, I8251_TAG, 0);
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(0, "mono", 0.05);
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 
 	// software
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "px8_cart")
-	MCFG_SOFTWARE_LIST_ADD("epson_cpm_list", "epson_cpm")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cart_list").set_original("px8_cart");
+	SOFTWARE_LIST(config, "epson_cpm_list").set_original("epson_cpm");
+}
 
 /***************************************************************************
     ROMS
@@ -813,9 +798,9 @@ ROM_START( px8 )
 	ROM_REGION( 0x10000, UPD70008_TAG, 0 )
 	ROM_DEFAULT_BIOS("052884")
 	ROM_SYSTEM_BIOS( 0, "091383", "9/13/83" )
-	ROMX_LOAD( "m25030aa.2a", 0x0000, 0x8000, CRC(bd3e4938) SHA1(5bd48abd2a563a1ae31ff137280f40c8f756e969), ROM_BIOS(1) )
+	ROMX_LOAD( "m25030aa.2a", 0x0000, 0x8000, CRC(bd3e4938) SHA1(5bd48abd2a563a1ae31ff137280f40c8f756e969), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "052884", "5/28/84" )
-	ROMX_LOAD( "px060688.2a", 0x0000, 0x8000, CRC(44308bdf) SHA1(5c4545fcf1af9931b4699436294d9b6298052a7b), ROM_BIOS(2) )
+	ROMX_LOAD( "px060688.2a", 0x0000, 0x8000, CRC(44308bdf) SHA1(5c4545fcf1af9931b4699436294d9b6298052a7b), ROM_BIOS(1) )
 
 	ROM_REGION( 0x0800, SED1320_TAG, 0 )
 	ROM_LOAD( "font.rom", 0x0000, 0x0800, CRC(5b52edbd) SHA1(38197edf301bb2843bea040536af545f76b3d44f) )
@@ -835,5 +820,5 @@ ROM_END
     SYSTEM DRIVERS
 ***************************************************************************/
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT  STATE      INIT    COMPANY     FULLNAME    FLAGS */
-COMP( 1984, px8,    0,      0,      px8,    px8,   px8_state, 0,      "Epson",    "PX-8",     MACHINE_NOT_WORKING )
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY  FULLNAME  FLAGS */
+COMP( 1984, px8,  0,      0,      px8,     px8,   px8_state, empty_init, "Epson", "PX-8",   MACHINE_NOT_WORKING )

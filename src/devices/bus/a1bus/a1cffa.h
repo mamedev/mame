@@ -14,7 +14,7 @@
 #pragma once
 
 #include "a1bus.h"
-#include "machine/ataintf.h"
+#include "bus/ata/ataintf.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -43,7 +43,7 @@ protected:
 	required_device<ata_interface_device> m_ata;
 
 private:
-	uint8_t *m_rom;
+	required_region_ptr<uint8_t> m_rom;
 	uint16_t m_lastdata;
 	bool m_writeprotect;
 };

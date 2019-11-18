@@ -38,7 +38,16 @@
 
 #include "emu.h"
 #include "handset.h"
-#include "machine/tms9901.h"
+
+#define LOG_WARN        (1U<<1)   // Warnings
+#define LOG_CONFIG      (1U<<2)   // Configuration
+#define LOG_JOYSTICK    (1U<<3)
+#define LOG_HANDSET     (1U<<4)
+#define LOG_CLOCK       (1U<<5)
+
+#define VERBOSE ( LOG_CONFIG | LOG_WARN )
+
+#include "logmacro.h"
 
 DEFINE_DEVICE_TYPE_NS(TI99_JOYSTICK, bus::ti99::joyport, ti99_twin_joystick_device, "ti99_twinjoy", "TI-99/4(A) Twin Joysticks")
 DEFINE_DEVICE_TYPE_NS(TI99_HANDSET, bus::ti99::joyport, ti99_handset_device, "ti99_handset", "TI-99/4 IR handset")
@@ -81,7 +90,7 @@ uint8_t ti99_handset_device::read_dev()
 
 void ti99_handset_device::write_dev(uint8_t data)
 {
-	if (TRACE_HANDSET) logerror("Set ack %d\n", data);
+	LOGMASKED(LOG_HANDSET, "Set ack %d\n", data);
 	set_acknowledge(data);
 }
 
@@ -146,7 +155,7 @@ void ti99_handset_device::post_message(int message)
 	m_clock_high = true;
 	m_buf = ~message;
 	m_buflen = 3;
-	if (TRACE_HANDSET) logerror("trigger interrupt\n");
+	LOGMASKED(LOG_HANDSET, "trigger interrupt\n");
 	m_joyport->set_interrupt(ASSERT_LINE);
 }
 
@@ -318,7 +327,7 @@ void ti99_handset_device::do_task()
 
 void ti99_handset_device::pulse_clock()
 {
-	logerror("handset: pulse_clock\n");
+	LOGMASKED(LOG_CLOCK, "pulse_clock\n");
 	do_task();
 }
 
@@ -335,7 +344,6 @@ void ti99_handset_device::device_start()
 
 void ti99_handset_device::device_reset()
 {
-	if (TRACE_HANDSET) logerror("Reset\n");
 	m_delay_timer->enable(true);
 	m_buf = 0;
 	m_buflen = 0;
@@ -523,13 +531,13 @@ uint8_t ti99_twin_joystick_device::read_dev()
 		if (m_joystick==2) value = ioport("JOY2")->read();
 		else value = 0xff;
 	}
-	if (TRACE_JOYSTICK) logerror("joy%d = %02x\n", m_joystick, value);
+	LOGMASKED(LOG_JOYSTICK, "joy%d = %02x\n", m_joystick, value);
 	return value;
 }
 
 void ti99_twin_joystick_device::write_dev(uint8_t data)
 {
-	if (TRACE_JOYSTICK) logerror("Select joystick %d\n", data);
+	LOGMASKED(LOG_JOYSTICK, "Select joystick %d\n", data);
 	m_joystick = data & 0x03;
 }
 

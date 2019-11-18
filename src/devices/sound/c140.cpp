@@ -10,12 +10,7 @@ This chip controls 24 channels (C140) or 16 (219) of PCM.
 16 bytes are associated with each channel.
 Channels can be 8 bit signed PCM, or 12 bit signed PCM.
 
-Timer behavior is not yet handled.
-
-Unmapped registers:
-    0x1f8:timer interval?   (Nx0.1 ms)
-    0x1fa:irq ack? timer restart?
-    0x1fe:timer switch?(0:off 1:on)
+TODO: What does the INT0 pin do? Normally Namco tied it to VOL0 (with VOL1 = VCC).
 
 --------------
 
@@ -89,14 +84,14 @@ static inline int limit(int32_t in)
 c140_device::c140_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, C140, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
+	, device_rom_interface(mconfig, *this, 21)
+	, m_int1_callback(*this)
 	, m_sample_rate(0)
 	, m_stream(nullptr)
 	, m_banking_type(C140_TYPE::SYSTEM2)
 	, m_mixer_buffer_left(nullptr)
 	, m_mixer_buffer_right(nullptr)
 	, m_baserate(0)
-	, m_rom_ptr(*this, DEVICE_SELF)
-	, m_pRom(nullptr)
 {
 	memset(m_REG, 0, sizeof(uint8_t)*0x200);
 	memset(m_pcmtbl, 0, sizeof(int16_t)*8);
@@ -111,12 +106,10 @@ void c140_device::device_start()
 {
 	m_sample_rate = m_baserate = clock();
 
-	m_stream = stream_alloc(0, 2, m_sample_rate);
+	m_int1_callback.resolve_safe();
+	m_int1_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(c140_device::int1_on), this));
 
-	if (m_rom_ptr != nullptr)
-	{
-		m_pRom = m_rom_ptr;
-	}
+	m_stream = stream_alloc(0, 2, m_sample_rate);
 
 	/* make decompress pcm table */     //2000.06.26 CAB
 	int32_t segbase = 0;
@@ -135,7 +128,7 @@ void c140_device::device_start()
 
 	/* allocate a pair of buffers to mix into - 1 second's worth should be more than enough */
 	m_mixer_buffer_left = std::make_unique<int16_t[]>(m_sample_rate);
-	m_mixer_buffer_right = std::make_unique<int16_t[]>(m_sample_rate);;
+	m_mixer_buffer_right = std::make_unique<int16_t[]>(m_sample_rate);
 
 	save_item(NAME(m_REG));
 
@@ -159,6 +152,24 @@ void c140_device::device_start()
 }
 
 
+void c140_device::device_clock_changed()
+{
+	m_sample_rate = m_baserate = clock();
+
+	m_stream->set_sample_rate(m_sample_rate);
+
+	/* allocate a pair of buffers to mix into - 1 second's worth should be more than enough */
+	m_mixer_buffer_left = std::make_unique<int16_t[]>(m_sample_rate);
+	m_mixer_buffer_right = std::make_unique<int16_t[]>(m_sample_rate);;
+}
+
+
+void c140_device::rom_bank_updated()
+{
+	m_stream->update();
+}
+
+
 //-------------------------------------------------
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
@@ -172,7 +183,7 @@ void c140_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 	int32_t   sdt;
 	int32_t   st,ed,sz;
 
-	int8_t    *pSampleData;
+	long      sampleData;
 	int32_t   frequency,delta,offset,pos;
 	int32_t   cnt, voicecnt;
 	int32_t   lastdt,prevdt,dltdt;
@@ -219,7 +230,7 @@ void c140_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 			sz=ed-st;
 
 			/* Retrieve base pointer to the sample data */
-			pSampleData = m_pRom + find_sample(st, v->bank, i);
+			sampleData = find_sample(st, v->bank, i);
 
 			/* Fetch back previous data pointers */
 			offset=v->ptoffset;
@@ -257,7 +268,7 @@ void c140_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 						}
 
 						/* Read the chosen sample byte */
-						dt=pSampleData[pos];
+						dt = (int8_t) read_byte(sampleData + pos);
 
 						/* decompress to 13bit range */     //2000.06.26 CAB
 						sdt=dt>>3;              //signed
@@ -307,7 +318,7 @@ void c140_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 
 						if (m_banking_type == C140_TYPE::ASIC219)
 						{
-							lastdt = pSampleData[BYTE_XOR_BE(pos)];
+							lastdt = (int8_t) read_byte(sampleData + BYTE_XOR_BE(pos));
 
 							// Sign + magnitude format
 							if ((v->mode & 0x01) && (lastdt & 0x80))
@@ -319,7 +330,7 @@ void c140_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 						}
 						else
 						{
-							lastdt=pSampleData[pos];
+							lastdt = (int8_t) read_byte(sampleData + pos);
 						}
 
 						dltdt = (lastdt - prevdt);
@@ -362,21 +373,21 @@ void c140_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 }
 
 
-READ8_MEMBER( c140_device::c140_r )
+u8 c140_device::c140_r(offs_t offset)
 {
 	offset&=0x1ff;
 	return m_REG[offset];
 }
 
 
-WRITE8_MEMBER( c140_device::c140_w )
+void c140_device::c140_w(offs_t offset, u8 data)
 {
 	m_stream->update();
 
 	offset&=0x1ff;
 
 	// mirror the bank registers on the 219, fixes bkrtmaq (and probably xday2 based on notes in the HLE)
-	if ((offset >= 0x1f8) && (m_banking_type == C140_TYPE::ASIC219))
+	if ((offset >= 0x1f8) && BIT(offset, 0) && (m_banking_type == C140_TYPE::ASIC219))
 	{
 		offset -= 8;
 	}
@@ -428,12 +439,36 @@ WRITE8_MEMBER( c140_device::c140_w )
 			}
 		}
 	}
+	else if (offset == 0x1fa)
+	{
+		m_int1_callback(CLEAR_LINE);
+
+		// timing not verified
+		unsigned div = m_REG[0x1f8] != 0 ? m_REG[0x1f8] : 256;
+		attotime interval = attotime::from_ticks(div * 2, m_baserate);
+		if (BIT(m_REG[0x1fe], 0))
+			m_int1_timer->adjust(interval);
+	}
+	else if (offset == 0x1fe)
+	{
+		if (BIT(data, 0))
+		{
+			// kyukaidk and marvlandj want the first interrupt to happen immediately
+			if (!m_int1_timer->enabled())
+				m_int1_callback(ASSERT_LINE);
+		}
+		else
+		{
+			m_int1_callback(CLEAR_LINE);
+			m_int1_timer->enable(false);
+		}
+	}
 }
 
 
-void c140_device::set_base(void *base)
+TIMER_CALLBACK_MEMBER(c140_device::int1_on)
 {
-	m_pRom = (int8_t *)base;
+	m_int1_callback(ASSERT_LINE);
 }
 
 

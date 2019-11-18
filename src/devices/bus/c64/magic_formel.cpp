@@ -96,12 +96,13 @@ WRITE_LINE_MEMBER( c64_magic_formel_cartridge_device::pia_cb2_w )
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(c64_magic_formel_cartridge_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(MC6821_TAG, PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(c64_magic_formel_cartridge_device, pia_pa_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(c64_magic_formel_cartridge_device, pia_pb_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(c64_magic_formel_cartridge_device, pia_cb2_w))
-MACHINE_CONFIG_END
+void c64_magic_formel_cartridge_device::device_add_mconfig(machine_config &config)
+{
+	PIA6821(config, m_pia, 0);
+	m_pia->writepa_handler().set(FUNC(c64_magic_formel_cartridge_device::pia_pa_w));
+	m_pia->writepb_handler().set(FUNC(c64_magic_formel_cartridge_device::pia_pb_w));
+	m_pia->cb2_handler().set(FUNC(c64_magic_formel_cartridge_device::pia_cb2_w));
+}
 
 
 //-------------------------------------------------
@@ -129,7 +130,7 @@ INPUT_CHANGED_MEMBER( c64_magic_formel_cartridge_device::freeze )
 
 static INPUT_PORTS_START( c64_magic_formel )
 	PORT_START("FREEZE")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Freeze") PORT_CODE(KEYCODE_F12) PORT_CHANGED_MEMBER(DEVICE_SELF, c64_magic_formel_cartridge_device, freeze, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Freeze") PORT_CODE(KEYCODE_F12) PORT_CHANGED_MEMBER(DEVICE_SELF, c64_magic_formel_cartridge_device, freeze, 0)
 INPUT_PORTS_END
 
 
@@ -205,7 +206,7 @@ void c64_magic_formel_cartridge_device::device_reset()
 //  c64_cd_r - cartridge data read
 //-------------------------------------------------
 
-uint8_t c64_magic_formel_cartridge_device::c64_cd_r(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+uint8_t c64_magic_formel_cartridge_device::c64_cd_r(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!romh)
 	{
@@ -226,7 +227,7 @@ uint8_t c64_magic_formel_cartridge_device::c64_cd_r(address_space &space, offs_t
 //  c64_cd_w - cartridge data write
 //-------------------------------------------------
 
-void c64_magic_formel_cartridge_device::c64_cd_w(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+void c64_magic_formel_cartridge_device::c64_cd_w(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!io1 && !m_ram_oe)
 	{
@@ -238,7 +239,7 @@ void c64_magic_formel_cartridge_device::c64_cd_w(address_space &space, offs_t of
 		offs_t addr = (offset >> 6) & 0x03;
 		uint8_t new_data = (BIT(data, 1) << 7) | (offset & 0x3f);
 
-		m_pia->write(space, addr, new_data);
+		m_pia->write(addr, new_data);
 	}
 	else if (offset == 0x0001)
 	{

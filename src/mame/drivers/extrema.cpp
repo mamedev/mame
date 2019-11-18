@@ -20,11 +20,14 @@ class extrema_state : public driver_device
 {
 public:
 	extrema_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+	{ }
 
-	required_device<cpu_device> m_maincpu;
 	void extrema(machine_config &config);
+
+private:
+	required_device<cpu_device> m_maincpu;
 	void extrema_map(address_map &map);
 	void extrema_portmap(address_map &map);
 };
@@ -48,12 +51,13 @@ static INPUT_PORTS_START( extrema )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(extrema_state::extrema)
+void extrema_state::extrema(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 6000000)
-	MCFG_CPU_PROGRAM_MAP(extrema_map)
-	MCFG_CPU_IO_MAP(extrema_portmap)
-MACHINE_CONFIG_END
+	Z80(config, m_maincpu, 6000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &extrema_state::extrema_map);
+	m_maincpu->set_addrmap(AS_IO, &extrema_state::extrema_portmap);
+}
 
 
 
@@ -163,13 +167,13 @@ ROM_END
 
 
 
-GAME( 200?, maski,    0,          extrema, extrema, extrema_state,  0,             ROT0,  "Extrema", "Maski Show (Russia) (Extrema)",      MACHINE_IS_SKELETON )
-GAME( 200?, adults,   0,          extrema, extrema, extrema_state,  0,             ROT0,  "Extrema", "Adults Only (Russia) (Extrema)",     MACHINE_IS_SKELETON )
-GAME( 200?, bloto,    0,          extrema, extrema, extrema_state,  0,             ROT0,  "Extrema", "Blits Loto (Russia) (Extrema)",      MACHINE_IS_SKELETON )
-GAME( 200?, blpearl,  0,          extrema, extrema, extrema_state,  0,             ROT0,  "Extrema", "Black Pearl (Russia) (Extrema)",     MACHINE_IS_SKELETON )
-GAME( 200?, grancan,  0,          extrema, extrema, extrema_state,  0,             ROT0,  "Extrema", "Grand Canyon (Russia) (Extrema)",    MACHINE_IS_SKELETON )
-GAME( 200?, luckshel, 0,          extrema, extrema, extrema_state,  0,             ROT0,  "Extrema", "Lucky Shell (Russia) (Extrema)",     MACHINE_IS_SKELETON )
-GAME( 200?, exsafar,  0,          extrema, extrema, extrema_state,  0,             ROT0,  "Extrema", "Safari (Russia) (Extrema)",          MACHINE_IS_SKELETON )
-GAME( 200?, strlink,  0,          extrema, extrema, extrema_state,  0,             ROT0,  "Extrema", "Strong Link (Russia) (Extrema)",     MACHINE_IS_SKELETON )
-GAME( 200?, extrmth,  0,          extrema, extrema, extrema_state,  0,             ROT0,  "Extrema", "Treasure Hunt (Russia) (Extrema)",   MACHINE_IS_SKELETON )
-GAME( 200?, extrmti,  0,          extrema, extrema, extrema_state,  0,             ROT0,  "Extrema", "Treasure Island (Russia) (Extrema)", MACHINE_IS_SKELETON )
+GAME( 200?, maski,    0,          extrema, extrema, extrema_state, empty_init, ROT0,  "Extrema", "Maski Show (Russia) (Extrema)",      MACHINE_IS_SKELETON )
+GAME( 200?, adults,   0,          extrema, extrema, extrema_state, empty_init, ROT0,  "Extrema", "Adults Only (Russia) (Extrema)",     MACHINE_IS_SKELETON )
+GAME( 200?, bloto,    0,          extrema, extrema, extrema_state, empty_init, ROT0,  "Extrema", "Blits Loto (Russia) (Extrema)",      MACHINE_IS_SKELETON )
+GAME( 200?, blpearl,  0,          extrema, extrema, extrema_state, empty_init, ROT0,  "Extrema", "Black Pearl (Russia) (Extrema)",     MACHINE_IS_SKELETON )
+GAME( 200?, grancan,  0,          extrema, extrema, extrema_state, empty_init, ROT0,  "Extrema", "Grand Canyon (Russia) (Extrema)",    MACHINE_IS_SKELETON )
+GAME( 200?, luckshel, 0,          extrema, extrema, extrema_state, empty_init, ROT0,  "Extrema", "Lucky Shell (Russia) (Extrema)",     MACHINE_IS_SKELETON )
+GAME( 200?, exsafar,  0,          extrema, extrema, extrema_state, empty_init, ROT0,  "Extrema", "Safari (Russia) (Extrema)",          MACHINE_IS_SKELETON )
+GAME( 200?, strlink,  0,          extrema, extrema, extrema_state, empty_init, ROT0,  "Extrema", "Strong Link (Russia) (Extrema)",     MACHINE_IS_SKELETON )
+GAME( 200?, extrmth,  0,          extrema, extrema, extrema_state, empty_init, ROT0,  "Extrema", "Treasure Hunt (Russia) (Extrema)",   MACHINE_IS_SKELETON )
+GAME( 200?, extrmti,  0,          extrema, extrema, extrema_state, empty_init, ROT0,  "Extrema", "Treasure Island (Russia) (Extrema)", MACHINE_IS_SKELETON )

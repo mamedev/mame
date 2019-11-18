@@ -13,8 +13,11 @@
 
 #include "ui/menu.h"
 
+#include <list>
+
 
 namespace ui {
+
 // ======================> menu_software_parts
 
 class menu_software_parts : public menu
@@ -33,15 +36,18 @@ public:
 	virtual ~menu_software_parts() override;
 
 private:
-	struct software_part_menu_entry {
+	struct software_part_menu_entry
+	{
 		result type;
 		const software_part *part;
 	};
+	using entry_list = std::list<software_part_menu_entry>;
 
 	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 
 	// variables
+	entry_list              m_entries;
 	const software_info *   m_info;
 	const char *            m_interface;
 	const software_part **  m_selected_part;

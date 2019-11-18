@@ -97,6 +97,7 @@ E000-FFFF  | R | D D D D D D D D | 8K ROM
 
 #include "cpu/m6809/m6809.h"
 #include "machine/bfm_bd1.h"  // vfd
+#include "emupal.h"
 #include "rendlay.h"
 #include "screen.h"
 
@@ -133,7 +134,7 @@ static const gfx_layout charlayout =
 // characters are grouped by 64 (512 pixels)
 // there are max 128 of these groups
 
-static GFXDECODE_START( adder2 )
+static GFXDECODE_START( gfx_adder2 )
 	GFXDECODE_ENTRY( ":gfx1",  0, charlayout, 0, 16 )
 GFXDECODE_END
 
@@ -141,7 +142,7 @@ DEFINE_DEVICE_TYPE(BFM_ADDER2, bfm_adder2_device, "bfm_adder2", "BFM ADDER2")
 
 bfm_adder2_device::bfm_adder2_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock )
 	: device_t(mconfig, BFM_ADDER2, tag, owner, clock)
-	, device_gfx_interface(mconfig, *this, GFXDECODE_NAME(adder2), "palette")
+	, device_gfx_interface(mconfig, *this, gfx_adder2, "palette")
 	, m_cpu(*this, "adder2")
 {
 }
@@ -232,9 +233,9 @@ void bfm_adder2_device::device_start()
 	save_item(NAME(m_adder_ram));
 	save_item(NAME(m_screen_ram));
 
-	m_tilemap0 = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(bfm_adder2_device::get_tile0_info),this), TILEMAP_SCAN_ROWS,  8, 8, 50, 35);
+	m_tilemap0 = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(bfm_adder2_device::get_tile0_info)), TILEMAP_SCAN_ROWS,  8, 8, 50, 35);
 
-	m_tilemap1 = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(bfm_adder2_device::get_tile1_info),this), TILEMAP_SCAN_ROWS,  8, 8, 50, 35);
+	m_tilemap1 = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(bfm_adder2_device::get_tile1_info)), TILEMAP_SCAN_ROWS,  8, 8, 50, 35);
 
 	palette().set_pen_color(0,rgb_t(0x00,0x00,0x00));
 	palette().set_pen_color(1,rgb_t(0x00,0x00,0xFF));
@@ -524,21 +525,21 @@ void bfm_adder2_device::adder2_decode_char_roms()
 void bfm_adder2_device::adder2_memmap(address_map &map)
 {
 
-	map(0x0000, 0x0000).w(this, FUNC(bfm_adder2_device::adder2_screen_page_w));      // screen access/display select
+	map(0x0000, 0x0000).w(FUNC(bfm_adder2_device::adder2_screen_page_w));      // screen access/display select
 	map(0x0000, 0x7FFF).bankr("bank2");                // 8k  paged ROM (4 pages)
-	map(0x8000, 0x917F).rw(this, FUNC(bfm_adder2_device::screen_ram_r), FUNC(bfm_adder2_device::screen_ram_w));
-	map(0x9180, 0x9FFF).rw(this, FUNC(bfm_adder2_device::normal_ram_r), FUNC(bfm_adder2_device::normal_ram_w));
+	map(0x8000, 0x917F).rw(FUNC(bfm_adder2_device::screen_ram_r), FUNC(bfm_adder2_device::screen_ram_w));
+	map(0x9180, 0x9FFF).rw(FUNC(bfm_adder2_device::normal_ram_r), FUNC(bfm_adder2_device::normal_ram_w));
 
-	map(0xC000, 0xC000).w(this, FUNC(bfm_adder2_device::adder2_rom_page_w));     // ROM page select
-	map(0xC001, 0xC001).w(this, FUNC(bfm_adder2_device::adder2_c001_w));         // ??
+	map(0xC000, 0xC000).w(FUNC(bfm_adder2_device::adder2_rom_page_w));     // ROM page select
+	map(0xC001, 0xC001).w(FUNC(bfm_adder2_device::adder2_c001_w));         // ??
 
-	map(0xC101, 0xC101).rw(this, FUNC(bfm_adder2_device::adder2_vbl_ctrl_r), FUNC(bfm_adder2_device::adder2_vbl_ctrl_w));
-	map(0xC103, 0xC103).r(this, FUNC(bfm_adder2_device::adder2_irq_r));               // IRQ latch read
+	map(0xC101, 0xC101).rw(FUNC(bfm_adder2_device::adder2_vbl_ctrl_r), FUNC(bfm_adder2_device::adder2_vbl_ctrl_w));
+	map(0xC103, 0xC103).r(FUNC(bfm_adder2_device::adder2_irq_r));               // IRQ latch read
 
 	// MC6850 compatible uart connected to main (scorpion2) board ///////////////////////////////////////
 
-	map(0xC200, 0xC200).rw(this, FUNC(bfm_adder2_device::adder2_uart_ctrl_r), FUNC(bfm_adder2_device::adder2_uart_ctrl_w));   // 6850 compatible uart control reg
-	map(0xC201, 0xC201).rw(this, FUNC(bfm_adder2_device::adder2_uart_rx_r), FUNC(bfm_adder2_device::adder2_uart_tx_w));   // 6850 compatible uart data reg
+	map(0xC200, 0xC200).rw(FUNC(bfm_adder2_device::adder2_uart_ctrl_r), FUNC(bfm_adder2_device::adder2_uart_ctrl_w));   // 6850 compatible uart control reg
+	map(0xC201, 0xC201).rw(FUNC(bfm_adder2_device::adder2_uart_rx_r), FUNC(bfm_adder2_device::adder2_uart_tx_w));   // 6850 compatible uart data reg
 
 	map(0xE000, 0xFFFF).rom().region(":adder2", 0xE000);                         // 8k  ROM
 }
@@ -548,17 +549,18 @@ void bfm_adder2_device::adder2_memmap(address_map &map)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(bfm_adder2_device::device_add_mconfig)
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_SIZE( 400, 280)
-	MCFG_SCREEN_VISIBLE_AREA(  0, 400-1, 0, 280-1)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, bfm_adder2_device, update_screen)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(bfm_adder2_device, adder2_vbl_w))      // board has a VBL IRQ
+void bfm_adder2_device::device_add_mconfig(machine_config &config)
+{
+	M6809(config, m_cpu, ADDER_CLOCK/4);  // adder2 board 6809 CPU at 2 Mhz
+	m_cpu->set_addrmap(AS_PROGRAM, &bfm_adder2_device::adder2_memmap);             // setup adder2 board memorymap
 
-	MCFG_PALETTE_ADD("palette", 16)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_size(400, 280);
+	screen.set_visarea(0, 400-1, 0, 280-1);
+	screen.set_refresh_hz(50);
+	screen.set_palette("palette");
+	screen.set_screen_update(FUNC(bfm_adder2_device::update_screen));
+	screen.screen_vblank().set(FUNC(bfm_adder2_device::adder2_vbl_w));      // board has a VBL IRQ
 
-	MCFG_CPU_ADD("adder2", M6809, ADDER_CLOCK/4 )  // adder2 board 6809 CPU at 2 Mhz
-	MCFG_CPU_PROGRAM_MAP(adder2_memmap)             // setup adder2 board memorymap
-MACHINE_CONFIG_END
+	PALETTE(config, "palette").set_entries(16);
+}

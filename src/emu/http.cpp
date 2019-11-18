@@ -7,8 +7,13 @@ http.cpp
 HTTP server handling
 
 ***************************************************************************/
-
 #include "emu.h"
+
+#ifdef __sun
+#define ASIO_DISABLE_DEV_POLL
+#define ASIO_HAS_EPOLL
+#endif
+
 #include "server_ws_impl.hpp"
 #include "server_http_impl.hpp"
 #include <fstream>
@@ -132,6 +137,8 @@ public:
 		m_path_end = m_query == std::string::npos ? m_query_end : m_query;
 	}
 
+	virtual ~http_request_impl() = default;
+
 	/** Retrieves the requested resource. */
 	virtual const std::string get_resource() {
 		// The entire resource: path, query and fragment.
@@ -189,6 +196,8 @@ struct http_response_impl : public http_manager::http_response {
 	std::stringstream m_body;
 
 	http_response_impl(std::shared_ptr<webpp::Response> response) : m_response(response) { }
+
+	virtual ~http_response_impl() = default;
 
 	/** Sets the HTTP status to be returned to the client. */
 	virtual void set_status(int status) {

@@ -33,11 +33,13 @@ public:
 	{
 	}
 
+	void digijet(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 
 	virtual void machine_start() override { }
 	virtual void machine_reset() override { }
-	void digijet(machine_config &config);
 	void io_map(address_map &map);
 };
 
@@ -48,16 +50,17 @@ void digijet_state::io_map(address_map &map)
 static INPUT_PORTS_START( digijet )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(digijet_state::digijet)
+void digijet_state::digijet(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD(I8049_TAG, I8049, XTAL(11'000'000))
-	MCFG_CPU_IO_MAP(io_map)
-MACHINE_CONFIG_END
+	I8049(config, m_maincpu, XTAL(11'000'000));
+	m_maincpu->set_addrmap(AS_IO, &digijet_state::io_map);
+}
 
 ROM_START( digijet )
 	ROM_REGION( 0x800, I8049_TAG, 0 )
 	ROM_LOAD( "vanagon_85_usa_ca.bin", 0x000, 0x800, CRC(2ed7c4c5) SHA1(ae48d8892b44fe76b48bcefd293c15cd47af3fba) ) // Volkswagen Vanagon, 1985, USA, California
 ROM_END
 
-//    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     STATE        INIT  COMPANY       FULLNAME   FLAGS
-CONS( 1985, digijet,  0,        0,        digijet,  digijet,  digijet_state,  0, "Volkswagen", "Digijet", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY       FULLNAME   FLAGS
+CONS( 1985, digijet, 0,      0,      digijet, digijet, digijet_state, empty_init, "Volkswagen", "Digijet", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

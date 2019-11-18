@@ -17,8 +17,6 @@ Template for skeleton device
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_XXX_ADD(tag, freq) \
-		MCFG_DEVICE_ADD((tag), XXX, (freq))
 
 
 //**************************************************************************

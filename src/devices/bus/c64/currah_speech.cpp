@@ -72,20 +72,11 @@ Notes:
 #include "speaker.h"
 
 
-
-//**************************************************************************
-//  MACROS/CONSTANTS
-//**************************************************************************
-
-#define SP0256_TAG      "sp0256"
-
-
-
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(C64_CURRAH_SPEECH, c64_currah_speech_cartridge_device, "c64_cs", "C64 Currah Speech")
+DEFINE_DEVICE_TYPE(C64_CURRAH_SPEECH, c64_currah_speech_cartridge_device, "c64_cspeech", "C64 Currah Speech")
 
 
 //-------------------------------------------------
@@ -93,7 +84,7 @@ DEFINE_DEVICE_TYPE(C64_CURRAH_SPEECH, c64_currah_speech_cartridge_device, "c64_c
 //-------------------------------------------------
 
 ROM_START( c64_currah_speech )
-	ROM_REGION( 0x10000, SP0256_TAG, 0 )
+	ROM_REGION( 0x10000, "sp0256", 0 )
 	ROM_LOAD( "sp0256a-al2", 0x1000, 0x0800, CRC(b504ac15) SHA1(e60fcb5fa16ff3f3b69d36c7a6e955744d3feafc) )
 ROM_END
 
@@ -112,11 +103,12 @@ const tiny_rom_entry *c64_currah_speech_cartridge_device::device_rom_region() co
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(c64_currah_speech_cartridge_device::device_add_mconfig)
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(SP0256_TAG, SP0256, 4000000) // ???
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-MACHINE_CONFIG_END
+void c64_currah_speech_cartridge_device::device_add_mconfig(machine_config &config)
+{
+	SPEAKER(config, "mono").front_center();
+	SP0256(config, m_nsp, 4000000); // ???
+	m_nsp->add_route(ALL_OUTPUTS, "mono", 1.00);
+}
 
 
 
@@ -149,7 +141,7 @@ void c64_currah_speech_cartridge_device::set_osc1(int voice, int intonation)
 c64_currah_speech_cartridge_device::c64_currah_speech_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, C64_CURRAH_SPEECH, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
-	m_nsp(*this, SP0256_TAG)
+	m_nsp(*this, "sp0256")
 {
 }
 
@@ -178,7 +170,7 @@ void c64_currah_speech_cartridge_device::device_reset()
 //  c64_cd_r - cartridge data read
 //-------------------------------------------------
 
-uint8_t c64_currah_speech_cartridge_device::c64_cd_r(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+uint8_t c64_currah_speech_cartridge_device::c64_cd_r(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!romh)
 	{
@@ -218,7 +210,7 @@ uint8_t c64_currah_speech_cartridge_device::c64_cd_r(address_space &space, offs_
 //  c64_cd_w - cartridge data write
 //-------------------------------------------------
 
-void c64_currah_speech_cartridge_device::c64_cd_w(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+void c64_currah_speech_cartridge_device::c64_cd_w(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!io1)
 	{
@@ -242,6 +234,6 @@ void c64_currah_speech_cartridge_device::c64_cd_w(address_space &space, offs_t o
 
 		set_osc1(voice, intonation);
 
-		m_nsp->ald_w(space, 0, data & 0x3f);
+		m_nsp->ald_w(data & 0x3f);
 	}
 }

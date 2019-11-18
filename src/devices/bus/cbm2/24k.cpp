@@ -49,7 +49,7 @@ void cbm2_24k_cartridge_device::device_start()
 //  cbm2_bd_r - cartridge data read
 //-------------------------------------------------
 
-uint8_t cbm2_24k_cartridge_device::cbm2_bd_r(address_space &space, offs_t offset, uint8_t data, int csbank1, int csbank2, int csbank3)
+uint8_t cbm2_24k_cartridge_device::cbm2_bd_r(offs_t offset, uint8_t data, int csbank1, int csbank2, int csbank3)
 {
 	if (!csbank1)
 	{
@@ -72,7 +72,7 @@ uint8_t cbm2_24k_cartridge_device::cbm2_bd_r(address_space &space, offs_t offset
 //  cbm2_bd_w - cartridge data write
 //-------------------------------------------------
 
-void cbm2_24k_cartridge_device::cbm2_bd_w(address_space &space, offs_t offset, uint8_t data, int csbank1, int csbank2, int csbank3)
+void cbm2_24k_cartridge_device::cbm2_bd_w(offs_t offset, uint8_t data, int csbank1, int csbank2, int csbank3)
 {
 	if (!csbank1)
 	{

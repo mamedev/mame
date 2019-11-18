@@ -13,7 +13,7 @@ DEFINE_DEVICE_TYPE(PSX_STANDARD_CONTROLLER, psx_standard_controller_device, "psx
 
 psx_controller_port_device::psx_controller_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, PSX_CONTROLLER_PORT, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_psx_controller_interface>(mconfig, *this),
 	m_tx(false),
 	m_dev(nullptr),
 	m_card(*this, "card")
@@ -22,12 +22,13 @@ psx_controller_port_device::psx_controller_port_device(const machine_config &mco
 
 void psx_controller_port_device::device_config_complete()
 {
-	m_dev = dynamic_cast<device_psx_controller_interface *>(get_card_device());
+	m_dev = get_card_device();
 }
 
-MACHINE_CONFIG_START(psx_controller_port_device::device_add_mconfig)
-	MCFG_PSXCARD_ADD("card")
-MACHINE_CONFIG_END
+void psx_controller_port_device::device_add_mconfig(machine_config &config)
+{
+	PSXCARD(config, m_card, 0);
+}
 
 void psx_controller_port_device::disable_card(bool state)
 {
@@ -39,7 +40,8 @@ void psx_controller_port_device::disable_card(bool state)
 
 psxcontrollerports_device::psxcontrollerports_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, PSXCONTROLLERPORTS, tag, owner, clock),
-	m_port0(nullptr), m_port1(nullptr),
+	m_port0(*this, "^port1"),
+	m_port1(*this, "^port2"),
 	m_dsr_handler(*this),
 	m_rxd_handler(*this)
 {
@@ -50,26 +52,26 @@ void psxcontrollerports_device::device_start()
 	m_dsr_handler.resolve_safe();
 	m_rxd_handler.resolve_safe();
 
-	m_port0 = machine().device<psx_controller_port_device>("port1");
-	m_port1 = machine().device<psx_controller_port_device>("port2");
 	m_port0->setup_ack_cb(psx_controller_port_device::void_cb(&psxcontrollerports_device::ack, this));
 	m_port1->setup_ack_cb(psx_controller_port_device::void_cb(&psxcontrollerports_device::ack, this));
 }
 
 // add controllers to define so they can be connected to the multitap
 #define PSX_CONTROLLERS \
-		SLOT_INTERFACE("digital_pad", PSX_STANDARD_CONTROLLER) \
-		SLOT_INTERFACE("dualshock_pad", PSX_DUALSHOCK) \
-		SLOT_INTERFACE("analog_joystick", PSX_ANALOG_JOYSTICK)
+		device.option_add("digital_pad", PSX_STANDARD_CONTROLLER); \
+		device.option_add("dualshock_pad", PSX_DUALSHOCK); \
+		device.option_add("analog_joystick", PSX_ANALOG_JOYSTICK);
 
-SLOT_INTERFACE_START(psx_controllers)
+void psx_controllers(device_slot_interface &device)
+{
 	PSX_CONTROLLERS
-	SLOT_INTERFACE("multitap", PSX_MULTITAP)
-SLOT_INTERFACE_END
+	device.option_add("multitap", PSX_MULTITAP);
+}
 
-SLOT_INTERFACE_START(psx_controllers_nomulti)
+void psx_controllers_nomulti(device_slot_interface &device)
+{
 	PSX_CONTROLLERS
-SLOT_INTERFACE_END
+}
 
 WRITE_LINE_MEMBER(psxcontrollerports_device::write_dtr)
 {
@@ -96,13 +98,21 @@ void psxcontrollerports_device::ack()
 }
 
 device_psx_controller_interface::device_psx_controller_interface(const machine_config &mconfig, device_t &device) :
-	device_slot_card_interface(mconfig, device), m_odata(0), m_idata(0), m_bit(0), m_count(0), m_memcard(false), m_clock(false), m_sel(false),
+	device_interface(device, "psxctrl"),
+	m_odata(0), m_idata(0), m_bit(0), m_count(0), m_memcard(false), m_clock(false), m_sel(false),
 	m_ack(true), m_rx(false), m_ack_timer(nullptr), m_owner(nullptr)
 {
 }
 
 device_psx_controller_interface::~device_psx_controller_interface()
 {
+}
+
+void device_psx_controller_interface::interface_pre_start()
+{
+	m_owner = dynamic_cast<psx_controller_port_device *>(device().owner());
+	if (!m_ack_timer)
+		m_ack_timer = device().machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(device_psx_controller_interface::ack_timer), this));
 }
 
 void device_psx_controller_interface::interface_pre_reset()
@@ -119,10 +129,9 @@ void device_psx_controller_interface::interface_pre_reset()
 	m_owner->ack();
 }
 
-void device_psx_controller_interface::interface_pre_start()
+void device_psx_controller_interface::interface_post_stop()
 {
-	m_owner = dynamic_cast<psx_controller_port_device *>(device().owner());
-	m_ack_timer = device().machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(device_psx_controller_interface::ack_timer), this));
+	m_ack_timer = nullptr;
 }
 
 void device_psx_controller_interface::ack_timer(void *ptr, int param)
@@ -130,13 +139,13 @@ void device_psx_controller_interface::ack_timer(void *ptr, int param)
 	m_ack = param;
 	m_owner->ack();
 
-	if(!param)
+	if (!param)
 		m_ack_timer->adjust(attotime::from_usec(2), 1);
 }
 
 void device_psx_controller_interface::do_pad()
 {
-	if(!m_bit)
+	if (!m_bit)
 	{
 		if(!m_count)
 			m_odata = 0xff;

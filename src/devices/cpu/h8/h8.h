@@ -87,16 +87,18 @@ protected:
 		EXR_I  = 0x07
 	};
 
-	h8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool mode_a16, address_map_constructor map_delegate);
+	h8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor map_delegate);
 
 	// device-level overrides
+	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override;
-	virtual uint32_t execute_max_cycles() const override;
-	virtual uint32_t execute_input_lines() const override;
+	virtual uint32_t execute_min_cycles() const noexcept override;
+	virtual uint32_t execute_max_cycles() const noexcept override;
+	virtual uint32_t execute_input_lines() const noexcept override;
+	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override;
 	virtual void execute_run() override;
 
 	// device_memory_interface overrides
@@ -112,7 +114,7 @@ protected:
 
 	address_space_config program_config, io_config;
 	address_space *program, *io;
-	direct_read_data<0> *direct;
+	memory_access_cache<1, 0, ENDIANNESS_BIG> *cache;
 	h8_dma_device *dma_device;
 	h8_dtc_device *dtc_device;
 	h8_dma_state *current_dma;
@@ -131,7 +133,7 @@ protected:
 	uint32_t  TMP1, TMP2;
 	uint32_t  TMPR;                   /* For debugger ER register import */
 
-	bool has_exr, has_trace, supports_advanced, mode_advanced, mac_saturating;
+	bool has_exr, has_trace, supports_advanced, mode_advanced, mode_a20, mac_saturating;
 
 	int inst_state, inst_substate, requested_state;
 	int icount, bcount, count_before_instruction_step;
@@ -162,8 +164,8 @@ protected:
 	inline void prefetch() { prefetch_start(); prefetch_done(); }
 	inline void prefetch_noirq() { prefetch_start(); prefetch_done_noirq(); }
 	inline void prefetch_noirq_notrace() { prefetch_start(); prefetch_done_noirq_notrace(); }
-	void prefetch_start() { NPC = PC; PIR = fetch(); }
-	void prefetch_switch(uint32_t pc, uint16_t ir) { NPC = pc; PC = pc+2; PIR = ir; }
+	void prefetch_start() { NPC = PC & 0xffffff; PIR = fetch(); }
+	void prefetch_switch(uint32_t pc, uint16_t ir) { NPC = pc & 0xffffff; PC = pc+2; PIR = ir; }
 	void prefetch_done();
 	void prefetch_done_noirq();
 	void prefetch_done_noirq_notrace();

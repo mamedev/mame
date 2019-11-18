@@ -36,7 +36,7 @@ protected:
 	virtual void device_start() override;
 
 	// device_vip_expansion_card_interface overrides
-	virtual void vip_io_w(address_space &space, offs_t offset, uint8_t data) override;
+	virtual void vip_io_w(offs_t offset, uint8_t data) override;
 	virtual int vip_ef3_r() override;
 	virtual int vip_ef4_r() override;
 

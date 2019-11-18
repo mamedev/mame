@@ -36,7 +36,7 @@ kr1601rr1_device::kr1601rr1_device(const machine_config &mconfig, const char *ta
 {
 }
 
-uint8_t kr1601rr1_device::read(int offset)
+READ8_MEMBER( kr1601rr1_device::read )
 {
 	assert(EAROM_SIZE > offset);
 	if (m_earom_mode == EAROM_READ)
@@ -53,7 +53,7 @@ uint8_t kr1601rr1_device::read(int offset)
  * b7..b4 = CS _PR _ER RD
  * b3..b0 = data
  */
-void kr1601rr1_device::write(int offset, uint8_t data)
+WRITE8_MEMBER( kr1601rr1_device::write )
 {
 	assert(EAROM_SIZE > offset);
 
@@ -102,16 +102,6 @@ void kr1601rr1_device::write(int offset, uint8_t data)
 	default:
 		break;
 	}
-}
-
-READ8_MEMBER( kr1601rr1_device::read )
-{
-	return read(offset);
-}
-
-WRITE8_MEMBER( kr1601rr1_device::write )
-{
-	write(offset, data);
 }
 
 //-------------------------------------------------

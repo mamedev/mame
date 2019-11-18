@@ -47,6 +47,7 @@ protected:
 	// device_isa8_card_interface
 	virtual uint8_t dack_r(int line) override;
 	virtual void dack_w(int line, uint8_t data) override;
+	virtual void dack_line_w(int line, int state) override;
 	virtual void eop_w(int state) override;
 
 private:

@@ -1,18 +1,23 @@
 // license:BSD-3-Clause
 // copyright-holders:Hau
+#ifndef MAME_INCLUDES_QDRMFGP_H
+#define MAME_INCLUDES_QDRMFGP_H
 
-#include "machine/ataintf.h"
+#pragma once
+
+#include "bus/ata/ataintf.h"
 #include "machine/timer.h"
 #include "sound/k054539.h"
 #include "machine/k053252.h"
 #include "video/konami_helper.h"
 #include "video/k054156_k054157_k056832.h"
+#include "emupal.h"
 
 class qdrmfgp_state : public driver_device
 {
 public:
-	qdrmfgp_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	qdrmfgp_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_nvram(*this, "nvram"),
 		m_workram(*this, "workram"),
@@ -84,3 +89,5 @@ private:
 	void qdrmfgp_k054539_map(address_map &map);
 	void qdrmfgp_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_QDRMFGP_H

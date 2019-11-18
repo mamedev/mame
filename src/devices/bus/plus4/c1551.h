@@ -13,6 +13,7 @@
 
 #include "exp.h"
 #include "cpu/m6502/m6510t.h"
+#include "imagedev/floppy.h"
 #include "machine/64h156.h"
 #include "machine/6525tpi.h"
 #include "machine/pla.h"
@@ -43,24 +44,24 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 
 	// device_plus4_expansion_card_interface overrides
-	virtual uint8_t plus4_cd_r(address_space &space, offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h) override;
-	virtual void plus4_cd_w(address_space &space, offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h) override;
+	virtual uint8_t plus4_cd_r(offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h) override;
+	virtual void plus4_cd_w(offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h) override;
 
 private:
-	DECLARE_READ8_MEMBER( port_r );
-	DECLARE_WRITE8_MEMBER( port_w );
+	uint8_t port_r();
+	void port_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER( tcbm_data_r );
-	DECLARE_WRITE8_MEMBER( tcbm_data_w );
-	DECLARE_READ8_MEMBER( tpi0_pc_r );
-	DECLARE_WRITE8_MEMBER( tpi0_pc_w );
+	uint8_t tcbm_data_r();
+	void tcbm_data_w(uint8_t data);
+	uint8_t tpi0_pc_r();
+	void tpi0_pc_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER( tpi1_pb_r );
-	DECLARE_READ8_MEMBER( tpi1_pc_r );
-	DECLARE_WRITE8_MEMBER( tpi1_pc_w );
+	uint8_t tpi1_pb_r();
+	uint8_t tpi1_pc_r();
+	void tpi1_pc_w(uint8_t data);
 
-	DECLARE_READ8_MEMBER( tpi0_r );
-	DECLARE_WRITE8_MEMBER( tpi0_w );
+	uint8_t tpi0_r(offs_t offset);
+	void tpi0_w(offs_t offset, uint8_t data);
 
 	void c1551_mem(address_map &map);
 
@@ -78,10 +79,11 @@ private:
 	required_device<tpi6525_device> m_tpi0;
 	required_device<tpi6525_device> m_tpi1;
 	required_device<c64h156_device> m_ga;
-	required_device<pla_device> m_pla;
+	required_device<pls100_device> m_pla;
 	required_device<floppy_image_device> m_floppy;
 	required_device<plus4_expansion_slot_device> m_exp;
 	required_ioport m_jp1;
+	output_finder<2> m_leds;
 
 	// TCBM bus
 	uint8_t m_tcbm_data;                      // data

@@ -72,16 +72,17 @@ DEFINE_DEVICE_TYPE(COMX_CLM, comx_clm_device, "comx_clm", "COMX 80 Column Card")
 //-------------------------------------------------
 
 ROM_START( comx_clm )
-	ROM_REGION( 0x2000, "c000", 0 )
 	ROM_DEFAULT_BIOS( "v11" )
 	ROM_SYSTEM_BIOS( 0, "v10", "v1.0" )
-	ROMX_LOAD( "p 1.0.cl1", 0x0000, 0x0800, CRC(b417d30a) SHA1(d428b0467945ecb9aec884211d0f4b1d8d56d738), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "v11", "v1.1" )
-	ROMX_LOAD( "p 1.1.cl1", 0x0000, 0x0800, CRC(0a2eaf19) SHA1(3f1f640caef964fb47aaa147cab6d215c2b30e9d), ROM_BIOS(2) )
+
+	ROM_REGION( 0x2000, "c000", 0 )
+	ROMX_LOAD( "p 1.0.cl1", 0x0000, 0x0800, CRC(b417d30a) SHA1(d428b0467945ecb9aec884211d0f4b1d8d56d738), ROM_BIOS(0) )
+	ROMX_LOAD( "p 1.1.cl1", 0x0000, 0x0800, CRC(0a2eaf19) SHA1(3f1f640caef964fb47aaa147cab6d215c2b30e9d), ROM_BIOS(1) )
 
 	ROM_REGION( 0x800, MC6845_TAG, 0 )
-	ROMX_LOAD( "c 1.0.cl4", 0x0000, 0x0800, CRC(69dd7b07) SHA1(71d368adbb299103d165eab8359a97769e463e26), ROM_BIOS(1) )
-	ROMX_LOAD( "c 1.1.cl4", 0x0000, 0x0800, CRC(dc9b5046) SHA1(4e041cec03dda6dba5e2598d060c49908a4fab2a), ROM_BIOS(2) )
+	ROMX_LOAD( "c 1.0.cl4", 0x0000, 0x0800, CRC(69dd7b07) SHA1(71d368adbb299103d165eab8359a97769e463e26), ROM_BIOS(0) )
+	ROMX_LOAD( "c 1.1.cl4", 0x0000, 0x0800, CRC(dc9b5046) SHA1(4e041cec03dda6dba5e2598d060c49908a4fab2a), ROM_BIOS(1) )
 ROM_END
 
 
@@ -127,7 +128,7 @@ MC6845_UPDATE_ROW( comx_clm_device::crtc_update_row )
 //  GFXDECODE( comx_clm )
 //-------------------------------------------------
 
-static GFXDECODE_START( comx_clm )
+static GFXDECODE_START( gfx_comx_clm )
 	GFXDECODE_ENTRY(MC6845_TAG, 0x0000, gfx_8x8x1, 0, 1)
 GFXDECODE_END
 
@@ -136,22 +137,24 @@ GFXDECODE_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(comx_clm_device::device_add_mconfig)
-	MCFG_SCREEN_ADD_MONOCHROME(MC6845_SCREEN_TAG, RASTER, rgb_t::white())
-	MCFG_SCREEN_UPDATE_DEVICE(MC6845_TAG, mc6845_device, screen_update)
-	MCFG_SCREEN_SIZE(80*8, 24*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 24*8-1)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_REFRESH_RATE(50)
+void comx_clm_device::device_add_mconfig(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, MC6845_SCREEN_TAG, SCREEN_TYPE_RASTER, rgb_t::white()));
+	screen.set_screen_update(MC6845_TAG, FUNC(mc6845_device::screen_update));
+	screen.set_size(80*8, 24*8);
+	screen.set_visarea(0, 80*8-1, 0, 24*8-1);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_refresh_hz(50);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", comx_clm)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_comx_clm);
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
-	MCFG_MC6845_ADD(MC6845_TAG, MC6845, MC6845_SCREEN_TAG, XTAL(14'318'181)/7)
-	MCFG_MC6845_SHOW_BORDER_AREA(true)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(comx_clm_device, crtc_update_row)
-MACHINE_CONFIG_END
+	MC6845(config, m_crtc, XTAL(14'318'181)/7);
+	m_crtc->set_screen(MC6845_SCREEN_TAG);
+	m_crtc->set_show_border_area(true);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(comx_clm_device::crtc_update_row));
+}
 
 
 //**************************************************************************
@@ -212,7 +215,7 @@ int comx_clm_device::comx_ef4_r()
 //  comx_mrd_r - memory read
 //-------------------------------------------------
 
-uint8_t comx_clm_device::comx_mrd_r(address_space &space, offs_t offset, int *extrom)
+uint8_t comx_clm_device::comx_mrd_r(offs_t offset, int *extrom)
 {
 	uint8_t data = 0xff;
 
@@ -226,7 +229,7 @@ uint8_t comx_clm_device::comx_mrd_r(address_space &space, offs_t offset, int *ex
 	}
 	else if (offset == 0xd801)
 	{
-		data = m_crtc->register_r(space, 0);
+		data = m_crtc->register_r();
 	}
 
 	return data;
@@ -237,7 +240,7 @@ uint8_t comx_clm_device::comx_mrd_r(address_space &space, offs_t offset, int *ex
 //  comx_mwr_w - memory write
 //-------------------------------------------------
 
-void comx_clm_device::comx_mwr_w(address_space &space, offs_t offset, uint8_t data)
+void comx_clm_device::comx_mwr_w(offs_t offset, uint8_t data)
 {
 	if (offset >= 0xd000 && offset < 0xd800)
 	{
@@ -245,10 +248,10 @@ void comx_clm_device::comx_mwr_w(address_space &space, offs_t offset, uint8_t da
 	}
 	else if (offset == 0xd800)
 	{
-		m_crtc->address_w(space, 0, data);
+		m_crtc->address_w(data);
 	}
 	else if (offset == 0xd801)
 	{
-		m_crtc->register_w(space, 0, data);
+		m_crtc->register_w(data);
 	}
 }

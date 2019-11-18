@@ -8,6 +8,7 @@
 #include "sunkbd.h"
 #include "machine/keyboard.h"
 #include "sound/beep.h"
+#include "diserial.h"
 
 
 namespace bus { namespace sunkbd {
@@ -92,6 +93,7 @@ private:
 
 	emu_timer                       *m_click_timer;
 	required_device<beep_device>    m_beeper;
+	output_finder<5>                m_leds;
 
 	uint8_t   m_make_count;
 	uint8_t   m_rx_state;
@@ -120,6 +122,7 @@ public:
 			device_t *owner,
 			uint32_t clock);
 
+protected:
 	virtual ioport_constructor device_input_ports() const override;
 
 private:
@@ -136,6 +139,7 @@ public:
 			device_t *owner,
 			uint32_t clock);
 
+protected:
 	virtual ioport_constructor device_input_ports() const override;
 };
 
@@ -149,6 +153,7 @@ public:
 			device_t *owner,
 			uint32_t clock);
 
+protected:
 	virtual ioport_constructor device_input_ports() const override;
 };
 
@@ -162,6 +167,7 @@ public:
 			device_t *owner,
 			uint32_t clock);
 
+protected:
 	virtual ioport_constructor device_input_ports() const override;
 };
 
@@ -175,6 +181,7 @@ public:
 			device_t *owner,
 			uint32_t clock);
 
+protected:
 	virtual ioport_constructor device_input_ports() const override;
 };
 
@@ -188,6 +195,7 @@ public:
 			device_t *owner,
 			uint32_t clock);
 
+protected:
 	virtual ioport_constructor device_input_ports() const override;
 };
 

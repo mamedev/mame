@@ -217,6 +217,9 @@ int netdev_pcap::recv_dev(uint8_t **buf)
 	uint8_t pktbuf[2048];
 	int ret;
 
+	// no device open?
+	if(!m_p) return 0;
+
 	// Empty
 	if(OSAtomicCompareAndSwapInt(m_ctx.head, m_ctx.tail, &m_ctx.tail)) {
 		return 0;

@@ -15,7 +15,7 @@
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
 #include "machine/ram.h"
-#include "sound/wave.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -33,9 +33,9 @@ void ondra_state::ondra_io(address_map &map)
 {
 	map.global_mask(0x0b);
 	map.unmap_value_high();
-	map(0x03, 0x03).w(this, FUNC(ondra_state::ondra_port_03_w));
-	//AM_RANGE(0x09, 0x09) AM_WRITE(ondra_port_09_w)
-	//AM_RANGE(0x0a, 0x0a) AM_WRITE(ondra_port_0a_w)
+	map(0x03, 0x03).w(FUNC(ondra_state::ondra_port_03_w));
+	//map(0x09, 0x09).w(FUNC(ondra_state::ondra_port_09_w);
+	//map(0x0a, 0x0a).w(FUNC(ondra_state::ondra_port_0a_w);
 }
 
 /* Input ports */
@@ -121,41 +121,39 @@ WRITE_LINE_MEMBER(ondra_state::vblank_irq)
 }
 
 /* Machine driver */
-MACHINE_CONFIG_START(ondra_state::ondra)
+void ondra_state::ondra(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 2000000)
-	MCFG_CPU_PROGRAM_MAP(ondra_mem)
-	MCFG_CPU_IO_MAP(ondra_io)
+	Z80(config, m_maincpu, 2000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ondra_state::ondra_mem);
+	m_maincpu->set_addrmap(AS_IO, &ondra_state::ondra_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(320, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(ondra_state, screen_update_ondra)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(ondra_state, vblank_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(320, 256);
+	screen.set_visarea(0, 320-1, 0, 256-1);
+	screen.set_screen_update(FUNC(ondra_state::screen_update_ondra));
+	screen.set_palette("palette");
+	screen.screen_vblank().set(FUNC(ondra_state::vblank_irq));
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("ondra_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cassette->set_interface("ondra_cass");
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list","ondra")
+	SOFTWARE_LIST(config, "cass_list").set_original("ondra");
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
-MACHINE_CONFIG_END
+	RAM(config, RAM_TAG).set_default_size("64K").set_default_value(0x00);
+}
 
 /* ROM definition */
 
@@ -185,6 +183,6 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT  STATE        INIT  COMPANY   FULLNAME       FLAGS
-COMP( 1989, ondrat, 0,      0,      ondra,      ondra, ondra_state, 0,    "Tesla",  "Ondra",       0 )
-COMP( 1989, ondrav, ondrat, 0,      ondra,      ondra, ondra_state, 0,    "ViLi",   "Ondra ViLi",  0 )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY  FULLNAME      FLAGS
+COMP( 1989, ondrat, 0,      0,      ondra,   ondra, ondra_state, empty_init, "Tesla", "Ondra",      0 )
+COMP( 1989, ondrav, ondrat, 0,      ondra,   ondra, ondra_state, empty_init, "ViLi",  "Ondra ViLi", 0 )

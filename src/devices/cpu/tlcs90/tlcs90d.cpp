@@ -27,23 +27,47 @@ u32 tlcs90_disassembler::opcode_alignment() const
 	return 1;
 }
 
-const char *const tlcs90_disassembler::ir_names[] =   {
+tlcs90_disassembler::tlcs90_disassembler(uint16_t iobase, const char *const ir_names[])
+	: m_iobase(iobase), m_ir_names(ir_names)
+{
+}
+
+const char *const tmp90840_disassembler::ir_names[0x40] =   {
 	"P0",       "P1",       "P01CR/IRFL",   "IRFH",     "P2",       "P2CR",     "P3",       "P3CR",
 	"P4",       "P4CR",     "P5",           "SMMOD",    "P6",       "P7",       "P67CR",    "SMCR",
 	"P8",       "P8CR",     "WDMOD",        "WDCR",     "TREG0",    "TREG1",    "TREG2",    "TREG3",
-	"TCLK",     "TFFCR",    "TMOD",         "TRUN",     "CAP1L",    "CAP1H",    "CAP2L",    "CAL2H",
+	"TCLK",     "TFFCR",    "TMOD",         "TRUN",     "CAP1L",    "CAP1H",    "CAP2L",    "CAP2H",
 	"TREG4L",   "TREG4H",   "TREG5L",       "TREG5H",   "T4MOD",    "T4FFCR",   "INTEL",    "INTEH",
-	"DMAEH",    "SCMOD",    "SCCR",         "SCBUF",    "BX",       "BY",       "ADREG",    "ADMOD"
+	"DMAEH",    "SCMOD",    "SCCR",         "SCBUF",    "BX",       "BY",       "ADREG",    "ADMOD",
+	nullptr,    nullptr,    nullptr,        nullptr,    nullptr,    nullptr,    nullptr,    nullptr,
+	nullptr,    nullptr,    nullptr,        nullptr,    nullptr,    nullptr,    nullptr,    nullptr
 };
 
-#define T90_IOBASE  0xffc0
-
-const char *tlcs90_disassembler::internal_registers_names(uint16_t x)
+tmp90840_disassembler::tmp90840_disassembler()
+	: tlcs90_disassembler(0xffc0, ir_names)
 {
-	// FIXME: TMP90PH44 and many other models have completely different SFR maps
-	int ir = x - T90_IOBASE;
-	if ( ir >= 0 && ir < ARRAY_LENGTH(ir_names) )
-		return ir_names[ir];
+}
+
+const char *const tmp90844_disassembler::ir_names[0x40] =   {
+	"P0",           "P0CR",         "P1",           "P1CR",         "P2",       "P2CR",     "P3",       "P3CR",
+	"P4",           "P4CR",         "P5",           "P6",           "P7",       "P67CR",    "P23FR",    "P4FR",
+	"P67FR",        "P25FR",        "WDMOD",        "WDCR",         "TREG0",    "TREG1",    "TREG2",    "TREG3",
+	"T01MOD",       "T23MOD",       "TFFCR",        "TRDC",         "TRUN",     nullptr,    nullptr,    nullptr,
+	"CAP1L/TREG4L", "CAP1H/TREG4H", "CAP2L/TREG5L", "CAP2H/TREG5H", "T4MOD",    "T4FFCR",   "SCMOD",    "SCCR",
+	"SCBUF",        "BRGCR",        "IRFL",         "IRFH/P1FR",    nullptr,    nullptr,    "STATUS",   "ADMOD",
+	"ADREG0",       "ADREG1",       "ADREG2",       "ADREG3",       "INTEL",    "INTEH",    "DMAEL",    "DMAEH",
+	nullptr,        nullptr,        nullptr,        nullptr,        nullptr,    nullptr,    nullptr,    nullptr
+};
+
+tmp90844_disassembler::tmp90844_disassembler()
+	: tlcs90_disassembler(0xffc0, ir_names)
+{
+}
+
+const char *tlcs90_disassembler::internal_registers_names(uint16_t x) const
+{
+	if (x >= m_iobase)
+		return m_ir_names[x - m_iobase];
 	return nullptr;
 }
 

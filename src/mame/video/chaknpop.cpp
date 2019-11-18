@@ -24,34 +24,33 @@
   palette decode
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(chaknpop_state, chaknpop)
+void chaknpop_state::chaknpop_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
+	uint8_t const *const color_prom = memregion("proms")->base();
 
 	for (int i = 0; i < 1024; i++)
 	{
-		int col, r, g, b;
 		int bit0, bit1, bit2;
 
-		col = (color_prom[i] & 0x0f) + ((color_prom[i + 1024] & 0x0f) << 4);
+		int const col = (color_prom[i] & 0x0f) | ((color_prom[i + 1024] & 0x0f) << 4);
 
-		/* red component */
-		bit0 = (col >> 0) & 0x01;
-		bit1 = (col >> 1) & 0x01;
-		bit2 = (col >> 2) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		// red component
+		bit0 = BIT(col, 0);
+		bit1 = BIT(col, 1);
+		bit2 = BIT(col, 2);
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		/* green component */
-		bit0 = (col >> 3) & 0x01;
-		bit1 = (col >> 4) & 0x01;
-		bit2 = (col >> 5) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		// green component
+		bit0 = BIT(col, 3);
+		bit1 = BIT(col, 4);
+		bit2 = BIT(col, 5);
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		/* blue component */
+		// blue component
 		bit0 = 0;
-		bit1 = (col >> 6) & 0x01;
-		bit2 = (col >> 7) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit1 = BIT(col, 6);
+		bit2 = BIT(col, 7);
+		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -151,7 +150,7 @@ void chaknpop_state::video_start()
 	uint8_t *RAM = memregion("maincpu")->base();
 
 	/*                          info                       offset             type             w   h  col row */
-	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(chaknpop_state::get_tx_tile_info),this), TILEMAP_SCAN_ROWS,   8,  8, 32, 32);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(chaknpop_state::get_tx_tile_info)), TILEMAP_SCAN_ROWS,   8,  8, 32, 32);
 
 	m_vram1 = &RAM[0x10000];
 	m_vram2 = &RAM[0x12000];

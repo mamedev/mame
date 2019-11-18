@@ -97,7 +97,7 @@ public:
 	// getters
 	sound_stream *next() const { return m_next; }
 	device_t &device() const { return m_device; }
-	int sample_rate() const { return (m_new_sample_rate != 0) ? m_new_sample_rate : m_sample_rate; }
+	int sample_rate() const { return (m_new_sample_rate != 0xffffffff) ? m_new_sample_rate : m_sample_rate; }
 	attotime sample_time() const;
 	attotime sample_period() const { return attotime(0, m_attoseconds_per_sample); }
 	int input_count() const { return m_input.size(); }
@@ -198,6 +198,8 @@ public:
 	const std::vector<std::unique_ptr<sound_stream>> &streams() const { return m_stream_list; }
 	attotime last_update() const { return m_last_update; }
 	attoseconds_t update_attoseconds() const { return m_update_attoseconds; }
+	int sample_count() const { return m_samples_this_update; }
+	void samples(s16 *buffer);
 
 	// stream creation
 	sound_stream *stream_alloc(device_t &device, int inputs, int outputs, int sample_rate, stream_update_delegate callback = stream_update_delegate());
@@ -233,6 +235,7 @@ private:
 	std::vector<s16>    m_finalmix;
 	std::vector<s32>    m_leftmix;
 	std::vector<s32>    m_rightmix;
+	int                 m_samples_this_update;
 
 	u8                  m_muted;
 	int                 m_attenuation;

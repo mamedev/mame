@@ -29,6 +29,7 @@ TODO:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/timer.h"
+#include "emupal.h"
 #include "screen.h"
 
 #include "dotrikun.lh"
@@ -39,14 +40,18 @@ TODO:
 class dotrikun_state : public driver_device
 {
 public:
-	dotrikun_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	dotrikun_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
 		m_vram(*this, "vram"),
 		m_interrupt_timer(*this, "interrupt"),
 		m_scanline_off_timer(*this, "scanline_off")
 	{ }
+
+	void dotrikun(machine_config &config);
+
+protected:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -66,7 +71,6 @@ public:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	void dotrikun(machine_config &config);
 	void dotrikun_map(address_map &map);
 	void io_map(address_map &map);
 };
@@ -145,14 +149,14 @@ uint32_t dotrikun_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 void dotrikun_state::dotrikun_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x8000, 0x85ff).ram().w(this, FUNC(dotrikun_state::vram_w)).share("vram");
+	map(0x8000, 0x85ff).ram().w(FUNC(dotrikun_state::vram_w)).share("vram");
 	map(0x8600, 0x87ff).ram();
 }
 
 void dotrikun_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).mirror(0xff).portr("INPUTS").w(this, FUNC(dotrikun_state::color_w));
+	map(0x00, 0x00).mirror(0xff).portr("INPUTS").w(FUNC(dotrikun_state::color_w));
 }
 
 
@@ -193,26 +197,27 @@ void dotrikun_state::machine_reset()
 	m_color = 0;
 }
 
-MACHINE_CONFIG_START(dotrikun_state::dotrikun)
-
+void dotrikun_state::dotrikun(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(dotrikun_map)
-	MCFG_CPU_IO_MAP(io_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scanline_on", dotrikun_state, scanline_on, "screen", 0, 1)
-	MCFG_TIMER_DRIVER_ADD("scanline_off", dotrikun_state, scanline_off)
-	MCFG_TIMER_DRIVER_ADD("interrupt", dotrikun_state, interrupt)
+	Z80(config, m_maincpu, MASTER_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &dotrikun_state::dotrikun_map);
+	m_maincpu->set_addrmap(AS_IO, &dotrikun_state::io_map);
+
+	TIMER(config, "scanline_on").configure_scanline(FUNC(dotrikun_state::scanline_on), "screen", 0, 1);
+	TIMER(config, m_scanline_off_timer).configure_generic(FUNC(dotrikun_state::scanline_off));
+	TIMER(config, m_interrupt_timer).configure_generic(FUNC(dotrikun_state::interrupt));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK, 128+128, 0, 128, 192+64, 0, 192)
-	MCFG_SCREEN_UPDATE_DRIVER(dotrikun_state, screen_update)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_PALETTE_ADD_3BIT_RGB("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(MASTER_CLOCK, 128+128, 0, 128, 192+64, 0, 192);
+	m_screen->set_screen_update(FUNC(dotrikun_state::screen_update));
+	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
+	m_screen->set_palette("palette");
+	PALETTE(config, "palette", palette_device::RGB_3BIT);
 
 	/* no sound hardware */
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************
@@ -228,7 +233,7 @@ ROM_END
 
 ROM_START( dotrikun2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "14479.mpr",  0x0000, 0x4000, CRC(a6aa7fa5) SHA1(4dbea33fb3541fdacf2195355751078a33bb30d5) )
+	ROM_LOAD( "epr-13141.ic2",  0x0000, 0x4000, CRC(a6aa7fa5) SHA1(4dbea33fb3541fdacf2195355751078a33bb30d5) )
 ROM_END
 
 ROM_START( dotriman )
@@ -237,6 +242,6 @@ ROM_START( dotriman )
 ROM_END
 
 
-GAMEL(1990, dotrikun,  0,        dotrikun, dotrikun, dotrikun_state, 0, ROT0, "Sega", "Dottori Kun (new version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW, layout_dotrikun )
-GAMEL(1990, dotrikun2, dotrikun, dotrikun, dotrikun, dotrikun_state, 0, ROT0, "Sega", "Dottori Kun (old version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW, layout_dotrikun )
-GAMEL(2016, dotriman,  dotrikun, dotrikun, dotrikun, dotrikun_state, 0, ROT0, "hack (Chris Covell)", "Dottori-Man Jr.", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW, layout_dotrikun )
+GAMEL( 1990, dotrikun,  0,        dotrikun, dotrikun, dotrikun_state, empty_init, ROT0, "Sega", "Dottori Kun (new version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW, layout_dotrikun )
+GAMEL( 1990, dotrikun2, dotrikun, dotrikun, dotrikun, dotrikun_state, empty_init, ROT0, "Sega", "Dottori Kun (old version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW, layout_dotrikun )
+GAMEL( 2016, dotriman,  dotrikun, dotrikun, dotrikun, dotrikun_state, empty_init, ROT0, "hack (Chris Covell)", "Dottori-Man Jr.", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW, layout_dotrikun )

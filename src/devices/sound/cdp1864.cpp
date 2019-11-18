@@ -23,6 +23,7 @@
 
 #include "emu.h"
 #include "cdp1864.h"
+#include "screen.h"
 
 
 
@@ -65,7 +66,7 @@ cdp1864_device::cdp1864_device(const machine_config &mconfig, const char *tag, d
 		m_read_rdata(*this),
 		m_read_bdata(*this),
 		m_read_gdata(*this),
-		m_write_irq(*this),
+		m_write_int(*this),
 		m_write_dma_out(*this),
 		m_write_efx(*this),
 		m_write_hsync(*this),
@@ -80,6 +81,25 @@ cdp1864_device::cdp1864_device(const machine_config &mconfig, const char *tag, d
 
 
 //-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void cdp1864_device::device_config_complete()
+{
+	if (!has_screen())
+		return;
+
+	if (!screen().refresh_attoseconds())
+		screen().set_raw(clock(), SCREEN_WIDTH, HBLANK_END, HBLANK_START, TOTAL_SCANLINES, SCANLINE_VBLANK_END, SCANLINE_VBLANK_START);
+
+	if (!screen().has_screen_update())
+		screen().set_screen_update(*this, FUNC(cdp1864_device::screen_update));
+}
+
+
+//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
@@ -90,7 +110,7 @@ void cdp1864_device::device_start()
 	m_read_rdata.resolve_safe(0);
 	m_read_bdata.resolve_safe(0);
 	m_read_gdata.resolve_safe(0);
-	m_write_irq.resolve_safe();
+	m_write_int.resolve_safe();
 	m_write_dma_out.resolve_safe();
 	m_write_efx.resolve_safe();
 	m_write_hsync.resolve_safe();
@@ -135,7 +155,7 @@ void cdp1864_device::device_reset()
 	m_disp = 0;
 	m_dmaout = 0;
 
-	m_write_irq(CLEAR_LINE);
+	m_write_int(CLEAR_LINE);
 	m_write_dma_out(CLEAR_LINE);
 	m_write_efx(CLEAR_LINE);
 	m_write_hsync(CLEAR_LINE);
@@ -157,7 +177,7 @@ void cdp1864_device::device_timer(emu_timer &timer, device_timer_id id, int para
 		{
 			if (m_disp)
 			{
-				m_write_irq(ASSERT_LINE);
+				m_write_int(ASSERT_LINE);
 			}
 
 			m_int_timer->adjust(screen().time_until_pos(SCANLINE_INT_END, 0));
@@ -166,7 +186,7 @@ void cdp1864_device::device_timer(emu_timer &timer, device_timer_id id, int para
 		{
 			if (m_disp)
 			{
-				m_write_irq(CLEAR_LINE);
+				m_write_int(CLEAR_LINE);
 			}
 
 			m_int_timer->adjust(screen().time_until_pos(SCANLINE_INT_START, 0));
@@ -302,7 +322,7 @@ READ8_MEMBER( cdp1864_device::dispoff_r )
 {
 	m_disp = 0;
 
-	m_write_irq(CLEAR_LINE);
+	m_write_int(CLEAR_LINE);
 	m_write_dma_out(CLEAR_LINE);
 
 	return 0xff;
@@ -371,10 +391,7 @@ WRITE8_MEMBER( cdp1864_device::dma_w )
 
 WRITE_LINE_MEMBER( cdp1864_device::con_w )
 {
-	if (!state)
-	{
-		m_con = 0;
-	}
+	m_con = state;
 }
 
 
@@ -450,18 +467,18 @@ void cdp1864_device::initialize_palette()
 		// foreground colors
 		uint8_t r = 0, g = 0, b = 0;
 
-		if (m_chr_r != RES_INF) r = combine_1_weights(color_weights_r, BIT(i, 0));
-		if (m_chr_b != RES_INF) b = combine_1_weights(color_weights_b, BIT(i, 1));
-		if (m_chr_g != RES_INF) g = combine_1_weights(color_weights_g, BIT(i, 2));
+		if (m_chr_r != RES_INF) r = combine_weights(color_weights_r, BIT(i, 0));
+		if (m_chr_b != RES_INF) b = combine_weights(color_weights_b, BIT(i, 1));
+		if (m_chr_g != RES_INF) g = combine_weights(color_weights_g, BIT(i, 2));
 
 		m_palette[i] = rgb_t(r, g, b);
 
 		// background colors
 		r = 0, g = 0, b = 0;
 
-		if (m_chr_r != RES_INF) r = combine_1_weights(color_weights_bkg_r, BIT(i, 0));
-		if (m_chr_b != RES_INF) b = combine_1_weights(color_weights_bkg_b, BIT(i, 1));
-		if (m_chr_g != RES_INF) g = combine_1_weights(color_weights_bkg_g, BIT(i, 2));
+		if (m_chr_r != RES_INF) r = combine_weights(color_weights_bkg_r, BIT(i, 0));
+		if (m_chr_b != RES_INF) b = combine_weights(color_weights_bkg_b, BIT(i, 1));
+		if (m_chr_g != RES_INF) g = combine_weights(color_weights_bkg_g, BIT(i, 2));
 
 		m_palette[i + 8] = rgb_t(r, g, b);
 	}

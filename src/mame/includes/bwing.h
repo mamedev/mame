@@ -8,6 +8,8 @@
 
 #include "machine/bankdev.h"
 #include "machine/gen_latch.h"
+#include "emupal.h"
+#include "tilemap.h"
 
 #define BW_DEBUG 0
 
@@ -79,7 +81,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_charinfo);
 	TILEMAP_MAPPER_MEMBER(scan_cols);
 
-	DECLARE_DRIVER_INIT(bwing);
+	void init_bwing();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;

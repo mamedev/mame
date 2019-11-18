@@ -15,6 +15,7 @@
 #include "textbuf.h"
 #include "debugger.h"
 #include <ctype.h>
+#include <fstream>
 
 /***************************************************************************
     CONSTANTS
@@ -57,6 +58,9 @@ debugger_console::debugger_console(running_machine &machine)
 	/* listen in on the errorlog */
 	using namespace std::placeholders;
 	m_machine.add_logerror_callback(std::bind(&debugger_console::errorlog_write_line, this, _1));
+
+	/* register our own custom-command help */
+	register_command("helpcustom", CMDFLAG_NONE, 0, 0, 0, std::bind(&debugger_console::execute_help_custom, this, _1, _2));
 }
 
 
@@ -90,6 +94,28 @@ void debugger_console::exit()
     Command Handling
 
 ***************************************************************************/
+
+/*------------------------------------------------------------
+    execute_help_custom - execute the helpcustom command
+------------------------------------------------------------*/
+
+void debugger_console::execute_help_custom(int ref, const std::vector<std::string> &params)
+{
+	debug_command *cmd = m_commandlist;
+	char buf[64];
+	while (cmd)
+	{
+		if (cmd->flags & CMDFLAG_CUSTOM_HELP)
+		{
+			snprintf(buf, 63, "%s help", cmd->command);
+			buf[63] = 0;
+			char *temp_params[1] = { buf };
+			internal_execute_command(true, 1, &temp_params[0]);
+		}
+		cmd = cmd->next;
+	}
+}
+
 
 /*-------------------------------------------------
     trim_parameter - executes a
@@ -373,8 +399,10 @@ CMDERR debugger_console::validate_command(const char *command)
 
 void debugger_console::register_command(const char *command, u32 flags, int ref, int minparams, int maxparams, std::function<void(int, const std::vector<std::string> &)> handler)
 {
-	assert_always(m_machine.phase() == machine_phase::INIT, "Can only call register_command() at init time!");
-	assert_always((m_machine.debug_flags & DEBUG_FLAG_ENABLED) != 0, "Cannot call register_command() when debugger is not running");
+	if (m_machine.phase() != machine_phase::INIT)
+		throw emu_fatalerror("Can only call debugger_console::register_command() at init time!");
+	if (!(m_machine.debug_flags & DEBUG_FLAG_ENABLED))
+		throw emu_fatalerror("Cannot call debugger_console::register_command() when debugger is not running");
 
 	debug_command *cmd = auto_alloc_clear(m_machine, <debug_command>());
 
@@ -389,6 +417,71 @@ void debugger_console::register_command(const char *command, u32 flags, int ref,
 	/* link it */
 	cmd->next = m_commandlist;
 	m_commandlist = cmd;
+}
+
+
+//-------------------------------------------------
+//  source_script - specifies a debug command
+//  script to execute
+//-------------------------------------------------
+
+void debugger_console::source_script(const char *file)
+{
+	// close any existing source file
+	m_source_file.reset();
+
+	// open a new one if requested
+	if (file != nullptr)
+	{
+		auto source_file = std::make_unique<std::ifstream>(file, std::ifstream::in);
+		if (source_file->fail())
+		{
+			if (m_machine.phase() == machine_phase::RUNNING)
+				printf("Cannot open command file '%s'\n", file);
+			else
+				fatalerror("Cannot open command file '%s'\n", file);
+		}
+		else
+		{
+			m_source_file = std::move(source_file);
+		}
+	}
+}
+
+
+//-------------------------------------------------
+//  process_source_file - executes commands from
+//  a source file
+//-------------------------------------------------
+
+void debugger_console::process_source_file()
+{
+	std::string buf;
+
+	// loop until the file is exhausted or until we are executing again
+	while (m_machine.debugger().cpu().is_stopped()
+			&& m_source_file
+			&& std::getline(*m_source_file, buf))
+	{
+		// strip out comments (text after '//')
+		size_t pos = buf.find("//");
+		if (pos != std::string::npos)
+			buf.resize(pos);
+
+		// strip whitespace
+		strtrimrightspace(buf);
+
+		// execute the command
+		if (!buf.empty())
+			execute_command(buf, true);
+	}
+
+	if (m_source_file && !m_source_file->good())
+	{
+		if (!m_source_file->eof())
+			printf("I/O error, script processing terminated\n");
+		m_source_file.reset();
+	}
 }
 
 

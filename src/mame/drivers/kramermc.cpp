@@ -17,7 +17,7 @@
 #include "screen.h"
 
 
-static GFXDECODE_START( kramermc )
+static GFXDECODE_START( gfx_kramermc )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, kramermc_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -111,31 +111,31 @@ static INPUT_PORTS_START( kramermc )
 INPUT_PORTS_END
 
 /* Machine driver */
-MACHINE_CONFIG_START(kramermc_state::kramermc)
+void kramermc_state::kramermc(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 1500000)
-	MCFG_CPU_PROGRAM_MAP(kramermc_mem)
-	MCFG_CPU_IO_MAP(kramermc_io)
+	Z80(config, m_maincpu, 1500000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &kramermc_state::kramermc_mem);
+	m_maincpu->set_addrmap(AS_IO, &kramermc_state::kramermc_io);
 
-	MCFG_DEVICE_ADD("z80pio", Z80PIO, 1500000)
-	MCFG_Z80PIO_IN_PA_CB(READ8(kramermc_state, kramermc_port_a_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(kramermc_state, kramermc_port_a_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(kramermc_state, kramermc_port_b_r))
+	z80pio_device& pio(Z80PIO(config, "z80pio", 1500000));
+	pio.in_pa_callback().set(FUNC(kramermc_state::kramermc_port_a_r));
+	pio.out_pa_callback().set(FUNC(kramermc_state::kramermc_port_a_w));
+	pio.in_pb_callback().set(FUNC(kramermc_state::kramermc_port_b_r));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(64*8, 16*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 16*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(kramermc_state, screen_update_kramermc)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(64*8, 16*8);
+	screen.set_visarea(0, 64*8-1, 0, 16*8-1);
+	screen.set_screen_update(FUNC(kramermc_state::screen_update_kramermc));
+	screen.set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", kramermc )
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_kramermc);
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
-
-MACHINE_CONFIG_END
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
+}
 
 /* ROM definition */
 ROM_START( kramermc )
@@ -152,5 +152,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT     CLASS           INIT     COMPANY           FULLNAME       FLAGS */
-COMP( 1987, kramermc,  0,      0,      kramermc,  kramermc, kramermc_state, kramermc,"Manfred Kramer", "Kramer MC",   MACHINE_NO_SOUND)
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT           COMPANY           FULLNAME       FLAGS */
+COMP( 1987, kramermc, 0,      0,      kramermc, kramermc, kramermc_state, init_kramermc, "Manfred Kramer", "Kramer MC",   MACHINE_NO_SOUND)

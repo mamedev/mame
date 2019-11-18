@@ -5,13 +5,17 @@
  * includes/advision.h
  *
  ****************************************************************************/
-
 #ifndef MAME_INCLUDES_ADVISION_H
 #define MAME_INCLUDES_ADVISION_H
 
-#include "sound/dac.h"
+#pragma once
+
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "cpu/cop400/cop400.h"
+#include "cpu/mcs48/mcs48.h"
+#include "sound/dac.h"
+#include "emupal.h"
 
 #define SCREEN_TAG  "screen"
 #define I8048_TAG   "i8048"
@@ -21,18 +25,18 @@ class advision_state : public driver_device
 {
 public:
 	advision_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, I8048_TAG),
-			m_soundcpu(*this, COP411_TAG),
-			m_dac(*this, "dac"),
-			m_cart(*this, "cartslot"),
-			m_bank1(*this, "bank1"),
-			m_joy(*this, "joystick"),
-			m_palette(*this, "palette")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, I8048_TAG)
+		, m_soundcpu(*this, COP411_TAG)
+		, m_dac(*this, "dac")
+		, m_cart(*this, "cartslot")
+		, m_bank1(*this, "bank1")
+		, m_joy(*this, "joystick")
+		, m_palette(*this, "palette")
 	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_soundcpu;
+	required_device<i8048_device> m_maincpu;
+	required_device<cop411_cpu_device> m_soundcpu;
 	required_device<dac_byte_interface> m_dac;
 	required_device<generic_slot_device> m_cart;
 	required_memory_bank m_bank1;
@@ -77,13 +81,13 @@ public:
 	int m_video_bank;
 	int m_video_hpos;
 	uint8_t m_led_latch[8];
-	std::vector<uint8_t> m_display;
+	std::unique_ptr<uint8_t []> m_display;
 
 	/* sound state */
 	int m_sound_cmd;
 	int m_sound_d;
 	int m_sound_g;
-	DECLARE_PALETTE_INIT(advision);
+	void advision_palette(palette_device &palette) const;
 	void advision(machine_config &config);
 	void io_map(address_map &map);
 	void program_map(address_map &map);

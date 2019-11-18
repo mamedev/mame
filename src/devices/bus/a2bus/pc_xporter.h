@@ -113,6 +113,7 @@ private:
 
 	DECLARE_WRITE8_MEMBER(pc_page_w);
 	DECLARE_WRITE8_MEMBER(nmi_enable_w);
+	DECLARE_WRITE_LINE_MEMBER(iochck_w);
 
 	void pc_select_dma_channel(int channel, bool state);
 

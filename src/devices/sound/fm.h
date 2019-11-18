@@ -60,6 +60,8 @@ typedef unsigned char  FMSAMPLE;
 #endif
 */
 
+typedef uint8_t (*FM_READBYTE)(device_t *device, offs_t offset);
+typedef void(*FM_WRITEBYTE)(device_t *device, offs_t offset, uint8_t data);
 typedef void (*FM_TIMERHANDLER)(device_t *device,int c,int cnt,int clock);
 typedef void (*FM_IRQHANDLER)(device_t *device,int irq);
 /* FM_TIMERHANDLER : Stop or Start timer         */
@@ -134,8 +136,10 @@ void ym2203_postload(void *chip);
 #if BUILD_YM2608
 /* -------------------- YM2608(OPNA) Interface -------------------- */
 void * ym2608_init(device_t *device, int baseclock, int rate,
-				void *pcmroma,int pcmsizea,
-				FM_TIMERHANDLER TimerHandler,FM_IRQHANDLER IRQHandler, const ssg_callbacks *ssg);
+	FM_READBYTE InternalReadByte,
+	FM_READBYTE ExternalReadByte, FM_WRITEBYTE ExternalWriteByte,
+	FM_TIMERHANDLER TimerHandler, FM_IRQHANDLER IRQHandler, const ssg_callbacks *ssg);
+void ym2608_clock_changed(void *chip, int clock, int rate);
 void ym2608_shutdown(void *chip);
 void ym2608_reset_chip(void *chip);
 void ym2608_update_one(void *chip, FMSAMPLE **buffer, int length);
@@ -149,8 +153,9 @@ void ym2608_postload(void *chip);
 #if (BUILD_YM2610||BUILD_YM2610B)
 /* -------------------- YM2610(OPNB) Interface -------------------- */
 void * ym2610_init(device_t *device, int baseclock, int rate,
-				void *pcmroma,int pcmasize,void *pcmromb,int pcmbsize,
-				FM_TIMERHANDLER TimerHandler,FM_IRQHANDLER IRQHandler, const ssg_callbacks *ssg);
+	FM_READBYTE adpcm_a_read_byte, FM_READBYTE adpcm_b_read_byte,
+	FM_TIMERHANDLER TimerHandler,FM_IRQHANDLER IRQHandler, const ssg_callbacks *ssg);
+void ym2610_clock_changed(void *chip, int clock, int rate);
 void ym2610_shutdown(void *chip);
 void ym2610_reset_chip(void *chip);
 void ym2610_update_one(void *chip, FMSAMPLE **buffer, int length);

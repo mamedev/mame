@@ -11,40 +11,37 @@
 
 #pragma once
 
-#include "cpu/mips/mips3.h"
-#include "machine/8042kbdc.h"
+#include "machine/at_keybc.h"
+#include "bus/pc_kbd/pc_kbdc.h"
+#include "bus/pc_kbd/keyboards.h"
 #include "machine/pc_lpt.h"
 #include "machine/pckeybrd.h"
 #include "machine/pit8253.h"
 #include "machine/z80scc.h"
 
-#define MCFG_IOC2_GUINNESS_ADD(_tag)  \
-	MCFG_DEVICE_ADD(_tag, SGI_IOC2_GUINNESS, 0)
-
-#define MCFG_IOC2_FULL_HOUSE_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, SGI_IOC2_FULL_HOUSE, 0)
-
-#define MCFG_IOC2_CPU(cpu_tag) \
-	downcast<ioc2_device &>(*device).set_cpu_tag(cpu_tag);
-
 class ioc2_device : public device_t
 {
 public:
-	void set_cpu_tag(const char *tag) { m_maincpu.set_tag(tag); }
-
-	DECLARE_WRITE32_MEMBER( write );
-	DECLARE_READ32_MEMBER( read );
+	template <typename T> void set_cpu_tag(T &&tag) { m_maincpu.set_tag(std::forward<T>(tag)); }
 
 	DECLARE_INPUT_CHANGED_MEMBER( power_button );
 	DECLARE_INPUT_CHANGED_MEMBER( volume_down );
 	DECLARE_INPUT_CHANGED_MEMBER( volume_up );
 
-	void lower_local0_irq(uint8_t source_mask);
-	void raise_local0_irq(uint8_t source_mask);
-	void lower_local1_irq(uint8_t source_mask);
-	void raise_local1_irq(uint8_t source_mask);
+	DECLARE_WRITE_LINE_MEMBER(gio_int0_w);
+	DECLARE_WRITE_LINE_MEMBER(gio_int1_w);
+	DECLARE_WRITE_LINE_MEMBER(gio_int2_w);
+	DECLARE_WRITE_LINE_MEMBER(hpc_dma_done_w);
+	DECLARE_WRITE_LINE_MEMBER(mc_dma_done_w);
+	DECLARE_WRITE_LINE_MEMBER(scsi0_int_w);
+	DECLARE_WRITE_LINE_MEMBER(scsi1_int_w);
+	DECLARE_WRITE_LINE_MEMBER(enet_int_w);
+	DECLARE_WRITE_LINE_MEMBER(video_int_w);
 
-	enum
+	void raise_local_irq(int channel, uint8_t mask);
+	void lower_local_irq(int channel, uint8_t mask);
+
+	enum : uint8_t
 	{
 		INT3_LOCAL0_FIFO      = 0x01,
 		INT3_LOCAL0_SCSI0     = 0x02,
@@ -56,7 +53,7 @@ public:
 		INT3_LOCAL0_MAPPABLE0 = 0x80,
 	};
 
-	enum
+	enum : uint8_t
 	{
 		INT3_LOCAL1_GP0       = 0x01,
 		INT3_LOCAL1_PANEL     = 0x02,
@@ -64,65 +61,71 @@ public:
 		INT3_LOCAL1_MAPPABLE1 = 0x08,
 		INT3_LOCAL1_HPC_DMA   = 0x10,
 		INT3_LOCAL1_AC_FAIL   = 0x20,
-		INT3_LOCAL1_VSYNC     = 0x40,
+		INT3_LOCAL1_VIDEO     = 0x40,
 		INT3_LOCAL1_RETRACE   = 0x80,
 	};
 
+	void set_local_int_mask(int channel, const uint8_t mask);
+	void set_map_int_mask(int channel, const uint8_t mask);
+	void set_timer_int_clear(const uint8_t data);
+	void set_mappable_int(uint8_t mask, bool state);
+
 protected:
-	ioc2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t id);
+	ioc2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 
-	enum
-	{
-		PI1_DATA_REG       = 0x00/4,
-		PI1_CTRL_REG       = 0x04/4,
-		PI1_STATUS_REG     = 0x08/4,
-		PI1_DMA_CTRL_REG   = 0x0c/4,
-		PI1_INT_STATUS_REG = 0x10/4,
-		PI1_INT_MASK_REG   = 0x14/4,
-		PI1_TIMER1_REG     = 0x18/4,
-		PI1_TIMER2_REG     = 0x1c/4,
-		PI1_TIMER3_REG     = 0x20/4,
-		PI1_TIMER4_REG     = 0x24/4,
+	DECLARE_WRITE_LINE_MEMBER(timer0_int);
+	DECLARE_WRITE_LINE_MEMBER(timer1_int);
+	DECLARE_WRITE_LINE_MEMBER(pit_clock2_out);
+	DECLARE_WRITE_LINE_MEMBER(kbdc_int_w);
+	DECLARE_WRITE_LINE_MEMBER(duart_int_w);
 
-		SERIAL1_CMD_REG    = 0x30/4,
-		SERIAL1_DATA_REG   = 0x34/4,
-		SERIAL2_CMD_REG    = 0x38/4,
-		SERIAL2_DATA_REG   = 0x3c/4,
+	void check_mappable_interrupt(int channel);
 
-		KBD_MOUSE_REGS1    = 0x40/4,
-		KBD_MOUSE_REGS2    = 0x44/4,
+	u8 pi1_dma_ctrl_r();
+	void pi1_dma_ctrl_w(u8 data);
+	u8 pi1_int_status_r();
+	void pi1_int_status_w(u8 data);
+	u8 pi1_int_mask_r();
+	void pi1_int_mask_w(u8 data);
+	u8 pi1_timer1_r();
+	u8 pi1_timer2_r();
+	u8 pi1_timer3_r();
+	u8 pi1_timer4_r();
+	void pi1_timer1_w(u8 data);
+	void pi1_timer2_w(u8 data);
+	void pi1_timer3_w(u8 data);
+	void pi1_timer4_w(u8 data);
+	u8 gc_select_r();
+	void gc_select_w(u8 data);
+	u8 gen_cntl_r();
+	void gen_cntl_w(u8 data);
+	u8 front_panel_r();
+	void front_panel_w(u8 data);
+	u8 system_id_r();
+	u8 read_r();
+	u8 dma_sel_r();
+	void dma_sel_w(u8 data);
+	u8 reset_r();
+	void reset_w(u8 data);
+	u8 write_r();
+	void write_w(u8 data);
+	template <int N> u8 local_status_r();
+	template <int N> u8 local_mask_r();
+	template <int N> void local_mask_w(u8 data);
+	u8 map_status_r();
+	template <int N> u8 map_mask_r();
+	template <int N> void map_mask_w(u8 data);
+	u8 map_pol_r();
+	void map_pol_w(u8 data);
+	void timer_int_clear_w(u8 data);
+	u8 error_status_r();
 
-		GENCTRL_SELECT_REG = 0x48/4,
-		GENCTRL_REG        = 0x4c/4,
-
-		PANEL_REG          = 0x50/4,
-		SYSID_REG          = 0x58/4,
-		READ_REG           = 0x60/4,
-		DMA_SEL_REG        = 0x68/4,
-		RESET_REG          = 0x70/4,
-		WRITE_REG          = 0x78/4,
-
-		INT3_LOCAL0_STATUS_REG = 0x80/4,
-		INT3_LOCAL0_MASK_REG   = 0x84/4,
-		INT3_LOCAL1_STATUS_REG = 0x88/4,
-		INT3_LOCAL1_MASK_REG   = 0x8c/4,
-		INT3_MAP_STATUS_REG    = 0x90/4,
-		INT3_MAP_MASK0_REG     = 0x94/4,
-		INT3_MAP_MASK1_REG     = 0x98/4,
-		INT3_MAP_POLARITY_REG  = 0x9c/4,
-		INT3_TIMER_CLEAR_REG   = 0xa0/4,
-		INT3_ERROR_STATUS_REG  = 0xa4/4,
-
-		TIMER_COUNT0_REG       = 0xb0/4,
-		TIMER_COUNT1_REG       = 0xb4/4,
-		TIMER_COUNT2_REG       = 0xb8/4,
-		TIMER_CONTROL_REG      = 0xbc/4,
-	};
+	void base_map(address_map &map);
 
 	enum
 	{
@@ -132,6 +135,10 @@ protected:
 		FRONT_PANEL_VOL_DOWN_HOLD    = 0x20,
 		FRONT_PANEL_VOL_UP_INT       = 0x40,
 		FRONT_PANEL_VOL_UP_HOLD      = 0x80,
+
+		FRONT_PANEL_INT_MASK         = FRONT_PANEL_POWER_BUTTON_INT |
+									   FRONT_PANEL_VOL_DOWN_INT |
+									   FRONT_PANEL_VOL_UP_INT
 	};
 
 	enum
@@ -142,14 +149,15 @@ protected:
 		DMA_SEL_CLOCK_SEL_EXT     = 0x20,
 	};
 
-	required_device<mips3_device> m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	required_device<scc85230_device> m_scc;
 	required_device<pc_lpt_device> m_pi1;   // we assume standard parallel port (SPP) mode
-											// TODO: SGI parallel port (SGIPP), HP BOISE high speed parallel port (HPBPP), and Ricoh scanner modes
-	required_device<kbdc8042_device> m_kbdc;
+											// TODO: SGI parallel port (SGIPP), HP BOISE high speed parallel port (HPBPP), and Ricoh scanner mode
+	required_device<ps2_keyboard_controller_device> m_kbdc;
 	required_device<pit8254_device> m_pit;
 
 	virtual void handle_reset_reg_write(uint8_t data);
+	virtual uint8_t get_system_id() = 0;
 
 	uint8_t m_gen_ctrl_select_reg;
 	uint8_t m_gen_ctrl_reg;
@@ -160,27 +168,23 @@ protected:
 	uint8_t m_reset_reg;
 	uint8_t m_write_reg;
 
-	uint8_t m_int3_local0_status_reg;
-	uint8_t m_int3_local0_mask_reg;
-	uint8_t m_int3_local1_status_reg;
-	uint8_t m_int3_local1_mask_reg;
+	uint8_t m_int3_local_status_reg[2];
+	uint8_t m_int3_local_mask_reg[2];
 	uint8_t m_int3_map_status_reg;
-	uint8_t m_int3_map_mask0_reg;
-	uint8_t m_int3_map_mask1_reg;
+	uint8_t m_int3_map_mask_reg[2];
 	uint8_t m_int3_map_pol_reg;
-	uint8_t m_int3_timer_clear_reg;
 	uint8_t m_int3_err_status_reg;
 
 	uint32_t    m_par_read_cnt;
 	uint32_t    m_par_cntl;
 	uint8_t m_system_id;
 
-	static const char *SCC_TAG;
-	static const char *PI1_TAG;
-	static const char *KBDC_TAG;
-	static const char *PIT_TAG;
-	static const char *RS232A_TAG;
-	static const char *RS232B_TAG;
+	static char const *const SCC_TAG;
+	static char const *const PI1_TAG;
+	static char const *const KBDC_TAG;
+	static char const *const PIT_TAG;
+	static char const *const RS232A_TAG;
+	static char const *const RS232B_TAG;
 
 	static const XTAL SCC_PCLK;
 	static const XTAL SCC_RXA_CLK;
@@ -192,21 +196,37 @@ protected:
 class ioc2_guinness_device : public ioc2_device
 {
 public:
+	template <typename T>
+	ioc2_guinness_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag)
+		: ioc2_guinness_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		set_cpu_tag(std::forward<T>(cpu_tag));
+	}
+
+	void map(address_map &map);
 	ioc2_guinness_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
 protected:
-	ioc2_guinness_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-		: ioc2_device(mconfig, type, tag, owner, clock, 0x01)
-	{ }
+	uint8_t get_system_id() override { return 0x26; }
 };
 
 class ioc2_full_house_device : public ioc2_device
 {
 public:
+	template <typename T>
+	ioc2_full_house_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag)
+		: ioc2_full_house_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		set_cpu_tag(std::forward<T>(cpu_tag));
+	}
+
 	ioc2_full_house_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	void map(address_map &map);
+	void int2_map(address_map &map);
+
 protected:
-	ioc2_full_house_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-		: ioc2_device(mconfig, type, tag, owner, clock, 0x20)
-	{ }
+	uint8_t get_system_id() override { return 0x11; }
 };
 
 DECLARE_DEVICE_TYPE(SGI_IOC2_GUINNESS,   ioc2_guinness_device)

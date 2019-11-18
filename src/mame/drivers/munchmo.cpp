@@ -29,7 +29,6 @@ Stephh's notes (based on the game Z80 code and some tests) :
 #include "includes/munchmo.h"
 
 #include "cpu/z80/z80.h"
-#include "sound/ay8910.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -76,17 +75,16 @@ WRITE8_MEMBER(munchmo_state::sound_nmi_ack_w)
 
 READ8_MEMBER(munchmo_state::ay1reset_r)
 {
-	ay8910_device *ay8910 = machine().device<ay8910_device>("ay1");
-	ay8910->reset_w(space,0,0);
+	m_ay8910[0]->reset_w();
 	return 0;
 }
 
 READ8_MEMBER(munchmo_state::ay2reset_r)
 {
-	ay8910_device *ay8910 = machine().device<ay8910_device>("ay2");
-	ay8910->reset_w(space,0,0);
+	m_ay8910[1]->reset_w();
 	return 0;
 }
+
 /*************************************
  *
  *  Address maps
@@ -97,24 +95,21 @@ void munchmo_state::mnchmobl_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x8000, 0x83ff).ram();
-	map(0xa000, 0xa3ff).mirror(0x0400).ram().share("sprite_xpos");
-	map(0xa800, 0xabff).mirror(0x0400).ram().share("sprite_tile");
-	map(0xb000, 0xb3ff).mirror(0x0400).ram().share("sprite_attr");
-	map(0xb800, 0xb8ff).mirror(0x0100).ram().share("videoram");
+	map(0xa000, 0xa3ff).mirror(0x0400).ram().share(m_sprite_xpos);
+	map(0xa800, 0xabff).mirror(0x0400).ram().share(m_sprite_tile);
+	map(0xb000, 0xb3ff).mirror(0x0400).ram().share(m_sprite_attr);
+	map(0xb800, 0xb8ff).mirror(0x0100).ram().share(m_videoram);
 	map(0xbaba, 0xbaba).nopw(); /* ? */
-	map(0xbc00, 0xbc7f).ram().share("status_vram");
+	map(0xbc00, 0xbc7f).ram().share(m_status_vram);
 	map(0xbe00, 0xbe00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0xbe01, 0xbe01).select(0x0070).lw8("mainlatch_w",
-										   [this](address_space &space, offs_t offset, u8 data, u8 mem_mask){
-											   m_mainlatch->write_d0(space, offset >> 4, data, mem_mask);
-										   });
+	map(0xbe01, 0xbe01).select(0x0070).lw8(NAME([this] (offs_t offset, u8 data){ m_mainlatch->write_d0(offset >> 4, data); }));
 	map(0xbe02, 0xbe02).portr("DSW1");
 	map(0xbe03, 0xbe03).portr("DSW2");
-	map(0xbf00, 0xbf00).w(this, FUNC(munchmo_state::nmi_ack_w)); // CNI 1-8C
+	map(0xbf00, 0xbf00).w(FUNC(munchmo_state::nmi_ack_w)); // CNI 1-8C
 	map(0xbf01, 0xbf01).portr("SYSTEM");
 	map(0xbf02, 0xbf02).portr("P1");
 	map(0xbf03, 0xbf03).portr("P2");
-	map(0xbf04, 0xbf07).writeonly().share("vreg"); // MY0 1-8C
+	map(0xbf04, 0xbf07).writeonly().share(m_vreg); // MY0 1-8C
 }
 
 /* memory map provided thru schematics */
@@ -122,13 +117,13 @@ void munchmo_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x3fff).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0x4000, 0x4fff).w("ay1", FUNC(ay8910_device::data_w));
-	map(0x5000, 0x5fff).w("ay1", FUNC(ay8910_device::address_w));
-	map(0x6000, 0x6fff).w("ay2", FUNC(ay8910_device::data_w));
-	map(0x7000, 0x7fff).w("ay2", FUNC(ay8910_device::address_w));
-	map(0x8000, 0x9fff).r(this, FUNC(munchmo_state::ay1reset_r)).w("ay1", FUNC(ay8910_device::reset_w));
-	map(0xa000, 0xbfff).r(this, FUNC(munchmo_state::ay2reset_r)).w("ay2", FUNC(ay8910_device::reset_w));
-	map(0xc000, 0xdfff).w(this, FUNC(munchmo_state::sound_nmi_ack_w)); // NCL 1-8H
+	map(0x4000, 0x4fff).w(m_ay8910[0], FUNC(ay8910_device::data_w));
+	map(0x5000, 0x5fff).w(m_ay8910[0], FUNC(ay8910_device::address_w));
+	map(0x6000, 0x6fff).w(m_ay8910[1], FUNC(ay8910_device::data_w));
+	map(0x7000, 0x7fff).w(m_ay8910[1], FUNC(ay8910_device::address_w));
+	map(0x8000, 0x9fff).r(FUNC(munchmo_state::ay1reset_r)).w(m_ay8910[0], FUNC(ay8910_device::reset_w));
+	map(0xa000, 0xbfff).r(FUNC(munchmo_state::ay2reset_r)).w(m_ay8910[1], FUNC(ay8910_device::reset_w));
+	map(0xc000, 0xdfff).w(FUNC(munchmo_state::sound_nmi_ack_w)); // NCL 1-8H
 	map(0xe000, 0xe7ff).mirror(0x1800).ram(); // is mirror ok?
 }
 
@@ -297,7 +292,7 @@ static const gfx_layout sprite_layout2 =
 	256
 };
 
-static GFXDECODE_START( mnchmobl )
+static GFXDECODE_START( gfx_mnchmobl )
 	GFXDECODE_ENTRY( "gfx1", 0,      char_layout,      0,  4 )  /* colors   0- 63 */
 	GFXDECODE_ENTRY( "gfx2", 0x1000, tile_layout,     64,  4 )  /* colors  64-127 */
 	GFXDECODE_ENTRY( "gfx3", 0,      sprite_layout1, 128, 16 )  /* colors 128-255 */
@@ -317,55 +312,53 @@ void munchmo_state::machine_start()
 	save_item(NAME(m_nmi_enable));
 }
 
-MACHINE_CONFIG_START(munchmo_state::mnchmobl)
-
+void munchmo_state::mnchmobl(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(15'000'000)/4) // from pin 13 of XTAL-driven 163
-	MCFG_CPU_PROGRAM_MAP(mnchmobl_map)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(munchmo_state, generic_irq_ack) // IORQ clears flip-flop at 1-2C
+	Z80(config, m_maincpu, XTAL(15'000'000)/4); // from pin 13 of XTAL-driven 163
+	m_maincpu->set_addrmap(AS_PROGRAM, &munchmo_state::mnchmobl_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(munchmo_state::generic_irq_ack)); // IORQ clears flip-flop at 1-2C
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(15'000'000)/8) // from pin 12 of XTAL-driven 163
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(munchmo_state, generic_irq_ack) // IORQ clears flip-flop at 1-7H
+	Z80(config, m_audiocpu, XTAL(15'000'000)/8); // from pin 12 of XTAL-driven 163
+	m_audiocpu->set_addrmap(AS_PROGRAM, &munchmo_state::sound_map);
+	m_audiocpu->set_irq_acknowledge_callback(FUNC(munchmo_state::generic_irq_ack)); // IORQ clears flip-flop at 1-7H
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 12E
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(munchmo_state, palette_bank_0_w)) // BCL0 2-11E
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(munchmo_state, palette_bank_1_w)) // BCL1 2-11E
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // CL2 2-11E
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP) // CL3 2-11E
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(munchmo_state, flipscreen_w)) // INV
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // DISP
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(munchmo_state, nmi_enable_w)) // ENI 1-10C
+	LS259(config, m_mainlatch, 0); // 12E
+	m_mainlatch->q_out_cb<0>().set(FUNC(munchmo_state::palette_bank_0_w)); // BCL0 2-11E
+	m_mainlatch->q_out_cb<1>().set(FUNC(munchmo_state::palette_bank_1_w)); // BCL1 2-11E
+	m_mainlatch->q_out_cb<2>().set_nop(); // CL2 2-11E
+	m_mainlatch->q_out_cb<3>().set_nop(); // CL3 2-11E
+	m_mainlatch->q_out_cb<4>().set(FUNC(munchmo_state::flipscreen_w)); // INV
+	m_mainlatch->q_out_cb<5>().set_nop(); // DISP
+	m_mainlatch->q_out_cb<6>().set(FUNC(munchmo_state::nmi_enable_w)); // ENI 1-10C
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(256+32+32, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 255+32+32,0, 255-16)
-	MCFG_SCREEN_UPDATE_DRIVER(munchmo_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(munchmo_state, vblank_irq))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(57);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(256+32+32, 256);
+	screen.set_visarea(0, 255+32+32,0, 255-16);
+	screen.set_screen_update(FUNC(munchmo_state::screen_update));
+	screen.screen_vblank().set(FUNC(munchmo_state::vblank_irq));
+	screen.set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mnchmobl)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(munchmo_state, munchmo)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mnchmobl);
+	PALETTE(config, m_palette, FUNC(munchmo_state::munchmo_palette), 256);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(ASSERTLINE("audiocpu", 0))
+	GENERIC_LATCH_8(config, m_soundlatch).data_pending_callback().set_inputline(m_audiocpu, 0, ASSERT_LINE);
 
 	/* AY clock speeds confirmed to match known recording */
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL(15'000'000)/8)
-	//MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	AY8910(config, m_ay8910[0], XTAL(15'000'000)/8);
+	//m_ay8910[0]->set_flags(AY8910_SINGLE_OUTPUT);
+	m_ay8910[0]->add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL(15'000'000)/8)
-	//MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	AY8910(config, m_ay8910[1], XTAL(15'000'000)/8);
+	//m_ay8910[1]->set_flags(AY8910_SINGLE_OUTPUT);
+	m_ay8910[1]->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
 /*************************************
@@ -437,5 +430,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, joyfulr,  0,        mnchmobl, mnchmobl, munchmo_state, 0, ROT270, "SNK",                   "Joyful Road (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, mnchmobl, joyfulr,  mnchmobl, mnchmobl, munchmo_state, 0, ROT270, "SNK (Centuri license)", "Munch Mobile (US)",   MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, joyfulr,  0,        mnchmobl, mnchmobl, munchmo_state, empty_init, ROT270, "SNK",                   "Joyful Road (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mnchmobl, joyfulr,  mnchmobl, mnchmobl, munchmo_state, empty_init, ROT270, "SNK (Centuri license)", "Munch Mobile (US)",   MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

@@ -43,15 +43,15 @@ protected:
 //  MACHINE DRIVERS
 //**************************************************************************
 
-MACHINE_CONFIG_START( empty_state::___empty )
-
+void empty_state::___empty(machine_config &config)
+{
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_UPDATE_DRIVER(empty_state, screen_update)
-	MCFG_SCREEN_SIZE(640,480)
-	MCFG_SCREEN_VISIBLE_AREA(0,639, 0,479)
-	MCFG_SCREEN_REFRESH_RATE(30)
-MACHINE_CONFIG_END
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_screen_update(FUNC(empty_state::screen_update));
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 639, 0, 479);
+	screen.set_refresh_hz(30);
+}
 
 
 
@@ -69,4 +69,4 @@ ROM_END
 //  GAME DRIVERS
 //**************************************************************************
 
-GAME( 2007, ___empty, 0, ___empty, 0, empty_state, 0, ROT0, "MAME", "No Driver Loaded", MACHINE_NO_SOUND_HW )
+GAME( 2007, ___empty, 0, ___empty, 0, empty_state, empty_init, ROT0, "MAME", "No Driver Loaded", MACHINE_NO_SOUND_HW )

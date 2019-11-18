@@ -13,9 +13,9 @@ class gb_rom_mbc_device : public device_t,
 {
 public:
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom) override;
-	virtual DECLARE_READ8_MEMBER(read_ram) override;
-	virtual DECLARE_WRITE8_MEMBER(write_ram) override;
+	virtual uint8_t read_rom(offs_t offset) override;
+	virtual uint8_t read_ram(offs_t offset) override;
+	virtual void write_ram(offs_t offset, uint8_t data) override;
 
 protected:
 	// construction/destruction
@@ -40,10 +40,10 @@ public:
 	// construction/destruction
 	gb_rom_mbc1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ8_MEMBER(read_rom) override;
-	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
-	virtual DECLARE_READ8_MEMBER(read_ram) override;
-	virtual DECLARE_WRITE8_MEMBER(write_ram) override;
+	virtual uint8_t read_rom(offs_t offset) override;
+	virtual void write_bank(offs_t offset, uint8_t data) override;
+	virtual uint8_t read_ram(offs_t offset) override;
+	virtual void write_ram(offs_t offset, uint8_t data) override;
 
 protected:
 	enum {
@@ -70,10 +70,10 @@ public:
 	// construction/destruction
 	gb_rom_mbc2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ8_MEMBER(read_rom) override;
-	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
-	virtual DECLARE_READ8_MEMBER(read_ram) override;
-	virtual DECLARE_WRITE8_MEMBER(write_ram) override;
+	virtual uint8_t read_rom(offs_t offset) override;
+	virtual void write_bank(offs_t offset, uint8_t data) override;
+	virtual uint8_t read_ram(offs_t offset) override;
+	virtual void write_ram(offs_t offset, uint8_t data) override;
 
 protected:
 	// device-level overrides
@@ -89,10 +89,10 @@ public:
 	// construction/destruction
 	gb_rom_mbc3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ8_MEMBER(read_rom) override;
-	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
-	virtual DECLARE_READ8_MEMBER(read_ram) override;
-	virtual DECLARE_WRITE8_MEMBER(write_ram) override;
+	virtual uint8_t read_rom(offs_t offset) override;
+	virtual void write_bank(offs_t offset, uint8_t data) override;
+	virtual uint8_t read_ram(offs_t offset) override;
+	virtual void write_ram(offs_t offset, uint8_t data) override;
 
 protected:
 	// device-level overrides
@@ -113,17 +113,19 @@ public:
 	// construction/destruction
 	gb_rom_mbc5_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ8_MEMBER(read_rom) override;
-	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
-	virtual DECLARE_READ8_MEMBER(read_ram) override;
-	virtual DECLARE_WRITE8_MEMBER(write_ram) override;
+	virtual uint8_t read_rom(offs_t offset) override;
+	virtual void write_bank(offs_t offset, uint8_t data) override;
+	virtual uint8_t read_ram(offs_t offset) override;
+	virtual void write_ram(offs_t offset, uint8_t data) override;
 
 protected:
 	gb_rom_mbc5_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override { shared_start(); }
+	virtual void device_start() override { shared_start(); m_rumble.resolve(); }
 	virtual void device_reset() override { shared_reset(); }
+
+	output_finder<> m_rumble;
 };
 
 // ======================> gb_rom_mbc6_device
@@ -134,10 +136,10 @@ public:
 	// construction/destruction
 	gb_rom_mbc6_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ8_MEMBER(read_rom) override;
-	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
-	virtual DECLARE_READ8_MEMBER(read_ram) override;
-	virtual DECLARE_WRITE8_MEMBER(write_ram) override;
+	virtual uint8_t read_rom(offs_t offset) override;
+	virtual void write_bank(offs_t offset, uint8_t data) override;
+	virtual uint8_t read_ram(offs_t offset) override;
+	virtual void write_ram(offs_t offset, uint8_t data) override;
 
 protected:
 	// device-level overrides
@@ -156,10 +158,10 @@ public:
 	// construction/destruction
 	gb_rom_mbc7_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ8_MEMBER(read_rom) override;
-	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
-	virtual DECLARE_READ8_MEMBER(read_ram) override;
-	virtual DECLARE_WRITE8_MEMBER(write_ram) override;
+	virtual uint8_t read_rom(offs_t offset) override;
+	virtual void write_bank(offs_t offset, uint8_t data) override;
+	virtual uint8_t read_ram(offs_t offset) override;
+	virtual void write_ram(offs_t offset, uint8_t data) override;
 
 protected:
 	// device-level overrides
@@ -175,10 +177,10 @@ public:
 	// construction/destruction
 	gb_rom_m161_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ8_MEMBER(read_rom) override;
-	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
-	virtual DECLARE_READ8_MEMBER(read_ram) override { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(write_ram) override { }
+	virtual uint8_t read_rom(offs_t offset) override;
+	virtual void write_bank(offs_t offset, uint8_t data) override;
+	virtual uint8_t read_ram(offs_t offset) override { return 0xff; }
+	virtual void write_ram(offs_t offset, uint8_t data) override { }
 
 protected:
 	// device-level overrides
@@ -197,10 +199,10 @@ public:
 	gb_rom_mmm01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom) override;
-	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
-	virtual DECLARE_READ8_MEMBER(read_ram) override;
-	virtual DECLARE_WRITE8_MEMBER(write_ram) override;
+	virtual uint8_t read_rom(offs_t offset) override;
+	virtual void write_bank(offs_t offset, uint8_t data) override;
+	virtual uint8_t read_ram(offs_t offset) override;
+	virtual void write_ram(offs_t offset, uint8_t data) override;
 
 protected:
 	// device-level overrides
@@ -225,10 +227,10 @@ public:
 	// construction/destruction
 	gb_rom_sachen_mmc1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ8_MEMBER(read_rom) override;
-	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
-	virtual DECLARE_READ8_MEMBER(read_ram) override { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(write_ram) override { }
+	virtual uint8_t read_rom(offs_t offset) override;
+	virtual void write_bank(offs_t offset, uint8_t data) override;
+	virtual uint8_t read_ram(offs_t offset) override { return 0xff; }
+	virtual void write_ram(offs_t offset, uint8_t data) override { }
 
 protected:
 	enum {
@@ -253,9 +255,9 @@ public:
 	// construction/destruction
 	gb_rom_sachen_mmc2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ8_MEMBER(read_rom) override;
-	virtual DECLARE_READ8_MEMBER(read_ram) override;
-	virtual DECLARE_WRITE8_MEMBER(write_ram) override;
+	virtual uint8_t read_rom(offs_t offset) override;
+	virtual uint8_t read_ram(offs_t offset) override;
+	virtual void write_ram(offs_t offset, uint8_t data) override;
 
 protected:
 	enum {
@@ -277,8 +279,8 @@ public:
 	gb_rom_188in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom) override;
-	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
+	virtual uint8_t read_rom(offs_t offset) override;
+	virtual void write_bank(offs_t offset, uint8_t data) override;
 
 protected:
 	// device-level overrides
@@ -297,10 +299,10 @@ public:
 	gb_rom_sintax_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom) override;
-	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
-	virtual DECLARE_READ8_MEMBER(read_ram) override;
-	virtual DECLARE_WRITE8_MEMBER(write_ram) override;
+	virtual uint8_t read_rom(offs_t offset) override;
+	virtual void write_bank(offs_t offset, uint8_t data) override;
+	virtual uint8_t read_ram(offs_t offset) override;
+	virtual void write_ram(offs_t offset, uint8_t data) override;
 
 protected:
 	// device-level overrides
@@ -321,7 +323,7 @@ public:
 	// construction/destruction
 	gb_rom_chongwu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ8_MEMBER(read_rom) override;
+	virtual uint8_t read_rom(offs_t offset) override;
 
 protected:
 	// device-level overrides
@@ -339,7 +341,7 @@ public:
 	// construction/destruction
 	gb_rom_licheng_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
+	virtual void write_bank(offs_t offset, uint8_t data) override;
 };
 
 // ======================> gb_rom_digimon_device
@@ -350,15 +352,15 @@ public:
 	// construction/destruction
 	gb_rom_digimon_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ8_MEMBER(read_rom) override;
-	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
-	virtual DECLARE_READ8_MEMBER(read_ram) override;
+	virtual uint8_t read_rom(offs_t offset) override;
+	virtual void write_bank(offs_t offset, uint8_t data) override;
+	virtual uint8_t read_ram(offs_t offset) override;
 
 protected:
 	// device-level overrides
 	virtual void device_start() override { shared_start(); }
 	virtual void device_reset() override { shared_reset(); }
-	virtual DECLARE_WRITE8_MEMBER(write_ram) override;
+	virtual void write_ram(offs_t offset, uint8_t data) override;
 };
 
 // ======================> gb_rom_rockman8_device
@@ -369,10 +371,10 @@ public:
 	gb_rom_rockman8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom) override;
-	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
-	virtual DECLARE_READ8_MEMBER(read_ram) override;
-	virtual DECLARE_WRITE8_MEMBER(write_ram) override;
+	virtual uint8_t read_rom(offs_t offset) override;
+	virtual void write_bank(offs_t offset, uint8_t data) override;
+	virtual uint8_t read_ram(offs_t offset) override;
+	virtual void write_ram(offs_t offset, uint8_t data) override;
 
 protected:
 	// device-level overrides
@@ -390,10 +392,10 @@ public:
 	gb_rom_sm3sp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom) override;
-	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
-	virtual DECLARE_READ8_MEMBER(read_ram) override;
-	virtual DECLARE_WRITE8_MEMBER(write_ram) override;
+	virtual uint8_t read_rom(offs_t offset) override;
+	virtual void write_bank(offs_t offset, uint8_t data) override;
+	virtual uint8_t read_ram(offs_t offset) override;
+	virtual void write_ram(offs_t offset, uint8_t data) override;
 
 protected:
 	// device-level overrides
@@ -410,10 +412,10 @@ public:
 	// construction/destruction
 	gb_rom_camera_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ8_MEMBER(read_rom) override;
-	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
-	virtual DECLARE_READ8_MEMBER(read_ram) override;
-	virtual DECLARE_WRITE8_MEMBER(write_ram) override;
+	virtual uint8_t read_rom(offs_t offset) override;
+	virtual void write_bank(offs_t offset, uint8_t data) override;
+	virtual uint8_t read_ram(offs_t offset) override;
+	virtual void write_ram(offs_t offset, uint8_t data) override;
 
 protected:
 	// device-level overrides

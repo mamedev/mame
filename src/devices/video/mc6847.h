@@ -13,46 +13,11 @@
 #pragma once
 
 #include "screen.h"
-
+#include <map>
 
 //**************************************************************************
 //  MC6847 CONFIGURATION / INTERFACE
 //**************************************************************************
-
-#define MCFG_SCREEN_MC6847_NTSC_ADD(_tag, _mctag) \
-	MCFG_SCREEN_ADD(_tag, RASTER)                               \
-	MCFG_SCREEN_UPDATE_DEVICE(_mctag, mc6847_base_device, screen_update) \
-	MCFG_SCREEN_REFRESH_RATE(60)                                \
-	MCFG_SCREEN_SIZE(320, 243)                                  \
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 1, 241-1)                \
-	MCFG_SCREEN_VBLANK_TIME(0)
-
-#define MCFG_SCREEN_MC6847_PAL_ADD(_tag, _mctag) \
-	MCFG_SCREEN_ADD(_tag, RASTER)                               \
-	MCFG_SCREEN_UPDATE_DEVICE(_mctag, mc6847_base_device, screen_update) \
-	MCFG_SCREEN_REFRESH_RATE(50)                                \
-	MCFG_SCREEN_SIZE(320, 243)                                  \
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 1, 241-1)                \
-	MCFG_SCREEN_VBLANK_TIME(0)
-
-#define MCFG_MC6847_HSYNC_CALLBACK(_write) \
-	devcb = &downcast<mc6847_friend_device &>(*device).set_hsync_wr_callback(DEVCB_##_write);
-
-#define MCFG_MC6847_FSYNC_CALLBACK(_write) \
-	devcb = &downcast<mc6847_friend_device &>(*device).set_fsync_wr_callback(DEVCB_##_write);
-
-#define MCFG_MC6847_CHARROM_CALLBACK(_class, _method) \
-	downcast<mc6847_friend_device &>(*device).set_get_char_rom(mc6847_friend_device::get_char_rom_delegate(&_class::_method, #_class "::" #_method, this));
-
-#define MCFG_MC6847_INPUT_CALLBACK(_read) \
-	devcb = &downcast<mc6847_base_device &>(*device).set_input_callback(DEVCB_##_read);
-
-#define MCFG_MC6847_FIXED_MODE(_mode) \
-	downcast<mc6847_base_device &>(*device).set_get_fixed_mode(_mode);
-
-#define MCFG_MC6847_BW(_bw) \
-	downcast<mc6847_base_device &>(*device).set_black_and_white(_bw);
-
 
 #define MC6847_GET_CHARROM_MEMBER(_name)   uint8_t _name(uint8_t ch, int line)
 
@@ -67,7 +32,7 @@ INPUT_PORTS_EXTERN(mc6847_artifacting);
 //**************************************************************************
 
 // base class so that the GIME emulation can access mc6847 stuff
-class mc6847_friend_device : public device_t
+class mc6847_friend_device : public device_t, public device_video_interface
 {
 public:
 	// video mode constants
@@ -86,10 +51,10 @@ public:
 	bool hs_r() const { return m_horizontal_sync; }
 	bool fs_r() const { return m_field_sync; }
 
-	template <class Object> devcb_base &set_hsync_wr_callback(Object &&cb) { return m_write_hsync.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_fsync_wr_callback(Object &&cb) { return m_write_fsync.set_callback(std::forward<Object>(cb)); }
+	auto hsync_wr_callback() { return m_write_hsync.bind(); }
+	auto fsync_wr_callback() { return m_write_fsync.bind(); }
 
-	template <typename Object> void set_get_char_rom(Object &&cb) { m_charrom_cb = std::forward<Object>(cb); }
+	template <typename... T> void set_get_char_rom(T &&... args) { m_charrom_cb.set(std::forward<T>(args)...); }
 
 protected:
 	mc6847_friend_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock,
@@ -204,9 +169,39 @@ protected:
 
 		// artifacting config
 		void setup_config(device_t *device);
-		void poll_config() { m_artifacting = (m_config!=nullptr) ? m_config->read() : 0; }
+		bool poll_config();
+		void set_pal_artifacting( bool palartifacting ) { m_palartifacting = palartifacting; }
+		bool get_pal_artifacting() { return m_palartifacting; }
+		void create_color_blend_table( const pixel_t *palette );
 
 		// artifacting application
+		template<int xscale>
+		void process_artifacts_pal(bitmap_rgb32 &bitmap, int y, int base_x, int base_y, uint8_t mode, const pixel_t *palette)
+		{
+			if( !m_artifacting || !m_palartifacting )
+				return;
+
+			if( (mode & MODE_AS) || ((mode & (MODE_AG|MODE_GM0) ) == MODE_AG) )
+			{
+				pixel_t *line1 = &bitmap.pix32(y + base_y, base_x);
+				pixel_t *line2 = &bitmap.pix32(y + base_y + 1, base_x);
+				std::map<std::pair<pixel_t,pixel_t>,pixel_t>::const_iterator newColor;
+
+				for( int pixel = 0; pixel < bitmap.width() - (base_x * 2); ++pixel )
+				{
+					if( line1[pixel] == line2[pixel] )
+						continue;
+
+					newColor = m_palcolorblendmap.find(std::pair<pixel_t,pixel_t>(line1[pixel],line2[pixel]));
+					if( newColor != m_palcolorblendmap.end() )
+					{
+						line1[pixel] = newColor->second;
+						line2[pixel] = newColor->second;
+					}
+				}
+			}
+		}
+
 		template<int xscale>
 		ATTR_FORCE_INLINE void process_artifacts(pixel_t *pixels, uint8_t mode, const pixel_t *palette)
 		{
@@ -244,11 +239,15 @@ protected:
 		}
 
 	private:
+		bool m_palartifacting;
 		ioport_port *m_config;
 		ioport_value m_artifacting;
 		ioport_value m_saved_artifacting;
 		pixel_t m_saved_c0, m_saved_c1;
 		pixel_t m_expanded_colors[128];
+
+		// PAL color blend emulation values.
+		std::map<std::pair<pixel_t,pixel_t>,pixel_t> m_palcolorblendmap;
 
 		void update_colors(pixel_t c0, pixel_t c1);
 		static pixel_t mix_color(double factor, uint8_t c0, uint8_t c1);
@@ -477,16 +476,19 @@ private:
 	emu_timer *m_hsync_off_timer;
 	emu_timer *m_fsync_timer;
 
+protected:
+	const double m_tpfs;
+
+private:
 	// incidentals
-	double m_tpfs;
-	int m_divider;
+	const int m_divider;
 	int m_field_sync_falling_edge_scanline;
 	bool m_wide;
 	bool m_video_changed;
 	uint16_t m_top_border_scanlines;
 	uint16_t m_body_scanlines;
 	bool m_recording_scanline;
-	bool m_supports_partial_body_scanlines;
+	const bool m_supports_partial_body_scanlines;
 
 	// video state
 	uint16_t m_physical_scanline;
@@ -511,7 +513,7 @@ private:
 class mc6847_base_device : public mc6847_friend_device
 {
 public:
-	template <class Object> devcb_base &set_input_callback(Object &&cb) { return m_input_cb.set_callback(std::forward<Object>(cb)); }
+	auto input_callback() { return m_input_cb.bind(); }
 
 	void set_get_fixed_mode(uint8_t mode) { m_fixed_mode = mode; }
 	void set_black_and_white(bool bw) { m_black_and_white = bw; }
@@ -535,6 +537,7 @@ protected:
 	mc6847_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const uint8_t *fontdata, double tpfs);
 
 	// device-level overrides
+	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual ioport_constructor device_input_ports() const override;

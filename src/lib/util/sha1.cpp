@@ -174,7 +174,7 @@ sha1_transform(uint32_t *state, uint32_t *data)
 	D = state[3];
 	E = state[4];
 
-	/* Heavy mangling, in 4 sub-rounds of 20 interations each. */
+	/* Heavy mangling, in 4 sub-rounds of 20 iterations each. */
 	subRound( A, B, C, D, E, f1, K1, data[ 0] );
 	subRound( E, A, B, C, D, f1, K1, data[ 1] );
 	subRound( D, E, A, B, C, f1, K1, data[ 2] );
@@ -427,17 +427,17 @@ sha1_digest(const struct sha1_ctx *ctx,
 		word = ctx->digest[i];
 
 		switch (leftover)
-	{
-	default:
-		/* this is just here to keep the compiler happy; it can never happen */
-	case 3:
-		digest[--j] = (word >> 8) & 0xff;
-		/* Fall through */
-	case 2:
-		digest[--j] = (word >> 16) & 0xff;
-		/* Fall through */
-	case 1:
-		digest[--j] = (word >> 24) & 0xff;
-	}
+		{
+		default:
+			/* this is just here to keep the compiler happy; it can never happen */
+		case 3:
+			digest[--j] = (word >> 8) & 0xff;
+			/* Fall through */
+		case 2:
+			digest[--j] = (word >> 16) & 0xff;
+			/* Fall through */
+		case 1:
+			digest[--j] = (word >> 24) & 0xff;
+		}
 	}
 }

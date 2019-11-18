@@ -129,17 +129,18 @@ namespace
 
 		optional_ioport m_autostart;
 
+		virtual DECLARE_READ8_MEMBER(cts_read) override;
 		virtual DECLARE_READ8_MEMBER(scs_read) override;
 		virtual DECLARE_WRITE8_MEMBER(scs_write) override;
 	private:
 		// internal state
+		required_memory_region m_eprom;
+		required_memory_region m_eprom_banked;
 		required_device<acia6850_device> m_uart;
 		required_device<pia6821_device> m_pia;
 		required_device<mc14411_device> m_brg;
 
 		required_ioport             m_serial_baud;
-
-		void set_bank();
 	};
 };
 
@@ -148,31 +149,31 @@ namespace
     IMPLEMENTATION
 ***************************************************************************/
 
-MACHINE_CONFIG_START(coco_t4426_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(PIA_TAG, PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(coco_t4426_device, pia_A_w))
+void coco_t4426_device::device_add_mconfig(machine_config &config)
+{
+	PIA6821(config, m_pia, 0);
+	m_pia->writepa_handler().set(FUNC(coco_t4426_device::pia_A_w));
 
-	MCFG_DEVICE_ADD(UART_TAG, ACIA6850, 0)
+	ACIA6850(config, m_uart, 0);
+	m_uart->txd_handler().set(SERIAL_TAG, FUNC(rs232_port_device::write_txd));
+	m_uart->rts_handler().set(SERIAL_TAG, FUNC(rs232_port_device::write_rts));
 
-	MCFG_ACIA6850_TXD_HANDLER (DEVWRITELINE (SERIAL_TAG, rs232_port_device, write_txd))
-	MCFG_ACIA6850_RTS_HANDLER (DEVWRITELINE (SERIAL_TAG, rs232_port_device, write_rts))
-
-	MCFG_RS232_PORT_ADD (SERIAL_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER (DEVWRITELINE (UART_TAG, acia6850_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER (DEVWRITELINE (UART_TAG, acia6850_device, write_cts))
+	rs232_port_device &rs232(RS232_PORT(config, SERIAL_TAG, default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(UART_TAG, FUNC(acia6850_device::write_rxd));
+	rs232.cts_handler().set(UART_TAG, FUNC(acia6850_device::write_cts));
 
 	/* Bit Rate Generator */
-	MCFG_MC14411_ADD (BRG_TAG, XTAL(1'843'200))
-	MCFG_MC14411_F1_CB(WRITELINE (coco_t4426_device, write_f1_clock))
-	MCFG_MC14411_F3_CB(WRITELINE (coco_t4426_device, write_f3_clock))
-	MCFG_MC14411_F5_CB(WRITELINE (coco_t4426_device, write_f5_clock))
-	MCFG_MC14411_F7_CB(WRITELINE (coco_t4426_device, write_f7_clock))
-	MCFG_MC14411_F8_CB(WRITELINE (coco_t4426_device, write_f8_clock))
-	MCFG_MC14411_F9_CB(WRITELINE (coco_t4426_device, write_f9_clock))
-	MCFG_MC14411_F11_CB(WRITELINE (coco_t4426_device, write_f11_clock))
-	MCFG_MC14411_F13_CB(WRITELINE (coco_t4426_device, write_f13_clock))
-	MCFG_MC14411_F15_CB(WRITELINE (coco_t4426_device, write_f15_clock))
-MACHINE_CONFIG_END
+	MC14411(config, m_brg, 1.8432_MHz_XTAL);
+	m_brg->out_f<1>().set(FUNC(coco_t4426_device::write_f1_clock));
+	m_brg->out_f<3>().set(FUNC(coco_t4426_device::write_f3_clock));
+	m_brg->out_f<5>().set(FUNC(coco_t4426_device::write_f5_clock));
+	m_brg->out_f<7>().set(FUNC(coco_t4426_device::write_f7_clock));
+	m_brg->out_f<8>().set(FUNC(coco_t4426_device::write_f8_clock));
+	m_brg->out_f<9>().set(FUNC(coco_t4426_device::write_f9_clock));
+	m_brg->out_f<11>().set(FUNC(coco_t4426_device::write_f11_clock));
+	m_brg->out_f<13>().set(FUNC(coco_t4426_device::write_f13_clock));
+	m_brg->out_f<15>().set(FUNC(coco_t4426_device::write_f15_clock));
+}
 
 ROM_START( coco_t4426 )
 	// Part of this region is filled by set_bank
@@ -226,8 +227,6 @@ INPUT_PORTS_END
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE_PRIVATE(COCO_T4426, device_cococart_interface, coco_t4426_device, "coco_t4426", "Terco CNC Programming Station 4426 multi cart")
-template class device_finder<device_cococart_interface, false>;
-template class device_finder<device_cococart_interface, true>;
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -243,6 +242,8 @@ coco_t4426_device::coco_t4426_device(const machine_config &mconfig, device_type 
 	, m_cart(nullptr)
 	, m_select(0)
 	, m_autostart(*this, CART_AUTOSTART_TAG)
+	, m_eprom(*this, CARTSLOT_TAG)
+	, m_eprom_banked(*this, CARTBANK_TAG)
 	, m_uart(*this, UART_TAG)
 	, m_pia(*this, PIA_TAG)
 	, m_brg(*this, BRG_TAG)
@@ -295,7 +296,7 @@ void coco_t4426_device::device_reset()
 	LOG("%s()\n", FUNCNAME );
 	auto cart_line = line_value::Q;
 	set_line_value(line::CART, cart_line);
-	set_bank();
+	m_select = 0x00;
 
 	// Set up the BRG divider statically to X1
 	m_brg->rsa_w( ASSERT_LINE );
@@ -334,16 +335,13 @@ READ8_MEMBER(coco_t4426_device::scs_read)
 	if ((offset >= 0x00) && (offset <= 0x07))
 	{
 		LOGPIA("- PIA\n");
-		result = m_pia->read(space, offset & 3);
+		result = m_pia->read(offset & 3);
 		LOGPIA("- Offs:%04x Data:%02x\n", offset - 0x04, result);
 	}
 	else if ((offset >= 0x08) && (offset <= 0x0f) && (offset & 2))
 	{
 		LOGACIA("- ACIA\n");
-		if (offset & 1)
-			result = m_uart->status_r(space, offset & 1);
-		else
-			result = m_uart->data_r(space, offset & 1);
+		result = m_uart->read(offset & 1);
 		LOGACIA("- Offs:%04x Data:%02x\n", offset - 0x04, result);
 	}
 	else
@@ -368,15 +366,12 @@ WRITE8_MEMBER(coco_t4426_device::scs_write)
 	if ((offset >= 0x00) && (offset <= 0x07))
 	{
 		LOG("- PIA\n");
-		m_pia->write(space, offset & 3, data);
+		m_pia->write(offset & 3, data);
 	}
 	else if ((offset >= 0x08) && (offset <= 0x0f) && (offset & 2))
 	{
 		LOGACIA("- ACIA");
-		if (offset & 1)
-		  m_uart->control_w(space, offset & 1, data);
-		else
-		  m_uart->data_w(space, offset & 1, data);
+		m_uart->write(offset & 1, data);
 		LOGACIA(" - Offs:%04x Data:%02x\n", offset & 1, data);
 	}
 	else
@@ -406,26 +401,39 @@ WRITE8_MEMBER( coco_t4426_device::pia_A_w )
 {
 	LOGPIA("%s(%02x)\n", FUNCNAME, data);
 	m_select = data;
-	set_bank();
 }
 
-void coco_t4426_device::set_bank()
-{
-	uint8_t *cartbase = memregion(CARTSLOT_TAG)->base();
-	uint8_t *bankbase = memregion(CARTBANK_TAG)->base();
+/*-------------------------------------------------
+    cts_read
+-------------------------------------------------*/
 
-	switch (m_select)
+READ8_MEMBER(coco_t4426_device::cts_read)
+{
+	uint8_t result = 0x00;
+
+	switch (offset & 0x2000)
 	{
-	case 0:
-	case ROM0:memcpy(cartbase, bankbase + 0x0000, 0x2000); break;
-	case ROM1:memcpy(cartbase, bankbase + 0x2000, 0x2000); break;
-	case ROM2:memcpy(cartbase, bankbase + 0x4000, 0x2000); break;
-	case ROM3:memcpy(cartbase, bankbase + 0x6000, 0x2000); break;
-	case ROM4:memcpy(cartbase, bankbase + 0x8000, 0x2000); break;
-	case ROM5:memcpy(cartbase, bankbase + 0xa000, 0x2000); break;
-	case ROM6:memcpy(cartbase, bankbase + 0xc000, 0x2000); break;
-	case ROM7:memcpy(cartbase, bankbase + 0xe000, 0x2000); break;
+	case 0x0000:
+		switch (m_select)
+		{
+		case 0:
+		case ROM0:result = m_eprom_banked->base()[0x0000 | offset]; break;
+		case ROM1:result = m_eprom_banked->base()[0x2000 | offset]; break;
+		case ROM2:result = m_eprom_banked->base()[0x4000 | offset]; break;
+		case ROM3:result = m_eprom_banked->base()[0x6000 | offset]; break;
+		case ROM4:result = m_eprom_banked->base()[0x8000 | offset]; break;
+		case ROM5:result = m_eprom_banked->base()[0xa000 | offset]; break;
+		case ROM6:result = m_eprom_banked->base()[0xc000 | offset]; break;
+		case ROM7:result = m_eprom_banked->base()[0xe000 | offset]; break;
+		}
+		break;
+
+	case 0x2000:
+		result = m_eprom->base()[offset];
+		break;
 	}
+
+	return result;
 }
 
 /*-------------------------------------------------

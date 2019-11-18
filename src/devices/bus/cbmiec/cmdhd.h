@@ -21,14 +21,6 @@
 
 
 //**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
-
-#define CMD_HD_TAG          "cmdhd"
-
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -56,12 +48,12 @@ protected:
 	void cbm_iec_reset(int state) override;
 
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<m6502_device> m_maincpu;
 	required_device<scsi_port_device> m_scsibus;
 
 	DECLARE_WRITE8_MEMBER( led_w );
 
-	void cmd_hd_mem(address_map &map);
+	void mem_map(address_map &map);
 };
 
 

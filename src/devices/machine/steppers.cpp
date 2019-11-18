@@ -42,13 +42,20 @@
 #include "steppers.h"
 
 DEFINE_DEVICE_TYPE(STEPPER, stepper_device, "stepper", "Stepper Motor")
+DEFINE_DEVICE_TYPE(REEL, reel_device, "reel", "Fruit Machine Reel")
 
 stepper_device::stepper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, STEPPER, tag, owner, clock)
+	: stepper_device(mconfig, STEPPER, tag, owner, clock)
+{
+}
+
+stepper_device::stepper_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, m_max_steps(48*2)
 	, m_optic_cb(*this)
 {
-	m_max_steps=(48*2);
 }
+
 ///////////////////////////////////////////////////////////////////////////
 
 void stepper_device::update_optic()
@@ -103,7 +110,6 @@ void stepper_device::device_start()
 	save_item(NAME(m_step_pos));
 	save_item(NAME(m_abs_step_pos));
 	save_item(NAME(m_max_steps));
-	save_item(NAME(m_type));
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -142,73 +148,117 @@ int stepper_device::update(uint8_t pattern)
 	a small movement that may trigger the optic tab.
 	*/
 
-	int pos,steps;
 	m_pattern = pattern;
-	switch ( m_type )
+	advance_phase();
+
+	int steps = m_old_phase - m_phase;
+	if (steps < -4)
+	{
+		steps = steps +8;
+	}
+	if (steps > 4)
+	{
+		steps = steps -8;
+	}
+
+	m_old_phase   = m_phase;
+	m_old_pattern = m_pattern;
+
+	int max = m_max_steps;
+	int pos = 0;
+
+	if (max!=0)
+	{
+		m_abs_step_pos += steps;
+		pos = (m_step_pos + steps + max) % max;
+	}
+
+	if (pos != m_step_pos)
+	{
+		changed++;
+	}
+
+	m_step_pos = pos;
+	update_optic();
+
+	return changed;
+}
+///////////////////////////////////////////////////////////////////////////
+
+void stepper_device::advance_phase()
+{
+	//Standard drive table is 2,6,4,5,1,9,8,a
+	//NOTE: This runs through the stator patterns in such a way as to drive the reel forward (downwards from the player's view, clockwise on our rose)
+	//The Heber 'Pluto' controller runs this in reverse
+	switch (m_pattern)
+	{             //Black  Blue  Red  Yellow
+		case 0x02://  0     0     1     0
+		m_phase = 7;
+		break;
+		case 0x06://  0     1     1     0
+		m_phase = 6;
+		break;
+		case 0x04://  0     1     0     0
+		m_phase = 5;
+		break;
+		case 0x05://  0     1     0     1
+		m_phase = 4;
+		break;
+		case 0x01://  0     0     0     1
+		m_phase = 3;
+		break;
+		case 0x09://  1     0     0     1
+		m_phase = 2;
+		break;
+		case 0x08://  1     0     0     0
+		m_phase = 1;
+		break;
+		case 0x0A://  1     0     1     0
+		m_phase = 0;
+		break;
+		//          Black  Blue  Red  Yellow
+		case 0x03://  0     0     1     1
+		{
+			if ((m_old_phase ==6)||(m_old_phase == 0)) // if the previous pattern had the drum in the northern quadrant, it will point north now
+			{
+				m_phase = 7;
+			}
+			else //otherwise it will line up due south
+			{
+				m_phase = 3;
+			}
+		}
+		break;
+		case 0x0C://  1     1     0     0
+		{
+			if ((m_old_phase ==6)||(m_old_phase == 4)) // if the previous pattern had the drum in the eastern quadrant, it will point east now
+			{
+				m_phase = 5;
+			}
+			else //otherwise it will line up due west
+			{
+				m_phase = 1;
+			}
+		}
+		break;
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////
+
+void reel_device::advance_phase()
+{
+	switch (m_type)
 	{
 		default:
 		logerror("No reel type specified!\n");
 		break;
-		case NOT_A_REEL :
+		case BASIC_STEPPER :
 		case STARPOINT_48STEP_REEL : /* STARPOINT RMxxx */
 		case GAMESMAN_200STEP_REEL : /* Gamesman GMxxxx */
 		case STARPOINT_144STEP_DICE :/* STARPOINT 1DCU DICE mechanism */
 		case STARPOINT_200STEP_REEL :/* STARPOINT 1DCU DICE mechanism */
-		//Standard drive table is 2,6,4,5,1,9,8,a
-		//NOTE: This runs through the stator patterns in such a way as to drive the reel forward (downwards from the player's view, clockwise on our rose)
-		//The Heber 'Pluto' controller runs this in reverse
-		switch (pattern)
-		{             //Black  Blue  Red  Yellow
-			case 0x02://  0     0     1     0
-			m_phase = 7;
-			break;
-			case 0x06://  0     1     1     0
-			m_phase = 6;
-			break;
-			case 0x04://  0     1     0     0
-			m_phase = 5;
-			break;
-			case 0x05://  0     1     0     1
-			m_phase = 4;
-			break;
-			case 0x01://  0     0     0     1
-			m_phase = 3;
-			break;
-			case 0x09://  1     0     0     1
-			m_phase = 2;
-			break;
-			case 0x08://  1     0     0     0
-			m_phase = 1;
-			break;
-			case 0x0A://  1     0     1     0
-			m_phase = 0;
-			break;
-			//          Black  Blue  Red  Yellow
-			case 0x03://  0     0     1     1
-			{
-				if ((m_old_phase ==6)||(m_old_phase == 0)) // if the previous pattern had the drum in the northern quadrant, it will point north now
-				{
-					m_phase = 7;
-				}
-				else //otherwise it will line up due south
-				{
-					m_phase = 3;
-				}
-			}
-			break;
-			case 0x0C://  1     1     0     0
-			{
-				if ((m_old_phase ==6)||(m_old_phase == 4)) // if the previous pattern had the drum in the eastern quadrant, it will point east now
-				{
-					m_phase = 5;
-				}
-				else //otherwise it will line up due west
-				{
-					m_phase = 1;
-				}
-			}
-			break;
-		}
+		stepper_device::advance_phase();
 		break;
 
 		case BARCREST_48STEP_REEL :
@@ -216,7 +266,7 @@ int stepper_device::update(uint8_t pattern)
 		case GAMESMAN_100STEP_REEL :
 		//Standard drive table is 1,3,2,6,4,C,8,9
 		//Gamesman 48 step uses this pattern shifted one place forward, though this shouldn't matter
-		switch (pattern)
+		switch (m_pattern)
 		{
 			//             Yellow   Brown  Orange Black
 			case 0x01://  0        0      0      1
@@ -279,7 +329,7 @@ int stepper_device::update(uint8_t pattern)
 		   Inverters are used so if a pin is low, the higher bit of the pair is activated, and if high the lower bit is activated.
 		   TODO:Check this, 2 and 1 could be switched over.
 		 */
-		switch (pattern)
+		switch (m_pattern)
 		{
 		//             Yellow(2)   Brown(1)  Orange(!2) Black(!1)
 			case 0x00 :// 0          0          1         1
@@ -301,7 +351,7 @@ int stepper_device::update(uint8_t pattern)
 		//While the 48 and 100 step models appear to be reverse driven Starpoint reels, the 200 step model seems bespoke, certainly in terms of wiring.
 		//On a Proconn machine this same pattern is seen but running in reverse
 		//Standard drive table is 8,c,4,6,2,3,1,9
-		switch (pattern)
+		switch (m_pattern)
 		{
 			case 0x08://  0     0     1     0
 			m_phase = 7;
@@ -358,7 +408,7 @@ int stepper_device::update(uint8_t pattern)
 		//Standard drive table is 8,c,4,5,1,3,2,a
 		//This appears to be basically a rewired Gamesman (the reel PCB looks like it does some shuffling)
 		//TODO: Not sure if this should be represented as a type here, or by defining it as a Gamesman in the driver and bitswapping.
-		switch (pattern)
+		switch (m_pattern)
 		{
 			case 0x08://  0     0     1     0
 			m_phase = 7;
@@ -410,41 +460,33 @@ int stepper_device::update(uint8_t pattern)
 			break;
 		}
 		break;
-
-
-
 	}
+}
+///////////////////////////////////////////////////////////////////////////
 
-	steps = m_old_phase - m_phase;
+reel_device::reel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint8_t type, int16_t start_index, int16_t end_index
+	, int16_t index_pattern, uint8_t init_phase, int16_t max_steps)
+	: stepper_device(mconfig, tag, owner)
+{
+	set_reel_type(type);
+	set_start_index(start_index);
+	set_end_index(end_index);
+	set_index_pattern(index_pattern);
+	set_init_phase(init_phase);
+	set_max_steps(max_steps);
+}
+///////////////////////////////////////////////////////////////////////////
 
-	if (steps < -4)
-	{
-		steps = steps +8;
-	}
-	if (steps > 4)
-	{
-		steps = steps -8;
-	}
+reel_device::reel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: stepper_device(mconfig, REEL, tag, owner, clock)
+{
+}
 
-	m_old_phase   = m_phase;
-	m_old_pattern = m_pattern;
+///////////////////////////////////////////////////////////////////////////
 
-	int max = m_max_steps;
-	pos = 0;
+void reel_device::device_start()
+{
+	stepper_device::device_start();
 
-	if (max!=0)
-	{
-		m_abs_step_pos += steps;
-		pos = (m_step_pos + steps + max) % max;
-	}
-
-	if (pos != m_step_pos)
-	{
-		changed++;
-	}
-
-	m_step_pos = pos;
-	update_optic();
-
-	return changed;
+	save_item(NAME(m_type));
 }

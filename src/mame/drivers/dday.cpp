@@ -35,15 +35,15 @@ read:
 write:
 
 4000 Search light image and flip
-6400 AY8910 #1 Control Port
-6401 AY8910 #1 Write Port
-6800 AY8910 #2 Control Port
-6801 AY8910 #2 Write Port
+6400 AY8912 #1 Control Port
+6401 AY8912 #1 Write Port
+6800 AY8912 #2 Control Port
+6801 AY8912 #2 Write Port
 7800 Bit 0 - Coin Counter 1
      Bit 1 - Coin Counter 2
      Bit 2 - ??? Pulsated when the player is hit
      Bit 3 - ??? Seems to be unused
-     Bit 4 - Tied to AY8910 RST. Used to turn off sound
+     Bit 4 - Tied to AY8912 RST. Used to turn off sound
      Bit 5 - ??? Seem to be always on
      Bit 6 - Search light enable
      Bit 7 - ???
@@ -61,18 +61,18 @@ write:
 void dday_state::dday_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x4000).w(this, FUNC(dday_state::dday_sl_control_w));
-	map(0x5000, 0x53ff).ram().w(this, FUNC(dday_state::dday_textvideoram_w)).share("textvideoram");
-	map(0x5400, 0x57ff).ram().w(this, FUNC(dday_state::dday_fgvideoram_w)).share("fgvideoram");
-	map(0x5800, 0x5bff).ram().w(this, FUNC(dday_state::dday_bgvideoram_w)).share("bgvideoram");
-	map(0x5c00, 0x5fff).rw(this, FUNC(dday_state::dday_colorram_r), FUNC(dday_state::dday_colorram_w)).share("colorram");
+	map(0x4000, 0x4000).w(FUNC(dday_state::dday_sl_control_w));
+	map(0x5000, 0x53ff).ram().w(FUNC(dday_state::dday_textvideoram_w)).share("textvideoram");
+	map(0x5400, 0x57ff).ram().w(FUNC(dday_state::dday_fgvideoram_w)).share("fgvideoram");
+	map(0x5800, 0x5bff).ram().w(FUNC(dday_state::dday_bgvideoram_w)).share("bgvideoram");
+	map(0x5c00, 0x5fff).rw(FUNC(dday_state::dday_colorram_r), FUNC(dday_state::dday_colorram_w)).share("colorram");
 	map(0x6000, 0x63ff).ram();
-	map(0x6400, 0x6401).mirror(0x000e).w(m_ay1, FUNC(ay8910_device::address_data_w));
-	map(0x6800, 0x6801).w("ay2", FUNC(ay8910_device::address_data_w));
+	map(0x6400, 0x6401).mirror(0x000e).w(m_ay1, FUNC(ay8912_device::address_data_w));
+	map(0x6800, 0x6801).w("ay2", FUNC(ay8912_device::address_data_w));
 	map(0x6c00, 0x6c00).portr("BUTTONS");
 	map(0x7000, 0x7000).portr("DSW0");
 	map(0x7400, 0x7400).portr("DSW1");
-	map(0x7800, 0x7800).rw(this, FUNC(dday_state::dday_countdown_timer_r), FUNC(dday_state::dday_control_w));
+	map(0x7800, 0x7800).rw(FUNC(dday_state::dday_countdown_timer_r), FUNC(dday_state::dday_control_w));
 	map(0x7c00, 0x7c00).portr("PADDLE");
 }
 
@@ -229,7 +229,7 @@ static const gfx_layout layout_3bpp =
 	8*8     /* every char takes 8 consecutive bytes */
 };
 
-static GFXDECODE_START( dday )
+static GFXDECODE_START( gfx_dday )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_3bpp, 0,       256/8 )   /* background */
 	GFXDECODE_ENTRY( "gfx2", 0, layout_2bpp, 8*4,     8 )       /* foreground */
 	GFXDECODE_ENTRY( "gfx3", 0, layout_2bpp, 8*4+8*4, 8 )       /* text */
@@ -254,37 +254,32 @@ void dday_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(dday_state::dday)
-
+void dday_state::dday(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 2000000)     /* 2 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(dday_map)
+	Z80(config, m_maincpu, 2000000);     /* 2 MHz ? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &dday_state::dday_map);
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(dday_state, screen_update_dday)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 0*8, 28*8-1);
+	m_screen->set_screen_update(FUNC(dday_state::screen_update_dday));
+	m_screen->set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dday)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256) /* HACK!!! */
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_INIT_OWNER(dday_state, dday)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dday);
+	PALETTE(config, m_palette, FUNC(dday_state::dday_palette), 256).enable_shadows();
+	m_palette->set_indirect_entries(256); // HACK!!!
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ay1", AY8910, 1000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-
-	MCFG_SOUND_ADD("ay2", AY8910, 1000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	AY8912(config, m_ay1, 1000000).add_route(ALL_OUTPUTS, "mono", 0.25);
+	AY8912(config, "ay2", 1000000).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -359,5 +354,5 @@ ROM_START( ddayc )
 ROM_END
 
 
-GAME( 1982, dday,  0,    dday, dday,  dday_state, 0, ROT0, "Olympia",                   "D-Day",           MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, ddayc, dday, dday, ddayc, dday_state, 0, ROT0, "Olympia (Centuri license)", "D-Day (Centuri)", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, dday,  0,    dday, dday,  dday_state, empty_init, ROT0, "Olympia",                   "D-Day",           MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, ddayc, dday, dday, ddayc, dday_state, empty_init, ROT0, "Olympia (Centuri license)", "D-Day (Centuri)", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )

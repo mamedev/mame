@@ -9,10 +9,10 @@ or for the case of a computer with an inbuilt (not serial) ascii keyboard.
 
 Example of usage in a driver.
 
-In MACHINE_CONFIG
+In the machine config function:
 
-    MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
-    MCFG_GENERIC_KEYBOARD_CB(WRITE8(xxx_state, kbd_put))
+    generic_keyboard_device &kbd(GENERIC_KEYBOARD(config, KEYBOARD_TAG, 0));
+    kbd.set_keyboard_callback(FUNC(xxx_state::kbd_put));
 
 In the code:
 
@@ -253,7 +253,7 @@ generic_keyboard_device::generic_keyboard_device(
 	, m_config(*this, "GENKBD_CFG")
 	, m_modifiers(*this, "GENKBD_MOD")
 	, m_last_modifiers(0U)
-	, m_keyboard_cb()
+	, m_keyboard_cb(*this)
 {
 }
 
@@ -272,7 +272,7 @@ ioport_constructor generic_keyboard_device::device_input_ports() const
 
 void generic_keyboard_device::device_start()
 {
-	m_keyboard_cb.bind_relative_to(*owner());
+	m_keyboard_cb.resolve();
 
 	save_item(NAME(m_last_modifiers));
 }

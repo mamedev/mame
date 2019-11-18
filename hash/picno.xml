@@ -5,7 +5,7 @@ List of games, initially taken from http://videogamesdensetsu.tumblr.com/post/14
 (* denotes dumped)
    RX101 Save Card / セーブカード
   *RX102 Montage / モンタージュ
-   RX103 Fushigi no Kuni no Alice / ふしぎの国のアリス
+  *RX103 Fushigi no Kuni no Alice / ふしぎの国のアリス
    RX104 ???
   *RX105 Picno de A B C
   *RX106 Anime Enikki / アニメ絵日記
@@ -14,7 +14,7 @@ List of games, initially taken from http://videogamesdensetsu.tumblr.com/post/14
   *RX109 Picno Art Puzzle / ピクノアートパズル
   *RX110 Real Montage / リアルモンタージュ
   *RX111 Kiiroi Kyōryū-kun Parasa no Obake Taiji / きいろい恐竜くん パラサのオバケ退治
-   RX112 Anime Box / アニメボックス
+  *RX112 Anime Box / アニメボックス
    RX113 Picno de Nihon Chizu / ピクノでにほんちず
    RX114 ???
    RX115 Dokkin Shinri Game / どっきん心理ゲーム
@@ -24,12 +24,25 @@ List of games, initially taken from http://videogamesdensetsu.tumblr.com/post/14
    RX119 Nontan to Issho Anime Stamp / ノンタンといっしょ アニメスタンプ
    RX120 Manfī no Fushigi na Bōken / マンフィーのふしぎなぼうけん
    RX121 ???
-   RX122 Son Gokū no Bōken / そんごくうの冒険
+  *RX122 Son Gokū no Bōken / そんごくうの冒険
    RX123 Sen'yō Card Soft / 専用カードソフト
    RX124 Chibimaruko-chan no Tashizan Hikizan / ちびまる子ちゃんのたしざんひきざん
 -->
 
 <softwarelist name="picno" description="Konami Picno cartridges">
+
+	<software name="animebox" supported="no">
+		<description>Anime Box</description>
+		<year>1994</year>
+		<publisher>Konami</publisher>
+		<info name="serial" value="RX112"/>
+		<info name="alt_title" value="アニメボックス"/>
+		<part name="cart" interface="picno_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="rx112.bin" size="524288" crc="42a6b05c" sha1="29ae55692c115b5f311f2c2a12888e8fff17ced5" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="aenikki" supported="no">
 		<description>Anime Enikki</description>
@@ -40,7 +53,20 @@ List of games, initially taken from http://videogamesdensetsu.tumblr.com/post/14
 		<part name="cart" interface="picno_cart">
 			<feature name="pcb" value="R0-028" />
 			<dataarea name="rom" size="524288">
-				<rom name="rx106.bin" size="524288" crc="aa334046" sha1="ee3f37c4a9256c1be446fc4ea877da1be1cf04d6" offset="00000" />
+				<rom name="rx106.bin" size="524288" crc="aa334046" sha1="ee3f37c4a9256c1be446fc4ea877da1be1cf04d6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alice" supported="no">
+		<description>Fushigi no Kuni no Alice</description>
+		<year>1992</year>
+		<publisher>Konami</publisher>
+		<info name="serial" value="RX112"/>
+		<info name="alt_title" value="ふしぎの国のアリス"/>
+		<part name="cart" interface="picno_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="rx103.bin" size="524288" crc="0dde07a2" sha1="4bd11755df05d7e4cbb76fffcc215ee91ba96d50" />
 			</dataarea>
 		</part>
 	</software>
@@ -54,7 +80,7 @@ List of games, initially taken from http://videogamesdensetsu.tumblr.com/post/14
 		<part name="cart" interface="picno_cart">
 			<feature name="pcb" value="R0-028" />
 			<dataarea name="rom" size="524288">
-				<rom name="rx116.bin" size="524288" crc="78b6eb10" sha1="dae38fbeeb0b411e849a800fe12ad1d1d42f9a99" offset="00000" />
+				<rom name="rx116.bin" size="524288" crc="78b6eb10" sha1="dae38fbeeb0b411e849a800fe12ad1d1d42f9a99" />
 			</dataarea>
 		</part>
 	</software>
@@ -67,7 +93,7 @@ List of games, initially taken from http://videogamesdensetsu.tumblr.com/post/14
 		<info name="alt_title" value="きいろい恐竜くん パラサのオバケ退治"/>
 		<part name="cart" interface="picno_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="rx111.bin" size="524288" crc="c2b1a5ab" sha1="3af4124d16fbd66805d26b7ddf9b6bcc8f5d07f5" offset="00000" />
+				<rom name="rx111.bin" size="524288" crc="c2b1a5ab" sha1="3af4124d16fbd66805d26b7ddf9b6bcc8f5d07f5" />
 			</dataarea>
 		</part>
 	</software>
@@ -81,7 +107,7 @@ List of games, initially taken from http://videogamesdensetsu.tumblr.com/post/14
 		<part name="cart" interface="picno_cart">
 			<feature name="pcb" value="R0-028" />
 			<dataarea name="rom" size="262144">
-				<rom name="rx102.bin" size="262144" crc="014b1da5" sha1="718000598da119fde15899e0b746e0d1b3c9b038" offset="00000" />
+				<rom name="rx102.bin" size="262144" crc="014b1da5" sha1="718000598da119fde15899e0b746e0d1b3c9b038" />
 			</dataarea>
 		</part>
 	</software>
@@ -95,7 +121,7 @@ List of games, initially taken from http://videogamesdensetsu.tumblr.com/post/14
 		<part name="cart" interface="picno_cart">
 			<feature name="pcb" value="R0-034" />
 			<dataarea name="rom" size="1048576">
-				<rom name="rx109.bin" size="1048576" crc="6de0342b" sha1="43534c4beb67036a5225634fa72567d93c4ee35e" offset="00000" />
+				<rom name="rx109.bin" size="1048576" crc="6de0342b" sha1="43534c4beb67036a5225634fa72567d93c4ee35e" />
 			</dataarea>
 		</part>
 	</software>
@@ -109,7 +135,7 @@ List of games, initially taken from http://videogamesdensetsu.tumblr.com/post/14
 		<part name="cart" interface="picno_cart">
 			<feature name="pcb" value="R0-034?" />
 			<dataarea name="rom" size="1048576">
-				<rom name="rx108.bin" size="1048576" crc="ca4a4d22" sha1="8ee0b6b6c69ea5d49472b56d6e00c1d5fb2ffdaa" offset="00000" />
+				<rom name="rx108.bin" size="1048576" crc="ca4a4d22" sha1="8ee0b6b6c69ea5d49472b56d6e00c1d5fb2ffdaa" />
 			</dataarea>
 		</part>
 	</software>
@@ -122,7 +148,7 @@ List of games, initially taken from http://videogamesdensetsu.tumblr.com/post/14
 		<part name="cart" interface="picno_cart">
 			<feature name="pcb" value="R0-028" />
 			<dataarea name="rom" size="524288">
-				<rom name="rx105.bin" size="524288" crc="590e3bd8" sha1="05a1c22aa916c8177ab743ef633bae31cb28c0db" offset="00000" />
+				<rom name="rx105.bin" size="524288" crc="590e3bd8" sha1="05a1c22aa916c8177ab743ef633bae31cb28c0db" />
 			</dataarea>
 		</part>
 	</software>
@@ -136,7 +162,7 @@ List of games, initially taken from http://videogamesdensetsu.tumblr.com/post/14
 		<part name="cart" interface="picno_cart">
 			<feature name="pcb" value="R0-034" />
 			<dataarea name="rom" size="1048576">
-				<rom name="rx107.bin" size="1048576" crc="f56e48bc" sha1="aa0ec867183e799c0ded1cfdaab92250a6fb6556" offset="00000" />
+				<rom name="rx107.bin" size="1048576" crc="f56e48bc" sha1="aa0ec867183e799c0ded1cfdaab92250a6fb6556" />
 			</dataarea>
 		</part>
 	</software>
@@ -150,7 +176,7 @@ List of games, initially taken from http://videogamesdensetsu.tumblr.com/post/14
 		<part name="cart" interface="picno_cart">
 			<feature name="pcb" value="R0-028" />
 			<dataarea name="rom" size="524288">
-				<rom name="rx110.bin" size="524288" crc="3fa2de37" sha1="27b99bc33ec00b025188039c434da5ad425492dc" offset="00000" />
+				<rom name="rx110.bin" size="524288" crc="3fa2de37" sha1="27b99bc33ec00b025188039c434da5ad425492dc" />
 			</dataarea>
 		</part>
 	</software>
@@ -164,7 +190,20 @@ List of games, initially taken from http://videogamesdensetsu.tumblr.com/post/14
 		<part name="cart" interface="picno_cart">
 			<feature name="pcb" value="R0-028" />
 			<dataarea name="rom" size="524288">
-				<rom name="RX118 - Shirayuki Hime Monogatari.bin" size="524288" crc="6720748f" sha1="cb6c1a4d53bb583e2114923f24ab2383a5e078c4" offset="00000" />
+				<rom name="RX118 - Shirayuki Hime Monogatari.bin" size="524288" crc="6720748f" sha1="cb6c1a4d53bb583e2114923f24ab2383a5e078c4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="songoku" supported="no">
+		<description>Son Gokū no Bōken</description>
+		<year>1995</year>
+		<publisher>Konami</publisher>
+		<info name="serial" value="RX122"/>
+		<info name="alt_title" value="そんごくうの冒険"/>
+		<part name="cart" interface="picno_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="rx122.bin" size="524288" crc="c3f8338d" sha1="f3f7508acb20a887d4cc9c831e2cf336656a3871" />
 			</dataarea>
 		</part>
 	</software>

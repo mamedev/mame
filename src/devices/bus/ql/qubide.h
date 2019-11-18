@@ -12,7 +12,7 @@
 #pragma once
 
 #include "exp.h"
-#include "machine/ataintf.h"
+#include "bus/ata/ataintf.h"
 
 
 
@@ -39,8 +39,8 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 
 	// device_ql_expansion_card_interface overrides
-	virtual uint8_t read(address_space &space, offs_t offset, uint8_t data) override;
-	virtual void write(address_space &space, offs_t offset, uint8_t data) override;
+	virtual uint8_t read(offs_t offset, uint8_t data) override;
+	virtual void write(offs_t offset, uint8_t data) override;
 
 private:
 	required_device<ata_interface_device> m_ata;

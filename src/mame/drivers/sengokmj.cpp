@@ -61,15 +61,17 @@ RSSENGO2.72   chr.
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
 #include "video/seibu_crtc.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
-class sengokmj_state : public driver_device, protected seibu_sound_common
+class sengokmj_state : public driver_device, public seibu_sound_common
 {
 public:
-	sengokmj_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	sengokmj_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
@@ -77,8 +79,16 @@ public:
 		m_sc1_vram(*this, "sc1_vram"),
 		m_sc2_vram(*this, "sc2_vram"),
 		m_sc3_vram(*this, "sc3_vram"),
-		m_spriteram16(*this, "sprite_ram") { }
+		m_spriteram16(*this, "sprite_ram")
+	{ }
 
+	void sengokmj(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -117,12 +127,9 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 
-	virtual void machine_start() override;
-	virtual void video_start() override;
-
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,int pri);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void sengokmj(machine_config &config);
+
 	void sengokmj_io_map(address_map &map);
 	void sengokmj_map(address_map &map);
 };
@@ -301,10 +308,10 @@ void sengokmj_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 
 void sengokmj_state::video_start()
 {
-	m_sc0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sengokmj_state::seibucrtc_sc0_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
-	m_sc2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sengokmj_state::seibucrtc_sc2_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
-	m_sc1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sengokmj_state::seibucrtc_sc1_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
-	m_sc3_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sengokmj_state::seibucrtc_sc3_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_sc0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sengokmj_state::seibucrtc_sc0_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_sc2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sengokmj_state::seibucrtc_sc2_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_sc1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sengokmj_state::seibucrtc_sc1_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_sc3_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sengokmj_state::seibucrtc_sc3_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	m_sc2_tilemap->set_transparent_pen(15);
 	m_sc1_tilemap->set_transparent_pen(15);
@@ -394,10 +401,10 @@ void sengokmj_state::sengokmj_map(address_map &map)
 {
 	map(0x00000, 0x07fff).ram();
 	map(0x08000, 0x09fff).ram().share("nvram");
-	map(0x0c000, 0x0c7ff).ram().w(this, FUNC(sengokmj_state::seibucrtc_sc0vram_w)).share("sc0_vram");
-	map(0x0c800, 0x0cfff).ram().w(this, FUNC(sengokmj_state::seibucrtc_sc1vram_w)).share("sc1_vram");
-	map(0x0d000, 0x0d7ff).ram().w(this, FUNC(sengokmj_state::seibucrtc_sc2vram_w)).share("sc2_vram");
-	map(0x0d800, 0x0e7ff).ram().w(this, FUNC(sengokmj_state::seibucrtc_sc3vram_w)).share("sc3_vram");
+	map(0x0c000, 0x0c7ff).ram().w(FUNC(sengokmj_state::seibucrtc_sc0vram_w)).share("sc0_vram");
+	map(0x0c800, 0x0cfff).ram().w(FUNC(sengokmj_state::seibucrtc_sc1vram_w)).share("sc1_vram");
+	map(0x0d000, 0x0d7ff).ram().w(FUNC(sengokmj_state::seibucrtc_sc2vram_w)).share("sc2_vram");
+	map(0x0d800, 0x0e7ff).ram().w(FUNC(sengokmj_state::seibucrtc_sc3vram_w)).share("sc3_vram");
 	map(0x0e800, 0x0f7ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x0f800, 0x0ffff).ram().share("sprite_ram");
 	map(0xc0000, 0xfffff).rom();
@@ -409,14 +416,14 @@ void sengokmj_state::sengokmj_io_map(address_map &map)
 	/*Areas from 8000-804f are for the custom Seibu CRTC.*/
 	map(0x8000, 0x804f).rw("crtc", FUNC(seibu_crtc_device::read), FUNC(seibu_crtc_device::write));
 
-//  AM_RANGE(0x8080, 0x8081) CRTC extra register?
-//  AM_RANGE(0x80c0, 0x80c1) CRTC extra register?
-//  AM_RANGE(0x8100, 0x8101) AM_WRITENOP // always 0
-	map(0x8180, 0x8181).w(this, FUNC(sengokmj_state::out_w));
-	map(0x8140, 0x8141).w(this, FUNC(sengokmj_state::mahjong_panel_w));
+//  map(0x8080, 0x8081) CRTC extra register?
+//  map(0x80c0, 0x80c1) CRTC extra register?
+//  map(0x8100, 0x8101).nopw(); // always 0
+	map(0x8180, 0x8181).w(FUNC(sengokmj_state::out_w));
+	map(0x8140, 0x8141).w(FUNC(sengokmj_state::mahjong_panel_w));
 	map(0xc000, 0xc001).portr("DSW");
-	map(0xc002, 0xc003).r(this, FUNC(sengokmj_state::mahjong_panel_r));
-	map(0xc004, 0xc005).r(this, FUNC(sengokmj_state::system_r)); //switches
+	map(0xc002, 0xc003).r(FUNC(sengokmj_state::mahjong_panel_r));
+	map(0xc004, 0xc005).r(FUNC(sengokmj_state::system_r)); //switches
 }
 
 
@@ -547,7 +554,7 @@ static const gfx_layout charlayout =
 	128*8   /* every sprite takes 128 consecutive bytes */
 };
 
-static GFXDECODE_START( sengokmj )
+static GFXDECODE_START( gfx_sengokmj )
 	GFXDECODE_ENTRY( "spr_gfx",0, tilelayout, 0x000, 0x40 ) /* Sprites */
 	GFXDECODE_ENTRY( "bg_gfx", 0, tilelayout, 0x400, 0x10 ) /* Tiles */
 	GFXDECODE_ENTRY( "md_gfx", 0, tilelayout, 0x500, 0x10 ) /* Tiles */
@@ -558,7 +565,7 @@ GFXDECODE_END
 WRITE_LINE_MEMBER(sengokmj_state::vblank_irq)
 {
 	if (state)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xc8/4);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xc8/4); // V30
 }
 
 WRITE16_MEMBER( sengokmj_state::layer_en_w )
@@ -572,52 +579,53 @@ WRITE16_MEMBER( sengokmj_state::layer_scroll_w )
 }
 
 
-MACHINE_CONFIG_START(sengokmj_state::sengokmj)
-
+void sengokmj_state::sengokmj(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V30, 16000000/2) /* V30-8 */
-	MCFG_CPU_PROGRAM_MAP(sengokmj_map)
-	MCFG_CPU_IO_MAP(sengokmj_io_map)
+	V30(config, m_maincpu, 16000000/2); /* V30-8 */
+	m_maincpu->set_addrmap(AS_PROGRAM, &sengokmj_state::sengokmj_map);
+	m_maincpu->set_addrmap(AS_IO, &sengokmj_state::sengokmj_io_map);
 
-	MCFG_CPU_ADD("audiocpu", Z80, 14318180/4)
-	MCFG_CPU_PROGRAM_MAP(seibu_sound_map)
+	z80_device &audiocpu(Z80(config, "audiocpu", 14318180/4));
+	audiocpu.set_addrmap(AS_PROGRAM, &sengokmj_state::seibu_sound_map);
+	audiocpu.set_irq_acknowledge_callback("seibu_sound", FUNC(seibu_sound_device::im0_vector_cb));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-1) //TODO: dynamic resolution
-	MCFG_SCREEN_UPDATE_DRIVER(sengokmj_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(sengokmj_state, vblank_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0, 320-1, 16, 256-1); //TODO: dynamic resolution
+	screen.set_screen_update(FUNC(sengokmj_state::screen_update));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(sengokmj_state::vblank_irq));
 
-	MCFG_DEVICE_ADD("crtc", SEIBU_CRTC, 0)
-	MCFG_SEIBU_CRTC_LAYER_EN_CB(WRITE16(sengokmj_state, layer_en_w))
-	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(sengokmj_state, layer_scroll_w))
+	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
+	crtc.layer_en_callback().set(FUNC(sengokmj_state::layer_en_w));
+	crtc.layer_scroll_callback().set(FUNC(sengokmj_state::layer_scroll_w));
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sengokmj)
-	MCFG_PALETTE_ADD("palette", 0x800)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sengokmj);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x800);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, 14318180/4)
-	MCFG_YM3812_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", 14318180/4));
+	ymsnd.irq_handler().set("seibu_sound", FUNC(seibu_sound_device::fm_irqhandler));
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_OKIM6295_ADD("oki", 1320000, PIN7_LOW)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	okim6295_device &oki(OKIM6295(config, "oki", 1320000, okim6295_device::PIN7_LOW));
+	oki.add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
-	MCFG_SEIBU_SOUND_CPU("audiocpu")
-	MCFG_SEIBU_SOUND_ROMBANK("seibu_bank1")
-	MCFG_SEIBU_SOUND_YM_READ_CB(DEVREAD8("ymsnd", ym3812_device, read))
-	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym3812_device, write))
-MACHINE_CONFIG_END
+	seibu_sound_device &seibu_sound(SEIBU_SOUND(config, "seibu_sound", 0));
+	seibu_sound.int_callback().set_inputline("audiocpu", 0);
+	seibu_sound.set_rom_tag("audiocpu");
+	seibu_sound.set_rombank_tag("seibu_bank1");
+	seibu_sound.ym_read_callback().set("ymsnd", FUNC(ym3812_device::read));
+	seibu_sound.ym_write_callback().set("ymsnd", FUNC(ym3812_device::write));
+}
 
 
 ROM_START( sengokmj )
@@ -656,5 +664,5 @@ ROM_START( sengokmj )
 	ROM_LOAD( "rs006.89", 0x000, 0x200, CRC(96f7646e) SHA1(400a831b83d6ac4d2a46ef95b97b1ee237099e44) ) /* Priority */
 ROM_END
 
-GAME( 1991, sengokmj, 0, sengokmj, sengokmj, sengokmj_state, 0, ROT0, "Sigma", "Sengoku Mahjong [BET] (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, sengokmj, 0, sengokmj, sengokmj, sengokmj_state, empty_init, ROT0, "Sigma", "Sengoku Mahjong [BET] (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 /*Non-Bet Version?*/

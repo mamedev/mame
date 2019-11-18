@@ -28,35 +28,34 @@
 
 /**************************************************************************************/
 
-PALETTE_INIT_MEMBER(snk_state,tnk3)
+void snk_state::tnk3_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
-	int num_colors = 0x400;
+	uint8_t const *const color_prom = memregion("proms")->base();
+	constexpr int num_colors = 0x400;
 
-	for( i=0; i<num_colors; i++ )
+	for (int i = 0; i < num_colors; i++)
 	{
-		int bit0=0,bit1,bit2,bit3,r,g,b;
+		int bit0, bit1, bit2, bit3;
 
-		bit0 = (color_prom[i + 2*num_colors] >> 3) & 0x01;
-		bit1 = (color_prom[i] >> 1) & 0x01;
-		bit2 = (color_prom[i] >> 2) & 0x01;
-		bit3 = (color_prom[i] >> 3) & 0x01;
-		r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		bit0 = BIT(color_prom[i + 2*num_colors], 3);
+		bit1 = BIT(color_prom[i], 1);
+		bit2 = BIT(color_prom[i], 2);
+		bit3 = BIT(color_prom[i], 3);
+		int const r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		bit0 = (color_prom[i + 2*num_colors] >> 2) & 0x01;
-		bit1 = (color_prom[i + num_colors] >> 2) & 0x01;
-		bit2 = (color_prom[i + num_colors] >> 3) & 0x01;
-		bit3 = (color_prom[i] >> 0) & 0x01;
-		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		bit0 = BIT(color_prom[i + 2*num_colors], 2);
+		bit1 = BIT(color_prom[i + num_colors], 2);
+		bit2 = BIT(color_prom[i + num_colors], 3);
+		bit3 = BIT(color_prom[i], 0);
+		int const g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		bit0 = (color_prom[i + 2*num_colors] >> 0) & 0x01;
-		bit1 = (color_prom[i + 2*num_colors] >> 1) & 0x01;
-		bit2 = (color_prom[i + num_colors] >> 0) & 0x01;
-		bit3 = (color_prom[i + num_colors] >> 1) & 0x01;
-		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		bit0 = BIT(color_prom[i + 2*num_colors], 0);
+		bit1 = BIT(color_prom[i + 2*num_colors], 1);
+		bit2 = BIT(color_prom[i + num_colors], 0);
+		bit3 = BIT(color_prom[i + num_colors], 1);
+		int const b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette.set_pen_color(i,rgb_t(r,g,b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
@@ -225,9 +224,9 @@ VIDEO_START_MEMBER(snk_state,marvins)
 {
 	VIDEO_START_CALL_MEMBER(snk_3bpp_shadow);
 
-	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(snk_state::marvins_get_tx_tile_info),this), tilemap_mapper_delegate(FUNC(snk_state::marvins_tx_scan_cols),this), 8, 8, 36, 28);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(snk_state::marvins_get_fg_tile_info),this), TILEMAP_SCAN_COLS,    8, 8, 64, 32);
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(snk_state::marvins_get_bg_tile_info),this), TILEMAP_SCAN_COLS,    8, 8, 64, 32);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(snk_state::marvins_get_tx_tile_info)), tilemap_mapper_delegate(*this, FUNC(snk_state::marvins_tx_scan_cols)), 8, 8, 36, 28);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(snk_state::marvins_get_fg_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(snk_state::marvins_get_bg_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 64, 32);
 
 	m_tx_tilemap->set_transparent_pen(15);
 	m_tx_tilemap->set_scrolldy(8, 8);
@@ -246,8 +245,8 @@ VIDEO_START_MEMBER(snk_state,jcross)
 {
 	VIDEO_START_CALL_MEMBER(snk_3bpp_shadow);
 
-	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(snk_state::marvins_get_tx_tile_info),this), tilemap_mapper_delegate(FUNC(snk_state::marvins_tx_scan_cols),this), 8, 8, 36, 28);
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(snk_state::aso_get_bg_tile_info),this),     TILEMAP_SCAN_COLS,    8, 8, 64, 64);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(snk_state::marvins_get_tx_tile_info)), tilemap_mapper_delegate(*this, FUNC(snk_state::marvins_tx_scan_cols)), 8, 8, 36, 28);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(snk_state::aso_get_bg_tile_info)),     TILEMAP_SCAN_COLS, 8, 8, 64, 64);
 
 	m_tx_tilemap->set_transparent_pen(15);
 	m_tx_tilemap->set_scrolldy(8, 8);
@@ -265,8 +264,8 @@ VIDEO_START_MEMBER(snk_state,sgladiat)
 {
 	VIDEO_START_CALL_MEMBER(snk_3bpp_shadow);
 
-	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(snk_state::marvins_get_tx_tile_info),this), tilemap_mapper_delegate(FUNC(snk_state::marvins_tx_scan_cols),this), 8, 8, 36, 28);
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(snk_state::aso_get_bg_tile_info),this),     TILEMAP_SCAN_COLS,    8, 8, 64, 32);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(snk_state::marvins_get_tx_tile_info)), tilemap_mapper_delegate(*this, FUNC(snk_state::marvins_tx_scan_cols)), 8, 8, 36, 28);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(snk_state::aso_get_bg_tile_info)),     TILEMAP_SCAN_COLS, 8, 8, 64, 32);
 
 	m_tx_tilemap->set_transparent_pen(15);
 	m_tx_tilemap->set_scrolldy(8, 8);
@@ -305,8 +304,8 @@ VIDEO_START_MEMBER(snk_state,tnk3)
 {
 	VIDEO_START_CALL_MEMBER(snk_3bpp_shadow);
 
-	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(snk_state::marvins_get_tx_tile_info),this), tilemap_mapper_delegate(FUNC(snk_state::marvins_tx_scan_cols),this), 8, 8, 36, 28);
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(snk_state::tnk3_get_bg_tile_info),this),    TILEMAP_SCAN_COLS,    8, 8, 64, 64);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(snk_state::marvins_get_tx_tile_info)), tilemap_mapper_delegate(*this, FUNC(snk_state::marvins_tx_scan_cols)), 8, 8, 36, 28);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(snk_state::tnk3_get_bg_tile_info)),    TILEMAP_SCAN_COLS, 8, 8, 64, 64);
 
 	m_tx_tilemap->set_transparent_pen(15);
 	m_tx_tilemap->set_scrolldy(8, 8);
@@ -323,8 +322,8 @@ VIDEO_START_MEMBER(snk_state,ikari)
 {
 	VIDEO_START_CALL_MEMBER(snk_3bpp_shadow);
 
-	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(snk_state::ikari_get_tx_tile_info),this), tilemap_mapper_delegate(FUNC(snk_state::marvins_tx_scan_cols),this),  8,  8, 36, 28);
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(snk_state::ikari_get_bg_tile_info),this), TILEMAP_SCAN_COLS,    16, 16, 32, 32);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(snk_state::ikari_get_tx_tile_info)), tilemap_mapper_delegate(*this, FUNC(snk_state::marvins_tx_scan_cols)), 8, 8, 36, 28);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(snk_state::ikari_get_bg_tile_info)), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
 
 	m_tx_tilemap->set_transparent_pen(15);
 	m_tx_tilemap->set_scrolldy(8, 8);
@@ -345,8 +344,8 @@ VIDEO_START_MEMBER(snk_state,gwar)
 
 	memset(m_empty_tile, 0xf, sizeof(m_empty_tile));
 
-	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(snk_state::gwar_get_tx_tile_info),this), TILEMAP_SCAN_COLS,  8,  8, 50, 32);
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(snk_state::gwar_get_bg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(snk_state::gwar_get_tx_tile_info)), TILEMAP_SCAN_COLS,  8,  8, 50, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(snk_state::gwar_get_bg_tile_info)), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
 
 	m_tx_tilemap->set_transparent_pen(15);
 

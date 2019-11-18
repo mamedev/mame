@@ -32,8 +32,8 @@ void changela_state::video_start()
 	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(changela_state::changela_scanline_callback),this));
 	m_scanline_timer->adjust(m_screen->time_until_pos(30), 30);
 
-	save_pointer(NAME(m_memory_devices.get()), 4 * 0x800);
-	save_pointer(NAME(m_tree_ram.get()), 2 * 0x20);
+	save_pointer(NAME(m_memory_devices), 4 * 0x800);
+	save_pointer(NAME(m_tree_ram), 2 * 0x20);
 }
 
 /**************************************************************************

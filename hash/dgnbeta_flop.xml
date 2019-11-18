@@ -9,7 +9,7 @@
 		<publisher>Dragon Data</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="849936">
-				<rom name="Dragon Beta(128) OS-9 C Compiler (198x)(Dragon Data Ltd)[!].dmk" size="849936" crc="98332ce9" sha1="95faa725cb824f0429ca7280e4af53e23f0f106f" offset="0" />
+				<rom name="Dragon Beta(128) OS-9 C Compiler (198x)(Dragon Data Ltd)[!].dmk" size="849936" crc="98332ce9" sha1="95faa725cb824f0429ca7280e4af53e23f0f106f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -20,7 +20,7 @@
 		<publisher>Dragon Data</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="849936">
-				<rom name="Dragon Beta(128) OS-9 Graphics Demo and Source (198x)(Dragon Data Ltd)[!].dmk" size="849936" crc="28912161" sha1="529f90ed0905d149d76edf56a6ce464a50d38d04" offset="0" />
+				<rom name="Dragon Beta(128) OS-9 Graphics Demo and Source (198x)(Dragon Data Ltd)[!].dmk" size="849936" crc="28912161" sha1="529f90ed0905d149d76edf56a6ce464a50d38d04"/>
 			</dataarea>
 		</part>
 	</software>
@@ -31,7 +31,7 @@
 		<publisher>Dragon Data</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="849936">
-				<rom name="Dragon Beta(128) OS-9 Level 2 v1.1 System Disk (198x)(Dragon Data Ltd)[!].dmk" size="849936" crc="5ad1d33c" sha1="08e4868046d648b0a78d3c01955e098a565db682" offset="0" />
+				<rom name="Dragon Beta(128) OS-9 Level 2 v1.1 System Disk (198x)(Dragon Data Ltd)[!].dmk" size="849936" crc="5ad1d33c" sha1="08e4868046d648b0a78d3c01955e098a565db682"/>
 			</dataarea>
 		</part>
 	</software>
@@ -42,7 +42,7 @@
 		<publisher>Dragon Data</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="849936">
-				<rom name="Dragon Beta(128) OS-9 Pascal Compiler (198x)(Dragon Data Ltd)[!].dmk" size="849936" crc="90e51089" sha1="de2088bf18ea6d0e56c36d700ac4d6ebdd995d7b" offset="0" />
+				<rom name="Dragon Beta(128) OS-9 Pascal Compiler (198x)(Dragon Data Ltd)[!].dmk" size="849936" crc="90e51089" sha1="de2088bf18ea6d0e56c36d700ac4d6ebdd995d7b"/>
 			</dataarea>
 		</part>
 	</software>

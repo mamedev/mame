@@ -43,7 +43,7 @@ static const discrete_lfsr_desc skydiver_lfsr =
 #define SKYDIVER_WHISTLE1_SND   NODE_13
 #define SKYDIVER_WHISTLE2_SND   NODE_14
 
-DISCRETE_SOUND_START(skydiver)
+DISCRETE_SOUND_START(skydiver_discrete)
 	/************************************************/
 	/* skydiver  Effects Relative Gain Table        */
 	/*                                              */

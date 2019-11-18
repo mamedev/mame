@@ -42,8 +42,10 @@
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "video/resnet.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 //**************************************************************************
@@ -53,8 +55,8 @@
 class popper_state : public driver_device
 {
 public:
-	popper_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	popper_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "subcpu"),
 		m_screen(*this, "screen"),
@@ -98,7 +100,7 @@ private:
 	void main_map(address_map &map);
 	void sub_map(address_map &map);
 
-	DECLARE_PALETTE_INIT(popper);
+	void popper_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TILE_GET_INFO_MEMBER(layer0_tile_info);
 	TILE_GET_INFO_MEMBER(layer1_tile_info);
@@ -131,23 +133,23 @@ void popper_state::main_map(address_map &map)
 	map(0xcf00, 0xcfff).ram();
 	map(0xd000, 0xd7ff).ram().share("sprite_ram");
 	map(0xd800, 0xdfff).ram().share("shared");
-	map(0xe000, 0xe003).mirror(0x03fc).r(this, FUNC(popper_state::inputs_r));
-	map(0xe000, 0xe000).mirror(0x1ff8).w(this, FUNC(popper_state::nmi_control_w));
-	map(0xe001, 0xe001).mirror(0x1ff8).w(this, FUNC(popper_state::crt_direction_w));
-	map(0xe002, 0xe002).mirror(0x1ff8).w(this, FUNC(popper_state::back_color_select_w));
-	map(0xe003, 0xe003).mirror(0x1ff8).w(this, FUNC(popper_state::vram_page_select_w));
-	map(0xe004, 0xe007).mirror(0x1ff8).w(this, FUNC(popper_state::intcycle_w));
-	map(0xe400, 0xe400).mirror(0x03ff).r(this, FUNC(popper_state::subcpu_nmi_r));
+	map(0xe000, 0xe003).mirror(0x03fc).r(FUNC(popper_state::inputs_r));
+	map(0xe000, 0xe000).mirror(0x1ff8).w(FUNC(popper_state::nmi_control_w));
+	map(0xe001, 0xe001).mirror(0x1ff8).w(FUNC(popper_state::crt_direction_w));
+	map(0xe002, 0xe002).mirror(0x1ff8).w(FUNC(popper_state::back_color_select_w));
+	map(0xe003, 0xe003).mirror(0x1ff8).w(FUNC(popper_state::vram_page_select_w));
+	map(0xe004, 0xe007).mirror(0x1ff8).w(FUNC(popper_state::intcycle_w));
+	map(0xe400, 0xe400).mirror(0x03ff).r(FUNC(popper_state::subcpu_nmi_r));
 	map(0xe800, 0xf7ff).noprw();
-	map(0xf800, 0xf800).mirror(0x03ff).r(this, FUNC(popper_state::subcpu_reset_r));
-	map(0xfc00, 0xfc00).mirror(0x03ff).r(this, FUNC(popper_state::watchdog_clear_r));
+	map(0xf800, 0xf800).mirror(0x03ff).r(FUNC(popper_state::subcpu_reset_r));
+	map(0xfc00, 0xfc00).mirror(0x03ff).r(FUNC(popper_state::watchdog_clear_r));
 }
 
 void popper_state::sub_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x7fff).noprw();
-	map(0x8000, 0x8003).mirror(0x1ffc).w(this, FUNC(popper_state::ay1_w));
+	map(0x8000, 0x8003).mirror(0x1ffc).w(FUNC(popper_state::ay1_w));
 	map(0xa000, 0xa003).mirror(0x1ffc).w("ay2", FUNC(ay8910_device::write_bc1_bc2));
 	map(0xc000, 0xc7ff).mirror(0x1800).ram().share("shared");
 	map(0xe000, 0xffff).noprw();
@@ -258,9 +260,9 @@ static const res_net_decode_info popper_decode_info =
 	0,
 	63,
 	//   R     G     B
-	{    0,    0,    0, }, // offsets
-	{    0,    3,    6, }, // shifts
-	{ 0x07, 0x07, 0x03, }  // masks
+	{    0,    0,    0 }, // offsets
+	{    0,    3,    6 }, // shifts
+	{ 0x07, 0x07, 0x03 }  // masks
 };
 
 static const res_net_info popper_net_info =
@@ -273,7 +275,7 @@ static const res_net_info popper_net_info =
 	}
 };
 
-PALETTE_INIT_MEMBER( popper_state, popper )
+void popper_state::popper_palette(palette_device &palette) const
 {
 	const uint8_t *prom = memregion("colors")->base();
 	std::vector<rgb_t> rgb;
@@ -414,7 +416,7 @@ static const gfx_layout spritelayout =
 	16*2*8
 };
 
-static GFXDECODE_START( popper )
+static GFXDECODE_START( gfx_popper )
 	GFXDECODE_ENTRY("tiles",   0, layer0_charlayout, 0, 32)
 	GFXDECODE_ENTRY("tiles",   0, layer1_charlayout, 0, 16)
 	GFXDECODE_ENTRY("sprites", 0, spritelayout,      0, 16)
@@ -478,7 +480,7 @@ WRITE8_MEMBER( popper_state::ay1_w )
 		m_ay[1]->reset();
 	}
 
-	m_ay[0]->write_bc1_bc2(space, offset, data);
+	m_ay[0]->write_bc1_bc2(offset, data);
 }
 
 
@@ -505,10 +507,10 @@ READ8_MEMBER( popper_state::watchdog_clear_r )
 void popper_state::machine_start()
 {
 	// create tilemaps
-	m_layer0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(popper_state::layer0_tile_info), this), TILEMAP_SCAN_COLS, 8, 8, 48, 32);
+	m_layer0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(popper_state::layer0_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 48, 32);
 	m_layer0_tilemap->set_transparent_pen(1);
 
-	m_layer1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(popper_state::layer1_tile_info), this), TILEMAP_SCAN_COLS, 8, 8, 48, 32);
+	m_layer1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(popper_state::layer1_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 48, 32);
 	m_layer1_tilemap->set_transparent_pen(0);
 
 	// allocate and start scanline timer
@@ -533,35 +535,33 @@ void popper_state::machine_reset()
 //  MACHINE DEFINTIONS
 //**************************************************************************
 
-MACHINE_CONFIG_START(popper_state::popper)
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(18'432'000)/3/2)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+void popper_state::popper(machine_config &config)
+{
+	Z80(config, m_maincpu, XTAL(18'432'000)/3/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &popper_state::main_map);
 
-	MCFG_CPU_ADD("subcpu", Z80, XTAL(18'432'000)/3/2)
-	MCFG_CPU_PROGRAM_MAP(sub_map)
+	Z80(config, m_subcpu, XTAL(18'432'000)/3/2);
+	m_subcpu->set_addrmap(AS_PROGRAM, &popper_state::sub_map);
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.set_perfect_quantum(m_maincpu);
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(18'432'000)/3, 384, 48, 328, 264, 16, 240)
-	MCFG_SCREEN_UPDATE_DRIVER(popper_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(XTAL(18'432'000)/3, 384, 48, 328, 264, 16, 240);
+	m_screen->set_screen_update(FUNC(popper_state::screen_update));
+	m_screen->set_palette("palette");
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", popper)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_popper);
 
-	MCFG_PALETTE_ADD("palette", 64)
-	MCFG_PALETTE_INIT_OWNER(popper_state, popper)
+	PALETTE(config, "palette", FUNC(popper_state::popper_palette), 64);
 
 	// audio hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL(18'432'000)/3/2/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8910(config, m_ay[0], XTAL(18'432'000)/3/2/2).add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL(18'432'000)/3/2/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	AY8910(config, m_ay[1], XTAL(18'432'000)/3/2/2).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 //**************************************************************************
@@ -594,5 +594,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  MACHINE  INPUT   CLASS         INIT  ROTATION  COMPANY  FULLNAME  FLAGS
-GAME( 1983, popper, 0,      popper,  popper, popper_state, 0,    ROT90,    "Omori", "Popper", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME    PARENT  MACHINE  INPUT   CLASS         INIT        ROTATION  COMPANY  FULLNAME  FLAGS
+GAME( 1983, popper, 0,      popper,  popper, popper_state, empty_init, ROT90,    "Omori", "Popper", MACHINE_SUPPORTS_SAVE )

@@ -29,14 +29,15 @@
 #include "video/k054156_k054157_k056832.h"
 #include "video/k055555.h"
 #include "video/konami_helper.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
 class konmedal68k_state : public driver_device
 {
 public:
-	konmedal68k_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	konmedal68k_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_k056832(*this, "k056832"),
 		m_k055555(*this, "k055555"),
@@ -44,10 +45,13 @@ public:
 		m_ymz(*this, "ymz")
 	{ }
 
+	void kzaurus(machine_config &config);
+	void koropens(machine_config &config);
+
+private:
 	uint32_t screen_update_konmedal68k(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void fill_backcolor(bitmap_ind16 &bitmap, const rectangle &cliprect, int pen_idx, int mode);
 
-	void kzaurus(machine_config &config);
 
 	K056832_CB_MEMBER(tile_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
@@ -75,18 +79,28 @@ public:
 			offset |= 0x1000;
 		}
 
-		return m_k056832->piratesh_rom_r(space, offset, mem_mask);
+		return m_k056832->piratesh_rom_r(offset);
+	}
+
+	DECLARE_READ16_MEMBER(vrom_koropens_r)
+	{
+		if (m_control2 & 0x10)
+		{
+			return 0;
+		}
+
+		return m_k056832->rom_word_r(offset);
 	}
 
 	void kzaurus_main(address_map &map);
-protected:
+	void koropens_main(address_map &map);
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
 	static constexpr int NUM_LAYERS = 4;
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<k056832_device> m_k056832;
 	required_device<k055555_device> m_k055555;
@@ -192,11 +206,11 @@ void konmedal68k_state::kzaurus_main(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom().region("maincpu", 0);
 	map(0x400000, 0x403fff).ram();
-	map(0x800000, 0x800001).w(this, FUNC(konmedal68k_state::control_w));
+	map(0x800000, 0x800001).w(FUNC(konmedal68k_state::control_w));
 	map(0x800004, 0x800005).portr("DSW");
 	map(0x800006, 0x800007).portr("IN1");
 	map(0x800008, 0x800009).portr("IN0");
-	map(0x810000, 0x810001).w(this, FUNC(konmedal68k_state::control2_w));
+	map(0x810000, 0x810001).w(FUNC(konmedal68k_state::control2_w));
 	map(0x830000, 0x83003f).rw(m_k056832, FUNC(k056832_device::word_r), FUNC(k056832_device::word_w));
 	map(0x840000, 0x84000f).w(m_k056832, FUNC(k056832_device::b_word_w));
 	map(0x85001c, 0x85001f).nopw();
@@ -204,8 +218,28 @@ void konmedal68k_state::kzaurus_main(address_map &map)
 	map(0x880000, 0x880003).rw(m_ymz, FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask16(0xff00);
 	map(0xa00000, 0xa01fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));
 	map(0xa02000, 0xa03fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));
-	map(0xb00000, 0xb01fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0xc00000, 0xc01fff).r(this, FUNC(konmedal68k_state::vrom_r));
+	map(0xb00000, 0xb03fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xc00000, 0xc01fff).r(FUNC(konmedal68k_state::vrom_r));
+}
+
+void konmedal68k_state::koropens_main(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom().region("maincpu", 0);
+	map(0x400000, 0x403fff).ram();
+	map(0x800000, 0x800001).w(FUNC(konmedal68k_state::control_w));
+	map(0x800004, 0x800005).portr("DSW");
+	map(0x800006, 0x800007).portr("IN1");
+	map(0x800008, 0x800009).portr("IN0");
+	map(0x810000, 0x810001).w(FUNC(konmedal68k_state::control2_w));
+	map(0x830000, 0x83003f).rw(m_k056832, FUNC(k056832_device::word_r), FUNC(k056832_device::word_w));
+	map(0x840000, 0x84000f).w(m_k056832, FUNC(k056832_device::b_word_w));
+	map(0x85001c, 0x85001f).nopw();
+	map(0x870000, 0x87005f).w(m_k055555, FUNC(k055555_device::K055555_word_w));
+	map(0x880000, 0x880003).rw(m_ymz, FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask16(0xff00);
+	map(0xa00000, 0xa01fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));
+	map(0xa02000, 0xa03fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));
+	map(0xb00000, 0xb03fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xc00000, 0xc01fff).r(FUNC(konmedal68k_state::vrom_koropens_r));
 }
 
 static INPUT_PORTS_START( kzaurus )
@@ -292,45 +326,53 @@ void konmedal68k_state::machine_reset()
 	m_control = m_control2 = 0;
 }
 
-MACHINE_CONFIG_START(konmedal68k_state::kzaurus)
+void konmedal68k_state::kzaurus(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(33'868'800)/4 )    // 33.8688 MHz crystal verified on PCB
-	MCFG_CPU_PROGRAM_MAP(kzaurus_main)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", konmedal68k_state, scanline, "screen", 0, 1)
+	M68000(config, m_maincpu, XTAL(33'868'800)/4);    // 33.8688 MHz crystal verified on PCB
+	m_maincpu->set_addrmap(AS_PROGRAM, &konmedal68k_state::kzaurus_main);
+	TIMER(config, "scantimer").configure_scanline(FUNC(konmedal68k_state::scanline), "screen", 0, 1);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59.62)  /* verified on pcb */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(40, 400-1, 16, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(konmedal68k_state, screen_update_konmedal68k)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(59.62);  /* verified on pcb */
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(40, 400-1, 16, 240-1);
+	screen.set_screen_update(FUNC(konmedal68k_state::screen_update_konmedal68k));
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 8192)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_FORMAT(XBGR)
+	PALETTE(config, "palette").set_format(palette_device::xBGR_888, 8192).enable_shadows();
 
-	MCFG_DEVICE_ADD("k056832", K056832, 0)
-	MCFG_K056832_CB(konmedal68k_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4dj, 1, 0, "none")
-	MCFG_K056832_PALETTE("palette")
+	K056832(config, m_k056832, 0);
+	m_k056832->set_tile_callback(FUNC(konmedal68k_state::tile_callback));
+	m_k056832->set_config(K056832_BPP_4dj, 1, 0);
+	m_k056832->set_palette(m_palette);
 
-	MCFG_K055555_ADD("k055555")
+	K055555(config, m_k055555, 0);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymz", YMZ280B, XTAL(33'868'800)/2) // 33.8688 MHz xtal verified on PCB
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	YMZ280B(config, m_ymz, XTAL(33'868'800)/2); // 33.8688 MHz xtal verified on PCB
+	m_ymz->add_route(0, "lspeaker", 1.0);
+	m_ymz->add_route(1, "rspeaker", 1.0);
+}
+
+void konmedal68k_state::koropens(machine_config &config)
+{
+	kzaurus(config);
+
+	M68000(config.replace(), m_maincpu, XTAL(33'868'800)/4);    // 33.8688 MHz crystal verified on PCB
+	m_maincpu->set_addrmap(AS_PROGRAM, &konmedal68k_state::koropens_main);
+}
 
 ROM_START( kzaurus )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* main program */
 	ROM_LOAD16_WORD_SWAP( "540-b05-2n.bin", 0x000000, 0x080000, CRC(110d4ecb) SHA1(8903783f62ad5a983242a0fe8d835857964abc43) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )   /* tilemaps */
+	ROM_REGION( 0x100000, "k056832", 0 )   /* tilemaps */
 	ROM_LOAD( "540-a06-14n.bin", 0x000000, 0x080000, CRC(260ad79e) SHA1(fb56bf6e59e78b2bd1f8df17c9c8fd0d1700dced) )
 	ROM_LOAD( "540-a07-17n.bin", 0x080000, 0x080000, CRC(442bcec2) SHA1(3100de8c146a28284ae3ab8763e5b1c6fb1755c2) )
 
@@ -338,4 +380,18 @@ ROM_START( kzaurus )
 	ROM_LOAD( "540-a01-2f.bin", 0x000000, 0x080000, CRC(391c6ee6) SHA1(a345934687a8abf818350d0597843a1159395fc0) )
 ROM_END
 
-GAME( 1995, kzaurus,    0, kzaurus, kzaurus,  konmedal68k_state, 0, ROT0, "Konami", "Pittanko Zaurus", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+ROM_START( koropens )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* main program */
+	ROM_LOAD16_WORD_SWAP( "741-c05-2n.bin", 0x000000, 0x080000, CRC(5c3ebe2a) SHA1(f42e15db386e63992844ded4dc30a16aea9918ac) )
+
+	ROM_REGION( 0x100000, "k056832", 0 )   /* tilemaps */
+	ROM_LOAD( "741-a06-14n.bin", 0x000000, 0x080000, CRC(dbd9b892) SHA1(d36dc192465b894fed03c83ac64738296ab12ca1) )
+	ROM_LOAD( "741-a07-17n.bin", 0x080000, 0x080000, CRC(a50c9a91) SHA1(3c44f78bdf016d39002b0d1e34c6dbc70872a92e) )
+
+	ROM_REGION( 0x100000, "ymz", 0 )
+	ROM_LOAD( "741-a01-2f.bin", 0x000000, 0x080000, CRC(56823bfb) SHA1(5c23af55ef0053345f853f4c6ea361182d3ce14a) )
+	ROM_LOAD( "741-a02-1f.bin", 0x080000, 0x080000, CRC(31918688) SHA1(70a1699a3914883f502e021dbb9c0847f4ebee04) )
+ROM_END
+
+GAME( 1995, kzaurus, 0, kzaurus, kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Pittanko Zaurus", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, koropens, 0, koropens, kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Korokoro Pensuke", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )

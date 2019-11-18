@@ -333,18 +333,18 @@ WRITE8_MEMBER(grchamp_state::cpu1_outputs_w)
 			/* bit 2-4: ATTACK UP 1-3 */
 			/* bit 5-6: SIFT 1-2 */
 			/* bit 7:   ENGINE CS */
-			m_discrete->write(space, GRCHAMP_ENGINE_CS_EN, data & 0x80);
-			m_discrete->write(space, GRCHAMP_SIFT_DATA, (data >> 5) & 0x03);
-			m_discrete->write(space, GRCHAMP_ATTACK_UP_DATA, (data >> 2) & 0x07);
-			m_discrete->write(space, GRCHAMP_IDLING_EN, data & 0x02);
-			m_discrete->write(space, GRCHAMP_FOG_EN, data & 0x01);
+			m_discrete->write(GRCHAMP_ENGINE_CS_EN, data & 0x80);
+			m_discrete->write(GRCHAMP_SIFT_DATA, (data >> 5) & 0x03);
+			m_discrete->write(GRCHAMP_ATTACK_UP_DATA, (data >> 2) & 0x07);
+			m_discrete->write(GRCHAMP_IDLING_EN, data & 0x02);
+			m_discrete->write(GRCHAMP_FOG_EN, data & 0x01);
 			break;
 
 		case 0x0d: /* OUTD */
 			/* bit 0-3: ATTACK SPEED 1-4 */
 			/* bit 4-7: PLAYER SPEED 1-4 */
-			m_discrete->write(space, GRCHAMP_PLAYER_SPEED_DATA, (data >> 4) & 0x0f);
-			m_discrete->write(space, GRCHAMP_ATTACK_SPEED_DATA,  data & 0x0f);
+			m_discrete->write(GRCHAMP_PLAYER_SPEED_DATA, (data >> 4) & 0x0f);
+			m_discrete->write(GRCHAMP_ATTACK_SPEED_DATA,  data & 0x0f);
 			break;
 
 		default:
@@ -480,12 +480,12 @@ READ8_MEMBER(grchamp_state::soundlatch_flags_r)
 
 WRITE8_MEMBER(grchamp_state::portA_0_w)
 {
-	m_discrete->write(space, GRCHAMP_A_DATA, data);
+	m_discrete->write(GRCHAMP_A_DATA, data);
 }
 
 WRITE8_MEMBER(grchamp_state::portB_0_w)
 {
-	m_discrete->write(space, GRCHAMP_B_DATA, 255-data);
+	m_discrete->write(GRCHAMP_B_DATA, 255-data);
 }
 
 WRITE8_MEMBER(grchamp_state::portA_2_w)
@@ -528,7 +528,7 @@ static const gfx_layout tile_layout =
 	16*8
 };
 
-static GFXDECODE_START( grchamp )
+static GFXDECODE_START( gfx_grchamp )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, gfx_8x8x2_planar,  0, 8 )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, tile_layout,       0, 2 )
 	GFXDECODE_ENTRY( "gfx3", 0x0000, tile_layout,       0, 2 )
@@ -559,18 +559,18 @@ void grchamp_state::main_portmap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).mirror(0x78).portr("ACCEL");
-	map(0x02, 0x02).mirror(0x78).r(this, FUNC(grchamp_state::sub_to_main_comm_r));
+	map(0x02, 0x02).mirror(0x78).r(FUNC(grchamp_state::sub_to_main_comm_r));
 	map(0x03, 0x03).mirror(0x78).portr("WHEEL");
 	map(0x04, 0x04).mirror(0x78).portr("DSWA");
 	map(0x05, 0x05).mirror(0x78).portr("DSWB");
 	map(0x06, 0x06).mirror(0x78).portr("TILT");
-	map(0x01, 0x01).mirror(0x60).r(this, FUNC(grchamp_state::pc3259_0_r));
-	map(0x09, 0x09).mirror(0x60).r(this, FUNC(grchamp_state::pc3259_1_r));
-	map(0x11, 0x11).mirror(0x60).r(this, FUNC(grchamp_state::pc3259_2_r));
-	map(0x19, 0x19).mirror(0x60).r(this, FUNC(grchamp_state::pc3259_3_r));
-	map(0x00, 0x0f).mirror(0x40).w(this, FUNC(grchamp_state::cpu0_outputs_w));
-	map(0x10, 0x13).mirror(0x40).w(this, FUNC(grchamp_state::main_to_sub_comm_w));
-	map(0x20, 0x20).select(0x0c).mirror(0x53).w(this, FUNC(grchamp_state::led_board_w));
+	map(0x01, 0x01).mirror(0x60).r(FUNC(grchamp_state::pc3259_0_r));
+	map(0x09, 0x09).mirror(0x60).r(FUNC(grchamp_state::pc3259_1_r));
+	map(0x11, 0x11).mirror(0x60).r(FUNC(grchamp_state::pc3259_2_r));
+	map(0x19, 0x19).mirror(0x60).r(FUNC(grchamp_state::pc3259_3_r));
+	map(0x00, 0x0f).mirror(0x40).w(FUNC(grchamp_state::cpu0_outputs_w));
+	map(0x10, 0x13).mirror(0x40).w(FUNC(grchamp_state::main_to_sub_comm_w));
+	map(0x20, 0x20).select(0x0c).mirror(0x53).w(FUNC(grchamp_state::led_board_w));
 }
 
 
@@ -578,9 +578,9 @@ void grchamp_state::main_portmap(address_map &map)
 void grchamp_state::sub_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
-	map(0x2000, 0x27ff).ram().w(this, FUNC(grchamp_state::left_w)).share("leftram");
-	map(0x2800, 0x2fff).ram().w(this, FUNC(grchamp_state::right_w)).share("rightram");
-	map(0x3000, 0x37ff).ram().w(this, FUNC(grchamp_state::center_w)).share("centerram");
+	map(0x2000, 0x27ff).ram().w(FUNC(grchamp_state::left_w)).share("leftram");
+	map(0x2800, 0x2fff).ram().w(FUNC(grchamp_state::right_w)).share("rightram");
+	map(0x3000, 0x37ff).ram().w(FUNC(grchamp_state::center_w)).share("centerram");
 	map(0x4000, 0x43ff).mirror(0x0400).ram();
 	map(0x5000, 0x6fff).rom();
 }
@@ -589,8 +589,8 @@ void grchamp_state::sub_map(address_map &map)
 void grchamp_state::sub_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x03).r(this, FUNC(grchamp_state::main_to_sub_comm_r));
-	map(0x00, 0x0f).mirror(0x70).w(this, FUNC(grchamp_state::cpu1_outputs_w));
+	map(0x00, 0x03).r(FUNC(grchamp_state::main_to_sub_comm_r));
+	map(0x00, 0x0f).mirror(0x70).w(FUNC(grchamp_state::cpu1_outputs_w));
 }
 
 
@@ -635,8 +635,8 @@ void grchamp_state::sound_map(address_map &map)
 	map(0x4803, 0x4803).mirror(0x07f8).r("ay2", FUNC(ay8910_device::data_r));
 	map(0x4804, 0x4805).mirror(0x07fa).w("ay3", FUNC(ay8910_device::address_data_w));
 	map(0x4805, 0x4805).mirror(0x07fa).r("ay3", FUNC(ay8910_device::data_r));
-	map(0x5000, 0x5000).mirror(0x07fc).r(this, FUNC(grchamp_state::soundlatch_r)).w(this, FUNC(grchamp_state::soundlatch_clear7_w));
-	map(0x5001, 0x5001).mirror(0x07fc).r(this, FUNC(grchamp_state::soundlatch_flags_r)).nopw(); // writes here on taitosj reset the secondary semaphore, which doesn't exist on grchamp, but the code tries to reset it anyway!
+	map(0x5000, 0x5000).mirror(0x07fc).r(FUNC(grchamp_state::soundlatch_r)).w(FUNC(grchamp_state::soundlatch_clear7_w));
+	map(0x5001, 0x5001).mirror(0x07fc).r(FUNC(grchamp_state::soundlatch_flags_r)).nopw(); // writes here on taitosj reset the secondary semaphore, which doesn't exist on grchamp, but the code tries to reset it anyway!
 }
 
 
@@ -735,64 +735,58 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(grchamp_state::grchamp)
-
+void grchamp_state::grchamp(machine_config &config)
+{
 	/* basic machine hardware */
 	/* CPU BOARD */
-	MCFG_CPU_ADD("maincpu", Z80, PIXEL_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", grchamp_state,  cpu0_interrupt)
+	Z80(config, m_maincpu, PIXEL_CLOCK/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &grchamp_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &grchamp_state::main_portmap);
+	m_maincpu->set_vblank_int("screen", FUNC(grchamp_state::cpu0_interrupt));
 
 	/* GAME BOARD */
-	MCFG_CPU_ADD("sub", Z80, PIXEL_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(sub_map)
-	MCFG_CPU_IO_MAP(sub_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", grchamp_state,  cpu1_interrupt)
+	Z80(config, m_subcpu, PIXEL_CLOCK/2);
+	m_subcpu->set_addrmap(AS_PROGRAM, &grchamp_state::sub_map);
+	m_subcpu->set_addrmap(AS_IO, &grchamp_state::sub_portmap);
+	m_subcpu->set_vblank_int("screen", FUNC(grchamp_state::cpu1_interrupt));
 
 	/* SOUND BOARD */
-	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(grchamp_state, irq0_line_hold,  (double)SOUND_CLOCK/4/16/16/10/16)
+	Z80(config, m_audiocpu, SOUND_CLOCK/2);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &grchamp_state::sound_map);
+	m_audiocpu->set_periodic_int(FUNC(grchamp_state::irq0_line_hold), attotime::from_hz((double)SOUND_CLOCK/4/16/16/10/16));
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count(m_screen, 8);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", grchamp)
-	MCFG_PALETTE_ADD("palette", 32)
-	MCFG_PALETTE_INIT_OWNER(grchamp_state, grchamp)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_grchamp);
+	PALETTE(config, m_palette, FUNC(grchamp_state::grchamp_palette), 32);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(grchamp_state, screen_update)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
+	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
+	m_screen->set_screen_update(FUNC(grchamp_state::screen_update));
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	INPUT_MERGER_ALL_HIGH(config, m_soundnmi).output_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_SOUND_ADD("ay1", AY8910, SOUND_CLOCK/4)    /* 3B */
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(grchamp_state, portA_0_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(grchamp_state, portB_0_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.2)
+	ay8910_device &ay1(AY8910(config, "ay1", SOUND_CLOCK/4));    /* 3B */
+	ay1.port_a_write_callback().set(FUNC(grchamp_state::portA_0_w));
+	ay1.port_b_write_callback().set(FUNC(grchamp_state::portB_0_w));
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.2);
 
-	MCFG_SOUND_ADD("ay2", AY8910, SOUND_CLOCK/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.2)
+	AY8910(config, "ay2", SOUND_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 0.2);
 
-	MCFG_SOUND_ADD("ay3", AY8910, SOUND_CLOCK/4)    /* 1B */
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(grchamp_state, portA_2_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(grchamp_state, portB_2_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.2)
+	ay8910_device &ay3(AY8910(config, "ay3", SOUND_CLOCK/4));    /* 1B */
+	ay3.port_a_write_callback().set(FUNC(grchamp_state::portA_2_w));
+	ay3.port_b_write_callback().set(FUNC(grchamp_state::portB_2_w));
+	ay3.add_route(ALL_OUTPUTS, "mono", 0.2);
 
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(grchamp)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	DISCRETE(config, m_discrete, grchamp_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 
@@ -954,6 +948,6 @@ ROM_END
  *
  *************************************/
 
-GAMEL( 1981, grchamp,        0, grchamp, grchamp, grchamp_state, 0, ROT270, "Taito", "Grand Champion (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_grchamp )
-GAMEL( 1981, grchampa, grchamp, grchamp, grchamp, grchamp_state, 0, ROT270, "Taito", "Grand Champion (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_grchamp ) // uses different ports. Bad dump?
-GAMEL( 1981, grchampb, grchamp, grchamp, grchamp, grchamp_state, 0, ROT270, "Taito", "Grand Champion (set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_grchamp )
+GAMEL( 1981, grchamp,        0, grchamp, grchamp, grchamp_state, empty_init, ROT270, "Taito", "Grand Champion (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_grchamp )
+GAMEL( 1981, grchampa, grchamp, grchamp, grchamp, grchamp_state, empty_init, ROT270, "Taito", "Grand Champion (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_grchamp ) // uses different ports. Bad dump?
+GAMEL( 1981, grchampb, grchamp, grchamp, grchamp, grchamp_state, empty_init, ROT270, "Taito", "Grand Champion (set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_grchamp )

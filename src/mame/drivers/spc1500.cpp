@@ -230,9 +230,9 @@ TODO:
 #include "machine/ram.h"
 #include "machine/timer.h"
 #include "sound/ay8910.h"
-#include "sound/wave.h"
 #include "video/mc6845.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -260,7 +260,11 @@ public:
 		, m_sound(*this, "ay8910")
 		, m_palette(*this, "palette")
 		, m_timer(nullptr)
-	{}
+	{ }
+
+	void spc1500(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(psga_r);
 	DECLARE_READ8_MEMBER(porta_r);
 	DECLARE_WRITE_LINE_MEMBER( centronics_busy_w ) { m_centronics_busy = state; }
@@ -286,15 +290,15 @@ public:
 	DECLARE_READ8_MEMBER(portb_r);
 	DECLARE_WRITE8_MEMBER(double_w);
 	DECLARE_READ8_MEMBER(io_r);
-	DECLARE_PALETTE_INIT(spc);
+	void spc_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(spc);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_RECONFIGURE(crtc_reconfig);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer);
-	void spc1500(machine_config &config);
+
 	void spc1500_double_io(address_map &map);
 	void spc1500_mem(address_map &map);
-private:
+
 	uint8_t *m_p_ram;
 	uint8_t m_ipl;
 	uint8_t m_palet[3];
@@ -370,7 +374,7 @@ WRITE8_MEMBER( spc1500_state::psgb_w)
 		m_ipl = ((data>>1)&1);
 		membank("bank1")->set_entry(m_ipl ? 0 : 1);
 	}
-	m_cass->set_state(BIT(data, 6) ? CASSETTE_SPEAKER_ENABLED : CASSETTE_SPEAKER_MUTED);
+	//m_cass->change_state(BIT(data, 6) ? CASSETTE_SPEAKER_ENABLED : CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
 	if (m_motor && !BIT(data, 7) && (elapsed_time > 100))
 	{
 		m_cass->change_state((m_cass->get_state() & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_DISABLED ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
@@ -385,7 +389,7 @@ WRITE8_MEMBER( spc1500_state::portc_w)
 	m_centronics->write_strobe(BIT(data, 7));
 	m_double_mode = (!m_p5bit && BIT(data, 5)); // double access I/O mode
 	m_p5bit = BIT(data, 5);
-	m_vdg->set_clock(VDP_CLOCK/(BIT(data, 2) ? 48 : 24));
+	m_vdg->set_unscaled_clock(VDP_CLOCK/(BIT(data, 2) ? 48 : 24));
 }
 
 READ8_MEMBER( spc1500_state::portb_r)
@@ -405,12 +409,12 @@ WRITE8_MEMBER( spc1500_state::crtc_w)
 	if((offset & 1) == 0)
 	{
 		m_crtc_index = data & 0x1f;
-		m_vdg->address_w(space, 0, data);
+		m_vdg->address_w(data);
 	}
 	else
 	{
 		m_crtc_vreg[m_crtc_index] = data;
-		m_vdg->register_w(space, 0, data);
+		m_vdg->register_w(data);
 	}
 }
 
@@ -418,7 +422,7 @@ READ8_MEMBER( spc1500_state::crtc_r)
 {
 	if (offset & 1)
 	{
-		return m_vdg->register_r(space, 0);
+		return m_vdg->register_r();
 	}
 	return 0;
 }
@@ -502,7 +506,7 @@ WRITE8_MEMBER( spc1500_state::palet_w)
 	}
 }
 
-PALETTE_INIT_MEMBER(spc1500_state,spc)
+void spc1500_state::spc_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0,rgb_t(0x00,0x00,0x00));
 	palette.set_pen_color(1,rgb_t(0x00,0x00,0xff));
@@ -642,9 +646,9 @@ WRITE8_MEMBER( spc1500_state::double_w)
 		if (offset < 0x1800) { pcg_w(space, offset, data); } else
 		if (offset < 0x1900) { crtc_w(space, offset, data); } else
 		if (offset < 0x1a00) {} else
-		if (offset < 0x1b00) { m_pio->write(space, offset, data);} else
-		if (offset < 0x1c00) { m_sound->data_w(space, offset, data);} else
-		if (offset < 0x1d00) { m_sound->address_w(space, offset, data);} else
+		if (offset < 0x1b00) { m_pio->write(offset, data); } else
+		if (offset < 0x1c00) { m_sound->data_w(data);} else
+		if (offset < 0x1d00) { m_sound->address_w(data);} else
 		if (offset < 0x1e00) { romsel(space, offset, data);} else
 		if (offset < 0x1f00) { ramsel(space, offset, data);} else
 		if (offset < 0x2000) {} else
@@ -669,8 +673,8 @@ READ8_MEMBER( spc1500_state::io_r)
 	if (offset < 0x1800) { return pcg_r(space, offset); } else
 	if (offset < 0x1900) { return crtc_r(space, offset); } else
 	if (offset < 0x1a00) { return keyboard_r(space, offset); } else
-	if (offset < 0x1b00) { return m_pio->read(space, offset); } else
-	if (offset < 0x1c00) { return m_sound->data_r(space, offset); } else
+	if (offset < 0x1b00) { return m_pio->read(offset); } else
+	if (offset < 0x1c00) { return m_sound->data_r(); } else
 	if (offset < 0x2000) {} else
 	if (offset < 0x10000){
 		if (offset < 0x4000)
@@ -684,7 +688,7 @@ void spc1500_state::spc1500_double_io(address_map &map)
 	map.unmap_value_high();
 	map(0x2000, 0xffff).ram().share("videoram");
 	map(0x0000, 0x17ff).ram().share("pcgram");
-	map(0x0000, 0xffff).rw(this, FUNC(spc1500_state::io_r), FUNC(spc1500_state::double_w));
+	map(0x0000, 0xffff).rw(FUNC(spc1500_state::io_r), FUNC(spc1500_state::double_w));
 }
 
 /* Input ports */
@@ -872,64 +876,69 @@ READ8_MEMBER( spc1500_state::porta_r )
 	return data;
 }
 
-MACHINE_CONFIG_START(spc1500_state::spc1500)
+void spc1500_state::spc1500(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(spc1500_mem)
-	//MCFG_CPU_IO_MAP(spc1500_io)
-	MCFG_CPU_IO_MAP(spc1500_double_io)
-	MCFG_CPU_PERIODIC_INT_DRIVER(spc1500_state, irq0_line_hold,  60)
+	Z80(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &spc1500_state::spc1500_mem);
+	//m_maincpu->set_addrmap(AS_IO, &spc1500_state::spc1500_io);
+	m_maincpu->set_addrmap(AS_IO, &spc1500_state::spc1500_double_io);
+	m_maincpu->set_periodic_int(FUNC(spc1500_state::irq0_line_hold), attotime::from_hz(60));
 
 	/* video hardware */
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(640, 400)
-	MCFG_SCREEN_VISIBLE_AREA(0,640-1,0,400-1)
-	MCFG_SCREEN_UPDATE_DEVICE("mc6845", mc6845_device, screen_update )
-	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_INIT_OWNER(spc1500_state, spc)
-	MCFG_MC6845_ADD("mc6845", MC6845, "screen", (VDP_CLOCK/48)) //unknown divider
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(spc1500_state, crtc_update_row)
-	MCFG_MC6845_RECONFIGURE_CB(spc1500_state, crtc_reconfig)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(640, 400);
+	screen.set_visarea(0,640-1,0,400-1);
+	screen.set_screen_update("mc6845", FUNC(mc6845_device::screen_update));
+
+	PALETTE(config, m_palette, FUNC(spc1500_state::spc_palette), 8);
+
+	MC6845(config, m_vdg, (VDP_CLOCK/48)); //unknown divider
+	m_vdg->set_screen("screen");
+	m_vdg->set_show_border_area(false);
+	m_vdg->set_char_width(8);
+	m_vdg->set_update_row_callback(FUNC(spc1500_state::crtc_update_row));
+	m_vdg->set_reconfigure_callback(FUNC(spc1500_state::crtc_reconfig));
+
 	MCFG_VIDEO_START_OVERRIDE(spc1500_state, spc)
 
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
-	MCFG_I8255_IN_PORTB_CB(READ8(spc1500_state, portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(spc1500_state, portb_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(spc1500_state, portc_w))
+	I8255(config, m_pio);
+	m_pio->out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	m_pio->in_pb_callback().set(FUNC(spc1500_state::portb_r));
+	m_pio->out_pb_callback().set(FUNC(spc1500_state::portb_w));
+	m_pio->out_pc_callback().set(FUNC(spc1500_state::portc_w));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("1hz", spc1500_state, timer, attotime::from_hz(1))
+	TIMER(config, "1hz").configure_periodic(FUNC(spc1500_state::timer), attotime::from_hz(1));
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ay8910", AY8910, XTAL(4'000'000) / 2)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(spc1500_state, psga_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(spc1500_state, psgb_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	AY8910(config, m_sound, XTAL(4'000'000) / 2);
+	m_sound->port_a_read_callback().set(FUNC(spc1500_state::psga_r));
+	m_sound->port_b_write_callback().set(FUNC(spc1500_state::psgb_w));
+	m_sound->add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(spc1500_state, centronics_busy_w))
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
-	MCFG_DEVICE_ADD("cent_status_in", INPUT_BUFFER, 0)
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(spc1500_state::centronics_busy_w));
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_FORMATS(spc1000_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_MUTED | CASSETTE_MOTOR_DISABLED)
-	MCFG_CASSETTE_INTERFACE("spc1500_cass")
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "spc1500_cass")
+	INPUT_BUFFER(config, "cent_status_in");
+
+	CASSETTE(config, m_cass);
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_DISABLED);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cass->set_formats(spc1000_cassette_formats);
+	m_cass->set_interface("spc1500_cass");
+
+	SOFTWARE_LIST(config, "cass_list").set_original("spc1500_cass");
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
-MACHINE_CONFIG_END
+	RAM(config, RAM_TAG).set_default_size("64K");
+}
 
 /* ROM definition */
 ROM_START( spc1500 )
@@ -942,11 +951,10 @@ ROM_START( spc1500 )
 	ROM_LOAD( "ss151fnt.bin", 0x2000, 0x2000, CRC(83c2eb8d) SHA1(2adf7816206dc74b9f0d32cb3b56cbab31fa6044) )
 	ROM_LOAD( "ss152fnt.bin", 0x4000, 0x2000, CRC(f4a5a590) SHA1(c9a02756107083bf602ae7c90cfe29b8b964e0df) )
 	ROM_LOAD( "ss153fnt.bin", 0x6000, 0x2000, CRC(8677d5fa) SHA1(34bfacc855c3846744cd586c150c72e5cbe948b0) )
-
 ROM_END
 
 
 /* Driver */
 
-//    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    CLASS          INIT  COMPANY    FULLNAME    FLAGS
-COMP( 1987, spc1500,  0,      0,       spc1500,   spc1500, spc1500_state, 0,    "Samsung", "SPC-1500", 0 )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY    FULLNAME    FLAGS
+COMP( 1987, spc1500, 0,      0,      spc1500, spc1500, spc1500_state, empty_init, "Samsung", "SPC-1500", 0 )

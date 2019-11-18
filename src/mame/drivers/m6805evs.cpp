@@ -13,7 +13,7 @@ XC68HC26P = PPI (3 ports), uses 8 addresses.
 
 2014-01-12 Skeleton driver
 
-Memory map:
+Memory map for MC68HC705P9:
 0000, 0000  PORTA       Port A data register
 0001, 0001  PORTB       Port B data register
 0002, 0002  PORTC       Port C data register
@@ -56,13 +56,12 @@ Memory map:
 
 
 ToDo:
-- Add CMOS family support to M6085 CPU core (different timings, different peripherals)
 - Everything
 
 ******************************************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6805/m6805.h"
+#include "cpu/m6805/m68hc05.h"
 
 
 class m6805evs_state : public driver_device
@@ -74,8 +73,10 @@ public:
 	{ }
 
 	void m6805evs(machine_config &config);
-	void mem_map(address_map &map);
+
 private:
+	void mem_map(address_map &map);
+
 	required_device<cpu_device> m_maincpu;
 	virtual void machine_reset() override;
 };
@@ -83,15 +84,10 @@ private:
 
 void m6805evs_state::mem_map(address_map &map)
 {
-	map.global_mask(0x1fff);
 	map.unmap_value_high();
 
-	// AM_RANGE(0x0000, 0x001f) I/O registers live here
-	map(0x0020, 0x004f).rom().region("eprom", 0x0020);
-	map(0x0080, 0x00ff).ram();
-	map(0x0100, 0x0900).rom().region("eprom", 0x0100);
-	// AM_RANGE(0x1f00, 0x1fef) bootloader ROM lives here
-	map(0x1ff8, 0x1fff).rom().region("eprom", 0x1ff0);
+	//map(0x0800, 0x1fff).rom().region("eprom", 0x0800);
+	//map(0xfff0, 0xffff).rom().region("eprom", 0xfff0);
 }
 
 static INPUT_PORTS_START( m6805evs )
@@ -101,15 +97,20 @@ void m6805evs_state::machine_reset()
 {
 }
 
-MACHINE_CONFIG_START(m6805evs_state::m6805evs)
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6805, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-MACHINE_CONFIG_END
+void m6805evs_state::m6805evs(machine_config &config)
+{
+	// FIXME: should this be MC68HC05E0 instead?
+	// (MC68HC705P9 doesn't use an external EPROM either and is also incompatible)
+	M68HC05C8(config, m_maincpu, XTAL(4'000'000));
+	//m_maincpu->set_addrmap(AS_PROGRAM, &m6805evs_state::mem_map);
+}
 
 ROM_START(m6805evs)
-	ROM_REGION(0x2000, "eprom", 0)
+	ROM_REGION(0x2000, "maincpu", 0)
 	ROM_LOAD( "evsbug12.bin", 0x0000, 0x2000, CRC(8b581aef) SHA1(eacf425cc8a042085ccc4097cc61570b633b1e38) )
+
+	ROM_REGION(0x2000, "mcu", 0)
+	ROM_LOAD( "mc68hc705p9cp.bin", 0x0000, 0x2000, NO_DUMP)
 ROM_END
 
 
@@ -119,5 +120,5 @@ ROM_END
 
 ***************************************************************************/
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT  COMPANY      FULLNAME      FLAGS
-COMP( 1990, m6805evs, 0,        0,      m6805evs, m6805evs, m6805evs_state, 0,    "Motorola",  "M68HC05EVS", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY     FULLNAME      FLAGS
+COMP( 1990, m6805evs, 0,      0,      m6805evs, m6805evs, m6805evs_state, empty_init, "Motorola", "M68HC05EVS", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

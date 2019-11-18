@@ -14,6 +14,8 @@
 #include "keyboard.h"
 #include "machine/keyboard.h"
 #include "machine/msm5832.h"
+#include "machine/timer.h"
+#include "diserial.h"
 
 
 //**************************************************************************
@@ -50,9 +52,13 @@ protected:
 	virtual void key_break(uint8_t row, uint8_t column) override;
 
 private:
+	TIMER_DEVICE_CALLBACK_MEMBER(mouse_callback);
+
 	enum {
 		CMD_REQ_TIME_AND_DATE = 0xe1,
 		CMD_SET_TIME_AND_DATE = 0xe4,
+		CMD_ENABLE_MOUSE      = 0xe5,
+		CMD_DISABLE_MOUSE     = 0xe6,
 		CMD_KEYBOARD_RESET    = 0xe8
 	};
 
@@ -61,8 +67,15 @@ private:
 	};
 
 	required_device<msm5832_device> m_rtc;
+	required_ioport m_mouse_b;
+	required_ioport m_mouse_x;
+	required_ioport m_mouse_y;
 
 	int m_rtc_index;
+	bool m_mouse_enabled;
+	uint8_t m_mouse_last_b;
+	uint8_t m_mouse_last_x;
+	uint8_t m_mouse_last_y;
 };
 
 

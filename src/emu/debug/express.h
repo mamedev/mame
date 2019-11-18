@@ -15,7 +15,9 @@
 
 #include "emucore.h"
 
+#include <deque>
 #include <functional>
+#include <list>
 #include <unordered_map>
 
 
@@ -103,8 +105,6 @@ private:
 // symbol_entry describes a symbol in a symbol table
 class symbol_entry
 {
-	friend class simple_list<symbol_entry>;
-
 protected:
 	// symbol types
 	enum symbol_type
@@ -119,7 +119,6 @@ public:
 	virtual ~symbol_entry();
 
 	// getters
-	symbol_entry *next() const { return m_next; }
 	const char *name() const { return m_name.c_str(); }
 	const std::string &format() const { return m_format; }
 
@@ -133,7 +132,6 @@ public:
 
 protected:
 	// internal state
-	symbol_entry *  m_next;                     // link to next entry
 	symbol_table &  m_table;                    // pointer back to the owning table
 	symbol_type     m_type;                     // type of symbol
 	std::string     m_name;                     // name of the symbol
@@ -328,27 +326,6 @@ private:
 		symbol_entry *          m_symbol;           // symbol pointer
 	};
 
-	// an expression_string holds an indexed string parsed from the expression
-	class expression_string
-	{
-		friend class simple_list<expression_string>;
-
-	public:
-		// construction/destruction
-		expression_string(const char *string, int length = 0)
-			: m_next(nullptr),
-				m_string(string, (length == 0) ? strlen(string) : length) { }
-
-		// operators
-		operator const char *() { return m_string.c_str(); }
-		operator const char *() const { return m_string.c_str(); }
-
-	private:
-		// internal state
-		expression_string * m_next;                     // next string in list
-		std::string         m_string;                   // copy of the string
-	};
-
 	// internal helpers
 	void copy(const parsed_expression &src);
 	void print_tokens(FILE *out);
@@ -366,7 +343,6 @@ private:
 	// execution helpers
 	void push_token(parse_token &token);
 	void pop_token(parse_token &token);
-	parse_token *peek_token(int count);
 	void pop_token_lval(parse_token &token);
 	void pop_token_rval(parse_token &token);
 	u64 execute_tokens();
@@ -374,15 +350,13 @@ private:
 
 	// constants
 	static const int MAX_FUNCTION_PARAMS = 16;
-	static const int MAX_STACK_DEPTH = 16;
 
 	// internal state
 	symbol_table *      m_symtable;                     // symbol table
 	std::string         m_original_string;              // original string (prior to parsing)
 	simple_list<parse_token> m_tokenlist;               // token list
-	simple_list<expression_string> m_stringlist;        // string list
-	int                 m_token_stack_ptr;              // stack pointer (used during execution)
-	parse_token         m_token_stack[MAX_STACK_DEPTH]; // token stack (used during execution)
+	std::list<std::string> m_stringlist;                // string list
+	std::deque<parse_token> m_token_stack;              // token stack (used during execution)
 };
 
 #endif // MAME_EMU_DEBUG_EXPRESS_H

@@ -52,6 +52,8 @@ render_primitive_list *renderer_gdi::get_primitives()
 
 	RECT client;
 	GetClientRect(std::static_pointer_cast<win_window_info>(win)->platform_window(), &client);
+	if ((rect_width(&client) == 0) || (rect_height(&client) == 0))
+		return nullptr;
 	win->target()->set_bounds(rect_width(&client), rect_height(&client), win->pixel_aspect());
 	return &win->target()->get_primitives();
 }

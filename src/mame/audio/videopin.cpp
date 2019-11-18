@@ -20,7 +20,7 @@
 #define VIDEOPIN_BELL_SND   NODE_11
 #define VIDEOPIN_BONG_SND   NODE_12
 
-DISCRETE_SOUND_START(videopin)
+DISCRETE_SOUND_START(videopin_discrete)
 /************************************************/
 	/* videopin  Effects Relataive Gain Table       */
 	/*                                              */

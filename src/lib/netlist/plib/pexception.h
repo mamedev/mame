@@ -1,126 +1,147 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * palloc.h
- *
- */
 
 #ifndef PEXCEPTION_H_
 #define PEXCEPTION_H_
 
+///
+/// \file: pexception.h
+///
+
 #include "pstring.h"
+#include "ptypes.h"
 
 #include <exception>
 
+#define passert_always(expr)							\
+  ((expr) ? static_cast<void>(0) : plib::passert_fail (#expr, __FILE__, __LINE__, nullptr))
+
+#define passert_always_msg(expr, msg)							\
+  ((expr) ? static_cast<void>(0) : plib::passert_fail (#expr, __FILE__, __LINE__, msg))
+
 namespace plib {
-//============================================================
-//  exception base
-//============================================================
 
-class pexception : public std::exception
-{
-public:
-	explicit pexception(const pstring &text);
-	pexception(const pexception &e) : std::exception(e), m_text(e.m_text) { }
+	/// \brief Terminate the program.
+	///
+	/// \note could be enhanced by setting a termination handler
+	///
+	[[noreturn]] void terminate(const char *msg) noexcept;
 
-	virtual ~pexception() noexcept;
+	[[noreturn]] void passert_fail(const char *assertion,
+		const char *file, int lineno, const char *msg) noexcept;
 
-	const pstring &text() { return m_text; }
-	const char* what() const noexcept override { return m_text.c_str(); }
+	/// \brief throw an exception.
+	///
+	/// throws an exception E. The purpose is to clearly identify exception
+	/// throwing in the code
+	///
+	/// \tparam E Type of exception to be thrown
+	///
+	template<typename E, typename... Args>
+	[[noreturn]] static inline void pthrow(Args&&... args) noexcept(false)
+	{
+		throw E(std::forward<Args>(args)...);
+	}
 
-private:
-	pstring m_text;
-};
+	//============================================================
+	//  exception base
+	//============================================================
 
-class file_e : public plib::pexception
-{
-public:
-	file_e(const pstring &fmt, const pstring &filename);
-	file_e(const file_e &e) : pexception(e) { }
-	virtual ~file_e() noexcept;
-};
+	class pexception : public std::exception
+	{
+	public:
+		explicit pexception(const pstring &text);
 
-class file_open_e : public file_e
-{
-public:
-	explicit file_open_e(const pstring &filename);
-	file_open_e(const file_open_e &e) : file_e(e) { }
-	virtual ~file_open_e() noexcept;
-};
+		const pstring &text() const noexcept { return m_text; }
+		const char* what() const noexcept override { return m_text.c_str(); }
 
-class file_read_e : public file_e
-{
-public:
-	explicit file_read_e(const pstring &filename);
-	file_read_e(const file_read_e &e) : file_e(e) { }
-	virtual ~file_read_e() noexcept;
-};
+	private:
+		pstring m_text;
+	};
 
-class file_write_e : public file_e
-{
-public:
-	explicit file_write_e(const pstring &filename);
-	file_write_e(const file_write_e &e) : file_e(e) { }
-	virtual ~file_write_e() noexcept;
-};
+	class file_e : public plib::pexception
+	{
+	public:
+		file_e(const pstring &fmt, const pstring &filename);
+	};
 
-class null_argument_e : public plib::pexception
-{
-public:
-	explicit null_argument_e(const pstring &argument);
-	null_argument_e(const null_argument_e &e) : pexception(e) { }
-	virtual ~null_argument_e() noexcept;
-};
+	class file_open_e : public file_e
+	{
+	public:
+		explicit file_open_e(const pstring &filename);
+	};
 
-class out_of_mem_e : public plib::pexception
-{
-public:
-	explicit out_of_mem_e(const pstring &location);
-	out_of_mem_e(const out_of_mem_e &e) : pexception(e) { }
-	virtual ~out_of_mem_e() noexcept;
-};
+	class file_read_e : public file_e
+	{
+	public:
+		explicit file_read_e(const pstring &filename);
+	};
 
-/* FIXME: currently only a stub for later use. More use could be added by
- * using “-fnon-call-exceptions" and sigaction to enable c++ exception supported.
- */
+	class file_write_e : public file_e
+	{
+	public:
+		explicit file_write_e(const pstring &filename);
+	};
 
-class fpexception_e : public pexception
-{
-public:
-	explicit fpexception_e(const pstring &text);
-	fpexception_e(const fpexception_e &e) : pexception(e) { }
-	virtual ~fpexception_e() noexcept;
-};
+	class null_argument_e : public plib::pexception
+	{
+	public:
+		explicit null_argument_e(const pstring &argument);
+	};
 
-static constexpr unsigned FP_INEXACT = 0x0001;
-static constexpr unsigned FP_DIVBYZERO = 0x0002;
-static constexpr unsigned FP_UNDERFLOW = 0x0004;
-static constexpr unsigned FP_OVERFLOW = 0x0008;
-static constexpr unsigned FP_INVALID = 0x00010;
-static constexpr unsigned FP_ALL = 0x0001f;
+	class out_of_mem_e : public plib::pexception
+	{
+	public:
+		explicit out_of_mem_e(const pstring &location);
+	};
 
-/*
- * Catch SIGFPE on linux for debugging purposes.
- */
+	// FIXME: currently only a stub for later use. More use could be added by
+	// using “-fnon-call-exceptions" and sigaction to enable c++ exception supported.
+	//
 
-class fpsignalenabler
-{
-public:
-	explicit fpsignalenabler(unsigned fpexceptions);
-	~fpsignalenabler();
+	class fpexception_e : public pexception
+	{
+	public:
+		explicit fpexception_e(const pstring &text);
+	};
 
-	/* is the functionality supported ? */
-	static bool supported();
-	/* returns last global enable state */
-	static bool global_enable(bool enable);
+	static constexpr unsigned FP_INEXACT = 0x0001;
+	static constexpr unsigned FP_DIVBYZERO = 0x0002;
+	static constexpr unsigned FP_UNDERFLOW = 0x0004;
+	static constexpr unsigned FP_OVERFLOW = 0x0008;
+	static constexpr unsigned FP_INVALID = 0x00010;
+	static constexpr unsigned FP_ALL = 0x0001f;
 
-private:
-	int m_last_enabled;
+	/// \brief Catch SIGFPE on linux for debugging purposes.
+	///
+	class fpsignalenabler
+	{
+	public:
+		explicit fpsignalenabler(unsigned fpexceptions);
 
-	static bool m_enable;
-};
+		COPYASSIGNMOVE(fpsignalenabler, delete)
+
+		~fpsignalenabler();
+
+		/// \brief is the functionality supported.
+		///
+		/// \return current status
+		///
+		static bool supported();
+		/// \brief get/set global enable status
+		///
+		/// \param enable new status
+		/// \return returns last global enable state
+		///
+		static bool global_enable(bool enable);
+
+	private:
+		int m_last_enabled;
+
+		static bool m_enable;
+	};
 
 
-}
+} // namespace plib
 
-#endif /* PEXCEPTION_H_ */
+#endif // PEXCEPTION_H_

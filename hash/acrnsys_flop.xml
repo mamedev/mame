@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!-- Acorn System - Floppy disk images -->
+
+<softwarelist name="acrnsys_flop" description="Acorn System disk images">
+
+	<software name="sbasic">
+		<description>System BBC BASIC</description>
+		<year>198?</year>
+		<publisher>Acorn</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="52224">
+				<rom name="sbasic.ssd" size="52224" crc="bbdd9bf7" sha1="0c9863c866dcfd6cfb28aacbf085904ccd8e9b94"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="asys3fs">
+		<description>Atom/System 3 File Server</description>
+		<year>198?</year>
+		<publisher>Acorn</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="82432">
+				<rom name="fileserver.ssd" size="82432" crc="1f28f7f5" sha1="63f7ddd745be51bcc003f7a517b44929fc4e980e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sys5fs">
+		<description>System 5 File Server</description>
+		<year>198?</year>
+		<publisher>Acorn</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="sys5fs.ssd" size="204800" crc="89fe7a4a" sha1="55e89dbb6eadbc25550d50fb727c5b956da08799"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sys3util">
+		<description>System 3 Utilities</description>
+		<year>198?</year>
+		<publisher>Acorn</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="40192">
+				<rom name="sys3utils.ssd" size="40192" crc="2fbe109e" sha1="e61f77c4d3c4fa0332e3fb9ae3400eb2ca5951fc"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

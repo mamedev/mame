@@ -5,9 +5,10 @@
 //  consolewininfo.h - Win32 debug window handling
 //
 //============================================================
+#ifndef MAME_DEBUGGER_WIN_CONSOLEWININFO_H
+#define MAME_DEBUGGER_WIN_CONSOLEWININFO_H
 
-#ifndef __DEBUG_WIN_CONSOLE_WIN_INFO_H__
-#define __DEBUG_WIN_CONSOLE_WIN_INFO_H__
+#pragma once
 
 #include "debugwin.h"
 
@@ -39,6 +40,8 @@ private:
 		DEVOPTION_CASSETTE_RECORD,
 		DEVOPTION_CASSETTE_REWIND,
 		DEVOPTION_CASSETTE_FASTFORWARD,
+		DEVOPTION_CASSETTE_MOTOR,
+		DEVOPTION_CASSETTE_SOUND,
 		DEVOPTION_MAX
 	};
 

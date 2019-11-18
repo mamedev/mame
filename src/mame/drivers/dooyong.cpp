@@ -57,7 +57,10 @@ because one of interrupt sources is _dead_ (timer never restarts).
 
 Music tempo and audio pitch depends on (unknown) YM clocks.
 Sound cpu runs currently at 8 MHz to avoid jerky music when there's (too)
-many sfx scheduled.
+many SFX scheduled.
+
+Reference video:
+- pollux : https://www.youtube.com/watch?v=SuUvX9U9dxo
 
 Currently there's some workaround implemented - both YM lines are OR-ed to
 allow nested (and in fact - delayed) interrupts. It's temporary solution
@@ -65,7 +68,7 @@ until we find real PCB and verify clocks and trace int lines.
 
 Pollux:
 Many (all? at least pollux, primella and flying tiger) use some kind of
-banked palette ram. Bit 1 at address 0xf008 controls banking (both palettes
+banked palette RAM. Bit 1 at address 0xf008 controls banking (both palettes
 are almost identical, except for much darker BG layer colors).
 
 
@@ -77,11 +80,13 @@ are almost identical, except for much darker BG layer colors).
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
+#include "machine/input_merger.h"
 #include "machine/timer.h"
 #include "sound/2203intf.h"
 #include "sound/okim6295.h"
 #include "sound/ym2151.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -97,10 +102,8 @@ protected:
 		, m_audiocpu(*this, "audiocpu")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
-		, m_bg(*this, "bg")
-		, m_bg2(*this, "bg2")
-		, m_fg(*this, "fg")
-		, m_fg2(*this, "fg2")
+		, m_bg(*this, "bg%u", 1U)
+		, m_fg(*this, "fg%u", 1U)
 	{
 	}
 
@@ -111,10 +114,8 @@ protected:
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	optional_device<dooyong_rom_tilemap_device> m_bg;
-	optional_device<dooyong_rom_tilemap_device> m_bg2;
-	optional_device<dooyong_rom_tilemap_device> m_fg;
-	optional_device<dooyong_rom_tilemap_device> m_fg2;
+	optional_device_array<dooyong_rom_tilemap_device, 2> m_bg;
+	optional_device_array<dooyong_rom_tilemap_device, 2> m_fg;
 };
 
 class dooyong_z80_state : public dooyong_state
@@ -124,6 +125,7 @@ public:
 		: dooyong_state(mconfig, type, tag)
 		, m_tx(*this, "tx")
 		, m_spriteram(*this, "spriteram")
+		, m_mainbank(*this, "mainbank")
 	{
 	}
 
@@ -140,65 +142,65 @@ protected:
 		SPRITE_YSHIFT_FLYTIGER = 0x08
 	};
 
-	DECLARE_WRITE8_MEMBER(flip_screen_w)
+	void flip_screen_w(u8 data)
 	{
 		flip_screen_set(data);
 	}
 
-	DECLARE_WRITE8_MEMBER(bankswitch_w)
+	void bankswitch_w(u8 data)
 	{
-		membank("bank1")->set_entry(data & 0x07);
+		m_mainbank->set_entry(data & 0x07);
 		if (data & 0xf8) popmessage("bankswitch %02x",data);
 	}
 
-	DECLARE_READ8_MEMBER(lastday_tx_r)
+	u8 lastday_tx_r(offs_t offset)
 	{
-		bool const lane(BIT(offset, 11));
-		return m_tx->tileram_r(space, offset & 0x07ffU) >> (lane ? 8 : 0);
+		const bool lane(BIT(offset, 11));
+		return m_tx->tileram_r(offset & 0x07ffU) >> (lane ? 8 : 0);
 	}
 
-	DECLARE_WRITE8_MEMBER(lastday_tx_w)
+	void lastday_tx_w(offs_t offset, u8 data)
 	{
-		bool const lane(BIT(offset, 11));
-		m_tx->tileram_w(space, offset & 0x07ffU, uint16_t(data) << (lane ? 8 : 0), lane ? 0xff00U : 0x00ffU);
+		const bool lane(BIT(offset, 11));
+		m_tx->tileram_w(offset & 0x07ffU, u16(data) << (lane ? 8 : 0), lane ? 0xff00U : 0x00ffU);
 	}
 
-	DECLARE_READ8_MEMBER(bluehawk_tx_r)
+	u8 bluehawk_tx_r(offs_t offset)
 	{
-		bool const lane(BIT(offset, 0));
-		return m_tx->tileram_r(space, offset >> 1) >> (lane ? 8 : 0);
+		const bool lane(BIT(offset, 0));
+		return m_tx->tileram_r(offset >> 1) >> (lane ? 8 : 0);
 	}
 
-	DECLARE_WRITE8_MEMBER(bluehawk_tx_w)
+	void bluehawk_tx_w(offs_t offset, u8 data)
 	{
-		bool const lane(BIT(offset, 0));
-		m_tx->tileram_w(space, offset >> 1, uint16_t(data) << (lane ? 8 : 0), lane ? 0xff00U : 0x00ffU);
+		const bool lane(BIT(offset, 0));
+		m_tx->tileram_w(offset >> 1, u16(data) << (lane ? 8 : 0), lane ? 0xff00U : 0x00ffU);
 	}
 
-	DECLARE_READ8_MEMBER(paletteram_flytiger_r)
+	u8 paletteram_flytiger_r(offs_t offset)
 	{
 		if (m_palette_bank) offset |= 0x800;
 		return m_paletteram_flytiger[offset];
 	}
 
-	DECLARE_WRITE8_MEMBER(paletteram_flytiger_w)
+	void paletteram_flytiger_w(offs_t offset, u8 data)
 	{
 		if (m_palette_bank) offset |= 0x800;
 		m_paletteram_flytiger[offset] = data;
-		uint16_t const value = m_paletteram_flytiger[offset & ~1] | (m_paletteram_flytiger[offset | 1] << 8);
+		const u16 value = m_paletteram_flytiger[offset & ~1] | (m_paletteram_flytiger[offset | 1] << 8);
 		m_palette->set_pen_color(offset/2, pal5bit(value >> 10), pal5bit(value >> 5), pal5bit(value >> 0));
 	}
 
-	DECLARE_WRITE8_MEMBER(primella_ctrl_w);
-	DECLARE_WRITE8_MEMBER(flytiger_ctrl_w);
+	void primella_ctrl_w(u8 data);
+	void flytiger_ctrl_w(u8 data);
 
-	uint32_t screen_update_bluehawk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_flytiger(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_primella(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_bluehawk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_flytiger(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_primella(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_MACHINE_START(cpu_z80)
 	{
-		membank("bank1")->configure_entries(0, 8, memregion("maincpu")->base(), 0x4000);
+		m_mainbank->configure_entries(0, 8, memregion("maincpu")->base(), 0x4000);
 	}
 
 	DECLARE_VIDEO_START(bluehawk)
@@ -207,8 +209,8 @@ protected:
 
 	DECLARE_VIDEO_START(flytiger)
 	{
-		m_paletteram_flytiger = make_unique_clear<uint8_t[]>(0x1000);
-		save_pointer(NAME(m_paletteram_flytiger.get()), 0x1000);
+		m_paletteram_flytiger = make_unique_clear<u8[]>(0x1000);
+		save_pointer(NAME(m_paletteram_flytiger), 0x1000);
 
 		m_palette_bank = 0;
 
@@ -223,6 +225,12 @@ protected:
 		save_item(NAME(m_tx_pri));
 	}
 
+	void bluehawk_tile_callback(u16 attr, u32 &code, u32 &color)
+	{
+		code = attr & 0x3ff;
+		color = (attr & 0x3c00) >> 10;
+	}
+
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, unsigned extensions = 0);
 
 	void sound_2151(machine_config &config);
@@ -230,14 +238,16 @@ protected:
 	void flytiger_map(address_map &map);
 	void primella_map(address_map &map);
 
-	std::unique_ptr<uint8_t[]> m_paletteram_flytiger;
-	uint8_t m_sprites_disabled = 0;
-	uint8_t m_flytiger_pri = 0;
-	uint8_t m_tx_pri = 0;
-	uint8_t m_palette_bank = 0;
+	std::unique_ptr<u8[]> m_paletteram_flytiger;
+	u8 m_sprites_disabled = 0;
+	u8 m_flytiger_pri = 0;
+	u8 m_tx_pri = 0;
+	u8 m_palette_bank = 0;
 
 	required_device<dooyong_ram_tilemap_device> m_tx;
 	optional_device<buffered_spriteram8_device> m_spriteram;
+
+	required_memory_bank m_mainbank;
 };
 
 class dooyong_z80_ym2203_state : public dooyong_z80_state
@@ -253,28 +263,18 @@ public:
 	void pollux(machine_config &config);
 
 protected:
-	DECLARE_WRITE8_MEMBER(lastday_ctrl_w);
-	DECLARE_WRITE8_MEMBER(pollux_ctrl_w);
-	DECLARE_WRITE_LINE_MEMBER(irqhandler_2203_1);
-	DECLARE_WRITE_LINE_MEMBER(irqhandler_2203_2);
-	DECLARE_READ8_MEMBER(unk_r);
+	void lastday_ctrl_w(u8 data);
+	void pollux_ctrl_w(u8 data);
+	u8 unk_r();
 
-	DECLARE_MACHINE_RESET(sound_ym2203)
-	{
-		m_interrupt_line_1 = 0;
-		m_interrupt_line_2 = 0;
-	}
-
-	uint32_t screen_update_lastday(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_gulfstrm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_pollux(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_lastday(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_gulfstrm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_pollux(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_VIDEO_START(lastday)
 	{
 		/* Register for save/restore */
 		save_item(NAME(m_sprites_disabled));
-		save_item(NAME(m_interrupt_line_1));
-		save_item(NAME(m_interrupt_line_2));
 	}
 
 	DECLARE_VIDEO_START(gulfstrm)
@@ -283,21 +283,17 @@ protected:
 
 		/* Register for save/restore */
 		save_item(NAME(m_palette_bank));
-		save_item(NAME(m_interrupt_line_1));
-		save_item(NAME(m_interrupt_line_2));
 	}
 
 	DECLARE_VIDEO_START(pollux)
 	{
-		m_paletteram_flytiger = make_unique_clear<uint8_t[]>(0x1000);
-		save_pointer(NAME(m_paletteram_flytiger.get()), 0x1000);
+		m_paletteram_flytiger = make_unique_clear<u8[]>(0x1000);
+		save_pointer(NAME(m_paletteram_flytiger), 0x1000);
 
 		m_palette_bank = 0;
 
 		/* Register for save/restore */
 		save_item(NAME(m_palette_bank));
-		save_item(NAME(m_interrupt_line_1));
-		save_item(NAME(m_interrupt_line_2));
 	}
 
 	void sound_2203(machine_config &config);
@@ -308,9 +304,6 @@ protected:
 
 	void lastday_sound_map(address_map &map);
 	void pollux_sound_map(address_map &map);
-
-	int m_interrupt_line_1 = 0;
-	int m_interrupt_line_2 = 0;
 };
 
 
@@ -323,25 +316,22 @@ protected:
 	{
 	}
 
-	DECLARE_WRITE16_MEMBER(ctrl_w)
+	void ctrl_w(u8 data)
 	{
-		if (ACCESSING_BITS_0_7)
-		{
-			/* bit 0 flips screen */
-			flip_screen_set(data & 0x0001);
+		/* bit 0 flips screen */
+		flip_screen_set(data & 0x01);
 
-			/* bit 4 changes tilemaps priority */
-			m_bg2_priority = data & 0x0010;
+		/* bit 4 changes tilemaps priority */
+		m_bg2_priority = data & 0x10;
 
-			/* bit 5 used but unknown */
-		}
+		/* bit 5 used but unknown */
 	}
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	uint16_t m_bg2_priority = 0;
+	u16 m_bg2_priority = 0;
 	required_device<buffered_spriteram16_device> m_spriteram;
 };
 
@@ -358,12 +348,18 @@ public:
 	void superx(machine_config &config);
 
 protected:
-	uint32_t screen_update_rshark(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_rshark(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	virtual void video_start() override
 	{
 		/* Register for save/restore */
 		save_item(NAME(m_bg2_priority));
+	}
+
+	void rshark_tile_callback(u16 attr, u32 &code, u32 &color)
+	{
+		code = attr & 0x1fff; // uses more code bits; because rshark and superx are uses 16x16 tiles for tilemap instead 32x32 tiles
+		color = 0; // use external ROM
 	}
 
 	void dooyong_68k(machine_config &config);
@@ -378,8 +374,6 @@ class popbingo_state : public dooyong_68k_state
 public:
 	popbingo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: dooyong_68k_state(mconfig, type, tag)
-		, m_bg_bitmap()
-		, m_bg2_bitmap()
 		, m_screen(*this, "screen")
 	{
 	}
@@ -387,31 +381,35 @@ public:
 	void popbingo(machine_config &config);
 
 protected:
-	uint32_t screen_update_popbingo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_popbingo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	virtual void video_start() override
 	{
-		m_screen->register_screen_bitmap(m_bg_bitmap);
-		m_screen->register_screen_bitmap(m_bg2_bitmap);
+		m_screen->register_screen_bitmap(m_bg_bitmap[0]);
+		m_screen->register_screen_bitmap(m_bg_bitmap[1]);
 
 		/* Register for save/restore */
 		save_item(NAME(m_bg2_priority)); // Not used atm
 	}
 
+	void popbingo_tile_callback(u16 attr, u32 &code, u32 &color)
+	{
+		code = attr & 0x7ff;
+		color = 0;
+	}
+
 	void popbingo_map(address_map &map);
 
 private:
-	bitmap_ind16 m_bg_bitmap;
-	bitmap_ind16 m_bg2_bitmap;
+	bitmap_ind16 m_bg_bitmap[2];
 
 	required_device<screen_device> m_screen;
 };
 
 
-
 /* Control registers seem to be different on every game */
 
-WRITE8_MEMBER(dooyong_z80_ym2203_state::lastday_ctrl_w)
+void dooyong_z80_ym2203_state::lastday_ctrl_w(u8 data)
 {
 	/* bits 0 and 1 are coin counters */
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
@@ -426,7 +424,7 @@ WRITE8_MEMBER(dooyong_z80_ym2203_state::lastday_ctrl_w)
 	flip_screen_set(data & 0x40);
 }
 
-WRITE8_MEMBER(dooyong_z80_ym2203_state::pollux_ctrl_w)
+void dooyong_z80_ym2203_state::pollux_ctrl_w(u8 data)
 {
 //  printf("pollux_ctrl_w %02x\n", data);
 
@@ -438,12 +436,12 @@ WRITE8_MEMBER(dooyong_z80_ym2203_state::pollux_ctrl_w)
 	machine().bookkeeping().coin_counter_w(1, data & 0x40);
 
 	/* bit 1 is used but unknown - palette banking (both write and display based on pollux bombs) */
-	uint8_t const last_palbank = m_palette_bank;
+	const u8 last_palbank = m_palette_bank;
 	if (m_paletteram_flytiger) m_palette_bank = BIT(data, 1);
 	if (last_palbank != m_palette_bank)
 	{
-		m_bg->set_palette_bank(m_palette_bank << 6);
-		m_fg->set_palette_bank(m_palette_bank << 6);
+		m_bg[0]->set_palette_bank(m_palette_bank << 6);
+		m_fg[0]->set_palette_bank(m_palette_bank << 6);
 		m_tx->set_palette_bank(m_palette_bank << 6);
 	}
 
@@ -453,11 +451,10 @@ WRITE8_MEMBER(dooyong_z80_ym2203_state::pollux_ctrl_w)
 }
 
 
-
-WRITE8_MEMBER(dooyong_z80_state::primella_ctrl_w)
+void dooyong_z80_state::primella_ctrl_w(u8 data)
 {
 	/* bits 0-2 select ROM bank */
-	membank("bank1")->set_entry(data & 0x07);
+	m_mainbank->set_entry(data & 0x07);
 
 	/* bit 3 disables tx layer */
 	m_tx_pri = data & 0x08;
@@ -471,7 +468,7 @@ WRITE8_MEMBER(dooyong_z80_state::primella_ctrl_w)
 }
 
 
-WRITE8_MEMBER(dooyong_z80_state::flytiger_ctrl_w)
+void dooyong_z80_state::flytiger_ctrl_w(u8 data)
 {
 	/* bit 0 is flip screen */
 	flip_screen_set(data & 0x01);
@@ -479,12 +476,12 @@ WRITE8_MEMBER(dooyong_z80_state::flytiger_ctrl_w)
 	/* bits 1, 2 used but unknown */
 
 	/* bit 3 palette banking  */
-	uint8_t const last_palbank = m_palette_bank;
+	const u8 last_palbank = m_palette_bank;
 	m_palette_bank = BIT(data, 3);
 	if (last_palbank != m_palette_bank)
 	{
-		m_bg->set_palette_bank(m_palette_bank << 6);
-		m_fg->set_palette_bank(m_palette_bank << 6);
+		m_bg[0]->set_palette_bank(m_palette_bank << 6);
+		m_fg[0]->set_palette_bank(m_palette_bank << 6);
 		m_tx->set_palette_bank(m_palette_bank << 6);
 	}
 
@@ -518,7 +515,7 @@ void dooyong_z80_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap
 	   height only used by pollux, bluehawk and flytiger
 	   x flip and y flip only used by pollux and flytiger */
 
-	uint8_t const *const buffered_spriteram = m_spriteram->buffer();
+	const u8 *const buffered_spriteram = m_spriteram->buffer();
 	for (int offs = 0; offs < m_spriteram->bytes(); offs += 32)
 	{
 		int sx = buffered_spriteram[offs+3] | ((buffered_spriteram[offs+1] & 0x10) << 4);
@@ -528,13 +525,13 @@ void dooyong_z80_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap
 
 		//TODO: This priority mechanism works for known games, but seems a bit strange.
 		//Are we missing something?  (The obvious spare palette bit isn't it.)
-		int const pri = (((color == 0x00) || (color == 0x0f)) ? 0xfc : 0xf0);
+		const int pri = (((color == 0x00) || (color == 0x0f)) ? 0xfc : 0xf0);
 
 		bool flipx = false, flipy = false;
 		int height = 0;
 		if (extensions)
 		{
-			uint8_t const ext = buffered_spriteram[offs+0x1c];
+			const u8 ext = buffered_spriteram[offs+0x1c];
 
 			if (extensions & SPRITE_12BIT)
 				code |= ((ext & 0x01) << 11);
@@ -579,7 +576,7 @@ void dooyong_z80_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap
 }
 
 
-uint32_t dooyong_z80_ym2203_state::screen_update_lastday(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 dooyong_z80_ym2203_state::screen_update_lastday(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	screen.priority().fill(0, cliprect);
@@ -587,8 +584,8 @@ uint32_t dooyong_z80_ym2203_state::screen_update_lastday(screen_device &screen, 
 	/* Text layer is offset on this machine */
 	m_tx->set_scrolly(flip_screen() ? -8 : 8);
 
-	m_bg->draw(screen, bitmap, cliprect, 0, 1);
-	m_fg->draw(screen, bitmap, cliprect, 0, 2);
+	m_bg[0]->draw(screen, bitmap, cliprect, 0, 1);
+	m_fg[0]->draw(screen, bitmap, cliprect, 0, 2);
 	m_tx->draw(screen, bitmap, cliprect, 0, 4);
 
 	if (!m_sprites_disabled)
@@ -597,7 +594,7 @@ uint32_t dooyong_z80_ym2203_state::screen_update_lastday(screen_device &screen, 
 	return 0;
 }
 
-uint32_t dooyong_z80_ym2203_state::screen_update_gulfstrm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 dooyong_z80_ym2203_state::screen_update_gulfstrm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	screen.priority().fill(0, cliprect);
@@ -605,8 +602,8 @@ uint32_t dooyong_z80_ym2203_state::screen_update_gulfstrm(screen_device &screen,
 	/* Text layer is offset on this machine */
 	m_tx->set_scrolly(flip_screen() ? -8 : 8);
 
-	m_bg->draw(screen, bitmap, cliprect, 0, 1);
-	m_fg->draw(screen, bitmap, cliprect, 0, 2);
+	m_bg[0]->draw(screen, bitmap, cliprect, 0, 1);
+	m_fg[0]->draw(screen, bitmap, cliprect, 0, 2);
 	m_tx->draw(screen, bitmap, cliprect, 0, 4);
 
 	draw_sprites(screen, bitmap, cliprect, SPRITE_12BIT);
@@ -614,13 +611,13 @@ uint32_t dooyong_z80_ym2203_state::screen_update_gulfstrm(screen_device &screen,
 	return 0;
 }
 
-uint32_t dooyong_z80_ym2203_state::screen_update_pollux(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 dooyong_z80_ym2203_state::screen_update_pollux(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	screen.priority().fill(0, cliprect);
 
-	m_bg->draw(screen, bitmap, cliprect, 0, 1);
-	m_fg->draw(screen, bitmap, cliprect, 0, 2);
+	m_bg[0]->draw(screen, bitmap, cliprect, 0, 1);
+	m_fg[0]->draw(screen, bitmap, cliprect, 0, 2);
 	m_tx->draw(screen, bitmap, cliprect, 0, 4);
 
 	draw_sprites(screen, bitmap, cliprect, SPRITE_12BIT | SPRITE_HEIGHT);
@@ -628,20 +625,20 @@ uint32_t dooyong_z80_ym2203_state::screen_update_pollux(screen_device &screen, b
 	return 0;
 }
 
-uint32_t dooyong_z80_state::screen_update_flytiger(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 dooyong_z80_state::screen_update_flytiger(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	screen.priority().fill(0, cliprect);
 
 	if (m_flytiger_pri)
 	{
-		m_fg->draw(screen, bitmap, cliprect, 0, 1);
-		m_bg->draw(screen, bitmap, cliprect, 0, 2);
+		m_fg[0]->draw(screen, bitmap, cliprect, 0, 1);
+		m_bg[0]->draw(screen, bitmap, cliprect, 0, 2);
 	}
 	else
 	{
-		m_bg->draw(screen, bitmap, cliprect, 0, 1);
-		m_fg->draw(screen, bitmap, cliprect, 0, 2);
+		m_bg[0]->draw(screen, bitmap, cliprect, 0, 1);
+		m_fg[0]->draw(screen, bitmap, cliprect, 0, 2);
 	}
 	m_tx->draw(screen, bitmap, cliprect, 0, 4);
 
@@ -651,14 +648,14 @@ uint32_t dooyong_z80_state::screen_update_flytiger(screen_device &screen, bitmap
 }
 
 
-uint32_t dooyong_z80_state::screen_update_bluehawk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 dooyong_z80_state::screen_update_bluehawk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	screen.priority().fill(0, cliprect);
 
-	m_bg->draw(screen, bitmap, cliprect, 0, 1);
-	m_fg->draw(screen, bitmap, cliprect, 0, 2);
-	m_fg2->draw(screen, bitmap, cliprect, 0, 4);
+	m_bg[0]->draw(screen, bitmap, cliprect, 0, 1);
+	m_fg[0]->draw(screen, bitmap, cliprect, 0, 2);
+	m_fg[1]->draw(screen, bitmap, cliprect, 0, 4);
 	m_tx->draw(screen, bitmap, cliprect, 0, 4);
 
 	draw_sprites(screen, bitmap, cliprect, SPRITE_12BIT | SPRITE_HEIGHT | SPRITE_YSHIFT_BLUEHAWK);
@@ -666,18 +663,17 @@ uint32_t dooyong_z80_state::screen_update_bluehawk(screen_device &screen, bitmap
 	return 0;
 }
 
-uint32_t dooyong_z80_state::screen_update_primella(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 dooyong_z80_state::screen_update_primella(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
-	m_bg->draw(screen, bitmap, cliprect, 0, 0);
+	m_bg[0]->draw(screen, bitmap, cliprect, 0, 0);
 	if (m_tx_pri) m_tx->draw(screen, bitmap, cliprect, 0, 0);
-	m_fg->draw(screen, bitmap, cliprect, 0, 0);
+	m_fg[0]->draw(screen, bitmap, cliprect, 0, 0);
 	if (!m_tx_pri) m_tx->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }
-
 
 
 void dooyong_68k_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -701,22 +697,22 @@ void dooyong_68k_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap
 	   w = width
 	   h = height */
 
-	uint16_t const *const buffered_spriteram = m_spriteram->buffer();
+	const u16 *const buffered_spriteram = m_spriteram->buffer();
 	for (int offs = (m_spriteram->bytes() / 2) - 8; offs >= 0; offs -= 8)
 	{
 		if (buffered_spriteram[offs] & 0x0001)    /* enable */
 		{
 			int code = buffered_spriteram[offs+3];
-			int const color = buffered_spriteram[offs+7] & 0x000f;
+			const int color = buffered_spriteram[offs+7] & 0x000f;
 			//TODO: This priority mechanism works for known games, but seems a bit strange.
 			//Are we missing something?  (The obvious spare palette bit isn't it.)
-			int const pri = (((color == 0x00) || (color == 0x0f)) ? 0xfc : 0xf0);
-			int const width = buffered_spriteram[offs+1] & 0x000f;
-			int const height = (buffered_spriteram[offs+1] & 0x00f0) >> 4;
+			const int pri = GFX_PMASK_4 | (((color == 0x00) || (color == 0x0f)) ? GFX_PMASK_2 : 0);
+			const int width = buffered_spriteram[offs+1] & 0x000f;
+			const int height = (buffered_spriteram[offs+1] & 0x00f0) >> 4;
 
-			bool const flip = flip_screen();
+			const bool flip = flip_screen();
 			int sx = buffered_spriteram[offs+4] & 0x01ff;
-			int sy = (int16_t)buffered_spriteram[offs+6] & 0x01ff;
+			int sy = (s16)buffered_spriteram[offs+6] & 0x01ff;
 			if (sy & 0x0100) sy |= ~(int)0x01ff;    // Correctly sign-extend 9-bit number
 			if (flip)
 			{
@@ -726,10 +722,10 @@ void dooyong_68k_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap
 
 			for (int y = 0; y <= height; y++)
 			{
-				int const _y = sy + (16 * (flip ? (height - y) : y));
+				const int _y = sy + (16 * (flip ? (height - y) : y));
 				for (int x = 0; x <= width; x++)
 				{
-					int const _x = sx + (16 * (flip ? (width - x) : x));
+					const int _x = sx + (16 * (flip ? (width - x) : x));
 					m_gfxdecode->gfx(0)->prio_transpen(bitmap,cliprect,
 							code,
 							color,
@@ -745,15 +741,15 @@ void dooyong_68k_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap
 }
 
 
-uint32_t rshark_state::screen_update_rshark(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 rshark_state::screen_update_rshark(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	screen.priority().fill(0, cliprect);
 
-	m_bg->draw(screen, bitmap, cliprect, 0, 1);
-	m_bg2->draw(screen, bitmap, cliprect, 0, (m_bg2_priority ? 2 : 1));
-	m_fg->draw(screen, bitmap, cliprect, 0, 2);
-	m_fg2->draw(screen, bitmap, cliprect, 0, 2);
+	m_bg[0]->draw(screen, bitmap, cliprect, 0, 1);
+	m_bg[1]->draw(screen, bitmap, cliprect, 0, (m_bg2_priority ? 2 : 1));
+	m_fg[0]->draw(screen, bitmap, cliprect, 0, 2);
+	m_fg[1]->draw(screen, bitmap, cliprect, 0, 2);
 
 	draw_sprites(screen, bitmap, cliprect);
 
@@ -761,23 +757,23 @@ uint32_t rshark_state::screen_update_rshark(screen_device &screen, bitmap_ind16 
 }
 
 
-uint32_t popbingo_state::screen_update_popbingo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 popbingo_state::screen_update_popbingo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	screen.priority().fill(0, cliprect);
 
-	m_bg_bitmap.fill(m_palette->black_pen(), cliprect);
-	m_bg->draw(screen, m_bg_bitmap, cliprect, 0, 1);
+	m_bg_bitmap[0].fill(m_palette->black_pen(), cliprect);
+	m_bg[0]->draw(screen, m_bg_bitmap[0], cliprect, 0, 1);
 
-	m_bg2_bitmap.fill(m_palette->black_pen(), cliprect);
-	m_bg2->draw(screen, m_bg2_bitmap, cliprect, 0, 1);
+	m_bg_bitmap[1].fill(m_palette->black_pen(), cliprect);
+	m_bg[1]->draw(screen, m_bg_bitmap[1], cliprect, 0, 1);
 
-	for (int y = cliprect.min_y; cliprect.max_y >= y; y++)
+	for (int y = cliprect.top(); cliprect.bottom() >= y; y++)
 	{
-		uint16_t const *const bg_src(&m_bg_bitmap.pix16(y, 0));
-		uint16_t const *const bg2_src(&m_bg2_bitmap.pix16(y, 0));
-		uint16_t *const dst(&bitmap.pix16(y, 0));
-		for (int x = cliprect.min_x; cliprect.max_x >= x; x++)
+		const u16 *const bg_src(&m_bg_bitmap[0].pix16(y, 0));
+		const u16 *const bg2_src(&m_bg_bitmap[1].pix16(y, 0));
+		u16 *const dst(&bitmap.pix16(y, 0));
+		for (int x = cliprect.left(); cliprect.right() >= x; x++)
 			dst[x] = 0x100U | (bg_src[x] << 4) | bg2_src[x];
 	}
 
@@ -785,7 +781,6 @@ uint32_t popbingo_state::screen_update_popbingo(screen_device &screen, bitmap_in
 
 	return 0;
 }
-
 
 
 /***************************************************************************
@@ -797,19 +792,19 @@ uint32_t popbingo_state::screen_update_popbingo(screen_device &screen, bitmap_in
 void dooyong_z80_ym2203_state::lastday_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("bank1");
-	map(0xc000, 0xc007).w(m_bg, FUNC(dooyong_rom_tilemap_device::ctrl_w));
-	map(0xc008, 0xc00f).w(m_fg, FUNC(dooyong_rom_tilemap_device::ctrl_w));
+	map(0x8000, 0xbfff).bankr(m_mainbank);
+	map(0xc000, 0xc007).w(m_bg[0], FUNC(dooyong_rom_tilemap_device::ctrl_w));
+	map(0xc008, 0xc00f).w(m_fg[0], FUNC(dooyong_rom_tilemap_device::ctrl_w));
 	map(0xc010, 0xc010).portr("SYSTEM");
-	map(0xc010, 0xc010).w(this, FUNC(dooyong_z80_ym2203_state::lastday_ctrl_w));   /* coin counter, flip screen */
+	map(0xc010, 0xc010).w(FUNC(dooyong_z80_ym2203_state::lastday_ctrl_w));   /* coin counter, flip screen */
 	map(0xc011, 0xc011).portr("P1");
-	map(0xc011, 0xc011).w(this, FUNC(dooyong_z80_ym2203_state::bankswitch_w));
+	map(0xc011, 0xc011).w(FUNC(dooyong_z80_ym2203_state::bankswitch_w));
 	map(0xc012, 0xc012).portr("P2");
 	map(0xc012, 0xc012).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0xc013, 0xc013).portr("DSWA");
 	map(0xc014, 0xc014).portr("DSWB");
 	map(0xc800, 0xcfff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0xd000, 0xdfff).rw(this, FUNC(dooyong_z80_ym2203_state::lastday_tx_r), FUNC(dooyong_z80_ym2203_state::lastday_tx_w));
+	map(0xd000, 0xdfff).rw(FUNC(dooyong_z80_ym2203_state::lastday_tx_r), FUNC(dooyong_z80_ym2203_state::lastday_tx_w));
 	map(0xe000, 0xefff).ram();
 	map(0xf000, 0xffff).ram().share("spriteram");
 }
@@ -817,59 +812,58 @@ void dooyong_z80_ym2203_state::lastday_map(address_map &map)
 void dooyong_z80_ym2203_state::pollux_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("bank1");
+	map(0x8000, 0xbfff).bankr(m_mainbank);
 	map(0xc000, 0xcfff).ram();
 	map(0xd000, 0xdfff).ram().share("spriteram");
-	map(0xe000, 0xefff).rw(this, FUNC(dooyong_z80_ym2203_state::lastday_tx_r), FUNC(dooyong_z80_ym2203_state::lastday_tx_w));
-	map(0xf000, 0xf000).portr("DSWA").w(this, FUNC(dooyong_z80_ym2203_state::bankswitch_w));
+	map(0xe000, 0xefff).rw(FUNC(dooyong_z80_ym2203_state::lastday_tx_r), FUNC(dooyong_z80_ym2203_state::lastday_tx_w));
+	map(0xf000, 0xf000).portr("DSWA").w(FUNC(dooyong_z80_ym2203_state::bankswitch_w));
 	map(0xf001, 0xf001).portr("DSWB");
 	map(0xf002, 0xf002).portr("P1");
 	map(0xf003, 0xf003).portr("P2");
 	map(0xf004, 0xf004).portr("SYSTEM");
-	map(0xf008, 0xf008).w(this, FUNC(dooyong_z80_ym2203_state::pollux_ctrl_w));    /* coin counter, flip screen */
+	map(0xf008, 0xf008).w(FUNC(dooyong_z80_ym2203_state::pollux_ctrl_w));    /* coin counter, flip screen */
 	map(0xf010, 0xf010).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0xf018, 0xf01f).w(m_bg, FUNC(dooyong_rom_tilemap_device::ctrl_w));
-	map(0xf020, 0xf027).w(m_fg, FUNC(dooyong_rom_tilemap_device::ctrl_w));
-	map(0xf800, 0xffff).rw(this, FUNC(dooyong_z80_ym2203_state::paletteram_flytiger_r), FUNC(dooyong_z80_ym2203_state::paletteram_flytiger_w));
+	map(0xf018, 0xf01f).w(m_bg[0], FUNC(dooyong_rom_tilemap_device::ctrl_w));
+	map(0xf020, 0xf027).w(m_fg[0], FUNC(dooyong_rom_tilemap_device::ctrl_w));
+	map(0xf800, 0xffff).rw(FUNC(dooyong_z80_ym2203_state::paletteram_flytiger_r), FUNC(dooyong_z80_ym2203_state::paletteram_flytiger_w));
 }
 
 void dooyong_z80_ym2203_state::gulfstrm_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("bank1");
+	map(0x8000, 0xbfff).bankr(m_mainbank);
 	map(0xc000, 0xcfff).ram();
 	map(0xd000, 0xdfff).ram().share("spriteram");
-	map(0xe000, 0xefff).rw(this, FUNC(dooyong_z80_ym2203_state::lastday_tx_r), FUNC(dooyong_z80_ym2203_state::lastday_tx_w));
-	map(0xf000, 0xf000).portr("DSWA");
-	map(0xf000, 0xf000).w(this, FUNC(dooyong_z80_ym2203_state::bankswitch_w));
+	map(0xe000, 0xefff).rw(FUNC(dooyong_z80_ym2203_state::lastday_tx_r), FUNC(dooyong_z80_ym2203_state::lastday_tx_w));
+	map(0xf000, 0xf000).portr("DSWA").w(FUNC(dooyong_z80_ym2203_state::bankswitch_w));
 	map(0xf001, 0xf001).portr("DSWB");
 	map(0xf002, 0xf002).portr("P2");
 	map(0xf003, 0xf003).portr("P1");
 	map(0xf004, 0xf004).portr("SYSTEM");
-	map(0xf008, 0xf008).w(this, FUNC(dooyong_z80_ym2203_state::pollux_ctrl_w));    /* coin counter, flip screen */
+	map(0xf008, 0xf008).w(FUNC(dooyong_z80_ym2203_state::pollux_ctrl_w));    /* coin counter, flip screen */
 	map(0xf010, 0xf010).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0xf018, 0xf01f).w(m_bg, FUNC(dooyong_rom_tilemap_device::ctrl_w));
-	map(0xf020, 0xf027).w(m_fg, FUNC(dooyong_rom_tilemap_device::ctrl_w));
+	map(0xf018, 0xf01f).w(m_bg[0], FUNC(dooyong_rom_tilemap_device::ctrl_w));
+	map(0xf020, 0xf027).w(m_fg[0], FUNC(dooyong_rom_tilemap_device::ctrl_w));
 	map(0xf800, 0xffff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 }
 
 void dooyong_z80_state::bluehawk_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("bank1");
+	map(0x8000, 0xbfff).bankr(m_mainbank);
 	map(0xc000, 0xc000).portr("DSWA");
-	map(0xc000, 0xc000).w(this, FUNC(dooyong_z80_state::flip_screen_w));
+	map(0xc000, 0xc000).w(FUNC(dooyong_z80_state::flip_screen_w));
 	map(0xc001, 0xc001).portr("DSWB");
 	map(0xc002, 0xc002).portr("P1");
 	map(0xc003, 0xc003).portr("P2");
 	map(0xc004, 0xc004).portr("SYSTEM");
-	map(0xc008, 0xc008).w(this, FUNC(dooyong_z80_state::bankswitch_w));
+	map(0xc008, 0xc008).w(FUNC(dooyong_z80_state::bankswitch_w));
 	map(0xc010, 0xc010).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0xc018, 0xc01f).w(m_fg2, FUNC(dooyong_rom_tilemap_device::ctrl_w));
-	map(0xc040, 0xc047).w(m_bg, FUNC(dooyong_rom_tilemap_device::ctrl_w));
-	map(0xc048, 0xc04f).w(m_fg, FUNC(dooyong_rom_tilemap_device::ctrl_w));
+	map(0xc018, 0xc01f).w(m_fg[1], FUNC(dooyong_rom_tilemap_device::ctrl_w));
+	map(0xc040, 0xc047).w(m_bg[0], FUNC(dooyong_rom_tilemap_device::ctrl_w));
+	map(0xc048, 0xc04f).w(m_fg[0], FUNC(dooyong_rom_tilemap_device::ctrl_w));
 	map(0xc800, 0xcfff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0xd000, 0xdfff).rw(this, FUNC(dooyong_z80_state::bluehawk_tx_r), FUNC(dooyong_z80_state::bluehawk_tx_w));
+	map(0xd000, 0xdfff).rw(FUNC(dooyong_z80_state::bluehawk_tx_r), FUNC(dooyong_z80_state::bluehawk_tx_w));
 	map(0xe000, 0xefff).ram().share("spriteram");
 	map(0xf000, 0xffff).ram();
 }
@@ -877,40 +871,40 @@ void dooyong_z80_state::bluehawk_map(address_map &map)
 void dooyong_z80_state::flytiger_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("bank1");
+	map(0x8000, 0xbfff).bankr(m_mainbank);
 	map(0xc000, 0xcfff).ram().share("spriteram");
 	map(0xd000, 0xdfff).ram();
 	map(0xe000, 0xe000).portr("P1");
-	map(0xe000, 0xe000).w(this, FUNC(dooyong_z80_state::bankswitch_w));
+	map(0xe000, 0xe000).w(FUNC(dooyong_z80_state::bankswitch_w));
 	map(0xe002, 0xe002).portr("P2");
 	map(0xe004, 0xe004).portr("SYSTEM");
 	map(0xe006, 0xe006).portr("DSWA");
 	map(0xe008, 0xe008).portr("DSWB");
-	map(0xe010, 0xe010).w(this, FUNC(dooyong_z80_state::flytiger_ctrl_w));  /* coin counter, flip screen */
+	map(0xe010, 0xe010).w(FUNC(dooyong_z80_state::flytiger_ctrl_w));  /* coin counter, flip screen */
 	map(0xe020, 0xe020).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0xe030, 0xe037).w(m_bg, FUNC(dooyong_rom_tilemap_device::ctrl_w));
-	map(0xe040, 0xe047).w(m_fg, FUNC(dooyong_rom_tilemap_device::ctrl_w));
-	map(0xe800, 0xefff).rw(this, FUNC(dooyong_z80_state::paletteram_flytiger_r), FUNC(dooyong_z80_state::paletteram_flytiger_w));
-	map(0xf000, 0xffff).rw(this, FUNC(dooyong_z80_state::lastday_tx_r), FUNC(dooyong_z80_state::lastday_tx_w));
+	map(0xe030, 0xe037).w(m_bg[0], FUNC(dooyong_rom_tilemap_device::ctrl_w));
+	map(0xe040, 0xe047).w(m_fg[0], FUNC(dooyong_rom_tilemap_device::ctrl_w));
+	map(0xe800, 0xefff).rw(FUNC(dooyong_z80_state::paletteram_flytiger_r), FUNC(dooyong_z80_state::paletteram_flytiger_w));
+	map(0xf000, 0xffff).rw(FUNC(dooyong_z80_state::lastday_tx_r), FUNC(dooyong_z80_state::lastday_tx_w));
 }
 
 void dooyong_z80_state::primella_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("bank1");
+	map(0x8000, 0xbfff).bankr(m_mainbank);
 	map(0xc000, 0xcfff).ram();
 	map(0xd000, 0xd3ff).ram(); /* what is this? looks like a palette? scratchpad RAM maybe? */
-	map(0xe000, 0xefff).rw(this, FUNC(dooyong_z80_state::bluehawk_tx_r), FUNC(dooyong_z80_state::bluehawk_tx_w));
+	map(0xe000, 0xefff).rw(FUNC(dooyong_z80_state::bluehawk_tx_r), FUNC(dooyong_z80_state::bluehawk_tx_w));
 	map(0xf000, 0xf7ff).w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0xf800, 0xf800).portr("DSWA");
-	map(0xf800, 0xf800).w(this, FUNC(dooyong_z80_state::primella_ctrl_w));  /* bank switch, flip screen etc */
+	map(0xf800, 0xf800).w(FUNC(dooyong_z80_state::primella_ctrl_w));  /* bank switch, flip screen etc */
 	map(0xf810, 0xf810).portr("DSWB");
 	map(0xf810, 0xf810).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0xf820, 0xf820).portr("P1");
 	map(0xf830, 0xf830).portr("P2");
 	map(0xf840, 0xf840).portr("SYSTEM");
-	map(0xfc00, 0xfc07).w(m_bg, FUNC(dooyong_rom_tilemap_device::ctrl_w));
-	map(0xfc08, 0xfc0f).w(m_fg, FUNC(dooyong_rom_tilemap_device::ctrl_w));
+	map(0xfc00, 0xfc07).w(m_bg[0], FUNC(dooyong_rom_tilemap_device::ctrl_w));
+	map(0xfc08, 0xfc0f).w(m_fg[0], FUNC(dooyong_rom_tilemap_device::ctrl_w));
 }
 
 void rshark_state::rshark_map(address_map &map)
@@ -923,13 +917,13 @@ void rshark_state::rshark_map(address_map &map)
 	map(0x0c0002, 0x0c0003).portr("DSW");
 	map(0x0c0004, 0x0c0005).portr("P1_P2");
 	map(0x0c0006, 0x0c0007).portr("SYSTEM");
-	map(0x0c4000, 0x0c400f).w(m_bg, FUNC(dooyong_rom_tilemap_device::ctrl_w)).umask16(0x00ff);
-	map(0x0c4010, 0x0c401f).w(m_bg2, FUNC(dooyong_rom_tilemap_device::ctrl_w)).umask16(0x00ff);
+	map(0x0c4000, 0x0c400f).w(m_bg[0], FUNC(dooyong_rom_tilemap_device::ctrl_w)).umask16(0x00ff);
+	map(0x0c4010, 0x0c401f).w(m_bg[1], FUNC(dooyong_rom_tilemap_device::ctrl_w)).umask16(0x00ff);
 	map(0x0c8000, 0x0c8fff).w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x0c0013, 0x0c0013).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x0c0014, 0x0c0015).w(this, FUNC(rshark_state::ctrl_w));    /* flip screen + unknown stuff */
-	map(0x0cc000, 0x0cc00f).w(m_fg, FUNC(dooyong_rom_tilemap_device::ctrl_w)).umask16(0x00ff);
-	map(0x0cc010, 0x0cc01f).w(m_fg2, FUNC(dooyong_rom_tilemap_device::ctrl_w)).umask16(0x00ff);
+	map(0x0c0015, 0x0c0015).w(FUNC(rshark_state::ctrl_w));    /* flip screen + unknown stuff */
+	map(0x0cc000, 0x0cc00f).w(m_fg[0], FUNC(dooyong_rom_tilemap_device::ctrl_w)).umask16(0x00ff);
+	map(0x0cc010, 0x0cc01f).w(m_fg[1], FUNC(dooyong_rom_tilemap_device::ctrl_w)).umask16(0x00ff);
 }
 
 void rshark_state::superx_map(address_map &map)
@@ -942,13 +936,13 @@ void rshark_state::superx_map(address_map &map)
 	map(0x080002, 0x080003).portr("DSW");
 	map(0x080004, 0x080005).portr("P1_P2");
 	map(0x080006, 0x080007).portr("SYSTEM");
-	map(0x084000, 0x08400f).w(m_bg, FUNC(dooyong_rom_tilemap_device::ctrl_w)).umask16(0x00ff);
-	map(0x084010, 0x08401f).w(m_bg2, FUNC(dooyong_rom_tilemap_device::ctrl_w)).umask16(0x00ff);
+	map(0x084000, 0x08400f).w(m_bg[0], FUNC(dooyong_rom_tilemap_device::ctrl_w)).umask16(0x00ff);
+	map(0x084010, 0x08401f).w(m_bg[1], FUNC(dooyong_rom_tilemap_device::ctrl_w)).umask16(0x00ff);
 	map(0x088000, 0x088fff).w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x080013, 0x080013).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x080014, 0x080015).w(this, FUNC(rshark_state::ctrl_w));    /* flip screen + unknown stuff */
-	map(0x08c000, 0x08c00f).w(m_fg, FUNC(dooyong_rom_tilemap_device::ctrl_w)).umask16(0x00ff);
-	map(0x08c010, 0x08c01f).w(m_fg2, FUNC(dooyong_rom_tilemap_device::ctrl_w)).umask16(0x00ff);
+	map(0x080015, 0x080015).w(FUNC(rshark_state::ctrl_w));    /* flip screen + unknown stuff */
+	map(0x08c000, 0x08c00f).w(m_fg[0], FUNC(dooyong_rom_tilemap_device::ctrl_w)).umask16(0x00ff);
+	map(0x08c010, 0x08c01f).w(m_fg[1], FUNC(dooyong_rom_tilemap_device::ctrl_w)).umask16(0x00ff);
 }
 
 void popbingo_state::popbingo_map(address_map &map)
@@ -962,13 +956,13 @@ void popbingo_state::popbingo_map(address_map &map)
 	map(0x0c0004, 0x0c0005).portr("P1_P2");
 	map(0x0c0006, 0x0c0007).portr("SYSTEM");
 	map(0x0c0013, 0x0c0013).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x0c0014, 0x0c0015).w(this, FUNC(popbingo_state::ctrl_w));
+	map(0x0c0015, 0x0c0015).w(FUNC(popbingo_state::ctrl_w));
 	map(0x0c0018, 0x0c001b).nopw(); // ?
-	map(0x0c4000, 0x0c400f).w(m_bg, FUNC(dooyong_rom_tilemap_device::ctrl_w)).umask16(0x00ff);
-	map(0x0c4010, 0x0c401f).w(m_bg2, FUNC(dooyong_rom_tilemap_device::ctrl_w)).umask16(0x00ff);
+	map(0x0c4000, 0x0c400f).w(m_bg[0], FUNC(dooyong_rom_tilemap_device::ctrl_w)).umask16(0x00ff);
+	map(0x0c4010, 0x0c401f).w(m_bg[1], FUNC(dooyong_rom_tilemap_device::ctrl_w)).umask16(0x00ff);
 	map(0x0c8000, 0x0c8fff).w(m_palette, FUNC(palette_device::write16)).share("palette");
-	//map(0x08c000, 0x08c00f) AM_DEVWRITE8("fg", dooyong_rom_tilemap_device, ctrl_w, 0x00ff) apparently not present
-	//map(0x08c010, 0x08c01f) AM_DEVWRITE8("fg2", dooyong_rom_tilemap_device, ctrl_w, 0x00ff) apparently not present
+	//map(0x08c000, 0x08c00f).w(m_fg[0], FUNC(dooyong_rom_tilemap_device::ctrl_w)).umask16(0x00ff); apparently not present
+	//map(0x08c010, 0x08c01f).w(m_fg[1], FUNC(dooyong_rom_tilemap_device::ctrl_w)).umask16(0x00ff); apparently not present
 	map(0x0dc000, 0x0dc01f).ram(); // registers of some kind?
 }
 
@@ -1334,10 +1328,10 @@ const gfx_layout lastday_charlayout =
 	8,8,
 	RGN_FRAC(1,2),
 	4,
-	{ 0, 4, RGN_FRAC(1,2)+0, RGN_FRAC(1,2)+4 },
-	{ 0, 1, 2, 3, 8+0, 8+1, 8+2, 8+3 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
-	16*8
+	{ STEP2(0,4), STEP2(RGN_FRAC(1,2), 4) },
+	{ STEP4(0,1), STEP4(8,1) },
+	{ STEP8(0,2*8) },
+	8*8*2
 };
 
 const gfx_layout bluehawk_charlayout =
@@ -1345,10 +1339,10 @@ const gfx_layout bluehawk_charlayout =
 	8,8,
 	RGN_FRAC(1,1),
 	4,
-	{ 0, 1, 2, 3 },
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8
+	{ STEP4(0,1) },
+	{ STEP8(0,4) },
+	{ STEP8(0,4*8) },
+	8*8*4
 };
 
 const gfx_layout tilelayout =
@@ -1356,16 +1350,15 @@ const gfx_layout tilelayout =
 	32,32,
 	RGN_FRAC(1,1),
 	4,
-	{ 0*4, 1*4, 2*4, 3*4 },
-	{ 0, 1, 2, 3, 16+0, 16+1, 16+2, 16+3,
-			32*32+0, 32*32+1, 32*32+2, 32*32+3, 32*32+16+0, 32*32+16+1, 32*32+16+2, 32*32+16+3,
-			2*32*32+0, 2*32*32+1, 2*32*32+2, 2*32*32+3, 2*32*32+16+0, 2*32*32+16+1, 2*32*32+16+2, 2*32*32+16+3,
-			3*32*32+0, 3*32*32+1, 3*32*32+2, 3*32*32+3, 3*32*32+16+0, 3*32*32+16+1, 3*32*32+16+2, 3*32*32+16+3 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-			8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32,
-			16*32, 17*32, 18*32, 19*32, 20*32, 21*32, 22*32, 23*32,
-			24*32, 25*32, 26*32, 27*32, 28*32, 29*32, 30*32, 31*32 },
-	512*8
+	{ STEP4(0,4) },
+	{
+		STEP4(0,1), STEP4(16,1),
+		STEP4(4*8*32,1), STEP4(4*8*32+16,1),
+		STEP4(2*4*8*32,1), STEP4(2*4*8*32+16,1),
+		STEP4(3*4*8*32,1), STEP4(3*4*8*32+16,1)
+	},
+	{ STEP32(0,4*8) },
+	32*32*4
 };
 
 const gfx_layout spritelayout =
@@ -1373,11 +1366,9 @@ const gfx_layout spritelayout =
 	16,16,
 	RGN_FRAC(1,1),
 	4,
-	{ 0*4, 1*4, 2*4, 3*4 },
-	{ 0, 1, 2, 3, 16+0, 16+1, 16+2, 16+3,
-			16*32+0, 16*32+1, 16*32+2, 16*32+3, 16*32+16+0, 16*32+16+1, 16*32+16+2, 16*32+16+3 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-			8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
+	{ STEP4(0,4) },
+	{ STEP4(0,1), STEP4(16,1), STEP4(4*8*16,1), STEP4(4*8*16+16,1) },
+	{ STEP16(0,4*8) },
 	128*8
 };
 
@@ -1386,75 +1377,61 @@ const gfx_layout rshark_spritelayout =
 	16,16,
 	RGN_FRAC(1,1),
 	4,
-	{ 0, 1, 2, 3 },
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4,
-			16*32+0*4, 16*32+1*4, 16*32+2*4, 16*32+3*4, 16*32+4*4, 16*32+5*4, 16*32+6*4, 16*32+7*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-			8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
+	{ STEP4(0,1) },
+	{ STEP8(0,4), STEP8(4*8*16,4) },
+	{ STEP16(0,4*8) },
 	128*8
 };
 
-GFXDECODE_START( lastday )
-	GFXDECODE_ENTRY( "gfx1", 0, lastday_charlayout,   0, 16+64 )
-	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,       256, 16+64 )
-	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,         768, 16+64 )
-	GFXDECODE_ENTRY( "gfx4", 0, tilelayout,         512, 16+64 )
+GFXDECODE_START( gfx_lastday )
+	GFXDECODE_ENTRY( "tx",     0, lastday_charlayout, 0, 16+64 )
+	GFXDECODE_ENTRY( "sprite", 0, spritelayout,     256, 16+64 )
+	GFXDECODE_ENTRY( "bg0",    0, tilelayout,       768, 16+64 )
+	GFXDECODE_ENTRY( "fg0",    0, tilelayout,       512, 16+64 )
 GFXDECODE_END
 
-GFXDECODE_START( flytiger )
-	GFXDECODE_ENTRY( "gfx1", 0, lastday_charlayout,   0, 16+64 )
-	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,       256, 16+64 )
-	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,         768, 16+64 )
-	GFXDECODE_ENTRY( "gfx4", 0, tilelayout,         512, 32+64 )
+GFXDECODE_START( gfx_flytiger )
+	GFXDECODE_ENTRY( "tx",     0, lastday_charlayout, 0, 16+64 )
+	GFXDECODE_ENTRY( "sprite", 0, spritelayout,     256, 16+64 )
+	GFXDECODE_ENTRY( "bg0",    0, tilelayout,       768, 16+64 )
+	GFXDECODE_ENTRY( "fg0",    0, tilelayout,       512, 32+64 )
 GFXDECODE_END
 
-GFXDECODE_START( bluehawk )
-	GFXDECODE_ENTRY( "gfx1", 0, bluehawk_charlayout,  0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,       256, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,         768, 16 )
-	GFXDECODE_ENTRY( "gfx4", 0, tilelayout,         512, 16 )
-	GFXDECODE_ENTRY( "gfx5", 0, tilelayout,           0, 16 )
+GFXDECODE_START( gfx_bluehawk )
+	GFXDECODE_ENTRY( "tx",     0, bluehawk_charlayout, 0, 16 )
+	GFXDECODE_ENTRY( "sprite", 0, spritelayout,      256, 16 )
+	GFXDECODE_ENTRY( "bg0",    0, tilelayout,        768, 16 )
+	GFXDECODE_ENTRY( "fg0",    0, tilelayout,        512, 16 )
+	GFXDECODE_ENTRY( "fg1",    0, tilelayout,          0, 16 )
 GFXDECODE_END
 
-GFXDECODE_START( primella )
-	GFXDECODE_ENTRY( "gfx1", 0, bluehawk_charlayout,  0, 16 )
+GFXDECODE_START( gfx_primella )
+	GFXDECODE_ENTRY( "tx",  0, bluehawk_charlayout, 0, 16 )
 	/* no sprites */
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,         768, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,         512, 16 )
+	GFXDECODE_ENTRY( "bg0", 0, tilelayout,        768, 16 )
+	GFXDECODE_ENTRY( "fg0", 0, tilelayout,        512, 16 )
 GFXDECODE_END
 
-GFXDECODE_START( rshark )
+GFXDECODE_START( gfx_rshark )
 	/* no chars */
-	GFXDECODE_ENTRY( "gfx1", 0, rshark_spritelayout,  0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,       256, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,       512, 16 )
-	GFXDECODE_ENTRY( "gfx4", 0, spritelayout,       768, 16 )
-	GFXDECODE_ENTRY( "gfx5", 0, spritelayout,      1024, 16 )
+	GFXDECODE_ENTRY( "sprite", 0, rshark_spritelayout,  0, 16 )
+	GFXDECODE_ENTRY( "fg1",    0, spritelayout,       256, 16 )
+	GFXDECODE_ENTRY( "fg0",    0, spritelayout,       512, 16 )
+	GFXDECODE_ENTRY( "bg1",    0, spritelayout,       768, 16 )
+	GFXDECODE_ENTRY( "bg0",    0, spritelayout,      1024, 16 )
 GFXDECODE_END
 
-GFXDECODE_START( popbingo )
+GFXDECODE_START( gfx_popbingo )
 	/* no chars */
-	GFXDECODE_ENTRY( "gfx1", 0, rshark_spritelayout,  0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,           0,  1 )
-	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,           0,  1 )
+	GFXDECODE_ENTRY( "sprite", 0, rshark_spritelayout,  0, 16 )
+	GFXDECODE_ENTRY( "bg0",    0, tilelayout,           0,  1 )
+	GFXDECODE_ENTRY( "bg1",    0, tilelayout,           0,  1 )
 
 GFXDECODE_END
 
-READ8_MEMBER(dooyong_z80_ym2203_state::unk_r)
+u8 dooyong_z80_ym2203_state::unk_r()
 {
 	return 0;
-}
-
-WRITE_LINE_MEMBER(dooyong_z80_ym2203_state::irqhandler_2203_1)
-{
-	m_interrupt_line_1=state;
-	m_audiocpu->set_input_line(0, (m_interrupt_line_1 | m_interrupt_line_2) ? ASSERT_LINE : CLEAR_LINE);
-}
-
-WRITE_LINE_MEMBER(dooyong_z80_ym2203_state::irqhandler_2203_2)
-{
-	m_interrupt_line_2=state;
-	m_audiocpu->set_input_line(0, (m_interrupt_line_1 | m_interrupt_line_2) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /***************************************************************************
@@ -1464,296 +1441,300 @@ WRITE_LINE_MEMBER(dooyong_z80_ym2203_state::irqhandler_2203_2)
 ***************************************************************************/
 
 
-MACHINE_CONFIG_START(dooyong_z80_ym2203_state::sound_2203)
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+void dooyong_z80_ym2203_state::sound_2203(machine_config &config)
+{
+	INPUT_MERGER_ANY_HIGH(config, "soundirq").output_handler().set_inputline(m_audiocpu, 0);
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ym1", YM2203, 1500000)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(dooyong_z80_ym2203_state, irqhandler_2203_1))
-	MCFG_AY8910_PORT_A_READ_CB(READ8(dooyong_z80_ym2203_state, unk_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_SOUND_ADD("ym2", YM2203, 1500000)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(dooyong_z80_ym2203_state, irqhandler_2203_2))
-	MCFG_AY8910_PORT_A_READ_CB(READ8(dooyong_z80_ym2203_state, unk_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-MACHINE_CONFIG_END
+	ym2203_device &ym1(YM2203(config, "ym1", 1500000));
+	ym1.irq_handler().set("soundirq", FUNC(input_merger_any_high_device::in_w<0>));
+	ym1.port_a_read_callback().set(FUNC(dooyong_z80_ym2203_state::unk_r));
+	ym1.add_route(ALL_OUTPUTS, "mono", 0.40);
 
-MACHINE_CONFIG_START(dooyong_z80_state::sound_2151)
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	ym2203_device &ym2(YM2203(config, "ym2", 1500000));
+	ym2.irq_handler().set("soundirq", FUNC(input_merger_any_high_device::in_w<1>));
+	ym2.port_a_read_callback().set(FUNC(dooyong_z80_ym2203_state::unk_r));
+	ym2.add_route(ALL_OUTPUTS, "mono", 0.40);
+}
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+void dooyong_z80_state::sound_2151(machine_config &config)
+{
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_YM2151_ADD("ymsnd", 3.579'545_MHz_XTAL)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.50)
-	MCFG_SOUND_ROUTE(1, "mono", 0.50)
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_OKIM6295_ADD("oki", 1_MHz_XTAL, PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
-MACHINE_CONFIG_END
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3.579'545_MHz_XTAL));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.add_route(0, "mono", 0.50);
+	ymsnd.add_route(1, "mono", 0.50);
 
-MACHINE_CONFIG_START(dooyong_state::sound_2151_4mhz)
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	OKIM6295(config, "oki", 1_MHz_XTAL, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.60);
+}
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+void dooyong_state::sound_2151_4mhz(machine_config &config)
+{
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_YM2151_ADD("ymsnd", 16_MHz_XTAL/4)  /* 4MHz (16MHz/4 for most, 8Mhz/2 for Super-X) */
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.50)
-	MCFG_SOUND_ROUTE(1, "mono", 0.50)
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_OKIM6295_ADD("oki", 16_MHz_XTAL/16, PIN7_HIGH)  /* 1MHz (16MHz/16 for most, 8Mhz/8 for Super-X) */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
-MACHINE_CONFIG_END
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 16_MHz_XTAL/4));  /* 4MHz (16MHz/4 for most, 8Mhz/2 for Super-X) */
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.add_route(0, "mono", 0.50);
+	ymsnd.add_route(1, "mono", 0.50);
 
-MACHINE_CONFIG_START(dooyong_z80_ym2203_state::lastday)
+	OKIM6295(config, "oki", 16_MHz_XTAL/16, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.60);  /* 1MHz (16MHz/16 for most, 8Mhz/8 for Super-X) */
+}
 
+void dooyong_z80_ym2203_state::lastday(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 16_MHz_XTAL/2)   /* 8MHz verified for Last Day / D-day */
-	MCFG_CPU_PROGRAM_MAP(lastday_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dooyong_state,  irq0_line_hold)
+	Z80(config, m_maincpu, 16_MHz_XTAL/2);   /* 8MHz verified for Last Day / D-day */
+	m_maincpu->set_addrmap(AS_PROGRAM, &dooyong_z80_ym2203_state::lastday_map);
+	m_maincpu->set_vblank_int("screen", FUNC(dooyong_state::irq0_line_hold));
 
-	MCFG_CPU_ADD("audiocpu", Z80, 16_MHz_XTAL/4)  /* 4MHz verified for Last Day / D-day */
-	MCFG_CPU_PROGRAM_MAP(lastday_sound_map)
+	Z80(config, m_audiocpu, 16_MHz_XTAL/4);  /* 4MHz verified for Last Day / D-day */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &dooyong_z80_ym2203_state::lastday_sound_map);
 
 	MCFG_MACHINE_START_OVERRIDE(dooyong_z80_ym2203_state, cpu_z80)
-	MCFG_MACHINE_RESET_OVERRIDE(dooyong_z80_ym2203_state, sound_ym2203)
-
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
+	BUFFERED_SPRITERAM8(config, m_spriteram);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(dooyong_z80_ym2203_state, screen_update_lastday)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(8*8, (64-8)*8-1, 1*8, 31*8-1 );
+	screen.set_screen_update(FUNC(dooyong_z80_ym2203_state::screen_update_lastday));
+	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
+	screen.set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lastday)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
-	MCFG_DOOYONG_ROM_TILEMAP_ADD("bg", "gfxdecode", 2, "gfx5", 0x00000)
-	MCFG_DOOYONG_ROM_TILEMAP_ADD("fg", "gfxdecode", 3, "gfx6", 0x00000)
-	MCFG_DOOYONG_ROM_TILEMAP_TRANSPARENT_PEN(15)
-	MCFG_DOOYONG_RAM_TILEMAP_ADD("tx", "gfxdecode", 0)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lastday);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 1024);
+	DOOYONG_ROM_TILEMAP(config, m_bg[0], m_gfxdecode, 2, "bg0_tmap", 0x00000, -1);
+	DOOYONG_ROM_TILEMAP(config, m_fg[0], m_gfxdecode, 3, "fg0_tmap", 0x00000, -1);
+	m_fg[0]->set_transparent_pen(15);
+	DOOYONG_RAM_TILEMAP(config, m_tx, m_gfxdecode, 0);
 
 	MCFG_VIDEO_START_OVERRIDE(dooyong_z80_ym2203_state, lastday)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	INPUT_MERGER_ANY_HIGH(config, "soundirq").output_handler().set_inputline(m_audiocpu, 0);
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ym1", YM2203, 16_MHz_XTAL/4)  /* 4MHz verified for Last Day / D-day */
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(dooyong_z80_ym2203_state, irqhandler_2203_1))
-	MCFG_AY8910_PORT_A_READ_CB(READ8(dooyong_z80_ym2203_state, unk_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_SOUND_ADD("ym2", YM2203, 16_MHz_XTAL/4)  /* 4MHz verified for Last Day / D-day */
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(dooyong_z80_ym2203_state, irqhandler_2203_2))
-	MCFG_AY8910_PORT_A_READ_CB(READ8(dooyong_z80_ym2203_state, unk_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	ym2203_device &ym1(YM2203(config, "ym1", 16_MHz_XTAL/4));  /* 4MHz verified for Last Day / D-day */
+	ym1.irq_handler().set("soundirq", FUNC(input_merger_any_high_device::in_w<0>));
+	ym1.port_a_read_callback().set(FUNC(dooyong_z80_ym2203_state::unk_r));
+	ym1.add_route(ALL_OUTPUTS, "mono", 0.40);
 
-MACHINE_CONFIG_END
+	ym2203_device &ym2(YM2203(config, "ym2", 16_MHz_XTAL/4));  /* 4MHz verified for Last Day / D-day */
+	ym2.irq_handler().set("soundirq", FUNC(input_merger_any_high_device::in_w<1>));
+	ym2.port_a_read_callback().set(FUNC(dooyong_z80_ym2203_state::unk_r));
+	ym2.add_route(ALL_OUTPUTS, "mono", 0.40);
+}
 
-MACHINE_CONFIG_START(dooyong_z80_ym2203_state::gulfstrm)
-
+void dooyong_z80_ym2203_state::gulfstrm(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 8000000)   /* ??? */
-	MCFG_CPU_PROGRAM_MAP(gulfstrm_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dooyong_state,  irq0_line_hold)
+	Z80(config, m_maincpu, 8000000);   /* ??? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &dooyong_z80_ym2203_state::gulfstrm_map);
+	m_maincpu->set_vblank_int("screen", FUNC(dooyong_state::irq0_line_hold));
 
-	MCFG_CPU_ADD("audiocpu", Z80, 8000000)  /* ??? */
-	MCFG_CPU_PROGRAM_MAP(lastday_sound_map)
+	Z80(config, m_audiocpu, 8000000);  /* ??? */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &dooyong_z80_ym2203_state::lastday_sound_map);
 
 	MCFG_MACHINE_START_OVERRIDE(dooyong_z80_ym2203_state, cpu_z80)
-	MCFG_MACHINE_RESET_OVERRIDE(dooyong_z80_ym2203_state, sound_ym2203)
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
+	BUFFERED_SPRITERAM8(config, m_spriteram);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(dooyong_z80_ym2203_state, screen_update_gulfstrm)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(8*8, (64-8)*8-1, 1*8, 31*8-1 );
+	screen.set_screen_update(FUNC(dooyong_z80_ym2203_state::screen_update_gulfstrm));
+	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
+	screen.set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lastday)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_DOOYONG_ROM_TILEMAP_ADD("bg", "gfxdecode", 2, "gfx5", 0x00000)
-	MCFG_DOOYONG_ROM_TILEMAP_ADD("fg", "gfxdecode", 3, "gfx6", 0x00000)
-	MCFG_DOOYONG_ROM_TILEMAP_TRANSPARENT_PEN(15)
-	MCFG_DOOYONG_RAM_TILEMAP_ADD("tx", "gfxdecode", 0)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lastday);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024);
+	DOOYONG_ROM_TILEMAP(config, m_bg[0], m_gfxdecode, 2, "bg0_tmap", 0x00000, -1);
+	DOOYONG_ROM_TILEMAP(config, m_fg[0], m_gfxdecode, 3, "fg0_tmap", 0x00000, -1);
+	m_fg[0]->set_transparent_pen(15);
+	DOOYONG_RAM_TILEMAP(config, m_tx, m_gfxdecode, 0);
 
 	MCFG_VIDEO_START_OVERRIDE(dooyong_z80_ym2203_state, gulfstrm)
 
 	/* sound hardware */
 	sound_2203(config); /* 3.579545MHz */
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(dooyong_z80_ym2203_state::pollux)
-
+void dooyong_z80_ym2203_state::pollux(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 16_MHz_XTAL/2)   /* 8Mhz */
-	MCFG_CPU_PROGRAM_MAP(pollux_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dooyong_state,  irq0_line_hold)
+	Z80(config, m_maincpu, 16_MHz_XTAL/2);   /* 8Mhz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &dooyong_z80_ym2203_state::pollux_map);
+	m_maincpu->set_vblank_int("screen", FUNC(dooyong_state::irq0_line_hold));
 
-	MCFG_CPU_ADD("audiocpu", Z80, 16_MHz_XTAL/4)  /* 4Mhz */
-	MCFG_CPU_PROGRAM_MAP(pollux_sound_map)
+	Z80(config, m_audiocpu, 16_MHz_XTAL/4);  /* 4Mhz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &dooyong_z80_ym2203_state::pollux_sound_map);
 
 	MCFG_MACHINE_START_OVERRIDE(dooyong_z80_ym2203_state, cpu_z80)
-	MCFG_MACHINE_RESET_OVERRIDE(dooyong_z80_ym2203_state, sound_ym2203)
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
+	BUFFERED_SPRITERAM8(config, m_spriteram);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(dooyong_z80_ym2203_state, screen_update_pollux)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(8*8, (64-8)*8-1, 1*8, 31*8-1 );
+	screen.set_screen_update(FUNC(dooyong_z80_ym2203_state::screen_update_pollux));
+	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
+	screen.set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lastday)
-	MCFG_PALETTE_ADD("palette", 1024*2)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_DOOYONG_ROM_TILEMAP_ADD("bg", "gfxdecode", 2, "gfx5", 0x00000)
-	MCFG_DOOYONG_ROM_TILEMAP_ADD("fg", "gfxdecode", 3, "gfx6", 0x00000)
-	MCFG_DOOYONG_ROM_TILEMAP_TRANSPARENT_PEN(15)
-	MCFG_DOOYONG_RAM_TILEMAP_ADD("tx", "gfxdecode", 0)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lastday);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024*2);
+	DOOYONG_ROM_TILEMAP(config, m_bg[0], m_gfxdecode, 2, "bg0_tmap", 0x00000, -1);
+	DOOYONG_ROM_TILEMAP(config, m_fg[0], m_gfxdecode, 3, "fg0_tmap", 0x00000, -1);
+	m_fg[0]->set_transparent_pen(15);
+	DOOYONG_RAM_TILEMAP(config, m_tx, m_gfxdecode, 0);
 
 	MCFG_VIDEO_START_OVERRIDE(dooyong_z80_ym2203_state, pollux)
 
 	/* sound hardware */
-	sound_2203(config); /* 3.579545MHz or 4Mhz ??? */
-MACHINE_CONFIG_END
+	sound_2203(config); /* 1.5MHz verified */
+}
 
-MACHINE_CONFIG_START(dooyong_z80_state::bluehawk)
-
+void dooyong_z80_state::bluehawk(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 8000000)   /* ??? */
-	MCFG_CPU_PROGRAM_MAP(bluehawk_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dooyong_state,  irq0_line_hold)
+	Z80(config, m_maincpu, 8000000);   /* ??? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &dooyong_z80_state::bluehawk_map);
+	m_maincpu->set_vblank_int("screen", FUNC(dooyong_state::irq0_line_hold));
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000)  /* ??? */
-	MCFG_CPU_PROGRAM_MAP(bluehawk_sound_map)
+	Z80(config, m_audiocpu, 4000000);  /* ??? */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &dooyong_z80_state::bluehawk_sound_map);
 
 	MCFG_MACHINE_START_OVERRIDE(dooyong_z80_state, cpu_z80)
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
+	BUFFERED_SPRITERAM8(config, m_spriteram);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(dooyong_z80_state, screen_update_bluehawk)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(8*8, (64-8)*8-1, 1*8, 31*8-1 );
+	screen.set_screen_update(FUNC(dooyong_z80_state::screen_update_bluehawk));
+	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
+	screen.set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bluehawk)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_DOOYONG_ROM_TILEMAP_ADD("bg", "gfxdecode", 2, "gfx3", 0x3c000)
-	MCFG_DOOYONG_ROM_TILEMAP_ADD("fg", "gfxdecode", 3, "gfx4", 0x3c000)
-	MCFG_DOOYONG_ROM_TILEMAP_TRANSPARENT_PEN(15)
-	MCFG_DOOYONG_ROM_TILEMAP_ADD("fg2", "gfxdecode", 4, "gfx5", 0x1c000)
-	MCFG_DOOYONG_ROM_TILEMAP_TRANSPARENT_PEN(15)
-	MCFG_DOOYONG_RAM_TILEMAP_ADD("tx", "gfxdecode", 0)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bluehawk);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024);
+
+	DOOYONG_ROM_TILEMAP(config, m_bg[0], m_gfxdecode, 2, "bg0", 0x3c000, 0x4000);
+	m_bg[0]->set_tile_callback(FUNC(dooyong_z80_state::bluehawk_tile_callback));
+
+	DOOYONG_ROM_TILEMAP(config, m_fg[0], m_gfxdecode, 3, "fg0", 0x3c000, 0x4000);
+	m_fg[0]->set_transparent_pen(15);
+	m_fg[0]->set_tile_callback(FUNC(dooyong_z80_state::bluehawk_tile_callback));
+
+	DOOYONG_ROM_TILEMAP(config, m_fg[1], m_gfxdecode, 4, "fg1", 0x1c000, 0x4000);
+	m_fg[1]->set_transparent_pen(15);
+	m_fg[1]->set_tile_callback(FUNC(dooyong_z80_state::bluehawk_tile_callback));
+
+	DOOYONG_RAM_TILEMAP(config, m_tx, m_gfxdecode, 0);
 
 	MCFG_VIDEO_START_OVERRIDE(dooyong_z80_state, bluehawk)
 
 	/* sound hardware */
 	sound_2151(config); /* 3.579545MHz or 4Mhz ??? */
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(dooyong_z80_state::flytiger)
-
+void dooyong_z80_state::flytiger(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 16_MHz_XTAL/2)   /* 8MHz */
-	MCFG_CPU_PROGRAM_MAP(flytiger_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dooyong_state,  irq0_line_hold)
+	Z80(config, m_maincpu, 16_MHz_XTAL/2);   /* 8MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &dooyong_z80_state::flytiger_map);
+	m_maincpu->set_vblank_int("screen", FUNC(dooyong_state::irq0_line_hold));
 
-	MCFG_CPU_ADD("audiocpu", Z80, 16_MHz_XTAL/4)  /* 4Mhz */
-	MCFG_CPU_PROGRAM_MAP(bluehawk_sound_map)
+	Z80(config, m_audiocpu, 16_MHz_XTAL/4);  /* 4Mhz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &dooyong_z80_state::bluehawk_sound_map);
 
 	MCFG_MACHINE_START_OVERRIDE(dooyong_z80_state, cpu_z80)
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
+	BUFFERED_SPRITERAM8(config, m_spriteram);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(dooyong_z80_state, screen_update_flytiger)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(8*8, (64-8)*8-1, 1*8, 31*8-1 );
+	screen.set_screen_update(FUNC(dooyong_z80_state::screen_update_flytiger));
+	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
+	screen.set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", flytiger)
-	MCFG_PALETTE_ADD("palette", 1024*2)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_DOOYONG_ROM_TILEMAP_ADD("bg", "gfxdecode", 2, "gfx3", 0x3c000)
-	MCFG_DOOYONG_ROM_TILEMAP_TRANSPARENT_PEN(15)
-	MCFG_DOOYONG_ROM_TILEMAP_ADD("fg", "gfxdecode", 3, "gfx4", 0x3c000)
-	MCFG_DOOYONG_ROM_TILEMAP_TRANSPARENT_PEN(15)
-	MCFG_DOOYONG_RAM_TILEMAP_ADD("tx", "gfxdecode", 0)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_flytiger);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024*2);
+	DOOYONG_ROM_TILEMAP(config, m_bg[0], m_gfxdecode, 2, "bg0", 0x3c000, 0x4000);
+	m_bg[0]->set_transparent_pen(15);
+	DOOYONG_ROM_TILEMAP(config, m_fg[0], m_gfxdecode, 3, "fg0", 0x3c000, 0x4000);
+	m_fg[0]->set_transparent_pen(15);
+	DOOYONG_RAM_TILEMAP(config, m_tx, m_gfxdecode, 0);
 
 	MCFG_VIDEO_START_OVERRIDE(dooyong_z80_state, flytiger)
 
 	/* sound hardware */
 	sound_2151(config);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(dooyong_z80_state::primella)
-
+void dooyong_z80_state::primella(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 16_MHz_XTAL/2)   /* 8MHz */
-	MCFG_CPU_PROGRAM_MAP(primella_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dooyong_state,  irq0_line_hold)
+	Z80(config, m_maincpu, 16_MHz_XTAL/2);   /* 8MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &dooyong_z80_state::primella_map);
+	m_maincpu->set_vblank_int("screen", FUNC(dooyong_state::irq0_line_hold));
 
-	MCFG_CPU_ADD("audiocpu", Z80, 16_MHz_XTAL/4)   /* 4MHz */
-	MCFG_CPU_PROGRAM_MAP(bluehawk_sound_map)
+	Z80(config, m_audiocpu, 16_MHz_XTAL/4);   /* 4MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &dooyong_z80_state::bluehawk_sound_map);
 
 	MCFG_MACHINE_START_OVERRIDE(dooyong_z80_state, cpu_z80)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 0*8, 32*8-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(dooyong_z80_state, screen_update_primella)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(8*8, (64-8)*8-1, 0*8, 32*8-1 );
+	screen.set_screen_update(FUNC(dooyong_z80_state::screen_update_primella));
+	screen.set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", primella)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_DOOYONG_ROM_TILEMAP_ADD("bg", "gfxdecode", 1, "gfx2", -0x4000)
-	MCFG_DOOYONG_ROM_TILEMAP_PRIMELLA_CODE_BITS(10)
-	MCFG_DOOYONG_ROM_TILEMAP_ADD("fg", "gfxdecode", 2, "gfx3", -0x4000)
-	MCFG_DOOYONG_ROM_TILEMAP_TRANSPARENT_PEN(15)
-	MCFG_DOOYONG_ROM_TILEMAP_PRIMELLA_CODE_BITS(10)
-	MCFG_DOOYONG_RAM_TILEMAP_ADD("tx", "gfxdecode", 0)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_primella);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024);
+
+	DOOYONG_ROM_TILEMAP(config, m_bg[0], m_gfxdecode, 1, "bg0", -0x4000, 0x4000);
+	m_bg[0]->set_tile_callback(FUNC(dooyong_z80_state::bluehawk_tile_callback));
+
+	DOOYONG_ROM_TILEMAP(config, m_fg[0], m_gfxdecode, 2, "fg0", -0x4000, 0x4000);
+	m_fg[0]->set_transparent_pen(15);
+	m_fg[0]->set_tile_callback(FUNC(dooyong_z80_state::bluehawk_tile_callback));
+
+	DOOYONG_RAM_TILEMAP(config, m_tx, m_gfxdecode, 0);
 
 	MCFG_VIDEO_START_OVERRIDE(dooyong_z80_state, primella)
 
 	/* sound hardware */
 	sound_2151_4mhz(config); /* PCB has only 1 OSC at 16Mhz */
-MACHINE_CONFIG_END
+}
 
 
 TIMER_DEVICE_CALLBACK_MEMBER(dooyong_68k_state::scanline)
@@ -1768,91 +1749,97 @@ TIMER_DEVICE_CALLBACK_MEMBER(dooyong_68k_state::scanline)
 }
 
 
-MACHINE_CONFIG_START(rshark_state::dooyong_68k)
-
+void rshark_state::dooyong_68k(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M68000, 8_MHz_XTAL)  // 8MHz measured on Super-X
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", rshark_state, scanline, "screen", 0, 1)
+	M68000(config, m_maincpu, 8_MHz_XTAL);  // 8MHz measured on Super-X
+	TIMER(config, "scantimer").configure_scanline(FUNC(rshark_state::scanline), "screen", 0, 1);
 
-	MCFG_CPU_ADD("audiocpu", Z80, 8_MHz_XTAL/2)  // 4MHz measured on Super-X
-	MCFG_CPU_PROGRAM_MAP(bluehawk_sound_map)
+	Z80(config, m_audiocpu, 8_MHz_XTAL/2);  // 4MHz measured on Super-X
+	m_audiocpu->set_addrmap(AS_PROGRAM, &rshark_state::bluehawk_sound_map);
 
 	// video hardware
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))  // not accurate
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(rshark_state, screen_update_rshark)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));  // not accurate
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(8*8, (64-8)*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(rshark_state::screen_update_rshark));
+	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram16_device::vblank_copy_rising));
+	screen.set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rshark)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rshark);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
-	MCFG_RSHARK_ROM_TILEMAP_ADD("bg", "gfxdecode", 4, "gfx5", 0x00000, "gfx6", 0x60000)
-	MCFG_RSHARK_ROM_TILEMAP_ADD("bg2", "gfxdecode", 3, "gfx4", 0x00000, "gfx6", 0x40000)
-	MCFG_DOOYONG_ROM_TILEMAP_TRANSPARENT_PEN(15);
-	MCFG_RSHARK_ROM_TILEMAP_ADD("fg", "gfxdecode", 2, "gfx3", 0x00000, "gfx6", 0x20000)
-	MCFG_DOOYONG_ROM_TILEMAP_TRANSPARENT_PEN(15);
-	MCFG_RSHARK_ROM_TILEMAP_ADD("fg2", "gfxdecode", 1, "gfx2", 0x00000, "gfx6", 0x00000)
-	MCFG_DOOYONG_ROM_TILEMAP_TRANSPARENT_PEN(15);
+	RSHARK_ROM_TILEMAP(config, m_bg[0], m_gfxdecode, 4, "bg0", 0x00000, 0x20000, "tmap_hi", 0x60000, 0x20000);
+	m_bg[0]->set_tile_callback(FUNC(rshark_state::rshark_tile_callback));
+
+	RSHARK_ROM_TILEMAP(config, m_bg[1], m_gfxdecode, 3, "bg1", 0x00000, 0x20000, "tmap_hi", 0x40000, 0x20000);
+	m_bg[1]->set_transparent_pen(15);
+	m_bg[1]->set_tile_callback(FUNC(rshark_state::rshark_tile_callback));
+
+	RSHARK_ROM_TILEMAP(config, m_fg[0], m_gfxdecode, 2, "fg0", 0x00000, 0x20000, "tmap_hi", 0x20000, 0x20000);
+	m_fg[0]->set_transparent_pen(15);
+	m_fg[0]->set_tile_callback(FUNC(rshark_state::rshark_tile_callback));
+
+	RSHARK_ROM_TILEMAP(config, m_fg[1], m_gfxdecode, 1, "fg1", 0x00000, 0x20000, "tmap_hi", 0x00000, 0x20000);
+	m_fg[1]->set_transparent_pen(15);
+	m_fg[1]->set_tile_callback(FUNC(rshark_state::rshark_tile_callback));
 
 	// sound hardware
 	sound_2151_4mhz(config);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(rshark_state::rshark)
+void rshark_state::rshark(machine_config &config)
+{
 	dooyong_68k(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(rshark_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &rshark_state::rshark_map);
+}
 
-MACHINE_CONFIG_START(rshark_state::superx)
+void rshark_state::superx(machine_config &config)
+{
 	dooyong_68k(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(superx_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &rshark_state::superx_map);
+}
 
-MACHINE_CONFIG_START(popbingo_state::popbingo)
-
+void popbingo_state::popbingo(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M68000, 20_MHz_XTAL/2)   // 10MHz measured
-	MCFG_CPU_PROGRAM_MAP(popbingo_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", popbingo_state, scanline, "screen", 0, 1)
+	M68000(config, m_maincpu, 20_MHz_XTAL/2);   // 10MHz measured
+	m_maincpu->set_addrmap(AS_PROGRAM, &popbingo_state::popbingo_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(popbingo_state::scanline), "screen", 0, 1);
 
-	MCFG_CPU_ADD("audiocpu", Z80, 16_MHz_XTAL/4)     // 4MHz measured
-	MCFG_CPU_PROGRAM_MAP(bluehawk_sound_map)
+	Z80(config, m_audiocpu, 16_MHz_XTAL/4);     // 4MHz measured
+	m_audiocpu->set_addrmap(AS_PROGRAM, &popbingo_state::bluehawk_sound_map);
 
 	// video hardware
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))  // not accurate
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(popbingo_state, screen_update_popbingo)
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));  // not accurate
+	m_screen->set_size(64*8, 32*8);
+	m_screen->set_visarea(8*8, (64-8)*8-1, 1*8, 31*8-1);
+	m_screen->set_screen_update(FUNC(popbingo_state::screen_update_popbingo));
+	m_screen->screen_vblank().set(m_spriteram, FUNC(buffered_spriteram16_device::vblank_copy_rising));
+	m_screen->set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", popbingo)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_popbingo);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
-	MCFG_DOOYONG_ROM_TILEMAP_ADD("bg", "gfxdecode", 1, "gfx2", 0x00000)
-	MCFG_DOOYONG_ROM_TILEMAP_PRIMELLA_CODE_BITS(11)
-	MCFG_DOOYONG_ROM_TILEMAP_ADD("bg2", "gfxdecode", 2, "gfx3", 0x00000)
-	MCFG_DOOYONG_ROM_TILEMAP_PRIMELLA_CODE_BITS(11)
+	DOOYONG_ROM_TILEMAP(config, m_bg[0], m_gfxdecode, 1, "bg0", 0x00000, 0x4000);
+	m_bg[0]->set_tile_callback(FUNC(popbingo_state::popbingo_tile_callback));
+
+	DOOYONG_ROM_TILEMAP(config, m_bg[1], m_gfxdecode, 2, "bg1", 0x00000, 0x4000);
+	m_bg[1]->set_tile_callback(FUNC(popbingo_state::popbingo_tile_callback));
 
 	// sound hardware
 	sound_2151_4mhz(config);
-MACHINE_CONFIG_END
+}
 
 } // anonymous namespace
 
@@ -1869,32 +1856,32 @@ ROM_START( lastday ) /* 90030003 PCB */
 	ROM_LOAD( "4.u5",         0x10000, 0x10000, CRC(70961ea6) SHA1(245d3da67abb4a511a024f030de461b9a2b4804e) )  /* banked at 0x8000-0xbfff */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound */
-	ROM_LOAD( "1.d3",    0x0000, 0x8000, CRC(dd4316fd) SHA1(496e6657bb76d91f488a2464d1af1be095ab9105) )    /* empty */
-	ROM_CONTINUE(        0x0000, 0x8000 )
+	ROM_LOAD( "1.d3",         0x00000, 0x08000, CRC(dd4316fd) SHA1(496e6657bb76d91f488a2464d1af1be095ab9105) )    /* empty */
+	ROM_CONTINUE(             0x00000, 0x08000 )
 
-	ROM_REGION( 0x8000, "gfx1", 0 ) /* chars */
-	ROM_LOAD( "2.j4",    0x0000, 0x8000, CRC(83eb572c) SHA1(e915afd55d505bce202206c9ecfa89bad561ef6c) )    /* empty */
-	ROM_CONTINUE(        0x0000, 0x8000 )
+	ROM_REGION( 0x8000, "tx", 0 ) /* chars */
+	ROM_LOAD( "2.j4",         0x00000, 0x08000, CRC(83eb572c) SHA1(e915afd55d505bce202206c9ecfa89bad561ef6c) )    /* empty */
+	ROM_CONTINUE(             0x00000, 0x08000 )
 
-	ROM_REGION16_BE( 0x40000, "gfx2", 0 )    /* sprites */
+	ROM_REGION16_BE( 0x40000, "sprite", 0 )    /* sprites */
 	ROM_LOAD16_BYTE( "16.d14",   0x00000, 0x20000, CRC(df503504) SHA1(daa58a7bc24415b5f59b7c7cc918bc85de9702a3) )
 	ROM_LOAD16_BYTE( "15.a14",   0x00001, 0x20000, CRC(cd990442) SHA1(891b2163db23ab0bb40cbadce6e06fc067d0532f) )
 
-	ROM_REGION16_BE( 0x80000, "gfx3", 0 )    /* tiles */
+	ROM_REGION16_BE( 0x80000, "bg0", 0 )    /* tiles */
 	ROM_LOAD16_BYTE( "6.s9",     0x00000, 0x20000, CRC(1054361d) SHA1(52566786ca8177404be8b66fd7de94ac25fc49ea) )
 	ROM_LOAD16_BYTE( "9.s11",    0x00001, 0x20000, CRC(6952ef4d) SHA1(b4e5ec02e97df213fe0bd4cd8a2ca77d7ecf8ad5) )
 	ROM_LOAD16_BYTE( "7.u9",     0x40000, 0x20000, CRC(6e57a888) SHA1(8efe876ea3c788b83e8291f7fc6f55b90de158c8) )
 	ROM_LOAD16_BYTE( "10.u11",   0x40001, 0x20000, CRC(a5548dca) SHA1(9914e01c1739c3bfd868a01e53c9030726ced4ea) )
 
-	ROM_REGION16_BE( 0x40000, "gfx4", 0 )    /* tiles */
+	ROM_REGION16_BE( 0x40000, "fg0", 0 )    /* tiles */
 	ROM_LOAD16_BYTE( "12.s13",   0x00000, 0x20000, CRC(992bc4af) SHA1(94570ebd1ee6acf1871cf914907acd12dca4026e) )
 	ROM_LOAD16_BYTE( "14.s14",   0x00001, 0x20000, CRC(a79abc85) SHA1(3e63dad11db9b7420331403a1d551d8c041c4cc2) )
 
-	ROM_REGION16_BE( 0x20000, "gfx5", 0 )    /* background tilemaps */
+	ROM_REGION16_BE( 0x20000, "bg0_tmap", 0 )    /* background tilemaps */
 	ROM_LOAD16_BYTE( "5.r9",     0x00000, 0x10000, CRC(4789bae8) SHA1(6ffecc16eb8c9c783b02c4ef68cb5098b01fafef) )
 	ROM_LOAD16_BYTE( "8.r11",    0x00001, 0x10000, CRC(92402b9a) SHA1(2ca8078d2687afbe7b6fc5412de16c6fbc11a650) )
 
-	ROM_REGION16_BE( 0x20000, "gfx6", 0 )    /* fg tilemaps */
+	ROM_REGION16_BE( 0x20000, "fg0_tmap", 0 )    /* fg tilemaps */
 	ROM_LOAD16_BYTE( "11.r13",   0x00000, 0x10000, CRC(04b961de) SHA1(7a94c9d0800d79048660cf3758708a346ead33f9) )
 	ROM_LOAD16_BYTE( "13.r14",   0x00001, 0x10000, CRC(6bdbd887) SHA1(a54f26f9ddd72b8b8f7a030610c1c4a5f94a3358) )
 ROM_END
@@ -1905,32 +1892,32 @@ ROM_START( lastdaya ) /* 90030003 PCB */
 	ROM_LOAD( "4.u5",         0x10000, 0x10000, CRC(70961ea6) SHA1(245d3da67abb4a511a024f030de461b9a2b4804e) )  /* banked at 0x8000-0xbfff */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound */
-	ROM_LOAD( "e1.d3",        0x0000, 0x8000, CRC(ce96e106) SHA1(5ef1f221618abd757e02db79c3d7016100f30c07) )    /* empty */
-	ROM_CONTINUE(             0x0000, 0x8000 )
+	ROM_LOAD( "e1.d3",        0x00000, 0x08000, CRC(ce96e106) SHA1(5ef1f221618abd757e02db79c3d7016100f30c07) )    /* empty */
+	ROM_CONTINUE(             0x00000, 0x08000 )
 
-	ROM_REGION( 0x8000, "gfx1", 0 ) /* chars */
-	ROM_LOAD( "2.j4",    0x0000, 0x8000, CRC(83eb572c) SHA1(e915afd55d505bce202206c9ecfa89bad561ef6c) )    /* empty */
-	ROM_CONTINUE(        0x0000, 0x8000 )
+	ROM_REGION( 0x08000, "tx", 0 ) /* chars */
+	ROM_LOAD( "2.j4",         0x00000, 0x08000, CRC(83eb572c) SHA1(e915afd55d505bce202206c9ecfa89bad561ef6c) )    /* empty */
+	ROM_CONTINUE(             0x00000, 0x08000 )
 
-	ROM_REGION16_BE( 0x40000, "gfx2", 0 )    /* sprites */
+	ROM_REGION16_BE( 0x40000, "sprite", 0 )    /* sprites */
 	ROM_LOAD16_BYTE( "16.d14",   0x00000, 0x20000, CRC(df503504) SHA1(daa58a7bc24415b5f59b7c7cc918bc85de9702a3) )
 	ROM_LOAD16_BYTE( "15.a14",   0x00001, 0x20000, CRC(cd990442) SHA1(891b2163db23ab0bb40cbadce6e06fc067d0532f) )
 
-	ROM_REGION16_BE( 0x80000, "gfx3", 0 )    /* tiles */
+	ROM_REGION16_BE( 0x80000, "bg0", 0 )    /* tiles */
 	ROM_LOAD16_BYTE( "e6.s9",    0x00000, 0x20000, CRC(7623c443) SHA1(abfed648a8cc438dbb7de9c23a663082667ca366) )
 	ROM_LOAD16_BYTE( "e9.s11",   0x00001, 0x20000, CRC(717f6a0e) SHA1(0b2d98fa5b8734210df18bce7725972fd42a6e4a) )
 	ROM_LOAD16_BYTE( "7.u9",     0x40000, 0x20000, CRC(6e57a888) SHA1(8efe876ea3c788b83e8291f7fc6f55b90de158c8) )
 	ROM_LOAD16_BYTE( "10.u11",   0x40001, 0x20000, CRC(a5548dca) SHA1(9914e01c1739c3bfd868a01e53c9030726ced4ea) )
 
-	ROM_REGION16_BE( 0x40000, "gfx4", 0 )    /* tiles */
+	ROM_REGION16_BE( 0x40000, "fg0", 0 )    /* tiles */
 	ROM_LOAD16_BYTE( "12.s13",   0x00000, 0x20000, CRC(992bc4af) SHA1(94570ebd1ee6acf1871cf914907acd12dca4026e) )
 	ROM_LOAD16_BYTE( "14.s14",   0x00001, 0x20000, CRC(a79abc85) SHA1(3e63dad11db9b7420331403a1d551d8c041c4cc2) )
 
-	ROM_REGION16_BE( 0x20000, "gfx5", 0 )    /* bg tilemaps */
-	ROM_LOAD16_BYTE( "e5.r9",           0x00000, 0x10000, CRC(5f801410) SHA1(382c1bcd69a6a5c245d2ba7603bc273fba840c8f) )
-	ROM_LOAD16_BYTE( "e8.r11",          0x00001, 0x10000, CRC(a7b8250b) SHA1(4bd79c09dacf69e1993353d7fcc7746d1324e9b0) )
+	ROM_REGION16_BE( 0x20000, "bg0_tmap", 0 )    /* bg tilemaps */
+	ROM_LOAD16_BYTE( "e5.r9",    0x00000, 0x10000, CRC(5f801410) SHA1(382c1bcd69a6a5c245d2ba7603bc273fba840c8f) )
+	ROM_LOAD16_BYTE( "e8.r11",   0x00001, 0x10000, CRC(a7b8250b) SHA1(4bd79c09dacf69e1993353d7fcc7746d1324e9b0) )
 
-	ROM_REGION16_BE( 0x20000, "gfx6", 0 )    /* fg tilemaps */
+	ROM_REGION16_BE( 0x20000, "fg0_tmap", 0 )    /* fg tilemaps */
 	ROM_LOAD16_BYTE( "11.r13",   0x00000, 0x10000, CRC(04b961de) SHA1(7a94c9d0800d79048660cf3758708a346ead33f9) )
 	ROM_LOAD16_BYTE( "13.r14",   0x00001, 0x10000, CRC(6bdbd887) SHA1(a54f26f9ddd72b8b8f7a030610c1c4a5f94a3358) )
 ROM_END
@@ -1941,32 +1928,32 @@ ROM_START( ddaydoo ) /* 90030003 PCB */
 	ROM_LOAD( "4.u5",    0x10000, 0x10000, CRC(70961ea6) SHA1(245d3da67abb4a511a024f030de461b9a2b4804e) )  /* banked at 0x8000-0xbfff */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound */
-	ROM_LOAD( "1.d3",    0x0000, 0x8000, CRC(dd4316fd) SHA1(496e6657bb76d91f488a2464d1af1be095ab9105) )    /* empty */
-	ROM_CONTINUE(        0x0000, 0x8000 )
+	ROM_LOAD( "1.d3",    0x00000, 0x08000, CRC(dd4316fd) SHA1(496e6657bb76d91f488a2464d1af1be095ab9105) )    /* empty */
+	ROM_CONTINUE(        0x00000, 0x08000 )
 
-	ROM_REGION( 0x8000, "gfx1", 0 ) /* chars */
-	ROM_LOAD( "2.j4",    0x0000, 0x8000, CRC(83eb572c) SHA1(e915afd55d505bce202206c9ecfa89bad561ef6c) )    /* empty */
-	ROM_CONTINUE(        0x0000, 0x8000 )
+	ROM_REGION( 0x08000, "tx", 0 ) /* chars */
+	ROM_LOAD( "2.j4",    0x00000, 0x08000, CRC(83eb572c) SHA1(e915afd55d505bce202206c9ecfa89bad561ef6c) )    /* empty */
+	ROM_CONTINUE(        0x00000, 0x08000 )
 
-	ROM_REGION16_BE( 0x40000, "gfx2", 0 )    /* sprites */
+	ROM_REGION16_BE( 0x40000, "sprite", 0 )    /* sprites */
 	ROM_LOAD16_BYTE( "16.d14",   0x00000, 0x20000, CRC(df503504) SHA1(daa58a7bc24415b5f59b7c7cc918bc85de9702a3) )
 	ROM_LOAD16_BYTE( "15.a14",   0x00001, 0x20000, CRC(cd990442) SHA1(891b2163db23ab0bb40cbadce6e06fc067d0532f) )
 
-	ROM_REGION16_BE( 0x80000, "gfx3", 0 )    /* tiles */
+	ROM_REGION16_BE( 0x80000, "bg0", 0 )    /* tiles */
 	ROM_LOAD16_BYTE( "6.s9",     0x00000, 0x20000, CRC(1054361d) SHA1(52566786ca8177404be8b66fd7de94ac25fc49ea) )
 	ROM_LOAD16_BYTE( "9.s11",    0x00001, 0x20000, CRC(6952ef4d) SHA1(b4e5ec02e97df213fe0bd4cd8a2ca77d7ecf8ad5) )
 	ROM_LOAD16_BYTE( "7.u9",     0x40000, 0x20000, CRC(6e57a888) SHA1(8efe876ea3c788b83e8291f7fc6f55b90de158c8) )
 	ROM_LOAD16_BYTE( "10.u11",   0x40001, 0x20000, CRC(a5548dca) SHA1(9914e01c1739c3bfd868a01e53c9030726ced4ea) )
 
-	ROM_REGION16_BE( 0x40000, "gfx4", 0 )    /* tiles */
+	ROM_REGION16_BE( 0x40000, "fg0", 0 )    /* tiles */
 	ROM_LOAD16_BYTE( "12.s13",   0x00000, 0x20000, CRC(992bc4af) SHA1(94570ebd1ee6acf1871cf914907acd12dca4026e) )
 	ROM_LOAD16_BYTE( "14.s14",   0x00001, 0x20000, CRC(a79abc85) SHA1(3e63dad11db9b7420331403a1d551d8c041c4cc2) )
 
-	ROM_REGION16_BE( 0x20000, "gfx5", 0 )    /* background tilemaps */
+	ROM_REGION16_BE( 0x20000, "bg0_tmap", 0 )    /* background tilemaps */
 	ROM_LOAD16_BYTE( "5.r9",     0x00000, 0x10000, CRC(4789bae8) SHA1(6ffecc16eb8c9c783b02c4ef68cb5098b01fafef) )
 	ROM_LOAD16_BYTE( "8.r11",    0x00001, 0x10000, CRC(92402b9a) SHA1(2ca8078d2687afbe7b6fc5412de16c6fbc11a650) )
 
-	ROM_REGION16_BE( 0x20000, "gfx6", 0 )    /* fg tilemaps */
+	ROM_REGION16_BE( 0x20000, "fg0_tmap", 0 )    /* fg tilemaps */
 	ROM_LOAD16_BYTE( "11.r13",   0x00000, 0x10000, CRC(04b961de) SHA1(7a94c9d0800d79048660cf3758708a346ead33f9) )
 	ROM_LOAD16_BYTE( "13.r14",   0x00001, 0x10000, CRC(6bdbd887) SHA1(a54f26f9ddd72b8b8f7a030610c1c4a5f94a3358) )
 ROM_END
@@ -1978,31 +1965,31 @@ ROM_START( gulfstrm )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound */
 	ROM_LOAD( "3.c5",         0x00000, 0x10000, CRC(c029b015) SHA1(86f8d4f6560cb99e25e8e8baf72dde743a7b9c4c) )
 
-	ROM_REGION( 0x8000, "gfx1", 0 ) /* chars */
-	ROM_LOAD( "2.s4",         0x0000, 0x8000, CRC(c2d65a25) SHA1(a198b42c0737b253aca5bab6fb58ab561ccc1d5c) )    /* empty */
-	ROM_CONTINUE(             0x0000, 0x8000 )
+	ROM_REGION( 0x08000, "tx", 0 ) /* chars */
+	ROM_LOAD( "2.s4",         0x00000, 0x08000, CRC(c2d65a25) SHA1(a198b42c0737b253aca5bab6fb58ab561ccc1d5c) )    /* empty */
+	ROM_CONTINUE(             0x00000, 0x08000 )
 
-	ROM_REGION16_BE( 0x80000, "gfx2", 0 )    /* sprites */
+	ROM_REGION16_BE( 0x80000, "sprite", 0 )    /* sprites */
 	ROM_LOAD16_BYTE( "14.b1",        0x00000, 0x20000, CRC(67bdf73d) SHA1(3e357448b6f255fdec731f143afa3d3149523ed2) )
 	ROM_LOAD16_BYTE( "16.c1",        0x00001, 0x20000, CRC(7770a76f) SHA1(4f9f5245f59008b26ed60e636285ea85271744e7) )
 	ROM_LOAD16_BYTE( "15.b1",        0x40000, 0x20000, CRC(84803f7e) SHA1(74b694c0d20c5b016b9d7258b0296229972151d5) )
 	ROM_LOAD16_BYTE( "17.e1",        0x40001, 0x20000, CRC(94706500) SHA1(8f4a6f7ce20b1b50577271601c2c2632b5a2292c) )
 
-	ROM_REGION16_BE( 0x80000, "gfx3", 0 )    /* tiles */
+	ROM_REGION16_BE( 0x80000, "bg0", 0 )    /* tiles */
 	ROM_LOAD16_BYTE( "4.d8",         0x00000, 0x20000, CRC(858fdbb6) SHA1(4c317ab6069a8509287d3df88cf4272f512a40a3) )
 	ROM_LOAD16_BYTE( "5.b9",         0x00001, 0x20000, CRC(c0a552e8) SHA1(31dcb14eb8815c609b0bf4d5f1ea17b26ab18aec) )
 	ROM_LOAD16_BYTE( "6.d8",         0x40000, 0x20000, CRC(20eedda3) SHA1(8c8b1284e07f5380037f8431f2649aa99fd47542) )
 	ROM_LOAD16_BYTE( "7.d9",         0x40001, 0x20000, CRC(294f8c40) SHA1(b7afb87510ab52682151ff2b13029427487589ec) )
 
-	ROM_REGION16_BE( 0x40000, "gfx4", 0 )    /* tiles */
+	ROM_REGION16_BE( 0x40000, "fg0", 0 )    /* tiles */
 	ROM_LOAD16_BYTE( "12.r8",        0x00000, 0x20000, CRC(ec3ad3e7) SHA1(276da309b788091cd6e5faada2ff9e5b0df2caea) )
 	ROM_LOAD16_BYTE( "13.r9",        0x00001, 0x20000, CRC(c64090cb) SHA1(5dab576e5f454c62c7826d477b3f699e979753ad) )
 
-	ROM_REGION16_BE( 0x20000, "gfx5", 0 )    /* background tilemaps */
+	ROM_REGION16_BE( 0x20000, "bg0_tmap", 0 )    /* background tilemaps */
 	ROM_LOAD16_BYTE( "8.e8",         0x00000, 0x10000, CRC(8d7f4693) SHA1(a7c8573d9e54c8230decc3e88f76ae729d77b096) )
 	ROM_LOAD16_BYTE( "9.e9",         0x00001, 0x10000, CRC(34d440c4) SHA1(74b0e15e75f62106177234b6ea54a5d312628802) )
 
-	ROM_REGION16_BE( 0x20000, "gfx6", 0 )    /* fg tilemaps */
+	ROM_REGION16_BE( 0x20000, "fg0_tmap", 0 )    /* fg tilemaps */
 	ROM_LOAD16_BYTE( "10.n8",        0x00000, 0x10000, CRC(b4f15bf4) SHA1(cb203390c3f917f213807a23c442e43bc6bcfc67) )
 	ROM_LOAD16_BYTE( "11.n9",        0x00001, 0x10000, CRC(7dfe4a9c) SHA1(40982b5b266e4a928544ab5ec330080935588c57) )
 ROM_END
@@ -2014,31 +2001,31 @@ ROM_START( gulfstrma )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound */
 	ROM_LOAD( "3.c5",         0x00000, 0x10000, CRC(c029b015) SHA1(86f8d4f6560cb99e25e8e8baf72dde743a7b9c4c) )
 
-	ROM_REGION( 0x8000, "gfx1", 0 ) /* chars */
-	ROM_LOAD( "2.s4",         0x0000, 0x8000, CRC(c2d65a25) SHA1(a198b42c0737b253aca5bab6fb58ab561ccc1d5c) )    /* empty */
-	ROM_CONTINUE(             0x0000, 0x8000 )
+	ROM_REGION( 0x08000, "tx", 0 ) /* chars */
+	ROM_LOAD( "2.s4",         0x00000, 0x08000, CRC(c2d65a25) SHA1(a198b42c0737b253aca5bab6fb58ab561ccc1d5c) )    /* empty */
+	ROM_CONTINUE(             0x00000, 0x08000 )
 
-	ROM_REGION16_BE( 0x80000, "gfx2", 0 )    /* sprites */
+	ROM_REGION16_BE( 0x80000, "sprite", 0 )    /* sprites */
 	ROM_LOAD16_BYTE( "14.b1",        0x00000, 0x20000, CRC(67bdf73d) SHA1(3e357448b6f255fdec731f143afa3d3149523ed2) )
 	ROM_LOAD16_BYTE( "16.c1",        0x00001, 0x20000, CRC(7770a76f) SHA1(4f9f5245f59008b26ed60e636285ea85271744e7) )
 	ROM_LOAD16_BYTE( "15.b1",        0x40000, 0x20000, CRC(84803f7e) SHA1(74b694c0d20c5b016b9d7258b0296229972151d5) )
 	ROM_LOAD16_BYTE( "17.e1",        0x40001, 0x20000, CRC(94706500) SHA1(8f4a6f7ce20b1b50577271601c2c2632b5a2292c) )
 
-	ROM_REGION16_BE( 0x80000, "gfx3", 0 )    /* tiles */
+	ROM_REGION16_BE( 0x80000, "bg0", 0 )    /* tiles */
 	ROM_LOAD16_BYTE( "4.d8",         0x00000, 0x20000, CRC(858fdbb6) SHA1(4c317ab6069a8509287d3df88cf4272f512a40a3) )
 	ROM_LOAD16_BYTE( "5.b9",         0x00001, 0x20000, CRC(c0a552e8) SHA1(31dcb14eb8815c609b0bf4d5f1ea17b26ab18aec) )
 	ROM_LOAD16_BYTE( "6.d8",         0x40000, 0x20000, CRC(20eedda3) SHA1(8c8b1284e07f5380037f8431f2649aa99fd47542) )
 	ROM_LOAD16_BYTE( "7.d9",         0x40001, 0x20000, CRC(294f8c40) SHA1(b7afb87510ab52682151ff2b13029427487589ec) )
 
-	ROM_REGION16_BE( 0x40000, "gfx4", 0 )    /* tiles */
+	ROM_REGION16_BE( 0x40000, "fg0", 0 )    /* tiles */
 	ROM_LOAD16_BYTE( "12.bin",       0x00000, 0x20000, CRC(3e3d3b57) SHA1(398a6cac7144ba7bacaa36c593bcb4b3c051eb0f) )
 	ROM_LOAD16_BYTE( "13.bin",       0x00001, 0x20000, CRC(66fcce80) SHA1(6ab2b7cd49447d374cde40b98db0a6209dcad461) )
 
-	ROM_REGION16_BE( 0x20000, "gfx5", 0 )    /* background tilemaps */
+	ROM_REGION16_BE( 0x20000, "bg0_tmap", 0 )    /* background tilemaps */
 	ROM_LOAD16_BYTE( "8.e8",         0x00000, 0x10000, CRC(8d7f4693) SHA1(a7c8573d9e54c8230decc3e88f76ae729d77b096) )
 	ROM_LOAD16_BYTE( "9.e9",         0x00001, 0x10000, CRC(34d440c4) SHA1(74b0e15e75f62106177234b6ea54a5d312628802) )
 
-	ROM_REGION16_BE( 0x20000, "gfx6", 0 )    /* fg tilemaps */
+	ROM_REGION16_BE( 0x20000, "fg0_tmap", 0 )    /* fg tilemaps */
 	ROM_LOAD16_BYTE( "10.bin",       0x00000, 0x10000, CRC(08149140) SHA1(ff0094883ca0fc81bae991d6ea62d0064d6f7c47) )
 	ROM_LOAD16_BYTE( "11.bin",       0x00001, 0x10000, CRC(2ed7545b) SHA1(6a70743bbb03ef694310f2b5531f384209db62a1) )
 ROM_END
@@ -2050,31 +2037,31 @@ ROM_START( gulfstrmb )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound */
 	ROM_LOAD( "3.c5",         0x00000, 0x10000, CRC(c029b015) SHA1(86f8d4f6560cb99e25e8e8baf72dde743a7b9c4c) )
 
-	ROM_REGION( 0x8000, "gfx1", 0 ) /* chars */
-	ROM_LOAD( "2.s4",         0x0000, 0x8000, CRC(c2d65a25) SHA1(a198b42c0737b253aca5bab6fb58ab561ccc1d5c) )    /* empty */
-	ROM_CONTINUE(             0x0000, 0x8000 )
+	ROM_REGION( 0x08000, "tx", 0 ) /* chars */
+	ROM_LOAD( "2.s4",         0x00000, 0x08000, CRC(c2d65a25) SHA1(a198b42c0737b253aca5bab6fb58ab561ccc1d5c) )    /* empty */
+	ROM_CONTINUE(             0x00000, 0x08000 )
 
-	ROM_REGION16_BE( 0x80000, "gfx2", 0 )    /* sprites */
+	ROM_REGION16_BE( 0x80000, "sprite", 0 )    /* sprites */
 	ROM_LOAD16_BYTE( "14.b1",        0x00000, 0x20000, CRC(67bdf73d) SHA1(3e357448b6f255fdec731f143afa3d3149523ed2) )
 	ROM_LOAD16_BYTE( "16.c1",        0x00001, 0x20000, CRC(7770a76f) SHA1(4f9f5245f59008b26ed60e636285ea85271744e7) )
 	ROM_LOAD16_BYTE( "15.b1",        0x40000, 0x20000, CRC(84803f7e) SHA1(74b694c0d20c5b016b9d7258b0296229972151d5) )
 	ROM_LOAD16_BYTE( "17.e1",        0x40001, 0x20000, CRC(94706500) SHA1(8f4a6f7ce20b1b50577271601c2c2632b5a2292c) )
 
-	ROM_REGION16_BE( 0x80000, "gfx3", 0 )    /* tiles */
+	ROM_REGION16_BE( 0x80000, "bg0", 0 )    /* tiles */
 	ROM_LOAD16_BYTE( "4.d8",         0x00000, 0x20000, CRC(858fdbb6) SHA1(4c317ab6069a8509287d3df88cf4272f512a40a3) )
 	ROM_LOAD16_BYTE( "5.b9",         0x00001, 0x20000, CRC(c0a552e8) SHA1(31dcb14eb8815c609b0bf4d5f1ea17b26ab18aec) )
 	ROM_LOAD16_BYTE( "6.d8",         0x40000, 0x20000, CRC(20eedda3) SHA1(8c8b1284e07f5380037f8431f2649aa99fd47542) )
 	ROM_LOAD16_BYTE( "7.d9",         0x40001, 0x20000, CRC(294f8c40) SHA1(b7afb87510ab52682151ff2b13029427487589ec) )
 
-	ROM_REGION16_BE( 0x40000, "gfx4", 0 )    /* tiles */
+	ROM_REGION16_BE( 0x40000, "fg0", 0 )    /* tiles */
 	ROM_LOAD16_BYTE( "12.bin",       0x00000, 0x20000, CRC(3e3d3b57) SHA1(398a6cac7144ba7bacaa36c593bcb4b3c051eb0f) )
 	ROM_LOAD16_BYTE( "13.bin",       0x00001, 0x20000, CRC(66fcce80) SHA1(6ab2b7cd49447d374cde40b98db0a6209dcad461) )
 
-	ROM_REGION16_BE( 0x20000, "gfx5", 0 )    /* background tilemaps */
+	ROM_REGION16_BE( 0x20000, "bg0_tmap", 0 )    /* background tilemaps */
 	ROM_LOAD16_BYTE( "8.e8",         0x00000, 0x10000, CRC(8d7f4693) SHA1(a7c8573d9e54c8230decc3e88f76ae729d77b096) )
 	ROM_LOAD16_BYTE( "9.e9",         0x00001, 0x10000, CRC(34d440c4) SHA1(74b0e15e75f62106177234b6ea54a5d312628802) )
 
-	ROM_REGION16_BE( 0x20000, "gfx6", 0 )    /* fg tilemaps */
+	ROM_REGION16_BE( 0x20000, "fg0_tmap", 0 )    /* fg tilemaps */
 	ROM_LOAD16_BYTE( "10.bin",       0x00000, 0x10000, CRC(08149140) SHA1(ff0094883ca0fc81bae991d6ea62d0064d6f7c47) )
 	ROM_LOAD16_BYTE( "11.bin",       0x00001, 0x10000, CRC(2ed7545b) SHA1(6a70743bbb03ef694310f2b5531f384209db62a1) )
 ROM_END
@@ -2086,31 +2073,31 @@ ROM_START( gulfstrmm )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound */
 	ROM_LOAD( "3.c5",         0x00000, 0x10000, CRC(c029b015) SHA1(86f8d4f6560cb99e25e8e8baf72dde743a7b9c4c) )
 
-	ROM_REGION( 0x8000, "gfx1", 0 ) /* chars */
-	ROM_LOAD( "2.bin",        0x0000, 0x8000, CRC(cb555d96) SHA1(ebc1dee91a09a829db2ae6fc1616c7c989f7f1c2) )    /* empty */
-	ROM_CONTINUE(             0x0000, 0x8000 )
+	ROM_REGION( 0x08000, "tx", 0 ) /* chars */
+	ROM_LOAD( "2.bin",        0x00000, 0x08000, CRC(cb555d96) SHA1(ebc1dee91a09a829db2ae6fc1616c7c989f7f1c2) )    /* empty */
+	ROM_CONTINUE(             0x00000, 0x08000 )
 
-	ROM_REGION16_BE( 0x80000, "gfx2", 0 )    /* sprites */
+	ROM_REGION16_BE( 0x80000, "sprite", 0 )    /* sprites */
 	ROM_LOAD16_BYTE( "14.b1",        0x00000, 0x20000, CRC(67bdf73d) SHA1(3e357448b6f255fdec731f143afa3d3149523ed2) )
 	ROM_LOAD16_BYTE( "16.c1",        0x00001, 0x20000, CRC(7770a76f) SHA1(4f9f5245f59008b26ed60e636285ea85271744e7) )
 	ROM_LOAD16_BYTE( "15.b1",        0x40000, 0x20000, CRC(84803f7e) SHA1(74b694c0d20c5b016b9d7258b0296229972151d5) )
 	ROM_LOAD16_BYTE( "17.e1",        0x40001, 0x20000, CRC(94706500) SHA1(8f4a6f7ce20b1b50577271601c2c2632b5a2292c) )
 
-	ROM_REGION16_BE( 0x80000, "gfx3", 0 )    /* tiles */
+	ROM_REGION16_BE( 0x80000, "bg0", 0 )    /* tiles */
 	ROM_LOAD16_BYTE( "4.d8",         0x00000, 0x20000, CRC(858fdbb6) SHA1(4c317ab6069a8509287d3df88cf4272f512a40a3) )
 	ROM_LOAD16_BYTE( "5.b9",         0x00001, 0x20000, CRC(c0a552e8) SHA1(31dcb14eb8815c609b0bf4d5f1ea17b26ab18aec) )
 	ROM_LOAD16_BYTE( "6.d8",         0x40000, 0x20000, CRC(20eedda3) SHA1(8c8b1284e07f5380037f8431f2649aa99fd47542) )
 	ROM_LOAD16_BYTE( "7.d9",         0x40001, 0x20000, CRC(294f8c40) SHA1(b7afb87510ab52682151ff2b13029427487589ec) )
 
-	ROM_REGION16_BE( 0x40000, "gfx4", 0 )    /* tiles */
+	ROM_REGION16_BE( 0x40000, "fg0", 0 )    /* tiles */
 	ROM_LOAD16_BYTE( "12.bin",       0x00000, 0x20000, CRC(3e3d3b57) SHA1(398a6cac7144ba7bacaa36c593bcb4b3c051eb0f) )
 	ROM_LOAD16_BYTE( "13.bin",       0x00001, 0x20000, CRC(66fcce80) SHA1(6ab2b7cd49447d374cde40b98db0a6209dcad461) )
 
-	ROM_REGION16_BE( 0x20000, "gfx5", 0 )    /* background tilemaps */
+	ROM_REGION16_BE( 0x20000, "bg0_tmap", 0 )    /* background tilemaps */
 	ROM_LOAD16_BYTE( "8.e8",         0x00000, 0x10000, CRC(8d7f4693) SHA1(a7c8573d9e54c8230decc3e88f76ae729d77b096) )
 	ROM_LOAD16_BYTE( "9.e9",         0x00001, 0x10000, CRC(34d440c4) SHA1(74b0e15e75f62106177234b6ea54a5d312628802) )
 
-	ROM_REGION16_BE( 0x20000, "gfx6", 0 )    /* fg tilemaps */
+	ROM_REGION16_BE( 0x20000, "fg0_tmap", 0 )    /* fg tilemaps */
 	ROM_LOAD16_BYTE( "10.bin",       0x00000, 0x10000, CRC(08149140) SHA1(ff0094883ca0fc81bae991d6ea62d0064d6f7c47) )
 	ROM_LOAD16_BYTE( "11.bin",       0x00001, 0x10000, CRC(2ed7545b) SHA1(6a70743bbb03ef694310f2b5531f384209db62a1) )
 ROM_END
@@ -2122,31 +2109,31 @@ ROM_START( gulfstrmk )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound */
 	ROM_LOAD( "3.c5",         0x00000, 0x10000, CRC(c029b015) SHA1(86f8d4f6560cb99e25e8e8baf72dde743a7b9c4c) )
 
-	ROM_REGION( 0x8000, "gfx1", 0 ) /* chars */
-	ROM_LOAD( "2.bin",        0x0000, 0x8000, CRC(cb555d96) SHA1(ebc1dee91a09a829db2ae6fc1616c7c989f7f1c2) )    /* empty */
-	ROM_CONTINUE(             0x0000, 0x8000 )
+	ROM_REGION( 0x08000, "tx", 0 ) /* chars */
+	ROM_LOAD( "2.bin",        0x00000, 0x08000, CRC(cb555d96) SHA1(ebc1dee91a09a829db2ae6fc1616c7c989f7f1c2) )    /* empty */
+	ROM_CONTINUE(             0x00000, 0x08000 )
 
-	ROM_REGION16_BE( 0x80000, "gfx2", 0 )    /* sprites */
+	ROM_REGION16_BE( 0x80000, "sprite", 0 )    /* sprites */
 	ROM_LOAD16_BYTE( "14.b1",        0x00000, 0x20000, CRC(67bdf73d) SHA1(3e357448b6f255fdec731f143afa3d3149523ed2) )
 	ROM_LOAD16_BYTE( "16.c1",        0x00001, 0x20000, CRC(7770a76f) SHA1(4f9f5245f59008b26ed60e636285ea85271744e7) )
 	ROM_LOAD16_BYTE( "15.b1",        0x40000, 0x20000, CRC(84803f7e) SHA1(74b694c0d20c5b016b9d7258b0296229972151d5) )
 	ROM_LOAD16_BYTE( "17.e1",        0x40001, 0x20000, CRC(94706500) SHA1(8f4a6f7ce20b1b50577271601c2c2632b5a2292c) )
 
-	ROM_REGION16_BE( 0x80000, "gfx3", 0 )    /* tiles */
+	ROM_REGION16_BE( 0x80000, "bg0", 0 )    /* tiles */
 	ROM_LOAD16_BYTE( "4.d8",         0x00000, 0x20000, CRC(858fdbb6) SHA1(4c317ab6069a8509287d3df88cf4272f512a40a3) )
 	ROM_LOAD16_BYTE( "5.b9",         0x00001, 0x20000, CRC(c0a552e8) SHA1(31dcb14eb8815c609b0bf4d5f1ea17b26ab18aec) )
 	ROM_LOAD16_BYTE( "6.d8",         0x40000, 0x20000, CRC(20eedda3) SHA1(8c8b1284e07f5380037f8431f2649aa99fd47542) )
 	ROM_LOAD16_BYTE( "7.d9",         0x40001, 0x20000, CRC(294f8c40) SHA1(b7afb87510ab52682151ff2b13029427487589ec) )
 
-	ROM_REGION16_BE( 0x40000, "gfx4", 0 )    /* tiles */
+	ROM_REGION16_BE( 0x40000, "fg0", 0 )    /* tiles */
 	ROM_LOAD16_BYTE( "12.bin",       0x00000, 0x20000, CRC(3e3d3b57) SHA1(398a6cac7144ba7bacaa36c593bcb4b3c051eb0f) )
 	ROM_LOAD16_BYTE( "13.bin",       0x00001, 0x20000, CRC(66fcce80) SHA1(6ab2b7cd49447d374cde40b98db0a6209dcad461) )
 
-	ROM_REGION16_BE( 0x20000, "gfx5", 0 )    /* background tilemaps */
+	ROM_REGION16_BE( 0x20000, "bg0_tmap", 0 )    /* background tilemaps */
 	ROM_LOAD16_BYTE( "8.e8",         0x00000, 0x10000, CRC(8d7f4693) SHA1(a7c8573d9e54c8230decc3e88f76ae729d77b096) )
 	ROM_LOAD16_BYTE( "9.e9",         0x00001, 0x10000, CRC(34d440c4) SHA1(74b0e15e75f62106177234b6ea54a5d312628802) )
 
-	ROM_REGION16_BE( 0x20000, "gfx6", 0 )    /* fg tilemaps */
+	ROM_REGION16_BE( 0x20000, "fg0_tmap", 0 )    /* fg tilemaps */
 	ROM_LOAD16_BYTE( "10.bin",       0x00000, 0x10000, CRC(08149140) SHA1(ff0094883ca0fc81bae991d6ea62d0064d6f7c47) )
 	ROM_LOAD16_BYTE( "11.bin",       0x00001, 0x10000, CRC(2ed7545b) SHA1(6a70743bbb03ef694310f2b5531f384209db62a1) )
 ROM_END
@@ -2158,26 +2145,26 @@ ROM_START( pollux )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound */
 	ROM_LOAD( "pollux3.bin",  0x00000, 0x10000, CRC(85a9dc98) SHA1(a349bfb05d870ba920469066ce5c007363aca348) )
 
-	ROM_REGION( 0x10000, "gfx1", 0 )    /* chars */
+	ROM_REGION( 0x10000, "tx", 0 )    /* chars */
 	ROM_LOAD( "pollux1.bin",  0x08000, 0x08000, CRC(7f7135da) SHA1(0f77841e52b3d7e731d5142fba9ed5cd57343305) )
 	ROM_CONTINUE(             0x00000, 0x08000 )
 
-	ROM_REGION16_BE( 0x80000, "gfx2", 0 )    /* sprites */
+	ROM_REGION16_BE( 0x80000, "sprite", 0 )    /* sprites */
 	ROM_LOAD16_WORD_SWAP( "dy-pl-m2_be023.bin", 0x00000, 0x80000, CRC(bdea6f7d) SHA1(b418710a6d12aa53037acf7bbec85a26dfac9ebe) )
 
-	ROM_REGION16_BE( 0x80000, "gfx3", 0 )    /* tiles */
+	ROM_REGION16_BE( 0x80000, "bg0", 0 )    /* tiles */
 	ROM_LOAD16_WORD_SWAP( "dy-pl-m1_be015.bin", 0x00000, 0x80000, CRC(1d2dedd2) SHA1(9bcb1c80f05eabbca2c0738e409d3cadfc14b0c8) )
 
-	ROM_REGION16_BE( 0x80000, "gfx4", 0 )    /* tiles */
+	ROM_REGION16_BE( 0x80000, "fg0", 0 )    /* tiles */
 	ROM_LOAD16_BYTE( "pollux6.bin",  0x00000, 0x20000, CRC(b0391db5) SHA1(0c522c5074dc7c0a639ebfb7b9a9eddc90314081) )
 	ROM_LOAD16_BYTE( "pollux7.bin",  0x00001, 0x20000, CRC(632f6e10) SHA1(a3605cbe7a9dc04cd8c1ab50110f72d93c78208b) )
 	ROM_FILL(                        0x40000, 0x40000, 0xff )
 
-	ROM_REGION16_BE( 0x20000, "gfx5", 0 )    /* bg tilemaps */
+	ROM_REGION16_BE( 0x20000, "bg0_tmap", 0 )    /* bg tilemaps */
 	ROM_LOAD16_BYTE( "pollux9.bin",  0x00000, 0x10000, CRC(378d8914) SHA1(ef95903971673bc26774fe2aff17e1581a7f0eb9) )
 	ROM_LOAD16_BYTE( "pollux8.bin",  0x00001, 0x10000, CRC(8859fa70) SHA1(7b1b9edde3f762c7ae1f0b847aa17e30140e9ffa) )
 
-	ROM_REGION16_BE( 0x20000, "gfx6", 0 )    /* fg tilemaps */
+	ROM_REGION16_BE( 0x20000, "fg0_tmap", 0 )    /* fg tilemaps */
 	ROM_LOAD16_BYTE( "pollux5.bin",  0x00000, 0x10000, CRC(ac090d34) SHA1(6b554450d8d46165e25fd6f12ab4c4b9b63dcd35) )
 	ROM_LOAD16_BYTE( "pollux4.bin",  0x00001, 0x10000, CRC(2c6bd3be) SHA1(6648264be83588a01f264e7ec72d84e29e0d4795) )
 ROM_END
@@ -2189,26 +2176,26 @@ ROM_START( polluxa )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound */
 	ROM_LOAD( "pollux3.bin",  0x00000, 0x10000, CRC(85a9dc98) SHA1(a349bfb05d870ba920469066ce5c007363aca348) )
 
-	ROM_REGION( 0x10000, "gfx1", 0 )    /* chars */
+	ROM_REGION( 0x10000, "tx", 0 )    /* chars */
 	ROM_LOAD( "dooyong1.bin",  0x08000, 0x08000, CRC(a7d820b2) SHA1(bbcc3690f91a4bd4f0cff5da25cbfeceb7a19437) )
-	ROM_CONTINUE(             0x00000, 0x08000 )
+	ROM_CONTINUE(              0x00000, 0x08000 )
 
-	ROM_REGION16_BE( 0x80000, "gfx2", 0 )    /* sprites */
+	ROM_REGION16_BE( 0x80000, "sprite", 0 )    /* sprites */
 	ROM_LOAD16_WORD_SWAP( "dy-pl-m2_be023.bin", 0x00000, 0x80000, CRC(bdea6f7d) SHA1(b418710a6d12aa53037acf7bbec85a26dfac9ebe) )
 
-	ROM_REGION16_BE( 0x80000, "gfx3", 0 )    /* tiles */
+	ROM_REGION16_BE( 0x80000, "bg0", 0 )    /* tiles */
 	ROM_LOAD16_WORD_SWAP( "dy-pl-m1_be015.bin", 0x00000, 0x80000, CRC(1d2dedd2) SHA1(9bcb1c80f05eabbca2c0738e409d3cadfc14b0c8) )
 
-	ROM_REGION16_BE( 0x80000, "gfx4", 0 )    /* tiles */
+	ROM_REGION16_BE( 0x80000, "fg0", 0 )    /* tiles */
 	ROM_LOAD16_BYTE( "pollux6.bin",  0x00000, 0x20000, CRC(b0391db5) SHA1(0c522c5074dc7c0a639ebfb7b9a9eddc90314081) )
 	ROM_LOAD16_BYTE( "pollux7.bin",  0x00001, 0x20000, CRC(632f6e10) SHA1(a3605cbe7a9dc04cd8c1ab50110f72d93c78208b) )
 	ROM_FILL(                        0x40000, 0x40000, 0xff )
 
-	ROM_REGION16_BE( 0x20000, "gfx5", 0 )    /* bg tilemaps */
+	ROM_REGION16_BE( 0x20000, "bg0_tmap", 0 )    /* bg tilemaps */
 	ROM_LOAD16_BYTE( "pollux9.bin",  0x00000, 0x10000, CRC(378d8914) SHA1(ef95903971673bc26774fe2aff17e1581a7f0eb9) )
 	ROM_LOAD16_BYTE( "pollux8.bin",  0x00001, 0x10000, CRC(8859fa70) SHA1(7b1b9edde3f762c7ae1f0b847aa17e30140e9ffa) )
 
-	ROM_REGION16_BE( 0x20000, "gfx6", 0 )    /* fg tilemaps */
+	ROM_REGION16_BE( 0x20000, "fg0_tmap", 0 )    /* fg tilemaps */
 	ROM_LOAD16_BYTE( "pollux5.bin",  0x00000, 0x10000, CRC(ac090d34) SHA1(6b554450d8d46165e25fd6f12ab4c4b9b63dcd35) )
 	ROM_LOAD16_BYTE( "pollux4.bin",  0x00001, 0x10000, CRC(2c6bd3be) SHA1(6648264be83588a01f264e7ec72d84e29e0d4795) )
 ROM_END
@@ -2220,26 +2207,26 @@ ROM_START( polluxa2 )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound */
 	ROM_LOAD( "pollux3.bin",  0x00000, 0x10000, CRC(85a9dc98) SHA1(a349bfb05d870ba920469066ce5c007363aca348) )
 
-	ROM_REGION( 0x10000, "gfx1", 0 )    /* chars */
+	ROM_REGION( 0x10000, "tx", 0 )    /* chars */
 	ROM_LOAD( "dooyong1.bin",  0x08000, 0x08000, CRC(a7d820b2) SHA1(bbcc3690f91a4bd4f0cff5da25cbfeceb7a19437) )
-	ROM_CONTINUE(             0x00000, 0x08000 )
+	ROM_CONTINUE(              0x00000, 0x08000 )
 
-	ROM_REGION16_BE( 0x80000, "gfx2", 0 )    /* sprites */
+	ROM_REGION16_BE( 0x80000, "sprite", 0 )    /* sprites */
 	ROM_LOAD16_WORD_SWAP( "dy-pl-m2_be023.bin", 0x00000, 0x80000, CRC(bdea6f7d) SHA1(b418710a6d12aa53037acf7bbec85a26dfac9ebe) )
 
-	ROM_REGION16_BE( 0x80000, "gfx3", 0 )    /* tiles */
+	ROM_REGION16_BE( 0x80000, "bg0", 0 )    /* tiles */
 	ROM_LOAD16_WORD_SWAP( "dy-pl-m1_be015.bin", 0x00000, 0x80000, CRC(1d2dedd2) SHA1(9bcb1c80f05eabbca2c0738e409d3cadfc14b0c8) )
 
-	ROM_REGION16_BE( 0x80000, "gfx4", 0 )    /* tiles */
+	ROM_REGION16_BE( 0x80000, "fg0", 0 )    /* tiles */
 	ROM_LOAD16_BYTE( "pollux6.bin",  0x00000, 0x20000, CRC(b0391db5) SHA1(0c522c5074dc7c0a639ebfb7b9a9eddc90314081) )
 	ROM_LOAD16_BYTE( "pollux7.bin",  0x00001, 0x20000, CRC(632f6e10) SHA1(a3605cbe7a9dc04cd8c1ab50110f72d93c78208b) )
 	ROM_FILL(                        0x40000, 0x40000, 0xff )
 
-	ROM_REGION16_BE( 0x20000, "gfx5", 0 )    /* bg tilemaps */
+	ROM_REGION16_BE( 0x20000, "bg0_tmap", 0 )    /* bg tilemaps */
 	ROM_LOAD16_BYTE( "pollux9.bin",  0x00000, 0x10000, CRC(378d8914) SHA1(ef95903971673bc26774fe2aff17e1581a7f0eb9) )
 	ROM_LOAD16_BYTE( "pollux8.bin",  0x00001, 0x10000, CRC(8859fa70) SHA1(7b1b9edde3f762c7ae1f0b847aa17e30140e9ffa) )
 
-	ROM_REGION16_BE( 0x20000, "gfx6", 0 )    /* fg tilemaps */
+	ROM_REGION16_BE( 0x20000, "fg0_tmap", 0 )    /* fg tilemaps */
 	ROM_LOAD16_BYTE( "pollux5.bin",  0x00000, 0x10000, CRC(ac090d34) SHA1(6b554450d8d46165e25fd6f12ab4c4b9b63dcd35) )
 	ROM_LOAD16_BYTE( "pollux4.bin",  0x00001, 0x10000, CRC(2c6bd3be) SHA1(6648264be83588a01f264e7ec72d84e29e0d4795) )
 ROM_END
@@ -2251,26 +2238,26 @@ ROM_START( polluxn )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound */
 	ROM_LOAD( "polluxntc_3.6t",  0x00000, 0x10000, CRC(85a9dc98) SHA1(a349bfb05d870ba920469066ce5c007363aca348) )
 
-	ROM_REGION( 0x10000, "gfx1", 0 )    /* chars */
+	ROM_REGION( 0x10000, "tx", 0 )    /* chars */
 	ROM_LOAD( "polluxntc_1.3r",  0x08000, 0x08000, CRC(7f7135da) SHA1(0f77841e52b3d7e731d5142fba9ed5cd57343305) )
-	ROM_CONTINUE(             0x00000, 0x08000 )
+	ROM_CONTINUE(                0x00000, 0x08000 )
 
-	ROM_REGION16_BE( 0x80000, "gfx2", 0 )    /* sprites */
+	ROM_REGION16_BE( 0x80000, "sprite", 0 )    /* sprites */
 	ROM_LOAD16_WORD_SWAP( "polluxntc_dy-pl-m2_be023.3t", 0x00000, 0x80000, CRC(bdea6f7d) SHA1(b418710a6d12aa53037acf7bbec85a26dfac9ebe) )
 
-	ROM_REGION16_BE( 0x80000, "gfx3", 0 )    /* tiles */
+	ROM_REGION16_BE( 0x80000, "bg0", 0 )    /* tiles */
 	ROM_LOAD16_WORD_SWAP( "polluxntc_dy-pl-m1_be002.8a", 0x00000, 0x80000, CRC(1d2dedd2) SHA1(9bcb1c80f05eabbca2c0738e409d3cadfc14b0c8) )
 
-	ROM_REGION16_BE( 0x80000, "gfx4", 0 )    /* tiles */
+	ROM_REGION16_BE( 0x80000, "fg0", 0 )    /* tiles */
 	ROM_LOAD16_BYTE( "polluxntc_6.8m",  0x00000, 0x20000, CRC(b0391db5) SHA1(0c522c5074dc7c0a639ebfb7b9a9eddc90314081) )
 	ROM_LOAD16_BYTE( "polluxntc_7.8l",  0x00001, 0x20000, CRC(632f6e10) SHA1(a3605cbe7a9dc04cd8c1ab50110f72d93c78208b) )
-	ROM_FILL(                        0x40000, 0x40000, 0xff )
+	ROM_FILL(                           0x40000, 0x40000, 0xff )
 
-	ROM_REGION16_BE( 0x20000, "gfx5", 0 )    /* bg tilemaps */
+	ROM_REGION16_BE( 0x20000, "bg0_tmap", 0 )    /* bg tilemaps */
 	ROM_LOAD16_BYTE( "polluxntc_9.8b",  0x00000, 0x10000, CRC(378d8914) SHA1(ef95903971673bc26774fe2aff17e1581a7f0eb9) )
 	ROM_LOAD16_BYTE( "polluxntc_8.8j",  0x00001, 0x10000, CRC(8859fa70) SHA1(7b1b9edde3f762c7ae1f0b847aa17e30140e9ffa) )
 
-	ROM_REGION16_BE( 0x20000, "gfx6", 0 )    /* fg tilemaps */
+	ROM_REGION16_BE( 0x20000, "fg0_tmap", 0 )    /* fg tilemaps */
 	ROM_LOAD16_BYTE( "polluxntc_5.8p",  0x00000, 0x10000, CRC(ac090d34) SHA1(6b554450d8d46165e25fd6f12ab4c4b9b63dcd35) )
 	ROM_LOAD16_BYTE( "polluxntc_4.8r",  0x00001, 0x10000, BAD_DUMP CRC(0195dc4e) SHA1(c87c90a38b382f11ee3377683c0becda745341e0) ) // need to confirm as bad, the same as other sets except it has some bits of data blanked out with 0xFF
 ROM_END
@@ -2283,19 +2270,19 @@ ROM_START( bluehawk )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound */
 	ROM_LOAD( "rom1",         0x00000, 0x10000, CRC(eef22920) SHA1(a3295ae7524df8c4d00ac3da422bbf66c959bf4f) )
 
-	ROM_REGION( 0x10000, "gfx1", 0 )    /* chars */
+	ROM_REGION( 0x10000, "tx", 0 )    /* chars */
 	ROM_LOAD( "rom3",         0x00000, 0x10000, CRC(c192683f) SHA1(060372b21bf331671c135a074640868eeb5f13ec) )
 
-	ROM_REGION16_BE( 0x80000, "gfx2", 0 )    /* sprites */
+	ROM_REGION16_BE( 0x80000, "sprite", 0 )    /* sprites */
 	ROM_LOAD16_WORD_SWAP( "dy-bh-m3",     0x00000, 0x80000, CRC(8809d157) SHA1(7f86378f9fcb95ab83b68f37a29732bb8cb3d95a) )
 
-	ROM_REGION16_BE( 0x80000, "gfx3", 0 )    /* tiles + tilemaps (together!) */
+	ROM_REGION16_BE( 0x80000, "bg0", 0 )    /* tiles + tilemaps (together!) */
 	ROM_LOAD16_WORD_SWAP( "dy-bh-m1",     0x00000, 0x80000, CRC(51816b2c) SHA1(72fb055de7979e40195316ef38a2e8c54be12e2b) )
 
-	ROM_REGION16_BE( 0x80000, "gfx4", 0 )    /* tiles + tilemaps (together!) */
+	ROM_REGION16_BE( 0x80000, "fg0", 0 )    /* tiles + tilemaps (together!) */
 	ROM_LOAD16_WORD_SWAP( "dy-bh-m2",     0x00000, 0x80000, CRC(f9daace6) SHA1(5e7892bad170ab9bd52426629ad49843fbc31996) )
 
-	ROM_REGION16_BE( 0x40000, "gfx5", 0 )    /* tiles + tilemaps (together!) */
+	ROM_REGION16_BE( 0x40000, "fg1", 0 )    /* tiles + tilemaps (together!) */
 	ROM_LOAD16_BYTE( "rom6",         0x00000, 0x20000, CRC(e6bd9daa) SHA1(3b478fd02b145d13e49539df5260191a5254be19) )
 	ROM_LOAD16_BYTE( "rom5",         0x00001, 0x20000, CRC(5c654dc6) SHA1(f10f64d7114adf7f18ec37c193c524ec80236201) )
 
@@ -2310,19 +2297,19 @@ ROM_START( bluehawkn )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound */
 	ROM_LOAD( "rom1",         0x00000, 0x10000, CRC(eef22920) SHA1(a3295ae7524df8c4d00ac3da422bbf66c959bf4f) )
 
-	ROM_REGION( 0x10000, "gfx1", 0 )    /* chars */
+	ROM_REGION( 0x10000, "tx", 0 )    /* chars */
 	ROM_LOAD( "rom3ntc",      0x00000, 0x10000, CRC(31eb221a) SHA1(7b893972227047d2f609fd1f97cc006eba2c9579) )
 
-	ROM_REGION16_BE( 0x80000, "gfx2", 0 )    /* sprites */
+	ROM_REGION16_BE( 0x80000, "sprite", 0 )    /* sprites */
 	ROM_LOAD16_WORD_SWAP( "dy-bh-m3",     0x00000, 0x80000, CRC(8809d157) SHA1(7f86378f9fcb95ab83b68f37a29732bb8cb3d95a) )  // ROM7+ROM8+ROM13+ROM14
 
-	ROM_REGION16_BE( 0x80000, "gfx3", 0 )    /* tiles + tilemaps (together!) */
+	ROM_REGION16_BE( 0x80000, "bg0", 0 )    /* tiles + tilemaps (together!) */
 	ROM_LOAD16_WORD_SWAP( "dy-bh-m1",     0x00000, 0x80000, CRC(51816b2c) SHA1(72fb055de7979e40195316ef38a2e8c54be12e2b) )  // ROM9+ROM10+ROM15+ROM16
 
-	ROM_REGION16_BE( 0x80000, "gfx4", 0 )    /* tiles + tilemaps (together!) */
+	ROM_REGION16_BE( 0x80000, "fg0", 0 )    /* tiles + tilemaps (together!) */
 	ROM_LOAD16_WORD_SWAP( "dy-bh-m2",     0x00000, 0x80000, CRC(f9daace6) SHA1(5e7892bad170ab9bd52426629ad49843fbc31996) )  // ROM11+ROM12+ROM17+ROM18
 
-	ROM_REGION16_BE( 0x40000, "gfx5", 0 )    /* tiles + tilemaps (together!) */
+	ROM_REGION16_BE( 0x40000, "fg1", 0 )    /* tiles + tilemaps (together!) */
 	ROM_LOAD16_BYTE( "rom6",         0x00000, 0x20000, CRC(e6bd9daa) SHA1(3b478fd02b145d13e49539df5260191a5254be19) )
 	ROM_LOAD16_BYTE( "rom5",         0x00001, 0x20000, CRC(5c654dc6) SHA1(f10f64d7114adf7f18ec37c193c524ec80236201) )
 
@@ -2406,20 +2393,20 @@ ROM_START( flytiger )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound */
 	ROM_LOAD( "3.6p",         0x00000, 0x10000, CRC(d238df5e) SHA1(428fd7abd78238089c0c0fd73de57102f4f65a74))
 
-	ROM_REGION( 0x10000, "gfx1", 0 )    /* chars */
+	ROM_REGION( 0x10000, "tx", 0 )    /* chars */
 	ROM_LOAD( "2.4h",         0x08000, 0x08000, CRC(2fb72912) SHA1(34453e2b49cf3a6bc9e87a8400428d95f626b97a) )
-	ROM_CONTINUE(             0x00000, 0x8000 )
+	ROM_CONTINUE(             0x00000, 0x08000 )
 
-	ROM_REGION16_BE( 0x80000, "gfx2", 0 )    /* sprites */
+	ROM_REGION16_BE( 0x80000, "sprite", 0 )    /* sprites */
 	ROM_LOAD16_BYTE( "16.4h", 0x00000, 0x20000, CRC(8a158b95) SHA1(ed09d9c40b76a27e06601381e463a00b16555f1e) )
 	ROM_LOAD16_BYTE( "15.2h", 0x00001, 0x20000, CRC(399f6043) SHA1(ea0debd6d0f8c61f0078809c2828734fc15e891d) )
 	ROM_LOAD16_BYTE( "14.4k", 0x40000, 0x20000, CRC(df66b6f3) SHA1(3a29ae69a09306c5a2a2786acbf227832b408152) )
 	ROM_LOAD16_BYTE( "13.2k", 0x40001, 0x20000, CRC(f24a5099) SHA1(408559057989a40ca298baa85d5fe7cbde72d2b8) )
 
-	ROM_REGION16_BE( 0x80000, "gfx3",0 ) /* tiles + tilemaps */
-	ROM_LOAD16_WORD_SWAP( "dy-ft-m1.11n",   0x00000, 0x80000, CRC(f06589c2) SHA1(fb4aa12257e2e0162f2219ebea5177e8bb15e3f0) )
+	ROM_REGION16_BE( 0x80000, "bg0",0 ) /* tiles + tilemaps */
+	ROM_LOAD16_WORD_SWAP( "dy-ft-m1.11n",  0x00000, 0x80000, CRC(f06589c2) SHA1(fb4aa12257e2e0162f2219ebea5177e8bb15e3f0) )
 
-	ROM_REGION16_BE( 0x80000, "gfx4",0 ) /* tiles + tilemaps */
+	ROM_REGION16_BE( 0x80000, "fg0",0 ) /* tiles + tilemaps */
 	ROM_LOAD16_WORD_SWAP("dy-ft-m2.11g",   0x00000, 0x80000, CRC(7545f9c9) SHA1(dcab4d64a8fada5afd4a352f5a30c868676d2b57) )
 
 	ROM_REGION( 0x80000, "oki", 0 ) /* OKI6295 samples */
@@ -2433,23 +2420,23 @@ ROM_START( flytigera ) // alt pcb type
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound */
 	ROM_LOAD( "ftiger_11.6p", 0x00000, 0x10000, CRC(d238df5e) SHA1(428fd7abd78238089c0c0fd73de57102f4f65a74))
 
-	ROM_REGION( 0x10000, "gfx1", 0 )    /* chars */
+	ROM_REGION( 0x10000, "tx", 0 )    /* chars */
 	ROM_LOAD( "ftiger_2.4h",  0x08000, 0x08000, CRC(ca9d6713) SHA1(645cccc06c7f6744b25e7917f414956856419b8a) )
-	ROM_CONTINUE(             0x00000, 0x8000 )
+	ROM_CONTINUE(             0x00000, 0x08000 )
 
-	ROM_REGION16_BE( 0x80000, "gfx2", 0 )    /* sprites */
+	ROM_REGION16_BE( 0x80000, "sprite", 0 )    /* sprites */
 	ROM_LOAD16_BYTE( "ftiger_16.4h", 0x00000, 0x20000, CRC(8a158b95) SHA1(ed09d9c40b76a27e06601381e463a00b16555f1e) )
 	ROM_LOAD16_BYTE( "ftiger_15.2h", 0x00001, 0x20000, CRC(399f6043) SHA1(ea0debd6d0f8c61f0078809c2828734fc15e891d) )
 	ROM_LOAD16_BYTE( "ftiger_14.4k", 0x40000, 0x20000, CRC(df66b6f3) SHA1(3a29ae69a09306c5a2a2786acbf227832b408152) )
 	ROM_LOAD16_BYTE( "ftiger_13.2k", 0x40001, 0x20000, CRC(f24a5099) SHA1(408559057989a40ca298baa85d5fe7cbde72d2b8) )
 
-	ROM_REGION16_BE( 0x80000, "gfx3",0 ) /* tiles + tilemaps */ // same data, but split
+	ROM_REGION16_BE( 0x80000, "bg0",0 ) /* tiles + tilemaps */ // same data, but split
 	ROM_LOAD16_BYTE( "ftiger_3.10p", 0x00001, 0x20000, CRC(9fc12ebd) SHA1(c8f03a20da01bd61a27813564eb79bb2e8483f28) )
 	ROM_LOAD16_BYTE( "ftiger_5.10l", 0x00000, 0x20000, CRC(06c9dd2a) SHA1(20235b7d55b9bc73ddb1fec5fd68e5ba32508d1b) )
 	ROM_LOAD16_BYTE( "ftiger_4.11p", 0x40001, 0x20000, CRC(fb30e884) SHA1(1f01ed15ae6cdebb120cc1f03ac65465c824dc89) )
 	ROM_LOAD16_BYTE( "ftiger_6.11l", 0x40000, 0x20000, CRC(dfb85152) SHA1(03a07e016d400c1c0e7a59716c08a61e23e5d60f) )
 
-	ROM_REGION16_BE( 0x80000, "gfx4",0 ) /* tiles + tilemaps */ // same data, but split
+	ROM_REGION16_BE( 0x80000, "fg0",0 ) /* tiles + tilemaps */ // same data, but split
 	ROM_LOAD16_BYTE( "ftiger_8.11h", 0x00001, 0x20000, CRC(cbd8c22f) SHA1(e7e64c99990e99336abbdbd7ffadfa4c0f1a4c0f) )
 	ROM_LOAD16_BYTE( "ftiger_10.11f",0x00000, 0x20000, CRC(e2175f3b) SHA1(1ce17beb431bb3e8454bb1899f28d16c6a537183) )
 	ROM_LOAD16_BYTE( "ftiger_7.10h", 0x40001, 0x20000, CRC(be431c61) SHA1(3227912117700751370059c173e46d0a8367c5f8) )
@@ -2464,20 +2451,20 @@ ROM_START( sadari )
 	ROM_LOAD( "1.3d",         0x00000, 0x20000, CRC(bd953217) SHA1(6e230103ea01744761ab8a194d0dde6921bee92e) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound */
-	ROM_LOAD( "3.6r",         0x0000, 0x10000, CRC(4786fca6) SHA1(b2347e2f6bbe3dd9d1cc8d8a4af40e7997d5ab74) )
+	ROM_LOAD( "3.6r",         0x00000, 0x10000, CRC(4786fca6) SHA1(b2347e2f6bbe3dd9d1cc8d8a4af40e7997d5ab74) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )    /* chars */
-	ROM_LOAD( "2.4c",         0x0000, 0x20000, CRC(b2a3f1c6) SHA1(06f0038dc113c8001786157b9c9ee0eda76c2411) )
+	ROM_REGION( 0x20000, "tx", 0 )    /* chars */
+	ROM_LOAD( "2.4c",         0x00000, 0x20000, CRC(b2a3f1c6) SHA1(06f0038dc113c8001786157b9c9ee0eda76c2411) )
 
 	/* no sprites */
 
-	ROM_REGION16_BE( 0x80000, "gfx2", 0 )    /* tiles + tilemaps (together!) */
+	ROM_REGION16_BE( 0x80000, "bg0", 0 )    /* tiles + tilemaps (together!) */
 	ROM_LOAD16_BYTE( "10.10l",       0x00000, 0x20000, CRC(70269ab1) SHA1(055ff484da028f11bb3097652ef4713603870f89) )
 	ROM_LOAD16_BYTE( "5.8l",         0x00001, 0x20000, CRC(ceceb4c3) SHA1(db08bbe9d23eb50d5c0603893a6e0368e2b6bbba) )
 	ROM_LOAD16_BYTE( "9.10n",        0x40000, 0x20000, CRC(21bd1bda) SHA1(a5c9df8b45b05130374a83e45b3fb7cce76b58f8) )
 	ROM_LOAD16_BYTE( "4.8n",         0x40001, 0x20000, CRC(cd318ae5) SHA1(457ccaf1d841ff763878dca8e534b9738510899a) )
 
-	ROM_REGION16_BE( 0x80000, "gfx3", 0 )    /* tiles + tilemaps (together!) */
+	ROM_REGION16_BE( 0x80000, "fg0", 0 )    /* tiles + tilemaps (together!) */
 	ROM_LOAD16_BYTE( "11.10j",       0x00000, 0x20000, CRC(62a1d580) SHA1(4df60db9ad306a4d8776d10826e802cab27809f7) )
 	ROM_LOAD16_BYTE( "6.8j",         0x00001, 0x20000, CRC(c4b13ed7) SHA1(97a33d700a8372b0e4bb13e567afc5ef898e9351) )
 	ROM_LOAD16_BYTE( "12.10g",       0x40000, 0x20000, CRC(547b7645) SHA1(fdfe5cccdae1b88736aae702aa55fd642396ce01) )
@@ -2492,18 +2479,18 @@ ROM_START( gundl94 )
 	ROM_LOAD( "gd94_001.d3",  0x00000, 0x20000, CRC(3a5cc045) SHA1(182743458c36bb6254a39cf9a371fd2b0d72d145) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound */
-	ROM_LOAD( "gd94_003.r6",  0x0000, 0x10000, CRC(ea41c4ad) SHA1(e39e0507f4f370432ef0ca11dbecef176716cec4) )
+	ROM_LOAD( "gd94_003.r6",  0x00000, 0x10000, CRC(ea41c4ad) SHA1(e39e0507f4f370432ef0ca11dbecef176716cec4) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )    /* chars */
-	ROM_LOAD( "gd94_002.c5",  0x0000, 0x20000, CRC(8575e64b) SHA1(08ef8af655a354c30ee3fe587554e418903147f5) )
+	ROM_REGION( 0x20000, "tx", 0 )    /* chars */
+	ROM_LOAD( "gd94_002.c5",  0x00000, 0x20000, CRC(8575e64b) SHA1(08ef8af655a354c30ee3fe587554e418903147f5) )
 
 	/* no sprites */
 
-	ROM_REGION16_BE( 0x40000, "gfx2", 0 )    /* tiles + tilemaps (together!) */
+	ROM_REGION16_BE( 0x40000, "bg0", 0 )    /* tiles + tilemaps (together!) */
 	ROM_LOAD16_BYTE( "gd94_009.n9",  0x00000, 0x20000, CRC(40eabf55) SHA1(660f4318248001049369e1e715c7ff09d551c256) )
 	ROM_LOAD16_BYTE( "gd94_004.n7",  0x00001, 0x20000, CRC(0654abb9) SHA1(c0fcd8ba78db341f46acb523c670d053e3d82b16) )
 
-	ROM_REGION16_BE( 0x40000, "gfx3", 0 )    /* tiles + tilemaps (together!) */
+	ROM_REGION16_BE( 0x40000, "fg0", 0 )    /* tiles + tilemaps (together!) */
 	ROM_LOAD16_BYTE( "gd94_012.g9",  0x00000, 0x20000, CRC(117c693c) SHA1(e08bd6fbbae8ac657e6a1f9df36983ace941da3a) )
 	ROM_LOAD16_BYTE( "gd94_007.g7",  0x00001, 0x20000, CRC(96a72c6d) SHA1(b79a746fc114eb8977591f147e4ea4a4e4f14526) )
 
@@ -2514,7 +2501,7 @@ ROM_START( gundl94 )
 	ROM_LOAD( "gd94_011.j9",  0x00000, 0x20000, CRC(d8ad0208) SHA1(5df0f94ef86d7a03bde546e7aafdc0caf8a17076) )
 	ROM_RELOAD(               0x10000, 0x20000 )                /* banked at 0x8000-0xbfff */
 
-	ROM_REGION( 0x40000, "gfx4", 0 )    /* more tiles? they don't seem to belong to this game! */
+	ROM_REGION16_BE( 0x40000, "gfx4", 0 )    /* more tiles? they don't seem to belong to this game! */
 	ROM_LOAD16_BYTE( "gd94_006.j7",  0x00000, 0x20000, CRC(1d9536fe) SHA1(d72e66a529456c87217f9ba88f7f45aa2aa3e399) )
 	ROM_LOAD16_BYTE( "gd94_010.l7",  0x00001, 0x20000, CRC(4b74857f) SHA1(a4413369fdb165c0f12454592181675095f28145) )
 ROM_END
@@ -2524,18 +2511,18 @@ ROM_START( primella )
 	ROM_LOAD( "1_d3.bin",     0x00000, 0x20000, CRC(82fea4e0) SHA1(3603c0edda29868d5e282465880e1ad341365f6f) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound */
-	ROM_LOAD( "gd94_003.r6",  0x0000, 0x10000, CRC(ea41c4ad) SHA1(e39e0507f4f370432ef0ca11dbecef176716cec4) )
+	ROM_LOAD( "gd94_003.r6",  0x00000, 0x10000, CRC(ea41c4ad) SHA1(e39e0507f4f370432ef0ca11dbecef176716cec4) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )    /* chars */
-	ROM_LOAD( "gd94_002.c5",  0x0000, 0x20000, CRC(8575e64b) SHA1(08ef8af655a354c30ee3fe587554e418903147f5) )
+	ROM_REGION( 0x20000, "tx", 0 )    /* chars */
+	ROM_LOAD( "gd94_002.c5",  0x00000, 0x20000, CRC(8575e64b) SHA1(08ef8af655a354c30ee3fe587554e418903147f5) )
 
 	/* no sprites */
 
-	ROM_REGION16_BE( 0x40000, "gfx2", 0 )    /* tiles + tilemaps (together!) */
+	ROM_REGION16_BE( 0x40000, "bg0", 0 )    /* tiles + tilemaps (together!) */
 	ROM_LOAD16_BYTE( "7_n9.bin",     0x00000, 0x20000, CRC(20b6a574) SHA1(e180e8440bf2dc22c7d24707fc47d0c70433ecba) )
 	ROM_LOAD16_BYTE( "4_n7.bin",     0x00001, 0x20000, CRC(fe593666) SHA1(f511e4881f79de91c501b0026de2ac5b4a59f747) )
 
-	ROM_REGION16_BE( 0x40000, "gfx3", 0 )    /* tiles + tilemaps (together!) */
+	ROM_REGION16_BE( 0x40000, "fg0", 0 )    /* tiles + tilemaps (together!) */
 	ROM_LOAD16_BYTE( "8_g9.bin",     0x00000, 0x20000, CRC(542ecb83) SHA1(0a4decaad9dde4681f7b6cdab0ae0e4951efc83d) )
 	ROM_LOAD16_BYTE( "5_g7.bin",     0x00001, 0x20000, CRC(058ecac6) SHA1(12f70f78b882b6ce08c56f6fa9a1211c3464bf9d) )
 
@@ -2613,23 +2600,27 @@ ROM_START( superx )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound */
 	ROM_LOAD( "1.5u",     0x0000, 0x10000, CRC(6894ce05) SHA1(9726fc3f1e9bebecf498c208ab03007f34936632) )
 
-	ROM_REGION16_BE( 0x200000, "gfx1", 0 )   /* sprite */
-	ROM_LOAD16_WORD_SWAP( "spxo-m05.10m",    0x00000, 0x200000, CRC(9120dd84) SHA1(bcf1fdc860d51b9bcfec1e84940ef21dfc41b5dc) )
+	ROM_REGION16_BE( 0x200000, "sprite", 0 )   /* sprite */
+	ROM_LOAD16_WORD_SWAP( "spxo-m05.10m",   0x00000, 0x200000, CRC(9120dd84) SHA1(bcf1fdc860d51b9bcfec1e84940ef21dfc41b5dc) )
 
-	ROM_REGION16_BE( 0x100000, "gfx2", 0 )   /* tiles + tilemaps (together!) */
+	ROM_REGION16_BE( 0x100000, "fg1", 0 )   /* tiles + tilemaps (together!) */
 	ROM_LOAD16_WORD_SWAP( "spxb-m04.8f",    0x00000, 0x100000, CRC(91a7ac6e) SHA1(b7fb79c2e4f5eecb7128b86ee2b1070eed905d2a) ) // bomb
+	// 0x00000-0x3ffff tilemap infos
 
-	ROM_REGION16_BE( 0x100000, "gfx3", 0 )   /* tiles + tilemaps (together!) */
+	ROM_REGION16_BE( 0x100000, "fg0", 0 )   /* tiles + tilemaps (together!) */
 	ROM_LOAD16_WORD_SWAP( "spxb-m03.8j",    0x00000, 0x100000, CRC(8b42861b) SHA1(6eb1f6bfe0b8e987e624a6fe7e025c6918804cf9) ) // title logo
+	// 0x00000-0x3ffff tilemap infos
 
-	ROM_REGION16_BE( 0x100000, "gfx4", 0 )   /* tiles + tilemaps (together!) */
-	ROM_LOAD16_WORD_SWAP( "spxb-m02.8a",    0x00000, 0x100000, CRC(21b8db78) SHA1(e7c51c9566ebce5b5db5af48f33e2194b518715f)) // title screen upper background
+	ROM_REGION16_BE( 0x100000, "bg1", 0 )   /* tiles + tilemaps (together!) */
+	ROM_LOAD16_WORD_SWAP( "spxb-m02.8a",    0x00000, 0x100000, CRC(21b8db78) SHA1(e7c51c9566ebce5b5db5af48f33e2194b518715f) ) // title screen upper background
+	// 0x00000-0x3ffff tilemap infos
 
-	ROM_REGION16_BE( 0x100000, "gfx5", 0 )   /* tiles + tilemaps (together!) */
+	ROM_REGION16_BE( 0x100000, "bg0", 0 )   /* tiles + tilemaps (together!) */
 	ROM_LOAD16_WORD_SWAP( "spxb-m01.8c",    0x00000, 0x100000, CRC(60c69129) SHA1(6871b08e354c7cf5fb16b0ed4562c537e2ce9194) ) // title screen lower background
+	// 0x00000-0x3ffff tilemap infos
 
-	ROM_REGION( 0x80000, "gfx6", 0 )    /* top 4 bits of tilemaps */
-	ROM_LOAD( "spxb-ms3.10f",    0x00000, 0x20000, CRC(8bf8c77d) SHA1(a89e50bd571e754cb56a17fe4ada6a804e74520b)) // bomb
+	ROM_REGION( 0x80000, "tmap_hi", 0 )    /* top 4 bits of tilemaps */
+	ROM_LOAD( "spxb-ms3.10f",    0x00000, 0x20000, CRC(8bf8c77d) SHA1(a89e50bd571e754cb56a17fe4ada6a804e74520b) ) // bomb
 	ROM_LOAD( "spxb-ms4.10j",    0x20000, 0x20000, CRC(d418a900) SHA1(0d69afa48d3072c7fecfc5d6dd63717b9f61c0fc) ) // title logo
 	ROM_LOAD( "spxb-ms2.10a",    0x40000, 0x20000, CRC(5ec87adf) SHA1(cdd0864ea23b2c6d8ace519fc66e77f59813e206) ) // title screen upper background
 	ROM_LOAD( "spxb-ms1.10c",    0x60000, 0x20000, CRC(40b4fe6c) SHA1(5ab63ce83522c32039ee33c59e713d2fb37aac44) ) // title screen lower background
@@ -2648,23 +2639,27 @@ ROM_START( superxm )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound */
 	ROM_LOAD( "1_m.5u",     0x0000, 0x10000,  CRC(319fa632) SHA1(b621ad080e8cf6611fc88d8fc2af5aa4e31e9e01) )
 
-	ROM_REGION16_BE( 0x200000, "gfx1", 0 )   /* sprite */
-	ROM_LOAD16_WORD_SWAP( "spxo-m05.10m",    0x00000, 0x200000, CRC(9120dd84) SHA1(bcf1fdc860d51b9bcfec1e84940ef21dfc41b5dc) )
+	ROM_REGION16_BE( 0x200000, "sprite", 0 )   /* sprite */
+	ROM_LOAD16_WORD_SWAP( "spxo-m05.10m",   0x00000, 0x200000, CRC(9120dd84) SHA1(bcf1fdc860d51b9bcfec1e84940ef21dfc41b5dc) )
 
-	ROM_REGION16_BE( 0x100000, "gfx2", 0 )   /* tiles + tilemaps (together!) */
+	ROM_REGION16_BE( 0x100000, "fg1", 0 )   /* tiles + tilemaps (together!) */
 	ROM_LOAD16_WORD_SWAP( "spxb-m04.8f",    0x00000, 0x100000, CRC(91a7ac6e) SHA1(b7fb79c2e4f5eecb7128b86ee2b1070eed905d2a) ) // bomb
+	// 0x00000-0x3ffff tilemap infos
 
-	ROM_REGION16_BE( 0x100000, "gfx3", 0 )   /* tiles + tilemaps (together!) */
+	ROM_REGION16_BE( 0x100000, "fg0", 0 )   /* tiles + tilemaps (together!) */
 	ROM_LOAD16_WORD_SWAP( "spxb-m03.8j",    0x00000, 0x100000, CRC(8b42861b) SHA1(6eb1f6bfe0b8e987e624a6fe7e025c6918804cf9) ) // title logo
+	// 0x00000-0x3ffff tilemap infos
 
-	ROM_REGION16_BE( 0x100000, "gfx4", 0 )   /* tiles + tilemaps (together!) */
-	ROM_LOAD16_WORD_SWAP( "spxb-m02.8a",    0x00000, 0x100000, CRC(21b8db78) SHA1(e7c51c9566ebce5b5db5af48f33e2194b518715f)) // title screen upper background
+	ROM_REGION16_BE( 0x100000, "bg1", 0 )   /* tiles + tilemaps (together!) */
+	ROM_LOAD16_WORD_SWAP( "spxb-m02.8a",    0x00000, 0x100000, CRC(21b8db78) SHA1(e7c51c9566ebce5b5db5af48f33e2194b518715f) ) // title screen upper background
+	// 0x00000-0x3ffff tilemap infos
 
-	ROM_REGION16_BE( 0x100000, "gfx5", 0 )   /* tiles + tilemaps (together!) */
+	ROM_REGION16_BE( 0x100000, "bg0", 0 )   /* tiles + tilemaps (together!) */
 	ROM_LOAD16_WORD_SWAP( "spxb-m01.8c",    0x00000, 0x100000, CRC(60c69129) SHA1(6871b08e354c7cf5fb16b0ed4562c537e2ce9194) ) // title screen lower background
+	// 0x00000-0x3ffff tilemap infos
 
-	ROM_REGION( 0x80000, "gfx6", 0 )    /* top 4 bits of tilemaps */
-	ROM_LOAD( "spxb-ms3.10f",    0x00000, 0x20000, CRC(8bf8c77d) SHA1(a89e50bd571e754cb56a17fe4ada6a804e74520b)) // bomb
+	ROM_REGION( 0x80000, "tmap_hi", 0 )    /* top 4 bits of tilemaps */
+	ROM_LOAD( "spxb-ms3.10f",    0x00000, 0x20000, CRC(8bf8c77d) SHA1(a89e50bd571e754cb56a17fe4ada6a804e74520b) ) // bomb
 	ROM_LOAD( "spxb-ms4.10j",    0x20000, 0x20000, CRC(d418a900) SHA1(0d69afa48d3072c7fecfc5d6dd63717b9f61c0fc) ) // title logo
 	ROM_LOAD( "spxb-ms2.10a",    0x40000, 0x20000, CRC(5ec87adf) SHA1(cdd0864ea23b2c6d8ace519fc66e77f59813e206) ) // title screen upper background
 	ROM_LOAD( "spxb-ms1.10c",    0x60000, 0x20000, CRC(40b4fe6c) SHA1(5ab63ce83522c32039ee33c59e713d2fb37aac44) ) // title screen lower background
@@ -2682,29 +2677,29 @@ ROM_START( rshark )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound */
 	ROM_LOAD( "rse3.bin",     0x0000, 0x10000, CRC(03c8fd17) SHA1(d59a3d8b731484572384a9d6f24ef4cd200ef661) )
 
-	ROM_REGION16_BE( 0x200000, "gfx1", 0 )   /* sprite */
+	ROM_REGION16_BE( 0x200000, "sprite", 0 )   /* sprite */
 	ROM_LOAD16_BYTE( "rse4.bin",     0x000000, 0x80000, CRC(b857e411) SHA1(14a8883243f3f1ee661395cbcce7d5d3c08caef8) )
 	ROM_LOAD16_BYTE( "rse5.bin",     0x000001, 0x80000, CRC(7822d77a) SHA1(25d34b508a25ab8052d3f73eeb60c7b9e6610db6) )
 	ROM_LOAD16_BYTE( "rse6.bin",     0x100000, 0x80000, CRC(80215c52) SHA1(6138804fc2f81cf1366cc1bcca7572e45845ca8a) )
 	ROM_LOAD16_BYTE( "rse7.bin",     0x100001, 0x80000, CRC(bd28bbdc) SHA1(b09ce8b21a08d129703f95b6fe9361e7f6614ee3) )
 
-	ROM_REGION16_BE( 0x100000, "gfx2", 0 )   /* tiles + tilemaps (together!) */
-	ROM_LOAD16_BYTE( "rse11.bin",    0x00000, 0x80000, CRC(8a0c572f) SHA1(218c4e4aeacedf459c6c08cc47dd2154b7dd4279) )
+	ROM_REGION16_BE( 0x100000, "fg1", 0 )   /* tiles + tilemaps (together!) */
+	ROM_LOAD16_BYTE( "rse11.bin",    0x00000, 0x80000, CRC(8a0c572f) SHA1(218c4e4aeacedf459c6c08cc47dd2154b7dd4279) ) // 0x00000-0x3ffff tilemap infos
 	ROM_LOAD16_BYTE( "rse10.bin",    0x00001, 0x80000, CRC(139d5947) SHA1(e371f27091924c605962f0a88d9f1f3deb0c954e) )
 
-	ROM_REGION16_BE( 0x100000, "gfx3", 0 )   /* tiles + tilemaps (together!) */
-	ROM_LOAD16_BYTE( "rse15.bin",    0x00000, 0x80000, CRC(d188134d) SHA1(b0711657ad87166330b471fa449e95d63939b223) )
+	ROM_REGION16_BE( 0x100000, "fg0", 0 )   /* tiles + tilemaps (together!) */
+	ROM_LOAD16_BYTE( "rse15.bin",    0x00000, 0x80000, CRC(d188134d) SHA1(b0711657ad87166330b471fa449e95d63939b223) ) // 0x00000-0x3ffff tilemap infos
 	ROM_LOAD16_BYTE( "rse14.bin",    0x00001, 0x80000, CRC(0ef637a7) SHA1(827867831f751a5ed4022932b755e128fb5886b6) )
 
-	ROM_REGION16_BE( 0x100000, "gfx4", 0 )   /* tiles + tilemaps (together!) */
-	ROM_LOAD16_BYTE( "rse17.bin",    0x00000, 0x80000, CRC(7ff0f3c7) SHA1(033722dbf69745676b71f7002b413abd3c7bdf3c) )
+	ROM_REGION16_BE( 0x100000, "bg1", 0 )   /* tiles + tilemaps (together!) */
+	ROM_LOAD16_BYTE( "rse17.bin",    0x00000, 0x80000, CRC(7ff0f3c7) SHA1(033722dbf69745676b71f7002b413abd3c7bdf3c) ) // 0x00000-0x3ffff tilemap infos
 	ROM_LOAD16_BYTE( "rse16.bin",    0x00001, 0x80000, CRC(c176c8bc) SHA1(98ef043befd2e067012d24299196964a0957b2ea) )
 
-	ROM_REGION16_BE( 0x100000, "gfx5", 0 )   /* tiles + tilemaps (together!) */
-	ROM_LOAD16_BYTE( "rse21.bin",    0x00000, 0x80000, CRC(2ea665af) SHA1(67445e525016c0873bc2d831230f908388dabd4d) )
+	ROM_REGION16_BE( 0x100000, "bg0", 0 )   /* tiles + tilemaps (together!) */
+	ROM_LOAD16_BYTE( "rse21.bin",    0x00000, 0x80000, CRC(2ea665af) SHA1(67445e525016c0873bc2d831230f908388dabd4d) ) // 0x00000-0x3ffff tilemap infos
 	ROM_LOAD16_BYTE( "rse20.bin",    0x00001, 0x80000, CRC(ef93e3ac) SHA1(397afe70c8039eb073589353bd5a9f469e8a6776) )
 
-	ROM_REGION( 0x80000, "gfx6", 0 )    /* top 4 bits of tilemaps */
+	ROM_REGION( 0x80000, "tmap_hi", 0 )    /* top 4 bits of tilemaps */
 	ROM_LOAD( "rse12.bin",    0x00000, 0x20000, CRC(fadbf947) SHA1(0d752c2499adca883f281aed95356a7fbf78fe5f) )
 	ROM_LOAD( "rse13.bin",    0x20000, 0x20000, CRC(323d4df6) SHA1(9ea0b84f7f565c7ca33335d286e8d4f812b216f2) )
 	ROM_LOAD( "rse18.bin",    0x40000, 0x20000, CRC(e00c9171) SHA1(10365ddbf4d60e99758ff0bb5042648c5f0f9c34) )
@@ -2763,16 +2758,16 @@ ROM_START( popbingo )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound */
 	ROM_LOAD( "rom1.3p",     0x0000, 0x10000, CRC(46e8d2c4) SHA1(a6fb55766e0bad321ac03977f33d3000ab7ab295) )
 
-	ROM_REGION16_BE( 0x100000, "gfx1", 0 )   /* sprite */
+	ROM_REGION16_BE( 0x100000, "sprite", 0 )   /* sprite */
 	ROM_LOAD16_BYTE( "rom5.9m",   0x00000, 0x80000, CRC(e8d73e07) SHA1(4ed647eaa6b32b9f159fc49d30962ad20f97b245) )
 	ROM_LOAD16_BYTE( "rom6.9l",   0x00001, 0x80000, CRC(c3db3975) SHA1(bb085c9339d640585b18992dc8b861870920559a) )
 
-	ROM_REGION16_BE( 0x100000, "gfx2", 0 )   /* tiles + tilemaps (together!) */
-	ROM_LOAD16_BYTE( "rom10.9a",  0x00000, 0x80000, CRC(135ab90a) SHA1(5911923ccf579edd0bf3449945a434fbf37b51aa) )
+	ROM_REGION16_BE( 0x100000, "bg0", 0 )   /* tiles + tilemaps (together!) */
+	ROM_LOAD16_BYTE( "rom10.9a",  0x00000, 0x80000, CRC(135ab90a) SHA1(5911923ccf579edd0bf3449945a434fbf37b51aa) ) // 0x00000-0x07fff Tilemap infos
 	ROM_LOAD16_BYTE( "rom9.9c",   0x00001, 0x80000, CRC(c9d90007) SHA1(ad457ef297797dcb9bb8dc1725fa207cd57eedfe) )
 
-	ROM_REGION16_BE( 0x100000, "gfx3", 0 )   /* tiles + tilemaps (together!) */
-	ROM_LOAD16_BYTE( "rom7.9h",   0x00000, 0x80000, CRC(b2b4c13b) SHA1(37ddc9751860a85b809782c5cec4418bca71412c) )
+	ROM_REGION16_BE( 0x100000, "bg1", 0 )   /* tiles + tilemaps (together!) */
+	ROM_LOAD16_BYTE( "rom7.9h",   0x00000, 0x80000, CRC(b2b4c13b) SHA1(37ddc9751860a85b809782c5cec4418bca71412c) ) // 0x00000-0x07fff Tilemap infos
 	ROM_LOAD16_BYTE( "rom8.9e",   0x00001, 0x80000, CRC(66c4b00f) SHA1(ed416ec594fe065c0f169008fb8ce553813f6260) )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* OKI6295 samples */
@@ -2787,35 +2782,35 @@ ROM_END
 
 /* The differences between the two lastday sets are only in the sound program and graphics. The main program is the same. */
 
-GAME( 1990, lastday,  0,        lastday,  lastday,  dooyong_z80_ym2203_state, 0, ROT270, "Dooyong",                       "The Last Day (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, lastdaya, lastday,  lastday,  lastday,  dooyong_z80_ym2203_state, 0, ROT270, "Dooyong",                       "The Last Day (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ddaydoo,  lastday,  lastday,  lastday,  dooyong_z80_ym2203_state, 0, ROT270, "Dooyong",                       "Chulgyeok D-Day (Korea)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, lastday,   0,        lastday,  lastday,  dooyong_z80_ym2203_state, empty_init, ROT270, "Dooyong",                       "The Last Day (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, lastdaya,  lastday,  lastday,  lastday,  dooyong_z80_ym2203_state, empty_init, ROT270, "Dooyong",                       "The Last Day (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ddaydoo,   lastday,  lastday,  lastday,  dooyong_z80_ym2203_state, empty_init, ROT270, "Dooyong",                       "Chulgyeok D-Day (Korea)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, gulfstrm, 0,        gulfstrm, gulfstrm, dooyong_z80_ym2203_state, 0, ROT270, "Dooyong",                       "Gulf Storm (set 1)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1991, gulfstrma,gulfstrm, gulfstrm, gulfstrm, dooyong_z80_ym2203_state, 0, ROT270, "Dooyong",                       "Gulf Storm (set 2)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1991, gulfstrmb,gulfstrm, gulfstrm, gulfstrm, dooyong_z80_ym2203_state, 0, ROT270, "Dooyong",                       "Gulf Storm (set 3)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1991, gulfstrmm,gulfstrm, gulfstrm, gulfstrm, dooyong_z80_ym2203_state, 0, ROT270, "Dooyong (Media Shoji license)", "Gulf Storm (Media Shoji)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1991, gulfstrmk,gulfstrm, gulfstrm, gulfstrm, dooyong_z80_ym2203_state, 0, ROT270, "Dooyong",                       "Gulf Storm (Korea)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1991, gulfstrm,  0,        gulfstrm, gulfstrm, dooyong_z80_ym2203_state, empty_init, ROT270, "Dooyong",                       "Gulf Storm (set 1)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1991, gulfstrma, gulfstrm, gulfstrm, gulfstrm, dooyong_z80_ym2203_state, empty_init, ROT270, "Dooyong",                       "Gulf Storm (set 2)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1991, gulfstrmb, gulfstrm, gulfstrm, gulfstrm, dooyong_z80_ym2203_state, empty_init, ROT270, "Dooyong",                       "Gulf Storm (set 3)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1991, gulfstrmm, gulfstrm, gulfstrm, gulfstrm, dooyong_z80_ym2203_state, empty_init, ROT270, "Dooyong (Media Shoji license)", "Gulf Storm (Japan, Media Shoji license)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1991, gulfstrmk, gulfstrm, gulfstrm, gulfstrm, dooyong_z80_ym2203_state, empty_init, ROT270, "Dooyong",                       "Gulf Storm (Korea)",        MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, pollux,   0,        pollux,   pollux,   dooyong_z80_ym2203_state, 0, ROT270, "Dooyong",                       "Pollux (set 1)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1991, polluxa,  pollux,   pollux,   pollux,   dooyong_z80_ym2203_state, 0, ROT270, "Dooyong",                       "Pollux (set 2)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1991, polluxa2, pollux,   pollux,   pollux,   dooyong_z80_ym2203_state, 0, ROT270, "Dooyong",                       "Pollux (set 3)",       MACHINE_SUPPORTS_SAVE ) // Original Dooyong Board distributed by TCH
-GAME( 1991, polluxn,  pollux,   pollux,   pollux,   dooyong_z80_ym2203_state, 0, ROT270, "Dooyong (NTC / Atlus license)", "Pollux (Japan, NTC license, distributed by Atlus)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, pollux,    0,        pollux,   pollux,   dooyong_z80_ym2203_state, empty_init, ROT270, "Dooyong",                       "Pollux (set 1)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1991, polluxa,   pollux,   pollux,   pollux,   dooyong_z80_ym2203_state, empty_init, ROT270, "Dooyong",                       "Pollux (set 2)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1991, polluxa2,  pollux,   pollux,   pollux,   dooyong_z80_ym2203_state, empty_init, ROT270, "Dooyong",                       "Pollux (set 3)",       MACHINE_SUPPORTS_SAVE ) // Original Dooyong Board distributed by TCH
+GAME( 1991, polluxn,   pollux,   pollux,   pollux,   dooyong_z80_ym2203_state, empty_init, ROT270, "Dooyong (NTC / Atlus license)", "Pollux (Japan, NTC license, distributed by Atlus)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1992, flytiger, 0,        flytiger, flytiger, dooyong_z80_state,        0, ROT270, "Dooyong",                       "Flying Tiger (set 1)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1992, flytigera,flytiger, flytiger, flytiger, dooyong_z80_state,        0, ROT270, "Dooyong",                       "Flying Tiger (set 2)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1992, flytiger,  0,        flytiger, flytiger, dooyong_z80_state,        empty_init, ROT270, "Dooyong",                       "Flying Tiger (set 1)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1992, flytigera, flytiger, flytiger, flytiger, dooyong_z80_state,        empty_init, ROT270, "Dooyong",                       "Flying Tiger (set 2)",         MACHINE_SUPPORTS_SAVE )
 
-GAME( 1993, bluehawk, 0,        bluehawk, bluehawk, dooyong_z80_state,        0, ROT270, "Dooyong",                       "Blue Hawk",            MACHINE_SUPPORTS_SAVE )
-GAME( 1993, bluehawkn,bluehawk, bluehawk, bluehawk, dooyong_z80_state,        0, ROT270, "Dooyong (NTC license)",         "Blue Hawk (NTC)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1993, bluehawk,  0,        bluehawk, bluehawk, dooyong_z80_state,        empty_init, ROT270, "Dooyong",                       "Blue Hawk",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1993, bluehawkn, bluehawk, bluehawk, bluehawk, dooyong_z80_state,        empty_init, ROT270, "Dooyong (NTC license)",         "Blue Hawk (Japan, NTC license)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1993, sadari,   0,        primella, sadari,   dooyong_z80_state,        0, ROT0,   "Dooyong (NTC license)",         "Sadari",  MACHINE_SUPPORTS_SAVE )
+GAME( 1993, sadari,    0,        primella, sadari,   dooyong_z80_state,        empty_init, ROT0,   "Dooyong (NTC license)",         "Sadari (Japan, NTC license)",  MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, gundl94,  0,        primella, primella, dooyong_z80_state,        0, ROT0,   "Dooyong",                       "Gun Dealer '94",       MACHINE_SUPPORTS_SAVE )
-GAME( 1994, primella, gundl94,  primella, primella, dooyong_z80_state,        0, ROT0,   "Dooyong (NTC license)",         "Primella",             MACHINE_SUPPORTS_SAVE )
+GAME( 1994, gundl94,   0,        primella, primella, dooyong_z80_state,        empty_init, ROT0,   "Dooyong",                       "Gun Dealer '94",                MACHINE_SUPPORTS_SAVE )
+GAME( 1994, primella,  gundl94,  primella, primella, dooyong_z80_state,        empty_init, ROT0,   "Dooyong (NTC license)",         "Primella (Japan, NTC license)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, superx,   0,        superx,   superx,   rshark_state,             0, ROT270, "Dooyong (NTC license)",         "Super-X (NTC)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1994, superxm,  superx,   superx,   superx,   rshark_state,             0, ROT270, "Dooyong (Mitchell license)",    "Super-X (Mitchell)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, superx,    0,        superx,   superx,   rshark_state,             empty_init, ROT270, "Dooyong (NTC license)",         "Super-X (NTC)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1994, superxm,   superx,   superx,   superx,   rshark_state,             empty_init, ROT270, "Dooyong (Mitchell license)",    "Super-X (Mitchell)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1995, rshark,   0,        rshark,   rshark,   rshark_state,             0, ROT270, "Dooyong",                       "R-Shark",              MACHINE_SUPPORTS_SAVE )
+GAME( 1995, rshark,    0,        rshark,   rshark,   rshark_state,             empty_init, ROT270, "Dooyong",                       "R-Shark",              MACHINE_SUPPORTS_SAVE )
 
-GAME( 1996, popbingo, 0,        popbingo, popbingo, popbingo_state,           0, ROT0,   "Dooyong",                       "Pop Bingo",            MACHINE_SUPPORTS_SAVE )
+GAME( 1996, popbingo,  0,        popbingo, popbingo, popbingo_state,           empty_init, ROT0,   "Dooyong",                       "Pop Bingo",            MACHINE_SUPPORTS_SAVE )

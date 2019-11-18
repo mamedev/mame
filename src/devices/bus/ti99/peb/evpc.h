@@ -32,11 +32,11 @@ class snug_enhanced_video_device : public device_t, public device_ti99_peribox_c
 public:
 	snug_enhanced_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	DECLARE_READ8Z_MEMBER(readz) override;
-	DECLARE_WRITE8_MEMBER(write) override;
+	void write(offs_t offset, uint8_t data) override;
 	DECLARE_SETADDRESS_DBIN_MEMBER(setaddress_dbin) override;
 
 	DECLARE_READ8Z_MEMBER(crureadz) override;
-	DECLARE_WRITE8_MEMBER(cruwrite) override;
+	void cruwrite(offs_t offset, uint8_t data) override;
 
 	TIMER_DEVICE_CALLBACK_MEMBER( hblank_interrupt );
 
@@ -85,8 +85,8 @@ private:
 	evpc_palette                            m_palette;
 	required_device<v9938_device>           m_video;
 	required_device<sn76496_base_device>    m_sound;
-	required_device<bus::ti99::colorbus::ti99_colorbus_device>   m_colorbus;
-	bus::ti99::internal::evpc_clock_connector*                   m_console_conn;
+	required_device<bus::ti99::colorbus::v9938_colorbus_device>   m_colorbus;
+	optional_device<bus::ti99::internal::evpc_clock_connector>   m_console_conn;
 };
 
 } } } // end namespace bus::ti99::peb

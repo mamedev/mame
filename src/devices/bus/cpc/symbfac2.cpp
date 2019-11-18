@@ -30,17 +30,17 @@ DEFINE_DEVICE_TYPE(CPC_SYMBIFACE2, cpc_symbiface2_device, "cpc_symf2", "SYMBiFAC
 
 static INPUT_PORTS_START(cpc_symbiface2)
 	PORT_START("sf2_mouse_x")
-	PORT_BIT(0x3f , 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(50) PORT_KEYDELTA(0) PORT_REVERSE PORT_PLAYER(1) PORT_CODE(MOUSECODE_X) PORT_CHANGED_MEMBER(DEVICE_SELF,cpc_symbiface2_device,mouse_change_x,nullptr)
+	PORT_BIT(0x3f , 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(50) PORT_KEYDELTA(0) PORT_REVERSE PORT_PLAYER(1) PORT_CODE(MOUSECODE_X) PORT_CHANGED_MEMBER(DEVICE_SELF,cpc_symbiface2_device,mouse_change_x,0)
 
 	PORT_START("sf2_mouse_y")
-	PORT_BIT(0x3f , 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(50) PORT_KEYDELTA(0) PORT_PLAYER(1) PORT_CODE(MOUSECODE_Y) PORT_CHANGED_MEMBER(DEVICE_SELF,cpc_symbiface2_device,mouse_change_x,nullptr)
+	PORT_BIT(0x3f , 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(50) PORT_KEYDELTA(0) PORT_PLAYER(1) PORT_CODE(MOUSECODE_Y) PORT_CHANGED_MEMBER(DEVICE_SELF,cpc_symbiface2_device,mouse_change_x,0)
 
 	PORT_START("sf2_mouse_buttons")
-	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("PS/2 Mouse left button") PORT_CODE(MOUSECODE_BUTTON1) PORT_CHANGED_MEMBER(DEVICE_SELF,cpc_symbiface2_device,mouse_change_x,nullptr)
-	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("PS/2 Mouse right button") PORT_CODE(MOUSECODE_BUTTON3) PORT_CHANGED_MEMBER(DEVICE_SELF,cpc_symbiface2_device,mouse_change_x,nullptr)
-	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("PS/2 Mouse middle button") PORT_CODE(MOUSECODE_BUTTON2) PORT_CHANGED_MEMBER(DEVICE_SELF,cpc_symbiface2_device,mouse_change_x,nullptr)
-	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("PS/2 Mouse back button") PORT_CODE(MOUSECODE_BUTTON4) PORT_CHANGED_MEMBER(DEVICE_SELF,cpc_symbiface2_device,mouse_change_x,nullptr)
-	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("PS/2 Mouse forward button") PORT_CODE(MOUSECODE_BUTTON5) PORT_CHANGED_MEMBER(DEVICE_SELF,cpc_symbiface2_device,mouse_change_x,nullptr)
+	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("PS/2 Mouse left button") PORT_CODE(MOUSECODE_BUTTON1) PORT_CHANGED_MEMBER(DEVICE_SELF,cpc_symbiface2_device,mouse_change_x,0)
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("PS/2 Mouse right button") PORT_CODE(MOUSECODE_BUTTON3) PORT_CHANGED_MEMBER(DEVICE_SELF,cpc_symbiface2_device,mouse_change_x,0)
+	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("PS/2 Mouse middle button") PORT_CODE(MOUSECODE_BUTTON2) PORT_CHANGED_MEMBER(DEVICE_SELF,cpc_symbiface2_device,mouse_change_x,0)
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("PS/2 Mouse back button") PORT_CODE(MOUSECODE_BUTTON4) PORT_CHANGED_MEMBER(DEVICE_SELF,cpc_symbiface2_device,mouse_change_x,0)
+	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("PS/2 Mouse forward button") PORT_CODE(MOUSECODE_BUTTON5) PORT_CHANGED_MEMBER(DEVICE_SELF,cpc_symbiface2_device,mouse_change_x,0)
 
 	// TODO: mouse scroll wheel support
 //  PORT_START("sf2_mouse_scroll")
@@ -51,12 +51,13 @@ static INPUT_PORTS_START(cpc_symbiface2)
 INPUT_PORTS_END
 
 // device machine config
-MACHINE_CONFIG_START(cpc_symbiface2_device::device_add_mconfig)
-	MCFG_ATA_INTERFACE_ADD("ide", ata_devices, "hdd", nullptr, false)
-	MCFG_DS12885_ADD("rtc")
-	MCFG_NVRAM_ADD_1FILL("nvram")
+void cpc_symbiface2_device::device_add_mconfig(machine_config &config)
+{
+	ATA_INTERFACE(config, m_ide).options(ata_devices, "hdd", nullptr, false);
+	DS12885(config, m_rtc, XTAL(32'768));
+	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_1);
 	// no pass-through
-MACHINE_CONFIG_END
+}
 
 ioport_constructor cpc_symbiface2_device::device_input_ports() const
 {
@@ -87,16 +88,13 @@ cpc_symbiface2_device::cpc_symbiface2_device(const machine_config &mconfig, cons
 
 void cpc_symbiface2_device::device_start()
 {
-	device_t* cpu = machine().device("maincpu");
-	address_space& space = cpu->memory().space(AS_IO);
-
 	m_slot = dynamic_cast<cpc_expansion_slot_device *>(owner());
-
-	space.install_readwrite_handler(0xfd00,0xfd07,read8_delegate(FUNC(cpc_symbiface2_device::ide_cs1_r),this),write8_delegate(FUNC(cpc_symbiface2_device::ide_cs1_w),this));
-	space.install_readwrite_handler(0xfd08,0xfd0f,read8_delegate(FUNC(cpc_symbiface2_device::ide_cs0_r),this),write8_delegate(FUNC(cpc_symbiface2_device::ide_cs0_w),this));
-	space.install_read_handler(0xfd10,0xfd10,read8_delegate(FUNC(cpc_symbiface2_device::mouse_r),this));
-	space.install_readwrite_handler(0xfd14,0xfd15,read8_delegate(FUNC(cpc_symbiface2_device::rtc_r),this),write8_delegate(FUNC(cpc_symbiface2_device::rtc_w),this));
-	space.install_readwrite_handler(0xfd17,0xfd17,read8_delegate(FUNC(cpc_symbiface2_device::rom_rewrite_r),this),write8_delegate(FUNC(cpc_symbiface2_device::rom_rewrite_w),this));
+	address_space &space = m_slot->cpu().space(AS_IO);
+	space.install_readwrite_handler(0xfd00,0xfd07, read8_delegate(*this, FUNC(cpc_symbiface2_device::ide_cs1_r)), write8_delegate(*this, FUNC(cpc_symbiface2_device::ide_cs1_w)));
+	space.install_readwrite_handler(0xfd08,0xfd0f, read8_delegate(*this, FUNC(cpc_symbiface2_device::ide_cs0_r)), write8_delegate(*this, FUNC(cpc_symbiface2_device::ide_cs0_w)));
+	space.install_read_handler(0xfd10,0xfd10, read8_delegate(*this, FUNC(cpc_symbiface2_device::mouse_r)));
+	space.install_readwrite_handler(0xfd14,0xfd15, read8_delegate(*this, FUNC(cpc_symbiface2_device::rtc_r)), write8_delegate(*this, FUNC(cpc_symbiface2_device::rtc_w)));
+	space.install_readwrite_handler(0xfd17,0xfd17, read8_delegate(*this, FUNC(cpc_symbiface2_device::rom_rewrite_r)), write8_delegate(*this, FUNC(cpc_symbiface2_device::rom_rewrite_w)));
 
 	// set up ROM space (these can be writable, when mapped to &4000, or completely disabled, allowing the built-in ROMs to be visible)
 	// 32 banks of 16kB (512kB)
@@ -163,27 +161,12 @@ WRITE8_MEMBER(cpc_symbiface2_device::ide_cs1_w)
 // #FD14 (read/write) read from or write into selected register
 READ8_MEMBER(cpc_symbiface2_device::rtc_r)
 {
-	switch(offset & 0x01)
-	{
-	case 0x00:
-		return m_rtc->read(space,1);
-	case 0x01:
-		return m_rtc->read(space,0);
-	}
-	return 0;
+	return m_rtc->read(~offset & 0x01);
 }
 
 WRITE8_MEMBER(cpc_symbiface2_device::rtc_w)
 {
-	switch(offset & 0x01)
-	{
-	case 0x00:
-		m_rtc->write(space,1,data);
-		break;
-	case 0x01:
-		m_rtc->write(space,0,data);
-		break;
-	}
+	m_rtc->write(~offset & 0x01, data);
 }
 
 // PS/2 Mouse connector

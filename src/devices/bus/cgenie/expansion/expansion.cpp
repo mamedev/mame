@@ -29,9 +29,9 @@ DEFINE_DEVICE_TYPE(CG_EXP_SLOT, cg_exp_slot_device, "cg_exp_slot", "Colour Genie
 
 cg_exp_slot_device::cg_exp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, CG_EXP_SLOT, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
-	m_program(nullptr),
-	m_io(nullptr),
+	device_single_card_slot_interface<device_cg_exp_interface>(mconfig, *this),
+	m_program(*this, finder_base::DUMMY_TAG, -1),
+	m_io(*this, finder_base::DUMMY_TAG, -1),
 	m_cart(nullptr),
 	m_int_handler(*this),
 	m_nmi_handler(*this),
@@ -59,32 +59,6 @@ void cg_exp_slot_device::device_start()
 	m_reset_handler.resolve_safe();
 }
 
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void cg_exp_slot_device::device_reset()
-{
-}
-
-//-------------------------------------------------
-//  set_program_space - set address space we are attached to
-//-------------------------------------------------
-
-void cg_exp_slot_device::set_program_space(address_space *program)
-{
-	m_program = program;
-}
-
-//-------------------------------------------------
-//  set_io_space - set address space we are attached to
-//-------------------------------------------------
-
-void cg_exp_slot_device::set_io_space(address_space *io)
-{
-	m_io = io;
-}
-
 
 //**************************************************************************
 //  CARTRIDGE INTERFACE
@@ -95,7 +69,7 @@ void cg_exp_slot_device::set_io_space(address_space *io)
 //-------------------------------------------------
 
 device_cg_exp_interface::device_cg_exp_interface(const machine_config &mconfig, device_t &device) :
-	device_slot_card_interface(mconfig, device)
+	device_interface(device, "cgenieexp")
 {
 	m_slot = dynamic_cast<cg_exp_slot_device *>(device.owner());
 }

@@ -19,19 +19,24 @@
 #include "emu.h"
 #include "bus/isa/fdc.h"
 #include "cpu/i86/i86.h"
+#include "emupal.h"
 #include "screen.h"
 
 class ax20_state : public driver_device
 {
 public:
-	ax20_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	ax20_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_p_vram(*this, "p_vram"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_fdc(*this, "fdc")  { }
+		m_fdc(*this, "fdc")
+	{ }
 
+	void ax20(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_p_vram;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -44,7 +49,7 @@ public:
 	DECLARE_READ8_MEMBER(unk_r);
 	DECLARE_WRITE8_MEMBER(tc_w);
 	DECLARE_WRITE8_MEMBER(ctl_w);
-	void ax20(machine_config &config);
+
 	void ax20_io(address_map &map);
 	void ax20_map(address_map &map);
 };
@@ -92,9 +97,9 @@ void ax20_state::ax20_map(address_map &map)
 void ax20_state::ax20_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0xffc0, 0xffc0).w(this, FUNC(ax20_state::tc_w));
-	map(0xffd0, 0xffd0).w(this, FUNC(ax20_state::ctl_w));
-	map(0xffe0, 0xffe0).r(this, FUNC(ax20_state::unk_r));
+	map(0xffc0, 0xffc0).w(FUNC(ax20_state::tc_w));
+	map(0xffd0, 0xffd0).w(FUNC(ax20_state::ctl_w));
+	map(0xffe0, 0xffe0).r(FUNC(ax20_state::unk_r));
 	map(0xff80, 0xff81).m(m_fdc, FUNC(i8272a_device::map));
 }
 
@@ -118,37 +123,38 @@ static const gfx_layout ax20_charlayout =
 	8*16
 };
 
-static GFXDECODE_START( ax20 )
+static GFXDECODE_START( gfx_ax20 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, ax20_charlayout, 0, 1 )
 GFXDECODE_END
 
-static SLOT_INTERFACE_START( ax20_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void ax20_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
-MACHINE_CONFIG_START(ax20_state::ax20)
+void ax20_state::ax20(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8088, XTAL(14'318'181)/3)
-	MCFG_CPU_PROGRAM_MAP(ax20_map)
-	MCFG_CPU_IO_MAP(ax20_io)
+	I8088(config, m_maincpu, XTAL(14'318'181)/3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ax20_state::ax20_map);
+	m_maincpu->set_addrmap(AS_IO, &ax20_state::ax20_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_COLOR(rgb_t::green())
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(ax20_state, screen_update)
-	MCFG_SCREEN_SIZE(80*8, 24*12)
-	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 24*12-1)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ax20)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update(FUNC(ax20_state::screen_update));
+	screen.set_size(80*8, 24*12);
+	screen.set_visarea(0, 80*8-1, 0, 24*12-1);
+	screen.set_palette(m_palette);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ax20);
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
-	MCFG_I8272A_ADD("fdc", true)
+	I8272A(config, m_fdc, 8'000'000, true);
 
 	/* Devices */
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ax20_floppies, "525dd", isa8_fdc_device::floppy_formats)
-MACHINE_CONFIG_END
+	FLOPPY_CONNECTOR(config, "fdc:0", ax20_floppies, "525dd", isa8_fdc_device::floppy_formats);
+}
 
 /* ROM definition */
 ROM_START( ax20 )
@@ -161,5 +167,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME   PARENT  COMPAT   MACHINE   INPUT STATE       INIT   COMPANY   FULLNAME  FLAGS
-COMP( 1982, ax20,  0,      0,       ax20,     ax20, ax20_state, 0,     "Axel",   "AX-20",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT CLASS       INIT        COMPANY  FULLNAME  FLAGS
+COMP( 1982, ax20, 0,      0,      ax20,    ax20, ax20_state, empty_init, "Axel",  "AX-20",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

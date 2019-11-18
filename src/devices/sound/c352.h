@@ -7,18 +7,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_C352_ADD(tag, clock, setting) \
-	MCFG_DEVICE_ADD((tag), C352, (clock)) \
-	MCFG_C352_DIVIDER(setting)
-
-#define MCFG_C352_DIVIDER(setting) \
-	downcast<c352_device &>(*device).set_divider((setting));
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -30,10 +18,15 @@ class c352_device : public device_t,
 {
 public:
 	// construction/destruction
+	c352_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, int divider)
+		: c352_device(mconfig, tag, owner, clock)
+	{
+		set_divider(divider);
+	}
+
 	c352_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// inline configuration helpers
-	void set_divider(int setting) { m_divider = setting; }
+	void set_divider(int divider) { m_divider = divider; }
 
 	DECLARE_READ16_MEMBER(read);
 	DECLARE_WRITE16_MEMBER(write);
@@ -51,7 +44,8 @@ protected:
 	virtual void rom_bank_updated() override;
 
 private:
-	enum {
+	enum
+	{
 		C352_FLG_BUSY       = 0x8000,   // channel is busy
 		C352_FLG_KEYON      = 0x4000,   // Keyon
 		C352_FLG_KEYOFF     = 0x2000,   // Keyoff
@@ -71,8 +65,8 @@ private:
 		C352_FLG_REVERSE    = 0x0001    // play sample backwards
 	};
 
-	struct c352_voice_t {
-
+	struct c352_voice_t
+	{
 		uint32_t pos;
 		uint32_t counter;
 
@@ -93,8 +87,8 @@ private:
 
 	};
 
-	void fetch_sample(c352_voice_t* v);
-	void ramp_volume(c352_voice_t* v,int ch,uint8_t val);
+	void fetch_sample(c352_voice_t &v);
+	void ramp_volume(c352_voice_t &v, int ch, uint8_t val);
 
 	unsigned short read_reg16(unsigned long address);
 	void write_reg16(unsigned long address, unsigned short val);

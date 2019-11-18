@@ -42,9 +42,11 @@ public:
 	{ }
 
 	void picno(machine_config &config);
+
+private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -58,39 +60,40 @@ void picno_state::mem_map(address_map &map)
 
 void picno_state::io_map(address_map &map)
 {
-//  ADDRESS_MAP_GLOBAL_MASK(0xff)
+//  map.global_mask(0xff);
 }
 
 static INPUT_PORTS_START( picno )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(picno_state::picno)
+void picno_state::picno(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",  H83002, XTAL(20'000'000)) /* TODO: correct CPU type (H8/532), crystal is a guess, divided by 2 in the cpu */
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	H83002(config, m_maincpu, XTAL(20'000'000)); /* TODO: correct CPU type (H8/532), crystal is a guess, divided by 2 in the cpu */
+	m_maincpu->set_addrmap(AS_PROGRAM, &picno_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &picno_state::io_map);
 
 	//MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker") // no speaker in the unit, but there's a couple of sockets on the back
 	//MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	//MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_linear_slot, "picno_cart")
+	GENERIC_CARTSLOT(config, "cartslot", generic_linear_slot, "picno_cart");
 
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "picno")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cart_list").set_original("picno");
+}
 
 ROM_START( picno )
-	ROM_REGION(0x88000, "roms", 0)
+	ROM_REGION16_BE(0x88000, "roms", 0)
 	ROM_LOAD( "hd6435328f10.u5", 0x00000, 0x08000, NO_DUMP ) // internal rom
 	ROM_LOAD( "rx001-z8-v3j.u2",    0x08000, 0x80000, CRC(e3c8929d) SHA1(1716f09b0a594b3782d257330282d77b6ca6fa0d) ) //HN62334BP
 ROM_END
 
 ROM_START( picno2 )
-	ROM_REGION(0x88000, "roms", 0)
+	ROM_REGION16_BE(0x88000, "roms", 0)
 	ROM_LOAD( "hd6435328f10.u5", 0x00000, 0x08000, NO_DUMP ) // internal rom
 	ROM_LOAD( "rx001-z8-v4j.u2",    0x08000, 0x80000, CRC(ae89a9a5) SHA1(51ed458ffd151e19019beb23517263efce4be272) ) //HN62334BP
 ROM_END
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT  COMPANY   FULLNAME       FLAGS
-CONS( 1993, picno,    0,      0,      picno,    picno,    picno_state,    0,    "Konami", "Picno",      MACHINE_IS_SKELETON )
-CONS( 1993, picno2,   0,      0,      picno,    picno,    picno_state,    0,    "Konami", "Picno 2",     MACHINE_IS_SKELETON )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY   FULLNAME   FLAGS
+CONS( 1993, picno,  0,      0,      picno,   picno, picno_state, empty_init, "Konami", "Picno",   MACHINE_IS_SKELETON )
+CONS( 1993, picno2, 0,      0,      picno,   picno, picno_state, empty_init, "Konami", "Picno 2", MACHINE_IS_SKELETON )

@@ -80,7 +80,7 @@ void hp_nanoprocessor_device::device_start()
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_flags).noshow().formatstr("%10s");
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<0, 0, ENDIANNESS_BIG>();
 	m_io = &space(AS_IO);
 
 	save_item(NAME(m_reg_A));
@@ -507,7 +507,7 @@ uint16_t hp_nanoprocessor_device::pa_offset(unsigned off) const
 
 uint8_t hp_nanoprocessor_device::fetch(void)
 {
-	uint8_t res = m_direct->read_byte(m_reg_PA);
+	uint8_t res = m_cache->read_byte(m_reg_PA);
 	m_reg_PA = pa_offset(1);
 	return res;
 }

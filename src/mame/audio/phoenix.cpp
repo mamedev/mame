@@ -48,11 +48,13 @@
 
 
 
-DEFINE_DEVICE_TYPE(PHOENIX, phoenix_sound_device, "phoenix_sound", "Phoenix Custom Sound")
+DEFINE_DEVICE_TYPE(PHOENIX_SOUND, phoenix_sound_device, "phoenix_sound", "Phoenix Custom Sound")
 
 phoenix_sound_device::phoenix_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, PHOENIX, tag, owner, clock)
+	: device_t(mconfig, PHOENIX_SOUND, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
+	, m_discrete(*this, ":discrete")
+	, m_tms(*this, ":tms")
 {
 }
 
@@ -69,9 +71,6 @@ void phoenix_sound_device::device_start()
 	memset(&m_c24_state, 0, sizeof(m_c24_state));
 	memset(&m_c25_state, 0, sizeof(m_c25_state));
 	memset(&m_noise_state, 0, sizeof(m_noise_state));
-
-	m_discrete = machine().device<discrete_device>("discrete");
-	m_tms = machine().device<tms36xx_device>("tms");
 
 	m_poly18 = std::make_unique<uint32_t[]>(1ul << (18-5));
 
@@ -102,7 +101,7 @@ void phoenix_sound_device::device_start()
 	save_item(NAME(m_noise_state.polyoffs));
 	save_item(NAME(m_noise_state.lowpass_counter));
 	save_item(NAME(m_noise_state.lowpass_polybit));
-	save_pointer(NAME(m_poly18.get()), (1ul << (18-5)));
+	save_pointer(NAME(m_poly18), (1ul << (18-5)));
 }
 
 int phoenix_sound_device::update_c24(int samplerate)
@@ -341,7 +340,7 @@ static const discrete_mixer_desc phoenix_mixer =
 #define PHOENIX_EFFECT_4_SND        0
 
 
-DISCRETE_SOUND_START(phoenix)
+DISCRETE_SOUND_START(phoenix_discrete)
 	/************************************************/
 	/* Input register mapping for phoenix           */
 	/************************************************/
@@ -498,12 +497,12 @@ DISCRETE_SOUND_END
 
 WRITE8_MEMBER( phoenix_sound_device::control_a_w )
 {
-	m_discrete->write(space, PHOENIX_EFFECT_2_DATA, data & 0x0f);
-	m_discrete->write(space, PHOENIX_EFFECT_2_FREQ, (data & 0x30) >> 4);
+	m_discrete->write(PHOENIX_EFFECT_2_DATA, data & 0x0f);
+	m_discrete->write(PHOENIX_EFFECT_2_FREQ, (data & 0x30) >> 4);
 #if 0
 	/* future handling of noise sounds */
-	m_discrete->write(space, PHOENIX_EFFECT_3_EN  , data & 0x40);
-	m_discrete->write(space, PHOENIX_EFFECT_4_EN  , data & 0x80);
+	m_discrete->write(PHOENIX_EFFECT_3_EN  , data & 0x40);
+	m_discrete->write(PHOENIX_EFFECT_4_EN  , data & 0x80);
 #endif
 	m_channel->update();
 	m_sound_latch_a = data;
@@ -511,9 +510,9 @@ WRITE8_MEMBER( phoenix_sound_device::control_a_w )
 
 WRITE8_MEMBER( phoenix_sound_device::control_b_w )
 {
-	m_discrete->write(space, PHOENIX_EFFECT_1_DATA, data & 0x0f);
-	m_discrete->write(space, PHOENIX_EFFECT_1_FILT, data & 0x20);
-	m_discrete->write(space, PHOENIX_EFFECT_1_FREQ, data & 0x10);
+	m_discrete->write(PHOENIX_EFFECT_1_DATA, data & 0x0f);
+	m_discrete->write(PHOENIX_EFFECT_1_FILT, data & 0x20);
+	m_discrete->write(PHOENIX_EFFECT_1_FREQ, data & 0x10);
 
 	/* update the tune that the MM6221AA is playing */
 	m_tms->mm6221aa_tune_w(data >> 6);

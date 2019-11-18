@@ -58,7 +58,7 @@ drc_frontend::drc_frontend(device_t &cpu, u32 window_start, u32 window_end, u32 
 	, m_max_sequence(max_sequence)
 	, m_cpudevice(downcast<cpu_device &>(cpu))
 	, m_program(m_cpudevice.space(AS_PROGRAM))
-	, m_pageshift(m_cpudevice.space_config(AS_PROGRAM)->m_page_shift)
+	, m_pageshift(m_cpudevice.space_config(AS_PROGRAM)->page_shift())
 	, m_desc_array(window_end + window_start + 2, nullptr)
 {
 }

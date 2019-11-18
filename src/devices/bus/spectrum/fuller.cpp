@@ -44,15 +44,18 @@ ioport_constructor spectrum_fuller_device::device_input_ports() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(spectrum_fuller_device::device_add_mconfig)
+void spectrum_fuller_device::device_add_mconfig(machine_config &config)
+{
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ay8912", AY8912, XTAL(3'579'545) / 2) // unverified clock
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	AY8912(config, m_psg, 3.579545_MHz_XTAL / 2); // unverified clock
+	m_psg->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* passthru */
-	MCFG_SPECTRUM_PASSTHRU_EXPANSION_SLOT_ADD()
-MACHINE_CONFIG_END
+	SPECTRUM_EXPANSION_SLOT(config, m_exp, spectrum_expansion_devices, nullptr);
+	m_exp->irq_handler().set(DEVICE_SELF_OWNER, FUNC(spectrum_expansion_slot_device::irq_w));
+	m_exp->nmi_handler().set(DEVICE_SELF_OWNER, FUNC(spectrum_expansion_slot_device::nmi_w));
+}
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -78,21 +81,6 @@ spectrum_fuller_device::spectrum_fuller_device(const machine_config &mconfig, co
 
 void spectrum_fuller_device::device_start()
 {
-	address_space& spaceio = machine().device("maincpu")->memory().space(AS_IO);
-	m_slot = dynamic_cast<spectrum_expansion_slot_device *>(owner());
-
-	spaceio.install_write_handler(0x3f, 0x3f, 0, 0xff00, 0, write8_delegate(FUNC(ay8910_device::address_w), (ay8910_device*)m_psg));
-	spaceio.install_readwrite_handler(0x5f, 0x5f, 0, 0xff00, 0, read8_delegate(FUNC(ay8910_device::data_r), (ay8910_device*)m_psg), write8_delegate(FUNC(ay8910_device::data_w), (ay8910_device*)m_psg));
-	spaceio.install_read_handler(0x7f, 0x7f, 0, 0xff00, 0, read8_delegate(FUNC(spectrum_fuller_device::joystick_r), this));
-}
-
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void spectrum_fuller_device::device_reset()
-{
 }
 
 
@@ -100,33 +88,58 @@ void spectrum_fuller_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ8_MEMBER(spectrum_fuller_device::joystick_r)
-{
-	return m_joy->read() | (0xff ^ 0x8f);
-}
-
 READ_LINE_MEMBER(spectrum_fuller_device::romcs)
 {
 	return m_exp->romcs();
 }
 
-READ8_MEMBER(spectrum_fuller_device::mreq_r)
+void spectrum_fuller_device::pre_opcode_fetch(offs_t offset)
 {
-	return m_exp->mreq_r(space, offset);
+	m_exp->pre_opcode_fetch(offset);
 }
 
-WRITE8_MEMBER(spectrum_fuller_device::mreq_w)
-{
-	if (m_exp->romcs())
-		m_exp->mreq_w(space, offset, data);
-}
-
-READ8_MEMBER(spectrum_fuller_device::port_fe_r)
+uint8_t spectrum_fuller_device::mreq_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
 	if (m_exp->romcs())
-		data &= m_exp->port_fe_r(space, offset);
+		data &= m_exp->mreq_r(offset);
 
 	return data;
+}
+
+void spectrum_fuller_device::mreq_w(offs_t offset, uint8_t data)
+{
+	if (m_exp->romcs())
+		m_exp->mreq_w(offset, data);
+}
+
+uint8_t spectrum_fuller_device::iorq_r(offs_t offset)
+{
+	uint8_t data = m_exp->iorq_r(offset);
+
+	switch (offset & 0xff)
+	{
+	case 0x5f:
+		data &= m_psg->data_r();
+		break;
+	case 0x7f:
+		data &= m_joy->read() | (0xff ^ 0x8f);
+		break;
+	}
+	return data;
+}
+
+void spectrum_fuller_device::iorq_w(offs_t offset, uint8_t data)
+{
+	switch (offset & 0xff)
+	{
+	case 0x3f:
+		m_psg->address_w(data);
+		break;
+	case 0x5f:
+		m_psg->data_w(data);
+		break;
+	}
+	m_exp->iorq_w(offset, data);
 }

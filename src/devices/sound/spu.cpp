@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "spu.h"
 #include "spureverb.h"
+#include "cpu/psx/psx.h"
 
 //
 //
@@ -108,7 +109,7 @@ enum srrr_flags
 	srrr_rr_mask=0x1f
 };
 
-static const unsigned int /*sound_buffer_size=65536*4,*/
+static unsigned int const /*sound_buffer_size=65536*4,*/
 													xa_sector_size=(18*28*8)<<1,
 													xa_buffer_sectors=16,
 													cdda_sector_size=2352,
@@ -132,7 +133,7 @@ static const unsigned int /*sound_buffer_size=65536*4,*/
 //
 //
 
-static const int filter_coef[5][2]=
+static int const filter_coef[5][2]=
 {
 	{ 0,0 },
 	{ 60,0 },
@@ -160,7 +161,7 @@ static const int filter_coef[5][2]=
 		_name##"0-15",                    \
 		_name##"16-23"
 
-	static const char *spu_register_names[256]=
+	static char const *const spu_register_names[256]=
 	{
 		_voice_registers(0),
 		_voice_registers(1),
@@ -933,6 +934,16 @@ static int shift_register15(int &shift)
 //-------------------------------------------------
 //  spu_device - constructor
 //-------------------------------------------------
+
+spu_device::spu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, psxcpu_device *cpu)
+	: spu_device(mconfig, tag, owner, clock)
+{
+	cpu->spu_read().set(tag, FUNC(spu_device::read));
+	cpu->spu_write().set(tag, FUNC(spu_device::write));
+	cpu->subdevice<psxdma_device>("dma")->install_read_handler(4, psxdma_device::read_delegate(&spu_device::dma_read, this));
+	cpu->subdevice<psxdma_device>("dma")->install_write_handler(4, psxdma_device::write_delegate(&spu_device::dma_write, this));
+	irq_handler().set(*cpu->subdevice<psxirq_device>("irq"), FUNC(psxirq_device::intin9));
+}
 
 spu_device::spu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SPU, tag, owner, clock),

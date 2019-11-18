@@ -21,22 +21,6 @@
 
 
 //**************************************************************************
-//  CONSTANTS
-//**************************************************************************
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_OKIM9810_ADD(_tag, _clock) \
-	MCFG_DEVICE_ADD(_tag, OKIM9810, _clock)
-
-#define MCFG_OKIM9810_REPLACE(_tag, _clock) \
-	MCFG_DEVICE_REPLACE(_tag, OKIM9810, _clock)
-
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -57,7 +41,7 @@ public:
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_WRITE8_MEMBER( write_tmp_register );
+	DECLARE_WRITE8_MEMBER( tmp_register_w );
 
 	// serial read/write handlers
 	DECLARE_WRITE_LINE_MEMBER( serial_w );

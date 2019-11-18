@@ -8,7 +8,7 @@
 /* this ALWAYS GENERATED file contains the definitions for the interfaces */
 
 
- /* File created by MIDL compiler version 8.00.0613 */
+ /* File created by MIDL compiler version 8.01.0622 */
 
 
 
@@ -50,11 +50,46 @@ typedef interface ID3D12Debug ID3D12Debug;
 #endif 	/* __ID3D12Debug_FWD_DEFINED__ */
 
 
+#ifndef __ID3D12Debug1_FWD_DEFINED__
+#define __ID3D12Debug1_FWD_DEFINED__
+typedef interface ID3D12Debug1 ID3D12Debug1;
+
+#endif 	/* __ID3D12Debug1_FWD_DEFINED__ */
+
+
+#ifndef __ID3D12Debug2_FWD_DEFINED__
+#define __ID3D12Debug2_FWD_DEFINED__
+typedef interface ID3D12Debug2 ID3D12Debug2;
+
+#endif 	/* __ID3D12Debug2_FWD_DEFINED__ */
+
+
+#ifndef __ID3D12Debug3_FWD_DEFINED__
+#define __ID3D12Debug3_FWD_DEFINED__
+typedef interface ID3D12Debug3 ID3D12Debug3;
+
+#endif 	/* __ID3D12Debug3_FWD_DEFINED__ */
+
+
+#ifndef __ID3D12DebugDevice1_FWD_DEFINED__
+#define __ID3D12DebugDevice1_FWD_DEFINED__
+typedef interface ID3D12DebugDevice1 ID3D12DebugDevice1;
+
+#endif 	/* __ID3D12DebugDevice1_FWD_DEFINED__ */
+
+
 #ifndef __ID3D12DebugDevice_FWD_DEFINED__
 #define __ID3D12DebugDevice_FWD_DEFINED__
 typedef interface ID3D12DebugDevice ID3D12DebugDevice;
 
 #endif 	/* __ID3D12DebugDevice_FWD_DEFINED__ */
+
+
+#ifndef __ID3D12DebugDevice2_FWD_DEFINED__
+#define __ID3D12DebugDevice2_FWD_DEFINED__
+typedef interface ID3D12DebugDevice2 ID3D12DebugDevice2;
+
+#endif 	/* __ID3D12DebugDevice2_FWD_DEFINED__ */
 
 
 #ifndef __ID3D12DebugCommandQueue_FWD_DEFINED__
@@ -64,11 +99,32 @@ typedef interface ID3D12DebugCommandQueue ID3D12DebugCommandQueue;
 #endif 	/* __ID3D12DebugCommandQueue_FWD_DEFINED__ */
 
 
+#ifndef __ID3D12DebugCommandList1_FWD_DEFINED__
+#define __ID3D12DebugCommandList1_FWD_DEFINED__
+typedef interface ID3D12DebugCommandList1 ID3D12DebugCommandList1;
+
+#endif 	/* __ID3D12DebugCommandList1_FWD_DEFINED__ */
+
+
 #ifndef __ID3D12DebugCommandList_FWD_DEFINED__
 #define __ID3D12DebugCommandList_FWD_DEFINED__
 typedef interface ID3D12DebugCommandList ID3D12DebugCommandList;
 
 #endif 	/* __ID3D12DebugCommandList_FWD_DEFINED__ */
+
+
+#ifndef __ID3D12DebugCommandList2_FWD_DEFINED__
+#define __ID3D12DebugCommandList2_FWD_DEFINED__
+typedef interface ID3D12DebugCommandList2 ID3D12DebugCommandList2;
+
+#endif 	/* __ID3D12DebugCommandList2_FWD_DEFINED__ */
+
+
+#ifndef __ID3D12SharingContract_FWD_DEFINED__
+#define __ID3D12SharingContract_FWD_DEFINED__
+typedef interface ID3D12SharingContract ID3D12SharingContract;
+
+#endif 	/* __ID3D12SharingContract_FWD_DEFINED__ */
 
 
 #ifndef __ID3D12InfoQueue_FWD_DEFINED__
@@ -91,6 +147,9 @@ extern "C"{
 /* interface __MIDL_itf_d3d12sdklayers_0000_0000 */
 /* [local] */ 
 
+#include <winapifamily.h>
+// BK - pragma region App Family
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_APP)
 
 
 extern RPC_IF_HANDLE __MIDL_itf_d3d12sdklayers_0000_0000_v0_0_c_ifspec;
@@ -177,14 +236,303 @@ EXTERN_C const IID IID_ID3D12Debug;
 /* [local] */ 
 
 typedef 
-enum D3D12_DEBUG_FEATURE
+enum D3D12_GPU_BASED_VALIDATION_FLAGS
     {
-        D3D12_DEBUG_FEATURE_NONE	= 0,
-        D3D12_DEBUG_FEATURE_TREAT_BUNDLE_AS_DRAW	= 0x1,
-        D3D12_DEBUG_FEATURE_TREAT_BUNDLE_AS_DISPATCH	= 0x2
-    } 	D3D12_DEBUG_FEATURE;
+        D3D12_GPU_BASED_VALIDATION_FLAGS_NONE	= 0,
+        D3D12_GPU_BASED_VALIDATION_FLAGS_DISABLE_STATE_TRACKING	= 0x1
+    } 	D3D12_GPU_BASED_VALIDATION_FLAGS;
 
-DEFINE_ENUM_FLAG_OPERATORS( D3D12_DEBUG_FEATURE );
+DEFINE_ENUM_FLAG_OPERATORS(D3D12_GPU_BASED_VALIDATION_FLAGS)
+
+
+extern RPC_IF_HANDLE __MIDL_itf_d3d12sdklayers_0000_0001_v0_0_c_ifspec;
+extern RPC_IF_HANDLE __MIDL_itf_d3d12sdklayers_0000_0001_v0_0_s_ifspec;
+
+#ifndef __ID3D12Debug1_INTERFACE_DEFINED__
+#define __ID3D12Debug1_INTERFACE_DEFINED__
+
+/* interface ID3D12Debug1 */
+/* [unique][local][object][uuid] */ 
+
+
+EXTERN_C const IID IID_ID3D12Debug1;
+
+#if defined(__cplusplus) && !defined(CINTERFACE)
+    
+    MIDL_INTERFACE("affaa4ca-63fe-4d8e-b8ad-159000af4304")
+    ID3D12Debug1 : public IUnknown
+    {
+    public:
+        virtual void STDMETHODCALLTYPE EnableDebugLayer( void) = 0;
+        
+        virtual void STDMETHODCALLTYPE SetEnableGPUBasedValidation( 
+            BOOL Enable) = 0;
+        
+        virtual void STDMETHODCALLTYPE SetEnableSynchronizedCommandQueueValidation( 
+            BOOL Enable) = 0;
+        
+    };
+    
+    
+#else 	/* C style interface */
+
+    typedef struct ID3D12Debug1Vtbl
+    {
+        BEGIN_INTERFACE
+        
+        HRESULT ( STDMETHODCALLTYPE *QueryInterface )( 
+            ID3D12Debug1 * This,
+            REFIID riid,
+            _COM_Outptr_  void **ppvObject);
+        
+        ULONG ( STDMETHODCALLTYPE *AddRef )( 
+            ID3D12Debug1 * This);
+        
+        ULONG ( STDMETHODCALLTYPE *Release )( 
+            ID3D12Debug1 * This);
+        
+        void ( STDMETHODCALLTYPE *EnableDebugLayer )( 
+            ID3D12Debug1 * This);
+        
+        void ( STDMETHODCALLTYPE *SetEnableGPUBasedValidation )( 
+            ID3D12Debug1 * This,
+            BOOL Enable);
+        
+        void ( STDMETHODCALLTYPE *SetEnableSynchronizedCommandQueueValidation )( 
+            ID3D12Debug1 * This,
+            BOOL Enable);
+        
+        END_INTERFACE
+    } ID3D12Debug1Vtbl;
+
+    interface ID3D12Debug1
+    {
+        CONST_VTBL struct ID3D12Debug1Vtbl *lpVtbl;
+    };
+
+    
+
+#ifdef COBJMACROS
+
+
+#define ID3D12Debug1_QueryInterface(This,riid,ppvObject)	\
+    ( (This)->lpVtbl -> QueryInterface(This,riid,ppvObject) ) 
+
+#define ID3D12Debug1_AddRef(This)	\
+    ( (This)->lpVtbl -> AddRef(This) ) 
+
+#define ID3D12Debug1_Release(This)	\
+    ( (This)->lpVtbl -> Release(This) ) 
+
+
+#define ID3D12Debug1_EnableDebugLayer(This)	\
+    ( (This)->lpVtbl -> EnableDebugLayer(This) ) 
+
+#define ID3D12Debug1_SetEnableGPUBasedValidation(This,Enable)	\
+    ( (This)->lpVtbl -> SetEnableGPUBasedValidation(This,Enable) ) 
+
+#define ID3D12Debug1_SetEnableSynchronizedCommandQueueValidation(This,Enable)	\
+    ( (This)->lpVtbl -> SetEnableSynchronizedCommandQueueValidation(This,Enable) ) 
+
+#endif /* COBJMACROS */
+
+
+#endif 	/* C style interface */
+
+
+
+
+#endif 	/* __ID3D12Debug1_INTERFACE_DEFINED__ */
+
+
+#ifndef __ID3D12Debug2_INTERFACE_DEFINED__
+#define __ID3D12Debug2_INTERFACE_DEFINED__
+
+/* interface ID3D12Debug2 */
+/* [unique][local][object][uuid] */ 
+
+
+EXTERN_C const IID IID_ID3D12Debug2;
+
+#if defined(__cplusplus) && !defined(CINTERFACE)
+    
+    MIDL_INTERFACE("93a665c4-a3b2-4e5d-b692-a26ae14e3374")
+    ID3D12Debug2 : public IUnknown
+    {
+    public:
+        virtual void STDMETHODCALLTYPE SetGPUBasedValidationFlags( 
+            D3D12_GPU_BASED_VALIDATION_FLAGS Flags) = 0;
+        
+    };
+    
+    
+#else 	/* C style interface */
+
+    typedef struct ID3D12Debug2Vtbl
+    {
+        BEGIN_INTERFACE
+        
+        HRESULT ( STDMETHODCALLTYPE *QueryInterface )( 
+            ID3D12Debug2 * This,
+            REFIID riid,
+            _COM_Outptr_  void **ppvObject);
+        
+        ULONG ( STDMETHODCALLTYPE *AddRef )( 
+            ID3D12Debug2 * This);
+        
+        ULONG ( STDMETHODCALLTYPE *Release )( 
+            ID3D12Debug2 * This);
+        
+        void ( STDMETHODCALLTYPE *SetGPUBasedValidationFlags )( 
+            ID3D12Debug2 * This,
+            D3D12_GPU_BASED_VALIDATION_FLAGS Flags);
+        
+        END_INTERFACE
+    } ID3D12Debug2Vtbl;
+
+    interface ID3D12Debug2
+    {
+        CONST_VTBL struct ID3D12Debug2Vtbl *lpVtbl;
+    };
+
+    
+
+#ifdef COBJMACROS
+
+
+#define ID3D12Debug2_QueryInterface(This,riid,ppvObject)	\
+    ( (This)->lpVtbl -> QueryInterface(This,riid,ppvObject) ) 
+
+#define ID3D12Debug2_AddRef(This)	\
+    ( (This)->lpVtbl -> AddRef(This) ) 
+
+#define ID3D12Debug2_Release(This)	\
+    ( (This)->lpVtbl -> Release(This) ) 
+
+
+#define ID3D12Debug2_SetGPUBasedValidationFlags(This,Flags)	\
+    ( (This)->lpVtbl -> SetGPUBasedValidationFlags(This,Flags) ) 
+
+#endif /* COBJMACROS */
+
+
+#endif 	/* C style interface */
+
+
+
+
+#endif 	/* __ID3D12Debug2_INTERFACE_DEFINED__ */
+
+
+#ifndef __ID3D12Debug3_INTERFACE_DEFINED__
+#define __ID3D12Debug3_INTERFACE_DEFINED__
+
+/* interface ID3D12Debug3 */
+/* [unique][local][object][uuid] */ 
+
+
+EXTERN_C const IID IID_ID3D12Debug3;
+
+#if defined(__cplusplus) && !defined(CINTERFACE)
+    
+    MIDL_INTERFACE("5cf4e58f-f671-4ff1-a542-3686e3d153d1")
+    ID3D12Debug3 : public ID3D12Debug
+    {
+    public:
+        virtual void STDMETHODCALLTYPE SetEnableGPUBasedValidation( 
+            BOOL Enable) = 0;
+        
+        virtual void STDMETHODCALLTYPE SetEnableSynchronizedCommandQueueValidation( 
+            BOOL Enable) = 0;
+        
+        virtual void STDMETHODCALLTYPE SetGPUBasedValidationFlags( 
+            D3D12_GPU_BASED_VALIDATION_FLAGS Flags) = 0;
+        
+    };
+    
+    
+#else 	/* C style interface */
+
+    typedef struct ID3D12Debug3Vtbl
+    {
+        BEGIN_INTERFACE
+        
+        HRESULT ( STDMETHODCALLTYPE *QueryInterface )( 
+            ID3D12Debug3 * This,
+            REFIID riid,
+            _COM_Outptr_  void **ppvObject);
+        
+        ULONG ( STDMETHODCALLTYPE *AddRef )( 
+            ID3D12Debug3 * This);
+        
+        ULONG ( STDMETHODCALLTYPE *Release )( 
+            ID3D12Debug3 * This);
+        
+        void ( STDMETHODCALLTYPE *EnableDebugLayer )( 
+            ID3D12Debug3 * This);
+        
+        void ( STDMETHODCALLTYPE *SetEnableGPUBasedValidation )( 
+            ID3D12Debug3 * This,
+            BOOL Enable);
+        
+        void ( STDMETHODCALLTYPE *SetEnableSynchronizedCommandQueueValidation )( 
+            ID3D12Debug3 * This,
+            BOOL Enable);
+        
+        void ( STDMETHODCALLTYPE *SetGPUBasedValidationFlags )( 
+            ID3D12Debug3 * This,
+            D3D12_GPU_BASED_VALIDATION_FLAGS Flags);
+        
+        END_INTERFACE
+    } ID3D12Debug3Vtbl;
+
+    interface ID3D12Debug3
+    {
+        CONST_VTBL struct ID3D12Debug3Vtbl *lpVtbl;
+    };
+
+    
+
+#ifdef COBJMACROS
+
+
+#define ID3D12Debug3_QueryInterface(This,riid,ppvObject)	\
+    ( (This)->lpVtbl -> QueryInterface(This,riid,ppvObject) ) 
+
+#define ID3D12Debug3_AddRef(This)	\
+    ( (This)->lpVtbl -> AddRef(This) ) 
+
+#define ID3D12Debug3_Release(This)	\
+    ( (This)->lpVtbl -> Release(This) ) 
+
+
+#define ID3D12Debug3_EnableDebugLayer(This)	\
+    ( (This)->lpVtbl -> EnableDebugLayer(This) ) 
+
+
+#define ID3D12Debug3_SetEnableGPUBasedValidation(This,Enable)	\
+    ( (This)->lpVtbl -> SetEnableGPUBasedValidation(This,Enable) ) 
+
+#define ID3D12Debug3_SetEnableSynchronizedCommandQueueValidation(This,Enable)	\
+    ( (This)->lpVtbl -> SetEnableSynchronizedCommandQueueValidation(This,Enable) ) 
+
+#define ID3D12Debug3_SetGPUBasedValidationFlags(This,Flags)	\
+    ( (This)->lpVtbl -> SetGPUBasedValidationFlags(This,Flags) ) 
+
+#endif /* COBJMACROS */
+
+
+#endif 	/* C style interface */
+
+
+
+
+#endif 	/* __ID3D12Debug3_INTERFACE_DEFINED__ */
+
+
+/* interface __MIDL_itf_d3d12sdklayers_0000_0004 */
+/* [local] */ 
+
 typedef 
 enum D3D12_RLDO_FLAGS
     {
@@ -195,10 +543,169 @@ enum D3D12_RLDO_FLAGS
     } 	D3D12_RLDO_FLAGS;
 
 DEFINE_ENUM_FLAG_OPERATORS(D3D12_RLDO_FLAGS)
+typedef 
+enum D3D12_DEBUG_DEVICE_PARAMETER_TYPE
+    {
+        D3D12_DEBUG_DEVICE_PARAMETER_FEATURE_FLAGS	= 0,
+        D3D12_DEBUG_DEVICE_PARAMETER_GPU_BASED_VALIDATION_SETTINGS	= ( D3D12_DEBUG_DEVICE_PARAMETER_FEATURE_FLAGS + 1 ) ,
+        D3D12_DEBUG_DEVICE_PARAMETER_GPU_SLOWDOWN_PERFORMANCE_FACTOR	= ( D3D12_DEBUG_DEVICE_PARAMETER_GPU_BASED_VALIDATION_SETTINGS + 1 ) 
+    } 	D3D12_DEBUG_DEVICE_PARAMETER_TYPE;
+
+typedef 
+enum D3D12_DEBUG_FEATURE
+    {
+        D3D12_DEBUG_FEATURE_NONE	= 0,
+        D3D12_DEBUG_FEATURE_ALLOW_BEHAVIOR_CHANGING_DEBUG_AIDS	= 0x1,
+        D3D12_DEBUG_FEATURE_CONSERVATIVE_RESOURCE_STATE_TRACKING	= 0x2,
+        D3D12_DEBUG_FEATURE_DISABLE_VIRTUALIZED_BUNDLES_VALIDATION	= 0x4,
+        D3D12_DEBUG_FEATURE_VALID_MASK	= ( ( D3D12_DEBUG_FEATURE_ALLOW_BEHAVIOR_CHANGING_DEBUG_AIDS | D3D12_DEBUG_FEATURE_CONSERVATIVE_RESOURCE_STATE_TRACKING )  | D3D12_DEBUG_FEATURE_DISABLE_VIRTUALIZED_BUNDLES_VALIDATION ) 
+    } 	D3D12_DEBUG_FEATURE;
+
+DEFINE_ENUM_FLAG_OPERATORS(D3D12_DEBUG_FEATURE)
+typedef 
+enum D3D12_GPU_BASED_VALIDATION_SHADER_PATCH_MODE
+    {
+        D3D12_GPU_BASED_VALIDATION_SHADER_PATCH_MODE_NONE	= 0,
+        D3D12_GPU_BASED_VALIDATION_SHADER_PATCH_MODE_STATE_TRACKING_ONLY	= ( D3D12_GPU_BASED_VALIDATION_SHADER_PATCH_MODE_NONE + 1 ) ,
+        D3D12_GPU_BASED_VALIDATION_SHADER_PATCH_MODE_UNGUARDED_VALIDATION	= ( D3D12_GPU_BASED_VALIDATION_SHADER_PATCH_MODE_STATE_TRACKING_ONLY + 1 ) ,
+        D3D12_GPU_BASED_VALIDATION_SHADER_PATCH_MODE_GUARDED_VALIDATION	= ( D3D12_GPU_BASED_VALIDATION_SHADER_PATCH_MODE_UNGUARDED_VALIDATION + 1 ) ,
+        NUM_D3D12_GPU_BASED_VALIDATION_SHADER_PATCH_MODES	= ( D3D12_GPU_BASED_VALIDATION_SHADER_PATCH_MODE_GUARDED_VALIDATION + 1 ) 
+    } 	D3D12_GPU_BASED_VALIDATION_SHADER_PATCH_MODE;
+
+typedef 
+enum D3D12_GPU_BASED_VALIDATION_PIPELINE_STATE_CREATE_FLAGS
+    {
+        D3D12_GPU_BASED_VALIDATION_PIPELINE_STATE_CREATE_FLAG_NONE	= 0,
+        D3D12_GPU_BASED_VALIDATION_PIPELINE_STATE_CREATE_FLAG_FRONT_LOAD_CREATE_TRACKING_ONLY_SHADERS	= 0x1,
+        D3D12_GPU_BASED_VALIDATION_PIPELINE_STATE_CREATE_FLAG_FRONT_LOAD_CREATE_UNGUARDED_VALIDATION_SHADERS	= 0x2,
+        D3D12_GPU_BASED_VALIDATION_PIPELINE_STATE_CREATE_FLAG_FRONT_LOAD_CREATE_GUARDED_VALIDATION_SHADERS	= 0x4,
+        D3D12_GPU_BASED_VALIDATION_PIPELINE_STATE_CREATE_FLAGS_VALID_MASK	= 0x7
+    } 	D3D12_GPU_BASED_VALIDATION_PIPELINE_STATE_CREATE_FLAGS;
+
+DEFINE_ENUM_FLAG_OPERATORS(D3D12_GPU_BASED_VALIDATION_PIPELINE_STATE_CREATE_FLAGS)
+typedef struct D3D12_DEBUG_DEVICE_GPU_BASED_VALIDATION_SETTINGS
+    {
+    UINT MaxMessagesPerCommandList;
+    D3D12_GPU_BASED_VALIDATION_SHADER_PATCH_MODE DefaultShaderPatchMode;
+    D3D12_GPU_BASED_VALIDATION_PIPELINE_STATE_CREATE_FLAGS PipelineStateCreateFlags;
+    } 	D3D12_DEBUG_DEVICE_GPU_BASED_VALIDATION_SETTINGS;
+
+typedef struct D3D12_DEBUG_DEVICE_GPU_SLOWDOWN_PERFORMANCE_FACTOR
+    {
+    FLOAT SlowdownFactor;
+    } 	D3D12_DEBUG_DEVICE_GPU_SLOWDOWN_PERFORMANCE_FACTOR;
 
 
-extern RPC_IF_HANDLE __MIDL_itf_d3d12sdklayers_0000_0001_v0_0_c_ifspec;
-extern RPC_IF_HANDLE __MIDL_itf_d3d12sdklayers_0000_0001_v0_0_s_ifspec;
+
+extern RPC_IF_HANDLE __MIDL_itf_d3d12sdklayers_0000_0004_v0_0_c_ifspec;
+extern RPC_IF_HANDLE __MIDL_itf_d3d12sdklayers_0000_0004_v0_0_s_ifspec;
+
+#ifndef __ID3D12DebugDevice1_INTERFACE_DEFINED__
+#define __ID3D12DebugDevice1_INTERFACE_DEFINED__
+
+/* interface ID3D12DebugDevice1 */
+/* [unique][local][object][uuid] */ 
+
+
+EXTERN_C const IID IID_ID3D12DebugDevice1;
+
+#if defined(__cplusplus) && !defined(CINTERFACE)
+    
+    MIDL_INTERFACE("a9b71770-d099-4a65-a698-3dee10020f88")
+    ID3D12DebugDevice1 : public IUnknown
+    {
+    public:
+        virtual HRESULT STDMETHODCALLTYPE SetDebugParameter( 
+            D3D12_DEBUG_DEVICE_PARAMETER_TYPE Type,
+            _In_reads_bytes_(DataSize)  const void *pData,
+            UINT DataSize) = 0;
+        
+        virtual HRESULT STDMETHODCALLTYPE GetDebugParameter( 
+            D3D12_DEBUG_DEVICE_PARAMETER_TYPE Type,
+            _Out_writes_bytes_(DataSize)  void *pData,
+            UINT DataSize) = 0;
+        
+        virtual HRESULT STDMETHODCALLTYPE ReportLiveDeviceObjects( 
+            D3D12_RLDO_FLAGS Flags) = 0;
+        
+    };
+    
+    
+#else 	/* C style interface */
+
+    typedef struct ID3D12DebugDevice1Vtbl
+    {
+        BEGIN_INTERFACE
+        
+        HRESULT ( STDMETHODCALLTYPE *QueryInterface )( 
+            ID3D12DebugDevice1 * This,
+            REFIID riid,
+            _COM_Outptr_  void **ppvObject);
+        
+        ULONG ( STDMETHODCALLTYPE *AddRef )( 
+            ID3D12DebugDevice1 * This);
+        
+        ULONG ( STDMETHODCALLTYPE *Release )( 
+            ID3D12DebugDevice1 * This);
+        
+        HRESULT ( STDMETHODCALLTYPE *SetDebugParameter )( 
+            ID3D12DebugDevice1 * This,
+            D3D12_DEBUG_DEVICE_PARAMETER_TYPE Type,
+            _In_reads_bytes_(DataSize)  const void *pData,
+            UINT DataSize);
+        
+        HRESULT ( STDMETHODCALLTYPE *GetDebugParameter )( 
+            ID3D12DebugDevice1 * This,
+            D3D12_DEBUG_DEVICE_PARAMETER_TYPE Type,
+            _Out_writes_bytes_(DataSize)  void *pData,
+            UINT DataSize);
+        
+        HRESULT ( STDMETHODCALLTYPE *ReportLiveDeviceObjects )( 
+            ID3D12DebugDevice1 * This,
+            D3D12_RLDO_FLAGS Flags);
+        
+        END_INTERFACE
+    } ID3D12DebugDevice1Vtbl;
+
+    interface ID3D12DebugDevice1
+    {
+        CONST_VTBL struct ID3D12DebugDevice1Vtbl *lpVtbl;
+    };
+
+    
+
+#ifdef COBJMACROS
+
+
+#define ID3D12DebugDevice1_QueryInterface(This,riid,ppvObject)	\
+    ( (This)->lpVtbl -> QueryInterface(This,riid,ppvObject) ) 
+
+#define ID3D12DebugDevice1_AddRef(This)	\
+    ( (This)->lpVtbl -> AddRef(This) ) 
+
+#define ID3D12DebugDevice1_Release(This)	\
+    ( (This)->lpVtbl -> Release(This) ) 
+
+
+#define ID3D12DebugDevice1_SetDebugParameter(This,Type,pData,DataSize)	\
+    ( (This)->lpVtbl -> SetDebugParameter(This,Type,pData,DataSize) ) 
+
+#define ID3D12DebugDevice1_GetDebugParameter(This,Type,pData,DataSize)	\
+    ( (This)->lpVtbl -> GetDebugParameter(This,Type,pData,DataSize) ) 
+
+#define ID3D12DebugDevice1_ReportLiveDeviceObjects(This,Flags)	\
+    ( (This)->lpVtbl -> ReportLiveDeviceObjects(This,Flags) ) 
+
+#endif /* COBJMACROS */
+
+
+#endif 	/* C style interface */
+
+
+
+
+#endif 	/* __ID3D12DebugDevice1_INTERFACE_DEFINED__ */
+
 
 #ifndef __ID3D12DebugDevice_INTERFACE_DEFINED__
 #define __ID3D12DebugDevice_INTERFACE_DEFINED__
@@ -297,14 +804,132 @@ EXTERN_C const IID IID_ID3D12DebugDevice;
 #endif 	/* __ID3D12DebugDevice_INTERFACE_DEFINED__ */
 
 
-/* interface __MIDL_itf_d3d12sdklayers_0000_0002 */
+#ifndef __ID3D12DebugDevice2_INTERFACE_DEFINED__
+#define __ID3D12DebugDevice2_INTERFACE_DEFINED__
+
+/* interface ID3D12DebugDevice2 */
+/* [unique][local][object][uuid] */ 
+
+
+EXTERN_C const IID IID_ID3D12DebugDevice2;
+
+#if defined(__cplusplus) && !defined(CINTERFACE)
+    
+    MIDL_INTERFACE("60eccbc1-378d-4df1-894c-f8ac5ce4d7dd")
+    ID3D12DebugDevice2 : public ID3D12DebugDevice
+    {
+    public:
+        virtual HRESULT STDMETHODCALLTYPE SetDebugParameter( 
+            D3D12_DEBUG_DEVICE_PARAMETER_TYPE Type,
+            _In_reads_bytes_(DataSize)  const void *pData,
+            UINT DataSize) = 0;
+        
+        virtual HRESULT STDMETHODCALLTYPE GetDebugParameter( 
+            D3D12_DEBUG_DEVICE_PARAMETER_TYPE Type,
+            _Out_writes_bytes_(DataSize)  void *pData,
+            UINT DataSize) = 0;
+        
+    };
+    
+    
+#else 	/* C style interface */
+
+    typedef struct ID3D12DebugDevice2Vtbl
+    {
+        BEGIN_INTERFACE
+        
+        HRESULT ( STDMETHODCALLTYPE *QueryInterface )( 
+            ID3D12DebugDevice2 * This,
+            REFIID riid,
+            _COM_Outptr_  void **ppvObject);
+        
+        ULONG ( STDMETHODCALLTYPE *AddRef )( 
+            ID3D12DebugDevice2 * This);
+        
+        ULONG ( STDMETHODCALLTYPE *Release )( 
+            ID3D12DebugDevice2 * This);
+        
+        HRESULT ( STDMETHODCALLTYPE *SetFeatureMask )( 
+            ID3D12DebugDevice2 * This,
+            D3D12_DEBUG_FEATURE Mask);
+        
+        D3D12_DEBUG_FEATURE ( STDMETHODCALLTYPE *GetFeatureMask )( 
+            ID3D12DebugDevice2 * This);
+        
+        HRESULT ( STDMETHODCALLTYPE *ReportLiveDeviceObjects )( 
+            ID3D12DebugDevice2 * This,
+            D3D12_RLDO_FLAGS Flags);
+        
+        HRESULT ( STDMETHODCALLTYPE *SetDebugParameter )( 
+            ID3D12DebugDevice2 * This,
+            D3D12_DEBUG_DEVICE_PARAMETER_TYPE Type,
+            _In_reads_bytes_(DataSize)  const void *pData,
+            UINT DataSize);
+        
+        HRESULT ( STDMETHODCALLTYPE *GetDebugParameter )( 
+            ID3D12DebugDevice2 * This,
+            D3D12_DEBUG_DEVICE_PARAMETER_TYPE Type,
+            _Out_writes_bytes_(DataSize)  void *pData,
+            UINT DataSize);
+        
+        END_INTERFACE
+    } ID3D12DebugDevice2Vtbl;
+
+    interface ID3D12DebugDevice2
+    {
+        CONST_VTBL struct ID3D12DebugDevice2Vtbl *lpVtbl;
+    };
+
+    
+
+#ifdef COBJMACROS
+
+
+#define ID3D12DebugDevice2_QueryInterface(This,riid,ppvObject)	\
+    ( (This)->lpVtbl -> QueryInterface(This,riid,ppvObject) ) 
+
+#define ID3D12DebugDevice2_AddRef(This)	\
+    ( (This)->lpVtbl -> AddRef(This) ) 
+
+#define ID3D12DebugDevice2_Release(This)	\
+    ( (This)->lpVtbl -> Release(This) ) 
+
+
+#define ID3D12DebugDevice2_SetFeatureMask(This,Mask)	\
+    ( (This)->lpVtbl -> SetFeatureMask(This,Mask) ) 
+
+#define ID3D12DebugDevice2_GetFeatureMask(This)	\
+    ( (This)->lpVtbl -> GetFeatureMask(This) ) 
+
+#define ID3D12DebugDevice2_ReportLiveDeviceObjects(This,Flags)	\
+    ( (This)->lpVtbl -> ReportLiveDeviceObjects(This,Flags) ) 
+
+
+#define ID3D12DebugDevice2_SetDebugParameter(This,Type,pData,DataSize)	\
+    ( (This)->lpVtbl -> SetDebugParameter(This,Type,pData,DataSize) ) 
+
+#define ID3D12DebugDevice2_GetDebugParameter(This,Type,pData,DataSize)	\
+    ( (This)->lpVtbl -> GetDebugParameter(This,Type,pData,DataSize) ) 
+
+#endif /* COBJMACROS */
+
+
+#endif 	/* C style interface */
+
+
+
+
+#endif 	/* __ID3D12DebugDevice2_INTERFACE_DEFINED__ */
+
+
+/* interface __MIDL_itf_d3d12sdklayers_0000_0007 */
 /* [local] */ 
 
 DEFINE_GUID(DXGI_DEBUG_D3D12, 0xcf59a98c, 0xa950, 0x4326, 0x91, 0xef, 0x9b, 0xba, 0xa1, 0x7b, 0xfd, 0x95);
 
 
-extern RPC_IF_HANDLE __MIDL_itf_d3d12sdklayers_0000_0002_v0_0_c_ifspec;
-extern RPC_IF_HANDLE __MIDL_itf_d3d12sdklayers_0000_0002_v0_0_s_ifspec;
+extern RPC_IF_HANDLE __MIDL_itf_d3d12sdklayers_0000_0007_v0_0_c_ifspec;
+extern RPC_IF_HANDLE __MIDL_itf_d3d12sdklayers_0000_0007_v0_0_s_ifspec;
 
 #ifndef __ID3D12DebugCommandQueue_INTERFACE_DEFINED__
 #define __ID3D12DebugCommandQueue_INTERFACE_DEFINED__
@@ -387,6 +1012,136 @@ EXTERN_C const IID IID_ID3D12DebugCommandQueue;
 
 
 #endif 	/* __ID3D12DebugCommandQueue_INTERFACE_DEFINED__ */
+
+
+/* interface __MIDL_itf_d3d12sdklayers_0000_0008 */
+/* [local] */ 
+
+typedef 
+enum D3D12_DEBUG_COMMAND_LIST_PARAMETER_TYPE
+    {
+        D3D12_DEBUG_COMMAND_LIST_PARAMETER_GPU_BASED_VALIDATION_SETTINGS	= 0
+    } 	D3D12_DEBUG_COMMAND_LIST_PARAMETER_TYPE;
+
+typedef struct D3D12_DEBUG_COMMAND_LIST_GPU_BASED_VALIDATION_SETTINGS
+    {
+    D3D12_GPU_BASED_VALIDATION_SHADER_PATCH_MODE ShaderPatchMode;
+    } 	D3D12_DEBUG_COMMAND_LIST_GPU_BASED_VALIDATION_SETTINGS;
+
+
+
+extern RPC_IF_HANDLE __MIDL_itf_d3d12sdklayers_0000_0008_v0_0_c_ifspec;
+extern RPC_IF_HANDLE __MIDL_itf_d3d12sdklayers_0000_0008_v0_0_s_ifspec;
+
+#ifndef __ID3D12DebugCommandList1_INTERFACE_DEFINED__
+#define __ID3D12DebugCommandList1_INTERFACE_DEFINED__
+
+/* interface ID3D12DebugCommandList1 */
+/* [unique][local][object][uuid] */ 
+
+
+EXTERN_C const IID IID_ID3D12DebugCommandList1;
+
+#if defined(__cplusplus) && !defined(CINTERFACE)
+    
+    MIDL_INTERFACE("102ca951-311b-4b01-b11f-ecb83e061b37")
+    ID3D12DebugCommandList1 : public IUnknown
+    {
+    public:
+        virtual BOOL STDMETHODCALLTYPE AssertResourceState( 
+            _In_  ID3D12Resource *pResource,
+            UINT Subresource,
+            UINT State) = 0;
+        
+        virtual HRESULT STDMETHODCALLTYPE SetDebugParameter( 
+            D3D12_DEBUG_COMMAND_LIST_PARAMETER_TYPE Type,
+            _In_reads_bytes_(DataSize)  const void *pData,
+            UINT DataSize) = 0;
+        
+        virtual HRESULT STDMETHODCALLTYPE GetDebugParameter( 
+            D3D12_DEBUG_COMMAND_LIST_PARAMETER_TYPE Type,
+            _Out_writes_bytes_(DataSize)  void *pData,
+            UINT DataSize) = 0;
+        
+    };
+    
+    
+#else 	/* C style interface */
+
+    typedef struct ID3D12DebugCommandList1Vtbl
+    {
+        BEGIN_INTERFACE
+        
+        HRESULT ( STDMETHODCALLTYPE *QueryInterface )( 
+            ID3D12DebugCommandList1 * This,
+            REFIID riid,
+            _COM_Outptr_  void **ppvObject);
+        
+        ULONG ( STDMETHODCALLTYPE *AddRef )( 
+            ID3D12DebugCommandList1 * This);
+        
+        ULONG ( STDMETHODCALLTYPE *Release )( 
+            ID3D12DebugCommandList1 * This);
+        
+        BOOL ( STDMETHODCALLTYPE *AssertResourceState )( 
+            ID3D12DebugCommandList1 * This,
+            _In_  ID3D12Resource *pResource,
+            UINT Subresource,
+            UINT State);
+        
+        HRESULT ( STDMETHODCALLTYPE *SetDebugParameter )( 
+            ID3D12DebugCommandList1 * This,
+            D3D12_DEBUG_COMMAND_LIST_PARAMETER_TYPE Type,
+            _In_reads_bytes_(DataSize)  const void *pData,
+            UINT DataSize);
+        
+        HRESULT ( STDMETHODCALLTYPE *GetDebugParameter )( 
+            ID3D12DebugCommandList1 * This,
+            D3D12_DEBUG_COMMAND_LIST_PARAMETER_TYPE Type,
+            _Out_writes_bytes_(DataSize)  void *pData,
+            UINT DataSize);
+        
+        END_INTERFACE
+    } ID3D12DebugCommandList1Vtbl;
+
+    interface ID3D12DebugCommandList1
+    {
+        CONST_VTBL struct ID3D12DebugCommandList1Vtbl *lpVtbl;
+    };
+
+    
+
+#ifdef COBJMACROS
+
+
+#define ID3D12DebugCommandList1_QueryInterface(This,riid,ppvObject)	\
+    ( (This)->lpVtbl -> QueryInterface(This,riid,ppvObject) ) 
+
+#define ID3D12DebugCommandList1_AddRef(This)	\
+    ( (This)->lpVtbl -> AddRef(This) ) 
+
+#define ID3D12DebugCommandList1_Release(This)	\
+    ( (This)->lpVtbl -> Release(This) ) 
+
+
+#define ID3D12DebugCommandList1_AssertResourceState(This,pResource,Subresource,State)	\
+    ( (This)->lpVtbl -> AssertResourceState(This,pResource,Subresource,State) ) 
+
+#define ID3D12DebugCommandList1_SetDebugParameter(This,Type,pData,DataSize)	\
+    ( (This)->lpVtbl -> SetDebugParameter(This,Type,pData,DataSize) ) 
+
+#define ID3D12DebugCommandList1_GetDebugParameter(This,Type,pData,DataSize)	\
+    ( (This)->lpVtbl -> GetDebugParameter(This,Type,pData,DataSize) ) 
+
+#endif /* COBJMACROS */
+
+
+#endif 	/* C style interface */
+
+
+
+
+#endif 	/* __ID3D12DebugCommandList1_INTERFACE_DEFINED__ */
 
 
 #ifndef __ID3D12DebugCommandList_INTERFACE_DEFINED__
@@ -490,7 +1245,242 @@ EXTERN_C const IID IID_ID3D12DebugCommandList;
 #endif 	/* __ID3D12DebugCommandList_INTERFACE_DEFINED__ */
 
 
-/* interface __MIDL_itf_d3d12sdklayers_0000_0004 */
+#ifndef __ID3D12DebugCommandList2_INTERFACE_DEFINED__
+#define __ID3D12DebugCommandList2_INTERFACE_DEFINED__
+
+/* interface ID3D12DebugCommandList2 */
+/* [unique][local][object][uuid] */ 
+
+
+EXTERN_C const IID IID_ID3D12DebugCommandList2;
+
+#if defined(__cplusplus) && !defined(CINTERFACE)
+    
+    MIDL_INTERFACE("aeb575cf-4e06-48be-ba3b-c450fc96652e")
+    ID3D12DebugCommandList2 : public ID3D12DebugCommandList
+    {
+    public:
+        virtual HRESULT STDMETHODCALLTYPE SetDebugParameter( 
+            D3D12_DEBUG_COMMAND_LIST_PARAMETER_TYPE Type,
+            _In_reads_bytes_(DataSize)  const void *pData,
+            UINT DataSize) = 0;
+        
+        virtual HRESULT STDMETHODCALLTYPE GetDebugParameter( 
+            D3D12_DEBUG_COMMAND_LIST_PARAMETER_TYPE Type,
+            _Out_writes_bytes_(DataSize)  void *pData,
+            UINT DataSize) = 0;
+        
+    };
+    
+    
+#else 	/* C style interface */
+
+    typedef struct ID3D12DebugCommandList2Vtbl
+    {
+        BEGIN_INTERFACE
+        
+        HRESULT ( STDMETHODCALLTYPE *QueryInterface )( 
+            ID3D12DebugCommandList2 * This,
+            REFIID riid,
+            _COM_Outptr_  void **ppvObject);
+        
+        ULONG ( STDMETHODCALLTYPE *AddRef )( 
+            ID3D12DebugCommandList2 * This);
+        
+        ULONG ( STDMETHODCALLTYPE *Release )( 
+            ID3D12DebugCommandList2 * This);
+        
+        BOOL ( STDMETHODCALLTYPE *AssertResourceState )( 
+            ID3D12DebugCommandList2 * This,
+            _In_  ID3D12Resource *pResource,
+            UINT Subresource,
+            UINT State);
+        
+        HRESULT ( STDMETHODCALLTYPE *SetFeatureMask )( 
+            ID3D12DebugCommandList2 * This,
+            D3D12_DEBUG_FEATURE Mask);
+        
+        D3D12_DEBUG_FEATURE ( STDMETHODCALLTYPE *GetFeatureMask )( 
+            ID3D12DebugCommandList2 * This);
+        
+        HRESULT ( STDMETHODCALLTYPE *SetDebugParameter )( 
+            ID3D12DebugCommandList2 * This,
+            D3D12_DEBUG_COMMAND_LIST_PARAMETER_TYPE Type,
+            _In_reads_bytes_(DataSize)  const void *pData,
+            UINT DataSize);
+        
+        HRESULT ( STDMETHODCALLTYPE *GetDebugParameter )( 
+            ID3D12DebugCommandList2 * This,
+            D3D12_DEBUG_COMMAND_LIST_PARAMETER_TYPE Type,
+            _Out_writes_bytes_(DataSize)  void *pData,
+            UINT DataSize);
+        
+        END_INTERFACE
+    } ID3D12DebugCommandList2Vtbl;
+
+    interface ID3D12DebugCommandList2
+    {
+        CONST_VTBL struct ID3D12DebugCommandList2Vtbl *lpVtbl;
+    };
+
+    
+
+#ifdef COBJMACROS
+
+
+#define ID3D12DebugCommandList2_QueryInterface(This,riid,ppvObject)	\
+    ( (This)->lpVtbl -> QueryInterface(This,riid,ppvObject) ) 
+
+#define ID3D12DebugCommandList2_AddRef(This)	\
+    ( (This)->lpVtbl -> AddRef(This) ) 
+
+#define ID3D12DebugCommandList2_Release(This)	\
+    ( (This)->lpVtbl -> Release(This) ) 
+
+
+#define ID3D12DebugCommandList2_AssertResourceState(This,pResource,Subresource,State)	\
+    ( (This)->lpVtbl -> AssertResourceState(This,pResource,Subresource,State) ) 
+
+#define ID3D12DebugCommandList2_SetFeatureMask(This,Mask)	\
+    ( (This)->lpVtbl -> SetFeatureMask(This,Mask) ) 
+
+#define ID3D12DebugCommandList2_GetFeatureMask(This)	\
+    ( (This)->lpVtbl -> GetFeatureMask(This) ) 
+
+
+#define ID3D12DebugCommandList2_SetDebugParameter(This,Type,pData,DataSize)	\
+    ( (This)->lpVtbl -> SetDebugParameter(This,Type,pData,DataSize) ) 
+
+#define ID3D12DebugCommandList2_GetDebugParameter(This,Type,pData,DataSize)	\
+    ( (This)->lpVtbl -> GetDebugParameter(This,Type,pData,DataSize) ) 
+
+#endif /* COBJMACROS */
+
+
+#endif 	/* C style interface */
+
+
+
+
+#endif 	/* __ID3D12DebugCommandList2_INTERFACE_DEFINED__ */
+
+
+#ifndef __ID3D12SharingContract_INTERFACE_DEFINED__
+#define __ID3D12SharingContract_INTERFACE_DEFINED__
+
+/* interface ID3D12SharingContract */
+/* [unique][local][object][uuid] */ 
+
+
+EXTERN_C const IID IID_ID3D12SharingContract;
+
+#if defined(__cplusplus) && !defined(CINTERFACE)
+    
+    MIDL_INTERFACE("0adf7d52-929c-4e61-addb-ffed30de66ef")
+    ID3D12SharingContract : public IUnknown
+    {
+    public:
+        virtual void STDMETHODCALLTYPE Present( 
+            _In_  ID3D12Resource *pResource,
+            UINT Subresource,
+            _In_  HWND window) = 0;
+        
+        virtual void STDMETHODCALLTYPE SharedFenceSignal( 
+            _In_  ID3D12Fence *pFence,
+            UINT64 FenceValue) = 0;
+        
+        virtual void STDMETHODCALLTYPE BeginCapturableWork( 
+            _In_  REFGUID guid) = 0;
+        
+        virtual void STDMETHODCALLTYPE EndCapturableWork( 
+            _In_  REFGUID guid) = 0;
+        
+    };
+    
+    
+#else 	/* C style interface */
+
+    typedef struct ID3D12SharingContractVtbl
+    {
+        BEGIN_INTERFACE
+        
+        HRESULT ( STDMETHODCALLTYPE *QueryInterface )( 
+            ID3D12SharingContract * This,
+            REFIID riid,
+            _COM_Outptr_  void **ppvObject);
+        
+        ULONG ( STDMETHODCALLTYPE *AddRef )( 
+            ID3D12SharingContract * This);
+        
+        ULONG ( STDMETHODCALLTYPE *Release )( 
+            ID3D12SharingContract * This);
+        
+        void ( STDMETHODCALLTYPE *Present )( 
+            ID3D12SharingContract * This,
+            _In_  ID3D12Resource *pResource,
+            UINT Subresource,
+            _In_  HWND window);
+        
+        void ( STDMETHODCALLTYPE *SharedFenceSignal )( 
+            ID3D12SharingContract * This,
+            _In_  ID3D12Fence *pFence,
+            UINT64 FenceValue);
+        
+        void ( STDMETHODCALLTYPE *BeginCapturableWork )( 
+            ID3D12SharingContract * This,
+            _In_  REFGUID guid);
+        
+        void ( STDMETHODCALLTYPE *EndCapturableWork )( 
+            ID3D12SharingContract * This,
+            _In_  REFGUID guid);
+        
+        END_INTERFACE
+    } ID3D12SharingContractVtbl;
+
+    interface ID3D12SharingContract
+    {
+        CONST_VTBL struct ID3D12SharingContractVtbl *lpVtbl;
+    };
+
+    
+
+#ifdef COBJMACROS
+
+
+#define ID3D12SharingContract_QueryInterface(This,riid,ppvObject)	\
+    ( (This)->lpVtbl -> QueryInterface(This,riid,ppvObject) ) 
+
+#define ID3D12SharingContract_AddRef(This)	\
+    ( (This)->lpVtbl -> AddRef(This) ) 
+
+#define ID3D12SharingContract_Release(This)	\
+    ( (This)->lpVtbl -> Release(This) ) 
+
+
+#define ID3D12SharingContract_Present(This,pResource,Subresource,window)	\
+    ( (This)->lpVtbl -> Present(This,pResource,Subresource,window) ) 
+
+#define ID3D12SharingContract_SharedFenceSignal(This,pFence,FenceValue)	\
+    ( (This)->lpVtbl -> SharedFenceSignal(This,pFence,FenceValue) ) 
+
+#define ID3D12SharingContract_BeginCapturableWork(This,guid)	\
+    ( (This)->lpVtbl -> BeginCapturableWork(This,guid) ) 
+
+#define ID3D12SharingContract_EndCapturableWork(This,guid)	\
+    ( (This)->lpVtbl -> EndCapturableWork(This,guid) ) 
+
+#endif /* COBJMACROS */
+
+
+#endif 	/* C style interface */
+
+
+
+
+#endif 	/* __ID3D12SharingContract_INTERFACE_DEFINED__ */
+
+
+/* interface __MIDL_itf_d3d12sdklayers_0000_0012 */
 /* [local] */ 
 
 typedef 
@@ -926,10 +1916,10 @@ enum D3D12_MESSAGE_ID
         D3D12_MESSAGE_ID_CREATERASTERIZERSTATE_INVALIDFORCEDSAMPLECOUNT	= ( D3D12_MESSAGE_ID_ENQUEUESETEVENT_ACCESSDENIED_RETURN + 1 ) ,
         D3D12_MESSAGE_ID_DEVICE_DRAW_INVALID_USE_OF_FORCED_SAMPLE_COUNT	= ( D3D12_MESSAGE_ID_CREATERASTERIZERSTATE_INVALIDFORCEDSAMPLECOUNT + 1 ) ,
         D3D12_MESSAGE_ID_CREATEBLENDSTATE_INVALIDLOGICOPS	= ( D3D12_MESSAGE_ID_DEVICE_DRAW_INVALID_USE_OF_FORCED_SAMPLE_COUNT + 1 ) ,
-        D3D12_MESSAGE_ID_CREATESHADERRESOURCEVIEW_INVALIDDARRAYWITHDECODER	= ( D3D12_MESSAGE_ID_CREATEBLENDSTATE_INVALIDLOGICOPS + 1 ) ,
-        D3D12_MESSAGE_ID_CREATEUNORDEREDACCESSVIEW_INVALIDDARRAYWITHDECODER	= ( D3D12_MESSAGE_ID_CREATESHADERRESOURCEVIEW_INVALIDDARRAYWITHDECODER + 1 ) ,
-        D3D12_MESSAGE_ID_CREATERENDERTARGETVIEW_INVALIDDARRAYWITHDECODER	= ( D3D12_MESSAGE_ID_CREATEUNORDEREDACCESSVIEW_INVALIDDARRAYWITHDECODER + 1 ) ,
-        D3D12_MESSAGE_ID_DEVICE_LOCKEDOUT_INTERFACE	= ( D3D12_MESSAGE_ID_CREATERENDERTARGETVIEW_INVALIDDARRAYWITHDECODER + 1 ) ,
+        D3D12_MESSAGE_ID_CREATESHADERRESOURCEVIEW_INVALIDARRAYWITHDECODER	= ( D3D12_MESSAGE_ID_CREATEBLENDSTATE_INVALIDLOGICOPS + 1 ) ,
+        D3D12_MESSAGE_ID_CREATEUNORDEREDACCESSVIEW_INVALIDARRAYWITHDECODER	= ( D3D12_MESSAGE_ID_CREATESHADERRESOURCEVIEW_INVALIDARRAYWITHDECODER + 1 ) ,
+        D3D12_MESSAGE_ID_CREATERENDERTARGETVIEW_INVALIDARRAYWITHDECODER	= ( D3D12_MESSAGE_ID_CREATEUNORDEREDACCESSVIEW_INVALIDARRAYWITHDECODER + 1 ) ,
+        D3D12_MESSAGE_ID_DEVICE_LOCKEDOUT_INTERFACE	= ( D3D12_MESSAGE_ID_CREATERENDERTARGETVIEW_INVALIDARRAYWITHDECODER + 1 ) ,
         D3D12_MESSAGE_ID_OFFERRESOURCES_INVALIDPRIORITY	= ( D3D12_MESSAGE_ID_DEVICE_LOCKEDOUT_INTERFACE + 1 ) ,
         D3D12_MESSAGE_ID_DEVICE_CLEARVIEW_INVALIDVIEW	= ( D3D12_MESSAGE_ID_OFFERRESOURCES_INVALIDPRIORITY + 1 ) ,
         D3D12_MESSAGE_ID_DEVICE_CREATEVERTEXSHADER_DOUBLEEXTENSIONSNOTSUPPORTED	= ( D3D12_MESSAGE_ID_DEVICE_CLEARVIEW_INVALIDVIEW + 1 ) ,
@@ -1268,10 +2258,7 @@ enum D3D12_MESSAGE_ID
         D3D12_MESSAGE_ID_CREATECOMMANDSIGNATURE_INVALID	= ( D3D12_MESSAGE_ID_CREATE_SAMPLER_INVALID + 1 ) ,
         D3D12_MESSAGE_ID_EXECUTE_INDIRECT_INVALID_PARAMETERS	= ( D3D12_MESSAGE_ID_CREATECOMMANDSIGNATURE_INVALID + 1 ) ,
         D3D12_MESSAGE_ID_GETGPUVIRTUALADDRESS_INVALID_RESOURCE_DIMENSION	= ( D3D12_MESSAGE_ID_EXECUTE_INDIRECT_INVALID_PARAMETERS + 1 ) ,
-        D3D12_MESSAGE_ID_CREATEQUERYORPREDICATE_INVALIDCONTEXTTYPE	= ( D3D12_MESSAGE_ID_GETGPUVIRTUALADDRESS_INVALID_RESOURCE_DIMENSION + 1 ) ,
-        D3D12_MESSAGE_ID_CREATEQUERYORPREDICATE_DECODENOTSUPPORTED	= ( D3D12_MESSAGE_ID_CREATEQUERYORPREDICATE_INVALIDCONTEXTTYPE + 1 ) ,
-        D3D12_MESSAGE_ID_CREATEQUERYORPREDICATE_ENCODENOTSUPPORTED	= ( D3D12_MESSAGE_ID_CREATEQUERYORPREDICATE_DECODENOTSUPPORTED + 1 ) ,
-        D3D12_MESSAGE_ID_CREATESHADERRESOURCEVIEW_INVALIDPLANEINDEX	= ( D3D12_MESSAGE_ID_CREATEQUERYORPREDICATE_ENCODENOTSUPPORTED + 1 ) ,
+        D3D12_MESSAGE_ID_CREATESHADERRESOURCEVIEW_INVALIDPLANEINDEX	= ( D3D12_MESSAGE_ID_GETGPUVIRTUALADDRESS_INVALID_RESOURCE_DIMENSION + 4 ) ,
         D3D12_MESSAGE_ID_CREATESHADERRESOURCEVIEW_INVALIDVIDEOPLANEINDEX	= ( D3D12_MESSAGE_ID_CREATESHADERRESOURCEVIEW_INVALIDPLANEINDEX + 1 ) ,
         D3D12_MESSAGE_ID_CREATESHADERRESOURCEVIEW_AMBIGUOUSVIDEOPLANEINDEX	= ( D3D12_MESSAGE_ID_CREATESHADERRESOURCEVIEW_INVALIDVIDEOPLANEINDEX + 1 ) ,
         D3D12_MESSAGE_ID_CREATERENDERTARGETVIEW_INVALIDPLANEINDEX	= ( D3D12_MESSAGE_ID_CREATESHADERRESOURCEVIEW_AMBIGUOUSVIDEOPLANEINDEX + 1 ) ,
@@ -1316,8 +2303,8 @@ enum D3D12_MESSAGE_ID
         D3D12_MESSAGE_ID_JPEGDECODE_UNSUPPORTEDSRCBUFFERMISCFLAGS	= ( D3D12_MESSAGE_ID_JPEGDECODE_UNSUPPORTEDSRCBUFFERUSAGE + 1 ) ,
         D3D12_MESSAGE_ID_JPEGDECODE_UNSUPPORTEDDSTTEXTUREUSAGE	= ( D3D12_MESSAGE_ID_JPEGDECODE_UNSUPPORTEDSRCBUFFERMISCFLAGS + 1 ) ,
         D3D12_MESSAGE_ID_JPEGDECODE_BACKBUFFERNOTSUPPORTED	= ( D3D12_MESSAGE_ID_JPEGDECODE_UNSUPPORTEDDSTTEXTUREUSAGE + 1 ) ,
-        D3D12_MESSAGE_ID_JPEGDECODE_UNSUPPRTEDCOPYFLAGS	= ( D3D12_MESSAGE_ID_JPEGDECODE_BACKBUFFERNOTSUPPORTED + 1 ) ,
-        D3D12_MESSAGE_ID_JPEGENCODE_NOTSUPPORTED	= ( D3D12_MESSAGE_ID_JPEGDECODE_UNSUPPRTEDCOPYFLAGS + 1 ) ,
+        D3D12_MESSAGE_ID_JPEGDECODE_UNSUPPORTEDCOPYFLAGS	= ( D3D12_MESSAGE_ID_JPEGDECODE_BACKBUFFERNOTSUPPORTED + 1 ) ,
+        D3D12_MESSAGE_ID_JPEGENCODE_NOTSUPPORTED	= ( D3D12_MESSAGE_ID_JPEGDECODE_UNSUPPORTEDCOPYFLAGS + 1 ) ,
         D3D12_MESSAGE_ID_JPEGENCODE_INVALIDSCANDATAOFFSET	= ( D3D12_MESSAGE_ID_JPEGENCODE_NOTSUPPORTED + 1 ) ,
         D3D12_MESSAGE_ID_JPEGENCODE_INVALIDCOMPONENTS	= ( D3D12_MESSAGE_ID_JPEGENCODE_INVALIDSCANDATAOFFSET + 1 ) ,
         D3D12_MESSAGE_ID_JPEGENCODE_SOURCENOT2D	= ( D3D12_MESSAGE_ID_JPEGENCODE_INVALIDCOMPONENTS + 1 ) ,
@@ -1335,8 +2322,8 @@ enum D3D12_MESSAGE_ID
         D3D12_MESSAGE_ID_JPEGENCODE_UNSUPPORTEDDSTBUFFERMISCFLAGS	= ( D3D12_MESSAGE_ID_JPEGENCODE_UNSUPPORTEDDSTBUFFERUSAGE + 1 ) ,
         D3D12_MESSAGE_ID_JPEGENCODE_UNSUPPORTEDSRCTEXTUREUSAGE	= ( D3D12_MESSAGE_ID_JPEGENCODE_UNSUPPORTEDDSTBUFFERMISCFLAGS + 1 ) ,
         D3D12_MESSAGE_ID_JPEGENCODE_BACKBUFFERNOTSUPPORTED	= ( D3D12_MESSAGE_ID_JPEGENCODE_UNSUPPORTEDSRCTEXTUREUSAGE + 1 ) ,
-        D3D12_MESSAGE_ID_CREATEQUERYORPREDICATE_UNSUPPORTEDCONTEXTTTYPEFORQUERY	= ( D3D12_MESSAGE_ID_JPEGENCODE_BACKBUFFERNOTSUPPORTED + 1 ) ,
-        D3D12_MESSAGE_ID_FLUSH1_INVALIDCONTEXTTYPE	= ( D3D12_MESSAGE_ID_CREATEQUERYORPREDICATE_UNSUPPORTEDCONTEXTTTYPEFORQUERY + 1 ) ,
+        D3D12_MESSAGE_ID_CREATEQUERYORPREDICATE_UNSUPPORTEDCONTEXTTYPEFORQUERY	= ( D3D12_MESSAGE_ID_JPEGENCODE_BACKBUFFERNOTSUPPORTED + 1 ) ,
+        D3D12_MESSAGE_ID_FLUSH1_INVALIDCONTEXTTYPE	= ( D3D12_MESSAGE_ID_CREATEQUERYORPREDICATE_UNSUPPORTEDCONTEXTTYPEFORQUERY + 1 ) ,
         D3D12_MESSAGE_ID_CREATERESOURCE_INVALIDCLEARVALUE	= ( D3D12_MESSAGE_ID_FLUSH1_INVALIDCONTEXTTYPE + 1 ) ,
         D3D12_MESSAGE_ID_CREATERESOURCE_UNRECOGNIZEDCLEARVALUEFORMAT	= ( D3D12_MESSAGE_ID_CREATERESOURCE_INVALIDCLEARVALUE + 1 ) ,
         D3D12_MESSAGE_ID_CREATERESOURCE_INVALIDCLEARVALUEFORMAT	= ( D3D12_MESSAGE_ID_CREATERESOURCE_UNRECOGNIZEDCLEARVALUEFORMAT + 1 ) ,
@@ -1456,9 +2443,292 @@ enum D3D12_MESSAGE_ID
         D3D12_MESSAGE_ID_UNMAP_INVALID_NULLRANGE	= ( D3D12_MESSAGE_ID_MAP_INVALID_NULLRANGE + 1 ) ,
         D3D12_MESSAGE_ID_NO_GRAPHICS_API_SUPPORT	= ( D3D12_MESSAGE_ID_UNMAP_INVALID_NULLRANGE + 1 ) ,
         D3D12_MESSAGE_ID_NO_COMPUTE_API_SUPPORT	= ( D3D12_MESSAGE_ID_NO_GRAPHICS_API_SUPPORT + 1 ) ,
-        D3D12_MESSAGE_ID_D3D12_MESSAGES_END	= ( D3D12_MESSAGE_ID_NO_COMPUTE_API_SUPPORT + 1 ) 
+        D3D12_MESSAGE_ID_RESOLVESUBRESOURCE_RESOURCE_FLAGS_NOT_SUPPORTED	= ( D3D12_MESSAGE_ID_NO_COMPUTE_API_SUPPORT + 1 ) ,
+        D3D12_MESSAGE_ID_GPU_BASED_VALIDATION_ROOT_ARGUMENT_UNINITIALIZED	= ( D3D12_MESSAGE_ID_RESOLVESUBRESOURCE_RESOURCE_FLAGS_NOT_SUPPORTED + 1 ) ,
+        D3D12_MESSAGE_ID_GPU_BASED_VALIDATION_DESCRIPTOR_HEAP_INDEX_OUT_OF_BOUNDS	= ( D3D12_MESSAGE_ID_GPU_BASED_VALIDATION_ROOT_ARGUMENT_UNINITIALIZED + 1 ) ,
+        D3D12_MESSAGE_ID_GPU_BASED_VALIDATION_DESCRIPTOR_TABLE_REGISTER_INDEX_OUT_OF_BOUNDS	= ( D3D12_MESSAGE_ID_GPU_BASED_VALIDATION_DESCRIPTOR_HEAP_INDEX_OUT_OF_BOUNDS + 1 ) ,
+        D3D12_MESSAGE_ID_GPU_BASED_VALIDATION_DESCRIPTOR_UNINITIALIZED	= ( D3D12_MESSAGE_ID_GPU_BASED_VALIDATION_DESCRIPTOR_TABLE_REGISTER_INDEX_OUT_OF_BOUNDS + 1 ) ,
+        D3D12_MESSAGE_ID_GPU_BASED_VALIDATION_DESCRIPTOR_TYPE_MISMATCH	= ( D3D12_MESSAGE_ID_GPU_BASED_VALIDATION_DESCRIPTOR_UNINITIALIZED + 1 ) ,
+        D3D12_MESSAGE_ID_GPU_BASED_VALIDATION_SRV_RESOURCE_DIMENSION_MISMATCH	= ( D3D12_MESSAGE_ID_GPU_BASED_VALIDATION_DESCRIPTOR_TYPE_MISMATCH + 1 ) ,
+        D3D12_MESSAGE_ID_GPU_BASED_VALIDATION_UAV_RESOURCE_DIMENSION_MISMATCH	= ( D3D12_MESSAGE_ID_GPU_BASED_VALIDATION_SRV_RESOURCE_DIMENSION_MISMATCH + 1 ) ,
+        D3D12_MESSAGE_ID_GPU_BASED_VALIDATION_INCOMPATIBLE_RESOURCE_STATE	= ( D3D12_MESSAGE_ID_GPU_BASED_VALIDATION_UAV_RESOURCE_DIMENSION_MISMATCH + 1 ) ,
+        D3D12_MESSAGE_ID_COPYRESOURCE_NULLDST	= ( D3D12_MESSAGE_ID_GPU_BASED_VALIDATION_INCOMPATIBLE_RESOURCE_STATE + 1 ) ,
+        D3D12_MESSAGE_ID_COPYRESOURCE_INVALIDDSTRESOURCE	= ( D3D12_MESSAGE_ID_COPYRESOURCE_NULLDST + 1 ) ,
+        D3D12_MESSAGE_ID_COPYRESOURCE_NULLSRC	= ( D3D12_MESSAGE_ID_COPYRESOURCE_INVALIDDSTRESOURCE + 1 ) ,
+        D3D12_MESSAGE_ID_COPYRESOURCE_INVALIDSRCRESOURCE	= ( D3D12_MESSAGE_ID_COPYRESOURCE_NULLSRC + 1 ) ,
+        D3D12_MESSAGE_ID_RESOLVESUBRESOURCE_NULLDST	= ( D3D12_MESSAGE_ID_COPYRESOURCE_INVALIDSRCRESOURCE + 1 ) ,
+        D3D12_MESSAGE_ID_RESOLVESUBRESOURCE_INVALIDDSTRESOURCE	= ( D3D12_MESSAGE_ID_RESOLVESUBRESOURCE_NULLDST + 1 ) ,
+        D3D12_MESSAGE_ID_RESOLVESUBRESOURCE_NULLSRC	= ( D3D12_MESSAGE_ID_RESOLVESUBRESOURCE_INVALIDDSTRESOURCE + 1 ) ,
+        D3D12_MESSAGE_ID_RESOLVESUBRESOURCE_INVALIDSRCRESOURCE	= ( D3D12_MESSAGE_ID_RESOLVESUBRESOURCE_NULLSRC + 1 ) ,
+        D3D12_MESSAGE_ID_PIPELINE_STATE_TYPE_MISMATCH	= ( D3D12_MESSAGE_ID_RESOLVESUBRESOURCE_INVALIDSRCRESOURCE + 1 ) ,
+        D3D12_MESSAGE_ID_COMMAND_LIST_DISPATCH_ROOT_SIGNATURE_NOT_SET	= ( D3D12_MESSAGE_ID_PIPELINE_STATE_TYPE_MISMATCH + 1 ) ,
+        D3D12_MESSAGE_ID_COMMAND_LIST_DISPATCH_ROOT_SIGNATURE_MISMATCH	= ( D3D12_MESSAGE_ID_COMMAND_LIST_DISPATCH_ROOT_SIGNATURE_NOT_SET + 1 ) ,
+        D3D12_MESSAGE_ID_RESOURCE_BARRIER_ZERO_BARRIERS	= ( D3D12_MESSAGE_ID_COMMAND_LIST_DISPATCH_ROOT_SIGNATURE_MISMATCH + 1 ) ,
+        D3D12_MESSAGE_ID_BEGIN_END_EVENT_MISMATCH	= ( D3D12_MESSAGE_ID_RESOURCE_BARRIER_ZERO_BARRIERS + 1 ) ,
+        D3D12_MESSAGE_ID_RESOURCE_BARRIER_POSSIBLE_BEFORE_AFTER_MISMATCH	= ( D3D12_MESSAGE_ID_BEGIN_END_EVENT_MISMATCH + 1 ) ,
+        D3D12_MESSAGE_ID_RESOURCE_BARRIER_MISMATCHING_BEGIN_END	= ( D3D12_MESSAGE_ID_RESOURCE_BARRIER_POSSIBLE_BEFORE_AFTER_MISMATCH + 1 ) ,
+        D3D12_MESSAGE_ID_GPU_BASED_VALIDATION_INVALID_RESOURCE	= ( D3D12_MESSAGE_ID_RESOURCE_BARRIER_MISMATCHING_BEGIN_END + 1 ) ,
+        D3D12_MESSAGE_ID_USE_OF_ZERO_REFCOUNT_OBJECT	= ( D3D12_MESSAGE_ID_GPU_BASED_VALIDATION_INVALID_RESOURCE + 1 ) ,
+        D3D12_MESSAGE_ID_OBJECT_EVICTED_WHILE_STILL_IN_USE	= ( D3D12_MESSAGE_ID_USE_OF_ZERO_REFCOUNT_OBJECT + 1 ) ,
+        D3D12_MESSAGE_ID_GPU_BASED_VALIDATION_ROOT_DESCRIPTOR_ACCESS_OUT_OF_BOUNDS	= ( D3D12_MESSAGE_ID_OBJECT_EVICTED_WHILE_STILL_IN_USE + 1 ) ,
+        D3D12_MESSAGE_ID_CREATEPIPELINELIBRARY_INVALIDLIBRARYBLOB	= ( D3D12_MESSAGE_ID_GPU_BASED_VALIDATION_ROOT_DESCRIPTOR_ACCESS_OUT_OF_BOUNDS + 1 ) ,
+        D3D12_MESSAGE_ID_CREATEPIPELINELIBRARY_DRIVERVERSIONMISMATCH	= ( D3D12_MESSAGE_ID_CREATEPIPELINELIBRARY_INVALIDLIBRARYBLOB + 1 ) ,
+        D3D12_MESSAGE_ID_CREATEPIPELINELIBRARY_ADAPTERVERSIONMISMATCH	= ( D3D12_MESSAGE_ID_CREATEPIPELINELIBRARY_DRIVERVERSIONMISMATCH + 1 ) ,
+        D3D12_MESSAGE_ID_CREATEPIPELINELIBRARY_UNSUPPORTED	= ( D3D12_MESSAGE_ID_CREATEPIPELINELIBRARY_ADAPTERVERSIONMISMATCH + 1 ) ,
+        D3D12_MESSAGE_ID_CREATE_PIPELINELIBRARY	= ( D3D12_MESSAGE_ID_CREATEPIPELINELIBRARY_UNSUPPORTED + 1 ) ,
+        D3D12_MESSAGE_ID_LIVE_PIPELINELIBRARY	= ( D3D12_MESSAGE_ID_CREATE_PIPELINELIBRARY + 1 ) ,
+        D3D12_MESSAGE_ID_DESTROY_PIPELINELIBRARY	= ( D3D12_MESSAGE_ID_LIVE_PIPELINELIBRARY + 1 ) ,
+        D3D12_MESSAGE_ID_STOREPIPELINE_NONAME	= ( D3D12_MESSAGE_ID_DESTROY_PIPELINELIBRARY + 1 ) ,
+        D3D12_MESSAGE_ID_STOREPIPELINE_DUPLICATENAME	= ( D3D12_MESSAGE_ID_STOREPIPELINE_NONAME + 1 ) ,
+        D3D12_MESSAGE_ID_LOADPIPELINE_NAMENOTFOUND	= ( D3D12_MESSAGE_ID_STOREPIPELINE_DUPLICATENAME + 1 ) ,
+        D3D12_MESSAGE_ID_LOADPIPELINE_INVALIDDESC	= ( D3D12_MESSAGE_ID_LOADPIPELINE_NAMENOTFOUND + 1 ) ,
+        D3D12_MESSAGE_ID_PIPELINELIBRARY_SERIALIZE_NOTENOUGHMEMORY	= ( D3D12_MESSAGE_ID_LOADPIPELINE_INVALIDDESC + 1 ) ,
+        D3D12_MESSAGE_ID_CREATEGRAPHICSPIPELINESTATE_PS_OUTPUT_RT_OUTPUT_MISMATCH	= ( D3D12_MESSAGE_ID_PIPELINELIBRARY_SERIALIZE_NOTENOUGHMEMORY + 1 ) ,
+        D3D12_MESSAGE_ID_SETEVENTONMULTIPLEFENCECOMPLETION_INVALIDFLAGS	= ( D3D12_MESSAGE_ID_CREATEGRAPHICSPIPELINESTATE_PS_OUTPUT_RT_OUTPUT_MISMATCH + 1 ) ,
+        D3D12_MESSAGE_ID_CREATE_QUEUE_VIDEO_NOT_SUPPORTED	= ( D3D12_MESSAGE_ID_SETEVENTONMULTIPLEFENCECOMPLETION_INVALIDFLAGS + 1 ) ,
+        D3D12_MESSAGE_ID_CREATE_COMMAND_ALLOCATOR_VIDEO_NOT_SUPPORTED	= ( D3D12_MESSAGE_ID_CREATE_QUEUE_VIDEO_NOT_SUPPORTED + 1 ) ,
+        D3D12_MESSAGE_ID_CREATEQUERY_HEAP_VIDEO_DECODE_STATISTICS_NOT_SUPPORTED	= ( D3D12_MESSAGE_ID_CREATE_COMMAND_ALLOCATOR_VIDEO_NOT_SUPPORTED + 1 ) ,
+        D3D12_MESSAGE_ID_CREATE_VIDEODECODECOMMANDLIST	= ( D3D12_MESSAGE_ID_CREATEQUERY_HEAP_VIDEO_DECODE_STATISTICS_NOT_SUPPORTED + 1 ) ,
+        D3D12_MESSAGE_ID_CREATE_VIDEODECODER	= ( D3D12_MESSAGE_ID_CREATE_VIDEODECODECOMMANDLIST + 1 ) ,
+        D3D12_MESSAGE_ID_CREATE_VIDEODECODESTREAM	= ( D3D12_MESSAGE_ID_CREATE_VIDEODECODER + 1 ) ,
+        D3D12_MESSAGE_ID_LIVE_VIDEODECODECOMMANDLIST	= ( D3D12_MESSAGE_ID_CREATE_VIDEODECODESTREAM + 1 ) ,
+        D3D12_MESSAGE_ID_LIVE_VIDEODECODER	= ( D3D12_MESSAGE_ID_LIVE_VIDEODECODECOMMANDLIST + 1 ) ,
+        D3D12_MESSAGE_ID_LIVE_VIDEODECODESTREAM	= ( D3D12_MESSAGE_ID_LIVE_VIDEODECODER + 1 ) ,
+        D3D12_MESSAGE_ID_DESTROY_VIDEODECODECOMMANDLIST	= ( D3D12_MESSAGE_ID_LIVE_VIDEODECODESTREAM + 1 ) ,
+        D3D12_MESSAGE_ID_DESTROY_VIDEODECODER	= ( D3D12_MESSAGE_ID_DESTROY_VIDEODECODECOMMANDLIST + 1 ) ,
+        D3D12_MESSAGE_ID_DESTROY_VIDEODECODESTREAM	= ( D3D12_MESSAGE_ID_DESTROY_VIDEODECODER + 1 ) ,
+        D3D12_MESSAGE_ID_DECODE_FRAME_INVALID_PARAMETERS	= ( D3D12_MESSAGE_ID_DESTROY_VIDEODECODESTREAM + 1 ) ,
+        D3D12_MESSAGE_ID_DEPRECATED_API	= ( D3D12_MESSAGE_ID_DECODE_FRAME_INVALID_PARAMETERS + 1 ) ,
+        D3D12_MESSAGE_ID_RESOURCE_BARRIER_MISMATCHING_COMMAND_LIST_TYPE	= ( D3D12_MESSAGE_ID_DEPRECATED_API + 1 ) ,
+        D3D12_MESSAGE_ID_COMMAND_LIST_DESCRIPTOR_TABLE_NOT_SET	= ( D3D12_MESSAGE_ID_RESOURCE_BARRIER_MISMATCHING_COMMAND_LIST_TYPE + 1 ) ,
+        D3D12_MESSAGE_ID_COMMAND_LIST_ROOT_CONSTANT_BUFFER_VIEW_NOT_SET	= ( D3D12_MESSAGE_ID_COMMAND_LIST_DESCRIPTOR_TABLE_NOT_SET + 1 ) ,
+        D3D12_MESSAGE_ID_COMMAND_LIST_ROOT_SHADER_RESOURCE_VIEW_NOT_SET	= ( D3D12_MESSAGE_ID_COMMAND_LIST_ROOT_CONSTANT_BUFFER_VIEW_NOT_SET + 1 ) ,
+        D3D12_MESSAGE_ID_COMMAND_LIST_ROOT_UNORDERED_ACCESS_VIEW_NOT_SET	= ( D3D12_MESSAGE_ID_COMMAND_LIST_ROOT_SHADER_RESOURCE_VIEW_NOT_SET + 1 ) ,
+        D3D12_MESSAGE_ID_DISCARD_INVALID_SUBRESOURCE_RANGE	= ( D3D12_MESSAGE_ID_COMMAND_LIST_ROOT_UNORDERED_ACCESS_VIEW_NOT_SET + 1 ) ,
+        D3D12_MESSAGE_ID_DISCARD_ONE_SUBRESOURCE_FOR_MIPS_WITH_RECTS	= ( D3D12_MESSAGE_ID_DISCARD_INVALID_SUBRESOURCE_RANGE + 1 ) ,
+        D3D12_MESSAGE_ID_DISCARD_NO_RECTS_FOR_NON_TEXTURE2D	= ( D3D12_MESSAGE_ID_DISCARD_ONE_SUBRESOURCE_FOR_MIPS_WITH_RECTS + 1 ) ,
+        D3D12_MESSAGE_ID_COPY_ON_SAME_SUBRESOURCE	= ( D3D12_MESSAGE_ID_DISCARD_NO_RECTS_FOR_NON_TEXTURE2D + 1 ) ,
+        D3D12_MESSAGE_ID_SETRESIDENCYPRIORITY_INVALID_PAGEABLE	= ( D3D12_MESSAGE_ID_COPY_ON_SAME_SUBRESOURCE + 1 ) ,
+        D3D12_MESSAGE_ID_GPU_BASED_VALIDATION_UNSUPPORTED	= ( D3D12_MESSAGE_ID_SETRESIDENCYPRIORITY_INVALID_PAGEABLE + 1 ) ,
+        D3D12_MESSAGE_ID_STATIC_DESCRIPTOR_INVALID_DESCRIPTOR_CHANGE	= ( D3D12_MESSAGE_ID_GPU_BASED_VALIDATION_UNSUPPORTED + 1 ) ,
+        D3D12_MESSAGE_ID_DATA_STATIC_DESCRIPTOR_INVALID_DATA_CHANGE	= ( D3D12_MESSAGE_ID_STATIC_DESCRIPTOR_INVALID_DESCRIPTOR_CHANGE + 1 ) ,
+        D3D12_MESSAGE_ID_DATA_STATIC_WHILE_SET_AT_EXECUTE_DESCRIPTOR_INVALID_DATA_CHANGE	= ( D3D12_MESSAGE_ID_DATA_STATIC_DESCRIPTOR_INVALID_DATA_CHANGE + 1 ) ,
+        D3D12_MESSAGE_ID_EXECUTE_BUNDLE_STATIC_DESCRIPTOR_DATA_STATIC_NOT_SET	= ( D3D12_MESSAGE_ID_DATA_STATIC_WHILE_SET_AT_EXECUTE_DESCRIPTOR_INVALID_DATA_CHANGE + 1 ) ,
+        D3D12_MESSAGE_ID_GPU_BASED_VALIDATION_RESOURCE_ACCESS_OUT_OF_BOUNDS	= ( D3D12_MESSAGE_ID_EXECUTE_BUNDLE_STATIC_DESCRIPTOR_DATA_STATIC_NOT_SET + 1 ) ,
+        D3D12_MESSAGE_ID_GPU_BASED_VALIDATION_SAMPLER_MODE_MISMATCH	= ( D3D12_MESSAGE_ID_GPU_BASED_VALIDATION_RESOURCE_ACCESS_OUT_OF_BOUNDS + 1 ) ,
+        D3D12_MESSAGE_ID_CREATE_FENCE_INVALID_FLAGS	= ( D3D12_MESSAGE_ID_GPU_BASED_VALIDATION_SAMPLER_MODE_MISMATCH + 1 ) ,
+        D3D12_MESSAGE_ID_RESOURCE_BARRIER_DUPLICATE_SUBRESOURCE_TRANSITIONS	= ( D3D12_MESSAGE_ID_CREATE_FENCE_INVALID_FLAGS + 1 ) ,
+        D3D12_MESSAGE_ID_SETRESIDENCYPRIORITY_INVALID_PRIORITY	= ( D3D12_MESSAGE_ID_RESOURCE_BARRIER_DUPLICATE_SUBRESOURCE_TRANSITIONS + 1 ) ,
+        D3D12_MESSAGE_ID_CREATE_PASS	= ( D3D12_MESSAGE_ID_SETRESIDENCYPRIORITY_INVALID_PRIORITY + 1 ) ,
+        D3D12_MESSAGE_ID_DESTROY_PASS	= ( D3D12_MESSAGE_ID_CREATE_PASS + 1 ) ,
+        D3D12_MESSAGE_ID_LIVE_PASS	= ( D3D12_MESSAGE_ID_DESTROY_PASS + 1 ) ,
+        D3D12_MESSAGE_ID_CREATE_DESCRIPTOR_HEAP_LARGE_NUM_DESCRIPTORS	= ( D3D12_MESSAGE_ID_LIVE_PASS + 1 ) ,
+        D3D12_MESSAGE_ID_BEGIN_EVENT	= ( D3D12_MESSAGE_ID_CREATE_DESCRIPTOR_HEAP_LARGE_NUM_DESCRIPTORS + 1 ) ,
+        D3D12_MESSAGE_ID_END_EVENT	= ( D3D12_MESSAGE_ID_BEGIN_EVENT + 1 ) ,
+        D3D12_MESSAGE_ID_CREATEDEVICE_DEBUG_LAYER_STARTUP_OPTIONS	= ( D3D12_MESSAGE_ID_END_EVENT + 1 ) ,
+        D3D12_MESSAGE_ID_CREATEDEPTHSTENCILSTATE_DEPTHBOUNDSTEST_UNSUPPORTED	= ( D3D12_MESSAGE_ID_CREATEDEVICE_DEBUG_LAYER_STARTUP_OPTIONS + 1 ) ,
+        D3D12_MESSAGE_ID_CREATEPIPELINESTATE_DUPLICATE_SUBOBJECT	= ( D3D12_MESSAGE_ID_CREATEDEPTHSTENCILSTATE_DEPTHBOUNDSTEST_UNSUPPORTED + 1 ) ,
+        D3D12_MESSAGE_ID_CREATEPIPELINESTATE_UNKNOWN_SUBOBJECT	= ( D3D12_MESSAGE_ID_CREATEPIPELINESTATE_DUPLICATE_SUBOBJECT + 1 ) ,
+        D3D12_MESSAGE_ID_CREATEPIPELINESTATE_ZERO_SIZE_STREAM	= ( D3D12_MESSAGE_ID_CREATEPIPELINESTATE_UNKNOWN_SUBOBJECT + 1 ) ,
+        D3D12_MESSAGE_ID_CREATEPIPELINESTATE_INVALID_STREAM	= ( D3D12_MESSAGE_ID_CREATEPIPELINESTATE_ZERO_SIZE_STREAM + 1 ) ,
+        D3D12_MESSAGE_ID_CREATEPIPELINESTATE_CANNOT_DEDUCE_TYPE	= ( D3D12_MESSAGE_ID_CREATEPIPELINESTATE_INVALID_STREAM + 1 ) ,
+        D3D12_MESSAGE_ID_COMMAND_LIST_STATIC_DESCRIPTOR_RESOURCE_DIMENSION_MISMATCH	= ( D3D12_MESSAGE_ID_CREATEPIPELINESTATE_CANNOT_DEDUCE_TYPE + 1 ) ,
+        D3D12_MESSAGE_ID_CREATE_COMMAND_QUEUE_INSUFFICIENT_PRIVILEGE_FOR_GLOBAL_REALTIME	= ( D3D12_MESSAGE_ID_COMMAND_LIST_STATIC_DESCRIPTOR_RESOURCE_DIMENSION_MISMATCH + 1 ) ,
+        D3D12_MESSAGE_ID_CREATE_COMMAND_QUEUE_INSUFFICIENT_HARDWARE_SUPPORT_FOR_GLOBAL_REALTIME	= ( D3D12_MESSAGE_ID_CREATE_COMMAND_QUEUE_INSUFFICIENT_PRIVILEGE_FOR_GLOBAL_REALTIME + 1 ) ,
+        D3D12_MESSAGE_ID_ATOMICCOPYBUFFER_INVALID_ARCHITECTURE	= ( D3D12_MESSAGE_ID_CREATE_COMMAND_QUEUE_INSUFFICIENT_HARDWARE_SUPPORT_FOR_GLOBAL_REALTIME + 1 ) ,
+        D3D12_MESSAGE_ID_ATOMICCOPYBUFFER_NULL_DST	= ( D3D12_MESSAGE_ID_ATOMICCOPYBUFFER_INVALID_ARCHITECTURE + 1 ) ,
+        D3D12_MESSAGE_ID_ATOMICCOPYBUFFER_INVALID_DST_RESOURCE_DIMENSION	= ( D3D12_MESSAGE_ID_ATOMICCOPYBUFFER_NULL_DST + 1 ) ,
+        D3D12_MESSAGE_ID_ATOMICCOPYBUFFER_DST_RANGE_OUT_OF_BOUNDS	= ( D3D12_MESSAGE_ID_ATOMICCOPYBUFFER_INVALID_DST_RESOURCE_DIMENSION + 1 ) ,
+        D3D12_MESSAGE_ID_ATOMICCOPYBUFFER_NULL_SRC	= ( D3D12_MESSAGE_ID_ATOMICCOPYBUFFER_DST_RANGE_OUT_OF_BOUNDS + 1 ) ,
+        D3D12_MESSAGE_ID_ATOMICCOPYBUFFER_INVALID_SRC_RESOURCE_DIMENSION	= ( D3D12_MESSAGE_ID_ATOMICCOPYBUFFER_NULL_SRC + 1 ) ,
+        D3D12_MESSAGE_ID_ATOMICCOPYBUFFER_SRC_RANGE_OUT_OF_BOUNDS	= ( D3D12_MESSAGE_ID_ATOMICCOPYBUFFER_INVALID_SRC_RESOURCE_DIMENSION + 1 ) ,
+        D3D12_MESSAGE_ID_ATOMICCOPYBUFFER_INVALID_OFFSET_ALIGNMENT	= ( D3D12_MESSAGE_ID_ATOMICCOPYBUFFER_SRC_RANGE_OUT_OF_BOUNDS + 1 ) ,
+        D3D12_MESSAGE_ID_ATOMICCOPYBUFFER_NULL_DEPENDENT_RESOURCES	= ( D3D12_MESSAGE_ID_ATOMICCOPYBUFFER_INVALID_OFFSET_ALIGNMENT + 1 ) ,
+        D3D12_MESSAGE_ID_ATOMICCOPYBUFFER_NULL_DEPENDENT_SUBRESOURCE_RANGES	= ( D3D12_MESSAGE_ID_ATOMICCOPYBUFFER_NULL_DEPENDENT_RESOURCES + 1 ) ,
+        D3D12_MESSAGE_ID_ATOMICCOPYBUFFER_INVALID_DEPENDENT_RESOURCE	= ( D3D12_MESSAGE_ID_ATOMICCOPYBUFFER_NULL_DEPENDENT_SUBRESOURCE_RANGES + 1 ) ,
+        D3D12_MESSAGE_ID_ATOMICCOPYBUFFER_INVALID_DEPENDENT_SUBRESOURCE_RANGE	= ( D3D12_MESSAGE_ID_ATOMICCOPYBUFFER_INVALID_DEPENDENT_RESOURCE + 1 ) ,
+        D3D12_MESSAGE_ID_ATOMICCOPYBUFFER_DEPENDENT_SUBRESOURCE_OUT_OF_BOUNDS	= ( D3D12_MESSAGE_ID_ATOMICCOPYBUFFER_INVALID_DEPENDENT_SUBRESOURCE_RANGE + 1 ) ,
+        D3D12_MESSAGE_ID_ATOMICCOPYBUFFER_DEPENDENT_RANGE_OUT_OF_BOUNDS	= ( D3D12_MESSAGE_ID_ATOMICCOPYBUFFER_DEPENDENT_SUBRESOURCE_OUT_OF_BOUNDS + 1 ) ,
+        D3D12_MESSAGE_ID_ATOMICCOPYBUFFER_ZERO_DEPENDENCIES	= ( D3D12_MESSAGE_ID_ATOMICCOPYBUFFER_DEPENDENT_RANGE_OUT_OF_BOUNDS + 1 ) ,
+        D3D12_MESSAGE_ID_DEVICE_CREATE_SHARED_HANDLE_INVALIDARG	= ( D3D12_MESSAGE_ID_ATOMICCOPYBUFFER_ZERO_DEPENDENCIES + 1 ) ,
+        D3D12_MESSAGE_ID_DESCRIPTOR_HANDLE_WITH_INVALID_RESOURCE	= ( D3D12_MESSAGE_ID_DEVICE_CREATE_SHARED_HANDLE_INVALIDARG + 1 ) ,
+        D3D12_MESSAGE_ID_SETDEPTHBOUNDS_INVALIDARGS	= ( D3D12_MESSAGE_ID_DESCRIPTOR_HANDLE_WITH_INVALID_RESOURCE + 1 ) ,
+        D3D12_MESSAGE_ID_GPU_BASED_VALIDATION_RESOURCE_STATE_IMPRECISE	= ( D3D12_MESSAGE_ID_SETDEPTHBOUNDS_INVALIDARGS + 1 ) ,
+        D3D12_MESSAGE_ID_COMMAND_LIST_PIPELINE_STATE_NOT_SET	= ( D3D12_MESSAGE_ID_GPU_BASED_VALIDATION_RESOURCE_STATE_IMPRECISE + 1 ) ,
+        D3D12_MESSAGE_ID_CREATEGRAPHICSPIPELINESTATE_SHADER_MODEL_MISMATCH	= ( D3D12_MESSAGE_ID_COMMAND_LIST_PIPELINE_STATE_NOT_SET + 1 ) ,
+        D3D12_MESSAGE_ID_OBJECT_ACCESSED_WHILE_STILL_IN_USE	= ( D3D12_MESSAGE_ID_CREATEGRAPHICSPIPELINESTATE_SHADER_MODEL_MISMATCH + 1 ) ,
+        D3D12_MESSAGE_ID_PROGRAMMABLE_MSAA_UNSUPPORTED	= ( D3D12_MESSAGE_ID_OBJECT_ACCESSED_WHILE_STILL_IN_USE + 1 ) ,
+        D3D12_MESSAGE_ID_SETSAMPLEPOSITIONS_INVALIDARGS	= ( D3D12_MESSAGE_ID_PROGRAMMABLE_MSAA_UNSUPPORTED + 1 ) ,
+        D3D12_MESSAGE_ID_RESOLVESUBRESOURCEREGION_INVALID_RECT	= ( D3D12_MESSAGE_ID_SETSAMPLEPOSITIONS_INVALIDARGS + 1 ) ,
+        D3D12_MESSAGE_ID_CREATE_VIDEODECODECOMMANDQUEUE	= ( D3D12_MESSAGE_ID_RESOLVESUBRESOURCEREGION_INVALID_RECT + 1 ) ,
+        D3D12_MESSAGE_ID_CREATE_VIDEOPROCESSCOMMANDLIST	= ( D3D12_MESSAGE_ID_CREATE_VIDEODECODECOMMANDQUEUE + 1 ) ,
+        D3D12_MESSAGE_ID_CREATE_VIDEOPROCESSCOMMANDQUEUE	= ( D3D12_MESSAGE_ID_CREATE_VIDEOPROCESSCOMMANDLIST + 1 ) ,
+        D3D12_MESSAGE_ID_LIVE_VIDEODECODECOMMANDQUEUE	= ( D3D12_MESSAGE_ID_CREATE_VIDEOPROCESSCOMMANDQUEUE + 1 ) ,
+        D3D12_MESSAGE_ID_LIVE_VIDEOPROCESSCOMMANDLIST	= ( D3D12_MESSAGE_ID_LIVE_VIDEODECODECOMMANDQUEUE + 1 ) ,
+        D3D12_MESSAGE_ID_LIVE_VIDEOPROCESSCOMMANDQUEUE	= ( D3D12_MESSAGE_ID_LIVE_VIDEOPROCESSCOMMANDLIST + 1 ) ,
+        D3D12_MESSAGE_ID_DESTROY_VIDEODECODECOMMANDQUEUE	= ( D3D12_MESSAGE_ID_LIVE_VIDEOPROCESSCOMMANDQUEUE + 1 ) ,
+        D3D12_MESSAGE_ID_DESTROY_VIDEOPROCESSCOMMANDLIST	= ( D3D12_MESSAGE_ID_DESTROY_VIDEODECODECOMMANDQUEUE + 1 ) ,
+        D3D12_MESSAGE_ID_DESTROY_VIDEOPROCESSCOMMANDQUEUE	= ( D3D12_MESSAGE_ID_DESTROY_VIDEOPROCESSCOMMANDLIST + 1 ) ,
+        D3D12_MESSAGE_ID_CREATE_VIDEOPROCESSOR	= ( D3D12_MESSAGE_ID_DESTROY_VIDEOPROCESSCOMMANDQUEUE + 1 ) ,
+        D3D12_MESSAGE_ID_CREATE_VIDEOPROCESSSTREAM	= ( D3D12_MESSAGE_ID_CREATE_VIDEOPROCESSOR + 1 ) ,
+        D3D12_MESSAGE_ID_LIVE_VIDEOPROCESSOR	= ( D3D12_MESSAGE_ID_CREATE_VIDEOPROCESSSTREAM + 1 ) ,
+        D3D12_MESSAGE_ID_LIVE_VIDEOPROCESSSTREAM	= ( D3D12_MESSAGE_ID_LIVE_VIDEOPROCESSOR + 1 ) ,
+        D3D12_MESSAGE_ID_DESTROY_VIDEOPROCESSOR	= ( D3D12_MESSAGE_ID_LIVE_VIDEOPROCESSSTREAM + 1 ) ,
+        D3D12_MESSAGE_ID_DESTROY_VIDEOPROCESSSTREAM	= ( D3D12_MESSAGE_ID_DESTROY_VIDEOPROCESSOR + 1 ) ,
+        D3D12_MESSAGE_ID_PROCESS_FRAME_INVALID_PARAMETERS	= ( D3D12_MESSAGE_ID_DESTROY_VIDEOPROCESSSTREAM + 1 ) ,
+        D3D12_MESSAGE_ID_COPY_INVALIDLAYOUT	= ( D3D12_MESSAGE_ID_PROCESS_FRAME_INVALID_PARAMETERS + 1 ) ,
+        D3D12_MESSAGE_ID_CREATE_CRYPTO_SESSION	= 1068,
+        D3D12_MESSAGE_ID_CREATE_CRYPTO_SESSION_POLICY	= 1069,
+        D3D12_MESSAGE_ID_CREATE_PROTECTED_RESOURCE_SESSION	= 1070,
+        D3D12_MESSAGE_ID_LIVE_CRYPTO_SESSION	= 1071,
+        D3D12_MESSAGE_ID_LIVE_CRYPTO_SESSION_POLICY	= 1072,
+        D3D12_MESSAGE_ID_LIVE_PROTECTED_RESOURCE_SESSION	= 1073,
+        D3D12_MESSAGE_ID_DESTROY_CRYPTO_SESSION	= 1074,
+        D3D12_MESSAGE_ID_DESTROY_CRYPTO_SESSION_POLICY	= 1075,
+        D3D12_MESSAGE_ID_DESTROY_PROTECTED_RESOURCE_SESSION	= 1076,
+        D3D12_MESSAGE_ID_PROTECTED_RESOURCE_SESSION_UNSUPPORTED	= 1077,
+        D3D12_MESSAGE_ID_FENCE_INVALIDOPERATION	= 1078,
+        D3D12_MESSAGE_ID_CREATEQUERY_HEAP_COPY_QUEUE_TIMESTAMPS_NOT_SUPPORTED	= 1079,
+        D3D12_MESSAGE_ID_SAMPLEPOSITIONS_MISMATCH_DEFERRED	= 1080,
+        D3D12_MESSAGE_ID_SAMPLEPOSITIONS_MISMATCH_RECORDTIME_ASSUMEDFROMFIRSTUSE	= 1081,
+        D3D12_MESSAGE_ID_SAMPLEPOSITIONS_MISMATCH_RECORDTIME_ASSUMEDFROMCLEAR	= 1082,
+        D3D12_MESSAGE_ID_CREATE_VIDEODECODERHEAP	= 1083,
+        D3D12_MESSAGE_ID_LIVE_VIDEODECODERHEAP	= 1084,
+        D3D12_MESSAGE_ID_DESTROY_VIDEODECODERHEAP	= 1085,
+        D3D12_MESSAGE_ID_OPENEXISTINGHEAP_INVALIDARG_RETURN	= 1086,
+        D3D12_MESSAGE_ID_OPENEXISTINGHEAP_OUTOFMEMORY_RETURN	= 1087,
+        D3D12_MESSAGE_ID_OPENEXISTINGHEAP_INVALIDADDRESS	= 1088,
+        D3D12_MESSAGE_ID_OPENEXISTINGHEAP_INVALIDHANDLE	= 1089,
+        D3D12_MESSAGE_ID_WRITEBUFFERIMMEDIATE_INVALID_DEST	= 1090,
+        D3D12_MESSAGE_ID_WRITEBUFFERIMMEDIATE_INVALID_MODE	= 1091,
+        D3D12_MESSAGE_ID_WRITEBUFFERIMMEDIATE_INVALID_ALIGNMENT	= 1092,
+        D3D12_MESSAGE_ID_WRITEBUFFERIMMEDIATE_NOT_SUPPORTED	= 1093,
+        D3D12_MESSAGE_ID_SETVIEWINSTANCEMASK_INVALIDARGS	= 1094,
+        D3D12_MESSAGE_ID_VIEW_INSTANCING_UNSUPPORTED	= 1095,
+        D3D12_MESSAGE_ID_VIEW_INSTANCING_INVALIDARGS	= 1096,
+        D3D12_MESSAGE_ID_COPYTEXTUREREGION_MISMATCH_DECODE_REFERENCE_ONLY_FLAG	= 1097,
+        D3D12_MESSAGE_ID_COPYRESOURCE_MISMATCH_DECODE_REFERENCE_ONLY_FLAG	= 1098,
+        D3D12_MESSAGE_ID_CREATE_VIDEO_DECODE_HEAP_CAPS_FAILURE	= 1099,
+        D3D12_MESSAGE_ID_CREATE_VIDEO_DECODE_HEAP_CAPS_UNSUPPORTED	= 1100,
+        D3D12_MESSAGE_ID_VIDEO_DECODE_SUPPORT_INVALID_INPUT	= 1101,
+        D3D12_MESSAGE_ID_CREATE_VIDEO_DECODER_UNSUPPORTED	= 1102,
+        D3D12_MESSAGE_ID_CREATEGRAPHICSPIPELINESTATE_METADATA_ERROR	= 1103,
+        D3D12_MESSAGE_ID_CREATEGRAPHICSPIPELINESTATE_VIEW_INSTANCING_VERTEX_SIZE_EXCEEDED	= 1104,
+        D3D12_MESSAGE_ID_CREATEGRAPHICSPIPELINESTATE_RUNTIME_INTERNAL_ERROR	= 1105,
+        D3D12_MESSAGE_ID_NO_VIDEO_API_SUPPORT	= 1106,
+        D3D12_MESSAGE_ID_VIDEO_PROCESS_SUPPORT_INVALID_INPUT	= 1107,
+        D3D12_MESSAGE_ID_CREATE_VIDEO_PROCESSOR_CAPS_FAILURE	= 1108,
+        D3D12_MESSAGE_ID_VIDEO_PROCESS_SUPPORT_UNSUPPORTED_FORMAT	= 1109,
+        D3D12_MESSAGE_ID_VIDEO_DECODE_FRAME_INVALID_ARGUMENT	= 1110,
+        D3D12_MESSAGE_ID_ENQUEUE_MAKE_RESIDENT_INVALID_FLAGS	= 1111,
+        D3D12_MESSAGE_ID_OPENEXISTINGHEAP_UNSUPPORTED	= 1112,
+        D3D12_MESSAGE_ID_VIDEO_PROCESS_FRAMES_INVALID_ARGUMENT	= 1113,
+        D3D12_MESSAGE_ID_VIDEO_DECODE_SUPPORT_UNSUPPORTED	= 1114,
+        D3D12_MESSAGE_ID_CREATE_COMMANDRECORDER	= 1115,
+        D3D12_MESSAGE_ID_LIVE_COMMANDRECORDER	= 1116,
+        D3D12_MESSAGE_ID_DESTROY_COMMANDRECORDER	= 1117,
+        D3D12_MESSAGE_ID_CREATE_COMMAND_RECORDER_VIDEO_NOT_SUPPORTED	= 1118,
+        D3D12_MESSAGE_ID_CREATE_COMMAND_RECORDER_INVALID_SUPPORT_FLAGS	= 1119,
+        D3D12_MESSAGE_ID_CREATE_COMMAND_RECORDER_INVALID_FLAGS	= 1120,
+        D3D12_MESSAGE_ID_CREATE_COMMAND_RECORDER_MORE_RECORDERS_THAN_LOGICAL_PROCESSORS	= 1121,
+        D3D12_MESSAGE_ID_CREATE_COMMANDPOOL	= 1122,
+        D3D12_MESSAGE_ID_LIVE_COMMANDPOOL	= 1123,
+        D3D12_MESSAGE_ID_DESTROY_COMMANDPOOL	= 1124,
+        D3D12_MESSAGE_ID_CREATE_COMMAND_POOL_INVALID_FLAGS	= 1125,
+        D3D12_MESSAGE_ID_CREATE_COMMAND_LIST_VIDEO_NOT_SUPPORTED	= 1126,
+        D3D12_MESSAGE_ID_COMMAND_RECORDER_SUPPORT_FLAGS_MISMATCH	= 1127,
+        D3D12_MESSAGE_ID_COMMAND_RECORDER_CONTENTION	= 1128,
+        D3D12_MESSAGE_ID_COMMAND_RECORDER_USAGE_WITH_CREATECOMMANDLIST_COMMAND_LIST	= 1129,
+        D3D12_MESSAGE_ID_COMMAND_ALLOCATOR_USAGE_WITH_CREATECOMMANDLIST1_COMMAND_LIST	= 1130,
+        D3D12_MESSAGE_ID_CANNOT_EXECUTE_EMPTY_COMMAND_LIST	= 1131,
+        D3D12_MESSAGE_ID_CANNOT_RESET_COMMAND_POOL_WITH_OPEN_COMMAND_LISTS	= 1132,
+        D3D12_MESSAGE_ID_CANNOT_USE_COMMAND_RECORDER_WITHOUT_CURRENT_TARGET	= 1133,
+        D3D12_MESSAGE_ID_CANNOT_CHANGE_COMMAND_RECORDER_TARGET_WHILE_RECORDING	= 1134,
+        D3D12_MESSAGE_ID_COMMAND_POOL_SYNC	= 1135,
+        D3D12_MESSAGE_ID_EVICT_UNDERFLOW	= 1136,
+        D3D12_MESSAGE_ID_CREATE_META_COMMAND	= 1137,
+        D3D12_MESSAGE_ID_LIVE_META_COMMAND	= 1138,
+        D3D12_MESSAGE_ID_DESTROY_META_COMMAND	= 1139,
+        D3D12_MESSAGE_ID_COPYBUFFERREGION_INVALID_DST_RESOURCE	= 1140,
+        D3D12_MESSAGE_ID_COPYBUFFERREGION_INVALID_SRC_RESOURCE	= 1141,
+        D3D12_MESSAGE_ID_ATOMICCOPYBUFFER_INVALID_DST_RESOURCE	= 1142,
+        D3D12_MESSAGE_ID_ATOMICCOPYBUFFER_INVALID_SRC_RESOURCE	= 1143,
+        D3D12_MESSAGE_ID_CREATEPLACEDRESOURCEONBUFFER_NULL_BUFFER	= 1144,
+        D3D12_MESSAGE_ID_CREATEPLACEDRESOURCEONBUFFER_NULL_RESOURCE_DESC	= 1145,
+        D3D12_MESSAGE_ID_CREATEPLACEDRESOURCEONBUFFER_UNSUPPORTED	= 1146,
+        D3D12_MESSAGE_ID_CREATEPLACEDRESOURCEONBUFFER_INVALID_BUFFER_DIMENSION	= 1147,
+        D3D12_MESSAGE_ID_CREATEPLACEDRESOURCEONBUFFER_INVALID_BUFFER_FLAGS	= 1148,
+        D3D12_MESSAGE_ID_CREATEPLACEDRESOURCEONBUFFER_INVALID_BUFFER_OFFSET	= 1149,
+        D3D12_MESSAGE_ID_CREATEPLACEDRESOURCEONBUFFER_INVALID_RESOURCE_DIMENSION	= 1150,
+        D3D12_MESSAGE_ID_CREATEPLACEDRESOURCEONBUFFER_INVALID_RESOURCE_FLAGS	= 1151,
+        D3D12_MESSAGE_ID_CREATEPLACEDRESOURCEONBUFFER_OUTOFMEMORY_RETURN	= 1152,
+        D3D12_MESSAGE_ID_CANNOT_CREATE_GRAPHICS_AND_VIDEO_COMMAND_RECORDER	= 1153,
+        D3D12_MESSAGE_ID_UPDATETILEMAPPINGS_POSSIBLY_MISMATCHING_PROPERTIES	= 1154,
+        D3D12_MESSAGE_ID_CREATE_COMMAND_LIST_INVALID_COMMAND_LIST_TYPE	= 1155,
+        D3D12_MESSAGE_ID_CLEARUNORDEREDACCESSVIEW_INCOMPATIBLE_WITH_STRUCTURED_BUFFERS	= 1156,
+        D3D12_MESSAGE_ID_COMPUTE_ONLY_DEVICE_OPERATION_UNSUPPORTED	= 1157,
+        D3D12_MESSAGE_ID_BUILD_RAYTRACING_ACCELERATION_STRUCTURE_INVALID	= 1158,
+        D3D12_MESSAGE_ID_EMIT_RAYTRACING_ACCELERATION_STRUCTURE_POSTBUILD_INFO_INVALID	= 1159,
+        D3D12_MESSAGE_ID_COPY_RAYTRACING_ACCELERATION_STRUCTURE_INVALID	= 1160,
+        D3D12_MESSAGE_ID_DISPATCH_RAYS_INVALID	= 1161,
+        D3D12_MESSAGE_ID_GET_RAYTRACING_ACCELERATION_STRUCTURE_PREBUILD_INFO_INVALID	= 1162,
+        D3D12_MESSAGE_ID_CREATE_LIFETIMETRACKER	= 1163,
+        D3D12_MESSAGE_ID_LIVE_LIFETIMETRACKER	= 1164,
+        D3D12_MESSAGE_ID_DESTROY_LIFETIMETRACKER	= 1165,
+        D3D12_MESSAGE_ID_DESTROYOWNEDOBJECT_OBJECTNOTOWNED	= 1166,
+        D3D12_MESSAGE_ID_CREATE_TRACKEDWORKLOAD	= 1167,
+        D3D12_MESSAGE_ID_LIVE_TRACKEDWORKLOAD	= 1168,
+        D3D12_MESSAGE_ID_DESTROY_TRACKEDWORKLOAD	= 1169,
+        D3D12_MESSAGE_ID_RENDER_PASS_ERROR	= 1170,
+        D3D12_MESSAGE_ID_META_COMMAND_ID_INVALID	= 1171,
+        D3D12_MESSAGE_ID_META_COMMAND_UNSUPPORTED_PARAMS	= 1172,
+        D3D12_MESSAGE_ID_META_COMMAND_FAILED_ENUMERATION	= 1173,
+        D3D12_MESSAGE_ID_META_COMMAND_PARAMETER_SIZE_MISMATCH	= 1174,
+        D3D12_MESSAGE_ID_UNINITIALIZED_META_COMMAND	= 1175,
+        D3D12_MESSAGE_ID_META_COMMAND_INVALID_GPU_VIRTUAL_ADDRESS	= 1176,
+        D3D12_MESSAGE_ID_CREATE_VIDEOENCODECOMMANDLIST	= 1177,
+        D3D12_MESSAGE_ID_LIVE_VIDEOENCODECOMMANDLIST	= 1178,
+        D3D12_MESSAGE_ID_DESTROY_VIDEOENCODECOMMANDLIST	= 1179,
+        D3D12_MESSAGE_ID_CREATE_VIDEOENCODECOMMANDQUEUE	= 1180,
+        D3D12_MESSAGE_ID_LIVE_VIDEOENCODECOMMANDQUEUE	= 1181,
+        D3D12_MESSAGE_ID_DESTROY_VIDEOENCODECOMMANDQUEUE	= 1182,
+        D3D12_MESSAGE_ID_CREATE_VIDEOMOTIONESTIMATOR	= 1183,
+        D3D12_MESSAGE_ID_LIVE_VIDEOMOTIONESTIMATOR	= 1184,
+        D3D12_MESSAGE_ID_DESTROY_VIDEOMOTIONESTIMATOR	= 1185,
+        D3D12_MESSAGE_ID_CREATE_VIDEOMOTIONVECTORHEAP	= 1186,
+        D3D12_MESSAGE_ID_LIVE_VIDEOMOTIONVECTORHEAP	= 1187,
+        D3D12_MESSAGE_ID_DESTROY_VIDEOMOTIONVECTORHEAP	= 1188,
+        D3D12_MESSAGE_ID_MULTIPLE_TRACKED_WORKLOADS	= 1189,
+        D3D12_MESSAGE_ID_MULTIPLE_TRACKED_WORKLOAD_PAIRS	= 1190,
+        D3D12_MESSAGE_ID_OUT_OF_ORDER_TRACKED_WORKLOAD_PAIR	= 1191,
+        D3D12_MESSAGE_ID_CANNOT_ADD_TRACKED_WORKLOAD	= 1192,
+        D3D12_MESSAGE_ID_INCOMPLETE_TRACKED_WORKLOAD_PAIR	= 1193,
+        D3D12_MESSAGE_ID_CREATE_STATE_OBJECT_ERROR	= 1194,
+        D3D12_MESSAGE_ID_GET_SHADER_IDENTIFIER_ERROR	= 1195,
+        D3D12_MESSAGE_ID_GET_SHADER_STACK_SIZE_ERROR	= 1196,
+        D3D12_MESSAGE_ID_GET_PIPELINE_STACK_SIZE_ERROR	= 1197,
+        D3D12_MESSAGE_ID_SET_PIPELINE_STACK_SIZE_ERROR	= 1198,
+        D3D12_MESSAGE_ID_GET_SHADER_IDENTIFIER_SIZE_INVALID	= 1199,
+        D3D12_MESSAGE_ID_CHECK_DRIVER_MATCHING_IDENTIFIER_INVALID	= 1200,
+        D3D12_MESSAGE_ID_CHECK_DRIVER_MATCHING_IDENTIFIER_DRIVER_REPORTED_ISSUE	= 1201,
+        D3D12_MESSAGE_ID_RENDER_PASS_INVALID_RESOURCE_BARRIER	= 1202,
+        D3D12_MESSAGE_ID_RENDER_PASS_DISALLOWED_API_CALLED	= 1203,
+        D3D12_MESSAGE_ID_RENDER_PASS_CANNOT_NEST_RENDER_PASSES	= 1204,
+        D3D12_MESSAGE_ID_RENDER_PASS_CANNOT_END_WITHOUT_BEGIN	= 1205,
+        D3D12_MESSAGE_ID_RENDER_PASS_CANNOT_CLOSE_COMMAND_LIST	= 1206,
+        D3D12_MESSAGE_ID_RENDER_PASS_GPU_WORK_WHILE_SUSPENDED	= 1207,
+        D3D12_MESSAGE_ID_RENDER_PASS_MISMATCHING_SUSPEND_RESUME	= 1208,
+        D3D12_MESSAGE_ID_RENDER_PASS_NO_PRIOR_SUSPEND_WITHIN_EXECUTECOMMANDLISTS	= 1209,
+        D3D12_MESSAGE_ID_RENDER_PASS_NO_SUBSEQUENT_RESUME_WITHIN_EXECUTECOMMANDLISTS	= 1210,
+        D3D12_MESSAGE_ID_TRACKED_WORKLOAD_COMMAND_QUEUE_MISMATCH	= 1211,
+        D3D12_MESSAGE_ID_TRACKED_WORKLOAD_NOT_SUPPORTED	= 1212,
+        D3D12_MESSAGE_ID_RENDER_PASS_MISMATCHING_NO_ACCESS	= 1213,
+        D3D12_MESSAGE_ID_RENDER_PASS_UNSUPPORTED_RESOLVE	= 1214,
+        D3D12_MESSAGE_ID_D3D12_MESSAGES_END	= ( D3D12_MESSAGE_ID_RENDER_PASS_UNSUPPORTED_RESOLVE + 1 ) 
     } 	D3D12_MESSAGE_ID;
 
+static_assert(D3D12_MESSAGE_ID_GPU_BASED_VALIDATION_UNSUPPORTED == 1000, "Publicly released SDK D3D12_MESSAGE_ID enum values must not be changed. New enum values must be added to the end of the list.");
+static_assert(D3D12_MESSAGE_ID_COPY_INVALIDLAYOUT == 1067, "Publicly released SDK D3D12_MESSAGE_ID enum values must not be changed. New enum values must be added to the end of the list.");
 typedef struct D3D12_MESSAGE
     {
     D3D12_MESSAGE_CATEGORY Category;
@@ -1487,8 +2757,8 @@ typedef struct D3D12_INFO_QUEUE_FILTER
 #define D3D12_INFO_QUEUE_DEFAULT_MESSAGE_COUNT_LIMIT 1024
 
 
-extern RPC_IF_HANDLE __MIDL_itf_d3d12sdklayers_0000_0004_v0_0_c_ifspec;
-extern RPC_IF_HANDLE __MIDL_itf_d3d12sdklayers_0000_0004_v0_0_s_ifspec;
+extern RPC_IF_HANDLE __MIDL_itf_d3d12sdklayers_0000_0012_v0_0_c_ifspec;
+extern RPC_IF_HANDLE __MIDL_itf_d3d12sdklayers_0000_0012_v0_0_s_ifspec;
 
 #ifndef __ID3D12InfoQueue_INTERFACE_DEFINED__
 #define __ID3D12InfoQueue_INTERFACE_DEFINED__
@@ -1895,18 +3165,28 @@ EXTERN_C const IID IID_ID3D12InfoQueue;
 #endif 	/* __ID3D12InfoQueue_INTERFACE_DEFINED__ */
 
 
-/* interface __MIDL_itf_d3d12sdklayers_0000_0005 */
+/* interface __MIDL_itf_d3d12sdklayers_0000_0013 */
 /* [local] */ 
 
+#endif /* WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_APP) */
+// BK - pragma endregion
 DEFINE_GUID(IID_ID3D12Debug,0x344488b7,0x6846,0x474b,0xb9,0x89,0xf0,0x27,0x44,0x82,0x45,0xe0);
+DEFINE_GUID(IID_ID3D12Debug1,0xaffaa4ca,0x63fe,0x4d8e,0xb8,0xad,0x15,0x90,0x00,0xaf,0x43,0x04);
+DEFINE_GUID(IID_ID3D12Debug2,0x93a665c4,0xa3b2,0x4e5d,0xb6,0x92,0xa2,0x6a,0xe1,0x4e,0x33,0x74);
+DEFINE_GUID(IID_ID3D12Debug3,0x5cf4e58f,0xf671,0x4ff1,0xa5,0x42,0x36,0x86,0xe3,0xd1,0x53,0xd1);
+DEFINE_GUID(IID_ID3D12DebugDevice1,0xa9b71770,0xd099,0x4a65,0xa6,0x98,0x3d,0xee,0x10,0x02,0x0f,0x88);
 DEFINE_GUID(IID_ID3D12DebugDevice,0x3febd6dd,0x4973,0x4787,0x81,0x94,0xe4,0x5f,0x9e,0x28,0x92,0x3e);
+DEFINE_GUID(IID_ID3D12DebugDevice2,0x60eccbc1,0x378d,0x4df1,0x89,0x4c,0xf8,0xac,0x5c,0xe4,0xd7,0xdd);
 DEFINE_GUID(IID_ID3D12DebugCommandQueue,0x09e0bf36,0x54ac,0x484f,0x88,0x47,0x4b,0xae,0xea,0xb6,0x05,0x3a);
+DEFINE_GUID(IID_ID3D12DebugCommandList1,0x102ca951,0x311b,0x4b01,0xb1,0x1f,0xec,0xb8,0x3e,0x06,0x1b,0x37);
 DEFINE_GUID(IID_ID3D12DebugCommandList,0x09e0bf36,0x54ac,0x484f,0x88,0x47,0x4b,0xae,0xea,0xb6,0x05,0x3f);
+DEFINE_GUID(IID_ID3D12DebugCommandList2,0xaeb575cf,0x4e06,0x48be,0xba,0x3b,0xc4,0x50,0xfc,0x96,0x65,0x2e);
+DEFINE_GUID(IID_ID3D12SharingContract,0x0adf7d52,0x929c,0x4e61,0xad,0xdb,0xff,0xed,0x30,0xde,0x66,0xef);
 DEFINE_GUID(IID_ID3D12InfoQueue,0x0742a90b,0xc387,0x483f,0xb9,0x46,0x30,0xa7,0xe4,0xe6,0x14,0x58);
 
 
-extern RPC_IF_HANDLE __MIDL_itf_d3d12sdklayers_0000_0005_v0_0_c_ifspec;
-extern RPC_IF_HANDLE __MIDL_itf_d3d12sdklayers_0000_0005_v0_0_s_ifspec;
+extern RPC_IF_HANDLE __MIDL_itf_d3d12sdklayers_0000_0013_v0_0_c_ifspec;
+extern RPC_IF_HANDLE __MIDL_itf_d3d12sdklayers_0000_0013_v0_0_s_ifspec;
 
 /* Additional Prototypes for ALL interfaces */
 

@@ -38,6 +38,9 @@ public:
 		, m_discrete(*this, "discrete")
 	{ }
 
+	void alinvade(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(irqmask_r);
 	DECLARE_WRITE8_MEMBER(irqmask_w);
 	DECLARE_WRITE8_MEMBER(sound_w);
@@ -45,9 +48,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void alinvade(machine_config &config);
 	void alinvade_map(address_map &map);
-private:
+
 	uint8_t m_irqmask;
 	uint8_t m_irqff;
 	virtual void machine_start() override;
@@ -62,7 +64,7 @@ static const discrete_dac_r1_ladder alinvade_music_dac =
 
 #define ALINVADE_MUSIC_CLK      (75000)
 
-DISCRETE_SOUND_START(alinvade)
+DISCRETE_SOUND_START(alinvade_discrete)
 	DISCRETE_INPUT_DATA (NODE_01)
 
 	DISCRETE_NOTE(NODE_20, 1, ALINVADE_MUSIC_CLK, NODE_01, 255, 5, DISC_CLK_IS_FREQ)
@@ -80,7 +82,7 @@ DISCRETE_SOUND_END
 
 WRITE8_MEMBER( alinvade_state::sound_w )
 {
-	m_discrete->write(space, NODE_01, (data^0x3f)<<2);
+	m_discrete->write(NODE_01, (data^0x3f)<<2);
 }
 
 WRITE8_MEMBER( alinvade_state::sounden_w )
@@ -107,7 +109,7 @@ void alinvade_state::alinvade_map(address_map &map)
 	map(0x0000, 0x01ff).ram();
 	map(0x0400, 0x0bff).ram().share("videoram");
 	map(0x0c00, 0x0dff).ram();
-	map(0x2000, 0x2000).w(this, FUNC(alinvade_state::sound_w));
+	map(0x2000, 0x2000).w(FUNC(alinvade_state::sound_w));
 	map(0x4000, 0x4000).portr("COIN");
 	map(0x6000, 0x6000).portr("DSW");
 	map(0x8000, 0x8000).portr("IN0");
@@ -118,8 +120,8 @@ void alinvade_state::alinvade_map(address_map &map)
 	map(0xa000, 0xa000).nopw(); //??
 	map(0xc000, 0xc00f).mirror(0xff0).rom().region("proms", 0);
 	map(0xe000, 0xe3ff).rom();
-	map(0xe400, 0xe400).w(this, FUNC(alinvade_state::sounden_w));
-	map(0xe800, 0xe800).rw(this, FUNC(alinvade_state::irqmask_r), FUNC(alinvade_state::irqmask_w)); //??
+	map(0xe400, 0xe400).w(FUNC(alinvade_state::sounden_w));
+	map(0xe800, 0xe800).rw(FUNC(alinvade_state::irqmask_r), FUNC(alinvade_state::irqmask_w)); //??
 	map(0xec00, 0xffff).rom();
 }
 
@@ -205,26 +207,25 @@ WRITE_LINE_MEMBER(alinvade_state::vblank_irq)
 		m_maincpu->set_input_line(0,HOLD_LINE);
 }
 
-MACHINE_CONFIG_START(alinvade_state::alinvade)
-
+void alinvade_state::alinvade(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502,2000000)         /* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(alinvade_map)
+	M6502(config, m_maincpu, 2000000);         /* ? MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &alinvade_state::alinvade_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(128, 128)
-	MCFG_SCREEN_VISIBLE_AREA(0, 128-1, 0, 128-1)
-	MCFG_SCREEN_UPDATE_DRIVER(alinvade_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(alinvade_state, vblank_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(128, 128);
+	screen.set_visarea_full();
+	screen.set_screen_update(FUNC(alinvade_state::screen_update));
+	screen.screen_vblank().set(FUNC(alinvade_state::vblank_irq));
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DISCRETE_ADD("discrete", 0, alinvade)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	SPEAKER(config, "mono").front_center();
+	DISCRETE(config, m_discrete, alinvade_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 
@@ -244,4 +245,4 @@ ROM_START( alinvade )
 ROM_END
 
 
-GAMEL( 198?, alinvade,  0,    alinvade, alinvade, alinvade_state,  0, ROT90, "Forbes?", "Alien Invaders", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_alinvade )
+GAMEL( 198?, alinvade, 0, alinvade, alinvade, alinvade_state, empty_init, ROT90, "Forbes?", "Alien Invaders", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_alinvade )

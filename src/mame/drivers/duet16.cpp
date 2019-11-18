@@ -4,6 +4,8 @@
 #include "emu.h"
 #include "cpu/i86/i86.h"
 #include "cpu/mcs48/mcs48.h"
+#include "imagedev/floppy.h"
+#include "machine/i8087.h"
 #include "machine/i8251.h"
 #include "machine/input_merger.h"
 #include "machine/pit8253.h"
@@ -15,6 +17,7 @@
 #include "machine/pit8253.h"
 #include "machine/am9517a.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "bus/rs232/rs232.h"
 #include "bus/rs232/keyboard.h"
@@ -67,7 +70,7 @@ private:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	void duet16_io(address_map &map);
 	void duet16_mem(address_map &map);
-	required_device<cpu_device> m_maincpu;
+	required_device<i8086_cpu_device> m_maincpu;
 	required_device<pic8259_device> m_pic;
 	required_device<upd765a_device> m_fdc;
 	required_device<am9517a_device> m_dmac;
@@ -93,12 +96,12 @@ void duet16_state::machine_reset()
 
 READ8_MEMBER(duet16_state::pic_r)
 {
-	return m_pic->read(space, offset ^ 1, mem_mask);
+	return m_pic->read(offset ^ 1);
 }
 
 WRITE8_MEMBER(duet16_state::pic_w)
 {
-	m_pic->write(space, offset ^ 1, data);
+	m_pic->write(offset ^ 1, data);
 }
 
 WRITE8_MEMBER(duet16_state::fdcctrl_w)
@@ -150,25 +153,24 @@ void duet16_state::duet16_mem(address_map &map)
 	map(0x00000, 0x8ffff).ram();
 	map(0xa8000, 0xbffff).ram().share("gvram");
 	map(0xc0000, 0xc0fff).ram().share("cvram");
-	map(0xf8000, 0xf801f).rw(this, FUNC(duet16_state::dmapg_r), FUNC(duet16_state::dmapg_w)).umask16(0x00ff);
+	map(0xf8000, 0xf801f).rw(FUNC(duet16_state::dmapg_r), FUNC(duet16_state::dmapg_w)).umask16(0x00ff);
 	map(0xf8000, 0xf801f).rw("dmac", FUNC(am9517a_device::read), FUNC(am9517a_device::write)).umask16(0xff00);
-	map(0xf8020, 0xf8023).rw(this, FUNC(duet16_state::pic_r), FUNC(duet16_state::pic_w)).umask16(0x00ff);
+	map(0xf8020, 0xf8023).rw(FUNC(duet16_state::pic_r), FUNC(duet16_state::pic_w)).umask16(0x00ff);
 	map(0xf8040, 0xf804f).rw("itm", FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask16(0x00ff);
 	map(0xf8060, 0xf8067).rw("bgpit", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
 	map(0xf8080, 0xf8087).rw("sio", FUNC(upd7201_new_device::ba_cd_r), FUNC(upd7201_new_device::ba_cd_w)).umask16(0x00ff);
-	map(0xf80a0, 0xf80a0).rw("kbusart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xf80a2, 0xf80a2).rw("kbusart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0xf80c0, 0xf80c0).rw("crtc", FUNC(h46505_device::status_r), FUNC(h46505_device::address_w));
-	map(0xf80c2, 0xf80c2).rw("crtc", FUNC(h46505_device::register_r), FUNC(h46505_device::register_w));
+	map(0xf80a0, 0xf80a3).rw("kbusart", FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
+	map(0xf80c0, 0xf80c0).rw("crtc", FUNC(hd6845s_device::status_r), FUNC(hd6845s_device::address_w));
+	map(0xf80c2, 0xf80c2).rw("crtc", FUNC(hd6845s_device::register_r), FUNC(hd6845s_device::register_w));
 	map(0xf80e0, 0xf80e3).rw("i8741", FUNC(upi41_cpu_device::upi41_master_r), FUNC(upi41_cpu_device::upi41_master_w)).umask16(0x00ff);
-	map(0xf8100, 0xf8103).m("fdc", FUNC(upd765a_device::map)).umask16(0x00ff);
-	map(0xf8120, 0xf8120).rw(this, FUNC(duet16_state::rtc_r), FUNC(duet16_state::rtc_w));
-	map(0xf8160, 0xf819f).w(this, FUNC(duet16_state::pal_w));
-	map(0xf8200, 0xf8201).r(this, FUNC(duet16_state::sysstat_r));
-	map(0xf8220, 0xf8220).w(this, FUNC(duet16_state::fdcctrl_w));
-	map(0xf8260, 0xf8260).w(this, FUNC(duet16_state::rtc_addr_w));
-	map(0xf8280, 0xf8280).r(this, FUNC(duet16_state::rtc_stat_r));
-	map(0xf8280, 0xf8280).w(this, FUNC(duet16_state::dispctrl_w));
+	map(0xf8100, 0xf8103).m(m_fdc, FUNC(upd765a_device::map)).umask16(0x00ff);
+	map(0xf8120, 0xf8120).rw(FUNC(duet16_state::rtc_r), FUNC(duet16_state::rtc_w));
+	map(0xf8160, 0xf819f).w(FUNC(duet16_state::pal_w));
+	map(0xf8200, 0xf8201).r(FUNC(duet16_state::sysstat_r));
+	map(0xf8220, 0xf8220).w(FUNC(duet16_state::fdcctrl_w));
+	map(0xf8260, 0xf8260).w(FUNC(duet16_state::rtc_addr_w));
+	map(0xf8280, 0xf8280).r(FUNC(duet16_state::rtc_stat_r));
+	map(0xf8280, 0xf8280).w(FUNC(duet16_state::dispctrl_w));
 	map(0xfe000, 0xfffff).rom().region("rom", 0);
 }
 
@@ -328,18 +330,20 @@ static const gfx_layout duet16_charlayout =
 	8*16                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START(duet16)
+static GFXDECODE_START(gfx_duet16)
 	GFXDECODE_ENTRY( "char", 0x0000, duet16_charlayout, 0, 1 )
 GFXDECODE_END
 
 
-static SLOT_INTERFACE_START( duet16_floppies )
-	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
-SLOT_INTERFACE_END
+static void duet16_floppies(device_slot_interface &device)
+{
+	device.option_add("525qd", FLOPPY_525_QD);
+}
 
-SLOT_INTERFACE_START(duet16_keyboard_devices)
-	SLOT_INTERFACE("keyboard", SERIAL_KEYBOARD)
-SLOT_INTERFACE_END
+void duet16_keyboard_devices(device_slot_interface &device)
+{
+	device.option_add("keyboard", SERIAL_KEYBOARD);
+}
 
 static DEVICE_INPUT_DEFAULTS_START(keyboard)
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_1200 )
@@ -349,96 +353,100 @@ static DEVICE_INPUT_DEFAULTS_START(keyboard)
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
 DEVICE_INPUT_DEFAULTS_END
 
-MACHINE_CONFIG_START(duet16_state::duet16)
-	MCFG_CPU_ADD("maincpu", I8086, 24_MHz_XTAL / 3)
-	MCFG_CPU_PROGRAM_MAP(duet16_mem)
-	MCFG_CPU_IO_MAP(duet16_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic", pic8259_device, inta_cb)
+void duet16_state::duet16(machine_config &config)
+{
+	I8086(config, m_maincpu, 24_MHz_XTAL / 3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &duet16_state::duet16_mem);
+	m_maincpu->set_addrmap(AS_IO, &duet16_state::duet16_io);
+	m_maincpu->set_irq_acknowledge_callback("pic", FUNC(pic8259_device::inta_cb));
+	m_maincpu->esc_opcode_handler().set("i8087", FUNC(i8087_device::insn_w));
+	m_maincpu->esc_data_handler().set("i8087", FUNC(i8087_device::addr_w));
 
-	MCFG_CPU_ADD("i8741", I8741, 20_MHz_XTAL / 4)
+	i8087_device &i8087(I8087(config, "i8087", 24_MHz_XTAL / 3));
+	i8087.set_space_86(m_maincpu, AS_PROGRAM);
+	i8087.irq().set(m_pic, FUNC(pic8259_device::ir2_w)); // INT87
+	i8087.busy().set_inputline(m_maincpu, INPUT_LINE_TEST);
 
-	MCFG_DEVICE_ADD("pic", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	I8741A(config, "i8741", 20_MHz_XTAL / 4);
 
-	MCFG_DEVICE_ADD("dmac", AM9517A, 20_MHz_XTAL / 4)
-	MCFG_AM9517A_OUT_HREQ_CB(WRITELINE(duet16_state, hrq_w))
-	MCFG_AM9517A_IN_MEMR_CB(READ8(duet16_state, dma_mem_r))
-	MCFG_AM9517A_OUT_MEMW_CB(WRITE8(duet16_state, dma_mem_w))
-	MCFG_AM9517A_IN_IOR_0_CB(DEVREAD8("fdc", upd765a_device, mdma_r))
-	MCFG_AM9517A_OUT_IOW_0_CB(DEVWRITE8("fdc", upd765a_device, mdma_w))
-	MCFG_AM9517A_OUT_EOP_CB(DEVWRITELINE("fdc", upd765a_device, tc_line_w))
+	PIC8259(config, m_pic, 0);
+	m_pic->out_int_callback().set_inputline(m_maincpu, 0);
 
-	MCFG_DEVICE_ADD("bgpit", PIT8253, 0)
-	MCFG_PIT8253_CLK0(8_MHz_XTAL / 13)
-	MCFG_PIT8253_CLK1(8_MHz_XTAL / 13)
-	MCFG_PIT8253_CLK2(8_MHz_XTAL / 13)
-	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("sio", upd7201_new_device, txca_w)) // TODO: selected through LS153
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio", upd7201_new_device, rxca_w))
-	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("sio", upd7201_new_device, txcb_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio", upd7201_new_device, rxcb_w))
-	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("kbusart", i8251_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("kbusart", i8251_device, write_rxc))
+	AM9517A(config, m_dmac, 20_MHz_XTAL / 4);
+	m_dmac->out_hreq_callback().set(FUNC(duet16_state::hrq_w));
+	m_dmac->in_memr_callback().set(FUNC(duet16_state::dma_mem_r));
+	m_dmac->out_memw_callback().set(FUNC(duet16_state::dma_mem_w));
+	m_dmac->in_ior_callback<0>().set(m_fdc, FUNC(upd765a_device::dma_r));
+	m_dmac->out_iow_callback<0>().set(m_fdc, FUNC(upd765a_device::dma_w));
+	m_dmac->out_eop_callback().set(m_fdc, FUNC(upd765a_device::tc_line_w));
 
-	MCFG_DEVICE_ADD("itm", PTM6840, 0)
-	MCFG_PTM6840_EXTERNAL_CLOCKS(0.0, 0.0, (8_MHz_XTAL / 8).dvalue()) // C3 = 1MHz
-	MCFG_PTM6840_O3_CB(DEVWRITELINE("itm", ptm6840_device, set_c1)) // C1 = C2 = O3
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("itm", ptm6840_device, set_c2))
-	MCFG_PTM6840_IRQ_CB(DEVWRITELINE("tmint", input_merger_device, in_w<0>))
+	pit8253_device &bgpit(PIT8253(config, "bgpit", 0));
+	bgpit.set_clk<0>(8_MHz_XTAL / 13);
+	bgpit.set_clk<1>(8_MHz_XTAL / 13);
+	bgpit.set_clk<2>(8_MHz_XTAL / 13);
+	bgpit.out_handler<0>().set("sio", FUNC(upd7201_new_device::txca_w)); // TODO: selected through LS153
+	bgpit.out_handler<0>().append("sio", FUNC(upd7201_new_device::rxca_w));
+	bgpit.out_handler<1>().set("sio", FUNC(upd7201_new_device::txcb_w));
+	bgpit.out_handler<1>().append("sio", FUNC(upd7201_new_device::rxcb_w));
+	bgpit.out_handler<2>().set("kbusart", FUNC(i8251_device::write_txc));
+	bgpit.out_handler<2>().append("kbusart", FUNC(i8251_device::write_rxc));
 
-	MCFG_DEVICE_ADD("sio", UPD7201_NEW, 8_MHz_XTAL / 2)
-	MCFG_Z80SIO_OUT_INT_CB(DEVWRITELINE("pic", pic8259_device, ir1_w)) // INT5
+	ptm6840_device &itm(PTM6840(config, "itm", 0));
+	itm.set_external_clocks(0.0, 0.0, (8_MHz_XTAL / 8).dvalue()); // C3 = 1MHz
+	itm.o3_callback().set("itm", FUNC(ptm6840_device::set_c1)); // C1 = C2 = O3
+	itm.o3_callback().append("itm", FUNC(ptm6840_device::set_c2));
+	itm.irq_callback().set(m_tmint, FUNC(input_merger_device::in_w<0>));
 
-	MCFG_DEVICE_ADD("kbusart", I8251, 8_MHz_XTAL / 4)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("kbd", rs232_port_device, write_txd))
-	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("kbusart", i8251_device, write_cts))
-	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("kbint", input_merger_device, in_w<0>))
-	MCFG_I8251_TXRDY_HANDLER(DEVWRITELINE("kbint", input_merger_device, in_w<1>))
+	upd7201_new_device& sio(UPD7201_NEW(config, "sio", 8_MHz_XTAL / 2));
+	sio.out_int_callback().set("pic", FUNC(pic8259_device::ir1_w)); // INT5
 
-	MCFG_RS232_PORT_ADD("kbd", duet16_keyboard_devices, "keyboard")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("kbusart", i8251_device, write_rxd))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("keyboard", keyboard)
+	i8251_device &kbusart(I8251(config, "kbusart", 8_MHz_XTAL / 4));
+	kbusart.txd_handler().set("kbd", FUNC(rs232_port_device::write_txd));
+	kbusart.rts_handler().set("kbusart", FUNC(i8251_device::write_cts));
+	kbusart.rxrdy_handler().set("kbint", FUNC(input_merger_device::in_w<0>));
+	kbusart.txrdy_handler().set("kbint", FUNC(input_merger_device::in_w<1>));
 
-	MCFG_INPUT_MERGER_ANY_HIGH("kbint")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(DEVWRITELINE("pic", pic8259_device, ir5_w)) // INT2
+	rs232_port_device &kbd(RS232_PORT(config, "kbd", duet16_keyboard_devices, "keyboard"));
+	kbd.rxd_handler().set("kbusart", FUNC(i8251_device::write_rxd));
+	kbd.set_option_device_input_defaults("keyboard", DEVICE_INPUT_DEFAULTS_NAME(keyboard));
 
-	MCFG_INPUT_MERGER_ANY_HIGH("tmint")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(DEVWRITELINE("pic", pic8259_device, ir0_w)) // INT6
+	INPUT_MERGER_ANY_HIGH(config, "kbint").output_handler().set(m_pic, FUNC(pic8259_device::ir5_w)); // INT2
 
-	MCFG_UPD765A_ADD("fdc", true, false)
-	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE("dmac", am9517a_device, dreq0_w))
-	MCFG_UPD765_INTRQ_CALLBACK(DEVWRITELINE("pic", pic8259_device, ir3_w)) // INT4
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", duet16_floppies, "525qd", floppy_image_device::default_floppy_formats)
-	MCFG_SLOT_FIXED(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", duet16_floppies, "525qd", floppy_image_device::default_floppy_formats)
-	MCFG_SLOT_FIXED(true)
+	INPUT_MERGER_ANY_HIGH(config, m_tmint).output_handler().set(m_pic, FUNC(pic8259_device::ir0_w)); // INT6
 
-	MCFG_DEVICE_ADD("crtc", H46505, 2000000)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(duet16_state, crtc_update_row)
+	UPD765A(config, m_fdc, 8_MHz_XTAL, true, false);
+	m_fdc->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq0_w));
+	m_fdc->intrq_wr_callback().set(m_pic, FUNC(pic8259_device::ir3_w)); // INT4
+	FLOPPY_CONNECTOR(config, "fdc:0", duet16_floppies, "525qd", floppy_image_device::default_floppy_formats, true);
+	FLOPPY_CONNECTOR(config, "fdc:1", duet16_floppies, "525qd", floppy_image_device::default_floppy_formats, true);
 
-	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_ADD_3BIT_BRG("chrpal")
+	hd6845s_device &crtc(HD6845S(config, "crtc", 2000000)); // "46505S" on schematics
+	crtc.set_char_width(8);
+	crtc.set_update_row_callback(FUNC(duet16_state::crtc_update_row));
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "chrpal", duet16)
+	PALETTE(config, m_pal).set_entries(8);
+	PALETTE(config, m_chrpal, palette_device::BRG_3BIT);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", h46505_device, screen_update)
+	GFXDECODE(config, "gfxdecode", m_chrpal, gfx_duet16);
 
-	MCFG_DEVICE_ADD("rtc", MSM58321, 32768_Hz_XTAL)
-	MCFG_MSM58321_D0_HANDLER(WRITELINE(duet16_state, rtc_d0_w))
-	MCFG_MSM58321_D1_HANDLER(WRITELINE(duet16_state, rtc_d1_w))
-	MCFG_MSM58321_D2_HANDLER(WRITELINE(duet16_state, rtc_d2_w))
-	MCFG_MSM58321_D3_HANDLER(WRITELINE(duet16_state, rtc_d3_w))
-	MCFG_MSM58321_BUSY_HANDLER(WRITELINE(duet16_state, rtc_busy_w))
-	MCFG_MSM58321_YEAR0(1980)
-	MCFG_MSM58321_DEFAULT_24H(true)
-MACHINE_CONFIG_END
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(640, 480);
+	m_screen->set_visarea_full();
+	m_screen->set_screen_update("crtc", FUNC(hd6845s_device::screen_update));
+
+	MSM58321(config, m_rtc, 32768_Hz_XTAL);
+	m_rtc->d0_handler().set(FUNC(duet16_state::rtc_d0_w));
+	m_rtc->d1_handler().set(FUNC(duet16_state::rtc_d1_w));
+	m_rtc->d2_handler().set(FUNC(duet16_state::rtc_d2_w));
+	m_rtc->d3_handler().set(FUNC(duet16_state::rtc_d3_w));
+	m_rtc->busy_handler().set(FUNC(duet16_state::rtc_busy_w));
+	m_rtc->set_year0(1980);
+	m_rtc->set_default_24h(true);
+}
 
 ROM_START(duet16)
-	ROM_REGION(0x2000, "rom", 0)
+	ROM_REGION16_LE(0x2000, "rom", 0)
 	ROM_LOAD16_BYTE("duet16_h516a_3.bin", 0x0001, 0x1000, CRC(936706aa) SHA1(412ff9c7bf4443d2ed29a8d792fc3c849c9393cc))
 	ROM_LOAD16_BYTE("duet16_h517a_z.bin", 0x0000, 0x1000, CRC(1633cce8) SHA1(5145d04a48921cacfed17a94873e8988772fc8d4))
 
@@ -449,4 +457,4 @@ ROM_START(duet16)
 	ROM_LOAD("duet16_key_8741ak001b_z.bin", 0x000, 0x400, CRC(d23ee68d) SHA1(3b6a86fe2a304823c5385cd673f9580a35199dac))
 ROM_END
 
-COMP(1983, duet16, 0, 0, duet16, 0, duet16_state, 0, "Panafacom (Panasonic/Fujitsu)", "Duet-16", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1983, duet16, 0, 0, duet16, 0, duet16_state, empty_init, "Panafacom (Panasonic/Fujitsu)", "Duet-16", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

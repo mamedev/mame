@@ -29,19 +29,6 @@
 
 #pragma once
 
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_EF9369_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, EF9369, 0) \
-
-#define MCFG_EF9369_COLOR_UPDATE_CB(_class, _method) \
-	downcast<ef9369_device &>(*device).set_color_update_callback(ef9369_device::color_update_delegate(&_class::_method, #_class "::" #_method, this));
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -56,10 +43,10 @@ public:
 	typedef device_delegate<void (int entry, bool m, uint8_t ca, uint8_t cb, uint8_t cc)> color_update_delegate;
 
 	// construction/destruction
-	ef9369_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ef9369_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// configuration
-	template <typename Object> void set_color_update_callback(Object &&cb) { m_color_update_cb = std::forward<Object>(cb); }
+	template <typename... T> void set_color_update_callback(T &&... args) { m_color_update_cb.set(std::forward<T>(args)...); }
 
 	DECLARE_READ8_MEMBER(data_r);
 	DECLARE_WRITE8_MEMBER(data_w);

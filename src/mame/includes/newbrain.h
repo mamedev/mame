@@ -1,25 +1,24 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#pragma once
-
 #ifndef MAME_INCLUDES_NEWBRAIN_H
 #define MAME_INCLUDES_NEWBRAIN_H
+
+#pragma once
 
 
 #include "bus/newbrain/exp.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "cpu/cop400/cop400.h"
 #include "imagedev/cassette.h"
 #include "machine/rescap.h"
 #include "machine/ram.h"
+#include "emupal.h"
 
 #define SCREEN_TAG      "screen"
 #define Z80_TAG         "409"
 #define COP420_TAG      "419"
-#define CASSETTE_TAG    "cassette"
-#define CASSETTE2_TAG   "cassette2"
 #define RS232_V24_TAG   "to"
 #define RS232_PRN_TAG   "po"
 
@@ -32,8 +31,8 @@ public:
 		m_cop(*this, COP420_TAG),
 		m_palette(*this, "palette"),
 		m_exp(*this, NEWBRAIN_EXPANSION_SLOT_TAG),
-		m_cassette1(*this, CASSETTE_TAG),
-		m_cassette2(*this, CASSETTE2_TAG),
+		m_cassette1(*this, "cassette1"),
+		m_cassette2(*this, "cassette2"),
 		m_rs232_v24(*this, RS232_V24_TAG),
 		m_rs232_prn(*this, RS232_PRN_TAG),
 		m_ram(*this, RAM_TAG),
@@ -50,6 +49,13 @@ public:
 	{
 	}
 
+	void newbrain(machine_config &config);
+	void newbrain_a(machine_config &config);
+	void newbrain_ad(machine_config &config);
+	void newbrain_md(machine_config &config);
+	void newbrain_video(machine_config &config);
+
+private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER( mreq_r );
@@ -70,14 +76,9 @@ public:
 	DECLARE_READ_LINE_MEMBER( tdi_r );
 	DECLARE_WRITE_LINE_MEMBER( k1_w );
 
-	void newbrain(machine_config &config);
-	void newbrain_a(machine_config &config);
-	void newbrain_ad(machine_config &config);
-	void newbrain_md(machine_config &config);
-	void newbrain_video(machine_config &config);
 	void newbrain_iorq(address_map &map);
 	void newbrain_mreq(address_map &map);
-protected:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -99,7 +100,7 @@ protected:
 	int get_reset_t();
 	int get_pwrup_t();
 
-	void screen_update(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void do_screen_update(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void tvl(uint8_t data, int a6);
 
 	required_device<z80_device> m_maincpu;

@@ -51,11 +51,11 @@ namespace
 };
 
 
-MACHINE_CONFIG_START(coco_pak_gmc_device::device_add_mconfig)
-	MCFG_SPEAKER_STANDARD_MONO("gmc_speaker")
-	MCFG_SOUND_ADD(SN76489AN_TAG, SN76489A, 4_MHz_XTAL)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "gmc_speaker", 1.0)
-MACHINE_CONFIG_END
+void coco_pak_gmc_device::device_add_mconfig(machine_config &config)
+{
+	SPEAKER(config, "gmc_speaker").front_center();
+	SN76489A(config, m_psg, 4_MHz_XTAL).add_route(ALL_OUTPUTS, "gmc_speaker", 1.0);
+}
 
 
 //**************************************************************************
@@ -63,8 +63,6 @@ MACHINE_CONFIG_END
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE_PRIVATE(COCO_PAK_GMC, device_cococart_interface, coco_pak_gmc_device, "cocopakgmc", "CoCo Games Master Cartridge")
-template class device_finder<device_cococart_interface, false>;
-template class device_finder<device_cococart_interface, true>;
 
 //-------------------------------------------------
 //  coco_pak_device - constructor

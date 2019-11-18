@@ -19,9 +19,9 @@
 #define LOG_READ    (1U <<  2)
 #define LOG_TIMER   (1U <<  3)
 #define LOG_INT     (1U <<  4)
+#define LOG_COUNT   (1U <<  5)
 
 //#define VERBOSE  (LOG_SETUP|LOG_INT|LOG_TIMER)
-#define LOG_OUTPUT_FUNC printf // Needs always to be enabled as the default value 'logerror' is not available here
 
 #include "logmacro.h"
 
@@ -30,6 +30,7 @@
 #define LOGR(...)     LOGMASKED(LOG_READ,  __VA_ARGS__)
 #define LOGTIMER(...) LOGMASKED(LOG_TIMER, __VA_ARGS__)
 #define LOGINT(...)   LOGMASKED(LOG_INT,   __VA_ARGS__)
+#define LOGCOUNT(...) LOGMASKED(LOG_COUNT, __VA_ARGS__)
 
 #ifdef _MSC_VER
 #define FUNCNAME __func__
@@ -86,6 +87,8 @@ READ16_MEMBER( mc68340_timer_module_device::read )
 			break;
 	case REG_COM:
 			val = m_com;
+			if (!machine().side_effects_disabled())
+				m_sr &= ~REG_SR_COM;
 			LOGTIMER("- %08x %s %04x, %04x (%04x) (COM - Compare Register)\n", m_cpu->pcbase(), FUNCNAME, offset * 2, val, mem_mask);
 			break;
 	default:
@@ -121,13 +124,14 @@ WRITE16_MEMBER( mc68340_timer_module_device::write )
 		LOGTIMER("- Clocks are %s\n", data & REG_MCR_STP ? "stopped" : "running");
 		LOGTIMER("- Freeze signal %s - not implemented\n", data & REG_MCR_FRZ1 ? "stops execution" : "is ignored");
 		LOGTIMER("- Supervisor registers %s - not implemented\n", data & REG_MCR_SUPV ? "requries supervisor privileges" : "can be accessed by user privileged software");
-		LOGTIMER("- Interrupt Arbitration level: %02x - not implemented\n", data & REG_MCR_ARBLV);
+		LOGTIMER("- Interrupt Arbitration level: %02x\n", data & REG_MCR_ARBLV);
 		break;
 	case REG_IR:
 		COMBINE_DATA(&m_ir);
 		LOGTIMER("PC: %08x %s %04x, %04x (%04x) (IR - Interrupt Register)\n", m_cpu->pcbase(), FUNCNAME, offset * 2, data, mem_mask);
 		LOGTIMER("- Interrupt level : %02x\n", (data & REG_IR_INTLEV) >> 8);
 		LOGTIMER("- Interrupt vector: %02x\n", (data & REG_IR_INTVEC));
+		m_cpu->update_ipl();
 		break;
 	case REG_CR:
 		COMBINE_DATA(&m_cr);
@@ -135,15 +139,14 @@ WRITE16_MEMBER( mc68340_timer_module_device::write )
 		LOGTIMER("- Software reset: %s\n", (data & REG_CR_SWR) ? "inactive" : "active" );
 		LOGTIMER("- Enabled interrupts: %02x TO:%d TG:%d TC:%d\n",
 			 data & REG_CR_INTMSK,
-			 (data & REG_CR_IE0) ? 1 : 0,
+			 (data & REG_CR_IE2) ? 1 : 0,
 			 (data & REG_CR_IE1) ? 1 : 0,
-			 (data & REG_CR_IE2) ? 1 : 0);
+			 (data & REG_CR_IE0) ? 1 : 0);
 		LOGTIMER("- TGE signal, TGATE%d is %s\n",  m_cpu->get_timer_index(this) + 1, (data & REG_CR_TGE) ? "enabled" : "disabled");
 		LOGTIMER("- PCLK: Counter uses %s\n", (data & REG_CR_PCLK) ? "prescaler" : "clock");
 		LOGTIMER("- CPE: Counter is %s\n", (data & REG_CR_CPE) ? "enabled" : "disabled");
 		LOGTIMER("- CLK: Clock is %s\n", (data & REG_CR_CLK) ? "TIN (external)" : "system clock / 2");
-		LOGTIMER("- Prescaler: Divide by %d\n", (data & REG_CR_POT_MASK) ? ( 1 << ((data & REG_CR_POT_MASK) >> 5)) : 256);
-		LOGTIMER("- Prescaler: Divide by %d\n", (0x101 << ((data & REG_CR_POT_MASK) >> 5) & 0x1fe));
+		LOGTIMER("- Prescaler: Divide by %d\n", (0x101 << ((data & REG_CR_POT_MASK) >> 5) & 0x1ff) * 2);
 		LOGTIMER("- MODE: %s\n", std::array<char const *, 8>
 			 {{  "Input Capture/Output Compare",
 				   "Square-Wave Generator - not implemented",
@@ -160,39 +163,51 @@ WRITE16_MEMBER( mc68340_timer_module_device::write )
 		/* The timer is enabled when the counter prescaler enable (CPE) and SWRx bits in the CR
 		   are set. Once enabled, the counter enable (ON) bit in the SR is set, and the next falling
 		   edge of the counter clock causes the counter to be loaded with the value in the preload 1
-		   register (PREL1). TODO: make sure of the intial load of PREL1 on first falling flank */
-		if (m_cr & REG_CR_SWR)
+		   register (PREL1). */
+		if ((m_cr & (REG_CR_SWR | REG_CR_CPE)) == (REG_CR_SWR | REG_CR_CPE))
 		{
-			if (m_cr & REG_CR_CPE)
+			if ((m_sr & REG_SR_ON) == 0)
 			{
 				m_sr |= REG_SR_ON; // Starts the counter
 				LOGTIMER("Starts counter %d\n",  m_cpu->get_timer_index(this));
 				if ((m_cr & REG_CR_CLK) == 0)
 				{
-					LOGTIMER("- Using system clock/2\n");
-					m_timer->adjust(m_cpu->cycles_to_attotime( (m_cpu->clock() / 2) / (0x101 << ((m_cr & REG_CR_POT_MASK) >> 5) & 0x1fe) * 2) );
+					attotime period = m_cpu->cycles_to_attotime((0x101 << ((m_cr & REG_CR_POT_MASK) >> 5) & 0x1ff) * 2);
+					LOGTIMER("- Using system clock/2: %f Hz\n", period.as_hz());
+					m_timer->adjust(period / 2);
 				}
 				else
 				{
 					LOGTIMER("- Using TIN%d\n",  m_cpu->get_timer_index(this));
 				}
 			}
-			else
+		}
+		else
+		{
+			if ((m_sr & REG_SR_ON) != 0)
 			{
 				m_sr &= ~REG_SR_ON; // Stops the counter
 				LOGTIMER("Stops counter %d\n",  m_cpu->get_timer_index(this));
 				m_timer->adjust(attotime::never);
 			}
-		}
-		else
-		{ // TODO: Detect Disable mode setting line to three state
-			if ((m_cr & REG_CR_OC_MASK) == REG_CR_OC_ONE)
+
+			if ((m_cr & REG_CR_SWR) == 0)
 			{
-				m_tout_out_cb(ASSERT_LINE);
-			}
-			else
-			{
-				m_tout_out_cb(CLEAR_LINE);
+				m_sr = (m_sr & ~REG_SR_COM) | 0x00ff;
+				m_cntr = m_cntr_reg = 0x0000;
+
+				if ((m_cr & REG_CR_OC_MASK) == REG_CR_OC_ONE)
+				{
+					tout_set();
+				}
+				else if ((m_cr & REG_CR_OC_MASK) != REG_CR_OC_DISABLED)
+				{
+					tout_clear();
+				}
+				else
+				{
+					// TODO: Disable mode setting line to three state
+				}
 			}
 		}
 		break;
@@ -202,13 +217,14 @@ WRITE16_MEMBER( mc68340_timer_module_device::write )
 		/* IRQ - Interrupt Request bit
 		   1 = An interrupt condition has occurred. This bit is the logical OR of the enabled TO, TG, and TC interrupt bits.
 		   0 = The bit(s) that caused the interrupt condition has been cleared. If an IRQ signal has been asserted, it is negated when this bit is cleared. */
-		data = (m_sr & ~(data & (REG_SR_TO | REG_SR_TG | REG_SR_TC))); // Clear only the set interrupt bits
-		if ((data & (REG_SR_TO | REG_SR_TG | REG_SR_TC)) == 0)
+		m_sr &= ~(data & mem_mask & (REG_SR_TO | REG_SR_TG | REG_SR_TC)); // Clear only the set interrupt bits
+		if ((m_sr & (REG_SR_IRQ | REG_SR_TO | REG_SR_TG | REG_SR_TC)) == REG_SR_IRQ)
 		{
-			data &= ~REG_SR_IRQ;
-			// TODO: clear IRQ line
+			LOGINT("TIMER IRQ cleared\n");
+			m_sr &= ~REG_SR_IRQ;
+			m_cpu->update_ipl();
 		}
-		COMBINE_DATA(&m_sr);
+		data = m_sr;
 		LOGTIMER("PC %08x %s %04x, %04x (%04x) (SR - Status/Prescaler Register)\n", m_cpu->pcbase(), FUNCNAME, offset * 2, data, mem_mask);
 		LOGTIMER("- IRQ: %s\n", (data & REG_SR_IRQ) ? "Yes" : "None");
 		LOGTIMER("- TO TimeOut int      : %s\n", (data & REG_SR_TO) ? "Asserted" : "Cleared");
@@ -238,6 +254,7 @@ WRITE16_MEMBER( mc68340_timer_module_device::write )
 		COMBINE_DATA(&m_com);
 		LOGTIMER("PC %08x %s %04x, %04x (%04x) (COM - Compare Register)\n", m_cpu->pcbase(), FUNCNAME, offset * 2, data, mem_mask);
 		LOGTIMER("- COM15-COM0: %04x\n", (data & 0xfff));
+		m_sr &= ~REG_SR_COM;
 		break;
 	default:
 		LOGTIMER("- %08x FUNCNAME %08x, %08x (%08x) - not implemented\n", m_cpu->pcbase(), offset * 2, data, mem_mask);
@@ -267,10 +284,8 @@ WRITE_LINE_MEMBER( mc68340_timer_module_device::tgate_w)
 			m_sr |= REG_SR_TG;
 			if (m_cr & REG_CR_IE1)
 			{
-				LOGTIMER(" - TG interrupt");
+				LOGTIMER(" - TG interrupt\n");
 				do_timer_irq();
-				m_sr |= REG_SR_IRQ;
-
 			}
 		}
 		m_sr |= REG_SR_TGL;
@@ -286,8 +301,8 @@ TIMER_CALLBACK_MEMBER(mc68340_timer_module_device::timer_callback)
 	do_timer_tick();
 	if ((m_sr & REG_SR_ON) != 0)
 	{
-	  LOGTIMER("Re-arming timer %d using system clock/2 as base: %d Hz\n",  m_cpu->get_timer_index(this) + 1, (m_cpu->clock() / 2) / (0x101 << ((m_cr & REG_CR_POT_MASK) >> 5) & 0x1fe));
-		m_timer->adjust(m_cpu->cycles_to_attotime( (m_cpu->clock() / 2) / (0x101 << ((m_cr & REG_CR_POT_MASK) >> 5) & 0x1fe) * 2));
+		//LOGTIMER("Re-arming timer %d using system clock/2 as base\n",  m_cpu->get_timer_index(this) + 1);
+		m_timer->adjust(m_cpu->cycles_to_attotime((0x101 << ((m_cr & REG_CR_POT_MASK) >> 5) & 0x1ff) * 2) / 2);
 	}
 }
 
@@ -305,29 +320,32 @@ void mc68340_timer_module_device::device_start()
 	m_tin_in_cb.resolve_safe();
 }
 
+void mc68340_timer_module_device::device_reset()
+{
+	m_mcr = REG_MCR_SUPV;
+	m_ir = 0x000f;
+	module_reset();
+}
+
+void mc68340_timer_module_device::module_reset()
+{
+	m_cr = 0x0000;
+	m_sr = (m_sr & REG_SR_TG) | 0x00ff;
+	m_cntr = m_cntr_reg = 0x0000;
+	m_prel1 = m_prel2 = 0xffff;
+	m_com = 0x0000;
+	m_timer->adjust(attotime::never);
+	m_cpu->update_ipl();
+}
+
 void mc68340_timer_module_device::do_timer_irq()
 {
-	assert(m_cpu->m_m68340SIM);
-	m68340_sim &sim = *m_cpu->m_m68340SIM;
-	int timer_irq_level  = (m_ir & 0x0700) >> 8;
-	int timer_irq_vector = (m_ir & 0x00ff) >> 0;
-
-	if (timer_irq_level) // 0 is irq disabled
+	assert((m_sr & (REG_SR_TO | REG_SR_TG | REG_SR_TC)) != 0);
+	if ((m_sr & REG_SR_IRQ) == 0)
 	{
-		int use_autovector = (sim.m_avr_rsr >> (8 + timer_irq_level)) & 1;
-
-		LOGINT("TIMER IRQ triggered, Lvl: %d using Vector: %d (0 = auto vector)\n", timer_irq_level, use_autovector ? 0 : timer_irq_vector);
-
-		if (use_autovector)
-		{
-			//logerror("irq with autovector\n");
-			m_cpu->set_input_line(timer_irq_level, HOLD_LINE);
-		}
-		else
-		{
-			//logerror("irq without autovector\n");
-			m_cpu->set_input_line_and_vector(timer_irq_level, HOLD_LINE, timer_irq_vector);
-		}
+		LOGINT("TIMER IRQ triggered\n");
+		m_sr |= REG_SR_IRQ;
+		m_cpu->update_ipl();
 	}
 }
 
@@ -339,30 +357,44 @@ void mc68340_timer_module_device::do_timer_tick()
 	{
 		if (m_timer_counter & 1) // Raising flank, copy shadow to register
 		{
-		  // Shadow the counter only if we are NOT in the ICOC mode WHILE the TG bit is set
-		  if (!((m_cr & REG_CR_MODE_MASK) == REG_CR_MODE_ICOC &&
+			// Shadow the counter only if we are NOT in the ICOC mode WHILE the TG bit is set
+			if (!((m_cr & REG_CR_MODE_MASK) == REG_CR_MODE_ICOC &&
 			(m_sr & REG_SR_TG) != 0))
-			m_cntr_reg = m_cntr;
+				m_cntr_reg = m_cntr;
+			return;
 		}
-		else // Falling flank
+
+		// Counter decrements on falling flank
+		if (m_cntr == 0)
+		{
+			m_cntr = m_prel1; // TODO: Support prel2 for certain modes
+			LOGCOUNT("Counter reloaded with %04X\n", m_cntr);
+		}
+		else
 		{
 			m_cntr--;
-
-			/* TC - Timer Compare Interrupt
-			   1 = This bit is set when the counter transitions (off a clock/event falling edge) to the
-			       value in the COM. This bit does not affect the programmed IRQ signal if the IE0
-			       bit in the CR is cleared.
-			   0 = This bit is cleared by the timer whenever the RESET signal is asserted on the
-			       IMB, regardless of the mode of operation. This bit may also be cleared by writing
-			       a one to it. Writing a zero to this bit does not alter its contents. This bit is not
-			       affected by disabling the timer (SWR = 0).*/
-			if (m_cntr == m_com) // Check COM register
-			{
-				m_sr |= (REG_SR_TC | REG_SR_COM);
-			}
+			LOGCOUNT("Counter decremented to %04X\n", m_cntr);
 		}
 
-		LOGINT("%s reached\n", m_cntr_reg == 0 ? "Timeout" : "COM value");
+		/* TC - Timer Compare Interrupt
+		   1 = This bit is set when the counter transitions (off a clock/event falling edge) to the
+		       value in the COM. This bit does not affect the programmed IRQ signal if the IE0
+		       bit in the CR is cleared.
+		   0 = This bit is cleared by the timer whenever the RESET signal is asserted on the
+		       IMB, regardless of the mode of operation. This bit may also be cleared by writing
+		       a one to it. Writing a zero to this bit does not alter its contents. This bit is not
+		       affected by disabling the timer (SWR = 0).*/
+		if (m_cntr == 0)
+		{
+			LOGINT("Timeout reached\n");
+			m_sr &= ~REG_SR_COM;
+		}
+		else if (m_cntr == m_com) // Check COM register
+		{
+			LOGINT("COM value reached\n");
+			m_sr |= REG_SR_COM;
+		}
+
 		/* OC1/OC0 - Output Control
 		   These bits select the conditions under which TOUTx changes These
 		   bits may have a different effect when in the input capture/output compare mode.*/
@@ -380,18 +412,24 @@ void mc68340_timer_module_device::do_timer_tick()
 			   TOUTx is immediately set to zero if the timer is disabled (SWR = 0). If the timer is
 			   enabled (SWR = 1), timer compare events toggle TOUTx. (Timer compare events occur
 			   when the counter reaches the value stored in the COM.)*/
-		  if ((m_cr & REG_CR_MODE_MASK) == REG_CR_MODE_ICOC) // Detect Input Capture/Output Compare mode
+			if ((m_cr & REG_CR_MODE_MASK) == REG_CR_MODE_ICOC) // Detect Input Capture/Output Compare mode
 			{
-				if ((m_sr & REG_SR_COM) != 0) // timer reached compare value?
+				if (m_cntr == m_com) // timer reached compare value?
 				{
-					m_tout_out_cb((m_tout++ & 1) != 0 ? ASSERT_LINE : CLEAR_LINE);
+					if ((m_sr & REG_SR_OUT) != 0)
+						tout_clear();
+					else
+						tout_set();
 				}
 			}
 			else // Any oher mode
 			{
-				if (m_cntr_reg == 0) // Counter reached timeout?
+				if (m_cntr == 0) // Counter reached timeout?
 				{
-					m_tout_out_cb((m_tout++ & 1) != 0 ? ASSERT_LINE : CLEAR_LINE);
+					if ((m_sr & REG_SR_OUT) != 0)
+						tout_clear();
+					else
+						tout_set();
 				}
 			}
 			break;
@@ -404,77 +442,75 @@ void mc68340_timer_module_device::do_timer_tick()
 			   immediately set to zero if the timer is disabled (SWR = 0). If the timer is enabled (SWR
 			   = 1), TOUTx will be set to zero at timeouts and set to one at timer compare events. If
 			   the COM is $0000, TOUTx will be set to zero at the timeout/timer compare event.*/
-			if ((m_cr & REG_CR_MODE_MASK) == REG_CR_MODE_ICOC) // Detect Input Capture/Output Compare mode
+			if (m_cntr == 0) // timer reached timeout value?
 			{
-				if ((m_sr & REG_SR_COM) != 0) // timer reached compare value?
-				{
-					m_tout_out_cb(ASSERT_LINE);
-				}
-				if (m_cntr_reg == 0) // timer reached timeout value?
-				{
-						m_tout_out_cb(CLEAR_LINE);
-				}
+				tout_clear();
 			}
-			else
+			else if ((m_cr & REG_CR_MODE_MASK) == REG_CR_MODE_ICOC && m_cntr == m_com) // timer reached compare value?
 			{
-				if (m_cntr_reg == 0) // timer reached timeout value?
-				{
-					m_tout_out_cb(CLEAR_LINE);
-				}
+				tout_set();
 			}
 			break;
-				case REG_CR_OC_ONE:
-					/* One Mode - If the timer is disabled (SWR = 0) when this encoding is programmed,
-					   TOUTx is immediately set to one. If the timer is enabled (SWR = 1), TOUTx will be set
-					   to one at the next timeout.
+		case REG_CR_OC_ONE:
+			/* One Mode - If the timer is disabled (SWR = 0) when this encoding is programmed,
+			   TOUTx is immediately set to one. If the timer is enabled (SWR = 1), TOUTx will be set
+			   to one at the next timeout.
 
-					   In the input capture/output compare mode, TOUTx is
-					   immediately set to one if the timer is disabled (SWR = 0). If the timer is enabled (SWR =
-					   1), TOUTx will be set to one at timeouts and set to zero at timer compare events. If the
-					   COM is $0000, TOUTx will be set to one at the timeout/timer compare event.*/
-			if ((m_cr & REG_CR_MODE_MASK) == REG_CR_MODE_ICOC) // Detect Input Capture/Output Compare mode
+			   In the input capture/output compare mode, TOUTx is
+			   immediately set to one if the timer is disabled (SWR = 0). If the timer is enabled (SWR =
+			   1), TOUTx will be set to one at timeouts and set to zero at timer compare events. If the
+			   COM is $0000, TOUTx will be set to one at the timeout/timer compare event.*/
+			if (m_cntr == 0) // timer reached timeout value?
 			{
-				if ((m_sr & REG_SR_COM) != 0) // timer reached compare value?
-				{
-					m_tout_out_cb(CLEAR_LINE);
-				}
-				if (m_cntr_reg == 0) // timer reached timeout value?
-				{
-					m_tout_out_cb(ASSERT_LINE);
-				}
+				tout_set();
 			}
-			else
+			else if ((m_cr & REG_CR_MODE_MASK) == REG_CR_MODE_ICOC && m_cntr == m_com) // timer reached compare value?
 			{
-				if (m_cntr_reg == 0) // timer reached timeout value?
-				{
-					m_tout_out_cb(ASSERT_LINE);
-				}
+				tout_clear();
 			}
 			break;
 		default:
 			LOGTIMER("Wrong TOUT mode, fix the code!\n");
 		}
 
-		if (m_cntr_reg == 0) // timer reached timeout value?
+		if (m_cntr == m_com) // timer reached compare value? )
 		{
-			m_cntr = m_prel1; // TODO: Support prel2 for certain modes
-			if (m_cr & REG_CR_IE2)
-			{
-				LOGTIMER(" - TO interrupt");
-				do_timer_irq();
-				m_sr |= REG_SR_IRQ;
-			}
-		}
-		if ((m_sr & REG_SR_COM) != 0) // timer reached compare value? )
-		{
+			m_sr |= REG_SR_TC;
 			if (m_cr & REG_CR_IE0)
 			{
-				LOGTIMER(" - TC interrupt");
+				LOGTIMER(" - TC interrupt\n");
 				do_timer_irq();
-				m_sr |= REG_SR_IRQ;
-
 			}
 		}
+		if (m_cntr == 0) // timer reached timeout value?
+		{
+			m_sr |= REG_SR_TO;
+			if (m_cr & REG_CR_IE2)
+			{
+				LOGTIMER(" - TO interrupt\n");
+				do_timer_irq();
+			}
+		}
+	}
+}
+
+void mc68340_timer_module_device::tout_set()
+{
+	if ((m_sr & REG_SR_OUT) == 0)
+	{
+		m_sr |= REG_SR_OUT;
+		LOGTIMER(" - TOUT set\n");
+		m_tout_out_cb(1);
+	}
+}
+
+void mc68340_timer_module_device::tout_clear()
+{
+	if ((m_sr & REG_SR_OUT) != 0)
+	{
+		m_sr &= ~REG_SR_OUT;
+		LOGTIMER(" - TOUT cleared\n");
+		m_tout_out_cb(0);
 	}
 }
 

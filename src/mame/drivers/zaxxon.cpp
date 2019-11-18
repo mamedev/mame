@@ -299,7 +299,7 @@ INPUT_CHANGED_MEMBER(zaxxon_state::service_switch)
 {
 	/* pressing the service switch sends an NMI */
 	if (newval)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -350,24 +350,24 @@ READ8_MEMBER(zaxxon_state::razmataz_counter_r)
 }
 
 
+template <int Num>
 CUSTOM_INPUT_MEMBER(zaxxon_state::razmataz_dial_r)
 {
-	int num = (uintptr_t)param;
 	int res;
 
-	int delta = m_dials[num]->read();
+	int delta = m_dials[Num]->read();
 
 	if (delta < 0x80)
 	{
 		// right
-		m_razmataz_dial_pos[num] -= delta;
-		res = (m_razmataz_dial_pos[num] << 1) | 1;
+		m_razmataz_dial_pos[Num] -= delta;
+		res = (m_razmataz_dial_pos[Num] << 1) | 1;
 	}
 	else
 	{
 		// left
-		m_razmataz_dial_pos[num] += delta;
-		res = (m_razmataz_dial_pos[num] << 1);
+		m_razmataz_dial_pos[Num] += delta;
+		res = (m_razmataz_dial_pos[Num] << 1);
 	}
 
 	return res;
@@ -417,14 +417,15 @@ WRITE_LINE_MEMBER(zaxxon_state::coin_enable_w)
 
 INPUT_CHANGED_MEMBER(zaxxon_state::zaxxon_coin_inserted)
 {
-	if (newval && BIT(m_mainlatch[0]->output_state(), (int)(uintptr_t)param))
-		m_coin_status[(int)(uintptr_t)param] = 1;
+	if (newval && BIT(m_mainlatch[0]->output_state(), param))
+		m_coin_status[param] = 1;
 }
 
 
-CUSTOM_INPUT_MEMBER(zaxxon_state::zaxxon_coin_r)
+template <int Num>
+READ_LINE_MEMBER(zaxxon_state::zaxxon_coin_r)
 {
-	return m_coin_status[(int)(uintptr_t)param];
+	return m_coin_status[Num];
 }
 
 
@@ -440,7 +441,7 @@ void zaxxon_state::zaxxon_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
 	map(0x6000, 0x6fff).ram();
-	map(0x8000, 0x83ff).mirror(0x1c00).ram().w(this, FUNC(zaxxon_state::zaxxon_videoram_w)).share("videoram");
+	map(0x8000, 0x83ff).mirror(0x1c00).ram().w(FUNC(zaxxon_state::zaxxon_videoram_w)).share("videoram");
 	map(0xa000, 0xa0ff).mirror(0x1f00).ram().share("spriteram");
 	map(0xc000, 0xc000).mirror(0x18fc).portr("SW00");
 	map(0xc001, 0xc001).mirror(0x18fc).portr("SW01");
@@ -449,7 +450,7 @@ void zaxxon_state::zaxxon_map(address_map &map)
 	map(0xc100, 0xc100).mirror(0x18ff).portr("SW100");
 	map(0xc000, 0xc007).mirror(0x18f8).w("mainlatch1", FUNC(ls259_device::write_d0));
 	map(0xe03c, 0xe03f).mirror(0x1f00).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xe0f0, 0xe0f3).mirror(0x1f00).select(0x0008).w(this, FUNC(zaxxon_state::zaxxon_control_w));
+	map(0xe0f0, 0xe0f3).mirror(0x1f00).select(0x0008).w(FUNC(zaxxon_state::zaxxon_control_w));
 }
 
 void zaxxon_state::decrypted_opcodes_map(address_map &map)
@@ -462,7 +463,7 @@ void zaxxon_state::ixion_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
 	map(0x6000, 0x6fff).ram();
-	map(0x8000, 0x83ff).mirror(0x1c00).ram().w(this, FUNC(zaxxon_state::zaxxon_videoram_w)).share("videoram");
+	map(0x8000, 0x83ff).mirror(0x1c00).ram().w(FUNC(zaxxon_state::zaxxon_videoram_w)).share("videoram");
 	map(0xa000, 0xa0ff).mirror(0x1f00).ram().share("spriteram");
 	map(0xc000, 0xc000).mirror(0x18fc).portr("SW00");
 	map(0xc001, 0xc001).mirror(0x18fc).portr("SW01");
@@ -471,7 +472,7 @@ void zaxxon_state::ixion_map(address_map &map)
 	map(0xc100, 0xc100).mirror(0x18ff).portr("SW100");
 	map(0xc000, 0xc007).mirror(0x18f8).w("mainlatch1", FUNC(ls259_device::write_d0));
 	map(0xe03c, 0xe03c).mirror(0x1f00).rw("usbsnd", FUNC(usb_sound_device::status_r), FUNC(usb_sound_device::data_w));
-	map(0xe0f0, 0xe0f3).mirror(0x1f00).select(0x0008).w(this, FUNC(zaxxon_state::zaxxon_control_w));
+	map(0xe0f0, 0xe0f3).mirror(0x1f00).select(0x0008).w(FUNC(zaxxon_state::zaxxon_control_w));
 }
 
 
@@ -480,8 +481,8 @@ void zaxxon_state::congo_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x8fff).ram();
-	map(0xa000, 0xa3ff).mirror(0x1800).ram().w(this, FUNC(zaxxon_state::zaxxon_videoram_w)).share("videoram");
-	map(0xa400, 0xa7ff).mirror(0x1800).ram().w(this, FUNC(zaxxon_state::congo_colorram_w)).share("colorram");
+	map(0xa000, 0xa3ff).mirror(0x1800).ram().w(FUNC(zaxxon_state::zaxxon_videoram_w)).share("videoram");
+	map(0xa400, 0xa7ff).mirror(0x1800).ram().w(FUNC(zaxxon_state::congo_colorram_w)).share("colorram");
 	map(0xc000, 0xc000).mirror(0x1fc4).portr("SW00");
 	map(0xc001, 0xc001).mirror(0x1fc4).portr("SW01");
 	map(0xc002, 0xc002).mirror(0x1fc4).portr("DSW02");
@@ -489,8 +490,8 @@ void zaxxon_state::congo_map(address_map &map)
 	map(0xc008, 0xc008).mirror(0x1fc7).portr("SW100");
 	map(0xc018, 0xc01f).mirror(0x1fc0).w("mainlatch1", FUNC(ls259_device::write_d0));
 	map(0xc020, 0xc027).mirror(0x1fc0).w("mainlatch2", FUNC(ls259_device::write_d0));
-	map(0xc028, 0xc029).mirror(0x1fc4).w(this, FUNC(zaxxon_state::bg_position_w));
-	map(0xc030, 0xc033).mirror(0x1fc4).w(this, FUNC(zaxxon_state::congo_sprite_custom_w));
+	map(0xc028, 0xc029).mirror(0x1fc4).w(FUNC(zaxxon_state::bg_position_w));
+	map(0xc030, 0xc033).mirror(0x1fc4).w(FUNC(zaxxon_state::congo_sprite_custom_w));
 	map(0xc038, 0xc03f).mirror(0x1fc0).w("soundlatch", FUNC(generic_latch_8_device::write));
 }
 
@@ -535,14 +536,14 @@ static INPUT_PORTS_START( zaxxon )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, zaxxon_state,zaxxon_coin_r, (void *)0)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, zaxxon_state,zaxxon_coin_r, (void *)1)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, zaxxon_state,zaxxon_coin_r, (void *)2)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(zaxxon_state, zaxxon_coin_r<0>)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(zaxxon_state, zaxxon_coin_r<1>)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(zaxxon_state, zaxxon_coin_r<2>)
 
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )    PORT_CHANGED_MEMBER(DEVICE_SELF, zaxxon_state,zaxxon_coin_inserted, (void *)0)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )    PORT_CHANGED_MEMBER(DEVICE_SELF, zaxxon_state,zaxxon_coin_inserted, (void *)1)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, zaxxon_state,zaxxon_coin_inserted, (void *)2)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )    PORT_CHANGED_MEMBER(DEVICE_SELF, zaxxon_state,zaxxon_coin_inserted, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )    PORT_CHANGED_MEMBER(DEVICE_SELF, zaxxon_state,zaxxon_coin_inserted, 1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, zaxxon_state,zaxxon_coin_inserted, 2)
 
 	PORT_START("SERVICESW")
 	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_HIGH ) PORT_CHANGED_MEMBER(DEVICE_SELF, zaxxon_state,service_switch, 0)
@@ -696,7 +697,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( razmataz )
 	PORT_START("SW00")
-	PORT_BIT( 0xff, 0x00, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, zaxxon_state,razmataz_dial_r, (void *)0)
+	PORT_BIT( 0xff, 0x00, IPT_CUSTOM) PORT_CUSTOM_MEMBER(zaxxon_state, razmataz_dial_r<0>)
 
 	PORT_START("DIAL.0")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(15) PORT_RESET PORT_PLAYER(1)
@@ -711,7 +712,7 @@ static INPUT_PORTS_START( razmataz )
 	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("SW08")
-	PORT_BIT( 0xff, 0x00, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, zaxxon_state,razmataz_dial_r, (void *)1)
+	PORT_BIT( 0xff, 0x00, IPT_CUSTOM) PORT_CUSTOM_MEMBER(zaxxon_state, razmataz_dial_r<1>)
 
 	PORT_START("DIAL.1")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(15) PORT_RESET PORT_PLAYER(2)
@@ -724,14 +725,14 @@ static INPUT_PORTS_START( razmataz )
 
 	PORT_START("SW100")
 	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, zaxxon_state,zaxxon_coin_r, (void *)0)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, zaxxon_state,zaxxon_coin_r, (void *)1)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, zaxxon_state,zaxxon_coin_r, (void *)2)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(zaxxon_state, zaxxon_coin_r<0>)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(zaxxon_state, zaxxon_coin_r<1>)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(zaxxon_state, zaxxon_coin_r<2>)
 
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )    PORT_CHANGED_MEMBER(DEVICE_SELF, zaxxon_state,zaxxon_coin_inserted, (void *)0)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )    PORT_CHANGED_MEMBER(DEVICE_SELF, zaxxon_state,zaxxon_coin_inserted, (void *)1)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, zaxxon_state,zaxxon_coin_inserted, (void *)2)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )    PORT_CHANGED_MEMBER(DEVICE_SELF, zaxxon_state,zaxxon_coin_inserted, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )    PORT_CHANGED_MEMBER(DEVICE_SELF, zaxxon_state,zaxxon_coin_inserted, 1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, zaxxon_state,zaxxon_coin_inserted, 2)
 
 	PORT_START("SERVICESW")
 	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_HIGH ) PORT_CHANGED_MEMBER(DEVICE_SELF, zaxxon_state,service_switch, 0)
@@ -789,7 +790,7 @@ static INPUT_PORTS_START( ixion )
 	PORT_INCLUDE(zaxxon)
 
 	PORT_MODIFY("SW00")
-	PORT_BIT( 0xff, 0x00, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, zaxxon_state,razmataz_dial_r, (void *)0)
+	PORT_BIT( 0xff, 0x00, IPT_CUSTOM) PORT_CUSTOM_MEMBER(zaxxon_state, razmataz_dial_r<0>)
 
 	PORT_START("DIAL.0")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(15) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_RESET
@@ -902,7 +903,7 @@ static const gfx_layout zaxxon_spritelayout =
 };
 
 
-static GFXDECODE_START( zaxxon )
+static GFXDECODE_START( gfx_zaxxon )
 	GFXDECODE_ENTRY( "gfx_tx", 0, gfx_8x8x2_planar,  0, 64*2 )  /* characters */
 	GFXDECODE_ENTRY( "gfx_bg", 0, gfx_8x8x3_planar,  0, 32*2 )  /* background tiles */
 	GFXDECODE_ENTRY( "gfx_spr", 0, zaxxon_spritelayout,  0, 32*2 )  /* sprites */
@@ -915,174 +916,166 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(zaxxon_state::root)
-
+void zaxxon_state::root(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/16)
-	MCFG_CPU_PROGRAM_MAP(zaxxon_map)
+	Z80(config, m_maincpu, MASTER_CLOCK/16);
+	m_maincpu->set_addrmap(AS_PROGRAM, &zaxxon_state::zaxxon_map);
 
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(zaxxon_state, zaxxon_sound_a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(zaxxon_state, zaxxon_sound_b_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(zaxxon_state, zaxxon_sound_c_w))
+	I8255A(config, m_ppi);
+	m_ppi->out_pa_callback().set(FUNC(zaxxon_state::zaxxon_sound_a_w));
+	m_ppi->out_pb_callback().set(FUNC(zaxxon_state::zaxxon_sound_b_w));
+	m_ppi->out_pc_callback().set(FUNC(zaxxon_state::zaxxon_sound_c_w));
 
-	MCFG_DEVICE_ADD("mainlatch1", LS259, 0) // U55 on Zaxxon IC Board A
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(zaxxon_state, coin_enable_w)) // COIN EN A
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(zaxxon_state, coin_enable_w)) // COIN EN B
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(zaxxon_state, coin_enable_w)) // SERV EN
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(zaxxon_state, coin_counter_a_w)) // COUNT A
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(zaxxon_state, coin_counter_b_w)) // COUNT B
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(zaxxon_state, flipscreen_w)) // FLIP
+	LS259(config, m_mainlatch[0]); // U55 on Zaxxon IC Board A
+	m_mainlatch[0]->q_out_cb<0>().set(FUNC(zaxxon_state::coin_enable_w)); // COIN EN A
+	m_mainlatch[0]->q_out_cb<1>().set(FUNC(zaxxon_state::coin_enable_w)); // COIN EN B
+	m_mainlatch[0]->q_out_cb<2>().set(FUNC(zaxxon_state::coin_enable_w)); // SERV EN
+	m_mainlatch[0]->q_out_cb<3>().set(FUNC(zaxxon_state::coin_counter_a_w)); // COUNT A
+	m_mainlatch[0]->q_out_cb<4>().set(FUNC(zaxxon_state::coin_counter_b_w)); // COUNT B
+	m_mainlatch[0]->q_out_cb<6>().set(FUNC(zaxxon_state::flipscreen_w)); // FLIP
 
-	MCFG_DEVICE_ADD("mainlatch2", LS259, 0) // U56 on Zaxxon IC Board A
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(zaxxon_state, int_enable_w)) // INTON
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(zaxxon_state, fg_color_w)) // CREF 1
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(zaxxon_state, bg_color_w)) // CREF 3
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(zaxxon_state, bg_enable_w)) // BEN
+	LS259(config, m_mainlatch[1]); // U56 on Zaxxon IC Board A
+	m_mainlatch[1]->q_out_cb<0>().set(FUNC(zaxxon_state::int_enable_w)); // INTON
+	m_mainlatch[1]->q_out_cb<1>().set(FUNC(zaxxon_state::fg_color_w)); // CREF 1
+	m_mainlatch[1]->q_out_cb<6>().set(FUNC(zaxxon_state::bg_color_w)); // CREF 3
+	m_mainlatch[1]->q_out_cb<7>().set(FUNC(zaxxon_state::bg_enable_w)); // BEN
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", zaxxon)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(zaxxon_state, zaxxon)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_zaxxon);
+	PALETTE(config, m_palette, FUNC(zaxxon_state::zaxxon_palette), 256);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(zaxxon_state, screen_update_zaxxon)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(zaxxon_state, vblank_int))
-MACHINE_CONFIG_END
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
+	screen.set_screen_update(FUNC(zaxxon_state::screen_update_zaxxon));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(zaxxon_state::vblank_int));
+}
 
 
-MACHINE_CONFIG_START(zaxxon_state::zaxxon)
+void zaxxon_state::zaxxon(machine_config &config)
+{
 	root(config);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 	zaxxon_samples(config);
-MACHINE_CONFIG_END
+}
 
 
-
-MACHINE_CONFIG_START(zaxxon_state::szaxxon)
+void zaxxon_state::szaxxon(machine_config &config)
+{
 	zaxxon(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_OPCODES, &zaxxon_state::decrypted_opcodes_map);
+}
 
 
-MACHINE_CONFIG_START(zaxxon_state::szaxxone)
+void zaxxon_state::szaxxone(machine_config &config)
+{
 	zaxxon(config);
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5013, MASTER_CLOCK/16)
-	MCFG_CPU_PROGRAM_MAP(zaxxon_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
-	MCFG_SEGACRPT_SET_SIZE(0x6000)
-MACHINE_CONFIG_END
+	sega_315_5013_device &maincpu(SEGA_315_5013(config.replace(), m_maincpu, MASTER_CLOCK/16));
+	maincpu.set_addrmap(AS_PROGRAM, &zaxxon_state::zaxxon_map);
+	maincpu.set_addrmap(AS_OPCODES, &zaxxon_state::decrypted_opcodes_map);
+	maincpu.set_decrypted_tag(":decrypted_opcodes");
+	maincpu.set_size(0x6000);
+}
 
 
-
-MACHINE_CONFIG_START(zaxxon_state::futspye)
+void zaxxon_state::futspye(machine_config &config)
+{
 	root(config);
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5061, MASTER_CLOCK/16)
-	MCFG_CPU_PROGRAM_MAP(zaxxon_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
-	MCFG_SEGACRPT_SET_SIZE(0x6000)
+	sega_315_5061_device &maincpu(SEGA_315_5061(config.replace(), m_maincpu, MASTER_CLOCK/16));
+	maincpu.set_addrmap(AS_PROGRAM, &zaxxon_state::zaxxon_map);
+	maincpu.set_addrmap(AS_OPCODES, &zaxxon_state::decrypted_opcodes_map);
+	maincpu.set_decrypted_tag(":decrypted_opcodes");
+	maincpu.set_size(0x6000);
 
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(zaxxon_state, screen_update_futspy)
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(zaxxon_state::screen_update_futspy));
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 	zaxxon_samples(config);
-
-MACHINE_CONFIG_END
-
+}
 
 
-
-MACHINE_CONFIG_START(zaxxon_state::razmataze)
+void zaxxon_state::razmataze(machine_config &config)
+{
 	root(config);
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5098,  MASTER_CLOCK/16)
-	MCFG_CPU_PROGRAM_MAP(ixion_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
-	MCFG_SEGACRPT_SET_SIZE(0x6000)
+	sega_315_5098_device &maincpu(SEGA_315_5098(config.replace(), m_maincpu, MASTER_CLOCK/16));
+	maincpu.set_addrmap(AS_PROGRAM, &zaxxon_state::ixion_map);
+	maincpu.set_addrmap(AS_OPCODES, &zaxxon_state::decrypted_opcodes_map);
+	maincpu.set_decrypted_tag(":decrypted_opcodes");
+	maincpu.set_size(0x6000);
 
-	MCFG_DEVICE_REMOVE("ppi8255")
+	config.device_remove("ppi8255");
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(zaxxon_state,razmataz)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(zaxxon_state, screen_update_razmataz)
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(zaxxon_state::screen_update_razmataz));
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SEGAUSBROM_ADD("usbsnd")
-MACHINE_CONFIG_END
+	SPEAKER(config, "speaker").front_center();
+	SEGAUSBROM(config, "usbsnd", 0, m_maincpu).add_route(ALL_OUTPUTS, "speaker", 1.0);
+}
 
-MACHINE_CONFIG_START(zaxxon_state::ixion)
+
+void zaxxon_state::ixion(machine_config &config)
+{
 	razmataze(config);
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5013, MASTER_CLOCK/16)
-	MCFG_CPU_PROGRAM_MAP(ixion_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
-	MCFG_SEGACRPT_SET_SIZE(0x6000)
+	sega_315_5013_device &maincpu(SEGA_315_5013(config.replace(), m_maincpu, MASTER_CLOCK/16));
+	maincpu.set_addrmap(AS_PROGRAM, &zaxxon_state::ixion_map);
+	maincpu.set_addrmap(AS_OPCODES, &zaxxon_state::decrypted_opcodes_map);
+	maincpu.set_decrypted_tag(":decrypted_opcodes");
+	maincpu.set_size(0x6000);
 
-	MCFG_DEVICE_MODIFY("mainlatch1")
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP) // flip screen not used
-MACHINE_CONFIG_END
+	m_mainlatch[0]->q_out_cb<6>().set_nop(); // flip screen not used
+}
 
-MACHINE_CONFIG_START(zaxxon_state::congo)
+
+void zaxxon_state::congo(machine_config &config)
+{
 	root(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(congo_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &zaxxon_state::congo_map);
 
-	MCFG_DEVICE_REPLACE("ppi8255", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(zaxxon_state, congo_sound_b_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(zaxxon_state, congo_sound_c_w))
+	m_ppi->in_pa_callback().set("soundlatch", FUNC(generic_latch_8_device::read));
+	m_ppi->out_pa_callback().set_nop();
+	m_ppi->out_pb_callback().set(FUNC(zaxxon_state::congo_sound_b_w));
+	m_ppi->out_pc_callback().set(FUNC(zaxxon_state::congo_sound_c_w));
 
-	MCFG_DEVICE_MODIFY("mainlatch1") // U52 on Control Board
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(zaxxon_state, bg_enable_w)) // BEN
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(zaxxon_state, int_enable_w)) // INTON
+	// U52 on Control Board
+	m_mainlatch[0]->q_out_cb<5>().set(FUNC(zaxxon_state::bg_enable_w)); // BEN
+	m_mainlatch[0]->q_out_cb<7>().set(FUNC(zaxxon_state::int_enable_w)); // INTON
 
-	MCFG_DEVICE_MODIFY("mainlatch2") // U53 on Control Board
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP) // not used
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(zaxxon_state, bg_color_w)) // CREF 3
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(zaxxon_state, congo_fg_bank_w)) // BS
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(zaxxon_state, congo_color_bank_w)) // CBS
+	// U53 on Control Board
+	m_mainlatch[1]->q_out_cb<0>().set_nop(); // not used
+	m_mainlatch[1]->q_out_cb<3>().set(FUNC(zaxxon_state::bg_color_w)); // CREF 3
+	m_mainlatch[1]->q_out_cb<6>().set(FUNC(zaxxon_state::congo_fg_bank_w)); // BS
+	m_mainlatch[1]->q_out_cb<7>().set(FUNC(zaxxon_state::congo_color_bank_w)); // CBS
 
-	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(congo_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(zaxxon_state, irq0_line_hold, SOUND_CLOCK/16/16/16/4)
+	z80_device &audiocpu(Z80(config, "audiocpu", SOUND_CLOCK));
+	audiocpu.set_addrmap(AS_PROGRAM, &zaxxon_state::congo_sound_map);
+	audiocpu.set_periodic_int(FUNC(zaxxon_state::irq0_line_hold), attotime::from_hz(SOUND_CLOCK/16/16/16/4));
 
 	/* video hardware */
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(512)
-	MCFG_PALETTE_INIT_OWNER(zaxxon_state, zaxxon)
+	m_palette->set_entries(512).set_init(FUNC(zaxxon_state::zaxxon_palette));
 
 	MCFG_VIDEO_START_OVERRIDE(zaxxon_state,congo)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(zaxxon_state, screen_update_congo)
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(zaxxon_state::screen_update_congo));
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_SOUND_ADD("sn1", SN76489A, SOUND_CLOCK) // schematic shows sn76489A
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+	SN76489A(config, "sn1", SOUND_CLOCK).add_route(ALL_OUTPUTS, "speaker", 1.0); // schematic shows sn76489A
 
-	MCFG_SOUND_ADD("sn2", SN76489A, SOUND_CLOCK/4) // schematic shows sn76489A
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+	SN76489A(config, "sn2", SOUND_CLOCK/4).add_route(ALL_OUTPUTS, "speaker", 1.0); // schematic shows sn76489A
 
 	congo_samples(config);
-MACHINE_CONFIG_END
-
+}
 
 
 /*************************************
@@ -1511,7 +1504,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(zaxxon_state,zaxxonj)
+void zaxxon_state::init_zaxxonj()
 {
 /*
     the values vary, but the translation mask is always laid out like this:
@@ -1559,16 +1552,13 @@ DRIVER_INIT_MEMBER(zaxxon_state,zaxxonj)
 
 	for (int A = 0x0000; A < 0x6000; A++)
 	{
-		int i,j;
-		uint8_t src;
-
-		src = rom[A];
+		uint8_t src = rom[A];
 
 		/* pick the translation table from bit 0 of the address */
-		i = A & 1;
+		int i = A & 1;
 
 		/* pick the offset in the table from bits 1, 3 and 5 of the source data */
-		j = ((src >> 1) & 1) + (((src >> 3) & 1) << 1) + (((src >> 5) & 1) << 2);
+		int j = ((src >> 1) & 1) + (((src >> 3) & 1) << 1) + (((src >> 5) & 1) << 2);
 		/* the bottom half of the translation table is the mirror image of the top */
 		if (src & 0x80) j = 7 - j;
 
@@ -1584,7 +1574,7 @@ DRIVER_INIT_MEMBER(zaxxon_state,zaxxonj)
 
 
 
-DRIVER_INIT_MEMBER(zaxxon_state,razmataz)
+void zaxxon_state::init_razmataz()
 {
 	address_space &pgmspace = m_maincpu->space(AS_PROGRAM);
 
@@ -1594,7 +1584,7 @@ DRIVER_INIT_MEMBER(zaxxon_state,razmataz)
 	pgmspace.install_read_port(0xc00c, 0xc00c, 0x18f3, "SW0C");
 
 	/* unknown behavior expected here */
-	pgmspace.install_read_handler(0xc80a, 0xc80a, read8_delegate(FUNC(zaxxon_state::razmataz_counter_r),this));
+	pgmspace.install_read_handler(0xc80a, 0xc80a, read8_delegate(*this, FUNC(zaxxon_state::razmataz_counter_r)));
 
 	/* additional state saving */
 	save_item(NAME(m_razmataz_dial_pos));
@@ -1610,25 +1600,25 @@ DRIVER_INIT_MEMBER(zaxxon_state,razmataz)
  *************************************/
 
 /* these games run on standard Zaxxon hardware */
-GAME( 1982, zaxxon,   0,      zaxxon,    zaxxon,   zaxxon_state,   0,        ROT90,  "Sega",    "Zaxxon (set 1, rev D)",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, zaxxon2,  zaxxon, zaxxon,    zaxxon,   zaxxon_state,   0,        ROT90,  "Sega",    "Zaxxon (set 2, unknown rev)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, zaxxon3,  zaxxon, zaxxon,    zaxxon,   zaxxon_state,   0,        ROT90,  "Sega",    "Zaxxon (set 3, unknown rev)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, zaxxonj,  zaxxon, szaxxon,   zaxxon,   zaxxon_state,   zaxxonj,  ROT90,  "Sega",    "Zaxxon (Japan)",               MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, zaxxonb,  zaxxon, szaxxon,   zaxxon,   zaxxon_state,   zaxxonj,  ROT90,  "bootleg", "Jackson",                      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, zaxxon,   0,      zaxxon,    zaxxon,   zaxxon_state,   empty_init,    ROT90,  "Sega",    "Zaxxon (set 1, rev D)",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, zaxxon2,  zaxxon, zaxxon,    zaxxon,   zaxxon_state,   empty_init,    ROT90,  "Sega",    "Zaxxon (set 2, unknown rev)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, zaxxon3,  zaxxon, zaxxon,    zaxxon,   zaxxon_state,   empty_init,    ROT90,  "Sega",    "Zaxxon (set 3, unknown rev)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, zaxxonj,  zaxxon, szaxxon,   zaxxon,   zaxxon_state,   init_zaxxonj,  ROT90,  "Sega",    "Zaxxon (Japan)",               MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, zaxxonb,  zaxxon, szaxxon,   zaxxon,   zaxxon_state,   init_zaxxonj,  ROT90,  "bootleg", "Jackson",                      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 /* standard Zaxxon hardware but extra sound board plugged into 8255 PPI socket and encrypted cpu */
-GAME( 1982, szaxxon,  0,      szaxxone,  szaxxon,  zaxxon_state,   0,        ROT90,  "Sega",    "Super Zaxxon (315-5013)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, szaxxon,  0,      szaxxone,  szaxxon,  zaxxon_state,   empty_init,    ROT90,  "Sega",    "Super Zaxxon (315-5013)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 /* standard Zaxxon hardware? but encrypted cpu */
-GAME( 1984, futspy,   0,      futspye,   futspy,   zaxxon_state,   0,        ROT90,  "Sega",    "Future Spy (315-5061)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, futspy,   0,      futspye,   futspy,   zaxxon_state,   empty_init,    ROT90,  "Sega",    "Future Spy (315-5061)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 /* these games run on modified Zaxxon hardware with no skewing, extra inputs, and a */
 /* G-80 Universal Sound Board */
-GAME( 1983, razmataz, 0,      razmataze, razmataz, zaxxon_state,   razmataz, ROT90,  "Sega",    "Razzmatazz",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, ixion,    0,      ixion,     ixion,    zaxxon_state,   0,        ROT270, "Sega",    "Ixion (prototype)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+GAME( 1983, razmataz, 0,      razmataze, razmataz, zaxxon_state,   init_razmataz, ROT90,  "Sega",    "Razzmatazz",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, ixion,    0,      ixion,     ixion,    zaxxon_state,   empty_init,    ROT270, "Sega",    "Ixion (prototype)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
 
 /* these games run on a slightly newer Zaxxon hardware with more ROM space and a */
 /* custom sprite DMA chip */
-GAME( 1983, congo,    0,      congo,     congo,   zaxxon_state,    0,        ROT90,  "Sega",    "Congo Bongo (Rev C, 2 board stack)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, congoa,   congo,  congo,     congo,   zaxxon_state,    0,        ROT90,  "Sega",    "Congo Bongo (Rev C, 3 board stack)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, tiptop,   congo,  congo,     congo,   zaxxon_state,    0,        ROT90,  "Sega",    "Tip Top (3 board stack)",            MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, congo,    0,      congo,     congo,   zaxxon_state,    empty_init,    ROT90,  "Sega",    "Congo Bongo (Rev C, 2 board stack)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, congoa,   congo,  congo,     congo,   zaxxon_state,    empty_init,    ROT90,  "Sega",    "Congo Bongo (Rev C, 3 board stack)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, tiptop,   congo,  congo,     congo,   zaxxon_state,    empty_init,    ROT90,  "Sega",    "Tip Top (3 board stack)",            MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

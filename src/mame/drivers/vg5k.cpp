@@ -56,7 +56,6 @@
 #include "machine/timer.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
-#include "sound/wave.h"
 #include "video/ef9345.h"
 
 #include "screen.h"
@@ -79,6 +78,11 @@ public:
 		, m_ram(*this, RAM_TAG)
 	{ }
 
+	void vg5k(machine_config &config);
+
+	void init_vg5k();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ef9345_device> m_ef9345;
 	required_device<dac_bit_interface> m_dac;
@@ -98,11 +102,9 @@ public:
 	DECLARE_WRITE8_MEMBER ( ef9345_io_w );
 	DECLARE_READ8_MEMBER ( cassette_r );
 	DECLARE_WRITE8_MEMBER ( cassette_w );
-	DECLARE_DRIVER_INIT(vg5k);
 	TIMER_CALLBACK_MEMBER(z80_irq_clear);
 	TIMER_DEVICE_CALLBACK_MEMBER(z80_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(vg5k_scanline);
-	void vg5k(machine_config &config);
 	void vg5k_io(address_map &map);
 	void vg5k_mem(address_map &map);
 };
@@ -128,13 +130,13 @@ WRITE8_MEMBER ( vg5k_state::ef9345_offset_w )
 
 READ8_MEMBER ( vg5k_state::ef9345_io_r )
 {
-	return m_ef9345->data_r(space, m_ef9345_offset, 0xff);
+	return m_ef9345->data_r(m_ef9345_offset);
 }
 
 
 WRITE8_MEMBER ( vg5k_state::ef9345_io_w )
 {
-	m_ef9345->data_w(space, m_ef9345_offset, data, 0xff);
+	m_ef9345->data_w(m_ef9345_offset, data);
 }
 
 
@@ -177,8 +179,8 @@ void vg5k_state::vg5k_io(address_map &map)
 	map(0x08, 0x08).portr("JOY1");
 
 	/* printer */
-	map(0x10, 0x10).r(this, FUNC(vg5k_state::printer_r));
-	map(0x11, 0x11).w(this, FUNC(vg5k_state::printer_w));
+	map(0x10, 0x10).r(FUNC(vg5k_state::printer_r));
+	map(0x11, 0x11).w(FUNC(vg5k_state::printer_w));
 
 	/* keyboard */
 	map(0x80, 0x80).portr("ROW1");
@@ -191,11 +193,11 @@ void vg5k_state::vg5k_io(address_map &map)
 	map(0x87, 0x87).portr("ROW8");
 
 	/* EF9345 */
-	map(0x8f, 0x8f).w(this, FUNC(vg5k_state::ef9345_offset_w));
-	map(0xcf, 0xcf).rw(this, FUNC(vg5k_state::ef9345_io_r), FUNC(vg5k_state::ef9345_io_w));
+	map(0x8f, 0x8f).w(FUNC(vg5k_state::ef9345_offset_w));
+	map(0xcf, 0xcf).rw(FUNC(vg5k_state::ef9345_io_r), FUNC(vg5k_state::ef9345_io_w));
 
 	/* cassette */
-	map(0xaf, 0xaf).rw(this, FUNC(vg5k_state::cassette_r), FUNC(vg5k_state::cassette_w));
+	map(0xaf, 0xaf).rw(FUNC(vg5k_state::cassette_r), FUNC(vg5k_state::cassette_w));
 }
 
 /* Input ports */
@@ -336,20 +338,20 @@ static const gfx_layout vg5k_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( vg5k )
+static GFXDECODE_START( gfx_vg5k )
 	GFXDECODE_ENTRY( "ef9345", 0x2000, vg5k_charlayout, 0, 4 )
 GFXDECODE_END
 
-DRIVER_INIT_MEMBER(vg5k_state,vg5k)
+void vg5k_state::init_vg5k()
 {
 	uint8_t *FNT = memregion("ef9345")->base();
-	uint16_t a,b,c,d,dest=0x2000;
+	uint16_t dest = 0x2000;
 
 	/* Unscramble the chargen rom as the format is too complex for gfxdecode to handle unaided */
-	for (a = 0; a < 8192; a+=4096)
-		for (b = 0; b < 2048; b+=64)
-			for (c = 0; c < 4; c++)
-				for (d = 0; d < 64; d+=4)
+	for (uint16_t a = 0; a < 8192; a+=4096)
+		for (uint16_t b = 0; b < 2048; b+=64)
+			for (uint16_t c = 0; c < 4; c++)
+				for (uint16_t d = 0; d < 64; d+=4)
 					FNT[dest++]=FNT[a|b|c|d];
 
 
@@ -363,70 +365,66 @@ DRIVER_INIT_MEMBER(vg5k_state,vg5k)
 }
 
 
-MACHINE_CONFIG_START(vg5k_state::vg5k)
-
+void vg5k_state::vg5k(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(vg5k_mem)
-	MCFG_CPU_IO_MAP(vg5k_io)
+	Z80(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &vg5k_state::vg5k_mem);
+	m_maincpu->set_addrmap(AS_IO, &vg5k_state::vg5k_io);
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("vg5k_scanline", vg5k_state, vg5k_scanline, "screen", 0, 10)
+	TIMER(config, "vg5k_scanline").configure_scanline(FUNC(vg5k_state::vg5k_scanline), "screen", 0, 10);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer", vg5k_state, z80_irq, attotime::from_msec(20))
+	TIMER(config, "irq_timer").configure_periodic(FUNC(vg5k_state::z80_irq), attotime::from_msec(20));
 
-	MCFG_DEVICE_ADD("ef9345", EF9345, 0)
-	MCFG_EF9345_PALETTE("palette")
+	EF9345(config, m_ef9345, 0);
+	m_ef9345->set_palette_tag("palette");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DEVICE("ef9345", ef9345_device, screen_update)
-	MCFG_SCREEN_SIZE(336, 300)
-	MCFG_SCREEN_VISIBLE_AREA(00, 336-1, 00, 270-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update("ef9345", FUNC(ef9345_device::screen_update));
+	screen.set_size(336, 300);
+	screen.set_visarea(00, 336-1, 00, 270-1);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vg5k)
-	MCFG_PALETTE_ADD("palette", 8)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_vg5k);
+	PALETTE(config, "palette").set_entries(8);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.125)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	SPEAKER(config, "speaker").front_center();
+	DAC_1BIT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.125);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
 	/* cassette */
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(0, "speaker", 0.25)
-
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(vg5k_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MASK_SPEAKER)
-	MCFG_CASSETTE_INTERFACE("vg5k_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(vg5k_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(0, "speaker", 0.05);
+	m_cassette->set_interface("vg5k_cass");
 
 	/* printer */
-	MCFG_DEVICE_ADD("printer", PRINTER, 0)
+	PRINTER(config, m_printer, 0);
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("16K")
-	MCFG_RAM_EXTRA_OPTIONS("32K,48k")
+	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("32K,48K");
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "vg5k")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cass_list").set_original("vg5k");
+}
 
 /* ROM definition */
 ROM_START( vg5k )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "v11", "BASIC v1.1")
-	ROMX_LOAD( "vg5k11.bin", 0x0000, 0x4000, CRC(a6f4a0ea) SHA1(58eccce33cc21fc17bc83921018f531b8001eda3), ROM_BIOS(1) )  // dumped from a Philips VG-5000.
+	ROMX_LOAD( "vg5k11.bin", 0x0000, 0x4000, CRC(a6f4a0ea) SHA1(58eccce33cc21fc17bc83921018f531b8001eda3), ROM_BIOS(0) )  // dumped from a Philips VG-5000.
 	ROM_SYSTEM_BIOS(1, "v10", "BASIC v1.0")
-	ROMX_LOAD( "vg5k10.bin", 0x0000, 0x4000, BAD_DUMP CRC(57983260) SHA1(5ad1787a6a597b5c3eedb7c3704b649faa9be4ca), ROM_BIOS(2) )
+	ROMX_LOAD( "vg5k10.bin", 0x0000, 0x4000, BAD_DUMP CRC(57983260) SHA1(5ad1787a6a597b5c3eedb7c3704b649faa9be4ca), ROM_BIOS(1) )
 
 	ROM_REGION( 0x4000, "ef9345", 0 )
 	ROM_LOAD( "charset.rom", 0x0000, 0x2000, BAD_DUMP CRC(b2f49eb3) SHA1(d0ef530be33bfc296314e7152302d95fdf9520fc) )                // from dcvg5k
 ROM_END
 
 /* Driver */
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE        INIT  COMPANY     FULLNAME   FLAGS
-COMP( 1984, vg5k,   0,      0,      vg5k,    vg5k,  vg5k_state,  vg5k, "Philips",  "VG-5000", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT       COMPANY    FULLNAME   FLAGS
+COMP( 1984, vg5k, 0,      0,      vg5k,    vg5k,  vg5k_state, init_vg5k, "Philips", "VG-5000", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )

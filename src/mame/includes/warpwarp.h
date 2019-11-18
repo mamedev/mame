@@ -1,15 +1,22 @@
 // license:BSD-3-Clause
 // copyright-holders:Chris Hardy
+#ifndef MAME_INCLUDES_WARPWARP_H
+#define MAME_INCLUDES_WARPWARP_H
 
+#pragma once
+
+#include "machine/74259.h"
 #include "machine/watchdog.h"
 #include "audio/geebee.h"
 #include "audio/warpwarp.h"
+#include "emupal.h"
+#include "tilemap.h"
 
 class warpwarp_state : public driver_device
 {
 public:
-	warpwarp_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	warpwarp_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_watchdog(*this, "watchdog"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -18,6 +25,7 @@ public:
 		m_geebee_videoram(*this, "geebee_videoram"),
 		m_videoram(*this, "videoram"),
 		m_palette(*this, "palette"),
+		m_latch(*this, "latch"),
 		m_in0(*this, "IN0"),
 		m_in1(*this, "IN1"),
 		m_in2(*this, "IN2"),
@@ -28,6 +36,22 @@ public:
 		m_ports(*this, { { "SW0", "SW1", "DSW2", "PLACEHOLDER" } }) // "IN1" & "IN2" are read separately when offset==3
 	{ }
 
+	void warpwarp(machine_config &config);
+	void geebee(machine_config &config);
+	void navarone(machine_config &config);
+	void kaitei(machine_config &config);
+	void bombbee(machine_config &config);
+	void geebeeb(machine_config &config);
+
+	void init_navarone();
+	void init_geebee();
+	void init_kaitein();
+	void init_warpwarp();
+	void init_sos();
+	void init_kaitei();
+	void init_bombbee();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<watchdog_timer_device> m_watchdog;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -36,6 +60,7 @@ public:
 	optional_shared_ptr<uint8_t> m_geebee_videoram;
 	optional_shared_ptr<uint8_t> m_videoram;
 	optional_device<palette_device> m_palette;
+	optional_device<ls259_device> m_latch;
 	optional_ioport m_in0;
 	optional_ioport m_in1;
 	optional_ioport m_in2;
@@ -75,19 +100,13 @@ public:
 
 	virtual void machine_start() override;
 	DECLARE_MACHINE_RESET(kaitei);
-	DECLARE_DRIVER_INIT(navarone);
-	DECLARE_DRIVER_INIT(geebee);
-	DECLARE_DRIVER_INIT(kaitein);
-	DECLARE_DRIVER_INIT(warpwarp);
-	DECLARE_DRIVER_INIT(sos);
-	DECLARE_DRIVER_INIT(kaitei);
-	DECLARE_DRIVER_INIT(bombbee);
+
 	DECLARE_VIDEO_START(geebee);
-	DECLARE_PALETTE_INIT(geebee);
+	void geebee_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(warpwarp);
-	DECLARE_PALETTE_INIT(warpwarp);
+	void warpwarp_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(navarone);
-	DECLARE_PALETTE_INIT(navarone);
+	void navarone_palette(palette_device &palette) const;
 
 	TILEMAP_MAPPER_MEMBER(tilemap_scan);
 	TILE_GET_INFO_MEMBER(geebee_get_tile_info);
@@ -99,14 +118,11 @@ public:
 	void draw_ball(bitmap_ind16 &bitmap, const rectangle &cliprect,pen_t pen);
 
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
-	void warpwarp(machine_config &config);
-	void geebee(machine_config &config);
-	void navarone(machine_config &config);
-	void kaitei(machine_config &config);
-	void bombbee(machine_config &config);
-	void geebeeb(machine_config &config);
+
 	void bombbee_map(address_map &map);
 	void geebee_map(address_map &map);
 	void geebee_port_map(address_map &map);
 	void warpwarp_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_WARPWARP_H

@@ -18,6 +18,7 @@
 #define MAME_EMU_DISOUND_H
 
 #include <functional>
+#include <utility>
 
 
 //**************************************************************************
@@ -27,32 +28,6 @@
 constexpr int ALL_OUTPUTS       = 65535;    // special value indicating all outputs for the current chip
 constexpr int AUTO_ALLOC_INPUT  = 65535;
 
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_SOUND_ADD(_tag, _type, _clock) \
-	MCFG_DEVICE_ADD(_tag, _type, _clock)
-#define MCFG_SOUND_MODIFY(_tag) \
-	MCFG_DEVICE_MODIFY(_tag)
-
-#define MCFG_SOUND_CLOCK(_clock) \
-	MCFG_DEVICE_CLOCK(_clock)
-
-#define MCFG_SOUND_REPLACE(_tag, _type, _clock) \
-	MCFG_DEVICE_REPLACE(_tag, _type, _clock)
-
-#define MCFG_SOUND_ROUTE(_output, _target, _gain) \
-	dynamic_cast<device_sound_interface &>(*device).add_route(_output, _target, _gain);
-#define MCFG_SOUND_ROUTE_EX(_output, _target, _gain, _input) \
-	dynamic_cast<device_sound_interface &>(*device).add_route(_output, _target, _gain, _input);
-#define MCFG_SOUND_ROUTES_RESET() \
-	dynamic_cast<device_sound_interface &>(*device).reset_routes();
-
-#define MCFG_MIXER_ROUTE(_output, _target, _gain, _mixoutput) \
-	dynamic_cast<device_sound_interface &>(*device).add_route(_output, _target, _gain, AUTO_ALLOC_INPUT, _mixoutput);
 
 
 //**************************************************************************
@@ -86,10 +61,16 @@ public:
 	std::vector<sound_route> const &routes() const { return m_route_list; }
 
 	// configuration helpers
-	void add_route(u32 output, const char *target, double gain, u32 input = AUTO_ALLOC_INPUT, u32 mixoutput = 0);
-	void add_route(u32 output, device_sound_interface &target, double gain, u32 input = AUTO_ALLOC_INPUT, u32 mixoutput = 0);
-	void add_route(u32 output, speaker_device &target, double gain, u32 input = AUTO_ALLOC_INPUT, u32 mixoutput = 0);
-	void reset_routes() { m_route_list.clear(); }
+	template <typename T, bool R>
+	device_sound_interface &add_route(u32 output, const device_finder<T, R> &target, double gain, u32 input = AUTO_ALLOC_INPUT, u32 mixoutput = 0)
+	{
+		const std::pair<device_t &, const char *> ft(target.finder_target());
+		return add_route(output, ft.first, ft.second, gain, input, mixoutput);
+	}
+	device_sound_interface &add_route(u32 output, const char *target, double gain, u32 input = AUTO_ALLOC_INPUT, u32 mixoutput = 0);
+	device_sound_interface &add_route(u32 output, device_sound_interface &target, double gain, u32 input = AUTO_ALLOC_INPUT, u32 mixoutput = 0);
+	device_sound_interface &add_route(u32 output, speaker_device &target, double gain, u32 input = AUTO_ALLOC_INPUT, u32 mixoutput = 0);
+	device_sound_interface &reset_routes() { m_route_list.clear(); return *this; }
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) = 0;
@@ -102,6 +83,8 @@ public:
 	int outputs() const;
 	sound_stream *input_to_stream_input(int inputnum, int &stream_inputnum) const;
 	sound_stream *output_to_stream_output(int outputnum, int &stream_outputnum) const;
+	float input_gain(int inputnum) const;
+	float output_gain(int outputnum) const;
 	void set_input_gain(int inputnum, float gain);
 	void set_output_gain(int outputnum, float gain);
 	int inputnum_from_device(device_t &device, int outputnum = 0) const;
@@ -109,6 +92,7 @@ public:
 protected:
 	// configuration access
 	std::vector<sound_route> &routes() { return m_route_list; }
+	device_sound_interface &add_route(u32 output, device_t &base, const char *tag, double gain, u32 input, u32 mixoutput);
 
 	// optional operation overrides
 	virtual void interface_validity_check(validity_checker &valid) const override;
@@ -154,4 +138,4 @@ protected:
 typedef device_interface_iterator<device_mixer_interface> mixer_interface_iterator;
 
 
-#endif  /* MAME_EMU_DISOUND_H */
+#endif // MAME_EMU_DISOUND_H

@@ -6,12 +6,14 @@
 	<element name="static_black"><rect><color red="0.0" green="0.0" blue="0.0" /></rect></element>
 
 	<element name="ledr" defstate="0">
-		<disk state="0"><color red="0.2" green="0.05" blue="0.06" /></disk>
-		<disk state="1"><color red="1.0" green="0.2" blue="0.23" /></disk>
+		<disk state="0"><color red="0.14" green="0.02" blue="0.03" /></disk>
+		<disk state="1"><color red="0.5" green="0.1" blue="0.11" /></disk>
+		<disk state="2"><color red="1.0" green="0.20" blue="0.22" /></disk>
 	</element>
 	<element name="ledg" defstate="0">
-		<disk state="0"><color red="0.05" green="0.2" blue="0.06" /></disk>
-		<disk state="1"><color red="0.23" green="1.0" blue="0.2" /></disk>
+		<disk state="0"><color red="0.02" green="0.14" blue="0.04" /></disk>
+		<disk state="1"><color red="0.1" green="0.5" blue="0.16" /></disk>
+		<disk state="2"><color red="0.2" green="1.0" blue="0.32" /></disk>
 	</element>
 
 

@@ -30,7 +30,9 @@
     - many connectors for I/O
 
     The sound and I/O board is used by other redemption games such as
-    Colorama and Wheel 'Em In, Super Rock and Bowl
+    Colorama, Wheel 'Em In, Super Rock and Bowl, Feed Big Bertha and Sonic
+    the Hedgehog (Redemption). The CPU location is marked "68A09" on the
+    PCB; some games have a 68B09E here, but others use a Z80 instead.
 
 ****************************************************************************/
 
@@ -54,13 +56,19 @@
 class tapatune_state : public driver_device
 {
 public:
-	tapatune_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	tapatune_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_videocpu(*this, "videocpu"),
 		m_bsmt(*this, "bsmt"),
-		m_videoram(*this, "videoram") {}
+		m_videoram(*this, "videoram")
+	{
+	}
 
+	void tapatune(machine_config &config);
+	void tapatune_base(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_videocpu;
 	required_device<bsmt2000_device> m_bsmt;
@@ -106,8 +114,7 @@ public:
 
 	MC6845_BEGIN_UPDATE(crtc_begin_update);
 	MC6845_UPDATE_ROW(crtc_update_row);
-	void tapatune(machine_config &config);
-	void tapatune_base(machine_config &config);
+
 	void maincpu_io_map(address_map &map);
 	void maincpu_map(address_map &map);
 	void video_map(address_map &map);
@@ -285,9 +292,9 @@ void tapatune_state::video_map(address_map &map)
 	map(0x000000, 0x2fffff).rom();
 	map(0x300000, 0x31ffff).ram().share("videoram");
 	map(0x320000, 0x33ffff).ram();
-	map(0x400000, 0x400003).rw(this, FUNC(tapatune_state::read_from_z80), FUNC(tapatune_state::write_to_z80));
+	map(0x400000, 0x400003).rw(FUNC(tapatune_state::read_from_z80), FUNC(tapatune_state::write_to_z80));
 	map(0x400010, 0x400011).noprw(); // Watchdog?
-	map(0x600000, 0x600005).w(this, FUNC(tapatune_state::palette_w));
+	map(0x600000, 0x600005).w(FUNC(tapatune_state::palette_w));
 	map(0x800000, 0x800000).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x800002, 0x800002).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 }
@@ -303,20 +310,20 @@ void tapatune_state::maincpu_map(address_map &map)
 void tapatune_state::maincpu_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(tapatune_state::bsmt_data_lo_w));
-	map(0x08, 0x08).w(this, FUNC(tapatune_state::bsmt_data_hi_w));
-	map(0x10, 0x10).w(this, FUNC(tapatune_state::bsmt_reg_w));
-	map(0x18, 0x18).w(this, FUNC(tapatune_state::controls_mux));
-	map(0x20, 0x20).r(this, FUNC(tapatune_state::sound_irq_clear));
-	map(0x28, 0x28).r(this, FUNC(tapatune_state::status_r));
-	map(0x30, 0x30).r(this, FUNC(tapatune_state::controls_r));
+	map(0x00, 0x00).w(FUNC(tapatune_state::bsmt_data_lo_w));
+	map(0x08, 0x08).w(FUNC(tapatune_state::bsmt_data_hi_w));
+	map(0x10, 0x10).w(FUNC(tapatune_state::bsmt_reg_w));
+	map(0x18, 0x18).w(FUNC(tapatune_state::controls_mux));
+	map(0x20, 0x20).r(FUNC(tapatune_state::sound_irq_clear));
+	map(0x28, 0x28).r(FUNC(tapatune_state::status_r));
+	map(0x30, 0x30).r(FUNC(tapatune_state::controls_r));
 	map(0x38, 0x38).portr("COINS");
-	map(0x60, 0x60).w(this, FUNC(tapatune_state::write_index_to_68k));
-	map(0x61, 0x61).w(this, FUNC(tapatune_state::write_data_to_68k));
-	map(0x63, 0x63).w(this, FUNC(tapatune_state::lamps_w));
-	map(0x68, 0x68).r(this, FUNC(tapatune_state::read_index_from_68k));
-	map(0x69, 0x69).r(this, FUNC(tapatune_state::read_data_from_68k));
-	map(0x6b, 0x6b).r(this, FUNC(tapatune_state::special_r));
+	map(0x60, 0x60).w(FUNC(tapatune_state::write_index_to_68k));
+	map(0x61, 0x61).w(FUNC(tapatune_state::write_data_to_68k));
+	map(0x63, 0x63).w(FUNC(tapatune_state::lamps_w));
+	map(0x68, 0x68).r(FUNC(tapatune_state::read_index_from_68k));
+	map(0x69, 0x69).r(FUNC(tapatune_state::read_data_from_68k));
+	map(0x6b, 0x6b).r(FUNC(tapatune_state::special_r));
 }
 
 
@@ -517,44 +524,49 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(tapatune_state::tapatune_base)
+void tapatune_state::tapatune_base(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(24'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(maincpu_map)
-	MCFG_CPU_IO_MAP(maincpu_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(tapatune_state, irq0_line_assert, XTAL(24'000'000) / 4 / 4 / 4096)
+	Z80(config, m_maincpu, XTAL(24'000'000) / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tapatune_state::maincpu_map);
+	m_maincpu->set_addrmap(AS_IO, &tapatune_state::maincpu_io_map);
+	m_maincpu->set_periodic_int(FUNC(tapatune_state::irq0_line_assert), attotime::from_ticks(4 * 4096, XTAL(24'000'000) / 4));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW)
+	TICKET_DISPENSER(config, "ticket", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("bsmt", BSMT2000, XTAL(24'000'000))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	BSMT2000(config, m_bsmt, XTAL(24'000'000));
+	m_bsmt->add_route(0, "lspeaker", 1.0);
+	m_bsmt->add_route(1, "rspeaker", 1.0);
+}
 
-MACHINE_CONFIG_START(tapatune_state::tapatune)
+void tapatune_state::tapatune(machine_config &config)
+{
 	tapatune_base(config);
-	MCFG_CPU_ADD("videocpu", M68000, XTAL(24'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(video_map)
 
-	MCFG_QUANTUM_PERFECT_CPU("videocpu")
+	M68000(config, m_videocpu, XTAL(24'000'000) / 2);
+	m_videocpu->set_addrmap(AS_PROGRAM, &tapatune_state::video_map);
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL(24'000'000) / 16)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(5)
-	MCFG_MC6845_BEGIN_UPDATE_CB(tapatune_state, crtc_begin_update)
-	MCFG_MC6845_UPDATE_ROW_CB(tapatune_state, crtc_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(tapatune_state, crtc_vsync))
+	config.set_perfect_quantum(m_videocpu);
+
+	hd6845s_device &crtc(HD6845S(config, "crtc", XTAL(24'000'000) / 16));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(5);
+	crtc.set_begin_update_callback(FUNC(tapatune_state::crtc_begin_update));
+	crtc.set_update_row_callback(FUNC(tapatune_state::crtc_update_row));
+	crtc.out_vsync_callback().set(FUNC(tapatune_state::crtc_vsync));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(24'000'000) / 16 * 5, 500, 0, 320, 250, 0, 240)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", h46505_device, screen_update)
-MACHINE_CONFIG_END
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(24'000'000) / 16 * 5, 500, 0, 320, 250, 0, 240);
+	screen.set_screen_update("crtc", FUNC(hd6845s_device::screen_update));
+}
 
 /*************************************
  *
@@ -637,8 +649,8 @@ ROM_END
  *
  *************************************/
 
-GAME(1994, tapatune, 0, tapatune,      tapatune, tapatune_state, 0, ROT0, "Moloney Manufacturing Inc. / Creative Electronics and Software", "Tap a Tune", MACHINE_SUPPORTS_SAVE )
+GAME(1994, tapatune, 0, tapatune,      tapatune, tapatune_state, empty_init, ROT0, "Moloney Manufacturing Inc. / Creative Electronics and Software", "Tap a Tune", MACHINE_SUPPORTS_SAVE )
 
 // below appear to be mechanical games with the same Z80 board as the above
-GAME(1994, srockbwl, 0, tapatune_base, tapatune, tapatune_state, 0, ROT0, "Bromley",                                                        "Super Rock and Bowl (V1.1)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(199?, smartoss, 0, tapatune_base, tapatune, tapatune_state, 0, ROT0, "Smart Industries / Creative Electronics and Software",           "Smart Toss 'em / Smartball (Ver 2.0)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1994, srockbwl, 0, tapatune_base, tapatune, tapatune_state, empty_init, ROT0, "Bromley",                                                        "Super Rock and Bowl (V1.1)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(199?, smartoss, 0, tapatune_base, tapatune, tapatune_state, empty_init, ROT0, "Smart Industries / Creative Electronics and Software",           "Smart Toss 'em / Smartball (Ver 2.0)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

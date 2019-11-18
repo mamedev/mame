@@ -160,16 +160,17 @@ INPUT_PORTS_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(mackbd_device::device_add_mconfig)
-	MCFG_CPU_ADD(MACKBD_CPU_TAG, I8021, 3000000)    // "the approximate clock rate of the MPU is 3 MHz"
-	MCFG_MCS48_PORT_BUS_IN_CB(READ8(mackbd_device, p0_r))
-	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(mackbd_device, p0_w))
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(mackbd_device, p1_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(mackbd_device, p1_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(mackbd_device, p2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(mackbd_device, p2_w))
-	MCFG_MCS48_PORT_T1_IN_CB(IOPORT("MODS")) MCFG_DEVCB_RSHIFT(1) // option
-MACHINE_CONFIG_END
+void mackbd_device::device_add_mconfig(machine_config &config)
+{
+	mcs48_cpu_device &cpu(I8021(config, m_maincpu, 3000000));   // "the approximate clock rate of the MPU is 3 MHz"
+	cpu.bus_in_cb().set(FUNC(mackbd_device::p0_r));
+	cpu.bus_out_cb().set(FUNC(mackbd_device::p0_w));
+	cpu.p1_in_cb().set(FUNC(mackbd_device::p1_r));
+	cpu.p1_out_cb().set(FUNC(mackbd_device::p1_w));
+	cpu.p2_in_cb().set(FUNC(mackbd_device::p2_r));
+	cpu.p2_out_cb().set(FUNC(mackbd_device::p2_w));
+	cpu.t1_in_cb().set_ioport("MODS").bit(1); // option
+}
 
 const tiny_rom_entry *mackbd_device::device_rom_region() const
 {
@@ -189,8 +190,8 @@ ioport_constructor mackbd_device::device_input_ports() const
 //  mackbd_device - constructor
 //-------------------------------------------------
 
-mackbd_device::mackbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MACKBD, tag, owner, clock),
+mackbd_device::mackbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, MACKBD, tag, owner, clock),
 	m_maincpu(*this, MACKBD_CPU_TAG),
 	m_clkout_handler(*this),
 	m_dataout_handler(*this)

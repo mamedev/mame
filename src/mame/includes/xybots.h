@@ -13,6 +13,7 @@
 #include "machine/atarigen.h"
 #include "audio/atarijsa.h"
 #include "video/atarimo.h"
+#include "tilemap.h"
 
 class xybots_state : public atarigen_state
 {
@@ -25,10 +26,11 @@ public:
 		m_mob(*this, "mob")
 	{ }
 
-	DECLARE_DRIVER_INIT(xybots);
 	void xybots(machine_config &config);
 
-protected:
+	void init_xybots();
+
+private:
 	virtual void update_interrupts() override;
 	DECLARE_READ16_MEMBER(special_port1_r);
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
@@ -36,7 +38,6 @@ protected:
 	uint32_t screen_update_xybots(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void main_map(address_map &map);
 
-private:
 	required_device<atari_jsa_i_device> m_jsa;
 	required_device<tilemap_device> m_playfield_tilemap;
 	required_device<tilemap_device> m_alpha_tilemap;

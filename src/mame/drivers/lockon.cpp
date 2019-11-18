@@ -6,8 +6,10 @@
 
     driver by Phil Bennett
 
-    Known bugs:
-        * None
+    TODO:
+    * Coincounters add one coin at boot, caused by ay8910 writing 00 on
+      port direction change. Likely wrong I/O emulation in ay8910 device,
+      but not trivial to fix.
 
 ***************************************************************************/
 
@@ -24,17 +26,6 @@
 
 #define V30_GND_ADDR    ((m_ctrl_reg & 0x3) << 16)
 #define V30_OBJ_ADDR    ((m_ctrl_reg & 0x18) << 13)
-
-
-/*************************************
- *
- *  Forward definitions
- *
- *************************************/
-
-
-
-
 
 /*************************************
  *
@@ -152,19 +143,19 @@ void lockon_state::main_v30(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00000, 0x03fff).ram();
-	map(0x04000, 0x04003).rw(this, FUNC(lockon_state::lockon_crtc_r), FUNC(lockon_state::lockon_crtc_w));
+	map(0x04000, 0x04003).rw(FUNC(lockon_state::lockon_crtc_r), FUNC(lockon_state::lockon_crtc_w));
 	map(0x06000, 0x06001).portr("DSW");
 	map(0x08000, 0x081ff).ram().share("hud_ram");
-	map(0x09000, 0x09fff).ram().w(this, FUNC(lockon_state::lockon_char_w)).share("char_ram");
-	map(0x0a000, 0x0a001).w(this, FUNC(lockon_state::adrst_w));
-	map(0x0b000, 0x0bfff).w(this, FUNC(lockon_state::lockon_rotate_w));
-	map(0x0c000, 0x0cfff).w(this, FUNC(lockon_state::lockon_fb_clut_w));
-	map(0x0e000, 0x0e001).w(this, FUNC(lockon_state::inten_w));
-	map(0x0f000, 0x0f001).w(this, FUNC(lockon_state::emres_w));
-	map(0x10000, 0x1ffff).nopr().w(this, FUNC(lockon_state::tst_w));
-	map(0x20000, 0x2ffff).rw(this, FUNC(lockon_state::main_z80_r), FUNC(lockon_state::main_z80_w));
-	map(0x30000, 0x3ffff).rw(this, FUNC(lockon_state::main_gnd_r), FUNC(lockon_state::main_gnd_w));
-	map(0x40000, 0x4ffff).rw(this, FUNC(lockon_state::main_obj_r), FUNC(lockon_state::main_obj_w));
+	map(0x09000, 0x09fff).ram().w(FUNC(lockon_state::lockon_char_w)).share("char_ram");
+	map(0x0a000, 0x0a001).w(FUNC(lockon_state::adrst_w));
+	map(0x0b000, 0x0bfff).w(FUNC(lockon_state::lockon_rotate_w));
+	map(0x0c000, 0x0cfff).w(FUNC(lockon_state::lockon_fb_clut_w));
+	map(0x0e000, 0x0e001).w(FUNC(lockon_state::inten_w));
+	map(0x0f000, 0x0f001).w(FUNC(lockon_state::emres_w));
+	map(0x10000, 0x1ffff).nopr().w(FUNC(lockon_state::tst_w));
+	map(0x20000, 0x2ffff).rw(FUNC(lockon_state::main_z80_r), FUNC(lockon_state::main_z80_w));
+	map(0x30000, 0x3ffff).rw(FUNC(lockon_state::main_gnd_r), FUNC(lockon_state::main_gnd_w));
+	map(0x40000, 0x4ffff).rw(FUNC(lockon_state::main_obj_r), FUNC(lockon_state::main_obj_w));
 	map(0x50000, 0x5ffff).mirror(0x80000).rom();
 	map(0x60000, 0x6ffff).mirror(0x80000).rom();
 	map(0x70000, 0x7ffff).mirror(0x80000).rom();
@@ -177,9 +168,9 @@ void lockon_state::ground_v30(address_map &map)
 	map(0x00000, 0x03fff).ram();
 	map(0x04000, 0x04fff).ram().share("scene_ram");
 	map(0x08000, 0x08fff).ram().share("ground_ram");
-	map(0x0C000, 0x0C001).w(this, FUNC(lockon_state::lockon_scene_h_scr_w));
-	map(0x0C002, 0x0C003).w(this, FUNC(lockon_state::lockon_scene_v_scr_w));
-	map(0x0C004, 0x0C005).w(this, FUNC(lockon_state::lockon_ground_ctrl_w));
+	map(0x0C000, 0x0C001).w(FUNC(lockon_state::lockon_scene_h_scr_w));
+	map(0x0C002, 0x0C003).w(FUNC(lockon_state::lockon_scene_v_scr_w));
+	map(0x0C004, 0x0C005).w(FUNC(lockon_state::lockon_ground_ctrl_w));
 	map(0x20000, 0x2ffff).mirror(0xc0000).rom();
 	map(0x30000, 0x3ffff).mirror(0xc0000).rom();
 }
@@ -189,8 +180,8 @@ void lockon_state::object_v30(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00000, 0x03fff).ram();
-	map(0x04000, 0x04001).rw(this, FUNC(lockon_state::lockon_obj_4000_r), FUNC(lockon_state::lockon_obj_4000_w));
-	map(0x08000, 0x08fff).w(this, FUNC(lockon_state::lockon_tza112_w));
+	map(0x04000, 0x04001).rw(FUNC(lockon_state::lockon_obj_4000_r), FUNC(lockon_state::lockon_obj_4000_w));
+	map(0x08000, 0x08fff).w(FUNC(lockon_state::lockon_tza112_w));
 	map(0x0c000, 0x0c1ff).ram().share("object_ram");
 	map(0x30000, 0x3ffff).mirror(0xc0000).rom();
 }
@@ -200,7 +191,7 @@ void lockon_state::sound_prg(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x6fff).rom();
-	map(0x7000, 0x7000).w(this, FUNC(lockon_state::sound_vol));
+	map(0x7000, 0x7000).w(FUNC(lockon_state::sound_vol));
 	map(0x7400, 0x7407).rw("adc", FUNC(adc0808_device::data_r), FUNC(adc0808_device::address_offset_start_w));
 	map(0x7800, 0x7fff).mirror(0x8000).ram();
 }
@@ -349,7 +340,7 @@ static const gfx_layout char_layout =
 	8*8
 };
 
-static GFXDECODE_START( lockon )
+static GFXDECODE_START( gfx_lockon )
 	GFXDECODE_ENTRY( "gfx1", 0, char_layout,  0, 128 )
 GFXDECODE_END
 
@@ -414,12 +405,12 @@ WRITE_LINE_MEMBER(lockon_state::ym2203_irq)
 
 WRITE8_MEMBER(lockon_state::ym2203_out_b)
 {
-	machine().bookkeeping().coin_counter_w(0, data & 0x80);
-	machine().bookkeeping().coin_counter_w(1, data & 0x40);
-	machine().bookkeeping().coin_counter_w(2, data & 0x20);
+	machine().bookkeeping().coin_counter_w(0, ~data & 0x80);
+	machine().bookkeeping().coin_counter_w(1, ~data & 0x40);
+	machine().bookkeeping().coin_counter_w(2, ~data & 0x20);
 
 	/* 'Lock-On' lamp */
-	output().set_led_value(1, !(data & 0x10));
+	m_lamp = BIT(~data, 4);
 }
 
 /*************************************
@@ -430,6 +421,8 @@ WRITE8_MEMBER(lockon_state::ym2203_out_b)
 
 void lockon_state::machine_start()
 {
+	m_lamp.resolve();
+
 	save_item(NAME(m_ground_ctrl));
 	save_item(NAME(m_scroll_h));
 	save_item(NAME(m_scroll_v));
@@ -468,70 +461,63 @@ void lockon_state::machine_reset()
 	m_main_inten = 0;
 }
 
-MACHINE_CONFIG_START(lockon_state::lockon)
+void lockon_state::lockon(machine_config &config)
+{
+	V30(config, m_maincpu, 16_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &lockon_state::main_v30);
 
-	MCFG_CPU_ADD("maincpu", V30, 16_MHz_XTAL / 2)
-	MCFG_CPU_PROGRAM_MAP(main_v30)
+	V30(config, m_ground, 16_MHz_XTAL / 2);
+	m_ground->set_addrmap(AS_PROGRAM, &lockon_state::ground_v30);
 
-	MCFG_CPU_ADD("ground", V30, 16_MHz_XTAL / 2)
-	MCFG_CPU_PROGRAM_MAP(ground_v30)
+	V30(config, m_object, 16_MHz_XTAL / 2);
+	m_object->set_addrmap(AS_PROGRAM, &lockon_state::object_v30);
 
-	MCFG_CPU_ADD("object", V30, 16_MHz_XTAL / 2)
-	MCFG_CPU_PROGRAM_MAP(object_v30)
+	Z80(config, m_audiocpu, 16_MHz_XTAL / 4);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &lockon_state::sound_prg);
+	m_audiocpu->set_addrmap(AS_IO, &lockon_state::sound_io);
 
-	MCFG_CPU_ADD("audiocpu", Z80, 16_MHz_XTAL / 4)
-	MCFG_CPU_PROGRAM_MAP(sound_prg)
-	MCFG_CPU_IO_MAP(sound_io)
+	WATCHDOG_TIMER(config, m_watchdog).set_time(PERIOD_OF_555_ASTABLE(10000, 4700, 10000e-12) * 4096);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_ASTABLE(10000, 4700, 10000e-12) * 4096)
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+	m58990_device &adc(M58990(config, "adc", 16_MHz_XTAL / 16));
+	adc.in_callback<0>().set_ioport("ADC_BANK");
+	adc.in_callback<1>().set_ioport("ADC_PITCH");
+	adc.in_callback<2>().set_ioport("ADC_MISSILE");
+	adc.in_callback<3>().set_ioport("ADC_HOVER");
 
-	MCFG_DEVICE_ADD("adc", M58990, 16_MHz_XTAL / 16)
-	MCFG_ADC0808_IN0_CB(IOPORT("ADC_BANK"))
-	MCFG_ADC0808_IN1_CB(IOPORT("ADC_PITCH"))
-	MCFG_ADC0808_IN2_CB(IOPORT("ADC_MISSILE"))
-	MCFG_ADC0808_IN3_CB(IOPORT("ADC_HOVER"))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
+	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
+	m_screen->set_screen_update(FUNC(lockon_state::screen_update_lockon));
+	m_screen->screen_vblank().set(FUNC(lockon_state::screen_vblank_lockon));
+	m_screen->set_palette(m_palette);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(lockon_state, screen_update_lockon)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(lockon_state, screen_vblank_lockon))
-	MCFG_SCREEN_PALETTE("palette")
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lockon);
+	PALETTE(config, m_palette, FUNC(lockon_state::lockon_palette), 1024 + 2048);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lockon)
-	MCFG_PALETTE_ADD("palette", 1024 + 2048)
-	MCFG_PALETTE_INIT_OWNER(lockon_state, lockon)
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", 16_MHz_XTAL / 4));
+	ymsnd.irq_handler().set(FUNC(lockon_state::ym2203_irq));
+	ymsnd.port_a_read_callback().set_ioport("YM2203");
+	ymsnd.port_b_write_callback().set(FUNC(lockon_state::ym2203_out_b));
+	ymsnd.add_route(0, "lspeaker", 0.40);
+	ymsnd.add_route(0, "rspeaker", 0.40);
+	ymsnd.add_route(1, "f2203.1l", 1.0);
+	ymsnd.add_route(1, "f2203.1r", 1.0);
+	ymsnd.add_route(2, "f2203.2l", 1.0);
+	ymsnd.add_route(2, "f2203.2r", 1.0);
+	ymsnd.add_route(3, "f2203.3l", 1.0);
+	ymsnd.add_route(3, "f2203.3r", 1.0);
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 16_MHz_XTAL / 4)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(lockon_state, ym2203_irq))
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("YM2203"))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(lockon_state, ym2203_out_b))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.40)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.40)
-	MCFG_SOUND_ROUTE(1, "f2203.1l", 1.0)
-	MCFG_SOUND_ROUTE(1, "f2203.1r", 1.0)
-	MCFG_SOUND_ROUTE(2, "f2203.2l", 1.0)
-	MCFG_SOUND_ROUTE(2, "f2203.2r", 1.0)
-	MCFG_SOUND_ROUTE(3, "f2203.3l", 1.0)
-	MCFG_SOUND_ROUTE(3, "f2203.3r", 1.0)
-
-	MCFG_FILTER_VOLUME_ADD("f2203.1l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("f2203.1r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("f2203.2l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("f2203.2r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("f2203.3l", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_FILTER_VOLUME_ADD("f2203.3r", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	FILTER_VOLUME(config, "f2203.1l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, "f2203.1r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_VOLUME(config, "f2203.2l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, "f2203.2r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_VOLUME(config, "f2203.3l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, "f2203.3r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+}
 
 
 /*************************************
@@ -771,5 +757,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1986, lockon,  0,      lockon,  lockon,  lockon_state, 0, ROT0, "Tatsumi", "Lock-On (rev. E)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, lockonc, lockon, lockon,  lockone, lockon_state, 0, ROT0, "Tatsumi", "Lock-On (rev. C)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lockon,  0,      lockon, lockon,  lockon_state, empty_init, ROT0, "Tatsumi", "Lock-On (rev. E)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, lockonc, lockon, lockon, lockone, lockon_state, empty_init, ROT0, "Tatsumi", "Lock-On (rev. C)", MACHINE_SUPPORTS_SAVE )

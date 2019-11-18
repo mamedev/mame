@@ -7,11 +7,11 @@
     Core file I/O interface functions and definitions.
 
 ***************************************************************************/
+#ifndef MAME_LIB_UTIL_COREFILE_H
+#define MAME_LIB_UTIL_COREFILE_H
 
 #pragma once
 
-#ifndef MAME_LIB_UTIL_COREFILE_H
-#define MAME_LIB_UTIL_COREFILE_H
 
 #include "corestr.h"
 #include "coretmpl.h"
@@ -23,6 +23,7 @@
 
 
 namespace util {
+
 /***************************************************************************
     ADDITIONAL OPEN FLAGS
 ***************************************************************************/
@@ -129,6 +130,22 @@ public:
 protected:
 	core_file();
 };
+
+
+/***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
+
+// is a given character a directory separator?
+
+constexpr bool is_directory_separator(char c)
+{
+#if defined(WIN32)
+	return ('\\' == c) || ('/' == c) || (':' == c);
+#else
+	return '/' == c;
+#endif
+}
 
 } // namespace util
 

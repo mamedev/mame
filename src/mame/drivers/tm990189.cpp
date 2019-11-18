@@ -67,7 +67,6 @@
 #include "machine/tms9901.h"
 #include "machine/tms9902.h"
 #include "sound/spkrdev.h"
-#include "sound/wave.h"
 #include "video/tms9928a.h"
 
 #include "speaker.h"
@@ -81,6 +80,8 @@
 
 class tm990189_state : public driver_device
 {
+	friend class tm990_189_rs232_image_device;
+
 public:
 	tm990189_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
@@ -90,46 +91,30 @@ public:
 		, m_tms9918(*this, "tms9918")
 		, m_tms9901_usr(*this, TMS9901_0_TAG)
 		, m_tms9901_sys(*this, TMS9901_1_TAG)
+		, m_tms9902(*this, "tms9902")
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
-	required_device<tms9980a_device> m_tms9980a;
-	required_device<speaker_sound_device> m_speaker;
-	required_device<cassette_image_device> m_cass;
-	optional_device<tms9918_device> m_tms9918;
+	void tm990_189_v(machine_config &config);
+	void tm990_189(machine_config &config);
 
+	DECLARE_INPUT_CHANGED_MEMBER( load_interrupt );
+
+private:
 	DECLARE_READ8_MEMBER(video_vdp_r);
 	DECLARE_WRITE8_MEMBER(video_vdp_w);
 	DECLARE_READ8_MEMBER(video_joy_r);
 	DECLARE_WRITE8_MEMBER(video_joy_w);
-	int m_load_state;
-
-	int m_digitsel;
-	int m_segment;
-	emu_timer *m_displayena_timer;
-	uint8_t m_segment_state[10];
-	uint8_t m_old_segment_state[10];
-	uint8_t m_LED_state;
-	emu_timer *m_joy1x_timer;
-	emu_timer *m_joy1y_timer;
-	emu_timer *m_joy2x_timer;
-	emu_timer *m_joy2y_timer;
-	device_image_interface *m_rs232_fp;
-	uint8_t m_rs232_rts;
-	emu_timer *m_rs232_input_timer;
-	uint8_t m_bogus_read_save;
 
 	DECLARE_WRITE8_MEMBER( external_operation );
-
-	DECLARE_INPUT_CHANGED_MEMBER( load_interrupt );
 
 	DECLARE_WRITE_LINE_MEMBER(usr9901_led0_w);
 	DECLARE_WRITE_LINE_MEMBER(usr9901_led1_w);
 	DECLARE_WRITE_LINE_MEMBER(usr9901_led2_w);
 	DECLARE_WRITE_LINE_MEMBER(usr9901_led3_w);
-	DECLARE_WRITE8_MEMBER(usr9901_interrupt_callback);
+	DECLARE_WRITE_LINE_MEMBER(usr9901_interrupt_callback);
 
-	DECLARE_WRITE8_MEMBER(sys9901_interrupt_callback);
+	DECLARE_WRITE_LINE_MEMBER(sys9901_interrupt_callback);
 	DECLARE_READ8_MEMBER(sys9901_r);
 	DECLARE_WRITE_LINE_MEMBER(sys9901_digitsel0_w);
 	DECLARE_WRITE_LINE_MEMBER(sys9901_digitsel1_w);
@@ -156,22 +141,46 @@ public:
 	DECLARE_MACHINE_START(tm990_189_v);
 	DECLARE_MACHINE_RESET(tm990_189_v);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(display_callback);
-	TIMER_CALLBACK_MEMBER(clear_load);
-	void hold_load();
-	void tm990_189_v(machine_config &config);
-	void tm990_189(machine_config &config);
+	emu_timer *m_rs232_input_timer;
+
 	void tm990_189_cru_map(address_map &map);
 	void tm990_189_memmap(address_map &map);
 	void tm990_189_v_memmap(address_map &map);
-private:
+
 	void draw_digit(void);
 	void led_set(int number, bool state);
 	void segment_set(int offset, bool state);
 	void digitsel(int offset, bool state);
-	required_device<tms9901_device>     m_tms9901_usr;
-	required_device<tms9901_device>     m_tms9901_sys;
+
+	TIMER_DEVICE_CALLBACK_MEMBER(display_callback);
+	TIMER_CALLBACK_MEMBER(clear_load);
+	void hold_load();
+
+	required_device<tms9980a_device> m_tms9980a;
+	required_device<speaker_sound_device> m_speaker;
+	required_device<cassette_image_device> m_cass;
+	optional_device<tms9918_device> m_tms9918;
+
+	required_device<tms9901_device> m_tms9901_usr;
+	required_device<tms9901_device> m_tms9901_sys;
+	required_device<tms9902_device> m_tms9902;
 	output_finder<10> m_digits;
+
+	int m_load_state;
+
+	int m_digitsel;
+	int m_segment;
+	emu_timer *m_displayena_timer;
+	uint8_t m_segment_state[10];
+	uint8_t m_old_segment_state[10];
+	uint8_t m_LED_state;
+	emu_timer *m_joy1x_timer;
+	emu_timer *m_joy1y_timer;
+	emu_timer *m_joy2x_timer;
+	emu_timer *m_joy2y_timer;
+	device_image_interface *m_rs232_fp;
+	//uint8_t m_rs232_rts;
+	uint8_t m_bogus_read_save;
 };
 
 
@@ -273,13 +282,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(tm990189_state::display_callback)
     tms9901 code
 */
 
-WRITE8_MEMBER( tm990189_state::usr9901_interrupt_callback )
+WRITE_LINE_MEMBER( tm990189_state::usr9901_interrupt_callback )
 {
 	// Triggered by internal timer (set by ROM to 1.6 ms cycle) on level 3
 	// or by keyboard interrupt (level 6)
 	if (!m_load_state)
 	{
-		m_tms9980a->set_input_line(offset & 7, ASSERT_LINE);
+		m_tms9980a->set_input_line(m_tms9901_usr->get_int_level() & 7, ASSERT_LINE);
 	}
 }
 
@@ -311,31 +320,50 @@ WRITE_LINE_MEMBER( tm990189_state::usr9901_led3_w )
 	led_set(3, state);
 }
 
-WRITE8_MEMBER( tm990189_state::sys9901_interrupt_callback )
+WRITE_LINE_MEMBER( tm990189_state::sys9901_interrupt_callback )
 {
-	// machine().device<tms9901_device>("tms9901_0")->set_single_int(5, (data!=0)? ASSERT_LINE:CLEAR_LINE);
 	// TODO: Check this
-	m_tms9901_usr->set_single_int(5, (data!=0)? ASSERT_LINE:CLEAR_LINE);
+	m_tms9901_usr->set_int_line(5, state);
 }
 
 READ8_MEMBER( tm990189_state::sys9901_r )
 {
-	uint8_t data = 0;
-	if (offset == tms9901_device::CB_INT7)
+	// |-|Cass|K|K|K|K|K|C|
+	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8" };
+
+	offset &= 0x0F;
+	switch (offset)
 	{
-		static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8" };
+		case tms9901_device::INT1:
+		case tms9901_device::INT2:
+		case tms9901_device::INT3:
+		case tms9901_device::INT4:
+		case tms9901_device::INT5:
+			if (m_digitsel < 9)
+				return BIT(ioport(keynames[m_digitsel])->read(), offset-tms9901_device::INT1);
+			else return 0;
 
-		/* keyboard read */
-		if (m_digitsel < 9)
-			data |= ioport(keynames[m_digitsel])->read() << 1;
-
-		/* tape input */
-		if (m_cass->input() > 0.0)
-			data |= 0x40;
+		case tms9901_device::INT6:
+			return (m_cass->input() > 0);
+		default:
+			return 0;
 	}
-
-	return data;
 }
+
+/*
+      uint8_t data = 0;
+      if (offset == tms9901_device::CB_INT7)
+      {
+              static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8" };
+              // keyboard read
+              if (m_digitsel < 9)
+                    data |= ioport(keynames[m_digitsel])->read() << 1;
+              // tape input
+              if (m_cass->input() > 0.0)
+                      data |= 0x40;
+      }
+      return data;
+*/
 
 void tm990189_state::digitsel(int offset, bool state)
 {
@@ -435,30 +463,37 @@ WRITE_LINE_MEMBER( tm990189_state::sys9901_tapewdata_w )
 	m_cass->output(state ? +1.0 : -1.0);
 }
 
-class tm990_189_rs232_image_device :    public device_t,
-									public device_image_interface
+class tm990_189_rs232_image_device : public device_t, public device_image_interface
 {
 public:
 	// construction/destruction
+	template <typename T> tm990_189_rs232_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&tms_tag)
+		: tm990_189_rs232_image_device(mconfig, tag, owner, clock)
+	{
+		m_tms9902.set_tag(std::forward<T>(tms_tag));
+	}
+
 	tm990_189_rs232_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// image-level overrides
-	virtual iodevice_t image_type() const override { return IO_SERIAL; }
+	virtual iodevice_t image_type() const noexcept override { return IO_SERIAL; }
 
-	virtual bool is_readable()  const override { return 1; }
-	virtual bool is_writeable() const override { return 1; }
-	virtual bool is_creatable() const override { return 1; }
-	virtual bool must_be_loaded() const override { return 0; }
-	virtual bool is_reset_on_load() const override { return 0; }
-	virtual const char *file_extensions() const override { return ""; }
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual bool is_readable()  const noexcept override { return true; }
+	virtual bool is_writeable() const noexcept override { return true; }
+	virtual bool is_creatable() const noexcept override { return true; }
+	virtual bool must_be_loaded() const noexcept override { return false; }
+	virtual bool is_reset_on_load() const noexcept override { return false; }
+	virtual const char *file_extensions() const noexcept override { return ""; }
 
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	required_device<tms9902_device> m_tms9902;
 };
 
 DEFINE_DEVICE_TYPE(TM990_189_RS232, tm990_189_rs232_image_device, "tm990_189_rs232_image", "TM990/189 RS232 port")
@@ -466,6 +501,7 @@ DEFINE_DEVICE_TYPE(TM990_189_RS232, tm990_189_rs232_image_device, "tm990_189_rs2
 tm990_189_rs232_image_device::tm990_189_rs232_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TM990_189_RS232, tag, owner, clock)
 	, device_image_interface(mconfig, *this)
+	, m_tms9902(*this, finder_base::DUMMY_TAG)
 {
 }
 
@@ -475,21 +511,18 @@ void tm990_189_rs232_image_device::device_start()
 
 void tm990_189_rs232_image_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	//tm990189_state *state = machine.driver_data<tm990189_state>();
 	uint8_t buf;
-	if (/*state->m_rs232_rts &&*/ /*(mame_ftell(state->m_rs232_fp) < mame_fsize(state->m_rs232_fp))*/1)
+	if (/*m_rs232_rts &&*/ /*(mame_ftell(m_rs232_fp) < mame_fsize(m_rs232_fp))*/1)
 	{
-		tms9902_device* tms9902 = static_cast<tms9902_device*>(machine().device("tms9902"));
 		if (fread(&buf, 1) == 1)
-			tms9902->rcv_data(buf);
+			m_tms9902->rcv_data(buf);
 	}
 }
 
 image_init_result tm990_189_rs232_image_device::call_load()
 {
 	tm990189_state *state = machine().driver_data<tm990189_state>();
-	tms9902_device* tms9902 = static_cast<tms9902_device*>(machine().device("tms9902"));
-	tms9902->rcv_dsr(ASSERT_LINE);
+	m_tms9902->rcv_dsr(ASSERT_LINE);
 	state->m_rs232_input_timer = timer_alloc();
 	state->m_rs232_input_timer->adjust(attotime::zero, 0, attotime::from_msec(10));
 	return image_init_result::PASS;
@@ -499,14 +532,10 @@ image_init_result tm990_189_rs232_image_device::call_load()
 void tm990_189_rs232_image_device::call_unload()
 {
 	tm990189_state *state = machine().driver_data<tm990189_state>();
-	tms9902_device* tms9902 = static_cast<tms9902_device*>(machine().device("tms9902"));
-	tms9902->rcv_dsr(CLEAR_LINE);
+	m_tms9902->rcv_dsr(CLEAR_LINE);
 
 	state->m_rs232_input_timer->reset();    /* FIXME - timers should only be allocated once */
 }
-
-#define MCFG_TM990_189_RS232_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, TM990_189_RS232, 0)
 
 
 /* static TMS9902_RTS_CALLBACK( rts_callback )
@@ -577,9 +606,9 @@ READ8_MEMBER( tm990189_state::video_vdp_r )
 	it. */
 
 	if (offset & 2)
-		reply = m_tms9918->register_read(space, 0);
+		reply = m_tms9918->register_read();
 	else
-		reply = m_tms9918->vram_read(space, 0);
+		reply = m_tms9918->vram_read();
 
 	if (!(offset & 1))
 		m_bogus_read_save = reply;
@@ -594,9 +623,9 @@ WRITE8_MEMBER( tm990189_state::video_vdp_w )
 	if (offset & 1)
 	{
 		if (offset & 2)
-			m_tms9918->register_write(space, 0, data);
+			m_tms9918->register_write(data);
 		else
-			m_tms9918->vram_write(space, 0, data);
+			m_tms9918->vram_write(data);
 	}
 }
 
@@ -737,9 +766,9 @@ void tm990189_state::tm990_189_v_memmap(address_map &map)
 	map(0x0800, 0x0fff).rom();                                 /* extra ROM - application programs with unibug, remaining 2kb of program for university basic */
 
 	map(0x1000, 0x17ff).rom().nopw();     /* video board ROM 1 */
-	map(0x1800, 0x1fff).rom().w(this, FUNC(tm990189_state::video_joy_w));   /* video board ROM 2 and joystick write port*/
-	map(0x2000, 0x27ff).r(this, FUNC(tm990189_state::video_vdp_r)).nopw();   /* video board tms9918 read ports (bogus) */
-	map(0x2800, 0x2fff).rw(this, FUNC(tm990189_state::video_joy_r), FUNC(tm990189_state::video_vdp_w)); /* video board joystick read port and tms9918 write ports */
+	map(0x1800, 0x1fff).rom().w(FUNC(tm990189_state::video_joy_w));   /* video board ROM 2 and joystick write port*/
+	map(0x2000, 0x27ff).r(FUNC(tm990189_state::video_vdp_r)).nopw();   /* video board tms9918 read ports (bogus) */
+	map(0x2800, 0x2fff).rw(FUNC(tm990189_state::video_joy_r), FUNC(tm990189_state::video_vdp_w)); /* video board joystick read port and tms9918 write ports */
 
 	map(0x3000, 0x3fff).rom();                                 /* main ROM - unibug or university basic */
 }
@@ -802,129 +831,131 @@ void tm990189_state::tm990_189_v_memmap(address_map &map)
 
 void tm990189_state::tm990_189_cru_map(address_map &map)
 {
-	map(0x0000, 0x003f).r(m_tms9901_usr, FUNC(tms9901_device::read));      /* user I/O tms9901 */
-	map(0x0040, 0x006f).r(m_tms9901_sys, FUNC(tms9901_device::read));      /* system I/O tms9901 */
-	map(0x0080, 0x00cf).r("tms9902", FUNC(tms9902_device::cruread));     /* optional tms9902 */
-
-	map(0x0000, 0x01ff).w(m_tms9901_usr, FUNC(tms9901_device::write));    /* user I/O tms9901 */
-	map(0x0200, 0x03ff).w(m_tms9901_sys, FUNC(tms9901_device::write));    /* system I/O tms9901 */
-	map(0x0400, 0x05ff).w("tms9902", FUNC(tms9902_device::cruwrite));   /* optional tms9902 */
+	map(0x0000, 0x03ff).rw(m_tms9901_usr, FUNC(tms9901_device::read), FUNC(tms9901_device::write));    /* user I/O tms9901 */
+	map(0x0400, 0x07ff).rw(m_tms9901_sys, FUNC(tms9901_device::read), FUNC(tms9901_device::write));    /* system I/O tms9901 */
+	map(0x0800, 0x0bff).rw(m_tms9902, FUNC(tms9902_device::cruread), FUNC(tms9902_device::cruwrite));   /* optional tms9902 */
 }
 
-MACHINE_CONFIG_START(tm990189_state::tm990_189)
+void tm990189_state::tm990_189(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_TMS99xx_ADD("maincpu", TMS9980A, 2000000, tm990_189_memmap, tm990_189_cru_map)
-	MCFG_TMS99xx_EXTOP_HANDLER( WRITE8(tm990189_state, external_operation) )
+	TMS9980A(config, m_tms9980a, 8_MHz_XTAL); // clock divided by 4 internally
+	m_tms9980a->set_addrmap(AS_PROGRAM, &tm990189_state::tm990_189_memmap);
+	m_tms9980a->set_addrmap(AS_IO, &tm990189_state::tm990_189_cru_map);
+	m_tms9980a->extop_cb().set(FUNC(tm990189_state::external_operation));
 
 	MCFG_MACHINE_START_OVERRIDE(tm990189_state, tm990_189 )
 	MCFG_MACHINE_RESET_OVERRIDE(tm990189_state, tm990_189 )
 
 	/* Video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_tm990189)
+	config.set_default_layout(layout_tm990189);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Devices */
-	MCFG_CASSETTE_ADD( "cassette" )
+	CASSETTE(config, "cassette", 0).add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD(TMS9901_0_TAG, TMS9901, 2000000)
-	MCFG_TMS9901_P0_HANDLER( WRITELINE( tm990189_state, usr9901_led0_w) )
-	MCFG_TMS9901_P1_HANDLER( WRITELINE( tm990189_state, usr9901_led1_w) )
-	MCFG_TMS9901_P2_HANDLER( WRITELINE( tm990189_state, usr9901_led2_w) )
-	MCFG_TMS9901_P3_HANDLER( WRITELINE( tm990189_state, usr9901_led3_w) )
-	MCFG_TMS9901_INTLEVEL_HANDLER( WRITE8( tm990189_state, usr9901_interrupt_callback) )
+	TMS9901(config, m_tms9901_usr, 8_MHz_XTAL / 4);
+	m_tms9901_usr->p_out_cb(0).set(FUNC(tm990189_state::usr9901_led0_w));
+	m_tms9901_usr->p_out_cb(1).set(FUNC(tm990189_state::usr9901_led1_w));
+	m_tms9901_usr->p_out_cb(2).set(FUNC(tm990189_state::usr9901_led2_w));
+	m_tms9901_usr->p_out_cb(3).set(FUNC(tm990189_state::usr9901_led3_w));
+	m_tms9901_usr->intreq_cb().set(FUNC(tm990189_state::usr9901_interrupt_callback));
 
-	MCFG_DEVICE_ADD(TMS9901_1_TAG, TMS9901, 2000000)
-	MCFG_TMS9901_READBLOCK_HANDLER( READ8(tm990189_state, sys9901_r) )
-	MCFG_TMS9901_P0_HANDLER( WRITELINE( tm990189_state, sys9901_digitsel0_w) )
-	MCFG_TMS9901_P1_HANDLER( WRITELINE( tm990189_state, sys9901_digitsel1_w) )
-	MCFG_TMS9901_P2_HANDLER( WRITELINE( tm990189_state, sys9901_digitsel2_w) )
-	MCFG_TMS9901_P3_HANDLER( WRITELINE( tm990189_state, sys9901_digitsel3_w) )
-	MCFG_TMS9901_P4_HANDLER( WRITELINE( tm990189_state, sys9901_segment0_w) )
-	MCFG_TMS9901_P5_HANDLER( WRITELINE( tm990189_state, sys9901_segment1_w) )
-	MCFG_TMS9901_P6_HANDLER( WRITELINE( tm990189_state, sys9901_segment2_w) )
-	MCFG_TMS9901_P7_HANDLER( WRITELINE( tm990189_state, sys9901_segment3_w) )
-	MCFG_TMS9901_P8_HANDLER( WRITELINE( tm990189_state, sys9901_segment4_w) )
-	MCFG_TMS9901_P9_HANDLER( WRITELINE( tm990189_state, sys9901_segment5_w) )
-	MCFG_TMS9901_P10_HANDLER( WRITELINE( tm990189_state, sys9901_segment6_w) )
-	MCFG_TMS9901_P11_HANDLER( WRITELINE( tm990189_state, sys9901_segment7_w) )
-	MCFG_TMS9901_P12_HANDLER( WRITELINE( tm990189_state, sys9901_dsplytrgr_w) )
-	MCFG_TMS9901_P13_HANDLER( WRITELINE( tm990189_state, sys9901_shiftlight_w) )
-	MCFG_TMS9901_P14_HANDLER( WRITELINE( tm990189_state, sys9901_spkrdrive_w) )
-	MCFG_TMS9901_P15_HANDLER( WRITELINE( tm990189_state, sys9901_tapewdata_w) )
-	MCFG_TMS9901_INTLEVEL_HANDLER( WRITE8( tm990189_state, sys9901_interrupt_callback) )
+	TMS9901(config, m_tms9901_sys, 8_MHz_XTAL / 4);
+	m_tms9901_sys->read_cb().set(FUNC(tm990189_state::sys9901_r));
+	m_tms9901_sys->p_out_cb(0).set(FUNC(tm990189_state::sys9901_digitsel0_w));
+	m_tms9901_sys->p_out_cb(1).set(FUNC(tm990189_state::sys9901_digitsel1_w));
+	m_tms9901_sys->p_out_cb(2).set(FUNC(tm990189_state::sys9901_digitsel2_w));
+	m_tms9901_sys->p_out_cb(3).set(FUNC(tm990189_state::sys9901_digitsel3_w));
+	m_tms9901_sys->p_out_cb(4).set(FUNC(tm990189_state::sys9901_segment0_w));
+	m_tms9901_sys->p_out_cb(5).set(FUNC(tm990189_state::sys9901_segment1_w));
+	m_tms9901_sys->p_out_cb(6).set(FUNC(tm990189_state::sys9901_segment2_w));
+	m_tms9901_sys->p_out_cb(7).set(FUNC(tm990189_state::sys9901_segment3_w));
+	m_tms9901_sys->p_out_cb(8).set(FUNC(tm990189_state::sys9901_segment4_w));
+	m_tms9901_sys->p_out_cb(9).set(FUNC(tm990189_state::sys9901_segment5_w));
+	m_tms9901_sys->p_out_cb(10).set(FUNC(tm990189_state::sys9901_segment6_w));
+	m_tms9901_sys->p_out_cb(11).set(FUNC(tm990189_state::sys9901_segment7_w));
+	m_tms9901_sys->p_out_cb(12).set(FUNC(tm990189_state::sys9901_dsplytrgr_w));
+	m_tms9901_sys->p_out_cb(13).set(FUNC(tm990189_state::sys9901_shiftlight_w));
+	m_tms9901_sys->p_out_cb(14).set(FUNC(tm990189_state::sys9901_spkrdrive_w));
+	m_tms9901_sys->p_out_cb(15).set(FUNC(tm990189_state::sys9901_tapewdata_w));
+	m_tms9901_sys->intreq_cb().set(FUNC(tm990189_state::sys9901_interrupt_callback));
 
-	MCFG_DEVICE_ADD("tms9902", TMS9902, 2000000) // MZ: needs to be fixed once the RS232 support is complete
-	MCFG_TMS9902_XMIT_CB(WRITE8(tm990189_state, xmit_callback))         /* called when a character is transmitted */
-	MCFG_TM990_189_RS232_ADD("rs232")
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_timer", tm990189_state, display_callback, attotime::from_hz(30))
+	TMS9902(config, m_tms9902, 8_MHz_XTAL / 4);
+	m_tms9902->xmit_cb().set(FUNC(tm990189_state::xmit_callback)); // called when a character is transmitted
+	TM990_189_RS232(config, "rs232", 0, m_tms9902);
+
+	timer_device &display_timer(TIMER(config, "display_timer"));
+	display_timer.configure_periodic(FUNC(tm990189_state::display_callback), attotime::from_hz(30));
 	// Need to delay the timer, or it will spoil the initial LOAD
 	// TODO: Fix this, probably inside CPU
-	MCFG_TIMER_START_DELAY(attotime::from_msec(150))
-MACHINE_CONFIG_END
+	display_timer.set_start_delay(attotime::from_msec(150));
+}
 
-MACHINE_CONFIG_START(tm990189_state::tm990_189_v)
+void tm990189_state::tm990_189_v(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_TMS99xx_ADD("maincpu", TMS9980A, 2000000, tm990_189_v_memmap, tm990_189_cru_map)
-	MCFG_TMS99xx_EXTOP_HANDLER( WRITE8(tm990189_state, external_operation) )
+	TMS9980A(config, m_tms9980a, 8_MHz_XTAL);
+	m_tms9980a->set_addrmap(AS_PROGRAM, &tm990189_state::tm990_189_v_memmap);
+	m_tms9980a->set_addrmap(AS_IO, &tm990189_state::tm990_189_cru_map);
+	m_tms9980a->extop_cb().set(FUNC(tm990189_state::external_operation));
 
 	MCFG_MACHINE_START_OVERRIDE(tm990189_state, tm990_189_v )
 	MCFG_MACHINE_RESET_OVERRIDE(tm990189_state, tm990_189_v )
 
 	/* video hardware */
-	MCFG_DEVICE_ADD( "tms9918", TMS9918, XTAL(10'738'635) / 2 )
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
-	MCFG_SCREEN_UPDATE_DEVICE( "tms9918", tms9918_device, screen_update )
-	MCFG_DEFAULT_LAYOUT(layout_tm990189v)
+	tms9918_device &vdp(TMS9918(config, "tms9918", XTAL(10'738'635)));
+	vdp.set_screen("screen");
+	vdp.set_vram_size(0x4000);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+
+	config.set_default_layout(layout_tm990189v);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)   /* one two-level buzzer */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);   /* one two-level buzzer */
 
 	/* Devices */
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_DEVICE_ADD(TMS9901_0_TAG, TMS9901, 2000000)
-	MCFG_TMS9901_P0_HANDLER( WRITELINE( tm990189_state, usr9901_led0_w) )
-	MCFG_TMS9901_P1_HANDLER( WRITELINE( tm990189_state, usr9901_led1_w) )
-	MCFG_TMS9901_P2_HANDLER( WRITELINE( tm990189_state, usr9901_led2_w) )
-	MCFG_TMS9901_P3_HANDLER( WRITELINE( tm990189_state, usr9901_led3_w) )
-	MCFG_TMS9901_INTLEVEL_HANDLER( WRITE8( tm990189_state, usr9901_interrupt_callback) )
+	CASSETTE(config, "cassette", 0).add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD(TMS9901_1_TAG, TMS9901, 2000000)
-	MCFG_TMS9901_READBLOCK_HANDLER( READ8(tm990189_state, sys9901_r) )
-	MCFG_TMS9901_P0_HANDLER( WRITELINE( tm990189_state, sys9901_digitsel0_w) )
-	MCFG_TMS9901_P1_HANDLER( WRITELINE( tm990189_state, sys9901_digitsel1_w) )
-	MCFG_TMS9901_P2_HANDLER( WRITELINE( tm990189_state, sys9901_digitsel2_w) )
-	MCFG_TMS9901_P3_HANDLER( WRITELINE( tm990189_state, sys9901_digitsel3_w) )
-	MCFG_TMS9901_P4_HANDLER( WRITELINE( tm990189_state, sys9901_segment0_w) )
-	MCFG_TMS9901_P5_HANDLER( WRITELINE( tm990189_state, sys9901_segment1_w) )
-	MCFG_TMS9901_P6_HANDLER( WRITELINE( tm990189_state, sys9901_segment2_w) )
-	MCFG_TMS9901_P7_HANDLER( WRITELINE( tm990189_state, sys9901_segment3_w) )
-	MCFG_TMS9901_P8_HANDLER( WRITELINE( tm990189_state, sys9901_segment4_w) )
-	MCFG_TMS9901_P9_HANDLER( WRITELINE( tm990189_state, sys9901_segment5_w) )
-	MCFG_TMS9901_P10_HANDLER( WRITELINE( tm990189_state, sys9901_segment6_w) )
-	MCFG_TMS9901_P11_HANDLER( WRITELINE( tm990189_state, sys9901_segment7_w) )
-	MCFG_TMS9901_P12_HANDLER( WRITELINE( tm990189_state, sys9901_dsplytrgr_w) )
-	MCFG_TMS9901_P13_HANDLER( WRITELINE( tm990189_state, sys9901_shiftlight_w) )
-	MCFG_TMS9901_P14_HANDLER( WRITELINE( tm990189_state, sys9901_spkrdrive_w) )
-	MCFG_TMS9901_P15_HANDLER( WRITELINE( tm990189_state, sys9901_tapewdata_w) )
-	MCFG_TMS9901_INTLEVEL_HANDLER( WRITE8( tm990189_state, sys9901_interrupt_callback) )
+	TMS9901(config, m_tms9901_usr, 8_MHz_XTAL / 4);
+	m_tms9901_usr->p_out_cb(0).set(FUNC(tm990189_state::usr9901_led0_w));
+	m_tms9901_usr->p_out_cb(1).set(FUNC(tm990189_state::usr9901_led1_w));
+	m_tms9901_usr->p_out_cb(2).set(FUNC(tm990189_state::usr9901_led2_w));
+	m_tms9901_usr->p_out_cb(3).set(FUNC(tm990189_state::usr9901_led3_w));
+	m_tms9901_usr->intreq_cb().set(FUNC(tm990189_state::usr9901_interrupt_callback));
 
-	MCFG_DEVICE_ADD("tms9902", TMS9902, 2000000) // MZ: needs to be fixed once the RS232 support is complete
-	MCFG_TMS9902_XMIT_CB(WRITE8(tm990189_state, xmit_callback))         /* called when a character is transmitted */
-	MCFG_TM990_189_RS232_ADD("rs232")
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_timer", tm990189_state, display_callback, attotime::from_hz(30))
-	MCFG_TIMER_START_DELAY(attotime::from_msec(150))
-MACHINE_CONFIG_END
+	TMS9901(config, m_tms9901_sys, 8_MHz_XTAL / 4);
+	m_tms9901_sys->read_cb().set(FUNC(tm990189_state::sys9901_r));
+	m_tms9901_sys->p_out_cb(0).set(FUNC(tm990189_state::sys9901_digitsel0_w));
+	m_tms9901_sys->p_out_cb(1).set(FUNC(tm990189_state::sys9901_digitsel1_w));
+	m_tms9901_sys->p_out_cb(2).set(FUNC(tm990189_state::sys9901_digitsel2_w));
+	m_tms9901_sys->p_out_cb(3).set(FUNC(tm990189_state::sys9901_digitsel3_w));
+	m_tms9901_sys->p_out_cb(4).set(FUNC(tm990189_state::sys9901_segment0_w));
+	m_tms9901_sys->p_out_cb(5).set(FUNC(tm990189_state::sys9901_segment1_w));
+	m_tms9901_sys->p_out_cb(6).set(FUNC(tm990189_state::sys9901_segment2_w));
+	m_tms9901_sys->p_out_cb(7).set(FUNC(tm990189_state::sys9901_segment3_w));
+	m_tms9901_sys->p_out_cb(8).set(FUNC(tm990189_state::sys9901_segment4_w));
+	m_tms9901_sys->p_out_cb(9).set(FUNC(tm990189_state::sys9901_segment5_w));
+	m_tms9901_sys->p_out_cb(10).set(FUNC(tm990189_state::sys9901_segment6_w));
+	m_tms9901_sys->p_out_cb(11).set(FUNC(tm990189_state::sys9901_segment7_w));
+	m_tms9901_sys->p_out_cb(12).set(FUNC(tm990189_state::sys9901_dsplytrgr_w));
+	m_tms9901_sys->p_out_cb(13).set(FUNC(tm990189_state::sys9901_shiftlight_w));
+	m_tms9901_sys->p_out_cb(14).set(FUNC(tm990189_state::sys9901_spkrdrive_w));
+	m_tms9901_sys->p_out_cb(15).set(FUNC(tm990189_state::sys9901_tapewdata_w));
+	m_tms9901_sys->intreq_cb().set(FUNC(tm990189_state::sys9901_interrupt_callback));
+
+	TMS9902(config, m_tms9902, 8_MHz_XTAL / 4);
+	m_tms9902->xmit_cb().set(FUNC(tm990189_state::xmit_callback)); // called when a character is transmitted;
+	TM990_189_RS232(config, "rs232", 0, m_tms9902);
+
+	timer_device &display_timer(TIMER(config, "display_timer"));
+	display_timer.configure_periodic(FUNC(tm990189_state::display_callback), attotime::from_hz(30));
+	display_timer.set_start_delay(attotime::from_msec(150));
+}
 
 
 /*
@@ -1050,6 +1081,6 @@ static INPUT_PORTS_START(tm990_189)
 	PORT_BIT( 0x3ff, 0x1aa,  IPT_AD_STICK_Y) PORT_SENSITIVITY(JOYSTICK_SENSITIVITY) PORT_KEYDELTA(JOYSTICK_DELTA) PORT_MINMAX(0xd2,0x282 ) PORT_PLAYER(2) PORT_REVERSE
 INPUT_PORTS_END
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE      INPUT      STATE           INIT  COMPANY              FULLNAME                                                                FLAGS
-COMP( 1978, 990189,   0,        0,      tm990_189,   tm990_189, tm990189_state, 0,    "Texas Instruments", "TM 990/189 University Board microcomputer",                            0 )
-COMP( 1980, 990189v,  990189,   0,      tm990_189_v, tm990_189, tm990189_state, 0,    "Texas Instruments", "TM 990/189 University Board microcomputer with Video Board Interface", 0 )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE      INPUT      CLASS           INIT        COMPANY              FULLNAME                                                                FLAGS
+COMP( 1978, 990189,  0,      0,      tm990_189,   tm990_189, tm990189_state, empty_init, "Texas Instruments", "TM 990/189 University Board microcomputer",                            0 )
+COMP( 1980, 990189v, 990189, 0,      tm990_189_v, tm990_189, tm990189_state, empty_init, "Texas Instruments", "TM 990/189 University Board microcomputer with Video Board Interface", 0 )

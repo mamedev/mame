@@ -43,25 +43,25 @@ jangou_blitter_device::jangou_blitter_device(const machine_config &mconfig, cons
 
 void jangou_blitter_device::blit_v1_regs(address_map &map)
 {
-	map(0x00, 0x00).w(this, FUNC(jangou_blitter_device::src_lo_address_w));
-	map(0x01, 0x01).w(this, FUNC(jangou_blitter_device::src_md_address_w));
-	map(0x02, 0x02).w(this, FUNC(jangou_blitter_device::x_w));
-	map(0x03, 0x03).w(this, FUNC(jangou_blitter_device::y_w));
-	map(0x04, 0x04).w(this, FUNC(jangou_blitter_device::width_w));
-	map(0x05, 0x05).w(this, FUNC(jangou_blitter_device::height_and_trigger_w));
-	map(0x06, 0x06).w(this, FUNC(jangou_blitter_device::src_hi_address_w));
+	map(0x00, 0x00).w(FUNC(jangou_blitter_device::src_lo_address_w));
+	map(0x01, 0x01).w(FUNC(jangou_blitter_device::src_md_address_w));
+	map(0x02, 0x02).w(FUNC(jangou_blitter_device::x_w));
+	map(0x03, 0x03).w(FUNC(jangou_blitter_device::y_w));
+	map(0x04, 0x04).w(FUNC(jangou_blitter_device::width_w));
+	map(0x05, 0x05).w(FUNC(jangou_blitter_device::height_and_trigger_w));
+	map(0x06, 0x06).w(FUNC(jangou_blitter_device::src_hi_address_w));
 }
 
 // Sexy Gal and variants (v2) swaps around upper src address
 void jangou_blitter_device::blit_v2_regs(address_map &map)
 {
-	map(0x00, 0x00).w(this, FUNC(jangou_blitter_device::src_lo_address_w));
-	map(0x01, 0x01).w(this, FUNC(jangou_blitter_device::src_md_address_w));
-	map(0x02, 0x02).w(this, FUNC(jangou_blitter_device::src_hi_address_w));
-	map(0x03, 0x03).w(this, FUNC(jangou_blitter_device::x_w));
-	map(0x04, 0x04).w(this, FUNC(jangou_blitter_device::y_w));
-	map(0x05, 0x05).w(this, FUNC(jangou_blitter_device::width_w));
-	map(0x06, 0x06).w(this, FUNC(jangou_blitter_device::height_and_trigger_w));
+	map(0x00, 0x00).w(FUNC(jangou_blitter_device::src_lo_address_w));
+	map(0x01, 0x01).w(FUNC(jangou_blitter_device::src_md_address_w));
+	map(0x02, 0x02).w(FUNC(jangou_blitter_device::src_hi_address_w));
+	map(0x03, 0x03).w(FUNC(jangou_blitter_device::x_w));
+	map(0x04, 0x04).w(FUNC(jangou_blitter_device::y_w));
+	map(0x05, 0x05).w(FUNC(jangou_blitter_device::width_w));
+	map(0x06, 0x06).w(FUNC(jangou_blitter_device::height_and_trigger_w));
 }
 
 //-------------------------------------------------

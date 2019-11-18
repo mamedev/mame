@@ -16,8 +16,8 @@
 #include "includes/orao.h"
 
 #include "cpu/m6502/m6502.h"
-#include "sound/wave.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -30,7 +30,7 @@ void orao_state::orao_mem(address_map &map)
 {
 	map(0x0000, 0x5fff).ram().share("memory");
 	map(0x6000, 0x7fff).ram().share("video_ram"); // video ram
-	map(0x8000, 0x9fff).rw(this, FUNC(orao_state::orao_io_r), FUNC(orao_state::orao_io_w));
+	map(0x8000, 0x9fff).rw(FUNC(orao_state::orao_io_r), FUNC(orao_state::orao_io_w));
 	map(0xa000, 0xafff).ram();  // extension
 	map(0xb000, 0xbfff).ram();  // DOS
 	map(0xc000, 0xdfff).rom();
@@ -170,37 +170,36 @@ static INPUT_PORTS_START( orao )
 INPUT_PORTS_END
 
 /* Machine driver */
-MACHINE_CONFIG_START(orao_state::orao)
+void orao_state::orao(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 1000000)
-	MCFG_CPU_PROGRAM_MAP(orao_mem)
+	M6502(config, m_maincpu, 1000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &orao_state::orao_mem);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(orao_state, screen_update_orao)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 256-1, 0, 256-1);
+	screen.set_screen_update(FUNC(orao_state::screen_update_orao));
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_CASSETTE_ADD( "cassette")
-	MCFG_CASSETTE_FORMATS(orao_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
-	MCFG_CASSETTE_INTERFACE("orao_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(orao_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cassette->set_interface("orao_cass");
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list","orao")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cass_list").set_original("orao");
+}
 
 /* ROM definition */
 ROM_START( orao )
@@ -216,6 +215,6 @@ ROM_START( orao103 )
 ROM_END
 
 /* Driver */
-//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  STATE       INIT     COMPANY         FULLNAME    FLAGS
-COMP( 1984, orao,     0,      0,      orao,    orao,  orao_state, orao,    "PEL Varazdin", "Orao 102", 0 )
-COMP( 1985, orao103,  orao,   0,      orao,    orao,  orao_state, orao103, "PEL Varazdin", "Orao 103", 0 )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT          COMPANY         FULLNAME    FLAGS
+COMP( 1984, orao,    0,      0,      orao,    orao,  orao_state, init_orao,    "PEL Varazdin", "Orao 102", 0 )
+COMP( 1985, orao103, orao,   0,      orao,    orao,  orao_state, init_orao103, "PEL Varazdin", "Orao 103", 0 )

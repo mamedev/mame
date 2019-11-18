@@ -6,7 +6,7 @@
 #include "CpuArch.h"
 
 #ifdef MY_CPU_X86_OR_AMD64
-#if _MSC_VER >= 1500
+#if _MSC_VER >= 1500 && !defined(__clang__)
 #define USE_INTEL_AES
 #endif
 #endif

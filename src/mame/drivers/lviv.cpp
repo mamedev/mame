@@ -10,13 +10,13 @@ Dr. Volodimir Mosorov for two Lviv machines.
 
 What's new:
 -----------
-28.02.2003      Snapshot veryfing function added.
+28.02.2003      Snapshot verifying function added.
 07.01.2003  Support for .SAV snapshots. Joystick support (there are strange
         problems with "Doroga (1991)(-)(Ru).lvt".
 21.12.2002  Cassette support rewritten, WAVs saving and loading are working now.
 08.12.2002  Comments on emulation status updated. Changed 'lvive' to 'lvivp'.
         ADC r instruction in I8080 core fixed (Arkanoid works now).
-        Orginal keyboard layout added.
+        Original keyboard layout added.
 20.07.2002  "Reset" key fixed. I8080 core fixed (all BASIC commands works).
         now). Unsupported .lvt files versions aren't now loaded.
 xx.07.2002  Improved port and memory mapping (Raphael Nabet).
@@ -34,7 +34,7 @@ Notes on emulation status and to do list:
 -----------------------------------------
 1. LIMITATION: Printer is not emulated.
 2. LIMITATION: Timings are not implemented, due to it emulated machine runs
-   twice fast as orginal.
+   twice fast as original.
 3. LIMITATION: .RSS files are not supported.
 4. LIMITATION: Some usage notes and trivia are needed in sysinfo.dat.
 
@@ -96,11 +96,11 @@ Ports:
 
     D0-D3   8255 PPI
         Port A:
-            keyboard scaning
+            keyboard scanning
         Port B:
             keyboard reading
         Port C:
-            keyboard scaning/reading
+            keyboard scanning/reading
 
 Keyboard:
 ---------
@@ -161,7 +161,7 @@ Keyboard:
 Video:
 -----
     Screen resolution is 256x256 pixels. 4 colors at once are possible,
-    but there is a posiibility of palette change. Bits 0..6 of port 0xc1
+    but there is a possibility of palette change. Bits 0..6 of port 0xc1
     are used for palette setting.
 
     One byte of video-RAM sets 4 pixels. Colors of pixels are corrected
@@ -286,9 +286,7 @@ Timings:
 #include "includes/lviv.h"
 
 #include "cpu/i8085/i8085.h"
-#include "sound/wave.h"
 
-#include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
 
@@ -299,17 +297,17 @@ Timings:
 
 void lviv_state::io_map(address_map &map)
 {
-	map(0x00, 0xff).rw(this, FUNC(lviv_state::lviv_io_r), FUNC(lviv_state::lviv_io_w));
+	map(0x00, 0xff).rw(FUNC(lviv_state::io_r), FUNC(lviv_state::io_w));
 }
 
 /* memory w/r functions */
 
-void lviv_state::lviv_mem(address_map &map)
+void lviv_state::mem_map(address_map &map)
 {
-	map(0x0000, 0x3fff).bankrw("bank1");
-	map(0x4000, 0x7fff).bankrw("bank2");
-	map(0x8000, 0xbfff).bankrw("bank3");
-	map(0xc000, 0xffff).bankrw("bank4");
+	map(0x0000, 0x3fff).bankrw(m_bank[0]);
+	map(0x4000, 0x7fff).bankrw(m_bank[1]);
+	map(0x8000, 0xbfff).bankrw(m_bank[2]);
+	map(0xc000, 0xffff).bankrw(m_bank[3]);
 }
 
 
@@ -408,7 +406,7 @@ static INPUT_PORTS_START (lviv)
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Left") PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Down") PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
 	PORT_START("RESET") /* CPU */
-		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Reset") PORT_CODE(KEYCODE_PGDN) PORT_CHAR(UCHAR_MAMEKEY(PGDN)) PORT_CHANGED_MEMBER(DEVICE_SELF, lviv_state, lviv_reset, 0)
+		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Reset") PORT_CODE(KEYCODE_PGDN) PORT_CHAR(UCHAR_MAMEKEY(PGDN)) PORT_CHANGED_MEMBER(DEVICE_SELF, lviv_state, reset_button, 0)
 	PORT_START("JOY") /* Joystick */
 		PORT_BIT(0x01,  IP_ACTIVE_HIGH, IPT_JOYSTICK_UP)
 		PORT_BIT(0x02,  IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN)
@@ -422,74 +420,70 @@ INPUT_PORTS_END
 
 
 /* machine definition */
-MACHINE_CONFIG_START(lviv_state::lviv)
+void lviv_state::lviv(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, 2500000)
-	MCFG_CPU_PROGRAM_MAP(lviv_mem)
-	MCFG_CPU_IO_MAP(io_map)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	I8080(config, m_maincpu, 2500000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &lviv_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &lviv_state::io_map);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(lviv_state, lviv_ppi_0_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(lviv_state, lviv_ppi_0_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(lviv_state, lviv_ppi_0_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(lviv_state, lviv_ppi_0_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(lviv_state, lviv_ppi_0_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(lviv_state, lviv_ppi_0_portc_w))
+	I8255(config, m_ppi[0]);
+	m_ppi[0]->in_pa_callback().set(FUNC(lviv_state::ppi_0_porta_r));
+	m_ppi[0]->out_pa_callback().set(FUNC(lviv_state::ppi_0_porta_w));
+	m_ppi[0]->in_pb_callback().set(FUNC(lviv_state::ppi_0_portb_r));
+	m_ppi[0]->out_pb_callback().set(FUNC(lviv_state::ppi_0_portb_w));
+	m_ppi[0]->in_pc_callback().set(FUNC(lviv_state::ppi_0_portc_r));
+	m_ppi[0]->out_pc_callback().set(FUNC(lviv_state::ppi_0_portc_w));
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(lviv_state, lviv_ppi_1_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(lviv_state, lviv_ppi_1_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(lviv_state, lviv_ppi_1_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(lviv_state, lviv_ppi_1_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(lviv_state, lviv_ppi_1_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(lviv_state, lviv_ppi_1_portc_w))
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(0)
+	I8255(config, m_ppi[1]);
+	m_ppi[1]->in_pa_callback().set(FUNC(lviv_state::ppi_1_porta_r));
+	m_ppi[1]->out_pa_callback().set(FUNC(lviv_state::ppi_1_porta_w));
+	m_ppi[1]->in_pb_callback().set(FUNC(lviv_state::ppi_1_portb_r));
+	m_ppi[1]->out_pb_callback().set(FUNC(lviv_state::ppi_1_portb_w));
+	m_ppi[1]->in_pc_callback().set(FUNC(lviv_state::ppi_1_portc_r));
+	m_ppi[1]->out_pc_callback().set(FUNC(lviv_state::ppi_1_portc_w));
 
 	/* video hardware */
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(lviv_state, screen_update_lviv)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(50);
+	m_screen->set_vblank_time(0);
+	m_screen->set_size(256, 256);
+	m_screen->set_visarea(0, 256-1, 0, 256-1);
+	m_screen->set_screen_update(FUNC(lviv_state::screen_update));
+	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", sizeof (lviv_palette) / 3)
-	MCFG_PALETTE_INIT_OWNER(lviv_state, lviv)
+	PALETTE(config, m_palette, FUNC(lviv_state::lviv_palette), ARRAY_LENGTH(s_palette));
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* snapshot */
-	MCFG_SNAPSHOT_ADD("snapshot", lviv_state, lviv, "sav", 0)
+	SNAPSHOT(config, "snapshot", "sav").set_load_callback(FUNC(lviv_state::snapshot_cb));
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(lviv_lvt_format)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("lviv_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(lviv_lvt_format);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cassette->set_interface("lviv_cass");
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list","lviv")
+	SOFTWARE_LIST(config, "cass_list").set_original("lviv");
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
-MACHINE_CONFIG_END
+	RAM(config, RAM_TAG).set_default_size("64K");
+}
 
 
 ROM_START(lviv)
 	ROM_REGION(0x14000,"maincpu",0)
 	ROM_SYSTEM_BIOS( 0, "lviv", "Lviv/L'vov" )
-	ROMX_LOAD("lviv.bin", 0x10000, 0x4000, CRC(44a347d9) SHA1(74e067493b2b7d9ab17333202009a1a4f5e460fd), ROM_BIOS(1))
+	ROMX_LOAD("lviv.bin", 0x10000, 0x4000, CRC(44a347d9) SHA1(74e067493b2b7d9ab17333202009a1a4f5e460fd), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "lviva", "Lviv/L'vov (alternate)" )
-	ROMX_LOAD("lviva.bin", 0x10000, 0x4000, CRC(551622f5) SHA1(b225f3542b029d767b7db9dce562e8a3f77f92a2), ROM_BIOS(2))
+	ROMX_LOAD("lviva.bin", 0x10000, 0x4000, CRC(551622f5) SHA1(b225f3542b029d767b7db9dce562e8a3f77f92a2), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 2, "lvivp", "Lviv/L'vov (prototype)" )
-	ROMX_LOAD("lvivp.bin", 0x10000, 0x4000, CRC(f171c282) SHA1(c7dc2bdb02400e6b5cdcc50040eb06f506a7ed84), ROM_BIOS(3))
+	ROMX_LOAD("lvivp.bin", 0x10000, 0x4000, CRC(f171c282) SHA1(c7dc2bdb02400e6b5cdcc50040eb06f506a7ed84), ROM_BIOS(2))
 ROM_END
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE       INIT    COMPANY         FULLNAME      FLAGS */
-COMP( 1989, lviv,   0,      0,      lviv,    lviv,  lviv_state, 0,      "V. I. Lenin",  "PK-01 Lviv", 0 )
+/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY        FULLNAME      FLAGS */
+COMP( 1989, lviv, 0,      0,      lviv,    lviv,  lviv_state, empty_init, "V. I. Lenin", "PK-01 Lviv", 0 )

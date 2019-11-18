@@ -25,7 +25,7 @@ static const uint8_t hex_to_7seg[16] =
 
 
 /* Driver initialization */
-DRIVER_INIT_MEMBER(ut88_state,ut88)
+void ut88_state::init_ut88()
 {
 	/* set initially ROM to be visible on first bank */
 	uint8_t *RAM = m_region_maincpu->base();
@@ -48,7 +48,7 @@ void ut88_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 		timer_set(attotime::from_hz(60), TIMER_UPDATE_DISPLAY);
 		break;
 	default:
-		assert_always(false, "Unknown id in ut88_state::device_timer");
+		throw emu_fatalerror("Unknown id in ut88_state::device_timer");
 	}
 }
 
@@ -97,13 +97,13 @@ MACHINE_RESET_MEMBER(ut88_state,ut88)
 
 READ8_MEMBER( ut88_state::ut88_keyboard_r )
 {
-	return m_ppi->read(space, offset^0x03);
+	return m_ppi->read(offset^0x03);
 }
 
 
 WRITE8_MEMBER( ut88_state::ut88_keyboard_w )
 {
-	m_ppi->write(space, offset^0x03, data);
+	m_ppi->write(offset^0x03, data);
 }
 
 WRITE8_MEMBER( ut88_state::ut88_sound_w )
@@ -161,7 +161,7 @@ WRITE8_MEMBER( ut88_state::ut88mini_write_led )
 		}
 }
 
-DRIVER_INIT_MEMBER(ut88_state,ut88mini)
+void ut88_state::init_ut88mini()
 {
 }
 

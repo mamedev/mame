@@ -157,6 +157,12 @@ project "softfloat"
 	includedirs {
 		MAME_DIR .. "src/osd",
 	}
+
+	configuration { "gmake or ninja" }
+		buildoptions_cpp {
+			"-x c++",
+		}
+
 	configuration { "vs*" }
 		buildoptions {
 			"/wd4244", -- warning C4244: 'argument' : conversion from 'xxx' to 'xxx', possible loss of data
@@ -177,6 +183,350 @@ end
 	}
 
 --------------------------------------------------
+-- SoftFloat 3 library objects
+--------------------------------------------------
+
+project "softfloat3"
+uuid "9c22fc90-53fd-11e8-b566-0800200c9a66"
+kind "StaticLib"
+
+options {
+	"ForceCPP",
+}
+
+includedirs {
+	MAME_DIR .. "src/osd",
+	MAME_DIR .. "3rdparty/softfloat3/build/MAME",
+	MAME_DIR .. "3rdparty/softfloat3/source",
+	MAME_DIR .. "3rdparty/softfloat3/source/include",
+	MAME_DIR .. "3rdparty/softfloat3/source/8086",
+}
+
+configuration { "gmake or ninja" }
+buildoptions_cpp {
+	"-x c++",
+}
+
+configuration { "vs*" }
+buildoptions {
+	"/wd4701", -- warning C4701: potentially uninitialized local variable 'xxx' used
+	"/wd4703", -- warning C4703: potentially uninitialized local pointer variable 'xxx' used
+}
+
+configuration { }
+defines {
+	"SOFTFLOAT_ROUND_ODD",
+	"INLINE_LEVEL=5",
+	"SOFTFLOAT_FAST_DIV32TO16",
+	"SOFTFLOAT_FAST_DIV64TO32",
+	"SOFTFLOAT_FAST_INT64"
+}
+
+files {
+	MAME_DIR .. "3rdparty/softfloat3/source/s_eq128.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/s_le128.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/s_lt128.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/s_shortShiftLeft128.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/s_shortShiftRight128.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/s_shortShiftRightJam64.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/s_shortShiftRightJam64Extra.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/s_shortShiftRightJam128.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/s_shortShiftRightJam128Extra.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/s_shiftRightJam32.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/s_shiftRightJam64.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/s_shiftRightJam64Extra.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/s_shiftRightJam128.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/s_shiftRightJam128Extra.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/s_shiftRightJam256M.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/s_countLeadingZeros8.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/s_countLeadingZeros16.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/s_countLeadingZeros32.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/s_countLeadingZeros64.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/s_add128.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/s_add256M.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/s_sub128.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/s_sub256M.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/s_mul64ByShifted32To128.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/s_mul64To128.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/s_mul128By32.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/s_mul128To256M.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/s_approxRecip_1Ks.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/s_approxRecip32_1.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/s_approxRecipSqrt_1Ks.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/s_approxRecipSqrt32_1.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/8086/softfloat_raiseFlags.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/8086/s_commonNaNToF16UI.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/8086/s_propagateNaNF16UI.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/8086/s_f32UIToCommonNaN.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/8086/s_commonNaNToF32UI.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/8086/s_propagateNaNF32UI.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/8086/s_f64UIToCommonNaN.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/8086/s_commonNaNToF64UI.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/8086/s_propagateNaNF64UI.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/8086/extF80M_isSignalingNaN.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/8086/s_extF80UIToCommonNaN.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/8086/s_commonNaNToExtF80UI.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/8086/s_propagateNaNExtF80UI.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/8086/f128M_isSignalingNaN.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/8086/s_f128UIToCommonNaN.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/8086/s_commonNaNToF128UI.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/8086/s_propagateNaNF128UI.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/s_roundToUI32.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/s_roundToUI64.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/s_roundToI32.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/s_roundToI64.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/s_normSubnormalF16Sig.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/s_roundPackToF16.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/s_normRoundPackToF16.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/s_addMagsF16.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/s_subMagsF16.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/s_mulAddF16.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/s_normSubnormalF32Sig.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/s_roundPackToF32.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/s_normRoundPackToF32.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/s_addMagsF32.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/s_subMagsF32.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/s_mulAddF32.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/s_normSubnormalF64Sig.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/s_roundPackToF64.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/s_normRoundPackToF64.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/s_addMagsF64.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/s_subMagsF64.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/s_mulAddF64.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/s_normSubnormalExtF80Sig.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/s_roundPackToExtF80.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/s_normRoundPackToExtF80.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/s_addMagsExtF80.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/s_subMagsExtF80.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/s_normSubnormalF128Sig.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/s_roundPackToF128.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/s_normRoundPackToF128.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/s_addMagsF128.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/s_subMagsF128.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/s_mulAddF128.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/softfloat_state.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/ui32_to_f16.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/ui32_to_f32.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/ui32_to_f64.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/ui32_to_extF80.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/ui32_to_extF80M.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/ui32_to_f128.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/ui32_to_f128M.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/ui64_to_f16.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/ui64_to_f32.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/ui64_to_f64.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/ui64_to_extF80.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/ui64_to_extF80M.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/ui64_to_f128.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/ui64_to_f128M.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/i32_to_f16.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/i32_to_f32.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/i32_to_f64.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/i32_to_extF80.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/i32_to_extF80M.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/i32_to_f128.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/i32_to_f128M.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/i64_to_f16.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/i64_to_f32.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/i64_to_f64.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/i64_to_extF80.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/i64_to_extF80M.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/i64_to_f128.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/i64_to_f128M.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f16_to_ui32.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f16_to_ui64.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f16_to_i32.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f16_to_i64.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f16_to_ui32_r_minMag.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f16_to_ui64_r_minMag.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f16_to_i32_r_minMag.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f16_to_i64_r_minMag.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f16_to_f32.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f16_to_f64.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f16_to_extF80.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f16_to_extF80M.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f16_to_f128.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f16_to_f128M.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f16_roundToInt.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f16_add.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f16_sub.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f16_mul.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f16_mulAdd.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f16_div.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f16_rem.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f16_sqrt.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f16_eq.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f16_le.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f16_lt.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f16_eq_signaling.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f16_le_quiet.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f16_lt_quiet.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f16_isSignalingNaN.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f32_to_ui32.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f32_to_ui64.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f32_to_i32.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f32_to_i64.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f32_to_ui32_r_minMag.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f32_to_ui64_r_minMag.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f32_to_i32_r_minMag.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f32_to_i64_r_minMag.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f32_to_f16.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f32_to_f64.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f32_to_extF80.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f32_to_extF80M.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f32_to_f128.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f32_to_f128M.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f32_roundToInt.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f32_add.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f32_sub.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f32_mul.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f32_mulAdd.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f32_div.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f32_rem.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f32_sqrt.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f32_eq.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f32_le.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f32_lt.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f32_eq_signaling.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f32_le_quiet.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f32_lt_quiet.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f32_isSignalingNaN.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f64_to_ui32.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f64_to_ui64.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f64_to_i32.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f64_to_i64.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f64_to_ui32_r_minMag.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f64_to_ui64_r_minMag.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f64_to_i32_r_minMag.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f64_to_i64_r_minMag.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f64_to_f16.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f64_to_f32.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f64_to_extF80.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f64_to_extF80M.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f64_to_f128.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f64_to_f128M.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f64_roundToInt.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f64_add.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f64_sub.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f64_mul.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f64_mulAdd.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f64_div.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f64_rem.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f64_sqrt.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f64_eq.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f64_le.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f64_lt.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f64_eq_signaling.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f64_le_quiet.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f64_lt_quiet.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f64_isSignalingNaN.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/extF80_to_ui32.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/extF80_to_ui64.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/extF80_to_i32.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/extF80_to_i64.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/extF80_to_ui32_r_minMag.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/extF80_to_ui64_r_minMag.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/extF80_to_i32_r_minMag.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/extF80_to_i64_r_minMag.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/extF80_to_f16.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/extF80_to_f32.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/extF80_to_f64.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/extF80_to_f128.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/extF80_roundToInt.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/extF80_add.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/extF80_sub.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/extF80_mul.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/extF80_div.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/extF80_rem.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/extF80_sqrt.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/extF80_eq.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/extF80_le.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/extF80_lt.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/extF80_eq_signaling.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/extF80_le_quiet.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/extF80_lt_quiet.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/extF80_isSignalingNaN.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/extF80M_to_ui32.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/extF80M_to_ui64.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/extF80M_to_i32.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/extF80M_to_i64.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/extF80M_to_ui32_r_minMag.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/extF80M_to_ui64_r_minMag.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/extF80M_to_i32_r_minMag.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/extF80M_to_i64_r_minMag.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/extF80M_to_f16.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/extF80M_to_f32.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/extF80M_to_f64.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/extF80M_to_f128M.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/extF80M_roundToInt.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/extF80M_add.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/extF80M_sub.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/extF80M_mul.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/extF80M_div.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/extF80M_rem.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/extF80M_sqrt.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/extF80M_eq.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/extF80M_le.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/extF80M_lt.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/extF80M_eq_signaling.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/extF80M_le_quiet.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/extF80M_lt_quiet.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f128_to_ui32.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f128_to_ui64.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f128_to_i32.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f128_to_i64.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f128_to_ui32_r_minMag.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f128_to_ui64_r_minMag.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f128_to_i32_r_minMag.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f128_to_i64_r_minMag.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f128_to_f16.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f128_to_f32.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f128_to_extF80.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f128_to_f64.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f128_roundToInt.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f128_add.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f128_sub.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f128_mul.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f128_mulAdd.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f128_div.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f128_rem.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f128_sqrt.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f128_eq.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f128_le.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f128_lt.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f128_eq_signaling.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f128_le_quiet.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f128_lt_quiet.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f128_isSignalingNaN.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f128M_to_ui32.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f128M_to_ui64.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f128M_to_i32.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f128M_to_i64.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f128M_to_ui32_r_minMag.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f128M_to_ui64_r_minMag.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f128M_to_i32_r_minMag.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f128M_to_i64_r_minMag.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f128M_to_f16.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f128M_to_f32.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f128M_to_extF80M.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f128M_to_f64.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f128M_roundToInt.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f128M_add.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f128M_sub.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f128M_mul.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f128M_mulAdd.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f128M_div.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f128M_rem.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f128M_sqrt.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f128M_eq.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f128M_le.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f128M_lt.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f128M_eq_signaling.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f128M_le_quiet.c",
+	MAME_DIR .. "3rdparty/softfloat3/source/f128M_lt_quiet.c",
+}
+
+-------------------------------------------------
 -- libJPEG library objects
 --------------------------------------------------
 
@@ -292,6 +642,12 @@ end
 	configuration { "vs201*" }
 		buildoptions {
 			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
+		}
+
+	configuration { "vsllvm" }
+		buildoptions {
+			"-Wno-unused-function",
+			"-Wno-enum-conversion",
 		}
 
 	configuration { }
@@ -631,6 +987,12 @@ end
 			"SQLITE_OS_WINRT",
 		}
 
+	configuration { "vsllvm" }
+		buildoptions {
+			"-Wno-deprecated-declarations",
+			"-Wno-unused-variable",
+		}
+
 	configuration { }
 
 	files {
@@ -847,6 +1209,14 @@ project "bimg"
 
 	configuration { }
 
+	if _OPTIONS["targetos"]=="macosx" or _OPTIONS["targetos"]=="linux" or _OPTIONS["targetos"]=="windows" or _OPTIONS["targetos"]=="asmjs" then
+		if _OPTIONS["gcc"]~=nil and (string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "asmjs")) then
+			buildoptions_cpp {
+				"-Wno-unused-const-variable",
+			}
+		end
+	end
+
 	defines {
 		"__STDC_LIMIT_MACROS",
 		"__STDC_FORMAT_MACROS",
@@ -855,10 +1225,25 @@ project "bimg"
 
 	includedirs {
 		MAME_DIR .. "3rdparty/bimg/include",
+		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-codec",
+		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-codec/include",
 	}
 
 	files {
 		MAME_DIR .. "3rdparty/bimg/src/image.cpp",
+		MAME_DIR .. "3rdparty/bimg/src/image_gnf.cpp",
+
+		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-codec/src/decoder/astc_file.cc",
+		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-codec/src/decoder/codec.cc",
+		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-codec/src/decoder/endpoint_codec.cc",
+		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-codec/src/decoder/footprint.cc",
+		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-codec/src/decoder/integer_sequence_codec.cc",
+		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-codec/src/decoder/intermediate_astc_block.cc",
+		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-codec/src/decoder/logical_astc_block.cc",
+		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-codec/src/decoder/partition.cc",
+		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-codec/src/decoder/physical_astc_block.cc",
+		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-codec/src/decoder/quantization.cc",
+		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-codec/src/decoder/weight_infill.cc",
 	}
 
 --------------------------------------------------
@@ -875,7 +1260,15 @@ project "bgfx"
 			"/wd4244", -- warning C4244: 'argument' : conversion from 'xxx' to 'xxx', possible loss of data
 			"/wd4611", -- warning C4611: interaction between '_setjmp' and C++ object destruction is non-portable
 			"/wd4310", -- warning C4310: cast truncates constant value
+			"/wd4701", -- warning C4701: potentially uninitialized local variable 'xxx' used
 		}
+
+	configuration { "vsllvm" }
+		buildoptions {
+			"-Wno-unneeded-internal-declaration",
+			"-Wno-unused-const-variable",
+		}
+
 if _OPTIONS["vs"]=="intel-15" then
 		buildoptions {
 			"/Qwd906",              -- message #906: effect of this "#pragma pack" directive is local to function "xxx"
@@ -976,21 +1369,38 @@ end
 		end
 	end
 
+	if _OPTIONS["targetos"]=="macosx" and _OPTIONS["gcc"]~=nil then
+		if string.find(_OPTIONS["gcc"], "clang") and (version < 80000) then
+			defines {
+				"TARGET_OS_OSX=1",
+			}
+		end
+	end
+
 	defines {
 		"__STDC_LIMIT_MACROS",
 		"__STDC_FORMAT_MACROS",
 		"__STDC_CONSTANT_MACROS",
 		"BGFX_CONFIG_MAX_FRAME_BUFFERS=128",
 	}
+
+	if _OPTIONS["targetos"]=="linux" or _OPTIONS["targetos"]=="netbsd" or _OPTIONS["targetos"]=="openbsd" then
+		if _OPTIONS["NO_X11"]=="1" then
+			defines {
+				"BGFX_CONFIG_RENDERER_OPENGLES=1",
+				"BGFX_CONFIG_RENDERER_OPENGL=0",
+			}
+		end
+	end
+
 	files {
 		MAME_DIR .. "3rdparty/bgfx/src/bgfx.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/debug_renderdoc.cpp",
+		MAME_DIR .. "3rdparty/bgfx/src/dxgi.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/glcontext_egl.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/glcontext_glx.cpp",
+		MAME_DIR .. "3rdparty/bgfx/src/glcontext_html5.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/glcontext_wgl.cpp",
-		MAME_DIR .. "3rdparty/bgfx/src/hmd.cpp",
-		MAME_DIR .. "3rdparty/bgfx/src/hmd_ovr.cpp",
-		MAME_DIR .. "3rdparty/bgfx/src/hmd_openvr.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/nvapi.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_d3d11.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_d3d12.cpp",
@@ -998,6 +1408,7 @@ end
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_gl.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_gnm.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_noop.cpp",
+		MAME_DIR .. "3rdparty/bgfx/src/renderer_nvn.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_vk.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/shader.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/shader_dx9bc.cpp",
@@ -1008,14 +1419,18 @@ end
 		MAME_DIR .. "3rdparty/bgfx/examples/common/imgui/imgui.cpp",
 		MAME_DIR .. "3rdparty/bgfx/examples/common/nanovg/nanovg.cpp",
 		MAME_DIR .. "3rdparty/bgfx/examples/common/nanovg/nanovg_bgfx.cpp",
-		MAME_DIR .. "3rdparty/bgfx/3rdparty/ocornut-imgui/imgui.cpp",
-		MAME_DIR .. "3rdparty/bgfx/3rdparty/ocornut-imgui/imgui_draw.cpp",
+		MAME_DIR .. "3rdparty/bgfx/3rdparty/dear-imgui/imgui.cpp",
+		MAME_DIR .. "3rdparty/bgfx/3rdparty/dear-imgui/imgui_draw.cpp",
+		MAME_DIR .. "3rdparty/bgfx/3rdparty/dear-imgui/imgui_widgets.cpp",
 	}
 	if _OPTIONS["targetos"]=="macosx" then
 		files {
 			MAME_DIR .. "3rdparty/bgfx/src/glcontext_eagl.mm",
 			MAME_DIR .. "3rdparty/bgfx/src/glcontext_nsgl.mm",
 			MAME_DIR .. "3rdparty/bgfx/src/renderer_mtl.mm",
+		}
+		buildoptions {
+			"-x objective-c++",
 		}
 	end
 
@@ -1048,6 +1463,15 @@ project "portaudio"
 	configuration { "vs2015*" }
 		buildoptions {
 			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
+		}
+
+	configuration { "vsllvm" }
+		buildoptions {
+			"-Wno-deprecated-declarations",
+			"-Wno-missing-braces",
+			"-Wno-unused-variable",
+			"-Wno-switch",
+			"-Wno-unused-function",
 		}
 
 	configuration { "gmake or ninja" }

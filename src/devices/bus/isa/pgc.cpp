@@ -64,12 +64,12 @@ ROM_START( pgc )
 	ROM_DEFAULT_BIOS("1985")
 
 	ROM_SYSTEM_BIOS(0, "1984", "1984 firmware, P/N 6137322/3")
-	ROMX_LOAD("ibm_6137323_pgc_card_27256.bin", 0x00000, 0x8000, CRC(f564f342) SHA1(c5ef17fd1569043cb59f61faf828ea8b0ee95526), ROM_BIOS(1))
-	ROMX_LOAD("ibm_6137322_pgc_card_27256.bin", 0x08000, 0x8000, CRC(5e6cc82f) SHA1(45b3ffb5a9c51986862f8d47b3e03dcaaf4073d5), ROM_BIOS(1))
+	ROMX_LOAD("ibm_6137323_pgc_card_27256.bin", 0x00000, 0x8000, CRC(f564f342) SHA1(c5ef17fd1569043cb59f61faf828ea8b0ee95526), ROM_BIOS(0))
+	ROMX_LOAD("ibm_6137322_pgc_card_27256.bin", 0x08000, 0x8000, CRC(5e6cc82f) SHA1(45b3ffb5a9c51986862f8d47b3e03dcaaf4073d5), ROM_BIOS(0))
 
 	ROM_SYSTEM_BIOS(1, "1985", "1985 firmware, P/N 59X7354/5")
-	ROMX_LOAD("pgc_u44.bin", 0x00000, 0x8000, CRC(71280241) SHA1(7042ccd4ebd03f576a256a433b8aa38d1b4fefa8), ROM_BIOS(2))
-	ROMX_LOAD("pgc_u43.bin", 0x08000, 0x8000, CRC(923f5ea3) SHA1(2b2a55d64b20d3a613b00c51443105aa03eca5d6), ROM_BIOS(2))
+	ROMX_LOAD("pgc_u44.bin", 0x00000, 0x8000, CRC(71280241) SHA1(7042ccd4ebd03f576a256a433b8aa38d1b4fefa8), ROM_BIOS(1))
+	ROMX_LOAD("pgc_u43.bin", 0x08000, 0x8000, CRC(923f5ea3) SHA1(2b2a55d64b20d3a613b00c51443105aa03eca5d6), ROM_BIOS(1))
 
 	ROM_REGION(0x800, "commarea", ROMREGION_ERASE00)
 
@@ -111,14 +111,14 @@ void isa8_pgc_device::pgc_map(address_map &map)
 	map.unmap_value_high();
 	map(0x00000, 0x07fff).rom();
 	map(0x08000, 0x0ffff).rom().region("maincpu", 0x8000);
-	map(0x10000, 0x1001f).rw(this, FUNC(isa8_pgc_device::stateparam_r), FUNC(isa8_pgc_device::stateparam_w));
+	map(0x10000, 0x1001f).rw(FUNC(isa8_pgc_device::stateparam_r), FUNC(isa8_pgc_device::stateparam_w));
 //  map(0x18000, 0x18fff).ram();   // ??
 	map(0x28000, 0x287ff).ram().region("commarea", 0).mirror(0x800);
 	map(0x32001, 0x32001).nopw();
-	map(0x32020, 0x3203f).w(this, FUNC(isa8_pgc_device::accel_w));
-	map(0x3c000, 0x3c001).r(this, FUNC(isa8_pgc_device::init_r));
+	map(0x32020, 0x3203f).w(FUNC(isa8_pgc_device::accel_w));
+	map(0x3c000, 0x3c001).r(FUNC(isa8_pgc_device::init_r));
 //  map(0x3e000, 0x3efff).ram();   // ??
-	map(0x80000, 0xf7fff).rw(this, FUNC(isa8_pgc_device::vram_r), FUNC(isa8_pgc_device::vram_w));
+	map(0x80000, 0xf7fff).rw(FUNC(isa8_pgc_device::vram_r), FUNC(isa8_pgc_device::vram_w));
 	map(0xf8000, 0xfffff).rom().region("maincpu", 0x8000);
 }
 
@@ -135,7 +135,7 @@ static const gfx_layout pgc_charlayout =
 	8*16                    /* every char takes 10 bytes */
 };
 
-static GFXDECODE_START( pgc )
+static GFXDECODE_START( gfx_pgc )
 	GFXDECODE_REVERSEBITS("chargen", 0, pgc_charlayout, 0, 1)
 GFXDECODE_END
 
@@ -151,30 +151,27 @@ DEFINE_DEVICE_TYPE(ISA8_PGC, isa8_pgc_device, "isa_ibm_pgc", "IBM Professional G
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(isa8_pgc_device::device_add_mconfig)
-	MCFG_CPU_ADD("maincpu", I8088, XTAL(24'000'000)/3)
-	MCFG_CPU_PROGRAM_MAP(pgc_map)
+void isa8_pgc_device::device_add_mconfig(machine_config &config)
+{
+	I8088(config, m_cpu, XTAL(24'000'000)/3);
+	m_cpu->set_addrmap(AS_PROGRAM, &isa8_pgc_device::pgc_map);
 #if 0
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(isa8_pgc_device, irq_callback)
+	m_cpu->set_irq_acknowledge_callback(FUNC(isa8_pgc_device::irq_callback));
 #endif
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("scantimer", isa8_pgc_device, scanline_callback,
-		attotime::from_hz(60*PGC_TOTAL_VERT))
-	MCFG_TIMER_START_DELAY(attotime::from_hz(XTAL(50'000'000)/(2*PGC_HORZ_START)))
-
-	MCFG_SCREEN_ADD(PGC_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(50'000'000)/2,
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(XTAL(50'000'000)/2,
 		PGC_TOTAL_HORZ, PGC_HORZ_START, PGC_HORZ_START+PGC_DISP_HORZ,
-		PGC_TOTAL_VERT, PGC_VERT_START, PGC_VERT_START+PGC_DISP_VERT)
-	MCFG_SCREEN_UPDATE_DRIVER(isa8_pgc_device, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+		PGC_TOTAL_VERT, PGC_VERT_START, PGC_VERT_START+PGC_DISP_VERT);
+	m_screen->set_screen_update(FUNC(isa8_pgc_device::screen_update));
+	m_screen->set_palette(m_palette);
 #if 0
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(isa8_pgc_device, vblank_irq))
+	m_screen->screen_vblank().set(FUNC(isa8_pgc_device::vblank_irq));
 #endif
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pgc)
-	MCFG_PALETTE_ADD( "palette", 256 )
-MACHINE_CONFIG_END
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_pgc);
+	PALETTE(config, m_palette).set_entries(256);
+}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -213,15 +210,12 @@ isa8_pgc_device::isa8_pgc_device(const machine_config &mconfig, device_type type
 	m_cpu(*this, "maincpu"),
 	m_screen(*this, PGC_SCREEN_NAME),
 	m_palette(*this, "palette"),
-	m_commarea(nullptr), m_vram(nullptr), m_eram(nullptr), m_bitmap(nullptr)
+	m_commarea(nullptr), m_vram(nullptr), m_eram(nullptr)
 {
 }
 
 void isa8_pgc_device::device_start()
 {
-	int width = PGC_DISP_HORZ;
-	int height = PGC_DISP_VERT;
-
 	if (m_palette != nullptr && !m_palette->started())
 		throw device_missing_dependencies();
 
@@ -231,9 +225,6 @@ void isa8_pgc_device::device_start()
 	{
 		m_palette->set_pen_color(i, 0, 0, 0);
 	}
-
-	m_bitmap = std::make_unique<bitmap_ind16>(width, height);
-	m_bitmap->fill(0);
 
 	m_vram = std::make_unique<uint8_t[]>(0x78000);
 	m_eram = std::make_unique<uint8_t[]>(0x8000);
@@ -378,13 +369,13 @@ WRITE8_MEMBER(isa8_pgc_device::lut_w)
 
 	if (offset & 1)
 	{
-		m_lut[o + 2] = (data & 15) << 4;
+		m_lut[o + 2] = (data & 15) * 17;
 		m_palette->set_pen_color( offset >> 1, m_lut[o], m_lut[o + 1], m_lut[o + 2] );
 		LOG("lut W @ %02X <- %d %d %d\n",
 			offset >> 1, m_lut[o], m_lut[o + 1], m_lut[o + 2] );
 	} else {
-		m_lut[o    ] = data & 0xf0;
-		m_lut[o + 1] = (data & 15) << 4;
+		m_lut[o    ] = (data >> 4) * 17;
+		m_lut[o + 1] = (data & 15) * 17;
 	}
 }
 
@@ -398,38 +389,26 @@ READ8_MEMBER(isa8_pgc_device::init_r)
 	membank("eram")->set_base(m_eram.get());
 
 	LOG("INIT: mapping LUT\n");
-	space.install_write_handler(0xf8400, 0xf85ff,
-		write8_delegate(FUNC(isa8_pgc_device::lut_w), this));
+	space.install_write_handler(0xf8400, 0xf85ff, write8_delegate(*this, FUNC(isa8_pgc_device::lut_w)));
 
 	return 0; // XXX ignored
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(isa8_pgc_device::scanline_callback)
+uint32_t isa8_pgc_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint16_t x, y = m_screen->vpos();
 	uint16_t *p;
 	uint8_t *v;
 
-	// XXX hpos shifts every frame -- fix
-	if (y == 0) LOGCMD("scanline_cb frame %d x %.4d y %.3d\n",
-		(int) m_screen->frame_number(), m_screen->hpos(), y);
-
-	if (y < PGC_VERT_START) return;
-	y -= PGC_VERT_START;
-	if (y >= PGC_DISP_VERT) return;
-
-	// XXX address translation happens in hardware
-	v = &m_vram[y * 1024];
-	p = &m_bitmap->pix16(y, 0);
-
-	for (x = 0; x < PGC_DISP_HORZ; x++)
+	for (int y = 0; y < PGC_DISP_VERT; y++)
 	{
-		*p++ = *v++;
-	}
-}
+		// XXX address translation happens in hardware
+		v = &m_vram[y * 1024];
+		p = &bitmap.pix16(y + PGC_VERT_START, PGC_HORZ_START);
 
-uint32_t isa8_pgc_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	copybitmap(bitmap, *m_bitmap, 0, 0, PGC_HORZ_START, PGC_VERT_START, cliprect);
+		for (int x = 0; x < PGC_DISP_HORZ; x++)
+		{
+			*p++ = *v++;
+		}
+	}
 	return 0;
 }

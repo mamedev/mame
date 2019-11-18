@@ -81,10 +81,10 @@ WRITE_LINE_MEMBER(sonson_state::coin2_counter_w)
 void sonson_state::main_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram();
-	map(0x1000, 0x13ff).ram().w(this, FUNC(sonson_state::sonson_videoram_w)).share("videoram");
-	map(0x1400, 0x17ff).ram().w(this, FUNC(sonson_state::sonson_colorram_w)).share("colorram");
+	map(0x1000, 0x13ff).ram().w(FUNC(sonson_state::sonson_videoram_w)).share("videoram");
+	map(0x1400, 0x17ff).ram().w(FUNC(sonson_state::sonson_colorram_w)).share("colorram");
 	map(0x2020, 0x207f).ram().share("spriteram");
-	map(0x3000, 0x3000).w(this, FUNC(sonson_state::sonson_scrollx_w));
+	map(0x3000, 0x3000).w(FUNC(sonson_state::sonson_scrollx_w));
 	map(0x3002, 0x3002).portr("P1");
 	map(0x3003, 0x3003).portr("P2");
 	map(0x3004, 0x3004).portr("SYSTEM");
@@ -217,7 +217,7 @@ static const gfx_layout spritelayout =
 	32*8
 };
 
-static GFXDECODE_START( sonson )
+static GFXDECODE_START( gfx_sonson )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,      0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 64*4, 32 )
 GFXDECODE_END
@@ -225,48 +225,44 @@ GFXDECODE_END
 
 
 
-MACHINE_CONFIG_START(sonson_state::sonson)
-
+void sonson_state::sonson(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809, XTAL(12'000'000)/2) // HD68B09P (/4 internally)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", sonson_state,  irq0_line_hold)
+	MC6809(config, m_maincpu, XTAL(12'000'000)/2); // HD68B09P (/4 internally)
+	m_maincpu->set_addrmap(AS_PROGRAM, &sonson_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(sonson_state::irq0_line_hold));
 
-	MCFG_CPU_ADD("audiocpu", MC6809, XTAL(12'000'000)/2) // HD68B09P (/4 internally)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(sonson_state, irq0_line_hold, 4*60)    /* FIRQs are triggered by the main CPU */
+	MC6809(config, m_audiocpu, XTAL(12'000'000)/2); // HD68B09P (/4 internally)
+	m_audiocpu->set_addrmap(AS_PROGRAM, &sonson_state::sound_map);
+	m_audiocpu->set_periodic_int(FUNC(sonson_state::irq0_line_hold), attotime::from_hz(4*60));    /* FIRQs are triggered by the main CPU */
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // A9
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(sonson_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(sonson_state, sh_irqtrigger_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(sonson_state, coin2_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(sonson_state, coin1_counter_w))
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // A9
+	mainlatch.q_out_cb<0>().set(FUNC(sonson_state::flipscreen_w));
+	mainlatch.q_out_cb<1>().set(FUNC(sonson_state::sh_irqtrigger_w));
+	mainlatch.q_out_cb<6>().set(FUNC(sonson_state::coin2_counter_w));
+	mainlatch.q_out_cb<7>().set(FUNC(sonson_state::coin1_counter_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57.37)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(sonson_state, screen_update_sonson)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(57.37);
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(1*8, 31*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(sonson_state::screen_update_sonson));
+	screen.set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sonson)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sonson);
 
-	MCFG_PALETTE_ADD("palette", 64*4+32*8)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(sonson_state, sonson)
+	PALETTE(config, m_palette, FUNC(sonson_state::sonson_palette), 64*4 + 32*8, 32);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL(12'000'000)/8)   /* 1.5 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	AY8910(config, "ay1", XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.30);   /* 1.5 MHz */
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL(12'000'000)/8)   /* 1.5 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_CONFIG_END
+	AY8910(config, "ay2", XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.30);   /* 1.5 MHz */
+}
 
 
 
@@ -338,5 +334,5 @@ ROM_START( sonsonj )
 ROM_END
 
 
-GAME( 1984, sonson,  0,      sonson, sonson, sonson_state, 0, ROT0, "Capcom", "Son Son",         MACHINE_SUPPORTS_SAVE )
-GAME( 1984, sonsonj, sonson, sonson, sonson, sonson_state, 0, ROT0, "Capcom", "Son Son (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sonson,  0,      sonson, sonson, sonson_state, empty_init, ROT0, "Capcom", "Son Son",         MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sonsonj, sonson, sonson, sonson, sonson_state, empty_init, ROT0, "Capcom", "Son Son (Japan)", MACHINE_SUPPORTS_SAVE )

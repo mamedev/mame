@@ -6,6 +6,9 @@
 
 *************************************************************************/
 
+#include "emupal.h"
+#include "tilemap.h"
+
 class cbasebal_state : public driver_device
 {
 public:
@@ -47,7 +50,7 @@ public:
 	DECLARE_WRITE8_MEMBER(cbasebal_gfxctrl_w);
 	DECLARE_WRITE8_MEMBER(cbasebal_scrollx_w);
 	DECLARE_WRITE8_MEMBER(cbasebal_scrolly_w);
-	DECLARE_DRIVER_INIT(cbasebal);
+	void init_cbasebal();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	virtual void machine_start() override;

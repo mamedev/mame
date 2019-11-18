@@ -55,7 +55,7 @@ All Clocks and Vsync verified by Corrado Tomaselli (August 2012)
 
 INTERRUPT_GEN_MEMBER(vulgus_state::vblank_irq)
 {
-	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xd7); /* RST 10h - vblank */
+	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xd7); /* Z80 - RST 10h - vblank */
 }
 
 void vulgus_state::main_map(address_map &map)
@@ -69,12 +69,12 @@ void vulgus_state::main_map(address_map &map)
 	map(0xc800, 0xc800).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0xc801, 0xc801).nopw(); // ?
 	map(0xc802, 0xc803).ram().share("scroll_low");
-	map(0xc804, 0xc804).w(this, FUNC(vulgus_state::c804_w));
-	map(0xc805, 0xc805).w(this, FUNC(vulgus_state::palette_bank_w));
+	map(0xc804, 0xc804).w(FUNC(vulgus_state::c804_w));
+	map(0xc805, 0xc805).w(FUNC(vulgus_state::palette_bank_w));
 	map(0xc902, 0xc903).ram().share("scroll_high");
 	map(0xcc00, 0xcc7f).ram().share("spriteram");
-	map(0xd000, 0xd7ff).ram().w(this, FUNC(vulgus_state::fgvideoram_w)).share("fgvideoram");
-	map(0xd800, 0xdfff).ram().w(this, FUNC(vulgus_state::bgvideoram_w)).share("bgvideoram");
+	map(0xd000, 0xd7ff).ram().w(FUNC(vulgus_state::fgvideoram_w)).share("fgvideoram");
+	map(0xd800, 0xdfff).ram().w(FUNC(vulgus_state::bgvideoram_w)).share("bgvideoram");
 	map(0xe000, 0xefff).ram();
 }
 
@@ -207,7 +207,7 @@ static const gfx_layout spritelayout =
 
 
 
-static GFXDECODE_START( vulgus )
+static GFXDECODE_START( gfx_vulgus )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,           0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,  64*4+16*16, 32*4 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,      64*4, 16 )
@@ -216,43 +216,39 @@ GFXDECODE_END
 
 
 
-MACHINE_CONFIG_START(vulgus_state::vulgus)
-
+void vulgus_state::vulgus(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/4)  /* 3 MHz */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", vulgus_state, vblank_irq)
+	Z80(config, m_maincpu, XTAL(12'000'000)/4);  /* 3 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &vulgus_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(vulgus_state::vblank_irq));
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(12'000'000)/4) /* 3 MHz */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(vulgus_state, irq0_line_hold, 8*60)
+	Z80(config, m_audiocpu, XTAL(12'000'000)/4); /* 3 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &vulgus_state::sound_map);
+	m_audiocpu->set_periodic_int(FUNC(vulgus_state::irq0_line_hold), attotime::from_hz(8*60));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59.59)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(vulgus_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(59.59);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(vulgus_state::screen_update));
+	screen.set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vulgus)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_vulgus);
 
-	MCFG_PALETTE_ADD("palette", 64*4+16*16+4*32*8)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256)
-	MCFG_PALETTE_INIT_OWNER(vulgus_state, vulgus)
+	PALETTE(config, m_palette, FUNC(vulgus_state::vulgus_palette), 64*4+16*16+4*32*8, 256);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL(12'000'000)/8) /* 1.5 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8910(config, "ay1", XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.25); /* 1.5 MHz */
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL(12'000'000)/8) /* 1.5 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	AY8910(config, "ay2", XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.25); /* 1.5 MHz */
+}
 
 
 
@@ -418,7 +414,7 @@ ROM_START( mach9 )
 	ROM_LOAD( "82s129_8n.bin",    0x0700, 0x0100, CRC(4921635c) SHA1(aee37d6cdc36acf0f11ff5f93e7b16e4b12f6c39) )    /* video timing? (not used) */
 ROM_END
 
-GAME( 1984, vulgus,  0,      vulgus, vulgus, vulgus_state, 0, ROT270, "Capcom", "Vulgus (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, vulgusa, vulgus, vulgus, vulgus, vulgus_state, 0, ROT90,  "Capcom", "Vulgus (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, vulgusj, vulgus, vulgus, vulgus, vulgus_state, 0, ROT270, "Capcom", "Vulgus (Japan?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, mach9,   vulgus, vulgus, vulgus, vulgus_state, 0, ROT270,  "bootleg (ITISA)", "Mach-9 (bootleg of Vulgus)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, vulgus,  0,      vulgus, vulgus, vulgus_state, empty_init, ROT270, "Capcom", "Vulgus (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, vulgusa, vulgus, vulgus, vulgus, vulgus_state, empty_init, ROT90,  "Capcom", "Vulgus (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, vulgusj, vulgus, vulgus, vulgus, vulgus_state, empty_init, ROT270, "Capcom", "Vulgus (Japan?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, mach9,   vulgus, vulgus, vulgus, vulgus_state, empty_init, ROT270,  "bootleg (ITISA)", "Mach-9 (bootleg of Vulgus)", MACHINE_SUPPORTS_SAVE )

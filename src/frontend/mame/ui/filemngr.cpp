@@ -158,7 +158,7 @@ void menu_file_manager::populate(float &customtop, float &custombottom)
 	if (m_warnings.empty() || m_curr_selected)
 		item_append("Reset", "", 0, (void *)1);
 
-	custombottom = ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
+	custombottom = ui().get_line_height() + 3.0f * ui().box_tb_border();
 }
 
 

@@ -14,32 +14,11 @@
 #pragma once
 
 
-/***************************************************************************
-    INTERFACE CONFIGURATION MACROS
-***************************************************************************/
-#define ESRIP_DRAW(name) int name(int l, int r, int fig, int attr, int addr, int col, int x_scale, int bank)
-
-#define MCFG_ESRIP_FDT_R_CALLBACK(_read) \
-	devcb = &downcast<esrip_device &>(*device).set_fdt_r_callback(DEVCB_##_read);
-
-#define MCFG_ESRIP_FDT_W_CALLBACK(_write) \
-	devcb = &downcast<esrip_device &>(*device).set_fdt_w_callback(DEVCB_##_write);
-
-#define MCFG_ESRIP_STATUS_IN_CALLBACK(_read) \
-	devcb = &downcast<esrip_device &>(*device).set_status_in_callback(DEVCB_##_read);
-
-#define MCFG_ESRIP_DRAW_CALLBACK_OWNER(_class, _method) \
-	downcast<esrip_device &>(*device).set_draw_callback(esrip_device::draw_delegate(&_class::_method, #_class "::" #_method, this));
-
-#define MCFG_ESRIP_LBRM_PROM(_tag) \
-	downcast<esrip_device &>(*device).lbrm_prom(_tag);
-
-#define MCFG_ESRIP_SCREEN(screen_tag) \
-	downcast<esrip_device &>(*device).set_screen_tag(screen_tag);
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
+
+#define ESRIP_DRAW(name) int name(int l, int r, int fig, int attr, int addr, int col, int x_scale, int bank)
 
 // device type definition
 DECLARE_DEVICE_TYPE(ESRIP, esrip_device)
@@ -56,12 +35,14 @@ public:
 	esrip_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// inline configuration helpers
-	void set_screen_tag(const char *tag) { m_screen.set_tag(tag); }
-	template <class Object> devcb_base &set_fdt_r_callback(Object &&cb) { return m_fdt_r.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_fdt_w_callback(Object &&cb) { return m_fdt_w.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_status_in_callback(Object &&cb) { return m_status_in.set_callback(std::forward<Object>(cb)); }
-	template <typename Object> void set_draw_callback(Object &&cb) { m_draw = std::forward<Object>(cb); }
-	void lbrm_prom(const char *name) { m_lbrm_prom = name; }
+	void set_lbrm_prom_region(const char *name) { m_lbrm_prom = name; }
+	template <typename T> void set_screen_tag(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
+	template <typename... T> void set_draw_callback(T &&... args) { m_draw.set(std::forward<T>(args)...); }
+
+	// devcb3 accessors
+	auto fdt_r() { return m_fdt_r.bind(); }
+	auto fdt_w() { return m_fdt_w.bind(); }
+	auto status_in() { return m_status_in.bind(); }
 
 	// public interfaces
 	uint8_t get_rip_status();
@@ -129,9 +110,9 @@ protected:
 	void make_ops();
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override;
-	virtual uint32_t execute_max_cycles() const override;
-	virtual uint32_t execute_input_lines() const override;
+	virtual uint32_t execute_min_cycles() const noexcept override;
+	virtual uint32_t execute_max_cycles() const noexcept override;
+	virtual uint32_t execute_input_lines() const noexcept override;
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -196,7 +177,7 @@ protected:
 	uint8_t   *m_lbrm;
 
 	address_space *m_program;
-	direct_read_data<-3> *m_direct;
+	memory_access_cache<3, -3, ENDIANNESS_BIG> *m_cache;
 
 	int     m_icount;
 

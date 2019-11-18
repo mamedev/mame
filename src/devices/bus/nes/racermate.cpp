@@ -81,7 +81,7 @@ void nes_racermate_device::update_banks()
 	prg16_89ab(m_latch >> 6);
 }
 
-WRITE8_MEMBER(nes_racermate_device::write_h)
+void nes_racermate_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("racermate write_h, offset: %04x, data: %02x\n", offset, data));
 

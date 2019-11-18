@@ -78,7 +78,7 @@ uint32_t segas16a_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 					{
 						// if color bits are all 1, this triggers shadow/hilight
 						if ((pix & 0x3f0) == 0x3f0)
-							dest[x] += (m_paletteram[dest[x]] & 0x8000) ? m_palette_entries*2 : m_palette_entries;
+							dest[x] += m_palette_entries;
 
 						// otherwise, just add in sprite palette base
 						else

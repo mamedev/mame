@@ -25,12 +25,15 @@ if(BUILD_TESTING)
             # -- Remapper tests
             ${CMAKE_CURRENT_SOURCE_DIR}/Remap.FromFile.cpp)
 
+        glslang_pch(TEST_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/pch.cpp)
+
         add_executable(glslangtests ${TEST_SOURCES})
         set_property(TARGET glslangtests PROPERTY FOLDER tests)
         glslang_set_link_args(glslangtests)
         if(ENABLE_GLSLANG_INSTALL)
-            install(TARGETS glslangtests
+            install(TARGETS glslangtests EXPORT glslangtestsTargets
                     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+			install(EXPORT glslangtestsTargets DESTINATION lib/cmake)
         endif(ENABLE_GLSLANG_INSTALL)
 
         set(GLSLANG_TEST_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../Test")

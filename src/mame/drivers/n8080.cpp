@@ -13,23 +13,23 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/i8085/i8085.h"
 #include "includes/n8080.h"
 
 #define MASTER_CLOCK    XTAL(20'160'000)
 
 
-WRITE8_MEMBER(n8080_state::n8080_shift_bits_w)
+void n8080_state::n8080_shift_bits_w(uint8_t data)
 {
 	m_shift_bits = data & 7;
 }
-WRITE8_MEMBER(n8080_state::n8080_shift_data_w)
+
+void n8080_state::n8080_shift_data_w(uint8_t data)
 {
 	m_shift_data = (m_shift_data >> 8) | (data << 8);
 }
 
 
-READ8_MEMBER(n8080_state::n8080_shift_r)
+uint8_t n8080_state::n8080_shift_r()
 {
 	return m_shift_data >> (8 - m_shift_bits);
 }
@@ -42,7 +42,7 @@ void n8080_state::main_cpu_map(address_map &map)
 }
 
 
-void n8080_state::helifire_main_cpu_map(address_map &map)
+void helifire_state::main_cpu_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x7fff).ram().share("videoram");
@@ -55,14 +55,14 @@ void n8080_state::main_io_map(address_map &map)
 	map(0x00, 0x00).portr("IN0");
 	map(0x01, 0x01).portr("IN1");
 	map(0x02, 0x02).portr("IN2");
-	map(0x03, 0x03).r(this, FUNC(n8080_state::n8080_shift_r));
+	map(0x03, 0x03).r(FUNC(n8080_state::n8080_shift_r));
 	map(0x04, 0x04).portr("IN3");
 
-	map(0x02, 0x02).w(this, FUNC(n8080_state::n8080_shift_bits_w));
-	map(0x03, 0x03).w(this, FUNC(n8080_state::n8080_shift_data_w));
-	map(0x04, 0x04).w(this, FUNC(n8080_state::n8080_sound_1_w));
-	map(0x05, 0x05).w(this, FUNC(n8080_state::n8080_sound_2_w));
-	map(0x06, 0x06).w(this, FUNC(n8080_state::n8080_video_control_w));
+	map(0x02, 0x02).w(FUNC(n8080_state::n8080_shift_bits_w));
+	map(0x03, 0x03).w(FUNC(n8080_state::n8080_shift_data_w));
+	map(0x04, 0x04).w(FUNC(n8080_state::n8080_sound_1_w));
+	map(0x05, 0x05).w(FUNC(n8080_state::n8080_sound_2_w));
+	map(0x06, 0x06).w(FUNC(n8080_state::n8080_video_control_w));
 }
 
 
@@ -438,7 +438,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(n8080_state::rst1_tick)
 	int state = m_inte ? ASSERT_LINE : CLEAR_LINE;
 
 	/* V7 = 1, V6 = 0 */
-	m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, state, 0xcf);
+	m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, state, 0xcf); // I8080
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(n8080_state::rst2_tick)
@@ -446,7 +446,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(n8080_state::rst2_tick)
 	int state = m_inte ? ASSERT_LINE : CLEAR_LINE;
 
 	/* vblank */
-	m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, state, 0xd7);
+	m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, state, 0xd7); // I8080
 }
 
 WRITE_LINE_MEMBER(n8080_state::n8080_inte_callback)
@@ -454,7 +454,7 @@ WRITE_LINE_MEMBER(n8080_state::n8080_inte_callback)
 	m_inte = state;
 }
 
-WRITE8_MEMBER(n8080_state::n8080_status_callback)
+void n8080_state::n8080_status_callback(uint8_t data)
 {
 	if (data & i8080_cpu_device::STATUS_INTA)
 	{
@@ -470,144 +470,130 @@ void n8080_state::machine_start()
 	save_item(NAME(m_inte));
 }
 
-MACHINE_RESET_MEMBER(n8080_state,n8080)
+void n8080_state::machine_reset()
 {
 	m_shift_data = 0;
 	m_shift_bits = 0;
 	m_inte = 0;
 }
 
-MACHINE_RESET_MEMBER(n8080_state,spacefev)
+void spacefev_state::machine_reset()
 {
-	MACHINE_RESET_CALL_MEMBER(n8080);
+	n8080_state::machine_reset();
 
-	m_spacefev_red_screen = 0;
-	m_spacefev_red_cannon = 0;
+	m_red_screen = 0;
+	m_red_cannon = 0;
 }
 
-MACHINE_RESET_MEMBER(n8080_state,sheriff)
+void sheriff_state::machine_reset()
 {
-	MACHINE_RESET_CALL_MEMBER(n8080);
+	n8080_state::machine_reset();
 
 	m_sheriff_color_mode = 0;
 	m_sheriff_color_data = 0;
 }
 
-MACHINE_RESET_MEMBER(n8080_state,helifire)
+void helifire_state::machine_reset()
 {
-	MACHINE_RESET_CALL_MEMBER(n8080);
+	n8080_state::machine_reset();
 
-	m_helifire_mv = 0;
-	m_helifire_sc = 0;
-	m_helifire_flash = 0;
+	m_mv = 0;
+	m_sc = 0;
+	m_flash = 0;
 }
 
 
-MACHINE_CONFIG_START(n8080_state::spacefev)
-
+void spacefev_state::spacefev(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, MASTER_CLOCK / 10)
-	MCFG_I8085A_STATUS(WRITE8(n8080_state,n8080_status_callback))
-	MCFG_I8085A_INTE(WRITELINE(n8080_state,n8080_inte_callback))
-	MCFG_CPU_PROGRAM_MAP(main_cpu_map)
-	MCFG_CPU_IO_MAP(main_io_map)
-
-	MCFG_MACHINE_RESET_OVERRIDE(n8080_state,spacefev)
+	I8080(config, m_maincpu, MASTER_CLOCK / 10);
+	m_maincpu->out_status_func().set(FUNC(spacefev_state::n8080_status_callback));
+	m_maincpu->out_inte_func().set(FUNC(spacefev_state::n8080_inte_callback));
+	m_maincpu->set_addrmap(AS_PROGRAM, &spacefev_state::main_cpu_map);
+	m_maincpu->set_addrmap(AS_IO, &spacefev_state::main_io_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 255, 16, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(n8080_state, screen_update_spacefev)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(256, 256);
+	m_screen->set_visarea(0, 255, 16, 239);
+	m_screen->set_screen_update(FUNC(spacefev_state::screen_update));
+	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_INIT_OWNER(n8080_state,n8080)
-	MCFG_VIDEO_START_OVERRIDE(n8080_state,spacefev)
+	PALETTE(config, m_palette, FUNC(spacefev_state::n8080_palette), 8);
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("rst1", n8080_state, rst1_tick, "screen", 128, 256)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("rst2", n8080_state, rst2_tick, "screen", 240, 256)
+	TIMER(config, "rst1").configure_scanline(FUNC(spacefev_state::rst1_tick), "screen", 128, 256);
+	TIMER(config, "rst2").configure_scanline(FUNC(spacefev_state::rst2_tick), "screen", 240, 256);
 
 	/* sound hardware */
 	spacefev_sound(config);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(n8080_state::sheriff)
-
+void sheriff_state::sheriff(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, MASTER_CLOCK / 10)
-	MCFG_I8085A_STATUS(WRITE8(n8080_state,n8080_status_callback))
-	MCFG_I8085A_INTE(WRITELINE(n8080_state,n8080_inte_callback))
-	MCFG_CPU_PROGRAM_MAP(main_cpu_map)
-	MCFG_CPU_IO_MAP(main_io_map)
-
-	MCFG_MACHINE_RESET_OVERRIDE(n8080_state,sheriff)
+	I8080(config, m_maincpu, MASTER_CLOCK / 10);
+	m_maincpu->out_status_func().set(FUNC(sheriff_state::n8080_status_callback));
+	m_maincpu->out_inte_func().set(FUNC(sheriff_state::n8080_inte_callback));
+	m_maincpu->set_addrmap(AS_PROGRAM, &sheriff_state::main_cpu_map);
+	m_maincpu->set_addrmap(AS_IO, &sheriff_state::main_io_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 255, 16, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(n8080_state, screen_update_sheriff)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(256, 256);
+	m_screen->set_visarea(0, 255, 16, 239);
+	m_screen->set_screen_update(FUNC(sheriff_state::screen_update));
+	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_INIT_OWNER(n8080_state,n8080)
-	MCFG_VIDEO_START_OVERRIDE(n8080_state,sheriff)
+	PALETTE(config, m_palette, FUNC(sheriff_state::n8080_palette), 8);
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("rst1", n8080_state, rst1_tick, "screen", 128, 256)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("rst2", n8080_state, rst2_tick, "screen", 240, 256)
+	TIMER(config, "rst1").configure_scanline(FUNC(sheriff_state::rst1_tick), "screen", 128, 256);
+	TIMER(config, "rst2").configure_scanline(FUNC(sheriff_state::rst2_tick), "screen", 240, 256);
 
 	/* sound hardware */
 	sheriff_sound(config);
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_START(n8080_state::westgun2)
+void sheriff_state::westgun2(machine_config &config)
+{
 	sheriff(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", I8080, XTAL(19'968'000) / 10)
-	MCFG_I8085A_STATUS(WRITE8(n8080_state,n8080_status_callback))
-	MCFG_I8085A_INTE(WRITELINE(n8080_state,n8080_inte_callback))
-	MCFG_CPU_PROGRAM_MAP(main_cpu_map)
-	MCFG_CPU_IO_MAP(main_io_map)
+	I8080(config.replace(), m_maincpu, XTAL(19'968'000) / 10);
+	m_maincpu->out_status_func().set(FUNC(sheriff_state::n8080_status_callback));
+	m_maincpu->out_inte_func().set(FUNC(sheriff_state::n8080_inte_callback));
+	m_maincpu->set_addrmap(AS_PROGRAM, &sheriff_state::main_cpu_map);
+	m_maincpu->set_addrmap(AS_IO, &sheriff_state::main_io_map);
+}
 
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(n8080_state::helifire)
-
+void helifire_state::helifire(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, MASTER_CLOCK / 10)
-	MCFG_I8085A_STATUS(WRITE8(n8080_state,n8080_status_callback))
-	MCFG_I8085A_INTE(WRITELINE(n8080_state,n8080_inte_callback))
-	MCFG_CPU_PROGRAM_MAP(helifire_main_cpu_map)
-	MCFG_CPU_IO_MAP(main_io_map)
-
-	MCFG_MACHINE_RESET_OVERRIDE(n8080_state,helifire)
+	I8080(config, m_maincpu, MASTER_CLOCK / 10);
+	m_maincpu->out_status_func().set(FUNC(helifire_state::n8080_status_callback));
+	m_maincpu->out_inte_func().set(FUNC(helifire_state::n8080_inte_callback));
+	m_maincpu->set_addrmap(AS_PROGRAM, &helifire_state::main_cpu_map);
+	m_maincpu->set_addrmap(AS_IO, &helifire_state::main_io_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 255, 16, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(n8080_state, screen_update_helifire)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(n8080_state, screen_vblank_helifire))
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(256, 256);
+	m_screen->set_visarea(0, 255, 16, 239);
+	m_screen->set_screen_update(FUNC(helifire_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(helifire_state::screen_vblank));
+	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 8 + 0x400)
-	MCFG_PALETTE_INIT_OWNER(n8080_state,helifire)
-	MCFG_VIDEO_START_OVERRIDE(n8080_state,helifire)
+	PALETTE(config, m_palette, FUNC(helifire_state::helifire_palette), 8 + 0x400);
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("rst1", n8080_state, rst1_tick, "screen", 128, 256)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("rst2", n8080_state, rst2_tick, "screen", 240, 256)
+	TIMER(config, "rst1").configure_scanline(FUNC(helifire_state::rst1_tick), "screen", 128, 256);
+	TIMER(config, "rst2").configure_scanline(FUNC(helifire_state::rst2_tick), "screen", 240, 256);
 
 	/* sound hardware */
 	helifire_sound(config);
-MACHINE_CONFIG_END
+}
 
 
 /*
@@ -936,15 +922,15 @@ ROM_START( helifirea )
 ROM_END
 
 
-GAME( 1979, spacefev,   0,        spacefev, spacefev, n8080_state, 0, ROT270, "Nintendo", "Space Fever (New Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1979, spacefevo,  spacefev, spacefev, spacefev, n8080_state, 0, ROT270, "Nintendo", "Space Fever (Old Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1979, spacefevo2, spacefev, spacefev, spacefev, n8080_state, 0, ROT270, "Nintendo", "Space Fever (Older Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1979, highsplt,   0,        spacefev, highsplt, n8080_state, 0, ROT270, "Nintendo", "Space Fever High Splitter (set 1)", MACHINE_SUPPORTS_SAVE ) // known as "SF-Hisplitter" on its flyer
-GAME( 1979, highsplta,  highsplt, spacefev, highsplt, n8080_state, 0, ROT270, "Nintendo", "Space Fever High Splitter (set 2)", MACHINE_SUPPORTS_SAVE ) // known as "SF-Hisplitter" on its flyer
-GAME( 1979, highspltb,  highsplt, spacefev, highsplt, n8080_state, 0, ROT270, "Nintendo", "Space Fever High Splitter (alt Sound)", MACHINE_SUPPORTS_SAVE ) // known as "SF-Hisplitter" on its flyer
-GAME( 1979, spacelnc,   0,        spacefev, spacelnc, n8080_state, 0, ROT270, "Nintendo", "Space Launcher", MACHINE_SUPPORTS_SAVE )
-GAME( 1979, sheriff,    0,        sheriff,  sheriff,  n8080_state, 0, ROT270, "Nintendo", "Sheriff", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, bandido,    sheriff,  sheriff,  bandido,  n8080_state, 0, ROT270, "Nintendo (Exidy license)", "Bandido", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, westgun2,   sheriff,  westgun2, westgun2, n8080_state, 0, ROT270, "Nintendo (Taito Corporation license)", "Western Gun Part II", MACHINE_SUPPORTS_SAVE ) // official Taito PCBs, but title/copyright not shown
-GAME( 1980, helifire,   0,        helifire, helifire, n8080_state, 0, ROT270, "Nintendo", "HeliFire (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, helifirea,  helifire, helifire, helifire, n8080_state, 0, ROT270, "Nintendo", "HeliFire (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, spacefev,   0,        spacefev, spacefev, spacefev_state, empty_init, ROT270, "Nintendo", "Space Fever (New Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1979, spacefevo,  spacefev, spacefev, spacefev, spacefev_state, empty_init, ROT270, "Nintendo", "Space Fever (Old Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1979, spacefevo2, spacefev, spacefev, spacefev, spacefev_state, empty_init, ROT270, "Nintendo", "Space Fever (Older Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1979, highsplt,   0,        spacefev, highsplt, spacefev_state, empty_init, ROT270, "Nintendo", "Space Fever High Splitter (set 1)", MACHINE_SUPPORTS_SAVE ) // known as "SF-Hisplitter" on its flyer
+GAME( 1979, highsplta,  highsplt, spacefev, highsplt, spacefev_state, empty_init, ROT270, "Nintendo", "Space Fever High Splitter (set 2)", MACHINE_SUPPORTS_SAVE ) // known as "SF-Hisplitter" on its flyer
+GAME( 1979, highspltb,  highsplt, spacefev, highsplt, spacefev_state, empty_init, ROT270, "Nintendo", "Space Fever High Splitter (alt Sound)", MACHINE_SUPPORTS_SAVE ) // known as "SF-Hisplitter" on its flyer
+GAME( 1979, spacelnc,   0,        spacefev, spacelnc, spacefev_state, empty_init, ROT270, "Nintendo", "Space Launcher", MACHINE_SUPPORTS_SAVE )
+GAME( 1979, sheriff,    0,        sheriff,  sheriff,  sheriff_state,  empty_init, ROT270, "Nintendo", "Sheriff", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, bandido,    sheriff,  sheriff,  bandido,  sheriff_state,  empty_init, ROT270, "Nintendo (Exidy license)", "Bandido", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, westgun2,   sheriff,  westgun2, westgun2, sheriff_state,  empty_init, ROT270, "Nintendo (Taito Corporation license)", "Western Gun Part II", MACHINE_SUPPORTS_SAVE ) // official Taito PCBs, but title/copyright not shown
+GAME( 1980, helifire,   0,        helifire, helifire, helifire_state, empty_init, ROT270, "Nintendo", "HeliFire (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, helifirea,  helifire, helifire, helifire, helifire_state, empty_init, ROT270, "Nintendo", "HeliFire (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

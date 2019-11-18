@@ -71,7 +71,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(pingpong_state::pingpong_interrupt)
 	}
 	else if ((scanline % 32) == 0)
 	{
-		if (m_intenable & 0x08) m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		if (m_intenable & 0x08) m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 }
 
@@ -85,15 +85,15 @@ TIMER_DEVICE_CALLBACK_MEMBER(pingpong_state::merlinmm_interrupt)
 	}
 	else if (scanline == 0)
 	{
-		if (m_intenable & 0x08) m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		if (m_intenable & 0x08) m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 }
 
 void pingpong_state::pingpong_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x83ff).ram().w(this, FUNC(pingpong_state::pingpong_colorram_w)).share("colorram");
-	map(0x8400, 0x87ff).ram().w(this, FUNC(pingpong_state::pingpong_videoram_w)).share("videoram");
+	map(0x8000, 0x83ff).ram().w(FUNC(pingpong_state::pingpong_colorram_w)).share("colorram");
+	map(0x8400, 0x87ff).ram().w(FUNC(pingpong_state::pingpong_videoram_w)).share("videoram");
 	map(0x9000, 0x9002).ram();
 	map(0x9003, 0x9052).ram().share("spriteram");
 	map(0x9053, 0x97ff).ram();
@@ -101,7 +101,7 @@ void pingpong_state::pingpong_map(address_map &map)
 	map(0xa880, 0xa880).portr("INPUTS");
 	map(0xa900, 0xa900).portr("DSW1");
 	map(0xa980, 0xa980).portr("DSW2");
-	map(0xa000, 0xa000).w(this, FUNC(pingpong_state::coin_w));   /* coin counters + irq enables */
+	map(0xa000, 0xa000).w(FUNC(pingpong_state::coin_w));   /* coin counters + irq enables */
 	map(0xa200, 0xa200).nopw();        /* SN76496 data latch */
 	map(0xa400, 0xa400).w("snsnd", FUNC(sn76496_device::write));    /* trigger read */
 	map(0xa600, 0xa600).w("watchdog", FUNC(watchdog_timer_device::reset_w));
@@ -114,12 +114,12 @@ void pingpong_state::merlinmm_map(address_map &map)
 	map(0x5400, 0x57ff).ram();
 	map(0x6000, 0x6007).nopw(); /* solenoid writes */
 	map(0x7000, 0x7000).portr("IN4");
-	map(0x8000, 0x83ff).ram().w(this, FUNC(pingpong_state::pingpong_colorram_w)).share("colorram");
-	map(0x8400, 0x87ff).ram().w(this, FUNC(pingpong_state::pingpong_videoram_w)).share("videoram");
+	map(0x8000, 0x83ff).ram().w(FUNC(pingpong_state::pingpong_colorram_w)).share("colorram");
+	map(0x8400, 0x87ff).ram().w(FUNC(pingpong_state::pingpong_videoram_w)).share("videoram");
 	map(0x9000, 0x9002).ram();
 	map(0x9003, 0x9052).ram().share("spriteram");
 	map(0x9053, 0x97ff).ram();
-	map(0xa000, 0xa000).w(this, FUNC(pingpong_state::coin_w));   /* irq enables */
+	map(0xa000, 0xa000).w(FUNC(pingpong_state::coin_w));   /* irq enables */
 	map(0xa000, 0xa000).portr("IN0");
 	map(0xa080, 0xa080).portr("IN1");
 	map(0xa100, 0xa100).portr("IN2");
@@ -442,51 +442,47 @@ static const gfx_layout spritelayout =
 	64*8    /* every char takes 64 consecutive bytes */
 };
 
-static GFXDECODE_START( pingpong )
+static GFXDECODE_START( gfx_pingpong )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,         0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,    64*4, 64 )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(pingpong_state::pingpong)
-
+void pingpong_state::pingpong(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80,18432000/6)      /* 3.072 MHz (probably) */
-	MCFG_CPU_PROGRAM_MAP(pingpong_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", pingpong_state, pingpong_interrupt, "screen", 0, 1)
-	MCFG_WATCHDOG_ADD("watchdog")
+	Z80(config, m_maincpu,18432000/6);      /* 3.072 MHz (probably) */
+	m_maincpu->set_addrmap(AS_PROGRAM, &pingpong_state::pingpong_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(pingpong_state::pingpong_interrupt), "screen", 0, 1);
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(456, 262)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(pingpong_state, screen_update_pingpong)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(456, 262);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(pingpong_state::screen_update_pingpong));
+	screen.set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pingpong)
-	MCFG_PALETTE_ADD("palette", 64*4+64*4)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(pingpong_state, pingpong)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pingpong);
+	PALETTE(config, m_palette, FUNC(pingpong_state::pingpong_palette), 64*4+64*4, 32);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("snsnd", SN76496, 18432000/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	SN76496(config, "snsnd", 18432000/8).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 /* too fast! */
-MACHINE_CONFIG_START(pingpong_state::merlinmm)
+void pingpong_state::merlinmm(machine_config &config)
+{
 	pingpong(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(merlinmm_map)
-	MCFG_TIMER_MODIFY("scantimer")
-	MCFG_TIMER_DRIVER_CALLBACK(pingpong_state, merlinmm_interrupt)
+	m_maincpu->set_addrmap(AS_PROGRAM, &pingpong_state::merlinmm_map);
+	subdevice<timer_device>("scantimer")->set_callback(FUNC(pingpong_state::merlinmm_interrupt));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
-MACHINE_CONFIG_END
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+}
 
 
 /***************************************************************************
@@ -495,21 +491,21 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-ROM_START( pingpong )
+ROM_START( pingpong ) /* GX555 - PWB200222A */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "pp_e04.rom",   0x0000, 0x4000, CRC(18552f8f) SHA1(cb03659b5e8a68003e72182a20979384d829280f) )
-	ROM_LOAD( "pp_e03.rom",   0x4000, 0x4000, CRC(ae5f01e8) SHA1(f0d6a2c64822f2662fed3f601e279db18246f894) )
+	ROM_LOAD( "555_e04.7a",   0x0000, 0x4000, CRC(18552f8f) SHA1(cb03659b5e8a68003e72182a20979384d829280f) )
+	ROM_LOAD( "555_e03.6a",   0x4000, 0x4000, CRC(ae5f01e8) SHA1(f0d6a2c64822f2662fed3f601e279db18246f894) )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
-	ROM_LOAD( "pp_e01.rom",   0x0000, 0x2000, CRC(d1d6f090) SHA1(7b7d7cb90bed746dda871227463145263e4b0c5a) )
+	ROM_LOAD( "555_e01.7h",   0x0000, 0x2000, CRC(d1d6f090) SHA1(7b7d7cb90bed746dda871227463145263e4b0c5a) )
 
 	ROM_REGION( 0x2000, "gfx2", 0 )
-	ROM_LOAD( "pp_e02.rom",   0x0000, 0x2000, CRC(33c687e0) SHA1(7c90de4d163d2ffad00c8cb6a194fa6125a4f4c1) )
+	ROM_LOAD( "555_e02.12c",   0x0000, 0x2000, CRC(33c687e0) SHA1(7c90de4d163d2ffad00c8cb6a194fa6125a4f4c1) )
 
 	ROM_REGION( 0x0220, "proms", 0 )
-	ROM_LOAD( "pingpong.3j",  0x0000, 0x0020, CRC(3e04f06e) SHA1(a642c350f148e062d56eb2a2fc53c470603000e3) ) /* palette (this might be bad) */
-	ROM_LOAD( "pingpong.5h",  0x0020, 0x0100, CRC(8456046a) SHA1(8226f1325c14eb8aed5cd3c3d6bad9f9fd88c5fa) ) /* characters */
-	ROM_LOAD( "pingpong.11j", 0x0120, 0x0100, CRC(09d96b08) SHA1(81405e33eacc47f91ea4c7221d122f7e6f5b1e5d) ) /* sprites */
+	ROM_LOAD( "555e06.3j",  0x0000, 0x0020, CRC(3e04f06e) SHA1(a642c350f148e062d56eb2a2fc53c470603000e3) ) /* palette (this might be bad) */
+	ROM_LOAD( "555e05.5h",  0x0020, 0x0100, CRC(8456046a) SHA1(8226f1325c14eb8aed5cd3c3d6bad9f9fd88c5fa) ) /* characters */
+	ROM_LOAD( "555e07.11j", 0x0120, 0x0100, CRC(09d96b08) SHA1(81405e33eacc47f91ea4c7221d122f7e6f5b1e5d) ) /* sprites */
 ROM_END
 
 ROM_START( merlinmm )
@@ -564,34 +560,30 @@ ROM_START( cashquiz )
 	ROM_LOAD( "pingpong.11j", 0x0120, 0x0100, CRC(09d96b08) SHA1(81405e33eacc47f91ea4c7221d122f7e6f5b1e5d) ) /* sprites */
 ROM_END
 
-DRIVER_INIT_MEMBER(pingpong_state,merlinmm)
+void pingpong_state::init_merlinmm()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
-	int i;
 
 	/* decrypt program code */
-	for( i = 0; i < 0x4000; i++ )
+	for (int i = 0; i < 0x4000; i++)
 		ROM[i] = bitswap<8>(ROM[i],0,1,2,3,4,5,6,7);
 }
 
-DRIVER_INIT_MEMBER(pingpong_state,cashquiz)
+void pingpong_state::init_cashquiz()
 {
-	uint8_t *ROM;
-	int i;
-
 	/* decrypt program code */
-	ROM = memregion("maincpu")->base();
-	for( i = 0; i < 0x4000; i++ )
+	uint8_t *ROM = memregion("maincpu")->base();
+	for (int i = 0; i < 0x4000; i++)
 		ROM[i] = bitswap<8>(ROM[i],0,1,2,3,4,5,6,7);
 
 	/* decrypt questions */
 	ROM = memregion("user1")->base();
-	for( i = 0; i < 0x40000; i++ )
+	for (int i = 0; i < 0x40000; i++)
 		ROM[i] = bitswap<8>(ROM[i],0,1,2,3,4,5,6,7);
 
 	/* questions banking handlers */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x4000, 0x4000, write8_delegate(FUNC(pingpong_state::cashquiz_question_bank_high_w),this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x4001, 0x4001, write8_delegate(FUNC(pingpong_state::cashquiz_question_bank_low_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x4000, 0x4000, write8_delegate(*this, FUNC(pingpong_state::cashquiz_question_bank_high_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x4001, 0x4001, write8_delegate(*this, FUNC(pingpong_state::cashquiz_question_bank_low_w)));
 
 	// 8 independents banks for questions
 	m_maincpu->space(AS_PROGRAM).install_read_bank(0x5000, 0x50ff, "bank1");
@@ -615,6 +607,6 @@ DRIVER_INIT_MEMBER(pingpong_state,cashquiz)
 }
 
 
-GAME( 1985, pingpong, 0, pingpong, pingpong, pingpong_state, 0,        ROT0,  "Konami",         "Konami's Ping-Pong",            0 )
-GAME( 1986, merlinmm, 0, merlinmm, merlinmm, pingpong_state, merlinmm, ROT90, "Zilec-Zenitone", "Merlins Money Maze",            0 )
-GAME( 1986, cashquiz, 0, merlinmm, cashquiz, pingpong_state, cashquiz, ROT0,  "Zilec-Zenitone", "Cash Quiz (Type B, Version 5)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1985, pingpong, 0, pingpong, pingpong, pingpong_state, empty_init,    ROT0,  "Konami",         "Konami's Ping-Pong",            0 )
+GAME( 1986, merlinmm, 0, merlinmm, merlinmm, pingpong_state, init_merlinmm, ROT90, "Zilec-Zenitone", "Merlins Money Maze",            0 )
+GAME( 1986, cashquiz, 0, merlinmm, cashquiz, pingpong_state, init_cashquiz, ROT0,  "Zilec-Zenitone", "Cash Quiz (Type B, Version 5)", MACHINE_IMPERFECT_GRAPHICS )

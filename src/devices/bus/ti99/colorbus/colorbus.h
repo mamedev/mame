@@ -20,51 +20,59 @@
 
 namespace bus { namespace ti99 { namespace colorbus {
 
-class ti99_colorbus_device;
+class v9938_colorbus_device;
 
 /********************************************************************
     Common parent class of all devices attached to the color bus
 ********************************************************************/
-class device_ti99_colorbus_interface : public device_slot_card_interface
+class device_v9938_colorbus_interface : public device_interface
 {
-public:
-	virtual void poll(int& delta_x, int& delta_y, int& buttons) = 0;
-
 protected:
-	using device_slot_card_interface::device_slot_card_interface;
+	device_v9938_colorbus_interface(const machine_config &mconfig, device_t &device);
 
 	virtual void interface_config_complete() override;
-	ti99_colorbus_device* m_colorbus = nullptr;
+
+	v9938_colorbus_device* m_colorbus;
 };
 
 /********************************************************************
     Color bus port
 ********************************************************************/
-class ti99_colorbus_device : public device_t, public device_slot_interface
+class v9938_colorbus_device : public device_t, public device_single_card_slot_interface<device_v9938_colorbus_interface>
 {
 public:
-	ti99_colorbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	line_state left_button();  // left button is not connected to the V9938 but to a TMS9901 pin
-	void poll();
+	template <typename U>
+	v9938_colorbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, U &&opts, const char *dflt)
+		: v9938_colorbus_device(mconfig, tag, owner, clock)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
+
+	v9938_colorbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	// For the extra button (V9938 only handles 2)
+	auto extra_button_cb() { return m_extra_button.bind(); }
+
+	// Called from the device
+	void movex(int delta);
+	void movey(int delta);
+	void buttons(int bstate);
 
 protected:
-	void device_start() override { }
-	void device_config_complete() override;
+	void device_start() override;
 
 private:
-	device_ti99_colorbus_interface* m_connected;
 	required_device<v9938_device> m_v9938;
-	bool m_left_button_pressed;
+	devcb_write_line   m_extra_button;
 };
 
 } } } // end namespace bus::ti99::colorbus
 
-SLOT_INTERFACE_EXTERN(ti99_colorbus_port);
+DECLARE_DEVICE_TYPE_NS(V9938_COLORBUS, bus::ti99::colorbus, v9938_colorbus_device)
 
-#define MCFG_COLORBUS_MOUSE_ADD( _tag )  \
-	MCFG_DEVICE_ADD(_tag, TI99_COLORBUS, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(ti99_colorbus_port, "busmouse", false)
-
-DECLARE_DEVICE_TYPE_NS(TI99_COLORBUS, bus::ti99::colorbus, ti99_colorbus_device)
+void ti99_colorbus_options(device_slot_interface &device);
 
 #endif // MAME_BUS_TI99_COLORBUS_COLORBUS_H

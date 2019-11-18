@@ -62,29 +62,6 @@ uint32_t bcd_2_dec(uint32_t a)
     MISC
 ***************************************************************************/
 
-/**
- * @fn  void rand_memory(void *memory, size_t length)
- *
- * @brief   Random memory.
- *
- * @param [in,out]  memory  If non-null, the memory.
- * @param   length          The length.
- */
-
-void rand_memory(void *memory, size_t length)
-{
-	static uint32_t seed = 0;
-	uint8_t *bytes = (uint8_t *) memory;
-	size_t i;
-
-	for (i = 0; i < length; i++)
-	{
-		seed = seed * 214013 + 2531011;
-		bytes[i] = (uint8_t) (seed >> 16);
-	}
-}
-
-
 uint32_t core_crc32(uint32_t crc, const uint8_t *buf, uint32_t len)
 {
 	return crc32(crc, buf, len);

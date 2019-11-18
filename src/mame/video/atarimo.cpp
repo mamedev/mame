@@ -161,8 +161,8 @@ atari_motion_objects_device::atari_motion_objects_device(const machine_config &m
 void atari_motion_objects_device::draw(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// compute start/stop bands
-	int startband = ((cliprect.min_y + m_yscroll - m_slipoffset) & m_bitmapymask) >> m_slipshift;
-	int stopband = ((cliprect.max_y + m_yscroll - m_slipoffset) & m_bitmapymask) >> m_slipshift;
+	int startband = ((cliprect.top() + m_yscroll - m_slipoffset) & m_bitmapymask) >> m_slipshift;
+	int stopband = ((cliprect.bottom() + m_yscroll - m_slipoffset) & m_bitmapymask) >> m_slipshift;
 	if (startband > stopband)
 		startband -= m_bitmapheight >> m_slipshift;
 	if (m_slipshift == 0)
@@ -185,7 +185,7 @@ void atari_motion_objects_device::draw(bitmap_ind16 &bitmap, const rectangle &cl
 				bandclip.min_y -= m_bitmapheight;
 
 			// maximum Y is based on the minimum
-			bandclip.max_y = bandclip.min_y + (1 << m_slipshift) - 1;
+			bandclip.set_height(1 << m_slipshift);
 
 			// keep within the cliprect
 			bandclip &= cliprect;
@@ -358,7 +358,7 @@ void atari_motion_objects_device::device_timer(emu_timer &timer, device_timer_id
 			if (param > 0)
 				screen().update_partial(param - 1);
 			param += 64;
-			if (param >= screen().visible_area().max_y)
+			if (param >= screen().visible_area().bottom())
 				param = 0;
 			timer.adjust(screen().time_until_pos(param), param);
 			break;
@@ -504,19 +504,19 @@ void atari_motion_objects_device::render_object(bitmap_ind16 &bitmap, const rect
 			for (int y = 0, sy = ypos; y < height; y++, sy += yadv)
 			{
 				// clip the Y coordinate
-				if (sy <= cliprect.min_y - m_tileheight)
+				if (sy <= cliprect.top() - m_tileheight)
 				{
 					code += width;
 					continue;
 				}
-				else if (sy > cliprect.max_y)
+				else if (sy > cliprect.bottom())
 					break;
 
 				// loop over the width
 				for (int x = 0, sx = xpos; x < width; x++, sx += xadv, code++)
 				{
 					// clip the X coordinate
-					if (sx <= -cliprect.min_x - m_tilewidth || sx > cliprect.max_x)
+					if (sx <= -cliprect.left() - m_tilewidth || sx > cliprect.right())
 						continue;
 
 					// draw the sprite
@@ -533,19 +533,19 @@ void atari_motion_objects_device::render_object(bitmap_ind16 &bitmap, const rect
 			for (int x = 0, sx = xpos; x < width; x++, sx += xadv)
 			{
 				// clip the X coordinate
-				if (sx <= cliprect.min_x - m_tilewidth)
+				if (sx <= cliprect.left() - m_tilewidth)
 				{
 					code += height;
 					continue;
 				}
-				else if (sx > cliprect.max_x)
+				else if (sx > cliprect.right())
 					break;
 
 				// loop over the height
 				for (int y = 0, sy = ypos; y < height; y++, sy += yadv, code++)
 				{
 					// clip the X coordinate
-					if (sy <= -cliprect.min_y - m_tileheight || sy > cliprect.max_y)
+					if (sy <= -cliprect.top() - m_tileheight || sy > cliprect.bottom())
 						continue;
 
 					// draw the sprite

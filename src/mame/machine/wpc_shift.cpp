@@ -17,10 +17,10 @@ wpc_shift_device::~wpc_shift_device()
 
 void wpc_shift_device::registers(address_map &map)
 {
-	map(0, 0).rw(this, FUNC(wpc_shift_device::adrh_r), FUNC(wpc_shift_device::adrh_w));
-	map(1, 1).rw(this, FUNC(wpc_shift_device::adrl_r), FUNC(wpc_shift_device::adrl_w));
-	map(2, 2).rw(this, FUNC(wpc_shift_device::val1_r), FUNC(wpc_shift_device::val1_w));
-	map(3, 3).rw(this, FUNC(wpc_shift_device::val2_r), FUNC(wpc_shift_device::val2_w));
+	map(0, 0).rw(FUNC(wpc_shift_device::adrh_r), FUNC(wpc_shift_device::adrh_w));
+	map(1, 1).rw(FUNC(wpc_shift_device::adrl_r), FUNC(wpc_shift_device::adrl_w));
+	map(2, 2).rw(FUNC(wpc_shift_device::val1_r), FUNC(wpc_shift_device::val1_w));
+	map(3, 3).rw(FUNC(wpc_shift_device::val2_r), FUNC(wpc_shift_device::val2_w));
 }
 
 

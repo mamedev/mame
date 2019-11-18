@@ -52,19 +52,24 @@
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/ay8910.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class mole_state : public driver_device
 {
 public:
-	mole_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	mole_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
+	void mole(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 
@@ -85,7 +90,6 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_mole(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void mole(machine_config &config);
 	void mole_map(address_map &map);
 };
 
@@ -106,7 +110,7 @@ TILE_GET_INFO_MEMBER(mole_state::get_bg_tile_info)
 void mole_state::video_start()
 {
 	memset(m_tileram, 0, sizeof(m_tileram));
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mole_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 40, 25);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(mole_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 40, 25);
 
 	save_item(NAME(m_tileram));
 }
@@ -204,20 +208,20 @@ READ8_MEMBER(mole_state::mole_protection_r)
 void mole_state::mole_map(address_map &map)
 {
 	map(0x0000, 0x03ff).ram();
-	map(0x0800, 0x08ff).r(this, FUNC(mole_state::mole_protection_r));
+	map(0x0800, 0x08ff).r(FUNC(mole_state::mole_protection_r));
 	map(0x0800, 0x0800).nopw(); // ???
 	map(0x0820, 0x0820).nopw(); // ???
 	map(0x5000, 0x7fff).mirror(0x8000).rom();
-	map(0x8000, 0x83ff).w(this, FUNC(mole_state::mole_tileram_w)).nopr();
-	map(0x8400, 0x8400).w(this, FUNC(mole_state::mole_tilebank_w));
+	map(0x8000, 0x83ff).w(FUNC(mole_state::mole_tileram_w)).nopr();
+	map(0x8400, 0x8400).w(FUNC(mole_state::mole_tilebank_w));
 	map(0x8c00, 0x8c01).w("aysnd", FUNC(ay8910_device::data_address_w));
 	map(0x8c40, 0x8c40).nopw(); // ???
 	map(0x8c80, 0x8c80).nopw(); // ???
 	map(0x8c81, 0x8c81).nopw(); // ???
-	map(0x8d00, 0x8d00).portr("DSW").w(this, FUNC(mole_state::mole_irqack_w));
+	map(0x8d00, 0x8d00).portr("DSW").w(FUNC(mole_state::mole_irqack_w));
 	map(0x8d40, 0x8d40).portr("IN0");
 	map(0x8d80, 0x8d80).portr("IN1");
-	map(0x8dc0, 0x8dc0).portr("IN2").w(this, FUNC(mole_state::mole_flipscreen_w));
+	map(0x8dc0, 0x8dc0).portr("IN2").w(FUNC(mole_state::mole_flipscreen_w));
 }
 
 
@@ -298,7 +302,7 @@ static const gfx_layout tile_layout =
 };
 
 
-static GFXDECODE_START( mole )
+static GFXDECODE_START( gfx_mole )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, tile_layout, 0x00, 1 )
 	GFXDECODE_ENTRY( "gfx1", 0x3000, tile_layout, 0x00, 1 )
 GFXDECODE_END
@@ -320,31 +324,30 @@ void mole_state::machine_reset()
 	m_tile_bank = 0;
 }
 
-MACHINE_CONFIG_START(mole_state::mole)
-
+void mole_state::mole(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 4000000) // ???
-	MCFG_CPU_PROGRAM_MAP(mole_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mole_state, irq0_line_assert)
+	M6502(config, m_maincpu, 4000000); // ???
+	m_maincpu->set_addrmap(AS_PROGRAM, &mole_state::mole_map);
+	m_maincpu->set_vblank_int("screen", FUNC(mole_state::irq0_line_assert));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(40*8, 25*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 25*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(mole_state, screen_update_mole)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_size(40*8, 25*8);
+	screen.set_visarea(0*8, 40*8-1, 0*8, 25*8-1);
+	screen.set_screen_update(FUNC(mole_state::screen_update_mole));
+	screen.set_palette("palette");
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mole)
-	MCFG_PALETTE_ADD_3BIT_RBG("palette")
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_mole);
+	PALETTE(config, "palette", palette_device::RBG_3BIT);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 2000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	AY8910(config, "aysnd", 2000000).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 /*************************************
@@ -375,4 +378,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1982, mole, 0, mole, mole, mole_state, 0, ROT0, "Yachiyo Electronics, Ltd.", "Mole Attack", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, mole, 0, mole, mole, mole_state, empty_init, ROT0, "Yachiyo Electronics, Ltd.", "Mole Attack", MACHINE_SUPPORTS_SAVE )

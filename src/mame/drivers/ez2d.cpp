@@ -50,13 +50,15 @@ public:
 		m_maincpu(*this, "maincpu")
 	{ }
 
+	void ez2d(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void ez2d(machine_config &config);
 	void ez2d_map(address_map &map);
 };
 
@@ -85,20 +87,20 @@ void ez2d_state::machine_reset()
 {
 }
 
-MACHINE_CONFIG_START(ez2d_state::ez2d)
-
+void ez2d_state::ez2d(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PENTIUM3, 100000000) // actually a Celeron at 533 MHz
-	MCFG_CPU_PROGRAM_MAP(ez2d_map)
+	PENTIUM3(config, m_maincpu, 100000000); // actually a Celeron at 533 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &ez2d_state::ez2d_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_DRIVER(ez2d_state, screen_update)
-MACHINE_CONFIG_END
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(640, 480);
+	screen.set_visarea_full();
+	screen.set_screen_update(FUNC(ez2d_state::screen_update));
+}
 
 /***************************************************************************
 
@@ -117,4 +119,4 @@ ROM_START( ez2d2m )
 	DISK_IMAGE( "ez2d2m", 0, SHA1(431f0bef3b81f83dad3818bca8994faa8ce9d5b7) )
 ROM_END
 
-GAME( 2001, ez2d2m,  0,   ez2d, ez2d, ez2d_state,  0, ROT0, "Amuse World", "Ez2dancer 2nd Move",  MACHINE_IS_SKELETON )
+GAME( 2001, ez2d2m, 0, ez2d, ez2d, ez2d_state, empty_init, ROT0, "Amuse World", "Ez2dancer 2nd Move",  MACHINE_IS_SKELETON )

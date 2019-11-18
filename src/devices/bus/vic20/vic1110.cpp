@@ -90,7 +90,7 @@ void vic1110_device::device_start()
 //  vic20_cd_r - cartridge data read
 //-------------------------------------------------
 
-uint8_t vic1110_device::vic20_cd_r(address_space &space, offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
+uint8_t vic1110_device::vic20_cd_r(offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
 {
 	uint8_t sw = m_sw->read();
 
@@ -107,7 +107,7 @@ uint8_t vic1110_device::vic20_cd_r(address_space &space, offs_t offset, uint8_t 
 //  vic20_cd_w - cartridge data write
 //-------------------------------------------------
 
-void vic1110_device::vic20_cd_w(address_space &space, offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
+void vic1110_device::vic20_cd_w(offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
 {
 	uint8_t sw = m_sw->read();
 

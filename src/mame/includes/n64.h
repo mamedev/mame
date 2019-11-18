@@ -12,6 +12,7 @@
 /*----------- driver state -----------*/
 
 class n64_rdp;
+class n64_periphs;
 
 class n64_state : public driver_device
 {
@@ -24,6 +25,7 @@ public:
 		, m_rdram(*this, "rdram")
 		, m_rsp_imem(*this, "rsp_imem")
 		, m_rsp_dmem(*this, "rsp_dmem")
+		, m_rcp_periphs(*this, "rcp")
 	{
 	}
 
@@ -51,14 +53,13 @@ protected:
 	required_shared_ptr<uint32_t> m_rsp_imem;
 	required_shared_ptr<uint32_t> m_rsp_dmem;
 
+	required_device<n64_periphs> m_rcp_periphs;
+
 	/* video-related */
 	n64_rdp *m_rdp;
 };
 
 /*----------- devices -----------*/
-
-#define MCFG_N64_PERIPHS_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, N64PERIPH, 0)
 
 #define AUDIO_DMA_DEPTH     2
 
@@ -170,8 +171,8 @@ protected:
 private:
 	n64_state* m_n64;
 	address_space *m_mem_map;
-	mips3_device *m_vr4300;
-	rsp_device *m_rsp;
+	required_device<mips3_device> m_vr4300;
+	required_device<rsp_device> m_rsp;
 
 	uint32_t *m_rdram;
 	uint32_t *m_sram;
@@ -196,7 +197,7 @@ private:
 	void ai_fifo_pop();
 	bool ai_delayed_carry;
 
-	dmadac_sound_device *ai_dac[2];
+	required_device_array<dmadac_sound_device, 2> ai_dac;
 	uint32_t ai_dram_addr;
 	uint32_t ai_len;
 	uint32_t ai_control;

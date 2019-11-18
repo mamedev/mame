@@ -11,6 +11,7 @@
 #include "cpu/i86/i86.h"
 #include "machine/pic8259.h"
 #include "video/upd7220.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -24,6 +25,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette") { }
 
+	void if800(machine_config &config);
+
+private:
 	required_device<upd7220_device> m_hgdc;
 
 	required_shared_ptr<uint16_t> m_video_ram;
@@ -32,7 +36,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
-	void if800(machine_config &config);
 	void if800_io(address_map &map);
 	void if800_map(address_map &map);
 	void upd7220_map(address_map &map);
@@ -65,7 +68,7 @@ void if800_state::if800_map(address_map &map)
 void if800_state::if800_io(address_map &map)
 {
 	map.unmap_value_high();
-//  AM_RANGE(0x0640, 0x065f) dma?
+//  map(0x0640, 0x065f) dma?
 	map(0x0660, 0x0663).rw(m_hgdc, FUNC(upd7220_device::read), FUNC(upd7220_device::write)).umask16(0x00ff);
 }
 
@@ -87,39 +90,39 @@ void if800_state::upd7220_map(address_map &map)
 	map(0x00000, 0x3ffff).ram().share("video_ram");
 }
 
-MACHINE_CONFIG_START(if800_state::if800)
+void if800_state::if800(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8086, 8000000)
-	MCFG_CPU_PROGRAM_MAP(if800_map)
-	MCFG_CPU_IO_MAP(if800_io)
+	I8086(config, m_maincpu, 8000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &if800_state::if800_map);
+	m_maincpu->set_addrmap(AS_IO, &if800_state::if800_io);
 
 
-//  MCFG_PIC8259_ADD( "pic8259", if800_pic8259_config )
-	MCFG_DEVICE_ADD("upd7220", UPD7220, 8000000/4)
-	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_map)
-	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(if800_state, hgdc_display_pixels)
+//  PIC8259(config, "pic8259", 0);
+	UPD7220(config, m_hgdc, 8000000/4);
+	m_hgdc->set_addrmap(0, &if800_state::upd7220_map);
+	m_hgdc->set_display_pixels(FUNC(if800_state::hgdc_display_pixels));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_DEVICE("upd7220", upd7220_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 640-1, 0, 480-1);
+	screen.set_screen_update("upd7220", FUNC(upd7220_device::screen_update));
 
-	MCFG_PALETTE_ADD("palette", 8)
-//  MCFG_PALETTE_INIT(black_and_white)
+	PALETTE(config, m_palette).set_entries(8);
 
 //  MCFG_VIDEO_START_OVERRIDE(if800_state,if800)
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( if800 )
-	ROM_REGION( 0x2000, "ipl", ROMREGION_ERASEFF )
+	ROM_REGION16_LE( 0x2000, "ipl", ROMREGION_ERASEFF )
 	ROM_LOAD( "ipl.rom", 0x0000, 0x2000, CRC(36212491) SHA1(6eaa8885e2dccb6dd86def6c0c9be1870cee957f))
 ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE        INIT   COMPANY           FULLNAME          FLAGS
-COMP( 1985, if800,  0,      0,       if800,     if800, if800_state, 0,     "Oki Electric",   "if800 model 60", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY         FULLNAME          FLAGS
+COMP( 1985, if800, 0,      0,      if800,   if800, if800_state, empty_init, "Oki Electric", "if800 model 60", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

@@ -2,7 +2,7 @@
 // copyright-holders:Juergen Buchmueller
 /****************************************************************************
  *
- * warpwarp.c
+ * warpwarp.cpp
  *
  * sound driver
  * juergen buchmueller <pullmoll@t-online.de>, jan 2000
@@ -12,14 +12,11 @@
 #include "emu.h"
 #include "audio/warpwarp.h"
 
-#define CLOCK_16H   (18432000/3/2/16)
-#define CLOCK_1V    (18432000/3/2/384)
 
-
-DEFINE_DEVICE_TYPE(WARPWARP, warpwarp_sound_device, "warpwarp_sound", "Warp Warp Custom Sound")
+DEFINE_DEVICE_TYPE(WARPWARP_SOUND, warpwarp_sound_device, "warpwarp_sound", "Warp Warp Custom Sound")
 
 warpwarp_sound_device::warpwarp_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, WARPWARP, tag, owner, clock),
+	: device_t(mconfig, WARPWARP_SOUND, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_decay(nullptr),
 		m_channel(nullptr),
@@ -53,7 +50,9 @@ void warpwarp_sound_device::device_start()
 	for (int i = 0; i < 0x8000; i++)
 		m_decay[0x7fff - i] = (int16_t) (0x7fff/exp(1.0*i/4096));
 
-	m_channel = machine().sound().stream_alloc(*this, 0, 1, CLOCK_16H);
+	m_clock_16h = clock() / 3 / 2 / 16;
+	m_clock_1v = clock() / 3 / 2 / 384;
+	m_channel = machine().sound().stream_alloc(*this, 0, 1, m_clock_16h);
 
 	m_sound_volume_timer = timer_alloc(TIMER_SOUND_VOLUME_DECAY);
 	m_music_volume_timer = timer_alloc(TIMER_MUSIC_VOLUME_DECAY);
@@ -76,22 +75,22 @@ void warpwarp_sound_device::device_timer(emu_timer &timer, device_timer_id id, i
 {
 	switch (id)
 	{
-		case TIMER_SOUND_VOLUME_DECAY:
-			if (--m_sound_volume < 0)
-				m_sound_volume = 0;
-			break;
+	case TIMER_SOUND_VOLUME_DECAY:
+		if (--m_sound_volume < 0)
+			m_sound_volume = 0;
+		break;
 
-		case TIMER_MUSIC_VOLUME_DECAY:
-			if (--m_music_volume < 0)
-				m_music_volume = 0;
-			break;
+	case TIMER_MUSIC_VOLUME_DECAY:
+		if (--m_music_volume < 0)
+			m_music_volume = 0;
+		break;
 
-		default:
-			assert_always(false, "Unknown id in warpwarp_sound_device::device_timer");
+	default:
+		throw emu_fatalerror("Unknown id in warpwarp_sound_device::device_timer");
 	}
 }
 
-WRITE8_MEMBER( warpwarp_sound_device::sound_w )
+void warpwarp_sound_device::sound_w(u8 data)
 {
 	m_channel->update();
 	m_sound_latch = data & 0x0f;
@@ -128,13 +127,13 @@ WRITE8_MEMBER( warpwarp_sound_device::sound_w )
 	}
 }
 
-WRITE8_MEMBER( warpwarp_sound_device::music1_w )
+void warpwarp_sound_device::music1_w(u8 data)
 {
 	m_channel->update();
 	m_music1_latch = data & 0x3f;
 }
 
-WRITE8_MEMBER( warpwarp_sound_device::music2_w )
+void warpwarp_sound_device::music2_w(u8 data)
 {
 	m_channel->update();
 	m_music2_latch = data & 0x3f;
@@ -195,10 +194,10 @@ void warpwarp_sound_device::sound_stream_update(sound_stream &stream, stream_sam
 		 * 63 =   4 steps -> 48 kHz
 		 */
 
-		m_mcarry -= CLOCK_16H / (4 * (64 - m_music1_latch));
+		m_mcarry -= m_clock_16h / (4 * (64 - m_music1_latch));
 		while( m_mcarry < 0 )
 		{
-			m_mcarry += CLOCK_16H;
+			m_mcarry += m_clock_16h;
 			m_mcount++;
 			m_music_signal = (m_mcount & ~m_music2_latch & 15) ? m_decay[m_music_volume] : 0;
 			/* override by noise gate? */
@@ -207,10 +206,10 @@ void warpwarp_sound_device::sound_stream_update(sound_stream &stream, stream_sam
 		}
 
 		/* clock 1V = 8kHz */
-		m_vcarry -= CLOCK_1V;
+		m_vcarry -= m_clock_1v;
 		while (m_vcarry < 0)
 		{
-			m_vcarry += CLOCK_16H;
+			m_vcarry += m_clock_16h;
 			m_vcount++;
 
 			/* noise is clocked with raising edge of 2V */

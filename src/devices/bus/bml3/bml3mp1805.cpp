@@ -32,8 +32,10 @@ static const floppy_interface bml3_mp1805_floppy_interface =
 
 WRITE_LINE_MEMBER( bml3bus_mp1805_device::bml3_mc6843_intrq_w )
 {
-	if (state) {
-		m_bml3bus->set_nmi_line(PULSE_LINE);
+	if (state)
+	{
+		raise_slot_nmi();
+		lower_slot_nmi();
 	}
 }
 
@@ -54,11 +56,15 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(bml3bus_mp1805_device::device_add_mconfig)
-	MCFG_DEVICE_ADD( "mc6843", MC6843, 0 )
-	MCFG_MC6843_IRQ_CALLBACK(WRITELINE(bml3bus_mp1805_device, bml3_mc6843_intrq_w))
-	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(bml3_mp1805_floppy_interface)
-MACHINE_CONFIG_END
+void bml3bus_mp1805_device::device_add_mconfig(machine_config &config)
+{
+	MC6843(config, m_mc6843, 0);
+	m_mc6843->set_floppy_drives(m_floppy[0], m_floppy[1], m_floppy[2], m_floppy[3]);
+	m_mc6843->irq().set(FUNC(bml3bus_mp1805_device::bml3_mc6843_intrq_w));
+
+	for (auto &floppy : m_floppy)
+		LEGACY_FLOPPY(config, floppy, 0, &bml3_mp1805_floppy_interface);
+}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -87,7 +93,6 @@ WRITE8_MEMBER( bml3bus_mp1805_device::bml3_mp1805_w)
 	// TODO: MESS UI for flipping disk? Note that D88 images are double-sided, but the physical drive is single-sided
 	int side = 0;
 	int motor = BIT(data, 7);
-	const char *floppy_name = nullptr;
 	switch (drive_select) {
 	case 1:
 		drive = 0;
@@ -106,24 +111,9 @@ WRITE8_MEMBER( bml3bus_mp1805_device::bml3_mp1805_w)
 		drive = 0;
 		break;
 	}
-	switch (drive) {
-	case 0:
-		floppy_name = FLOPPY_0;
-		break;
-	case 1:
-		floppy_name = FLOPPY_1;
-		break;
-	case 2:
-		floppy_name = FLOPPY_2;
-		break;
-	case 3:
-		floppy_name = FLOPPY_3;
-		break;
-	}
-	legacy_floppy_image_device *floppy = subdevice<legacy_floppy_image_device>(floppy_name);
 	m_mc6843->set_drive(drive);
-	floppy->floppy_mon_w(motor);
-	floppy->floppy_drive_set_ready_state(ASSERT_LINE, 0);
+	m_floppy[drive]->floppy_mon_w(motor);
+	m_floppy[drive]->floppy_drive_set_ready_state(ASSERT_LINE, 0);
 	m_mc6843->set_side(side);
 }
 
@@ -135,6 +125,7 @@ WRITE8_MEMBER( bml3bus_mp1805_device::bml3_mp1805_w)
 bml3bus_mp1805_device::bml3bus_mp1805_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, BML3BUS_MP1805, tag, owner, clock),
 	device_bml3bus_card_interface(mconfig, *this),
+	m_floppy(*this, "floppy%u", 0U),
 	m_mc6843(*this, "mc6843"), m_rom(nullptr)
 {
 }
@@ -146,15 +137,12 @@ bml3bus_mp1805_device::bml3bus_mp1805_device(const machine_config &mconfig, cons
 
 void bml3bus_mp1805_device::device_start()
 {
-	// set_bml3bus_device makes m_slot valid
-	set_bml3bus_device();
-
 	m_rom = memregion(MP1805_ROM_REGION)->base();
 
 	// install into memory
-	address_space &space_prg = m_bml3bus->space();
-	space_prg.install_readwrite_handler(0xff18, 0xff1f, read8_delegate( FUNC(mc6843_device::read), (mc6843_device*)m_mc6843), write8_delegate(FUNC(mc6843_device::write), (mc6843_device*)m_mc6843) );
-	space_prg.install_readwrite_handler(0xff20, 0xff20, read8_delegate( FUNC(bml3bus_mp1805_device::bml3_mp1805_r), this), write8_delegate(FUNC(bml3bus_mp1805_device::bml3_mp1805_w), this) );
+	address_space &space_prg = space();
+	space_prg.install_readwrite_handler(0xff18, 0xff1f, read8sm_delegate(*m_mc6843, FUNC(mc6843_device::read)), write8sm_delegate(*m_mc6843, FUNC(mc6843_device::write)));
+	space_prg.install_readwrite_handler(0xff20, 0xff20, read8_delegate(*this, FUNC(bml3bus_mp1805_device::bml3_mp1805_r)), write8_delegate(*this, FUNC(bml3bus_mp1805_device::bml3_mp1805_w)));
 	// overwriting the main ROM (rather than using e.g. install_rom) should mean that bank switches for RAM expansion still work...
 	uint8_t *mainrom = device().machine().root_device().memregion("maincpu")->base();
 	memcpy(mainrom + 0xf800, m_rom + 0xf800, 0x800);

@@ -35,7 +35,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	// device_vip_expansion_card_interface overrides
-	virtual void vip_io_w(address_space &space, offs_t offset, uint8_t data) override;
+	virtual void vip_io_w(offs_t offset, uint8_t data) override;
 	virtual void vip_q_w(int state) override;
 
 private:

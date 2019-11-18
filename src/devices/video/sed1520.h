@@ -15,10 +15,6 @@
 #define SED1520CB_UPDATE(cls, fnc) sed1520_device::screen_update_delegate((&cls::fnc), (#cls "::" #fnc), DEVICE_SELF, ((cls *)nullptr))
 #define SED1520CB_DEVUPDATE(tag, cls, fnc) sed1520_device::screen_update_delegate((&cls::fnc), (#cls "::" #fnc), (tag), ((cls *)nullptr))
 
-#define MCFG_SED1520_ADD(tag, cb) \
-	MCFG_DEVICE_ADD(tag, SED1520, 0) \
-	downcast<sed1520_device &>(*device).set_screen_update_cb(SED1520CB_##cb);
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -34,10 +30,10 @@ public:
 	typedef device_delegate<uint32_t (bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *vram, int start_line, int adc)> screen_update_delegate;
 
 	// construction/destruction
-	sed1520_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sed1520_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// sconfiguration helpers
-	template <typename Object> void set_screen_update_cb(Object &&cb) { m_screen_update_cb = std::forward<Object>(cb); }
+	template <typename... T> void set_screen_update_cb(T &&... args) { m_screen_update_cb.set(std::forward<T>(args)...); }
 
 	// device interface
 	virtual DECLARE_WRITE8_MEMBER(write);

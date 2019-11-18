@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
+#ifndef MAME_INCLUDES_MEGADRIV_H
+#define MAME_INCLUDES_MEGADRIV_H
+
+#pragma once
 
 #include "coreutil.h"
 #include "cpu/m68000/m68000.h"
@@ -40,23 +44,25 @@ struct genesis_z80_vars
 class md_base_state : public driver_device
 {
 public:
-	md_base_state(const machine_config &mconfig, device_type type, const char *tag)
-	: driver_device(mconfig, type, tag),
+	md_base_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_z80snd(*this,"genesis_snd_z80"),
 		m_ymsnd(*this,"ymsnd"),
+		m_scan_timer(*this, "md_scan_timer"),
 		m_vdp(*this,"gen_vdp"),
-		m_snsnd(*this, "snsnd"),
 		m_megadrive_ram(*this,"megadrive_ram"),
-		m_io_reset(*this, "RESET")
+		m_io_reset(*this, "RESET"),
+		m_megadrive_io_read_data_port_ptr(*this),
+		m_megadrive_io_write_data_port_ptr(*this)
 	{ }
+
 	required_device<m68000_base_device> m_maincpu;
 	optional_device<cpu_device> m_z80snd;
 	optional_device<ym2612_device> m_ymsnd;
+	optional_device<timer_device> m_scan_timer;
 	required_device<sega315_5313_device> m_vdp;
-	required_device<sn76496_base_device> m_snsnd;
 	optional_shared_ptr<uint16_t> m_megadrive_ram;
-
 
 	optional_ioport m_io_reset;
 	ioport_port *m_io_pad_3b[4];
@@ -65,10 +71,10 @@ public:
 	genesis_z80_vars m_genz80;
 	int m_version_hi_nibble;
 
-	DECLARE_DRIVER_INIT(megadriv_c2);
-	DECLARE_DRIVER_INIT(megadrie);
-	DECLARE_DRIVER_INIT(megadriv);
-	DECLARE_DRIVER_INIT(megadrij);
+	void init_megadriv_c2();
+	void init_megadrie();
+	void init_megadriv();
+	void init_megadrij();
 
 	DECLARE_READ8_MEMBER(megadriv_68k_YM2612_read);
 	DECLARE_WRITE8_MEMBER(megadriv_68k_YM2612_write);
@@ -145,12 +151,12 @@ public:
 class md_cons_state : public md_base_state
 {
 public:
-	md_cons_state(const machine_config &mconfig, device_type type, const char *tag)
-	: md_base_state(mconfig, type, tag),
-	m_32x(*this,"sega32x"),
-	m_segacd(*this,"segacd"),
-	m_cart(*this, "mdslot"),
-	m_tmss(*this, "tmss")
+	md_cons_state(const machine_config &mconfig, device_type type, const char *tag) :
+		md_base_state(mconfig, type, tag),
+		m_32x(*this,"sega32x"),
+		m_segacd(*this,"segacd"),
+		m_cart(*this, "mdslot"),
+		m_tmss(*this, "tmss")
 	{ }
 
 	ioport_port *m_io_ctrlr;
@@ -162,10 +168,10 @@ public:
 	optional_device<md_cart_slot_device> m_cart;
 	optional_region_ptr<uint16_t> m_tmss;
 
-	DECLARE_DRIVER_INIT(mess_md_common);
-	DECLARE_DRIVER_INIT(genesis);
-	DECLARE_DRIVER_INIT(md_eur);
-	DECLARE_DRIVER_INIT(md_jpn);
+	void init_mess_md_common();
+	void init_genesis();
+	void init_md_eur();
+	void init_md_jpn();
 
 	READ8_MEMBER(mess_md_io_read_data_port);
 	WRITE16_MEMBER(mess_md_io_write_data_port);
@@ -179,7 +185,7 @@ public:
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( _32x_cart );
 
-	void _32x_scanline_callback(int x, uint32_t priority, uint16_t &lineptr);
+	void _32x_scanline_callback(int x, uint32_t priority, uint32_t &lineptr);
 	void _32x_interrupt_callback(int scanline, int irq6);
 	void _32x_scanline_helper_callback(int scanline);
 
@@ -202,3 +208,5 @@ public:
 	void genesis_scd(machine_config &config);
 	void genesis_tmss(machine_config &config);
 };
+
+#endif // MAME_INCLUDES_MEGADRIV_H

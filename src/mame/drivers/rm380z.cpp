@@ -167,27 +167,29 @@ Module timer tag static_vblank_timer name m_expire.seconds
 
 #include "emu.h"
 #include "includes/rm380z.h"
+#include "speaker.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 
 void rm380z_state::rm380z_mem(address_map &map)
 {
 	map(0xe000, 0xefff).rom().region(RM380Z_MAINCPU_TAG, 0);
-	map(0xf000, 0xf5ff).rw(this, FUNC(rm380z_state::videoram_read), FUNC(rm380z_state::videoram_write));
+	map(0xf000, 0xf5ff).rw(FUNC(rm380z_state::videoram_read), FUNC(rm380z_state::videoram_write));
 	map(0xf600, 0xf9ff).rom().region(RM380Z_MAINCPU_TAG, 0x1000);     /* Extra ROM space for COS4.0 */
 	map(0xfa00, 0xfaff).ram();
-	map(0xfb00, 0xfbff).rw(this, FUNC(rm380z_state::port_read), FUNC(rm380z_state::port_write));
-	map(0xfc00, 0xffff).rw(this, FUNC(rm380z_state::hiram_read), FUNC(rm380z_state::hiram_write));
+	map(0xfb00, 0xfbff).rw(FUNC(rm380z_state::port_read), FUNC(rm380z_state::port_write));
+	map(0xfc00, 0xffff).rw(FUNC(rm380z_state::hiram_read), FUNC(rm380z_state::hiram_write));
 }
 
 void rm380z_state::rm380z_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0xbf).rw(this, FUNC(rm380z_state::rm380z_portlow_r), FUNC(rm380z_state::rm380z_portlow_w));
+	map(0x00, 0xbf).rw(FUNC(rm380z_state::rm380z_portlow_r), FUNC(rm380z_state::rm380z_portlow_w));
 	map(0xc0, 0xc3).rw(m_fdc, FUNC(fd1771_device::read), FUNC(fd1771_device::write));
-	map(0xc4, 0xc4).w(this, FUNC(rm380z_state::disk_0_control));
-	map(0xc5, 0xff).rw(this, FUNC(rm380z_state::rm380z_porthi_r), FUNC(rm380z_state::rm380z_porthi_w));
+	map(0xc4, 0xc4).w(FUNC(rm380z_state::disk_0_control));
+	map(0xc5, 0xff).rw(FUNC(rm380z_state::rm380z_porthi_r), FUNC(rm380z_state::rm380z_porthi_w));
 }
 
 void rm380z_state::rm480z_mem(address_map &map)
@@ -199,18 +201,18 @@ void rm380z_state::rm480z_mem(address_map &map)
 
 void rm380z_state::rm480z_io(address_map &map)
 {
-	//AM_RANGE(0x00, 0x17) AM_RAM // videoram
-	//AM_RANGE(0x18, 0x18) AM_MIRROR(0xff00) // control port 0
-	//AM_RANGE(0x19, 0x19) AM_MIRROR(0xff00) // control port 1
-	//AM_RANGE(0x1a, 0x1a) AM_MIRROR(0xff00) // control port 2
-	//AM_RANGE(0x1b, 0x1b) AM_MIRROR(0xff00) // control port 3 (DAC) // option
-	//AM_RANGE(0x1d, 0x1d) AM_MIRROR(0xff00) // control port 5 (USERIO) // option
-	//AM_RANGE(0x20, 0x23) AM_MIRROR(0xff00) // system CTC - 0=SIO4&cassin, 1=SIO2&cassio, 2=keybd int, 3=50hz int for repeat key
-	//AM_RANGE(0x24, 0x27) AM_MIRROR(0xff00) // system SIO - 0=chA network data, 1=chB SIO4 data, 2=ChA control, 3=ChB control
-	//AM_RANGE(0x28, 0x29) AM_MIRROR(0xff02) // am9511/am9512 maths chip // option
-	//AM_RANGE(0x2c, 0x2f) AM_MIRROR(0xff00) // z80ctc IEEE int, Maths int, RTC, RTC // option
-	//AM_RANGE(0x30, 0x37) AM_MIRROR(0xff00) // IEEE chip // option
-	//AM_RANGE(0x38, 0x3b) AM_MIRROR(0xff00) // Hi-res graphics option
+	//map(0x00, 0x17).ram(); // videoram
+	//map(0x18, 0x18).mirror(0xff00); // control port 0
+	//map(0x19, 0x19).mirror(0xff00); // control port 1
+	//map(0x1a, 0x1a).mirror(0xff00); // control port 2
+	//map(0x1b, 0x1b).mirror(0xff00); // control port 3 (DAC) // option
+	//map(0x1d, 0x1d).mirror(0xff00); // control port 5 (USERIO) // option
+	//map(0x20, 0x23).mirror(0xff00); // system CTC - 0=SIO4&cassin, 1=SIO2&cassio, 2=keybd int, 3=50hz int for repeat key
+	//map(0x24, 0x27).mirror(0xff00); // system SIO - 0=chA network data, 1=chB SIO4 data, 2=ChA control, 3=ChB control
+	//map(0x28, 0x29).mirror(0xff02); // am9511/am9512 maths chip // option
+	//map(0x2c, 0x2f).mirror(0xff00); // z80ctc IEEE int, Maths int, RTC, RTC // option
+	//map(0x30, 0x37).mirror(0xff00); // IEEE chip // option
+	//map(0x38, 0x3b).mirror(0xff00); // Hi-res graphics option
 }
 
 INPUT_PORTS_START( rm380z )
@@ -222,9 +224,10 @@ INPUT_PORTS_END
 //
 //
 
-static SLOT_INTERFACE_START( rm380z_floppies )
-	SLOT_INTERFACE("sssd", FLOPPY_525_SSSD)
-SLOT_INTERFACE_END
+static void rm380z_floppies(device_slot_interface &device)
+{
+	device.option_add("sssd", FLOPPY_525_SSSD);
+}
 
 uint32_t rm380z_state::screen_update_rm380z(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -232,68 +235,71 @@ uint32_t rm380z_state::screen_update_rm380z(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-MACHINE_CONFIG_START(rm380z_state::rm380z)
+void rm380z_state::rm380z(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD(RM380Z_MAINCPU_TAG, Z80, XTAL(16'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(rm380z_mem)
-	MCFG_CPU_IO_MAP(rm380z_io)
+	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &rm380z_state::rm380z_mem);
+	m_maincpu->set_addrmap(AS_IO, &rm380z_state::rm380z_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	// according to videos and pictures of the real hardware, chars are spaced of at least 1 pixel
 	// and there is at least 1 pixel between each row of characters
-	MCFG_SCREEN_SIZE((RM380Z_SCREENCOLS*(RM380Z_CHDIMX+1)), (RM380Z_SCREENROWS*(RM380Z_CHDIMY+1)))
-	MCFG_SCREEN_VISIBLE_AREA(0, (RM380Z_SCREENCOLS*(RM380Z_CHDIMX+1))-1, 0, (RM380Z_SCREENROWS*(RM380Z_CHDIMY+1))-1)
-	MCFG_SCREEN_UPDATE_DRIVER(rm380z_state, screen_update_rm380z)
-	MCFG_SCREEN_PALETTE("palette")
+	screen.set_size((RM380Z_SCREENCOLS*(RM380Z_CHDIMX+1)), (RM380Z_SCREENROWS*(RM380Z_CHDIMY+1)));
+	screen.set_visarea(0, (RM380Z_SCREENCOLS*(RM380Z_CHDIMX+1))-1, 0, (RM380Z_SCREENROWS*(RM380Z_CHDIMY+1))-1);
+	screen.set_screen_update(FUNC(rm380z_state::screen_update_rm380z));
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
+
+	SPEAKER(config, "mono").front_center();
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( "cassette" )
-//  MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED)
-	//m_cassette->change_state((BIT(data,x)) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+	CASSETTE(config, m_cassette);
+//  m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* RAM configurations */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("56K")
+	RAM(config, RAM_TAG).set_default_size("56K");
 
 	/* floppy disk */
-	MCFG_FD1771_ADD("wd1771", XTAL(1'000'000))
+	FD1771(config, m_fdc, 1_MHz_XTAL);
 
-	MCFG_FLOPPY_DRIVE_ADD("wd1771:0", rm380z_floppies, "sssd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("wd1771:1", rm380z_floppies, "sssd", floppy_image_device::default_floppy_formats)
+	FLOPPY_CONNECTOR(config, "wd1771:0", rm380z_floppies, "sssd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "wd1771:1", rm380z_floppies, "sssd", floppy_image_device::default_floppy_formats);
 
 	/* keyboard */
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(rm380z_state, keyboard_put))
-MACHINE_CONFIG_END
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(rm380z_state::keyboard_put));
+}
 
-MACHINE_CONFIG_START(rm380z_state::rm480z)
+void rm380z_state::rm480z(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD(RM380Z_MAINCPU_TAG, Z80, XTAL(16'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(rm480z_mem)
-	MCFG_CPU_IO_MAP(rm480z_io)
+	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &rm380z_state::rm480z_mem);
+	m_maincpu->set_addrmap(AS_IO, &rm380z_state::rm480z_io);
 
 	MCFG_MACHINE_RESET_OVERRIDE(rm380z_state, rm480z)
 	/* video hardware */
-//  MCFG_SCREEN_ADD("screen", RASTER)
-//  MCFG_SCREEN_REFRESH_RATE(50)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-//  MCFG_SCREEN_SIZE((RM380Z_SCREENCOLS*(RM380Z_CHDIMX+1)), (RM380Z_SCREENROWS*(RM380Z_CHDIMY+1)))
-//  MCFG_SCREEN_VISIBLE_AREA(0, (RM380Z_SCREENCOLS*(RM380Z_CHDIMX+1))-1, 0, (RM380Z_SCREENROWS*(RM380Z_CHDIMY+1))-1)
-//  MCFG_SCREEN_UPDATE_DRIVER(rm380z_state, screen_update_rm480z)
-//  MCFG_SCREEN_PALETTE("palette")
+//  screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+//  screen.set_refresh_hz(50);
+//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+//  screen.set_size((RM380Z_SCREENCOLS*(RM380Z_CHDIMX+1)), (RM380Z_SCREENROWS*(RM380Z_CHDIMY+1)));
+//  screen.set_visarea(0, (RM380Z_SCREENCOLS*(RM380Z_CHDIMX+1))-1, 0, (RM380Z_SCREENROWS*(RM380Z_CHDIMY+1))-1);
+//  screen.set_screen_update(FUNC(rm380z_state::screen_update_rm480z));
+//  screen.set_palette("palette");
 
-//  MCFG_PALETTE_ADD_MONOCHROME("palette")
+//  PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* keyboard */
-//  MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-//  MCFG_GENERIC_KEYBOARD_CB(PUT(rm380z_state, keyboard_put))
-MACHINE_CONFIG_END
+//  generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+//  keyboard.set_keyboard_callback(FUNC(rm380z_state::keyboard_put));
+}
 
 
 /* ROM definitions */
@@ -349,10 +355,10 @@ ROM_END
 
 
 /* Driver */
-//   YEAR  NAME        PARENT    COMPAT  MACHINE     INPUT     CLASS            INIT        COMPANY                 FULLNAME                FLAGS
-COMP(1978, rm380z,     0,         0,     rm380z,     rm380z,   rm380z_state,    rm380z,     "Research Machines",    "RM-380Z, COS 4.0B",    MACHINE_NO_SOUND_HW)
-COMP(1978, rm380z34d,  rm380z,    0,     rm380z,     rm380z,   rm380z_state,    rm380z34d,  "Research Machines",    "RM-380Z, COS 3.4D",    MACHINE_NO_SOUND_HW)
-COMP(1978, rm380z34e,  rm380z,    0,     rm380z,     rm380z,   rm380z_state,    rm380z34e,  "Research Machines",    "RM-380Z, COS 3.4E",    MACHINE_NO_SOUND_HW)
-COMP(1981, rm480z,     rm380z,    0,     rm480z,     rm380z,   rm380z_state,    rm380z34e,  "Research Machines",    "LINK RM-480Z (set 1)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP(1981, rm480za,    rm380z,    0,     rm480z,     rm380z,   rm380z_state,    rm380z34e,  "Research Machines",    "LINK RM-480Z (set 2)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//   YEAR  NAME       PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT            COMPANY              FULLNAME                FLAGS
+COMP(1978, rm380z,    0,      0,      rm380z,  rm380z, rm380z_state, init_rm380z,    "Research Machines", "RM-380Z, COS 4.0B",    MACHINE_NO_SOUND_HW)
+COMP(1978, rm380z34d, rm380z, 0,      rm380z,  rm380z, rm380z_state, init_rm380z34d, "Research Machines", "RM-380Z, COS 3.4D",    MACHINE_NO_SOUND_HW)
+COMP(1978, rm380z34e, rm380z, 0,      rm380z,  rm380z, rm380z_state, init_rm380z34e, "Research Machines", "RM-380Z, COS 3.4E",    MACHINE_NO_SOUND_HW)
+COMP(1981, rm480z,    rm380z, 0,      rm480z,  rm380z, rm380z_state, init_rm380z34e, "Research Machines", "LINK RM-480Z (set 1)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP(1981, rm480za,   rm380z, 0,      rm480z,  rm380z, rm380z_state, init_rm380z34e, "Research Machines", "LINK RM-480Z (set 2)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 

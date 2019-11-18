@@ -3,7 +3,10 @@
 #ifndef NLD_CD4XXX_H_
 #define NLD_CD4XXX_H_
 
-#include "../nl_setup.h"
+/// \file nlm_cd4xxx.h
+///
+
+#include "netlist/nl_setup.h"
 
 /*
  * Devices:

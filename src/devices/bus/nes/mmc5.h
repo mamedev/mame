@@ -7,6 +7,9 @@
 
 #include "nxrom.h"
 
+#include "sound/nes_apu.h"  // temp hack to pass the additional sound regs to APU...
+#include "video/ppu2c0x.h"  // this has to be included so that IRQ functions can access ppu2c0x_device::BOTTOM_VISIBLE_SCANLINE
+
 
 // ======================> nes_exrom_device
 
@@ -15,23 +18,25 @@ class nes_exrom_device : public nes_nrom_device
 public:
 	// construction/destruction
 	nes_exrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	~nes_exrom_device();
 
-	virtual DECLARE_READ8_MEMBER(read_l) override;
-	virtual DECLARE_READ8_MEMBER(read_m) override;
-	virtual DECLARE_READ8_MEMBER(read_h) override;
-	virtual DECLARE_WRITE8_MEMBER(write_l) override;
-	virtual DECLARE_WRITE8_MEMBER(write_m) override;
-	virtual DECLARE_WRITE8_MEMBER(write_h) override;
+	virtual uint8_t read_l(offs_t offset) override;
+	virtual uint8_t read_m(offs_t offset) override;
+	virtual uint8_t read_h(offs_t offset) override;
+	virtual void write_l(offs_t offset, uint8_t data) override;
+	virtual void write_m(offs_t offset, uint8_t data) override;
+	virtual void write_h(offs_t offset, uint8_t data) override;
 
-	virtual DECLARE_READ8_MEMBER(chr_r) override;
-	virtual DECLARE_READ8_MEMBER(nt_r) override;
-	virtual DECLARE_WRITE8_MEMBER(nt_w) override;
+	virtual uint8_t chr_r(offs_t offset) override;
+	virtual uint8_t nt_r(offs_t offset) override;
+	virtual void nt_w(offs_t offset, uint8_t data) override;
 
 	virtual void hblank_irq(int scanline, int vblank, int blanked) override;
 	virtual void pcb_reset() override;
 
 protected:
 	// device-level overrides
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 
 	void set_mirror(int page, int src);
@@ -70,6 +75,7 @@ protected:
 	uint8_t m_prg_ram_mapped[4];
 
 	uint8_t m_ex1_bank;
+	uint8_t m_ex1_attrib;
 
 	uint8_t m_high_chr;   // $5130
 
@@ -86,6 +92,9 @@ protected:
 	uint8_t m_ram_hi_banks[4];
 
 	//  int m_nes_vram_sprite[8];
+
+	required_device<ppu2c0x_device> m_ppu;
+	required_device<nesapu_device> m_sound;
 };
 
 

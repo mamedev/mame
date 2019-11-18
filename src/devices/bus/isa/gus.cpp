@@ -1250,33 +1250,34 @@ INPUT_PORTS_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(isa16_gus_device::device_add_mconfig)
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
-	MCFG_SOUND_ADD("gf1",GGF1,GF1_CLOCK)
-	MCFG_SOUND_ROUTE(0,"lspeaker",0.50)
-	MCFG_SOUND_ROUTE(1,"rspeaker",0.50)
+void isa16_gus_device::device_add_mconfig(machine_config &config)
+{
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	GGF1(config, m_gf1, GF1_CLOCK);
+	m_gf1->add_route(0, "lspeaker", 0.50);
+	m_gf1->add_route(1, "rspeaker", 0.50);
 
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("mdout", midi_port_device, write_txd))
-	MCFG_GF1_TXIRQ_HANDLER(WRITELINE(isa16_gus_device, midi_txirq))
-	MCFG_GF1_RXIRQ_HANDLER(WRITELINE(isa16_gus_device, midi_txirq))
-	MCFG_GF1_WAVE_IRQ_HANDLER(WRITELINE(isa16_gus_device, wavetable_irq))
-	MCFG_GF1_RAMP_IRQ_HANDLER(WRITELINE(isa16_gus_device, volumeramp_irq))
-	MCFG_GF1_TIMER1_IRQ_HANDLER(WRITELINE(isa16_gus_device, timer1_irq))
-	MCFG_GF1_TIMER2_IRQ_HANDLER(WRITELINE(isa16_gus_device, timer2_irq))
-	MCFG_GF1_SB_IRQ_HANDLER(WRITELINE(isa16_gus_device, sb_irq))
-	MCFG_GF1_DMA_IRQ_HANDLER(WRITELINE(isa16_gus_device, dma_irq))
-	MCFG_GF1_DRQ1_HANDLER(WRITELINE(isa16_gus_device, drq1_w))
-	MCFG_GF1_DRQ2_HANDLER(WRITELINE(isa16_gus_device, drq2_w))
-	MCFG_GF1_NMI_HANDLER(WRITELINE(isa16_gus_device, nmi_w))
+	m_gf1->txd_handler().set("mdout", FUNC(midi_port_device::write_txd));
+	m_gf1->txirq_handler().set(FUNC(isa16_gus_device::midi_txirq));
+	m_gf1->rxirq_handler().set(FUNC(isa16_gus_device::midi_rxirq));
+	m_gf1->wave_irq_handler().set(FUNC(isa16_gus_device::wavetable_irq));
+	m_gf1->ramp_irq_handler().set(FUNC(isa16_gus_device::volumeramp_irq));
+	m_gf1->timer1_irq_handler().set(FUNC(isa16_gus_device::timer1_irq));
+	m_gf1->timer2_irq_handler().set(FUNC(isa16_gus_device::timer2_irq));
+	m_gf1->sb_irq_handler().set(FUNC(isa16_gus_device::sb_irq));
+	m_gf1->dma_irq_handler().set(FUNC(isa16_gus_device::dma_irq));
+	m_gf1->drq1_handler().set(FUNC(isa16_gus_device::drq1_w));
+	m_gf1->drq2_handler().set(FUNC(isa16_gus_device::drq2_w));
+	m_gf1->nmi_handler().set(FUNC(isa16_gus_device::nmi_w));
 
-	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_MIDI_RX_HANDLER(DEVWRITELINE("gf1", acia6850_device, write_rxd))
+	MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set(m_gf1, FUNC(acia6850_device::write_rxd));
 
-	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
+	MIDI_PORT(config, "mdout", midiout_slot, "midiout");
 
-	MCFG_DEVICE_ADD("acia_clock", CLOCK, 31250*16)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(isa16_gus_device, write_acia_clock))
-MACHINE_CONFIG_END
+	clock_device &acia_clock(CLOCK(config, "acia_clock", 31250*16));
+	acia_clock.signal_handler().set(FUNC(isa16_gus_device::write_acia_clock));
+}
 
 ioport_constructor isa16_gus_device::device_input_ports() const
 {
@@ -1295,10 +1296,10 @@ isa16_gus_device::isa16_gus_device(const machine_config &mconfig, const char *ta
 void isa16_gus_device::device_start()
 {
 	set_isa_device();
-	m_isa->install_device(0x0200, 0x0201, read8_delegate(FUNC(isa16_gus_device::joy_r),this), write8_delegate(FUNC(isa16_gus_device::joy_w),this) );
-	m_isa->install_device(0x0220, 0x022f, read8_delegate(FUNC(isa16_gus_device::board_r),this), write8_delegate(FUNC(isa16_gus_device::board_w),this) );
-	m_isa->install_device(0x0320, 0x0327, read8_delegate(FUNC(isa16_gus_device::synth_r),this), write8_delegate(FUNC(isa16_gus_device::synth_w),this) );
-	m_isa->install_device(0x0388, 0x0389, read8_delegate(FUNC(isa16_gus_device::adlib_r),this), write8_delegate(FUNC(isa16_gus_device::adlib_w),this) );
+	m_isa->install_device(0x0200, 0x0201, read8_delegate(*this, FUNC(isa16_gus_device::joy_r)), write8_delegate(*this, FUNC(isa16_gus_device::joy_w)));
+	m_isa->install_device(0x0220, 0x022f, read8_delegate(*this, FUNC(isa16_gus_device::board_r)), write8_delegate(*this, FUNC(isa16_gus_device::board_w)));
+	m_isa->install_device(0x0320, 0x0327, read8_delegate(*this, FUNC(isa16_gus_device::synth_r)), write8_delegate(*this, FUNC(isa16_gus_device::synth_w)));
+	m_isa->install_device(0x0388, 0x0389, read8_delegate(*this, FUNC(isa16_gus_device::adlib_r)), write8_delegate(*this, FUNC(isa16_gus_device::adlib_w)));
 }
 
 void isa16_gus_device::device_reset()
@@ -1383,9 +1384,9 @@ READ8_MEMBER(isa16_gus_device::synth_r)
 	switch(offset)
 	{
 	case 0x00:
-		return m_gf1->status_r(space,0);
+		return m_gf1->status_r();
 	case 0x01:
-		return m_gf1->data_r(space,0);
+		return m_gf1->data_r();
 	case 0x02:
 	case 0x03:
 		return m_gf1->global_reg_select_r(space,offset-2);
@@ -1406,10 +1407,10 @@ WRITE8_MEMBER(isa16_gus_device::synth_w)
 	switch(offset)
 	{
 	case 0x00:
-		m_gf1->control_w(space,0,data);
+		m_gf1->control_w(data);
 		break;
 	case 0x01:
-		m_gf1->data_w(space,0,data);
+		m_gf1->data_w(data);
 		break;
 	case 0x02:
 	case 0x03:

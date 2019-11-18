@@ -30,7 +30,7 @@ static const discrete_comp_adder_table desc_##_name##_caps =                \
 	}                                                                       \
 };                                                                          \
 																			\
-DISCRETE_SOUND_START( _name )                                               \
+DISCRETE_SOUND_START( _name##_discrete )                                    \
 	/************************************************                       \
 	 * Input register mapping                                               \
 	 ************************************************/                      \

@@ -1981,7 +1981,7 @@
 	<software name="f29ret" supported="no">
 		<description>F-29 Retaliator</description>
 		<year>1995</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -2123,6 +2123,21 @@
 			<feature name="disk_label" value="SPRW·5015" />
 			<diskarea name="cdrom">
 				<disk name="jake_b" sha1="5efd03633979db40cd37a4c1ba1176cdb8b35c83" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Windows 98 -->
+	<!-- Intel Celeron 266 MHz class minimum / DirectX 7.0 -->
+	<!-- Korean game, published in Japan by Media Kite -->
+	<!-- ID code: MKW-239 -->
+	<software name="jaxis" supported="no">
+		<description>Jaxis (Japan)</description>
+		<year>2002</year>
+		<publisher>Jamie System Development</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="jaxis" sha1="749981bb810b64df141c752daf5b47a64ec0acc9" />
 			</diskarea>
 		</part>
 	</software>

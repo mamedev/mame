@@ -35,11 +35,11 @@ DEFINE_DEVICE_TYPE(CBM2_EXPANSION_SLOT, cbm2_expansion_slot_device, "cbm2_expans
 //  device_cbm2_expansion_card_interface - constructor
 //-------------------------------------------------
 
-device_cbm2_expansion_card_interface::device_cbm2_expansion_card_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device),
-		m_bank1(*this, "bank1"),
-		m_bank2(*this, "bank2"),
-		m_bank3(*this, "bank3")
+device_cbm2_expansion_card_interface::device_cbm2_expansion_card_interface(const machine_config &mconfig, device_t &device) :
+	device_interface(device, "cbm2exp"),
+	m_bank1(*this, "bank1"),
+	m_bank2(*this, "bank2"),
+	m_bank3(*this, "bank3")
 {
 	m_slot = dynamic_cast<cbm2_expansion_slot_device *>(device.owner());
 }
@@ -65,7 +65,7 @@ device_cbm2_expansion_card_interface::~device_cbm2_expansion_card_interface()
 
 cbm2_expansion_slot_device::cbm2_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, CBM2_EXPANSION_SLOT, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_cbm2_expansion_card_interface>(mconfig, *this),
 	device_image_interface(mconfig, *this),
 	m_card(nullptr)
 {
@@ -78,24 +78,16 @@ cbm2_expansion_slot_device::cbm2_expansion_slot_device(const machine_config &mco
 
 void cbm2_expansion_slot_device::device_start()
 {
-	m_card = dynamic_cast<device_cbm2_expansion_card_interface *>(get_card_device());
+	m_card = get_card_device();
 
 	// inherit bus clock
+	// FIXME: this should be unnecessary as slots pass DERIVED_CLOCK(1, 1) through by default
 	if (clock() == 0)
 	{
 		cbm2_expansion_slot_device *root = machine().device<cbm2_expansion_slot_device>(CBM2_EXPANSION_SLOT_TAG);
 		assert(root);
 		set_unscaled_clock(root->clock());
 	}
-}
-
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void cbm2_expansion_slot_device::device_reset()
-{
 }
 
 
@@ -155,11 +147,11 @@ std::string cbm2_expansion_slot_device::get_default_card_software(get_default_ca
 //  read - cartridge data read
 //-------------------------------------------------
 
-uint8_t cbm2_expansion_slot_device::read(address_space &space, offs_t offset, uint8_t data, int csbank1, int csbank2, int csbank3)
+uint8_t cbm2_expansion_slot_device::read(offs_t offset, uint8_t data, int csbank1, int csbank2, int csbank3)
 {
 	if (m_card != nullptr)
 	{
-		data = m_card->cbm2_bd_r(space, offset, data, csbank1, csbank2, csbank3);
+		data = m_card->cbm2_bd_r(offset, data, csbank1, csbank2, csbank3);
 	}
 
 	return data;
@@ -170,11 +162,11 @@ uint8_t cbm2_expansion_slot_device::read(address_space &space, offs_t offset, ui
 //  write - cartridge data write
 //-------------------------------------------------
 
-void cbm2_expansion_slot_device::write(address_space &space, offs_t offset, uint8_t data, int csbank1, int csbank2, int csbank3)
+void cbm2_expansion_slot_device::write(offs_t offset, uint8_t data, int csbank1, int csbank2, int csbank3)
 {
 	if (m_card != nullptr)
 	{
-		m_card->cbm2_bd_w(space, offset, data, csbank1, csbank2, csbank3);
+		m_card->cbm2_bd_w(offset, data, csbank1, csbank2, csbank3);
 	}
 }
 
@@ -188,9 +180,10 @@ void cbm2_expansion_slot_device::write(address_space &space, offs_t offset, uint
 #include "hrg.h"
 #include "std.h"
 
-SLOT_INTERFACE_START( cbm2_expansion_cards )
-	SLOT_INTERFACE("24k", CBM2_24K)
-	SLOT_INTERFACE("hrga", CBM2_HRG_A)
-	SLOT_INTERFACE("hrgb", CBM2_HRG_B)
-	SLOT_INTERFACE_INTERNAL("standard", CBM2_STD)
-SLOT_INTERFACE_END
+void cbm2_expansion_cards(device_slot_interface &device)
+{
+	device.option_add("24k", CBM2_24K);
+	device.option_add("hrga", CBM2_HRG_A);
+	device.option_add("hrgb", CBM2_HRG_B);
+	device.option_add_internal("standard", CBM2_STD);
+}

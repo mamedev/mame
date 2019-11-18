@@ -14,16 +14,18 @@
 #include "cpu/z80/z80.h"
 #include "machine/bankdev.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 #define MCLK 16000000
 
 class cultures_state : public driver_device
 {
 public:
-	cultures_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	cultures_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_vrambank(*this, "vrambank"),
@@ -107,9 +109,9 @@ TILE_GET_INFO_MEMBER(cultures_state::get_bg0_tile_info)
 
 void cultures_state::video_start()
 {
-	m_bg0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cultures_state::get_bg0_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8, 64, 128);
-	m_bg1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cultures_state::get_bg1_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8, 512, 512);
-	m_bg2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cultures_state::get_bg2_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8, 512, 512);
+	m_bg0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cultures_state::get_bg0_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 128);
+	m_bg1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cultures_state::get_bg1_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 512, 512);
+	m_bg2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cultures_state::get_bg2_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 512, 512);
 
 	m_bg1_tilemap->set_transparent_pen(0);
 	m_bg0_tilemap->set_transparent_pen(0);
@@ -196,7 +198,7 @@ void cultures_state::oki_map(address_map &map)
 
 void cultures_state::vrambank_map(address_map &map)
 {
-	map(0x0000, 0x3fff).ram().w(this, FUNC(cultures_state::bg0_videoram_w)).share("bg0_videoram");
+	map(0x0000, 0x3fff).ram().w(FUNC(cultures_state::bg0_videoram_w)).share("bg0_videoram");
 	map(0x4000, 0x6fff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
 }
 
@@ -220,9 +222,9 @@ void cultures_state::cultures_io_map(address_map &map)
 	map(0x50, 0x53).ram().share("bg1_regs_y");
 	map(0x60, 0x63).ram().share("bg2_regs_x");
 	map(0x70, 0x73).ram().share("bg2_regs_y");
-	map(0x80, 0x80).w(this, FUNC(cultures_state::cpu_bankswitch_w));
-	map(0x90, 0x90).w(this, FUNC(cultures_state::misc_w));
-	map(0xa0, 0xa0).w(this, FUNC(cultures_state::bg_bank_w));
+	map(0x80, 0x80).w(FUNC(cultures_state::cpu_bankswitch_w));
+	map(0x90, 0x90).w(FUNC(cultures_state::misc_w));
+	map(0xa0, 0xa0).w(FUNC(cultures_state::bg_bank_w));
 	map(0xc0, 0xc0).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xd0, 0xd0).portr("SW1_A");
 	map(0xd1, 0xd1).portr("SW1_B");
@@ -369,7 +371,7 @@ static const gfx_layout gfxlayout =
 	8*64,
 };
 
-static GFXDECODE_START( culture )
+static GFXDECODE_START( gfx_cultures )
 	GFXDECODE_ENTRY("bg0", 0, gfxlayout, 0x0000, 16 )
 	GFXDECODE_ENTRY("bg1", 0, gfxlayout, 0x1000, 8 )
 	GFXDECODE_ENTRY("bg2", 0, gfxlayout, 0x1000, 8 )
@@ -403,43 +405,35 @@ void cultures_state::machine_reset()
 
 
 
-MACHINE_CONFIG_START(cultures_state::cultures)
-
+void cultures_state::cultures(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MCLK/2) /* 8.000 MHz */
-	MCFG_CPU_PROGRAM_MAP(cultures_map)
-	MCFG_CPU_IO_MAP(cultures_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cultures_state,  cultures_interrupt)
+	Z80(config, m_maincpu, MCLK/2); /* 8.000 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &cultures_state::cultures_map);
+	m_maincpu->set_addrmap(AS_IO, &cultures_state::cultures_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(cultures_state::cultures_interrupt));
 
-	MCFG_DEVICE_ADD("vrambank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(vrambank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(15)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
-
+	ADDRESS_MAP_BANK(config, "vrambank").set_map(&cultures_state::vrambank_map).set_options(ENDIANNESS_LITTLE, 8, 15, 0x4000);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cultures_state, screen_update_cultures)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 0*8, 30*8-1);
+	screen.set_screen_update(FUNC(cultures_state::screen_update_cultures));
+	screen.set_palette("palette");
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", culture)
-	MCFG_PALETTE_ADD("palette", 0x3000/2)
-	MCFG_PALETTE_FORMAT(xRGBRRRRGGGGBBBB_bit0)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_cultures);
+	PALETTE(config, "palette").set_format(palette_device::xRGBRRRRGGGGBBBB_bit0, 0x3000/2);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", MCLK/8, PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
-
-MACHINE_CONFIG_END
+	okim6295_device &oki(OKIM6295(config, "oki", MCLK/8, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
+	oki.add_route(ALL_OUTPUTS, "mono", 0.30);
+	oki.set_addrmap(0, &cultures_state::oki_map);
+}
 
 /*
 
@@ -505,4 +499,4 @@ ROM_START( cultures )
 ROM_END
 
 
-GAME( 1994, cultures, 0, cultures, cultures, cultures_state, 0, ROT0, "Face", "Jibun wo Migaku Culture School Mahjong Hen", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, cultures, 0, cultures, cultures, cultures_state, empty_init, ROT0, "Face", "Jibun wo Migaku Culture School Mahjong Hen", MACHINE_SUPPORTS_SAVE )

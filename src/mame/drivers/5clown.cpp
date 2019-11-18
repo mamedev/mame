@@ -314,6 +314,18 @@
 
 
 
+  To access Chance Settings, follow the following directions precisely:
+
+  From the game screen, start with 0 credits remaining.
+  Press SETTING to get a black screen. (HOLD 5 exits back to the game from here.)
+  From this black screen, press BET to get a crosshatch pattern.
+  Press PAYOUT once. (The screen will not change.)
+  Then press RECORD 5 times, then HOLD 5 7 times, then SETTING 2 times.
+  If this sequence was successfully entered, the screen will now go black.
+  Wait a few seconds for the settings table to appear.
+  (If you get stuck at the crosshatch screen, HOLD 1 will return to the game.)
+
+
   Settings Suggestions
   --------------------
 
@@ -448,6 +460,7 @@
 #include "sound/ay8910.h"
 #include "sound/okim6295.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -458,24 +471,32 @@
 class _5clown_state : public driver_device
 {
 public:
-	_5clown_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	_5clown_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_ay8910(*this, "ay8910"),
-		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
+		m_gfxbanks(*this, "gfxbanks"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram")
 	{
 	}
 
+	void fclown(machine_config &config);
+
+	void init_fclown();
+
+protected:
+	virtual void machine_start() override;
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<ay8910_device> m_ay8910;
-	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
+	required_region_ptr<uint8_t> m_gfxbanks;
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 
@@ -483,11 +504,8 @@ public:
 	uint8_t m_snd_latch_0800;
 	uint8_t m_snd_latch_0a02;
 	uint8_t m_ay8910_addr;
-	tilemap_t *m_bg_tilemap;
 	int m_mux_data;
 
-	DECLARE_WRITE8_MEMBER(fclown_videoram_w);
-	DECLARE_WRITE8_MEMBER(fclown_colorram_w);
 	DECLARE_WRITE8_MEMBER(cpu_c048_w);
 	DECLARE_WRITE8_MEMBER(cpu_d800_w);
 	DECLARE_READ8_MEMBER(snd_e06_r);
@@ -499,14 +517,10 @@ public:
 	DECLARE_WRITE8_MEMBER(trigsnd_w);
 	DECLARE_READ8_MEMBER(pia0_b_r);
 	DECLARE_READ8_MEMBER(pia1_b_r);
-	DECLARE_WRITE8_MEMBER(fclown_ay8910_w);
-	DECLARE_DRIVER_INIT(fclown);
-	TILE_GET_INFO_MEMBER(get_fclown_tile_info);
-	virtual void machine_start() override;
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(_5clown);
-	uint32_t screen_update_fclown(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void fclown(machine_config &config);
+	void fclown_ay8910_w(offs_t offset, u8 data);
+	MC6845_UPDATE_ROW(update_row);
+	void _5clown_palette(palette_device &palette) const;
+
 	void fcaudio_map(address_map &map);
 	void fclown_map(address_map &map);
 };
@@ -528,20 +542,7 @@ void _5clown_state::machine_start()
 
 
 
-WRITE8_MEMBER(_5clown_state::fclown_videoram_w)
-{
-	m_videoram[offset] = data;
-	m_bg_tilemap->mark_tile_dirty(offset);
-}
-
-WRITE8_MEMBER(_5clown_state::fclown_colorram_w)
-{
-	m_colorram[offset] = data;
-	m_bg_tilemap->mark_tile_dirty(offset);
-}
-
-
-TILE_GET_INFO_MEMBER(_5clown_state::get_fclown_tile_info)
+MC6845_UPDATE_ROW(_5clown_state::update_row)
 {
 /*  - bits -
     7654 3210
@@ -552,63 +553,57 @@ TILE_GET_INFO_MEMBER(_5clown_state::get_fclown_tile_info)
     x--- ----   Extra color for 7's.
 */
 
-	int attr = m_colorram[tile_index];
-	int code = ((attr & 0x01) << 8) | ((attr & 0x40) << 2) | m_videoram[tile_index];    /* bit 8 for extended char set */
-	int bank = (attr & 0x02) >> 1;                                                  /* bit 1 switch the gfx banks */
-	int color = (attr & 0x3c) >> 2 | ((attr & 0x80) >> 3);                          /* bits 2-3-4-5-7 for color */
+	uint32_t *pix = &bitmap.pix32(y);
+	ra &= 0x07;
 
-	SET_TILE_INFO_MEMBER(bank, code, color, 0);
+	for (int x = 0; x < x_count; x++)
+	{
+		int tile_index = (x + ma) & m_videoram.mask();
+		int attr = m_colorram[tile_index];
+		int code = ((attr & 0x01) << 8) | ((attr & 0x40) << 2) | m_videoram[tile_index];    /* bit 8 for extended char set */
+		int bank = (attr & 0x02) >> 1;                                                  /* bit 1 switch the gfx banks */
+		int color = (attr & 0x3c) >> 2 | ((attr & 0x80) >> 3);                          /* bits 2-3-4-5-7 for color */
+
+		const uint8_t plane2 = bank ? m_gfxbanks[code << 3 | ra | 0x6000] : 0;
+		const uint8_t plane1 = bank ? m_gfxbanks[code << 3 | ra | 0x5000] : 0;
+		const uint8_t plane0 = m_gfxbanks[code << 3 | ra | (bank ? 0x4000 : 0x7000)];
+		const pen_t *pens = &m_palette->pen(color << 3);
+		for (int n = 7; n >= 0; n--)
+			*pix++ = pens[BIT(plane2, n) << 2 | BIT(plane1, n) << 1 | BIT(plane0, n)];
+	}
 }
 
 
-void _5clown_state::video_start()
+void _5clown_state::_5clown_palette(palette_device &palette) const
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(_5clown_state::get_fclown_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-}
-
-
-uint32_t _5clown_state::screen_update_fclown(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	return 0;
-}
-
-PALETTE_INIT_MEMBER(_5clown_state, _5clown)
-{
-	const uint8_t *color_prom = memregion("proms")->base();
-/*
-    7654 3210
-    ---- ---x   RED component.
-    ---- --x-   GREEN component.
-    ---- -x--   BLUE component.
-    ---- x---   background killer.
-    xxxx ----   unused.
-*/
-	int i;
+	/*
+	    7654 3210
+	    ---- ---x   RED component.
+	    ---- --x-   GREEN component.
+	    ---- -x--   BLUE component.
+	    ---- x---   background killer.
+	    xxxx ----   unused.
+	*/
 
 	/* 0000KBGR */
 
-	if (color_prom == nullptr) return;
+	uint8_t const *const color_prom = memregion("proms")->base();
+	if (!color_prom)
+		return;
 
-	for (i = 0;i < m_palette->entries();i++)
+	for (int i = 0; i < m_palette->entries(); i++)
 	{
-		int bit0, bit1, bit2, bit3, r, g, b, bk;
+		// background killer
+		int const bk = BIT(color_prom[i], 3);
 
-		/* background killer */
-		bit3 = (color_prom[i] >> 3) & 0x01;
-		bk = bit3;
+		// red component
+		int const r = BIT(color_prom[i], 0) * 0xff;
 
-		/* red component */
-		bit0 = (color_prom[i] >> 0) & 0x01;
-		r = (bit0 * 0xff);
+		// green component
+		int const g = BIT(color_prom[i], 1) * 0xff;
 
-		/* green component */
-		bit1 = (color_prom[i] >> 1) & 0x01;
-		g = (bit1 * 0xff);
-
-		/* blue component */
-		bit2 = (color_prom[i] >> 2) & 0x01;
-		b = bk * (bit2 * 0xff);
+		// blue component
+		int const b = bk * BIT(color_prom[i], 2) * 0xff;
 
 		m_palette->set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -713,10 +708,10 @@ WRITE8_MEMBER(_5clown_state::cpu_d800_w)
 *  AY3-8910 R/W Handlers        *
 ********************************/
 
-WRITE8_MEMBER(_5clown_state::fclown_ay8910_w)
+void _5clown_state::fclown_ay8910_w(offs_t offset, u8 data)
 {
-	m_ay8910->address_w(space, 0, offset);
-	m_ay8910->data_w(space, 0, data);
+	m_ay8910->address_w(offset);
+	m_ay8910->data_w(data);
 }
 
 
@@ -741,7 +736,7 @@ WRITE8_MEMBER(_5clown_state::snd_800_w)
 
 	if (m_snd_latch_0a02 == 0x00)
 	{
-		fclown_ay8910_w(space, m_ay8910_addr, m_snd_latch_0800);
+		fclown_ay8910_w(m_ay8910_addr, m_snd_latch_0800);
 	}
 }
 
@@ -763,12 +758,12 @@ void _5clown_state::fclown_map(address_map &map)
 	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x0848, 0x084b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x1000, 0x13ff).ram().w(this, FUNC(_5clown_state::fclown_videoram_w)).share("videoram");   /* Init'ed at $2042 */
-	map(0x1800, 0x1bff).ram().w(this, FUNC(_5clown_state::fclown_colorram_w)).share("colorram");   /* Init'ed at $2054 */
+	map(0x1000, 0x13ff).ram().share("videoram");   /* Init'ed at $2042 */
+	map(0x1800, 0x1bff).ram().share("colorram");   /* Init'ed at $2054 */
 	map(0x2000, 0x7fff).rom();                 /* ROM space */
 
-	map(0xc048, 0xc048).w(this, FUNC(_5clown_state::cpu_c048_w));
-	map(0xd800, 0xd800).w(this, FUNC(_5clown_state::cpu_d800_w));
+	map(0xc048, 0xc048).w(FUNC(_5clown_state::cpu_c048_w));
+	map(0xd800, 0xd800).w(FUNC(_5clown_state::cpu_d800_w));
 
 	map(0xc400, 0xc400).portr("SW1");    /* DIP Switches bank */
 	map(0xcc00, 0xcc00).portr("SW2");    /* DIP Switches bank */
@@ -835,11 +830,11 @@ void _5clown_state::fclown_map(address_map &map)
 void _5clown_state::fcaudio_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
-	map(0x0800, 0x0800).w(this, FUNC(_5clown_state::snd_800_w));
-	map(0x0a02, 0x0a02).w(this, FUNC(_5clown_state::snd_a02_w));
+	map(0x0800, 0x0800).w(FUNC(_5clown_state::snd_800_w));
+	map(0x0a02, 0x0a02).w(FUNC(_5clown_state::snd_a02_w));
 	map(0x0c04, 0x0c04).w("oki6295", FUNC(okim6295_device::write));
 	map(0x0c06, 0x0c06).r("oki6295", FUNC(okim6295_device::read));
-	map(0x0e06, 0x0e06).r(this, FUNC(_5clown_state::snd_e06_r));
+	map(0x0e06, 0x0e06).r(FUNC(_5clown_state::snd_e06_r));
 	map(0xe000, 0xffff).rom();                 /* ROM space */
 }
 
@@ -1010,7 +1005,7 @@ static const gfx_layout tilelayout =
 * Graphics Decode Information *
 ******************************/
 
-static GFXDECODE_START( fclown )
+static GFXDECODE_START( gfx_fclown )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 0, 16 )
 GFXDECODE_END
@@ -1019,56 +1014,50 @@ GFXDECODE_END
 *    Machine Drivers     *
 *************************/
 
-MACHINE_CONFIG_START(_5clown_state::fclown)
-
+void _5clown_state::fclown(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK/8)  /* guess, seems ok */
-	MCFG_CPU_PROGRAM_MAP(fclown_map)
+	M6502(config, m_maincpu, MASTER_CLOCK/8);  /* guess, seems ok */
+	m_maincpu->set_addrmap(AS_PROGRAM, &_5clown_state::fclown_map);
 
-	MCFG_CPU_ADD("audiocpu", M6502, MASTER_CLOCK/8) /* guess, seems ok */
-	MCFG_CPU_PROGRAM_MAP(fcaudio_map)
+	M6502(config, m_audiocpu, MASTER_CLOCK/8); /* guess, seems ok */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &_5clown_state::fcaudio_map);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(_5clown_state, mux_port_r))
-	MCFG_PIA_READPB_HANDLER(READ8(_5clown_state, pia0_b_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(_5clown_state, counters_w))
+	pia6821_device &pia0(PIA6821(config, "pia0", 0));
+	pia0.readpa_handler().set(FUNC(_5clown_state::mux_port_r));
+	pia0.readpb_handler().set(FUNC(_5clown_state::pia0_b_r));
+	pia0.writepb_handler().set(FUNC(_5clown_state::counters_w));
 
-	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(IOPORT("SW4"))
-	MCFG_PIA_READPB_HANDLER(READ8(_5clown_state, pia1_b_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(_5clown_state, trigsnd_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(_5clown_state, mux_w))
+	pia6821_device &pia1(PIA6821(config, "pia1", 0));
+	pia1.readpa_handler().set_ioport("SW4");
+	pia1.readpb_handler().set(FUNC(_5clown_state::pia1_b_r));
+	pia1.writepa_handler().set(FUNC(_5clown_state::trigsnd_w));
+	pia1.writepb_handler().set(FUNC(_5clown_state::mux_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE((39+1)*8, (31+1)*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(_5clown_state, screen_update_fclown)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(MASTER_CLOCK/2, 320, 0, 256, 312, 0, 256);
+	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fclown)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(_5clown_state, _5clown)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_fclown);
+	PALETTE(config, m_palette, FUNC(_5clown_state::_5clown_palette), 256);
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK/16) /* guess */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	mc6845_device &crtc(MC6845(config, "crtc", MASTER_CLOCK/16)); /* guess */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	crtc.set_update_row_callback(FUNC(_5clown_state::update_row));
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ay8910", AY8910, MASTER_CLOCK/8)        /* guess, seems ok */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	AY8910(config, m_ay8910, MASTER_CLOCK/8).add_route(ALL_OUTPUTS, "mono", 1.00);        /* guess, seems ok */
 
-	MCFG_OKIM6295_ADD("oki6295", MASTER_CLOCK/12, PIN7_LOW)    /* guess, seems ok; pin7 guessed, seems ok */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.20)
-
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki6295", MASTER_CLOCK/12, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 1.20);    /* guess, seems ok; pin7 guessed, seems ok */
+}
 
 
 /*************************
@@ -1173,45 +1162,43 @@ ROM_END
 *      Driver Init       *
 *************************/
 
-DRIVER_INIT_MEMBER(_5clown_state,fclown)
+void _5clown_state::init_fclown()
 {
 	/* Decrypting main program */
-
-	int x;
 	uint8_t *src = memregion( "maincpu" )->base();
 
-	for (x = 0x0000; x < 0x10000; x++)
+	for (int x = 0x0000; x < 0x10000; x++)
 	{
 		src[x] = src[x] ^ 0x20;     /* Decrypting byte */
 	}
 
 
 	/* Decrypting GFX by segments */
-
 	uint8_t *gfx1_src = memregion( "gfx1" )->base();
 	uint8_t *gfx2_src = memregion( "gfx2" )->base();
 
-	for (x = 0x2000; x < 0x3000; x++)
+	for (int x = 0x2000; x < 0x3000; x++)
 	{
 		gfx1_src[x] = gfx1_src[x] ^ 0x22;   /* Decrypting bulk GFX segment 7000-7fff */
+		m_gfxbanks[0x7000 - 0x2000 + x] ^= 0x22;
 	}
 
-	for (x = 0x0000; x < 0x1000; x++)
+	for (int x = 0x0000; x < 0x1000; x++)
 	{
 		gfx2_src[x] = gfx2_src[x] ^ 0x3f;   /* Decrypting bulk GFX segment 6000-6fff */
+		m_gfxbanks[0x6000 - 0x0000 + x] ^= 0x3f;
 	}
 
-	for (x = 0x2000; x < 0x3000; x++)
+	for (int x = 0x2000; x < 0x3000; x++)
 	{
 		gfx2_src[x] = gfx2_src[x] ^ 0x22;   /* Decrypting bulk GFX segment 4000-4fff */
+		m_gfxbanks[0x4000 - 0x2000 + x] ^= 0x22;
 	}
 
 
 	/* Decrypting sound samples */
-
 	uint8_t *samples_src = memregion( "oki6295" )->base();
-
-	for (x = 0x0000; x < 0x10000; x++)
+	for (int x = 0x0000; x < 0x10000; x++)
 	{
 		if (samples_src[x] & 0x02)                      /* If bit 1 is active... */
 		{
@@ -1230,7 +1217,7 @@ DRIVER_INIT_MEMBER(_5clown_state,fclown)
 *      Game Drivers      *
 *************************/
 
-//    YEAR  NAME      PARENT  MACHINE INPUT   STATE          INIT    ROT   COMPANY  FULLNAME                       FLAGS...
-GAME( 1993, 5clown,   0,      fclown, fclown, _5clown_state, fclown, ROT0, "IGS",   "Five Clown (English, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, 5clowna,  5clown, fclown, fclown, _5clown_state, fclown, ROT0, "IGS",   "Five Clown (English, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, 5clownsp, 5clown, fclown, fclown, _5clown_state, fclown, ROT0, "IGS",   "Five Clown (Spanish hack)",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT  MACHINE INPUT   CLASS          INIT         ROT   COMPANY  FULLNAME                       FLAGS...
+GAME( 1993, 5clown,   0,      fclown, fclown, _5clown_state, init_fclown, ROT0, "IGS",   "Five Clown (English, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, 5clowna,  5clown, fclown, fclown, _5clown_state, init_fclown, ROT0, "IGS",   "Five Clown (English, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, 5clownsp, 5clown, fclown, fclown, _5clown_state, init_fclown, ROT0, "IGS",   "Five Clown (Spanish hack)",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

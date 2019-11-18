@@ -44,6 +44,8 @@ pocketrc   Pocket Racer (PKR1/VER.B)               COH-110             SYSTEM11 
 starswep   Star Sweep (STP2/VER.A)                 COH-100 / COH-110   SYSTEM11 MOTHER(B) PCB                           C442     -
 starswepj  Star Sweep (STP1/VER.A)                 COH-100 / COH-110   SYSTEM11 MOTHER(B) PCB                           C442     -
 myangel3   Kosodate Quiz My Angel 3 (KQT1/VER.A)   COH-110             SYSTEM11 MOTHER(B) PCB   SYSTEM11 ROM8(64) PCB   C443     2
+ptblank2a  Point Blank 2 (GNB2/VER.A)              COH-100 / COH-110   SYSTEM11 MOTHER PCB      SK990722                C443     4
+ptblank2b  Point Blank 2 (GNB2/VER.A alt)          COH-100 / COH-110   SYSTEM11 MOTHER(B) PCB   SK990722                C443     4
 ptblank2ua Point Blank 2 (GNB3/VER.A)              COH-100 / COH-110   SYSTEM11 MOTHER PCB      SYSTEM11 ROM8(64) PCB   C443     2
 
 
@@ -64,8 +66,8 @@ MOTHER PCB- This is the main PCB. It holds all sound circuitry, sound ROMs, prog
             for some minor component shuffling. The 2nd revision is used only by Kosodate Quiz My Angel 3 and Star Sweep.
 CPU PCB   - There are two known revisions of this PCB. Any game can use either PCB. Contains main CPU/RAM and GPU/Video RAM
             The differences are only in the RAM type, one uses 4x 16MBit chips compared to the other that uses 2x 32MBit chips.
-ROM PCB   - There are two known revisions of this PCB. They're mostly identical except one uses all 32MBit SOP44 MASKROMs and the other
-            uses 64MBit SOP44 MASKROMs. The 64MBit ROM board also has space for a PAL and a KEYCUS.
+ROM PCB   - There are two known revisions of this PCB. They're mostly identical except one uses all 32MBit SOP44 mask ROMs and the other
+            uses 64MBit SOP44 mask ROMs. The 64MBit ROM board also has space for a PAL and a KEYCUS.
 
 Each game has a multi-letter code assigned to it which is printed on a small sticker and placed on the bottom side of the MOTHER PCB.
 This code is then proceeded by a number (1, 2, 3 & 4 seen so far), then 'Ver.' then A/B/C/D/E which denotes the software
@@ -112,7 +114,7 @@ Notes:
                    * Pin 9 VCLKOUT - 40.0264MHz (==2x MCLKOUT). Tied to C195
                    * Pin 7 XTALOUT - 16.93426MHz. This is tied to the clock input of the C76
       S11MOT*  - Standard System 11 PALs (DIP20)
-      WAVE.8K  - Sound samples, 42 pin DIP MASKROM, either 16MBit or 32MBit. If 32MBit, it is programmed in Byte Mode.
+      WAVE.8K  - Sound samples, 42 pin DIP mask ROM, either 16MBit or 32MBit. If 32MBit, it is programmed in Byte Mode.
       SPROG.6D - Sound program, Intel PA28F200BX 2MBit Flash ROM (SOP44)
       PRG.2*   - Main program, Intel E28F008SA 8MBit Flash ROM (TSOP40)
       CONN1    - for connection of the ROM Board
@@ -124,8 +126,11 @@ Notes:
       LA4705   - Sanyo LA4705 15W 2-Channel Power Amplifier (SIP18)
       48WAY    - Namco 48 way edge connector used for extra controls and to output the 2nd speaker when set to stereo mode.
 
-      There is a REV B Mother board 'SYSTEM11 MOTHER(B) PCB' with slightly different
-      component placings. It's not known if it has different components also.
+      There is a REV B Motherboard 'SYSTEM11 MOTHER(B) PCB 8645960301 (8645970301)'
+      which uses 2x Intel E28F016SA TSOP56 flash ROMs for the main program at locations 1L
+      and 1J. The C76 SOP44 ROM is present on the PCB at location 6D and as an option, at 90
+      degrees there are unused SMD pads to accept 1x Intel E28F200 TSOP56 flash ROM at location 7E.
+      The remaining components and locations are identical to the standard 'SYSTEM 11 MOTHER PCB'
 
                                 Game Code
       Game                      Sticker      KEYCUS
@@ -164,7 +169,7 @@ SYSTEM11 ROM8 PCB 8645960202 (8645970202)
 |                                        |
 |----------------------------------------|
 Notes:
-      This ROM board is wired to accept a maximum of 8x 8Bit 32MBit SOP44 MASK ROMs.
+      This ROM board is wired to accept a maximum of 8x 8Bit 32MBit SOP44 mask ROMs.
 
 
 SYSTEM11 ROM8(64) PCB 8645960500 (8645970500)
@@ -177,7 +182,7 @@ SYSTEM11 ROM8(64) PCB 8645960500 (8645970500)
 |                 *PRG3L.IC9             |
 |----------------------------------------|
 Notes:
-      This ROM board is wired to accept a maximum of 8x 8Bit 64MBit SOP44 MASK ROMs.
+      This ROM board is wired to accept a maximum of 8x 8Bit 64MBit SOP44 mask ROMs.
       There is room for a PLCC44 KEYCUS IC (usually a CPLD, but not populated) and a PLCC20
       IC type PAL16V8H (populated and labelled 'ROM8 DEC0')
       * - These ROMs are on the other side of the PCB.
@@ -304,6 +309,7 @@ Pin 22 Solder Side - Gun 2 Trigger
 #include "machine/timer.h"
 #include "sound/c352.h"
 #include "video/psx.h"
+#include "screen.h"
 #include "speaker.h"
 
 #define C76_SPEEDUP   ( 1 ) /* sound cpu idle skipping */
@@ -323,19 +329,6 @@ public:
 	{
 	}
 
-	DECLARE_WRITE16_MEMBER(rom8_w);
-	DECLARE_WRITE16_MEMBER(rom8_64_upper_w);
-	DECLARE_WRITE16_MEMBER(rom8_64_w);
-	DECLARE_WRITE16_MEMBER(lightgun_w);
-	DECLARE_READ16_MEMBER(lightgun_r);
-	DECLARE_READ16_MEMBER(c76_shared_r);
-	DECLARE_WRITE16_MEMBER(c76_shared_w);
-	DECLARE_READ16_MEMBER(c76_speedup_r);
-	DECLARE_WRITE16_MEMBER(c76_speedup_w);
-	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq0_cb);
-	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq2_cb);
-	TIMER_DEVICE_CALLBACK_MEMBER(mcu_adc_cb);
-
 	void coh110(machine_config &config);
 	void coh100(machine_config &config);
 	void myangel3(machine_config &config);
@@ -350,19 +343,31 @@ public:
 	void souledge(machine_config &config);
 	void tekken(machine_config &config);
 	void tekken2(machine_config &config);
-	void c76_io_map(address_map &map);
+
+private:
+	DECLARE_WRITE16_MEMBER(rom8_w);
+	DECLARE_WRITE16_MEMBER(rom8_64_upper_w);
+	DECLARE_WRITE16_MEMBER(rom8_64_w);
+	DECLARE_WRITE16_MEMBER(lightgun_w);
+	DECLARE_READ16_MEMBER(lightgun_r);
+	DECLARE_READ16_MEMBER(c76_shared_r);
+	DECLARE_WRITE16_MEMBER(c76_shared_w);
+	DECLARE_READ16_MEMBER(c76_speedup_r);
+	DECLARE_WRITE16_MEMBER(c76_speedup_w);
+	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq0_cb);
+	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq2_cb);
+
 	void c76_map(address_map &map);
 	void namcos11_map(address_map &map);
 	void ptblank2ua_map(address_map &map);
 	void rom8_64_map(address_map &map);
 	void rom8_map(address_map &map);
-protected:
+
 	virtual void driver_start() override;
 
-private:
 	required_shared_ptr<uint16_t> m_sharedram;
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_mcu;
+	required_device<m37710_cpu_device> m_mcu;
 
 	optional_memory_region m_bankedroms;
 	optional_memory_bank_array<8> m_bank;
@@ -472,9 +477,9 @@ WRITE16_MEMBER( namcos11_state::c76_shared_w )
 
 void namcos11_state::namcos11_map(address_map &map)
 {
-	map(0x1fa04000, 0x1fa0ffff).rw(this, FUNC(namcos11_state::c76_shared_r), FUNC(namcos11_state::c76_shared_w)); /* shared ram with C76 */
+	map(0x1fa04000, 0x1fa0ffff).rw(FUNC(namcos11_state::c76_shared_r), FUNC(namcos11_state::c76_shared_w)); /* shared RAM with C76 */
 	map(0x1fa20000, 0x1fa2001f).rw("keycus", FUNC(ns11_keycus_device::read), FUNC(ns11_keycus_device::write));
-	map(0x1fa30000, 0x1fa30fff).rw("at28c16", FUNC(at28c16_device::read), FUNC(at28c16_device::write)).umask32(0x00ff00ff); /* eeprom */
+	map(0x1fa30000, 0x1fa30fff).rw("at28c16", FUNC(at28c16_device::read), FUNC(at28c16_device::write)).umask32(0x00ff00ff); /* EEPROM */
 	map(0x1fb00000, 0x1fb00003).nopw(); /* ?? */
 	map(0x1fbf6000, 0x1fbf6003).nopw(); /* ?? */
 }
@@ -491,7 +496,7 @@ void namcos11_state::rom8_map(address_map &map)
 	map(0x1f500000, 0x1f5fffff).bankr("bank6");
 	map(0x1f600000, 0x1f6fffff).bankr("bank7");
 	map(0x1f700000, 0x1f7fffff).bankr("bank8");
-	map(0x1fa10020, 0x1fa1002f).w(this, FUNC(namcos11_state::rom8_w));
+	map(0x1fa10020, 0x1fa1002f).w(FUNC(namcos11_state::rom8_w));
 }
 
 void namcos11_state::rom8_64_map(address_map &map)
@@ -506,16 +511,16 @@ void namcos11_state::rom8_64_map(address_map &map)
 	map(0x1f500000, 0x1f5fffff).bankr("bank6");
 	map(0x1f600000, 0x1f6fffff).bankr("bank7");
 	map(0x1f700000, 0x1f7fffff).bankr("bank8");
-	map(0x1f080000, 0x1f080003).w(this, FUNC(namcos11_state::rom8_64_upper_w));
-	map(0x1fa10020, 0x1fa1002f).nopr().w(this, FUNC(namcos11_state::rom8_64_w));
+	map(0x1f080000, 0x1f080003).w(FUNC(namcos11_state::rom8_64_upper_w));
+	map(0x1fa10020, 0x1fa1002f).nopr().w(FUNC(namcos11_state::rom8_64_w));
 }
 
 void namcos11_state::ptblank2ua_map(address_map &map)
 {
 	rom8_64_map(map);
 
-	map(0x1f780000, 0x1f78000f).r(this, FUNC(namcos11_state::lightgun_r));
-	map(0x1f788000, 0x1f788003).w(this, FUNC(namcos11_state::lightgun_w));
+	map(0x1f780000, 0x1f78000f).r(FUNC(namcos11_state::lightgun_r));
+	map(0x1f788000, 0x1f788003).w(FUNC(namcos11_state::lightgun_w));
 }
 
 void namcos11_state::c76_map(address_map &map)
@@ -531,19 +536,6 @@ void namcos11_state::c76_map(address_map &map)
 	map(0x280000, 0x2fffff).rom().region("c76", 0);
 	map(0x300000, 0x300001).nopw();
 	map(0x301000, 0x301001).nopw();
-}
-
-void namcos11_state::c76_io_map(address_map &map)
-{
-	map(M37710_ADC0_H, M37710_ADC7_H).nopr();
-	map(M37710_ADC0_L, M37710_ADC0_L).portr("ADC0");
-	map(M37710_ADC1_L, M37710_ADC1_L).portr("ADC1");
-	map(M37710_ADC2_L, M37710_ADC2_L).portr("ADC2");
-	map(M37710_ADC3_L, M37710_ADC3_L).portr("ADC3");
-	map(M37710_ADC4_L, M37710_ADC4_L).portr("ADC4");
-	map(M37710_ADC5_L, M37710_ADC5_L).portr("ADC5");
-	map(M37710_ADC6_L, M37710_ADC6_L).portr("ADC6");
-	map(M37710_ADC7_L, M37710_ADC7_L).portr("ADC7");
 }
 
 READ16_MEMBER(namcos11_state::c76_speedup_r)
@@ -568,7 +560,7 @@ void namcos11_state::driver_start()
 	{
 		m_su_83 = 0;
 		save_item( NAME(m_su_83) );
-		m_mcu->space(AS_PROGRAM).install_readwrite_handler(0x82, 0x83, read16_delegate(FUNC(namcos11_state::c76_speedup_r),this), write16_delegate(FUNC(namcos11_state::c76_speedup_w),this));
+		m_mcu->space(AS_PROGRAM).install_readwrite_handler(0x82, 0x83, read16_delegate(*this, FUNC(namcos11_state::c76_speedup_r)), write16_delegate(*this, FUNC(namcos11_state::c76_speedup_w)));
 	}
 
 	if( m_bankedroms != nullptr )
@@ -601,144 +593,137 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos11_state::mcu_irq2_cb)
 	m_mcu->set_input_line(M37710_LINE_IRQ2, HOLD_LINE);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(namcos11_state::mcu_adc_cb)
+void namcos11_state::coh110(machine_config &config)
 {
-	m_mcu->set_input_line(M37710_LINE_ADC, HOLD_LINE);
-}
-
-MACHINE_CONFIG_START(namcos11_state::coh110)
-	MCFG_CPU_ADD( "maincpu", CXD8530CQ, XTAL(67'737'600) )
-	MCFG_CPU_PROGRAM_MAP( namcos11_map )
-
-	MCFG_RAM_MODIFY("maincpu:ram")
-	MCFG_RAM_DEFAULT_SIZE("4M")
+	CXD8530CQ(config, m_maincpu, XTAL(67'737'600));
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcos11_state::namcos11_map);
+	m_maincpu->subdevice<ram_device>("ram")->set_default_size("4M");
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("c76", NAMCO_C76, 16934400)
-	MCFG_CPU_PROGRAM_MAP(c76_map)
-	MCFG_CPU_IO_MAP(c76_io_map)
+	NAMCO_C76(config, m_mcu, 16934400);
+	m_mcu->set_addrmap(AS_PROGRAM, &namcos11_state::c76_map);
+	m_mcu->an0_cb().set_ioport("ADC0");
+	m_mcu->an1_cb().set_ioport("ADC1");
+	m_mcu->an2_cb().set_ioport("ADC2");
+	m_mcu->an3_cb().set_ioport("ADC3");
+	m_mcu->an4_cb().set_ioport("ADC4");
+	m_mcu->an5_cb().set_ioport("ADC5");
+	m_mcu->an6_cb().set_ioport("ADC6");
+	m_mcu->an7_cb().set_ioport("ADC7");
+
 	/* TODO: irq generation for these */
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcu_irq0", namcos11_state, mcu_irq0_cb, attotime::from_hz(60))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcu_irq2", namcos11_state, mcu_irq2_cb, attotime::from_hz(60))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcu_adc", namcos11_state, mcu_adc_cb, attotime::from_hz(60))
+	TIMER(config, "mcu_irq0").configure_periodic(FUNC(namcos11_state::mcu_irq0_cb), attotime::from_hz(60));
+	TIMER(config, "mcu_irq2").configure_periodic(FUNC(namcos11_state::mcu_irq2_cb), attotime::from_hz(60));
 
-	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0x200000, XTAL(53'693'175) )
+	CXD8561Q(config, "gpu", XTAL(53'693'175), 0x200000, subdevice<psxcpu_device>("maincpu")).set_screen("screen");
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
-	MCFG_C352_ADD("c352", 25401600, 288)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
-	//MCFG_SOUND_ROUTE(2, "lspeaker", 1.00) // Second DAC not present.
-	//MCFG_SOUND_ROUTE(3, "rspeaker", 1.00)
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_AT28C16_ADD( "at28c16", nullptr )
-MACHINE_CONFIG_END
+	c352_device &c352(C352(config, "c352", 25401600, 288));
+	c352.add_route(0, "lspeaker", 1.00);
+	c352.add_route(1, "rspeaker", 1.00);
+	//c352.add_route(2, "lspeaker", 1.00); // Second DAC not present.
+	//c352.add_route(3, "rspeaker", 1.00);
 
-MACHINE_CONFIG_START(namcos11_state::coh100)
+	AT28C16(config, "at28c16", 0);
+}
+
+void namcos11_state::coh100(machine_config &config)
+{
 	coh110(config);
-	MCFG_CPU_REPLACE( "maincpu", CXD8530AQ, XTAL(67'737'600) )
-	MCFG_CPU_PROGRAM_MAP( namcos11_map )
+	CXD8530AQ(config.replace(), m_maincpu, XTAL(67'737'600));
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcos11_state::namcos11_map);
+	m_maincpu->subdevice<ram_device>("ram")->set_default_size("4M");
 
-	MCFG_RAM_MODIFY("maincpu:ram")
-	MCFG_RAM_DEFAULT_SIZE("4M")
+	CXD8538Q(config.replace(), "gpu", XTAL(53'693'175), 0x200000, subdevice<psxcpu_device>("maincpu")).set_screen("screen");
+}
 
-	MCFG_PSXGPU_REPLACE( "maincpu", "gpu", CXD8538Q, 0x200000, XTAL(53'693'175) )
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(namcos11_state::tekken)
+void namcos11_state::tekken(machine_config &config)
+{
 	coh100(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP( rom8_map )
-
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcos11_state::rom8_map);
 	// TODO: either allow optional devices in memory maps, add another memory map without keycus or add a dummy keycus for tekken
-	MCFG_DEVICE_ADD( "keycus", KEYCUS_C406, 0 )
-MACHINE_CONFIG_END
+	KEYCUS_C406(config, "keycus", 0);
+}
 
-MACHINE_CONFIG_START(namcos11_state::tekken2o)
+void namcos11_state::tekken2o(machine_config &config)
+{
 	coh100(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP( rom8_map )
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcos11_state::rom8_map);
+	KEYCUS_C406(config, "keycus", 0);
+}
 
-	MCFG_DEVICE_ADD( "keycus", KEYCUS_C406, 0 )
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(namcos11_state::tekken2)
+void namcos11_state::tekken2(machine_config &config)
+{
 	coh110(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP( rom8_map )
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcos11_state::rom8_map);
+	KEYCUS_C406(config, "keycus", 0);
+}
 
-	MCFG_DEVICE_ADD( "keycus", KEYCUS_C406, 0 )
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(namcos11_state::souledge)
+void namcos11_state::souledge(machine_config &config)
+{
 	coh110(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP( rom8_map )
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcos11_state::rom8_map);
+	KEYCUS_C409(config, "keycus", 0);
+}
 
-	MCFG_DEVICE_ADD( "keycus", KEYCUS_C409, 0 )
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(namcos11_state::dunkmnia)
+void namcos11_state::dunkmnia(machine_config &config)
+{
 	coh110(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP( rom8_map )
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcos11_state::rom8_map);
+	KEYCUS_C410(config, "keycus", 0);
+}
 
-	MCFG_DEVICE_ADD( "keycus", KEYCUS_C410, 0 )
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(namcos11_state::primglex)
+void namcos11_state::primglex(machine_config &config)
+{
 	coh110(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP( rom8_map )
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcos11_state::rom8_map);
+	KEYCUS_C411(config, "keycus", 0);
+}
 
-	MCFG_DEVICE_ADD( "keycus", KEYCUS_C411, 0 )
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(namcos11_state::xevi3dg)
+void namcos11_state::xevi3dg(machine_config &config)
+{
 	coh110(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP( rom8_map )
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcos11_state::rom8_map);
+	KEYCUS_C430(config, "keycus", 0);
+}
 
-	MCFG_DEVICE_ADD( "keycus", KEYCUS_C430, 0 )
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(namcos11_state::danceyes)
+void namcos11_state::danceyes(machine_config &config)
+{
 	coh110(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP( rom8_map )
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcos11_state::rom8_map);
+	KEYCUS_C431(config, "keycus", 0);
+}
 
-	MCFG_DEVICE_ADD( "keycus", KEYCUS_C431, 0 )
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(namcos11_state::pocketrc)
+void namcos11_state::pocketrc(machine_config &config)
+{
 	coh110(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP( rom8_map )
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcos11_state::rom8_map);
+	KEYCUS_C432(config, "keycus", 0);
+}
 
-	MCFG_DEVICE_ADD( "keycus", KEYCUS_C432, 0 )
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(namcos11_state::starswep)
+void namcos11_state::starswep(machine_config &config)
+{
 	coh110(config);
-	MCFG_DEVICE_ADD( "keycus", KEYCUS_C442, 0 )
-MACHINE_CONFIG_END
+	KEYCUS_C442(config, "keycus", 0);
+}
 
-MACHINE_CONFIG_START(namcos11_state::myangel3)
+void namcos11_state::myangel3(machine_config &config)
+{
 	coh110(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP( rom8_64_map )
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcos11_state::rom8_64_map);
+	KEYCUS_C443(config, "keycus", 0);
+}
 
-	MCFG_DEVICE_ADD( "keycus", KEYCUS_C443, 0 )
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(namcos11_state::ptblank2ua)
+void namcos11_state::ptblank2ua(machine_config &config)
+{
 	coh110(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP( ptblank2ua_map )
-
-	MCFG_DEVICE_ADD( "keycus", KEYCUS_C443, 0 )
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcos11_state::ptblank2ua_map);
+	KEYCUS_C443(config, "keycus", 0);
+}
 
 static INPUT_PORTS_START( namcos11 )
 	PORT_START( "SWITCH" )
@@ -1238,12 +1223,54 @@ ROM_START( primglex )
 	ROM_RELOAD( 0x800000, 0x400000 )
 ROM_END
 
+// no rom labels, converted from Dunk Mania (DM1 Ver.A)
+ROM_START( ptblank2a )
+	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 ) /* main prg */
+	ROM_LOAD16_BYTE( "gnb2vera.2l",  0x0000000, 0x100000, CRC(4926599d) SHA1(acb5e37d5f5d9e9ade0e92c9574cccdd0f7388e0) )
+	ROM_LOAD16_BYTE( "gnb2vera.2j",  0x0000001, 0x100000, CRC(2aba8c09) SHA1(18c31f4bde3b90ef7b3ca7cc07da4a3c146fa2c1) )
+	ROM_LOAD16_BYTE( "gnb1vera.2k",  0x0200000, 0x100000, CRC(e6335e4e) SHA1(9067f05d848c1c8a88967a3c6552d2d24e80672b) )
+	ROM_LOAD16_BYTE( "gnb1vera.2f",  0x0200001, 0x100000, CRC(2bb7eb6d) SHA1(d1b1e031a28443140ac8652dfd77a65a042b67fc) )
+
+	ROM_REGION32_LE( 0x2000000, "bankedroms", 0 ) /* main data */
+	ROM_LOAD16_BYTE( "gnb2prg.1",    0x0000000, 0x400000, CRC(8a8e77c3) SHA1(1a37e04a0acd1ab8c5fcbf807f24fd22f1d90a82) ) // == same data as the 64Mbit ROMs
+	ROM_LOAD16_BYTE( "gnb2prg.2",    0x0000001, 0x400000, CRC(563edc3f) SHA1(d691560bded88fe7738de01b293f1e761ab9304c) )
+	ROM_LOAD16_BYTE( "gnb2prg.3",    0x0800000, 0x400000, CRC(94fbe733) SHA1(74634c3680d22697c1cc3059c2bbe1703e77ddf1) )
+	ROM_LOAD16_BYTE( "gnb2prg.4",    0x0800001, 0x400000, CRC(1cbe79a6) SHA1(46e9f72c121ece3457b2f66413489ce6568e5510) )
+
+	ROM_REGION16_LE( 0x80000, "c76", 0 ) /* sound data */
+	ROM_LOAD( "gnb1vera.6d",  0x0000000, 0x040000, CRC(6461ae77) SHA1(1377b716a69ef9d4d2e48083d23f22bd5c103c00) )
+
+	ROM_REGION( 0x1000000, "c352", 0 ) /* samples */
+	ROM_LOAD( "gnb1wave.8k",  0x0000000, 0x400000, CRC(4e19d9d6) SHA1(0a92c987536999a789663a30c787950ab6995128) )
+	ROM_RELOAD( 0x800000, 0x400000 )
+ROM_END
+
+// no rom labels, converted from Kosodate Quiz My Angel 3 (KQT1 Ver B)
+ROM_START( ptblank2b )
+	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 ) /* main prg */
+	ROM_LOAD( "gnb2vera.1j",         0x0000000, 0x200000, CRC(df0bc5f0) SHA1(ccd5cac2c8cef73dae971d256afec58d4b897430) ) // == gnb2vera.2l + gnb2vera.2j interleaved
+	ROM_LOAD( "gnb2vera.1l",         0x0200000, 0x200000, CRC(8a274d96) SHA1(9ae0932e5dba2a052dc4977c76bde2e0c5f39d54) ) // == gnb1vera.2k + gnb1vera.2f interleaved
+
+	ROM_REGION32_LE( 0x2000000, "bankedroms", 0 ) /* main data */
+	ROM_LOAD16_BYTE( "gnb2prg.1",    0x0000000, 0x400000, CRC(8a8e77c3) SHA1(1a37e04a0acd1ab8c5fcbf807f24fd22f1d90a82) ) // == same data as the 64Mbit ROMs
+	ROM_LOAD16_BYTE( "gnb2prg.2",    0x0000001, 0x400000, CRC(563edc3f) SHA1(d691560bded88fe7738de01b293f1e761ab9304c) )
+	ROM_LOAD16_BYTE( "gnb2prg.3",    0x0800000, 0x400000, CRC(94fbe733) SHA1(74634c3680d22697c1cc3059c2bbe1703e77ddf1) )
+	ROM_LOAD16_BYTE( "gnb2prg.4",    0x0800001, 0x400000, CRC(1cbe79a6) SHA1(46e9f72c121ece3457b2f66413489ce6568e5510) )
+
+	ROM_REGION16_LE( 0x80000, "c76", 0 ) /* sound data */
+	ROM_LOAD( "gnb1vera.7e",  0x0000000, 0x040000, CRC(6461ae77) SHA1(1377b716a69ef9d4d2e48083d23f22bd5c103c00) )
+
+	ROM_REGION( 0x1000000, "c352", 0 ) /* samples */
+	ROM_LOAD( "gnb1wave.8k",  0x0000000, 0x400000, CRC(4e19d9d6) SHA1(0a92c987536999a789663a30c787950ab6995128) )
+	ROM_RELOAD( 0x800000, 0x400000 )
+ROM_END
+
 ROM_START( ptblank2ua )
 	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 ) /* main prg */
 	ROM_LOAD16_BYTE( "gnb3vera.2l",  0x0000000, 0x100000, CRC(57ad719a) SHA1(f22a02d33c7c23cccffb8ce2e3aca26b07ecac0a) )
 	ROM_LOAD16_BYTE( "gnb3vera.2j",  0x0000001, 0x100000, CRC(0378af98) SHA1(601444b5a0935a4b69b5ada618aaf1bc6bb12a3b) )
-	ROM_LOAD16_BYTE( "gnb3vera.2k",  0x0200000, 0x100000, CRC(e6335e4e) SHA1(9067f05d848c1c8a88967a3c6552d2d24e80672b) )
-	ROM_LOAD16_BYTE( "gnb3vera.2f",  0x0200001, 0x100000, CRC(2bb7eb6d) SHA1(d1b1e031a28443140ac8652dfd77a65a042b67fc) )
+	ROM_LOAD16_BYTE( "gnb1vera.2k",  0x0200000, 0x100000, CRC(e6335e4e) SHA1(9067f05d848c1c8a88967a3c6552d2d24e80672b) )
+	ROM_LOAD16_BYTE( "gnb1vera.2f",  0x0200001, 0x100000, CRC(2bb7eb6d) SHA1(d1b1e031a28443140ac8652dfd77a65a042b67fc) )
 
 	ROM_REGION32_LE( 0x2000000, "bankedroms", 0 ) /* main data */
 	ROM_LOAD16_BYTE( "gnb1prg0l.ic2", 0x000000, 0x800000, CRC(78746037) SHA1(d130ca1153a730e3c967945248f00662f9fab304) )
@@ -1399,7 +1426,7 @@ ROM_END
 ROM_START( starswepj )
 	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 ) /* main prg */
 	ROM_LOAD( "stp1vera.1j",         0x0000000, 0x200000, CRC(ef83e126) SHA1(f721b43358cedad0f28af5d2b292b44043fd47a0) )
-	ROM_LOAD( "stp1vera.1l",         0x0200000, 0x200000, CRC(0ee7fe1e) SHA1(8c2f5b0e7b49dbe0e8105bf55c493acd46a4f59d) )
+	ROM_LOAD( "stp1vera.1l",         0x0200000, 0x200000, CRC(0ee7fe1e) SHA1(8c2f5b0e7b49dbe0e8105bf55c493acd46a4f59d) ) // == stp2vera.2k + stp2vera.2f interleaved
 
 	ROM_REGION16_LE( 0x80000, "c76", 0 ) /* sound data */
 	ROM_LOAD( "stp1sprog.7e", 0x0000000, 0x040000, CRC(08aaaf6a) SHA1(51c913a39ff7c154aef8bb10139cc8b92eb4756a) )
@@ -1643,8 +1670,8 @@ ROM_END
 
 ROM_START( xevi3dg ) /* PCB was stickered as XV3 2 / VER.B */
 	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 ) /* main prg */
-	ROM_LOAD16_BYTE( "xv32vera.2l",  0x0000000, 0x100000, CRC(6ffcceac) SHA1(b26b1c38680a818335748554eee50f6290ae23d2) )
-	ROM_LOAD16_BYTE( "xv32vera.2j",  0x0000001, 0x100000, CRC(c096dd18) SHA1(195e080f833b8854d9011d5eb50b9e556954903f) )
+	ROM_LOAD16_BYTE( "xv32verb.2l",  0x0000000, 0x100000, CRC(6ffcceac) SHA1(b26b1c38680a818335748554eee50f6290ae23d2) )
+	ROM_LOAD16_BYTE( "xv32verb.2j",  0x0000001, 0x100000, CRC(c096dd18) SHA1(195e080f833b8854d9011d5eb50b9e556954903f) )
 	ROM_LOAD16_BYTE( "xv31vera.2k",  0x0200000, 0x100000, CRC(3d58138e) SHA1(9203d6bdc2d968de818d5f465523cc030217dcf8) )
 	ROM_LOAD16_BYTE( "xv31vera.2f",  0x0200001, 0x100000, CRC(9e8780a2) SHA1(83148d55456b2b92969f7ac2bdb2d492bf969895) )
 
@@ -1658,6 +1685,29 @@ ROM_START( xevi3dg ) /* PCB was stickered as XV3 2 / VER.B */
 
 	ROM_REGION16_LE( 0x80000, "c76", 0 ) /* sound data */
 	ROM_LOAD( "xv31sprog.6d", 0x0000000, 0x040000, CRC(e50b856a) SHA1(631da4f60c9ce08387fca26a70481a2fdacf9765) )
+
+	ROM_REGION( 0x1000000, "c352", 0 ) /* samples */
+	ROM_LOAD( "xv31wave.8k",  0x000000, 0x400000, CRC(14f25ddd) SHA1(4981cf1017432ff85b768ec88c36f535df30b783) )
+	ROM_RELOAD( 0x800000, 0x400000 )
+ROM_END
+
+ROM_START( xevi3dga )
+	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 ) /* main prg */
+	ROM_LOAD16_BYTE( "xv32vera.2l",  0x0000000, 0x100000, CRC(bb5c0f1b) SHA1(b021fce7237208e95c138d8ad1bdbdcbafd3796e) )
+	ROM_LOAD16_BYTE( "xv32vera.2j",  0x0000001, 0x100000, CRC(21e20037) SHA1(f383150e9a0e5d0d96a0be661dfb5d3d09cb2518) )
+	ROM_LOAD16_BYTE( "xv31vera.2k",  0x0200000, 0x100000, CRC(3d58138e) SHA1(9203d6bdc2d968de818d5f465523cc030217dcf8) )
+	ROM_LOAD16_BYTE( "xv31vera.2f",  0x0200001, 0x100000, CRC(9e8780a2) SHA1(83148d55456b2b92969f7ac2bdb2d492bf969895) )
+
+	ROM_REGION32_LE( 0x1000000, "bankedroms", 0 ) /* main data */
+	ROM_LOAD16_BYTE( "xv31rom0l.ic5", 0x0000000, 0x200000, CRC(24e1e262) SHA1(84df49b22a8a36284da771944a8390672a0c32bf) )
+	ROM_LOAD16_BYTE( "xv31rom0u.ic6", 0x0000001, 0x200000, CRC(cae38ef3) SHA1(2dfe0b31969091975e8d8c8188ce7dd007e4a0f3) )
+	ROM_LOAD16_BYTE( "xv31rom1l.ic3", 0x0400000, 0x200000, CRC(46b4cb72) SHA1(c3360c4fdb71ffcbccec3f4ad8d7963b08822e26) )
+	ROM_LOAD16_BYTE( "xv31rom1u.ic8", 0x0400001, 0x200000, CRC(be0eb5d1) SHA1(f1a0adcb7c65bbba723fe09b07280b0b924d6b19) )
+	ROM_LOAD16_BYTE( "xv31rom2l.ic4", 0x0800000, 0x200000, CRC(8403a277) SHA1(35193211351494a086d8422e3b0b71a8d3a262a6) )
+	ROM_LOAD16_BYTE( "xv31rom2u.ic7", 0x0800001, 0x200000, CRC(ecf70432) SHA1(bec128a215e0aef66e9a8707bb0d1eb7b098a356) )
+
+	ROM_REGION16_LE( 0x80000, "c76", 0 ) /* sound data */
+	ROM_LOAD( "xv31sprog.6d", 0x000000, 0x040000, CRC(7e9fc6a0) SHA1(7f8f1bb9c55f0de0d21c20128806ee9e8a821504) )
 
 	ROM_REGION( 0x1000000, "c352", 0 ) /* samples */
 	ROM_LOAD( "xv31wave.8k",  0x000000, 0x400000, CRC(14f25ddd) SHA1(4981cf1017432ff85b768ec88c36f535df30b783) )
@@ -1695,30 +1745,33 @@ ROM_END
 9 = Location Test
 */
 
-GAME( 1994, tekken,     0,        tekken,     tekken,     namcos11_state, 0, ROT0, "Namco",         "Tekken (World, TE2/VER.C)",                    MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, tekkenac,   tekken,   tekken,     tekken,     namcos11_state, 0, ROT0, "Namco",         "Tekken (Asia, TE4/VER.C)",                     MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, tekkenb,    tekken,   tekken,     tekken,     namcos11_state, 0, ROT0, "Namco",         "Tekken (World, TE2/VER.B)",                    MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, tekkenjb,   tekken,   tekken,     tekken,     namcos11_state, 0, ROT0, "Namco",         "Tekken (Japan, TE1/VER.B)",                    MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, tekken2,    0,        tekken2,    tekken,     namcos11_state, 0, ROT0, "Namco",         "Tekken 2 Ver.B (US, TES3/VER.D)",              MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, tekken2ub,  tekken2,  tekken2o,   tekken,     namcos11_state, 0, ROT0, "Namco",         "Tekken 2 Ver.B (US, TES3/VER.B)",              MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, tekken2b,   tekken2,  tekken2o,   tekken,     namcos11_state, 0, ROT0, "Namco",         "Tekken 2 Ver.B (World, TES2/VER.B)",           MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, tekken2jc,  tekken2,  tekken2o,   tekken,     namcos11_state, 0, ROT0, "Namco",         "Tekken 2 Ver.B (Japan, TES1/VER.C)",           MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, tekken2jb,  tekken2,  tekken2o,   tekken,     namcos11_state, 0, ROT0, "Namco",         "Tekken 2 Ver.B (Japan, TES1/VER.B)",           MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, tekken2a,   tekken2,  tekken2o,   tekken,     namcos11_state, 0, ROT0, "Namco",         "Tekken 2 (World, TES2/VER.A)",                 MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, souledge,   0,        souledge,   souledge,   namcos11_state, 0, ROT0, "Namco",         "Soul Edge Ver. II (Asia, SO4/VER.C)",          MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, souledgeuc, souledge, souledge,   souledge,   namcos11_state, 0, ROT0, "Namco",         "Soul Edge Ver. II (US, SO3/VER.C)",            MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, souledgea,  souledge, souledge,   souledge,   namcos11_state, 0, ROT0, "Namco",         "Soul Edge (World, SO2/VER.A)",                 MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, souledgeua, souledge, souledge,   souledge,   namcos11_state, 0, ROT0, "Namco",         "Soul Edge (US, SO3/VER.A)",                    MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, souledgeja, souledge, souledge,   souledge,   namcos11_state, 0, ROT0, "Namco",         "Soul Edge (Japan, SO1/VER.A)",                 MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, dunkmnia,   0,        dunkmnia,   namcos11,   namcos11_state, 0, ROT0, "Namco",         "Dunk Mania (World, DM2/VER.C)",                MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, dunkmniajc, dunkmnia, dunkmnia,   namcos11,   namcos11_state, 0, ROT0, "Namco",         "Dunk Mania (Japan, DM1/VER.C)",                MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, xevi3dg,    0,        xevi3dg,    namcos11,   namcos11_state, 0, ROT0, "Namco",         "Xevious 3D/G (World, XV32/VER.A)",             MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, xevi3dgj,   xevi3dg,  xevi3dg,    namcos11,   namcos11_state, 0, ROT0, "Namco",         "Xevious 3D/G (Japan, XV31/VER.A)",             MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, primglex,   0,        primglex,   tekken,     namcos11_state, 0, ROT0, "Namco",         "Prime Goal EX (Japan, PG1/VER.A)",             MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, danceyes,   0,        danceyes,   namcos11,   namcos11_state, 0, ROT0, "Namco",         "Dancing Eyes (US, DC3/VER.C)",                 MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, danceyesj,  danceyes, danceyes,   namcos11,   namcos11_state, 0, ROT0, "Namco",         "Dancing Eyes (Japan, DC1/VER.A)",              MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, pocketrc,   0,        pocketrc,   pocketrc,   namcos11_state, 0, ROT0, "Namco",         "Pocket Racer (Japan, PKR1/VER.B)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
-GAME( 1997, starswep,   0,        starswep,   namcos11,   namcos11_state, 0, ROT0, "Axela / Namco", "Star Sweep (World, STP2/VER.A)",               MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, starswepj,  starswep, starswep,   namcos11,   namcos11_state, 0, ROT0, "Axela / Namco", "Star Sweep (Japan, STP1/VER.A)",               MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, myangel3,   0,        myangel3,   myangel3,   namcos11_state, 0, ROT0, "MOSS / Namco",  "Kosodate Quiz My Angel 3 (Japan, KQT1/VER.A)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, ptblank2ua, ptblank2, ptblank2ua, ptblank2ua, namcos11_state, 0, ROT0, "Namco",         "Point Blank 2 (US, GNB3/VER.A)",               MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, tekken,     0,        tekken,     tekken,     namcos11_state, empty_init, ROT0, "Namco",         "Tekken (World, TE2/VER.C)",                    0 )
+GAME( 1994, tekkenac,   tekken,   tekken,     tekken,     namcos11_state, empty_init, ROT0, "Namco",         "Tekken (Asia, TE4/VER.C)",                     0 )
+GAME( 1994, tekkenb,    tekken,   tekken,     tekken,     namcos11_state, empty_init, ROT0, "Namco",         "Tekken (World, TE2/VER.B)",                    0 )
+GAME( 1994, tekkenjb,   tekken,   tekken,     tekken,     namcos11_state, empty_init, ROT0, "Namco",         "Tekken (Japan, TE1/VER.B)",                    0 )
+GAME( 1996, tekken2,    0,        tekken2,    tekken,     namcos11_state, empty_init, ROT0, "Namco",         "Tekken 2 Ver.B (US, TES3/VER.D)",              0 )
+GAME( 1995, tekken2ub,  tekken2,  tekken2o,   tekken,     namcos11_state, empty_init, ROT0, "Namco",         "Tekken 2 Ver.B (US, TES3/VER.B)",              0 )
+GAME( 1995, tekken2b,   tekken2,  tekken2o,   tekken,     namcos11_state, empty_init, ROT0, "Namco",         "Tekken 2 Ver.B (World, TES2/VER.B)",           0 )
+GAME( 1995, tekken2jc,  tekken2,  tekken2o,   tekken,     namcos11_state, empty_init, ROT0, "Namco",         "Tekken 2 Ver.B (Japan, TES1/VER.C)",           0 )
+GAME( 1995, tekken2jb,  tekken2,  tekken2o,   tekken,     namcos11_state, empty_init, ROT0, "Namco",         "Tekken 2 Ver.B (Japan, TES1/VER.B)",           0 )
+GAME( 1995, tekken2a,   tekken2,  tekken2o,   tekken,     namcos11_state, empty_init, ROT0, "Namco",         "Tekken 2 (World, TES2/VER.A)",                 0 )
+GAME( 1996, souledge,   0,        souledge,   souledge,   namcos11_state, empty_init, ROT0, "Namco",         "Soul Edge Ver. II (Asia, SO4/VER.C)",          0 )
+GAME( 1995, souledgeuc, souledge, souledge,   souledge,   namcos11_state, empty_init, ROT0, "Namco",         "Soul Edge Ver. II (US, SO3/VER.C)",            0 )
+GAME( 1995, souledgea,  souledge, souledge,   souledge,   namcos11_state, empty_init, ROT0, "Namco",         "Soul Edge (World, SO2/VER.A)",                 0 )
+GAME( 1995, souledgeua, souledge, souledge,   souledge,   namcos11_state, empty_init, ROT0, "Namco",         "Soul Edge (US, SO3/VER.A)",                    0 )
+GAME( 1995, souledgeja, souledge, souledge,   souledge,   namcos11_state, empty_init, ROT0, "Namco",         "Soul Edge (Japan, SO1/VER.A)",                 0 )
+GAME( 1995, dunkmnia,   0,        dunkmnia,   namcos11,   namcos11_state, empty_init, ROT0, "Namco",         "Dunk Mania (World, DM2/VER.C)",                0 )
+GAME( 1995, dunkmniajc, dunkmnia, dunkmnia,   namcos11,   namcos11_state, empty_init, ROT0, "Namco",         "Dunk Mania (Japan, DM1/VER.C)",                0 )
+GAME( 1995, xevi3dg,    0,        xevi3dg,    namcos11,   namcos11_state, empty_init, ROT0, "Namco",         "Xevious 3D/G (World, XV32/VER.B)",             0 )
+GAME( 1995, xevi3dga,   xevi3dg,  xevi3dg,    namcos11,   namcos11_state, empty_init, ROT0, "Namco",         "Xevious 3D/G (World, XV32/VER.A)",             0 )
+GAME( 1995, xevi3dgj,   xevi3dg,  xevi3dg,    namcos11,   namcos11_state, empty_init, ROT0, "Namco",         "Xevious 3D/G (Japan, XV31/VER.A)",             0 )
+GAME( 1996, primglex,   0,        primglex,   tekken,     namcos11_state, empty_init, ROT0, "Namco",         "Prime Goal EX (Japan, PG1/VER.A)",             0 )
+GAME( 1996, danceyes,   0,        danceyes,   namcos11,   namcos11_state, empty_init, ROT0, "Namco",         "Dancing Eyes (US, DC3/VER.C)",                 0 )
+GAME( 1996, danceyesj,  danceyes, danceyes,   namcos11,   namcos11_state, empty_init, ROT0, "Namco",         "Dancing Eyes (Japan, DC1/VER.A)",              0 )
+GAME( 1996, pocketrc,   0,        pocketrc,   pocketrc,   namcos11_state, empty_init, ROT0, "Namco",         "Pocket Racer (Japan, PKR1/VER.B)",             MACHINE_NODEVICE_LAN )
+GAME( 1997, starswep,   0,        starswep,   namcos11,   namcos11_state, empty_init, ROT0, "Axela / Namco", "Star Sweep (World, STP2/VER.A)",               0 )
+GAME( 1997, starswepj,  starswep, starswep,   namcos11,   namcos11_state, empty_init, ROT0, "Axela / Namco", "Star Sweep (Japan, STP1/VER.A)",               0 )
+GAME( 1998, myangel3,   0,        myangel3,   myangel3,   namcos11_state, empty_init, ROT0, "MOSS / Namco",  "Kosodate Quiz My Angel 3 (Japan, KQT1/VER.A)", 0 )
+GAME( 1999, ptblank2a,  ptblank2 ,ptblank2ua, ptblank2ua, namcos11_state, empty_init, ROT0, "Namco",         "Point Blank 2 (World, GNB2/VER.A)",            0 )
+GAME( 1999, ptblank2b,  ptblank2 ,ptblank2ua, ptblank2ua, namcos11_state, empty_init, ROT0, "Namco",         "Point Blank 2 (World, GNB2/VER.A alt)",        0 )
+GAME( 1999, ptblank2ua, ptblank2, ptblank2ua, ptblank2ua, namcos11_state, empty_init, ROT0, "Namco",         "Point Blank 2 (US, GNB3/VER.A)",               0 )

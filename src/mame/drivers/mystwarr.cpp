@@ -84,7 +84,7 @@ Notes:
       054986A - Audio DAC/filter + sound latch + Z80 memory mapper/banker (large ceramic SDIP64 module)
                 This module contains several surface mounted capacitors and resistors, 4558 OP amp,
                 Analog Devices AD1868 dual 18-bit audio DAC and a Konami 054321 QFP44 IC. Clock input 8.000MHz [32/4]
-      054983  - MMI PAL16L8
+      055983  - MMI PAL16L8
       056371  - MMI PAL20L10
 
       Sync Measurements
@@ -251,7 +251,7 @@ WRITE16_MEMBER(mystwarr_state::sound_irq_w)
 
 WRITE16_MEMBER(mystwarr_state::irq_ack_w)
 {
-	m_k056832->b_word_w(space, offset, data, mem_mask);
+	m_k056832->b_word_w(offset, data, mem_mask);
 
 	if (offset == 3 && ACCESSING_BITS_0_7)
 	{
@@ -271,7 +271,7 @@ READ16_MEMBER(mystwarr_state::k053247_scattered_word_r)
 	else
 	{
 		offset = (offset & 0x0007) | ((offset & 0x7f80) >> 4);
-		return m_k055673->k053247_word_r(space,offset,mem_mask);
+		return m_k055673->k053247_word_r(offset);
 	}
 }
 
@@ -286,7 +286,7 @@ WRITE16_MEMBER(mystwarr_state::k053247_scattered_word_w)
 	{
 		offset = (offset & 0x0007) | ((offset & 0x7f80) >> 4);
 
-		m_k055673->k053247_word_w(space,offset,data,mem_mask);
+		m_k055673->k053247_word_w(offset,data,mem_mask);
 	}
 }
 
@@ -296,23 +296,23 @@ void mystwarr_state::mystwarr_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom(); // main program
 	map(0x200000, 0x20ffff).ram().share("gx_workram");
-	map(0x400000, 0x40ffff).rw(this, FUNC(mystwarr_state::k053247_scattered_word_r), FUNC(mystwarr_state::k053247_scattered_word_w)).share("spriteram");
+	map(0x400000, 0x40ffff).rw(FUNC(mystwarr_state::k053247_scattered_word_r), FUNC(mystwarr_state::k053247_scattered_word_w)).share("spriteram");
 	map(0x480000, 0x4800ff).w(m_k055555, FUNC(k055555_device::K055555_word_w));
 	map(0x482000, 0x48200f).r(m_k055673, FUNC(k055673_device::k055673_rom_word_r));
 	map(0x482010, 0x48201f).w(m_k055673, FUNC(k055673_device::k055673_reg_word_w));
-	map(0x484000, 0x484007).w(m_k055673, FUNC(k055673_device::k053246_word_w));
+	map(0x484000, 0x484007).w(m_k055673, FUNC(k055673_device::k053246_w));
 	map(0x48a000, 0x48a01f).w(m_k054338, FUNC(k054338_device::word_w));
 	map(0x48c000, 0x48c03f).w(m_k056832, FUNC(k056832_device::word_w));
-	map(0x490000, 0x490001).w(this, FUNC(mystwarr_state::mweeprom_w));
+	map(0x490000, 0x490001).w(FUNC(mystwarr_state::mweeprom_w));
 	map(0x492000, 0x492001).noprw();    // watchdog
 	map(0x494000, 0x494001).portr("P1_P2");
 	map(0x494002, 0x494003).portr("P3_P4");
 	map(0x496000, 0x496001).portr("IN0");
-	map(0x496002, 0x496003).r(this, FUNC(mystwarr_state::eeprom_r));
+	map(0x496002, 0x496003).r(FUNC(mystwarr_state::eeprom_r));
 	map(0x498000, 0x49801f).m(m_k054321, FUNC(k054321_device::main_map)).umask16(0x00ff);
-	map(0x49a000, 0x49a001).w(this, FUNC(mystwarr_state::sound_irq_w));
+	map(0x49a000, 0x49a001).w(FUNC(mystwarr_state::sound_irq_w));
 	map(0x49c000, 0x49c01f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write)).umask16(0x00ff);
-	map(0x49e000, 0x49e007).w(this, FUNC(mystwarr_state::irq_ack_w));    // VSCCS (custom)
+	map(0x49e000, 0x49e007).w(FUNC(mystwarr_state::irq_ack_w));    // VSCCS (custom)
 	map(0x600000, 0x601fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));
 	map(0x602000, 0x603fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w)); // tilemap RAM mirror read(essential)
 	map(0x680000, 0x683fff).r(m_k056832, FUNC(k056832_device::mw_rom_word_r));
@@ -326,7 +326,7 @@ void mystwarr_state::metamrph_map(address_map &map)
 	map(0x200000, 0x20ffff).ram().share("gx_workram");
 	map(0x210000, 0x210fff).rw(m_k055673, FUNC(k055673_device::k053247_word_r), FUNC(k055673_device::k053247_word_w));
 	map(0x211000, 0x21ffff).ram();
-	map(0x240000, 0x240007).w(m_k055673, FUNC(k055673_device::k053246_word_w));
+	map(0x240000, 0x240007).w(m_k055673, FUNC(k055673_device::k053246_w));
 	map(0x244000, 0x24400f).r(m_k055673, FUNC(k055673_device::k055673_rom_word_r));
 	map(0x244010, 0x24401f).w(m_k055673, FUNC(k055673_device::k055673_reg_word_w));
 	map(0x24c000, 0x24ffff).rw("k053250_1", FUNC(k053250_device::ram_r), FUNC(k053250_device::ram_w));
@@ -334,16 +334,16 @@ void mystwarr_state::metamrph_map(address_map &map)
 	map(0x254000, 0x25401f).w(m_k054338, FUNC(k054338_device::word_w));
 	map(0x258000, 0x2580ff).w(m_k055555, FUNC(k055555_device::K055555_word_w));
 	map(0x260000, 0x26001f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write)).umask16(0x00ff);
-	map(0x264000, 0x264001).w(this, FUNC(mystwarr_state::sound_irq_w));
+	map(0x264000, 0x264001).w(FUNC(mystwarr_state::sound_irq_w));
 	map(0x268000, 0x26801f).m(m_k054321, FUNC(k054321_device::main_map)).umask16(0x00ff);
 	map(0x26c000, 0x26c007).w(m_k056832, FUNC(k056832_device::b_word_w));
 	map(0x270000, 0x27003f).w(m_k056832, FUNC(k056832_device::word_w));
 	map(0x274000, 0x274001).portr("P1_P3");
 	map(0x274002, 0x274003).portr("P2_P4");
 	map(0x278000, 0x278001).portr("IN0");
-	map(0x278002, 0x278003).r(this, FUNC(mystwarr_state::eeprom_r));
+	map(0x278002, 0x278003).r(FUNC(mystwarr_state::eeprom_r));
 	map(0x27c000, 0x27c001).nopr(); // watchdog lives here
-	map(0x27c000, 0x27c001).w(this, FUNC(mystwarr_state::mmeeprom_w));
+	map(0x27c000, 0x27c001).w(FUNC(mystwarr_state::mmeeprom_w));
 	map(0x300000, 0x301fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));
 	map(0x302000, 0x303fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w)); // tilemap RAM mirror read/write (essential)
 	map(0x310000, 0x311fff).r(m_k056832, FUNC(k056832_device::mw_rom_word_r));
@@ -358,25 +358,25 @@ void mystwarr_state::viostorm_map(address_map &map)
 	map(0x200000, 0x20ffff).ram().share("gx_workram");
 	map(0x210000, 0x210fff).rw(m_k055673, FUNC(k055673_device::k053247_word_r), FUNC(k055673_device::k053247_word_w));
 	map(0x211000, 0x21ffff).ram();
-	map(0x240000, 0x240007).w(m_k055673, FUNC(k055673_device::k053246_word_w));
+	map(0x240000, 0x240007).w(m_k055673, FUNC(k055673_device::k053246_w));
 	map(0x244000, 0x24400f).r(m_k055673, FUNC(k055673_device::k055673_rom_word_r));
 	map(0x244010, 0x24401f).w(m_k055673, FUNC(k055673_device::k055673_reg_word_w));
 	map(0x24c000, 0x24ffff).ram();     // K053250 ram
 	map(0x250000, 0x25000f).ram();     // K053250 reg
 	map(0x254000, 0x25401f).w(m_k054338, FUNC(k054338_device::word_w));
 	map(0x258000, 0x2580ff).w(m_k055555, FUNC(k055555_device::K055555_word_w));
-	map(0x25c000, 0x25c03f).rw(this, FUNC(mystwarr_state::K055550_word_r), FUNC(mystwarr_state::K055550_word_w));
+	map(0x25c000, 0x25c03f).rw(FUNC(mystwarr_state::K055550_word_r), FUNC(mystwarr_state::K055550_word_w));
 	map(0x260000, 0x26001f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write)).umask16(0x00ff);
-	map(0x264000, 0x264001).w(this, FUNC(mystwarr_state::sound_irq_w));
+	map(0x264000, 0x264001).w(FUNC(mystwarr_state::sound_irq_w));
 	map(0x268000, 0x26801f).m(m_k054321, FUNC(k054321_device::main_map)).umask16(0x00ff);
 	map(0x26c000, 0x26c007).w(m_k056832, FUNC(k056832_device::b_word_w));
 	map(0x270000, 0x27003f).w(m_k056832, FUNC(k056832_device::word_w));
 	map(0x274000, 0x274001).portr("P1_P3");
 	map(0x274002, 0x274003).portr("P2_P4");
 	map(0x278000, 0x278001).portr("IN0");
-	map(0x278002, 0x278003).r(this, FUNC(mystwarr_state::eeprom_r));
+	map(0x278002, 0x278003).r(FUNC(mystwarr_state::eeprom_r));
 	map(0x27c000, 0x27c001).nopr();     // watchdog lives here
-	map(0x27c000, 0x27c001).w(this, FUNC(mystwarr_state::mmeeprom_w));
+	map(0x27c000, 0x27c001).w(FUNC(mystwarr_state::mmeeprom_w));
 	map(0x300000, 0x301fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));
 	map(0x302000, 0x303fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w)); // tilemap RAM mirror read(essential)
 	map(0x304000, 0x3041ff).ram();
@@ -392,7 +392,7 @@ READ16_MEMBER(mystwarr_state::k053247_martchmp_word_r)
 	else
 	{
 		offset = (offset & 0x0007) | ((offset & 0x1fe0) >> 2);
-		return m_k055673->k053247_word_r(space,offset,mem_mask);
+		return m_k055673->k053247_word_r(offset);
 	}
 }
 
@@ -406,7 +406,7 @@ WRITE16_MEMBER(mystwarr_state::k053247_martchmp_word_w)
 	{
 		offset = (offset & 0x0007) | ((offset & 0x1fe0) >> 2);
 
-		m_k055673->k053247_word_w(space,offset,data,mem_mask);
+		m_k055673->k053247_word_w(offset,data,mem_mask);
 	}
 }
 
@@ -455,21 +455,21 @@ void mystwarr_state::martchmp_map(address_map &map)
 	map(0x400000, 0x4000ff).w(m_k055555, FUNC(k055555_device::K055555_word_w));                // PCU2
 	map(0x402000, 0x40200f).r(m_k055673, FUNC(k055673_device::k055673_rom_word_r));         // sprite ROM readback
 	map(0x402010, 0x40201f).w(m_k055673, FUNC(k055673_device::k055673_reg_word_w));            // OBJSET2
-	map(0x404000, 0x404007).w(m_k055673, FUNC(k055673_device::k053246_word_w));                // OBJSET1
+	map(0x404000, 0x404007).w(m_k055673, FUNC(k055673_device::k053246_w));                // OBJSET1
 	map(0x40a000, 0x40a01f).w(m_k054338, FUNC(k054338_device::word_w));                // CLTC
 	map(0x40c000, 0x40c03f).w(m_k056832, FUNC(k056832_device::word_w));                // VACSET
-	map(0x40e000, 0x40e03f).w(this, FUNC(mystwarr_state::K053990_martchmp_word_w));      // protection
-	map(0x410000, 0x410001).w(this, FUNC(mystwarr_state::mceeprom_w));
-	map(0x412000, 0x412001).rw(this, FUNC(mystwarr_state::mccontrol_r), FUNC(mystwarr_state::mccontrol_w));
+	map(0x40e000, 0x40e03f).w(FUNC(mystwarr_state::K053990_martchmp_word_w));      // protection
+	map(0x410000, 0x410001).w(FUNC(mystwarr_state::mceeprom_w));
+	map(0x412000, 0x412001).rw(FUNC(mystwarr_state::mccontrol_r), FUNC(mystwarr_state::mccontrol_w));
 	map(0x414000, 0x414001).portr("P1_P2");
 	map(0x414002, 0x414003).portr("P3_P4");
 	map(0x416000, 0x416001).portr("IN0");
-	map(0x416002, 0x416003).r(this, FUNC(mystwarr_state::eeprom_r));                  // eeprom read
+	map(0x416002, 0x416003).r(FUNC(mystwarr_state::eeprom_r));                  // eeprom read
 	map(0x418000, 0x41801f).m(m_k054321, FUNC(k054321_device::main_map)).umask16(0x00ff);
-	map(0x41a000, 0x41a001).w(this, FUNC(mystwarr_state::sound_irq_w));
+	map(0x41a000, 0x41a001).w(FUNC(mystwarr_state::sound_irq_w));
 	map(0x41c000, 0x41c01f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write)).umask16(0x00ff);              // CCU
 	map(0x41e000, 0x41e007).w(m_k056832, FUNC(k056832_device::b_word_w));              // VSCCS
-	map(0x480000, 0x483fff).rw(this, FUNC(mystwarr_state::k053247_martchmp_word_r), FUNC(mystwarr_state::k053247_martchmp_word_w)).share("spriteram");    // sprite RAM
+	map(0x480000, 0x483fff).rw(FUNC(mystwarr_state::k053247_martchmp_word_r), FUNC(mystwarr_state::k053247_martchmp_word_w)).share("spriteram");    // sprite RAM
 	map(0x600000, 0x601fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");                     // palette RAM
 	map(0x680000, 0x681fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w)); // tilemap RAM
 	map(0x682000, 0x683fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w)); // tilemap RAM mirror read/write (essential)
@@ -480,11 +480,11 @@ void mystwarr_state::martchmp_map(address_map &map)
 void mystwarr_state::dadandrn_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom();                         // main program and data ROM
-	map(0x400000, 0x40ffff).rw(this, FUNC(mystwarr_state::k053247_scattered_word_r), FUNC(mystwarr_state::k053247_scattered_word_w)).share("spriteram");
+	map(0x400000, 0x40ffff).rw(FUNC(mystwarr_state::k053247_scattered_word_r), FUNC(mystwarr_state::k053247_scattered_word_w)).share("spriteram");
 	map(0x410000, 0x411fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w)); // tilemap RAM
 	map(0x412000, 0x413fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w)); // tilemap RAM mirror read/write (essential)
 	map(0x420000, 0x421fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x430000, 0x430007).w(m_k055673, FUNC(k055673_device::k053246_word_w));
+	map(0x430000, 0x430007).w(m_k055673, FUNC(k055673_device::k053246_w));
 	map(0x440000, 0x443fff).r(m_k056832, FUNC(k056832_device::mw_rom_word_r));
 	map(0x450000, 0x45000f).r(m_k055673, FUNC(k055673_device::k055673_rom_word_r));
 	map(0x450010, 0x45001f).w(m_k055673, FUNC(k055673_device::k055673_reg_word_w));
@@ -492,21 +492,21 @@ void mystwarr_state::dadandrn_map(address_map &map)
 	map(0x470000, 0x470fff).ram().share("k053936_0_li16");
 	map(0x480000, 0x48003f).w(m_k056832, FUNC(k056832_device::word_w));        // VACSET
 	map(0x482000, 0x482007).w(m_k056832, FUNC(k056832_device::b_word_w));  // VSCCS
-	map(0x484000, 0x484003).w(this, FUNC(mystwarr_state::ddd_053936_clip_w));
+	map(0x484000, 0x484003).w(FUNC(mystwarr_state::ddd_053936_clip_w));
 	map(0x486000, 0x48601f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write)).umask16(0x00ff);
 	map(0x488000, 0x4880ff).w(m_k055555, FUNC(k055555_device::K055555_word_w));
 	map(0x48a000, 0x48a01f).m(m_k054321, FUNC(k054321_device::main_map)).umask16(0xff00);
 	map(0x48c000, 0x48c01f).w(m_k054338, FUNC(k054338_device::word_w));
 	map(0x48e000, 0x48e001).portr("IN0_P1"); // bit 3 (0x8) is test switch
-	map(0x48e020, 0x48e021).r(this, FUNC(mystwarr_state::dddeeprom_r));
+	map(0x48e020, 0x48e021).r(FUNC(mystwarr_state::dddeeprom_r));
 	map(0x600000, 0x60ffff).ram().share("gx_workram");
-	map(0x680000, 0x68003f).rw(this, FUNC(mystwarr_state::K055550_word_r), FUNC(mystwarr_state::K055550_word_w));
-	map(0x6a0000, 0x6a0001).w(this, FUNC(mystwarr_state::mmeeprom_w));
-	map(0x6c0000, 0x6c0001).w(this, FUNC(mystwarr_state::ddd_053936_enable_w));
-	map(0x6e0000, 0x6e0001).w(this, FUNC(mystwarr_state::sound_irq_w));
-	map(0x800000, 0x87ffff).r(this, FUNC(mystwarr_state::ddd_053936_tilerom_0_r));    // 256k tilemap readback
-	map(0xa00000, 0xa7ffff).r(this, FUNC(mystwarr_state::ddd_053936_tilerom_1_r)); // 128k tilemap readback
-	map(0xc00000, 0xdfffff).r(this, FUNC(mystwarr_state::ddd_053936_tilerom_2_r));    // tile character readback
+	map(0x680000, 0x68003f).rw(FUNC(mystwarr_state::K055550_word_r), FUNC(mystwarr_state::K055550_word_w));
+	map(0x6a0000, 0x6a0001).w(FUNC(mystwarr_state::mmeeprom_w));
+	map(0x6c0000, 0x6c0001).w(FUNC(mystwarr_state::ddd_053936_enable_w));
+	map(0x6e0000, 0x6e0001).w(FUNC(mystwarr_state::sound_irq_w));
+	map(0x800000, 0x87ffff).r(FUNC(mystwarr_state::ddd_053936_tilerom_0_r));    // 256k tilemap readback
+	map(0xa00000, 0xa7ffff).r(FUNC(mystwarr_state::ddd_053936_tilerom_1_r)); // 128k tilemap readback
+	map(0xc00000, 0xdfffff).r(FUNC(mystwarr_state::ddd_053936_tilerom_2_r));    // tile character readback
 	map(0xe00000, 0xe00001).nopw();    // watchdog
 }
 
@@ -517,11 +517,11 @@ void mystwarr_state::dadandrn_map(address_map &map)
 void mystwarr_state::gaiapols_map(address_map &map)
 {
 	map(0x000000, 0x2fffff).rom();                             // main program
-	map(0x400000, 0x40ffff).rw(this, FUNC(mystwarr_state::k053247_scattered_word_r), FUNC(mystwarr_state::k053247_scattered_word_w)).share("spriteram");
+	map(0x400000, 0x40ffff).rw(FUNC(mystwarr_state::k053247_scattered_word_r), FUNC(mystwarr_state::k053247_scattered_word_w)).share("spriteram");
 	map(0x410000, 0x411fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));     // tilemap RAM
 	map(0x412000, 0x413fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));     // tilemap RAM mirror read / write (essential)
 	map(0x420000, 0x421fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x430000, 0x430007).w(m_k055673, FUNC(k055673_device::k053246_word_w));
+	map(0x430000, 0x430007).w(m_k055673, FUNC(k055673_device::k053246_w));
 	map(0x440000, 0x441fff).r(m_k056832, FUNC(k056832_device::mw_rom_word_r));
 	map(0x450000, 0x45000f).r(m_k055673, FUNC(k055673_device::k055673_rom_word_r));
 	map(0x450010, 0x45001f).w(m_k055673, FUNC(k055673_device::k055673_reg_word_w));
@@ -529,21 +529,21 @@ void mystwarr_state::gaiapols_map(address_map &map)
 	map(0x470000, 0x470fff).ram().share("k053936_0_li16");
 	map(0x480000, 0x48003f).w(m_k056832, FUNC(k056832_device::word_w));            // VACSET
 	map(0x482000, 0x482007).w(m_k056832, FUNC(k056832_device::b_word_w));          // VSCCS
-	map(0x484000, 0x484003).w(this, FUNC(mystwarr_state::ddd_053936_clip_w));
+	map(0x484000, 0x484003).w(FUNC(mystwarr_state::ddd_053936_clip_w));
 	map(0x486000, 0x48601f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write)).umask16(0x00ff);
 	map(0x488000, 0x4880ff).w(m_k055555, FUNC(k055555_device::K055555_word_w));
 	map(0x48a000, 0x48a01f).m(m_k054321, FUNC(k054321_device::main_map)).umask16(0xff00);
 	map(0x48c000, 0x48c01f).w(m_k054338, FUNC(k054338_device::word_w));
 	map(0x48e000, 0x48e001).portr("IN0_P1");             // bit 3 (0x8) is test switch
-	map(0x48e020, 0x48e021).r(this, FUNC(mystwarr_state::dddeeprom_r));
+	map(0x48e020, 0x48e021).r(FUNC(mystwarr_state::dddeeprom_r));
 	map(0x600000, 0x60ffff).ram().share("gx_workram");
-	map(0x660000, 0x6600ff).rw("k054000", FUNC(k054000_device::lsb_r), FUNC(k054000_device::lsb_w));
-	map(0x6a0000, 0x6a0001).w(this, FUNC(mystwarr_state::mmeeprom_w));
-	map(0x6c0000, 0x6c0001).w(this, FUNC(mystwarr_state::ddd_053936_enable_w));
-	map(0x6e0000, 0x6e0001).w(this, FUNC(mystwarr_state::sound_irq_w));
-	map(0x800000, 0x87ffff).r(this, FUNC(mystwarr_state::gai_053936_tilerom_0_r));    // 256k tilemap readback
-	map(0xa00000, 0xa7ffff).r(this, FUNC(mystwarr_state::ddd_053936_tilerom_1_r));    // 128k tilemap readback
-	map(0xc00000, 0xdfffff).r(this, FUNC(mystwarr_state::gai_053936_tilerom_2_r));    // tile character readback
+	map(0x660000, 0x6600ff).rw("k054000", FUNC(k054000_device::read), FUNC(k054000_device::write)).umask16(0x00ff);
+	map(0x6a0000, 0x6a0001).w(FUNC(mystwarr_state::mmeeprom_w));
+	map(0x6c0000, 0x6c0001).w(FUNC(mystwarr_state::ddd_053936_enable_w));
+	map(0x6e0000, 0x6e0001).w(FUNC(mystwarr_state::sound_irq_w));
+	map(0x800000, 0x87ffff).r(FUNC(mystwarr_state::gai_053936_tilerom_0_r));    // 256k tilemap readback
+	map(0xa00000, 0xa7ffff).r(FUNC(mystwarr_state::ddd_053936_tilerom_1_r));    // 128k tilemap readback
+	map(0xc00000, 0xdfffff).r(FUNC(mystwarr_state::gai_053936_tilerom_2_r));    // tile character readback
 	map(0xe00000, 0xe00001).nopw();    // watchdog
 }
 
@@ -566,7 +566,7 @@ WRITE8_MEMBER(mystwarr_state::sound_ctrl_w)
    quite similar to xexex/gijoe/asterix's sound.
  */
 
-void mystwarr_state::mystwarr_sound_map(address_map &map)
+void mystwarr_state::martchmp_sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("z80bank");
@@ -574,33 +574,18 @@ void mystwarr_state::mystwarr_sound_map(address_map &map)
 	map(0xc000, 0xdfff).ram();
 	map(0xe000, 0xe22f).rw(m_k054539_1, FUNC(k054539_device::read), FUNC(k054539_device::write));
 	map(0xe230, 0xe3ff).ram();
-	map(0xe400, 0xe62f).rw(m_k054539_2, FUNC(k054539_device::read), FUNC(k054539_device::write));
-	map(0xe630, 0xe7ff).ram();
-	map(0xf000, 0xf003).m(m_k054321, FUNC(k054321_device::sound_map));
-	map(0xf800, 0xf800).w(this, FUNC(mystwarr_state::sound_ctrl_w));
-	map(0xfff0, 0xfff3).nopw();    // unknown write
-}
-
-
-void mystwarr_state::martchmp_sound_map(address_map &map)
-{
-	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("z80bank");
-	map(0x0000, 0xbfff).nopw();
-	map(0xc000, 0xdfff).ram();
-	map(0xe000, 0xe22f).rw("k054539", FUNC(k054539_device::read), FUNC(k054539_device::write));
-	map(0xe230, 0xe3ff).ram();
 	map(0xe400, 0xe62f).noprw();
 	map(0xe630, 0xe7ff).ram();
 	map(0xf000, 0xf003).m(m_k054321, FUNC(k054321_device::sound_map));
-	map(0xf800, 0xf800).w(this, FUNC(mystwarr_state::sound_ctrl_w));
+	map(0xf800, 0xf800).w(FUNC(mystwarr_state::sound_ctrl_w));
 	map(0xfff0, 0xfff3).nopw();    // unknown write
 }
 
 
-void mystwarr_state::mystwarr_k054539_map(address_map &map)
+void mystwarr_state::mystwarr_sound_map(address_map &map)
 {
-	map(0x000000, 0x3fffff).rom().region("k054539", 0);
+	martchmp_sound_map(map);
+	map(0xe400, 0xe62f).rw(m_k054539_2, FUNC(k054539_device::read), FUNC(k054539_device::write));
 }
 
 
@@ -665,8 +650,8 @@ static INPUT_PORTS_START( metamrph )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN4 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -708,7 +693,7 @@ static INPUT_PORTS_START( viostorm )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE2 )
@@ -851,11 +836,11 @@ static const gfx_layout bglayout_8bpp =
 	16*128
 };
 
-static GFXDECODE_START( gaiapols )
+static GFXDECODE_START( gfx_gaiapols )
 	GFXDECODE_ENTRY( "gfx3", 0, bglayout_4bpp, 0x0000, 128 )
 GFXDECODE_END
 
-static GFXDECODE_START( dadandrn )
+static GFXDECODE_START( gfx_dadandrn )
 	GFXDECODE_ENTRY( "gfx3", 0, bglayout_8bpp, 0x0000, 8 )
 GFXDECODE_END
 
@@ -923,12 +908,9 @@ MACHINE_RESET_MEMBER(mystwarr_state,metamrph)
 MACHINE_RESET_MEMBER(mystwarr_state,martchmp)
 {
 	int i;
-	k054539_device *k054539 = subdevice<k054539_device>("k054539");
-
-	k054539->init_flags(k054539_device::REVERSE_STEREO);
 
 	// boost voice(chip 0 channel 4-7)
-	for (i=4; i<=7; i++) k054539->set_gain(i, 1.4);
+	for (i=4; i<=7; i++) m_k054539_1->set_gain(i, 1.4);
 }
 
 MACHINE_RESET_MEMBER(mystwarr_state,gaiapols)
@@ -940,259 +922,220 @@ MACHINE_RESET_MEMBER(mystwarr_state,gaiapols)
 }
 
 
-MACHINE_CONFIG_START(mystwarr_state::mystwarr)
-
+void mystwarr_state::mystwarr(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz (confirmed) */
-	MCFG_CPU_PROGRAM_MAP(mystwarr_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mystwarr_state, mystwarr_interrupt, "screen", 0, 1)
+	M68000(config, m_maincpu, 16000000);   /* 16 MHz (confirmed) */
+	m_maincpu->set_addrmap(AS_PROGRAM, &mystwarr_state::mystwarr_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(mystwarr_state::mystwarr_interrupt), "screen", 0, 1);
 
-	MCFG_CPU_ADD("soundcpu", Z80, 8000000)
-	MCFG_CPU_PROGRAM_MAP(mystwarr_sound_map)
+	Z80(config, m_soundcpu, 8000000);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &mystwarr_state::mystwarr_sound_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(1920))
+	config.set_maximum_quantum(attotime::from_hz(1920));
 
-	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
+	EEPROM_ER5911_8BIT(config, "eeprom");
 
-	MCFG_DEVICE_ADD("k053252", K053252, 6000000) // 6 MHz?
-	MCFG_K053252_OFFSETS(24, 16)
+	K053252(config, m_k053252, 6000000); // 6 MHz?
+	m_k053252->set_offsets(24, 16);
 
 	MCFG_MACHINE_START_OVERRIDE(mystwarr_state,mystwarr)
 	MCFG_MACHINE_RESET_OVERRIDE(mystwarr_state,mystwarr)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
-//  MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_RAW_PARAMS(6000000, 288+16+32+48, 0, 287, 224+16+8+16, 0, 223)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(600))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(24, 24+288-1, 16, 16+224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(mystwarr_state, screen_update_mystwarr)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
+//  m_screen->set_refresh_hz(60);
+	m_screen->set_raw(6000000, 288+16+32+48, 0, 287, 224+16+8+16, 0, 223);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(600));
+	m_screen->set_size(64*8, 32*8);
+	m_screen->set_visarea(24, 24+288-1, 16, 16+224-1);
+	m_screen->set_screen_update(FUNC(mystwarr_state::screen_update_mystwarr));
 
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(XRGB)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_ENABLE_HILIGHTS()
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 2048);
+	m_palette->enable_shadows();
+	m_palette->enable_hilights();
 
-	MCFG_DEVICE_ADD("k056832", K056832, 0)
-	MCFG_K056832_CB(mystwarr_state, mystwarr_tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_5, 0, 0, "none")
-	MCFG_K056832_PALETTE("palette")
+	K056832(config, m_k056832, 0);
+	m_k056832->set_tile_callback(FUNC(mystwarr_state::mystwarr_tile_callback));
+	m_k056832->set_config(K056832_BPP_5, 0, 0);
+	m_k056832->set_palette(m_palette);
 
-	MCFG_K055555_ADD("k055555")
+	K055555(config, m_k055555, 0);
 
-	MCFG_DEVICE_ADD("k055673", K055673, 0)
-	MCFG_K055673_CB(mystwarr_state, mystwarr_sprite_callback)
-	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX, -48, -24)
-	MCFG_K055673_PALETTE("palette")
+	K055673(config, m_k055673, 0);
+	m_k055673->set_sprite_callback(FUNC(mystwarr_state::mystwarr_sprite_callback));
+	m_k055673->set_config(K055673_LAYOUT_GX, -48, -24);
+	m_k055673->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("k054338", K054338, 0)
-	MCFG_K054338_ALPHAINV(1)
-	MCFG_K054338_MIXER("k055555")
+	K054338(config, m_k054338, 0, m_k055555);
+	m_k054338->set_alpha_invert(1);
 
 	MCFG_VIDEO_START_OVERRIDE(mystwarr_state, mystwarr)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_K054321_ADD("k054321", "lspeaker", "rspeaker")
+	K054321(config, m_k054321, "lspeaker", "rspeaker");
 
-	MCFG_DEVICE_ADD("k054539_1", K054539, XTAL(18'432'000))
-	MCFG_DEVICE_ADDRESS_MAP(0, mystwarr_k054539_map)
-	MCFG_K054539_TIMER_HANDLER(WRITELINE(mystwarr_state, k054539_nmi_gen))
-	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)    /* stereo channels are inverted */
-	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
+	K054539(config, m_k054539_1, XTAL(18'432'000));
+	m_k054539_1->set_device_rom_tag("k054539");
+	m_k054539_1->timer_handler().set(FUNC(mystwarr_state::k054539_nmi_gen));
+	m_k054539_1->add_route(0, "rspeaker", 1.0);    /* stereo channels are inverted */
+	m_k054539_1->add_route(1, "lspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("k054539_2", K054539, XTAL(18'432'000))
-	MCFG_DEVICE_ADDRESS_MAP(0, mystwarr_k054539_map)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)    /* stereo channels are inverted */
-	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
-MACHINE_CONFIG_END
+	K054539(config, m_k054539_2, XTAL(18'432'000));
+	m_k054539_2->set_device_rom_tag("k054539");
+	m_k054539_2->add_route(0, "rspeaker", 1.0);    /* stereo channels are inverted */
+	m_k054539_2->add_route(1, "lspeaker", 1.0);
+}
 
-MACHINE_CONFIG_START(mystwarr_state::viostorm)
+void mystwarr_state::viostorm(machine_config &config)
+{
 	mystwarr(config);
 
 	MCFG_MACHINE_RESET_OVERRIDE(mystwarr_state,viostorm)
 
-	MCFG_DEVICE_REPLACE("k053252", K053252, 16000000/2)
-	MCFG_K053252_OFFSETS(40, 16)
+	m_k053252->set_clock(16000000/2);
+	m_k053252->set_offsets(40, 16);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(viostorm_map)
-	MCFG_TIMER_MODIFY("scantimer")
-	MCFG_TIMER_DRIVER_CALLBACK(mystwarr_state, metamrph_interrupt)
+	m_maincpu->set_addrmap(AS_PROGRAM, &mystwarr_state::viostorm_map);
+	subdevice<timer_device>("scantimer")->set_callback(FUNC(mystwarr_state::metamrph_interrupt));
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(mystwarr_state, viostorm)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(mystwarr_state, screen_update_metamrph)
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(900))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(40, 40+384-1, 16, 16+224-1)
+	m_screen->set_screen_update(FUNC(mystwarr_state::screen_update_metamrph));
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(900));
+	m_screen->set_size(64*8, 32*8);
+	m_screen->set_visarea(40, 40+384-1, 16, 16+224-1);
 
-	MCFG_DEVICE_MODIFY("k056832")
-	MCFG_K056832_CB(mystwarr_state, game4bpp_tile_callback)
+	m_k056832->set_tile_callback(FUNC(mystwarr_state::game4bpp_tile_callback));
 
-	MCFG_DEVICE_MODIFY("k055673")
-	MCFG_K055673_CB(mystwarr_state, metamrph_sprite_callback)
-	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_RNG, -62, -23)
-MACHINE_CONFIG_END
+	m_k055673->set_sprite_callback(FUNC(mystwarr_state::metamrph_sprite_callback));
+	m_k055673->set_config(K055673_LAYOUT_RNG, -62, -23);
+}
 
-MACHINE_CONFIG_START(mystwarr_state::metamrph)
+void mystwarr_state::metamrph(machine_config &config)
+{
 	mystwarr(config);
 
 	MCFG_MACHINE_RESET_OVERRIDE(mystwarr_state,metamrph)
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(metamrph_map)
-	MCFG_TIMER_MODIFY("scantimer")
-	MCFG_TIMER_DRIVER_CALLBACK(mystwarr_state, metamrph_interrupt)
+	m_maincpu->set_addrmap(AS_PROGRAM, &mystwarr_state::metamrph_map);
+	subdevice<timer_device>("scantimer")->set_callback(FUNC(mystwarr_state::metamrph_interrupt));
 
-	MCFG_DEVICE_MODIFY("k053252")
-	MCFG_K053252_OFFSETS(24, 15)
+	m_k053252->set_offsets(24, 15);
 
-	MCFG_K053250_ADD("k053250_1", "palette", "screen", -7, 0)
+	K053250(config, m_k053250_1, 0, m_palette, m_screen, -7, 0);
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(mystwarr_state, metamrph)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(mystwarr_state, screen_update_metamrph)
+	m_screen->set_screen_update(FUNC(mystwarr_state::screen_update_metamrph));
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(900));
+	m_screen->set_size(64*8, 32*8);
+	m_screen->set_visarea(24, 24+288-1, 15, 15+224-1);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(900))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(24, 24+288-1, 15, 15+224-1)
+	m_k056832->set_tile_callback(FUNC(mystwarr_state::game4bpp_tile_callback));
 
-	MCFG_DEVICE_MODIFY("k056832")
-	MCFG_K056832_CB(mystwarr_state, game4bpp_tile_callback)
+	m_k055673->set_sprite_callback(FUNC(mystwarr_state::metamrph_sprite_callback));
+	m_k055673->set_config(K055673_LAYOUT_RNG, -51, -24);
+}
 
-	MCFG_DEVICE_MODIFY("k055673")
-	MCFG_K055673_CB(mystwarr_state, metamrph_sprite_callback)
-	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_RNG, -51, -24)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(mystwarr_state::dadandrn)
+void mystwarr_state::dadandrn(machine_config &config)
+{
 	mystwarr(config);
 
 	MCFG_MACHINE_RESET_OVERRIDE(mystwarr_state,dadandrn)
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(dadandrn_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mystwarr_state,  ddd_interrupt)
-	MCFG_DEVICE_REMOVE("scantimer")
+	m_maincpu->set_addrmap(AS_PROGRAM, &mystwarr_state::dadandrn_map);
+	m_maincpu->set_vblank_int("screen", FUNC(mystwarr_state::ddd_interrupt));
+	config.device_remove("scantimer");
 
-	MCFG_DEVICE_MODIFY("k053252")
-	MCFG_K053252_OFFSETS(24, 16+1)
+	m_k053252->set_offsets(24, 16+1);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dadandrn)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dadandrn);
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(mystwarr_state, dadandrn)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(mystwarr_state, screen_update_dadandrn)
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(600))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(24, 24+288-1, 17, 17+224-1)
+	m_screen->set_screen_update(FUNC(mystwarr_state::screen_update_dadandrn));
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(600));
+	m_screen->set_size(64*8, 32*8);
+	m_screen->set_visarea(24, 24+288-1, 17, 17+224-1);
 
-	MCFG_DEVICE_MODIFY("k056832")
-	MCFG_K056832_CB(mystwarr_state, game5bpp_tile_callback)
+	m_k056832->set_tile_callback(FUNC(mystwarr_state::game5bpp_tile_callback));
 
-	MCFG_DEVICE_MODIFY("k055673")
-	MCFG_K055673_CB(mystwarr_state, gaiapols_sprite_callback)
-	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX, -42, -22)
-MACHINE_CONFIG_END
+	m_k055673->set_sprite_callback(FUNC(mystwarr_state::gaiapols_sprite_callback));
+	m_k055673->set_config(K055673_LAYOUT_GX, -42, -22);
+}
 
-MACHINE_CONFIG_START(mystwarr_state::gaiapols)
+void mystwarr_state::gaiapols(machine_config &config)
+{
 	mystwarr(config);
 
 	MCFG_MACHINE_RESET_OVERRIDE(mystwarr_state,gaiapols)
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(gaiapols_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mystwarr_state,  ddd_interrupt)
-	MCFG_DEVICE_REMOVE("scantimer")
+	m_maincpu->set_addrmap(AS_PROGRAM, &mystwarr_state::gaiapols_map);
+	m_maincpu->set_vblank_int("screen", FUNC(mystwarr_state::ddd_interrupt));
+	config.device_remove("scantimer");
 
-	MCFG_DEVICE_MODIFY("k053252")
-	MCFG_K053252_OFFSETS(40, 16)
+	m_k053252->set_offsets(40, 16);
 
-	MCFG_K054000_ADD("k054000")
+	K054000(config, "k054000", 0);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gaiapols)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gaiapols);
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(mystwarr_state, gaiapols)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(mystwarr_state, screen_update_dadandrn)
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_RAW_PARAMS(8000000, 384+24+64+40, 0, 383, 224+16+8+16, 0, 223)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(600))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(40, 40+376-1, 16, 16+224-1)
+	m_screen->set_screen_update(FUNC(mystwarr_state::screen_update_dadandrn));
+	m_screen->set_raw(8000000, 384+24+64+40, 0, 383, 224+16+8+16, 0, 223);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(600));
+	m_screen->set_size(64*8, 32*8);
+	m_screen->set_visarea(40, 40+376-1, 16, 16+224-1);
 
-	MCFG_DEVICE_MODIFY("k056832")
-	MCFG_K056832_CB(mystwarr_state, game4bpp_tile_callback)
+	m_k056832->set_tile_callback(FUNC(mystwarr_state::game4bpp_tile_callback));
 
-	MCFG_DEVICE_MODIFY("k055673")
-	MCFG_K055673_CB(mystwarr_state, gaiapols_sprite_callback)
-	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_RNG, -61, -22) // stage2 brick walls
-MACHINE_CONFIG_END
+	m_k055673->set_sprite_callback(FUNC(mystwarr_state::gaiapols_sprite_callback));
+	m_k055673->set_config(K055673_LAYOUT_RNG, -61, -22); // stage2 brick walls
+}
 
-MACHINE_CONFIG_START(mystwarr_state::martchmp)
+void mystwarr_state::martchmp(machine_config &config)
+{
 	mystwarr(config);
 
 	MCFG_MACHINE_RESET_OVERRIDE(mystwarr_state,martchmp)
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(martchmp_map)
-	MCFG_TIMER_MODIFY("scantimer")
-	MCFG_TIMER_DRIVER_CALLBACK(mystwarr_state, mchamp_interrupt)
+	m_maincpu->set_addrmap(AS_PROGRAM, &mystwarr_state::martchmp_map);
+	subdevice<timer_device>("scantimer")->set_callback(FUNC(mystwarr_state::mchamp_interrupt));
 
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_PROGRAM_MAP(martchmp_sound_map)
+	m_soundcpu->set_addrmap(AS_PROGRAM, &mystwarr_state::martchmp_sound_map);
 
-	MCFG_DEVICE_REPLACE("k053252", K053252, 16000000/2)
-	MCFG_K053252_OFFSETS(32, 24-1)
-
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_FORMAT(XRGB)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_ENABLE_HILIGHTS()
+	m_k053252->set_clock(16000000/2);
+	m_k053252->set_offsets(32, 24-1);
 
 	MCFG_VIDEO_START_OVERRIDE(mystwarr_state, martchmp)
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_UPDATE_DRIVER(mystwarr_state, screen_update_martchmp)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(32, 32+384-1, 16, 16+224-1)
+	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	m_screen->set_screen_update(FUNC(mystwarr_state::screen_update_martchmp));
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(64*8, 32*8);
+	m_screen->set_visarea(32, 32+384-1, 16, 16+224-1);
 
-	MCFG_DEVICE_MODIFY("k056832")
-	MCFG_K056832_CB(mystwarr_state, game5bpp_tile_callback)
+	m_k056832->set_tile_callback(FUNC(mystwarr_state::game5bpp_tile_callback));
 
-	MCFG_DEVICE_MODIFY("k055673")
-	MCFG_K055673_CB(mystwarr_state, martchmp_sprite_callback)
-	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX, -58, -23)
+	m_k055673->set_sprite_callback(FUNC(mystwarr_state::martchmp_sprite_callback));
+	m_k055673->set_config(K055673_LAYOUT_GX, -58, -23);
 
-	MCFG_DEVICE_REMOVE("k054539_1")
-	MCFG_DEVICE_REMOVE("k054539_2")
-
-	MCFG_DEVICE_ADD("k054539", K054539, XTAL(18'432'000))
-	MCFG_K054539_TIMER_HANDLER(WRITELINE(mystwarr_state, k054539_nmi_gen))
-	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)    /* stereo channels are inverted */
-	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
-MACHINE_CONFIG_END
+	config.device_remove("k054539_2");
+}
 
 /**********************************************************************************/
 
@@ -1213,13 +1156,13 @@ ROM_START( mystwarr )
 	ROM_RELOAD(           0x20000, 0x20000 )
 
 	/* tiles */
-	ROM_REGION( 0x500000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x500000, "k056832", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "128a08.1h", 0x000000, 1*1024*1024, CRC(63d6cfa0) SHA1(324bf25cf79aa030d2dcc94a53c1984eb8abec3a) )
 	ROM_LOADTILE_WORD( "128a09.1k", 0x000002, 1*1024*1024, CRC(573a7725) SHA1(f2fef32053ed2a65c6c3ddd3e1657a866aa80b3e) )
 	ROM_LOADTILE_BYTE( "128a10.3h", 0x000004, 512*1024, CRC(558e545a) SHA1(cac53e545f3f8980d431443f2c3b8b95e6077d1c) )
 
 	/* sprites */
-	ROM_REGION( 0x500000, "gfx2", ROMREGION_ERASE00 )
+	ROM_REGION( 0x500000, "k055673", ROMREGION_ERASE00 )
 	ROM_LOAD64_WORD( "128a16.22k", 0x000000, 1*1024*1024, CRC(459b6407) SHA1(e4dace4912f9558bee75a8e95ee2637f5e950b47) )
 	ROM_LOAD64_WORD( "128a15.20k", 0x000002, 1*1024*1024, CRC(6bbfedf4) SHA1(0b3acb2b34c722ddc60c0e64e12baa1f225e4fbb) )
 	ROM_LOAD64_WORD( "128a14.19k", 0x000004, 1*1024*1024, CRC(f7bd89dd) SHA1(c9b2ebd5a49840f8b260d53c25cfcc238d21c75c) )
@@ -1253,13 +1196,13 @@ ROM_START( mystwarru )
 	ROM_RELOAD(           0x20000, 0x20000 )
 
 	/* tiles */
-	ROM_REGION( 0x500000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x500000, "k056832", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "128a08.1h", 0x000000, 1*1024*1024, CRC(63d6cfa0) SHA1(324bf25cf79aa030d2dcc94a53c1984eb8abec3a) )
 	ROM_LOADTILE_WORD( "128a09.1k", 0x000002, 1*1024*1024, CRC(573a7725) SHA1(f2fef32053ed2a65c6c3ddd3e1657a866aa80b3e) )
 	ROM_LOADTILE_BYTE( "128a10.3h", 0x000004, 512*1024, CRC(558e545a) SHA1(cac53e545f3f8980d431443f2c3b8b95e6077d1c) )
 
 	/* sprites */
-	ROM_REGION( 0x500000, "gfx2", ROMREGION_ERASE00 )
+	ROM_REGION( 0x500000, "k055673", ROMREGION_ERASE00 )
 	ROM_LOAD64_WORD( "128a16.22k", 0x000000, 1*1024*1024, CRC(459b6407) SHA1(e4dace4912f9558bee75a8e95ee2637f5e950b47) )
 	ROM_LOAD64_WORD( "128a15.20k", 0x000002, 1*1024*1024, CRC(6bbfedf4) SHA1(0b3acb2b34c722ddc60c0e64e12baa1f225e4fbb) )
 	ROM_LOAD64_WORD( "128a14.19k", 0x000004, 1*1024*1024, CRC(f7bd89dd) SHA1(c9b2ebd5a49840f8b260d53c25cfcc238d21c75c) )
@@ -1293,13 +1236,13 @@ ROM_START( mystwarrj )
 	ROM_RELOAD(           0x20000, 0x20000 )
 
 	/* tiles */
-	ROM_REGION( 0x500000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x500000, "k056832", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "128a08.1h", 0x000000, 1*1024*1024, CRC(63d6cfa0) SHA1(324bf25cf79aa030d2dcc94a53c1984eb8abec3a) )
 	ROM_LOADTILE_WORD( "128a09.1k", 0x000002, 1*1024*1024, CRC(573a7725) SHA1(f2fef32053ed2a65c6c3ddd3e1657a866aa80b3e) )
 	ROM_LOADTILE_BYTE( "128a10.3h", 0x000004, 512*1024, CRC(558e545a) SHA1(cac53e545f3f8980d431443f2c3b8b95e6077d1c) )
 
 	/* sprites */
-	ROM_REGION( 0x500000, "gfx2", ROMREGION_ERASE00 )
+	ROM_REGION( 0x500000, "k055673", ROMREGION_ERASE00 )
 	ROM_LOAD64_WORD( "128a16.22k", 0x000000, 1*1024*1024, CRC(459b6407) SHA1(e4dace4912f9558bee75a8e95ee2637f5e950b47) )
 	ROM_LOAD64_WORD( "128a15.20k", 0x000002, 1*1024*1024, CRC(6bbfedf4) SHA1(0b3acb2b34c722ddc60c0e64e12baa1f225e4fbb) )
 	ROM_LOAD64_WORD( "128a14.19k", 0x000004, 1*1024*1024, CRC(f7bd89dd) SHA1(c9b2ebd5a49840f8b260d53c25cfcc238d21c75c) )
@@ -1333,13 +1276,13 @@ ROM_START( mystwarra )
 	ROM_RELOAD(           0x20000, 0x20000 )
 
 	/* tiles */
-	ROM_REGION( 0x500000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x500000, "k056832", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "128a08.1h", 0x000000, 1*1024*1024, CRC(63d6cfa0) SHA1(324bf25cf79aa030d2dcc94a53c1984eb8abec3a) )
 	ROM_LOADTILE_WORD( "128a09.1k", 0x000002, 1*1024*1024, CRC(573a7725) SHA1(f2fef32053ed2a65c6c3ddd3e1657a866aa80b3e) )
 	ROM_LOADTILE_BYTE( "128a10.3h", 0x000004, 512*1024, CRC(558e545a) SHA1(cac53e545f3f8980d431443f2c3b8b95e6077d1c) )
 
 	/* sprites */
-	ROM_REGION( 0x500000, "gfx2", ROMREGION_ERASE00 )
+	ROM_REGION( 0x500000, "k055673", ROMREGION_ERASE00 )
 	ROM_LOAD64_WORD( "128a16.22k", 0x000000, 1*1024*1024, CRC(459b6407) SHA1(e4dace4912f9558bee75a8e95ee2637f5e950b47) )
 	ROM_LOAD64_WORD( "128a15.20k", 0x000002, 1*1024*1024, CRC(6bbfedf4) SHA1(0b3acb2b34c722ddc60c0e64e12baa1f225e4fbb) )
 	ROM_LOAD64_WORD( "128a14.19k", 0x000004, 1*1024*1024, CRC(f7bd89dd) SHA1(c9b2ebd5a49840f8b260d53c25cfcc238d21c75c) )
@@ -1373,13 +1316,13 @@ ROM_START( mystwarraa )
 	ROM_RELOAD(           0x20000, 0x20000 )
 
 	/* tiles */
-	ROM_REGION( 0x500000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x500000, "k056832", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "128a08.1h", 0x000000, 1*1024*1024, CRC(63d6cfa0) SHA1(324bf25cf79aa030d2dcc94a53c1984eb8abec3a) )
 	ROM_LOADTILE_WORD( "128a09.1k", 0x000002, 1*1024*1024, CRC(573a7725) SHA1(f2fef32053ed2a65c6c3ddd3e1657a866aa80b3e) )
 	ROM_LOADTILE_BYTE( "128a10.3h", 0x000004, 512*1024, CRC(558e545a) SHA1(cac53e545f3f8980d431443f2c3b8b95e6077d1c) )
 
 	/* sprites */
-	ROM_REGION( 0x500000, "gfx2", ROMREGION_ERASE00 )
+	ROM_REGION( 0x500000, "k055673", ROMREGION_ERASE00 )
 	ROM_LOAD64_WORD( "128a16.22k", 0x000000, 1*1024*1024, CRC(459b6407) SHA1(e4dace4912f9558bee75a8e95ee2637f5e950b47) )
 	ROM_LOAD64_WORD( "128a15.20k", 0x000002, 1*1024*1024, CRC(6bbfedf4) SHA1(0b3acb2b34c722ddc60c0e64e12baa1f225e4fbb) )
 	ROM_LOAD64_WORD( "128a14.19k", 0x000004, 1*1024*1024, CRC(f7bd89dd) SHA1(c9b2ebd5a49840f8b260d53c25cfcc238d21c75c) )
@@ -1411,12 +1354,12 @@ ROM_START( viostorm )
 	ROM_RELOAD(           0x20000, 0x20000 )
 
 	/* tiles */
-	ROM_REGION( 0x600000, "gfx1", ROMREGION_ERASE00)
+	ROM_REGION( 0x600000, "k056832", ROMREGION_ERASE00)
 	ROM_LOADTILE_WORD( "168a09.1h", 0x000000, 2*1024*1024, CRC(1b34a881) SHA1(5de20f7ee7f90d4f6dea349ca5000bfcf74253b1) )
 	ROM_LOADTILE_WORD( "168a08.1k", 0x000002, 2*1024*1024, CRC(db0ce743) SHA1(dfe24a1e3e72da188a92668928e79afd6c5d22ee) )
 
 	/* sprites */
-	ROM_REGION( 0x800000, "gfx2", ROMREGION_ERASE00)
+	ROM_REGION( 0x800000, "k055673", ROMREGION_ERASE00)
 	ROM_LOAD64_WORD( "168a10.22k", 0x000000, 2*1024*1024, CRC(bd2bbdea) SHA1(54faf2ded16e66d675bbbec4ebd42b4708edfaef) )
 	ROM_LOAD64_WORD( "168a11.19k", 0x000002, 2*1024*1024, CRC(7a57c9e7) SHA1(8763c310f7b515aef52d4e007bc949e8803690f4) )
 	ROM_LOAD64_WORD( "168a12.20k", 0x000004, 2*1024*1024, CRC(b6b1c4ef) SHA1(064ab4db884c8f98ab9e631b7034996d4b92ab7b) )
@@ -1446,12 +1389,12 @@ ROM_START( viostormeb )
 	ROM_RELOAD(           0x20000, 0x20000 )
 
 	/* tiles */
-	ROM_REGION( 0x600000, "gfx1", ROMREGION_ERASE00)
+	ROM_REGION( 0x600000, "k056832", ROMREGION_ERASE00)
 	ROM_LOADTILE_WORD( "168a09.1h", 0x000000, 2*1024*1024, CRC(1b34a881) SHA1(5de20f7ee7f90d4f6dea349ca5000bfcf74253b1) )
 	ROM_LOADTILE_WORD( "168a08.1k", 0x000002, 2*1024*1024, CRC(db0ce743) SHA1(dfe24a1e3e72da188a92668928e79afd6c5d22ee) )
 
 	/* sprites */
-	ROM_REGION( 0x800000, "gfx2", ROMREGION_ERASE00)
+	ROM_REGION( 0x800000, "k055673", ROMREGION_ERASE00)
 	ROM_LOAD64_WORD( "168a10.22k", 0x000000, 2*1024*1024, CRC(bd2bbdea) SHA1(54faf2ded16e66d675bbbec4ebd42b4708edfaef) )
 	ROM_LOAD64_WORD( "168a11.19k", 0x000002, 2*1024*1024, CRC(7a57c9e7) SHA1(8763c310f7b515aef52d4e007bc949e8803690f4) )
 	ROM_LOAD64_WORD( "168a12.20k", 0x000004, 2*1024*1024, CRC(b6b1c4ef) SHA1(064ab4db884c8f98ab9e631b7034996d4b92ab7b) )
@@ -1481,12 +1424,12 @@ ROM_START( viostormu )
 	ROM_RELOAD(           0x20000, 0x20000 )
 
 	/* tiles */
-	ROM_REGION( 0x600000, "gfx1", ROMREGION_ERASE00)
+	ROM_REGION( 0x600000, "k056832", ROMREGION_ERASE00)
 	ROM_LOADTILE_WORD( "168a09.1h", 0x000000, 2*1024*1024, CRC(1b34a881) SHA1(5de20f7ee7f90d4f6dea349ca5000bfcf74253b1) )
 	ROM_LOADTILE_WORD( "168a08.1k", 0x000002, 2*1024*1024, CRC(db0ce743) SHA1(dfe24a1e3e72da188a92668928e79afd6c5d22ee) )
 
 	/* sprites */
-	ROM_REGION( 0x800000, "gfx2", ROMREGION_ERASE00)
+	ROM_REGION( 0x800000, "k055673", ROMREGION_ERASE00)
 	ROM_LOAD64_WORD( "168a10.22k", 0x000000, 2*1024*1024, CRC(bd2bbdea) SHA1(54faf2ded16e66d675bbbec4ebd42b4708edfaef) )
 	ROM_LOAD64_WORD( "168a11.19k", 0x000002, 2*1024*1024, CRC(7a57c9e7) SHA1(8763c310f7b515aef52d4e007bc949e8803690f4) )
 	ROM_LOAD64_WORD( "168a12.20k", 0x000004, 2*1024*1024, CRC(b6b1c4ef) SHA1(064ab4db884c8f98ab9e631b7034996d4b92ab7b) )
@@ -1516,12 +1459,12 @@ ROM_START( viostormub )
 	ROM_RELOAD(           0x20000, 0x20000 )
 
 	/* tiles */
-	ROM_REGION( 0x600000, "gfx1", ROMREGION_ERASE00)
+	ROM_REGION( 0x600000, "k056832", ROMREGION_ERASE00)
 	ROM_LOADTILE_WORD( "168a09.1h", 0x000000, 2*1024*1024, CRC(1b34a881) SHA1(5de20f7ee7f90d4f6dea349ca5000bfcf74253b1) )
 	ROM_LOADTILE_WORD( "168a08.1k", 0x000002, 2*1024*1024, CRC(db0ce743) SHA1(dfe24a1e3e72da188a92668928e79afd6c5d22ee) )
 
 	/* sprites */
-	ROM_REGION( 0x800000, "gfx2", ROMREGION_ERASE00)
+	ROM_REGION( 0x800000, "k055673", ROMREGION_ERASE00)
 	ROM_LOAD64_WORD( "168a10.22k", 0x000000, 2*1024*1024, CRC(bd2bbdea) SHA1(54faf2ded16e66d675bbbec4ebd42b4708edfaef) )
 	ROM_LOAD64_WORD( "168a11.19k", 0x000002, 2*1024*1024, CRC(7a57c9e7) SHA1(8763c310f7b515aef52d4e007bc949e8803690f4) )
 	ROM_LOAD64_WORD( "168a12.20k", 0x000004, 2*1024*1024, CRC(b6b1c4ef) SHA1(064ab4db884c8f98ab9e631b7034996d4b92ab7b) )
@@ -1551,12 +1494,12 @@ ROM_START( viostorma )
 	ROM_RELOAD(           0x20000, 0x20000 )
 
 	/* tiles */
-	ROM_REGION( 0x600000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x600000, "k056832", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "168a09.1h", 0x000000, 2*1024*1024, CRC(1b34a881) SHA1(5de20f7ee7f90d4f6dea349ca5000bfcf74253b1) )
 	ROM_LOADTILE_WORD( "168a08.1k", 0x000002, 2*1024*1024, CRC(db0ce743) SHA1(dfe24a1e3e72da188a92668928e79afd6c5d22ee) )
 
 	/* sprites */
-	ROM_REGION( 0x800000, "gfx2", ROMREGION_ERASE00 )
+	ROM_REGION( 0x800000, "k055673", ROMREGION_ERASE00 )
 	ROM_LOAD64_WORD( "168a10.22k", 0x000000, 2*1024*1024, CRC(bd2bbdea) SHA1(54faf2ded16e66d675bbbec4ebd42b4708edfaef) )
 	ROM_LOAD64_WORD( "168a11.19k", 0x000002, 2*1024*1024, CRC(7a57c9e7) SHA1(8763c310f7b515aef52d4e007bc949e8803690f4) )
 	ROM_LOAD64_WORD( "168a12.20k", 0x000004, 2*1024*1024, CRC(b6b1c4ef) SHA1(064ab4db884c8f98ab9e631b7034996d4b92ab7b) )
@@ -1586,12 +1529,12 @@ ROM_START( viostormab )
 	ROM_RELOAD(           0x20000, 0x20000 )
 
 	/* tiles */
-	ROM_REGION( 0x600000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x600000, "k056832", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "168a09.1h", 0x000000, 2*1024*1024, CRC(1b34a881) SHA1(5de20f7ee7f90d4f6dea349ca5000bfcf74253b1) )
 	ROM_LOADTILE_WORD( "168a08.1k", 0x000002, 2*1024*1024, CRC(db0ce743) SHA1(dfe24a1e3e72da188a92668928e79afd6c5d22ee) )
 
 	/* sprites */
-	ROM_REGION( 0x800000, "gfx2", ROMREGION_ERASE00 )
+	ROM_REGION( 0x800000, "k055673", ROMREGION_ERASE00 )
 	ROM_LOAD64_WORD( "168a10.22k", 0x000000, 2*1024*1024, CRC(bd2bbdea) SHA1(54faf2ded16e66d675bbbec4ebd42b4708edfaef) )
 	ROM_LOAD64_WORD( "168a11.19k", 0x000002, 2*1024*1024, CRC(7a57c9e7) SHA1(8763c310f7b515aef52d4e007bc949e8803690f4) )
 	ROM_LOAD64_WORD( "168a12.20k", 0x000004, 2*1024*1024, CRC(b6b1c4ef) SHA1(064ab4db884c8f98ab9e631b7034996d4b92ab7b) )
@@ -1622,12 +1565,12 @@ ROM_START( viostormj )
 	ROM_RELOAD(           0x20000, 0x20000 )
 
 	/* tiles */
-	ROM_REGION( 0x600000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x600000, "k056832", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "168a09.1h", 0x000000, 2*1024*1024, CRC(1b34a881) SHA1(5de20f7ee7f90d4f6dea349ca5000bfcf74253b1) )
 	ROM_LOADTILE_WORD( "168a08.1k", 0x000002, 2*1024*1024, CRC(db0ce743) SHA1(dfe24a1e3e72da188a92668928e79afd6c5d22ee) )
 
 	/* sprites */
-	ROM_REGION( 0x800000, "gfx2", ROMREGION_ERASE00 )
+	ROM_REGION( 0x800000, "k055673", ROMREGION_ERASE00 )
 	ROM_LOAD64_WORD( "168a10.22k", 0x000000, 2*1024*1024, CRC(bd2bbdea) SHA1(54faf2ded16e66d675bbbec4ebd42b4708edfaef) )
 	ROM_LOAD64_WORD( "168a11.19k", 0x000002, 2*1024*1024, CRC(7a57c9e7) SHA1(8763c310f7b515aef52d4e007bc949e8803690f4) )
 	ROM_LOAD64_WORD( "168a12.20k", 0x000004, 2*1024*1024, CRC(b6b1c4ef) SHA1(064ab4db884c8f98ab9e631b7034996d4b92ab7b) )
@@ -1658,12 +1601,12 @@ ROM_START( metamrph )
 	ROM_LOAD("224a05", 0x000000, 0x40000, CRC(4b4c985c) SHA1(c83cce05355023be9cd55b4aa595c61f8236269c) )
 
 	/* tiles */
-	ROM_REGION( 0x500000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x500000, "k056832", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "224a09", 0x000000, 1*1024*1024, CRC(1931afce) SHA1(78838c0fd2a9c80f130db1fcf6c88b14f7363639) )
 	ROM_LOADTILE_WORD( "224a08", 0x000002, 1*1024*1024, CRC(dc94d53a) SHA1(91e16371a335f078a81c06a1045759653080aba0) )
 
 	/* sprites */
-	ROM_REGION( 0x800000, "gfx2", ROMREGION_ERASE00 )
+	ROM_REGION( 0x800000, "k055673", ROMREGION_ERASE00 )
 	ROM_LOAD64_WORD( "224a10", 0x000000, 2*1024*1024, CRC(161287f0) SHA1(a13b197a98fa1cebb11fb87b54e277c72852c4ee) )
 	ROM_LOAD64_WORD( "224a11", 0x000002, 2*1024*1024, CRC(df5960e1) SHA1(ee7794dd119f5f2c52e7ba589d78067a89ff3cab) )
 	ROM_LOAD64_WORD( "224a12", 0x000004, 2*1024*1024, CRC(ca72a4b3) SHA1(a09deb6d7cb8be4edaeb78e0e676ea2d6055e9e0) )
@@ -1695,12 +1638,12 @@ ROM_START( metamrphe ) /* alternate set - possibly a bugfix version. Only 2 adju
 	ROM_LOAD("224a05", 0x000000, 0x40000, CRC(4b4c985c) SHA1(c83cce05355023be9cd55b4aa595c61f8236269c) )
 
 	/* tiles */
-	ROM_REGION( 0x500000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x500000, "k056832", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "224a09", 0x000000, 1*1024*1024, CRC(1931afce) SHA1(78838c0fd2a9c80f130db1fcf6c88b14f7363639) )
 	ROM_LOADTILE_WORD( "224a08", 0x000002, 1*1024*1024, CRC(dc94d53a) SHA1(91e16371a335f078a81c06a1045759653080aba0) )
 
 	/* sprites */
-	ROM_REGION( 0x800000, "gfx2", ROMREGION_ERASE00 )
+	ROM_REGION( 0x800000, "k055673", ROMREGION_ERASE00 )
 	ROM_LOAD64_WORD( "224a10", 0x000000, 2*1024*1024, CRC(161287f0) SHA1(a13b197a98fa1cebb11fb87b54e277c72852c4ee) )
 	ROM_LOAD64_WORD( "224a11", 0x000002, 2*1024*1024, CRC(df5960e1) SHA1(ee7794dd119f5f2c52e7ba589d78067a89ff3cab) )
 	ROM_LOAD64_WORD( "224a12", 0x000004, 2*1024*1024, CRC(ca72a4b3) SHA1(a09deb6d7cb8be4edaeb78e0e676ea2d6055e9e0) )
@@ -1732,12 +1675,12 @@ ROM_START( metamrpha )
 	ROM_LOAD("224a05", 0x000000, 0x40000, CRC(4b4c985c) SHA1(c83cce05355023be9cd55b4aa595c61f8236269c) )
 
 	/* tiles */
-	ROM_REGION( 0x500000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x500000, "k056832", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "224a09", 0x000000, 1*1024*1024, CRC(1931afce) SHA1(78838c0fd2a9c80f130db1fcf6c88b14f7363639) )
 	ROM_LOADTILE_WORD( "224a08", 0x000002, 1*1024*1024, CRC(dc94d53a) SHA1(91e16371a335f078a81c06a1045759653080aba0) )
 
 	/* sprites */
-	ROM_REGION( 0x800000, "gfx2", ROMREGION_ERASE00 )
+	ROM_REGION( 0x800000, "k055673", ROMREGION_ERASE00 )
 	ROM_LOAD64_WORD( "224a10", 0x000000, 2*1024*1024, CRC(161287f0) SHA1(a13b197a98fa1cebb11fb87b54e277c72852c4ee) )
 	ROM_LOAD64_WORD( "224a11", 0x000002, 2*1024*1024, CRC(df5960e1) SHA1(ee7794dd119f5f2c52e7ba589d78067a89ff3cab) )
 	ROM_LOAD64_WORD( "224a12", 0x000004, 2*1024*1024, CRC(ca72a4b3) SHA1(a09deb6d7cb8be4edaeb78e0e676ea2d6055e9e0) )
@@ -1769,12 +1712,12 @@ ROM_START( metamrphu )
 	ROM_LOAD("224a05", 0x000000, 0x40000, CRC(4b4c985c) SHA1(c83cce05355023be9cd55b4aa595c61f8236269c) )
 
 	/* tiles */
-	ROM_REGION( 0x500000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x500000, "k056832", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "224a09", 0x000000, 1*1024*1024, CRC(1931afce) SHA1(78838c0fd2a9c80f130db1fcf6c88b14f7363639) )
 	ROM_LOADTILE_WORD( "224a08", 0x000002, 1*1024*1024, CRC(dc94d53a) SHA1(91e16371a335f078a81c06a1045759653080aba0) )
 
 	/* sprites */
-	ROM_REGION( 0x800000, "gfx2", ROMREGION_ERASE00 )
+	ROM_REGION( 0x800000, "k055673", ROMREGION_ERASE00 )
 	ROM_LOAD64_WORD( "224a10", 0x000000, 2*1024*1024, CRC(161287f0) SHA1(a13b197a98fa1cebb11fb87b54e277c72852c4ee) )
 	ROM_LOAD64_WORD( "224a11", 0x000002, 2*1024*1024, CRC(df5960e1) SHA1(ee7794dd119f5f2c52e7ba589d78067a89ff3cab) )
 	ROM_LOAD64_WORD( "224a12", 0x000004, 2*1024*1024, CRC(ca72a4b3) SHA1(a09deb6d7cb8be4edaeb78e0e676ea2d6055e9e0) )
@@ -1806,12 +1749,12 @@ ROM_START( metamrphj )
 	ROM_LOAD("224a05", 0x000000, 0x40000, CRC(4b4c985c) SHA1(c83cce05355023be9cd55b4aa595c61f8236269c) )
 
 	/* tiles */
-	ROM_REGION( 0x500000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x500000, "k056832", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "224a09", 0x000000, 1*1024*1024, CRC(1931afce) SHA1(78838c0fd2a9c80f130db1fcf6c88b14f7363639) )
 	ROM_LOADTILE_WORD( "224a08", 0x000002, 1*1024*1024, CRC(dc94d53a) SHA1(91e16371a335f078a81c06a1045759653080aba0) )
 
 	/* sprites */
-	ROM_REGION( 0x800000, "gfx2", ROMREGION_ERASE00 )
+	ROM_REGION( 0x800000, "k055673", ROMREGION_ERASE00 )
 	ROM_LOAD64_WORD( "224a10", 0x000000, 2*1024*1024, CRC(161287f0) SHA1(a13b197a98fa1cebb11fb87b54e277c72852c4ee) )
 	ROM_LOAD64_WORD( "224a11", 0x000002, 2*1024*1024, CRC(df5960e1) SHA1(ee7794dd119f5f2c52e7ba589d78067a89ff3cab) )
 	ROM_LOAD64_WORD( "224a12", 0x000004, 2*1024*1024, CRC(ca72a4b3) SHA1(a09deb6d7cb8be4edaeb78e0e676ea2d6055e9e0) )
@@ -1844,13 +1787,13 @@ ROM_START( mtlchamp )
 	ROM_RELOAD(            0x20000, 0x20000 )
 
 	/* tiles */
-	ROM_REGION( 0x600000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x600000, "k056832", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "234a08.1h", 0x000000, 1*1024*1024, CRC(27e94288) SHA1(a92b03adf7beea6a1ceb74f659c87c628a7ab8e4) )
 	ROM_LOADTILE_WORD( "234a09.1k", 0x000002, 1*1024*1024, CRC(03aad28f) SHA1(e7d9d788822ac9666e089b58288e3fcdba1b89da) )
 	ROM_LOADTILE_BYTE( "234a10.3h", 0x000004, 512*1024, CRC(51f50fe2) SHA1(164fc975feff442d93f1917727c159051dcd3a55) )
 
 	/* sprites */
-	ROM_REGION( 0xa00000, "gfx2", ROMREGION_ERASE00 )
+	ROM_REGION( 0xa00000, "k055673", ROMREGION_ERASE00 )
 	ROM_LOAD64_WORD( "234a16.22k", 0x000000, 2*1024*1024, CRC(14d909a5) SHA1(15da356852fc0c63ecd924ac37ebe24bf3ba0760) )
 	ROM_LOAD64_WORD( "234a15.20k", 0x000002, 2*1024*1024, CRC(a5028418) SHA1(ec6fc7b38fb1d27490a5a9310ecac2d1049e197c) )
 	ROM_LOAD64_WORD( "234a14.19k", 0x000004, 2*1024*1024, CRC(d7921f47) SHA1(3fc97b308ad2ca25a376373ddfe08c8a375c424e) )
@@ -1881,13 +1824,13 @@ ROM_START( mtlchamp1 )
 	ROM_RELOAD(            0x20000, 0x20000 )
 
 	/* tiles */
-	ROM_REGION( 0x600000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x600000, "k056832", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "234a08.1h", 0x000000, 1*1024*1024, CRC(27e94288) SHA1(a92b03adf7beea6a1ceb74f659c87c628a7ab8e4) )
 	ROM_LOADTILE_WORD( "234a09.1k", 0x000002, 1*1024*1024, CRC(03aad28f) SHA1(e7d9d788822ac9666e089b58288e3fcdba1b89da) )
 	ROM_LOADTILE_BYTE( "234a10.3h", 0x000004, 512*1024, CRC(51f50fe2) SHA1(164fc975feff442d93f1917727c159051dcd3a55) )
 
 	/* sprites */
-	ROM_REGION( 0xa00000, "gfx2", ROMREGION_ERASE00 )
+	ROM_REGION( 0xa00000, "k055673", ROMREGION_ERASE00 )
 	ROM_LOAD64_WORD( "234a16.22k", 0x000000, 2*1024*1024, CRC(14d909a5) SHA1(15da356852fc0c63ecd924ac37ebe24bf3ba0760) )
 	ROM_LOAD64_WORD( "234a15.20k", 0x000002, 2*1024*1024, CRC(a5028418) SHA1(ec6fc7b38fb1d27490a5a9310ecac2d1049e197c) )
 	ROM_LOAD64_WORD( "234a14.19k", 0x000004, 2*1024*1024, CRC(d7921f47) SHA1(3fc97b308ad2ca25a376373ddfe08c8a375c424e) )
@@ -1918,13 +1861,13 @@ ROM_START( mtlchampa )
 	ROM_RELOAD(            0x20000, 0x20000 )
 
 	/* tiles */
-	ROM_REGION( 0x600000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x600000, "k056832", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "234a08.1h", 0x000000, 1*1024*1024, CRC(27e94288) SHA1(a92b03adf7beea6a1ceb74f659c87c628a7ab8e4) )
 	ROM_LOADTILE_WORD( "234a09.1k", 0x000002, 1*1024*1024, CRC(03aad28f) SHA1(e7d9d788822ac9666e089b58288e3fcdba1b89da) )
 	ROM_LOADTILE_BYTE( "234a10.3h", 0x000004, 512*1024, CRC(51f50fe2) SHA1(164fc975feff442d93f1917727c159051dcd3a55) )
 
 	/* sprites */
-	ROM_REGION( 0xa00000, "gfx2", ROMREGION_ERASE00 )
+	ROM_REGION( 0xa00000, "k055673", ROMREGION_ERASE00 )
 	ROM_LOAD64_WORD( "234a16.22k", 0x000000, 2*1024*1024, CRC(14d909a5) SHA1(15da356852fc0c63ecd924ac37ebe24bf3ba0760) )
 	ROM_LOAD64_WORD( "234a15.20k", 0x000002, 2*1024*1024, CRC(a5028418) SHA1(ec6fc7b38fb1d27490a5a9310ecac2d1049e197c) )
 	ROM_LOAD64_WORD( "234a14.19k", 0x000004, 2*1024*1024, CRC(d7921f47) SHA1(3fc97b308ad2ca25a376373ddfe08c8a375c424e) )
@@ -1955,13 +1898,13 @@ ROM_START( mtlchampj )
 	ROM_RELOAD(            0x20000, 0x20000 )
 
 	/* tiles */
-	ROM_REGION( 0x600000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x600000, "k056832", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "234a08.1h", 0x000000, 1*1024*1024, CRC(27e94288) SHA1(a92b03adf7beea6a1ceb74f659c87c628a7ab8e4) )
 	ROM_LOADTILE_WORD( "234a09.1k", 0x000002, 1*1024*1024, CRC(03aad28f) SHA1(e7d9d788822ac9666e089b58288e3fcdba1b89da) )
 	ROM_LOADTILE_BYTE( "234a10.3h", 0x000004, 512*1024, CRC(51f50fe2) SHA1(164fc975feff442d93f1917727c159051dcd3a55) )
 
 	/* sprites */
-	ROM_REGION( 0xa00000, "gfx2", ROMREGION_ERASE00 )
+	ROM_REGION( 0xa00000, "k055673", ROMREGION_ERASE00 )
 	ROM_LOAD64_WORD( "234a16.22k", 0x000000, 2*1024*1024, CRC(14d909a5) SHA1(15da356852fc0c63ecd924ac37ebe24bf3ba0760) )
 	ROM_LOAD64_WORD( "234a15.20k", 0x000002, 2*1024*1024, CRC(a5028418) SHA1(ec6fc7b38fb1d27490a5a9310ecac2d1049e197c) )
 	ROM_LOAD64_WORD( "234a14.19k", 0x000004, 2*1024*1024, CRC(d7921f47) SHA1(3fc97b308ad2ca25a376373ddfe08c8a375c424e) )
@@ -1992,13 +1935,13 @@ ROM_START( mtlchampu )
 	ROM_RELOAD(            0x20000, 0x20000 )
 
 	/* tiles */
-	ROM_REGION( 0x600000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x600000, "k056832", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "234a08.1h", 0x000000, 1*1024*1024, CRC(27e94288) SHA1(a92b03adf7beea6a1ceb74f659c87c628a7ab8e4) )
 	ROM_LOADTILE_WORD( "234a09.1k", 0x000002, 1*1024*1024, CRC(03aad28f) SHA1(e7d9d788822ac9666e089b58288e3fcdba1b89da) )
 	ROM_LOADTILE_BYTE( "234a10.3h", 0x000004, 512*1024, CRC(51f50fe2) SHA1(164fc975feff442d93f1917727c159051dcd3a55) )
 
 	/* sprites */
-	ROM_REGION( 0xa00000, "gfx2", ROMREGION_ERASE00 )
+	ROM_REGION( 0xa00000, "k055673", ROMREGION_ERASE00 )
 	ROM_LOAD64_WORD( "234a16.22k", 0x000000, 2*1024*1024, CRC(14d909a5) SHA1(15da356852fc0c63ecd924ac37ebe24bf3ba0760) )
 	ROM_LOAD64_WORD( "234a15.20k", 0x000002, 2*1024*1024, CRC(a5028418) SHA1(ec6fc7b38fb1d27490a5a9310ecac2d1049e197c) )
 	ROM_LOAD64_WORD( "234a14.19k", 0x000004, 2*1024*1024, CRC(d7921f47) SHA1(3fc97b308ad2ca25a376373ddfe08c8a375c424e) )
@@ -2029,13 +1972,13 @@ ROM_START( mtlchampu1 )
 	ROM_RELOAD(            0x20000, 0x20000 )
 
 	/* tiles */
-	ROM_REGION( 0x600000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x600000, "k056832", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "234a08.1h", 0x000000, 1*1024*1024, CRC(27e94288) SHA1(a92b03adf7beea6a1ceb74f659c87c628a7ab8e4) )
 	ROM_LOADTILE_WORD( "234a09.1k", 0x000002, 1*1024*1024, CRC(03aad28f) SHA1(e7d9d788822ac9666e089b58288e3fcdba1b89da) )
 	ROM_LOADTILE_BYTE( "234a10.3h", 0x000004, 512*1024, CRC(51f50fe2) SHA1(164fc975feff442d93f1917727c159051dcd3a55) )
 
 	/* sprites */
-	ROM_REGION( 0xa00000, "gfx2", ROMREGION_ERASE00 )
+	ROM_REGION( 0xa00000, "k055673", ROMREGION_ERASE00 )
 	ROM_LOAD64_WORD( "234a16.22k", 0x000000, 2*1024*1024, CRC(14d909a5) SHA1(15da356852fc0c63ecd924ac37ebe24bf3ba0760) )
 	ROM_LOAD64_WORD( "234a15.20k", 0x000002, 2*1024*1024, CRC(a5028418) SHA1(ec6fc7b38fb1d27490a5a9310ecac2d1049e197c) )
 	ROM_LOAD64_WORD( "234a14.19k", 0x000004, 2*1024*1024, CRC(d7921f47) SHA1(3fc97b308ad2ca25a376373ddfe08c8a375c424e) )
@@ -2067,12 +2010,12 @@ ROM_START( gaiapols )
 	ROM_LOAD("123e13.9c", 0x00000, 0x40000, CRC(e772f822) SHA1(2a5cdfc0aacad56cbef8bdbe8319e7ff4ab71eee) )
 
 	/* tiles */
-	ROM_REGION( 0x500000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x500000, "k056832", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "123e16.2t", 0x000000, 1*1024*1024, CRC(a3238200) SHA1(9ea073f7611b5c0b328c707c97ef174634c303bc) )
 	ROM_LOADTILE_WORD( "123e17.2x", 0x000002, 1*1024*1024, CRC(bd0b9fb9) SHA1(1714c19d2123b8fd4cfedb66d13bdcee6fc77576) )
 
 	/* sprites */
-	ROM_REGION( 0x800000, "gfx2", ROMREGION_ERASE00 )
+	ROM_REGION( 0x800000, "k055673", ROMREGION_ERASE00 )
 	ROM_LOAD64_WORD( "123e19.34u", 0x000000, 2*1024*1024, CRC(219a7c26) SHA1(0f24873523f91379862e0d4317fc42b8a10d412e) )
 	ROM_LOAD64_WORD( "123e21.34y", 0x000002, 2*1024*1024, CRC(1888947b) SHA1(41a046cbcd2406add2ff48cb82a1353d9ac5fa3c) )
 	ROM_LOAD64_WORD( "123e18.36u", 0x000004, 2*1024*1024, CRC(3719b6d4) SHA1(25ef6e8c3c7f151f1cee063356bdd56c713356ea) )
@@ -2114,12 +2057,12 @@ ROM_START( gaiapolsu )
 	ROM_LOAD("123e13.9c", 0x00000, 0x40000, CRC(e772f822) SHA1(2a5cdfc0aacad56cbef8bdbe8319e7ff4ab71eee) )
 
 	/* tiles */
-	ROM_REGION( 0x500000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x500000, "k056832", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "123e16.2t", 0x000000, 1*1024*1024, CRC(a3238200) SHA1(9ea073f7611b5c0b328c707c97ef174634c303bc) )
 	ROM_LOADTILE_WORD( "123e17.2x", 0x000002, 1*1024*1024, CRC(bd0b9fb9) SHA1(1714c19d2123b8fd4cfedb66d13bdcee6fc77576) )
 
 	/* sprites */
-	ROM_REGION( 0x800000, "gfx2", ROMREGION_ERASE00 )
+	ROM_REGION( 0x800000, "k055673", ROMREGION_ERASE00 )
 	ROM_LOAD64_WORD( "123e19.34u", 0x000000, 2*1024*1024, CRC(219a7c26) SHA1(0f24873523f91379862e0d4317fc42b8a10d412e) )
 	ROM_LOAD64_WORD( "123e21.34y", 0x000002, 2*1024*1024, CRC(1888947b) SHA1(41a046cbcd2406add2ff48cb82a1353d9ac5fa3c) )
 	ROM_LOAD64_WORD( "123e18.36u", 0x000004, 2*1024*1024, CRC(3719b6d4) SHA1(25ef6e8c3c7f151f1cee063356bdd56c713356ea) )
@@ -2161,12 +2104,12 @@ ROM_START( gaiapolsj )
 	ROM_LOAD("123e13.9c", 0x00000, 0x40000, CRC(e772f822) SHA1(2a5cdfc0aacad56cbef8bdbe8319e7ff4ab71eee) )
 
 	/* tiles */
-	ROM_REGION( 0x500000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x500000, "k056832", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "123e16.2t", 0x000000, 1*1024*1024, CRC(a3238200) SHA1(9ea073f7611b5c0b328c707c97ef174634c303bc) )
 	ROM_LOADTILE_WORD( "123e17.2x", 0x000002, 1*1024*1024, CRC(bd0b9fb9) SHA1(1714c19d2123b8fd4cfedb66d13bdcee6fc77576) )
 
 	/* sprites */
-	ROM_REGION( 0x800000, "gfx2", ROMREGION_ERASE00 )
+	ROM_REGION( 0x800000, "k055673", ROMREGION_ERASE00 )
 	ROM_LOAD64_WORD( "123e19.34u", 0x000000, 2*1024*1024, CRC(219a7c26) SHA1(0f24873523f91379862e0d4317fc42b8a10d412e) )
 	ROM_LOAD64_WORD( "123e21.34y", 0x000002, 2*1024*1024, CRC(1888947b) SHA1(41a046cbcd2406add2ff48cb82a1353d9ac5fa3c) )
 	ROM_LOAD64_WORD( "123e18.36u", 0x000004, 2*1024*1024, CRC(3719b6d4) SHA1(25ef6e8c3c7f151f1cee063356bdd56c713356ea) )
@@ -2206,13 +2149,13 @@ ROM_START( mmaulers )
 	ROM_LOAD("170a13.9c", 0x00000, 0x40000, CRC(2ebf4d1c) SHA1(33a3f4153dfdc46cc223d216a17ef9428c09129d) )
 
 	/* tiles */
-	ROM_REGION( 0x600000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x600000, "k056832", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "170a16.2t", 0x000000, 1*1024*1024, CRC(41fee912) SHA1(73cf167ac9fc42cb8048a87b6c6d1c3c0ae3c2e2) )
 	ROM_LOADTILE_WORD( "170a17.2x", 0x000002, 1*1024*1024, CRC(96957c91) SHA1(b12d356f8a015ec0984bdb86da9c569eb0c67880) )
 	ROM_LOADTILE_BYTE( "170a24.5r", 0x000004, 512*1024, CRC(562ad4bd) SHA1(f55b29142ea39f090244f0945a56760bab25c7a7) )
 
 	/* sprites */
-	ROM_REGION( 0xa00000, "gfx2", ROMREGION_ERASE00 )
+	ROM_REGION( 0xa00000, "k055673", ROMREGION_ERASE00 )
 	ROM_LOAD64_WORD( "170a19.34u", 0x000000, 2*1024*1024, CRC(be835141) SHA1(b76e1da45bf602dd9eb30fb8b7181cea2e820c3d) )
 	ROM_LOAD64_WORD( "170a21.34y", 0x000002, 2*1024*1024, CRC(bcb68136) SHA1(1d453f59d832b8ea99cf0a60a917edce5c1c90a0) )
 	ROM_LOAD64_WORD( "170a18.36u", 0x000004, 2*1024*1024, CRC(e1e3c8d2) SHA1(2c94fcedd1dcef3d3332af358ae8a67dea507216) )
@@ -2253,13 +2196,13 @@ ROM_START( dadandrn )
 	ROM_LOAD("170a13.9c", 0x00000, 0x40000, CRC(2ebf4d1c) SHA1(33a3f4153dfdc46cc223d216a17ef9428c09129d) )
 
 	/* tiles */
-	ROM_REGION( 0x600000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x600000, "k056832", ROMREGION_ERASE00 )
 	ROM_LOADTILE_WORD( "170a16.2t", 0x000000, 1*1024*1024, CRC(41fee912) SHA1(73cf167ac9fc42cb8048a87b6c6d1c3c0ae3c2e2) )
 	ROM_LOADTILE_WORD( "170a17.2x", 0x000002, 1*1024*1024, CRC(96957c91) SHA1(b12d356f8a015ec0984bdb86da9c569eb0c67880) )
 	ROM_LOADTILE_BYTE( "170a24.5r", 0x000004, 512*1024, CRC(562ad4bd) SHA1(f55b29142ea39f090244f0945a56760bab25c7a7) )
 
 	/* sprites */
-	ROM_REGION( 0xa00000, "gfx2", ROMREGION_ERASE00 )
+	ROM_REGION( 0xa00000, "k055673", ROMREGION_ERASE00 )
 	ROM_LOAD64_WORD( "170a19.34u", 0x000000, 2*1024*1024, CRC(be835141) SHA1(b76e1da45bf602dd9eb30fb8b7181cea2e820c3d) )
 	ROM_LOAD64_WORD( "170a21.34y", 0x000002, 2*1024*1024, CRC(bcb68136) SHA1(1d453f59d832b8ea99cf0a60a917edce5c1c90a0) )
 	ROM_LOAD64_WORD( "170a18.36u", 0x000004, 2*1024*1024, CRC(e1e3c8d2) SHA1(2c94fcedd1dcef3d3332af358ae8a67dea507216) )
@@ -2288,36 +2231,36 @@ ROM_START( dadandrn )
 ROM_END
 
 //    YEAR  NAME        PARENT    MACHINE   INPUT     STATE
-GAME( 1993, mystwarr,   0,        mystwarr, mystwarr, mystwarr_state, 0, ROT0,  "Konami", "Mystic Warriors (ver EAA)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, mystwarru,  mystwarr, mystwarr, mystwarr, mystwarr_state, 0, ROT0,  "Konami", "Mystic Warriors (ver UAA)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, mystwarrj,  mystwarr, mystwarr, mystwarr, mystwarr_state, 0, ROT0,  "Konami", "Mystic Warriors (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, mystwarra,  mystwarr, mystwarr, mystwarr, mystwarr_state, 0, ROT0,  "Konami", "Mystic Warriors (ver AAB)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, mystwarraa, mystwarr, mystwarr, mystwarr, mystwarr_state, 0, ROT0,  "Konami", "Mystic Warriors (ver AAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, mystwarr,   0,        mystwarr, mystwarr, mystwarr_state, empty_init, ROT0,  "Konami", "Mystic Warriors (ver EAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, mystwarru,  mystwarr, mystwarr, mystwarr, mystwarr_state, empty_init, ROT0,  "Konami", "Mystic Warriors (ver UAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, mystwarrj,  mystwarr, mystwarr, mystwarr, mystwarr_state, empty_init, ROT0,  "Konami", "Mystic Warriors (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, mystwarra,  mystwarr, mystwarr, mystwarr, mystwarr_state, empty_init, ROT0,  "Konami", "Mystic Warriors (ver AAB)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, mystwarraa, mystwarr, mystwarr, mystwarr, mystwarr_state, empty_init, ROT0,  "Konami", "Mystic Warriors (ver AAA)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1993, mmaulers,   0,        dadandrn, dadandrn, mystwarr_state, 0, ROT0,  "Konami", "Monster Maulers (ver EAA)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, dadandrn,   mmaulers, dadandrn, dadandrn, mystwarr_state, 0, ROT0,  "Konami", "Kyukyoku Sentai Dadandarn (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, mmaulers,   0,        dadandrn, dadandrn, mystwarr_state, empty_init, ROT0,  "Konami", "Monster Maulers (ver EAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, dadandrn,   mmaulers, dadandrn, dadandrn, mystwarr_state, empty_init, ROT0,  "Konami", "Kyukyoku Sentai Dadandarn (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1993, viostorm,   0,        viostorm, viostorm, mystwarr_state, 0, ROT0,  "Konami", "Violent Storm (ver EAC)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, viostormeb, viostorm, viostorm, viostorm, mystwarr_state, 0, ROT0,  "Konami", "Violent Storm (ver EAB)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, viostormu,  viostorm, viostorm, viostorm, mystwarr_state, 0, ROT0,  "Konami", "Violent Storm (ver UAC)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, viostormub, viostorm, viostorm, viostorm, mystwarr_state, 0, ROT0,  "Konami", "Violent Storm (ver UAB)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, viostormj,  viostorm, viostorm, viostorm, mystwarr_state, 0, ROT0,  "Konami", "Violent Storm (ver JAC)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, viostorma,  viostorm, viostorm, viostorm, mystwarr_state, 0, ROT0,  "Konami", "Violent Storm (ver AAC)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, viostormab, viostorm, viostorm, viostorm, mystwarr_state, 0, ROT0,  "Konami", "Violent Storm (ver AAB)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, viostorm,   0,        viostorm, viostorm, mystwarr_state, empty_init, ROT0,  "Konami", "Violent Storm (ver EAC)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, viostormeb, viostorm, viostorm, viostorm, mystwarr_state, empty_init, ROT0,  "Konami", "Violent Storm (ver EAB)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, viostormu,  viostorm, viostorm, viostorm, mystwarr_state, empty_init, ROT0,  "Konami", "Violent Storm (ver UAC)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, viostormub, viostorm, viostorm, viostorm, mystwarr_state, empty_init, ROT0,  "Konami", "Violent Storm (ver UAB)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, viostormj,  viostorm, viostorm, viostorm, mystwarr_state, empty_init, ROT0,  "Konami", "Violent Storm (ver JAC)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, viostorma,  viostorm, viostorm, viostorm, mystwarr_state, empty_init, ROT0,  "Konami", "Violent Storm (ver AAC)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, viostormab, viostorm, viostorm, viostorm, mystwarr_state, empty_init, ROT0,  "Konami", "Violent Storm (ver AAB)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1993, metamrph,   0,        metamrph, metamrph, mystwarr_state, 0, ROT0,  "Konami", "Metamorphic Force (ver EAA)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, metamrphe,  metamrph, metamrph, metamrph, mystwarr_state, 0, ROT0,  "Konami", "Metamorphic Force (ver EAA - alternate)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, metamrphu,  metamrph, metamrph, metamrph, mystwarr_state, 0, ROT0,  "Konami", "Metamorphic Force (ver UAA)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, metamrphj,  metamrph, metamrph, metamrph, mystwarr_state, 0, ROT0,  "Konami", "Metamorphic Force (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, metamrpha,  metamrph, metamrph, metamrph, mystwarr_state, 0, ROT0,  "Konami", "Metamorphic Force (ver AAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, metamrph,   0,        metamrph, metamrph, mystwarr_state, empty_init, ROT0,  "Konami", "Metamorphic Force (ver EAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, metamrphe,  metamrph, metamrph, metamrph, mystwarr_state, empty_init, ROT0,  "Konami", "Metamorphic Force (ver EAA - alternate)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, metamrphu,  metamrph, metamrph, metamrph, mystwarr_state, empty_init, ROT0,  "Konami", "Metamorphic Force (ver UAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, metamrphj,  metamrph, metamrph, metamrph, mystwarr_state, empty_init, ROT0,  "Konami", "Metamorphic Force (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, metamrpha,  metamrph, metamrph, metamrph, mystwarr_state, empty_init, ROT0,  "Konami", "Metamorphic Force (ver AAA)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1993, mtlchamp,   0,        martchmp, martchmp, mystwarr_state, 0, ROT0,  "Konami", "Martial Champion (ver EAB)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, mtlchamp1,  mtlchamp, martchmp, martchmp, mystwarr_state, 0, ROT0,  "Konami", "Martial Champion (ver EAA)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, mtlchampu,  mtlchamp, martchmp, martchmp, mystwarr_state, 0, ROT0,  "Konami", "Martial Champion (ver UAE)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, mtlchampu1, mtlchamp, martchmp, martchmp, mystwarr_state, 0, ROT0,  "Konami", "Martial Champion (ver UAD)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, mtlchampj,  mtlchamp, martchmp, martchmp, mystwarr_state, 0, ROT0,  "Konami", "Martial Champion (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, mtlchampa,  mtlchamp, martchmp, martchmp, mystwarr_state, 0, ROT0,  "Konami", "Martial Champion (ver AAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, mtlchamp,   0,        martchmp, martchmp, mystwarr_state, empty_init, ROT0,  "Konami", "Martial Champion (ver EAB)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, mtlchamp1,  mtlchamp, martchmp, martchmp, mystwarr_state, empty_init, ROT0,  "Konami", "Martial Champion (ver EAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, mtlchampu,  mtlchamp, martchmp, martchmp, mystwarr_state, empty_init, ROT0,  "Konami", "Martial Champion (ver UAE)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, mtlchampu1, mtlchamp, martchmp, martchmp, mystwarr_state, empty_init, ROT0,  "Konami", "Martial Champion (ver UAD)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, mtlchampj,  mtlchamp, martchmp, martchmp, mystwarr_state, empty_init, ROT0,  "Konami", "Martial Champion (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, mtlchampa,  mtlchamp, martchmp, martchmp, mystwarr_state, empty_init, ROT0,  "Konami", "Martial Champion (ver AAA)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1993, gaiapols,   0,        gaiapols, dadandrn, mystwarr_state, 0, ROT90, "Konami", "Gaiapolis (ver EAF)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, gaiapolsu,  gaiapols, gaiapols, dadandrn, mystwarr_state, 0, ROT90, "Konami", "Gaiapolis (ver UAF)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, gaiapolsj,  gaiapols, gaiapols, dadandrn, mystwarr_state, 0, ROT90, "Konami", "Gaiapolis (ver JAF)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, gaiapols,   0,        gaiapols, dadandrn, mystwarr_state, empty_init, ROT90, "Konami", "Gaiapolis (ver EAF)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, gaiapolsu,  gaiapols, gaiapols, dadandrn, mystwarr_state, empty_init, ROT90, "Konami", "Gaiapolis (ver UAF)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, gaiapolsj,  gaiapols, gaiapols, dadandrn, mystwarr_state, empty_init, ROT90, "Konami", "Gaiapolis (ver JAF)", MACHINE_IMPERFECT_GRAPHICS )

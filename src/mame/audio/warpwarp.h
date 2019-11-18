@@ -18,9 +18,9 @@ public:
 	};
 
 
-	DECLARE_WRITE8_MEMBER( sound_w );
-	DECLARE_WRITE8_MEMBER( music1_w );
-	DECLARE_WRITE8_MEMBER( music2_w );
+	void sound_w(u8 data);
+	void music1_w(u8 data);
+	void music2_w(u8 data);
 
 protected:
 	// device-level overrides
@@ -35,6 +35,8 @@ private:
 	// internal state
 	std::unique_ptr<int16_t[]> m_decay;
 	sound_stream *m_channel;
+	u32 m_clock_16h;
+	u32 m_clock_1v;
 	int m_sound_latch;
 	int m_music1_latch;
 	int m_music2_latch;
@@ -52,6 +54,6 @@ private:
 	int m_mcount;
 };
 
-DECLARE_DEVICE_TYPE(WARPWARP, warpwarp_sound_device)
+DECLARE_DEVICE_TYPE(WARPWARP_SOUND, warpwarp_sound_device)
 
 #endif // MAME_AUDIO_WARPWARP_H

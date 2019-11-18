@@ -11,7 +11,7 @@
 
 		<part name="rom" interface="hp9845a_rom">
 			<dataarea name="rom" size="0x2800">
-				<rom name="09845-65531-01_46_mass_storage_ppu.bin" size="0x2800" crc="70fac710" sha1="233be806b5262e5261e2d2144859c45c70cb0dd9" offset="0x0000" />
+				<rom name="09845-65531-01_46_mass_storage_ppu.bin" size="0x2800" crc="70fac710" sha1="233be806b5262e5261e2d2144859c45c70cb0dd9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -24,7 +24,7 @@
 
 		<part name="rom" interface="hp9845a_rom">
 			<dataarea name="rom" size="0x4000">
-				<rom name="09845-65532-02_40-io_lpu.bin" size="0x4000" crc="f1d5bada" sha1="25aa0c482e6a5a9adcd594196262da236fc62dc1" offset="0x0000" />
+				<rom name="09845-65532-02_40-io_lpu.bin" size="0x4000" crc="f1d5bada" sha1="25aa0c482e6a5a9adcd594196262da236fc62dc1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -37,7 +37,7 @@
 
 		<part name="rom" interface="hp9845a_rom">
 			<dataarea name="rom" size="0x1800">
-				<rom name="09845-65533-01_60-io_ppu.bin" size="0x1800" crc="0be7d960" sha1="f7302dd91a8aac20e6ecd430683c7aa164edc601" offset="0x0000" />
+				<rom name="09845-65533-01_60-io_ppu.bin" size="0x1800" crc="0be7d960" sha1="f7302dd91a8aac20e6ecd430683c7aa164edc601"/>
 			</dataarea>
 		</part>
 	</software>
@@ -50,7 +50,7 @@
 
 		<part name="rom" interface="hp9845a_rom">
 			<dataarea name="rom" size="0x4000">
-				<rom name="09845-65537-02_60-graphics.bin" size="0x4000" crc="fc5437b4" sha1="67f1e2812003de92fad713b0b1d47defc5bbb74b" offset="0x0000" />
+				<rom name="09845-65537-02_60-graphics.bin" size="0x4000" crc="fc5437b4" sha1="67f1e2812003de92fad713b0b1d47defc5bbb74b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -91,7 +91,7 @@
 
 		<part name="rom" interface="hp9845a_rom">
 			<dataarea name="rom" size="0x2000">
-				<rom name="831010-15_10-reva-structured_software_systems_mass_storage.bin" size="0x2000" crc="bc875ee0" sha1="e82dd5c1b826eb80cd323cefe1d8a19fa4733952" offset="0x0000" />
+				<rom name="831010-15_10-reva-structured_software_systems_mass_storage.bin" size="0x2000" crc="bc875ee0" sha1="e82dd5c1b826eb80cd323cefe1d8a19fa4733952"/>
 			</dataarea>
 		</part>
 	</software>

@@ -5,19 +5,22 @@
   Galaxian hardware family (old)
 
   This include file is used by the following drivers:
-    - dambustr.c
-    - galaxold.c
-    - scramble.c
-    - scobra.c
+    - dambustr.cpp
+    - galaxold.cpp
+    - scramble.cpp
+    - scobra.cpp
 
 ***************************************************************************/
-
 #ifndef MAME_INCLUDES_GALAXOLD_H
 #define MAME_INCLUDES_GALAXOLD_H
 
+#pragma once
+
 #include "machine/7474.h"
 #include "machine/timer.h"
+#include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 /* star circuit */
 #define STAR_COUNT  252
@@ -30,24 +33,24 @@ class galaxold_state : public driver_device
 {
 public:
 	galaxold_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_audiocpu(*this, "audiocpu"),
-			m_7474_9m_1(*this, "7474_9m_1"),
-			m_7474_9m_2(*this, "7474_9m_2"),
-			m_gfxdecode(*this, "gfxdecode"),
-			m_screen(*this, "screen"),
-			m_palette(*this, "palette"),
-			m_videoram(*this,"videoram"),
-			m_spriteram(*this,"spriteram"),
-			m_spriteram2(*this,"spriteram2"),
-			m_attributesram(*this,"attributesram"),
-			m_bulletsram(*this,"bulletsram"),
-			m_rockclim_videoram(*this,"rockclim_vram"),
-			m_racknrol_tiles_bank(*this,"racknrol_tbank"),
-			m_leftclip(2)
-	{
-	}
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_7474_9m_1(*this, "7474_9m_1")
+		, m_7474_9m_2(*this, "7474_9m_2")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+		, m_videoram(*this,"videoram")
+		, m_spriteram(*this,"spriteram")
+		, m_spriteram2(*this,"spriteram2")
+		, m_attributesram(*this,"attributesram")
+		, m_bulletsram(*this,"bulletsram")
+		, m_rockclim_videoram(*this,"rockclim_vram")
+		, m_racknrol_tiles_bank(*this,"racknrol_tbank")
+		, m_leds(*this, "led%u", 0U)
+		, m_leftclip(2)
+	{ }
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -66,6 +69,7 @@ public:
 	optional_shared_ptr<uint8_t> m_bulletsram;
 	optional_shared_ptr<uint8_t> m_rockclim_videoram;
 	optional_shared_ptr<uint8_t> m_racknrol_tiles_bank;
+	output_finder<2> m_leds;
 
 	int m_irq_line;
 	uint8_t m__4in1_bank;
@@ -152,16 +156,16 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(galaxold_7474_9m_2_q_callback);
 	DECLARE_WRITE_LINE_MEMBER(galaxold_7474_9m_1_callback);
 	DECLARE_READ8_MEMBER(rescueb_a002_r) { return 0xfc; }
-	DECLARE_CUSTOM_INPUT_MEMBER(_4in1_fake_port_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(vpool_lives_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(ckongg_coinage_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(dkongjrm_coinage_r);
+	template <int Mask> DECLARE_READ_LINE_MEMBER(_4in1_fake_port_r);
+	template <int Mask> DECLARE_READ_LINE_MEMBER(vpool_lives_r);
+	template <int Mask> DECLARE_CUSTOM_INPUT_MEMBER(ckongg_coinage_r);
+	template <int Mask> DECLARE_CUSTOM_INPUT_MEMBER(dkongjrm_coinage_r);
 
-	DECLARE_DRIVER_INIT(bullsdrtg);
-	DECLARE_DRIVER_INIT(ladybugg);
-	DECLARE_DRIVER_INIT(4in1);
-	DECLARE_DRIVER_INIT(guttangt);
-	DECLARE_DRIVER_INIT(ckonggx);
+	void init_bullsdrtg();
+	void init_ladybugg();
+	void init_4in1();
+	void init_guttangt();
+	void init_ckonggx();
 
 	TILE_GET_INFO_MEMBER(drivfrcg_get_tile_info);
 	TILE_GET_INFO_MEMBER(racknrol_get_tile_info);
@@ -174,16 +178,16 @@ public:
 	DECLARE_MACHINE_RESET(devilfsg);
 	DECLARE_MACHINE_RESET(hunchbkg);
 
-	DECLARE_PALETTE_INIT(galaxold);
-	DECLARE_PALETTE_INIT(rockclim);
-	DECLARE_PALETTE_INIT(scrambold);
-	DECLARE_PALETTE_INIT(stratgyx);
-	DECLARE_PALETTE_INIT(darkplnt);
-	DECLARE_PALETTE_INIT(minefld);
-	DECLARE_PALETTE_INIT(rescue);
-	DECLARE_PALETTE_INIT(mariner);
-	DECLARE_PALETTE_INIT(dambustr);
-	DECLARE_PALETTE_INIT(turtles);
+	void galaxold_palette(palette_device &palette);
+	void rockclim_palette(palette_device &palette) const;
+	void scrambold_palette(palette_device &palette);
+	void stratgyx_palette(palette_device &palette);
+	void darkplnt_palette(palette_device &palette) const;
+	void minefld_palette(palette_device &palette);
+	void rescue_palette(palette_device &palette);
+	void mariner_palette(palette_device &palette);
+	void dambustr_palette(palette_device &palette);
+	void turtles_palette(palette_device &palette);
 
 	DECLARE_VIDEO_START(galaxold);
 	DECLARE_VIDEO_START(drivfrcg);
@@ -288,6 +292,7 @@ public:
 	void scramblb(machine_config &config);
 	void porter(machine_config &config);
 	void scramb2(machine_config &config);
+	void scramb3(machine_config &config);
 	void ozon1(machine_config &config);
 	void mooncrst(machine_config &config);
 	void guttang(machine_config &config);
@@ -296,33 +301,38 @@ public:
 	void mooncrst_audio(machine_config &config);
 	void _4in1_map(address_map &map);
 	void bagmanmc_map(address_map &map);
-	void bongo(address_map &map);
+	void bongo_map(address_map &map);
 	void bongo_io(address_map &map);
 	void bullsdrtg_data_map(address_map &map);
 	void ckongg_map(address_map &map);
 	void ckongmc_map(address_map &map);
 	void dkongjrm_map(address_map &map);
 	void dkongjrmc_map(address_map &map);
-	void drivfrcg(address_map &map);
+	void drivfrcg_program(address_map &map);
 	void drivfrcg_io(address_map &map);
 	void galaxold_map(address_map &map);
 	void guttang_map(address_map &map);
 	void hexpoola_data(address_map &map);
 	void hexpoola_io(address_map &map);
-	void hunchbkg(address_map &map);
+	void hunchbkg_map(address_map &map);
 	void hunchbkg_data(address_map &map);
 	void hustlerb3_map(address_map &map);
 	void mooncrst_map(address_map &map);
 	void ozon1_io_map(address_map &map);
 	void ozon1_map(address_map &map);
-	void racknrol(address_map &map);
+	void racknrol_map(address_map &map);
 	void racknrol_io(address_map &map);
 	void rockclim_map(address_map &map);
+	void scramb_common_map(address_map &map);
 	void scramb2_map(address_map &map);
+	void scramb3_map(address_map &map);
 	void scramblb_map(address_map &map);
 	void scrambler_map(address_map &map);
-	void spcwarp(address_map &map);
-	void tazzmang(address_map &map);
+	void spcwarp_map(address_map &map);
+	void tazzmang_map(address_map &map);
+
+protected:
+	virtual void machine_start() override { m_leds.resolve(); }
 };
 
 #define galaxold_coin_counter_0_w galaxold_coin_counter_w

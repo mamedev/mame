@@ -16,20 +16,20 @@
 
 void kaneko_grap2_device::grap2_map(address_map &map)
 {
-	map(0x000000, 0x0003ff).rw(this, FUNC(kaneko_grap2_device::unk1_r), FUNC(kaneko_grap2_device::unk1_w));
-	map(0x000400, 0x000401).w(this, FUNC(kaneko_grap2_device::framebuffer1_scrollx_w));
-	map(0x000800, 0x000bff).rw(this, FUNC(kaneko_grap2_device::unk2_r), FUNC(kaneko_grap2_device::unk2_w));
-	map(0x000c00, 0x000c01).w(this, FUNC(kaneko_grap2_device::framebuffer1_scrolly_w));
-	map(0x000c02, 0x000c03).w(this, FUNC(kaneko_grap2_device::framebuffer1_enable_w));
-	map(0x000c06, 0x000c07).w(this, FUNC(kaneko_grap2_device::framebuffer1_bgcol_w));
-	map(0x000c10, 0x000c11).rw(this, FUNC(kaneko_grap2_device::framebuffer1_fbbright1_r), FUNC(kaneko_grap2_device::framebuffer1_fbbright1_w));
-	map(0x000c12, 0x000c13).rw(this, FUNC(kaneko_grap2_device::framebuffer1_fbbright2_r), FUNC(kaneko_grap2_device::framebuffer1_fbbright2_w));
-	map(0x000c18, 0x000c1b).w(this, FUNC(kaneko_grap2_device::regs1_address_w));
-	map(0x000c1c, 0x000c1d).w(this, FUNC(kaneko_grap2_device::regs2_w));
-	map(0x000c1e, 0x000c1f).w(this, FUNC(kaneko_grap2_device::regs1_go_w));
-	map(0x000c00, 0x000c1f).r(this, FUNC(kaneko_grap2_device::regs1_r));
-	map(0x080000, 0x0801ff).rw(this, FUNC(kaneko_grap2_device::pal_r), FUNC(kaneko_grap2_device::framebuffer1_palette_w));
-	map(0x100000, 0x17ffff).rw(this, FUNC(kaneko_grap2_device::framebuffer_r), FUNC(kaneko_grap2_device::framebuffer_w));
+	map(0x000000, 0x0003ff).rw(FUNC(kaneko_grap2_device::unk1_r), FUNC(kaneko_grap2_device::unk1_w));
+	map(0x000400, 0x000401).w(FUNC(kaneko_grap2_device::framebuffer1_scrollx_w));
+	map(0x000800, 0x000bff).rw(FUNC(kaneko_grap2_device::unk2_r), FUNC(kaneko_grap2_device::unk2_w));
+	map(0x000c00, 0x000c01).w(FUNC(kaneko_grap2_device::framebuffer1_scrolly_w));
+	map(0x000c02, 0x000c03).w(FUNC(kaneko_grap2_device::framebuffer1_enable_w));
+	map(0x000c06, 0x000c07).w(FUNC(kaneko_grap2_device::framebuffer1_bgcol_w));
+	map(0x000c10, 0x000c11).rw(FUNC(kaneko_grap2_device::framebuffer1_fbbright1_r), FUNC(kaneko_grap2_device::framebuffer1_fbbright1_w));
+	map(0x000c12, 0x000c13).rw(FUNC(kaneko_grap2_device::framebuffer1_fbbright2_r), FUNC(kaneko_grap2_device::framebuffer1_fbbright2_w));
+	map(0x000c18, 0x000c1b).w(FUNC(kaneko_grap2_device::regs1_address_w));
+	map(0x000c1c, 0x000c1d).w(FUNC(kaneko_grap2_device::regs2_w));
+	map(0x000c1e, 0x000c1f).w(FUNC(kaneko_grap2_device::regs1_go_w));
+	map(0x000c00, 0x000c1f).r(FUNC(kaneko_grap2_device::regs1_r));
+	map(0x080000, 0x0801ff).rw(FUNC(kaneko_grap2_device::pal_r), FUNC(kaneko_grap2_device::framebuffer1_palette_w));
+	map(0x100000, 0x17ffff).rw(FUNC(kaneko_grap2_device::framebuffer_r), FUNC(kaneko_grap2_device::framebuffer_w));
 }
 
 DEFINE_DEVICE_TYPE(KANEKO_GRAP2, kaneko_grap2_device, "kaneko_grap2", "Kaneko GRAP2")
@@ -37,26 +37,21 @@ DEFINE_DEVICE_TYPE(KANEKO_GRAP2, kaneko_grap2_device, "kaneko_grap2", "Kaneko GR
 kaneko_grap2_device::kaneko_grap2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, KANEKO_GRAP2, tag, owner, clock)
 	, device_rom_interface(mconfig, *this, 32) // TODO : Unknown Address Bits
-	, m_palette(*this, "palette")
+	, device_palette_interface(mconfig, *this)
 {
 }
-
-MACHINE_CONFIG_START(kaneko_grap2_device::device_add_mconfig)
-	MCFG_PALETTE_ADD("palette", 0x101)
-	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
-MACHINE_CONFIG_END
 
 void kaneko_grap2_device::device_start()
 {
 	m_framebuffer = make_unique_clear<uint16_t[]>(0x80000/2);
-	m_framebuffer_palette = make_unique_clear<uint16_t[]>(0x101); // 0x00-0xff is internal palette, 0x100 is background colour
+	m_framebuffer_palette = make_unique_clear<uint16_t[]>(PALETTE_SIZE);
 	m_framebuffer_unk1 = make_unique_clear<uint16_t[]>(0x400/2);
 	m_framebuffer_unk2 = make_unique_clear<uint16_t[]>(0x400/2);
 
-	save_pointer(NAME(m_framebuffer.get()), 0x80000/2);
-	save_pointer(NAME(m_framebuffer_palette.get()), 0x101);
-	save_pointer(NAME(m_framebuffer_unk1.get()), 0x400/2);
-	save_pointer(NAME(m_framebuffer_unk2.get()), 0x400/2);
+	save_pointer(NAME(m_framebuffer), 0x80000/2);
+	save_pointer(NAME(m_framebuffer_palette), PALETTE_SIZE);
+	save_pointer(NAME(m_framebuffer_unk1), 0x400/2);
+	save_pointer(NAME(m_framebuffer_unk2), 0x400/2);
 
 	save_item(NAME(m_framebuffer_scrolly));
 	save_item(NAME(m_framebuffer_scrollx));
@@ -170,7 +165,7 @@ WRITE16_MEMBER(kaneko_grap2_device::regs1_go_w)
 
 void kaneko_grap2_device::set_color_555(pen_t color, int rshift, int gshift, int bshift, uint16_t data)
 {
-	m_palette->set_pen_color(color, pal5bit(data >> rshift), pal5bit(data >> gshift), pal5bit(data >> bshift));
+	set_pen_color(color, pal5bit(data >> rshift), pal5bit(data >> gshift), pal5bit(data >> bshift));
 }
 
 WRITE16_MEMBER(kaneko_grap2_device::framebuffer1_palette_w)
@@ -184,9 +179,4 @@ WRITE16_MEMBER(kaneko_grap2_device::framebuffer1_bgcol_w)
 {
 	COMBINE_DATA(&m_framebuffer_palette[0x100]);
 	set_color_555(0x100, 5, 10, 0, m_framebuffer_palette[0x100]);
-}
-
-uint32_t kaneko_grap2_device::pen_r(int pen)
-{
-	return m_palette->pens()[pen];
 }

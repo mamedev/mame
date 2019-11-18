@@ -1,13 +1,52 @@
 // license:LGPL-2.1+
 // copyright-holders:Michael Zapf
 /***************************************************************************
-    Geneve 9640 mapper and more components
+    Geneve 9640 Gate Array and more components
 
-    This file contains 2 classes:
-    - mapper: main function of the Gate Array on the Geneve board. Maps logical
-        memory accesses to a wider address space using map registers.
-    - keyboard: an implementation of a XT-style keyboard. This should be dropped
-        and replaced by a proper XT keyboard implementation.
+    This file contains the emulation of the gate array and of the PAL chip
+    that is used to control wait state generation.
+
+    Pins of the Gate Array:
+
+    in:  AMC, AMB, AMA, A0..A15: Address bus
+    in:  CLKOUT
+    in:  IAQ/HOLDA
+    in?: NMI*
+    in?: RESET*
+
+    i/o: D0..D7: Data bus
+
+    out: KBDINT*:  Keyboard interrupt
+    i/o: KBDCLK:   Keyboard clock line
+    i/o: KBDDATA:  Keyboard data line
+
+    out: SNDEN*: Sound chip select
+    out: RTCEN*: RTC chip select
+
+    out: RAS*
+    out: CAS* (2x for two banks)
+    out: DRA0..DRA8: Address bus for DRAM (1+18 bit = 512K)
+
+    out: PSIEN*:   9901 enable
+    out: CRUCLK*
+
+    out: CSW*: v9938 write
+    out: CSR*: v9938 read
+
+    out: RAMENX*: SRAM expansion
+    out: RAMEN*:  SRAM
+    out: ROMEN*:  EPROM
+    out: AB0, AB1, AB2: Mapped address bits
+    in:  DBIN*
+    ? :  ABUS* / HOLDA
+    out: DBIN
+    ? :  HOLD*
+    ? :  READY*
+    out: DBEN*: External data bus enable
+    in:  MEMEN*
+    in:  SNDRDY
+    out: WE* / CRUCLK
+    out: PhiCLK: System clock for 9901
 
     Onboard SRAM configuration:
     There is an adjustable SRAM configuration on board, representing the
@@ -81,7 +120,7 @@
     Genmod's double switch box is also emulated. There are two switches:
     - Turbo mode: Activates or deactivates the wait state logic on the Geneve
       board. This switch may be changed at any time.
-    - TI mode: Selects between the on-board memory, which is obviously required
+    - TI mode: Selects between the on-board memory, which is required
       for the GPL interpreter, and the external Memex memory. This switch
       triggers a reset when changed.
 
@@ -92,27 +131,41 @@
 
     Logical address space: 64 KiB
 
-    Geneve mode:
+    Geneve mode
+    -----------
+    Video:    F100 (port 0, rw),
+              F102 (port 1, rw),
+              F104 (port 2, w),
+              F106 (port 3, w)
+                                  1111 0001 0000 .xx0
+    Mapper:   F110 - F117         1111 0001 0001 0xxx
+    Keyboard: F118                1111 0001 0001 1...
+    Clock:    F130 - F13F         1111 0001 0011 xxxx
+    Sound:    F120                1111 0001 0010 ...0
 
-    Video:    F100, F102, F104, F106 (mirror: +8)
-    Mapper:   F110 - F117
-    Keyboard: F118
-    Clock:    F130 - F13F
-    Sound:    F120
+    TI mode
+    -------
+    Video:    8800 (port 0, r), 8c00 (port 0, w),
+              8802 (port 1, r), 8c02 (port 0, w),
+                                8c04 (port 2, w),
+                                8c06 (port 3, w)
 
-    TI mode:
+                                  1000 1w.. .... .xx0
+    Mapper:   8000 - 8007         1000 0000 0000 0xxx
+    Keyboard: 8008 - 800F         1000 0000 0000 1...
+    Clock:    8010 - 801F         1000 0000 0001 xxxx
+    Speech:   9000 / 9400         1001 0w.. .... ...0
+    Grom:     9800 / 9802         1001 1w.. .... ..x0
+              9c00 / 9c02
 
-    Video:    8800, 8802, 8804, 8806
-    Mapper:   8000 - 8007
-    Keyboard: 8008 - 800F
-    Clock:    8010 - 801F
-    Speech:   9000 / 9400
-    Grom:     9800 / 9802
+    Physical address space
+    ----------------------
+    Address space size = 2 MiB
 
-    Physical address space: 2 MiB
-
-    Start    End      Banks
+    Start    End      Phys.pages
     000000 - 07FFFF   00-3F   512 KiB DRAM on-board
+       06C000 - 06DFFF   36     Cartridge space first 8K
+       06E000 - 06FFFF   37     Cartridge space second 8K
     080000 - 0FFFFF   40-7F   512 KiB on-board expansion (never used)
     100000 - 16FFFF   80-B7   448 KiB P-Box space (special cards, like MEMEX)
     170000 - 17FFFF   B8-BF    64 KiB P-Box space (current cards)
@@ -120,10 +173,12 @@
     1E0000 - 1FFFFF   F0-FF   128 KiB EPROM space; 16 KiB actually used, 8 mirrors
 
 
-    GenMod modification:
-
+    GenMod modification
+    -------------------
     TI mode
     000000 - 07FFFF   00-3F   512 KiB DRAM on-board
+       06C000 - 06DFFF   36     Cartridge space first 8K
+       06E000 - 06FFFF   37     Cartridge space second 8K
     080000 - 1DFFFF   40-EF  1408 KiB P-Box space
     1E0000 - 1FFFFF   F0-FF   128 KiB EPROM space; 16 KiB actually used, 8 mirrors
 
@@ -147,16 +202,15 @@
     - accesses to the peripheral expansion box: 1 WS
     - accesses to on-board DRAM: 1 WS
     - accesses to video: 15 WS
-    - accesses to sound: ~25 WS
     - accesses to SRAM: 0 WS
 
     Additional waitstates are created when one of the CRU bits is set. In that
     case, all delays are extended to 2 WS (including SRAM).
 
     Sound waitstates are somewhat unpredictable. It seems as if they depend
-    on the clock of the sound chip; the theory is that the READY line is
-    pulled down until the next clock pulse, which may take some value between
-    18 CPU cycles and 30 CPU cycles.
+    on the clock of the sound chip; the READY line is pulled down until the
+    next clock pulse, which may take some value between 18 CPU cycles and
+    30 CPU cycles.
 
     The gate array is able to create wait states for video accesses. However,
     these wait states are effective after the video access has been completed.
@@ -165,7 +219,8 @@
     Without additional wait states, the video access takes the usual 1 or 2 WS.
 
     Waitstate behavior (Nov 2013)
-       Almost perfect. Only video read access from code in DRAM is too fast by one WS
+       Almost perfect. Only video read access from code in DRAM is too fast
+       by one WS
 
     ==========================
     PFM expansion
@@ -204,20 +259,24 @@
 #define LOG_SETTING  (1U<<8)
 #define LOG_VIDEOWS  (1U<<9)
 #define LOG_PFM      (1U<<10)
+#define LOG_DECODE   (1U<<11)
+#define LOG_INVADDR  (1U<<12)
 
 // Minimum log should be settings and warnings
-#define VERBOSE (LOG_GENERAL | LOG_SETTING | LOG_WARN)
+#define VERBOSE ( LOG_SETTING | LOG_WARN )
 
 #include "genboard.h"
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE_NS(GENEVE_KEYBOARD, bus::ti99::internal, geneve_keyboard_device, "geneve_keyboard", "Geneve XT-style keyboard")
-DEFINE_DEVICE_TYPE_NS(GENEVE_MAPPER, bus::ti99::internal, geneve_mapper_device, "geneve_mapper", "Geneve Gate Array")
+DEFINE_DEVICE_TYPE_NS(GENEVE_GATE_ARRAY, bus::ti99::internal, geneve_gate_array_device, "geneve_gate_array", "Geneve Gate Array")
+DEFINE_DEVICE_TYPE_NS(GENMOD_GATE_ARRAY, bus::ti99::internal, genmod_gate_array_device, "genmod_gate_array", "Geneve Mod Gate Array")
 
 namespace bus { namespace ti99 { namespace internal {
 
-geneve_mapper_device::geneve_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, GENEVE_MAPPER, tag, owner, clock), m_gromwaddr_LSB(false),
+geneve_gate_array_device::geneve_gate_array_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock),
+	m_boot_rom(0),
+	m_gromwaddr_LSB(false),
 	m_gromraddr_LSB(false),
 	m_grom_address(0),
 	m_video_waitstates(false),
@@ -231,34 +290,56 @@ geneve_mapper_device::geneve_mapper_device(const machine_config &mconfig, const 
 	m_cartridge_secondpage(false),
 	m_cartridge6_writable(false),
 	m_cartridge7_writable(false),
-	m_turbo(false),
-	m_genmod(false),
-	m_timode(false),
-	m_pfm_mode(0),
 	m_pfm_bank(0),
 	m_pfm_output_enable(false),
 	m_sram_mask(0),
 	m_sram_val(0),
 	m_ready(*this),
+	m_keyint(*this),
 	m_waitcount(0),
-	m_ext_waitcount(0),
-	m_clock(*owner, GENEVE_CLOCK_TAG),
+	m_video_waitcount(0),
+	m_keyboard_shift_reg(0),
+	m_keyboard_last_clock(CLEAR_LINE),
+	m_keyboard_data_in(CLEAR_LINE),
+	m_shift_reg_enabled(false),
 	m_cpu(*owner, "maincpu"),
+	m_sound(*owner, TI_SOUNDCHIP_TAG),
+	m_video(*owner, TI_VDP_TAG),
+	m_rtc(*owner, GENEVE_CLOCK_TAG),
+	m_sram(*this, GENEVE_SRAM_PAR_TAG),
+	m_dram(*this, GENEVE_DRAM_PAR_TAG),
+	m_peribox(*owner, TI_PERIBOX_TAG),
 	m_pfm512(*owner, GENEVE_PFM512_TAG),
 	m_pfm512a(*owner, GENEVE_PFM512A_TAG),
-	m_sound(*owner, TI_SOUNDCHIP_TAG),
-	m_keyboard(*owner, GENEVE_KEYBOARD_TAG),
-	m_video(*owner, TI_VDP_TAG),
-	m_peribox(*owner, TI_PERIBOX_TAG),
-	m_sram(*this, GENEVE_SRAM_PAR_TAG),
-	m_dram(*this, GENEVE_DRAM_PAR_TAG)
+	m_keyb_conn(*owner, GENEVE_KEYBOARD_CONN_TAG)
 {
-	m_eprom = nullptr;
 }
 
-INPUT_CHANGED_MEMBER( geneve_mapper_device::settings_changed )
+geneve_gate_array_device::geneve_gate_array_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: geneve_gate_array_device(mconfig, GENEVE_GATE_ARRAY, tag, owner, clock)
 {
-	int number = (int)((uint64_t)param&0x03);
+	m_eprom = nullptr;
+	m_pbox_prefix = 0x070000;
+}
+
+genmod_gate_array_device::genmod_gate_array_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: geneve_gate_array_device(mconfig, GENMOD_GATE_ARRAY, tag, owner, clock),
+	m_gm_timode(false),
+	m_turbo(false)
+{
+	m_eprom = nullptr;
+	m_pbox_prefix = 0x170000;
+}
+
+INPUT_CHANGED_MEMBER( geneve_gate_array_device::settings_changed )
+{
+	// Used when switching the boot ROMs during runtime, especially the PFM
+	m_boot_rom = newval;
+}
+
+INPUT_CHANGED_MEMBER( genmod_gate_array_device::setgm_changed )
+{
+	int number = int(param&0x03);
 	int value = newval;
 
 	switch (number)
@@ -271,12 +352,12 @@ INPUT_CHANGED_MEMBER( geneve_mapper_device::settings_changed )
 	case 2:
 		// TIMode switch. Causes reset when changed.
 		LOGMASKED(LOG_SETTING, "Setting timode flag to %d\n", value);
-		m_timode = (value!=0);
+		m_gm_timode = (value!=0);
 		machine().schedule_hard_reset();
 		break;
 	case 3:
 		// Used when switching the boot ROMs during runtime, especially the PFM
-		set_boot_rom(value);
+		m_boot_rom = value;
 		break;
 	default:
 		LOGMASKED(LOG_WARN, "Unknown setting %d ignored\n", number);
@@ -293,7 +374,7 @@ INPUT_CHANGED_MEMBER( geneve_mapper_device::settings_changed )
     within the gate array. Unlike with real GROMs, no address wrapping occurs,
     and the complete 64K space is available.
 */
-READ8_MEMBER( geneve_mapper_device::read_grom )
+uint8_t geneve_gate_array_device::read_grom(offs_t offset)
 {
 	uint8_t reply;
 	if (offset & 0x0002)
@@ -316,8 +397,8 @@ READ8_MEMBER( geneve_mapper_device::read_grom )
 	{
 		// GROM data handling
 		// GROMs are stored in pages 38..3f
-		int page = 0x38;
-		reply = m_dram->pointer()[(page<<13) + m_grom_address];
+		int physpage = 0x38;
+		reply = m_dram->pointer()[(physpage<<13) + m_grom_address];
 		m_grom_address = (m_grom_address + 1) & 0xffff;
 		m_gromraddr_LSB = m_gromwaddr_LSB = false;
 	}
@@ -328,7 +409,7 @@ READ8_MEMBER( geneve_mapper_device::read_grom )
     Simulates GROM. The real Geneve does not use GROMs but simulates them
     within the gate array.
 */
-WRITE8_MEMBER( geneve_mapper_device::write_grom )
+void geneve_gate_array_device::write_grom(offs_t offset, uint8_t data)
 {
 	if (offset & 0x0002)
 	{
@@ -349,22 +430,21 @@ WRITE8_MEMBER( geneve_mapper_device::write_grom )
 	else
 	{   // write GPL data
 		// The Geneve GROM simulator allows for GROM writing (verified with a real system)
-		int page = 0x38;
-		m_dram->pointer()[(page<<13) + m_grom_address] = data;
+		int physpage = 0x38;
+		m_dram->pointer()[(physpage<<13) + m_grom_address] = data;
 
 		m_grom_address = (m_grom_address + 1) & 0xffff;
 		m_gromraddr_LSB = m_gromwaddr_LSB = false;
 	}
 }
 
-void geneve_mapper_device::set_wait(int min)
+void geneve_gate_array_device::set_wait(int min)
 {
-	if (m_debug_no_ws) return;
 	if (m_extra_waitstates && min < 2) min = 2;
 
 	// if we still have video wait states, do not set this counter
 	// (or it will assert READY when expiring)
-	if (m_ext_waitcount > min) return;
+	if (m_video_waitcount > min) return;
 
 	// need one more pass so that READY will be asserted again
 	m_waitcount = min + 1;
@@ -376,65 +456,38 @@ void geneve_mapper_device::set_wait(int min)
 	}
 }
 
-void geneve_mapper_device::set_ext_wait(int min)
+void geneve_gate_array_device::set_video_waitcount(int min)
 {
 	if (m_debug_no_ws) return;
-	m_ext_waitcount = min;
+	m_video_waitcount = min;
 }
 
-void geneve_mapper_device::set_boot_rom(int selection)
-{
-	switch (selection)
-	{
-	case GENEVE_098:
-		LOGMASKED(LOG_SETTING, "Using 0.98 boot eprom\n");
-		m_eprom = machine().root_device().memregion("maincpu")->base() + 0x4000;
-		m_pfm_mode = 0;
-		break;
-	case GENEVE_100:
-		LOGMASKED(LOG_SETTING, "Using 1.00 boot eprom\n");
-		m_eprom = machine().root_device().memregion("maincpu")->base();
-		m_pfm_mode = 0;
-		break;
-	case GENEVE_PFM512:
-		LOGMASKED(LOG_SETTING, "Using PFM512 (AT29C040)\n");
-		m_pfm_mode = 1;
-		break;
-	case GENEVE_PFM512A:
-		LOGMASKED(LOG_SETTING, "Using PFM512A (AT29C040A)\n");
-		m_pfm_mode = 2;
-		break;
-	default:
-		LOGMASKED(LOG_WARN, "Unknown boot ROM selection\n");
-	}
-}
-
-void geneve_mapper_device::set_geneve_mode(bool geneve)
+void geneve_gate_array_device::set_geneve_mode(bool geneve)
 {
 	LOGMASKED(LOG_SETTING, "Setting Geneve mode = %d\n", geneve);
 	m_geneve_mode = geneve;
 }
 
-void geneve_mapper_device::set_direct_mode(bool direct)
+void geneve_gate_array_device::set_direct_mode(bool direct)
 {
 	LOGMASKED(LOG_SETTING, "Setting direct mode = %d\n", direct);
 	m_direct_mode = direct;
 }
 
-void geneve_mapper_device::set_cartridge_size(int size)
+void geneve_gate_array_device::set_cartridge_size(int size)
 {
 	LOGMASKED(LOG_SETTING, "Setting cartridge size to %d\n", size);
 	m_cartridge_size = size;
 }
 
-void geneve_mapper_device::set_cartridge_writable(int base, bool write)
+void geneve_gate_array_device::set_cartridge_writable(int base, bool write)
 {
 	LOGMASKED(LOG_SETTING, "Cartridge %04x space writable = %d\n", base, write);
 	if (base==0x6000) m_cartridge6_writable = write;
 	else m_cartridge7_writable = write;
 }
 
-void geneve_mapper_device::set_video_waitstates(bool wait)
+void geneve_gate_array_device::set_video_waitstates(bool wait)
 {
 	// Tends to be called repeatedly
 	if (m_video_waitstates != wait)
@@ -444,52 +497,116 @@ void geneve_mapper_device::set_video_waitstates(bool wait)
 	m_video_waitstates = wait;
 }
 
-void geneve_mapper_device::set_extra_waitstates(bool wait)
+void geneve_gate_array_device::set_extra_waitstates(bool wait)
 {
 	LOGMASKED(LOG_SETTING, "Setting extra waitstates = %d\n", wait);
 	m_extra_waitstates = wait;
 }
 
+/******************************************************************
+   Keyboard support
+   XT protocol:
+
+    Original XT: 0 1 bit0 bit1 bit2 bit3 bit4 bit5 bit6 bit7
+    Some clones:   1 bit0 bit1 bit2 bit3 bit4 bit5 bit6 bit7
+
+    bit0 = LSB, bit7 = MSB
+
+   For now we assume that the Geneve needs the original XT keyboard.
+
+   We can use the start 1 bit to control bit reception. When it reaches the
+   rightmost position, we suspend transfer and raise the interrupt.
+
+   With the flagging of the interrupt, the data line towards the keyboard
+   is held low until the interrupt is cleared. This is done by clearing the
+   shift register by setting the CRU address 1EF2 to 0.
+
+   Note that lowering the clock line to 0 for more than 20ms will trigger
+   a keyboard reset.
+
+******************************************************************/
+
+/*
+    Pull down or release the clock line.
+    Called by setting CRU bit 1EF0 to 0 or 1.
+*/
+WRITE_LINE_MEMBER( geneve_gate_array_device::set_keyboard_clock)
+{
+	m_keyb_conn->clock_write_from_mb(state);
+}
+
+/*
+    Enable the shift register. Setting to 0 will clear the register and
+    lock it. At the same time, the interrupt is cleared, and the data line
+    is released. If further scancodes are expected, the shift register should
+    immediately be enabled again.
+
+    Called by setting CRU bit 1EF2 to 0 or 1
+*/
+WRITE_LINE_MEMBER( geneve_gate_array_device::enable_shift_register)
+{
+	m_shift_reg_enabled = (state==ASSERT_LINE);
+
+	if (!m_shift_reg_enabled)
+	{
+		LOGMASKED(LOG_KEYBOARD, "Clear shift register, disable\n");
+		m_keyboard_shift_reg = 0;
+		shift_reg_changed();
+	}
+	else
+		LOGMASKED(LOG_KEYBOARD, "Enable shift register\n");
+}
+
+void geneve_gate_array_device::shift_reg_changed()
+{
+	// The level of the data line is the inverse of the rightmost bit of
+	// the shift register. This means that once the start bit reaches that
+	// position, it will pull down the data line and stop the transfer.
+	m_keyb_conn->data_write_from_mb(1 - (m_keyboard_shift_reg & 1));
+	m_keyint((m_keyboard_shift_reg & 1)? ASSERT_LINE : CLEAR_LINE);
+	if (m_keyboard_shift_reg & 1)
+		LOGMASKED(LOG_KEYBOARD, "Scan code complete; raise interrupt, hold down data line\n");
+	else
+		LOGMASKED(LOG_KEYBOARD, "Clear keyboard interrupt, release data line\n");
+}
+
+/*
+    Incoming keyboard strobe. When 0, push the current data line level into
+    the shift register at the leftmost position.
+*/
+WRITE_LINE_MEMBER( geneve_gate_array_device::kbdclk )
+{
+	LOGMASKED(LOG_KEYBOARD, "Keyboard clock: %d\n", state);
+	bool clock_falling_edge = (m_keyboard_last_clock == ASSERT_LINE && state == CLEAR_LINE);
+
+	if (m_shift_reg_enabled && clock_falling_edge)
+	{
+		m_keyboard_shift_reg = (m_keyboard_shift_reg>>1) | (m_keyboard_data_in? 0x100 : 0x00);
+		LOGMASKED(LOG_KEYBOARD, "Shift register = %02x\n", m_keyboard_shift_reg>>1);
+		shift_reg_changed();
+	}
+	m_keyboard_last_clock = (line_state)state;
+}
+
+/*
+    Latch the value of the incoming data line.
+*/
+WRITE_LINE_MEMBER( geneve_gate_array_device::kbddata )
+{
+	LOGMASKED(LOG_KEYBOARD, "Keyboard data: %d\n", state);
+	m_keyboard_data_in = (line_state)state;
+}
 
 /************************************************************************
     Called by the address map
 ************************************************************************/
-/*
-    Constants for mapper decoding. Naming scheme:
-    M=mapper
-    L=Logical space; P=Physical space
-    G=Geneve mode;  T=TI mode; GM=GenMod
-*/
-enum
-{
-	MLGVIDEO=1,
-	MLGMAPPER,
-	MLGKEY,
-	MLGCLOCK,
-	MLGSOUND,
-	MLTMAPPER,
-	MLTKEY,
-	MLTCLOCK,
-	MLTVIDEO,
-	MLTSPEECH,
-	MLTGROM,
-	MLTSOUND,
-	MPGDRAM,
-	MPGEXP,
-	MPGEPROM,
-	MPGSRAM,
-	MPGBOX,
-	MPGMDRAM,
-	MPGMEPROM,
-	MPGMBOX
-};
 
 /*
     Read a byte via the data bus. The decoding has already been done in the
-    SETOFFSET method, and we re-use the values stored there to quickly
+    SETADDRESS method, and we re-use the values stored there to quickly
     access the appropriate component.
 */
-READ8_MEMBER( geneve_mapper_device::readm )
+uint8_t geneve_gate_array_device::readm(offs_t offset)
 {
 	uint8_t value = 0;
 
@@ -502,7 +619,19 @@ READ8_MEMBER( geneve_mapper_device::readm )
 		if (m_cpu->is_onchip(offset)) return m_cpu->debug_read_onchip_memory(offset&0xff);
 		dec = &debug;
 		m_debug_no_ws = true;
-		decode(space, offset, true, dec);
+		dec->offset = offset;
+		decode_logical(true, dec);
+		if (dec->function == MUNDEF)
+		{
+			map_address(m_read_mode, dec);
+			decode_physical(dec);
+			decode_mod(dec);
+		}
+		if (dec->function == MBOX)
+		{
+			m_peribox->memen_in(ASSERT_LINE);
+			m_peribox->setaddress_dbin(dec->physaddr, true);
+		}
 	}
 	else
 	{
@@ -511,174 +640,110 @@ READ8_MEMBER( geneve_mapper_device::readm )
 		m_debug_no_ws = false;
 	}
 
+	// Logical space
+
 	switch (dec->function)
 	{
-	case MLGVIDEO:
+	case MLVIDEO:
 		if (!machine().side_effects_disabled())
 		{
-			value = m_video->read(space, dec->offset>>1);
+			value = m_video->read(dec->offset>>1);
 			LOGMASKED(LOG_READ, "Read video %04x -> %02x\n", dec->offset, value);
 			// Video wait states are created *after* the access
 			// Accordingly, they have no effect when execution is in onchip RAM
-			if (m_video_waitstates) set_ext_wait(15);
+			if (m_video_waitstates) set_video_waitcount(15);
 		}
 		break;
 
-	case MLGMAPPER:
+	case MLMAPPER:
 		// mapper
-		value = m_map[dec->offset];
-		LOGMASKED(LOG_READ, "read mapper %04x -> %02x\n", dec->offset, value);
-		break;
-
-	case MLGKEY:
-		// key
-		if (!machine().side_effects_disabled()) value = m_keyboard->get_recent_key();
-		LOGMASKED(LOG_READ, "Read keyboard -> %02x\n", value);
-		break;
-
-	case MLGCLOCK:
-		// clock
-		// tests on the real machine showed that
-		// upper nibble is 0xf (probably because of the location at 0xf130?)
-		value = m_clock->read(space, dec->offset) | 0xf0;
-		LOGMASKED(LOG_READ, "Read clock %04x -> %02x\n", dec->offset, value);
-		break;
-
-	case MLTMAPPER:
-		// mapper
-		value = m_map[dec->offset];
+		value = m_map[dec->offset & 0x0007];
 		LOGMASKED(LOG_READ, "Read mapper %04x -> %02x\n", dec->offset, value);
 		break;
 
-	case MLTKEY:
+	case MLKEY:
 		// key
-		if (!machine().side_effects_disabled()) value = m_keyboard->get_recent_key();
-		LOGMASKED(LOG_READ, "Read keyboard -> %02x\n", value);
+		value = m_keyboard_shift_reg>>1;
+		LOGMASKED(LOG_KEYBOARD, "Read keyboard -> %02x\n", value);
 		break;
 
-	case MLTCLOCK:
+	case MLCLOCK:
 		// clock
-		// upper nibble is 1, only last byte gets a 2
-		// probably because of the location at 8010...8020?
-		// (TI mode used swapped byte order)
-		// unless we use a workspace at >F000, in which case we get 8x values
-		// Obscure, needs more investigation. We might as well ignore this,
+		// Tests on the real machine showed that the upper nibble is 0xf
+		// (probably because of the location at f130-f13f?)
+		// In TI mode, however, the upper nibble is 1, unless we read 801f,
+		// in which case the nibble is 2. Here the location is 8010-801f.
+		// Needs more investigation. We might as well ignore this,
 		// as the high nibble is obviously undefined and takes some past
 		// value floating around.
-		value = m_clock->read(space, dec->offset);
-		value |= (dec->offset==0x000f)? 0x20 : 0x10;
+		value = m_rtc->read(dec->offset & 0x000f);
+		if (m_geneve_mode) value |= 0xf0;
+		else value |= ((dec->offset & 0x000f)==0x000f)? 0x20 : 0x10;
 		LOGMASKED(LOG_READ, "Read clock %04x -> %02x\n", dec->offset, value);
 		break;
 
-	case MLTVIDEO:
-		// video
-		// ++++ ++-- ---- ---+
-		// 1000 1000 0000 00x0
-		if (!machine().side_effects_disabled())
-		{
-			value = m_video->read(space, dec->offset>>1);
-			LOGMASKED(LOG_READ, "Read video %04x -> %02x\n", dec->offset, value);
-			// See above
-			if (m_video_waitstates) set_ext_wait(15);
-		}
-		break;
-
-	case MLTSPEECH:
-		// speech
-		// ++++ ++-- ---- ---+
-		// 1001 0000 0000 0000
-		// We need to add the address prefix bits
-		m_peribox->readz(space, dec->offset, &value, 0xff);
-		m_peribox->memen_in(CLEAR_LINE);
-		LOGMASKED(LOG_READ, "Read speech -> %02x\n", value);
-		break;
-
-	case MLTGROM:
+	case MLGROM:
 		// grom simulation
 		// ++++ ++-- ---- ---+
 		// 1001 1000 0000 00x0
-		if (!machine().side_effects_disabled()) value = read_grom(space, dec->offset, 0xff);
+		if (!machine().side_effects_disabled()) value = read_grom(dec->offset);
 		LOGMASKED(LOG_READ, "Read GROM %04x -> %02x\n", dec->offset, value);
 		break;
 
-	case MLGSOUND:
-	case MLTSOUND:
+	case MLSOUND:
 		value = 0;
 		break;
 
-
-	case MPGDRAM:
-		// DRAM.
+	case MPDRAM:
+		// DRAM. One wait state.
 		value = m_dram->pointer()[dec->physaddr];
-//          LOG("dram read physaddr = %06x logaddr = %04x value = %02x\n", dec->physaddr, dec->offset, value);
 		LOGMASKED(LOG_READ, "Read DRAM %04x (%06x) -> %02x\n", dec->offset, dec->physaddr, value);
 		break;
 
-	case MPGEXP:
+	case MPEXP:
 		// On-board memory expansion for standard Geneve (never used)
-		LOGMASKED(LOG_READ, "Read unmapped area %06x\n", dec->physaddr);
+		LOGMASKED(LOG_READ, "Read on-board expansion (not available) %06x -> 00\n", dec->physaddr);
 		value = 0;
 		break;
 
-	case MPGEPROM:
+	case MPEPROM:
 		// 1 111. ..xx xxxx xxxx xxxx on-board eprom (16K)
 		// mirrored for f0, f2, f4, ...; f1, f3, f5, ...
-		if (m_pfm_mode == 0)
-		{
-			value = m_eprom[dec->physaddr & 0x003fff];
-			LOGMASKED(LOG_READ, "Read EPROM %04x (%06x) -> %02x\n", dec->offset, dec->physaddr, value);
-		}
-		else value = read_from_pfm(space, dec->physaddr, 0xff);
-
+		value = boot_rom(dec->physaddr);
 		break;
 
-	case MPGSRAM:
+	case MPSRAM:
 		if ((dec->physaddr & m_sram_mask)==m_sram_val)
 		{
 			value = m_sram->pointer()[dec->physaddr & ~m_sram_mask];
+			LOGMASKED(LOG_READ, "Read SRAM %04x (%06x) -> %02x\n", dec->offset, dec->physaddr, value);
 		}
-		else value = 0;
+		else
+		{
+			LOGMASKED(LOG_INVADDR, "Decoded as SRAM read, but no SRAM at %06x\n", dec->physaddr);
+			value = 0;
+		}
 		// Return in any case
-//          LOG("sram read physaddr = %06x logaddr = %04x value = %02x\n", dec->physaddr, dec->offset, value);
-		LOGMASKED(LOG_READ, "Read SRAM %04x (%06x) -> %02x\n", dec->offset, dec->physaddr, value);
 		break;
 
-	case MPGBOX:
+	case MBOX:
 		// Route everything else to the P-Box
 		//   0x000000-0x07ffff for the stock Geneve (AMC,AMB,AMA,A0 ...,A15)
 		//   0x000000-0x1fffff for the GenMod.(AME,AMD,AMC,AMB,AMA,A0 ...,A15)
 
-		m_peribox->readz(space, dec->physaddr, &value, 0xff);
+		m_peribox->readz(dec->physaddr, &value);
 		m_peribox->memen_in(CLEAR_LINE);
 		LOGMASKED(LOG_READ, "Read P-Box %04x (%06x) -> %02x\n", dec->offset, dec->physaddr, value);
 		break;
 
-	case MPGMDRAM:
-		// DRAM. One wait state.
-		value = m_dram->pointer()[dec->physaddr];
-		break;
-
-	case MPGMEPROM:
-		// 1 111. ..xx xxxx xxxx xxxx on-board eprom (16K)
-		// mirrored for f0, f2, f4, ...; f1, f3, f5, ...
-		if (m_pfm_mode == 0)
-		{
-			value = m_eprom[dec->physaddr & 0x003fff];
-			LOGMASKED(LOG_READ, "Read EPROM %04x (%06x) -> %02x\n", dec->offset, dec->physaddr, value);
-		}
-		else value = read_from_pfm(space, dec->physaddr, 0xff);
-		break;
-
-	case MPGMBOX:
-		// Route everything else to the P-Box
-		m_peribox->readz(space, dec->physaddr, &value, 0xff);
-		m_peribox->memen_in(CLEAR_LINE);
+	default:
+		LOGMASKED(LOG_WARN, "Unknown decoding result type: %d\n", dec->function);
 		break;
 	}
 	return value;
 }
 
-WRITE8_MEMBER( geneve_mapper_device::writem )
+void geneve_gate_array_device::writem(offs_t offset, uint8_t data)
 {
 	decdata *dec;
 	decdata debug;
@@ -686,618 +751,310 @@ WRITE8_MEMBER( geneve_mapper_device::writem )
 	// For the debugger, do the decoding here with no wait states
 	if (machine().side_effects_disabled())
 	{
+		// TODO: add debug_write_onchip_memory
 		dec = &debug;
 		m_debug_no_ws = true;
-		decode(space, offset, false, dec);
+		dec->offset = offset;
+		decode_logical(false, dec);
+		if (dec->function == MUNDEF)
+		{
+			map_address(m_read_mode, dec);
+			decode_physical(dec);
+			decode_mod(dec);
+		}
+		if (dec->function == MBOX)
+		{
+			m_peribox->memen_in(ASSERT_LINE);
+			m_peribox->setaddress_dbin(dec->physaddr, false);
+		}
 	}
 	else
 	{
 		// Use the values found in the setaddress phase
-		m_debug_no_ws = false;
 		dec = &m_decoded;
+		m_debug_no_ws = false;
 	}
+
+
+	// Logical space
 
 	switch (dec->function)
 	{
-	case MLGVIDEO:
+	case MLVIDEO:
 		// video
 		// ++++ ++++ ++++ ---+
 		// 1111 0001 0000 .cc0
+		// Initialize waitstate timer
 
 		if (!machine().side_effects_disabled())
 		{
-			m_video->write(space, dec->offset>>1, data);
+			m_video->write(dec->offset>>1, data);
 			LOGMASKED(LOG_WRITE, "Write video %04x <- %02x\n", offset, data);
 			// See above
-			if (m_video_waitstates) set_ext_wait(15);
+			if (m_video_waitstates) set_video_waitcount(15);
 		}
 		break;
 
-	case MLGMAPPER:
+	case MLMAPPER:
 		// mapper
-		m_map[dec->offset] = data;
+		m_map[dec->offset & 0x0007] = data;
 		LOGMASKED(LOG_WRITE, "Write mapper %04x <- %02x\n", offset, data);
 		break;
 
-	case MLGCLOCK:
+	case MLCLOCK:
 		// clock
 		// ++++ ++++ ++++ ----
-		m_clock->write(space, dec->offset, data);
+		m_rtc->write(dec->offset & 0x000f, data);
 		LOGMASKED(LOG_WRITE, "Write clock %04x <- %02x\n", offset, data);
 		break;
 
-	case MLGSOUND:
+	case MLSOUND:
 		// sound
 		// ++++ ++++ ++++ ---+
-		m_sound->write(space, 0, data, 0xff);
+		m_sound->write(data);
 		LOGMASKED(LOG_WRITE, "Write sound <- %02x\n", data);
 		break;
 
-	case MLTMAPPER:
-		// mapper
-		m_map[dec->offset] = data;
-		LOGMASKED(LOG_WRITE, "Write mapper %04x <- %02x\n", offset, data);
-		break;
-
-	case MLTCLOCK:
-		// clock
-		m_clock->write(space, dec->offset, data);
-		LOGMASKED(LOG_WRITE, "Write clock %04x <- %02x\n", offset, data);
-		break;
-
-	case MLTVIDEO:
-		// video
-		// ++++ ++-- ---- ---+
-		// 1000 1100 0000 00c0
-		// Initialize waitstate timer
-		if (!machine().side_effects_disabled())
-		{
-			m_video->write(space, dec->offset>>1, data);
-			LOGMASKED(LOG_WRITE, "Write video %04x <- %02x\n", offset, data);
-			// See above
-			if (m_video_waitstates) set_ext_wait(15);
-		}
-		break;
-
-	case MLTSPEECH:
-		// speech
-		// ++++ ++-- ---- ---+
-		// 1001 0100 0000 0000
-		// We need to add the address prefix bits
-		m_peribox->write(space, dec->offset, data, 0xff);
-		m_peribox->memen_in(CLEAR_LINE);
-		LOGMASKED(LOG_WRITE, "Write speech <- %02x\n", data);
-		break;
-
-	case MLTGROM:
-		// grom simulation
-		// ++++ ++-- ---- ---+
-		// 1001 1100 0000 00c0
-		write_grom(space, dec->offset, data, 0xff);
+	case MLGROM:
+		// The GROM simulator is only available in TI Mode
+		write_grom(dec->offset, data);
 		LOGMASKED(LOG_WRITE, "Write GROM %04x <- %02x\n", offset, data);
 		break;
 
-	case MLTSOUND:
-		// sound
-		// ++++ ++-- ---- ---+
-		// 1000 0100 0000 0000
-		m_sound->write(space, 0, data, 0xff);
-		LOGMASKED(LOG_WRITE, "Write sound <- %02x\n", data);
-		break;
-
-	case MLTKEY:
-	case MLGKEY:
-		break;
-
-	case MPGDRAM:
-		// DRAM write. One wait state. (only for normal Geneve)
+	// Physical space
+	case MPDRAM:
+		// DRAM write
 		m_dram->pointer()[dec->physaddr] = data;
 		LOGMASKED(LOG_WRITE, "Write DRAM %04x (%06x) <- %02x\n", offset, dec->physaddr, data);
 		break;
 
-	case MPGEXP:
-		// On-board memory expansion for standard Geneve (never used)
-		LOGMASKED(LOG_WRITE, "Write unmapped area %06x\n", dec->physaddr);
+	case MPEXP:
+		// On-board memory expansion for standard Geneve
+		// Actually never built, so we show it as unmapped
+		LOGMASKED(LOG_WRITE, "Write on-board expansion (not available) %06x <- %02x\n", dec->physaddr, data);
 		break;
 
-	case MPGEPROM:
+	case MPEPROM:
 		// 1 111. ..xx xxxx xxxx xxxx on-board eprom (16K)
 		// mirrored for f0, f2, f4, ...; f1, f3, f5, ...
 		// Ignore EPROM write (unless PFM)
-		if (m_pfm_mode != 0) write_to_pfm(space, dec->physaddr, data, 0xff);
+		if (m_boot_rom != GENEVE_EPROM) write_to_pfm(dec->physaddr, data);
 		else
-			LOGMASKED(LOG_WARN, "Write EPROM %04x (%06x) <- %02x, ignored\n", offset, dec->physaddr, data);
+			LOGMASKED(LOG_INVADDR, "Write EPROM %04x (%06x) <- %02x, ignored\n", offset, dec->physaddr, data);
 		break;
 
-	case MPGSRAM:
+	case MPSRAM:
 		if ((dec->physaddr & m_sram_mask)==m_sram_val)
 		{
 			m_sram->pointer()[dec->physaddr & ~m_sram_mask] = data;
+			LOGMASKED(LOG_WRITE, "Write SRAM %04x (%06x) <- %02x\n", offset, dec->physaddr, data);
 		}
-		LOGMASKED(LOG_WRITE, "Write SRAM %04x (%06x) <- %02x\n", offset, dec->physaddr, data);
-		break;
-
-	case MPGBOX:
-		dec->physaddr = (dec->physaddr & 0x0007ffff);  // 19 bit address
-		LOGMASKED(LOG_WRITE, "Write P-Box %04x (%06x) <- %02x\n", offset, dec->physaddr, data);
-		m_peribox->write(space, dec->physaddr, data, 0xff);
-		m_peribox->memen_in(CLEAR_LINE);
-		break;
-
-	case MPGMDRAM:
-		// DRAM. One wait state.
-		m_dram->pointer()[dec->physaddr] = data;
-		break;
-
-	case MPGMEPROM:
-		// 1 111. ..xx xxxx xxxx xxxx on-board eprom (16K)
-		// mirrored for f0, f2, f4, ...; f1, f3, f5, ...
-		// Ignore EPROM write
-		if (m_pfm_mode != 0) write_to_pfm(space, dec->physaddr, data, 0xff);
 		else
-			LOGMASKED(LOG_WARN, "Write EPROM %04x (%06x) <- %02x, ignored\n", offset, dec->physaddr, data);
+		{
+			LOGMASKED(LOG_INVADDR, "Decoded as SRAM write, but no SRAM at %06x\n", dec->physaddr);
+		}
 		break;
 
-	case MPGMBOX:
+	case MBOX:
 		// Route everything else to the P-Box
-		m_peribox->write(space, dec->physaddr, data, 0xff);
+		LOGMASKED(LOG_WRITE, "Write P-Box %04x (%06x) <- %02x\n", offset, dec->physaddr, data);
+		m_peribox->write(dec->physaddr, data);
 		m_peribox->memen_in(CLEAR_LINE);
+		break;
+
+	default:
+		LOGMASKED(LOG_WARN, "Unknown decoding result type: %d\n", dec->function);
 		break;
 	}
 }
 
-void geneve_mapper_device::decode(address_space& space, offs_t offset, bool read_mode, geneve_mapper_device::decdata* dec)
+const geneve_gate_array_device::logentry_t geneve_gate_array_device::s_logmap[7] =
 {
-	dec->function = 0;
-	dec->offset = offset;
-	dec->physaddr = 0;
+	{ 0xf100, 0x000e, 0x8800, 0x03fe, 0x0400, MLVIDEO,  "video" },
+	{ 0xf110, 0x0007, 0x8000, 0x0007, 0x0000, MLMAPPER, "mapper" },
+	{ 0xf118, 0x0007, 0x8008, 0x0007, 0x0000, MLKEY,    "keyboard" },
+	{ 0xf120, 0x000e, 0x8400, 0x03fe, 0x0000, MLSOUND,  "sound" },
+	{ 0xf130, 0x000f, 0x8010, 0x000f, 0x0000, MLCLOCK,  "clock" },
+	{ 0x0000, 0x0000, 0x9000, 0x03fe, 0x0400, MBOX,     "speech (in P-Box)" },
+	{ 0x0000, 0x0000, 0x9800, 0x03fe, 0x0400, MLGROM,   "GROM" },
+};
 
-	int page;
+void geneve_gate_array_device::decode_logical(bool reading, geneve_gate_array_device::decdata* dec)
+{
+	dec->function = MUNDEF;
+	dec->physaddr = m_pbox_prefix | dec->offset;
+	dec->wait = 1;
 
-	if (read_mode)    // got this from DBIN
+	int i = 0;
+	while (i < 7)
 	{
-		// Logical addresses
 		if (m_geneve_mode)
 		{
-			// TODO: shortcut offset & 0xffc0 = 0xf100
-			if ((offset & 0xfff5)==0xf100)
-			{
-				// video
-				// ++++ ++++ ++++ -+-+
-				// 1111 0001 0000 0000
-				// 1111 0001 0000 0010
-				// 1111 0001 0000 1000
-				// 1111 0001 0000 1010
-
-				dec->function = MLGVIDEO;
-				set_wait(1);
-				return;
-			}
-			if ((offset & 0xfff8)==0xf110)
-			{
-				// mapper
-				dec->function = MLGMAPPER;
-				dec->offset = dec->offset & 0x0007;
-				set_wait(1);
-				return;
-			}
-			if ((offset & 0xfff8) == 0xf118)
-			{
-				// key
-				dec->function = MLGKEY;
-				set_wait(1);
-				return;
-			}
-			if ((offset & 0xfff0)==0xf130)
-			{
-				// clock
-				// tests on the real machine showed that
-				// upper nibble is 0xf (probably because of the location at 0xf130?)
-				dec->function = MLGCLOCK;
-				dec->offset = dec->offset & 0x000f;
-				set_wait(1);
-				return;
-			}
+			// Skip when genbase is 0
+			if ((s_logmap[i].genbase != 0) && ((dec->offset & ~s_logmap[i].genmask) == s_logmap[i].genbase))
+				break;
 		}
 		else
 		{
-			if ((offset & 0xfff8)==0x8000)
+			if (reading)
 			{
-				// mapper
-				dec->function = MLTMAPPER;
-				dec->offset = dec->offset & 0x0007;
-				set_wait(1);
-				return;
-			}
-			if ((offset & 0xfff8)== 0x8008)
-			{
-				// key
-				dec->function = MLTKEY;
-				set_wait(1);
-				return;
-			}
-			if ((offset & 0xfff0)==0x8010)
-			{
-				// clock
-				dec->function = MLTCLOCK;
-				dec->offset = dec->offset & 0x000f;
-				set_wait(1);
-				return;
-			}
-			if ((offset & 0xfc01)==0x8800)
-			{
-				// video
-				// ++++ ++-- ---- ---+
-				// 1000 1000 0000 00x0
-				// 1 WS is always added; any pending video waitstates are canceled
-				dec->function = MLTVIDEO;
-				set_wait(1);
-				return;
-			}
-			if ((offset & 0xfc01)==0x9000)
-			{
-				// speech
-				// ++++ ++-- ---- ---+
-				// 1001 0000 0000 0000
-				// We need to add the address prefix bits
-				dec->function = MLTSPEECH;
-				dec->offset = offset | ((m_genmod)? 0x170000 : 0x070000);
-				m_peribox->memen_in(ASSERT_LINE);
-				m_peribox->setaddress_dbin(space, dec->offset, read_mode);
-				set_wait(1);
-				return;
-			}
-			if ((offset & 0xfc01)==0x9800)
-			{
-				// grom simulation
-				// ++++ ++-- ---- ---+
-				// 1001 1000 0000 00x0
-				dec->function = MLTGROM;
-				set_wait(1);
-				return;
-			}
-		}
-		// still here? Then go via mapping.
-		page = (offset & 0xe000) >> 13;
-
-		// Determine physical address
-		if (m_direct_mode)
-		{
-			dec->physaddr = 0x1f0000; // points to boot eprom (page F8)
-		}
-		else
-		{
-			if (!m_geneve_mode && page==3)
-			{
-				if (m_cartridge_size==0x4000 && m_cartridge_secondpage) dec->physaddr = 0x06e000;
-				else dec->physaddr = 0x06c000;
+				if ((dec->offset & ~s_logmap[i].timask) == s_logmap[i].tibase)
+					break;
 			}
 			else
 			{
-				dec->physaddr = (m_map[page] << 13);
+				if ((dec->offset & ~s_logmap[i].timask) == (s_logmap[i].tibase | s_logmap[i].writeoff))
+					break;
 			}
 		}
-		dec->physaddr |= (offset & 0x1fff);
-
-		if (!m_genmod)      // Standard Geneve
-		{
-			if ((dec->physaddr & 0x180000)==0x000000)
-			{
-				// DRAM.
-				dec->physaddr = dec->physaddr & 0x07ffff;
-				dec->function = MPGDRAM;
-				set_wait(1);
-				return;
-			}
-
-			if ((dec->physaddr & 0x180000)==0x080000)
-			{
-				// On-board memory expansion for standard Geneve (never used)
-				dec->function = MPGEXP;
-				set_wait(1);
-				return;
-			}
-
-			if ((dec->physaddr & 0x1e0000)==0x1e0000)
-			{
-				// 1 111. ..xx xxxx xxxx xxxx on-board eprom (16K)
-				// mirrored for f0, f2, f4, ...; f1, f3, f5, ... unless using PFM
-				dec->function = MPGEPROM;
-				set_wait(0);
-				return;
-			}
-
-			if ((dec->physaddr & 0x180000)==0x180000)
-			{
-				dec->function = MPGSRAM;
-				set_wait(0);
-				return;
-			}
-
-			// Route everything else to the P-Box
-			//   0x000000-0x07ffff for the stock Geneve (AMC,AMB,AMA,A0 ...,A15)
-			//   0x000000-0x1fffff for the GenMod.(AME,AMD,AMC,AMB,AMA,A0 ...,A15)
-			// Add a wait state
-			set_wait(1);
-			dec->function = MPGBOX;
-
-			dec->physaddr = (dec->physaddr & 0x0007ffff);  // 19 bit address (with AMA..AMC)
-			m_peribox->memen_in(ASSERT_LINE);
-			m_peribox->setaddress_dbin(space, dec->physaddr, read_mode);
-			return;
-		}
-		else
-		{
-			// GenMod mode
-			if ((m_timode) && ((dec->physaddr & 0x180000)==0x000000))
-			{
-				// DRAM. One wait state.
-				dec->function = MPGMDRAM;
-				dec->physaddr = dec->physaddr & 0x07ffff;
-				if (!m_turbo) set_wait(1);
-				return;
-			}
-
-			if ((dec->physaddr & 0x1e0000)==0x1e0000)
-			{
-				// 1 111. ..xx xxxx xxxx xxxx on-board eprom (16K)
-				// mirrored for f0, f2, f4, ...; f1, f3, f5, ... unless using PFM
-				dec->function = MPGMEPROM;
-				set_wait(0);
-				return;
-			}
-
-			// Route everything else to the P-Box
-			dec->physaddr = (dec->physaddr & 0x001fffff);  // 21 bit address for Genmod
-			dec->function = MPGMBOX;
-
-			if (!m_turbo) set_wait(1);
-			// Check: Are waitstates completely turned off for turbo mode, or
-			// merely the waitstates for DRAM memory access and box access?
-
-			m_peribox->memen_in(ASSERT_LINE);
-			m_peribox->setaddress_dbin(space, dec->physaddr, read_mode);
-			return;
-		}
+		i++;
 	}
+	if (i != 7)
+	{
+		LOGMASKED(LOG_DECODE, "Decoded as %s: %04x\n", s_logmap[i].description, dec->offset);
+		dec->function = s_logmap[i].function;
+	}
+}
+
+void geneve_gate_array_device::map_address(bool reading, geneve_gate_array_device::decdata* dec)
+{
+	int logpage = (dec->offset & 0xe000) >> 13;
+	int physpage = 0;
+
+	// Determine physical address
+	if (m_direct_mode) physpage = 0xf8; // points to boot eprom
 	else
-	{   // Write access
-		// Logical addresses
-		if (m_geneve_mode)
+	{
+		// TI mode, accessing logical addresses 6000-7fff
+		if (!m_geneve_mode && logpage==3)
 		{
-			if ((offset & 0xfff1)==0xf100)
+			if (reading)
 			{
-				// 1 WS is always added; any pending video waitstates are canceled
-				dec->function = MLGVIDEO;
-				set_wait(1);
-				return;
+				physpage = (m_cartridge_size==0x4000 && m_cartridge_secondpage)? 0x37 : 0x36;
 			}
-			if ((offset & 0xfff8)==0xf110)
+			else
 			{
-				dec->function = MLGMAPPER;
-				dec->offset = dec->offset & 0x0007;
-				set_wait(1);
-				return;
-			}
-			if ((offset & 0xfff1)==0xf120)
-			{
-				// Add 24 waitstates. This is an average value, as the
-				// waitstate generation seems to depend on an external timer of
-				// the sound chip
-				// TODO: do it properly with the use of READY
-				dec->function = MLGSOUND;
-				set_wait(24);
-				return;
-			}
-			if ((offset & 0xfff0)==0xf130)
-			{
-				dec->function = MLGCLOCK;
-				dec->offset = dec->offset & 0x00f;
-				set_wait(1);
-				return;
-			}
-		}
-		else
-		{
-			// TI mode
-			if ((offset & 0xfff8)==0x8000)
-			{
-				dec->function = MLTMAPPER;
-				dec->offset = dec->offset & 0x0007;
-				set_wait(1);
-				return;
-			}
-			if ((offset & 0xfff0)==0x8010)
-			{
-				dec->function = MLTCLOCK;
-				dec->offset = dec->offset & 0x00f;
-				set_wait(1);
-				return;
-			}
-			if ((offset & 0xfc01)==0x9c00)
-			{
-				dec->function = MLTGROM;
-				set_wait(1);
-				return;
-			}
-			if ((offset & 0xfc01)==0x8400)
-			{
-				// Add 24 waitstates. This is an approximation, as the
-				// waitstate generation seems to depend on an external timer of
-				// the sound chip
-				// TODO: do it properly with the use of READY-
-				dec->function = MLTSOUND;
-				set_wait(24);
-				return;
-			}
-			if ((offset & 0xfc01)==0x8c00)
-			{
-				// 1 WS is always added; any pending video waitstates are canceled
-				dec->function = MLTVIDEO;
-				set_wait(1);
-				return;
-			}
-
-			if ((offset & 0xfc01)==0x9400)
-			{
-				dec->function = MLTSPEECH;
-				dec->offset = dec->offset | ((m_genmod)? 0x170000 : 0x070000);
-				m_peribox->memen_in(ASSERT_LINE);
-				m_peribox->setaddress_dbin(space, dec->offset, read_mode);
-				set_wait(1);
-				return;
-			}
-		}
-
-		// Determine physical address
-		page = (dec->offset & 0xe000) >> 13;
-
-		if (m_direct_mode)
-		{
-			dec->physaddr = 0x1e0000; // points to boot eprom
-		}
-		else
-		{
-			if (!m_geneve_mode && page==3)
-			{
+				// Emulate the cartridge bank switch feature of Extended Basic
+				// TODO: Is this the right place? Or writem()?
 				if (m_cartridge_size==0x4000)
 				{
 					m_cartridge_secondpage = ((dec->offset & 0x0002)!=0);
 					LOGMASKED(LOG_WRITE, "Set cartridge page %02x\n", m_cartridge_secondpage);
-					set_wait(1);
-					return;
 				}
 				else
 				{
-					// writing into cartridge rom space (no bankswitching)
+					// writing into cartridge rom space (no bank switching)
 					if ((((dec->offset & 0x1000)==0x0000) && !m_cartridge6_writable)
 						|| (((dec->offset & 0x1000)==0x1000) && !m_cartridge7_writable))
 					{
 						LOGMASKED(LOG_WARN, "Writing to protected cartridge space %04x ignored\n", dec->offset);
-						return;
 					}
 					else
 						// TODO: Check whether secondpage is really ignored
-					dec->physaddr = 0x06c000;
+						physpage = 0x36;
 				}
 			}
-			else
-				dec->physaddr = (m_map[page] << 13);
-		}
-
-		dec->physaddr |= dec->offset & 0x1fff;
-
-		if (!m_genmod)
-		{
-			if ((dec->physaddr & 0x180000)==0x000000)
-			{
-				dec->function = MPGDRAM;
-				dec->physaddr = dec->physaddr & 0x07ffff;
-				set_wait(1);
-				return;
-			}
-			if ((dec->physaddr & 0x180000)==0x080000)
-			{
-				dec->function = MPGEXP;
-				set_wait(1);
-				return;
-			}
-
-			if ((dec->physaddr & 0x1e0000)==0x1e0000)
-			{
-				dec->function = MPGEPROM;
-				set_wait(0); // EPROM
-				return;
-			}
-			if ((dec->physaddr & 0x180000)==0x180000)
-			{
-				dec->function = MPGSRAM;
-				set_wait(0); // SRAM
-				return;
-			}
-
-			// Route everything else to the P-Box
-			// Add a wait state
-
-			// only AMA, AMB, AMC are used; AMD and AME are not used
-			dec->function = MPGBOX;
-			dec->physaddr = (dec->physaddr & 0x0007ffff);  // 19 bit address
-			m_peribox->memen_in(ASSERT_LINE);
-			m_peribox->setaddress_dbin(space, dec->physaddr, read_mode);
-			set_wait(1);
 		}
 		else
-		{
-			// GenMod mode
-			if ((dec->physaddr & 0x1e0000)==0x1e0000)
-			{   // EPROM, ignore (unless PFM)
-				dec->function = MPGMEPROM;
-				set_wait(0);
-				return;
-			}
-
-			if (m_timode && ((dec->physaddr & 0x180000)==0x000000))
-			{
-				dec->function = MPGMDRAM;
-				dec->physaddr = dec->physaddr & 0x07ffff;
-				if (!m_turbo) set_wait(1);
-				return;
-			}
-
-			// Route everything else to the P-Box
-			dec->function = MPGMBOX;
-			dec->physaddr = (dec->physaddr & 0x001fffff);  // 21 bit address for Genmod
-			m_peribox->memen_in(ASSERT_LINE);
-			m_peribox->setaddress_dbin(space, dec->physaddr, read_mode);
-			if (!m_turbo) set_wait(1);
-		}
+			physpage = m_map[logpage];
 	}
+	dec->physaddr = ((physpage << 13) | (dec->offset & 0x1fff)) & 0x1fffff;
+}
+
+const geneve_gate_array_device::physentry_t geneve_gate_array_device::s_physmap[4] =
+{
+	{ 0x000000, 0x07ffff, MPDRAM,  1, "DRAM" },
+	{ 0x080000, 0x07ffff, MPEXP,   1, "on-board expansion" },
+	{ 0x1e0000, 0x01ffff, MPEPROM, 0, "EPROM" },
+	{ 0x180000, 0x07ffff, MPSRAM,  0, "SRAM" }
+};
+
+void geneve_gate_array_device::decode_physical(geneve_gate_array_device::decdata* dec)
+{
+	dec->function = MUNDEF;
+
+	int i = 0;
+	while (i < 4)
+	{
+		if ((dec->physaddr & ~s_physmap[i].mask) == s_physmap[i].base)
+			break;
+		i++;
+	}
+	if (i != 4)
+	{
+		LOGMASKED(LOG_DECODE, "Decoded as %s: %06x\n", s_physmap[i].description, dec->physaddr);
+		dec->function = s_physmap[i].function;
+		dec->wait = s_physmap[i].wait;
+	}
+	else
+	{
+		// Route everything else to the P-Box
+		dec->function = MBOX;
+		dec->wait = 1;
+	}
+}
+
+void genmod_gate_array_device::decode_mod(geneve_gate_array_device::decdata* dec)
+{
+	// GenMod mode
+	// The TI Mode switch activates the DRAM on the board (1 WS)
+	// for the first 512K (000000-07ffff)
+	if (((dec->function == MPDRAM) && !m_gm_timode) || dec->function==MPSRAM || dec->function==MPEXP)
+	{
+		dec->function = MBOX;
+	}
+
+	if ((dec->function != MPDRAM) && m_turbo)
+		dec->wait = 0;
 }
 
 /*
-    Read from PFM.
+    Boot ROM handling, from EPROM or PFM.
 */
-READ8_MEMBER( geneve_mapper_device::read_from_pfm )
+uint8_t geneve_gate_array_device::boot_rom(offs_t offset)
 {
 	uint8_t value;
-	if (!m_pfm_output_enable) return 0;
+	int pfmaddress = (offset & 0x01ffff) | (m_pfm_bank<<17);
 
-	int address = (offset & 0x01ffff) | (m_pfm_bank<<17);
-
-	switch (m_pfm_mode)
+	switch (m_boot_rom)
 	{
-	case 1:
-		value = m_pfm512->read(space, address, mem_mask);
+	case GENEVE_EPROM:
+		value = m_eprom[offset & 0x003fff];
+		LOGMASKED(LOG_READ, "Read EPROM %04x -> %02x\n", offset & 0x003fff, value);
+		return value;
+	case GENEVE_PFM512:
+		value = m_pfm512->read(pfmaddress);
 		break;
-	case 2:
-		value = m_pfm512a->read(space, address, mem_mask);
+	case GENEVE_PFM512A:
+		value = m_pfm512a->read(pfmaddress);
 		break;
 	default:
-		LOGMASKED(LOG_WARN, "Illegal mode for reading PFM: %d\n", m_pfm_mode);
-		return 0;
+		LOGMASKED(LOG_WARN, "Illegal mode for reading boot ROM: %d\n", m_boot_rom);
+		value = 0;
 	}
 
-	LOGMASKED(LOG_PFM, "Reading from PFM at address %05x -> %02x\n", address, value);
+	if (!m_pfm_output_enable) value = 0;
+	LOGMASKED(LOG_PFM, "Reading from PFM at address %05x -> %02x\n", pfmaddress, value);
 	return value;
 }
 
-WRITE8_MEMBER( geneve_mapper_device::write_to_pfm )
+void geneve_gate_array_device::write_to_pfm(offs_t offset, uint8_t data)
 {
 	// Nota bene: The PFM must be write protected on startup, or the RESET
 	// of the 9995 will attempt to write the return vector into the flash EEPROM
 	int address = (offset & 0x01ffff) | (m_pfm_bank<<17);
 	LOGMASKED(LOG_PFM, "Writing to PFM at address %05x <- %02x\n", address, data);
 
-	switch (m_pfm_mode)
+	switch (m_boot_rom)
 	{
-	case 1:
-		m_pfm512->write(space, address, data, mem_mask);
+	case GENEVE_PFM512:
+		m_pfm512->write(address, data);
 		break;
-	case 2:
-		m_pfm512a->write(space, address, data, mem_mask);
+	case GENEVE_PFM512A:
+		m_pfm512a->write(address, data);
 		break;
 	default:
-		LOGMASKED(LOG_WARN, "Illegal mode for writing to PFM: %d\n", m_pfm_mode);
+		LOGMASKED(LOG_WARN, "Illegal mode for writing to PFM: %d\n", m_boot_rom);
 	}
 }
 
@@ -1307,11 +1064,29 @@ WRITE8_MEMBER( geneve_mapper_device::write_to_pfm )
     This decoding will later be used in the READ/WRITE member functions. Also,
     we initiate wait state creation here.
 */
-SETOFFSET_MEMBER( geneve_mapper_device::setoffset )
+void geneve_gate_array_device::setaddress(offs_t address, uint8_t busctrl)
 {
-	LOGMASKED(LOG_DETAIL, "setoffset = %04x\n", offset);
+	LOGMASKED(LOG_DETAIL, "setaddress = %04x\n", address);
 	m_debug_no_ws = false;
-	decode(space, offset, m_read_mode, &m_decoded);
+	m_decoded.offset = address;
+
+	m_read_mode = ((busctrl & TMS99xx_BUS_DBIN)!=0);
+
+	decode_logical(m_read_mode, &m_decoded);
+	if (m_decoded.function == MUNDEF)
+	{
+		map_address(m_read_mode, &m_decoded);
+		decode_physical(&m_decoded);
+		decode_mod(&m_decoded);
+	}
+
+	set_wait(m_decoded.wait);
+
+	if (m_decoded.function == MBOX)
+	{
+		m_peribox->memen_in(ASSERT_LINE);
+		m_peribox->setaddress_dbin(m_decoded.physaddr, m_read_mode);
+	}
 }
 
 /*
@@ -1326,7 +1101,7 @@ SETOFFSET_MEMBER( geneve_mapper_device::setoffset )
     affect the video access itself but become effective after the access; if
     the code runs on the chip, these wait states are ignored.)
 */
-WRITE_LINE_MEMBER( geneve_mapper_device::clock_in )
+WRITE_LINE_MEMBER( geneve_gate_array_device::clock_in )
 {
 	if (state==ASSERT_LINE)
 	{
@@ -1349,10 +1124,10 @@ WRITE_LINE_MEMBER( geneve_mapper_device::clock_in )
 			}
 			else
 			{
-				if (m_ext_waitcount > 0)
+				if (m_video_waitcount > 0)
 				{
-					m_ext_waitcount--;
-					if (m_ext_waitcount == 0)
+					m_video_waitcount--;
+					if (m_video_waitcount == 0)
 					{
 						LOGMASKED(LOG_CLOCK, "clock, READY asserted after video\n");
 						m_ready(ASSERT_LINE);
@@ -1360,7 +1135,7 @@ WRITE_LINE_MEMBER( geneve_mapper_device::clock_in )
 					}
 					else
 					{
-						LOGMASKED(LOG_CLOCK, "vclock, ew=%d\n", m_ext_waitcount);
+						LOGMASKED(LOG_CLOCK, "vclock, ew=%d\n", m_video_waitcount);
 					}
 				}
 			}
@@ -1370,7 +1145,7 @@ WRITE_LINE_MEMBER( geneve_mapper_device::clock_in )
 	{
 		// Falling edge
 		// Do we have video wait states? In that case, clear the line again
-		if ((m_waitcount == 0) && (m_ext_waitcount > 0) && m_ready_asserted)
+		if ((m_waitcount == 0) && (m_video_waitcount > 0) && m_ready_asserted)
 		{
 			LOGMASKED(LOG_CLOCK, "clock, READY cleared for video\n");
 			m_ready(CLEAR_LINE);
@@ -1380,32 +1155,23 @@ WRITE_LINE_MEMBER( geneve_mapper_device::clock_in )
 }
 
 /*
-    We need the DBIN line for the setoffset operation.
-*/
-WRITE_LINE_MEMBER( geneve_mapper_device::dbin_in )
-{
-	m_read_mode = (state==ASSERT_LINE);
-	LOGMASKED(LOG_DETAIL, "dbin = %02x\n", m_read_mode? 1:0);
-}
-
-/*
     PFM expansion: Setting the bank.
 */
-WRITE_LINE_MEMBER( geneve_mapper_device::pfm_select_lsb )
+WRITE_LINE_MEMBER( geneve_gate_array_device::pfm_select_lsb )
 {
 	if (state==ASSERT_LINE) m_pfm_bank |= 1;
 	else m_pfm_bank &= 0xfe;
 	LOGMASKED(LOG_PFM, "Setting bank (l) = %d\n", m_pfm_bank);
 }
 
-WRITE_LINE_MEMBER( geneve_mapper_device::pfm_select_msb )
+WRITE_LINE_MEMBER( geneve_gate_array_device::pfm_select_msb )
 {
 	if (state==ASSERT_LINE) m_pfm_bank |= 2;
 	else m_pfm_bank &= 0xfd;
 	LOGMASKED(LOG_PFM, "Setting bank (u) = %d\n", m_pfm_bank);
 }
 
-WRITE_LINE_MEMBER( geneve_mapper_device::pfm_output_enable )
+WRITE_LINE_MEMBER( geneve_gate_array_device::pfm_output_enable )
 {
 	// Negative logic
 	m_pfm_output_enable = (state==CLEAR_LINE);
@@ -1416,9 +1182,10 @@ WRITE_LINE_MEMBER( geneve_mapper_device::pfm_output_enable )
 //  Common device lifecycle
 //====================================================================
 
-void geneve_mapper_device::device_start()
+void geneve_gate_array_device::device_start()
 {
-	m_ready.resolve();
+	m_ready.resolve_safe();
+	m_keyint.resolve_safe();
 
 	m_geneve_mode = false;
 	m_direct_mode = true;
@@ -1442,25 +1209,22 @@ void geneve_mapper_device::device_start()
 	save_item(NAME(m_decoded.function));
 	save_item(NAME(m_decoded.offset));
 	save_item(NAME(m_decoded.physaddr));
-	save_item(NAME(m_turbo));
-	save_item(NAME(m_genmod));
-	save_item(NAME(m_timode));
-	save_item(NAME(m_pfm_mode));
+	save_item(NAME(m_boot_rom));
 	save_item(NAME(m_pfm_bank));
 	save_item(NAME(m_pfm_output_enable));
 	save_item(NAME(m_sram_mask));
 	save_item(NAME(m_sram_val));
 	save_item(NAME(m_waitcount));
-	save_item(NAME(m_ext_waitcount));
+	save_item(NAME(m_video_waitcount));
 }
 
-void geneve_mapper_device::device_reset()
+void geneve_gate_array_device::common_reset()
 {
 	m_extra_waitstates = false;
 	m_video_waitstates = true;
 	m_read_mode = false;
 	m_waitcount = 0;
-	m_ext_waitcount = 0;
+	m_video_waitcount = 0;
 	m_ready_asserted = true;
 
 	m_geneve_mode =false;
@@ -1476,25 +1240,22 @@ void geneve_mapper_device::device_reset()
 	// Clear map
 	for (auto & elem : m_map) elem = 0;
 
-	m_genmod = false;
-
 	// Check which boot EPROM we are using (or PFM)
-	set_boot_rom(machine().root_device().ioport("BOOTROM")->read());
+	m_boot_rom = machine().root_device().ioport("BOOTROM")->read();
+	m_eprom = machine().root_device().memregion("maincpu")->base();
 
-	// Check for GenMod. We assume that GenMod can be combined with PFM.
-	if (machine().root_device().ioport("MODE")->read()!=0)
-	{
-		LOGMASKED(LOG_SETTING, "Using GenMod modification\n");
-		m_eprom = machine().root_device().memregion("maincpu")->base() + 0x8000;
-		if (m_eprom[0] != 0xf0)
-		{
-			fatalerror("genboard: GenMod boot ROM missing\n");
-		}
-		m_genmod = true;
-		m_turbo = ((machine().root_device().ioport("GENMODDIPS")->read() & GENEVE_GM_TURBO)!=0);
-		m_timode = ((machine().root_device().ioport("GENMODDIPS")->read() & GENEVE_GM_TIM)!=0);
-	}
+	// Allow for configuring the VRAM size
+	uint32_t videoram = (machine().root_device().ioport("VRAM")->read()!=0)? 0x30000 : 0x20000;
+	downcast<v99x8_device &>(*m_video.target()).set_vram_size(videoram);
+	LOGMASKED(LOG_SETTING, "Video RAM set to %d KiB\n", videoram / 1024);
+}
 
+void geneve_gate_array_device::device_reset()
+{
+	common_reset();
+
+	// SRAM is only separately handled for the standard Geneve; Genmod uses
+	// the Memex instead
 	switch (machine().root_device().ioport("SRAM")->read())
 	{
 /*  1 100. .... .... .... .... on-board sram (128K) -+
@@ -1516,511 +1277,16 @@ void geneve_mapper_device::device_reset()
 		m_sram_val =    0x180000;
 		break;
 	}
-
-	// Allow for configuring the VRAM size
-	uint32_t videoram = (machine().root_device().ioport("VRAM")->read()!=0)? 0x30000 : 0x20000;
-	downcast<v99x8_device &>(*m_video.target()).set_vram_size(videoram);
-	LOGMASKED(LOG_SETTING, "Video RAM set to %d KiB\n", videoram / 1024);
 }
 
-/****************************************************************************
-    Keyboard support
-****************************************************************************/
-
-static const uint8_t MF1_CODE[0xe] =
+void genmod_gate_array_device::device_reset()
 {
-	/* extended keys that are equivalent to non-extended keys */
-	0x1c,   /* keypad enter */
-	0x1d,   /* right control */
-	0x38,   /* alt gr */
-	// extra codes are 0x5b for Left Windows, 0x5c for Right Windows, 0x5d
-	// for Menu, 0x5e for power, 0x5f for sleep, 0x63 for wake, but I doubt
-	// any Geneve program would take advantage of these. */
-
-	// extended key that is equivalent to a non-extended key
-	// with shift off
-	0x35,   /* pad slash */
-
-	// extended keys that are equivalent to non-extended keys
-	// with numlock off
-	0x47,   /* home */
-	0x48,   /* up */
-	0x49,   /* page up */
-	0x4b,   /* left */
-	0x4d,   /* right */
-	0x4f,   /* end */
-	0x50,   /* down */
-	0x51,   /* page down */
-	0x52,   /* insert */
-	0x53    /* delete */
-};
-
-geneve_keyboard_device::geneve_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, GENEVE_KEYBOARD, tag, owner, clock),
-	m_interrupt(*this),
-	m_keys(*this, "KEY%u", 0),
-	m_key_reset(false), m_key_queue_length(0), m_key_queue_head(0), m_key_in_buffer(false), m_key_numlock_state(false), m_key_ctrl_state(0), m_key_alt_state(0),
-	m_key_real_shift_state(0), m_key_fake_shift_state(false), m_key_fake_unshift_state(false), m_key_autorepeat_key(0), m_key_autorepeat_timer(0), m_keep_keybuf(false),
-	m_keyboard_clock(false), m_timer(nullptr)
-{
+	common_reset();
+	LOGMASKED(LOG_SETTING, "Using GenMod modification\n");
+	m_turbo = ((machine().root_device().ioport("GENMODDIPS")->read() & GENEVE_GM_TURBO)!=0);
+	m_gm_timode = ((machine().root_device().ioport("GENMODDIPS")->read() & GENEVE_GM_TIM)!=0);
 }
 
-void geneve_keyboard_device::post_in_key_queue(int keycode)
-{
-	m_key_queue[(m_key_queue_head + m_key_queue_length) % KEYQUEUESIZE] = keycode;
-	m_key_queue_length++;
-
-	LOGMASKED(LOG_KEYBOARD, "Posting keycode %02x\n", keycode);
-}
-
-void geneve_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	poll();
-}
-
-void geneve_keyboard_device::poll()
-{
-	uint32_t keystate;
-	uint32_t key_transitions;
-	int i, j;
-	int keycode;
-	int pressed;
-	LOGMASKED(LOG_KEYBOARD, "Poll keyboard\n");
-	if (m_key_reset) return;
-
-	/* Poll keyboard */
-	for (i = 0; (i < 4) && (m_key_queue_length <= (KEYQUEUESIZE-MAXKEYMSGLENGTH)); i++)
-	{
-		keystate = m_keys[2*i]->read() | (m_keys[2*i + 1]->read() << 16);
-		key_transitions = keystate ^ m_key_state_save[i];
-		if (key_transitions)
-		{
-			for (j = 0; (j < 32) && (m_key_queue_length <= (KEYQUEUESIZE-MAXKEYMSGLENGTH)); j++)
-			{
-				if ((key_transitions >> j) & 1)
-				{
-					keycode = (i << 5) | j;
-					pressed = ((keystate >> j) & 1);
-					if (pressed)
-						m_key_state_save[i] |= (1 << j);
-					else
-						m_key_state_save[i] &= ~ (1 << j);
-
-					/* Update auto-repeat */
-					if (pressed)
-					{
-						m_key_autorepeat_key = keycode;
-						m_key_autorepeat_timer = KEYAUTOREPEATDELAY+1;
-					}
-					else /*if (keycode == m_key_autorepeat_key)*/
-						m_key_autorepeat_key = 0;
-
-					// Release Fake Shift/Unshift if another key is pressed
-					// We do so if a key is released, though it is actually
-					// required only if it is a modifier key
-					/*if (pressed)*/
-					//{
-					if (m_key_fake_shift_state)
-					{
-						/* Fake shift release */
-						post_in_key_queue(0xe0);
-						post_in_key_queue(0xaa);
-						m_key_fake_shift_state = false;
-					}
-					if (m_key_fake_unshift_state)
-					{
-						/* Fake shift press */
-						post_in_key_queue(0xe0);
-						post_in_key_queue(0x2a);
-						m_key_fake_unshift_state = false;
-					}
-					//}
-
-					/* update shift and numlock state */
-					if ((keycode == 0x2a) || (keycode == 0x36))
-						m_key_real_shift_state = m_key_real_shift_state + (pressed ? +1 : -1);
-					if ((keycode == 0x1d) || (keycode == 0x61))
-						m_key_ctrl_state = m_key_ctrl_state + (pressed ? +1 : -1);
-					if ((keycode == 0x38) || (keycode == 0x62))
-						m_key_alt_state = m_key_alt_state + (pressed ? +1 : -1);
-					if ((keycode == 0x45) && pressed)
-						m_key_numlock_state = !m_key_numlock_state;
-
-					if ((keycode >= 0x60) && (keycode < 0x6e))
-					{   /* simpler extended keys */
-						/* these keys are emulated */
-
-						if ((keycode >= 0x63) && pressed)
-						{
-							/* Handle shift state */
-							if (keycode == 0x63)
-							{   /* non-shifted key */
-								if (m_key_real_shift_state!=0)
-									/* Fake shift unpress */
-									m_key_fake_unshift_state = true;
-							}
-							else /*if (keycode >= 0x64)*/
-							{   /* non-numlock mode key */
-								if (m_key_numlock_state & (m_key_real_shift_state==0))
-									/* Fake shift press if numlock is active */
-									m_key_fake_shift_state = true;
-								else if ((!m_key_numlock_state) & (m_key_real_shift_state!=0))
-									/* Fake shift unpress if shift is down */
-									m_key_fake_unshift_state = true;
-							}
-
-							if (m_key_fake_shift_state)
-							{
-								post_in_key_queue(0xe0);
-								post_in_key_queue(0x2a);
-							}
-
-							if (m_key_fake_unshift_state)
-							{
-								post_in_key_queue(0xe0);
-								post_in_key_queue(0xaa);
-							}
-						}
-
-						keycode = MF1_CODE[keycode-0x60];
-						if (!pressed) keycode |= 0x80;
-						post_in_key_queue(0xe0);
-						post_in_key_queue(keycode);
-					}
-					else if (keycode == 0x6e)
-					{   /* emulate Print Screen / System Request (F13) key */
-						/* this is a bit complex, as Alt+PrtScr -> SysRq */
-						/* Additionally, Ctrl+PrtScr involves no fake shift press */
-						if (m_key_alt_state!=0)
-						{
-							/* SysRq */
-							keycode = 0x54;
-							if (!pressed) keycode |= 0x80;
-							post_in_key_queue(keycode);
-						}
-						else
-						{
-							/* Handle shift state */
-							if (pressed && (m_key_real_shift_state==0) && (m_key_ctrl_state==0))
-							{   /* Fake shift press */
-								post_in_key_queue(0xe0);
-								post_in_key_queue(0x2a);
-								m_key_fake_shift_state = true;
-							}
-
-							keycode = 0x37;
-							if (!pressed) keycode |= 0x80;
-							post_in_key_queue(0xe0);
-							post_in_key_queue(keycode);
-						}
-					}
-					else if (keycode == 0x6f)
-					{   // emulate pause (F15) key
-						// this is a bit complex, as Pause -> Ctrl+NumLock and
-						// Ctrl+Pause -> Ctrl+ScrLock.  Furthermore, there is no
-						// repeat or release.
-						if (pressed)
-						{
-							if (m_key_ctrl_state!=0)
-							{
-								post_in_key_queue(0xe0);
-								post_in_key_queue(0x46);
-								post_in_key_queue(0xe0);
-								post_in_key_queue(0xc6);
-							}
-							else
-							{
-								post_in_key_queue(0xe1);
-								post_in_key_queue(0x1d);
-								post_in_key_queue(0x45);
-								post_in_key_queue(0xe1);
-								post_in_key_queue(0x9d);
-								post_in_key_queue(0xc5);
-							}
-						}
-					}
-					else
-					{
-						if (!pressed) keycode |= 0x80;
-						post_in_key_queue(keycode);
-					}
-					signal_when_key_available();
-				}
-			}
-		}
-	}
-
-	/* Handle auto-repeat */
-	if ((m_key_queue_length <= (KEYQUEUESIZE-MAXKEYMSGLENGTH)) && (m_key_autorepeat_key!=0) && (--m_key_autorepeat_timer == 0))
-	{
-		if ((m_key_autorepeat_key >= 0x60) && (m_key_autorepeat_key < 0x6e))
-		{
-			post_in_key_queue(0xe0);
-			post_in_key_queue(MF1_CODE[m_key_autorepeat_key-0x60]);
-		}
-		else if (m_key_autorepeat_key == 0x6e)
-		{
-			if (m_key_alt_state!=0)
-				post_in_key_queue(0x54);
-			else
-			{
-				post_in_key_queue(0xe0);
-				post_in_key_queue(0x37);
-			}
-		}
-		else if (m_key_autorepeat_key == 0x6f)
-			;
-		else
-		{
-			post_in_key_queue(m_key_autorepeat_key);
-		}
-		signal_when_key_available();
-		m_key_autorepeat_timer = KEYAUTOREPEATRATE;
-	}
-}
-
-uint8_t geneve_keyboard_device::get_recent_key()
-{
-	if (m_key_in_buffer) return m_key_queue[m_key_queue_head];
-	else return 0;
-}
-
-void geneve_keyboard_device::signal_when_key_available()
-{
-	// if keyboard reset is not asserted, and key clock is enabled, and key
-	// buffer clear is disabled, and key queue is not empty. */
-	if ((!m_key_reset) && (m_keyboard_clock) && (m_keep_keybuf) && (m_key_queue_length != 0))
-	{
-		LOGMASKED(LOG_KEYBOARD, "Key available\n");
-		m_interrupt(ASSERT_LINE);
-		m_key_in_buffer = true;
-	}
-}
-
-WRITE_LINE_MEMBER( geneve_keyboard_device::clock_control )
-{
-	bool rising_edge = (!m_keyboard_clock && (state==ASSERT_LINE));
-	m_keyboard_clock = (state==ASSERT_LINE);
-	LOGMASKED(LOG_KEYBOARD, "Keyboard clock_control state=%d\n", m_keyboard_clock);
-	if (rising_edge)
-		signal_when_key_available();
-}
-
-WRITE_LINE_MEMBER( geneve_keyboard_device::send_scancodes )
-{
-	bool rising_edge = (!m_keep_keybuf && (state==ASSERT_LINE));
-	bool falling_edge = (m_keep_keybuf && (state==CLEAR_LINE));
-	m_keep_keybuf = (state==ASSERT_LINE);
-
-	if (rising_edge) signal_when_key_available();
-	else
-	{
-		if (falling_edge)
-		{
-			if (m_key_queue_length != 0)
-			{
-				m_key_queue_head = (m_key_queue_head + 1) % KEYQUEUESIZE;
-				m_key_queue_length--;
-			}
-			/* clear keyboard interrupt */
-			m_interrupt(CLEAR_LINE);
-			m_key_in_buffer = false;
-		}
-	}
-}
-
-WRITE_LINE_MEMBER( geneve_keyboard_device::reset_line )
-{
-	m_key_reset = !(state==ASSERT_LINE);
-
-	if (m_key_reset)
-	{
-		/* reset -> clear keyboard key queue, but not geneve key buffer */
-		m_key_queue_length = (m_key_in_buffer)? 1 : 0;
-		m_key_queue_head = 0;
-		memset(m_key_state_save, 0, sizeof(m_key_state_save));
-		m_key_numlock_state = false;
-		m_key_ctrl_state = 0;
-		m_key_alt_state = 0;
-		m_key_real_shift_state = 0;
-		m_key_fake_shift_state = false;
-		m_key_fake_unshift_state = false;
-		m_key_autorepeat_key = 0;
-	}
-}
-
-void geneve_keyboard_device::device_start()
-{
-	m_timer = timer_alloc(0);
-	m_interrupt.resolve();
-
-	// State registration
-	save_item(NAME(m_key_reset));
-	save_item(NAME(m_key_queue_length));
-	save_item(NAME(m_key_queue_head));
-	save_item(NAME(m_key_in_buffer));
-	save_item(NAME(m_key_numlock_state));
-	save_item(NAME(m_key_ctrl_state));
-	save_item(NAME(m_key_alt_state));
-	save_item(NAME(m_key_real_shift_state));
-	save_item(NAME(m_key_fake_shift_state));
-	save_item(NAME(m_key_fake_unshift_state));
-	save_item(NAME(m_key_autorepeat_key));
-	save_item(NAME(m_key_autorepeat_timer));
-	save_item(NAME(m_keep_keybuf));
-	save_item(NAME(m_keyboard_clock));
-	save_pointer(NAME(m_key_queue),KEYQUEUESIZE);
-	save_pointer(NAME(m_key_state_save),4);
-}
-
-void geneve_keyboard_device::device_reset()
-{
-	m_key_in_buffer = false;
-	reset_line(CLEAR_LINE);
-	m_key_queue_length = 0;
-	m_key_reset = true;
-	m_keyboard_clock = false;
-	m_keep_keybuf = false;
-	m_timer->adjust(attotime::from_usec(1), 0, attotime::from_hz(120));
-}
-
-INPUT_PORTS_START( genkeys )
-	PORT_START("KEY0")  /* IN3 */
-	PORT_BIT ( 0x0001, 0x0000, IPT_UNUSED )     /* unused scancode 0 */
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Esc") PORT_CODE(KEYCODE_ESC) /* Esc                       01  81 */
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("1 !") PORT_CODE(KEYCODE_1) /* 1                           02  82 */
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("2 @") PORT_CODE(KEYCODE_2) /* 2                           03  83 */
-	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("3 #") PORT_CODE(KEYCODE_3) /* 3                           04  84 */
-	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("4 $") PORT_CODE(KEYCODE_4) /* 4                           05  85 */
-	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("5 %") PORT_CODE(KEYCODE_5) /* 5                           06  86 */
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("6 ^") PORT_CODE(KEYCODE_6) /* 6                           07  87 */
-	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("7 &") PORT_CODE(KEYCODE_7) /* 7                           08  88 */
-	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("8 *") PORT_CODE(KEYCODE_8) /* 8                           09  89 */
-	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("9 (") PORT_CODE(KEYCODE_9) /* 9                           0A  8A */
-	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("0 )") PORT_CODE(KEYCODE_0) /* 0                           0B  8B */
-	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("- _") PORT_CODE(KEYCODE_MINUS) /* -                           0C  8C */
-	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("= +") PORT_CODE(KEYCODE_EQUALS) /* =                          0D  8D */
-	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Backspace") PORT_CODE(KEYCODE_BACKSPACE) /* Backspace                 0E  8E */
-	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Tab") PORT_CODE(KEYCODE_TAB) /* Tab                       0F  8F */
-
-	PORT_START("KEY1")  /* IN4 */
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Q") PORT_CODE(KEYCODE_Q) /* Q                         10  90 */
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("W") PORT_CODE(KEYCODE_W) /* W                         11  91 */
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("E") PORT_CODE(KEYCODE_E) /* E                         12  92 */
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("R") PORT_CODE(KEYCODE_R) /* R                         13  93 */
-	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("T") PORT_CODE(KEYCODE_T) /* T                         14  94 */
-	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Y") PORT_CODE(KEYCODE_Y) /* Y                         15  95 */
-	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("U") PORT_CODE(KEYCODE_U) /* U                         16  96 */
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("I") PORT_CODE(KEYCODE_I) /* I                         17  97 */
-	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("O") PORT_CODE(KEYCODE_O) /* O                         18  98 */
-	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("P") PORT_CODE(KEYCODE_P) /* P                         19  99 */
-	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("[ {") PORT_CODE(KEYCODE_OPENBRACE) /* [                           1A  9A */
-	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("] }") PORT_CODE(KEYCODE_CLOSEBRACE) /* ]                          1B  9B */
-	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Enter") PORT_CODE(KEYCODE_ENTER) /* Enter                     1C  9C */
-	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("L-Ctrl") PORT_CODE(KEYCODE_LCONTROL) /* Left Ctrl                 1D  9D */
-	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("A") PORT_CODE(KEYCODE_A) /* A                         1E  9E */
-	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("S") PORT_CODE(KEYCODE_S) /* S                         1F  9F */
-
-	PORT_START("KEY2")  /* IN5 */
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("D") PORT_CODE(KEYCODE_D) /* D                         20  A0 */
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F") PORT_CODE(KEYCODE_F) /* F                         21  A1 */
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("G") PORT_CODE(KEYCODE_G) /* G                         22  A2 */
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("H") PORT_CODE(KEYCODE_H) /* H                         23  A3 */
-	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("J") PORT_CODE(KEYCODE_J) /* J                         24  A4 */
-	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("K") PORT_CODE(KEYCODE_K) /* K                         25  A5 */
-	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("L") PORT_CODE(KEYCODE_L) /* L                         26  A6 */
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("; :") PORT_CODE(KEYCODE_COLON) /* ;                           27  A7 */
-	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("' \"") PORT_CODE(KEYCODE_QUOTE) /* '                          28  A8 */
-	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("` ~") PORT_CODE(KEYCODE_TILDE) /* `                           29  A9 */
-	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("L-Shift") PORT_CODE(KEYCODE_LSHIFT) /* Left Shift                 2A  AA */
-	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("\\ |") PORT_CODE(KEYCODE_BACKSLASH) /* \                          2B  AB */
-	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Z") PORT_CODE(KEYCODE_Z) /* Z                         2C  AC */
-	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("X") PORT_CODE(KEYCODE_X) /* X                         2D  AD */
-	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("C") PORT_CODE(KEYCODE_C) /* C                         2E  AE */
-	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("V") PORT_CODE(KEYCODE_V) /* V                         2F  AF */
-
-	PORT_START("KEY3")  /* IN6 */
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("B") PORT_CODE(KEYCODE_B) /* B                         30  B0 */
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("N") PORT_CODE(KEYCODE_N) /* N                         31  B1 */
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("M") PORT_CODE(KEYCODE_M) /* M                         32  B2 */
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(", <") PORT_CODE(KEYCODE_COMMA) /* ,                           33  B3 */
-	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(". >") PORT_CODE(KEYCODE_STOP) /* .                            34  B4 */
-	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("/ ?") PORT_CODE(KEYCODE_SLASH) /* /                           35  B5 */
-	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("R-Shift") PORT_CODE(KEYCODE_RSHIFT) /* Right Shift                36  B6 */
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP * (PrtScr)") PORT_CODE(KEYCODE_ASTERISK    ) /* Keypad *  (PrtSc)          37  B7 */
-	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Alt") PORT_CODE(KEYCODE_LALT) /* Left Alt                 38  B8 */
-	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Space") PORT_CODE(KEYCODE_SPACE) /* Space                     39  B9 */
-	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Caps") PORT_CODE(KEYCODE_CAPSLOCK) /* Caps Lock                   3A  BA */
-	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F1") PORT_CODE(KEYCODE_F1) /* F1                          3B  BB */
-	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F2") PORT_CODE(KEYCODE_F2) /* F2                          3C  BC */
-	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F3") PORT_CODE(KEYCODE_F3) /* F3                          3D  BD */
-	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F4") PORT_CODE(KEYCODE_F4) /* F4                          3E  BE */
-	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F5") PORT_CODE(KEYCODE_F5) /* F5                          3F  BF */
-
-	PORT_START("KEY4")  /* IN7 */
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F6") PORT_CODE(KEYCODE_F6) /* F6                          40  C0 */
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F7") PORT_CODE(KEYCODE_F7) /* F7                          41  C1 */
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F8") PORT_CODE(KEYCODE_F8) /* F8                          42  C2 */
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F9") PORT_CODE(KEYCODE_F9) /* F9                          43  C3 */
-	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F10") PORT_CODE(KEYCODE_F10) /* F10                       44  C4 */
-	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("NumLock") PORT_CODE(KEYCODE_NUMLOCK) /* Num Lock                  45  C5 */
-	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ScrLock (F14)") PORT_CODE(KEYCODE_SCRLOCK) /* Scroll Lock             46  C6 */
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 7 (Home)") PORT_CODE(KEYCODE_7_PAD     ) /* Keypad 7  (Home)           47  C7 */
-	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 8 (Up)") PORT_CODE(KEYCODE_8_PAD       ) /* Keypad 8  (Up arrow)       48  C8 */
-	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 9 (PgUp)") PORT_CODE(KEYCODE_9_PAD     ) /* Keypad 9  (PgUp)           49  C9 */
-	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP -") PORT_CODE(KEYCODE_MINUS_PAD) /* Keypad -                   4A  CA */
-	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 4 (Left)") PORT_CODE(KEYCODE_4_PAD     ) /* Keypad 4  (Left arrow)     4B  CB */
-	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 5") PORT_CODE(KEYCODE_5_PAD) /* Keypad 5                   4C  CC */
-	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 6 (Right)") PORT_CODE(KEYCODE_6_PAD        ) /* Keypad 6  (Right arrow)    4D  CD */
-	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP +") PORT_CODE(KEYCODE_PLUS_PAD) /* Keypad +                    4E  CE */
-	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 1 (End)") PORT_CODE(KEYCODE_1_PAD      ) /* Keypad 1  (End)            4F  CF */
-
-	PORT_START("KEY5")  /* IN8 */
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 2 (Down)") PORT_CODE(KEYCODE_2_PAD     ) /* Keypad 2  (Down arrow)     50  D0 */
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 3 (PgDn)") PORT_CODE(KEYCODE_3_PAD     ) /* Keypad 3  (PgDn)           51  D1 */
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP 0 (Ins)") PORT_CODE(KEYCODE_0_PAD      ) /* Keypad 0  (Ins)            52  D2 */
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("KP . (Del)") PORT_CODE(KEYCODE_DEL_PAD        ) /* Keypad .  (Del)            53  D3 */
-	PORT_BIT ( 0x0030, 0x0000, IPT_UNUSED )
-	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(84/102)\\") PORT_CODE(KEYCODE_BACKSLASH2) /* Backslash 2             56  D6 */
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(101)F11") PORT_CODE(KEYCODE_F11) /* F11                      57  D7 */
-	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(101)F12") PORT_CODE(KEYCODE_F12) /* F12                      58  D8 */
-	PORT_BIT ( 0xfe00, 0x0000, IPT_UNUSED )
-
-	PORT_START("KEY6")  /* IN9 */
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(101)KP Enter") PORT_CODE(KEYCODE_ENTER_PAD) /* PAD Enter                 60  e0 */
-	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(101)R-Control") PORT_CODE(KEYCODE_RCONTROL) /* Right Control             61  e1 */
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(101)ALTGR") PORT_CODE(KEYCODE_RALT) /* ALTGR                     64  e4 */
-
-	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(101)KP /") PORT_CODE(KEYCODE_SLASH_PAD) /* PAD Slash                 62  e2 */
-
-	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(101)Home") PORT_CODE(KEYCODE_HOME) /* Home                       66  e6 */
-	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(101)Cursor Up") PORT_CODE(KEYCODE_UP) /* Up                          67  e7 */
-	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(101)Page Up") PORT_CODE(KEYCODE_PGUP) /* Page Up                 68  e8 */
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(101)Cursor Left") PORT_CODE(KEYCODE_LEFT) /* Left                        69  e9 */
-	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(101)Cursor Right") PORT_CODE(KEYCODE_RIGHT) /* Right                     6a  ea */
-	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(101)End") PORT_CODE(KEYCODE_END) /* End                      6b  eb */
-	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(101)Cursor Down") PORT_CODE(KEYCODE_DOWN) /* Down                        6c  ec */
-	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(101)Page Down") PORT_CODE(KEYCODE_PGDN) /* Page Down                 6d  ed */
-	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(101)Insert") PORT_CODE(KEYCODE_INSERT) /* Insert                     6e  ee */
-	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(101)Delete") PORT_CODE(KEYCODE_DEL) /* Delete                        6f  ef */
-
-	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(101)PrtScr (F13)") PORT_CODE(KEYCODE_PRTSCR) /* Print Screen             63  e3 */
-	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(101)Pause (F15)") PORT_CODE(KEYCODE_PAUSE) /* Pause                      65  e5 */
-
-	PORT_START("KEY7")  /* IN10 */
-	PORT_BIT ( 0xffff, 0x0000, IPT_UNUSED )
-#if 0
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Print Screen") PORT_CODE(KEYCODE_PRTSCR) /* Print Screen alternate        77  f7 */
-	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Left Win") /* Left Win                    7d  fd */
-	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Right Win") /* Right Win                  7e  fe */
-	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Menu") /* Menu                        7f  ff */
-#endif
-INPUT_PORTS_END
-
-ioport_constructor geneve_keyboard_device::device_input_ports() const
-{
-	return INPUT_PORTS_NAME( genkeys );
-}
 
 } } } // end namespace bus::ti99::internal
 

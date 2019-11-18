@@ -50,15 +50,14 @@ WRITE8_MEMBER(tagteam_state::irq_clear_w)
 void tagteam_state::main_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
-	map(0x2000, 0x2000).portr("P2").w(this, FUNC(tagteam_state::flipscreen_w));
-	map(0x2001, 0x2001).portr("P1").w(this, FUNC(tagteam_state::control_w));
+	map(0x2000, 0x2000).portr("P2").w(FUNC(tagteam_state::flipscreen_w));
+	map(0x2001, 0x2001).portr("P1").w(FUNC(tagteam_state::control_w));
 	map(0x2002, 0x2002).portr("DSW1").w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x2003, 0x2003).portr("DSW2").w(this, FUNC(tagteam_state::irq_clear_w));
-	map(0x4000, 0x43ff).rw(this, FUNC(tagteam_state::mirrorvideoram_r), FUNC(tagteam_state::mirrorvideoram_w));
-	map(0x4400, 0x47ff).rw(this, FUNC(tagteam_state::mirrorcolorram_r), FUNC(tagteam_state::mirrorcolorram_w));
-	map(0x4800, 0x4fff).readonly();
-	map(0x4800, 0x4bff).w(this, FUNC(tagteam_state::videoram_w)).share("videoram");
-	map(0x4c00, 0x4fff).w(this, FUNC(tagteam_state::colorram_w)).share("colorram");
+	map(0x2003, 0x2003).portr("DSW2").w(FUNC(tagteam_state::irq_clear_w));
+	map(0x4000, 0x43ff).rw(FUNC(tagteam_state::mirrorvideoram_r), FUNC(tagteam_state::mirrorvideoram_w));
+	map(0x4400, 0x47ff).rw(FUNC(tagteam_state::mirrorcolorram_r), FUNC(tagteam_state::mirrorcolorram_w));
+	map(0x4800, 0x4bff).ram().w(FUNC(tagteam_state::videoram_w)).share("videoram");
+	map(0x4c00, 0x4fff).ram().w(FUNC(tagteam_state::colorram_w)).share("colorram");
 	map(0x8000, 0xffff).rom();
 }
 
@@ -73,8 +72,8 @@ void tagteam_state::sound_map(address_map &map)
 	map(0x0000, 0x03ff).ram();
 	map(0x2000, 0x2001).w("ay1", FUNC(ay8910_device::data_address_w));
 	map(0x2002, 0x2003).w("ay2", FUNC(ay8910_device::data_address_w));
-	map(0x2004, 0x2004).w("dac", FUNC(dac_byte_interface::write));
-	map(0x2005, 0x2005).w(this, FUNC(tagteam_state::sound_nmi_mask_w));
+	map(0x2004, 0x2004).w("dac", FUNC(dac_byte_interface::data_w));
+	map(0x2005, 0x2005).w(FUNC(tagteam_state::sound_nmi_mask_w));
 	map(0x2007, 0x2007).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x4000, 0xffff).rom();
 }
@@ -196,7 +195,7 @@ static const gfx_layout spritelayout =
 	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
-static GFXDECODE_START( tagteam )
+static GFXDECODE_START( gfx_tagteam )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 4 ) /* chars */
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 0, 4 ) /* sprites */
 GFXDECODE_END
@@ -205,50 +204,47 @@ GFXDECODE_END
 INTERRUPT_GEN_MEMBER(tagteam_state::sound_timer_irq)
 {
 	if(m_sound_nmi_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
-MACHINE_CONFIG_START(tagteam_state::tagteam)
-
+void tagteam_state::tagteam(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, XTAL(12'000'000)/8)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(tagteam_state, irq0_line_assert, 272/16*57) // connected to bit 4 of vcount (basically once every 16 scanlines)
+	M6502(config, m_maincpu, XTAL(12'000'000)/8);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tagteam_state::main_map);
+	m_maincpu->set_periodic_int(FUNC(tagteam_state::irq0_line_assert), attotime::from_hz(272/16*57)); // connected to bit 4 of vcount (basically once every 16 scanlines)
 
-	MCFG_CPU_ADD("audiocpu", M6502, XTAL(12'000'000)/2/6) // daughterboard gets 12mhz/2 from mainboard, but how it's divided further is a guess
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(tagteam_state, sound_timer_irq, 272/16*57) // same source as maincpu irq
+	M6502(config, m_audiocpu, XTAL(12'000'000)/2/6); // daughterboard gets 12mhz/2 from mainboard, but how it's divided further is a guess
+	m_audiocpu->set_addrmap(AS_PROGRAM, &tagteam_state::sound_map);
+	m_audiocpu->set_periodic_int(FUNC(tagteam_state::sound_timer_irq), attotime::from_hz(272/16*57)); // same source as maincpu irq
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57) // measured?
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(3072))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tagteam_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(57); // measured?
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(3072));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(tagteam_state::screen_update));
+	screen.set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tagteam)
-	MCFG_PALETTE_ADD("palette", 32)
-	MCFG_PALETTE_INIT_OWNER(tagteam_state, tagteam)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tagteam);
+	PALETTE(config, m_palette, FUNC(tagteam_state::tagteam_palette), 32);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", M6502_IRQ_LINE))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, M6502_IRQ_LINE);
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL(12'000'000)/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	AY8910(config, "ay1", XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	AY8910(config, "ay2", XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "speaker", 0.25);
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL(12'000'000)/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
 
 
@@ -316,5 +312,5 @@ ROM_END
 
 
 
-GAME( 1983, bigprowr, 0,        tagteam, bigprowr, tagteam_state, 0, ROT270, "Technos Japan",                     "The Big Pro Wrestling!", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, tagteam,  bigprowr, tagteam, tagteam,  tagteam_state, 0, ROT270, "Technos Japan (Data East license)", "Tag Team Wrestling",     MACHINE_SUPPORTS_SAVE )
+GAME( 1983, bigprowr, 0,        tagteam, bigprowr, tagteam_state, empty_init, ROT270, "Technos Japan",                     "The Big Pro Wrestling!", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, tagteam,  bigprowr, tagteam, tagteam,  tagteam_state, empty_init, ROT270, "Technos Japan (Data East license)", "Tag Team Wrestling",     MACHINE_SUPPORTS_SAVE )

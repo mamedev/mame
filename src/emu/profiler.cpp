@@ -159,6 +159,7 @@ void real_profiler_state::update_text(running_machine &machine)
 		{ PROFILER_INPUT,            "Input Processing" },
 		{ PROFILER_MOVIE_REC,        "Movie Recording" },
 		{ PROFILER_LOGERROR,         "Error Logging" },
+		{ PROFILER_LUA,              "LUA" },
 		{ PROFILER_EXTRA,            "Unaccounted/Overhead" },
 		{ PROFILER_USER1,            "User 1" },
 		{ PROFILER_USER2,            "User 2" },

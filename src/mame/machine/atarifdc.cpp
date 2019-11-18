@@ -13,9 +13,6 @@
 #include "emu.h"
 #include "atarifdc.h"
 
-#include "machine/6821pia.h"
-#include "sound/pokey.h"
-
 #include "formats/atari_dsk.h"
 
 #include <ctype.h>
@@ -109,20 +106,18 @@ static void _atari_load_proc(device_image_interface &image, bool is_created)
 	atarifdc->atari_load_proc(image, is_created);
 }
 
-static int atari_fdc_get_drive(device_t *image)
-{
-	int drive = -1;
-	if (strcmp(image->tag(), ":fdc:" FLOPPY_0) == 0) drive = 0;
-	if (strcmp(image->tag(), ":fdc:" FLOPPY_1) == 0) drive = 1;
-	if (strcmp(image->tag(), ":fdc:" FLOPPY_2) == 0) drive = 2;
-	if (strcmp(image->tag(), ":fdc:" FLOPPY_3) == 0) drive = 3;
-	return drive;
-}
-
 void atari_fdc_device::atari_load_proc(device_image_interface &image, bool is_created)
 {
-	int id = atari_fdc_get_drive(&image.device());
-	int size, i;
+	int id = -1;
+
+	for (int i = 0; i < 4; i++)
+	{
+		if (&image.device() == m_floppy[i].target())
+		{
+			id = i;
+			break;
+		}
+	}
 
 	if (id == -1)
 		return;
@@ -145,7 +140,7 @@ void atari_fdc_device::atari_load_proc(device_image_interface &image, bool is_cr
 		image.fseek(0, SEEK_SET);
 	}
 
-	size = image.fread(m_drv[id].image.get(), MAXSIZE);
+	int size = image.fread(m_drv[id].image.get(), MAXSIZE);
 
 	if( size <= 0 )
 	{
@@ -201,6 +196,7 @@ void atari_fdc_device::atari_load_proc(device_image_interface &image, bool is_cr
 	}
 
 
+	int i;
 	switch (m_drv[id].type)
 	{
 	/* XFD or unknown format: find a matching size from the table */
@@ -393,11 +389,10 @@ void atari_fdc_device::add_serout(int expect_data)
 
 void atari_fdc_device::clr_serin(int ser_delay)
 {
-	pokey_device *pokey = machine().device<pokey_device>("pokey");
 	m_serin_chksum = 0;
 	m_serin_offs = 0;
 	m_serin_count = 0;
-	pokey->serin_ready(ser_delay * 40);
+	m_pokey->serin_ready(ser_delay * 40);
 }
 
 void atari_fdc_device::add_serin(uint8_t data, int with_checksum)
@@ -674,8 +669,6 @@ READ8_MEMBER( atari_fdc_device::serin_r )
 
 	if (m_serin_count)
 	{
-		pokey_device *pokey = machine().device<pokey_device>("pokey");
-
 		data = m_serin_buff[m_serin_offs];
 		ser_delay = 2 * 40;
 		if (m_serin_offs < 3)
@@ -688,7 +681,7 @@ READ8_MEMBER( atari_fdc_device::serin_r )
 		if (--m_serin_count == 0)
 			m_serin_offs = 0;
 		else
-			pokey->serin_ready(ser_delay);
+			m_pokey->serin_ready(ser_delay);
 	}
 
 	if (VERBOSE_SERIAL)
@@ -699,8 +692,6 @@ READ8_MEMBER( atari_fdc_device::serin_r )
 
 WRITE8_MEMBER( atari_fdc_device::serout_w )
 {
-	pia6821_device *pia = machine().device<pia6821_device>( "pia" );
-
 	/* ignore serial commands if no floppy image is specified */
 	if( !m_drv[0].image )
 		return;
@@ -718,7 +709,7 @@ WRITE8_MEMBER( atari_fdc_device::serout_w )
 			/* exclusive or written checksum with calculated */
 			m_serout_chksum ^= data;
 			/* if the attention line is high, this should be data */
-			if (pia->irq_b_state())
+			if (m_pia->irq_b_state())
 				a800_serial_write();
 		}
 		else
@@ -748,21 +739,13 @@ static const floppy_interface atari_floppy_interface =
 	"floppy_5_25"
 };
 
-legacy_floppy_image_device *atari_fdc_device::atari_floppy_get_device_child(int drive)
-{
-	switch(drive) {
-		case 0 : return subdevice<legacy_floppy_image_device>(FLOPPY_0);
-		case 1 : return subdevice<legacy_floppy_image_device>(FLOPPY_1);
-		case 2 : return subdevice<legacy_floppy_image_device>(FLOPPY_2);
-		case 3 : return subdevice<legacy_floppy_image_device>(FLOPPY_3);
-	}
-	return nullptr;
-}
-
 DEFINE_DEVICE_TYPE(ATARI_FDC, atari_fdc_device, "atari_fdc", "Atari FDC")
 
 atari_fdc_device::atari_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ATARI_FDC, tag, owner, clock),
+	m_floppy(*this, "floppy%u", 0U),
+	m_pokey(*this, "^pokey"),
+	m_pia(*this, "^pia"),
 	m_serout_count(0),
 	m_serout_offs(0),
 	m_serout_chksum(0),
@@ -780,22 +763,20 @@ atari_fdc_device::atari_fdc_device(const machine_config &mconfig, const char *ta
 
 void atari_fdc_device::device_start()
 {
-	int id;
-
 	memset(m_serout_buff, 0, sizeof(m_serout_buff));
 	memset(m_serin_buff, 0, sizeof(m_serin_buff));
 	memset(m_drv, 0, sizeof(m_drv));
 
-	for(id=0;id<4;id++)
-	{
-		atari_floppy_get_device_child(id)->floppy_install_load_proc(_atari_load_proc);
-	}
+	for (auto &floppy : m_floppy)
+		floppy->floppy_install_load_proc(_atari_load_proc);
 }
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(atari_fdc_device::device_add_mconfig)
-	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(atari_floppy_interface)
-MACHINE_CONFIG_END
+void atari_fdc_device::device_add_mconfig(machine_config &config)
+{
+	for (auto &floppy : m_floppy)
+		LEGACY_FLOPPY(config, floppy, 0, &atari_floppy_interface);
+}

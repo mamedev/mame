@@ -6,14 +6,14 @@
  *  DM9316: Synchronous 4-Bit Counters
  *
  *          +--------------+
- *    CLEAR |1     ++    16| VCC
+ *   /CLEAR |1     ++    16| VCC
  *    CLOCK |2           15| RC (Ripple Carry)
  *        A |3           14| QA
  *        B |4    9316   13| QB
  *        C |5           12| QC
  *        D |6           11| QD
  * Enable P |7           10| Enable T
- *      GND |8            9| LOAD
+ *      GND |8            9| /LOAD
  *          +--------------+
  *
  *          Counter Sequence
@@ -51,21 +51,23 @@
 #ifndef NLD_9316_H_
 #define NLD_9316_H_
 
-#include "../nl_setup.h"
+#include "netlist/nl_setup.h"
 
-#define TTL_9316(name, cCLK, cENP, cENT, cCLRQ, cLOADQ, cA, cB, cC, cD)         \
-		NET_REGISTER_DEV(TTL_9316, name)                                        \
-		NET_CONNECT(name, CLK, cCLK)                                            \
-		NET_CONNECT(name, ENP,  cENP)                                           \
-		NET_CONNECT(name, ENT,  cENT)                                           \
-		NET_CONNECT(name, CLRQ, cCLRQ)                                          \
-		NET_CONNECT(name, LOADQ, cLOADQ)                                        \
-		NET_CONNECT(name, A,    cA)                                             \
-		NET_CONNECT(name, B,    cB)                                             \
-		NET_CONNECT(name, C,    cC)                                             \
+#define TTL_9316(name, cCLK, cENP, cENT, cCLRQ, cLOADQ, cA, cB, cC, cD)        \
+		NET_REGISTER_DEV(TTL_9316, name)                                       \
+		NET_CONNECT(name, GND, GND)                                            \
+		NET_CONNECT(name, VCC, VCC)                                            \
+		NET_CONNECT(name, CLK, cCLK)                                           \
+		NET_CONNECT(name, ENP,  cENP)                                          \
+		NET_CONNECT(name, ENT,  cENT)                                          \
+		NET_CONNECT(name, CLRQ, cCLRQ)                                         \
+		NET_CONNECT(name, LOADQ, cLOADQ)                                       \
+		NET_CONNECT(name, A,    cA)                                            \
+		NET_CONNECT(name, B,    cB)                                            \
+		NET_CONNECT(name, C,    cC)                                            \
 		NET_CONNECT(name, D,    cD)
 
-#define TTL_9316_DIP(name)                                                      \
+#define TTL_9316_DIP(name)                                                     \
 		NET_REGISTER_DEV(TTL_9316_DIP, name)
 
 #endif /* NLD_9316_H_ */

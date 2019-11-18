@@ -15,33 +15,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_DECO_IRQ_ADD(_tag, _screen_tag) \
-	MCFG_DEVICE_ADD(_tag, DECO_IRQ, 0) \
-	downcast<deco_irq_device &>(*device).set_screen_tag(_screen_tag);
-
-#define MCFG_DECO_IRQ_LIGHTGUN1_CB(_devcb) \
-	devcb = &downcast<deco_irq_device &>(*device).set_lightgun1_callback(DEVCB_##_devcb);
-
-#define MCFG_DECO_IRQ_LIGHTGUN2_CB(_devcb) \
-	devcb = &downcast<deco_irq_device &>(*device).set_lightgun2_callback(DEVCB_##_devcb);
-
-#define MCFG_DECO_IRQ_LIGHTGUN_IRQ_CB(_devcb) \
-	devcb = &downcast<deco_irq_device &>(*device).set_lightgun_irq_callback(DEVCB_##_devcb);
-
-#define MCFG_DECO_IRQ_RASTER1_IRQ_CB(_devcb) \
-	devcb = &downcast<deco_irq_device &>(*device).set_raster1_irq_callback(DEVCB_##_devcb);
-
-#define MCFG_DECO_IRQ_RASTER2_IRQ_CB(_devcb) \
-	devcb = &downcast<deco_irq_device &>(*device).set_raster2_irq_callback(DEVCB_##_devcb);
-
-#define MCFG_DECO_IRQ_VBLANK_IRQ_CB(_devcb) \
-	devcb = &downcast<deco_irq_device &>(*device).set_vblank_irq_callback(DEVCB_##_devcb);
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -52,31 +25,28 @@ public:
 	deco_irq_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	template <class Object> devcb_base &set_lightgun1_callback(Object &&cb) { return m_lightgun1_cb.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> devcb_base &set_lightgun2_callback(Object &&cb) { return m_lightgun2_cb.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> devcb_base &set_lightgun_irq_callback(Object &&cb) { return m_lightgun_irq_cb.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> devcb_base &set_raster1_irq_callback(Object &&cb) { return m_raster1_irq_cb.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> devcb_base &set_raster2_irq_callback(Object &&cb) { return m_raster2_irq_cb.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> devcb_base &set_vblank_irq_callback(Object &&cb) { return m_vblank_irq_cb.set_callback(std::forward<Object>(cb)); }
+	auto lightgun1_callback() { return m_lightgun1_cb.bind(); }
+	auto lightgun2_callback() { return m_lightgun2_cb.bind(); }
+	auto lightgun_irq_callback() { return m_lightgun_irq_cb.bind(); }
+	auto raster1_irq_callback() { return m_raster1_irq_cb.bind(); }
+	auto raster2_irq_callback() { return m_raster2_irq_cb.bind(); }
+	auto vblank_irq_callback() { return m_vblank_irq_cb.bind(); }
 
 	// configuration
-	void set_screen_tag(const char *tag) { m_screen.set_tag(tag); }
+	template <typename T> void set_screen_tag(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
 
 	TIMER_CALLBACK_MEMBER(scanline_callback);
 
 	void map(address_map &map);
 
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_READ8_MEMBER(scanline_r);
-	DECLARE_WRITE8_MEMBER(scanline_w);
-	DECLARE_READ8_MEMBER(raster_irq_ack_r);
-	DECLARE_WRITE8_MEMBER(vblank_irq_ack_w);
-	DECLARE_READ8_MEMBER(status_r);
+	void control_w(u8 data);
+	u8 scanline_r();
+	void scanline_w(u8 data);
+	u8 raster_irq_ack_r();
+	void vblank_irq_ack_w(u8 data);
+	u8 status_r();
+
+	void raster_irq_ack();
 
 	DECLARE_WRITE_LINE_MEMBER(lightgun1_trigger_w);
 	DECLARE_WRITE_LINE_MEMBER(lightgun2_trigger_w);
@@ -109,9 +79,9 @@ private:
 
 	int m_raster_irq_target;
 	bool m_raster_irq_masked;
-	uint8_t m_raster_irq_scanline;
+	u8 m_raster_irq_scanline;
 
-	uint8_t m_lightgun_latch;
+	int m_lightgun_latch;
 };
 
 

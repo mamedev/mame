@@ -25,16 +25,16 @@ Getting Started with GLSL
 
 You will need to have followed the initial MAME setup instructions elsewhere in this manual before beginning. Official MAME distributions include GLSL support by default, but do NOT include the GLSL shader files. You will need to obtain the shader files from third party online sources.
 
-Open your MAME.INI in your text editor of choice (e.g. Notepad), and make sure the following options are set correctly:
+Open your ``mame.ini`` in your text editor of choice (e.g. Notepad), and make sure the following options are set correctly:
 
-* **video opengl**
-* **filter 0**
+* ``video opengl``
+* ``filter 0``
 
 The former is required because GLSL requires OpenGL support. The latter turns off extra filtering that interferes with GLSL output.
 
 Lastly, one more edit will turn GLSL on:
 
-* **gl_glsl 1**
+* ``gl_glsl 1``
 
 Save the .INI file and you're ready to begin.
 
@@ -54,7 +54,7 @@ Once you've found settings you like, write the numbers down on a notepad and exi
 Configuration Editing
 ---------------------
 
-As referenced in :ref:`advanced-multi-CFG`, MAME has a order in which it processes INI files. The GLSL settings can be edited in MAME.INI, but to take full advantage of the power of MAME's config files, you'll want to copy the GLSL settings from MAME.INI to one of the other config files and make changes there.
+As referenced in :ref:`advanced-multi-CFG`, MAME has a order in which it processes INI files. The GLSL settings can be edited in ``mame.ini``, but to take full advantage of the power of MAME's config files, you'll want to copy the GLSL settings from mame.ini to one of the other config files and make changes there.
 
 For instance, once you've found GLSL settings you think are appropriate for Neo Geo games, you can put those settings into neogeo.ini so that all Neo-Geo games will be able to take advantage of those settings without needing to add it to every game INI manually.
 
@@ -63,23 +63,22 @@ Configuration Settings
 ----------------------
 
 | **gl_glsl**
-| 
+|
 | 	Enables GLSL when set to 1, disabled if set to 0. Defaults to *0*.
-| 
+|
 | **gl_glsl_filter**
-| 
+|
 | 	Enables filtering to GLSL output. Reduces jagginess at the cost of blurriness.
-| 
+|
 | **glsl_shader_mame0**
 |         ...
 | **glsl_shader_mame9**
-| 
+|
 | 	Specifies the shaders to run, in the order from 0 to 9. See your shader pack author for details on which to run in which order for best effect.
-| 
+|
 | **glsl_shader_screen0**
 |         ...
 | **glsl_shader_screen9**
-| 
+|
 | 	Specifies screen to apply the shaders on.
 |
-

@@ -29,48 +29,48 @@ DEFINE_DEVICE_TYPE(P1_SOUND, p1_sound_device, "p1_sound", "Poisk-1 sound card (B
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(p1_sound_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("midi", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("mdout", midi_port_device, write_txd))
-	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE(":isa", isa8_device, irq3_w))
+void p1_sound_device::device_add_mconfig(machine_config &config)
+{
+	I8251(config, m_midi, 0);
+	m_midi->txd_handler().set("mdout", FUNC(midi_port_device::write_txd));
+	m_midi->rxrdy_handler().set(":isa", FUNC(isa8_device::irq3_w));
 
-	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_MIDI_RX_HANDLER(DEVWRITELINE("midi", i8251_device, write_rxd))
+	MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set(m_midi, FUNC(i8251_device::write_rxd));
 
-	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
+	MIDI_PORT(config, "mdout", midiout_slot, "midiout");
 
-	MCFG_DEVICE_ADD("d14", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL(12'500'000)/10)
+	PIT8253(config, m_d14, 0);
+	m_d14->set_clk<0>(XTAL(12'500'000)/10);
 //  sampler at 10 KHz
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(p1_sound_device, sampler_sync))
-	MCFG_PIT8253_CLK1(XTAL(12'500'000)/10)
-	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("midi", i8251_device, write_txc))
-	MCFG_PIT8253_CLK2(XTAL(12'500'000)/10)
-	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("midi", i8251_device, write_rxc))
+	m_d14->out_handler<0>().set(FUNC(p1_sound_device::sampler_sync));
+	m_d14->set_clk<1>(XTAL(12'500'000)/10);
+	m_d14->out_handler<1>().set(m_midi, FUNC(i8251_device::write_txc));
+	m_d14->set_clk<2>(XTAL(12'500'000)/10);
+	m_d14->out_handler<2>().set(m_midi, FUNC(i8251_device::write_rxc));
 
-	MCFG_DEVICE_ADD("d16", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL(12'500'000)/10)
-//  MCFG_PIT8253_OUT0_HANDLER(XXX)
-	MCFG_PIT8253_CLK1(XTAL(12'500'000)/10)
-//  MCFG_PIT8253_OUT1_HANDLER(XXX)
-	MCFG_PIT8253_CLK2(XTAL(12'500'000)/10)
-//  MCFG_PIT8253_OUT2_HANDLER(XXX)
+	PIT8253(config, m_d16, 0);
+	m_d16->set_clk<0>(XTAL(12'500'000)/10);
+//  m_d16->out_handler<0>().set(FUNC(XXX));
+	m_d16->set_clk<1>(XTAL(12'500'000)/10);
+//  m_d16->out_handler<1>().set(FUNC(XXX));
+	m_d16->set_clk<2>(XTAL(12'500'000)/10);
+//  m_d16->out_handler<2>().set(FUNC(XXX));
 
-	MCFG_DEVICE_ADD("d17", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL(12'500'000)/10)
-//  MCFG_PIT8253_OUT0_HANDLER(XXX)
-	MCFG_PIT8253_CLK1(XTAL(12'500'000)/10)
-//  MCFG_PIT8253_OUT1_HANDLER(XXX)
-	MCFG_PIT8253_CLK2(XTAL(12'500'000)/10)
-//  MCFG_PIT8253_OUT2_HANDLER(XXX)
+	PIT8253(config, m_d17, 0);
+	m_d17->set_clk<0>(XTAL(12'500'000)/10);
+//  m_d17->out_handler<0>().set(FUNC(XXX));
+	m_d17->set_clk<1>(XTAL(12'500'000)/10);
+//  m_d17->out_handler<1>().set(FUNC(XXX));
+	m_d17->set_clk<2>(XTAL(12'500'000)/10);
+//  m_d17->out_handler<2>().set(FUNC(XXX));
 
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_FILTER_RC_ADD("filter", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter", 0.5) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	SPEAKER(config, "speaker").front_center();
+	FILTER_RC(config, m_filter).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "filter", 0.5); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
 
 //**************************************************************************
@@ -95,32 +95,32 @@ p1_sound_device::p1_sound_device(const machine_config &mconfig, const char *tag,
 
 READ8_MEMBER(p1_sound_device::d14_r)
 {
-	return m_d14->read(space, offset >> 1);
+	return m_d14->read(offset >> 1);
 }
 
 WRITE8_MEMBER(p1_sound_device::d14_w)
 {
-	m_d14->write(space, offset >> 1, data);
+	m_d14->write(offset >> 1, data);
 }
 
 READ8_MEMBER(p1_sound_device::d16_r)
 {
-	return m_d16->read(space, offset >> 1);
+	return m_d16->read(offset >> 1);
 }
 
 WRITE8_MEMBER(p1_sound_device::d16_w)
 {
-	m_d16->write(space, offset >> 1, data);
+	m_d16->write(offset >> 1, data);
 }
 
 READ8_MEMBER(p1_sound_device::d17_r)
 {
-	return m_d17->read(space, offset >> 1);
+	return m_d17->read(offset >> 1);
 }
 
 WRITE8_MEMBER(p1_sound_device::d17_w)
 {
-	m_d17->write(space, offset >> 1, data);
+	m_d17->write(offset >> 1, data);
 }
 
 READ8_MEMBER(p1_sound_device::adc_r)
@@ -161,28 +161,28 @@ void p1_sound_device::device_start()
 	// EFC00 -- ADC output
 
 	m_isa->install_memory(0xea000, 0xea01f,
-		read8_delegate(FUNC(p1_sound_device::adc_r), this), // XXX not really
-		write8_delegate(FUNC(p1_sound_device::dac_w), this));
+			read8_delegate(*this, FUNC(p1_sound_device::adc_r)), // XXX not really
+			write8_delegate(*this, FUNC(p1_sound_device::dac_w)));
 
 	m_isa->install_memory(0xee000, 0xee000,
-		read8_delegate(FUNC(i8251_device::data_r), (i8251_device*)m_midi),
-		write8_delegate(FUNC(i8251_device::data_w), (i8251_device*)m_midi));
+			read8smo_delegate(*m_midi, FUNC(i8251_device::data_r)),
+			write8smo_delegate(*m_midi, FUNC(i8251_device::data_w)));
 	m_isa->install_memory(0xee002, 0xee002,
-		read8_delegate(FUNC(i8251_device::status_r), (i8251_device*)m_midi),
-		write8_delegate(FUNC(i8251_device::control_w), (i8251_device*)m_midi));
+			read8smo_delegate(*m_midi, FUNC(i8251_device::status_r)),
+			write8smo_delegate(*m_midi, FUNC(i8251_device::control_w)));
 
 	// sync generator
 	m_isa->install_memory(0xef000, 0xef007,
-		read8_delegate(FUNC(p1_sound_device::d14_r), this),
-		write8_delegate(FUNC(p1_sound_device::d14_w), this));
+			read8_delegate(*this, FUNC(p1_sound_device::d14_r)),
+			write8_delegate(*this, FUNC(p1_sound_device::d14_w)));
 
 	// 6 music channels
 	m_isa->install_memory(0xef400, 0xef407,
-		read8_delegate(FUNC(p1_sound_device::d16_r), this),
-		write8_delegate(FUNC(p1_sound_device::d16_w), this));
+			read8_delegate(*this, FUNC(p1_sound_device::d16_r)),
+			write8_delegate(*this, FUNC(p1_sound_device::d16_w)));
 	m_isa->install_memory(0xef800, 0xef807,
-		read8_delegate(FUNC(p1_sound_device::d17_r), this),
-		write8_delegate(FUNC(p1_sound_device::d17_w), this));
+			read8_delegate(*this, FUNC(p1_sound_device::d17_r)),
+			write8_delegate(*this, FUNC(p1_sound_device::d17_w)));
 }
 
 

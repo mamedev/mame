@@ -87,18 +87,24 @@ L10, L15, L18 and G18 all read the same
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class warpspeed_state : public driver_device
 {
 public:
-	warpspeed_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	warpspeed_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_videoram(*this, "videoram"),
-		m_workram(*this, "workram") { }
+		m_workram(*this, "workram")
+	{ }
 
+	void warpspeed(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 
@@ -116,11 +122,10 @@ public:
 	TILE_GET_INFO_MEMBER(get_starfield_tile_info);
 
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(warpspeed);
+	void warpsped_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_circles(bitmap_ind16 &bitmap);
-	void warpspeed(machine_config &config);
 	void warpspeed_io_map(address_map &map);
 	void warpspeed_map(address_map &map);
 };
@@ -154,9 +159,9 @@ WRITE8_MEMBER(warpspeed_state::vidram_w)
 
 void warpspeed_state::video_start()
 {
-	m_text_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(warpspeed_state::get_text_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_text_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(warpspeed_state::get_text_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_text_tilemap->set_transparent_pen(0);
-	m_starfield_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(warpspeed_state::get_starfield_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_starfield_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(warpspeed_state::get_starfield_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_starfield_tilemap->mark_all_dirty();
 
 	save_item(NAME(m_regs));
@@ -236,7 +241,7 @@ uint32_t warpspeed_state::screen_update(screen_device &screen, bitmap_ind16 &bit
 void warpspeed_state::warpspeed_map(address_map &map)
 {
 	map(0x0000, 0x0dff).rom();
-	map(0x1800, 0x1bff).ram().w(this, FUNC(warpspeed_state::vidram_w)).share("videoram");
+	map(0x1800, 0x1bff).ram().w(FUNC(warpspeed_state::vidram_w)).share("videoram");
 	map(0x1c00, 0x1cff).ram().share("workram");
 }
 
@@ -247,7 +252,7 @@ void warpspeed_state::warpspeed_io_map(address_map &map)
 	map(0x01, 0x01).portr("IN1");
 	map(0x02, 0x02).portr("DSW");
 	map(0x03, 0x03).portr("IN2");
-	map(0x00, 0x27).w(this, FUNC(warpspeed_state::hardware_w));
+	map(0x00, 0x27).w(FUNC(warpspeed_state::hardware_w));
 }
 
 static INPUT_PORTS_START( warpspeed )
@@ -302,45 +307,42 @@ static const gfx_layout charlayout =
 	8*8
 };
 
-static GFXDECODE_START( warpspeed )
+static GFXDECODE_START( gfx_warpspeed )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 1  )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout,   0, 1  )
 GFXDECODE_END
 
-PALETTE_INIT_MEMBER(warpspeed_state, warpspeed)
+void warpspeed_state::warpsped_palette(palette_device &palette) const
 {
 	// tilemaps
-	palette.set_pen_color(0,rgb_t::black()); /* black */
-	palette.set_pen_color(1,rgb_t::white()); /* white */
+	palette.set_pen_color(0, rgb_t::black()); // black
+	palette.set_pen_color(1, rgb_t::white()); // white
 
 	// circles
-	for ( int i = 0; i < 8; i++ )
-	{
-		palette.set_pen_color(2 + i, 0xff*BIT(i,0), 0xff*BIT(i,1), 0xff*BIT(i,2));
-	}
+	for (int i = 0; i < 8; i++)
+		palette.set_pen_color(2 + i, 0xff * BIT(i, 0), 0xff * BIT(i, 1), 0xff * BIT(i, 2));
 }
 
-MACHINE_CONFIG_START(warpspeed_state::warpspeed)
-
+void warpspeed_state::warpspeed(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(5'000'000)/2)
-	MCFG_CPU_PROGRAM_MAP(warpspeed_map)
-	MCFG_CPU_IO_MAP(warpspeed_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", warpspeed_state,  irq0_line_hold)
+	Z80(config, m_maincpu, XTAL(5'000'000)/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &warpspeed_state::warpspeed_map);
+	m_maincpu->set_addrmap(AS_IO, &warpspeed_state::warpspeed_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(warpspeed_state::irq0_line_hold));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE((32)*8, (32)*8)
-	MCFG_SCREEN_VISIBLE_AREA(4*8, 32*8-1, 8*8, 32*8-1)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_UPDATE_DRIVER(warpspeed_state, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_size((32)*8, (32)*8);
+	screen.set_visarea(4*8, 32*8-1, 8*8, 32*8-1);
+	screen.set_palette("palette");
+	screen.set_screen_update(FUNC(warpspeed_state::screen_update));
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", warpspeed)
-	MCFG_PALETTE_ADD("palette", 2+8)
-	MCFG_PALETTE_INIT_OWNER(warpspeed_state, warpspeed)
-MACHINE_CONFIG_END
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_warpspeed);
+	PALETTE(config, "palette", FUNC(warpspeed_state::warpsped_palette), 2 + 8);
+}
 
 ROM_START( warpsped )
 	ROM_REGION(0x1000, "maincpu", 0)
@@ -378,4 +380,4 @@ ROM_START( warpsped )
 ROM_END
 
 
-GAME( 1979?, warpsped,  0,      warpspeed, warpspeed, warpspeed_state, 0, ROT0, "Meadows Games, Inc.", "Warp Speed (prototype)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // year not shown, 1979 is according to date stamps on PCB chips.
+GAME( 1979?, warpsped,  0,      warpspeed, warpspeed, warpspeed_state, empty_init, ROT0, "Meadows Games, Inc.", "Warp Speed (prototype)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // year not shown, 1979 is according to date stamps on PCB chips.

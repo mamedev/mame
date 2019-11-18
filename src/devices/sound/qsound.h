@@ -12,13 +12,12 @@
 
 #include "cpu/dsp16/dsp16.h"
 
-// default 60MHz clock (divided by 2 for DSP core clock, and then by 1248 for sample rate)
-#define QSOUND_CLOCK 60_MHz_XTAL
 
 class qsound_device : public device_t, public device_sound_interface, public device_rom_interface
 {
 public:
-	qsound_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	// default 60MHz clock (divided by 2 for DSP core clock, and then by 1248 for sample rate)
+	qsound_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 60'000'000);
 
 	DECLARE_WRITE8_MEMBER(qsound_w);
 	DECLARE_READ8_MEMBER(qsound_r);
@@ -28,6 +27,7 @@ protected:
 	tiny_rom_entry const *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
+	virtual void device_clock_changed() override;
 	virtual void device_reset() override;
 
 	// device_sound_interface implementation

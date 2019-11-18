@@ -1,10 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Mike Balfour, Ben Bruscella, Sean Young
-#pragma once
+#ifndef MAME_MACHINE_COLECO_H
+#define MAME_MACHINE_COLECO_H
 
-#ifndef __COLECO_CONTROLLERS__
-#define __COLECO_CONTROLLERS__
+#pragma once
 
 INPUT_PORTS_EXTERN( coleco );
 
-#endif
+#endif // MAME_MACHINE_COLECO_H

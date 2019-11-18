@@ -63,9 +63,9 @@ void vtech_rtty_interface_device::device_reset()
 	program_space().install_rom(0x4000, 0x4fff, 0x1000, memregion("software")->base());
 
 	// data
-	program_space().install_read_handler(0x5000, 0x57ff, read8_delegate(FUNC(vtech_rtty_interface_device::receive_data_r), this));
-	program_space().install_write_handler(0x5800, 0x5fff, write8_delegate(FUNC(vtech_rtty_interface_device::transmit_data_w), this));
-	program_space().install_write_handler(0x6000, 0x67ff, write8_delegate(FUNC(vtech_rtty_interface_device::relay_w), this));
+	program_space().install_read_handler(0x5000, 0x57ff, read8_delegate(*this, FUNC(vtech_rtty_interface_device::receive_data_r)));
+	program_space().install_write_handler(0x5800, 0x5fff, write8_delegate(*this, FUNC(vtech_rtty_interface_device::transmit_data_w)));
+	program_space().install_write_handler(0x6000, 0x67ff, write8_delegate(*this, FUNC(vtech_rtty_interface_device::relay_w)));
 }
 
 

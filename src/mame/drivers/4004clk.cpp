@@ -29,7 +29,7 @@ public:
 
 	void _4004clk(machine_config &config);
 
-protected:
+private:
 	DECLARE_WRITE8_MEMBER( nixie_w );
 	DECLARE_WRITE8_MEMBER( neon_w );
 
@@ -41,7 +41,6 @@ protected:
 
 	virtual void machine_start() override;
 
-private:
 	static constexpr uint8_t nixie_to_num(uint16_t val)
 	{
 		return
@@ -103,13 +102,13 @@ void nixieclock_state::_4004clk_rp(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x000f).mirror(0x0700).portr("INPUT");
-	map(0x0000, 0x00ef).mirror(0x0700).w(this, FUNC(nixieclock_state::nixie_w));
-	map(0x00f0, 0x00ff).mirror(0x0700).w(this, FUNC(nixieclock_state::neon_w));
+	map(0x0000, 0x00ef).mirror(0x0700).w(FUNC(nixieclock_state::nixie_w));
+	map(0x00f0, 0x00ff).mirror(0x0700).w(FUNC(nixieclock_state::neon_w));
 }
 
 void nixieclock_state::_4004clk_mp(address_map &map)
 {
-	map(0x00, 0x00).w("dac", FUNC(dac_bit_interface::write));
+	map(0x00, 0x00).w("dac", FUNC(dac_bit_interface::data_w));
 }
 
 /* Input ports */
@@ -135,28 +134,28 @@ void nixieclock_state::machine_start()
 	save_pointer(NAME(m_nixie), 6);
 }
 
-MACHINE_CONFIG_START(nixieclock_state::_4004clk)
-
+void nixieclock_state::_4004clk(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I4004, 5_MHz_XTAL / 8);
-	MCFG_I4004_ROM_MAP(_4004clk_rom)
-	MCFG_I4004_RAM_MEMORY_MAP(_4004clk_mem)
-	MCFG_I4004_ROM_PORTS_MAP(_4004clk_rp)
-	MCFG_I4004_RAM_STATUS_MAP(_4004clk_stat)
-	MCFG_I4004_RAM_PORTS_MAP(_4004clk_mp)
+	i4004_cpu_device &cpu(I4004(config, "maincpu", 5_MHz_XTAL / 8));
+	cpu.set_rom_map(&nixieclock_state::_4004clk_rom);
+	cpu.set_ram_memory_map(&nixieclock_state::_4004clk_mem);
+	cpu.set_rom_ports_map(&nixieclock_state::_4004clk_rp);
+	cpu.set_ram_status_map(&nixieclock_state::_4004clk_stat);
+	cpu.set_ram_ports_map(&nixieclock_state::_4004clk_mp);
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_4004clk)
+	config.set_default_layout(layout_4004clk);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	SPEAKER(config, "speaker").front_center();
+	DAC_1BIT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
-	MCFG_CLOCK_ADD("clk", 60)
-	MCFG_CLOCK_SIGNAL_HANDLER(INPUTLINE("maincpu", I4004_TEST_LINE))
-MACHINE_CONFIG_END
+	clock_device &clk(CLOCK(config, "clk", 60));
+	clk.signal_handler().set_inputline("maincpu", I4004_TEST_LINE);
+}
 
 /* ROM definition */
 ROM_START( 4004clk )
@@ -181,5 +180,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    STATE             INIT  COMPANY             FULLNAME            FLAGS
-SYST( 2008, 4004clk,  0,      0,       _4004clk,  4004clk, nixieclock_state, 0,    "John L. Weinrich", "4004 Nixie Clock", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE   INPUT    CLASS             INIT        COMPANY             FULLNAME            FLAGS
+SYST( 2008, 4004clk, 0,      0,      _4004clk, 4004clk, nixieclock_state, empty_init, "John L. Weinrich", "4004 Nixie Clock", MACHINE_SUPPORTS_SAVE )

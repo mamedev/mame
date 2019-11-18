@@ -1066,17 +1066,10 @@ READ32_MEMBER( sh4_base_device::sh4_internal_r )
 	return m_m[offset];
 }
 
-void sh34_base_device::sh4_set_frt_input(int state)
+void sh34_base_device::set_frt_input(int state)
 {
 	if (m_cpu_type != CPU_TYPE_SH4)
 		fatalerror("sh4_set_frt_input uses m_m[] with SH3\n");
-
-	if(state == PULSE_LINE)
-	{
-		sh4_set_frt_input(ASSERT_LINE);
-		sh4_set_frt_input(CLEAR_LINE);
-		return;
-	}
 
 	if(m_sh2_state->m_frt_input == state) {
 		return;
@@ -1225,42 +1218,42 @@ void sh34_base_device::execute_set_input(int irqline, int state) // set state of
 
 void sh34_base_device::sh4_parse_configuration()
 {
-	if(c_clock > 0)
+	if(m_clock > 0)
 	{
-		switch((c_md2 << 2) | (c_md1 << 1) | (c_md0))
+		switch((m_md[2] << 2) | (m_md[1] << 1) | (m_md[0]))
 		{
 		case 0:
-			m_cpu_clock = c_clock;
-			m_bus_clock = c_clock / 4;
-			m_pm_clock = c_clock / 4;
+			m_cpu_clock = m_clock;
+			m_bus_clock = m_clock / 4;
+			m_pm_clock = m_clock / 4;
 			break;
 		case 1:
-			m_cpu_clock = c_clock;
-			m_bus_clock = c_clock / 6;
-			m_pm_clock = c_clock / 6;
+			m_cpu_clock = m_clock;
+			m_bus_clock = m_clock / 6;
+			m_pm_clock = m_clock / 6;
 			break;
 		case 2:
-			m_cpu_clock = c_clock;
-			m_bus_clock = c_clock / 3;
-			m_pm_clock = c_clock / 6;
+			m_cpu_clock = m_clock;
+			m_bus_clock = m_clock / 3;
+			m_pm_clock = m_clock / 6;
 			break;
 		case 3:
-			m_cpu_clock = c_clock;
-			m_bus_clock = c_clock / 3;
-			m_pm_clock = c_clock / 6;
+			m_cpu_clock = m_clock;
+			m_bus_clock = m_clock / 3;
+			m_pm_clock = m_clock / 6;
 			break;
 		case 4:
-			m_cpu_clock = c_clock;
-			m_bus_clock = c_clock / 2;
-			m_pm_clock = c_clock / 4;
+			m_cpu_clock = m_clock;
+			m_bus_clock = m_clock / 2;
+			m_pm_clock = m_clock / 4;
 			break;
 		case 5:
-			m_cpu_clock = c_clock;
-			m_bus_clock = c_clock / 2;
-			m_pm_clock = c_clock / 4;
+			m_cpu_clock = m_clock;
+			m_bus_clock = m_clock / 2;
+			m_pm_clock = m_clock / 4;
 			break;
 		}
-		m_is_slave = (~(c_md7)) & 1;
+		m_is_slave = (~(m_md[7])) & 1;
 	}
 	else
 	{

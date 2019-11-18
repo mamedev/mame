@@ -13,6 +13,7 @@
 
 #include "slot.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 
 
 //**************************************************************************
@@ -27,10 +28,10 @@ public:
 	// construction/destruction
 	sv806_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ8_MEMBER( mreq_r ) override;
-	virtual DECLARE_WRITE8_MEMBER( mreq_w ) override;
-	virtual DECLARE_READ8_MEMBER( iorq_r ) override;
-	virtual DECLARE_WRITE8_MEMBER( iorq_w ) override;
+	virtual uint8_t mreq_r(offs_t offset) override;
+	virtual void mreq_w(offs_t offset, uint8_t data) override;
+	virtual uint8_t iorq_r(offs_t offset) override;
+	virtual void iorq_w(offs_t offset, uint8_t data) override;
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -40,7 +41,7 @@ protected:
 private:
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	required_device<hd6845_device> m_crtc;
+	required_device<hd6845s_device> m_crtc;
 	required_device<palette_device> m_palette;
 	required_memory_region m_gfx;
 

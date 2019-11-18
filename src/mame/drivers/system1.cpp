@@ -222,8 +222,6 @@ seem to have access to.
 #include "emu.h"
 #include "includes/system1.h"
 
-#include "cpu/mcs51/mcs51.h"
-#include "machine/z80pio.h"
 #include "machine/segacrpt_device.h"
 #include "machine/mc8123.h"
 #include "sound/sn76496.h"
@@ -526,22 +524,20 @@ WRITE8_MEMBER(system1_state::sound_control_w)
 
 READ8_MEMBER(system1_state::sound_data_r)
 {
-	z80pio_device *pio = machine().device<z80pio_device>("pio");
-
 	/* if we have an 8255 PPI, get the data from the port and toggle the ack */
 	if (m_ppi8255 != nullptr)
 	{
 		m_ppi8255->pc6_w(0);
 		m_ppi8255->pc6_w(1);
-		return m_soundlatch->read(space, offset);
+		return m_soundlatch->read();
 	}
 
 	/* if we have a Z80 PIO, get the data from the port and toggle the strobe */
-	else if (pio != nullptr)
+	else if (m_pio != nullptr)
 	{
-		uint8_t data = pio->port_read(z80pio_device::PORT_A);
-		pio->strobe(z80pio_device::PORT_A, false);
-		pio->strobe(z80pio_device::PORT_A, true);
+		uint8_t data = m_pio->port_read(z80pio_device::PORT_A);
+		m_pio->strobe(z80pio_device::PORT_A, false);
+		m_pio->strobe(z80pio_device::PORT_A, true);
 		return data;
 	}
 
@@ -552,7 +548,7 @@ READ8_MEMBER(system1_state::sound_data_r)
 WRITE8_MEMBER(system1_state::soundport_w)
 {
 	/* boost interleave when communicating with the sound CPU */
-	m_soundlatch->write(space, 0, data);
+	m_soundlatch->write(data);
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 }
 
@@ -583,6 +579,11 @@ WRITE8_MEMBER(system1_state::mcu_control_w)
 	    Bit 1 -> n/c
 	    Bit 0 -> Directly connected to Z80 /INT line
 	*/
+
+	/* boost interleave to ensure that the MCU can break the Z80 out of a HALT */
+	if (!BIT(m_mcu_control, 6) && BIT(data, 6))
+		machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(10));
+
 	m_mcu_control = data;
 	m_maincpu->set_input_line(INPUT_LINE_HALT, (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 	m_maincpu->set_input_line(0, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
@@ -627,17 +628,6 @@ READ8_MEMBER(system1_state::mcu_io_r)
 						m_mcu->pc(), m_mcu_control, offset);
 			return 0xff;
 	}
-}
-
-
-INTERRUPT_GEN_MEMBER(system1_state::mcu_irq_assert)
-{
-	/* toggle the INT0 line on the MCU */
-	device.execute().set_input_line(MCS51_INT0_LINE, ASSERT_LINE);
-	device.execute().set_input_line(MCS51_INT0_LINE, CLEAR_LINE);
-
-	/* boost interleave to ensure that the MCU can break the Z80 out of a HALT */
-	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(10));
 }
 
 
@@ -766,12 +756,12 @@ void system1_state::system1_map(address_map &map)
 	map(0x8000, 0xbfff).bankr("bank1");
 	map(0xc000, 0xcfff).ram().share("ram");
 	map(0xd000, 0xd7ff).ram().share("spriteram");
-	map(0xd800, 0xdfff).ram().w(this, FUNC(system1_state::system1_paletteram_w)).share("palette");
-	map(0xe000, 0xefff).rw(this, FUNC(system1_state::system1_videoram_r), FUNC(system1_state::system1_videoram_w));
-	map(0xf000, 0xf3ff).rw(this, FUNC(system1_state::system1_mixer_collision_r), FUNC(system1_state::system1_mixer_collision_w));
-	map(0xf400, 0xf7ff).w(this, FUNC(system1_state::system1_mixer_collision_reset_w));
-	map(0xf800, 0xfbff).rw(this, FUNC(system1_state::system1_sprite_collision_r), FUNC(system1_state::system1_sprite_collision_w));
-	map(0xfc00, 0xffff).w(this, FUNC(system1_state::system1_sprite_collision_reset_w));
+	map(0xd800, 0xdfff).ram().w(FUNC(system1_state::system1_paletteram_w)).share("palette");
+	map(0xe000, 0xefff).rw(FUNC(system1_state::system1_videoram_r), FUNC(system1_state::system1_videoram_w));
+	map(0xf000, 0xf3ff).rw(FUNC(system1_state::system1_mixer_collision_r), FUNC(system1_state::system1_mixer_collision_w));
+	map(0xf400, 0xf7ff).w(FUNC(system1_state::system1_mixer_collision_reset_w));
+	map(0xf800, 0xfbff).rw(FUNC(system1_state::system1_sprite_collision_r), FUNC(system1_state::system1_sprite_collision_w));
+	map(0xfc00, 0xffff).w(FUNC(system1_state::system1_sprite_collision_reset_w));
 }
 
 void system1_state::decrypted_opcodes_map(address_map &map)
@@ -780,7 +770,7 @@ void system1_state::decrypted_opcodes_map(address_map &map)
 	map(0x8000, 0xbfff).bankr("bank1");
 	map(0xc000, 0xcfff).ram().share("ram");
 	map(0xd000, 0xd7ff).ram().share("spriteram");
-	map(0xd800, 0xdfff).ram().w(this, FUNC(system1_state::system1_paletteram_w)).share("palette");
+	map(0xd800, 0xdfff).ram().w(FUNC(system1_state::system1_paletteram_w)).share("palette");
 }
 
 void system1_state::banked_decrypted_opcodes_map(address_map &map)
@@ -789,7 +779,7 @@ void system1_state::banked_decrypted_opcodes_map(address_map &map)
 	map(0x8000, 0xbfff).bankr("bank1d");
 	map(0xc000, 0xcfff).ram().share("ram");
 	map(0xd000, 0xd7ff).ram().share("spriteram");
-	map(0xd800, 0xdfff).ram().w(this, FUNC(system1_state::system1_paletteram_w)).share("palette");
+	map(0xd800, 0xdfff).ram().w(FUNC(system1_state::system1_paletteram_w)).share("palette");
 }
 
 /* same as normal System 1 except address map is shuffled (RAM/collision are swapped) */
@@ -797,13 +787,13 @@ void system1_state::nobo_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("bank1");
-	map(0xc000, 0xc3ff).rw(this, FUNC(system1_state::system1_mixer_collision_r), FUNC(system1_state::system1_mixer_collision_w));
-	map(0xc400, 0xc7ff).w(this, FUNC(system1_state::system1_mixer_collision_reset_w));
-	map(0xc800, 0xcbff).rw(this, FUNC(system1_state::system1_sprite_collision_r), FUNC(system1_state::system1_sprite_collision_w));
-	map(0xcc00, 0xcfff).w(this, FUNC(system1_state::system1_sprite_collision_reset_w));
+	map(0xc000, 0xc3ff).rw(FUNC(system1_state::system1_mixer_collision_r), FUNC(system1_state::system1_mixer_collision_w));
+	map(0xc400, 0xc7ff).w(FUNC(system1_state::system1_mixer_collision_reset_w));
+	map(0xc800, 0xcbff).rw(FUNC(system1_state::system1_sprite_collision_r), FUNC(system1_state::system1_sprite_collision_w));
+	map(0xcc00, 0xcfff).w(FUNC(system1_state::system1_sprite_collision_reset_w));
 	map(0xd000, 0xd7ff).ram().share("spriteram");
-	map(0xd800, 0xdfff).ram().w(this, FUNC(system1_state::system1_paletteram_w)).share("palette");
-	map(0xe000, 0xefff).rw(this, FUNC(system1_state::system1_videoram_r), FUNC(system1_state::system1_videoram_w));
+	map(0xd800, 0xdfff).ram().w(FUNC(system1_state::system1_paletteram_w)).share("palette");
+	map(0xe000, 0xefff).rw(FUNC(system1_state::system1_videoram_r), FUNC(system1_state::system1_videoram_w));
 	map(0xf000, 0xffff).ram().share("ram");
 }
 
@@ -847,7 +837,7 @@ void system1_state::sound_map(address_map &map)
 	map(0x8000, 0x87ff).mirror(0x1800).ram();
 	map(0xa000, 0xa000).mirror(0x1fff).w("sn1", FUNC(sn76489a_device::write));
 	map(0xc000, 0xc000).mirror(0x1fff).w("sn2", FUNC(sn76489a_device::write));
-	map(0xe000, 0xe000).mirror(0x1fff).r(this, FUNC(system1_state::sound_data_r));
+	map(0xe000, 0xe000).mirror(0x1fff).r(FUNC(system1_state::sound_data_r));
 }
 
 
@@ -860,7 +850,7 @@ void system1_state::sound_map(address_map &map)
 
 void system1_state::mcu_io_map(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(system1_state::mcu_io_r), FUNC(system1_state::mcu_io_w));
+	map(0x0000, 0xffff).rw(FUNC(system1_state::mcu_io_r), FUNC(system1_state::mcu_io_w));
 }
 
 
@@ -1961,9 +1951,9 @@ static INPUT_PORTS_START( tokisens )
 	PORT_INCLUDE( choplift )
 
 	PORT_MODIFY("SWA")
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SWB:2")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SWB:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) )        PORT_DIPLOCATION("SWB:3,4")
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x08, "2" )
@@ -1981,6 +1971,15 @@ static INPUT_PORTS_START( tokisens )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SWB:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( tokisensa )
+	PORT_INCLUDE( tokisens )
+
+	PORT_MODIFY("SWA")
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SWB:2")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( wbml )
@@ -2013,10 +2012,10 @@ static INPUT_PORTS_START( dakkochn )
 	PORT_INCLUDE( choplift )
 
 	PORT_MODIFY("P1")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, system1_state,dakkochn_mux_data_r, nullptr)
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(system1_state, dakkochn_mux_data_r)
 
 	PORT_MODIFY("P2")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, system1_state,dakkochn_mux_status_r, nullptr)
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(system1_state, dakkochn_mux_status_r)
 
 	PORT_MODIFY("SYSTEM")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )     /* start 1 & 2 not connected. */
@@ -2149,7 +2148,7 @@ static const gfx_layout charlayout =
 	8*8
 };
 
-static GFXDECODE_START( system1 )
+static GFXDECODE_START( gfx_system1 )
 	GFXDECODE_ENTRY( "tiles", 0, charlayout, 0, 256 )
 GFXDECODE_END
 
@@ -2161,418 +2160,437 @@ GFXDECODE_END
  *************************************/
 
 /* original board with 64kbit ROMs and an 8255 PPI for outputs */
-MACHINE_CONFIG_START(system1_state::sys1ppi)
-
+void system1_state::sys1ppi(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK)  /* not really, see notes above */
-	MCFG_CPU_PROGRAM_MAP(system1_map)
-	MCFG_CPU_IO_MAP(system1_ppi_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", system1_state, irq0_line_hold)
+	Z80(config, m_maincpu, MASTER_CLOCK);  /* not really, see notes above */
+	m_maincpu->set_addrmap(AS_PROGRAM, &system1_state::system1_map);
+	m_maincpu->set_addrmap(AS_IO, &system1_state::system1_ppi_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(system1_state::irq0_line_hold));
 
-	MCFG_CPU_ADD("soundcpu", Z80, SOUND_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("soundirq", system1_state, soundirq_gen, "screen", 32, 64)
+	Z80(config, m_soundcpu, SOUND_CLOCK/2);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &system1_state::sound_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	TIMER(config, "soundirq", 0).configure_scanline(FUNC(system1_state::soundirq_gen), "screen", 32, 64);
 
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(system1_state, soundport_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(system1_state, videomode_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(system1_state, sound_control_w))
+	config.set_maximum_quantum(attotime::from_hz(6000));
+
+	I8255A(config, m_ppi8255);
+	m_ppi8255->out_pa_callback().set(FUNC(system1_state::soundport_w));
+	m_ppi8255->out_pb_callback().set(FUNC(system1_state::videomode_w));
+	m_ppi8255->out_pc_callback().set(FUNC(system1_state::sound_control_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)  /* needed for proper hardware collisions */
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 640, 0, 512, 260, 0, 224)
-	MCFG_SCREEN_UPDATE_DRIVER(system1_state, screen_update_system1)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);  /* needed for proper hardware collisions */
+	m_screen->set_raw(MASTER_CLOCK/2, 640, 0, 512, 260, 0, 224);
+	m_screen->set_screen_update(FUNC(system1_state::screen_update_system1));
+	m_screen->set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", system1)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(BBGGGRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_system1);
+	PALETTE(config, m_palette).set_format(palette_device::BGR_233, 2048);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_SOUND_ADD("sn1", SN76489A, SOUND_CLOCK/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SN76489A(config, "sn1", SOUND_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_SOUND_ADD("sn2", SN76489A, SOUND_CLOCK/2)  /* selectable via jumper */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
-
-
-
+	/* 2nd SN's clock is selectable via jumper */
+	SN76489A(config, "sn2", SOUND_CLOCK/2).add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 /* reduced visible area for scrolling games */
-MACHINE_CONFIG_START(system1_state::sys1ppis)
+void system1_state::sys1ppis(machine_config &config)
+{
 	sys1ppi(config);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(2*(0*8+8), 2*(32*8-1-8), 0*8, 28*8-1)
-MACHINE_CONFIG_END
-
-
-
-
-
+	m_screen->set_visarea(2*(0*8+8), 2*(32*8-1-8), 0*8, 28*8-1);
+}
 
 /* revised board with 128kbit ROMs and a Z80 PIO for outputs */
-MACHINE_CONFIG_START(system1_state::sys1pio)
+void system1_state::sys1pio(machine_config &config)
+{
 	sys1ppi(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(system1_pio_io_map)
+	m_maincpu->set_addrmap(AS_IO, &system1_state::system1_pio_io_map);
 
-	MCFG_DEVICE_REMOVE("ppi8255")
-	MCFG_DEVICE_ADD("pio", Z80PIO, MASTER_CLOCK)
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(system1_state, soundport_w))
-	MCFG_Z80PIO_OUT_ARDY_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(system1_state, videomode_w))
-MACHINE_CONFIG_END
+	config.device_remove("ppi8255");
 
-#define ENCRYPTED_SYS1PPI_MAPS \
-	MCFG_CPU_PROGRAM_MAP(system1_map) \
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map) \
-	MCFG_CPU_IO_MAP(system1_ppi_io_map) \
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", system1_state, irq0_line_hold)
+	Z80PIO(config, m_pio, MASTER_CLOCK);
+	m_pio->out_pa_callback().set(FUNC(system1_state::soundport_w));
+	m_pio->out_ardy_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);
+	m_pio->out_pb_callback().set(FUNC(system1_state::videomode_w));
+}
 
-#define ENCRYPTED_SYS1PIO_MAPS \
-	MCFG_CPU_PROGRAM_MAP(system1_map) \
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map) \
-	MCFG_CPU_IO_MAP(system1_pio_io_map) \
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", system1_state, irq0_line_hold)
+void system1_state::encrypted_sys1ppi_maps(machine_config &config)
+{
+	m_maincpu->set_addrmap(AS_PROGRAM, &system1_state::system1_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &system1_state::decrypted_opcodes_map);
+	m_maincpu->set_addrmap(AS_IO, &system1_state::system1_ppi_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(system1_state::irq0_line_hold));
+}
 
-#define ENCRYPTED_SYS2_MC8123_MAPS \
-	MCFG_CPU_PROGRAM_MAP(system1_map) \
-	MCFG_CPU_OPCODES_MAP(banked_decrypted_opcodes_map) \
-	MCFG_CPU_IO_MAP(system1_ppi_io_map) \
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", system1_state, irq0_line_hold)
+void system1_state::encrypted_sys1pio_maps(machine_config &config)
+{
+	m_maincpu->set_addrmap(AS_PROGRAM, &system1_state::system1_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &system1_state::decrypted_opcodes_map);
+	m_maincpu->set_addrmap(AS_IO, &system1_state::system1_pio_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(system1_state::irq0_line_hold));
+}
 
+void system1_state::encrypted_sys2_mc8123_maps(machine_config &config)
+{
+	m_maincpu->set_addrmap(AS_PROGRAM, &system1_state::system1_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &system1_state::banked_decrypted_opcodes_map);
+	m_maincpu->set_addrmap(AS_IO, &system1_state::system1_ppi_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(system1_state::irq0_line_hold));
+}
 
-MACHINE_CONFIG_START(system1_state::sys1pioxb)
+void system1_state::sys1pioxb(machine_config &config)
+{
 	sys1pio(config);
-	MCFG_CPU_REPLACE("maincpu", MC8123, MASTER_CLOCK)
-	ENCRYPTED_SYS1PIO_MAPS
-MACHINE_CONFIG_END
+	MC8123(config.replace(), m_maincpu, MASTER_CLOCK);
+	encrypted_sys1pio_maps(config);
+}
 
-MACHINE_CONFIG_START(system1_state::sys1ppix_315_5178)
+void system1_state::sys1ppix_315_5178(machine_config &config)
+{
 	sys1ppi(config);
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5178, MASTER_CLOCK)
-	ENCRYPTED_SYS1PPI_MAPS
-	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	segacrp2_z80_device &z80(SEGA_315_5178(config.replace(), m_maincpu, MASTER_CLOCK));
+	encrypted_sys1ppi_maps(config);
+	z80.set_decrypted_tag(m_decrypted_opcodes);
+}
 
-MACHINE_CONFIG_START(system1_state::sys1ppix_315_5179)
+void system1_state::sys1ppix_315_5179(machine_config &config)
+{
 	sys1ppi(config);
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5179, MASTER_CLOCK)
-	ENCRYPTED_SYS1PPI_MAPS
-	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	segacrp2_z80_device &z80(SEGA_315_5179(config.replace(), m_maincpu, MASTER_CLOCK));
+	encrypted_sys1ppi_maps(config);
+	z80.set_decrypted_tag(m_decrypted_opcodes);
+}
 
-MACHINE_CONFIG_START(system1_state::sys1ppix_315_5051)
+void system1_state::sys1ppix_315_5051(machine_config &config)
+{
 	sys1ppi(config);
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5051, MASTER_CLOCK)
-	ENCRYPTED_SYS1PPI_MAPS
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	segacrpt_z80_device &z80(SEGA_315_5051(config.replace(), m_maincpu, MASTER_CLOCK));
+	encrypted_sys1ppi_maps(config);
+	z80.set_decrypted_tag(":decrypted_opcodes");
+}
 
-MACHINE_CONFIG_START(system1_state::sys1ppix_315_5048)
+void system1_state::sys1ppix_315_5048(machine_config &config)
+{
 	sys1ppi(config);
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5048, MASTER_CLOCK)
-	ENCRYPTED_SYS1PPI_MAPS
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	segacrpt_z80_device &z80(SEGA_315_5048(config.replace(), m_maincpu, MASTER_CLOCK));
+	encrypted_sys1ppi_maps(config);
+	z80.set_decrypted_tag(":decrypted_opcodes");
+}
 
-MACHINE_CONFIG_START(system1_state::sys1ppix_315_5033)
+void system1_state::sys1ppix_315_5033(machine_config &config)
+{
 	sys1ppi(config);
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5033, MASTER_CLOCK)
-	ENCRYPTED_SYS1PPI_MAPS
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	segacrpt_z80_device &z80(SEGA_315_5033(config.replace(), m_maincpu, MASTER_CLOCK));
+	encrypted_sys1ppi_maps(config);
+	z80.set_decrypted_tag(":decrypted_opcodes");
+}
 
-MACHINE_CONFIG_START(system1_state::sys1ppix_315_5065)
+void system1_state::sys1ppix_315_5065(machine_config &config)
+{
 	sys1ppi(config);
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5065, MASTER_CLOCK)
-	ENCRYPTED_SYS1PPI_MAPS
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	segacrpt_z80_device &z80(SEGA_315_5065(config.replace(), m_maincpu, MASTER_CLOCK));
+	encrypted_sys1ppi_maps(config);
+	z80.set_decrypted_tag(":decrypted_opcodes");
+}
 
-
-MACHINE_CONFIG_START(system1_state::sys1ppix_315_5098)
+void system1_state::sys1ppix_315_5098(machine_config &config)
+{
 	sys1ppi(config);
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5098, MASTER_CLOCK)
-	ENCRYPTED_SYS1PPI_MAPS
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	segacrpt_z80_device &z80(SEGA_315_5098(config.replace(), m_maincpu, MASTER_CLOCK));
+	encrypted_sys1ppi_maps(config);
+	z80.set_decrypted_tag(":decrypted_opcodes");
+}
 
-MACHINE_CONFIG_START(system1_state::sys1piox_315_5177)
+void system1_state::sys1piox_315_5177(machine_config &config)
+{
 	sys1pio(config);
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5177, MASTER_CLOCK)
-	ENCRYPTED_SYS1PIO_MAPS
-	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	segacrp2_z80_device &z80(SEGA_315_5177(config.replace(), m_maincpu, MASTER_CLOCK));
+	encrypted_sys1pio_maps(config);
+	z80.set_decrypted_tag(m_decrypted_opcodes);
+}
 
-MACHINE_CONFIG_START(system1_state::sys1piox_315_5162)
+void system1_state::sys1piox_315_5162(machine_config &config)
+{
 	sys1pio(config);
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5162, MASTER_CLOCK)
-	ENCRYPTED_SYS1PIO_MAPS
-	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	segacrp2_z80_device &z80(SEGA_315_5162(config.replace(), m_maincpu, MASTER_CLOCK));
+	encrypted_sys1pio_maps(config);
+	z80.set_decrypted_tag(m_decrypted_opcodes);
+}
 
-MACHINE_CONFIG_START(system1_state::sys1piox_317_0006)
+void system1_state::sys1piox_317_0006(machine_config &config)
+{
 	sys1pio(config);
-	MCFG_CPU_REPLACE("maincpu", SEGA_317_0006, MASTER_CLOCK)
-	ENCRYPTED_SYS1PIO_MAPS
-	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	segacrp2_z80_device &z80(SEGA_317_0006(config.replace(), m_maincpu, MASTER_CLOCK));
+	encrypted_sys1pio_maps(config);
+	z80.set_decrypted_tag(m_decrypted_opcodes);
+}
 
-MACHINE_CONFIG_START(system1_state::sys1piox_315_5135)
+void system1_state::sys1piox_315_5135(machine_config &config)
+{
 	sys1pio(config);
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5135, MASTER_CLOCK)
-	ENCRYPTED_SYS1PIO_MAPS
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	segacrpt_z80_device &z80(SEGA_315_5135(config.replace(), m_maincpu, MASTER_CLOCK));
+	encrypted_sys1pio_maps(config);
+	z80.set_decrypted_tag(":decrypted_opcodes");
+}
 
-MACHINE_CONFIG_START(system1_state::sys1piox_315_5132)
+void system1_state::sys1piox_315_5132(machine_config &config)
+{
 	sys1pio(config);
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5132, MASTER_CLOCK)
-	ENCRYPTED_SYS1PIO_MAPS
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	segacrpt_z80_device &z80(SEGA_315_5132(config.replace(), m_maincpu, MASTER_CLOCK));
+	encrypted_sys1pio_maps(config);
+	z80.set_decrypted_tag(":decrypted_opcodes");
+}
 
-MACHINE_CONFIG_START(system1_state::sys1piox_315_5155)
+void system1_state::sys1piox_315_5155(machine_config &config)
+{
 	sys1pio(config);
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5155, MASTER_CLOCK)
-	ENCRYPTED_SYS1PIO_MAPS
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	segacrpt_z80_device &z80(SEGA_315_5155(config.replace(), m_maincpu, MASTER_CLOCK));
+	encrypted_sys1pio_maps(config);
+	z80.set_decrypted_tag(":decrypted_opcodes");
+}
 
-MACHINE_CONFIG_START(system1_state::sys1piox_315_5110)
+void system1_state::sys1piox_315_5110(machine_config &config)
+{
 	sys1pio(config);
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5110, MASTER_CLOCK)
-	ENCRYPTED_SYS1PIO_MAPS
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	segacrpt_z80_device &z80(SEGA_315_5110(config.replace(), m_maincpu, MASTER_CLOCK));
+	encrypted_sys1pio_maps(config);
+	z80.set_decrypted_tag(":decrypted_opcodes");
+}
 
-MACHINE_CONFIG_START(system1_state::sys1piox_315_5051)
+void system1_state::sys1piox_315_5051(machine_config &config)
+{
 	sys1pio(config);
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5051, MASTER_CLOCK)
-	ENCRYPTED_SYS1PIO_MAPS
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	segacrpt_z80_device &z80(SEGA_315_5051(config.replace(), m_maincpu, MASTER_CLOCK));
+	encrypted_sys1pio_maps(config);
+	z80.set_decrypted_tag(":decrypted_opcodes");
+}
 
-MACHINE_CONFIG_START(system1_state::sys1piox_315_5098)
+void system1_state::sys1piox_315_5098(machine_config &config)
+{
 	sys1pio(config);
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5098, MASTER_CLOCK)
-	ENCRYPTED_SYS1PIO_MAPS
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	segacrpt_z80_device &z80(SEGA_315_5098(config.replace(), m_maincpu, MASTER_CLOCK));
+	encrypted_sys1pio_maps(config);
+	z80.set_decrypted_tag(":decrypted_opcodes");
+}
 
-MACHINE_CONFIG_START(system1_state::sys1piox_315_5102)
+void system1_state::sys1piox_315_5102(machine_config &config)
+{
 	sys1pio(config);
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5102, MASTER_CLOCK)
-	ENCRYPTED_SYS1PIO_MAPS
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	segacrpt_z80_device &z80(SEGA_315_5102(config.replace(), m_maincpu, MASTER_CLOCK));
+	encrypted_sys1pio_maps(config);
+	z80.set_decrypted_tag(":decrypted_opcodes");
+}
 
-
-MACHINE_CONFIG_START(system1_state::sys1piox_315_5133)
+void system1_state::sys1piox_315_5133(machine_config &config)
+{
 	sys1pio(config);
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5133, MASTER_CLOCK)
-	ENCRYPTED_SYS1PIO_MAPS
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	segacrpt_z80_device &z80(SEGA_315_5133(config.replace(), m_maincpu, MASTER_CLOCK));
+	encrypted_sys1pio_maps(config);
+	z80.set_decrypted_tag(":decrypted_opcodes");
+}
 
-
-MACHINE_CONFIG_START(system1_state::sys1piox_315_5093)
+void system1_state::sys1piox_315_5093(machine_config &config)
+{
 	sys1pio(config);
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5093, MASTER_CLOCK)
-	ENCRYPTED_SYS1PIO_MAPS
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	segacrpt_z80_device &z80(SEGA_315_5093(config.replace(), m_maincpu, MASTER_CLOCK));
+	encrypted_sys1pio_maps(config);
+	z80.set_decrypted_tag(":decrypted_opcodes");
+}
 
-MACHINE_CONFIG_START(system1_state::sys1piox_315_5065)
+void system1_state::sys1piox_315_5065(machine_config &config)
+{
 	sys1pio(config);
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5065, MASTER_CLOCK)
-	ENCRYPTED_SYS1PIO_MAPS
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	segacrpt_z80_device &z80(SEGA_315_5065(config.replace(), m_maincpu, MASTER_CLOCK));
+	encrypted_sys1pio_maps(config);
+	z80.set_decrypted_tag(":decrypted_opcodes");
+}
 
 /* reduced visible area for scrolling games */
-MACHINE_CONFIG_START(system1_state::sys1pios)
+void system1_state::sys1pios(machine_config &config)
+{
 	sys1pio(config);
+	m_screen->set_visarea(2*(0*8+8), 2*(32*8-1-8), 0*8, 28*8-1);
+}
 
-	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(2*(0*8+8), 2*(32*8-1-8), 0*8, 28*8-1)
-MACHINE_CONFIG_END
+void system1_state::sys1piosx_315_5099(machine_config &config)
+{
+	sys1pio(config);
+	segacrpt_z80_device &z80(SEGA_315_5099(config.replace(), m_maincpu, MASTER_CLOCK));
+	encrypted_sys1pio_maps(config);
+	z80.set_decrypted_tag(":decrypted_opcodes");
+}
 
-MACHINE_CONFIG_START(system1_state::sys1piosx_315_5099)
+void system1_state::sys1piosx_315_spat(machine_config &config)
+{
 	sys1pios(config);
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5065, MASTER_CLOCK)
-	ENCRYPTED_SYS1PIO_MAPS
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	segacrpt_z80_device &z80(SEGA_315_SPAT(config.replace(), m_maincpu, MASTER_CLOCK));
+	encrypted_sys1pio_maps(config);
+	z80.set_decrypted_tag(":decrypted_opcodes");
+}
 
-MACHINE_CONFIG_START(system1_state::sys1piosx_315_spat)
-	sys1pios(config);
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_SPAT, MASTER_CLOCK)
-	ENCRYPTED_SYS1PIO_MAPS
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(system1_state::sys1ppisx_315_5064)
+void system1_state::sys1ppisx_315_5064(machine_config &config)
+{
 	sys1ppis(config);
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5064, MASTER_CLOCK)
-	ENCRYPTED_SYS1PPI_MAPS
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	segacrpt_z80_device &z80(SEGA_315_5064(config.replace(), m_maincpu, MASTER_CLOCK));
+	encrypted_sys1ppi_maps(config);
+	z80.set_decrypted_tag(":decrypted_opcodes");
+}
 
-MACHINE_CONFIG_START(system1_state::sys1ppisx_315_5041)
+void system1_state::sys1ppisx_315_5041(machine_config &config)
+{
 	sys1ppis(config);
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5041, MASTER_CLOCK)
-	ENCRYPTED_SYS1PPI_MAPS
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
-
-
-
-
-
+	segacrpt_z80_device &z80(SEGA_315_5041(config.replace(), m_maincpu, MASTER_CLOCK));
+	encrypted_sys1ppi_maps(config);
+	z80.set_decrypted_tag(":decrypted_opcodes");
+}
 
 /* this describes the additional 8751 MCU when present */
-MACHINE_CONFIG_START(system1_state::mcu)
-
+void system1_state::mcu(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_VBLANK_INT_REMOVE()
+	m_maincpu->remove_vblank_int();
 
-	MCFG_CPU_ADD("mcu", I8751, SOUND_CLOCK)
-	MCFG_CPU_IO_MAP(mcu_io_map)
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(system1_state, mcu_control_w))
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", system1_state, mcu_irq_assert)
+	I8751(config, m_mcu, SOUND_CLOCK);
+	m_mcu->set_addrmap(AS_IO, &system1_state::mcu_io_map);
+	m_mcu->port_out_cb<1>().set(FUNC(system1_state::mcu_control_w));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcu_t0", system1_state, mcu_t0_callback, attotime::from_usec(2500))
-MACHINE_CONFIG_END
+	m_screen->screen_vblank().set_inputline("mcu", MCS51_INT0_LINE);
+	// This interrupt is driven by pin 15 of a PAL16R4 (315-5138 on Choplifter), based on the vertical count.
+	// The actual duty cycle likely differs from VBLANK, which is another output from the same PAL.
 
-
+	TIMER(config, "mcu_t0", 0).configure_periodic(FUNC(system1_state::mcu_t0_callback), attotime::from_usec(2500));
+}
 
 /* alternate program map with RAM/collision swapped */
-MACHINE_CONFIG_START(system1_state::nob)
+void system1_state::nob(machine_config &config)
+{
 	sys1ppi(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(nobo_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &system1_state::nobo_map);
+}
 
-MACHINE_CONFIG_START(system1_state::nobm)
+void system1_state::nobm(machine_config &config)
+{
 	nob(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("mcu", I8751, SOUND_CLOCK)
-	MCFG_MCS51_PORT_P0_IN_CB(READ8(system1_state, nob_mcu_latch_r))
-	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(system1_state, nob_mcu_latch_w))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(system1_state, nob_mcu_status_w))
-	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(system1_state, nob_mcu_control_p2_w))
-MACHINE_CONFIG_END
+	I8751(config, m_mcu, SOUND_CLOCK);
+	m_mcu->port_in_cb<0>().set(FUNC(system1_state::nob_mcu_latch_r));
+	m_mcu->port_out_cb<0>().set(FUNC(system1_state::nob_mcu_latch_w));
+	m_mcu->port_out_cb<1>().set(FUNC(system1_state::nob_mcu_status_w));
+	m_mcu->port_out_cb<2>().set(FUNC(system1_state::nob_mcu_control_p2_w));
+}
 
 
 
 /* system2 video */
-MACHINE_CONFIG_START(system1_state::sys2)
+void system1_state::sys2(machine_config &config)
+{
 	sys1ppi(config);
 
 	MCFG_MACHINE_START_OVERRIDE(system1_state,system2)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(system1_state,system2)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(system1_state, screen_update_system2)
-MACHINE_CONFIG_END
+	m_screen->set_screen_update(FUNC(system1_state::screen_update_system2));
+}
 
-MACHINE_CONFIG_START(system1_state::sys2x)
+void system1_state::sys2x(machine_config &config)
+{
 	sys2(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_OPCODES, &system1_state::decrypted_opcodes_map);
+}
 
-MACHINE_CONFIG_START(system1_state::sys2_315_5177)
+void system1_state::sys2_315_5177(machine_config &config)
+{
 	sys2(config);
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5177, MASTER_CLOCK)
-	ENCRYPTED_SYS1PPI_MAPS
-	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	segacrp2_z80_device &z80(SEGA_315_5177(config.replace(), m_maincpu, MASTER_CLOCK));
+	encrypted_sys1ppi_maps(config);
+	z80.set_decrypted_tag(m_decrypted_opcodes);
+}
 
-MACHINE_CONFIG_START(system1_state::sys2_315_5176)
+void system1_state::sys2_315_5176(machine_config &config)
+{
 	sys2(config);
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5176, MASTER_CLOCK)
-	ENCRYPTED_SYS1PPI_MAPS
-	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	segacrp2_z80_device &z80(SEGA_315_5176(config.replace(), m_maincpu, MASTER_CLOCK));
+	encrypted_sys1ppi_maps(config);
+	z80.set_decrypted_tag(m_decrypted_opcodes);
+}
 
-MACHINE_CONFIG_START(system1_state::sys2_317_0006)
+void system1_state::sys2_317_0006(machine_config &config)
+{
 	sys2(config);
-	MCFG_CPU_REPLACE("maincpu", SEGA_317_0006, MASTER_CLOCK)
-	ENCRYPTED_SYS1PPI_MAPS
-	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	segacrp2_z80_device &z80(SEGA_317_0006(config.replace(), m_maincpu, MASTER_CLOCK));
+	encrypted_sys1ppi_maps(config);
+	z80.set_decrypted_tag(m_decrypted_opcodes);
+}
 
-MACHINE_CONFIG_START(system1_state::sys2_317_0007)
+void system1_state::sys2_317_0007(machine_config &config)
+{
 	sys2(config);
-	MCFG_CPU_REPLACE("maincpu", SEGA_317_0007, MASTER_CLOCK)
-	ENCRYPTED_SYS1PPI_MAPS
-	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	segacrp2_z80_device &z80(SEGA_317_0007(config.replace(), m_maincpu, MASTER_CLOCK));
+	encrypted_sys1ppi_maps(config);
+	z80.set_decrypted_tag(m_decrypted_opcodes);
+}
 
-
-MACHINE_CONFIG_START(system1_state::sys2xb)
+void system1_state::sys2xb(machine_config &config)
+{
 	sys2(config);
-	MCFG_CPU_REPLACE("maincpu", MC8123, MASTER_CLOCK)
-	ENCRYPTED_SYS2_MC8123_MAPS
-MACHINE_CONFIG_END
+	MC8123(config.replace(), m_maincpu, MASTER_CLOCK);
+	encrypted_sys2_mc8123_maps(config);
+}
 
-MACHINE_CONFIG_START(system1_state::sys2xboot)
+void system1_state::sys2xboot(machine_config &config)
+{
 	sys2(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_OPCODES_MAP(banked_decrypted_opcodes_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_OPCODES, &system1_state::banked_decrypted_opcodes_map);
+}
 
-MACHINE_CONFIG_START(system1_state::sys2m)
+void system1_state::sys2m(machine_config &config)
+{
 	sys2(config);
 	mcu(config);
-MACHINE_CONFIG_END
+}
 
 /* system2 with rowscroll */
-MACHINE_CONFIG_START(system1_state::sys2row)
+void system1_state::sys2row(machine_config &config)
+{
 	sys2(config);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(system1_state, screen_update_system2_rowscroll)
-MACHINE_CONFIG_END
+	m_screen->set_screen_update(FUNC(system1_state::screen_update_system2_rowscroll));
+}
 
-MACHINE_CONFIG_START(system1_state::sys2rowxb)
+void system1_state::sys2rowxb(machine_config &config)
+{
 	sys2row(config);
-	MCFG_CPU_REPLACE("maincpu", MC8123, MASTER_CLOCK)
-	ENCRYPTED_SYS2_MC8123_MAPS
-MACHINE_CONFIG_END
+	MC8123(config.replace(), m_maincpu, MASTER_CLOCK);
+	encrypted_sys2_mc8123_maps(config);
+}
 
-MACHINE_CONFIG_START(system1_state::sys2rowxboot)
+void system1_state::sys2rowxboot(machine_config &config)
+{
 	sys2row(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_OPCODES_MAP(banked_decrypted_opcodes_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_OPCODES, &system1_state::banked_decrypted_opcodes_map);
+}
 
-MACHINE_CONFIG_START(system1_state::sys2rowm)
+void system1_state::sys2rowm(machine_config &config)
+{
 	sys2row(config);
 	mcu(config);
-MACHINE_CONFIG_END
+}
 
 
 
@@ -2586,9 +2604,9 @@ MACHINE_CONFIG_END
 /* ROM is #5318, is probably the first or second System 1 game produced */
 ROM_START( starjack )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "epr5320b.129",   0x0000, 0x2000, CRC(7ab72ecd) SHA1(28d3f87851cccc94a86eb0217893de0baf8e62fd) )
-	ROM_LOAD( "epr5321a.130",   0x2000, 0x2000, CRC(38b99050) SHA1(79fd23bb7db577d1dbf1b50503085eccdd17b98c) )
-	ROM_LOAD( "epr5322a.131",   0x4000, 0x2000, CRC(103a595b) SHA1(6bb8a063279c93341ff472351b79c92795845f74) )
+	ROM_LOAD( "epr-5320b.129",  0x0000, 0x2000, CRC(7ab72ecd) SHA1(28d3f87851cccc94a86eb0217893de0baf8e62fd) )
+	ROM_LOAD( "epr-5321a.130",  0x2000, 0x2000, CRC(38b99050) SHA1(79fd23bb7db577d1dbf1b50503085eccdd17b98c) )
+	ROM_LOAD( "epr-5322a.131",  0x4000, 0x2000, CRC(103a595b) SHA1(6bb8a063279c93341ff472351b79c92795845f74) )
 	ROM_LOAD( "epr-5323.132",   0x6000, 0x2000, CRC(46af0d58) SHA1(6cfa288e28e3b415db5ef3cef8e8849259234af9) )
 	ROM_LOAD( "epr-5324.133",   0x8000, 0x2000, CRC(1e89efe2) SHA1(d36ef8f176d5e44884d3d0b9af81be6f7fbd0cde) )
 	ROM_LOAD( "epr-5325.134",   0xa000, 0x2000, CRC(d6e379a1) SHA1(27362b3e10d9d4235647eadb9cd1404700a8fb49) )
@@ -2614,27 +2632,27 @@ ROM_END
 
 ROM_START( starjacks )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "a1_ic29.129",    0x0000, 0x2000, CRC(59a22a1f) SHA1(4827b537f8df04429ed53c2119c67a32efcf04a2) )
-	ROM_LOAD( "a1_ic30.130",    0x2000, 0x2000, CRC(7f4597dc) SHA1(7574853fc2e38880f8493cf628100a890f7aa7dc) )
-	ROM_LOAD( "a1_ic31.131",    0x4000, 0x2000, CRC(6074c046) SHA1(5d2bd679d6a13a6c3b203662ce5496b801383db9) )
-	ROM_LOAD( "a1_ic32.132",    0x6000, 0x2000, CRC(1c48a3fa) SHA1(4a2e7798600bc4a5fd68533083547212d148d347) )
-	ROM_LOAD( "a1_ic33.133",    0x8000, 0x2000, CRC(7598bd51) SHA1(0c18b83dc7874aefcd94593ffbe2b50cc0329367) )
-	ROM_LOAD( "a1_ic34.134",    0xa000, 0x2000, CRC(f66fa604) SHA1(d7a81920217fcf7a687ba5e2d10abad5c78085d2) )
+	ROM_LOAD( "star_jacker_a1_ic29.129", 0x0000, 0x2000, CRC(59a22a1f) SHA1(4827b537f8df04429ed53c2119c67a32efcf04a2) )
+	ROM_LOAD( "star_jacker_a1_ic30.130", 0x2000, 0x2000, CRC(7f4597dc) SHA1(7574853fc2e38880f8493cf628100a890f7aa7dc) )
+	ROM_LOAD( "star_jacker_a1_ic31.131", 0x4000, 0x2000, CRC(6074c046) SHA1(5d2bd679d6a13a6c3b203662ce5496b801383db9) )
+	ROM_LOAD( "star_jacker_a1_ic32.132", 0x6000, 0x2000, CRC(1c48a3fa) SHA1(4a2e7798600bc4a5fd68533083547212d148d347) )
+	ROM_LOAD( "star_jacker_a1_ic33.133", 0x8000, 0x2000, CRC(7598bd51) SHA1(0c18b83dc7874aefcd94593ffbe2b50cc0329367) )
+	ROM_LOAD( "star_jacker_a1_ic34.134", 0xa000, 0x2000, CRC(f66fa604) SHA1(d7a81920217fcf7a687ba5e2d10abad5c78085d2) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "epr-5332.3",     0x0000, 0x2000, CRC(7a72ab3d) SHA1(4a6ad09949a438562d7043532d628cefdbb5a2fe) )
+	ROM_LOAD( "star_jacker_a1_ic3.3",    0x0000, 0x2000, CRC(7a72ab3d) SHA1(4a6ad09949a438562d7043532d628cefdbb5a2fe) ) /* same as EPR-5332 */
 
 	ROM_REGION( 0xc000, "tiles", 0 )
-	ROM_LOAD( "epr-5331.82",    0x0000, 0x2000, CRC(251d898f) SHA1(353067a75d583d5f53ce2f473b52a35dd912639f) )
-	ROM_LOAD( "a1_ic65.65",     0x2000, 0x2000, CRC(0ab1893c) SHA1(97877f5d8be7a7b80bbf9fe8dae2acd47c411d64) )
-	ROM_LOAD( "epr-5329.81",    0x4000, 0x2000, CRC(3e8bcaed) SHA1(6d19543427b9c4d8d8f5ea0872cdf8cc4fe5018c) )
-	ROM_LOAD( "a1_ic64.64",     0x6000, 0x2000, CRC(7f628ae6) SHA1(f859a505b543382b42a478c8ae5cd90f3ea2bc2c) )
-	ROM_LOAD( "epr-5327.80",    0x8000, 0x2000, CRC(79e92cb1) SHA1(03124ce123684b8469cf42be6ed5f0fffa64c480) )
-	ROM_LOAD( "a1_ic63.63",     0xa000, 0x2000, CRC(5bcb253e) SHA1(8c34a8377344940bcfb2495bfda3ffc6794f261b) )
+	ROM_LOAD( "star_jacker_a1_ic82.82",  0x0000, 0x2000, CRC(251d898f) SHA1(353067a75d583d5f53ce2f473b52a35dd912639f) )
+	ROM_LOAD( "star_jacker_a1_ic65.65",  0x2000, 0x2000, CRC(0ab1893c) SHA1(97877f5d8be7a7b80bbf9fe8dae2acd47c411d64) )
+	ROM_LOAD( "epr-5456.81",             0x4000, 0x2000, CRC(3e8bcaed) SHA1(6d19543427b9c4d8d8f5ea0872cdf8cc4fe5018c) )
+	ROM_LOAD( "epr-5455.64",             0x6000, 0x2000, CRC(7f628ae6) SHA1(f859a505b543382b42a478c8ae5cd90f3ea2bc2c) ) /* Also found labeled as STAR JACKER A1 IC64 */
+	ROM_LOAD( "epr-5454.80",             0x8000, 0x2000, CRC(79e92cb1) SHA1(03124ce123684b8469cf42be6ed5f0fffa64c480) )
+	ROM_LOAD( "epr-5453.63",             0xa000, 0x2000, CRC(5bcb253e) SHA1(8c34a8377344940bcfb2495bfda3ffc6794f261b) ) /* Also found labeled as STAR JACKER A1 IC63 */
 
 	ROM_REGION( 0x8000, "sprites", 0 )
-	ROM_LOAD( "a1_ic86.86",   0x0000, 0x4000, CRC(6f2e1fd3) SHA1(326d538551245fce67d0fdba85975e27093b7a93) )
-	ROM_LOAD( "a1_ic93.93",   0x4000, 0x4000, CRC(07987244) SHA1(8468b95684b1f62c6de6af1b1d405bfb333e4e26) )
+	ROM_LOAD( "star_jacker_a1_ic86.86",  0x0000, 0x4000, CRC(6f2e1fd3) SHA1(326d538551245fce67d0fdba85975e27093b7a93) )
+	ROM_LOAD( "epr-5446.93",             0x4000, 0x4000, CRC(07987244) SHA1(8468b95684b1f62c6de6af1b1d405bfb333e4e26) ) /* Also found labeled as STAR JACKER A1 IC93 */
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "pr-5317.106",    0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
@@ -2871,8 +2889,8 @@ ROM_END
 
 ROM_START( flicky )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "epr5978a.116",   0x0000, 0x4000, CRC(296f1492) SHA1(52e2c63ce376ab8124b2c68bdfa432b6621cfa78) ) /* encrypted */
-	ROM_LOAD( "epr5979a.109",   0x4000, 0x4000, CRC(64b03ef9) SHA1(7519aa7f036bce6d52a5d4be2418139559f9a8a5) ) /* encrypted */
+	ROM_LOAD( "epr-5978a.116",  0x0000, 0x4000, CRC(296f1492) SHA1(52e2c63ce376ab8124b2c68bdfa432b6621cfa78) ) /* encrypted */
+	ROM_LOAD( "epr-5979a.109",  0x4000, 0x4000, CRC(64b03ef9) SHA1(7519aa7f036bce6d52a5d4be2418139559f9a8a5) ) /* encrypted */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr-5869.120",   0x0000, 0x2000, CRC(6d220d4e) SHA1(fe02a7a94a1ad046fc775a7f67f460c8d0f6dca6) )
@@ -2896,8 +2914,8 @@ ROM_END
 // PCB label: 834-5411-11 FLICKY
 ROM_START( flickya )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "epr5978a.116",   0x0000, 0x4000, CRC(296f1492) SHA1(52e2c63ce376ab8124b2c68bdfa432b6621cfa78) ) /* encrypted */
-	ROM_LOAD( "epr5979a.109",   0x4000, 0x4000, CRC(64b03ef9) SHA1(7519aa7f036bce6d52a5d4be2418139559f9a8a5) ) /* encrypted */
+	ROM_LOAD( "epr-5978a.116",  0x0000, 0x4000, CRC(296f1492) SHA1(52e2c63ce376ab8124b2c68bdfa432b6621cfa78) ) /* encrypted */
+	ROM_LOAD( "epr-5979a.109",  0x4000, 0x4000, CRC(64b03ef9) SHA1(7519aa7f036bce6d52a5d4be2418139559f9a8a5) ) /* encrypted */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr-5869.120",   0x0000, 0x2000, CRC(6d220d4e) SHA1(fe02a7a94a1ad046fc775a7f67f460c8d0f6dca6) )
@@ -2968,7 +2986,7 @@ ROM_END
 ROM_START( flickyo )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr-5857.bin",   0x0000, 0x2000, CRC(a65ac88e) SHA1(1d1c276f7ffb33bc9f216b6b69517f1783d435a4) ) /* encrypted */
-	ROM_LOAD( "epr5858a.bin",   0x2000, 0x2000, CRC(18b412f4) SHA1(6205dc2a6c1092f9bc7752672b7c06d5faf2f65e) ) /* encrypted */
+	ROM_LOAD( "epr-5858a.bin",  0x2000, 0x2000, CRC(18b412f4) SHA1(6205dc2a6c1092f9bc7752672b7c06d5faf2f65e) ) /* encrypted */
 	ROM_LOAD( "epr-5859.bin",   0x4000, 0x2000, CRC(a5558d7e) SHA1(ca59c7e57ae45f960f769db9a04ffa5c870005dd) ) /* encrypted */
 	ROM_LOAD( "epr-5860.bin",   0x6000, 0x2000, CRC(1b35fef1) SHA1(53ca5361309c59a2b3490ea0037c6e58f07837d9) ) /* encrypted */
 
@@ -2989,6 +3007,33 @@ ROM_START( flickyo )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "pr-5317.76",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
+ROM_END
+
+// Coverted from and running on a Up n' Down board.
+ROM_START( flickyup )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "2764-ic29",  0x0000, 0x2000, CRC(59ba3107) SHA1(2d37f00b8a81b97e45aa78ae75449663c35acece) ) /* encrypted */
+	ROM_LOAD( "2764-ic30",  0x2000, 0x2000, CRC(5c84216f) SHA1(8147a51e5d5aee788f1aab8e9032a5813e5c43a1) ) /* encrypted */
+	ROM_LOAD( "2764-ic31",  0x4000, 0x2000, CRC(106132fa) SHA1(669d9cbc1f18649a7d7a8cb462b76a6c34362ed3) ) /* encrypted */
+	ROM_LOAD( "2764-ic32",  0x6000, 0x2000, CRC(c5ea7f58) SHA1(0adcbee77dad813fe168ad383e579c94bc31635f) ) /* encrypted */
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "epr-5869.120",   0x0000, 0x2000, CRC(6d220d4e) SHA1(fe02a7a94a1ad046fc775a7f67f460c8d0f6dca6) ) /* 2764-ic3 */
+
+	ROM_REGION( 0xc000, "tiles", 0 )
+	ROM_LOAD( "epr-5868.62",    0x0000, 0x2000, CRC(7402256b) SHA1(5bd660ac24a2d0d8ad983e948674a82a2d2e8b49) ) /* 2764-ic82 */
+	ROM_LOAD( "epr-5867.61",    0x2000, 0x2000, CRC(2f5ce930) SHA1(4bc3bc6eb8f03926d3710c9f96fcc1b116e918d3) ) /* 2764-ic65 */
+	ROM_LOAD( "epr-5866.64",    0x4000, 0x2000, CRC(967f1d9a) SHA1(652be7848526c6e61db4a502f75d1689d2ff2f59) ) /* 2764-ic81 */
+	ROM_LOAD( "epr-5865.63",    0x6000, 0x2000, CRC(03d9a34c) SHA1(e158db3e0b86f2b8ad34cefc2714cb0a942efde7) ) /* 2764-ic64 */
+	ROM_LOAD( "epr-5864.66",    0x8000, 0x2000, CRC(e659f358) SHA1(cf59f1fb0f9fb77d5ac36be52b6ee946ee85d6de) ) /* 2764-ic80 */
+	ROM_LOAD( "epr-5863.65",    0xa000, 0x2000, CRC(a496ca15) SHA1(8c629a853486bbe049b1deecdc00f9e16b87698f) ) /* 2764-ic63 */
+
+	ROM_REGION( 0x8000, "sprites", 0 )
+	ROM_LOAD( "epr-5855.117",   0x0000, 0x4000, CRC(b5f894a1) SHA1(2c72dc16739dad155fcd572e1add067a7647f5bd) ) /* 27128-ic86 */
+	ROM_LOAD( "epr-5856.110",   0x4000, 0x4000, CRC(266af78f) SHA1(dcbfce550d10a1f2b3ce3e7e081fc008cb575708) ) /* 27128-ic93 */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "pr-5317.76",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* location ic106 */
 ROM_END
 
 
@@ -3046,8 +3091,7 @@ ROM_START( bullfgt )
 	ROM_LOAD( "epr-6070.93",    0x4000, 0x4000, CRC(34f080df) SHA1(0e7d28e3325c8c3f06438fde29ea0ffe57fc325f) ) /* epr-6070.93 */
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr-5317.76",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
-																/* pr-5317.106 */
+	ROM_LOAD( "pr-5317.106",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* pr-5317.106 */
 ROM_END
 
 ROM_START( thetogyu )
@@ -3100,8 +3144,7 @@ ROM_START( spatter )
 	ROM_LOAD( "epr-6309.110",   0xc000, 0x4000, CRC(7423ad98) SHA1(e19b4c64795f30e1491520160d315e4148d58df2) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr-5317.76",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
-																/* pr-5317.106 */
+	ROM_LOAD( "pr-5317.106",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* pr-5317.106 */
 ROM_END
 
 ROM_START( spattera )
@@ -3128,8 +3171,7 @@ ROM_START( spattera )
 	ROM_LOAD( "epr-6309.110",   0xc000, 0x4000, CRC(7423ad98) SHA1(e19b4c64795f30e1491520160d315e4148d58df2) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr-5317.76",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
-																/* pr-5317.106 */
+	ROM_LOAD( "pr-5317.106",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* pr-5317.106 */
 ROM_END
 
 ROM_START( ssanchan )
@@ -3156,30 +3198,29 @@ ROM_START( ssanchan )
 	ROM_LOAD( "epr-6309.110",   0xc000, 0x4000, CRC(7423ad98) SHA1(e19b4c64795f30e1491520160d315e4148d58df2) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr-5317.76",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
-																/* pr-5317.106 */
+	ROM_LOAD( "pr-5317.106",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* pr-5317.106 */
 ROM_END
 
 
 ROM_START( pitfall2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "epr6456a.116",   0x0000, 0x4000, CRC(bcc8406b) SHA1(2e5c76886fce2c9863db7a914b85b088971aceef) ) /* encrypted */
-	ROM_LOAD( "epr6457a.109",   0x4000, 0x4000, CRC(a016fd2a) SHA1(866f82066466bc5eaf6ab1b6f85a1c173692a1f7) ) /* encrypted */
-	ROM_LOAD( "epr6458a.96",    0x8000, 0x4000, CRC(5c30b3e8) SHA1(9048091ebf054d0ba0c6a92520ddfac38a479034) )
+	ROM_LOAD( "epr-6456a.116",  0x0000, 0x4000, CRC(bcc8406b) SHA1(2e5c76886fce2c9863db7a914b85b088971aceef) ) /* encrypted */
+	ROM_LOAD( "epr-6457a.109",  0x4000, 0x4000, CRC(a016fd2a) SHA1(866f82066466bc5eaf6ab1b6f85a1c173692a1f7) ) /* encrypted */
+	ROM_LOAD( "epr-6458a.96",   0x8000, 0x4000, CRC(5c30b3e8) SHA1(9048091ebf054d0ba0c6a92520ddfac38a479034) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr-6462.120",   0x0000, 0x2000, CRC(86bb9185) SHA1(89add2e3784e8f5a20b895fb2c4466bdd6c34b0c) )
 
 	ROM_REGION( 0xc000, "tiles", 0 )
-	ROM_LOAD( "epr6474a.62",    0x0000, 0x2000, CRC(9f1711b9) SHA1(c652010a8b19828f81fd101aa1ea781e250c4ec2) )
-	ROM_LOAD( "epr6473a.61",    0x2000, 0x2000, CRC(8e53b8dd) SHA1(23e04589f2b523d6b8e46d16f40e59685e27f522) )
-	ROM_LOAD( "epr6472a.64",    0x4000, 0x2000, CRC(e0f34a11) SHA1(b7a96a1867f8bd3cc1251b5fd12991c406e62a37) )
-	ROM_LOAD( "epr6471a.63",    0x6000, 0x2000, CRC(d5bc805c) SHA1(520afa7617e8dfd09bf469c01ac606a4a3acdc5e) )
-	ROM_LOAD( "epr6470a.66",    0x8000, 0x2000, CRC(1439729f) SHA1(54ea6ef54be6dcc2a5d00f7f817fd8836a02b3b9) )
-	ROM_LOAD( "epr6469a.65",    0xa000, 0x2000, CRC(e4ac6921) SHA1(f95e3b368c2c6dbf8265fb314d73019fe7dcce22) )
+	ROM_LOAD( "epr-6474a.62",   0x0000, 0x2000, CRC(9f1711b9) SHA1(c652010a8b19828f81fd101aa1ea781e250c4ec2) )
+	ROM_LOAD( "epr-6473a.61",   0x2000, 0x2000, CRC(8e53b8dd) SHA1(23e04589f2b523d6b8e46d16f40e59685e27f522) )
+	ROM_LOAD( "epr-6472a.64",   0x4000, 0x2000, CRC(e0f34a11) SHA1(b7a96a1867f8bd3cc1251b5fd12991c406e62a37) )
+	ROM_LOAD( "epr-6471a.63",   0x6000, 0x2000, CRC(d5bc805c) SHA1(520afa7617e8dfd09bf469c01ac606a4a3acdc5e) )
+	ROM_LOAD( "epr-6470a.66",   0x8000, 0x2000, CRC(1439729f) SHA1(54ea6ef54be6dcc2a5d00f7f817fd8836a02b3b9) )
+	ROM_LOAD( "epr-6469a.65",   0xa000, 0x2000, CRC(e4ac6921) SHA1(f95e3b368c2c6dbf8265fb314d73019fe7dcce22) )
 
 	ROM_REGION( 0x8000, "sprites", 0 )
-	ROM_LOAD( "epr6454a.117",   0x0000, 0x4000, CRC(a5d96780) SHA1(e0571f6fd031bbe2d971c3be7b96a017b0ea4be9) )
+	ROM_LOAD( "epr-6454a.117",  0x0000, 0x4000, CRC(a5d96780) SHA1(e0571f6fd031bbe2d971c3be7b96a017b0ea4be9) )
 	ROM_LOAD( "epr-6455.05",    0x4000, 0x4000, CRC(32ee64a1) SHA1(21743f78735fc9105fbbfac420bdaa2965b4b56f) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
@@ -3188,23 +3229,23 @@ ROM_END
 
 ROM_START( pitfall2a )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "epr-6505",   0x0000, 0x4000, CRC(b6769739) SHA1(e1b8401c20f77f8ec799b19d7bc94ae4f9ed702f) ) /* encrypted */
-	ROM_LOAD( "epr-6506",   0x4000, 0x4000, CRC(1ce6aec4) SHA1(69b54c4569ccfb1166a901e7044ae1026db01a82) ) /* encrypted */
-	ROM_LOAD( "epr6458a.96",    0x8000, 0x4000, CRC(5c30b3e8) SHA1(9048091ebf054d0ba0c6a92520ddfac38a479034) )
+	ROM_LOAD( "epr-6505.116",   0x0000, 0x4000, CRC(b6769739) SHA1(e1b8401c20f77f8ec799b19d7bc94ae4f9ed702f) ) /* encrypted */
+	ROM_LOAD( "epr-6506.109",   0x4000, 0x4000, CRC(1ce6aec4) SHA1(69b54c4569ccfb1166a901e7044ae1026db01a82) ) /* encrypted */
+	ROM_LOAD( "epr-6458a.96",   0x8000, 0x4000, CRC(5c30b3e8) SHA1(9048091ebf054d0ba0c6a92520ddfac38a479034) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr-6462.120",   0x0000, 0x2000, CRC(86bb9185) SHA1(89add2e3784e8f5a20b895fb2c4466bdd6c34b0c) )
 
 	ROM_REGION( 0xc000, "tiles", 0 )
-	ROM_LOAD( "epr6474a.62",    0x0000, 0x2000, CRC(9f1711b9) SHA1(c652010a8b19828f81fd101aa1ea781e250c4ec2) )
-	ROM_LOAD( "epr6473a.61",    0x2000, 0x2000, CRC(8e53b8dd) SHA1(23e04589f2b523d6b8e46d16f40e59685e27f522) )
-	ROM_LOAD( "epr6472a.64",    0x4000, 0x2000, CRC(e0f34a11) SHA1(b7a96a1867f8bd3cc1251b5fd12991c406e62a37) )
-	ROM_LOAD( "epr6471a.63",    0x6000, 0x2000, CRC(d5bc805c) SHA1(520afa7617e8dfd09bf469c01ac606a4a3acdc5e) )
-	ROM_LOAD( "epr6470a.66",    0x8000, 0x2000, CRC(1439729f) SHA1(54ea6ef54be6dcc2a5d00f7f817fd8836a02b3b9) )
-	ROM_LOAD( "epr6469a.65",    0xa000, 0x2000, CRC(e4ac6921) SHA1(f95e3b368c2c6dbf8265fb314d73019fe7dcce22) )
+	ROM_LOAD( "epr-6474a.62",   0x0000, 0x2000, CRC(9f1711b9) SHA1(c652010a8b19828f81fd101aa1ea781e250c4ec2) )
+	ROM_LOAD( "epr-6473a.61",   0x2000, 0x2000, CRC(8e53b8dd) SHA1(23e04589f2b523d6b8e46d16f40e59685e27f522) )
+	ROM_LOAD( "epr-6472a.64",   0x4000, 0x2000, CRC(e0f34a11) SHA1(b7a96a1867f8bd3cc1251b5fd12991c406e62a37) )
+	ROM_LOAD( "epr-6471a.63",   0x6000, 0x2000, CRC(d5bc805c) SHA1(520afa7617e8dfd09bf469c01ac606a4a3acdc5e) )
+	ROM_LOAD( "epr-6470a.66",   0x8000, 0x2000, CRC(1439729f) SHA1(54ea6ef54be6dcc2a5d00f7f817fd8836a02b3b9) )
+	ROM_LOAD( "epr-6469a.65",   0xa000, 0x2000, CRC(e4ac6921) SHA1(f95e3b368c2c6dbf8265fb314d73019fe7dcce22) )
 
 	ROM_REGION( 0x8000, "sprites", 0 )
-	ROM_LOAD( "epr6454a.117",   0x0000, 0x4000, CRC(a5d96780) SHA1(e0571f6fd031bbe2d971c3be7b96a017b0ea4be9) )
+	ROM_LOAD( "epr-6454a.117",  0x0000, 0x4000, CRC(a5d96780) SHA1(e0571f6fd031bbe2d971c3be7b96a017b0ea4be9) )
 	ROM_LOAD( "epr-6455.05",    0x4000, 0x4000, CRC(32ee64a1) SHA1(21743f78735fc9105fbbfac420bdaa2965b4b56f) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
@@ -3214,22 +3255,22 @@ ROM_END
 ROM_START( pitfall2u )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr-6623.116",   0x0000, 0x4000, CRC(bcb47ed6) SHA1(d33421999f899c0a4dc0d4553614c1f5c7027257) )
-	ROM_LOAD( "epr6624a.109",   0x4000, 0x4000, CRC(6e8b09c1) SHA1(4869ca4d3f0b08cd3df4c82be9cfc774ddeb3010) )
+	ROM_LOAD( "epr-6624a.109",  0x4000, 0x4000, CRC(6e8b09c1) SHA1(4869ca4d3f0b08cd3df4c82be9cfc774ddeb3010) )
 	ROM_LOAD( "epr-6625.96",    0x8000, 0x4000, CRC(dc5484ba) SHA1(62fffff7d935c104def5f09e9dc4a26fa4ce4f94) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr-6462.120",   0x0000, 0x2000, CRC(86bb9185) SHA1(89add2e3784e8f5a20b895fb2c4466bdd6c34b0c) )
 
 	ROM_REGION( 0xc000, "tiles", 0 )
-	ROM_LOAD( "epr6474a.62",    0x0000, 0x2000, CRC(9f1711b9) SHA1(c652010a8b19828f81fd101aa1ea781e250c4ec2) )
-	ROM_LOAD( "epr6473a.61",    0x2000, 0x2000, CRC(8e53b8dd) SHA1(23e04589f2b523d6b8e46d16f40e59685e27f522) )
-	ROM_LOAD( "epr6472a.64",    0x4000, 0x2000, CRC(e0f34a11) SHA1(b7a96a1867f8bd3cc1251b5fd12991c406e62a37) )
-	ROM_LOAD( "epr6471a.63",    0x6000, 0x2000, CRC(d5bc805c) SHA1(520afa7617e8dfd09bf469c01ac606a4a3acdc5e) )
-	ROM_LOAD( "epr6470a.66",    0x8000, 0x2000, CRC(1439729f) SHA1(54ea6ef54be6dcc2a5d00f7f817fd8836a02b3b9) )
-	ROM_LOAD( "epr6469a.65",    0xa000, 0x2000, CRC(e4ac6921) SHA1(f95e3b368c2c6dbf8265fb314d73019fe7dcce22) )
+	ROM_LOAD( "epr-6474a.62",   0x0000, 0x2000, CRC(9f1711b9) SHA1(c652010a8b19828f81fd101aa1ea781e250c4ec2) )
+	ROM_LOAD( "epr-6473a.61",   0x2000, 0x2000, CRC(8e53b8dd) SHA1(23e04589f2b523d6b8e46d16f40e59685e27f522) )
+	ROM_LOAD( "epr-6472a.64",   0x4000, 0x2000, CRC(e0f34a11) SHA1(b7a96a1867f8bd3cc1251b5fd12991c406e62a37) )
+	ROM_LOAD( "epr-6471a.63",   0x6000, 0x2000, CRC(d5bc805c) SHA1(520afa7617e8dfd09bf469c01ac606a4a3acdc5e) )
+	ROM_LOAD( "epr-6470a.66",   0x8000, 0x2000, CRC(1439729f) SHA1(54ea6ef54be6dcc2a5d00f7f817fd8836a02b3b9) )
+	ROM_LOAD( "epr-6469a.65",   0xa000, 0x2000, CRC(e4ac6921) SHA1(f95e3b368c2c6dbf8265fb314d73019fe7dcce22) )
 
 	ROM_REGION( 0x8000, "sprites", 0 )
-	ROM_LOAD( "epr6454a.117",   0x0000, 0x4000, CRC(a5d96780) SHA1(e0571f6fd031bbe2d971c3be7b96a017b0ea4be9) )
+	ROM_LOAD( "epr-6454a.117",  0x0000, 0x4000, CRC(a5d96780) SHA1(e0571f6fd031bbe2d971c3be7b96a017b0ea4be9) )
 	ROM_LOAD( "epr-6455.05",    0x4000, 0x4000, CRC(32ee64a1) SHA1(21743f78735fc9105fbbfac420bdaa2965b4b56f) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
@@ -3345,8 +3386,7 @@ ROM_START( nprinces )
 	ROM_LOAD( "epr-6549.05",    0xc000, 0x4000, CRC(d2057668) SHA1(ded2a04f7555eb3b1e4da57901ca00635de2c043) ) /* epr-6549.2 */
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr-5317.76",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
-																/* pr-5317.106 */
+	ROM_LOAD( "pr-5317.76",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* pr-5317.106 */
 ROM_END
 
 ROM_START( nprinceso )
@@ -3437,8 +3477,8 @@ ROM_END
 
 ROM_START( ninja )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "epr6594.bin",    0x0000, 0x4000, CRC(3ef0e5fc) SHA1(ba2d832aa33759c21582e728ca7e4a0ca03cb937) )
-	ROM_LOAD( "epr6595.bin",    0x4000, 0x4000, CRC(b16f13cd) SHA1(e4649ce76393fdf8d2a1f53f1c25ee27ed35db45) )
+	ROM_LOAD( "epr-6594.116",   0x0000, 0x4000, CRC(3ef0e5fc) SHA1(ba2d832aa33759c21582e728ca7e4a0ca03cb937) )
+	ROM_LOAD( "epr-6595.109",   0x4000, 0x4000, CRC(b16f13cd) SHA1(e4649ce76393fdf8d2a1f53f1c25ee27ed35db45) )
 	ROM_LOAD( "epr-6552.96",    0x8000, 0x4000, CRC(f2eeb0d8) SHA1(1f0d1c73ba9eaa2887ffc596f0038b0af37ced49) ) /* epr-7151.96 */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
@@ -3446,11 +3486,11 @@ ROM_START( ninja )
 
 	ROM_REGION( 0xc000, "tiles", 0 )
 	ROM_LOAD( "epr-6558.62",    0x0000, 0x2000, CRC(2af9eaeb) SHA1(a8a472e9f156c34f1cfcf6d6be808da4303a2276) )
-	ROM_LOAD( "epr6592.bin",    0x2000, 0x2000, CRC(88d0c7a1) SHA1(a649a56484f3cf466dbd4bc468d21220e638c5fe) )
+	ROM_LOAD( "epr-6592.61",    0x2000, 0x2000, CRC(88d0c7a1) SHA1(a649a56484f3cf466dbd4bc468d21220e638c5fe) )
 	ROM_LOAD( "epr-6556.64",    0x4000, 0x2000, CRC(79fd26f7) SHA1(a7de0f21ccbcfda495a5c93237569a9b3919d2d5) )
-	ROM_LOAD( "epr6590.bin",    0x6000, 0x2000, CRC(956e3b61) SHA1(47e797bcc39f3ef917848b64a3666e08f9498cc0) )
+	ROM_LOAD( "epr-6590.63",    0x6000, 0x2000, CRC(956e3b61) SHA1(47e797bcc39f3ef917848b64a3666e08f9498cc0) )
 	ROM_LOAD( "epr-6554.66",    0x8000, 0x2000, CRC(5ac9d205) SHA1(c3094d10d1d6226bf9ad174d2dd1631b8d6ca33a) )
-	ROM_LOAD( "epr6588.bin",    0xa000, 0x2000, CRC(023a14a3) SHA1(199bdf597ace496992f323c0eaa1e779920fb976) )
+	ROM_LOAD( "epr-6588.65",    0xa000, 0x2000, CRC(023a14a3) SHA1(199bdf597ace496992f323c0eaa1e779920fb976) )
 
 	ROM_REGION( 0x10000, "sprites", 0 )
 	ROM_LOAD( "epr-6546.117",   0x0000, 0x4000, CRC(a4785692) SHA1(95ce23076dc86c5d6d3a65274873d4c48e91cc06) )
@@ -3576,12 +3616,12 @@ ROM_START( teddybbobl ) // data in romset is an exact match for teddybbo, includ
 	ROM_LOAD( "3.k2",   0x8000, 0x4000, CRC(e5a74f5f) SHA1(ccf18b424d4aaeec0bae1e6f096b4c176f6ab554) ) // == epr-6741.96
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "6.e10",   0x0000, 0x2000, CRC(9325a1cf) SHA1(555d137b1c974b144ebe6593b4c32c97b3bb5de9) )
+	ROM_LOAD( "6.e10",  0x0000, 0x2000, CRC(9325a1cf) SHA1(555d137b1c974b144ebe6593b4c32c97b3bb5de9) )
 
 	ROM_REGION( 0xc000, "tiles", 0 ) /* same as parent except 3x16k instead of 6x8k */
-	ROM_LOAD( "11.r7",          0x0000, 0x4000, CRC(55d7aaf7) SHA1(84041b665f91b515968aaa48d8ffe93c84c90c57) ) // epr-6747.62 + epr-6746.61
-	ROM_LOAD( "10.r8",          0x4000, 0x4000, CRC(52a5083d) SHA1(33afef936ce21d49fc7bae3dd9b9d827e26e002f) ) // epr-6745.64 + epr-6744.63
-	ROM_LOAD( "9.r10",          0x8000, 0x4000, CRC(8076d3a3) SHA1(ba7f136b9300a2b41f225a7696345c90a6fbd6a5) ) // epr-6753.66 + epr-6742.65
+	ROM_LOAD( "11.r7",  0x0000, 0x4000, CRC(55d7aaf7) SHA1(84041b665f91b515968aaa48d8ffe93c84c90c57) ) // epr-6747.62 + epr-6746.61
+	ROM_LOAD( "10.r8",  0x4000, 0x4000, CRC(52a5083d) SHA1(33afef936ce21d49fc7bae3dd9b9d827e26e002f) ) // epr-6745.64 + epr-6744.63
+	ROM_LOAD( "9.r10",  0x8000, 0x4000, CRC(8076d3a3) SHA1(ba7f136b9300a2b41f225a7696345c90a6fbd6a5) ) // epr-6753.66 + epr-6742.65
 
 	ROM_REGION( 0x10000, "sprites", 0 )
 	ROM_LOAD( "4.f3",   0x0000, 0x4000, CRC(1be35a97) SHA1(7524cfa1a9c9a2e37753f119e7ac7aa3158621be) )
@@ -3599,26 +3639,26 @@ ROM_END
 
 ROM_START( hvymetal )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "epra6790.1",   0x00000, 0x8000, CRC(59195bb9) SHA1(63dde673bd875dd23d445b152decb1d70c3750a4) ) /* encrypted */
-	ROM_LOAD( "epra6789.2",   0x10000, 0x8000, CRC(83e1d18a) SHA1(07ef58ee2a5212e1e2800efc2bd48d2b2a9ed10d) )
-	ROM_LOAD( "epra6788.3",   0x18000, 0x8000, CRC(6ecefd57) SHA1(3236313d5d826873d58af5ad80652c8d0ae0cc31) )
+	ROM_LOAD( "epr-6790a.1",   0x00000, 0x8000, CRC(59195bb9) SHA1(63dde673bd875dd23d445b152decb1d70c3750a4) ) /* encrypted */
+	ROM_LOAD( "epr-6789a.2",   0x10000, 0x8000, CRC(83e1d18a) SHA1(07ef58ee2a5212e1e2800efc2bd48d2b2a9ed10d) )
+	ROM_LOAD( "epr-6788a.3",   0x18000, 0x8000, CRC(6ecefd57) SHA1(3236313d5d826873d58af5ad80652c8d0ae0cc31) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "epr6787.120",  0x0000, 0x8000, CRC(b64ac7f0) SHA1(2b16c2702d3230891b700714a66ece95f1a74b44) )
+	ROM_LOAD( "epr-6787.120",   0x0000, 0x8000, CRC(b64ac7f0) SHA1(2b16c2702d3230891b700714a66ece95f1a74b44) )
 
 	ROM_REGION( 0x18000, "tiles", 0 )
-	ROM_LOAD( "epr6795.62",   0x00000, 0x4000, CRC(58a3d038) SHA1(9aabfad143748e2ec1b41fde72a1d533bac3f9d8) )
-	ROM_LOAD( "epr6796.61",   0x04000, 0x4000, CRC(d8b08a55) SHA1(cfa5370aa430947637bfe57a5a1f802f273b43f7) )
-	ROM_LOAD( "epr6793.64",   0x08000, 0x4000, CRC(487407c2) SHA1(9bb9fff24fe057fa17057ba9263d412905a0c036) )
-	ROM_LOAD( "epr6794.63",   0x0c000, 0x4000, CRC(89eb3793) SHA1(90a0cc81d917122c726238585eb802763d34884e) )
-	ROM_LOAD( "epr6791.66",   0x10000, 0x4000, CRC(a7dcd042) SHA1(d9bac10aa7ac591a20bfed4e391ec1669eadc32d) )
-	ROM_LOAD( "epr6792.65",   0x14000, 0x4000, CRC(d0be5e33) SHA1(1e61c6e14c3c736e74e6c2ff5cde71d1d20b99a4) )
+	ROM_LOAD( "epr-6795.62",   0x00000, 0x4000, CRC(58a3d038) SHA1(9aabfad143748e2ec1b41fde72a1d533bac3f9d8) )
+	ROM_LOAD( "epr-6796.61",   0x04000, 0x4000, CRC(d8b08a55) SHA1(cfa5370aa430947637bfe57a5a1f802f273b43f7) )
+	ROM_LOAD( "epr-6793.64",   0x08000, 0x4000, CRC(487407c2) SHA1(9bb9fff24fe057fa17057ba9263d412905a0c036) )
+	ROM_LOAD( "epr-6794.63",   0x0c000, 0x4000, CRC(89eb3793) SHA1(90a0cc81d917122c726238585eb802763d34884e) )
+	ROM_LOAD( "epr-6791.66",   0x10000, 0x4000, CRC(a7dcd042) SHA1(d9bac10aa7ac591a20bfed4e391ec1669eadc32d) )
+	ROM_LOAD( "epr-6792.65",   0x14000, 0x4000, CRC(d0be5e33) SHA1(1e61c6e14c3c736e74e6c2ff5cde71d1d20b99a4) )
 
 	ROM_REGION( 0x20000, "sprites", 0 )
-	ROM_LOAD( "epr6778.117",  0x00000, 0x8000, CRC(0af61aee) SHA1(90879d4d1bef38714a39ca71c101bd103d250284) )
-	ROM_LOAD( "epr6777.110",  0x08000, 0x8000, CRC(91d7a197) SHA1(34c12b7de22169d369ff5b8a8d86da62404267f8) )
-	ROM_LOAD( "epr6780.4",    0x10000, 0x8000, CRC(55b31df5) SHA1(aa1ce0b1666e17db196bd1e079691fbe433a9226) )
-	ROM_LOAD( "epr6779.5",    0x18000, 0x8000, CRC(e03a2b28) SHA1(7e742c09e832d01f74fe4025d194cbc8d2f24b70) )
+	ROM_LOAD( "epr-6778.117",  0x00000, 0x8000, CRC(0af61aee) SHA1(90879d4d1bef38714a39ca71c101bd103d250284) )
+	ROM_LOAD( "epr-6777.110",  0x08000, 0x8000, CRC(91d7a197) SHA1(34c12b7de22169d369ff5b8a8d86da62404267f8) )
+	ROM_LOAD( "epr-6780.4",    0x10000, 0x8000, CRC(55b31df5) SHA1(aa1ce0b1666e17db196bd1e079691fbe433a9226) )
+	ROM_LOAD( "epr-6779.5",    0x18000, 0x8000, CRC(e03a2b28) SHA1(7e742c09e832d01f74fe4025d194cbc8d2f24b70) )
 
 	ROM_REGION( 0x0300, "palette", 0 )
 	ROM_LOAD( "pr7036.3",     0x0000, 0x0100, CRC(146f16fb) SHA1(0a2ac871383b115c16491b9ba5973f0d363eac49) ) /* palette red component */
@@ -3632,8 +3672,8 @@ ROM_END
 
 ROM_START( myhero )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "epr6963b.116",   0x0000, 0x4000, CRC(4daf89d4) SHA1(6fd69964d4e0dcd5637920711361f1879fcf330e) )
-	ROM_LOAD( "epr6964a.109",   0x4000, 0x4000, CRC(c26188e5) SHA1(48d7871a9c63de774c48f1bd9dcaf84b4188f84f) )
+	ROM_LOAD( "epr-6963b.116",  0x0000, 0x4000, CRC(4daf89d4) SHA1(6fd69964d4e0dcd5637920711361f1879fcf330e) )
+	ROM_LOAD( "epr-6964a.109",  0x4000, 0x4000, CRC(c26188e5) SHA1(48d7871a9c63de774c48f1bd9dcaf84b4188f84f) )
 	ROM_LOAD( "epr-6927.96",    0x8000, 0x4000, CRC(3cbbaf64) SHA1(fdb5f2ca38010729afa4ed24c087119cf398f27d) ) /* epr-6965.96 */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
@@ -3659,8 +3699,8 @@ ROM_END
 
 ROM_START( sscandal )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "epr6925b.116",   0x0000, 0x4000, CRC(ff54dcec) SHA1(634ba5c79dc20dc6ab3efd9597b9fb1e4f86f58f) ) /* encrypted */
-	ROM_LOAD( "epr6926a.109",   0x4000, 0x4000, CRC(5c41eea8) SHA1(6a060a9739ee85c5c3a3e205bfac46bff1ed0b91) ) /* encrypted */
+	ROM_LOAD( "epr-6925b.116",  0x0000, 0x4000, CRC(ff54dcec) SHA1(634ba5c79dc20dc6ab3efd9597b9fb1e4f86f58f) ) /* encrypted */
+	ROM_LOAD( "epr-6926a.109",  0x4000, 0x4000, CRC(5c41eea8) SHA1(6a060a9739ee85c5c3a3e205bfac46bff1ed0b91) ) /* encrypted */
 	ROM_LOAD( "epr-6927.96",    0x8000, 0x4000, CRC(3cbbaf64) SHA1(fdb5f2ca38010729afa4ed24c087119cf398f27d) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
@@ -3781,44 +3821,38 @@ ROM_END
 */
 ROM_START( shtngmst )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	/* This rom is located on the daughter board. */
-	ROM_LOAD( "epr7100.ic18",   0x00000, 0x8000, CRC(45e64431) SHA1(7edf818dc1f65365641e51abc197d13db7a8d4d9) )
-	/* These roms are located on the main board. */
-	ROM_LOAD( "epr7101.ic91",   0x10000, 0x8000, CRC(ebf5ff72) SHA1(13ae06e3a81cf00b80ec939d5baf30143d61d480) )
-	ROM_LOAD( "epr7102.ic92",   0x18000, 0x8000, CRC(c890a4ad) SHA1(4b59d37902ace3a69b380ff40652ee37c85f0e9d) )
+	ROM_LOAD( "epr-7100.ic18",   0x00000, 0x8000, CRC(45e64431) SHA1(7edf818dc1f65365641e51abc197d13db7a8d4d9) ) /* This rom is located on the daughter board. */
+	ROM_LOAD( "epr-7101.ic91",   0x10000, 0x8000, CRC(ebf5ff72) SHA1(13ae06e3a81cf00b80ec939d5baf30143d61d480) ) /* These 2 roms are located on the main board. */
+	ROM_LOAD( "epr-7102.ic92",   0x18000, 0x8000, CRC(c890a4ad) SHA1(4b59d37902ace3a69b380ff40652ee37c85f0e9d) )
 
-	/* This rom is located on the main board. */
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "epr7043.ic126",  0x0000, 0x8000, CRC(99a368ab) SHA1(a9451f39ee2613e5c3e2791d4d8d837b4a3ab666) )
+	ROM_LOAD( "epr-7043.ic126",  0x0000, 0x8000, CRC(99a368ab) SHA1(a9451f39ee2613e5c3e2791d4d8d837b4a3ab666) ) /* This rom is located on the main board. */
 
-	/* This mcu is located on the main board. */
 	ROM_REGION( 0x1000, "mcu", 0 )
-	ROM_LOAD( "315-5159.ic74", 0x00000, 0x1000, NO_DUMP )
+	ROM_LOAD( "315-5159.ic74", 0x00000, 0x1000, NO_DUMP ) /* This mcu is located on the main board. */
 
-	/* These roms are located on the main board. */
 	ROM_REGION( 0x18000, "tiles", 0 )
-	ROM_LOAD( "epr7040.ic4",    0x00000, 0x8000, CRC(f30769fa) SHA1(366c1fbe4e1c8943b209f6c831c9a6b7e4372105) )
-	ROM_LOAD( "epr7041.ic5",    0x08000, 0x8000, CRC(f3e273f9) SHA1(b8715c528299dc1e4f0c19c50d91ca9861a423a1) )
-	ROM_LOAD( "epr7042.ic6",    0x10000, 0x8000, CRC(6841c917) SHA1(6553843eea0131eb7b5a9aa29dddf641e41d8cc3) )
+	ROM_LOAD( "epr-7040.ic4",    0x00000, 0x8000, CRC(f30769fa) SHA1(366c1fbe4e1c8943b209f6c831c9a6b7e4372105) ) /* These roms are located on the main board. */
+	ROM_LOAD( "epr-7041.ic5",    0x08000, 0x8000, CRC(f3e273f9) SHA1(b8715c528299dc1e4f0c19c50d91ca9861a423a1) )
+	ROM_LOAD( "epr-7042.ic6",    0x10000, 0x8000, CRC(6841c917) SHA1(6553843eea0131eb7b5a9aa29dddf641e41d8cc3) )
 
-	/* These roms are located on the daughter board. */
 	ROM_REGION( 0x40000, "sprites", ROMREGION_ERASEFF )
-	ROM_LOAD( "epr7110.ic26",   0x00000, 0x8000, CRC(5d1a5048) SHA1(d1626ab1981080451c912df7e4ad7f76c0cb3459) )
-	ROM_LOAD( "epr7106.ic22",   0x08000, 0x8000, CRC(ae7ab7a2) SHA1(153691e468d29d21b95f1fbffb6896a3140d7e14) )
-	ROM_LOAD( "epr7108.ic24",   0x10000, 0x8000, CRC(816180ac) SHA1(a59670ec77d4359041ebf12dae5b74add55d82ac) )
-	ROM_LOAD( "epr7104.ic20",   0x18000, 0x8000, CRC(84a679c5) SHA1(19a21b1b33fc215f606093bfd61d597e4bd0b3d0) )
-	ROM_LOAD( "epr7109.ic25",   0x20000, 0x8000, CRC(097f7481) SHA1(4d93ea01b811af1cd3e136116625e4b8e06358a2) )
-	ROM_LOAD( "epr7105.ic21",   0x28000, 0x8000, CRC(13111729) SHA1(57ca2b945db36b056d0e40a39456fd8bf9d0a3ec) )
-	ROM_LOAD( "epr7107.ic23",   0x30000, 0x8000, CRC(8f50ea24) SHA1(781687e202dedca7b72c9bd5b97d9d46fcfd601c) )
+	ROM_LOAD( "epr-7110.ic26",   0x00000, 0x8000, CRC(5d1a5048) SHA1(d1626ab1981080451c912df7e4ad7f76c0cb3459) ) /* These roms are located on the daughter board. */
+	ROM_LOAD( "epr-7106.ic22",   0x08000, 0x8000, CRC(ae7ab7a2) SHA1(153691e468d29d21b95f1fbffb6896a3140d7e14) )
+	ROM_LOAD( "epr-7108.ic24",   0x10000, 0x8000, CRC(816180ac) SHA1(a59670ec77d4359041ebf12dae5b74add55d82ac) )
+	ROM_LOAD( "epr-7104.ic20",   0x18000, 0x8000, CRC(84a679c5) SHA1(19a21b1b33fc215f606093bfd61d597e4bd0b3d0) )
+	ROM_LOAD( "epr-7109.ic25",   0x20000, 0x8000, CRC(097f7481) SHA1(4d93ea01b811af1cd3e136116625e4b8e06358a2) )
+	ROM_LOAD( "epr-7105.ic21",   0x28000, 0x8000, CRC(13111729) SHA1(57ca2b945db36b056d0e40a39456fd8bf9d0a3ec) )
+	ROM_LOAD( "epr-7107.ic23",   0x30000, 0x8000, CRC(8f50ea24) SHA1(781687e202dedca7b72c9bd5b97d9d46fcfd601c) )
 
 	/* These proms are located on the main board. */
 	ROM_REGION( 0x0300, "palette", 0 )
-	ROM_LOAD( "epr7113.ic20",   0x00000, 0x0100, CRC(5c0e1360) SHA1(2011b3eef2a58f9bd3f3b1bb9e6c201db85727c2) ) /* palette red component */
-	ROM_LOAD( "epr7112.ic14",   0x00100, 0x0100, CRC(46fbd351) SHA1(1fca7fbc5d5f8e13e58bbac735511bd0af392446) ) /* palette green component */
-	ROM_LOAD( "epr7111.ic8",    0x00200, 0x0100, CRC(8123b6b9) SHA1(fb2c5498f0603b5cd270402a738c891a85453666) ) /* palette blue component - N82S129AN */
+	ROM_LOAD( "epr-7113.ic20",   0x00000, 0x0100, CRC(5c0e1360) SHA1(2011b3eef2a58f9bd3f3b1bb9e6c201db85727c2) ) /* palette red component */
+	ROM_LOAD( "epr-7112.ic14",   0x00100, 0x0100, CRC(46fbd351) SHA1(1fca7fbc5d5f8e13e58bbac735511bd0af392446) ) /* palette green component */
+	ROM_LOAD( "epr-7111.ic8",    0x00200, 0x0100, CRC(8123b6b9) SHA1(fb2c5498f0603b5cd270402a738c891a85453666) ) /* palette blue component - N82S129AN */
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "epr5317.ic37",   0x00000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* N82S129AN */
+	ROM_LOAD( "pr5317.ic37",   0x00000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* N82S129AN */
 
 	/* These pld's are located on the main board. */
 	ROM_REGION( 0x0618, "plds", 0 )
@@ -3858,37 +3892,37 @@ ROM_END
 */
 ROM_START( shtngmste )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "epr7100.ic18", 0x00000, 0x8000, CRC(268ecb1d) SHA1(a9274c9718f7244235cc6df76331d6a0b7e4e4c8) ) // sldh
-	ROM_LOAD( "epr7101.ic91", 0x10000, 0x8000, CRC(ebf5ff72) SHA1(13ae06e3a81cf00b80ec939d5baf30143d61d480) )
-	ROM_LOAD( "epr7102.ic92", 0x18000, 0x8000, CRC(c890a4ad) SHA1(4b59d37902ace3a69b380ff40652ee37c85f0e9d) )
+	ROM_LOAD( "epr-7100.ic18", 0x00000, 0x8000, CRC(268ecb1d) SHA1(a9274c9718f7244235cc6df76331d6a0b7e4e4c8) ) // sldh
+	ROM_LOAD( "epr-7101.ic91", 0x10000, 0x8000, CRC(ebf5ff72) SHA1(13ae06e3a81cf00b80ec939d5baf30143d61d480) )
+	ROM_LOAD( "epr-7102.ic92", 0x18000, 0x8000, CRC(c890a4ad) SHA1(4b59d37902ace3a69b380ff40652ee37c85f0e9d) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "epr7043.ic126",  0x0000, 0x8000, CRC(99a368ab) SHA1(a9451f39ee2613e5c3e2791d4d8d837b4a3ab666) )
+	ROM_LOAD( "epr-7043.ic126",  0x0000, 0x8000, CRC(99a368ab) SHA1(a9451f39ee2613e5c3e2791d4d8d837b4a3ab666) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )
 	ROM_LOAD( "315-5159a.ic74", 0x00000, 0x1000, BAD_DUMP CRC(1f774912) SHA1(34d12756735514bea5a513fdf441ae93318747b2) )
 
 	ROM_REGION( 0x18000, "tiles", 0 )
-	ROM_LOAD( "epr7040.ic4",    0x00000, 0x8000, CRC(f30769fa) SHA1(366c1fbe4e1c8943b209f6c831c9a6b7e4372105) )
-	ROM_LOAD( "epr7041.ic5",    0x08000, 0x8000, CRC(f3e273f9) SHA1(b8715c528299dc1e4f0c19c50d91ca9861a423a1) )
-	ROM_LOAD( "epr7042.ic6",    0x10000, 0x8000, CRC(6841c917) SHA1(6553843eea0131eb7b5a9aa29dddf641e41d8cc3) )
+	ROM_LOAD( "epr-7040.ic4",    0x00000, 0x8000, CRC(f30769fa) SHA1(366c1fbe4e1c8943b209f6c831c9a6b7e4372105) )
+	ROM_LOAD( "epr-7041.ic5",    0x08000, 0x8000, CRC(f3e273f9) SHA1(b8715c528299dc1e4f0c19c50d91ca9861a423a1) )
+	ROM_LOAD( "epr-7042.ic6",    0x10000, 0x8000, CRC(6841c917) SHA1(6553843eea0131eb7b5a9aa29dddf641e41d8cc3) )
 
 	ROM_REGION( 0x40000, "sprites", ROMREGION_ERASEFF )
-	ROM_LOAD( "epr7110",      0x00000, 0x8000, CRC(5d1a5048) SHA1(d1626ab1981080451c912df7e4ad7f76c0cb3459) )
-	ROM_LOAD( "epr7106",      0x08000, 0x8000, CRC(ae7ab7a2) SHA1(153691e468d29d21b95f1fbffb6896a3140d7e14) )
-	ROM_LOAD( "epr7108",      0x10000, 0x8000, CRC(816180ac) SHA1(a59670ec77d4359041ebf12dae5b74add55d82ac) )
-	ROM_LOAD( "epr7104",      0x18000, 0x8000, CRC(84a679c5) SHA1(19a21b1b33fc215f606093bfd61d597e4bd0b3d0) )
-	ROM_LOAD( "epr7109",      0x20000, 0x8000, CRC(097f7481) SHA1(4d93ea01b811af1cd3e136116625e4b8e06358a2) )
-	ROM_LOAD( "epr7105",      0x28000, 0x8000, CRC(13111729) SHA1(57ca2b945db36b056d0e40a39456fd8bf9d0a3ec) )
-	ROM_LOAD( "epr7107",      0x30000, 0x8000, CRC(8f50ea24) SHA1(781687e202dedca7b72c9bd5b97d9d46fcfd601c) )
+	ROM_LOAD( "epr-7110.ic26",   0x00000, 0x8000, CRC(5d1a5048) SHA1(d1626ab1981080451c912df7e4ad7f76c0cb3459) )
+	ROM_LOAD( "epr-7106.ic22",   0x08000, 0x8000, CRC(ae7ab7a2) SHA1(153691e468d29d21b95f1fbffb6896a3140d7e14) )
+	ROM_LOAD( "epr-7108.ic24",   0x10000, 0x8000, CRC(816180ac) SHA1(a59670ec77d4359041ebf12dae5b74add55d82ac) )
+	ROM_LOAD( "epr-7104.ic20",   0x18000, 0x8000, CRC(84a679c5) SHA1(19a21b1b33fc215f606093bfd61d597e4bd0b3d0) )
+	ROM_LOAD( "epr-7109.ic25",   0x20000, 0x8000, CRC(097f7481) SHA1(4d93ea01b811af1cd3e136116625e4b8e06358a2) )
+	ROM_LOAD( "epr-7105.ic21",   0x28000, 0x8000, CRC(13111729) SHA1(57ca2b945db36b056d0e40a39456fd8bf9d0a3ec) )
+	ROM_LOAD( "epr-7107.ic23",   0x30000, 0x8000, CRC(8f50ea24) SHA1(781687e202dedca7b72c9bd5b97d9d46fcfd601c) )
 
 	ROM_REGION( 0x0300, "palette", 0 )
-	ROM_LOAD( "epr7113.ic20",   0x00000, 0x0100, CRC(5c0e1360) SHA1(2011b3eef2a58f9bd3f3b1bb9e6c201db85727c2) ) /* palette red component */
-	ROM_LOAD( "epr7112.ic14",   0x00100, 0x0100, CRC(46fbd351) SHA1(1fca7fbc5d5f8e13e58bbac735511bd0af392446) ) /* palette green component */
-	ROM_LOAD( "epr7111.ic8",    0x00200, 0x0100, CRC(8123b6b9) SHA1(fb2c5498f0603b5cd270402a738c891a85453666) ) /* palette blue component - N82S129AN */
+	ROM_LOAD( "epr-7113.ic20",   0x00000, 0x0100, CRC(5c0e1360) SHA1(2011b3eef2a58f9bd3f3b1bb9e6c201db85727c2) ) /* palette red component */
+	ROM_LOAD( "epr-7112.ic14",   0x00100, 0x0100, CRC(46fbd351) SHA1(1fca7fbc5d5f8e13e58bbac735511bd0af392446) ) /* palette green component */
+	ROM_LOAD( "epr-7111.ic8",    0x00200, 0x0100, CRC(8123b6b9) SHA1(fb2c5498f0603b5cd270402a738c891a85453666) ) /* palette blue component - N82S129AN */
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "epr5317.ic37",   0x00000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* N82S129AN */
+	ROM_LOAD( "pr5317.ic37",   0x00000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* N82S129AN */
 
 	ROM_REGION( 0x0400, "plds", 0 )
 	ROM_LOAD( "315-5137.bin",   0x00000, 0x0104, CRC(6ffd9e6f) SHA1(a60a3a2ec5bc256b18bfff0fec0172ee2e4fd955) ) /* TI PAL16R4A-2CN Located at IC10 */
@@ -3912,7 +3946,7 @@ ROM_START( choplift )
 	ROM_LOAD( "epr-7130.ic126", 0x0000, 0x8000, CRC(346af118) SHA1(ef579818a45b8ebb276d5832092b26e232d5a737) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )
-	ROM_LOAD( "315-5151.ic74",  0x00000, 0x1000, BAD_DUMP CRC(7bd11a6c) SHA1(2d75a2276e572f97f269af062536c1c58e1c8eaf) )
+	ROM_LOAD( "315-5151.ic74",  0x00000, 0x1000, CRC(1377a6ef) SHA1(b85acd7292e5480c98af1a0492b6b5d3f9b1716c) )
 
 	ROM_REGION( 0x18000, "tiles", 0 )
 	ROM_LOAD( "epr-7127.ic4",   0x00000, 0x8000, CRC(1e708f6d) SHA1(b975e13bdc44105e7a15c2694e3ec53b60e23e5e) )
@@ -3947,7 +3981,7 @@ ROM_END
     Year: 1985
     System 2
 
-    Main Board 834-5795
+    Main Board 834-5795-03
 */
 ROM_START( chopliftu )
 	ROM_REGION( 0x20000, "maincpu", 0 )
@@ -4147,7 +4181,7 @@ ROM_START( wboyub ) // seems to be the same as 'wboy' but a different rom layout
 	ROM_LOAD( "0cpu.bin",     0xc000, 0x2000, CRC(a962e6af) SHA1(f46b01db38cdc9c8485d7fe0a344e9f6ed918925) ) /* supposedly the encryption key */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "epr7498a.3",     0x0000, 0x2000, CRC(c198205c) SHA1(d2d5cd154ce6a5a3c6a099b4ab2ea7cc045ab0a1) )
+	ROM_LOAD( "epr-7498a.3",    0x0000, 0x2000, CRC(c198205c) SHA1(d2d5cd154ce6a5a3c6a099b4ab2ea7cc045ab0a1) )
 
 	ROM_REGION( 0xc000, "tiles", 0 )
 	ROM_LOAD( "epr-7497.62",    0x0000, 0x2000, CRC(08d609ca) SHA1(11799e9ef7e6942b304f132b404bff3ed44d524b) )
@@ -4228,8 +4262,7 @@ ROM_START( wboy2 )
 	ROM_LOAD( "epr-7488.05",    0xc000, 0x4000, CRC(007c2f1b) SHA1(c2f1376144a49d20cb35384648e06d06978474c1) ) /* epr-7488.2 */
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr-5317.76",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
-																/* pr-5317.106 */
+	ROM_LOAD( "pr-5317.76",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* pr-5317.106 */
 ROM_END
 
 ROM_START( wboy2u )
@@ -4259,8 +4292,7 @@ ROM_START( wboy2u )
 	ROM_LOAD( "epr-7488.05",    0xc000, 0x4000, CRC(007c2f1b) SHA1(c2f1376144a49d20cb35384648e06d06978474c1) ) /* epr-7488.2 */
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr-5317.76",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
-																/* pr-5317.106 */
+	ROM_LOAD( "pr-5317.76",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* pr-5317.106 */
 ROM_END
 
 ROM_START( wboy3 )
@@ -4305,23 +4337,23 @@ The second piggyback is marked "SEGA 834-5755" and it contains proms and some lo
 
 ROM_START( wboy4 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "epr7622.ic1",    0x0000, 0x8000, CRC(48b2c006) SHA1(35492330dae71d410712380466b4c09b81df8559) ) /* encrypted */
-	ROM_LOAD( "epr7621.ic2",    0x8000, 0x8000, CRC(466cae31) SHA1(e47e9084c83796a0a0dfeaa1f8f868cadd5f32c7) )
+	ROM_LOAD( "epr-7622.ic1",  0x0000, 0x8000, CRC(48b2c006) SHA1(35492330dae71d410712380466b4c09b81df8559) ) /* encrypted */
+	ROM_LOAD( "epr-7621.ic2",  0x8000, 0x8000, CRC(466cae31) SHA1(e47e9084c83796a0a0dfeaa1f8f868cadd5f32c7) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "7583.126", 0x0000, 0x8000, CRC(99334b3c) SHA1(dfc09f63082b7666fa2152e22810c0455a7e5051) )    // epr7583.ic120
+	ROM_LOAD( "epr-7583.126",  0x0000, 0x8000, CRC(99334b3c) SHA1(dfc09f63082b7666fa2152e22810c0455a7e5051) )    // epr7583.ic120
 
 	ROM_REGION( 0xc000, "tiles", 0 )
-	ROM_LOAD( "epr7610.ic62",   0x0000, 0x4000, CRC(1685d26a) SHA1(d30d08d61d789fd5a0eb7ef2998eb9728dabf4c9) )
-	ROM_LOAD( "epr7609.ic64",   0x4000, 0x4000, CRC(87ecba53) SHA1(b904d5af25e0c1f8c8ca8dc11a3bed508c868f19) )
-	ROM_LOAD( "epr7608.ic66",   0x8000, 0x4000, CRC(e812b3ec) SHA1(3eebeaf3480a0370aa5ee031c25768ada17ad8a2) )
+	ROM_LOAD( "epr-7610.ic62", 0x0000, 0x4000, CRC(1685d26a) SHA1(d30d08d61d789fd5a0eb7ef2998eb9728dabf4c9) )
+	ROM_LOAD( "epr-7609.ic64", 0x4000, 0x4000, CRC(87ecba53) SHA1(b904d5af25e0c1f8c8ca8dc11a3bed508c868f19) )
+	ROM_LOAD( "epr-7608.ic66", 0x8000, 0x4000, CRC(e812b3ec) SHA1(3eebeaf3480a0370aa5ee031c25768ada17ad8a2) )
 
 	ROM_REGION( 0x10000, "sprites", 0 )
-	ROM_LOAD( "7578.87",  0x00000, 0x8000, CRC(6ff1637f) SHA1(9a6ddbd7b8d53273b30c3529b028c1f28bf3c63b) )   // epr7577.ic110
-	ROM_LOAD( "7577.86",  0x08000, 0x8000, CRC(58b3705e) SHA1(1a8ff3f1765a3b21145bd1a6c85441f806f7b17d) )   // epr7576.ic117
+	ROM_LOAD( "epr-7578.87",  0x00000, 0x8000, CRC(6ff1637f) SHA1(9a6ddbd7b8d53273b30c3529b028c1f28bf3c63b) )   // epr7577.ic110
+	ROM_LOAD( "epr-7577.86",  0x08000, 0x8000, CRC(58b3705e) SHA1(1a8ff3f1765a3b21145bd1a6c85441f806f7b17d) )   // epr7576.ic117
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr-5317.76",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
+	ROM_LOAD( "pr-5317.76",    0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
 ROM_START( wboy5 )
@@ -4342,10 +4374,10 @@ ROM_START( wboy5 )
 	ROM_LOAD( "epr-7492.65",0xa000, 0x2000, CRC(60f806b1) SHA1(f91e5868a455dff2bce3c2891a7cfd648957cd73) )
 
 	ROM_REGION( 0x10000, "sprites", 0 )
-	ROM_LOAD( "epr-7485.117",0x0000, 0x4000, CRC(c2891722) SHA1(e4e11c0e9bd0dc121c25349493f2b13d2ff8c807) )
-	ROM_LOAD( "epr-7487.04",0x4000, 0x4000, CRC(2d3a421b) SHA1(d70440a8703ccface3212cd9544c950b36263e8c) )
-	ROM_LOAD( "epr-7486.110",0x8000, 0x4000, CRC(8d622c50) SHA1(9a76a50204c618347d3e8eee6cda841becd906eb) )
-	ROM_LOAD( "epr-7488.05",0xc000, 0x4000, CRC(007c2f1b) SHA1(c2f1376144a49d20cb35384648e06d06978474c1) )
+	ROM_LOAD( "epr-7485.117", 0x0000, 0x4000, CRC(c2891722) SHA1(e4e11c0e9bd0dc121c25349493f2b13d2ff8c807) )
+	ROM_LOAD( "epr-7487.04",  0x4000, 0x4000, CRC(2d3a421b) SHA1(d70440a8703ccface3212cd9544c950b36263e8c) )
+	ROM_LOAD( "epr-7486.110", 0x8000, 0x4000, CRC(8d622c50) SHA1(9a76a50204c618347d3e8eee6cda841becd906eb) )
+	ROM_LOAD( "epr-7488.05",  0xc000, 0x4000, CRC(007c2f1b) SHA1(c2f1376144a49d20cb35384648e06d06978474c1) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "pr-5317.76",0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
@@ -4378,8 +4410,7 @@ ROM_START( wboy6 )
 	ROM_LOAD( "epr-7488.05",    0xc000, 0x4000, CRC(007c2f1b) SHA1(c2f1376144a49d20cb35384648e06d06978474c1) ) /* epr-7488.2 */
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr-5317.76",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
-																/* pr-5317.106 */
+	ROM_LOAD( "pr-5317.76",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* pr-5317.106 */
 ROM_END
 
 ROM_START( wboyu )
@@ -4412,25 +4443,25 @@ ROM_END
 
 ROM_START( wboysys2 )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "epr7580.90",  0x00000, 0x8000, CRC(d69927a5) SHA1(b633177146a83953131d4e03fa987416f222199a) ) /* encrypted */
-	ROM_LOAD( "epr7579.91",  0x10000, 0x8000, CRC(8a6f4b00) SHA1(2b1c26daa2e9c668292db73e28318257c62b175c) )
+	ROM_LOAD( "epr-7580.90",  0x00000, 0x8000, CRC(d69927a5) SHA1(b633177146a83953131d4e03fa987416f222199a) ) /* encrypted */
+	ROM_LOAD( "epr-7579.91",  0x10000, 0x8000, CRC(8a6f4b00) SHA1(2b1c26daa2e9c668292db73e28318257c62b175c) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "epr7583.126", 0x0000, 0x8000, CRC(99334b3c) SHA1(dfc09f63082b7666fa2152e22810c0455a7e5051) )
+	ROM_LOAD( "epr-7583.126", 0x0000, 0x8000, CRC(99334b3c) SHA1(dfc09f63082b7666fa2152e22810c0455a7e5051) )
 
 	ROM_REGION( 0x18000, "tiles", 0 )
-	ROM_LOAD( "epr7581.4",   0x00000, 0x8000, CRC(d95565fd) SHA1(25f1653cca1d6432171a7b391cbb76bc18ddfb06) )
-	ROM_LOAD( "epr7582.5",   0x08000, 0x8000, CRC(560cbac0) SHA1(851283e6d63e33d250840501dd22750b19772fb0) )
-	ROM_LOAD( "epr7607.6",   0x10000, 0x8000, CRC(bd36df03) SHA1(7f7efac2c71fae48dd1dcb4dcc849f07e8127f7d) )
+	ROM_LOAD( "epr-7581.4",   0x00000, 0x8000, CRC(d95565fd) SHA1(25f1653cca1d6432171a7b391cbb76bc18ddfb06) )
+	ROM_LOAD( "epr-7582.5",   0x08000, 0x8000, CRC(560cbac0) SHA1(851283e6d63e33d250840501dd22750b19772fb0) )
+	ROM_LOAD( "epr-7607.6",   0x10000, 0x8000, CRC(bd36df03) SHA1(7f7efac2c71fae48dd1dcb4dcc849f07e8127f7d) )
 
 	ROM_REGION( 0x10000, "sprites", 0 )
-	ROM_LOAD( "epr7578.87",  0x00000, 0x8000, CRC(6ff1637f) SHA1(9a6ddbd7b8d53273b30c3529b028c1f28bf3c63b) )
-	ROM_LOAD( "epr7577.86",  0x08000, 0x8000, CRC(58b3705e) SHA1(1a8ff3f1765a3b21145bd1a6c85441f806f7b17d) )
+	ROM_LOAD( "epr-7578.87",  0x00000, 0x8000, CRC(6ff1637f) SHA1(9a6ddbd7b8d53273b30c3529b028c1f28bf3c63b) )
+	ROM_LOAD( "epr-7577.86",  0x08000, 0x8000, CRC(58b3705e) SHA1(1a8ff3f1765a3b21145bd1a6c85441f806f7b17d) )
 
 	ROM_REGION( 0x0300, "palette", 0 )
-	ROM_LOAD( "pr-7345.20",      0x0000, 0x0100, CRC(8eee0f72) SHA1(b5694c120f604a5f7cc95618a71ab16a1a6151ed) ) /* palette red component */
-	ROM_LOAD( "pr-7344.14",      0x0100, 0x0100, CRC(3e7babd7) SHA1(d4f8790db4dce75e27156a4c6de2dcef2baf6d76) ) /* palette green component */
-	ROM_LOAD( "pr-7343.8",      0x0200, 0x0100, CRC(371c44a6) SHA1(ac37458d1feb6566b09a795b20c21953d4ab109d) ) /* palette blue component */
+	ROM_LOAD( "pr-7345.ic20", 0x0000, 0x0100, CRC(8eee0f72) SHA1(b5694c120f604a5f7cc95618a71ab16a1a6151ed) ) /* palette red component */
+	ROM_LOAD( "pr-7344.ic14", 0x0100, 0x0100, CRC(3e7babd7) SHA1(d4f8790db4dce75e27156a4c6de2dcef2baf6d76) ) /* palette green component */
+	ROM_LOAD( "pr-7343.ic8",  0x0200, 0x0100, CRC(371c44a6) SHA1(ac37458d1feb6566b09a795b20c21953d4ab109d) ) /* palette blue component */
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "pr-5317.28",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
@@ -4438,25 +4469,25 @@ ROM_END
 
 ROM_START( wboysys2a )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "epr7625.90",  0x00000, 0x8000, CRC(43b3d155) SHA1(40cc063bf64327250be7ae078ea85315ad4db794) ) /* encrypted */
-	ROM_LOAD( "epr7626.91",  0x10000, 0x8000, CRC(8a6f4b00) SHA1(2b1c26daa2e9c668292db73e28318257c62b175c) )
+	ROM_LOAD( "epr-7625.90",  0x00000, 0x8000, CRC(43b3d155) SHA1(40cc063bf64327250be7ae078ea85315ad4db794) ) /* encrypted */
+	ROM_LOAD( "epr-7626.91",  0x10000, 0x8000, CRC(8a6f4b00) SHA1(2b1c26daa2e9c668292db73e28318257c62b175c) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "epr7583.126", 0x0000, 0x8000, CRC(99334b3c) SHA1(dfc09f63082b7666fa2152e22810c0455a7e5051) )
+	ROM_LOAD( "epr-7583.126", 0x0000, 0x8000, CRC(99334b3c) SHA1(dfc09f63082b7666fa2152e22810c0455a7e5051) )
 
 	ROM_REGION( 0x18000, "tiles", 0 )
-	ROM_LOAD( "epr7581.4",   0x00000, 0x8000, CRC(d95565fd) SHA1(25f1653cca1d6432171a7b391cbb76bc18ddfb06) )
-	ROM_LOAD( "epr7582.5",   0x08000, 0x8000, CRC(560cbac0) SHA1(851283e6d63e33d250840501dd22750b19772fb0) )
-	ROM_LOAD( "epr7607.6",   0x10000, 0x8000, CRC(bd36df03) SHA1(7f7efac2c71fae48dd1dcb4dcc849f07e8127f7d) )
+	ROM_LOAD( "epr-7581.4",   0x00000, 0x8000, CRC(d95565fd) SHA1(25f1653cca1d6432171a7b391cbb76bc18ddfb06) )
+	ROM_LOAD( "epr-7582.5",   0x08000, 0x8000, CRC(560cbac0) SHA1(851283e6d63e33d250840501dd22750b19772fb0) )
+	ROM_LOAD( "epr-7607.6",   0x10000, 0x8000, CRC(bd36df03) SHA1(7f7efac2c71fae48dd1dcb4dcc849f07e8127f7d) )
 
 	ROM_REGION( 0x10000, "sprites", 0 )
-	ROM_LOAD( "epr7578.87",  0x00000, 0x8000, CRC(6ff1637f) SHA1(9a6ddbd7b8d53273b30c3529b028c1f28bf3c63b) )
-	ROM_LOAD( "epr7577.86",  0x08000, 0x8000, CRC(58b3705e) SHA1(1a8ff3f1765a3b21145bd1a6c85441f806f7b17d) )
+	ROM_LOAD( "epr-7578.87",  0x00000, 0x8000, CRC(6ff1637f) SHA1(9a6ddbd7b8d53273b30c3529b028c1f28bf3c63b) )
+	ROM_LOAD( "epr-7577.86",  0x08000, 0x8000, CRC(58b3705e) SHA1(1a8ff3f1765a3b21145bd1a6c85441f806f7b17d) )
 
 	ROM_REGION( 0x0300, "palette", 0 )
-	ROM_LOAD( "pr-7345.20",      0x0000, 0x0100, CRC(8eee0f72) SHA1(b5694c120f604a5f7cc95618a71ab16a1a6151ed) ) /* palette red component */
-	ROM_LOAD( "pr-7344.14",      0x0100, 0x0100, CRC(3e7babd7) SHA1(d4f8790db4dce75e27156a4c6de2dcef2baf6d76) ) /* palette green component */
-	ROM_LOAD( "pr-7343.8",      0x0200, 0x0100, CRC(371c44a6) SHA1(ac37458d1feb6566b09a795b20c21953d4ab109d) ) /* palette blue component */
+	ROM_LOAD( "pr-7345.20", 0x0000, 0x0100, CRC(8eee0f72) SHA1(b5694c120f604a5f7cc95618a71ab16a1a6151ed) ) /* palette red component */
+	ROM_LOAD( "pr-7344.14", 0x0100, 0x0100, CRC(3e7babd7) SHA1(d4f8790db4dce75e27156a4c6de2dcef2baf6d76) ) /* palette green component */
+	ROM_LOAD( "pr-7343.8",  0x0200, 0x0100, CRC(371c44a6) SHA1(ac37458d1feb6566b09a795b20c21953d4ab109d) ) /* palette blue component */
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "pr-5317.28",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
@@ -4489,37 +4520,36 @@ ROM_START( wbdeluxe )
 	ROM_LOAD( "epr-7488.05",    0xc000, 0x4000, CRC(007c2f1b) SHA1(c2f1376144a49d20cb35384648e06d06978474c1) ) /* epr-7488.2 */
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr-5317.76",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
-																/* pr-5317.106 */
+	ROM_LOAD( "pr-5317.106",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* pr-5317.106 */
 ROM_END
 
 
-ROM_START( gardia )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "epr10255.1",   0x00000, 0x8000, CRC(89282a6b) SHA1(f19e345e5fae6a518276cc1bd09d1e2083672b25) ) /* encrypted */
-	ROM_LOAD( "epr10254.2",   0x10000, 0x8000, CRC(2826b6d8) SHA1(de1faf33cca031b72052bf5244fcb0bd79d85659) )
-	ROM_LOAD( "epr10253.3",   0x18000, 0x8000, CRC(7911260f) SHA1(44196f0a6c4c2b22a68609ddfc75be6a7877a69a) )
+ROM_START( gardia ) /* Factory conversion, Sega game ID# 834-6119-04 GARDIA (CVT) */
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* These 3 EPROMs located on a Sega 834-5764 daughter card with a 315-5134 PAL? */
+	ROM_LOAD( "epr-10255.1",   0x00000, 0x8000, CRC(89282a6b) SHA1(f19e345e5fae6a518276cc1bd09d1e2083672b25) ) /* encrypted */
+	ROM_LOAD( "epr-10254.2",   0x10000, 0x8000, CRC(2826b6d8) SHA1(de1faf33cca031b72052bf5244fcb0bd79d85659) )
+	ROM_LOAD( "epr-10253.3",   0x18000, 0x8000, CRC(7911260f) SHA1(44196f0a6c4c2b22a68609ddfc75be6a7877a69a) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "epr10243.120", 0x0000, 0x4000, CRC(87220660) SHA1(3f2bfc03e0f1053a4aa0ec5ebb0d573f2e20964c) )
+	ROM_LOAD( "epr-10243.120", 0x0000, 0x4000, CRC(87220660) SHA1(3f2bfc03e0f1053a4aa0ec5ebb0d573f2e20964c) )
 
 	ROM_REGION( 0xc000, "tiles", 0 )
-	ROM_LOAD( "epr10249.61",  0x0000, 0x4000, CRC(4e0ad0f2) SHA1(b76c155b674f3ad8938278d5dbb0452351c716a5) )
-	ROM_LOAD( "epr10248.64",  0x4000, 0x4000, CRC(3515d124) SHA1(39b28a103d8bfe702a376ebd880d6060e3d1ab30) )
-	ROM_LOAD( "epr10247.66",  0x8000, 0x4000, CRC(541e1555) SHA1(6660204c74a9f7e63b3ba08d99fb854aa863710e) )
+	ROM_LOAD( "epr-10249.61",  0x0000, 0x4000, CRC(4e0ad0f2) SHA1(b76c155b674f3ad8938278d5dbb0452351c716a5) )
+	ROM_LOAD( "epr-10248.64",  0x4000, 0x4000, CRC(3515d124) SHA1(39b28a103d8bfe702a376ebd880d6060e3d1ab30) )
+	ROM_LOAD( "epr-10247.66",  0x8000, 0x4000, CRC(541e1555) SHA1(6660204c74a9f7e63b3ba08d99fb854aa863710e) )
 
 	ROM_REGION( 0x20000, "sprites", 0 )
-	ROM_LOAD( "epr10234.117", 0x00000, 0x8000, CRC(8a6aed33) SHA1(044836885ace8294124b1be9b3a4828f772bb9ee) )
-	ROM_LOAD( "epr10233.110", 0x08000, 0x8000, CRC(c52784d3) SHA1(b37d7f261be12616dbe11dfa375eaf6878e4a0f3) )
-	ROM_LOAD( "epr10236.04",  0x10000, 0x8000, CRC(b35ab227) SHA1(616f6097afddffa9af89fe84d8b6df59c567c1e6) )
-	ROM_LOAD( "epr10235.5",   0x18000, 0x8000, CRC(006a3151) SHA1(a575f9d5c026e6b18e990720ec7520b6b5ae94e3) )
+	ROM_LOAD( "epr-10234.117", 0x00000, 0x8000, CRC(8a6aed33) SHA1(044836885ace8294124b1be9b3a4828f772bb9ee) )
+	ROM_LOAD( "epr-10233.110", 0x08000, 0x8000, CRC(c52784d3) SHA1(b37d7f261be12616dbe11dfa375eaf6878e4a0f3) )
+	ROM_LOAD( "epr-10236.04",  0x10000, 0x8000, CRC(b35ab227) SHA1(616f6097afddffa9af89fe84d8b6df59c567c1e6) )
+	ROM_LOAD( "epr-10235.5",   0x18000, 0x8000, CRC(006a3151) SHA1(a575f9d5c026e6b18e990720ec7520b6b5ae94e3) )
 
-	ROM_REGION( 0x0300, "palette", 0 )
-	ROM_LOAD( "bprom.3",      0x0000, 0x0100, CRC(8eee0f72) SHA1(b5694c120f604a5f7cc95618a71ab16a1a6151ed) ) /* palette red component */
-	ROM_LOAD( "bprom.2",      0x0100, 0x0100, CRC(3e7babd7) SHA1(d4f8790db4dce75e27156a4c6de2dcef2baf6d76) ) /* palette green component */
-	ROM_LOAD( "bprom.1",      0x0200, 0x0100, CRC(371c44a6) SHA1(ac37458d1feb6566b09a795b20c21953d4ab109d) ) /* palette blue component */
+	ROM_REGION( 0x0300, "palette", 0 ) /* BPROMs located on a Sega 834-5755 daughter card (N82S129AN or equivalent) */
+	ROM_LOAD( "pr-7345.3",      0x0000, 0x0100, CRC(8eee0f72) SHA1(b5694c120f604a5f7cc95618a71ab16a1a6151ed) ) /* palette red component */
+	ROM_LOAD( "pr-7344.2",      0x0100, 0x0100, CRC(3e7babd7) SHA1(d4f8790db4dce75e27156a4c6de2dcef2baf6d76) ) /* palette green component */
+	ROM_LOAD( "pr-7343.1",      0x0200, 0x0100, CRC(371c44a6) SHA1(ac37458d1feb6566b09a795b20c21953d4ab109d) ) /* palette blue component */
 
-	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_REGION( 0x0100, "proms", 0 ) /* BPROM located on a Sega 834-5755 daughter card */
 	ROM_LOAD( "pr5317.4",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
@@ -4530,7 +4560,7 @@ ROM_START( gardiab )
 	ROM_LOAD( "gardiabl.7",   0x18000, 0x8000, CRC(0a490588) SHA1(18df754ebdf062096f2d631a722b168901610345) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "epr10243.120", 0x0000, 0x4000, CRC(87220660) SHA1(3f2bfc03e0f1053a4aa0ec5ebb0d573f2e20964c) )
+	ROM_LOAD( "epr-10243.120", 0x0000, 0x4000, CRC(87220660) SHA1(3f2bfc03e0f1053a4aa0ec5ebb0d573f2e20964c) )
 
 	ROM_REGION( 0xc000, "tiles", 0 )
 	ROM_LOAD( "gardiabl.8",   0x0000, 0x4000, CRC(367c9a17) SHA1(bde7592ce94bbc6674c04b427c52e74207066f56) )
@@ -4538,21 +4568,21 @@ ROM_START( gardiab )
 	ROM_LOAD( "gardiabl.10",  0x8000, 0x4000, CRC(e5c9af10) SHA1(6bff5bbc0f339e84a8e31446dc9897c02600fbcf) )
 
 	ROM_REGION( 0x20000, "sprites", 0 )
-	ROM_LOAD( "epr10234.117", 0x00000, 0x8000, CRC(8a6aed33) SHA1(044836885ace8294124b1be9b3a4828f772bb9ee) )
-	ROM_LOAD( "epr10233.110", 0x08000, 0x8000, CRC(c52784d3) SHA1(b37d7f261be12616dbe11dfa375eaf6878e4a0f3) )
-	ROM_LOAD( "epr10236.04",  0x10000, 0x8000, CRC(b35ab227) SHA1(616f6097afddffa9af89fe84d8b6df59c567c1e6) )
-	ROM_LOAD( "epr10235.5",   0x18000, 0x8000, CRC(006a3151) SHA1(a575f9d5c026e6b18e990720ec7520b6b5ae94e3) )
+	ROM_LOAD( "epr-10234.117", 0x00000, 0x8000, CRC(8a6aed33) SHA1(044836885ace8294124b1be9b3a4828f772bb9ee) )
+	ROM_LOAD( "epr-10233.110", 0x08000, 0x8000, CRC(c52784d3) SHA1(b37d7f261be12616dbe11dfa375eaf6878e4a0f3) )
+	ROM_LOAD( "epr-10236.04",  0x10000, 0x8000, CRC(b35ab227) SHA1(616f6097afddffa9af89fe84d8b6df59c567c1e6) )
+	ROM_LOAD( "epr-10235.5",   0x18000, 0x8000, CRC(006a3151) SHA1(a575f9d5c026e6b18e990720ec7520b6b5ae94e3) )
 
-	ROM_REGION( 0x0300, "palette", 0 )
-	ROM_LOAD( "bprom.3",      0x0000, 0x0100, CRC(8eee0f72) SHA1(b5694c120f604a5f7cc95618a71ab16a1a6151ed) ) /* palette red component */
-	ROM_LOAD( "bprom.2",      0x0100, 0x0100, CRC(3e7babd7) SHA1(d4f8790db4dce75e27156a4c6de2dcef2baf6d76) ) /* palette green component */
-	ROM_LOAD( "bprom.1",      0x0200, 0x0100, CRC(371c44a6) SHA1(ac37458d1feb6566b09a795b20c21953d4ab109d) ) /* palette blue component */
+	ROM_REGION( 0x0300, "palette", 0 ) /* BPROMs are N82S129AN or equivalent */
+	ROM_LOAD( "pr-7345.3",      0x0000, 0x0100, CRC(8eee0f72) SHA1(b5694c120f604a5f7cc95618a71ab16a1a6151ed) ) /* palette red component */
+	ROM_LOAD( "pr-7344.2",      0x0100, 0x0100, CRC(3e7babd7) SHA1(d4f8790db4dce75e27156a4c6de2dcef2baf6d76) ) /* palette green component */
+	ROM_LOAD( "pr-7343.1",      0x0200, 0x0100, CRC(371c44a6) SHA1(ac37458d1feb6566b09a795b20c21953d4ab109d) ) /* palette blue component */
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "pr5317.4",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
-ROM_START( gardiaj )
+ROM_START( gardiaj ) /* Sega game ID# 834-6119-02 GARDIA */
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "epr-10250.ic90",   0x00000, 0x8000, CRC(c97943a7) SHA1(eb201987c7a78f7eb6838211c0af3394c0b2d95f) ) /* encrypted */
 	ROM_LOAD( "epr-10251.ic91",   0x10000, 0x8000, CRC(b2ed05dc) SHA1(c520bf7024c85dc759c27eccb0a31998f4d72b5f) )
@@ -4572,13 +4602,17 @@ ROM_START( gardiaj )
 	ROM_LOAD( "epr-10236.ic89", 0x10000, 0x8000, CRC(b35ab227) SHA1(616f6097afddffa9af89fe84d8b6df59c567c1e6) )
 	ROM_LOAD( "epr-10235.ic88", 0x18000, 0x8000, CRC(006a3151) SHA1(a575f9d5c026e6b18e990720ec7520b6b5ae94e3) )
 
-	ROM_REGION( 0x0300, "palette", 0 )
+	ROM_REGION( 0x0300, "palette", 0 ) /* BPROMs are N82S129AN or equivalent */
 	ROM_LOAD( "pr-7345.ic20",      0x0000, 0x0100, CRC(8eee0f72) SHA1(b5694c120f604a5f7cc95618a71ab16a1a6151ed) ) /* palette red component */
 	ROM_LOAD( "pr-7344.ic14",      0x0100, 0x0100, CRC(3e7babd7) SHA1(d4f8790db4dce75e27156a4c6de2dcef2baf6d76) ) /* palette green component */
 	ROM_LOAD( "pr-7343.ic8",       0x0200, 0x0100, CRC(371c44a6) SHA1(ac37458d1feb6566b09a795b20c21953d4ab109d) ) /* palette blue component */
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr5317.ic28",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
+	ROM_LOAD( "pr5317.ic28",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* MB7114E */
+
+	ROM_REGION( 0x0400, "plds", 0 )
+	ROM_LOAD( "315-5137.bin",   0x00000, 0x0104, CRC(6ffd9e6f) SHA1(a60a3a2ec5bc256b18bfff0fec0172ee2e4fd955) ) /* TI PAL16R4A-2CN Located at IC10 */
+	ROM_LOAD( "315-5138.bin",   0x00000, 0x0104, CRC(dd223015) SHA1(8d70f91b118e8653dda1efee3eaea287ae63809f) ) /* TI PAL16R4ACN Located at IC11 */
 ROM_END
 
 
@@ -4614,58 +4648,90 @@ ROM_START( brain )
 ROM_END
 
 
-ROM_START( tokisens )
+ROM_START( tokisens ) /* Sega game ID#  834-6409 - Sega MC-8123, 317-0040 */
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "epr10961.90",  0x00000, 0x8000, CRC(1466b61d) SHA1(99f93813834d3a7c9f6228076d400f74d9b6dea9) )
-	ROM_LOAD( "epr10962.91",  0x10000, 0x8000, CRC(a8479f91) SHA1(0700746fb481fd2bd22ae82c9881aa61222a6379) )
-	ROM_LOAD( "epr10963.92",  0x18000, 0x8000, CRC(b7193b39) SHA1(d40fb8591b1ff83f3d56b955ac11a07496a0adbb) )
+	ROM_LOAD( "epr-10961.ic90",  0x00000, 0x8000, CRC(5c71c203) SHA1(65c3730d2255be5e09fda2f8eae1c7f3d245ce9b) )
+	ROM_LOAD( "epr-10962.ic91",  0x10000, 0x8000, CRC(db9080e3) SHA1(591b1bd4ab694f45d472bb50483dadb980cd2f86) )
+	ROM_LOAD( "epr-10963.ic92",  0x18000, 0x8000, CRC(d17ad93f) SHA1(870dbd3558a4c3a47f36d3d3c0c71c647baacf10) )
+
+	ROM_REGION( 0x2000, "maincpu:key", 0 ) /* MC8123 key */
+	ROM_LOAD( "317-0040.key",  0x0000, 0x2000, CRC(e2b67fd6) SHA1(4fcf457279dac317ccf700591cfaa9a4cff81b4a) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "epr10967.126", 0x0000, 0x8000, CRC(97966bf2) SHA1(b5a3d36afbb3d6e2e2e2c121609a30dc080ccf13) )
+	ROM_LOAD( "epr-10967.ic126", 0x0000, 0x8000, CRC(97966bf2) SHA1(b5a3d36afbb3d6e2e2e2c121609a30dc080ccf13) )
 
 	ROM_REGION( 0x18000, "tiles", 0 )
-	ROM_LOAD( "epr10964.4",   0x00000, 0x8000, CRC(9013b85c) SHA1(c27322245052ffc9d840fe683ed35965c61bf9e8) )
-	ROM_LOAD( "epr10965.5",   0x08000, 0x8000, CRC(e4755cc6) SHA1(33370d556a70e19edce5e0c7fa8b11453ccbe91b) )
-	ROM_LOAD( "epr10966.6",   0x10000, 0x8000, CRC(5bbfbdcc) SHA1(e7e679da874a79dfdda0be58d1352c192635296d) )
+	ROM_LOAD( "epr-10964.ic4",   0x00000, 0x8000, CRC(25af5c93) SHA1(da6e6244b14c9ad51cee012bf46d591928d13050) )
+	ROM_LOAD( "epr-10965.ic5",   0x08000, 0x8000, CRC(cc8eb99a) SHA1(b66c2a786a3401021a05740f36103cf8e6129a85) )
+	ROM_LOAD( "epr-10966.ic6",   0x10000, 0x8000, CRC(7ecf2459) SHA1(2dc6c4295d0e6f18efd26f8e15e0f31cf0a6820e) )
 
 	ROM_REGION( 0x20000, "sprites", 0 )
-	ROM_LOAD( "epr10958.87",  0x00000, 0x8000, CRC(fc2bcbd7) SHA1(6b9007f2057e4c860ecae4ba5db4e02b8aaae8fd) )
-	ROM_LOAD( "epr10957.86",  0x08000, 0x8000, CRC(4ec56860) SHA1(9fd6ba8a68b4cb98183e8ac8643656c251f1c72d) )
-	ROM_LOAD( "epr10960.89",  0x10000, 0x8000, CRC(880e0d44) SHA1(2b2dc144807d1d048ffe81bfd33a77ccf618dd3e) )
-	ROM_LOAD( "epr10959.88",  0x18000, 0x8000, CRC(4deda48f) SHA1(12db2a69286f22cd8243be6faa9a075fafec1dfd) )
+	ROM_LOAD( "epr-10958.ic87",  0x00000, 0x8000, CRC(bb62dbc8) SHA1(f48aa1b38077d801521afe6cd43f1463a22b9431) )
+	ROM_LOAD( "epr-10957.ic86",  0x08000, 0x8000, CRC(4ec56860) SHA1(9fd6ba8a68b4cb98183e8ac8643656c251f1c72d) )
+	ROM_LOAD( "epr-10960.ic89",  0x10000, 0x8000, CRC(880e0d44) SHA1(2b2dc144807d1d048ffe81bfd33a77ccf618dd3e) )
+	ROM_LOAD( "epr-10959.ic88",  0x18000, 0x8000, CRC(4deda48f) SHA1(12db2a69286f22cd8243be6faa9a075fafec1dfd) )
 
 	ROM_REGION( 0x0300, "palette", 0 )
-	ROM_LOAD( "bprom.20",      0x0000, 0x0100, CRC(8eee0f72) SHA1(b5694c120f604a5f7cc95618a71ab16a1a6151ed) ) /* palette red component */
-	ROM_LOAD( "bprom.14",      0x0100, 0x0100, CRC(3e7babd7) SHA1(d4f8790db4dce75e27156a4c6de2dcef2baf6d76) ) /* palette green component */
-	ROM_LOAD( "bprom.8",       0x0200, 0x0100, CRC(371c44a6) SHA1(ac37458d1feb6566b09a795b20c21953d4ab109d) ) /* palette blue component */
+	ROM_LOAD( "pr10956.ic20", 0x0000, 0x0100, CRC(fd1bba8a) SHA1(4a38239d89f70291df71976b18be49fb24f071ca) ) /* MMI 63S141AN - palette red component */
+	ROM_LOAD( "pr10955.ic14", 0x0100, 0x0100, CRC(72b35df7) SHA1(ef782fb7012c359ed7ca8f4ab42734c4994e473a) ) /* MMI 63S141AN - palette green component */
+	ROM_LOAD( "pr10954.ic8",  0x0200, 0x0100, CRC(b7984867) SHA1(8a03cc98c33e4defe880d10a02a5d0108fa0c9da) ) /* MMI 63S141AN - palette blue component */
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "bprom.28",      0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
+	ROM_LOAD( "pr-5317.ic28",      0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* BPROM type N82S129AN or compatible */
+ROM_END
+
+ROM_START( tokisensa )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "ic90",  0x00000, 0x8000, CRC(1466b61d) SHA1(99f93813834d3a7c9f6228076d400f74d9b6dea9) )
+	ROM_LOAD( "ic91",  0x10000, 0x8000, CRC(a8479f91) SHA1(0700746fb481fd2bd22ae82c9881aa61222a6379) )
+	ROM_LOAD( "ic92",  0x18000, 0x8000, CRC(b7193b39) SHA1(d40fb8591b1ff83f3d56b955ac11a07496a0adbb) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "epr-10967.ic126", 0x0000, 0x8000, CRC(97966bf2) SHA1(b5a3d36afbb3d6e2e2e2c121609a30dc080ccf13) )
+
+	ROM_REGION( 0x18000, "tiles", 0 )
+	ROM_LOAD( "ic4",   0x00000, 0x8000, CRC(9013b85c) SHA1(c27322245052ffc9d840fe683ed35965c61bf9e8) )
+	ROM_LOAD( "ic5",   0x08000, 0x8000, CRC(e4755cc6) SHA1(33370d556a70e19edce5e0c7fa8b11453ccbe91b) )
+	ROM_LOAD( "ic6",   0x10000, 0x8000, CRC(5bbfbdcc) SHA1(e7e679da874a79dfdda0be58d1352c192635296d) )
+
+	ROM_REGION( 0x20000, "sprites", 0 )
+	ROM_LOAD( "ic87",            0x00000, 0x8000, CRC(fc2bcbd7) SHA1(6b9007f2057e4c860ecae4ba5db4e02b8aaae8fd) )
+	ROM_LOAD( "epr-10957.ic86",  0x08000, 0x8000, CRC(4ec56860) SHA1(9fd6ba8a68b4cb98183e8ac8643656c251f1c72d) )
+	ROM_LOAD( "epr-10960.ic89",  0x10000, 0x8000, CRC(880e0d44) SHA1(2b2dc144807d1d048ffe81bfd33a77ccf618dd3e) )
+	ROM_LOAD( "epr-10959.ic88",  0x18000, 0x8000, CRC(4deda48f) SHA1(12db2a69286f22cd8243be6faa9a075fafec1dfd) )
+
+	ROM_REGION( 0x0300, "palette", 0 )
+	ROM_LOAD( "ic20", 0x0000, 0x0100, CRC(8eee0f72) SHA1(b5694c120f604a5f7cc95618a71ab16a1a6151ed) ) /* MMI 63S141AN - palette red component */
+	ROM_LOAD( "ic14", 0x0100, 0x0100, CRC(3e7babd7) SHA1(d4f8790db4dce75e27156a4c6de2dcef2baf6d76) ) /* MMI 63S141AN - palette green component */
+	ROM_LOAD( "ic8",  0x0200, 0x0100, CRC(371c44a6) SHA1(ac37458d1feb6566b09a795b20c21953d4ab109d) ) /* MMI 63S141AN - palette blue component */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "pr-5317.ic28",      0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
 
-ROM_START( wbml )
+ROM_START( wbml ) /* Sega game ID# 834-6409 MONSTER LAND */
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "ep11031a.90",  0x00000, 0x8000, CRC(bd3349e5) SHA1(65cc16e5d3b08429388946df254b8122ad1da339) ) /* encrypted */
-	ROM_LOAD( "epr11032.91",  0x10000, 0x8000, CRC(9d03bdb2) SHA1(7dbab23e7c7972d9b51a0d3d046374720b7d6af5) ) /* encrypted */
-	ROM_LOAD( "epr11033.92",  0x18000, 0x8000, CRC(7076905c) SHA1(562fbd9bd60851f7e4e60b725193395b4f193479) ) /* encrypted */
+	ROM_LOAD( "epr-11031a.90", 0x00000, 0x8000, CRC(bd3349e5) SHA1(65cc16e5d3b08429388946df254b8122ad1da339) ) /* encrypted */
+	ROM_LOAD( "epr-11032.91",  0x10000, 0x8000, CRC(9d03bdb2) SHA1(7dbab23e7c7972d9b51a0d3d046374720b7d6af5) ) /* encrypted */
+	ROM_LOAD( "epr-11033.92",  0x18000, 0x8000, CRC(7076905c) SHA1(562fbd9bd60851f7e4e60b725193395b4f193479) ) /* encrypted */
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) /* MC8123 key */
 	ROM_LOAD( "317-0043.key",  0x0000, 0x2000, CRC(e354abfc) SHA1(07b0d3c51301ebb25909234b6220a3ed20dbcc7d) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "epr11037.126", 0x0000, 0x8000, CRC(7a4ee585) SHA1(050436106cced5dcbf40a3d94d48202eedddc3ad) )
+	ROM_LOAD( "epr-11037.126", 0x0000, 0x8000, CRC(7a4ee585) SHA1(050436106cced5dcbf40a3d94d48202eedddc3ad) )
 
 	ROM_REGION( 0x18000, "tiles", 0 )
-	ROM_LOAD( "epr11034.4",   0x00000, 0x8000, CRC(37a2077d) SHA1(57f032a98022bf03ff98cb2e563178ba97e4b63c) )
-	ROM_LOAD( "epr11035.5",   0x08000, 0x8000, CRC(cdf2a21b) SHA1(db2553866f21e03bd9d668c179be3352adbaf8a6) )
-	ROM_LOAD( "epr11036.6",   0x10000, 0x8000, CRC(644687fa) SHA1(d6c5bc95da4fc7e81091dcfe6205b6f47d54af76) )
+	ROM_LOAD( "epr-11034.4",   0x00000, 0x8000, CRC(37a2077d) SHA1(57f032a98022bf03ff98cb2e563178ba97e4b63c) )
+	ROM_LOAD( "epr-11035.5",   0x08000, 0x8000, CRC(cdf2a21b) SHA1(db2553866f21e03bd9d668c179be3352adbaf8a6) )
+	ROM_LOAD( "epr-11036.6",   0x10000, 0x8000, CRC(644687fa) SHA1(d6c5bc95da4fc7e81091dcfe6205b6f47d54af76) )
 
 	ROM_REGION( 0x20000, "sprites", 0 )
-	ROM_LOAD( "epr11028.87",  0x00000, 0x8000, CRC(af0b3972) SHA1(413825f66b84c7e45aa1855131482abead8f7f3b) )
-	ROM_LOAD( "epr11027.86",  0x08000, 0x8000, CRC(277d8f1d) SHA1(7854673503ed03d276abe971805a11f8c992f6d6) )
-	ROM_LOAD( "epr11030.89",  0x10000, 0x8000, CRC(f05ffc76) SHA1(f3dbb518240f86430840c3d4cda04bac79c20f69) )
-	ROM_LOAD( "epr11029.88",  0x18000, 0x8000, CRC(cedc9c61) SHA1(dbe5744f9b6f2a406b52b910dd4e133db7bce6b2) )
+	ROM_LOAD( "epr-11028.87",  0x00000, 0x8000, CRC(af0b3972) SHA1(413825f66b84c7e45aa1855131482abead8f7f3b) )
+	ROM_LOAD( "epr-11027.86",  0x08000, 0x8000, CRC(277d8f1d) SHA1(7854673503ed03d276abe971805a11f8c992f6d6) )
+	ROM_LOAD( "epr-11030.89",  0x10000, 0x8000, CRC(f05ffc76) SHA1(f3dbb518240f86430840c3d4cda04bac79c20f69) )
+	ROM_LOAD( "epr-11029.88",  0x18000, 0x8000, CRC(cedc9c61) SHA1(dbe5744f9b6f2a406b52b910dd4e133db7bce6b2) )
 
 	ROM_REGION( 0x0300, "palette", 0 )
 	ROM_LOAD( "pr11026.20",   0x0000, 0x0100, CRC(27057298) SHA1(654be7abb937bb0720263ee6512e31194662effe) )
@@ -4676,28 +4742,28 @@ ROM_START( wbml )
 	ROM_LOAD( "pr5317.37",    0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
-ROM_START( wbmljo )
+ROM_START( wbmljo ) /* Sega game ID# 834-6409 MONSTER LAND */
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "epr11031.90",  0x00000, 0x8000, CRC(497ebfb4) SHA1(d90872c7d5285c85b05879bc67638f640e0339d5) ) /* encrypted */
-	ROM_LOAD( "epr11032.91",  0x10000, 0x8000, CRC(9d03bdb2) SHA1(7dbab23e7c7972d9b51a0d3d046374720b7d6af5) ) /* encrypted */
-	ROM_LOAD( "epr11033.92",  0x18000, 0x8000, CRC(7076905c) SHA1(562fbd9bd60851f7e4e60b725193395b4f193479) ) /* encrypted */
+	ROM_LOAD( "epr-11031.90",  0x00000, 0x8000, CRC(497ebfb4) SHA1(d90872c7d5285c85b05879bc67638f640e0339d5) ) /* encrypted */
+	ROM_LOAD( "epr-11032.91",  0x10000, 0x8000, CRC(9d03bdb2) SHA1(7dbab23e7c7972d9b51a0d3d046374720b7d6af5) ) /* encrypted */
+	ROM_LOAD( "epr-11033.92",  0x18000, 0x8000, CRC(7076905c) SHA1(562fbd9bd60851f7e4e60b725193395b4f193479) ) /* encrypted */
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) /* MC8123 key */
 	ROM_LOAD( "317-0043.key",  0x0000, 0x2000, CRC(e354abfc) SHA1(07b0d3c51301ebb25909234b6220a3ed20dbcc7d) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "epr11037.126", 0x0000, 0x8000, CRC(7a4ee585) SHA1(050436106cced5dcbf40a3d94d48202eedddc3ad) )
+	ROM_LOAD( "epr-11037.126", 0x0000, 0x8000, CRC(7a4ee585) SHA1(050436106cced5dcbf40a3d94d48202eedddc3ad) )
 
 	ROM_REGION( 0x18000, "tiles", 0 )
-	ROM_LOAD( "epr11034.4",   0x00000, 0x8000, CRC(37a2077d) SHA1(57f032a98022bf03ff98cb2e563178ba97e4b63c) )
-	ROM_LOAD( "epr11035.5",   0x08000, 0x8000, CRC(cdf2a21b) SHA1(db2553866f21e03bd9d668c179be3352adbaf8a6) )
-	ROM_LOAD( "epr11036.6",   0x10000, 0x8000, CRC(644687fa) SHA1(d6c5bc95da4fc7e81091dcfe6205b6f47d54af76) )
+	ROM_LOAD( "epr-11034.4",   0x00000, 0x8000, CRC(37a2077d) SHA1(57f032a98022bf03ff98cb2e563178ba97e4b63c) )
+	ROM_LOAD( "epr-11035.5",   0x08000, 0x8000, CRC(cdf2a21b) SHA1(db2553866f21e03bd9d668c179be3352adbaf8a6) )
+	ROM_LOAD( "epr-11036.6",   0x10000, 0x8000, CRC(644687fa) SHA1(d6c5bc95da4fc7e81091dcfe6205b6f47d54af76) )
 
 	ROM_REGION( 0x20000, "sprites", 0 )
-	ROM_LOAD( "epr11028.87",  0x00000, 0x8000, CRC(af0b3972) SHA1(413825f66b84c7e45aa1855131482abead8f7f3b) )
-	ROM_LOAD( "epr11027.86",  0x08000, 0x8000, CRC(277d8f1d) SHA1(7854673503ed03d276abe971805a11f8c992f6d6) )
-	ROM_LOAD( "epr11030.89",  0x10000, 0x8000, CRC(f05ffc76) SHA1(f3dbb518240f86430840c3d4cda04bac79c20f69) )
-	ROM_LOAD( "epr11029.88",  0x18000, 0x8000, CRC(cedc9c61) SHA1(dbe5744f9b6f2a406b52b910dd4e133db7bce6b2) )
+	ROM_LOAD( "epr-11028.87",  0x00000, 0x8000, CRC(af0b3972) SHA1(413825f66b84c7e45aa1855131482abead8f7f3b) )
+	ROM_LOAD( "epr-11027.86",  0x08000, 0x8000, CRC(277d8f1d) SHA1(7854673503ed03d276abe971805a11f8c992f6d6) )
+	ROM_LOAD( "epr-11030.89",  0x10000, 0x8000, CRC(f05ffc76) SHA1(f3dbb518240f86430840c3d4cda04bac79c20f69) )
+	ROM_LOAD( "epr-11029.88",  0x18000, 0x8000, CRC(cedc9c61) SHA1(dbe5744f9b6f2a406b52b910dd4e133db7bce6b2) )
 
 	ROM_REGION( 0x0300, "palette", 0 )
 	ROM_LOAD( "pr11026.20",   0x0000, 0x0100, CRC(27057298) SHA1(654be7abb937bb0720263ee6512e31194662effe) )
@@ -4711,23 +4777,23 @@ ROM_END
 
 ROM_START( wbmld )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "decrypted_ep11031a.90",  0x00000, 0x8000, CRC(aba42eb7) SHA1(d2bb16a52404ba867930140e71f981cfa225dd21) )
-	ROM_LOAD( "decrypted_epr11032.91",  0x10000, 0x8000, CRC(1b158845) SHA1(26360f4bc2884746fbcc5fd6dc21fd848a3d2157) )
-	ROM_LOAD( "decrypted_epr11033.92",  0x18000, 0x8000, CRC(39e07286) SHA1(70192f03e52dd34c9fe5698a5ec1c24d3c58543c) )
+	ROM_LOAD( "decrypted_epr-11031a.90", 0x00000, 0x8000, CRC(aba42eb7) SHA1(d2bb16a52404ba867930140e71f981cfa225dd21) )
+	ROM_LOAD( "decrypted_epr-11032.91",  0x10000, 0x8000, CRC(1b158845) SHA1(26360f4bc2884746fbcc5fd6dc21fd848a3d2157) )
+	ROM_LOAD( "decrypted_epr-11033.92",  0x18000, 0x8000, CRC(39e07286) SHA1(70192f03e52dd34c9fe5698a5ec1c24d3c58543c) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "epr11037.126", 0x0000, 0x8000, CRC(7a4ee585) SHA1(050436106cced5dcbf40a3d94d48202eedddc3ad) )
+	ROM_LOAD( "epr-11037.126", 0x0000, 0x8000, CRC(7a4ee585) SHA1(050436106cced5dcbf40a3d94d48202eedddc3ad) )
 
 	ROM_REGION( 0x18000, "tiles", 0 )
-	ROM_LOAD( "epr11034.4",   0x00000, 0x8000, CRC(37a2077d) SHA1(57f032a98022bf03ff98cb2e563178ba97e4b63c) )
-	ROM_LOAD( "epr11035.5",   0x08000, 0x8000, CRC(cdf2a21b) SHA1(db2553866f21e03bd9d668c179be3352adbaf8a6) )
-	ROM_LOAD( "epr11036.6",   0x10000, 0x8000, CRC(644687fa) SHA1(d6c5bc95da4fc7e81091dcfe6205b6f47d54af76) )
+	ROM_LOAD( "epr-11034.4",   0x00000, 0x8000, CRC(37a2077d) SHA1(57f032a98022bf03ff98cb2e563178ba97e4b63c) )
+	ROM_LOAD( "epr-11035.5",   0x08000, 0x8000, CRC(cdf2a21b) SHA1(db2553866f21e03bd9d668c179be3352adbaf8a6) )
+	ROM_LOAD( "epr-11036.6",   0x10000, 0x8000, CRC(644687fa) SHA1(d6c5bc95da4fc7e81091dcfe6205b6f47d54af76) )
 
 	ROM_REGION( 0x20000, "sprites", 0 )
-	ROM_LOAD( "epr11028.87",  0x00000, 0x8000, CRC(af0b3972) SHA1(413825f66b84c7e45aa1855131482abead8f7f3b) )
-	ROM_LOAD( "epr11027.86",  0x08000, 0x8000, CRC(277d8f1d) SHA1(7854673503ed03d276abe971805a11f8c992f6d6) )
-	ROM_LOAD( "epr11030.89",  0x10000, 0x8000, CRC(f05ffc76) SHA1(f3dbb518240f86430840c3d4cda04bac79c20f69) )
-	ROM_LOAD( "epr11029.88",  0x18000, 0x8000, CRC(cedc9c61) SHA1(dbe5744f9b6f2a406b52b910dd4e133db7bce6b2) )
+	ROM_LOAD( "epr-11028.87",  0x00000, 0x8000, CRC(af0b3972) SHA1(413825f66b84c7e45aa1855131482abead8f7f3b) )
+	ROM_LOAD( "epr-11027.86",  0x08000, 0x8000, CRC(277d8f1d) SHA1(7854673503ed03d276abe971805a11f8c992f6d6) )
+	ROM_LOAD( "epr-11030.89",  0x10000, 0x8000, CRC(f05ffc76) SHA1(f3dbb518240f86430840c3d4cda04bac79c20f69) )
+	ROM_LOAD( "epr-11029.88",  0x18000, 0x8000, CRC(cedc9c61) SHA1(dbe5744f9b6f2a406b52b910dd4e133db7bce6b2) )
 
 	ROM_REGION( 0x0300, "palette", 0 )
 	ROM_LOAD( "pr11026.20",   0x0000, 0x0100, CRC(27057298) SHA1(654be7abb937bb0720263ee6512e31194662effe) )
@@ -4740,23 +4806,23 @@ ROM_END
 
 ROM_START( wbmljod )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "decrypted_epr11031.90",  0x00000, 0x8000, CRC(940b35bf) SHA1(b0e3b494d17cfad3b4bb1de996931ee813e91f92) )
-	ROM_LOAD( "decrypted_epr11032.91",  0x10000, 0x8000, CRC(1b158845) SHA1(26360f4bc2884746fbcc5fd6dc21fd848a3d2157) )
-	ROM_LOAD( "decrypted_epr11033.92",  0x18000, 0x8000, CRC(39e07286) SHA1(70192f03e52dd34c9fe5698a5ec1c24d3c58543c) )
+	ROM_LOAD( "decrypted_epr-11031.90",  0x00000, 0x8000, CRC(940b35bf) SHA1(b0e3b494d17cfad3b4bb1de996931ee813e91f92) )
+	ROM_LOAD( "decrypted_epr-11032.91",  0x10000, 0x8000, CRC(1b158845) SHA1(26360f4bc2884746fbcc5fd6dc21fd848a3d2157) )
+	ROM_LOAD( "decrypted_epr-11033.92",  0x18000, 0x8000, CRC(39e07286) SHA1(70192f03e52dd34c9fe5698a5ec1c24d3c58543c) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "epr11037.126", 0x0000, 0x8000, CRC(7a4ee585) SHA1(050436106cced5dcbf40a3d94d48202eedddc3ad) )
+	ROM_LOAD( "epr-11037.126", 0x0000, 0x8000, CRC(7a4ee585) SHA1(050436106cced5dcbf40a3d94d48202eedddc3ad) )
 
 	ROM_REGION( 0x18000, "tiles", 0 )
-	ROM_LOAD( "epr11034.4",   0x00000, 0x8000, CRC(37a2077d) SHA1(57f032a98022bf03ff98cb2e563178ba97e4b63c) )
-	ROM_LOAD( "epr11035.5",   0x08000, 0x8000, CRC(cdf2a21b) SHA1(db2553866f21e03bd9d668c179be3352adbaf8a6) )
-	ROM_LOAD( "epr11036.6",   0x10000, 0x8000, CRC(644687fa) SHA1(d6c5bc95da4fc7e81091dcfe6205b6f47d54af76) )
+	ROM_LOAD( "epr-11034.4",   0x00000, 0x8000, CRC(37a2077d) SHA1(57f032a98022bf03ff98cb2e563178ba97e4b63c) )
+	ROM_LOAD( "epr-11035.5",   0x08000, 0x8000, CRC(cdf2a21b) SHA1(db2553866f21e03bd9d668c179be3352adbaf8a6) )
+	ROM_LOAD( "epr-11036.6",   0x10000, 0x8000, CRC(644687fa) SHA1(d6c5bc95da4fc7e81091dcfe6205b6f47d54af76) )
 
 	ROM_REGION( 0x20000, "sprites", 0 )
-	ROM_LOAD( "epr11028.87",  0x00000, 0x8000, CRC(af0b3972) SHA1(413825f66b84c7e45aa1855131482abead8f7f3b) )
-	ROM_LOAD( "epr11027.86",  0x08000, 0x8000, CRC(277d8f1d) SHA1(7854673503ed03d276abe971805a11f8c992f6d6) )
-	ROM_LOAD( "epr11030.89",  0x10000, 0x8000, CRC(f05ffc76) SHA1(f3dbb518240f86430840c3d4cda04bac79c20f69) )
-	ROM_LOAD( "epr11029.88",  0x18000, 0x8000, CRC(cedc9c61) SHA1(dbe5744f9b6f2a406b52b910dd4e133db7bce6b2) )
+	ROM_LOAD( "epr-11028.87",  0x00000, 0x8000, CRC(af0b3972) SHA1(413825f66b84c7e45aa1855131482abead8f7f3b) )
+	ROM_LOAD( "epr-11027.86",  0x08000, 0x8000, CRC(277d8f1d) SHA1(7854673503ed03d276abe971805a11f8c992f6d6) )
+	ROM_LOAD( "epr-11030.89",  0x10000, 0x8000, CRC(f05ffc76) SHA1(f3dbb518240f86430840c3d4cda04bac79c20f69) )
+	ROM_LOAD( "epr-11029.88",  0x18000, 0x8000, CRC(cedc9c61) SHA1(dbe5744f9b6f2a406b52b910dd4e133db7bce6b2) )
 
 	ROM_REGION( 0x0300, "palette", 0 )
 	ROM_LOAD( "pr11026.20",   0x0000, 0x0100, CRC(27057298) SHA1(654be7abb937bb0720263ee6512e31194662effe) )
@@ -4778,18 +4844,18 @@ ROM_START( wbmljb )
 	ROM_CONTINUE(             0x18000, 0x8000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "epr11037.126", 0x0000, 0x8000, CRC(7a4ee585) SHA1(050436106cced5dcbf40a3d94d48202eedddc3ad) )
+	ROM_LOAD( "epr-11037.126", 0x0000, 0x8000, CRC(7a4ee585) SHA1(050436106cced5dcbf40a3d94d48202eedddc3ad) )
 
 	ROM_REGION( 0x18000, "tiles", 0 )
-	ROM_LOAD( "epr11034.4",   0x00000, 0x8000, CRC(37a2077d) SHA1(57f032a98022bf03ff98cb2e563178ba97e4b63c) )
-	ROM_LOAD( "epr11035.5",   0x08000, 0x8000, CRC(cdf2a21b) SHA1(db2553866f21e03bd9d668c179be3352adbaf8a6) )
-	ROM_LOAD( "epr11036.6",   0x10000, 0x8000, CRC(644687fa) SHA1(d6c5bc95da4fc7e81091dcfe6205b6f47d54af76) )
+	ROM_LOAD( "epr-11034.4",   0x00000, 0x8000, CRC(37a2077d) SHA1(57f032a98022bf03ff98cb2e563178ba97e4b63c) )
+	ROM_LOAD( "epr-11035.5",   0x08000, 0x8000, CRC(cdf2a21b) SHA1(db2553866f21e03bd9d668c179be3352adbaf8a6) )
+	ROM_LOAD( "epr-11036.6",   0x10000, 0x8000, CRC(644687fa) SHA1(d6c5bc95da4fc7e81091dcfe6205b6f47d54af76) )
 
 	ROM_REGION( 0x20000, "sprites", 0 )
-	ROM_LOAD( "epr11028.87",  0x00000, 0x8000, CRC(af0b3972) SHA1(413825f66b84c7e45aa1855131482abead8f7f3b) )
-	ROM_LOAD( "epr11027.86",  0x08000, 0x8000, CRC(277d8f1d) SHA1(7854673503ed03d276abe971805a11f8c992f6d6) )
-	ROM_LOAD( "epr11030.89",  0x10000, 0x8000, CRC(f05ffc76) SHA1(f3dbb518240f86430840c3d4cda04bac79c20f69) )
-	ROM_LOAD( "epr11029.88",  0x18000, 0x8000, CRC(cedc9c61) SHA1(dbe5744f9b6f2a406b52b910dd4e133db7bce6b2) )
+	ROM_LOAD( "epr-11028.87",  0x00000, 0x8000, CRC(af0b3972) SHA1(413825f66b84c7e45aa1855131482abead8f7f3b) )
+	ROM_LOAD( "epr-11027.86",  0x08000, 0x8000, CRC(277d8f1d) SHA1(7854673503ed03d276abe971805a11f8c992f6d6) )
+	ROM_LOAD( "epr-11030.89",  0x10000, 0x8000, CRC(f05ffc76) SHA1(f3dbb518240f86430840c3d4cda04bac79c20f69) )
+	ROM_LOAD( "epr-11029.88",  0x18000, 0x8000, CRC(cedc9c61) SHA1(dbe5744f9b6f2a406b52b910dd4e133db7bce6b2) )
 
 	ROM_REGION( 0x0300, "palette", 0 )
 	ROM_LOAD( "pr11026.20",   0x0000, 0x0100, CRC(27057298) SHA1(654be7abb937bb0720263ee6512e31194662effe) )
@@ -4810,7 +4876,7 @@ ROM_START( wbmlb )
 	ROM_CONTINUE(             0x18000, 0x8000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "epr11037.126", 0x0000, 0x8000, CRC(7a4ee585) SHA1(050436106cced5dcbf40a3d94d48202eedddc3ad) )
+	ROM_LOAD( "epr-11037.126", 0x0000, 0x8000, CRC(7a4ee585) SHA1(050436106cced5dcbf40a3d94d48202eedddc3ad) )
 
 	ROM_REGION( 0x18000, "tiles", 0 )
 	ROM_LOAD( "wbml.08",      0x00000, 0x8000, CRC(bbea6afe) SHA1(ba56c6789a35eb57cd226296ebf57e9aa19ba625) )
@@ -4818,10 +4884,10 @@ ROM_START( wbmlb )
 	ROM_LOAD( "wbml.10",      0x10000, 0x8000, CRC(a52ffbdd) SHA1(609375112268b770a798186697ecab5853f29f89) )
 
 	ROM_REGION( 0x20000, "sprites", 0 )
-	ROM_LOAD( "epr11028.87",  0x00000, 0x8000, CRC(af0b3972) SHA1(413825f66b84c7e45aa1855131482abead8f7f3b) )
-	ROM_LOAD( "epr11027.86",  0x08000, 0x8000, CRC(277d8f1d) SHA1(7854673503ed03d276abe971805a11f8c992f6d6) )
-	ROM_LOAD( "epr11030.89",  0x10000, 0x8000, CRC(f05ffc76) SHA1(f3dbb518240f86430840c3d4cda04bac79c20f69) )
-	ROM_LOAD( "epr11029.88",  0x18000, 0x8000, CRC(cedc9c61) SHA1(dbe5744f9b6f2a406b52b910dd4e133db7bce6b2) )
+	ROM_LOAD( "epr-11028.87",  0x00000, 0x8000, CRC(af0b3972) SHA1(413825f66b84c7e45aa1855131482abead8f7f3b) )
+	ROM_LOAD( "epr-11027.86",  0x08000, 0x8000, CRC(277d8f1d) SHA1(7854673503ed03d276abe971805a11f8c992f6d6) )
+	ROM_LOAD( "epr-11030.89",  0x10000, 0x8000, CRC(f05ffc76) SHA1(f3dbb518240f86430840c3d4cda04bac79c20f69) )
+	ROM_LOAD( "epr-11029.88",  0x18000, 0x8000, CRC(cedc9c61) SHA1(dbe5744f9b6f2a406b52b910dd4e133db7bce6b2) )
 
 	ROM_REGION( 0x0300, "palette", 0 )
 	ROM_LOAD( "pr11026.20",   0x0000, 0x0100, CRC(27057298) SHA1(654be7abb937bb0720263ee6512e31194662effe) )
@@ -4842,7 +4908,7 @@ ROM_START( wbmlbg )
 	ROM_RELOAD(               0x18000, 0x8000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "epr11037.126", 0x0000, 0x8000, CRC(7a4ee585) SHA1(050436106cced5dcbf40a3d94d48202eedddc3ad) )
+	ROM_LOAD( "epr-11037.126", 0x0000, 0x8000, CRC(7a4ee585) SHA1(050436106cced5dcbf40a3d94d48202eedddc3ad) )
 
 	ROM_REGION( 0x18000, "tiles", 0 )
 	ROM_LOAD( "galaxy.ic4", 0x00000, 0x8000, CRC(ab75d056) SHA1(d90d9c723536d0ec21900dc70b51715300b01fe7) )
@@ -4850,10 +4916,10 @@ ROM_START( wbmlbg )
 	ROM_LOAD( "galaxy.ic5", 0x10000, 0x8000, CRC(3c11d151) SHA1(7b0c6792ae919ac309a709ca0c89006487e1d6e9) )
 
 	ROM_REGION( 0x20000, "sprites", 0 )
-	ROM_LOAD( "epr11028.87",  0x00000, 0x8000, CRC(af0b3972) SHA1(413825f66b84c7e45aa1855131482abead8f7f3b) )
-	ROM_LOAD( "epr11027.86",  0x08000, 0x8000, CRC(277d8f1d) SHA1(7854673503ed03d276abe971805a11f8c992f6d6) )
-	ROM_LOAD( "epr11030.89",  0x10000, 0x8000, CRC(f05ffc76) SHA1(f3dbb518240f86430840c3d4cda04bac79c20f69) )
-	ROM_LOAD( "epr11029.88",  0x18000, 0x8000, CRC(cedc9c61) SHA1(dbe5744f9b6f2a406b52b910dd4e133db7bce6b2) )
+	ROM_LOAD( "epr-11028.87",  0x00000, 0x8000, CRC(af0b3972) SHA1(413825f66b84c7e45aa1855131482abead8f7f3b) )
+	ROM_LOAD( "epr-11027.86",  0x08000, 0x8000, CRC(277d8f1d) SHA1(7854673503ed03d276abe971805a11f8c992f6d6) )
+	ROM_LOAD( "epr-11030.89",  0x10000, 0x8000, CRC(f05ffc76) SHA1(f3dbb518240f86430840c3d4cda04bac79c20f69) )
+	ROM_LOAD( "epr-11029.88",  0x18000, 0x8000, CRC(cedc9c61) SHA1(dbe5744f9b6f2a406b52b910dd4e133db7bce6b2) )
 
 	ROM_REGION( 0x0300, "palette", 0 )
 	ROM_LOAD( "pr11026.20",   0x0000, 0x0100, CRC(27057298) SHA1(654be7abb937bb0720263ee6512e31194662effe) )
@@ -4907,7 +4973,7 @@ ROM_START( wbmlvc )
 	ROM_RELOAD(           0x18000, 0x8000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "epr11037.126", 0x0000, 0x8000, CRC(7a4ee585) SHA1(050436106cced5dcbf40a3d94d48202eedddc3ad) )
+	ROM_LOAD( "epr-11037.126", 0x0000, 0x8000, CRC(7a4ee585) SHA1(050436106cced5dcbf40a3d94d48202eedddc3ad) )
 
 	ROM_REGION( 0x18000, "tiles", 0 )
 	ROM_LOAD( "vc.ic4",   0x00000, 0x8000, CRC(820bee59) SHA1(47afff58387eb67a8b0849d74023bd2c176a45e9) )
@@ -4915,10 +4981,10 @@ ROM_START( wbmlvc )
 	ROM_LOAD( "vc.ic6",   0x10000, 0x8000, CRC(359026a0) SHA1(a20c801dbc758f172fcfc505a5083ddb76604243) )
 
 	ROM_REGION( 0x20000, "sprites", 0 )
-	ROM_LOAD( "epr11028.87",  0x00000, 0x8000, CRC(af0b3972) SHA1(413825f66b84c7e45aa1855131482abead8f7f3b) )
-	ROM_LOAD( "epr11027.86",  0x08000, 0x8000, CRC(277d8f1d) SHA1(7854673503ed03d276abe971805a11f8c992f6d6) )
-	ROM_LOAD( "epr11030.89",  0x10000, 0x8000, CRC(f05ffc76) SHA1(f3dbb518240f86430840c3d4cda04bac79c20f69) )
-	ROM_LOAD( "epr11029.88",  0x18000, 0x8000, CRC(cedc9c61) SHA1(dbe5744f9b6f2a406b52b910dd4e133db7bce6b2) )
+	ROM_LOAD( "epr-11028.87",  0x00000, 0x8000, CRC(af0b3972) SHA1(413825f66b84c7e45aa1855131482abead8f7f3b) )
+	ROM_LOAD( "epr-11027.86",  0x08000, 0x8000, CRC(277d8f1d) SHA1(7854673503ed03d276abe971805a11f8c992f6d6) )
+	ROM_LOAD( "epr-11030.89",  0x10000, 0x8000, CRC(f05ffc76) SHA1(f3dbb518240f86430840c3d4cda04bac79c20f69) )
+	ROM_LOAD( "epr-11029.88",  0x18000, 0x8000, CRC(cedc9c61) SHA1(dbe5744f9b6f2a406b52b910dd4e133db7bce6b2) )
 
 	ROM_REGION( 0x0300, "palette", 0 )
 	ROM_LOAD( "pr11026.20",   0x0000, 0x0100, CRC(27057298) SHA1(654be7abb937bb0720263ee6512e31194662effe) )
@@ -4936,7 +5002,7 @@ ROM_START( wbmlvcd )
 	ROM_LOAD( "wbmlvcd.ic92",  0x18000, 0x8000, CRC(ffb69e82) SHA1(0d48ce1e3cc02a992c495a92fec4e2d03fc27193) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "epr11037.126", 0x0000, 0x8000, CRC(7a4ee585) SHA1(050436106cced5dcbf40a3d94d48202eedddc3ad) )
+	ROM_LOAD( "epr-11037.126", 0x0000, 0x8000, CRC(7a4ee585) SHA1(050436106cced5dcbf40a3d94d48202eedddc3ad) )
 
 	ROM_REGION( 0x18000, "tiles", 0 )
 	ROM_LOAD( "vc.ic4",   0x00000, 0x8000, CRC(820bee59) SHA1(47afff58387eb67a8b0849d74023bd2c176a45e9) )
@@ -4944,10 +5010,10 @@ ROM_START( wbmlvcd )
 	ROM_LOAD( "vc.ic6",   0x10000, 0x8000, CRC(359026a0) SHA1(a20c801dbc758f172fcfc505a5083ddb76604243) )
 
 	ROM_REGION( 0x20000, "sprites", 0 )
-	ROM_LOAD( "epr11028.87",  0x00000, 0x8000, CRC(af0b3972) SHA1(413825f66b84c7e45aa1855131482abead8f7f3b) )
-	ROM_LOAD( "epr11027.86",  0x08000, 0x8000, CRC(277d8f1d) SHA1(7854673503ed03d276abe971805a11f8c992f6d6) )
-	ROM_LOAD( "epr11030.89",  0x10000, 0x8000, CRC(f05ffc76) SHA1(f3dbb518240f86430840c3d4cda04bac79c20f69) )
-	ROM_LOAD( "epr11029.88",  0x18000, 0x8000, CRC(cedc9c61) SHA1(dbe5744f9b6f2a406b52b910dd4e133db7bce6b2) )
+	ROM_LOAD( "epr-11028.87",  0x00000, 0x8000, CRC(af0b3972) SHA1(413825f66b84c7e45aa1855131482abead8f7f3b) )
+	ROM_LOAD( "epr-11027.86",  0x08000, 0x8000, CRC(277d8f1d) SHA1(7854673503ed03d276abe971805a11f8c992f6d6) )
+	ROM_LOAD( "epr-11030.89",  0x10000, 0x8000, CRC(f05ffc76) SHA1(f3dbb518240f86430840c3d4cda04bac79c20f69) )
+	ROM_LOAD( "epr-11029.88",  0x18000, 0x8000, CRC(cedc9c61) SHA1(dbe5744f9b6f2a406b52b910dd4e133db7bce6b2) )
 
 	ROM_REGION( 0x0300, "palette", 0 )
 	ROM_LOAD( "pr11026.20",   0x0000, 0x0100, CRC(27057298) SHA1(654be7abb937bb0720263ee6512e31194662effe) )
@@ -4996,26 +5062,26 @@ ROM_END
 
 ROM_START( ufosensi )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "epr11661.90",  0x00000, 0x8000, CRC(f3e394e2) SHA1(a295a2aa80a164a548995822c46f32fd9fad7a0b) ) /* encrypted */
-	ROM_LOAD( "epr11662.91",  0x10000, 0x8000, CRC(0c2e4120) SHA1(d81fbefa95868e3efd29ef3bacf108329781ca17) ) /* encrypted */
-	ROM_LOAD( "epr11663.92",  0x18000, 0x8000, CRC(4515ebae) SHA1(9b823f10999746292762c2f0a1ca9039efa22506) ) /* encrypted */
+	ROM_LOAD( "epr-11661.90",  0x00000, 0x8000, CRC(f3e394e2) SHA1(a295a2aa80a164a548995822c46f32fd9fad7a0b) ) /* encrypted */
+	ROM_LOAD( "epr-11662.91",  0x10000, 0x8000, CRC(0c2e4120) SHA1(d81fbefa95868e3efd29ef3bacf108329781ca17) ) /* encrypted */
+	ROM_LOAD( "epr-11663.92",  0x18000, 0x8000, CRC(4515ebae) SHA1(9b823f10999746292762c2f0a1ca9039efa22506) ) /* encrypted */
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) /* MC8123 key */
 	ROM_LOAD( "317-0064.key",  0x0000, 0x2000, CRC(da326f36) SHA1(0871b351379a094ac578e0eca5cb17797f9085aa) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "epr11667.126", 0x0000, 0x8000, CRC(110baba9) SHA1(e14cf5af11ac9691eca897bbae7c238665cd2a4d) )
+	ROM_LOAD( "epr-11667.126", 0x0000, 0x8000, CRC(110baba9) SHA1(e14cf5af11ac9691eca897bbae7c238665cd2a4d) )
 
 	ROM_REGION( 0x18000, "tiles", 0 )
-	ROM_LOAD( "epr11664.4",   0x00000, 0x8000, CRC(1b1bc3d5) SHA1(2a09e0dbe2d467c151dce705f249367df849eaeb) )
-	ROM_LOAD( "epr11665.5",   0x08000, 0x8000, CRC(3659174a) SHA1(176d2436abb45827a8d387241082854f55dc0314) )
-	ROM_LOAD( "epr11666.6",   0x10000, 0x8000, CRC(99dcc793) SHA1(ad1d0acb60e7c1a7016955e142ebca1cf07b4908) )
+	ROM_LOAD( "epr-11664.4",   0x00000, 0x8000, CRC(1b1bc3d5) SHA1(2a09e0dbe2d467c151dce705f249367df849eaeb) )
+	ROM_LOAD( "epr-11665.5",   0x08000, 0x8000, CRC(3659174a) SHA1(176d2436abb45827a8d387241082854f55dc0314) )
+	ROM_LOAD( "epr-11666.6",   0x10000, 0x8000, CRC(99dcc793) SHA1(ad1d0acb60e7c1a7016955e142ebca1cf07b4908) )
 
 	ROM_REGION( 0x20000, "sprites", 0 )
-	ROM_LOAD( "epr11658.87",  0x00000, 0x8000, CRC(3b5a20f7) SHA1(03e0934b0913c3a2cadf1d28b8a700d70b80fbac) )
-	ROM_LOAD( "epr11657.86",  0x08000, 0x8000, CRC(010f81a9) SHA1(1b7ee05c80edfa403e32c216fa69387ca556895e) )
-	ROM_LOAD( "epr11660.89",  0x10000, 0x8000, CRC(e1e2e7c5) SHA1(434039a70049a6e74e2a2f48b60345f720e6b1af) )
-	ROM_LOAD( "epr11659.88",  0x18000, 0x8000, CRC(286c7286) SHA1(449a19ea9a9f9df47005e8dac1b8eacaebc515e7) )
+	ROM_LOAD( "epr-11658.87",  0x00000, 0x8000, CRC(3b5a20f7) SHA1(03e0934b0913c3a2cadf1d28b8a700d70b80fbac) )
+	ROM_LOAD( "epr-11657.86",  0x08000, 0x8000, CRC(010f81a9) SHA1(1b7ee05c80edfa403e32c216fa69387ca556895e) )
+	ROM_LOAD( "epr-11660.89",  0x10000, 0x8000, CRC(e1e2e7c5) SHA1(434039a70049a6e74e2a2f48b60345f720e6b1af) )
+	ROM_LOAD( "epr-11659.88",  0x18000, 0x8000, CRC(286c7286) SHA1(449a19ea9a9f9df47005e8dac1b8eacaebc515e7) )
 
 	ROM_REGION( 0x0300, "palette", 0 )
 	ROM_LOAD( "pr11656.20",   0x0000, 0x0100, CRC(640740eb) SHA1(9a601a3665f612d00c70019d33c7abd3cca9434b) ) /* palette red component */
@@ -5036,18 +5102,18 @@ ROM_START( ufosensib )
 	ROM_CONTINUE(               0x18000, 0x8000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "epr11667.126", 0x0000, 0x8000, CRC(110baba9) SHA1(e14cf5af11ac9691eca897bbae7c238665cd2a4d) ) /* label on chip is "k111.ic168.10v" */
+	ROM_LOAD( "epr-11667.126", 0x0000, 0x8000, CRC(110baba9) SHA1(e14cf5af11ac9691eca897bbae7c238665cd2a4d) ) /* label on chip is "k111.ic168.10v" */
 
 	ROM_REGION( 0x18000, "tiles", 0 )
-	ROM_LOAD( "epr11664.4",   0x00000, 0x8000, CRC(1b1bc3d5) SHA1(2a09e0dbe2d467c151dce705f249367df849eaeb) ) /* label on chip is "k101.ic72.6d" */
-	ROM_LOAD( "epr11665.5",   0x08000, 0x8000, CRC(3659174a) SHA1(176d2436abb45827a8d387241082854f55dc0314) ) /* label on chip is "k102.ic73.6-7d" */
-	ROM_LOAD( "epr11666.6",   0x10000, 0x8000, CRC(99dcc793) SHA1(ad1d0acb60e7c1a7016955e142ebca1cf07b4908) ) /* label on chip is "k103.ic74.7d" */
+	ROM_LOAD( "epr-11664.4",   0x00000, 0x8000, CRC(1b1bc3d5) SHA1(2a09e0dbe2d467c151dce705f249367df849eaeb) ) /* label on chip is "k101.ic72.6d" */
+	ROM_LOAD( "epr-11665.5",   0x08000, 0x8000, CRC(3659174a) SHA1(176d2436abb45827a8d387241082854f55dc0314) ) /* label on chip is "k102.ic73.6-7d" */
+	ROM_LOAD( "epr-11666.6",   0x10000, 0x8000, CRC(99dcc793) SHA1(ad1d0acb60e7c1a7016955e142ebca1cf07b4908) ) /* label on chip is "k103.ic74.7d" */
 
 	ROM_REGION( 0x20000, "sprites", 0 )
-	ROM_LOAD( "epr11658.87",  0x00000, 0x8000, CRC(3b5a20f7) SHA1(03e0934b0913c3a2cadf1d28b8a700d70b80fbac) ) /* label on chip is "k105.ic15.1-2s" */
-	ROM_LOAD( "epr11657.86",  0x08000, 0x8000, CRC(010f81a9) SHA1(1b7ee05c80edfa403e32c216fa69387ca556895e) ) /* label on chip is "k104.ic14.1s" */
-	ROM_LOAD( "epr11660.89",  0x10000, 0x8000, CRC(e1e2e7c5) SHA1(434039a70049a6e74e2a2f48b60345f720e6b1af) ) /* label on chip is "k107.ic17.2-3s" */
-	ROM_LOAD( "epr11659.88",  0x18000, 0x8000, CRC(286c7286) SHA1(449a19ea9a9f9df47005e8dac1b8eacaebc515e7) ) /* label on chip is "k106.ic16.2s" */
+	ROM_LOAD( "epr-11658.87",  0x00000, 0x8000, CRC(3b5a20f7) SHA1(03e0934b0913c3a2cadf1d28b8a700d70b80fbac) ) /* label on chip is "k105.ic15.1-2s" */
+	ROM_LOAD( "epr-11657.86",  0x08000, 0x8000, CRC(010f81a9) SHA1(1b7ee05c80edfa403e32c216fa69387ca556895e) ) /* label on chip is "k104.ic14.1s" */
+	ROM_LOAD( "epr-11660.89",  0x10000, 0x8000, CRC(e1e2e7c5) SHA1(434039a70049a6e74e2a2f48b60345f720e6b1af) ) /* label on chip is "k107.ic17.2-3s" */
+	ROM_LOAD( "epr-11659.88",  0x18000, 0x8000, CRC(286c7286) SHA1(449a19ea9a9f9df47005e8dac1b8eacaebc515e7) ) /* label on chip is "k106.ic16.2s" */
 
 	ROM_REGION( 0x0300, "palette", 0 )
 	ROM_LOAD( "pr11656.20",   0x0000, 0x0100, CRC(640740eb) SHA1(9a601a3665f612d00c70019d33c7abd3cca9434b) ) /* palette red component - label on chip is "74s287.ic134.9f" */
@@ -5277,16 +5343,16 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(system1_state,bank00)
+void system1_state::init_bank00()
 {
 }
 
-DRIVER_INIT_MEMBER(system1_state,bank44)
+void system1_state::init_bank44()
 {
 	m_videomode_custom = &system1_state::bank44_custom_w;
 }
 
-DRIVER_INIT_MEMBER(system1_state,bank0c)
+void system1_state::init_bank0c()
 {
 	m_videomode_custom = &system1_state::bank0c_custom_w;
 }
@@ -5294,7 +5360,7 @@ DRIVER_INIT_MEMBER(system1_state,bank0c)
 
 
 
-DRIVER_INIT_MEMBER(system1_state,myherok)
+void system1_state::init_myherok()
 {
 	// extra layer of encryption applied BEFORE the usual CPU decryption
 	// probably bootleg?
@@ -5338,43 +5404,34 @@ DRIVER_INIT_MEMBER(system1_state,myherok)
 		}
 	}
 
-	DRIVER_INIT_CALL(bank00);
+	init_bank00();
 }
 
 
 
-
-
-
-
-DRIVER_INIT_MEMBER(system1_state,blockgal)
+void system1_state::init_blockgal()
 {
-	DRIVER_INIT_CALL(bank00);
+	init_bank00();
 	downcast<mc8123_device &>(*m_maincpu).decode(m_maincpu_region->base(), m_decrypted_opcodes, 0x8000);
 }
 
 
-
-
-
-
-DRIVER_INIT_MEMBER(system1_state,wbml)
+void system1_state::init_wbml()
 {
-	DRIVER_INIT_CALL(bank0c);
+	init_bank0c();
 	m_banked_decrypted_opcodes = std::make_unique<uint8_t[]>(m_maincpu_region->bytes());
 	downcast<mc8123_device &>(*m_maincpu).decode(m_maincpu_region->base(), m_banked_decrypted_opcodes.get(), m_maincpu_region->bytes());
 }
 
-DRIVER_INIT_MEMBER(system1_state,ufosensi)
+void system1_state::init_tokisens()
 {
-	DRIVER_INIT_CALL(bank0c);
-	m_banked_decrypted_opcodes = std::make_unique<uint8_t[]>(m_maincpu_region->bytes());
-	downcast<mc8123_device &>(*m_maincpu).decode(m_maincpu_region->base(), m_banked_decrypted_opcodes.get(), m_maincpu_region->bytes());
+	// HACK otherwise player dies in attract mode and game gives a continue screen, probably the other Z80 timing kludges aren't quite accurate (or the encrypted CPU differs)
+	// could also be different screen refresh, or even just exactly when the first interrupt occurs
+	m_maincpu->set_clock_scale(1.07f);
+	init_wbml();
 }
 
-
-
-DRIVER_INIT_MEMBER(system1_state,dakkochn)
+void system1_state::init_dakkochn()
 {
 	m_videomode_custom = &system1_state::dakkochn_custom_w;
 	m_banked_decrypted_opcodes = std::make_unique<uint8_t[]>(m_maincpu_region->bytes());
@@ -5389,24 +5446,24 @@ READ8_MEMBER(system1_state::nob_start_r)
 	return (m_maincpu->pc() <= 0x0003) ? 0x80 : m_maincpu_region->base()[1];
 }
 
-DRIVER_INIT_MEMBER(system1_state,nob)
+void system1_state::init_nob()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	address_space &iospace = m_maincpu->space(AS_IO);
 
-	DRIVER_INIT_CALL(bank44);
+	init_bank44();
 
 	/* hack to fix incorrect JMP at start, which should obviously be to $0080 */
 	/* patching the ROM causes errors in the self-test */
 	/* in real-life, it could be some behavior dependent upon M1 */
-	space.install_read_handler(0x0001, 0x0001, read8_delegate(FUNC(system1_state::nob_start_r),this));
+	space.install_read_handler(0x0001, 0x0001, read8_delegate(*this, FUNC(system1_state::nob_start_r)));
 
 	/* install MCU communications */
-	iospace.install_readwrite_handler(0x18, 0x18, read8_delegate(FUNC(system1_state::nob_maincpu_latch_r),this), write8_delegate(FUNC(system1_state::nob_maincpu_latch_w),this));
-	iospace.install_read_handler(0x1c, 0x1c, read8_delegate(FUNC(system1_state::nob_mcu_status_r),this));
+	iospace.install_readwrite_handler(0x18, 0x18, read8_delegate(*this, FUNC(system1_state::nob_maincpu_latch_r)), write8_delegate(*this, FUNC(system1_state::nob_maincpu_latch_w)));
+	iospace.install_read_handler(0x1c, 0x1c, read8_delegate(*this, FUNC(system1_state::nob_mcu_status_r)));
 }
 
-DRIVER_INIT_MEMBER(system1_state,nobb)
+void system1_state::init_nobb()
 {
 	/* Patch to get PRG ROMS ('T', 'R' and 'S) status as "GOOD" in the "test mode" */
 	/* not really needed */
@@ -5428,57 +5485,44 @@ DRIVER_INIT_MEMBER(system1_state,nobb)
 
 	ROM2[0x02f9] = 0x28;//'jr z' instead of 'jr'
 
-	DRIVER_INIT_CALL(bank44);
+	init_bank44();
 
-	iospace.install_read_handler(0x1c, 0x1c, read8_delegate(FUNC(system1_state::nobb_inport1c_r),this));
-	iospace.install_read_handler(0x02, 0x02, read8_delegate(FUNC(system1_state::nobb_inport22_r),this));
-	iospace.install_read_handler(0x03, 0x03, read8_delegate(FUNC(system1_state::nobb_inport23_r),this));
-	iospace.install_write_handler(0x04, 0x04, write8_delegate(FUNC(system1_state::nobb_outport24_w),this));
+	iospace.install_read_handler(0x1c, 0x1c, read8_delegate(*this, FUNC(system1_state::nobb_inport1c_r)));
+	iospace.install_read_handler(0x02, 0x02, read8_delegate(*this, FUNC(system1_state::nobb_inport22_r)));
+	iospace.install_read_handler(0x03, 0x03, read8_delegate(*this, FUNC(system1_state::nobb_inport23_r)));
+	iospace.install_write_handler(0x04, 0x04, write8_delegate(*this, FUNC(system1_state::nobb_outport24_w)));
 }
 
 
-DRIVER_INIT_MEMBER(system1_state,bootleg)
+void system1_state::init_bootleg()
 {
-	DRIVER_INIT_CALL(bank00);
+	init_bank00();
 	memcpy(m_decrypted_opcodes, m_maincpu_region->base() + 0x10000, 0x8000);
 }
 
 
-DRIVER_INIT_MEMBER(system1_state,bootsys2)
+void system1_state::init_bootsys2()
 {
-	DRIVER_INIT_CALL(bank0c);
+	init_bank0c();
 	m_bank0d->set_base(m_maincpu_region->base() + 0x20000);
 	m_bank1d->configure_entries(0, 4, m_maincpu_region->base() + 0x30000, 0x4000);
 }
 
-DRIVER_INIT_MEMBER(system1_state,bootsys2d)
+void system1_state::init_bootsys2d()
 {
-	DRIVER_INIT_CALL(bank0c);
+	init_bank0c();
 	m_bank0d->set_base(m_maincpu_region->base());
 	m_bank1d->configure_entries(0, 4, m_maincpu_region->base() + 0x10000, 0x4000);
 }
 
-
-DRIVER_INIT_MEMBER(system1_state,choplift)
-{
-	uint8_t *mcurom = memregion("mcu")->base();
-
-	/* the ROM dump we have is bad; the following patches make it work */
-	mcurom[0x100] = 0x55;       /* D5 in current dump */
-	mcurom[0x27b] = 0xfb;       /* F2 in current dump */
-	mcurom[0x2ff] = 0xff - 9;   /* fix up checksum; means there's still something incorrect */
-
-	DRIVER_INIT_CALL(bank0c);
-}
-
-DRIVER_INIT_MEMBER(system1_state,shtngmst)
+void system1_state::init_shtngmst()
 {
 	address_space &iospace = m_maincpu->space(AS_IO);
 	iospace.install_read_port(0x12, 0x12, "TRIGGER");
 	iospace.install_read_port(0x18, 0x18, 0x03, "18");
-	iospace.install_read_handler(0x1c, 0x1c, 0, 0x02, 0, read8_delegate(FUNC(system1_state::shtngmst_gunx_r),this));
+	iospace.install_read_handler(0x1c, 0x1c, 0, 0x02, 0, read8_delegate(*this, FUNC(system1_state::shtngmst_gunx_r)));
 	iospace.install_read_port(0x1d, 0x1d, 0x02, "GUNY");
-	DRIVER_INIT_CALL(bank0c);
+	init_bank0c();
 }
 
 
@@ -5490,93 +5534,95 @@ DRIVER_INIT_MEMBER(system1_state,shtngmst)
  *************************************/
 
 /* PPI-based System 1 */
-GAME( 1983, starjack,   0,        sys1ppis,          starjack,  system1_state, bank00,       ROT270, "Sega", "Star Jacker (Sega)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, starjacks,  starjack, sys1ppis,          starjacks, system1_state, bank00,       ROT270, "Sega (Stern Electronics license)", "Star Jacker (Stern Electronics)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, upndown,    0,        sys1ppix_315_5098, upndown,   system1_state, bank00,       ROT270, "Sega", "Up'n Down (315-5030)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, upndownu,   upndown,  sys1ppi,           upndown,   system1_state, bank00,       ROT270, "Sega", "Up'n Down (not encrypted)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, regulus,    0,        sys1ppix_315_5033, regulus,   system1_state, bank00,       ROT270, "Sega", "Regulus (315-5033, Rev A.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, reguluso,   regulus,  sys1ppix_315_5033, reguluso,  system1_state, bank00,       ROT270, "Sega", "Regulus (315-5033)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, regulusu,   regulus,  sys1ppi,           regulus,   system1_state, bank00,       ROT270, "Sega", "Regulus (not encrypted)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, mrviking,   0,        sys1ppisx_315_5041,mrviking,  system1_state, bank00,       ROT270, "Sega", "Mister Viking (315-5041)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, mrvikingj,  mrviking, sys1ppisx_315_5041,mrvikingj, system1_state, bank00,       ROT270, "Sega", "Mister Viking (315-5041, Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, swat,       0,        sys1ppix_315_5048, swat,      system1_state, bank00,       ROT270, "Coreland / Sega", "SWAT (315-5048)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, flickyo,    flicky,   sys1ppix_315_5051, flicky,    system1_state, bank00,       ROT0,   "Sega", "Flicky (64k Version, 315-5051, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, flickys1,   flicky,   sys1ppix_315_5051, flickys1,  system1_state, bank00,       ROT0,   "Sega", "Flicky (64k Version, 315-5051, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, wmatch,     0,        sys1ppisx_315_5064,wmatch,    system1_state, bank00,       ROT270, "Sega", "Water Match (315-5064)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, bullfgt,    0,        sys1ppix_315_5065, bullfgt,   system1_state, bank00,       ROT0,   "Coreland / Sega", "Bullfight (315-5065)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, nprinces,   seganinj, sys1ppix_315_5051, seganinj,  system1_state, bank00,       ROT0,   "bootleg?", "Ninja Princess (315-5051, 64k Ver. bootleg?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, nprincesu,  seganinj, sys1ppi,           seganinj,  system1_state, bank00,       ROT0,   "Sega", "Ninja Princess (64k Ver. not encrypted)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, wboy2,      wboy,     sys1ppix_315_5178, wboy,      system1_state, bank00,       ROT0,   "Escape (Sega license)", "Wonder Boy (set 2, 315-5178)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, wboy2u,     wboy,     sys1ppi,           wboy,      system1_state, bank00,       ROT0,   "Escape (Sega license)", "Wonder Boy (set 2, not encrypted)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, wboy6,      wboy,     sys1ppix_315_5179, wboy,      system1_state, bank00,       ROT0,   "Escape (Sega license)", "Wonder Boy (set 6, 315-5179)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, wbdeluxe,   wboy,     sys1ppi,           wbdeluxe,  system1_state, bank00,       ROT0,   "Escape (Sega license)", "Wonder Boy Deluxe", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, nob,        0,        nobm,              nob,       system1_state, nob,          ROT270, "Coreland / Data East Corporation", "Noboranka (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, nobb,       nob,      nob,               nob,       system1_state, nobb,         ROT270, "bootleg (Game Electronics)", "Noboranka (Japan, bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, starjack,   0,        sys1ppis,          starjack,  system1_state, init_bank00,       ROT270, "Sega", "Star Jacker (Sega)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, starjacks,  starjack, sys1ppis,          starjacks, system1_state, init_bank00,       ROT270, "Sega (Stern Electronics license)", "Star Jacker (Stern Electronics)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, upndown,    0,        sys1ppix_315_5098, upndown,   system1_state, init_bank00,       ROT270, "Sega", "Up'n Down (315-5030)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, upndownu,   upndown,  sys1ppi,           upndown,   system1_state, init_bank00,       ROT270, "Sega", "Up'n Down (not encrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, regulus,    0,        sys1ppix_315_5033, regulus,   system1_state, init_bank00,       ROT270, "Sega", "Regulus (315-5033, Rev A.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, reguluso,   regulus,  sys1ppix_315_5033, reguluso,  system1_state, init_bank00,       ROT270, "Sega", "Regulus (315-5033)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, regulusu,   regulus,  sys1ppi,           regulus,   system1_state, init_bank00,       ROT270, "Sega", "Regulus (not encrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, mrviking,   0,        sys1ppisx_315_5041,mrviking,  system1_state, init_bank00,       ROT270, "Sega", "Mister Viking (315-5041)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, mrvikingj,  mrviking, sys1ppisx_315_5041,mrvikingj, system1_state, init_bank00,       ROT270, "Sega", "Mister Viking (315-5041, Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, swat,       0,        sys1ppix_315_5048, swat,      system1_state, init_bank00,       ROT270, "Coreland / Sega", "SWAT (315-5048)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, flickyo,    flicky,   sys1ppix_315_5051, flicky,    system1_state, init_bank00,       ROT0,   "Sega", "Flicky (64k Version, 315-5051, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, flickys1,   flicky,   sys1ppix_315_5051, flickys1,  system1_state, init_bank00,       ROT0,   "Sega", "Flicky (64k Version, 315-5051, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, flickyup,   flicky,   sys1ppix_315_5051, flicky,    system1_state, init_bank00,       ROT0,   "Sega", "Flicky (64k Version, on Up'n Down boardset)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, wmatch,     0,        sys1ppisx_315_5064,wmatch,    system1_state, init_bank00,       ROT270, "Sega", "Water Match (315-5064)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, bullfgt,    0,        sys1ppix_315_5065, bullfgt,   system1_state, init_bank00,       ROT0,   "Coreland / Sega", "Bullfight (315-5065)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, nprinces,   seganinj, sys1ppix_315_5051, seganinj,  system1_state, init_bank00,       ROT0,   "bootleg?", "Ninja Princess (315-5051, 64k Ver. bootleg?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, nprincesu,  seganinj, sys1ppi,           seganinj,  system1_state, init_bank00,       ROT0,   "Sega", "Ninja Princess (64k Ver. not encrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, wboy2,      wboy,     sys1ppix_315_5178, wboy,      system1_state, init_bank00,       ROT0,   "Escape (Sega license)", "Wonder Boy (set 2, 315-5178)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, wboy2u,     wboy,     sys1ppi,           wboy,      system1_state, init_bank00,       ROT0,   "Escape (Sega license)", "Wonder Boy (set 2, not encrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, wboy6,      wboy,     sys1ppix_315_5179, wboy,      system1_state, init_bank00,       ROT0,   "Escape (Sega license)", "Wonder Boy (set 6, 315-5179)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, wbdeluxe,   wboy,     sys1ppi,           wbdeluxe,  system1_state, init_bank00,       ROT0,   "hack (Vision Electronics)", "Wonder Boy Deluxe", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, nob,        0,        nobm,              nob,       system1_state, init_nob,          ROT270, "Coreland / Data East Corporation", "Noboranka (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, nobb,       nob,      nob,               nob,       system1_state, init_nobb,         ROT270, "bootleg (Game Electronics)", "Noboranka (Japan, bootleg)", MACHINE_SUPPORTS_SAVE )
 
 /* PIO-based System 1 */
-GAME( 1984, flicky,     0,        sys1piox_315_5051, flicky,    system1_state, bank00,       ROT0,   "Sega", "Flicky (128k Version, 315-5051)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, flickya,    flicky,   sys1piox_315_5051, flicky,    system1_state, bank00,       ROT0,   "Sega", "Flicky (128k Version, 315-5051, larger roms)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, flickys2,   flicky,   sys1pio,           flickys2,  system1_state, bank00,       ROT0,   "Sega", "Flicky (128k Version, not encrypted)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, thetogyu,   bullfgt,  sys1piox_315_5065, bullfgt,   system1_state, bank00,       ROT0,   "Coreland / Sega", "The Togyu (315-5065, Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, spatter,    0,        sys1piosx_315_spat,spatter,   system1_state, bank00,       ROT0,   "Sega", "Spatter (315-xxxx)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, spattera,   spatter,  sys1piosx_315_5099,spatter,   system1_state, bank00,       ROT0,   "Sega", "Spatter (315-5099)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, ssanchan,   spatter,  sys1piosx_315_spat,spatter,   system1_state, bank00,       ROT0,   "Sega", "Sanrin San Chan (Japan, 315-xxxx)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, pitfall2,   0,        sys1piox_315_5093, pitfall2,  system1_state, bank00,       ROT0,   "Sega", "Pitfall II (315-5093)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, pitfall2a,  pitfall2, sys1piox_315_5093, pitfall2,  system1_state, bank00,       ROT0,   "Sega", "Pitfall II (315-5093, Flicky Conversion)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, pitfall2u,  pitfall2, sys1pio,           pitfall2u, system1_state, bank00,       ROT0,   "Sega", "Pitfall II (not encrypted)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, seganinj,   0,        sys1piox_315_5102, seganinj,  system1_state, bank00,       ROT0,   "Sega", "Sega Ninja (315-5102)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, seganinju,  seganinj, sys1pio,           seganinj,  system1_state, bank00,       ROT0,   "Sega", "Sega Ninja (not encrypted)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, seganinja,  seganinj, sys1piox_315_5133, seganinj,  system1_state, bank00,       ROT0,   "Sega", "Sega Ninja (315-5113)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, ninja,      seganinj, sys1piox_315_5102, seganinj,  system1_state, bank00,       ROT0,   "Sega", "Ninja (315-5102)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, nprinceso,  seganinj, sys1piox_315_5098, seganinj,  system1_state, bank00,       ROT0,   "Sega", "Ninja Princess (315-5098, 128k Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, nprincesb,  seganinj, sys1piox_315_5051, seganinj,  system1_state, bank00,       ROT0,   "bootleg?", "Ninja Princess (315-5051?, 128k Ver. bootleg?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, imsorry,    0,        sys1piox_315_5110, imsorry,   system1_state, bank00,       ROT0,   "Coreland / Sega", "I'm Sorry (315-5110, US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, imsorryj,   imsorry,  sys1piox_315_5110, imsorry,   system1_state, bank00,       ROT0,   "Coreland / Sega", "Gonbee no I'm Sorry (315-5110, Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, teddybb,    0,        sys1piox_315_5155, teddybb,   system1_state, bank00,       ROT0,   "Sega", "TeddyBoy Blues (315-5115, New Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, teddybbo,   teddybb,  sys1piox_315_5155, teddybb,   system1_state, bank00,       ROT0,   "Sega", "TeddyBoy Blues (315-5115, Old Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, teddybbobl, teddybb,  sys1piox_315_5155, teddybb,   system1_state, bank00,       ROT0,   "bootleg", "TeddyBoy Blues (Old Ver. bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, myhero,     0,        sys1pio,           myhero,    system1_state, bank00,       ROT0,   "Coreland / Sega", "My Hero (US, not encrypted)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, sscandal,   myhero,   sys1piox_315_5132, myhero,    system1_state, bank00,       ROT0,   "Coreland / Sega", "Seishun Scandal (315-5132, Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, myherobl,   myhero,   sys1piox_315_5132, myhero,    system1_state, bank00,       ROT0,   "bootleg",         "My Hero (bootleg, 315-5132 encryption)", MACHINE_SUPPORTS_SAVE ) // cloned 315-5132 encryption? might be a direct copy of an undumped original set
-GAME( 1985, myherok,    myhero,   sys1piox_315_5132, myhero,    system1_state, myherok,      ROT0,   "Coreland / Sega", "My Hero (Korea)", MACHINE_SUPPORTS_SAVE ) // possible bootleg, has extra encryption
-GAME( 1985, 4dwarrio,   0,        sys1piox_315_5162, 4dwarrio,  system1_state, bank00,       ROT0,   "Coreland / Sega", "4-D Warriors (315-5162)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, raflesia,   0,        sys1piox_315_5162, raflesia,  system1_state, bank00,       ROT270, "Coreland / Sega", "Rafflesia (315-5162)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, wboy,       0,        sys1piox_315_5177, wboy,      system1_state, bank00,       ROT0,   "Escape (Sega license)", "Wonder Boy (set 1, 315-5177)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, wboyo,      wboy,     sys1piox_315_5135, wboy,      system1_state, bank00,       ROT0,   "Escape (Sega license)", "Wonder Boy (set 2, 315-5135)", MACHINE_SUPPORTS_SAVE ) // aka 317-0003
-GAME( 1986, wboy3,      wboy,     sys1piox_315_5135, wboy3,     system1_state, bank00,       ROT0,   "Escape (Sega license)", "Wonder Boy (set 3, 315-5135)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, wboy4,      wboy,     sys1piox_315_5162, wboy,      system1_state, bank00,       ROT0,   "Escape (Sega license)", "Wonder Boy (315-5162, 4-D Warriors Conversion)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, wboyu,      wboy,     sys1pio,           wboyu,     system1_state, bank00,       ROT0,   "Escape (Sega license)", "Wonder Boy (prototype?)", MACHINE_SUPPORTS_SAVE ) // appears to be a very early / unfinished version.
-GAME( 1986, wboy5,      wboy,     sys1piox_315_5135, wboy3,     system1_state, bank00,       ROT0,   "bootleg", "Wonder Boy (set 5, bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, wboyub,     wboy,     sys1piox_315_5177, wboy,      system1_state, bank00,       ROT0,   "bootleg", "Wonder Boy (US bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, blockgal,   0,        sys1pioxb,         blockgal,  system1_state, blockgal,     ROT90,  "Sega / Vic Tokai","Block Gal (MC-8123B, 317-0029)", MACHINE_SUPPORTS_SAVE)
+GAME( 1984, flicky,     0,        sys1piox_315_5051, flicky,    system1_state, init_bank00,       ROT0,   "Sega", "Flicky (128k Version, 315-5051)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, flickya,    flicky,   sys1piox_315_5051, flicky,    system1_state, init_bank00,       ROT0,   "Sega", "Flicky (128k Version, 315-5051, larger roms)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, flickys2,   flicky,   sys1pio,           flickys2,  system1_state, init_bank00,       ROT0,   "Sega", "Flicky (128k Version, not encrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, thetogyu,   bullfgt,  sys1piox_315_5065, bullfgt,   system1_state, init_bank00,       ROT0,   "Coreland / Sega", "The Togyu (315-5065, Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, spatter,    0,        sys1piosx_315_spat,spatter,   system1_state, init_bank00,       ROT0,   "Sega", "Spatter (315-5xxx)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, spattera,   spatter,  sys1piosx_315_5099,spatter,   system1_state, init_bank00,       ROT0,   "Sega", "Spatter (315-5099)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, ssanchan,   spatter,  sys1piosx_315_spat,spatter,   system1_state, init_bank00,       ROT0,   "Sega", "Sanrin San Chan (Japan, 315-5xxx)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pitfall2,   0,        sys1piox_315_5093, pitfall2,  system1_state, init_bank00,       ROT0,   "Sega", "Pitfall II (315-5093)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pitfall2a,  pitfall2, sys1piox_315_5093, pitfall2,  system1_state, init_bank00,       ROT0,   "Sega", "Pitfall II (315-5093, Flicky Conversion)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pitfall2u,  pitfall2, sys1pio,           pitfall2u, system1_state, init_bank00,       ROT0,   "Sega", "Pitfall II (not encrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, seganinj,   0,        sys1piox_315_5102, seganinj,  system1_state, init_bank00,       ROT0,   "Sega", "Sega Ninja (315-5102)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, seganinju,  seganinj, sys1pio,           seganinj,  system1_state, init_bank00,       ROT0,   "Sega", "Sega Ninja (not encrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, seganinja,  seganinj, sys1piox_315_5133, seganinj,  system1_state, init_bank00,       ROT0,   "Sega", "Sega Ninja (315-5113)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, ninja,      seganinj, sys1piox_315_5102, seganinj,  system1_state, init_bank00,       ROT0,   "Sega", "Ninja (315-5102)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, nprinceso,  seganinj, sys1piox_315_5098, seganinj,  system1_state, init_bank00,       ROT0,   "Sega", "Ninja Princess (315-5098, 128k Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, nprincesb,  seganinj, sys1piox_315_5051, seganinj,  system1_state, init_bank00,       ROT0,   "bootleg?", "Ninja Princess (315-5051?, 128k Ver. bootleg?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, imsorry,    0,        sys1piox_315_5110, imsorry,   system1_state, init_bank00,       ROT0,   "Coreland / Sega", "I'm Sorry (315-5110, US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, imsorryj,   imsorry,  sys1piox_315_5110, imsorry,   system1_state, init_bank00,       ROT0,   "Coreland / Sega", "Gonbee no I'm Sorry (315-5110, Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, teddybb,    0,        sys1piox_315_5155, teddybb,   system1_state, init_bank00,       ROT0,   "Sega", "TeddyBoy Blues (315-5115, New Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, teddybbo,   teddybb,  sys1piox_315_5155, teddybb,   system1_state, init_bank00,       ROT0,   "Sega", "TeddyBoy Blues (315-5115, Old Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, teddybbobl, teddybb,  sys1piox_315_5155, teddybb,   system1_state, init_bank00,       ROT0,   "bootleg", "TeddyBoy Blues (Old Ver. bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, myhero,     0,        sys1pio,           myhero,    system1_state, init_bank00,       ROT0,   "Coreland / Sega", "My Hero (US, not encrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, sscandal,   myhero,   sys1piox_315_5132, myhero,    system1_state, init_bank00,       ROT0,   "Coreland / Sega", "Seishun Scandal (315-5132, Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, myherobl,   myhero,   sys1piox_315_5132, myhero,    system1_state, init_bank00,       ROT0,   "bootleg",         "My Hero (bootleg, 315-5132 encryption)", MACHINE_SUPPORTS_SAVE ) // cloned 315-5132 encryption? might be a direct copy of an undumped original set
+GAME( 1985, myherok,    myhero,   sys1piox_315_5132, myhero,    system1_state, init_myherok,      ROT0,   "Coreland / Sega", "My Hero (Korea)", MACHINE_SUPPORTS_SAVE ) // possible bootleg, has extra encryption
+GAME( 1985, 4dwarrio,   0,        sys1piox_315_5162, 4dwarrio,  system1_state, init_bank00,       ROT0,   "Coreland / Sega", "4-D Warriors (315-5162)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, raflesia,   0,        sys1piox_315_5162, raflesia,  system1_state, init_bank00,       ROT270, "Coreland / Sega", "Rafflesia (315-5162)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, wboy,       0,        sys1piox_315_5177, wboy,      system1_state, init_bank00,       ROT0,   "Escape (Sega license)", "Wonder Boy (set 1, 315-5177)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, wboyo,      wboy,     sys1piox_315_5135, wboy,      system1_state, init_bank00,       ROT0,   "Escape (Sega license)", "Wonder Boy (set 2, 315-5135)", MACHINE_SUPPORTS_SAVE ) // aka 317-0003
+GAME( 1986, wboy3,      wboy,     sys1piox_315_5135, wboy3,     system1_state, init_bank00,       ROT0,   "Escape (Sega license)", "Wonder Boy (set 3, 315-5135)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, wboy4,      wboy,     sys1piox_315_5162, wboy,      system1_state, init_bank00,       ROT0,   "Escape (Sega license)", "Wonder Boy (315-5162, 4-D Warriors Conversion)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, wboyu,      wboy,     sys1pio,           wboyu,     system1_state, init_bank00,       ROT0,   "Escape (Sega license)", "Wonder Boy (prototype?)", MACHINE_SUPPORTS_SAVE ) // appears to be a very early / unfinished version.
+GAME( 1986, wboy5,      wboy,     sys1piox_315_5135, wboy3,     system1_state, init_bank00,       ROT0,   "bootleg", "Wonder Boy (set 5, bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, wboyub,     wboy,     sys1piox_315_5177, wboy,      system1_state, init_bank00,       ROT0,   "bootleg", "Wonder Boy (US bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, blockgal,   0,        sys1pioxb,         blockgal,  system1_state, init_blockgal,     ROT90,  "Sega / Vic Tokai","Block Gal (MC-8123B, 317-0029)", MACHINE_SUPPORTS_SAVE)
 
 /* PIO-based System 1 with ROM banking */
-GAME( 1985, hvymetal,   0,        sys1piox_315_5135, hvymetal,  system1_state, bank44,       ROT0,   "Sega", "Heavy Metal (315-5135)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, gardia,     0,        sys1piox_317_0006, gardia,    system1_state, bank44,       ROT270, "Coreland / Sega", "Gardia (317-0006)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE)
-GAME( 1986, brain,      0,        sys1pio,           brain,     system1_state, bank44,       ROT0,   "Coreland / Sega", "Brain", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, hvymetal,   0,        sys1piox_315_5135, hvymetal,  system1_state, init_bank44,       ROT0,   "Sega", "Heavy Metal (315-5135)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, gardia,     0,        sys1piox_317_0006, gardia,    system1_state, init_bank44,       ROT270, "Coreland / Sega", "Gardia (317-0006)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE)
+GAME( 1986, brain,      0,        sys1pio,           brain,     system1_state, init_bank44,       ROT0,   "Coreland / Sega", "Brain", MACHINE_SUPPORTS_SAVE )
 
 /* System 2 */
-GAME( 1985, choplift,   0,        sys2rowm,          choplift,  system1_state, choplift,     ROT0,   "Sega (licensed from Dan Gorlin)", "Choplifter (8751 315-5151)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, chopliftu,  choplift, sys2row,           choplift,  system1_state, bank0c,       ROT0,   "Sega (licensed from Dan Gorlin)", "Choplifter (unprotected)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, chopliftbl, choplift, sys2row,           choplift,  system1_state, bank0c,       ROT0,   "bootleg", "Choplifter (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, shtngmst,   0,        sys2m,             shtngmst,  system1_state, shtngmst,     ROT0,   "Sega", "Shooting Master (8751 315-5159)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1985, shtngmste,  shtngmst, sys2m,             shtngmst,  system1_state, shtngmst,     ROT0,   "Sega / EVG", "Shooting Master (EVG, 8751 315-5159a)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, gardiab,    gardia,   sys2_317_0007,     gardia,    system1_state, bank44,       ROT270, "bootleg", "Gardia (317-0007?, bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, gardiaj,    gardia,   sys2_317_0006,     gardia,    system1_state, bank44,       ROT270, "Coreland / Sega", "Gardia (Japan, 317-0006)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, wboysys2,   wboy,     sys2_315_5177,     wboysys2,  system1_state, bank0c,       ROT0,   "Escape (Sega license)", "Wonder Boy (system 2, set 1, 315-5177)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, wboysys2a,  wboy,     sys2_315_5176,     wboysys2,  system1_state, bank0c,       ROT0,   "Escape (Sega license)", "Wonder Boy (system 2, set 2, 315-5176)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, tokisens,   0,        sys2,              tokisens,  system1_state, bank0c,       ROT90,  "Sega", "Toki no Senshi - Chrono Soldier", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, wbml,       0,        sys2xb,            wbml,      system1_state, wbml,         ROT0,   "Sega / Westone", "Wonder Boy in Monster Land (Japan New Ver., MC-8123, 317-0043)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, wbmljo,     wbml,     sys2xb,            wbml,      system1_state, wbml,         ROT0,   "Sega / Westone", "Wonder Boy in Monster Land (Japan Old Ver., MC-8123, 317-0043)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, wbmljb,     wbml,     sys2xboot,         wbml,      system1_state, bootsys2,     ROT0,   "bootleg", "Wonder Boy in Monster Land (Japan bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, wbmlb,      wbml,     sys2xboot,         wbml,      system1_state, bootsys2,     ROT0,   "bootleg", "Wonder Boy in Monster Land (English bootleg set 1)", MACHINE_SUPPORTS_SAVE)
-GAME( 1987, wbmlbg,     wbml,     sys2xboot,         wbml,      system1_state, bootsys2,     ROT0,   "bootleg (Galaxy Electronics)", "Wonder Boy in Monster Land (English bootleg set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, wbmlbge,    wbml,     sys2xboot,         wbml,      system1_state, bootsys2,     ROT0,   "bootleg (Gecas)", "Wonder Boy in Monster Land (English bootleg set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 2009, wbmlvc,     wbml,     sys2xboot,         wbml,      system1_state, bootsys2,     ROT0,   "Sega", "Wonder Boy in Monster Land (English, Virtual Console)", MACHINE_SUPPORTS_SAVE )
-GAME( 2009, wbmlvcd,    wbml,     sys2xboot,         wbml,      system1_state, bootsys2d,    ROT0,   "bootleg (mpatou)", "Wonder Boy in Monster Land (decrypted bootleg of English, Virtual Console release)", MACHINE_SUPPORTS_SAVE ) // fully decrypted version
-GAME( 1987, wbmld,      wbml,     sys2xboot,         wbml,      system1_state, bootsys2d,    ROT0,   "bootleg (mpatou)", "Wonder Boy in Monster Land (decrypted bootleg of Japan New Ver., MC-8123, 317-0043)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, wbmljod,    wbml,     sys2xboot,         wbml,      system1_state, bootsys2d,    ROT0,   "bootleg (mpatou)", "Wonder Boy in Monster Land (decrypted bootleg of Japan Old Ver., MC-8123, 317-0043)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, dakkochn,   0,        sys2xb,            dakkochn,  system1_state, dakkochn,     ROT0,   "White Board", "DakkoChan House (MC-8123B, 317-5014)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, blockgalb,  blockgal, sys2x,             blockgal,  system1_state, bootleg,      ROT90,  "bootleg", "Block Gal (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, ufosensi,   0,        sys2rowxb,         ufosensi,  system1_state, ufosensi,     ROT0,   "Sega", "Ufo Senshi Yohko Chan (MC-8123, 317-0064)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, ufosensib,  ufosensi, sys2rowxboot,      ufosensi,  system1_state, bootsys2,     ROT0,   "bootleg", "Ufo Senshi Yohko Chan (bootleg, not encrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, choplift,   0,        sys2rowm,          choplift,  system1_state, init_bank0c,       ROT0,   "Sega (licensed from Dan Gorlin)", "Choplifter (8751 315-5151)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, chopliftu,  choplift, sys2row,           choplift,  system1_state, init_bank0c,       ROT0,   "Sega (licensed from Dan Gorlin)", "Choplifter (unprotected)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, chopliftbl, choplift, sys2row,           choplift,  system1_state, init_bank0c,       ROT0,   "bootleg", "Choplifter (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, shtngmst,   0,        sys2m,             shtngmst,  system1_state, init_shtngmst,     ROT0,   "Sega", "Shooting Master (8751 315-5159)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1985, shtngmste,  shtngmst, sys2m,             shtngmst,  system1_state, init_shtngmst,     ROT0,   "Sega / EVG", "Shooting Master (EVG, 8751 315-5159a)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, gardiab,    gardia,   sys2_317_0007,     gardia,    system1_state, init_bank44,       ROT270, "bootleg", "Gardia (317-0007?, bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, gardiaj,    gardia,   sys2_317_0006,     gardia,    system1_state, init_bank44,       ROT270, "Coreland / Sega", "Gardia (Japan, 317-0006)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, wboysys2,   wboy,     sys2_315_5177,     wboysys2,  system1_state, init_bank0c,       ROT0,   "Escape (Sega license)", "Wonder Boy (system 2, set 1, 315-5177)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, wboysys2a,  wboy,     sys2_315_5176,     wboysys2,  system1_state, init_bank0c,       ROT0,   "Escape (Sega license)", "Wonder Boy (system 2, set 2, 315-5176)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, tokisens,   0,        sys2xb,            tokisens,  system1_state, init_tokisens,     ROT90,  "Sega", "Toki no Senshi - Chrono Soldier (MC-8123, 317-0040)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, tokisensa,  tokisens, sys2,              tokisensa, system1_state, init_bank0c,       ROT90,  "Sega", "Toki no Senshi - Chrono Soldier (prototype?)", MACHINE_SUPPORTS_SAVE ) // or bootleg?
+GAME( 1987, wbml,       0,        sys2xb,            wbml,      system1_state, init_wbml,         ROT0,   "Sega / Westone", "Wonder Boy in Monster Land (Japan New Ver., MC-8123, 317-0043)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, wbmljo,     wbml,     sys2xb,            wbml,      system1_state, init_wbml,         ROT0,   "Sega / Westone", "Wonder Boy in Monster Land (Japan Old Ver., MC-8123, 317-0043)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, wbmljb,     wbml,     sys2xboot,         wbml,      system1_state, init_bootsys2,     ROT0,   "bootleg", "Wonder Boy in Monster Land (Japan bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, wbmlb,      wbml,     sys2xboot,         wbml,      system1_state, init_bootsys2,     ROT0,   "bootleg", "Wonder Boy in Monster Land (English bootleg set 1)", MACHINE_SUPPORTS_SAVE)
+GAME( 1987, wbmlbg,     wbml,     sys2xboot,         wbml,      system1_state, init_bootsys2,     ROT0,   "bootleg (Galaxy Electronics)", "Wonder Boy in Monster Land (English bootleg set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, wbmlbge,    wbml,     sys2xboot,         wbml,      system1_state, init_bootsys2,     ROT0,   "bootleg (Gecas)", "Wonder Boy in Monster Land (English bootleg set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 2009, wbmlvc,     wbml,     sys2xboot,         wbml,      system1_state, init_bootsys2,     ROT0,   "Sega", "Wonder Boy in Monster Land (English, Virtual Console)", MACHINE_SUPPORTS_SAVE )
+GAME( 2009, wbmlvcd,    wbml,     sys2xboot,         wbml,      system1_state, init_bootsys2d,    ROT0,   "bootleg (mpatou)", "Wonder Boy in Monster Land (decrypted bootleg of English, Virtual Console release)", MACHINE_SUPPORTS_SAVE ) // fully decrypted version
+GAME( 1987, wbmld,      wbml,     sys2xboot,         wbml,      system1_state, init_bootsys2d,    ROT0,   "bootleg (mpatou)", "Wonder Boy in Monster Land (decrypted bootleg of Japan New Ver., MC-8123, 317-0043)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, wbmljod,    wbml,     sys2xboot,         wbml,      system1_state, init_bootsys2d,    ROT0,   "bootleg (mpatou)", "Wonder Boy in Monster Land (decrypted bootleg of Japan Old Ver., MC-8123, 317-0043)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, dakkochn,   0,        sys2xb,            dakkochn,  system1_state, init_dakkochn,     ROT0,   "White Board", "DakkoChan House (MC-8123B, 317-5014)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, blockgalb,  blockgal, sys2x,             blockgal,  system1_state, init_bootleg,      ROT90,  "bootleg", "Block Gal (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, ufosensi,   0,        sys2rowxb,         ufosensi,  system1_state, init_wbml,         ROT0,   "Sega", "Ufo Senshi Yohko Chan (MC-8123, 317-0064)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, ufosensib,  ufosensi, sys2rowxboot,      ufosensi,  system1_state, init_bootsys2,     ROT0,   "bootleg", "Ufo Senshi Yohko Chan (bootleg, not encrypted)", MACHINE_SUPPORTS_SAVE )

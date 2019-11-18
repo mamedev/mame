@@ -2,7 +2,7 @@
 // copyright-holders:Dirk Best, R. Belmont
 /***************************************************************************
 
-    AT&T Unix PC series
+    AT&T UNIX PC series (7300 and 3B1)
 
     Skeleton driver by Dirk Best and R. Belmont
 
@@ -17,9 +17,21 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/ram.h"
-#include "machine/wd_fdc.h"
+#include "bus/centronics/ctronics.h"
+#include "bus/rs232/rs232.h"
+#include "imagedev/floppy.h"
+#include "imagedev/harddriv.h"
+#include "machine/6850acia.h"
+#include "machine/74259.h"
 #include "machine/bankdev.h"
+#include "machine/input_merger.h"
+#include "machine/output_latch.h"
+#include "machine/ram.h"
+//#include "machine/tc8250.h"
+#include "machine/wd1010.h"
+#include "machine/wd_fdc.h"
+#include "machine/z80sio.h"
+#include "emupal.h"
 #include "screen.h"
 
 #include "unixpc.lh"
@@ -35,9 +47,14 @@ public:
 	unixpc_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_gcr(*this, "gcr"),
+		m_tcr(*this, "tcr"),
+		m_int02(*this, "int02"),
 		m_ram(*this, RAM_TAG),
 		m_wd2797(*this, "wd2797"),
 		m_floppy(*this, "wd2797:0:525dd"),
+		m_hdc(*this, "hdc"),
+		m_hdr0(*this, "hdc:0"),
 		m_ramrombank(*this, "ramrombank"),
 		m_mapram(*this, "mapram"),
 		m_videoram(*this, "videoram")
@@ -45,38 +62,48 @@ public:
 
 	void unixpc(machine_config &config);
 
-protected:
+private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ16_MEMBER( line_printer_r );
-	DECLARE_WRITE16_MEMBER( misc_control_w );
-	DECLARE_WRITE16_MEMBER( disk_control_w );
-	DECLARE_WRITE16_MEMBER( romlmap_w );
-	DECLARE_WRITE16_MEMBER( error_enable_w );
-	DECLARE_WRITE16_MEMBER( parity_enable_w );
-	DECLARE_WRITE16_MEMBER( bpplus_w );
-	DECLARE_READ16_MEMBER( ram_mmu_r );
-	DECLARE_WRITE16_MEMBER( ram_mmu_w );
-	DECLARE_READ16_MEMBER( rtc_r );
-	DECLARE_WRITE16_MEMBER( rtc_w );
-	DECLARE_READ16_MEMBER( diskdma_size_r );
-	DECLARE_WRITE16_MEMBER( diskdma_size_w );
-	DECLARE_WRITE16_MEMBER( diskdma_ptr_w );
+	DECLARE_READ16_MEMBER(line_printer_r);
+	void disk_control_w(uint8_t data);
+	DECLARE_WRITE16_MEMBER(gcr_w);
+	DECLARE_WRITE_LINE_MEMBER(romlmap_w);
+	DECLARE_WRITE_LINE_MEMBER(error_enable_w);
+	DECLARE_WRITE_LINE_MEMBER(parity_enable_w);
+	DECLARE_WRITE_LINE_MEMBER(bpplus_w);
+	DECLARE_READ16_MEMBER(ram_mmu_r);
+	DECLARE_WRITE16_MEMBER(ram_mmu_w);
+	DECLARE_READ16_MEMBER(gsr_r);
+	DECLARE_WRITE16_MEMBER(tcr_w);
+	DECLARE_READ16_MEMBER(tsr_r);
+	DECLARE_READ16_MEMBER(rtc_r);
+	DECLARE_WRITE16_MEMBER(rtc_w);
+	DECLARE_READ16_MEMBER(diskdma_size_r);
+	DECLARE_WRITE16_MEMBER(diskdma_size_w);
+	DECLARE_WRITE16_MEMBER(diskdma_ptr_w);
 
-	DECLARE_WRITE_LINE_MEMBER( wd2797_intrq_w );
-	DECLARE_WRITE_LINE_MEMBER( wd2797_drq_w );
+	DECLARE_WRITE_LINE_MEMBER(wd2797_intrq_w);
+	DECLARE_WRITE_LINE_MEMBER(wd2797_drq_w);
+
+	DECLARE_WRITE_LINE_MEMBER(wd1010_intrq_w);
 
 	void ramrombank_map(address_map &map);
 	void unixpc_mem(address_map &map);
 
 private:
 	required_device<cpu_device> m_maincpu;
+	required_device<ls259_device> m_gcr;
+	required_device<ls259_device> m_tcr;
+	required_device<input_merger_device> m_int02;
 	required_device<ram_device> m_ram;
 	required_device<wd2797_device> m_wd2797;
 	required_device<floppy_image_device> m_floppy;
+	required_device<wd1010_device> m_hdc;
+	required_device<harddisk_image_device> m_hdr0;
 	required_device<address_map_bank_device> m_ramrombank;
 
 	required_shared_ptr<uint16_t> m_mapram;
@@ -87,6 +114,7 @@ private:
 	uint16_t m_diskdmasize;
 	uint32_t m_diskdmaptr;
 	bool m_fdc_intrq;
+	bool m_hdc_intrq;
 };
 
 
@@ -94,19 +122,17 @@ private:
     MEMORY
 ***************************************************************************/
 
-WRITE16_MEMBER( unixpc_state::romlmap_w )
+WRITE16_MEMBER(unixpc_state::gcr_w)
 {
-	if (BIT(data, 15))
-	{
-		m_ramrombank->set_bank(1);
-	}
-	else
-	{
-		m_ramrombank->set_bank(0);
-	}
+	m_gcr->write_bit(offset >> 11, BIT(data, 15));
 }
 
-READ16_MEMBER( unixpc_state::ram_mmu_r )
+WRITE_LINE_MEMBER(unixpc_state::romlmap_w)
+{
+	m_ramrombank->set_bank(state ? 1 : 0);
+}
+
+READ16_MEMBER(unixpc_state::ram_mmu_r)
 {
 	// TODO: MMU translation
 	if (offset > m_ramsize)
@@ -116,7 +142,7 @@ READ16_MEMBER( unixpc_state::ram_mmu_r )
 	return m_ramptr[offset];
 }
 
-WRITE16_MEMBER( unixpc_state::ram_mmu_w )
+WRITE16_MEMBER(unixpc_state::ram_mmu_w)
 {
 	// TODO: MMU translation
 	if (offset < m_ramsize)
@@ -133,49 +159,60 @@ void unixpc_state::machine_start()
 
 void unixpc_state::machine_reset()
 {
-	// force ROM into lower mem on reset
-	m_ramrombank->set_bank(0);
-
-	// reset cpu so that it can pickup the new values
-	m_maincpu->reset();
+	disk_control_w(0);
 }
 
-WRITE16_MEMBER( unixpc_state::error_enable_w )
+WRITE_LINE_MEMBER(unixpc_state::error_enable_w)
 {
-	logerror("error_enable_w: %04x\n", data & 0x8000);
+	logerror("error_enable_w: %d\n", state);
 }
 
-WRITE16_MEMBER( unixpc_state::parity_enable_w )
+WRITE_LINE_MEMBER(unixpc_state::parity_enable_w)
 {
-	logerror("parity_enable_w: %04x\n", data & 0x8000);
+	logerror("parity_enable_w: %d\n", state);
 }
 
-WRITE16_MEMBER( unixpc_state::bpplus_w )
+WRITE_LINE_MEMBER(unixpc_state::bpplus_w)
 {
-	logerror("bpplus_w: %04x\n", data & 0x8000);
+	logerror("bpplus_w: %d\n", state);
 }
 
 /***************************************************************************
     MISC
 ***************************************************************************/
 
-READ16_MEMBER( unixpc_state::rtc_r )
+READ16_MEMBER(unixpc_state::gsr_r)
 {
 	return 0;
 }
 
-WRITE16_MEMBER( unixpc_state::rtc_w )
+WRITE16_MEMBER(unixpc_state::tcr_w)
+{
+	m_tcr->write_bit(offset >> 11, BIT(data, 14));
+}
+
+READ16_MEMBER(unixpc_state::tsr_r)
+{
+	return 0;
+}
+
+READ16_MEMBER(unixpc_state::rtc_r)
+{
+	return 0;
+}
+
+WRITE16_MEMBER(unixpc_state::rtc_w)
 {
 	logerror("rtc_w: %04x\n", data);
 }
 
-READ16_MEMBER( unixpc_state::line_printer_r )
+READ16_MEMBER(unixpc_state::line_printer_r)
 {
 	uint16_t data = 0;
 
 	data |= 1; // no dial tone detected
 	data |= 1 << 1; // no parity error
-	data |= 0 << 2; // hdc intrq
+	data |= m_hdc_intrq ? 1<<2 : 0<<2;
 	data |= m_fdc_intrq ? 1<<3 : 0<<3;
 
 	//logerror("line_printer_r: %04x\n", data);
@@ -183,37 +220,22 @@ READ16_MEMBER( unixpc_state::line_printer_r )
 	return data;
 }
 
-WRITE16_MEMBER( unixpc_state::misc_control_w )
-{
-	logerror("misc_control_w: %04x\n", data);
-
-	// bit 15 = VBL ack (must go high-low-high to ack)
-	// bit 14 = 0 for disk DMA write, 1 for disk DMA read
-	// bit 13 = Centronics strobe
-	// bit 12 = 0 = modem baud rate from UART clock inputs, 1 = baud from programmable timer
-
-	output().set_value("led_0", !BIT(data,  8));
-	output().set_value("led_1", !BIT(data,  9));
-	output().set_value("led_2", !BIT(data, 10));
-	output().set_value("led_3", !BIT(data, 11));
-}
-
 /***************************************************************************
     DMA
 ***************************************************************************/
 
-READ16_MEMBER( unixpc_state::diskdma_size_r )
+READ16_MEMBER(unixpc_state::diskdma_size_r)
 {
 	return m_diskdmasize;
 }
 
-WRITE16_MEMBER( unixpc_state::diskdma_size_w )
+WRITE16_MEMBER(unixpc_state::diskdma_size_w)
 {
 	COMBINE_DATA( &m_diskdmasize );
 	logerror("%x to disk DMA size\n", data);
 }
 
-WRITE16_MEMBER( unixpc_state::diskdma_ptr_w )
+WRITE16_MEMBER(unixpc_state::diskdma_ptr_w)
 {
 	if (offset >= 0x2000)
 	{
@@ -234,9 +256,16 @@ WRITE16_MEMBER( unixpc_state::diskdma_ptr_w )
     FLOPPY
 ***************************************************************************/
 
-WRITE16_MEMBER( unixpc_state::disk_control_w )
+void unixpc_state::disk_control_w(uint8_t data)
 {
-	logerror("disk_control_w: %04x\n", data);
+	logerror("disk_control_w: %02x\n", data);
+
+	// TODO: bits 0-2 = head select
+
+	m_hdc->drdy_w(BIT(data, 3) && m_hdr0->exists());
+
+	if (!BIT(data, 4))
+		m_hdc->reset();
 
 	m_floppy->mon_w(!BIT(data, 5));
 
@@ -245,19 +274,31 @@ WRITE16_MEMBER( unixpc_state::disk_control_w )
 		m_wd2797->set_floppy(m_floppy);
 	else
 		m_wd2797->set_floppy(nullptr);
+
+	m_wd2797->mr_w(BIT(data, 7));
 }
 
-WRITE_LINE_MEMBER( unixpc_state::wd2797_intrq_w )
+WRITE_LINE_MEMBER(unixpc_state::wd2797_intrq_w)
 {
 	logerror("wd2797_intrq_w: %d\n", state);
 	m_fdc_intrq = state;
+	m_int02->in_w<1>(state);
 }
 
-WRITE_LINE_MEMBER( unixpc_state::wd2797_drq_w )
+WRITE_LINE_MEMBER(unixpc_state::wd2797_drq_w)
 {
 	logerror("wd2797_drq_w: %d\n", state);
 }
 
+/***************************************************************************
+    HARD DISK
+***************************************************************************/
+
+WRITE_LINE_MEMBER(unixpc_state::wd1010_intrq_w)
+{
+	m_hdc_intrq = state;
+	m_int02->in_w<0>(state);
+}
 
 /***************************************************************************
     VIDEO
@@ -282,27 +323,30 @@ void unixpc_state::unixpc_mem(address_map &map)
 {
 	map(0x000000, 0x3fffff).m(m_ramrombank, FUNC(address_map_bank_device::amap16));
 	map(0x400000, 0x4007ff).ram().share("mapram");
+	map(0x410000, 0x410001).r(FUNC(unixpc_state::gsr_r));
 	map(0x420000, 0x427fff).ram().share("videoram");
-	map(0x460000, 0x460001).rw(this, FUNC(unixpc_state::diskdma_size_r), FUNC(unixpc_state::diskdma_size_w));
-	map(0x470000, 0x470001).r(this, FUNC(unixpc_state::line_printer_r));
-	map(0x480000, 0x480001).w(this, FUNC(unixpc_state::rtc_w));
-	map(0x4a0000, 0x4a0001).w(this, FUNC(unixpc_state::misc_control_w));
-	map(0x4d0000, 0x4d7fff).w(this, FUNC(unixpc_state::diskdma_ptr_w));
-	map(0x4e0000, 0x4e0001).w(this, FUNC(unixpc_state::disk_control_w));
+	map(0x450000, 0x450001).r(FUNC(unixpc_state::tsr_r));
+	map(0x460000, 0x460001).rw(FUNC(unixpc_state::diskdma_size_r), FUNC(unixpc_state::diskdma_size_w));
+	map(0x470000, 0x470001).r(FUNC(unixpc_state::line_printer_r));
+	map(0x480000, 0x480001).w(FUNC(unixpc_state::rtc_w));
+	map(0x490000, 0x490001).select(0x7000).w(FUNC(unixpc_state::tcr_w));
+	map(0x4a0000, 0x4a0000).w("mreg", FUNC(output_latch_device::bus_w));
+	map(0x4d0000, 0x4d7fff).w(FUNC(unixpc_state::diskdma_ptr_w));
+	map(0x4e0001, 0x4e0001).w(FUNC(unixpc_state::disk_control_w)).cswidth(16);
+	map(0x4f0001, 0x4f0001).w("printlatch", FUNC(output_latch_device::bus_w));
+	map(0xe00000, 0xe0000f).rw(m_hdc, FUNC(wd1010_device::read), FUNC(wd1010_device::write)).umask16(0x00ff);
 	map(0xe10000, 0xe10007).rw(m_wd2797, FUNC(wd_fdc_device_base::read), FUNC(wd_fdc_device_base::write)).umask16(0x00ff);
-	map(0xe30000, 0xe30001).r(this, FUNC(unixpc_state::rtc_r));
-	map(0xe40000, 0xe40001).w(this, FUNC(unixpc_state::error_enable_w));
-	map(0xe41000, 0xe41001).w(this, FUNC(unixpc_state::parity_enable_w));
-	map(0xe42000, 0xe42001).w(this, FUNC(unixpc_state::bpplus_w));
-	map(0xe43000, 0xe43001).w(this, FUNC(unixpc_state::romlmap_w));
+	map(0xe30000, 0xe30001).r(FUNC(unixpc_state::rtc_r));
+	map(0xe40000, 0xe40001).select(0x7000).w(FUNC(unixpc_state::gcr_w));
+	map(0xe50000, 0xe50007).rw("mpsc", FUNC(upd7201_new_device::cd_ba_r), FUNC(upd7201_new_device::cd_ba_w)).umask16(0x00ff);
+	map(0xe70000, 0xe70003).rw("kbc", FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0xff00);
 	map(0x800000, 0x803fff).mirror(0x7fc000).rom().region("bootrom", 0);
-	// e70000 / e70002 = keyboard 6850 status/control and Rx data / Tx data
 }
 
 void unixpc_state::ramrombank_map(address_map &map)
 {
 	map(0x000000, 0x3fffff).rom().region("bootrom", 0);
-	map(0x400000, 0x7fffff).rw(this, FUNC(unixpc_state::ram_mmu_r), FUNC(unixpc_state::ram_mmu_w));
+	map(0x400000, 0x7fffff).rw(FUNC(unixpc_state::ram_mmu_r), FUNC(unixpc_state::ram_mmu_w));
 }
 
 /***************************************************************************
@@ -317,44 +361,86 @@ INPUT_PORTS_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-static SLOT_INTERFACE_START( unixpc_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
-SLOT_INTERFACE_END
+static void unixpc_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
 
-MACHINE_CONFIG_START(unixpc_state::unixpc)
+void unixpc_state::unixpc(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M68010, XTAL(10'000'000))
-	MCFG_CPU_PROGRAM_MAP(unixpc_mem)
+	M68010(config, m_maincpu, 40_MHz_XTAL / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &unixpc_state::unixpc_mem);
+
+	LS259(config, m_gcr); // 7K
+	m_gcr->q_out_cb<0>().set(FUNC(unixpc_state::error_enable_w));
+	m_gcr->q_out_cb<1>().set(FUNC(unixpc_state::parity_enable_w));
+	m_gcr->q_out_cb<2>().set(FUNC(unixpc_state::bpplus_w));
+	m_gcr->q_out_cb<3>().set(FUNC(unixpc_state::romlmap_w));
+
+	LS259(config, m_tcr); // 10K
+
+	INPUT_MERGER_ANY_HIGH(config, m_int02); // 26H pins 3-6
+	m_int02->output_handler().set_inputline(m_maincpu, M68K_IRQ_2);
+
+	output_latch_device &mreg(OUTPUT_LATCH(config, "mreg"));
+	mreg.bit_handler<0>().set_output("led_0").invert();
+	mreg.bit_handler<1>().set_output("led_1").invert();
+	mreg.bit_handler<2>().set_output("led_2").invert();
+	mreg.bit_handler<3>().set_output("led_3").invert();
+	// bit 4 (D12) = 0 = modem baud rate from UART clock inputs, 1 = baud from programmable timer
+	mreg.bit_handler<5>().set("printer", FUNC(centronics_device::write_strobe)).invert();
+	// bit 6 (D14) = 0 for disk DMA write, 1 for disk DMA read
+	// bit 7 (D15) = VBL ack (must go high-low-high to ack)
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_UPDATE_DRIVER(unixpc_state, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(20'000'000), 896, 0, 720, 367, 0, 348)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_screen_update(FUNC(unixpc_state::screen_update));
+	screen.set_raw(40_MHz_XTAL / 2, 896, 0, 720, 367, 0, 348);
+	screen.set_palette("palette");
 	// vsync should actually last 17264 pixels
 
-	MCFG_DEFAULT_LAYOUT(layout_unixpc)
+	config.set_default_layout(layout_unixpc);
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1M")
-	MCFG_RAM_EXTRA_OPTIONS("2M")
+	RAM(config, RAM_TAG).set_default_size("1M").set_extra_options("2M");
 
 	// RAM/ROM bank
-	MCFG_DEVICE_ADD("ramrombank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(ramrombank_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x400000)
+	ADDRESS_MAP_BANK(config, "ramrombank").set_map(&unixpc_state::ramrombank_map).set_options(ENDIANNESS_BIG, 16, 32, 0x400000);
 
 	// floppy
-	MCFG_DEVICE_ADD("wd2797", WD2797, 1000000)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(unixpc_state, wd2797_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(unixpc_state, wd2797_drq_w))
-	MCFG_FLOPPY_DRIVE_ADD("wd2797:0", unixpc_floppies, "525dd", floppy_image_device::default_floppy_formats)
-MACHINE_CONFIG_END
+	WD2797(config, m_wd2797, 40_MHz_XTAL / 40); // 1PCK (CPU clock) divided by custom DMA chip
+	m_wd2797->intrq_wr_callback().set(FUNC(unixpc_state::wd2797_intrq_w));
+	m_wd2797->drq_wr_callback().set(FUNC(unixpc_state::wd2797_drq_w));
+	FLOPPY_CONNECTOR(config, "wd2797:0", unixpc_floppies, "525dd", floppy_image_device::default_floppy_formats);
+
+	WD1010(config, m_hdc, 40_MHz_XTAL / 8);
+	m_hdc->out_intrq_callback().set(FUNC(unixpc_state::wd1010_intrq_w));
+	HARDDISK(config, m_hdr0, 0);
+
+	upd7201_new_device &mpsc(UPD7201_NEW(config, "mpsc", 19.6608_MHz_XTAL / 8));
+	mpsc.out_txda_callback().set("rs232", FUNC(rs232_port_device::write_txd));
+	mpsc.out_dtra_callback().set("rs232", FUNC(rs232_port_device::write_dtr));
+	mpsc.out_rtsa_callback().set("rs232", FUNC(rs232_port_device::write_rts));
+	mpsc.out_int_callback().set_inputline(m_maincpu, M68K_IRQ_4);
+
+	acia6850_device &kbc(ACIA6850(config, "kbc", 0));
+	kbc.irq_handler().set_inputline(m_maincpu, M68K_IRQ_3);
+
+	// TODO: RTC
+	//TC8250(config, "rtc", 32.768_kHz_XTAL);
+
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
+	rs232.rxd_handler().set("mpsc", FUNC(upd7201_new_device::rxa_w));
+	rs232.dsr_handler().set("mpsc", FUNC(upd7201_new_device::dcda_w));
+	rs232.cts_handler().set("mpsc", FUNC(upd7201_new_device::ctsa_w));
+
+	centronics_device &printer(CENTRONICS(config, "printer", centronics_devices, nullptr));
+	output_latch_device &printlatch(OUTPUT_LATCH(config, "printlatch"));
+	printer.set_output_latch(printlatch);
+}
 
 
 /***************************************************************************
@@ -373,5 +459,5 @@ ROM_END
     GAME DRIVERS
 ***************************************************************************/
 
-//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT   STATE         INIT  COMPANY  FULLNAME  FLAGS
-COMP( 1985, 3b1,  0,      0,      unixpc,  unixpc, unixpc_state, 0,    "AT&T",  "3B1",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME             FLAGS
+COMP( 1985, 3b1,  0,      0,      unixpc,  unixpc, unixpc_state, empty_init, "AT&T",  "UNIX PC Model 3B1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

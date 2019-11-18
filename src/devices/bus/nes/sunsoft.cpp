@@ -24,7 +24,6 @@
 #include "emu.h"
 #include "sunsoft.h"
 
-#include "cpu/m6502/m6502.h"
 #include "sound/ay8910.h"
 #include "speaker.h"
 
@@ -124,7 +123,7 @@ void nes_sunsoft_3_device::device_start()
 {
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
-	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
+	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_toggle));
@@ -170,7 +169,7 @@ void nes_sunsoft_fme7_device::device_start()
 	irq_timer = timer_alloc(TIMER_IRQ);
 	// this has to be hardcoded because some some scanline code only suits NTSC... it will be fixed with PPU rewrite
 	irq_timer->adjust(attotime::zero, 0, attotime::from_hz((21477272.724 / 12)));
-//  irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
+//  irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_wram_bank));
 	save_item(NAME(m_latch));
@@ -210,7 +209,7 @@ void nes_sunsoft_fme7_device::pcb_reset()
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_sunsoft_1_device::write_m)
+void nes_sunsoft_1_device::write_m(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("Sunsoft 1 write_m, offset: %04x, data: %02x\n", offset, data));
 
@@ -236,7 +235,7 @@ WRITE8_MEMBER(nes_sunsoft_1_device::write_m)
 
 // there are two 'variants' depending on hardwired or mapper ctrl mirroring
 
-WRITE8_MEMBER(nes_sunsoft_2_device::write_h)
+void nes_sunsoft_2_device::write_h(offs_t offset, uint8_t data)
 {
 	uint8_t helper = (data & 0x07) | ((data & 0x80) ? 0x08 : 0x00);
 	LOG_MMC(("Sunsoft 2 write_h, offset: %04x, data: %02x\n", offset, data));
@@ -273,7 +272,7 @@ void nes_sunsoft_3_device::device_timer(emu_timer &timer, device_timer_id id, in
 		{
 			if (!m_irq_count)
 			{
-				m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+				set_irq_line(ASSERT_LINE);
 				m_irq_count = 0xffff;
 				m_irq_enable = 0;
 			}
@@ -283,7 +282,7 @@ void nes_sunsoft_3_device::device_timer(emu_timer &timer, device_timer_id id, in
 	}
 }
 
-WRITE8_MEMBER(nes_sunsoft_3_device::write_h)
+void nes_sunsoft_3_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("Sunsoft 3 write_h, offset %04x, data: %02x\n", offset, data));
 
@@ -312,7 +311,7 @@ WRITE8_MEMBER(nes_sunsoft_3_device::write_h)
 		case 0x5800:
 			m_irq_enable = BIT(data, 4);
 			m_irq_toggle = 0;
-			m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+			set_irq_line(CLEAR_LINE);
 			break;
 		case 0x6800:
 			switch (data & 3)
@@ -385,7 +384,7 @@ void nes_sunsoft_4_device::sun4_mirror( int mirror, int mirr0, int mirr1 )
 	}
 }
 
-WRITE8_MEMBER(nes_sunsoft_4_device::sun4_write)
+void nes_sunsoft_4_device::sun4_write(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("Sunsoft 4 write_h, offset %04x, data: %02x\n", offset, data));
 
@@ -425,7 +424,7 @@ WRITE8_MEMBER(nes_sunsoft_4_device::sun4_write)
 	}
 }
 
-WRITE8_MEMBER(nes_sunsoft_4_device::write_m)
+void nes_sunsoft_4_device::write_m(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("Sunsoft 4 write_m, offset: %04x, data: %02x\n", offset, data));
 
@@ -435,7 +434,7 @@ WRITE8_MEMBER(nes_sunsoft_4_device::write_m)
 		m_prgram[offset & (m_prgram.size() - 1)] = data;
 }
 
-READ8_MEMBER(nes_sunsoft_4_device::read_m)
+uint8_t nes_sunsoft_4_device::read_m(offs_t offset)
 {
 	LOG_MMC(("Sunsoft 4 read_m, offset: %04x\n", offset));
 
@@ -444,7 +443,7 @@ READ8_MEMBER(nes_sunsoft_4_device::read_m)
 	if (!m_prgram.empty() && m_wram_enable)
 		return m_prgram[offset & (m_prgram.size() - 1)];
 
-	return m_open_bus;   // open bus
+	return get_open_bus();   // open bus
 }
 
 /*-------------------------------------------------
@@ -468,7 +467,7 @@ void nes_sunsoft_fme7_device::device_timer(emu_timer &timer, device_timer_id id,
 			{
 				m_irq_count = 0xffff;
 				if (m_irq_enable & 0x01) // bit0, trigger enable
-					m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+					set_irq_line(ASSERT_LINE);
 			}
 			else
 				m_irq_count--;
@@ -476,7 +475,7 @@ void nes_sunsoft_fme7_device::device_timer(emu_timer &timer, device_timer_id id,
 	}
 }
 
-WRITE8_MEMBER(nes_sunsoft_fme7_device::fme7_write)
+void nes_sunsoft_fme7_device::fme7_write(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("fme7_write, offset %04x, data: %02x\n", offset, data));
 
@@ -517,7 +516,7 @@ WRITE8_MEMBER(nes_sunsoft_fme7_device::fme7_write)
 				case 0x0d:
 					m_irq_enable = data;
 					if (!(m_irq_enable & 1))
-						m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+						set_irq_line(CLEAR_LINE);
 					break;
 				case 0x0e:
 					m_irq_count = (m_irq_count & 0xff00) | data;
@@ -534,7 +533,7 @@ WRITE8_MEMBER(nes_sunsoft_fme7_device::fme7_write)
 	}
 }
 
-WRITE8_MEMBER(nes_sunsoft_fme7_device::write_m)
+void nes_sunsoft_fme7_device::write_m(offs_t offset, uint8_t data)
 {
 	uint8_t bank = m_wram_bank & 0x3f;
 	LOG_MMC(("Sunsoft FME7 write_m, offset: %04x, data: %02x\n", offset, data));
@@ -550,7 +549,7 @@ WRITE8_MEMBER(nes_sunsoft_fme7_device::write_m)
 	}
 }
 
-READ8_MEMBER(nes_sunsoft_fme7_device::read_m)
+uint8_t nes_sunsoft_fme7_device::read_m(offs_t offset)
 {
 	uint8_t bank = m_wram_bank & 0x3f;
 	LOG_MMC(("Sunsoft FME7 read_m, offset: %04x\n", offset));
@@ -565,7 +564,7 @@ READ8_MEMBER(nes_sunsoft_fme7_device::read_m)
 			return m_prgram[((bank * 0x2000) + offset) & (m_prgram.size() - 1)];
 	}
 
-	return m_open_bus;   // open bus
+	return get_open_bus();   // open bus
 }
 
 
@@ -579,20 +578,20 @@ READ8_MEMBER(nes_sunsoft_fme7_device::read_m)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_sunsoft_5_device::write_h)
+void nes_sunsoft_5_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("sunsoft 5 write_h, offset %04x, data: %02x\n", offset, data));
 
 	switch (offset & 0x6000)
 	{
 		case 0x4000:
-			m_ym2149->address_w(space, 0, data & 0x0f);
+			m_ym2149->address_w(data & 0x0f);
 			break;
 		case 0x6000:
-			m_ym2149->data_w(space, 0, data);
+			m_ym2149->data_w(data);
 			break;
 		default:
-			fme7_write(space, offset, data, mem_mask);
+			fme7_write(offset, data);
 			break;
 	}
 }
@@ -610,13 +609,12 @@ WRITE8_MEMBER(nes_sunsoft_5_device::write_h)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(nes_sunsoft_5_device::device_add_mconfig)
-
+void nes_sunsoft_5_device::device_add_mconfig(machine_config &config)
+{
 	// additional sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("addon")
+	SPEAKER(config, "addon").front_center();
 
 	// TODO: this is not how Sunsoft 5B clock signaling works!
 	// The board uses the CLK pin in reality, not hardcoded NTSC values!
-	MCFG_SOUND_ADD("ay", YM2149, (XTAL(21'477'272)/12)/2) // divide by 2 for the internal divider
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 0.50)
-MACHINE_CONFIG_END
+	SUNSOFT_5B_SOUND(config, m_ym2149, XTAL(21'477'272)/12).add_route(ALL_OUTPUTS, "addon", 0.50);
+}

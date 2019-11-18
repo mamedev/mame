@@ -144,6 +144,10 @@ rsp_device::rsp_device(const machine_config &mconfig, const char *tag, device_t 
 {
 }
 
+rsp_device::~rsp_device()
+{
+}
+
 device_memory_interface::space_config_vector rsp_device::memory_space_config() const
 {
 	return space_config_vector {
@@ -322,7 +326,7 @@ void rsp_device::unimplemented_opcode(uint32_t op)
 		std::ostringstream string;
 		rsp_disassembler rspd;
 		rspd.dasm_one(string, m_ppc, op);
-		osd_printf_debug("%08X: %s\n", m_ppc, string.str().c_str());
+		osd_printf_debug("%08X: %s\n", m_ppc, string.str());
 	}
 
 #if SAVE_DISASM
@@ -378,7 +382,7 @@ void rsp_device::device_start()
 		m_exec_output = fopen("rsp_execute.txt", "wt");
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	m_pcache = m_program->cache<2, 0, ENDIANNESS_BIG>();
 	resolve_cb();
 
 	if (m_isdrc)

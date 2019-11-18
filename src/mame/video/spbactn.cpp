@@ -49,8 +49,8 @@ VIDEO_START_MEMBER(spbactn_state,spbactn)
 	m_screen->register_screen_bitmap(m_tile_bitmap_fg);
 	m_screen->register_screen_bitmap(m_sprite_bitmap);
 
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(spbactn_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 8, 64, 128);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(spbactn_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 8, 64, 128);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(spbactn_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16, 8, 64, 128);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(spbactn_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 16, 8, 64, 128);
 	m_bg_tilemap->set_transparent_pen(0);
 	m_fg_tilemap->set_transparent_pen(0);
 }
@@ -59,7 +59,7 @@ VIDEO_START_MEMBER(spbactn_state,spbactnp)
 {
 	VIDEO_START_CALL_MEMBER(spbactn);
 	// no idea..
-	m_extra_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(spbactn_state::get_extra_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 16, 16);
+	m_extra_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(spbactn_state::get_extra_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 16, 16);
 }
 
 WRITE16_MEMBER( spbactn_state::spbatnp_90006_w )
@@ -120,7 +120,7 @@ int spbactn_state::draw_video(screen_device &screen, bitmap_rgb32 &bitmap, const
 	m_sprite_bitmap.fill(0, cliprect);
 	bitmap.fill(0, cliprect);
 
-	m_sprgen->gaiden_draw_sprites(screen, m_gfxdecode, cliprect, &m_spvideoram[0], 0, 0, flip_screen(), m_sprite_bitmap);
+	m_sprgen->gaiden_draw_sprites(screen, m_gfxdecode->gfx(2), cliprect, &m_spvideoram[0], 0, 0, flip_screen(), m_sprite_bitmap);
 	m_bg_tilemap->draw(screen, m_tile_bitmap_bg, cliprect, 0, 0);
 	m_fg_tilemap->draw(screen, m_tile_bitmap_fg, cliprect, 0, 0);
 

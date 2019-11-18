@@ -41,80 +41,9 @@
 
 #pragma once
 
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
+#include "diserial.h"
 
-//**************************************************************************
-//  DEVICE CONFIGURATION MACROS
-//**************************************************************************
-
-//#define LOCAL_BRG 0 FIXME - what is this for?  the name is overly generic and shouldn't be in global namespace
-
-/* Variant ADD macros - use the right one to enable the right feature set! */
-#define MCFG_DUSCC26562_ADD(_tag, _clock, _rxa, _txa, _rxb, _txb) \
-	MCFG_DEVICE_ADD(_tag, DUSCC26562, _clock) \
-	MCFG_DUSCC_OFFSETS(_rxa, _txa, _rxb, _txb)
-
-#define MCFG_DUSCC26C562_ADD(_tag, _clock, _rxa, _txa, _rxb, _txb) \
-	MCFG_DEVICE_ADD(_tag, DUSCC26C562, _clock) \
-	MCFG_DUSCC_OFFSETS(_rxa, _txa, _rxb, _txb)
-
-#define MCFG_DUSCC68562_ADD(_tag, _clock, _rxa, _txa, _rxb, _txb) \
-	MCFG_DEVICE_ADD(_tag, DUSCC68562, _clock) \
-	MCFG_DUSCC_OFFSETS(_rxa, _txa, _rxb, _txb)
-
-#define MCFG_DUSCC68C562_ADD(_tag, _clock, _rxa, _txa, _rxb, _txb) \
-	MCFG_DEVICE_ADD(_tag, DUSCC68C562, _clock) \
-	MCFG_DUSCC_OFFSETS(_rxa, _txa, _rxb, _txb)
-
-/* generic ADD macro - Avoid using it directly, see above for correct variant instead */
-#define MCFG_DUSCC_ADD(_tag, _clock, _rxa, _txa, _rxb, _txb) \
-	MCFG_DEVICE_ADD(_tag, DUSCC, _clock) \
-	MCFG_DUSCC_OFFSETS(_rxa, _txa, _rxb, _txb)
-
-/* Generic macros */
-#define MCFG_DUSCC_OFFSETS(_rxa, _txa, _rxb, _txb) \
-	downcast<duscc_device &>(*device).configure_channels(_rxa, _txa, _rxb, _txb);
-
-// Port A callbacks
-#define MCFG_DUSCC_OUT_TXDA_CB(_devcb) \
-	devcb = &downcast<duscc_device &>(*device).set_out_txda_callback(DEVCB_##_devcb);
-
-#define MCFG_DUSCC_OUT_DTRA_CB(_devcb) \
-	devcb = &downcast<duscc_device &>(*device).set_out_dtra_callback(DEVCB_##_devcb);
-
-#define MCFG_DUSCC_OUT_RTSA_CB(_devcb) \
-	devcb = &downcast<duscc_device &>(*device).set_out_rtsa_callback(DEVCB_##_devcb);
-
-#define MCFG_DUSCC_OUT_SYNCA_CB(_devcb) \
-	devcb = &downcast<duscc_device &>(*device).set_out_synca_callback(DEVCB_##_devcb);
-
-#define MCFG_DUSCC_OUT_TRXCA_CB(_devcb) \
-	devcb = &downcast<duscc_device &>(*device).set_out_trxca_callback(DEVCB_##_devcb);
-
-#define MCFG_DUSCC_OUT_RTXCA_CB(_devcb) \
-	devcb = &downcast<duscc_device &>(*device).set_out_rtxca_callback(DEVCB_##_devcb);
-
-// Port B callbacks
-#define MCFG_DUSCC_OUT_TXDB_CB(_devcb) \
-	devcb = &downcast<duscc_device &>(*device).set_out_txdb_callback(DEVCB_##_devcb);
-
-#define MCFG_DUSCC_OUT_DTRB_CB(_devcb) \
-	devcb = &downcast<duscc_device &>(*device).set_out_dtrb_callback(DEVCB_##_devcb);
-
-#define MCFG_DUSCC_OUT_RTSB_CB(_devcb) \
-	devcb = &downcast<duscc_device &>(*device).set_out_rtsb_callback(DEVCB_##_devcb);
-
-#define MCFG_DUSCC_OUT_SYNCB_CB(_devcb) \
-	devcb = &downcast<duscc_device &>(*device).set_out_syncb_callback(DEVCB_##_devcb);
-
-#define MCFG_DUSCC_OUT_TRXCB_CB(_devcb) \
-	devcb = &downcast<duscc_device &>(*device).set_out_trxcb_callback(DEVCB_##_devcb);
-
-#define MCFG_DUSCC_OUT_RTXCB_CB(_devcb) \
-	devcb = &downcast<duscc_device &>(*device).set_out_rtxcb_callback(DEVCB_##_devcb);
-
-#define MCFG_DUSCC_OUT_INT_CB(_devcb) \
-	devcb = &downcast<duscc_device &>(*device).set_out_int_callback(DEVCB_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -607,20 +536,20 @@ public:
 	// construction/destruction
 	duscc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_out_txda_callback(Object &&cb) { return m_out_txda_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_dtra_callback(Object &&cb) { return m_out_dtra_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_rtsa_callback(Object &&cb) { return m_out_rtsa_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_synca_callback(Object &&cb) { return m_out_synca_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_rtxca_callback(Object &&cb) { return m_out_rtxca_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_trxca_callback(Object &&cb) { return m_out_trxca_cb.set_callback(std::forward<Object>(cb)); }
+	auto out_txda_callback() { return m_out_txda_cb.bind(); }
+	auto out_dtra_callback() { return m_out_dtra_cb.bind(); }
+	auto out_rtsa_callback() { return m_out_rtsa_cb.bind(); }
+	auto out_synca_callback() { return m_out_synca_cb.bind(); }
+	auto out_rtxca_callback() { return m_out_rtxca_cb.bind(); }
+	auto out_trxca_callback() { return m_out_trxca_cb.bind(); }
 
-	template <class Object> devcb_base &set_out_txdb_callback(Object &&cb) { return m_out_txdb_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_dtrb_callback(Object &&cb) { return m_out_dtrb_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_rtsb_callback(Object &&cb) { return m_out_rtsb_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_syncb_callback(Object &&cb) { return m_out_syncb_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_rtxcb_callback(Object &&cb) { return m_out_rtxcb_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_trxcb_callback(Object &&cb) { return m_out_trxcb_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_int_callback(Object &&cb) { return m_out_int_cb.set_callback(std::forward<Object>(cb)); }
+	auto out_txdb_callback() { return m_out_txdb_cb.bind(); }
+	auto out_dtrb_callback() { return m_out_dtrb_cb.bind(); }
+	auto out_rtsb_callback() { return m_out_rtsb_cb.bind(); }
+	auto out_syncb_callback() { return m_out_syncb_cb.bind(); }
+	auto out_rtxcb_callback() { return m_out_rtxcb_cb.bind(); }
+	auto out_trxcb_callback() { return m_out_trxcb_cb.bind(); }
+	auto out_int_callback() { return m_out_int_cb.bind(); }
 
 	void configure_channels(int rxa, int txa, int rxb, int txb)
 	{

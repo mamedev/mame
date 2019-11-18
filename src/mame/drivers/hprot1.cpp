@@ -59,7 +59,7 @@ Infinite loop is reached at address 0x7699
 #include "cpu/mcs51/mcs51.h"
 #include "sound/spkrdev.h"
 #include "video/hd44780.h"
-#include "rendlay.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -72,20 +72,25 @@ public:
 		, m_lcdc(*this, "hd44780")
 	{ }
 
-	DECLARE_WRITE8_MEMBER(henry_p1_w);
-	DECLARE_WRITE8_MEMBER(henry_p3_w);
-	DECLARE_DRIVER_INIT(hprot1);
-	DECLARE_PALETTE_INIT(hprot1);
-	HD44780_PIXEL_UPDATE(hprot1_pixel_update);
 	void hprotr8a(machine_config &config);
 	void hprot2r6(machine_config &config);
 	void hprot1(machine_config &config);
-	void i80c31_io(address_map &map);
-	void i80c31_prg(address_map &map);
-private:
+
+	void init_hprot1();
+
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	required_device<cpu_device> m_maincpu;
+
+private:
+	DECLARE_WRITE8_MEMBER(henry_p1_w);
+	DECLARE_WRITE8_MEMBER(henry_p3_w);
+	void hprot1_palette(palette_device &palette) const;
+	HD44780_PIXEL_UPDATE(hprot1_pixel_update);
+	void i80c31_io(address_map &map);
+	void i80c31_prg(address_map &map);
+
+	required_device<i80c31_device> m_maincpu;
 	required_device<hd44780_device> m_lcdc;
 };
 
@@ -96,16 +101,15 @@ void hprot1_state::i80c31_prg(address_map &map)
 	map(0x0000, 0xffff).rom();
 }
 
-DRIVER_INIT_MEMBER( hprot1_state, hprot1 )
+void hprot1_state::init_hprot1()
 {
-	int i;
 	uint8_t *ROM = memregion("maincpu")->base();
 	uint8_t bitswapped_ROM[0x10000];
 
-	for(i=0x0000;i<0x10000;i++)
+	for (int i = 0x0000; i < 0x10000; i++)
 		bitswapped_ROM[i] = ROM[i];
 
-	for(i=0x0000;i<0x10000;i++)
+	for (int i = 0x0000; i < 0x10000; i++)
 		ROM[bitswap<16>(i, 15, 14, 13, 12, 11, 10, 9, 8, 3, 2, 1, 0, 4, 5, 6, 7)] = bitswapped_ROM[i];
 }
 
@@ -131,10 +135,10 @@ void hprot1_state::i80c31_io(address_map &map)
 {
 	map(0x0000, 0x7fff).ram();
 /*TODO: verify the mirror mask value for the HD44780 device */
-	map(0xc000, 0xc000).mirror(0x13cf).w(m_lcdc, FUNC(hd44780_device::control_write));
-	map(0xc010, 0xc010).mirror(0x13cf).w(m_lcdc, FUNC(hd44780_device::data_write));
-	map(0xc020, 0xc020).mirror(0x13cf).r(m_lcdc, FUNC(hd44780_device::control_read));
-	map(0xc030, 0xc030).mirror(0x13cf).r(m_lcdc, FUNC(hd44780_device::data_read));
+	map(0xc000, 0xc000).mirror(0x13cf).w(m_lcdc, FUNC(hd44780_device::control_w));
+	map(0xc010, 0xc010).mirror(0x13cf).w(m_lcdc, FUNC(hd44780_device::data_w));
+	map(0xc020, 0xc020).mirror(0x13cf).r(m_lcdc, FUNC(hd44780_device::control_r));
+	map(0xc030, 0xc030).mirror(0x13cf).r(m_lcdc, FUNC(hd44780_device::data_r));
 /*TODO: attach the watchdog/brownout reset device:
     map(0xe000,0xe0??).mirror(?).r("adm965an", FUNC(adm965an_device::data_read)); */
 }
@@ -207,7 +211,7 @@ WRITE8_MEMBER(hprot1_state::henry_p3_w)
 		logerror("Write to P3: %02X\n", data);
 }
 
-PALETTE_INIT_MEMBER(hprot1_state, hprot1)
+void hprot1_state::hprot1_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
@@ -224,7 +228,7 @@ static const gfx_layout henry_prot_charlayout =
 	8*8                     /* 8 bytes */
 };
 
-static GFXDECODE_START( hprot1 )
+static GFXDECODE_START( gfx_hprot1 )
 	GFXDECODE_ENTRY( "hd44780:cgrom", 0x0000, henry_prot_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -241,68 +245,69 @@ HD44780_PIXEL_UPDATE(hprot1_state::hprot1_pixel_update)
 	}
 }
 
-MACHINE_CONFIG_START(hprot1_state::hprot1)
+void hprot1_state::hprot1(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80C31, XTAL(10'000'000))
-	MCFG_CPU_PROGRAM_MAP(i80c31_prg)
-	MCFG_CPU_IO_MAP(i80c31_io)
-	MCFG_MCS51_PORT_P1_IN_CB(IOPORT("inputs"))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(hprot1_state, henry_p1_w))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(hprot1_state, henry_p3_w))
+	I80C31(config, m_maincpu, XTAL(10'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &hprot1_state::i80c31_prg);
+	m_maincpu->set_addrmap(AS_IO, &hprot1_state::i80c31_io);
+	m_maincpu->port_in_cb<1>().set_ioport("inputs");
+	m_maincpu->port_out_cb<1>().set(FUNC(hprot1_state::henry_p1_w));
+	m_maincpu->port_out_cb<3>().set(FUNC(hprot1_state::henry_p3_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
-	MCFG_SCREEN_SIZE(6*16, 9*2)
-	MCFG_SCREEN_VISIBLE_AREA(0, 6*16-1, 0, 9*2-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update("hd44780", FUNC(hd44780_device::screen_update));
+	screen.set_size(6*16, 9*2);
+	screen.set_visarea(0, 6*16-1, 0, 9*2-1);
+	screen.set_palette("palette");
 
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(hprot1_state, hprot1)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hprot1)
+	PALETTE(config, "palette", FUNC(hprot1_state::hprot1_palette), 2);
+	GFXDECODE(config, "gfxdecode", "palette", gfx_hprot1);
 
-	MCFG_HD44780_ADD("hd44780")
-	MCFG_HD44780_LCD_SIZE(2, 16)
-	MCFG_HD44780_PIXEL_UPDATE_CB(hprot1_state,hprot1_pixel_update)
+	HD44780(config, m_lcdc, 0);
+	m_lcdc->set_lcd_size(2, 16);
+	m_lcdc->set_pixel_update_cb(FUNC(hprot1_state::hprot1_pixel_update));
 
 	/* TODO: figure out which RTC chip is in use. */
 
 	/* TODO: emulate the ADM695AN chip (watchdog/brownout reset)*/
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(hprot1_state::hprotr8a)
+void hprot1_state::hprotr8a(machine_config &config)
+{
 	hprot1(config);
-	MCFG_CPU_REPLACE("maincpu", I80C31, 11059200) // value of X1 cristal on the PCB
-	MCFG_CPU_PROGRAM_MAP(i80c31_prg)
-	MCFG_CPU_IO_MAP(i80c31_io)
+
+	I80C31(config.replace(), m_maincpu, 11059200); // value of X1 crystal on the PCB
+	m_maincpu->set_addrmap(AS_PROGRAM, &hprot1_state::i80c31_prg);
+	m_maincpu->set_addrmap(AS_IO, &hprot1_state::i80c31_io);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* TODO: add an RS232 interface (emulate MAX232N chip)
 	(the board has GND/VCC/RX/TX pins available in a connector) */
 
 	/* TODO: add an I2C interface (the board has GND/VCC/SDA/SCL pins available in a connector) */
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(hprot1_state::hprot2r6)
+void hprot1_state::hprot2r6(machine_config &config)
+{
 	hprot1(config);
-	MCFG_CPU_REPLACE("maincpu", I80C31, 11059200) // value of X1 cristal on the PCB
-	MCFG_CPU_PROGRAM_MAP(i80c31_prg)
-	MCFG_CPU_IO_MAP(i80c31_io)
+
+	I80C31(config.replace(), m_maincpu, 11059200); // value of X1 crystal on the PCB
+	m_maincpu->set_addrmap(AS_PROGRAM, &hprot1_state::i80c31_prg);
+	m_maincpu->set_addrmap(AS_IO, &hprot1_state::i80c31_io);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* TODO: add an RS232 interface (emulate MAX232N chip) */
-MACHINE_CONFIG_END
+}
 
 ROM_START( hprot1 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -319,12 +324,12 @@ ROM_START( hprot2r6 )
 	ROM_LOAD( "hprot_card2_rev6.u2",  0x00000, 0x10000, CRC(791f2425) SHA1(70af8911a27921cac6d98a5cd07602a7f59c2848) )
 ROM_END
 
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT     CLASS         INIT    COMPANY  FULLNAME                       FLAGS */
-COMP( 2002, hprot1,   0,      0,      hprot1,     hprot1,   hprot1_state, hprot1, "HENRY", "Henry Prot I v19 (REV.1)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS         INIT         COMPANY  FULLNAME                       FLAGS */
+COMP( 2002, hprot1,   0,      0,      hprot1,   hprot1,   hprot1_state, init_hprot1, "HENRY", "Henry Prot I v19 (REV.1)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
 /* fw version: "R19"        Release date: February 1st, 2002.   */
 
-COMP( 2006, hprotr8a, hprot1, 0,      hprotr8a,   hprotr8a, hprot1_state, hprot1, "HENRY", "Henry Prot CARD I (REV.08A)", MACHINE_NOT_WORKING)
+COMP( 2006, hprotr8a, hprot1, 0,      hprotr8a, hprotr8a, hprot1_state, init_hprot1, "HENRY", "Henry Prot CARD I (REV.08A)", MACHINE_NOT_WORKING)
 /* fw version: "V6.5QI I"   Release date: September 18th, 2006. */
 
-COMP( 2003, hprot2r6, hprot1, 0,      hprot2r6,   hprot2r6, hprot1_state, hprot1, "HENRY", "Henry Prot CARD II (REV.6)",  MACHINE_NOT_WORKING)
+COMP( 2003, hprot2r6, hprot1, 0,      hprot2r6, hprot2r6, hprot1_state, init_hprot1, "HENRY", "Henry Prot CARD II (REV.6)",  MACHINE_NOT_WORKING)
 /* fw version: "V5.8CF II"  Release date: June 23rd, 2003.      */

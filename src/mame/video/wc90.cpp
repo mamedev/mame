@@ -71,9 +71,9 @@ TILE_GET_INFO_MEMBER(wc90_state::track_get_fg_tile_info)
 
 void wc90_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wc90_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS,     16,16,64,32);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wc90_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS,16,16,64,32);
-	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wc90_state::get_tx_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,64,32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wc90_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16,16, 64,32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wc90_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 16,16, 64,32);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wc90_state::get_tx_tile_info)), TILEMAP_SCAN_ROWS,  8, 8, 64,32);
 
 	m_fg_tilemap->set_transparent_pen(0);
 	m_tx_tilemap->set_transparent_pen(0);
@@ -81,9 +81,9 @@ void wc90_state::video_start()
 
 VIDEO_START_MEMBER(wc90_state,wc90t)
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wc90_state::track_get_bg_tile_info),this),TILEMAP_SCAN_ROWS,     16,16,64,32);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wc90_state::track_get_fg_tile_info),this),TILEMAP_SCAN_ROWS,16,16,64,32);
-	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wc90_state::get_tx_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,64,32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wc90_state::track_get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16,16, 64,32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wc90_state::track_get_fg_tile_info)), TILEMAP_SCAN_ROWS, 16,16, 64,32);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wc90_state::get_tx_tile_info)),       TILEMAP_SCAN_ROWS,  8, 8, 64,32);
 
 	m_fg_tilemap->set_transparent_pen(0);
 	m_tx_tilemap->set_transparent_pen(0);
@@ -132,12 +132,12 @@ uint32_t wc90_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 	m_tx_tilemap->set_scrollx(0,m_scroll0xlo[0] + 256 * m_scroll0xhi[0]);
 	m_tx_tilemap->set_scrolly(0,m_scroll0ylo[0] + 256 * m_scroll0yhi[0]);
 
-//  m_sprgen->draw_sprites(bitmap,cliprect, m_gfxdecode, m_spriteram, m_spriteram.bytes(), 3); // unused
+//  m_sprgen->draw_wc90_sprites(bitmap,cliprect, m_gfxdecode->gfx(3), m_spriteram, m_spriteram.bytes(), 3); // unused
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);
-	m_sprgen->draw_wc90_sprites(bitmap,cliprect, m_gfxdecode, m_spriteram, m_spriteram.bytes(), 2);
+	m_sprgen->draw_wc90_sprites(bitmap,cliprect, m_gfxdecode->gfx(3), m_spriteram, m_spriteram.bytes(), 2);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0,0);
-	m_sprgen->draw_wc90_sprites(bitmap,cliprect, m_gfxdecode, m_spriteram, m_spriteram.bytes(), 1);
+	m_sprgen->draw_wc90_sprites(bitmap,cliprect, m_gfxdecode->gfx(3), m_spriteram, m_spriteram.bytes(), 1);
 	m_tx_tilemap->draw(screen, bitmap, cliprect, 0,0);
-	m_sprgen->draw_wc90_sprites(bitmap,cliprect, m_gfxdecode, m_spriteram, m_spriteram.bytes(), 0);
+	m_sprgen->draw_wc90_sprites(bitmap,cliprect, m_gfxdecode->gfx(3), m_spriteram, m_spriteram.bytes(), 0);
 	return 0;
 }

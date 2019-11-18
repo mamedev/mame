@@ -50,34 +50,6 @@
 
 #pragma once
 
-
-
-
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-#define MCFG_TTL74123_CONNECTION_TYPE(_ctype) \
-	downcast<ttl74123_device &>(*device).set_connection_type(_ctype);
-
-#define MCFG_TTL74123_RESISTOR_VALUE(_value) \
-	downcast<ttl74123_device &>(*device).set_resistor_value(_value);
-
-#define MCFG_TTL74123_CAPACITOR_VALUE(_value) \
-	downcast<ttl74123_device &>(*device).set_capacitor_value(_value);
-
-#define MCFG_TTL74123_A_PIN_VALUE(_value) \
-	downcast<ttl74123_device &>(*device).set_a_pin_value(_value);
-
-#define MCFG_TTL74123_B_PIN_VALUE(_value) \
-	downcast<ttl74123_device &>(*device).set_b_pin_value(_value);
-
-#define MCFG_TTL74123_CLEAR_PIN_VALUE(_value) \
-	downcast<ttl74123_device &>(*device).set_clear_pin_value(_value);
-
-#define MCFG_TTL74123_OUTPUT_CHANGED_CB(_devcb) \
-	devcb = &downcast<ttl74123_device &>(*device).set_output_changed_callback(DEVCB_##_devcb);
-
 /* constants for the different ways the cap/res can be connected.
    This determines the formula for calculating the pulse width */
 #define TTL74123_NOT_GROUNDED_NO_DIODE      (1)
@@ -96,6 +68,12 @@ class ttl74123_device :  public device_t
 public:
 	// construction/destruction
 	ttl74123_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ttl74123_device(const machine_config &mconfig, const char *tag, device_t *owner, double res, double cap)
+		: ttl74123_device(mconfig, tag, owner, 0U)
+	{
+		set_resistor_value(res);
+		set_capacitor_value(cap);
+	}
 
 	void set_connection_type(int type) { m_connection_type = type; }
 	void set_resistor_value(double value) { m_res = value; }
@@ -103,12 +81,15 @@ public:
 	void set_a_pin_value(int value) { m_a = value; }
 	void set_b_pin_value(int value) { m_b = value; }
 	void set_clear_pin_value(int value) { m_clear = value; }
-	template <class Object> devcb_base &set_output_changed_callback(Object &&cb) { return m_output_changed_cb.set_callback(std::forward<Object>(cb)); }
+
+	auto out_cb() { return m_output_changed_cb.bind(); }
 
 	DECLARE_WRITE_LINE_MEMBER(a_w);
 	DECLARE_WRITE_LINE_MEMBER(b_w);
 	DECLARE_WRITE_LINE_MEMBER(clear_w);
 	DECLARE_WRITE_LINE_MEMBER(reset_w);
+
+	DECLARE_READ_LINE_MEMBER(q_r) { return timer_running(); }
 
 protected:
 	// device-level overrides

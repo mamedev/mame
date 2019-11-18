@@ -444,9 +444,9 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override { return 1; }
-	virtual uint32_t execute_max_cycles() const override { return 2; }
-	virtual uint32_t execute_input_lines() const override { return 1; }
+	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 2; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 1; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -630,10 +630,10 @@ protected:
 	uint32_t          m_next_pc;
 
 	address_space *m_program;
-	direct_read_data<0> *m_direct;
+	memory_access_cache<2, 0, ENDIANNESS_BIG> *m_cache;
 	address_space *m_data;
 
-	direct_read_data<0> *m_datadirect;
+	memory_access_cache<2, 0, ENDIANNESS_BIG> *m_datacache;
 	address_space *m_io;
 
 	typedef void ( am29000_cpu_device::*opcode_func ) ();

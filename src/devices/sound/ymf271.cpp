@@ -1346,7 +1346,7 @@ void ymf271_device::device_timer(emu_timer &timer, device_timer_id id, int param
 			break;
 
 		default:
-			assert_always(false, "Unknown id in ymf271_device::device_timer");
+			throw emu_fatalerror("Unknown id in ymf271_device::device_timer");
 			break;
 	}
 }
@@ -1457,7 +1457,7 @@ void ymf271_device::ymf271_write_timer(uint8_t address, uint8_t data)
 	}
 }
 
-WRITE8_MEMBER( ymf271_device::write )
+void ymf271_device::write(offs_t offset, u8 data)
 {
 	m_stream->update();
 
@@ -1503,7 +1503,7 @@ WRITE8_MEMBER( ymf271_device::write )
 	}
 }
 
-READ8_MEMBER( ymf271_device::read )
+u8 ymf271_device::read(offs_t offset)
 {
 	switch (offset & 0xf)
 	{

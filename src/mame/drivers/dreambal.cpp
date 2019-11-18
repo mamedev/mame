@@ -28,27 +28,32 @@ lamps?
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"
 #include "video/deco16ic.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
 class dreambal_state : public driver_device
 {
 public:
-	dreambal_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	dreambal_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_deco104(*this, "ioprot104"),
-		m_deco_tilegen1(*this, "tilegen1"),
+		m_deco_tilegen(*this, "tilegen"),
 		m_eeprom(*this, "eeprom")
 	{ }
 
+	void dreambal(machine_config &config);
+
+	void init_dreambal();
+
+private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	optional_device<deco104_device> m_deco104;
-	required_device<deco16ic_device> m_deco_tilegen1;
+	required_device<deco16ic_device> m_deco_tilegen;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 
-	DECLARE_DRIVER_INIT(dreambal);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -72,24 +77,22 @@ public:
 			m_eeprom->cs_write(data&0x4 ? ASSERT_LINE : CLEAR_LINE);
 		}
 	}
-	void dreambal(machine_config &config);
 	void dreambal_map(address_map &map);
 };
 
 
 uint32_t dreambal_state::screen_update_dreambal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	address_space &space = generic_space();
-	uint16_t flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
+	uint16_t flip = m_deco_tilegen->pf_control_r(0);
 
 	flip_screen_set(BIT(flip, 7));
-	m_deco_tilegen1->pf_update(nullptr, nullptr);
+	m_deco_tilegen->pf_update(nullptr, nullptr);
 
 	bitmap.fill(0, cliprect); /* not Confirmed */
 	screen.priority().fill(0);
 
-	m_deco_tilegen1->tilemap_2_draw(screen, bitmap, cliprect, 0, 2);
-	m_deco_tilegen1->tilemap_1_draw(screen, bitmap, cliprect, 0, 4);
+	m_deco_tilegen->tilemap_2_draw(screen, bitmap, cliprect, 0, 2);
+	m_deco_tilegen->tilemap_1_draw(screen, bitmap, cliprect, 0, 4);
 	return 0;
 }
 
@@ -99,7 +102,7 @@ READ16_MEMBER( dreambal_state::dreambal_protection_region_0_104_r )
 	int real_address = 0 + (offset *2);
 	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
-	uint16_t data = m_deco104->read_data( deco146_addr, mem_mask, cs );
+	uint16_t data = m_deco104->read_data( deco146_addr, cs );
 	return data;
 }
 
@@ -108,24 +111,24 @@ WRITE16_MEMBER( dreambal_state::dreambal_protection_region_0_104_w )
 	int real_address = 0 + (offset *2);
 	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
-	m_deco104->write_data( space, deco146_addr, data, mem_mask, cs );
+	m_deco104->write_data( deco146_addr, data, mem_mask, cs );
 }
 
 void dreambal_state::dreambal_map(address_map &map)
 {
-//ADDRESS_MAP_UNMAP_HIGH
+//map.unmap_value_high();
 	map(0x000000, 0x07ffff).rom();
-	map(0x100000, 0x100fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
+	map(0x100000, 0x100fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
 	map(0x101000, 0x101fff).ram();
-	map(0x102000, 0x102fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
+	map(0x102000, 0x102fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w));
 	map(0x103000, 0x103fff).ram();
 
 	map(0x120000, 0x123fff).ram();
 	map(0x140000, 0x1403ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 
-	map(0x160000, 0x163fff).rw(this, FUNC(dreambal_state::dreambal_protection_region_0_104_r), FUNC(dreambal_state::dreambal_protection_region_0_104_w)).share("prot16ram"); /* Protection device */
+	map(0x160000, 0x163fff).rw(FUNC(dreambal_state::dreambal_protection_region_0_104_r), FUNC(dreambal_state::dreambal_protection_region_0_104_w)).share("prot16ram"); /* Protection device */
 
-	map(0x161000, 0x16100f).w(m_deco_tilegen1, FUNC(deco16ic_device::pf_control_w));
+	map(0x161000, 0x16100f).w(m_deco_tilegen, FUNC(deco16ic_device::pf_control_w));
 
 
 	map(0x180001, 0x180001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
@@ -134,7 +137,7 @@ void dreambal_state::dreambal_map(address_map &map)
 	map(0x163000, 0x163001).nopw(); // something on bit 1
 	map(0x164000, 0x164001).nopw(); // something on bit 1
 
-	map(0x165000, 0x165001).w(this, FUNC(dreambal_state::dreambal_eeprom_w)); // EEP Write?
+	map(0x165000, 0x165001).w(FUNC(dreambal_state::dreambal_eeprom_w)); // EEP Write?
 
 	map(0x16c002, 0x16c00d).nopw(); // writes 0000 to 0005 on startup
 	map(0x1a0000, 0x1a0003).nopw(); // RS-232C status / data ports (byte access)
@@ -164,7 +167,7 @@ static const gfx_layout tile_16x16_layout =
 };
 
 
-static GFXDECODE_START( dreambal )
+static GFXDECODE_START( gfx_dreambal )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_8x8_layout,     0x000, 32 )    /* Tiles (8x8) */
 	GFXDECODE_ENTRY( "gfx1", 0, tile_16x16_layout,   0x000, 32 )    /* Tiles (16x16) */
 GFXDECODE_END
@@ -307,56 +310,52 @@ void dreambal_state::machine_reset()
 }
 
 // xtals = 28.000, 9.8304
-MACHINE_CONFIG_START(dreambal_state::dreambal)
-
+void dreambal_state::dreambal(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 28000000/2)
-	MCFG_CPU_PROGRAM_MAP(dreambal_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dreambal_state,  irq6_line_hold) // 5 valid too?
+	M68000(config, m_maincpu, 28000000/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &dreambal_state::dreambal_map);
+	m_maincpu->set_vblank_int("screen", FUNC(dreambal_state::irq6_line_hold)); // 5 valid too?
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(dreambal_state, screen_update_dreambal)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(58);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(dreambal_state::screen_update_dreambal));
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 0x400/2)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dreambal)
+	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 0x400/2);
+	GFXDECODE(config, "gfxdecode", "palette", gfx_dreambal);
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")  // 93lc46b
+	EEPROM_93C46_16BIT(config, "eeprom");  // 93lc46b
 
-	MCFG_DECO104_ADD("ioprot104")
-	MCFG_DECO146_IN_PORTA_CB(IOPORT("INPUTS"))
-	MCFG_DECO146_IN_PORTB_CB(IOPORT("SYSTEM"))
-	MCFG_DECO146_IN_PORTC_CB(IOPORT("DSW"))
+	DECO104PROT(config, m_deco104, 0);
+	m_deco104->port_a_cb().set_ioport("INPUTS");
+	m_deco104->port_b_cb().set_ioport("SYSTEM");
+	m_deco104->port_c_cb().set_ioport("DSW");
 
-	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
-	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
-	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
-	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF1_COL_BANK(0x00)
-	MCFG_DECO16IC_PF2_COL_BANK(0x10)
-	MCFG_DECO16IC_PF1_COL_MASK(0x0f)
-	MCFG_DECO16IC_PF2_COL_MASK(0x0f)
-	MCFG_DECO16IC_BANK1_CB(dreambal_state, bank_callback)
-	MCFG_DECO16IC_BANK2_CB(dreambal_state, bank_callback)
-	MCFG_DECO16IC_PF12_8X8_BANK(0)
-	MCFG_DECO16IC_PF12_16X16_BANK(1)
-	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	DECO16IC(config, m_deco_tilegen, 0);
+	m_deco_tilegen->set_pf1_size(DECO_64x32);
+	m_deco_tilegen->set_pf2_size(DECO_64x32);
+	m_deco_tilegen->set_pf1_trans_mask(0x0f);
+	m_deco_tilegen->set_pf2_trans_mask(0x0f);
+	m_deco_tilegen->set_pf1_col_bank(0x00);
+	m_deco_tilegen->set_pf2_col_bank(0x10);
+	m_deco_tilegen->set_pf1_col_mask(0x0f);
+	m_deco_tilegen->set_pf2_col_mask(0x0f);
+	m_deco_tilegen->set_bank1_callback(FUNC(dreambal_state::bank_callback));
+	m_deco_tilegen->set_bank2_callback(FUNC(dreambal_state::bank_callback));
+	m_deco_tilegen->set_pf12_8x8_bank(0);
+	m_deco_tilegen->set_pf12_16x16_bank(1);
+	m_deco_tilegen->set_gfxdecode_tag("gfxdecode");
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", 9830400/8, PIN7_HIGH)
-
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki", 9830400/8, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.00);
+}
 
 
 
@@ -371,10 +370,10 @@ ROM_START( dreambal )
 	ROM_LOAD( "mm_01-1.12f",    0x00000, 0x20000, CRC(4f134be7) SHA1(b83230cc62bde55be736fd604af23f927706a770) )
 ROM_END
 
-DRIVER_INIT_MEMBER(dreambal_state,dreambal)
+void dreambal_state::init_dreambal()
 {
 	deco56_decrypt_gfx(machine(), "gfx1");
 }
 
 // Ver 2.4 JPN 93.12.02
-GAME( 1993, dreambal, 0,     dreambal, dreambal, dreambal_state,  dreambal,  ROT0, "NDK / Data East", "Dream Ball (Japan V2.4)", MACHINE_SUPPORTS_SAVE ) // copyright shows NDK, board is Data East, code seems Data East-like too
+GAME( 1993, dreambal, 0, dreambal, dreambal, dreambal_state, init_dreambal, ROT0, "NDK / Data East", "Dream Ball (Japan V2.4)", MACHINE_SUPPORTS_SAVE ) // copyright shows NDK, board is Data East, code seems Data East-like too

@@ -7,14 +7,14 @@
     Multi-language support.
 
 ***************************************************************************/
+#ifndef MAME_FRONTEND_MAME_LANGUAGE_H
+#define MAME_FRONTEND_MAME_LANGUAGE_H
+
 #pragma once
 
 #ifndef __EMU_H__
 #error Dont include this file directly; include emu.h instead.
 #endif
-
-#ifndef __LANGUAGE_H__
-#define __LANGUAGE_H__
 
 //**************************************************************************
 //  LOCALIZATION SUPPORT
@@ -28,4 +28,4 @@
 void load_translation(emu_options &option);
 const char *lang_translate(const char *word);
 
-#endif /*__LANGUAGE_H__*/
+#endif // MAME_FRONTEND_MAME_LANGUAGE_H

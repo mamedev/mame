@@ -101,6 +101,7 @@
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6840ptm.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -108,12 +109,16 @@
 class vpoker_state : public driver_device
 {
 public:
-	vpoker_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	vpoker_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette")
+	{ }
 
+	void vpoker(machine_config &config);
+
+private:
 	std::unique_ptr<uint8_t[]> m_videoram;
 	uint8_t m_blit_ram[8];
 	DECLARE_READ8_MEMBER(blitter_r);
@@ -124,7 +129,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void vpoker(machine_config &config);
 	void main_map(address_map &map);
 };
 
@@ -187,7 +191,7 @@ void vpoker_state::main_map(address_map &map)
 	map.global_mask(0x3fff);
 	map(0x0000, 0x01ff).ram();     /* vpoker has 0x100, 5acespkr has 0x200 */
 	map(0x0400, 0x0407).rw("6840ptm", FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
-	map(0x0800, 0x0807).r(this, FUNC(vpoker_state::blitter_r)).w(this, FUNC(vpoker_state::blitter_w));
+	map(0x0800, 0x0807).r(FUNC(vpoker_state::blitter_r)).w(FUNC(vpoker_state::blitter_w));
 	map(0x2000, 0x3fff).rom();
 }
 
@@ -621,7 +625,7 @@ static const gfx_layout charlayout =
 	16*16
 };
 
-static GFXDECODE_START( vpoker )
+static GFXDECODE_START( gfx_vpoker )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 1 )
 GFXDECODE_END
 
@@ -630,37 +634,36 @@ WRITE_LINE_MEMBER(vpoker_state::ptm_irq)
 	m_maincpu->set_input_line(M6809_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-MACHINE_CONFIG_START(vpoker_state::vpoker)
-
+void vpoker_state::vpoker(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M6809,XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", vpoker_state, irq0_line_hold) //irq0 valid too
+	MC6809(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &vpoker_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(vpoker_state::irq0_line_hold));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 480-1, 0*8, 240-1)
-//  MCFG_SCREEN_VISIBLE_AREA(0*8, 512-1, 0*8, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(vpoker_state, screen_update_vpoker)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
+	screen.set_size(512, 256);
+	screen.set_visarea(0*8, 480-1, 0*8, 240-1);
+//  screen.set_visarea(0*8, 512-1, 0*8, 256-1);
+	screen.set_screen_update(FUNC(vpoker_state::screen_update_vpoker));
+	screen.set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", vpoker)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_vpoker);
 
-	MCFG_PALETTE_ADD_3BIT_GBR("palette")
+	PALETTE(config, m_palette, palette_device::GBR_3BIT);
 
 	/* 6840 PTM */
-	MCFG_DEVICE_ADD("6840ptm", PTM6840, XTAL(4'000'000))
-	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_IRQ_CB(WRITELINE(vpoker_state, ptm_irq))
+	ptm6840_device &ptm(PTM6840(config, "6840ptm", XTAL(4'000'000) / 4));
+	ptm.set_external_clocks(0, 0, 0);
+	ptm.irq_callback().set(FUNC(vpoker_state::ptm_irq));
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-//  MCFG_SOUND_ADD("aysnd", AY8910, 8000000/4 /* guess */)
-//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_CONFIG_END
+	SPEAKER(config, "mono").front_center();
+//  AY8910(config, "aysnd", 8000000/4 /* guess */).add_route(ALL_OUTPUTS, "mono", 0.30);
+}
 
 /***************************************************************************
 
@@ -705,6 +708,6 @@ ROM_START( 5acespkr )
 ROM_END
 
 
-//    YEAR  NAME      PARENT  MACHINE  INPUT     STATE         INIT  ROT   COMPANY               FULLNAME                   FLAGS
-GAME( 198?, vpoker,   0,      vpoker,  vpoker,   vpoker_state, 0,    ROT0, "Videotronics, Inc.", "Videotronics Draw Poker", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 198?, 5acespkr, 0,      vpoker,  5acespkr, vpoker_state, 0,    ROT0, "<unknown>",          "5-Aces Poker",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME      PARENT  MACHINE  INPUT     STATE         INIT        ROT   COMPANY               FULLNAME                   FLAGS
+GAME( 198?, vpoker,   0,      vpoker,  vpoker,   vpoker_state, empty_init, ROT0, "Videotronics, Inc.", "Videotronics Draw Poker", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 198?, 5acespkr, 0,      vpoker,  5acespkr, vpoker_state, empty_init, ROT0, "<unknown>",          "5-Aces Poker",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

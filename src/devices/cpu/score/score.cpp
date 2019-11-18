@@ -73,7 +73,7 @@ void score7_cpu_device::device_start()
 {
 	// find address spaces
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<2, 0, ENDIANNESS_LITTLE>();
 
 	// set our instruction counter
 	set_icountptr(m_icount);
@@ -283,7 +283,7 @@ int32_t score7_cpu_device::sign_extend(uint32_t data, uint8_t len)
 
 uint32_t score7_cpu_device::fetch()
 {
-	return m_direct->read_dword(m_pc & ~3);
+	return m_cache->read_dword(m_pc & ~3);
 }
 
 uint8_t score7_cpu_device::read_byte(offs_t offset)
@@ -325,7 +325,7 @@ void score7_cpu_device::check_irq()
 			if (m_pending_interrupt[i])
 			{
 				m_pending_interrupt[i] = false;
-				debugger_interrupt_hook(i);
+				standard_irq_callback(i);
 				gen_exception(EXCEPTION_INTERRUPT, i);
 				return;
 			}

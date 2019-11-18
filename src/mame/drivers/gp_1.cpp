@@ -23,7 +23,7 @@ ToDo:
 #include "machine/genpin.h"
 
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/i8255.h"
 #include "machine/timer.h"
 #include "machine/z80ctc.h"
@@ -38,6 +38,7 @@ public:
 	gp_1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_ppi(*this, "ppi")
 		, m_ctc(*this, "ctc")
 		, m_sn(*this, "snsnd")
 		, m_io_dsw0(*this, "DSW0")
@@ -52,23 +53,27 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
-	DECLARE_DRIVER_INIT(gp_1);
+	void gp_1(machine_config &config);
+	void gp_1s(machine_config &config);
+
+	void init_gp_1();
+
+private:
 	DECLARE_WRITE8_MEMBER(porta_w);
 	DECLARE_WRITE8_MEMBER(portas_w);
 	DECLARE_WRITE8_MEMBER(portc_w);
 	DECLARE_READ8_MEMBER(portb_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(zero_timer);
-	void gp_1(machine_config &config);
-	void gp_1s(machine_config &config);
 	void gp_1_io(address_map &map);
 	void gp_1_map(address_map &map);
-private:
+
 	uint8_t m_u14;
 	uint8_t m_digit;
 	uint8_t m_segment[16];
 	virtual void machine_reset() override;
 	virtual void machine_start() override { m_digits.resolve(); }
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
+	required_device<i8255_device> m_ppi;
 	required_device<z80ctc_device> m_ctc;
 	optional_device<sn76477_device> m_sn;
 	required_ioport m_io_dsw0;
@@ -93,7 +98,7 @@ void gp_1_state::gp_1_map(address_map &map)
 void gp_1_state::gp_1_io(address_map &map)
 {
 	map.global_mask(0x0f);
-	map(0x04, 0x07).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x04, 0x07).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x08, 0x0b).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 }
 
@@ -430,57 +435,55 @@ static const z80_daisy_config daisy_chain[] =
 	{ nullptr }
 };
 
-MACHINE_CONFIG_START(gp_1_state::gp_1)
+void gp_1_state::gp_1(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 2457600)
-	MCFG_CPU_PROGRAM_MAP(gp_1_map)
-	MCFG_CPU_IO_MAP(gp_1_io)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain)
+	Z80(config, m_maincpu, 2457600);
+	m_maincpu->set_addrmap(AS_PROGRAM, &gp_1_state::gp_1_map);
+	m_maincpu->set_addrmap(AS_IO, &gp_1_state::gp_1_io);
+	m_maincpu->set_daisy_config(daisy_chain);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_gp_1)
+	config.set_default_layout(layout_gp_1);
 
 	/* Sound */
 	genpin_audio(config);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("ppi", I8255A, 0 )
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(gp_1_state, porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(gp_1_state, portb_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(gp_1_state, portc_w))
+	I8255A(config, m_ppi);
+	m_ppi->out_pa_callback().set(FUNC(gp_1_state::porta_w));
+	m_ppi->in_pb_callback().set(FUNC(gp_1_state::portb_r));
+	m_ppi->out_pc_callback().set(FUNC(gp_1_state::portc_w));
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, 2457600 )
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0)) // Todo: absence of ints will cause a watchdog reset
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("gp1", gp_1_state, zero_timer, attotime::from_hz(120)) // mains freq*2
-MACHINE_CONFIG_END
+	Z80CTC(config, m_ctc, 2457600);
+	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0); // Todo: absence of ints will cause a watchdog reset
+	TIMER(config, "gp1").configure_periodic(FUNC(gp_1_state::zero_timer), attotime::from_hz(120)); // mains freq*2
+}
 
-MACHINE_CONFIG_START(gp_1_state::gp_1s)
+void gp_1_state::gp_1s(machine_config &config)
+{
 	gp_1(config);
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("snsnd", SN76477, 0)
-	MCFG_SN76477_NOISE_PARAMS(0, 0, 0)                // noise + filter: N/C
-	MCFG_SN76477_DECAY_RES(0)                         // decay_res: N/C
-	MCFG_SN76477_ATTACK_PARAMS(0, 0)                  // attack_decay_cap + attack_res: N/C
-	MCFG_SN76477_AMP_RES(RES_K(220))                  // amplitude_res
-	MCFG_SN76477_FEEDBACK_RES(RES_K(47))              // feedback_res
-	MCFG_SN76477_VCO_PARAMS(0, CAP_U(0.1), RES_K(56)) // VCO volt + cap + res
-	MCFG_SN76477_PITCH_VOLTAGE(5.0)                   // pitch_voltage
-	MCFG_SN76477_SLF_PARAMS(CAP_U(1.0), RES_K(220))   // slf caps + res
-	MCFG_SN76477_ONESHOT_PARAMS(0, 0)                 // oneshot caps + res: N/C
-	MCFG_SN76477_VCO_MODE(0)                          // VCO mode: N/C
-	MCFG_SN76477_MIXER_PARAMS(0, 0, 0)                // mixer A, B, C: N/C
-	MCFG_SN76477_ENVELOPE_PARAMS(0, 1)                // envelope 1, 2
-	MCFG_SN76477_ENABLE(1)                            // enable
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	SPEAKER(config, "mono").front_center();
+	SN76477(config, m_sn);
+	m_sn->set_noise_params(0, 0, 0);
+	m_sn->set_decay_res(0);
+	m_sn->set_attack_params(0, 0);
+	m_sn->set_amp_res(RES_K(220));
+	m_sn->set_feedback_res(RES_K(47));
+	m_sn->set_vco_params(0, CAP_U(0.1), RES_K(56));
+	m_sn->set_pitch_voltage(5.0);
+	m_sn->set_slf_params(CAP_U(1.0), RES_K(220));
+	m_sn->set_oneshot_params(0, 0);
+	m_sn->set_vco_mode(0);
+	m_sn->set_mixer_params(0, 0, 0);
+	m_sn->set_envelope_params(0, 1);
+	m_sn->set_enable(1);
+	m_sn->add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_REMOVE("ppi")
-	MCFG_DEVICE_ADD("ppi", I8255A, 0 )
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(gp_1_state, portas_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(gp_1_state, portb_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(gp_1_state, portc_w))
-MACHINE_CONFIG_END
+	m_ppi->out_pa_callback().set(FUNC(gp_1_state::portas_w));
+}
 
 
 ROM_START( gp_110 )
@@ -543,13 +546,13 @@ ROM_START(vegasgp)
 	ROM_LOAD( "140b.13", 0x0800, 0x0800, CRC(cf26d67b) SHA1(05481e880e23a7bc1d1716b52ac1effc0db437f2))
 ROM_END
 
-GAME(1978, gp_110,   0,        gp_1,     gp_1,     gp_1_state, 0,   ROT0, "Game Plan", "Model 110",         MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING)
-GAME(1978, blvelvet, gp_110,   gp_1,     gp_1,     gp_1_state, 0,   ROT0, "Game Plan", "Black Velvet",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME(1978, camlight, gp_110,   gp_1,     gp_1,     gp_1_state, 0,   ROT0, "Game Plan", "Camel Lights",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME(1978, foxylady, gp_110,   gp_1,     gp_1,     gp_1_state, 0,   ROT0, "Game Plan", "Foxy Lady",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME(1978, real,     gp_110,   gp_1,     gp_1,     gp_1_state, 0,   ROT0, "Game Plan", "Real",              MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME(1978, rio,      gp_110,   gp_1,     gp_1,     gp_1_state, 0,   ROT0, "Game Plan", "Rio",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME(1978, chucklck, gp_110,   gp_1,     gp_1,     gp_1_state, 0,   ROT0, "Game Plan", "Chuck-A-Luck",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME(1979, famlyfun, 0,        gp_1s,    gp_1,     gp_1_state, 0,   ROT0, "Game Plan", "Family Fun!",       MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME(1979, startrip, 0,        gp_1s,    gp_1,     gp_1_state, 0,   ROT0, "Game Plan", "Star Trip",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME(1979, vegasgp,  0,        gp_1s,    gp_1,     gp_1_state, 0,   ROT0, "Game Plan", "Vegas (Game Plan)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME(1978, gp_110,   0,      gp_1,  gp_1, gp_1_state, empty_init, ROT0, "Game Plan", "Model 110",         MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING)
+GAME(1978, blvelvet, gp_110, gp_1,  gp_1, gp_1_state, empty_init, ROT0, "Game Plan", "Black Velvet",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME(1978, camlight, gp_110, gp_1,  gp_1, gp_1_state, empty_init, ROT0, "Game Plan", "Camel Lights",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME(1978, foxylady, gp_110, gp_1,  gp_1, gp_1_state, empty_init, ROT0, "Game Plan", "Foxy Lady",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME(1978, real,     gp_110, gp_1,  gp_1, gp_1_state, empty_init, ROT0, "Game Plan", "Real",              MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME(1978, rio,      gp_110, gp_1,  gp_1, gp_1_state, empty_init, ROT0, "Game Plan", "Rio",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME(1978, chucklck, gp_110, gp_1,  gp_1, gp_1_state, empty_init, ROT0, "Game Plan", "Chuck-A-Luck",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME(1979, famlyfun, 0,      gp_1s, gp_1, gp_1_state, empty_init, ROT0, "Game Plan", "Family Fun!",       MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME(1979, startrip, 0,      gp_1s, gp_1, gp_1_state, empty_init, ROT0, "Game Plan", "Star Trip",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME(1979, vegasgp,  0,      gp_1s, gp_1, gp_1_state, empty_init, ROT0, "Game Plan", "Vegas (Game Plan)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)

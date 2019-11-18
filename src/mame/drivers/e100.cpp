@@ -10,7 +10,7 @@
  * extended with commands suitable for educational experiments using the exapansion bus and its built in
  * io control capabilities.
  *
- * The Esselte 1000 was an educational package based on Apple II plus software and litterature but the relation
+ * The Esselte 1000 was an educational package based on Apple II plus software and literature but the relation
  * to Didact is at this point unknown so it is probably a pure Esselte software production. If this branded
  * distribution is recovered it will be added as a clone of the Apple II driver or just as softlist item.
  *
@@ -37,6 +37,8 @@
 // Features
 #include "imagedev/cassette.h"
 #include "bus/rs232/rs232.h"
+#include "speaker.h"
+#include "emupal.h"
 #include "screen.h"
 
 //**************************************************************************
@@ -96,7 +98,7 @@
  * |DIDACT ESS 100 CPU                         +----+ +----+ +----+ +----+ +----+ +----+ +----+ +----+ +----++                            |
  * |___________________________________________________________________________________________________________+----+__+----+__+----+_____+----
  *
- * rev2 board had 4Kb more ROM memory, 2 x 2764 instead of the 6 x 2716 (note the rev1 piggy back on righ most 2716) with funny address decoding.
+ * rev2 board had 4Kb more ROM memory, 2 x 2764 instead of the 6 x 2716 (note the rev1 piggyback on rightmost 2716) with funny address decoding.
  * Once we get a rom dump for rev 1 the driver need to accomodate another keymap too so probably needs to be splitted somehow.
  *  __________________________________________________________________________________________________________________________________________
  * | The Didact Esselte 100 CPU board rev2, 15/4 1983                                                                     in-PCB coil     +----
@@ -148,15 +150,15 @@ public:
 		,m_io_line7(*this, "LINE7")
 		,m_io_line8(*this, "LINE8")
 		,m_io_line9(*this, "LINE9")
-		,m_line0(0)
-		,m_line1(0)
-		,m_line2(0)
-		,m_line3(0)
 		,m_pia1(*this, PIA1_TAG)
 		,m_pia2(*this, PIA2_TAG)
 		,m_pia1_B(0)
 		,m_50hz(0)
 		{ }
+
+	void e100(machine_config &config);
+
+private:
 	required_device<m6802_cpu_device> m_maincpu;
 	required_device<ttl74145_device> m_kbd_74145;
 	required_shared_ptr<uint8_t> m_videoram;
@@ -178,9 +180,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( pia1_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER( pia1_cb2_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(rtc_w);
-	void e100(machine_config &config);
 	void e100_map(address_map &map);
-protected:
+
 	required_ioport m_io_line0;
 	required_ioport m_io_line1;
 	required_ioport m_io_line2;
@@ -191,10 +192,6 @@ protected:
 	required_ioport m_io_line7;
 	required_ioport m_io_line8;
 	required_ioport m_io_line9;
-	uint8_t m_line0;
-	uint8_t m_line1;
-	uint8_t m_line2;
-	uint8_t m_line3;
 	required_device<pia6821_device> m_pia1;
 	required_device<pia6821_device> m_pia2;
 	uint8_t m_pia1_B;
@@ -262,12 +259,12 @@ WRITE8_MEMBER( e100_state::pia_w )
 	if ((offset & 0x08) == 0x08)
 	{
 		LOG("- PIA1\n");
-		m_pia1->write(space, offset, data);
+		m_pia1->write(offset, data);
 	}
 	if ((offset & 0x10) == 0x10)
 	{
 		LOG("- PIA2\n");
-		m_pia2->write(space, offset, data);
+		m_pia2->write(offset, data);
 	}
 	if (VERBOSE && (offset & 0x18) == 0x18)
 	{
@@ -288,19 +285,19 @@ READ8_MEMBER( e100_state::pia_r )
 	{
 	case 0x18: // read PIA1 and PIA2 at the same time, should really only happen for writes...
 		{
-			uint8_t data1 =  m_pia1->read(space, offset);
-			uint8_t data2 =  m_pia2->read(space, offset);
+			uint8_t data1 =  m_pia1->read(offset);
+			uint8_t data2 =  m_pia2->read(offset);
 			logerror("%s: Dual device read may have caused unpredictable results on real hardware\n", FUNCNAME);
 			data = data1 & data2; // We assume that the stable behaviour is that data lines with a low level by either device succeeds
 			LOGCS("%s %s[%02x] %02x & %02x -> %02x Dual device read!!\n", PIA1_TAG "/" PIA2_TAG, FUNCNAME, offset, data1, data2, data);
 		}
 		break;
 	case 0x08: // PIA1
-		data = m_pia1->read(space, offset);
+		data = m_pia1->read(offset);
 		LOGCS("%s %s(%02x)\n", PIA1_TAG, FUNCNAME, data);
 		break;
 	case 0x10: // PIA2
-		data = m_pia2->read(space, offset);
+		data = m_pia2->read(offset);
 		LOGCS("%s %s(%02x)\n", PIA2_TAG, FUNCNAME, data);
 		break;
 	default: // None of the devices are selected
@@ -348,7 +345,7 @@ READ8_MEMBER( e100_state::pia1_kbA_r )
   PB4-PB5 together with CA1, CA2, CB1 and CB2 are used for the printer interface
   PB6-PB7 forms the cassette interface
 
-  The serial bitbanging perform enreliable atm, can be poor original code or inexact CPU timing.
+  The serial bitbanging performs unreliably atm, can be poor original code or inexact CPU timing.
   Best results is achieved with 8 bit at 9600 baud as follows:
 
     mame e100 -window -rs232 null_modem -bitbngr socket.127.0.0.1:4321
@@ -428,7 +425,7 @@ void e100_state::e100_map(address_map &map)
 	map(0x0000, 0x1fff).ram();
 	map(0x8000, 0x87ff).rom().region("roms", 0);
 	map(0xc000, 0xc3ff).ram().share("videoram");
-	map(0xc800, 0xc81f).rw(this, FUNC(e100_state::pia_r), FUNC(e100_state::pia_w)).mirror(0x07e0);
+	map(0xc800, 0xc81f).rw(FUNC(e100_state::pia_r), FUNC(e100_state::pia_w)).mirror(0x07e0);
 	map(0xd000, 0xffff).rom().region("roms", 0x1000);
 }
 
@@ -542,12 +539,13 @@ static INPUT_PORTS_START( e100 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_9_PAD)        PORT_CHAR(UCHAR_MAMEKEY(9_PAD))
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(e100_state::e100)
-	MCFG_CPU_ADD("maincpu", M6802, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(e100_map)
+void e100_state::e100(machine_config &config)
+{
+	M6802(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &e100_state::e100_map);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("kbd_74145", TTL74145, 0)
+	TTL74145(config, m_kbd_74145, 0);
 
 	/* --PIA inits----------------------- */
 	/* 0xF883 0xC818 (PIA1 DDR A)     = 0x00 - Port A all inputs */
@@ -564,23 +562,24 @@ MACHINE_CONFIG_START(e100_state::e100)
 	/* 0xF894 0xC818 (PIA2 Control A) = 0x34 - CA2 is low and lock DDRA */
 	/* 0xF896 0xC818 (PIA1 Control B) = 0x34 - CB2 is low and lock DDRB */
 	/* 0xF896 0xC818 (PIA2 Control B) = 0x34 - CB2 is low and lock DDRB */
-	MCFG_DEVICE_ADD(PIA1_TAG, PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(e100_state, pia1_kbA_w))
-	MCFG_PIA_READPA_HANDLER(READ8(e100_state, pia1_kbA_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(e100_state, pia1_kbB_w))
-	MCFG_PIA_READPB_HANDLER(READ8(e100_state, pia1_kbB_r))
-	MCFG_PIA_READCA1_HANDLER(READLINE(e100_state, pia1_ca1_r))
-	MCFG_PIA_READCB1_HANDLER(READLINE(e100_state, pia1_cb1_r))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(e100_state, pia1_ca2_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(e100_state, pia1_cb2_w))
+	PIA6821(config, m_pia1, 0);
+	m_pia1->writepa_handler().set(FUNC(e100_state::pia1_kbA_w));
+	m_pia1->readpa_handler().set(FUNC(e100_state::pia1_kbA_r));
+	m_pia1->writepb_handler().set(FUNC(e100_state::pia1_kbB_w));
+	m_pia1->readpb_handler().set(FUNC(e100_state::pia1_kbB_r));
+	m_pia1->readca1_handler().set(FUNC(e100_state::pia1_ca1_r));
+	m_pia1->readcb1_handler().set(FUNC(e100_state::pia1_cb1_r));
+	m_pia1->ca2_handler().set(FUNC(e100_state::pia1_ca2_w));
+	m_pia1->cb2_handler().set(FUNC(e100_state::pia1_cb2_w));
 
 	/* The optional second PIA enables the expansion port on CA1 and a software RTC with 50Hz resolution */
-	MCFG_DEVICE_ADD(PIA2_TAG, PIA6821, 0)
-	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
+	PIA6821(config, m_pia2, 0);
+	m_pia2->irqa_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 
 	/* Serial port support */
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
 
+	SPEAKER(config, "mono").front_center();
 	/* Cassette support - E100 uses 300 baud Kansas City Standard with 1200/2400 Hz modulation */
 	/* NOTE on usage: mame e100 -window -cass <wav file> -ui_active
 	 * Once running enable/disable internal UI by pressing Scroll Lock in case it interferes with target keys
@@ -589,19 +588,20 @@ MACHINE_CONFIG_START(e100_state::e100)
 	 * Once created it may be given on the commandline or mounted via TAB and select
 	 * E100 supports cassette through the 'LOAD' and 'SAVE' commands with no arguments
 	 */
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_MUTED | CASSETTE_MOTOR_ENABLED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* screen TODO: simplify the screen config, look at zx.cpp */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(4'000'000)/2, 265, 0, 265, 265, 0, 265)
-	MCFG_SCREEN_UPDATE_DRIVER(e100_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(4'000'000)/2, 265, 0, 265, 265, 0, 265);
+	screen.set_screen_update(FUNC(e100_state::screen_update));
+	screen.set_palette("palette");
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* There is a 50Hz signal from the video circuit to CA1 which generates interrupts and drives a software RTC */
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("video50hz", e100_state, rtc_w, attotime::from_hz(100)) /* Will be divided by two through toggle in the handler */
-MACHINE_CONFIG_END
+	TIMER(config, "video50hz").configure_periodic(FUNC(e100_state::rtc_w), attotime::from_hz(100)); /* Will be divided by two through toggle in the handler */
+}
 
 /* ROM sets from Didact was not versioned in general, so the numbering are just assumptions */
 ROM_START( e100 )
@@ -610,22 +610,22 @@ ROM_START( e100 )
 
 	/* TODO: Get the original ROMs */
 	ROM_SYSTEM_BIOS(0, "rev1-basic", "Esselte 100 rev1 BASIC")
-	ROMX_LOAD( "e100r1u201.bin", 0x1000, 0x0800, NO_DUMP, ROM_BIOS(1) )
-	ROMX_LOAD( "e100r1u202.bin", 0x1800, 0x0800, NO_DUMP, ROM_BIOS(1) )
-	ROMX_LOAD( "e100r1u203.bin", 0x2000, 0x0800, NO_DUMP, ROM_BIOS(1) )
-	ROMX_LOAD( "e100r1u204.bin", 0x2800, 0x0800, NO_DUMP, ROM_BIOS(1) )
-	ROMX_LOAD( "e100r1u205.bin", 0x3000, 0x0800, NO_DUMP, ROM_BIOS(1) )
-	ROMX_LOAD( "e100r1u206.bin", 0x3800, 0x0800, NO_DUMP, ROM_BIOS(1) )
+	ROMX_LOAD( "e100r1u201.bin", 0x1000, 0x0800, NO_DUMP, ROM_BIOS(0) )
+	ROMX_LOAD( "e100r1u202.bin", 0x1800, 0x0800, NO_DUMP, ROM_BIOS(0) )
+	ROMX_LOAD( "e100r1u203.bin", 0x2000, 0x0800, NO_DUMP, ROM_BIOS(0) )
+	ROMX_LOAD( "e100r1u204.bin", 0x2800, 0x0800, NO_DUMP, ROM_BIOS(0) )
+	ROMX_LOAD( "e100r1u205.bin", 0x3000, 0x0800, NO_DUMP, ROM_BIOS(0) )
+	ROMX_LOAD( "e100r1u206.bin", 0x3800, 0x0800, NO_DUMP, ROM_BIOS(0) )
 
 	/* This is a prototype ROM, commercial relase not verified. The prototype also have different keyboard and supports
 	   more ram so might need to be split out as a clone later */
 	ROM_SYSTEM_BIOS(1, "rev2-basic", "Esselte 100 rev2 BASIC")
-	ROMX_LOAD( "e100r2u201.bin", 0x0000, 0x2000, CRC(53513b67) SHA1(a91c5c32aead82dcc87db5d818ff286a7fc6a5c8), ROM_BIOS(2) )
-	ROMX_LOAD( "e100r2u202.bin", 0x2000, 0x2000, CRC(eab3adf2) SHA1(ff3f5f5c8ea8732702a39cff76d0706ab6b751ee), ROM_BIOS(2) )
+	ROMX_LOAD( "e100r2u201.bin", 0x0000, 0x2000, CRC(53513b67) SHA1(a91c5c32aead82dcc87db5d818ff286a7fc6a5c8), ROM_BIOS(1) )
+	ROMX_LOAD( "e100r2u202.bin", 0x2000, 0x2000, CRC(eab3adf2) SHA1(ff3f5f5c8ea8732702a39cff76d0706ab6b751ee), ROM_BIOS(1) )
 
 	ROM_REGION(0x0800, "chargen",0)
 	ROM_LOAD( "e100u506.bin", 0x0000, 0x0800, CRC(fff9f288) SHA1(2dfb3eb551fe1ef67da328f61ef51ae8d1abdfb8) )
 ROM_END
 
-//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   CLASS         INIT        COMPANY             FULLNAME            FLAGS
-COMP( 1982, e100,       0,          0,      e100,       e100,   e100_state,   0,          "Didact AB",        "Esselte 100",      MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE)
+//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY      FULLNAME       FLAGS
+COMP( 1982, e100, 0,      0,      e100,    e100,  e100_state, empty_init, "Didact AB", "Esselte 100", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE)

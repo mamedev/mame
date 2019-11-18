@@ -7,9 +7,10 @@
     Kaypro disk image format
 
 *********************************************************************/
+#ifndef MAME_FORMATS_KAYPRO_DSK_H
+#define MAME_FORMATS_KAYPRO_DSK_H
 
-#ifndef KAYPRO_DSK_H_
-#define KAYPRO_DSK_H_
+#pragma once
 
 #include "upd765_dsk.h"
 
@@ -39,4 +40,4 @@ private:
 extern const floppy_format_type FLOPPY_KAYPROII_FORMAT;
 extern const floppy_format_type FLOPPY_KAYPRO2X_FORMAT;
 
-#endif
+#endif // MAME_FORMATS_KAYPRO_DSK_H

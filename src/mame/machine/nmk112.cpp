@@ -20,14 +20,12 @@
 DEFINE_DEVICE_TYPE(NMK112, nmk112_device, "nmk112", "NMK112")
 
 nmk112_device::nmk112_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, NMK112, tag, owner, clock),
-		m_page_mask(0xff),
-		m_tag0(nullptr),
-		m_tag1(nullptr),
-		m_rom0(nullptr),
-		m_rom1(nullptr),
-		m_size0(0),
-		m_size1(0)
+	: device_t(mconfig, NMK112, tag, owner, clock)
+	, m_page_mask(0xff)
+	, m_rom0(*this, finder_base::DUMMY_TAG)
+	, m_rom1(*this, finder_base::DUMMY_TAG)
+	, m_size0(0)
+	, m_size1(0)
 {
 }
 
@@ -38,18 +36,12 @@ nmk112_device::nmk112_device(const machine_config &mconfig, const char *tag, dev
 void nmk112_device::device_start()
 {
 	save_item(NAME(m_current_bank));
-	machine().save().register_postload(save_prepost_delegate(FUNC(nmk112_device::postload_bankswitch), this));
 
-	if (m_tag0)
-	{
-		m_rom0 = machine().root_device().memregion(m_tag0)->base();
-		m_size0 = machine().root_device().memregion(m_tag0)->bytes() - 0x40000;
-	}
-	if (m_tag1)
-	{
-		m_rom1 = machine().root_device().memregion(m_tag1)->base();
-		m_size1 = machine().root_device().memregion(m_tag1)->bytes() - 0x40000;
-	}
+	if (m_rom0)
+		m_size0 = m_rom0.bytes() - 0x40000;
+
+	if (m_rom1)
+		m_size1 = m_rom1.bytes() - 0x40000;
 }
 
 //-------------------------------------------------
@@ -98,13 +90,13 @@ void nmk112_device::do_bankswitch( int offset, int data )
     DEVICE HANDLERS
 *****************************************************************************/
 
-WRITE8_MEMBER( nmk112_device::okibank_w )
+void nmk112_device::okibank_w(offs_t offset, u8 data)
 {
 	if (m_current_bank[offset] != data)
 		do_bankswitch(offset, data);
 }
 
-void nmk112_device::postload_bankswitch()
+void nmk112_device::device_post_load()
 {
 	for (int i = 0; i < 8; i++)
 		do_bankswitch(i, m_current_bank[i]);

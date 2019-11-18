@@ -43,84 +43,30 @@
 			<bounds left="46" top="90" right="56" bottom="100" />
 		</bezel>
 
-		<!-- DL1414 left -->
-		<bezel name="digit3" element="a_digit">
-			<bounds left="65" top="70" right="90" bottom="120" />
-		</bezel>
-		<bezel name="digit2" element="a_digit">
-			<bounds left="99" top="70" right="124" bottom="120" />
-		</bezel>
-		<bezel name="digit1" element="a_digit">
-			<bounds left="133" top="70" right="158" bottom="120" />
-		</bezel>
-		<bezel name="digit0" element="a_digit">
-			<bounds left="167" top="70" right="192" bottom="120" />
-		</bezel>
+		<!-- DL1414 left/right -->
+		<repeat count="2">
+			<param name="moduleno" start="3" increment="4" />
+			<param name="modulex" start="65" increment="139" />
+			<repeat count="4">
+				<param name="digitno" start="~moduleno~" increment="-1" />
+				<param name="digitx" start="~modulex~" increment="34" />
+				<bezel name="digit~digitno~" element="a_digit">
+					<bounds x="~digitx~" y="70" width="25" height="50" />
+				</bezel>
+			</repeat>
+		</repeat>
 
-		<!-- DL1414 right -->
-		<bezel name="digit7" element="a_digit">
-			<bounds left="204" top="70" right="229" bottom="120" />
-		</bezel>
-		<bezel name="digit6" element="a_digit">
-			<bounds left="238" top="70" right="263" bottom="120" />
-		</bezel>
-		<bezel name="digit5" element="a_digit">
-			<bounds left="272" top="70" right="297" bottom="120" />
-		</bezel>
-		<bezel name="digit4" element="a_digit">
-			<bounds left="306" top="70" right="331" bottom="120" />
-		</bezel>
-
-		<bezel name="pb7" element="b_led">
-			<bounds left="65" top="140" right="75" bottom="150" />
-		</bezel>
-		<bezel name="pb6" element="b_led">
-			<bounds left="80" top="140" right="90" bottom="150" />
-		</bezel>
-		<bezel name="pb5" element="b_led">
-			<bounds left="95" top="140" right="105" bottom="150" />
-		</bezel>
-		<bezel name="pb4" element="b_led">
-			<bounds left="110" top="140" right="120" bottom="150" />
-		</bezel>
-		<bezel name="pb3" element="b_led">
-			<bounds left="125" top="140" right="135" bottom="150" />
-		</bezel>
-		<bezel name="pb2" element="b_led">
-			<bounds left="140" top="140" right="150" bottom="150" />
-		</bezel>
-		<bezel name="pb1" element="b_led">
-			<bounds left="155" top="140" right="165" bottom="150" />
-		</bezel>
-		<bezel name="pb0" element="b_led">
-			<bounds left="170" top="140" right="180" bottom="150" />
-		</bezel>
-
-		<bezel name="pa7" element="b_led">
-			<bounds left="185" top="140" right="195" bottom="150" />
-		</bezel>
-		<bezel name="pa6" element="b_led">
-			<bounds left="200" top="140" right="210" bottom="150" />
-		</bezel>
-		<bezel name="pa5" element="b_led">
-			<bounds left="215" top="140" right="225" bottom="150" />
-		</bezel>
-		<bezel name="pa4" element="b_led">
-			<bounds left="230" top="140" right="240" bottom="150" />
-		</bezel>
-		<bezel name="pa3" element="b_led">
-			<bounds left="245" top="140" right="255" bottom="150" />
-		</bezel>
-		<bezel name="pa2" element="b_led">
-			<bounds left="260" top="140" right="270" bottom="150" />
-		</bezel>
-		<bezel name="pa1" element="b_led">
-			<bounds left="275" top="140" right="285" bottom="150" />
-		</bezel>
-		<bezel name="pa0" element="b_led">
-			<bounds left="290" top="140" right="300" bottom="150" />
-		</bezel>
-
+		<repeat count="8">
+			<param name="ledno" start="7" increment="-1" />
+			<param name="bx" start="65" increment="15" />
+			<param name="ax" start="185" increment="15" />
+			<bezel name="pb~ledno~" element="b_led">
+				<bounds x="~bx~" y="140" width="10" height="10" />
+			</bezel>
+			<bezel name="pa~ledno~" element="b_led">
+				<bounds x="~ax~" y="140" width="10" height="10" />
+			</bezel>
+		</repeat>
 	</view>
 
 </mamelayout>

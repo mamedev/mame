@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "mips3com.h"
+#include "ps2vu.h"
 
 
 /***************************************************************************
@@ -136,6 +137,18 @@ void mips3_device::mips3com_tlbwi()
 
 
 /*-------------------------------------------------
+generate_tlb_index - generate a random tlb index
+-------------------------------------------------*/
+
+uint32_t mips3_device::generate_tlb_index()
+{
+	// Actual hardware uses a free running counter to generate the index.
+	// This impementation uses a linear congruential generator so that DRC and non-DRC code sequences match.
+	m_tlb_seed = 214013 * m_tlb_seed + 2531011;
+	return (m_tlb_seed >> 16) & 0x3f;
+}
+
+/*-------------------------------------------------
     mips3com_tlbwr - execute the tlbwr instruction
 -------------------------------------------------*/
 
@@ -145,9 +158,9 @@ void mips3_device::mips3com_tlbwr()
 	uint32_t unwired = m_tlbentries - wired;
 	uint32_t tlbindex = m_tlbentries - 1;
 
-	/* "random" is based off of the current cycle counting through the non-wired pages */
+	/* "random" is based off of linear congruential sequence through the non-wired pages */
 	if (unwired > 0)
-		tlbindex = ((total_cycles() - m_core->count_zero_time) % unwired + wired) & 0x3f;
+		tlbindex = (generate_tlb_index() % unwired) + wired;
 
 	/* use the common handler to write to this tlbindex */
 	tlb_write_common(tlbindex);
@@ -211,7 +224,9 @@ uint32_t mips3_device::compute_config_register()
 {
 	/* set the cache line size to 32 bytes */
 	uint32_t configreg = 0x00026030;
-	int divisor;
+
+	m_dcache = nullptr;
+	m_icache = nullptr;
 
 	// NEC VR series does not use a 100% compatible COP0/TLB implementation
 	if (m_flavor == MIPS3_TYPE_VR4300)
@@ -251,13 +266,13 @@ uint32_t mips3_device::compute_config_register()
 	else
 	{
 		/* set the data cache size */
-				if (c_icache_size <= 0x01000) configreg |= 0 << 6;
-		else if (c_icache_size <= 0x02000) configreg |= 1 << 6;
-		else if (c_icache_size <= 0x04000) configreg |= 2 << 6;
-		else if (c_icache_size <= 0x08000) configreg |= 3 << 6;
-		else if (c_icache_size <= 0x10000) configreg |= 4 << 6;
-		else if (c_icache_size <= 0x20000) configreg |= 5 << 6;
-		else if (c_icache_size <= 0x40000) configreg |= 6 << 6;
+				if (c_dcache_size <= 0x01000) configreg |= 0 << 6;
+		else if (c_dcache_size <= 0x02000) configreg |= 1 << 6;
+		else if (c_dcache_size <= 0x04000) configreg |= 2 << 6;
+		else if (c_dcache_size <= 0x08000) configreg |= 3 << 6;
+		else if (c_dcache_size <= 0x10000) configreg |= 4 << 6;
+		else if (c_dcache_size <= 0x20000) configreg |= 5 << 6;
+		else if (c_dcache_size <= 0x40000) configreg |= 6 << 6;
 		else                                   configreg |= 7 << 6;
 
 		/* set the instruction cache size */
@@ -270,9 +285,15 @@ uint32_t mips3_device::compute_config_register()
 		else if (c_icache_size <= 0x40000) configreg |= 6 << 9;
 		else                                   configreg |= 7 << 9;
 
-
+		if (c_secondary_cache_line_size != 0) {
+			configreg &= ~((0xf << 20) | (1 << 17));
+					if (c_secondary_cache_line_size <= 0x10) configreg |= 0 << 22;
+			else if (c_secondary_cache_line_size <= 0x20) configreg |= 1 << 22;
+			else if (c_secondary_cache_line_size <= 0x40) configreg |= 2 << 22;
+			else                                          configreg |= 3 << 22;
+		}
 		/* set the system clock divider */
-		divisor = 2;
+		int divisor = 2;
 		if (c_system_clock != 0)
 		{
 			divisor = m_cpu_clock / c_system_clock;
@@ -302,6 +323,12 @@ uint32_t mips3_device::compute_prid_register()
 {
 	switch (m_flavor)
 	{
+		case MIPS3_TYPE_R4000:
+			return 0x0400;
+
+		case MIPS3_TYPE_R4400:
+			return 0x0440;
+
 		case MIPS3_TYPE_VR4300:
 			return 0x0b00;
 
@@ -319,11 +346,16 @@ uint32_t mips3_device::compute_prid_register()
 			return 0x2d23;
 
 		case MIPS3_TYPE_R5000:
-		case MIPS3_TYPE_QED5271:
 			return 0x2300;
+
+		case MIPS3_TYPE_QED5271:
+			return 0x2800;
 
 		case MIPS3_TYPE_RM7000:
 			return 0x2700;
+
+		case MIPS3_TYPE_R5900:
+			return 0x2e14;
 
 		default:
 			fatalerror("Unknown MIPS flavor specified\n");
@@ -331,7 +363,6 @@ uint32_t mips3_device::compute_prid_register()
 	// never executed
 	//return 0x2000;
 }
-
 
 /*-------------------------------------------------
     tlb_map_entry - map a single TLB
@@ -363,7 +394,11 @@ void mips3_device::tlb_map_entry(int tlbindex)
 	}
 
 	/* get the number of pages from the page mask */
-	count = ((entry->page_mask >> 13) & 0x00fff) + 1;
+	/* R5900: if the S bit is set in EntryLo, it is the scratchpad, and is always 4 pages. */
+	if ((entry->entry_lo[0] & 0x80000000) && m_flavor == MIPS3_TYPE_R5900)
+		count = 4;
+	else
+		count = ((entry->page_mask >> 13) & 0x00fff) + 1;
 
 	/* loop over both the even and odd pages */
 	for (which = 0; which < 2; which++)
@@ -419,7 +454,6 @@ void mips3_device::tlb_write_common(int tlbindex)
 
 		/* remap this TLB entry */
 		tlb_map_entry(tlbindex);
-
 		/* log the two halves once they are in */
 		tlb_entry_log_half(entry, tlbindex, 0);
 		tlb_entry_log_half(entry, tlbindex, 1);

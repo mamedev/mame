@@ -31,12 +31,14 @@ public:
 		m_cassette(*this, "cassette"),
 		m_cart1(*this, "cartslot1"),
 		m_cart2(*this, "cartslot2"),
-		m_screen(*this, "screen")
+		m_screen(*this, "screen"),
+		m_mem_exp_port(*this, "MEMORY_EXPANSION"),
+		m_clock_port(*this, "CPU_CLOCK")
 	{ }
 
-	DECLARE_DRIVER_INIT(primo48);
-	DECLARE_DRIVER_INIT(primo64);
-	DECLARE_DRIVER_INIT(primo32);
+	void init_primo48();
+	void init_primo64();
+	void init_primo32();
 
 	void primob32(machine_config &config);
 	void primob64(machine_config &config);
@@ -46,7 +48,7 @@ public:
 	void primoc64(machine_config &config);
 	void primoa48(machine_config &config);
 
-protected:
+private:
 	DECLARE_READ8_MEMBER(primo_be_1_r);
 	DECLARE_READ8_MEMBER(primo_be_2_r);
 	DECLARE_WRITE8_MEMBER(primo_ki_1_w);
@@ -63,8 +65,8 @@ protected:
 	void primo_common_machine_init();
 	void primo_setup_pss(uint8_t* snapshot_data, uint32_t snapshot_size);
 	void primo_setup_pp(uint8_t* quickload_data, uint32_t quickload_size);
-	DECLARE_SNAPSHOT_LOAD_MEMBER( primo );
-	DECLARE_QUICKLOAD_LOAD_MEMBER( primo );
+	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
 	void primo32_mem(address_map &map);
 	void primo48_mem(address_map &map);
@@ -72,7 +74,6 @@ protected:
 	void primoa_port(address_map &map);
 	void primob_port(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cbm_iec_device> m_iec;
 	required_device<speaker_sound_device> m_speaker;
@@ -80,6 +81,8 @@ private:
 	required_device<generic_slot_device> m_cart1;
 	required_device<generic_slot_device> m_cart2;
 	required_device<screen_device> m_screen;
+	required_ioport m_mem_exp_port;
+	required_ioport m_clock_port;
 
 	memory_region *m_cart1_rom;
 	memory_region *m_cart2_rom;

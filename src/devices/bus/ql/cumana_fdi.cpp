@@ -26,9 +26,9 @@ ROM_START( cumana_floppy_disk_interface )
 	ROM_REGION( 0x4000, "rom", 0 )
 	ROM_DEFAULT_BIOS("v116")
 	ROM_SYSTEM_BIOS( 0, "v114", "v1.14" )
-	ROMX_LOAD( "cumana114.rom", 0x0000, 0x4000, CRC(03baf164) SHA1(e487742c481be8c2771ab2c0fc5e3acd612dec54), ROM_BIOS(1) )
+	ROMX_LOAD( "cumana114.rom", 0x0000, 0x4000, CRC(03baf164) SHA1(e487742c481be8c2771ab2c0fc5e3acd612dec54), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "v116", "v1.16" )
-	ROMX_LOAD( "cumana116.rom", 0x0000, 0x4000, CRC(def02822) SHA1(323120cd3e1eaa38f6d0ae74367a4835a5a2a011), ROM_BIOS(2) )
+	ROMX_LOAD( "cumana116.rom", 0x0000, 0x4000, CRC(def02822) SHA1(323120cd3e1eaa38f6d0ae74367a4835a5a2a011), ROM_BIOS(1) )
 ROM_END
 
 
@@ -71,7 +71,7 @@ void cumana_floppy_disk_interface_device::device_start()
 //  read -
 //-------------------------------------------------
 
-uint8_t cumana_floppy_disk_interface_device::read(address_space &space, offs_t offset, uint8_t data)
+uint8_t cumana_floppy_disk_interface_device::read(offs_t offset, uint8_t data)
 {
 	return data;
 }
@@ -81,6 +81,6 @@ uint8_t cumana_floppy_disk_interface_device::read(address_space &space, offs_t o
 //  write -
 //-------------------------------------------------
 
-void cumana_floppy_disk_interface_device::write(address_space &space, offs_t offset, uint8_t data)
+void cumana_floppy_disk_interface_device::write(offs_t offset, uint8_t data)
 {
 }

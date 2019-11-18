@@ -29,7 +29,8 @@ public:
 		m_bank2(*this, "bank2"),
 		m_bank3(*this, "bank3"),
 		m_bank4(*this, "bank4"),
-		m_io_cnt(*this, "CNT")
+		m_io_cnt(*this, "CNT"),
+		m_io_ports(*this, "LINE%u", 0U)
 	{ }
 
 	DECLARE_INPUT_CHANGED_MEMBER(ef_w);
@@ -79,7 +80,7 @@ private:
 	required_memory_bank m_bank3;
 	required_memory_bank m_bank4;
 	required_ioport m_io_cnt;
-	ioport_port *m_io_ports[26];
+	required_ioport_array<26> m_io_ports;
 };
 
 #endif // MAME_INCLUDES_PECOM_H

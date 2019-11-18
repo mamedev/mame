@@ -73,13 +73,13 @@ READ16_MEMBER( btoads_state::main_sound_r )
 }
 
 
-CUSTOM_INPUT_MEMBER( btoads_state::main_to_sound_r )
+READ_LINE_MEMBER( btoads_state::main_to_sound_r )
 {
 	return m_main_to_sound_ready;
 }
 
 
-CUSTOM_INPUT_MEMBER( btoads_state::sound_to_main_r )
+READ_LINE_MEMBER( btoads_state::sound_to_main_r )
 {
 	return m_sound_to_main_ready;
 }
@@ -177,21 +177,20 @@ void btoads_state::main_map(address_map &map)
 	map(0x20000280, 0x200002ff).portr("SW1");
 	map(0x20000000, 0x200000ff).writeonly().share("sprite_scale");
 	map(0x20000100, 0x2000017f).writeonly().share("sprite_control");
-	map(0x20000180, 0x200001ff).w(this, FUNC(btoads_state::display_control_w));
-	map(0x20000200, 0x2000027f).w(this, FUNC(btoads_state::scroll0_w));
-	map(0x20000280, 0x200002ff).w(this, FUNC(btoads_state::scroll1_w));
-	map(0x20000300, 0x2000037f).rw(this, FUNC(btoads_state::paletteram_r), FUNC(btoads_state::paletteram_w));
-	map(0x20000380, 0x200003ff).rw(this, FUNC(btoads_state::main_sound_r), FUNC(btoads_state::main_sound_w));
-	map(0x20000400, 0x2000047f).w(this, FUNC(btoads_state::misc_control_w));
+	map(0x20000180, 0x200001ff).w(FUNC(btoads_state::display_control_w));
+	map(0x20000200, 0x2000027f).w(FUNC(btoads_state::scroll0_w));
+	map(0x20000280, 0x200002ff).w(FUNC(btoads_state::scroll1_w));
+	map(0x20000300, 0x2000037f).rw(FUNC(btoads_state::paletteram_r), FUNC(btoads_state::paletteram_w));
+	map(0x20000380, 0x200003ff).rw(FUNC(btoads_state::main_sound_r), FUNC(btoads_state::main_sound_w));
+	map(0x20000400, 0x2000047f).w(FUNC(btoads_state::misc_control_w));
 	map(0x40000000, 0x4000000f).nopw();    /* watchdog? */
 	map(0x60000000, 0x6003ffff).ram().share("nvram");
-	map(0xa0000000, 0xa03fffff).rw(this, FUNC(btoads_state::vram_fg_display_r), FUNC(btoads_state::vram_fg_display_w)).share("vram_fg0");
-	map(0xa4000000, 0xa43fffff).rw(this, FUNC(btoads_state::vram_fg_draw_r), FUNC(btoads_state::vram_fg_draw_w)).share("vram_fg1");
+	map(0xa0000000, 0xa03fffff).rw(FUNC(btoads_state::vram_fg_display_r), FUNC(btoads_state::vram_fg_display_w)).share("vram_fg0");
+	map(0xa4000000, 0xa43fffff).rw(FUNC(btoads_state::vram_fg_draw_r), FUNC(btoads_state::vram_fg_draw_w)).share("vram_fg1");
 	map(0xa8000000, 0xa87fffff).ram().share("vram_fg_data");
 	map(0xa8800000, 0xa8ffffff).nopw();
-	map(0xb0000000, 0xb03fffff).rw(this, FUNC(btoads_state::vram_bg0_r), FUNC(btoads_state::vram_bg0_w)).share("vram_bg0");
-	map(0xb4000000, 0xb43fffff).rw(this, FUNC(btoads_state::vram_bg1_r), FUNC(btoads_state::vram_bg1_w)).share("vram_bg1");
-	map(0xc0000000, 0xc00003ff).rw(m_maincpu, FUNC(tms34020_device::io_register_r), FUNC(tms34020_device::io_register_w));
+	map(0xb0000000, 0xb03fffff).rw(FUNC(btoads_state::vram_bg0_r), FUNC(btoads_state::vram_bg0_w)).share("vram_bg0");
+	map(0xb4000000, 0xb43fffff).rw(FUNC(btoads_state::vram_bg1_r), FUNC(btoads_state::vram_bg1_w)).share("vram_bg1");
 	map(0xfc000000, 0xffffffff).rom().region("user1", 0);
 }
 
@@ -211,12 +210,12 @@ void btoads_state::sound_map(address_map &map)
 
 void btoads_state::sound_io_map(address_map &map)
 {
-	map(0x0000, 0x7fff).w(this, FUNC(btoads_state::bsmt2000_port_w));
-	map(0x8000, 0x8000).rw(this, FUNC(btoads_state::sound_data_r), FUNC(btoads_state::sound_data_w));
-	map(0x8002, 0x8002).w(this, FUNC(btoads_state::sound_int_state_w));
-	map(0x8004, 0x8004).r(this, FUNC(btoads_state::sound_data_ready_r));
-	map(0x8005, 0x8005).r(this, FUNC(btoads_state::sound_ready_to_send_r));
-	map(0x8006, 0x8006).r(this, FUNC(btoads_state::bsmt_ready_r));
+	map(0x0000, 0x7fff).w(FUNC(btoads_state::bsmt2000_port_w));
+	map(0x8000, 0x8000).rw(FUNC(btoads_state::sound_data_r), FUNC(btoads_state::sound_data_w));
+	map(0x8002, 0x8002).w(FUNC(btoads_state::sound_int_state_w));
+	map(0x8004, 0x8004).r(FUNC(btoads_state::sound_data_ready_r));
+	map(0x8005, 0x8005).r(FUNC(btoads_state::sound_ready_to_send_r));
+	map(0x8006, 0x8006).r(FUNC(btoads_state::bsmt_ready_r));
 }
 
 
@@ -265,9 +264,9 @@ static INPUT_PORTS_START( btoads )
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("SPECIAL")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, btoads_state, sound_to_main_r, nullptr)
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(btoads_state, sound_to_main_r)
 	PORT_SERVICE_NO_TOGGLE( 0x0002, IP_ACTIVE_LOW )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, btoads_state, main_to_sound_r, nullptr)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(btoads_state, main_to_sound_r)
 	PORT_BIT( 0xff7c, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("SW1")
@@ -303,38 +302,39 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(btoads_state::btoads)
+void btoads_state::btoads(machine_config &config)
+{
+	TMS34020(config, m_maincpu, CPU_CLOCK/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &btoads_state::main_map);
+	m_maincpu->set_halt_on_reset(false);
+	m_maincpu->set_pixel_clock(VIDEO_CLOCK/2);
+	m_maincpu->set_pixels_per_clock(1);
+	m_maincpu->set_scanline_rgb32_callback(FUNC(btoads_state::scanline_update));
+	m_maincpu->set_shiftreg_in_callback(FUNC(btoads_state::to_shiftreg));
+	m_maincpu->set_shiftreg_out_callback(FUNC(btoads_state::from_shiftreg));
 
-	MCFG_CPU_ADD("maincpu", TMS34020, CPU_CLOCK/2)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
-	MCFG_TMS340X0_PIXEL_CLOCK(VIDEO_CLOCK/2) /* pixel clock */
-	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
-	MCFG_TMS340X0_SCANLINE_RGB32_CB(btoads_state, scanline_update)     /* scanline updater (RGB32) */
-	MCFG_TMS340X0_TO_SHIFTREG_CB(btoads_state, to_shiftreg)  /* write to shiftreg function */
-	MCFG_TMS340X0_FROM_SHIFTREG_CB(btoads_state, from_shiftreg) /* read from shiftreg function */
+	Z80(config, m_audiocpu, SOUND_CLOCK/4);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &btoads_state::sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &btoads_state::sound_io_map);
+	m_audiocpu->set_periodic_int(FUNC(btoads_state::irq0_line_assert), attotime::from_hz(SOUND_CLOCK/4/32768));
 
-	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(btoads_state, irq0_line_assert,  183)
-
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* video hardware */
-	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
+	TLC34076(config, m_tlc34076, tlc34076_device::TLC34076_6_BIT);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK/2, 640, 0, 512, 257, 0, 224)
-	MCFG_SCREEN_UPDATE_DEVICE("maincpu", tms34020_device, tms340x0_rgb32)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(VIDEO_CLOCK/2, 640, 0, 512, 257, 0, 224);
+	m_screen->set_screen_update("maincpu", FUNC(tms34020_device::tms340x0_rgb32));
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_BSMT2000_ADD("bsmt", SOUND_CLOCK)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	BSMT2000(config, m_bsmt, SOUND_CLOCK);
+	m_bsmt->add_route(0, "lspeaker", 1.0);
+	m_bsmt->add_route(1, "rspeaker", 1.0);
+}
 
 
 
@@ -372,4 +372,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1994, btoads, 0, btoads, btoads, btoads_state, 0,  ROT0, "Rare / Electronic Arts", "Battletoads", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, btoads, 0, btoads, btoads, btoads_state, empty_init, ROT0, "Rare / Electronic Arts", "Battletoads", MACHINE_SUPPORTS_SAVE )

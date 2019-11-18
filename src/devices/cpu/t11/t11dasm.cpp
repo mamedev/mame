@@ -41,10 +41,10 @@ template <int Width> std::string t11_disassembler::MakeEA (int lo, offs_t &pc, c
 			return util::string_format ("(%s)", regs[reg]);
 			break;
 		case 2:
-			if (reg == 7)
+			if (reg == 7) // immediate
 			{
 				pm = r16p(pc, opcodes);
-				return util::string_format ("#$%0*X", Width, pm & ((Width == 2) ? 0xff : 0xffff));
+				return util::string_format ("#%0*X", Width, pm & ((Width == 2) ? 0xff : 0xffff));
 			}
 			else
 			{
@@ -52,10 +52,10 @@ template <int Width> std::string t11_disassembler::MakeEA (int lo, offs_t &pc, c
 			}
 			break;
 		case 3:
-			if (reg == 7)
+			if (reg == 7) // absolute
 			{
 				pm = r16p(pc, opcodes);
-				return util::string_format ( "$%04X", pm &= 0xffff);
+				return util::string_format ("@#%04X", pm &= 0xffff);
 			}
 			else
 			{
@@ -70,17 +70,31 @@ template <int Width> std::string t11_disassembler::MakeEA (int lo, offs_t &pc, c
 			break;
 		case 6:
 			pm = r16p(pc, opcodes);
-			return util::string_format ("%s$%X(%s)",
-				(pm&0x8000)?"-":"",
-				(pm&0x8000)?-(signed short)pm:pm,
-				regs[reg]);
+			if (reg == 7) // relative
+			{
+				return util::string_format ("%04X", (pm + pc) & 0xffff);
+			}
+			else
+			{
+				return util::string_format ("%s%X(%s)",
+					(pm&0x8000)?"-":"",
+					(pm&0x8000)?-(signed short)pm:pm,
+					regs[reg]);
+			}
 			break;
 		case 7:
 			pm = r16p(pc, opcodes);
-			return util::string_format ("@%s$%X(%s)",
-				(pm&0x8000)?"-":"",
-				(pm&0x8000)?-(signed short)pm:pm,
-				regs[reg]);
+			if (reg == 7) // relative deferred
+			{
+				return util::string_format ("@%04X", (pm + pc) & 0xffff);
+			}
+			else
+			{
+				return util::string_format ("@%s%X(%s)",
+					(pm&0x8000)?"-":"",
+					(pm&0x8000)?-(signed short)pm:pm,
+					regs[reg]);
+			}
 			break;
 	}
 	return "";
@@ -138,7 +152,7 @@ offs_t t11_disassembler::disassemble(std::ostream &stream, offs_t pc, const data
 						case 0x02:  util::stream_format(stream, "CEV"); break;
 						case 0x04:  util::stream_format(stream, "CEZ"); break;
 						case 0x08:  util::stream_format(stream, "CEN"); break;
-						default:    util::stream_format(stream, "Ccc   #$%X", lo & 15); break;
+						default:    util::stream_format(stream, "Ccc   #%X", lo & 15); break;
 					}
 					break;
 				case 060:
@@ -151,7 +165,7 @@ offs_t t11_disassembler::disassemble(std::ostream &stream, offs_t pc, const data
 						case 0x02:  util::stream_format(stream, "SEV"); break;
 						case 0x04:  util::stream_format(stream, "SEZ"); break;
 						case 0x08:  util::stream_format(stream, "SEN"); break;
-						default:    util::stream_format(stream, "Scc   #$%X", lo & 15); break;
+						default:    util::stream_format(stream, "Scc   #%X", lo & 15); break;
 					}
 					break;
 			}
@@ -162,31 +176,31 @@ offs_t t11_disassembler::disassemble(std::ostream &stream, offs_t pc, const data
 			break;
 		case 0x0100: case 0x0140: case 0x0180: case 0x01c0:
 			offset = 2 * (int8_t)(op & 0xff);
-			util::stream_format(stream, "BR    $%04X", pc + offset);
+			util::stream_format(stream, "BR    %04X", pc + offset);
 			break;
 		case 0x0200: case 0x0240: case 0x0280: case 0x02c0:
 			offset = 2 * (int8_t)(op & 0xff);
-			util::stream_format(stream, "BNE   $%04X", pc + offset);
+			util::stream_format(stream, "BNE   %04X", pc + offset);
 			break;
 		case 0x0300: case 0x0340: case 0x0380: case 0x03c0:
 			offset = 2 * (int8_t)(op & 0xff);
-			util::stream_format(stream, "BEQ   $%04X", pc + offset);
+			util::stream_format(stream, "BEQ   %04X", pc + offset);
 			break;
 		case 0x0400: case 0x0440: case 0x0480: case 0x04c0:
 			offset = 2 * (int8_t)(op & 0xff);
-			util::stream_format(stream, "BGE   $%04X", pc + offset);
+			util::stream_format(stream, "BGE   %04X", pc + offset);
 			break;
 		case 0x0500: case 0x0540: case 0x0580: case 0x05c0:
 			offset = 2 * (int8_t)(op & 0xff);
-			util::stream_format(stream, "BLT   $%04X", pc + offset);
+			util::stream_format(stream, "BLT   %04X", pc + offset);
 			break;
 		case 0x0600: case 0x0640: case 0x0680: case 0x06c0:
 			offset = 2 * (int8_t)(op & 0xff);
-			util::stream_format(stream, "BGT   $%04X", pc + offset);
+			util::stream_format(stream, "BGT   %04X", pc + offset);
 			break;
 		case 0x0700: case 0x0740: case 0x0780: case 0x07c0:
 			offset = 2 * (int8_t)(op & 0xff);
-			util::stream_format(stream, "BLE   $%04X", pc + offset);
+			util::stream_format(stream, "BLE   %04X", pc + offset);
 			break;
 		case 0x0800: case 0x0840: case 0x0880: case 0x08c0:
 		case 0x0900: case 0x0940: case 0x0980: case 0x09c0:
@@ -246,7 +260,7 @@ offs_t t11_disassembler::disassemble(std::ostream &stream, offs_t pc, const data
 			util::stream_format(stream, "ASL   %s", ea1);
 			break;
 /*      case 0x0d00:
-            util::stream_format(stream, "MARK  #$%X", lo);
+            util::stream_format(stream, "MARK  #%X", lo);
             break;*/
 		case 0x0dc0:
 			ea1 = MakeEA<4> (lo, pc, opcodes);
@@ -338,46 +352,46 @@ offs_t t11_disassembler::disassemble(std::ostream &stream, offs_t pc, const data
 
 		case 0x7e00: case 0x7e40: case 0x7e80: case 0x7ec0: case 0x7f00: case 0x7f40: case 0x7f80: case 0x7fc0:
 			addr = (pc + 2 - 2 * lo) & 0xffff;
-			util::stream_format(stream, "SOB   %s,$%X", regs[hi & 7], addr);
+			util::stream_format(stream, "SOB   %s,%04X", regs[hi & 7], addr);
 			break;
 
 		case 0x8000: case 0x8040: case 0x8080: case 0x80c0:
 			offset = 2 * (int8_t)(op & 0xff);
-			util::stream_format(stream, "BPL   $%04X", pc + offset);
+			util::stream_format(stream, "BPL   %04X", pc + offset);
 			break;
 		case 0x8100: case 0x8140: case 0x8180: case 0x81c0:
 			offset = 2 * (int8_t)(op & 0xff);
-			util::stream_format(stream, "BMI   $%04X", pc + offset);
+			util::stream_format(stream, "BMI   %04X", pc + offset);
 			break;
 		case 0x8200: case 0x8240: case 0x8280: case 0x82c0:
 			offset = 2 * (int8_t)(op & 0xff);
-			util::stream_format(stream, "BHI   $%04X", pc + offset);
+			util::stream_format(stream, "BHI   %04X", pc + offset);
 			break;
 		case 0x8300: case 0x8340: case 0x8380: case 0x83c0:
 			offset = 2 * (int8_t)(op & 0xff);
-			util::stream_format(stream, "BLOS  $%04X", pc + offset);
+			util::stream_format(stream, "BLOS  %04X", pc + offset);
 			break;
 		case 0x8400: case 0x8440: case 0x8480: case 0x84c0:
 			offset = 2 * (int8_t)(op & 0xff);
-			util::stream_format(stream, "BVC   $%04X", pc + offset);
+			util::stream_format(stream, "BVC   %04X", pc + offset);
 			break;
 		case 0x8500: case 0x8540: case 0x8580: case 0x85c0:
 			offset = 2 * (int8_t)(op & 0xff);
-			util::stream_format(stream, "BVS   $%04X", pc + offset);
+			util::stream_format(stream, "BVS   %04X", pc + offset);
 			break;
 		case 0x8600: case 0x8640: case 0x8680: case 0x86c0:
 			offset = 2 * (int8_t)(op & 0xff);
-			util::stream_format(stream, "BCC   $%04X", pc + offset);
+			util::stream_format(stream, "BCC   %04X", pc + offset);
 			break;
 		case 0x8700: case 0x8740: case 0x8780: case 0x87c0:
 			offset = 2 * (int8_t)(op & 0xff);
-			util::stream_format(stream, "BCS   $%04X", pc + offset);
+			util::stream_format(stream, "BCS   %04X", pc + offset);
 			break;
 		case 0x8800: case 0x8840: case 0x8880: case 0x88c0:
-			util::stream_format(stream, "EMT   #$%02X", op & 0xff);
+			util::stream_format(stream, "EMT   %02X", op & 0xff);
 			break;
 		case 0x8900: case 0x8940: case 0x8980: case 0x89c0:
-			util::stream_format(stream, "TRAP  #$%02X", op & 0xff);
+			util::stream_format(stream, "TRAP  %02X", op & 0xff);
 			break;
 
 		case 0x8a00:

@@ -37,8 +37,8 @@ public:
 	pdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	/* Callbacks */
-	template <class Object> devcb_base &m68k_r_callback(Object &&cb) { return m_m68k_r_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &m68k_w_callback(Object &&cb) { return m_m68k_w_cb.set_callback(std::forward<Object>(cb)); }
+	auto m68k_r_callback() { return m_m68k_r_cb.bind(); }
+	auto m68k_w_callback() { return m_m68k_w_cb.bind(); }
 
 	/* Read and Write members */
 	DECLARE_WRITE_LINE_MEMBER(hdd_irq);
@@ -107,16 +107,11 @@ private:
 
 	/* Callbacks */
 	devcb_read8 m_m68k_r_cb;
-	devcb_write8    m_m68k_w_cb;
+	devcb_write8 m_m68k_w_cb;
 };
 
 /* Device type */
 DECLARE_DEVICE_TYPE(PDC, pdc_device)
 
-/* MCFG defines */
-#define MCFG_PDC_R_CB(_devcb) \
-	devcb = &downcast<pdc_device &>(*device).m68k_r_callback(DEVCB_##_devcb);
-#define MCFG_PDC_W_CB(_devcb) \
-	devcb = &downcast<pdc_device &>(*device).m68k_w_callback(DEVCB_##_devcb);
 
 #endif // MAME_MACHINE_PDC_H

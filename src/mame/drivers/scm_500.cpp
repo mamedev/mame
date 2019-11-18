@@ -11,21 +11,33 @@ http://www.standardchange.com/frequently-asked-questions
 */
 
 #include "emu.h"
+#include "cpu/mcs51/mcs51.h"
 
 class scm_500_state : public driver_device
 {
 public:
 	scm_500_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-//      ,m_maincpu(*this, "maincpu")
-		{ }
+		, m_maincpu(*this, "maincpu")
+	{
+	}
+
+	void scm_500(machine_config &config);
+
+private:
+	void prog_map(address_map &map);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	void scm_500(machine_config &config);
-//  required_device<cpu_device> m_maincpu;
+
+	required_device<mcs51_cpu_device> m_maincpu;
 };
 
+
+void scm_500_state::prog_map(address_map &map)
+{
+	map(0x0000, 0xffff).rom().region("maincpu", 0);
+}
 
 static INPUT_PORTS_START( scm_500 )
 INPUT_PORTS_END
@@ -38,11 +50,11 @@ void scm_500_state::machine_reset()
 {
 }
 
-MACHINE_CONFIG_START(scm_500_state::scm_500)
-
-	// unknown CPU
-
-MACHINE_CONFIG_END
+void scm_500_state::scm_500(machine_config &config)
+{
+	I80C51GB(config, m_maincpu, 12'000'000); // unknown clock
+	m_maincpu->set_addrmap(AS_PROGRAM, &scm_500_state::prog_map);
+}
 
 /*
 
@@ -65,7 +77,7 @@ Std-chan is most current program.
 */
 
 #define ROM_LOAD_BIOS(bios,name,offset,length,hash) \
-	ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios+1)) /* Note '+1' */
+	ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios))
 
 ROM_START( scm_500 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -81,5 +93,5 @@ ROM_START( scm_500 )
 	ROM_LOAD_BIOS( 4, "stndxgr_307", 0x00000, 0x10000, CRC(4d0d91c6) SHA1(85ff5d43ec331bcd4cde6aaf82f6143acc7e020c)  ) // USA 03.07 (could be 500E specific)
 ROM_END
 
-GAME( 1987, scm_500,  0,    scm_500, scm_500, scm_500_state,  0, ROT0, "Standard Change-Makers", "Standard Change-Makers System 500 / 500E", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1987, scm_500,  0,    scm_500, scm_500, scm_500_state, empty_init, ROT0, "Standard Change-Makers", "Standard Change-Makers System 500 / 500E", MACHINE_IS_SKELETON_MECHANICAL )
 // 1995 - 500E - same basic hw?

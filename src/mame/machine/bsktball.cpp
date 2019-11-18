@@ -29,7 +29,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(bsktball_state::bsktball_scanline)
 	if(scanline == 0) // vblank irq
 		m_maincpu->set_input_line(0, HOLD_LINE);
 	else if(((scanline % 28) == 0) && (m_nmi_on)) // 32v timer irq
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 

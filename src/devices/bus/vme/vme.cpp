@@ -185,18 +185,20 @@ WRITE8_MEMBER(vme_slot_device::write8)
 /* The following two slot collections be combined once we intriduce capabilities for each board */
 /* Usually a VME firmware supports only a few boards so it will have its own slot collection defined */
 // Controller capable boards that can go into slot1 ( or has an embedded VME bus )
-SLOT_INTERFACE_START( vme_slot1 )
-//  SLOT_INTERFACE("mzr8105", VME_MZR8105)
-SLOT_INTERFACE_END
+void vme_slot1(device_slot_interface &device)
+{
+//  device.option_add("mzr8105", VME_MZR8105);
+}
 #endif
 
 // All boards that can be non-controller boards, eg not driving the VME CLK etc
-SLOT_INTERFACE_START( vme_slots )
-	SLOT_INTERFACE("mzr8300", VME_MZR8300)
-	SLOT_INTERFACE("mvme350", VME_MVME350)
-	SLOT_INTERFACE("fcisio1", VME_FCISIO1)
-	SLOT_INTERFACE("fcscsi1", VME_FCSCSI1)
-SLOT_INTERFACE_END
+void vme_slots(device_slot_interface &device)
+{
+	device.option_add("mzr8300", VME_MZR8300);
+	device.option_add("mvme350", VME_MVME350);
+	device.option_add("fcisio1", VME_FCISIO1);
+	device.option_add("fcscsi1", VME_FCSCSI1);
+}
 
 //
 // VME device P1
@@ -257,7 +259,7 @@ void vme_device::device_start()
 		LOG(" - using owner memory spaces for %s\n", m_cputag);
 		m_maincpu = owner()->subdevice<cpu_device>(m_cputag);
 		m_prgspace = &m_maincpu->space(AS_PROGRAM);
-		m_prgwidth = m_maincpu->space_config(AS_PROGRAM)->m_data_width;
+		m_prgwidth = m_maincpu->space_config(AS_PROGRAM)->data_width();
 		LOG(" - Done at %d width\n", m_prgwidth);
 	}
 }
@@ -298,6 +300,66 @@ void vme_device::install_ub_handler(offs_t start, offs_t end, read8_delegate rha
 
 // D8 bit devices in A16, A24 and A32
 void vme_device::install_device(vme_amod_t amod, offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler, uint32_t mask)
+{
+	LOG("%s %s AM%d D%02x\n", tag(), FUNCNAME, amod, m_prgwidth);
+
+	LOG(" - width:%d\n", m_prgwidth);
+
+	// TODO: support address modifiers and buscycles other than single access cycles
+	switch(amod)
+	{
+	case A16_SC: break;
+	case A24_SC: break;
+	case A32_SC: break;
+	default: fatalerror("VME D8: Non supported Address modifier: AM%02x\n", amod);
+	}
+
+	switch(m_prgwidth)
+	{
+	case 16:
+		m_prgspace->install_readwrite_handler(start, end, rhandler, whandler, (uint16_t)(mask & 0x0000ffff));
+		break;
+	case 24:
+		m_prgspace->install_readwrite_handler(start, end, rhandler, whandler, (uint32_t)(mask & 0x00ffffff));
+		break;
+	case 32:
+		m_prgspace->install_readwrite_handler(start, end, rhandler, whandler, mask);
+		break;
+	default: fatalerror("VME D8: Bus width %d not supported\n", m_prgwidth);
+	}
+}
+
+void vme_device::install_device(vme_amod_t amod, offs_t start, offs_t end, read8sm_delegate rhandler, write8sm_delegate whandler, uint32_t mask)
+{
+	LOG("%s %s AM%d D%02x\n", tag(), FUNCNAME, amod, m_prgwidth);
+
+	LOG(" - width:%d\n", m_prgwidth);
+
+	// TODO: support address modifiers and buscycles other than single access cycles
+	switch(amod)
+	{
+	case A16_SC: break;
+	case A24_SC: break;
+	case A32_SC: break;
+	default: fatalerror("VME D8: Non supported Address modifier: AM%02x\n", amod);
+	}
+
+	switch(m_prgwidth)
+	{
+	case 16:
+		m_prgspace->install_readwrite_handler(start, end, rhandler, whandler, (uint16_t)(mask & 0x0000ffff));
+		break;
+	case 24:
+		m_prgspace->install_readwrite_handler(start, end, rhandler, whandler, (uint32_t)(mask & 0x00ffffff));
+		break;
+	case 32:
+		m_prgspace->install_readwrite_handler(start, end, rhandler, whandler, mask);
+		break;
+	default: fatalerror("VME D8: Bus width %d not supported\n", m_prgwidth);
+	}
+}
+
+void vme_device::install_device(vme_amod_t amod, offs_t start, offs_t end, read8smo_delegate rhandler, write8smo_delegate whandler, uint32_t mask)
 {
 	LOG("%s %s AM%d D%02x\n", tag(), FUNCNAME, amod, m_prgwidth);
 
@@ -393,12 +455,12 @@ void vme_device::install_device(vme_amod_t amod, offs_t start, offs_t end, read3
 // Card interface
 //
 device_vme_card_interface::device_vme_card_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device)
-	,m_vme(nullptr)
-	,m_vme_tag(nullptr)
-	,m_vme_slottag(nullptr)
-	,m_slot(0)
-	,m_next(nullptr)
+	: device_interface(device, "vme")
+	, m_vme(nullptr)
+	, m_vme_tag(nullptr)
+	, m_vme_slottag(nullptr)
+	, m_slot(0)
+	, m_next(nullptr)
 {
 	m_device = &device;
 	LOG("%s %s\n", m_device->tag(), FUNCNAME);

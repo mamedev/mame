@@ -2,7 +2,7 @@
 // copyright-holders:Miodrag Milanovic, Curt Coder
 /*
 
-Omnibyte MSBC-1
+Omnibyte MSBC-1 Multibus Single Board Computer
 
 PCB Layout
 ----------
@@ -52,6 +52,9 @@ Notes:
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/68230pit.h"
+#include "machine/z80sio.h"
+
 #define MC68000R12_TAG  "u50"
 #define MK68564_0_TAG   "u14"
 #define MK68564_1_TAG   "u15"
@@ -66,8 +69,9 @@ public:
 	{ }
 
 	void msbc1(machine_config &config);
-	void msbc1_mem(address_map &map);
+
 private:
+	void msbc1_mem(address_map &map);
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 };
@@ -75,8 +79,11 @@ private:
 void msbc1_state::msbc1_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x000000, 0x03ffff).ram();
+	map(0x000000, 0x5fffff).ram();
 	map(0xf80000, 0xf87fff).rom().region(MC68000R12_TAG, 0);
+	map(0xfffa00, 0xfffa3f).rw("sio1", FUNC(mk68564_device::read), FUNC(mk68564_device::write)).umask16(0x00ff);
+	map(0xfffc00, 0xfffc3f).rw("sio2", FUNC(mk68564_device::read), FUNC(mk68564_device::write)).umask16(0x00ff);
+	map(0xfffe00, 0xfffe3f).rw("pit", FUNC(pit68230_device::read), FUNC(pit68230_device::write)).umask16(0x00ff);
 }
 
 /* Input ports */
@@ -89,15 +96,19 @@ void msbc1_state::machine_reset()
 	uint8_t *rom = memregion(MC68000R12_TAG)->base();
 
 	memcpy(ram, rom, 8);
-
-	m_maincpu->reset();
 }
 
-MACHINE_CONFIG_START(msbc1_state::msbc1)
+void msbc1_state::msbc1(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD(MC68000R12_TAG, M68000, XTAL(12'500'000))
-	MCFG_CPU_PROGRAM_MAP(msbc1_mem)
-MACHINE_CONFIG_END
+	M68000(config, m_maincpu, 12.5_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &msbc1_state::msbc1_mem);
+
+	PIT68230(config, "pit", 8_MHz_XTAL);
+
+	MK68564(config, "sio1", 8_MHz_XTAL / 2).set_xtal(3.6864_MHz_XTAL);
+	MK68564(config, "sio2", 8_MHz_XTAL / 2).set_xtal(3.6864_MHz_XTAL);
+}
 
 /* ROM definition */
 ROM_START( msbc1 )
@@ -122,5 +133,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE        INIT  COMPANY     FULLNAME  FLAGS
-COMP( 1985, msbc1,  0,      0,       msbc1,     msbc1, msbc1_state, 0,    "Omnibyte", "MSBC-1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY     FULLNAME  FLAGS
+COMP( 1985, msbc1, 0,      0,      msbc1,   msbc1, msbc1_state, empty_init, "Omnibyte", "MSBC-1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

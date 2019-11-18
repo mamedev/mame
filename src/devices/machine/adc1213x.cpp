@@ -57,6 +57,7 @@ adc12138_device::adc12138_device(const machine_config &mconfig, const char *tag,
 }
 adc12138_device::adc12138_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
+	, m_ipt_read_cb(*this)
 {
 }
 
@@ -76,7 +77,7 @@ void adc12138_device::device_start()
 	m_end_conv = 0;
 
 	/* resolve callbacks */
-	m_ipt_read_cb.bind_relative_to(*owner());
+	m_ipt_read_cb.resolve();
 
 	/* register for state saving */
 	save_item(NAME(m_cycle));
@@ -113,7 +114,7 @@ void adc12138_device::device_reset()
     di_w
 -------------------------------------------------*/
 
-WRITE8_MEMBER( adc12138_device::di_w )
+void adc12138_device::di_w(u8 data)
 {
 	m_data_in = data & 1;
 }
@@ -211,7 +212,7 @@ void adc12138_device::convert(int channel, int bits16, int lsbfirst)
     cs_w
 -------------------------------------------------*/
 
-WRITE8_MEMBER( adc12138_device::cs_w )
+void adc12138_device::cs_w(u8 data)
 {
 	if (data)
 	{
@@ -292,7 +293,7 @@ WRITE8_MEMBER( adc12138_device::cs_w )
     sclk_w
 -------------------------------------------------*/
 
-WRITE8_MEMBER( adc12138_device::sclk_w )
+void adc12138_device::sclk_w(u8 data)
 {
 	if (data)
 	{
@@ -312,7 +313,7 @@ WRITE8_MEMBER( adc12138_device::sclk_w )
     conv_w
 -------------------------------------------------*/
 
-WRITE8_MEMBER( adc12138_device::conv_w )
+void adc12138_device::conv_w(u8 data)
 {
 	m_end_conv = 1;
 }
@@ -321,7 +322,7 @@ WRITE8_MEMBER( adc12138_device::conv_w )
     do_r
 -------------------------------------------------*/
 
-READ8_MEMBER( adc12138_device::do_r )
+u8 adc12138_device::do_r()
 {
 	//printf("ADC: DO\n");
 	return m_data_out;
@@ -331,7 +332,7 @@ READ8_MEMBER( adc12138_device::do_r )
     eoc_r
 -------------------------------------------------*/
 
-READ8_MEMBER( adc12138_device::eoc_r )
+u8 adc12138_device::eoc_r()
 {
 	return m_end_conv;
 }

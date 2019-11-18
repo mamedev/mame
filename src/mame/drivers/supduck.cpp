@@ -28,26 +28,31 @@ All clock timing comes from crystal 1
 #include "sound/okim6295.h"
 #include "video/bufsprite.h"
 #include "video/tigeroad_spr.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 class supduck_state : public driver_device
 {
 public:
 	supduck_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_audiocpu(*this, "audiocpu"),
-			m_spriteram(*this, "spriteram") ,
-			m_text_videoram(*this, "textvideoram"),
-			m_fore_videoram(*this, "forevideoram"),
-			m_back_videoram(*this, "backvideoram"),
-			m_gfxdecode(*this, "gfxdecode"),
-			m_palette(*this, "palette"),
-			m_spritegen(*this, "spritegen"),
-			m_soundlatch(*this, "soundlatch")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_spriteram(*this, "spriteram")
+		, m_text_videoram(*this, "textvideoram")
+		, m_fore_videoram(*this, "forevideoram")
+		, m_back_videoram(*this, "backvideoram")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_spritegen(*this, "spritegen")
+		, m_soundlatch(*this, "soundlatch")
 	{ }
 
+	void supduck(machine_config &config);
+
+private:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<z80_device> m_audiocpu;
@@ -81,11 +86,9 @@ public:
 
 	DECLARE_WRITE8_MEMBER(okibank_w);
 
-	void supduck(machine_config &config);
 	void main_map(address_map &map);
 	void oki_map(address_map &map);
 	void sound_map(address_map &map);
-protected:
 
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -120,10 +123,10 @@ TILEMAP_MAPPER_MEMBER(supduck_state::supduk_tilemap_scan)
 
 void supduck_state::video_start()
 {
-	m_text_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(supduck_state::get_text_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_text_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(supduck_state::get_text_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
-	m_fore_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(supduck_state::get_fore_tile_info),this), tilemap_mapper_delegate(FUNC(supduck_state::supduk_tilemap_scan),this), 32, 32, 128,64);
-	m_back_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(supduck_state::get_back_tile_info),this), tilemap_mapper_delegate(FUNC(supduck_state::supduk_tilemap_scan),this), 32, 32, 128,64);
+	m_fore_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(supduck_state::get_fore_tile_info)), tilemap_mapper_delegate(*this, FUNC(supduck_state::supduk_tilemap_scan)), 32, 32, 128,64);
+	m_back_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(supduck_state::get_back_tile_info)), tilemap_mapper_delegate(*this, FUNC(supduck_state::supduk_tilemap_scan)), 32, 32, 128,64);
 
 	m_text_tilemap->set_transparent_pen(0x3);
 	m_fore_tilemap->set_transparent_pen(0xf);
@@ -137,7 +140,7 @@ uint32_t supduck_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	m_back_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_fore_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
-	m_spritegen->draw_sprites(bitmap, cliprect, m_gfxdecode, 3, m_spriteram->buffer(), m_spriteram->bytes(), flip_screen(), 1 );
+	m_spritegen->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), m_spriteram->bytes(), flip_screen(), true);
 
 	m_text_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -218,7 +221,7 @@ WRITE16_MEMBER(supduck_state::supduck_4002_w)
 {
 	data &= mem_mask;
 
-	m_soundlatch->write(space, 0, (data>>8));
+	m_soundlatch->write((data>>8));
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 
 }
@@ -251,16 +254,16 @@ void supduck_state::main_map(address_map &map)
 	map(0x000000, 0x03ffff).rom().nopw();
 	map(0xfe0000, 0xfe1fff).ram().share("spriteram");
 
-	map(0xfe4000, 0xfe4001).portr("P1_P2").w(this, FUNC(supduck_state::supduck_4000_w));
-	map(0xfe4002, 0xfe4003).portr("SYSTEM").w(this, FUNC(supduck_state::supduck_4002_w));
+	map(0xfe4000, 0xfe4001).portr("P1_P2").w(FUNC(supduck_state::supduck_4000_w));
+	map(0xfe4002, 0xfe4003).portr("SYSTEM").w(FUNC(supduck_state::supduck_4002_w));
 	map(0xfe4004, 0xfe4005).portr("DSW");
 
-	map(0xfe8000, 0xfe8007).w(this, FUNC(supduck_state::supduck_scroll_w));
+	map(0xfe8000, 0xfe8007).w(FUNC(supduck_state::supduck_scroll_w));
 	map(0xfe800e, 0xfe800f).nopw(); // watchdog or irqack
 
-	map(0xfec000, 0xfecfff).ram().w(this, FUNC(supduck_state::text_videoram_w)).share("textvideoram");
-	map(0xff0000, 0xff3fff).ram().w(this, FUNC(supduck_state::back_videoram_w)).share("backvideoram");
-	map(0xff4000, 0xff7fff).ram().w(this, FUNC(supduck_state::fore_videoram_w)).share("forevideoram");
+	map(0xfec000, 0xfecfff).ram().w(FUNC(supduck_state::text_videoram_w)).share("textvideoram");
+	map(0xff0000, 0xff3fff).ram().w(FUNC(supduck_state::back_videoram_w)).share("backvideoram");
+	map(0xff4000, 0xff7fff).ram().w(FUNC(supduck_state::fore_videoram_w)).share("forevideoram");
 	map(0xff8000, 0xff87ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xffc000, 0xffffff).ram(); /* working RAM */
 }
@@ -269,7 +272,7 @@ void supduck_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0x9000, 0x9000).w(this, FUNC(supduck_state::okibank_w));
+	map(0x9000, 0x9000).w(FUNC(supduck_state::okibank_w));
 	map(0x9800, 0x9800).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }
@@ -367,32 +370,14 @@ static INPUT_PORTS_START( supduck )
 INPUT_PORTS_END
 
 
-static const gfx_layout spritelayout_bionicc=
-{
-	16,16,  /* 16*16 sprites */
-	RGN_FRAC(1,4),   /* 2048 sprites */
-	4,      /* 4 bits per pixel */
-	{ RGN_FRAC(3,4), RGN_FRAC(2,4), RGN_FRAC(1,4), RGN_FRAC(0,4) },
-	{
-		0,1,2,3,4,5,6,7,
-		(16*8)+0,(16*8)+1,(16*8)+2,(16*8)+3,
-		(16*8)+4,(16*8)+5,(16*8)+6,(16*8)+7
-	},
-	{
-		0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-		8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8,
-	},
-	256   /* every sprite takes 256 consecutive bytes */
-};
-
-static const gfx_layout vramlayout_bionicc=
+static const gfx_layout vramlayout=
 {
 	8,8,    /* 8*8 characters */
 	RGN_FRAC(1,1),   /* 1024 character */
 	2,      /* 2 bitplanes */
 	{ 4,0 },
-	{ 0,1,2,3,8,9,10,11 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
+	{ STEP4(0,1), STEP4(4*2,1) },
+	{ STEP8(0,4*2*2) },
 	128   /* every character takes 128 consecutive bytes */
 };
 
@@ -403,30 +388,18 @@ static const gfx_layout tile_layout =
 	RGN_FRAC(1, 2),
 	4,
 	{ RGN_FRAC(1,2)+4, RGN_FRAC(1,2)+0, 4, 0 },
-	{
-		0, 1, 2, 3, 8 + 0, 8 + 1, 8 + 2, 8 + 3,
-		64 * 8 + 0, 64 * 8 + 1, 64 * 8 + 2, 64 * 8 + 3, 64 * 8 + 8 + 0, 64 * 8 + 8 + 1, 64 * 8 + 8 + 2, 64 * 8 + 8 + 3,
-		2 * 64 * 8 + 0, 2 * 64 * 8 + 1, 2 * 64 * 8 + 2, 2 * 64 * 8 + 3, 2 * 64 * 8 + 8 + 0, 2 * 64 * 8 + 8 + 1, 2 * 64 * 8 + 8 + 2, 2 * 64 * 8 + 8 + 3,
-		3 * 64 * 8 + 0, 3 * 64 * 8 + 1, 3 * 64 * 8 + 2, 3 * 64 * 8 + 3, 3 * 64 * 8 + 8 + 0, 3 * 64 * 8 + 8 + 1, 3 * 64 * 8 + 8 + 2, 3 * 64 * 8 + 8 + 3,
-	},
-	{
-		0 * 16, 1 * 16, 2 * 16, 3 * 16, 4 * 16, 5 * 16, 6 * 16, 7 * 16,
-		8 * 16, 9 * 16, 10 * 16, 11 * 16, 12 * 16, 13 * 16, 14 * 16, 15 * 16,
-		16 * 16, 17 * 16, 18 * 16, 19 * 16, 20 * 16, 21 * 16, 22 * 16, 23 * 16,
-		24 * 16, 25 * 16, 26 * 16, 27 * 16, 28 * 16, 29 * 16, 30 * 16, 31 * 16
-	},
+	{ STEP4(0,1),        STEP4(4*2,1),          STEP4(4*2*2*32,1), STEP4(4*2*2*32+4*2,1),
+	  STEP4(4*2*2*64,1), STEP4(4*2*2*64+4*2,1), STEP4(4*2*2*96,1), STEP4(4*2*2*96+4*2,1) },
+	{ STEP32(0,4*2*2) },
 	256 * 8
 };
 
 
-
-static GFXDECODE_START( supduck )
-	GFXDECODE_ENTRY( "gfx1", 0, vramlayout_bionicc,    768, 64 )    /* colors 768-1023 */
-	GFXDECODE_ENTRY( "gfx2", 0, tile_layout,   0,  16 )    /* colors   0-  63 */
-	GFXDECODE_ENTRY( "gfx3", 0, tile_layout, 256,  16 )    /* colors 256- 319 */
-	GFXDECODE_ENTRY( "gfx4", 0, spritelayout_bionicc,  512, 16 )    /* colors 512- 767 */
+static GFXDECODE_START( gfx_supduck )
+	GFXDECODE_ENTRY( "gfx1", 0, vramlayout,  768, 64 )    /* colors 768-1023 */
+	GFXDECODE_ENTRY( "gfx2", 0, tile_layout,   0, 16 )    /* colors   0-  63 */
+	GFXDECODE_ENTRY( "gfx3", 0, tile_layout, 256, 16 )    /* colors 256- 319 */
 GFXDECODE_END
-
 
 
 void supduck_state::machine_start()
@@ -440,46 +413,45 @@ void supduck_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(supduck_state::supduck)
-
+void supduck_state::supduck(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(8'000'000)) /* Verified on PCB */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", supduck_state,  irq2_line_hold) // 2 & 4?
+	M68000(config, m_maincpu, XTAL(8'000'000)); /* Verified on PCB */
+	m_maincpu->set_addrmap(AS_PROGRAM, &supduck_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(supduck_state::irq2_line_hold)); // 2 & 4?
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(8'000'000)/4) /* 2MHz - verified on PCB */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	Z80(config, m_audiocpu, XTAL(8'000'000)/4); /* 2MHz - verified on PCB */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &supduck_state::sound_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_UPDATE_DRIVER(supduck_state, screen_update)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_screen_update(FUNC(supduck_state::screen_update));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram16_device::vblank_copy_rising));
 
-	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", supduck)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_supduck);
 
-	MCFG_DEVICE_ADD("spritegen", TIGEROAD_SPRITE, 0)
+	TIGEROAD_SPRITE(config, m_spritegen, 0);
+	m_spritegen->set_palette(m_palette);
+	m_spritegen->set_color_base(512);    /* colors 512- 767 */
 
-	MCFG_PALETTE_ADD("palette", 0x800/2)
-	MCFG_PALETTE_FORMAT(xRGBRRRRGGGGBBBB_bit4)
+	PALETTE(config, m_palette).set_format(palette_device::xRGBRRRRGGGGBBBB_bit4, 0x800/2);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_OKIM6295_ADD("oki", XTAL(8'000'000)/8, PIN7_HIGH) // 1MHz - Verified on PCB, pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
-
-MACHINE_CONFIG_END
-
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL(8'000'000)/8, okim6295_device::PIN7_HIGH)); // 1MHz - Verified on PCB, pin 7 not verified
+	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
+	oki.set_addrmap(0, &supduck_state::oki_map);
+}
 
 
 /***************************************************************************
@@ -511,11 +483,11 @@ ROM_START( supduck )
 	ROM_LOAD( "13.ul31",   0x40000, 0x20000, CRC(bff7b7cd) SHA1(2f65cadcfcc02fe31ba721eea9f45d4a729e4374) )
 	ROM_LOAD( "14.ul32",   0x60000, 0x20000, CRC(97a7310b) SHA1(76b82bfea64b59890c0ba2e1688b7321507a4da7) )
 
-	ROM_REGION( 0x80000, "gfx4", 0 )
-	ROM_LOAD( "15.u1d",   0x60000, 0x20000, CRC(81bf1f27) SHA1(7a66630a2da85387904917d3c136880dffcb9649) )
-	ROM_LOAD( "16.u2d",   0x40000, 0x20000, CRC(9573d6ec) SHA1(9923be782bae47c49913d01554bcf3e5efb5395b) )
-	ROM_LOAD( "17.u1c",   0x20000, 0x20000, CRC(21ef14d4) SHA1(66e389aaa1186921a07da9a9a9eda88a1083ad42) )
-	ROM_LOAD( "18.u2c",   0x00000, 0x20000, CRC(33dd0674) SHA1(b95dfcc16d939bac77f338b8a8cada19328a1993) )
+	ROM_REGION( 0x80000, "spritegen", 0 )
+	ROM_LOAD32_BYTE( "15.u1d",   0x00000, 0x20000, CRC(81bf1f27) SHA1(7a66630a2da85387904917d3c136880dffcb9649) )
+	ROM_LOAD32_BYTE( "16.u2d",   0x00001, 0x20000, CRC(9573d6ec) SHA1(9923be782bae47c49913d01554bcf3e5efb5395b) )
+	ROM_LOAD32_BYTE( "17.u1c",   0x00002, 0x20000, CRC(21ef14d4) SHA1(66e389aaa1186921a07da9a9a9eda88a1083ad42) )
+	ROM_LOAD32_BYTE( "18.u2c",   0x00003, 0x20000, CRC(33dd0674) SHA1(b95dfcc16d939bac77f338b8a8cada19328a1993) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "2.su12",   0x00000, 0x20000, CRC(745d42fb) SHA1(f9aee3ddbad3cc2f3a7002ee0d762eb041967e1e) ) // static sample data
@@ -524,4 +496,4 @@ ROM_START( supduck )
 	ROM_LOAD( "1.su13",   0x00000, 0x80000, CRC(7fb1ed42) SHA1(77ec86a6454398e329066aa060e9b6a39085ce71) ) // banked sample data
 ROM_END
 
-GAME( 1992, supduck, 0, supduck, supduck, supduck_state, 0, ROT0, "Comad", "Super Duck", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, supduck, 0, supduck, supduck, supduck_state, empty_init, ROT0, "Comad", "Super Duck", MACHINE_SUPPORTS_SAVE )

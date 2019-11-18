@@ -16,8 +16,8 @@
 // reading the original raw data
 void mystwarr_state::decode_tiles()
 {
-	uint8_t *s = memregion("gfx1")->base();
-	int len = memregion("gfx1")->bytes();
+	uint8_t *s = memregion("k056832")->base();
+	int len = memregion("k056832")->bytes();
 	uint8_t *pFinish = s+len-3;
 	uint8_t *d;
 
@@ -164,7 +164,7 @@ VIDEO_START_MEMBER(mystwarr_state, gaiapols)
 	K053936_wraparound_enable(0, 1);
 	K053936GP_set_offset(0, -10,  0); // floor tiles in demo loop2 (Elaine vs. boss)
 
-	m_ult_936_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mystwarr_state::get_gai_936_tile_info),this), TILEMAP_SCAN_ROWS,  16, 16, 512, 512);
+	m_ult_936_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(mystwarr_state::get_gai_936_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 512, 512);
 	m_ult_936_tilemap->set_transparent_pen(0);
 }
 
@@ -199,7 +199,7 @@ VIDEO_START_MEMBER(mystwarr_state, dadandrn)
 	K053936_wraparound_enable(0, 1);
 	K053936GP_set_offset(0, -8, 0); // Brainy's laser
 
-	m_ult_936_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mystwarr_state::get_ult_936_tile_info),this), TILEMAP_SCAN_ROWS,  16, 16, 512, 512);
+	m_ult_936_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(mystwarr_state::get_ult_936_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 512, 512);
 	m_ult_936_tilemap->set_transparent_pen(0);
 }
 

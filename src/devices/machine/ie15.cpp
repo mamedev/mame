@@ -14,6 +14,8 @@
 #include "emu.h"
 #include "machine/ie15.h"
 
+#include "emupal.h"
+
 #include "ie15.lh"
 
 
@@ -37,10 +39,26 @@ ie15_device::ie15_device(const machine_config &mconfig, device_type type, const 
 	, m_p_videoram(*this, "video")
 	, m_p_chargen(*this, "chargen")
 	, m_beeper(*this, "beeper")
-	, m_rs232(*this, "rs232")
 	, m_screen(*this, "screen")
 	, m_keyboard(*this, "keyboard")
 	, m_io_keyboard(*this, "io_keyboard")
+	, m_lat_led(*this, "lat_led")
+	, m_nr_led(*this, "nr_led")
+	, m_pch_led(*this, "pch_led")
+	, m_dup_led(*this, "dup_led")
+	, m_lin_led(*this, "lin_led")
+	, m_red_led(*this, "red_led")
+	, m_sdv_led(*this, "sdv_led")
+	, m_prd_led(*this, "prd_led")
+	, m_rs232_conn_txd_handler(*this)
+	, m_rs232_conn_dtr_handler(*this)
+	, m_rs232_conn_rts_handler(*this)
+	  // Until the UART is implemented
+	, m_rs232_txbaud(*this, "RS232_TXBAUD")
+	, m_rs232_rxbaud(*this, "RS232_RXBAUD")
+	, m_rs232_databits(*this, "RS232_DATABITS")
+	, m_rs232_parity(*this, "RS232_PARITY")
+	, m_rs232_stopbits(*this, "RS232_STOPBITS")
 {
 }
 
@@ -226,7 +244,7 @@ void ie15_device::device_timer(emu_timer &timer, device_timer_id id, int param, 
 	}
 }
 
-WRITE_LINE_MEMBER(ie15_device::serial_rx_callback)
+WRITE_LINE_MEMBER(ie15_device::rs232_conn_rxd_w)
 {
 	device_serial_interface::rx_w(state);
 }
@@ -241,7 +259,7 @@ void ie15_device::rcv_complete()
 void ie15_device::tra_callback()
 {
 	uint8_t bit = transmit_register_get_data_bit();
-	m_rs232->write_txd(bit);
+	m_rs232_conn_txd_handler(bit);
 }
 
 void ie15_device::tra_complete()
@@ -280,6 +298,24 @@ WRITE8_MEMBER(ie15_device::serial_w)
 WRITE8_MEMBER(ie15_device::serial_speed_w)
 {
 	return;
+}
+
+WRITE_LINE_MEMBER(ie15_device::update_serial)
+{
+	int startbits = 1;
+	int databits = m_rs232_databits->read();
+	parity_t parity_table[] = { PARITY_NONE, PARITY_ODD, PARITY_EVEN, PARITY_MARK, PARITY_SPACE };
+	parity_t parity = parity_table[m_rs232_parity->read()];
+	stop_bits_t stopbits_table[] = { STOP_BITS_1, STOP_BITS_2 };
+	stop_bits_t stopbits = stopbits_table[m_rs232_stopbits->read()];
+
+	set_data_frame(startbits, databits, parity, stopbits);
+
+	int txbaud = m_rs232_txbaud->read();
+	set_tra_rate(txbaud);
+
+	int rxbaud = m_rs232_rxbaud->read();
+	set_rcv_rate(rxbaud);
 }
 
 READ8_MEMBER(ie15_device::flag_r)
@@ -341,24 +377,24 @@ void ie15_device::ie15_mem(address_map &map)
 void ie15_device::ie15_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(000, 000).rw(this, FUNC(ie15_device::mem_r), FUNC(ie15_device::mem_w));   // 00h W: memory request, R: memory data [6.1.2.2]
-	map(001, 001).r(this, FUNC(ie15_device::serial_rx_ready_r)).nopw();   // 01h W: memory latch [6.1.2.2]
-	map(002, 002).w(this, FUNC(ie15_device::mem_addr_hi_w));      // 02h W: memory address high [6.1.2.2]
-	map(003, 003).w(this, FUNC(ie15_device::mem_addr_lo_w));      // 03h W: memory address low [6.1.2.2]
-	map(004, 004).w(this, FUNC(ie15_device::mem_addr_inc_w));     // 04h W: memory address counter + [6.1.2.2]
-	map(005, 005).w(this, FUNC(ie15_device::mem_addr_dec_w));     // 05h W: memory address counter - [6.1.2.2]
-	map(006, 006).rw(this, FUNC(ie15_device::serial_r), FUNC(ie15_device::serial_w));     // 06h W: serial port data [6.1.5.4]
+	map(000, 000).rw(FUNC(ie15_device::mem_r), FUNC(ie15_device::mem_w));   // 00h W: memory request, R: memory data [6.1.2.2]
+	map(001, 001).r(FUNC(ie15_device::serial_rx_ready_r)).nopw();   // 01h W: memory latch [6.1.2.2]
+	map(002, 002).w(FUNC(ie15_device::mem_addr_hi_w));      // 02h W: memory address high [6.1.2.2]
+	map(003, 003).w(FUNC(ie15_device::mem_addr_lo_w));      // 03h W: memory address low [6.1.2.2]
+	map(004, 004).w(FUNC(ie15_device::mem_addr_inc_w));     // 04h W: memory address counter + [6.1.2.2]
+	map(005, 005).w(FUNC(ie15_device::mem_addr_dec_w));     // 05h W: memory address counter - [6.1.2.2]
+	map(006, 006).rw(FUNC(ie15_device::serial_r), FUNC(ie15_device::serial_w));     // 06h W: serial port data [6.1.5.4]
 // port 7 is handled in cpu core
-	map(010, 010).rw(this, FUNC(ie15_device::serial_tx_ready_r), FUNC(ie15_device::beep_w));  // 08h W: speaker control [6.1.5.4]
-	map(011, 011).r(this, FUNC(ie15_device::kb_r));            // 09h R: keyboard data [6.1.5.2]
-	map(012, 012).r(this, FUNC(ie15_device::kb_s_red_r));          // 0Ah I: keyboard mode "RED" [6.1.5.2]
-	map(013, 013).r(this, FUNC(ie15_device::kb_ready_r));          // 0Bh R: keyboard data ready [6.1.5.2]
-	map(014, 014).rw(this, FUNC(ie15_device::kb_s_sdv_r), FUNC(ie15_device::serial_speed_w)); // 0Ch W: serial port speed [6.1.3.1], R: keyboard mode "SDV" [6.1.5.2]
-	map(015, 015).rw(this, FUNC(ie15_device::kb_s_dk_r), FUNC(ie15_device::kb_ready_w));  // 0Dh I: keyboard mode "DK" [6.1.5.2]
-	map(016, 016).r(this, FUNC(ie15_device::kb_s_dupl_r));         // 0Eh I: keyboard mode "DUPL" [6.1.5.2]
-	map(017, 017).r(this, FUNC(ie15_device::kb_s_lin_r));          // 0Fh I: keyboard mode "LIN" [6.1.5.2]
+	map(010, 010).rw(FUNC(ie15_device::serial_tx_ready_r), FUNC(ie15_device::beep_w));  // 08h W: speaker control [6.1.5.4]
+	map(011, 011).r(FUNC(ie15_device::kb_r));            // 09h R: keyboard data [6.1.5.2]
+	map(012, 012).r(FUNC(ie15_device::kb_s_red_r));          // 0Ah I: keyboard mode "RED" [6.1.5.2]
+	map(013, 013).r(FUNC(ie15_device::kb_ready_r));          // 0Bh R: keyboard data ready [6.1.5.2]
+	map(014, 014).rw(FUNC(ie15_device::kb_s_sdv_r), FUNC(ie15_device::serial_speed_w)); // 0Ch W: serial port speed [6.1.3.1], R: keyboard mode "SDV" [6.1.5.2]
+	map(015, 015).rw(FUNC(ie15_device::kb_s_dk_r), FUNC(ie15_device::kb_ready_w));  // 0Dh I: keyboard mode "DK" [6.1.5.2]
+	map(016, 016).r(FUNC(ie15_device::kb_s_dupl_r));         // 0Eh I: keyboard mode "DUPL" [6.1.5.2]
+	map(017, 017).r(FUNC(ie15_device::kb_s_lin_r));          // 0Fh I: keyboard mode "LIN" [6.1.5.2]
 // simulation of flag registers
-	map(020, 027).rw(this, FUNC(ie15_device::flag_r), FUNC(ie15_device::flag_w));
+	map(020, 027).rw(FUNC(ie15_device::flag_r), FUNC(ie15_device::flag_w));
 }
 
 /* Input ports */
@@ -373,6 +409,46 @@ INPUT_PORTS_START( ie15 )
 	PORT_DIPNAME(ie15_keyboard_device::IE_KB_LIN, ie15_keyboard_device::IE_KB_LIN, "LIN (Online)")
 	PORT_DIPSETTING(0x00, "Off")
 	PORT_DIPSETTING(ie15_keyboard_device::IE_KB_LIN, "On")
+
+	// Until the UART is implemented
+	PORT_START("RS232_RXBAUD")
+	PORT_CONFNAME(0xffff, 9600, "RX Baud") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, ie15_device, update_serial)
+	PORT_CONFSETTING(300, "300")
+	PORT_CONFSETTING(600, "600")
+	PORT_CONFSETTING(1200, "1200")
+	PORT_CONFSETTING(2400, "2400")
+	PORT_CONFSETTING(4800, "4800")
+	PORT_CONFSETTING(9600, "9600")
+	PORT_CONFSETTING(19200, "19200")
+
+	PORT_START("RS232_TXBAUD")
+	PORT_CONFNAME(0xffff, 9600, "TX Baud") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, ie15_device, update_serial)
+	PORT_CONFSETTING(300, "300")
+	PORT_CONFSETTING(600, "600")
+	PORT_CONFSETTING(1200, "1200")
+	PORT_CONFSETTING(2400, "2400")
+	PORT_CONFSETTING(4800, "4800")
+	PORT_CONFSETTING(9600, "9600")
+	PORT_CONFSETTING(19200, "19200")
+
+	PORT_START("RS232_DATABITS")
+	PORT_CONFNAME(0xf, 8, "Data Bits") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, ie15_device, update_serial)
+	PORT_CONFSETTING(7, "7")
+	PORT_CONFSETTING(8, "8")
+
+	PORT_START("RS232_PARITY")
+	PORT_CONFNAME(0x7, 0, "Parity") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, ie15_device, update_serial)
+	PORT_CONFSETTING(0, "None")
+	PORT_CONFSETTING(1, "Odd")
+	PORT_CONFSETTING(2, "Even")
+	PORT_CONFSETTING(3, "Mark")
+	PORT_CONFSETTING(4, "Space")
+
+	PORT_START("RS232_STOPBITS")
+	PORT_CONFNAME(0x3, 1, "Stop Bits") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, ie15_device, update_serial)
+	PORT_CONFSETTING(1, "1")
+	PORT_CONFSETTING(2, "2")
+
 INPUT_PORTS_END
 
 WRITE16_MEMBER( ie15_device::kbd_put )
@@ -388,8 +464,24 @@ WRITE16_MEMBER( ie15_device::kbd_put )
 	}
 }
 
+void ie15_device::device_resolve_objects()
+{
+	m_rs232_conn_dtr_handler.resolve_safe();
+	m_rs232_conn_rts_handler.resolve_safe();
+	m_rs232_conn_txd_handler.resolve_safe();
+}
+
 void ie15_device::device_start()
 {
+	m_lat_led.resolve();
+	m_nr_led.resolve();
+	m_pch_led.resolve();
+	m_dup_led.resolve();
+	m_lin_led.resolve();
+	m_red_led.resolve();
+	m_sdv_led.resolve();
+	m_prd_led.resolve();
+
 	m_hblank_timer = timer_alloc(TIMER_HBLANK);
 	m_hblank_timer->adjust(attotime::never);
 
@@ -400,6 +492,8 @@ void ie15_device::device_start()
 
 void ie15_device::device_reset()
 {
+	update_serial(0);
+
 	memset(&m_video, 0, sizeof(m_video));
 	m_kb_ruslat = m_long_beep = m_kb_control = m_kb_data = m_kb_flag0 = 0;
 	m_kb_flag = IE_TRUE;
@@ -497,14 +591,14 @@ void ie15_device::update_leds()
 {
 	uint8_t data = m_io_keyboard->read();
 
-	machine().output().set_value("lat_led", m_kb_ruslat ^ 1);
-	machine().output().set_value("nr_led", BIT(m_kb_control, ie15_keyboard_device::IE_KB_NR_BIT) ^ 1);
-	machine().output().set_value("pch_led", BIT(data, ie15_keyboard_device::IE_KB_PCH_BIT) ^ 1);
-	machine().output().set_value("dup_led", BIT(data, ie15_keyboard_device::IE_KB_DUP_BIT) ^ 1);
-	machine().output().set_value("lin_led", BIT(data, ie15_keyboard_device::IE_KB_LIN_BIT) ^ 1);
-	machine().output().set_value("red_led", BIT(data, ie15_keyboard_device::IE_KB_RED_BIT) ^ 1);
-	machine().output().set_value("sdv_led", BIT(m_kb_control, ie15_keyboard_device::IE_KB_SDV_BIT) ^ 1);
-	machine().output().set_value("prd_led", 1); // XXX
+	m_lat_led = m_kb_ruslat ^ 1;
+	m_nr_led = BIT(m_kb_control, ie15_keyboard_device::IE_KB_NR_BIT) ^ 1;
+	m_pch_led = BIT(data, ie15_keyboard_device::IE_KB_PCH_BIT) ^ 1;
+	m_dup_led = BIT(data, ie15_keyboard_device::IE_KB_DUP_BIT) ^ 1;
+	m_lin_led = BIT(data, ie15_keyboard_device::IE_KB_LIN_BIT) ^ 1;
+	m_red_led = BIT(data, ie15_keyboard_device::IE_KB_RED_BIT) ^ 1;
+	m_sdv_led = BIT(m_kb_control, ie15_keyboard_device::IE_KB_SDV_BIT) ^ 1;
+	m_prd_led = 1; // XXX
 }
 
 /*
@@ -562,38 +656,35 @@ static const gfx_layout ie15_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( ie15 )
+static GFXDECODE_START( gfx_ie15 )
 	GFXDECODE_ENTRY("chargen", 0x0000, ie15_charlayout, 0, 1)
 GFXDECODE_END
 
-MACHINE_CONFIG_START(ie15_device::ie15core)
+void ie15_device::ie15core(machine_config &config)
+{
 	/* Basic machine hardware */
-	MCFG_CPU_ADD("maincpu", IE15_CPU, XTAL(30'800'000)/10)
-	MCFG_CPU_PROGRAM_MAP(ie15_mem)
-	MCFG_CPU_IO_MAP(ie15_io)
+	IE15_CPU(config, m_maincpu, XTAL(30'800'000)/10);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ie15_device::ie15_mem);
+	m_maincpu->set_addrmap(AS_IO, &ie15_device::ie15_io);
 
-	MCFG_DEFAULT_LAYOUT(layout_ie15)
+	config.set_default_layout(layout_ie15);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("keyboard", IE15_KEYBOARD, 0)
-	MCFG_IE15_KEYBOARD_CB(WRITE16(ie15_device, kbd_put))
+	IE15_KEYBOARD(config, m_keyboard, 0).keyboard_cb().set(FUNC(ie15_device::kbd_put));
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "null_modem")
-	MCFG_RS232_RXD_HANDLER(WRITELINE(ie15_device, serial_rx_callback))
-
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 2400)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
-MACHINE_CONFIG_END
+	SPEAKER(config, "mono").front_center();
+	BEEP(config, m_beeper, 2400);
+	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.15);
+}
 
 /* ROM definition */
 ROM_START( ie15 )
 	ROM_REGION(0x1000, "maincpu", ROMREGION_ERASE00)
 	ROM_DEFAULT_BIOS("5chip")
 	ROM_SYSTEM_BIOS(0, "5chip", "5-chip firmware (newer)")
-	ROMX_LOAD("dump1.bin", 0x0000, 0x1000, CRC(14b82284) SHA1(5ac4159fbb1c3b81445605e26cd97a713ae12b5f), ROM_BIOS(1))
+	ROMX_LOAD("dump1.bin", 0x0000, 0x1000, CRC(14b82284) SHA1(5ac4159fbb1c3b81445605e26cd97a713ae12b5f), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "6chip", "6-chip firmware (older)")
-	ROMX_LOAD("dump5.bin", 0x0000, 0x1000, CRC(01f2e065) SHA1(2b72dc0594e38a528400cd25aed0c47e0c432895), ROM_BIOS(2))
+	ROMX_LOAD("dump5.bin", 0x0000, 0x1000, CRC(01f2e065) SHA1(2b72dc0594e38a528400cd25aed0c47e0c432895), ROM_BIOS(1))
 
 	ROM_REGION(0x1000, "video", ROMREGION_ERASE00)
 
@@ -601,18 +692,20 @@ ROM_START( ie15 )
 	ROM_LOAD("chargen-15ie.bin", 0x0000, 0x0800, CRC(ed16bf6b) SHA1(6af9fb75f5375943d5c0ce9ed408e0fb4621b17e))
 ROM_END
 
-MACHINE_CONFIG_START(ie15_device::device_add_mconfig)
+void ie15_device::device_add_mconfig(machine_config &config)
+{
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_color(rgb_t::green());
+	m_screen->set_screen_update(FUNC(ie15_device::screen_update));
+	m_screen->set_raw(XTAL(30'800'000)/2,
+			IE15_TOTAL_HORZ, IE15_HORZ_START, IE15_HORZ_START+IE15_DISP_HORZ,
+			IE15_TOTAL_VERT, IE15_VERT_START, IE15_VERT_START+IE15_DISP_VERT);
+
 	ie15core(config);
 
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_UPDATE_DRIVER(ie15_device, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(30'800'000)/2, IE15_TOTAL_HORZ, IE15_HORZ_START,
-		IE15_HORZ_START+IE15_DISP_HORZ, IE15_TOTAL_VERT, IE15_VERT_START,
-		IE15_VERT_START+IE15_DISP_VERT);
-
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ie15)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
-MACHINE_CONFIG_END
+	GFXDECODE(config, "gfxdecode", "palette", gfx_ie15);
+	PALETTE(config, "palette", palette_device::MONOCHROME);
+}
 
 ioport_constructor ie15_device::device_input_ports() const
 {

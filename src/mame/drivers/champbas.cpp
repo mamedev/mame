@@ -82,7 +82,6 @@ TODO:
 #include "includes/champbas.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6805/m68705.h"
-#include "machine/74259.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
@@ -99,7 +98,7 @@ TODO:
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(champbas_state::watchdog_bit2)
+READ_LINE_MEMBER(champbas_state::watchdog_bit2)
 {
 	return (0x10 - m_watchdog->get_vblank_counter()) >> 2 & 1;
 }
@@ -112,9 +111,9 @@ WRITE_LINE_MEMBER(champbas_state::irq_enable_w)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(champbas_state::exctsccr_sound_irq)
+TIMER_DEVICE_CALLBACK_MEMBER(exctsccr_state::exctsccr_sound_irq)
 {
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
 
@@ -184,8 +183,8 @@ READ8_MEMBER(champbas_state::champbja_protection_r)
 void champbas_state::champbas_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
-	map(0x7000, 0x7001).w("ay1", FUNC(ay8910_device::data_address_w));
-	map(0x8000, 0x87ff).ram().w(this, FUNC(champbas_state::tilemap_w)).share("vram");
+	map(0x7000, 0x7001).mirror(0x0ffe).w("ay1", FUNC(ay8910_device::data_address_w));
+	map(0x8000, 0x87ff).ram().w(FUNC(champbas_state::tilemap_w)).share("vram");
 	map(0x8800, 0x8fff).ram().share("mainram");
 
 	map(0xa000, 0xa000).portr("P1");
@@ -193,7 +192,7 @@ void champbas_state::champbas_map(address_map &map)
 	map(0xa080, 0xa080).mirror(0x0020).portr("DSW");
 	map(0xa0c0, 0xa0c0).portr("SYSTEM");
 
-	map(0xa000, 0xa007).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0xa000, 0xa007).w(m_mainlatch, FUNC(ls259_device::write_d0));
 
 	map(0xa060, 0xa06f).writeonly().share("spriteram");
 	map(0xa080, 0xa080).w("soundlatch", FUNC(generic_latch_8_device::write));
@@ -212,7 +211,7 @@ void champbas_state::champbasja_map(address_map &map)
 {
 	champbas_map(map);
 	map(0x6000, 0x63ff).ram();
-	map(0x6800, 0x68ff).r(this, FUNC(champbas_state::champbja_protection_r));
+	map(0x6800, 0x68ff).r(FUNC(champbas_state::champbja_protection_r));
 }
 
 // champbasjb appears to have no protection
@@ -229,6 +228,13 @@ void champbas_state::champbb2_map(address_map &map)
 	map(0x7800, 0x7fff).rom();
 }
 
+// champbb2j appears to have AY select inverted
+void champbas_state::champbb2j_map(address_map &map)
+{
+	champbb2_map(map);
+	map(0x7000, 0x7001).mirror(0x0ffe).w("ay1", FUNC(ay8910_device::address_data_w));
+}
+
 void champbas_state::tbasebal_map(address_map &map)
 {
 	champbas_map(map);
@@ -236,7 +242,7 @@ void champbas_state::tbasebal_map(address_map &map)
 }
 
 // more sprites in exctsccr
-void champbas_state::exctsccr_map(address_map &map)
+void exctsccr_state::exctsccr_map(address_map &map)
 {
 	champbasj_map(map);
 	map(0x7000, 0x7001).unmaprw(); // aysnd is controlled by audiocpu
@@ -245,7 +251,7 @@ void champbas_state::exctsccr_map(address_map &map)
 }
 
 // exctsccrb
-void champbas_state::exctsccrb_map(address_map &map)
+void exctsccr_state::exctsccrb_map(address_map &map)
 {
 	champbasj_map(map);
 	map(0xa040, 0xa04f).writeonly().share("spriteram2");
@@ -261,23 +267,23 @@ void champbas_state::champbas_sound_map(address_map &map)
 	map(0x6000, 0x6000).mirror(0x1fff).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0x8000, 0x8000).mirror(0x1fff).nopw(); // 4-bit return code to main CPU (not used)
 	map(0xa000, 0xa000).mirror(0x1fff).w("soundlatch", FUNC(generic_latch_8_device::clear_w));
-	map(0xc000, 0xc000).mirror(0x1fff).w("dac", FUNC(dac_byte_interface::write));
+	map(0xc000, 0xc000).mirror(0x1fff).w("dac", FUNC(dac_byte_interface::data_w));
 	map(0xe000, 0xe3ff).mirror(0x1c00).ram();
 }
 
 // exctsccr
-void champbas_state::exctsccr_sound_map(address_map &map)
+void exctsccr_state::exctsccr_sound_map(address_map &map)
 {
 	map(0x0000, 0x8fff).rom();
 	map(0xa000, 0xa7ff).ram();
-	map(0xc008, 0xc008).w("dac1", FUNC(dac_byte_interface::write));
-	map(0xc009, 0xc009).w("dac2", FUNC(dac_byte_interface::write));
+	map(0xc008, 0xc008).w("dac1", FUNC(dac_byte_interface::data_w));
+	map(0xc009, 0xc009).w("dac2", FUNC(dac_byte_interface::data_w));
 	map(0xc00c, 0xc00c).w("soundlatch", FUNC(generic_latch_8_device::clear_w));
 	map(0xc00d, 0xc00d).r("soundlatch", FUNC(generic_latch_8_device::read));
-//  AM_RANGE(0xc00f, 0xc00f) AM_WRITENOP // ?
+//  map(0xc00f, 0xc00f).nopw(); // ?
 }
 
-void champbas_state::exctsccr_sound_io_map(address_map &map)
+void exctsccr_state::exctsccr_sound_io_map(address_map &map)
 {
 	map.global_mask(0x00ff);
 	map(0x82, 0x83).w("ay1", FUNC(ay8910_device::data_address_w));
@@ -331,7 +337,7 @@ static INPUT_PORTS_START( talbot )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, champbas_state, watchdog_bit2, nullptr) // bit 2 of the watchdog counter
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(champbas_state, watchdog_bit2) // bit 2 of the watchdog counter
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
@@ -435,12 +441,12 @@ static const gfx_layout spritelayout =
 	64*8
 };
 
-static GFXDECODE_START( talbot )
+static GFXDECODE_START( gfx_talbot )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0x100, 0x100>>2 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0x000, 0x100>>2 )
 GFXDECODE_END
 
-static GFXDECODE_START( champbas )
+static GFXDECODE_START( gfx_champbas )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 0x200>>2 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0, 0x200>>2 )
 GFXDECODE_END
@@ -479,7 +485,7 @@ static const gfx_layout spritelayout_4bpp =
 	64*8
 };
 
-static GFXDECODE_START( exctsccr )
+static GFXDECODE_START( gfx_exctsccr )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout_3bpp,   0x000, 0x080>>3 ) /* chars */
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout_3bpp, 0x080, 0x080>>3 ) /* sprites */
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout_4bpp, 0x100, 0x100>>4 ) /* sprites */
@@ -506,293 +512,269 @@ void champbas_state::machine_start()
 	save_item(NAME(m_gfx_bank));
 }
 
-void champbas_state::machine_reset()
+WRITE_LINE_MEMBER(champbas_state::vblank_irq)
 {
-	// 74LS259 is auto CLR on reset
-	for (int i = 0; i < 8; i++)
-		m_maincpu->space(AS_PROGRAM).write_byte(0xa000 + i, 0);
-}
-
-INTERRUPT_GEN_MEMBER(champbas_state::vblank_irq)
-{
-	if (m_irq_mask)
-		device.execute().set_input_line(0, ASSERT_LINE);
+	if (state && m_irq_mask)
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
 
-MACHINE_CONFIG_START(champbas_state::talbot)
-
+void champbas_state::talbot(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(18'432'000)/6)
-	MCFG_CPU_PROGRAM_MAP(champbasj_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", champbas_state, vblank_irq)
+	Z80(config, m_maincpu, XTAL(18'432'000)/6);
+	m_maincpu->set_addrmap(AS_PROGRAM, &champbas_state::champbasj_map);
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(champbas_state, irq_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(NOOP) // !WORK board output (no use?)
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // no gfxbank
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(champbas_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // no palettebank
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // n.c.
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(champbas_state, mcu_start_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(champbas_state, mcu_switch_w))
+	LS259(config, m_mainlatch);
+	m_mainlatch->q_out_cb<0>().set(FUNC(champbas_state::irq_enable_w));
+	m_mainlatch->q_out_cb<1>().set_nop(); // !WORK board output (no use?)
+	m_mainlatch->q_out_cb<2>().set_nop(); // no gfxbank
+	m_mainlatch->q_out_cb<3>().set(FUNC(champbas_state::flipscreen_w));
+	m_mainlatch->q_out_cb<4>().set_nop(); // no palettebank
+	m_mainlatch->q_out_cb<5>().set_nop(); // n.c.
+	m_mainlatch->q_out_cb<6>().set(FUNC(champbas_state::mcu_start_w));
+	m_mainlatch->q_out_cb<7>().set(FUNC(champbas_state::mcu_switch_w));
 
-	MCFG_DEVICE_ADD("alpha_8201", ALPHA_8201, XTAL(18'432'000)/6/8)
-	MCFG_QUANTUM_PERFECT_CPU("alpha_8201:mcu")
+	ALPHA_8201(config, m_alpha_8201, XTAL(18'432'000)/6/8);
+	config.set_perfect_quantum("alpha_8201:mcu");
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 0x10)
+	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 0x10);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(champbas_state, screen_update_champbas)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(champbas_state::screen_update_champbas));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(champbas_state::vblank_irq));
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", talbot)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(champbas_state,champbas)
-	MCFG_VIDEO_START_OVERRIDE(champbas_state,champbas)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_talbot);
+	PALETTE(config, m_palette, FUNC(champbas_state::champbas_palette), 512, 32);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL(18'432'000)/12)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
-MACHINE_CONFIG_END
+	AY8910(config, "ay1", XTAL(18'432'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.5);
+}
 
 
-MACHINE_CONFIG_START(champbas_state::champbas)
-
+void champbas_state::champbas(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(18'432'000)/6)
-	MCFG_CPU_PROGRAM_MAP(champbas_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", champbas_state, vblank_irq)
+	Z80(config, m_maincpu, XTAL(18'432'000)/6);
+	m_maincpu->set_addrmap(AS_PROGRAM, &champbas_state::champbas_map);
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 9D; 8G on Champion Baseball II Double Board Configuration
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(champbas_state, irq_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(NOOP) // !WORK board output (no use?)
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(champbas_state, gfxbank_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(champbas_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(champbas_state, palette_bank_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // n.c.
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP) // no MCU
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP) // no MCU
+	LS259(config, m_mainlatch); // 9D; 8G on Champion Baseball II Double Board Configuration
+	m_mainlatch->q_out_cb<0>().set(FUNC(champbas_state::irq_enable_w));
+	m_mainlatch->q_out_cb<1>().set_nop(); // !WORK board output (no use?)
+	m_mainlatch->q_out_cb<2>().set(FUNC(champbas_state::gfxbank_w));
+	m_mainlatch->q_out_cb<3>().set(FUNC(champbas_state::flipscreen_w));
+	m_mainlatch->q_out_cb<4>().set(FUNC(champbas_state::palette_bank_w));
+	m_mainlatch->q_out_cb<5>().set_nop(); // n.c.
+	m_mainlatch->q_out_cb<6>().set_nop(); // no MCU
+	m_mainlatch->q_out_cb<7>().set_nop(); // no MCU
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(18'432'000)/6)
-	MCFG_CPU_PROGRAM_MAP(champbas_sound_map)
+	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(18'432'000)/6));
+	audiocpu.set_addrmap(AS_PROGRAM, &champbas_state::champbas_sound_map);
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 0x10)
+	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 0x10);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(champbas_state, screen_update_champbas)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(champbas_state::screen_update_champbas));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(champbas_state::vblank_irq));
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", champbas)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(champbas_state,champbas)
-	MCFG_VIDEO_START_OVERRIDE(champbas_state,champbas)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_champbas);
+	PALETTE(config, m_palette, FUNC(champbas_state::champbas_palette), 512, 32);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL(18'432'000)/12)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
+	AY8910(config, "ay1", XTAL(18'432'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.3);
 
-	MCFG_SOUND_ADD("dac", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.7) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	DAC_6BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.7); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
-MACHINE_CONFIG_START(champbas_state::champbasj)
+void champbas_state::champbasj(machine_config &config)
+{
 	champbas(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(champbasj_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &champbas_state::champbasj_map);
 
-	MCFG_DEVICE_MODIFY("mainlatch")
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(champbas_state, mcu_start_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(champbas_state, mcu_switch_w))
+	m_mainlatch->q_out_cb<6>().set(FUNC(champbas_state::mcu_start_w));
+	m_mainlatch->q_out_cb<7>().set(FUNC(champbas_state::mcu_switch_w));
 
-	MCFG_DEVICE_ADD("alpha_8201", ALPHA_8201, XTAL(18'432'000)/6/8) // note: 8302 rom on champbb2 (same device!)
-	MCFG_QUANTUM_PERFECT_CPU("alpha_8201:mcu")
-MACHINE_CONFIG_END
+	ALPHA_8201(config, m_alpha_8201, XTAL(18'432'000)/6/8); // note: 8302 rom on champbb2 (same device!)
+	config.set_perfect_quantum("alpha_8201:mcu");
+}
 
 
-MACHINE_CONFIG_START(champbas_state::champbasja)
+void champbas_state::champbasja(machine_config &config)
+{
 	champbas(config);
 
-	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(champbasja_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &champbas_state::champbasja_map);
+}
 
-MACHINE_CONFIG_START(champbas_state::champbasjb)
+void champbas_state::champbasjb(machine_config &config)
+{
 	champbas(config);
 
-	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(champbasjb_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &champbas_state::champbasjb_map);
+}
 
-MACHINE_CONFIG_START(champbas_state::champbb2)
+void champbas_state::champbb2(machine_config &config)
+{
 	champbasj(config);
 
-	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(champbb2_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &champbas_state::champbb2_map);
+}
+
+void champbas_state::champbb2j(machine_config &config)
+{
+	champbb2(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &champbas_state::champbb2j_map);
+}
 
 
-MACHINE_CONFIG_START(champbas_state::tbasebal)
+void champbas_state::tbasebal(machine_config &config)
+{
 	champbas(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(tbasebal_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &champbas_state::tbasebal_map);
 
-	MCFG_CPU_ADD("mcu", M68705P3, XTAL(18'432'000)/6) // ?Mhz
-MACHINE_CONFIG_END
-
+	M68705P3(config, "mcu", XTAL(18'432'000)/6); // ?Mhz
+}
 
 
-MACHINE_CONFIG_START(champbas_state::exctsccr)
 
+void exctsccr_state::exctsccr(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(18'432'000)/6 )
-	MCFG_CPU_PROGRAM_MAP(exctsccr_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", champbas_state, vblank_irq)
+	Z80(config, m_maincpu, XTAL(18'432'000)/6);
+	m_maincpu->set_addrmap(AS_PROGRAM, &exctsccr_state::exctsccr_map);
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(champbas_state, irq_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(NOOP) // !WORK board output (no use?)
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(champbas_state, gfxbank_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(champbas_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // no palettebank
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // n.c.
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(champbas_state, mcu_start_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(champbas_state, mcu_switch_w))
+	LS259(config, m_mainlatch);
+	m_mainlatch->q_out_cb<0>().set(FUNC(exctsccr_state::irq_enable_w));
+	m_mainlatch->q_out_cb<1>().set_nop(); // !WORK board output (no use?)
+	m_mainlatch->q_out_cb<2>().set(FUNC(exctsccr_state::gfxbank_w));
+	m_mainlatch->q_out_cb<3>().set(FUNC(exctsccr_state::flipscreen_w));
+	m_mainlatch->q_out_cb<4>().set_nop(); // no palettebank
+	m_mainlatch->q_out_cb<5>().set_nop(); // n.c.
+	m_mainlatch->q_out_cb<6>().set(FUNC(exctsccr_state::mcu_start_w));
+	m_mainlatch->q_out_cb<7>().set(FUNC(exctsccr_state::mcu_switch_w));
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(14'318'181)/4 )
-	MCFG_CPU_PROGRAM_MAP(exctsccr_sound_map)
-	MCFG_CPU_IO_MAP(exctsccr_sound_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(champbas_state, nmi_line_pulse, 4000) // 4 kHz, updates the dac
+	Z80(config, m_audiocpu, XTAL(14'318'181)/4);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &exctsccr_state::exctsccr_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &exctsccr_state::exctsccr_sound_io_map);
+	m_audiocpu->set_periodic_int(FUNC(exctsccr_state::nmi_line_pulse), attotime::from_hz(4000)); // 4 kHz, updates the dac
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("exc_snd_irq", champbas_state, exctsccr_sound_irq, attotime::from_hz(75)) // irq source unknown, determines music tempo
-	MCFG_TIMER_START_DELAY(attotime::from_hz(75))
+	timer_device &exc_snd_irq(TIMER(config, "exc_snd_irq"));
+	exc_snd_irq.configure_periodic(FUNC(exctsccr_state::exctsccr_sound_irq), attotime::from_hz(75)); // irq source unknown, determines music tempo
+	exc_snd_irq.set_start_delay(attotime::from_hz(75));
 
-	MCFG_DEVICE_ADD("alpha_8201", ALPHA_8201, XTAL(18'432'000)/6/8) // note: 8302 rom, or 8303 on exctscc2 (same device!)
-	MCFG_QUANTUM_PERFECT_CPU("alpha_8201:mcu")
+	ALPHA_8201(config, m_alpha_8201, XTAL(18'432'000)/6/8); // note: 8302 rom, or 8303 on exctscc2 (same device!)
+	config.set_perfect_quantum("alpha_8201:mcu");
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 0x10)
+	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 0x10);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60.54)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(champbas_state, screen_update_exctsccr)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60.54);
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(exctsccr_state::screen_update_exctsccr));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(exctsccr_state::vblank_irq));
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", exctsccr)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(champbas_state,exctsccr)
-	MCFG_VIDEO_START_OVERRIDE(champbas_state,exctsccr)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_exctsccr);
+	PALETTE(config, m_palette, FUNC(exctsccr_state::exctsccr_palette), 512, 32);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
 	/* AY (melody) clock is specified by a VR (0.9 - 3.9 MHz) */
-	MCFG_SOUND_ADD("ay1", AY8910, 1940000) /* VR has a factory mark and this is the value read */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.08)
+	AY8910(config, "ay1", 1940000).add_route(ALL_OUTPUTS, "speaker", 0.08); /* VR has a factory mark and this is the value read */
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL(14'318'181)/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.08)
+	AY8910(config, "ay2", XTAL(14'318'181)/8).add_route(ALL_OUTPUTS, "speaker", 0.08);
 
-	MCFG_SOUND_ADD("ay3", AY8910, XTAL(14'318'181)/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.08)
+	AY8910(config, "ay3", XTAL(14'318'181)/8).add_route(ALL_OUTPUTS, "speaker", 0.08);
 
-	MCFG_SOUND_ADD("ay4", AY8910, XTAL(14'318'181)/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.08)
+	AY8910(config, "ay4", XTAL(14'318'181)/8).add_route(ALL_OUTPUTS, "speaker", 0.08);
 
-	MCFG_SOUND_ADD("dac1", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3) // unknown DAC
-	MCFG_SOUND_ADD("dac2", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	DAC_6BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.3); // unknown DAC
+	DAC_6BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.3); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac1", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac1", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "dac2", -1.0, DAC_VREF_NEG_INPUT);
+}
 
 /* Bootleg running on a modified Champion Baseball board */
-MACHINE_CONFIG_START(champbas_state::exctsccrb)
-
+void exctsccr_state::exctsccrb(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(18'432'000)/6)
-	MCFG_CPU_PROGRAM_MAP(exctsccrb_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", champbas_state, vblank_irq)
+	Z80(config, m_maincpu, XTAL(18'432'000)/6);
+	m_maincpu->set_addrmap(AS_PROGRAM, &exctsccr_state::exctsccrb_map);
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(champbas_state, irq_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(NOOP) // !WORK board output (no use?)
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(champbas_state, gfxbank_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(champbas_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // no palettebank
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // n.c.
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(champbas_state, mcu_start_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(champbas_state, mcu_switch_w))
+	LS259(config, m_mainlatch);
+	m_mainlatch->q_out_cb<0>().set(FUNC(exctsccr_state::irq_enable_w));
+	m_mainlatch->q_out_cb<1>().set_nop(); // !WORK board output (no use?)
+	m_mainlatch->q_out_cb<2>().set(FUNC(exctsccr_state::gfxbank_w));
+	m_mainlatch->q_out_cb<3>().set(FUNC(exctsccr_state::flipscreen_w));
+	m_mainlatch->q_out_cb<4>().set_nop(); // no palettebank
+	m_mainlatch->q_out_cb<5>().set_nop(); // n.c.
+	m_mainlatch->q_out_cb<6>().set(FUNC(exctsccr_state::mcu_start_w));
+	m_mainlatch->q_out_cb<7>().set(FUNC(exctsccr_state::mcu_switch_w));
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(18'432'000)/6)
-	MCFG_CPU_PROGRAM_MAP(champbas_sound_map)
+	Z80(config, m_audiocpu, XTAL(18'432'000)/6);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &exctsccr_state::champbas_sound_map);
 
-	MCFG_DEVICE_ADD("alpha_8201", ALPHA_8201, XTAL(18'432'000)/6/8) // champbasj 8201 on pcb, though unused
-	MCFG_QUANTUM_PERFECT_CPU("alpha_8201:mcu")
+	ALPHA_8201(config, m_alpha_8201, XTAL(18'432'000)/6/8); // champbasj 8201 on pcb, though unused
+	config.set_perfect_quantum("alpha_8201:mcu");
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 0x10)
+	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 0x10);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(champbas_state, screen_update_exctsccr)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(exctsccr_state::screen_update_exctsccr));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(exctsccr_state::vblank_irq));
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", exctsccr)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(champbas_state,exctsccr)
-	MCFG_VIDEO_START_OVERRIDE(champbas_state,exctsccr)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_exctsccr);
+	PALETTE(config, m_palette, FUNC(exctsccr_state::exctsccr_palette), 512, 32);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL(18'432'000)/12)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
+	AY8910(config, "ay1", XTAL(18'432'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.3);
 
-	MCFG_SOUND_ADD("dac", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.7) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	DAC_6BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.7); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
 
 
@@ -1251,7 +1233,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(champbas_state,champbas)
+void champbas_state::init_champbas()
 {
 	// chars and sprites are mixed in the same ROMs, so rearrange them for easier decoding
 	uint8_t *rom1 = memregion("gfx1")->base();
@@ -1267,7 +1249,7 @@ DRIVER_INIT_MEMBER(champbas_state,champbas)
 }
 
 
-DRIVER_INIT_MEMBER(champbas_state,exctsccr)
+void exctsccr_state::init_exctsccr()
 {
 	// chars and sprites are mixed in the same ROMs, so rearrange them for easier decoding
 	uint8_t *rom1 = memregion("gfx1")->base();
@@ -1303,20 +1285,20 @@ DRIVER_INIT_MEMBER(champbas_state,exctsccr)
  *************************************/
 
 /*    YEAR  NAME        PARENT    MACHINE     INPUT     INIT                      MONITOR COMPANY, FULLNAME, FLAGS */
-GAME( 1982, talbot,     0,        talbot,     talbot,   champbas_state, 0,        ROT270, "Alpha Denshi Co. (Volt Electronics license)", "Talbot", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, talbot,     0,        talbot,     talbot,   champbas_state, empty_init,    ROT270, "Alpha Denshi Co. (Volt Electronics license)", "Talbot", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, champbas,   0,        champbas,   champbas, champbas_state, champbas, ROT0,   "Alpha Denshi Co. (Sega license)", "Champion Base Ball", MACHINE_SUPPORTS_SAVE ) // no protection
-GAME( 1983, champbasj,  champbas, champbasj,  champbas, champbas_state, champbas, ROT0,   "Alpha Denshi Co.", "Champion Base Ball (Japan set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, champbasja, champbas, champbasja, champbas, champbas_state, champbas, ROT0,   "Alpha Denshi Co.", "Champion Base Ball (Japan set 2)", MACHINE_SUPPORTS_SAVE ) // simplified protection, no mcu
-GAME( 1983, champbasjb, champbas, champbasjb, champbas, champbas_state, champbas, ROT0,   "Alpha Denshi Co.", "Champion Base Ball (Japan set 3)", MACHINE_SUPPORTS_SAVE ) // no protection
-GAME( 1983, champbb2,   0,        champbb2,   champbas, champbas_state, champbas, ROT0,   "Alpha Denshi Co. (Sega license)", "Champion Base Ball Part-2 (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, champbb2j,  champbb2, champbb2,   champbas, champbas_state, champbas, ROT0,   "Alpha Denshi Co.", "Champion Base Ball Part-2 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, tbasebal,   champbb2, tbasebal,   champbas, champbas_state, champbas, ROT0,   "Alpha Denshi Co.", "Taikyoku Base Ball", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // 68705 protection instead
+GAME( 1983, champbas,   0,        champbas,   champbas, champbas_state, init_champbas, ROT0,   "Alpha Denshi Co. (Sega license)", "Champion Base Ball", MACHINE_SUPPORTS_SAVE ) // no protection
+GAME( 1983, champbasj,  champbas, champbasj,  champbas, champbas_state, init_champbas, ROT0,   "Alpha Denshi Co.", "Champion Base Ball (Japan set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, champbasja, champbas, champbasja, champbas, champbas_state, init_champbas, ROT0,   "Alpha Denshi Co.", "Champion Base Ball (Japan set 2)", MACHINE_SUPPORTS_SAVE ) // simplified protection, no mcu
+GAME( 1983, champbasjb, champbas, champbasjb, champbas, champbas_state, init_champbas, ROT0,   "Alpha Denshi Co.", "Champion Base Ball (Japan set 3)", MACHINE_SUPPORTS_SAVE ) // no protection
+GAME( 1983, champbb2,   0,        champbb2,   champbas, champbas_state, init_champbas, ROT0,   "Alpha Denshi Co. (Sega license)", "Champion Base Ball Part-2 (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, champbb2j,  champbb2, champbb2j,  champbas, champbas_state, init_champbas, ROT0,   "Alpha Denshi Co.", "Champion Base Ball Part-2 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, tbasebal,   champbb2, tbasebal,   champbas, champbas_state, init_champbas, ROT0,   "Alpha Denshi Co.", "Taikyoku Base Ball", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // 68705 protection instead
 
-GAME( 1983, exctsccr,   0,        exctsccr,   exctsccr, champbas_state, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, exctsccru,  exctsccr, exctsccr,   exctsccr, champbas_state, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, exctsccra,  exctsccr, exctsccr,   exctsccr, champbas_state, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer (alternate music)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, exctsccrj,  exctsccr, exctsccr,   exctsccr, champbas_state, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, exctsccrjo, exctsccr, exctsccr,   exctsccr, champbas_state, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer (Japan, older)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, exctsccrb,  exctsccr, exctsccrb,  exctsccr, champbas_state, exctsccr, ROT270, "bootleg (Kazutomi)", "Exciting Soccer (bootleg)", MACHINE_SUPPORTS_SAVE ) // on champbasj hardware
-GAME( 1984, exctscc2,   0,        exctsccr,   exctsccr, champbas_state, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer II", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, exctsccr,   0,        exctsccr,   exctsccr, exctsccr_state, init_exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, exctsccru,  exctsccr, exctsccr,   exctsccr, exctsccr_state, init_exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, exctsccra,  exctsccr, exctsccr,   exctsccr, exctsccr_state, init_exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer (alternate music)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, exctsccrj,  exctsccr, exctsccr,   exctsccr, exctsccr_state, init_exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, exctsccrjo, exctsccr, exctsccr,   exctsccr, exctsccr_state, init_exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer (Japan, older)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, exctsccrb,  exctsccr, exctsccrb,  exctsccr, exctsccr_state, init_exctsccr, ROT270, "bootleg (Kazutomi)", "Exciting Soccer (bootleg)", MACHINE_SUPPORTS_SAVE ) // on champbasj hardware
+GAME( 1984, exctscc2,   0,        exctsccr,   exctsccr, exctsccr_state, init_exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer II", MACHINE_SUPPORTS_SAVE )

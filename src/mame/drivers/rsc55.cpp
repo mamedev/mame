@@ -46,11 +46,13 @@ INPUT_PORTS_END
 class sc55_state : public driver_device
 {
 public:
+	sc55_state(const machine_config &mconfig, device_type type, const char *tag);
+
+	void sc55(machine_config &config);
+
+private:
 	required_device<i8x9x_device> m_maincpu;
 
-	sc55_state(const machine_config &mconfig, device_type type, const char *tag);
-	void sc55(machine_config &config);
-	void sc55_io(address_map &map);
 	void sc55_map(address_map &map);
 };
 
@@ -65,15 +67,11 @@ void sc55_state::sc55_map(address_map &map)
 	map(0x1000, 0x3fff).rom().region("maincpu", 0x1000);
 }
 
-void sc55_state::sc55_io(address_map &map)
+void sc55_state::sc55(machine_config &config)
 {
+	P8098(config, m_maincpu, XTAL(20'000'000));    // probably not?
+	m_maincpu->set_addrmap(AS_PROGRAM, &sc55_state::sc55_map);
 }
-
-MACHINE_CONFIG_START(sc55_state::sc55)
-	MCFG_CPU_ADD( "maincpu", P8098, XTAL(20'000'000) )    // probably not?
-	MCFG_CPU_PROGRAM_MAP( sc55_map )
-	MCFG_CPU_IO_MAP( sc55_io )
-MACHINE_CONFIG_END
 
 ROM_START( sc55 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // additional H8/532 code and patch data - revisions match main CPU revisions
@@ -85,4 +83,4 @@ ROM_START( sc55 )
 	ROM_LOAD( "roland-gss.c_r15209281.ic26", 0x200000, 0x100000, CRC(e21ebc04) SHA1(7454b817778179806f3f9d1985b3a2ef67ace76f) )
 ROM_END
 
-CONS( 1991, sc55,  0, 0, sc55, sc55, sc55_state, 0, "Roland", "Sound Canvas SC-55",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 1991, sc55, 0, 0, sc55, sc55, sc55_state, empty_init, "Roland", "Sound Canvas SC-55", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

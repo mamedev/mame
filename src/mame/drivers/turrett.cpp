@@ -11,11 +11,7 @@
 #include "emu.h"
 #include "includes/turrett.h"
 
-#include "cpu/mips/r3000.h"
-#include "machine/ataintf.h"
-#include "machine/idehd.h"
-#include "speaker.h"
-
+#include "bus/ata/idehd.h"
 
 
 /*************************************
@@ -41,8 +37,8 @@ void turrett_state::machine_start()
 	m_video_ram[1] = std::make_unique<uint16_t[]>(VRAM_BANK_WORDS);
 
 	// Register our state for saving
-	save_pointer(NAME(m_video_ram[0].get()), VRAM_BANK_WORDS);
-	save_pointer(NAME(m_video_ram[1].get()), VRAM_BANK_WORDS);
+	save_pointer(NAME(m_video_ram[0]), VRAM_BANK_WORDS);
+	save_pointer(NAME(m_video_ram[1]), VRAM_BANK_WORDS);
 	save_item(NAME(m_inputs_active));
 	save_item(NAME(m_last_pixel));
 	save_item(NAME(m_video_ctrl));
@@ -87,17 +83,17 @@ void turrett_state::machine_reset()
 
 void turrett_state::cpu_map(address_map &map)
 {
-	map(0x00000000, 0x0007ffff).ram();
+	map(0x00000000, 0x0007ffff).ram().mirror(0x40000000);
 	map(0x02000010, 0x02000013).ram();
 	map(0x02000040, 0x02000043).ram();
 	map(0x02000050, 0x02000053).ram();
 	map(0x02000060, 0x02000063).ram();
 	map(0x02000070, 0x02000073).ram(); // TODO: What are these?
-	map(0x04000000, 0x0400000f).w(this, FUNC(turrett_state::dma_w));
-	map(0x04000100, 0x04000103).rw(this, FUNC(turrett_state::int_r), FUNC(turrett_state::int_w));
+	map(0x04000000, 0x0400000f).w(FUNC(turrett_state::dma_w));
+	map(0x04000100, 0x04000103).rw(FUNC(turrett_state::int_r), FUNC(turrett_state::int_w));
 	map(0x04000200, 0x040003ff).rw("ttsound", FUNC(turrett_device::read), FUNC(turrett_device::write));
-	map(0x08000000, 0x0800000f).rw(this, FUNC(turrett_state::video_r), FUNC(turrett_state::video_w));
-	map(0x08000200, 0x080003ff).rw(m_ata, FUNC(ata_interface_device::read_cs0), FUNC(ata_interface_device::write_cs0));
+	map(0x08000000, 0x0800000f).rw(FUNC(turrett_state::video_r), FUNC(turrett_state::video_w));
+	map(0x08000200, 0x080003ff).rw(m_ata, FUNC(ata_interface_device::cs0_r), FUNC(ata_interface_device::cs0_w));
 	map(0x1fc00000, 0x1fdfffff).rom().region("maincpu", 0);
 }
 
@@ -124,24 +120,24 @@ static INPUT_PORTS_START( turrett )
 	PORT_BIT( 0x3f, 0x00, IPT_AD_STICK_X ) PORT_MINMAX(0x20,0x1f) PORT_SENSITIVITY(60) PORT_KEYDELTA(2)
 
 	PORT_START("PORT CX")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )    PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, (void *)0x00000100)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )   PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, (void *)0x00000200)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BILL1 )      PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, (void *)0x00000400)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )    PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, (void *)0x00000800)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )      PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, (void *)0x00001000)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )      PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, (void *)0x00002000)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )     PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, (void *)0x00004000)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, (void *)0x00008000)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )    PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, 0x00000100)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )   PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, 0x00000200)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BILL1 )      PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, 0x00000400)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )    PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, 0x00000800)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )      PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, 0x00001000)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )      PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, 0x00002000)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )     PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, 0x00004000)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, 0x00008000)
 
 	PORT_START("PORT DX")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )    PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, (void *)0x00010000)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )    PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, (void *)0x00020000)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 )    PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, (void *)0x00040000)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )    PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, (void *)0x00080000)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )    PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, (void *)0x00100000)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )    PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, (void *)0x00200000)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )    PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, (void *)0x00400000)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, (void *)0x00800000)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )    PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, 0x00010000)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )    PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, 0x00020000)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 )    PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, 0x00040000)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )    PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, 0x00080000)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )    PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, 0x00100000)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )    PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, 0x00200000)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )    PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, 0x00400000)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    PORT_CHANGED_MEMBER(DEVICE_SELF, turrett_state, ipt_change, 0x00800000)
 
 	PORT_START("PORT EX")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Floor mat")
@@ -252,14 +248,14 @@ uint32_t turrett_state::update_inputs(void)
 	}
 
 	// Update IRQ state
-	m_maincpu->set_input_line(R3000_IRQ1, m_inputs_active ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ1, m_inputs_active ? ASSERT_LINE : CLEAR_LINE);
 	return val;
 }
 
 
 INPUT_CHANGED_MEMBER( turrett_state::ipt_change )
 {
-	int p = (uintptr_t)param;
+	int p = param;
 
 	if (newval != oldval)
 	{
@@ -269,13 +265,13 @@ INPUT_CHANGED_MEMBER( turrett_state::ipt_change )
 			if (newval == 0)
 			{
 				m_inputs_active |= p;
-				m_maincpu->set_input_line(R3000_IRQ1, ASSERT_LINE);
+				m_maincpu->set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
 			}
 		}
 		else
 		{
 			m_inputs_active |= p;
-			m_maincpu->set_input_line(R3000_IRQ1, ASSERT_LINE);
+			m_maincpu->set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
 		}
 	}
 }
@@ -296,7 +292,7 @@ INTERRUPT_GEN_MEMBER( turrett_state::vblank )
 		m_inputs_active |= 0x02000000;
 
 	m_frame ^= 1;
-	m_maincpu->set_input_line(R3000_IRQ1, ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
 }
 
 
@@ -308,7 +304,7 @@ INTERRUPT_GEN_MEMBER( turrett_state::adc )
 		m_inputs_active |= 0x00000002;
 
 	m_adc ^= 1;
-	m_maincpu->set_input_line(R3000_IRQ1, ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
 }
 
 /*************************************
@@ -341,9 +337,10 @@ public:
 
 DEFINE_DEVICE_TYPE(TURRETT_HARDDISK, turrett_hdd, "turrett_hdd", "Turret Tower HDD")
 
-SLOT_INTERFACE_START(turrett_devices)
-	SLOT_INTERFACE("hdd", TURRETT_HARDDISK)
-SLOT_INTERFACE_END
+void turrett_devices(device_slot_interface &device)
+{
+	device.option_add("hdd", TURRETT_HARDDISK);
+}
 
 /*************************************
  *
@@ -351,37 +348,38 @@ SLOT_INTERFACE_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(turrett_state::turrett)
-
+void turrett_state::turrett(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", R3041, R3041_CLOCK)
-	MCFG_R3000_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_R3000_BRCOND2_INPUT(READLINE(turrett_state, sbrc2_r))
-	MCFG_R3000_BRCOND3_INPUT(READLINE(turrett_state, sbrc3_r))
-	MCFG_CPU_PROGRAM_MAP(cpu_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", turrett_state, vblank)
-	MCFG_CPU_PERIODIC_INT_DRIVER(turrett_state, adc, 60)
+	R3041(config, m_maincpu, R3041_CLOCK);
+	m_maincpu->set_endianness(ENDIANNESS_BIG);
+	m_maincpu->in_brcond<2>().set(FUNC(turrett_state::sbrc2_r));
+	m_maincpu->in_brcond<3>().set(FUNC(turrett_state::sbrc3_r));
+	m_maincpu->set_addrmap(AS_PROGRAM, &turrett_state::cpu_map);
+	m_maincpu->set_vblank_int("screen", FUNC(turrett_state::vblank));
+	m_maincpu->set_periodic_int(FUNC(turrett_state::adc), attotime::from_hz(60));
 
-	MCFG_ATA_INTERFACE_ADD("ata", turrett_devices, "hdd", nullptr, true)
+	ATA_INTERFACE(config, m_ata).options(turrett_devices, "hdd", nullptr, true);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	// TODO: Likely not correct. Refresh rate empirically determined
 	// to ensure in-sync streaming sound
-	MCFG_SCREEN_RAW_PARAMS(4000000, 512, 0, 336, 259, 0, 244)
-	MCFG_SCREEN_UPDATE_DRIVER(turrett_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	m_screen->set_raw(4000000, 512, 0, 336, 259, 0, 244);
+	m_screen->set_screen_update(FUNC(turrett_state::screen_update));
+	m_screen->set_palette("palette");
 
-	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
+	PALETTE(config, "palette", palette_device::RGB_555);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ttsound", TURRETT, R3041_CLOCK) // ?
-	MCFG_DEVICE_ADDRESS_MAP(0, turrett_sound_map)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	turrett_device &ttsound(TURRETT(config, "ttsound", R3041_CLOCK)); // ?
+	ttsound.set_addrmap(0, &turrett_state::turrett_sound_map);
+	ttsound.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	ttsound.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+}
 
 
 
@@ -414,4 +412,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 2001, turrett, 0, turrett, turrett, turrett_state, 0, ROT0, "Dell Electronics (Namco license)", "Turret Tower", 0 )
+GAME( 2001, turrett, 0, turrett, turrett, turrett_state, empty_init, ROT0, "Dell Electronics (Namco license)", "Turret Tower", 0 )

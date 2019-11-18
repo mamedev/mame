@@ -6,12 +6,13 @@
 
         08/11/2008 Preliminary driver.
 
+        Need to press capslock twice to get caps to engage - bug?
+
 ****************************************************************************/
 
 #include "emu.h"
 #include "includes/pecom.h"
 
-#include "sound/wave.h"
 #include "softlist.h"
 #include "speaker.h"
 
@@ -29,9 +30,9 @@ void pecom_state::pecom64_mem(address_map &map)
 
 void pecom_state::pecom64_io(address_map &map)
 {
-	map(0x01, 0x01).w(this, FUNC(pecom_state::pecom_bank_w));
-	map(0x03, 0x03).r(this, FUNC(pecom_state::pecom_keyboard_r));
-	map(0x03, 0x07).w(this, FUNC(pecom_state::pecom_cdp1869_w));
+	map(0x01, 0x01).w(FUNC(pecom_state::pecom_bank_w));
+	map(0x03, 0x03).r(FUNC(pecom_state::pecom_keyboard_r));
+	map(0x03, 0x07).w(FUNC(pecom_state::pecom_cdp1869_w));
 }
 
 /* Input ports */
@@ -54,7 +55,7 @@ mappings, this is another situation where natural keyboard comes very handy!    
 
 INPUT_CHANGED_MEMBER(pecom_state::ef_w)
 {
-	m_cdp1802->set_input_line((int)(uintptr_t)param, newval);
+	m_cdp1802->set_input_line((int)param, newval);
 }
 
 static INPUT_PORTS_START( pecom )
@@ -163,39 +164,38 @@ static INPUT_PORTS_START( pecom )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Del") PORT_CODE(KEYCODE_TAB) PORT_CHAR(UCHAR_MAMEKEY(DEL))
 
 	PORT_START("CNT")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Ctrl") PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_2) PORT_CHANGED_MEMBER(DEVICE_SELF, pecom_state, ef_w, (void*)COSMAC_INPUT_LINE_EF1)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Ctrl") PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_2) PORT_CHANGED_MEMBER(DEVICE_SELF, pecom_state, ef_w, COSMAC_INPUT_LINE_EF1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Shift") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Caps") PORT_CODE(KEYCODE_CAPSLOCK) PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK)) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, pecom_state, ef_w, (void*)COSMAC_INPUT_LINE_EF3)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Break") PORT_CODE(KEYCODE_MINUS) PORT_CHANGED_MEMBER(DEVICE_SELF, pecom_state, ef_w, (void*)COSMAC_INPUT_LINE_EF4)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Caps") PORT_CODE(KEYCODE_CAPSLOCK) PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK)) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, pecom_state, ef_w, COSMAC_INPUT_LINE_EF3)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Break") PORT_CODE(KEYCODE_MINUS) PORT_CHANGED_MEMBER(DEVICE_SELF, pecom_state, ef_w, COSMAC_INPUT_LINE_EF4)
 INPUT_PORTS_END
 
 /* Machine driver */
-MACHINE_CONFIG_START(pecom_state::pecom64)
+void pecom_state::pecom64(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, cdp1869_device::DOT_CLK_PAL/3)
-	MCFG_CPU_PROGRAM_MAP(pecom64_mem)
-	MCFG_CPU_IO_MAP(pecom64_io)
-	MCFG_COSMAC_WAIT_CALLBACK(VCC)
-	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(pecom_state, clear_r))
-	MCFG_COSMAC_EF2_CALLBACK(READLINE(pecom_state, ef2_r))
-	MCFG_COSMAC_Q_CALLBACK(WRITELINE(pecom_state, q_w))
-	MCFG_COSMAC_SC_CALLBACK(WRITE8(pecom_state, sc_w))
+	CDP1802(config, m_cdp1802, cdp1869_device::DOT_CLK_PAL);
+	m_cdp1802->set_addrmap(AS_PROGRAM, &pecom_state::pecom64_mem);
+	m_cdp1802->set_addrmap(AS_IO, &pecom_state::pecom64_io);
+	m_cdp1802->wait_cb().set_constant(1);
+	m_cdp1802->clear_cb().set(FUNC(pecom_state::clear_r));
+	m_cdp1802->ef2_cb().set(FUNC(pecom_state::ef2_r));
+	m_cdp1802->q_cb().set(FUNC(pecom_state::q_w));
+	m_cdp1802->sc_cb().set(FUNC(pecom_state::sc_w));
 
 	// sound and video hardware
 	pecom_video(config);
 
 	// devices
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("pecom_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->set_interface("pecom_cass");
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list","pecom_cass")
+	SOFTWARE_LIST(config, "cass_list").set_original("pecom_cass");
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("32K")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
-MACHINE_CONFIG_END
+	RAM(config, RAM_TAG).set_default_size("32K").set_default_value(0x00);
+}
 
 /* ROM definition */
 ROM_START( pecom32 )
@@ -206,15 +206,15 @@ ROM_END
 ROM_START( pecom64 )
 	ROM_REGION( 0x10000, CDP1802_TAG, ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "ver4", "version 4")
-	ROMX_LOAD( "rom_1_g_24.02.88_l.bin", 0x8000, 0x4000, CRC(9a433b47) SHA1(dadb8c399e0a25a2693e10e42a2d7fc2ea9ad427), ROM_BIOS(1) )
-	ROMX_LOAD( "rom_2_g_24.02.88_d.bin", 0xc000, 0x4000, CRC(2116cadc) SHA1(03f11055cd221d438a40a41874af8fba0fa116d9), ROM_BIOS(1) )
+	ROMX_LOAD( "rom_1_g_24.02.88_l.bin", 0x8000, 0x4000, CRC(9a433b47) SHA1(dadb8c399e0a25a2693e10e42a2d7fc2ea9ad427), ROM_BIOS(0) )
+	ROMX_LOAD( "rom_2_g_24.02.88_d.bin", 0xc000, 0x4000, CRC(2116cadc) SHA1(03f11055cd221d438a40a41874af8fba0fa116d9), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS(1, "ver1", "version 1")
-	ROMX_LOAD( "170887-rom1.bin", 0x8000, 0x4000, CRC(43710fb4) SHA1(f84f75061c9ac3e34af93141ecabd3c955881aa2), ROM_BIOS(2) )
-	ROMX_LOAD( "170887-rom2.bin", 0xc000, 0x4000, CRC(d0d34f08) SHA1(7baab17d1e68771b8dcef97d0fffc655beabef28), ROM_BIOS(2) )
+	ROMX_LOAD( "170887-rom1.bin", 0x8000, 0x4000, CRC(43710fb4) SHA1(f84f75061c9ac3e34af93141ecabd3c955881aa2), ROM_BIOS(1) )
+	ROMX_LOAD( "170887-rom2.bin", 0xc000, 0x4000, CRC(d0d34f08) SHA1(7baab17d1e68771b8dcef97d0fffc655beabef28), ROM_BIOS(1) )
 ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME     PARENT   COMPAT  MACHINE     INPUT  STATE         INIT   COMPANY   FULLNAME     FLAGS */
-COMP( 1986, pecom32, 0,       0,      pecom64,    pecom, pecom_state,  0,     "Ei Nis", "Pecom 32",  0)
-COMP( 1987, pecom64, pecom32, 0,      pecom64,    pecom, pecom_state,  0,     "Ei Nis", "Pecom 64",  0)
+/*    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY   FULLNAME     FLAGS */
+COMP( 1986, pecom32, 0,       0,      pecom64, pecom, pecom_state, empty_init, "Ei Nis", "Pecom 32",  0)
+COMP( 1987, pecom64, pecom32, 0,      pecom64, pecom, pecom_state, empty_init, "Ei Nis", "Pecom 64",  0)

@@ -1,7 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
+#ifndef MAME_INCLUDES_PACMAN_H
+#define MAME_INCLUDES_PACMAN_H
+
+#pragma once
+
+#include "machine/74259.h"
 #include "machine/watchdog.h"
 #include "sound/namco.h"
+#include "emupal.h"
+#include "tilemap.h"
 
 /*************************************************************************
 
@@ -15,6 +23,7 @@ public:
 	pacman_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_mainlatch(*this, "mainlatch")
 		, m_namco_sound(*this, "namco")
 		, m_watchdog(*this, "watchdog")
 		, m_spriteram(*this, "spriteram")
@@ -59,6 +68,7 @@ public:
 	void woodpek_map(address_map &map);
 	void writeport(address_map &map);
 protected:
+	optional_device<ls259_device> m_mainlatch;
 	optional_device<namco_device> m_namco_sound;
 	required_device<watchdog_timer_device> m_watchdog;
 	optional_shared_ptr<uint8_t> m_spriteram;
@@ -148,30 +158,32 @@ public:
 	DECLARE_WRITE8_MEMBER(jrpacman_scroll_w);
 	DECLARE_WRITE_LINE_MEMBER(jrpacman_bgpriority_w);
 	DECLARE_WRITE8_MEMBER(superabc_bank_w);
-	DECLARE_DRIVER_INIT(maketrax);
-	DECLARE_DRIVER_INIT(drivfrcp);
-	DECLARE_DRIVER_INIT(mspacmbe);
-	DECLARE_DRIVER_INIT(ponpoko);
-	DECLARE_DRIVER_INIT(eyes);
-	DECLARE_DRIVER_INIT(woodpek);
-	DECLARE_DRIVER_INIT(cannonbp);
-	DECLARE_DRIVER_INIT(jumpshot);
-	DECLARE_DRIVER_INIT(mspacii);
-	DECLARE_DRIVER_INIT(pacplus);
-	DECLARE_DRIVER_INIT(rocktrv2);
-	DECLARE_DRIVER_INIT(superabc);
-	DECLARE_DRIVER_INIT(8bpm);
-	DECLARE_DRIVER_INIT(porky);
-	DECLARE_DRIVER_INIT(mspacman);
-	DECLARE_DRIVER_INIT(mschamp);
-	DECLARE_DRIVER_INIT(mbrush);
+	void init_maketrax();
+	void init_drivfrcp();
+	void init_mspacmbe();
+	void init_ponpoko();
+	void init_eyes();
+	void init_woodpek();
+	void init_cannonbp();
+	void init_jumpshot();
+	void init_mspacii();
+	void init_pacplus();
+	void init_rocktrv2();
+	void init_superabc();
+	void init_8bpm();
+	void init_porky();
+	void init_mspacman();
+	void init_mschamp();
+	void init_mbrush();
+	void init_pengomc1();
+	void init_clubpacma();
 	TILEMAP_MAPPER_MEMBER(pacman_scan_rows);
 	TILE_GET_INFO_MEMBER(pacman_get_tile_info);
 	TILE_GET_INFO_MEMBER(s2650_get_tile_info);
 	TILEMAP_MAPPER_MEMBER(jrpacman_scan_rows);
 	TILE_GET_INFO_MEMBER(jrpacman_get_tile_info);
 	DECLARE_VIDEO_START(pacman);
-	DECLARE_PALETTE_INIT(pacman);
+	void pacman_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(birdiy);
 	DECLARE_VIDEO_START(s2650games);
 	DECLARE_MACHINE_RESET(mschamp);
@@ -198,8 +210,8 @@ public:
 	DECLARE_READ8_MEMBER(epos_decryption_w);
 	DECLARE_MACHINE_START(theglobp);
 	DECLARE_MACHINE_RESET(theglobp);
-	DECLARE_MACHINE_START(eeekk);
-	DECLARE_MACHINE_RESET(eeekk);
+	DECLARE_MACHINE_START(eeekkp);
+	DECLARE_MACHINE_RESET(eeekkp);
 	DECLARE_MACHINE_START(acitya);
 	DECLARE_MACHINE_RESET(acitya);
 
@@ -215,13 +227,13 @@ public:
 	void s2650games(machine_config &config);
 	void woodpek(machine_config &config);
 	void crushs(machine_config &config);
-	void eeekk(machine_config &config);
+	void eeekkp(machine_config &config);
 	void superabc(machine_config &config);
 	void numcrash(machine_config &config);
 	void crush4(machine_config &config);
 	void bigbucks(machine_config &config);
 	void porky(machine_config &config);
-	void pacman(machine_config &config);
+	void pacman(machine_config &config, bool latch = true);
 	void _8bpm(machine_config &config);
 	void maketrax(machine_config &config);
 	void korosuke(machine_config &config);
@@ -239,3 +251,5 @@ private:
 	uint8_t jumpshot_decrypt(int addr, uint8_t e);
 	void jumpshot_decode();
 };
+
+#endif // MAME_INCLUDES_PACMAN_H

@@ -23,7 +23,6 @@
 // ======================> sms_light_phaser_device
 
 class sms_light_phaser_device : public device_t,
-							public device_video_interface,
 							public device_sms_control_port_interface
 {
 public:

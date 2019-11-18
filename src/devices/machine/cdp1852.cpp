@@ -39,13 +39,16 @@ enum
 //  cdp1852_device - constructor
 //-------------------------------------------------
 
-cdp1852_device::cdp1852_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+cdp1852_device::cdp1852_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, CDP1852, tag, owner, clock),
 	m_read_mode(*this),
 	m_write_sr(*this),
 	m_read_data(*this),
 	m_write_data(*this),
-	m_new_data(0), m_data(0), m_next_data(0), m_sr(0), m_next_sr(0), m_scan_timer(nullptr)
+	m_new_data(false), m_data(0),
+	m_clock_active(true), m_sr(false), m_next_sr(false),
+	m_update_do_timer(nullptr),
+	m_update_sr_timer(nullptr)
 {
 }
 
@@ -63,16 +66,13 @@ void cdp1852_device::device_start()
 	m_write_data.resolve_safe();
 
 	// allocate timers
-	if (clock() > 0)
-	{
-		m_scan_timer = timer_alloc();
-		m_scan_timer->adjust(attotime::zero, 0, attotime::from_hz(clock()));
-	}
+	m_update_do_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cdp1852_device::update_do), this));
+	m_update_sr_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cdp1852_device::update_sr), this));
 
 	// register for state saving
 	save_item(NAME(m_new_data));
 	save_item(NAME(m_data));
-	save_item(NAME(m_next_data));
+	save_item(NAME(m_clock_active));
 	save_item(NAME(m_sr));
 	save_item(NAME(m_next_sr));
 }
@@ -90,7 +90,7 @@ void cdp1852_device::device_reset()
 	if (!m_read_mode())
 	{
 		// reset service request flip-flop
-		set_sr_line(1);
+		set_sr_line(true);
 	}
 	else
 	{
@@ -98,45 +98,47 @@ void cdp1852_device::device_reset()
 		m_write_data((offs_t)0, m_data);
 
 		// reset service request flip-flop
-		set_sr_line(0);
+		set_sr_line(false);
 	}
 }
 
 
 //-------------------------------------------------
-//  device_timer - handler timer events
+//  clock_w - clock write
 //-------------------------------------------------
 
-void cdp1852_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+WRITE_LINE_MEMBER(cdp1852_device::clock_w)
 {
-	if (!m_read_mode())
-	{
-		// input data into register
-		m_data = m_read_data(0);
+	if (m_clock_active != bool(state))
+		return;
 
-		// signal processor
-		set_sr_line(0);
-	}
-	else
+	m_clock_active = bool(state);
+
+	if (!state)
 	{
-		if (m_new_data)
+		if (!m_read_mode())
 		{
-			m_new_data = 0;
+			// input data into register
+			m_data = m_read_data(0);
 
-			// latch data into register
-			m_data = m_next_data;
-
-			// output data
-			m_write_data((offs_t)0, m_data);
-
-			// signal peripheral device
-			set_sr_line(1);
-
-			m_next_sr = 0;
+			// signal processor
+			set_sr_line(0);
 		}
 		else
 		{
-			set_sr_line(m_next_sr);
+			if (m_new_data)
+			{
+				m_new_data = false;
+
+				// signal peripheral device
+				set_sr_line(true);
+
+				m_next_sr = false;
+			}
+			else
+			{
+				set_sr_line(m_next_sr);
+			}
 		}
 	}
 }
@@ -146,14 +148,34 @@ void cdp1852_device::device_timer(emu_timer &timer, device_timer_id id, int para
 //  set_sr_line -
 //-------------------------------------------------
 
-void cdp1852_device::set_sr_line(int state)
+void cdp1852_device::set_sr_line(bool state)
 {
 	if (m_sr != state)
 	{
 		m_sr = state;
 
-		m_write_sr(m_sr);
+		m_update_sr_timer->adjust(attotime::zero);
 	}
+}
+
+
+//-------------------------------------------------
+//  update_do - update data output
+//-------------------------------------------------
+
+TIMER_CALLBACK_MEMBER(cdp1852_device::update_do)
+{
+	m_write_data(param);
+}
+
+
+//-------------------------------------------------
+//  update_sr - update status request output
+//-------------------------------------------------
+
+TIMER_CALLBACK_MEMBER(cdp1852_device::update_sr)
+{
+	m_write_sr(m_sr ? 1 : 0);
 }
 
 
@@ -161,15 +183,15 @@ void cdp1852_device::set_sr_line(int state)
 //  read - data read
 //-------------------------------------------------
 
-READ8_MEMBER( cdp1852_device::read )
+READ8_MEMBER(cdp1852_device::read)
 {
-	if (!m_read_mode() && !clock())
+	if (!m_read_mode() && m_clock_active)
 	{
 		// input data into register
 		m_data = m_read_data(0);
 	}
 
-	set_sr_line(1);
+	set_sr_line(true);
 
 	return m_data;
 }
@@ -179,11 +201,13 @@ READ8_MEMBER( cdp1852_device::read )
 //  write - data write
 //-------------------------------------------------
 
-WRITE8_MEMBER( cdp1852_device::write )
+WRITE8_MEMBER(cdp1852_device::write)
 {
-	if (m_read_mode())
+	if (m_read_mode() && m_clock_active)
 	{
-		m_next_data = data;
-		m_new_data = 1;
+		// output data
+		m_update_do_timer->adjust(attotime::zero, data);
+
+		m_new_data = true;
 	}
 }

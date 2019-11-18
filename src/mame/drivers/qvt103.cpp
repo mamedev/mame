@@ -9,10 +9,11 @@ Skeleton driver for Qume QVT-103 video display terminal.
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/mcs48/mcs48.h"
-//#include "machine/nvram.h"
+#include "machine/nvram.h"
 #include "machine/z80ctc.h"
 #include "machine/z80dart.h"
-//#include "video/crt9007.h"
+#include "video/crt9007.h"
+#include "emupal.h"
 #include "screen.h"
 
 class qvt103_state : public driver_device
@@ -22,30 +23,53 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_p_chargen(*this, "chargen")
+		, m_vram(*this, "vram")
 	{ }
 
+	void qvt103(machine_config &config);
+
+private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void qvt103(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
-	required_device<cpu_device> m_maincpu;
+
+	required_device<z80_device> m_maincpu;
 	required_region_ptr<u8> m_p_chargen;
+	required_shared_ptr<u8> m_vram;
 };
 
 u32 qvt103_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	for (int col = 0; col < 25; col++)
+	{
+		for (int row = 0; row < 80; row++)
+		{
+			uint8_t code = m_vram[col * 80 + row] & 0x7f;
+
+			for (int y = 0; y < 12; y++)
+			{
+				uint16_t gfx = m_p_chargen[code << 4 | y];
+
+				for (int x = 0; x < 8; x++)
+					bitmap.pix32(col*12 + y, row*8 + (7 - x)) = BIT(gfx, x) ? rgb_t::white() : rgb_t::black();
+			}
+		}
+	}
+
 	return 0;
 }
 
 void qvt103_state::mem_map(address_map &map)
 {
+	map.unmap_value_high();
 	map(0x0000, 0x5fff).rom().region("maincpu", 0);
-	map(0x6000, 0x6001).rw("kbdmcu", FUNC(i8741_device::upi41_master_r), FUNC(i8741_device::upi41_master_w));
-	map(0x8000, 0x87ff).ram();
-	//AM_RANGE(0xa000, 0xa03f) AM_DEVREADWRITE("vpac", crt9007_device, read, write)
-	map(0xc000, 0xffff).ram(); // not entirely contiguous?
+	map(0x6000, 0x6001).rw("kbdmcu", FUNC(i8741a_device::upi41_master_r), FUNC(i8741a_device::upi41_master_w));
+//  map(0x6000, 0x6001).lr8("test", [this]() -> u8 { return machine().rand(); }); // uncomment to pass kbd test
+	map(0x8000, 0x87ff).ram().share("nvram");
+	map(0xa000, 0xa03f).rw("vpac", FUNC(crt9007_device::read), FUNC(crt9007_device::write));
+	map(0xc000, 0xdfff).ram(); // not entirely contiguous?
+	map(0xe000, 0xffff).ram().share("vram");
 }
 
 void qvt103_state::io_map(address_map &map)
@@ -58,6 +82,21 @@ void qvt103_state::io_map(address_map &map)
 static INPUT_PORTS_START( qvt103 )
 INPUT_PORTS_END
 
+static const gfx_layout char_layout =
+{
+	8,12,
+	RGN_FRAC(1,1),
+	1,
+	{ 0 },
+	{ 7, 0, 1, 2, 3, 4, 5, 6 }, // drawing chars look better with 0, 1, 2, 3, 4, 5, 6, 7
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8 },
+	8*16
+};
+
+static GFXDECODE_START(chars)
+	GFXDECODE_ENTRY("chargen", 0, char_layout, 0, 1)
+GFXDECODE_END
+
 static const z80_daisy_config daisy_chain[] =
 {
 	{ "dart" },
@@ -65,25 +104,36 @@ static const z80_daisy_config daisy_chain[] =
 	{ nullptr }
 };
 
-MACHINE_CONFIG_START(qvt103_state::qvt103)
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(29'376'000) / 9) // divider guessed
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain)
+void qvt103_state::qvt103(machine_config &config)
+{
+	Z80(config, m_maincpu, 29.376_MHz_XTAL / 9); // divider guessed
+	m_maincpu->set_addrmap(AS_PROGRAM, &qvt103_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &qvt103_state::io_map);
+	m_maincpu->set_daisy_config(daisy_chain);
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(29'376'000) / 9)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // TC5516APL + battery
 
-	MCFG_DEVICE_ADD("dart", Z80DART, XTAL(29'376'000) / 9)
-	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	z80ctc_device &ctc(Z80CTC(config, "ctc", 29.376_MHz_XTAL / 9));
+	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(29'376'000) * 2 / 3, 102 * 10, 0, 80 * 10, 320, 0, 300)
-	//MCFG_SCREEN_RAW_PARAMS(XTAL(29'376'000), 170 * 9, 0, 132 * 9, 320, 0, 300)
-	MCFG_SCREEN_UPDATE_DRIVER(qvt103_state, screen_update)
+	z80dart_device &dart(Z80DART(config, "dart", 29.376_MHz_XTAL / 9));
+	dart.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_CPU_ADD("kbdmcu", I8741, XTAL(6'000'000))
-MACHINE_CONFIG_END
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(29.376_MHz_XTAL * 2 / 3, 102 * 10, 0, 80 * 10, 320, 0, 300);
+	//screen.set_raw(29.376_MHz_XTAL, 170 * 9, 0, 132 * 9, 320, 0, 300);
+	screen.set_screen_update(FUNC(qvt103_state::screen_update));
+
+	PALETTE(config, "palette", palette_device::MONOCHROME_HIGHLIGHT);
+
+	GFXDECODE(config, "gfxdecode", "palette", chars);
+
+	crt9007_device &vpac(CRT9007(config, "vpac", 29.376_MHz_XTAL / 15));
+	vpac.set_character_width(10);
+	vpac.int_callback().set("ctc", FUNC(z80ctc_device::trg3));
+
+	I8741A(config, "kbdmcu", 6_MHz_XTAL);
+}
 
 /**************************************************************************************************************
 
@@ -106,4 +156,4 @@ ROM_START( qvt103 )
 	ROM_LOAD( "k304a.u24",  0x0000, 0x0400, CRC(e4b1f0da) SHA1(e9f8c48c34105464b3db206b34f67e7603484fea) )
 ROM_END
 
-COMP( 1983, qvt103, 0, 0, qvt103, qvt103, qvt103_state, 0, "Qume", "QVT-103", MACHINE_IS_SKELETON )
+COMP( 1983, qvt103, 0, 0, qvt103, qvt103, qvt103_state, empty_init, "Qume", "QVT-103", MACHINE_IS_SKELETON )

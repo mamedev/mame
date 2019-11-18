@@ -24,12 +24,19 @@
 
 namespace bus { namespace ti99 { namespace joyport {
 
+enum
+{
+	PLAIN=0,
+	MOUSE,
+	HANDSET
+};
+
 class joyport_device;
 
 /********************************************************************
     Common parent class of all devices attached to the joystick port
 ********************************************************************/
-class device_ti99_joyport_interface : public device_slot_card_interface
+class device_ti99_joyport_interface : public device_interface
 {
 public:
 	virtual uint8_t read_dev() = 0;
@@ -37,25 +44,34 @@ public:
 	virtual void pulse_clock() { }
 
 protected:
-	using device_slot_card_interface::device_slot_card_interface;
+	device_ti99_joyport_interface(const machine_config &mconfig, device_t &device);
 
 	virtual void interface_config_complete() override;
-	joyport_device* m_joyport = nullptr;
+	joyport_device* m_joyport;
 };
 
 /********************************************************************
     Joystick port
 ********************************************************************/
-class joyport_device : public device_t, public device_slot_interface
+class joyport_device : public device_t, public device_single_card_slot_interface<device_ti99_joyport_interface>
 {
 public:
+	template <typename U>
+	joyport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, U &&opts, const char *dflt)
+		: joyport_device(mconfig, tag, owner, clock)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
+
 	joyport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	uint8_t   read_port();
 	void    write_port(int data);
 	void    set_interrupt(int state);
 	void    pulse_clock();
-
-	template <class Object> devcb_base &set_int_callback(Object &&cb) { return m_interrupt.set_callback(std::forward<Object>(cb)); }
+	auto    int_cb() { return m_interrupt.bind(); }
 
 protected:
 	void device_start() override;
@@ -68,26 +84,10 @@ private:
 
 } } } // end namespace bus::ti99::joyport
 
-SLOT_INTERFACE_EXTERN(ti99_joystick_port);
-SLOT_INTERFACE_EXTERN(ti99_joystick_port_994);
-SLOT_INTERFACE_EXTERN(ti99_joystick_port_gen);
-
 DECLARE_DEVICE_TYPE_NS(TI99_JOYPORT, bus::ti99::joyport, joyport_device)
 
-#define MCFG_JOYPORT_INT_HANDLER( _intcallb ) \
-	devcb = &downcast<bus::ti99::joyport::joyport_device &>(*device).set_int_callback(DEVCB_##_intcallb);
-
-#define MCFG_GENEVE_JOYPORT_ADD( _tag )  \
-	MCFG_DEVICE_ADD(_tag, TI99_JOYPORT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(ti99_joystick_port_gen, "twinjoy", false)
-
-#define MCFG_TI_JOYPORT4A_ADD( _tag )    \
-	MCFG_DEVICE_ADD(_tag, TI99_JOYPORT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(ti99_joystick_port, "twinjoy", false)
-
-#define MCFG_TI_JOYPORT4_ADD( _tag ) \
-	MCFG_DEVICE_ADD(_tag, TI99_JOYPORT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(ti99_joystick_port_994, "twinjoy", false)
-
+void ti99_joyport_options_plain(device_slot_interface &device);
+void ti99_joyport_options_mouse(device_slot_interface &device);
+void ti99_joyport_options_994(device_slot_interface &device);
 
 #endif // MAME_BUS_TI99_JOYPORT_JOYPORT_H

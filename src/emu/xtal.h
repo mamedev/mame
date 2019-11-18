@@ -49,7 +49,7 @@ public:
 	constexpr explicit XTAL(double base_clock) : m_base_clock(base_clock), m_current_clock(base_clock) {}
 
 	constexpr double dvalue() const noexcept { return m_current_clock; }
-	constexpr u32    value()  const noexcept { return u32(m_current_clock); }
+	constexpr u32    value()  const noexcept { return u32(m_current_clock + 1e-3); }
 	constexpr double base()   const noexcept { return m_base_clock; }
 
 	template <typename T> constexpr XTAL operator *(T &&mult) const noexcept { return XTAL(m_base_clock, m_current_clock * mult); }

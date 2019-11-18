@@ -118,6 +118,7 @@
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
+#include "emupal.h"
 #include "screen.h"
 
 class taito_type_x_state : public driver_device
@@ -128,13 +129,15 @@ public:
 		m_maincpu(*this, "maincpu")
 	{ }
 
+	void taito_type_x(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_taito_type_x(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void taito_type_x(machine_config &config);
 	void taito_type_x_map(address_map &map);
 };
 
@@ -169,23 +172,22 @@ void taito_type_x_state::machine_reset()
 }
 
 // todo: different configs for the different machine types.
-MACHINE_CONFIG_START(taito_type_x_state::taito_type_x)
-
+void taito_type_x_state::taito_type_x(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PENTIUM3, 733333333) /* Wrong, much newer processors, much faster. */
-	MCFG_CPU_PROGRAM_MAP(taito_type_x_map)
+	PENTIUM3(config, m_maincpu, 733333333); /* Wrong, much newer processors, much faster. */
+	m_maincpu->set_addrmap(AS_PROGRAM, &taito_type_x_state::taito_type_x_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_DRIVER(taito_type_x_state, screen_update_taito_type_x)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 640-1, 0, 480-1);
+	screen.set_screen_update(FUNC(taito_type_x_state::screen_update_taito_type_x));
 
-	MCFG_PALETTE_ADD("palette", 0x10000)
-
-MACHINE_CONFIG_END
+	PALETTE(config, "palette").set_entries(0x10000);
+}
 
 
 
@@ -323,19 +325,19 @@ ROM_START( trbwtchs )
 ROM_END
 
 
-GAME( 2004, chaosbrk,  0,    taito_type_x, taito_type_x, taito_type_x_state,  0, ROT0, "Taito Corporation", "Chaos Breaker (v2.02J)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2004, gwinggen,  0,    taito_type_x, taito_type_x, taito_type_x_state,  0, ROT0, "Takumi Corporation", "Giga Wing Generations (v2.02J)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2005, homura,    0,    taito_type_x, taito_type_x, taito_type_x_state,  0, ROT0, "SKonec Entertainment", "Homura (v2.04J)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2005, hotgmkmp,  0,    taito_type_x, taito_type_x, taito_type_x_state,  0, ROT0, "XNauts", "Taisen Hot Gimmick Mix Party",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2005, raiden3,   0,    taito_type_x, taito_type_x, taito_type_x_state,  0, ROT0, "MOSS / Seibu Kaihatsu", "Raiden III (v2.01J)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2005, spicaadv,  0,    taito_type_x, taito_type_x, taito_type_x_state,  0, ROT0, "Taito Corporation", "Spica Adventure (v2.03J)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2005, usagiol,   0,    taito_type_x, taito_type_x, taito_type_x_state,  0, ROT0, "Taito Corporation/Warashi", "Usagi Online (v2.04J)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2006, shikiga3,  0,    taito_type_x, taito_type_x, taito_type_x_state,  0, ROT0, "Alfa System/SKonec Entertainment", "Shikigami no Shiro III (v2.06J)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2007, raiden4,   0,    taito_type_x, taito_type_x, taito_type_x_state,  0, ROT0, "MOSS / Seibu Kaihatsu", "Raiden IV (v1.00J)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2008, kof98um,   0,    taito_type_x, taito_type_x, taito_type_x_state,  0, ROT0, "SNK", "The King of Fighters '98: Ultimate Match (v1.00)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2008, trbwtchs,  0,    taito_type_x, taito_type_x, taito_type_x_state,  0, ROT0, "Adventure Planning Service/Studio SiestA", "Trouble Witches AC (v1.00J)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2009, goketsuj,  0,    taito_type_x, taito_type_x, taito_type_x_state,  0, ROT0, "Atlus", "Goketsuji Ichizoku: Matsuri Senzo Kuyou (v200906230)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2010, kofskyst,  0,    taito_type_x, taito_type_x, taito_type_x_state,  0, ROT0, "Moss / SNK Playmore", "KOF Sky Stage (v1.00J)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2004, chaosbrk,  0,    taito_type_x, taito_type_x, taito_type_x_state, empty_init, ROT0, "Taito Corporation", "Chaos Breaker (v2.02J)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2004, gwinggen,  0,    taito_type_x, taito_type_x, taito_type_x_state, empty_init, ROT0, "Takumi Corporation", "Giga Wing Generations (v2.02J)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2005, homura,    0,    taito_type_x, taito_type_x, taito_type_x_state, empty_init, ROT0, "SKonec Entertainment", "Homura (v2.04J)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2005, hotgmkmp,  0,    taito_type_x, taito_type_x, taito_type_x_state, empty_init, ROT0, "XNauts", "Taisen Hot Gimmick Mix Party",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2005, raiden3,   0,    taito_type_x, taito_type_x, taito_type_x_state, empty_init, ROT0, "MOSS / Seibu Kaihatsu", "Raiden III (v2.01J)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2005, spicaadv,  0,    taito_type_x, taito_type_x, taito_type_x_state, empty_init, ROT0, "Taito Corporation", "Spica Adventure (v2.03J)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2005, usagiol,   0,    taito_type_x, taito_type_x, taito_type_x_state, empty_init, ROT0, "Taito Corporation/Warashi", "Usagi Online (v2.04J)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2006, shikiga3,  0,    taito_type_x, taito_type_x, taito_type_x_state, empty_init, ROT0, "Alfa System/SKonec Entertainment", "Shikigami no Shiro III (v2.06J)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2007, raiden4,   0,    taito_type_x, taito_type_x, taito_type_x_state, empty_init, ROT0, "MOSS / Seibu Kaihatsu", "Raiden IV (v1.00J)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2008, kof98um,   0,    taito_type_x, taito_type_x, taito_type_x_state, empty_init, ROT0, "SNK", "The King of Fighters '98: Ultimate Match (v1.00)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2008, trbwtchs,  0,    taito_type_x, taito_type_x, taito_type_x_state, empty_init, ROT0, "Adventure Planning Service/Studio SiestA", "Trouble Witches AC (v1.00J)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2009, goketsuj,  0,    taito_type_x, taito_type_x, taito_type_x_state, empty_init, ROT0, "Atlus", "Goketsuji Ichizoku: Matsuri Senzo Kuyou (v200906230)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2010, kofskyst,  0,    taito_type_x, taito_type_x, taito_type_x_state, empty_init, ROT0, "Moss / SNK Playmore", "KOF Sky Stage (v1.00J)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 
 // Type X+
@@ -356,7 +358,7 @@ ROM_START( wontmuch )
 ROM_END
 
 
-GAME( 2006, wontmuch,   0,    taito_type_x, taito_type_x, taito_type_x_state,  0, ROT0, "Capcom", "Won!Tertainment Music Channel (v1.00)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2006, wontmuch, 0, taito_type_x, taito_type_x, taito_type_x_state, empty_init, ROT0, "Capcom", "Won!Tertainment Music Channel (v1.00)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 
 // Type X2
@@ -392,6 +394,6 @@ ROM_START( kofxii )
 ROM_END
 
 
-GAME( 2006, chasehq2,  0,    taito_type_x, taito_type_x, taito_type_x_state,  0, ROT0, "Taito Corporation", "Chase H.Q. 2 (v2.0.6.JP)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2008, samspsen,  0,    taito_type_x, taito_type_x, taito_type_x_state,  0, ROT0, "SNK Playmore",      "Samurai Spirits Sen (v1.00)",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2009, kofxii,    0,    taito_type_x, taito_type_x, taito_type_x_state,  0, ROT0, "SNK Playmore",      "The King of Fighters XII (v1.00)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2006, chasehq2, 0, taito_type_x, taito_type_x, taito_type_x_state, empty_init, ROT0, "Taito Corporation", "Chase H.Q. 2 (v2.0.6.JP)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2008, samspsen, 0, taito_type_x, taito_type_x, taito_type_x_state, empty_init, ROT0, "SNK Playmore",      "Samurai Spirits Sen (v1.00)",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2009, kofxii,   0, taito_type_x, taito_type_x, taito_type_x_state, empty_init, ROT0, "SNK Playmore",      "The King of Fighters XII (v1.00)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

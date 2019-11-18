@@ -66,9 +66,9 @@ TILE_GET_INFO_MEMBER(dynduke_state::get_tx_tile_info)
 
 void dynduke_state::video_start()
 {
-	m_bg_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dynduke_state::get_bg_tile_info),this),TILEMAP_SCAN_COLS,      16,16,32,32);
-	m_fg_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dynduke_state::get_fg_tile_info),this),TILEMAP_SCAN_COLS,16,16,32,32);
-	m_tx_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dynduke_state::get_tx_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,32,32);
+	m_bg_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(dynduke_state::get_bg_tile_info)), TILEMAP_SCAN_COLS,16,16,32,32);
+	m_fg_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(dynduke_state::get_fg_tile_info)), TILEMAP_SCAN_COLS,16,16,32,32);
+	m_tx_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(dynduke_state::get_tx_tile_info)), TILEMAP_SCAN_ROWS, 8, 8,32,32);
 
 	m_fg_layer->set_transparent_pen(15);
 	m_tx_layer->set_transparent_pen(15);

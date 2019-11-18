@@ -11,6 +11,7 @@
 #include "floppy.h"
 
 
-SLOT_INTERFACE_START( cg_exp_slot_carts )
-	SLOT_INTERFACE("floppy", CGENIE_FDC)
-SLOT_INTERFACE_END
+void cg_exp_slot_carts(device_slot_interface &device)
+{
+	device.option_add("floppy", CGENIE_FDC);
+}

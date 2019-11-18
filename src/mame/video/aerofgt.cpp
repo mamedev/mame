@@ -73,7 +73,7 @@ void aerofgt_state::aerofgt_register_state_globals(  )
 
 VIDEO_START_MEMBER(aerofgt_state,pspikes)
 {
-	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(aerofgt_state::get_pspikes_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(aerofgt_state::get_pspikes_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 64,32);
 	/* no bg2 in this game */
 
 	m_sprite_gfx = 1;
@@ -84,8 +84,8 @@ VIDEO_START_MEMBER(aerofgt_state,pspikes)
 
 VIDEO_START_MEMBER(aerofgt_state,karatblz)
 {
-	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(aerofgt_state::karatblz_tile_info<0>),this),TILEMAP_SCAN_ROWS,8,8,64,64);
-	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(aerofgt_state::karatblz_tile_info<1>),this),TILEMAP_SCAN_ROWS,8,8,64,64);
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(aerofgt_state::karatblz_tile_info<0>)), TILEMAP_SCAN_ROWS, 8,8, 64,64);
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(aerofgt_state::karatblz_tile_info<1>)), TILEMAP_SCAN_ROWS, 8,8, 64,64);
 
 	m_tilemap[1]->set_transparent_pen(15);
 	m_spritepalettebank = 0;
@@ -96,8 +96,8 @@ VIDEO_START_MEMBER(aerofgt_state,karatblz)
 
 VIDEO_START_MEMBER(aerofgt_state,spinlbrk)
 {
-	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(aerofgt_state::spinlbrk_tile_info<0>),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(aerofgt_state::karatblz_tile_info<1>),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(aerofgt_state::spinlbrk_tile_info<0>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(aerofgt_state::karatblz_tile_info<1>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
 	m_tilemap[1]->set_transparent_pen(15);
 
@@ -111,8 +111,8 @@ VIDEO_START_MEMBER(aerofgt_state,spinlbrk)
 
 VIDEO_START_MEMBER(aerofgt_state,turbofrc)
 {
-	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(aerofgt_state::get_tile_info<0>),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(aerofgt_state::get_tile_info<1>),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(aerofgt_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(aerofgt_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
 	m_tilemap[1]->set_transparent_pen(15);
 
@@ -367,7 +367,7 @@ uint32_t aerofgt_state::screen_update_aerofgt(screen_device &screen, bitmap_ind1
 // BOOTLEG
 VIDEO_START_MEMBER(aerofgt_state,wbbc97)
 {
-	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(aerofgt_state::get_pspikes_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(aerofgt_state::get_pspikes_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	/* no bg2 in this game */
 
 	m_tilemap[0]->set_transparent_pen(15);

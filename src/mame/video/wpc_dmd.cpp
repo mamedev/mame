@@ -2,21 +2,20 @@
 // copyright-holders:Olivier Galibert
 #include "emu.h"
 #include "wpc_dmd.h"
-#include "rendlay.h"
 #include "screen.h"
 
 DEFINE_DEVICE_TYPE(WPC_DMD, wpc_dmd_device, "wpc_dmd", "Williams Pinball Controller Dot Matrix Display")
 
 void wpc_dmd_device::registers(address_map &map)
 {
-	map(0, 0).w(this, FUNC(wpc_dmd_device::bank2_w));
-	map(1, 1).w(this, FUNC(wpc_dmd_device::bank0_w));
-	map(2, 2).w(this, FUNC(wpc_dmd_device::bank6_w));
-	map(3, 3).w(this, FUNC(wpc_dmd_device::bank4_w));
-	map(4, 4).w(this, FUNC(wpc_dmd_device::banka_w));
-	map(5, 5).w(this, FUNC(wpc_dmd_device::firq_scanline_w));
-	map(6, 6).w(this, FUNC(wpc_dmd_device::bank8_w));
-	map(7, 7).w(this, FUNC(wpc_dmd_device::visible_page_w));
+	map(0, 0).w(FUNC(wpc_dmd_device::bank2_w));
+	map(1, 1).w(FUNC(wpc_dmd_device::bank0_w));
+	map(2, 2).w(FUNC(wpc_dmd_device::bank6_w));
+	map(3, 3).w(FUNC(wpc_dmd_device::bank4_w));
+	map(4, 4).w(FUNC(wpc_dmd_device::banka_w));
+	map(5, 5).w(FUNC(wpc_dmd_device::firq_scanline_w));
+	map(6, 6).w(FUNC(wpc_dmd_device::bank8_w));
+	map(7, 7).w(FUNC(wpc_dmd_device::visible_page_w));
 }
 
 
@@ -36,17 +35,17 @@ wpc_dmd_device::~wpc_dmd_device()
 {
 }
 
-MACHINE_CONFIG_START(wpc_dmd_device::device_add_mconfig)
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, wpc_dmd_device, screen_update)
-	MCFG_SCREEN_SIZE(128*4, 32*4)
-	MCFG_SCREEN_VISIBLE_AREA(0, 128*4-1, 0, 32*4-1)
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+void wpc_dmd_device::device_add_mconfig(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_screen_update(FUNC(wpc_dmd_device::screen_update));
+	screen.set_size(128*4, 32*4);
+	screen.set_visarea(0, 128*4-1, 0, 32*4-1);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("scanline", wpc_dmd_device, scanline_timer, attotime::from_hz(60*4*32))
-MACHINE_CONFIG_END
+	TIMER(config, "scanline").configure_periodic(FUNC(wpc_dmd_device::scanline_timer), attotime::from_hz(60*4*32));
+}
 
 void wpc_dmd_device::device_start()
 {

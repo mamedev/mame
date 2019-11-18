@@ -33,30 +33,6 @@
 #pragma once
 
 //**************************************************************************
-//  CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(_devcb) \
-	devcb = &downcast<addressable_latch_device &>(*device).set_q_out_cb<0>(DEVCB_##_devcb);
-#define MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(_devcb) \
-	devcb = &downcast<addressable_latch_device &>(*device).set_q_out_cb<1>(DEVCB_##_devcb);
-#define MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(_devcb) \
-	devcb = &downcast<addressable_latch_device &>(*device).set_q_out_cb<2>(DEVCB_##_devcb);
-#define MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(_devcb) \
-	devcb = &downcast<addressable_latch_device &>(*device).set_q_out_cb<3>(DEVCB_##_devcb);
-#define MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(_devcb) \
-	devcb = &downcast<addressable_latch_device &>(*device).set_q_out_cb<4>(DEVCB_##_devcb);
-#define MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(_devcb) \
-	devcb = &downcast<addressable_latch_device &>(*device).set_q_out_cb<5>(DEVCB_##_devcb);
-#define MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(_devcb) \
-	devcb = &downcast<addressable_latch_device &>(*device).set_q_out_cb<6>(DEVCB_##_devcb);
-#define MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(_devcb) \
-	devcb = &downcast<addressable_latch_device &>(*device).set_q_out_cb<7>(DEVCB_##_devcb);
-
-#define MCFG_ADDRESSABLE_LATCH_PARALLEL_OUT_CB(_devcb) \
-	devcb = &downcast<addressable_latch_device &>(*device).set_parallel_out_cb(DEVCB_##_devcb);
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -66,20 +42,20 @@ class addressable_latch_device : public device_t
 {
 public:
 	// static configuration
-	template<unsigned Bit, class Object> devcb_base &set_q_out_cb(Object &&cb) { return m_q_out_cb[Bit].set_callback(std::forward<Object>(cb)); }
-	template<class Object> devcb_base &set_parallel_out_cb(Object &&cb) { return m_parallel_out_cb.set_callback(std::forward<Object>(cb)); }
+	template <unsigned Bit> auto q_out_cb() { return m_q_out_cb[Bit].bind(); }
+	auto parallel_out_cb() { return m_parallel_out_cb.bind(); }
 
 	// data write handlers
 	void write_bit(offs_t offset, bool d);
 	void write_abcd(u8 a, bool d);
-	DECLARE_WRITE8_MEMBER(write_d0);
-	DECLARE_WRITE8_MEMBER(write_d1);
-	DECLARE_WRITE8_MEMBER(write_d7);
-	DECLARE_WRITE8_MEMBER(write_a0);
-	DECLARE_WRITE8_MEMBER(write_a3);
-	DECLARE_WRITE8_MEMBER(write_nibble_d0);
-	DECLARE_WRITE8_MEMBER(write_nibble_d3);
-	DECLARE_WRITE8_MEMBER(clear);
+	void write_d0(offs_t offset, u8 data);
+	void write_d1(offs_t offset, u8 data);
+	void write_d7(offs_t offset, u8 data);
+	void write_a0(offs_t offset, u8 data = 0);
+	void write_a3(offs_t offset, u8 data = 0);
+	void write_nibble_d0(u8 data);
+	void write_nibble_d3(u8 data);
+	void clear(u8 data = 0);
 
 	// read handlers (inlined for the sake of optimization)
 	DECLARE_READ_LINE_MEMBER(q0_r) { return BIT(m_q, 0); }
@@ -129,7 +105,7 @@ private:
 class ls259_device : public addressable_latch_device
 {
 public:
-	ls259_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	ls259_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 // ======================> hc259_device
@@ -137,7 +113,7 @@ public:
 class hc259_device : public addressable_latch_device
 {
 public:
-	hc259_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	hc259_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 // ======================> hct259_device
@@ -145,7 +121,7 @@ public:
 class hct259_device : public addressable_latch_device
 {
 public:
-	hct259_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	hct259_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 // ======================> f9334_device
@@ -153,7 +129,7 @@ public:
 class f9334_device : public addressable_latch_device
 {
 public:
-	f9334_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	f9334_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 // ======================> cd4099_device
@@ -161,7 +137,7 @@ public:
 class cd4099_device : public addressable_latch_device
 {
 public:
-	cd4099_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	cd4099_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 // device type definition

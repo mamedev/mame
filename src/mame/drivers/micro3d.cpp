@@ -30,7 +30,6 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
 #include "bus/rs232/rs232.h"
-#include "machine/adc0844.h"
 #include "machine/mc68681.h"
 #include "machine/mc68901.h"
 #include "machine/nvram.h"
@@ -118,7 +117,7 @@ static INPUT_PORTS_START( botss )
 	PORT_INCLUDE( micro3d )
 
 	PORT_MODIFY("INPUTS_A_B")
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, micro3d_state, botss_hwchk_r, nullptr)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(micro3d_state, botss_hwchk_r)
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON3 )  PORT_NAME("Shield")
 	PORT_SERVICE( 0x0400, IP_ACTIVE_LOW )
@@ -209,17 +208,17 @@ void micro3d_state::hostmem(address_map &map)
 	map(0x000000, 0x143fff).rom();
 	map(0x200000, 0x20ffff).ram().share("nvram");
 	map(0x800000, 0x83ffff).ram().share("shared_ram");
-	map(0x900000, 0x900001).w(this, FUNC(micro3d_state::host_drmath_int_w));
+	map(0x900000, 0x900001).w(FUNC(micro3d_state::host_drmath_int_w));
 	map(0x920000, 0x920001).portr("INPUTS_C_D");
 	map(0x940000, 0x940001).portr("INPUTS_A_B");
-	map(0x960000, 0x960001).w(this, FUNC(micro3d_state::micro3d_reset_w));
+	map(0x960000, 0x960001).w(FUNC(micro3d_state::micro3d_reset_w));
 	map(0x980001, 0x980001).rw("adc", FUNC(adc0844_device::read), FUNC(adc0844_device::write));
 	map(0x9a0000, 0x9a0007).rw(m_vgb, FUNC(tms34010_device::host_r), FUNC(tms34010_device::host_w));
 	map(0x9c0000, 0x9c0001).noprw();                 /* Lamps */
 	map(0x9e0000, 0x9e002f).rw("mfp", FUNC(mc68901_device::read), FUNC(mc68901_device::write)).umask16(0xff00);
 	map(0xa00000, 0xa0003f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0xff00);
-	map(0xa20000, 0xa20001).r(this, FUNC(micro3d_state::micro3d_encoder_h_r));
-	map(0xa40002, 0xa40003).r(this, FUNC(micro3d_state::micro3d_encoder_l_r));
+	map(0xa20000, 0xa20001).r(FUNC(micro3d_state::micro3d_encoder_h_r));
+	map(0xa40002, 0xa40003).r(FUNC(micro3d_state::micro3d_encoder_l_r));
 }
 
 
@@ -234,14 +233,13 @@ void micro3d_state::vgbmem(address_map &map)
 	map(0x00000000, 0x007fffff).ram().share("sprite_vram");
 	map(0x00800000, 0x00bfffff).ram();
 	map(0x00c00000, 0x00c0000f).portr("VGB_SW");
-	map(0x00e00000, 0x00e0000f).w(this, FUNC(micro3d_state::micro3d_xfer3dk_w));
+	map(0x00e00000, 0x00e0000f).w(FUNC(micro3d_state::micro3d_xfer3dk_w));
 	map(0x02000000, 0x0200ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); // clut
-	map(0x02600000, 0x0260000f).w(this, FUNC(micro3d_state::micro3d_creg_w));
-	map(0x02c00000, 0x02c0003f).r(this, FUNC(micro3d_state::vgb_uart_r)).umask16(0x00ff);
-	map(0x02e00000, 0x02e0003f).w(this, FUNC(micro3d_state::vgb_uart_w)).umask16(0x00ff);
+	map(0x02600000, 0x0260000f).w(FUNC(micro3d_state::micro3d_creg_w));
+	map(0x02c00000, 0x02c0003f).r(FUNC(micro3d_state::vgb_uart_r)).umask16(0x00ff);
+	map(0x02e00000, 0x02e0003f).w(FUNC(micro3d_state::vgb_uart_w)).umask16(0x00ff);
 	map(0x03800000, 0x03dfffff).rom().region("tms_gfx", 0);
 	map(0x03e00000, 0x03ffffff).rom().region("tms34010", 0);
-	map(0xc0000000, 0xc00001ff).rw(m_vgb, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 	map(0xffe00000, 0xffffffff).rom().region("tms34010", 0);
 }
 
@@ -260,17 +258,17 @@ void micro3d_state::drmath_prg(address_map &map)
 void micro3d_state::drmath_data(address_map &map)
 {
 	map(0x00000000, 0x000fffff).rom().region("drmath", 0);
-	map(0x00800000, 0x0083ffff).rw(this, FUNC(micro3d_state::micro3d_shared_r), FUNC(micro3d_state::micro3d_shared_w));
+	map(0x00800000, 0x0083ffff).rw(FUNC(micro3d_state::micro3d_shared_r), FUNC(micro3d_state::micro3d_shared_w));
 	map(0x00400000, 0x004fffff).ram();
 	map(0x00500000, 0x005fffff).ram();
-	map(0x00a00000, 0x00a00003).w(this, FUNC(micro3d_state::drmath_int_w));
-	map(0x01000000, 0x01000003).w(this, FUNC(micro3d_state::micro3d_mac1_w));
-	map(0x01000004, 0x01000007).rw(this, FUNC(micro3d_state::micro3d_mac2_r), FUNC(micro3d_state::micro3d_mac2_w));
+	map(0x00a00000, 0x00a00003).w(FUNC(micro3d_state::drmath_int_w));
+	map(0x01000000, 0x01000003).w(FUNC(micro3d_state::micro3d_mac1_w));
+	map(0x01000004, 0x01000007).rw(FUNC(micro3d_state::micro3d_mac2_r), FUNC(micro3d_state::micro3d_mac2_w));
 	map(0x01200000, 0x01203fff).ram().share("mac_sram");
-	map(0x01400000, 0x01400003).rw(this, FUNC(micro3d_state::micro3d_pipe_r), FUNC(micro3d_state::micro3d_fifo_w));
-	map(0x01600000, 0x01600003).w(this, FUNC(micro3d_state::drmath_intr2_ack));
-	map(0x01800000, 0x01800003).w(this, FUNC(micro3d_state::micro3d_alt_fifo_w));
-	map(0x03fffff0, 0x03fffff7).rw("scc", FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask32(0x000000ff);
+	map(0x01400000, 0x01400003).rw(FUNC(micro3d_state::micro3d_pipe_r), FUNC(micro3d_state::micro3d_fifo_w));
+	map(0x01600000, 0x01600003).w(FUNC(micro3d_state::drmath_intr2_ack));
+	map(0x01800000, 0x01800003).w(FUNC(micro3d_state::micro3d_alt_fifo_w));
+	map(0x03fffff0, 0x03ffffff).rw("scc", FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask32(0x000000ff);
 }
 
 /*************************************
@@ -288,9 +286,15 @@ void micro3d_state::soundmem_io(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
 	map(0xfd00, 0xfd01).rw("ym2151", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0xfe00, 0xfe00).w(this, FUNC(micro3d_state::micro3d_upd7759_w));
-	map(0xff00, 0xff00).w(this, FUNC(micro3d_state::micro3d_snd_dac_a));
-	map(0xff01, 0xff01).w(this, FUNC(micro3d_state::micro3d_snd_dac_b));
+	map(0xfe00, 0xfe00).w(FUNC(micro3d_state::micro3d_upd7759_w));
+	map(0xff00, 0xff00).w(FUNC(micro3d_state::micro3d_snd_dac_a));
+	map(0xff01, 0xff01).w(FUNC(micro3d_state::micro3d_snd_dac_b));
+}
+
+void micro3d_state::cpu_space_map(address_map &map)
+{
+	map(0xfffff0, 0xffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));
+	map(0xfffff6, 0xfffff7).lr16(NAME([this] () -> u16 { return m_duart->get_irq_vector(); }));
 }
 
 
@@ -300,108 +304,109 @@ void micro3d_state::soundmem_io(address_map &map)
  *
  *************************************/
 
-MACHINE_CONFIG_START(micro3d_state::micro3d)
+void micro3d_state::micro3d(machine_config &config)
+{
+	M68000(config, m_maincpu, 32_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &micro3d_state::hostmem);
+	m_maincpu->set_vblank_int("screen", FUNC(micro3d_state::micro3d_vblank));
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &micro3d_state::cpu_space_map);
 
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(32'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(hostmem)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", micro3d_state,  micro3d_vblank)
+	TMS34010(config, m_vgb, 40_MHz_XTAL);
+	m_vgb->set_addrmap(AS_PROGRAM, &micro3d_state::vgbmem);
+	m_vgb->set_halt_on_reset(false);
+	m_vgb->set_pixel_clock(40_MHz_XTAL / 8);
+	m_vgb->set_pixels_per_clock(4);
+	m_vgb->set_scanline_ind16_callback(FUNC(micro3d_state::scanline_update));
+	m_vgb->output_int().set(FUNC(micro3d_state::tms_interrupt));
+	m_vgb->set_screen("screen");
 
-	MCFG_CPU_ADD("vgb", TMS34010, XTAL(40'000'000))
-	MCFG_CPU_PROGRAM_MAP(vgbmem)
-	MCFG_VIDEO_SET_SCREEN("screen")
-	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
-	MCFG_TMS340X0_PIXEL_CLOCK(XTAL(40'000'000) / 8) /* pixel clock */
-	MCFG_TMS340X0_PIXELS_PER_CLOCK(4) /* pixels per clock */
-	MCFG_TMS340X0_SCANLINE_IND16_CB(micro3d_state, scanline_update)        /* scanline updater (indexed16) */
-	MCFG_TMS340X0_OUTPUT_INT_CB(WRITELINE(micro3d_state, tms_interrupt))
+	AM29000(config, m_drmath, 32_MHz_XTAL / 2);
+	m_drmath->set_addrmap(AS_PROGRAM, &micro3d_state::drmath_prg);
+	m_drmath->set_addrmap(AS_DATA, &micro3d_state::drmath_data);
 
-	MCFG_CPU_ADD("drmath", AM29000, XTAL(32'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(drmath_prg)
-	MCFG_CPU_DATA_MAP(drmath_data)
+	scc8530_device &scc(SCC8530N(config, "scc", 32_MHz_XTAL / 2 / 2));
+	scc.out_txdb_callback().set("monitor_drmath", FUNC(rs232_port_device::write_txd));
 
-	MCFG_SCC8530_ADD("scc", XTAL(32'000'000) / 2 / 2, 0, 0, 0, 0)
-	MCFG_Z80SCC_OUT_TXDB_CB(DEVWRITELINE("monitor_drmath", rs232_port_device, write_txd))
+	I8051(config, m_audiocpu, 11.0592_MHz_XTAL);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &micro3d_state::soundmem_prg);
+	m_audiocpu->set_addrmap(AS_IO, &micro3d_state::soundmem_io);
+	m_audiocpu->port_in_cb<1>().set(FUNC(micro3d_state::micro3d_sound_p1_r));
+	m_audiocpu->port_out_cb<1>().set(FUNC(micro3d_state::micro3d_sound_p1_w));
+	m_audiocpu->port_in_cb<3>().set(FUNC(micro3d_state::micro3d_sound_p3_r));
+	m_audiocpu->port_out_cb<3>().set(FUNC(micro3d_state::micro3d_sound_p3_w));
+	m_audiocpu->serial_tx_cb().set(FUNC(micro3d_state::data_from_i8031));
+	m_audiocpu->serial_rx_cb().set(FUNC(micro3d_state::data_to_i8031));
 
-	MCFG_RS232_PORT_ADD("monitor_drmath", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("scc", z80scc_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("scc", z80scc_device, dcdb_w)) MCFG_DEVCB_XOR(1)
+	MC68681(config, m_duart, 3.6864_MHz_XTAL);
+	m_duart->irq_cb().set(FUNC(micro3d_state::duart_irq_handler));
+	m_duart->a_tx_cb().set("monitor_host", FUNC(rs232_port_device::write_txd));
+	m_duart->b_tx_cb().set(FUNC(micro3d_state::duart_txb));
+	m_duart->inport_cb().set(FUNC(micro3d_state::duart_input_r));
+	m_duart->outport_cb().set(FUNC(micro3d_state::duart_output_w));
 
-	MCFG_CPU_ADD("audiocpu", I8051, XTAL(11'059'200))
-	MCFG_CPU_PROGRAM_MAP(soundmem_prg)
-	MCFG_CPU_IO_MAP(soundmem_io)
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(micro3d_state, micro3d_sound_p1_r))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(micro3d_state, micro3d_sound_p1_w))
-	MCFG_MCS51_PORT_P3_IN_CB(READ8(micro3d_state, micro3d_sound_p3_r))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(micro3d_state, micro3d_sound_p3_w))
-	MCFG_MCS51_SERIAL_TX_CB(WRITE8(micro3d_state, data_from_i8031))
-	MCFG_MCS51_SERIAL_RX_CB(READ8(micro3d_state, data_to_i8031))
+	mc68901_device &mfp(MC68901(config, "mfp", 4000000));
+	mfp.set_timer_clock(4000000);
+	mfp.set_rx_clock(0);
+	mfp.set_tx_clock(0);
+	mfp.out_irq_cb().set_inputline("maincpu", M68K_IRQ_4);
+	//mfp.out_tao_cb().set("mfp", FUNC(mc68901_device::rc_w));
+	//mfp.out_tao_cb().append("mfp", FUNC(mc68901_device::tc_w));
+	mfp.out_tco_cb().set("mfp", FUNC(mc68901_device::tbi_w));
 
-	MCFG_DEVICE_ADD("duart", MC68681, XTAL(3'686'400))
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(micro3d_state, duart_irq_handler))
-	MCFG_MC68681_A_TX_CALLBACK(DEVWRITELINE("monitor_host", rs232_port_device, write_txd))
-	MCFG_MC68681_B_TX_CALLBACK(WRITELINE(micro3d_state, duart_txb))
-	MCFG_MC68681_INPORT_CALLBACK(READ8(micro3d_state, duart_input_r))
-	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(micro3d_state, duart_output_w))
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	config.set_maximum_quantum(attotime::from_hz(3000));
 
-	MCFG_DEVICE_ADD("mfp", MC68901, 4000000)
-	MCFG_MC68901_TIMER_CLOCK(4000000)
-	MCFG_MC68901_RX_CLOCK(0)
-	MCFG_MC68901_TX_CLOCK(0)
-	MCFG_MC68901_OUT_IRQ_CB(INPUTLINE("maincpu", M68K_IRQ_4))
-	//MCFG_MC68901_OUT_TAO_CB(DEVWRITELINE("mfp", mc68901_device, rc_w))
-	//MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("mfp", mc68901_device, tc_w))
-	MCFG_MC68901_OUT_TCO_CB(DEVWRITELINE("mfp", mc68901_device, tbi_w))
+	PALETTE(config, m_palette).set_format(palette_device::BRGx_555, 4096);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
-	MCFG_QUANTUM_TIME(attotime::from_hz(3000))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(40_MHz_XTAL/8*4, 192*4, 0, 144*4, 434, 0, 400);
+	screen.set_screen_update("vgb", FUNC(tms34010_device::tms340x0_ind16));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(BBBBBRRRRRGGGGGx)
+	MC2661(config, m_vgb_uart, 40_MHz_XTAL / 8); // actually SCN2651
+	m_vgb_uart->txd_handler().set("monitor_vgb", FUNC(rs232_port_device::write_txd));
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(40'000'000)/8*4, 192*4, 0, 144*4, 434, 0, 400)
-	MCFG_SCREEN_UPDATE_DEVICE("vgb", tms34010_device, tms340x0_ind16)
-	MCFG_SCREEN_PALETTE("palette")
+	rs232_port_device &monitor_host(RS232_PORT(config, "monitor_host", default_rs232_devices, nullptr)); // J2 (4-pin molex)
+	monitor_host.rxd_handler().set("duart", FUNC(mc68681_device::rx_a_w));
 
-	MCFG_DEVICE_ADD("uart", MC2661, XTAL(40'000'000) / 8) // actually SCN2651
-	MCFG_MC2661_TXD_HANDLER(DEVWRITELINE("monitor_vgb", rs232_port_device, write_txd))
+	rs232_port_device &monitor_drmath(RS232_PORT(config, "monitor_drmath", default_rs232_devices, nullptr)); // J4 (4-pin molex)
+	monitor_drmath.rxd_handler().set("scc", FUNC(z80scc_device::rxb_w));
+	monitor_drmath.dcd_handler().set("scc", FUNC(z80scc_device::dcdb_w));
 
-	MCFG_RS232_PORT_ADD("monitor_vgb", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart", mc2661_device, rx_w))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart", mc2661_device, dsr_w))
+	rs232_port_device &monitor_vgb(RS232_PORT(config, "monitor_vgb", default_rs232_devices, nullptr)); // J3 (4-pin molex)
+	monitor_vgb.rxd_handler().set(m_vgb_uart, FUNC(mc2661_device::rx_w));
+	monitor_vgb.dsr_handler().set(m_vgb_uart, FUNC(mc2661_device::dsr_w));
 
-	MCFG_RS232_PORT_ADD("monitor_host", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("duart", mc68681_device, rx_a_w))
+	ADC0844(config, m_adc);
+	m_adc->intr_callback().set("mfp", FUNC(mc68901_device::i3_w));
+	m_adc->ch1_callback().set_ioport("THROTTLE");
+	m_adc->ch2_callback().set(FUNC(micro3d_state::adc_volume_r));
 
-	MCFG_ADC0844_ADD("adc")
-	MCFG_ADC0844_INTR_CB(DEVWRITELINE("mfp", mc68901_device, i3_w))
-	MCFG_ADC0844_CH1_CB(IOPORT("THROTTLE"))
-	MCFG_ADC0844_CH2_CB(READ8(micro3d_state, adc_volume_r))
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	UPD7759(config, m_upd7759);
+	m_upd7759->add_route(ALL_OUTPUTS, "lspeaker", 0.35);
+	m_upd7759->add_route(ALL_OUTPUTS, "rspeaker", 0.35);
 
-	MCFG_SOUND_ADD("upd7759", UPD7759, XTAL(640'000))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.35)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.35)
+	ym2151_device &ym2151(YM2151(config, "ym2151", 3.579545_MHz_XTAL));
+	ym2151.add_route(0, "lspeaker", 0.35);
+	ym2151.add_route(1, "rspeaker", 0.35);
 
-	MCFG_YM2151_ADD("ym2151", XTAL(3'579'545))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.35)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.35)
+	MICRO3D_SOUND(config, m_noise_1);
+	m_noise_1->add_route(0, "lspeaker", 1.0);
+	m_noise_1->add_route(1, "rspeaker", 1.0);
 
-	MCFG_SOUND_ADD("noise_1", MICRO3D, 0)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MICRO3D_SOUND(config, m_noise_2);
+	m_noise_2->add_route(0, "lspeaker", 1.0);
+	m_noise_2->add_route(1, "rspeaker", 1.0);
+}
 
-	MCFG_SOUND_ADD("noise_2", MICRO3D, 0)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(micro3d_state::botss11)
+void micro3d_state::botss11(machine_config &config)
+{
 	micro3d(config);
-	MCFG_DEVICE_MODIFY("adc")
-	MCFG_ADC0844_CH1_CB(NOOP)
-MACHINE_CONFIG_END
+	m_adc->ch1_callback().set_constant(0);
+}
 
 
 /*************************************
@@ -467,10 +472,10 @@ ROM_END
 ROM_START( f15se21 )
 	/* Host PCB (MPG DW-00011C-0011-01) */
 	ROM_REGION( 0x180000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "500.hst", 0x000001, 0x20000, CRC(6c26806d) SHA1(7cfd2b3b92b0fc6627c92a2013a317ca5abc66a0) )
-	ROM_LOAD16_BYTE( "501.hst", 0x000000, 0x20000, CRC(81f02bf7) SHA1(09976746fe4d9c88bd8840f6e7addb09226aa54b) )
-	ROM_LOAD16_BYTE( "502.hst", 0x040001, 0x20000, CRC(1eb945e5) SHA1(aba3ff038f2ca0f1200be5710073825ce80e3656) )
-	ROM_LOAD16_BYTE( "503.hst", 0x040000, 0x20000, CRC(21fcb974) SHA1(56f78ce652e2bf432fbba8cda8c800f02dad84bb) )
+	ROM_LOAD16_BYTE( "110-00001-500.u67", 0x000001, 0x20000, CRC(6c26806d) SHA1(7cfd2b3b92b0fc6627c92a2013a317ca5abc66a0) )
+	ROM_LOAD16_BYTE( "110-00001-501.u91", 0x000000, 0x20000, CRC(81f02bf7) SHA1(09976746fe4d9c88bd8840f6e7addb09226aa54b) )
+	ROM_LOAD16_BYTE( "110-00001-502.u68", 0x040001, 0x20000, CRC(1eb945e5) SHA1(aba3ff038f2ca0f1200be5710073825ce80e3656) )
+	ROM_LOAD16_BYTE( "110-00001-503.u92", 0x040000, 0x20000, CRC(21fcb974) SHA1(56f78ce652e2bf432fbba8cda8c800f02dad84bb) )
 
 	ROM_LOAD16_BYTE( "004.hst", 0x080001, 0x20000, CRC(81671ce1) SHA1(51ff641ccbc9dea640a62944910abe73d796b062) )
 	ROM_LOAD16_BYTE( "005.hst", 0x080000, 0x20000, CRC(bdaa7db5) SHA1(52cd832cdd44e609e8cd269469b806e2cd27d63d) )
@@ -688,8 +693,8 @@ ROM_END
  *
  *************************************/
 
-GAME( 1991, f15se,    0,     micro3d, f15se,    micro3d_state, micro3d, ROT0, "Microprose Games Inc.", "F-15 Strike Eagle (rev. 2.2 02/25/91)",          MACHINE_IMPERFECT_SOUND )
-GAME( 1991, f15se21,  f15se, micro3d, f15se,    micro3d_state, micro3d, ROT0, "Microprose Games Inc.", "F-15 Strike Eagle (rev. 2.1 02/04/91)",          MACHINE_IMPERFECT_SOUND )
-GAME( 1992, botss,    0,     micro3d, botss,    micro3d_state, botss,   ROT0, "Microprose Games Inc.", "Battle of the Solar System (rev. 1.1a 7/23/92)", MACHINE_IMPERFECT_SOUND )
-GAME( 1992, botss11,  botss, botss11, botss11,  micro3d_state, micro3d, ROT0, "Microprose Games Inc.", "Battle of the Solar System (rev. 1.1 3/24/92)",  MACHINE_IMPERFECT_SOUND )
-GAME( 1992, tankbatl, 0,     botss11, tankbatl, micro3d_state, micro3d, ROT0, "Microprose Games Inc.", "Tank Battle (prototype rev. 4/21/92)",           MACHINE_IMPERFECT_SOUND )
+GAME( 1991, f15se,    0,     micro3d, f15se,    micro3d_state, init_micro3d, ROT0, "Microprose Games Inc.", "F-15 Strike Eagle (rev. 2.2 02/25/91)",          MACHINE_IMPERFECT_SOUND )
+GAME( 1991, f15se21,  f15se, micro3d, f15se,    micro3d_state, init_micro3d, ROT0, "Microprose Games Inc.", "F-15 Strike Eagle (rev. 2.1 02/04/91)",          MACHINE_IMPERFECT_SOUND )
+GAME( 1992, botss,    0,     micro3d, botss,    micro3d_state, init_botss,   ROT0, "Microprose Games Inc.", "Battle of the Solar System (rev. 1.1a 7/23/92)", MACHINE_IMPERFECT_SOUND )
+GAME( 1992, botss11,  botss, botss11, botss11,  micro3d_state, init_micro3d, ROT0, "Microprose Games Inc.", "Battle of the Solar System (rev. 1.1 3/24/92)",  MACHINE_IMPERFECT_SOUND )
+GAME( 1992, tankbatl, 0,     botss11, tankbatl, micro3d_state, init_micro3d, ROT0, "Microprose Games Inc.", "Tank Battle (prototype rev. 4/21/92)",           MACHINE_IMPERFECT_SOUND )

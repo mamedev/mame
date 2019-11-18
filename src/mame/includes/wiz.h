@@ -5,14 +5,19 @@
   Seibu Stinger/Wiz hardware
 
 ***************************************************************************/
+#ifndef MAME_INCLUDES_WIZ_H
+#define MAME_INCLUDES_WIZ_H
+
+#pragma once
 
 #include "sound/discrete.h"
+#include "emupal.h"
 
 class wiz_state : public driver_device
 {
 public:
-	wiz_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	wiz_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_discrete(*this, "discrete"),
@@ -29,6 +34,14 @@ public:
 		m_decrypted_opcodes(*this, "decrypted_opcodes")
 	{ }
 
+	void wiz(machine_config &config);
+	void kungfut(machine_config &config);
+	void scion(machine_config &config);
+	void stinger(machine_config &config);
+
+	void init_stinger();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	optional_device<discrete_device> m_discrete;
@@ -70,11 +83,9 @@ public:
 	DECLARE_WRITE8_MEMBER(stinger_explosion_w);
 	DECLARE_WRITE8_MEMBER(stinger_shot_w);
 
-	DECLARE_DRIVER_INIT(stinger);
-
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
-	DECLARE_PALETTE_INIT(wiz);
+	void wiz_palette(palette_device &palette) const;
 	uint32_t screen_update_wiz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_stinger(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_kungfut(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -82,10 +93,7 @@ public:
 	INTERRUPT_GEN_MEMBER(wiz_sound_interrupt);
 	void draw_tiles(bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int charbank, int colortype);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int set, int charbank);
-	void wiz(machine_config &config);
-	void kungfut(machine_config &config);
-	void scion(machine_config &config);
-	void stinger(machine_config &config);
+
 	void decrypted_opcodes_map(address_map &map);
 	void kungfut_main_map(address_map &map);
 	void kungfut_sound_map(address_map &map);
@@ -93,3 +101,5 @@ public:
 	void stinger_sound_map(address_map &map);
 	void wiz_main_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_WIZ_H

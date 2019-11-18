@@ -43,6 +43,9 @@ public:
 	{
 	}
 
+	void queen(machine_config &config);
+
+private:
 	std::unique_ptr<uint32_t[]> m_bios_ram;
 	std::unique_ptr<uint32_t[]> m_bios_ext_ram;
 	uint8_t m_mtxc_config_reg[256];
@@ -54,7 +57,6 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void intel82439tx_init();
-	void queen(machine_config &config);
 	void queen_io(address_map &map);
 	void queen_map(address_map &map);
 
@@ -174,7 +176,7 @@ uint8_t queen_state::piix4_config_r(int function, int reg)
 
 void queen_state::piix4_config_w(int function, int reg, uint8_t data)
 {
-//  osd_printf_debug("%s:PIIX4: write %d, %02X, %02X\n", machine().describe_context().c_str(), function, reg, data);
+//  osd_printf_debug("%s:PIIX4: write %d, %02X, %02X\n", machine().describe_context(), function, reg, data);
 	m_piix4_config_reg[function][reg] = data;
 }
 
@@ -242,8 +244,8 @@ void queen_state::queen_map(address_map &map)
 {
 	map(0x00000000, 0x0009ffff).ram();
 	map(0x000a0000, 0x000bffff).rw("vga", FUNC(vga_device::mem_r), FUNC(vga_device::mem_w));
-	map(0x000e0000, 0x000effff).bankr("bios_ext").w(this, FUNC(queen_state::bios_ext_ram_w));
-	map(0x000f0000, 0x000fffff).bankr("bios_bank").w(this, FUNC(queen_state::bios_ram_w));
+	map(0x000e0000, 0x000effff).bankr("bios_ext").w(FUNC(queen_state::bios_ext_ram_w));
+	map(0x000f0000, 0x000fffff).bankr("bios_bank").w(FUNC(queen_state::bios_ram_w));
 	map(0x00100000, 0x01ffffff).ram();
 	map(0xfffc0000, 0xffffffff).rom().region("bios", 0);    /* System BIOS */
 }
@@ -253,13 +255,13 @@ void queen_state::queen_io(address_map &map)
 	pcat32_io_common(map);
 	map(0x00e8, 0x00ef).noprw();
 
-	map(0x0170, 0x0177).rw("ide2", FUNC(ide_controller_32_device::read_cs0), FUNC(ide_controller_32_device::write_cs0));
-	map(0x01f0, 0x01f7).rw("ide", FUNC(ide_controller_device::read_cs0), FUNC(ide_controller_device::write_cs0));
-	map(0x0370, 0x0377).rw("ide2", FUNC(ide_controller_32_device::read_cs1), FUNC(ide_controller_32_device::write_cs1));
+	map(0x0170, 0x0177).rw("ide2", FUNC(ide_controller_32_device::cs0_r), FUNC(ide_controller_32_device::cs0_w));
+	map(0x01f0, 0x01f7).rw("ide", FUNC(ide_controller_device::cs0_r), FUNC(ide_controller_device::cs0_w));
+	map(0x0370, 0x0377).rw("ide2", FUNC(ide_controller_32_device::cs1_r), FUNC(ide_controller_32_device::cs1_w));
 	map(0x03b0, 0x03bf).rw("vga", FUNC(vga_device::port_03b0_r), FUNC(vga_device::port_03b0_w));
 	map(0x03c0, 0x03cf).rw("vga", FUNC(vga_device::port_03c0_r), FUNC(vga_device::port_03c0_w));
 	map(0x03d0, 0x03df).rw("vga", FUNC(vga_device::port_03d0_r), FUNC(vga_device::port_03d0_w));
-	map(0x03f0, 0x03f7).rw("ide", FUNC(ide_controller_device::read_cs1), FUNC(ide_controller_device::write_cs1));
+	map(0x03f0, 0x03f7).rw("ide", FUNC(ide_controller_device::cs1_r), FUNC(ide_controller_device::cs1_w));
 
 	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_legacy_device::read), FUNC(pci_bus_legacy_device::write));
 }
@@ -278,35 +280,32 @@ void queen_state::machine_reset()
 	membank("bios_ext")->set_base(memregion("bios")->base() + 0x20000);
 }
 
-
-
-MACHINE_CONFIG_START(queen_state::queen)
-	MCFG_CPU_ADD("maincpu", PENTIUM3, 533000000/16) // Celeron or Pentium 3, 533 Mhz
-	MCFG_CPU_PROGRAM_MAP(queen_map)
-	MCFG_CPU_IO_MAP(queen_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
+void queen_state::queen(machine_config &config)
+{
+	PENTIUM3(config, m_maincpu, 533000000/16); // Celeron or Pentium 3, 533 Mhz
+	m_maincpu->set_addrmap(AS_PROGRAM, &queen_state::queen_map);
+	m_maincpu->set_addrmap(AS_IO, &queen_state::queen_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
 
 	pcat_common(config);
 
-	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
-	MCFG_PCI_BUS_LEGACY_DEVICE(0, DEVICE_SELF, queen_state, intel82439tx_pci_r, intel82439tx_pci_w)
-	MCFG_PCI_BUS_LEGACY_DEVICE(7, DEVICE_SELF, queen_state, intel82371ab_pci_r, intel82371ab_pci_w)
+	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
+	pcibus.set_device(0, FUNC(queen_state::intel82439tx_pci_r), FUNC(queen_state::intel82439tx_pci_w));
+	pcibus.set_device(7, FUNC(queen_state::intel82371ab_pci_r), FUNC(queen_state::intel82371ab_pci_w));
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))
+	ide_controller_device &ide(IDE_CONTROLLER(config, "ide").options(ata_devices, "hdd", nullptr, true));
+	ide.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir6_w));
 
-	MCFG_IDE_CONTROLLER_32_ADD("ide2", ata_devices, nullptr, nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir7_w))
+	ide_controller_32_device &ide2(IDE_CONTROLLER_32(config, "ide2").options(ata_devices, nullptr, nullptr, true));
+	ide2.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir7_w));
 
 	/* video hardware */
 	pcvideo_vga(config);
-MACHINE_CONFIG_END
-
-
+}
 
 
 ROM_START( queen )
-	ROM_REGION( 0x40000, "bios", 0 )
+	ROM_REGION32_LE( 0x40000, "bios", 0 )
 	ROM_LOAD( "bios-original.bin", 0x00000, 0x40000, CRC(feb542d4) SHA1(3cc5d8aeb0e3b7d9ed33248a4f3dc507d29debd9) )
 
 	ROM_REGION( 0x8000, "video_bios", ROMREGION_ERASEFF ) // TODO: no VGA card is hooked up, to be removed
@@ -318,4 +317,4 @@ ROM_START( queen )
 ROM_END
 
 
-GAME( 2002?, queen,  0,    queen, at_keyboard, queen_state,  0, ROT0, "STG", "Queen?", MACHINE_IS_SKELETON )
+GAME( 2002?, queen,  0,    queen, at_keyboard, queen_state, empty_init, ROT0, "STG", "Queen?", MACHINE_IS_SKELETON )

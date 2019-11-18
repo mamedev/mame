@@ -49,13 +49,13 @@ void gomoku_state::gomoku_map(address_map &map)
 {
 	map(0x0000, 0x47ff).rom();
 	map(0x4800, 0x4fff).ram();
-	map(0x5000, 0x53ff).ram().w(this, FUNC(gomoku_state::gomoku_videoram_w)).share("videoram");
-	map(0x5400, 0x57ff).ram().w(this, FUNC(gomoku_state::gomoku_colorram_w)).share("colorram");
-	map(0x5800, 0x58ff).ram().w(this, FUNC(gomoku_state::gomoku_bgram_w)).share("bgram");
+	map(0x5000, 0x53ff).ram().w(FUNC(gomoku_state::gomoku_videoram_w)).share("videoram");
+	map(0x5400, 0x57ff).ram().w(FUNC(gomoku_state::gomoku_colorram_w)).share("colorram");
+	map(0x5800, 0x58ff).ram().w(FUNC(gomoku_state::gomoku_bgram_w)).share("bgram");
 	map(0x6000, 0x601f).w("gomoku", FUNC(gomoku_sound_device::sound1_w));
 	map(0x6800, 0x681f).w("gomoku", FUNC(gomoku_sound_device::sound2_w));
 	map(0x7000, 0x7007).w("latch", FUNC(ls259_device::write_d1));
-	map(0x7800, 0x7807).r(this, FUNC(gomoku_state::input_port_r));
+	map(0x7800, 0x7807).r(FUNC(gomoku_state::input_port_r));
 	map(0x7800, 0x7800).nopw();
 }
 
@@ -117,41 +117,40 @@ static const gfx_layout charlayout =
 	16*8        /* every char takes 16 consecutive bytes */
 };
 
-static GFXDECODE_START( gomoku )
+static GFXDECODE_START( gfx_gomoku )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 32 )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(gomoku_state::gomoku)
+void gomoku_state::gomoku(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(18'432'000)/12)      /* 1.536 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(gomoku_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gomoku_state,  irq0_line_hold)
+	Z80(config, m_maincpu, XTAL(18'432'000)/12);      /* 1.536 MHz ? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &gomoku_state::gomoku_map);
+	m_maincpu->set_vblank_int("screen", FUNC(gomoku_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("latch", LS259, 0) // 7J
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(gomoku_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(gomoku_state, bg_dispsw_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP) // start LED?
+	ls259_device &latch(LS259(config, "latch")); // 7J
+	latch.q_out_cb<1>().set(FUNC(gomoku_state::flipscreen_w));
+	latch.q_out_cb<2>().set(FUNC(gomoku_state::bg_dispsw_w));
+	latch.q_out_cb<7>().set_nop(); // start LED?
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(gomoku_state, screen_update_gomoku)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(256, 256);
+	m_screen->set_visarea(0, 256-1, 16, 256-16-1);
+	m_screen->set_screen_update(FUNC(gomoku_state::screen_update_gomoku));
+	m_screen->set_palette("palette");
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gomoku)
-	MCFG_PALETTE_ADD("palette", 64)
-	MCFG_PALETTE_INIT_OWNER(gomoku_state, gomoku)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_gomoku);
+	PALETTE(config, "palette", FUNC(gomoku_state::gomoku_palette), 64);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("gomoku", GOMOKU, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	GOMOKU_SOUND(config, "gomoku").add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 ROM_START( gomoku )
@@ -186,5 +185,5 @@ ROM_START( gomoku )
 ROM_END
 
 
-//    YEAR,   NAME,   PARENT,  MACHINE,  INPUT,  STATE         INIT,   MONITOR, COMPANY,      FULLNAME,              FLAGS
-GAME( 1981,   gomoku, 0,       gomoku,   gomoku, gomoku_state, 0,      ROT90,   "Nichibutsu", "Gomoku Narabe Renju", 0 )
+//    YEAR,   NAME,   PARENT,  MACHINE,  INPUT,  STATE         INIT,       MONITOR, COMPANY,      FULLNAME,              FLAGS
+GAME( 1981,   gomoku, 0,       gomoku,   gomoku, gomoku_state, empty_init, ROT90,   "Nichibutsu", "Gomoku Narabe Renju", 0 )

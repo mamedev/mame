@@ -19,7 +19,7 @@ i960_cpu_device::i960_cpu_device(const machine_config &mconfig, const char *tag,
 	: cpu_device(mconfig, I960, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0)
 	, m_rcache_pos(0), m_SAT(0), m_PRCB(0), m_PC(0), m_AC(0), m_IP(0), m_PIP(0), m_ICR(0), m_bursting(0), m_immediate_irq(0)
-	, m_immediate_vector(0), m_immediate_pri(0), m_program(nullptr), m_direct(nullptr), m_icount(0)
+	, m_immediate_vector(0), m_immediate_pri(0), m_program(nullptr), m_cache(nullptr), m_icount(0)
 {
 }
 
@@ -116,7 +116,7 @@ uint32_t i960_cpu_device::get_ea(uint32_t opcode)
 
 		case 0x5:   // address of this instruction + the offset dword + 8
 			// which in reality is "address of next instruction + the offset dword"
-			ret = m_direct->read_dword(m_IP);
+			ret = m_cache->read_dword(m_IP);
 			m_IP += 4;
 			ret += m_IP;
 			return ret;
@@ -125,22 +125,22 @@ uint32_t i960_cpu_device::get_ea(uint32_t opcode)
 			return m_r[abase] + (m_r[index] << scale);
 
 		case 0xc:
-			ret = m_direct->read_dword(m_IP);
+			ret = m_cache->read_dword(m_IP);
 			m_IP += 4;
 			return ret;
 
 		case 0xd:
-			ret = m_direct->read_dword(m_IP) + m_r[abase];
+			ret = m_cache->read_dword(m_IP) + m_r[abase];
 			m_IP += 4;
 			return ret;
 
 		case 0xe:
-			ret = m_direct->read_dword(m_IP) + (m_r[index] << scale);
+			ret = m_cache->read_dword(m_IP) + (m_r[index] << scale);
 			m_IP += 4;
 			return ret;
 
 		case 0xf:
-			ret = m_direct->read_dword(m_IP) + m_r[abase] + (m_r[index] << scale);
+			ret = m_cache->read_dword(m_IP) + m_r[abase] + (m_r[index] << scale);
 			m_IP += 4;
 			return ret;
 
@@ -1530,6 +1530,12 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 				set_rif(opcode, t2f*log(t1f+1.0)/log(2.0));
 				break;
 
+			case 0x2: // logr
+				m_icount -= 400; // checkme
+				t1f = get_1_rif(opcode);
+				set_rif(opcode, log(t1f));
+				break;
+
 			case 0x3: // remr
 				m_icount -= 67; // (67 to 75878 depending on opcodes!!!)
 				t1f = get_1_rif(opcode);
@@ -1548,6 +1554,12 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 				m_icount -= 104;
 				t1f = get_1_rif(opcode);
 				set_rif(opcode, sqrt(t1f));
+				break;
+
+			case 0x9: // expr
+				m_icount -= 334; // checkme
+				t1f = get_1_rif(opcode);
+				set_rif(opcode, pow(2.0, t1f) - 1.0);
 				break;
 
 			case 0xa: // logbnr
@@ -2118,7 +2130,7 @@ void i960_cpu_device::execute_run()
 
 		m_bursting = 0;
 
-		opcode = m_direct->read_dword(m_IP);
+		opcode = m_cache->read_dword(m_IP);
 		m_IP += 4;
 
 		m_stalled = false;
@@ -2202,7 +2214,7 @@ void i960_cpu_device::execute_set_input(int irqline, int state)
 void i960_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<2, 0, ENDIANNESS_LITTLE>();
 
 	save_item(NAME(m_IP));
 	save_item(NAME(m_PIP));

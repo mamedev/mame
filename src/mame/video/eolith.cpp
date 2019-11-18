@@ -24,7 +24,7 @@ READ16_MEMBER(eolith_state::eolith_vram_r)
 VIDEO_START_MEMBER(eolith_state,eolith)
 {
 	m_vram = std::make_unique<uint16_t[]>(0x40000);
-	save_pointer(NAME(m_vram.get()), 0x40000);
+	save_pointer(NAME(m_vram), 0x40000);
 	save_item(NAME(m_buffer));
 }
 

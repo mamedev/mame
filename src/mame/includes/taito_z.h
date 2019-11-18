@@ -6,10 +6,15 @@
     Taito Z system
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_TAITO_Z_H
+#define MAME_INCLUDES_TAITO_Z_H
+
+#pragma once
 
 #include "audio/taitosnd.h"
 #include "machine/eepromser.h"
 #include "machine/taitoio.h"
+#include "sound/flt_vol.h"
 #include "video/tc0100scn.h"
 #include "video/tc0110pcr.h"
 #include "video/tc0150rod.h"
@@ -19,9 +24,11 @@
 class taitoz_state : public driver_device
 {
 public:
-	taitoz_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	taitoz_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
+		m_spritemap(*this, "spritemap"),
+		m_z80bank(*this, "z80bank"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_subcpu(*this, "sub"),
@@ -35,10 +42,18 @@ public:
 		m_tc0510nio(*this, "tc0510nio"),
 		m_tc0140syt(*this, "tc0140syt"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_steer(*this, "STEER") { }
+		m_filter(*this, {"2610.1.r", "2610.1.l", "2610.2.r", "2610.2.l"}),
+		m_gas(*this, "GAS"),
+		m_brake(*this, "BRAKE"),
+		m_steer(*this, "STEER"),
+		m_io_eepromout(*this, "EEPROMOUT"),
+		m_lamps(*this, "lamp%u", 0U)
+	{ }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(taitoz_pedal_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(gas_pedal_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(brake_pedal_r);
 
+	void bshark_base(machine_config &config);
 	void sci(machine_config &config);
 	void spacegun(machine_config &config);
 	void chasehq(machine_config &config);
@@ -51,11 +66,13 @@ public:
 	void bsharkjjs(machine_config &config);
 	void enforce(machine_config &config);
 
-	DECLARE_DRIVER_INIT(taitoz);
-	DECLARE_DRIVER_INIT(bshark);
+	void init_bshark();
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_post_load() override;
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	enum
@@ -64,17 +81,20 @@ private:
 	};
 
 	/* memory pointers */
-	required_shared_ptr<uint16_t> m_spriteram;
+	required_shared_ptr<u16> m_spriteram;
+	required_region_ptr<u16> m_spritemap;
+
+	optional_memory_bank m_z80bank;
 
 	/* video-related */
-	int         m_sci_spriteframe;
-	int         m_road_palbank;
+	int      m_sci_spriteframe;
+	int      m_road_palbank;
 
 	/* misc */
-	uint16_t      m_cpua_ctrl;
-	int32_t       m_sci_int6;
-	int32_t       m_ioc220_port;
-	uint16_t      m_eep_latch;
+	u16      m_cpua_ctrl;
+	s32      m_sci_int6;
+	s32      m_ioc220_port;
+	u8       m_eep_latch;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -90,47 +110,47 @@ private:
 	optional_device<tc0510nio_device> m_tc0510nio;
 	optional_device<tc0140syt_device> m_tc0140syt;  // bshark & spacegun miss the CPUs which shall use TC0140
 	required_device<gfxdecode_device> m_gfxdecode;
+	optional_device_array<filter_volume_device, 4> m_filter;
+	optional_ioport m_gas;
+	optional_ioport m_brake;
 	optional_ioport m_steer;
+	optional_ioport m_io_eepromout;
+	output_finder<2> m_lamps;
 
-	DECLARE_WRITE16_MEMBER(cpua_ctrl_w);
-	DECLARE_WRITE16_MEMBER(bshark_cpua_ctrl_w);
-	DECLARE_WRITE16_MEMBER(chasehq_cpua_ctrl_w);
-	DECLARE_WRITE16_MEMBER(dblaxle_cpua_ctrl_w);
-	DECLARE_WRITE8_MEMBER(spacegun_eeprom_w);
-	DECLARE_READ8_MEMBER(contcirc_input_bypass_r);
-	DECLARE_READ8_MEMBER(chasehq_input_bypass_r);
-	DECLARE_READ16_MEMBER(sci_steer_input_r);
-	DECLARE_WRITE16_MEMBER(spacegun_gun_output_w);
-	DECLARE_READ16_MEMBER(dblaxle_steer_input_r);
-	DECLARE_READ16_MEMBER(chasehq_motor_r);
-	DECLARE_WRITE16_MEMBER(chasehq_motor_w);
-	DECLARE_WRITE16_MEMBER(nightstr_motor_w);
-	DECLARE_WRITE8_MEMBER(coin_control_w);
-	DECLARE_READ16_MEMBER(aquajack_unknown_r);
-	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
-	DECLARE_WRITE16_MEMBER(taitoz_sound_w);
-	DECLARE_READ16_MEMBER(taitoz_sound_r);
-	DECLARE_WRITE8_MEMBER(taitoz_pancontrol);
-	DECLARE_READ16_MEMBER(sci_spriteframe_r);
-	DECLARE_WRITE16_MEMBER(sci_spriteframe_w);
-	DECLARE_WRITE16_MEMBER(contcirc_out_w);
-	DECLARE_MACHINE_START(taitoz);
-	DECLARE_MACHINE_RESET(taitoz);
+	void cpua_ctrl_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void chasehq_cpua_ctrl_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void dblaxle_cpua_ctrl_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void spacegun_eeprom_w(u8 data);
+	u8 contcirc_input_bypass_r();
+	u8 chasehq_input_bypass_r();
+	u16 sci_steer_input_r(offs_t offset);
+	void spacegun_gun_output_w(u16 data);
+	u16 dblaxle_steer_input_r(offs_t offset);
+	u16 chasehq_motor_r(offs_t offset);
+	void chasehq_motor_w(offs_t offset, u16 data);
+	void nightstr_motor_w(offs_t offset, u16 data);
+	void coin_control_w(u8 data);
+	u16 aquajack_unknown_r();
+	void sound_bankswitch_w(u8 data);
+	void pancontrol_w(offs_t offset, u8 data);
+	u16 sci_spriteframe_r();
+	void sci_spriteframe_w(u16 data);
+	void contcirc_out_w(u8 data);
 	DECLARE_VIDEO_START(taitoz);
-	DECLARE_MACHINE_START(bshark);
-	uint32_t screen_update_contcirc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_chasehq(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_bshark(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_sci(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_aquajack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_spacegun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_dblaxle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_racingb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_MACHINE_START(chasehq);
+	u32 screen_update_contcirc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_chasehq(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_bshark(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_sci(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_aquajack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_spacegun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_dblaxle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_racingb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(sci_interrupt);
-	void contcirc_draw_sprites_16x8( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs );
-	void chasehq_draw_sprites_16x16( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs );
-	void bshark_draw_sprites_16x8( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs );
-	void sci_draw_sprites_16x8( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs );
+	void contcirc_draw_sprites_16x8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs);
+	void chasehq_draw_sprites_16x16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs);
+	void bshark_draw_sprites_16x8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs);
+	void sci_draw_sprites_16x8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs);
 	void aquajack_draw_sprites_16x8(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,int y_offs);
 	void spacegun_draw_sprites_16x8(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,int y_offs);
 	void parse_cpu_control();
@@ -158,3 +178,5 @@ private:
 	void spacegun_map(address_map &map);
 	void z80_sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_TAITO_Z_H

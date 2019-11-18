@@ -14,6 +14,7 @@
 #include "video/decospr.h"
 #include "machine/deco146.h"
 #include "machine/deco104.h"
+#include "emupal.h"
 
 class rohga_state : public driver_device
 {
@@ -32,6 +33,19 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
+	void wizdfire(machine_config &config);
+	void nitrobal(machine_config &config);
+	void hangzo(machine_config &config);
+	void schmeisr(machine_config &config);
+	void rohga(machine_config &config);
+
+	void init_wizdfire();
+	void init_nitrobal();
+	void init_schmeisr();
+	void init_hangzo();
+	void init_rohga();
+
+private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<h6280_device> m_audiocpu;
@@ -42,39 +56,30 @@ public:
 	optional_device_array<buffered_spriteram16_device, 2> m_spriteram;
 
 	/* memory pointers */
-	optional_shared_ptr_array<uint16_t, 4> m_pf_rowscroll;
+	optional_shared_ptr_array<u16, 4> m_pf_rowscroll;
 
 	optional_device_array<decospr_device, 2> m_sprgen;
 
 	required_device<palette_device> m_palette;
 
-	DECLARE_READ16_MEMBER(rohga_irq_ack_r);
-	DECLARE_WRITE16_MEMBER(wizdfire_irq_ack_w);
-	DECLARE_WRITE16_MEMBER(rohga_buffer_spriteram16_w);
-	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
-	DECLARE_DRIVER_INIT(wizdfire);
-	DECLARE_DRIVER_INIT(nitrobal);
-	DECLARE_DRIVER_INIT(schmeisr);
-	DECLARE_DRIVER_INIT(hangzo);
-	DECLARE_DRIVER_INIT(rohga);
+	u16 irq_ack_r();
+	void irq_ack_w(u16 data);
+	void rohga_buffer_spriteram16_w(u16 data);
+	void sound_bankswitch_w(u8 data);
+
 	DECLARE_VIDEO_START(wizdfire);
-	uint32_t screen_update_rohga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_wizdfire(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_nitrobal(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void mixwizdfirelayer(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint16_t pri, uint16_t primask);
+	u32 screen_update_rohga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_wizdfire(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	u32 screen_update_nitrobal(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void mixwizdfirelayer(bitmap_rgb32 &bitmap, const rectangle &cliprect, u16 pri, u16 primask);
 	void mixnitroballlayer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 	DECOSPR_PRIORITY_CB_MEMBER(rohga_pri_callback);
 	DECOSPR_COLOUR_CB_MEMBER(rohga_col_callback);
 	DECOSPR_COLOUR_CB_MEMBER(schmeisr_col_callback);
 
-	READ16_MEMBER( ioprot_r );
-	WRITE16_MEMBER( ioprot_w );
-	void wizdfire(machine_config &config);
-	void nitrobal(machine_config &config);
-	void hangzo(machine_config &config);
-	void schmeisr(machine_config &config);
-	void rohga(machine_config &config);
+	u16 ioprot_r(offs_t offset);
+	void ioprot_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void hangzo_map(address_map &map);
 	void hotb_base_map(address_map &map);
 	void nitrobal_map(address_map &map);

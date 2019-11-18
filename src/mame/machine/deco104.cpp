@@ -3,7 +3,7 @@
 /****************************************************************************
 
     Data East 104 based protection/IO chips
-    (a variation on the Deco 146 protection, see deco146.c for notes)
+    (a variation on the Deco 146 protection, see deco146.cpp for notes)
 
     Emulation by David Haywood
      based on findings by Charles MacDonald
@@ -1048,12 +1048,10 @@ static deco146port_xx const port104_table[] = {
 	};
 
 
-
 DEFINE_DEVICE_TYPE(DECO104PROT, deco104_device, "deco104", "DECO 104 Protection")
 
 
-
-deco104_device::deco104_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+deco104_device::deco104_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: deco_146_base_device(mconfig, DECO104PROT, tag, owner, clock)
 {
 	m_bankswitch_swap_read_address = 0x66;
@@ -1065,8 +1063,6 @@ deco104_device::deco104_device(const machine_config &mconfig, const char *tag, d
 	m_lookup_table = port104_table;
 	m_configregion = 0xc;
 }
-
-
 
 
 void deco104_device::device_start()

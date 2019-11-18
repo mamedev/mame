@@ -12,7 +12,6 @@
 //**************************************************************************
 
 // device type definition
-DECLARE_DEVICE_TYPE(M6805,     m6805_device)
 DECLARE_DEVICE_TYPE(M68HC05EG, m68hc05eg_device)
 DECLARE_DEVICE_TYPE(HD63705,   hd63705_device)
 
@@ -65,6 +64,25 @@ protected:
 			, m_addr_width(addr_width)
 			, m_sp_mask(sp_mask)
 			, m_sp_floor(sp_floor)
+			, m_vector_mask((1U << addr_width) - 1)
+			, m_swi_vector(swi_vector)
+		{
+		}
+
+		configuration_params(
+				op_handler_table &ops,
+				cycle_count_table &cycles,
+				u32 addr_width,
+				u32 sp_mask,
+				u32 sp_floor,
+				u16 vector_mask,
+				u16 swi_vector)
+			: m_ops(ops)
+			, m_cycles(cycles)
+			, m_addr_width(addr_width)
+			, m_sp_mask(sp_mask)
+			, m_sp_floor(sp_floor)
+			, m_vector_mask(vector_mask)
 			, m_swi_vector(swi_vector)
 		{
 		}
@@ -74,6 +92,7 @@ protected:
 		u32 m_addr_width;
 		u32 m_sp_mask;
 		u32 m_sp_floor;
+		u16 m_vector_mask;
 		u16 m_swi_vector;
 	};
 
@@ -107,13 +126,14 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override;
-	virtual uint32_t execute_max_cycles() const override;
-	virtual uint32_t execute_input_lines() const override;
+	virtual uint32_t execute_min_cycles() const noexcept override;
+	virtual uint32_t execute_max_cycles() const noexcept override;
+	virtual uint32_t execute_input_lines() const noexcept override;
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
-	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override;
-	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override;
+	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override;
+	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override;
+	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return true; }
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
@@ -145,8 +165,8 @@ protected:
 
 	unsigned    rdmem(u32 addr)             { return unsigned(m_program->read_byte(addr)); }
 	void        wrmem(u32 addr, u8 value)   { m_program->write_byte(addr, value); }
-	unsigned    rdop(u32 addr)              { return unsigned(m_direct->read_byte(addr)); }
-	unsigned    rdop_arg(u32 addr)          { return unsigned(m_direct->read_byte(addr)); }
+	unsigned    rdop(u32 addr)              { return unsigned(m_cache->read_byte(addr)); }
+	unsigned    rdop_arg(u32 addr)          { return unsigned(m_cache->read_byte(addr)); }
 
 	unsigned    rm(u32 addr)                { return rdmem(addr); }
 	void        rm16(u32 addr, PAIR &p);
@@ -254,6 +274,8 @@ protected:
 	virtual bool test_il();
 
 	configuration_params const m_params;
+	u32 m_min_cycles;
+	u32 m_max_cycles;
 
 	// address spaces
 	address_space_config const m_program_config;
@@ -277,17 +299,7 @@ protected:
 
 	// address spaces
 	address_space *m_program;
-	direct_read_data<0> *m_direct;
-};
-
-
-// ======================> m6805_device
-
-class m6805_device : public m6805_base_device
-{
-public:
-	// construction/destruction
-	m6805_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	memory_access_cache<0, 0, ENDIANNESS_BIG> *m_cache;
 };
 
 
@@ -319,6 +331,7 @@ protected:
 	virtual void device_reset() override;
 
 	virtual void execute_set_input(int inputnum, int state) override;
+	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum == INPUT_LINE_NMI; }
 
 	virtual void interrupt_vector() override;
 	virtual bool test_il() override { return m_nmi_state != CLEAR_LINE; }

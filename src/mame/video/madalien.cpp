@@ -17,12 +17,11 @@
 #define PIXEL_CLOCK (MADALIEN_MAIN_CLOCK / 2)
 
 
-PALETTE_INIT_MEMBER(madalien_state,madalien)
+void madalien_state::madalien_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
+	uint8_t const *const color_prom = memregion("proms")->base();
 
-	for (i = 0; i < 0x20; i++)
+	for (int i = 0; i < 0x20; i++)
 	{
 		int r = 0;
 		int g = 0;
@@ -44,10 +43,10 @@ PALETTE_INIT_MEMBER(madalien_state,madalien)
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
-	for (i = 0; i < 0x10; i++)
+	for (int i = 0; i < 0x10; i++)
 		palette.set_pen_indirect(i, i);
 
-	for (i = 0x10; i < 0x20; i++)
+	for (int i = 0x10; i < 0x20; i++)
 	{
 		uint8_t ctabentry = i - 0x10;
 
@@ -60,7 +59,7 @@ PALETTE_INIT_MEMBER(madalien_state,madalien)
 		palette.set_pen_indirect(i, ctabentry);
 	}
 
-	for (i = 0x20; i < 0x30; i++)
+	for (int i = 0x20; i < 0x30; i++)
 		palette.set_pen_indirect(i, (i - 0x20) | 0x10);
 }
 
@@ -117,31 +116,26 @@ WRITE8_MEMBER(madalien_state::madalien_videoram_w)
 }
 
 
-VIDEO_START_MEMBER(madalien_state,madalien)
+void madalien_state::video_start()
 {
-	int i;
-
-	static const tilemap_mapper_delegate scan_functions[4] =
+	// can't make this static or it will keep stale pointers after a hard reset
+	const tilemap_mapper_delegate scan_functions[4] =
 	{
-		tilemap_mapper_delegate(FUNC(madalien_state::scan_mode0),this),
-		tilemap_mapper_delegate(FUNC(madalien_state::scan_mode1),this),
-		tilemap_mapper_delegate(FUNC(madalien_state::scan_mode2),this),
-		tilemap_mapper_delegate(FUNC(madalien_state::scan_mode3),this)
+		tilemap_mapper_delegate(*this, FUNC(madalien_state::scan_mode0)),
+		tilemap_mapper_delegate(*this, FUNC(madalien_state::scan_mode1)),
+		tilemap_mapper_delegate(*this, FUNC(madalien_state::scan_mode2)),
+		tilemap_mapper_delegate(*this, FUNC(madalien_state::scan_mode3))
 	};
 
-	static const int tilemap_cols[4] =
-	{
-		16, 16, 32, 32
-	};
+	static constexpr int tilemap_cols[4] = { 16, 16, 32, 32 };
 
-	m_tilemap_fg = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(madalien_state::get_tile_info_FG),this), TILEMAP_SCAN_COLS_FLIP_X, 8, 8, 32, 32);
+	m_tilemap_fg = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(madalien_state::get_tile_info_FG)), TILEMAP_SCAN_COLS_FLIP_X, 8, 8, 32, 32);
 	m_tilemap_fg->set_transparent_pen(0);
 
-	for (i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)
 	{
-		m_tilemap_edge1[i] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(madalien_state::get_tile_info_BG_1),this), scan_functions[i], 16, 16, tilemap_cols[i], 8);
-
-		m_tilemap_edge2[i] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(madalien_state::get_tile_info_BG_2),this), scan_functions[i], 16, 16, tilemap_cols[i], 8);
+		m_tilemap_edge1[i] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(madalien_state::get_tile_info_BG_1)), scan_functions[i], 16, 16, tilemap_cols[i], 8);
+		m_tilemap_edge2[i] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(madalien_state::get_tile_info_BG_2)), scan_functions[i], 16, 16, tilemap_cols[i], 8);
 	}
 
 	m_headlight_bitmap = std::make_unique<bitmap_ind16>(128, 128);
@@ -155,11 +149,8 @@ VIDEO_START_MEMBER(madalien_state,madalien)
 
 void madalien_state::draw_edges(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flip, int scroll_mode)
 {
-	rectangle clip_edge1;
-	rectangle clip_edge2;
-
-	clip_edge1 = cliprect;
-	clip_edge2 = cliprect;
+	rectangle clip_edge1(cliprect);
+	rectangle clip_edge2(cliprect);
 
 	if (flip)
 	{
@@ -205,7 +196,7 @@ void madalien_state::draw_headlight(bitmap_ind16 &bitmap, const rectangle &clipr
 			if (flip)
 				hy = ~hy;
 
-			if ((hy < cliprect.min_y) || (hy > cliprect.max_y))
+			if ((hy < cliprect.top()) || (hy > cliprect.bottom()))
 				continue;
 
 			for (x = 0; x < 0x80; x++)
@@ -215,7 +206,7 @@ void madalien_state::draw_headlight(bitmap_ind16 &bitmap, const rectangle &clipr
 				if (flip)
 					hx = ~hx;
 
-				if ((hx < cliprect.min_x) || (hx > cliprect.max_x))
+				if ((hx < cliprect.left()) || (hx > cliprect.right()))
 					continue;
 
 				if (m_headlight_bitmap->pix16(y, x) != 0)
@@ -283,9 +274,9 @@ uint32_t madalien_state::screen_update_madalien(screen_device &screen, bitmap_in
 			min_x = 0xff - max_x_save;
 		}
 
-		for (y = cliprect.min_y; y <= cliprect.max_y ; y++)
+		for (y = cliprect.top(); y <= cliprect.bottom(); y++)
 			for (x = min_x; x <= max_x; x++)
-				if ((x >= cliprect.min_x) && (x <= cliprect.max_x))
+				if ((x >= cliprect.left()) && (x <= cliprect.right()))
 					bitmap.pix16(y, x) |= 8;
 	}
 
@@ -361,27 +352,26 @@ static const gfx_layout tilelayout =
 };
 
 
-static GFXDECODE_START( madalien )
+static GFXDECODE_START( gfx_madalien )
 	GFXDECODE_ENTRY( nullptr,   0, charlayout,     0x20, 2 ) /* foreground characters, stored in RAM */
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,        0, 4 )
 	GFXDECODE_ENTRY( "gfx2", 0, headlightlayout,   0, 1 )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(madalien_state::madalien_video)
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 336, 0, 256, 288, 0, 256)
-	MCFG_SCREEN_UPDATE_DRIVER(madalien_state, screen_update_madalien)
-	MCFG_SCREEN_PALETTE("palette")
+void madalien_state::madalien_video(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(PIXEL_CLOCK, 336, 0, 256, 288, 0, 256);
+	screen.set_screen_update(FUNC(madalien_state::screen_update_madalien));
+	screen.set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", madalien)
-	MCFG_PALETTE_ADD("palette", 0x30)
-	MCFG_PALETTE_INDIRECT_ENTRIES(0x20)
-	MCFG_PALETTE_INIT_OWNER(madalien_state,madalien)
-	MCFG_VIDEO_START_OVERRIDE(madalien_state,madalien)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_madalien);
+	PALETTE(config, m_palette, FUNC(madalien_state::madalien_palette), 0x30, 0x20);
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", PIXEL_CLOCK / 8)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
-MACHINE_CONFIG_END
+	mc6845_device &crtc(MC6845(config, "crtc", PIXEL_CLOCK / 8));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.out_vsync_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+}

@@ -106,7 +106,23 @@ static int parse_options(int argc, char *argv[], int minunnamed, int maxunnamed,
 				if (i < minunnamed)
 					goto error; /* Too few unnamed */
 
-				resolution->find(name)->set_value(value);
+				util::option_resolution::entry *entry = resolution->find(name);
+				if (entry->option_type() == util::option_guide::entry::option_type::ENUM_BEGIN)
+				{
+					const util::option_guide::entry *enum_value;
+					for (enum_value = entry->enum_value_begin(); enum_value != entry->enum_value_end(); enum_value++)
+					{
+						if (!strcmp (enum_value->identifier(), value))
+						{
+							entry->set_value(enum_value->parameter());
+							break;
+						}
+					}
+					if (enum_value ==  entry->enum_value_end())
+						goto error;
+				}
+				else
+					entry->set_value(value);
 			}
 		}
 	}
@@ -271,6 +287,8 @@ static int cmd_dir(const struct command *c, int argc, char *argv[])
 	util::stream_format(std::wcout, L"%8i File(s)        %8i bytes", total_count, total_size);
 	if (!freespace_err)
 		util::stream_format(std::wcout, L"                        %8u bytes free\n", (unsigned int)freespace);
+	else
+		util::stream_format(std::wcout, L"\n");
 
 done:
 	if (err)
@@ -832,7 +850,7 @@ static const struct command cmds[] =
 {
 	{ "create",             cmd_create,             "<format> <imagename> [--(createoption)=value]", 2, 8, 0},
 	{ "dir",                cmd_dir,                "<format> <imagename> [path]", 2, 3, 0 },
-	{ "get",                cmd_get,                "<format> <imagename> <filename> [newname] [--filter=filter] [--fork=fork]", 3, 4, 0 },
+	{ "get",                cmd_get,                "<format> <imagename> <filename> [newname] [--filter=filter] [--fork=fork]", 3, 6, 0 },
 	{ "put",                cmd_put,                "<format> <imagename> <filename>... <destname> [--(fileoption)==value] [--filter=filter] [--fork=fork]", 3, 0xffff, 0 },
 	{ "getall",             cmd_getall,             "<format> <imagename> [path] [--filter=filter]", 2, 3, 0 },
 	{ "del",                cmd_del,                "<format> <imagename> <filename>...", 3, 3, 1 },

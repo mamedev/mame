@@ -36,13 +36,13 @@ DEFINE_DEVICE_TYPE(MEGADUCK_CART_SLOT, megaduck_cart_slot_device, "megaduck_cart
 //  device_gb_cart_interface - constructor
 //-------------------------------------------------
 
-device_gb_cart_interface::device_gb_cart_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device),
-		m_rom(nullptr),
-		m_rom_size(0), m_ram_bank(0), m_latch_bank(0), m_latch_bank2(0),
-		has_rumble(false),
-		has_timer(false),
-		has_battery(false)
+device_gb_cart_interface::device_gb_cart_interface(const machine_config &mconfig, device_t &device) :
+	device_interface(device, "gbcart"),
+	m_rom(nullptr),
+	m_rom_size(0), m_ram_bank(0), m_latch_bank(0), m_latch_bank2(0),
+	has_rumble(false),
+	has_timer(false),
+	has_battery(false)
 {
 }
 
@@ -140,7 +140,7 @@ void device_gb_cart_interface::ram_map_setup(uint8_t banks)
 gb_cart_slot_device_base::gb_cart_slot_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_image_interface(mconfig, *this),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_gb_cart_interface>(mconfig, *this),
 	m_type(GB_MBC_UNKNOWN),
 	m_cart(nullptr)
 {
@@ -170,7 +170,7 @@ gb_cart_slot_device_base::~gb_cart_slot_device_base()
 
 void gb_cart_slot_device_base::device_start()
 {
-	m_cart = dynamic_cast<device_gb_cart_interface *>(get_card_device());
+	m_cart = get_card_device();
 }
 
 
@@ -624,18 +624,18 @@ std::string megaduck_cart_slot_device::get_default_card_software(get_default_car
  read
  -------------------------------------------------*/
 
-READ8_MEMBER(gb_cart_slot_device_base::read_rom)
+uint8_t gb_cart_slot_device_base::read_rom(offs_t offset)
 {
 	if (m_cart)
-		return m_cart->read_rom(space, offset);
+		return m_cart->read_rom(offset);
 	else
 		return 0xff;
 }
 
-READ8_MEMBER(gb_cart_slot_device_base::read_ram)
+uint8_t gb_cart_slot_device_base::read_ram(offs_t offset)
 {
 	if (m_cart)
-		return m_cart->read_ram(space, offset);
+		return m_cart->read_ram(offset);
 	else
 		return 0xff;
 }
@@ -645,16 +645,16 @@ READ8_MEMBER(gb_cart_slot_device_base::read_ram)
  write
  -------------------------------------------------*/
 
-WRITE8_MEMBER(gb_cart_slot_device_base::write_bank)
+void gb_cart_slot_device_base::write_bank(offs_t offset, uint8_t data)
 {
 	if (m_cart)
-		m_cart->write_bank(space, offset, data);
+		m_cart->write_bank(offset, data);
 }
 
-WRITE8_MEMBER(gb_cart_slot_device_base::write_ram)
+void gb_cart_slot_device_base::write_ram(offs_t offset, uint8_t data)
 {
 	if (m_cart)
-		m_cart->write_ram(space, offset, data);
+		m_cart->write_ram(offset, data);
 }
 
 

@@ -36,8 +36,7 @@
 #else
 #define VERBOSE 0
 #endif
-
-#define LOG_MMC(x) do { if (VERBOSE) logerror x; } while (0)
+#include "logmacro.h"
 
 
 //-----------------------------------------
@@ -51,7 +50,7 @@
 //-------------------------------------------------
 
 kstudio_cart_interface::kstudio_cart_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device)
+	: device_interface(device, "kstudiocart")
 	, m_rom(nullptr), m_bank(0)
 {
 }
@@ -60,7 +59,7 @@ kstudio_cart_interface::~kstudio_cart_interface()
 {
 }
 
-READ8_MEMBER(kstudio_cart_interface::read)
+uint8_t kstudio_cart_interface::read(offs_t offset)
 {
 	return m_rom[(m_bank * 0x4000) + (offset & 0x3fff)];
 }
@@ -74,7 +73,7 @@ DEFINE_DEVICE_TYPE(NES_KSEXPANSION_SLOT, nes_kstudio_slot_device, "nes_ks_slot",
 nes_kstudio_slot_device::nes_kstudio_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, NES_KSEXPANSION_SLOT, tag, owner, clock)
 	, device_image_interface(mconfig, *this)
-	, device_slot_interface(mconfig, *this)
+	, device_single_card_slot_interface<kstudio_cart_interface>(mconfig, *this)
 	, m_cart(nullptr)
 {
 }
@@ -86,15 +85,15 @@ nes_kstudio_slot_device::~nes_kstudio_slot_device()
 
 void nes_kstudio_slot_device::device_start()
 {
-	m_cart = dynamic_cast<kstudio_cart_interface *>(get_card_device());
+	m_cart = get_card_device();
 }
 
-READ8_MEMBER(nes_kstudio_slot_device::read)
+uint8_t nes_kstudio_slot_device::read(offs_t offset)
 {
 	if (m_cart)
-		return m_cart->read(space, offset, mem_mask);
-
-	return 0xff;
+		return m_cart->read(offset);
+	else
+		return 0xff;
 }
 
 image_init_result nes_kstudio_slot_device::call_load()
@@ -225,31 +224,31 @@ void nes_karaokestudio_device::pcb_reset()
 
  -------------------------------------------------*/
 
-READ8_MEMBER(nes_karaokestudio_device::read_m)
+uint8_t nes_karaokestudio_device::read_m(offs_t offset)
 {
-	LOG_MMC(("karaoke studio read_m, offset: %04x\n", offset));
+	LOG("karaoke studio read_m, offset: %04x\n", offset);
 	return m_mic_ipt->read();
 }
 
-READ8_MEMBER(nes_karaokestudio_device::read_h)
+uint8_t nes_karaokestudio_device::read_h(offs_t offset)
 {
-	LOG_MMC(("karaoke studio read_h, offset: %04x\n", offset));
+	LOG("karaoke studio read_h, offset: %04x\n", offset);
 	// this shall be the proper code, but it's a bit slower, so we access directly the subcart below
-	//return m_subslot->read(space, offset, mem_mask);
+	//return m_subslot->read(offset);
 
 	// access expansion cart only if all of the followings are verified
 	// * we are in $8000-$bfff range
 	// * there has been a bankswitch write to map the expansion to such range
 	// * there actually is an expansion cart mounted
 	if (offset < 0x4000 && m_exp_active && m_subslot->m_cart)
-		return m_subslot->m_cart->read(space, offset, mem_mask);
+		return m_subslot->m_cart->read(offset);
 	else
 		return hi_access_rom(offset);
 }
 
-WRITE8_MEMBER(nes_karaokestudio_device::write_h)
+void nes_karaokestudio_device::write_h(offs_t offset, uint8_t data)
 {
-	LOG_MMC(("karaoke studio write_h, offset: %04x, data: %02x\n", offset, data));
+	LOG("karaoke studio write_h, offset: %04x, data: %02x\n", offset, data);
 	// bit3 1 = M ROM (main unit), 0=E ROM (expansion)
 	// HACK(?): currently it is not clear how the unit acknowledges the presence of the expansion
 	// cart (when expansion is present, code keeps switching both from the expansion rom and from
@@ -290,11 +289,13 @@ ioport_constructor nes_karaokestudio_device::device_input_ports() const
 //  CART SLOT
 //-------------------------------------------------
 
-static SLOT_INTERFACE_START(karaoke_studio_cart)
-	SLOT_INTERFACE_INTERNAL("ks_exp", NES_KSEXPANSION_ROM)
-SLOT_INTERFACE_END
+static void karaoke_studio_cart(device_slot_interface &device)
+{
+	device.option_add_internal("ks_exp", NES_KSEXPANSION_ROM);
+}
 
 
-MACHINE_CONFIG_START(nes_karaokestudio_device::device_add_mconfig)
-	MCFG_KSTUDIO_MINICART_ADD("exp_slot", karaoke_studio_cart)
-MACHINE_CONFIG_END
+void nes_karaokestudio_device::device_add_mconfig(machine_config &config)
+{
+	NES_KSEXPANSION_SLOT(config, m_subslot, karaoke_studio_cart);
+}

@@ -66,6 +66,7 @@ Final Fight (USA 900613)                                           89624B-3   S2
 Final Fight (Japan)                                                ?          S222B            ?     ?            CPS-B-04  DL-0411-10005
 Final Fight (Japan 900112)                                         89625B-1   S222B            LWIO  88622-C-5    CPS-B-01  DL-0411-10001  None
 Final Fight (Japan 900305)                                         88622B-3   S222B            LWIO  88622-C-5    CPS-B-02  DL-0411-10002  None
+Final Fight (Japan 900405)                                         88622B-2   S222B            LWIO  88622-C-5    CPS-B-03  DL-0411-10003  None
 Final Fight (Japan 900613)                                         89625B-1   S222B            LWIO  88622-C-5    CPS-B-05  DL-0411-10006  None
 
 1941: Counter Attack (World)                                 1990  89624B-3   YI24B            IOB1  88622-C-5    CPS-B-05  DL-0411-10006  None
@@ -97,6 +98,7 @@ Nemo (World 901130)                                                89624B-3   NM
 Nemo (Japan 901120)                                                89625B-1   NM22B            ?     ?            CPS-B-15  DL-0411-10010
 
 Street Fighter II: The World Warrior (World 910129)          1991  90629B-2   STF29            IOB1  90632C-1     CPS-B-17  DL-0411-10012  C632
+Street Fighter II: The World Warrior (World 910204)                89625B-1   STF29?           IOB1  90632C-1     CPS-B-17  DL-0411-10012  C632
 Street Fighter II: The World Warrior (World 910214)                90629B-2   STF29            IOB1  90632C-1     CPS-B-17  DL-0411-10012  C632
 Street Fighter II: The World Warrior (World 910228)                90629B-3   STF29            IOB2  90632C-1     CPS-B-18  DL-0411-10013  C632B
 Street Fighter II: The World Warrior (World 910318)                90629B-3   STF29            IOB1  90632C-1     CPS-B-05  DL-0411-10006  C632
@@ -108,6 +110,7 @@ Street Fighter II: The World Warrior (USA 910306)                  90629B-3   ST
 Street Fighter II: The World Warrior (USA 910318)                  90629B-3   STF29            IOB1  90632C-1     CPS-B-05  DL-0411-10006  C632
 Street Fighter II: The World Warrior (USA 910411)                  90629B-3   STF29            IOB1  90632C-1     CPS-B-15  DL-0411-10010  C632
 Street Fighter II: The World Warrior (USA 910522, Rev. G)          90629B-3   STF29            IOB1  90632C-1     CPS-B-11  DL-0411-10004  C632
+Street Fighter II: The World Warrior (USA 910522, Rev. H)          90629B-3   STF29            IOB1  90632C-1     CPS-B-13  DL-0411-10008  C632
 Street Fighter II: The World Warrior (USA 910522, Rev. I)          90629B-3   STF29            IOB1  90632C-1     CPS-B-14  DL-0411-10009  C632
 Street Fighter II: The World Warrior (USA 911101)                  90629B-3   STF29            IOB1  90632C-1     CPS-B-17  DL-0411-10012  C632
 Street Fighter II: The World Warrior (Japan 910214)                90629B-2   STF29            IOB1  90632C-1     CPS-B-17  DL-0411-10012  C632
@@ -124,16 +127,17 @@ Three Wonders* (USA 910520)                                        89624B-3   RT
 Wonder 3* (Japan 910520)                                           89625B-1   RT22B            IOB1  90630C-4     CPS-B-21  DL-0921-10014          IOC1
 
 The King of Dragons* (World 910711)                          1991  90629B-3   KD29B            IOB1  90631C-5     CPS-B-21  DL-0921-10014  C632    IOC1
+The King of Dragons* (World 910731)                                90629B-3   KD29B            IOB1  90631C-5     CPS-B-21  DL-0921-10014  C632    IOC1
 The King of Dragons* (World 910805)                                90629B-3   KD29B            IOB1  90631C-5     CPS-B-21  DL-0921-10014  C632    IOC1
 The King of Dragons* (USA 910910)                                  90629B-3   KD29B            IOB1  90631C-5     CPS-B-21  DL-0921-10014  C632    IOC1
 The King of Dragons* (Japan 910805, B-Board 89625B-1)              89625B-1   KD22B            IOB1  90631C-5     CPS-B-21  DL-0921-10014  C632    IOC1
 The King of Dragons* (Japan 910805, B-Board 90629B-3)              90629B-3   KD29B            IOB1  90631C-5     CPS-B-21  DL-0921-10014  C632    IOC1
 
 Captain Commando* (World 911014)                             1991  91635B-2   CC63B    CCPRG   IOB1  90631C-5     CPS-B-21  DL-0921-10014  C632    IOC1
-Captain Commando* (World 911202)                                   91635B-2   CC63B    CCPRG1  IOB1  90631C-5     CPS-B-21  DL-0921-10014  C632B   IOC1
+Captain Commando* (World 911202)                                   91635B-2   CC63B    CCPRG1  IOB1  90631C-5     CPS-B-21  DL-0921-10014  C632^   IOC1
 Captain Commando* (USA 910928)                                     91635B-2   CC63B    CCPRG1  IOB1  90631C-5     CPS-B-21  DL-0921-10014  C632    IOC1
 Captain Commando* (Japan 910928)                                   91634B-2   CC63B    CCPRG   IOB1  90631C-5     CPS-B-21  DL-0921-10014  C632    IOC1
-Captain Commando* (Japan 911202)                                   91634B-2   CC63B    CCPRG1  IOB1  90631C-5     CPS-B-21  DL-0921-10014  C632B   IOC1
+Captain Commando* (Japan 911202)                                   91634B-2   CC63B    CCPRG1  IOB1  90631C-5     CPS-B-21  DL-0921-10014  C632^   IOC1
 
 Knights of the Round* (World 911127)                         1991  91635B-2   KR63B    BPRG1   IOB1  90631C-5     CPS-B-21  DL-0921-10014  C632    IOC1
 Knights of the Round* (USA 911127)                                 91635B-2   KR63B    BPRG1   IOB1  90631C-5     CPS-B-21  DL-0921-10014  C632    IOC1
@@ -209,8 +213,9 @@ Ganbare! Marine Kun (Japan 2K0411)                           2000  91634B-2   GB
 
 @the original number (CPS-B-01) was scratched out and "04" stamped over it.
 *denotes Suicide Battery
+^c632b chips seen, but all variants of the game read the same c board io ports so the fusemap must be the same, perhaps incorrectly marked?
 
-The C628/C632 PALs on some C-boards probably handle the extra inputs (6 buttons/third player).
+The C628/C632 PALs on some C-boards handle the io for games with more than 3 buttons or more than 2 players.
 
 You can set the suicide CPS-B-21 chips to their default layer register and priority bit values
 if you pull pins 45 and 46 high (floating the pins seems to work, too). The default is the same
@@ -1401,6 +1406,7 @@ static const struct gfx_range mapper_pokonyan_table[] =
 	{ 0 }
 };
 
+// a game without an entry here defaults to cps2 mapper (eg. some games in fcrash.cpp)
 static const struct CPS1config cps1_config_table[]=
 {
 	/* name         CPSB          gfx mapper   in2  in3  out2   kludge */
@@ -1440,7 +1446,8 @@ static const struct CPS1config cps1_config_table[]=
 	{"ffightj",     CPS_B_04,     mapper_S224B },   // wrong, this set uses S222B
 	{"ffightj1",    CPS_B_01,     mapper_S224B },   // wrong, this set uses S222B
 	{"ffightj2",    CPS_B_02,     mapper_S224B },   // wrong, this set uses S222B
-	{"ffightj3",    CPS_B_05,     mapper_S224B },   // wrong, this set uses S222B
+	{"ffightj3",    CPS_B_03,     mapper_S224B },   // wrong, this set uses S222B
+	{"ffightj4",    CPS_B_05,     mapper_S224B },   // wrong, this set uses S222B
 	{"ffightjh",    CPS_B_01,     mapper_S224B },   // wrong, ffightjh hack doesn't even use the S222B PAL, since replaced with a GAL.
 	{"1941",        CPS_B_05,     mapper_YI24B },
 	{"1941r1",      CPS_B_05,     mapper_YI24B },
@@ -1469,10 +1476,12 @@ static const struct CPS1config cps1_config_table[]=
 	{"cawingj",     CPS_B_16,     mapper_CA22B },   // equivalent to CA24B
 	{"cawingbl",    CPS_B_16,     mapper_CA22B },   // equivalent to CA24B
 	{"sf2",         CPS_B_11,     mapper_STF29,  0x36 },
+	{"sf2ea",       CPS_B_17,     mapper_STF29,  0x36 },
 	{"sf2eb",       CPS_B_17,     mapper_STF29,  0x36 },
 	{"sf2ed",       CPS_B_05,     mapper_STF29,  0x36 },
 	{"sf2ee",       CPS_B_18,     mapper_STF29,  0x3c },
 	{"sf2em",       CPS_B_17,     mapper_STF29,  0x36 },
+	{"sf2en",       CPS_B_17,     mapper_STF29,  0x36 },
 	{"sf2ebbl",     CPS_B_17,     mapper_STF29,  0x36, 0, 0, 1  },
 	{"sf2ebbl2",    CPS_B_17,     mapper_STF29,  0x36, 0, 0, 1  },
 	{"sf2ebbl3",    CPS_B_17,     mapper_STF29,  0x36, 0, 0, 1  },
@@ -1485,6 +1494,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"sf2ue",       CPS_B_18,     mapper_STF29,  0x3c },
 	{"sf2uf",       CPS_B_15,     mapper_STF29,  0x36 },
 	{"sf2ug",       CPS_B_11,     mapper_STF29,  0x36 },
+	{"sf2uh",       CPS_B_13,     mapper_STF29,  0x36 },
 	{"sf2ui",       CPS_B_14,     mapper_STF29,  0x36 },
 	{"sf2uk",       CPS_B_17,     mapper_STF29,  0x36 },
 	{"sf2j",        CPS_B_13,     mapper_STF29,  0x36 },
@@ -1509,6 +1519,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"3wondersh",   HACK_B_2,     mapper_RT24B },  // one port is changed from 3wonders, and no protection
 	{"kod",         CPS_B_21_BT2, mapper_KD29B,  0x36, 0, 0x34 },
 	{"kodr1",       CPS_B_21_BT2, mapper_KD29B,  0x36, 0, 0x34 },
+	{"kodr2",       CPS_B_21_BT2, mapper_KD29B,  0x36, 0, 0x34 },
 	{"kodu",        CPS_B_21_BT2, mapper_KD29B,  0x36, 0, 0x34 },
 	{"kodj",        CPS_B_21_BT2, mapper_KD29B,  0x36, 0, 0x34 },
 	{"kodja",       CPS_B_21_BT2, mapper_KD29B,  0x36, 0, 0x34 },   // wrong, this set uses KD22B, still not dumped
@@ -1519,12 +1530,14 @@ static const struct CPS1config cps1_config_table[]=
 	{"captcommj",   CPS_B_21_BT3, mapper_CC63B,  0x36, 0x38, 0x34 },
 	{"captcommjr1", CPS_B_21_BT3, mapper_CC63B,  0x36, 0x38, 0x34 },
 	{"captcommb",   CPS_B_21_BT3, mapper_CC63B,  0x36, 0x38, 0x34, 3 },
+	{"captcommb2",  CPS_B_21_BT4, mapper_CC63B },  // junk around health bar with default cps2 mapper, uses BT4(knights) config
 	{"knights",     CPS_B_21_BT4, mapper_KR63B,  0x36, 0, 0x34 },
 	{"knightsu",    CPS_B_21_BT4, mapper_KR63B,  0x36, 0, 0x34 },
 	{"knightsj",    CPS_B_21_BT4, mapper_KR63B,  0x36, 0, 0x34 },
 	{"knightsja",   CPS_B_21_BT4, mapper_KR63B,  0x36, 0, 0x34 },   // wrong, this set uses KR22B, still not dumped
 	{"knightsb2",   CPS_B_21_BT4, mapper_KR63B,  0x36, 0, 0x34 },   // wrong, knightsb bootleg doesn't use the KR63B PAL
 	//{"knightsb",    CPS_B_21_BT4, mapper_KR63B,  0x36, 0, 0x34 },   // wrong, knightsb bootleg doesn't use the KR63B PAL
+	{"knightsb3",   CPS_B_21_BT4, mapper_KR63B },
 	{"pokonyan",    CPS_B_21_DEF, mapper_pokonyan, 0x36 },
 	{"sf2ce",       CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2ceea",     CPS_B_21_DEF, mapper_S9263B, 0x36 },
@@ -1540,6 +1553,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"sf2rb2",      CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2rb3",      CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2red",      CPS_B_21_DEF, mapper_S9263B, 0x36 },
+	{"sf2redp2",    CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2v004",     CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2acc",      CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2ceblp",    CPS_B_21_DEF, mapper_S9263B, 0x36 },
@@ -1548,7 +1562,9 @@ static const struct CPS1config cps1_config_table[]=
 	{"sf2accp2",    CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2amf",      CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 }, // probably wrong but this set is not completely dumped anyway
 	{"sf2amf2",     CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
+	{"sf2amf3",     CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
 	{"sf2dkot2",    CPS_B_21_DEF, mapper_S9263B, 0x36 },
+	{"sf2level",    HACK_B_1,     mapper_S9263B, 0,    0, 0, 2 },
 	{"sf2m1",       CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2m2",       CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
 	{"sf2m3",       HACK_B_1,     mapper_S9263B, 0,    0, 0, 2 },
@@ -1569,7 +1585,12 @@ static const struct CPS1config cps1_config_table[]=
 	{"sf2b",        CPS_B_17,     mapper_STF29,  0x36, 0, 0, 1 },
 	{"sf2b2",       CPS_B_17,     mapper_STF29,  0x36, 0, 0, 1 },
 	{"sf2ceupl",    HACK_B_1,     mapper_S9263B, 0x36, 0, 0, 1 },
-	{"sf2rules",    HACK_B_1,     mapper_S9263B, 0,    0, 0, 2 },
+	{"sf2rules",    HACK_B_1,     mapper_S9263B, 0x36, 0, 0, 2 },
+	{"sf2ceds6",    HACK_B_1,     mapper_S9263B, 0,    0, 0, 2 },
+	{"sf2cems6a",   HACK_B_1,     mapper_S9263B, 0,    0, 0, 2 },
+	{"sf2cems6b",   HACK_B_1,     mapper_S9263B, 0,    0, 0, 2 },
+	{"sf2cems6c",   HACK_B_1,     mapper_S9263B, 0,    0, 0, 2 },
+	{"sf2re",       HACK_B_1,     mapper_S9263B, 0,    0, 0, 2 },
 	{"varth",       CPS_B_04,     mapper_VA63B },   /* CPSB test has been patched out (60=0008) register is also written to, possibly leftover from development */  // wrong, this set uses VA24B, dumped but equations still not added
 	{"varthb",      CPS_B_04,     mapper_VA63B, 0, 0, 0, 0x0F },
 	{"varthr1",     CPS_B_04,     mapper_VA63B },   /* CPSB test has been patched out (60=0008) register is also written to, possibly leftover from development */  // wrong, this set uses VA24B, dumped but equations still not added
@@ -1603,6 +1624,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"slammast",    CPS_B_21_QS4, mapper_MB63B },
 	{"slammastu",   CPS_B_21_QS4, mapper_MB63B },
 	{"slampic",     CPS_B_21_QS4, mapper_MB63B },
+	{"slampic2",    CPS_B_21_QS4, mapper_sfzch },  // default cps2 mapper breaks scroll layers
 	{"mbomberj",    CPS_B_21_QS4, mapper_MB63B },
 	{"mbombrd",     CPS_B_21_QS5, mapper_MB63B },
 	{"mbombrdj",    CPS_B_21_QS5, mapper_MB63B },
@@ -1796,10 +1818,12 @@ READ16_MEMBER(cps_state::cps1_cps_b_r)
 		return (m_cps_b_regs[m_game_config->mult_factor1 / 2] *
 				m_cps_b_regs[m_game_config->mult_factor2 / 2]) >> 16;
 
-	if (offset == m_game_config->in2_addr / 2)  /* Extra input ports (on C-board) */
+	/* Extra input ports (on C-board) */
+	if (m_game_config->in2_addr != 0 && offset == m_game_config->in2_addr / 2)
 		return ioport("IN2")->read();
 
-	if (offset == m_game_config->in3_addr / 2)  /* Player 4 controls (on C-board) ("Captain Commando") */
+	/* Player 4 controls (on C-board) ("Captain Commando") */
+	if (m_game_config->in3_addr != 0 && offset == m_game_config->in3_addr / 2)
 		return ioport("IN3")->read();
 
 	if (m_cps_version == 2)
@@ -1845,16 +1869,16 @@ WRITE16_MEMBER(cps_state::cps1_cps_b_w)
 
 
 	// additional outputs on C-board
-	if (offset == m_game_config->out2_addr / 2)
+	if (m_game_config->out2_addr != 0 && offset == m_game_config->out2_addr / 2)
 	{
 		if (ACCESSING_BITS_0_7)
 		{
 			if (m_game_config->cpsb_value == 0x0402)    // Mercs (CN2 connector)
 			{
 				machine().bookkeeping().coin_lockout_w(2, ~data & 0x01);
-				output().set_led_value(0, data & 0x02);
-				output().set_led_value(1, data & 0x04);
-				output().set_led_value(2, data & 0x08);
+				m_led_cboard[0] = BIT(data, 1);
+				m_led_cboard[1] = BIT(data, 2);
+				m_led_cboard[2] = BIT(data, 3);
 			}
 			else    // kod, captcomm, knights
 			{
@@ -1884,7 +1908,7 @@ WRITE16_MEMBER(cps_state::cps1_cps_b_w)
 }
 
 
-void cps_state::unshuffle( uint64_t *buf, int len )
+void cps2_state::unshuffle( uint64_t *buf, int len )
 {
 	int i;
 	uint64_t t;
@@ -1908,7 +1932,7 @@ void cps_state::unshuffle( uint64_t *buf, int len )
 }
 
 
-void cps_state::cps2_gfx_decode()
+void cps2_state::cps2_gfx_decode()
 {
 	const int banksize = 0x200000;
 	int size = memregion("gfx")->bytes();
@@ -1919,19 +1943,17 @@ void cps_state::cps2_gfx_decode()
 }
 
 
-DRIVER_INIT_MEMBER(cps_state,cps1)
+void cps_state::init_cps1()
 {
 	m_scanline1 = 0;
 	m_scanline2 = 0;
 	m_scancalls = 0;
 	m_last_sprite_offset = 0;
-	m_pri_ctrl = 0;
-	m_objram_bank = 0;
 }
 
 
 
-DRIVER_INIT_MEMBER(cps_state,cps2_video)
+void cps2_state::init_cps2_video()
 {
 	cps2_gfx_decode();
 
@@ -2240,25 +2262,22 @@ void cps_state::cps1_update_transmasks()
 	}
 }
 
-VIDEO_START_MEMBER(cps_state,cps)
+void cps_state::video_start()
 {
-	int i;
-
 	MACHINE_RESET_CALL_MEMBER(cps);
 
 	/* Put in some const */
 	m_scroll_size    = 0x4000;  /* scroll1, scroll2, scroll3 */
 	m_obj_size       = 0x0800;
-	m_cps2_obj_size  = 0x2000;
 	m_other_size     = 0x0800;
 	m_palette_align  = 0x0400;  /* minimum alignment is a single palette page (512 colors). Verified on pcb. */
 	m_palette_size   = cps1_palette_entries * 32; /* Size of palette RAM */
 	m_stars_rom_size = 0x2000;  /* first 0x4000 of gfx ROM are used, but 0x0000-0x1fff is == 0x2000-0x3fff */
 
 	/* create tilemaps */
-	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cps_state::get_tile0_info),this), tilemap_mapper_delegate(FUNC(cps_state::tilemap0_scan),this),  8,  8, 64, 64);
-	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cps_state::get_tile1_info),this), tilemap_mapper_delegate(FUNC(cps_state::tilemap1_scan),this), 16, 16, 64, 64);
-	m_bg_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cps_state::get_tile2_info),this), tilemap_mapper_delegate(FUNC(cps_state::tilemap2_scan),this), 32, 32, 64, 64);
+	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cps_state::get_tile0_info)), tilemap_mapper_delegate(*this, FUNC(cps_state::tilemap0_scan)),  8,  8, 64, 64);
+	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cps_state::get_tile1_info)), tilemap_mapper_delegate(*this, FUNC(cps_state::tilemap1_scan)), 16, 16, 64, 64);
+	m_bg_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cps_state::get_tile2_info)), tilemap_mapper_delegate(*this, FUNC(cps_state::tilemap2_scan)), 32, 32, 64, 64);
 
 	/* create empty tiles */
 	memset(m_empty_tile, 0x0f, sizeof(m_empty_tile));
@@ -2266,24 +2285,12 @@ VIDEO_START_MEMBER(cps_state,cps)
 	/* front masks will change at runtime to handle sprite occluding */
 	cps1_update_transmasks();
 
-	for (i = 0; i < cps1_palette_entries * 16; i++)
-		m_palette->set_pen_color(i, rgb_t(0,0,0));
-
 	m_buffered_obj = make_unique_clear<uint16_t[]>(m_obj_size / 2);
-
-	if (m_cps_version == 2)
-		m_cps2_buffered_obj = make_unique_clear<uint16_t[]>(m_cps2_obj_size / 2);
 
 	/* clear RAM regions */
 	memset(m_gfxram, 0, m_gfxram.bytes());   /* Clear GFX RAM */
 	memset(m_cps_a_regs, 0, 0x40);   /* Clear CPS-A registers */
 	memset(m_cps_b_regs, 0, 0x40);   /* Clear CPS-B registers */
-
-	if (m_cps_version == 2)
-	{
-		memset(m_objram1, 0, m_cps2_obj_size);
-		memset(m_objram2, 0, m_cps2_obj_size);
-	}
 
 	/* Put in some defaults */
 	m_cps_a_regs[CPS1_OBJ_BASE]     = 0x9200;
@@ -2293,7 +2300,8 @@ VIDEO_START_MEMBER(cps_state,cps)
 	m_cps_a_regs[CPS1_OTHER_BASE]   = 0x9100;
 
 	/* This should never be hit, since game_config is set in machine_reset */
-	assert_always(m_game_config, "state_game_config hasn't been set up yet");
+	if (!m_game_config)
+		throw emu_fatalerror("cps_state::video_start: m_game_config hasn't been set up yet");
 
 
 	/* Set up old base */
@@ -2304,6 +2312,8 @@ VIDEO_START_MEMBER(cps_state,cps)
 	m_other = nullptr;
 	cps1_get_video_base();   /* Calculate base pointers */
 	cps1_get_video_base();   /* Calculate old base pointers */
+
+	m_screen->register_screen_bitmap(m_dummy_bitmap);
 
 	/* state save register */
 	save_item(NAME(m_scanline1));
@@ -2324,29 +2334,26 @@ VIDEO_START_MEMBER(cps_state,cps)
 	save_item(NAME(m_stars_enabled));
 #endif
 	save_item(NAME(m_last_sprite_offset));
-	save_item(NAME(m_pri_ctrl));
-	save_item(NAME(m_objram_bank));
 
-	save_pointer(NAME(m_buffered_obj.get()), m_obj_size / 2);
-	if (m_cps_version == 2)
-	{
-		save_item(NAME(m_cps2_last_sprite_offset));
-		save_pointer(NAME(m_cps2_buffered_obj.get()), m_cps2_obj_size / 2);
-	}
+	save_pointer(NAME(m_buffered_obj), m_obj_size / 2);
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(cps_state::cps1_get_video_base), this));
 }
 
-VIDEO_START_MEMBER(cps_state,cps1)
+void cps2_state::video_start()
 {
-	m_cps_version = 1;
-	VIDEO_START_CALL_MEMBER(cps);
-}
+	cps_state::video_start();
 
-VIDEO_START_MEMBER(cps_state,cps2)
-{
-	m_cps_version = 2;
-	VIDEO_START_CALL_MEMBER(cps);
+	m_cps2_obj_size = 0x2000;
+	m_cps2_buffered_obj = make_unique_clear<uint16_t[]>(m_cps2_obj_size / 2);
+
+	memset(m_objram1, 0, m_cps2_obj_size);
+	memset(m_objram2, 0, m_cps2_obj_size);
+
+	save_item(NAME(m_cps2_last_sprite_offset));
+	save_pointer(NAME(m_cps2_buffered_obj), m_cps2_obj_size / 2);
+	save_item(NAME(m_pri_ctrl));
+	save_item(NAME(m_objram_bank));
 }
 
 /***************************************************************************
@@ -2386,7 +2393,7 @@ void cps_state::cps1_build_palette( const uint16_t* const palette_base )
 				g = ((palette >> 4) & 0x0f) * 0x11 * bright / 0x2d;
 				b = ((palette >> 0) & 0x0f) * 0x11 * bright / 0x2d;
 
-				m_palette->set_pen_color (0x200 * page + offset, rgb_t(r, g, b));
+				m_palette->set_pen_color(0x200 * page + offset, rgb_t(r, g, b));
 			}
 		}
 		else
@@ -2434,7 +2441,7 @@ void cps_state::cps1_build_palette( const uint16_t* const palette_base )
 
 ***************************************************************************/
 
-void cps_state::cps1_find_last_sprite()    /* Find the offset of last sprite */
+void cps_state::find_last_sprite()    /* Find the offset of last sprite */
 {
 	int offset = 0;
 	/* Locate the end of table marker */
@@ -2625,13 +2632,13 @@ void cps_state::cps1_render_sprites( screen_device &screen, bitmap_ind16 &bitmap
 
 
 
-WRITE16_MEMBER(cps_state::cps2_objram_bank_w)
+WRITE16_MEMBER(cps2_state::cps2_objram_bank_w)
 {
 	if (ACCESSING_BITS_0_7)
 		m_objram_bank = data & 1;
 }
 
-READ16_MEMBER(cps_state::cps2_objram1_r)
+READ16_MEMBER(cps2_state::cps2_objram1_r)
 {
 	if (m_objram_bank & 1)
 		return m_objram2[offset];
@@ -2639,7 +2646,7 @@ READ16_MEMBER(cps_state::cps2_objram1_r)
 		return m_objram1[offset];
 }
 
-READ16_MEMBER(cps_state::cps2_objram2_r)
+READ16_MEMBER(cps2_state::cps2_objram2_r)
 {
 	if (m_objram_bank & 1)
 		return m_objram1[offset];
@@ -2647,7 +2654,7 @@ READ16_MEMBER(cps_state::cps2_objram2_r)
 		return m_objram2[offset];
 }
 
-WRITE16_MEMBER(cps_state::cps2_objram1_w)
+WRITE16_MEMBER(cps2_state::cps2_objram1_w)
 {
 	if (m_objram_bank & 1)
 		COMBINE_DATA(&m_objram2[offset]);
@@ -2655,7 +2662,7 @@ WRITE16_MEMBER(cps_state::cps2_objram1_w)
 		COMBINE_DATA(&m_objram1[offset]);
 }
 
-WRITE16_MEMBER(cps_state::cps2_objram2_w)
+WRITE16_MEMBER(cps2_state::cps2_objram2_w)
 {
 	if (m_objram_bank & 1)
 		COMBINE_DATA(&m_objram1[offset]);
@@ -2663,7 +2670,7 @@ WRITE16_MEMBER(cps_state::cps2_objram2_w)
 		COMBINE_DATA(&m_objram2[offset]);
 }
 
-uint16_t *cps_state::cps2_objbase()
+uint16_t *cps2_state::cps2_objbase()
 {
 	int baseptr;
 	baseptr = 0x7000;
@@ -2680,8 +2687,10 @@ uint16_t *cps_state::cps2_objbase()
 }
 
 
-void cps_state::cps2_find_last_sprite()    /* Find the offset of last sprite */
+void cps2_state::find_last_sprite()    /* Find the offset of last sprite */
 {
+	cps_state::find_last_sprite();
+
 	int offset = 0;
 	uint16_t *base = m_cps2_buffered_obj.get();
 
@@ -2701,7 +2710,7 @@ void cps_state::cps2_find_last_sprite()    /* Find the offset of last sprite */
 	m_cps2_last_sprite_offset = m_cps2_obj_size / 2 - 4;
 }
 
-void cps_state::cps2_render_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int *primasks )
+void cps2_state::cps2_render_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int *primasks )
 {
 #define DRAWSPRITE(CODE,COLOR,FLIPX,FLIPY,SX,SY)                                    \
 {                                                                                   \
@@ -2930,7 +2939,6 @@ void cps_state::cps1_render_layer( screen_device &screen, bitmap_ind16 &bitmap, 
 
 void cps_state::cps1_render_high_layer( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer )
 {
-	bitmap_ind16 dummy_bitmap;
 	switch (layer)
 	{
 		case 0:
@@ -2939,7 +2947,7 @@ void cps_state::cps1_render_high_layer( screen_device &screen, bitmap_ind16 &bit
 		case 1:
 		case 2:
 		case 3:
-			m_bg_tilemap[layer - 1]->draw(screen, dummy_bitmap, cliprect, TILEMAP_DRAW_LAYER0, 1);
+			m_bg_tilemap[layer - 1]->draw(screen, m_dummy_bitmap, cliprect, TILEMAP_DRAW_LAYER0, 1);
 			break;
 	}
 }
@@ -2951,23 +2959,110 @@ void cps_state::cps1_render_high_layer( screen_device &screen, bitmap_ind16 &bit
 
 ***************************************************************************/
 
+void cps_state::render_layers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	/* Draw layers (0 = sprites, 1-3 = tilemaps) */
+	int layercontrol = m_cps_b_regs[m_game_config->layer_control / 2];
+	int l0 = (layercontrol >> 0x06) & 03;
+	int l1 = (layercontrol >> 0x08) & 03;
+	int l2 = (layercontrol >> 0x0a) & 03;
+	int l3 = (layercontrol >> 0x0c) & 03;
+	screen.priority().fill(0, cliprect);
+
+	if (BIT(m_game_config->bootleg_kludge, 7))
+		cps1_build_palette(cps1_base(CPS1_PALETTE_BASE, m_palette_align));
+
+	cps1_render_layer(screen, bitmap, cliprect, l0, 0);
+
+	if (l1 == 0)
+		cps1_render_high_layer(screen, bitmap, cliprect, l0); /* prepare mask for sprites */
+
+	cps1_render_layer(screen, bitmap, cliprect, l1, 0);
+
+	if (l2 == 0)
+		cps1_render_high_layer(screen, bitmap, cliprect, l1); /* prepare mask for sprites */
+
+	cps1_render_layer(screen, bitmap, cliprect, l2, 0);
+
+	if (l3 == 0)
+		cps1_render_high_layer(screen, bitmap, cliprect, l2); /* prepare mask for sprites */
+
+	cps1_render_layer(screen, bitmap, cliprect, l3, 0);
+}
+
+void cps2_state::render_layers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	/* Draw layers (0 = sprites, 1-3 = tilemaps) */
+	int layercontrol = m_cps_b_regs[m_game_config->layer_control / 2];
+	int l0 = (layercontrol >> 0x06) & 03;
+	int l1 = (layercontrol >> 0x08) & 03;
+	int l2 = (layercontrol >> 0x0a) & 03;
+	int l3 = (layercontrol >> 0x0c) & 03;
+	screen.priority().fill(0, cliprect);
+
+	int primasks[8], i;
+	int l0pri = (m_pri_ctrl >> 4 * l0) & 0x0f;
+	int l1pri = (m_pri_ctrl >> 4 * l1) & 0x0f;
+	int l2pri = (m_pri_ctrl >> 4 * l2) & 0x0f;
+	int l3pri = (m_pri_ctrl >> 4 * l3) & 0x0f;
+
+#if 0
+if (    (m_output[CPS2_OBJ_BASE /2] != 0x7080 && m_output[CPS2_OBJ_BASE /2] != 0x7000) ||
+		m_output[CPS2_OBJ_UK1 /2] != 0x807d ||
+		(m_output[CPS2_OBJ_UK2 /2] != 0x0000 && m_output[CPS2_OBJ_UK2 /2] != 0x1101 && m_output[CPS2_OBJ_UK2 /2] != 0x0001))
+	popmessage("base %04x uk1 %04x uk2 %04x",
+			m_output[CPS2_OBJ_BASE /2],
+			m_output[CPS2_OBJ_UK1 /2],
+			m_output[CPS2_OBJ_UK2 /2]);
+
+if (0 && machine().input().code_pressed(KEYCODE_Z))
+	popmessage("order: %d (%d) %d (%d) %d (%d) %d (%d)",l0,l0pri,l1,l1pri,l2,l2pri,l3,l3pri);
+#endif
+
+	/* take out the CPS1 sprites layer */
+	if (l0 == 0) { l0 = l1; l1 = 0; l0pri = l1pri; }
+	if (l1 == 0) { l1 = l2; l2 = 0; l1pri = l2pri; }
+	if (l2 == 0) { l2 = l3; l3 = 0; l2pri = l3pri; }
+
+	{
+		int mask0 = 0xaa;
+		int mask1 = 0xcc;
+		if (l0pri > l1pri) mask0 &= ~0x88;
+		if (l0pri > l2pri) mask0 &= ~0xa0;
+		if (l1pri > l2pri) mask1 &= ~0xc0;
+
+		primasks[0] = 0xff;
+		for (i = 1; i < 8; i++)
+		{
+			if (i <= l0pri && i <= l1pri && i <= l2pri)
+			{
+				primasks[i] = 0xfe;
+				continue;
+			}
+			primasks[i] = 0;
+			if (i <= l0pri) primasks[i] |= mask0;
+			if (i <= l1pri) primasks[i] |= mask1;
+			if (i <= l2pri) primasks[i] |= 0xf0;
+		}
+	}
+
+	cps1_render_layer(screen, bitmap, cliprect, l0, 1);
+	cps1_render_layer(screen, bitmap, cliprect, l1, 2);
+	cps1_render_layer(screen, bitmap, cliprect, l2, 4);
+	cps2_render_sprites(screen, bitmap, cliprect, primasks);
+}
+
 uint32_t cps_state::screen_update_cps1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int layercontrol, l0, l1, l2, l3;
 	int videocontrol = m_cps_a_regs[CPS1_VIDEOCONTROL];
 
 	flip_screen_set(videocontrol & 0x8000);
-
-	layercontrol = m_cps_b_regs[m_game_config->layer_control / 2];
 
 	/* Get video memory base registers */
 	cps1_get_video_base();
 
 	/* Find the offset of the last sprite in the sprite table */
-	cps1_find_last_sprite();
-
-	if (m_cps_version == 2)
-		cps2_find_last_sprite();
+	find_last_sprite();
 
 	cps1_update_transmasks();
 
@@ -3017,89 +3112,7 @@ uint32_t cps_state::screen_update_cps1(screen_device &screen, bitmap_ind16 &bitm
 		cps1_render_stars(screen, bitmap, cliprect);
 	}
 
-	/* Draw layers (0 = sprites, 1-3 = tilemaps) */
-	l0 = (layercontrol >> 0x06) & 03;
-	l1 = (layercontrol >> 0x08) & 03;
-	l2 = (layercontrol >> 0x0a) & 03;
-	l3 = (layercontrol >> 0x0c) & 03;
-	screen.priority().fill(0, cliprect);
-
-	if (m_cps_version == 1)
-	{
-		if (BIT(m_game_config->bootleg_kludge, 7))
-			cps1_build_palette(cps1_base(CPS1_PALETTE_BASE, m_palette_align));
-
-		cps1_render_layer(screen, bitmap, cliprect, l0, 0);
-
-		if (l1 == 0)
-			cps1_render_high_layer(screen, bitmap, cliprect, l0); /* prepare mask for sprites */
-
-		cps1_render_layer(screen, bitmap, cliprect, l1, 0);
-
-		if (l2 == 0)
-			cps1_render_high_layer(screen, bitmap, cliprect, l1); /* prepare mask for sprites */
-
-		cps1_render_layer(screen, bitmap, cliprect, l2, 0);
-
-		if (l3 == 0)
-			cps1_render_high_layer(screen, bitmap, cliprect, l2); /* prepare mask for sprites */
-
-		cps1_render_layer(screen, bitmap, cliprect, l3, 0);
-	}
-	else
-	{
-		int l0pri, l1pri, l2pri, l3pri;
-		int primasks[8], i;
-		l0pri = (m_pri_ctrl >> 4 * l0) & 0x0f;
-		l1pri = (m_pri_ctrl >> 4 * l1) & 0x0f;
-		l2pri = (m_pri_ctrl >> 4 * l2) & 0x0f;
-		l3pri = (m_pri_ctrl >> 4 * l3) & 0x0f;
-
-#if 0
-if (    (m_output[CPS2_OBJ_BASE /2] != 0x7080 && m_output[CPS2_OBJ_BASE /2] != 0x7000) ||
-		m_output[CPS2_OBJ_UK1 /2] != 0x807d ||
-		(m_output[CPS2_OBJ_UK2 /2] != 0x0000 && m_output[CPS2_OBJ_UK2 /2] != 0x1101 && m_output[CPS2_OBJ_UK2 /2] != 0x0001))
-	popmessage("base %04x uk1 %04x uk2 %04x",
-			m_output[CPS2_OBJ_BASE /2],
-			m_output[CPS2_OBJ_UK1 /2],
-			m_output[CPS2_OBJ_UK2 /2]);
-
-if (0 && machine().input().code_pressed(KEYCODE_Z))
-	popmessage("order: %d (%d) %d (%d) %d (%d) %d (%d)",l0,l0pri,l1,l1pri,l2,l2pri,l3,l3pri);
-#endif
-
-		/* take out the CPS1 sprites layer */
-		if (l0 == 0) { l0 = l1; l1 = 0; l0pri = l1pri; }
-		if (l1 == 0) { l1 = l2; l2 = 0; l1pri = l2pri; }
-		if (l2 == 0) { l2 = l3; l3 = 0; l2pri = l3pri; }
-
-		{
-			int mask0 = 0xaa;
-			int mask1 = 0xcc;
-			if (l0pri > l1pri) mask0 &= ~0x88;
-			if (l0pri > l2pri) mask0 &= ~0xa0;
-			if (l1pri > l2pri) mask1 &= ~0xc0;
-
-			primasks[0] = 0xff;
-			for (i = 1; i < 8; i++)
-			{
-				if (i <= l0pri && i <= l1pri && i <= l2pri)
-				{
-					primasks[i] = 0xfe;
-					continue;
-				}
-				primasks[i] = 0;
-				if (i <= l0pri) primasks[i] |= mask0;
-				if (i <= l1pri) primasks[i] |= mask1;
-				if (i <= l2pri) primasks[i] |= 0xf0;
-			}
-		}
-
-		cps1_render_layer(screen, bitmap, cliprect, l0, 1);
-		cps1_render_layer(screen, bitmap, cliprect, l1, 2);
-		cps1_render_layer(screen, bitmap, cliprect, l2, 4);
-		cps2_render_sprites(screen, bitmap, cliprect, primasks);
-	}
+	render_layers(screen, bitmap, cliprect);
 
 	return 0;
 }
@@ -3120,12 +3133,19 @@ WRITE_LINE_MEMBER(cps_state::screen_vblank_cps1)
 	}
 }
 
-void cps_state::cps2_set_sprite_priorities()
+
+uint32_t cps2_state::screen_update_cps2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	cps2_set_sprite_priorities();
+	return screen_update_cps1(screen, bitmap, cliprect);
+}
+
+void cps2_state::cps2_set_sprite_priorities()
 {
 	m_pri_ctrl = m_output[CPS2_OBJ_PRI /2];
 }
 
-void cps_state::cps2_objram_latch()
+void cps2_state::cps2_objram_latch()
 {
 	cps2_set_sprite_priorities();
 	memcpy(m_cps2_buffered_obj.get(), cps2_objbase(), m_cps2_obj_size);

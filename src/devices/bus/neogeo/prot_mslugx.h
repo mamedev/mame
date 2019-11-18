@@ -9,15 +9,12 @@
 
 DECLARE_DEVICE_TYPE(NG_MSLUGX_PROT, mslugx_prot_device)
 
-#define MCFG_MSLUGX_PROT_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, NG_MSLUGX_PROT, 0)
-
 
 class mslugx_prot_device :  public device_t
 {
 public:
 	// construction/destruction
-	mslugx_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mslugx_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	DECLARE_WRITE16_MEMBER( protection_w );
 	DECLARE_READ16_MEMBER( protection_r );

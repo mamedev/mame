@@ -23,6 +23,7 @@
 #include "effectmanager.h"
 #include "../frontend/mame/ui/menuitem.h"
 #include "../frontend/mame/ui/sliderchangednotifier.h"
+#include "render.h"
 
 class running_machine;
 class osd_window;
@@ -52,7 +53,8 @@ public:
 	chain_manager(running_machine& machine, osd_options& options, texture_manager& textures, target_manager& targets, effect_manager& effects, uint32_t window_index, slider_dirty_notifier& slider_notifier);
 	~chain_manager();
 
-	uint32_t handle_screen_chains(uint32_t view, render_primitive *starting_prim, osd_window& window);
+	uint32_t update_screen_textures(uint32_t view, render_primitive *starting_prim, osd_window& window);
+	uint32_t process_screen_chains(uint32_t view, osd_window& window);
 
 	// Getters
 	running_machine& machine() const { return m_machine; }
@@ -72,10 +74,46 @@ public:
 	// Setters
 	void restore_slider_settings(int32_t id, std::vector<std::vector<float>>& settings);
 
+	class screen_prim
+	{
+	public:
+		screen_prim() : m_prim(nullptr), m_screen_width(0), m_screen_height(0), m_quad_width(0), m_quad_height(0)
+			, m_tex_width(0), m_tex_height(0), m_rowpixels(0), m_palette_length(0), m_flags(0)
+		{
+		}
+
+		screen_prim(render_primitive *prim)
+		{
+			m_prim = prim;
+			m_screen_width = (uint16_t)floorf(prim->get_full_quad_width() + 0.5f);
+			m_screen_height = (uint16_t)floorf(prim->get_full_quad_height() + 0.5f);
+			m_quad_width = (uint16_t)floorf(prim->get_quad_width() + 0.5f);
+			m_quad_height = (uint16_t)floorf(prim->get_quad_height() + 0.5f);
+			m_tex_width = (float)prim->texture.width;
+			m_tex_height = (float)prim->texture.height;
+			m_rowpixels = prim->texture.rowpixels;
+			m_palette_length = prim->texture.palette_length;
+			m_flags = prim->flags;
+		}
+
+		render_primitive *m_prim;
+		uint16_t m_screen_width;
+		uint16_t m_screen_height;
+		uint16_t m_quad_width;
+		uint16_t m_quad_height;
+		float m_tex_width;
+		float m_tex_height;
+		int m_rowpixels;
+		uint32_t m_palette_length;
+		uint32_t m_flags;
+	};
+
 private:
 	void load_chains();
 	void destroy_chains();
 	void reload_chains();
+
+	void init_texture_converters();
 
 	void refresh_available_chains();
 	void destroy_unloaded_chains();
@@ -89,8 +127,8 @@ private:
 	void create_selection_slider(uint32_t screen_index);
 	bool needs_sliders();
 
-	std::vector<render_primitive*> count_screens(render_primitive* prim);
-	void process_screen_quad(uint32_t view, uint32_t screen, render_primitive* prim, osd_window &window);
+	uint32_t count_screens(render_primitive* prim);
+	void process_screen_quad(uint32_t view, uint32_t screen, screen_prim &prim, osd_window& window);
 
 	running_machine&            m_machine;
 	osd_options&                m_options;
@@ -106,6 +144,11 @@ private:
 	std::vector<ui::menu_item>  m_selection_sliders;
 	std::vector<std::unique_ptr<slider_state>> m_core_sliders;
 	std::vector<int32_t>        m_current_chain;
+	std::vector<bgfx_texture*>  m_screen_textures;
+	std::vector<bgfx_texture*>  m_screen_palettes;
+	std::vector<bgfx_effect*>   m_converters;
+	std::vector<screen_prim>    m_screen_prims;
+	std::vector<uint8_t>        m_palette_temp;
 
 	static const uint32_t       CHAIN_NONE;
 };

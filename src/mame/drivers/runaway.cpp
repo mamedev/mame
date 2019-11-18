@@ -16,7 +16,7 @@
 #include "includes/runaway.h"
 
 #include "cpu/m6502/m6502.h"
-#include "machine/atari_vg.h"
+#include "machine/74259.h"
 #include "sound/pokey.h"
 #include "speaker.h"
 
@@ -44,6 +44,8 @@ void runaway_state::machine_start()
 void runaway_state::machine_reset()
 {
 	m_interrupt_timer->adjust(m_screen->time_until_pos(16), 16);
+	if (m_earom.found())
+		earom_control_w(machine().dummy_space(), 0, 0);
 }
 
 
@@ -70,39 +72,54 @@ READ8_MEMBER(runaway_state::runaway_pot_r)
 }
 
 
-WRITE8_MEMBER(runaway_state::runaway_led_w)
-{
-	output().set_led_value(offset, ~data & 1);
-}
-
-
 WRITE8_MEMBER(runaway_state::runaway_irq_ack_w)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 
-void runaway_state::runaway_map(address_map &map)
+READ8_MEMBER(runaway_state::earom_read)
+{
+	return m_earom->data();
+}
+
+WRITE8_MEMBER(runaway_state::earom_write)
+{
+	m_earom->set_address(offset & 0x3f);
+	m_earom->set_data(data);
+}
+
+WRITE8_MEMBER(runaway_state::earom_control_w)
+{
+	// CK = DB0, C1 = /DB2, C2 = DB1, CS1 = DB3, /CS2 = GND
+	m_earom->set_control(BIT(data, 3), 1, !BIT(data, 2), BIT(data, 1));
+	m_earom->set_clk(BIT(data, 0));
+}
+
+
+void runaway_state::qwak_map(address_map &map)
 {
 	map(0x0000, 0x03ff).ram();
-	map(0x0400, 0x07bf).ram().w(this, FUNC(runaway_state::runaway_video_ram_w)).share("video_ram");
+	map(0x0400, 0x07bf).ram().w(FUNC(runaway_state::runaway_video_ram_w)).share("video_ram");
 	map(0x07c0, 0x07ff).ram().share("sprite_ram");
-	map(0x1000, 0x1000).w(this, FUNC(runaway_state::runaway_irq_ack_w));
-	map(0x1400, 0x143f).w("earom", FUNC(atari_vg_earom_device::write));
-	map(0x1800, 0x1800).w("earom", FUNC(atari_vg_earom_device::ctrl_w));
-	map(0x1c00, 0x1c0f).w(this, FUNC(runaway_state::runaway_paletteram_w));
-	map(0x2000, 0x2000).nopw(); /* coin counter? */
-	map(0x2001, 0x2001).nopw(); /* coin counter? */
-	map(0x2003, 0x2004).w(this, FUNC(runaway_state::runaway_led_w));
-	map(0x2005, 0x2005).w(this, FUNC(runaway_state::runaway_tile_bank_w));
+	map(0x1000, 0x1000).w(FUNC(runaway_state::runaway_irq_ack_w));
+	map(0x1c00, 0x1c0f).w(FUNC(runaway_state::runaway_paletteram_w));
+	map(0x2000, 0x2007).w("mainlatch", FUNC(ls259_device::write_d0));
 
-	map(0x3000, 0x3007).r(this, FUNC(runaway_state::runaway_input_r));
+	map(0x3000, 0x3007).r(FUNC(runaway_state::runaway_input_r));
 	map(0x4000, 0x4000).portr("4000");
-	map(0x5000, 0x5000).r("earom", FUNC(atari_vg_earom_device::read));
 	map(0x6000, 0x600f).rw("pokey1", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x7000, 0x700f).rw("pokey2", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x8000, 0xcfff).rom();
 	map(0xf000, 0xffff).rom(); /* for the interrupt vectors */
+}
+
+void runaway_state::runaway_map(address_map &map)
+{
+	qwak_map(map);
+	map(0x1400, 0x143f).w(FUNC(runaway_state::earom_write));
+	map(0x1800, 0x1800).w(FUNC(runaway_state::earom_control_w));
+	map(0x5000, 0x5000).r(FUNC(runaway_state::earom_read));
 }
 
 
@@ -316,73 +333,79 @@ static const gfx_layout qwak_sprite_layout =
 };
 
 
-static GFXDECODE_START( runaway )
+static GFXDECODE_START( gfx_runaway )
 	GFXDECODE_ENTRY( "gfx1", 0x000, runaway_tile_layout,   0, 1 )
 	GFXDECODE_ENTRY( "gfx1", 0x800, runaway_sprite_layout, 8, 1 )
 GFXDECODE_END
 
 
-static GFXDECODE_START( qwak )
+static GFXDECODE_START( gfx_qwak )
 	GFXDECODE_ENTRY( "gfx1", 0x800, qwak_tile_layout,   0, 1 )
 	GFXDECODE_ENTRY( "gfx1", 0x000, qwak_sprite_layout, 0, 1 )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(runaway_state::runaway)
-
+void runaway_state::runaway(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 12096000 / 8) /* ? */
-	MCFG_CPU_PROGRAM_MAP(runaway_map)
+	M6502(config, m_maincpu, 12096000 / 8); /* ? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &runaway_state::runaway_map);
 
+	ls259_device &mainlatch(LS259(config, "mainlatch"));
+	mainlatch.q_out_cb<0>().set_nop(); // coin counter?
+	mainlatch.q_out_cb<1>().set_nop(); // coin counter?
+	mainlatch.q_out_cb<3>().set_output("led0").invert();
+	mainlatch.q_out_cb<4>().set_output("led1").invert();
+	mainlatch.q_out_cb<5>().set(FUNC(runaway_state::tile_bank_w));
 
-	MCFG_ATARIVGEAROM_ADD("earom")
+	ER2055(config, m_earom);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(256, 263)
-	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(runaway_state, screen_update_runaway)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(256, 263);
+	m_screen->set_visarea(0, 255, 0, 239);
+	m_screen->set_screen_update(FUNC(runaway_state::screen_update_runaway));
+	m_screen->set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", runaway)
-	MCFG_PALETTE_ADD("palette", 16)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_runaway);
+	PALETTE(config, m_palette).set_entries(16);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("pokey1", POKEY, 12096000 / 8)
-	MCFG_POKEY_ALLPOT_R_CB(IOPORT("6008"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	pokey_device &pokey1(POKEY(config, "pokey1", 12096000 / 8));
+	pokey1.allpot_r().set_ioport("6008");
+	pokey1.add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_SOUND_ADD("pokey2", POKEY, 12096000 / 8)
-	MCFG_POKEY_POT0_R_CB(READ8(runaway_state, runaway_pot_r))
-	MCFG_POKEY_POT1_R_CB(READ8(runaway_state, runaway_pot_r))
-	MCFG_POKEY_POT2_R_CB(READ8(runaway_state, runaway_pot_r))
-	MCFG_POKEY_POT3_R_CB(READ8(runaway_state, runaway_pot_r))
-	MCFG_POKEY_POT4_R_CB(READ8(runaway_state, runaway_pot_r))
-	MCFG_POKEY_POT5_R_CB(READ8(runaway_state, runaway_pot_r))
-	MCFG_POKEY_POT6_R_CB(READ8(runaway_state, runaway_pot_r))
-	MCFG_POKEY_POT7_R_CB(READ8(runaway_state, runaway_pot_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	pokey_device &pokey2(POKEY(config, "pokey2", 12096000 / 8));
+	pokey2.pot_r<0>().set(FUNC(runaway_state::runaway_pot_r));
+	pokey2.pot_r<1>().set(FUNC(runaway_state::runaway_pot_r));
+	pokey2.pot_r<2>().set(FUNC(runaway_state::runaway_pot_r));
+	pokey2.pot_r<3>().set(FUNC(runaway_state::runaway_pot_r));
+	pokey2.pot_r<4>().set(FUNC(runaway_state::runaway_pot_r));
+	pokey2.pot_r<5>().set(FUNC(runaway_state::runaway_pot_r));
+	pokey2.pot_r<6>().set(FUNC(runaway_state::runaway_pot_r));
+	pokey2.pot_r<7>().set(FUNC(runaway_state::runaway_pot_r));
+	pokey2.add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
-
-MACHINE_CONFIG_START(runaway_state::qwak)
+void runaway_state::qwak(machine_config &config)
+{
 	runaway(config);
 
 	/* basic machine hardware */
+	m_maincpu->set_addrmap(AS_PROGRAM, &runaway_state::qwak_map);
+
+	config.device_remove("earom");
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", qwak)
+	m_gfxdecode->set_info(gfx_qwak);
 
 	MCFG_VIDEO_START_OVERRIDE(runaway_state,qwak)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(runaway_state, screen_update_qwak)
 
-MACHINE_CONFIG_END
-
+	m_screen->set_screen_update(FUNC(runaway_state::screen_update_qwak));
+}
 
 ROM_START( runaway )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -416,5 +439,5 @@ ROM_START( qwak )
 ROM_END
 
 
-GAME( 1982, qwak,    0, qwak,    qwak,    runaway_state, 0, ROT270, "Atari", "Qwak (prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, runaway, 0, runaway, runaway, runaway_state, 0, ROT0,   "Atari", "Runaway (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, qwak,    0, qwak,    qwak,    runaway_state, empty_init, ROT270, "Atari", "Qwak (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, runaway, 0, runaway, runaway, runaway_state, empty_init, ROT0,   "Atari", "Runaway (prototype)", MACHINE_SUPPORTS_SAVE )

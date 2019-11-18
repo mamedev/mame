@@ -34,14 +34,16 @@
 #elif defined(OSD_SDL)
 // SDL include
 #include <SDL2/SDL.h>
-#define KEY_TRANS_ENTRY0(mame, sdlsc, sdlkey, disc, virtual, uwp, ascii, UI) { ITEM_ID_##mame, SDL_SCANCODE_ ## sdlsc, SDLK_ ## sdlkey, ascii, "ITEM_ID_"#mame, (char *) UI }
-#define KEY_TRANS_ENTRY1(mame, sdlsc, sdlkey, disc, virtual, uwp, ascii)     { ITEM_ID_##mame, SDL_SCANCODE_ ## sdlsc, SDLK_ ## sdlkey, ascii, "ITEM_ID_"#mame, (char*) #mame }
+#define KEY_TRANS_ENTRY0(mame, sdlsc, sdlkey, disc, virtual, uwp, ascii, UI) { ITEM_ID_##mame, SDL_SCANCODE_ ## sdlsc, ascii, "ITEM_ID_"#mame, (char *) UI }
+#define KEY_TRANS_ENTRY1(mame, sdlsc, sdlkey, disc, virtual, uwp, ascii)     { ITEM_ID_##mame, SDL_SCANCODE_ ## sdlsc, ascii, "ITEM_ID_"#mame, (char*) #mame }
 #elif defined(OSD_UWP)
 #define KEY_TRANS_ENTRY0(mame, sdlsc, sdlkey, disc, virtual, uwp, ascii, UI) { ITEM_ID_##mame, KEY_ ## disc, Windows::System::VirtualKey:: ## uwp, ascii, "ITEM_ID_"#mame, (char *) UI }
 #define KEY_TRANS_ENTRY1(mame, sdlsc, sdlkey, disc, virtual, uwp, ascii)     { ITEM_ID_##mame, KEY_ ## disc, Windows::System::VirtualKey:: ## uwp, ascii, "ITEM_ID_"#mame, (char*) #mame }
 #else
 // osd mini
 #endif
+
+// FIXME: sdl_key can be removed from the table below. It is no longer used.
 
 #if defined(OSD_WINDOWS) || defined(OSD_SDL) || defined(OSD_UWP)
 key_trans_entry keyboard_trans_table::s_default_table[] =
@@ -162,6 +164,8 @@ key_trans_entry keyboard_trans_table::s_default_table[] =
 	KEY_TRANS_ENTRY1(TAB_PAD,      KP_TAB,       KP_TAB,       UNKNOWN,        0,              None,          0),
 	KEY_TRANS_ENTRY1(00_PAD,       KP_00,        KP_00,        UNKNOWN,        0,              None,          0),
 	KEY_TRANS_ENTRY1(000_PAD,      KP_000,       KP_000,       UNKNOWN,        0,              None,          0),
+	KEY_TRANS_ENTRY1(COMMA_PAD,    KP_COMMA,     KP_COMMA,     NUMPADCOMMA,    0,              None,          0),
+	KEY_TRANS_ENTRY1(EQUALS_PAD,   KP_EQUALS,    KP_EQUALS,    NUMPADEQUALS,   0,              None,          0),
 
 	// New keys introduced in Windows 2000. These have no MAME codes to
 	// preserve compatibility with old config files that may refer to them

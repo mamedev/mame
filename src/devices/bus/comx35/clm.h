@@ -13,6 +13,7 @@
 
 #include "exp.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 
 
 
@@ -41,8 +42,8 @@ protected:
 
 	// device_comx_expansion_card_interface overrides
 	virtual int comx_ef4_r() override;
-	virtual uint8_t comx_mrd_r(address_space &space, offs_t offset, int *extrom) override;
-	virtual void comx_mwr_w(address_space &space, offs_t offset, uint8_t data) override;
+	virtual uint8_t comx_mrd_r(offs_t offset, int *extrom) override;
+	virtual void comx_mwr_w(offs_t offset, uint8_t data) override;
 
 private:
 	MC6845_UPDATE_ROW( crtc_update_row );

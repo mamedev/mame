@@ -34,17 +34,17 @@ INPUT_PORTS_END
 
 
 
-MACHINE_CONFIG_START(bfmsys83_state::bfmsys83)
-	MCFG_CPU_ADD("maincpu", M6802, 40000000/4)
-	MCFG_CPU_PROGRAM_MAP(memmap)
+void bfmsys83_state::bfmsys83(machine_config &config)
+{
+	M6802(config, m_maincpu, 40000000/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &bfmsys83_state::memmap);
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd",AY8912, 40000000/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER(config, "mono").front_center();
+	AY8912(config, "aysnd", 40000000/4).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 /*
-DRIVER_INIT_MEMBER(bfmsys83_state,decode)
+void bfmsys83_state::init_decode()
 {
     bfm_decode_mainrom(machine(),"maincpu", m_codec_data);
 }
@@ -66,5 +66,5 @@ ROM_START( b83cops ) // was marked as sys85, but I think this is the sys83 set?
 	ROM_LOAD( "cops.p4", 0x8000, 0x2000, CRC(ce573b35) SHA1(f2ba22f0d55f882dd91b37e80e4bb14effd9113a) )
 ROM_END
 
-GAME( 198?, b83catms    , 0         ,  bfmsys83     , bfmsys83  , bfmsys83_state, 0  , ROT0,  "BFM",      "Cat & Mouse (Bellfruit) (System 83)",    MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 198?, b83cops     , 0         ,  bfmsys83     , bfmsys83  , bfmsys83_state, 0  , ROT0,  "BFM",      "Cops & Robbers (Bellfruit) (System 83)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 198?, b83catms, 0, bfmsys83, bfmsys83, bfmsys83_state, empty_init, ROT0, "BFM", "Cat & Mouse (Bellfruit) (System 83)",    MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 198?, b83cops,  0, bfmsys83, bfmsys83, bfmsys83_state, empty_init, ROT0, "BFM", "Cops & Robbers (Bellfruit) (System 83)", MACHINE_IS_SKELETON_MECHANICAL)

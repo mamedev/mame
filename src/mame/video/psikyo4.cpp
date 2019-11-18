@@ -3,7 +3,7 @@
 /*
 
 Psikyo PS6807 (PS4):
-See src/drivers/psikyo4.c for more info
+See src/mame/drivers/psikyo4.cpp for more info
 
 Each sprite has a flag denoting the screen to which it should be drawn.
 
@@ -33,7 +33,7 @@ HgKairak: 86010000 1f201918 a0000000 Large Screen
 
 
 /* --- SPRITES --- */
-void psikyo4_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t scr)
+void psikyo4_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t scr)
 {
 	/*- Sprite Format 0x0000 - 0x2bff -**
 
@@ -58,35 +58,32 @@ void psikyo4_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 	uint32_t *source = m_spriteram;
 	uint16_t *list = (uint16_t *)m_spriteram.target() + 0x2c00/2 + 0x04/2; /* 0x2c00/0x2c02 what are these for, pointers? one for each screen */
 	uint16_t listlen = (0xc00/2 - 0x04/2), listcntr = 0;
-	bool flipscreen = BIT(m_vidregs[1], (scr == 0 ? 31 : 23));
-	int screen_height = (scr == 0 ? m_lscreen : m_rscreen)->visible_area().max_y + 1;
+	bool const flipscreen = BIT(m_vidregs[1], (scr == 0 ? 31 : 23));
+	uint16_t const screen_height = screen.visible_area().max_y + 1;
 
 	while (listcntr < listlen)
 	{
-		uint16_t listdat, sprnum;
-
-		listdat = list[BYTE_XOR_BE(listcntr)];
-		sprnum = (listdat & 0x03ff) * 2;
+		uint16_t const listdat = list[BYTE_XOR_BE(listcntr)];
+		uint16_t const sprnum = (listdat & 0x03ff) * 2;
 
 		/* start drawing */
 		if ((listdat & 0x8000) == 0 && (listdat & 0x2000) == scr) /* draw only selected screen */
 		{
-			int loopnum = 0, i, j;
-			uint32_t xpos, ypos, tnum, wide, high, colr, flipx, flipy;
+			int loopnum = 0;
 			int xstart, ystart, xend, yend, xinc, yinc;
 
-			ypos = (source[sprnum + 0] & 0x03ff0000) >> 16;
-			xpos = (source[sprnum + 0] & 0x000003ff) >> 00;
+			int16_t ypos        = (source[sprnum + 0] & 0x03ff0000) >> 16;
+			int16_t xpos        = (source[sprnum + 0] & 0x000003ff) >> 00;
 
-			high = ((source[sprnum + 0] & 0xf0000000) >> (12 + 16)) + 1;
-			wide = ((source[sprnum + 0] & 0x0000f000) >> 12) + 1;
+			uint8_t const high  = ((source[sprnum + 0] & 0xf0000000) >> (12 + 16)) + 1;
+			uint8_t const wide  = ((source[sprnum + 0] & 0x0000f000) >> 12) + 1;
 
-			tnum = (source[sprnum + 1] & 0x0007ffff) >> 00;
+			uint32_t const tnum = (source[sprnum + 1] & 0x0007ffff) >> 00;
 
-			colr = (source[sprnum + 1] & 0x3f000000) >> 24;
+			uint8_t const colr  = (source[sprnum + 1] & 0x3f000000) >> 24;
 
-			flipx = (source[sprnum + 1] & 0x40000000);
-			flipy = (source[sprnum + 1] & 0x80000000); /* Guess */
+			bool flipx          = (source[sprnum + 1] & 0x40000000);
+			bool flipy          = (source[sprnum + 1] & 0x80000000); /* Guess */
 
 			if (ypos & 0x200) ypos -= 0x400;
 			if (xpos & 0x200) xpos -= 0x400;
@@ -106,11 +103,11 @@ void psikyo4_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 			if (flipy)  { ystart = high - 1;  yend = -1;     yinc = -1; }
 			else        { ystart = 0;         yend = high;   yinc = +1; }
 
-			for (j = ystart; j != yend; j += yinc)
+			for (int j = ystart; j != yend; j += yinc)
 			{
-				for (i = xstart; i != xend; i += xinc)
+				for (int i = xstart; i != xend; i += xinc)
 				{
-						gfx->transpen(bitmap,cliprect, tnum + loopnum, colr, flipx, flipy, xpos + 16 * i, ypos + 16 * j, 0);
+					gfx->transpen(bitmap,cliprect, tnum + loopnum, colr, flipx, flipy, xpos + 16 * i, ypos + 16 * j, 0);
 					loopnum++;
 				}
 			}
@@ -120,22 +117,6 @@ void psikyo4_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 		if (listdat & 0x4000)
 			break;
 	}
-}
-
-uint32_t psikyo4_state::screen_update_psikyo4_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	bitmap.fill(0x800, cliprect);
-	m_gfxdecode->gfx(0)->set_palette(*m_palette);
-	draw_sprites(bitmap, cliprect, 0x0000);
-	return 0;
-}
-
-uint32_t psikyo4_state::screen_update_psikyo4_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	bitmap.fill(0x800, cliprect);
-	m_gfxdecode->gfx(0)->set_palette(*m_palette2);
-	draw_sprites(bitmap, cliprect, 0x2000);
-	return 0;
 }
 
 void psikyo4_state::video_start()

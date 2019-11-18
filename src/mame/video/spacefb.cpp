@@ -91,7 +91,7 @@ void spacefb_state::video_start()
 	   uses whatever value is on the shift register on power-up */
 	m_star_shift_reg = 0x18f89;
 
-	save_pointer(NAME(m_object_present_map.get()), width * height);
+	save_pointer(NAME(m_object_present_map), width * height);
 	save_item(NAME(m_port_0));
 	save_item(NAME(m_port_2));
 	save_item(NAME(m_star_shift_reg));
@@ -135,9 +135,9 @@ void spacefb_state::get_starfield_pens(pen_t *pens)
 		uint8_t ra = (((i >> 4) & 0x01) || background_red) && !disable_star_field;
 		uint8_t rb =  ((i >> 5) & 0x01) && color_contrast_r && !disable_star_field;
 
-		uint8_t r = combine_3_weights(m_color_weights_rg, 0, rb, ra);
-		uint8_t g = combine_3_weights(m_color_weights_rg, 0, gb, ga);
-		uint8_t b = combine_2_weights(m_color_weights_b,     bb, ba);
+		uint8_t r = combine_weights(m_color_weights_rg, 0, rb, ra);
+		uint8_t g = combine_weights(m_color_weights_rg, 0, gb, ga);
+		uint8_t b = combine_weights(m_color_weights_b,     bb, ba);
 
 		pens[i] = rgb_t(r, g, b);
 	}
@@ -233,9 +233,9 @@ void spacefb_state::get_sprite_pens(pen_t *pens)
 		uint8_t b1 = (data >> 6) & 0x01;
 		uint8_t b2 = (data >> 7) & 0x01;
 
-		uint8_t r = combine_3_weights(m_color_weights_rg, r0, r1, r2);
-		uint8_t g = combine_3_weights(m_color_weights_rg, g0, g1, g2);
-		uint8_t b = combine_2_weights(m_color_weights_b,      b1, b2);
+		uint8_t r = combine_weights(m_color_weights_rg, r0, r1, r2);
+		uint8_t g = combine_weights(m_color_weights_rg, g0, g1, g2);
+		uint8_t b = combine_weights(m_color_weights_b,      b1, b2);
 
 		if (i >> 4)
 		{

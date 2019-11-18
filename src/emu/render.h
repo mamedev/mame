@@ -49,12 +49,16 @@
 #include "screen.h"
 
 #include <math.h>
+#include <array>
 #include <map>
 #include <memory>
 #include <mutex>
 #include <string>
 #include <unordered_map>
 #include <vector>
+
+
+namespace emu { namespace render { namespace detail { class layout_environment; } } }
 
 
 //**************************************************************************
@@ -127,40 +131,37 @@ constexpr u32 PRIMFLAG_PACKABLE = 1 << PRIMFLAG_PACKABLE_SHIFT;
 //  MACROS
 //**************************************************************************
 
-#define PRIMFLAG_TEXORIENT(x)       ((x) << PRIMFLAG_TEXORIENT_SHIFT)
-#define PRIMFLAG_GET_TEXORIENT(x)   (((x) & PRIMFLAG_TEXORIENT_MASK) >> PRIMFLAG_TEXORIENT_SHIFT)
+constexpr u32 PRIMFLAG_TEXORIENT(u32 x)     { return x << PRIMFLAG_TEXORIENT_SHIFT; }
+constexpr u32 PRIMFLAG_GET_TEXORIENT(u32 x) { return (x & PRIMFLAG_TEXORIENT_MASK) >> PRIMFLAG_TEXORIENT_SHIFT; }
 
-#define PRIMFLAG_TEXFORMAT(x)       ((x) << PRIMFLAG_TEXFORMAT_SHIFT)
-#define PRIMFLAG_GET_TEXFORMAT(x)   (((x) & PRIMFLAG_TEXFORMAT_MASK) >> PRIMFLAG_TEXFORMAT_SHIFT)
+constexpr u32 PRIMFLAG_TEXFORMAT(u32 x)     { return x << PRIMFLAG_TEXFORMAT_SHIFT; }
+constexpr u32 PRIMFLAG_GET_TEXFORMAT(u32 x) { return (x & PRIMFLAG_TEXFORMAT_MASK) >> PRIMFLAG_TEXFORMAT_SHIFT; }
 
-#define PRIMFLAG_BLENDMODE(x)       ((x) << PRIMFLAG_BLENDMODE_SHIFT)
-#define PRIMFLAG_GET_BLENDMODE(x)   (((x) & PRIMFLAG_BLENDMODE_MASK) >> PRIMFLAG_BLENDMODE_SHIFT)
+constexpr u32 PRIMFLAG_BLENDMODE(u32 x)     { return x << PRIMFLAG_BLENDMODE_SHIFT; }
+constexpr u32 PRIMFLAG_GET_BLENDMODE(u32 x) { return (x & PRIMFLAG_BLENDMODE_MASK) >> PRIMFLAG_BLENDMODE_SHIFT; }
 
-#define PRIMFLAG_ANTIALIAS(x)       ((x) << PRIMFLAG_ANTIALIAS_SHIFT)
-#define PRIMFLAG_GET_ANTIALIAS(x)   (((x) & PRIMFLAG_ANTIALIAS_MASK) >> PRIMFLAG_ANTIALIAS_SHIFT)
+constexpr u32 PRIMFLAG_ANTIALIAS(u32 x)     { return x << PRIMFLAG_ANTIALIAS_SHIFT; }
+constexpr u32 PRIMFLAG_GET_ANTIALIAS(u32 x) { return (x & PRIMFLAG_ANTIALIAS_MASK) >> PRIMFLAG_ANTIALIAS_SHIFT; }
 
-#define PRIMFLAG_SCREENTEX(x)       ((x) << PRIMFLAG_SCREENTEX_SHIFT)
-#define PRIMFLAG_GET_SCREENTEX(x)   (((x) & PRIMFLAG_SCREENTEX_MASK) >> PRIMFLAG_SCREENTEX_SHIFT)
+constexpr u32 PRIMFLAG_SCREENTEX(u32 x)     { return x << PRIMFLAG_SCREENTEX_SHIFT; }
+constexpr u32 PRIMFLAG_GET_SCREENTEX(u32 x) { return (x & PRIMFLAG_SCREENTEX_MASK) >> PRIMFLAG_SCREENTEX_SHIFT; }
 
-#define PRIMFLAG_TEXWRAP(x)         ((x) << PRIMFLAG_TEXWRAP_SHIFT)
-#define PRIMFLAG_GET_TEXWRAP(x)     (((x) & PRIMFLAG_TEXWRAP_MASK) >> PRIMFLAG_TEXWRAP_SHIFT)
+constexpr u32 PRIMFLAG_TEXWRAP(u32 x)       { return x << PRIMFLAG_TEXWRAP_SHIFT; }
+constexpr u32 PRIMFLAG_GET_TEXWRAP(u32 x)   { return (x & PRIMFLAG_TEXWRAP_MASK) >> PRIMFLAG_TEXWRAP_SHIFT; }
 
-#define PRIMFLAG_TEXSHADE(x)        ((x) << PRIMFLAG_TEXSHADE_SHIFT)
-#define PRIMFLAG_GET_TEXSHADE(x)    (((x) & PRIMFLAG_TEXSHADE_MASK) >> PRIMFLAG_TEXSHADE_SHIFT)
+constexpr u32 PRIMFLAG_TEXSHADE(u32 x)      { return x << PRIMFLAG_TEXSHADE_SHIFT; }
+constexpr u32 PRIMFLAG_GET_TEXSHADE(u32 x)  { return (x & PRIMFLAG_TEXSHADE_MASK) >> PRIMFLAG_TEXSHADE_SHIFT; }
 
-#define PRIMFLAG_VECTOR(x)          ((x) << PRIMFLAG_VECTOR_SHIFT)
-#define PRIMFLAG_GET_VECTOR(x)      (((x) & PRIMFLAG_VECTOR_MASK) >> PRIMFLAG_VECTOR_SHIFT)
+constexpr u32 PRIMFLAG_VECTOR(u32 x)        { return x << PRIMFLAG_VECTOR_SHIFT; }
+constexpr u32 PRIMFLAG_GET_VECTOR(u32 x)    { return (x & PRIMFLAG_VECTOR_MASK) >> PRIMFLAG_VECTOR_SHIFT; }
 
-#define PRIMFLAG_VECTORBUF(x)       ((x) << PRIMFLAG_VECTORBUF_SHIFT)
-#define PRIMFLAG_GET_VECTORBUF(x)   (((x) & PRIMFLAG_VECTORBUF_MASK) >> PRIMFLAG_VECTORBUF_SHIFT)
+constexpr u32 PRIMFLAG_VECTORBUF(u32 x)     { return x << PRIMFLAG_VECTORBUF_SHIFT; }
+constexpr u32 PRIMFLAG_GET_VECTORBUF(u32 x) { return (x & PRIMFLAG_VECTORBUF_MASK) >> PRIMFLAG_VECTORBUF_SHIFT; }
 
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
-
-// private classes declared in render.cpp
-struct object_transform;
 
 // texture scaling callback
 typedef void (*texture_scaler_func)(bitmap_argb32 &dest, bitmap_argb32 &source, const rectangle &sbounds, void *param);
@@ -173,8 +174,8 @@ struct render_bounds
 	float               x1;                 // rightmost X coordinate
 	float               y1;                 // bottommost Y coordinate
 
-	float width() const { return x1 - x0; }
-	float height() const { return y1 - y0; }
+	constexpr float width() const { return x1 - x0; }
+	constexpr float height() const { return y1 - y0; }
 };
 
 
@@ -214,8 +215,10 @@ struct render_texinfo
 	u32                 width;              // width of the image
 	u32                 height;             // height of the image
 	u32                 seqid;              // sequence ID
-	u64                 osddata;            // aux data to pass to osd
+	u64                 unique_id;          // unique identifier to pass to osd
+	u64                 old_id;             // previously allocated id, if applicable
 	const rgb_t *       palette;            // palette for PALETTE16 textures, bcg lookup table for RGB32/YUY16
+	u32                 palette_length;
 };
 
 
@@ -232,12 +235,10 @@ class render_screen_list
 
 	public:
 		// construction/destruction
-		item(screen_device &screen)
-			: m_next(nullptr),
-				m_screen(screen) { }
+		item(screen_device &screen) : m_screen(screen) { }
 
 		// state
-		item *              m_next;             // next screen in list
+		item *              m_next = nullptr;   // next screen in list
 		screen_device &     m_screen;           // reference to screen device
 	};
 
@@ -253,7 +254,7 @@ public:
 	int contains(screen_device &screen) const
 	{
 		int count = 0;
-		for (item *curitem = m_list.first(); curitem != nullptr; curitem = curitem->m_next)
+		for (item *curitem = m_list.first(); curitem; curitem = curitem->m_next)
 			if (&curitem->m_screen == &screen) count++;
 		return count;
 	}
@@ -269,40 +270,31 @@ private:
 // render_layer_config - describes the state of layers
 class render_layer_config
 {
-	static constexpr u8 ENABLE_BACKDROP          = 0x01; // enable backdrop layers
-	static constexpr u8 ENABLE_OVERLAY           = 0x02; // enable overlay layers
-	static constexpr u8 ENABLE_BEZEL             = 0x04; // enable bezel layers
-	static constexpr u8 ENABLE_CPANEL            = 0x08; // enable cpanel layers
-	static constexpr u8 ENABLE_MARQUEE           = 0x10; // enable marquee layers
-	static constexpr u8 ZOOM_TO_SCREEN           = 0x20; // zoom to screen area by default
-	static constexpr u8 ENABLE_SCREEN_OVERLAY    = 0x40; // enable screen overlays
-	static constexpr u8 DEFAULT = ENABLE_BACKDROP | ENABLE_OVERLAY | ENABLE_BEZEL | ENABLE_CPANEL | ENABLE_MARQUEE | ENABLE_SCREEN_OVERLAY;
+private:
+	static constexpr u8 ZOOM_TO_SCREEN           = 0x01; // zoom to screen area by default
+	static constexpr u8 ENABLE_SCREEN_OVERLAY    = 0x02; // enable screen overlays
+	static constexpr u8 DEFAULT = ENABLE_SCREEN_OVERLAY;
+
+	u8               m_state = DEFAULT;
+
+	render_layer_config &set_flag(u8 flag, bool enable)
+	{
+		if (enable) m_state |= flag;
+		else m_state &= ~flag;
+		return *this;
+	}
 
 public:
-	render_layer_config()
-		: m_state(DEFAULT) { }
+	constexpr render_layer_config() { }
 
 	bool operator==(const render_layer_config &rhs) const { return m_state == rhs.m_state; }
 	bool operator!=(const render_layer_config &rhs) const { return m_state != rhs.m_state; }
 
-	bool backdrops_enabled() const { return ((m_state & ENABLE_BACKDROP) != 0); }
-	bool overlays_enabled() const { return ((m_state & ENABLE_OVERLAY) != 0); }
-	bool bezels_enabled() const { return ((m_state & ENABLE_BEZEL) != 0); }
-	bool cpanels_enabled() const { return ((m_state & ENABLE_CPANEL) != 0); }
-	bool marquees_enabled() const { return ((m_state & ENABLE_MARQUEE) != 0); }
-	bool screen_overlay_enabled() const { return ((m_state & ENABLE_SCREEN_OVERLAY) != 0); }
-	bool zoom_to_screen() const { return ((m_state & ZOOM_TO_SCREEN) != 0); }
+	constexpr bool screen_overlay_enabled() const   { return (m_state & ENABLE_SCREEN_OVERLAY) != 0; }
+	constexpr bool zoom_to_screen() const           { return (m_state & ZOOM_TO_SCREEN) != 0; }
 
-	render_layer_config &set_backdrops_enabled(bool enable) { if (enable) m_state |= ENABLE_BACKDROP; else m_state &= ~ENABLE_BACKDROP; return *this; }
-	render_layer_config &set_overlays_enabled(bool enable) { if (enable) m_state |= ENABLE_OVERLAY; else m_state &= ~ENABLE_OVERLAY; return *this; }
-	render_layer_config &set_bezels_enabled(bool enable) { if (enable) m_state |= ENABLE_BEZEL; else m_state &= ~ENABLE_BEZEL; return *this; }
-	render_layer_config &set_cpanels_enabled(bool enable) { if (enable) m_state |= ENABLE_CPANEL; else m_state &= ~ENABLE_CPANEL; return *this; }
-	render_layer_config &set_marquees_enabled(bool enable) { if (enable) m_state |= ENABLE_MARQUEE; else m_state &= ~ENABLE_MARQUEE; return *this; }
-	render_layer_config &set_screen_overlay_enabled(bool enable) { if (enable) m_state |= ENABLE_SCREEN_OVERLAY; else m_state &= ~ENABLE_SCREEN_OVERLAY; return *this; }
-	render_layer_config &set_zoom_to_screen(bool zoom) { if (zoom) m_state |= ZOOM_TO_SCREEN; else m_state &= ~ZOOM_TO_SCREEN; return *this; }
-
-private:
-	u8               m_state;
+	render_layer_config &set_screen_overlay_enabled(bool enable)    { return set_flag(ENABLE_SCREEN_OVERLAY, enable); }
+	render_layer_config &set_zoom_to_screen(bool zoom)              { return set_flag(ZOOM_TO_SCREEN, zoom); }
 };
 
 
@@ -314,13 +306,7 @@ class render_primitive
 	friend class simple_list<render_primitive>;
 
 public:
-	render_primitive():
-		type(),
-		flags(0),
-		width(0),
-		container(nullptr),
-		m_next(nullptr)
-	{}
+	render_primitive() { }
 
 	// render primitive types
 	enum primitive_type
@@ -342,19 +328,19 @@ public:
 	void reset();
 
 	// public state
-	primitive_type      type;               // type of primitive
+	primitive_type      type = INVALID;     // type of primitive
 	render_bounds       bounds;             // bounds or positions
 	render_bounds       full_bounds;        // bounds or positions (unclipped)
 	render_color        color;              // RGBA values
-	u32              flags;              // flags
-	float               width;              // width (for line primitives)
+	u32                 flags = 0U;         // flags
+	float               width = 0.0F;       // width (for line primitives)
 	render_texinfo      texture;            // texture info (for quad primitives)
 	render_quad_texuv   texcoords;          // texture coordinates (for quad primitives)
-	render_container *  container;          // the render container we belong to
+	render_container *  container = nullptr;// the render container we belong to
 
 private:
 	// internal state
-	render_primitive *  m_next;             // pointer to next element
+	render_primitive *  m_next = nullptr;   // pointer to next element
 };
 
 
@@ -442,8 +428,8 @@ public:
 	// configure the texture bitmap
 	void set_bitmap(bitmap_t &bitmap, const rectangle &sbounds, texture_format format);
 
-	// set any necessary aux data
-	void set_osd_data(u64 data) { m_osddata = data; }
+	// set a unique identifier
+	void set_id(u64 id) { m_old_id = m_id; m_id = id; }
 
 	// generic high-quality bitmap scaler
 	static void hq_scale(bitmap_argb32 &dest, bitmap_argb32 &source, const rectangle &sbounds, void *param);
@@ -451,7 +437,7 @@ public:
 private:
 	// internal helpers
 	void get_scaled(u32 dwidth, u32 dheight, render_texinfo &texinfo, render_primitive_list &primlist, u32 flags = 0);
-	const rgb_t *get_adjusted_palette(render_container &container);
+	const rgb_t *get_adjusted_palette(render_container &container, u32 &out_length);
 
 	static const int MAX_TEXTURE_SCALES = 16;
 
@@ -459,7 +445,7 @@ private:
 	struct scaled_texture
 	{
 		bitmap_argb32 *     bitmap;                 // final bitmap
-		u32              seqid;                  // sequence number
+		u32                 seqid;                  // sequence number
 	};
 
 	// internal state
@@ -468,12 +454,13 @@ private:
 	bitmap_t *          m_bitmap;                   // pointer to the original bitmap
 	rectangle           m_sbounds;                  // source bounds within the bitmap
 	texture_format      m_format;                   // format of the texture data
-	u64              m_osddata;                  // aux data to pass to osd
+	u64                 m_id;                       // unique id to pass to osd
+	u64                 m_old_id;                   // previous id, if applicable
 
 	// scaling state (ARGB32 only)
 	texture_scaler_func m_scaler;                   // scaling callback
 	void *              m_param;                    // scaling callback parameter
-	u32              m_curseq;                   // current sequence number
+	u32                 m_curseq;                   // current sequence number
 	scaled_texture      m_scaled[MAX_TEXTURE_SCALES];// array of scaled variants of this texture
 };
 
@@ -541,7 +528,7 @@ public:
 	bool has_brightness_contrast_gamma_changes() const { return (m_user.m_brightness != 1.0f || m_user.m_contrast != 1.0f || m_user.m_gamma != 1.0f); }
 	u8 apply_brightness_contrast_gamma(u8 value);
 	float apply_brightness_contrast_gamma_fp(float value);
-	const rgb_t *bcg_lookup_table(int texformat, palette_t *palette = nullptr);
+	const rgb_t *bcg_lookup_table(int texformat, u32 &out_length, palette_t *palette = nullptr);
 
 private:
 	// an item describes a high level primitive that is added to a container
@@ -566,11 +553,11 @@ private:
 	private:
 		// internal state
 		item *              m_next;             // pointer to the next element in the list
-		u8               m_type;             // type of element
+		u8                  m_type;             // type of element
 		render_bounds       m_bounds;           // bounds of the element
 		render_color        m_color;            // RGBA factors
-		u32              m_flags;            // option flags
-		u32              m_internal;         // internal flags
+		u32                 m_flags;            // option flags
+		u32                 m_internal;         // internal flags
 		float               m_width;            // width of the line (lines only)
 		render_texture *    m_texture;          // pointer to the source texture (quads only)
 	};
@@ -601,25 +588,6 @@ private:
 
 
 //**************************************************************************
-//  CONSTANTS
-//**************************************************************************
-
-enum item_layer
-{
-	ITEM_LAYER_FIRST = 0,
-	ITEM_LAYER_BACKDROP = ITEM_LAYER_FIRST,
-	ITEM_LAYER_SCREEN,
-	ITEM_LAYER_OVERLAY,
-	ITEM_LAYER_BEZEL,
-	ITEM_LAYER_CPANEL,
-	ITEM_LAYER_MARQUEE,
-	ITEM_LAYER_MAX
-};
-DECLARE_ENUM_INCDEC_OPERATORS(item_layer)
-
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -635,8 +603,10 @@ DECLARE_ENUM_INCDEC_OPERATORS(item_layer)
 class layout_element
 {
 public:
+	using environment = emu::render::detail::layout_environment;
+
 	// construction/destruction
-	layout_element(running_machine &machine, util::xml::data_node const &elemnode, const char *dirname);
+	layout_element(environment &env, util::xml::data_node const &elemnode, const char *dirname);
 	virtual ~layout_element();
 
 	// getters
@@ -659,7 +629,7 @@ private:
 		typedef std::unique_ptr<component> ptr;
 
 		// construction/destruction
-		component(running_machine &machine, util::xml::data_node const &compnode, const char *dirname);
+		component(environment &env, util::xml::data_node const &compnode, const char *dirname);
 		virtual ~component() = default;
 
 		// setup
@@ -727,13 +697,13 @@ private:
 		int                 m_state;        // associated state number
 	};
 
-	typedef component::ptr (*make_component_func)(running_machine &machine, util::xml::data_node const &compnode, const char *dirname);
+	typedef component::ptr (*make_component_func)(environment &env, util::xml::data_node const &compnode, const char *dirname);
 	typedef std::map<std::string, make_component_func> make_component_map;
 
 	// internal helpers
 	static void element_scale(bitmap_argb32 &dest, bitmap_argb32 &source, const rectangle &sbounds, void *param);
-	template <typename T> static component::ptr make_component(running_machine &machine, util::xml::data_node const &compnode, const char *dirname);
-	template <int D> static component::ptr make_dotmatrix_component(running_machine &machine, util::xml::data_node const &compnode, const char *dirname);
+	template <typename T> static component::ptr make_component(environment &env, util::xml::data_node const &compnode, const char *dirname);
+	template <int D> static component::ptr make_dotmatrix_component(environment &env, util::xml::data_node const &compnode, const char *dirname);
 
 	static make_component_map const s_make_component; // maps component XML names to creator functions
 
@@ -757,22 +727,33 @@ private:
 class layout_group
 {
 public:
-	typedef std::unordered_map<std::string, layout_group> group_map;
+	using environment = emu::render::detail::layout_environment;
+	using group_map = std::unordered_map<std::string, layout_group>;
+	using transform = std::array<std::array<float, 3>, 3>;
 
-	layout_group(running_machine &machine, util::xml::data_node const &groupnode);
+	layout_group(util::xml::data_node const &groupnode);
 	~layout_group();
 
 	util::xml::data_node const &get_groupnode() const { return m_groupnode; }
 
-	render_bounds make_transform(render_bounds const &dest) const;
-	render_bounds make_transform(render_bounds const &dest, render_bounds const &transform) const;
+	transform make_transform(int orientation, render_bounds const &dest) const;
+	transform make_transform(int orientation, transform const &trans) const;
+	transform make_transform(int orientation, render_bounds const &dest, transform const &trans) const;
 
-	void resolve_bounds(group_map &groupmap);
+	void set_bounds_unresolved();
+	void resolve_bounds(environment &env, group_map &groupmap);
 
 private:
-	void resolve_bounds(group_map &groupmap, std::vector<layout_group const *> &seen);
+	void resolve_bounds(environment &env, group_map &groupmap, std::vector<layout_group const *> &seen);
+	void resolve_bounds(
+			environment &env,
+			util::xml::data_node const &parentnode,
+			group_map &groupmap,
+			std::vector<layout_group const *> &seen,
+			bool empty,
+			bool repeat,
+			bool init);
 
-	running_machine &               m_machine;
 	util::xml::data_node const &    m_groupnode;
 	render_bounds                   m_bounds;
 	bool                            m_bounds_resolved;
@@ -787,6 +768,7 @@ private:
 class layout_view
 {
 public:
+	using environment = emu::render::detail::layout_environment;
 	using element_map = std::unordered_map<std::string, layout_element>;
 	using group_map = std::unordered_map<std::string, layout_group>;
 
@@ -806,10 +788,12 @@ public:
 	public:
 		// construction/destruction
 		item(
-				running_machine &machine,
+				environment &env,
 				util::xml::data_node const &itemnode,
 				element_map &elemmap,
-				render_bounds const &transform);
+				int orientation,
+				layout_group::transform const &trans,
+				render_color const &color);
 		~item();
 
 		// getters
@@ -817,9 +801,10 @@ public:
 		screen_device *screen() { return m_screen; }
 		const render_bounds &bounds() const { return m_bounds; }
 		const render_color &color() const { return m_color; }
+		int blend_mode() const { return m_blend_mode; }
 		int orientation() const { return m_orientation; }
 		render_container *screen_container(running_machine &machine) const;
-		bool has_input() const { return !m_input_tag.empty(); }
+		bool has_input() const { return bool(m_input_port); }
 		ioport_port *input_tag_and_mask(ioport_value &mask) const { mask = m_input_mask; return m_input_port; };
 
 		// fetch state based on configured source
@@ -828,40 +813,51 @@ public:
 		// resolve tags, if any
 		void resolve_tags();
 
+		// setters
+		void set_blend_mode(int mode) { m_blend_mode = mode; }
+
 	private:
+		static layout_element *find_element(environment &env, util::xml::data_node const &itemnode, element_map &elemmap);
+		static render_bounds make_bounds(environment &env, util::xml::data_node const &itemnode, layout_group::transform const &trans);
+		static std::string make_input_tag(environment &env, util::xml::data_node const &itemnode);
+		static int get_blend_mode(environment &env, util::xml::data_node const &itemnode);
+
 		// internal state
-		layout_element *    m_element;          // pointer to the associated element (non-screens only)
-		output_finder<>     m_output;           // associated output
-		bool const          m_have_output;      // whether we actually have an output
-		std::string         m_input_tag;        // input tag of this item
-		ioport_port *       m_input_port;       // input port of this item
-		ioport_value        m_input_mask;       // input mask of this item
-		screen_device *     m_screen;           // pointer to screen
-		int                 m_orientation;      // orientation of this item
-		render_bounds       m_bounds;           // bounds of the item
-		render_bounds       m_rawbounds;        // raw (original) bounds of the item
-		render_color        m_color;            // color of the item
+		layout_element *const   m_element;          // pointer to the associated element (non-screens only)
+		output_finder<>         m_output;           // associated output
+		bool const              m_have_output;      // whether we actually have an output
+		std::string const       m_input_tag;        // input tag of this item
+		ioport_port *           m_input_port;       // input port of this item
+		ioport_field const *    m_input_field;      // input port field of this item
+		ioport_value const      m_input_mask;       // input mask of this item
+		u8                      m_input_shift;      // input mask rightshift for raw (trailing 0s)
+		bool const              m_input_raw;        // get raw data from input port
+		screen_device *         m_screen;           // pointer to screen
+		int                     m_orientation;      // orientation of this item
+		render_bounds           m_bounds;           // bounds of the item
+		render_bounds const     m_rawbounds;        // raw (original) bounds of the item
+		render_color            m_color;            // color of the item
+		int                     m_blend_mode;       // blending mode to use when drawing
 	};
 	using item_list = std::list<item>;
 
 	// construction/destruction
 	layout_view(
-			running_machine &machine,
+			environment &env,
 			util::xml::data_node const &viewnode,
 			element_map &elemmap,
-			group_map const &groupmap);
+			group_map &groupmap);
 	~layout_view();
 
 	// getters
-	item_list &items(item_layer layer);
+	item_list &items() { return m_items; }
 	const std::string &name() const { return m_name; }
 	const render_bounds &bounds() const { return m_bounds; }
 	const render_bounds &screen_bounds() const { return m_scrbounds; }
 	const render_screen_list &screens() const { return m_screens; }
-	bool layer_enabled(item_layer layer) const { return m_layenabled[layer]; }
 
 	//
-	bool has_art() const { return !m_backdrop_list.empty() || !m_overlay_list.empty() || !m_bezel_list.empty() || !m_cpanel_list.empty() || !m_marquee_list.empty(); }
+	bool has_art() const { return m_has_art; }
 	float effective_aspect(render_layer_config config) const { return (config.zoom_to_screen() && m_screens.count() != 0) ? m_scraspect : m_aspect; }
 
 	// operations
@@ -871,13 +867,23 @@ public:
 	void resolve_tags();
 
 private:
+	struct layer_lists;
+
 	// add items, recursing for groups
 	void add_items(
-			running_machine &machine,
+			layer_lists &layers,
+			environment &env,
 			util::xml::data_node const &parentnode,
 			element_map &elemmap,
-			group_map const &groupmap,
-			render_bounds const &transform);
+			group_map &groupmap,
+			int orientation,
+			layout_group::transform const &trans,
+			render_color const &color,
+			bool root,
+			bool repeat,
+			bool init);
+
+	static std::string make_name(environment &env, util::xml::data_node const &viewnode);
 
 	// internal state
 	std::string         m_name;             // name of the layout
@@ -887,13 +893,8 @@ private:
 	render_bounds       m_bounds;           // computed bounds of the view
 	render_bounds       m_scrbounds;        // computed bounds of the screens within the view
 	render_bounds       m_expbounds;        // explicit bounds of the view
-	bool                m_layenabled[ITEM_LAYER_MAX]; // is this layer enabled?
-	item_list           m_backdrop_list;    // list of backdrop items
-	item_list           m_screen_list;      // list of screen items
-	item_list           m_overlay_list;     // list of overlay items
-	item_list           m_bezel_list;       // list of bezel items
-	item_list           m_cpanel_list;      // list of marquee items
-	item_list           m_marquee_list;     // list of marquee items
+	item_list           m_items;            // list of layout items
+	bool                m_has_art;          // true if the layout contains non-screen elements
 };
 
 
@@ -909,7 +910,7 @@ public:
 	using view_list = std::list<layout_view>;
 
 	// construction/destruction
-	layout_file(running_machine &machine, util::xml::data_node const &rootnode, char const *dirname);
+	layout_file(device_t &device, util::xml::data_node const &rootnode, char const *dirname);
 	~layout_file();
 
 	// getters
@@ -918,6 +919,17 @@ public:
 	view_list const &views() const { return m_viewlist; }
 
 private:
+	using environment = emu::render::detail::layout_environment;
+
+	// add elements and parameters
+	void add_elements(
+			char const *dirname,
+			environment &env,
+			util::xml::data_node const &parentnode,
+			group_map &groupmap,
+			bool repeat,
+			bool init);
+
 	// internal state
 	element_map     m_elemmap;      // list of shared layout elements
 	view_list       m_viewlist;     // list of views
@@ -965,20 +977,10 @@ public:
 	void set_scale_mode(int scale_mode) { m_scale_mode = scale_mode; }
 
 	// layer config getters
-	bool backdrops_enabled() const { return m_layerconfig.backdrops_enabled(); }
-	bool overlays_enabled() const { return m_layerconfig.overlays_enabled(); }
-	bool bezels_enabled() const { return m_layerconfig.bezels_enabled(); }
-	bool cpanels_enabled() const { return m_layerconfig.cpanels_enabled(); }
-	bool marquees_enabled() const { return m_layerconfig.marquees_enabled(); }
 	bool screen_overlay_enabled() const { return m_layerconfig.screen_overlay_enabled(); }
 	bool zoom_to_screen() const { return m_layerconfig.zoom_to_screen(); }
 
 	// layer config setters
-	void set_backdrops_enabled(bool enable) { m_layerconfig.set_backdrops_enabled(enable); update_layer_config(); }
-	void set_overlays_enabled(bool enable) { m_layerconfig.set_overlays_enabled(enable); update_layer_config(); }
-	void set_bezels_enabled(bool enable) { m_layerconfig.set_bezels_enabled(enable); update_layer_config(); }
-	void set_cpanels_enabled(bool enable) { m_layerconfig.set_cpanels_enabled(enable); update_layer_config(); }
-	void set_marquees_enabled(bool enable) { m_layerconfig.set_marquees_enabled(enable); update_layer_config(); }
 	void set_screen_overlay_enabled(bool enable) { m_layerconfig.set_screen_overlay_enabled(enable); update_layer_config(); }
 	void set_zoom_to_screen(bool zoom) { m_layerconfig.set_zoom_to_screen(zoom); update_layer_config(); }
 
@@ -1012,6 +1014,9 @@ public:
 	void resolve_tags();
 
 private:
+	// private classes declared in render.cpp
+	struct object_transform;
+
 	// internal helpers
 	enum constructor_impl_t { CONSTRUCTOR_IMPL };
 	template <typename T> render_target(render_manager &manager, T&& layout, u32 flags, constructor_impl_t);
@@ -1020,8 +1025,8 @@ private:
 	void load_layout_files(util::xml::data_node const &rootnode, bool singlefile);
 	void load_additional_layout_files(const char *basename, bool have_artwork);
 	bool load_layout_file(const char *dirname, const char *filename);
-	bool load_layout_file(const char *dirname, const internal_layout *layout_data);
-	bool load_layout_file(const char *dirname, util::xml::data_node const &rootnode);
+	bool load_layout_file(const char *dirname, const internal_layout &layout_data, device_t *device = nullptr);
+	bool load_layout_file(device_t &device, const char *dirname, util::xml::data_node const &rootnode);
 	void add_container_primitives(render_primitive_list &list, const object_transform &root_xform, const object_transform &xform, render_container &container, int blendmode);
 	void add_element_primitives(render_primitive_list &list, const object_transform &xform, layout_element &element, int state, int blendmode);
 	bool map_point_internal(s32 target_x, s32 target_y, render_container *container, float &mapped_x, float &mapped_y, ioport_port *&mapped_input_port, ioport_value &mapped_input_mask);
@@ -1146,6 +1151,7 @@ private:
 
 	// texture lists
 	u32                             m_live_textures;    // number of live textures
+	u64                             m_texture_id;       // rolling texture ID counter
 	fixed_allocator<render_texture> m_texture_allocator;// texture allocator
 
 	// containers for the UI and for screens

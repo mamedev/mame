@@ -10,14 +10,19 @@
 #include "machine/lc89510.h"
 #include "machine/megacdcd.h"
 #include "sound/rf5c68.h"
+#include "screen.h"
+#include "tilemap.h"
 
-class sega_segacd_device : public device_t, public device_gfx_interface
+class sega_segacd_device : public device_t, public device_gfx_interface, public device_video_interface
 {
 public:
+	template <typename T> void set_hostcpu(T &&tag) { m_hostcpu.set_tag(std::forward<T>(tag)); }
+
 	// set some variables at start, depending on region (shall be moved to a device interface?)
 	void set_framerate(int rate) { m_framerate = rate; }
 	void set_total_scanlines(int total) { m_base_total_scanlines = total; }     // this gets set at start only
 	void update_total_scanlines(bool mode3) { m_total_scanlines = mode3 ? (m_base_total_scanlines * 2) : m_base_total_scanlines; }  // this gets set at each EOF
+	double get_framerate() { return has_screen() ? screen().frame_period().as_hz() : double(m_framerate); }
 
 	DECLARE_READ16_MEMBER( segacd_dmaaddr_r );
 	DECLARE_WRITE16_MEMBER( segacd_dmaaddr_w );
@@ -25,12 +30,12 @@ public:
 	DECLARE_WRITE16_MEMBER( scd_a12000_halt_reset_w );
 	DECLARE_READ16_MEMBER( scd_a12000_halt_reset_r );
 	DECLARE_READ16_MEMBER( scd_a12002_memory_mode_r );
-	DECLARE_WRITE8_MEMBER( scd_a12002_memory_mode_w_8_15 );
-	DECLARE_WRITE8_MEMBER( scd_a12002_memory_mode_w_0_7 );
+	void scd_a12002_memory_mode_w_8_15(u8 data);
+	void scd_a12002_memory_mode_w_0_7(u8 data);
 	DECLARE_WRITE16_MEMBER( scd_a12002_memory_mode_w );
 	DECLARE_READ16_MEMBER( segacd_sub_memory_mode_r );
-	DECLARE_WRITE8_MEMBER( segacd_sub_memory_mode_w_8_15 );
-	DECLARE_WRITE8_MEMBER( segacd_sub_memory_mode_w_0_7 );
+	void segacd_sub_memory_mode_w_8_15(u8 data);
+	void segacd_sub_memory_mode_w_0_7(u8 data);
 	DECLARE_WRITE16_MEMBER( segacd_sub_memory_mode_w );
 
 	DECLARE_READ16_MEMBER( segacd_comms_flags_r );
@@ -97,6 +102,7 @@ public:
 	READ16_MEMBER( font_converted_r );
 
 	void segacd_map(address_map &map);
+	void segacd_pcm_map(address_map &map);
 protected:
 	sega_segacd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -104,6 +110,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	required_device<cpu_device> m_scdcpu;
+	required_device<cpu_device> m_hostcpu;
 	required_device<rf5c68_device> m_rfsnd;
 	required_device<lc89510_temp_device> m_lc89510_temp;
 	required_device<timer_device> m_stopwatch_timer;

@@ -25,6 +25,14 @@ void galastrm_state::video_start()
 
 	m_screen->register_screen_bitmap(m_tmpbitmaps);
 	m_screen->register_screen_bitmap(m_poly->screenbits());
+
+	save_item(NAME(m_rsxb));
+	save_item(NAME(m_rsyb));
+	save_item(NAME(m_rsxoffs));
+	save_item(NAME(m_rsyoffs));
+	save_item(NAME(m_frame_counter));
+	save_item(NAME(m_tc0610_addr));
+	save_item(NAME(m_tc0610_ctrl_reg));
 }
 
 
@@ -76,43 +84,36 @@ Heavy use is made of sprite zooming.
 
 void galastrm_state::draw_sprites_pre(int x_offs, int y_offs)
 {
-	uint32_t *spriteram32 = m_spriteram;
-	uint16_t *spritemap = (uint16_t *)memregion("user1")->base();
-	int offs, data, tilenum, color, flipx, flipy;
-	int x, y, priority, dblsize, curx, cury;
 	int sprites_flipscreen = 0;
-	int zoomx, zoomy, zx, zy;
-	int sprite_chunk,map_offset,code,j,k,px,py;
-	int dimension,total_chunks,bad_chunks;
 
 	/* pdrawgfx() needs us to draw sprites front to back, so we have to build a list
 	   while processing sprite ram and then draw them all at the end */
 	m_sprite_ptr_pre = m_spritelist.get();
 
-	for (offs = (m_spriteram.bytes()/4-4);offs >= 0;offs -= 4)
+	for (int offs = (m_spriteram.bytes()/4-4);offs >= 0;offs -= 4)
 	{
-		data = spriteram32[offs+0];
-		flipx =    (data & 0x00800000) >> 23;
-		zoomx =    (data & 0x007f0000) >> 16;
-		tilenum =  (data & 0x00007fff);
+		u32 data = m_spriteram[offs+0];
+		int flipx =          (data & 0x00800000) >> 23;
+		int zoomx =          (data & 0x007f0000) >> 16;
+		const u32 tilenum =  (data & 0x00007fff);
 
 		if (!tilenum) continue;
 
-		data = spriteram32[offs+2];
-		priority = (data & 0x000c0000) >> 18;
-		color =    (data & 0x0003fc00) >> 10;
-		x =        (data & 0x000003ff);
+		data = m_spriteram[offs+2];
+		const int priority = (data & 0x000c0000) >> 18;
+		int color =          (data & 0x0003fc00) >> 10;
+		int x =              (data & 0x000003ff);
 
-		data = spriteram32[offs+3];
-		dblsize =  (data & 0x00040000) >> 18;
-		flipy =    (data & 0x00020000) >> 17;
-		zoomy =    (data & 0x0001fc00) >> 10;
-		y =        (data & 0x000003ff);
+		data = m_spriteram[offs+3];
+		const int dblsize =  (data & 0x00040000) >> 18;
+		int flipy =          (data & 0x00020000) >> 17;
+		int zoomy =          (data & 0x0001fc00) >> 10;
+		int y =              (data & 0x000003ff);
 
-		bad_chunks = 0;
-		dimension = ((dblsize*2) + 2);  // 2 or 4
-		total_chunks = ((dblsize*3) + 1) << 2;  // 4 or 16
-		map_offset = tilenum << 2;
+		int bad_chunks = 0;
+		const int dimension = ((dblsize * 2) + 2);  // 2 or 4
+		const int total_chunks = ((dblsize * 3) + 1) << 2;  // 4 or 16
+		const u32 map_offset = tilenum << 2;
 
 		zoomx += 1;
 		zoomy += 1;
@@ -125,30 +126,30 @@ void galastrm_state::draw_sprites_pre(int x_offs, int y_offs)
 		y += y_offs;
 		if (flipy) y += (128 - zoomy);
 
-		for (sprite_chunk=0;sprite_chunk<total_chunks;sprite_chunk++)
+		for (int sprite_chunk = 0; sprite_chunk < total_chunks; sprite_chunk++)
 		{
-			j = sprite_chunk / dimension;   /* rows */
-			k = sprite_chunk % dimension;   /* chunks per row */
+			const int j = sprite_chunk / dimension;   /* rows */
+			const int k = sprite_chunk % dimension;   /* chunks per row */
 
-			px = k;
-			py = j;
+			int px = k;
+			int py = j;
 			/* pick tiles back to front for x and y flips */
-			if (flipx)  px = dimension-1-k;
-			if (flipy)  py = dimension-1-j;
+			if (flipx)  px = dimension - 1 - k;
+			if (flipy)  py = dimension - 1 - j;
 
-			code = spritemap[map_offset + px + (py<<(dblsize+1))];
+			const u16 code = m_spritemap_rom[map_offset + px + (py << (dblsize + 1))];
 
-			if (code==0xffff)
+			if (code == 0xffff)
 			{
 				bad_chunks += 1;
 				continue;
 			}
 
-			curx = x + ((k*zoomx)/dimension);
-			cury = y + ((j*zoomy)/dimension);
+			int curx = x + ((k * zoomx) / dimension);
+			int cury = y + ((j * zoomy) / dimension);
 
-			zx= x + (((k+1)*zoomx)/dimension) - curx;
-			zy= y + (((j+1)*zoomy)/dimension) - cury;
+			const int zx = x + (((k + 1) * zoomx) / dimension) - curx;
+			const int zy = y + (((j + 1) * zoomy) / dimension) - cury;
 
 			if (sprites_flipscreen)
 			{
@@ -180,7 +181,7 @@ void galastrm_state::draw_sprites_pre(int x_offs, int y_offs)
 	}
 }
 
-void galastrm_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, const int *primasks, int priority)
+void galastrm_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, const u32 *primasks, int priority)
 {
 	struct gs_tempsprite *sprite_ptr = m_sprite_ptr_pre;
 
@@ -206,14 +207,14 @@ void galastrm_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
                 POLYGON RENDERER
 **************************************************************/
 
-void galastrm_renderer::tc0610_draw_scanline(int32_t scanline, const extent_t& extent, const gs_poly_data& object, int threadid)
+void galastrm_renderer::tc0610_draw_scanline(s32 scanline, const extent_t& extent, const gs_poly_data& object, int threadid)
 {
-	uint16_t *framebuffer = &m_screenbits.pix16(scanline);
-	const int32_t dudx = extent.param[0].dpdx;
-	const int32_t dvdx = extent.param[1].dpdx;
+	u16 *framebuffer = &m_screenbits.pix16(scanline);
+	const s32 dudx = extent.param[0].dpdx;
+	const s32 dvdx = extent.param[1].dpdx;
 
-	int32_t u = extent.param[0].start;
-	int32_t v = extent.param[1].start;
+	s32 u = extent.param[0].start;
+	s32 v = extent.param[1].start;
 	for (int x = extent.startx; x < extent.stopx; x++)
 	{
 		framebuffer[x] = object.texbase->pix16(v >> 16, u >> 16);
@@ -241,33 +242,30 @@ void galastrm_renderer::tc0610_rotate_draw(bitmap_ind16 &srcbitmap, const rectan
 	const int lx  = srcbitmap.width();
 	const int ly  = srcbitmap.height();
 
-	int yx, /*yy,*/ zx, zy, pxx, pxy, pyx, pyy;
-	float /*ssn, scs, ysn, ycs,*/ zsn, zcs;
-
-	pxx = 0;
-	pxy = 0;
-	pyx = 0;
-	pyy = 0;
-	zx  = 0;
-	zy  = 0;
+	int pxx = 0;
+	int pxy = 0;
+	int pyx = 0;
+	int pyy = 0;
+	int zx  = 0;
+	int zy  = 0;
 
 	if (rzx != 0 || rzy != 0)
 	{
-		while (sqrtf(powf((float)pxx/4096.0f, 2.0f) + powf((float)pxy/4096.0f, 2.0f)) < (float)(lx / 2))
+		while (sqrtf(powf((float)pxx / 4096.0f, 2.0f) + powf((float)pxy / 4096.0f, 2.0f)) < (float)(lx / 2))
 		{
 			pxx += rzx;
 			pxy += rzy;
 			zx++;
 		}
-		while (sqrtf(powf((float)pyy/4096.0f, 2.0f) + powf((float)pyx/4096.0f, 2.0f)) < (float)(ly / 2))
+		while (sqrtf(powf((float)pyy / 4096.0f, 2.0f) + powf((float)pyx / 4096.0f, 2.0f)) < (float)(ly / 2))
 		{
 			pyy += rzx;
 			pyx += -rzy;
 			zy++;
 		}
 	}
-	zsn = ((float)pyx/4096.0f) / (float)(ly / 2);
-	zcs = ((float)pxx/4096.0f) / (float)(lx / 2);
+	float zsn = ((float)pyx / 4096.0f) / (float)(ly / 2);
+	float zcs = ((float)pxx / 4096.0f) / (float)(lx / 2);
 
 
 	if ((rsx == -240 && rsy == 1072) || !m_state.m_tc0610_ctrl_reg[1][7])
@@ -287,7 +285,7 @@ void galastrm_renderer::tc0610_rotate_draw(bitmap_ind16 &srcbitmap, const rectan
 		if (rsx < m_state.m_rsxb && m_state.m_rsxb > 0 && m_state.m_rsxb-rsx > 0x8000)
 		{
 			if (m_state.m_rsxoffs == 0)
-				m_state.m_rsxoffs = 0x10000-1;
+				m_state.m_rsxoffs = 0x10000 - 1;
 			else
 				m_state.m_rsxoffs = 0;
 		}
@@ -301,7 +299,7 @@ void galastrm_renderer::tc0610_rotate_draw(bitmap_ind16 &srcbitmap, const rectan
 		if (rsy < m_state.m_rsyb && m_state.m_rsyb > 0 && m_state.m_rsyb-rsy > 0x8000)
 		{
 			if (m_state.m_rsyoffs == 0)
-				m_state.m_rsyoffs = 0x10000-1;
+				m_state.m_rsyoffs = 0x10000 - 1;
 			else
 				m_state.m_rsyoffs = 0;
 		}
@@ -318,24 +316,24 @@ void galastrm_renderer::tc0610_rotate_draw(bitmap_ind16 &srcbitmap, const rectan
 	pxy = 0;
 	pyx = 0;
 	pyy = 0;
-	yx  = 0;
-	//yy  = 0;
-	//ssn = 0.0;
-	//scs = 0.0;
-	//ysn = 0.0;
-	//ycs = 0.0;
+	int yx  = 0;
+	//int yy  = 0;
+	//float ssn = 0.0;
+	//float scs = 0.0;
+	//float ysn = 0.0;
+	//float ycs = 0.0;
 
 	if (m_state.m_tc0610_ctrl_reg[1][7])
 	{
 		if (ryx != 0 || ryy != 0)
 		{
-			while (sqrtf(powf((float)pxx/4096.0f, 2.0f) + powf((float)pxy/4096.0f, 2.0f)) < (float)(lx / 2))
+			while (sqrtf(powf((float)pxx / 4096.0f, 2.0f) + powf((float)pxy / 4096.0f, 2.0f)) < (float)(lx / 2))
 			{
 				pxx += ryx;
 				pxy += ryy;
 				yx++;
 			}
-			while (sqrtf(powf((float)pyy/4096.0f, 2.0f) + powf((float)pyx/4096.0f, 2.0f)) < (float)(ly / 2))
+			while (sqrtf(powf((float)pyy / 4096.0f, 2.0f) + powf((float)pyx / 4096.0f, 2.0f)) < (float)(ly / 2))
 			{
 				pyy += ryx;
 				pyx += -ryy;
@@ -356,12 +354,12 @@ void galastrm_renderer::tc0610_rotate_draw(bitmap_ind16 &srcbitmap, const rectan
 
 		if (rsx != 0 || rsy != 0)
 		{
-			while (sqrtf(powf((float)pxx/65536.0f, 2.0) + powf((float)pxy/65536.0f, 2.0f)) < (float)(lx / 2))
+			while (sqrtf(powf((float)pxx / 65536.0f, 2.0) + powf((float)pxy / 65536.0f, 2.0f)) < (float)(lx / 2))
 			{
 				pxx += rsx;
 				pxy += rsy;
 			}
-			while (sqrtf(powf((float)pyy/65536.0f, 2.0f) + powf((float)pyx/65536.0f, 2.0f)) < (float)(ly / 2))
+			while (sqrtf(powf((float)pyy / 65536.0f, 2.0f) + powf((float)pyx / 65536.0f, 2.0f)) < (float)(ly / 2))
 			{
 				pyy += rsx;
 				pyx += -rsy;
@@ -373,17 +371,17 @@ void galastrm_renderer::tc0610_rotate_draw(bitmap_ind16 &srcbitmap, const rectan
 
 	{
 //      polyVert tmpz[4];
-		tmpz[0].x = ((float)(-zx)  * zcs) - ((float)(-zy)  * zsn);
-		tmpz[0].y = ((float)(-zx)  * zsn) + ((float)(-zy)  * zcs);
+		tmpz[0].x = ((float)(-zx)    * zcs) - ((float)(-zy)    * zsn);
+		tmpz[0].y = ((float)(-zx)    * zsn) + ((float)(-zy)    * zcs);
 //      tmpz[0].z = 0.0;
-		tmpz[1].x = ((float)(-zx)  * zcs) - ((float)(zy-1) * zsn);
-		tmpz[1].y = ((float)(-zx)  * zsn) + ((float)(zy-1) * zcs);
+		tmpz[1].x = ((float)(-zx)    * zcs) - ((float)(zy - 1) * zsn);
+		tmpz[1].y = ((float)(-zx)    * zsn) + ((float)(zy - 1) * zcs);
 //      tmpz[1].z = 0.0;
-		tmpz[2].x = ((float)(zx-1) * zcs) - ((float)(zy-1) * zsn);
-		tmpz[2].y = ((float)(zx-1) * zsn) + ((float)(zy-1) * zcs);
+		tmpz[2].x = ((float)(zx - 1) * zcs) - ((float)(zy - 1) * zsn);
+		tmpz[2].y = ((float)(zx - 1) * zsn) + ((float)(zy - 1) * zcs);
 //      tmpz[2].z = 0.0;
-		tmpz[3].x = ((float)(zx-1) * zcs) - ((float)(-zy)  * zsn);
-		tmpz[3].y = ((float)(zx-1) * zsn) + ((float)(-zy)  * zcs);
+		tmpz[3].x = ((float)(zx - 1) * zcs) - ((float)(-zy)    * zsn);
+		tmpz[3].y = ((float)(zx - 1) * zsn) + ((float)(-zy)    * zcs);
 //      tmpz[3].z = 0.0;
 
 		vert[0].x = tmpz[0].x + (float)(lx / 2);
@@ -416,20 +414,19 @@ void galastrm_renderer::tc0610_rotate_draw(bitmap_ind16 &srcbitmap, const rectan
                 SCREEN REFRESH
 **************************************************************/
 
-uint32_t galastrm_state::screen_update_galastrm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 galastrm_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t layer[5];
-	uint8_t pivlayer[3];
-	uint16_t priority;
-	static const int primasks[4] = {0xfffc, 0xfff0, 0xff00, 0x0};
+	u8 layer[5];
+	u8 pivlayer[3];
+	static const u32 primasks[4] = {0xfffc, 0xfff0, 0xff00, 0x0};
 	bitmap_ind8 &priority_bitmap = screen.priority();
 
-	rectangle clip(0, screen.width() -1, 0, screen.height() -1);
+	rectangle clip(0, screen.width() -1, 0, screen.height()  - 1);
 
 	m_tc0100scn->tilemap_update();
 	m_tc0480scp->tilemap_update();
 
-	priority = m_tc0480scp->get_bg_priority();
+	const u16 priority = m_tc0480scp->get_bg_priority();
 	layer[0] = (priority & 0xf000) >> 12;   /* tells us which bg layer is bottom */
 	layer[1] = (priority & 0x0f00) >>  8;
 	layer[2] = (priority & 0x00f0) >>  4;
@@ -465,14 +462,11 @@ uint32_t galastrm_state::screen_update_galastrm(screen_device &screen, bitmap_in
 
 	if (layer[0]==3 && layer[1]==0 && layer[2]==1 && layer[3]==2)
 	{
-		int x,y;
-		uint8_t *pri;
-
-		for (y=0; y < priority_bitmap.height; y++)
+		for (int y = 0; y < priority_bitmap.height; y++)
 		{
-			for (x=0; x < priority_bitmap.width; x++)
+			for (int x = 0; x < priority_bitmap.width; x++)
 			{
-				pri = &priority_bitmap.pix8(y, x);
+				u8 *pri = &priority_bitmap.pix8(y, x);
 				if (!(*pri & 0x02) && m_tmpbitmaps.pix16(y, x))
 						*pri |= 0x04;
 			}
@@ -480,14 +474,14 @@ uint32_t galastrm_state::screen_update_galastrm(screen_device &screen, bitmap_in
 	}
 
 	draw_sprites_pre(machine(), 42-X_OFFSET, -571+Y_OFFSET);
-	draw_sprites(screen,m_tmpbitmaps,clip,primasks,1);
+	draw_sprites(screen, m_tmpbitmaps, clip, primasks, 1);
 
-	copybitmap_trans(bitmap,m_polybitmap,0,0, 0,0,cliprect,0);
+	copybitmap_trans(bitmap, m_polybitmap, 0,0, 0,0, cliprect, 0);
 	m_polybitmap->fill(0, clip);
-	tc0610_rotate_draw(machine(),m_polybitmap,m_tmpbitmaps,cliprect);
+	tc0610_rotate_draw(machine(), m_polybitmap, m_tmpbitmaps, cliprect);
 
 	priority_bitmap.fill(0, cliprect);
-	draw_sprites(screen,bitmap,cliprect,primasks,0);
+	draw_sprites(screen, bitmap, cliprect, primasks, 0);
 
 	if (!machine().input().code_pressed(KEYCODE_B)) m_tc0480scp->tilemap_draw(screen, bitmap, cliprect, layer[4], 0, 0);
 	if (!machine().input().code_pressed(KEYCODE_M)) m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, pivlayer[2], 0, 0);
@@ -495,7 +489,7 @@ uint32_t galastrm_state::screen_update_galastrm(screen_device &screen, bitmap_in
 
 
 #else
-	if (layer[0]==0 && layer[1]==3 && layer[2]==2 && layer[3]==1)
+	if (layer[0] == 0 && layer[1] == 3 && layer[2] == 2 && layer[3] == 1)
 	{
 		m_tc0480scp->tilemap_draw(screen, m_tmpbitmaps, clip, layer[0], 0, 1);
 		m_tc0480scp->tilemap_draw(screen, m_tmpbitmaps, clip, layer[1], 0, 4);
@@ -510,31 +504,28 @@ uint32_t galastrm_state::screen_update_galastrm(screen_device &screen, bitmap_in
 		m_tc0480scp->tilemap_draw(screen, m_tmpbitmaps, clip, layer[3], 0, 8);
 	}
 
-	if (layer[0]==3 && layer[1]==0 && layer[2]==1 && layer[3]==2)
+	if (layer[0] == 3 && layer[1] == 0 && layer[2] == 1 && layer[3] == 2)
 	{
-		int x,y;
-		uint8_t *pri;
-
-		for (y=0; y < priority_bitmap.height(); y++)
+		for (int y=0; y < priority_bitmap.height(); y++)
 		{
-			for (x=0; x < priority_bitmap.width(); x++)
+			for (int x=0; x < priority_bitmap.width(); x++)
 			{
-				pri = &priority_bitmap.pix8(y, x);
+				u8 *pri = &priority_bitmap.pix8(y, x);
 				if (!(*pri & 0x02) && m_tmpbitmaps.pix16(y, x))
 					*pri |= 0x04;
 			}
 		}
 	}
 
-	draw_sprites_pre(42-X_OFFSET, -571+Y_OFFSET);
-	draw_sprites(screen,m_tmpbitmaps,clip,primasks,1);
+	draw_sprites_pre(42 - X_OFFSET, -571 + Y_OFFSET);
+	draw_sprites(screen, m_tmpbitmaps, clip, primasks, 1);
 
 	copybitmap_trans(bitmap, m_poly->screenbits(), 0,0, 0,0, cliprect, 0);
 	m_poly->screenbits().fill(0, clip);
 	m_poly->tc0610_rotate_draw(m_tmpbitmaps, cliprect);
 
 	priority_bitmap.fill(0, cliprect);
-	draw_sprites(screen,bitmap,cliprect,primasks,0);
+	draw_sprites(screen, bitmap, cliprect, primasks, 0);
 
 	m_tc0480scp->tilemap_draw(screen, bitmap, cliprect, layer[4], 0, 0);
 	m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, pivlayer[2], 0, 0);

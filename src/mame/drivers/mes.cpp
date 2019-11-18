@@ -14,6 +14,7 @@ Schleicher MES
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
 #include "machine/keyboard.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -27,15 +28,17 @@ public:
 		, m_p_chargen(*this, "chargen")
 	{ }
 
+	void mes(machine_config &config);
+
+private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void kbd_put(u8 data);
 	DECLARE_READ8_MEMBER(port00_r);
 	DECLARE_READ8_MEMBER(port08_r);
 
-	void mes(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	u8 m_term_data;
 	u8 m_port08;
 	virtual void machine_reset() override;
@@ -68,8 +71,8 @@ void mes_state::mem_map(address_map &map)
 void mes_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).r(this, FUNC(mes_state::port00_r));
-	map(0x08, 0x08).r(this, FUNC(mes_state::port08_r));
+	map(0x00, 0x00).r(FUNC(mes_state::port00_r));
+	map(0x08, 0x08).r(FUNC(mes_state::port08_r));
 	map(0x0c, 0x0f).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x10, 0x13).rw("sio", FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w));
 	map(0x18, 0x1b).rw("pio", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
@@ -128,30 +131,31 @@ void mes_state::kbd_put(u8 data)
 	m_term_data = data;
 }
 
-MACHINE_CONFIG_START(mes_state::mes)
+void mes_state::mes(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000) / 4)
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	Z80(config, m_maincpu, XTAL(16'000'000) / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mes_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &mes_state::io_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(mes_state, screen_update)
-	MCFG_SCREEN_SIZE(640, 250)
-	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 249)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update(FUNC(mes_state::screen_update));
+	screen.set_size(640, 250);
+	screen.set_visarea(0, 639, 0, 249);
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, 0)
-	MCFG_DEVICE_ADD("pio", Z80PIO, 0)
-	MCFG_DEVICE_ADD("sio", Z80SIO, 0)
+	Z80CTC(config, "ctc", 0);
+	Z80PIO(config, "pio", 0);
+	Z80SIO(config, "sio", 0);
 
-	MCFG_DEVICE_ADD("keybd", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(mes_state, kbd_put))
-MACHINE_CONFIG_END
+	generic_keyboard_device &keybd(GENERIC_KEYBOARD(config, "keybd", 0));
+	keybd.set_keyboard_callback(FUNC(mes_state::kbd_put));
+}
 
 
 /* ROM definition */
@@ -169,5 +173,5 @@ ROM_END
 
 /* Driver */
 
-//   YEAR   NAME    PARENT  COMPAT   MACHINE  INPUT  STATE      INIT  COMPANY       FULLNAME  FLAGS
-COMP( 198?, mes,    0,      0,       mes,     mes,   mes_state, 0,    "Schleicher", "MES",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//   YEAR   NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY       FULLNAME  FLAGS
+COMP( 198?, mes,  0,      0,      mes,     mes,   mes_state, empty_init, "Schleicher", "MES",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

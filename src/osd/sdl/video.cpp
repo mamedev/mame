@@ -109,13 +109,21 @@ void sdl_osd_interface::update(bool skip_redraw)
 //      profiler_mark(PROFILER_END);
 	}
 
-	// poll the joystick values here
-	downcast<sdl_osd_interface&>(machine().osd()).poll_inputs(machine());
-
-	check_osd_inputs(machine());
 	// if we're running, disable some parts of the debugger
 	if ((machine().debug_flags & DEBUG_FLAG_OSD_ENABLED) != 0)
 		debugger_update();
+}
+
+//============================================================
+//  input_update
+//============================================================
+
+void sdl_osd_interface::input_update()
+{
+	// poll the joystick values here
+	process_events_buf();
+	poll_inputs(machine());
+	check_osd_inputs(machine());
 }
 
 //============================================================
@@ -195,13 +203,13 @@ void sdl_osd_interface::extract_video_config()
 	// default to working video please
 	video_config.novideo = 0;
 
-	// d3d options: extract the data
+	// video options: extract the data
 	stemp = options().video();
 	if (strcmp(stemp, "auto") == 0)
 	{
-#if (defined SDLMAME_MACOSX || defined SDLMAME_WIN32)
+#if (defined SDLMAME_WIN32)
 		stemp = "opengl";
-#elif (defined __STEAMLINK__)
+#elif (defined SDLMAME_MACOSX || defined __STEAMLINK__)
 		stemp = "bgfx";
 #else
 		stemp = "soft";

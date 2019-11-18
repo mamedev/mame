@@ -13,10 +13,16 @@
 
 /***************************************************************************/
 
-WRITE16_MEMBER(rastan_state::rastan_spritectrl_w)
+void rastan_state::rastan_colpri_cb(u32 &sprite_colbank, u32 &pri_mask, u16 sprite_ctrl)
 {
 	/* bits 5-7 are the sprite palette bank */
-	m_pc090oj->set_sprite_ctrl((data & 0xe0) >> 5);
+	sprite_colbank = (sprite_ctrl & 0xe0) >> 1;
+	pri_mask = 0; /* sprites over everything */
+}
+
+void rastan_state::spritectrl_w(u16 data)
+{
+	m_pc090oj->sprite_ctrl_w(data);
 
 	/* bit 4 unused */
 
@@ -31,7 +37,7 @@ WRITE16_MEMBER(rastan_state::rastan_spritectrl_w)
 
 /***************************************************************************/
 
-uint32_t rastan_state::screen_update_rastan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 rastan_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layer[2];
 
@@ -45,6 +51,6 @@ uint32_t rastan_state::screen_update_rastan(screen_device &screen, bitmap_ind16 
 	m_pc080sn->tilemap_draw(screen, bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 1);
 	m_pc080sn->tilemap_draw(screen, bitmap, cliprect, layer[1], 0, 2);
 
-	m_pc090oj->draw_sprites(bitmap, cliprect, screen.priority(), 0);
+	m_pc090oj->draw_sprites(screen, bitmap, cliprect);
 	return 0;
 }

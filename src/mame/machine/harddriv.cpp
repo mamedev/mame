@@ -37,6 +37,7 @@
 
 void harddriv_state::device_start()
 {
+	m_lamps.resolve();
 	//atarigen_state::machine_start();
 
 	/* predetermine memory regions */
@@ -143,7 +144,7 @@ READ16_MEMBER( harddriv_state::hd68k_gsp_io_r )
 	uint16_t result;
 	offset = (offset / 2) ^ 1;
 	m_hd34010_host_access = true;
-	result = m_gsp->host_r(space, offset, 0xffff);
+	result = m_gsp->host_r(offset);
 	m_hd34010_host_access = false;
 	return result;
 }
@@ -153,7 +154,7 @@ WRITE16_MEMBER( harddriv_state::hd68k_gsp_io_w )
 {
 	offset = (offset / 2) ^ 1;
 	m_hd34010_host_access = true;
-	m_gsp->host_w(space, offset, data, 0xffff);
+	m_gsp->host_w(offset, data);
 	m_hd34010_host_access = false;
 }
 
@@ -170,7 +171,7 @@ READ16_MEMBER( harddriv_state::hd68k_msp_io_r )
 	uint16_t result;
 	offset = (offset / 2) ^ 1;
 	m_hd34010_host_access = true;
-	result = m_msp.found() ? m_msp->host_r(space, offset, 0xffff) : 0xffff;
+	result = m_msp.found() ? m_msp->host_r(offset) : 0xffff;
 	m_hd34010_host_access = false;
 	return result;
 }
@@ -182,7 +183,7 @@ WRITE16_MEMBER( harddriv_state::hd68k_msp_io_w )
 	if (m_msp.found())
 	{
 		m_hd34010_host_access = true;
-		m_msp->host_w(space, offset, data, 0xffff);
+		m_msp->host_w(offset, data);
 		m_hd34010_host_access = false;
 	}
 }
@@ -311,7 +312,7 @@ WRITE16_MEMBER( harddriv_state::hd68k_adc_control_w )
 	COMBINE_DATA(&m_adc_control);
 
 	/* handle a write to the 8-bit ADC address select */
-	m_adc8->address_w(space, 0, m_adc_control & 0x07);
+	m_adc8->address_w(m_adc_control & 0x07);
 	m_adc8->start_w(BIT(m_adc_control, 3));
 
 	/* handle a write to the 12-bit ADC address select */
@@ -415,11 +416,11 @@ WRITE16_MEMBER( harddriv_state::hd68k_nwr_w )
 			break;
 		case 2: /* LC1 */
 			// used for seat locking on harddriv
-			machine().output().set_led_value(1, data);
+			m_lamps[0] = data;
 			break;
 		case 3: /* LC2 */
 			// used for "abort" button lamp
-			machine().output().set_led_value(2, data);
+			m_lamps[1] = data;
 			break;
 		case 4: /* ZP1 */
 			m_m68k_zp1 = data;
@@ -463,7 +464,7 @@ READ16_MEMBER( harddriv_state::hd68k_zram_r )
 		data |= m_210e->read(space, offset, mem_mask);
 
 	if (ACCESSING_BITS_8_15)
-		data |= m_200e->read(space, offset, mem_mask >> 8) << 8;
+		data |= m_200e->read(offset) << 8;
 
 	return data;
 }
@@ -477,7 +478,7 @@ WRITE16_MEMBER( harddriv_state::hd68k_zram_w )
 			m_210e->write(space, offset, data, mem_mask);
 
 		if (ACCESSING_BITS_8_15)
-			m_200e->write(space, offset, data >> 8, mem_mask >> 8);
+			m_200e->write(offset, data >> 8);
 	}
 }
 
@@ -502,7 +503,7 @@ WRITE_LINE_MEMBER(harddriv_state::harddriv_duart_irq_handler)
  *
  *************************************/
 
-WRITE16_MEMBER( harddriv_state::hdgsp_io_w )
+void harddriv_state::hdgsp_io_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	/* detect an enabling of the shift register and force yielding */
 	if (offset == REG_DPYCTL)
@@ -519,10 +520,8 @@ WRITE16_MEMBER( harddriv_state::hdgsp_io_w )
 	screen_device &scr = m_gsp->screen();
 
 	/* detect changes to HEBLNK and HSBLNK and force an update before they change */
-	if ((offset == REG_HEBLNK || offset == REG_HSBLNK) && data != m_gsp->io_register_r(space, offset, 0xffff))
+	if ((offset == REG_HEBLNK || offset == REG_HSBLNK) && data != m_gsp->io_register_r(offset))
 		scr.update_partial(scr.vpos() - 1);
-
-	m_gsp->io_register_w(space, offset, data, mem_mask);
 }
 
 
@@ -1217,7 +1216,7 @@ WRITE16_MEMBER( harddriv_state::hdds3_sdsp_control_w )
 			{
 				uint32_t page = (data >> 6) & 7;
 				m_ds3sdsp->load_boot_data(m_ds3sdsp_region->base() + (0x2000 * page), m_ds3sdsp_pgm_memory);
-				m_ds3sdsp->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+				m_ds3sdsp->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 				data &= ~0x200;
 			}
 

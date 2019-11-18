@@ -7,6 +7,7 @@
 **********************************************************************/
 
 #include "emu.h"
+#include "screen.h"
 #include "zapper.h"
 
 //**************************************************************************
@@ -80,11 +81,29 @@ void nes_zapper_device::device_reset()
 uint8_t nes_zapper_device::read_bit34()
 {
 	uint8_t ret = m_trigger->read();
-	if (!m_port->m_brightpixel_cb.isnull() &&
-		m_port->m_brightpixel_cb(m_lightx->read(), m_lighty->read()))
+	int x = m_lightx->read();
+	int y = m_lighty->read();
+
+	// update the screen if necessary
+	if (!m_port->m_screen->vblank())
+	{
+		int vpos = m_port->m_screen->vpos();
+		int hpos = m_port->m_screen->hpos();
+
+		if (vpos > y || (vpos == y && hpos >= x))
+			m_port->m_screen->update_now();
+	}
+
+	// get the pixel at the gun position
+	rgb_t pix = m_port->m_screen->pixel(x, y);
+
+	// check if the cursor is over a bright pixel
+	// FIXME: still a gross hack
+	if (pix.r() == 0xff && pix.b() == 0xff && pix.g() > 0x90)
 		ret &= ~0x08; // sprite hit
 	else
 		ret |= 0x08;  // no sprite hit
+
 	return ret;
 }
 

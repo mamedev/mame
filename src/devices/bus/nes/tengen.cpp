@@ -21,7 +21,6 @@
 #include "emu.h"
 #include "tengen.h"
 
-#include "cpu/m6502/m6502.h"
 #include "video/ppu2c0x.h"      // this has to be included so that IRQ functions can access ppu2c0x_device::BOTTOM_VISIBLE_SCANLINE
 
 
@@ -83,7 +82,7 @@ void nes_tengen032_device::device_start()
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
 	irq_timer->reset();
-	timer_freq = machine().device<cpu_device>("maincpu")->cycles_to_attotime(4);
+	timer_freq = clocks_to_attotime(4);
 
 	save_item(NAME(m_mmc_prg_bank));
 	save_item(NAME(m_mmc_vrom_bank));
@@ -127,7 +126,7 @@ void nes_tengen032_device::pcb_reset()
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_tengen008_device::write_h)
+void nes_tengen008_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("tengen008 write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -176,7 +175,7 @@ inline void nes_tengen032_device::irq_clock(int blanked)
 
 	m_irq_count--;
 	if (m_irq_enable && !blanked && !m_irq_count)
-		m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+		set_irq_line(ASSERT_LINE);
 }
 
 // we use the HBLANK IRQ latch from PPU for the scanline based IRQ mode
@@ -241,7 +240,7 @@ void nes_tengen032_device::set_chr()
 	chr_cb(7 ^ chr_page, m_mmc_vrom_bank[5], CHRROM);
 }
 
-WRITE8_MEMBER(nes_tengen032_device::tengen032_write)
+void nes_tengen032_device::tengen032_write(offs_t offset, uint8_t data)
 {
 	uint8_t helper, cmd;
 	LOG_MMC(("tengen032_write, offset: %04x, data: %02x\n", offset, data));
@@ -305,7 +304,7 @@ WRITE8_MEMBER(nes_tengen032_device::tengen032_write)
 
 		case 0x6000:
 			m_irq_enable = 0;
-			m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+			set_irq_line(CLEAR_LINE);
 			break;
 
 		case 0x6001:
@@ -360,7 +359,7 @@ void nes_tengen037_device::chr_cb( int start, int bank, int source )
 }
 
 
-WRITE8_MEMBER(nes_tengen037_device::write_h)
+void nes_tengen037_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("tengen037 write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -370,7 +369,7 @@ WRITE8_MEMBER(nes_tengen037_device::write_h)
 			break;
 
 		default:
-			tengen032_write(space, offset, data, mem_mask);
+			tengen032_write(offset, data);
 			break;
 	}
 }

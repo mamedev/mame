@@ -6,10 +6,9 @@
 
 #pragma once
 
-DECLARE_DEVICE_TYPE(GAMATE_VIDEO, gamate_video_device)
+#include "emupal.h"
 
-#define MCFG_GAMATE_VIDEO_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, GAMATE_VIDEO, 0)
+DECLARE_DEVICE_TYPE(GAMATE_VIDEO, gamate_video_device)
 
 class gamate_video_device : public device_t,
 	public device_memory_interface
@@ -29,18 +28,18 @@ public:
 	void regs_map(address_map &map);
 	void vram_map(address_map &map);
 
-	DECLARE_PALETTE_INIT(gamate);
-
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 	virtual space_config_vector memory_space_config() const override;
+
 	address_space *m_vramspace;
 
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void gamate_palette(palette_device &palette) const;
 	const address_space_config m_vram_space_config;
 	required_shared_ptr<uint8_t> m_vram;
 

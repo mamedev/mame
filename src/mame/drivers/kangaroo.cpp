@@ -166,7 +166,7 @@
 #include "speaker.h"
 
 
-#define MASTER_CLOCK        XTAL(10'000'000)
+#define MASTER_CLOCK        (10_MHz_XTAL)
 
 
 
@@ -185,7 +185,7 @@ void kangaroo_state::machine_start()
 MACHINE_START_MEMBER(kangaroo_state,kangaroo_mcu)
 {
 	kangaroo_state::machine_start();
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xef00, 0xefff, read8_delegate(FUNC(kangaroo_state::mcu_sim_r),this), write8_delegate(FUNC(kangaroo_state::mcu_sim_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xef00, 0xefff, read8_delegate(*this, FUNC(kangaroo_state::mcu_sim_r)), write8_delegate(*this, FUNC(kangaroo_state::mcu_sim_w)));
 	save_item(NAME(m_mcu_clock));
 }
 
@@ -203,7 +203,7 @@ void kangaroo_state::machine_reset()
 	/* the copy protection. */
 	/* Anyway, what I do here is just immediately generate the NMI, so the game */
 	/* properly starts. */
-	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 
 	m_mcu_clock = 0;
 }
@@ -254,13 +254,13 @@ WRITE8_MEMBER(kangaroo_state::kangaroo_coin_counter_w)
 void kangaroo_state::main_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
-	map(0x8000, 0xbfff).w(this, FUNC(kangaroo_state::kangaroo_videoram_w));
+	map(0x8000, 0xbfff).w(FUNC(kangaroo_state::kangaroo_videoram_w));
 	map(0xc000, 0xdfff).bankr("bank1");
 	map(0xe000, 0xe3ff).ram();
 	map(0xe400, 0xe400).mirror(0x03ff).portr("DSW0");
-	map(0xe800, 0xe80a).mirror(0x03f0).w(this, FUNC(kangaroo_state::kangaroo_video_control_w)).share("video_control");
+	map(0xe800, 0xe80a).mirror(0x03f0).w(FUNC(kangaroo_state::kangaroo_video_control_w)).share("video_control");
 	map(0xec00, 0xec00).mirror(0x00ff).portr("IN0").w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0xed00, 0xed00).mirror(0x00ff).portr("IN1").w(this, FUNC(kangaroo_state::kangaroo_coin_counter_w));
+	map(0xed00, 0xed00).mirror(0x00ff).portr("IN1").w(FUNC(kangaroo_state::kangaroo_coin_counter_w));
 	map(0xee00, 0xee00).mirror(0x00ff).portr("IN2");
 }
 
@@ -273,17 +273,6 @@ void kangaroo_state::main_map(address_map &map)
  *************************************/
 
 void kangaroo_state::sound_map(address_map &map)
-{
-	map(0x0000, 0x0fff).rom();
-	map(0x4000, 0x43ff).mirror(0x0c00).ram();
-	map(0x6000, 0x6000).mirror(0x0fff).r("soundlatch", FUNC(generic_latch_8_device::read));
-	map(0x7000, 0x7000).mirror(0x0fff).w("aysnd", FUNC(ay8910_device::data_w));
-	map(0x8000, 0x8000).mirror(0x0fff).w("aysnd", FUNC(ay8910_device::address_w));
-}
-
-
-/* yes, this is identical */
-void kangaroo_state::sound_portmap(address_map &map)
 {
 	map(0x0000, 0x0fff).rom();
 	map(0x4000, 0x43ff).mirror(0x0c00).ram();
@@ -429,45 +418,44 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(kangaroo_state::nomcu)
-
+void kangaroo_state::nomcu(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", kangaroo_state,  irq0_line_hold)
+	Z80(config, m_maincpu, MASTER_CLOCK/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &kangaroo_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(kangaroo_state::irq0_line_hold));
 
-	MCFG_CPU_ADD("audiocpu", Z80, MASTER_CLOCK/8)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", kangaroo_state,  irq0_line_hold)
+	z80_device &audiocpu(Z80(config, "audiocpu", MASTER_CLOCK/8));
+	audiocpu.set_addrmap(AS_PROGRAM, &kangaroo_state::sound_map);
+	audiocpu.set_addrmap(AS_IO, &kangaroo_state::sound_map); // yes, this is identical
+	audiocpu.set_vblank_int("screen", FUNC(kangaroo_state::irq0_line_hold));
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK, 320*2, 0*2, 256*2, 260, 8, 248)
-	MCFG_SCREEN_UPDATE_DRIVER(kangaroo_state, screen_update_kangaroo)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_UPDATE_SCANLINE);
+	screen.set_raw(MASTER_CLOCK, 320*2, 0*2, 256*2, 260, 8, 248);
+	screen.set_screen_update(FUNC(kangaroo_state::screen_update_kangaroo));
 
-	MCFG_PALETTE_ADD_3BIT_BGR("palette")
+	PALETTE(config, m_palette, palette_device::BGR_3BIT);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	AY8910(config, "aysnd", MASTER_CLOCK/8).add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
-MACHINE_CONFIG_START(kangaroo_state::mcu)
+void kangaroo_state::mcu(machine_config &config)
+{
 	nomcu(config);
 
 	MCFG_MACHINE_START_OVERRIDE(kangaroo_state,kangaroo_mcu)
 
-	MCFG_CPU_ADD("mcu", MB8841, MASTER_CLOCK/4/2)
-	MCFG_DEVICE_DISABLE()
-MACHINE_CONFIG_END
+	MB8841(config, "mcu", MASTER_CLOCK/4/2).set_disable();
+}
 
 
 
@@ -576,7 +564,7 @@ ROM_END
  *
  *************************************/
 
-GAME( 1981, fnkyfish,  0,        nomcu, fnkyfish, kangaroo_state, 0, ROT90, "Sun Electronics",                 "Funky Fish",         MACHINE_SUPPORTS_SAVE )
-GAME( 1982, kangaroo,  0,        mcu,   kangaroo, kangaroo_state, 0, ROT90, "Sun Electronics",                 "Kangaroo",           MACHINE_SUPPORTS_SAVE )
-GAME( 1982, kangarooa, kangaroo, mcu,   kangaroo, kangaroo_state, 0, ROT90, "Sun Electronics (Atari license)", "Kangaroo (Atari)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1982, kangaroob, kangaroo, nomcu, kangaroo, kangaroo_state, 0, ROT90, "bootleg",                         "Kangaroo (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, fnkyfish,  0,        nomcu, fnkyfish, kangaroo_state, empty_init, ROT90, "Sun Electronics",                 "Funky Fish",         MACHINE_SUPPORTS_SAVE )
+GAME( 1982, kangaroo,  0,        mcu,   kangaroo, kangaroo_state, empty_init, ROT90, "Sun Electronics",                 "Kangaroo",           MACHINE_SUPPORTS_SAVE )
+GAME( 1982, kangarooa, kangaroo, mcu,   kangaroo, kangaroo_state, empty_init, ROT90, "Sun Electronics (Atari license)", "Kangaroo (Atari)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1982, kangaroob, kangaroo, nomcu, kangaroo, kangaroo_state, empty_init, ROT90, "bootleg",                         "Kangaroo (bootleg)", MACHINE_SUPPORTS_SAVE )

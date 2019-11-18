@@ -9,22 +9,33 @@
 *********************************************************************/
 
 #include "emu.h"
+#include "ui/miscmenu.h"
+
+#include "ui/inifile.h"
+#include "ui/selector.h"
+#include "ui/submenu.h"
+#include "ui/ui.h"
+
 #include "mame.h"
 #include "osdnet.h"
 #include "mameopts.h"
 #include "pluginopts.h"
 #include "drivenum.h"
 #include "natkeyboard.h"
+#include "romload.h"
 
 #include "uiinput.h"
-#include "ui/ui.h"
-#include "ui/menu.h"
-#include "ui/miscmenu.h"
+
 #include "../info.h"
-#include "ui/inifile.h"
-#include "ui/submenu.h"
+
+#include <algorithm>
+#include <cstring>
+#include <fstream>
+#include <iterator>
+
 
 namespace ui {
+
 /***************************************************************************
     MENU HANDLERS
 ***************************************************************************/
@@ -267,93 +278,99 @@ void menu_bookkeeping::populate(float &customtop, float &custombottom)
 
 void menu_crosshair::handle()
 {
-	/* process the menu */
-	const event *menu_event = process(PROCESS_LR_REPEAT);
+	// process the menu
+	event const *const menu_event(process(PROCESS_LR_REPEAT));
 
-	/* handle events */
-	if (menu_event != nullptr && menu_event->itemref != nullptr)
+	// handle events
+	if (menu_event && menu_event->itemref)
 	{
-		crosshair_item_data *data = (crosshair_item_data *)menu_event->itemref;
-		bool changed = false;
-		//int set_def = false;
-		int newval = data->cur;
-
-		/* retreive the user settings */
-		render_crosshair &crosshair = machine().crosshair().get_crosshair(data->player);
+		crosshair_item_data &data(*reinterpret_cast<crosshair_item_data *>(menu_event->itemref));
+		bool changed(false);
+		int newval(data.cur);
 
 		switch (menu_event->iptkey)
 		{
-			/* if selected, reset to default value */
-			case IPT_UI_SELECT:
-				newval = data->defvalue;
-				//set_def = true;
-				break;
+		// if selected, reset to default value
+		case IPT_UI_SELECT:
+			newval = data.defvalue;
+			break;
 
-			/* left decrements */
-			case IPT_UI_LEFT:
-				newval -= machine().input().code_pressed(KEYCODE_LSHIFT) ? 10 : 1;
-				break;
+		// left decrements
+		case IPT_UI_LEFT:
+			newval -= machine().input().code_pressed(KEYCODE_LSHIFT) ? 10 : 1;
+			break;
 
-			/* right increments */
-			case IPT_UI_RIGHT:
-				newval += machine().input().code_pressed(KEYCODE_LSHIFT) ? 10 : 1;
-				break;
+		// right increments
+		case IPT_UI_RIGHT:
+			newval += machine().input().code_pressed(KEYCODE_LSHIFT) ? 10 : 1;
+			break;
 		}
 
-		/* clamp to range */
-		if (newval < data->min)
-			newval = data->min;
-		if (newval > data->max)
-			newval = data->max;
+		// clamp to range
+		if (newval < data.min)
+			newval = data.min;
+		if (newval > data.max)
+			newval = data.max;
 
-		/* if things changed, update */
-		if (newval != data->cur)
+		// if things changed, update
+		if (newval != data.cur)
 		{
-			switch (data->type)
+			switch (data.type)
 			{
-				/* visibility state */
-				case CROSSHAIR_ITEM_VIS:
-					crosshair.set_mode(newval);
-					// set visibility as specified by mode - auto mode starts with visibility off
-					crosshair.set_visible(newval == CROSSHAIR_VISIBILITY_ON);
-					changed = true;
-					break;
+			// visibility state
+			case CROSSHAIR_ITEM_VIS:
+				data.crosshair->set_mode(newval);
+				// set visibility as specified by mode - auto mode starts with visibility off
+				data.crosshair->set_visible(newval == CROSSHAIR_VISIBILITY_ON);
+				changed = true;
+				break;
 
-				/* auto time */
-				case CROSSHAIR_ITEM_AUTO_TIME:
-					machine().crosshair().set_auto_time(newval);
-					changed = true;
-					break;
+			// auto time
+			case CROSSHAIR_ITEM_AUTO_TIME:
+				machine().crosshair().set_auto_time(newval);
+				changed = true;
+				break;
 			}
 		}
 
-		/* crosshair graphic name */
-		if (data->type == CROSSHAIR_ITEM_PIC)
+		// crosshair graphic name
+		if (data.type == CROSSHAIR_ITEM_PIC)
 		{
 			switch (menu_event->iptkey)
 			{
-				case IPT_UI_SELECT:
-					crosshair.set_default_bitmap();
-					changed = true;
-					break;
+			case IPT_UI_SELECT:
+				{
+					std::vector<std::string> sel;
+					sel.reserve(m_pics.size() + 1);
+					sel.push_back("DEFAULT");
+					std::copy(m_pics.begin(), m_pics.end(), std::back_inserter(sel));
+					menu::stack_push<menu_selector>(
+							ui(), container(), std::move(sel), data.cur,
+							[this, &data] (int selection)
+							{
+								if (!selection)
+									data.crosshair->set_default_bitmap();
+								else
+									data.crosshair->set_bitmap_name(m_pics[selection - 1].c_str());
+								reset(reset_options::REMEMBER_REF);
+							});
+				}
+				break;
 
-				case IPT_UI_LEFT:
-					crosshair.set_bitmap_name(data->last_name);
-					changed = true;
-					break;
+			case IPT_UI_LEFT:
+				data.crosshair->set_bitmap_name(data.last_name.c_str());
+				changed = true;
+				break;
 
-				case IPT_UI_RIGHT:
-					crosshair.set_bitmap_name(data->next_name);
-					changed = true;
-					break;
+			case IPT_UI_RIGHT:
+				data.crosshair->set_bitmap_name(data.next_name.c_str());
+				changed = true;
+				break;
 			}
 		}
 
 		if (changed)
-		{
-			/* rebuild the menu */
-			reset(reset_options::REMEMBER_POSITION);
-		}
+			reset(reset_options::REMEMBER_REF); // rebuild the menu
 	}
 }
 
@@ -369,142 +386,165 @@ menu_crosshair::menu_crosshair(mame_ui_manager &mui, render_container &container
 
 void menu_crosshair::populate(float &customtop, float &custombottom)
 {
-	crosshair_item_data *data;
-	char temp_text[16];
-	int player;
-	uint8_t use_auto = false;
-	uint32_t flags = 0;
-
-	/* loop over player and add the manual items */
-	for (player = 0; player < MAX_PLAYERS; player++)
+	if (m_data.empty())
 	{
-		/* get the user settings */
-		render_crosshair &crosshair = machine().crosshair().get_crosshair(player);
-
-		/* add menu items for usable crosshairs */
-		if (crosshair.is_used())
+		// loop over player and add the manual items
+		for (int player = 0; player < MAX_PLAYERS; player++)
 		{
-			/* Make sure to keep these matched to the CROSSHAIR_VISIBILITY_xxx types */
-			static const char *const vis_text[] = { "Off", "On", "Auto" };
+			// get the user settings
+			render_crosshair &crosshair(machine().crosshair().get_crosshair(player));
 
-			/* track if we need the auto time menu */
-			if (crosshair.mode() == CROSSHAIR_VISIBILITY_AUTO) use_auto = true;
-
-			/* CROSSHAIR_ITEM_VIS - allocate a data item and fill it */
-			data = (crosshair_item_data *)m_pool_alloc(sizeof(*data));
-			data->type = CROSSHAIR_ITEM_VIS;
-			data->player = player;
-			data->min = CROSSHAIR_VISIBILITY_OFF;
-			data->max = CROSSHAIR_VISIBILITY_AUTO;
-			data->defvalue = CROSSHAIR_VISIBILITY_DEFAULT;
-			data->cur = crosshair.mode();
-
-			/* put on arrows */
-			if (data->cur > data->min)
-				flags |= FLAG_LEFT_ARROW;
-			if (data->cur < data->max)
-				flags |= FLAG_RIGHT_ARROW;
-
-			/* add CROSSHAIR_ITEM_VIS menu */
-			sprintf(temp_text, "P%d Visibility", player + 1);
-			item_append(temp_text, vis_text[crosshair.mode()], flags, data);
-
-			/* CROSSHAIR_ITEM_PIC - allocate a data item and fill it */
-			data = (crosshair_item_data *)m_pool_alloc(sizeof(*data));
-			data->type = CROSSHAIR_ITEM_PIC;
-			data->player = player;
-			data->last_name[0] = 0;
-			/* other data item not used by this menu */
-
-			/* search for crosshair graphics */
-
-			/* open a path to the crosshairs */
-			file_enumerator path(machine().options().crosshair_path());
-			const osd::directory::entry *dir;
-			/* reset search flags */
-			bool using_default = false;
-			bool finished = false;
-			bool found = false;
-
-			/* if we are using the default, then we just need to find the first in the list */
-			if (*crosshair.bitmap_name() == '\0')
-				using_default = true;
-
-			/* look for the current name, then remember the name before */
-			/* and find the next name */
-			while (((dir = path.next()) != nullptr) && !finished)
+			// add menu items for usable crosshairs
+			if (crosshair.is_used())
 			{
-				int length = strlen(dir->name);
+				// CROSSHAIR_ITEM_VIS - allocate a data item and fill it
+				crosshair_item_data &visdata(*m_data.emplace(m_data.end()));
+				visdata.crosshair = &crosshair;
+				visdata.type = CROSSHAIR_ITEM_VIS;
+				visdata.player = player;
+				visdata.min = CROSSHAIR_VISIBILITY_OFF;
+				visdata.max = CROSSHAIR_VISIBILITY_AUTO;
+				visdata.defvalue = CROSSHAIR_VISIBILITY_DEFAULT;
 
-				/* look for files ending in .png with a name not larger then 9 chars*/
-				if ((length > 4) && (length <= CROSSHAIR_PIC_NAME_LENGTH + 4) && core_filename_ends_with(dir->name, ".png"))
+				// CROSSHAIR_ITEM_PIC - allocate a data item and fill it
+				crosshair_item_data &picdata(*m_data.emplace(m_data.end()));
+				picdata.crosshair = &crosshair;
+				picdata.type = CROSSHAIR_ITEM_PIC;
+				picdata.player = player;
+				// other data item not used by this menu
+			}
+		}
+
+		// CROSSHAIR_ITEM_AUTO_TIME - allocate a data item and fill it
+		crosshair_item_data &timedata(*m_data.emplace(m_data.end()));
+		timedata.type = CROSSHAIR_ITEM_AUTO_TIME;
+		timedata.min = CROSSHAIR_VISIBILITY_AUTOTIME_MIN;
+		timedata.max = CROSSHAIR_VISIBILITY_AUTOTIME_MAX;
+		timedata.defvalue = CROSSHAIR_VISIBILITY_AUTOTIME_DEFAULT;
+	}
+
+	if (m_pics.empty())
+	{
+		// open a path to the crosshairs
+		file_enumerator path(machine().options().crosshair_path());
+		for (osd::directory::entry const *dir = path.next(); dir; dir = path.next())
+		{
+			// look for files ending in .png
+			size_t const length(std::strlen(dir->name));
+			if ((length > 4) && core_filename_ends_with(dir->name, ".png"))
+				m_pics.emplace_back(dir->name, length - 4);
+		}
+		std::stable_sort(
+				m_pics.begin(),
+				m_pics.end(),
+				[] (std::string const &a, std::string const &b) { return 0 > core_stricmp(a.c_str(), b.c_str()); });
+	}
+
+	// Make sure to keep these matched to the CROSSHAIR_VISIBILITY_xxx types
+	static char const *const vis_text[] = { "Off", "On", "Auto" };
+
+	bool use_auto = false;
+	for (crosshair_item_data &data : m_data)
+	{
+		switch (data.type)
+		{
+		case CROSSHAIR_ITEM_VIS:
+			{
+				// track if we need the auto time menu
+				if (data.crosshair->mode() == CROSSHAIR_VISIBILITY_AUTO)
+					use_auto = true;
+
+				data.cur = data.crosshair->mode();
+
+				// put on arrows
+				uint32_t flags(0U);
+				if (data.cur > data.min)
+					flags |= FLAG_LEFT_ARROW;
+				if (data.cur < data.max)
+					flags |= FLAG_RIGHT_ARROW;
+
+				// add CROSSHAIR_ITEM_VIS menu */
+				item_append(util::string_format(_("P%d Visibility"), data.player + 1), vis_text[data.crosshair->mode()], flags, &data);
+			}
+			break;
+
+		case CROSSHAIR_ITEM_PIC:
+			// search for crosshair graphics
+			{
+				// reset search flags
+				bool const using_default(*data.crosshair->bitmap_name() == '\0');
+				bool finished(false);
+				bool found(false);
+				data.cur = using_default ? 0U : 1U;
+				data.last_name.clear();
+				data.next_name.clear();
+
+				// look for the current name, then remember the name before and find the next name
+				for (auto it = m_pics.begin(); it != m_pics.end() && !finished; ++it)
 				{
-					/* remove .png from length */
-					length -= 4;
-
+					// if we are using the default, then we just need to find the first in the list
 					if (found || using_default)
 					{
-						/* get the next name */
-						strncpy(data->next_name, dir->name, length);
-						data->next_name[length] = 0;
+						// get the next name
+						data.next_name = *it;
 						finished = true;
 					}
-					else if (!strncmp(dir->name, crosshair.bitmap_name(), length))
+					else if (data.crosshair->bitmap_name() == *it)
 					{
-						/* we found the current name */
-						/* so loop once more to find the next name */
+						// we found the current name so loop once more to find the next name
 						found = true;
 					}
 					else
-						/* remember last name */
-						/* we will do it here in case files get added to the directory */
 					{
-						strncpy(data->last_name, dir->name, length);
-						data->last_name[length] = 0;
+						// remember last name - we will do it here in case files get added to the directory
+						++data.cur;
+						data.last_name = *it;
 					}
 				}
-			}
-			/* if name not found then next item is DEFAULT */
-			if (!found && !using_default)
-			{
-				data->next_name[0] = 0;
-				finished = true;
-			}
-			/* setup the selection flags */
-			flags = 0;
-			if (finished)
-				flags |= FLAG_RIGHT_ARROW;
-			if (found)
-				flags |= FLAG_LEFT_ARROW;
 
-			/* add CROSSHAIR_ITEM_PIC menu */
-			sprintf(temp_text, "P%d Crosshair", player + 1);
-			item_append(temp_text, using_default ? "DEFAULT" : crosshair.bitmap_name(), flags, data);
+				// if name not found then next item is DEFAULT
+				if (!found && !using_default)
+				{
+					data.cur = 0U;
+					data.next_name.clear();
+					finished = true;
+				}
+
+				// set up the selection flags
+				uint32_t flags(0U);
+				if (finished)
+					flags |= FLAG_RIGHT_ARROW;
+				if (found)
+					flags |= FLAG_LEFT_ARROW;
+
+				// add CROSSHAIR_ITEM_PIC menu
+				item_append(util::string_format(_("P%d Crosshair"), data.player + 1), using_default ? "DEFAULT" : data.crosshair->bitmap_name(), flags, &data);
+			}
+			break;
+
+		case CROSSHAIR_ITEM_AUTO_TIME:
+			if (use_auto)
+			{
+				data.cur = machine().crosshair().auto_time();
+
+				// put on arrows in visible menu
+				uint32_t flags(0U);
+				if (data.cur > data.min)
+					flags |= FLAG_LEFT_ARROW;
+				if (data.cur < data.max)
+					flags |= FLAG_RIGHT_ARROW;
+
+				// add CROSSHAIR_ITEM_AUTO_TIME menu
+				item_append(_("Visible Delay"), util::string_format("%d", data.cur), flags, &data);
+			}
+			else
+			{
+				// leave a blank filler line when not in auto time so size does not rescale
+				//item_append("", "", nullptr, nullptr);
+			}
+			break;
 		}
 	}
-	if (use_auto)
-	{
-		/* CROSSHAIR_ITEM_AUTO_TIME - allocate a data item and fill it */
-		data = (crosshair_item_data *)m_pool_alloc(sizeof(*data));
-		data->type = CROSSHAIR_ITEM_AUTO_TIME;
-		data->min = CROSSHAIR_VISIBILITY_AUTOTIME_MIN;
-		data->max = CROSSHAIR_VISIBILITY_AUTOTIME_MAX;
-		data->defvalue = CROSSHAIR_VISIBILITY_AUTOTIME_DEFAULT;
-		data->cur = machine().crosshair().auto_time();
-
-		/* put on arrows in visible menu */
-		if (data->cur > data->min)
-			flags |= FLAG_LEFT_ARROW;
-		if (data->cur < data->max)
-			flags |= FLAG_RIGHT_ARROW;
-
-		/* add CROSSHAIR_ITEM_AUTO_TIME menu */
-		sprintf(temp_text, "%d", machine().crosshair().auto_time());
-		item_append(_("Visible Delay"), temp_text, flags, data);
-	}
-//  else
-//      /* leave a blank filler line when not in auto time so size does not rescale */
-//      item_append("", "", nullptr, nullptr);
 }
 
 menu_crosshair::~menu_crosshair()
@@ -584,21 +624,28 @@ void menu_export::handle()
 				emu_file file(ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 				if (file.open(filename.c_str(), ".xml") == osd_file::error::NONE)
 				{
-					FILE *pfile;
 					std::string fullpath(file.fullpath());
 					file.close();
-					pfile = fopen(fullpath.c_str(), "w");
+					std::ofstream pfile(fullpath);
 
-					// create the XML and save to file
-					driver_enumerator drvlist(machine().options());
-					drvlist.exclude_all();
-					for (auto & elem : m_list)
-						drvlist.include(driver_list::find(*elem));
+					// prepare a filter for the drivers we want to show
+					std::unordered_set<const game_driver *> driver_list(m_list.begin(), m_list.end());
+					auto filter = [&driver_list](const char *shortname, bool &)
+					{
+						auto iter = std::find_if(
+							driver_list.begin(),
+							driver_list.end(),
+							[shortname](const game_driver *driver) { return !strcmp(shortname, driver->name); });
+						return iter != driver_list.end();
+					};
 
+					// do we want to show devices?
+					bool include_devices = uintptr_t(menu_event->itemref) == 1;
+
+					// and do the dirty work
 					info_xml_creator creator(machine().options());
-					creator.output(pfile, drvlist, (uintptr_t(menu_event->itemref) == 1) ? false : true);
-					fclose(pfile);
-					machine().popmessage(_("%s.xml saved under ui folder."), filename.c_str());
+					creator.output(pfile, filter, include_devices);
+					machine().popmessage(_("%s.xml saved under ui folder."), filename);
 				}
 			}
 			break;
@@ -635,7 +682,7 @@ void menu_export::handle()
 						util::stream_format(buffer, "%-18s\"%s\"\n", drvlist.driver().name, drvlist.driver().type.fullname());
 					file.puts(buffer.str().c_str());
 					file.close();
-					machine().popmessage(_("%s.txt saved under ui folder."), filename.c_str());
+					machine().popmessage(_("%s.txt saved under ui folder."), filename);
 				}
 			}
 			break;
@@ -662,25 +709,40 @@ void menu_export::populate(float &customtop, float &custombottom)
 //  ctor / dtor
 //-------------------------------------------------
 
-menu_machine_configure::menu_machine_configure(mame_ui_manager &mui, render_container &container, const game_driver *prev, float _x0, float _y0)
+menu_machine_configure::menu_machine_configure(
+		mame_ui_manager &mui,
+		render_container &container,
+		game_driver const &drv,
+		std::function<void (bool, bool)> &&handler,
+		float x0, float y0)
 	: menu(mui, container)
-	, m_drv(prev)
-	, x0(_x0)
-	, y0(_y0)
+	, m_handler(std::move(handler))
+	, m_drv(drv)
+	, m_x0(x0)
+	, m_y0(y0)
 	, m_curbios(0)
-	, m_fav_reset(false)
+	, m_was_favorite(mame_machine_manager::instance()->favorite().is_favorite_system(drv))
+	, m_want_favorite(m_was_favorite)
 {
 	// parse the INI file
 	std::ostringstream error;
 	osd_setup_osd_specific_emu_options(m_opts);
-	mame_options::parse_standard_inis(m_opts, error, m_drv);
+	mame_options::parse_standard_inis(m_opts, error, &m_drv);
 	setup_bios();
 }
 
 menu_machine_configure::~menu_machine_configure()
 {
-	if (m_fav_reset)
-		reset_topmost(reset_options::SELECT_FIRST);
+	if (m_was_favorite != m_want_favorite)
+	{
+		if (m_want_favorite)
+			mame_machine_manager::instance()->favorite().add_favorite_system(m_drv);
+		else
+			mame_machine_manager::instance()->favorite().remove_favorite_system(m_drv);
+	}
+
+	if (m_handler)
+		m_handler(m_want_favorite, m_was_favorite != m_want_favorite);
 }
 
 //-------------------------------------------------
@@ -691,16 +753,16 @@ void menu_machine_configure::handle()
 {
 	// process the menu
 	process_parent();
-	const event *menu_event = process(PROCESS_NOIMAGE, x0, y0);
+	const event *menu_event = process(PROCESS_NOIMAGE, m_x0, m_y0);
 	if (menu_event != nullptr && menu_event->itemref != nullptr)
 	{
 		if (menu_event->iptkey == IPT_UI_SELECT)
 		{
 			switch ((uintptr_t)menu_event->itemref)
 			{
-				case SAVE:
+			case SAVE:
 				{
-					std::string filename(m_drv->name);
+					std::string filename(m_drv.name);
 					emu_file file(machine().options().ini_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE);
 					osd_file::error filerr = file.open(filename.c_str(), ".ini");
 					if (filerr == osd_file::error::NONE)
@@ -709,36 +771,30 @@ void menu_machine_configure::handle()
 						file.puts(inistring.c_str());
 						ui().popup_time(2, "%s", _("\n    Configuration saved    \n\n"));
 					}
-					break;
 				}
-				case ADDFAV:
-					mame_machine_manager::instance()->favorite().add_favorite_game(m_drv);
-					reset(reset_options::REMEMBER_POSITION);
-					break;
-				case DELFAV:
-					mame_machine_manager::instance()->favorite().remove_favorite_game();
-					if (main_filters::actual == machine_filter::FAVORITE)
-					{
-						m_fav_reset = true;
-						menu::stack_pop();
-					}
-					else
-						reset(reset_options::REMEMBER_POSITION);
-					break;
-				case CONTROLLER:
-					if (menu_event->iptkey == IPT_UI_SELECT)
-						menu::stack_push<submenu>(ui(), container(), submenu::control_options, m_drv, &m_opts);
-					break;
-				case VIDEO:
-					if (menu_event->iptkey == IPT_UI_SELECT)
-						menu::stack_push<submenu>(ui(), container(), submenu::video_options, m_drv, &m_opts);
-					break;
-				case ADVANCED:
-					if (menu_event->iptkey == IPT_UI_SELECT)
-						menu::stack_push<submenu>(ui(), container(), submenu::advanced_options, m_drv, &m_opts);
-					break;
-				default:
-					break;
+				break;
+			case ADDFAV:
+				m_want_favorite = true;
+				reset(reset_options::REMEMBER_POSITION);
+				break;
+			case DELFAV:
+				m_want_favorite = false;
+				reset(reset_options::REMEMBER_POSITION);
+				break;
+			case CONTROLLER:
+				if (menu_event->iptkey == IPT_UI_SELECT)
+					menu::stack_push<submenu>(ui(), container(), submenu::control_options, &m_drv, &m_opts);
+				break;
+			case VIDEO:
+				if (menu_event->iptkey == IPT_UI_SELECT)
+					menu::stack_push<submenu>(ui(), container(), submenu::video_options, &m_drv, &m_opts);
+				break;
+			case ADVANCED:
+				if (menu_event->iptkey == IPT_UI_SELECT)
+					menu::stack_push<submenu>(ui(), container(), submenu::advanced_options, &m_drv, &m_opts);
+				break;
+			default:
+				break;
 			}
 		}
 		else if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
@@ -772,7 +828,7 @@ void menu_machine_configure::populate(float &customtop, float &custombottom)
 	item_append(_(submenu::control_options[0].description), "", 0, (void *)(uintptr_t)CONTROLLER);
 	item_append(menu_item_type::SEPARATOR);
 
-	if (!mame_machine_manager::instance()->favorite().isgame_favorite(m_drv))
+	if (!m_want_favorite)
 		item_append(_("Add To Favorites"), "", 0, (void *)ADDFAV);
 	else
 		item_append(_("Remove From Favorites"), "", 0, (void *)DELFAV);
@@ -780,7 +836,7 @@ void menu_machine_configure::populate(float &customtop, float &custombottom)
 	item_append(menu_item_type::SEPARATOR);
 	item_append(_("Save machine configuration"), "", 0, (void *)(uintptr_t)SAVE);
 	item_append(menu_item_type::SEPARATOR);
-	customtop = 2.0f * ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
+	customtop = 2.0f * ui().get_line_height() + 3.0f * ui().box_tb_border();
 }
 
 //-------------------------------------------------
@@ -789,29 +845,29 @@ void menu_machine_configure::populate(float &customtop, float &custombottom)
 
 void menu_machine_configure::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
-	char const *const text[] = { _("Configure machine:"), m_drv->type.fullname() };
+	char const *const text[] = { _("Configure machine:"), m_drv.type.fullname() };
 	draw_text_box(
 			std::begin(text), std::end(text),
-			origx1, origx2, origy1 - top, origy1 - UI_BOX_TB_BORDER,
+			origx1, origx2, origy1 - top, origy1 - ui().box_tb_border(),
 			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
-			UI_TEXT_COLOR, UI_GREEN_COLOR, 1.0f);
+			ui().colors().text_color(), UI_GREEN_COLOR, 1.0f);
 }
 
 void menu_machine_configure::setup_bios()
 {
-	if (m_drv->rom == nullptr)
+	if (!m_drv.rom)
 		return;
 
 	std::string specbios(m_opts.bios());
 	char const *default_name(nullptr);
-	for (tiny_rom_entry const *rom = m_drv->rom; !ROMENTRY_ISEND(rom); ++rom)
+	for (tiny_rom_entry const *rom = m_drv.rom; !ROMENTRY_ISEND(rom); ++rom)
 	{
 		if (ROMENTRY_ISDEFAULT_BIOS(rom))
 			default_name = rom->name;
 	}
 
 	std::size_t bios_count = 0;
-	for (romload::system_bios const &bios : romload::entries(m_drv->rom).get_system_bioses())
+	for (romload::system_bios const &bios : romload::entries(m_drv.rom).get_system_bioses())
 	{
 		std::string name(bios.get_description());
 		u32 const bios_flags(bios.get_value());
@@ -870,9 +926,12 @@ void menu_plugins_configure::handle()
 	{
 		if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT || menu_event->iptkey == IPT_UI_SELECT)
 		{
-			int oldval = plugins.int_value((const char*)menu_event->itemref);
-			plugins.set_value((const char*)menu_event->itemref, oldval == 1 ? 0 : 1, OPTION_PRIORITY_CMDLINE);
-			changed = true;
+			plugin *p = plugins.find((const char*)menu_event->itemref);
+			if (p)
+			{
+				p->m_start = !p->m_start;
+				changed = true;
+			}
 		}
 	}
 	if (changed)
@@ -887,17 +946,13 @@ void menu_plugins_configure::populate(float &customtop, float &custombottom)
 {
 	plugin_options& plugins = mame_machine_manager::instance()->plugins();
 
-	for (auto &curentry : plugins.entries())
+	for (auto &curentry : plugins.plugins())
 	{
-		if (curentry->type() != OPTION_HEADER)
-		{
-			auto enabled = !strcmp(curentry->value(), "1");
-			item_append(curentry->description(), enabled ? _("On") : _("Off"),
-				enabled ? FLAG_RIGHT_ARROW : FLAG_LEFT_ARROW, (void *)(uintptr_t)curentry->name().c_str());
-		}
+		bool enabled = curentry.m_start;
+		item_append_on_off(curentry.m_description, enabled, 0, (void *)(uintptr_t)curentry.m_name.c_str());
 	}
 	item_append(menu_item_type::SEPARATOR);
-	customtop = ui().get_line_height() + (3.0f * UI_BOX_TB_BORDER);
+	customtop = ui().get_line_height() + (3.0f * ui().box_tb_border());
 }
 
 //-------------------------------------------------
@@ -909,9 +964,9 @@ void menu_plugins_configure::custom_render(void *selectedref, float top, float b
 	char const *const toptext[] = { _("Plugins") };
 	draw_text_box(
 			std::begin(toptext), std::end(toptext),
-			origx1, origx2, origy1 - top, origy1 - UI_BOX_TB_BORDER,
+			origx1, origx2, origy1 - top, origy1 - ui().box_tb_border(),
 			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
-			UI_TEXT_COLOR, UI_GREEN_COLOR, 1.0f);
+			ui().colors().text_color(), UI_GREEN_COLOR, 1.0f);
 }
 
 } // namespace ui

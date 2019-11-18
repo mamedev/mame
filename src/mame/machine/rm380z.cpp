@@ -242,21 +242,21 @@ void rm380z_state::machine_start()
 	m_static_vblank_timer->adjust(attotime::from_hz(TIMER_SPEED), 0, attotime::from_hz(TIMER_SPEED));
 }
 
-DRIVER_INIT_MEMBER( rm380z_state, rm380z )
+void rm380z_state::init_rm380z()
 {
 	m_videomode=RM380Z_VIDEOMODE_80COL;
 	m_old_videomode=m_videomode;
 	m_port0_mask=0xff;
 }
 
-DRIVER_INIT_MEMBER( rm380z_state, rm380z34d )
+void rm380z_state::init_rm380z34d()
 {
 	m_videomode=RM380Z_VIDEOMODE_40COL;
 	m_old_videomode=m_videomode;
 	m_port0_mask=0xdf;      // disable 80 column mode
 }
 
-DRIVER_INIT_MEMBER( rm380z_state, rm380z34e )
+void rm380z_state::init_rm380z34e()
 {
 	m_videomode=RM380Z_VIDEOMODE_40COL;
 	m_old_videomode=m_videomode;
@@ -287,7 +287,7 @@ void rm380z_state::machine_reset()
 	memset(m_vram,0,RM380Z_SCREENSIZE);
 
 	config_memory_map();
-	machine().device("wd1771")->reset();
+	m_fdc->reset();
 
 	init_graphic_chars();
 }
@@ -305,7 +305,7 @@ void rm380z_state::config_memory_map()
 	else
 	{
 		program.install_rom( 0x0000, 0x0FFF, rom );
-		program.install_readwrite_handler(0x1BFC, 0x1BFF,read8_delegate(FUNC(rm380z_state::port_read_1b00), this),write8_delegate(FUNC(rm380z_state::port_write_1b00), this)    );
+		program.install_readwrite_handler(0x1BFC, 0x1BFF, read8_delegate(*this, FUNC(rm380z_state::port_read_1b00)), write8_delegate(*this, FUNC(rm380z_state::port_write_1b00)));
 		program.install_rom( 0x1C00, 0x1DFF, rom + 0x1400 );
 		program.install_ram( 0x4000, 0xDFFF, m_ram_p );
 	}

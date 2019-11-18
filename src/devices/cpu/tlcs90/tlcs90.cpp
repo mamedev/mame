@@ -45,35 +45,35 @@ void tlcs90_device::tmp90840_mem(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();  // 8KB ROM (internal)
 	map(0xfec0, 0xffbf).ram();  // 256b RAM (internal)
-	map(T90_IOBASE, T90_IOBASE+47).rw(this, FUNC(tlcs90_device::t90_internal_registers_r), FUNC(tlcs90_device::t90_internal_registers_w));
+	map(T90_IOBASE, T90_IOBASE+47).rw(FUNC(tlcs90_device::t90_internal_registers_r), FUNC(tlcs90_device::t90_internal_registers_w));
 }
 
 void tlcs90_device::tmp90841_mem(address_map &map)
 {
-//  AM_RANGE(   0x0000,     0x1fff          )   AM_ROM  // rom-less
+//  map(0x0000, 0x1fff).rom();   // rom-less
 	map(0xfec0, 0xffbf).ram();  // 256b RAM (internal)
-	map(T90_IOBASE, T90_IOBASE+47).rw(this, FUNC(tlcs90_device::t90_internal_registers_r), FUNC(tlcs90_device::t90_internal_registers_w));
+	map(T90_IOBASE, T90_IOBASE+47).rw(FUNC(tlcs90_device::t90_internal_registers_r), FUNC(tlcs90_device::t90_internal_registers_w));
 }
 
 void tlcs90_device::tmp91640_mem(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();    // 16KB ROM (internal)
 	map(0xfdc0, 0xffbf).ram();    // 512b RAM (internal)
-	map(T90_IOBASE, T90_IOBASE+47).rw(this, FUNC(tlcs90_device::t90_internal_registers_r), FUNC(tlcs90_device::t90_internal_registers_w));
+	map(T90_IOBASE, T90_IOBASE+47).rw(FUNC(tlcs90_device::t90_internal_registers_r), FUNC(tlcs90_device::t90_internal_registers_w));
 }
 
 void tlcs90_device::tmp91641_mem(address_map &map)
 {
-//  AM_RANGE(   0x0000,     0x3fff          ) AM_ROM    // rom-less
+//  map(0x0000, 0x3fff).rom();     // rom-less
 	map(0xfdc0, 0xffbf).ram();    // 512b RAM (internal)
-	map(T90_IOBASE, T90_IOBASE+47).rw(this, FUNC(tlcs90_device::t90_internal_registers_r), FUNC(tlcs90_device::t90_internal_registers_w));
+	map(T90_IOBASE, T90_IOBASE+47).rw(FUNC(tlcs90_device::t90_internal_registers_r), FUNC(tlcs90_device::t90_internal_registers_w));
 }
 
 void tlcs90_device::tmp90ph44_mem(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();    // 16KB PROM (internal)
 	map(0xfdc0, 0xffbf).ram();    // 512b RAM (internal)
-	map(T90_IOBASE, T90_IOBASE+55).rw(this, FUNC(tlcs90_device::t90_internal_registers_r), FUNC(tlcs90_device::t90_internal_registers_w)); // TODO: has 8 more registers
+	map(T90_IOBASE, T90_IOBASE+55).rw(FUNC(tlcs90_device::t90_internal_registers_r), FUNC(tlcs90_device::t90_internal_registers_w)); // TODO: has 8 more registers
 }
 
 
@@ -2877,7 +2877,32 @@ void tlcs90_device::state_string_export(const device_state_entry &entry, std::st
 	}
 }
 
-std::unique_ptr<util::disasm_interface> tlcs90_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> tmp90840_device::create_disassembler()
 {
-	return std::make_unique<tlcs90_disassembler>();
+	return std::make_unique<tmp90840_disassembler>();
+}
+
+std::unique_ptr<util::disasm_interface> tmp90841_device::create_disassembler()
+{
+	return std::make_unique<tmp90840_disassembler>();
+}
+
+std::unique_ptr<util::disasm_interface> tmp90845_device::create_disassembler()
+{
+	return std::make_unique<tmp90840_disassembler>();
+}
+
+std::unique_ptr<util::disasm_interface> tmp91640_device::create_disassembler()
+{
+	return std::make_unique<tmp90840_disassembler>();
+}
+
+std::unique_ptr<util::disasm_interface> tmp91641_device::create_disassembler()
+{
+	return std::make_unique<tmp90840_disassembler>();
+}
+
+std::unique_ptr<util::disasm_interface> tmp90ph44_device::create_disassembler()
+{
+	return std::make_unique<tmp90844_disassembler>();
 }

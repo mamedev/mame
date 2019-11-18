@@ -69,15 +69,16 @@ class big10_state : public driver_device
 public:
 	big10_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_v9938(*this, "v9938")
 		, m_maincpu(*this, "maincpu")
 		, m_hopper(*this, "hopper")
 		, m_in(*this, "IN%u", 1)
+		, m_lamp(*this, "lamp")
 	{ }
 
 	void big10(machine_config &config);
 
 protected:
+	virtual void machine_start() override { m_lamp.resolve(); }
 	void main_io(address_map &map);
 	void main_map(address_map &map);
 
@@ -85,11 +86,11 @@ protected:
 	DECLARE_WRITE8_MEMBER(mux_w);
 
 private:
-	required_device<v9938_device> m_v9938;
 	uint8_t m_mux_data;
 	required_device<cpu_device> m_maincpu;
 	required_device<ticket_dispenser_device> m_hopper;
 	required_ioport_array<6> m_in;
+	output_finder<> m_lamp;
 };
 
 
@@ -106,7 +107,7 @@ WRITE8_MEMBER(big10_state::mux_w)
 {
 	m_mux_data = ~data;
 	m_hopper->motor_w(BIT(data, 6));
-	machine().output().set_lamp_value(1, BIT(~data, 7)); // maybe a coin counter?
+	m_lamp = BIT(~data, 7); // maybe a coin counter?
 }
 
 READ8_MEMBER(big10_state::mux_r)
@@ -134,9 +135,9 @@ void big10_state::main_map(address_map &map)
 void big10_state::main_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).r(this, FUNC(big10_state::mux_r));         /* present in test mode */
+	map(0x00, 0x00).r(FUNC(big10_state::mux_r));         /* present in test mode */
 	map(0x02, 0x02).portr("SYSTEM"); /* coins and service */
-	map(0x98, 0x9b).rw(m_v9938, FUNC(v9938_device::read), FUNC(v9938_device::write));
+	map(0x98, 0x9b).rw("v9938", FUNC(v9938_device::read), FUNC(v9938_device::write));
 	map(0xa0, 0xa1).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0xa2, 0xa2).r("aysnd", FUNC(ay8910_device::data_r)); /* Dip-Switches routes here. */
 }
@@ -227,30 +228,32 @@ INPUT_PORTS_END
 *           Machine Driver            *
 **************************************/
 
-MACHINE_CONFIG_START(big10_state::big10)
-
+void big10_state::big10(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)    /* guess */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_io)
+	Z80(config, m_maincpu, MASTER_CLOCK/6);    /* guess */
+	m_maincpu->set_addrmap(AS_PROGRAM, &big10_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &big10_state::main_io);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_V9938_ADD("v9938", "screen", VDP_MEM, MASTER_CLOCK)
-	MCFG_V99X8_INTERRUPT_CALLBACK(INPUTLINE("maincpu", 0))
-	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9938", MASTER_CLOCK)
+	v9938_device &v9938(V9938(config, "v9938", MASTER_CLOCK));
+	v9938.set_screen_ntsc("screen");
+	v9938.set_vram_size(VDP_MEM);
+	v9938.int_cb().set_inputline("maincpu", 0);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK/12)    /* guess */
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW2"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(big10_state, mux_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	SPEAKER(config, "mono").front_center();
+	ym2149_device &aysnd(YM2149(config, "aysnd", MASTER_CLOCK/12));    /* guess */
+	aysnd.port_a_read_callback().set_ioport("DSW2");
+	aysnd.port_b_read_callback().set_ioport("DSW1");
+	aysnd.port_a_write_callback().set(FUNC(big10_state::mux_w));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(HOPPER_PULSE), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW )
-MACHINE_CONFIG_END
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(HOPPER_PULSE), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW);
+}
 
 
 /**************************************
@@ -269,5 +272,5 @@ ROM_END
 *           Game Driver(s)            *
 **************************************/
 
-/*    YEAR  NAME      PARENT    MACHINE   INPUT     STATE          INIT    ROT      COMPANY     FULLNAME   FLAGS  */
-GAME( 1985, big10,    0,        big10,    big10,    big10_state,   0,      ROT0,   "Success",  "Big 10",   0 )
+/*    YEAR  NAME   PARENT    MACHINE   INPUT     STATE        INIT        ROT      COMPANY     FULLNAME   FLAGS  */
+GAME( 1985, big10, 0,        big10,    big10,    big10_state, empty_init, ROT0,   "Success",  "Big 10",   0 )

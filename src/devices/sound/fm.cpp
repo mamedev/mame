@@ -2441,8 +2441,7 @@ struct ym2610_state
 	uint8_t       addr_A1;            /* address line A1      */
 
 	/* ADPCM-A unit */
-	const uint8_t *pcmbuf;            /* pcm rom buffer       */
-	uint32_t      pcm_size;           /* size of pcm rom      */
+	FM_READBYTE   read_byte;
 	uint8_t       adpcmTL;            /* adpcmA total level   */
 	ADPCM_CH    adpcm[6];           /* adpcm channels       */
 	uint32_t      adpcmreg[0x30];     /* registers            */
@@ -2492,7 +2491,7 @@ struct ym2610_state
 					data = ch->now_data & 0x0f;
 				else
 				{
-					ch->now_data = *(pcmbuf+(ch->now_addr>>1));
+					ch->now_data = read_byte(device, ch->now_addr>>1);
 					data = (ch->now_data >> 4) & 0x0f;
 				}
 
@@ -2500,11 +2499,12 @@ struct ym2610_state
 
 				ch->adpcm_acc += jedi_table[ch->adpcm_step + data];
 
+				/* the 12-bit accumulator wraps on the ym2610 and ym2608 (like the msm5205), it does not saturate (like the msm5218) */
+				ch->adpcm_acc &= 0xfff;
+
 				/* extend 12-bit signed int */
-				if (ch->adpcm_acc & ~0x7ff)
+				if (ch->adpcm_acc & 0x800)
 					ch->adpcm_acc |= ~0xfff;
-				else
-					ch->adpcm_acc &= 0xfff;
 
 				ch->adpcm_step += step_inc[data & 7];
 				Limit( ch->adpcm_step, 48*16, 0*16 );
@@ -2543,25 +2543,6 @@ struct ym2610_state
 						adpcm[c].adpcm_step= 0;
 						adpcm[c].adpcm_out = 0;
 						adpcm[c].flag      = 1;
-
-						if(pcmbuf==nullptr)
-						{                   /* Check ROM Mapped */
-							device->logerror("YM2608-YM2610: ADPCM-A rom not mapped\n");
-							adpcm[c].flag = 0;
-						}
-						else
-						{
-							if(adpcm[c].end >= pcm_size)
-							{   /* Check End in Range */
-								device->logerror("YM2610: ADPCM-A end out of range: $%08x\n",adpcm[c].end);
-								/*adpcm[c].end = pcm_size-1;*/ /* JB: DO NOT uncomment this, otherwise you will break the comparison in the ADPCM_CALC_CHA() */
-							}
-							if(adpcm[c].start >= pcm_size)   /* Check Start in Range */
-							{
-								device->logerror("YM2608-YM2610: ADPCM-A start out of range: $%08x\n",adpcm[c].start);
-								adpcm[c].flag = 0;
-							}
-						}
 					}
 				}
 			}
@@ -2959,8 +2940,10 @@ static void YM2608_deltat_status_reset(void *chip, uint8_t changebits)
 	FM_STATUS_RESET(&(F2608->OPN.ST), changebits);
 }
 /* YM2608(OPNA) */
-void * ym2608_init(device_t *device, int clock, int rate, void *pcmrom,int pcmsize,
-				FM_TIMERHANDLER timer_handler,FM_IRQHANDLER IRQHandler, const ssg_callbacks *ssg)
+void * ym2608_init(device_t *device, int clock, int rate,
+	FM_READBYTE InternalReadByte,
+	FM_READBYTE ExternalReadByte, FM_WRITEBYTE ExternalWriteByte,
+	FM_TIMERHANDLER timer_handler,FM_IRQHANDLER IRQHandler, const ssg_callbacks *ssg)
 {
 	ym2608_state *F2608;
 
@@ -2986,8 +2969,8 @@ void * ym2608_init(device_t *device, int clock, int rate, void *pcmrom,int pcmsi
 	F2608->OPN.ST.SSG           = ssg;
 
 	/* DELTA-T */
-	F2608->deltaT.memory = (uint8_t *)pcmrom;
-	F2608->deltaT.memory_size = pcmsize;
+	F2608->deltaT.read_byte = ExternalReadByte;
+	F2608->deltaT.write_byte = ExternalWriteByte;
 
 	/*F2608->deltaT.write_time = 20.0 / clock;*/    /* a single byte write takes 20 cycles of main clock */
 	/*F2608->deltaT.read_time  = 18.0 / clock;*/    /* a single byte read takes 18 cycles of main clock */
@@ -3000,8 +2983,7 @@ void * ym2608_init(device_t *device, int clock, int rate, void *pcmrom,int pcmsi
 	F2608->deltaT.status_change_ZERO_bit = 0x10;    /* status flag: set bit4 if silence continues for more than 290 milliseconds while recording the ADPCM */
 
 	/* ADPCM Rhythm */
-	F2608->pcmbuf = device->memregion("ym2608")->base();
-	F2608->pcm_size = 0x2000;
+	F2608->read_byte = InternalReadByte;
 
 	Init_ADPCMATable();
 
@@ -3009,6 +2991,14 @@ void * ym2608_init(device_t *device, int clock, int rate, void *pcmrom,int pcmsi
 	YM2608_save_state(F2608, device);
 #endif
 	return F2608;
+}
+
+void ym2608_clock_changed(void *chip, int clock, int rate)
+{
+	ym2608_state *F2608 = (ym2608_state *)chip;
+
+	F2608->OPN.ST.clock = clock;
+	F2608->OPN.ST.rate = rate;
 }
 
 /* shut down emulator */
@@ -3638,9 +3628,9 @@ static void YM2610_deltat_status_reset(void *chip, uint8_t changebits)
 	F2610->adpcm_arrivedEndAddress &= (~changebits);
 }
 
-void *ym2610_init(device_t *device, int clock, int rate, void *pcmroma,int pcmsizea,void *pcmromb,int pcmsizeb,
-				FM_TIMERHANDLER timer_handler,FM_IRQHANDLER IRQHandler, const ssg_callbacks *ssg)
-
+void *ym2610_init(device_t *device, int clock, int rate,
+	FM_READBYTE adpcm_a_read_byte, FM_READBYTE adpcm_b_read_byte,
+	FM_TIMERHANDLER timer_handler,FM_IRQHANDLER IRQHandler, const ssg_callbacks *ssg)
 {
 	ym2610_state *F2610;
 
@@ -3665,11 +3655,10 @@ void *ym2610_init(device_t *device, int clock, int rate, void *pcmroma,int pcmsi
 	F2610->OPN.ST.IRQ_Handler   = IRQHandler;
 	F2610->OPN.ST.SSG           = ssg;
 	/* ADPCM */
-	F2610->pcmbuf   = (const uint8_t *)pcmroma;
-	F2610->pcm_size = pcmsizea;
+	F2610->read_byte = adpcm_a_read_byte;
 	/* DELTA-T */
-	F2610->deltaT.memory = (uint8_t *)pcmromb;
-	F2610->deltaT.memory_size = pcmsizeb;
+	F2610->deltaT.read_byte = adpcm_b_read_byte;
+	F2610->deltaT.write_byte = nullptr;
 
 	F2610->deltaT.status_set_handler = YM2610_deltat_status_set;
 	F2610->deltaT.status_reset_handler = YM2610_deltat_status_reset;
@@ -3681,6 +3670,14 @@ void *ym2610_init(device_t *device, int clock, int rate, void *pcmroma,int pcmsi
 	YM2610_save_state(F2610, device);
 #endif
 	return F2610;
+}
+
+void ym2610_clock_changed(void *chip, int clock, int rate)
+{
+	ym2610_state *F2610 = (ym2610_state *)chip;
+
+	F2610->OPN.ST.clock = clock;
+	F2610->OPN.ST.rate = rate;
 }
 
 /* shut down emulator */
@@ -3702,26 +3699,6 @@ void ym2610_reset_chip(void *chip)
 
 	device_t* dev = F2610->OPN.ST.device;
 	std::string name(dev->tag());
-
-	/* setup PCM buffers again */
-	F2610->pcmbuf = (const uint8_t *)dev->machine().root_device().memregion(name.c_str())->base();
-	F2610->pcm_size = dev->machine().root_device().memregion(name.c_str())->bytes();
-	name.append(".deltat");
-	memory_region *deltat_region = dev->machine().root_device().memregion(name.c_str());
-	F2610->deltaT.memory = nullptr;
-	if (deltat_region != nullptr)
-	{
-		F2610->deltaT.memory = (uint8_t *)dev->machine().root_device().memregion(name.c_str())->base();
-	}
-	if(F2610->deltaT.memory == nullptr)
-	{
-		F2610->deltaT.memory = (uint8_t*)F2610->pcmbuf;
-		F2610->deltaT.memory_size = F2610->pcm_size;
-	}
-	else
-	{
-		F2610->deltaT.memory_size = dev->machine().root_device().memregion(name.c_str())->bytes();
-	}
 
 	/* Reset Prescaler */
 	OPNSetPres( OPN, 6*24, 6*24, 4*2); /* OPN 1/6 , SSG 1/4 */

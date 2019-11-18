@@ -8,9 +8,6 @@
 
 #pragma once
 
-#define MCFG_WPC_PIC_ADD( _tag ) \
-	MCFG_DEVICE_ADD( _tag, WPC_PIC, 0 )
-
 class wpc_pic_device : public device_t
 {
 public:

@@ -79,7 +79,7 @@ static const discrete_mixer_desc atarifb_mixer =
 #define ATARIFB_WHISTLE_SND     NODE_12
 #define ATARIFB_CROWD_SND       NODE_13
 
-DISCRETE_SOUND_START(atarifb)
+DISCRETE_SOUND_START(atarifb_discrete)
 	/************************************************/
 	/* Input register mapping for atarifb           */
 	/************************************************/
@@ -169,7 +169,7 @@ static const discrete_mixer_desc abaseb_mixer =
 #define ABASEB_WHISTLE_SND      NODE_12
 #define ABASEB_CROWD_SND        NODE_13
 
-DISCRETE_SOUND_START(abaseb)
+DISCRETE_SOUND_START(abaseb_discrete)
 	/************************************************/
 	/* Input register mapping for abaseb            */
 	/************************************************/

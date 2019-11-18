@@ -13,7 +13,7 @@
 class deco104_device : public deco_146_base_device
 {
 public:
-	deco104_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	deco104_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
 	virtual void device_start() override;
@@ -21,9 +21,5 @@ protected:
 };
 
 DECLARE_DEVICE_TYPE(DECO104PROT, deco104_device)
-
-
-#define MCFG_DECO104_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, DECO104PROT, 0)
 
 #endif // MAME_MACHINE_DECO104_H

@@ -11,16 +11,17 @@ class gameboy_sound_device : public device_t,
 public:
 	gameboy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(sound_r);
-	virtual DECLARE_READ8_MEMBER(wave_r) = 0;
-	virtual DECLARE_WRITE8_MEMBER(sound_w) = 0;
-	virtual DECLARE_WRITE8_MEMBER(wave_w) = 0;
+	u8 sound_r(offs_t offset);
+	virtual u8 wave_r(offs_t offset) = 0;
+	virtual void sound_w(offs_t offset, u8 data) = 0;
+	virtual void wave_w(offs_t offset, u8 data) = 0;
 
 protected:
 	gameboy_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_clock_changed() override;
 	virtual void device_reset() override;
 
 	// sound stream update overrides
@@ -165,9 +166,9 @@ class dmg_apu_device : public gameboy_sound_device
 public:
 	dmg_apu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ8_MEMBER(wave_r) override;
-	virtual DECLARE_WRITE8_MEMBER(wave_w) override;
-	virtual DECLARE_WRITE8_MEMBER(sound_w) override;
+	virtual u8 wave_r(offs_t offset) override;
+	virtual void wave_w(offs_t offset, u8 data) override;
+	virtual void sound_w(offs_t offset, u8 data) override;
 
 protected:
 	virtual void apu_power_off() override;
@@ -181,9 +182,9 @@ class cgb04_apu_device : public gameboy_sound_device
 public:
 	cgb04_apu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ8_MEMBER(wave_r) override;
-	virtual DECLARE_WRITE8_MEMBER(wave_w) override;
-	virtual DECLARE_WRITE8_MEMBER(sound_w) override;
+	virtual u8 wave_r(offs_t offset) override;
+	virtual void wave_w(offs_t offset, u8 data) override;
+	virtual void sound_w(offs_t offset, u8 data) override;
 
 protected:
 	virtual void device_reset() override;

@@ -59,10 +59,10 @@ void neogeo_base_state::create_rgb_lookups()
 		int i2 = (i >> 2) & 1;
 		int i1 = (i >> 1) & 1;
 		int i0 = (i >> 0) & 1;
-		m_palette_lookup[i][0] = combine_5_weights(weights_normal, i0, i1, i2, i3, i4);
-		m_palette_lookup[i][1] = combine_5_weights(weights_dark, i0, i1, i2, i3, i4);
-		m_palette_lookup[i][2] = combine_5_weights(weights_shadow, i0, i1, i2, i3, i4);
-		m_palette_lookup[i][3] = combine_5_weights(weights_dark_shadow, i0, i1, i2, i3, i4);
+		m_palette_lookup[i][0] = combine_weights(weights_normal, i0, i1, i2, i3, i4);
+		m_palette_lookup[i][1] = combine_weights(weights_dark, i0, i1, i2, i3, i4);
+		m_palette_lookup[i][2] = combine_weights(weights_shadow, i0, i1, i2, i3, i4);
+		m_palette_lookup[i][3] = combine_weights(weights_dark_shadow, i0, i1, i2, i3, i4);
 	}
 }
 
@@ -116,7 +116,6 @@ WRITE16_MEMBER(neogeo_base_state::paletteram_w)
 }
 
 
-
 /*************************************
  *
  *  Video system start
@@ -127,8 +126,7 @@ void neogeo_base_state::video_start()
 {
 	create_rgb_lookups();
 
-	m_paletteram.resize(0x1000 * 2);
-	memset(&m_paletteram[0], 0, 0x1000 * 2 * sizeof(m_paletteram[0]));
+	m_paletteram.resize(0x1000 * 2, 0);
 
 	m_screen_shadow = 0;
 	m_palette_bank = 0;
@@ -136,11 +134,9 @@ void neogeo_base_state::video_start()
 	save_item(NAME(m_paletteram));
 	save_item(NAME(m_screen_shadow));
 	save_item(NAME(m_palette_bank));
-	machine().save().register_postload(save_prepost_delegate(FUNC(neogeo_base_state::set_pens), this));
 
 	set_pens();
 }
-
 
 
 /*************************************
@@ -154,14 +150,13 @@ void neogeo_base_state::video_reset()
 }
 
 
-
 /*************************************
  *
  *  Video update
  *
  *************************************/
 
-uint32_t neogeo_base_state::screen_update_neogeo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t neogeo_base_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// fill with background color first
 	bitmap.fill(*m_bg_pen, cliprect);
@@ -172,7 +167,6 @@ uint32_t neogeo_base_state::screen_update_neogeo(screen_device &screen, bitmap_r
 
 	return 0;
 }
-
 
 
 /*************************************

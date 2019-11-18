@@ -107,25 +107,25 @@ void gundealr_state::base_map(address_map &map)
 	map(0xc004, 0xc004).portr("IN0");
 	map(0xc005, 0xc005).portr("IN1");
 	map(0xc006, 0xc006).portr("IN2");
-	map(0xc016, 0xc016).w(this, FUNC(gundealr_state::bankswitch_w));
-	map(0xc400, 0xc7ff).ram().w(this, FUNC(gundealr_state::paletteram_w)).share("paletteram");
-	map(0xc800, 0xcfff).ram().w(this, FUNC(gundealr_state::bg_videoram_w)).share("bg_videoram");
-	map(0xd000, 0xdfff).ram().w(this, FUNC(gundealr_state::fg_videoram_w)).share("fg_videoram");
+	map(0xc016, 0xc016).w(FUNC(gundealr_state::bankswitch_w));
+	map(0xc400, 0xc7ff).ram().w(FUNC(gundealr_state::paletteram_w)).share("paletteram");
+	map(0xc800, 0xcfff).ram().w(FUNC(gundealr_state::bg_videoram_w)).share("bg_videoram");
+	map(0xd000, 0xdfff).ram().w(FUNC(gundealr_state::fg_videoram_w)).share("fg_videoram");
 	map(0xe000, 0xffff).ram().share("rambase");
 }
 
 void gundealr_state::gundealr_main_map(address_map &map)
 {
 	base_map(map);
-	map(0xc014, 0xc014).w(this, FUNC(gundealr_state::flipscreen_w<0>));
-	map(0xc020, 0xc023).w(this, FUNC(gundealr_state::fg_scroll_w<1>));
+	map(0xc014, 0xc014).w(FUNC(gundealr_state::flipscreen_w<0>));
+	map(0xc020, 0xc023).w(FUNC(gundealr_state::fg_scroll_w<1>));
 }
 
 void gundealr_state::yamyam_main_map(address_map &map)
 {
 	base_map(map);
-	map(0xc010, 0xc013).w(this, FUNC(gundealr_state::fg_scroll_w<0>));
-	map(0xc014, 0xc014).w(this, FUNC(gundealr_state::flipscreen_w<7>));
+	map(0xc010, 0xc013).w(FUNC(gundealr_state::fg_scroll_w<0>));
+	map(0xc014, 0xc014).w(FUNC(gundealr_state::flipscreen_w<7>));
 	map(0xc015, 0xc015).nopw(); // Bit 7 = MCU reset?
 }
 
@@ -405,7 +405,7 @@ static const gfx_layout layout16x16x4 =
 	16*16*4
 };
 
-static GFXDECODE_START( gundealr )
+static GFXDECODE_START( gfx_gundealr )
 	GFXDECODE_ENTRY( "gfx1", 0, layout8x8x4,     0, 16 ) /* colors 0-255 */
 	GFXDECODE_ENTRY( "gfx2", 0, layout16x16x4, 256, 16 ) /* colors 256-511 */
 GFXDECODE_END
@@ -433,37 +433,36 @@ TIMER_DEVICE_CALLBACK_MEMBER(gundealr_state::scanline)
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xd7); /* RST 10h */
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xd7); /* Z80 - RST 10h */
 	else if((scanline == 0) || (scanline == 120) ) //timer irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xcf); /* RST 10h */
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xcf); /* Z80 - RST 10h */
 }
 
-MACHINE_CONFIG_START(gundealr_state::gundealr)
-
+void gundealr_state::gundealr(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/2)   /* 6 MHz verified for Yam! Yam!? */
-	MCFG_CPU_PROGRAM_MAP(gundealr_main_map)
-	MCFG_CPU_IO_MAP(main_portmap)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", gundealr_state, scanline, "screen", 0, 1)
+	Z80(config, m_maincpu, XTAL(12'000'000)/2);   /* 6 MHz verified for Yam! Yam!? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &gundealr_state::gundealr_main_map);
+	m_maincpu->set_addrmap(AS_IO, &gundealr_state::main_portmap);
+	TIMER(config, "scantimer").configure_scanline(FUNC(gundealr_state::scanline), "screen", 0, 1);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(gundealr_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(gundealr_state::screen_update));
+	screen.set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", gundealr)
-	MCFG_PALETTE_ADD("palette", 512)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gundealr);
+	PALETTE(config, m_palette).set_entries(512);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(12'000'000)/8) /* 1.5Mhz verified for Yam! Yam!? */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	YM2203(config, "ymsnd", XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.25); /* 1.5Mhz verified for Yam! Yam!? */
+}
 
 TIMER_DEVICE_CALLBACK_MEMBER(gundealr_state::yamyam_mcu_sim)
 {
@@ -529,18 +528,19 @@ TIMER_DEVICE_CALLBACK_MEMBER(gundealr_state::yamyam_mcu_sim)
 	m_rambase[0x006] = m_port_in[0]->read();
 }
 
-MACHINE_CONFIG_START(gundealr_state::yamyam)
+void gundealr_state::yamyam(machine_config &config)
+{
 	gundealr(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(yamyam_main_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &gundealr_state::yamyam_main_map);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcusim", gundealr_state, yamyam_mcu_sim, attotime::from_hz(6000000/60)) /* 6mhz confirmed */
-MACHINE_CONFIG_END
+	TIMER(config, "mcusim").configure_periodic(FUNC(gundealr_state::yamyam_mcu_sim), attotime::from_hz(6000000/60)); /* 6mhz confirmed */
+}
 
-MACHINE_CONFIG_START(gundealr_state::gundealrbl)
+void gundealr_state::gundealrbl(machine_config &config)
+{
 	yamyam(config);
-	MCFG_DEVICE_REMOVE("mcusim")
-MACHINE_CONFIG_END
+	config.device_remove("mcusim");
+}
 
 
 /***************************************************************************
@@ -677,11 +677,11 @@ ROM_END
 
 
 
-GAME( 1990, gundealr,   0,        gundealr, gundealr, gundealr_state, 0, ROT270, "Dooyong", "Gun Dealer",                MACHINE_SUPPORTS_SAVE )
-GAME( 1990, gundealra,  gundealr, gundealr, gundealr, gundealr_state, 0, ROT270, "Dooyong", "Gun Dealer (alt card set)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, gundealrt,  gundealr, gundealr, gundealt, gundealr_state, 0, ROT270, "Dooyong (Tecmo license)", "Gun Dealer (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, gundealrbl, gundealr, gundealrbl, gundealr, gundealr_state, 0, ROT270, "Dooyong", "Gun Dealer (Yam! Yam!? hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, gundealr,   0,        gundealr,   gundealr, gundealr_state, empty_init, ROT270, "Dooyong", "Gun Dealer",                MACHINE_SUPPORTS_SAVE )
+GAME( 1990, gundealra,  gundealr, gundealr,   gundealr, gundealr_state, empty_init, ROT270, "Dooyong", "Gun Dealer (alt card set)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, gundealrt,  gundealr, gundealr,   gundealt, gundealr_state, empty_init, ROT270, "Dooyong (Tecmo license)", "Gun Dealer (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, gundealrbl, gundealr, gundealrbl, gundealr, gundealr_state, empty_init, ROT270, "Dooyong", "Gun Dealer (Yam! Yam!? hardware)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, yamyam,     0,        yamyam,   yamyam,   gundealr_state, 0, ROT0,   "Dooyong", "Yam! Yam!?",                MACHINE_SUPPORTS_SAVE )
-GAME( 1990, yamyamk,    yamyam,   yamyam,   yamyam,   gundealr_state, 0, ROT0,   "Dooyong", "Yam! Yam!? (Korea)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1990, wiseguy,    yamyam,   yamyam,   yamyam,   gundealr_state, 0, ROT0,   "Dooyong", "Wise Guy",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1990, yamyam,     0,        yamyam,     yamyam,   gundealr_state, empty_init, ROT0,   "Dooyong", "Yam! Yam!?",                MACHINE_SUPPORTS_SAVE )
+GAME( 1990, yamyamk,    yamyam,   yamyam,     yamyam,   gundealr_state, empty_init, ROT0,   "Dooyong", "Yam! Yam!? (Korea)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1990, wiseguy,    yamyam,   yamyam,     yamyam,   gundealr_state, empty_init, ROT0,   "Dooyong", "Wise Guy",                  MACHINE_SUPPORTS_SAVE )

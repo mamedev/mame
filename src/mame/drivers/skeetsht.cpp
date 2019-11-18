@@ -40,6 +40,9 @@ public:
 	{
 	}
 
+	void skeetsht(machine_config &config);
+
+private:
 	required_device<tlc34076_device> m_tlc34076;
 	required_shared_ptr<uint16_t> m_tms_vram;
 	uint8_t m_porta_latch;
@@ -50,18 +53,15 @@ public:
 	DECLARE_WRITE16_MEMBER(ramdac_w);
 	DECLARE_WRITE8_MEMBER(tms_w);
 	DECLARE_READ8_MEMBER(tms_r);
-	DECLARE_READ8_MEMBER(hc11_porta_r);
 	DECLARE_WRITE8_MEMBER(hc11_porta_w);
 	DECLARE_WRITE8_MEMBER(ay8910_w);
 	DECLARE_WRITE_LINE_MEMBER(tms_irq);
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline_update);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	required_device<cpu_device> m_68hc11;
+	required_device<mc68hc11_cpu_device> m_68hc11;
 	required_device<ay8910_device> m_ay;
 	required_device<tms34010_device> m_tms;
-	void skeetsht(machine_config &config);
-	void hc11_io_map(address_map &map);
 	void hc11_pgm_map(address_map &map);
 	void tms_program_map(address_map &map);
 };
@@ -90,7 +90,7 @@ void skeetsht_state::video_start()
 
 TMS340X0_SCANLINE_RGB32_CB_MEMBER(skeetsht_state::scanline_update)
 {
-	const rgb_t *const pens = m_tlc34076->get_pens();
+	const pen_t *const pens = m_tlc34076->pens();
 	uint16_t *vram = &m_tms_vram[(params->rowaddr << 8) & 0x3ff00];
 	uint32_t *dest = &bitmap.pix32(scanline);
 	int coladdr = params->coladdr;
@@ -111,7 +111,7 @@ READ16_MEMBER(skeetsht_state::ramdac_r)
 	if (offset & 8)
 		offset = (offset & ~8) | 4;
 
-	return m_tlc34076->read(space, offset);
+	return m_tlc34076->read(offset);
 }
 
 WRITE16_MEMBER(skeetsht_state::ramdac_w)
@@ -121,7 +121,7 @@ WRITE16_MEMBER(skeetsht_state::ramdac_w)
 	if (offset & 8)
 		offset = (offset & ~8) | 4;
 
-	m_tlc34076->write(space, offset, data);
+	m_tlc34076->write(offset, data);
 }
 
 
@@ -142,13 +142,13 @@ WRITE8_MEMBER(skeetsht_state::tms_w)
 	if ((offset & 1) == 0)
 		m_lastdataw = data;
 	else
-		m_tms->host_w(space, offset >> 1, (m_lastdataw << 8) | data, 0xffff);
+		m_tms->host_w(offset >> 1, (m_lastdataw << 8) | data);
 }
 
 READ8_MEMBER(skeetsht_state::tms_r)
 {
 	if ((offset & 1) == 0)
-		m_lastdatar = m_tms->host_r(space, offset >> 1, 0xffff);
+		m_lastdatar = m_tms->host_r(offset >> 1);
 
 	return m_lastdatar >> ((offset & 1) ? 0 : 8);
 }
@@ -159,11 +159,6 @@ READ8_MEMBER(skeetsht_state::tms_r)
  *  I/O
  *
  *************************************/
-
-READ8_MEMBER(skeetsht_state::hc11_porta_r)
-{
-	return m_porta_latch;
-}
 
 WRITE8_MEMBER(skeetsht_state::hc11_porta_w)
 {
@@ -176,9 +171,9 @@ WRITE8_MEMBER(skeetsht_state::hc11_porta_w)
 WRITE8_MEMBER(skeetsht_state::ay8910_w)
 {
 	if (m_ay_sel)
-		m_ay->data_w(space, 0, data);
+		m_ay->data_w(data);
 	else
-		m_ay->address_w(space, 0, data);
+		m_ay->address_w(data);
 }
 
 
@@ -191,14 +186,9 @@ WRITE8_MEMBER(skeetsht_state::ay8910_w)
 void skeetsht_state::hc11_pgm_map(address_map &map)
 {
 	map(0x0000, 0xffff).rom().region("68hc11", 0);
-	map(0x1800, 0x1800).w(this, FUNC(skeetsht_state::ay8910_w));
-	map(0x2800, 0x2807).rw(this, FUNC(skeetsht_state::tms_r), FUNC(skeetsht_state::tms_w));
+	map(0x1800, 0x1800).w(FUNC(skeetsht_state::ay8910_w));
+	map(0x2800, 0x2807).rw(FUNC(skeetsht_state::tms_r), FUNC(skeetsht_state::tms_w));
 	map(0xb600, 0xbdff).ram(); //internal EEPROM
-}
-
-void skeetsht_state::hc11_io_map(address_map &map)
-{
-	map(MC68HC11_IO_PORTA, MC68HC11_IO_PORTA).rw(this, FUNC(skeetsht_state::hc11_porta_r), FUNC(skeetsht_state::hc11_porta_w));
 }
 
 
@@ -211,8 +201,7 @@ void skeetsht_state::hc11_io_map(address_map &map)
 void skeetsht_state::tms_program_map(address_map &map)
 {
 	map(0x00000000, 0x003fffff).ram().share("tms_vram");
-	map(0x00440000, 0x004fffff).rw(this, FUNC(skeetsht_state::ramdac_r), FUNC(skeetsht_state::ramdac_w));
-	map(0xc0000000, 0xc00001ff).rw(m_tms, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
+	map(0x00440000, 0x004fffff).rw(FUNC(skeetsht_state::ramdac_r), FUNC(skeetsht_state::ramdac_w));
 	map(0xff800000, 0xffbfffff).rom().mirror(0x00400000).region("tms", 0);
 }
 
@@ -234,33 +223,31 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(skeetsht_state::skeetsht)
+void skeetsht_state::skeetsht(machine_config &config)
+{
+	MC68HC11A1(config, m_68hc11, 8000000); // ?
+	m_68hc11->set_addrmap(AS_PROGRAM, &skeetsht_state::hc11_pgm_map);
+	m_68hc11->out_pa_callback().set(FUNC(skeetsht_state::hc11_porta_w));
 
-	MCFG_CPU_ADD("68hc11", MC68HC11, 4000000) // ?
-	MCFG_CPU_PROGRAM_MAP(hc11_pgm_map)
-	MCFG_CPU_IO_MAP(hc11_io_map)
-	MCFG_MC68HC11_CONFIG( 0, 0x100, 0x01 )  // And 512 bytes EEPROM? (68HC11A1)
+	TMS34010(config, m_tms, 48000000);
+	m_tms->set_addrmap(AS_PROGRAM, &skeetsht_state::tms_program_map);
+	m_tms->set_halt_on_reset(true);
+	m_tms->set_pixel_clock(48000000 / 8);
+	m_tms->set_pixels_per_clock(1);
+	m_tms->set_scanline_rgb32_callback(FUNC(skeetsht_state::scanline_update));
+	m_tms->output_int().set(FUNC(skeetsht_state::tms_irq));
 
-	MCFG_CPU_ADD("tms", TMS34010, 48000000)
-	MCFG_CPU_PROGRAM_MAP(tms_program_map)
-	MCFG_TMS340X0_HALT_ON_RESET(true) /* halt on reset */
-	MCFG_TMS340X0_PIXEL_CLOCK(48000000 / 8) /* pixel clock */
-	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
-	MCFG_TMS340X0_SCANLINE_RGB32_CB(skeetsht_state, scanline_update)   /* scanline updater (rgb32) */
-	MCFG_TMS340X0_OUTPUT_INT_CB(WRITELINE(skeetsht_state, tms_irq))
+	TLC34076(config, m_tlc34076, 0);
+	m_tlc34076->set_bits(tlc34076_device::TLC34076_6_BIT);
 
-	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(48000000 / 8, 156*4, 0, 100*4, 328, 0, 300); // FIXME
+	screen.set_screen_update("tms", FUNC(tms34010_device::tms340x0_rgb32));
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(48000000 / 8, 156*4, 0, 100*4, 328, 0, 300) // FIXME
-	MCFG_SCREEN_UPDATE_DEVICE("tms", tms34010_device, tms340x0_rgb32)
+	SPEAKER(config, "mono").front_center();
 
-
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_SOUND_ADD("aysnd", AY8910, 2000000) // ?
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	AY8910(config, m_ay, 2000000).add_route(ALL_OUTPUTS, "mono", 0.50); // ?
+}
 
 
 /*************************************
@@ -302,5 +289,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1991, skeetsht, 0, skeetsht, skeetsht, skeetsht_state, 0, ROT0, "Dynamo", "Skeet Shot",           MACHINE_NOT_WORKING )
-GAME( 1991, popshot,  0, skeetsht, skeetsht, skeetsht_state, 0, ROT0, "Dynamo", "Pop Shot (prototype)", MACHINE_NOT_WORKING )
+GAME( 1991, skeetsht, 0, skeetsht, skeetsht, skeetsht_state, empty_init, ROT0, "Dynamo", "Skeet Shot",           MACHINE_NOT_WORKING )
+GAME( 1991, popshot,  0, skeetsht, skeetsht, skeetsht_state, empty_init, ROT0, "Dynamo", "Pop Shot (prototype)", MACHINE_NOT_WORKING )

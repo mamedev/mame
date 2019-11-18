@@ -6,7 +6,7 @@
  *---------------------------
  * The Candela computer was designed to be the big breakthough and developed by Candela Data AB, "a Didact Company".
  * The Candela system was based around a main unit that could run OS-9 or Flex and a terminal unit that had a
- * propietary software including CDBASIC. The Candela system lost the battle of the swedish schools to
+ * proprietary software including CDBASIC. The Candela system lost the battle of the Swedish schools to
  * the Compis computer by TeleNova which was based on CP/M initially.  Later both lost to IBM PC as we know.
  * Candela Data continued to sell their system to the swedish industry without major successes despite great
  * innovation and spririt.
@@ -45,7 +45,9 @@
 // Features
 #include "imagedev/cassette.h"
 #include "bus/rs232/rs232.h"
+#include "emupal.h"
 #include "screen.h"
+#include "speaker.h"
 
 //**************************************************************************
 //  MACROS / CONSTANTS
@@ -136,14 +138,15 @@
 public:
 	can09t_state(const machine_config &mconfig, device_type type, const char * tag)
 		: driver_device(mconfig, type, tag)
-		,m_maincpu(*this, "maincpu")
-		,m_syspia(*this, SYSPIA_TAG)
-		,m_usrpia(*this, USRPIA_TAG)
-		,m_pia3(*this, PIA3_TAG)
-		,m_pia4(*this, PIA4_TAG)
-		,m_ptm(*this, "ptm")
-		,m_acia(*this, "acia")
-		,m_banksel(1)
+		, m_maincpu(*this, "maincpu")
+		, m_syspia(*this, SYSPIA_TAG)
+		, m_usrpia(*this, USRPIA_TAG)
+		, m_pia3(*this, PIA3_TAG)
+		, m_pia4(*this, PIA4_TAG)
+		, m_ptm(*this, "ptm")
+		, m_acia(*this, "acia")
+		, m_cass(*this, "cassette")
+		, m_banksel(1)
 	{ }
 	required_device<cpu_device> m_maincpu;
 	virtual void machine_start() override;
@@ -164,6 +167,7 @@ protected:
 	required_device<pia6821_device> m_pia4;
 	required_device<ptm6840_device> m_ptm;
 	required_device<acia6850_device> m_acia;
+	required_device<cassette_image_device> m_cass;
 
 	uint8_t m_banksel;
 	uint8_t *m_plap;
@@ -304,19 +308,19 @@ READ8_MEMBER( can09t_state::read )
 		{
 		case X0XX: // ACIA
 			LOGPLA("-- ACIA\n");
-			byte = m_acia->read(space, offset & 1);
+			byte = m_acia->read(offset & 1);
 			break;
 		case X1XX: // SYSPIA
 			LOGPLA("-- SYSPIA\n");
-			byte = m_syspia->read_alt(space, offset & 3);
+			byte = m_syspia->read_alt(offset & 3);
 			break;
 		case X2XX: // USRPIA
 			LOGPLA("-- USRPIA\n");
-			byte = m_usrpia->read_alt(space, offset & 3);
+			byte = m_usrpia->read_alt(offset & 3);
 			break;
 		case X3XX: // PTM
 			LOGPLA("-- PTM\n");
-			byte = m_ptm->read(space, offset & 7);
+			byte = m_ptm->read(offset & 7);
 			break;
 		case X4XX: //
 			LOGPLA("-- XX4X\n");
@@ -386,19 +390,19 @@ WRITE8_MEMBER( can09t_state::write )
 		{
 		case X0XX: // ACIA
 			LOGPLA("-- ACIA\n");
-			m_acia->write(space, offset & 1, data);
+			m_acia->write(offset & 1, data);
 			break;
 		case X1XX: // SYSPIA
 			LOGPLA("-- SYSPIA\n");
-			m_syspia->write_alt(space, offset & 3, data);
+			m_syspia->write_alt(offset & 3, data);
 			break;
 		case X2XX: // USRPIA
 			LOGPLA("-- USRPIA\n");
-			m_usrpia->write_alt(space, offset & 3, data);
+			m_usrpia->write_alt(offset & 3, data);
 			break;
 		case X3XX: // PTM
 			LOGPLA("-- PTM\n");
-			m_ptm->write(space, offset & 7, data);
+			m_ptm->write(offset & 7, data);
 			break;
 		case X4XX: //
 			LOGPLA("-- XX4X\n");
@@ -425,7 +429,8 @@ READ8_MEMBER( can09t_state::syspia_A_r )
 READ8_MEMBER( can09t_state::syspia_B_r )
 {
 	LOG("%s()\n", FUNCNAME);
-	return 0;
+	u8 data = (m_cass->input() > 0.04) ? 0x80 : 0;
+	return data;
 }
 
 WRITE8_MEMBER( can09t_state::syspia_B_w )
@@ -434,6 +439,7 @@ WRITE8_MEMBER( can09t_state::syspia_B_w )
 
 	m_banksel = (data & 0x20) ? 0x10 : 0;
 	LOGBANK("Bank select: %d", (m_banksel >> 4) & 1);
+	m_cass->output(BIT(data, 6) ? 1.0 : -1.0);
 }
 
 WRITE_LINE_MEMBER(can09t_state::syspia_cb2_w)
@@ -474,7 +480,7 @@ WRITE_LINE_MEMBER (can09t_state::write_acia_clock){
 void can09t_state::can09t_map(address_map &map)
 {
 // Everything is dynamically and asymetrically mapped through the PAL decoded by read/write
-	map(0x0000, 0xffff).rw(this, FUNC(can09t_state::read), FUNC(can09t_state::write));
+	map(0x0000, 0xffff).rw(FUNC(can09t_state::read), FUNC(can09t_state::write));
 }
 
 static INPUT_PORTS_START( can09t )
@@ -484,8 +490,9 @@ INPUT_PORTS_END
  * Candela Main Unit
  * TODO:
  * - Map PIA:S
- * - ROM/RAM paging by using the PIA:s and the myriad of 74138:s on the board
+ * - ROM/RAM paging by using the PIAs and the myriad of 74138s on the board
  * - Vram and screen for the 6845 CRTC
+ * - Check actual clock source for CRTC. An 8MHz UKI crystal is also nearby
  * - Keyboard
  * - Serial port
  * - Floppy controller
@@ -503,6 +510,10 @@ public:
 		,m_bank1(*this, "bank1")
 		,m_crtc(*this, "crtc")
 	{ }
+
+	void can09(machine_config &config);
+
+protected:
 	required_device<cpu_device> m_maincpu;
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
@@ -512,13 +523,11 @@ public:
 	DECLARE_WRITE8_MEMBER( pia1_B_w );
 	DECLARE_WRITE_LINE_MEMBER( pia1_cb2_w);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void can09(machine_config &config);
 	void can09_map(address_map &map);
-protected:
 	required_device<pia6821_device> m_pia1;
 	required_device<ram_device> m_ram;
 	required_memory_bank m_bank1;
-	required_device<h46505_device> m_crtc;
+	required_device<hd6845s_device> m_crtc;
 };
 
 void can09_state::machine_reset()
@@ -625,7 +634,7 @@ static INPUT_PORTS_START( can09 )
 INPUT_PORTS_END
 
 // traced and guessed from pcb images and debugger
-// It is very likelly that this is a PIA based dynamic address map, needs more analysis
+// It is very likely that this is a PIA based dynamic address map, needs more analysis
 void can09_state::can09_map(address_map &map)
 {
 /*
@@ -634,11 +643,11 @@ void can09_state::can09_map(address_map &map)
  * Port A=0x18 B=0x00
  * Port A=0x10 B=
 */
-//  AM_RANGE(0x0000, 0x7fff) AM_RAM
+//  map(0x0000, 0x7fff).ram();
 	map(0x0000, 0x7fff).ram().bankrw("bank1");
 	map(0xe000, 0xffff).rom().region("roms", 0);
-	map(0xe020, 0xe020).w(m_crtc, FUNC(h46505_device::address_w));
-	map(0xe021, 0xe021).w(m_crtc, FUNC(h46505_device::register_w));
+	map(0xe020, 0xe020).w(m_crtc, FUNC(hd6845s_device::address_w));
+	map(0xe021, 0xe021).w(m_crtc, FUNC(hd6845s_device::register_w));
 	map(0xe034, 0xe037).rw(m_pia1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 
 #if 0
@@ -663,19 +672,20 @@ DEVICE_INPUT_DEFAULTS_END
 #endif
 
 /* Fake clock values until we TODO: figure out how the PTM generates the clocks */
-#define CAN09T_BAUDGEN_CLOCK XTAL(1'843'200)
+#define CAN09T_BAUDGEN_CLOCK 1.8432_MHz_XTAL
 #define CAN09T_ACIA_CLOCK (CAN09T_BAUDGEN_CLOCK / 12)
 
-MACHINE_CONFIG_START(can09t_state::can09t)
-	MCFG_CPU_ADD("maincpu", MC6809, XTAL(4'915'200)) // IPL crystal
-	MCFG_CPU_PROGRAM_MAP(can09t_map)
+void can09t_state::can09t(machine_config &config)
+{
+	MC6809(config, m_maincpu, 4.9152_MHz_XTAL); // IPL crystal
+	m_maincpu->set_addrmap(AS_PROGRAM, &can09t_state::can09t_map);
 
 	/* --PIA inits----------------------- */
-	MCFG_DEVICE_ADD(SYSPIA_TAG, PIA6821, 0) // CPU board
-	MCFG_PIA_READPA_HANDLER(READ8(can09t_state, syspia_A_r))
-	MCFG_PIA_READPB_HANDLER(READ8(can09t_state, syspia_B_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(can09t_state, syspia_B_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(can09t_state, syspia_cb2_w))
+	PIA6821(config, m_syspia, 0); // CPU board
+	m_syspia->readpa_handler().set(FUNC(can09t_state::syspia_A_r));
+	m_syspia->readpb_handler().set(FUNC(can09t_state::syspia_B_r));
+	m_syspia->writepb_handler().set(FUNC(can09t_state::syspia_B_w));
+	m_syspia->cb2_handler().set(FUNC(can09t_state::syspia_cb2_w));
 	/* 0xE1FB 0xB112 (SYSPIA Control A) = 0x00 - Channel A IRQ disabled */
 	/* 0xE1FB 0xB113 (SYSPIA Control B) = 0x00 - Channel B IRQ disabled */
 	/* 0xE203 0xB110 (SYSPIA DDR A)     = 0x00 - Port A all inputs */
@@ -683,46 +693,52 @@ MACHINE_CONFIG_START(can09t_state::can09t)
 	/* 0xE20A 0xB112 (SYSPIA Control A) = 0x05 - IRQ A enabled on falling transition on CA2 */
 	/* 0xE20A 0xB113 (SYSPIA Control B) = 0x34 - CB2 is low and lock DDRB */
 	/* 0xE20E 0xB111 (SYSPIA port B)    = 0x10 - Data to port B */
-	MCFG_DEVICE_ADD(USRPIA_TAG, PIA6821, 0) // CPU board
-	MCFG_PIA_CB2_HANDLER(WRITELINE(can09t_state, usrpia_cb2_w))
+
+	PIA6821(config, m_usrpia, 0); // CPU board
+	m_usrpia->cb2_handler().set(FUNC(can09t_state::usrpia_cb2_w));
 	/* 0xE212 0xB122 (USRPIA Control A) = 0x00 - Channel A IRQ disabled */
 	/* 0xE212 0xB123 (USRPIA Control B) = 0x00 - Channel B IRQ disabled */
 	/* 0xE215 0xB120 (USRPIA DDR A)     = 0x00 - Port A all inputs */
 	/* 0xE215 0xB121 (USRPIA DDR B)     = 0xFF - Port B all outputs */
 	/* 0xE21A 0xB122 (USRPIA Control A) = 0x34 - CA2 is low and lock DDRB */
 	/* 0xE21A 0xB123 (USRPIA Control B) = 0x34 - CB2 is low and lock DDRB */
-	MCFG_DEVICE_ADD(PIA3_TAG, PIA6821, 0) // ROM board
-	MCFG_DEVICE_ADD(PIA4_TAG, PIA6821, 0) // ROM board
+	PIA6821(config, m_pia3, 0); // ROM board
+	PIA6821(config, m_pia4, 0); // ROM board
 
-	MCFG_DEVICE_ADD("ptm", PTM6840, 0)
+	PTM6840(config, "ptm", 0);
 
 	/* RS232 usage: mame can09t -window -debug -rs232 terminal */
-	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE ("rs232", rs232_port_device, write_txd))
-	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE ("rs232", rs232_port_device, write_rts))
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE ("acia", acia6850_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE ("acia", acia6850_device, write_cts))
+	ACIA6850(config, m_acia, 0);
+	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_acia->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set(m_acia, FUNC(acia6850_device::write_rxd));
+	rs232.cts_handler().set(m_acia, FUNC(acia6850_device::write_cts));
 
-	MCFG_DEVICE_ADD ("acia_clock", CLOCK, CAN09T_ACIA_CLOCK)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE (can09t_state, write_acia_clock))
-MACHINE_CONFIG_END
+	CLOCK(config, "acia_clock", CAN09T_ACIA_CLOCK).signal_handler().set(FUNC(can09t_state::write_acia_clock));
 
-#define CAN09_X1_CLOCK XTAL(22'118'400)        /* UKI 22118.40 Khz */
+	SPEAKER(config, "mono").front_center();
+	CASSETTE(config, m_cass);
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
+}
+
+#define CAN09_X1_CLOCK 22.1184_MHz_XTAL        /* UKI 22118.40 Khz */
 #define CAN09_CPU_CLOCK (CAN09_X1_CLOCK / 16) /* ~1.38MHz Divider needs to be check but is the most likelly */
-MACHINE_CONFIG_START(can09_state::can09)
-	MCFG_CPU_ADD("maincpu", MC6809E, CAN09_CPU_CLOCK) // MC68A09EP
-	MCFG_CPU_PROGRAM_MAP(can09_map)
+void can09_state::can09(machine_config &config)
+{
+	MC6809E(config, m_maincpu, CAN09_CPU_CLOCK); // MC68A09EP
+	m_maincpu->set_addrmap(AS_PROGRAM, &can09_state::can09_map);
 
 	/* RAM banks */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("768K")
+	RAM(config, RAM_TAG).set_default_size("768K");
 
-	// CRTC  init
-	MCFG_MC6845_ADD("crtc", H46505, "screen", CAN09_CPU_CLOCK) // TODO: Check actual clock source, An 8MHz UKI crystal is also nearby
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	//MCFG_MC6845_UPDATE_ROW_CB(can09_state, crtc_update_row) // not written yet
+	// CRTC init
+	hd6845s_device &crtc(HD6845S(config, "crtc", CAN09_CPU_CLOCK)); // HD46505SP-1 (HD68A45SP)
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	//crtc.set_update_row_callback(FUNC(can09_state::crtc_update_row), this); // not written yet
 
 	/* Setup loop from data table in ROM: 0xFFCB 0xE020 (CRTC register number), 0xFFD0 0xE021 (CRTC register value)
 	    Reg  Value Comment
@@ -748,27 +764,27 @@ MACHINE_CONFIG_START(can09_state::can09)
 
 
 	/* screen - totally faked value for now */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(4'000'000)/2, 512, 0, 512, 576, 0, 576)
-	MCFG_SCREEN_UPDATE_DRIVER(can09_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_raw(4_MHz_XTAL / 2, 512, 0, 512, 576, 0, 576);
+	screen.set_screen_update(FUNC(can09_state::screen_update));
+	screen.set_palette("palette");
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* Floppy */
-	MCFG_WD1770_ADD("wd1770", XTAL(8'000'000) ) // TODO: Verify 8MHz UKI crystal assumed to be used
+	WD1770(config, "wd1770", 8_MHz_XTAL); // TODO: Verify 8MHz UKI crystal assumed to be used
 #if 0
-	MCFG_FLOPPY_DRIVE_ADD("wd1770:0", candela_floppies, "3dd", floppy_image_device::default_floppy_formats)
-	MCFG_SOFTWARE_LIST_ADD("flop3_list", "candela")
+	FLOPPY_CONNECTOR(config, "wd1770:0", candela_floppies, "3dd", floppy_image_device::default_floppy_formats);
+	SOFTWARE_LIST(config, "flop3_list").set_original("candela");
 #endif
 
 	/* --PIA inits----------------------- */
-	MCFG_DEVICE_ADD(PIA1_TAG, PIA6821, 0) // CPU board
-	MCFG_PIA_READPA_HANDLER(READ8(can09_state, pia1_A_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(can09_state, pia1_A_w))
-	MCFG_PIA_READPB_HANDLER(READ8(can09_state, pia1_B_r))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(can09_state, pia1_B_w))
-	MCFG_PIA_CB2_HANDLER(WRITELINE(can09_state, pia1_cb2_w))
+	PIA6821(config, m_pia1, 0); // CPU board
+	m_pia1->readpa_handler().set(FUNC(can09_state::pia1_A_r));
+	m_pia1->writepa_handler().set(FUNC(can09_state::pia1_A_w));
+	m_pia1->readpb_handler().set(FUNC(can09_state::pia1_B_r));
+	m_pia1->writepb_handler().set(FUNC(can09_state::pia1_B_w));
+	m_pia1->cb2_handler().set(FUNC(can09_state::pia1_cb2_w));
 	/* 0xFF7D 0xE035 (PIA1 Control A) = 0x00 - Channel A IRQ disabled */
 	/* 0xFF81 0xE037 (PIA1 Control B) = 0x00 - Channel A IRQ disabled */
 	/* 0xFF85 0xE034 (PIA1 DDR A)     = 0x1F - Port A mixed mode */
@@ -778,11 +794,11 @@ MACHINE_CONFIG_START(can09_state::can09)
 	/* 0xFF93 0xE034 (PIA1 Port B)    = 0x18 - Write Data on Port B */
 
 #if 1
-	MCFG_DEVICE_ADD(PIA2_TAG, PIA6821, 0) // CPU board
-	MCFG_DEVICE_ADD("acia1", ACIA6850, 0) // CPU board
-	MCFG_DEVICE_ADD("acia2", ACIA6850, 0) // CPU board
+	PIA6821(config, PIA2_TAG, 0); // CPU board
+	ACIA6850(config, "acia1", 0); // CPU board
+	ACIA6850(config, "acia2", 0); // CPU board
 #endif
-MACHINE_CONFIG_END
+}
 
 ROM_START( can09t ) /* The smaller grey computer */
 	ROM_REGION(0x10000, "roms", 0)
@@ -799,6 +815,6 @@ ROM_START( can09 ) /* The bigger black computer CAN v1 */
 	ROM_LOAD( "ic14-vdu42.bin", 0x0000, 0x2000, CRC(67fc3c8c) SHA1(1474d6259646798377ef4ce7e43d3c8d73858344) )
 ROM_END
 
-//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   CLASS         INIT        COMPANY             FULLNAME            FLAGS
-COMP( 1984, can09,      0,          0,      can09,      can09,  can09_state,  0,          "Candela Data AB",  "Candela CAN09 v1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_IMPERFECT_GRAPHICS)
-COMP( 1984, can09t,     0,          0,      can09t,     can09t, can09t_state, 0,          "Candela Data AB",  "Candela CAN09",    MACHINE_NO_SOUND_HW )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY            FULLNAME            FLAGS
+COMP( 1984, can09,  0,      0,      can09,   can09,  can09_state,  empty_init, "Candela Data AB", "Candela CAN09 v1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_IMPERFECT_GRAPHICS)
+COMP( 1984, can09t, 0,      0,      can09t,  can09t, can09t_state, empty_init, "Candela Data AB", "Candela CAN09",    MACHINE_NO_SOUND_HW )

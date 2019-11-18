@@ -206,7 +206,7 @@ void menu_control_device_image::handle()
 			break;
 		}
 		m_software_info_name.clear();
-		menu::stack_push<menu_software_list>(ui(), container(), m_sld, m_image.image_interface(), m_software_info_name);
+		menu::stack_push_special_main<menu_software_list>(ui(), container(), m_sld, m_image.image_interface(), m_software_info_name);
 		m_state = SELECT_PARTLIST;
 		break;
 

@@ -7,12 +7,12 @@
     Timer devices.
 
 ***************************************************************************/
-
-#pragma once
-
 #ifndef MAME_MACHINE_TIMER_H
 #define MAME_MACHINE_TIMER_H
 
+#pragma once
+
+#include "screen.h"
 
 
 //**************************************************************************
@@ -21,44 +21,6 @@
 
 // macros for a timer callback functions
 #define TIMER_DEVICE_CALLBACK_MEMBER(name)  void name(timer_device &timer, void *ptr, s32 param)
-
-//**************************************************************************
-//  TIMER DEVICE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_TIMER_ADD_NONE(_tag) \
-	MCFG_DEVICE_ADD(_tag, TIMER, 0) \
-	downcast<timer_device &>(*device).configure_generic(timer_device::expired_delegate());
-#define MCFG_TIMER_DRIVER_ADD(_tag, _class, _callback) \
-	MCFG_DEVICE_ADD(_tag, TIMER, 0) \
-	downcast<timer_device &>(*device).configure_generic(timer_device::expired_delegate(&_class::_callback, #_class "::" #_callback, nullptr, (_class *)nullptr));
-#define MCFG_TIMER_DEVICE_ADD(_tag, _devtag, _class, _callback) \
-	MCFG_DEVICE_ADD(_tag, TIMER, 0) \
-	downcast<timer_device &>(*device).configure_generic(timer_device::expired_delegate(&_class::_callback, #_class "::" #_callback, _devtag, (_class *)nullptr));
-#define MCFG_TIMER_DRIVER_ADD_PERIODIC(_tag, _class, _callback, _period) \
-	MCFG_DEVICE_ADD(_tag, TIMER, 0) \
-	downcast<timer_device &>(*device).configure_periodic(timer_device::expired_delegate(&_class::_callback, #_class "::" #_callback, nullptr, (_class *)nullptr), _period);
-#define MCFG_TIMER_DEVICE_ADD_PERIODIC(_tag, _devtag, _class, _callback, _period) \
-	MCFG_DEVICE_ADD(_tag, TIMER, 0) \
-	downcast<timer_device &>(*device).configure_periodic(timer_device::expired_delegate(&_class::_callback, #_class "::" #_callback, _devtag, (_class *)nullptr), _period);
-#define MCFG_TIMER_DRIVER_ADD_SCANLINE(_tag, _class, _callback, _screen, _first_vpos, _increment) \
-	MCFG_DEVICE_ADD(_tag, TIMER, 0) \
-	downcast<timer_device &>(*device).configure_scanline(timer_device::expired_delegate(&_class::_callback, #_class "::" #_callback, nullptr, (_class *)nullptr), _screen, _first_vpos, _increment);
-#define MCFG_TIMER_DEVICE_ADD_SCANLINE(_tag, _devtag, _class, _callback, _screen, _first_vpos, _increment) \
-	MCFG_DEVICE_ADD(_tag, TIMER, 0) \
-	downcast<timer_device &>(*device).configure_scanline(timer_device::expired_delegate(&_class::_callback, #_class "::" #_callback, _devtag, (_class *)nullptr), _screen, _first_vpos, _increment);
-#define MCFG_TIMER_MODIFY(_tag) \
-	MCFG_DEVICE_MODIFY(_tag)
-
-#define MCFG_TIMER_DRIVER_CALLBACK(_class, _callback) \
-	downcast<timer_device &>(*device).set_callback(timer_device::expired_delegate(&_class::_callback, #_class "::" #_callback, nullptr, (_class *)nullptr));
-#define MCFG_TIMER_START_DELAY(_start_delay) \
-	downcast<timer_device &>(*device).set_start_delay(_start_delay);
-#define MCFG_TIMER_PARAM(_param) \
-	downcast<timer_device &>(*device).config_param(_param);
-#define MCFG_TIMER_PTR(_ptr) \
-	downcast<timer_device &>(*device).set_ptr((void *)(_ptr));
-
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -73,29 +35,47 @@ public:
 	typedef device_delegate<void (timer_device &, void *, s32)> expired_delegate;
 
 	// construction/destruction
-	timer_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	timer_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// inline configuration helpers
-	template <typename Object> void configure_generic(Object &&cb)
+	template <typename... T> void configure_generic(T &&... args)
 	{
 		m_type = TIMER_TYPE_GENERIC;
-		m_callback = std::forward<Object>(cb);
+		m_callback.set(std::forward<T>(args)...);
 	}
-	template <typename Object> void configure_periodic(Object &&cb, const attotime &period)
+
+	template <typename F> void configure_periodic(F &&callback, const char *name, const attotime &period)
 	{
 		m_type = TIMER_TYPE_PERIODIC;
-		m_callback = std::forward<Object>(cb);
+		m_callback.set(std::forward<F>(callback), name);
 		m_period = period;
 	}
-	template <typename Object> void configure_scanline(Object &&cb, const char *screen, int first_vpos, int increment)
+	template <typename T, typename F> void configure_periodic(T &&target, F &&callback, const char *name, const attotime &period)
+	{
+		m_type = TIMER_TYPE_PERIODIC;
+		m_callback.set(std::forward<T>(target), std::forward<F>(callback), name);
+		m_period = period;
+	}
+
+	template <typename F, typename U> void configure_scanline(F &&callback, const char *name, U &&screen, int first_vpos, int increment)
 	{
 		m_type = TIMER_TYPE_SCANLINE;
-		m_callback = std::forward<Object>(cb);
-		m_screen_tag = screen;
+		m_callback.set(std::forward<F>(callback), name);
+		m_screen.set_tag(std::forward<U>(screen));
 		m_first_vpos = first_vpos;
 		m_increment = increment;
 	}
-	template <typename Object> void set_callback(Object &&cb) { m_callback = std::forward<Object>(cb); }
+	template <typename T, typename F, typename U> void configure_scanline(T &&target, F &&callback, const char *name, U &&screen, int first_vpos, int increment)
+	{
+		m_type = TIMER_TYPE_SCANLINE;
+		m_callback.set(std::forward<T>(target), std::forward<F>(callback), name);
+		m_screen.set_tag(std::forward<U>(screen));
+		m_first_vpos = first_vpos;
+		m_increment = increment;
+	}
+
+	template <typename... T> void set_callback(T &&... args) { m_callback.set(std::forward<T>(args)...); }
+
 	void set_start_delay(const attotime &delay) { m_start_delay = delay; }
 	void config_param(int param) { m_param = param; }
 
@@ -111,13 +91,18 @@ public:
 
 	// adjustments
 	void reset() { adjust(attotime::never, 0, attotime::never); }
-	void adjust(const attotime &duration, s32 param = 0, const attotime &period = attotime::never) const { assert(m_type == TIMER_TYPE_GENERIC); m_timer->adjust(duration, param, period); }
+	void adjust(const attotime &duration, s32 param = 0, const attotime &period = attotime::never) const
+	{
+		assert(m_type == TIMER_TYPE_GENERIC);
+		m_timer->adjust(duration, param, period);
+	}
 
 	// timing information
 	attotime time_elapsed() const { return m_timer->elapsed(); }
 	attotime time_left() const { return m_timer->remaining(); }
 	attotime start_time() const { return m_timer->start(); }
 	attotime fire_time() const { return m_timer->expire(); }
+	attotime period() const { return m_timer ? m_timer->period() : m_period; }
 
 private:
 	// device-level overrides
@@ -136,7 +121,7 @@ private:
 
 	// configuration data
 	timer_type              m_type;             // type of timer
-	expired_delegate   m_callback;         // the timer's callback function
+	expired_delegate        m_callback;         // the timer's callback function
 	void *                  m_ptr;              // the pointer parameter passed to the timer callback
 
 	// periodic timers only
@@ -145,8 +130,7 @@ private:
 	s32                     m_param;            // the integer parameter passed to the timer callback
 
 	// scanline timers only
-	const char *            m_screen_tag;       // the tag of the screen this timer tracks
-	screen_device *         m_screen;           // pointer to the screen device
+	optional_device<screen_device> m_screen;    // pointer to the screen device
 	u32                     m_first_vpos;       // the first vertical scanline position the timer fires on
 	u32                     m_increment;        // the number of scanlines between firings
 

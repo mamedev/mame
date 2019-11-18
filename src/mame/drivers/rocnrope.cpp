@@ -68,16 +68,17 @@ void rocnrope_state::rocnrope_map(address_map &map)
 	map(0x3083, 0x3083).portr("DSW1");
 	map(0x3000, 0x3000).portr("DSW2");
 	map(0x3100, 0x3100).portr("DSW3");
-	map(0x4000, 0x47ff).ram();
 	map(0x4000, 0x402f).ram().share("spriteram2");
+	map(0x4030, 0x43ff).ram();
 	map(0x4400, 0x442f).ram().share("spriteram");
-	map(0x4800, 0x4bff).ram().w(this, FUNC(rocnrope_state::rocnrope_colorram_w)).share("colorram");
-	map(0x4c00, 0x4fff).ram().w(this, FUNC(rocnrope_state::rocnrope_videoram_w)).share("videoram");
+	map(0x4430, 0x47ff).ram();
+	map(0x4800, 0x4bff).ram().w(FUNC(rocnrope_state::rocnrope_colorram_w)).share("colorram");
+	map(0x4c00, 0x4fff).ram().w(FUNC(rocnrope_state::rocnrope_videoram_w)).share("videoram");
 	map(0x5000, 0x5fff).ram();
 	map(0x8000, 0x8000).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x8080, 0x8087).w("mainlatch", FUNC(ls259_device::write_d0));
 	map(0x8100, 0x8100).w("timeplt_audio", FUNC(timeplt_audio_device::sound_data_w));
-	map(0x8182, 0x818d).w(this, FUNC(rocnrope_state::rocnrope_interrupt_vector_w));
+	map(0x8182, 0x818d).w(FUNC(rocnrope_state::rocnrope_interrupt_vector_w));
 	map(0x6000, 0xffff).rom();
 }
 
@@ -187,7 +188,7 @@ static const gfx_layout spritelayout =
 	64*8    /* every sprite takes 64 consecutive bytes */
 };
 
-static GFXDECODE_START( rocnrope )
+static GFXDECODE_START( gfx_rocnrope )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,     0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout,   16*16, 16 )
 GFXDECODE_END
@@ -206,41 +207,38 @@ WRITE_LINE_MEMBER(rocnrope_state::vblank_irq)
 		m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
 
-MACHINE_CONFIG_START(rocnrope_state::rocnrope)
-
+void rocnrope_state::rocnrope(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", KONAMI1, MASTER_CLOCK / 3 / 4)        /* Verified in schematics */
-	MCFG_CPU_PROGRAM_MAP(rocnrope_map)
+	KONAMI1(config, m_maincpu, MASTER_CLOCK / 3 / 4);        /* Verified in schematics */
+	m_maincpu->set_addrmap(AS_PROGRAM, &rocnrope_state::rocnrope_map);
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // B2
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(rocnrope_state, flip_screen_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("timeplt_audio", timeplt_audio_device, sh_irqtrigger_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(DEVWRITELINE("timeplt_audio", timeplt_audio_device, mute_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(rocnrope_state, coin_counter_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(rocnrope_state, coin_counter_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(rocnrope_state, irq_mask_w))
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // B2
+	mainlatch.q_out_cb<0>().set(FUNC(rocnrope_state::flip_screen_w));
+	mainlatch.q_out_cb<1>().set("timeplt_audio", FUNC(timeplt_audio_device::sh_irqtrigger_w));
+	mainlatch.q_out_cb<2>().set("timeplt_audio", FUNC(timeplt_audio_device::mute_w));
+	mainlatch.q_out_cb<3>().set(FUNC(rocnrope_state::coin_counter_1_w));
+	mainlatch.q_out_cb<4>().set(FUNC(rocnrope_state::coin_counter_2_w));
+	mainlatch.q_out_cb<7>().set(FUNC(rocnrope_state::irq_mask_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(rocnrope_state, screen_update_rocnrope)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(rocnrope_state, vblank_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(rocnrope_state::screen_update_rocnrope));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(rocnrope_state::vblank_irq));
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rocnrope)
-	MCFG_PALETTE_ADD("palette", 16*16+16*16)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(rocnrope_state, rocnrope)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rocnrope);
+	PALETTE(config, m_palette, FUNC(rocnrope_state::rocnrope_palette), 16*16+16*16, 32);
 
 	/* sound hardware */
-
-	MCFG_SOUND_ADD("timeplt_audio", TIMEPLT_AUDIO, 0)
-MACHINE_CONFIG_END
+	TIMEPLT_AUDIO(config, "timeplt_audio");
+}
 
 /*************************************
  *
@@ -361,8 +359,8 @@ ROM_START( ropeman )
 	ROM_LOAD( "2.16b",            0x0020, 0x0100, CRC(750a9677) SHA1(7a5b4aed5f87180850657b8852bb3f3138d58b5b) ) /* TBP24S10N */
 	ROM_LOAD( "3.16g",            0x0120, 0x0100, CRC(b5c75a27) SHA1(923d6ccf015fd7458494416cc05426cc922a9238) ) /* TBP24S10N */
 
-	ROM_REGION( 0x0001, "pal_cpuvidbd", 0 ) /* MMI PAL10L8 located on the cpu/video board */
-	ROM_LOAD( "pal10l8.6g",       0x0000, 0x0001, NO_DUMP )
+	ROM_REGION( 0x002c, "pal_cpuvidbd", 0 ) /* MMI PAL10L8 located on the cpu/video board */
+	ROM_LOAD( "pal10l8.6g",       0x0000, 0x002c, CRC(82e98da9) SHA1(a49cb9713c6553969de75dc60fc7981d8aa8a4d6) )
 
 	ROM_REGION( 0x01D6, "pals_daughterbd", 0 ) /* N82S153's located on the daughterboard of the cpu/video board */
 	ROM_LOAD( "n82s153.pal1.bin", 0x0000, 0x00eb, CRC(baebe804) SHA1(c2e084b4df8a5c6d12cc34106583b532cd7a697b) ) /* Signetics N82S153 */
@@ -376,7 +374,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(rocnrope_state,rocnrope)
+void rocnrope_state::init_rocnrope()
 {
 	memregion("maincpu")->base()[0x703d] = 0x98^0x22; // HACK: fix one instruction
 }
@@ -388,6 +386,6 @@ DRIVER_INIT_MEMBER(rocnrope_state,rocnrope)
  *
  *************************************/
 
-GAME( 1983, rocnrope,  0,        rocnrope, rocnrope, rocnrope_state, rocnrope, ROT270, "Konami", "Roc'n Rope", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, rocnropek, rocnrope, rocnrope, rocnrope, rocnrope_state, 0,        ROT270, "Konami (Kosuka license)", "Roc'n Rope (Kosuka)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, ropeman,   rocnrope, rocnrope, rocnrope, rocnrope_state, rocnrope, ROT270, "bootleg", "Ropeman (bootleg of Roc'n Rope)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, rocnrope,  0,        rocnrope, rocnrope, rocnrope_state, init_rocnrope, ROT270, "Konami", "Roc'n Rope", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, rocnropek, rocnrope, rocnrope, rocnrope, rocnrope_state, empty_init,    ROT270, "Konami (Kosuka license)", "Roc'n Rope (Kosuka)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, ropeman,   rocnrope, rocnrope, rocnrope, rocnrope_state, init_rocnrope, ROT270, "bootleg", "Ropeman (bootleg of Roc'n Rope)", MACHINE_SUPPORTS_SAVE )

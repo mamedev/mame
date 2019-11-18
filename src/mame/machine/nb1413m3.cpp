@@ -24,15 +24,16 @@ Memo:
 
 DEFINE_DEVICE_TYPE(NB1413M3, nb1413m3_device, "nb1413m3", "NB1413 Mahjong Custom")
 
-nb1413m3_device::nb1413m3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, NB1413M3, tag, owner, clock),
+nb1413m3_device::nb1413m3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, NB1413M3, tag, owner, clock),
+	m_maincpu(*this, "^maincpu"),
 	m_sndromrgntag("voice"),
 	m_sndrombank1(0),
 	m_sndrombank2(0),
 	m_busyctr(0),
-	m_busyflag(1),
 	m_outcoin_flag(1),
 	m_inputport(0xff),
+	m_busyflag(1),
 	m_74ls193_counter(0),
 	m_nmi_count(0),
 	m_nmi_clock(0),
@@ -41,7 +42,8 @@ nb1413m3_device::nb1413m3_device(const machine_config &mconfig, const char *tag,
 	m_gfxradr_l(0),
 	m_gfxradr_h(0),
 	m_gfxrombank(0),
-	m_outcoin_enable(0)
+	m_outcoin_enable(0),
+	m_led(*this, "led0")
 {
 }
 
@@ -52,6 +54,7 @@ nb1413m3_device::nb1413m3_device(const machine_config &mconfig, const char *tag,
 
 void nb1413m3_device::device_start()
 {
+	m_led.resolve();
 	m_timer_cb = timer_alloc(TIMER_CB);
 	m_timer_cb->adjust(attotime::zero);
 
@@ -108,7 +111,7 @@ void nb1413m3_device::device_timer(emu_timer &timer, device_timer_id id, int par
 			timer_callback(ptr, param);
 			break;
 		default:
-			assert_always(false, "Unknown id in nb1413m3_device::device_timer");
+			throw emu_fatalerror("Unknown id in nb1413m3_device::device_timer");
 	}
 }
 
@@ -124,7 +127,7 @@ TIMER_CALLBACK_MEMBER( nb1413m3_device::timer_callback )
 	{
 		if (m_nmi_enable)
 		{
-			machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 			m_nmi_count++;
 		}
 
@@ -306,6 +309,27 @@ WRITE8_MEMBER( nb1413m3_device::sndrombank1_w )
 	m_sndrombank1 = (((data & 0xc0) >> 5) | ((data & 0x10) >> 4));
 }
 
+// bikkuri, to be exposed in driver
+WRITE8_MEMBER( nb1413m3_device::sndrombank1_alt_w )
+{
+	machine().bookkeeping().coin_counter_w(0, data & 0x02);
+	machine().bookkeeping().coin_counter_w(1, data & 0x01);
+	//outcoin_w(space, 0, data);             // (data & 0x04) >> 2;
+	m_outcoin_enable = (data & 0x04) >> 2;
+
+	if (m_outcoin_enable)
+	{
+		if (m_counter++ == 2)
+		{
+			m_outcoin_flag ^= 1;
+			m_counter = 0;
+		}
+	}
+
+	m_nmi_enable = ((data & 0x80) >> 7);
+	//m_sndrombank1 = (((data & 0xc0) >> 5) | ((data & 0x10) >> 4));
+}
+
 WRITE8_MEMBER( nb1413m3_device::sndrombank2_w )
 {
 	m_sndrombank2 = (data & 0x03);
@@ -336,6 +360,16 @@ WRITE8_MEMBER( nb1413m3_device::gfxradr_h_w )
 WRITE8_MEMBER( nb1413m3_device::inputportsel_w )
 {
 	m_inputport = data;
+}
+
+READ_LINE_MEMBER( nb1413m3_device::busyflag_r )
+{
+	return m_busyflag & 0x01;
+}
+
+WRITE_LINE_MEMBER( nb1413m3_device::busyflag_w )
+{
+	m_busyflag = state;
 }
 
 READ8_MEMBER( nb1413m3_device::inputport0_r )
@@ -598,7 +632,7 @@ WRITE8_MEMBER( nb1413m3_device::outcoin_w )
 			break;
 	}
 
-	machine().output().set_led_value(2, m_outcoin_flag);      // out coin
+	m_led = m_outcoin_flag;      // out coin
 }
 
 WRITE8_MEMBER( nb1413m3_device::vcrctrl_w )
@@ -606,11 +640,11 @@ WRITE8_MEMBER( nb1413m3_device::vcrctrl_w )
 	if (data & 0x08)
 	{
 		popmessage(" ** VCR CONTROL ** ");
-		machine().output().set_led_value(2, 1);
+		m_led = 1;
 	}
 	else
 	{
-		machine().output().set_led_value(2, 0);
+		m_led = 0;
 	}
 }
 

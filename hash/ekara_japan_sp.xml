@@ -1,0 +1,72 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="ekara_japan_sp" description="Takara e-kara (Japan) SP-xx series cartridges">
+	<!-- cartridges contain the ROM only, the XaviX CPU and BIOS are in the base unit
+	     some cartridges also contain an SEEPROM
+
+	***********************************************************************************
+
+	Japanese cart listing (by SP code)  * = dumped
+
+	A secondary 4-digit naming scheme SPxxxx (no extension) appears on a sticker on the cartridge PCB only
+
+	These are for use with 5 different units
+	1. e-Kara
+	2. Popira (Yellow)
+	3. Popira 2 (Blue/Green) ( https://www.youtube.com/watch?v=iY1I-jfXw7U )
+	4. Taiko de Popira
+	5. Jumping Popira (Stepping Mat type thing) ( https://www.youtube.com/watch?v=yJruMOBdLFY )
+
+	If you plug this into a DDR Family Mat you get the message (in Japanese)
+
+	 "please play this cartridge on e-kara series, popira, popira 2, taiko de popira or jumping popira"
+
+	 SP-01  (unknown)
+	*SP-02  'Super Cartridge' SP-2
+	*SP-03  'Super Cartridge' SP-3
+	*SP-04  'Super Cartridge' SP-4
+	 SP-05
+	 SP-06  (seen)
+	 SP-07  (seen)
+
+	(more? what's the SP highest number?)
+
+	-->
+
+	<software name="sp02">
+		<description>SP-02 Super Cartridge (Japan)</description>
+		<year>2004</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<feature name="slot" value="rom_24lc04"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="sp02.u1" size="0x200000" crc="c8a84ded" sha1="02ffa04cdc7732fd3ab75505c5cc68bda130c7ee"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sp03">
+		<description>SP-03 Super Cartridge (Japan)</description>
+		<year>2004</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<feature name="slot" value="rom_24lc04"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="sp03.u1" size="0x200000" crc="cd7dbbaf" sha1="cc62c10f8f83015e4c472bc41e9a1fd7ac497655"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sp04">
+		<description>SP-04 Super Cartridge (Japan)</description>
+		<year>2004</year>
+		<publisher>Takara</publisher>
+		<part name="cart" interface="ekara_cart">
+			<feature name="slot" value="rom_24lc04"/>
+			<dataarea name="rom" size="0x200000">
+				<rom name="sp04.u1" size="0x200000" crc="77818ddb" sha1="708980b1ae30864bd3395ef663de1c57ecbc113c"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

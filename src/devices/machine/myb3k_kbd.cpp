@@ -271,7 +271,7 @@ INPUT_PORTS_START( myb3k_common_ports )
 	PORT_START("MYB3K_TB")
 	PORT_BIT( 0x0001U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("KP 5")              // 87
 	PORT_BIT( 0x0002U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("KP 6")              // 88
-//  PORT_BIT( 0x0004U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA_PAD) PORT_NAME("KP ,")          // 89
+	PORT_BIT( 0x0004U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA_PAD) PORT_NAME("KP ,")          // 89
 	PORT_BIT( 0x0008U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("KP 1")              // 90
 	PORT_BIT( 0x0010U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("KP 2")              // 91
 	PORT_BIT( 0x0020U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("KP 3")              // 92
@@ -336,7 +336,7 @@ myb3k_keyboard_device::myb3k_keyboard_device(
 		device_t *owner,
 		u32 clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, m_keyboard_cb()
+	, m_keyboard_cb(*this)
 	, m_io_kbd_t(*this, "MYB3K_T%X", 0U)
 {
 }
@@ -353,8 +353,7 @@ ioport_constructor myb3k_keyboard_device::device_input_ports() const
 
 void myb3k_keyboard_device::device_start()
 {
-	m_keyboard_cb.bind_relative_to(*owner());
-	device_reset();
+	m_keyboard_cb.resolve();
 }
 
 void myb3k_keyboard_device::device_reset()

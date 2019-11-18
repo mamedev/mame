@@ -12,61 +12,26 @@
 #include "pci.h"
 #include "cpu/mips/mips3.h"
 
-// Supports R4600/4650/4700/R5000 CPUs
-#define MCFG_GT64010_ADD(_tag,  _cpu_tag, _clock, _irq_num) \
-	MCFG_PCI_HOST_ADD(_tag, GT64XXX, 0x11ab0146, 0x03, 0x00000000) \
-	downcast<gt64xxx_device *>(device)->set_cpu_tag(_cpu_tag); \
-	downcast<gt64xxx_device *>(device)->set_clock(_clock); \
-	downcast<gt64xxx_device *>(device)->set_irq_num(_irq_num);
-
-// Supports the following 32-bit bus CPUs:
-// IDT RC4640 and RC4650 (in 32-bit mode)
-// QED RM523X
-// NEC/Toshiba VR4300
-#define MCFG_GT64111_ADD(_tag,  _cpu_tag, _clock, _irq_num) \
-	MCFG_PCI_DEVICE_ADD(_tag, GT64XXX, 0x414611ab, 0x10, 0x058000, 0x00000000) \
-	downcast<gt64xxx_device *>(device)->set_cpu_tag(_cpu_tag); \
-	downcast<gt64xxx_device *>(device)->set_clock(_clock); \
-	downcast<gt64xxx_device *>(device)->set_irq_num(_irq_num);
-
-#define MCFG_GT64XXX_SET_BE_CPU(_be) \
-	downcast<gt64xxx_device *>(device)->set_be(_be);
-
-#define MCFG_GT64XXX_IRQ_ADD(_irq_num) \
-	downcast<gt64xxx_device *>(device)->set_irq_info(_irq_num);
-
-#define MCFG_GT64XXX_SET_CS(_cs_num, _map) \
-	downcast<gt64xxx_device *>(device)->set_map(_cs_num, address_map_constructor(&_map, #_map, this), this);
-
-#define MCFG_GT64XX_SET_SIMM(_index, _size) \
-	downcast<gt64xxx_device *>(device)->set_simm_size(_index, _size);
-
-#define MCFG_GT64XX_SET_SIMM0(_size) \
-	downcast<gt64xxx_device *>(device)->set_simm0_size(_size);
-
-#define MCFG_GT64XX_SET_SIMM1(_size) \
-	downcast<gt64xxx_device *>(device)->set_simm1_size(_size);
+DECLARE_DEVICE_TYPE(GT64010, gt64010_device)
+DECLARE_DEVICE_TYPE(GT64111, gt64111_device)
 
 /*************************************
  *  Structures
  *************************************/
 class gt64xxx_device : public pci_host_device {
 public:
-	gt64xxx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
 	virtual void reset_all_mappings() override;
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
-	void set_cpu_tag(const char *tag) { cpu_tag = tag;}
-	void set_clock(const uint32_t clock) {m_clock = clock;}
-	void set_be(const int be) {m_be = be;}
-	void set_autoconfig(const int autoconfig) {m_autoconfig = autoconfig;}
-	void set_irq_num(const int irq_num) {m_irq_num = irq_num;}
+	template <typename T> void set_cpu_tag(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
+	void set_be(int be) { m_be = be; }
+	void set_autoconfig(int autoconfig) { m_autoconfig = autoconfig; }
+	void set_irq_num(int irq_num) { m_irq_num = irq_num; }
 	virtual void config_map(address_map &map) override;
-	void set_simm_size(const int index, const int size) { m_simm_size[index] = size; };
-	void set_simm0_size(const int size) { m_simm_size[0] = size; };
-	void set_simm1_size(const int size) { m_simm_size[1] = size; };
+	void set_simm_size(int index, int size) { m_simm_size[index] = size; };
+	void set_simm0_size(int size) { m_simm_size[0] = size; };
+	void set_simm1_size(int size) { m_simm_size[1] = size; };
 
 	DECLARE_WRITE_LINE_MEMBER(pci_stall);
 
@@ -106,6 +71,8 @@ public:
 	virtual void device_post_load() override;
 
 protected:
+	gt64xxx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	address_space *m_cpu_space;
 	virtual space_config_vector memory_space_config() const override;
 	virtual void device_start() override;
@@ -134,9 +101,7 @@ private:
 		galileo_addr_map() : low_addr(0xffffffff), high_addr(0x0) {}
 	};
 
-	mips3_device *m_cpu;
-	const char *cpu_tag;
-	uint32_t m_clock;
+	required_device<mips3_device> m_cpu;
 	int m_be, m_autoconfig;
 	int m_irq_num;
 	int m_simm_size[4];
@@ -186,6 +151,37 @@ private:
 	address_space* dma_decode_address(uint32_t &addr);
 };
 
-DECLARE_DEVICE_TYPE(GT64XXX, gt64xxx_device)
+// Supports R4600/4650/4700/R5000 CPUs
+class gt64010_device : public gt64xxx_device {
+public:
+	template <typename T>
+	gt64010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag, int irq_num)
+		: gt64010_device(mconfig, tag, owner, clock)
+	{
+		set_ids_host(0x11ab0146, 0x03, 0x00000000);
+		set_cpu_tag(std::forward<T>(cpu_tag));
+		set_irq_num(irq_num);
+	}
+	gt64010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: gt64xxx_device(mconfig, GT64010, tag, owner, clock) {}
+};
+
+// Supports the following 32-bit bus CPUs:
+// IDT RC4640 and RC4650 (in 32-bit mode)
+// QED RM523X
+// NEC/Toshiba VR4300
+class gt64111_device : public gt64xxx_device {
+public:
+	template <typename T>
+	gt64111_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag, int irq_num)
+		: gt64111_device(mconfig, tag, owner, clock)
+	{
+		set_ids(0x414611ab, 0x10, 0x058000, 0x00000000);
+		set_cpu_tag(std::forward<T>(cpu_tag));
+		set_irq_num(irq_num);
+	}
+	gt64111_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: gt64xxx_device(mconfig, GT64111, tag, owner, clock) {}
+};
 
 #endif // MAME_MACHINE_GT64XXX_H

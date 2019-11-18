@@ -586,9 +586,9 @@ void es5510_device::device_start() {
 	save_item(NAME(dol));
 	save_item(NAME(dol_count));
 
-	save_pointer(NAME(gpr.get()), 0xc0);
-	save_pointer(NAME(instr.get()), 160);
-	save_pointer(NAME(dram.get()), DRAM_SIZE);
+	save_pointer(NAME(gpr), 0xc0);
+	save_pointer(NAME(instr), 160);
+	save_pointer(NAME(dram), DRAM_SIZE);
 
 	save_item(NAME(dol_latch));
 	save_item(NAME(dil_latch));
@@ -647,23 +647,23 @@ device_memory_interface::space_config_vector es5510_device::memory_space_config(
 	};
 }
 
-uint64_t es5510_device::execute_clocks_to_cycles(uint64_t clocks) const {
+uint64_t es5510_device::execute_clocks_to_cycles(uint64_t clocks) const noexcept {
 	return clocks / 3;
 }
 
-uint64_t es5510_device::execute_cycles_to_clocks(uint64_t cycles) const {
+uint64_t es5510_device::execute_cycles_to_clocks(uint64_t cycles) const noexcept {
 	return cycles * 3;
 }
 
-uint32_t es5510_device::execute_min_cycles() const {
+uint32_t es5510_device::execute_min_cycles() const noexcept {
 	return 1;
 }
 
-uint32_t es5510_device::execute_max_cycles() const {
+uint32_t es5510_device::execute_max_cycles() const noexcept {
 	return 1;
 }
 
-uint32_t es5510_device::execute_input_lines() const {
+uint32_t es5510_device::execute_input_lines() const noexcept {
 	return 1;
 }
 

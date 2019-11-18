@@ -221,6 +221,7 @@
 #include "sound/ymz280b.h"
 #include "machine/nvram.h"
 #include "video/ramdac.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -243,8 +244,8 @@ public:
 		m_palette2(*this, "palette2") { }
 
 	required_shared_ptr<uint16_t> m_vram;
-	DECLARE_DRIVER_INIT(colorama);
-	DECLARE_DRIVER_INIT(cmrltv75);
+	void init_colorama();
+	void init_cmrltv75();
 	virtual void video_start() override;
 	uint32_t screen_update_coinmvga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
@@ -320,11 +321,11 @@ void coinmvga_state::coinmvga_map(address_map &map)
 	map(0x000000, 0x07ffff).rom();
 	map(0x080000, 0x0fffff).rom().region("maincpu", 0); //maybe not
 
-//  AM_RANGE(0x0a0000, 0x0fffff) AM_RAM
-//  AM_RANGE(0x100000, 0x1fffff) AM_RAM //colorama
+//  map(0x0a0000, 0x0fffff).ram();
+//  map(0x100000, 0x1fffff).ram(); //colorama
 	map(0x210000, 0x21ffff).ram().share("vram");
-//  AM_RANGE(0x40746e, 0x40746f) AM_READ(test_r) AM_WRITENOP //touch screen related, colorama
-//  AM_RANGE(0x403afa, 0x403afb) AM_READ(test_r) AM_WRITENOP //touch screen related, cmrltv75
+//  map(0x40746e, 0x40746f).r(FUNC(coinmvga_state::test_r)).nopw(); //touch screen related, colorama
+//  map(0x403afa, 0x403afb).r(FUNC(coinmvga_state::test_r)).nopw(); //touch screen related, cmrltv75
 	map(0x400000, 0x40ffff).ram();
 
 	map(0x600000, 0x600000).w("ramdac", FUNC(ramdac_device::index_w));
@@ -346,20 +347,20 @@ void coinmvga_state::coinmvga_map(address_map &map)
 void coinmvga_state::coinmvga_io_map(address_map &map)
 {
 /*  Digital I/O ports (ports 4-B are valid on 16-bit H8/3xx) */
-//  AM_RANGE(h8_device::PORT_4, h8_device::PORT_4)
-//  AM_RANGE(h8_device::PORT_5, h8_device::PORT_5)
-//  AM_RANGE(h8_device::PORT_6, h8_device::PORT_6)
-//  AM_RANGE(h8_device::PORT_7, h8_device::PORT_7) <---- 0006 RW colorama
-//  AM_RANGE(h8_device::PORT_8, h8_device::PORT_8)
-//  AM_RANGE(h8_device::PORT_9, h8_device::PORT_9)
-//  AM_RANGE(h8_device::PORT_A, h8_device::PORT_A)
-//  AM_RANGE(h8_device::PORT_B, h8_device::PORT_B)
+//  map(h8_device::PORT_4, h8_device::PORT_4)
+//  map(h8_device::PORT_5, h8_device::PORT_5)
+//  map(h8_device::PORT_6, h8_device::PORT_6)
+//  map(h8_device::PORT_7, h8_device::PORT_7) <---- 0006 RW colorama
+//  map(h8_device::PORT_8, h8_device::PORT_8)
+//  map(h8_device::PORT_9, h8_device::PORT_9)
+//  map(h8_device::PORT_A, h8_device::PORT_A)
+//  map(h8_device::PORT_B, h8_device::PORT_B)
 
 /*  Analog Inputs */
-//  AM_RANGE(h8_device::ADC_0, h8_device::ADC_0)
-//  AM_RANGE(h8_device::ADC_1, h8_device::ADC_1)
-//  AM_RANGE(h8_device::ADC_2, h8_device::ADC_2)
-//  AM_RANGE(h8_device::ADC_3, h8_device::ADC_3)
+//  map(h8_device::ADC_0, h8_device::ADC_0)
+//  map(h8_device::ADC_1, h8_device::ADC_1)
+//  map(h8_device::ADC_2, h8_device::ADC_2)
+//  map(h8_device::ADC_3, h8_device::ADC_3)
 }
 
 /*  unknown writes (cmrltv75):
@@ -600,11 +601,11 @@ static const gfx_layout tiles16x16_layout =
 * Graphics Decode Information *
 ******************************/
 
-static GFXDECODE_START( coinmvga )
+static GFXDECODE_START( gfx_coinmvga )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout,   0x000, 16 )  /* Foreground GFX */
 GFXDECODE_END
 
-static GFXDECODE_START( coinmvga2 )
+static GFXDECODE_START( gfx_coinmvga2 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles16x16_layout, 0x000, 1 )  /* Background GFX */
 GFXDECODE_END
 
@@ -635,41 +636,44 @@ void coinmvga_state::ramdac2_map(address_map &map)
 }
 
 
-MACHINE_CONFIG_START(coinmvga_state::coinmvga)
-
+void coinmvga_state::coinmvga(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", H83007, CPU_CLOCK)  /* xtal */
-	MCFG_CPU_PROGRAM_MAP(coinmvga_map)
-	MCFG_CPU_IO_MAP(coinmvga_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", coinmvga_state,  vblank_irq)   /* wrong, fix me */
+	H83007(config, m_maincpu, CPU_CLOCK);  /* xtal */
+	m_maincpu->set_addrmap(AS_PROGRAM, &coinmvga_state::coinmvga_map);
+	m_maincpu->set_addrmap(AS_IO, &coinmvga_state::coinmvga_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(coinmvga_state::vblank_irq));   /* wrong, fix me */
 
-//  MCFG_NVRAM_ADD_0FILL("nvram")
+//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(640,480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_DRIVER(coinmvga_state, screen_update_coinmvga)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(640,480);
+	screen.set_visarea_full();
+	screen.set_screen_update(FUNC(coinmvga_state::screen_update_coinmvga));
+	screen.set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", coinmvga)
-	MCFG_GFXDECODE_ADD("gfxdecode2", "palette2", coinmvga2)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_coinmvga);
+	GFXDECODE(config, "gfxdecode2", m_palette2, gfx_coinmvga2);
 
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
+	PALETTE(config, m_palette).set_entries(256);
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
+	ramdac.set_addrmap(0, &coinmvga_state::ramdac_map);
 
-	MCFG_PALETTE_ADD("palette2", 16)
-	MCFG_RAMDAC_ADD("ramdac2", ramdac2_map, "palette2")
+	PALETTE(config, m_palette2).set_entries(16);
+	ramdac_device &ramdac2(RAMDAC(config, "ramdac2", 0, m_palette2));
+	ramdac2.set_addrmap(0, &coinmvga_state::ramdac2_map);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, SND_CLOCK)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	ymz280b_device &ymz(YMZ280B(config, "ymz", SND_CLOCK));
+	ymz.add_route(0, "lspeaker", 1.0);
+	ymz.add_route(1, "rspeaker", 1.0);
+}
 
 
 /*************************
@@ -878,11 +882,11 @@ ROM_END
 *      Driver Init       *
 *************************/
 
-DRIVER_INIT_MEMBER(coinmvga_state,colorama)
+void coinmvga_state::init_colorama()
 {
 }
 
-DRIVER_INIT_MEMBER(coinmvga_state,cmrltv75)
+void coinmvga_state::init_cmrltv75()
 {
 }
 
@@ -891,9 +895,9 @@ DRIVER_INIT_MEMBER(coinmvga_state,cmrltv75)
 *      Game Drivers      *
 *************************/
 
-//    YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT      ROT    COMPANY                    FULLNAME                                       FLAGS
-GAME( 2000, colorama,  0,        coinmvga, coinmvga, coinmvga_state, colorama, ROT0,  "Coinmaster-Gaming, Ltd.", "Colorama (P521, English)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2000, coloramas, colorama, coinmvga, coinmvga, coinmvga_state, colorama, ROT0,  "Coinmaster-Gaming, Ltd.", "Colorama (P521 V13, Spanish)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2001, cmrltv75,  0,        coinmvga, coinmvga, coinmvga_state, cmrltv75, ROT90, "Coinmaster-Gaming, Ltd.", "Coinmaster Roulette P497 V75 (Y2K, Spanish)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2000, cmkenosp,  0,        coinmvga, coinmvga, coinmvga_state, 0,        ROT90, "Coinmaster-Gaming, Ltd.", "Coinmaster Keno (Y2K, Spanish, 2000-12-14)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2000, cmkenospa, cmkenosp, coinmvga, coinmvga, coinmvga_state, 0,        ROT90, "Coinmaster-Gaming, Ltd.", "Coinmaster Keno (Y2K, Spanish, 2000-12-02)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+//    YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT           ROT    COMPANY                    FULLNAME                                       FLAGS
+GAME( 2000, colorama,  0,        coinmvga, coinmvga, coinmvga_state, init_colorama, ROT0,  "Coinmaster-Gaming, Ltd.", "Colorama (P521, English)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2000, coloramas, colorama, coinmvga, coinmvga, coinmvga_state, init_colorama, ROT0,  "Coinmaster-Gaming, Ltd.", "Colorama (P521 V13, Spanish)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2001, cmrltv75,  0,        coinmvga, coinmvga, coinmvga_state, init_cmrltv75, ROT90, "Coinmaster-Gaming, Ltd.", "Coinmaster Roulette P497 V75 (Y2K, Spanish)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2000, cmkenosp,  0,        coinmvga, coinmvga, coinmvga_state, empty_init,    ROT90, "Coinmaster-Gaming, Ltd.", "Coinmaster Keno (Y2K, Spanish, 2000-12-14)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2000, cmkenospa, cmkenosp, coinmvga, coinmvga, coinmvga_state, empty_init,    ROT90, "Coinmaster-Gaming, Ltd.", "Coinmaster Keno (Y2K, Spanish, 2000-12-02)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

@@ -62,7 +62,7 @@ WRITE_LINE_MEMBER(stactics_state::motor_w)
 }
 
 
-CUSTOM_INPUT_MEMBER(stactics_state::get_motor_not_ready)
+READ_LINE_MEMBER(stactics_state::motor_not_ready_r)
 {
 	// if the motor is self-centering, but not centered yet
 	return (!m_motor_on && (m_horiz_pos != 0 || m_vert_pos != 0));
@@ -186,18 +186,18 @@ void stactics_state::main_map(address_map &map)
 	map(0x6000, 0x6007).mirror(0x0f08).w(m_outlatch, FUNC(ls259_device::write_d0));
 	map(0x6010, 0x6017).mirror(0x0f08).w("audiolatch", FUNC(ls259_device::write_d0));
 	map(0x6020, 0x6027).mirror(0x0f08).w("lamplatch", FUNC(ls259_device::write_d0));
-	map(0x6030, 0x6030).mirror(0x0f0f).w(this, FUNC(stactics_state::speed_latch_w));
-	map(0x6040, 0x6040).mirror(0x0f0f).w(this, FUNC(stactics_state::shot_trigger_w));
-	map(0x6050, 0x6050).mirror(0x0f0f).w(this, FUNC(stactics_state::shot_flag_clear_w));
+	map(0x6030, 0x6030).mirror(0x0f0f).w(FUNC(stactics_state::speed_latch_w));
+	map(0x6040, 0x6040).mirror(0x0f0f).w(FUNC(stactics_state::shot_trigger_w));
+	map(0x6050, 0x6050).mirror(0x0f0f).w(FUNC(stactics_state::shot_flag_clear_w));
 	map(0x6060, 0x606f).mirror(0x0f00).writeonly().share("display_buffer");
 	map(0x6070, 0x609f).mirror(0x0f00).nopw();
-	/* AM_RANGE(0x60a0, 0x60ef) AM_MIRROR(0x0f00) AM_WRITE(sound2_w) */
+	/* map(0x60a0, 0x60ef).mirror(0x0f00).w(FUNC(stactics_state::sound2_w)); */
 	map(0x60f0, 0x60ff).mirror(0x0f00).nopw();
 	map(0x7000, 0x7000).mirror(0x0fff).portr("IN2");
 	map(0x8000, 0x8000).mirror(0x0fff).portr("IN3");
-	map(0x8000, 0x87ff).mirror(0x0800).w(this, FUNC(stactics_state::scroll_ram_w));
-	map(0x9000, 0x9000).mirror(0x0fff).r(this, FUNC(stactics_state::vert_pos_r));
-	map(0xa000, 0xa000).mirror(0x0fff).r(this, FUNC(stactics_state::horiz_pos_r));
+	map(0x8000, 0x87ff).mirror(0x0800).w(FUNC(stactics_state::scroll_ram_w));
+	map(0x9000, 0x9000).mirror(0x0fff).r(FUNC(stactics_state::vert_pos_r));
+	map(0xa000, 0xa000).mirror(0x0fff).r(FUNC(stactics_state::horiz_pos_r));
 	map(0xb000, 0xbfff).ram().share("videoram_b");
 	map(0xc000, 0xcfff).noprw();
 	map(0xd000, 0xdfff).ram().share("videoram_d");
@@ -222,7 +222,7 @@ static INPUT_PORTS_START( stactics )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, stactics_state, get_motor_not_ready, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(stactics_state, motor_not_ready_r)
 
 	PORT_START("IN1")   /* IN1 */
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_B ) )
@@ -251,8 +251,8 @@ static INPUT_PORTS_START( stactics )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("IN2")   /* IN2 */
-	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, stactics_state, get_rng, nullptr)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, stactics_state, get_frame_count_d3, nullptr)
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(stactics_state, get_rng)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(stactics_state, frame_count_d3_r)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Free_Play ) )
@@ -262,7 +262,7 @@ static INPUT_PORTS_START( stactics )
 
 	PORT_START("IN3")   /* IN3 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, stactics_state, get_shot_standby, nullptr)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(stactics_state, shot_standby_r)
 	PORT_DIPNAME( 0x04, 0x04, "Number of Barriers" )
 	PORT_DIPSETTING(    0x04, "4" )
 	PORT_DIPSETTING(    0x00, "6" )
@@ -274,7 +274,7 @@ static INPUT_PORTS_START( stactics )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, stactics_state, get_not_shot_arrive, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(stactics_state, not_shot_arrive_r)
 
 	PORT_START("FAKE")  /* FAKE */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
@@ -308,43 +308,43 @@ void stactics_state::machine_start()
  *
  *************************************/
 
-MACHINE_CONFIG_START(stactics_state::stactics)
-
+void stactics_state::stactics(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, 1933560)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", stactics_state,  interrupt)
+	I8080(config, m_maincpu, 1933560);
+	m_maincpu->set_addrmap(AS_PROGRAM, &stactics_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(stactics_state::interrupt));
 
-	MCFG_DEVICE_ADD("outlatch", LS259, 0) // 50
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(stactics_state, coin_lockout_1_w)) // COIN REJECT 1
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(stactics_state, coin_lockout_2_w)) // COIN REJECT 2
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(stactics_state, palette_bank_w)) // FLM COL 0
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(stactics_state, palette_bank_w)) // FLM COL 1
+	LS259(config, m_outlatch); // 50
+	m_outlatch->q_out_cb<0>().set(FUNC(stactics_state::coin_lockout_1_w)); // COIN REJECT 1
+	m_outlatch->q_out_cb<1>().set(FUNC(stactics_state::coin_lockout_2_w)); // COIN REJECT 2
+	m_outlatch->q_out_cb<6>().set(FUNC(stactics_state::palette_bank_w)); // FLM COL 0
+	m_outlatch->q_out_cb<7>().set(FUNC(stactics_state::palette_bank_w)); // FLM COL 1
 
-	MCFG_DEVICE_ADD("audiolatch", LS259, 0) // 58 - TODO: implement these switches
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP) // MUTE
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(NOOP) // INV. DISTANCE A
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // INV. DISTANCE B
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP) // UFO
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // INVADER
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // EMEGENCY (sic)
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(stactics_state, motor_w)) // overlaps rocket sound
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP) // SOUND ON
+	ls259_device &audiolatch(LS259(config, "audiolatch")); // 58 - TODO: implement these switches
+	audiolatch.q_out_cb<0>().set_nop(); // MUTE
+	audiolatch.q_out_cb<1>().set_nop(); // INV. DISTANCE A
+	audiolatch.q_out_cb<2>().set_nop(); // INV. DISTANCE B
+	audiolatch.q_out_cb<3>().set_nop(); // UFO
+	audiolatch.q_out_cb<4>().set_nop(); // INVADER
+	audiolatch.q_out_cb<5>().set_nop(); // EMEGENCY (sic)
+	audiolatch.q_out_cb<6>().set(FUNC(stactics_state::motor_w)); // overlaps rocket sound
+	audiolatch.q_out_cb<7>().set_nop(); // SOUND ON
 
-	MCFG_DEVICE_ADD("lamplatch", LS259, 0) // 96
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(stactics_state, base_lamp_w<4>))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(stactics_state, base_lamp_w<3>))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(stactics_state, base_lamp_w<2>))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(stactics_state, base_lamp_w<1>))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(stactics_state, base_lamp_w<0>))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(stactics_state, start_lamp_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(stactics_state, barrier_lamp_w))
+	ls259_device &lamplatch(LS259(config, "lamplatch")); // 96
+	lamplatch.q_out_cb<0>().set(FUNC(stactics_state::base_lamp_w<4>));
+	lamplatch.q_out_cb<1>().set(FUNC(stactics_state::base_lamp_w<3>));
+	lamplatch.q_out_cb<2>().set(FUNC(stactics_state::base_lamp_w<2>));
+	lamplatch.q_out_cb<3>().set(FUNC(stactics_state::base_lamp_w<1>));
+	lamplatch.q_out_cb<4>().set(FUNC(stactics_state::base_lamp_w<0>));
+	lamplatch.q_out_cb<5>().set(FUNC(stactics_state::start_lamp_w));
+	lamplatch.q_out_cb<6>().set(FUNC(stactics_state::barrier_lamp_w));
 
 	/* video hardware */
 	stactics_video(config);
 
 	/* audio hardware */
-MACHINE_CONFIG_END
+}
 
 
 
@@ -382,4 +382,4 @@ ROM_END
  *
  *************************************/
 
-GAMEL( 1981, stactics, 0, stactics, stactics, stactics_state, 0, ORIENTATION_FLIP_X, "Sega", "Space Tactics", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_stactics )
+GAMEL( 1981, stactics, 0, stactics, stactics, stactics_state, empty_init, ORIENTATION_FLIP_X, "Sega", "Space Tactics", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_stactics )

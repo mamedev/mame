@@ -39,13 +39,14 @@ DEFINE_DEVICE_TYPE(PDS030_XCEED30HR, nubus_xceed30hr_device, "pd3_30hr", "Micron
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(nubus_xceed30hr_device::device_add_mconfig)
-	MCFG_SCREEN_ADD( XCEED30HR_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, nubus_xceed30hr_device, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
-	MCFG_SCREEN_SIZE(1024,768)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-MACHINE_CONFIG_END
+void nubus_xceed30hr_device::device_add_mconfig(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, XCEED30HR_SCREEN_NAME, SCREEN_TYPE_RASTER));
+	screen.set_screen_update(FUNC(nubus_xceed30hr_device::screen_update));
+	screen.set_raw(25175000, 800, 0, 640, 525, 0, 480);
+	screen.set_size(1024, 768);
+	screen.set_visarea(0, 640-1, 0, 480-1);
+}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -95,8 +96,8 @@ void nubus_xceed30hr_device::device_start()
 	m_vram.resize(VRAM_SIZE);
 	m_vram32 = (uint32_t *)&m_vram[0];
 
-	nubus().install_device(slotspace, slotspace+VRAM_SIZE-1, read32_delegate(FUNC(nubus_xceed30hr_device::vram_r), this), write32_delegate(FUNC(nubus_xceed30hr_device::vram_w), this));
-	nubus().install_device(slotspace+0x800000, slotspace+0xefffff, read32_delegate(FUNC(nubus_xceed30hr_device::xceed30hr_r), this), write32_delegate(FUNC(nubus_xceed30hr_device::xceed30hr_w), this));
+	nubus().install_device(slotspace, slotspace+VRAM_SIZE-1, read32_delegate(*this, FUNC(nubus_xceed30hr_device::vram_r)), write32_delegate(*this, FUNC(nubus_xceed30hr_device::vram_w)));
+	nubus().install_device(slotspace+0x800000, slotspace+0xefffff, read32_delegate(*this, FUNC(nubus_xceed30hr_device::xceed30hr_r)), write32_delegate(*this, FUNC(nubus_xceed30hr_device::xceed30hr_w)));
 
 	m_timer = timer_alloc(0, nullptr);
 	m_timer->adjust(screen().time_until_pos(479, 0), 0);

@@ -23,7 +23,7 @@
   FOR AMUSEMENT ONLY.
 
   The ingenious Match Games offers something for everyone. Four captivating themes
-  with brillant graphics, challenging play action, an enticing bonus feature and a
+  with brilliant graphics, challenging play action, an enticing bonus feature and a
   host of options to tailor the game to any location.
 
   Match Games is today's perfect alternative in adult video skill games...
@@ -36,19 +36,19 @@
   and number combinations. Play appeal stays high as new characters are introduced.
 
   "Wild" characters liven the action even more and build special bonus points, co-
-  llected on a 5-way number match. The appeal is irresistable... Players stay hoo-
+  llected on a 5-way number match. The appeal is irresistible... Players stay hoo-
   ked in for lot more action (and more earnings) for you!.
 
 
   GAME THEMES:
 
-  Match Games aknowledges every scoring combination by displaying its own special
+  Match Games acknowledges every scoring combination by displaying its own special
   name keyed to each game theme.
 
   Every time 2 "Wild" characters pop up together, special bonus symbols appear,
   increasing bonus by 5 points.
 
-  * "THE WHITE KNIGHT" features knights in armor with colores plumes and wild
+  * "THE WHITE KNIGHT" features knights in armor with colored plumes and wild
                        'White Knights'.
 
   * "THE FROG POND" stars colorful and humorous frogs perched on top of mushrooms.
@@ -217,7 +217,9 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
+#include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 #include "mgames.lh"
 
@@ -225,16 +227,20 @@
 class mgames_state : public driver_device
 {
 public:
-	mgames_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	mgames_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_video(*this, "video"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_lamps(*this, "lamp%u", 1U)
+	{ }
 
-	uint8_t m_output[8];
-	required_shared_ptr<uint8_t> m_video;
-	int m_mixdata;
+	void mgames(machine_config &config);
+
+private:
+	tilemap_t *m_tilemap;
+
 	DECLARE_READ8_MEMBER(mixport_r);
 	DECLARE_WRITE8_MEMBER(outport0_w);
 	DECLARE_WRITE8_MEMBER(outport1_w);
@@ -244,56 +250,58 @@ public:
 	DECLARE_WRITE8_MEMBER(outport5_w);
 	DECLARE_WRITE8_MEMBER(outport6_w);
 	DECLARE_WRITE8_MEMBER(outport7_w);
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(mgames);
+
+	void mgames_palette(palette_device &palette) const;
 	uint32_t screen_update_mgames(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TILE_GET_INFO_MEMBER(tile_info);
+
+	void main_map(address_map &map);
+
+	virtual void machine_start() override;
+
+	uint8_t m_output[8];
+	required_shared_ptr<uint8_t> m_video;
+	int m_mixdata;
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void mgames(machine_config &config);
-	void main_map(address_map &map);
+	output_finder<9> m_lamps;
 };
 
-
-void mgames_state::video_start()
+TILE_GET_INFO_MEMBER( mgames_state::tile_info )
 {
+	uint8_t code = m_video[tile_index];
+	uint8_t color = m_video[tile_index + 0x400] & 0x3f;
+
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
+}
+
+void mgames_state::machine_start()
+{
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(mgames_state::tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+
+	m_lamps.resolve();
 }
 
 uint32_t mgames_state::screen_update_mgames(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int y,x;
-	int count;
-	gfx_element *gfx = m_gfxdecode->gfx(0);
+	m_tilemap->mark_all_dirty();
+	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
-	count = 0;
-	for (y = 0; y < 32; y++)
-	{
-		for (x = 0; x < 32; x++)
-		{
-			uint16_t dat = m_video[count];
-			uint16_t col = m_video[count + 0x400] & 0x7f;
-			gfx->opaque(bitmap, cliprect, dat, col, 0, 0, x * 16, y * 16);
-			count++;
-		}
-
-	}
 	return 0;
 }
 
-PALETTE_INIT_MEMBER(mgames_state, mgames)
+void mgames_state::mgames_palette(palette_device &palette) const
 {
-	int i;
-
-	for (i = 0; i < 0x100; i++)
+	for (int i = 0; i < 64; i++)
 	{
-		rgb_t color;
-
-		if (i & 0x01)
-			color = rgb_t(pal2bit((i & 0x6) >> 1), pal2bit((i & 0x18) >> 3), pal2bit((i & 0x60) >> 5));
-		else
-			color = rgb_t::black();
-
-		palette.set_pen_color(i, color);
+		palette.set_indirect_color(i, rgb_t(
+			pal2bit((i >> 0) & 3),
+			pal2bit((i >> 2) & 3),
+			pal2bit((i >> 4) & 3)
+		));
+		palette.set_pen_indirect(i * 2 + 0, 0); // all tiles black background
+		palette.set_pen_indirect(i * 2 + 1, i);
 	}
 }
 
@@ -349,8 +357,8 @@ READ8_MEMBER(mgames_state::mixport_r)
 
 WRITE8_MEMBER(mgames_state::outport0_w)
 {
-	output().set_lamp_value(1, (data & 1));           /* Lamp 1 - BET */
-	output().set_lamp_value(5, (data >> 1) & 1);      /* Lamp 5 - HOLD 1 */
+	m_lamps[0] = BIT(data, 0);      /* Lamp 1 - BET */
+	m_lamps[4] = BIT(data, 1);      /* Lamp 5 - HOLD 1 */
 
 	m_output[0] = data;
 	popmessage("outport0 : %02X %02X %02X %02X %02X %02X %02X %02X", m_output[0], m_output[1], m_output[2], m_output[3], m_output[4], m_output[5], m_output[6], m_output[7]);
@@ -370,8 +378,8 @@ WRITE8_MEMBER(mgames_state::outport0_w)
 
 WRITE8_MEMBER(mgames_state::outport1_w)
 {
-	output().set_lamp_value(2, (data & 1));           /* Lamp 2 - DEAL */
-	output().set_lamp_value(6, (data >> 1) & 1);      /* Lamp 6 - HOLD 2 */
+	m_lamps[1] = BIT(data, 0);      /* Lamp 2 - DEAL */
+	m_lamps[5] = BIT(data, 1);      /* Lamp 6 - HOLD 2 */
 
 	m_output[1] = data;
 	popmessage("outport1 : %02X %02X %02X %02X %02X %02X %02X %02X", m_output[0], m_output[1], m_output[2], m_output[3], m_output[4], m_output[5], m_output[6], m_output[7]);
@@ -391,8 +399,8 @@ WRITE8_MEMBER(mgames_state::outport1_w)
 
 WRITE8_MEMBER(mgames_state::outport2_w)
 {
-	output().set_lamp_value(3, (data & 1));           /* Lamp 3 - CANCEL */
-	output().set_lamp_value(7, (data >> 1) & 1);      /* Lamp 7 - HOLD 3 */
+	m_lamps[2] = BIT(data, 0);      /* Lamp 3 - CANCEL */
+	m_lamps[6] = BIT(data, 1);      /* Lamp 7 - HOLD 3 */
 
 	m_output[2] = data;
 	popmessage("outport2 : %02X %02X %02X %02X %02X %02X %02X %02X", m_output[0], m_output[1], m_output[2], m_output[3], m_output[4], m_output[5], m_output[6], m_output[7]);
@@ -412,8 +420,8 @@ WRITE8_MEMBER(mgames_state::outport2_w)
 
 WRITE8_MEMBER(mgames_state::outport3_w)
 {
-	output().set_lamp_value(4, (data & 1));           /* Lamp 4 - STAND */
-	output().set_lamp_value(8, (data >> 1) & 1);      /* Lamp 8 - HOLD 4 */
+	m_lamps[3] = BIT(data, 0);      /* Lamp 4 - STAND */
+	m_lamps[7] = BIT(data, 1);      /* Lamp 8 - HOLD 4 */
 
 	m_output[3] = data;
 	popmessage("outport3 : %02X %02X %02X %02X %02X %02X %02X %02X", m_output[0], m_output[1], m_output[2], m_output[3], m_output[4], m_output[5], m_output[6], m_output[7]);
@@ -433,7 +441,7 @@ WRITE8_MEMBER(mgames_state::outport3_w)
 
 WRITE8_MEMBER(mgames_state::outport4_w)
 {
-	output().set_lamp_value(9, (data >> 1) & 1);      /* Lamp 9 - HOLD 5 */
+	m_lamps[8] = BIT(data, 1);      /* Lamp 9 - HOLD 5 */
 
 	m_output[4] = data;
 	popmessage("outport4 : %02X %02X %02X %02X %02X %02X %02X %02X", m_output[0], m_output[1], m_output[2], m_output[3], m_output[4], m_output[5], m_output[6], m_output[7]);
@@ -527,21 +535,21 @@ WRITE8_MEMBER(mgames_state::outport7_w)
 void mgames_state::main_map(address_map &map)
 {
 	map(0x0000, 0x2fff).rom();
-//  AM_RANGE(0x0158, 0x0158) AM_WRITE (muxed_w)
+//  map(0x0158, 0x0158).w(FUNC(mgames_state::muxed_w));
 	map(0x3800, 0x38ff).ram().share("nvram");   /* NVRAM = 2x SCM5101E */
 	map(0x4000, 0x47ff).ram().share("video");   /* 4x MM2114N-3 */
 	map(0x8000, 0x8000).portr("SW1");
-	map(0x8001, 0x8001).r(this, FUNC(mgames_state::mixport_r)); /* DIP switch bank 2 + a sort of watchdog */
+	map(0x8001, 0x8001).r(FUNC(mgames_state::mixport_r)); /* DIP switch bank 2 + a sort of watchdog */
 	map(0x8002, 0x8002).portr("IN1");
 	map(0x8003, 0x8003).portr("IN2");
-	map(0x8000, 0x8000).w(this, FUNC(mgames_state::outport0_w));
-	map(0x8001, 0x8001).w(this, FUNC(mgames_state::outport1_w));
-	map(0x8002, 0x8002).w(this, FUNC(mgames_state::outport2_w));
-	map(0x8003, 0x8003).w(this, FUNC(mgames_state::outport3_w));
-	map(0x8004, 0x8004).w(this, FUNC(mgames_state::outport4_w));
-	map(0x8005, 0x8005).w(this, FUNC(mgames_state::outport5_w));
-	map(0x8006, 0x8006).w(this, FUNC(mgames_state::outport6_w));
-	map(0x8007, 0x8007).w(this, FUNC(mgames_state::outport7_w));
+	map(0x8000, 0x8000).w(FUNC(mgames_state::outport0_w));
+	map(0x8001, 0x8001).w(FUNC(mgames_state::outport1_w));
+	map(0x8002, 0x8002).w(FUNC(mgames_state::outport2_w));
+	map(0x8003, 0x8003).w(FUNC(mgames_state::outport3_w));
+	map(0x8004, 0x8004).w(FUNC(mgames_state::outport4_w));
+	map(0x8005, 0x8005).w(FUNC(mgames_state::outport5_w));
+	map(0x8006, 0x8006).w(FUNC(mgames_state::outport6_w));
+	map(0x8007, 0x8007).w(FUNC(mgames_state::outport7_w));
 }
 
 
@@ -618,48 +626,46 @@ static INPUT_PORTS_START( mgames )
 INPUT_PORTS_END
 
 
-static const gfx_layout tiles16x16_layout =
+static const gfx_layout gfx_16x16x1 =
 {
 	16,16,
 	RGN_FRAC(1,1),
 	1,
 	{ 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-		8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16},
+	{ STEP16(0,1) },
+	{ STEP16(0,16) },
 	16*16
 };
 
-static GFXDECODE_START( mgames )
-	GFXDECODE_ENTRY( "gfx1", 0, tiles16x16_layout, 0, 0x100 )
+static GFXDECODE_START( gfx_mgames )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_16x16x1, 0, 64 )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(mgames_state::mgames)
+void mgames_state::mgames(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,MASTER_CLOCK/6)      /* 3 MHz? */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mgames_state, irq0_line_hold)
+	Z80(config, m_maincpu, MASTER_CLOCK/6);      /* 3 MHz? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &mgames_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(mgames_state::irq0_line_hold));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(mgames_state, screen_update_mgames)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(512, 256);
+	screen.set_visarea(0, 512-1, 0, 256-1);
+	screen.set_screen_update(FUNC(mgames_state::screen_update_mgames));
+	screen.set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mgames)
-	MCFG_PALETTE_ADD("palette", 0x200)
-	MCFG_PALETTE_INIT_OWNER(mgames_state, mgames)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mgames);
+	PALETTE(config, m_palette, FUNC(mgames_state::mgames_palette), 128, 64);
 
 	/* sound hardware */
 	//  to do...
-
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( mgames )
@@ -683,5 +689,5 @@ ROM_END
 *      Game Drivers      *
 *************************/
 
-/*     YEAR  NAME      PARENT  MACHINE   INPUT   STATE         INIT   ROT    COMPANY  FULLNAME      FLAGS...                                 LAYOUT  */
-GAMEL( 1981, mgames,   0,      mgames,   mgames, mgames_state, 0,     ROT0, "Merit", "Match Games", MACHINE_WRONG_COLORS | MACHINE_NO_SOUND, layout_mgames )
+/*     YEAR  NAME    PARENT  MACHINE  INPUT   CLASS         INIT        ROT   COMPANY  FULLNAME       FLAGS...                                 LAYOUT  */
+GAMEL( 1981, mgames, 0,      mgames,  mgames, mgames_state, empty_init, ROT0, "Merit", "Match Games", MACHINE_WRONG_COLORS | MACHINE_NO_SOUND, layout_mgames )

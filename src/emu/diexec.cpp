@@ -46,9 +46,12 @@ device_execute_interface::device_execute_interface(const machine_config &mconfig
 	: device_interface(device, "execute")
 	, m_scheduler(nullptr)
 	, m_disabled(false)
+	, m_vblank_interrupt(device)
 	, m_vblank_interrupt_screen(nullptr)
+	, m_timed_interrupt(device)
 	, m_timed_interrupt_period(attotime::zero)
 	, m_nextexec(nullptr)
+	, m_driver_irq(device)
 	, m_timedint_timer(nullptr)
 	, m_profiler(PROFILER_IDLE)
 	, m_icountptr(nullptr)
@@ -89,7 +92,7 @@ device_execute_interface::~device_execute_interface()
 //  run before we run again
 //-------------------------------------------------
 
-void device_execute_interface::abort_timeslice()
+void device_execute_interface::abort_timeslice() noexcept
 {
 	// ignore if not the executing device
 	if (!executing())
@@ -204,7 +207,7 @@ void device_execute_interface::trigger(int trigid)
 //  for a device
 //-------------------------------------------------
 
-attotime device_execute_interface::local_time() const
+attotime device_execute_interface::local_time() const noexcept
 {
 	// if we're active, add in the time from the current slice
 	if (executing())
@@ -222,7 +225,7 @@ attotime device_execute_interface::local_time() const
 //  cycles executed on this device
 //-------------------------------------------------
 
-u64 device_execute_interface::total_cycles() const
+u64 device_execute_interface::total_cycles() const noexcept
 {
 	if (executing())
 	{
@@ -239,7 +242,7 @@ u64 device_execute_interface::total_cycles() const
 //  of clocks to cycles, rounding down if necessary
 //-------------------------------------------------
 
-u64 device_execute_interface::execute_clocks_to_cycles(u64 clocks) const
+u64 device_execute_interface::execute_clocks_to_cycles(u64 clocks) const noexcept
 {
 	return clocks;
 }
@@ -250,7 +253,7 @@ u64 device_execute_interface::execute_clocks_to_cycles(u64 clocks) const
 //  of cycles to clocks, rounding down if necessary
 //-------------------------------------------------
 
-u64 device_execute_interface::execute_cycles_to_clocks(u64 cycles) const
+u64 device_execute_interface::execute_cycles_to_clocks(u64 cycles) const noexcept
 {
 	return cycles;
 }
@@ -262,7 +265,7 @@ u64 device_execute_interface::execute_cycles_to_clocks(u64 cycles) const
 //  operation can take
 //-------------------------------------------------
 
-u32 device_execute_interface::execute_min_cycles() const
+u32 device_execute_interface::execute_min_cycles() const noexcept
 {
 	return 1;
 }
@@ -274,7 +277,7 @@ u32 device_execute_interface::execute_min_cycles() const
 //  operation can take
 //-------------------------------------------------
 
-u32 device_execute_interface::execute_max_cycles() const
+u32 device_execute_interface::execute_max_cycles() const noexcept
 {
 	return 1;
 }
@@ -285,7 +288,7 @@ u32 device_execute_interface::execute_max_cycles() const
 //  of input lines for the device
 //-------------------------------------------------
 
-u32 device_execute_interface::execute_input_lines() const
+u32 device_execute_interface::execute_input_lines() const noexcept
 {
 	return 0;
 }
@@ -296,9 +299,20 @@ u32 device_execute_interface::execute_input_lines() const
 //  IRQ vector when an acknowledge is processed
 //-------------------------------------------------
 
-u32 device_execute_interface::execute_default_irq_vector() const
+u32 device_execute_interface::execute_default_irq_vector(int linenum) const noexcept
 {
 	return 0;
+}
+
+
+//-------------------------------------------------
+//  execute_input_edge_triggered - return true if
+//  the input line has an asynchronous edge trigger
+//-------------------------------------------------
+
+bool device_execute_interface::execute_input_edge_triggered(int linenum) const noexcept
+{
+	return false;
 }
 
 
@@ -340,7 +354,7 @@ void device_execute_interface::interface_validity_check(validity_checker &valid)
 		if (iter.first() == nullptr)
 			osd_printf_error("VBLANK interrupt specified, but the driver is screenless\n");
 		else if (m_vblank_interrupt_screen != nullptr && device().siblingdevice(m_vblank_interrupt_screen) == nullptr)
-			osd_printf_error("VBLANK interrupt references a non-existant screen tag '%s'\n", m_vblank_interrupt_screen);
+			osd_printf_error("VBLANK interrupt references a nonexistent screen tag '%s'\n", m_vblank_interrupt_screen);
 	}
 
 	if (!m_timed_interrupt.isnull() && m_timed_interrupt_period == attotime::zero)
@@ -360,9 +374,9 @@ void device_execute_interface::interface_pre_start()
 	m_scheduler = &device().machine().scheduler();
 
 	// bind delegates
-	m_vblank_interrupt.bind_relative_to(*device().owner());
-	m_timed_interrupt.bind_relative_to(*device().owner());
-	m_driver_irq.bind_relative_to(*device().owner());
+	m_vblank_interrupt.resolve();
+	m_timed_interrupt.resolve();
+	m_driver_irq.resolve();
 
 	// fill in the initial states
 	int const index = device_iterator(device().machine().root_device()).indexof(*this);
@@ -435,7 +449,7 @@ void device_execute_interface::interface_post_reset()
 	if (m_vblank_interrupt_screen != nullptr)
 	{
 		// get the screen that will trigger the VBLANK
-		screen_device *screen = downcast<screen_device *>(device().machine().device(device().siblingtag(m_vblank_interrupt_screen).c_str()));
+		screen_device * screen = device().siblingdevice<screen_device>(m_vblank_interrupt_screen);
 
 		assert(screen != nullptr);
 		screen->register_vblank_callback(vblank_state_delegate(&device_execute_interface::on_vblank, this));
@@ -511,7 +525,9 @@ int device_execute_interface::standard_irq_callback(int irqline)
 		vector = m_driver_irq(device(), irqline);
 
 	// notify the debugger
-	debugger_interrupt_hook(irqline);
+	if (device().machine().debug_flags & DEBUG_FLAG_ENABLED)
+		device().debug()->interrupt_hook(irqline);
+
 	return vector;
 }
 
@@ -580,11 +596,22 @@ TIMER_CALLBACK_MEMBER(device_execute_interface::trigger_periodic_interrupt)
 
 void device_execute_interface::pulse_input_line(int irqline, const attotime &duration)
 {
-	assert(duration > attotime::zero);
-	set_input_line(irqline, ASSERT_LINE);
+	// treat instantaneous pulses as ASSERT+CLEAR
+	if (duration == attotime::zero)
+	{
+		if (irqline != INPUT_LINE_RESET && !input_edge_triggered(irqline))
+			throw emu_fatalerror("device '%s': zero-width pulse is not allowed for input line %d\n", device().tag(), irqline);
 
-	attotime target_time = local_time() + duration;
-	m_scheduler->timer_set(target_time - m_scheduler->time(), timer_expired_delegate(FUNC(device_execute_interface::irq_pulse_clear), this), irqline);
+		set_input_line(irqline, ASSERT_LINE);
+		set_input_line(irqline, CLEAR_LINE);
+	}
+	else
+	{
+		set_input_line(irqline, ASSERT_LINE);
+
+		attotime target_time = local_time() + duration;
+		m_scheduler->timer_set(target_time - m_scheduler->time(), timer_expired_delegate(FUNC(device_execute_interface::irq_pulse_clear), this), irqline);
+	}
 }
 
 
@@ -596,11 +623,22 @@ void device_execute_interface::pulse_input_line(int irqline, const attotime &dur
 
 void device_execute_interface::pulse_input_line_and_vector(int irqline, int vector, const attotime &duration)
 {
-	assert(duration > attotime::zero);
-	set_input_line_and_vector(irqline, ASSERT_LINE, vector);
+	// treat instantaneous pulses as ASSERT+CLEAR
+	if (duration == attotime::zero)
+	{
+		if (irqline != INPUT_LINE_RESET && !input_edge_triggered(irqline))
+			throw emu_fatalerror("device '%s': zero-width pulse is not allowed for input line %d\n", device().tag(), irqline);
 
-	attotime target_time = local_time() + duration;
-	m_scheduler->timer_set(target_time - m_scheduler->time(), timer_expired_delegate(FUNC(device_execute_interface::irq_pulse_clear), this), irqline);
+		set_input_line_and_vector(irqline, ASSERT_LINE, vector);
+		set_input_line_and_vector(irqline, CLEAR_LINE, vector);
+	}
+	else
+	{
+		set_input_line_and_vector(irqline, ASSERT_LINE, vector);
+
+		attotime target_time = local_time() + duration;
+		m_scheduler->timer_set(target_time - m_scheduler->time(), timer_expired_delegate(FUNC(device_execute_interface::irq_pulse_clear), this), irqline);
+	}
 }
 
 
@@ -650,7 +688,7 @@ void device_execute_interface::device_input::start(device_execute_interface *exe
 
 void device_execute_interface::device_input::reset()
 {
-	m_curvector = m_stored_vector = m_execute->default_irq_vector();
+	m_curvector = m_stored_vector = m_execute->default_irq_vector(m_linenum);
 	m_qindex = 0;
 }
 
@@ -665,19 +703,7 @@ void device_execute_interface::device_input::set_state_synced(int state, int vec
 	LOG(("set_state_synced('%s',%d,%d,%02x)\n", m_execute->device().tag(), m_linenum, state, vector));
 
 if (TEMPLOG) printf("setline(%s,%d,%d,%d)\n", m_execute->device().tag(), m_linenum, state, (vector == USE_STORED_VECTOR) ? 0 : vector);
-	assert(state == ASSERT_LINE || state == HOLD_LINE || state == CLEAR_LINE || state == PULSE_LINE);
-
-	// treat PULSE_LINE as ASSERT+CLEAR
-	if (state == PULSE_LINE)
-	{
-		// catch errors where people use PULSE_LINE for devices that don't support it
-		if (m_linenum != INPUT_LINE_NMI && m_linenum != INPUT_LINE_RESET)
-			throw emu_fatalerror("device '%s': PULSE_LINE can only be used for NMI and RESET lines\n", m_execute->device().tag());
-
-		set_state_synced(ASSERT_LINE, vector);
-		set_state_synced(CLEAR_LINE, vector);
-		return;
-	}
+	assert(state == ASSERT_LINE || state == HOLD_LINE || state == CLEAR_LINE);
 
 	// if we're full of events, flush the queue and log a message
 	int event_index = m_qindex++;

@@ -13,6 +13,7 @@
 #include "cpu/m6502/m6502.h"
 #include "machine/74259.h"
 #include "machine/x2212.h"
+#include "emupal.h"
 #include "screen.h"
 
 class cloud9_state : public driver_device
@@ -30,13 +31,11 @@ public:
 		m_videolatch(*this, "videolatch")
 	{ }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(get_vblank);
+	DECLARE_READ_LINE_MEMBER(vblank_r);
 	void cloud9(machine_config &config);
 
 protected:
 	DECLARE_WRITE8_MEMBER(irq_ack_w);
-	DECLARE_WRITE_LINE_MEMBER(coin1_counter_w);
-	DECLARE_WRITE_LINE_MEMBER(coin2_counter_w);
 	DECLARE_READ8_MEMBER(leta_r);
 	DECLARE_WRITE8_MEMBER(nvram_recall_w);
 	DECLARE_WRITE8_MEMBER(nvram_store_w);

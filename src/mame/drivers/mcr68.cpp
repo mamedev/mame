@@ -63,6 +63,7 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/nvram.h"
 
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -106,7 +107,7 @@ WRITE16_MEMBER(mcr68_state::blasted_control_w)
 READ16_MEMBER(mcr68_state::spyhunt2_port_0_r)
 {
 	int result = ioport("IN0")->read();
-	int analog = m_adc->read(space, 0);
+	int analog = m_adc->read();
 
 	return result | ((m_sounds_good->read(space, 0) & 1) << 5) | (analog << 8);
 }
@@ -129,7 +130,7 @@ WRITE16_MEMBER(mcr68_state::spyhunt2_control_w)
 	m_sounds_good->reset_write(~m_control_word & 0x2000);
 	m_sounds_good->write(space, offset, (m_control_word >> 8) & 0x001f);
 
-	m_adc->write(space, 0, (m_control_word >> 3) & 0x0f);
+	m_adc->write((m_control_word >> 3) & 0x0f);
 }
 
 
@@ -180,7 +181,7 @@ WRITE16_MEMBER(mcr68_state::archrivl_control_w)
 {
 	COMBINE_DATA(&m_control_word);
 	m_cvsd_sound->reset_write(~m_control_word & 0x0400);
-	m_cvsd_sound->write(space, 0, m_control_word & 0x3ff);
+	m_cvsd_sound->write(m_control_word & 0x3ff);
 }
 
 
@@ -279,11 +280,11 @@ void mcr68_state::mcr68_map(address_map &map)
 	map.global_mask(0x1fffff);
 	map(0x000000, 0x03ffff).rom();
 	map(0x060000, 0x063fff).ram();
-	map(0x070000, 0x070fff).ram().w(this, FUNC(mcr68_state::mcr68_videoram_w)).share("videoram");
+	map(0x070000, 0x070fff).ram().w(FUNC(mcr68_state::mcr68_videoram_w)).share("videoram");
 	map(0x071000, 0x071fff).ram();
 	map(0x080000, 0x080fff).ram().share("spriteram");
 	map(0x090000, 0x09007f).w("palette", FUNC(palette_device::write16)).share("palette");
-	map(0x0a0000, 0x0a000f).rw(m_ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask16(0xff00);
+	map(0x0a0000, 0x0a000f).rw(m_ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask16(0x00ff).cswidth(16);
 	map(0x0b0000, 0x0bffff).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0x0d0000, 0x0dffff).portr("IN0");
 	map(0x0e0000, 0x0effff).portr("IN1");
@@ -303,16 +304,16 @@ void mcr68_state::pigskin_map(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0x1fffff);
 	map(0x000000, 0x03ffff).rom();
-	map(0x080000, 0x08ffff).r(this, FUNC(mcr68_state::pigskin_port_1_r));
-	map(0x0a0000, 0x0affff).r(this, FUNC(mcr68_state::pigskin_port_2_r));
+	map(0x080000, 0x08ffff).r(FUNC(mcr68_state::pigskin_port_1_r));
+	map(0x0a0000, 0x0affff).r(FUNC(mcr68_state::pigskin_port_2_r));
 	map(0x0c0000, 0x0c007f).w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x0e0000, 0x0effff).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
-	map(0x100000, 0x100fff).ram().w(this, FUNC(mcr68_state::mcr68_videoram_w)).share("videoram");
-	map(0x120000, 0x120001).rw(this, FUNC(mcr68_state::pigskin_protection_r), FUNC(mcr68_state::pigskin_protection_w));
+	map(0x100000, 0x100fff).ram().w(FUNC(mcr68_state::mcr68_videoram_w)).share("videoram");
+	map(0x120000, 0x120001).rw(FUNC(mcr68_state::pigskin_protection_r), FUNC(mcr68_state::pigskin_protection_w));
 	map(0x140000, 0x143fff).ram();
 	map(0x160000, 0x1607ff).ram().share("spriteram");
 	map(0x180000, 0x18000f).rw(m_ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask16(0xff00);
-	map(0x1a0000, 0x1affff).w(this, FUNC(mcr68_state::archrivl_control_w));
+	map(0x1a0000, 0x1affff).w(FUNC(mcr68_state::archrivl_control_w));
 	map(0x1e0000, 0x1effff).portr("IN0");
 }
 
@@ -329,14 +330,14 @@ void mcr68_state::trisport_map(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0x1fffff);
 	map(0x000000, 0x03ffff).rom();
-	map(0x080000, 0x08ffff).r(this, FUNC(mcr68_state::trisport_port_1_r));
+	map(0x080000, 0x08ffff).r(FUNC(mcr68_state::trisport_port_1_r));
 	map(0x0a0000, 0x0affff).portr("DSW");
 	map(0x100000, 0x103fff).ram().share("nvram");
 	map(0x120000, 0x12007f).w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x140000, 0x1407ff).ram().share("spriteram");
-	map(0x160000, 0x160fff).ram().w(this, FUNC(mcr68_state::mcr68_videoram_w)).share("videoram");
+	map(0x160000, 0x160fff).ram().w(FUNC(mcr68_state::mcr68_videoram_w)).share("videoram");
 	map(0x180000, 0x18000f).rw(m_ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask16(0xff00);
-	map(0x1a0000, 0x1affff).w(this, FUNC(mcr68_state::archrivl_control_w));
+	map(0x1a0000, 0x1affff).w(FUNC(mcr68_state::archrivl_control_w));
 	map(0x1c0000, 0x1cffff).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0x1e0000, 0x1effff).portr("IN0");
 }
@@ -855,7 +856,7 @@ static const gfx_layout mcr68_sprite_layout =
 	32*32
 };
 
-static GFXDECODE_START( mcr68 )
+static GFXDECODE_START( gfx_mcr68 )
 	GFXDECODE_SCALE( "gfx1", 0, mcr68_bg_layout,     0, 4, 2, 2 )
 	GFXDECODE_ENTRY( "gfx2", 0, mcr68_sprite_layout, 0, 4 )
 GFXDECODE_END
@@ -895,112 +896,106 @@ GFXDECODE_END
 
 =================================================================*/
 
-MACHINE_CONFIG_START(mcr68_state::mcr68)
-
+void mcr68_state::mcr68(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 7723800)
-	MCFG_CPU_PROGRAM_MAP(mcr68_map)
+	M68000(config, m_maincpu, 7723800);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mcr68_state::mcr68_map);
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 8);
 	MCFG_MACHINE_START_OVERRIDE(mcr68_state,mcr68)
 	MCFG_MACHINE_RESET_OVERRIDE(mcr68_state,mcr68)
 
-	MCFG_DEVICE_ADD("ptm", PTM6840, 7723800 / 10)
-	MCFG_PTM6840_IRQ_CB(INPUTLINE("maincpu", 2))
+	PTM6840(config, m_ptm, 7723800 / 10);
+	m_ptm->irq_callback().set_inputline("maincpu", 2);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(30)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*16, 30*16)
-	MCFG_SCREEN_VISIBLE_AREA(0, 32*16-1, 0, 30*16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(mcr68_state, screen_update_mcr68)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(30);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	m_screen->set_size(32*16, 30*16);
+	m_screen->set_visarea(0, 32*16-1, 0, 30*16-1);
+	m_screen->set_screen_update(FUNC(mcr68_state::screen_update_mcr68));
+	m_screen->set_palette("palette");
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mcr68_state, scanline_cb, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(mcr68_state::scanline_cb), "screen", 0, 1);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mcr68)
-	MCFG_PALETTE_ADD("palette", 64)
-	MCFG_PALETTE_FORMAT(xxxxxxxRRRBBBGGG)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_mcr68);
+	PALETTE(config, "palette").set_format(palette_device::xRBG_333, 64);
 
 	MCFG_VIDEO_START_OVERRIDE(mcr68_state,mcr68)
 
 	/* sound hardware -- determined by specific machine */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-MACHINE_CONFIG_END
+	SPEAKER(config, "speaker").front_center();
+}
 
 
-MACHINE_CONFIG_START(mcr68_state::xenophob)
+void mcr68_state::xenophob(machine_config &config)
+{
 	mcr68(config);
 
 	/* basic machine hardware */
-	MCFG_SOUND_ADD("sg", MIDWAY_SOUNDS_GOOD, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-MACHINE_CONFIG_END
+	MIDWAY_SOUNDS_GOOD(config, m_sounds_good).add_route(ALL_OUTPUTS, "speaker", 1.0);
+}
 
-MACHINE_CONFIG_START(mcr68_state::intlaser)
+void mcr68_state::intlaser(machine_config &config)
+{
 	mcr68(config);
 
 	/* basic machine hardware */
-	MCFG_SOUND_ADD("sg", MIDWAY_SOUNDS_GOOD, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+	MIDWAY_SOUNDS_GOOD(config, m_sounds_good).add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	MCFG_WATCHDOG_MODIFY("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 800)
-MACHINE_CONFIG_END
+	subdevice<watchdog_timer_device>("watchdog")->set_vblank_count("screen", 800);
+}
 
 
-MACHINE_CONFIG_START(mcr68_state::spyhunt2)
+void mcr68_state::spyhunt2(machine_config &config)
+{
 	mcr68(config);
 
 	/* basic machine hardware */
-	MCFG_SOUND_ADD("sg", MIDWAY_SOUNDS_GOOD, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-	MCFG_SOUND_ADD("tcs", MIDWAY_TURBO_CHEAP_SQUEAK, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+	MIDWAY_SOUNDS_GOOD(config, m_sounds_good).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	MIDWAY_TURBO_CHEAP_SQUEAK(config, m_turbo_cheap_squeak).add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	MCFG_ADC0844_ADD("adc")
-	MCFG_ADC0844_CH1_CB(IOPORT("AN1"))
-	MCFG_ADC0844_CH2_CB(IOPORT("AN2"))
-	MCFG_ADC0844_CH3_CB(IOPORT("AN3"))
-	MCFG_ADC0844_CH4_CB(IOPORT("AN4"))
-MACHINE_CONFIG_END
+	ADC0844(config, m_adc);
+	m_adc->ch1_callback().set_ioport("AN1");
+	m_adc->ch2_callback().set_ioport("AN2");
+	m_adc->ch3_callback().set_ioport("AN3");
+	m_adc->ch4_callback().set_ioport("AN4");
+}
 
 
-MACHINE_CONFIG_START(mcr68_state::archrivl)
+void mcr68_state::archrivl(machine_config &config)
+{
 	mcr68(config);
 
 	/* basic machine hardware */
-	MCFG_SOUND_ADD("cvsd", WILLIAMS_CVSD_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-MACHINE_CONFIG_END
+	WILLIAMS_CVSD_SOUND(config, m_cvsd_sound).add_route(ALL_OUTPUTS, "speaker", 1.0);
+}
 
 
-MACHINE_CONFIG_START(mcr68_state::pigskin)
+void mcr68_state::pigskin(machine_config &config)
+{
 	mcr68(config);
 
 	/* basic machine hardware */
-	MCFG_SOUND_ADD("cvsd", WILLIAMS_CVSD_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+	WILLIAMS_CVSD_SOUND(config, m_cvsd_sound).add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(pigskin_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &mcr68_state::pigskin_map);
+}
 
 
-MACHINE_CONFIG_START(mcr68_state::trisport)
+void mcr68_state::trisport(machine_config &config)
+{
 	mcr68(config);
 
 	/* basic machine hardware */
-	MCFG_SOUND_ADD("cvsd", WILLIAMS_CVSD_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+	WILLIAMS_CVSD_SOUND(config, m_cvsd_sound).add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(trisport_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &mcr68_state::trisport_map);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
-MACHINE_CONFIG_END
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+}
 
 
 
@@ -1485,7 +1480,7 @@ void mcr68_state::mcr68_common_init(int clip, int xoffset)
 }
 
 
-DRIVER_INIT_MEMBER(mcr68_state,xenophob)
+void mcr68_state::init_xenophob()
 {
 	mcr68_common_init(0, -4);
 
@@ -1493,11 +1488,11 @@ DRIVER_INIT_MEMBER(mcr68_state,xenophob)
 	m_timing_factor = attotime::from_hz(m_maincpu->unscaled_clock() / 10) * (256 + 16);
 
 	/* install control port handler */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0cffff, write16_delegate(FUNC(mcr68_state::xenophobe_control_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0cffff, write16_delegate(*this, FUNC(mcr68_state::xenophobe_control_w)));
 }
 
 
-DRIVER_INIT_MEMBER(mcr68_state,spyhunt2)
+void mcr68_state::init_spyhunt2()
 {
 	mcr68_common_init(0, -6);
 
@@ -1505,13 +1500,13 @@ DRIVER_INIT_MEMBER(mcr68_state,spyhunt2)
 	m_timing_factor = attotime::from_hz(m_maincpu->unscaled_clock() / 10) * (256 + 16);
 
 	/* analog port handling is a bit tricky */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0cffff, write16_delegate(FUNC(mcr68_state::spyhunt2_control_w),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0d0000, 0x0dffff, read16_delegate(FUNC(mcr68_state::spyhunt2_port_0_r),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0e0000, 0x0effff, read16_delegate(FUNC(mcr68_state::spyhunt2_port_1_r),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0cffff, write16_delegate(*this, FUNC(mcr68_state::spyhunt2_control_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0d0000, 0x0dffff, read16_delegate(*this, FUNC(mcr68_state::spyhunt2_port_0_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0e0000, 0x0effff, read16_delegate(*this, FUNC(mcr68_state::spyhunt2_port_1_r)));
 }
 
 
-DRIVER_INIT_MEMBER(mcr68_state,blasted)
+void mcr68_state::init_blasted()
 {
 	mcr68_common_init(0, 0);
 
@@ -1521,13 +1516,10 @@ DRIVER_INIT_MEMBER(mcr68_state,blasted)
 	m_timing_factor = attotime::from_hz(m_maincpu->unscaled_clock() / 10) * (256 + 16);
 
 	/* handle control writes */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0cffff, write16_delegate(FUNC(mcr68_state::blasted_control_w),this));
-
-	/* 6840 is mapped to the lower 8 bits */
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0a0000, 0x0a000f, read8_delegate(FUNC(ptm6840_device::read), &(*m_ptm)), write8_delegate(FUNC(ptm6840_device::write), &(*m_ptm)), 0x00ff);
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0cffff, write16_delegate(*this, FUNC(mcr68_state::blasted_control_w)));
 }
 
-DRIVER_INIT_MEMBER(mcr68_state,intlaser)
+void mcr68_state::init_intlaser()
 {
 	mcr68_common_init(0, 0);
 
@@ -1535,13 +1527,13 @@ DRIVER_INIT_MEMBER(mcr68_state,intlaser)
 	m_timing_factor = attotime::from_hz(m_maincpu->unscaled_clock() / 10) * (256 + 16);
 
 	/* handle control writes */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0cffff, write16_delegate(FUNC(mcr68_state::blasted_control_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0cffff, write16_delegate(*this, FUNC(mcr68_state::blasted_control_w)));
 
 }
 
 
 
-DRIVER_INIT_MEMBER(mcr68_state,archrivl)
+void mcr68_state::init_archrivl()
 {
 	mcr68_common_init(16, 0);
 
@@ -1549,13 +1541,10 @@ DRIVER_INIT_MEMBER(mcr68_state,archrivl)
 	m_timing_factor = attotime::from_hz(m_maincpu->unscaled_clock() / 10) * (256 + 16);
 
 	/* handle control writes */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0cffff, write16_delegate(FUNC(mcr68_state::archrivl_control_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0cffff, write16_delegate(*this, FUNC(mcr68_state::archrivl_control_w)));
 
 	/* 49-way joystick handling is a bit tricky */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0e0000, 0x0effff, read16_delegate(FUNC(mcr68_state::archrivl_port_1_r),this));
-
-	/* 6840 is mapped to the lower 8 bits */
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0a0000, 0x0a000f, read8_delegate(FUNC(ptm6840_device::read), &(*m_ptm)), write8_delegate(FUNC(ptm6840_device::write), &(*m_ptm)), 0x00ff);
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0e0000, 0x0effff, read16_delegate(*this, FUNC(mcr68_state::archrivl_port_1_r)));
 }
 
 READ16_MEMBER(mcr68_state::archrivlb_port_1_r)
@@ -1563,7 +1552,7 @@ READ16_MEMBER(mcr68_state::archrivlb_port_1_r)
 	return ioport("IN1")->read();
 }
 
-DRIVER_INIT_MEMBER(mcr68_state,archrivlb)
+void mcr68_state::init_archrivlb()
 {
 	mcr68_common_init(16, 0);
 
@@ -1571,18 +1560,15 @@ DRIVER_INIT_MEMBER(mcr68_state,archrivlb)
 	m_timing_factor = attotime::from_hz(m_maincpu->unscaled_clock() / 10) * (256 + 16);
 
 	/* handle control writes */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0cffff, write16_delegate(FUNC(mcr68_state::archrivl_control_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0cffff, write16_delegate(*this, FUNC(mcr68_state::archrivl_control_w)));
 
 	/* 49-way joystick replaced by standard 8way stick */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0e0000, 0x0effff, read16_delegate(FUNC(mcr68_state::archrivlb_port_1_r),this));
-
-	/* 6840 is mapped to the lower 8 bits */
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0a0000, 0x0a000f, read8_delegate(FUNC(ptm6840_device::read), &(*m_ptm)), write8_delegate(FUNC(ptm6840_device::write), &(*m_ptm)), 0x00ff);
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0e0000, 0x0effff, read16_delegate(*this, FUNC(mcr68_state::archrivlb_port_1_r)));
 }
 
 
 
-DRIVER_INIT_MEMBER(mcr68_state,pigskin)
+void mcr68_state::init_pigskin()
 {
 	mcr68_common_init(16, 0);
 
@@ -1593,7 +1579,7 @@ DRIVER_INIT_MEMBER(mcr68_state,pigskin)
 }
 
 
-DRIVER_INIT_MEMBER(mcr68_state,trisport)
+void mcr68_state::init_trisport()
 {
 	mcr68_common_init(0, 0);
 
@@ -1611,20 +1597,20 @@ DRIVER_INIT_MEMBER(mcr68_state,trisport)
  *
  *************************************/
 
-GAME( 1987, xenophob, 0,        xenophob, xenophob, mcr68_state, xenophob, ROT0,   "Bally Midway", "Xenophobe", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, xenophob, 0,        xenophob, xenophob, mcr68_state, init_xenophob, ROT0,   "Bally Midway", "Xenophobe", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1987, spyhunt2, 0,        spyhunt2, spyhunt2, mcr68_state, spyhunt2, ROT0,   "Bally Midway", "Spy Hunter II (rev 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, spyhunt2a,spyhunt2, spyhunt2, spyhunt2, mcr68_state, spyhunt2, ROT0,   "Bally Midway", "Spy Hunter II (rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, spyhunt2, 0,        spyhunt2, spyhunt2, mcr68_state, init_spyhunt2, ROT0,   "Bally Midway", "Spy Hunter II (rev 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, spyhunt2a,spyhunt2, spyhunt2, spyhunt2, mcr68_state, init_spyhunt2, ROT0,   "Bally Midway", "Spy Hunter II (rev 1)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, blasted,  0,        xenophob, blasted,  mcr68_state, blasted,  ROT0,   "Bally Midway", "Blasted", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, intlaser, blasted,  intlaser, intlaser, mcr68_state, intlaser, ROT0,   "Bally Midway", "International Team Laser (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, blasted,  0,        xenophob, blasted,  mcr68_state, init_blasted,  ROT0,   "Bally Midway", "Blasted", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, intlaser, blasted,  intlaser, intlaser, mcr68_state, init_intlaser, ROT0,   "Bally Midway", "International Team Laser (prototype)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, archrivl, 0,        archrivl, archrivl, mcr68_state, archrivl, ROT0,   "Bally Midway", "Arch Rivals (rev 4.0 6/29/89)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, archrivla,archrivl, archrivl, archrivl, mcr68_state, archrivl, ROT0,   "Bally Midway", "Arch Rivals (rev 2.0 5/03/89)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, archrivlb,archrivl, archrivl, archrivlb,mcr68_state, archrivlb,ROT0,   "bootleg",      "Arch Rivals (rev 2.0 5/03/89, 8-way Joystick bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, archrivl, 0,        archrivl, archrivl, mcr68_state, init_archrivl, ROT0,   "Bally Midway", "Arch Rivals (rev 4.0 6/29/89)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, archrivla,archrivl, archrivl, archrivl, mcr68_state, init_archrivl, ROT0,   "Bally Midway", "Arch Rivals (rev 2.0 5/03/89)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, archrivlb,archrivl, archrivl, archrivlb,mcr68_state, init_archrivlb,ROT0,   "bootleg",      "Arch Rivals (rev 2.0 5/03/89, 8-way Joystick bootleg)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, trisport, 0,        trisport, trisport, mcr68_state, trisport, ROT270, "Bally Midway", "Tri-Sports", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, trisport, 0,        trisport, trisport, mcr68_state, init_trisport, ROT270, "Bally Midway", "Tri-Sports", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, pigskin,  0,        pigskin,  pigskin,  mcr68_state, pigskin,  ROT0,   "Midway",       "Pigskin 621AD (rev 1.1K 8/01/90)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, pigskina, pigskin,  pigskin,  pigskin,  mcr68_state, pigskin,  ROT0,   "Midway",       "Pigskin 621AD (rev 2.0 7/06/90)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, pigskinb, pigskin,  pigskin,  pigskin,  mcr68_state, pigskin,  ROT0,   "Midway",       "Pigskin 621AD (rev 1.1 6/05/90)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pigskin,  0,        pigskin,  pigskin,  mcr68_state, init_pigskin,  ROT0,   "Midway",       "Pigskin 621AD (rev 1.1K 8/01/90)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pigskina, pigskin,  pigskin,  pigskin,  mcr68_state, init_pigskin,  ROT0,   "Midway",       "Pigskin 621AD (rev 2.0 7/06/90)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, pigskinb, pigskin,  pigskin,  pigskin,  mcr68_state, init_pigskin,  ROT0,   "Midway",       "Pigskin 621AD (rev 1.1 6/05/90)", MACHINE_SUPPORTS_SAVE )

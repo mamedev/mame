@@ -10,24 +10,46 @@
 
 #pragma once
 
+#include "emupal.h"
+#include "tilemap.h"
+
 typedef device_delegate<void (int, uint16_t*, uint16_t*, uint16_t*, uint16_t*)> segaic16_video_pagelatch_delegate;
 
-#define MCFG_SEGAIC16_VIDEO_SET_PAGELATCH_CB( _class, _method) \
-	downcast<segaic16_video_device &>(*device).set_pagelatch_cb(segaic16_video_pagelatch_delegate(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
 
 
-/*************************************
- *
- *  Type definitions
- *
- *************************************/
+// ======================> sega_16bit_common_base
 
+class sega_16bit_common_base : public driver_device
+{
+public:
+	// palette helpers
+	DECLARE_WRITE16_MEMBER( paletteram_w );
+	DECLARE_WRITE16_MEMBER( hangon_paletteram_w );
+	DECLARE_WRITE16_MEMBER( philko_paletteram_w );
 
+protected:
+	// construction/destruction
+	sega_16bit_common_base(const machine_config &mconfig, device_type type, const char *tag);
 
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
+	// internal helpers
+	void palette_init();
 
+public: // -- stupid system16.cpp
+	// memory pointers
+	required_shared_ptr<u16> m_paletteram;
+protected:
+
+	// internal state
+	u32      m_palette_entries;          // number of palette entries
+	u8       m_palette_normal[32];       // RGB translations for normal pixels
+	u8       m_palette_shadow[32];       // RGB translations for shadowed pixels
+	u8       m_palette_hilight[32];      // RGB translations for hilighted pixels
+	required_device<palette_device> m_palette;
+};
 
 
 class segaic16_video_device :   public device_t,
@@ -98,12 +120,16 @@ public:
 		std::unique_ptr<uint16_t[]>        buffer;                         /* buffered data */
 	};
 
+	template <typename T> segaic16_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&decode_tag)
+		: segaic16_video_device(mconfig, tag, owner, clock)
+	{
+		m_gfxdecode.set_tag(std::forward<T>(decode_tag));
+	}
 
 	segaic16_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	void set_gfxdecode_tag(const char *tag) { m_gfxdecode.set_tag(tag); }
-	void set_pagelatch_cb(segaic16_video_pagelatch_delegate newtilecb) { m_pagelatch_cb = newtilecb; }
+	template <typename... T> void set_pagelatch_cb(T &&... args) { m_pagelatch_cb.set(std::forward<T>(args)...); }
 
 	uint8_t m_display_enable;
 	optional_shared_ptr<uint16_t> m_tileram;
@@ -160,11 +186,5 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(SEGAIC16VID, segaic16_video_device)
-
-#define MCFG_SEGAIC16VID_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, SEGAIC16VID, 0)
-
-#define MCFG_SEGAIC16VID_GFXDECODE(_gfxtag) \
-	downcast<segaic16_video_device &>(*device).set_gfxdecode_tag(_gfxtag);
 
 #endif // MAME_VIDEO_SEGAIC16_H

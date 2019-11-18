@@ -217,11 +217,27 @@ Notes:
     * Quantities of 15 or more available less case and speaker (Assembled
     keypad and circut board only). Price on request.
 
+
+Usage:
+    - If you turn it on as is, it quickly jumps into the weeds as it is expecting
+      valid code to exist at 0000. To enter the monitor, press R, hold C, press R,
+      (you will see the memory editor) then choose a command (0 for example).
+    - If you load a chip-8 cart, press R twice. If it doesn't do anything you may
+      need to do a hard reset, then hit R twice. R toggles between the CPU running
+      or stopped. Most chip-8 (.c8) programs work, but make sure 4k RAM is enabled.
+    - There's a slot option to use Tiny Basic, this starts up, but unable to type
+      anything.
+    - Not known if (.bin) files work - don't have any for this machine.
+    - (.c8x) files do not work.
+    - Cassette records and plays back, however about 10% of the data is
+      consistently loaded wrongly.
+
 */
 
 #include "emu.h"
 #include "includes/vip.h"
 
+#include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
 
@@ -263,13 +279,13 @@ void vip_state::update_interrupts()
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( vip_state::read )
+READ8_MEMBER(vip_state::read)
 {
 	int cs = BIT(offset, 15) || m_8000;
 	int cdef = !((offset >= 0xc00) && (offset < 0x1000));
 	int minh = 0;
 
-	uint8_t data = m_exp->program_r(space, offset, cs, cdef, &minh);
+	uint8_t data = m_exp->program_r(offset, cs, cdef, &minh);
 
 	if (cs)
 	{
@@ -288,13 +304,13 @@ READ8_MEMBER( vip_state::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( vip_state::write )
+WRITE8_MEMBER(vip_state::write)
 {
 	int cs = BIT(offset, 15) || m_8000;
 	int cdef = !((offset >= 0xc00) && (offset < 0x1000));
 	int minh = 0;
 
-	m_exp->program_w(space, offset, data, cdef, &minh);
+	m_exp->program_w(offset, data, cdef, &minh);
 
 	if (!cs && !minh)
 	{
@@ -307,9 +323,9 @@ WRITE8_MEMBER( vip_state::write )
 //  io_r -
 //-------------------------------------------------
 
-READ8_MEMBER( vip_state::io_r )
+READ8_MEMBER(vip_state::io_r)
 {
-	uint8_t data = m_exp->io_r(space, offset);
+	uint8_t data = m_exp->io_r(offset);
 
 	switch (offset)
 	{
@@ -336,9 +352,9 @@ READ8_MEMBER( vip_state::io_r )
 //  io_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( vip_state::io_w )
+WRITE8_MEMBER(vip_state::io_w)
 {
-	m_exp->io_w(space, offset, data);
+	m_exp->io_w(offset, data);
 
 	switch (offset)
 	{
@@ -375,7 +391,7 @@ WRITE8_MEMBER( vip_state::io_w )
 void vip_state::vip_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xffff).rw(this, FUNC(vip_state::read), FUNC(vip_state::write));
+	map(0x0000, 0xffff).rw(FUNC(vip_state::read), FUNC(vip_state::write));
 }
 
 
@@ -386,7 +402,7 @@ void vip_state::vip_mem(address_map &map)
 void vip_state::vip_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x00, 0x07).rw(this, FUNC(vip_state::io_r), FUNC(vip_state::io_w));
+	map(0x00, 0x07).rw(FUNC(vip_state::io_r), FUNC(vip_state::io_w));
 }
 
 
@@ -399,7 +415,7 @@ void vip_state::vip_io(address_map &map)
 //  INPUT_PORTS( vip )
 //-------------------------------------------------
 
-INPUT_CHANGED_MEMBER( vip_state::reset_w )
+INPUT_CHANGED_MEMBER(vip_state::reset_w)
 {
 	m_exp->run_w(newval);
 
@@ -409,7 +425,7 @@ INPUT_CHANGED_MEMBER( vip_state::reset_w )
 	}
 }
 
-INPUT_CHANGED_MEMBER( vip_state::beeper_w )
+INPUT_CHANGED_MEMBER(vip_state::beeper_w)
 {
 	m_beeper->set_output_gain(0, newval ? 0.80 : 0);
 }
@@ -452,40 +468,40 @@ INPUT_PORTS_END
 //  COSMAC_INTERFACE( cosmac_intf )
 //-------------------------------------------------
 
-READ_LINE_MEMBER( vip_state::clear_r )
+READ_LINE_MEMBER(vip_state::clear_r)
 {
 	return BIT(m_run->read(), 0);
 }
 
-READ_LINE_MEMBER( vip_state::ef1_r )
+READ_LINE_MEMBER(vip_state::ef1_r)
 {
 	return m_vdc_ef1 || m_exp->ef1_r();
 }
 
-READ_LINE_MEMBER( vip_state::ef2_r )
+READ_LINE_MEMBER(vip_state::ef2_r)
 {
-	output().set_led_value(LED_TAPE, m_cassette->input() > 0);
+	m_leds[LED_TAPE] = m_cassette->input() > 0 ? 1 : 0;
 
 	return (m_cassette->input() < 0) ? ASSERT_LINE : CLEAR_LINE;
 }
 
-READ_LINE_MEMBER( vip_state::ef3_r )
+READ_LINE_MEMBER(vip_state::ef3_r)
 {
 	return !BIT(m_keypad->read(), m_keylatch) || m_byteio_ef3 || m_exp_ef3;
 }
 
-READ_LINE_MEMBER( vip_state::ef4_r )
+READ_LINE_MEMBER(vip_state::ef4_r)
 {
 	return m_byteio_ef4 || m_exp_ef4;
 }
 
-WRITE_LINE_MEMBER( vip_state::q_w )
+WRITE_LINE_MEMBER(vip_state::q_w)
 {
 	// sound output
-	m_beeper->write(machine().dummy_space(), NODE_01, state);
+	m_beeper->write(NODE_01, state);
 
 	// Q led
-	output().set_led_value(LED_Q, state);
+	m_leds[LED_Q] = state ? 1 : 0;
 
 	// tape output
 	m_cassette->output(state ? 1.0 : -1.0);
@@ -494,43 +510,26 @@ WRITE_LINE_MEMBER( vip_state::q_w )
 	m_exp->q_w(state);
 }
 
-READ8_MEMBER( vip_state::dma_r )
-{
-	return m_exp->dma_r(space, offset);
-}
-
-WRITE8_MEMBER( vip_state::dma_w )
-{
-	m_vdc->dma_w(space, offset, data);
-
-	m_exp->dma_w(space, offset, data);
-}
-
-WRITE8_MEMBER( vip_state::sc_w )
-{
-	m_exp->sc_w(data);
-}
-
 
 //-------------------------------------------------
 //  CDP1861_INTERFACE( vdc_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( vip_state::vdc_int_w )
+WRITE_LINE_MEMBER(vip_state::vdc_int_w)
 {
 	m_vdc_int = state;
 
 	update_interrupts();
 }
 
-WRITE_LINE_MEMBER( vip_state::vdc_dma_out_w )
+WRITE_LINE_MEMBER(vip_state::vdc_dma_out_w)
 {
 	m_vdc_dma_out = state;
 
 	update_interrupts();
 }
 
-WRITE_LINE_MEMBER( vip_state::vdc_ef1_w )
+WRITE_LINE_MEMBER(vip_state::vdc_ef1_w)
 {
 	m_vdc_ef1 = state;
 }
@@ -556,9 +555,9 @@ static const discrete_555_desc vip_ca555_a =
 	DEFAULT_555_VALUES
 };
 
-static DISCRETE_SOUND_START( vip )
+static DISCRETE_SOUND_START( vip_discrete )
 	DISCRETE_INPUT_LOGIC(NODE_01)
-	DISCRETE_555_ASTABLE_CV(NODE_02, NODE_01, 470, (int) RES_M(1), (int) CAP_P(470), NODE_01, &vip_ca555_a)
+	DISCRETE_555_ASTABLE_CV(NODE_02, NODE_01, 470, RES_M(1), CAP_P(470), NODE_01, &vip_ca555_a)
 	DISCRETE_OUTPUT(NODE_02, 5000)
 DISCRETE_SOUND_END
 
@@ -567,7 +566,7 @@ DISCRETE_SOUND_END
 //  VIP_BYTEIO_PORT_INTERFACE( byteio_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( vip_state::byteio_inst_w )
+WRITE_LINE_MEMBER(vip_state::byteio_inst_w)
 {
 	if (!state)
 	{
@@ -580,21 +579,21 @@ WRITE_LINE_MEMBER( vip_state::byteio_inst_w )
 //  VIP_EXPANSION_INTERFACE( expansion_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( vip_state::exp_int_w )
+WRITE_LINE_MEMBER(vip_state::exp_int_w)
 {
 	m_exp_int = state;
 
 	update_interrupts();
 }
 
-WRITE_LINE_MEMBER( vip_state::exp_dma_out_w )
+WRITE_LINE_MEMBER(vip_state::exp_dma_out_w)
 {
 	m_exp_dma_out = state;
 
 	update_interrupts();
 }
 
-WRITE_LINE_MEMBER( vip_state::exp_dma_in_w )
+WRITE_LINE_MEMBER(vip_state::exp_dma_in_w)
 {
 	m_exp_dma_in = state;
 
@@ -621,11 +620,13 @@ void vip_state::machine_start()
 		ram[addr] = machine().rand() & 0xff;
 	}
 
+	m_leds.resolve();
+
 	// turn on power LED
-	output().set_led_value(LED_POWER, 1);
+	m_leds[LED_POWER] = 1;
 
 	// reset sound
-	m_beeper->write(machine().dummy_space(), NODE_01, 0);
+	m_beeper->write(NODE_01, 0);
 
 	// state saving
 	save_item(NAME(m_8000));
@@ -665,7 +666,7 @@ void vip_state::machine_reset()
 //  QUICKLOAD_LOAD_MEMBER( vip_state, vip )
 //-------------------------------------------------
 
-QUICKLOAD_LOAD_MEMBER( vip_state, vip )
+QUICKLOAD_LOAD_MEMBER(vip_state::quickload_cb)
 {
 	uint8_t *ram = m_ram->pointer();
 	uint8_t *chip8_ptr = nullptr;
@@ -709,73 +710,74 @@ QUICKLOAD_LOAD_MEMBER( vip_state, vip )
 //**************************************************************************
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( vip )
+//  machine_config( vip )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(vip_state::vip)
+void vip_state::vip(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL(3'521'280)/2)
-	MCFG_CPU_PROGRAM_MAP(vip_mem)
-	MCFG_CPU_IO_MAP(vip_io)
-	MCFG_COSMAC_WAIT_CALLBACK(VCC)
-	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(vip_state, clear_r))
-	MCFG_COSMAC_EF1_CALLBACK(READLINE(vip_state, ef1_r))
-	MCFG_COSMAC_EF2_CALLBACK(READLINE(vip_state, ef2_r))
-	MCFG_COSMAC_EF3_CALLBACK(READLINE(vip_state, ef3_r))
-	MCFG_COSMAC_EF4_CALLBACK(READLINE(vip_state, ef4_r))
-	MCFG_COSMAC_Q_CALLBACK(WRITELINE(vip_state, q_w))
-	MCFG_COSMAC_DMAR_CALLBACK(READ8(vip_state, dma_r))
-	MCFG_COSMAC_DMAW_CALLBACK(WRITE8(vip_state, dma_w))
-	MCFG_COSMAC_SC_CALLBACK(WRITE8(vip_state, sc_w))
+	CDP1802(config, m_maincpu, 3.52128_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &vip_state::vip_mem);
+	m_maincpu->set_addrmap(AS_IO, &vip_state::vip_io);
+	m_maincpu->wait_cb().set_constant(1);
+	m_maincpu->clear_cb().set(FUNC(vip_state::clear_r));
+	m_maincpu->ef1_cb().set(FUNC(vip_state::ef1_r));
+	m_maincpu->ef2_cb().set(FUNC(vip_state::ef2_r));
+	m_maincpu->ef3_cb().set(FUNC(vip_state::ef3_r));
+	m_maincpu->ef4_cb().set(FUNC(vip_state::ef4_r));
+	m_maincpu->q_cb().set(FUNC(vip_state::q_w));
+	m_maincpu->dma_rd_cb().set(m_exp, FUNC(vip_expansion_slot_device::dma_r));
+	m_maincpu->dma_wr_cb().set(m_vdc, FUNC(cdp1861_device::dma_w));
+	m_maincpu->dma_wr_cb().append(m_exp, FUNC(vip_expansion_slot_device::dma_w));
+	m_maincpu->sc_cb().set(m_exp, FUNC(vip_expansion_slot_device::sc_w));
+	m_maincpu->tpb_cb().set(m_exp, FUNC(vip_expansion_slot_device::tpb_w));
 
 	// video hardware
-	MCFG_DEVICE_ADD(CDP1861_TAG, CDP1861, XTAL(3'521'280)/2)
-	MCFG_CDP1861_IRQ_CALLBACK(WRITELINE(vip_state, vdc_int_w))
-	MCFG_CDP1861_DMA_OUT_CALLBACK(WRITELINE(vip_state, vdc_dma_out_w))
-	MCFG_CDP1861_EFX_CALLBACK(WRITELINE(vip_state, vdc_ef1_w))
-	MCFG_CDP1861_SCREEN_ADD(CDP1861_TAG, SCREEN_TAG, XTAL(3'521'280)/2)
-	MCFG_SCREEN_UPDATE_DRIVER(vip_state, screen_update)
+	CDP1861(config, m_vdc, 3.52128_MHz_XTAL / 2).set_screen(SCREEN_TAG);
+	m_vdc->int_cb().set(FUNC(vip_state::vdc_int_w));
+	m_vdc->dma_out_cb().set(FUNC(vip_state::vdc_dma_out_w));
+	m_vdc->efx_cb().set(FUNC(vip_state::vdc_ef1_w));
+
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen.set_screen_update(FUNC(vip_state::screen_update));
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD(DISCRETE_TAG, DISCRETE, 0)
-	MCFG_DISCRETE_INTF(vip)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	DISCRETE(config, m_beeper, vip_discrete);
+	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_VIP_BYTEIO_PORT_ADD(VIP_BYTEIO_PORT_TAG, vip_byteio_cards, nullptr, WRITELINE(vip_state, byteio_inst_w))
-	MCFG_VIP_EXPANSION_SLOT_ADD(VIP_EXPANSION_SLOT_TAG, XTAL(3'521'280)/2, vip_expansion_cards, nullptr)
-	MCFG_VIP_EXPANSION_SLOT_INT_CALLBACK(WRITELINE(vip_state, exp_int_w))
-	MCFG_VIP_EXPANSION_SLOT_DMA_OUT_CALLBACK(WRITELINE(vip_state, exp_dma_out_w))
-	MCFG_VIP_EXPANSION_SLOT_DMA_IN_CALLBACK(WRITELINE(vip_state, exp_dma_in_w))
+	VIP_BYTEIO_PORT(config, m_byteio, vip_byteio_cards, nullptr);
+	m_byteio->inst_callback().set(FUNC(vip_state::byteio_inst_w));
+	VIP_EXPANSION_SLOT(config, m_exp, 3.52128_MHz_XTAL / 2, vip_expansion_cards, nullptr);
+	m_exp->int_wr_callback().set(FUNC(vip_state::exp_int_w));
+	m_exp->dma_out_wr_callback().set(FUNC(vip_state::exp_dma_out_w));
+	m_exp->dma_in_wr_callback().set(FUNC(vip_state::exp_dma_in_w));
 
 	// devices
-	MCFG_QUICKLOAD_ADD("quickload", vip_state, vip, "bin,c8,c8x", 0)
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
-	MCFG_CASSETTE_INTERFACE("vip_cass")
+	QUICKLOAD(config, "quickload", "bin,c8,c8x").set_load_callback(FUNC(vip_state::quickload_cb));
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->set_interface("vip_cass");
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "vip")
+	SOFTWARE_LIST(config, "cass_list").set_original("vip");
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("2K")
-	MCFG_RAM_EXTRA_OPTIONS("4K")
-MACHINE_CONFIG_END
+	RAM(config, m_ram).set_default_size("2K").set_extra_options("4K");
+}
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( vp111 )
+//  machine_config( vp111 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(vip_state::vp111)
+void vip_state::vp111(machine_config &config)
+{
 	vip(config);
 	// internal ram
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1K")
-	MCFG_RAM_EXTRA_OPTIONS("2K,4K")
-MACHINE_CONFIG_END
+	m_ram->set_default_size("1K").set_extra_options("2K,4K");
+}
 
 
 
@@ -811,6 +813,6 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE      INIT    COMPANY  FULLNAME                FLAGS
-COMP( 1977, vip,    0,      0,      vip,     vip,   vip_state, 0,      "RCA",   "Cosmac VIP (VP-711)",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS )
-COMP( 1977, vp111,  vip,    0,      vp111,   vip,   vip_state, 0,      "RCA",   "Cosmac VIP (VP-111)",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY  FULLNAME                FLAGS
+COMP( 1977, vip,   0,      0,      vip,     vip,   vip_state, empty_init, "RCA",   "Cosmac VIP (VP-711)",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS )
+COMP( 1977, vp111, vip,    0,      vp111,   vip,   vip_state, empty_init, "RCA",   "Cosmac VIP (VP-111)",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS )

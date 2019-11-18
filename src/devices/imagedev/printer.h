@@ -13,8 +13,6 @@
 
 #pragma once
 
-#define MCFG_PRINTER_ONLINE_CB(_devcb) \
-	devcb = &downcast<printer_image_device &>(*device).set_online_callback(DEVCB_##_devcb);
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -29,7 +27,7 @@ public:
 	// construction/destruction
 	printer_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> devcb_base &set_online_callback(_Object object) { return m_online_cb.set_callback(object); }
+	auto online_callback() { return m_online_cb.bind(); }
 
 	// image-level overrides
 	virtual image_init_result call_load() override;
@@ -37,13 +35,13 @@ public:
 	virtual void call_unload() override;
 
 	// image device
-	virtual iodevice_t image_type() const override { return IO_PRINTER; }
-	virtual bool is_readable()  const override { return 0; }
-	virtual bool is_writeable() const override { return 1; }
-	virtual bool is_creatable() const override { return 1; }
-	virtual bool must_be_loaded() const override { return 0; }
-	virtual bool is_reset_on_load() const override { return 0; }
-	virtual const char *file_extensions() const override { return "prn"; }
+	virtual iodevice_t image_type() const noexcept override { return IO_PRINTER; }
+	virtual bool is_readable()  const noexcept override { return false; }
+	virtual bool is_writeable() const noexcept override { return true; }
+	virtual bool is_creatable() const noexcept override { return true; }
+	virtual bool must_be_loaded() const noexcept override { return false; }
+	virtual bool is_reset_on_load() const noexcept override { return false; }
+	virtual const char *file_extensions() const noexcept override { return "prn"; }
 
 	// specific implementation
 
@@ -51,6 +49,7 @@ public:
 	int is_ready();
 	/* outputs data to a printer */
 	void output(uint8_t data);
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;

@@ -5,6 +5,7 @@
 
 #include "rs232.h"
 #include "imagedev/bitbngr.h"
+#include "diserial.h"
 
 class null_modem_device : public device_t,
 	public device_serial_interface,
@@ -15,6 +16,7 @@ public:
 
 	virtual WRITE_LINE_MEMBER( input_txd ) override { device_serial_interface::rx_w(state); }
 	virtual WRITE_LINE_MEMBER( input_rts ) override { m_rts = state; }
+	virtual WRITE_LINE_MEMBER( input_dtr ) override { m_dtr = state; }
 
 	DECLARE_WRITE_LINE_MEMBER(update_serial);
 
@@ -49,6 +51,7 @@ private:
 	uint32_t m_input_index;
 	emu_timer *m_timer_poll;
 	int m_rts;
+	int m_dtr;
 };
 
 DECLARE_DEVICE_TYPE(NULL_MODEM, null_modem_device)

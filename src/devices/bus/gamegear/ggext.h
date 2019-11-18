@@ -16,28 +16,6 @@
 #pragma once
 
 
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_GG_EXT_PORT_ADD(_tag, _slot_intf, _def_slot) \
-	MCFG_DEVICE_ADD(_tag, GG_EXT_PORT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
-#define MCFG_GG_EXT_PORT_MODIFY(_tag) \
-	MCFG_DEVICE_MODIFY(_tag)
-
-
-#define MCFG_GG_EXT_PORT_TH_INPUT_HANDLER(_devcb) \
-	devcb = &downcast<gg_ext_port_device &>(*device).set_th_input_handler(DEVCB_##_devcb);
-
-
-#define MCFG_GG_EXT_PORT_PIXEL_HANDLER(_devcb) \
-	devcb = &downcast<gg_ext_port_device &>(*device).set_pixel_handler(DEVCB_##_devcb);
-
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -46,17 +24,25 @@
 
 class device_gg_ext_port_interface;
 
-class gg_ext_port_device : public device_t, public device_slot_interface
+class gg_ext_port_device : public device_t, public device_single_card_slot_interface<device_gg_ext_port_interface>
 {
 public:
 	// construction/destruction
-	gg_ext_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T>
+	gg_ext_port_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
+		: gg_ext_port_device(mconfig, tag, owner, 0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
+
+	gg_ext_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~gg_ext_port_device();
 
 	// static configuration helpers
-	template <class Object> devcb_base &set_th_input_handler(Object &&cb) { return m_th_pin_handler.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> devcb_base &set_pixel_handler(Object &&cb) { return m_pixel_handler.set_callback(std::forward<Object>(cb)); }
+	auto th_input_handler() { return m_th_pin_handler.bind(); }
 
 	// Currently, only the support for SMS Controller Adaptor is emulated,
 	// for when SMS Compatibility mode is enabled. In that mode, the 10 pins
@@ -78,7 +64,11 @@ public:
 	void port_w( uint8_t data );
 
 	void th_pin_w(int state);
-	uint32_t pixel_r();
+
+	template <typename T> void set_screen_tag(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
+
+	// for peripherals that interact with the machine's screen
+	required_device<screen_device> m_screen;
 
 //protected:
 	// device-level overrides
@@ -88,14 +78,13 @@ public:
 
 private:
 	devcb_write_line m_th_pin_handler;
-	devcb_read32 m_pixel_handler;
 };
 
 
 // ======================> device_gg_ext_port_interface
 
 // class representing interface-specific live sms_expansion card
-class device_gg_ext_port_interface : public device_slot_card_interface
+class device_gg_ext_port_interface : public device_interface
 {
 public:
 	// construction/destruction
@@ -115,7 +104,6 @@ protected:
 DECLARE_DEVICE_TYPE(GG_EXT_PORT, gg_ext_port_device)
 
 
-SLOT_INTERFACE_EXTERN(gg_ext_port_devices);
-
+void gg_ext_port_devices(device_slot_interface &device);
 
 #endif // MAME_BUS_GAMEGEAR_GGEXT_H

@@ -41,8 +41,8 @@ DEFINE_DEVICE_TYPE(INTVECS_CONTROL_PORT, intvecs_control_port_device, "intvecs_c
 //  device_intvecs_control_port_interface - constructor
 //-------------------------------------------------
 
-device_intvecs_control_port_interface::device_intvecs_control_port_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig,device)
+device_intvecs_control_port_interface::device_intvecs_control_port_interface(const machine_config &mconfig, device_t &device) :
+	device_interface(device, "intvecsctrl")
 {
 	m_port = dynamic_cast<intvecs_control_port_device *>(device.owner());
 }
@@ -67,7 +67,8 @@ device_intvecs_control_port_interface::~device_intvecs_control_port_interface()
 
 intvecs_control_port_device::intvecs_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, INTVECS_CONTROL_PORT, tag, owner, clock),
-	device_slot_interface(mconfig, *this), m_device(nullptr)
+	device_single_card_slot_interface<device_intvecs_control_port_interface>(mconfig, *this),
+	m_device(nullptr)
 {
 }
 
@@ -87,30 +88,7 @@ intvecs_control_port_device::~intvecs_control_port_device()
 
 void intvecs_control_port_device::device_start()
 {
-	m_device = dynamic_cast<device_intvecs_control_port_interface *>(get_card_device());
-}
-
-
-uint8_t intvecs_control_port_device::read_portA()
-{
-	uint8_t data = 0;
-	if (m_device)
-		data |= m_device->read_portA();
-	return data;
-}
-
-uint8_t intvecs_control_port_device::read_portB()
-{
-	uint8_t data = 0;
-	if (m_device)
-		data |= m_device->read_portB();
-	return data;
-}
-
-void intvecs_control_port_device::write_portA(uint8_t data)
-{
-	if (m_device)
-		m_device->write_portA(data);
+	m_device = get_card_device();
 }
 
 
@@ -118,11 +96,12 @@ void intvecs_control_port_device::write_portA(uint8_t data)
 //  SLOT_INTERFACE( intvecs_control_port_devices )
 //-------------------------------------------------
 
-SLOT_INTERFACE_START( intvecs_control_port_devices )
-	SLOT_INTERFACE("ctrls", ECS_CTRLS)
-	SLOT_INTERFACE("keybd", ECS_KEYBD)
-	SLOT_INTERFACE("synth", ECS_SYNTH)
-SLOT_INTERFACE_END
+void intvecs_control_port_devices(device_slot_interface &device)
+{
+	device.option_add("ctrls", ECS_CTRLS);
+	device.option_add("keybd", ECS_KEYBD);
+	device.option_add("synth", ECS_SYNTH);
+}
 
 
 
@@ -139,14 +118,16 @@ SLOT_INTERFACE_END
 
 DEFINE_DEVICE_TYPE(ECS_CTRLS, intvecs_ctrls_device, "intvecs_ctrls", "Mattel Intellivision ECS Hand Controller x2 (HACK)")
 
-static SLOT_INTERFACE_START( intvecs_controller )
-	SLOT_INTERFACE("handctrl", INTV_HANDCTRL)
-SLOT_INTERFACE_END
+static void intvecs_controller(device_slot_interface &device)
+{
+	device.option_add("handctrl", INTV_HANDCTRL);
+}
 
-MACHINE_CONFIG_START(intvecs_ctrls_device::device_add_mconfig)
-	MCFG_INTV_CONTROL_PORT_ADD("port1", intvecs_controller, "handctrl")
-	MCFG_INTV_CONTROL_PORT_ADD("port2", intvecs_controller, "handctrl")
-MACHINE_CONFIG_END
+void intvecs_ctrls_device::device_add_mconfig(machine_config &config)
+{
+	INTV_CONTROL_PORT(config, m_hand1, intvecs_controller, "handctrl");
+	INTV_CONTROL_PORT(config, m_hand2, intvecs_controller, "handctrl");
+}
 
 
 intvecs_ctrls_device::intvecs_ctrls_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
@@ -167,12 +148,12 @@ void intvecs_ctrls_device::device_reset()
 
 uint8_t intvecs_ctrls_device::read_portA()
 {
-	return m_hand1->read_ctrl();
+	return m_hand1->ctrl_r();
 }
 
 uint8_t intvecs_ctrls_device::read_portB()
 {
-	return m_hand2->read_ctrl();
+	return m_hand2->ctrl_r();
 }
 
 //-------------------------------------------------

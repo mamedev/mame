@@ -39,7 +39,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_nmi);
 	void kim1(machine_config &config);
 
-protected:
+private:
 	DECLARE_READ8_MEMBER(kim1_u2_read_a);
 	DECLARE_WRITE8_MEMBER(kim1_u2_write_a);
 	DECLARE_READ8_MEMBER(kim1_u2_read_b);
@@ -54,7 +54,6 @@ protected:
 
 	void kim1_map(address_map &map);
 
-protected:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<mos6530_device> m_riot2;

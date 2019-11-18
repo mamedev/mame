@@ -7,9 +7,10 @@
     MikroMikko formats
 
 *********************************************************************/
+#ifndef MAME_FORMATS_MM_DSK_H
+#define MAME_FORMATS_MM_DSK_H
 
-#ifndef MM_DSK_H_
-#define MM_DSK_H_
+#pragma once
 
 #include "upd765_dsk.h"
 
@@ -40,4 +41,4 @@ private:
 extern const floppy_format_type FLOPPY_MM1_FORMAT;
 extern const floppy_format_type FLOPPY_MM2_FORMAT;
 
-#endif
+#endif // MAME_FORMATS_MM_DSK_H

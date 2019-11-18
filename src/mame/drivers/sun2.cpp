@@ -116,12 +116,14 @@ How the architecture works:
     set the segment map validly in order to write to the page map.  This is how they get away
     with having 16 MB of segment entries and only 8 MB of PMEGs.
 
+    See http://sunstuff.org/Sun-Hardware-Ref/s2hr/part2
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/ram.h"
 #include "machine/am9513.h"
+#include "machine/i82586.h"
 #include "machine/mm58167.h"
 #include "machine/z80scc.h"
 #include "machine/bankdev.h"
@@ -154,39 +156,51 @@ public:
 		, m_type1space(*this, "type1")
 		, m_type2space(*this, "type2")
 		, m_type3space(*this, "type3")
+		, m_edlc(*this, "edlc")
 		, m_bw2_vram(*this, "bw2_vram")
 	{ }
 
+	void sun2mbus(machine_config &config);
+	void sun2vme(machine_config &config);
+
+private:
 	required_device<m68010_device> m_maincpu;
 	required_memory_region m_rom, m_idprom;
 	required_device<ram_device> m_ram;
 	required_device<address_map_bank_device> m_type0space, m_type1space, m_type2space, m_type3space;
+	optional_device<i82586_device> m_edlc;
 	required_shared_ptr<uint16_t> m_bw2_vram;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ16_MEMBER( tl_mmu_r );
-	DECLARE_WRITE16_MEMBER( tl_mmu_w );
+	DECLARE_READ16_MEMBER( mmu_r );
+	DECLARE_WRITE16_MEMBER( mmu_w );
+	uint16_t tl_mmu_r(uint8_t fc, offs_t offset, uint16_t mem_mask);
+	void tl_mmu_w(uint8_t fc, offs_t offset, uint16_t data, uint16_t mem_mask);
 	DECLARE_READ16_MEMBER( video_ctrl_r );
 	DECLARE_WRITE16_MEMBER( video_ctrl_w );
 	DECLARE_READ16_MEMBER( ram_r );
 	DECLARE_WRITE16_MEMBER( ram_w );
+	uint8_t ethernet_r();
+	void ethernet_w(uint8_t data);
+	DECLARE_WRITE_LINE_MEMBER(ethernet_int_w);
+	uint16_t edlc_mmu_r(offs_t offset, uint16_t mem_mask);
+	void edlc_mmu_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 
 	uint32_t bw2_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void sun2mbus(machine_config &config);
-	void sun2vme(machine_config &config);
 	void mbustype0space_map(address_map &map);
 	void mbustype1space_map(address_map &map);
 	void mbustype2space_map(address_map &map);
 	void mbustype3space_map(address_map &map);
 	void sun2_mem(address_map &map);
+	void edlc_mem(address_map &map);
 	void vmetype0space_map(address_map &map);
 	void vmetype1space_map(address_map &map);
 	void vmetype2space_map(address_map &map);
 	void vmetype3space_map(address_map &map);
-private:
+
 	uint16_t *m_rom_ptr, *m_ram_ptr;
 	uint8_t *m_idprom_ptr;
 	uint16_t m_diagreg, m_sysenable, m_buserror;
@@ -195,6 +209,7 @@ private:
 	uint32_t m_pagemap[4097];
 	uint32_t m_ram_size, m_ram_size_words;
 	uint16_t m_bw2_ctrl;
+	uint8_t m_ethernet_status;
 };
 
 READ16_MEMBER( sun2_state::ram_r )
@@ -208,10 +223,13 @@ WRITE16_MEMBER( sun2_state::ram_w )
 	if (offset < m_ram_size_words) COMBINE_DATA(&m_ram_ptr[offset]);
 }
 
-READ16_MEMBER( sun2_state::tl_mmu_r )
+READ16_MEMBER( sun2_state::mmu_r )
 {
-	uint8_t fc = m_maincpu->get_fc();
+	return tl_mmu_r(m_maincpu->get_fc(), offset, mem_mask);
+}
 
+uint16_t sun2_state::tl_mmu_r(uint8_t fc, offs_t offset, uint16_t mem_mask)
+{
 	if ((fc == 3) && !machine().side_effects_disabled())
 	{
 		if (offset & 0x4)   // set for CPU space
@@ -297,7 +315,7 @@ READ16_MEMBER( sun2_state::tl_mmu_r )
 		switch ((m_pagemap[entry] >> 22) & 7)
 		{
 			case 0: // type 0 space
-				return m_type0space->read16(space, tmp, mem_mask);
+				return m_type0space->read16(tmp, mem_mask);
 
 			case 1: // type 1 space
 				// EPROM space is special: the MMU has a trap door
@@ -311,25 +329,25 @@ READ16_MEMBER( sun2_state::tl_mmu_r )
 				{
 					if ((tmp >= (0x7f0000>>1)) && (tmp <= (0x7f07ff>>1)))
 					{
-						return m_rom_ptr[offset & 0x3fff];
+						return m_rom_ptr[offset & 0x3fff]; // the mask here is probably &0x7fff, change it if any 8KW (1.x?) romset shows up for a VME machine
 					}
 				}
 				else    // Multibus has EPROM at 0x000000
 				{
 					if (tmp <= (0x7ff>>1))
 					{
-						return m_rom_ptr[offset & 0x3fff];
+						return m_rom_ptr[offset & 0x7fff];
 					}
 				}
 
 				//printf("read device space @ %x\n", tmp<<1);
-				return m_type1space->read16(space, tmp, mem_mask);
+				return m_type1space->read16(tmp, mem_mask);
 
 			case 2: // type 2 space
-				return m_type2space->read16(space, tmp, mem_mask);
+				return m_type2space->read16(tmp, mem_mask);
 
 			case 3: // type 3 space
-				return m_type3space->read16(space, tmp, mem_mask);
+				return m_type3space->read16(tmp, mem_mask);
 		}
 	}
 	else
@@ -342,10 +360,13 @@ READ16_MEMBER( sun2_state::tl_mmu_r )
 	return 0xffff;
 }
 
-WRITE16_MEMBER( sun2_state::tl_mmu_w )
+WRITE16_MEMBER( sun2_state::mmu_w )
 {
-	uint8_t fc = m_maincpu->get_fc();
+	tl_mmu_w(m_maincpu->get_fc(), offset, data, mem_mask);
+}
 
+void sun2_state::tl_mmu_w(uint8_t fc, offs_t offset, uint16_t data, uint16_t mem_mask)
+{
 	//printf("sun2: Write %04x (FC %d, mask %04x, PC=%x) to %08x\n", data, fc, mem_mask, m_maincpu->pc(), offset<<1);
 
 	if (fc == 3)
@@ -442,20 +463,20 @@ WRITE16_MEMBER( sun2_state::tl_mmu_w )
 		switch ((m_pagemap[entry] >> 22) & 7)
 		{
 			case 0: // type 0
-				m_type0space->write16(space, tmp, data, mem_mask);
+				m_type0space->write16(tmp, data, mem_mask);
 				return;
 
 			case 1: // type 1
 				//printf("write device space @ %x\n", tmp<<1);
-				m_type1space->write16(space, tmp, data, mem_mask);
+				m_type1space->write16(tmp, data, mem_mask);
 				return;
 
 			case 2: // type 2
-				m_type2space->write16(space, tmp, data, mem_mask);
+				m_type2space->write16(tmp, data, mem_mask);
 				return;
 
 			case 3: // type 3
-				m_type3space->write16(space, tmp, data, mem_mask);
+				m_type3space->write16(tmp, data, mem_mask);
 				return;
 		}
 	}
@@ -479,30 +500,79 @@ WRITE16_MEMBER( sun2_state::video_ctrl_w )
 	COMBINE_DATA(&m_bw2_ctrl);
 }
 
+// 82586 Ethernet Data Link Controller interface
+uint8_t sun2_state::ethernet_r()
+{
+	return m_ethernet_status;
+}
+
+void sun2_state::ethernet_w(uint8_t data)
+{
+	m_edlc->reset_w(!BIT(data, 7));
+	m_edlc->set_loopback(!BIT(data, 6)); // LBC on MB502
+	m_edlc->ca(BIT(data, 5));
+
+	m_ethernet_status = (data & 0xf0) | (m_ethernet_status & 0x0f);
+	m_maincpu->set_input_line(M68K_IRQ_3, BIT(m_ethernet_status, 0) && BIT(m_ethernet_status, 4) ? ASSERT_LINE : CLEAR_LINE);
+}
+
+WRITE_LINE_MEMBER(sun2_state::ethernet_int_w)
+{
+	if (state)
+	{
+		m_ethernet_status |= 0x01;
+		if (BIT(m_ethernet_status, 4))
+			m_maincpu->set_input_line(M68K_IRQ_3, ASSERT_LINE);
+	}
+	else
+	{
+		m_ethernet_status &= 0xfe;
+		if (BIT(m_ethernet_status, 4))
+			m_maincpu->set_input_line(M68K_IRQ_3, CLEAR_LINE);
+	}
+}
+
+uint16_t sun2_state::edlc_mmu_r(offs_t offset, uint16_t mem_mask)
+{
+	uint16_t result = tl_mmu_r(M68K_FC_SUPERVISOR_DATA, offset, (mem_mask >> 8) | (mem_mask << 8));
+	return (result >> 8) | (result << 8);
+}
+
+void sun2_state::edlc_mmu_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	tl_mmu_w(M68K_FC_SUPERVISOR_DATA, offset, (data >> 8) | (data << 8), (mem_mask >> 8) | (mem_mask << 8));
+}
+
 void sun2_state::sun2_mem(address_map &map)
 {
-	map(0x000000, 0xffffff).rw(this, FUNC(sun2_state::tl_mmu_r), FUNC(sun2_state::tl_mmu_w));
+	map(0x000000, 0xffffff).rw(FUNC(sun2_state::mmu_r), FUNC(sun2_state::mmu_w));
+}
+
+void sun2_state::edlc_mem(address_map &map)
+{
+	map(0x000000, 0xffffff).rw(FUNC(sun2_state::edlc_mmu_r), FUNC(sun2_state::edlc_mmu_w));
 }
 
 // VME memory spaces
 // type 0 device space
 void sun2_state::vmetype0space_map(address_map &map)
 {
-	map(0x000000, 0x7fffff).rw(this, FUNC(sun2_state::ram_r), FUNC(sun2_state::ram_w));
+	map(0x000000, 0x7fffff).rw(FUNC(sun2_state::ram_r), FUNC(sun2_state::ram_w));
 }
 
 // type 1 device space
 void sun2_state::vmetype1space_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).ram().share("bw2_vram");
-	map(0x020000, 0x020001).rw(this, FUNC(sun2_state::video_ctrl_r), FUNC(sun2_state::video_ctrl_w));
+	map(0x020000, 0x020001).rw(FUNC(sun2_state::video_ctrl_r), FUNC(sun2_state::video_ctrl_w));
 	map(0x7f0000, 0x7f07ff).rom().region("bootprom", 0);    // uses MMU loophole to read 32k from a 2k window
-	// 7f0800-7f0fff: Ethernet interface
+	map(0x7f0800, 0x7f0800).mirror(0x7fe).rw(FUNC(sun2_state::ethernet_r), FUNC(sun2_state::ethernet_w)).cswidth(16);
 	// 7f1000-7f17ff: AM9518 encryption processor
-	//AM_RANGE(0x7f1800, 0x7f1801) AM_DEVREADWRITE8(SCC1_TAG, z80scc_device, cb_r, cb_w, 0xff00)
-	//AM_RANGE(0x7f1802, 0x7f1803) AM_DEVREADWRITE8(SCC1_TAG, z80scc_device, db_r, db_w, 0xff00)
-	//AM_RANGE(0x7f1804, 0x7f1805) AM_DEVREADWRITE8(SCC1_TAG, z80scc_device, ca_r, ca_w, 0xff00)
-	//AM_RANGE(0x7f1806, 0x7f1807) AM_DEVREADWRITE8(SCC1_TAG, z80scc_device, da_r, da_w, 0xff00)
+	//map(0x7f1800, 0x7f1800).rw(SCC1_TAG, FUNC(z80scc_device::cb_r), FUNC(z80scc_device::cb_w));
+	//map(0x7f1802, 0x7f1802).rw(SCC1_TAG, FUNC(z80scc_device::db_r), FUNC(z80scc_device::db_w));
+	map(0x7f1804, 0x7f1805).nopr();
+	//map(0x7f1804, 0x7f1804).rw(SCC1_TAG, FUNC(z80scc_device::ca_r), FUNC(z80scc_device::ca_w));
+	//map(0x7f1806, 0x7f1806).rw(SCC1_TAG, FUNC(z80scc_device::da_r), FUNC(z80scc_device::da_w));
 	map(0x7f2000, 0x7f2000).rw(SCC2_TAG, FUNC(z80scc_device::cb_r), FUNC(z80scc_device::cb_w));
 	map(0x7f2002, 0x7f2002).rw(SCC2_TAG, FUNC(z80scc_device::db_r), FUNC(z80scc_device::db_w));
 	map(0x7f2004, 0x7f2004).rw(SCC2_TAG, FUNC(z80scc_device::ca_r), FUNC(z80scc_device::ca_w));
@@ -524,11 +594,11 @@ void sun2_state::vmetype3space_map(address_map &map)
 // type 0 device space
 void sun2_state::mbustype0space_map(address_map &map)
 {
-	map(0x000000, 0x3fffff).rw(this, FUNC(sun2_state::ram_r), FUNC(sun2_state::ram_w));
+	map(0x000000, 0x3fffff).rw(FUNC(sun2_state::ram_r), FUNC(sun2_state::ram_w));
 	// 7f80000-7f807ff: Keyboard/mouse SCC8530
-	//AM_RANGE(0x7f8000, 0x7f8007) AM_DEVREADWRITE8(SCC1_TAG, z80scc_device, ba_cd_inv_r, ba_cd_inv_w, 0xff00)
+	//map(0x7f8000, 0x7f8007).rw(SCC1_TAG, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask16(0xff00);
 	map(0x700000, 0x71ffff).ram().share("bw2_vram");
-	map(0x781800, 0x781801).rw(this, FUNC(sun2_state::video_ctrl_r), FUNC(sun2_state::video_ctrl_w));
+	map(0x781800, 0x781801).rw(FUNC(sun2_state::video_ctrl_r), FUNC(sun2_state::video_ctrl_w));
 }
 
 // type 1 device space
@@ -537,7 +607,7 @@ void sun2_state::mbustype1space_map(address_map &map)
 	map(0x000000, 0x0007ff).rom().region("bootprom", 0);    // uses MMU loophole to read 32k from a 2k window
 	// 001000-0017ff: AM9518 encryption processor
 	// 001800-001fff: Parallel port
-	map(0x002000, 0x0027ff).rw(SCC2_TAG, FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask16(0xff00);
+	map(0x002000, 0x0027ff).rw(SCC2_TAG, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask16(0xff00);
 	map(0x002800, 0x002803).mirror(0x7fc).rw("timer", FUNC(am9513_device::read16), FUNC(am9513_device::write16));
 	map(0x003800, 0x00383f).mirror(0x7c0).rw("rtc", FUNC(mm58167_device::read), FUNC(mm58167_device::write)).umask16(0xff00); // 12 wait states generated by PAL16R6 (U415)
 }
@@ -594,6 +664,8 @@ void sun2_state::machine_start()
 	m_ram_ptr = (uint16_t *)m_ram->pointer();
 	m_ram_size = m_ram->size();
 	m_ram_size_words = m_ram_size >> 1;
+
+	m_ethernet_status = 0;
 }
 
 void sun2_state::machine_reset()
@@ -605,175 +677,157 @@ void sun2_state::machine_reset()
 	memset(m_segmap, 0, sizeof(m_segmap));
 	memset(m_pagemap, 0, sizeof(m_pagemap));
 
-	m_maincpu->reset();
+	if (m_edlc.found())
+		ethernet_w(0);
 }
 
-MACHINE_CONFIG_START(sun2_state::sun2vme)
+void sun2_state::sun2vme(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68010, XTAL(19'660'800) / 2) // or XTAL(24'000'000) / 2 by jumper setting
-	MCFG_CPU_PROGRAM_MAP(sun2_mem)
+	M68010(config, m_maincpu, 19.6608_MHz_XTAL / 2); // or 24_MHz_XTAL / 2 by jumper setting
+	m_maincpu->set_addrmap(AS_PROGRAM, &sun2_state::sun2_mem);
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("2M")
-	MCFG_RAM_EXTRA_OPTIONS("4M,6M,8M")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
+	RAM(config, RAM_TAG).set_default_size("2M").set_extra_options("4M,6M,8M").set_default_value(0x00);
 
 	// MMU Type 0 device space
-	MCFG_DEVICE_ADD("type0", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(vmetype0space_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000000)
+	ADDRESS_MAP_BANK(config, "type0").set_map(&sun2_state::vmetype0space_map).set_options(ENDIANNESS_BIG, 16, 32, 0x1000000);
 
 	// MMU Type 1 device space
-	MCFG_DEVICE_ADD("type1", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(vmetype1space_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000000)
+	ADDRESS_MAP_BANK(config, "type1").set_map(&sun2_state::vmetype1space_map).set_options(ENDIANNESS_BIG, 16, 32, 0x1000000);
 
 	// MMU Type 2 device space
-	MCFG_DEVICE_ADD("type2", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(vmetype2space_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000000)
+	ADDRESS_MAP_BANK(config, "type2").set_map(&sun2_state::vmetype2space_map).set_options(ENDIANNESS_BIG, 16, 32, 0x1000000);
 
 	// MMU Type 3 device space
-	MCFG_DEVICE_ADD("type3", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(vmetype3space_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000000)
+	ADDRESS_MAP_BANK(config, "type3").set_map(&sun2_state::vmetype3space_map).set_options(ENDIANNESS_BIG, 16, 32, 0x1000000);
 
-	MCFG_SCREEN_ADD("bwtwo", RASTER)
-	MCFG_SCREEN_UPDATE_DRIVER(sun2_state, bw2_update)
-	MCFG_SCREEN_SIZE(1152,900)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1152-1, 0, 900-1)
-	MCFG_SCREEN_REFRESH_RATE(72)
+	screen_device &bwtwo(SCREEN(config, "bwtwo", SCREEN_TYPE_RASTER));
+	bwtwo.set_screen_update(FUNC(sun2_state::bw2_update));
+	bwtwo.set_raw(100_MHz_XTAL, 1600, 0, 1152, 937, 0, 900);
 
-	MCFG_DEVICE_ADD("timer", AM9513A, XTAL(19'660'800) / 4)
-	MCFG_AM9513_FOUT_CALLBACK(DEVWRITELINE("timer", am9513_device, gate1_w))
-	MCFG_AM9513_OUT1_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_7))
-	MCFG_AM9513_OUT2_CALLBACK(DEVWRITELINE("irq5", input_merger_device, in_w<0>))
-	MCFG_AM9513_OUT3_CALLBACK(DEVWRITELINE("irq5", input_merger_device, in_w<1>))
-	MCFG_AM9513_OUT4_CALLBACK(DEVWRITELINE("irq5", input_merger_device, in_w<2>))
-	MCFG_AM9513_OUT5_CALLBACK(DEVWRITELINE("irq5", input_merger_device, in_w<3>))
+	I82586(config, m_edlc, 16_MHz_XTAL / 2);
+	m_edlc->set_addrmap(0, &sun2_state::edlc_mem);
+	m_edlc->out_irq_cb().set(FUNC(sun2_state::ethernet_int_w));
 
-	MCFG_INPUT_MERGER_ANY_HIGH("irq5") // 74LS05 open collectors
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M68K_IRQ_5))
+	am9513a_device &timer(AM9513A(config, "timer", 19.6608_MHz_XTAL / 4));
+	timer.fout_cb().set("timer", FUNC(am9513_device::gate1_w));
+	timer.out1_cb().set_inputline(m_maincpu, M68K_IRQ_7);
+	timer.out2_cb().set("irq5", FUNC(input_merger_device::in_w<0>));
+	timer.out3_cb().set("irq5", FUNC(input_merger_device::in_w<1>));
+	timer.out4_cb().set("irq5", FUNC(input_merger_device::in_w<2>));
+	timer.out5_cb().set("irq5", FUNC(input_merger_device::in_w<3>));
 
-	MCFG_SCC8530_ADD(SCC1_TAG, XTAL(19'660'800) / 4, 0, 0, 0, 0)
-	MCFG_SCC8530_ADD(SCC2_TAG, XTAL(19'660'800) / 4, 0, 0, 0, 0)
-	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(RS232A_TAG, rs232_port_device, write_txd))
-	MCFG_Z80SCC_OUT_TXDB_CB(DEVWRITELINE(RS232B_TAG, rs232_port_device, write_txd))
-	MCFG_Z80SCC_OUT_INT_CB(INPUTLINE("maincpu", M68K_IRQ_6))
+	INPUT_MERGER_ANY_HIGH(config, "irq5").output_handler().set_inputline(m_maincpu, M68K_IRQ_5); // 74LS05 open collectors
 
-	MCFG_RS232_PORT_ADD(RS232A_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, ctsa_w))
+	SCC8530N(config, SCC1_TAG, 19.6608_MHz_XTAL / 4);
+	scc8530_device& scc2(SCC8530N(config, SCC2_TAG, 19.6608_MHz_XTAL / 4));
+	scc2.out_txda_callback().set(RS232A_TAG, FUNC(rs232_port_device::write_txd));
+	scc2.out_txdb_callback().set(RS232B_TAG, FUNC(rs232_port_device::write_txd));
+	scc2.out_int_callback().set_inputline(m_maincpu, M68K_IRQ_6);
 
-	MCFG_RS232_PORT_ADD(RS232B_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, ctsb_w))
-MACHINE_CONFIG_END
+	rs232_port_device &rs232a(RS232_PORT(config, RS232A_TAG, default_rs232_devices, nullptr));
+	rs232a.rxd_handler().set(SCC2_TAG, FUNC(z80scc_device::rxa_w));
+	rs232a.dcd_handler().set(SCC2_TAG, FUNC(z80scc_device::dcda_w));
+	rs232a.cts_handler().set(SCC2_TAG, FUNC(z80scc_device::ctsa_w));
 
-MACHINE_CONFIG_START(sun2_state::sun2mbus)
+	rs232_port_device &rs232b(RS232_PORT(config, RS232B_TAG, default_rs232_devices, nullptr));
+	rs232b.rxd_handler().set(SCC2_TAG, FUNC(z80scc_device::rxb_w));
+	rs232b.dcd_handler().set(SCC2_TAG, FUNC(z80scc_device::dcdb_w));
+	rs232b.cts_handler().set(SCC2_TAG, FUNC(z80scc_device::ctsb_w));
+}
+
+void sun2_state::sun2mbus(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68010, XTAL(39'321'600) / 4)
-	MCFG_CPU_PROGRAM_MAP(sun2_mem)
+	M68010(config, m_maincpu, 39.3216_MHz_XTAL / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sun2_state::sun2_mem);
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("2M")
-	MCFG_RAM_EXTRA_OPTIONS("4M")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
+	RAM(config, RAM_TAG).set_default_size("2M").set_extra_options("4M").set_default_value(0x00);
 
 	// MMU Type 0 device space
-	MCFG_DEVICE_ADD("type0", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(mbustype0space_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000000)
+	ADDRESS_MAP_BANK(config, "type0").set_map(&sun2_state::mbustype0space_map).set_options(ENDIANNESS_BIG, 16, 32, 0x1000000);
 
 	// MMU Type 1 device space
-	MCFG_DEVICE_ADD("type1", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(mbustype1space_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000000)
+	ADDRESS_MAP_BANK(config, "type1").set_map(&sun2_state::mbustype1space_map).set_options(ENDIANNESS_BIG, 16, 32, 0x1000000);
 
 	// MMU Type 2 device space
-	MCFG_DEVICE_ADD("type2", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(mbustype2space_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000000)
+	ADDRESS_MAP_BANK(config, "type2").set_map(&sun2_state::mbustype2space_map).set_options(ENDIANNESS_BIG, 16, 32, 0x1000000);
 
 	// MMU Type 3 device space
-	MCFG_DEVICE_ADD("type3", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(mbustype3space_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000000)
+	ADDRESS_MAP_BANK(config, "type3").set_map(&sun2_state::mbustype3space_map).set_options(ENDIANNESS_BIG, 16, 32, 0x1000000);
 
-	MCFG_SCREEN_ADD("bwtwo", RASTER)
-	MCFG_SCREEN_UPDATE_DRIVER(sun2_state, bw2_update)
-	MCFG_SCREEN_SIZE(1152,900)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1152-1, 0, 900-1)
-	MCFG_SCREEN_REFRESH_RATE(72)
+	screen_device &bwtwo(SCREEN(config, "bwtwo", SCREEN_TYPE_RASTER));
+	bwtwo.set_screen_update(FUNC(sun2_state::bw2_update));
+	bwtwo.set_raw(100_MHz_XTAL, 1600, 0, 1152, 937, 0, 900);
+	//bwtwo.set_raw(100_MHz_XTAL, 1600, 0, 1024, 1061, 0, 1024);
 
-	MCFG_DEVICE_ADD("timer", AM9513, XTAL(39'321'600) / 8)
-	MCFG_AM9513_FOUT_CALLBACK(DEVWRITELINE("timer", am9513_device, gate1_w))
-	MCFG_AM9513_OUT1_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_7))
-	MCFG_AM9513_OUT2_CALLBACK(DEVWRITELINE("irq5", input_merger_device, in_w<0>))
-	MCFG_AM9513_OUT3_CALLBACK(DEVWRITELINE("irq5", input_merger_device, in_w<1>))
-	MCFG_AM9513_OUT4_CALLBACK(DEVWRITELINE("irq5", input_merger_device, in_w<2>))
-	MCFG_AM9513_OUT5_CALLBACK(DEVWRITELINE("irq5", input_merger_device, in_w<3>))
+	am9513a_device &timer(AM9513A(config, "timer", 39.3216_MHz_XTAL / 8));
+	timer.fout_cb().set("timer", FUNC(am9513_device::gate1_w));
+	timer.out1_cb().set_inputline(m_maincpu, M68K_IRQ_7);
+	timer.out2_cb().set("irq5", FUNC(input_merger_device::in_w<0>));
+	timer.out3_cb().set("irq5", FUNC(input_merger_device::in_w<1>));
+	timer.out4_cb().set("irq5", FUNC(input_merger_device::in_w<2>));
+	timer.out5_cb().set("irq5", FUNC(input_merger_device::in_w<3>));
 
-	MCFG_INPUT_MERGER_ANY_HIGH("irq5") // 74LS05 open collectors
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M68K_IRQ_5))
+	INPUT_MERGER_ANY_HIGH(config, "irq5").output_handler().set_inputline(m_maincpu, M68K_IRQ_5); // 74LS05 open collectors
 
-	MCFG_SCC8530_ADD(SCC1_TAG, XTAL(39'321'600) / 8, 0, 0, 0, 0)
-	MCFG_SCC8530_ADD(SCC2_TAG, XTAL(39'321'600) / 8, 0, 0, 0, 0)
-	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(RS232A_TAG, rs232_port_device, write_txd))
-	MCFG_Z80SCC_OUT_TXDB_CB(DEVWRITELINE(RS232B_TAG, rs232_port_device, write_txd))
-	MCFG_Z80SCC_OUT_INT_CB(INPUTLINE("maincpu", M68K_IRQ_6))
+	SCC8530N(config, SCC1_TAG, 39.3216_MHz_XTAL / 8);
+	scc8530_device& scc2(SCC8530N(config, SCC2_TAG, 39.3216_MHz_XTAL / 8));
+	scc2.out_txda_callback().set(RS232A_TAG, FUNC(rs232_port_device::write_txd));
+	scc2.out_txdb_callback().set(RS232B_TAG, FUNC(rs232_port_device::write_txd));
+	scc2.out_int_callback().set_inputline(m_maincpu, M68K_IRQ_6);
 
-	MCFG_RS232_PORT_ADD(RS232A_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, ctsa_w))
+	rs232_port_device &rs232a(RS232_PORT(config, RS232A_TAG, default_rs232_devices, nullptr));
+	rs232a.rxd_handler().set(SCC2_TAG, FUNC(z80scc_device::rxa_w));
+	rs232a.dcd_handler().set(SCC2_TAG, FUNC(z80scc_device::dcda_w));
+	rs232a.cts_handler().set(SCC2_TAG, FUNC(z80scc_device::ctsa_w));
 
-	MCFG_RS232_PORT_ADD(RS232B_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, ctsb_w))
+	rs232_port_device &rs232b(RS232_PORT(config, RS232B_TAG, default_rs232_devices, nullptr));
+	rs232b.rxd_handler().set(SCC2_TAG, FUNC(z80scc_device::rxb_w));
+	rs232b.dcd_handler().set(SCC2_TAG, FUNC(z80scc_device::dcdb_w));
+	rs232b.cts_handler().set(SCC2_TAG, FUNC(z80scc_device::ctsb_w));
 
-	MCFG_DEVICE_ADD("rtc", MM58167, XTAL(32'768))
-MACHINE_CONFIG_END
+	MM58167(config, "rtc", 32.768_kHz_XTAL);
+}
 
 /* ROM definition */
-ROM_START( sun2_120 )
-	ROM_REGION( 0x8000, "bootprom", ROMREGION_ERASEFF )
-	ROM_LOAD16_WORD_SWAP( "sun2-multi-rev-r.bin", 0x0000, 0x8000, CRC(4df0df77) SHA1(4d6bcf09ddc9cc8f5823847b8ea88f98fe4a642e))
+ROM_START( sun2_120 ) // ROMs are located on the '501-1007' CPU PCB at locations B11 and B10; J400 is set to 1-2 for 27128 EPROMs and 3-4 for 27256 EPROMs
+	ROM_REGION16_BE(0x10000, "bootprom", ROMREGION_ERASEFF)
+	// There is an undumped revision 1.1.2, which uses 27256 EPROMs
+	ROM_SYSTEM_BIOS(0, "rev10f", "Bootrom Rev 1.0F")
+	ROMX_LOAD("1.0f.b11", 0x0000, 0x8000, CRC(8fb0050a) SHA1(399cdb894b2a66d847d76d8a5d266906fb1d3430), ROM_SKIP(1) | ROM_BIOS(0)) // actual rom stickers had fallen off
+	ROMX_LOAD("1.0f.b10", 0x0001, 0x8000, CRC(70de816d) SHA1(67e980497f463dbc529f64ec5f3e0046b3901b7e), ROM_SKIP(1) | ROM_BIOS(0)) // "
+	ROM_SYSTEM_BIOS(1, "revr", "Bootrom Rev R")
+	ROMX_LOAD("520-1102-03.b11", 0x0000, 0x4000, CRC(020bb0a8) SHA1(a7b60e89a40757975a5d345d57ea02781dea4f89), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("520-1101-03.b10", 0x0001, 0x4000, CRC(b97c61f7) SHA1(9f08fe232cfc3da48539fa66673fc1f89a362b1e), ROM_SKIP(1) | ROM_BIOS(1))
+	// There is an undumped revision Q, with roms:
+	//ROM_SYSTEM_BIOS( 8, "revq", "Bootrom Rev Q")
+	// ROMX_LOAD( "520-1104-02.b11", 0x0000, 0x4000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(8))
+	// ROMX_LOAD( "520-1103-02.b10", 0x0001, 0x4000, NO_DUMP, ROM_SKIP(1) | ROM_BIOS(8))
+	ROM_SYSTEM_BIOS( 2, "revn", "Bootrom Rev N") // SunOS 2.0 requires this bootrom version at a minimum; this version supports the sun-2 keyboard
+	ROMX_LOAD("revn.b11", 0x0000, 0x4000, CRC(b1e70965) SHA1(726b3ed9323750a1ae238cf6dccaed6ff5981ad1), ROM_SKIP(1) | ROM_BIOS(2)) // actual rom stickers had fallen off
+	ROMX_LOAD("revn.b10", 0x0001, 0x4000, CRC(95fd9242) SHA1(1eee2d291f4b18f6aafdde1a9521d88e454843b9), ROM_SKIP(1) | ROM_BIOS(2)) // "
+	ROM_SYSTEM_BIOS( 3, "revm", "Bootrom Rev M") // SunOS 1.0 apparently requires this bootrom revision; this version might only support the sun-1 keyboard?
+	ROMX_LOAD("sun2-revm-8.b11", 0x0000, 0x4000, CRC(98b8ae55) SHA1(55485f4d8fd1ebc218aa8527c8bb62752c34abf7), ROM_SKIP(1) | ROM_BIOS(3)) // handwritten label: "SUN2-RevM-8"
+	ROMX_LOAD("sun2-revm-0.b10", 0x0001, 0x4000, CRC(5117f431) SHA1(fce85c11ada1614152dde35bb329350f6fb2ecd9), ROM_SKIP(1) | ROM_BIOS(3)) // handwritten label: "SUN2-RevM-0"
 
-	ROM_REGION( 0x20, "idprom", ROMREGION_ERASEFF)
-	ROM_LOAD( "sun2120-idprom.bin", 0x000000, 0x000020, CRC(eec8cd1d) SHA1(6a78dc0ea6f9cc7687cffea754d65864fb751ebf) )
+	ROM_REGION(0x20, "idprom", ROMREGION_ERASEFF)
+	ROM_LOAD("sun2120-idprom.bin", 0x000000, 0x000020, CRC(eec8cd1d) SHA1(6a78dc0ea6f9cc7687cffea754d65864fb751ebf))
 ROM_END
 
 ROM_START( sun2_50 )
-	ROM_REGION( 0x8000, "bootprom", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "250_q_8.rom", 0x0001, 0x4000, CRC(5bfacb5c) SHA1(ec7fb3fb0217b0138ba4748b7c79b8ff0cad896b))
-	ROM_LOAD16_BYTE( "250_q_0.rom", 0x0000, 0x4000, CRC(2ee29abe) SHA1(82f52b9f25e92387329581f7c8ba50a171784968))
+	ROM_REGION16_BE(0x8000, "bootprom", ROMREGION_ERASEFF)
+	// There is at least one undumped revision (Rev 1.1.2) which uses 27256 EPROMs; the sun2/50 board handles up to 27512 EPROMs
+	// bootrom rev Q
+	ROM_LOAD16_BYTE("250_q_8.rom", 0x0000, 0x4000, CRC(5bfacb5c) SHA1(ec7fb3fb0217b0138ba4748b7c79b8ff0cad896b))
+	ROM_LOAD16_BYTE("250_q_0.rom", 0x0001, 0x4000, CRC(2ee29abe) SHA1(82f52b9f25e92387329581f7c8ba50a171784968))
 
-	ROM_REGION( 0x20, "idprom", ROMREGION_ERASEFF)
-	ROM_LOAD( "sun250-idprom.bin", 0x000000, 0x000020, CRC(927744ab) SHA1(d29302b69128165e69dd3a79b8c8d45f2163b88a) )
+	ROM_REGION(0x20, "idprom", ROMREGION_ERASEFF)
+	ROM_LOAD("sun250-idprom.bin", 0x000000, 0x000020, CRC(927744ab) SHA1(d29302b69128165e69dd3a79b8c8d45f2163b88a))
 ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE    INPUT  STATE       INIT  COMPANY             FULLNAME     FLAGS
-COMP( 1984, sun2_50,  0,      0,      sun2vme,   sun2,  sun2_state, 0,    "Sun Microsystems", "Sun 2/50",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1984, sun2_120, 0,      0,      sun2mbus,  sun2,  sun2_state, 0,    "Sun Microsystems", "Sun 2/120", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT  CLASS       INIT        COMPANY             FULLNAME     FLAGS
+COMP( 1984, sun2_50,  0,      0,      sun2vme,  sun2,  sun2_state, empty_init, "Sun Microsystems", "Sun 2/50",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1984, sun2_120, 0,      0,      sun2mbus, sun2,  sun2_state, empty_init, "Sun Microsystems", "Sun 2/120", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

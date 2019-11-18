@@ -96,6 +96,9 @@ public:
 		m_soundlatch(*this, "soundlatch"),
 		m_colorram(*this, "colorram") { }
 
+	void sliver(machine_config &config);
+
+private:
 	uint16_t m_io_offset;
 	uint16_t m_io_reg[IO_SIZE];
 	uint16_t m_fifo[FIFO_SIZE];
@@ -108,7 +111,7 @@ public:
 	int m_tmp_counter;
 
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
+	required_device<i8051_device> m_audiocpu;
 	required_device<screen_device> m_screen;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_shared_ptr<uint8_t> m_colorram;
@@ -139,7 +142,7 @@ public:
 	void render_jpeg();
 
 	void postload();
-	void sliver(machine_config &config);
+
 	void oki_map(address_map &map);
 	void ramdac_map(address_map &map);
 	void sliver_map(address_map &map);
@@ -348,7 +351,7 @@ WRITE16_MEMBER(sliver_state::io_data_w)
 
 WRITE16_MEMBER(sliver_state::sound_w)
 {
-	m_soundlatch->write(space, 0, data & 0xff);
+	m_soundlatch->write(data & 0xff);
 	m_audiocpu->set_input_line(MCS51_INT0_LINE, HOLD_LINE);
 }
 
@@ -362,20 +365,20 @@ void sliver_state::sliver_map(address_map &map)
 
 	map(0x300002, 0x300003).noprw(); // bit 0 tested, writes 0xe0 and 0xc0 - both r and w at the end of interrupt code
 
-	map(0x300004, 0x300005).w(this, FUNC(sliver_state::io_offset_w)); //unknown i/o device
-	map(0x300006, 0x300007).w(this, FUNC(sliver_state::io_data_w));
+	map(0x300004, 0x300005).w(FUNC(sliver_state::io_offset_w)); //unknown i/o device
+	map(0x300006, 0x300007).w(FUNC(sliver_state::io_data_w));
 
 	map(0x400000, 0x400001).portr("P1_P2");
 	map(0x400002, 0x400003).portr("SYSTEM");
 	map(0x400004, 0x400005).portr("DSW");
-	map(0x400006, 0x400007).w(this, FUNC(sliver_state::fifo_data_w));
-	map(0x400008, 0x400009).w(this, FUNC(sliver_state::fifo_clear_w));
-	map(0x40000a, 0x40000b).w(this, FUNC(sliver_state::fifo_flush_w));
-	map(0x40000c, 0x40000d).w(this, FUNC(sliver_state::jpeg1_w));
-	map(0x40000e, 0x40000f).w(this, FUNC(sliver_state::jpeg2_w));
+	map(0x400006, 0x400007).w(FUNC(sliver_state::fifo_data_w));
+	map(0x400008, 0x400009).w(FUNC(sliver_state::fifo_clear_w));
+	map(0x40000a, 0x40000b).w(FUNC(sliver_state::fifo_flush_w));
+	map(0x40000c, 0x40000d).w(FUNC(sliver_state::jpeg1_w));
+	map(0x40000e, 0x40000f).w(FUNC(sliver_state::jpeg2_w));
 
 	map(0x400010, 0x400015).nopw(); //unknown
-	map(0x400016, 0x400017).w(this, FUNC(sliver_state::sound_w));
+	map(0x400016, 0x400017).w(FUNC(sliver_state::sound_w));
 	map(0x400018, 0x400019).nopw(); //unknown
 
 	map(0xff0000, 0xffffff).ram();
@@ -513,38 +516,41 @@ TIMER_DEVICE_CALLBACK_MEMBER ( sliver_state::obj_irq_cb )
 	m_maincpu->set_input_line(3, HOLD_LINE);
 }
 
-MACHINE_CONFIG_START(sliver_state::sliver)
-	MCFG_CPU_ADD("maincpu", M68000, 12000000)
-	MCFG_CPU_PROGRAM_MAP(sliver_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", sliver_state, irq4_line_hold)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("obj_actel", sliver_state, obj_irq_cb, attotime::from_hz(60)) /* unknown clock, causes "obj actel ready error" without this */
+void sliver_state::sliver(machine_config &config)
+{
+	M68000(config, m_maincpu, 12000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sliver_state::sliver_map);
+	m_maincpu->set_vblank_int("screen", FUNC(sliver_state::irq4_line_hold));
+
+	TIMER(config, "obj_actel").configure_periodic(FUNC(sliver_state::obj_irq_cb), attotime::from_hz(60)); /* unknown clock, causes "obj actel ready error" without this */
 	// irq 2 valid but not used?
 
-	MCFG_CPU_ADD("audiocpu", I8051, 8000000)
-	MCFG_CPU_PROGRAM_MAP(soundmem_prg)
-	MCFG_CPU_IO_MAP(soundmem_io)
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(sliver_state, oki_setbank))
+	I8051(config, m_audiocpu, 8000000);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &sliver_state::soundmem_prg);
+	m_audiocpu->set_addrmap(AS_IO, &sliver_state::soundmem_io);
+	m_audiocpu->port_out_cb<1>().set(FUNC(sliver_state::oki_setbank));
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 384-1-16, 0*8, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(sliver_state, screen_update)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	m_screen->set_size(64*8, 32*8);
+	m_screen->set_visarea(0*8, 384-1-16, 0*8, 240-1);
+	m_screen->set_screen_update(FUNC(sliver_state::screen_update));
 
-	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
+	PALETTE(config, "palette").set_entries(0x100);
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, "palette"));
+	ramdac.set_addrmap(0, &sliver_state::ramdac_map);
 
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-
-	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH)
-	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.6)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.6)
-MACHINE_CONFIG_END
+	okim6295_device &oki(OKIM6295(config, "oki", 1000000, okim6295_device::PIN7_HIGH));
+	oki.set_addrmap(0, &sliver_state::oki_map);
+	oki.add_route(ALL_OUTPUTS, "lspeaker", 0.6);
+	oki.add_route(ALL_OUTPUTS, "rspeaker", 0.6);
+}
 
 ROM_START( sliver )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
@@ -595,5 +601,5 @@ ROM_START( slivera )
 ROM_END
 
 
-GAME( 1996, sliver,  0,        sliver, sliver, sliver_state, 0, ROT0,  "Hollow Corp", "Sliver (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, slivera, sliver,   sliver, sliver, sliver_state, 0, ROT0,  "Hollow Corp", "Sliver (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, sliver,  0,        sliver, sliver, sliver_state, empty_init, ROT0, "Hollow Corp", "Sliver (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, slivera, sliver,   sliver, sliver, sliver_state, empty_init, ROT0, "Hollow Corp", "Sliver (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

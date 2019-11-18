@@ -226,8 +226,8 @@ namespace imgtool
 		std::unique_ptr<uint8_t[]> m_extra_bytes;
 
 		// methods
-		imgtoolerr_t cannonicalize_path(uint32_t flags, const char *path, std::string &result);
-		imgtoolerr_t cannonicalize_fork(const char **fork);
+		imgtoolerr_t canonicalize_path(uint32_t flags, const char *path, std::string &result);
+		imgtoolerr_t canonicalize_fork(const char **fork);
 		imgtoolerr_t map_block_to_image_block(uint64_t partition_block, uint64_t &image_block) const;
 	};
 

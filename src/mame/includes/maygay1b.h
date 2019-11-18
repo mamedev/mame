@@ -5,13 +5,6 @@
 
 #pragma once
 
-
-#define VERBOSE 0
-#define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
-
-#define M1_MASTER_CLOCK (XTAL(8'000'000))
-#define M1_DUART_CLOCK  (XTAL(3'686'400))
-
 #include "cpu/m6809/m6809.h"
 #include "machine/i8279.h"
 
@@ -29,6 +22,7 @@
 #include "sound/upd7759.h"
 #include "cpu/mcs51/mcs51.h"
 #include "sound/okim6295.h"
+
 
 class maygay1b_state : public driver_device
 {
@@ -55,6 +49,16 @@ public:
 	{
 	}
 
+	void maygay_m1_no_oki(machine_config &config);
+	void maygay_m1(machine_config &config);
+	void maygay_m1_nec(machine_config &config);
+	void maygay_m1_empire(machine_config &config);
+
+	void init_m1();
+	void init_m1common();
+	void init_m1nec();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<i80c51_device> m_mcu;
 	optional_device<s16lf01_device> m_vfd;
@@ -133,19 +137,14 @@ public:
 
 	uint8_t m_main_to_mcu;
 
-	DECLARE_DRIVER_INIT(m1);
-	DECLARE_DRIVER_INIT(m1common);
-	DECLARE_DRIVER_INIT(m1nec);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void cpu0_firq(int data);
 	void cpu0_nmi();
-	void maygay_m1_no_oki(machine_config &config);
-	void maygay_m1(machine_config &config);
-	void maygay_m1_nec(machine_config &config);
-	void maygay_m1_empire(machine_config &config);
 	void m1_memmap(address_map &map);
 	void m1_nec_memmap(address_map &map);
 };
+
+INPUT_PORTS_EXTERN( maygay_m1 );
 
 #endif // MAME_INCLUDES_MAYGAY1B_H

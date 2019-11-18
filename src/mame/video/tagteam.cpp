@@ -34,11 +34,11 @@ static const res_net_decode_info tagteam_decode_info =
 	{  0x07, 0x07, 0x03 }  /* masks */
 };
 
-PALETTE_INIT_MEMBER(tagteam_state, tagteam)
+void tagteam_state::tagteam_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	std::vector<rgb_t> rgb;
+	uint8_t const *const color_prom = memregion("proms")->base();
 
+	std::vector<rgb_t> rgb;
 	compute_res_net_all(rgb, color_prom, tagteam_decode_info, tagteam_net_info);
 	palette.set_pen_colors(0x00, rgb);
 }
@@ -137,7 +137,7 @@ TILE_GET_INFO_MEMBER(tagteam_state::get_bg_tile_info)
 
 void tagteam_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tagteam_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS_FLIP_X,
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tagteam_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS_FLIP_X,
 			8, 8, 32, 32);
 
 	save_item(NAME(m_palettebank));

@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Bryan McPhail
+// copyright-holders:Bryan McPhail, Phil Stroffolino
+
 #ifndef MAME_CPU_ARM_ARM_H
 #define MAME_CPU_ARM_ARM_H
 
@@ -15,10 +16,6 @@
 /****************************************************************************************************
  *  PUBLIC FUNCTIONS
  ***************************************************************************************************/
-
-#define MCFG_ARM_COPRO(_type) \
-	downcast<arm_cpu_device &>(*device).set_copro_type(arm_cpu_device::copro_type::_type);
-
 
 class arm_cpu_device : public cpu_device
 {
@@ -51,9 +48,9 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override { return 3; }
-	virtual uint32_t execute_max_cycles() const override { return 4; }
-	virtual uint32_t execute_input_lines() const override { return 2; }
+	virtual uint32_t execute_min_cycles() const noexcept override { return 3; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 4; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 2; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -74,7 +71,7 @@ protected:
 	uint8_t m_pendingIrq;
 	uint8_t m_pendingFiq;
 	address_space *m_program;
-	direct_read_data<0> *m_direct;
+	std::function<u32 (offs_t)> m_pr32;
 	endianness_t m_endian;
 	copro_type m_copro_type;
 

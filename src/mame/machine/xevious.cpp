@@ -20,60 +20,50 @@
 
 ***************************************************************************/
 
-void xevious_state::battles_customio_init()
+TIMER_DEVICE_CALLBACK_MEMBER(battles_state::nmi_generate)
 {
-	m_battles_customio_command = 0;
-	m_battles_customio_prev_command = 0;
-	m_battles_customio_command_count = 0;
-	m_battles_customio_data = 0;
-	m_battles_sound_played = 0;
-}
+	m_customio_prev_command = m_customio_command;
 
-
-TIMER_DEVICE_CALLBACK_MEMBER(xevious_state::battles_nmi_generate)
-{
-	m_battles_customio_prev_command = m_battles_customio_command;
-
-	if( m_battles_customio_command & 0x10 )
+	if( m_customio_command & 0x10 )
 	{
-		if( m_battles_customio_command_count == 0 )
+		if( m_customio_command_count == 0 )
 		{
-			m_subcpu3->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			m_subcpu3->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 		}
 		else
 		{
-			m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-			m_subcpu3->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+			m_subcpu3->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 		}
 	}
 	else
 	{
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-		m_subcpu3->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+		m_subcpu3->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
-	m_battles_customio_command_count++;
+	m_customio_command_count++;
 }
 
 
-READ8_MEMBER( xevious_state::battles_customio0_r )
+READ8_MEMBER( battles_state::customio0_r )
 {
-	logerror("%s: custom I/O Read = %02x\n", machine().describe_context(), m_battles_customio_command);
-	return m_battles_customio_command;
+	logerror("%s: custom I/O Read = %02x\n", machine().describe_context(), m_customio_command);
+	return m_customio_command;
 }
 
-READ8_MEMBER( xevious_state::battles_customio3_r )
+READ8_MEMBER( battles_state::customio3_r )
 {
 	int return_data;
 
 	if( m_subcpu3->pc() == 0xAE ){
 		/* CPU4 0xAA - 0xB9 : waiting for MB8851 ? */
-		return_data =   ( (m_battles_customio_command & 0x10) << 3)
+		return_data =   ( (m_customio_command & 0x10) << 3)
 						| 0x00
-						| (m_battles_customio_command & 0x0f);
+						| (m_customio_command & 0x0f);
 	}else{
-		return_data =   ( (m_battles_customio_prev_command & 0x10) << 3)
+		return_data =   ( (m_customio_prev_command & 0x10) << 3)
 						| 0x60
-						| (m_battles_customio_prev_command & 0x0f);
+						| (m_customio_prev_command & 0x0f);
 	}
 	logerror("%s: custom I/O Read = %02x\n", machine().describe_context(), return_data);
 
@@ -81,65 +71,63 @@ READ8_MEMBER( xevious_state::battles_customio3_r )
 }
 
 
-WRITE8_MEMBER( xevious_state::battles_customio0_w )
+WRITE8_MEMBER( battles_state::customio0_w )
 {
-	timer_device *timer = machine().device<timer_device>("battles_nmi");
-
 	logerror("%s: custom I/O Write = %02x\n", machine().describe_context(), data);
 
-	m_battles_customio_command = data;
-	m_battles_customio_command_count = 0;
+	m_customio_command = data;
+	m_customio_command_count = 0;
 
 	switch (data)
 	{
 		case 0x10:
-			timer->reset();
+			m_nmi_timer->reset();
 			return; /* nop */
 	}
-	timer->adjust(attotime::from_usec(166), 0, attotime::from_usec(166));
+	m_nmi_timer->adjust(attotime::from_usec(166), 0, attotime::from_usec(166));
 
 }
 
-WRITE8_MEMBER( xevious_state::battles_customio3_w )
+WRITE8_MEMBER( battles_state::customio3_w )
 {
 	logerror("%s: custom I/O Write = %02x\n", machine().describe_context(), data);
 
-	m_battles_customio_command = data;
+	m_customio_command = data;
 }
 
 
 
-READ8_MEMBER( xevious_state::battles_customio_data0_r )
+READ8_MEMBER( battles_state::customio_data0_r )
 {
-	logerror("%s: custom I/O parameter %02x Read = %02x\n", machine().describe_context(), offset, m_battles_customio_data);
+	logerror("%s: custom I/O parameter %02x Read = %02x\n", machine().describe_context(), offset, m_customio_data);
 
-	return m_battles_customio_data;
+	return m_customio_data;
 }
 
-READ8_MEMBER( xevious_state::battles_customio_data3_r )
+READ8_MEMBER( battles_state::customio_data3_r )
 {
-	logerror("%s: custom I/O parameter %02x Read = %02x\n", machine().describe_context(), offset, m_battles_customio_data);
-	return m_battles_customio_data;
+	logerror("%s: custom I/O parameter %02x Read = %02x\n", machine().describe_context(), offset, m_customio_data);
+	return m_customio_data;
 }
 
 
-WRITE8_MEMBER( xevious_state::battles_customio_data0_w )
-{
-	logerror("%s: custom I/O parameter %02x Write = %02x\n", machine().describe_context(), offset, data);
-	m_battles_customio_data = data;
-}
-
-WRITE8_MEMBER( xevious_state::battles_customio_data3_w )
+WRITE8_MEMBER( battles_state::customio_data0_w )
 {
 	logerror("%s: custom I/O parameter %02x Write = %02x\n", machine().describe_context(), offset, data);
-	m_battles_customio_data = data;
+	m_customio_data = data;
+}
+
+WRITE8_MEMBER( battles_state::customio_data3_w )
+{
+	logerror("%s: custom I/O parameter %02x Write = %02x\n", machine().describe_context(), offset, data);
+	m_customio_data = data;
 }
 
 
-WRITE8_MEMBER( xevious_state::battles_CPU4_coin_w )
+WRITE8_MEMBER( battles_state::cpu4_coin_w )
 {
-	output().set_led_value(0,data & 0x02); // Start 1
-	output().set_led_value(1,data & 0x01); // Start 2
+	m_leds[0] = BIT(data, 1); // Start 1
+	m_leds[1] = BIT(data, 0); // Start 2
 
 	machine().bookkeeping().coin_counter_w(0,data & 0x20);
 	machine().bookkeeping().coin_counter_w(1,data & 0x10);
@@ -147,10 +135,10 @@ WRITE8_MEMBER( xevious_state::battles_CPU4_coin_w )
 }
 
 
-WRITE8_MEMBER( xevious_state::battles_noise_sound_w )
+WRITE8_MEMBER( battles_state::noise_sound_w )
 {
 	logerror("%s: 50%02x Write = %02x\n", machine().describe_context(), offset, data);
-	if( (m_battles_sound_played == 0) && (data == 0xFF) ){
+	if( (m_sound_played == 0) && (data == 0xFF) ){
 		if( m_customio[0] == 0x40 ){
 			m_samples->start(0, 0);
 		}
@@ -158,11 +146,11 @@ WRITE8_MEMBER( xevious_state::battles_noise_sound_w )
 			m_samples->start(0, 1);
 		}
 	}
-	m_battles_sound_played = data;
+	m_sound_played = data;
 }
 
 
-READ8_MEMBER( xevious_state::battles_input_port_r )
+READ8_MEMBER( battles_state::input_port_r )
 {
 	switch ( offset )
 	{
@@ -175,7 +163,7 @@ READ8_MEMBER( xevious_state::battles_input_port_r )
 }
 
 
-WRITE_LINE_MEMBER(xevious_state::battles_interrupt_4)
+WRITE_LINE_MEMBER(battles_state::interrupt_4)
 {
 	if (state)
 		m_subcpu3->set_input_line(0, HOLD_LINE);

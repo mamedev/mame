@@ -22,14 +22,11 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(blueprnt_state, blueprnt)
+void blueprnt_state::blueprnt_palette(palette_device &palette) const
 {
-	int i;
-
-	for (i = 0; i < palette.entries(); i++)
+	for (int i = 0; i < palette.entries(); i++)
 	{
 		uint8_t pen;
-		int r, g, b;
 
 		if (i < 0x200)
 			/* characters */
@@ -40,9 +37,9 @@ PALETTE_INIT_MEMBER(blueprnt_state, blueprnt)
 			/* sprites */
 			pen = i - 0x200;
 
-		r = ((pen >> 0) & 1) * ((pen & 0x08) ? 0xbf : 0xff);
-		g = ((pen >> 2) & 1) * ((pen & 0x08) ? 0xbf : 0xff);
-		b = ((pen >> 1) & 1) * ((pen & 0x08) ? 0xbf : 0xff);
+		int const r = ((pen >> 0) & 1) * ((pen & 0x08) ? 0xbf : 0xff);
+		int const g = ((pen >> 2) & 1) * ((pen & 0x08) ? 0xbf : 0xff);
+		int const b = ((pen >> 1) & 1) * ((pen & 0x08) ? 0xbf : 0xff);
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -118,7 +115,7 @@ TILE_GET_INFO_MEMBER(blueprnt_state::get_bg_tile_info)
 
 VIDEO_START_MEMBER(blueprnt_state,blueprnt)
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(blueprnt_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS_FLIP_X, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(blueprnt_state::get_bg_tile_info)), TILEMAP_SCAN_COLS_FLIP_X, 8, 8, 32, 32);
 	m_bg_tilemap->set_transparent_pen(0);
 	m_bg_tilemap->set_scroll_cols(32);
 

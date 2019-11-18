@@ -10,7 +10,7 @@
 		<!-- Boot software is 60k CP/M vers 2.2K Z80 Operating System -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="301876">
-				<rom name="system1.imd" size="301876" crc="f9dc2ea8" sha1="3cd0471e3be90db59dc83beb04fedb979c810ca2" offset="0" />
+				<rom name="system1.imd" size="301876" crc="f9dc2ea8" sha1="3cd0471e3be90db59dc83beb04fedb979c810ca2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -21,17 +21,17 @@
 		<publisher>Ampro</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333994">
-				<rom name="disk1.imd" size="333994" crc="0b9e7336" sha1="6d6e0d3e76b080fddfd40149a48b9ca3aae70d0e" offset="0" />
+				<rom name="disk1.imd" size="333994" crc="0b9e7336" sha1="6d6e0d3e76b080fddfd40149a48b9ca3aae70d0e"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="363632">
-				<rom name="disk2.imd" size="363632" crc="f1be0f1c" sha1="12fcb4ef181f66c9a32d69748c62c3b4b4c6f362" offset="0" />
+				<rom name="disk2.imd" size="363632" crc="f1be0f1c" sha1="12fcb4ef181f66c9a32d69748c62c3b4b4c6f362"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="355456">
-				<rom name="disk3.imd" size="355456" crc="e78acfa4" sha1="72cb5b671828d30b8c6e9f4d32d184d513e90949" offset="0" />
+				<rom name="disk3.imd" size="355456" crc="e78acfa4" sha1="72cb5b671828d30b8c6e9f4d32d184d513e90949"/>
 			</dataarea>
 		</part>
 	</software>
@@ -42,7 +42,7 @@
 		<publisher>Ampro</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="22805">
-				<rom name="smartclk.imd" size="22805" crc="9208340c" sha1="015ee83d53636263a7b61ebbb68437c3be409874" offset="0" />
+				<rom name="smartclk.imd" size="22805" crc="9208340c" sha1="015ee83d53636263a7b61ebbb68437c3be409874"/>
 			</dataarea>
 		</part>
 	</software>
@@ -53,7 +53,7 @@
 		<publisher>Ampro</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="61121">
-				<rom name="hdtools.imd" size="61121" crc="21b6d3f5" sha1="005b9357f3fa334f300c0c23ebac878a69955500" offset="0" />
+				<rom name="hdtools.imd" size="61121" crc="21b6d3f5" sha1="005b9357f3fa334f300c0c23ebac878a69955500"/>
 			</dataarea>
 		</part>
 	</software>

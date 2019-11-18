@@ -8,13 +8,14 @@
 #ifndef NLID_CMOS_H_
 #define NLID_CMOS_H_
 
-#include "../nl_setup.h"
-#include "../nl_base.h"
+#include "netlist/nl_base.h"
+#include "netlist/nl_setup.h"
 
 namespace netlist
 {
-	namespace devices
-	{
+namespace devices
+{
+	// FIXME: this needs to be removed
 	NETLIB_OBJECT(vdd_vss)
 	{
 		NETLIB_CONSTRUCTOR(vdd_vss)
@@ -27,14 +28,14 @@ namespace netlist
 		NETLIB_RESETI() {}
 
 	public:
-		nl_double vdd() { return m_vdd(); }
-		nl_double vss() { return m_vss(); }
+		nl_fptype vdd() { return m_vdd(); }
+		nl_fptype vss() { return m_vss(); }
 
 		analog_input_t m_vdd;
 		analog_input_t m_vss;
 	};
 
-	} //namespace devices
+} //namespace devices
 } // namespace netlist
 
 #endif /* NLID_CMOS_H_ */

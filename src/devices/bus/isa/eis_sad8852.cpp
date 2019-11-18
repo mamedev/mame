@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Joakim Larsson Edström
+// copyright-holders:Joakim Larsson Edstrom
 /***********************************************************************************************************
  *
  *   Ericsson Information Systems/Nokia Data/ICL, SAD 8852 IBM 3270/5250 terminal emulation adapter
@@ -199,13 +199,14 @@ ioport_constructor isa16_sad8852_device::device_input_ports() const
 //-------------------------------------------------
 //  Board configuration
 //-------------------------------------------------
-MACHINE_CONFIG_START(isa16_sad8852_device::device_add_mconfig)
-	MCFG_CPU_ADD(I80188_TAG, I80188, XTAL(12'000'000) / 2) // Chip revision is 6 MHz
-	MCFG_CPU_PROGRAM_MAP( sad8852_mem )
-	MCFG_CPU_IO_MAP(sad8852_io)
+void isa16_sad8852_device::device_add_mconfig(machine_config &config)
+{
+	i80188_cpu_device &cpu(I80188(config, I80188_TAG, XTAL(12'000'000) / 2)); // Chip revision is 6 MHz
+	cpu.set_addrmap(AS_PROGRAM, &isa16_sad8852_device::sad8852_mem);
+	cpu.set_addrmap(AS_IO, &isa16_sad8852_device::sad8852_io);
 
-	MCFG_DEVICE_ADD("terminal", I8274_NEW, XTAL(12'000'000) / 3) // Needs verification
-MACHINE_CONFIG_END
+	I8274_NEW(config, "terminal", XTAL(12'000'000) / 3); // Needs verification
+}
 
 isa16_sad8852_device::isa16_sad8852_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ISA16_SAD8852, tag, owner, clock)
@@ -235,8 +236,8 @@ void isa16_sad8852_device::device_reset()
 	{
 		m_isa->install_device(
 				0x378, 0x378, // Wrong, need to find real i/o addresses
-				read8_delegate(FUNC( isa16_sad8852_device::sad8852_r ), this),
-				write8_delegate(FUNC( isa16_sad8852_device::sad8852_w ), this));
+				read8_delegate(*this, FUNC(isa16_sad8852_device::sad8852_r)),
+				write8_delegate(*this, FUNC(isa16_sad8852_device::sad8852_w)));
 		m_irq = m_isairq->read();
 		m_installed = true;
 	}

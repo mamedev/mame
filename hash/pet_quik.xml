@@ -11,7 +11,7 @@
 
 		<part name="quik" interface="cbm_quik">
 			<dataarea name="quik" size="31382">
-				<rom name="npa.prg" size="31382" crc="55295e40" sha1="43fb301f7f22878773ef9692ea7763191c085244" offset="0" />
+				<rom name="npa.prg" size="31382" crc="55295e40" sha1="43fb301f7f22878773ef9692ea7763191c085244"/>
 			</dataarea>
 		</part>
 	</software>
@@ -25,7 +25,7 @@
 
 		<part name="quik" interface="cbm_quik">
 			<dataarea name="quik" size="6013">
-				<rom name="hardcore_petting.prg" size="6013" crc="4f2853cf" sha1="c1e4f0d959c69c08c7ea4ea428736bc3ea0a2176" offset="0" />
+				<rom name="hardcore_petting.prg" size="6013" crc="4f2853cf" sha1="c1e4f0d959c69c08c7ea4ea428736bc3ea0a2176"/>
 			</dataarea>
 		</part>
 	</software>

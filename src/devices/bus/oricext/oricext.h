@@ -13,23 +13,27 @@
 
 #include "cpu/m6502/m6502.h"
 
-#define MCFG_ORICEXT_ADD(_tag, _slot_intf, _def_slot, _cputag, _irq)    \
-	MCFG_DEVICE_ADD(_tag, ORICEXT_CONNECTOR, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
-	downcast<oricext_connector *>(device)->set_cputag(_cputag); \
-	devcb = &downcast<oricext_connector &>(*device).set_irq_handler(DEVCB_##_irq);
+class device_oricext_interface;
 
-
-class oricext_device;
-
-class oricext_connector: public device_t, public device_slot_interface
+class oricext_connector: public device_t, public device_single_card_slot_interface<device_oricext_interface>
 {
 public:
+	template <typename T>
+	oricext_connector(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt, const char *cputag)
+		: oricext_connector(mconfig, tag, owner, (uint32_t)0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+		set_cputag(cputag);
+	}
+
 	oricext_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~oricext_connector();
 
 	void set_cputag(const char *tag);
-	template <class Object> devcb_base &set_irq_handler(Object &&cb) { return irq_handler.set_callback(std::forward<Object>(cb)); }
+	auto irq_callback() { return irq_handler.bind(); }
 	void irq_w(int state);
 
 protected:
@@ -40,17 +44,16 @@ protected:
 	const char *cputag;
 };
 
-class oricext_device : public device_t,
-						public device_slot_card_interface
+class device_oricext_interface : public device_interface
 {
 public:
 	void set_cputag(const char *tag);
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
 
 protected:
-	oricext_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	device_oricext_interface(const machine_config &mconfig, device_t &device);
 
-	virtual void device_start() override;
+	virtual void interface_pre_start() override;
 
 	const char *cputag;
 	m6502_device *cpu;
@@ -62,6 +65,6 @@ protected:
 
 DECLARE_DEVICE_TYPE(ORICEXT_CONNECTOR, oricext_connector)
 
-SLOT_INTERFACE_EXTERN( oricext_intf );
+void oricext_intf(device_slot_interface &device);
 
 #endif // MAME_BUS_ORICEXT_ORICEXT_H

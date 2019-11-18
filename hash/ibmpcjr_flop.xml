@@ -12,12 +12,12 @@
 		<publisher>IBM</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184320">
-				<rom name="disk1.img" size="184320" crc="6a568d95" sha1="db165cb9bf2b2abbf5fa826dfe3a8f9819ce7ea5" offset="0" />
+				<rom name="disk1.img" size="184320" crc="6a568d95" sha1="db165cb9bf2b2abbf5fa826dfe3a8f9819ce7ea5"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="184320">
-				<rom name="disk2.img" size="184320" crc="d5f74e98" sha1="2bfda7185e769ceb5594cfae01c503eaac8449df" offset="0" />
+				<rom name="disk2.img" size="184320" crc="d5f74e98" sha1="2bfda7185e769ceb5594cfae01c503eaac8449df"/>
 			</dataarea>
 		</part>
 	</software>
@@ -30,17 +30,17 @@
 		<info name="usage" value="boot from PC DOS 2.1 and then load wordstar" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="disk 1.img" size="368640" crc="81b95671" sha1="a5f33403b1e3762e6b1c2c84b279e093eec9501f" offset="0x00000" />
+				<rom name="disk 1.img" size="368640" crc="81b95671" sha1="a5f33403b1e3762e6b1c2c84b279e093eec9501f"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="disk 2.img" size="368640" crc="d5c84856" sha1="ef138f490f302e687827b71b8d254143d870f895" offset="0x00000" />
+				<rom name="disk 2.img" size="368640" crc="d5c84856" sha1="ef138f490f302e687827b71b8d254143d870f895"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="disk 3.img" size="368640" crc="49884404" sha1="11c8c7d638ba00a1e42844a1efb09fd6f75ac7d4" offset="0x00000" />
+				<rom name="disk 3.img" size="368640" crc="49884404" sha1="11c8c7d638ba00a1e42844a1efb09fd6f75ac7d4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -51,7 +51,7 @@
 		<publisher>IBM</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
-				<rom name="exploring the ibm pcjr.img" size="163840" crc="409ff73f" sha1="453ae5f3fa7781ece7d421dd973ce54204b9c99d" offset="0x00000" />
+				<rom name="exploring the ibm pcjr.img" size="163840" crc="409ff73f" sha1="453ae5f3fa7781ece7d421dd973ce54204b9c99d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -62,7 +62,7 @@
 		<publisher>IBM</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="ibm pcjr sampler.img" size="368640" crc="c36607b3" sha1="a1d99d975aaed9746056fa1c06563cf08d1a8bc5" offset="0x00000" />
+				<rom name="ibm pcjr sampler.img" size="368640" crc="c36607b3" sha1="a1d99d975aaed9746056fa1c06563cf08d1a8bc5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -75,7 +75,7 @@
 		<!-- marked as bad since source is questionable, needs a redump -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="procomm 243.img" size="368640" crc="63c75c78" sha1="cc3f293349d3458d4577221f15eb121c18465109" offset="0x00000" status="baddump" />
+				<rom name="procomm 243.img" size="368640" crc="63c75c78" sha1="cc3f293349d3458d4577221f15eb121c18465109" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -88,7 +88,7 @@
 		<!-- marked as bad since source is questionable, needs a redump -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="turbo pascal 302.img" size="368640" crc="07fafb7e" sha1="1358d6082b0d44107ef1411f3a2c251cef7eb922" offset="0x00000" status="baddump" />
+				<rom name="turbo pascal 302.img" size="368640" crc="07fafb7e" sha1="1358d6082b0d44107ef1411f3a2c251cef7eb922" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -101,7 +101,7 @@
 		<!-- marked as bad since source is questionable, needs a redump -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="zbasic 402.img" size="368640" crc="c8d0b1a0" sha1="ac264cb7267f54acf6d6619e4f782f781674c5e0" offset="0x00000" status="baddump" />
+				<rom name="zbasic 402.img" size="368640" crc="c8d0b1a0" sha1="ac264cb7267f54acf6d6619e4f782f781674c5e0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -113,7 +113,7 @@
 		<publisher>Sierra</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="king's quest.img" size="368640" crc="524c1991" sha1="f6159d955959bf421774ed85df09b50026fa5a81" offset="0x00000" />
+				<rom name="king's quest.img" size="368640" crc="524c1991" sha1="f6159d955959bf421774ed85df09b50026fa5a81"/>
 			</dataarea>
 		</part>
 	</software>

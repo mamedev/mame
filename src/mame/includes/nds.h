@@ -23,6 +23,9 @@ public:
 		m_arm7ram(*this, "arm7ram")
 	{ }
 
+	void nds(machine_config &config);
+
+private:
 	void machine_start() override;
 	void machine_reset() override;
 
@@ -41,12 +44,11 @@ public:
 	DECLARE_READ32_MEMBER(wram_arm7mirror_r);
 	DECLARE_WRITE32_MEMBER(wram_arm7mirror_w);
 
-	void nds(machine_config &config);
 	void nds7_wram_map(address_map &map);
 	void nds9_wram_map(address_map &map);
 	void nds_arm7_map(address_map &map);
 	void nds_arm9_map(address_map &map);
-protected:
+
 	required_device<arm7_cpu_device> m_arm7;
 	required_device<arm946es_cpu_device> m_arm9;
 	required_region_ptr<uint32_t> m_firmware;
@@ -91,9 +93,9 @@ protected:
 
 	// DMA
 	emu_timer *m_dma_timer[8];
-	uint32_t m_dma_src[8];
-	uint32_t m_dma_dst[8];
-	uint16_t m_dma_cnt[8];
+	//uint32_t m_dma_src[8];
+	//uint32_t m_dma_dst[8];
+	//uint16_t m_dma_cnt[8];
 
 	// Timers
 	uint32_t m_timer_regs[8];

@@ -26,6 +26,7 @@
 #include "sound/okim6295.h"
 #include "video/decbac06.h"
 #include "video/decmxc06.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -39,18 +40,19 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_tilegen(*this, "tilegen%u", 1),
-		m_spritegen(*this, "spritegen")
+		m_spritegen(*this, "spritegen"),
+		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
-	DECLARE_DRIVER_INIT(madmotor);
 	void madmotor(machine_config &config);
 
-protected:
-	uint32_t screen_update_madmotor(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void init_madmotor();
+
+private:
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void madmotor_map(address_map &map);
 	void sound_map(address_map &map);
 
-private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_spriteram;
 
@@ -59,6 +61,7 @@ private:
 	required_device<h6280_device> m_audiocpu;
 	required_device_array<deco_bac06_device, 3> m_tilegen;
 	required_device<deco_mxc06_device> m_spritegen;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 
@@ -102,9 +105,7 @@ void madmotor_state::sound_map(address_map &map)
 	map(0x120000, 0x120001).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x130000, 0x130001).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x140000, 0x140001).r("soundlatch", FUNC(generic_latch_8_device::read));
-	map(0x1f0000, 0x1f1fff).bankrw("bank8");
-	map(0x1fec00, 0x1fec01).w(m_audiocpu, FUNC(h6280_device::timer_w));
-	map(0x1ff400, 0x1ff403).w(m_audiocpu, FUNC(h6280_device::irq_status_w));
+	map(0x1f0000, 0x1f1fff).ram();
 }
 
 /******************************************************************************/
@@ -195,8 +196,8 @@ static const gfx_layout charlayout =
 	4096,
 	4,      /* 4 bits per pixel  */
 	{ 0x18000*8, 0x8000*8, 0x10000*8, 0x00000*8 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	{ STEP8(0,1) },
+	{ STEP8(0,8) },
 	8*8 /* every char takes 8 consecutive bytes */
 };
 
@@ -206,10 +207,8 @@ static const gfx_layout tilelayout =
 	2048,
 	4,
 	{ 0x30000*8, 0x10000*8, 0x20000*8, 0x00000*8 },
-	{ 16*8+0, 16*8+1, 16*8+2, 16*8+3, 16*8+4, 16*8+5, 16*8+6, 16*8+7,
-			0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-			8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	{ STEP8(16*8,1), STEP8(0,1) },
+	{ STEP16(0,8) },
 	16*16
 };
 
@@ -219,10 +218,8 @@ static const gfx_layout tilelayout2 =
 	4096,
 	4,
 	{ 0x60000*8, 0x20000*8, 0x40000*8, 0x00000*8 },
-	{ 16*8+0, 16*8+1, 16*8+2, 16*8+3, 16*8+4, 16*8+5, 16*8+6, 16*8+7,
-			0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-			8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	{ STEP8(16*8,1), STEP8(0,1) },
+	{ STEP16(0,8) },
 	16*16
 };
 
@@ -232,14 +229,12 @@ static const gfx_layout spritelayout =
 	4096*2,
 	4,
 	{ 0xc0000*8, 0x80000*8, 0x40000*8, 0x00000*8 },
-	{ 16*8+0, 16*8+1, 16*8+2, 16*8+3, 16*8+4, 16*8+5, 16*8+6, 16*8+7,
-			0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-			8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	{ STEP8(16*8,1), STEP8(0,1) },
+	{ STEP16(0,8) },
 	16*16
 };
 
-static GFXDECODE_START( madmotor )
+static GFXDECODE_START( gfx_madmotor )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 16 ) /* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,   512, 16 ) /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout2,  768, 16 ) /* Tiles 16x16 */
@@ -248,7 +243,7 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-uint32_t madmotor_state::screen_update_madmotor(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t madmotor_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bool flip = m_tilegen[0]->get_flip_state();
 	m_tilegen[0]->set_flip_screen(flip);
@@ -256,76 +251,69 @@ uint32_t madmotor_state::screen_update_madmotor(screen_device &screen, bitmap_in
 	m_tilegen[2]->set_flip_screen(flip);
 	m_spritegen->set_flip_screen(flip);
 
-	m_tilegen[2]->deco_bac06_pf_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
-	m_tilegen[1]->deco_bac06_pf_draw(bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
-	m_spritegen->draw_sprites(bitmap, cliprect, m_spriteram, 0x00, 0x00, 0x0f);
-	m_tilegen[0]->deco_bac06_pf_draw(bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
+	m_tilegen[2]->deco_bac06_pf_draw(screen,bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00, 0);
+	m_tilegen[1]->deco_bac06_pf_draw(screen,bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00, 0);
+	m_spritegen->draw_sprites(screen, bitmap, cliprect, m_gfxdecode->gfx(3), m_spriteram, 0x800/2);
+	m_tilegen[0]->deco_bac06_pf_draw(screen,bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00, 0);
 	return 0;
 }
 
 /******************************************************************************/
 
-MACHINE_CONFIG_START(madmotor_state::madmotor)
-
+void madmotor_state::madmotor(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000) /* Custom chip 59, 24 MHz crystal */
-	MCFG_CPU_PROGRAM_MAP(madmotor_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", madmotor_state,  irq6_line_hold)/* VBL */
+	M68000(config, m_maincpu, 12000000); /* Custom chip 59, 24 MHz crystal */
+	m_maincpu->set_addrmap(AS_PROGRAM, &madmotor_state::madmotor_map);
+	m_maincpu->set_vblank_int("screen", FUNC(madmotor_state::irq6_line_hold)); /* VBL */
 
-	MCFG_CPU_ADD("audiocpu", H6280, 8053000/2) /* Custom chip 45, Crystal near CPU is 8.053 MHz */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-
+	H6280(config, m_audiocpu, 8053000/2); /* Custom chip 45, Crystal near CPU is 8.053 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &madmotor_state::sound_map);
+	m_audiocpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(58)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */ /* frames per second, vblank duration taken from Burger Time */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(madmotor_state, screen_update_madmotor)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	screen.set_refresh_hz(58);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */ /* frames per second, vblank duration taken from Burger Time */);
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(madmotor_state::screen_update));
+	screen.set_palette("palette");
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", madmotor)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_madmotor);
+	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 1024);
 
-	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
-	MCFG_DECO_BAC06_GFX_REGION_WIDE(0, 0, 0)
-	MCFG_DECO_BAC06_GFXDECODE("gfxdecode")
-	MCFG_DEVICE_ADD("tilegen2", DECO_BAC06, 0)
-	MCFG_DECO_BAC06_GFX_REGION_WIDE(0, 1, 0)
-	MCFG_DECO_BAC06_GFXDECODE("gfxdecode")
-	MCFG_DEVICE_ADD("tilegen3", DECO_BAC06, 0)
-	MCFG_DECO_BAC06_GFX_REGION_WIDE(0, 2, 1)
-	MCFG_DECO_BAC06_GFXDECODE("gfxdecode")
+	DECO_BAC06(config, m_tilegen[0], 0);
+	m_tilegen[0]->set_gfx_region_wide(0, 0, 0);
+	m_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DEVICE_ADD("spritegen", DECO_MXC06, 0)
-	MCFG_DECO_MXC06_GFX_REGION(3)
-	MCFG_DECO_MXC06_GFXDECODE("gfxdecode")
+	DECO_BAC06(config, m_tilegen[1], 0);
+	m_tilegen[1]->set_gfx_region_wide(0, 1, 0);
+	m_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
+	DECO_BAC06(config, m_tilegen[2], 0);
+	m_tilegen[2]->set_gfx_region_wide(0, 2, 1);
+	m_tilegen[2]->set_gfxdecode_tag(m_gfxdecode);
 
+	DECO_MXC06(config, m_spritegen, 0);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
+	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, 0);
 
-	MCFG_SOUND_ADD("ym1", YM2203, 21470000/6)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	YM2203(config, "ym1", 21470000/6).add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	MCFG_YM2151_ADD("ym2", 21470000/6)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1)) /* IRQ 2 */
-	MCFG_SOUND_ROUTE(0, "mono", 0.45)
-	MCFG_SOUND_ROUTE(1, "mono", 0.45)
+	ym2151_device &ym2(YM2151(config, "ym2", 21470000/6));
+	ym2.irq_handler().set_inputline(m_audiocpu, 1); /* IRQ2 */
+	ym2.add_route(0, "mono", 0.45);
+	ym2.add_route(1, "mono", 0.45);
 
-	MCFG_OKIM6295_ADD("oki1", 1023924, PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	OKIM6295(config, "oki1", 1023924, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.50); // clock frequency & pin 7 not verified
 
-	MCFG_OKIM6295_ADD("oki2", 2047848, PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki2", 2047848, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.25); // clock frequency & pin 7 not verified
+}
 
 /******************************************************************************/
 
@@ -373,12 +361,10 @@ ROM_END
 
 /******************************************************************************/
 
-DRIVER_INIT_MEMBER(madmotor_state,madmotor)
+void madmotor_state::init_madmotor()
 {
 	uint8_t *rom = memregion("maincpu")->base();
-	int i;
-
-	for (i = 0x00000;i < 0x80000;i++)
+	for (int i = 0x00000; i < 0x80000; i++)
 	{
 		rom[i] = (rom[i] & 0xdb) | ((rom[i] & 0x04) << 3) | ((rom[i] & 0x20) >> 3);
 		rom[i] = (rom[i] & 0x7e) | ((rom[i] & 0x01) << 7) | ((rom[i] & 0x80) >> 7);
@@ -387,4 +373,4 @@ DRIVER_INIT_MEMBER(madmotor_state,madmotor)
 
 
 	/* The title screen is undated, but it's (c) 1989 Data East at 0xefa0 */
-GAME( 1989, madmotor, 0, madmotor, madmotor, madmotor_state, madmotor, ROT0, "Mitchell", "Mad Motor (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, madmotor, 0, madmotor, madmotor, madmotor_state, init_madmotor, ROT0, "Mitchell", "Mad Motor (prototype)", MACHINE_SUPPORTS_SAVE )

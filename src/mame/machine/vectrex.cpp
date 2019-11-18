@@ -205,7 +205,7 @@ READ8_MEMBER(vectrex_base_state::vectrex_via_pa_r)
 	if ((!(m_via_out[PORTB] & 0x10)) && (m_via_out[PORTB] & 0x08))
 		/* BDIR inactive, we can read the PSG. BC1 has to be active. */
 	{
-		m_via_out[PORTA] = m_ay8912->data_r(space, 0)
+		m_via_out[PORTA] = m_ay8912->data_r()
 			& ~(m_imager_pinlevel & 0x80);
 	}
 	return m_via_out[PORTA];
@@ -328,9 +328,9 @@ void vectrex_state::machine_start()
 	{
 		// install cart accesses
 		if (m_cart->get_type() == VECTREX_SRAM)
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0000, 0x7fff, read8_delegate(FUNC(vectrex_cart_slot_device::read_rom),(vectrex_cart_slot_device*)m_cart), write8_delegate(FUNC(vectrex_cart_slot_device::write_ram),m_cart.target()));
+			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0000, 0x7fff, read8_delegate(*m_cart, FUNC(vectrex_cart_slot_device::read_rom)), write8_delegate(*m_cart, FUNC(vectrex_cart_slot_device::write_ram)));
 		else
-			m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x7fff, read8_delegate(FUNC(vectrex_cart_slot_device::read_rom),m_cart.target()));
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x7fff, read8_delegate(*m_cart, FUNC(vectrex_cart_slot_device::read_rom)));
 
 		// setup 3d imager and refresh timer
 

@@ -37,16 +37,16 @@ WRITE8_MEMBER(skyfox_state::skyfox_vregs_w)
 {
 	switch (offset)
 	{
-		case 0:
-			m_bg_ctrl = data;
-			break;
+	case 0:
+		m_bg_ctrl = data;
+		break;
 
-		case 1:
-			m_soundlatch->write(space, 0, data);
-			break;
+	case 1:
+		m_soundlatch->write(data);
+		break;
 
-		default:
-			break;
+	default:
+		break;
 	}
 }
 
@@ -59,7 +59,7 @@ void skyfox_state::skyfox_map(address_map &map)
 	map(0xe000, 0xe000).portr("INPUTS");
 	map(0xe001, 0xe001).portr("DSW0");
 	map(0xe002, 0xe002).portr("DSW1");
-	map(0xe008, 0xe00f).w(this, FUNC(skyfox_state::skyfox_vregs_w));
+	map(0xe008, 0xe00f).w(FUNC(skyfox_state::skyfox_vregs_w));
 	map(0xf001, 0xf001).portr("DSW2");
 }
 
@@ -74,9 +74,9 @@ void skyfox_state::skyfox_sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
-//  AM_RANGE(0x9000, 0x9001) AM_WRITENOP // ??
+//  map(0x9000, 0x9001).nopw(); // ??
 	map(0xa000, 0xa001).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-//  AM_RANGE(0xb000, 0xb001) AM_WRITENOP // ??
+//  map(0xb000, 0xb001).nopw(); // ??
 	map(0xc000, 0xc001).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xb000, 0xb000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }
@@ -191,7 +191,7 @@ static const gfx_layout layout_8x8x8 =
 	8*8*8
 };
 
-static GFXDECODE_START( skyfox )
+static GFXDECODE_START( gfx_skyfox )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x8, 0, 1 ) // [0] Sprites
 GFXDECODE_END
 
@@ -222,40 +222,37 @@ void skyfox_state::machine_reset()
 	m_bg_ctrl = 0;
 }
 
-MACHINE_CONFIG_START(skyfox_state::skyfox)
-
+void skyfox_state::skyfox(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(8'000'000)/2) /* Verified at 4MHz */
-	MCFG_CPU_PROGRAM_MAP(skyfox_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", skyfox_state, skyfox_interrupt)
+	Z80(config, m_maincpu, XTAL(8'000'000)/2); /* Verified at 4MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &skyfox_state::skyfox_map);
+	m_maincpu->set_vblank_int("screen", FUNC(skyfox_state::skyfox_interrupt));
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(14'318'181)/8) /* Verified at 1.789772MHz */
-	MCFG_CPU_PROGRAM_MAP(skyfox_sound_map)
+	Z80(config, m_audiocpu, XTAL(14'318'181)/8); /* Verified at 1.789772MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &skyfox_state::skyfox_sound_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(62.65)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0+0x60, 320-1+0x60, 0+16, 256-1-16) // from $30*2 to $CC*2+8
-	MCFG_SCREEN_UPDATE_DRIVER(skyfox_state, screen_update_skyfox)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(62.65);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	m_screen->set_size(512, 256);
+	m_screen->set_visarea(0+0x60, 320-1+0x60, 0+16, 256-1-16); // from $30*2 to $CC*2+8
+	m_screen->set_screen_update(FUNC(skyfox_state::screen_update_skyfox));
+	m_screen->set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", skyfox)
-	MCFG_PALETTE_ADD("palette", 256+256) /* 256 static colors (+256 for the background??) */
-	MCFG_PALETTE_INIT_OWNER(skyfox_state, skyfox)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_skyfox);
+	PALETTE(config, m_palette, FUNC(skyfox_state::skyfox_palette), 256+256); // 256 static colors (+256 for the background??)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL(14'318'181)/8) /* Verified at 1.789772MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	YM2203(config, "ym1", XTAL(14'318'181)/8).add_route(ALL_OUTPUTS, "mono", 0.80); /* Verified at 1.789772MHz */
 
-	MCFG_SOUND_ADD("ym2", YM2203, XTAL(14'318'181)/8) /* Verified at 1.789772MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_CONFIG_END
+	YM2203(config, "ym2", XTAL(14'318'181)/8).add_route(ALL_OUTPUTS, "mono", 0.80); /* Verified at 1.789772MHz */
+}
 
 
 
@@ -401,7 +398,7 @@ ROM_END
 
 
 /* Untangle the graphics: cut each 32x32x8 tile in 16 8x8x8 tiles */
-DRIVER_INIT_MEMBER(skyfox_state,skyfox)
+void skyfox_state::init_skyfox()
 {
 	uint8_t *rom = memregion("gfx1")->base();
 	uint8_t *end = rom + memregion("gfx1")->bytes();
@@ -418,6 +415,6 @@ DRIVER_INIT_MEMBER(skyfox_state,skyfox)
 }
 
 
-GAME( 1987, skyfox,    0,      skyfox, skyfox, skyfox_state, skyfox, ROT90, "Jaleco (Nichibutsu USA license)", "Sky Fox", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, exerizer,  skyfox, skyfox, skyfox, skyfox_state, skyfox, ROT90, "Jaleco", "Exerizer (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, exerizerb, skyfox, skyfox, skyfox, skyfox_state, skyfox, ROT90, "bootleg", "Exerizer (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, skyfox,    0,      skyfox, skyfox, skyfox_state, init_skyfox, ROT90, "Jaleco (Nichibutsu USA license)", "Sky Fox", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, exerizer,  skyfox, skyfox, skyfox, skyfox_state, init_skyfox, ROT90, "Jaleco", "Exerizer (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, exerizerb, skyfox, skyfox, skyfox, skyfox_state, init_skyfox, ROT90, "bootleg", "Exerizer (bootleg)", MACHINE_SUPPORTS_SAVE )

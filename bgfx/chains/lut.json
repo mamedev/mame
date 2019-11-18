@@ -1,0 +1,36 @@
+{
+	"name": "3D LUT",
+	"author": "W. M. Martinez",
+	"targets": [
+		{
+			"name": "temp",
+			"mode": "guest"
+		}
+	],
+	"passes": [
+		{
+			"effect": "misc/blit",
+			"name": "Copy To Filtered Texture",
+			"input": [
+				{ "sampler": "s_tex", "texture": "screen" }
+			],
+			"output": "temp"
+		}, {
+			"effect": "misc/lut",
+			"name": "Apply LUT",
+			"input": [
+				{
+					"sampler": "s_tex",
+					"target": "temp"
+				}, {
+					"sampler": "s_3dlut",
+					"option": "bgfx_lut",
+					"bilinear": false,
+					"clamp": true,
+					"selection": "LUT Texture"
+				}
+			],
+			"output": "output"
+		}
+	]
+}

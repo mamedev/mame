@@ -29,12 +29,12 @@ msx_cart_fmpac_device::msx_cart_fmpac_device(const machine_config &mconfig, cons
 }
 
 
-MACHINE_CONFIG_START(msx_cart_fmpac_device::device_add_mconfig)
+void msx_cart_fmpac_device::device_add_mconfig(machine_config &config)
+{
 	// This is actually incorrect. The sound output is passed back into the MSX machine where it is mixed internally and output through the system 'speaker'.
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ym2413", YM2413, XTAL(10'738'635)/3)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-MACHINE_CONFIG_END
+	SPEAKER(config, "mono").front_center();
+	YM2413(config, m_ym2413, XTAL(10'738'635)/3).add_route(ALL_OUTPUTS, "mono", 0.40);
+}
 
 
 void msx_cart_fmpac_device::device_start()
@@ -46,11 +46,14 @@ void msx_cart_fmpac_device::device_start()
 	save_item(NAME(m_1fff));
 	save_item(NAME(m_7ff6));
 
-	machine().save().register_postload(save_prepost_delegate(FUNC(msx_cart_fmpac_device::restore_banks), this));
-
 	// Install IO read/write handlers
-	address_space &space = machine().device<cpu_device>("maincpu")->space(AS_IO);
-	space.install_write_handler(0x7c, 0x7d, write8_delegate(FUNC(msx_cart_fmpac_device::write_ym2413), this));
+	io_space().install_write_handler(0x7c, 0x7d, write8sm_delegate(*this, FUNC(msx_cart_fmpac_device::write_ym2413)));
+}
+
+
+void msx_cart_fmpac_device::device_post_load()
+{
+	restore_banks();
 }
 
 
@@ -87,7 +90,7 @@ void msx_cart_fmpac_device::initialize_cartridge()
 }
 
 
-READ8_MEMBER(msx_cart_fmpac_device::read_cart)
+uint8_t msx_cart_fmpac_device::read_cart(offs_t offset)
 {
 	if (offset >= 0x4000 && offset < 0x8000)
 	{
@@ -116,7 +119,7 @@ READ8_MEMBER(msx_cart_fmpac_device::read_cart)
 }
 
 
-WRITE8_MEMBER(msx_cart_fmpac_device::write_cart)
+void msx_cart_fmpac_device::write_cart(offs_t offset, uint8_t data)
 {
 	if (offset >= 0x4000 && offset < 0x6000)
 	{
@@ -141,7 +144,7 @@ WRITE8_MEMBER(msx_cart_fmpac_device::write_cart)
 		case 0x7ff5:
 			if (m_opll_active)
 			{
-				m_ym2413->write(space, offset & 1, data);
+				m_ym2413->write(offset & 1, data);
 			}
 			break;
 
@@ -159,10 +162,10 @@ WRITE8_MEMBER(msx_cart_fmpac_device::write_cart)
 }
 
 
-WRITE8_MEMBER(msx_cart_fmpac_device::write_ym2413)
+void msx_cart_fmpac_device::write_ym2413(offs_t offset, uint8_t data)
 {
 	if (m_opll_active)
 	{
-		m_ym2413->write(space, offset & 1, data);
+		m_ym2413->write(offset & 1, data);
 	}
 }

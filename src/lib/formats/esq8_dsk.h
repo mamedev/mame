@@ -11,9 +11,10 @@
     Sectors 0-4 are 1024 bytes, sector 5 is 512 bytes
 
 *********************************************************************/
+#ifndef MAME_FORMATS_ESQ8_DSK_H
+#define MAME_FORMATS_ESQ8_DSK_H
 
-#ifndef ESQ8_DSK_H_
-#define ESQ8_DSK_H_
+#pragma once
 
 #include "flopimg.h"
 
@@ -39,4 +40,4 @@ private:
 
 extern const floppy_format_type FLOPPY_ESQ8IMG_FORMAT;
 
-#endif /* ESQ8_DSK_H_ */
+#endif // MAME_FORMATS_ESQ8_DSK_H

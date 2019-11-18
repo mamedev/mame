@@ -5,12 +5,13 @@
 
 #define SADDR 0xcc000
 
-MACHINE_CONFIG_START(el2_3c503_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("dp8390d", DP8390D, 0)
-	MCFG_DP8390D_IRQ_CB(WRITELINE(el2_3c503_device, el2_3c503_irq_w))
-	MCFG_DP8390D_MEM_READ_CB(READ8(el2_3c503_device, el2_3c503_mem_read))
-	MCFG_DP8390D_MEM_WRITE_CB(WRITE8(el2_3c503_device, el2_3c503_mem_write))
-MACHINE_CONFIG_END
+void el2_3c503_device::device_add_mconfig(machine_config &config)
+{
+	DP8390D(config, m_dp8390, 0);
+	m_dp8390->irq_callback().set(FUNC(el2_3c503_device::el2_3c503_irq_w));
+	m_dp8390->mem_read_callback().set(FUNC(el2_3c503_device::el2_3c503_mem_r));
+	m_dp8390->mem_write_callback().set(FUNC(el2_3c503_device::el2_3c503_mem_w));
+}
 
 DEFINE_DEVICE_TYPE(EL2_3C503, el2_3c503_device, "el2_3c503", "3C503 Network Adapter")
 
@@ -31,8 +32,8 @@ void el2_3c503_device::device_start() {
 	memset(m_rom, 0, 8*1024); // empty
 	m_dp8390->set_mac(mac);
 	set_isa_device();
-	m_isa->install_device(0x0300, 0x030f, read8_delegate(FUNC(el2_3c503_device::el2_3c503_loport_r), this), write8_delegate(FUNC(el2_3c503_device::el2_3c503_loport_w), this));
-	m_isa->install_device(0x0700, 0x070f, read8_delegate(FUNC(el2_3c503_device::el2_3c503_hiport_r), this), write8_delegate(FUNC(el2_3c503_device::el2_3c503_hiport_w), this));
+	m_isa->install_device(0x0300, 0x030f, read8_delegate(*this, FUNC(el2_3c503_device::el2_3c503_loport_r)), write8_delegate(*this, FUNC(el2_3c503_device::el2_3c503_loport_w)));
+	m_isa->install_device(0x0700, 0x070f, read8_delegate(*this, FUNC(el2_3c503_device::el2_3c503_hiport_r)), write8_delegate(*this, FUNC(el2_3c503_device::el2_3c503_hiport_w)));
 
 	// TODO: This is wrong, fix if anything actually uses it
 	//  DMA can change in runtime
@@ -168,10 +169,10 @@ READ8_MEMBER(el2_3c503_device::el2_3c503_hiport_r) {
 		return (m_regs.vptr & 0x0f) << 4;
 	case 14:
 		if(!(m_regs.ctrl & 0x80)) return 0xff;
-		return el2_3c503_mem_read(space, m_regs.da++, mem_mask);
+		return el2_3c503_mem_r(space, machine().side_effects_disabled() ? m_regs.da : m_regs.da++, mem_mask);
 	case 15:
 		if(!(m_regs.ctrl & 0x80)) return 0xff;
-		return el2_3c503_mem_read(space, m_regs.da++, mem_mask);
+		return el2_3c503_mem_r(space, machine().side_effects_disabled() ? m_regs.da : m_regs.da++, mem_mask);
 	}
 	return 0;
 }
@@ -267,11 +268,11 @@ WRITE8_MEMBER(el2_3c503_device::el2_3c503_hiport_w) {
 		return;
 	case 14:
 		if(!(m_regs.ctrl & 0x80)) return;
-		el2_3c503_mem_write(space, m_regs.da++, data, mem_mask);
+		el2_3c503_mem_w(space, m_regs.da++, data, mem_mask);
 		return;
 	case 15:
 		if(!(m_regs.ctrl & 0x80)) return;
-		el2_3c503_mem_write(space, m_regs.da++, data, mem_mask);
+		el2_3c503_mem_w(space, m_regs.da++, data, mem_mask);
 		return;
 	default:
 		logerror("3c503: invalid high register write %02x\n", offset);
@@ -281,14 +282,6 @@ WRITE8_MEMBER(el2_3c503_device::el2_3c503_hiport_w) {
 WRITE_LINE_MEMBER(el2_3c503_device::el2_3c503_irq_w) {
 	m_irq_state = state;
 	if(!(m_regs.gacfr & 0x80)) set_irq(state);
-}
-
-READ8_MEMBER(el2_3c503_device::el2_3c503_mem_read) {
-	return el2_3c503_mem_read(offset);
-}
-
-WRITE8_MEMBER(el2_3c503_device::el2_3c503_mem_write) {
-	el2_3c503_mem_write(offset, data);
 }
 
 uint8_t el2_3c503_device::el2_3c503_mem_read(offs_t offset) {

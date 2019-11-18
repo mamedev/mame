@@ -7,19 +7,6 @@
 
 #pragma once
 
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_C140_ADD(tag, clock) \
-	MCFG_DEVICE_ADD((tag), C140, (clock))
-
-#define MCFG_C140_REPLACE(tag, clock) \
-	MCFG_DEVICE_REPLACE((tag), C140, (clock))
-
-#define MCFG_C140_BANK_TYPE(type) \
-	downcast<c140_device &>(*device).set_bank_type((c140_device::C140_TYPE::type));
-
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -29,7 +16,8 @@
 // ======================> c140_device
 
 class c140_device : public device_t,
-					public device_sound_interface
+	public device_sound_interface,
+	public device_rom_interface
 {
 public:
 	enum class C140_TYPE
@@ -43,15 +31,17 @@ public:
 
 	// configuration
 	void set_bank_type(C140_TYPE bank) { m_banking_type = bank; }
+	auto int1_callback() { return m_int1_callback.bind(); }
 
-	DECLARE_READ8_MEMBER( c140_r );
-	DECLARE_WRITE8_MEMBER( c140_w );
-
-	void set_base(void *base);
+	u8 c140_r(offs_t offset);
+	void c140_w(offs_t offset, u8 data);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_clock_changed() override;
+
+	virtual void rom_bank_updated() override;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
@@ -85,6 +75,10 @@ private:
 	void init_voice( C140_VOICE *v );
 	long find_sample(long adrs, long bank, int voice);
 
+	TIMER_CALLBACK_MEMBER(int1_on);
+
+	devcb_write_line m_int1_callback;
+
 	int m_sample_rate;
 	sound_stream *m_stream;
 	C140_TYPE m_banking_type;
@@ -93,13 +87,13 @@ private:
 	std::unique_ptr<int16_t[]> m_mixer_buffer_right;
 
 	int m_baserate;
-	optional_region_ptr<int8_t> m_rom_ptr;
-	int8_t *m_pRom;
 	uint8_t m_REG[0x200];
 
 	int16_t m_pcmtbl[8];        //2000.06.26 CAB
 
 	C140_VOICE m_voi[MAX_VOICE];
+
+	emu_timer *m_int1_timer;
 };
 
 DECLARE_DEVICE_TYPE(C140, c140_device)

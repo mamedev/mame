@@ -23,6 +23,9 @@ public:
 	{
 	}
 
+	void mpu4plasma(machine_config &config);
+
+private:
 	required_shared_ptr<uint16_t> m_plasmaram;
 
 	DECLARE_READ16_MEMBER( mpu4plasma_unk_r )
@@ -34,7 +37,6 @@ public:
 	{
 	}
 	uint32_t screen_update_mpu4plasma(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void mpu4plasma(machine_config &config);
 	void mpu4plasma_map(address_map &map);
 };
 
@@ -47,8 +49,8 @@ void mpu4plasma_state::mpu4plasma_map(address_map &map)
 	// why does it test this much ram, just sloppy code expecting mirroring?
 	map(0x400000, 0x4fffff).ram().share("plasmaram");
 	// comms?
-	map(0xffff00, 0xffff01).r(this, FUNC(mpu4plasma_state::mpu4plasma_unk_r));
-	map(0xffff04, 0xffff05).w(this, FUNC(mpu4plasma_state::mpu4plasma_unk_w));
+	map(0xffff00, 0xffff01).r(FUNC(mpu4plasma_state::mpu4plasma_unk_r));
+	map(0xffff04, 0xffff05).w(FUNC(mpu4plasma_state::mpu4plasma_unk_w));
 }
 
 uint32_t mpu4plasma_state::screen_update_mpu4plasma(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -86,22 +88,23 @@ uint32_t mpu4plasma_state::screen_update_mpu4plasma(screen_device &screen, bitma
 }
 
 
-MACHINE_CONFIG_START(mpu4plasma_state::mpu4plasma)
+void mpu4plasma_state::mpu4plasma(machine_config &config)
+{
 	mod2(config);
-	MCFG_CPU_ADD("plasmacpu", M68000, 10000000)
-	MCFG_CPU_PROGRAM_MAP(mpu4plasma_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mpu4plasma_state,  irq4_line_hold)
+	m68000_device &plasmacpu(M68000(config, "plasmacpu", 10000000));
+	plasmacpu.set_addrmap(AS_PROGRAM, &mpu4plasma_state::mpu4plasma_map);
+	plasmacpu.set_vblank_int("screen", FUNC(mpu4plasma_state::irq4_line_hold));
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 128-1, 0*8, 40-1)
-	MCFG_SCREEN_UPDATE_DRIVER(mpu4plasma_state, screen_update_mpu4plasma)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0, 128-1, 0*8, 40-1);
+	screen.set_screen_update(FUNC(mpu4plasma_state::screen_update_mpu4plasma));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 0x200)
-MACHINE_CONFIG_END
+	PALETTE(config, m_palette).set_entries(0x200);
+}
 
 // plasma v0.1
 #define M4BIGCHF_PLASMA \
@@ -196,14 +199,14 @@ ROM_END
 
 #define GAME_FLAGS (MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL)
 
-GAMEL(199?, m4bigchf    ,0          ,mpu4plasma     ,mpu4               , mpu4plasma_state,m4default          ,ROT0,   "Barcrest","Big Chief (Barcrest) (MPU4 w/ Plasma DMD) (set 1)",            GAME_FLAGS|MACHINE_NO_SOUND,layout_mpu4plasma )
-GAMEL(199?, m4bigchfa   ,m4bigchf   ,mpu4plasma     ,mpu4               , mpu4plasma_state,m4default          ,ROT0,   "Barcrest","Big Chief (Barcrest) (MPU4 w/ Plasma DMD) (set 2)",            GAME_FLAGS|MACHINE_NO_SOUND,layout_mpu4plasma )
-GAMEL(199?, m4bigchfb   ,m4bigchf   ,mpu4plasma     ,mpu4               , mpu4plasma_state,m4default          ,ROT0,   "Barcrest","Big Chief (Barcrest) (MPU4 w/ Plasma DMD) (set 3)",            GAME_FLAGS|MACHINE_NO_SOUND,layout_mpu4plasma )
-GAMEL(199?, m4bigchfc   ,m4bigchf   ,mpu4plasma     ,mpu4               , mpu4plasma_state,m4default          ,ROT0,   "Barcrest","Big Chief (Barcrest) (MPU4 w/ Plasma DMD) (set 4)",            GAME_FLAGS|MACHINE_NO_SOUND,layout_mpu4plasma )
+GAMEL(199?, m4bigchf,  0,        mpu4plasma, mpu4, mpu4plasma_state, init_m4default, ROT0, "Barcrest","Big Chief (Barcrest) (MPU4 w/ Plasma DMD) (set 1)",            GAME_FLAGS|MACHINE_NO_SOUND,layout_mpu4plasma )
+GAMEL(199?, m4bigchfa, m4bigchf, mpu4plasma, mpu4, mpu4plasma_state, init_m4default, ROT0, "Barcrest","Big Chief (Barcrest) (MPU4 w/ Plasma DMD) (set 2)",            GAME_FLAGS|MACHINE_NO_SOUND,layout_mpu4plasma )
+GAMEL(199?, m4bigchfb, m4bigchf, mpu4plasma, mpu4, mpu4plasma_state, init_m4default, ROT0, "Barcrest","Big Chief (Barcrest) (MPU4 w/ Plasma DMD) (set 3)",            GAME_FLAGS|MACHINE_NO_SOUND,layout_mpu4plasma )
+GAMEL(199?, m4bigchfc, m4bigchf, mpu4plasma, mpu4, mpu4plasma_state, init_m4default, ROT0, "Barcrest","Big Chief (Barcrest) (MPU4 w/ Plasma DMD) (set 4)",            GAME_FLAGS|MACHINE_NO_SOUND,layout_mpu4plasma )
 
-GAMEL(199?, m4click     ,0          ,mpu4plasma     ,mpu4               , mpu4plasma_state,m4default          ,ROT0,   "Barcrest","Clickity Click (Barcrest) (MPU4 w/ Plasma DMD)",               GAME_FLAGS|MACHINE_NO_SOUND,layout_mpu4plasma )
+GAMEL(199?, m4click,   0,        mpu4plasma, mpu4, mpu4plasma_state, init_m4default, ROT0, "Barcrest","Clickity Click (Barcrest) (MPU4 w/ Plasma DMD)",               GAME_FLAGS|MACHINE_NO_SOUND,layout_mpu4plasma )
 
 // not confirmed to be plasma, is this an alt version of big chief? maybe it uses the same plasma roms?
-GAMEL(199?, m4apach     ,0          ,mpu4plasma     ,mpu4               , mpu4plasma_state,m4default          ,ROT0,   "Barcrest","Apache (Barcrest) (MPU4 w/ Plasma DMD?)",                      GAME_FLAGS|MACHINE_NO_SOUND,layout_mpu4plasma )
+GAMEL(199?, m4apach,   0,        mpu4plasma, mpu4, mpu4plasma_state, init_m4default, ROT0, "Barcrest","Apache (Barcrest) (MPU4 w/ Plasma DMD?)",                      GAME_FLAGS|MACHINE_NO_SOUND,layout_mpu4plasma )
 // not confirmed to be plasma, but acts like it
-GAMEL(199?, m4elite     ,0          ,mpu4plasma     ,mpu4               , mpu4plasma_state,m4default          ,ROT0,   "Barcrest","Elite (Barcrest) (MPU4 w/ Plasma DMD?)",                       GAME_FLAGS|MACHINE_NO_SOUND,layout_mpu4plasma )
+GAMEL(199?, m4elite,   0,        mpu4plasma, mpu4, mpu4plasma_state, init_m4default, ROT0, "Barcrest","Elite (Barcrest) (MPU4 w/ Plasma DMD?)",                       GAME_FLAGS|MACHINE_NO_SOUND,layout_mpu4plasma )

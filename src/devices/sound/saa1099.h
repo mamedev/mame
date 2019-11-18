@@ -10,19 +10,8 @@
 #pragma once
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_SAA1099_ADD(_tag, _clock) \
-	MCFG_DEVICE_ADD(_tag, SAA1099, _clock)
-#define MCFG_SAA1099_REPLACE(_tag, _clock) \
-	MCFG_DEVICE_REPLACE(_tag, SAA1099, _clock)
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
-
 
 // ======================> saa1099_device
 
@@ -32,14 +21,15 @@ class saa1099_device : public device_t,
 public:
 	saa1099_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER( control_w );
-	DECLARE_WRITE8_MEMBER( data_w );
+	void control_w(u8 data);
+	void data_w(u8 data);
 
-	DECLARE_WRITE8_MEMBER( write );
+	void write(offs_t offset, u8 data);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_clock_changed() override;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;

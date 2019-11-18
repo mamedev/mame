@@ -203,7 +203,9 @@
 #include "machine/esqvfd.h"
 
 #include "machine/68340.h"
+#include "machine/68340ser.h"
 #include "sound/es5506.h"
+#include "machine/esqpanel.h"
 
 #include "speaker.h"
 
@@ -214,19 +216,24 @@ public:
 	esqmr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_sq1vfd(*this, "sq1vfd")
+		, m_panel(*this, "sq1vfd")
 	{ }
 
+	void mr(machine_config &config);
+
+	void init_mr();
+
+private:
 	required_device<m68340_cpu_device> m_maincpu;
-	required_device<esq2x40_sq1_device> m_sq1vfd;
+	required_device<esqpanel2x40_vfx_device> m_panel;
 
 	virtual void machine_reset() override;
 
-public:
-	DECLARE_DRIVER_INIT(mr);
 	DECLARE_WRITE_LINE_MEMBER(esq5506_otto_irq);
 	DECLARE_READ16_MEMBER(esq5506_read_adc);
-	void mr(machine_config &config);
+	DECLARE_WRITE_LINE_MEMBER(duart_tx_a);
+	DECLARE_WRITE_LINE_MEMBER(duart_tx_b);
+
 	void mr_map(address_map &map);
 };
 
@@ -237,9 +244,20 @@ void esqmr_state::machine_reset()
 void esqmr_state::mr_map(address_map &map)
 {
 	map(0x00000000, 0x000fffff).rom().region("maincpu", 0);
-//  AM_RANGE(0x200000, 0x20003f) AM_DEVREADWRITE8("ensoniq", es5506_device, read, write, 0xffffffff)
-//  AM_RANGE(0x240000, 0x24003f) AM_DEVREADWRITE8("ensoniq2", es5506_device, read, write, 0xffffffff)
-//    AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("osram")
+	map(0x00300000, 0x0037ffff).rom().region("maincpu", 0x80000);   // MR-61 needs this
+	map(0x00c00000, 0x00c7ffff).ram();
+	map(0x00dc0000, 0x00dc003f).rw("ensoniq", FUNC(es5506_device::read), FUNC(es5506_device::write));
+	map(0x00de0000, 0x00de003f).rw("ensoniq2", FUNC(es5506_device::read), FUNC(es5506_device::write));
+}
+
+WRITE_LINE_MEMBER(esqmr_state::duart_tx_a)
+{
+	//m_mdout->write_txd(state);
+}
+
+WRITE_LINE_MEMBER(esqmr_state::duart_tx_b)
+{
+	m_panel->rx_w(state);
 }
 
 WRITE_LINE_MEMBER(esqmr_state::esq5506_otto_irq)
@@ -251,32 +269,42 @@ READ16_MEMBER(esqmr_state::esq5506_read_adc)
 	return 0;
 }
 
-MACHINE_CONFIG_START(esqmr_state::mr)
-	MCFG_CPU_ADD("maincpu", M68340, XTAL(16'000'000))
-	MCFG_CPU_PROGRAM_MAP(mr_map)
+void esqmr_state::mr(machine_config &config)
+{
+	M68340(config, m_maincpu, XTAL(16'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &esqmr_state::mr_map);
 
-	MCFG_ESQ2X40_SQ1_ADD("sq1vfd")
+	mc68340_serial_module_device &duart(*m_maincpu->subdevice<mc68340_serial_module_device>("serial"));
+	duart.set_clocks(500000, 500000, 1000000, 1000000);
+	duart.a_tx_cb().set(FUNC(esqmr_state::duart_tx_a));
+	duart.b_tx_cb().set(FUNC(esqmr_state::duart_tx_b));
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("ensoniq", ES5506, XTAL(16'000'000))
-	MCFG_ES5506_REGION0("waverom")  /* Bank 0 */
-	MCFG_ES5506_REGION1("waverom2") /* Bank 1 */
-	MCFG_ES5506_REGION2("waverom3") /* Bank 0 */
-	MCFG_ES5506_REGION3("waverom4") /* Bank 1 */
-	MCFG_ES5506_CHANNELS(1)          /* channels */
-	MCFG_ES5506_IRQ_CB(WRITELINE(esqmr_state, esq5506_otto_irq)) /* irq */
-	MCFG_ES5506_READ_PORT_CB(READ16(esqmr_state, esq5506_read_adc))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.5)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.5)
-	MCFG_SOUND_ADD("ensoniq2", ES5506, XTAL(16'000'000))
-	MCFG_ES5506_REGION0("waverom")  /* Bank 0 */
-	MCFG_ES5506_REGION1("waverom2") /* Bank 1 */
-	MCFG_ES5506_REGION2("waverom3") /* Bank 0 */
-	MCFG_ES5506_REGION3("waverom4") /* Bank 1 */
-	MCFG_ES5506_CHANNELS(1)          /* channels */
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.5)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.5)
-MACHINE_CONFIG_END
+	ESQPANEL2X40_VFX(config, m_panel);
+	m_panel->write_tx().set(duart, FUNC(mc68340_serial_module_device::rx_b_w));
+
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
+	es5506_device &ensoniq(ES5506(config, "ensoniq", XTAL(16'000'000)));
+	ensoniq.set_region0("waverom");  /* Bank 0 */
+	ensoniq.set_region1("waverom2"); /* Bank 1 */
+	ensoniq.set_region2("waverom3"); /* Bank 0 */
+	ensoniq.set_region3("waverom4"); /* Bank 1 */
+	ensoniq.set_channels(1);
+	ensoniq.irq_cb().set(FUNC(esqmr_state::esq5506_otto_irq)); /* irq */
+	ensoniq.read_port_cb().set(FUNC(esqmr_state::esq5506_read_adc));
+	ensoniq.add_route(0, "lspeaker", 0.5);
+	ensoniq.add_route(1, "rspeaker", 0.5);
+
+	es5506_device &ensoniq2(ES5506(config, "ensoniq2", XTAL(16'000'000)));
+	ensoniq2.set_region0("waverom");  /* Bank 0 */
+	ensoniq2.set_region1("waverom2"); /* Bank 1 */
+	ensoniq2.set_region2("waverom3"); /* Bank 0 */
+	ensoniq2.set_region3("waverom4"); /* Bank 1 */
+	ensoniq2.set_channels(1);
+	ensoniq2.add_route(0, "lspeaker", 0.5);
+	ensoniq2.add_route(1, "rspeaker", 0.5);
+}
 
 static INPUT_PORTS_START( mr )
 INPUT_PORTS_END
@@ -317,9 +345,9 @@ ROM_START( mrrack )
 	ROM_REGION(0x200000, "waverom4", ROMREGION_ERASE00)
 ROM_END
 
-DRIVER_INIT_MEMBER(esqmr_state, mr)
+void esqmr_state::init_mr()
 {
 }
 
-CONS( 1996, mr61,   0, 0, mr, mr, esqmr_state, mr, "Ensoniq", "MR-61 Workstation", MACHINE_NOT_WORKING )
-CONS( 1996, mrrack, 0, 0, mr, mr, esqmr_state, mr, "Ensoniq", "MR-Rack", MACHINE_NOT_WORKING )
+CONS( 1996, mr61,   0, 0, mr, mr, esqmr_state, init_mr, "Ensoniq", "MR-61 Workstation", MACHINE_NOT_WORKING )
+CONS( 1996, mrrack, 0, 0, mr, mr, esqmr_state, init_mr, "Ensoniq", "MR-Rack",           MACHINE_NOT_WORKING )

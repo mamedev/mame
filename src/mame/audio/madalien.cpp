@@ -126,7 +126,7 @@ static const discrete_mixer_desc madalien_final_mix =
 	32768.0/DEFAULT_TTL_V_LOGIC_1   // final gain
 };
 
-DISCRETE_SOUND_START( madalien )
+DISCRETE_SOUND_START( madalien_discrete )
 	/************************************************
 	 * Input register mapping
 	 ************************************************/

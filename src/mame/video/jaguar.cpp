@@ -137,8 +137,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "machine/atarigen.h"
-#include "cpu/mips/r3000.h"
+#include "cpu/mips/mips1.h"
 #include "cpu/m68000/m68000.h"
 #include "includes/jaguar.h"
 #include "jagblit.h"
@@ -204,8 +203,8 @@ inline void jaguar_state::get_crosshair_xy(int player, int &x, int &y)
 	const rectangle &visarea = m_screen->visible_area();
 
 	/* only 2 lightguns are connected */
-	x = visarea.min_x + (((ioport(player ? "FAKE2_X" : "FAKE1_X")->read() & 0xff) * visarea.width()) >> 8);
-	y = visarea.min_y + (((ioport(player ? "FAKE2_Y" : "FAKE1_Y")->read() & 0xff) * visarea.height()) >> 8);
+	x = visarea.left() + (((ioport(player ? "FAKE2_X" : "FAKE1_X")->read() & 0xff) * visarea.width()) >> 8);
+	y = visarea.top() + (((ioport(player ? "FAKE2_Y" : "FAKE1_Y")->read() & 0xff) * visarea.height()) >> 8);
 }
 
 
@@ -270,9 +269,9 @@ inline bool jaguar_state::adjust_object_timer(int vc)
 void jaguar_state::update_cpu_irq()
 {
 	if ((m_cpu_irq_state & m_gpu_regs[INT1] & 0x1f) != 0)
-		m_maincpu->set_input_line(m_is_r3000 ? R3000_IRQ4 : M68K_IRQ_6, ASSERT_LINE);
+		m_maincpu->set_input_line(m_is_r3000 ? INPUT_LINE_IRQ4 : M68K_IRQ_6, ASSERT_LINE);
 	else
-		m_maincpu->set_input_line(m_is_r3000 ? R3000_IRQ4 : M68K_IRQ_6, CLEAR_LINE);
+		m_maincpu->set_input_line(m_is_r3000 ? INPUT_LINE_IRQ4 : M68K_IRQ_6, CLEAR_LINE);
 }
 
 
@@ -296,13 +295,14 @@ WRITE_LINE_MEMBER( jaguar_state::dsp_cpu_int )
  *
  *************************************/
 
-void jaguar_state::set_palette(uint16_t vmode)
+void jaguar_state::jagpal_ycc(palette_device &palette) const
 {
+	// construct YCC Color lookup
 	static const uint8_t red_lookup[256] =
 	{
-			0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-			34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 19,  0,
-			68, 68, 68, 68, 68, 68, 68, 68, 68, 68, 68, 68, 64, 43, 21,  0,
+		  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+		 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 19,  0,
+		 68, 68, 68, 68, 68, 68, 68, 68, 68, 68, 68, 68, 64, 43, 21,  0,
 		102,102,102,102,102,102,102,102,102,102,102, 95, 71, 47, 23,  0,
 		135,135,135,135,135,135,135,135,135,135,130,104, 78, 52, 26,  0,
 		169,169,169,169,169,169,169,169,169,170,141,113, 85, 56, 28,  0,
@@ -320,22 +320,22 @@ void jaguar_state::set_palette(uint16_t vmode)
 
 	static const uint8_t grn_lookup[256] =
 	{
-			0, 17, 34, 51, 68, 85,102,119,136,153,170,187,204,221,238,255,
-			0, 19, 38, 57, 77, 96,115,134,154,173,182,211,231,250,255,255,
-			0, 21, 43, 64, 86,107,129,150,172,193,215,236,255,255,255,255,
-			0, 23, 47, 71, 96,119,142,166,190,214,238,255,255,255,255,255,
-			0, 26, 52, 78,104,130,156,182,208,234,255,255,255,255,255,255,
-			0, 28, 56, 85,113,141,170,198,226,255,255,255,255,255,255,255,
-			0, 30, 61, 91,122,153,183,214,244,255,255,255,255,255,255,255,
-			0, 32, 65, 98,131,164,197,230,255,255,255,255,255,255,255,255,
-			0, 32, 65, 98,131,164,197,230,255,255,255,255,255,255,255,255,
-			0, 30, 61, 91,122,153,183,214,244,255,255,255,255,255,255,255,
-			0, 28, 56, 85,113,141,170,198,226,255,255,255,255,255,255,255,
-			0, 26, 52, 78,104,130,156,182,208,234,255,255,255,255,255,255,
-			0, 23, 47, 71, 96,119,142,166,190,214,238,255,255,255,255,255,
-			0, 21, 43, 64, 86,107,129,150,172,193,215,236,255,255,255,255,
-			0, 19, 38, 57, 77, 96,115,134,154,173,182,211,231,250,255,255,
-			0, 17, 34, 51, 68, 85,102,119,136,153,170,187,204,221,238,255
+		  0, 17, 34, 51, 68, 85,102,119,136,153,170,187,204,221,238,255,
+		  0, 19, 38, 57, 77, 96,115,134,154,173,182,211,231,250,255,255,
+		  0, 21, 43, 64, 86,107,129,150,172,193,215,236,255,255,255,255,
+		  0, 23, 47, 71, 96,119,142,166,190,214,238,255,255,255,255,255,
+		  0, 26, 52, 78,104,130,156,182,208,234,255,255,255,255,255,255,
+		  0, 28, 56, 85,113,141,170,198,226,255,255,255,255,255,255,255,
+		  0, 30, 61, 91,122,153,183,214,244,255,255,255,255,255,255,255,
+		  0, 32, 65, 98,131,164,197,230,255,255,255,255,255,255,255,255,
+		  0, 32, 65, 98,131,164,197,230,255,255,255,255,255,255,255,255,
+		  0, 30, 61, 91,122,153,183,214,244,255,255,255,255,255,255,255,
+		  0, 28, 56, 85,113,141,170,198,226,255,255,255,255,255,255,255,
+		  0, 26, 52, 78,104,130,156,182,208,234,255,255,255,255,255,255,
+		  0, 23, 47, 71, 96,119,142,166,190,214,238,255,255,255,255,255,
+		  0, 21, 43, 64, 86,107,129,150,172,193,215,236,255,255,255,255,
+		  0, 19, 38, 57, 77, 96,115,134,154,173,182,211,231,250,255,255,
+		  0, 17, 34, 51, 68, 85,102,119,136,153,170,187,204,221,238,255
 	};
 
 	static const uint8_t blu_lookup[256] =
@@ -353,11 +353,22 @@ void jaguar_state::set_palette(uint16_t vmode)
 		169,169,169,169,169,169,169,169,169,170,141,113, 85, 56, 28,  0,
 		135,135,135,135,135,135,135,135,135,135,130,104, 78, 52, 26,  0,
 		102,102,102,102,102,102,102,102,102,102,102, 95, 71, 47, 23,  0,
-			68, 68, 68, 68, 68, 68, 68, 68, 68, 68, 68, 68, 64, 43, 21,  0,
-			34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 19,  0,
-			0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0
+		 68, 68, 68, 68, 68, 68, 68, 68, 68, 68, 68, 68, 64, 43, 21,  0,
+		 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 34, 19,  0,
+		  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0
 	};
 
+	for (int i = 0; i < 65536; i++)
+	{
+		const u8 r = (red_lookup[i >> 8] * (i & 0xff)) / 0xff;
+		const u8 g = (grn_lookup[i >> 8] * (i & 0xff)) / 0xff;
+		const u8 b = (blu_lookup[i >> 8] * (i & 0xff)) / 0xff;
+		palette.set_pen_color(i, rgb_t(r, g, b));
+	}
+}
+
+void jaguar_state::set_palette(uint16_t vmode)
+{
 	int i;
 
 	/* switch off the mode */
@@ -368,33 +379,18 @@ void jaguar_state::set_palette(uint16_t vmode)
 		/* RGB24 */
 		case 0x002:
 			for (i = 0; i < 65536; i++)
-			{
-				uint8_t r = (red_lookup[i >> 8] * (i & 0xff)) >> 8;
-				uint8_t g = (grn_lookup[i >> 8] * (i & 0xff)) >> 8;
-				uint8_t b = (blu_lookup[i >> 8] * (i & 0xff)) >> 8;
-				m_pen_table[i] = rgb_t(r, g, b);
-			}
+				m_pen_table[i] = m_palette->pen(i);
 			break;
 
 		/* YCC VARMOD */
 		case 0x100:
 			for (i = 0; i < 65536; i++)
 			{
-				uint8_t r = (red_lookup[i >> 8] * (i & 0xff)) >> 8;
-				uint8_t g = (grn_lookup[i >> 8] * (i & 0xff)) >> 8;
-				uint8_t b = (blu_lookup[i >> 8] * (i & 0xff)) >> 8;
-
 				/* if the low bit is set, treat it as 5-5-5 RGB instead */
 				if (i & 1)
-				{
-					r = (i >> 11) & 31;
-					g = (i >> 1) & 31;
-					b = (i >> 6) & 31;
-					r = (r << 3) | (r >> 2);
-					g = (g << 3) | (g >> 2);
-					b = (b << 3) | (b >> 2);
-				}
-				m_pen_table[i] = rgb_t(r, g, b);
+					m_pen_table[i] = rgb_t(pal5bit(i >> 11), pal5bit(i >> 1), pal5bit(i >> 6));
+				else
+					m_pen_table[i] = m_palette->pen((i & ~0xff) | pal7bit(i >> 1));
 			}
 			break;
 
@@ -515,9 +511,9 @@ if (++reps % 100 == 99)
 {
 	osd_printf_debug("---\nBlitter stats:\n");
 	for (i = 0; i < blitter_count; i++)
-		osd_printf_debug("  CMD=%08X A1=%08X A2=%08X %6d times, %08X%08X pixels\n",
+		osd_printf_debug("  CMD=%08X A1=%08X A2=%08X %6d times, %016X pixels\n",
 				blitter_stats[i][0], blitter_stats[i][1], blitter_stats[i][2],
-				blitter_stats[i][3], (uint32_t)(blitter_pixels[i] >> 32), (uint32_t)(blitter_pixels[i]));
+				blitter_stats[i][3], blitter_pixels[i]);
 	osd_printf_debug("---\n");
 }
 }
@@ -548,7 +544,7 @@ WRITE32_MEMBER( jaguar_state::blitter_w )
 		m_blitter_status = 0;
 		int inner_count = m_blitter_regs[B_COUNT] & 0xffff;
 		int outer_count = m_blitter_regs[B_COUNT] >> 16;
-		timer_set(attotime::from_ticks(inner_count * outer_count, JAGUAR_CLOCK), TID_BLITTER_DONE);
+		timer_set(attotime::from_ticks(inner_count * outer_count, m_gpu->clock()), TID_BLITTER_DONE);
 		blitter_run();
 	}
 
@@ -612,7 +608,7 @@ WRITE16_MEMBER( jaguar_state::tom_regs_w )
 			case PIT1:
 				if (m_gpu_regs[PIT0] && m_gpu_regs[PIT0] != 0xffff) //FIXME: avoid too much small timers for now
 				{
-					sample_period = attotime::from_ticks((1+m_gpu_regs[PIT0]) * (1+m_gpu_regs[PIT1]), JAGUAR_CLOCK/2);
+					sample_period = attotime::from_ticks((1+m_gpu_regs[PIT0]) * (1+m_gpu_regs[PIT1]), m_gpu->clock()/2);
 					timer_set(sample_period, TID_PIT);
 				}
 				break;
@@ -725,7 +721,7 @@ void jaguar_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 			}
 			if (m_gpu_regs[PIT0] != 0)
 			{
-				attotime sample_period = attotime::from_ticks((1+m_gpu_regs[PIT0]) * (1+m_gpu_regs[PIT1]), JAGUAR_CLOCK/2);
+				attotime sample_period = attotime::from_ticks((1+m_gpu_regs[PIT0]) * (1+m_gpu_regs[PIT1]), m_gpu->clock()/2);
 				timer_set(sample_period, TID_PIT);
 			}
 			break;
@@ -752,7 +748,7 @@ void jaguar_state::scanline_update(int param)
 	if ((m_gpu_regs[VMODE] & 1) && vc >= (m_gpu_regs[VDB] & 0x7ff))
 	{
 		uint32_t *dest = &m_screen_bitmap.pix32(vc >> 1);
-		int maxx = visarea.max_x;
+		int maxx = visarea.right();
 		int hde = effective_hvalue(m_gpu_regs[HDE]) >> 1;
 		uint16_t x,scanline[760];
 		uint8_t y,pixel_width = ((m_gpu_regs[VMODE]>>10)&3)+1;
@@ -761,7 +757,7 @@ void jaguar_state::scanline_update(int param)
 		if (ENABLE_BORDERS && vc % 2 == 0)
 		{
 			rgb_t border = rgb_t(m_gpu_regs[BORD1] & 0xff, m_gpu_regs[BORD1] >> 8, m_gpu_regs[BORD2] & 0xff);
-			for (x = visarea.min_x; x <= visarea.max_x; x++)
+			for (x = visarea.left(); x <= visarea.right(); x++)
 				dest[x] = border;
 		}
 

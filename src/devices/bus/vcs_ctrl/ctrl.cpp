@@ -28,7 +28,7 @@ DEFINE_DEVICE_TYPE(VCS_CONTROL_PORT, vcs_control_port_device, "vcs_control_port"
 //-------------------------------------------------
 
 device_vcs_control_port_interface::device_vcs_control_port_interface(const machine_config &mconfig, device_t &device) :
-	device_slot_card_interface(mconfig, device)
+	device_interface(device, "vcsctrl")
 {
 	m_port = dynamic_cast<vcs_control_port_device *>(device.owner());
 }
@@ -71,14 +71,17 @@ void vcs_control_port_device::device_start()
 #include "joystick.h"
 #include "keypad.h"
 #include "lightpen.h"
+#include "mouse.h"
 #include "paddles.h"
 #include "wheel.h"
 
-SLOT_INTERFACE_START( vcs_control_port_devices )
-	SLOT_INTERFACE("joy", VCS_JOYSTICK)
-	SLOT_INTERFACE("pad", VCS_PADDLES)
-	SLOT_INTERFACE("lp", VCS_LIGHTPEN)
-	SLOT_INTERFACE("joybstr", VCS_JOYSTICK_BOOSTER)
-	SLOT_INTERFACE("wheel", VCS_WHEEL)
-	SLOT_INTERFACE("keypad", VCS_KEYPAD)
-SLOT_INTERFACE_END
+void vcs_control_port_devices(device_slot_interface &device)
+{
+	device.option_add("joy", VCS_JOYSTICK);
+	device.option_add("pad", VCS_PADDLES);
+	device.option_add("mouse", VCS_MOUSE);
+	device.option_add("lp", VCS_LIGHTPEN);
+	device.option_add("joybstr", VCS_JOYSTICK_BOOSTER);
+	device.option_add("wheel", VCS_WHEEL);
+	device.option_add("keypad", VCS_KEYPAD);
+}

@@ -10,7 +10,9 @@
 
 #pragma once
 
+#include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class cloak_state : public driver_device
 {

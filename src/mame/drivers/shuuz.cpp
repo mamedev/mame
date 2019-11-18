@@ -26,6 +26,7 @@
 #include "machine/eeprompar.h"
 #include "machine/watchdog.h"
 #include "sound/okim6295.h"
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -116,12 +117,12 @@ void shuuz_state::main_map(address_map &map)
 	map(0x100000, 0x100fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 	map(0x101000, 0x101fff).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
 	map(0x102000, 0x102001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
-	map(0x103000, 0x103003).r(this, FUNC(shuuz_state::leta_r));
-	map(0x105000, 0x105001).rw(this, FUNC(shuuz_state::special_port0_r), FUNC(shuuz_state::latch_w));
+	map(0x103000, 0x103003).r(FUNC(shuuz_state::leta_r));
+	map(0x105000, 0x105001).rw(FUNC(shuuz_state::special_port0_r), FUNC(shuuz_state::latch_w));
 	map(0x105002, 0x105003).portr("BUTTONS");
 	map(0x106001, 0x106001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x107000, 0x107007).noprw();
-	map(0x3e0000, 0x3e07ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x3e0000, 0x3e07ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x3effc0, 0x3effff).rw(m_vad, FUNC(atari_vad_device::control_read), FUNC(atari_vad_device::control_write));
 	map(0x3f4000, 0x3f5eff).ram().w(m_vad, FUNC(atari_vad_device::playfield_latched_msb_w)).share("vad:playfield");
 	map(0x3f5f00, 0x3f5f7f).ram().share("vad:eof");
@@ -219,7 +220,7 @@ static const gfx_layout pfmolayout =
 };
 
 
-static GFXDECODE_START( shuuz )
+static GFXDECODE_START( gfx_shuuz )
 	GFXDECODE_ENTRY( "gfx1", 0, pfmolayout,  256, 16 )      /* sprites & playfield */
 	GFXDECODE_ENTRY( "gfx2", 0, pfmolayout,    0, 16 )      /* sprites & playfield */
 GFXDECODE_END
@@ -232,40 +233,38 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(shuuz_state::shuuz)
-
+void shuuz_state::shuuz(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	M68000(config, m_maincpu, ATARI_CLOCK_14MHz/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &shuuz_state::main_map);
 
-	MCFG_EEPROM_2816_ADD("eeprom")
-	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
+	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", shuuz)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_shuuz);
+	PALETTE(config, "palette").set_format(palette_device::IRGB_1555, 1024);
 
-	MCFG_ATARI_VAD_ADD("vad", "screen", WRITELINE(shuuz_state, scanline_int_write_line))
-	MCFG_ATARI_VAD_PLAYFIELD(shuuz_state, "gfxdecode", get_playfield_tile_info)
-	MCFG_ATARI_VAD_MOB(shuuz_state::s_mob_config, "gfxdecode")
+	ATARI_VAD(config, m_vad, 0, m_screen);
+	m_vad->scanline_int_cb().set(FUNC(shuuz_state::scanline_int_write_line));
+	TILEMAP(config, "vad:playfield", m_gfxdecode, 2, 8, 8, TILEMAP_SCAN_COLS, 64, 64).set_info_callback(DEVICE_SELF_OWNER, FUNC(shuuz_state::get_playfield_tile_info));
+	ATARI_MOTION_OBJECTS(config, "vad:mob", 0, m_screen, shuuz_state::s_mob_config).set_gfxdecode(m_gfxdecode);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses a VAD chip to generate video signals */
-	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
-	MCFG_SCREEN_UPDATE_DRIVER(shuuz_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	m_screen->set_raw(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240);
+	m_screen->set_screen_update(FUNC(shuuz_state::screen_update));
+	m_screen->set_palette("palette");
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", ATARI_CLOCK_14MHz/16, PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki", ATARI_CLOCK_14MHz/16, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 
@@ -350,5 +349,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1990, shuuz,  0,     shuuz, shuuz,  shuuz_state,  0, ROT0, "Atari Games", "Shuuz (version 8.0)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, shuuz2, shuuz, shuuz, shuuz2, shuuz_state,  0, ROT0, "Atari Games", "Shuuz (version 7.1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, shuuz,  0,     shuuz, shuuz,  shuuz_state, empty_init, ROT0, "Atari Games", "Shuuz (version 8.0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, shuuz2, shuuz, shuuz, shuuz2, shuuz_state, empty_init, ROT0, "Atari Games", "Shuuz (version 7.1)", MACHINE_SUPPORTS_SAVE )

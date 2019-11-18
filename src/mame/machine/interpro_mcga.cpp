@@ -23,28 +23,28 @@
 
 void interpro_mcga_device::map(address_map &map)
 {
-	map(0x00, 0x01).rw(this, FUNC(interpro_mcga_device::reg00_r), FUNC(interpro_mcga_device::reg00_w));
-	map(0x08, 0x09).rw(this, FUNC(interpro_mcga_device::control_r), FUNC(interpro_mcga_device::control_w));
-	map(0x10, 0x11).rw(this, FUNC(interpro_mcga_device::error_r), FUNC(interpro_mcga_device::error_w));
-	map(0x18, 0x18).rw(this, FUNC(interpro_mcga_device::frcrd_r), FUNC(interpro_mcga_device::frcrd_w));
-	map(0x20, 0x20).rw(this, FUNC(interpro_mcga_device::cbsub_r), FUNC(interpro_mcga_device::cbsub_w));
-	map(0x28, 0x29).rw(this, FUNC(interpro_mcga_device::reg28_r), FUNC(interpro_mcga_device::reg28_w));
-	map(0x30, 0x31).rw(this, FUNC(interpro_mcga_device::reg30_r), FUNC(interpro_mcga_device::reg30_w));
-	map(0x38, 0x39).rw(this, FUNC(interpro_mcga_device::memsize_r), FUNC(interpro_mcga_device::memsize_w));
+	map(0x00, 0x01).rw(FUNC(interpro_mcga_device::reg00_r), FUNC(interpro_mcga_device::reg00_w));
+	map(0x08, 0x09).rw(FUNC(interpro_mcga_device::control_r), FUNC(interpro_mcga_device::control_w));
+	map(0x10, 0x11).rw(FUNC(interpro_mcga_device::error_r), FUNC(interpro_mcga_device::error_w));
+	map(0x18, 0x18).rw(FUNC(interpro_mcga_device::frcrd_r), FUNC(interpro_mcga_device::frcrd_w));
+	map(0x20, 0x20).rw(FUNC(interpro_mcga_device::cbsub_r), FUNC(interpro_mcga_device::cbsub_w));
+	map(0x28, 0x29).rw(FUNC(interpro_mcga_device::reg28_r), FUNC(interpro_mcga_device::reg28_w));
+	map(0x30, 0x31).rw(FUNC(interpro_mcga_device::reg30_r), FUNC(interpro_mcga_device::reg30_w));
+	map(0x38, 0x39).rw(FUNC(interpro_mcga_device::memsize_r), FUNC(interpro_mcga_device::memsize_w));
 }
 
 void interpro_fmcc_device::map(address_map &map)
 {
-	map(0x00, 0x01).rw(this, FUNC(interpro_fmcc_device::reg00_r), FUNC(interpro_fmcc_device::reg00_w));
-	map(0x08, 0x09).rw(this, FUNC(interpro_fmcc_device::control_r), FUNC(interpro_fmcc_device::control_w));
-	map(0x10, 0x11).rw(this, FUNC(interpro_fmcc_device::error_r), FUNC(interpro_fmcc_device::error_w));
-	map(0x18, 0x18).rw(this, FUNC(interpro_fmcc_device::frcrd_r), FUNC(interpro_fmcc_device::frcrd_w));
-	map(0x20, 0x20).rw(this, FUNC(interpro_fmcc_device::cbsub_r), FUNC(interpro_fmcc_device::cbsub_w));
-	map(0x28, 0x29).rw(this, FUNC(interpro_fmcc_device::reg28_r), FUNC(interpro_fmcc_device::reg28_w));
-	map(0x30, 0x31).rw(this, FUNC(interpro_fmcc_device::reg30_r), FUNC(interpro_fmcc_device::reg30_w));
-	map(0x38, 0x39).rw(this, FUNC(interpro_fmcc_device::memsize_r), FUNC(interpro_fmcc_device::memsize_w));
+	map(0x00, 0x01).rw(FUNC(interpro_fmcc_device::reg00_r), FUNC(interpro_fmcc_device::reg00_w));
+	map(0x08, 0x09).rw(FUNC(interpro_fmcc_device::control_r), FUNC(interpro_fmcc_device::control_w));
+	map(0x10, 0x11).rw(FUNC(interpro_fmcc_device::error_r), FUNC(interpro_fmcc_device::error_w));
+	map(0x18, 0x18).rw(FUNC(interpro_fmcc_device::frcrd_r), FUNC(interpro_fmcc_device::frcrd_w));
+	map(0x20, 0x20).rw(FUNC(interpro_fmcc_device::cbsub_r), FUNC(interpro_fmcc_device::cbsub_w));
+	map(0x28, 0x29).rw(FUNC(interpro_fmcc_device::reg28_r), FUNC(interpro_fmcc_device::reg28_w));
+	map(0x30, 0x31).rw(FUNC(interpro_fmcc_device::reg30_r), FUNC(interpro_fmcc_device::reg30_w));
+	map(0x38, 0x39).rw(FUNC(interpro_fmcc_device::memsize_r), FUNC(interpro_fmcc_device::memsize_w));
 	map(0x40, 0x43).noprw(); // unknown
-	map(0x48, 0x49).rw(this, FUNC(interpro_fmcc_device::error_control_r), FUNC(interpro_fmcc_device::error_control_w));
+	map(0x48, 0x49).rw(FUNC(interpro_fmcc_device::error_control_r), FUNC(interpro_fmcc_device::error_control_w));
 }
 
 DEFINE_DEVICE_TYPE(INTERPRO_MCGA, interpro_mcga_device, "mcga", "Memory Controller Gate Array")

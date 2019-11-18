@@ -207,9 +207,9 @@ void taitosj_state::taitosj_main_nomcu_map(address_map &map)
 	map(0x0000, 0x5fff).rom();
 	map(0x6000, 0x7fff).bankr("bank1");
 	map(0x8000, 0x87ff).ram();
-	map(0x8800, 0x8800).mirror(0x07fe).rw(this, FUNC(taitosj_state::taitosj_fake_data_r), FUNC(taitosj_state::taitosj_fake_data_w));
-	map(0x8801, 0x8801).mirror(0x07fe).r(this, FUNC(taitosj_state::taitosj_fake_status_r));
-	map(0x9000, 0xbfff).w(this, FUNC(taitosj_state::taitosj_characterram_w)).share("characterram");
+	map(0x8800, 0x8800).mirror(0x07fe).rw(FUNC(taitosj_state::taitosj_fake_data_r), FUNC(taitosj_state::taitosj_fake_data_w));
+	map(0x8801, 0x8801).mirror(0x07fe).r(FUNC(taitosj_state::taitosj_fake_status_r));
+	map(0x9000, 0xbfff).w(FUNC(taitosj_state::taitosj_characterram_w)).share("characterram");
 	map(0xc000, 0xc3ff).ram();
 	map(0xc400, 0xc7ff).ram().share("videoram_1");
 	map(0xc800, 0xcbff).ram().share("videoram_2");
@@ -219,7 +219,7 @@ void taitosj_state::taitosj_main_nomcu_map(address_map &map)
 	map(0xd200, 0xd27f).mirror(0x0080).ram().share("paletteram");
 	map(0xd300, 0xd300).mirror(0x00ff).writeonly().share("video_priority");
 	map(0xd400, 0xd403).mirror(0x00f0).readonly().share("collision_reg");
-	map(0xd404, 0xd404).mirror(0x00f3).r(this, FUNC(taitosj_state::taitosj_gfxrom_r));
+	map(0xd404, 0xd404).mirror(0x00f3).r(FUNC(taitosj_state::taitosj_gfxrom_r));
 	map(0xd408, 0xd408).mirror(0x00f0).portr("IN0");
 	map(0xd409, 0xd409).mirror(0x00f0).portr("IN1");
 	map(0xd40a, 0xd40a).mirror(0x00f0).portr("DSW1");         /* DSW1 */
@@ -230,12 +230,12 @@ void taitosj_state::taitosj_main_nomcu_map(address_map &map)
 	map(0xd40f, 0xd40f).mirror(0x00f0).r(m_ay1, FUNC(ay8910_device::data_r));   /* DSW2 and DSW3 */
 	map(0xd500, 0xd505).mirror(0x00f0).writeonly().share("scroll");
 	map(0xd506, 0xd507).mirror(0x00f0).writeonly().share("colorbank");
-	map(0xd508, 0xd508).mirror(0x00f0).w(this, FUNC(taitosj_state::taitosj_collision_reg_clear_w));
+	map(0xd508, 0xd508).mirror(0x00f0).w(FUNC(taitosj_state::taitosj_collision_reg_clear_w));
 	map(0xd509, 0xd50a).mirror(0x00f0).writeonly().share("gfxpointer");
-	map(0xd50b, 0xd50b).mirror(0x00f0).w(this, FUNC(taitosj_state::soundlatch_w));
-	map(0xd50c, 0xd50c).mirror(0x00f0).w(this, FUNC(taitosj_state::sound_semaphore2_w));
+	map(0xd50b, 0xd50b).mirror(0x00f0).w(FUNC(taitosj_state::soundlatch_w));
+	map(0xd50c, 0xd50c).mirror(0x00f0).w(FUNC(taitosj_state::sound_semaphore2_w));
 	map(0xd50d, 0xd50d).mirror(0x00f0).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0xd50e, 0xd50e).mirror(0x00f0).w(this, FUNC(taitosj_state::taitosj_bankswitch_w));
+	map(0xd50e, 0xd50e).mirror(0x00f0).w(FUNC(taitosj_state::taitosj_bankswitch_w));
 	map(0xd50f, 0xd50f).mirror(0x00f0).nopw();
 	map(0xd600, 0xd600).mirror(0x00ff).writeonly().share("video_mode");
 	map(0xd700, 0xdfff).noprw();
@@ -254,23 +254,22 @@ void taitosj_state::taitosj_main_mcu_map(address_map &map)
 
 /* seems the most logical way to do the gears */
 
+template <int Player>
 CUSTOM_INPUT_MEMBER(taitosj_state::kikstart_gear_r)
 {
 	const char *port_tag;
 
-	int player = (int)(uintptr_t)param;
-
-	if (player == 0)
+	if (Player == 0)
 		port_tag = "GEARP1";
 	else
 		port_tag = "GEARP2";
 
 	/* gear MUST be 1, 2 or 3 */
-	if (ioport(port_tag)->read() & 0x01) m_kikstart_gears[player] = 0x02;
-	if (ioport(port_tag)->read() & 0x02) m_kikstart_gears[player] = 0x03;
-	if (ioport(port_tag)->read() & 0x04) m_kikstart_gears[player] = 0x01;
+	if (ioport(port_tag)->read() & 0x01) m_kikstart_gears[Player] = 0x02;
+	if (ioport(port_tag)->read() & 0x02) m_kikstart_gears[Player] = 0x03;
+	if (ioport(port_tag)->read() & 0x04) m_kikstart_gears[Player] = 0x01;
 
-	return m_kikstart_gears[player];
+	return m_kikstart_gears[Player];
 }
 
 // TODO: merge with above
@@ -282,7 +281,7 @@ void taitosj_state::kikstart_main_map(address_map &map)
 	map(0x8800, 0x8801).rw(m_mcu, FUNC(taito_sj_security_mcu_device::data_r), FUNC(taito_sj_security_mcu_device::data_w));
 	map(0x8802, 0x8802).noprw();
 	map(0x8a00, 0x8a5f).writeonly().share("colscrolly");
-	map(0x9000, 0xbfff).w(this, FUNC(taitosj_state::taitosj_characterram_w)).share("characterram");
+	map(0x9000, 0xbfff).w(FUNC(taitosj_state::taitosj_characterram_w)).share("characterram");
 	map(0xc000, 0xc3ff).ram();
 	map(0xc400, 0xc7ff).ram().share("videoram_1");
 	map(0xc800, 0xcbff).ram().share("videoram_2");
@@ -293,7 +292,7 @@ void taitosj_state::kikstart_main_map(address_map &map)
 	map(0xd200, 0xd27f).ram().share("paletteram");
 	map(0xd300, 0xd300).writeonly().share("video_priority");
 	map(0xd400, 0xd403).readonly().share("collision_reg");
-	map(0xd404, 0xd404).r(this, FUNC(taitosj_state::taitosj_gfxrom_r));
+	map(0xd404, 0xd404).r(FUNC(taitosj_state::taitosj_gfxrom_r));
 	map(0xd408, 0xd408).mirror(0x00f0).portr("IN0");
 	map(0xd409, 0xd409).mirror(0x00f0).portr("IN1");
 	map(0xd40a, 0xd40a).mirror(0x00f0).portr("DSW1");         /* DSW1 */
@@ -302,12 +301,12 @@ void taitosj_state::kikstart_main_map(address_map &map)
 	map(0xd40d, 0xd40d).mirror(0x00f0).portr("IN4");
 	map(0xd40e, 0xd40f).w(m_ay1, FUNC(ay8910_device::address_data_w));
 	map(0xd40f, 0xd40f).r(m_ay1, FUNC(ay8910_device::data_r)); /* DSW2 and DSW3 */
-	map(0xd508, 0xd508).w(this, FUNC(taitosj_state::taitosj_collision_reg_clear_w));
+	map(0xd508, 0xd508).w(FUNC(taitosj_state::taitosj_collision_reg_clear_w));
 	map(0xd509, 0xd50a).writeonly().share("gfxpointer");
-	map(0xd50b, 0xd50b).w(this, FUNC(taitosj_state::soundlatch_w));
-	map(0xd50c, 0xd50c).w(this, FUNC(taitosj_state::sound_semaphore2_w));
+	map(0xd50b, 0xd50b).w(FUNC(taitosj_state::soundlatch_w));
+	map(0xd50c, 0xd50c).w(FUNC(taitosj_state::sound_semaphore2_w));
 	map(0xd50d, 0xd50d).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0xd50e, 0xd50e).w(this, FUNC(taitosj_state::taitosj_bankswitch_w));
+	map(0xd50e, 0xd50e).w(FUNC(taitosj_state::taitosj_bankswitch_w));
 	map(0xd600, 0xd600).writeonly().share("video_mode");
 	map(0xd800, 0xdfff).ram().share("kikstart_scroll");// scroll ram + ???
 	map(0xe000, 0xefff).rom();
@@ -381,8 +380,8 @@ void taitosj_state::taitosj_audio_map(address_map &map)
 	map(0x4803, 0x4803).mirror(0x07f8).r(m_ay3, FUNC(ay8910_device::data_r));
 	map(0x4804, 0x4805).mirror(0x07fa).w(m_ay4, FUNC(ay8910_device::address_data_w));
 	map(0x4805, 0x4805).mirror(0x07fa).r(m_ay4, FUNC(ay8910_device::data_r));
-	map(0x5000, 0x5000).mirror(0x07fc).rw(this, FUNC(taitosj_state::soundlatch_r), FUNC(taitosj_state::soundlatch_clear7_w));
-	map(0x5001, 0x5001).mirror(0x07fc).rw(this, FUNC(taitosj_state::soundlatch_flags_r), FUNC(taitosj_state::sound_semaphore2_clear_w));
+	map(0x5000, 0x5000).mirror(0x07fc).rw(FUNC(taitosj_state::soundlatch_r), FUNC(taitosj_state::soundlatch_clear7_w));
+	map(0x5001, 0x5001).mirror(0x07fc).rw(FUNC(taitosj_state::soundlatch_flags_r), FUNC(taitosj_state::sound_semaphore2_clear_w));
 	map(0xe000, 0xefff).rom(); /* space for diagnostic ROM */
 }
 
@@ -515,7 +514,7 @@ static INPUT_PORTS_START( spaceskr )
 
 	PORT_START("IN4")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitosj_state,input_port_4_f0_r, nullptr)    // from sound CPU
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(taitosj_state, input_port_4_f0_r)    // from sound CPU
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
@@ -597,59 +596,59 @@ static INPUT_PORTS_START( spacecr )
 
 	PORT_START("IN4")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitosj_state,input_port_4_f0_r, nullptr)    // from sound CPU
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(taitosj_state, input_port_4_f0_r)    // from sound CPU
 
-	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_START("DSW1") // according to the manual, dips 1, 2, 3 and 6 are unused but should be left off
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unused ) ) PORT_DIPLOCATION("SWA:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unused ) ) PORT_DIPLOCATION("SWA:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unused ) ) PORT_DIPLOCATION("SWA:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Lives ) ) PORT_DIPLOCATION("SWA:4,5")
 	PORT_DIPSETTING(    0x00, "6" )
 	PORT_DIPSETTING(    0x08, "5" )
 	PORT_DIPSETTING(    0x10, "4" )
 	PORT_DIPSETTING(    0x18, "3" )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unused ) ) PORT_DIPLOCATION("SWA:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SWA:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SWA:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 
 	PORT_START("DSW2")      /* Coinage */
 	DSW2_PORT
 
-	PORT_START("DSW3")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_START("DSW3") // according to the manual, dips 1, 2, 3, 4 and 5 are unused but should be left off
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unused ) ) PORT_DIPLOCATION("SWC:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unused ) ) PORT_DIPLOCATION("SWC:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unused ) ) PORT_DIPLOCATION("SWC:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unused ) ) PORT_DIPLOCATION("SWC:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unused ) ) PORT_DIPLOCATION("SWC:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Year Display" )
+	PORT_DIPNAME( 0x20, 0x20, "Year Display" ) PORT_DIPLOCATION("SWC:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x40, 0x40, "Invulnerability (Cheat)")
+	PORT_DIPNAME( 0x40, 0x40, "Invulnerability (Cheat)") PORT_DIPLOCATION("SWC:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SWC:8")
 	PORT_DIPSETTING(    0x80, "A and B" )
 	PORT_DIPSETTING(    0x00, "A only" )
 INPUT_PORTS_END
@@ -681,7 +680,7 @@ static INPUT_PORTS_START( junglek )
 
 	PORT_START("IN4")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitosj_state,input_port_4_f0_r, nullptr)    // from sound CPU
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(taitosj_state, input_port_4_f0_r)    // from sound CPU
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, "Finish Bonus" )
@@ -803,7 +802,7 @@ static INPUT_PORTS_START( alpine )
 
 	PORT_START("IN4")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitosj_state,input_port_4_f0_r, nullptr)    // from sound CPU
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(taitosj_state, input_port_4_f0_r)    // from sound CPU
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, "Jump Bonus" )
@@ -888,7 +887,7 @@ static INPUT_PORTS_START( alpinea )
 
 	PORT_START("IN4")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitosj_state,input_port_4_f0_r, nullptr)    // from sound CPU
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(taitosj_state, input_port_4_f0_r)    // from sound CPU
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, "Jump Bonus" )
@@ -966,7 +965,7 @@ static INPUT_PORTS_START( timetunl )
 
 	PORT_START("IN4")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitosj_state,input_port_4_f0_r, nullptr)    // from sound CPU
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(taitosj_state, input_port_4_f0_r)    // from sound CPU
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )
@@ -1166,7 +1165,7 @@ static INPUT_PORTS_START( elevator )
 
 	PORT_START("IN4")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitosj_state,input_port_4_f0_r, nullptr)    // from sound CPU
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(taitosj_state, input_port_4_f0_r)    // from sound CPU
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Bonus_Life ) )    PORT_DIPLOCATION("SW1:1,2")
@@ -1249,7 +1248,7 @@ static INPUT_PORTS_START( tinstar )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_RIGHT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitosj_state,input_port_4_f0_r, nullptr)    // from sound CPU
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(taitosj_state, input_port_4_f0_r)    // from sound CPU
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, "Bonus Life?" )
@@ -1332,7 +1331,7 @@ static INPUT_PORTS_START( waterski )
 
 	PORT_START("IN4")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitosj_state,input_port_4_f0_r, nullptr)    // from sound CPU
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(taitosj_state, input_port_4_f0_r)    // from sound CPU
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
@@ -1421,7 +1420,7 @@ static INPUT_PORTS_START( bioatack )
 
 	PORT_START("IN4")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitosj_state,input_port_4_f0_r, nullptr)    // from sound CPU
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(taitosj_state, input_port_4_f0_r)    // from sound CPU
 
 	PORT_START("DSW1")      /* d50a */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Bonus_Life ) )
@@ -1488,7 +1487,7 @@ static INPUT_PORTS_START( sfposeid )
 
 	PORT_START("IN4")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitosj_state,input_port_4_f0_r, nullptr)    // from sound CPU
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(taitosj_state, input_port_4_f0_r)    // from sound CPU
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
@@ -1556,7 +1555,7 @@ static INPUT_PORTS_START( hwrace )
 
 	PORT_START("IN4")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitosj_state,input_port_4_f0_r, nullptr)    // from sound CPU
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(taitosj_state, input_port_4_f0_r)    // from sound CPU
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
@@ -1615,12 +1614,24 @@ static INPUT_PORTS_START( kikstart )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
+	PORT_BIT( 0x0c, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	// in revolve mode button1 acts as accelerate button/pedal
+	// in buttons mode button1 is left button
+	// nothing pressed: 1st gear
+	// left button pressed: 2nd gear
+	// right button pressed: 3rd gear
+	// TODO: can't find a pedal for buttons mode, maybe neither input schemes are supposed to have one?
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CONDITION("DSW3", 0x08, EQUALS, 0x00)
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
+	PORT_BIT( 0x0c, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL PORT_CONDITION("DSW3", 0x08, EQUALS, 0x00)
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1633,7 +1644,8 @@ static INPUT_PORTS_START( kikstart )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
 	PORT_START("IN3")      /* Service */
-	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitosj_state,kikstart_gear_r, (void *)0)
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(taitosj_state, kikstart_gear_r<0>) PORT_CONDITION("DSW3", 0x08, EQUALS, 0x08)
+	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW3", 0x08, EQUALS, 0x00)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* needs to be 0, otherwise cannot shift */
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SERVICE1 )
@@ -1642,7 +1654,8 @@ static INPUT_PORTS_START( kikstart )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN4")
-	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, taitosj_state,kikstart_gear_r, (void *)1)
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(taitosj_state, kikstart_gear_r<1>) PORT_CONDITION("DSW3", 0x08, EQUALS, 0x08)
+	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW3", 0x08, EQUALS, 0x00)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* needs to be 0, otherwise cannot shift */
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1674,8 +1687,8 @@ static INPUT_PORTS_START( kikstart )
 
 	PORT_START("DSW3")
 	PORT_DIPNAME( 0x08, 0x08, "Control Type" )
-	PORT_DIPSETTING(    0x08, "Revolve" )
-	PORT_DIPSETTING(    0x00, "Buttons" )
+	PORT_DIPSETTING(    0x08, "Revolve" ) // 3-way positional knob for gears
+	PORT_DIPSETTING(    0x00, "Buttons" ) // 2 buttons for gears
 	PORT_DIPNAME( 0x10, 0x10, "Coinage Display" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
@@ -1691,14 +1704,14 @@ static INPUT_PORTS_START( kikstart )
 
 	/* fake for handling the gears */
 	PORT_START("GEARP1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 1st Gear")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P1 2nd Gear")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("P1 3rd Gear")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 1st Gear") PORT_CONDITION("DSW3", 0x08, EQUALS, 0x08)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P1 2nd Gear") PORT_CONDITION("DSW3", 0x08, EQUALS, 0x08)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("P1 3rd Gear") PORT_CONDITION("DSW3", 0x08, EQUALS, 0x08)
 
 	PORT_START("GEARP2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P2 1st Gear") PORT_COCKTAIL
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P2 2nd Gear") PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("P2 3rd Gear") PORT_COCKTAIL
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P2 1st Gear") PORT_COCKTAIL PORT_CONDITION("DSW3", 0x08, EQUALS, 0x08)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P2 2nd Gear") PORT_COCKTAIL PORT_CONDITION("DSW3", 0x08, EQUALS, 0x08)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("P2 3rd Gear") PORT_COCKTAIL PORT_CONDITION("DSW3", 0x08, EQUALS, 0x08)
 INPUT_PORTS_END
 
 
@@ -1728,7 +1741,7 @@ static const gfx_layout spritelayout =
 
 
 
-static GFXDECODE_START( taitosj )
+static GFXDECODE_START( gfx_taitosj )
 	GFXDECODE_ENTRY( nullptr, 0x9000, charlayout,   0, 8 )    /* the game dynamically modifies this */
 	GFXDECODE_ENTRY( nullptr, 0x9000, spritelayout, 0, 8 )    /* the game dynamically modifies this */
 	GFXDECODE_ENTRY( nullptr, 0xa800, charlayout,   0, 8 )    /* the game dynamically modifies this */
@@ -1745,7 +1758,7 @@ static const discrete_dac_r1_ladder taitosj_dacvol_ladder =
 	0           // no cap
 };
 
-DISCRETE_SOUND_START(taitosj_dacvol)
+DISCRETE_SOUND_START(taitosj_dacvol_discrete)
 	DISCRETE_INPUT_DATA(NODE_01)
 	DISCRETE_DAC_R1(NODE_02, NODE_01, DEFAULT_TTL_V_LOGIC_1, &taitosj_dacvol_ladder)
 	DISCRETE_OUTPUT(NODE_02, 9637)
@@ -1753,112 +1766,109 @@ DISCRETE_SOUND_END
 
 WRITE8_MEMBER(taitosj_state::taitosj_dacvol_w)
 {
-	m_dacvol->write(space, NODE_01, data ^ 0xff); // 7416 hex inverter
+	m_dacvol->write(NODE_01, data ^ 0xff); // 7416 hex inverter
 }
 
-MACHINE_CONFIG_START(taitosj_state::nomcu)
-
+void taitosj_state::nomcu(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80,XTAL(8'000'000)/2)      /* 8 MHz / 2, on CPU board */
-	MCFG_CPU_PROGRAM_MAP(taitosj_main_nomcu_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitosj_state,  irq0_line_hold)
+	Z80(config, m_maincpu, XTAL(8'000'000)/2);      /* 8 MHz / 2, on CPU board */
+	m_maincpu->set_addrmap(AS_PROGRAM, &taitosj_state::taitosj_main_nomcu_map);
+	m_maincpu->set_vblank_int("screen", FUNC(taitosj_state::irq0_line_hold));
 
-	MCFG_CPU_ADD("audiocpu", Z80,XTAL(6'000'000)/2)    /* 6 MHz / 2, on GAME board */
-	MCFG_CPU_PROGRAM_MAP(taitosj_audio_map)
+	Z80(config, m_audiocpu, XTAL(6'000'000)/2);    /* 6 MHz / 2, on GAME board */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &taitosj_state::taitosj_audio_map);
 			/* interrupts: */
 			/* - no interrupts synced with vblank */
 			/* - NMI triggered by the main CPU */
 			/* - periodic IRQ, with frequency 6000000/(4*16*16*10*16) = 36.621 Hz, */
-	MCFG_CPU_PERIODIC_INT_DRIVER(taitosj_state, irq0_line_hold, XTAL(6'000'000)/(4*16*16*10*16))
+	m_audiocpu->set_periodic_int(FUNC(taitosj_state::irq0_line_hold), attotime::from_hz(XTAL(6'000'000)/(4*16*16*10*16)));
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(taitosj_state, screen_update_taitosj)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(taitosj_state::screen_update_taitosj));
+	m_screen->set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taitosj)
-	MCFG_PALETTE_ADD("palette", 64)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_taitosj);
+	PALETTE(config, m_palette).set_entries(64);
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
-	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(DEVWRITELINE("soundnmi2", input_merger_device, in_w<0>))
+	INPUT_MERGER_ALL_HIGH(config, m_soundnmi).output_handler().set(m_soundnmi2, FUNC(input_merger_device::in_w<0>));
 
-	MCFG_INPUT_MERGER_ANY_HIGH("soundnmi2")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	INPUT_MERGER_ANY_HIGH(config, m_soundnmi2).output_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL(6'000'000)/4) // 6mhz/4 on GAME board, AY-3-8910 @ IC53 (this is the only AY which uses proper mixing resistors, the 3 below have outputs tied together)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW2"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW3"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15)
+	AY8910(config, m_ay1, XTAL(6'000'000)/4); // 6mhz/4 on GAME board, AY-3-8910 @ IC53 (this is the only AY which uses proper mixing resistors, the 3 below have outputs tied together)
+	m_ay1->port_a_read_callback().set_ioport("DSW2");
+	m_ay1->port_b_read_callback().set_ioport("DSW3");
+	m_ay1->add_route(ALL_OUTPUTS, "speaker", 0.15);
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL(6'000'000)/4) // 6mhz/4 on GAME board, AY-3-8910 @ IC51
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
-	MCFG_AY8910_PORT_A_WRITE_CB(DEVWRITE8("dac", dac_byte_interface, write))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(taitosj_state, taitosj_dacvol_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	AY8910(config, m_ay2, XTAL(6'000'000)/4); // 6mhz/4 on GAME board, AY-3-8910 @ IC51
+	m_ay2->set_flags(AY8910_SINGLE_OUTPUT);
+	m_ay2->port_a_write_callback().set(m_dac, FUNC(dac_byte_interface::data_w));
+	m_ay2->port_b_write_callback().set(FUNC(taitosj_state::taitosj_dacvol_w));
+	m_ay2->add_route(ALL_OUTPUTS, "speaker", 0.5);
 
-	MCFG_SOUND_ADD("ay3", AY8910, XTAL(6'000'000)/4) // 6mhz/4 on GAME board, AY-3-8910 @ IC49
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(taitosj_state, input_port_4_f0_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	AY8910(config, m_ay3, XTAL(6'000'000)/4); // 6mhz/4 on GAME board, AY-3-8910 @ IC49
+	m_ay3->set_flags(AY8910_SINGLE_OUTPUT);
+	m_ay3->port_a_write_callback().set(FUNC(taitosj_state::input_port_4_f0_w));
+	m_ay3->add_route(ALL_OUTPUTS, "speaker", 0.5);
 
-	MCFG_SOUND_ADD("ay4", AY8910, XTAL(6'000'000)/4) // 6mhz/4 on GAME board, AY-3-8910 @ IC50
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
+	AY8910(config, m_ay4, XTAL(6'000'000)/4); // 6mhz/4 on GAME board, AY-3-8910 @ IC50
+	m_ay4->set_flags(AY8910_SINGLE_OUTPUT);
 	/* TODO: Implement ay4 Port A bits 0 and 1 which connect to a 7416 open
 	   collector inverter, to selectively tie none, either or both of two
 	   capacitors between the ay4 audio output signal and ground, or between
 	   audio output signal and high-z (i.e. do nothing).
 	   Bio Attack uses this?
 	*/
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(taitosj_state, taitosj_sndnmi_msk_w)) /* port Bwrite */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+	m_ay4->port_b_write_callback().set(FUNC(taitosj_state::taitosj_sndnmi_msk_w));
+	m_ay4->add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 128); // 74LS393 on CPU board, counts 128 vblanks before firing watchdog
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 128); // 74LS393 on CPU board, counts 128 vblanks before firing watchdog
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15) // 30k r-2r network
-	MCFG_SOUND_ADD("dacvol", DISCRETE, 0) MCFG_DISCRETE_INTF(taitosj_dacvol)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.15); // 30k r-2r network
+	DISCRETE(config, m_dacvol, taitosj_dacvol_discrete);
+	m_dacvol->add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	m_dacvol->add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
 
 /* same as above, but with additional 68705 MCU */
-MACHINE_CONFIG_START(taitosj_state::mcu)
+void taitosj_state::mcu(machine_config &config)
+{
 	nomcu(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(taitosj_main_mcu_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &taitosj_state::taitosj_main_mcu_map);
 
-	MCFG_CPU_ADD("bmcu", TAITO_SJ_SECURITY_MCU, XTAL(3'000'000))   /* xtal is 3MHz, divided by 4 internally */
-	MCFG_TAITO_SJ_SECURITY_MCU_INT_MODE(LATCH)
-	MCFG_TAITO_SJ_SECURITY_MCU_68READ_CB(READ8(taitosj_state, mcu_mem_r))
-	MCFG_TAITO_SJ_SECURITY_MCU_68WRITE_CB(WRITE8(taitosj_state, mcu_mem_w))
-	MCFG_TAITO_SJ_SECURITY_MCU_68INTRQ_CB(WRITELINE(taitosj_state, mcu_intrq_w))
-	MCFG_TAITO_SJ_SECURITY_MCU_BUSRQ_CB(WRITELINE(taitosj_state, mcu_busrq_w))
+	TAITO_SJ_SECURITY_MCU(config, m_mcu, XTAL(3'000'000));   /* xtal is 3MHz, divided by 4 internally */
+	m_mcu->set_int_mode(taito_sj_security_mcu_device::int_mode::LATCH);
+	m_mcu->m68read_cb().set(FUNC(taitosj_state::mcu_mem_r));
+	m_mcu->m68write_cb().set(FUNC(taitosj_state::mcu_mem_w));
+	m_mcu->m68intrq_cb().set(FUNC(taitosj_state::mcu_intrq_w));
+	m_mcu->busrq_cb().set(FUNC(taitosj_state::mcu_busrq_w));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
-MACHINE_CONFIG_END
+	config.set_maximum_quantum(attotime::from_hz(6000));
+}
 
 
-MACHINE_CONFIG_START(taitosj_state::kikstart)
+void taitosj_state::kikstart(machine_config &config)
+{
 	mcu(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(kikstart_main_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &taitosj_state::kikstart_main_map);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(taitosj_state, screen_update_kikstart)
-MACHINE_CONFIG_END
+	m_screen->set_screen_update(FUNC(taitosj_state::screen_update_kikstart));
+}
 
 
 
@@ -2815,67 +2825,67 @@ void taitosj_state::init_common()
 	machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(&taitosj_state::reset_common, this));
 }
 
-DRIVER_INIT_MEMBER(taitosj_state,taitosj)
+void taitosj_state::init_taitosj()
 {
 	init_common();
 }
 
-DRIVER_INIT_MEMBER(taitosj_state,spacecr)
+void taitosj_state::init_spacecr()
 {
 	init_common();
 
 	/* install protection handler */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd48b, 0xd48b, read8_delegate(FUNC(taitosj_state::spacecr_prot_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd48b, 0xd48b, read8_delegate(*this, FUNC(taitosj_state::spacecr_prot_r)));
 }
 
-DRIVER_INIT_MEMBER(taitosj_state,alpine)
+void taitosj_state::init_alpine()
 {
 	init_common();
 
 	/* install protection handlers */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd40b, 0xd40b, read8_delegate(FUNC(taitosj_state::alpine_port_2_r),this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xd50f, 0xd50f, write8_delegate(FUNC(taitosj_state::alpine_protection_w),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd40b, 0xd40b, read8_delegate(*this, FUNC(taitosj_state::alpine_port_2_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xd50f, 0xd50f, write8_delegate(*this, FUNC(taitosj_state::alpine_protection_w)));
 }
 
-DRIVER_INIT_MEMBER(taitosj_state,alpinea)
+void taitosj_state::init_alpinea()
 {
 	init_common();
 
 	/* install protection handlers */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd40b, 0xd40b, read8_delegate(FUNC(taitosj_state::alpine_port_2_r),this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xd50e, 0xd50e, write8_delegate(FUNC(taitosj_state::alpinea_bankswitch_w),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd40b, 0xd40b, read8_delegate(*this, FUNC(taitosj_state::alpine_port_2_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xd50e, 0xd50e, write8_delegate(*this, FUNC(taitosj_state::alpinea_bankswitch_w)));
 }
 
-DRIVER_INIT_MEMBER(taitosj_state,junglhbr)
+void taitosj_state::init_junglhbr()
 {
 	init_common();
 
 	/* inverter on bits 0 and 1 */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x9000, 0xbfff, write8_delegate(FUNC(taitosj_state::junglhbr_characterram_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x9000, 0xbfff, write8_delegate(*this, FUNC(taitosj_state::junglhbr_characterram_w)));
 }
 
-GAME( 1981, spaceskr, 0,        nomcu,    spaceskr, taitosj_state,   taitosj, ROT0,   "Taito Corporation", "Space Seeker", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, spacecr,  0,        nomcu,    spacecr,  taitosj_state,   spacecr, ROT90,  "Taito Corporation", "Space Cruiser", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, junglek,  0,        nomcu,    junglek,  taitosj_state,   taitosj, ROT180, "Taito Corporation", "Jungle King (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, junglekas,junglek,  nomcu,    junglek,  taitosj_state,   taitosj, ROT180, "Taito Corporation", "Jungle King (alternate sound)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, junglekj2,junglek,  nomcu,    junglek,  taitosj_state,   taitosj, ROT180, "Taito Corporation", "Jungle King (Japan, earlier)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, jungleh,  junglek,  nomcu,    junglek,  taitosj_state,   taitosj, ROT180, "Taito America Corporation", "Jungle Hunt (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, junglehbr,junglek,  nomcu,    junglek,  taitosj_state,   junglhbr,ROT180, "Taito do Brasil",   "Jungle Hunt (Brazil)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, piratpet, junglek,  nomcu,    piratpet, taitosj_state,   taitosj, ROT180, "Taito America Corporation", "Pirate Pete", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, jungleby, junglek,  nomcu,    junglek,  taitosj_state,   taitosj, ROT180, "bootleg", "Jungle Boy (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, alpine,   0,        nomcu,    alpine,   taitosj_state,   alpine,  ROT270, "Taito Corporation", "Alpine Ski (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, alpinea,  alpine,   nomcu,    alpinea,  taitosj_state,   alpinea, ROT270, "Taito Corporation", "Alpine Ski (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, timetunl, 0,        nomcu,    timetunl, taitosj_state,   taitosj, ROT0,   "Taito Corporation", "Time Tunnel", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, wwestern, 0,        nomcu,    wwestern, taitosj_state,   taitosj, ROT270, "Taito Corporation", "Wild Western (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, wwestern1,wwestern, nomcu,    wwestern, taitosj_state,   taitosj, ROT270, "Taito Corporation", "Wild Western (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, frontlin, 0,        mcu,      frontlin, taitosj_state,   taitosj, ROT270, "Taito Corporation", "Front Line", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, elevator, 0,        mcu,      elevator, taitosj_state,   taitosj, ROT0,   "Taito Corporation", "Elevator Action (5 pcb version, 1.1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, elevatorb,elevator, nomcu,    elevator, taitosj_state,   taitosj, ROT0,   "bootleg", "Elevator Action (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, elevator4,elevator, mcu,      elevator, taitosj_state,   taitosj, ROT0,   "Taito Corporation", "Elevator Action (4 pcb version, 1.1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, tinstar,  0,        mcu,      tinstar,  taitosj_state,   taitosj, ROT0,   "Taito Corporation", "The Tin Star (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, tinstar2, tinstar,  mcu,      tinstar,  taitosj_state,   taitosj, ROT0,   "Taito Corporation", "The Tin Star (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, waterski, 0,        nomcu,    waterski, taitosj_state,   taitosj, ROT270, "Taito Corporation", "Water Ski", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, bioatack, 0,        nomcu,    bioatack, taitosj_state,   taitosj, ROT270, "Taito Corporation (Fox Video Games license)", "Bio Attack", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, sfposeid, 0,        mcu,      sfposeid, taitosj_state,   taitosj, ROT0,   "Taito Corporation", "Sea Fighter Poseidon", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, hwrace,   0,        nomcu,    hwrace,   taitosj_state,   taitosj, ROT270, "Taito Corporation", "High Way Race", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, kikstart, 0,        kikstart, kikstart, taitosj_state,   taitosj, ROT0,   "Taito Corporation", "Kick Start - Wheelie King", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, spaceskr, 0,        nomcu,    spaceskr, taitosj_state, init_taitosj, ROT0,   "Taito Corporation", "Space Seeker", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, spacecr,  0,        nomcu,    spacecr,  taitosj_state, init_spacecr, ROT90,  "Taito Corporation", "Space Cruiser", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, junglek,  0,        nomcu,    junglek,  taitosj_state, init_taitosj, ROT180, "Taito Corporation", "Jungle King (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, junglekas,junglek,  nomcu,    junglek,  taitosj_state, init_taitosj, ROT180, "Taito Corporation", "Jungle King (alternate sound)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, junglekj2,junglek,  nomcu,    junglek,  taitosj_state, init_taitosj, ROT180, "Taito Corporation", "Jungle King (Japan, earlier)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, jungleh,  junglek,  nomcu,    junglek,  taitosj_state, init_taitosj, ROT180, "Taito America Corporation", "Jungle Hunt (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, junglehbr,junglek,  nomcu,    junglek,  taitosj_state, init_junglhbr,ROT180, "Taito do Brasil",   "Jungle Hunt (Brazil)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, piratpet, junglek,  nomcu,    piratpet, taitosj_state, init_taitosj, ROT180, "Taito America Corporation", "Pirate Pete", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, jungleby, junglek,  nomcu,    junglek,  taitosj_state, init_taitosj, ROT180, "bootleg", "Jungle Boy (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, alpine,   0,        nomcu,    alpine,   taitosj_state, init_alpine,  ROT270, "Taito Corporation", "Alpine Ski (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, alpinea,  alpine,   nomcu,    alpinea,  taitosj_state, init_alpinea, ROT270, "Taito Corporation", "Alpine Ski (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, timetunl, 0,        nomcu,    timetunl, taitosj_state, init_taitosj, ROT0,   "Taito Corporation", "Time Tunnel", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, wwestern, 0,        nomcu,    wwestern, taitosj_state, init_taitosj, ROT270, "Taito Corporation", "Wild Western (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, wwestern1,wwestern, nomcu,    wwestern, taitosj_state, init_taitosj, ROT270, "Taito Corporation", "Wild Western (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, frontlin, 0,        mcu,      frontlin, taitosj_state, init_taitosj, ROT270, "Taito Corporation", "Front Line", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, elevator, 0,        mcu,      elevator, taitosj_state, init_taitosj, ROT0,   "Taito Corporation", "Elevator Action (5 pcb version, 1.1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, elevatorb,elevator, nomcu,    elevator, taitosj_state, init_taitosj, ROT0,   "bootleg", "Elevator Action (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, elevator4,elevator, mcu,      elevator, taitosj_state, init_taitosj, ROT0,   "Taito Corporation", "Elevator Action (4 pcb version, 1.1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, tinstar,  0,        mcu,      tinstar,  taitosj_state, init_taitosj, ROT0,   "Taito Corporation", "The Tin Star (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, tinstar2, tinstar,  mcu,      tinstar,  taitosj_state, init_taitosj, ROT0,   "Taito Corporation", "The Tin Star (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, waterski, 0,        nomcu,    waterski, taitosj_state, init_taitosj, ROT270, "Taito Corporation", "Water Ski", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, bioatack, 0,        nomcu,    bioatack, taitosj_state, init_taitosj, ROT270, "Taito Corporation (Fox Video Games license)", "Bio Attack", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sfposeid, 0,        mcu,      sfposeid, taitosj_state, init_taitosj, ROT0,   "Taito Corporation", "Sea Fighter Poseidon", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, hwrace,   0,        nomcu,    hwrace,   taitosj_state, init_taitosj, ROT270, "Taito Corporation", "High Way Race", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, kikstart, 0,        kikstart, kikstart, taitosj_state, init_taitosj, ROT0,   "Taito Corporation", "Kick Start - Wheelie King", MACHINE_SUPPORTS_SAVE )

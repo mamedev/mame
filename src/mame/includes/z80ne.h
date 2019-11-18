@@ -17,8 +17,11 @@
 
 #include "video/mc6847.h"
 #include "imagedev/cassette.h"
+#include "imagedev/floppy.h"
 #include "machine/ay31015.h"
+#include "machine/clock.h"
 #include "machine/kr2376.h"
+#include "machine/ram.h"
 #include "machine/wd_fdc.h"
 
 /***************************************************************************
@@ -67,10 +70,12 @@ public:
 		m_vdg(*this, "mc6847"),
 		m_videoram(*this, "videoram"),
 		m_uart(*this, "uart"),
+		m_uart_clock(*this, "uart_clock"),
 		m_lx387_kr2376(*this, "lx387_kr2376"),
 		m_maincpu(*this, "z80ne"),
 		m_cassette1(*this, "cassette"),
 		m_cassette2(*this, "cassette2"),
+		m_ram(*this, RAM_TAG),
 		m_region_z80ne(*this, "z80ne"),
 		m_bank1(*this, "bank1"),
 		m_bank2(*this, "bank2"),
@@ -87,11 +92,27 @@ public:
 	{
 	}
 
+	void lx387(machine_config &config);
+	void z80net(machine_config &config);
+	void z80ne(machine_config &config);
+	void z80netb(machine_config &config);
+
+	void init_z80net();
+	void init_z80netb();
+	void init_z80ne();
+
+	DECLARE_INPUT_CHANGED_MEMBER(z80ne_reset);
+	DECLARE_INPUT_CHANGED_MEMBER(z80ne_nmi);
+
+	DECLARE_READ8_MEMBER(lx388_mc6847_videoram_r);
+
+protected:
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 	optional_device<mc6847_base_device> m_vdg;
 	optional_shared_ptr<uint8_t> m_videoram;
 	required_device<ay31015_device> m_uart;
+	required_device<clock_device> m_uart_clock;
 	optional_device<kr2376_device> m_lx387_kr2376;
 	uint8_t m_lx383_scan_counter;
 	uint8_t m_lx383_key[LX383_KEYS];
@@ -104,13 +125,11 @@ public:
 	DECLARE_WRITE8_MEMBER(lx383_w);
 	DECLARE_READ8_MEMBER(lx385_ctrl_r);
 	DECLARE_WRITE8_MEMBER(lx385_ctrl_w);
+	DECLARE_WRITE_LINE_MEMBER(lx385_uart_tx_clock_w);
 	DECLARE_READ_LINE_MEMBER(lx387_shift_r);
 	DECLARE_READ_LINE_MEMBER(lx387_control_r);
 	DECLARE_READ8_MEMBER(lx387_data_r);
 	DECLARE_READ8_MEMBER(lx388_read_field_sync);
-	DECLARE_DRIVER_INIT(z80net);
-	DECLARE_DRIVER_INIT(z80netb);
-	DECLARE_DRIVER_INIT(z80ne);
 	DECLARE_MACHINE_START(z80ne);
 	DECLARE_MACHINE_RESET(z80ne);
 	DECLARE_MACHINE_START(z80netb);
@@ -118,26 +137,22 @@ public:
 	DECLARE_MACHINE_START(z80net);
 	DECLARE_MACHINE_RESET(z80net);
 	DECLARE_MACHINE_RESET(z80ne_base);
-	DECLARE_INPUT_CHANGED_MEMBER(z80ne_reset);
-	DECLARE_INPUT_CHANGED_MEMBER(z80ne_nmi);
+
 	TIMER_CALLBACK_MEMBER(z80ne_cassette_tc);
 	TIMER_CALLBACK_MEMBER(z80ne_kbd_scan);
-	DECLARE_READ8_MEMBER(lx388_mc6847_videoram_r);
 
-	void z80net(machine_config &config);
-	void z80ne(machine_config &config);
-	void z80netb(machine_config &config);
 	void z80ne_io(address_map &map);
 	void z80ne_mem(address_map &map);
 	void z80net_io(address_map &map);
 	void z80net_mem(address_map &map);
 	void z80netb_mem(address_map &map);
-protected:
+
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette1;
 	required_device<cassette_image_device> m_cassette2;
+	required_device<ram_device> m_ram;
 	required_memory_region m_region_z80ne;
 	optional_memory_bank m_bank1;
 	optional_memory_bank m_bank2;
@@ -162,14 +177,6 @@ protected:
 
 class z80netf_state : public z80ne_state
 {
-	struct wd17xx_state_t
-	{
-		int drq;
-		int intrq;
-		uint8_t drive; /* current drive */
-		uint8_t head;  /* current head */
-	};
-
 public:
 	z80netf_state(const machine_config &mconfig, device_type type, const char *tag)
 		: z80ne_state(mconfig, type, tag),
@@ -180,9 +187,19 @@ public:
 	{
 	}
 
-	DECLARE_DRIVER_INIT(z80netf);
 	void z80netf(machine_config &config);
+
+	void init_z80netf();
+
 private:
+	struct wd17xx_state_t
+	{
+		int drq;
+		int intrq;
+		uint8_t drive; /* current drive */
+		uint8_t head;  /* current head */
+	};
+
 	void z80netf_io(address_map &map);
 	void z80netf_mem(address_map &map);
 

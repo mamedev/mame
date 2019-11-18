@@ -78,12 +78,12 @@ public:
 		, m_videoram_2(*this, "vram2")
 		, m_maincpu(*this, "maincpu")
 		, m_dac(*this, "dac")
+		, m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	required_shared_ptr<uint8_t> m_videoram_0;
-	required_shared_ptr<uint8_t> m_videoram_1;
-	required_shared_ptr<uint8_t> m_videoram_2;
+	void meyc8080(machine_config &config);
 
+private:
 	DECLARE_WRITE8_MEMBER(lights_1_w);
 	DECLARE_WRITE8_MEMBER(lights_2_w);
 	DECLARE_WRITE8_MEMBER(counters_w);
@@ -92,10 +92,16 @@ public:
 	DECLARE_WRITE8_MEMBER(meyc8080_dac_3_w);
 	DECLARE_WRITE8_MEMBER(meyc8080_dac_4_w);
 	uint32_t screen_update_meyc8080(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void meyc8080_map(address_map &map);
+
+	virtual void machine_start() override { m_lamps.resolve(); }
+
+	required_shared_ptr<uint8_t> m_videoram_0;
+	required_shared_ptr<uint8_t> m_videoram_1;
+	required_shared_ptr<uint8_t> m_videoram_2;
 	required_device<cpu_device> m_maincpu;
 	required_device<dac_byte_interface> m_dac;
-	void meyc8080(machine_config &config);
-	void meyc8080_map(address_map &map);
+	output_finder<11> m_lamps;
 };
 
 
@@ -185,11 +191,11 @@ WRITE8_MEMBER(meyc8080_state::lights_1_w)
   xxxx ----   Seems unused...
 
 */
-	output().set_lamp_value(0, (data) & 1);       /* Lamp 0 */
-	output().set_lamp_value(1, (data >> 1) & 1);  /* Lamp 1 */
-	output().set_lamp_value(2, (data >> 2) & 1);  /* Lamp 2 */
-	output().set_lamp_value(3, (data >> 3) & 1);  /* Lamp 3 */
-	output().set_lamp_value(4, (data >> 4) & 1);  /* Lamp 4 */
+	m_lamps[0] = BIT(data, 0);  /* Lamp 0 */
+	m_lamps[1] = BIT(data, 1);  /* Lamp 1 */
+	m_lamps[2] = BIT(data, 2);  /* Lamp 2 */
+	m_lamps[3] = BIT(data, 3);  /* Lamp 3 */
+	m_lamps[4] = BIT(data, 4);  /* Lamp 4 */
 
 	logerror("lights 1: %02x\n", data);
 }
@@ -232,13 +238,13 @@ WRITE8_MEMBER(meyc8080_state::lights_2_w)
   xxx- ----   Unknown.
 
 */
-	output().set_lamp_value(5, (data) & 1);       /* Lamp 5 */
-	output().set_lamp_value(6, (data >> 1) & 1);  /* Lamp 6 */
-	output().set_lamp_value(7, (data >> 2) & 1);  /* Lamp 7 */
-	output().set_lamp_value(8, (data >> 3) & 1);  /* Lamp 8 */
-	output().set_lamp_value(9, (data >> 4) & 1);  /* Lamp 9 */
+	m_lamps[5] = BIT(data, 0);  /* Lamp 5 */
+	m_lamps[6] = BIT(data, 1);  /* Lamp 6 */
+	m_lamps[7] = BIT(data, 2);  /* Lamp 7 */
+	m_lamps[8] = BIT(data, 3);  /* Lamp 8 */
+	m_lamps[9] = BIT(data, 4);  /* Lamp 9 */
 
-	output().set_lamp_value(10, (data >> 5) & 1); /* Lamp 10 (Game-Over) */
+	m_lamps[10] = BIT(data, 5); /* Lamp 10 (Game-Over) */
 
 	logerror("lights 2: %02x\n", data);
 }
@@ -318,15 +324,15 @@ void meyc8080_state::meyc8080_map(address_map &map)
 	map(0x4000, 0x5fff).ram().share("vram0");
 	map(0x6000, 0x7fff).ram().share("vram1");
 	map(0x8000, 0x9fff).ram().share("vram2");
-//  AM_RANGE(0xa000, 0xa0ff) AM_RAM     // unknown... filled with 00's at boot time or when entering the service mode.
+//  map(0xa000, 0xa0ff).ram();     // unknown... filled with 00's at boot time or when entering the service mode.
 	map(0xcd00, 0xcdff).ram().share("nvram");
-	map(0xf000, 0xf000).portr("BSW").w(this, FUNC(meyc8080_state::meyc8080_dac_1_w));
-	map(0xf004, 0xf004).portr("IN1").w(this, FUNC(meyc8080_state::lights_1_w));
-	map(0xf006, 0xf006).portr("IN2").w(this, FUNC(meyc8080_state::lights_2_w));
-	map(0xf008, 0xf008).w(this, FUNC(meyc8080_state::counters_w));
-	map(0xf00f, 0xf00f).w(this, FUNC(meyc8080_state::meyc8080_dac_2_w));
-	map(0xf0f0, 0xf0f0).w(this, FUNC(meyc8080_state::meyc8080_dac_3_w));
-	map(0xf0ff, 0xf0ff).w(this, FUNC(meyc8080_state::meyc8080_dac_4_w));
+	map(0xf000, 0xf000).portr("BSW").w(FUNC(meyc8080_state::meyc8080_dac_1_w));
+	map(0xf004, 0xf004).portr("IN1").w(FUNC(meyc8080_state::lights_1_w));
+	map(0xf006, 0xf006).portr("IN2").w(FUNC(meyc8080_state::lights_2_w));
+	map(0xf008, 0xf008).w(FUNC(meyc8080_state::counters_w));
+	map(0xf00f, 0xf00f).w(FUNC(meyc8080_state::meyc8080_dac_2_w));
+	map(0xf0f0, 0xf0f0).w(FUNC(meyc8080_state::meyc8080_dac_3_w));
+	map(0xf0ff, 0xf0ff).w(FUNC(meyc8080_state::meyc8080_dac_4_w));
 }
 
 
@@ -582,29 +588,29 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(meyc8080_state::meyc8080)
-
+void meyc8080_state::meyc8080(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, XTAL(20'000'000) / 10) // divider guessed
-	MCFG_CPU_PROGRAM_MAP(meyc8080_map)
+	I8080A(config, m_maincpu, XTAL(20'000'000) / 10); // divider guessed
+	m_maincpu->set_addrmap(AS_PROGRAM, &meyc8080_state::meyc8080_map);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 32*8-1)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_UPDATE_DRIVER(meyc8080_state, screen_update_meyc8080)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_size(256, 256);
+	screen.set_visarea(0*8, 32*8-1, 4*8, 32*8-1);
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_screen_update(FUNC(meyc8080_state::screen_update_meyc8080));
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_2BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.66) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-
-MACHINE_CONFIG_END
+	SPEAKER(config, "speaker").front_center();
+	DAC_2BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.66); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
 
 
@@ -735,8 +741,8 @@ ROM_END
  *
  *************************************/
 
-//    YEAR  NAME       PARENT    MACHINE   INPUT      STATE           INIT  ROT   COMPANY              FULLNAME                                     FLAGS                                            LAYOUT
-GAMEL(1982, wldarrow,  0,        meyc8080, wldarrow,  meyc8080_state, 0,    ROT0, "Meyco Games, Inc.", "Wild Arrow (color, Standard V4.8)",         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_wldarrow ) // B&W version not dumped yet
-GAMEL(1984, mdrawpkr,  0,        meyc8080, mdrawpkr,  meyc8080_state, 0,    ROT0, "Meyco Games, Inc.", "Draw Poker - Joker's Wild (Standard)",      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_mdrawpkr ) // year not shown, but it is in mdrawpkra
-GAMEL(1984, mdrawpkra, mdrawpkr, meyc8080, mdrawpkra, meyc8080_state, 0,    ROT0, "Meyco Games, Inc.", "Draw Poker - Joker's Wild (02-11)",         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_mdrawpkr )
-GAMEL(1983, casbjack,  0,        meyc8080, casbjack,  meyc8080_state, 0,    ROT0, "Meyco Games, Inc.", "Casino Black Jack (color, Standard 00-05)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_meybjack ) // B&W version not dumped yet
+//    YEAR  NAME       PARENT    MACHINE   INPUT      CLASS           INIT        ROT   COMPANY              FULLNAME                                     FLAGS                                            LAYOUT
+GAMEL(1982, wldarrow,  0,        meyc8080, wldarrow,  meyc8080_state, empty_init, ROT0, "Meyco Games, Inc.", "Wild Arrow (color, Standard V4.8)",         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_wldarrow ) // B&W version not dumped yet
+GAMEL(1984, mdrawpkr,  0,        meyc8080, mdrawpkr,  meyc8080_state, empty_init, ROT0, "Meyco Games, Inc.", "Draw Poker - Joker's Wild (Standard)",      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_mdrawpkr ) // year not shown, but it is in mdrawpkra
+GAMEL(1984, mdrawpkra, mdrawpkr, meyc8080, mdrawpkra, meyc8080_state, empty_init, ROT0, "Meyco Games, Inc.", "Draw Poker - Joker's Wild (02-11)",         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_mdrawpkr )
+GAMEL(1983, casbjack,  0,        meyc8080, casbjack,  meyc8080_state, empty_init, ROT0, "Meyco Games, Inc.", "Casino Black Jack (color, Standard 00-05)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_meybjack ) // B&W version not dumped yet

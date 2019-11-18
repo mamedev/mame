@@ -12,7 +12,7 @@
 #include "includes/aquarius.h"
 
 
-static const unsigned short aquarius_palette[] =
+static constexpr unsigned short aquarius_pens[] =
 {
 	0, 0, 1, 0, 2, 0, 3, 0, 4, 0, 5, 0, 6, 0, 7, 0, 8, 0, 9, 0,10, 0,11, 0,12, 0,13, 0,14, 0,15, 0,
 	0, 1, 1, 1, 2, 1, 3, 1, 4, 1, 5, 1, 6, 1, 7, 1, 8, 1, 9, 1,10, 1,11, 1,12, 1,13, 1,14, 1,15, 1,
@@ -32,15 +32,13 @@ static const unsigned short aquarius_palette[] =
 	0,15, 1,15, 2,15, 3,15, 4,15, 5,15, 6,15, 7,15, 8,15, 9,15,10,15,11,15,12,15,13,15,14,15,15,15,
 };
 
-PALETTE_INIT_MEMBER(aquarius_state, aquarius)
+void aquarius_state::aquarius_palette(palette_device &palette) const
 {
-	int i;
+	for (int i = 0; i < 16; i++)
+		palette.set_indirect_color(i, m_tea1002->color(i));
 
-	for (i = 0; i < 16; i++)
-		m_palette->set_indirect_color(i, m_tea1002->color(i));
-
-	for (i = 0; i < 512; i++)
-		m_palette->set_pen_indirect(i, aquarius_palette[i]);
+	for (int i = 0; i < 512; i++)
+		palette.set_pen_indirect(i, aquarius_pens[i]);
 }
 
 WRITE8_MEMBER(aquarius_state::aquarius_videoram_w)
@@ -69,7 +67,7 @@ TILE_GET_INFO_MEMBER(aquarius_state::aquarius_gettileinfo)
 
 void aquarius_state::video_start()
 {
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(aquarius_state::aquarius_gettileinfo),this), TILEMAP_SCAN_ROWS, 8, 8, 40, 25);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(aquarius_state::aquarius_gettileinfo)), TILEMAP_SCAN_ROWS, 8, 8, 40, 25);
 }
 
 uint32_t aquarius_state::screen_update_aquarius(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

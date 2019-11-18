@@ -20,15 +20,6 @@
     REGISTER ENUMERATION
 ***************************************************************************/
 
-
-
-#define MCFG_CCPU_EXTERNAL_FUNC(_devcb) \
-	downcast<ccpu_cpu_device &>(*device).set_external_func(DEVCB_##_devcb);
-
-#define MCFG_CCPU_VECTOR_FUNC(d) \
-	downcast<ccpu_cpu_device &>(*device).set_vector_func(d);
-
-
 class ccpu_cpu_device : public cpu_device
 {
 public:
@@ -54,8 +45,9 @@ public:
 	ccpu_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
-	template <class Object> devcb_base &set_external_func(Object &&cb) { return m_external_input.set_callback(std::forward<Object>(cb)); }
-	template <typename Object> void set_vector_func(Object &&cb) { m_vector_callback = std::forward<Object>(cb); }
+	auto external_func() { return m_external_input.bind(); }
+
+	template <typename... T> void set_vector_func(T &&... args) { m_vector_callback.set(std::forward<T>(args)...); }
 
 	DECLARE_READ8_MEMBER( read_jmi );
 	void wdt_timer_trigger();
@@ -66,9 +58,9 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override { return 1; }
-	virtual uint32_t execute_max_cycles() const override { return 1; }
-	virtual uint32_t execute_input_lines() const override { return 0; }
+	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 1; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 0; }
 	virtual void execute_run() override;
 
 	// device_memory_interface overrides
@@ -109,7 +101,7 @@ protected:
 	int                 m_icount;
 
 	address_space *m_program;
-	direct_read_data<0> *m_direct;
+	memory_access_cache<0, 0, ENDIANNESS_BIG> *m_cache;
 	address_space *m_data;
 	address_space *m_io;
 

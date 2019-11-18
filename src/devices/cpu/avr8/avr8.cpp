@@ -575,22 +575,22 @@ DEFINE_DEVICE_TYPE(ATMEGA2560, atmega2560_device, "atmega2560", "Atmel ATmega256
 
 void atmega88_device::atmega88_internal_map(address_map &map)
 {
-	map(0x0000, 0x00ff).rw(this, FUNC(atmega88_device::regs_r), FUNC(atmega88_device::regs_w));
+	map(0x0000, 0x00ff).rw(FUNC(atmega88_device::regs_r), FUNC(atmega88_device::regs_w));
 }
 
 void atmega644_device::atmega644_internal_map(address_map &map)
 {
-	map(0x0000, 0x00ff).rw(this, FUNC(atmega644_device::regs_r), FUNC(atmega644_device::regs_w));
+	map(0x0000, 0x00ff).rw(FUNC(atmega644_device::regs_r), FUNC(atmega644_device::regs_w));
 }
 
 void atmega1280_device::atmega1280_internal_map(address_map &map)
 {
-	map(0x0000, 0x01ff).rw(this, FUNC(atmega1280_device::regs_r), FUNC(atmega1280_device::regs_w));
+	map(0x0000, 0x01ff).rw(FUNC(atmega1280_device::regs_r), FUNC(atmega1280_device::regs_w));
 }
 
 void atmega2560_device::atmega2560_internal_map(address_map &map)
 {
-	map(0x0000, 0x01ff).rw(this, FUNC(atmega2560_device::regs_r), FUNC(atmega2560_device::regs_w));
+	map(0x0000, 0x01ff).rw(FUNC(atmega2560_device::regs_r), FUNC(atmega2560_device::regs_w));
 }
 
 //-------------------------------------------------
@@ -877,8 +877,7 @@ void avr8_device::device_reset()
 
 //-------------------------------------------------
 //  memory_space_config - return the configuration
-//  of the specified address space, or nullptr if
-//  the space doesn't exist
+//  of the CPU's address spaces
 //-------------------------------------------------
 
 device_memory_interface::space_config_vector avr8_device::memory_space_config() const
@@ -914,11 +913,6 @@ void avr8_device::state_string_export(const device_state_entry &entry, std::stri
 	}
 }
 
-
-//-------------------------------------------------
-//  disassemble - call the disassembly
-//  helper function
-//-------------------------------------------------
 
 std::unique_ptr<util::disasm_interface> avr8_device::create_disassembler()
 {
@@ -2901,7 +2895,7 @@ READ8_MEMBER( avr8_device::regs_r )
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-uint32_t avr8_device::execute_min_cycles() const
+uint32_t avr8_device::execute_min_cycles() const noexcept
 {
 	return 1;
 }
@@ -2912,7 +2906,7 @@ uint32_t avr8_device::execute_min_cycles() const
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-uint32_t avr8_device::execute_max_cycles() const
+uint32_t avr8_device::execute_max_cycles() const noexcept
 {
 	return 4;
 }
@@ -2923,7 +2917,7 @@ uint32_t avr8_device::execute_max_cycles() const
 //  input/interrupt lines
 //-------------------------------------------------
 
-uint32_t avr8_device::execute_input_lines() const
+uint32_t avr8_device::execute_input_lines() const noexcept
 {
 	return 0;
 }

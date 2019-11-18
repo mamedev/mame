@@ -77,13 +77,15 @@ public:
 		m_maincpu(*this, "maincpu")
 	{ }
 
+	void odyssey(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void odyssey(machine_config &config);
 	void odyssey_map(address_map &map);
 };
 
@@ -131,20 +133,20 @@ void odyssey_state::machine_reset()
 *           Machine Config            *
 **************************************/
 
-MACHINE_CONFIG_START(odyssey_state::odyssey)
-
+void odyssey_state::odyssey(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PENTIUM, 133000000) // a Celeron at 1.70 GHz on the MB I checked.
-	MCFG_CPU_PROGRAM_MAP(odyssey_map)
+	PENTIUM(config, m_maincpu, 133000000); // a Celeron at 1.70 GHz on the MB I checked.
+	m_maincpu->set_addrmap(AS_PROGRAM, &odyssey_state::odyssey_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_DRIVER(odyssey_state, screen_update)
-MACHINE_CONFIG_END
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 640-1, 0, 480-1);
+	screen.set_screen_update(FUNC(odyssey_state::screen_update));
+}
 
 
 /**************************************
@@ -202,5 +204,5 @@ ROM_END
 *           Game Driver(s)            *
 **************************************/
 
-/*    YEAR  NAME      PARENT  MACHINE  INPUT    STATE          INIT   ROT    COMPANY           FULLNAME    FLAGS  */
-GAME( 1998, odyssey,  0,      odyssey, odyssey, odyssey_state, 0,     ROT0, "Silicon Gaming", "Odyssey",   MACHINE_IS_SKELETON )
+/*    YEAR  NAME      PARENT  MACHINE  INPUT    STATE          INIT        ROT   COMPANY           FULLNAME    FLAGS  */
+GAME( 1998, odyssey,  0,      odyssey, odyssey, odyssey_state, empty_init, ROT0, "Silicon Gaming", "Odyssey",   MACHINE_IS_SKELETON )

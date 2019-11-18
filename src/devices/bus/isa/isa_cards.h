@@ -13,7 +13,7 @@
 
 
 // supported devices
-SLOT_INTERFACE_EXTERN( pc_isa8_cards );
-SLOT_INTERFACE_EXTERN( pc_isa16_cards );
+void pc_isa8_cards(device_slot_interface &device);
+void pc_isa16_cards(device_slot_interface &device);
 
 #endif // MAME_BUS_ISA_ISA_CARDS_H

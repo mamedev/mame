@@ -122,7 +122,7 @@ uint32_t copsnrob_state::screen_update_copsnrob(screen_device &screen, bitmap_in
 		{
 			if (val & mask1)
 			{
-				for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+				for (y = cliprect.top(); y <= cliprect.bottom(); y++)
 					if (m_bulletsram[y] & mask2)
 						bitmap.pix16(y, 256 - x) = 1;
 			}

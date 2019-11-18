@@ -19,6 +19,9 @@ public:
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu") { }
 
+	void embargo(machine_config &config);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
 
@@ -35,7 +38,6 @@ public:
 	virtual void machine_reset() override;
 	uint32_t screen_update_embargo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
-	void embargo(machine_config &config);
 	void main_data_map(address_map &map);
 	void main_io_map(address_map &map);
 	void main_map(address_map &map);
@@ -179,15 +181,15 @@ void embargo_state::main_map(address_map &map)
 
 void embargo_state::main_io_map(address_map &map)
 {
-	map(0x01, 0x01).portr("IN0").w(this, FUNC(embargo_state::port_1_w));
-	map(0x02, 0x02).rw(this, FUNC(embargo_state::dial_r), FUNC(embargo_state::port_2_w));
+	map(0x01, 0x01).portr("IN0").w(FUNC(embargo_state::port_1_w));
+	map(0x02, 0x02).rw(FUNC(embargo_state::dial_r), FUNC(embargo_state::port_2_w));
 	map(0x03, 0x03).nopw(); /* always 0xFE */
 }
 
 void embargo_state::main_data_map(address_map &map)
 {
 	map(S2650_DATA_PORT, S2650_DATA_PORT).portr("IN2");
-	map(S2650_CTRL_PORT, S2650_CTRL_PORT).rw(this, FUNC(embargo_state::input_port_bit_r), FUNC(embargo_state::input_select_w));
+	map(S2650_CTRL_PORT, S2650_CTRL_PORT).rw(FUNC(embargo_state::input_port_bit_r), FUNC(embargo_state::input_select_w));
 }
 
 
@@ -264,22 +266,21 @@ void embargo_state::machine_reset()
  *
  *************************************/
 
-MACHINE_CONFIG_START(embargo_state::embargo)
-
+void embargo_state::embargo(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, 625000)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_IO_MAP(main_io_map)
-	MCFG_CPU_DATA_MAP(main_data_map)
+	S2650(config, m_maincpu, 625000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &embargo_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &embargo_state::main_io_map);
+	m_maincpu->set_addrmap(AS_DATA, &embargo_state::main_data_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_UPDATE_DRIVER(embargo_state, screen_update_embargo)
-
-MACHINE_CONFIG_END
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 255, 0, 239);
+	screen.set_refresh_hz(60);
+	screen.set_screen_update(FUNC(embargo_state::screen_update_embargo));
+}
 
 
 
@@ -309,4 +310,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1977, embargo, 0, embargo, embargo, embargo_state, 0, ROT0, "Cinematronics", "Embargo", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1977, embargo, 0, embargo, embargo, embargo_state, empty_init, ROT0, "Cinematronics", "Embargo", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -79,17 +79,17 @@ CD Interface Register 0x0f - ADPCM fade in/out register
 
 
 
-DRIVER_INIT_MEMBER(pce_state,mess_pce)
+void pce_state::init_mess_pce()
 {
 	m_io_port_options = PCE_JOY_SIG | CONST_SIG;
 }
 
-DRIVER_INIT_MEMBER(pce_state,tg16)
+void pce_state::init_tg16()
 {
 	m_io_port_options = TG_16_JOY_SIG | CONST_SIG;
 }
 
-DRIVER_INIT_MEMBER(pce_state,sgx)
+void pce_state::init_sgx()
 {
 	m_io_port_options = PCE_JOY_SIG | CONST_SIG;
 }
@@ -120,13 +120,13 @@ MACHINE_RESET_MEMBER(pce_state,mess_pce)
 	if (m_cartslot->get_type() == PCE_CDSYS3J)
 	{
 		m_sys3_card = 1;
-		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x080000, 0x087fff, read8_delegate(FUNC(pce_state::pce_cd_acard_wram_r),this),write8_delegate(FUNC(pce_state::pce_cd_acard_wram_w),this));
+		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x080000, 0x087fff, read8_delegate(*this, FUNC(pce_state::pce_cd_acard_wram_r)), write8_delegate(*this, FUNC(pce_state::pce_cd_acard_wram_w)));
 	}
 
 	if (m_cartslot->get_type() == PCE_CDSYS3U)
 	{
 		m_sys3_card = 3;
-		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x080000, 0x087fff, read8_delegate(FUNC(pce_state::pce_cd_acard_wram_r),this),write8_delegate(FUNC(pce_state::pce_cd_acard_wram_w),this));
+		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x080000, 0x087fff, read8_delegate(*this, FUNC(pce_state::pce_cd_acard_wram_r)), write8_delegate(*this, FUNC(pce_state::pce_cd_acard_wram_w)));
 	}
 }
 
@@ -135,8 +135,6 @@ WRITE8_MEMBER(pce_state::mess_pce_joystick_w)
 {
 	int joy_i;
 	uint8_t joy_type = m_joy_type->read();
-
-	m_maincpu->io_set_buffer(data);
 
 	/* bump counter on a low-to-high transition of bit 1 */
 	if ((!m_joystick_data_select) && (data & JOY_CLOCK))

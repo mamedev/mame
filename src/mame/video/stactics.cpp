@@ -60,26 +60,25 @@ tilt the mirror up and down, and the monitor left and right.
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(stactics_state,stactics)
+void stactics_state::stactics_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
+	uint8_t const *const color_prom = memregion("proms")->base();
 
-	for (i = 0; i < 0x400; i++)
+	for (int i = 0; i < 0x400; i++)
 	{
-		int bit0 = (color_prom[i] >> 0) & 0x01;
-		int bit1 = (color_prom[i] >> 1) & 0x01;
-		int bit2 = (color_prom[i] >> 2) & 0x01;
-		int bit3 = (color_prom[i] >> 3) & 0x01;
+		int const bit0 = BIT(color_prom[i], 0);
+		int const bit1 = BIT(color_prom[i], 1);
+		int const bit2 = BIT(color_prom[i], 2);
+		int const bit3 = BIT(color_prom[i], 3);
 
-		/* red component */
-		int r = 0xff * bit0;
+		// red component
+		int const r = 0xff * bit0;
 
-		/* green component */
-		int g = 0xff * bit1 - 0xcc * bit3;
+		// green component
+		int const g = 0xff * bit1 - 0xcc * bit3;
 
-		/* blue component */
-		int b = 0xff * bit2;
+		// blue component
+		int const b = 0xff * bit2;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -120,7 +119,7 @@ WRITE8_MEMBER(stactics_state::scroll_ram_w)
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(stactics_state::get_frame_count_d3)
+READ_LINE_MEMBER(stactics_state::frame_count_d3_r)
 {
 	return (m_frame_count >> 3) & 0x01;
 }
@@ -170,13 +169,13 @@ WRITE8_MEMBER(stactics_state::shot_flag_clear_w)
 }
 
 
-CUSTOM_INPUT_MEMBER(stactics_state::get_shot_standby)
+READ_LINE_MEMBER(stactics_state::shot_standby_r)
 {
 	return m_shot_standby;
 }
 
 
-CUSTOM_INPUT_MEMBER(stactics_state::get_not_shot_arrive)
+READ_LINE_MEMBER(stactics_state::not_shot_arrive_r)
 {
 	return !m_shot_arrive;
 }
@@ -427,17 +426,16 @@ uint32_t stactics_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
  *
  *************************************/
 
-MACHINE_CONFIG_START(stactics_state::stactics_video)
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(stactics_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+void stactics_state::stactics_video(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_ALWAYS_UPDATE);
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
+	screen.set_screen_update(FUNC(stactics_state::screen_update));
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 0x400)
-
-	MCFG_PALETTE_INIT_OWNER(stactics_state,stactics)
-MACHINE_CONFIG_END
+	PALETTE(config, "palette", FUNC(stactics_state::stactics_palette), 0x400);
+}

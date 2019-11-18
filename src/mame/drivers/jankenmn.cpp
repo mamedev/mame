@@ -147,7 +147,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/z80ctc.h"
 #include "machine/i8255.h"
 #include "sound/dac.h"
@@ -169,11 +169,11 @@ public:
 		, m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(hopper_status_r);
+	DECLARE_READ_LINE_MEMBER(hopper_status_r);
 
 	void jankenmn(machine_config &config);
 
-protected:
+private:
 	DECLARE_WRITE8_MEMBER(lamps1_w);
 	DECLARE_WRITE8_MEMBER(lamps2_w);
 	DECLARE_WRITE8_MEMBER(lamps3_w);
@@ -183,8 +183,7 @@ protected:
 	void jankenmn_map(address_map &map);
 	void jankenmn_port_map(address_map &map);
 
-private:
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	output_finder<2> m_digits;
 	output_finder<16> m_lamps;
 };
@@ -252,7 +251,7 @@ WRITE8_MEMBER(jankenmn_state::lamps3_w)
 		logerror("payout: %02X\n", (data & 0x04));
 }
 
-CUSTOM_INPUT_MEMBER(jankenmn_state::hopper_status_r)
+READ_LINE_MEMBER(jankenmn_state::hopper_status_r)
 {
 	// temp workaround, needs hopper
 	return machine().rand();
@@ -337,7 +336,7 @@ static INPUT_PORTS_START( jankenmn )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Paa (Paper)")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN3 ) // 100 yen coin
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, jankenmn_state, hopper_status_r, nullptr)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(jankenmn_state, hopper_status_r)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 ) // 10 yen coin
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 ) // 10 yen coin
 
@@ -384,37 +383,39 @@ static const z80_daisy_config daisy_chain[] =
 *               Machine Config               *
 *********************************************/
 
-MACHINE_CONFIG_START(jankenmn_state::jankenmn)
+void jankenmn_state::jankenmn(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK)  /* 2.5 MHz */
-	MCFG_Z80_DAISY_CHAIN(daisy_chain)
-	MCFG_CPU_PROGRAM_MAP(jankenmn_map)
-	MCFG_CPU_IO_MAP(jankenmn_port_map)
+	Z80(config, m_maincpu, MASTER_CLOCK);  /* 2.5 MHz */
+	m_maincpu->set_daisy_config(daisy_chain);
+	m_maincpu->set_addrmap(AS_PROGRAM, &jankenmn_state::jankenmn_map);
+	m_maincpu->set_addrmap(AS_IO, &jankenmn_state::jankenmn_port_map);
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255, 0)
+	i8255_device &ppi0(I8255(config, "ppi8255_0"));
 	/* (10-13) Mode 0 - Ports A & B set as input, high C & low C as output. */
-	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN0"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(jankenmn_state, lamps3_w))
+	ppi0.in_pa_callback().set_ioport("DSW");
+	ppi0.in_pb_callback().set_ioport("IN0");
+	ppi0.out_pc_callback().set(FUNC(jankenmn_state::lamps3_w));
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
+	i8255_device &ppi1(I8255(config, "ppi8255_1"));
 	/* (20-23) Mode 0 - Ports A, B, high C & low C set as output. */
-	MCFG_I8255_OUT_PORTA_CB(DEVWRITE8("dac", dac_byte_interface, write))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(jankenmn_state, lamps1_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(jankenmn_state, lamps2_w))
+	ppi1.out_pa_callback().set("dac", FUNC(dac_byte_interface::data_w));
+	ppi1.out_pb_callback().set(FUNC(jankenmn_state::lamps1_w));
+	ppi1.out_pc_callback().set(FUNC(jankenmn_state::lamps2_w));
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, MASTER_CLOCK)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	z80ctc_device& ctc(Z80CTC(config, "ctc", MASTER_CLOCK));
+	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	/* NO VIDEO */
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
-	MCFG_SOUND_ADD("dac", AD7523, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	AD7523(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
 
 /*********************************************
@@ -438,5 +439,5 @@ ROM_END
 *                Game Drivers                *
 *********************************************/
 
-//     YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT  ROT   COMPANY    FULLNAME                    FLAGS                  LAYOUT
-GAMEL( 1991, jankenmn, 0,      jankenmn, jankenmn, jankenmn_state, 0,    ROT0, "Sunwise", "Janken Man Kattara Ageru", MACHINE_SUPPORTS_SAVE, layout_jankenmn )
+//     YEAR  NAME      PARENT  MACHINE   INPUT     CLASS           INIT        ROT   COMPANY    FULLNAME                    FLAGS                  LAYOUT
+GAMEL( 1991, jankenmn, 0,      jankenmn, jankenmn, jankenmn_state, empty_init, ROT0, "Sunwise", "Janken Man Kattara Ageru", MACHINE_SUPPORTS_SAVE, layout_jankenmn )

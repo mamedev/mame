@@ -84,6 +84,7 @@
 #include "sound/ay8910.h"
 #include "sound/upd7759.h"
 #include "video/ramdac.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -233,7 +234,7 @@ public:
 	{
 	}
 
-	DECLARE_DRIVER_INIT(bfcobra);
+	void init_bfcobra();
 	void bfcobra(machine_config &config);
 
 protected:
@@ -407,13 +408,13 @@ uint32_t bfcobra_state::screen_update_bfcobra(screen_device &screen, bitmap_rgb3
 		lorescol = m_col8bit;
 	}
 
-	for (y = cliprect.min_y; y <= cliprect.max_y; ++y)
+	for (y = cliprect.top(); y <= cliprect.bottom(); ++y)
 	{
 		uint16_t y_offset = (y + m_v_scroll) * 256;
 		src = &m_video_ram[offset + y_offset];
 		dest = &bitmap.pix32(y);
 
-		for (x = cliprect.min_x; x <= cliprect.max_x / 2; ++x)
+		for (x = cliprect.left(); x <= cliprect.right() / 2; ++x)
 		{
 			uint8_t x_offset = x + m_h_scroll;
 			uint8_t pen = *(src + x_offset);
@@ -495,7 +496,7 @@ void bfcobra_state::RunBlit(address_space &space)
 		/* This debug is now wrong ! */
 		if (DEBUG_BLITTER)
 		{
-			osd_printf_debug("\n%s:Blitter: Running command from 0x%.5x\n\n", device->machine().describe_context().c_str(), blitter.program.addr - 12);
+			osd_printf_debug("\n%s:Blitter: Running command from 0x%.5x\n\n", device->machine().describe_context(), blitter.program.addr - 12);
 			osd_printf_debug("Command Reg         %.2x",   blitter.command);
 			osd_printf_debug("     %s %s %s %s %s %s %s\n",
 				blitter.command & CMD_RUN ? "RUN" : "     ",
@@ -1273,12 +1274,12 @@ void bfcobra_state::z80_prog_map(address_map &map)
 void bfcobra_state::z80_io_map(address_map &map)
 {
 map.global_mask(0xff);
-	map(0x00, 0x23).rw(this, FUNC(bfcobra_state::chipset_r), FUNC(bfcobra_state::chipset_w));
+	map(0x00, 0x23).rw(FUNC(bfcobra_state::chipset_r), FUNC(bfcobra_state::chipset_w));
 	map(0x24, 0x25).w(m_acia6850_0, FUNC(acia6850_device::write));
 	map(0x26, 0x27).r(m_acia6850_0, FUNC(acia6850_device::read));
-	map(0x30, 0x30).r(this, FUNC(bfcobra_state::fdctrl_r));
-	map(0x31, 0x31).rw(this, FUNC(bfcobra_state::fddata_r), FUNC(bfcobra_state::fdctrl_w));
-	map(0x40, 0x40).w(this, FUNC(bfcobra_state::rombank_w));
+	map(0x30, 0x30).r(FUNC(bfcobra_state::fdctrl_r));
+	map(0x31, 0x31).rw(FUNC(bfcobra_state::fddata_r), FUNC(bfcobra_state::fdctrl_w));
+	map(0x40, 0x40).w(FUNC(bfcobra_state::rombank_w));
 	map(0x50, 0x50).w("ramdac", FUNC(ramdac_device::index_w));
 	map(0x51, 0x51).rw("ramdac", FUNC(ramdac_device::pal_r), FUNC(ramdac_device::pal_w));
 	map(0x52, 0x52).w("ramdac", FUNC(ramdac_device::mask_w));
@@ -1396,9 +1397,9 @@ READ8_MEMBER(bfcobra_state::upd_r)
 
 WRITE8_MEMBER(bfcobra_state::upd_w)
 {
-	m_upd7759->reset_w(data & 0x80);
-	m_upd7759->port_w(space, 0, data & 0x3f);
-	m_upd7759->start_w(data & 0x40 ? 0 : 1);
+	m_upd7759->reset_w(BIT(data, 7));
+	m_upd7759->port_w(data & 0x3f);
+	m_upd7759->start_w(!BIT(data, 6));
 }
 
 void bfcobra_state::m6809_prog_map(address_map &map)
@@ -1406,18 +1407,18 @@ void bfcobra_state::m6809_prog_map(address_map &map)
 	map(0x0000, 0x1fff).ram().share("nvram");
 	map(0x2000, 0x2000).ram();     // W 'B', 6F
 	map(0x2200, 0x2200).ram();     // W 'F'
-	map(0x2600, 0x2600).rw(this, FUNC(bfcobra_state::meter_r), FUNC(bfcobra_state::meter_w));
+	map(0x2600, 0x2600).rw(FUNC(bfcobra_state::meter_r), FUNC(bfcobra_state::meter_w));
 	map(0x2800, 0x2800).ram();     // W
-	map(0x2A00, 0x2A02).rw(this, FUNC(bfcobra_state::latch_r), FUNC(bfcobra_state::latch_w));
-	map(0x2E00, 0x2E00).r(this, FUNC(bfcobra_state::int_latch_r));
+	map(0x2a00, 0x2a02).rw(FUNC(bfcobra_state::latch_r), FUNC(bfcobra_state::latch_w));
+	map(0x2e00, 0x2e00).r(FUNC(bfcobra_state::int_latch_r));
 	map(0x3001, 0x3001).w("aysnd", FUNC(ay8910_device::data_w));
 	map(0x3201, 0x3201).w("aysnd", FUNC(ay8910_device::address_w));
 	map(0x3404, 0x3405).rw(m_acia6850_1, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
 	map(0x3406, 0x3407).rw(m_acia6850_2, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
-//  AM_RANGE(0x3408, 0x3408) AM_NOP
-//  AM_RANGE(0x340A, 0x340A) AM_NOP
-//  AM_RANGE(0x3600, 0x3600) AM_NOP
-	map(0x3801, 0x3801).rw(this, FUNC(bfcobra_state::upd_r), FUNC(bfcobra_state::upd_w));
+//  map(0x3408, 0x3408).noprw();
+//  map(0x340a, 0x340a).noprw();
+//  map(0x3600, 0x3600).noprw();
+	map(0x3801, 0x3801).rw(FUNC(bfcobra_state::upd_r), FUNC(bfcobra_state::upd_w));
 	map(0x8000, 0xffff).rom();
 	map(0xf000, 0xf000).nopw();    /* Watchdog */
 }
@@ -1569,7 +1570,7 @@ WRITE_LINE_MEMBER(bfcobra_state::write_acia_clock)
 
 
 /* TODO: Driver vs Machine Init */
-DRIVER_INIT_MEMBER(bfcobra_state,bfcobra)
+void bfcobra_state::init_bfcobra()
 {
 	/*
 	    6809 ROM address and data lines are scrambled.
@@ -1578,24 +1579,20 @@ DRIVER_INIT_MEMBER(bfcobra_state,bfcobra)
 	static const uint8_t datalookup[] = { 1, 3, 5, 6, 4, 2, 0, 7 };
 	static const uint8_t addrlookup[] = { 11, 12, 0, 2, 3, 5, 7, 9, 8, 6, 1, 4, 10, 13, 14 };
 
-	uint32_t i;
-	uint8_t *rom;
-
 	std::vector<uint8_t> tmp(0x8000);
-	rom = memregion("audiocpu")->base() + 0x8000;
+	uint8_t *rom = memregion("audiocpu")->base() + 0x8000;
 	memcpy(&tmp[0], rom, 0x8000);
 
-	for (i = 0; i < 0x8000; i++)
+	for (uint32_t i = 0; i < 0x8000; i++)
 	{
-		uint16_t addr = 0;
-		uint8_t x;
-		uint8_t data = 0;
 		uint8_t val = tmp[i];
 
-		for (x = 0; x < 8; x ++)
+		uint8_t data = 0;
+		for (uint8_t x = 0; x < 8; x ++)
 			data |= ((val >> x) & 1) << datalookup[x];
 
-		for (x = 0; x < 15; x ++)
+		uint16_t addr = 0;
+		for (uint8_t x = 0; x < 15; x ++)
 			addr |= ((i >> x) & 1)  << addrlookup[x];
 
 		rom[addr] = data;
@@ -1624,8 +1621,8 @@ DRIVER_INIT_MEMBER(bfcobra_state,bfcobra)
 	save_item(NAME(m_z80_int));
 	save_item(NAME(m_z80_inten));
 	save_item(NAME(m_bank_data));
-	save_pointer(NAME(m_work_ram.get()), 0xc0000);
-	save_pointer(NAME(m_video_ram.get()), 0x20000);
+	save_pointer(NAME(m_work_ram), 0xc0000);
+	save_pointer(NAME(m_video_ram), 0x20000);
 }
 
 /* TODO */
@@ -1641,58 +1638,57 @@ INTERRUPT_GEN_MEMBER(bfcobra_state::vblank_gen)
 	update_irqs();
 }
 
-MACHINE_CONFIG_START(bfcobra_state::bfcobra)
-	MCFG_CPU_ADD("maincpu", Z80, Z80_XTAL)
-	MCFG_CPU_PROGRAM_MAP(z80_prog_map)
-	MCFG_CPU_IO_MAP(z80_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", bfcobra_state,  vblank_gen)
+void bfcobra_state::bfcobra(machine_config &config)
+{
+	Z80(config, m_maincpu, Z80_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &bfcobra_state::z80_prog_map);
+	m_maincpu->set_addrmap(AS_IO, &bfcobra_state::z80_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(bfcobra_state::vblank_gen));
 
-	MCFG_CPU_ADD("audiocpu", MC6809, M6809_XTAL) // MC6809P
-	MCFG_CPU_PROGRAM_MAP(m6809_prog_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(bfcobra_state, timer_irq, 1000)
+	MC6809(config, m_audiocpu, M6809_XTAL); // MC6809P
+	m_audiocpu->set_addrmap(AS_PROGRAM, &bfcobra_state::m6809_prog_map);
+	m_audiocpu->set_periodic_int(FUNC(bfcobra_state::timer_irq), attotime::from_hz(1000));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 
 	/* TODO */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512 - 1, 0, 256 - 1)
-	MCFG_SCREEN_UPDATE_DRIVER(bfcobra_state, screen_update_bfcobra)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(512, 256);
+	screen.set_visarea_full();
+	screen.set_screen_update(FUNC(bfcobra_state::screen_update_bfcobra));
 
-	MCFG_PALETTE_ADD("palette", 256)
+	PALETTE(config, m_palette).set_entries(256);
 
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette") // MUSIC Semiconductor TR9C1710 RAMDAC or equivalent
-	MCFG_RAMDAC_SPLIT_READ(1)
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette)); // MUSIC Semiconductor TR9C1710 RAMDAC or equivalent
+	ramdac.set_addrmap(0, &bfcobra_state::ramdac_map);
+	ramdac.set_split_read(1);
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8910, M6809_XTAL / 4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	AY8910(config, "aysnd", M6809_XTAL / 4).add_route(ALL_OUTPUTS, "mono", 0.20);
 
-	MCFG_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	UPD7759(config, m_upd7759).add_route(ALL_OUTPUTS, "mono", 0.40);
 
 	/* ACIAs */
-	MCFG_DEVICE_ADD("acia6850_0", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("acia6850_1", acia6850_device, write_rxd))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(bfcobra_state, z80_acia_irq))
+	ACIA6850(config, m_acia6850_0, 0);
+	m_acia6850_0->txd_handler().set(m_acia6850_1, FUNC(acia6850_device::write_rxd));
+	m_acia6850_0->irq_handler().set(FUNC(bfcobra_state::z80_acia_irq));
 
-	MCFG_DEVICE_ADD("acia6850_1", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("acia6850_0", acia6850_device, write_rxd))
+	ACIA6850(config, m_acia6850_1, 0);
+	m_acia6850_1->txd_handler().set(m_acia6850_0, FUNC(acia6850_device::write_rxd));
 
-	MCFG_DEVICE_ADD("acia6850_2", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(bfcobra_state, data_acia_tx_w))
-	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(bfcobra_state, m6809_data_irq))
+	ACIA6850(config, m_acia6850_2, 0);
+	m_acia6850_2->txd_handler().set(FUNC(bfcobra_state::data_acia_tx_w));
+	m_acia6850_2->irq_handler().set(FUNC(bfcobra_state::m6809_data_irq));
 
-	MCFG_DEVICE_ADD("acia_clock", CLOCK, 31250*16) // What are the correct ACIA clocks ?
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(bfcobra_state, write_acia_clock))
+	clock_device &acia_clock(CLOCK(config, "acia_clock", 31250*16)); // What are the correct ACIA clocks ?
+	acia_clock.signal_handler().set(FUNC(bfcobra_state::write_acia_clock));
 
-	MCFG_DEVICE_ADD("meters", METERS, 0)
-	MCFG_METERS_NUMBER(8)
-MACHINE_CONFIG_END
+	METERS(config, m_meters, 0).set_number(8);
+}
 
 /***************************************************************************
 
@@ -1851,11 +1847,11 @@ ROM_START( qosb )
 ROM_END
 
 
-GAME( 1989, inquiztr, 0         ,   bfcobra, bfcobra, bfcobra_state, bfcobra, ROT0, "BFM", "Inquizitor",                       MACHINE_NOT_WORKING )
-GAME( 1990, escounts, 0         ,   bfcobra, bfcobra, bfcobra_state, bfcobra, ROT0, "BFM", "Every Second Counts (39-360-053)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1991, trebltop, 0         ,   bfcobra, bfcobra, bfcobra_state, bfcobra, ROT0, "BFM", "Treble Top (39-360-070)",          MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1991, beeline,  0         ,   bfcobra, bfcobra, bfcobra_state, bfcobra, ROT0, "BFM", "Beeline (39-360-075)",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1991, quizvadr, 0         ,   bfcobra, bfcobra, bfcobra_state, bfcobra, ROT0, "BFM", "Quizvaders (39-360-078)",          MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, qos,      0         ,   bfcobra, bfcobra, bfcobra_state, bfcobra, ROT0, "BFM", "A Question of Sport (set 1, 39-960-107)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, qosa,     qos       ,   bfcobra, bfcobra, bfcobra_state, bfcobra, ROT0, "BFM", "A Question of Sport (set 2, 39-960-099)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, qosb,     qos       ,   bfcobra, bfcobra, bfcobra_state, bfcobra, ROT0, "BFM", "A Question of Sport (set 3, 39-960-089)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1989, inquiztr, 0,   bfcobra, bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM", "Inquizitor",                       MACHINE_NOT_WORKING )
+GAME( 1990, escounts, 0,   bfcobra, bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM", "Every Second Counts (39-360-053)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1991, trebltop, 0,   bfcobra, bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM", "Treble Top (39-360-070)",          MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1991, beeline,  0,   bfcobra, bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM", "Beeline (39-360-075)",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1991, quizvadr, 0,   bfcobra, bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM", "Quizvaders (39-360-078)",          MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, qos,      0,   bfcobra, bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM", "A Question of Sport (set 1, 39-960-107)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, qosa,     qos, bfcobra, bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM", "A Question of Sport (set 2, 39-960-099)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, qosb,     qos, bfcobra, bfcobra, bfcobra_state, init_bfcobra, ROT0, "BFM", "A Question of Sport (set 3, 39-960-089)", MACHINE_IMPERFECT_GRAPHICS )

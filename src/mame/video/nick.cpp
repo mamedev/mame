@@ -78,15 +78,15 @@ DEFINE_DEVICE_TYPE(NICK, nick_device, "nick", "NICK")
 
 void nick_device::vram_map(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(nick_device::vram_r), FUNC(nick_device::vram_w));
+	map(0x0000, 0xffff).rw(FUNC(nick_device::vram_r), FUNC(nick_device::vram_w));
 }
 
 void nick_device::vio_map(address_map &map)
 {
-	map(0x00, 0x00).w(this, FUNC(nick_device::fixbias_w));
-	map(0x01, 0x01).w(this, FUNC(nick_device::border_w));
-	map(0x02, 0x02).w(this, FUNC(nick_device::lpl_w));
-	map(0x03, 0x03).w(this, FUNC(nick_device::lph_w));
+	map(0x00, 0x00).w(FUNC(nick_device::fixbias_w));
+	map(0x01, 0x01).w(FUNC(nick_device::border_w));
+	map(0x02, 0x02).w(FUNC(nick_device::lpl_w));
+	map(0x03, 0x03).w(FUNC(nick_device::lph_w));
 }
 
 
@@ -335,9 +335,9 @@ void nick_device::initialize_palette()
 		int ba = BIT(i, 2);
 		int bb = BIT(i, 5);
 
-		uint8_t r = combine_3_weights(color_weights_rg, rc, rb, ra);
-		uint8_t g = combine_3_weights(color_weights_rg, gc, gb, ga);
-		uint8_t b = combine_2_weights(color_weights_b, bb, ba);
+		uint8_t r = combine_weights(color_weights_rg, rc, rb, ra);
+		uint8_t g = combine_weights(color_weights_rg, gc, gb, ga);
+		uint8_t b = combine_weights(color_weights_b, bb, ba);
 
 		m_palette[i] = rgb_t(r, g, b);
 	}

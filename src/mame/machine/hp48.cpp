@@ -115,9 +115,6 @@ void hp48_state::rs232_start_recv_byte(uint8_t data)
 /* end of send event */
 TIMER_CALLBACK_MEMBER(hp48_state::rs232_byte_sent_cb)
 {
-	//device_image_interface *xmodem = dynamic_cast<device_image_interface *>(machine().device("rs232_x"));
-	//device_image_interface *kermit = dynamic_cast<device_image_interface *>(machine().device("rs232_k"));
-
 	LOG_SERIAL(("%f hp48_state::rs232_byte_sent_cb: end of send, data=%02x\n", machine().time().as_double(), param));
 
 	m_io[0x12] &= ~3; /* clear byte sending and buffer full */
@@ -127,10 +124,6 @@ TIMER_CALLBACK_MEMBER(hp48_state::rs232_byte_sent_cb)
 	{
 		pulse_irq(SATURN_IRQ_LINE);
 	}
-
-	/* protocol action */
-	//if ( xmodem && xmodem->exists() ) xmodem_receive_byte( &xmodem->device(), param );
-	//else if ( kermit && kermit->exists() ) kermit_receive_byte( &kermit->device(), param );
 }
 
 /* CPU initiates a send event */
@@ -445,17 +438,8 @@ READ8_MEMBER(hp48_state::io_r)
 	/* serial */
 	case 0x15:
 	{
-		/* second nibble of received data */
-
-		//device_image_interface *xmodem = dynamic_cast<device_image_interface *>(machine().device("rs232_x"));
-		//device_image_interface *kermit = dynamic_cast<device_image_interface *>(machine().device("rs232_k"));
-
 		m_io[0x11] &= ~1;  /* clear byte received */
 		data = m_io[offset];
-
-		/* protocol action */
-		//if ( xmodem && xmodem->exists() ) xmodem_byte_transmitted( &xmodem->device() );
-		//else if ( kermit && kermit->exists() ) kermit_byte_transmitted( &kermit->device() );
 		break;
 	}
 
@@ -917,15 +901,14 @@ void hp48_state::encode_nibble(uint8_t* dst, uint8_t* src, int size)
     MACHINES
 ***************************************************************************/
 
-DRIVER_INIT_MEMBER(hp48_state,hp48)
+void hp48_state::init_hp48()
 {
-	int i;
 	LOG(( "hp48: driver init called\n" ));
-	for ( i = 0; i < 6; i++ )
+	for (int i = 0; i < 6; i++)
 	{
 		m_modules[i].off_mask = 0x00fff;  /* 2 KB */
-		m_modules[i].read     = read8_delegate();
-		m_modules[i].write    = write8_delegate();
+		m_modules[i].read     = read8_delegate(*this);
+		m_modules[i].write    = write8_delegate(*this);
 		m_modules[i].data     = nullptr;
 		m_modules[i].isnop    = 0;
 	}
@@ -952,7 +935,7 @@ void hp48_state::base_machine_start(hp48_models model)
 		HP48_GX_MODEL ? (128 * 1024) : (32 * 1024);
 
 	uint8_t *ram = auto_alloc_array(machine(), uint8_t, 2 * ram_size);
-	machine().device<nvram_device>("nvram")->set_base(ram, 2 * ram_size);
+	subdevice<nvram_device>("nvram")->set_base(ram, 2 * ram_size);
 
 
 	/* ROM load */
@@ -974,8 +957,8 @@ void hp48_state::base_machine_start(hp48_models model)
 
 	/* I/O RAM */
 	m_modules[HP48_HDW].off_mask = 0x0003f;  /* 32 B */
-	m_modules[HP48_HDW].read     = read8_delegate(FUNC(hp48_state::io_r),this);
-	m_modules[HP48_HDW].write    = write8_delegate(FUNC(hp48_state::io_w),this);
+	m_modules[HP48_HDW].read     = read8_delegate(*this, FUNC(hp48_state::io_r));
+	m_modules[HP48_HDW].write    = write8_delegate(*this, FUNC(hp48_state::io_w));
 
 	/* internal RAM */
 	if (HP49_G_MODEL)
@@ -997,8 +980,8 @@ void hp48_state::base_machine_start(hp48_models model)
 	if (HP48_G_SERIES)
 	{
 		m_modules[HP48_CE1].off_mask = 0x00fff;  /* 2 KB */
-		m_modules[HP48_CE1].read     = read8_delegate(FUNC(hp48_state::bank_r),this);
-		m_modules[HP48_CE1].write    = HP49_G_MODEL ? write8_delegate(FUNC(hp48_state::hp49_bank_w),this) : write8_delegate();
+		m_modules[HP48_CE1].read     = read8_delegate(*this, FUNC(hp48_state::bank_r));
+		m_modules[HP48_CE1].write    = HP49_G_MODEL ? write8_delegate(*this, FUNC(hp48_state::hp49_bank_w)) : write8_delegate(*this);
 	}
 
 	/* timers */
@@ -1013,13 +996,13 @@ void hp48_state::base_machine_start(hp48_models model)
 	m_kbd_timer->adjust(attotime::from_msec(1), 0, attotime::from_msec(1));
 
 	/* save state */
-	save_item(NAME(m_out) );
-	save_item(NAME(m_kdn) );
-	save_item(NAME(m_io_addr) );
-	save_item(NAME(m_crc) );
-	save_item(NAME(m_timer1) );
-	save_item(NAME(m_timer2) );
-	save_item(NAME(m_bank_switch) );
+	save_item(NAME(m_out));
+	save_item(NAME(m_kdn));
+	save_item(NAME(m_io_addr));
+	save_item(NAME(m_crc));
+	save_item(NAME(m_timer1));
+	save_item(NAME(m_timer2));
+	save_item(NAME(m_bank_switch));
 	for (int i = 0; i < 6; i++)
 	{
 		save_item(m_modules[i].state, "globals/m_modules[i].state", i);

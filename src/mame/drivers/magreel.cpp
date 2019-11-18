@@ -118,30 +118,29 @@ void magreel_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(magreel_state::magreel)
-
+void magreel_state::magreel(machine_config &config)
+{
 	/* basic machine hardware - all information unknown */
-//  MCFG_CPU_ADD("maincpu",m68000,MAIN_CLOCK/12)
-//  MCFG_CPU_PROGRAM_MAP(magreel_map)
+//  m68000_device &maincpu(M68000(config, "maincpu", MAIN_CLOCK/12));
+//  maincpu.set_addrmap(AS_PROGRAM, &magreel_state::magreel_map);
 
 	/* video hardware */
-//  MCFG_SCREEN_ADD("screen", RASTER)
-//  MCFG_SCREEN_REFRESH_RATE(60)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-//  MCFG_SCREEN_UPDATE_DRIVER(magreel_state, screen_update)
-//  MCFG_SCREEN_SIZE(32*8, 32*8)
-//  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-//  MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK/2, 442, 0, 320, 264, 0, 240)          /* generic NTSC video timing at 320x240 */
-//  MCFG_SCREEN_PALETTE("palette")
+//  screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+//  screen.set_refresh_hz(60);
+//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+//  screen.set_screen_update(FUNC(magreel_state::screen_update));
+//  screen.set_size(32*8, 32*8);
+//  screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);
+//  screen.set_raw(MAIN_CLOCK/2, 442, 0, 320, 264, 0, 240);          /* generic NTSC video timing at 320x240 */
+//  screen.set_palette("palette");
 
-//  MCFG_GFXDECODE_ADD("gfxdecode", "palette", magreel)
+//  GFXDECODE(config, "gfxdecode", "palette", gfx_magreel);
 
-//  MCFG_PALETTE_ADD("palette", 8)
-//  MCFG_PALETTE_INIT_OWNER(magreel_state, magreel)
+//  PALETTE(config, "palette", FUNC(magreel_state::magreel), 8)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-MACHINE_CONFIG_END
+	SPEAKER(config, "mono").front_center();
+}
 
 
 /***************************************************************************
@@ -162,4 +161,4 @@ ROM_START( magreel ) // roms have not been looked at
 	ROM_LOAD( "m28c64.ic20",  0xb02000, 0x002000, CRC(4e6abd42) SHA1(5b1741b755f0fddd94e16d41d5d39a03f37fb23b) )
 ROM_END
 
-GAME( 199?, magreel,  0,   magreel,  magreel, magreel_state,  0,       ROT0, "Play System",      "Magic Reels", MACHINE_IS_SKELETON )
+GAME( 199?, magreel, 0, magreel, magreel, magreel_state, empty_init, ROT0, "Play System",      "Magic Reels", MACHINE_IS_SKELETON )

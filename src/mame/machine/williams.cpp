@@ -20,93 +20,22 @@ TIMER_DEVICE_CALLBACK_MEMBER(williams_state::williams_va11_callback)
 {
 	int scanline = param;
 
+	// must not fire at line 256
+	if (scanline == 256)
+		return;
+
 	/* the IRQ signal comes into CB1, and is set to VA11 */
-	m_pia_1->cb1_w(scanline & 0x20);
-
-	/* set a timer for the next update */
-	scanline += 0x20;
-	if (scanline >= 256) scanline = 0;
-	timer.adjust(m_screen->time_until_pos(scanline), scanline);
-}
-
-
-TIMER_CALLBACK_MEMBER(williams_state::williams_count240_off_callback)
-{
-	/* the COUNT240 signal comes into CA1, and is set to the logical AND of VA10-VA13 */
-	m_pia_1->ca1_w(0);
+	m_pia[1]->cb1_w(BIT(scanline, 5));
 }
 
 
 TIMER_DEVICE_CALLBACK_MEMBER(williams_state::williams_count240_callback)
 {
-	/* the COUNT240 signal comes into CA1, and is set to the logical AND of VA10-VA13 */
-	m_pia_1->ca1_w(1);
+	int scanline = param;
 
-	/* set a timer to turn it off once the scanline counter resets */
-	machine().scheduler().timer_set(m_screen->time_until_pos(0), timer_expired_delegate(FUNC(williams_state::williams_count240_off_callback),this));
-
-	/* set a timer for next frame */
-	timer.adjust(m_screen->time_until_pos(240));
+	// the COUNT240 signal comes into CA1, and is set to the logical AND of VA10-VA13
+	m_pia[1]->ca1_w(scanline >= 240 ? 1 : 0);
 }
-
-
-WRITE_LINE_MEMBER(williams_state::williams_main_irq)
-{
-	int combined_state = m_pia_1->irq_a_state() | m_pia_1->irq_b_state();
-
-	/* IRQ to the main CPU */
-	m_maincpu->set_input_line(M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
-WRITE_LINE_MEMBER(williams_state::williams_main_firq)
-{
-	/* FIRQ to the main CPU */
-	m_maincpu->set_input_line(M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
-WRITE_LINE_MEMBER(williams_state::williams_snd_irq)
-{
-	int combined_state = m_pia_2->irq_a_state() | m_pia_2->irq_b_state();
-
-	/* IRQ to the sound CPU */
-	m_soundcpu->set_input_line(M6808_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
-}
-/* Same as above, but for second sound board */
-WRITE_LINE_MEMBER(blaster_state::williams_snd_irq_b)
-{
-	int combined_state = m_pia_2b->irq_a_state() | m_pia_2b->irq_b_state();
-
-	/* IRQ to the sound CPU */
-	m_soundcpu_b->set_input_line(M6808_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
-
-/*************************************
- *
- *  Newer Williams interrupts
- *
- *************************************/
-
-WRITE_LINE_MEMBER(williams2_state::mysticm_main_irq)
-{
-	int combined_state = m_pia_0->irq_b_state() | m_pia_1->irq_a_state() | m_pia_1->irq_b_state();
-
-	/* IRQ to the main CPU */
-	m_maincpu->set_input_line(M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
-WRITE_LINE_MEMBER(williams2_state::tshoot_main_irq)
-{
-	int combined_state = m_pia_0->irq_a_state() | m_pia_0->irq_b_state() | m_pia_1->irq_a_state() | m_pia_1->irq_b_state();
-
-	/* IRQ to the main CPU */
-	m_maincpu->set_input_line(M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
-}
-
 
 
 /*************************************
@@ -118,32 +47,14 @@ WRITE_LINE_MEMBER(williams2_state::tshoot_main_irq)
 MACHINE_START_MEMBER(williams_state,williams_common)
 {
 	/* configure the memory bank */
-	membank("bank1")->configure_entry(1, memregion("maincpu")->base() + 0x10000);
-	membank("bank1")->configure_entry(0, m_videoram);
-}
-
-
-MACHINE_RESET_MEMBER(williams_state,williams_common)
-{
-	/* set a timer to go off every 16 scanlines, to toggle the VA11 line and update the screen */
-	timer_device *scan_timer = machine().device<timer_device>("scan_timer");
-	scan_timer->adjust(m_screen->time_until_pos(0));
-
-	/* also set a timer to go off on scanline 240 */
-	timer_device *l240_timer = machine().device<timer_device>("240_timer");
-	l240_timer->adjust(m_screen->time_until_pos(240));
+	m_mainbank->configure_entry(1, memregion("maincpu")->base() + 0x10000);
+	m_mainbank->configure_entry(0, m_videoram);
 }
 
 
 MACHINE_START_MEMBER(williams_state,williams)
 {
 	MACHINE_START_CALL_MEMBER(williams_common);
-}
-
-
-MACHINE_RESET_MEMBER(williams_state,williams)
-{
-	MACHINE_RESET_CALL_MEMBER(williams_common);
 }
 
 
@@ -157,35 +68,21 @@ MACHINE_RESET_MEMBER(williams_state,williams)
 TIMER_DEVICE_CALLBACK_MEMBER(williams2_state::williams2_va11_callback)
 {
 	int scanline = param;
+	if (scanline == 256)
+		return;
 
-	/* the IRQ signal comes into CB1, and is set to VA11 */
-	m_pia_0->cb1_w(scanline & 0x20);
-	m_pia_1->ca1_w(scanline & 0x20);
-
-	/* set a timer for the next update */
-	scanline += 0x20;
-	if (scanline >= 256) scanline = 0;
-	timer.adjust(m_screen->time_until_pos(scanline), scanline);
-}
-
-
-TIMER_CALLBACK_MEMBER(williams2_state::williams2_endscreen_off_callback)
-{
-	/* the /ENDSCREEN signal comes into CA1 */
-	m_pia_0->ca1_w(1);
+	// the IRQ signal comes into CB1, and is set to VA11
+	m_pia[0]->cb1_w(BIT(scanline, 5));
+	m_pia[1]->ca1_w(BIT(scanline, 5));
 }
 
 
 TIMER_DEVICE_CALLBACK_MEMBER(williams2_state::williams2_endscreen_callback)
 {
-	/* the /ENDSCREEN signal comes into CA1 */
-	m_pia_0->ca1_w(0);
+	int scanline = param;
 
-	/* set a timer to turn it off once the scanline counter resets */
-	machine().scheduler().timer_set(m_screen->time_until_pos(8), timer_expired_delegate(FUNC(williams2_state::williams2_endscreen_off_callback),this));
-
-	/* set a timer for next frame */
-	timer.adjust(m_screen->time_until_pos(254));
+	// the /ENDSCREEN signal comes into CA1
+	m_pia[0]->ca1_w(scanline >= 254 ? 0 : 1);
 }
 
 
@@ -199,26 +96,16 @@ TIMER_DEVICE_CALLBACK_MEMBER(williams2_state::williams2_endscreen_callback)
 MACHINE_START_MEMBER(williams2_state,williams2)
 {
 	/* configure memory banks */
-	membank("bank1")->configure_entries(1, 4, memregion("maincpu")->base() + 0x10000, 0x10000);
-	membank("bank1")->configure_entry(0, m_videoram);
+	m_mainbank->configure_entries(1, 4, memregion("maincpu")->base() + 0x10000, 0x10000);
+	m_mainbank->configure_entry(0, m_videoram);
 	membank("vram8000")->set_base(&m_videoram[0x8000]);
 }
 
 
 MACHINE_RESET_MEMBER(williams2_state,williams2)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-
 	/* make sure our banking is reset */
-	williams2_bank_select_w(space, 0, 0);
-
-	/* set a timer to go off every 16 scanlines, to toggle the VA11 line and update the screen */
-	timer_device *scan_timer = machine().device<timer_device>("scan_timer");
-	scan_timer->adjust(m_screen->time_until_pos(0));
-
-	/* also set a timer to go off on scanline 254 */
-	timer_device *l254_timer = machine().device<timer_device>("254_timer");
-	l254_timer->adjust(m_screen->time_until_pos(254));
+	williams2_bank_select_w(0);
 }
 
 
@@ -229,37 +116,37 @@ MACHINE_RESET_MEMBER(williams2_state,williams2)
  *
  *************************************/
 
-WRITE8_MEMBER(williams_state::williams_vram_select_w)
+void williams_state::williams_vram_select_w(u8 data)
 {
 	/* VRAM/ROM banking from bit 0 */
-	membank("bank1")->set_entry(data & 0x01);
+	m_mainbank->set_entry(data & 0x01);
 
 	/* cocktail flip from bit 1 */
 	m_cocktail = data & 0x02;
 }
 
 
-WRITE8_MEMBER(williams2_state::williams2_bank_select_w)
+void williams2_state::williams2_bank_select_w(u8 data)
 {
 	/* the low two bits control the paging */
 	switch (data & 0x03)
 	{
 		/* page 0 is video ram */
 		case 0:
-			membank("bank1")->set_entry(0);
+			m_mainbank->set_entry(0);
 			m_bank8000->set_bank(0);
 			break;
 
 		/* pages 1 and 2 are ROM */
 		case 1:
 		case 2:
-			membank("bank1")->set_entry(1 + ((data & 6) >> 1));
+			m_mainbank->set_entry(1 + ((data & 6) >> 1));
 			m_bank8000->set_bank(0);
 			break;
 
 		/* page 3 accesses palette RAM; the remaining areas are as if page 1 ROM was selected */
 		case 3:
-			membank("bank1")->set_entry(1 + ((data & 4) >> 1));
+			m_mainbank->set_entry(1 + ((data & 4) >> 1));
 			m_bank8000->set_bank(1);
 			break;
 	}
@@ -275,27 +162,27 @@ WRITE8_MEMBER(williams2_state::williams2_bank_select_w)
 
 TIMER_CALLBACK_MEMBER(williams_state::williams_deferred_snd_cmd_w)
 {
-	m_pia_2->portb_w(param);
-	m_pia_2->cb1_w((param == 0xff) ? 0 : 1);
+	m_pia[2]->write_portb(param);
+	m_pia[2]->cb1_w((param == 0xff) ? 0 : 1);
 }
 
-WRITE8_MEMBER(williams_state::williams_snd_cmd_w)
+void williams_state::williams_snd_cmd_w(u8 data)
 {
 	/* the high two bits are set externally, and should be 1 */
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(williams_state::williams_deferred_snd_cmd_w),this), data | 0xc0);
 }
 
-WRITE8_MEMBER(williams_state::playball_snd_cmd_w)
+void williams_state::playball_snd_cmd_w(u8 data)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(williams_state::williams_deferred_snd_cmd_w),this), data);
 }
 
 TIMER_CALLBACK_MEMBER(williams2_state::williams2_deferred_snd_cmd_w)
 {
-	m_pia_2->porta_w(param);
+	m_pia[2]->write_porta(param);
 }
 
-WRITE8_MEMBER(williams2_state::williams2_snd_cmd_w)
+void williams2_state::williams2_snd_cmd_w(u8 data)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(williams2_state::williams2_deferred_snd_cmd_w),this), data);
 }
@@ -327,7 +214,7 @@ WRITE8_MEMBER(williams2_state::williams2_snd_cmd_w)
  *      1000 = right/down full
  */
 
-READ8_MEMBER(williams_state::williams_49way_port_0_r)
+u8 williams_state::williams_49way_port_0_r()
 {
 	static const uint8_t translate49[7] = { 0x0, 0x4, 0x6, 0x7, 0xb, 0x9, 0x8 };
 	return (translate49[ioport("49WAYX")->read() >> 4] << 4) | translate49[ioport("49WAYY")->read() >> 4];
@@ -341,14 +228,14 @@ READ8_MEMBER(williams_state::williams_49way_port_0_r)
  *
  *************************************/
 
-WRITE8_MEMBER(williams_state::williams_cmos_w)
+void williams_state::williams_cmos_w(offs_t offset, u8 data)
 {
 	/* only 4 bits are valid */
 	m_nvram[offset] = data | 0xf0;
 }
 
 
-WRITE8_MEMBER(williams_state::bubbles_cmos_w)
+void williams_state::bubbles_cmos_w(offs_t offset, u8 data)
 {
 	/* bubbles has additional CMOS for a full 8 bits */
 	m_nvram[offset] = data;
@@ -366,7 +253,7 @@ WRITE8_MEMBER(williams_state::williams_watchdog_reset_w)
 {
 	/* yes, the data bits are checked for this specific value */
 	if (data == 0x39)
-		m_watchdog->reset_w(space,0,0);
+		m_watchdog->watchdog_reset();
 }
 
 
@@ -374,7 +261,7 @@ WRITE8_MEMBER(williams2_state::williams2_watchdog_reset_w)
 {
 	/* yes, the data bits are checked for this specific value */
 	if ((data & 0x3f) == 0x14)
-		m_watchdog->reset_w(space,0,0);
+		m_watchdog->watchdog_reset();
 }
 
 
@@ -385,7 +272,7 @@ WRITE8_MEMBER(williams2_state::williams2_watchdog_reset_w)
  *
  *************************************/
 
-WRITE8_MEMBER(williams2_state::williams2_7segment_w)
+void williams2_state::williams2_7segment_w(u8 data)
 {
 	int n;
 	char dot;
@@ -433,21 +320,17 @@ MACHINE_START_MEMBER(williams_state,defender)
 
 MACHINE_RESET_MEMBER(williams_state,defender)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-
-	MACHINE_RESET_CALL_MEMBER(williams_common);
-
-	defender_bank_select_w(space, 0, 0);
+	defender_bank_select_w(0);
 }
 
 
-WRITE8_MEMBER(williams_state::defender_video_control_w)
+void williams_state::defender_video_control_w(u8 data)
 {
 	m_cocktail = data & 0x01;
 }
 
 
-WRITE8_MEMBER(williams_state::defender_bank_select_w)
+void williams_state::defender_bank_select_w(u8 data)
 {
 	m_bankc000->set_bank(data & 0x0f);
 }
@@ -460,7 +343,7 @@ WRITE8_MEMBER(williams_state::defender_bank_select_w)
  *
  *************************************/
 
-READ8_MEMBER(williams_state::mayday_protection_r)
+u8 williams_state::mayday_protection_r(offs_t offset)
 {
 	/* Mayday does some kind of protection check that is not currently understood  */
 	/* However, the results of that protection check are stored at $a190 and $a191 */
@@ -478,10 +361,10 @@ READ8_MEMBER(williams_state::mayday_protection_r)
  *
  *************************************/
 
-WRITE8_MEMBER(williams_state::sinistar_vram_select_w)
+void williams_state::sinistar_vram_select_w(u8 data)
 {
 	/* low two bits are standard */
-	williams_vram_select_w(space, offset, data);
+	williams_vram_select_w(data);
 
 	/* window enable from bit 2 (clips to 0x7400) */
 	m_blitter_window_enable = data & 0x04;
@@ -498,11 +381,11 @@ WRITE8_MEMBER(williams_state::sinistar_vram_select_w)
 MACHINE_START_MEMBER(blaster_state,blaster)
 {
 	/* banking is different for blaster */
-	membank("bank1")->configure_entries(1, 16, memregion("maincpu")->base() + 0x18000, 0x4000);
-	membank("bank1")->configure_entry(0, m_videoram);
+	m_mainbank->configure_entries(1, 16, memregion("maincpu")->base() + 0x18000, 0x4000);
+	m_mainbank->configure_entry(0, m_videoram);
 
-	membank("bank2")->configure_entries(1, 16, memregion("maincpu")->base() + 0x10000, 0x0000);
-	membank("bank2")->configure_entry(0, &m_videoram[0x4000]);
+	m_blaster_bankb->configure_entries(1, 16, memregion("maincpu")->base() + 0x10000, 0x0000);
+	m_blaster_bankb->configure_entry(0, &m_videoram[0x4000]);
 
 	/* register for save states */
 	save_item(NAME(m_vram_bank));
@@ -510,20 +393,14 @@ MACHINE_START_MEMBER(blaster_state,blaster)
 }
 
 
-MACHINE_RESET_MEMBER(blaster_state,blaster)
-{
-	MACHINE_RESET_CALL_MEMBER(williams_common);
-}
-
-
 inline void blaster_state::update_blaster_banking()
 {
-	membank("bank1")->set_entry(m_vram_bank * (m_rom_bank + 1));
-	membank("bank2")->set_entry(m_vram_bank * (m_rom_bank + 1));
+	m_mainbank->set_entry(m_vram_bank * (m_rom_bank + 1));
+	m_blaster_bankb->set_entry(m_vram_bank * (m_rom_bank + 1));
 }
 
 
-WRITE8_MEMBER(blaster_state::blaster_vram_select_w)
+void blaster_state::blaster_vram_select_w(u8 data)
 {
 	/* VRAM/ROM banking from bit 0 */
 	m_vram_bank = data & 0x01;
@@ -537,7 +414,7 @@ WRITE8_MEMBER(blaster_state::blaster_vram_select_w)
 }
 
 
-WRITE8_MEMBER(blaster_state::blaster_bank_select_w)
+void blaster_state::blaster_bank_select_w(u8 data)
 {
 	m_rom_bank = data & 0x0f;
 	update_blaster_banking();
@@ -549,12 +426,12 @@ TIMER_CALLBACK_MEMBER(blaster_state::blaster_deferred_snd_cmd_w)
 	uint8_t l_data = param | 0x80;
 	uint8_t r_data = (param >> 1 & 0x40) | (param & 0x3f) | 0x80;
 
-	m_pia_2->portb_w(l_data); m_pia_2->cb1_w((l_data == 0xff) ? 0 : 1);
-	m_pia_2b->portb_w(r_data); m_pia_2b->cb1_w((r_data == 0xff) ? 0 : 1);
+	m_pia[2]->write_portb(l_data); m_pia[2]->cb1_w((l_data == 0xff) ? 0 : 1);
+	m_pia[3]->write_portb(r_data); m_pia[3]->cb1_w((r_data == 0xff) ? 0 : 1);
 }
 
 
-WRITE8_MEMBER(blaster_state::blaster_snd_cmd_w)
+void blaster_state::blaster_snd_cmd_w(u8 data)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(blaster_state::blaster_deferred_snd_cmd_w),this), data);
 }
@@ -580,10 +457,13 @@ WRITE_LINE_MEMBER(williams_state::lottofun_coin_lock_w)
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(tshoot_state::gun_r)
+MACHINE_START_MEMBER(tshoot_state,tshoot)
 {
-	int data = m_gun[(uintptr_t)param]->read();
-	return (data & 0x3f) ^ ((data & 0x3f) >> 1);
+	MACHINE_START_CALL_MEMBER(williams2);
+	m_grenade_lamp.resolve();
+	m_gun_lamp.resolve();
+	m_p1_gun_recoil.resolve();
+	m_feather_blower.resolve();
 }
 
 
@@ -594,16 +474,16 @@ WRITE_LINE_MEMBER(tshoot_state::maxvol_w)
 }
 
 
-WRITE8_MEMBER(tshoot_state::lamp_w)
+void tshoot_state::lamp_w(u8 data)
 {
 	/* set the grenade lamp */
-	output().set_value("Grenade_lamp", (~data & 0x4)>>2 );
+	m_grenade_lamp   = BIT(~data, 2);
 	/* set the gun lamp */
-	output().set_value("Gun_lamp", (~data & 0x8)>>3 );
+	m_gun_lamp       = BIT(~data, 3);
 	/* gun coil */
-	output().set_value("Player1_Gun_Recoil", (data & 0x10)>>4 );
+	m_p1_gun_recoil  = BIT(data, 4);
 	/* feather coil */
-	output().set_value("Feather_Blower", (data & 0x20)>>5 );
+	m_feather_blower = BIT(data, 5);
 }
 
 
@@ -629,20 +509,20 @@ MACHINE_RESET_MEMBER(joust2_state,joust2)
 
 TIMER_CALLBACK_MEMBER(joust2_state::joust2_deferred_snd_cmd_w)
 {
-	m_pia_2->porta_w(param & 0xff);
+	m_pia[2]->write_porta(param & 0xff);
 }
 
 
 WRITE_LINE_MEMBER(joust2_state::joust2_pia_3_cb1_w)
 {
 	m_joust2_current_sound_data = (m_joust2_current_sound_data & ~0x100) | ((state << 8) & 0x100);
-	m_cvsd_sound->write(machine().dummy_space(), 0, m_joust2_current_sound_data);
+	m_cvsd_sound->write(m_joust2_current_sound_data);
 }
 
 
 WRITE8_MEMBER(joust2_state::joust2_snd_cmd_w)
 {
 	m_joust2_current_sound_data = (m_joust2_current_sound_data & ~0xff) | (data & 0xff);
-	m_cvsd_sound->write(machine().dummy_space(), 0, m_joust2_current_sound_data);
+	m_cvsd_sound->write(m_joust2_current_sound_data);
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(joust2_state::joust2_deferred_snd_cmd_w),this), m_joust2_current_sound_data);
 }

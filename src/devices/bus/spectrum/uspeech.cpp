@@ -11,14 +11,6 @@
 #include "speaker.h"
 
 
-
-//**************************************************************************
-//  MACROS/CONSTANTS
-//**************************************************************************
-
-#define SP0256_TAG      "sp0256"
-
-
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
@@ -34,7 +26,7 @@ ROM_START( uspeech )
 	ROM_REGION(0x0800, "rom", 0)
 	ROM_LOAD("currah.rom", 0x0000, 0x0800, CRC(ce7cf52e) SHA1(90dbba5afbf07949df9cbdcb0a8ec0b106340422))
 
-	ROM_REGION(0x10000, SP0256_TAG, 0)
+	ROM_REGION(0x10000, "sp0256", 0)
 	ROM_LOAD( "sp0256a-al2.bin", 0x1000, 0x0800, CRC(b504ac15) SHA1(e60fcb5fa16ff3f3b69d36c7a6e955744d3feafc) )
 ROM_END
 
@@ -53,11 +45,12 @@ const tiny_rom_entry *spectrum_uspeech_device::device_rom_region() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(spectrum_uspeech_device::device_add_mconfig)
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(SP0256_TAG, SP0256, XTAL(14'000'000) / 4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+void spectrum_uspeech_device::device_add_mconfig(machine_config &config)
+{
+	SPEAKER(config, "mono").front_center();
+	SP0256(config, m_nsp, 14_MHz_XTAL / 4);
+	m_nsp->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 //**************************************************************************
@@ -71,7 +64,7 @@ MACHINE_CONFIG_END
 spectrum_uspeech_device::spectrum_uspeech_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SPECTRUM_USPEECH, tag, owner, clock),
 	device_spectrum_expansion_interface(mconfig, *this),
-	m_nsp(*this, SP0256_TAG),
+	m_nsp(*this, "sp0256"),
 	m_rom(*this, "rom")
 {
 }
@@ -83,7 +76,7 @@ spectrum_uspeech_device::spectrum_uspeech_device(const machine_config &mconfig, 
 
 void spectrum_uspeech_device::device_start()
 {
-	m_slot = dynamic_cast<spectrum_expansion_slot_device *>(owner());
+	save_item(NAME(m_romcs));
 }
 
 
@@ -106,46 +99,59 @@ READ_LINE_MEMBER(spectrum_uspeech_device::romcs)
 	return m_romcs;
 }
 
-
-READ8_MEMBER(spectrum_uspeech_device::mreq_r)
+void spectrum_uspeech_device::pre_opcode_fetch(offs_t offset)
 {
-	uint8_t data;
+	if (!machine().side_effects_disabled() && (offset == 0x0038))
+	{
+		m_romcs = !m_romcs;
+	}
+}
 
-	if (!machine().side_effects_disabled() && (offset == 0x38))
+uint8_t spectrum_uspeech_device::iorq_r(offs_t offset)
+{
+	if (!machine().side_effects_disabled() && (offset == 0x0038))
 	{
 		m_romcs = !m_romcs;
 	}
 
-	switch (offset)
+	return 0xff;
+}
+
+uint8_t spectrum_uspeech_device::mreq_r(offs_t offset)
+{
+	uint8_t data = 0xff;
+
+	switch (offset & 0xf000)
 	{
-	case 0x1000:
-		data = !m_nsp->lrq_r(); // (m_nsp->lrq_r() && (m_nsp->sby_r() != 0)) ? 0x00 : 0x01;
-		break;
-	default:
+	case 0x0000:
 		data = m_rom->base()[offset & 0x7ff];
+		break;
+	case 0x1000:
+		data = !m_nsp->lrq_r();
 		break;
 	}
 
 	return data;
 }
 
-WRITE8_MEMBER(spectrum_uspeech_device::mreq_w)
+void spectrum_uspeech_device::mreq_w(offs_t offset, uint8_t data)
 {
-	switch (offset)
+	switch (offset & 0xf001)
 	{
 	case 0x1000:
+	case 0x1001:
 		// allophone
-		m_nsp->ald_w(space, 0, data & 0x3f);
+		m_nsp->ald_w(data & 0x3f);
 		break;
 
 	case 0x3000:
 		// intonation low
-		m_nsp->set_clock(3500000); // CK / 4 ??
+		m_nsp->set_clock(3050000); // oscillator frequency read from hardware
 		break;
 
 	case 0x3001:
 		// intonation high
-		m_nsp->set_clock(3800000); // TODO: the exact frequency is unknown
+		m_nsp->set_clock(3260000); // oscillator frequency read from hardware
 		break;
 	}
 }

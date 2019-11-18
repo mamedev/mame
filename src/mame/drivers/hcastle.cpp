@@ -43,26 +43,26 @@ WRITE8_MEMBER(hcastle_state::hcastle_coin_w)
 
 void hcastle_state::hcastle_map(address_map &map)
 {
-	map(0x0000, 0x0007).w(this, FUNC(hcastle_state::hcastle_pf1_control_w));
+	map(0x0000, 0x0007).w(FUNC(hcastle_state::hcastle_pf1_control_w));
 	map(0x0020, 0x003f).ram(); /* rowscroll? */
-	map(0x0200, 0x0207).w(this, FUNC(hcastle_state::hcastle_pf2_control_w));
+	map(0x0200, 0x0207).w(FUNC(hcastle_state::hcastle_pf2_control_w));
 	map(0x0220, 0x023f).ram(); /* rowscroll? */
-	map(0x0400, 0x0400).w(this, FUNC(hcastle_state::hcastle_bankswitch_w));
+	map(0x0400, 0x0400).w(FUNC(hcastle_state::hcastle_bankswitch_w));
 	map(0x0404, 0x0404).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x0408, 0x0408).w(this, FUNC(hcastle_state::hcastle_soundirq_w));
+	map(0x0408, 0x0408).w(FUNC(hcastle_state::hcastle_soundirq_w));
 	map(0x040c, 0x040c).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x0410, 0x0410).portr("SYSTEM").w(this, FUNC(hcastle_state::hcastle_coin_w));
+	map(0x0410, 0x0410).portr("SYSTEM").w(FUNC(hcastle_state::hcastle_coin_w));
 	map(0x0411, 0x0411).portr("P1");
 	map(0x0412, 0x0412).portr("P2");
 	map(0x0413, 0x0413).portr("DSW3");
 	map(0x0414, 0x0414).portr("DSW1");
 	map(0x0415, 0x0415).portr("DSW2");
-	map(0x0418, 0x0418).rw(this, FUNC(hcastle_state::hcastle_gfxbank_r), FUNC(hcastle_state::hcastle_gfxbank_w));
+	map(0x0418, 0x0418).rw(FUNC(hcastle_state::hcastle_gfxbank_r), FUNC(hcastle_state::hcastle_gfxbank_w));
 	map(0x0600, 0x06ff).ram().w(m_palette, FUNC(palette_device::write_indirect)).share("palette");
 	map(0x0700, 0x1fff).ram();
-	map(0x2000, 0x2fff).ram().w(this, FUNC(hcastle_state::hcastle_pf1_video_w)).share("pf1_videoram");
+	map(0x2000, 0x2fff).ram().w(FUNC(hcastle_state::hcastle_pf1_video_w)).share("pf1_videoram");
 	map(0x3000, 0x3fff).ram().share("spriteram");
-	map(0x4000, 0x4fff).ram().w(this, FUNC(hcastle_state::hcastle_pf2_video_w)).share("pf2_videoram");
+	map(0x4000, 0x4fff).ram().w(FUNC(hcastle_state::hcastle_pf2_video_w)).share("pf2_videoram");
 	map(0x5000, 0x5fff).ram().share("spriteram2");
 	map(0x6000, 0x7fff).bankr("bank1");
 	map(0x8000, 0xffff).rom();
@@ -84,7 +84,7 @@ void hcastle_state::sound_map(address_map &map)
 	map(0x9800, 0x98ff).m("k051649", FUNC(k051649_device::scc_map));
 	map(0xa000, 0xa001).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
 	map(0xb000, 0xb00d).rw(m_k007232, FUNC(k007232_device::read), FUNC(k007232_device::write));
-	map(0xc000, 0xc000).w(this, FUNC(hcastle_state::sound_bank_w)); /* 7232 bankswitch */
+	map(0xc000, 0xc000).w(FUNC(hcastle_state::sound_bank_w)); /* 7232 bankswitch */
 	map(0xd000, 0xd000).r("soundlatch", FUNC(generic_latch_8_device::read));
 }
 
@@ -151,7 +151,7 @@ static const gfx_layout charlayout =
 	32*8
 };
 
-static GFXDECODE_START( hcastle )
+static GFXDECODE_START( gfx_hcastle )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,       0, 8*16 ) /* 007121 #0 */
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout, 8*16*16, 8*16 ) /* 007121 #1 */
 GFXDECODE_END
@@ -186,59 +186,54 @@ void hcastle_state::machine_reset()
 	m_old_pf2 = -1;
 }
 
-MACHINE_CONFIG_START(hcastle_state::hcastle)
-
+void hcastle_state::hcastle(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", KONAMI, 3000000)    /* Derived from 24 MHz clock */
-	MCFG_CPU_PROGRAM_MAP(hcastle_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", hcastle_state,  irq0_line_hold)
+	KONAMI(config, m_maincpu, 3000000);    /* Derived from 24 MHz clock */
+	m_maincpu->set_addrmap(AS_PROGRAM, &hcastle_state::hcastle_map);
+	m_maincpu->set_vblank_int("screen", FUNC(hcastle_state::irq0_line_hold));
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	Z80(config, m_audiocpu, 3579545);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &hcastle_state::sound_map);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
-	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram2")
+	BUFFERED_SPRITERAM8(config, m_spriteram);
+	BUFFERED_SPRITERAM8(config, m_spriteram2);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)  /* frames per second verified by comparison with real board */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(hcastle_state, screen_update_hcastle)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(59);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));  /* frames per second verified by comparison with real board */
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(hcastle_state::screen_update_hcastle));
+	screen.set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hcastle)
-	MCFG_PALETTE_ADD("palette", 2*8*16*16)
-	MCFG_PALETTE_INDIRECT_ENTRIES(128)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_PALETTE_INIT_OWNER(hcastle_state, hcastle)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_hcastle);
+	PALETTE(config, m_palette, FUNC(hcastle_state::hcastle_palette)).set_format(palette_device::xBGR_555, 2*8*16*16, 128);
 
-
-	MCFG_K007121_ADD("k007121_1")
-	MCFG_K007121_PALETTE("palette")
-	MCFG_K007121_ADD("k007121_2")
-	MCFG_K007121_PALETTE("palette")
+	K007121(config, m_k007121_1, 0);
+	m_k007121_1->set_palette_tag(m_palette);
+	K007121(config, m_k007121_2, 0);
+	m_k007121_2->set_palette_tag(m_palette);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_SOUND_ADD("k007232", K007232, 3579545)
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(hcastle_state, volume_callback))
-	MCFG_SOUND_ROUTE(0, "mono", 0.44)
-	MCFG_SOUND_ROUTE(1, "mono", 0.50)
+	K007232(config, m_k007232, 3579545);
+	m_k007232->port_write().set(FUNC(hcastle_state::volume_callback));
+	m_k007232->add_route(0, "mono", 0.44);
+	m_k007232->add_route(1, "mono", 0.50);
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, 3579545)
-	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI)) /* from schematic; NMI handler is just a retn */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", 3579545));
+	ymsnd.irq_handler().set_inputline("audiocpu", INPUT_LINE_NMI); /* from schematic; NMI handler is just a retn */
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.70);
 
-	MCFG_K051649_ADD("k051649", 3579545/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
-MACHINE_CONFIG_END
+	K051649(config, "k051649", 3579545/2).add_route(ALL_OUTPUTS, "mono", 0.45);
+}
 
 /***************************************************************************/
 
@@ -379,8 +374,8 @@ ROM_END
 
 
 
-GAME( 1988, hcastle,   0,       hcastle, hcastle, hcastle_state, 0, ROT0, "Konami", "Haunted Castle (version M)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1988, hcastlek,  hcastle, hcastle, hcastle, hcastle_state, 0, ROT0, "Konami", "Haunted Castle (version K)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1988, hcastlee,  hcastle, hcastle, hcastle, hcastle_state, 0, ROT0, "Konami", "Haunted Castle (version E)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1988, akumajou,  hcastle, hcastle, hcastle, hcastle_state, 0, ROT0, "Konami", "Akuma-Jou Dracula (Japan version P)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, akumajoun, hcastle, hcastle, hcastle, hcastle_state, 0, ROT0, "Konami", "Akuma-Jou Dracula (Japan version N)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, hcastle,   0,       hcastle, hcastle, hcastle_state, empty_init, ROT0, "Konami", "Haunted Castle (version M)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1988, hcastlek,  hcastle, hcastle, hcastle, hcastle_state, empty_init, ROT0, "Konami", "Haunted Castle (version K)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1988, hcastlee,  hcastle, hcastle, hcastle, hcastle_state, empty_init, ROT0, "Konami", "Haunted Castle (version E)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1988, akumajou,  hcastle, hcastle, hcastle, hcastle_state, empty_init, ROT0, "Konami", "Akuma-Jou Dracula (Japan version P)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, akumajoun, hcastle, hcastle, hcastle, hcastle_state, empty_init, ROT0, "Konami", "Akuma-Jou Dracula (Japan version N)", MACHINE_SUPPORTS_SAVE )

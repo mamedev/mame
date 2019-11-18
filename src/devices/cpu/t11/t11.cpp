@@ -78,7 +78,7 @@ device_memory_interface::space_config_vector t11_device::memory_space_config() c
 int t11_device::ROPCODE()
 {
 	PC &= 0xfffe;
-	int val = m_direct->read_word(PC);
+	int val = m_cache->read_word(PC);
 	PC += 2;
 	return val;
 }
@@ -221,7 +221,7 @@ void t11_device::t11_check_irqs()
 		PUSH(PC);
 		PCD = new_pc;
 		PSW = new_psw;
-		t11_check_irqs();
+		//t11_check_irqs();
 
 		/* count cycles and clear the WAIT flag */
 		m_icount -= 114;
@@ -261,7 +261,7 @@ void t11_device::device_start()
 
 	m_initial_pc = initial_pc[c_initial_mode >> 13];
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<1, 0, ENDIANNESS_LITTLE>();
 	m_out_reset_func.resolve_safe();
 
 	save_item(NAME(m_ppc.w.l));
@@ -409,7 +409,7 @@ void t11_device::execute_run()
 		return;
 	}
 
-	do
+	while (m_icount > 0)
 	{
 		uint16_t op;
 
@@ -419,8 +419,7 @@ void t11_device::execute_run()
 
 		op = ROPCODE();
 		(this->*s_opcode_table[op >> 3])(op);
-
-	} while (m_icount > 0);
+	}
 }
 
 std::unique_ptr<util::disasm_interface> t11_device::create_disassembler()

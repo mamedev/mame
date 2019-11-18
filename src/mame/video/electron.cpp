@@ -85,13 +85,13 @@ inline void electron_state::electron_plot_pixel(bitmap_ind16 &bitmap, int x, int
 
 uint32_t electron_state::screen_update_electron(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int min_x = screen.visible_area().min_x;
-	int min_y = screen.visible_area().min_y;
+	int min_x = screen.visible_area().left();
+	int min_y = screen.visible_area().top();
 	int x = min_x;
 	int pal[16];
 	int scanline = screen.vpos();
 	rectangle r = cliprect;
-	r.min_y = r.max_y = scanline;
+	r.sety(scanline, scanline);
 
 	/* set up palette */
 	switch( m_ula.screen_mode )

@@ -40,19 +40,19 @@ void tail2nos_state::main_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x200000, 0x27ffff).rom().region("user1", 0);    /* extra ROM */
 	map(0x2c0000, 0x2dffff).rom().region("user2", 0);
-	map(0x400000, 0x41ffff).ram().w(this, FUNC(tail2nos_state::tail2nos_zoomdata_w)).share("k051316");
+	map(0x400000, 0x41ffff).ram().w(FUNC(tail2nos_state::tail2nos_zoomdata_w)).share("k051316");
 	map(0x500000, 0x500fff).rw(m_k051316, FUNC(k051316_device::read), FUNC(k051316_device::write)).umask16(0x00ff);
 	map(0x510000, 0x51001f).w(m_k051316, FUNC(k051316_device::ctrl_w)).umask16(0x00ff);
 	map(0xff8000, 0xffbfff).ram();                             /* work RAM */
 	map(0xffc000, 0xffc2ff).ram().share("spriteram");
 	map(0xffc300, 0xffcfff).ram();
-	map(0xffd000, 0xffdfff).ram().w(this, FUNC(tail2nos_state::tail2nos_txvideoram_w)).share("txvideoram");
+	map(0xffd000, 0xffdfff).ram().w(FUNC(tail2nos_state::tail2nos_txvideoram_w)).share("txvideoram");
 	map(0xffe000, 0xffefff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xfff000, 0xfff001).portr("IN0");
-	map(0xfff001, 0xfff001).w(this, FUNC(tail2nos_state::tail2nos_gfxbank_w));
+	map(0xfff001, 0xfff001).w(FUNC(tail2nos_state::tail2nos_gfxbank_w));
 	map(0xfff002, 0xfff003).portr("IN1");
 	map(0xfff004, 0xfff005).portr("DSW");
-	map(0xfff009, 0xfff009).r(this, FUNC(tail2nos_state::sound_semaphore_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask16(0x00ff);
+	map(0xfff009, 0xfff009).r(FUNC(tail2nos_state::sound_semaphore_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask16(0x00ff);
 	map(0xfff020, 0xfff023).w("gga", FUNC(vsystem_gga_device::write)).umask16(0x00ff);
 	map(0xfff030, 0xfff033).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
 }
@@ -74,10 +74,10 @@ void tail2nos_state::sound_port_map(address_map &map)
 #endif
 }
 
+template <int N>
 CUSTOM_INPUT_MEMBER(tail2nos_state::analog_in_r)
 {
-	int num = (uintptr_t)param;
-	int delta = ioport(num ? "AN1" : "AN0")->read();
+	int delta = m_analog[N]->read();
 
 	return delta >> 5;
 }
@@ -91,7 +91,7 @@ static INPUT_PORTS_START( tail2nos )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CONDITION("DSW", 0x4000, EQUALS, 0x4000) PORT_NAME("Brake (standard BD)")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CONDITION("DSW", 0x4000, EQUALS, 0x4000) PORT_NAME("Accelerate (standard BD)")
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW", 0x4000, EQUALS, 0x4000)
-	PORT_BIT( 0x0070, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, tail2nos_state,analog_in_r, (void *)0) PORT_CONDITION("DSW", 0x4000, NOTEQUALS, 0x4000)
+	PORT_BIT( 0x0070, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(tail2nos_state, analog_in_r<0>) PORT_CONDITION("DSW", 0x4000, NOTEQUALS, 0x4000)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -103,7 +103,7 @@ static INPUT_PORTS_START( tail2nos )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x0070, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, tail2nos_state,analog_in_r, (void *)1) PORT_CONDITION("DSW", 0x4000, NOTEQUALS, 0x4000)
+	PORT_BIT( 0x0070, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(tail2nos_state, analog_in_r<1>) PORT_CONDITION("DSW", 0x4000, NOTEQUALS, 0x4000)
 	PORT_BIT( 0x0070, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW", 0x4000, EQUALS, 0x4000)
 	PORT_BIT( 0xff8f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -201,7 +201,7 @@ static const gfx_layout tail2nos_spritelayout =
 	128*8
 };
 
-static GFXDECODE_START( tail2nos )
+static GFXDECODE_START( gfx_tail2nos )
 	GFXDECODE_ENTRY( "gfx1", 0, tail2nos_charlayout,   0, 128 )
 	GFXDECODE_ENTRY( "gfx2", 0, tail2nos_spritelayout, 0, 128 )
 GFXDECODE_END
@@ -232,60 +232,60 @@ void tail2nos_state::machine_reset()
 {
 }
 
-MACHINE_CONFIG_START(tail2nos_state::tail2nos)
-
+void tail2nos_state::tail2nos(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,XTAL(20'000'000)/2)    /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tail2nos_state,  irq6_line_hold)
+	M68000(config, m_maincpu, XTAL(20'000'000)/2);    /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &tail2nos_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(tail2nos_state::irq6_line_hold));
 
-	MCFG_CPU_ADD("audiocpu", Z80,XTAL(20'000'000)/4)  /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_port_map)
+	Z80(config, m_audiocpu, XTAL(20'000'000)/4);  /* verified on pcb */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &tail2nos_state::sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &tail2nos_state::sound_port_map);
 								/* IRQs are triggered by the YM2608 */
 
-	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
-	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE("maincpu", M68K_IRQ_3))
-	//MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("link", rs232_port_device, write_txd))
-	//MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("link", rs232_port_device, write_rts))
+	ACIA6850(config, m_acia, 0);
+	m_acia->irq_handler().set_inputline("maincpu", M68K_IRQ_3);
+	//m_acia->txd_handler().set("link", FUNC(rs232_port_device::write_txd));
+	//m_acia->rts_handler().set("link", FUNC(rs232_port_device::write_rts));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tail2nos_state, screen_update_tail2nos)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(tail2nos_state::screen_update_tail2nos));
+	screen.set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tail2nos)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tail2nos);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
-	MCFG_DEVICE_ADD("k051316", K051316, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051316_BPP(-4)
-	MCFG_K051316_OFFSETS(-89, -14)
-	MCFG_K051316_WRAP(1)
-	MCFG_K051316_CB(tail2nos_state, zoom_callback)
+	K051316(config, m_k051316, 0);
+	m_k051316->set_palette(m_palette);
+	m_k051316->set_bpp(-4);
+	m_k051316->set_offsets(-89, -14);
+	m_k051316->set_wrap(1);
+	m_k051316->set_zoom_callback(FUNC(tail2nos_state::zoom_callback));
 
-	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL(14'318'181) / 2) // divider not verified
+	VSYSTEM_GGA(config, "gga", XTAL(14'318'181) / 2); // divider not verified
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
+	m_soundlatch->set_separate_acknowledge(true);
 
-	MCFG_SOUND_ADD("ymsnd", YM2608, XTAL(8'000'000))  /* verified on pcb */
-	MCFG_YM2608_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(tail2nos_state, sound_bankswitch_w))
-	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
-	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
-	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	ym2608_device &ymsnd(YM2608(config, "ymsnd", XTAL(8'000'000)));  /* verified on pcb */
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.port_b_write_callback().set(FUNC(tail2nos_state::sound_bankswitch_w));
+	ymsnd.add_route(0, "lspeaker", 0.25);
+	ymsnd.add_route(0, "rspeaker", 0.25);
+	ymsnd.add_route(1, "lspeaker", 1.0);
+	ymsnd.add_route(2, "rspeaker", 1.0);
+}
 
 
 
@@ -387,6 +387,6 @@ ROM_START( sformulaa )
 	ROM_LOAD( "osb",          0x00000, 0x20000, CRC(d49ab2f5) SHA1(92f7f6c8f35ac39910879dd88d2cfb6db7c848c9) )
 ROM_END
 
-GAME( 1989, tail2nos,  0,        tail2nos, tail2nos, tail2nos_state, 0, ROT90, "V-System Co.", "Tail to Nose - Great Championship", MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, sformula,  tail2nos, tail2nos, tail2nos, tail2nos_state, 0, ROT90, "V-System Co.", "Super Formula (Japan, set 1)",      MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, sformulaa, tail2nos, tail2nos, tail2nos, tail2nos_state, 0, ROT90, "V-System Co.", "Super Formula (Japan, set 2)",      MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE ) // No Japan warning, but Japanese version
+GAME( 1989, tail2nos,  0,        tail2nos, tail2nos, tail2nos_state, empty_init, ROT90, "V-System Co.", "Tail to Nose - Great Championship", MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, sformula,  tail2nos, tail2nos, tail2nos, tail2nos_state, empty_init, ROT90, "V-System Co.", "Super Formula (Japan, set 1)",      MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, sformulaa, tail2nos, tail2nos, tail2nos, tail2nos_state, empty_init, ROT90, "V-System Co.", "Super Formula (Japan, set 2)",      MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE ) // No Japan warning, but Japanese version

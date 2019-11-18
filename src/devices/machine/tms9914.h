@@ -35,40 +35,6 @@
 
 #pragma once
 
-// Set read and write callbacks to access DIO bus on IEEE-488
-#define MCFG_TMS9914_DIO_READWRITE_CB(_read , _write)                   \
-	downcast<tms9914_device &>(*device).set_dio_read_cb(DEVCB_##_read); \
-	downcast<tms9914_device &>(*device).set_dio_write_cb(DEVCB_##_write);
-
-// Set write callbacks to access uniline signals on IEEE-488
-#define MCFG_TMS9914_EOI_WRITE_CB(_write)                               \
-	downcast<tms9914_device &>(*device).set_488_signal_write_cb(tms9914_device::IEEE_488_EOI , DEVCB_##_write);
-
-#define MCFG_TMS9914_DAV_WRITE_CB(_write)                               \
-	downcast<tms9914_device &>(*device).set_488_signal_write_cb(tms9914_device::IEEE_488_DAV , DEVCB_##_write);
-
-#define MCFG_TMS9914_NRFD_WRITE_CB(_write)                              \
-	downcast<tms9914_device &>(*device).set_488_signal_write_cb(tms9914_device::IEEE_488_NRFD , DEVCB_##_write);
-
-#define MCFG_TMS9914_NDAC_WRITE_CB(_write)                              \
-	downcast<tms9914_device &>(*device).set_488_signal_write_cb(tms9914_device::IEEE_488_NDAC , DEVCB_##_write);
-
-#define MCFG_TMS9914_IFC_WRITE_CB(_write)                               \
-	downcast<tms9914_device &>(*device).set_488_signal_write_cb(tms9914_device::IEEE_488_IFC , DEVCB_##_write);
-
-#define MCFG_TMS9914_SRQ_WRITE_CB(_write)                               \
-	downcast<tms9914_device &>(*device).set_488_signal_write_cb(tms9914_device::IEEE_488_SRQ , DEVCB_##_write);
-
-#define MCFG_TMS9914_ATN_WRITE_CB(_write)                               \
-	downcast<tms9914_device &>(*device).set_488_signal_write_cb(tms9914_device::IEEE_488_ATN , DEVCB_##_write);
-
-#define MCFG_TMS9914_REN_WRITE_CB(_write)                               \
-	downcast<tms9914_device &>(*device).set_488_signal_write_cb(tms9914_device::IEEE_488_REN , DEVCB_##_write);
-
-// Set write callback for INT signal
-#define MCFG_TMS9914_INT_WRITE_CB(_write)                               \
-	downcast<tms9914_device &>(*device).set_int_write_cb(DEVCB_##_write);
-
 class tms9914_device : public device_t
 {
 public:
@@ -88,17 +54,25 @@ public:
 		IEEE_488_SIGNAL_COUNT
 	};
 
-	template <class Object> devcb_base& set_dio_read_cb(Object &&cb)
-	{ return m_dio_read_func.set_callback(std::forward<Object>(cb)); }
+	// Set read and write callbacks to access DIO bus on IEEE-488
+	auto dio_read_cb() { return m_dio_read_func.bind(); }
+	auto dio_write_cb() { return m_dio_write_func.bind(); }
 
-	template <class Object> devcb_base& set_dio_write_cb(Object &&cb)
-	{ return m_dio_write_func.set_callback(std::forward<Object>(cb)); }
+	// Set write callbacks to access uniline signals on IEEE-488
+	auto eoi_write_cb() { return m_signal_wr_fns[IEEE_488_EOI].bind(); }
+	auto dav_write_cb() { return m_signal_wr_fns[IEEE_488_DAV].bind(); }
+	auto nrfd_write_cb() { return m_signal_wr_fns[IEEE_488_NRFD].bind(); }
+	auto ndac_write_cb() { return m_signal_wr_fns[IEEE_488_NDAC].bind(); }
+	auto ifc_write_cb() { return m_signal_wr_fns[IEEE_488_IFC].bind(); }
+	auto srq_write_cb() { return m_signal_wr_fns[IEEE_488_SRQ].bind(); }
+	auto atn_write_cb() { return m_signal_wr_fns[IEEE_488_ATN].bind(); }
+	auto ren_write_cb() { return m_signal_wr_fns[IEEE_488_REN].bind(); }
 
-	template <class Object> devcb_base& set_488_signal_write_cb(ieee_488_signal_t signal , Object &&cb)
-	{ return m_signal_wr_fns[ signal ].set_callback(std::forward<Object>(cb)); }
+	// Set write callback for INT signal
+	auto int_write_cb() { return m_int_write_func.bind(); }
 
-	template <class Object> devcb_base& set_int_write_cb(Object &&cb)
-	{ return m_int_write_func.set_callback(std::forward<Object>(cb)); }
+	// Set write callback for ACCRQ signal
+	auto accrq_write_cb() { return m_accrq_write_func.bind(); }
 
 	DECLARE_WRITE_LINE_MEMBER(eoi_w);
 	DECLARE_WRITE_LINE_MEMBER(dav_w);
@@ -109,8 +83,12 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(atn_w);
 	DECLARE_WRITE_LINE_MEMBER(ren_w);
 
-	DECLARE_WRITE8_MEMBER(reg8_w);
-	DECLARE_READ8_MEMBER(reg8_r);
+	// Register access
+	void write(offs_t offset, uint8_t data);
+	uint8_t read(offs_t offset);
+
+	// CONT output: true when 9914 is current controller-in-charge
+	DECLARE_READ_LINE_MEMBER(cont_r);
 
 private:
 	// device-level overrides
@@ -122,7 +100,9 @@ private:
 	devcb_write8 m_dio_write_func;
 	devcb_write_line m_signal_wr_fns[ IEEE_488_SIGNAL_COUNT ];
 	devcb_write_line m_int_write_func;
+	devcb_write_line m_accrq_write_func;
 	bool m_int_line;
+	bool m_accrq_line;
 
 	uint8_t m_dio;
 	bool m_signals[ IEEE_488_SIGNAL_COUNT ];
@@ -147,6 +127,8 @@ private:
 	bool m_swrst;
 	bool m_hdfa;
 	bool m_hdfe;
+	bool m_rtl;
+	bool m_gts;
 	bool m_rpp;
 	bool m_sic;
 	bool m_sre;
@@ -275,6 +257,7 @@ private:
 	bool listener_reset() const;
 	bool talker_reset() const;
 	bool controller_reset() const;
+	bool sh_active() const;
 	void update_fsm();
 	bool is_my_address(uint8_t addr);
 	void do_LAF();
@@ -287,6 +270,8 @@ private:
 	void update_int();
 	void update_ifc();
 	void update_ren();
+	void set_accrq(bool state);
+	bool m_next_eoi;
 };
 
 // device type definition

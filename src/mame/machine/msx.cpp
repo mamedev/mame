@@ -19,46 +19,23 @@
 #define VERBOSE 0
 
 
-void msx_state::msx_irq_source(int source, int level)
-{
-	assert(source >= 0 && source < ARRAY_LENGTH(m_irq_state));
-
-	m_irq_state[source] = level;
-	check_irq();
-}
-
-
-void msx_state::check_irq()
-{
-	int state = CLEAR_LINE;
-
-	for (auto & elem : m_irq_state)
-	{
-		if (elem != CLEAR_LINE)
-		{
-			state = ASSERT_LINE;
-		}
-	}
-
-	m_maincpu->set_input_line(0, state);
-}
-
-
 void msx_state::machine_reset()
 {
 	msx_memory_reset ();
 	msx_memory_map_all ();
-	for (auto & elem : m_irq_state)
-	{
-		elem = CLEAR_LINE;
-	}
-	check_irq();
 }
 
 
 void msx_state::machine_start()
 {
+	m_leds.resolve();
 	m_port_c_old = 0xff;
+}
+
+
+void msx2_state::machine_start()
+{
+	msx_state::machine_start();
 
 	for (device_t &device : device_iterator(*this))
 	{
@@ -68,6 +45,8 @@ void msx_state::machine_start()
 			m_switched.push_back(switched);
 		}
 	}
+
+	save_item(NAME(m_rtc_latch));
 }
 
 
@@ -189,7 +168,7 @@ static const uint8_t cc_ex[0x100] = {
 
 void msx_state::driver_start()
 {
-	m_maincpu->set_input_line_vector(0, 0xff);
+	m_maincpu->set_input_line_vector(0, 0xff); // Z80
 
 	msx_memory_init();
 
@@ -198,19 +177,15 @@ void msx_state::driver_start()
 	save_item(NAME(m_psg_b));
 	save_item(NAME(m_mouse));
 	save_item(NAME(m_mouse_stat));
-	save_item(NAME(m_rtc_latch));
 	save_item(NAME(m_kanji_latch));
 	save_item(NAME(m_slot_expanded));
 	save_item(NAME(m_primary_slot));
 	save_item(NAME(m_secondary_slot));
 	save_item(NAME(m_port_c_old));
 	save_item(NAME(m_keylatch));
-	save_item(NAME(m_irq_state));
-
-	machine().save().register_postload(save_prepost_delegate(FUNC(msx_state::post_load), this));
 }
 
-void msx_state::post_load()
+void msx_state::device_post_load()
 {
 	for (int page = 0; page < 4; page++)
 	{
@@ -223,9 +198,9 @@ void msx_state::post_load()
 
 INTERRUPT_GEN_MEMBER(msx_state::msx_interrupt)
 {
-	m_mouse[0] = m_io_mouse0->read();
+	m_mouse[0] = m_io_mouse[0]->read();
 	m_mouse_stat[0] = -1;
-	m_mouse[1] = m_io_mouse1->read();
+	m_mouse[1] = m_io_mouse[1]->read();
 	m_mouse_stat[1] = -1;
 }
 
@@ -236,14 +211,12 @@ INTERRUPT_GEN_MEMBER(msx_state::msx_interrupt)
 
 READ8_MEMBER(msx_state::msx_psg_port_a_r)
 {
-	uint8_t data;
-
-	data = (m_cassette->input() > 0.0038 ? 0x80 : 0);
+	uint8_t data = (m_cassette->input() > 0.0038 ? 0x80 : 0);
 
 	if ( (m_psg_b ^ m_io_dsw->read() ) & 0x40)
 	{
 		/* game port 2 */
-		uint8_t inp = m_io_joy1->read();
+		uint8_t inp = m_io_joy[1]->read();
 		if ( !(inp & 0x80) )
 		{
 			/* joystick */
@@ -262,7 +235,7 @@ READ8_MEMBER(msx_state::msx_psg_port_a_r)
 	else
 	{
 		/* game port 1 */
-		uint8_t inp = m_io_joy0->read();
+		uint8_t inp = m_io_joy[0]->read();
 		if ( !(inp & 0x80) )
 		{
 			/* joystick */
@@ -295,7 +268,7 @@ WRITE8_MEMBER(msx_state::msx_psg_port_b_w)
 {
 	/* Arabic or kana mode led */
 	if ( (data ^ m_psg_b) & 0x80)
-		output().set_led_value(2, !(data & 0x80) );
+		m_leds[1] = BIT(~data, 7);
 
 	if ( (m_psg_b ^ data) & 0x10)
 	{
@@ -314,17 +287,17 @@ WRITE8_MEMBER(msx_state::msx_psg_port_b_w)
 ** RTC functions
 */
 
-WRITE8_MEMBER( msx_state::msx_rtc_latch_w )
+WRITE8_MEMBER( msx2_state::msx_rtc_latch_w )
 {
 	m_rtc_latch = data & 15;
 }
 
-WRITE8_MEMBER( msx_state::msx_rtc_reg_w )
+WRITE8_MEMBER( msx2_state::msx_rtc_reg_w )
 {
 	m_rtc->write(space, m_rtc_latch, data);
 }
 
-READ8_MEMBER( msx_state::msx_rtc_reg_r )
+READ8_MEMBER( msx2_state::msx_rtc_reg_r )
 {
 	return m_rtc->read(space, m_rtc_latch);
 }
@@ -349,7 +322,7 @@ WRITE8_MEMBER( msx_state::msx_ppi_port_c_w )
 
 	/* caps lock */
 	if ( BIT(m_port_c_old ^ data, 6) )
-		output().set_led_value(1, !BIT(data, 6) );
+		m_leds[0] = BIT(~data, 6);
 
 	/* key click */
 	if ( BIT(m_port_c_old ^ data, 7) )
@@ -389,18 +362,15 @@ READ8_MEMBER( msx_state::msx_ppi_port_b_r )
  *
  ***********************************************************************/
 
-void msx_state::install_slot_pages(device_t &owner, uint8_t prim, uint8_t sec, uint8_t page, uint8_t numpages, device_t *device)
+void msx_state::install_slot_pages(uint8_t prim, uint8_t sec, uint8_t page, uint8_t numpages, msx_internal_slot_interface &device)
 {
-	msx_state &msx = downcast<msx_state &>(owner);
-	msx_internal_slot_interface *internal_slot = dynamic_cast<msx_internal_slot_interface *>(device);
-
 	for ( int i = page; i < std::min(page + numpages, 4); i++ )
 	{
-		msx.m_all_slots[prim][sec][i] = internal_slot;
+		m_all_slots[prim][sec][i] = &device;
 	}
 	if ( sec )
 	{
-		msx.m_slot_expanded[prim] = true;
+		m_slot_expanded[prim] = true;
 	}
 }
 
@@ -458,12 +428,12 @@ void msx_state::msx_memory_map_all ()
 
 READ8_MEMBER( msx_state::msx_mem_read )
 {
-	return m_current_page[offset >> 14]->read(space, offset);
+	return m_current_page[offset >> 14]->read(offset);
 }
 
 WRITE8_MEMBER( msx_state::msx_mem_write )
 {
-	m_current_page[offset >> 14]->write(space, offset, data);
+	m_current_page[offset >> 14]->write(offset, data);
 }
 
 WRITE8_MEMBER( msx_state::msx_sec_slot_w )
@@ -478,7 +448,7 @@ WRITE8_MEMBER( msx_state::msx_sec_slot_w )
 		msx_memory_map_all ();
 	}
 	else
-		m_current_page[3]->write(space, 0xffff, data);
+		m_current_page[3]->write(0xffff, data);
 }
 
 READ8_MEMBER( msx_state::msx_sec_slot_r )
@@ -491,7 +461,7 @@ READ8_MEMBER( msx_state::msx_sec_slot_r )
 	}
 	else
 	{
-		return m_current_page[3]->read(space, 0xffff);
+		return m_current_page[3]->read(0xffff);
 	}
 }
 
@@ -518,7 +488,7 @@ WRITE8_MEMBER( msx_state::msx_kanji_w )
 		m_kanji_latch = (m_kanji_latch & 0x1f800) | ((data & 0x3f) << 5);
 }
 
-READ8_MEMBER( msx_state::msx_switched_r )
+READ8_MEMBER( msx2_state::msx_switched_r )
 {
 	uint8_t data = 0xff;
 
@@ -530,7 +500,7 @@ READ8_MEMBER( msx_state::msx_switched_r )
 	return data;
 }
 
-WRITE8_MEMBER( msx_state::msx_switched_w )
+WRITE8_MEMBER( msx2_state::msx_switched_w )
 {
 	for (int i = 0; i < m_switched.size(); i++)
 	{

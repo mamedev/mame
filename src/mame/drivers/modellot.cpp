@@ -36,11 +36,15 @@ Optional ports:
 It's not clear if these are meant to be 3881 PIOs connected to the devices, or for
 the devices themselves. An example shows a i8251 used as the US1 device.
 
+There's a rom missing EC00-EFFF, it is used if you try to save to tape.
+All input must in UPPER case.
+
 ***********************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/keyboard.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -54,15 +58,17 @@ public:
 		, m_p_chargen(*this, "chargen")
 	{ }
 
+	void modellot(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(port77_r);
 	DECLARE_READ8_MEMBER(portff_r);
 	void kbd_put(u8 data);
 	uint32_t screen_update_modellot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void modellot(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
 	required_shared_ptr<uint8_t> m_p_videoram;
@@ -82,8 +88,8 @@ void modellot_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x77, 0x77).r(this, FUNC(modellot_state::port77_r));
-	map(0xff, 0xff).r(this, FUNC(modellot_state::portff_r));
+	map(0x77, 0x77).r(FUNC(modellot_state::port77_r));
+	map(0xff, 0xff).r(FUNC(modellot_state::portff_r));
 }
 
 
@@ -126,7 +132,7 @@ const gfx_layout modellot_charlayout =
 	8*8             /* space between characters */
 };
 
-static GFXDECODE_START( modellot )
+static GFXDECODE_START( gfx_modellot )
 	GFXDECODE_ENTRY( "chargen", 0x0000, modellot_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -175,28 +181,29 @@ uint32_t modellot_state::screen_update_modellot(screen_device &screen, bitmap_in
 	return 0;
 }
 
-MACHINE_CONFIG_START(modellot_state::modellot)
+void modellot_state::modellot(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(4'000'000))
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	Z80(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &modellot_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &modellot_state::io_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(64*8, 16*16)
-	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 16*16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(modellot_state, screen_update_modellot)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(64*8, 16*16);
+	screen.set_visarea(0, 64*8-1, 0, 16*16-1);
+	screen.set_screen_update(FUNC(modellot_state::screen_update_modellot));
+	screen.set_palette("palette");
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", modellot )
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	GFXDECODE(config, "gfxdecode", "palette", gfx_modellot);
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(modellot_state, kbd_put))
-MACHINE_CONFIG_END
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(modellot_state::kbd_put));
+}
 
 /* ROM definition */
 ROM_START( modellot )
@@ -213,4 +220,4 @@ ROM_START( modellot )
 ROM_END
 
 /* Driver */
-COMP( 1979, modellot, 0, 0, modellot, modellot, modellot_state, 0, "General Processor", "Modello T", MACHINE_IS_SKELETON )
+COMP( 1979, modellot, 0, 0, modellot, modellot, modellot_state, empty_init, "General Processor", "Modello T", MACHINE_IS_SKELETON )

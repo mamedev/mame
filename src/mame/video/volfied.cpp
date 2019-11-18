@@ -14,7 +14,7 @@ void volfied_state::video_start()
 	m_video_ctrl = 0;
 	m_video_mask = 0;
 
-	save_pointer(NAME(m_video_ram.get()), 0x40000);
+	save_pointer(NAME(m_video_ram), 0x40000);
 	save_item(NAME(m_video_ctrl));
 	save_item(NAME(m_video_mask));
 }
@@ -57,9 +57,10 @@ WRITE16_MEMBER(volfied_state::video_mask_w)
 	COMBINE_DATA(&m_video_mask);
 }
 
-WRITE16_MEMBER(volfied_state::sprite_ctrl_w)
+void volfied_state::volfied_colpri_cb(u32 &sprite_colbank, u32 &pri_mask, u16 sprite_ctrl)
 {
-	m_pc090oj->set_sprite_ctrl((data & 0x3c) >> 2);
+	sprite_colbank = 0x100 | ((sprite_ctrl & 0x3c) << 2);
+	pri_mask = 0; /* sprites over everything */
 }
 
 
@@ -123,6 +124,6 @@ uint32_t volfied_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 {
 	screen.priority().fill(0, cliprect);
 	refresh_pixel_layer(bitmap);
-	m_pc090oj->draw_sprites(bitmap, cliprect, screen.priority(), 0);
+	m_pc090oj->draw_sprites(screen, bitmap, cliprect);
 	return 0;
 }

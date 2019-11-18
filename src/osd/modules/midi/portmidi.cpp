@@ -237,12 +237,18 @@ int osd_midi_device_pm::read(uint8_t *pOut)
 		{
 			if (status & 0x80)  // sys real-time imposing on us?
 			{
-				if ((status == 0xf2) || (status == 0xf3))
+				if (status == 0xf2)
 				{
 					*pOut++ = status;
 					*pOut++ = Pm_MessageData1(rx_evBuf[msg].message);
 					*pOut++ = Pm_MessageData2(rx_evBuf[msg].message);
 					bytesOut += 3;
+				}
+				else if (status == 0xf3)
+				{
+					*pOut++ = status;
+					*pOut++ = Pm_MessageData1(rx_evBuf[msg].message);
+					bytesOut += 2;
 				}
 				else
 				{
@@ -302,14 +308,21 @@ int osd_midi_device_pm::read(uint8_t *pOut)
 							break;
 
 						case 2: // song pos
-						case 3: // song select
 							*pOut++ = status;
 							*pOut++ = Pm_MessageData1(rx_evBuf[msg].message);
 							*pOut++ = Pm_MessageData2(rx_evBuf[msg].message);
 							bytesOut += 3;
 							break;
 
+						case 3: // song select
+							*pOut++ = status;
+							*pOut++ = Pm_MessageData1(rx_evBuf[msg].message);
+							bytesOut += 2;
+							break;
+
 						default:    // all other defined Fx messages are 1 byte
+							*pOut++ = status;
+							bytesOut += 1;
 							break;
 					}
 					break;

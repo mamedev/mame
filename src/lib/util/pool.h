@@ -8,8 +8,10 @@
 
 ***************************************************************************/
 
-#ifndef __POOL_H__
-#define __POOL_H__
+#ifndef MAME_UTIL_POOL_H
+#define MAME_UTIL_POOL_H
+
+#pragma once
 
 #include "osdcore.h"
 
@@ -113,4 +115,4 @@ char *pool_strdup_file_line(object_pool *pool, const char *str, const char *file
 bool test_memory_pools(void);
 
 
-#endif /* __POOL_H__ */
+#endif // MAME_UTIL_POOL_H

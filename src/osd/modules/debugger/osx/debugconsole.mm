@@ -237,8 +237,7 @@
 	if ([dasmView cursorVisible] && (machine->debugger().cpu().get_visible_cpu() == &device))
 	{
 		offs_t const address = [dasmView selectedAddress];
-		device_debug::breakpoint *bp = [[self class] findBreakpointAtAddress:address
-																   forDevice:device];
+		const device_debug::breakpoint *bp = [dasmView source]->device()->debug()->breakpoint_find(address);
 
 		// if it doesn't exist, add a new one
 		NSString *command;
@@ -255,8 +254,7 @@
 	device_t &device = *[dasmView source]->device();
 	if ([dasmView cursorVisible] && (machine->debugger().cpu().get_visible_cpu() == &device))
 	{
-		device_debug::breakpoint *bp = [[self class] findBreakpointAtAddress:[dasmView selectedAddress]
-																   forDevice:device];
+		const device_debug::breakpoint *bp = [dasmView source]->device()->debug()->breakpoint_find([dasmView selectedAddress]);
 		if (bp != nullptr)
 		{
 			NSString *command;
@@ -566,11 +564,10 @@
 	BOOL const haveCursor = [dasmView cursorVisible];
 	BOOL const isCurrent = (machine->debugger().cpu().get_visible_cpu() == [dasmView source]->device());
 
-	device_debug::breakpoint *breakpoint = nullptr;
+	const device_debug::breakpoint *breakpoint = nullptr;
 	if (haveCursor)
 	{
-		breakpoint = [[self class] findBreakpointAtAddress:[dasmView selectedAddress]
-												 forDevice:*[dasmView source]->device()];
+		breakpoint = [dasmView source]->device()->debug()->breakpoint_find([dasmView selectedAddress]);
 	}
 
 	if (action == @selector(debugToggleBreakpoint:))

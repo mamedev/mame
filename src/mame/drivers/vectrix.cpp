@@ -23,14 +23,16 @@ class vectrix_state : public driver_device
 public:
 	vectrix_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-//      , m_maincpu(*this, "maincpu")
+		//      , m_maincpu(*this, "maincpu")
 	{ }
 
-void vectrix(machine_config &config);
-void io_map(address_map &map);
-void mem_map(address_map &map);
+	void vectrix(machine_config &config);
+
 private:
-//  required_device<cpu_device> m_maincpu;
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
+
+	//  required_device<cpu_device> m_maincpu;
 };
 
 void vectrix_state::mem_map(address_map &map)
@@ -42,20 +44,20 @@ void vectrix_state::mem_map(address_map &map)
 
 void vectrix_state::io_map(address_map &map)
 {
-	map(0x3000, 0x3000).rw("uart1", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x3001, 0x3001).rw("uart1", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x3000, 0x3001).rw("uart1", FUNC(i8251_device::read), FUNC(i8251_device::write));
 }
 
 static INPUT_PORTS_START( vectrix )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(vectrix_state::vectrix)
-	MCFG_CPU_ADD("maincpu", I8088, XTAL(14'318'181)/3)  // no idea of clock
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+void vectrix_state::vectrix(machine_config &config)
+{
+	i8088_cpu_device &maincpu(I8088(config, "maincpu", XTAL(14'318'181)/3));  // no idea of clock
+	maincpu.set_addrmap(AS_PROGRAM, &vectrix_state::mem_map);
+	maincpu.set_addrmap(AS_IO, &vectrix_state::io_map);
 
-	MCFG_DEVICE_ADD("uart1", I8251, 0)
-MACHINE_CONFIG_END
+	I8251(config, "uart1", 0);
+}
 
 ROM_START( vectrix )
 	ROM_REGION( 0x4000, "roms", 0 )
@@ -63,4 +65,4 @@ ROM_START( vectrix )
 	ROM_LOAD( "vectrixr.bin", 0x2000, 0x2000, CRC(33f9b06b) SHA1(6a1dffe5c2c0254824a8dddb8543f86d9ad8f173) )
 ROM_END
 
-COMP( 1983, vectrix, 0, 0, vectrix, vectrix, vectrix_state, 0, "Vectrix", "VX384 Graphics Processor Terminal", MACHINE_IS_SKELETON )
+COMP( 1983, vectrix, 0, 0, vectrix, vectrix, vectrix_state, empty_init, "Vectrix", "VX384 Graphics Processor Terminal", MACHINE_IS_SKELETON )

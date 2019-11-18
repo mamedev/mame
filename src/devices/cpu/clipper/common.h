@@ -35,8 +35,6 @@ enum ssw_mask : u32
 	SSW_K   = 0x20000000, // protect key
 	SSW_U   = 0x40000000, // user mode
 	SSW_P   = 0x80000000, // previous mode
-
-	SSW_PL  = 0x78000000  // protection level relevant bits
 };
 
 enum exception_vector : u16

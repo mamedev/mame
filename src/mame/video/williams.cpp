@@ -170,7 +170,6 @@ void williams_state::state_save_register()
 VIDEO_START_MEMBER(williams_state,williams)
 {
 	blitter_init(m_blitter_config, nullptr);
-	create_palette_lookup();
 	state_save_register();
 }
 
@@ -178,7 +177,6 @@ VIDEO_START_MEMBER(williams_state,williams)
 VIDEO_START_MEMBER(blaster_state,blaster)
 {
 	blitter_init(m_blitter_config, memregion("proms")->base());
-	create_palette_lookup();
 	state_save_register();
 	save_item(NAME(m_blaster_color0));
 	save_item(NAME(m_blaster_video_control));
@@ -190,7 +188,7 @@ VIDEO_START_MEMBER(williams2_state,williams2)
 	blitter_init(m_blitter_config, nullptr);
 
 	/* create the tilemap */
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(williams2_state::get_tile_info),this), TILEMAP_SCAN_COLS,  24,16, 128,16);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(williams2_state::get_tile_info)), TILEMAP_SCAN_COLS,  24,16, 128,16);
 	m_bg_tilemap->set_scrolldx(2, 0);
 
 	state_save_register();
@@ -213,7 +211,7 @@ uint32_t williams_state::screen_update_williams(screen_device &screen, bitmap_rg
 
 	/* precompute the palette */
 	for (x = 0; x < 16; x++)
-		pens[x] = m_palette_lookup[m_generic_paletteram_8[x]];
+		pens[x] = m_palette->pen_color(m_paletteram[x]);
 
 	/* loop over rows */
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
@@ -240,11 +238,11 @@ uint32_t blaster_state::screen_update_blaster(screen_device &screen, bitmap_rgb3
 
 	/* precompute the palette */
 	for (x = 0; x < 16; x++)
-		pens[x] = m_palette_lookup[m_generic_paletteram_8[x]];
+		pens[x] = m_palette->pen_color(m_paletteram[x]);
 
 	/* if we're blitting from the top, start with a 0 for color 0 */
 	if (cliprect.min_y == screen.visible_area().min_y || !(m_blaster_video_control & 1))
-		m_blaster_color0 = m_palette_lookup[m_blaster_palette_0[0] ^ 0xff];
+		m_blaster_color0 = m_palette->pen_color(m_blaster_palette_0[0] ^ 0xff);
 
 	/* loop over rows */
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
@@ -255,7 +253,7 @@ uint32_t blaster_state::screen_update_blaster(screen_device &screen, bitmap_rgb3
 
 		/* latch a new color0 pen? */
 		if (m_blaster_video_control & m_blaster_scanline_control[y] & 1)
-			m_blaster_color0 = m_palette_lookup[m_blaster_palette_0[y] ^ 0xff];
+			m_blaster_color0 = m_palette->pen_color(m_blaster_palette_0[y] ^ 0xff);
 
 		/* loop over columns */
 		for (x = cliprect.min_x & ~1; x <= cliprect.max_x; x += 2)
@@ -315,35 +313,34 @@ uint32_t williams2_state::screen_update_williams2(screen_device &screen, bitmap_
  *
  *************************************/
 
-void williams_state::create_palette_lookup()
+void williams_state::williams_palette(palette_device &palette) const
 {
-	static const int resistances_rg[3] = { 1200, 560, 330 };
-	static const int resistances_b[2]  = { 560, 330 };
-	double weights_r[3], weights_g[3], weights_b[2];
-	int i;
+	static constexpr int resistances_rg[3] = { 1200, 560, 330 };
+	static constexpr int resistances_b[2]  = { 560, 330 };
 
-	/* compute palette information */
-	/* note that there really are pullup/pulldown resistors, but this situation is complicated */
-	/* by the use of transistors, so we ignore that and just use the relative resistor weights */
+	// compute palette information
+	// note that there really are pullup/pulldown resistors, but this situation is complicated
+	// by the use of transistors, so we ignore that and just use the relative resistor weights
+	double weights_r[3], weights_g[3], weights_b[2];
 	compute_resistor_weights(0, 255, -1.0,
 			3, resistances_rg, weights_r, 0, 0,
 			3, resistances_rg, weights_g, 0, 0,
 			2, resistances_b,  weights_b, 0, 0);
 
-	/* build a palette lookup */
-	m_palette_lookup = std::make_unique<rgb_t[]>(256);
-	for (i = 0; i < 256; i++)
+	// build a palette lookup
+	for (int i = 0; i < 256; i++)
 	{
-		int r = combine_3_weights(weights_r, BIT(i,0), BIT(i,1), BIT(i,2));
-		int g = combine_3_weights(weights_g, BIT(i,3), BIT(i,4), BIT(i,5));
-		int b = combine_2_weights(weights_b, BIT(i,6), BIT(i,7));
+		int const r = combine_weights(weights_r, BIT(i, 0), BIT(i, 1), BIT(i, 2));
+		int const g = combine_weights(weights_g, BIT(i, 3), BIT(i, 4), BIT(i, 5));
+		int const b = combine_weights(weights_b, BIT(i, 6), BIT(i, 7));
 
-		m_palette_lookup[i] = rgb_t(r, g, b);
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
 
-WRITE8_MEMBER(williams2_state::williams2_paletteram_w)
+
+void williams2_state::williams2_paletteram_w(offs_t offset, u8 data)
 {
 	static const uint8_t ztable[16] =
 	{
@@ -353,11 +350,11 @@ WRITE8_MEMBER(williams2_state::williams2_paletteram_w)
 	uint8_t entry_lo, entry_hi, i, r, g, b;
 
 	/* set the new value */
-	m_generic_paletteram_8[offset] = data;
+	m_paletteram[offset] = data;
 
 	/* pull the associated low/high bytes */
-	entry_lo = m_generic_paletteram_8[offset & ~1];
-	entry_hi = m_generic_paletteram_8[offset |  1];
+	entry_lo = m_paletteram[offset & ~1];
+	entry_hi = m_paletteram[offset |  1];
 
 	/* update the palette entry */
 	i = ztable[(entry_hi >> 4) & 15];
@@ -368,7 +365,7 @@ WRITE8_MEMBER(williams2_state::williams2_paletteram_w)
 }
 
 
-WRITE8_MEMBER(williams2_state::williams2_fg_select_w)
+void williams2_state::williams2_fg_select_w(u8 data)
 {
 	m_williams2_fg_color = data & 0x3f;
 }
@@ -381,7 +378,7 @@ WRITE8_MEMBER(williams2_state::williams2_fg_select_w)
  *
  *************************************/
 
-READ8_MEMBER(williams_state::williams_video_counter_r)
+u8 williams_state::williams_video_counter_r()
 {
 	if (m_screen->vpos() < 0x100)
 		return m_screen->vpos() & 0xfc;
@@ -431,7 +428,7 @@ TILE_GET_INFO_MEMBER(williams2_state::get_tile_info)
 }
 
 
-WRITE8_MEMBER(williams2_state::williams2_bg_select_w)
+void williams2_state::williams2_bg_select_w(u8 data)
 {
 	/* based on the tilemap config, only certain bits are used */
 	/* the rest are determined by other factors */
@@ -456,21 +453,21 @@ WRITE8_MEMBER(williams2_state::williams2_bg_select_w)
 }
 
 
-WRITE8_MEMBER(williams2_state::williams2_tileram_w)
+void williams2_state::williams2_tileram_w(offs_t offset, u8 data)
 {
 	m_williams2_tileram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(williams2_state::williams2_xscroll_low_w)
+void williams2_state::williams2_xscroll_low_w(u8 data)
 {
 	m_tilemap_xscroll = (m_tilemap_xscroll & ~0x00f) | ((data & 0x80) >> 4) | (data & 0x07);
 	m_bg_tilemap->set_scrollx(0, (m_tilemap_xscroll & 7) + ((m_tilemap_xscroll >> 3) * 6));
 }
 
 
-WRITE8_MEMBER(williams2_state::williams2_xscroll_high_w)
+void williams2_state::williams2_xscroll_high_w(u8 data)
 {
 	m_tilemap_xscroll = (m_tilemap_xscroll & 0x00f) | (data << 4);
 	m_bg_tilemap->set_scrollx(0, (m_tilemap_xscroll & 7) + ((m_tilemap_xscroll >> 3) * 6));
@@ -484,14 +481,14 @@ WRITE8_MEMBER(williams2_state::williams2_xscroll_high_w)
  *
  *************************************/
 
-WRITE8_MEMBER(blaster_state::blaster_remap_select_w)
+void blaster_state::blaster_remap_select_w(u8 data)
 {
 	m_blitter_remap_index = data;
 	m_blitter_remap = m_blitter_remap_lookup.get() + data * 256;
 }
 
 
-WRITE8_MEMBER(blaster_state::blaster_video_control_w)
+void blaster_state::blaster_video_control_w(u8 data)
 {
 	m_blaster_video_control = data;
 }
@@ -578,7 +575,7 @@ WRITE8_MEMBER(williams_state::williams_blitter_w)
 }
 
 
-WRITE8_MEMBER(williams2_state::williams2_blit_window_enable_w)
+void williams2_state::williams2_blit_window_enable_w(u8 data)
 {
 	m_blitter_window_enable = data & 0x01;
 }

@@ -5,7 +5,19 @@
     Data East IRQ Controller
 
     TODO:
-    - Lightgun support is only used by Locked 'n Loaded and works badly
+    - Lightgun support is only used by Locked 'n Loaded.
+      irq is likely an h AND v beam trigger, game counts via raster irqs until
+      it finds one of these, and where gun trigger x position is the H pixel
+      latch.
+      Two problems here:
+      1. (assuming being correct) default calibration looks way offset.
+      2. We currently give minmax defaults to Y latches to order to avoid
+         making the game to crash. These limits doesn't seem very sane,
+         for example lower limit is / 3 the full screen height (248 / 3 = 82).
+      Being an highly timing dependant behaviour ARM core is probably at
+      fault here.
+    - Understand if there's an additional switch for player 1 and player 2
+      wrt lightgun trigger.
 
 ***************************************************************************/
 
@@ -90,10 +102,10 @@ void deco_irq_device::device_reset()
 TIMER_CALLBACK_MEMBER( deco_irq_device::scanline_callback )
 {
 	const rectangle visible = m_screen->visible_area();
-	uint8_t y = m_screen->vpos();
+	const u16 y = m_screen->vpos();
 
 	// raster irq?
-	if (m_raster_irq_scanline > 0 && m_raster_irq_scanline < 240 && y == (m_raster_irq_scanline - 1))
+	if (m_raster_irq_scanline >= visible.top() && m_raster_irq_scanline <= visible.bottom() && y == m_raster_irq_scanline)
 	{
 		if (!m_raster_irq_masked)
 		{
@@ -108,14 +120,14 @@ TIMER_CALLBACK_MEMBER( deco_irq_device::scanline_callback )
 	}
 
 	// lightgun?
-	if (m_lightgun_latch >= visible.min_y && m_lightgun_latch <= visible.max_y && y == m_lightgun_latch)
+	if (m_lightgun_latch >= visible.top() && m_lightgun_latch <= visible.bottom() && y == m_lightgun_latch)
 	{
 		m_lightgun_irq = true;
 		m_lightgun_irq_cb(ASSERT_LINE);
 	}
 
 	// vblank-in?
-	if (y == (visible.max_y + 1))
+	if (y == (visible.bottom() + 1))
 	{
 		m_vblank_irq = true;
 		m_vblank_irq_cb(ASSERT_LINE);
@@ -130,15 +142,22 @@ TIMER_CALLBACK_MEMBER( deco_irq_device::scanline_callback )
 //  INTERFACE
 //**************************************************************************
 
-void deco_irq_device::map(address_map &map)
+void deco_irq_device::raster_irq_ack()
 {
-	map(0x0, 0x0).w(this, FUNC(deco_irq_device::control_w));
-	map(0x1, 0x1).rw(this, FUNC(deco_irq_device::scanline_r), FUNC(deco_irq_device::scanline_w));
-	map(0x2, 0x2).rw(this, FUNC(deco_irq_device::raster_irq_ack_r), FUNC(deco_irq_device::vblank_irq_ack_w));
-	map(0x3, 0x3).r(this, FUNC(deco_irq_device::status_r));
+	m_raster_irq = false;
+	m_raster1_irq_cb(CLEAR_LINE);
+	m_raster2_irq_cb(CLEAR_LINE);
 }
 
-WRITE8_MEMBER( deco_irq_device::control_w )
+void deco_irq_device::map(address_map &map)
+{
+	map(0x0, 0x0).w(FUNC(deco_irq_device::control_w));
+	map(0x1, 0x1).rw(FUNC(deco_irq_device::scanline_r), FUNC(deco_irq_device::scanline_w));
+	map(0x2, 0x2).rw(FUNC(deco_irq_device::raster_irq_ack_r), FUNC(deco_irq_device::vblank_irq_ack_w));
+	map(0x3, 0x3).r(FUNC(deco_irq_device::status_r));
+}
+
+void deco_irq_device::control_w(u8 data)
 {
 	// 765-----  unused?
 	// ---4----  raster irq target
@@ -151,37 +170,35 @@ WRITE8_MEMBER( deco_irq_device::control_w )
 	m_raster_irq_masked = bool(BIT(data, 1));
 
 	if (m_raster_irq_masked)
-		raster_irq_ack_r(space, 0);
+		raster_irq_ack();
 }
 
-READ8_MEMBER( deco_irq_device::scanline_r )
+u8 deco_irq_device::scanline_r()
 {
 	return m_raster_irq_scanline;
 }
 
-WRITE8_MEMBER( deco_irq_device::scanline_w )
+void deco_irq_device::scanline_w(u8 data)
 {
 	m_raster_irq_scanline = data;
 }
 
-READ8_MEMBER( deco_irq_device::raster_irq_ack_r )
+u8 deco_irq_device::raster_irq_ack_r()
 {
-	m_raster_irq = false;
-	m_raster1_irq_cb(CLEAR_LINE);
-	m_raster2_irq_cb(CLEAR_LINE);
-
+	if (!machine().side_effects_disabled())
+		raster_irq_ack();
 	return 0xff;
 }
 
-WRITE8_MEMBER( deco_irq_device::vblank_irq_ack_w )
+void deco_irq_device::vblank_irq_ack_w(u8 data)
 {
 	m_vblank_irq = false;
 	m_vblank_irq_cb(CLEAR_LINE);
 }
 
-READ8_MEMBER( deco_irq_device::status_r )
+u8 deco_irq_device::status_r()
 {
-	uint8_t data = 0;
+	u8 data = 0;
 
 	// 7-------  unknown
 	// -6------  lightgun irq
@@ -207,13 +224,13 @@ READ8_MEMBER( deco_irq_device::status_r )
 WRITE_LINE_MEMBER( deco_irq_device::lightgun1_trigger_w )
 {
 	if (state)
-		m_lightgun_latch = m_lightgun1_cb() / 2;
+		m_lightgun_latch = m_lightgun1_cb();
 }
 
 WRITE_LINE_MEMBER( deco_irq_device::lightgun2_trigger_w )
 {
 	if (state)
-		m_lightgun_latch = m_lightgun2_cb() / 2;
+		m_lightgun_latch = m_lightgun2_cb();
 }
 
 WRITE_LINE_MEMBER( deco_irq_device::lightgun_irq_ack_w )

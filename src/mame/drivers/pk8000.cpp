@@ -16,7 +16,6 @@
 #include "machine/i8255.h"
 #include "imagedev/cassette.h"
 #include "sound/spkrdev.h"
-#include "sound/wave.h"
 #include "machine/ram.h"
 
 #include "screen.h"
@@ -47,6 +46,9 @@ public:
 		, m_keyboard(*this, "LINE%u", 0)
 	{ }
 
+	void pk8000(machine_config &config);
+
+private:
 	uint8_t m_keyboard_line;
 
 	DECLARE_READ8_MEMBER(joy_1_r);
@@ -64,10 +66,9 @@ public:
 	INTERRUPT_GEN_MEMBER(interrupt);
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
-	void pk8000(machine_config &config);
 	void pk8000_io(address_map &map);
 	void pk8000_mem(address_map &map);
-protected:
+
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
 	required_device<speaker_sound_device> m_speaker;
@@ -198,14 +199,14 @@ void pk8000_state::pk8000_io(address_map &map)
 	map.unmap_value_high();
 	map(0x80, 0x83).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x84, 0x87).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x88, 0x88).rw(this, FUNC(pk8000_state::video_color_r), FUNC(pk8000_state::video_color_w));
-	map(0x8c, 0x8c).r(this, FUNC(pk8000_state::joy_1_r));
-	map(0x8d, 0x8d).r(this, FUNC(pk8000_state::joy_2_r));
-	map(0x90, 0x90).rw(this, FUNC(pk8000_state::text_start_r), FUNC(pk8000_state::text_start_w));
-	map(0x91, 0x91).rw(this, FUNC(pk8000_state::chargen_start_r), FUNC(pk8000_state::chargen_start_w));
-	map(0x92, 0x92).rw(this, FUNC(pk8000_state::video_start_r), FUNC(pk8000_state::video_start_w));
-	map(0x93, 0x93).rw(this, FUNC(pk8000_state::color_start_r), FUNC(pk8000_state::color_start_w));
-	map(0xa0, 0xbf).rw(this, FUNC(pk8000_state::color_r), FUNC(pk8000_state::color_w));
+	map(0x88, 0x88).rw(FUNC(pk8000_state::video_color_r), FUNC(pk8000_state::video_color_w));
+	map(0x8c, 0x8c).r(FUNC(pk8000_state::joy_1_r));
+	map(0x8d, 0x8d).r(FUNC(pk8000_state::joy_2_r));
+	map(0x90, 0x90).rw(FUNC(pk8000_state::text_start_r), FUNC(pk8000_state::text_start_w));
+	map(0x91, 0x91).rw(FUNC(pk8000_state::chargen_start_r), FUNC(pk8000_state::chargen_start_w));
+	map(0x92, 0x92).rw(FUNC(pk8000_state::video_start_r), FUNC(pk8000_state::video_start_w));
+	map(0x93, 0x93).rw(FUNC(pk8000_state::color_start_r), FUNC(pk8000_state::color_start_w));
+	map(0xa0, 0xbf).rw(FUNC(pk8000_state::color_r), FUNC(pk8000_state::color_w));
 }
 
 /*   Input ports */
@@ -358,51 +359,48 @@ uint32_t pk8000_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return video_update(screen, bitmap, cliprect, m_ram->pointer());
 }
 
-MACHINE_CONFIG_START(pk8000_state::pk8000)
+void pk8000_state::pk8000(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8080, 1780000)
-	MCFG_CPU_PROGRAM_MAP(pk8000_mem)
-	MCFG_CPU_IO_MAP(pk8000_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pk8000_state,  interrupt)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(pk8000_state, irq_callback)
+	I8080(config, m_maincpu, 1780000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pk8000_state::pk8000_mem);
+	m_maincpu->set_addrmap(AS_IO, &pk8000_state::pk8000_io);
+	m_maincpu->set_vblank_int("screen", FUNC(pk8000_state::interrupt));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(pk8000_state::irq_callback));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(256+32, 192+32)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256+32-1, 0, 192+32-1)
-	MCFG_SCREEN_UPDATE_DRIVER(pk8000_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(256+32, 192+32);
+	screen.set_visarea(0, 256+32-1, 0, 192+32-1);
+	screen.set_screen_update(FUNC(pk8000_state::screen_update));
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_INIT_OWNER(pk8000_base_state, pk8000)
+	PALETTE(config, "palette", FUNC(pk8000_state::pk8000_palette), 16);
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(pk8000_state, _80_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(pk8000_state, _80_portb_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(pk8000_state, _80_portc_w))
+	i8255_device &ppi1(I8255(config, "ppi8255_1"));
+	ppi1.out_pa_callback().set(FUNC(pk8000_state::_80_porta_w));
+	ppi1.in_pb_callback().set(FUNC(pk8000_state::_80_portb_r));
+	ppi1.out_pc_callback().set(FUNC(pk8000_state::_80_portc_w));
 
-	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(pk8000_base_state, _84_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(pk8000_base_state, _84_porta_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(pk8000_base_state, _84_portc_w))
+	i8255_device &ppi2(I8255(config, "ppi8255_2"));
+	ppi2.in_pa_callback().set(FUNC(pk8000_base_state::_84_porta_r));
+	ppi2.out_pa_callback().set(FUNC(pk8000_base_state::_84_porta_w));
+	ppi2.out_pc_callback().set(FUNC(pk8000_base_state::_84_portc_w));
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(fmsx_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(fmsx_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_PLAY);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
-MACHINE_CONFIG_END
+	RAM(config, RAM_TAG).set_default_size("64K");
+}
 
 /* ROM definition */
 ROM_START( vesta )
@@ -422,7 +420,7 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT   COMPAT  MACHINE    INPUT   STATE          INIT  COMPANY     FULLNAME              FLAGS */
-COMP( 1987, vesta,  0,       0,      pk8000,    pk8000, pk8000_state,  0,    "BP EVM",   "PK8000 Vesta",       0 )
-COMP( 1987, hobby,  vesta,   0,      pk8000,    pk8000, pk8000_state,  0,    "BP EVM",   "PK8000 Sura/Hobby",  0 )
-COMP( 1987, pk8002, vesta,   0,      pk8000,    pk8000, pk8000_state,  0,    "<unknown>","PK8002 Elf",         MACHINE_NOT_WORKING )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY      FULLNAME             FLAGS */
+COMP( 1987, vesta,  0,      0,      pk8000,  pk8000, pk8000_state, empty_init, "BP EVM",    "PK8000 Vesta",      0 )
+COMP( 1987, hobby,  vesta,  0,      pk8000,  pk8000, pk8000_state, empty_init, "BP EVM",    "PK8000 Sura/Hobby", 0 )
+COMP( 1987, pk8002, vesta,  0,      pk8000,  pk8000, pk8000_state, empty_init, "<unknown>", "PK8002 Elf",        MACHINE_NOT_WORKING )

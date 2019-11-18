@@ -12,6 +12,6 @@
 #include "h8s2000d.h"
 #include "cpu/h8/h8s2000d.hxx"
 
-h8s2000_disassembler::h8s2000_disassembler() : h8_disassembler(disasm_entries)
+h8s2000_disassembler::h8s2000_disassembler() : h8_disassembler(disasm_entries, true)
 {
 }

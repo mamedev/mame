@@ -15,6 +15,7 @@
 #include "machine/atarigen.h"
 #include "machine/atarixga.h"
 #include "video/atarirle.h"
+#include "tilemap.h"
 
 
 class atarigx2_state : public atarigen_state
@@ -31,9 +32,9 @@ public:
 		, m_adc(*this, "adc")
 	{ }
 
-	DECLARE_DRIVER_INIT(spclords);
-	DECLARE_DRIVER_INIT(rrreveng);
-	DECLARE_DRIVER_INIT(motofren);
+	void init_spclords();
+	void init_rrreveng();
+	void init_motofren();
 	void atarigx2_0x200(machine_config &config);
 	void atarigx2_0x400(machine_config &config);
 

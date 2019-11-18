@@ -8,11 +8,7 @@
 
 #include "memcard.h"
 
-#define MCFG_PSX_CTRL_PORT_ADD(_tag, _slot_intf, _def_slot) \
-	MCFG_DEVICE_ADD(_tag, PSX_CONTROLLER_PORT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
-
-SLOT_INTERFACE_EXTERN(psx_controllers);
+void psx_controllers(device_slot_interface &device);
 
 DECLARE_DEVICE_TYPE(PSXCONTROLLERPORTS,      psxcontrollerports_device)
 DECLARE_DEVICE_TYPE(PSX_CONTROLLER_PORT,     psx_controller_port_device)
@@ -20,7 +16,7 @@ DECLARE_DEVICE_TYPE(PSX_STANDARD_CONTROLLER, psx_standard_controller_device)
 
 class psx_controller_port_device;
 
-class device_psx_controller_interface : public device_slot_card_interface
+class device_psx_controller_interface : public device_interface
 {
 	friend class psx_multitap_device;
 public:
@@ -35,8 +31,9 @@ public:
 protected:
 	device_psx_controller_interface(const machine_config &mconfig, device_t &device);
 
-	virtual void interface_pre_reset() override;
 	virtual void interface_pre_start() override;
+	virtual void interface_pre_reset() override;
+	virtual void interface_post_stop() override;
 
 	enum
 	{
@@ -81,11 +78,6 @@ private:
 	required_ioport m_pad1;
 };
 
-#define MCFG_PSX_CONTROLLER_PORTS_DSR_HANDLER(_devcb) \
-	devcb = &downcast<psxcontrollerports_device &>(*device).set_dsr_handler(DEVCB_##_devcb);
-
-#define MCFG_PSX_CONTROLLER_PORTS_RXD_HANDLER(_devcb) \
-	devcb = &downcast<psxcontrollerports_device &>(*device).set_rxd_handler(DEVCB_##_devcb);
 
 class psxcontrollerports_device : public device_t
 {
@@ -94,8 +86,8 @@ public:
 
 	void ack();
 
-	template <class Object> devcb_base &set_dsr_handler(Object &&cb) { return m_dsr_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_rxd_handler(Object &&cb) { return m_rxd_handler.set_callback(std::forward<Object>(cb)); }
+	auto dsr() { return m_dsr_handler.bind(); }
+	auto rxd() { return m_rxd_handler.bind(); }
 
 	DECLARE_WRITE_LINE_MEMBER(write_sck);
 	DECLARE_WRITE_LINE_MEMBER(write_dtr);
@@ -105,17 +97,26 @@ protected:
 	virtual void device_start() override;
 
 private:
-	psx_controller_port_device *m_port0;
-	psx_controller_port_device *m_port1;
+	required_device<psx_controller_port_device> m_port0;
+	required_device<psx_controller_port_device> m_port1;
 
 	devcb_write_line m_dsr_handler;
 	devcb_write_line m_rxd_handler;
 };
 
 class psx_controller_port_device :  public device_t,
-									public device_slot_interface
+									public device_single_card_slot_interface<device_psx_controller_interface>
 {
 public:
+	template <typename T>
+	psx_controller_port_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
+		: psx_controller_port_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
 	psx_controller_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	typedef delegate<void ()> void_cb;

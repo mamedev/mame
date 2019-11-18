@@ -85,7 +85,6 @@ ToDo:
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
 #include "sound/sn76496.h"
-#include "sound/wave.h"
 #include "video/tms9928a.h"
 
 #include "bus/centronics/ctronics.h"
@@ -106,6 +105,12 @@ public:
 		, m_cart(*this, "cartslot")
 	{}
 
+	void pencil2(machine_config &config);
+
+	DECLARE_READ_LINE_MEMBER(printer_ready_r);
+	DECLARE_READ_LINE_MEMBER(printer_ack_r);
+
+private:
 	DECLARE_WRITE8_MEMBER(port10_w);
 	DECLARE_WRITE8_MEMBER(port30_w);
 	DECLARE_WRITE8_MEMBER(port80_w);
@@ -113,12 +118,9 @@ public:
 	DECLARE_READ8_MEMBER(porte2_r);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
-	DECLARE_CUSTOM_INPUT_MEMBER(printer_ready_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(printer_ack_r);
-	void pencil2(machine_config &config);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
+
 	virtual void machine_start() override;
 	int m_centronics_busy;
 	int m_centronics_ack;
@@ -135,24 +137,23 @@ void pencil2_state::mem_map(address_map &map)
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x5fff).nopw();  // stop error log filling up
 	map(0x6000, 0x67ff).mirror(0x1800).ram();
-	//AM_RANGE(0x8000, 0xffff)      // mapped by the cartslot
+	//map(0x8000, 0xffff)      // mapped by the cartslot
 }
 
 void pencil2_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x00, 0x0f).w("cent_data_out", FUNC(output_latch_device::write));
-	map(0x10, 0x1f).w(this, FUNC(pencil2_state::port10_w));
-	map(0x30, 0x3f).w(this, FUNC(pencil2_state::port30_w));
-	map(0x80, 0x9f).w(this, FUNC(pencil2_state::port80_w));
-	map(0xa0, 0xa0).mirror(0x1e).rw("tms9928a", FUNC(tms9928a_device::vram_read), FUNC(tms9928a_device::vram_write));
-	map(0xa1, 0xa1).mirror(0x1e).rw("tms9928a", FUNC(tms9928a_device::register_read), FUNC(tms9928a_device::register_write));
-	map(0xc0, 0xdf).w(this, FUNC(pencil2_state::portc0_w));
+	map(0x00, 0x0f).w("cent_data_out", FUNC(output_latch_device::bus_w));
+	map(0x10, 0x1f).w(FUNC(pencil2_state::port10_w));
+	map(0x30, 0x3f).w(FUNC(pencil2_state::port30_w));
+	map(0x80, 0x9f).w(FUNC(pencil2_state::port80_w));
+	map(0xa0, 0xa1).mirror(0x1e).rw("tms9928a", FUNC(tms9928a_device::read), FUNC(tms9928a_device::write));
+	map(0xc0, 0xdf).w(FUNC(pencil2_state::portc0_w));
 	map(0xe0, 0xff).w("sn76489a", FUNC(sn76489a_device::write));
 	map(0xe0, 0xe0).portr("E0");
 	map(0xe1, 0xe1).portr("E1");
-	map(0xe2, 0xe2).r(this, FUNC(pencil2_state::porte2_r));
+	map(0xe2, 0xe2).r(FUNC(pencil2_state::porte2_r));
 	map(0xe3, 0xe3).portr("E3");
 	map(0xe4, 0xe4).portr("E4");
 	map(0xe6, 0xe6).portr("E6");
@@ -191,7 +192,7 @@ WRITE_LINE_MEMBER( pencil2_state::write_centronics_busy )
 	m_centronics_busy = state;
 }
 
-CUSTOM_INPUT_MEMBER( pencil2_state::printer_ready_r )
+READ_LINE_MEMBER( pencil2_state::printer_ready_r )
 {
 	return m_centronics_busy;
 }
@@ -201,7 +202,7 @@ WRITE_LINE_MEMBER( pencil2_state::write_centronics_ack )
 	m_centronics_ack = state;
 }
 
-CUSTOM_INPUT_MEMBER( pencil2_state::printer_ack_r )
+READ_LINE_MEMBER( pencil2_state::printer_ack_r )
 {
 	return m_centronics_ack;
 }
@@ -215,10 +216,10 @@ static INPUT_PORTS_START( pencil2 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_RIGHT)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DOWN)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LEFT)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, pencil2_state, printer_ready_r, " ")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(pencil2_state, printer_ready_r)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Break") PORT_CODE(KEYCODE_END)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, pencil2_state, printer_ack_r, " ")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(pencil2_state, printer_ack_r)
 
 	PORT_START("E1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_CHAR('J') PORT_CHAR('j') PORT_CHAR('@')
@@ -305,45 +306,46 @@ INPUT_PORTS_END
 void pencil2_state::machine_start()
 {
 	if (m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0xffff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0xffff, read8sm_delegate(*m_cart, FUNC(generic_slot_device::read_rom)));
 }
 
-MACHINE_CONFIG_START(pencil2_state::pencil2)
+void pencil2_state::pencil2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(10'738'635)/3)
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	Z80(config, m_maincpu, XTAL(10'738'635)/3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pencil2_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &pencil2_state::io_map);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD( "tms9928a", TMS9929A, XTAL(10'738'635) / 2 )
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
-	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
+	tms9929a_device &vdp(TMS9929A(config, "tms9928a", XTAL(10'738'635)));
+	vdp.set_screen("screen");
+	vdp.set_vram_size(0x4000);
+	vdp.int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("sn76489a", SN76489A, XTAL(10'738'635)/3) // guess
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER(config, "mono").front_center();
+	SN76489A(config, "sn76489a", XTAL(10'738'635)/3).add_route(ALL_OUTPUTS, "mono", 1.00); // guess
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
+	CASSETTE(config, m_cass);
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "pencil2_cart")
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "pencil2_cart");
 
 	/* printer */
-	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(pencil2_state, write_centronics_ack))
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(pencil2_state, write_centronics_busy))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->ack_handler().set(FUNC(pencil2_state::write_centronics_ack));
+	m_centronics->busy_handler().set(FUNC(pencil2_state::write_centronics_busy));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "pencil2")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cart_list").set_original("pencil2");
+}
 
 /* ROM definition */
 ROM_START( pencil2 )
@@ -353,5 +355,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE   INPUT    STATE          INIT  COMPANY    FULLNAME     FLAGS
-COMP( 1983, pencil2, 0,      0,      pencil2,  pencil2, pencil2_state, 0,    "Hanimex", "Pencil II", 0 )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY    FULLNAME     FLAGS
+COMP( 1983, pencil2, 0,      0,      pencil2, pencil2, pencil2_state, empty_init, "Hanimex", "Pencil II", 0 )

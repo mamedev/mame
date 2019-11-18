@@ -10,8 +10,6 @@
 
 #include "emu.h"
 #include "machine/mc68328.h"
-#include "cpu/m68000/m68000.h"
-#include "machine/ram.h"
 
 
 #define SCR_BETO                0x80
@@ -350,8 +348,19 @@ static inline void ATTR_PRINTF(3,4) verboselog(device_t &device, int n_level, co
 DEFINE_DEVICE_TYPE(MC68328, mc68328_device, "mc68328", "MC68328 DragonBall Integrated Processor")
 
 
+void mc68328_device::internal_map(address_map &map)
+{
+	map(0xfff000, 0xffffff).rw(FUNC(mc68328_device::internal_read), FUNC(mc68328_device::internal_write));
+}
+
+void mc68328_device::cpu_space_map(address_map &map)
+{
+	map(0xfffff0, 0xffffff).r(FUNC(mc68328_device::irq_callback)).umask16(0x00ff);
+}
+
+
 mc68328_device::mc68328_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MC68328, tag, owner, clock)
+	: m68000_device(mconfig, tag, owner, clock, MC68328, 16, 24, address_map_constructor(FUNC(mc68328_device::internal_map), this))
 	, m_rtc(nullptr), m_pwm(nullptr)
 	, m_out_port_a_cb(*this)
 	, m_out_port_b_cb(*this)
@@ -377,16 +386,20 @@ mc68328_device::mc68328_device(const machine_config &mconfig, const char *tag, d
 	, m_out_spim_cb(*this)
 	, m_in_spim_cb(*this)
 	, m_spim_xch_trigger_cb(*this)
-	, m_cpu(*this, finder_base::DUMMY_TAG)
 {
+	m_cpu_space_config.m_internal_map = address_map_constructor(FUNC(mc68328_device::cpu_space_map), this);
 }
 
 //-------------------------------------------------
-//  device_start - device-specific startup
+//  device_resolve_objects - resolve objects that
+//  may be needed for other devices to set
+//  initial conditions at start time
 //-------------------------------------------------
 
-void mc68328_device::device_start()
+void mc68328_device::device_resolve_objects()
 {
+	m68000_device::device_resolve_objects();
+
 	m_out_port_a_cb.resolve();
 	m_out_port_b_cb.resolve();
 	m_out_port_c_cb.resolve();
@@ -415,6 +428,15 @@ void mc68328_device::device_start()
 	m_in_spim_cb.resolve();
 
 	m_spim_xch_trigger_cb.resolve();
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void mc68328_device::device_start()
+{
+	m68000_device::device_start();
 
 	m_gptimer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mc68328_device::timer1_hit),this));
 	m_gptimer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mc68328_device::timer2_hit),this));
@@ -430,6 +452,8 @@ void mc68328_device::device_start()
 
 void mc68328_device::device_reset()
 {
+	m68000_device::device_reset();
+
 	m_regs.scr = 0x0c;
 	m_regs.grpbasea = 0x0000;
 	m_regs.grpbaseb = 0x0000;
@@ -575,31 +599,31 @@ void mc68328_device::set_interrupt_line(uint32_t line, uint32_t active)
 
 			if (m_regs.isr & INT_M68K_LINE7)
 			{
-				m_cpu->set_input_line_and_vector(M68K_IRQ_7, ASSERT_LINE, m_regs.ivr | 0x07);
+				set_input_line(M68K_IRQ_7, ASSERT_LINE);
 			}
 			else if (m_regs.isr & INT_M68K_LINE6)
 			{
-				m_cpu->set_input_line_and_vector(M68K_IRQ_6, ASSERT_LINE, m_regs.ivr | 0x06);
+				set_input_line(M68K_IRQ_6, ASSERT_LINE);
 			}
 			else if (m_regs.isr & INT_M68K_LINE5)
 			{
-				m_cpu->set_input_line_and_vector(M68K_IRQ_5, ASSERT_LINE, m_regs.ivr | 0x05);
+				set_input_line(M68K_IRQ_5, ASSERT_LINE);
 			}
 			else if (m_regs.isr & INT_M68K_LINE4)
 			{
-				m_cpu->set_input_line_and_vector(M68K_IRQ_4, ASSERT_LINE, m_regs.ivr | 0x04);
+				set_input_line(M68K_IRQ_4, ASSERT_LINE);
 			}
 			else if (m_regs.isr & INT_M68K_LINE3)
 			{
-				m_cpu->set_input_line_and_vector(M68K_IRQ_3, ASSERT_LINE, m_regs.ivr | 0x03);
+				set_input_line(M68K_IRQ_3, ASSERT_LINE);
 			}
 			else if (m_regs.isr & INT_M68K_LINE2)
 			{
-				m_cpu->set_input_line_and_vector(M68K_IRQ_2, ASSERT_LINE, m_regs.ivr | 0x02);
+				set_input_line(M68K_IRQ_2, ASSERT_LINE);
 			}
 			else if (m_regs.isr & INT_M68K_LINE1)
 			{
-				m_cpu->set_input_line_and_vector(M68K_IRQ_1, ASSERT_LINE, m_regs.ivr | 0x01);
+				set_input_line(M68K_IRQ_1, ASSERT_LINE);
 			}
 		}
 	}
@@ -609,31 +633,31 @@ void mc68328_device::set_interrupt_line(uint32_t line, uint32_t active)
 
 		if ((line & INT_M68K_LINE7) && !(m_regs.isr & INT_M68K_LINE7))
 		{
-			m_cpu->set_input_line(M68K_IRQ_7, CLEAR_LINE);
+			set_input_line(M68K_IRQ_7, CLEAR_LINE);
 		}
 		if ((line & INT_M68K_LINE6) && !(m_regs.isr & INT_M68K_LINE6))
 		{
-			m_cpu->set_input_line(M68K_IRQ_6, CLEAR_LINE);
+			set_input_line(M68K_IRQ_6, CLEAR_LINE);
 		}
 		if ((line & INT_M68K_LINE5) && !(m_regs.isr & INT_M68K_LINE5))
 		{
-			m_cpu->set_input_line(M68K_IRQ_5, CLEAR_LINE);
+			set_input_line(M68K_IRQ_5, CLEAR_LINE);
 		}
 		if ((line & INT_M68K_LINE4) && !(m_regs.isr & INT_M68K_LINE4))
 		{
-			m_cpu->set_input_line(M68K_IRQ_4, CLEAR_LINE);
+			set_input_line(M68K_IRQ_4, CLEAR_LINE);
 		}
 		if ((line & INT_M68K_LINE3) && !(m_regs.isr & INT_M68K_LINE3))
 		{
-			m_cpu->set_input_line(M68K_IRQ_3, CLEAR_LINE);
+			set_input_line(M68K_IRQ_3, CLEAR_LINE);
 		}
 		if ((line & INT_M68K_LINE2) && !(m_regs.isr & INT_M68K_LINE2))
 		{
-			m_cpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
+			set_input_line(M68K_IRQ_2, CLEAR_LINE);
 		}
 		if ((line & INT_M68K_LINE1) && !(m_regs.isr & INT_M68K_LINE1))
 		{
-			m_cpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
+			set_input_line(M68K_IRQ_1, CLEAR_LINE);
 		}
 	}
 }
@@ -683,6 +707,11 @@ void mc68328_device::set_port_d_lines(uint8_t state, int bit)
 	m_regs.pddataedge |= ~old_button_state & m_regs.pddata;
 
 	poll_port_d_interrupts();
+}
+
+uint8_t mc68328_device::irq_callback(offs_t offset)
+{
+	return m_regs.ivr | offset;
 }
 
 uint32_t mc68328_device::get_timer_frequency(uint32_t index)
@@ -918,7 +947,7 @@ TIMER_CALLBACK_MEMBER( mc68328_device::rtc_tick )
 	}
 }
 
-WRITE16_MEMBER( mc68328_device::write )
+void mc68328_device::internal_write(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint32_t address = offset << 1;
 	uint16_t temp16[4] = { 0 };
@@ -1198,8 +1227,8 @@ WRITE16_MEMBER( mc68328_device::write )
 			}
 			else
 			{
-				verboselog( *this, 2, "mc68328_w: IVR = %02x\n", (data >> 8) & 0x00ff);
-				m_regs.ivr = (data >> 8) & 0x00ff;
+				verboselog( *this, 2, "mc68328_w: IVR = %02x\n", (data >> 8) & 0x00f8);
+				m_regs.ivr = (data >> 8) & 0x00f8;
 			}
 			break;
 
@@ -2112,7 +2141,7 @@ WRITE16_MEMBER( mc68328_device::write )
 	}
 }
 
-READ16_MEMBER( mc68328_device::read )
+uint16_t mc68328_device::internal_read(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t temp16;
 	uint32_t address = offset << 1;
@@ -3014,7 +3043,8 @@ READ16_MEMBER( mc68328_device::read )
 /* THIS IS PRETTY MUCH TOTALLY WRONG AND DOESN'T REFLECT THE MC68328'S INTERNAL FUNCTIONALITY AT ALL! */
 uint32_t mc68328_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint16_t *video_ram = (uint16_t *)(machine().device<ram_device>(RAM_TAG)->pointer() + (m_regs.lssa & 0x00ffffff));
+	auto mcache = space(AS_PROGRAM).cache<1, 0, ENDIANNESS_BIG>();
+	uint32_t vram_addr = m_regs.lssa & 0x00fffffe;
 	uint16_t word;
 	uint16_t *line;
 	int y, x, b;
@@ -3025,9 +3055,9 @@ uint32_t mc68328_device::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		{
 			line = &bitmap.pix16(y);
 
-			for (x = 0; x < 160; x += 16)
+			for (x = 0; x < 160; x += 16, vram_addr += 2)
 			{
-				word = *(video_ram++);
+				word = mcache->read_word(vram_addr);
 				for (b = 0; b < 16; b++)
 				{
 					line[x + b] = (word >> (15 - b)) & 0x0001;

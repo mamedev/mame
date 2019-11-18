@@ -15,89 +15,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_315_5649_IN_PA_CB(_devcb) \
-	devcb = &downcast<sega_315_5649_device &>(*device).set_in_port_callback(DEVCB_##_devcb, 0);
-
-#define MCFG_315_5649_OUT_PA_CB(_devcb) \
-	devcb = &downcast<sega_315_5649_device &>(*device).set_out_port_callback(DEVCB_##_devcb, 0);
-
-#define MCFG_315_5649_IN_PB_CB(_devcb) \
-	devcb = &downcast<sega_315_5649_device &>(*device).set_in_port_callback(DEVCB_##_devcb, 1);
-
-#define MCFG_315_5649_OUT_PB_CB(_devcb) \
-	devcb = &downcast<sega_315_5649_device &>(*device).set_out_port_callback(DEVCB_##_devcb, 1);
-
-#define MCFG_315_5649_IN_PC_CB(_devcb) \
-	devcb = &downcast<sega_315_5649_device &>(*device).set_in_port_callback(DEVCB_##_devcb, 2);
-
-#define MCFG_315_5649_OUT_PC_CB(_devcb) \
-	devcb = &downcast<sega_315_5649_device &>(*device).set_out_port_callback(DEVCB_##_devcb, 2);
-
-#define MCFG_315_5649_IN_PD_CB(_devcb) \
-	devcb = &downcast<sega_315_5649_device &>(*device).set_in_port_callback(DEVCB_##_devcb, 3);
-
-#define MCFG_315_5649_OUT_PD_CB(_devcb) \
-	devcb = &downcast<sega_315_5649_device &>(*device).set_out_port_callback(DEVCB_##_devcb, 3);
-
-#define MCFG_315_5649_IN_PE_CB(_devcb) \
-	devcb = &downcast<sega_315_5649_device &>(*device).set_in_port_callback(DEVCB_##_devcb, 4);
-
-#define MCFG_315_5649_OUT_PE_CB(_devcb) \
-	devcb = &downcast<sega_315_5649_device &>(*device).set_out_port_callback(DEVCB_##_devcb, 4);
-
-#define MCFG_315_5649_IN_PF_CB(_devcb) \
-	devcb = &downcast<sega_315_5649_device &>(*device).set_in_port_callback(DEVCB_##_devcb, 5);
-
-#define MCFG_315_5649_OUT_PF_CB(_devcb) \
-	devcb = &downcast<sega_315_5649_device &>(*device).set_out_port_callback(DEVCB_##_devcb, 5);
-
-#define MCFG_315_5649_IN_PG_CB(_devcb) \
-	devcb = &downcast<sega_315_5649_device &>(*device).set_in_port_callback(DEVCB_##_devcb, 6);
-
-#define MCFG_315_5649_OUT_PG_CB(_devcb) \
-	devcb = &downcast<sega_315_5649_device &>(*device).set_out_port_callback(DEVCB_##_devcb, 6);
-
-#define MCFG_315_5649_AN0_CB(_devcb) \
-	devcb = &downcast<sega_315_5649_device &>(*device).set_an_port_callback(DEVCB_##_devcb, 0);
-
-#define MCFG_315_5649_AN1_CB(_devcb) \
-	devcb = &downcast<sega_315_5649_device &>(*device).set_an_port_callback(DEVCB_##_devcb, 1);
-
-#define MCFG_315_5649_AN2_CB(_devcb) \
-	devcb = &downcast<sega_315_5649_device &>(*device).set_an_port_callback(DEVCB_##_devcb, 2);
-
-#define MCFG_315_5649_AN3_CB(_devcb) \
-	devcb = &downcast<sega_315_5649_device &>(*device).set_an_port_callback(DEVCB_##_devcb, 3);
-
-#define MCFG_315_5649_AN4_CB(_devcb) \
-	devcb = &downcast<sega_315_5649_device &>(*device).set_an_port_callback(DEVCB_##_devcb, 4);
-
-#define MCFG_315_5649_AN5_CB(_devcb) \
-	devcb = &downcast<sega_315_5649_device &>(*device).set_an_port_callback(DEVCB_##_devcb, 5);
-
-#define MCFG_315_5649_AN6_CB(_devcb) \
-	devcb = &downcast<sega_315_5649_device &>(*device).set_an_port_callback(DEVCB_##_devcb, 6);
-
-#define MCFG_315_5649_AN7_CB(_devcb) \
-	devcb = &downcast<sega_315_5649_device &>(*device).set_an_port_callback(DEVCB_##_devcb, 7);
-
-#define MCFG_315_5649_SERIAL_CH1_READ_CB(_devcb) \
-	devcb = &downcast<sega_315_5649_device &>(*device).set_serial_rd_callback(DEVCB_##_devcb, 0);
-
-#define MCFG_315_5649_SERIAL_CH1_WRITE_CB(_devcb) \
-	devcb = &downcast<sega_315_5649_device &>(*device).set_serial_wr_callback(DEVCB_##_devcb, 0);
-
-#define MCFG_315_5649_SERIAL_CH2_READ_CB(_devcb) \
-	devcb = &downcast<sega_315_5649_device &>(*device).set_serial_rd_callback(DEVCB_##_devcb, 1);
-
-#define MCFG_315_5649_SERIAL_CH2_WRITE_CB(_devcb) \
-	devcb = &downcast<sega_315_5649_device &>(*device).set_serial_wr_callback(DEVCB_##_devcb, 1);
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -108,20 +25,31 @@ public:
 	sega_315_5649_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	template <class Object> devcb_base &set_in_port_callback(Object &&cb, int index)
-	{ return m_in_port_cb[index].set_callback(std::forward<Object>(cb)); }
+	auto in_pa_callback() { return m_in_port_cb[0].bind(); }
+	auto in_pb_callback() { return m_in_port_cb[1].bind(); }
+	auto in_pc_callback() { return m_in_port_cb[2].bind(); }
+	auto in_pd_callback() { return m_in_port_cb[3].bind(); }
+	auto in_pe_callback() { return m_in_port_cb[4].bind(); }
+	auto in_pf_callback() { return m_in_port_cb[5].bind(); }
+	auto in_pg_callback() { return m_in_port_cb[6].bind(); }
 
-	template <class Object> devcb_base &set_out_port_callback(Object &&cb, int index)
-	{ return m_out_port_cb[index].set_callback(std::forward<Object>(cb)); }
+	auto out_pa_callback() { return m_out_port_cb[0].bind(); }
+	auto out_pb_callback() { return m_out_port_cb[1].bind(); }
+	auto out_pc_callback() { return m_out_port_cb[2].bind(); }
+	auto out_pd_callback() { return m_out_port_cb[3].bind(); }
+	auto out_pe_callback() { return m_out_port_cb[4].bind(); }
+	auto out_pf_callback() { return m_out_port_cb[5].bind(); }
+	auto out_pg_callback() { return m_out_port_cb[6].bind(); }
 
-	template <class Object> devcb_base &set_an_port_callback(Object &&cb, int index)
-	{ return m_an_port_cb[index].set_callback(std::forward<Object>(cb)); }
+	template <unsigned N> auto an_port_callback() { return m_an_port_cb[N].bind(); }
 
-	template <class Object> devcb_base &set_serial_rd_callback(Object &&cb, int index)
-	{ return m_serial_rd_cb[index].set_callback(std::forward<Object>(cb)); }
+	auto serial_ch1_rd_callback() { return m_serial_rd_cb[0].bind(); }
+	auto serial_ch2_rd_callback() { return m_serial_rd_cb[1].bind(); }
 
-	template <class Object> devcb_base &set_serial_wr_callback(Object &&cb, int index)
-	{ return m_serial_wr_cb[index].set_callback(std::forward<Object>(cb)); }
+	auto serial_ch1_wr_callback() { return m_serial_wr_cb[0].bind(); }
+	auto serial_ch2_wr_callback() { return m_serial_wr_cb[1].bind(); }
+
+	template <unsigned N> auto in_counter_callback() { return m_cnt_cb[N].bind(); }
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
@@ -129,6 +57,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_reset() override;
 
 private:
 	// callbacks
@@ -137,9 +66,11 @@ private:
 	devcb_read8 m_an_port_cb[8];
 	devcb_read8 m_serial_rd_cb[2];
 	devcb_write8 m_serial_wr_cb[2];
+	devcb_read16 m_cnt_cb[4];
 
 	uint8_t m_port_value[7];
 	uint8_t m_port_config;
+	uint8_t m_mode;
 	int m_analog_channel;
 };
 

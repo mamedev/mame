@@ -5,7 +5,7 @@
 #define MAME_INCLUDES_C80_H
 
 #include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "machine/z80pio.h"
 #include "imagedev/cassette.h"
 #include "machine/ram.h"
@@ -29,7 +29,7 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<z80pio_device> m_pio1;
 	required_device<cassette_image_device> m_cassette;
 	required_ioport m_row0;

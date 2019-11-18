@@ -16,17 +16,35 @@
 #define VISIBLE_SCREEN_WIDTH         (32*8) /* Visible screen width */
 
 // devices
-DEFINE_DEVICE_TYPE(PPU_VT03, ppu_vt03_device, "ppu_vt03", "VT03 PPU")
+DEFINE_DEVICE_TYPE(PPU_VT03, ppu_vt03_device, "ppu_vt03", "VT03 PPU (NTSC)")
+DEFINE_DEVICE_TYPE(PPU_VT03PAL, ppu_vt03pal_device, "ppu_vt03pal", "VT03 PPU (PAL)")
 
-
-ppu_vt03_device::ppu_vt03_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ppu2c0x_device(mconfig, PPU_VT03, tag, owner, clock),
+ppu_vt03_device::ppu_vt03_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)	:
+	ppu2c0x_device(mconfig, type, tag, owner, clock),
+	m_is_pal(false),
+	m_is_50hz(false),
 	m_read_bg(*this),
 	m_read_sp(*this)
 {
 	for(int i = 0; i < 6; i++)
 		m_2012_2017_descramble[i] = 2 + i;
 }
+
+ppu_vt03_device::ppu_vt03_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+	ppu_vt03_device(mconfig, PPU_VT03, tag, owner, clock)
+{
+}
+
+
+ppu_vt03pal_device::ppu_vt03pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	ppu_vt03_device(mconfig, PPU_VT03PAL, tag, owner, clock)
+{
+	m_scanlines_per_frame = PAL_SCANLINES_PER_FRAME;
+	m_vblank_first_scanline = VBLANK_FIRST_SCANLINE_PALC;
+	m_is_pal = true;
+	m_is_50hz = true;
+}
+
 
 READ8_MEMBER(ppu_vt03_device::palette_read)
 {
@@ -40,23 +58,33 @@ READ8_MEMBER(ppu_vt03_device::palette_read)
 	}
 }
 
+void ppu_vt03_device::set_201x_descramble(uint8_t reg0, uint8_t reg1, uint8_t reg2, uint8_t reg3, uint8_t reg4, uint8_t reg5)
+{
+	m_2012_2017_descramble[0] = reg0; // TOOD: name regs
+	m_2012_2017_descramble[1] = reg1;
+	m_2012_2017_descramble[2] = reg2;
+	m_2012_2017_descramble[3] = reg3;
+	m_2012_2017_descramble[4] = reg4;
+	m_2012_2017_descramble[5] = reg5;
+}
+
 void ppu_vt03_device::set_new_pen(int i)
 {
 	if((i < 0x20) && ((i & 0x3) == 0)) {
-		m_palette->set_pen_color(i & 0x7f, rgb_t(0, 0, 0));
+		set_pen_color(i & 0x7f, rgb_t(0, 0, 0));
 	} else {
 		if(m_pal_mode == PAL_MODE_NEW_RGB) {
 			uint16_t rgbval = (m_newpal[i&0x7f] & 0xff) | ((m_newpal[(i&0x7f)+0x80] & 0xff)<<8);
 			uint8_t blue = (rgbval & 0x001f) << 3;
 			uint8_t green = (rgbval & 0x3e0) >> 2;
 			uint8_t red  = (rgbval & 0x7C00) >> 7;
-			m_palette->set_pen_color(i & 0x7f, rgb_t(red, green, blue));
+			set_pen_color(i & 0x7f, rgb_t(red, green, blue));
 		} else if(m_pal_mode == PAL_MODE_NEW_RGB12) {
 			uint16_t rgbval = (m_newpal[i&0x7f] & 0x3f) | ((m_newpal[(i&0x7f)+0x80] & 0x3f)<<6);
 			uint8_t red = (rgbval & 0x000f) << 4;
 			uint8_t green = (rgbval & 0x0f0);
 			uint8_t blue  = (rgbval & 0xf00) >> 4;
-			m_palette->set_pen_color(i & 0x7f, rgb_t(red, green, blue));
+			set_pen_color(i & 0x7f, rgb_t(red, green, blue));
 		} else {
 			// Credit to NewRisingSun
 			uint16_t palval = (m_newpal[i&0x7f] & 0x3f) | ((m_newpal[(i&0x7f)+0x80] & 0x3f)<<6);
@@ -107,7 +135,7 @@ void ppu_vt03_device::set_new_pen(int i)
 			int GV = G *255.0;
 			int BV = B *255.0;
 
-			m_palette->set_pen_color(i & 0x7f, rgb_t(RV, GV ,BV));
+			set_pen_color(i & 0x7f, rgb_t(RV, GV ,BV));
 		}
 	}
 
@@ -117,17 +145,18 @@ void ppu_vt03_device::set_new_pen(int i)
 WRITE8_MEMBER(ppu_vt03_device::palette_write)
 {
 	//logerror("pal write %d %02x\n", offset, data);
+	// why is the check pal_mask = (m_pal_mode == PAL_MODE_NEW_VG) ? 0x08 : 0x80 in set_2010_reg and 0x04 : 0x80 here?
 	uint8_t pal_mask = (m_pal_mode == PAL_MODE_NEW_VG) ? 0x04 : 0x80;
 
 	if (m_201x_regs[0] & pal_mask)
 	{
-		m_newpal[offset] = data;
+		m_newpal[offset&0xff] = data;
 		set_new_pen(offset);
 	}
 	else
 	{
-		if(m_pal_mode == PAL_MODE_NEW_VG)
-			m_newpal[offset] = data;
+		//if(m_pal_mode == PAL_MODE_NEW_VG) // ddrdismx writes the palette before setting the register but doesn't use 'PAL_MODE_NEW_VG', Konami logo is missing if you don't allow writes to be stored for when we switch
+		m_newpal[offset&0xff] = data;
 		ppu2c0x_device::palette_write(space, offset, data);
 	}
 }
@@ -143,11 +172,10 @@ READ8_MEMBER( ppu_vt03_device::read )
 	 }
 }
 
-void ppu_vt03_device::init_palette(palette_device &palette, int first_entry)
+void ppu_vt03_device::init_palette()
 {
 	// todo, work out the format of the 12 palette bits instead of just calling the main init
-	m_palette = &palette;
-	ppu2c0x_device::init_palette(palette, first_entry, true);
+	ppu2c0x_device::init_palette(true);
 }
 
 void ppu_vt03_device::device_start()
@@ -155,7 +183,7 @@ void ppu_vt03_device::device_start()
 	ppu2c0x_device::device_start();
 
 	m_newpal = std::make_unique<uint8_t[]>(0x100);
-	save_pointer(&m_newpal[0], "m_newpal", 0x100);
+	save_pointer(NAME(m_newpal), 0x100);
 
 	save_item(NAME(m_201x_regs));
 }
@@ -185,7 +213,9 @@ void ppu_vt03_device::device_reset()
 	for (int i = 0;i < 0x20;i++)
 		set_201x_reg(i, 0x00);
 
-	init_palette(*m_palette, 0);
+	//m_201x_regs[0] = 0x86; // alt fix for ddrdismx would be to set the default palette mode here
+
+	init_palette();
 
 	m_read_bg4_bg3 = 0;
 	m_va34 = 0;
@@ -250,7 +280,7 @@ void ppu_vt03_device::make_sprite_pixel_data(uint8_t &pixel_data, int flipx)
 	}
 }
 
-void ppu_vt03_device::draw_sprite_pixel(int sprite_xpos, int color, int pixel, uint8_t pixel_data, bitmap_ind16& bitmap)
+void ppu_vt03_device::draw_sprite_pixel(int sprite_xpos, int color, int pixel, uint8_t pixel_data, bitmap_rgb32 &bitmap)
 {
 	int is4bpp = get_201x_reg(0x0) & 0x04;
 	int is16pix = get_201x_reg(0x0) & 0x01;
@@ -259,7 +289,7 @@ void ppu_vt03_device::draw_sprite_pixel(int sprite_xpos, int color, int pixel, u
 	{
 		if (!is16pix)
 		{
-			bitmap.pix16(m_scanline, sprite_xpos + pixel) = pixel_data + (4 * color);
+			bitmap.pix32(m_scanline, sprite_xpos + pixel) = pen(pixel_data + (4 * color));
 		}
 		else
 		{
@@ -267,9 +297,9 @@ void ppu_vt03_device::draw_sprite_pixel(int sprite_xpos, int color, int pixel, u
 			   we probably need to split them out again and draw them at xpos+8 with a
 			   cliprect - not seen used yet */
 			if((pixel_data & 0x03) != 0)
-				bitmap.pix16(m_scanline, sprite_xpos + pixel) = (pixel_data & 0x03) + (4 * color);
+				bitmap.pix32(m_scanline, sprite_xpos + pixel) = pen((pixel_data & 0x03) + (4 * color));
 			if(((pixel_data >> 5) & 0x03) != 0)
-				bitmap.pix16(m_scanline, sprite_xpos + pixel + 8) = ((pixel_data >> 5) & 0x03) + (4 * color);
+				bitmap.pix32(m_scanline, sprite_xpos + pixel + 8) = pen(((pixel_data >> 5) & 0x03) + (4 * color));
 			//ppu2c0x_device::draw_sprite_pixel(sprite_xpos, color, pixel, pixel_data & 0x03, bitmap);
 			//ppu2c0x_device::draw_sprite_pixel(sprite_xpos, color, pixel + 8, (pixel_data >> 5) & 0x03, bitmap);
 		}
@@ -320,7 +350,7 @@ void ppu_vt03_device::shift_tile_plane_data(uint8_t &pix)
 	}
 }
 
-void ppu_vt03_device::draw_tile_pixel(uint8_t pix, int color, uint16_t back_pen, uint16_t *&dest, const pen_t *color_table)
+void ppu_vt03_device::draw_tile_pixel(uint8_t pix, int color, pen_t back_pen, uint32_t *&dest, const pen_t *color_table)
 {
 	int is4bpp = get_201x_reg(0x0) & 0x02;
 
@@ -350,7 +380,7 @@ void ppu_vt03_device::draw_tile_pixel(uint8_t pix, int color, uint16_t back_pen,
 		{
 			pen = 0; // fixme backpen logic probably differs on vt03 due to extra colours
 		}
-		*dest = pen;
+		*dest = this->pen(pen);
 	}
 }
 
@@ -388,7 +418,7 @@ void ppu_vt03_device::set_2010_reg(uint8_t data)
 		{
 			for (int i = 0;i < 256;i++)
 			{
-				m_palette->set_pen_indirect(i, i);
+				set_pen_indirect(i, i);
 			}
 		}
 	}

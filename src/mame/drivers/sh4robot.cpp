@@ -42,10 +42,12 @@ public:
 	{ }
 
 	void sh4robot(machine_config &config);
+
+private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-private:
-	required_device<cpu_device> m_maincpu;
+
+	required_device<sh4_device> m_maincpu;
 };
 
 
@@ -66,24 +68,24 @@ void sh4robot_state::io_map(address_map &map)
 static INPUT_PORTS_START( sh4robot )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(sh4robot_state::sh4robot)
+void sh4robot_state::sh4robot(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", SH4LE, 200000000) // SH7750
-	MCFG_SH4_MD0(1)
-	MCFG_SH4_MD1(0)
-	MCFG_SH4_MD2(1)
-	MCFG_SH4_MD3(0)
-	MCFG_SH4_MD4(0)
-	MCFG_SH4_MD5(1)
-	MCFG_SH4_MD6(0)
-	MCFG_SH4_MD7(1)
-	MCFG_SH4_MD8(0)
-	MCFG_SH4_CLOCK(200000000)
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_FORCE_NO_DRC()
-
-MACHINE_CONFIG_END
+	SH4LE(config, m_maincpu, 200000000); // SH7750
+	m_maincpu->set_md(0, 1);
+	m_maincpu->set_md(1, 0);
+	m_maincpu->set_md(2, 1);
+	m_maincpu->set_md(3, 0);
+	m_maincpu->set_md(4, 0);
+	m_maincpu->set_md(5, 1);
+	m_maincpu->set_md(6, 0);
+	m_maincpu->set_md(7, 1);
+	m_maincpu->set_md(8, 0);
+	m_maincpu->set_sh4_clock(200000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sh4robot_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &sh4robot_state::io_map);
+	m_maincpu->set_force_no_drc(true);
+}
 
 /* ROM definition */
 ROM_START( sh4robot )
@@ -99,5 +101,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     STATE           INIT  COMPANY      FULLNAME  FLAGS
-COMP( 20??, sh4robot, 0,      0,      sh4robot, sh4robot, sh4robot_state, 0,    "<unknown>", "Robot",  MACHINE_IS_SKELETON_MECHANICAL )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY      FULLNAME  FLAGS
+COMP( 20??, sh4robot, 0,      0,      sh4robot, sh4robot, sh4robot_state, empty_init, "<unknown>", "Robot",  MACHINE_IS_SKELETON_MECHANICAL )

@@ -25,13 +25,13 @@ DEFINE_DEVICE_TYPE(WS_CART_SLOT, ws_cart_slot_device, "ws_cart_slot", "Wonderswa
 //  device_ws_cart_interface - constructor
 //-------------------------------------------------
 
-device_ws_cart_interface::device_ws_cart_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device),
-		m_rom(nullptr),
-		m_rom_size(0),
-		m_bank_mask(0),
-		m_has_rtc(false),
-		m_is_rotated(false)
+device_ws_cart_interface::device_ws_cart_interface(const machine_config &mconfig, device_t &device) :
+	device_interface(device, "wswancart"),
+	m_rom(nullptr),
+	m_rom_size(0),
+	m_bank_mask(0),
+	m_has_rtc(false),
+	m_is_rotated(false)
 {
 }
 
@@ -79,7 +79,7 @@ void device_ws_cart_interface::nvram_alloc(uint32_t size)
 ws_cart_slot_device::ws_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, WS_CART_SLOT, tag, owner, clock),
 	device_image_interface(mconfig, *this),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_ws_cart_interface>(mconfig, *this),
 	m_type(WS_STD),
 	m_cart(nullptr)
 {
@@ -100,7 +100,7 @@ ws_cart_slot_device::~ws_cart_slot_device()
 
 void ws_cart_slot_device::device_start()
 {
-	m_cart = dynamic_cast<device_ws_cart_interface *>(get_card_device());
+	m_cart = get_card_device();
 }
 
 
@@ -312,10 +312,10 @@ std::string ws_cart_slot_device::get_default_card_software(get_default_card_soft
  read_rom20
  -------------------------------------------------*/
 
-READ8_MEMBER(ws_cart_slot_device::read_rom20)
+uint8_t ws_cart_slot_device::read_rom20(offs_t offset)
 {
 	if (m_cart)
-		return m_cart->read_rom20(space, offset);
+		return m_cart->read_rom20(offset);
 	else
 		return 0xff;
 }
@@ -324,10 +324,10 @@ READ8_MEMBER(ws_cart_slot_device::read_rom20)
  read_rom30
  -------------------------------------------------*/
 
-READ8_MEMBER(ws_cart_slot_device::read_rom30)
+uint8_t ws_cart_slot_device::read_rom30(offs_t offset)
 {
 	if (m_cart)
-		return m_cart->read_rom30(space, offset);
+		return m_cart->read_rom30(offset);
 	else
 		return 0xff;
 }
@@ -336,10 +336,10 @@ READ8_MEMBER(ws_cart_slot_device::read_rom30)
  read_rom40
  -------------------------------------------------*/
 
-READ8_MEMBER(ws_cart_slot_device::read_rom40)
+uint8_t ws_cart_slot_device::read_rom40(offs_t offset)
 {
 	if (m_cart)
-		return m_cart->read_rom40(space, offset);
+		return m_cart->read_rom40(offset);
 	else
 		return 0xff;
 }
@@ -348,10 +348,10 @@ READ8_MEMBER(ws_cart_slot_device::read_rom40)
  read_ram
  -------------------------------------------------*/
 
-READ8_MEMBER(ws_cart_slot_device::read_ram)
+uint8_t ws_cart_slot_device::read_ram(offs_t offset)
 {
 	if (m_cart)
-		return m_cart->read_ram(space, offset);
+		return m_cart->read_ram(offset);
 	else
 		return 0xff;
 }
@@ -360,20 +360,20 @@ READ8_MEMBER(ws_cart_slot_device::read_ram)
  write_ram
  -------------------------------------------------*/
 
-WRITE8_MEMBER(ws_cart_slot_device::write_ram)
+void ws_cart_slot_device::write_ram(offs_t offset, uint8_t data)
 {
 	if (m_cart)
-		m_cart->write_ram(space, offset, data);
+		m_cart->write_ram(offset, data);
 }
 
 /*-------------------------------------------------
  read_io
  -------------------------------------------------*/
 
-READ8_MEMBER(ws_cart_slot_device::read_io)
+uint8_t ws_cart_slot_device::read_io(offs_t offset)
 {
 	if (m_cart)
-		return m_cart->read_io(space, offset);
+		return m_cart->read_io(offset);
 	else
 		return 0xff;
 }
@@ -382,10 +382,10 @@ READ8_MEMBER(ws_cart_slot_device::read_io)
  write_io
  -------------------------------------------------*/
 
-WRITE8_MEMBER(ws_cart_slot_device::write_io)
+void ws_cart_slot_device::write_io(offs_t offset, uint8_t data)
 {
 	if (m_cart)
-		m_cart->write_io(space, offset, data);
+		m_cart->write_io(offset, data);
 }
 
 

@@ -7,9 +7,10 @@
     PC98 FDD disk images
 
 *********************************************************************/
+#ifndef MAME_FORMATS_FDD_DSK_H
+#define MAME_FORMATS_FDD_DSK_H
 
-#ifndef FDD_DSK_H
-#define FDD_DSK_H
+#pragma once
 
 #include "flopimg.h"
 
@@ -30,4 +31,4 @@ public:
 
 extern const floppy_format_type FLOPPY_FDD_FORMAT;
 
-#endif /* FDD_DSK_H */
+#endif // MAME_FORMATS_FDD_DSK_H

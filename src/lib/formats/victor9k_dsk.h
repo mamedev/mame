@@ -7,9 +7,10 @@
     Victor 9000 sector disk image format
 
 *********************************************************************/
+#ifndef MAME_FORMATS_VICTOR9K_DSK_H
+#define MAME_FORMATS_VICTOR9K_DSK_H
 
-#ifndef VICTOR9K_DSK_H_
-#define VICTOR9K_DSK_H_
+#pragma once
 
 #include "flopimg.h"
 
@@ -64,4 +65,4 @@ FLOPPY_IDENTIFY( victor9k_dsk_identify );
 
 FLOPPY_CONSTRUCT( victor9k_dsk_construct );
 
-#endif
+#endif // MAME_FORMATS_VICTOR9K_DSK_H

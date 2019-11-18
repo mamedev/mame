@@ -34,8 +34,6 @@
 #include "emu.h"
 #include "bandai.h"
 
-#include "cpu/m6502/m6502.h"
-
 #ifdef NES_PCB_DEBUG
 #define VERBOSE 1
 #else
@@ -126,7 +124,7 @@ void nes_fcg_device::device_start()
 {
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
-	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
+	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));
@@ -147,7 +145,7 @@ void nes_lz93d50_24c01_device::device_start()
 {
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
-	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
+	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));
@@ -170,7 +168,7 @@ void nes_fjump2_device::device_start()
 {
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
-	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
+	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_reg));
 }
@@ -207,7 +205,7 @@ void nes_fjump2_device::pcb_reset()
  -------------------------------------------------*/
 
 
-WRITE8_MEMBER(nes_oekakids_device::nt_w)
+void nes_oekakids_device::nt_w(offs_t offset, uint8_t data)
 {
 	int page = ((offset & 0xc00) >> 10);
 
@@ -222,7 +220,7 @@ WRITE8_MEMBER(nes_oekakids_device::nt_w)
 	m_nt_access[page][offset & 0x3ff] = data;
 }
 
-READ8_MEMBER(nes_oekakids_device::nt_r)
+uint8_t nes_oekakids_device::nt_r(offs_t offset)
 {
 	int page = ((offset & 0xc00) >> 10);
 
@@ -255,7 +253,7 @@ void nes_oekakids_device::ppu_latch(offs_t offset)
 #endif
 }
 
-WRITE8_MEMBER(nes_oekakids_device::write_h)
+void nes_oekakids_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("oeka kids write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -303,14 +301,14 @@ void nes_fcg_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 			if (!m_irq_count)
 			{
-				m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+				set_irq_line(ASSERT_LINE);
 				m_irq_enable = 0;
 			}
 		}
 	}
 }
 
-WRITE8_MEMBER(nes_fcg_device::fcg_write)
+void nes_fcg_device::fcg_write(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("lz93d50_write, offset: %04x, data: %02x\n", offset, data));
 
@@ -334,7 +332,7 @@ WRITE8_MEMBER(nes_fcg_device::fcg_write)
 			break;
 		case 0x0a:
 			m_irq_enable = data & 0x01;
-			m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+			set_irq_line(CLEAR_LINE);
 			break;
 		case 0x0b:
 			m_irq_count = (m_irq_count & 0xff00) | data;
@@ -348,12 +346,12 @@ WRITE8_MEMBER(nes_fcg_device::fcg_write)
 	}
 }
 
-WRITE8_MEMBER(nes_fcg_device::write_m)
+void nes_fcg_device::write_m(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("lz93d50 write_m, offset: %04x, data: %02x\n", offset, data));
 
 	if (m_battery.empty() && m_prgram.empty())
-		fcg_write(space, offset & 0x0f, data, mem_mask);
+		fcg_write(offset & 0x0f, data);
 	else if (!m_battery.empty())
 		m_battery[offset] = data;
 	else
@@ -363,7 +361,7 @@ WRITE8_MEMBER(nes_fcg_device::write_m)
 // FCG board does not access regs in 0x8000-0xffff space!
 // only later design lz93d50 (and its variants do)!
 
-WRITE8_MEMBER(nes_lz93d50_24c01_device::write_h)
+void nes_lz93d50_24c01_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("lz93d50_24c01 write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -375,12 +373,12 @@ WRITE8_MEMBER(nes_lz93d50_24c01_device::write_h)
 			m_i2c_dir = BIT(data, 7);
 			break;
 		default:
-			fcg_write(space, offset & 0x0f, data, mem_mask);
+			fcg_write(offset & 0x0f, data);
 			break;
 	}
 }
 
-READ8_MEMBER(nes_lz93d50_24c01_device::read_m)
+uint8_t nes_lz93d50_24c01_device::read_m(offs_t offset)
 {
 	LOG_MMC(("lz93d50 EEPROM read, offset: %04x\n", offset));
 	if (m_i2c_dir)
@@ -393,13 +391,15 @@ READ8_MEMBER(nes_lz93d50_24c01_device::read_m)
 //  SERIAL I2C DEVICE
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(nes_lz93d50_24c01_device::device_add_mconfig)
-	MCFG_24C01_ADD("i2cmem")
-MACHINE_CONFIG_END
+void nes_lz93d50_24c01_device::device_add_mconfig(machine_config &config)
+{
+	I2C_24C01(config, m_i2cmem);
+}
 
-MACHINE_CONFIG_START(nes_lz93d50_24c02_device::device_add_mconfig)
-	MCFG_24C02_ADD("i2cmem")
-MACHINE_CONFIG_END
+void nes_lz93d50_24c02_device::device_add_mconfig(machine_config &config)
+{
+	I2C_24C02(config, m_i2cmem);
+}
 
 
 /*-------------------------------------------------
@@ -430,19 +430,19 @@ void nes_fjump2_device::set_prg()
 	prg16_cdef(prg_base | 0x0f);
 }
 
-READ8_MEMBER(nes_fjump2_device::read_m)
+uint8_t nes_fjump2_device::read_m(offs_t offset)
 {
 	LOG_MMC(("fjump2 read_m, offset: %04x\n", offset));
 	return m_battery[offset & (m_battery.size() - 1)];
 }
 
-WRITE8_MEMBER(nes_fjump2_device::write_m)
+void nes_fjump2_device::write_m(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("fjump2 write_m, offset: %04x, data: %02x\n", offset, data));
 	m_battery[offset & (m_battery.size() - 1)] = data;
 }
 
-WRITE8_MEMBER(nes_fjump2_device::write_h)
+void nes_fjump2_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("fjump2 write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -460,7 +460,7 @@ WRITE8_MEMBER(nes_fjump2_device::write_h)
 			set_prg();
 			break;
 		default:
-			fcg_write(space, offset & 0x0f, data, mem_mask);
+			fcg_write(offset & 0x0f, data);
 			break;
 	}
 }

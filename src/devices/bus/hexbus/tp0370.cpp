@@ -144,6 +144,7 @@ ibc_device::ibc_device(const machine_config &mconfig, const char *tag, device_t 
 	m_int_pending(false),
 	m_incoming_message(false),
 	m_message_started(false),
+	m_latch_inhibit(false),
 	m_data(0),
 	m_transmit(0xff)
 {
@@ -229,11 +230,14 @@ void ibc_device::set_disable_inhibit(bool dis, bool inh)
 }
 
 /*
-    Called from the HSK latch or by command.
+    Called by a command, not automatically.
 */
 void ibc_device::set_lines(bool bav, bool hsk)
 {
 	LOGMASKED(LOG_LINES, "%s BAV*, %s HSK*\n", bav? "Pull down" : "Release",  hsk? "Pull down" : "Release");
+
+	// We're in the response phase.
+	if (hsk) m_latch_inhibit = true;
 
 	// Assert HSK*  (110 0 0111)
 	// Release HSK* (110 1 0111)
@@ -245,7 +249,6 @@ void ibc_device::set_lines(bool bav, bool hsk)
 	if (m_transmit != 0xff) LOGMASKED(LOG_LINES, "Data = %01x\n", m_transmit>>4);
 
 	m_hexout(val);
-	m_transmit=0xff; // TODO: Check this
 }
 
 /*
@@ -280,6 +283,14 @@ void ibc_device::from_hexbus(uint8_t val)
 			m_inhibit = false;
 			m_incoming_message = true;
 		}
+		else
+		{
+			if (!m_bav && m_bavold)
+			{
+				LOGMASKED(LOG_LINES, "Bus released\n");
+				m_latch_inhibit = false;
+			}
+		}
 
 		// The message may combine a change of BAV* and of HSK*.
 		if (!m_inhibit)
@@ -287,27 +298,34 @@ void ibc_device::from_hexbus(uint8_t val)
 			// Falling edge of HSK*
 			if (m_hsk && !m_hskold)
 			{
-				// On this falling edge, the nibble is supposed to be stable,
-				// so keep it
-				m_data = data;
-				if (m_incoming_message && !m_message_started)
+				if (m_latch_inhibit)
 				{
-					// Set flag for new message
-					m_incoming_message = false;
-					m_message_started = true;
-					LOGMASKED(LOG_DETAIL, "New message started\n", data);
+					LOGMASKED(LOG_LINES, "Not latching HSK* in response phase\n");
 				}
 				else
-					m_message_started = false;
+				{
+					// On this falling edge, the nibble is supposed to be stable,
+					// so keep it
+					m_data = data;
+					if (m_incoming_message && !m_message_started)
+					{
+						// Set flag for new message
+						m_incoming_message = false;
+						m_message_started = true;
+						LOGMASKED(LOG_DETAIL, "New message started\n", data);
+					}
+					else
+						m_message_started = false;
 
-				LOGMASKED(LOG_DETAIL, "Data reg <- %1x\n", data);
+					LOGMASKED(LOG_DETAIL, "Data reg <- %1x\n", data);
 
-				// set the latch
-				m_latch(ASSERT_LINE);
+					// set the latch
+					m_latch(ASSERT_LINE);
 
-				// and set interrupt
-				m_int_pending = true;
-				m_int(ASSERT_LINE);
+					// and set interrupt
+					m_int_pending = true;
+					m_int(ASSERT_LINE);
+				}
 			}
 		}
 	}

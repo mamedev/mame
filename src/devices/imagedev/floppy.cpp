@@ -145,7 +145,7 @@ floppy_connector::~floppy_connector()
 {
 }
 
-void floppy_connector::set_formats(const floppy_format_type *_formats)
+void floppy_connector::set_formats(const floppy_format_type _formats[])
 {
 	formats = _formats;
 }
@@ -176,7 +176,6 @@ floppy_image_device *floppy_connector::get_device()
 floppy_image_device::floppy_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock),
 		device_image_interface(mconfig, *this),
-		device_slot_card_interface(mconfig, *this),
 		input_format(nullptr),
 		output_format(nullptr),
 		image(nullptr),
@@ -346,8 +345,31 @@ void floppy_image_device::device_start()
 
 	if (m_make_sound) m_sound_out = subdevice<floppy_sound_device>(FLOPSND_TAG);
 
+	save_item(NAME(dir));
+	save_item(NAME(stp));
+	save_item(NAME(wtg));
+	save_item(NAME(mon));
+	save_item(NAME(ss));
+	save_item(NAME(ds));
+	save_item(NAME(idx));
+	save_item(NAME(wpt));
+	save_item(NAME(rdy));
+	save_item(NAME(dskchg));
+	save_item(NAME(ready));
+	save_item(NAME(rpm));
+	save_item(NAME(floppy_ratio_1));
+	save_item(NAME(revolution_start_time));
+	save_item(NAME(rev_time));
+	save_item(NAME(revolution_count));
 	save_item(NAME(cyl));
 	save_item(NAME(subcyl));
+	save_item(NAME(cache_start_time));
+	save_item(NAME(cache_end_time));
+	save_item(NAME(cache_index));
+	save_item(NAME(cache_entry));
+	save_item(NAME(cache_weak));
+	save_item(NAME(image_dirty));
+	save_item(NAME(ready_counter));
 }
 
 void floppy_image_device::device_reset()
@@ -364,6 +386,7 @@ void floppy_image_device::device_reset()
 	set_ready(true);
 	if(motor_always_on && image)
 		mon_w(0);
+	cache_clear();
 }
 
 void floppy_image_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -400,6 +423,32 @@ floppy_image_format_t *floppy_image_device::identify(std::string filename)
 	return best_format;
 }
 
+void floppy_image_device::init_floppy_load(bool write_supported)
+{
+	cache_clear();
+	revolution_start_time = mon ? attotime::never : machine().time();
+	revolution_count = 0;
+
+	index_resync();
+
+	wpt = 1; // disk sleeve is covering the sensor
+	if (!cur_wpt_cb.isnull())
+		cur_wpt_cb(this, wpt);
+
+	wpt = is_readonly() || (!write_supported);
+	if (!cur_wpt_cb.isnull())
+		cur_wpt_cb(this, wpt);
+
+	if (motor_always_on) {
+		// When disk is inserted, start motor
+		mon_w(0);
+	} else if(!mon)
+		ready_counter = 2;
+
+	if (dskchg_writable)
+		dskchg = 1;
+}
+
 image_init_result floppy_image_device::call_load()
 {
 	io_generic io;
@@ -434,37 +483,19 @@ image_init_result floppy_image_device::call_load()
 	}
 	output_format = is_readonly() ? nullptr : best_format;
 
-	revolution_start_time = mon ? attotime::never : machine().time();
-	revolution_count = 0;
-
-	index_resync();
 	image_dirty = false;
 
-	wpt = 1; // disk sleeve is covering the sensor
-	if (!cur_wpt_cb.isnull())
-		cur_wpt_cb(this, wpt);
-
-	wpt = is_readonly() || (output_format == nullptr);
-	if (!cur_wpt_cb.isnull())
-		cur_wpt_cb(this, wpt);
+	init_floppy_load(output_format != nullptr);
 
 	if (!cur_load_cb.isnull())
 		return cur_load_cb(this);
-
-	if (motor_always_on) {
-		// When disk is inserted, start motor
-		mon_w(0);
-	} else if(!mon)
-		ready_counter = 2;
-
-	if (dskchg_writable)
-		dskchg = 1;
 
 	return image_init_result::PASS;
 }
 
 void floppy_image_device::call_unload()
 {
+	cache_clear();
 	dskchg = 0;
 
 	if (image) {
@@ -519,9 +550,7 @@ image_init_result floppy_image_device::call_create(int format_type, util::option
 		return image_init_result::FAIL;
 	}
 
-	if (motor_always_on)
-		// When disk is inserted, start motor
-		mon_w(0);
+	init_floppy_load(output_format != nullptr);
 
 	return image_init_result::PASS;
 }
@@ -538,6 +567,7 @@ void floppy_image_device::mon_w(int state)
 	if (!mon && image)
 	{
 		revolution_start_time = machine().time();
+		cache_clear();
 		if (motor_always_on) {
 			// Drives with motor that is always spinning are immediately ready when a disk is loaded
 			// because there is no spin-up time
@@ -552,6 +582,7 @@ void floppy_image_device::mon_w(int state)
 	else {
 		if(image_dirty)
 			commit_image();
+		cache_clear();
 		revolution_start_time = attotime::never;
 		index_timer->adjust(attotime::zero);
 		set_ready(true);
@@ -654,6 +685,7 @@ void floppy_image_device::stp_w(int state)
 	// if (ready_counter > 0) return;
 
 	if ( stp != state ) {
+		cache_clear();
 		stp = state;
 		if ( stp == 0 ) {
 			int ocyl = cyl;
@@ -711,6 +743,8 @@ void floppy_image_device::seek_phase_w(int phases)
 	cyl = next_pos >> 2;
 	subcyl = next_pos & 3;
 
+	cache_clear();
+
 	if(TRACE_STEP && (next_pos != cur_pos))
 		logerror("track %d.%d\n", cyl, subcyl);
 
@@ -720,7 +754,19 @@ void floppy_image_device::seek_phase_w(int phases)
 			dskchg = 1;
 }
 
-int floppy_image_device::find_index(uint32_t position, const std::vector<uint32_t> &buf)
+// From http://burtleburtle.net/bob/hash/integer.html
+uint32_t floppy_image_device::hash32(uint32_t a) const
+{
+	a = (a+0x7ed55d16) + (a<<12);
+	a = (a^0xc761c23c) ^ (a>>19);
+	a = (a+0x165667b1) + (a<<5);
+	a = (a+0xd3a2646c) ^ (a<<9);
+	a = (a+0xfd7046c5) + (a<<3);
+	a = (a^0xb55a4f09) ^ (a>>16);
+	return a;
+}
+
+int floppy_image_device::find_index(uint32_t position, const std::vector<uint32_t> &buf)const
 {
 	int spos = (buf.size() >> 1)-1;
 	int step;
@@ -763,20 +809,99 @@ uint32_t floppy_image_device::find_position(attotime &base, const attotime &when
 	return res;
 }
 
-attotime floppy_image_device::get_next_index_time(std::vector<uint32_t> &buf, int index, int delta, attotime base)
+bool floppy_image_device::test_track_last_entry_warps(const std::vector<uint32_t> &buf) const
 {
-	uint32_t next_position;
+	return !((buf[buf.size() - 1]^buf[0]) & floppy_image::MG_MASK);
+}
+
+attotime floppy_image_device::position_to_time(const attotime &base, int position) const
+{
+	return base + attotime::from_nsec((int64_t(position)*2000/floppy_ratio_1+1)/2);
+}
+
+void floppy_image_device::cache_fill_index(const std::vector<uint32_t> &buf, int &index, attotime &base)
+{
 	int cells = buf.size();
-	if(index+delta < cells)
-		next_position = buf[index+delta] & floppy_image::TIME_MASK;
-	else {
-		if((buf[cells-1]^buf[0]) & floppy_image::MG_MASK)
-			delta--;
-		index = index + delta - cells + 1;
-		next_position = 200000000 + (buf[index] & floppy_image::TIME_MASK);
+
+	if(index != 0 || !test_track_last_entry_warps(buf)) {
+		cache_index = index;
+		cache_start_time = position_to_time(base, buf[index] & floppy_image::TIME_MASK);
+	} else {
+		cache_index = cells - 1;
+		cache_start_time = position_to_time(base - rev_time, buf[cache_index] & floppy_image::TIME_MASK);
 	}
 
-	return base + attotime::from_nsec((uint64_t(next_position)*2000/floppy_ratio_1+1)/2);
+	cache_entry = buf[cache_index];
+
+	index ++;
+	if(index >= cells) {
+		index = test_track_last_entry_warps(buf) ? 1 : 0;
+		base += rev_time;
+	}
+
+	cache_end_time = position_to_time(base, buf[index] & floppy_image::TIME_MASK);
+}
+
+void floppy_image_device::cache_clear()
+{
+	cache_start_time = cache_end_time = cache_weak_start = attotime::zero;
+	cache_index = 0;
+	cache_entry = 0;
+	cache_weak = false;
+}
+
+void floppy_image_device::cache_fill(const attotime &when)
+{
+	std::vector<uint32_t> &buf = image->get_buffer(cyl, ss, subcyl);
+	uint32_t cells = buf.size();
+	if(cells <= 1) {
+		cache_start_time = attotime::zero;
+		cache_end_time = attotime::never;
+		cache_index = 0;
+		cache_entry = cells == 1 ? buf[0] : floppy_image::MG_N;
+		cache_weakness_setup();
+		return;
+	}
+
+	attotime base;
+	uint32_t position = find_position(base, when);
+
+	int index = find_index(position, buf);
+
+	if(index == -1) {
+		// I suspect this should be an abort(), to check...
+		cache_start_time = attotime::zero;
+		cache_end_time = attotime::never;
+		cache_index = 0;
+		cache_entry = buf[0];
+		cache_weakness_setup();
+		return;
+	}
+
+	for(;;) {
+		cache_fill_index(buf, index, base);
+		if(cache_end_time > when) {
+			cache_weakness_setup();
+			return;
+		}
+	}
+}
+
+void floppy_image_device::cache_weakness_setup()
+{
+	u32 type = cache_entry & floppy_image::MG_MASK;
+	if(type == floppy_image::MG_N || type == floppy_image::MG_D) {
+		cache_weak = true;
+		cache_weak_start = cache_start_time;
+		return;
+	}
+
+	cache_weak = cache_end_time.is_never() || (cache_end_time - cache_start_time >= attotime::from_usec(16));
+	if(!cache_weak) {
+		cache_weak_start = attotime::never;
+		return;
+	}
+	cache_weak_start = cache_start_time + attotime::from_usec(16);
 }
 
 attotime floppy_image_device::get_next_transition(const attotime &from_when)
@@ -784,31 +909,28 @@ attotime floppy_image_device::get_next_transition(const attotime &from_when)
 	if(!image || mon)
 		return attotime::never;
 
-	// If the drive is still spinning up, pretend that no transitions will come
-	// TODO: Implement a proper spin-up ramp for transition times, also in order
-	// to cover potential copy protection measures that have direct device
-	// access (mz)
-	// MORE TODO: this breaks the tandy2k and pcjr.  needs investigation.
-	//if (ready_counter > 0)
-	//  return attotime::never;
+	if(from_when < cache_start_time || (!cache_end_time.is_never() && from_when >= cache_end_time))
+		cache_fill(from_when);
 
-	std::vector<uint32_t> &buf = image->get_buffer(cyl, ss, subcyl);
-	uint32_t cells = buf.size();
-	if(cells <= 1)
-		return attotime::never;
+	if(!cache_weak)
+		return cache_end_time;
 
-	attotime base;
-	uint32_t position = find_position(base, from_when);
-
-	int index = find_index(position, buf);
-
-	if(index == -1)
-		return attotime::never;
-
-	attotime result = get_next_index_time(buf, index, 1,  base);
-	if(result > from_when)
-		return result;
-	return get_next_index_time(buf, index, 2,  base);
+	// Put a flux transition in the middle of a 4us interval with a 50% probability
+	int interval_index = (from_when - cache_weak_start).as_ticks(250000);
+	if(interval_index < 0)
+		interval_index = 0;
+	attotime weak_time = cache_weak_start + attotime::from_ticks(interval_index*2+1, 500000);
+	for(;;) {
+		if(weak_time >= cache_end_time)
+			return cache_end_time;
+		if(weak_time > from_when) {
+			u32 test = hash32(hash32(hash32(hash32(revolution_count) ^ 0x4242) + cache_index) + interval_index);
+			if(test & 1)
+				return weak_time;
+		}
+		weak_time += attotime::from_usec(4);
+		interval_index ++;
+	}
 }
 
 void floppy_image_device::write_flux(const attotime &start, const attotime &end, int transition_count, const attotime *transitions)
@@ -869,6 +991,7 @@ void floppy_image_device::write_flux(const attotime &start, const attotime &end,
 
 void floppy_image_device::write_zone(uint32_t *buf, int &cells, int &index, uint32_t spos, uint32_t epos, uint32_t mg)
 {
+	cache_clear();
 	while(spos < epos) {
 		while(index != cells-1 && (buf[index+1] & floppy_image::TIME_MASK) <= spos)
 			index++;
@@ -989,9 +1112,8 @@ uint32_t floppy_image_device::get_variant() const
 //===================================================================
 //   Floppy sound
 //
-//   In order to enable floppy sound you must add the line
-//      MCFG_FLOPPY_DRIVE_SOUND(true)
-//   after MCFG_FLOPPY_DRIVE_ADD
+//   In order to enable floppy sound you must call
+//      enable_sound(true)
 //   and you must put audio samples (44100Hz, mono) with names as
 //   shown in floppy_sample_names into the directory samples/floppy
 //   Sound will be disabled when these samples are missing.
@@ -1361,11 +1483,11 @@ void floppy_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 
 #define FLOPSPK "flopsndout"
 
-MACHINE_CONFIG_START(floppy_image_device::device_add_mconfig)
-	MCFG_SPEAKER_STANDARD_MONO(FLOPSPK)
-	MCFG_SOUND_ADD(FLOPSND_TAG, FLOPPYSOUND, 44100)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, FLOPSPK, 0.5)
-MACHINE_CONFIG_END
+void floppy_image_device::device_add_mconfig(machine_config &config)
+{
+	SPEAKER(config, FLOPSPK).front_center();
+	FLOPPYSOUND(config, FLOPSND_TAG, 44100).add_route(ALL_OUTPUTS, FLOPSPK, 0.5);
+}
 
 
 DEFINE_DEVICE_TYPE(FLOPPYSOUND, floppy_sound_device, "flopsnd", "Floppy sound")
@@ -2355,4 +2477,3 @@ void ibm_6360::handled_variants(uint32_t *variants, int &var_count) const
 	var_count = 0;
 	variants[var_count++] = floppy_image::SSSD;
 }
-

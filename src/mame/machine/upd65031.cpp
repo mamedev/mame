@@ -196,12 +196,14 @@ inline void upd65031_device::set_mode(int mode)
 //  upd65031_device - constructor
 //-------------------------------------------------
 
-upd65031_device::upd65031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, UPD65031, tag, owner, clock),
+upd65031_device::upd65031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, UPD65031, tag, owner, clock),
 	m_read_kb(*this),
 	m_write_int(*this),
 	m_write_nmi(*this),
-	m_write_spkr(*this)
+	m_write_spkr(*this),
+	m_screen_update_cb(*this),
+	m_out_mem_cb(*this)
 {
 }
 
@@ -219,8 +221,8 @@ void upd65031_device::device_start()
 	m_write_spkr.resolve_safe();
 
 	// bind delegates
-	m_screen_update_cb.bind_relative_to(*owner());
-	m_out_mem_cb.bind_relative_to(*owner());
+	m_screen_update_cb.resolve();
+	m_out_mem_cb.resolve();
 
 	// allocate timers
 	m_rtc_timer = timer_alloc(TIMER_RTC);

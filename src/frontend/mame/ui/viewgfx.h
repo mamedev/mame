@@ -8,10 +8,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_FRONTEND_MAME_UI_VIEWGFX_H
+#define MAME_FRONTEND_MAME_UI_VIEWGFX_H
 
-#ifndef __UI_VIEWGFX_H__
-#define __UI_VIEWGFX_H__
+#pragma once
 
 
 
@@ -29,4 +29,4 @@ bool ui_gfx_is_relevant(running_machine &machine);
 uint32_t ui_gfx_ui_handler(render_container &container, mame_ui_manager &mui, bool uistate);
 
 
-#endif  /* __UI_VIEWGFX_H__ */
+#endif // MAME_FRONTEND_MAME_UI_VIEWGFX_H

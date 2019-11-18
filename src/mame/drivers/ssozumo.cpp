@@ -32,18 +32,18 @@ void ssozumo_state::ssozumo_map(address_map &map)
 {
 	map(0x0000, 0x077f).ram();
 	map(0x0780, 0x07ff).ram().share("spriteram");
-	map(0x2000, 0x23ff).ram().w(this, FUNC(ssozumo_state::videoram2_w)).share("videoram2");
-	map(0x2400, 0x27ff).ram().w(this, FUNC(ssozumo_state::colorram2_w)).share("colorram2");
-	map(0x3000, 0x31ff).ram().w(this, FUNC(ssozumo_state::videoram_w)).share("videoram");
-	map(0x3200, 0x33ff).ram().w(this, FUNC(ssozumo_state::colorram_w)).share("colorram");
+	map(0x2000, 0x23ff).ram().w(FUNC(ssozumo_state::videoram2_w)).share("videoram2");
+	map(0x2400, 0x27ff).ram().w(FUNC(ssozumo_state::colorram2_w)).share("colorram2");
+	map(0x3000, 0x31ff).ram().w(FUNC(ssozumo_state::videoram_w)).share("videoram");
+	map(0x3200, 0x33ff).ram().w(FUNC(ssozumo_state::colorram_w)).share("colorram");
 	map(0x3400, 0x35ff).ram();
 	map(0x3600, 0x37ff).ram();
-	map(0x4000, 0x4000).portr("P1").w(this, FUNC(ssozumo_state::flipscreen_w));
+	map(0x4000, 0x4000).portr("P1").w(FUNC(ssozumo_state::flipscreen_w));
 	map(0x4010, 0x4010).portr("P2").w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x4020, 0x4020).portr("DSW2").w(this, FUNC(ssozumo_state::scroll_w));
+	map(0x4020, 0x4020).portr("DSW2").w(FUNC(ssozumo_state::scroll_w));
 	map(0x4030, 0x4030).portr("DSW1");
-//  AM_RANGE(0x4030, 0x4030) AM_WRITEONLY
-	map(0x4050, 0x407f).ram().w(this, FUNC(ssozumo_state::paletteram_w)).share("paletteram");
+//  map(0x4030, 0x4030).writeonly();
+	map(0x4050, 0x407f).ram().w(FUNC(ssozumo_state::paletteram_w)).share("paletteram");
 	map(0x6000, 0xffff).rom();
 }
 
@@ -59,8 +59,8 @@ void ssozumo_state::ssozumo_sound_map(address_map &map)
 	map(0x0000, 0x01ff).ram();
 	map(0x2000, 0x2001).w("ay1", FUNC(ay8910_device::data_address_w));
 	map(0x2002, 0x2003).w("ay2", FUNC(ay8910_device::data_address_w));
-	map(0x2004, 0x2004).w("dac", FUNC(dac_byte_interface::write));
-	map(0x2005, 0x2005).w(this, FUNC(ssozumo_state::sound_nmi_mask_w));
+	map(0x2004, 0x2004).w("dac", FUNC(dac_byte_interface::data_w));
+	map(0x2005, 0x2005).w(FUNC(ssozumo_state::sound_nmi_mask_w));
 	map(0x2007, 0x2007).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0x4000, 0xffff).rom();
 }
@@ -182,7 +182,7 @@ static const gfx_layout spritelayout =
 };
 
 
-static GFXDECODE_START( ssozumo )
+static GFXDECODE_START( gfx_ssozumo )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 4 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,   4*8, 4 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 8*8, 2 )
@@ -191,51 +191,47 @@ GFXDECODE_END
 INTERRUPT_GEN_MEMBER(ssozumo_state::sound_timer_irq)
 {
 	if(m_sound_nmi_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-MACHINE_CONFIG_START(ssozumo_state::ssozumo)
-
+void ssozumo_state::ssozumo(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 1200000) /* 1.2 MHz ???? */
-	MCFG_CPU_PROGRAM_MAP(ssozumo_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", ssozumo_state,  irq0_line_hold)
+	M6502(config, m_maincpu, 1200000); /* 1.2 MHz ???? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &ssozumo_state::ssozumo_map);
+	m_maincpu->set_vblank_int("screen", FUNC(ssozumo_state::irq0_line_hold));
 
-	MCFG_CPU_ADD("audiocpu", M6502, 975000)         /* 975 kHz ?? */
-	MCFG_CPU_PROGRAM_MAP(ssozumo_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(ssozumo_state, sound_timer_irq, 272/16*57) // guess, assume to be the same as tagteam
+	M6502(config, m_audiocpu, 975000);         /* 975 kHz ?? */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &ssozumo_state::ssozumo_sound_map);
+	m_audiocpu->set_periodic_int(FUNC(ssozumo_state::sound_timer_irq), attotime::from_hz(272/16*57)); // guess, assume to be the same as tagteam
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-//  MCFG_SCREEN_REFRESH_RATE(60)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-//  MCFG_SCREEN_SIZE(32*8, 32*8)
-//  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8 - 1, 1*8, 31*8 - 1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+//  screen.set_refresh_hz(60);
+//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+//  screen.set_size(32*8, 32*8);
+//  screen.set_visarea(0*8, 32*8 - 1, 1*8, 31*8 - 1);
 	// DECO video CRTC, unverified
-	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000)/2,384,0,256,272,8,248)
-	MCFG_SCREEN_UPDATE_DRIVER(ssozumo_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen.set_raw(XTAL(12'000'000)/2,384,0,256,272,8,248);
+	screen.set_screen_update(FUNC(ssozumo_state::screen_update));
+	screen.set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ssozumo)
-	MCFG_PALETTE_ADD("palette", 64 + 16)
-	MCFG_PALETTE_INIT_OWNER(ssozumo_state, ssozumo)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ssozumo);
+	PALETTE(config, m_palette, FUNC(ssozumo_state::ssozumo_palette), 64 + 16);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", m6502_device::IRQ_LINE))
+	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, m6502_device::IRQ_LINE);
 
-	MCFG_SOUND_ADD("ay1", YM2149, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
+	YM2149(config, "ay1", 1500000).add_route(ALL_OUTPUTS, "speaker", 0.3);
+	YM2149(config, "ay2", 1500000).add_route(ALL_OUTPUTS, "speaker", 0.3);
 
-	MCFG_SOUND_ADD("ay2", YM2149, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
-
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.3); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
 
 
@@ -296,4 +292,4 @@ ROM_END
 
 
 
-GAME( 1984, ssozumo, 0, ssozumo, ssozumo, ssozumo_state, 0, ROT270, "Technos Japan", "Syusse Oozumou (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, ssozumo, 0, ssozumo, ssozumo, ssozumo_state, empty_init, ROT270, "Technos Japan", "Syusse Oozumou (Japan)", MACHINE_SUPPORTS_SAVE )

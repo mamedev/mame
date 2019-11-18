@@ -10,28 +10,13 @@
 #define MAME_VIDEO_TMS9927_H
 
 
-#define MCFG_TMS9927_VSYN_CALLBACK(_write) \
-	devcb = &downcast<tms9927_device &>(*device).set_vsyn_wr_callback(DEVCB_##_write);
-
-#define MCFG_TMS9927_HSYN_CALLBACK(_write) \
-	devcb = &downcast<tms9927_device &>(*device).set_hsyn_wr_callback(DEVCB_##_write);
-
-#define MCFG_TMS9927_CHAR_WIDTH(_pixels) \
-	downcast<tms9927_device &>(*device).set_char_width(_pixels);
-
-#define MCFG_TMS9927_REGION(_tag) \
-	downcast<tms9927_device &>(*device).set_region_tag(_tag);
-
-#define MCFG_TMS9927_OVERSCAN(_left, _right, _top, _bottom) \
-	downcast<tms9927_device &>(*device).set_overscan(_left, _right, _top, _bottom);
-
 class tms9927_device : public device_t, public device_video_interface
 {
 public:
 	tms9927_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_vsyn_wr_callback(Object &&cb) { return m_write_vsyn.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_hsyn_wr_callback(Object &&cb) { return m_write_hsyn.set_callback(std::forward<Object>(cb)); }
+	auto vsyn_callback() { return m_write_vsyn.bind(); }
+	auto hsyn_callback() { return m_write_hsyn.bind(); }
 
 	void set_char_width(int pixels) { m_hpixels_per_column = pixels; }
 	void set_region_tag(const char *tag) { m_selfload.set_tag(tag); }
@@ -41,6 +26,7 @@ public:
 		m_overscan_top = top;
 		m_overscan_bottom = bottom;
 	}
+	void set_visarea(s16 minx, s16 maxx, s16 miny, s16 maxy) { m_custom_visarea.set(minx, maxx, miny, maxy); }
 
 	DECLARE_WRITE8_MEMBER(write);
 	DECLARE_READ8_MEMBER(read);
@@ -60,6 +46,7 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_clock_changed() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_post_load() override;
 
 private:
 	enum
@@ -68,7 +55,6 @@ private:
 		TIMER_HSYNC
 	};
 
-	void state_postload();
 	void recompute_parameters(bool postload);
 	void generic_access(address_space &space, offs_t offset);
 
@@ -95,6 +81,7 @@ private:
 	bool      m_valid_config;
 	uint16_t  m_total_hpix, m_total_vpix;
 	uint16_t  m_visible_hpix, m_visible_vpix;
+	rectangle m_custom_visarea;
 	uint16_t  m_vsyn_start, m_vsyn_end;
 	uint16_t  m_hsyn_start, m_hsyn_end;
 

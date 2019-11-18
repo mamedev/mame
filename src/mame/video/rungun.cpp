@@ -33,24 +33,24 @@ K055673_CB_MEMBER(rungun_state::sprite_callback)
 	*color = m_sprite_colorbase | (*color & 0x001f);
 }
 
-READ16_MEMBER(rungun_state::rng_ttl_ram_r)
+READ16_MEMBER(rungun_state::ttl_ram_r)
 {
 	return m_ttl_vram[offset+(m_video_mux_bank*0x1000)];
 }
 
-WRITE16_MEMBER(rungun_state::rng_ttl_ram_w)
+WRITE16_MEMBER(rungun_state::ttl_ram_w)
 {
 	COMBINE_DATA(&m_ttl_vram[offset+(m_video_mux_bank*0x1000)]);
 	m_ttl_tilemap[m_video_mux_bank]->mark_tile_dirty(offset / 2);
 }
 
 /* 53936 (PSAC2) rotation/zoom plane */
-READ16_MEMBER(rungun_state::rng_psac2_videoram_r)
+READ16_MEMBER(rungun_state::psac2_videoram_r)
 {
 	return m_psac2_vram[offset+(m_video_mux_bank*0x80000)];
 }
 
-WRITE16_MEMBER(rungun_state::rng_psac2_videoram_w)
+WRITE16_MEMBER(rungun_state::psac2_videoram_w)
 {
 	COMBINE_DATA(&m_psac2_vram[offset+(m_video_mux_bank*0x80000)]);
 	m_936_tilemap[m_video_mux_bank]->mark_tile_dirty(offset / 2);
@@ -101,11 +101,11 @@ void rungun_state::video_start()
 	// create the tilemaps
 	for(uint32_t screen_num = 0;screen_num < 2;screen_num++)
 	{
-		m_ttl_tilemap[screen_num] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(rungun_state::ttl_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+		m_ttl_tilemap[screen_num] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(rungun_state::ttl_get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 		m_ttl_tilemap[screen_num]->set_user_data((void *)(uintptr_t)(screen_num * 0x2000));
 		m_ttl_tilemap[screen_num]->set_transparent_pen(0);
 
-		m_936_tilemap[screen_num] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(rungun_state::get_rng_936_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 128, 128);
+		m_936_tilemap[screen_num] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(rungun_state::get_rng_936_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 128, 128);
 		m_936_tilemap[screen_num]->set_user_data((void *)(uintptr_t)(screen_num * 0x80000));
 		m_936_tilemap[screen_num]->set_transparent_pen(0);
 
@@ -136,7 +136,6 @@ uint32_t rungun_state::screen_update_rng(screen_device &screen, bitmap_ind16 &bi
 	}
 
 	m_ttl_tilemap[m_current_display_bank]->draw(screen, bitmap, cliprect, 0, 0);
-
 	return 0;
 }
 
@@ -164,7 +163,6 @@ uint32_t rungun_state::screen_update_rng_dual_right(screen_device &screen, bitma
 
 void rungun_state::sprite_dma_trigger(void)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
 	uint32_t src_address;
 
 	if(m_single_screen_mode == true)
@@ -174,5 +172,5 @@ void rungun_state::sprite_dma_trigger(void)
 
 	// TODO: size could be programmable somehow.
 	for(int i=0;i<0x1000;i+=2)
-		m_k055673->k053247_word_w(space,i/2,m_banked_ram[(i + src_address) /2],0xffff);
+		m_k055673->k053247_word_w(i/2, m_banked_ram[(i + src_address) /2]);
 }

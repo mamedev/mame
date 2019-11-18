@@ -170,7 +170,7 @@ void capricorn_cpu_device::device_start()
 	state_add(STATE_GENFLAGS , "GENFLAGS" , m_flags).noshow().formatstr("%9s");
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<0, 0, ENDIANNESS_LITTLE>();
 
 	save_item(NAME(m_reg));
 	save_item(NAME(m_arp));
@@ -299,7 +299,7 @@ void capricorn_cpu_device::WM(ea_addr_t& addr , uint8_t v)
 uint8_t capricorn_cpu_device::fetch()
 {
 	m_genpc = read_u16(REG_PC | GP_REG_MASK);
-	return m_direct->read_byte(m_genpc);
+	return m_cache->read_byte(m_genpc);
 }
 
 void capricorn_cpu_device::offset_pc(uint16_t offset)

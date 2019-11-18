@@ -57,39 +57,39 @@
 #define CAR_BORDER_EXTRA_BITS       0x50
 
 
-TTL74148_OUTPUT_CB(carpolo_state::ttl74148_3s_cb)
+WRITE8_MEMBER(carpolo_state::ttl74148_3s_cb)
 {
 	m_maincpu->set_input_line(M6502_IRQ_LINE, m_ttl74148_3s->output_valid_r() ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
 /* the outputs of the flip-flops are connected to the priority encoder */
-WRITE_LINE_MEMBER(carpolo_state::carpolo_7474_2s_1_q_cb)
+WRITE_LINE_MEMBER(carpolo_state::ttl7474_2s_1_q_cb)
 {
 	m_ttl74148_3s->input_line_w(COIN1_PRIORITY_LINE, state);
 	m_ttl74148_3s->update();
 }
 
-WRITE_LINE_MEMBER(carpolo_state::carpolo_7474_2s_2_q_cb)
+WRITE_LINE_MEMBER(carpolo_state::ttl7474_2s_2_q_cb)
 {
 	m_ttl74148_3s->input_line_w(COIN2_PRIORITY_LINE, state);
 	m_ttl74148_3s->update();
 }
 
-WRITE_LINE_MEMBER(carpolo_state::carpolo_7474_2u_1_q_cb)
+WRITE_LINE_MEMBER(carpolo_state::ttl7474_2u_1_q_cb)
 {
 	m_ttl74148_3s->input_line_w(COIN3_PRIORITY_LINE, state);
 	m_ttl74148_3s->update();
 }
 
-WRITE_LINE_MEMBER(carpolo_state::carpolo_7474_2u_2_q_cb)
+WRITE_LINE_MEMBER(carpolo_state::ttl7474_2u_2_q_cb)
 {
 	m_ttl74148_3s->input_line_w(COIN4_PRIORITY_LINE, state);
 	m_ttl74148_3s->update();
 }
 
 
-void carpolo_state::carpolo_generate_ball_screen_interrupt(uint8_t cause)
+void carpolo_state::generate_ball_screen_interrupt(uint8_t cause)
 {
 	m_ball_screen_collision_cause = cause;
 
@@ -97,7 +97,7 @@ void carpolo_state::carpolo_generate_ball_screen_interrupt(uint8_t cause)
 	m_ttl74148_3s->update();
 }
 
-void carpolo_state::carpolo_generate_car_car_interrupt(int car1, int car2)
+void carpolo_state::generate_car_car_interrupt(int car1, int car2)
 {
 	m_car_car_collision_cause = ~((1 << (3 - car1)) | (1 << (3 - car2)));
 
@@ -105,7 +105,7 @@ void carpolo_state::carpolo_generate_car_car_interrupt(int car1, int car2)
 	m_ttl74148_3s->update();
 }
 
-void carpolo_state::carpolo_generate_car_goal_interrupt(int car, int right_goal)
+void carpolo_state::generate_car_goal_interrupt(int car, int right_goal)
 {
 	m_car_goal_collision_cause = car | (right_goal ? 0x08 : 0x00);
 
@@ -113,7 +113,7 @@ void carpolo_state::carpolo_generate_car_goal_interrupt(int car, int right_goal)
 	m_ttl74148_3s->update();
 }
 
-void carpolo_state::carpolo_generate_car_ball_interrupt(int car, int car_x, int car_y)
+void carpolo_state::generate_car_ball_interrupt(int car, int car_x, int car_y)
 {
 	m_car_ball_collision_cause = car;
 	m_car_ball_collision_x = car_x;
@@ -125,7 +125,7 @@ void carpolo_state::carpolo_generate_car_ball_interrupt(int car, int car_x, int 
 	m_ttl74148_3s->update();
 }
 
-void carpolo_state::carpolo_generate_car_border_interrupt(int car, int horizontal_border)
+void carpolo_state::generate_car_border_interrupt(int car, int horizontal_border)
 {
 	m_car_border_collision_cause = car | (horizontal_border ? 0x04 : 0x00);
 
@@ -136,7 +136,7 @@ void carpolo_state::carpolo_generate_car_border_interrupt(int car, int horizonta
 }
 
 
-READ8_MEMBER(carpolo_state::carpolo_ball_screen_collision_cause_r)
+READ8_MEMBER(carpolo_state::ball_screen_collision_cause_r)
 {
 	/* bit 0 - 0=ball collided with border
 	   bit 1 - 0=ball collided with goal
@@ -145,19 +145,19 @@ READ8_MEMBER(carpolo_state::carpolo_ball_screen_collision_cause_r)
 	return m_ball_screen_collision_cause;
 }
 
-READ8_MEMBER(carpolo_state::carpolo_car_ball_collision_x_r)
+READ8_MEMBER(carpolo_state::car_ball_collision_x_r)
 {
 	/* the x coordinate of the colliding pixel */
 	return m_car_ball_collision_x;
 }
 
-READ8_MEMBER(carpolo_state::carpolo_car_ball_collision_y_r)
+READ8_MEMBER(carpolo_state::car_ball_collision_y_r)
 {
 	/* the y coordinate of the colliding pixel */
 	return m_car_ball_collision_y;
 }
 
-READ8_MEMBER(carpolo_state::carpolo_car_car_collision_cause_r)
+READ8_MEMBER(carpolo_state::car_car_collision_cause_r)
 {
 	/* bit 0 - car 4 collided
 	   bit 1 - car 3 collided
@@ -166,7 +166,7 @@ READ8_MEMBER(carpolo_state::carpolo_car_car_collision_cause_r)
 	return m_car_car_collision_cause;
 }
 
-READ8_MEMBER(carpolo_state::carpolo_car_goal_collision_cause_r)
+READ8_MEMBER(carpolo_state::car_goal_collision_cause_r)
 {
 	/* bit 0-1 - which car collided
 	   bit 2   - horizontal timing bit 1TEC4 (not accessed)
@@ -174,14 +174,14 @@ READ8_MEMBER(carpolo_state::carpolo_car_goal_collision_cause_r)
 	return m_car_goal_collision_cause;
 }
 
-READ8_MEMBER(carpolo_state::carpolo_car_ball_collision_cause_r)
+READ8_MEMBER(carpolo_state::car_ball_collision_cause_r)
 {
 	/* bit 0-1 - which car collided
 	   bit 2-3 - unconnected */
 	return m_car_ball_collision_cause;
 }
 
-READ8_MEMBER(carpolo_state::carpolo_car_border_collision_cause_r)
+READ8_MEMBER(carpolo_state::car_border_collision_cause_r)
 {
 	/* bit 0-1 - which car collided
 	   bit 2   - 0=vertical border, 1=horizontal border */
@@ -189,28 +189,22 @@ READ8_MEMBER(carpolo_state::carpolo_car_border_collision_cause_r)
 }
 
 
-READ8_MEMBER(carpolo_state::carpolo_interrupt_cause_r)
+READ8_MEMBER(carpolo_state::interrupt_cause_r)
 {
 	/* the output of the 148 goes to bits 1-3 (which is priority ^ 7) */
 	return (m_ttl74148_3s->output_r() << 1) | m_priority_0_extension;
 }
 
-
-INTERRUPT_GEN_MEMBER(carpolo_state::carpolo_timer_interrupt)
+void carpolo_state::timer_tick()
 {
-	uint8_t port_value;
-	int player;
-
-
 	/* cause the timer interrupt */
 	m_ttl74148_3s->input_line_w(PRI0_PRIORTITY_LINE, 0);
 	m_priority_0_extension = TIMER_EXTRA_BITS;
 
 	m_ttl74148_3s->update();
 
-
 	/* check the coins here as well - they drive the clock of the flip-flops */
-	port_value = ioport("IN0")->read();
+	uint8_t port_value = m_in[0]->read();
 
 	m_ttl7474_2s_1->clock_w((port_value & 0x01) >> 0);
 	m_ttl7474_2s_2->clock_w((port_value & 0x02) >> 1);
@@ -218,9 +212,8 @@ INTERRUPT_GEN_MEMBER(carpolo_state::carpolo_timer_interrupt)
 	m_ttl7474_2u_2->clock_w((port_value & 0x08) >> 3);
 
 	/* read the steering controls */
-	for (player = 0; player < 4; player++)
+	for (int player = 0; player < 4; player++)
 	{
-		static const char *const portnames[] = { "DIAL0", "DIAL1", "DIAL2", "DIAL3" };
 		ttl7474_device *movement_flip_flop;
 		ttl7474_device *dir_flip_flop;
 
@@ -233,7 +226,7 @@ INTERRUPT_GEN_MEMBER(carpolo_state::carpolo_timer_interrupt)
 			case 3: movement_flip_flop = m_ttl7474_1a_1;    dir_flip_flop = m_ttl7474_1a_2; break;
 		}
 
-		port_value = ioport(portnames[player])->read();
+		port_value = m_dial[player]->read();
 
 		if (port_value != m_last_wheel_value[player])
 		{
@@ -251,7 +244,7 @@ INTERRUPT_GEN_MEMBER(carpolo_state::carpolo_timer_interrupt)
 
 
 	/* finally read the accelerator pedals */
-	port_value = ioport("PEDALS")->read();
+	port_value = m_pedals->read();
 
 	// one line indicates if the pedal is pressed and the other
 	// how much, resulting in only two different possible levels
@@ -287,37 +280,37 @@ WRITE_LINE_MEMBER(carpolo_state::coin4_interrupt_clear_w)
 	m_ttl7474_2u_2->clear_w(state);
 }
 
-WRITE8_MEMBER(carpolo_state::carpolo_ball_screen_interrupt_clear_w)
+WRITE8_MEMBER(carpolo_state::ball_screen_interrupt_clear_w)
 {
 	m_ttl74148_3s->input_line_w(BALL_SCREEN_PRIORITY_LINE, 1);
 	m_ttl74148_3s->update();
 }
 
-WRITE8_MEMBER(carpolo_state::carpolo_car_car_interrupt_clear_w)
+WRITE8_MEMBER(carpolo_state::car_car_interrupt_clear_w)
 {
 	m_ttl74148_3s->input_line_w(CAR_CAR_PRIORITY_LINE, 1);
 	m_ttl74148_3s->update();
 }
 
-WRITE8_MEMBER(carpolo_state::carpolo_car_goal_interrupt_clear_w)
+WRITE8_MEMBER(carpolo_state::car_goal_interrupt_clear_w)
 {
 	m_ttl74148_3s->input_line_w(CAR_GOAL_PRIORITY_LINE, 1);
 	m_ttl74148_3s->update();
 }
 
-WRITE8_MEMBER(carpolo_state::carpolo_car_ball_interrupt_clear_w)
+WRITE8_MEMBER(carpolo_state::car_ball_interrupt_clear_w)
 {
 	m_ttl74148_3s->input_line_w(PRI0_PRIORTITY_LINE, 1);
 	m_ttl74148_3s->update();
 }
 
-WRITE8_MEMBER(carpolo_state::carpolo_car_border_interrupt_clear_w)
+WRITE8_MEMBER(carpolo_state::car_border_interrupt_clear_w)
 {
 	m_ttl74148_3s->input_line_w(PRI0_PRIORTITY_LINE, 1);
 	m_ttl74148_3s->update();
 }
 
-WRITE8_MEMBER(carpolo_state::carpolo_timer_interrupt_clear_w)
+WRITE8_MEMBER(carpolo_state::timer_interrupt_clear_w)
 {
 	m_ttl74148_3s->input_line_w(PRI0_PRIORTITY_LINE, 1);
 	m_ttl74148_3s->update();
@@ -400,7 +393,7 @@ READ8_MEMBER(carpolo_state::pia_1_port_a_r)
 			(m_ttl7474_1c_2->output_r() ? 0x02 : 0x00) |
 			(m_ttl7474_1d_2->output_r() ? 0x04 : 0x00) |
 			(m_ttl7474_1f_2->output_r() ? 0x08 : 0x00) |
-			(ioport("IN2")->read() & 0xf0);
+			(m_in[2]->read() & 0xf0);
 
 	return ret;
 }

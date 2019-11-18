@@ -16,7 +16,6 @@
  * Namcot 340 [mapper 210]
 
  TODO:
- - add sound feature of Namcot-163
  - Quinty is not working (same issue of Mendel Palace on TxROM boards, of course)
 
  ***********************************************************************************************************/
@@ -26,7 +25,7 @@
 #include "namcot.h"
 #include "ui/uimain.h"
 
-#include "cpu/m6502/m6502.h"
+#include "speaker.h"
 
 #ifdef NES_PCB_DEBUG
 #define VERBOSE 1
@@ -85,7 +84,7 @@ nes_namcot175_device::nes_namcot175_device(const machine_config &mconfig, const 
 }
 
 nes_namcot163_device::nes_namcot163_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_namcot340_device(mconfig, NES_NAMCOT163, tag, owner, clock), m_wram_protect(0), m_latch(0), m_chr_bank(0)
+	: nes_namcot340_device(mconfig, NES_NAMCOT163, tag, owner, clock), m_wram_protect(0), m_latch(0), m_chr_bank(0), m_namco163snd(*this, "n163")
 {
 }
 
@@ -145,7 +144,7 @@ void nes_namcot340_device::device_start()
 {
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
-	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
+	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));
@@ -171,7 +170,7 @@ void nes_namcot175_device::device_start()
 {
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
-	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
+	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));
@@ -199,7 +198,7 @@ void nes_namcot163_device::device_start()
 {
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
-	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
+	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));
@@ -210,6 +209,24 @@ void nes_namcot163_device::device_start()
 
 	m_mapper_sram_size = 0x2000;
 	m_mapper_sram = m_n163_ram;
+
+	// TODO : Measure actual volume
+	if (m_n163_vol == 2) // Submapper 2 - No expansion sound
+	{
+		m_namco163snd->set_output_gain(ALL_OUTPUTS, 0.0f);
+	}
+	else if (m_n163_vol == 3) // Submapper 3 - N163 expansion sound: 11.0-13.0 dB louder than NES APU
+	{
+		m_namco163snd->set_output_gain(ALL_OUTPUTS, 1.125f);
+	}
+	else if (m_n163_vol == 4) // Submapper 4 - N163 expansion sound: 16.0-17.0 dB louder than NES APU
+	{
+		m_namco163snd->set_output_gain(ALL_OUTPUTS, 1.17f);
+	}
+	else if (m_n163_vol == 5) // Submapper 5 - N163 expansion sound: 18.0-19.5 dB louder than NES APU
+	{
+		m_namco163snd->set_output_gain(ALL_OUTPUTS, 1.19f);
+	}
 }
 
 void nes_namcot163_device::pcb_reset()
@@ -248,7 +265,7 @@ void nes_namcot163_device::pcb_reset()
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_namcot3433_device::dxrom_write)
+void nes_namcot3433_device::dxrom_write(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("dxrom_write, offset: %04x, data: %02x\n", offset, data));
 
@@ -292,7 +309,7 @@ WRITE8_MEMBER(nes_namcot3433_device::dxrom_write)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_namcot3446_device::write_h)
+void nes_namcot3446_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("namcot3446 write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -336,7 +353,7 @@ WRITE8_MEMBER(nes_namcot3446_device::write_h)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_namcot3425_device::write_h)
+void nes_namcot3425_device::write_h(offs_t offset, uint8_t data)
 {
 	uint8_t mode;
 	LOG_MMC(("namcot3425 write_h, offset: %04x, data: %02x\n", offset, data));
@@ -402,14 +419,14 @@ void nes_namcot340_device::device_timer(emu_timer &timer, device_timer_id id, in
 		if (m_irq_enable)
 		{
 			if (m_irq_count == 0x7fff)  // counter does not wrap to 0!
-				m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+				set_irq_line(ASSERT_LINE);
 			else
 				m_irq_count++;
 		}
 	}
 }
 
-WRITE8_MEMBER(nes_namcot340_device::n340_lowrite)
+void nes_namcot340_device::n340_lowrite(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("n340_lowrite, offset: %04x, data: %02x\n", offset, data));
 	offset += 0x100;
@@ -418,17 +435,17 @@ WRITE8_MEMBER(nes_namcot340_device::n340_lowrite)
 	{
 		case 0x1000: /* low byte of IRQ */
 			m_irq_count = (m_irq_count & 0x7f00) | data;
-			m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+			set_irq_line(CLEAR_LINE);
 			break;
 		case 0x1800: /* high byte of IRQ, IRQ enable in high bit */
 			m_irq_count = (m_irq_count & 0xff) | ((data & 0x7f) << 8);
 			m_irq_enable = data & 0x80;
-			m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+			set_irq_line(CLEAR_LINE);
 			break;
 	}
 }
 
-READ8_MEMBER(nes_namcot340_device::n340_loread)
+uint8_t nes_namcot340_device::n340_loread(offs_t offset)
 {
 	LOG_MMC(("n340_loread, offset: %04x\n", offset));
 	offset += 0x100;
@@ -437,16 +454,16 @@ READ8_MEMBER(nes_namcot340_device::n340_loread)
 	{
 		case 0x1000:
 			return m_irq_count & 0xff;
-			m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+			set_irq_line(CLEAR_LINE);
 		case 0x1800:
 			return (m_irq_count >> 8) & 0xff;
-			m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+			set_irq_line(CLEAR_LINE);
 		default:
 			return 0x00;
 	}
 }
 
-WRITE8_MEMBER(nes_namcot340_device::n340_hiwrite)
+void nes_namcot340_device::n340_hiwrite(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("n340_hiwrite, offset: %04x, data: %02x\n", offset, data));
 
@@ -507,17 +524,17 @@ WRITE8_MEMBER(nes_namcot340_device::n340_hiwrite)
 
  -------------------------------------------------*/
 
-READ8_MEMBER(nes_namcot175_device::read_m)
+uint8_t nes_namcot175_device::read_m(offs_t offset)
 {
 	// the only game supporting this is Family Circuit '91, and it has 2KB of battery
 	// but it's mirrored up to 8KB (see Sprint Race -> Back Up menu breakage if not)
 	if (!m_battery.empty() && !m_wram_protect)
 		return m_battery[offset & (m_battery.size() - 1)];
 
-	return m_open_bus;   // open bus
+	return get_open_bus();   // open bus
 }
 
-WRITE8_MEMBER(nes_namcot175_device::write_m)
+void nes_namcot175_device::write_m(offs_t offset, uint8_t data)
 {
 	// the only game supporting this is Family Circuit '91, and it has 2KB of battery
 	// but it's mirrored up to 8KB (see Sprint Race -> Back Up menu breakage if not)
@@ -525,7 +542,7 @@ WRITE8_MEMBER(nes_namcot175_device::write_m)
 		m_battery[offset & (m_battery.size() - 1)] = data;
 }
 
-WRITE8_MEMBER(nes_namcot175_device::write_h)
+void nes_namcot175_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("namcot175 write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -538,7 +555,7 @@ WRITE8_MEMBER(nes_namcot175_device::write_h)
 			prg8_89(data & 0x3f);
 			break;
 		default:
-			n340_hiwrite(space, offset, data, mem_mask);
+			n340_hiwrite(offset, data);
 			break;
 	}
 }
@@ -552,17 +569,15 @@ WRITE8_MEMBER(nes_namcot175_device::write_h)
 
  Compared to Namcot-175 here we have mapper controlled
  mirroring, NTRAM mapping to VRAM and additional
- sound hw inside the chip (currently unemulated) and
- some internal RAM.
+ sound hw inside the chip and some internal RAM.
 
  iNES: mapper 19
 
- In MESS: Supported (with no emulation of the
- sound component)
+ In MESS: Supported
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_namcot163_device::chr_w)
+void nes_namcot163_device::chr_w(offs_t offset, uint8_t data)
 {
 	int bank = offset >> 10;
 
@@ -578,7 +593,7 @@ WRITE8_MEMBER(nes_namcot163_device::chr_w)
 	// or ROM, so no write
 }
 
-READ8_MEMBER(nes_namcot163_device::chr_r)
+uint8_t nes_namcot163_device::chr_r(offs_t offset)
 {
 	int bank = offset >> 10;
 	if (!(m_latch & 0x40) && m_chr_bank >= 0xe0)
@@ -592,15 +607,15 @@ READ8_MEMBER(nes_namcot163_device::chr_r)
 }
 
 
-READ8_MEMBER(nes_namcot163_device::read_m)
+uint8_t nes_namcot163_device::read_m(offs_t offset)
 {
 	if (!m_battery.empty() && offset < m_battery.size())
 		return m_battery[offset & (m_battery.size() - 1)];
 
-	return m_open_bus;   // open bus
+	return get_open_bus();   // open bus
 }
 
-WRITE8_MEMBER(nes_namcot163_device::write_m)
+void nes_namcot163_device::write_m(offs_t offset, uint8_t data)
 {
 	// the pcb can separately protect each 2KB chunk of the external wram from writes
 	int bank = (offset & 0x1800) >> 11;
@@ -608,7 +623,7 @@ WRITE8_MEMBER(nes_namcot163_device::write_m)
 		m_battery[offset & (m_battery.size() - 1)] = data;
 }
 
-WRITE8_MEMBER(nes_namcot163_device::write_l)
+void nes_namcot163_device::write_l(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("namcot163 write_l, offset: %04x, data: %02x\n", offset, data));
 	offset += 0x100;
@@ -616,15 +631,15 @@ WRITE8_MEMBER(nes_namcot163_device::write_l)
 	switch (offset & 0x1800)
 	{
 		case 0x0800:
-			LOG_MMC(("Namcot-163 sound reg write, data: %02x\n", data));
+			m_namco163snd->data_w(data);
 			break;
 		default:
-			n340_lowrite(space, offset, data, mem_mask);
+			n340_lowrite(offset, data);
 			break;
 	}
 }
 
-READ8_MEMBER(nes_namcot163_device::read_l)
+uint8_t nes_namcot163_device::read_l(offs_t offset)
 {
 	LOG_MMC(("namcot163 read_l, offset: %04x\n", offset));
 	offset += 0x100;
@@ -632,10 +647,9 @@ READ8_MEMBER(nes_namcot163_device::read_l)
 	switch (offset & 0x1800)
 	{
 		case 0x0800:
-			LOG_MMC(("Namcot-163 sound reg read\n"));
-			return 0;
+			return m_namco163snd->data_r();
 		default:
-			return n340_loread(space, offset, mem_mask);
+			return n340_loread(offset);
 	}
 }
 
@@ -647,7 +661,7 @@ void nes_namcot163_device::set_mirror(uint8_t page, uint8_t data)
 		set_nt_page(page, CIRAM, data & 0x01, 1);
 }
 
-WRITE8_MEMBER(nes_namcot163_device::write_h)
+void nes_namcot163_device::write_h(offs_t offset, uint8_t data)
 {
 	int page;
 	LOG_MMC(("namcot163 write_h, offset: %04x, data: %02x\n", offset, data));
@@ -669,7 +683,7 @@ WRITE8_MEMBER(nes_namcot163_device::write_h)
 			set_mirror(page, data);
 			break;
 		case 0x6000:
-			// TODO: data & 40 (or data & c0) disable sound if set
+			m_namco163snd->disable_w((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 			prg8_89(data & 0x3f);
 			break;
 		case 0x6800:
@@ -679,10 +693,23 @@ WRITE8_MEMBER(nes_namcot163_device::write_h)
 		case 0x7800:
 			// the lower 4 bits work *BOTH* as WRAM write protect *AND* as sound address!
 			m_wram_protect = data & 0x0f;
-			LOG_MMC(("Namcot-163 sound address write, data: %02x\n", data));
+			m_namco163snd->addr_w(data);
 			break;
 		default:
-			n340_hiwrite(space, offset, data, mem_mask);
+			n340_hiwrite(offset, data);
 			break;
 	}
+}
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+void nes_namcot163_device::device_add_mconfig(machine_config &config)
+{
+	// additional sound hardware
+	SPEAKER(config, "addon").front_center();
+
+	// TODO: Correct clock input / divider?
+	NAMCO_163(config, m_namco163snd, XTAL(21'477'272)/12).add_route(ALL_OUTPUTS, "addon", 0.5);
 }

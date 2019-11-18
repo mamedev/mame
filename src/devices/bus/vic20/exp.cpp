@@ -28,7 +28,7 @@ DEFINE_DEVICE_TYPE(VIC20_EXPANSION_SLOT, vic20_expansion_slot_device, "vic20_exp
 //-------------------------------------------------
 
 device_vic20_expansion_card_interface::device_vic20_expansion_card_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device),
+	: device_interface(device, "vic20exp"),
 		m_blk1(*this, "blk1"),
 		m_blk2(*this, "blk2"),
 		m_blk3(*this, "blk3"),
@@ -59,7 +59,7 @@ device_vic20_expansion_card_interface::~device_vic20_expansion_card_interface()
 
 vic20_expansion_slot_device::vic20_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, VIC20_EXPANSION_SLOT, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_vic20_expansion_card_interface>(mconfig, *this),
 	device_image_interface(mconfig, *this),
 	m_write_irq(*this),
 	m_write_nmi(*this),
@@ -70,40 +70,17 @@ vic20_expansion_slot_device::vic20_expansion_slot_device(const machine_config &m
 
 
 //-------------------------------------------------
-//  device_validity_check -
-//-------------------------------------------------
-
-void vic20_expansion_slot_device::device_validity_check(validity_checker &valid) const
-{
-	device_t *const carddev = get_card_device();
-	if (carddev && !dynamic_cast<device_vic20_expansion_card_interface *>(carddev))
-		osd_printf_error("Card device %s (%s) does not implement device_vic20_expansion_card_interface\n", carddev->tag(), carddev->name());
-}
-
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void vic20_expansion_slot_device::device_start()
 {
-	device_t *const carddev = get_card_device();
-	m_card = dynamic_cast<device_vic20_expansion_card_interface *>(carddev);
-	if (carddev && !m_card)
-		fatalerror("Card device %s (%s) does not implement device_vic20_expansion_card_interface\n", carddev->tag(), carddev->name());
+	m_card = get_card_device();
 
 	// resolve callbacks
 	m_write_irq.resolve_safe();
 	m_write_nmi.resolve_safe();
 	m_write_res.resolve_safe();
-
-	// inherit bus clock
-	if (clock() == 0)
-	{
-		vic20_expansion_slot_device *root = machine().device<vic20_expansion_slot_device>(VIC20_EXPANSION_SLOT_TAG);
-		assert(root);
-		set_unscaled_clock(root->clock());
-	}
 }
 
 
@@ -178,11 +155,11 @@ std::string vic20_expansion_slot_device::get_default_card_software(get_default_c
 //  cd_r - cartridge data read
 //-------------------------------------------------
 
-uint8_t vic20_expansion_slot_device::cd_r(address_space &space, offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
+uint8_t vic20_expansion_slot_device::cd_r(offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
 {
 	if (m_card != nullptr)
 	{
-		data = m_card->vic20_cd_r(space, offset, data, ram1, ram2, ram3, blk1, blk2, blk3, blk5, io2, io3);
+		data = m_card->vic20_cd_r(offset, data, ram1, ram2, ram3, blk1, blk2, blk3, blk5, io2, io3);
 	}
 
 	return data;
@@ -193,12 +170,20 @@ uint8_t vic20_expansion_slot_device::cd_r(address_space &space, offs_t offset, u
 //  cd_w - cartridge data write
 //-------------------------------------------------
 
-void vic20_expansion_slot_device::cd_w(address_space &space, offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
+void vic20_expansion_slot_device::cd_w(offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
 {
 	if (m_card != nullptr)
 	{
-		m_card->vic20_cd_w(space, offset, data, ram1, ram2, ram3, blk1, blk2, blk3, blk5, io2, io3);
+		m_card->vic20_cd_w(offset, data, ram1, ram2, ram3, blk1, blk2, blk3, blk5, io2, io3);
 	}
+}
+
+void vic20_expansion_slot_device::add_passthrough(machine_config &config, const char *_tag)
+{
+	vic20_expansion_slot_device &slot(VIC20_EXPANSION_SLOT(config, _tag, DERIVED_CLOCK(1, 1), vic20_expansion_cards, nullptr));
+	slot.irq_wr_callback().set(DEVICE_SELF_OWNER, FUNC(vic20_expansion_slot_device::irq_w));
+	slot.nmi_wr_callback().set(DEVICE_SELF_OWNER, FUNC(vic20_expansion_slot_device::nmi_w));
+	slot.res_wr_callback().set(DEVICE_SELF_OWNER, FUNC(vic20_expansion_slot_device::res_w));
 }
 
 
@@ -218,18 +203,18 @@ void vic20_expansion_slot_device::cd_w(address_space &space, offs_t offset, uint
 #include "videopak.h"
 #include "speakeasy.h"
 
-SLOT_INTERFACE_START( vic20_expansion_cards )
-	SLOT_INTERFACE("exp", VIC1010)
-	SLOT_INTERFACE("3k", VIC1210)
-	SLOT_INTERFACE("8k", VIC1110)
-	SLOT_INTERFACE("16k", VIC1111)
-	SLOT_INTERFACE("fe3", VIC20_FE3)
-	SLOT_INTERFACE("speakez", VIC20_SPEAKEASY)
-	SLOT_INTERFACE("videopak", VIC20_VIDEO_PAK)
+void vic20_expansion_cards(device_slot_interface &device)
+{
+	device.option_add("exp", VIC1010);
+	device.option_add("3k", VIC1210);
+	device.option_add("8k", VIC1110);
+	device.option_add("16k", VIC1111);
+	device.option_add("fe3", VIC20_FE3);
+	device.option_add("speakez", VIC20_SPEAKEASY);
+	device.option_add("videopak", VIC20_VIDEO_PAK);
 
 	// the following need ROMs from the software list
-	SLOT_INTERFACE_INTERNAL("standard", VIC20_STD)
-	SLOT_INTERFACE_INTERNAL("ieee488", VIC1112)
-	MCFG_SLOT_OPTION_CLOCK("ieee488", DERIVED_CLOCK(1, 1))
-	SLOT_INTERFACE_INTERNAL("megacart", VIC20_MEGACART)
-SLOT_INTERFACE_END
+	device.option_add_internal("standard", VIC20_STD);
+	device.option_add_internal("ieee488", VIC1112);
+	device.option_add_internal("megacart", VIC20_MEGACART);
+}

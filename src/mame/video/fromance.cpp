@@ -72,8 +72,8 @@ void fromance_state::init_common(  )
 
 	/* state save */
 	save_item(NAME(m_selected_videoram));
-	save_pointer(NAME(m_local_videoram[0].get()), 0x1000 * 3);
-	save_pointer(NAME(m_local_videoram[1].get()), 0x1000 * 3);
+	save_pointer(NAME(m_local_videoram[0]), 0x1000 * 3);
+	save_pointer(NAME(m_local_videoram[1]), 0x1000 * 3);
 	save_item(NAME(m_selected_paletteram));
 	save_item(NAME(m_scrollx));
 	save_item(NAME(m_scrolly));
@@ -82,14 +82,14 @@ void fromance_state::init_common(  )
 	save_item(NAME(m_flipscreen_old));
 	save_item(NAME(m_scrollx_ofs));
 	save_item(NAME(m_scrolly_ofs));
-	save_pointer(NAME(m_local_paletteram.get()), 0x800 * 2);
+	save_pointer(NAME(m_local_paletteram), 0x800 * 2);
 }
 
 VIDEO_START_MEMBER(fromance_state,fromance)
 {
 	/* allocate tilemaps */
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(fromance_state::get_fromance_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 4, 64, 64);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(fromance_state::get_fromance_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 4, 64, 64);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(fromance_state::get_fromance_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 4, 64, 64);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(fromance_state::get_fromance_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 4, 64, 64);
 
 	init_common();
 }
@@ -97,8 +97,8 @@ VIDEO_START_MEMBER(fromance_state,fromance)
 VIDEO_START_MEMBER(fromance_state,nekkyoku)
 {
 	/* allocate tilemaps */
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(fromance_state::get_nekkyoku_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 4, 64, 64);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(fromance_state::get_nekkyoku_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 4, 64, 64);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(fromance_state::get_nekkyoku_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 4, 64, 64);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(fromance_state::get_nekkyoku_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 4, 64, 64);
 
 	init_common();
 }

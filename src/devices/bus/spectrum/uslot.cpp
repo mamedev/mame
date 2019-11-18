@@ -20,16 +20,17 @@ DEFINE_DEVICE_TYPE(SPECTRUM_USLOT, spectrum_uslot_device, "spectrum_uslot", "Spe
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(spectrum_uslot_device::device_add_mconfig)
+void spectrum_uslot_device::device_add_mconfig(machine_config &config)
+{
 	/* passthru */
-	MCFG_SPECTRUM_EXPANSION_SLOT_ADD("exp1", spectrum_expansion_devices, nullptr)
-	MCFG_SPECTRUM_EXPANSION_SLOT_IRQ_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, spectrum_expansion_slot_device, irq_w))
-	MCFG_SPECTRUM_EXPANSION_SLOT_NMI_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, spectrum_expansion_slot_device, nmi_w))
+	SPECTRUM_EXPANSION_SLOT(config, m_exp1, spectrum_expansion_devices, nullptr);
+	m_exp1->irq_handler().set(DEVICE_SELF_OWNER, FUNC(spectrum_expansion_slot_device::irq_w));
+	m_exp1->nmi_handler().set(DEVICE_SELF_OWNER, FUNC(spectrum_expansion_slot_device::nmi_w));
 
-	MCFG_SPECTRUM_EXPANSION_SLOT_ADD("exp2", spectrum_expansion_devices, nullptr)
-	MCFG_SPECTRUM_EXPANSION_SLOT_IRQ_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, spectrum_expansion_slot_device, irq_w))
-	MCFG_SPECTRUM_EXPANSION_SLOT_NMI_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, spectrum_expansion_slot_device, nmi_w))
-MACHINE_CONFIG_END
+	SPECTRUM_EXPANSION_SLOT(config, m_exp2, spectrum_expansion_devices, nullptr);
+	m_exp2->irq_handler().set(DEVICE_SELF_OWNER, FUNC(spectrum_expansion_slot_device::irq_w));
+	m_exp2->nmi_handler().set(DEVICE_SELF_OWNER, FUNC(spectrum_expansion_slot_device::nmi_w));
+}
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -54,7 +55,6 @@ spectrum_uslot_device::spectrum_uslot_device(const machine_config &mconfig, cons
 
 void spectrum_uslot_device::device_start()
 {
-	m_slot = dynamic_cast<spectrum_expansion_slot_device *>(owner());
 }
 
 
@@ -76,41 +76,41 @@ READ_LINE_MEMBER(spectrum_uslot_device::romcs)
 	return m_exp1->romcs() | m_exp2->romcs();
 }
 
-
-READ8_MEMBER(spectrum_uslot_device::mreq_r)
+void spectrum_uslot_device::pre_opcode_fetch(offs_t offset)
 {
-	uint8_t temp;
-	uint8_t data = 0xff;
-
-	temp = m_exp1->mreq_r(space, offset);
-	if (m_exp1->romcs())
-		data &= temp;
-
-	temp = m_exp2->mreq_r(space, offset);
-	if (m_exp2->romcs())
-		data &= temp;
-
-	return data;
+	m_exp1->pre_opcode_fetch(offset);
+	m_exp2->pre_opcode_fetch(offset);
 }
 
-WRITE8_MEMBER(spectrum_uslot_device::mreq_w)
-{
-	if (m_exp1->romcs())
-		m_exp1->mreq_w(space, offset, data);
-
-	if (m_exp2->romcs())
-		m_exp2->mreq_w(space, offset, data);
-}
-
-READ8_MEMBER(spectrum_uslot_device::port_fe_r)
+uint8_t spectrum_uslot_device::mreq_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
 	if (m_exp1->romcs())
-		data &= m_exp1->port_fe_r(space, offset);
+		data &= m_exp1->mreq_r(offset);
 
 	if (m_exp2->romcs())
-		data &= m_exp2->port_fe_r(space, offset);
+		data &= m_exp2->mreq_r(offset);
 
 	return data;
+}
+
+void spectrum_uslot_device::mreq_w(offs_t offset, uint8_t data)
+{
+	if (m_exp1->romcs())
+		m_exp1->mreq_w(offset, data);
+
+	if (m_exp2->romcs())
+		m_exp2->mreq_w(offset, data);
+}
+
+uint8_t spectrum_uslot_device::iorq_r(offs_t offset)
+{
+	return m_exp1->iorq_r(offset) & m_exp2->iorq_r(offset);
+}
+
+void spectrum_uslot_device::iorq_w(offs_t offset, uint8_t data)
+{
+	m_exp1->iorq_w(offset, data);
+	m_exp2->iorq_w(offset, data);
 }

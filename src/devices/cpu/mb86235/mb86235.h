@@ -15,18 +15,7 @@
 #include "cpu/drcuml.h"
 #include "machine/gen_fifo.h"
 
-#define MCFG_MB86235_FIFOIN(tag) \
-	downcast<mb86235_device &>(*device).set_fifoin_tag(tag);
-
-#define MCFG_MB86235_FIFOOUT0(tag) \
-	downcast<mb86235_device &>(*device).set_fifoout0_tag(tag);
-
-#define MCFG_MB86235_FIFOOUT1(tag) \
-	downcast<mb86235_device &>(*device).set_fifoout1_tag(tag);
-
 class mb86235_frontend;
-
-
 
 class mb86235_device :  public cpu_device
 {
@@ -35,10 +24,11 @@ class mb86235_device :  public cpu_device
 public:
 	// construction/destruction
 	mb86235_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t clock);
+	virtual ~mb86235_device() override;
 
-	void set_fifoin_tag(const char *tag) { m_fifoin.set_tag(tag); }
-	void set_fifoout0_tag(const char *tag) { m_fifoout0.set_tag(tag); }
-	void set_fifoout1_tag(const char *tag) { m_fifoout1.set_tag(tag); }
+	template <typename T> void set_fifoin_tag(T &&fifo_tag) { m_fifoin.set_tag(std::forward<T>(fifo_tag)); }
+	template <typename T> void set_fifoout0_tag(T &&fifo_tag) { m_fifoout0.set_tag(std::forward<T>(fifo_tag)); }
+	template <typename T> void set_fifoout1_tag(T &&fifo_tag) { m_fifoout1.set_tag(std::forward<T>(fifo_tag)); }
 
 	void unimplemented_op();
 	void unimplemented_alu();
@@ -69,9 +59,9 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override { return 1; }
-	virtual uint32_t execute_max_cycles() const override { return 7; }
-	virtual uint32_t execute_input_lines() const override { return 0; }
+	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 7; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 0; }
 	virtual void execute_run() override;
 	//virtual void execute_set_input(int inputnum, int state);
 
@@ -84,7 +74,7 @@ protected:
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	direct_read_data<-3> *m_direct;
+	memory_access_cache<3, -3, ENDIANNESS_LITTLE> *m_pcache;
 
 private:
 

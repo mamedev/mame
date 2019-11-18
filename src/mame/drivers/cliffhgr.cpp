@@ -26,15 +26,15 @@ More info on the LD-V1100:
 http://www.laserdiscarchive.co.uk/laserdisc_archive/pioneer/pioneer_ld-1100/pioneer_ld-1100.htm
 
 Interrupts:
-The frame decoder reads in the Phillips code from the composite signal into
+The frame decoder reads in the Philips code from the composite signal into
 3x8 bit flip flops. If bit 7 of the code is set, then an IRQ is generated.
-Phillips codes come in scanline 17 and 18 of the composite signal for each
+Philips codes come in scanline 17 and 18 of the composite signal for each
 field, so if we have valid codes, we would have 4 irq's per frame.
 NMIs are triggered by the TMS9128NL chip. The TMS9128NL SYNC signal is hooked
 up to the composite SYNC signal from the frame decoder.
 
 Goal To Go Side detection:
-The side detection code expects to read a chapter Phillips code of 0x881DDD
+The side detection code expects to read a chapter Philips code of 0x881DDD
 for Side 1, or 0x8F7DDD for Side 2. That would be chapter 1 for Side 1, or
 chapter number 119 for Side 2.
 
@@ -47,13 +47,13 @@ IO Ports:
 0x44: W TMS9128NL VRAM Port
 0x45: R TMS9128NL VRAM Port
 0x46: W Sound/Overlay
-0x50: R Reads lower byte of Phillips code
-0x51: R Reads middle byte of Phillips code
-0x52: R Reads high byte of Phillips code
+0x50: R Reads lower byte of Philips code
+0x51: R Reads middle byte of Philips code
+0x52: R Reads high byte of Philips code
 0x53: R Clears the flip flop that generated the IRQ
 0x54: W TMS9128NL REG Port
 0x55: R TMS9128NL REG Port
-0x57: W Clears the serial->parallel chips of the Phillips code reader.
+0x57: W Clears the serial->parallel chips of the Philips code reader.
 0x60: W Input Port/Dipswitch selector
 0x62: R Input Port/Dipswitch data read
 0x64: - Unused in the schematics, but used in the code (maybe as delay?)
@@ -94,39 +94,47 @@ class cliffhgr_state : public driver_device
 {
 public:
 	cliffhgr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_laserdisc(*this, "laserdisc"),
-			m_port_bank(0),
-			m_phillips_code(0) ,
-		m_maincpu(*this, "maincpu"),
-		m_discrete(*this, "discrete"),
-		m_screen(*this, "screen") { }
+		: driver_device(mconfig, type, tag)
+		, m_laserdisc(*this, "laserdisc")
+		, m_port_bank(0)
+		, m_philips_code(0)
+		, m_maincpu(*this, "maincpu")
+		, m_discrete(*this, "discrete")
+		, m_screen(*this, "screen")
+		, m_led(*this, "led0")
+	{ }
 
-	required_device<pioneer_pr8210_device> m_laserdisc;
-
-	int m_port_bank;
-	uint32_t m_phillips_code;
-
-	emu_timer *m_irq_timer;
 	DECLARE_WRITE8_MEMBER(cliff_test_led_w);
 	DECLARE_WRITE8_MEMBER(cliff_port_bank_w);
 	DECLARE_READ8_MEMBER(cliff_port_r);
-	DECLARE_READ8_MEMBER(cliff_phillips_code_r);
-	DECLARE_WRITE8_MEMBER(cliff_phillips_clear_w);
+	DECLARE_READ8_MEMBER(cliff_philips_code_r);
+	DECLARE_WRITE8_MEMBER(cliff_philips_clear_w);
 	DECLARE_WRITE8_MEMBER(cliff_coin_counter_w);
 	DECLARE_READ8_MEMBER(cliff_irq_ack_r);
 	DECLARE_WRITE8_MEMBER(cliff_ldwire_w);
 	DECLARE_WRITE8_MEMBER(cliff_sound_overlay_w);
-	DECLARE_DRIVER_INIT(cliff);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	void init_cliff();
 	TIMER_CALLBACK_MEMBER(cliff_irq_callback);
-	required_device<cpu_device> m_maincpu;
-	required_device<discrete_device> m_discrete;
-	required_device<screen_device> m_screen;
 	void cliffhgr(machine_config &config);
 	void mainmem(address_map &map);
 	void mainport(address_map &map);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+	required_device<pioneer_pr8210_device> m_laserdisc;
+
+	int m_port_bank;
+	uint32_t m_philips_code;
+
+	emu_timer *m_irq_timer;
+
+	required_device<cpu_device> m_maincpu;
+	required_device<discrete_device> m_discrete;
+	required_device<screen_device> m_screen;
+	output_finder<> m_led;
 };
 
 
@@ -134,7 +142,7 @@ public:
 
 WRITE8_MEMBER(cliffhgr_state::cliff_test_led_w)
 {
-	output().set_led_value(0, offset ^ 1);
+	m_led = offset ^ 1;
 }
 
 WRITE8_MEMBER(cliffhgr_state::cliff_port_bank_w)
@@ -159,12 +167,12 @@ READ8_MEMBER(cliffhgr_state::cliff_port_r)
 	return 0xff;
 }
 
-READ8_MEMBER(cliffhgr_state::cliff_phillips_code_r)
+READ8_MEMBER(cliffhgr_state::cliff_philips_code_r)
 {
-	return (m_phillips_code >> (8 * offset)) & 0xff;
+	return (m_philips_code >> (8 * offset)) & 0xff;
 }
 
-WRITE8_MEMBER(cliffhgr_state::cliff_phillips_clear_w)
+WRITE8_MEMBER(cliffhgr_state::cliff_philips_clear_w)
 {
 	/* reset serial to parallel converters */
 }
@@ -185,8 +193,8 @@ READ8_MEMBER(cliffhgr_state::cliff_irq_ack_r)
 WRITE8_MEMBER(cliffhgr_state::cliff_sound_overlay_w)
 {
 	/* audio */
-	m_discrete->write(space, CLIFF_ENABLE_SND_1, data & 1);
-	m_discrete->write(space, CLIFF_ENABLE_SND_2, (data >> 1) & 1);
+	m_discrete->write(CLIFF_ENABLE_SND_1, data & 1);
+	m_discrete->write(CLIFF_ENABLE_SND_2, (data >> 1) & 1);
 
 	// bit 4 (data & 0x10) is overlay related?
 }
@@ -201,25 +209,25 @@ WRITE8_MEMBER(cliffhgr_state::cliff_ldwire_w)
 
 TIMER_CALLBACK_MEMBER(cliffhgr_state::cliff_irq_callback)
 {
-	m_phillips_code = 0;
+	m_philips_code = 0;
 
 	switch (param)
 	{
 		case 17:
-			m_phillips_code = m_laserdisc->get_field_code(LASERDISC_CODE_LINE17, true);
+			m_philips_code = m_laserdisc->get_field_code(LASERDISC_CODE_LINE17, true);
 			param = 18;
 			break;
 
 		case 18:
-			m_phillips_code = m_laserdisc->get_field_code(LASERDISC_CODE_LINE18, true);
+			m_philips_code = m_laserdisc->get_field_code(LASERDISC_CODE_LINE18, true);
 			param = 17;
 			break;
 	}
 
 	/* if we have a valid code, trigger an IRQ */
-	if (m_phillips_code & 0x800000)
+	if (m_philips_code & 0x800000)
 	{
-//      printf("%2d:code = %06X\n", param, phillips_code);
+//      printf("%2d:code = %06X\n", param, philips_code);
 		m_maincpu->set_input_line(0, ASSERT_LINE);
 	}
 
@@ -228,13 +236,14 @@ TIMER_CALLBACK_MEMBER(cliffhgr_state::cliff_irq_callback)
 
 void cliffhgr_state::machine_start()
 {
+	m_led.resolve();
 	m_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cliffhgr_state::cliff_irq_callback),this));
 }
 
 void cliffhgr_state::machine_reset()
 {
 	m_port_bank = 0;
-	m_phillips_code = 0;
+	m_philips_code = 0;
 	m_irq_timer->adjust(m_screen->time_until_pos(17), 17);
 }
 
@@ -252,19 +261,19 @@ void cliffhgr_state::mainport(address_map &map)
 	map.global_mask(0xff);
 	map(0x44, 0x44).w("tms9928a", FUNC(tms9928a_device::vram_write));
 	map(0x45, 0x45).r("tms9928a", FUNC(tms9928a_device::vram_read));
-	map(0x46, 0x46).w(this, FUNC(cliffhgr_state::cliff_sound_overlay_w));
-	map(0x50, 0x52).r(this, FUNC(cliffhgr_state::cliff_phillips_code_r));
-	map(0x53, 0x53).r(this, FUNC(cliffhgr_state::cliff_irq_ack_r));
+	map(0x46, 0x46).w(FUNC(cliffhgr_state::cliff_sound_overlay_w));
+	map(0x50, 0x52).r(FUNC(cliffhgr_state::cliff_philips_code_r));
+	map(0x53, 0x53).r(FUNC(cliffhgr_state::cliff_irq_ack_r));
 	map(0x54, 0x54).w("tms9928a", FUNC(tms9928a_device::register_write));
 	map(0x55, 0x55).r("tms9928a", FUNC(tms9928a_device::register_read));
-	map(0x57, 0x57).w(this, FUNC(cliffhgr_state::cliff_phillips_clear_w));
-	map(0x60, 0x60).w(this, FUNC(cliffhgr_state::cliff_port_bank_w));
-	map(0x62, 0x62).r(this, FUNC(cliffhgr_state::cliff_port_r));
+	map(0x57, 0x57).w(FUNC(cliffhgr_state::cliff_philips_clear_w));
+	map(0x60, 0x60).w(FUNC(cliffhgr_state::cliff_port_bank_w));
+	map(0x62, 0x62).r(FUNC(cliffhgr_state::cliff_port_r));
 	map(0x64, 0x64).nopw(); /* unused in schematics, may be used as timing delay for IR interface */
-	map(0x66, 0x66).w(this, FUNC(cliffhgr_state::cliff_ldwire_w));
-	map(0x68, 0x68).w(this, FUNC(cliffhgr_state::cliff_coin_counter_w));
+	map(0x66, 0x66).w(FUNC(cliffhgr_state::cliff_ldwire_w));
+	map(0x68, 0x68).w(FUNC(cliffhgr_state::cliff_coin_counter_w));
 	map(0x6a, 0x6a).nopw(); /* /LAMP0 (Infrared?) */
-	map(0x6e, 0x6f).w(this, FUNC(cliffhgr_state::cliff_test_led_w));
+	map(0x6e, 0x6f).w(FUNC(cliffhgr_state::cliff_test_led_w));
 }
 
 
@@ -679,38 +688,35 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(cliffhgr_state::cliffhgr)
+void cliffhgr_state::cliffhgr(machine_config &config)
+{
+	Z80(config, m_maincpu, 4000000);       /* 4MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &cliffhgr_state::mainmem);
+	m_maincpu->set_addrmap(AS_IO, &cliffhgr_state::mainport);
 
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)       /* 4MHz */
-	MCFG_CPU_PROGRAM_MAP(mainmem)
-	MCFG_CPU_IO_MAP(mainport)
 
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
-
-	MCFG_LASERDISC_PR8210_ADD("laserdisc")
-	MCFG_LASERDISC_OVERLAY_DEVICE(tms9928a_device::TOTAL_HORZ, tms9928a_device::TOTAL_VERT_NTSC, "tms9928a", tms9928a_device, screen_update)
-	MCFG_LASERDISC_OVERLAY_CLIP(tms9928a_device::HORZ_DISPLAY_START-12, tms9928a_device::HORZ_DISPLAY_START+32*8+12-1, tms9928a_device::VERT_DISPLAY_START_NTSC - 12, tms9928a_device::VERT_DISPLAY_START_NTSC+24*8+12-1)
+	PIONEER_PR8210(config, m_laserdisc, 0);
+	m_laserdisc->set_overlay(tms9928a_device::TOTAL_HORZ, tms9928a_device::TOTAL_VERT_NTSC, "tms9928a", FUNC(tms9928a_device::screen_update));
+	m_laserdisc->set_overlay_clip(tms9928a_device::HORZ_DISPLAY_START-12, tms9928a_device::HORZ_DISPLAY_START+32*8+12-1, tms9928a_device::VERT_DISPLAY_START_NTSC - 12, tms9928a_device::VERT_DISPLAY_START_NTSC+24*8+12-1);
+	m_laserdisc->add_route(0, "lspeaker", 1.0);
+	m_laserdisc->add_route(1, "rspeaker", 1.0);
 
 	/* start with the TMS9928a video configuration */
-	MCFG_DEVICE_ADD( "tms9928a", TMS9128, XTAL(10'738'635) / 2 )   /* TMS9128NL on the board */
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	tms9128_device &vdp(TMS9128(config, "tms9928a", XTAL(10'738'635)));   /* TMS9128NL on the board */
+	vdp.set_vram_size(0x4000);
+	vdp.int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	/* override video rendering and raw screen info */
-	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
+	m_laserdisc->add_ntsc_screen(config, "screen");
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_MODIFY("laserdisc")
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(cliffhgr)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-MACHINE_CONFIG_END
+	DISCRETE(config, m_discrete, cliffhgr_discrete).add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+}
 
 
 
@@ -774,7 +780,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(cliffhgr_state,cliff)
+void cliffhgr_state::init_cliff()
 {
 }
 
@@ -786,7 +792,7 @@ DRIVER_INIT_MEMBER(cliffhgr_state,cliff)
  *
  *************************************/
 
-GAME( 1983, cliffhgr,  0,        cliffhgr, cliffhgr,  cliffhgr_state, cliff, ROT0, "Stern Electronics", "Cliff Hanger (set 1)", 0 )
-GAME( 1983, cliffhgra, cliffhgr, cliffhgr, cliffhgra, cliffhgr_state, cliff, ROT0, "Stern Electronics", "Cliff Hanger (set 2)", 0 )
-GAME( 1983, cliffhgra2,cliffhgr, cliffhgr, cliffhgra, cliffhgr_state, cliff, ROT0, "Stern Electronics", "Cliff Hanger (set 3)", 0 )
-GAME( 1983, goaltogo,  0,        cliffhgr, goaltogo,  cliffhgr_state, cliff, ROT0, "Stern Electronics", "Goal To Go",           MACHINE_NOT_WORKING )
+GAME( 1983, cliffhgr,  0,        cliffhgr, cliffhgr,  cliffhgr_state, init_cliff, ROT0, "Stern Electronics", "Cliff Hanger (set 1)", 0 )
+GAME( 1983, cliffhgra, cliffhgr, cliffhgr, cliffhgra, cliffhgr_state, init_cliff, ROT0, "Stern Electronics", "Cliff Hanger (set 2)", 0 )
+GAME( 1983, cliffhgra2,cliffhgr, cliffhgr, cliffhgra, cliffhgr_state, init_cliff, ROT0, "Stern Electronics", "Cliff Hanger (set 3)", 0 )
+GAME( 1983, goaltogo,  0,        cliffhgr, goaltogo,  cliffhgr_state, init_cliff, ROT0, "Stern Electronics", "Goal To Go",           MACHINE_NOT_WORKING )

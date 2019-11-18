@@ -30,9 +30,8 @@ a1bus_slot_device::a1bus_slot_device(const machine_config &mconfig, const char *
 
 a1bus_slot_device::a1bus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, device_slot_interface(mconfig, *this)
-	, m_a1bus_tag(nullptr)
-	, m_a1bus_slottag(nullptr)
+	, device_single_card_slot_interface<device_a1bus_card_interface>(mconfig, *this)
+	, m_a1bus(*this, finder_base::DUMMY_TAG)
 {
 }
 
@@ -40,12 +39,17 @@ a1bus_slot_device::a1bus_slot_device(const machine_config &mconfig, device_type 
 //  device_start - device-specific startup
 //-------------------------------------------------
 
+void a1bus_slot_device::device_resolve_objects()
+{
+	device_a1bus_card_interface *const a1bus_card(dynamic_cast<device_a1bus_card_interface *>(get_card_device()));
+	if (a1bus_card)
+		a1bus_card->set_a1bus(m_a1bus, tag());
+}
+
 void a1bus_slot_device::device_start()
 {
-	device_a1bus_card_interface *dev = dynamic_cast<device_a1bus_card_interface *>(get_card_device());
-
-	if (dev) dev->set_a1bus_tag(m_a1bus_tag, m_a1bus_slottag);
 }
+
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -68,25 +72,26 @@ a1bus_device::a1bus_device(const machine_config &mconfig, const char *tag, devic
 
 a1bus_device::a1bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, m_maincpu(nullptr)
+	, m_space(*this, finder_base::DUMMY_TAG, -1)
 	, m_out_irq_cb(*this)
 	, m_out_nmi_cb(*this)
 	, m_device(nullptr)
-	, m_cputag(nullptr)
 {
 }
+
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void a1bus_device::device_start()
+void a1bus_device::device_resolve_objects()
 {
-	m_maincpu = machine().device<cpu_device>(m_cputag);
-
 	// resolve callbacks
 	m_out_irq_cb.resolve_safe();
 	m_out_nmi_cb.resolve_safe();
+}
 
+void a1bus_device::device_start()
+{
 	// clear slot
 	m_device = nullptr;
 }
@@ -101,7 +106,7 @@ void a1bus_device::device_reset()
 
 device_a1bus_card_interface *a1bus_device::get_a1bus_card()
 {
-		return m_device;
+	return m_device;
 }
 
 void a1bus_device::add_a1bus_card(device_a1bus_card_interface *card)
@@ -121,17 +126,13 @@ void a1bus_device::set_nmi_line(int state)
 
 void a1bus_device::install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler)
 {
-	m_maincpu = machine().device<cpu_device>(m_cputag);
-
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(start, end, rhandler, whandler);
+	m_space->install_readwrite_handler(start, end, rhandler, whandler);
 }
 
 void a1bus_device::install_bank(offs_t start, offs_t end, const char *tag, uint8_t *data)
 {
 //  printf("install_bank: %s @ %x->%x\n", tag, start, end);
-	m_maincpu = machine().device<cpu_device>(m_cputag);
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.install_readwrite_bank(start, end, tag );
+	m_space->install_readwrite_bank(start, end, tag);
 	machine().root_device().membank(siblingtag(tag).c_str())->set_base(data);
 }
 
@@ -153,9 +154,9 @@ WRITE_LINE_MEMBER( a1bus_device::nmi_w ) { m_out_nmi_cb(state); }
 //-------------------------------------------------
 
 device_a1bus_card_interface::device_a1bus_card_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device),
-		m_a1bus(nullptr),
-		m_a1bus_tag(nullptr), m_a1bus_slottag(nullptr), m_next(nullptr)
+	: device_interface(device, "a1bus")
+	, m_a1bus_finder(device, finder_base::DUMMY_TAG), m_a1bus(nullptr)
+	, m_a1bus_slottag(nullptr), m_next(nullptr)
 {
 }
 
@@ -168,10 +169,24 @@ device_a1bus_card_interface::~device_a1bus_card_interface()
 {
 }
 
-
-void device_a1bus_card_interface::set_a1bus_device()
+void device_a1bus_card_interface::interface_validity_check(validity_checker &valid) const
 {
-	m_a1bus = dynamic_cast<a1bus_device *>(device().machine().device(m_a1bus_tag));
+	if (m_a1bus_finder && m_a1bus && (m_a1bus != m_a1bus_finder))
+		osd_printf_error("Contradictory buses configured (%s and %s)\n", m_a1bus_finder->tag(), m_a1bus->tag());
+}
+
+void device_a1bus_card_interface::interface_pre_start()
+{
+	if (!m_a1bus)
+	{
+		m_a1bus = m_a1bus_finder;
+		if (!m_a1bus)
+			fatalerror("Can't find Apple I Bus device %s\n", m_a1bus_finder.finder_tag());
+	}
+
+	if (!m_a1bus->started())
+		throw device_missing_dependencies();
+
 	m_a1bus->add_a1bus_card(this);
 }
 
@@ -180,7 +195,7 @@ void device_a1bus_card_interface::install_device(offs_t start, offs_t end, read8
 	m_a1bus->install_device(start, end, rhandler, whandler);
 }
 
-void device_a1bus_card_interface::install_bank(offs_t start, offs_t end, char *tag, uint8_t *data)
+void device_a1bus_card_interface::install_bank(offs_t start, offs_t end, const char *tag, uint8_t *data)
 {
 	m_a1bus->install_bank(start, end, tag, data);
 }

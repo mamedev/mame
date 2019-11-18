@@ -420,7 +420,7 @@ TMS340X0_SCANLINE_IND16_CB_MEMBER(harddriv_state::scanline_driver)
 	for (x = params->heblnk; x < params->hsblnk; x++)
 		dest[x] = m_gfx_palettebank * 256 + vram_base[BYTE_XOR_LE(coladdr++ & 0xfff)];
 
-	if (scanline == screen.visible_area().max_y)
+	if (scanline == screen.visible_area().bottom())
 		display_speedups();
 }
 
@@ -438,6 +438,6 @@ TMS340X0_SCANLINE_IND16_CB_MEMBER(harddriv_state::scanline_multisync)
 	for (x = params->heblnk; x < params->hsblnk; x++)
 		dest[x] = m_gfx_palettebank * 256 + vram_base[BYTE_XOR_LE(coladdr++ & 0x7ff)];
 
-	if (scanline == screen.visible_area().max_y)
+	if (scanline == screen.visible_area().bottom())
 		display_speedups();
 }

@@ -17,81 +17,31 @@
 #include <memory>
 #include <utility>
 
-
-#define MCFG_DSP16_EXM(exm) \
-		downcast<dsp16_device_base &>(*device).exm_w(exm);
-
-#define MCFG_DSP16_EXM_HIGH() \
-		downcast<dsp16_device_base &>(*device).exm_w(1);
-
-#define MCFG_DSP16_EXM_LOW() \
-		downcast<dsp16_device_base &>(*device).exm_w(0);
-
-#define MCFG_DSP16_IACK_CB(obj) \
-		downcast<dsp16_device_base &>(*device).set_iack_cb(DEVCB_##obj);
-
-#define MCFG_DSP16_ICK_CB(obj) \
-		downcast<dsp16_device_base &>(*device).set_ick_cb(DEVCB_##obj);
-
-#define MCFG_DSP16_ILD_CB(obj) \
-		downcast<dsp16_device_base &>(*device).set_ild_cb(DEVCB_##obj);
-
-#define MCFG_DSP16_DO_CB(obj) \
-		downcast<dsp16_device_base &>(*device).set_do_cb(DEVCB_##obj);
-
-#define MCFG_DSP16_OCK_CB(obj) \
-		downcast<dsp16_device_base &>(*device).set_ock_cb(DEVCB_##obj);
-
-#define MCFG_DSP16_OLD_CB(obj) \
-		downcast<dsp16_device_base &>(*device).set_old_cb(DEVCB_##obj);
-
-#define MCFG_DSP16_OSE_CB(obj) \
-		downcast<dsp16_device_base &>(*device).set_ose_cb(DEVCB_##obj);
-
-#define MCFG_DSP16_PIO_R_CB(obj) \
-		downcast<dsp16_device_base &>(*device).set_pio_r_cb(DEVCB_##obj);
-
-#define MCFG_DSP16_PIO_W_CB(obj) \
-		downcast<dsp16_device_base &>(*device).set_pio_w_cb(DEVCB_##obj);
-
-#define MCFG_DSP16_PDB_W_CB(obj) \
-		downcast<dsp16_device_base &>(*device).set_pdb_w_cb(DEVCB_##obj);
-
-#define MCFG_DSP16_PSEL_CB(obj) \
-		downcast<dsp16_device_base &>(*device).set_psel_cb(DEVCB_##obj);
-
-#define MCFG_DSP16_PIDS_CB(obj) \
-		downcast<dsp16_device_base &>(*device).set_pids_cb(DEVCB_##obj);
-
-#define MCFG_DSP16_PODS_CB(obj) \
-		downcast<dsp16_device_base &>(*device).set_pods_cb(DEVCB_##obj);
-
-
 class dsp16_device_base : public cpu_device, protected dsp16_disassembler::cpu
 {
 public:
 	DECLARE_WRITE_LINE_MEMBER(exm_w);
 
 	// interrupt output callbacks
-	template <typename Obj> devcb_base *set_iack_cb(Obj &&cb) { return &m_iack_cb.set_callback(std::forward<Obj>(cb)); }
+	auto iack_cb() { return m_iack_cb.bind(); }
 
 	// serial output callbacks
-	template <typename Obj> devcb_base *set_ick_cb(Obj &&cb) { return &m_ick_cb.set_callback(std::forward<Obj>(cb)); }
-	template <typename Obj> devcb_base *set_ild_cb(Obj &&cb) { return &m_ild_cb.set_callback(std::forward<Obj>(cb)); }
-	template <typename Obj> devcb_base *set_do_cb(Obj &&cb) { return &m_do_cb.set_callback(std::forward<Obj>(cb)); }
-	template <typename Obj> devcb_base *set_ock_cb(Obj &&cb) { return &m_ock_cb.set_callback(std::forward<Obj>(cb)); }
-	template <typename Obj> devcb_base *set_old_cb(Obj &&cb) { return &m_old_cb.set_callback(std::forward<Obj>(cb)); }
-	template <typename Obj> devcb_base *set_ose_cb(Obj &&cb) { return &m_ose_cb.set_callback(std::forward<Obj>(cb)); }
+	auto ick_cb() { return m_ick_cb.bind(); }
+	auto ild_cb() { return m_ild_cb.bind(); }
+	auto do_cb() { return m_do_cb.bind(); }
+	auto ock_cb() { return m_ock_cb.bind(); }
+	auto old_cb() { return m_old_cb.bind(); }
+	auto ose_cb() { return m_ose_cb.bind(); }
 
 	// high-level active parallel I/O callbacks
-	template <typename Obj> devcb_base *set_pio_r_cb(Obj &&cb) { return &m_pio_r_cb.set_callback(std::forward<Obj>(cb)); }
-	template <typename Obj> devcb_base *set_pio_w_cb(Obj &&cb) { return &m_pio_w_cb.set_callback(std::forward<Obj>(cb)); }
+	auto pio_r_cb() { return m_pio_r_cb.bind(); }
+	auto pio_w_cb() { return m_pio_w_cb.bind(); }
 
 	// low-level parallel I/O callbacks
-	template <typename Obj> devcb_base *set_pdb_w_cb(Obj &&cb) { return &m_pdb_w_cb.set_callback(std::forward<Obj>(cb)); }
-	template <typename Obj> devcb_base *set_psel_cb(Obj &&cb) { return &m_psel_cb.set_callback(std::forward<Obj>(cb)); }
-	template <typename Obj> devcb_base *set_pids_cb(Obj &&cb) { return &m_pids_cb.set_callback(std::forward<Obj>(cb)); }
-	template <typename Obj> devcb_base *set_pods_cb(Obj &&cb) { return &m_pods_cb.set_callback(std::forward<Obj>(cb)); }
+	auto pdb_w_cb() { return m_pdb_w_cb.bind(); }
+	auto psel_cb() { return m_psel_cb.bind(); }
+	auto pids_cb() { return m_pids_cb.bind(); }
+	auto pods_cb() { return m_pods_cb.bind(); }
 
 	// interrupt outputs
 	DECLARE_READ_LINE_MEMBER(iack_r) { return m_iack_out; }
@@ -131,9 +81,9 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface implementation
-	virtual u64 execute_clocks_to_cycles(u64 clocks) const override { return (clocks + 2 - 1) >> 1; }
-	virtual u64 execute_cycles_to_clocks(u64 cycles) const override { return cycles << 1; }
-	virtual u32 execute_input_lines() const override { return 5U; }
+	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override { return (clocks + 2 - 1) >> 1; }
+	virtual u64 execute_cycles_to_clocks(u64 cycles) const noexcept override { return cycles << 1; }
+	virtual u32 execute_input_lines() const noexcept override { return 5U; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -325,7 +275,7 @@ private:
 	// memory system access
 	required_shared_ptr<u16>    m_workram;
 	address_space               *m_spaces[3];
-	direct_read_data<-1>        *m_direct;
+	memory_access_cache<1, -1, ENDIANNESS_BIG> *m_pcache;
 	u16                         m_workram_mask;
 
 	// recompiler stuff

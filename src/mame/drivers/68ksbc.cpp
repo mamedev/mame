@@ -42,8 +42,10 @@ public:
 	{ }
 
 	void c68ksbc(machine_config &config);
-	void c68ksbc_mem(address_map &map);
+
 private:
+	void c68ksbc_mem(address_map &map);
+
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -61,23 +63,23 @@ static INPUT_PORTS_START( c68ksbc )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(c68ksbc_state::c68ksbc)
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 8000000) // text says 8MHz, schematic says 10MHz
-	MCFG_CPU_PROGRAM_MAP(c68ksbc_mem)
+void c68ksbc_state::c68ksbc(machine_config &config)
+{
+	M68000(config, m_maincpu, 8000000); // text says 8MHz, schematic says 10MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &c68ksbc_state::c68ksbc_mem);
 
-	MCFG_DEVICE_ADD("acia", ACIA6850, 0)
-	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	acia6850_device &acia(ACIA6850(config, "acia", 0));
+	acia.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	acia.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia", acia6850_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia", acia6850_device, write_cts))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set("acia", FUNC(acia6850_device::write_rxd));
+	rs232.cts_handler().set("acia", FUNC(acia6850_device::write_cts));
 
-	MCFG_DEVICE_ADD("acia_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("acia", acia6850_device, write_txc))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia", acia6850_device, write_rxc))
-MACHINE_CONFIG_END
+	clock_device &acia_clock(CLOCK(config, "acia_clock", 153600));
+	acia_clock.signal_handler().set("acia", FUNC(acia6850_device::write_txc));
+	acia_clock.signal_handler().append("acia", FUNC(acia6850_device::write_rxc));
+}
 
 /* ROM definition */
 ROM_START( 68ksbc )
@@ -87,5 +89,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    CLASS           INIT  COMPANY             FULLNAME                     FLAGS */
-COMP( 2002, 68ksbc,   0,       0,    c68ksbc,   c68ksbc, c68ksbc_state,  0,    "Wichit Sirichote", "68k Single Board Computer", MACHINE_NO_SOUND_HW)
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY             FULLNAME                     FLAGS */
+COMP( 2002, 68ksbc, 0,      0,      c68ksbc, c68ksbc, c68ksbc_state, empty_init, "Wichit Sirichote", "68k Single Board Computer", MACHINE_NO_SOUND_HW)

@@ -27,12 +27,12 @@ Titles, serial #s, publishers and release dates taken from:
 		<info name="alt_title" value="九玉伝"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="416688">
-				<rom name="9gyokuden_a.d77" size="416688" crc="c3757455" sha1="dcf9d2422daa7920d91c26171dd0334e65cf15f8" offset="000000" />
+				<rom name="9gyokuden_a.d77" size="416688" crc="c3757455" sha1="dcf9d2422daa7920d91c26171dd0334e65cf15f8"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="416688">
-				<rom name="9gyokuden_b.d77" size="416688" crc="d34cd804" sha1="a39338e29255c7fe8b60a1b43f8fd9500e76fb7a" offset="000000" />
+				<rom name="9gyokuden_b.d77" size="416688" crc="d34cd804" sha1="a39338e29255c7fe8b60a1b43f8fd9500e76fb7a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -46,12 +46,12 @@ Titles, serial #s, publishers and release dates taken from:
 		<info name="alt_title" value="九玉伝"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="416688">
-				<rom name="kugyokuden (1986)(tecno soft)(jp) (disk 1).d77" size="416688" crc="98160ebc" sha1="06933c513916a89888be7a67c45752cef5e9e7e6" offset="000000" />
+				<rom name="kugyokuden (1986)(tecno soft)(jp) (disk 1).d77" size="416688" crc="98160ebc" sha1="06933c513916a89888be7a67c45752cef5e9e7e6"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="416688">
-				<rom name="9gyokuden_b.d77" size="416688" crc="d34cd804" sha1="a39338e29255c7fe8b60a1b43f8fd9500e76fb7a" offset="000000" />
+				<rom name="9gyokuden_b.d77" size="416688" crc="d34cd804" sha1="a39338e29255c7fe8b60a1b43f8fd9500e76fb7a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -77,12 +77,12 @@ Titles, serial #s, publishers and release dates taken from:
 		<info name="alt_title" value="アルゴー"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348576">
-				<rom name="argo_a.d77" size="348576" crc="a16e0351" sha1="38502279d0db666f8aa73fde34a7b1557141d3d6" offset="000000" />
+				<rom name="argo_a.d77" size="348576" crc="a16e0351" sha1="38502279d0db666f8aa73fde34a7b1557141d3d6"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-				<rom name="argo_b.d77" size="348848" crc="0c380a2d" sha1="37582d8cb4562711537ba2e9c06e9827b250a4ca" offset="000000" />
+				<rom name="argo_b.d77" size="348848" crc="0c380a2d" sha1="37582d8cb4562711537ba2e9c06e9827b250a4ca"/>
 			</dataarea>
 		</part>
 	</software>
@@ -97,12 +97,12 @@ Titles, serial #s, publishers and release dates taken from:
 		<info name="alt_title" value="ディーヴァ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-				<rom name="daiva_a.d77" size="348848" crc="80e45da2" sha1="576741ef1cf5f4821634414bfe4ffa4904e4904a" offset="000000" />
+				<rom name="daiva_a.d77" size="348848" crc="80e45da2" sha1="576741ef1cf5f4821634414bfe4ffa4904e4904a"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-				<rom name="daiva_b.d77" size="348848" crc="83f48c67" sha1="e182bc6186a185de89acc492ccdb69eb42a30dea" offset="000000" />
+				<rom name="daiva_b.d77" size="348848" crc="83f48c67" sha1="e182bc6186a185de89acc492ccdb69eb42a30dea"/>
 			</dataarea>
 		</part>
 	</software>
@@ -117,17 +117,17 @@ Titles, serial #s, publishers and release dates taken from:
 		<info name="alt_title" value="デスフォース"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="392880">
-				<rom name="dforce1.d77" size="392880" crc="968512c6" sha1="fe7fe9bec16949a4f24cbdb7b1e842c743d4688d" offset="000000" />
+				<rom name="dforce1.d77" size="392880" crc="968512c6" sha1="fe7fe9bec16949a4f24cbdb7b1e842c743d4688d"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="473776">
-				<rom name="user disk.d77" size="473776" crc="0e342f31" sha1="32a5a85b36b646da6f9e8bbd48b9e27d2bd1857c" offset="000000" />
+				<rom name="user disk.d77" size="473776" crc="0e342f31" sha1="32a5a85b36b646da6f9e8bbd48b9e27d2bd1857c"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="392880">
-				<rom name="dforce2.d77" size="392880" crc="c7feb23c" sha1="fb5a25c736c20a2dd0ba3ac2be488612c7017855" offset="000000" />
+				<rom name="dforce2.d77" size="392880" crc="c7feb23c" sha1="fb5a25c736c20a2dd0ba3ac2be488612c7017855"/>
 			</dataarea>
 		</part>
 	</software>
@@ -140,12 +140,12 @@ Titles, serial #s, publishers and release dates taken from:
 		<info name="alt_title" value="ディープフォレスト"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-				<rom name="dforst_a.d77" size="348848" crc="3077a74a" sha1="88a8d8e0dd189612356ae80b70d2d1e4448e0a5f" offset="000000" />
+				<rom name="dforst_a.d77" size="348848" crc="3077a74a" sha1="88a8d8e0dd189612356ae80b70d2d1e4448e0a5f"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-				<rom name="dforst_b.d77" size="348848" crc="1f7ffa3f" sha1="cfa6d67a16bb7b0ceb5f260bba9ed2772eeb33df" offset="000000" />
+				<rom name="dforst_b.d77" size="348848" crc="1f7ffa3f" sha1="cfa6d67a16bb7b0ceb5f260bba9ed2772eeb33df"/>
 			</dataarea>
 		</part>
 	</software>
@@ -180,7 +180,7 @@ Titles, serial #s, publishers and release dates taken from:
 		<info name="alt_title" value="ドラゴンバスター"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-				<rom name="drabus.d77" size="348848" crc="6100e7f0" sha1="4671fadc689cb3e0c708119082f0db083d260232" offset="000000" />
+				<rom name="drabus.d77" size="348848" crc="6100e7f0" sha1="4671fadc689cb3e0c708119082f0db083d260232"/>
 			</dataarea>
 		</part>
 	</software>
@@ -206,7 +206,7 @@ Titles, serial #s, publishers and release dates taken from:
 		<info name="alt_title" value="ドルアーガノトウ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-				<rom name="druaga.d77" size="348848" crc="2d5e1a08" sha1="c6cdcf38ca98514c96dab84eed22ed8cb277c54b" offset="000000" />
+				<rom name="druaga.d77" size="348848" crc="2d5e1a08" sha1="c6cdcf38ca98514c96dab84eed22ed8cb277c54b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -218,7 +218,7 @@ Titles, serial #s, publishers and release dates taken from:
 		<publisher>&lt;Unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-				<rom name="dsenryaku.d77" size="348848" crc="35f02f75" sha1="f590c7f2d3d1b602274bef5e1992babf4acfebc3" offset="000000" />
+				<rom name="dsenryaku.d77" size="348848" crc="35f02f75" sha1="f590c7f2d3d1b602274bef5e1992babf4acfebc3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -230,7 +230,7 @@ Titles, serial #s, publishers and release dates taken from:
 		<info name="serial" value="12130"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-				<rom name="fireball.d77" size="348848" crc="40562d43" sha1="1bf32a4ec4600ce9ba9ebdc8233311ed08dc8f52" offset="000000" />
+				<rom name="fireball.d77" size="348848" crc="40562d43" sha1="1bf32a4ec4600ce9ba9ebdc8233311ed08dc8f52"/>
 			</dataarea>
 		</part>
 	</software>
@@ -243,7 +243,7 @@ Titles, serial #s, publishers and release dates taken from:
 		<info name="alt_title" value="ホットドッグ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="364976">
-				<rom name="hotdog.d77" size="364976" crc="4e63fa35" sha1="6f094715edbe60edbb091e3b5f8bcbf6e019be6c" offset="000000" />
+				<rom name="hotdog.d77" size="364976" crc="4e63fa35" sha1="6f094715edbe60edbb091e3b5f8bcbf6e019be6c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -285,22 +285,22 @@ Titles, serial #s, publishers and release dates taken from:
 		<info name="alt_title" value="琥珀色の遺言"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="473776">
-				<rom name="kohaku1d.d77" size="473776" crc="3778278b" sha1="ee61c6756bd6a882056c8123e56491de3e7681cb" offset="000000" />
+				<rom name="kohaku1d.d77" size="473776" crc="3778278b" sha1="ee61c6756bd6a882056c8123e56491de3e7681cb"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="473776">
-				<rom name="kohaku2d.d77" size="473776" crc="029f9afe" sha1="0810835a6e9cf3774c66e2f5081d9a4ad435e948" offset="000000" />
+				<rom name="kohaku2d.d77" size="473776" crc="029f9afe" sha1="0810835a6e9cf3774c66e2f5081d9a4ad435e948"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="473776">
-				<rom name="kohaku3d.d77" size="473776" crc="a2dce416" sha1="14259104d2a023876becd09b461c9a7cd512506e" offset="000000" />
+				<rom name="kohaku3d.d77" size="473776" crc="a2dce416" sha1="14259104d2a023876becd09b461c9a7cd512506e"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="473776">
-				<rom name="kohaku4d.d77" size="473776" crc="a317b71d" sha1="c45ea740ce2138b15e5ff2db4e1282539809cdc0" offset="000000" />
+				<rom name="kohaku4d.d77" size="473776" crc="a317b71d" sha1="c45ea740ce2138b15e5ff2db4e1282539809cdc0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -313,22 +313,22 @@ Titles, serial #s, publishers and release dates taken from:
 		<info name="alt_title" value="琥珀色の遺言"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="416384">
-				<rom name="k1.d77" size="416384" crc="00e0c527" sha1="7017440ad4f2eb09e0d036905dca010bfb31aff0" offset="000000" />
+				<rom name="k1.d77" size="416384" crc="00e0c527" sha1="7017440ad4f2eb09e0d036905dca010bfb31aff0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="416688">
-				<rom name="k2.d77" size="416688" crc="cc35b1d0" sha1="622a69b1156849d9d6c3f4965bbf0949d41b5c36" offset="000000" />
+				<rom name="k2.d77" size="416688" crc="cc35b1d0" sha1="622a69b1156849d9d6c3f4965bbf0949d41b5c36"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="416688">
-				<rom name="k3.d77" size="416688" crc="a98a8b0c" sha1="1b9b521f4b2ec79fa3e28a2c7d16d8d776f0684b" offset="000000" />
+				<rom name="k3.d77" size="416688" crc="a98a8b0c" sha1="1b9b521f4b2ec79fa3e28a2c7d16d8d776f0684b"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="416688">
-				<rom name="k4.d77" size="416688" crc="c03f7ff5" sha1="8fd07d1fa49e6b07b02175ed63e7d08b11c15d16" offset="000000" />
+				<rom name="k4.d77" size="416688" crc="c03f7ff5" sha1="8fd07d1fa49e6b07b02175ed63e7d08b11c15d16"/>
 			</dataarea>
 		</part>
 	</software>
@@ -342,12 +342,12 @@ Titles, serial #s, publishers and release dates taken from:
 		<info name="alt_title" value="レイドック"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="414992">
-				<rom name="laydock1.d77" size="414992" crc="32cc60c2" sha1="d6949201ddbf624586c1169a4fddef086d4cb8dc" offset="000000" />
+				<rom name="laydock1.d77" size="414992" crc="32cc60c2" sha1="d6949201ddbf624586c1169a4fddef086d4cb8dc"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="122544">
-				<rom name="laydock2.d77" size="122544" crc="ad50c9ae" sha1="c930a37e4e7d283799c0693f8fd8ba787cee93af" offset="000000" />
+				<rom name="laydock2.d77" size="122544" crc="ad50c9ae" sha1="c930a37e4e7d283799c0693f8fd8ba787cee93af"/>
 			</dataarea>
 		</part>
 	</software>
@@ -361,12 +361,12 @@ Titles, serial #s, publishers and release dates taken from:
 		<info name="alt_title" value="レイドック"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="414992">
-				<rom name="laydocka1.d77" size="416048" crc="3b53877e" sha1="e2f3579fe93622a74fb07d0b8d2cd7bfb2b39132" offset="000000" />
+				<rom name="laydocka1.d77" size="416048" crc="3b53877e" sha1="e2f3579fe93622a74fb07d0b8d2cd7bfb2b39132"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="122544">
-				<rom name="laydocka2.d77" size="122544" crc="93ec6454" sha1="cae77215f6acf7d47d0b914f148c4f4f4fc804fa" offset="000000" />
+				<rom name="laydocka2.d77" size="122544" crc="93ec6454" sha1="cae77215f6acf7d47d0b914f148c4f4f4fc804fa"/>
 			</dataarea>
 		</part>
 	</software>
@@ -383,12 +383,12 @@ Titles, serial #s, publishers and release dates taken from:
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="414992">
-				<rom name="laydock (disk 1).d77" size="416048" crc="3b53877e" sha1="e2f3579fe93622a74fb07d0b8d2cd7bfb2b39132" offset="000000" />
+				<rom name="laydock (disk 1).d77" size="416048" crc="3b53877e" sha1="e2f3579fe93622a74fb07d0b8d2cd7bfb2b39132"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="122544">
-				<rom name="laydock (disk 2).d77" size="122544" crc="cdc8d21d" sha1="ce4f3e5b4601afc2882ce2abc55d08e41048dc8d" offset="000000" />
+				<rom name="laydock (disk 2).d77" size="122544" crc="cdc8d21d" sha1="ce4f3e5b4601afc2882ce2abc55d08e41048dc8d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -401,12 +401,12 @@ Titles, serial #s, publishers and release dates taken from:
 		<info name="alt_title" value="ルクソール"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="416688">
-				<rom name="luxsor_1.d77" size="416688" crc="360d26f1" sha1="86fba737fc65fbcb5960c8e475108065c7791b34" offset="000000" />
+				<rom name="luxsor_1.d77" size="416688" crc="360d26f1" sha1="86fba737fc65fbcb5960c8e475108065c7791b34"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="416688">
-				<rom name="luxsor_2.d77" size="416688" crc="45c71456" sha1="393e8d419778000058982ad04bd72f17e37349a2" offset="000000" />
+				<rom name="luxsor_2.d77" size="416688" crc="45c71456" sha1="393e8d419778000058982ad04bd72f17e37349a2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -441,7 +441,7 @@ Titles, serial #s, publishers and release dates taken from:
 		<info name="alt_title" value="メタルエックス"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="473776">
-				<rom name="metalx.d77" size="473776" crc="5f93cd68" sha1="a651931d03fbb018187fd0f851e6e1ae3c6b4fd4" offset="000000" />
+				<rom name="metalx.d77" size="473776" crc="5f93cd68" sha1="a651931d03fbb018187fd0f851e6e1ae3c6b4fd4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -454,7 +454,7 @@ Titles, serial #s, publishers and release dates taken from:
 		<info name="alt_title" value="少年マイクのひとり旅"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-				<rom name="mike.d77" size="348848" crc="4ba9d06d" sha1="70eefd207ca9d146534c7d8f295b941415f5f9ec" offset="000000" />
+				<rom name="mike.d77" size="348848" crc="4ba9d06d" sha1="70eefd207ca9d146534c7d8f295b941415f5f9ec"/>
 			</dataarea>
 		</part>
 	</software>
@@ -467,22 +467,22 @@ Titles, serial #s, publishers and release dates taken from:
 		<info name="alt_title" value="マイトアンドマジック"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-				<rom name="mm1_a.d77" size="348848" crc="40f89403" sha1="a474db8952f91443ebaf79957cca0237d7d58e36" offset="000000" />
+				<rom name="mm1_a.d77" size="348848" crc="40f89403" sha1="a474db8952f91443ebaf79957cca0237d7d58e36"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-				<rom name="mm1_b.d77" size="348848" crc="e14992f6" sha1="ce71077fb63ffef1fd47107a4f481c8d4fa083f7" offset="000000" />
+				<rom name="mm1_b.d77" size="348848" crc="e14992f6" sha1="ce71077fb63ffef1fd47107a4f481c8d4fa083f7"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-				<rom name="mm1_c.d77" size="348848" crc="ff56dedb" sha1="05cedbbd313659246e65b3311e71aa2594213609" offset="000000" />
+				<rom name="mm1_c.d77" size="348848" crc="ff56dedb" sha1="05cedbbd313659246e65b3311e71aa2594213609"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-				<rom name="mm1_d.d77" size="348848" crc="f2b3dfb0" sha1="f448cecfca9dc88e72a71f9784f5216c822f74ca" offset="000000" />
+				<rom name="mm1_d.d77" size="348848" crc="f2b3dfb0" sha1="f448cecfca9dc88e72a71f9784f5216c822f74ca"/>
 			</dataarea>
 		</part>
 	</software>
@@ -495,22 +495,22 @@ Titles, serial #s, publishers and release dates taken from:
 		<info name="alt_title" value="マイトアンドマジック"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-				<rom name="might and magic (1987)(star craft)(jp) (disk 1).d77" size="348848" crc="bd47a2aa" sha1="ab3de776f3bc2b0282698a3d81ff18447ae0601c" offset="000000" />
+				<rom name="might and magic (1987)(star craft)(jp) (disk 1).d77" size="348848" crc="bd47a2aa" sha1="ab3de776f3bc2b0282698a3d81ff18447ae0601c"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-				<rom name="mm1_b.d77" size="348848" crc="e14992f6" sha1="ce71077fb63ffef1fd47107a4f481c8d4fa083f7" offset="000000" />
+				<rom name="mm1_b.d77" size="348848" crc="e14992f6" sha1="ce71077fb63ffef1fd47107a4f481c8d4fa083f7"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-				<rom name="mm1_c.d77" size="348848" crc="ff56dedb" sha1="05cedbbd313659246e65b3311e71aa2594213609" offset="000000" />
+				<rom name="mm1_c.d77" size="348848" crc="ff56dedb" sha1="05cedbbd313659246e65b3311e71aa2594213609"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-				<rom name="mm1_d.d77" size="348848" crc="f2b3dfb0" sha1="f448cecfca9dc88e72a71f9784f5216c822f74ca" offset="000000" />
+				<rom name="mm1_d.d77" size="348848" crc="f2b3dfb0" sha1="f448cecfca9dc88e72a71f9784f5216c822f74ca"/>
 			</dataarea>
 		</part>
 	</software>
@@ -573,12 +573,12 @@ Titles, serial #s, publishers and release dates taken from:
 		<info name="alt_title" value="信長の野望全国版"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="380848">
-				<rom name="nobunaga_a.d77" size="380848" crc="32dff63d" sha1="9127dfcd4b42fc40581e32ceed1ce9d40c9c380b" offset="000000" />
+				<rom name="nobunaga_a.d77" size="380848" crc="32dff63d" sha1="9127dfcd4b42fc40581e32ceed1ce9d40c9c380b"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="380848">
-				<rom name="nobunaga_b.d77" size="380848" crc="432bc7ec" sha1="5d6acbc2c1e1833167057f0d0f1298ca7417f16f" offset="000000" />
+				<rom name="nobunaga_b.d77" size="380848" crc="432bc7ec" sha1="5d6acbc2c1e1833167057f0d0f1298ca7417f16f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -596,12 +596,12 @@ Titles, serial #s, publishers and release dates taken from:
 		<info name="alt_title" value="プロ野球ファン"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="416688">
-				<rom name="probbfan_a.d77" size="416688" crc="be418ab5" sha1="10c250261fcd2e7a92d23338f3759f826da16f59" offset="000000" />
+				<rom name="probbfan_a.d77" size="416688" crc="be418ab5" sha1="10c250261fcd2e7a92d23338f3759f826da16f59"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="416688">
-				<rom name="probbfan_b.d77" size="416688" crc="ae64088e" sha1="56f40ebc9c640f6608e235ce1adf4900b5e35d63" offset="000000" />
+				<rom name="probbfan_b.d77" size="416688" crc="ae64088e" sha1="56f40ebc9c640f6608e235ce1adf4900b5e35d63"/>
 			</dataarea>
 		</part>
 	</software>
@@ -699,12 +699,12 @@ Titles, serial #s, publishers and release dates taken from:
 		<info name="serial" value="KO-1028(FUWS19001)"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-				<rom name="ruin_a.d77" size="348848" crc="67ce97b8" sha1="0034e0a4999b92f548abc52607cd1b75bcc4f6c9" offset="000000" />
+				<rom name="ruin_a.d77" size="348848" crc="67ce97b8" sha1="0034e0a4999b92f548abc52607cd1b75bcc4f6c9"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-				<rom name="ruin_b.d77" size="348848" crc="45bdccc2" sha1="86baec6e7febc31d99ce1b71193a1b6dae21b0c8" offset="000000" />
+				<rom name="ruin_b.d77" size="348848" crc="45bdccc2" sha1="86baec6e7febc31d99ce1b71193a1b6dae21b0c8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -716,12 +716,12 @@ Titles, serial #s, publishers and release dates taken from:
 		<info name="alt_title" value="セレス"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-				<rom name="seles_a.d77" size="348848" crc="b75dc08f" sha1="ab085cafa1fd4c0ab0f0ff93301abce5ffda334d" offset="000000" />
+				<rom name="seles_a.d77" size="348848" crc="b75dc08f" sha1="ab085cafa1fd4c0ab0f0ff93301abce5ffda334d"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-				<rom name="seles_b.d77" size="348848" crc="b7646c75" sha1="47b9f46b2506e05457569cfdd3d63794206849d3" offset="000000" />
+				<rom name="seles_b.d77" size="348848" crc="b7646c75" sha1="47b9f46b2506e05457569cfdd3d63794206849d3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -736,12 +736,12 @@ Titles, serial #s, publishers and release dates taken from:
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-				<rom name="seles (disc a).d77" size="348848" crc="b75dc08f" sha1="ab085cafa1fd4c0ab0f0ff93301abce5ffda334d" offset="000000" />
+				<rom name="seles (disc a).d77" size="348848" crc="b75dc08f" sha1="ab085cafa1fd4c0ab0f0ff93301abce5ffda334d"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-				<rom name="seles (disc b).d77" size="348848" crc="77abb3c5" sha1="b409c7ffde557c392ef7648781b8d0b001b9391d" offset="000000" />
+				<rom name="seles (disc b).d77" size="348848" crc="77abb3c5" sha1="b409c7ffde557c392ef7648781b8d0b001b9391d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -754,12 +754,12 @@ Titles, serial #s, publishers and release dates taken from:
 		<info name="alt_title" value="スペースハリアー"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-				<rom name="sharriera.d77" size="348848" crc="2d6741dc" sha1="29e7a71293f3587a66fae9181480e32c06279498" offset="000000" />
+				<rom name="sharriera.d77" size="348848" crc="2d6741dc" sha1="29e7a71293f3587a66fae9181480e32c06279498"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-				<rom name="sharrierb.d77" size="348848" crc="3d40877f" sha1="8f86abf2fc8f2f92546939c843c6f8a1f4c311cd" offset="000000" />
+				<rom name="sharrierb.d77" size="348848" crc="3d40877f" sha1="8f86abf2fc8f2f92546939c843c6f8a1f4c311cd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -773,12 +773,12 @@ Titles, serial #s, publishers and release dates taken from:
 		<info name="alt_title" value="シルフィード"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">    <!-- Data CRC16: 28788 -->
-				<rom name="sil_a.d77" size="348848" crc="3233658c" sha1="0594a90a0462a6324f929cc2ec9d5788f496b248" offset="000000" />
+				<rom name="sil_a.d77" size="348848" crc="3233658c" sha1="0594a90a0462a6324f929cc2ec9d5788f496b248"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">    <!-- Data CRC16: 39767 -->
-				<rom name="sil_b.d77" size="348848" crc="4b298065" sha1="63e8c73165d6e871e5da413ec7606ad7724186a2" offset="000000" />
+				<rom name="sil_b.d77" size="348848" crc="4b298065" sha1="63e8c73165d6e871e5da413ec7606ad7724186a2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -796,12 +796,12 @@ Titles, serial #s, publishers and release dates taken from:
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">    <!-- Data CRC16: 28788 -->
-				<rom name="silpheed (disk 1).d77" size="348848" crc="fa446a5a" sha1="4da0ba7dad37e6698c71535c55c3b44c4fb80d69" offset="000000" />
+				<rom name="silpheed (disk 1).d77" size="348848" crc="fa446a5a" sha1="4da0ba7dad37e6698c71535c55c3b44c4fb80d69"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">    <!-- Data CRC16: 48335 -->
-				<rom name="silpheed (disk 2).d77" size="348848" crc="1fdaa3d7" sha1="456548ab6ae7a1acd1a6c59d8912345c2c6d0e63" offset="000000" />
+				<rom name="silpheed (disk 2).d77" size="348848" crc="1fdaa3d7" sha1="456548ab6ae7a1acd1a6c59d8912345c2c6d0e63"/>
 			</dataarea>
 		</part>
 	</software>
@@ -976,12 +976,12 @@ Titles, serial #s, publishers and release dates taken from:
 		<info name="alt_title" value="イース"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="415840">
-				<rom name="ys_ap.d77" size="415840" crc="d6f7544d" sha1="cc9686d21a765215130128bc94b544d73c4065dc" offset="000000" />
+				<rom name="ys_ap.d77" size="415840" crc="d6f7544d" sha1="cc9686d21a765215130128bc94b544d73c4065dc"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="415840">
-				<rom name="ys_bp.d77" size="415840" crc="289bc187" sha1="98fdc648d2e1efafe013b8ca0d76cc97a1259b3b" offset="000000" />
+				<rom name="ys_bp.d77" size="415840" crc="289bc187" sha1="98fdc648d2e1efafe013b8ca0d76cc97a1259b3b"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
@@ -1082,7 +1082,7 @@ Titles, serial #s, publishers and release dates taken from:
 		<info name="usage" value="Load F-BASIC first, then LOADM &quot;CALLEB&quot; and RUN &quot;MAIN&quot;"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="473776">
-				<rom name="pacris.d77" size="473776" crc="caf9666a" sha1="895446e7622c02362429fe43cfa7e119cf5d5b66" offset="000000" />
+				<rom name="pacris.d77" size="473776" crc="caf9666a" sha1="895446e7622c02362429fe43cfa7e119cf5d5b66"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1095,7 +1095,7 @@ Titles, serial #s, publishers and release dates taken from:
 		<publisher>富士通 (Fujitsu)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="353200">
-				<rom name="77avdemo.d77" size="353200" crc="7046810d" sha1="116a422147107943c0d378e99923cb14cd31a13f" offset="000000" />
+				<rom name="77avdemo.d77" size="353200" crc="7046810d" sha1="116a422147107943c0d378e99923cb14cd31a13f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1140,7 +1140,7 @@ Titles, serial #s, publishers and release dates taken from:
 		<publisher>富士通 (Fujitsu)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
-				<rom name="v33l11.d77" size="348848" crc="d5d8393a" sha1="14b97869f650e913bceea91f02b428768ae7afc6" offset="000000" />
+				<rom name="v33l11.d77" size="348848" crc="d5d8393a" sha1="14b97869f650e913bceea91f02b428768ae7afc6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1208,7 +1208,7 @@ Titles, serial #s, publishers and release dates taken from:
 		<year>1986</year>
 		<publisher>Kyoto Media</publisher>
 		<!--combined image (with hfe1->8)-->
-		<!--rom name="tfm-hfe.d77" size="3488480" crc="1D635297" sha1="BA40C6BC4D51BF33A657B53B7BAE201C95D2769B" offset="0" /-->
+		<!--rom name="tfm-hfe.d77" size="3488480" crc="1d635297" sha1="ba40c6bc4d51bf33a657b53b7bae201c95d2769b" offset="0" /-->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">

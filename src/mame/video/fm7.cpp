@@ -1087,7 +1087,7 @@ WRITE8_MEMBER(fm7_state::fm77av_sub_bank_w)
 			break;
 	}
 	// reset sub CPU, set busy flag, set reset flag
-	m_sub->set_input_line(INPUT_LINE_RESET,PULSE_LINE);
+	m_sub->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	m_video.sub_busy = 0x80;
 	m_video.sub_halt = 0;
 	m_video.sub_reset = 1;

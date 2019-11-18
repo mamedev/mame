@@ -19,7 +19,7 @@ namespace ui {
 class menu_device_config : public menu
 {
 public:
-	menu_device_config(mame_ui_manager &mui, render_container &container, device_slot_interface *slot, device_slot_option *option);
+	menu_device_config(mame_ui_manager &mui, render_container &container, device_slot_interface *slot, device_slot_interface::slot_option const *option);
 	virtual ~menu_device_config() override;
 
 private:
@@ -27,7 +27,7 @@ private:
 	virtual void handle() override;
 
 	device_slot_interface *m_owner;
-	device_slot_option *m_option;
+	device_slot_interface::slot_option const *m_option;
 	bool m_mounted;
 };
 

@@ -14,7 +14,7 @@ Option ROM booting instructions:
 
 		<part name="cart" interface="tandy200_cart">
 			<dataarea name="rom" size="0x8000">
-				<rom name="r2c200.bin" size="0x8000" crc="f0fb2d77" sha1="48c07cf283c327b5f703acc51c844cc347c8ecf6" offset="0x0000" />
+				<rom name="r2c200.bin" size="0x8000" crc="f0fb2d77" sha1="48c07cf283c327b5f703acc51c844cc347c8ecf6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -26,7 +26,7 @@ Option ROM booting instructions:
 
 		<part name="cart" interface="tandy200_cart">
 			<dataarea name="rom" size="0x8000">
-				<rom name="sard200.bin" size="0x8000" crc="3e853cf6" sha1="30b2b1ce50d00f75364a9ecd7a4283a6bc26c70d" offset="0x0000" />
+				<rom name="sard200.bin" size="0x8000" crc="3e853cf6" sha1="30b2b1ce50d00f75364a9ecd7a4283a6bc26c70d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -38,7 +38,7 @@ Option ROM booting instructions:
 
 		<part name="cart" interface="tandy200_cart">
 			<dataarea name="rom" size="0x8000">
-				<rom name="tsdos200.bin" size="0x8000" crc="94444744" sha1="0580347ca123ad88e0042eb94d4393a9bc133a15" offset="0x0000" />
+				<rom name="tsdos200.bin" size="0x8000" crc="94444744" sha1="0580347ca123ad88e0042eb94d4393a9bc133a15"/>
 			</dataarea>
 		</part>
 	</software>
@@ -50,7 +50,7 @@ Option ROM booting instructions:
 
 		<part name="cart" interface="tandy200_cart">
 			<dataarea name="rom" size="0x8000">
-				<rom name="ur2200.bin" size="0x8000" crc="771d4fdf" sha1="09bbe0c8cf690a62748ab1c9ffd82ba4c9388305" offset="0x0000" />
+				<rom name="ur2200.bin" size="0x8000" crc="771d4fdf" sha1="09bbe0c8cf690a62748ab1c9ffd82ba4c9388305"/>
 			</dataarea>
 		</part>
 	</software>

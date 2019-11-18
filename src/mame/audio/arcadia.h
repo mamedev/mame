@@ -4,13 +4,6 @@
 #define MAME_AUDIO_ARCADIA_H
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_ARCADIA_SOUND_ADD(_tag) \
-	MCFG_SOUND_ADD(_tag, ARCADIA_SOUND, 0)
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -20,7 +13,7 @@ class arcadia_sound_device : public device_t, public device_sound_interface
 {
 public:
 	// construction/destruction
-	arcadia_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	arcadia_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	DECLARE_WRITE8_MEMBER(write);
 protected:

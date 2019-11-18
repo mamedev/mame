@@ -6,12 +6,13 @@
 
 DEFINE_DEVICE_TYPE(NE2000, ne2000_device, "ne2000", "NE2000 Network Adapter")
 
-MACHINE_CONFIG_START(ne2000_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("dp8390d", DP8390D, 0)
-	MCFG_DP8390D_IRQ_CB(WRITELINE(ne2000_device, ne2000_irq_w))
-	MCFG_DP8390D_MEM_READ_CB(READ8(ne2000_device, ne2000_mem_read))
-	MCFG_DP8390D_MEM_WRITE_CB(WRITE8(ne2000_device, ne2000_mem_write))
-MACHINE_CONFIG_END
+void ne2000_device::device_add_mconfig(machine_config &config)
+{
+	DP8390D(config, m_dp8390, 0);
+	m_dp8390->irq_callback().set(FUNC(ne2000_device::ne2000_irq_w));
+	m_dp8390->mem_read_callback().set(FUNC(ne2000_device::ne2000_mem_read));
+	m_dp8390->mem_write_callback().set(FUNC(ne2000_device::ne2000_mem_write));
+}
 
 ne2000_device::ne2000_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock)
 	: device_t(mconfig, NE2000, tag, owner, clock),
@@ -30,7 +31,7 @@ void ne2000_device::device_start() {
 	memcpy(m_prom, mac, 6);
 	m_dp8390->set_mac(mac);
 	set_isa_device();
-	m_isa->install16_device(0x0300, 0x031f, read16_delegate(FUNC(ne2000_device::ne2000_port_r), this), write16_delegate(FUNC(ne2000_device::ne2000_port_w), this));
+	m_isa->install16_device(0x0300, 0x031f, read16_delegate(*this, FUNC(ne2000_device::ne2000_port_r)), write16_delegate(*this, FUNC(ne2000_device::ne2000_port_w)));
 }
 
 void ne2000_device::device_reset() {

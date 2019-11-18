@@ -6,7 +6,7 @@
  *
  *  19/08/2015
  *
- * I baught this board from http://www.retrotechnology.com without documentation.
+ * I bought this board from http://www.retrotechnology.com without documentation.
  * It has a Motorola 68000 CPU @ 10MHz and two 27128 EPROMS with OS9 DEBUG labels
  * and not much more except 16 or so TTLs, 2 PALs and a VME P1 connector. It is a
  * 2 layered pcb so it shold be possible to trace the schematics quite easily.
@@ -91,7 +91,7 @@
  * mailbox interrupt support. Standard MXbus side modules include additional DRAM.
  * SRAM, and I/O.
  *
- * Mizar's standard double- height (6U) processors provide additional features such
+ * Mizar's standard double-height (6U) processors provide additional features such
  * as a high-speed cache to enhance 68030 performance, floating, point coprocessor
  * support, up to four MB dual ported DRAM, VSB memory interface, Ethernet, and SCSI.
  *
@@ -179,8 +179,9 @@ mzr8105_state(const machine_config &mconfig, device_type type, const char *tag) 
 	}
 
 	void mzr8105(machine_config &config);
-	void mzr8105_mem(address_map &map);
+
 private:
+	void mzr8105_mem(address_map &map);
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -191,28 +192,29 @@ void mzr8105_state::mzr8105_mem(address_map &map)
 	map(0x000000, 0x003fff).rom().region("roms", 0x000000); /* System EPROM Area 16Kb OS9 DEBUG - not verified     */
 	map(0x004000, 0x01ffff).rom().region("roms", 0x004000);/* System EPROM Area 112Kb for System ROM - not verified    */
 	map(0x020000, 0x03ffff).ram(); /* Not verified */
-//  AM_RANGE (0x100000, 0xfeffff)  AM_READWRITE(vme_a24_r, vme_a24_w) /* VMEbus Rev B addresses (24 bits) - not verified */
-//  AM_RANGE (0xff0000, 0xffffff)  AM_READWRITE(vme_a16_r, vme_a16_w) /* VMEbus Rev B addresses (16 bits) - not verified */
+//  map(0x100000, 0xfeffff).rw(FUNC(mzr8105_state::vme_a24_r), FUNC(mzr8105_state::vme_a24_w)); /* VMEbus Rev B addresses (24 bits) - not verified */
+//  map(0xff0000, 0xffffff).rw(FUNC(mzr8105_state::vme_a16_r), FUNC(mzr8105_state::vme_a16_w)); /* VMEbus Rev B addresses (16 bits) - not verified */
 }
 
 /* Input ports */
 static INPUT_PORTS_START (mzr8105)
 INPUT_PORTS_END
 
-static SLOT_INTERFACE_START(mzr8105_vme_cards)
-	SLOT_INTERFACE("mzr8300", VME_MZR8300)
-SLOT_INTERFACE_END
+static void mzr8105_vme_cards(device_slot_interface &device)
+{
+	device.option_add("mzr8300", VME_MZR8300);
+}
 
 /*
  * Machine configuration
  */
-MACHINE_CONFIG_START(mzr8105_state::mzr8105)
-	MCFG_CPU_ADD ("maincpu", M68000, XTAL(10'000'000))
-	MCFG_CPU_PROGRAM_MAP (mzr8105_mem)
-	MCFG_VME_DEVICE_ADD("vme")
-	MCFG_VME_BUS_OWNER_SPACES()
-	MCFG_VME_SLOT_ADD ("vme", 1, mzr8105_vme_cards, "mzr8300")
-MACHINE_CONFIG_END
+void mzr8105_state::mzr8105(machine_config &config)
+{
+	M68000(config, m_maincpu, XTAL(10'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &mzr8105_state::mzr8105_mem);
+	VME(config, "vme", 0).use_owner_spaces();
+	VME_SLOT(config, "slot1", mzr8105_vme_cards, "mzr8300", 1, "vme");
+}
 
 /* ROM definitions */
 /* mzr8300 UPD7201 init sequence
@@ -224,11 +226,11 @@ MACHINE_CONFIG_END
  * :upd B Reg 05 <- 68 Tx 8 bit chars + Tx enable
  */
 ROM_START (mzr8105)
-	ROM_REGION (0x20000, "roms", 0)
-	ROM_LOAD16_BYTE ("mzros9lb.bin", 0x000000, 0x2000, CRC (7c6a354d) SHA1 (2721eb649c8046dbcb517a36a97dc0816cd133f2))
-	ROM_LOAD16_BYTE ("mzros9hb.bin", 0x000001, 0x2000, CRC (d18e69a6) SHA1 (a00b68f4d649bcc09a29361f8692e52be12b3792))
+	ROM_REGION16_BE(0x20000, "roms", 0)
+	ROM_LOAD16_BYTE ("mzros9lb.bin", 0x000001, 0x2000, CRC (7c6a354d) SHA1 (2721eb649c8046dbcb517a36a97dc0816cd133f2))
+	ROM_LOAD16_BYTE ("mzros9hb.bin", 0x000000, 0x2000, CRC (d18e69a6) SHA1 (a00b68f4d649bcc09a29361f8692e52be12b3792))
 ROM_END
 
 /* Driver */
-//    YEAR  NAME          PARENT  COMPAT   MACHINE         INPUT    CLASS           INIT  COMPANY      FULLNAME          FLAGS
-COMP (1987, mzr8105,      0,      0,       mzr8105,        mzr8105, mzr8105_state,  0,    "Mizar Inc", "Mizar VME8105",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY      FULLNAME         FLAGS
+COMP( 1987, mzr8105, 0,      0,      mzr8105, mzr8105, mzr8105_state, empty_init, "Mizar Inc", "Mizar VME8105", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

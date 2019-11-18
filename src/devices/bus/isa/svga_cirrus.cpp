@@ -30,14 +30,14 @@ DEFINE_DEVICE_TYPE(ISA16_SVGA_CIRRUS_GD542X, isa16_svga_cirrus_gd542x_device, "c
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(isa16_svga_cirrus_device::device_add_mconfig)
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(25'174'800),900,0,640,526,0,480)
-	MCFG_SCREEN_UPDATE_DEVICE("vga", cirrus_gd5430_device, screen_update)
+void isa16_svga_cirrus_device::device_add_mconfig(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
+	screen.set_screen_update("vga", FUNC(cirrus_gd5430_device::screen_update));
 
-	MCFG_DEVICE_ADD("vga", CIRRUS_GD5430, 0)
-	MCFG_VIDEO_SET_SCREEN("screen")
-MACHINE_CONFIG_END
+	CIRRUS_GD5430(config, m_vga, 0).set_screen("screen");
+}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -59,7 +59,7 @@ const tiny_rom_entry *isa16_svga_cirrus_device::device_rom_region() const
 isa16_svga_cirrus_device::isa16_svga_cirrus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ISA16_SVGA_CIRRUS, tag, owner, clock),
 	device_isa16_card_interface(mconfig, *this),
-	m_vga(nullptr)
+	m_vga(*this, "vga")
 {
 }
 
@@ -72,15 +72,13 @@ void isa16_svga_cirrus_device::device_start()
 {
 	set_isa_device();
 
-	m_vga = subdevice<cirrus_gd5430_device>("vga");
-
 	m_isa->install_rom(this, 0xc0000, 0xc7fff, "svga", "dm_clgd5430");
 
-	m_isa->install_device(0x03b0, 0x03bf, read8_delegate(FUNC(cirrus_gd5430_device::port_03b0_r),m_vga), write8_delegate(FUNC(cirrus_gd5430_device::port_03b0_w),m_vga));
-	m_isa->install_device(0x03c0, 0x03cf, read8_delegate(FUNC(cirrus_gd5430_device::port_03c0_r),m_vga), write8_delegate(FUNC(cirrus_gd5430_device::port_03c0_w),m_vga));
-	m_isa->install_device(0x03d0, 0x03df, read8_delegate(FUNC(cirrus_gd5430_device::port_03d0_r),m_vga), write8_delegate(FUNC(cirrus_gd5430_device::port_03d0_w),m_vga));
+	m_isa->install_device(0x03b0, 0x03bf, read8_delegate(*m_vga, FUNC(cirrus_gd5430_device::port_03b0_r)), write8_delegate(*m_vga, FUNC(cirrus_gd5430_device::port_03b0_w)));
+	m_isa->install_device(0x03c0, 0x03cf, read8_delegate(*m_vga, FUNC(cirrus_gd5430_device::port_03c0_r)), write8_delegate(*m_vga, FUNC(cirrus_gd5430_device::port_03c0_w)));
+	m_isa->install_device(0x03d0, 0x03df, read8_delegate(*m_vga, FUNC(cirrus_gd5430_device::port_03d0_r)), write8_delegate(*m_vga, FUNC(cirrus_gd5430_device::port_03d0_w)));
 
-	m_isa->install_memory(0xa0000, 0xbffff, read8_delegate(FUNC(cirrus_gd5430_device::mem_r),m_vga), write8_delegate(FUNC(cirrus_gd5430_device::mem_w),m_vga));
+	m_isa->install_memory(0xa0000, 0xbffff, read8_delegate(*m_vga, FUNC(cirrus_gd5430_device::mem_r)), write8_delegate(*m_vga, FUNC(cirrus_gd5430_device::mem_w)));
 }
 
 //-------------------------------------------------
@@ -110,14 +108,14 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(isa16_svga_cirrus_gd542x_device::device_add_mconfig)
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(25'174'800),900,0,640,526,0,480)
-	MCFG_SCREEN_UPDATE_DEVICE("vga", cirrus_gd5428_device, screen_update)
+void isa16_svga_cirrus_gd542x_device::device_add_mconfig(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
+	screen.set_screen_update("vga", FUNC(cirrus_gd5428_device::screen_update));
 
-	MCFG_DEVICE_ADD("vga", CIRRUS_GD5428, 0)
-	MCFG_VIDEO_SET_SCREEN("screen")
-MACHINE_CONFIG_END
+	CIRRUS_GD5428(config, m_vga, 0).set_screen("screen");
+}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -139,7 +137,7 @@ const tiny_rom_entry *isa16_svga_cirrus_gd542x_device::device_rom_region() const
 isa16_svga_cirrus_gd542x_device::isa16_svga_cirrus_gd542x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ISA16_SVGA_CIRRUS_GD542X, tag, owner, clock),
 	device_isa16_card_interface(mconfig, *this),
-	m_vga(nullptr)
+	m_vga(*this, "vga")
 {
 }
 
@@ -152,15 +150,13 @@ void isa16_svga_cirrus_gd542x_device::device_start()
 {
 	set_isa_device();
 
-	m_vga = subdevice<cirrus_gd5428_device>("vga");
-
 	m_isa->install_rom(this, 0xc0000, 0xc7fff, "svga", "clgd542x");
 
-	m_isa->install_device(0x03b0, 0x03bf, read8_delegate(FUNC(cirrus_gd5428_device::port_03b0_r),m_vga), write8_delegate(FUNC(cirrus_gd5428_device::port_03b0_w),m_vga));
-	m_isa->install_device(0x03c0, 0x03cf, read8_delegate(FUNC(cirrus_gd5428_device::port_03c0_r),m_vga), write8_delegate(FUNC(cirrus_gd5428_device::port_03c0_w),m_vga));
-	m_isa->install_device(0x03d0, 0x03df, read8_delegate(FUNC(cirrus_gd5428_device::port_03d0_r),m_vga), write8_delegate(FUNC(cirrus_gd5428_device::port_03d0_w),m_vga));
+	m_isa->install_device(0x03b0, 0x03bf, read8_delegate(*m_vga, FUNC(cirrus_gd5428_device::port_03b0_r)), write8_delegate(*m_vga, FUNC(cirrus_gd5428_device::port_03b0_w)));
+	m_isa->install_device(0x03c0, 0x03cf, read8_delegate(*m_vga, FUNC(cirrus_gd5428_device::port_03c0_r)), write8_delegate(*m_vga, FUNC(cirrus_gd5428_device::port_03c0_w)));
+	m_isa->install_device(0x03d0, 0x03df, read8_delegate(*m_vga, FUNC(cirrus_gd5428_device::port_03d0_r)), write8_delegate(*m_vga, FUNC(cirrus_gd5428_device::port_03d0_w)));
 
-	m_isa->install_memory(0xa0000, 0xbffff, read8_delegate(FUNC(cirrus_gd5428_device::mem_r),m_vga), write8_delegate(FUNC(cirrus_gd5428_device::mem_w),m_vga));
+	m_isa->install_memory(0xa0000, 0xbffff, read8_delegate(*m_vga, FUNC(cirrus_gd5428_device::mem_r)), write8_delegate(*m_vga, FUNC(cirrus_gd5428_device::mem_w)));
 }
 
 //-------------------------------------------------

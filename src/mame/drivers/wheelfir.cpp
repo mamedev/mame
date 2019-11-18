@@ -175,6 +175,7 @@ BIT N - ( scale < 50% ) ? 1 : 0
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "video/ramdac.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -222,7 +223,7 @@ private:
 	std::unique_ptr<int32_t[]> m_zoom_table;
 	std::unique_ptr<uint16_t[]> m_blitter_data;
 
-	scroll_info *m_scanlines;
+	std::unique_ptr<scroll_info[]> m_scanlines;
 
 	int32_t m_direct_write_x0;
 	int32_t m_direct_write_x1;
@@ -584,15 +585,15 @@ void wheelfir_state::wheelfir_main(address_map &map)
 	map(0x000000, 0x0fffff).rom();
 	map(0x200000, 0x20ffff).ram();
 
-	map(0x700000, 0x70001f).w(this, FUNC(wheelfir_state::wheelfir_blit_w));
+	map(0x700000, 0x70001f).w(FUNC(wheelfir_state::wheelfir_blit_w));
 	map(0x720001, 0x720001).w("ramdac", FUNC(ramdac_device::index_w));
 	map(0x720003, 0x720003).w("ramdac", FUNC(ramdac_device::pal_w));
 	map(0x720005, 0x720005).w("ramdac", FUNC(ramdac_device::mask_w)); // word write?
 	map(0x740000, 0x740001).w("soundlatch", FUNC(generic_latch_16_device::write));
-	map(0x760000, 0x760001).w(this, FUNC(wheelfir_state::coin_cnt_w));
+	map(0x760000, 0x760001).w(FUNC(wheelfir_state::coin_cnt_w));
 	map(0x780000, 0x78000f).rw("adc", FUNC(adc0808_device::data_r), FUNC(adc0808_device::address_offset_start_w)).umask16(0x00ff);
-	map(0x7a0000, 0x7a0001).w(this, FUNC(wheelfir_state::wheelfir_scanline_cnt_w));
-	map(0x7c0000, 0x7c0001).rw(this, FUNC(wheelfir_state::wheelfir_7c0000_r), FUNC(wheelfir_state::wheelfir_7c0000_w));
+	map(0x7a0000, 0x7a0001).w(FUNC(wheelfir_state::wheelfir_scanline_cnt_w));
+	map(0x7c0000, 0x7c0001).rw(FUNC(wheelfir_state::wheelfir_7c0000_r), FUNC(wheelfir_state::wheelfir_7c0000_w));
 	map(0x7e0000, 0x7e0001).portr("P1");
 	map(0x7e0002, 0x7e0003).portr("P2");
 }
@@ -605,8 +606,8 @@ void wheelfir_state::wheelfir_sub(address_map &map)
 
 	map(0x780000, 0x780001).r("soundlatch", FUNC(generic_latch_16_device::read));
 
-	map(0x700000, 0x700001).w("ldac", FUNC(dac_word_interface::write));
-	map(0x740000, 0x740001).w("rdac", FUNC(dac_word_interface::write));
+	map(0x700000, 0x700001).w("ldac", FUNC(dac_word_interface::data_w));
+	map(0x740000, 0x740001).w("rdac", FUNC(dac_word_interface::data_w));
 }
 
 
@@ -699,7 +700,7 @@ void wheelfir_state::machine_start()
 	m_zoom_table = std::make_unique<int32_t[]>(ZOOM_TABLE_SIZE);
 	m_blitter_data = std::make_unique<uint16_t[]>(16);
 
-	m_scanlines = reinterpret_cast<scroll_info*>(auto_alloc_array(machine(), uint8_t, sizeof(scroll_info)*(NUM_SCANLINES+NUM_VBLANK_LINES)));
+	m_scanlines = std::make_unique<scroll_info[]>(NUM_SCANLINES+NUM_VBLANK_LINES);
 
 
 	for(int i=0;i<(ZOOM_TABLE_SIZE);++i)
@@ -731,47 +732,49 @@ void wheelfir_state::ramdac_map(address_map &map)
 	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb888_w));
 }
 
-MACHINE_CONFIG_START(wheelfir_state::wheelfir)
+void wheelfir_state::wheelfir(machine_config &config)
+{
+	M68000(config, m_maincpu, 32000000/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &wheelfir_state::wheelfir_main);
 
-	MCFG_CPU_ADD("maincpu", M68000, 32000000/2)
-	MCFG_CPU_PROGRAM_MAP(wheelfir_main)
+	M68000(config, m_subcpu, 32000000/2);
+	m_subcpu->set_addrmap(AS_PROGRAM, &wheelfir_state::wheelfir_sub);
 
-	MCFG_CPU_ADD("subcpu", M68000, 32000000/2)
-	MCFG_CPU_PROGRAM_MAP(wheelfir_sub)
+	//config.set_maximum_quantum(attotime::from_hz(12000));
 
-	//MCFG_QUANTUM_TIME(attotime::from_hz(12000))
+	adc0808_device &adc(ADC0808(config, "adc", 500000)); // unknown clock
+	adc.eoc_ff_callback().set(FUNC(wheelfir_state::adc_eoc_w));
+	adc.in_callback<0>().set_ioport("STEERING");
+	adc.in_callback<1>().set_ioport("ACCELERATOR");
+	adc.in_callback<2>().set_ioport("BRAKE");
 
-	MCFG_DEVICE_ADD("adc", ADC0808, 500000) // unknown clock
-	MCFG_ADC0808_EOC_FF_CB(WRITELINE(wheelfir_state, adc_eoc_w))
-	MCFG_ADC0808_IN0_CB(IOPORT("STEERING"))
-	MCFG_ADC0808_IN1_CB(IOPORT("ACCELERATOR"))
-	MCFG_ADC0808_IN2_CB(IOPORT("BRAKE"))
+	TIMER(config, "scan_timer").configure_scanline(FUNC(wheelfir_state::scanline_timer_callback), "screen", 0, 1);
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scan_timer", wheelfir_state, scanline_timer_callback, "screen", 0, 1)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(336, NUM_SCANLINES+NUM_VBLANK_LINES);
+	m_screen->set_visarea(0,335, 0, NUM_SCANLINES-1);
+	m_screen->set_screen_update(FUNC(wheelfir_state::screen_update_wheelfir));
+	m_screen->screen_vblank().set(FUNC(wheelfir_state::screen_vblank_wheelfir));
+	m_screen->set_palette(m_palette);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(336, NUM_SCANLINES+NUM_VBLANK_LINES)
-	MCFG_SCREEN_VISIBLE_AREA(0,335, 0, NUM_SCANLINES-1)
-	MCFG_SCREEN_UPDATE_DRIVER(wheelfir_state, screen_update_wheelfir)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(wheelfir_state, screen_vblank_wheelfir))
-	MCFG_SCREEN_PALETTE("palette")
+	PALETTE(config, m_palette).set_entries(NUM_COLORS);
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
+	ramdac.set_addrmap(0, &wheelfir_state::ramdac_map);
 
-	MCFG_PALETTE_ADD("palette", NUM_COLORS)
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
+	EEPROM_93C46_16BIT(config, "eeprom");
 
-	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
-
-	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
+	GENERIC_LATCH_16(config, "soundlatch");
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("ldac", DAC_10BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0) // unknown DAC
-	MCFG_SOUND_ADD("rdac", DAC_10BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	DAC_10BIT_R2R(config, "ldac", 0).add_route(ALL_OUTPUTS, "lspeaker", 1.0); // unknown DAC
+	DAC_10BIT_R2R(config, "rdac", 0).add_route(ALL_OUTPUTS, "rspeaker", 1.0); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
 
 ROM_START( wheelfir )
@@ -797,4 +800,4 @@ ROM_START( wheelfir )
 	ROM_LOAD16_WORD_SWAP( "eeprom", 0x000000, 0x000080, CRC(961e4bc9) SHA1(8944504bf56a272e9aa08185e73c6b4212d52383) )
 ROM_END
 
-GAME( 199?, wheelfir,    0, wheelfir,    wheelfir, wheelfir_state, 0, ROT0,  "TCH", "Wheels & Fire", MACHINE_IMPERFECT_GRAPHICS)
+GAME( 199?, wheelfir,    0, wheelfir,    wheelfir, wheelfir_state, empty_init, ROT0,  "TCH", "Wheels & Fire", MACHINE_IMPERFECT_GRAPHICS)

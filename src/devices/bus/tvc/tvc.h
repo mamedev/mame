@@ -65,7 +65,7 @@
 
 // ======================> device_tvcexp_interface
 
-class device_tvcexp_interface : public device_slot_card_interface
+class device_tvcexp_interface : public device_interface
 {
 public:
 	// construction/destruction
@@ -86,16 +86,25 @@ protected:
 
 // ======================> tvcexp_slot_device
 
-class tvcexp_slot_device : public device_t,
-							public device_slot_interface
+class tvcexp_slot_device : public device_t, public device_single_card_slot_interface<device_tvcexp_interface>
 {
 public:
 	// construction/destruction
-	tvcexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T>
+	tvcexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
+		: tvcexp_slot_device(mconfig, tag, owner, 0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
+
+	tvcexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~tvcexp_slot_device();
 
-	template <class Object> devcb_base &set_out_irq_callback(Object &&cb) { return m_out_irq_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_nmi_callback(Object &&cb) { return m_out_nmi_cb.set_callback(std::forward<Object>(cb)); }
+	auto out_irq_callback() { return m_out_irq_cb.bind(); }
+	auto out_nmi_callback() { return m_out_nmi_cb.bind(); }
 
 	// reading and writing
 	virtual uint8_t id_r();
@@ -119,15 +128,5 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(TVCEXP_SLOT, tvcexp_slot_device)
 
-
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-#define MCFG_TVCEXP_SLOT_OUT_IRQ_CB(_devcb) \
-	devcb = &downcast<tvcexp_slot_device &>(*device).set_out_irq_callback(DEVCB_##_devcb);
-
-#define MCFG_TVCEXP_SLOT_OUT_NMI_CB(_devcb) \
-	devcb = &downcast<tvcexp_slot_device &>(*device).set_out_nmi_callback(DEVCB_##_devcb);
 
 #endif // MAME_BUS_TVC_TVC_H

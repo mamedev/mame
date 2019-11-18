@@ -97,12 +97,19 @@ History:
 #include "emu.h"
 #include "machine/ins8250.h"
 
+#include <algorithm>
+
+//#define VERBOSE 1
+//#define LOG_OUTPUT_STREAM std::cout
+
+#include "logmacro.h"
+
 DEFINE_DEVICE_TYPE(INS8250,  ins8250_device, "ins8250",  "National Semiconductor INS8250 UART")
 DEFINE_DEVICE_TYPE(NS16450,  ns16450_device, "ns16450",  "National Semiconductor NS16450 UART")
 DEFINE_DEVICE_TYPE(NS16550,  ns16550_device, "ns16550",  "National Semiconductor NS16550 UART")
 DEFINE_DEVICE_TYPE(PC16552D, pc16552_device, "pc16552d", "National Semiconductor PC16552D UART")
 
-ins8250_uart_device::ins8250_uart_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, dev_type device_type)
+ins8250_uart_device::ins8250_uart_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, dev_type device_type)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_serial_interface(mconfig, *this)
 	, m_device_type(device_type)
@@ -112,6 +119,9 @@ ins8250_uart_device::ins8250_uart_device(const machine_config &mconfig, device_t
 	, m_out_int_cb(*this)
 	, m_out_out1_cb(*this)
 	, m_out_out2_cb(*this)
+	, m_out_baudout_cb(*this)
+	, m_brg_clock(true)
+	, m_txd(1)
 	, m_rxd(1)
 	, m_dcd(1)
 	, m_dsr(1)
@@ -121,22 +131,22 @@ ins8250_uart_device::ins8250_uart_device(const machine_config &mconfig, device_t
 	m_regs.ier = 0;
 }
 
-ins8250_device::ins8250_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ins8250_device::ins8250_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: ins8250_uart_device(mconfig, INS8250, tag, owner, clock, dev_type::INS8250)
 {
 }
 
-ns16450_device::ns16450_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ns16450_device::ns16450_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: ins8250_uart_device(mconfig, NS16450, tag, owner, clock, dev_type::NS16450)
 {
 }
 
-ns16550_device::ns16550_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ns16550_device::ns16550_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: ins8250_uart_device(mconfig, NS16550, tag, owner, clock, dev_type::NS16550)
 {
 }
 
-pc16552_device::pc16552_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+pc16552_device::pc16552_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, PC16552D, tag, owner, clock)
 {
 }
@@ -154,27 +164,27 @@ void pc16552_device::device_start()
 #define COM_INT_PENDING_MODEM_STATUS_REGISTER 0x0008
 #define COM_INT_PENDING_CHAR_TIMEOUT 0x0011
 
-static constexpr uint8_t INS8250_LSR_TSRE = 0x40;
-static constexpr uint8_t INS8250_LSR_THRE = 0x20;
-//static constexpr uint8_t INS8250_LSR_BI = 0x10;
-//static constexpr uint8_t INS8250_LSR_FE = 0x08;
-//static constexpr uint8_t INS8250_LSR_PE = 0x04;
-static constexpr uint8_t INS8250_LSR_OE = 0x02;
-static constexpr uint8_t INS8250_LSR_DR = 0x01;
+static constexpr u8 INS8250_LSR_TSRE = 0x40;
+static constexpr u8 INS8250_LSR_THRE = 0x20;
+static constexpr u8 INS8250_LSR_BI = 0x10;
+static constexpr u8 INS8250_LSR_FE = 0x08;
+static constexpr u8 INS8250_LSR_PE = 0x04;
+static constexpr u8 INS8250_LSR_OE = 0x02;
+static constexpr u8 INS8250_LSR_DR = 0x01;
 
-static constexpr uint8_t INS8250_MCR_DTR = 0x01;
-static constexpr uint8_t INS8250_MCR_RTS = 0x02;
-static constexpr uint8_t INS8250_MCR_OUT1 = 0x04;
-static constexpr uint8_t INS8250_MCR_OUT2 = 0x08;
-static constexpr uint8_t INS8250_MCR_LOOPBACK = 0x10;
+static constexpr u8 INS8250_MCR_DTR = 0x01;
+static constexpr u8 INS8250_MCR_RTS = 0x02;
+static constexpr u8 INS8250_MCR_OUT1 = 0x04;
+static constexpr u8 INS8250_MCR_OUT2 = 0x08;
+static constexpr u8 INS8250_MCR_LOOPBACK = 0x10;
 
-static constexpr uint8_t INS8250_LCR_BITCOUNT_MASK= 0x03;
-static constexpr uint8_t INS8250_LCR_2STOP_BITS = 0x04;
-//static constexpr uint8_t INS8250_LCR_PEN = 0x08;
-//static constexpr uint8_t INS8250_LCR_EVEN_PAR = 0x10;
-//static constexpr uint8_t INS8250_LCR_PARITY = 0x20;
-//static constexpr uint8_t INS8250_LCR_BREAK = 0x40;
-static constexpr uint8_t INS8250_LCR_DLAB = 0x80;
+static constexpr u8 INS8250_LCR_BITCOUNT_MASK= 0x03;
+static constexpr u8 INS8250_LCR_2STOP_BITS = 0x04;
+//static constexpr u8 INS8250_LCR_PEN = 0x08;
+//static constexpr u8 INS8250_LCR_EVEN_PAR = 0x10;
+//static constexpr u8 INS8250_LCR_PARITY = 0x20;
+//static constexpr u8 INS8250_LCR_BREAK = 0x40;
+static constexpr u8 INS8250_LCR_DLAB = 0x80;
 
 /* ints will continue to be set for as long as there are ints pending */
 void ins8250_uart_device::update_interrupt()
@@ -235,18 +245,42 @@ void ins8250_uart_device::clear_int(int flag)
 	update_interrupt();
 }
 
+READ_LINE_MEMBER(ins8250_uart_device::intrpt_r)
+{
+	return !BIT(m_regs.iir, 0);
+}
+
+TIMER_CALLBACK_MEMBER(ins8250_uart_device::brg_clock)
+{
+	bool state = m_brg_clock;
+	if (!is_transmit_register_empty())
+	{
+		device_serial_interface::tx_clock_w(m_brg_clock);
+		m_brg_clock = !state;
+	}
+	if (is_receive_register_synchronized())
+	{
+		if (m_out_baudout_cb.isnull())
+		{
+			device_serial_interface::rx_clock_w(m_brg_clock);
+		}
+		else
+		{
+			m_out_baudout_cb(m_brg_clock);
+		}
+		m_brg_clock = !state;
+	}
+	m_brg->adjust(((clock() && (m_regs.dl) ? (attotime::from_hz(clock()) * m_regs.dl * 16) : attotime::never) / 2));
+}
+
 // Baud rate generator is reset after writing to either byte of divisor latch
 void ins8250_uart_device::update_baud_rate()
 {
-	set_rate(clock(), m_regs.dl * 16);
-
-	// FIXME: Baud rate generator should not affect transmitter or receiver, but device_serial_interface resets them regardless.
-	// If the transmitter is still running at this time and we don't flush it, the shift register will never be emptied!
-	if (!(m_regs.lsr & INS8250_LSR_TSRE))
-		tra_complete();
+	LOG("%.1f baud selected (divisor = %d)\n", double(clock()) / (m_regs.dl * 16), m_regs.dl);
+	m_brg->adjust(((clock() && (m_regs.dl) ? (attotime::from_hz(clock()) * m_regs.dl * 16) : attotime::never) / 2));
 }
 
-WRITE8_MEMBER( ins8250_uart_device::ins8250_w )
+void ins8250_uart_device::ins8250_w(offs_t offset, u8 data)
 {
 	int tmp;
 
@@ -379,6 +413,8 @@ WRITE8_MEMBER( ins8250_uart_device::ins8250_w )
 
 			if ( m_regs.msr & 0x0f )
 				trigger_int(COM_INT_PENDING_MODEM_STATUS_REGISTER);
+			else
+				clear_int(COM_INT_PENDING_MODEM_STATUS_REGISTER);
 			break;
 		case 7:
 			m_regs.scr = data;
@@ -386,7 +422,7 @@ WRITE8_MEMBER( ins8250_uart_device::ins8250_w )
 	}
 }
 
-READ8_MEMBER( ins8250_uart_device::ins8250_r )
+u8 ins8250_uart_device::ins8250_r(offs_t offset)
 {
 	int data = 0x0ff;
 
@@ -397,13 +433,16 @@ READ8_MEMBER( ins8250_uart_device::ins8250_r )
 				data = (m_regs.dl & 0xff);
 			else
 			{
-				if((m_device_type >= dev_type::NS16550) && (m_regs.fcr & 1))
-					m_regs.rbr = pop_rx();
-				else
+				if (!machine().side_effects_disabled())
 				{
-					clear_int(COM_INT_PENDING_RECEIVED_DATA_AVAILABLE);
-					if( m_regs.lsr & INS8250_LSR_DR )
-						m_regs.lsr &= ~INS8250_LSR_DR;
+					if ((m_device_type >= dev_type::NS16550) && (m_regs.fcr & 1))
+						m_regs.rbr = pop_rx();
+					else
+					{
+						clear_int(COM_INT_PENDING_RECEIVED_DATA_AVAILABLE);
+						if (m_regs.lsr & INS8250_LSR_DR)
+							m_regs.lsr &= ~INS8250_LSR_DR;
+					}
 				}
 				data = m_regs.rbr;
 			}
@@ -418,8 +457,11 @@ READ8_MEMBER( ins8250_uart_device::ins8250_r )
 			data = m_regs.iir;
 			/* The documentation says that reading this register will
 			clear the int if this is the source of the int */
-			if ( m_regs.ier & COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY )
-				clear_int(COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY);
+			if (!machine().side_effects_disabled())
+			{
+				if (m_regs.iir == 0x02)
+					clear_int(COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY);
+			}
 			break;
 		case 3:
 			data = m_regs.lcr;
@@ -429,19 +471,23 @@ READ8_MEMBER( ins8250_uart_device::ins8250_r )
 			break;
 		case 5:
 			data = m_regs.lsr;
-			if( m_regs.lsr & 0x1f )
+			if (!machine().side_effects_disabled() && (m_regs.lsr & (INS8250_LSR_BI | INS8250_LSR_FE | INS8250_LSR_PE | INS8250_LSR_OE)) != 0)
+			{
 				m_regs.lsr &= 0xe1; /* clear FE, PE and OE and BREAK bits */
 
-			/* reading line status register clears int */
-			clear_int(COM_INT_PENDING_RECEIVER_LINE_STATUS);
+				/* reading line status register clears int */
+				clear_int(COM_INT_PENDING_RECEIVER_LINE_STATUS);
+			}
 			break;
 		case 6:
 			data = m_regs.msr;
-			m_regs.msr &= 0xf0; /* reset delta values */
+			if (!machine().side_effects_disabled())
+			{
+				m_regs.msr &= 0xf0; /* reset delta values */
 
-			/* reading msr clears int */
-			clear_int(COM_INT_PENDING_MODEM_STATUS_REGISTER);
-
+				/* reading msr clears int */
+				clear_int(COM_INT_PENDING_MODEM_STATUS_REGISTER);
+			}
 			break;
 		case 7:
 			data = m_regs.scr;
@@ -464,8 +510,20 @@ void ns16550_device::rcv_complete()
 		return;
 	}
 
+	u8 errors = 0;
+	if (is_receive_framing_error())
+		errors |= INS8250_LSR_FE;
+	if (is_receive_parity_error())
+		errors |= INS8250_LSR_PE;
+	if (m_rnum == 0 && errors != 0)
+	{
+		m_regs.lsr |= errors;
+		trigger_int(COM_INT_PENDING_RECEIVER_LINE_STATUS);
+	}
+
 	m_regs.lsr |= INS8250_LSR_DR;
 	m_rfifo[m_rhead] = get_received_char();
+	m_efifo[m_rhead] = errors;
 	++m_rhead &= 0x0f;
 	m_rnum++;
 	if(m_rnum >= m_rintlvl)
@@ -505,6 +563,14 @@ void ins8250_uart_device::rcv_complete()
 	{
 		m_regs.lsr |= INS8250_LSR_DR;
 		receive_register_extract();
+
+		if (is_receive_framing_error())
+			m_regs.lsr |= INS8250_LSR_FE;
+		if (is_receive_parity_error())
+			m_regs.lsr |= INS8250_LSR_PE;
+		if ((m_regs.lsr & (INS8250_LSR_BI | INS8250_LSR_PE | INS8250_LSR_FE)) != 0)
+			trigger_int(COM_INT_PENDING_RECEIVER_LINE_STATUS);
+
 		m_regs.rbr = get_received_char();
 		trigger_int(COM_INT_PENDING_RECEIVED_DATA_AVAILABLE);
 	}
@@ -538,7 +604,7 @@ void ins8250_uart_device::tra_callback()
 
 void ins8250_uart_device::update_msr()
 {
-	uint8_t data;
+	u8 data;
 	int change;
 
 	if (m_regs.mcr & INS8250_MCR_LOOPBACK)
@@ -559,6 +625,11 @@ void ins8250_uart_device::update_msr()
 
 	if(change)
 		trigger_int(COM_INT_PENDING_MODEM_STATUS_REGISTER);
+}
+
+WRITE_LINE_MEMBER(ins8250_uart_device::rclk_w)
+{
+	device_serial_interface::rx_clock_w(state);
 }
 
 WRITE_LINE_MEMBER(ins8250_uart_device::dcd_w)
@@ -601,9 +672,10 @@ void ins8250_uart_device::device_start()
 	m_out_int_cb.resolve_safe();
 	m_out_out1_cb.resolve_safe();
 	m_out_out2_cb.resolve_safe();
+	m_out_baudout_cb.resolve();
 	set_tra_rate(0);
 	set_rcv_rate(0);
-
+	m_brg = device().machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ins8250_uart_device::brg_clock), this));
 	save_item(NAME(m_regs.thr));
 	save_item(NAME(m_regs.rbr));
 	save_item(NAME(m_regs.ier));
@@ -616,6 +688,7 @@ void ins8250_uart_device::device_start()
 	save_item(NAME(m_regs.msr));
 	save_item(NAME(m_regs.scr));
 	save_item(NAME(m_int_pending));
+	save_item(NAME(m_brg_clock));
 	save_item(NAME(m_txd));
 	save_item(NAME(m_rxd));
 	save_item(NAME(m_dcd));
@@ -637,12 +710,14 @@ void ins8250_uart_device::device_reset()
 	update_interrupt();
 	receive_register_reset();
 	transmit_register_reset();
+	m_brg_clock = true;
 	m_txd = 1;
 	m_out_tx_cb(1);
 	m_out_rts_cb(1);
 	m_out_dtr_cb(1);
 	m_out_out1_cb(1);
 	m_out_out2_cb(1);
+	if (!m_out_baudout_cb.isnull()) m_out_baudout_cb(1);
 }
 
 void ns16550_device::device_start()
@@ -651,6 +726,7 @@ void ns16550_device::device_start()
 	ins8250_uart_device::device_start();
 	save_item(NAME(m_rintlvl));
 	save_item(NAME(m_rfifo));
+	save_item(NAME(m_efifo));
 	save_item(NAME(m_tfifo));
 	save_item(NAME(m_rhead));
 	save_item(NAME(m_rtail));
@@ -661,8 +737,9 @@ void ns16550_device::device_start()
 
 void ns16550_device::device_reset()
 {
-	memset(&m_rfifo, '\0', sizeof(m_rfifo));
-	memset(&m_tfifo, '\0', sizeof(m_tfifo));
+	std::fill(std::begin(m_rfifo), std::end(m_rfifo), 0);
+	std::fill(std::begin(m_efifo), std::end(m_efifo), 0);
+	std::fill(std::begin(m_tfifo), std::end(m_tfifo), 0);
 	m_rhead = m_rtail = m_rnum = 0;
 	m_thead = m_ttail = 0;
 	m_timeout->adjust(attotime::never);
@@ -678,21 +755,26 @@ void ns16550_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	}
 }
 
-void ns16550_device::push_tx(uint8_t data)
+void ns16550_device::push_tx(u8 data)
 {
 	m_tfifo[m_thead] = data;
 	++m_thead &= 0x0f;
 }
 
-uint8_t ns16550_device::pop_rx()
+u8 ns16550_device::pop_rx()
 {
-	uint8_t data = m_rfifo[m_rtail];
+	u8 data = m_rfifo[m_rtail];
 	clear_int(COM_INT_PENDING_CHAR_TIMEOUT & ~1); // don't clear bit 1 yet
 
 	if(m_rnum)
 	{
 		++m_rtail &= 0x0f;
 		m_rnum--;
+		if (m_rnum > 0 && m_efifo[m_rtail] != 0)
+		{
+			m_regs.lsr |= m_efifo[m_rtail];
+			trigger_int(COM_INT_PENDING_RECEIVER_LINE_STATUS);
+		}
 	}
 	else
 		data = 0;
@@ -711,7 +793,7 @@ uint8_t ns16550_device::pop_rx()
 	return data;
 }
 
-void ns16550_device::set_fcr(uint8_t data)
+void ns16550_device::set_fcr(u8 data)
 {
 	const int bytes_per_int[] = {1, 4, 8, 14};
 	if(!(data & 1))
@@ -724,14 +806,15 @@ void ns16550_device::set_fcr(uint8_t data)
 		data |= 0x06;
 	if(data & 2)
 	{
-		memset(&m_rfifo, '\0', sizeof(m_rfifo));
+		std::fill(std::begin(m_rfifo), std::end(m_rfifo), 0);
+		std::fill(std::begin(m_efifo), std::end(m_efifo), 0);
 		m_rhead = m_rtail = m_rnum = 0;
 		clear_int(COM_INT_PENDING_CHAR_TIMEOUT | COM_INT_PENDING_RECEIVED_DATA_AVAILABLE);
 		m_timeout->adjust(attotime::never);
 	}
 	if(data & 4)
 	{
-		memset(&m_tfifo, '\0', sizeof(m_tfifo));
+		std::fill(std::begin(m_tfifo), std::end(m_tfifo), 0);
 		m_thead = m_ttail = 0;
 		m_regs.lsr |= INS8250_LSR_THRE;
 		trigger_int(COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY);

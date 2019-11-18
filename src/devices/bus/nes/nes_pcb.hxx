@@ -435,6 +435,41 @@ static int nes_cart_get_line( const char *feature )
 	return nes_line->line;
 }
 
+struct n163_vol_lines
+{
+	const char *tag;
+	int line;
+};
+
+static const struct n163_vol_lines n163_vol_table[] =
+{
+	{ "SUBMAPPER 0",    0 },
+	{ "SUBMAPPER 1",    1 },
+	{ "SUBMAPPER 2",    2 },
+	{ "SUBMAPPER 3",    3 },
+	{ "SUBMAPPER 4",    4 },
+	{ "SUBMAPPER 5",    5 },
+	{ nullptr }
+};
+
+static int n163_get_submapper_num( const char *feature )
+{
+	const struct n163_vol_lines *n163_line = &n163_vol_table[0];
+
+	if (feature == nullptr)
+		return 128;
+
+	while (n163_line->tag)
+	{
+		if (strcmp(n163_line->tag, feature) == 0)
+			break;
+
+		n163_line++;
+	}
+
+	return n163_line->line;
+}
+
 void nes_cart_slot_device::call_load_pcb()
 {
 	uint32_t vram_size = 0, prgram_size = 0, battery_size = 0, mapper_sram_size = 0;
@@ -549,6 +584,12 @@ void nes_cart_slot_device::call_load_pcb()
 	{
 		if (get_feature("batt"))
 			mapper_sram_size = m_cart->get_mapper_sram_size();
+	}
+
+	if (m_pcb_id == NAMCOT_163)
+	{
+		if (get_feature("n163-vol"))
+			m_cart->set_n163_vol(n163_get_submapper_num(get_feature("n163-vol")));
 	}
 
 

@@ -18,7 +18,7 @@
 
 		<part name="z24" interface="aim65_z24_cart">
 			<dataarea name="z24" size="4096">
-				<rom name="assembler.z24" size="4096" crc="0878b399" sha1="483e92b57d64be51643a9f6490521a8572aa2f68" offset="0x0000" />
+				<rom name="assembler.z24" size="4096" crc="0878b399" sha1="483e92b57d64be51643a9f6490521a8572aa2f68"/>
 			</dataarea>
 		</part>
 	</software>
@@ -31,12 +31,12 @@
 
 		<part name="z26" interface="aim65_z26_cart">
 			<dataarea name="z26" size="4096">
-				<rom name="basic.z26" size="4096" crc="36a61f39" sha1="f5ce0126cb594a565e730973fd140d03c298cefa" offset="0x0000" />
+				<rom name="basic.z26" size="4096" crc="36a61f39" sha1="f5ce0126cb594a565e730973fd140d03c298cefa"/>
 			</dataarea>
 		</part>
 		<part name="z25" interface="aim65_z25_cart">
 			<dataarea name="z25" size="4096">
-				<rom name="basic.z25" size="4096" crc="d7b42d2a" sha1="4bbdb28d332429825adea0266ed9192786d9e392" offset="0x0000" />
+				<rom name="basic.z25" size="4096" crc="d7b42d2a" sha1="4bbdb28d332429825adea0266ed9192786d9e392"/>
 			</dataarea>
 		</part>
 	</software>
@@ -49,17 +49,17 @@
 
 		<part name="z26" interface="aim65_z26_cart">
 			<dataarea name="z26" size="4096">
-				<rom name="gwk extended basic v2.1.z26" size="4096" crc="3ec90376" sha1="22322cfc490615c58a6260a43138e5b47ecb10a1" offset="0x0000" />
+				<rom name="gwk extended basic v2.1.z26" size="4096" crc="3ec90376" sha1="22322cfc490615c58a6260a43138e5b47ecb10a1"/>
 			</dataarea>
 		</part>
 		<part name="z25" interface="aim65_z25_cart">
 			<dataarea name="z25" size="4096">
-				<rom name="gwk extended basic v2.1.z25" size="4096" crc="ac50cedb" sha1="848887fe5c6a6c0c2d9f7c082f531bc9ebd60e51" offset="0x0000" />
+				<rom name="gwk extended basic v2.1.z25" size="4096" crc="ac50cedb" sha1="848887fe5c6a6c0c2d9f7c082f531bc9ebd60e51"/>
 			</dataarea>
 		</part>
 		<part name="z24" interface="aim65_z24_cart">
 			<dataarea name="z24" size="4096">
-				<rom name="gwk extended basic v2.1.z24" size="4096" crc="5bb93856" sha1="7684a1e7c1b566ca5c93c73d1e4e0e8eaa4400ad" offset="0x0000" />
+				<rom name="gwk extended basic v2.1.z24" size="4096" crc="5bb93856" sha1="7684a1e7c1b566ca5c93c73d1e4e0e8eaa4400ad"/>
 			</dataarea>
 		</part>
 	</software>
@@ -72,17 +72,17 @@
 
 		<part name="z26" interface="aim65_z26_cart">
 			<dataarea name="z26" size="4096">
-				<rom name="gwk extended basic v2.3.z26" size="4096" crc="841b05fa" sha1="f930bd8db542fe1edc37abda4cddaec6bcd093e2" offset="0x0000" />
+				<rom name="gwk extended basic v2.3.z26" size="4096" crc="841b05fa" sha1="f930bd8db542fe1edc37abda4cddaec6bcd093e2"/>
 			</dataarea>
 		</part>
 		<part name="z25" interface="aim65_z25_cart">
 			<dataarea name="z25" size="4096">
-				<rom name="gwk extended basic v2.3.z25" size="4096" crc="31de604c" sha1="0b80c5015c125acd75a3883f924e48fd928bdff7" offset="0x0000" />
+				<rom name="gwk extended basic v2.3.z25" size="4096" crc="31de604c" sha1="0b80c5015c125acd75a3883f924e48fd928bdff7"/>
 			</dataarea>
 		</part>
 		<part name="z24" interface="aim65_z24_cart">
 			<dataarea name="z24" size="4096">
-				<rom name="gwk extended basic v2.3.z24" size="4096" crc="5aa4e61e" sha1="62dbff204b6cccbe3dc8fc5298260c0dfdb9a632" offset="0x0000" />
+				<rom name="gwk extended basic v2.3.z24" size="4096" crc="5aa4e61e" sha1="62dbff204b6cccbe3dc8fc5298260c0dfdb9a632"/>
 			</dataarea>
 		</part>
 	</software>
@@ -95,12 +95,12 @@
 
 		<part name="z26" interface="aim65_z26_cart">
 			<dataarea name="z26" size="4096">
-				<rom name="forth v1.3.z26" size="4096" crc="a80ad472" sha1="42a2e8c86829a2fe48090e6665ff9fe25b12b070" offset="0x0000" />
+				<rom name="forth v1.3.z26" size="4096" crc="a80ad472" sha1="42a2e8c86829a2fe48090e6665ff9fe25b12b070"/>
 			</dataarea>
 		</part>
 		<part name="z25" interface="aim65_z25_cart">
 			<dataarea name="z25" size="4096">
-				<rom name="forth v1.3.z25" size="4096" crc="0671d019" sha1="dd2a1613e435c833634100cf4a22c6cff70c7a26" offset="0x0000" />
+				<rom name="forth v1.3.z25" size="4096" crc="0671d019" sha1="dd2a1613e435c833634100cf4a22c6cff70c7a26"/>
 			</dataarea>
 		</part>
 	</software>
@@ -113,17 +113,17 @@
 
 		<part name="z26" interface="aim65_z26_cart">
 			<dataarea name="z26" size="4096">
-				<rom name="forth v1.3.z26" size="4096" crc="a80ad472" sha1="42a2e8c86829a2fe48090e6665ff9fe25b12b070" offset="0x0000" />
+				<rom name="forth v1.3.z26" size="4096" crc="a80ad472" sha1="42a2e8c86829a2fe48090e6665ff9fe25b12b070"/>
 			</dataarea>
 		</part>
 		<part name="z25" interface="aim65_z25_cart">
 			<dataarea name="z25" size="4096">
-				<rom name="forth v1.3.z25" size="4096" crc="0671d019" sha1="dd2a1613e435c833634100cf4a22c6cff70c7a26" offset="0x0000" />
+				<rom name="forth v1.3.z25" size="4096" crc="0671d019" sha1="dd2a1613e435c833634100cf4a22c6cff70c7a26"/>
 			</dataarea>
 		</part>
 		<part name="z24" interface="aim65_z24_cart">
 			<dataarea name="z24" size="4096">
-				<rom name="mathpack.z24" size="4096" crc="4889af55" sha1="5e9541ddfc06e3802d09b30d1bd89c5da914c76e" offset="0x0000" />
+				<rom name="mathpack.z24" size="4096" crc="4889af55" sha1="5e9541ddfc06e3802d09b30d1bd89c5da914c76e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -136,27 +136,27 @@
 
 		<part name="z26" interface="aim65_z26_cart">
 			<dataarea name="z26" size="4096">
-				<rom name="r32p6.z26" size="4096" crc="ae41b361" sha1="fd4c28675920d464ca3e97578c2fd9536299bf44" offset="0x0000" />
+				<rom name="r32p6.z26" size="4096" crc="ae41b361" sha1="fd4c28675920d464ca3e97578c2fd9536299bf44"/>
 			</dataarea>
 		</part>
 		<part name="z12" interface="rm65_z12_cart">
 			<dataarea name="z12" size="4096">
-				<rom name="r32p2.z12" size="4096" crc="e83786c7" sha1="a0c08648af48d766e53b04cc04bbfa3502b85beb" offset="0x0000" />
+				<rom name="r32p2.z12" size="4096" crc="e83786c7" sha1="a0c08648af48d766e53b04cc04bbfa3502b85beb"/>
 			</dataarea>
 		</part>
 		<part name="z13" interface="rm65_z13_cart">
 			<dataarea name="z13" size="4096">
-				<rom name="r32p3.z13" size="4096" crc="32d6e231" sha1="fd9e549d8c3e14ec1ba22e87260b65d38f9a3be5" offset="0x0000" />
+				<rom name="r32p3.z13" size="4096" crc="32d6e231" sha1="fd9e549d8c3e14ec1ba22e87260b65d38f9a3be5"/>
 			</dataarea>
 		</part>
 		<part name="z14" interface="rm65_z14_cart">
 			<dataarea name="z14" size="4096">
-				<rom name="r32p4.z14" size="4096" crc="a703a2c3" sha1="9b5737625a54b041dfd432fff3dafef6e80ce640" offset="0x0000" />
+				<rom name="r32p4.z14" size="4096" crc="a703a2c3" sha1="9b5737625a54b041dfd432fff3dafef6e80ce640"/>
 			</dataarea>
 		</part>
 		<part name="z15" interface="rm65_z15_cart">
 			<dataarea name="z15" size="4096">
-				<rom name="r32p5.z15" size="4096" crc="05bd6507" sha1="68fd30893e05d1ea7f0a0cf497470506e8b94cbe" offset="0x0000" />
+				<rom name="r32p5.z15" size="4096" crc="05bd6507" sha1="68fd30893e05d1ea7f0a0cf497470506e8b94cbe"/>
 			</dataarea>
 		</part>
 	</software>
@@ -169,12 +169,12 @@
 
 		<part name="z26" interface="aim65_z26_cart">
 			<dataarea name="z26" size="4096">
-				<rom name="pl65 v1.0.z26" size="4096" crc="2ac71abd" sha1="6df5e3125bebefac80d51d9337555f54bdf0d8ea" offset="0x0000" />
+				<rom name="pl65 v1.0.z26" size="4096" crc="2ac71abd" sha1="6df5e3125bebefac80d51d9337555f54bdf0d8ea"/>
 			</dataarea>
 		</part>
 		<part name="z25" interface="aim65_z25_cart">
 			<dataarea name="z25" size="4096">
-				<rom name="pl65 v1.0.z25" size="4096" crc="76dcf864" sha1="e937c54ed109401f796640cd45b27dfefb76667e" offset="0x0000" />
+				<rom name="pl65 v1.0.z25" size="4096" crc="76dcf864" sha1="e937c54ed109401f796640cd45b27dfefb76667e"/>
 			</dataarea>
 		</part>
 	</software>

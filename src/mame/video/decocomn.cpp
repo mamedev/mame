@@ -36,7 +36,7 @@ void decocomn_device::device_start()
 	m_dirty_palette = make_unique_clear<uint8_t[]>(4096);
 
 	save_item(NAME(m_priority));
-	save_pointer(NAME(m_dirty_palette.get()), 4096);
+	save_pointer(NAME(m_dirty_palette), 4096);
 }
 
 //-------------------------------------------------

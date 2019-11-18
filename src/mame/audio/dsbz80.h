@@ -11,12 +11,6 @@
 
 #define DSBZ80_TAG "dsbz80"
 
-#define MCFG_DSBZ80_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, DSBZ80, 0)
-
-#define MCFG_DSBZ80_RXD_HANDLER(_devcb) \
-	devcb = &downcast<dsbz80_device &>(*device).set_rxd_handler(DEVCB_##_devcb);
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -28,7 +22,7 @@ public:
 	dsbz80_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	template<class Object> devcb_base &set_rxd_handler(device_t &device, Object &&object) { return m_rxd_handler.set_callback(std::forward<Object>(object)); }
+	auto rxd_handler() { return m_rxd_handler.bind(); }
 
 	required_device<cpu_device> m_ourcpu;
 	required_device<i8251_device> m_uart;

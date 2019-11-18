@@ -1,22 +1,21 @@
 // license:BSD-3-Clause
-// copyright-holders:?
+// copyright-holders:Samuele Zannoli
 /***************************************************************************
 
     XBOX (c) 2001 Microsoft
-
-    Skeleton driver
 
 ***************************************************************************/
 
 
 #include "emu.h"
-#include "includes/xbox.h"
+#include "machine/pci.h"
+#include "machine/idectrl.h"
 #include "includes/xbox_pci.h"
+#include "includes/xbox.h"
 
 #include "cpu/i386/i386.h"
-#include "machine/atapicdr.h"
-#include "machine/idehd.h"
-#include "machine/pit8253.h"
+#include "bus/ata/atapicdr.h"
+#include "bus/ata/idehd.h"
 
 #include "debug/debugcmd.h"
 #include "debug/debugcon.h"
@@ -31,14 +30,17 @@
 class xbox_state : public xbox_base_state
 {
 public:
-	xbox_state(const machine_config &mconfig, device_type type, const char *tag) :
-		xbox_base_state(mconfig, type, tag)
+	xbox_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xbox_base_state(mconfig, type, tag)
+		, m_ide(*this, "pci:09.0:ide1")
+		, m_devh(*this, "pci:09.0:ide1:0:hdd")
+		, m_devc(*this, "pci:09.0:ide1:1:cdrom")
 	{ }
 
 	void xbox(machine_config &config);
-	void xbox_map(address_map &map);
-	void xbox_map_io(address_map &map);
 protected:
+	void xbox_map(address_map &map);
+
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -46,9 +48,10 @@ protected:
 
 	virtual void hack_eeprom() override;
 
-	struct chihiro_devices {
-		bus_master_ide_controller_device    *ide;
-	} xbox_devs;
+	// devices
+	optional_device<bus_master_ide_controller_device> m_ide;
+	required_device<ata_mass_storage_device> m_devh;
+	required_device<atapi_cdrom_device> m_devc;
 };
 
 void xbox_state::video_start()
@@ -57,13 +60,7 @@ void xbox_state::video_start()
 
 void xbox_state::xbox_map(address_map &map)
 {
-	xbox_base_map(map);
 	map(0xff000000, 0xff0fffff).rom().region("bios", 0).mirror(0x00f00000);
-}
-
-void xbox_state::xbox_map_io(address_map &map)
-{
-	xbox_base_map_io(map);
 }
 
 static INPUT_PORTS_START( xbox )
@@ -136,60 +133,52 @@ void xbox_state::hack_eeprom()
 void xbox_state::machine_start()
 {
 	xbox_base_state::machine_start();
-	xbox_devs.ide = machine().device<bus_master_ide_controller_device>("ide");
 	// savestates
 	//save_item(NAME(item));
 }
 
 void xbox_state::machine_reset()
 {
-	ata_mass_storage_device *devh;
-	atapi_cdrom_device *devc;
 	uint16_t *id;
 
 	// set some needed parameters
-	devh = machine().device<ata_mass_storage_device>(":pci:09.0:ide:0:hdd");
-	id = devh->identify_device_buffer();
+	id = m_devh->identify_device_buffer();
 	id[88] |= (1 << 2); // ultra dma mode 2 supported
 	id[128] |= 2; // bits 2-1=01 drive already unlocked
-	devc = machine().device<atapi_cdrom_device>(":pci:09.0:ide:1:cdrom");
-	id = devc->identify_device_buffer();
+
+	id = m_devc->identify_device_buffer();
 	id[64] |= (1 << 1);
 	id[88] |= (1 << 2); // ultra dma mode 2 supported
 }
 
-SLOT_INTERFACE_START(usb_xbox)
-	SLOT_INTERFACE("xbox_controller", OHCI_GAME_CONTROLLER)
-SLOT_INTERFACE_END
+void usb_xbox(device_slot_interface &device)
+{
+	device.option_add("xbox_controller", OHCI_GAME_CONTROLLER);
+}
 
-SLOT_INTERFACE_START(xbox_ata_devices)
-	SLOT_INTERFACE("hdd", IDE_HARDDISK)
-	SLOT_INTERFACE("cdrom", ATAPI_CDROM)
-SLOT_INTERFACE_END
+void xbox_ata_devices(device_slot_interface &device)
+{
+	device.option_add("hdd", IDE_HARDDISK);
+	device.option_add("cdrom", ATAPI_CDROM);
+}
 
-MACHINE_CONFIG_START(xbox_state::xbox)
+void xbox_state::xbox(machine_config &config)
+{
 	xbox_base(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(xbox_map)
-	MCFG_CPU_IO_MAP(xbox_map_io)
+	m_maincpu->set_addrmap(AS_PROGRAM, &xbox_state::xbox_map);
 
-	MCFG_DEVICE_MODIFY(":pci:09.0:ide:0")
-	MCFG_DEVICE_SLOT_INTERFACE(xbox_ata_devices, "hdd", true)
-	MCFG_DEVICE_MODIFY(":pci:09.0:ide:1")
-	MCFG_DEVICE_SLOT_INTERFACE(xbox_ata_devices, "cdrom", true)
+	subdevice<ide_controller_32_device>(":pci:09.0:ide1")->options(xbox_ata_devices, "hdd", "cdrom", true);
 
-	MCFG_USB_PORT_ADD(":pci:02.0:port1", usb_xbox, nullptr, false)
-	MCFG_USB_PORT_ADD(":pci:02.0:port2", usb_xbox, nullptr, false)
-	MCFG_USB_PORT_ADD(":pci:02.0:port3", usb_xbox, "xbox_controller", false)
-	MCFG_USB_PORT_ADD(":pci:02.0:port4", usb_xbox, nullptr, false)
+	OHCI_USB_CONNECTOR(config, ":pci:02.0:port1", usb_xbox, nullptr, false);
+	OHCI_USB_CONNECTOR(config, ":pci:02.0:port2", usb_xbox, nullptr, false);
+	OHCI_USB_CONNECTOR(config, ":pci:02.0:port3", usb_xbox, "xbox_controller", false);
+	OHCI_USB_CONNECTOR(config, ":pci:02.0:port4", usb_xbox, nullptr, false);
 
-/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-//  MCFG_SOUND_ADD("aysnd", AY8910, MAIN_CLOCK/4)
-//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ohci_gamepad", OHCI_GAME_CONTROLLER, 0)
-MACHINE_CONFIG_END
+	OHCI_GAME_CONTROLLER(config, "ohci_gamepad", 0);
+}
 
 
 /***************************************************************************
@@ -198,14 +187,14 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 #define ROM_LOAD_BIOS(bios,name,offset,length,hash) \
-		ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios+1)) /* Note '+1' */
+		ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios))
 
 ROM_START( xbox )
 	ROM_REGION( 0x400, "mcpx", 0 )
 	ROM_LOAD( "mcpx_1_0.bin", 0, 0x200, CRC(0b07d1f1) SHA1(5d270675b54eb8071b480e42d22a3015ac211cef) )
 	ROM_LOAD( "mcpx_1_1.bin", 0x200, 0x200, CRC(94ce376b) SHA1(6c875f17f773aaec51eb434068bb6c657c4343c0) )
 
-	ROM_REGION( 0x100000, "bios", 0)
+	ROM_REGION32_LE( 0x100000, "bios", 0)
 	ROM_SYSTEM_BIOS(0, "bios0", "Chihiro Bios 4134 1024k") \
 	ROM_LOAD_BIOS(0, "4134_1024k.bin", 0x000000, 0x100000, CRC(49d8055a) SHA1(d46cef771a63dc8024fe36d7ab5b959087ac999f)) \
 	ROM_SYSTEM_BIOS(1, "bios1", "Chihiro Bios 3944 1024k") \
@@ -226,17 +215,6 @@ ROM_START( xbox )
 	ROM_LOAD( "xbox-5713.bin", 0x080000, 0x040000, CRC(58fd8173) SHA1(8b7ccc4648ccd78cdb7b65cfca09621eaf2d4238) )
 	ROM_LOAD( "5838_256k.bin", 0x0C0000, 0x040000, CRC(5be2413d) SHA1(b9489e883c650b5e5fe2f83a32237dbf74f0e9f1) )
 ROM_END
-// See src/emu/gamedrv.h for details
-// For a game:
-// GAME(YEAR,NAME,PARENT,MACHINE,INPUT,CLASS,INIT,MONITOR,COMPANY,FULLNAME,FLAGS)
 
-// For a console:
-// CONS(YEAR,NAME,PARENT,COMPAT,MACHINE,INPUT,CLASS,INIT,COMPANY,FULLNAME,FLAGS)
 
-// For a computer:
-// COMP(YEAR,NAME,PARENT,COMPAT,MACHINE,INPUT,CLASS,INIT,COMPANY,FULLNAME,FLAGS)
-
-// For a generic system:
-// SYST(YEAR,NAME,PARENT,COMPAT,MACHINE,INPUT,CLASS,INIT,COMPANY,FULLNAME,FLAGS)
-
-CONS( 2001, xbox,  0,  0,   xbox,  xbox, xbox_state,  0,       "Microsoft",      "XBOX", MACHINE_IS_SKELETON )
+CONS( 2001, xbox, 0, 0, xbox,  xbox, xbox_state, empty_init, "Microsoft", "XBOX", MACHINE_IS_SKELETON )

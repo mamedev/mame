@@ -53,7 +53,7 @@ void dmadac_sound_device::device_start()
 	save_item(NAME(m_volume));
 	save_item(NAME(m_enabled));
 	save_item(NAME(m_frequency));
-	save_pointer(NAME(m_buffer.get()), BUFFER_SIZE);
+	save_pointer(NAME(m_buffer), BUFFER_SIZE);
 }
 
 

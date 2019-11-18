@@ -39,6 +39,7 @@ namespace
 		coco_rs232_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 			: device_t(mconfig, COCO_RS232, tag, owner, clock)
 			, device_cococart_interface(mconfig, *this)
+			, m_eprom(*this, "eprom")
 			, m_uart(*this, UART_TAG)
 		{
 		}
@@ -56,8 +57,8 @@ namespace
 		virtual void device_start() override
 		{
 			install_readwrite_handler(0xFF68, 0xFF6B,
-				read8_delegate(FUNC(mos6551_device::read), (mos6551_device *)m_uart),
-				write8_delegate(FUNC(mos6551_device::write), (mos6551_device *)m_uart));
+					read8sm_delegate(*m_uart, FUNC(mos6551_device::read)),
+					write8sm_delegate(*m_uart, FUNC(mos6551_device::write)));
 		}
 
 		virtual const tiny_rom_entry *device_rom_region() const override;
@@ -65,11 +66,19 @@ namespace
 		// CoCo cartridge level overrides
 		virtual uint8_t *get_cart_base() override
 		{
-			return memregion("eprom")->base();
+			return m_eprom->base();
 		}
+
+		virtual memory_region* get_cart_memregion() override
+		{
+			return m_eprom;
+		}
+
+		virtual DECLARE_READ8_MEMBER(cts_read) override;
 
 	private:
 		// internal state
+		required_memory_region m_eprom;
 		required_device<mos6551_device> m_uart;
 	};
 };
@@ -79,19 +88,19 @@ namespace
 IMPLEMENTATION
 ***************************************************************************/
 
-MACHINE_CONFIG_START(coco_rs232_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(UART_TAG, MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL(1'843'200))
+void coco_rs232_device::device_add_mconfig(machine_config &config)
+{
+	MOS6551(config, m_uart, 0);
+	m_uart->set_xtal(1.8432_MHz_XTAL);
+	m_uart->irq_handler().set(FUNC(coco_rs232_device::uart_irq_w));
+	m_uart->txd_handler().set(PORT_TAG, FUNC(rs232_port_device::write_txd));
 
-	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(coco_rs232_device, uart_irq_w))
-	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE(PORT_TAG, rs232_port_device, write_txd))
-
-	MCFG_RS232_PORT_ADD(PORT_TAG, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(UART_TAG, mos6551_device, write_rxd))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(UART_TAG, mos6551_device, write_dcd))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(UART_TAG, mos6551_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(UART_TAG, mos6551_device, write_cts))
-MACHINE_CONFIG_END
+	rs232_port_device &rs232(RS232_PORT(config, PORT_TAG, default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(m_uart, FUNC(mos6551_device::write_rxd));
+	rs232.dcd_handler().set(m_uart, FUNC(mos6551_device::write_dcd));
+	rs232.dsr_handler().set(m_uart, FUNC(mos6551_device::write_dsr));
+	rs232.cts_handler().set(m_uart, FUNC(mos6551_device::write_cts));
+}
 
 ROM_START(coco_rs232_device)
 	ROM_REGION(0x1000, "eprom", ROMREGION_ERASE00)
@@ -107,10 +116,17 @@ const tiny_rom_entry *coco_rs232_device::device_rom_region() const
 	return ROM_NAME(coco_rs232_device);
 }
 
+//-------------------------------------------------
+//  cts_read
+//-------------------------------------------------
+
+READ8_MEMBER(coco_rs232_device::cts_read)
+{
+	return m_eprom->base()[offset & 0x0fff];
+}
+
 //**************************************************************************
 //  DEVICE DECLARATION
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE_PRIVATE(COCO_RS232, device_cococart_interface, coco_rs232_device, "coco_rs232", "CoCo Deluxe RS-232 PAK")
-template class device_finder<device_cococart_interface, false>;
-template class device_finder<device_cococart_interface, true>;

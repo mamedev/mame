@@ -18,10 +18,22 @@
 		<publisher>Firesoft</publisher>
 		<part name="cass" interface="spectrum_cass">
 			<dataarea name="cass" size="45895">
-				<rom name="boulder mix (19xx)(firesoft)(ru)[pentagon 128].tzx" size="45895" crc="dd36b3bf" sha1="26430d66baaf04c2e7757f23169ffb201190d5c6" offset="0"/>
+				<rom name="boulder mix (19xx)(firesoft)(ru)[pentagon 128].tzx" size="45895" crc="dd36b3bf" sha1="26430d66baaf04c2e7757f23169ffb201190d5c6"/>
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="oldtwrp">
+		<description>Old Tower</description>
+		<year>2018</year>
+		<publisher>RetroSouls</publisher>
+		<part name="cass" interface="spectrum_cass">
+			<dataarea name="cass" size="101080">
+				<rom name="oldtowerpentagon.tap" size="101080" crc="a68f6ac1" sha1="7e397cd79d8444bc36e7dc27c7fc511ffc5236b9"/>
+			</dataarea>
+		</part>
+	</software>
+
 
 </softwarelist>
 

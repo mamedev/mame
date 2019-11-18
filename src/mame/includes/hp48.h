@@ -12,9 +12,10 @@
 
 #pragma once
 
+#include "cpu/saturn/saturn.h"
 #include "machine/hp48_port.h"
-
 #include "sound/dac.h"
+#include "emupal.h"
 #include "screen.h"
 
 /* model */
@@ -27,25 +28,6 @@ typedef enum {
 	HP49_G
 } hp48_models;
 
-/* memory module configuration */
-typedef struct
-{
-	/* static part */
-	uint32_t off_mask;             /* offset bit-mask, indicates the real size */
-	read8_delegate read;
-	const char *read_name;
-	write8_delegate write;
-	void* data;                  /* non-NULL for banks */
-	int isnop;
-
-	/* configurable part */
-	uint8_t  state;                /* one of HP48_MODULE_ */
-	uint32_t base;                 /* base address */
-	uint32_t mask;                 /* often improperly called size, it is an address select mask */
-
-} hp48_module;
-
-
 /* screen image averaging */
 #define HP48_NB_SCREENS 3
 
@@ -54,17 +36,57 @@ class hp48_state : public driver_device
 public:
 	hp48_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, m_modules{ { *this }, { *this }, { *this }, { *this }, { *this }, { *this } }
 		, m_maincpu(*this, "maincpu")
 		, m_dac(*this, "dac")
 		, m_palette(*this, "palette")
 		, m_screen(*this, "screen")
-		, m_port(*this, "port%u", 1U) {}
+		, m_port(*this, "port%u", 1U)
+	{
+	}
 
+	void hp48s(machine_config &config);
+	void hp48gp(machine_config &config);
+	void hp48sx(machine_config &config);
+	void hp48g(machine_config &config);
+	void hp48gx(machine_config &config);
+	void hp49g(machine_config &config);
+
+	void init_hp48();
+
+	void decode_nibble(uint8_t* dst, uint8_t* src, int size);
+	void encode_nibble(uint8_t* dst, uint8_t* src, int size);
+
+	void apply_modules();
+
+	/* memory module configuration */
+	struct hp48_module
+	{
+		hp48_module(device_t &owner) : read(owner), write(owner) { }
+
+		/* static part */
+		uint32_t off_mask;          // offset bit-mask, indicates the real size
+		read8_delegate read;
+		const char *read_name;
+		write8_delegate write;
+		void* data;                 // non-NULL for banks
+		int isnop;
+
+		/* configurable part */
+		uint8_t  state;             // one of HP48_MODULE_
+		uint32_t base;              // base address
+		uint32_t mask;              // often improperly called size, it is an address select mask
+
+	};
+
+	/* from highest to lowest priority: HDW, NCE2, CE1, CE2, NCE3, NCE1 */
+	hp48_module m_modules[6];
+
+private:
 	virtual void machine_reset() override;
 	void base_machine_start(hp48_models model);
 
-	DECLARE_DRIVER_INIT(hp48);
-	DECLARE_PALETTE_INIT(hp48);
+	void hp48_palette(palette_device &palette) const;
 	DECLARE_MACHINE_START(hp49g);
 	DECLARE_MACHINE_START(hp48gx);
 	DECLARE_MACHINE_START(hp48g);
@@ -82,15 +104,12 @@ public:
 	TIMER_CALLBACK_MEMBER(timer1_cb);
 	TIMER_CALLBACK_MEMBER(timer2_cb);
 	void update_annunciators();
-	void apply_modules();
 	void pulse_irq(int irq_line);
 	void rs232_start_recv_byte(uint8_t data);
 	void rs232_send_byte();
 	int get_in();
 	void update_kdn();
 	void reset_modules();
-	void decode_nibble(uint8_t* dst, uint8_t* src, int size);
-	void encode_nibble(uint8_t* dst, uint8_t* src, int size);
 
 	/* memory controller */
 	DECLARE_WRITE_LINE_MEMBER(mem_reset);
@@ -108,15 +127,9 @@ public:
 	/* keyboard interrupt system */
 	DECLARE_WRITE_LINE_MEMBER(rsi);
 	void hp48_common(machine_config &config);
-	void hp48s(machine_config &config);
-	void hp48gp(machine_config &config);
-	void hp48sx(machine_config &config);
-	void hp48g(machine_config &config);
-	void hp48gx(machine_config &config);
-	void hp49g(machine_config &config);
 	void hp48(address_map &map);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<saturn_device> m_maincpu;
 	required_device<dac_bit_interface> m_dac;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
@@ -130,9 +143,6 @@ public:
 
 	/* keyboard interrupt */
 	uint8_t m_kdn;
-
-	/* from highest to lowest priority: HDW, NCE2, CE1, CE2, NCE3, NCE1 */
-	hp48_module m_modules[6];
 
 	/* RAM/ROM extensions, GX/SX only
 	   port1: SX/GX: 32/128 KB

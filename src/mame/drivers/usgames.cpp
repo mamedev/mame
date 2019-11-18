@@ -68,16 +68,16 @@ void usgames_state::usgames_map(address_map &map)
 	map(0x0000, 0x1fff).ram().share("nvram");
 	map(0x2000, 0x2000).portr("DSW");
 	map(0x2010, 0x2010).portr("INPUTS");
-	map(0x2020, 0x2020).w(this, FUNC(usgames_state::lamps1_w));
-	map(0x2030, 0x2030).w(this, FUNC(usgames_state::lamps2_w));
+	map(0x2020, 0x2020).w(FUNC(usgames_state::lamps1_w));
+	map(0x2030, 0x2030).w(FUNC(usgames_state::lamps2_w));
 	map(0x2040, 0x2040).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x2041, 0x2041).portr("UNK1");
 	map(0x2041, 0x2041).w("crtc", FUNC(mc6845_device::register_w));
-	map(0x2060, 0x2060).w(this, FUNC(usgames_state::rombank_w));
+	map(0x2060, 0x2060).w(FUNC(usgames_state::rombank_w));
 	map(0x2070, 0x2070).portr("UNK2");
 	map(0x2400, 0x2401).w("aysnd", FUNC(ay8912_device::address_data_w));
-	map(0x2800, 0x2fff).ram().w(this, FUNC(usgames_state::charram_w)).share("charram");
-	map(0x3000, 0x3fff).ram().w(this, FUNC(usgames_state::videoram_w)).share("videoram");
+	map(0x2800, 0x2fff).ram().w(FUNC(usgames_state::charram_w)).share("charram");
+	map(0x3000, 0x3fff).ram().share("videoram");
 	map(0x4000, 0x7fff).bankr("bank1");
 	map(0x8000, 0xffff).rom();
 }
@@ -89,15 +89,15 @@ void usgames_state::usg185_map(address_map &map)
 	map(0x2000, 0x2001).w("aysnd", FUNC(ay8912_device::address_data_w));
 	map(0x2400, 0x2400).portr("DSW");
 	map(0x2410, 0x2410).portr("INPUTS");
-	map(0x2420, 0x2420).w(this, FUNC(usgames_state::lamps1_w));
-	map(0x2430, 0x2430).w(this, FUNC(usgames_state::lamps2_w));
+	map(0x2420, 0x2420).w(FUNC(usgames_state::lamps1_w));
+	map(0x2430, 0x2430).w(FUNC(usgames_state::lamps2_w));
 	map(0x2440, 0x2440).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x2441, 0x2441).portr("UNK1");
 	map(0x2441, 0x2441).w("crtc", FUNC(mc6845_device::register_w));
-	map(0x2460, 0x2460).w(this, FUNC(usgames_state::rombank_w));
+	map(0x2460, 0x2460).w(FUNC(usgames_state::rombank_w));
 	map(0x2470, 0x2470).portr("UNK2");
-	map(0x2800, 0x2fff).ram().w(this, FUNC(usgames_state::charram_w)).share("charram");
-	map(0x3000, 0x3fff).ram().w(this, FUNC(usgames_state::videoram_w)).share("videoram");
+	map(0x2800, 0x2fff).ram().w(FUNC(usgames_state::charram_w)).share("charram");
+	map(0x3000, 0x3fff).ram().share("videoram");
 	map(0x4000, 0x7fff).bankr("bank1");
 	map(0x8000, 0xffff).rom();
 }
@@ -213,49 +213,48 @@ static const gfx_layout charlayout =
 	8*8
 };
 
-static GFXDECODE_START( usgames )
-	GFXDECODE_ENTRY( nullptr, 0x2800, charlayout, 0, 256 )
+static GFXDECODE_START( gfx_usgames )
+	GFXDECODE_ENTRY( nullptr, 0x2800, charlayout, 0, 1 )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(usgames_state::usg32)
-
+void usgames_state::usg32(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, 2000000) /* ?? */
-	MCFG_CPU_PROGRAM_MAP(usgames_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(usgames_state, irq0_line_hold, 5*60) /* ?? */
+	MC6809(config, m_maincpu, 18_MHz_XTAL / 3); // 68B09P (divider not verified)
+	m_maincpu->set_addrmap(AS_PROGRAM, &usgames_state::usgames_map);
+	m_maincpu->set_periodic_int(FUNC(usgames_state::irq0_line_hold), attotime::from_hz(5*60)); /* ?? */
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(7*8, 57*8-1, 0*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(usgames_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(7*8, 57*8-1, 0*8, 31*8-1);
+	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", usgames)
-	MCFG_PALETTE_ADD("palette", 2*256)
-	MCFG_PALETTE_INIT_OWNER(usgames_state, usgames)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_usgames);
+	PALETTE(config, "palette", FUNC(usgames_state::usgames_palette), 16);
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL(18'000'000) / 16)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
+	mc6845_device &crtc(MC6845(config, "crtc", 18_MHz_XTAL / 16));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.set_update_row_callback(FUNC(usgames_state::update_row));
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8912, 2000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_CONFIG_END
+	AY8912(config, "aysnd", 2000000).add_route(ALL_OUTPUTS, "mono", 0.30);
+}
 
-MACHINE_CONFIG_START(usgames_state::usg185)
+void usgames_state::usg185(machine_config &config)
+{
 	usg32(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(usg185_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &usgames_state::usg185_map);
+}
 
 
 ROM_START( usg32 )
@@ -407,11 +406,11 @@ ROM_START( usg182 ) /* Version 18.2 */
 ROM_END
 
 
-GAME( 1987, usg32,    0,        usg32,  usg32, usgames_state, 0, ROT0, "U.S. Games", "Super Duper Casino (California V3.2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, superten, 0,        usg32,  usg83, usgames_state, 0, ROT0, "U.S. Games", "Super Ten V8.3",                       MACHINE_SUPPORTS_SAVE )
-GAME( 1988, usg83x,   superten, usg32,  usg83, usgames_state, 0, ROT0, "U.S. Games", "Super Ten V8.3X",                      MACHINE_SUPPORTS_SAVE ) /* "Experimental" version?? */
-GAME( 1988, usg82,    superten, usg32,  usg83, usgames_state, 0, ROT0, "U.S. Games", "Super Ten V8.2" ,                      MACHINE_SUPPORTS_SAVE )
-GAME( 1992, usgames,  0,        usg185, usg83, usgames_state, 0, ROT0, "U.S. Games", "Games V25.4X",                         MACHINE_SUPPORTS_SAVE )
-GAME( 1991, usg187c,  usgames,  usg185, usg83, usgames_state, 0, ROT0, "U.S. Games", "Games V18.7C",                         MACHINE_SUPPORTS_SAVE )
-GAME( 1990, usg185,   usgames,  usg185, usg83, usgames_state, 0, ROT0, "U.S. Games", "Games V18.5",                          MACHINE_SUPPORTS_SAVE )
-GAME( 1989, usg182,   usgames,  usg185, usg83, usgames_state, 0, ROT0, "U.S. Games", "Games V18.2",                          MACHINE_SUPPORTS_SAVE )
+GAME( 1987, usg32,    0,        usg32,  usg32, usgames_state, empty_init, ROT0, "U.S. Games", "Super Duper Casino (California V3.2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, superten, 0,        usg32,  usg83, usgames_state, empty_init, ROT0, "U.S. Games", "Super Ten V8.3",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1988, usg83x,   superten, usg32,  usg83, usgames_state, empty_init, ROT0, "U.S. Games", "Super Ten V8.3X",                      MACHINE_SUPPORTS_SAVE ) /* "Experimental" version?? */
+GAME( 1988, usg82,    superten, usg32,  usg83, usgames_state, empty_init, ROT0, "U.S. Games", "Super Ten V8.2" ,                      MACHINE_SUPPORTS_SAVE )
+GAME( 1992, usgames,  0,        usg185, usg83, usgames_state, empty_init, ROT0, "U.S. Games", "Games V25.4X",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1991, usg187c,  usgames,  usg185, usg83, usgames_state, empty_init, ROT0, "U.S. Games", "Games V18.7C",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1990, usg185,   usgames,  usg185, usg83, usgames_state, empty_init, ROT0, "U.S. Games", "Games V18.5",                          MACHINE_SUPPORTS_SAVE )
+GAME( 1989, usg182,   usgames,  usg185, usg83, usgames_state, empty_init, ROT0, "U.S. Games", "Games V18.2",                          MACHINE_SUPPORTS_SAVE )

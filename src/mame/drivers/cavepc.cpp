@@ -52,6 +52,7 @@
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -65,7 +66,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 
-	DECLARE_DRIVER_INIT(cavepc);
+	void init_cavepc();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -111,27 +112,28 @@ void cavepc_state::machine_reset()
 	membank("bank1")->set_base(memregion("bios")->base() + 0x30000);
 }
 
-MACHINE_CONFIG_START(cavepc_state::cavepc)
+void cavepc_state::cavepc(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PENTIUM3, 200000000) /*  AMD Athlon 64 X2 5050e Brisbane 2.60GHz, 1024KB L2 Cache ! */
-	MCFG_CPU_PROGRAM_MAP(cavepc_map)
-	MCFG_CPU_IO_MAP(cavepc_io)
+	PENTIUM3(config, m_maincpu, 200000000); /*  AMD Athlon 64 X2 5050e Brisbane 2.60GHz, 1024KB L2 Cache ! */
+	m_maincpu->set_addrmap(AS_PROGRAM, &cavepc_state::cavepc_map);
+	m_maincpu->set_addrmap(AS_IO, &cavepc_state::cavepc_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 199)
-	MCFG_SCREEN_UPDATE_DRIVER(cavepc_state, screen_update_cavepc)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 639, 0, 199);
+	screen.set_screen_update(FUNC(cavepc_state::screen_update_cavepc));
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 16)
-MACHINE_CONFIG_END
+	PALETTE(config, "palette").set_entries(16);
+}
 
 
 
-DRIVER_INIT_MEMBER(cavepc_state,cavepc)
+void cavepc_state::init_cavepc()
 {
 }
 
@@ -179,4 +181,4 @@ ROM_END
 
 /*****************************************************************************/
 
-GAME(2009, deathsm2, 0,        cavepc, cavepc, cavepc_state, cavepc, ROT0, "Cave", "Deathsmiles II: Makai no Merry Christmas (2009/10/14 MASTER VER 4.00)", MACHINE_IS_SKELETON )
+GAME(2009, deathsm2, 0, cavepc, cavepc, cavepc_state, init_cavepc, ROT0, "Cave", "Deathsmiles II: Makai no Merry Christmas (2009/10/14 MASTER VER 4.00)", MACHINE_IS_SKELETON )

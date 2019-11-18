@@ -10,19 +10,18 @@ public:
 	{
 	}
 
+	void drgw2_common_init();
 
+	void init_drgw2();
+	void init_dw2v100x();
+	void init_drgw2c();
+	void init_drgw2j();
+	void init_drgw2hk();
+
+	void pgm_012_025_drgw2(machine_config &config);
+private:
 	required_device<igs025_device> m_igs025;
 
 	void pgm_drgw2_decrypt();
-	void drgw2_common_init();
-
-	DECLARE_DRIVER_INIT(drgw2);
-	DECLARE_DRIVER_INIT(dw2v100x);
-	DECLARE_DRIVER_INIT(drgw2c);
-	DECLARE_DRIVER_INIT(drgw2j);
-	DECLARE_DRIVER_INIT(drgw2hk);
-
-	DECLARE_MACHINE_RESET(drgw2);
-	void pgm_012_025_drgw2(machine_config &config);
 	void drgw2_mem(address_map &map);
 };

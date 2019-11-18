@@ -293,6 +293,7 @@ pc_keyboard_device::pc_keyboard_device(const machine_config &mconfig, device_typ
 
 at_keyboard_device::at_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	pc_keyboard_device(mconfig, AT_KEYB, tag, owner, clock),
+	m_leds(*this, "led%u", 0U),
 	m_scan_code_set(1)
 {
 	m_type = KEYBOARD_TYPE::AT;
@@ -333,6 +334,7 @@ void at_keyboard_device::device_start()
 	save_item(NAME(m_scan_code_set));
 	save_item(NAME(m_input_state));
 	pc_keyboard_device::device_start();
+	m_leds.resolve();
 }
 
 void pc_keyboard_device::device_reset()
@@ -341,10 +343,6 @@ void pc_keyboard_device::device_reset()
 	m_repeat = 8;
 	m_numlock = 0;
 	m_on = true;
-	/* set default led state */
-	machine().output().set_led_value(2, 0);
-	machine().output().set_led_value(0, 0);
-	machine().output().set_led_value(1, 0);
 
 	m_head = m_tail = 0;
 	queue_insert(0xaa);
@@ -355,6 +353,11 @@ void at_keyboard_device::device_reset()
 {
 	m_input_state = 0;
 	pc_keyboard_device::device_reset();
+
+	/* set default led state */
+	m_leds[2] = 0;
+	m_leds[0] = 0;
+	m_leds[1] = 0;
 }
 
 WRITE_LINE_MEMBER(pc_keyboard_device::enable)
@@ -784,10 +787,9 @@ WRITE8_MEMBER(at_keyboard_device::write)
 
 				/* led's in same order as my keyboard leds. */
 				/* num lock, caps lock, scroll lock */
-				machine().output().set_led_value(2, (data & 0x01));
-				machine().output().set_led_value(0, ((data & 0x02)>>1));
-				machine().output().set_led_value(1, ((data & 0x04)>>2));
-
+				m_leds[2] = BIT(data, 0);
+				m_leds[0] = BIT(data, 1);
+				m_leds[1] = BIT(data, 2);
 			}
 			break;
 		case 2:

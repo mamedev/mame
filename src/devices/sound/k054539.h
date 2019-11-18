@@ -13,16 +13,6 @@
 
 #define K054539_CB_MEMBER(_name)   void _name(double left, double right)
 
-#define MCFG_K054539_APAN_CB(_class, _method) \
-	downcast<k054539_device &>(*device).set_analog_callback(k054539_device::cb_delegate(&_class::_method, #_class "::" #_method, this));
-
-#define MCFG_K054539_REGION_OVERRRIDE(_region) \
-	downcast<k054539_device &>(*device).set_override("^" _region);
-
-#define MCFG_K054539_TIMER_HANDLER(_devcb) \
-	devcb = &downcast<k054539_device &>(*device).set_timer_handler(DEVCB_##_devcb);
-
-
 class k054539_device : public device_t,
 						public device_sound_interface,
 						public device_rom_interface
@@ -36,18 +26,18 @@ public:
 		UPDATE_AT_KEYON = 4
 	};
 
-	typedef device_delegate<void (double left, double right)> cb_delegate;
+	using apan_delegate = device_delegate<void (double left, double right)>;
 
 	// construction/destruction
 	k054539_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
-	template <typename Object> void set_analog_callback(Object &&cb) { m_apan_cb = std::forward<Object>(cb); }
-	template <class Object> devcb_base &set_timer_handler(Object &&cb) { return m_timer_handler.set_callback(std::forward<Object>(cb)); }
+	auto timer_handler() { return m_timer_handler.bind(); }
 
+	template <typename... T> void set_analog_callback(T &&... args) { m_apan_cb.set(std::forward<T>(args)...); }
 
-	DECLARE_WRITE8_MEMBER(write);
-	DECLARE_READ8_MEMBER(read);
+	void write(offs_t offset, u8 data);
+	u8 read(offs_t offset);
 
 	void init_flags(int flags);
 
@@ -67,6 +57,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_clock_changed() override;
 	virtual void device_reset() override;
 	virtual void device_post_load() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -106,7 +97,7 @@ private:
 	emu_timer          *m_timer;
 	uint32_t             m_timer_state;
 	devcb_write_line   m_timer_handler;
-	cb_delegate m_apan_cb;
+	apan_delegate m_apan_cb;
 
 	bool regupdate();
 	void keyon(int channel);

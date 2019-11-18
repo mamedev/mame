@@ -36,16 +36,6 @@ enum
 };
 
 
-#define MCFG_SCUDSP_OUT_IRQ_CB(_devcb) \
-	devcb = &downcast<scudsp_cpu_device &>(*device).set_out_irq_callback(DEVCB_##_devcb);
-
-#define MCFG_SCUDSP_IN_DMA_CB(_devcb) \
-	devcb = &downcast<scudsp_cpu_device &>(*device).set_in_dma_callback(DEVCB_##_devcb);
-
-#define MCFG_SCUDSP_OUT_DMA_CB(_devcb) \
-	devcb = &downcast<scudsp_cpu_device &>(*device).set_out_dma_callback(DEVCB_##_devcb);
-
-
 #define SCUDSP_RESET        INPUT_LINE_RESET    /* Non-Maskable */
 
 class scudsp_cpu_device : public cpu_device
@@ -54,9 +44,9 @@ public:
 	// construction/destruction
 	scudsp_cpu_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
 
-	template <class Object> devcb_base &set_out_irq_callback(Object &&cb) { return m_out_irq_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_in_dma_callback(Object &&cb) { return m_in_dma_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_dma_callback(Object &&cb) { return m_out_dma_cb.set_callback(std::forward<Object>(cb)); }
+	auto out_irq_callback() { return m_out_irq_cb.bind(); }
+	auto in_dma_callback() { return m_in_dma_cb.bind(); }
+	auto out_dma_callback() { return m_out_dma_cb.bind(); }
 
 	/* port 0 */
 	DECLARE_READ32_MEMBER( program_control_r );
@@ -77,9 +67,9 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override { return 1; }
-	virtual uint32_t execute_max_cycles() const override { return 7; }
-	virtual uint32_t execute_input_lines() const override { return 0; }
+	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 7; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 0; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 

@@ -36,24 +36,24 @@ WRITE8_MEMBER(laserbat_state_base::csound2_w)
     The Laser Battle/Lazarian sound board has a SN76477 CSG, two TMS3615
     tone synthesisers, and a TDA1010 power amplifier.  It receives
     commands from the game board over a 16-bit unidirectional data bus.
-    The CPU cannot write all sixteen lines atomically, it write to lines
-    1-8 as one group and 9-16 as another group.
+    The CPU cannot write all sixteen lines atomically, it writes to
+    lines 1-8 as one group and 9-16 as another group.
 
-    The game board makes the the audio output from the first S2636 PVI
-    (5E) available on a pin at the sound board interface connector, but
-    it isn't routed anywhere, so you won't hear it.
+    The game board makes the audio output from the first S2636 PVI (5E)
+    available on a pin at the sound board interface connector, but it
+    isn't routed anywhere, so you won't hear it.
 
     The TMS3615 at 05 is clocked at 250kHz (4MHz crystal oscillator
     divided by 16), and its divide-by-two output is used to clock the
     TMS3615 at 04.  This gives a base 16' note of C3.  The combined 8'
-    or 16' outputs are selectable by jumper, allowing board to be
+    or 16' outputs are selectable by jumper, allowing the board to be
     switched between two octaves.  There's no indication of which octave
     would have been selected in the Lazarian manual.
 
     There's a filter network between the TMS3615 outputs and the power
     amplifier with several parameters controllable from the game board.
 
-    The audio output of the SN76477 isn't actually used.  Rather the
+    The audio output of the SN76477 isn't actually used.  Rather, the
     signal from before the output amplifier is taken and used to gate
     distortion elements in the analog filter network.
 
@@ -302,7 +302,7 @@ WRITE8_MEMBER(laserbat_state::csound2_w)
     There could well be other connections on the sound board - these are
     just what can be deduced by tracing the sound program.
 
-    The game board makes the the audio output from the first S2636 PVI
+    The game board makes the audio output from the first S2636 PVI
     (5E) available on a pin at the sound board interface connector, but
     it isn't routed anywhere.
 */

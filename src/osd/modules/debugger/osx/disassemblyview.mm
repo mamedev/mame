@@ -46,7 +46,7 @@
 - (NSSize)maximumFrameSize {
 	debug_view_xy           max(0, 0);
 	debug_view_source const *source = view->source();
-	for (debug_view_source const *source = view->first_source(); source != nullptr; source = source->next())
+	for (auto &source : view->source_list())
 	{
 		view->set_source(*source);
 		debug_view_xy const current = view->total_size();
@@ -118,16 +118,16 @@
 - (int)selectedSubviewIndex {
 	const debug_view_source *source = view->source();
 	if (source != nullptr)
-		return view->source_list().indexof(*source);
+		return view->source_index(*source);
 	else
 		return -1;
 }
 
 
 - (void)selectSubviewAtIndex:(int)index {
-	const int   selected = view->source_list().indexof(*view->source());
+	const int   selected = view->source_index(*view->source());
 	if (selected != index) {
-		view->set_source(*view->source_list().find(index));
+		view->set_source(*view->source(index));
 		if ([[self window] firstResponder] != self)
 			view->set_cursor_visible(false);
 	}
@@ -155,23 +155,21 @@
 
 - (BOOL)selectSubviewForSpace:(address_space *)space {
 	if (space == nullptr) return NO;
-	debug_view_disasm_source const *source = downcast<debug_view_disasm_source const *>(view->first_source());
-	while ((source != nullptr) && (&source->space() != space))
-		source = downcast<debug_view_disasm_source *>(source->next());
-	if (source != nullptr)
+	for (auto &ptr : view->source_list())
 	{
-		if (view->source() != source)
+		debug_view_disasm_source const *const source = downcast<debug_view_disasm_source const *>(ptr.get());
+		if (&source->space() == space)
 		{
-			view->set_source(*source);
-			if ([[self window] firstResponder] != self)
-				view->set_cursor_visible(false);
+			if (view->source() != source)
+			{
+				view->set_source(*source);
+				if ([[self window] firstResponder] != self)
+					view->set_cursor_visible(false);
+			}
+			return YES;
 		}
-		return YES;
 	}
-	else
-	{
-		return NO;
-	}
+	return NO;
 }
 
 
@@ -256,12 +254,12 @@
 
 
 - (void)insertSubviewItemsInMenu:(NSMenu *)menu atIndex:(NSInteger)index {
-	for (const debug_view_source *source = view->source_list().first(); source != nullptr; source = source->next())
+	for (auto &source : view->source_list())
 	{
 		[[menu insertItemWithTitle:[NSString stringWithUTF8String:source->name()]
 							action:NULL
 					 keyEquivalent:@""
-						   atIndex:index++] setTag:view->source_list().indexof(*source)];
+						   atIndex:index++] setTag:view->source_index(*source)];
 	}
 	if (index < [menu numberOfItems])
 		[menu insertItem:[NSMenuItem separatorItem] atIndex:index++];

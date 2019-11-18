@@ -1,16 +1,16 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese,Carl
-
-#pragma once
-
 #ifndef MAME_INCLUDES_PC9801_H
 #define MAME_INCLUDES_PC9801_H
+
+#pragma once
 
 #include "cpu/i386/i386.h"
 #include "cpu/i86/i286.h"
 #include "cpu/i86/i86.h"
 #include "cpu/nec/nec.h"
 
+#include "imagedev/floppy.h"
 #include "machine/am9517a.h"
 #include "machine/bankdev.h"
 #include "machine/buffer.h"
@@ -22,6 +22,7 @@
 #include "machine/ram.h"
 #include "machine/timer.h"
 #include "machine/upd1990a.h"
+#include "machine/pc9801_memsw.h"
 #include "machine/upd765.h"
 
 #include "bus/scsi/pc9801_sasi.h"
@@ -43,10 +44,11 @@
 #include "machine/pc9801_kbd.h"
 #include "machine/pc9801_cd.h"
 
-#include "machine/idectrl.h"
-#include "machine/idehd.h"
+#include "bus/ata/atadev.h"
+#include "bus/ata/ataintf.h"
 
 #include "debugger.h"
+#include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
@@ -84,9 +86,12 @@ public:
 		m_pit8253(*this, "pit8253"),
 		m_pic1(*this, "pic8259_master"),
 		m_pic2(*this, "pic8259_slave"),
+		m_ppi_sys(*this, "ppi8255_sys"),
+		m_ppi_prn(*this, "ppi8255_prn"),
 		m_fdc_2hd(*this, "upd765_2hd"),
 		m_fdc_2dd(*this, "upd765_2dd"),
 		m_rtc(*this, UPD1990A_TAG),
+		m_memsw(*this, "memsw"),
 		m_keyb(*this, "keyb"),
 		m_sio(*this, UPD8251_TAG),
 		m_hgdc1(*this, "upd7220_chr"),
@@ -113,11 +118,13 @@ public:
 	void pc9801vm(machine_config &config);
 	void pc9801(machine_config &config);
 	void pc9801bx2(machine_config &config);
-	void pc9821ap2(machine_config &config);
-	void pc9821(machine_config &config);
 	void pc9801rs(machine_config &config);
+	void pc9821(machine_config &config);
+	void pc9821as(machine_config &config);
+	void pc9821ap2(machine_config &config);
 	DECLARE_CUSTOM_INPUT_MEMBER(system_type_r);
-	DECLARE_DRIVER_INIT(pc9801_kanji);
+	void init_pc9801_kanji();
+	void init_pc9801vm_kanji();
 
 protected:
 	virtual void video_start() override;
@@ -130,9 +137,12 @@ private:
 	required_device<pit8253_device> m_pit8253;
 	required_device<pic8259_device> m_pic1;
 	required_device<pic8259_device> m_pic2;
+	required_device<i8255_device> m_ppi_sys;
+	required_device<i8255_device> m_ppi_prn;
 	required_device<upd765a_device> m_fdc_2hd;
 	optional_device<upd765a_device> m_fdc_2dd;
 	required_device<upd1990a_device> m_rtc;
+	required_device<pc9801_memsw_device> m_memsw;
 	required_device<pc9801_kbd_device> m_keyb;
 	required_device<i8251_device> m_sio;
 	required_device<upd7220_device> m_hgdc1;
@@ -251,6 +261,10 @@ private:
 	DECLARE_WRITE8_MEMBER(sdip_a_w);
 	DECLARE_WRITE8_MEMBER(sdip_b_w);
 
+	DECLARE_READ8_MEMBER(as_unkdev_data_r);
+	DECLARE_WRITE8_MEMBER(as_unkdev_data_w);
+	DECLARE_WRITE8_MEMBER(as_unkdev_addr_w);
+
 	DECLARE_READ8_MEMBER(window_bank_r);
 	DECLARE_WRITE8_MEMBER(window_bank_w);
 	DECLARE_READ16_MEMBER(timestamp_r);
@@ -272,7 +286,7 @@ private:
 	DECLARE_MACHINE_RESET(pc9801rs);
 	DECLARE_MACHINE_RESET(pc9821);
 
-	DECLARE_PALETTE_INIT(pc9801);
+	void pc9801_palette(palette_device &palette) const;
 	DECLARE_WRITE_LINE_MEMBER(vrtc_irq);
 	DECLARE_READ8_MEMBER(get_slave_ack);
 	DECLARE_WRITE_LINE_MEMBER(dma_hrq_changed);
@@ -316,6 +330,7 @@ private:
 	void pc9801ux_map(address_map &map);
 	void pc9821_io(address_map &map);
 	void pc9821_map(address_map &map);
+	void pc9821as_io(address_map &map);
 	void upd7220_1_map(address_map &map);
 	void upd7220_2_map(address_map &map);
 	void upd7220_grcg_2_map(address_map &map);
@@ -388,6 +403,7 @@ private:
 
 	/* PC9821 specific */
 	uint8_t m_sdip[24], m_sdip_bank;
+	uint8_t m_unkdev0468[0x100], m_unkdev0468_addr;
 	uint8_t m_pc9821_window_bank;
 	uint8_t m_ext2_ff;
 	uint8_t m_sys_type;
@@ -410,5 +426,4 @@ private:
 	uint16_t egc_shift(int plane, uint16_t val);
 };
 
-
-#endif
+#endif // MAME_INCLUDES_PC9801_H

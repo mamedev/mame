@@ -12,32 +12,6 @@
 #pragma once
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_HD61700_LCD_CTRL_CB(_devcb) \
-	devcb = &downcast<hd61700_cpu_device &>(*device).set_lcd_ctrl_callback(DEVCB_##_devcb);
-
-#define MCFG_HD61700_LCD_WRITE_CB(_devcb) \
-	devcb = &downcast<hd61700_cpu_device &>(*device).set_lcd_write_callback(DEVCB_##_devcb);
-
-#define MCFG_HD61700_LCD_READ_CB(_devcb) \
-	devcb = &downcast<hd61700_cpu_device &>(*device).set_lcd_read_callback(DEVCB_##_devcb);
-
-#define MCFG_HD61700_KB_WRITE_CB(_devcb) \
-	devcb = &downcast<hd61700_cpu_device &>(*device).set_kb_write_callback(DEVCB_##_devcb);
-
-#define MCFG_HD61700_KB_READ_CB(_devcb) \
-	devcb = &downcast<hd61700_cpu_device &>(*device).set_kb_read_callback(DEVCB_##_devcb);
-
-#define MCFG_HD61700_PORT_WRITE_CB(_devcb) \
-	devcb = &downcast<hd61700_cpu_device &>(*device).set_port_write_callback(DEVCB_##_devcb);
-
-#define MCFG_HD61700_PORT_READ_CB(_devcb) \
-	devcb = &downcast<hd61700_cpu_device &>(*device).set_port_read_callback(DEVCB_##_devcb);
-
-
-//**************************************************************************
 //  DEFINITIONS
 //**************************************************************************
 
@@ -61,13 +35,13 @@ public:
 	// construction/destruction
 	hd61700_cpu_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
 
-	template<class Object> devcb_base &set_lcd_ctrl_callback(Object &&cb) { return m_lcd_ctrl_cb.set_callback(std::forward<Object>(cb)); }
-	template<class Object> devcb_base &set_lcd_write_callback(Object &&cb) { return m_lcd_write_cb.set_callback(std::forward<Object>(cb)); }
-	template<class Object> devcb_base &set_lcd_read_callback(Object &&cb) { return m_lcd_read_cb.set_callback(std::forward<Object>(cb)); }
-	template<class Object> devcb_base &set_kb_write_callback(Object &&cb) { return m_kb_write_cb.set_callback(std::forward<Object>(cb)); }
-	template<class Object> devcb_base &set_kb_read_callback(Object &&cb) { return m_kb_read_cb.set_callback(std::forward<Object>(cb)); }
-	template<class Object> devcb_base &set_port_write_callback(Object &&cb) { return m_port_write_cb.set_callback(std::forward<Object>(cb)); }
-	template<class Object> devcb_base &set_port_read_callback(Object &&cb) { return m_port_read_cb.set_callback(std::forward<Object>(cb)); }
+	auto lcd_ctrl() { return m_lcd_ctrl_cb.bind(); }
+	auto lcd_write() { return m_lcd_write_cb.bind(); }
+	auto lcd_read() { return m_lcd_read_cb.bind(); }
+	auto kb_write() { return m_kb_write_cb.bind(); }
+	auto kb_read() { return m_kb_read_cb.bind(); }
+	auto port_write() { return m_port_write_cb.bind(); }
+	auto port_read() { return m_port_read_cb.bind(); }
 
 protected:
 	// device-level overrides
@@ -76,9 +50,9 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override { return 1; }
-	virtual uint32_t execute_max_cycles() const override { return 52; }
-	virtual uint32_t execute_input_lines() const override { return 6; }
+	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 52; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 6; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 

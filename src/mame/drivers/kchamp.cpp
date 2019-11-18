@@ -92,11 +92,11 @@ WRITE_LINE_MEMBER(kchamp_state::sound_reset_w)
 	{
 		m_ay[0]->reset();
 		m_ay[1]->reset();
-		sound_control_w(machine().dummy_space(), 0, 0);
+		sound_control_w(0);
 	}
 }
 
-WRITE8_MEMBER(kchamp_state::sound_control_w)
+void kchamp_state::sound_control_w(u8 data)
 {
 	m_msm->reset_w(!(data & 1));
 	m_sound_nmi_enable = ((data >> 1) & 1);
@@ -108,8 +108,8 @@ void kchamp_state::kchampvs_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xcfff).ram();
-	map(0xd000, 0xd3ff).ram().w(this, FUNC(kchamp_state::kchamp_videoram_w)).share("videoram");
-	map(0xd400, 0xd7ff).ram().w(this, FUNC(kchamp_state::kchamp_colorram_w)).share("colorram");
+	map(0xd000, 0xd3ff).ram().w(FUNC(kchamp_state::kchamp_videoram_w)).share("videoram");
+	map(0xd400, 0xd7ff).ram().w(FUNC(kchamp_state::kchamp_colorram_w)).share("colorram");
 	map(0xd800, 0xd8ff).ram().share("spriteram");
 	map(0xd900, 0xdfff).ram();
 	map(0xe000, 0xffff).rom();
@@ -143,7 +143,7 @@ void kchamp_state::kchampvs_sound_io_map(address_map &map)
 	map(0x01, 0x01).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x02, 0x03).w("ay2", FUNC(ay8910_device::data_address_w));
 	map(0x04, 0x04).w(m_adpcm_select, FUNC(ls157_device::ab_w));
-	map(0x05, 0x05).w(this, FUNC(kchamp_state::sound_control_w));
+	map(0x05, 0x05).w(FUNC(kchamp_state::sound_control_w));
 }
 
 
@@ -152,7 +152,8 @@ void kchamp_state::kchampvs_sound_io_map(address_map &map)
 ********************/
 READ8_MEMBER(kchamp_state::sound_reset_r)
 {
-	m_audiocpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+	if (!machine().side_effects_disabled())
+		m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	return 0;
 }
 
@@ -172,8 +173,8 @@ void kchamp_state::kchamp_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xdfff).ram();
-	map(0xe000, 0xe3ff).ram().w(this, FUNC(kchamp_state::kchamp_videoram_w)).share("videoram");
-	map(0xe400, 0xe7ff).ram().w(this, FUNC(kchamp_state::kchamp_colorram_w)).share("colorram");
+	map(0xe000, 0xe3ff).ram().w(FUNC(kchamp_state::kchamp_videoram_w)).share("videoram");
+	map(0xe400, 0xe7ff).ram().w(FUNC(kchamp_state::kchamp_colorram_w)).share("colorram");
 	map(0xea00, 0xeaff).ram().share("spriteram");
 	map(0xeb00, 0xffff).ram();
 }
@@ -186,7 +187,7 @@ void kchamp_state::kchamp_io_map(address_map &map)
 	map(0x90, 0x90).portr("P1");
 	map(0x98, 0x98).portr("P2");
 	map(0xa0, 0xa0).portr("SYSTEM");
-	map(0xa8, 0xa8).r(this, FUNC(kchamp_state::sound_reset_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0xa8, 0xa8).r(FUNC(kchamp_state::sound_reset_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 }
 
 void kchamp_state::kchamp_sound_map(address_map &map)
@@ -200,8 +201,8 @@ void kchamp_state::kchamp_sound_io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x01).w("ay1", FUNC(ay8910_device::data_address_w));
 	map(0x02, 0x03).w("ay2", FUNC(ay8910_device::data_address_w));
-	map(0x04, 0x04).w(m_dac, FUNC(dac_byte_interface::write));
-	map(0x05, 0x05).w(this, FUNC(kchamp_state::kc_sound_control_w));
+	map(0x04, 0x04).w(m_dac, FUNC(dac_byte_interface::data_w));
+	map(0x05, 0x05).w(FUNC(kchamp_state::kc_sound_control_w));
 	map(0x06, 0x06).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }
 
@@ -346,7 +347,7 @@ static const gfx_layout spritelayout =
 	16*8    /* ofset to next tile */
 };
 
-static GFXDECODE_START( kchamp )
+static GFXDECODE_START( gfx_kchamp )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, tilelayout,   32*4, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0x08000, spritelayout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0x04000, spritelayout, 0, 16 )
@@ -403,117 +404,109 @@ void kchamp_state::machine_reset()
 	m_sound_nmi_enable = 0;
 }
 
-MACHINE_CONFIG_START(kchamp_state::kchampvs)
-
+void kchamp_state::kchampvs(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/4)    /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(kchampvs_map)
-	MCFG_CPU_IO_MAP(kchampvs_io_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
+	Z80(config, m_maincpu, XTAL(12'000'000)/4);     /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &kchamp_state::kchampvs_map);
+	m_maincpu->set_addrmap(AS_IO, &kchamp_state::kchampvs_io_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &kchamp_state::decrypted_opcodes_map);
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(12'000'000)/4)    /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(kchampvs_sound_map)
-	MCFG_CPU_IO_MAP(kchampvs_sound_io_map)      /* irq's triggered from main cpu */
-										/* nmi's from msm5205 */
+	Z80(config, m_audiocpu, XTAL(12'000'000)/4);    /* verified on pcb */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &kchamp_state::kchampvs_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &kchamp_state::kchampvs_sound_io_map);
+	/* IRQs triggered from main CPU */
+	/* NMIs from MSM5205 */
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 8C
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(kchamp_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(kchamp_state, nmi_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(kchamp_state, sound_reset_w))
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // 8C
+	mainlatch.q_out_cb<0>().set(FUNC(kchamp_state::flipscreen_w));
+	mainlatch.q_out_cb<1>().set(FUNC(kchamp_state::nmi_enable_w));
+	mainlatch.q_out_cb<2>().set(FUNC(kchamp_state::sound_reset_w));
 
 	MCFG_MACHINE_START_OVERRIDE(kchamp_state,kchampvs)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59.10) /* verified on pcb */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(kchamp_state, screen_update_kchampvs)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(kchamp_state, vblank_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(59.10); /* verified on pcb */
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(kchamp_state::screen_update_kchampvs));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(kchamp_state::vblank_irq));
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", kchamp)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(kchamp_state, kchamp)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_kchamp);
+	PALETTE(config, m_palette, FUNC(kchamp_state::kchamp_palette), 256);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL(12'000'000)/8)    /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
+	AY8910(config, m_ay[0], XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "speaker", 0.3);    /* verified on pcb */
+	AY8910(config, m_ay[1], XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "speaker", 0.3);    /* verified on pcb */
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL(12'000'000)/8)    /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
+	LS157(config, m_adpcm_select, 0); // at 4C
+	m_adpcm_select->out_callback().set("msm", FUNC(msm5205_device::data_w));
 
-	MCFG_DEVICE_ADD("adpcm_select", LS157, 0) // at 4C
-	MCFG_74157_OUT_CB(DEVWRITE8("msm", msm5205_device, data_w))
-
-	MCFG_SOUND_ADD("msm", MSM5205, 375000)  /* verified on pcb, discrete circuit clock */
-	MCFG_MSM5205_VCK_CALLBACK(WRITELINE(kchamp_state, msmint))         /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)  /* 1 / 96 = 3906.25Hz playback */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-MACHINE_CONFIG_END
+	MSM5205(config, m_msm, 375000);  /* verified on pcb, discrete circuit clock */
+	m_msm->vck_callback().set(FUNC(kchamp_state::msmint));  /* interrupt function */
+	m_msm->set_prescaler_selector(msm5205_device::S96_4B);  /* 1 / 96 = 3906.25Hz playback */
+	m_msm->add_route(ALL_OUTPUTS, "speaker", 1.0);
+}
 
 /********************
 * 1 Player Version  *
 ********************/
 
-MACHINE_CONFIG_START(kchamp_state::kchamp)
-
+void kchamp_state::kchamp(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/4)  /* 12MHz / 4 = 3.0 MHz */
-	MCFG_CPU_PROGRAM_MAP(kchamp_map)
-	MCFG_CPU_IO_MAP(kchamp_io_map)
+	Z80(config, m_maincpu, XTAL(12'000'000)/4);     /* 12MHz / 4 = 3.0 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &kchamp_state::kchamp_map);
+	m_maincpu->set_addrmap(AS_IO, &kchamp_state::kchamp_io_map);
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(12'000'000)/4) /* 12MHz / 4 = 3.0 MHz */
-	MCFG_CPU_PROGRAM_MAP(kchamp_sound_map)
-	MCFG_CPU_IO_MAP(kchamp_sound_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(kchamp_state, sound_int,  125) /* Hz */
-											/* irq's triggered from main cpu */
-											/* nmi's from 125 Hz clock */
+	Z80(config, m_audiocpu, XTAL(12'000'000)/4);    /* 12MHz / 4 = 3.0 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &kchamp_state::kchamp_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &kchamp_state::kchamp_sound_io_map);
+	m_audiocpu->set_periodic_int(FUNC(kchamp_state::sound_int), attotime::from_hz(125)); /* Hz */
+	/* IRQs triggered from main CPU */
+	/* NMIs from 125Hz clock */
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // IC71
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(kchamp_state, flipscreen_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(kchamp_state, nmi_enable_w))
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // IC71
+	mainlatch.q_out_cb<0>().set(FUNC(kchamp_state::flipscreen_w));
+	mainlatch.q_out_cb<1>().set(FUNC(kchamp_state::nmi_enable_w));
 
 	MCFG_MACHINE_START_OVERRIDE(kchamp_state,kchamp)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(kchamp_state, screen_update_kchamp)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(kchamp_state, vblank_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(kchamp_state::screen_update_kchamp));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(kchamp_state::vblank_irq));
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", kchamp)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(kchamp_state, kchamp)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_kchamp);
+	PALETTE(config, m_palette, FUNC(kchamp_state::kchamp_palette), 256);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL(12'000'000)/12) /* Guess based on actual pcb recordings of karatedo */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
+	AY8910(config, m_ay[0], XTAL(12'000'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.3); /* Guess based on actual pcb recordings of karatedo */
+	AY8910(config, m_ay[1], XTAL(12'000'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.3); /* Guess based on actual pcb recordings of karatedo */
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL(12'000'000)/12) /* Guess based on actual pcb recordings of karatedo */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
-
-	MCFG_SOUND_ADD("dac", DAC08, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3) // IC11
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	DAC08(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.3); // IC11
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
 
 /***************************************************************************
@@ -688,6 +681,92 @@ ROM_START( kchampvs2 )
 	ROM_LOAD( "lt.k8",    0x0200, 0x0100, CRC(ba4a5651) SHA1(77e81bd64ab59a7466d20eabdff4be241e963c52) ) /* blue */
 ROM_END
 
+// This version has a mix of the "Karate Champ (US VS version, set 1)" ROMs and a few ROMs unique to "Taisen Karate Dou (Japan VS version)" along with 1 completely unique program ROM.
+// The only difference is instead of "My hero" as found in the later US sets it says "My hero deserves the fair".
+ROM_START( kchampvs3 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "bs24.d13", 0x00000, 0x02000, CRC(829da69b) SHA1(3266e7686e537f34ee5ce4cccc349eb12fc65038) )
+	ROM_LOAD( "bs23.d11", 0x02000, 0x02000, CRC(091f810e) SHA1(283edb08ce106835185a1c2d6b88f7544d75f3b4) )
+	ROM_LOAD( "bs22.d10", 0x04000, 0x02000, CRC(d4df2a52) SHA1(60d6cb1cb51c6f80a0f88913d4152ab8bda752d6) )
+	ROM_LOAD( "bs21.d8",  0x06000, 0x02000, CRC(80839912) SHA1(4a3c6ad8eba756ae8e89faf42b72b41f85731e67) ) // only unique ROM
+	ROM_LOAD( "bs20.d7",  0x08000, 0x02000, CRC(623a467b) SHA1(5f150c67632f8e32769b75aa0615d0eb018afdc4) )
+	ROM_LOAD( "bs19.d6",  0x0a000, 0x02000, CRC(43e196c4) SHA1(8029798ea0a560603c3dcde56db5a1ccde58c514) )
+	ROM_CONTINUE(         0x0e000, 0x02000 )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Sound CPU */
+	ROM_LOAD( "bs18.d4",  0x00000, 0x02000, CRC(eaa646eb) SHA1(cbd48f4d5d225b71c2dd0b14f420838561e3f83e) )
+	ROM_LOAD( "bs17.d2",  0x02000, 0x02000, CRC(d71031ad) SHA1(b168f4ef4feb4195305404df699acecb731eab02) )
+	ROM_LOAD( "bs16.d1",  0x04000, 0x02000, CRC(6f811c43) SHA1(1d33ac8129562ab709bd7396b4c2457b6db99277) )
+
+	ROM_REGION( 0x08000, "gfx1", 0 )
+	ROM_LOAD( "bs12.k1",  0x00000, 0x02000, CRC(4c574ecd) SHA1(86914eef33da73463ba6261eecae75209d24fac1) )
+	ROM_LOAD( "bs13.k3",  0x02000, 0x02000, CRC(750b66af) SHA1(c7824994b977d4e846f3ecadfcfc51331f52b6f4) )
+	ROM_LOAD( "bs14.k5",  0x04000, 0x02000, CRC(9ad6227c) SHA1(708af5e70927040cf7f2ae6f792344c19099530c) )
+	ROM_LOAD( "bs15.k6",  0x06000, 0x02000, CRC(3b6d5de5) SHA1(288fffcbc9369db5c75e7e0d6181612de6f12da3) )
+
+	ROM_REGION( 0x18000, "gfx2", 0 ) // 00, 06, 03 and 09 match the karatevs set
+	ROM_LOAD( "bs00.a1",  0x00000, 0x02000, CRC(c46a8b88) SHA1(a47e56a6dc7f36b896b8156e77a1da7e8be2332e) )
+	ROM_LOAD( "bs06.c1",  0x02000, 0x02000, CRC(cf8982ff) SHA1(aafb249503ad51f64b1f31ea2d869dfc0e065d19) )
+	ROM_LOAD( "bs01.a3",  0x04000, 0x02000, CRC(b4842ea9) SHA1(471475f65edbd292b9162ad50e5cb0c7144845b0) )
+	ROM_LOAD( "bs07.c3",  0x06000, 0x02000, CRC(8cd166a5) SHA1(4b623c4c0025d75b3ed9746f8b6730bf3e65d85a) )
+	ROM_LOAD( "bs02.a5",  0x08000, 0x02000, CRC(4cbd3aa3) SHA1(a9a683dcc4f52b18450659a20434a4d2a7b411d9) )
+	ROM_LOAD( "bs08.c5",  0x0a000, 0x02000, CRC(6be342a6) SHA1(0b8ac7ef7c6a6464fbc027a9fd17fa7ce1ffd962) )
+	ROM_LOAD( "bs03.a6",  0x0c000, 0x02000, CRC(bde8a52b) SHA1(1a0800472caf8c79a15cc977dad1a7bc97c74b2b) )
+	ROM_LOAD( "bs09.c6",  0x0e000, 0x02000, CRC(e9a5f945) SHA1(e6b21912bee97de06819c8ac85a45bbc70030f88) )
+	ROM_LOAD( "bs04.a8",  0x10000, 0x02000, CRC(7346db8a) SHA1(d2b2c1700ae0ff9c614a9981a3da3d69879e9f25) )
+	ROM_LOAD( "bs10.c8",  0x12000, 0x02000, CRC(b78714fc) SHA1(4df7f15c37d56a9d66d0049aad65b32063e5c29a) )
+	ROM_LOAD( "bs05.a10", 0x14000, 0x02000, CRC(b2557102) SHA1(ec4285029fc3ee1ad0adb05f363b234c67f8903d) )
+	ROM_LOAD( "bs11.c10", 0x16000, 0x02000, CRC(c85aba0e) SHA1(4be21b38623c2a8ae7f1e7397fb002e4cb9e4614) )
+
+	ROM_REGION( 0x0300, "proms", 0 )
+	ROM_LOAD( "br27.k10", 0x0000, 0x0100, CRC(f683c54a) SHA1(92893990456b92f04a2be98b8e9626e97b7a2562) ) /* red */
+	ROM_LOAD( "br26.k9",  0x0100, 0x0100, CRC(3ddbb6c4) SHA1(0eca5594d6812bc79f8b78f83fe003877d20c973) ) /* green */
+	ROM_LOAD( "br25.k8",  0x0200, 0x0100, CRC(ba4a5651) SHA1(77e81bd64ab59a7466d20eabdff4be241e963c52) ) /* blue */
+ROM_END
+
+// This version has a mix of the "Karate Champ (US VS version, set 1)" ROMs and a few ROMs unique to "Taisen Karate Dou (Japan VS version)".
+// It displays the dialog balloon in red with a boat below it.
+ROM_START( kchampvs4 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "bs24.d13", 0x00000, 0x02000, CRC(829da69b) SHA1(3266e7686e537f34ee5ce4cccc349eb12fc65038) )
+	ROM_LOAD( "bs23.d11", 0x02000, 0x02000, CRC(091f810e) SHA1(283edb08ce106835185a1c2d6b88f7544d75f3b4) )
+	ROM_LOAD( "bs22.d10", 0x04000, 0x02000, CRC(d4df2a52) SHA1(60d6cb1cb51c6f80a0f88913d4152ab8bda752d6) )
+	ROM_LOAD( "bs21.d8",  0x06000, 0x02000, CRC(3d4ef0da) SHA1(228c8e47bb7123b69746506402edb875a43d7af5) )
+	ROM_LOAD( "bs20.d7",  0x08000, 0x02000, CRC(623a467b) SHA1(5f150c67632f8e32769b75aa0615d0eb018afdc4) )
+	ROM_LOAD( "bs19.d6",  0x0a000, 0x02000, CRC(43e196c4) SHA1(8029798ea0a560603c3dcde56db5a1ccde58c514) )
+	ROM_CONTINUE(         0x0e000, 0x02000 )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Sound CPU */
+	ROM_LOAD( "bs18.d4",  0x00000, 0x02000, CRC(eaa646eb) SHA1(cbd48f4d5d225b71c2dd0b14f420838561e3f83e) )
+	ROM_LOAD( "bs17.d2",  0x02000, 0x02000, CRC(d71031ad) SHA1(b168f4ef4feb4195305404df699acecb731eab02) )
+	ROM_LOAD( "bs16.d1",  0x04000, 0x02000, CRC(6f811c43) SHA1(1d33ac8129562ab709bd7396b4c2457b6db99277) )
+
+	ROM_REGION( 0x08000, "gfx1", 0 )
+	ROM_LOAD( "bs12.k1",  0x00000, 0x02000, CRC(4c574ecd) SHA1(86914eef33da73463ba6261eecae75209d24fac1) )
+	ROM_LOAD( "bs13.k3",  0x02000, 0x02000, CRC(750b66af) SHA1(c7824994b977d4e846f3ecadfcfc51331f52b6f4) )
+	ROM_LOAD( "bs14.k5",  0x04000, 0x02000, CRC(9ad6227c) SHA1(708af5e70927040cf7f2ae6f792344c19099530c) )
+	ROM_LOAD( "bs15.k6",  0x06000, 0x02000, CRC(3b6d5de5) SHA1(288fffcbc9369db5c75e7e0d6181612de6f12da3) )
+
+	ROM_REGION( 0x18000, "gfx2", 0 ) // 00, 06, 03 and 09 match the karatevs set
+	ROM_LOAD( "bs00.a1",  0x00000, 0x02000, CRC(c46a8b88) SHA1(a47e56a6dc7f36b896b8156e77a1da7e8be2332e) )
+	ROM_LOAD( "bs06.c1",  0x02000, 0x02000, CRC(cf8982ff) SHA1(aafb249503ad51f64b1f31ea2d869dfc0e065d19) )
+	ROM_LOAD( "bs01.a3",  0x04000, 0x02000, CRC(b4842ea9) SHA1(471475f65edbd292b9162ad50e5cb0c7144845b0) )
+	ROM_LOAD( "bs07.c3",  0x06000, 0x02000, CRC(8cd166a5) SHA1(4b623c4c0025d75b3ed9746f8b6730bf3e65d85a) )
+	ROM_LOAD( "bs02.a5",  0x08000, 0x02000, CRC(4cbd3aa3) SHA1(a9a683dcc4f52b18450659a20434a4d2a7b411d9) )
+	ROM_LOAD( "bs08.c5",  0x0a000, 0x02000, CRC(6be342a6) SHA1(0b8ac7ef7c6a6464fbc027a9fd17fa7ce1ffd962) )
+	ROM_LOAD( "bs03.a6",  0x0c000, 0x02000, CRC(bde8a52b) SHA1(1a0800472caf8c79a15cc977dad1a7bc97c74b2b) )
+	ROM_LOAD( "bs09.c6",  0x0e000, 0x02000, CRC(e9a5f945) SHA1(e6b21912bee97de06819c8ac85a45bbc70030f88) )
+	ROM_LOAD( "bs04.a8",  0x10000, 0x02000, CRC(7346db8a) SHA1(d2b2c1700ae0ff9c614a9981a3da3d69879e9f25) )
+	ROM_LOAD( "bs10.c8",  0x12000, 0x02000, CRC(b78714fc) SHA1(4df7f15c37d56a9d66d0049aad65b32063e5c29a) )
+	ROM_LOAD( "bs05.a10", 0x14000, 0x02000, CRC(b2557102) SHA1(ec4285029fc3ee1ad0adb05f363b234c67f8903d) )
+	ROM_LOAD( "bs11.c10", 0x16000, 0x02000, CRC(c85aba0e) SHA1(4be21b38623c2a8ae7f1e7397fb002e4cb9e4614) )
+
+	ROM_REGION( 0x0300, "proms", 0 )
+	ROM_LOAD( "br27.k10", 0x0000, 0x0100, CRC(f683c54a) SHA1(92893990456b92f04a2be98b8e9626e97b7a2562) ) /* red */
+	ROM_LOAD( "br26.k9",  0x0100, 0x0100, CRC(3ddbb6c4) SHA1(0eca5594d6812bc79f8b78f83fe003877d20c973) ) /* green */
+	ROM_LOAD( "br25.k8",  0x0200, 0x0100, CRC(ba4a5651) SHA1(77e81bd64ab59a7466d20eabdff4be241e963c52) ) /* blue */
+ROM_END
+
 ROM_START( karatevs )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "br24.d13", 0x00000, 0x02000, CRC(ea9cda49) SHA1(7d753a8d391418d0fe5231eb88b3627f7d3fd99e) )
@@ -738,12 +817,11 @@ void kchamp_state::decrypt_code()
 }
 
 
-DRIVER_INIT_MEMBER(kchamp_state,kchampvs)
+void kchamp_state::init_kchampvs()
 {
 	decrypt_code();
 
 	uint8_t *rom = memregion("maincpu")->base();
-	int A;
 
 	/*
 	    Note that the first 4 opcodes that the program
@@ -755,7 +833,7 @@ DRIVER_INIT_MEMBER(kchamp_state,kchampvs)
 	    encrypted address for the jump.
 	 */
 	m_decrypted_opcodes[0] = rom[0];  /* this is a jump */
-	A = rom[1] + 256 * rom[2];
+	int A = rom[1] + 256 * rom[2];
 	m_decrypted_opcodes[A] = rom[A];  /* fix opcode on first jump address (again, a jump) */
 	rom[A+1] ^= 0xee;       /* fix address of the second jump */
 	A = rom[A+1] + 256 * rom[A+2];
@@ -768,7 +846,7 @@ DRIVER_INIT_MEMBER(kchamp_state,kchampvs)
 }
 
 
-DRIVER_INIT_MEMBER(kchamp_state,kchampvs2)
+void kchamp_state::init_kchampvs2()
 {
 	decrypt_code();
 	m_msm_play_lo_nibble = true;
@@ -776,8 +854,10 @@ DRIVER_INIT_MEMBER(kchamp_state,kchampvs2)
 
 
 
-GAME( 1984, kchamp,    0,      kchamp,   kchamp,   kchamp_state,  0,         ROT90, "Data East USA",         "Karate Champ (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, karatedo,  kchamp, kchamp,   kchamp,   kchamp_state,  0,         ROT90, "Data East Corporation", "Karate Dou (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, kchampvs,  kchamp, kchampvs, kchampvs, kchamp_state,  kchampvs,  ROT90, "Data East USA",         "Karate Champ (US VS version, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, kchampvs2, kchamp, kchampvs, kchampvs, kchamp_state,  kchampvs2, ROT90, "Data East USA",         "Karate Champ (US VS version, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, karatevs,  kchamp, kchampvs, kchampvs, kchamp_state,  kchampvs,  ROT90, "Data East Corporation", "Taisen Karate Dou (Japan VS version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, kchamp,    0,      kchamp,   kchamp,   kchamp_state,  empty_init,     ROT90, "Data East USA",         "Karate Champ (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, karatedo,  kchamp, kchamp,   kchamp,   kchamp_state,  empty_init,     ROT90, "Data East Corporation", "Karate Dou (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, kchampvs,  kchamp, kchampvs, kchampvs, kchamp_state,  init_kchampvs,  ROT90, "Data East USA",         "Karate Champ (US VS version, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, kchampvs2, kchamp, kchampvs, kchampvs, kchamp_state,  init_kchampvs2, ROT90, "Data East USA",         "Karate Champ (US VS version, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, kchampvs3, kchamp, kchampvs, kchampvs, kchamp_state,  init_kchampvs,  ROT90, "Data East USA",         "Karate Champ (US VS version, set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, kchampvs4, kchamp, kchampvs, kchampvs, kchamp_state,  init_kchampvs,  ROT90, "Data East USA",         "Karate Champ (US VS version, set 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, karatevs,  kchamp, kchampvs, kchampvs, kchamp_state,  init_kchampvs,  ROT90, "Data East Corporation", "Taisen Karate Dou (Japan VS version)", MACHINE_SUPPORTS_SAVE )

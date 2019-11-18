@@ -21,13 +21,13 @@ class mightyframe_state : public driver_device
 public:
 	mightyframe_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-//      , m_maincpu(*this, "maincpu")
+		//      , m_maincpu(*this, "maincpu")
 	{ }
 
-void mightyframe(machine_config &config);
-void mem_map(address_map &map);
+	void mightyframe(machine_config &config);
 private:
-//  required_device<cpu_device> m_maincpu;
+	void mem_map(address_map &map);
+	//  required_device<cpu_device> m_maincpu;
 };
 
 void mightyframe_state::mem_map(address_map &map)
@@ -38,14 +38,15 @@ void mightyframe_state::mem_map(address_map &map)
 static INPUT_PORTS_START( mightyframe )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(mightyframe_state::mightyframe)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)) // no idea of clock
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-MACHINE_CONFIG_END
+void mightyframe_state::mightyframe(machine_config &config)
+{
+	m68000_device &maincpu(M68000(config, "maincpu", XTAL(16'000'000))); // no idea of clock
+	maincpu.set_addrmap(AS_PROGRAM, &mightyframe_state::mem_map);
+}
 
 ROM_START( mightyframe )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "72-01231.26c", 0x0000, 0x8000, CRC(41faf884) SHA1(d0c6f35394b4006bbe9a3f81b658ded37f41d86f) )
 ROM_END
 
-COMP( 1985?, mightyframe, 0, 0, mightyframe, mightyframe, mightyframe_state, 0, "Convergent Technologies", "Mightyframe", MACHINE_IS_SKELETON )
+COMP( 1985?, mightyframe, 0, 0, mightyframe, mightyframe, mightyframe_state, empty_init, "Convergent Technologies", "Mightyframe", MACHINE_IS_SKELETON )

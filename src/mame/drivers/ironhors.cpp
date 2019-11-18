@@ -15,7 +15,6 @@
 #include "cpu/m6809/m6809.h"
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
-#include "screen.h"
 #include "speaker.h"
 
 
@@ -25,11 +24,11 @@
  *
  *************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(ironhors_state::irq)
+TIMER_DEVICE_CALLBACK_MEMBER(ironhors_state::ironhors_scanline_tick)
 {
 	int scanline = param;
 
-	if (scanline == 240)
+	if (scanline == 240 && (m_screen->frame_number() & 1) == 0)
 	{
 		if (*m_interrupt_enable & 4)
 			m_maincpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
@@ -37,20 +36,20 @@ TIMER_DEVICE_CALLBACK_MEMBER(ironhors_state::irq)
 	else if (((scanline+16) % 64) == 0)
 	{
 		if (*m_interrupt_enable & 1)
-			m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 }
 
 WRITE8_MEMBER(ironhors_state::sh_irqtrigger_w)
 {
-	m_soundcpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+	m_soundcpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
 WRITE8_MEMBER(ironhors_state::filter_w)
 {
-	m_disc_ih->write(space, NODE_11, (data & 0x04) >> 2);
-	m_disc_ih->write(space, NODE_12, (data & 0x02) >> 1);
-	m_disc_ih->write(space, NODE_13, (data & 0x01) >> 0);
+	m_disc_ih->write(NODE_11, (data & 0x04) >> 2);
+	m_disc_ih->write(NODE_12, (data & 0x02) >> 1);
+	m_disc_ih->write(NODE_13, (data & 0x01) >> 0);
 }
 
 /*************************************
@@ -62,24 +61,24 @@ WRITE8_MEMBER(ironhors_state::filter_w)
 void ironhors_state::master_map(address_map &map)
 {
 	map(0x0000, 0x0002).ram();
-	map(0x0003, 0x0003).ram().w(this, FUNC(ironhors_state::charbank_w));
+	map(0x0003, 0x0003).ram().w(FUNC(ironhors_state::charbank_w));
 	map(0x0004, 0x0004).ram().share("int_enable");
 	map(0x0005, 0x001f).ram();
 	map(0x0020, 0x003f).ram().share("scroll");
 	map(0x0040, 0x005f).ram();
 	map(0x0060, 0x00df).ram();
 	map(0x0800, 0x0800).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x0900, 0x0900).portr("DSW3").w(this, FUNC(ironhors_state::sh_irqtrigger_w));
-	map(0x0a00, 0x0a00).portr("DSW2").w(this, FUNC(ironhors_state::palettebank_w));
-	map(0x0b00, 0x0b00).portr("DSW1").w(this, FUNC(ironhors_state::flipscreen_w));
+	map(0x0900, 0x0900).portr("DSW3").w(FUNC(ironhors_state::sh_irqtrigger_w));
+	map(0x0a00, 0x0a00).portr("DSW2").w(FUNC(ironhors_state::palettebank_w));
+	map(0x0b00, 0x0b00).portr("DSW1").w(FUNC(ironhors_state::flipscreen_w));
 	map(0x0b01, 0x0b01).portr("P2");
 	map(0x0b02, 0x0b02).portr("P1");
 	map(0x0b03, 0x0b03).portr("SYSTEM");
 	map(0x1800, 0x1800).nopw(); // ???
 	map(0x1a00, 0x1a01).nopw(); // ???
 	map(0x1c00, 0x1dff).nopw(); // ???
-	map(0x2000, 0x23ff).ram().w(this, FUNC(ironhors_state::colorram_w)).share("colorram");
-	map(0x2400, 0x27ff).ram().w(this, FUNC(ironhors_state::videoram_w)).share("videoram");
+	map(0x2000, 0x23ff).ram().w(FUNC(ironhors_state::colorram_w)).share("colorram");
+	map(0x2400, 0x27ff).ram().w(FUNC(ironhors_state::videoram_w)).share("videoram");
 	map(0x2800, 0x2fff).ram();
 	map(0x3000, 0x30ff).ram().share("spriteram2");
 	map(0x3100, 0x37ff).ram();
@@ -112,28 +111,27 @@ void ironhors_state::farwest_master_map(address_map &map)
 	map(0x0040, 0x005f).ram();
 	map(0x0060, 0x00ff).ram();
 	map(0x0800, 0x0800).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x0900, 0x0900) /*.protr("DSW3") */ .w(this, FUNC(ironhors_state::sh_irqtrigger_w));
-	map(0x0a00, 0x0a00).portr("DSW2"); //.w(this, FUNC(ironhors_state::palettebank_w));
-	map(0x0b00, 0x0b00).portr("DSW1").w(this, FUNC(ironhors_state::flipscreen_w));
-	map(0x0b01, 0x0b01).portr("DSW2"); //.w(this, FUNC(ironhors_state::palettebank_w));
+	map(0x0900, 0x0900) /*.protr("DSW3") */ .w(FUNC(ironhors_state::sh_irqtrigger_w));
+	map(0x0a00, 0x0a00).portr("DSW2"); //.w(FUNC(ironhors_state::palettebank_w));
+	map(0x0b00, 0x0b00).portr("DSW1").w(FUNC(ironhors_state::flipscreen_w));
+	map(0x0b01, 0x0b01).portr("DSW2"); //.w(FUNC(ironhors_state::palettebank_w));
 	map(0x0b02, 0x0b02).portr("P1");
 	map(0x0b03, 0x0b03).portr("SYSTEM");
 
 
 
-	map(0x1800, 0x1800).w(this, FUNC(ironhors_state::sh_irqtrigger_w));
+	map(0x1800, 0x1800).w(FUNC(ironhors_state::sh_irqtrigger_w));
 	map(0x1a00, 0x1a00).ram().share("int_enable");
-	map(0x1a01, 0x1a01).ram().w(this, FUNC(ironhors_state::charbank_w));
-	map(0x1a02, 0x1a02).w(this, FUNC(ironhors_state::palettebank_w));
-//  map(0x1c00, 0x1fff).ram();
-	map(0x2000, 0x23ff).ram().w(this, FUNC(ironhors_state::colorram_w)).share("colorram");
-	map(0x2400, 0x27ff).ram().w(this, FUNC(ironhors_state::videoram_w)).share("videoram");
+	map(0x1a01, 0x1a01).ram().w(FUNC(ironhors_state::charbank_w));
+	map(0x1a02, 0x1a02).w(FUNC(ironhors_state::palettebank_w));
+	map(0x1e00, 0x1eff).ram().share("spriteram");
+	map(0x2000, 0x23ff).ram().w(FUNC(ironhors_state::colorram_w)).share("colorram");
+	map(0x2400, 0x27ff).ram().w(FUNC(ironhors_state::videoram_w)).share("videoram");
 	map(0x2800, 0x2fff).ram();
 	map(0x1c00, 0x1dff).ram().share("spriteram2");
-	map(0x3000, 0x38ff).ram();
+	map(0x3000, 0x31da).ram();
 	map(0x31db, 0x31fa).ram().share("scroll");
-	map(0x1e00, 0x1eff).ram().share("spriteram");
-	map(0x3900, 0x3fff).ram();
+	map(0x31fb, 0x3fff).ram();
 	map(0x4000, 0xffff).rom();
 }
 
@@ -244,7 +242,7 @@ static const gfx_layout ironhors_spritelayout =
 	32*32
 };
 
-static GFXDECODE_START( ironhors )
+static GFXDECODE_START( gfx_ironhors )
 	GFXDECODE_ENTRY( "gfx1", 0, ironhors_charlayout,         0, 16*8 )
 	GFXDECODE_ENTRY( "gfx1", 0, ironhors_spritelayout, 16*8*16, 16*8 )
 	GFXDECODE_ENTRY( "gfx1", 0, ironhors_charlayout,   16*8*16, 16*8 )  /* to handle 8x8 sprites */
@@ -286,7 +284,7 @@ static const gfx_layout farwest_spritelayout2 =
 	8*8 /* every char takes 8 consecutive bytes */
 };
 
-static GFXDECODE_START( farwest )
+static GFXDECODE_START( gfx_farwest )
 	GFXDECODE_ENTRY( "gfx1", 0, farwest_charlayout,         0, 16*8 )
 	GFXDECODE_ENTRY( "gfx2", 0, farwest_spritelayout, 16*8*16, 16*8 )
 	GFXDECODE_ENTRY( "gfx2", 0, farwest_spritelayout2,16*8*16, 16*8 )  /* to handle 8x8 sprites */
@@ -319,7 +317,7 @@ static const discrete_mixer_desc ironhors_mixer_desc_final =
 		0,
 		0, 1};
 
-static DISCRETE_SOUND_START( ironhors )
+static DISCRETE_SOUND_START( ironhors_discrete )
 
 	DISCRETE_INPUTX_STREAM(NODE_01, 0, 5.0, 0)
 	DISCRETE_INPUTX_STREAM(NODE_02, 1, 5.0, 0)
@@ -379,52 +377,47 @@ Hsync is 15,56khz
 These clocks make the emulation run too fast.
 */
 
-MACHINE_CONFIG_START(ironhors_state::ironhors)
-
+void ironhors_state::ironhors(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, 18432000/6)        /* 3.072 MHz??? mod by Shingo Suzuki 1999/10/15 */
-	MCFG_CPU_PROGRAM_MAP(master_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ironhors_state, irq, "screen", 0, 1)
+	MC6809E(config, m_maincpu, 18432000/6);        /* 3.072 MHz??? mod by Shingo Suzuki 1999/10/15 */
+	m_maincpu->set_addrmap(AS_PROGRAM, &ironhors_state::master_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(ironhors_state::ironhors_scanline_tick), "screen", 0, 1);
 
-	MCFG_CPU_ADD("soundcpu", Z80, 18432000/6)      /* 3.072 MHz */
-	MCFG_CPU_PROGRAM_MAP(slave_map)
-	MCFG_CPU_IO_MAP(slave_io_map)
+	Z80(config, m_soundcpu, 18432000/6);      /* 3.072 MHz */
+	m_soundcpu->set_addrmap(AS_PROGRAM, &ironhors_state::slave_map);
+	m_soundcpu->set_addrmap(AS_IO, &ironhors_state::slave_io_map);
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(30)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(ironhors_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+//  m_screen->set_refresh_hz(61);
+//  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+//  m_screen->set_size(32*8, 32*8);
+//  m_screen->set_visarea(1*8, 31*8-1, 2*8, 30*8-1);
+	m_screen->set_raw(18432000/4,296,8,256-8,255,16,240); // pixel clock is a guesswork
+	m_screen->set_screen_update(FUNC(ironhors_state::screen_update));
+	m_screen->set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ironhors)
-	MCFG_PALETTE_ADD("palette", 16*8*16+16*8*16)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256)
-	MCFG_PALETTE_INIT_OWNER(ironhors_state, ironhors)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ironhors);
+	PALETTE(config, m_palette, FUNC(ironhors_state::ironhors_palette), 16*8*16+16*8*16, 256);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_SOUND_ADD("ym2203", YM2203, 18432000/6)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(ironhors_state, filter_w))
+	ym2203_device &ym2203(YM2203(config, "ym2203", 18432000/6));
+	ym2203.port_a_write_callback().set(FUNC(ironhors_state::filter_w));
+	ym2203.add_route(0, "disc_ih", 1.0, 0);
+	ym2203.add_route(1, "disc_ih", 1.0, 1);
+	ym2203.add_route(2, "disc_ih", 1.0, 2);
+	ym2203.add_route(3, "disc_ih", 1.0, 3);
 
-	MCFG_SOUND_ROUTE_EX(0, "disc_ih", 1.0, 0)
-	MCFG_SOUND_ROUTE_EX(1, "disc_ih", 1.0, 1)
-	MCFG_SOUND_ROUTE_EX(2, "disc_ih", 1.0, 2)
-	MCFG_SOUND_ROUTE_EX(3, "disc_ih", 1.0, 3)
+	DISCRETE(config, m_disc_ih, ironhors_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-	MCFG_SOUND_ADD("disc_ih", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(ironhors)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
-MACHINE_CONFIG_END
-
-TIMER_DEVICE_CALLBACK_MEMBER(ironhors_state::farwest_irq)
+TIMER_DEVICE_CALLBACK_MEMBER(ironhors_state::farwest_scanline_tick)
 {
 	int scanline = param;
 
@@ -436,36 +429,32 @@ TIMER_DEVICE_CALLBACK_MEMBER(ironhors_state::farwest_irq)
 	else if ((scanline % 2) == 0)
 	{
 		if (*m_interrupt_enable & 1)
-			m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 }
 
 READ8_MEMBER(ironhors_state::farwest_soundlatch_r)
 {
-	return m_soundlatch->read(m_soundcpu->space(AS_PROGRAM), 0);
+	return m_soundlatch->read();
 }
 
-MACHINE_CONFIG_START(ironhors_state::farwest)
+void ironhors_state::farwest(machine_config &config)
+{
 	ironhors(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(farwest_master_map)
-	MCFG_DEVICE_MODIFY("scantimer")
-	MCFG_TIMER_DRIVER_CALLBACK(ironhors_state, farwest_irq)
+	m_maincpu->set_addrmap(AS_PROGRAM, &ironhors_state::farwest_master_map);
+	subdevice<timer_device>("scantimer")->set_callback(FUNC(ironhors_state::farwest_scanline_tick));
 
-	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_PROGRAM_MAP(farwest_slave_map)
-	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_IO)
+	Z80(config.replace(), m_soundcpu, 18432000/6);      /* 3.072 MHz */
+	m_soundcpu->set_addrmap(AS_PROGRAM, &ironhors_state::farwest_slave_map);
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", farwest)
+	m_gfxdecode->set_info(gfx_farwest);
 	MCFG_VIDEO_START_OVERRIDE(ironhors_state,farwest)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(ironhors_state, screen_update_farwest)
 
-	MCFG_SOUND_MODIFY("ym2203")
-	MCFG_AY8910_PORT_B_READ_CB(READ8(ironhors_state, farwest_soundlatch_r))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(ironhors_state, filter_w))
-MACHINE_CONFIG_END
+	m_screen->set_screen_update(FUNC(ironhors_state::screen_update_farwest));
+
+	subdevice<ym2203_device>("ym2203")->port_b_read_callback().set(FUNC(ironhors_state::farwest_soundlatch_r));
+}
 
 
 
@@ -575,7 +564,7 @@ ROM_END
  *
  *************************************/
 // versions are taken from the letters on the program ROMs' labels
-GAME( 1986, ironhors,  0,        ironhors, ironhors, ironhors_state, 0, ROT0, "Konami", "Iron Horse (version K)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, ironhorsh, ironhors, ironhors, ironhors, ironhors_state, 0, ROT0, "Konami", "Iron Horse (version H)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, dairesya,  ironhors, ironhors, dairesya, ironhors_state, 0, ROT0, "Konami (Kawakusu license)", "Dai Ressya Goutou (Japan, version K)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, farwest,   ironhors, farwest,  ironhors, ironhors_state, 0, ROT0, "bootleg?", "Far West", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, ironhors,  0,        ironhors, ironhors, ironhors_state, empty_init, ROT0, "Konami", "Iron Horse (version K)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, ironhorsh, ironhors, ironhors, ironhors, ironhors_state, empty_init, ROT0, "Konami", "Iron Horse (version H)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, dairesya,  ironhors, ironhors, dairesya, ironhors_state, empty_init, ROT0, "Konami (Kawakusu license)", "Dai Ressya Goutou (Japan, version K)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, farwest,   ironhors, farwest,  ironhors, ironhors_state, empty_init, ROT0, "bootleg?", "Far West", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

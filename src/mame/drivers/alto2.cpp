@@ -8,6 +8,8 @@
 #include "emu.h"
 #include "cpu/alto2/alto2cpu.h"
 #include "machine/diablo_hd.h"
+#include "sound/spkrdev.h"
+#include "emupal.h"
 #include "screen.h"
 #include "rendlay.h"
 #include "speaker.h"
@@ -19,35 +21,22 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_speaker(*this, "speaker"),
-		m_io_row0(*this, "ROW0"),
-		m_io_row1(*this, "ROW1"),
-		m_io_row2(*this, "ROW2"),
-		m_io_row3(*this, "ROW3"),
-		m_io_row4(*this, "ROW4"),
-		m_io_row5(*this, "ROW5"),
-		m_io_row6(*this, "ROW6"),
-		m_io_row7(*this, "ROW7"),
+		m_io_row(*this, "ROW%u", 0U),
 		m_io_config(*this, "CONFIG")
 	{ }
 
-	DECLARE_DRIVER_INIT(alto2);
+	void init_alto2();
 	DECLARE_MACHINE_RESET(alto2);
 
 	void alto2(machine_config &config);
-	void alto2_const_map(address_map &map);
-	void alto2_iomem_map(address_map &map);
-	void alto2_ucode_map(address_map &map);
+
 protected:
+	u16 kb_r(offs_t offset);
+	void utilout_w(u16 data);
+
 	required_device<alto2_cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
-	required_ioport m_io_row0;
-	required_ioport m_io_row1;
-	required_ioport m_io_row2;
-	required_ioport m_io_row3;
-	required_ioport m_io_row4;
-	required_ioport m_io_row5;
-	required_ioport m_io_row6;
-	required_ioport m_io_row7;
+	required_ioport_array<8> m_io_row;
 	optional_ioport m_io_config;
 	static const device_timer_id TIMER_VBLANK = 0;
 	emu_timer* m_vblank_timer;
@@ -154,17 +143,17 @@ static INPUT_PORTS_START( alto2 )
 	PORT_KEY(A2_KEY_FR5,        KEYCODE_F9,         0,              0,            "FR5"          )  //!< ADL right function key 5
 
 	PORT_START("mouseb0")   // Mouse button 0
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Mouse RED (left)")      PORT_PLAYER(1) PORT_CODE(MOUSECODE_BUTTON1) PORT_CHANGED_MEMBER( ":maincpu", alto2_cpu_device, mouse_button_0, nullptr )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Mouse RED (left)")      PORT_PLAYER(1) PORT_CODE(MOUSECODE_BUTTON1) PORT_CHANGED_MEMBER( ":maincpu", alto2_cpu_device, mouse_button_0, 0 )
 	PORT_START("mouseb1")   // Mouse button 1
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("Mouse BLUE (right)")    PORT_PLAYER(1) PORT_CODE(MOUSECODE_BUTTON2) PORT_CHANGED_MEMBER( ":maincpu", alto2_cpu_device, mouse_button_1, nullptr )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("Mouse BLUE (right)")    PORT_PLAYER(1) PORT_CODE(MOUSECODE_BUTTON2) PORT_CHANGED_MEMBER( ":maincpu", alto2_cpu_device, mouse_button_1, 0 )
 	PORT_START("mouseb2")   // Mouse button 2
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_NAME("Mouse YELLOW (middle)") PORT_PLAYER(1) PORT_CODE(MOUSECODE_BUTTON3) PORT_CHANGED_MEMBER( ":maincpu", alto2_cpu_device, mouse_button_2, nullptr )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_NAME("Mouse YELLOW (middle)") PORT_PLAYER(1) PORT_CODE(MOUSECODE_BUTTON3) PORT_CHANGED_MEMBER( ":maincpu", alto2_cpu_device, mouse_button_2, 0 )
 
 	PORT_START("mousex")    // Mouse - X AXIS
-	PORT_BIT( 0xffff, 0, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_CHANGED_MEMBER( ":maincpu", alto2_cpu_device, mouse_motion_x, nullptr )
+	PORT_BIT( 0xffff, 0, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_CHANGED_MEMBER( ":maincpu", alto2_cpu_device, mouse_motion_x, 0 )
 
 	PORT_START("mousey")    // Mouse - Y AXIS
-	PORT_BIT( 0xffff, 0, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_CHANGED_MEMBER( ":maincpu", alto2_cpu_device, mouse_motion_y, nullptr )
+	PORT_BIT( 0xffff, 0, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_CHANGED_MEMBER( ":maincpu", alto2_cpu_device, mouse_motion_y, 0 )
 
 	PORT_START("CONFIG")    /* Memory switch on AIM board */
 	PORT_CONFNAME( 0x01, 0x01, "Memory switch")
@@ -253,6 +242,18 @@ static INPUT_PORTS_START( alto2 )
 	PORT_DIPSETTING( 0374, "ID 374")   PORT_DIPSETTING( 0375, "ID 375")
 INPUT_PORTS_END
 
+u16 alto2_state::kb_r(offs_t offset)
+{
+	return m_io_row[offset]->read();
+}
+
+void alto2_state::utilout_w(u16 data)
+{
+	// FIXME: write printer data
+	// printer_write();
+	m_speaker->level_w(data ^ 0177777 ? 1 : 0);
+}
+
 /* ROM */
 ROM_START( alto2 )
 	// dummy region for the maincpu - this is not used in any way
@@ -264,61 +265,40 @@ ROM_END
 //  ADDRESS MAPS
 //**************************************************************************
 
-void alto2_state::alto2_ucode_map(address_map &map)
+void alto2_state::alto2(machine_config &config)
 {
-	map(0, 4*ALTO2_UCODE_PAGE_SIZE-1).m(m_maincpu, FUNC(alto2_cpu_device::ucode_map));
-}
-
-void alto2_state::alto2_const_map(address_map &map)
-{
-	map(0, ALTO2_CONST_SIZE-1).m(m_maincpu, FUNC(alto2_cpu_device::const_map));
-}
-
-void alto2_state::alto2_iomem_map(address_map &map)
-{
-	map(0, 2*ALTO2_RAM_SIZE-1).m(m_maincpu, FUNC(alto2_cpu_device::iomem_map));
-}
-
-MACHINE_CONFIG_START(alto2_state::alto2)
 	// Basic machine hardware
 	// SYSCLK is Display Control part A51 (tagged 29.4MHz) divided by 5(?)
 	// 5.8MHz according to de.wikipedia.org/wiki/Xerox_Alto
-	MCFG_CPU_ADD("maincpu", ALTO2, XTAL(29'491'200)/5)
-	MCFG_CPU_PROGRAM_MAP(alto2_ucode_map)
-	MCFG_CPU_DATA_MAP(alto2_const_map)
-	MCFG_CPU_IO_MAP(alto2_iomem_map)
+	ALTO2(config, m_maincpu, XTAL(29'491'200)/5);
+	m_maincpu->kb_read_callback().set(FUNC(alto2_state::kb_r));
+	m_maincpu->utilout_callback().set(FUNC(alto2_state::utilout_w));
+	m_maincpu->set_diablo(0, DIABLO_HD_0);
+	m_maincpu->set_diablo(1, DIABLO_HD_1);
 
 	// Video hardware
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::white())
-	MCFG_SCREEN_RAW_PARAMS(XTAL(20'160'000),
-			 A2_DISP_TOTAL_WIDTH, 0, A2_DISP_WIDTH,
-			 A2_DISP_TOTAL_HEIGHT, 0, A2_DISP_HEIGHT)
-	// Two interlaced fields at 60Hz => 30Hz frame rate
-	MCFG_SCREEN_REFRESH_RATE(30)
-	MCFG_SCREEN_UPDATE_DEVICE("maincpu", alto2_cpu_device, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_color(rgb_t::white());
+	screen.set_physical_aspect(3, 4); // Portrait CRT
+	screen.set_raw(XTAL(20'160'000), A2_DISP_TOTAL_WIDTH, 0, A2_DISP_WIDTH, A2_DISP_TOTAL_HEIGHT, 0, A2_DISP_HEIGHT);
+	screen.set_refresh_hz(30); // Two interlaced fields at 60Hz => 30Hz frame rate
+	screen.set_screen_update("maincpu", FUNC(alto2_cpu_device::screen_update));
+	screen.set_palette("palette");
 
-	MCFG_DEFAULT_LAYOUT( layout_vertical )
-
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	// Sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_DIABLO_DRIVES_ADD()
-MACHINE_CONFIG_END
+	DIABLO_HD(config, DIABLO_HD_0, 3333333);
+	DIABLO_HD(config, DIABLO_HD_1, 3333333);
+}
 
 /* Driver Init */
 
-DRIVER_INIT_MEMBER( alto2_state, alto2 )
+void alto2_state::init_alto2()
 {
-	// Make the diablo drives known to the CPU core
-	alto2_cpu_device* cpu = downcast<alto2_cpu_device *>(m_maincpu.target());
-	cpu->set_diablo(0, downcast<diablo_hd_device *>(machine().device(DIABLO_HD_0)));
-	cpu->set_diablo(1, downcast<diablo_hd_device *>(machine().device(DIABLO_HD_1)));
-	cpu->set_speaker(m_speaker);
 	// Create a timer which fires twice per frame, once for each field
 	m_vblank_timer = timer_alloc(TIMER_VBLANK);
 	m_vblank_timer->adjust(attotime::from_hz(2*30),0,attotime::from_hz(30*2));
@@ -336,5 +316,5 @@ void alto2_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 
 /* Game Drivers */
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT   COMPANY  FULLNAME   FLAGS
-COMP( 1977, alto2,  0,      0,      alto2,   alto2, alto2_state, alto2, "Xerox", "Alto-II", 0 )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY  FULLNAME   FLAGS
+COMP( 1977, alto2, 0,      0,      alto2,   alto2, alto2_state, init_alto2, "Xerox", "Alto-II", 0 )

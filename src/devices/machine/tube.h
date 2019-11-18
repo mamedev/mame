@@ -14,27 +14,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_TUBE_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, TUBE, 0);
-
-#define MCFG_TUBE_HIRQ_HANDLER(_devcb) \
-	devcb = &downcast<tube_device &>(*device).set_hirq_handler(DEVCB_##_devcb);
-
-#define MCFG_TUBE_PNMI_HANDLER(_devcb) \
-	devcb = &downcast<tube_device &>(*device).set_pnmi_handler(DEVCB_##_devcb);
-
-#define MCFG_TUBE_PIRQ_HANDLER(_devcb) \
-	devcb = &downcast<tube_device &>(*device).set_pirq_handler(DEVCB_##_devcb);
-
-#define MCFG_TUBE_DRQ_HANDLER(_devcb) \
-	devcb = &downcast<tube_device &>(*device).set_drq_handler(DEVCB_##_devcb);
-
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -45,18 +24,18 @@ class tube_device : public device_t
 {
 public:
 	// construction/destruction
-	tube_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tube_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// callbacks
-	template <class Object> devcb_base &set_hirq_handler(Object &&cb) { return m_hirq_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_pnmi_handler(Object &&cb) { return m_pnmi_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_pirq_handler(Object &&cb) { return m_pirq_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_drq_handler(Object &&cb) { return m_drq_handler.set_callback(std::forward<Object>(cb)); }
+	auto hirq_handler() { return m_hirq_handler.bind(); }
+	auto pnmi_handler() { return m_pnmi_handler.bind(); }
+	auto pirq_handler() { return m_pirq_handler.bind(); }
+	auto drq_handler() { return m_drq_handler.bind(); }
 
-	DECLARE_READ8_MEMBER(host_r);
-	DECLARE_WRITE8_MEMBER(host_w);
-	DECLARE_READ8_MEMBER(parasite_r);
-	DECLARE_WRITE8_MEMBER(parasite_w);
+	uint8_t host_r(offs_t offset);
+	void host_w(offs_t offset, uint8_t data);
+	uint8_t parasite_r(offs_t offset);
+	void parasite_w(offs_t offset, uint8_t data);
 
 protected:
 	// device-level overrides

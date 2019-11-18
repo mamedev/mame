@@ -76,7 +76,7 @@ DEFINE_DEVICE_TYPE(COCOCART_SLOT, cococart_slot_device, "cococart_slot", "CoCo C
 //-------------------------------------------------
 cococart_slot_device::cococart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, COCOCART_SLOT, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_cococart_interface>(mconfig, *this),
 	device_image_interface(mconfig, *this),
 	m_cart_callback(*this),
 	m_nmi_callback(*this),
@@ -123,7 +123,7 @@ void cococart_slot_device::device_start()
 	m_halt_callback.resolve();
 	m_halt_line.callback = &m_halt_callback;
 
-	m_cart = dynamic_cast<device_cococart_interface *>(get_card_device());
+	m_cart = get_card_device();
 }
 
 
@@ -148,6 +148,30 @@ void cococart_slot_device::device_timer(emu_timer &timer, device_timer_id id, in
 			set_line("HALT", m_halt_line, (line_value) param);
 			break;
 	}
+}
+
+
+//-------------------------------------------------
+//  cts_read
+//-------------------------------------------------
+
+READ8_MEMBER(cococart_slot_device::cts_read)
+{
+	uint8_t result = 0x00;
+	if (m_cart)
+		result = m_cart->cts_read(space, offset);
+	return result;
+}
+
+
+//-------------------------------------------------
+//  cts_write
+//-------------------------------------------------
+
+WRITE8_MEMBER(cococart_slot_device::cts_write)
+{
+	if (m_cart)
+		m_cart->cts_write(space, offset, data);
 }
 
 
@@ -249,8 +273,8 @@ void cococart_slot_device::set_line_timer(coco_cartridge_line &line, cococart_sl
 {
 	// calculate delay; delay dependant on cycles per second
 	attotime delay = (line.delay != 0)
-		? clocks_to_attotime(line.delay)
-		: attotime::zero;
+			? clocks_to_attotime(line.delay)
+			: attotime::zero;
 
 	line.timer[line.timer_index]->adjust(delay, (int) value);
 	line.timer_index = (line.timer_index + 1) % TIMER_POOL;
@@ -387,9 +411,9 @@ uint32_t cococart_slot_device::get_cart_size()
 {
 	if (m_cart != nullptr)
 		return m_cart->get_cart_size();
-	return 0;
-}
 
+	return 0x8000;
+}
 
 //-------------------------------------------------
 //  set_cart_base_update
@@ -410,20 +434,24 @@ image_init_result cococart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		offs_t read_length;
+		memory_region *cart_mem = m_cart->get_cart_memregion();
+		uint8_t *base = cart_mem->base();
+		offs_t read_length, cart_length = cart_mem->bytes();
+
 		if (!loaded_through_softlist())
 		{
-			read_length = fread(m_cart->get_cart_base(), m_cart->get_cart_size());
+			read_length = fread(base, cart_length);
 		}
 		else
 		{
 			read_length = get_software_region_length("rom");
-			memcpy(m_cart->get_cart_base(), get_software_region("rom"), read_length);
+			memcpy(base, get_software_region("rom"), read_length);
 		}
-		while(read_length < m_cart->get_cart_size())
+
+		while (read_length < cart_length)
 		{
 			offs_t len = std::min(read_length, m_cart->get_cart_size() - read_length);
-			memcpy(m_cart->get_cart_base() + read_length, m_cart->get_cart_base(), len);
+			memcpy(base + read_length, base, len);
 			read_length += len;
 		}
 	}
@@ -447,12 +475,15 @@ std::string cococart_slot_device::get_default_card_software(get_default_card_sof
 //  CoCo cartridge slots
 //**************************************************************************
 
+template class device_finder<device_cococart_interface, false>;
+template class device_finder<device_cococart_interface, true>;
+
 //-------------------------------------------------
 //  device_cococart_interface - constructor
 //-------------------------------------------------
 
 device_cococart_interface::device_cococart_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device)
+	: device_interface(device, "cococart")
 	, m_owning_slot(nullptr)
 	, m_host(nullptr)
 {
@@ -476,8 +507,8 @@ void device_cococart_interface::interface_config_complete()
 {
 	m_owning_slot = dynamic_cast<cococart_slot_device *>(device().owner());
 	m_host = m_owning_slot
-		? dynamic_cast<device_cococart_host_interface *>(m_owning_slot->owner())
-		: nullptr;
+			? dynamic_cast<device_cococart_host_interface *>(m_owning_slot->owner())
+			: nullptr;
 }
 
 
@@ -491,6 +522,27 @@ void device_cococart_interface::interface_pre_start()
 		throw emu_fatalerror("Expected device().owner() to be of type cococart_slot_device");
 	if (!m_host)
 		throw emu_fatalerror("Expected m_owning_slot->owner() to be of type device_cococart_host_interface");
+}
+
+
+//-------------------------------------------------
+//  cts_read - Signifies a read where the CTS pin
+//  on the cartridge slot was asserted ($C000-FFEF)
+//-------------------------------------------------
+
+READ8_MEMBER(device_cococart_interface::cts_read)
+{
+	return 0x00;
+}
+
+
+//-------------------------------------------------
+//  cts_write - Signifies a write where the CTS pin
+//  on the cartridge slot was asserted ($C000-FFEF)
+//-------------------------------------------------
+
+WRITE8_MEMBER(device_cococart_interface::cts_write)
+{
 }
 
 
@@ -562,8 +614,22 @@ void device_cococart_interface::cart_base_changed(void)
 {
 	if (!m_update.isnull())
 		m_update(get_cart_base());
+	else
+	{
+		// propagate up to host interface
+		device_cococart_interface *host = dynamic_cast<device_cococart_interface*>(m_host);
+		host->cart_base_changed();
+	}
 }
 
+/*-------------------------------------------------
+    get_cart_memregion
+-------------------------------------------------*/
+
+memory_region* device_cococart_interface::get_cart_memregion()
+{
+	return 0;
+}
 
 //-------------------------------------------------
 //  cartridge_space
@@ -572,40 +638,6 @@ void device_cococart_interface::cart_base_changed(void)
 address_space &device_cococart_interface::cartridge_space()
 {
 	return host().cartridge_space();
-}
-
-
-//-------------------------------------------------
-//  install_read_handler
-//-------------------------------------------------
-
-void device_cococart_interface::install_read_handler(uint16_t addrstart, uint16_t addrend, read8_delegate rhandler)
-{
-	address_space &space(cartridge_space());
-	space.install_read_handler(addrstart, addrend, rhandler);
-}
-
-
-//-------------------------------------------------
-//  install_write_handler
-//-------------------------------------------------
-
-void device_cococart_interface::install_write_handler(uint16_t addrstart, uint16_t addrend, write8_delegate whandler)
-{
-	address_space &space(cartridge_space());
-	space.install_write_handler(addrstart, addrend, whandler);
-}
-
-
-//-------------------------------------------------
-//  install_readwrite_handler
-//-------------------------------------------------
-
-void device_cococart_interface::install_readwrite_handler(uint16_t addrstart, uint16_t addrend, read8_delegate rhandler, write8_delegate whandler)
-{
-	address_space &space(cartridge_space());
-	space.install_read_handler(addrstart, addrend, rhandler);
-	space.install_write_handler(addrstart, addrend, whandler);
 }
 
 

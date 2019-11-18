@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<!--
+license:CC0
+copyright-holders:F. Ulivi
+Hewlett-Packard 9825 Layout
+-->
+<mamelayout version="2">
+	<element name="dotmatrix5dot">
+		<dotmatrix5dot>
+			<color red="1.0" green="0" blue="0" />
+		</dotmatrix5dot>
+	</element>
+
+	<element name="run_light" defstate="0">
+		<disk state="0">
+			<color red="0.25" green="0" blue="0" />
+		</disk>
+		<disk state="1">
+			<color red="1.0" green="0" blue="0" />
+		</disk>
+	</element>
+
+	<view name="32-char display">
+		<bounds x="-5" y="0" width="289" height="7"/>
+		<bezel name="run_light" element="run_light">
+			<bounds x="-5" y="2" width="2" height="2"/>
+		</bezel>
+		<!-- 32 5x7 characters -->
+		<repeat count="32">
+			<param name="digitidx" start="0" increment="1" />
+			<param name="digit_x" start="0.0" increment="9"/>
+			<!-- Each of the 7 rows in a character -->
+			<repeat count="7">
+				<param name="rowidx" start="0" increment="1" />
+				<bezel name="char_~digitidx~_~rowidx~" element="dotmatrix5dot" state="0">
+					<bounds x="~digit_x~" y="~rowidx~" width="5" height="1" />
+				</bezel>
+			</repeat>
+		</repeat>
+	</view>
+</mamelayout>

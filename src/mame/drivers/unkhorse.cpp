@@ -23,6 +23,7 @@ TODO:
 #include "cpu/i8085/i8085.h"
 #include "machine/i8155.h"
 #include "sound/spkrdev.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -30,17 +31,20 @@ TODO:
 class horse_state : public driver_device
 {
 public:
-	horse_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	horse_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_speaker(*this, "speaker"),
-		m_inp_matrix(*this, "IN.%u", 0),
+		m_inputs(*this, "IN.%u", 0),
 		m_vram(*this, "vram")
 	{ }
 
+	void horse(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
-	required_ioport_array<4> m_inp_matrix;
+	required_ioport_array<4> m_inputs;
 	required_shared_ptr<uint8_t> m_vram;
 
 	std::unique_ptr<uint8_t[]> m_colorram;
@@ -53,7 +57,6 @@ public:
 
 	virtual void machine_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void horse(machine_config &config);
 	void horse_io_map(address_map &map);
 	void horse_map(address_map &map);
 };
@@ -61,7 +64,7 @@ public:
 void horse_state::machine_start()
 {
 	m_colorram = std::make_unique<uint8_t []>(0x200);
-	save_pointer(NAME(m_colorram.get()), 0x200);
+	save_pointer(NAME(m_colorram), 0x200);
 	save_item(NAME(m_output));
 }
 
@@ -103,7 +106,7 @@ void horse_state::horse_map(address_map &map)
 	map(0x0000, 0x37ff).rom();
 	map(0x4000, 0x40ff).rw("i8155", FUNC(i8155_device::memory_r), FUNC(i8155_device::memory_w));
 	map(0x6000, 0x7fff).ram().share("vram");
-	map(0x8000, 0x87ff).mirror(0x0800).rw(this, FUNC(horse_state::colorram_r), FUNC(horse_state::colorram_w));
+	map(0x8000, 0x87ff).mirror(0x0800).rw(FUNC(horse_state::colorram_r), FUNC(horse_state::colorram_w));
 }
 
 void horse_state::horse_io_map(address_map &map)
@@ -114,7 +117,7 @@ void horse_state::horse_io_map(address_map &map)
 
 READ8_MEMBER(horse_state::input_r)
 {
-	return m_inp_matrix[m_output >> 6 & 3]->read();
+	return m_inputs[m_output >> 6 & 3]->read();
 }
 
 WRITE8_MEMBER(horse_state::output_w)
@@ -189,34 +192,33 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-MACHINE_CONFIG_START(horse_state::horse)
-
+void horse_state::horse(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8085A, XTAL(12'000'000) / 2)
-	MCFG_CPU_PROGRAM_MAP(horse_map)
-	MCFG_CPU_IO_MAP(horse_io_map)
+	I8085A(config, m_maincpu, XTAL(12'000'000) / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &horse_state::horse_map);
+	m_maincpu->set_addrmap(AS_IO, &horse_state::horse_io_map);
 
-	MCFG_DEVICE_ADD("i8155", I8155, XTAL(12'000'000) / 4) // port A input, B output, C output but unused
-	MCFG_I8155_IN_PORTA_CB(READ8(horse_state, input_r))
-	MCFG_I8155_OUT_PORTB_CB(WRITE8(horse_state, output_w))
-	MCFG_I8155_OUT_TIMEROUT_CB(DEVWRITELINE("speaker", speaker_sound_device, level_w))
+	i8155_device &i8155(I8155(config, "i8155", XTAL(12'000'000) / 4)); // port A input, B output, C output but unused
+	i8155.in_pa_callback().set(FUNC(horse_state::input_r));
+	i8155.out_pb_callback().set(FUNC(horse_state::output_w));
+	i8155.out_to_callback().set("speaker", FUNC(speaker_sound_device::level_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(horse_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", I8085_RST75_LINE))
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_PALETTE_ADD_3BIT_BGR("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(horse_state::screen_update));
+	screen.screen_vblank().set_inputline(m_maincpu, I8085_RST75_LINE);
+	screen.set_palette("palette");
+	PALETTE(config, "palette", palette_device::BGR_3BIT);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -238,4 +240,4 @@ ROM_START( unkhorse )
 ROM_END
 
 
-GAME( 1981?, unkhorse, 0, horse, horse, horse_state, 0, ROT270, "<unknown>", "unknown Japanese horse gambling game", MACHINE_SUPPORTS_SAVE ) // copyright not shown, datecodes on pcb suggests early-1981
+GAME( 1981?, unkhorse, 0, horse, horse, horse_state, empty_init, ROT270, "<unknown>", "unknown Japanese horse gambling game", MACHINE_SUPPORTS_SAVE ) // copyright not shown, datecodes on pcb suggests early-1981

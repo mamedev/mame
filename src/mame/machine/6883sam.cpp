@@ -68,16 +68,15 @@ DEFINE_DEVICE_TYPE(SAM6883, sam6883_device, "sam6883", "MC6883 SAM")
 //**************************************************************************
 
 //-------------------------------------------------
-//  ctor
+//  constructor
 //-------------------------------------------------
 
 sam6883_device::sam6883_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SAM6883, tag, owner, clock)
 	, sam6883_friend_device_interface(mconfig, *this, 4)
-	, m_cpu_tag(nullptr)
-	, m_cpu_space_ref(AS_PROGRAM)
 	, m_cpu_space(nullptr)
 	, m_read_res(*this)
+	, m_banks{ { *this }, { *this }, { *this }, { *this }, { *this }, { *this }, { *this }, { *this } }
 	, m_space_0000(*this)
 	, m_space_8000(*this)
 	, m_space_A000(*this)
@@ -87,12 +86,13 @@ sam6883_device::sam6883_device(const machine_config &mconfig, const char *tag, d
 	, m_space_FF40(*this)
 	, m_space_FF60(*this)
 	, m_space_FFE0(*this)
+	, m_space_FFF2(*this)
 {
 }
 
 sam6883_friend_device_interface::sam6883_friend_device_interface(const machine_config &mconfig, device_t &device, int divider)
 	: device_interface(device, "sam6883")
-	, m_cpu(nullptr)
+	, m_cpu(device, finder_base::DUMMY_TAG)
 	, m_sam_state(0x0000)
 	, m_divider(divider)
 {
@@ -105,16 +105,14 @@ sam6883_friend_device_interface::sam6883_friend_device_interface(const machine_c
 
 void sam6883_device::device_start()
 {
-	// find the CPU
-	m_cpu = machine().device<cpu_device>(m_cpu_tag);
-	m_cpu_space = &m_cpu->space(m_cpu_space_ref);
+	m_cpu_space = &m_cpu->space(AS_PROGRAM);
 
 	// resolve callbacks
 	m_read_res.resolve_safe(0);
 
 	// install SAM handlers
-	m_cpu_space->install_read_handler(0xFFC0, 0xFFDF, read8_delegate(FUNC(sam6883_device::read), this));
-	m_cpu_space->install_write_handler(0xFFC0, 0xFFDF, write8_delegate(FUNC(sam6883_device::write), this));
+	m_cpu_space->install_read_handler(0xFFC0, 0xFFDF, read8_delegate(*this, FUNC(sam6883_device::read)));
+	m_cpu_space->install_write_handler(0xFFC0, 0xFFDF, write8_delegate(*this, FUNC(sam6883_device::write)));
 
 	// save state support
 	save_item(NAME(m_sam_state));
@@ -130,7 +128,7 @@ void sam6883_device::device_start()
 
 void sam6883_device::configure_bank(int bank, uint8_t *memory, uint32_t memory_size, bool is_read_only)
 {
-	configure_bank(bank, memory, memory_size, is_read_only, read8_delegate(), write8_delegate());
+	configure_bank(bank, memory, memory_size, is_read_only, read8_delegate(*this), write8_delegate(*this));
 }
 
 
@@ -160,6 +158,9 @@ void sam6883_device::configure_bank(int bank, uint8_t *memory, uint32_t memory_s
 	/* if we're configuring a bank that never changes, update it now */
 	switch(bank)
 	{
+		case 3:
+			m_space_C000.point(m_banks[3], 0x0000);
+			break;
 		case 4:
 			m_space_FF00.point(m_banks[4], 0x0000);
 			break;
@@ -174,6 +175,7 @@ void sam6883_device::configure_bank(int bank, uint8_t *memory, uint32_t memory_s
 			break;
 		case 2:
 			m_space_FFE0.point(m_banks[2], 0x1FE0);
+			m_space_FFF2.point(m_banks[2], 0x1FF2);
 			break;
 	}
 }
@@ -211,7 +213,7 @@ void sam6883_device::device_post_load()
 //  update_state
 //-------------------------------------------------
 
-void sam6883_device::update_state(void)
+void sam6883_device::update_state()
 {
 	update_memory();
 	update_cpu_clock();
@@ -223,7 +225,7 @@ void sam6883_device::update_state(void)
 //  update_memory
 //-------------------------------------------------
 
-void sam6883_device::update_memory(void)
+void sam6883_device::update_memory()
 {
 	// Memory size - allowed restricting memory accesses to something less than
 	// 32k
@@ -265,15 +267,16 @@ void sam6883_device::update_memory(void)
 			break;
 
 		case SAM_STATE_M1:
+			// 64k mode (dynamic)
 		case SAM_STATE_M1|SAM_STATE_M0:
-			// 64k mode
+			// 64k mode (static)
 			if (m_sam_state & SAM_STATE_TY)
 			{
 				// full 64k RAM
 				m_space_0000.point(m_banks[0], 0x0000, m_banks[0].m_memory_size);
-				m_space_8000.point(m_banks[0], 0x8000);
-				m_space_A000.point(m_banks[0], 0xA000);
-				m_space_C000.point(m_banks[0], 0xC000);
+				m_space_8000.point(m_banks[0], 0x8000 & (m_banks[0].m_memory_size - 1));
+				m_space_A000.point(m_banks[0], 0xA000 & (m_banks[0].m_memory_size - 1));
+				m_space_C000.point(m_banks[0], 0xC000 & (m_banks[0].m_memory_size - 1));
 				m_counter_mask = 0xFFFF;
 				setup_rom = false;
 			}
@@ -294,8 +297,8 @@ void sam6883_device::update_memory(void)
 		m_space_C000.point(m_banks[3], m_banks[3].m_memory_offset);
 	}
 
-	// update $FFE0-$FFFF
-	m_space_FFE0.point(m_banks[2], m_banks[2].m_memory_offset + 0x1FE0);
+	// update $FFF2-$FFFF
+	m_space_FFF2.point(m_banks[2], m_banks[2].m_memory_offset + 0x1FF2);
 }
 
 
@@ -305,7 +308,7 @@ void sam6883_device::update_memory(void)
 //  clock
 //-------------------------------------------------
 
-void sam6883_friend_device_interface::update_cpu_clock(void)
+void sam6883_friend_device_interface::update_cpu_clock()
 {
 	// The infamous speed up poke.
 	//
@@ -383,7 +386,7 @@ WRITE8_MEMBER( sam6883_device::write )
 //  horizontal_sync
 //-------------------------------------------------
 
-void sam6883_device::horizontal_sync(void)
+void sam6883_device::horizontal_sync()
 {
 	bool carry;
 
@@ -443,7 +446,7 @@ WRITE_LINE_MEMBER( sam6883_device::hs_w )
 
 
 //-------------------------------------------------
-//  sam_space::ctor
+//  sam_space::constructor
 //-------------------------------------------------
 
 template<uint16_t _addrstart, uint16_t _addrend>
@@ -507,38 +510,34 @@ void sam6883_device::sam_space<_addrstart, _addrend>::point_specific_bank(const 
 		if (length != ~0)
 			length -= std::min(offset, length);
 
-		// do we even have a bank?  and if so, have legit changes occured?
-		if (!memory_bank || !memory_bank->matches_exactly(addrstart, addrend) || (length != m_length))
+		// name the bank
+		auto tag = string_format("bank%04X_%c", addrstart, is_write ? 'w' : 'r');
+
+		// determine "nop_addrstart" - where the bank ends, and above which is .noprw();
+		uint32_t nop_addrstart = (length != ~0)
+			? std::min(addrend + 1, addrstart + length)
+			: addrend + 1;
+
+		// install the bank
+		if (is_write)
 		{
-			// name the bank
-			auto tag = string_format("bank%04X_%c", addrstart, is_write ? 'w' : 'r');
-
-			// determine "nop_addrstart" - where the bank ends, and above which is AM_NOP
-			uint32_t nop_addrstart = (length != ~0)
-				? std::min(addrend + 1, addrstart + length)
-				: addrend + 1;
-
-			// install the bank
-			if (is_write)
-			{
-				if (addrstart < nop_addrstart)
-					cpu_space().install_write_bank(addrstart, nop_addrstart - 1, 0, tag.c_str());
-				if (nop_addrstart <= addrend)
-					cpu_space().nop_write(nop_addrstart, addrend);
-			}
-			else
-			{
-				if (addrstart < nop_addrstart)
-					cpu_space().install_read_bank(addrstart, nop_addrstart - 1, 0, tag.c_str());
-				if (nop_addrstart <= addrend)
-					cpu_space().nop_read(nop_addrstart, addrend);
-			}
-
-			m_length = length;
-
-			// and get it
-			memory_bank = cpu_space().device().owner()->membank(tag.c_str());
+			if (addrstart < nop_addrstart)
+				cpu_space().install_write_bank(addrstart, nop_addrstart - 1, 0, tag.c_str());
+			if (nop_addrstart <= addrend)
+				cpu_space().nop_write(nop_addrstart, addrend);
 		}
+		else
+		{
+			if (addrstart < nop_addrstart)
+				cpu_space().install_read_bank(addrstart, nop_addrstart - 1, 0, tag.c_str());
+			if (nop_addrstart <= addrend)
+				cpu_space().nop_read(nop_addrstart, addrend);
+		}
+
+		m_length = length;
+
+		// and get it
+		memory_bank = cpu_space().device().owner()->membank(tag.c_str());
 
 		// point the bank
 		if (memory_bank != nullptr)
@@ -552,7 +551,7 @@ void sam6883_device::sam_space<_addrstart, _addrend>::point_specific_bank(const 
 	else
 	{
 		// this bank uses handlers - first thing's first, assert that we are not doing
-		// any weird stuff with offfsets and lengths - that isn't supported in this path
+		// any weird stuff with offsets and lengths - that isn't supported in this path
 		assert((offset == 0) && (length == (uint32_t)~0));
 
 		if (is_write)

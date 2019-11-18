@@ -206,6 +206,22 @@ class MachineHandler(ElementHandler):
                 status = 0 if 'status' not in attrs else 2 if attrs['status'] == 'unemulated' else 1
                 overall = status if 'overall' not in attrs else 2 if attrs['overall'] == 'unemulated' else 1
                 self.dbcurs.add_feature(self.id, attrs['type'], status, overall)
+            elif name == 'rom':
+                crc = attrs.get('crc')
+                sha1 = attrs.get('sha1')
+                if (crc is not None) and (sha1 is not None):
+                    crc = int(crc, 16)
+                    sha1 = sha1.lower()
+                    self.dbcurs.add_rom(crc, sha1)
+                    status = attrs.get('status', 'good')
+                    self.dbcurs.add_romdump(self.id, attrs['name'], crc, sha1, status != 'good')
+            elif name == 'disk':
+                sha1 = attrs.get('sha1')
+                if sha1 is not None:
+                    sha1 = sha1.lower()
+                    self.dbcurs.add_disk(sha1)
+                    status = attrs.get('status', 'good')
+                    self.dbcurs.add_diskdump(self.id, attrs['name'], sha1, status != 'good')
             self.setChildHandler(name, attrs, self.IGNORE)
 
     def endChildHandler(self, name, handler):

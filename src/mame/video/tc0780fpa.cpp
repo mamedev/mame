@@ -409,8 +409,8 @@ void tc0780fpa_device::device_start()
 
 	m_renderer = std::make_unique<tc0780fpa_renderer>(*this, screen(), m_texture.get());
 
-	save_pointer(NAME(m_texture.get()), 0x400000);
-	save_pointer(NAME(m_poly_fifo.get()), POLY_FIFO_SIZE);
+	save_pointer(NAME(m_texture), 0x400000);
+	save_pointer(NAME(m_poly_fifo), POLY_FIFO_SIZE);
 	save_item(NAME(m_poly_fifo_ptr));
 	save_item(NAME(m_tex_address));
 	save_item(NAME(m_tex_offset));

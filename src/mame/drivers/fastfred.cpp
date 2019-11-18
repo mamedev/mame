@@ -14,7 +14,6 @@
 #include "includes/fastfred.h"
 
 #include "cpu/z80/z80.h"
-#include "machine/74259.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
@@ -24,6 +23,7 @@
 
 void fastfred_state::machine_start()
 {
+	galaxold_state::machine_start();
 	save_item(NAME(m_charbank));
 	save_item(NAME(m_colorbank));
 	save_item(NAME(m_nmi_mask));
@@ -193,13 +193,13 @@ void fastfred_state::fastfred_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xc7ff).ram();
-	map(0xd000, 0xd3ff).mirror(0x400).ram().w(this, FUNC(fastfred_state::fastfred_videoram_w)).share("videoram");
-	map(0xd800, 0xd83f).ram().w(this, FUNC(fastfred_state::fastfred_attributes_w)).share("attributesram");
+	map(0xd000, 0xd3ff).mirror(0x400).ram().w(FUNC(fastfred_state::fastfred_videoram_w)).share("videoram");
+	map(0xd800, 0xd83f).ram().w(FUNC(fastfred_state::fastfred_attributes_w)).share("attributesram");
 	map(0xd840, 0xd85f).ram().share("spriteram");
 	map(0xd860, 0xdbff).ram(); // Unused, but initialized
 	map(0xe000, 0xe000).portr("BUTTONS").writeonly().share("bgcolor");
 	map(0xe800, 0xe800).portr("JOYS");
-	map(0xf000, 0xf007).mirror(0x07f8).w("outlatch", FUNC(ls259_device::write_d0));
+	map(0xf000, 0xf007).mirror(0x07f8).w(m_outlatch, FUNC(ls259_device::write_d0));
 	map(0xf000, 0xf000).portr("DSW").nopw();
 	map(0xf800, 0xf800).r("watchdog", FUNC(watchdog_timer_device::reset_r)).w("soundlatch", FUNC(generic_latch_8_device::write));
 }
@@ -209,17 +209,17 @@ void fastfred_state::jumpcoas_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0xc000, 0xc7ff).ram();
-	map(0xd000, 0xd03f).ram().w(this, FUNC(fastfred_state::fastfred_attributes_w)).share("attributesram");
+	map(0xd000, 0xd03f).ram().w(FUNC(fastfred_state::fastfred_attributes_w)).share("attributesram");
 	map(0xd040, 0xd05f).ram().share("spriteram");
 	map(0xd060, 0xd3ff).ram();
-	map(0xd800, 0xdbff).mirror(0x400).ram().w(this, FUNC(fastfred_state::fastfred_videoram_w)).share("videoram");
+	map(0xd800, 0xdbff).mirror(0x400).ram().w(FUNC(fastfred_state::fastfred_videoram_w)).share("videoram");
 	map(0xe000, 0xe000).writeonly().share("bgcolor");
 	map(0xe800, 0xe800).portr("DSW1");
 	map(0xe801, 0xe801).portr("DSW2");
 	map(0xe802, 0xe802).portr("BUTTONS");
 	map(0xe803, 0xe803).portr("JOYS");
-	map(0xf000, 0xf007).mirror(0x07f8).w("outlatch", FUNC(ls259_device::write_d0));
-	//AM_RANGE(0xf800, 0xf800) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)  // Why doesn't this work???
+	map(0xf000, 0xf007).mirror(0x07f8).w(m_outlatch, FUNC(ls259_device::write_d0));
+	//map(0xf800, 0xf800).r("watchdog", FUNC(watchdog_timer_device::reset_r));  // Why doesn't this work???
 	map(0xf800, 0xf801).nopr().w("ay8910.1", FUNC(ay8910_device::address_data_w));
 }
 
@@ -227,22 +227,22 @@ void fastfred_state::jumpcoas_map(address_map &map)
 void fastfred_state::imago_map(address_map &map)
 {
 	map(0x0000, 0x0fff).rom();
-	map(0x1000, 0x1fff).r(this, FUNC(fastfred_state::imago_sprites_offset_r));
+	map(0x1000, 0x1fff).r(FUNC(fastfred_state::imago_sprites_offset_r));
 	map(0x2000, 0x6fff).rom();
 	map(0xb000, 0xb3ff).ram(); // same fg videoram (which one of the 2 is really used?)
-	map(0xb800, 0xbfff).ram().w(this, FUNC(fastfred_state::imago_sprites_dma_w));
+	map(0xb800, 0xbfff).ram().w(FUNC(fastfred_state::imago_sprites_dma_w));
 	map(0xc000, 0xc7ff).ram();
-	map(0xc800, 0xcbff).ram().w(this, FUNC(fastfred_state::imago_fg_videoram_w)).share("imago_fg_vram");
-	map(0xd000, 0xd3ff).ram().w(this, FUNC(fastfred_state::fastfred_videoram_w)).share("videoram");
-	map(0xd800, 0xd83f).ram().w(this, FUNC(fastfred_state::fastfred_attributes_w)).share("attributesram");
+	map(0xc800, 0xcbff).ram().w(FUNC(fastfred_state::imago_fg_videoram_w)).share("imago_fg_vram");
+	map(0xd000, 0xd3ff).ram().w(FUNC(fastfred_state::fastfred_videoram_w)).share("videoram");
+	map(0xd800, 0xd83f).ram().w(FUNC(fastfred_state::fastfred_attributes_w)).share("attributesram");
 	map(0xd840, 0xd85f).ram().share("spriteram");
 	map(0xd860, 0xd8ff).ram(); // Unused, but initialized
 	map(0xe000, 0xe000).portr("BUTTONS");
 	map(0xe800, 0xe800).portr("JOYS");
 	map(0xf000, 0xf000).portr("DSW");
-	map(0xf000, 0xf007).mirror(0x03f8).w("outlatch", FUNC(ls259_device::write_d0));
+	map(0xf000, 0xf007).mirror(0x03f8).w(m_outlatch, FUNC(ls259_device::write_d0));
 	map(0xf400, 0xf400).nopw(); // writes 0 or 2
-	map(0xf401, 0xf401).w(this, FUNC(fastfred_state::imago_sprites_bank_w));
+	map(0xf401, 0xf401).w(FUNC(fastfred_state::imago_sprites_bank_w));
 	map(0xf800, 0xf800).nopr().w("soundlatch", FUNC(generic_latch_8_device::write));
 }
 
@@ -250,7 +250,7 @@ void fastfred_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x23ff).ram();
-	map(0x3000, 0x3000).r("soundlatch", FUNC(generic_latch_8_device::read)).w(this, FUNC(fastfred_state::sound_nmi_mask_w));
+	map(0x3000, 0x3000).r("soundlatch", FUNC(generic_latch_8_device::read)).w(FUNC(fastfred_state::sound_nmi_mask_w));
 	map(0x4000, 0x4000).writeonly();  // Reset PSG's
 	map(0x5000, 0x5001).w("ay8910.1", FUNC(ay8910_device::address_data_w));
 	map(0x6000, 0x6001).w("ay8910.2", FUNC(ay8910_device::address_data_w));
@@ -603,17 +603,17 @@ static const gfx_layout imago_char_1bpp =
 	8*8
 };
 
-static GFXDECODE_START( fastfred )
+static GFXDECODE_START( gfx_fastfred )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0, 32 )
 GFXDECODE_END
 
-static GFXDECODE_START( jumpcoas )
+static GFXDECODE_START( gfx_jumpcoas )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 32 )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 0, 32 )
 GFXDECODE_END
 
-static GFXDECODE_START( imago )
+static GFXDECODE_START( gfx_imago )
 	GFXDECODE_ENTRY( "gfx1", 0,      charlayout,          0, 32 )
 	GFXDECODE_ENTRY( nullptr,   0xb800, imago_spritelayout,  0, 32 )
 	GFXDECODE_ENTRY( "gfx3", 0,      charlayout,          0, 32 )
@@ -629,99 +629,92 @@ WRITE_LINE_MEMBER(fastfred_state::vblank_irq)
 INTERRUPT_GEN_MEMBER(fastfred_state::sound_timer_irq)
 {
 	if(m_sound_nmi_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-MACHINE_CONFIG_START(fastfred_state::fastfred)
-
+void fastfred_state::fastfred(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'432'000)/4)   /* 3.108 MHz; xtal from pcb pics, divider not verified */
-	MCFG_CPU_PROGRAM_MAP(fastfred_map)
+	Z80(config, m_maincpu, XTAL(12'432'000)/4);   /* 3.108 MHz; xtal from pcb pics, divider not verified */
+	m_maincpu->set_addrmap(AS_PROGRAM, &fastfred_state::fastfred_map);
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(12'432'000)/8)  /* 1.554 MHz; xtal from pcb pics, divider not verified */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(fastfred_state, sound_timer_irq, 4*60)
+	Z80(config, m_audiocpu, XTAL(12'432'000)/8);  /* 1.554 MHz; xtal from pcb pics, divider not verified */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &fastfred_state::sound_map);
+	m_audiocpu->set_periodic_int(FUNC(fastfred_state::sound_timer_irq), attotime::from_hz(4*60));
 
-	MCFG_DEVICE_ADD("outlatch", LS259, 0) // "Control Signal Latch" at D10
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(fastfred_state, nmi_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(fastfred_state, colorbank1_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(fastfred_state, colorbank2_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(fastfred_state, charbank1_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(fastfred_state, charbank2_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(fastfred_state, flip_screen_x_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(fastfred_state, flip_screen_y_w))
+	LS259(config, m_outlatch); // "Control Signal Latch" at D10
+	m_outlatch->q_out_cb<1>().set(FUNC(fastfred_state::nmi_mask_w));
+	m_outlatch->q_out_cb<2>().set(FUNC(fastfred_state::colorbank1_w));
+	m_outlatch->q_out_cb<3>().set(FUNC(fastfred_state::colorbank2_w));
+	m_outlatch->q_out_cb<4>().set(FUNC(fastfred_state::charbank1_w));
+	m_outlatch->q_out_cb<5>().set(FUNC(fastfred_state::charbank2_w));
+	m_outlatch->q_out_cb<6>().set(FUNC(fastfred_state::flip_screen_x_w));
+	m_outlatch->q_out_cb<7>().set(FUNC(fastfred_state::flip_screen_y_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)) //CLOCK/16/60
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(fastfred_state, screen_update_fastfred)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(fastfred_state, vblank_irq))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0)); //CLOCK/16/60
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(fastfred_state::screen_update_fastfred));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(fastfred_state::vblank_irq));
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fastfred)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_fastfred);
 
-	MCFG_PALETTE_ADD("palette", 32*8)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256)
-	MCFG_PALETTE_INIT_OWNER(fastfred_state,fastfred)
+	PALETTE(config, m_palette, FUNC(fastfred_state::fastfred_palette), 32 * 8, 256);
 	MCFG_VIDEO_START_OVERRIDE(fastfred_state,fastfred)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_SOUND_ADD("ay8910.1", AY8910, XTAL(12'432'000)/8) /* 1.554 MHz; xtal from pcb pics, divider not verified */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8910(config, "ay8910.1", XTAL(12'432'000)/8).add_route(ALL_OUTPUTS, "mono", 0.25); /* 1.554 MHz; xtal from pcb pics, divider not verified */
 
-	MCFG_SOUND_ADD("ay8910.2", AY8910, XTAL(12'432'000)/8) /* 1.554 MHz; xtal from pcb pics, divider not verified */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	AY8910(config, "ay8910.2", XTAL(12'432'000)/8).add_route(ALL_OUTPUTS, "mono", 0.25); /* 1.554 MHz; xtal from pcb pics, divider not verified */
+}
 
-MACHINE_CONFIG_START(fastfred_state::jumpcoas)
+void fastfred_state::jumpcoas(machine_config &config)
+{
 	fastfred(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(jumpcoas_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &fastfred_state::jumpcoas_map);
 
-	MCFG_DEVICE_REMOVE("audiocpu")
+	config.device_remove("audiocpu");
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", jumpcoas)
+	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_jumpcoas);
 
 	/* sound hardware */
-	MCFG_DEVICE_REMOVE("soundlatch")
-	MCFG_DEVICE_REMOVE("ay8910.2")
-MACHINE_CONFIG_END
+	config.device_remove("soundlatch");
+	config.device_remove("ay8910.2");
+}
 
-MACHINE_CONFIG_START(fastfred_state::imago)
+void fastfred_state::imago(machine_config &config)
+{
 	fastfred(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(imago_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &fastfred_state::imago_map);
 
-	MCFG_DEVICE_MODIFY("outlatch")
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP) // writes 1 when level starts, 0 when game over
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(fastfred_state, imago_dma_irq_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(fastfred_state, imago_charbank_w))
+	m_outlatch->q_out_cb<0>().set_nop(); // writes 1 when level starts, 0 when game over
+	m_outlatch->q_out_cb<4>().set(FUNC(fastfred_state::imago_dma_irq_w));
+	m_outlatch->q_out_cb<5>().set(FUNC(fastfred_state::imago_charbank_w));
 
 	MCFG_MACHINE_START_OVERRIDE(fastfred_state,imago)
 
 	/* video hardware */
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(256+64+2) /* 256 for characters, 64 for the stars and 2 for the web */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", imago)
+	m_palette->set_entries(256+64+2); // 256 for characters, 64 for the stars and 2 for the web
+	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_imago);
 
 	MCFG_VIDEO_START_OVERRIDE(fastfred_state,imago)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(fastfred_state, screen_update_imago)
-MACHINE_CONFIG_END
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(fastfred_state::screen_update_imago));
+}
 
 #undef CLOCK
 
@@ -833,40 +826,58 @@ ROM_START( flyboyb )
 	ROM_LOAD( "blue.7h",      0x0200, 0x0100, CRC(85c05c18) SHA1(a609a45c593fc6c491624076f7d65da55b5e603f) )
 ROM_END
 
-ROM_START( jumpcoas )
+ROM_START( jumpcoas ) /* Kaneko FB-100A PCB, ROMs simply labeled 1 through 7 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "jumpcoas.001", 0x0000, 0x2000, CRC(0778c953) SHA1(7def6656532332e56d76700431e4c3199e407e50) )
-	ROM_LOAD( "jumpcoas.002", 0x2000, 0x2000, CRC(57f59ce1) SHA1(1508afb34f77c829ed62b16be10b0ebf8e91a62c) )
-	ROM_LOAD( "jumpcoas.003", 0x4000, 0x2000, CRC(d9fc93be) SHA1(e13476991720a1e900f4ab65175df7ee40c6960d) )
-	ROM_LOAD( "jumpcoas.004", 0x6000, 0x2000, CRC(dc108fc1) SHA1(a238b1b924877167aa8f17e9c9bd450e2c2cc9f6) )
+	ROM_LOAD( "1.d1", 0x0000, 0x2000, CRC(418b4b3d) SHA1(4ae8180e1f0541fcbd6644fcfa5a839447ad0c61) )
+	ROM_LOAD( "2.d2", 0x2000, 0x2000, CRC(4bba794b) SHA1(94d65034b10cd2dc72d27bb4b97e0a5c839b0b09) )
+	ROM_LOAD( "3.d3", 0x4000, 0x2000, CRC(6383c0b0) SHA1(8cf46208962069a5e8e23a99f0d43e0f11b0bfa6) )
+	ROM_LOAD( "4.d5", 0x6000, 0x2000, CRC(340f4c3c) SHA1(f0d7ff44139b18d864a8c108c97e4c95262e45de) )
 
 	ROM_REGION( 0x3000, "gfx1", 0 )
-	ROM_LOAD( "jumpcoas.005", 0x0000, 0x1000, CRC(2dce6b07) SHA1(e7f9e5d68c53ee2433c22d00e69d4b994b44d349) )
-	ROM_LOAD( "jumpcoas.006", 0x1000, 0x1000, CRC(0d24aa1b) SHA1(300eba18c69eb693b033562446e7fee764161e07) )
-	ROM_LOAD( "jumpcoas.007", 0x2000, 0x1000, CRC(14c21e67) SHA1(1a01dcd917e9c06db5d86cd35146e9ccdad65975) )
+	ROM_LOAD( "5.h10", 0x0000, 0x1000, CRC(2dce6b07) SHA1(e7f9e5d68c53ee2433c22d00e69d4b994b44d349) )
+	ROM_LOAD( "6.h11", 0x1000, 0x1000, CRC(0d24aa1b) SHA1(300eba18c69eb693b033562446e7fee764161e07) )
+	ROM_LOAD( "7.h12", 0x2000, 0x1000, CRC(14c21e67) SHA1(1a01dcd917e9c06db5d86cd35146e9ccdad65975) )
 
 	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "jumpcoas.red", 0x0000, 0x0100, CRC(13714880) SHA1(ede901434f3a35138574e65985e5791e6686ef0d) )
-	ROM_LOAD( "jumpcoas.gre", 0x0100, 0x0100, CRC(05354848) SHA1(c44f6b4b9c9d58d9ace617dcd36ca197f6d7dd8c) )
-	ROM_LOAD( "jumpcoas.blu", 0x0200, 0x0100, CRC(f4662db7) SHA1(638ac15b15ae908581561ff77f446d81ec64c086) )
+	ROM_LOAD( "tbp24s10n_r.e10", 0x0000, 0x0100, CRC(13714880) SHA1(ede901434f3a35138574e65985e5791e6686ef0d) ) /* TBP24S10N BPROM marked R */
+	ROM_LOAD( "tbp24s10n_g.e11", 0x0100, 0x0100, CRC(05354848) SHA1(c44f6b4b9c9d58d9ace617dcd36ca197f6d7dd8c) ) /* TBP24S10N BPROM marked G */
+	ROM_LOAD( "tbp24s10n_b.e12", 0x0200, 0x0100, CRC(f4662db7) SHA1(638ac15b15ae908581561ff77f446d81ec64c086) ) /* TBP24S10N BPROM marked B */
 ROM_END
 
-ROM_START( jumpcoast )
+ROM_START( jumpcoasa ) /* Kaneko FB-100A PCB, ROMs simply labeled 1 through 7 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "1.d1", 0x0000, 0x2000, CRC(8ac220c5) SHA1(714dd34ca6c6c1803778a715b803f81a94286e1c) )
-	ROM_LOAD( "jumpcoas.002", 0x2000, 0x2000, CRC(57f59ce1) SHA1(1508afb34f77c829ed62b16be10b0ebf8e91a62c) )
-	ROM_LOAD( "3.d3", 0x4000, 0x2000, CRC(17e4deba) SHA1(880689304af9744de3c96936f03345968ab8085c) )
-	ROM_LOAD( "jumpcoas.004", 0x6000, 0x2000, CRC(dc108fc1) SHA1(a238b1b924877167aa8f17e9c9bd450e2c2cc9f6) )
+	ROM_LOAD( "1.d1", 0x0000, 0x2000, CRC(0778c953) SHA1(7def6656532332e56d76700431e4c3199e407e50) ) // sldh
+	ROM_LOAD( "2.d2", 0x2000, 0x2000, CRC(57f59ce1) SHA1(1508afb34f77c829ed62b16be10b0ebf8e91a62c) ) // sldh
+	ROM_LOAD( "3.d3", 0x4000, 0x2000, CRC(d9fc93be) SHA1(e13476991720a1e900f4ab65175df7ee40c6960d) ) // sldh
+	ROM_LOAD( "4.d5", 0x6000, 0x2000, CRC(dc108fc1) SHA1(a238b1b924877167aa8f17e9c9bd450e2c2cc9f6) ) // sldh
 
 	ROM_REGION( 0x3000, "gfx1", 0 )
-	ROM_LOAD( "jumpcoas.005", 0x0000, 0x1000, CRC(2dce6b07) SHA1(e7f9e5d68c53ee2433c22d00e69d4b994b44d349) )
-	ROM_LOAD( "jumpcoas.006", 0x1000, 0x1000, CRC(0d24aa1b) SHA1(300eba18c69eb693b033562446e7fee764161e07) )
-	ROM_LOAD( "jumpcoas.007", 0x2000, 0x1000, CRC(14c21e67) SHA1(1a01dcd917e9c06db5d86cd35146e9ccdad65975) )
+	ROM_LOAD( "5.h10", 0x0000, 0x1000, CRC(2dce6b07) SHA1(e7f9e5d68c53ee2433c22d00e69d4b994b44d349) )
+	ROM_LOAD( "6.h11", 0x1000, 0x1000, CRC(0d24aa1b) SHA1(300eba18c69eb693b033562446e7fee764161e07) )
+	ROM_LOAD( "7.h12", 0x2000, 0x1000, CRC(14c21e67) SHA1(1a01dcd917e9c06db5d86cd35146e9ccdad65975) )
 
 	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "jumpcoas.red", 0x0000, 0x0100, CRC(13714880) SHA1(ede901434f3a35138574e65985e5791e6686ef0d) )
-	ROM_LOAD( "jumpcoas.gre", 0x0100, 0x0100, CRC(05354848) SHA1(c44f6b4b9c9d58d9ace617dcd36ca197f6d7dd8c) )
-	ROM_LOAD( "jumpcoas.blu", 0x0200, 0x0100, CRC(f4662db7) SHA1(638ac15b15ae908581561ff77f446d81ec64c086) )
+	ROM_LOAD( "tbp24s10n_r.e10", 0x0000, 0x0100, CRC(13714880) SHA1(ede901434f3a35138574e65985e5791e6686ef0d) ) /* TBP24S10N BPROM marked R */
+	ROM_LOAD( "tbp24s10n_g.e11", 0x0100, 0x0100, CRC(05354848) SHA1(c44f6b4b9c9d58d9ace617dcd36ca197f6d7dd8c) ) /* TBP24S10N BPROM marked G */
+	ROM_LOAD( "tbp24s10n_b.e12", 0x0200, 0x0100, CRC(f4662db7) SHA1(638ac15b15ae908581561ff77f446d81ec64c086) ) /* TBP24S10N BPROM marked B */
+ROM_END
+
+ROM_START( jumpcoast ) /* Kaneko FB-100A PCB, ROMs simply labeled 1 through 7 */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.d1", 0x0000, 0x2000, CRC(8ac220c5) SHA1(714dd34ca6c6c1803778a715b803f81a94286e1c) ) // sldh
+	ROM_LOAD( "2.d2", 0x2000, 0x2000, CRC(57f59ce1) SHA1(1508afb34f77c829ed62b16be10b0ebf8e91a62c) ) // sldh
+	ROM_LOAD( "3.d3", 0x4000, 0x2000, CRC(17e4deba) SHA1(880689304af9744de3c96936f03345968ab8085c) ) // sldh
+	ROM_LOAD( "4.d5", 0x6000, 0x2000, CRC(dc108fc1) SHA1(a238b1b924877167aa8f17e9c9bd450e2c2cc9f6) ) // sldh
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_LOAD( "5.h10", 0x0000, 0x1000, CRC(2dce6b07) SHA1(e7f9e5d68c53ee2433c22d00e69d4b994b44d349) )
+	ROM_LOAD( "6.h11", 0x1000, 0x1000, CRC(0d24aa1b) SHA1(300eba18c69eb693b033562446e7fee764161e07) )
+	ROM_LOAD( "7.h12", 0x2000, 0x1000, CRC(14c21e67) SHA1(1a01dcd917e9c06db5d86cd35146e9ccdad65975) )
+
+	ROM_REGION( 0x0300, "proms", 0 )
+	ROM_LOAD( "tbp24s10n_r.e10", 0x0000, 0x0100, CRC(13714880) SHA1(ede901434f3a35138574e65985e5791e6686ef0d) ) /* TBP24S10N BPROM marked R */
+	ROM_LOAD( "tbp24s10n_g.e11", 0x0100, 0x0100, CRC(05354848) SHA1(c44f6b4b9c9d58d9ace617dcd36ca197f6d7dd8c) ) /* TBP24S10N BPROM marked G */
+	ROM_LOAD( "tbp24s10n_b.e12", 0x0200, 0x0100, CRC(f4662db7) SHA1(638ac15b15ae908581561ff77f446d81ec64c086) ) /* TBP24S10N BPROM marked B */
 ROM_END
 
 ROM_START( boggy84 )
@@ -903,6 +914,29 @@ ROM_START( boggy84b )
 	ROM_LOAD( "r12e", 0x0000, 0x0100, CRC(f3862912) SHA1(128ba48202299ef5852f08fd0f910d8e9f68f22c) )
 	ROM_LOAD( "g12e", 0x0100, 0x0100, CRC(80b87220) SHA1(7bd81060b986d5cd4a27dc8a9394423959deaa05) )
 	ROM_LOAD( "b12e", 0x0200, 0x0100, CRC(52b7f445) SHA1(6395ac705a35e602a355cbf700025ff917e89b37) )
+ROM_END
+
+// main PCB is marked: "MC9003" and "MADE IN ITALY" on component side
+// main PCB is marked: "MADE IN ITALY" on solder side
+// ROMs PCB is marked: "MG25157" on component side
+ROM_START( boggy84b2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "boggy84-1.bin", 0x0000, 0x1000, CRC(97235e3a) SHA1(f493efd03331416a392cab7d73e39029d7e8098c) )
+	ROM_LOAD( "boggy84-2.bin", 0x1000, 0x1000, CRC(282f8830) SHA1(10c2c3d3b14fbe44ef4ad81607c61361fa2f25ae) )
+	ROM_LOAD( "boggy84-3.bin", 0x2000, 0x1000, CRC(b49c835a) SHA1(c6782643ff44e6cf972f0d2fc47ecc0a220c0e26) )
+	ROM_LOAD( "boggy84-4.bin", 0x3000, 0x1000, CRC(1f98ce07) SHA1(4145785ea55db3940ff4d3834ab736825e5c8712) )
+	ROM_LOAD( "boggy84-5.bin", 0x4000, 0x1000, CRC(7b3fd5fb) SHA1(630e7553fc76e59448cedca5dcb34dae3b08d9ba) )
+	ROM_LOAD( "boggy84-6.bin", 0x5000, 0x1000, CRC(a4083cc2) SHA1(a266ff0935288678d6e0286ac67ea17b9b42371a) )
+	ROM_LOAD( "boggy84-7.bin", 0x6000, 0x1000, CRC(9da29eb9) SHA1(d8802b9b67f9993aa26b8fe7941fc662a6719172) )
+	ROM_LOAD( "boggy84-8.bin", 0x7000, 0x1000, NO_DUMP ) // broken, unreadable
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_LOAD( "boggy84-11.7a", 0x0000, 0x1000, CRC(f4238c68) SHA1(a14cedb126e49e40bab6f46870af64c04ccb01f4) )
+	ROM_LOAD( "boggy84-10.9a", 0x1000, 0x1000, CRC(1979d9a6) SHA1(9da387179e6f09ba113219689d3aa039e87bd5e1) )
+	ROM_LOAD( "boggy84-9.bin", 0x2000, 0x0800, CRC(de3d8f06) SHA1(0ccc261fe15f63d5bd000b3a7008e294b78837a2) )
+
+	ROM_REGION( 0x20, "proms", 0 )
+	ROM_LOAD( "6331.10f", 0x00, 0x20, CRC(24652bc4) SHA1(d89575f3749c75dc963317fe451ffeffd9856e4d) )
 ROM_END
 
 ROM_START( redrobin )
@@ -1014,59 +1048,61 @@ ROM_START( imagoa )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(fastfred_state,flyboy)
+void fastfred_state::init_flyboy()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc085, 0xc099, read8_delegate(FUNC(fastfred_state::flyboy_custom1_io_r),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc8fb, 0xc900, read8_delegate(FUNC(fastfred_state::flyboy_custom2_io_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc085, 0xc099, read8_delegate(*this, FUNC(fastfred_state::flyboy_custom1_io_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc8fb, 0xc900, read8_delegate(*this, FUNC(fastfred_state::flyboy_custom2_io_r)));
 	m_hardware_type = 1;
 }
 
-DRIVER_INIT_MEMBER(fastfred_state,flyboyb)
+void fastfred_state::init_flyboyb()
 {
 	m_hardware_type = 1;
 }
 
-DRIVER_INIT_MEMBER(fastfred_state,fastfred)
+void fastfred_state::init_fastfred()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc800, 0xcfff, read8_delegate(FUNC(fastfred_state::fastfred_custom_io_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc800, 0xcfff, read8_delegate(*this, FUNC(fastfred_state::fastfred_custom_io_r)));
 	m_maincpu->space(AS_PROGRAM).nop_write(0xc800, 0xcfff);
 	m_hardware_type = 1;
 }
 
-DRIVER_INIT_MEMBER(fastfred_state,jumpcoas)
+void fastfred_state::init_jumpcoas()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc800, 0xcfff, read8_delegate(FUNC(fastfred_state::jumpcoas_custom_io_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc800, 0xcfff, read8_delegate(*this, FUNC(fastfred_state::jumpcoas_custom_io_r)));
 	m_maincpu->space(AS_PROGRAM).nop_write(0xc800, 0xcfff);
 	m_hardware_type = 0;
 }
 
-DRIVER_INIT_MEMBER(fastfred_state,boggy84b)
+void fastfred_state::init_boggy84b()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc800, 0xcfff, read8_delegate(FUNC(fastfred_state::jumpcoas_custom_io_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc800, 0xcfff, read8_delegate(*this, FUNC(fastfred_state::jumpcoas_custom_io_r)));
 	m_maincpu->space(AS_PROGRAM).nop_write(0xc800, 0xcfff);
 	m_hardware_type = 2;
 }
 
-DRIVER_INIT_MEMBER(fastfred_state,boggy84)
+void fastfred_state::init_boggy84()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc800, 0xcfff, read8_delegate(FUNC(fastfred_state::boggy84_custom_io_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc800, 0xcfff, read8_delegate(*this, FUNC(fastfred_state::boggy84_custom_io_r)));
 	m_maincpu->space(AS_PROGRAM).nop_write(0xc800, 0xcfff);
 	m_hardware_type = 2;
 }
 
 
-DRIVER_INIT_MEMBER(fastfred_state,imago)
+void fastfred_state::init_imago()
 {
 	m_hardware_type = 3;
 }
 
-GAME( 1982, flyboy,   0,        fastfred, flyboy,   fastfred_state, flyboy,   ROT90, "Kaneko", "Fly-Boy", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, flyboyb,  flyboy,   fastfred, flyboy,   fastfred_state, flyboyb,  ROT90, "bootleg", "Fly-Boy (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, fastfred, flyboy,   fastfred, fastfred, fastfred_state, fastfred, ROT90, "Kaneko (Atari license)", "Fast Freddie", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, jumpcoas, 0,        jumpcoas, jumpcoas, fastfred_state, jumpcoas, ROT90, "Kaneko", "Jump Coaster", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, jumpcoast,jumpcoas, jumpcoas, jumpcoas, fastfred_state, jumpcoas, ROT90, "Kaneko (Taito license)", "Jump Coaster (Taito)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, boggy84,  0,        jumpcoas, boggy84,  fastfred_state, boggy84,  ROT90, "Kaneko", "Boggy '84", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, boggy84b, boggy84,  jumpcoas, boggy84,  fastfred_state, boggy84b, ROT90, "bootleg (Eddie's Games)", "Boggy '84 (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, redrobin, 0,        fastfred, redrobin, fastfred_state, flyboyb,  ROT90, "Elettronolo", "Red Robin", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, imago,    0,        imago,    imago,    fastfred_state, imago,    ROT90, "Acom", "Imago (cocktail set)", 0 )
-GAME( 1983, imagoa,   imago,    imago,    imagoa,   fastfred_state, imago,    ROT90, "Acom", "Imago (no cocktail set)", 0 )
+GAME( 1982, flyboy,    0,        fastfred, flyboy,   fastfred_state, init_flyboy,   ROT90, "Kaneko", "Fly-Boy", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, flyboyb,   flyboy,   fastfred, flyboy,   fastfred_state, init_flyboyb,  ROT90, "bootleg", "Fly-Boy (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, fastfred,  flyboy,   fastfred, fastfred, fastfred_state, init_fastfred, ROT90, "Kaneko (Atari license)", "Fast Freddie", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, jumpcoas,  0,        jumpcoas, jumpcoas, fastfred_state, init_jumpcoas, ROT90, "Kaneko Elc. Co.", "Jump Coaster (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, jumpcoasa, jumpcoas, jumpcoas, jumpcoas, fastfred_state, init_jumpcoas, ROT90, "Kaneko", "Jump Coaster", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, jumpcoast, jumpcoas, jumpcoas, jumpcoas, fastfred_state, init_jumpcoas, ROT90, "Kaneko (Taito license)", "Jump Coaster (Taito)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, boggy84,   0,        jumpcoas, boggy84,  fastfred_state, init_boggy84,  ROT90, "Kaneko", "Boggy '84", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, boggy84b,  boggy84,  jumpcoas, boggy84,  fastfred_state, init_boggy84b, ROT90, "bootleg (Eddie's Games)", "Boggy '84 (bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, boggy84b2, boggy84,  jumpcoas, boggy84,  fastfred_state, init_boggy84,  ROT90, "bootleg", "Boggy '84 (bootleg, set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // one program ROM isn't dumped
+GAME( 1986, redrobin,  0,        fastfred, redrobin, fastfred_state, init_flyboyb,  ROT90, "Elettronolo", "Red Robin", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, imago,     0,        imago,    imago,    fastfred_state, init_imago,    ROT90, "Acom", "Imago (cocktail set)", 0 )
+GAME( 1983, imagoa,    imago,    imago,    imagoa,   fastfred_state, init_imago,    ROT90, "Acom", "Imago (no cocktail set)", 0 )

@@ -47,7 +47,7 @@ DEFINE_DEVICE_TYPE(MB8844,  mb8844_cpu_device,  "mb8844",  "Fujitsu MB8844")
     MACROS
 ***************************************************************************/
 
-#define READOP(a)           (m_direct->read_byte(a))
+#define READOP(a)           (m_cache->read_byte(a))
 
 #define RDMEM(a)            (m_data->read_byte(a))
 #define WRMEM(a,v)          (m_data->write_byte((a), (v)))
@@ -183,7 +183,7 @@ std::unique_ptr<util::disasm_interface> mb88_cpu_device::create_disassembler()
 void mb88_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<0, 0, ENDIANNESS_BIG>();
 	m_data = &space(AS_DATA);
 
 	m_read_k.resolve_safe(0);

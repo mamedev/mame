@@ -9,7 +9,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
-				<rom name="los96disk.d64" size="174848" crc="b78332c5" sha1="744509449b09fae636f47ac47e6496672c2f7ff0" offset="0" status="baddump" />
+				<rom name="los96disk.d64" size="174848" crc="b78332c5" sha1="744509449b09fae636f47ac47e6496672c2f7ff0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -22,7 +22,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
-				<rom name="cbm8x96.d64" size="174848" crc="33210394" sha1="AB59246300847B9CCB00B10F220253BAE20E76B2" offset="0" />
+				<rom name="cbm8x96.d64" size="174848" crc="33210394" sha1="ab59246300847b9ccb00b10f220253bae20e76b2"/>
 			</dataarea>
 		</part>
 	</software>

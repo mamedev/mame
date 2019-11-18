@@ -1,22 +1,29 @@
 // license:LGPL-2.1+
 // copyright-holders:David Haywood, Angelo Salese, Olivier Galibert, Mariusz Wojcieszek, R. Belmont
+#ifndef MAME_INCLUDES_SATURN_H
+#define MAME_INCLUDES_SATURN_H
 
-#include "machine/timer.h"
-#include "cpu/m68000/m68000.h"
-#include "machine/sega_scu.h"
-#include "machine/smpc.h"
-#include "cpu/sh/sh2.h"
+#pragma once
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
-#include "machine/315-5881_crypt.h"
-#include "machine/315-5838_317-0229_comp.h"
+#include "cpu/m68000/m68000.h"
+#include "cpu/sh/sh2.h"
 
 #include "debug/debugcon.h"
 #include "debug/debugcmd.h"
-#include "debugger.h"
 
+#include "machine/315-5881_crypt.h"
+#include "machine/315-5838_317-0229_comp.h"
+#include "machine/sega_scu.h"
+#include "machine/smpc.h"
+#include "machine/timer.h"
+
+#include "sound/scsp.h"
+
+#include "debugger.h"
+#include "emupal.h"
 #include "screen.h"
 
 class saturn_state : public driver_device
@@ -32,6 +39,7 @@ public:
 			m_maincpu(*this, "maincpu"),
 			m_slave(*this, "slave"),
 			m_audiocpu(*this, "audiocpu"),
+			m_scsp(*this, "scsp"),
 			m_smpc_hle(*this, "smpc"),
 			m_scu(*this, "scu"),
 			m_gfxdecode(*this, "gfxdecode"),
@@ -40,6 +48,20 @@ public:
 	{
 	}
 
+	DECLARE_WRITE8_MEMBER(scsp_irq);
+
+	// SMPC HLE delegates
+	DECLARE_WRITE_LINE_MEMBER(master_sh2_reset_w);
+	DECLARE_WRITE_LINE_MEMBER(master_sh2_nmi_w);
+	DECLARE_WRITE_LINE_MEMBER(slave_sh2_reset_w);
+	DECLARE_WRITE_LINE_MEMBER(sound_68k_reset_w);
+	DECLARE_WRITE_LINE_MEMBER(system_reset_w);
+	DECLARE_WRITE_LINE_MEMBER(system_halt_w);
+	DECLARE_WRITE_LINE_MEMBER(dot_select_w);
+
+	DECLARE_WRITE_LINE_MEMBER(m68k_reset_callback);
+
+protected:
 	required_region_ptr<uint32_t> m_rom;
 	required_shared_ptr<uint32_t> m_workram_l;
 	required_shared_ptr<uint32_t> m_workram_h;
@@ -102,6 +124,7 @@ public:
 	required_device<sh2_device> m_maincpu;
 	required_device<sh2_device> m_slave;
 	required_device<m68000_base_device> m_audiocpu;
+	required_device<scsp_device> m_scsp;
 	required_device<smpc_hle_device> m_smpc_hle;
 	required_device<sega_scu_device> m_scu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -124,7 +147,7 @@ public:
 	DECLARE_WRITE32_MEMBER(saturn_sinit_w);
 	DECLARE_READ8_MEMBER(saturn_backupram_r);
 	DECLARE_WRITE8_MEMBER(saturn_backupram_w);
-	DECLARE_WRITE8_MEMBER(scsp_irq);
+
 	int m_scsp_last_line;
 
 	DECLARE_READ16_MEMBER ( saturn_vdp1_regs_r );
@@ -269,13 +292,13 @@ public:
 	void draw_rgb15_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_rgb32_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void stv_vdp2_drawgfxzoom(bitmap_rgb32 &dest_bmp,const rectangle &clip,gfx_element *gfx, uint32_t code,uint32_t color,int flipx,int flipy,int sx,int sy,int transparency,int transparent_color,int scalex, int scaley,int sprite_screen_width, int sprite_screen_height, int alpha);
-	void stv_vdp2_drawgfxzoom_rgb555(bitmap_rgb32 &dest_bmp,const rectangle &clip,uint32_t code,uint32_t color,int flipx,int flipy,int sx,int sy,int transparency,int transparent_color,int scalex, int scaley,int sprite_screen_width, int sprite_screen_height, int alpha);
+	void stv_vdp2_drawgfxzoom(bitmap_rgb32 &dest_bmp,const rectangle &clip,gfx_element *gfx, uint32_t code,uint32_t color,int flipx,int flipy,int sx,int sy,int transparency,int scalex, int scaley,int sprite_screen_width, int sprite_screen_height, int alpha);
+	void stv_vdp2_drawgfxzoom_rgb555(bitmap_rgb32 &dest_bmp,const rectangle &clip,uint32_t code,uint32_t color,int flipx,int flipy,int sx,int sy,int transparency,int scalex, int scaley,int sprite_screen_width, int sprite_screen_height, int alpha);
 	void stv_vdp2_drawgfx_rgb555( bitmap_rgb32 &dest_bmp, const rectangle &clip, uint32_t code, int flipx, int flipy, int sx, int sy, int transparency, int alpha);
 	void stv_vdp2_drawgfx_rgb888( bitmap_rgb32 &dest_bmp, const rectangle &clip, uint32_t code, int flipx, int flipy, int sx, int sy, int transparency, int alpha);
 
-	void stv_vdp2_drawgfx_alpha(bitmap_rgb32 &dest_bmp,const rectangle &clip,gfx_element *gfx, uint32_t code,uint32_t color, int flipx,int flipy,int offsx,int offsy, int transparent_color, int alpha);
-	void stv_vdp2_drawgfx_transpen(bitmap_rgb32 &dest_bmp,const rectangle &clip,gfx_element *gfx, uint32_t code,uint32_t color, int flipx,int flipy,int offsx,int offsy, int transparent_color);
+	void stv_vdp2_drawgfx_alpha(bitmap_rgb32 &dest_bmp,const rectangle &clip,gfx_element *gfx, uint32_t code,uint32_t color, int flipx,int flipy,int offsx,int offsy, int transparency, int alpha);
+	void stv_vdp2_drawgfx_transpen(bitmap_rgb32 &dest_bmp,const rectangle &clip,gfx_element *gfx, uint32_t code,uint32_t color, int flipx,int flipy,int offsx,int offsy, int transparency);
 
 
 	void stv_vdp2_draw_rotation_screen(bitmap_rgb32 &bitmap, const rectangle &cliprect, int iRP);
@@ -415,21 +438,9 @@ public:
 
 	} stv_rbg_cache_data;
 
-	DECLARE_WRITE_LINE_MEMBER(m68k_reset_callback);
-
 //  DECLARE_WRITE_LINE_MEMBER(scudsp_end_w);
 //  DECLARE_READ16_MEMBER(scudsp_dma_r);
 //  DECLARE_WRITE16_MEMBER(scudsp_dma_w);
-
-	// SMPC HLE delegates
-	DECLARE_WRITE_LINE_MEMBER(master_sh2_reset_w);
-	DECLARE_WRITE_LINE_MEMBER(master_sh2_nmi_w);
-	DECLARE_WRITE_LINE_MEMBER(slave_sh2_reset_w);
-	DECLARE_WRITE_LINE_MEMBER(sound_68k_reset_w);
-	DECLARE_WRITE_LINE_MEMBER(system_reset_w);
-	DECLARE_WRITE_LINE_MEMBER(system_halt_w);
-	DECLARE_WRITE_LINE_MEMBER(dot_select_w);
-
 
 //  void debug_scudma_command(int ref, const std::vector<std::string> &params);
 //  void debug_scuirq_command(int ref, const std::vector<std::string> &params);
@@ -450,4 +461,6 @@ public:
 #define STV_VDP1_TVM  ((STV_VDP1_TVMR & 0x0007) >> 0)
 
 
-GFXDECODE_EXTERN( stv );
+extern gfx_decode_entry const gfx_stv[];
+
+#endif // MAME_INCLUDES_SATURN_H

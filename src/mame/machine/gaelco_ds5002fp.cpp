@@ -16,7 +16,7 @@ void gaelco_ds5002fp_device::dallas_rom(address_map &map)
 
 void gaelco_ds5002fp_device::dallas_ram(address_map &map)
 {
-	map(0x00000, 0x0ffff).rw(this, FUNC(gaelco_ds5002fp_device::hostmem_r), FUNC(gaelco_ds5002fp_device::hostmem_w));
+	map(0x00000, 0x0ffff).rw(FUNC(gaelco_ds5002fp_device::hostmem_r), FUNC(gaelco_ds5002fp_device::hostmem_w));
 	map(0x10000, 0x17fff).ram().share("sram"); // yes, the games access it as data and use it for temporary storage!!
 }
 
@@ -38,15 +38,14 @@ WRITE8_MEMBER(gaelco_ds5002fp_device::hostmem_w)
 	m_hostmem->write_byte(offset, data);
 }
 
-MACHINE_CONFIG_START(gaelco_ds5002fp_device::device_add_mconfig)
-	MCFG_CPU_ADD("mcu", DS5002FP, DERIVED_CLOCK(1, 1))
-	MCFG_CPU_PROGRAM_MAP(dallas_rom)
-	MCFG_CPU_IO_MAP(dallas_ram)
+void gaelco_ds5002fp_device::device_add_mconfig(machine_config &config)
+{
+	ds5002fp_device &mcu(DS5002FP(config, "mcu", DERIVED_CLOCK(1, 1)));
+	mcu.set_addrmap(AS_PROGRAM, &gaelco_ds5002fp_device::dallas_rom);
+	mcu.set_addrmap(AS_IO, &gaelco_ds5002fp_device::dallas_ram);
 
-	MCFG_QUANTUM_PERFECT_CPU("mcu")
-
-	MCFG_NVRAM_ADD_0FILL("sram")
-MACHINE_CONFIG_END
+	NVRAM(config, "sram", nvram_device::DEFAULT_ALL_0);
+}
 
 void gaelco_ds5002fp_device::device_start()
 {

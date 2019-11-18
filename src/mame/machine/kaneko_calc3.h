@@ -6,10 +6,20 @@
 
 #pragma once
 
+#include "machine/eepromser.h"
 
 class kaneko_calc3_device : public device_t
 {
 public:
+	template <typename T, typename U, typename V>
+	kaneko_calc3_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag, U &&eeprom_tag, V &&region_tag)
+		: kaneko_calc3_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		m_maincpu.set_tag(std::forward<T>(cpu_tag));
+		m_eeprom.set_tag(std::forward<U>(eeprom_tag));
+		m_calc3_region.set_tag(std::forward<V>(region_tag));
+	}
+
 	kaneko_calc3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_WRITE16_MEMBER(mcu_com0_w);
@@ -26,6 +36,9 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
+	required_device<cpu_device> m_maincpu;
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_memory_region m_calc3_region;
 	required_shared_ptr<uint16_t> m_mcuram;
 	int m_mcu_status;
 	int m_mcu_command_offset;
@@ -57,6 +70,8 @@ private:
 	void mcu_com_w(offs_t offset, uint16_t data, uint16_t mem_mask, int _n_);
 	uint8_t shift_bits(uint8_t dat, int bits);
 	int decompress_table(int tabnum, uint8_t* dstram, int dstoffset);
+
+	static const int16_t s_keydata[0x40*0x100];
 };
 
 

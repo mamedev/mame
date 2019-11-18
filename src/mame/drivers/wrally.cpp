@@ -140,14 +140,14 @@ The PCB has a layout that can either use the 4 rom set of I7, I9, I11 & I13 or l
 
 void wrally_state::mcu_hostmem_map(address_map &map)
 {
-	map(0x0000, 0xffff).mask(0x3fff).rw(this, FUNC(wrally_state::shareram_r), FUNC(wrally_state::shareram_w)); // shared RAM with the main CPU
+	map(0x0000, 0xffff).mask(0x3fff).rw(FUNC(wrally_state::shareram_r), FUNC(wrally_state::shareram_w)); // shared RAM with the main CPU
 }
 
 
 void wrally_state::wrally_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();                                                         /* ROM */
-	map(0x100000, 0x103fff).ram().w(this, FUNC(wrally_state::vram_w)).share("videoram");   /* encrypted Video RAM */
+	map(0x100000, 0x103fff).ram().w(FUNC(wrally_state::vram_w)).share("videoram");   /* encrypted Video RAM */
 	map(0x108000, 0x108007).ram().share("vregs");                                   /* Video Registers */
 	map(0x10800c, 0x10800d).nopw();                                                /* CLR INT Video */
 	map(0x200000, 0x203fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    /* Palette */
@@ -156,11 +156,8 @@ void wrally_state::wrally_map(address_map &map)
 	map(0x700002, 0x700003).portr("P1_P2");
 	map(0x700004, 0x700005).portr("WHEEL");
 	map(0x700008, 0x700009).portr("SYSTEM");
-	map(0x70000b, 0x70000b).select(0x000070).lw8("outlatch_w",
-												 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
-													 m_outlatch->write_d0(space, offset >> 3, data, mem_mask);
-												 });
-	map(0x70000c, 0x70000d).w(this, FUNC(wrally_state::okim6295_bankswitch_w));                                /* OKI6295 bankswitch */
+	map(0x70000b, 0x70000b).select(0x000070).lw8(NAME([this] (offs_t offset, u8 data) { m_outlatch->write_d0(offset >> 4, data); }));
+	map(0x70000d, 0x70000d).w(FUNC(wrally_state::okim6295_bankswitch_w));                                /* OKI6295 bankswitch */
 	map(0x70000f, 0x70000f).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));  /* OKI6295 status/data register */
 	map(0xfec000, 0xfeffff).ram().share("shareram");                                        /* Work RAM (shared with DS5002FP) */
 }
@@ -187,6 +184,7 @@ static INPUT_PORTS_START( wrally )
 	PORT_DIPSETTING(      0x0018, DEF_STR( Joystick ) )
 	PORT_DIPSETTING(      0x0010, "Pot Wheel" )
 	PORT_DIPSETTING(      0x0000, "Optical Wheel" )
+	PORT_DIPSETTING(      0x0008, "invalid" )
 	PORT_DIPNAME( 0x0020, 0x0000, DEF_STR( Demo_Sounds ) )     PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -253,57 +251,60 @@ static const gfx_layout wrally_tilelayout16 =
 	RGN_FRAC(1,2),                          /* number of tiles */
 	4,                                      /* 4 bpp */
 	{ RGN_FRAC(1,2)+8, RGN_FRAC(1,2)+0, 8, 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7,
-		16*16+0, 16*16+1, 16*16+2, 16*16+3, 16*16+4, 16*16+5, 16*16+6, 16*16+7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-		8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
+	{ STEP8(0,1), STEP8(16*16,1) },
+	{ STEP16(0,16) },
 	64*8
 };
 
-static GFXDECODE_START( wrally )
+static GFXDECODE_START( gfx_wrally )
 	GFXDECODE_ENTRY( "gfx1", 0x000000, wrally_tilelayout16, 0, 64*8 )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(wrally_state::wrally)
+void wrally_state::wrally(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,XTAL(24'000'000)/2)        /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(wrally_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", wrally_state,  irq6_line_hold)
+	M68000(config, m_maincpu, XTAL(24'000'000)/2);        /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &wrally_state::wrally_map);
+	m_maincpu->set_vblank_int("screen", FUNC(wrally_state::irq6_line_hold));
 
-	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL(24'000'000) / 2) /* verified on pcb */
-	MCFG_DEVICE_ADDRESS_MAP(0, mcu_hostmem_map)
+	gaelco_ds5002fp_device &ds5002(GAELCO_DS5002FP(config, "gaelco_ds5002fp", XTAL(24'000'000) / 2)); /* verified on pcb */
+	ds5002.set_addrmap(0, &wrally_state::mcu_hostmem_map);
+	config.set_perfect_quantum("gaelco_ds5002fp:mcu");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(64*16, 32*16)
-	MCFG_SCREEN_VISIBLE_AREA(8, 24*16-8-1, 16, 16*16-8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(wrally_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(64*16, 32*16);
+	screen.set_visarea(8, 24*16-8-1, 16, 16*16-8-1);
+	screen.set_screen_update(FUNC(wrally_state::screen_update));
+	screen.set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wrally)
-	MCFG_PALETTE_ADD("palette", 1024*8)
-	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_wrally);
+	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 1024*8);
 
-	MCFG_DEVICE_ADD("outlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(wrally_state, coin1_lockout_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(wrally_state, coin2_lockout_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(wrally_state, coin1_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(wrally_state, coin2_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP)                                                  /* Sound muting */
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(wrally_state, flipscreen_w))                 /* Flip screen */
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP)                                                  /* ??? */
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP)                                                  /* ??? */
+	GAELCO_WRALLY_SPRITES(config, m_sprites, 0);
+	m_sprites->set_gfxdecode_tag("gfxdecode");
+	m_sprites->set_screen_tag("screen");
+
+	LS259(config, m_outlatch);
+	m_outlatch->q_out_cb<0>().set(FUNC(wrally_state::coin1_lockout_w));
+	m_outlatch->q_out_cb<1>().set(FUNC(wrally_state::coin2_lockout_w));
+	m_outlatch->q_out_cb<2>().set(FUNC(wrally_state::coin1_counter_w));
+	m_outlatch->q_out_cb<3>().set(FUNC(wrally_state::coin2_counter_w));
+	m_outlatch->q_out_cb<4>().set_nop();                                /* Sound muting */
+	m_outlatch->q_out_cb<5>().set(FUNC(wrally_state::flipscreen_w));    /* Flip screen */
+	m_outlatch->q_out_cb<6>().set_nop();                                /* ??? */
+	m_outlatch->q_out_cb<7>().set_nop();                                /* ??? */
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki", XTAL(1'000'000), PIN7_HIGH)                 /* verified on pcb */
-	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL(1'000'000), okim6295_device::PIN7_HIGH)); /* verified on pcb */
+	oki.set_addrmap(0, &wrally_state::oki_map);
+	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 ROM_START( wrally )
@@ -431,7 +432,7 @@ ROM_START( wrallyat ) /* Board Marked 930217, Atari License */
 ROM_END
 
 
-GAME( 1993, wrally,   0,      wrally, wrally, wrally_state, 0, ROT0, "Gaelco", "World Rally (Version 1.0, Checksum 0E56)", MACHINE_SUPPORTS_SAVE ) /* Dallas DS5002FP power failure shows as: "Tension  baja " */
-GAME( 1993, wrallya,  wrally, wrally, wrally, wrally_state, 0, ROT0, "Gaelco", "World Rally (Version 1.0, Checksum 3873)", MACHINE_SUPPORTS_SAVE ) /* Dallas DS5002FP power failure shows as: "Power  Failure" */
-GAME( 1993, wrallyb,  wrally, wrally, wrally, wrally_state, 0, ROT0, "Gaelco", "World Rally (Version 1.0, Checksum 8AA2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, wrallyat, wrally, wrally, wrally, wrally_state, 0, ROT0, "Gaelco (Atari license)", "World Rally (US, 930217)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, wrally,   0,      wrally, wrally, wrally_state, empty_init, ROT0, "Gaelco", "World Rally (Version 1.0, Checksum 0E56)", MACHINE_SUPPORTS_SAVE ) /* Dallas DS5002FP power failure shows as: "Tension  baja " */
+GAME( 1993, wrallya,  wrally, wrally, wrally, wrally_state, empty_init, ROT0, "Gaelco", "World Rally (Version 1.0, Checksum 3873)", MACHINE_SUPPORTS_SAVE ) /* Dallas DS5002FP power failure shows as: "Power  Failure" */
+GAME( 1993, wrallyb,  wrally, wrally, wrally, wrally_state, empty_init, ROT0, "Gaelco", "World Rally (Version 1.0, Checksum 8AA2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, wrallyat, wrally, wrally, wrally, wrally_state, empty_init, ROT0, "Gaelco (Atari license)", "World Rally (US, 930217)", MACHINE_SUPPORTS_SAVE )

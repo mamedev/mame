@@ -6,19 +6,13 @@
 #pragma once
 
 
-#define MCFG_NSCSI_BUS_ADD(_tag)        \
-	MCFG_DEVICE_ADD(_tag, NSCSI_BUS, 0)
-
-#define MCFG_NSCSI_ADD(_tag, _slot_intf, _def_slot, _fixed) \
-	MCFG_DEVICE_ADD(_tag, NSCSI_CONNECTOR, 0)                   \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _fixed)
-
 class nscsi_device;
+class nscsi_slot_card_interface;
 
 class nscsi_bus_device : public device_t
 {
 public:
-	nscsi_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nscsi_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	void ctrl_w(int refid, uint32_t lines, uint32_t mask);
 	void data_w(int refid, uint32_t lines);
@@ -30,7 +24,7 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_config_complete() override;
+	virtual void device_resolve_objects() override;
 
 private:
 	struct dev_t {
@@ -49,10 +43,19 @@ private:
 };
 
 class nscsi_connector: public device_t,
-						public device_slot_interface
+					   public device_single_card_slot_interface<nscsi_slot_card_interface>
 {
 public:
-	nscsi_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T>
+	nscsi_connector(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt, bool fixed = false)
+		: nscsi_connector(mconfig, tag, owner, 0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(fixed);
+	}
+	nscsi_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~nscsi_connector();
 
 	nscsi_device *get_device();
@@ -61,7 +64,18 @@ protected:
 	virtual void device_start() override;
 };
 
-class nscsi_device : public device_t, public device_slot_card_interface
+class nscsi_slot_card_interface : public device_interface
+{
+	friend class nscsi_connector;
+
+public:
+	nscsi_slot_card_interface(const machine_config &mconfig, device_t &device, const char *nscsi_tag);
+
+private:
+	required_device<nscsi_device> m_nscsi;
+};
+
+class nscsi_device : public device_t
 {
 public:
 	// Here because the biggest users are the devices, not the bus
@@ -86,6 +100,33 @@ public:
 		S_PHASE_MASK     = S_MSG|S_CTL|S_INP
 	};
 
+	// SCSI Messages
+	// Here because some controllers interpret messages
+	enum {
+		SM_COMMAND_COMPLETE              = 0x00,
+		SM_EXTENDED_MSG                  = 0x01,
+		SM_SAVE_DATA_PTR                 = 0x02,
+		SM_RESTORE_PTR                   = 0x03,
+		SM_DISCONNECT                    = 0x04,
+		SM_INITIATOR_ERROR               = 0x05,
+		SM_ABORT                         = 0x06,
+		SM_MSG_REJECT                    = 0x07,
+		SM_NOP                           = 0x08,
+		SM_MSG_PARITY                    = 0x09,
+		SM_LCMD_COMPLETE                 = 0x0a,
+		SM_LCMD_COMPLETE_F               = 0x0b,
+		SM_BUS_DEVICE_RESET              = 0x0c,
+		SM_ABORT_TAG                     = 0x0d,
+		SM_CLEAR_QUEUE                   = 0x0e,
+		SM_INIT_RECOVERY                 = 0x0f,
+		SM_RELEASE_RECOVERY              = 0x10,
+		SM_TERMINATE_IO                  = 0x11,
+		SM_SIMPLE_QUEUE                  = 0x20,
+		SM_HEAD_QUEUE                    = 0x21,
+		SM_ORDERED_QUEUE                 = 0x22,
+		SM_IGNORE_WIDE_RES               = 0x23
+	};
+
 	void connect_to_bus(nscsi_bus_device *bus, int refid, int default_scsi_id);
 	virtual void scsi_ctrl_changed();
 
@@ -99,7 +140,7 @@ protected:
 	nscsi_bus_device *scsi_bus;
 };
 
-class nscsi_full_device : public nscsi_device
+class nscsi_full_device : public nscsi_device, public nscsi_slot_card_interface
 {
 public:
 	virtual void scsi_ctrl_changed() override;
@@ -117,6 +158,32 @@ protected:
 		SS_RESV_CONFLICT                 = 0x18,
 		SS_TERMINATED                    = 0x22,
 		SS_QUEUE_FULL                    = 0x28
+	};
+
+	// SCSI sense keys
+	enum {
+		SK_NO_SENSE                      = 0x00,
+		SK_RECOVERED_ERROR               = 0x01,
+		SK_NOT_READY                     = 0x02,
+		SK_MEDIUM_ERROR                  = 0x03,
+		SK_HARDWARE_ERROR                = 0x04,
+		SK_ILLEGAL_REQUEST               = 0x05,
+		SK_UNIT_ATTENTION                = 0x06,
+		SK_DATA_PROTECT                  = 0x07,
+		SK_BLANK_CHECK                   = 0x08,
+		SK_VENDOR_SPECIFIC               = 0x09,
+		SK_COPY_ABORTED                  = 0x0a,
+		SK_ABORTED_COMMAND               = 0x0b,
+		SK_VOLUME_OVERFLOW               = 0x0d,
+		SK_MISCOMPARE                    = 0x0e,
+		SK_COMPLETED                     = 0x0f
+	};
+
+	// SCSI addtional sense code qualifiers
+	enum {
+		SK_ASC_INVALID_FIELD_IN_CDB       = 0x24,
+		SK_ASC_LOGICAL_UNIT_NOT_SUPPORTED = 0x25,
+		SK_ASC_MEDIUM_NOT_PRESENT         = 0x3a
 	};
 
 	// SCSI commands
@@ -240,38 +307,12 @@ protected:
 		SC_SEND_DVD_STRUCTURE            = 0xbf
 	};
 
-	// SCSI Messages
-	enum {
-		SM_COMMAND_COMPLETE              = 0x00,
-		SM_EXTENDED_MSG                  = 0x01,
-		SM_SAVE_DATA_PTR                 = 0x02,
-		SM_RESTORE_PTR                   = 0x03,
-		SM_DISCONNECT                    = 0x04,
-		SM_INITIATOR_ERROR               = 0x05,
-		SM_ABORT                         = 0x06,
-		SM_MSG_REJECT                    = 0x07,
-		SM_NOP                           = 0x08,
-		SM_MSG_PARITY                    = 0x09,
-		SM_LCMD_COMPLETE                 = 0x0a,
-		SM_LCMD_COMPLETE_F               = 0x0b,
-		SM_BUS_DEVICE_RESET              = 0x0c,
-		SM_ABORT_TAG                     = 0x0d,
-		SM_CLEAR_QUEUE                   = 0x0e,
-		SM_INIT_RECOVERY                 = 0x0f,
-		SM_RELEASE_RECOVERY              = 0x10,
-		SM_TERMINATE_IO                  = 0x11,
-		SM_SIMPLE_QUEUE                  = 0x20,
-		SM_HEAD_QUEUE                    = 0x21,
-		SM_ORDERED_QUEUE                 = 0x22,
-		SM_IGNORE_WIDE_RES               = 0x23
-	};
-
 	enum {
 		SBUF_MAIN,
 		SBUF_SENSE
 	};
 
-	using nscsi_device::nscsi_device;
+	nscsi_full_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -279,13 +320,14 @@ protected:
 
 	virtual void scsi_message();
 	virtual void scsi_command();
+	virtual bool scsi_command_done(uint8_t command, uint8_t length);
 
 	void scsi_unknown_command();
 	void scsi_status_complete(uint8_t st);
 	void scsi_data_in(int buf, int size);
 	void scsi_data_out(int buf, int size);
 
-	void sense(bool deferred, uint8_t key);
+	void sense(bool deferred, uint8_t key, uint8_t asc = 0, uint8_t ascq = 0);
 	int get_lun(int def = 0);
 	void bad_lun();
 
@@ -354,7 +396,7 @@ protected:
 	// Fast negation period (30ns)
 	virtual attotime scsi_fast_negation_period();
 
-	uint8_t scsi_cmdbuf[4096], scsi_sense_buffer[8];
+	uint8_t scsi_cmdbuf[4096], scsi_sense_buffer[18];
 	int scsi_cmdsize;
 	uint8_t scsi_identify;
 
@@ -419,7 +461,6 @@ private:
 	void target_recv_byte();
 	void target_send_byte(uint8_t val);
 	void target_send_buffer_byte();
-	bool command_done();
 };
 
 

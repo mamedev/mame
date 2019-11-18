@@ -11,9 +11,10 @@
 
 #pragma once
 
-
 #include "ctrl.h"
 #include "bus/midi/midi.h"
+#include "diserial.h"
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS

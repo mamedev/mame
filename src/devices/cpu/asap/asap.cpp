@@ -153,7 +153,7 @@ asap_device::asap_device(const machine_config &mconfig, const char *tag, device_
 		m_irq_state(0),
 		m_icount(0),
 		m_program(nullptr),
-		m_direct(nullptr)
+		m_cache(nullptr)
 {
 	// initialize the src2val table to contain immediates for low values
 	for (int i = 0; i < REGBASE; i++)
@@ -184,7 +184,7 @@ void asap_device::device_start()
 {
 	// get our address spaces
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<2, 0, ENDIANNESS_LITTLE>();
 
 	// register our state for the debugger
 	state_add(STATE_GENPC,     "GENPC",     m_pc).noshow();
@@ -321,7 +321,7 @@ std::unique_ptr<util::disasm_interface> asap_device::create_disassembler()
 
 inline uint32_t asap_device::readop(offs_t pc)
 {
-	return m_direct->read_dword(pc);
+	return m_cache->read_dword(pc);
 }
 
 
@@ -503,7 +503,7 @@ inline void asap_device::execute_instruction()
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-uint32_t asap_device::execute_min_cycles() const
+uint32_t asap_device::execute_min_cycles() const noexcept
 {
 	return 1;
 }
@@ -514,7 +514,7 @@ uint32_t asap_device::execute_min_cycles() const
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-uint32_t asap_device::execute_max_cycles() const
+uint32_t asap_device::execute_max_cycles() const noexcept
 {
 	return 2;
 }
@@ -525,7 +525,7 @@ uint32_t asap_device::execute_max_cycles() const
 //  input/interrupt lines
 //-------------------------------------------------
 
-uint32_t asap_device::execute_input_lines() const
+uint32_t asap_device::execute_input_lines() const noexcept
 {
 	return 1;
 }

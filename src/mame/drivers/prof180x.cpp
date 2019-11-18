@@ -12,7 +12,6 @@
 
     TODO:
 
-    - HD64180 CPU (DMA, MMU, SIO, etc) (Z80180 like)
     - memory banking
     - keyboard
     - floppy
@@ -26,7 +25,9 @@
 #include "emu.h"
 #include "includes/prof180x.h"
 
-#include "cpu/z80/z80.h"
+#include "cpu/z180/z180.h"
+#include "imagedev/floppy.h"
+#include "machine/74259.h"
 #include "machine/ram.h"
 #include "machine/upd765.h"
 #include "screen.h"
@@ -81,62 +82,44 @@ WRITE8_MEMBER( prof180x_state::write )
 	}
 }
 
-void prof180x_state::ls259_w(int flag, int value)
+WRITE_LINE_MEMBER(prof180x_state::c0_flag_w)
 {
-	switch (flag)
-	{
-	case 0: // C0
-		m_c0 = value;
-		break;
-
-	case 1: // C1
-		m_c1 = value;
-		break;
-
-	case 2: // C2
-		m_c2 = value;
-		break;
-
-	case 3: // MINI
-		break;
-
-	case 4: // MM0
-		m_mm0 = value;
-		break;
-
-	case 5: // RTC
-		break;
-
-	case 6: // PEPS
-		break;
-
-	case 7: // MM1
-		m_mm1 = value;
-		break;
-	}
+	// C0 (DATA)
+	m_c0 = state;
 }
 
-WRITE8_MEMBER( prof180x_state::flr_w )
+WRITE_LINE_MEMBER(prof180x_state::c1_flag_w)
 {
-	/*
+	// C1 (M0)
+	m_c1 = state;
+}
 
-	    bit     description
+WRITE_LINE_MEMBER(prof180x_state::c2_flag_w)
+{
+	// C2 (M1)
+	m_c2 = state;
+}
 
-	    0       VAL
-	    1       FLG0
-	    2       FLG1
-	    3       FLG2
-	    4
-	    5
-	    6
-	    7
+WRITE_LINE_MEMBER(prof180x_state::mini_flag_w)
+{
+}
 
-	*/
+WRITE_LINE_MEMBER(prof180x_state::mm0_flag_w)
+{
+	m_mm0 = state;
+}
 
-	int val = BIT(data, 0);
-	int flg = (data >> 1) & 0x07;
+WRITE_LINE_MEMBER(prof180x_state::rtc_ce_w)
+{
+}
 
-	ls259_w(flg, val);
+WRITE_LINE_MEMBER(prof180x_state::peps_flag_w)
+{
+}
+
+WRITE_LINE_MEMBER(prof180x_state::mm1_flag_w)
+{
+	m_mm1 = state;
 }
 
 READ8_MEMBER( prof180x_state::status0_r )
@@ -188,16 +171,19 @@ READ8_MEMBER( prof180x_state::status_r )
 
 void prof180x_state::prof180x_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(this, FUNC(prof180x_state::read), FUNC(prof180x_state::write));
+	map(0x00000, 0x0ffff).rom().region(HD64180_TAG, 0);
+	map(0x4f000, 0x4ffff).ram();
+	//map(0x0000, 0xffff).rw(FUNC(prof180x_state::read), FUNC(prof180x_state::write));
 }
 
 void prof180x_state::prof180x_io(address_map &map)
 {
-	map(0x08, 0x08).mirror(0xff00).w(this, FUNC(prof180x_state::flr_w));
-	map(0x09, 0x09).select(0xff00).r(this, FUNC(prof180x_state::status_r));
-	map(0x0a, 0x0a).mirror(0xff00).rw(FDC9268_TAG, FUNC(upd765a_device::mdma_r), FUNC(upd765a_device::mdma_w));
-	map(0x0b, 0x0b).mirror(0xff00).w("cent_data_out", FUNC(output_latch_device::write));
-	map(0x0c, 0x0d).mirror(0xff00).m(FDC9268_TAG, FUNC(upd765a_device::map));
+	map(0x0000, 0x003f).noprw(); // Z180 internal registers
+	map(0x00d8, 0x00d8).mirror(0xff00).w("syslatch", FUNC(ls259_device::write_nibble_d0));
+	map(0x00d9, 0x00d9).select(0xff00).r(FUNC(prof180x_state::status_r));
+	map(0x00da, 0x00da).mirror(0xff00).rw(FDC9268_TAG, FUNC(upd765a_device::dma_r), FUNC(upd765a_device::dma_w));
+	map(0x00db, 0x00db).mirror(0xff00).w("cent_data_out", FUNC(output_latch_device::bus_w));
+	map(0x00dc, 0x00dd).mirror(0xff00).m(FDC9268_TAG, FUNC(upd765a_device::map));
 }
 
 /* Input ports */
@@ -207,9 +193,10 @@ INPUT_PORTS_END
 
 /* Video */
 
-static SLOT_INTERFACE_START( prof180x_floppies )
-	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
-SLOT_INTERFACE_END
+static void prof180x_floppies(device_slot_interface &device)
+{
+	device.option_add("35dd", FLOPPY_35_DD);
+}
 
 /*
 static RTC8583_INTERFACE( rtc_intf )
@@ -230,69 +217,76 @@ void prof180x_state::machine_start()
 
 void prof180x_state::machine_reset()
 {
-	for (int i = 0; i < 8; i++)
-	{
-		ls259_w(i, 0);
-	}
 }
 
-MACHINE_CONFIG_START(prof180x_state::prof180x)
+void prof180x_state::prof180x(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD(HD64180_TAG, Z80, XTAL(9'216'000))
-	MCFG_CPU_PROGRAM_MAP(prof180x_mem)
-	MCFG_CPU_IO_MAP(prof180x_io)
+	z180_device &maincpu(HD64180RP(config, HD64180_TAG, 18.432_MHz_XTAL));
+	maincpu.set_addrmap(AS_PROGRAM, &prof180x_state::prof180x_mem);
+	maincpu.set_addrmap(AS_IO, &prof180x_state::prof180x_io);
+
+	ls259_device &syslatch(LS259(config, "syslatch")); // Z41
+	syslatch.q_out_cb<0>().set(FUNC(prof180x_state::c0_flag_w));
+	syslatch.q_out_cb<1>().set(FUNC(prof180x_state::c1_flag_w));
+	syslatch.q_out_cb<2>().set(FUNC(prof180x_state::c2_flag_w));
+	syslatch.q_out_cb<3>().set(FUNC(prof180x_state::mini_flag_w));
+	syslatch.q_out_cb<4>().set(FUNC(prof180x_state::mm0_flag_w));
+	syslatch.q_out_cb<5>().set(FUNC(prof180x_state::rtc_ce_w));
+	syslatch.q_out_cb<6>().set(FUNC(prof180x_state::peps_flag_w));
+	syslatch.q_out_cb<7>().set(FUNC(prof180x_state::mm1_flag_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_UPDATE_DRIVER(prof180x_state, screen_update)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen.set_screen_update(FUNC(prof180x_state::screen_update));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 640-1, 0, 480-1);
 
 	/* devices */
-	MCFG_UPD765A_ADD(FDC9268_TAG, false, true)
-	MCFG_FLOPPY_DRIVE_ADD(FDC9268_TAG ":0", prof180x_floppies, "35dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FDC9268_TAG ":1", prof180x_floppies, "35dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FDC9268_TAG ":2", prof180x_floppies, "35dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FDC9268_TAG ":3", prof180x_floppies, "35dd", floppy_image_device::default_floppy_formats)
+	UPD765A(config, FDC9268_TAG, 8'000'000, false, true);
+	FLOPPY_CONNECTOR(config, FDC9268_TAG ":0", prof180x_floppies, "35dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, FDC9268_TAG ":1", prof180x_floppies, "35dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, FDC9268_TAG ":2", prof180x_floppies, "35dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, FDC9268_TAG ":3", prof180x_floppies, "35dd", floppy_image_device::default_floppy_formats);
 
-	//MCFG_RTC8583_ADD(MK3835_TAG, rtc_intf)
-	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
+	//RTC8583(config, MK3835_TAG, rtc_intf);
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+
+	output_latch_device &latch(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(latch);
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
-	MCFG_RAM_EXTRA_OPTIONS("256K,512K")
+	RAM(config, RAM_TAG).set_default_size("128K").set_extra_options("256K,512K");
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "prof180")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "flop_list").set_original("prof180");
+}
 
 /* ROM definition */
 
 ROM_START( prof180x )
 	ROM_REGION( 0x10000, HD64180_TAG, 0 )
 	ROM_SYSTEM_BIOS( 0, "pmon13", "pmon v1.3" )
-	ROMX_LOAD( "pmon1_3.z16", 0x00000, 0x04000, CRC(32986688) SHA1(a6229d7e66ef699722ca3d41179fe3f1b75185d4), ROM_BIOS(1) )
+	ROMX_LOAD( "pmon1_3.z16", 0x00000, 0x04000, CRC(32986688) SHA1(a6229d7e66ef699722ca3d41179fe3f1b75185d4), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "pmon14", "pmon v1.4" )
-	ROMX_LOAD( "pmon1_4.z16", 0x00000, 0x04000, CRC(ed03f49f) SHA1(e016f9e0b89ab64c6203e2e46501d0b09f74ee9b), ROM_BIOS(2) )
+	ROMX_LOAD( "pmon1_4.z16", 0x00000, 0x04000, CRC(ed03f49f) SHA1(e016f9e0b89ab64c6203e2e46501d0b09f74ee9b), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "pmon15", "pmon v1.5" )
-	ROMX_LOAD( "pmon1_5.z16", 0x00000, 0x04000, CRC(f43d185c) SHA1(a7a219b3d48c74602b3116cfcd34e44d6e7bc423), ROM_BIOS(3) )
+	ROMX_LOAD( "pmon1_5.z16", 0x00000, 0x04000, CRC(f43d185c) SHA1(a7a219b3d48c74602b3116cfcd34e44d6e7bc423), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 3, "pmon", "pmon" )
-	ROMX_LOAD( "pmon.z16",    0x00000, 0x04000, CRC(4f3732d7) SHA1(7dc27262db4e0c8f109470253b9364a216909f2c), ROM_BIOS(4) )
+	ROMX_LOAD( "pmon.z16",    0x00000, 0x04000, CRC(4f3732d7) SHA1(7dc27262db4e0c8f109470253b9364a216909f2c), ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS( 4, "eboot1", "eboot1" )
-	ROMX_LOAD( "eboot1.z16",  0x00000, 0x08000, CRC(7a164b3c) SHA1(69367804b5cbc0633e3d7bbbcc256c2c8c9e7aca), ROM_BIOS(5) )
+	ROMX_LOAD( "eboot1.z16",  0x00000, 0x08000, CRC(7a164b3c) SHA1(69367804b5cbc0633e3d7bbbcc256c2c8c9e7aca), ROM_BIOS(4) )
 	ROM_SYSTEM_BIOS( 5, "eboot2", "eboot2" )
-	ROMX_LOAD( "eboot2.z16",  0x00000, 0x08000, CRC(0c2d4301) SHA1(f1a4f457e287b19e14d8ccdbc0383f183d8a3efe), ROM_BIOS(6) )
+	ROMX_LOAD( "eboot2.z16",  0x00000, 0x08000, CRC(0c2d4301) SHA1(f1a4f457e287b19e14d8ccdbc0383f183d8a3efe), ROM_BIOS(5) )
 	ROM_SYSTEM_BIOS( 6, "epmon1", "epmon1" )
-	ROMX_LOAD( "epmon1.z16",  0x00000, 0x10000, CRC(27aabfb4) SHA1(41adf038c474596dbf7d387a1a7f33ed86aa7869), ROM_BIOS(7) )
+	ROMX_LOAD( "epmon1.z16",  0x00000, 0x10000, CRC(27aabfb4) SHA1(41adf038c474596dbf7d387a1a7f33ed86aa7869), ROM_BIOS(6) )
 	ROM_SYSTEM_BIOS( 7, "epmon2", "epmon2" )
-	ROMX_LOAD( "epmon2.z16",  0x00000, 0x10000, CRC(3b8a7b59) SHA1(33741f0725e3eaa21c6881c712579b3c1fd30607), ROM_BIOS(8) )
+	ROMX_LOAD( "epmon2.z16",  0x00000, 0x10000, CRC(3b8a7b59) SHA1(33741f0725e3eaa21c6881c712579b3c1fd30607), ROM_BIOS(7) )
 	ROM_SYSTEM_BIOS( 8, "epmon3", "epmon3" )
-	ROMX_LOAD( "epmon3.z16",  0x00000, 0x10000, CRC(51313af1) SHA1(60c293171a1c7cb9a5ff6d681e61894f44fddbd1), ROM_BIOS(9) )
+	ROMX_LOAD( "epmon3.z16",  0x00000, 0x10000, CRC(51313af1) SHA1(60c293171a1c7cb9a5ff6d681e61894f44fddbd1), ROM_BIOS(8) )
 
 	ROM_REGION( 0x157, "plds", 0 )
 	ROM_LOAD( "pal14l8.z10", 0x000, 0x157, NO_DUMP )
@@ -301,23 +295,23 @@ ROM_END
 ROM_START( prof181x )
 	ROM_REGION( 0x10000, HD64180_TAG, 0 )
 	ROM_SYSTEM_BIOS( 0, "pmon13", "pmon v1.3" )
-	ROMX_LOAD( "pmon1_3.u13", 0x00000, 0x04000, CRC(32986688) SHA1(a6229d7e66ef699722ca3d41179fe3f1b75185d4), ROM_BIOS(1) )
+	ROMX_LOAD( "pmon1_3.u13", 0x00000, 0x04000, CRC(32986688) SHA1(a6229d7e66ef699722ca3d41179fe3f1b75185d4), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "pmon14", "pmon v1.4" )
-	ROMX_LOAD( "pmon1_4.u13", 0x00000, 0x04000, CRC(ed03f49f) SHA1(e016f9e0b89ab64c6203e2e46501d0b09f74ee9b), ROM_BIOS(2) )
+	ROMX_LOAD( "pmon1_4.u13", 0x00000, 0x04000, CRC(ed03f49f) SHA1(e016f9e0b89ab64c6203e2e46501d0b09f74ee9b), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "pmon15", "pmon v1.5" )
-	ROMX_LOAD( "pmon1_5.u13", 0x00000, 0x04000, CRC(f43d185c) SHA1(a7a219b3d48c74602b3116cfcd34e44d6e7bc423), ROM_BIOS(3) )
+	ROMX_LOAD( "pmon1_5.u13", 0x00000, 0x04000, CRC(f43d185c) SHA1(a7a219b3d48c74602b3116cfcd34e44d6e7bc423), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 3, "pmon", "pmon" )
-	ROMX_LOAD( "pmon.u13",    0x00000, 0x04000, CRC(4f3732d7) SHA1(7dc27262db4e0c8f109470253b9364a216909f2c), ROM_BIOS(4) )
+	ROMX_LOAD( "pmon.u13",    0x00000, 0x04000, CRC(4f3732d7) SHA1(7dc27262db4e0c8f109470253b9364a216909f2c), ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS( 4, "eboot1", "eboot1" )
-	ROMX_LOAD( "eboot1.u13",  0x00000, 0x08000, CRC(7a164b3c) SHA1(69367804b5cbc0633e3d7bbbcc256c2c8c9e7aca), ROM_BIOS(5) )
+	ROMX_LOAD( "eboot1.u13",  0x00000, 0x08000, CRC(7a164b3c) SHA1(69367804b5cbc0633e3d7bbbcc256c2c8c9e7aca), ROM_BIOS(4) )
 	ROM_SYSTEM_BIOS( 5, "eboot2", "eboot2" )
-	ROMX_LOAD( "eboot2.u13",  0x00000, 0x08000, CRC(0c2d4301) SHA1(f1a4f457e287b19e14d8ccdbc0383f183d8a3efe), ROM_BIOS(6) )
+	ROMX_LOAD( "eboot2.u13",  0x00000, 0x08000, CRC(0c2d4301) SHA1(f1a4f457e287b19e14d8ccdbc0383f183d8a3efe), ROM_BIOS(5) )
 	ROM_SYSTEM_BIOS( 6, "epmon1", "epmon1" )
-	ROMX_LOAD( "epmon1.u13",  0x00000, 0x10000, CRC(27aabfb4) SHA1(41adf038c474596dbf7d387a1a7f33ed86aa7869), ROM_BIOS(7) )
+	ROMX_LOAD( "epmon1.u13",  0x00000, 0x10000, CRC(27aabfb4) SHA1(41adf038c474596dbf7d387a1a7f33ed86aa7869), ROM_BIOS(6) )
 	ROM_SYSTEM_BIOS( 7, "epmon2", "epmon2" )
-	ROMX_LOAD( "epmon2.u13",  0x00000, 0x10000, CRC(3b8a7b59) SHA1(33741f0725e3eaa21c6881c712579b3c1fd30607), ROM_BIOS(8) )
+	ROMX_LOAD( "epmon2.u13",  0x00000, 0x10000, CRC(3b8a7b59) SHA1(33741f0725e3eaa21c6881c712579b3c1fd30607), ROM_BIOS(7) )
 	ROM_SYSTEM_BIOS( 8, "epmon3", "epmon3" )
-	ROMX_LOAD( "epmon3.u13",  0x00000, 0x10000, CRC(51313af1) SHA1(60c293171a1c7cb9a5ff6d681e61894f44fddbd1), ROM_BIOS(9) )
+	ROMX_LOAD( "epmon3.u13",  0x00000, 0x10000, CRC(51313af1) SHA1(60c293171a1c7cb9a5ff6d681e61894f44fddbd1), ROM_BIOS(8) )
 
 	ROM_REGION( 0x157, "plds", 0 ) // converted from JED files
 	ROM_LOAD( "pal20v8.u14", 0x000, 0x157, CRC(46da52b0) SHA1(c11362223c0d5c57c6ef970e66d674b89d8e7784) )
@@ -328,6 +322,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    STATE            INIT  COMPANY                   FULLNAME       FLAGS */
-COMP( 1986, prof180x,  0,       0,  prof180x,   prof180x, prof180x_state, 0,    "Conitec Datensysteme",   "PROF-180X",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1992, prof181x,  prof180x,0,  prof180x,   prof180x, prof180x_state, 0,    "Conitec Datensysteme",   "PROF-181X",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY                 FULLNAME     FLAGS */
+COMP( 1986, prof180x, 0,        0,      prof180x, prof180x, prof180x_state, empty_init, "Conitec Datensysteme", "PROF-180X", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1992, prof181x, prof180x, 0,      prof180x, prof180x, prof180x_state, empty_init, "Conitec Datensysteme", "PROF-181X", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

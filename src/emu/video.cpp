@@ -91,6 +91,7 @@ video_manager::video_manager(running_machine &machine)
 	, m_seconds_to_run(machine.options().seconds_to_run())
 	, m_auto_frameskip(machine.options().auto_frameskip())
 	, m_speed(original_speed_setting())
+	, m_low_latency(machine.options().low_latency())
 	, m_empty_skip_count(0)
 	, m_frameskip_level(machine.options().frameskip())
 	, m_frameskip_counter(0)
@@ -152,11 +153,6 @@ video_manager::video_manager(running_machine &machine)
 		}
 
 		m_snap_target = machine.render().target_alloc(*root, RENDER_CREATE_SINGLE_FILE | RENDER_CREATE_HIDDEN);
-		m_snap_target->set_backdrops_enabled(false);
-		m_snap_target->set_overlays_enabled(false);
-		m_snap_target->set_bezels_enabled(false);
-		m_snap_target->set_cpanels_enabled(false);
-		m_snap_target->set_marquees_enabled(false);
 		m_snap_target->set_screen_overlay_enabled(false);
 		m_snap_target->set_zoom_to_screen(false);
 	}
@@ -171,15 +167,6 @@ video_manager::video_manager(running_machine &machine)
 	// extract snap resolution if present
 	if (sscanf(machine.options().snap_size(), "%dx%d", &m_snap_width, &m_snap_height) != 2)
 		m_snap_width = m_snap_height = 0;
-
-	// start recording movie if specified
-	const char *filename = machine.options().mng_write();
-	if (filename[0] != 0)
-		begin_recording(filename, MF_MNG);
-
-	filename = machine.options().avi_write();
-	if (filename[0] != 0)
-		begin_recording(filename, MF_AVI);
 
 	// if no screens, create a periodic timer to drive updates
 	if (no_screens)
@@ -243,13 +230,20 @@ void video_manager::frame_update(bool from_debugger)
 
 	// if we're throttling, synchronize before rendering
 	attotime current_time = machine().time();
-	if (!from_debugger && !skipped_it && effective_throttle())
+	if (!from_debugger && !skipped_it && !m_low_latency && effective_throttle())
 		update_throttle(current_time);
 
 	// ask the OSD to update
 	g_profiler.start(PROFILER_BLIT);
 	machine().osd().update(!from_debugger && skipped_it);
 	g_profiler.stop();
+
+	// we synchronize after rendering instead of before, if low latency mode is enabled
+	if (!from_debugger && !skipped_it && m_low_latency && effective_throttle())
+		update_throttle(current_time);
+
+	// get most recent input now
+	machine().osd().input_update();
 
 	emulator_info::periodic_check();
 
@@ -457,7 +451,7 @@ void video_manager::begin_recording_mng(const char *name, uint32_t index, screen
 	if (filerr == osd_file::error::NONE)
 	{
 		// start the capture
-		int rate = ATTOSECONDS_TO_HZ(screen->frame_period().attoseconds());
+		int rate = int(screen->frame_period().as_hz());
 		png_error pngerr = mng_capture_start(*info.m_mng_file, m_snap_bitmap, rate);
 		if (pngerr != PNGERR_NONE)
 		{
@@ -493,7 +487,7 @@ void video_manager::begin_recording_avi(const char *name, uint32_t index, screen
 	// build up information about this new movie
 	avi_file::movie_info info;
 	info.video_format = 0;
-	info.video_timescale = 1000 * ATTOSECONDS_TO_HZ(screen->frame_period().attoseconds());
+	info.video_timescale = 1000 * screen->frame_period().as_hz();
 	info.video_sampletime = 1000;
 	info.video_numsamples = 0;
 	info.video_width = m_snap_bitmap.width();
@@ -793,7 +787,7 @@ inline bool video_manager::effective_autoframeskip() const
 //  forward
 //-------------------------------------------------
 
-inline int video_manager::effective_frameskip() const
+int video_manager::effective_frameskip() const
 {
 	// if we're fast forwarding, use the maximum frameskip
 	if (m_fastforward)
@@ -813,7 +807,7 @@ inline int video_manager::effective_frameskip() const
 inline bool video_manager::effective_throttle() const
 {
 	// if we're paused, or if the UI is active, we always throttle
-	if (machine().paused()) //|| machine().ui().is_menu_active())
+	if (machine().paused() && !machine().options().update_in_pause()) //|| machine().ui().is_menu_active())
 		return true;
 
 	// if we're fast forwarding, we don't throttle
@@ -846,12 +840,18 @@ bool video_manager::finish_screen_updates()
 	// finish updating the screens
 	screen_device_iterator iter(machine().root_device());
 
+	bool has_live_screen = false;
 	for (screen_device &screen : iter)
+	{
 		screen.update_partial(screen.visible_area().max_y);
+		if (machine().render().is_live(screen))
+			has_live_screen = true;
+	}
+
+	bool anything_changed = !has_live_screen || m_output_changed;
+	m_output_changed = false;
 
 	// now add the quads for all the screens
-	bool anything_changed = m_output_changed;
-	m_output_changed = false;
 	for (screen_device &screen : iter)
 		if (screen.update_quads())
 			anything_changed = true;
@@ -1045,7 +1045,11 @@ osd_ticks_t video_manager::throttle_until_ticks(osd_ticks_t target_ticks)
 	while (current_ticks < target_ticks)
 	{
 		// compute how much time to sleep for, taking into account the average oversleep
-		osd_ticks_t const delta = (target_ticks - current_ticks) * 1000 / (1000 + m_average_oversleep);
+		osd_ticks_t delta = target_ticks - current_ticks;
+		if (delta > m_average_oversleep / 1000)
+			delta -= m_average_oversleep / 1000;
+		else
+			delta = 0;
 
 		// see if we can sleep
 		bool const slept = allowed_to_sleep && delta;
@@ -1062,8 +1066,8 @@ osd_ticks_t video_manager::throttle_until_ticks(osd_ticks_t target_ticks)
 			osd_ticks_t const actual_ticks = new_ticks - current_ticks;
 			if (actual_ticks > delta)
 			{
-				// take 90% of the previous average plus 10% of the new value
-				osd_ticks_t const oversleep_milliticks = 1000 * (actual_ticks - delta) / delta;
+				// take 99% of the previous average plus 1% of the new value
+				osd_ticks_t const oversleep_milliticks = 1000 * (actual_ticks - delta);
 				m_average_oversleep = (m_average_oversleep * 99 + oversleep_milliticks) / 100;
 
 				if (LOG_THROTTLE)
@@ -1257,10 +1261,8 @@ void video_manager::create_snapshot_bitmap(screen_device *screen)
 	}
 
 	// get the minimum width/height and set it on the target
-	s32 width = m_snap_width;
-	s32 height = m_snap_height;
-	if (width == 0 || height == 0)
-		m_snap_target->compute_minimum_size(width, height);
+	s32 width, height;
+	compute_snapshot_size(width, height);
 	m_snap_target->set_bounds(width, height);
 
 	// if we don't have a bitmap, or if it's not the right size, allocate a new one
@@ -1275,6 +1277,40 @@ void video_manager::create_snapshot_bitmap(screen_device *screen)
 	else
 		snap_renderer::draw_primitives(primlist, &m_snap_bitmap.pix32(0), width, height, m_snap_bitmap.rowpixels());
 	primlist.release_lock();
+}
+
+
+//-------------------------------------------------
+//  compute_snapshot_size - computes width and
+//  height of the current snapshot target
+//  accounting for OPTION_SNAPSIZE
+//-------------------------------------------------
+
+void video_manager::compute_snapshot_size(s32 &width, s32 &height)
+{
+	width = m_snap_width;
+	height = m_snap_height;
+	if (width == 0 || height == 0)
+		m_snap_target->compute_minimum_size(width, height);
+}
+
+
+//-------------------------------------------------
+//  pixels - fills the specified buffer with the
+//  RGB values of each pixel in the snapshot target
+//-------------------------------------------------
+
+void video_manager::pixels(u32 *buffer)
+{
+	create_snapshot_bitmap(nullptr);
+	for (int y = 0; y < m_snap_bitmap.height(); y++)
+	{
+		const u32 *src = &m_snap_bitmap.pix(y, 0);
+		for (int x = 0; x < m_snap_bitmap.width(); x++)
+		{
+			*buffer++ = *src++;
+		}
+	}
 }
 
 

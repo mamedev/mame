@@ -21,6 +21,7 @@
 #include "emu.h"
 #include "cpu/i86/i86.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -31,12 +32,15 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_gvram(*this, "gvram"),
 		m_vram(*this, "vram"),
-		m_maincpu(*this, "maincpu")
-		, m_crtc(*this, "crtc"),
+		m_maincpu(*this, "maincpu"),
+		m_crtc(*this, "crtc"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")
 	{ }
 
+	void fp6000(machine_config &config);
+
+private:
 	uint8_t *m_char_rom;
 	required_shared_ptr<uint16_t> m_gvram;
 	required_shared_ptr<uint16_t> m_vram;
@@ -62,7 +66,6 @@ public:
 	required_device<mc6845_device>m_crtc;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void fp6000(machine_config &config);
 	void fp6000_io(address_map &map);
 	void fp6000_map(address_map &map);
 };
@@ -167,13 +170,13 @@ WRITE8_MEMBER(fp6000_state::fp6000_pcg_w)
 WRITE8_MEMBER(fp6000_state::fp6000_6845_address_w)
 {
 	m_crtc_index = data;
-	m_crtc->address_w(space, offset, data);
+	m_crtc->address_w(data);
 }
 
 WRITE8_MEMBER(fp6000_state::fp6000_6845_data_w)
 {
 	m_crtc_vreg[m_crtc_index] = data;
-	m_crtc->register_w(space, offset, data);
+	m_crtc->register_w(data);
 }
 
 void fp6000_state::fp6000_map(address_map &map)
@@ -182,7 +185,7 @@ void fp6000_state::fp6000_map(address_map &map)
 	map(0x00000, 0xbffff).ram();
 	map(0xc0000, 0xdffff).ram().share("gvram");//gvram
 	map(0xe0000, 0xe0fff).ram().share("vram");
-	map(0xe7000, 0xe7fff).rw(this, FUNC(fp6000_state::fp6000_pcg_r), FUNC(fp6000_state::fp6000_pcg_w));
+	map(0xe7000, 0xe7fff).rw(FUNC(fp6000_state::fp6000_pcg_r), FUNC(fp6000_state::fp6000_pcg_w));
 	map(0xf0000, 0xfffff).rom().region("ipl", 0);
 }
 
@@ -230,14 +233,14 @@ READ16_MEMBER(fp6000_state::pit_r)
 void fp6000_state::fp6000_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x08, 0x09).r(this, FUNC(fp6000_state::ex_board_r)); // BIOS of some sort ...
+	map(0x08, 0x09).r(FUNC(fp6000_state::ex_board_r)); // BIOS of some sort ...
 	map(0x0a, 0x0b).portr("DSW"); // installed RAM id?
 	map(0x10, 0x11).nopr();
-	map(0x20, 0x23).rw(this, FUNC(fp6000_state::fp6000_key_r), FUNC(fp6000_state::fp6000_key_w)).umask16(0x00ff);
-	map(0x38, 0x39).r(this, FUNC(fp6000_state::pit_r)); // pit?
-	map(0x70, 0x70).w(this, FUNC(fp6000_state::fp6000_6845_address_w));
-	map(0x72, 0x72).w(this, FUNC(fp6000_state::fp6000_6845_data_w));
-	map(0x74, 0x75).r(this, FUNC(fp6000_state::unk_r)); //bit 6 busy flag
+	map(0x20, 0x23).rw(FUNC(fp6000_state::fp6000_key_r), FUNC(fp6000_state::fp6000_key_w)).umask16(0x00ff);
+	map(0x38, 0x39).r(FUNC(fp6000_state::pit_r)); // pit?
+	map(0x70, 0x70).w(FUNC(fp6000_state::fp6000_6845_address_w));
+	map(0x72, 0x72).w(FUNC(fp6000_state::fp6000_6845_data_w));
+	map(0x74, 0x75).r(FUNC(fp6000_state::unk_r)); //bit 6 busy flag
 }
 
 /* Input ports */
@@ -280,7 +283,7 @@ static const gfx_layout fp6000_charlayout =
 	8*16
 };
 
-static GFXDECODE_START( fp6000 )
+static GFXDECODE_START( gfx_fp6000 )
 	GFXDECODE_ENTRY( "pcg", 0x0000, fp6000_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -294,34 +297,35 @@ void fp6000_state::machine_reset()
 {
 }
 
-MACHINE_CONFIG_START(fp6000_state::fp6000)
+void fp6000_state::fp6000(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8086, 16000000/2)
-	MCFG_CPU_PROGRAM_MAP(fp6000_map)
-	MCFG_CPU_IO_MAP(fp6000_io)
+	I8086(config, m_maincpu, 16000000/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &fp6000_state::fp6000_map);
+	m_maincpu->set_addrmap(AS_IO, &fp6000_state::fp6000_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_DRIVER(fp6000_state, screen_update_fp6000)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(640, 480);
+	screen.set_visarea_full();
+	screen.set_screen_update(FUNC(fp6000_state::screen_update_fp6000));
+	screen.set_palette(m_palette);
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", 16000000/5)    /* unknown clock, hand tuned to get ~60 fps */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
+	MC6845(config, m_crtc, 16000000/5);    /* unknown variant, unknown clock, hand tuned to get ~60 fps */
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
 
-	MCFG_PALETTE_ADD("palette", 8)
-//  MCFG_PALETTE_INIT(black_and_white)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fp6000)
+	PALETTE(config, m_palette).set_entries(8);
 
-MACHINE_CONFIG_END
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fp6000);
+}
 
 /* ROM definition */
 ROM_START( fp6000 )
-	ROM_REGION( 0x10000, "ipl", ROMREGION_ERASEFF )
+	ROM_REGION16_LE( 0x10000, "ipl", ROMREGION_ERASEFF )
 	ROM_LOAD( "ipl.rom", 0x0000, 0x10000, CRC(c72fe40a) SHA1(0e4c60dc27f6c7f461c4bc382b81602b3327a7a4))
 
 	ROM_REGION( 0x1000, "mcu", ROMREGION_ERASEFF )
@@ -332,5 +336,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    STATE            INIT   COMPANY    FULLNAME   FLAGS */
-COMP( 1985, fp6000, 0,      0,       fp6000,    fp6000,  fp6000_state,    0,     "Casio",   "FP-6000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME   FLAGS */
+COMP( 1985, fp6000, 0,      0,      fp6000,  fp6000, fp6000_state, empty_init, "Casio", "FP-6000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

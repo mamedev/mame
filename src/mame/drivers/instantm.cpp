@@ -39,15 +39,17 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
+	void instantm(machine_config &config);
+
+private:
 	DECLARE_READ8_MEMBER(port01_r);
 	DECLARE_WRITE8_MEMBER(port01_w);
 	DECLARE_WRITE_LINE_MEMBER(clock_w);
 
-	void instantm(machine_config &config);
 	void main_map(address_map &map);
 	void sub_io(address_map &map);
 	void sub_map(address_map &map);
-private:
+
 	u8 m_port01;
 	bool m_clock_en;
 	virtual void machine_start() override;
@@ -84,28 +86,28 @@ void instantm_state::main_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x4000, 0x47ff).ram();
-	map(0x8000, 0x8000); //AM_WRITE
-	map(0xc000, 0xc000); //AM_WRITE
-	map(0xc400, 0xc400); //AM_WRITE
-	map(0xc800, 0xc800); //AM_WRITE
-	map(0xcc00, 0xcc00); //AM_WRITE
-	map(0xec00, 0xec00); //AM_READ
-	map(0xf000, 0xf000); //AM_READ
-	map(0xf400, 0xf400); //AM_READ
-	map(0xfc00, 0xfc00); //AM_READ
+	map(0x8000, 0x8000); //.w(FUNC(instantm_state::));
+	map(0xc000, 0xc000); //.w(FUNC(instantm_state::));
+	map(0xc400, 0xc400); //.w(FUNC(instantm_state::));
+	map(0xc800, 0xc800); //.w(FUNC(instantm_state::));
+	map(0xcc00, 0xcc00); //.w(FUNC(instantm_state::));
+	map(0xec00, 0xec00); //.r(FUNC(instantm_state::));
+	map(0xf000, 0xf000); //.r(FUNC(instantm_state::));
+	map(0xf400, 0xf400); //.r(FUNC(instantm_state::));
+	map(0xfc00, 0xfc00); //.r(FUNC(instantm_state::));
 }
 
 // doesn't use ram
 void instantm_state::sub_map(address_map &map)
 {
 	map(0x0000, 0xffff).rom();
-	map(0x0000, 0x0000).w("dac", FUNC(dac_byte_interface::write));
+	map(0x0000, 0x0000).w("dac", FUNC(dac_byte_interface::data_w));
 }
 
 void instantm_state::sub_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x01, 0x01).rw(this, FUNC(instantm_state::port01_r), FUNC(instantm_state::port01_w));
+	map(0x01, 0x01).rw(FUNC(instantm_state::port01_r), FUNC(instantm_state::port01_w));
 }
 
 static INPUT_PORTS_START( instantm )
@@ -124,24 +126,26 @@ void instantm_state::machine_reset()
 
 // OSC1 = XTAL(3'579'545)
 
-MACHINE_CONFIG_START(instantm_state::instantm)
+void instantm_state::instantm(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(3'579'545))
-	MCFG_CPU_PROGRAM_MAP(main_map)
+	Z80(config, m_maincpu, XTAL(3'579'545));
+	m_maincpu->set_addrmap(AS_PROGRAM, &instantm_state::main_map);
 
-	MCFG_CPU_ADD("subcpu", Z80, XTAL(3'579'545))
-	MCFG_CPU_PROGRAM_MAP(sub_map)
-	MCFG_CPU_IO_MAP(sub_io)
+	z80_device &subcpu(Z80(config, "subcpu", XTAL(3'579'545)));
+	subcpu.set_addrmap(AS_PROGRAM, &instantm_state::sub_map);
+	subcpu.set_addrmap(AS_IO, &instantm_state::sub_io);
 
 	// all guesswork
-	MCFG_DEVICE_ADD("voice_clock", CLOCK, 24000)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(instantm_state, clock_w))
+	clock_device &voice_clock(CLOCK(config, "voice_clock", 24000));
+	voice_clock.signal_handler().set(FUNC(instantm_state::clock_w));
 
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	SPEAKER(config, "speaker").front_center();
+	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
 
 
@@ -154,4 +158,4 @@ ROM_START( instantm )
 ROM_END
 
 
-GAME( 199?, instantm,  0,    instantm, instantm, instantm_state,  0, ROT0, "Capcom / Polaroid", "Polaroid Instant Memories", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, instantm, 0, instantm, instantm, instantm_state, empty_init, ROT0, "Capcom / Polaroid", "Polaroid Instant Memories", MACHINE_IS_SKELETON_MECHANICAL )

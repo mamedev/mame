@@ -16,12 +16,6 @@
 #include "pci.h"
 #include "northbridge.h"
 
-#define MCFG_I82439TX_CPU( _tag ) \
-	downcast<i82439tx_device &>(*device).set_cpu(_tag);
-
-#define MCFG_I82439TX_REGION( _tag ) \
-	downcast<i82439tx_device &>(*device).set_region(_tag);
-
 // ======================> i82439tx_device
 
 class i82439tx_device : public northbridge_device, public pci_device_interface
@@ -74,6 +68,6 @@ private:
 };
 
 // device type definition
-DECLARE_DEVICE_TYPE(I82439TX, i82439tx_device)
+DECLARE_DEVICE_TYPE(I82439TX_LEGACY, i82439tx_device)
 
 #endif // MAME_BUS_LPCI_I82439TX_H

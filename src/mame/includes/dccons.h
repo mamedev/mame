@@ -7,9 +7,9 @@
 
 #include "dc.h"
 
+#include "bus/ata/ataintf.h"
 #include "imagedev/chd_cd.h"
 #include "machine/gdrom.h"
-#include "machine/ataintf.h"
 #include "machine/intelfsh.h"
 
 class dc_cons_state : public dc_state
@@ -18,15 +18,17 @@ public:
 	dc_cons_state(const machine_config &mconfig, device_type type, const char *tag)
 		: dc_state(mconfig, type, tag)
 		, m_ata(*this, "ata")
+		, atapi_xfercomplete(0)
 //      , m_dcflash(*this, "dcflash")
 	{ }
 
 	required_device<ata_interface_device> m_ata;
 //  required_device<macronix_29lv160tmc_device> m_dcflash;
 
-	DECLARE_DRIVER_INIT(dc);
-	DECLARE_DRIVER_INIT(dcus);
-	DECLARE_DRIVER_INIT(dcjp);
+	void init_dc();
+	void init_dcus();
+	void init_dcjp();
+	void init_tream();
 
 	DECLARE_READ64_MEMBER(dcus_idle_skip_r);
 	DECLARE_READ64_MEMBER(dcjp_idle_skip_r);
@@ -49,13 +51,14 @@ public:
 
 	static void gdrom_config(device_t *device);
 	void dc(machine_config &config);
+	void aica_map(address_map &map);
 	void dc_audio_map(address_map &map);
 	void dc_map(address_map &map);
 	void dc_port(address_map &map);
 private:
 	uint64_t PDTRA, PCTRA;
 	emu_timer *atapi_timer;
-	int atapi_xferlen, atapi_xferbase;
+	int atapi_xferlen, atapi_xferbase, atapi_xfercomplete;
 };
 
 #endif // MAME_INCLUDES_DCCONS_H

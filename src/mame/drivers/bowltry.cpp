@@ -84,7 +84,7 @@ void bowltry_state::bowltry_map(address_map &map)
 	map(0x080000, 0x083fff).ram();
 	map(0x600000, 0x60ffff).ram();
 #if HACK_ENABLED
-	map(0x60e090, 0x60e093).rw(this, FUNC(bowltry_state::hack_r), FUNC(bowltry_state::hack_w));
+	map(0x60e090, 0x60e093).rw(FUNC(bowltry_state::hack_r), FUNC(bowltry_state::hack_w));
 #endif
 
 }
@@ -99,24 +99,24 @@ uint32_t bowltry_state::screen_update_bowltry(screen_device &screen, bitmap_rgb3
 
 
 
-MACHINE_CONFIG_START(bowltry_state::bowltry)
-	MCFG_CPU_ADD("maincpu", H83008, 16000000 )
-	MCFG_CPU_PROGRAM_MAP( bowltry_map )
-//  MCFG_CPU_VBLANK_INT_DRIVER("screen", bowltry_state,  irq0_line_hold) // uses vector $64, IMIAB according to the manual (timer/compare B, internal to the CPU)
+void bowltry_state::bowltry(machine_config &config)
+{
+	H83008(config, m_maincpu, 16000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &bowltry_state::bowltry_map);
+//  m_maincpu->set_vblank_int("screen", FUNC(bowltry_state::irq0_line_hold)); // uses vector $64, IMIAB according to the manual (timer/compare B, internal to the CPU)
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(bowltry_state, screen_update_bowltry)
-	//MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea_full();
+	screen.set_screen_update(FUNC(bowltry_state::screen_update_bowltry));
+	//screen.set_palette("palette");
 
-	//MCFG_PALETTE_ADD("palette", 65536)
+	//PALETTE(config, "palette").set_entries(65536);
 
 	/* tt5665 sound */
-
-MACHINE_CONFIG_END
+}
 
 ROM_START( bowltry )
 	ROM_REGION( 0x080000, "maincpu", 0 )
@@ -131,4 +131,4 @@ ROM_START( bowltry )
 ROM_END
 
 
-GAME( 200?, bowltry,    0,          bowltry,  bowltry, bowltry_state,  0, ROT0, "Atlus",        "Bowling Try",MACHINE_IS_SKELETON )
+GAME( 200?, bowltry, 0, bowltry, bowltry, bowltry_state, empty_init, ROT0, "Atlus", "Bowling Try", MACHINE_IS_SKELETON )

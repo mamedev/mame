@@ -81,14 +81,14 @@ WRITE_LINE_MEMBER(wiping_state::sound_irq_mask_w)
 void wiping_state::main_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
-	map(0x8000, 0x83ff).share("videoram");
-	map(0x8400, 0x87ff).share("colorram");
-	map(0x8800, 0x88ff).share("spriteram");
-	map(0x8000, 0x8bff).ram();
+	map(0x8000, 0x83ff).ram().share("videoram");
+	map(0x8400, 0x87ff).ram().share("colorram");
+	map(0x8800, 0x88ff).ram().share("spriteram");
+	map(0x8900, 0x8bff).ram();
 	map(0x9000, 0x93ff).ram().share("share1");
 	map(0x9800, 0x9bff).ram().share("share2");
 	map(0xa000, 0xa007).w("mainlatch", FUNC(ls259_device::write_d0));
-	map(0xa800, 0xa807).r(this, FUNC(wiping_state::ports_r));
+	map(0xa800, 0xa807).r(FUNC(wiping_state::ports_r));
 	map(0xb000, 0xb7ff).ram();
 	map(0xb800, 0xb800).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 }
@@ -266,7 +266,7 @@ static const gfx_layout spritelayout =
 	64*8    /* every sprite takes 64 consecutive bytes */
 };
 
-static GFXDECODE_START( wiping )
+static GFXDECODE_START( gfx_wiping )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,      0, 64 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 64*4, 64 )
 GFXDECODE_END
@@ -285,45 +285,42 @@ INTERRUPT_GEN_MEMBER(wiping_state::sound_timer_irq)
 
 
 
-MACHINE_CONFIG_START(wiping_state::wiping)
-
+void wiping_state::wiping(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,18432000/6) /* 3.072 MHz */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", wiping_state,  vblank_irq)
+	Z80(config, m_maincpu, 18432000/6); /* 3.072 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &wiping_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(wiping_state::vblank_irq));
 
-	MCFG_CPU_ADD("audiocpu", Z80,18432000/6)    /* 3.072 MHz */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(wiping_state, sound_timer_irq, 120)    /* periodic interrupt, don't know about the frequency */
+	Z80(config, m_audiocpu, 18432000/6);    /* 3.072 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &wiping_state::sound_map);
+	m_audiocpu->set_periodic_int(FUNC(wiping_state::sound_timer_irq), attotime::from_hz(120));    /* periodic interrupt, don't know about the frequency */
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 5A
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(wiping_state, main_irq_mask_w)) // INT1
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(wiping_state, sound_irq_mask_w)) // INT2
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(wiping_state, flipscreen_w)) // INV
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(INPUTLINE("audiocpu", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT // CP2RE
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // 5A
+	mainlatch.q_out_cb<0>().set(FUNC(wiping_state::main_irq_mask_w)); // INT1
+	mainlatch.q_out_cb<1>().set(FUNC(wiping_state::sound_irq_mask_w)); // INT2
+	mainlatch.q_out_cb<2>().set(FUNC(wiping_state::flipscreen_w)); // INV
+	mainlatch.q_out_cb<3>().set_inputline(m_audiocpu, INPUT_LINE_RESET).invert(); // CP2RE
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(36*8, 28*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(wiping_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(36*8, 28*8);
+	screen.set_visarea(0*8, 36*8-1, 0*8, 28*8-1);
+	screen.set_screen_update(FUNC(wiping_state::screen_update));
+	screen.set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", wiping)
-	MCFG_PALETTE_ADD("palette", 64*4+64*4)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(wiping_state, wiping)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_wiping);
+	PALETTE(config, m_palette, FUNC(wiping_state::wiping_palette), 64*4+64*4, 32);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("wiping", WIPING_CUSTOM, 96000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	WIPING_CUSTOM(config, "wiping", 96000).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 
@@ -393,5 +390,5 @@ ROM_END
 
 
 
-GAME( 1982, wiping,  0,      wiping, wiping,  wiping_state, 0, ROT90, "Nichibutsu", "Wiping",   MACHINE_SUPPORTS_SAVE )
-GAME( 1983, rugrats, wiping, wiping, rugrats, wiping_state, 0, ROT90, "Nichibutsu", "Rug Rats", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, wiping,  0,      wiping, wiping,  wiping_state, empty_init, ROT90, "Nichibutsu", "Wiping",   MACHINE_SUPPORTS_SAVE )
+GAME( 1983, rugrats, wiping, wiping, rugrats, wiping_state, empty_init, ROT90, "Nichibutsu", "Rug Rats", MACHINE_SUPPORTS_SAVE )

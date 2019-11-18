@@ -57,21 +57,21 @@ void kingofb_state::palette_init_common( palette_device &palette, const uint8_t 
 		bit1 = (r_data >> 1) & 0x01;
 		bit2 = (r_data >> 2) & 0x01;
 		bit3 = (r_data >> 3) & 0x01;
-		r = combine_4_weights(rweights, bit0, bit1, bit2, bit3);
+		r = combine_weights(rweights, bit0, bit1, bit2, bit3);
 
 		/* green component */
 		bit0 = (g_data >> 0) & 0x01;
 		bit1 = (g_data >> 1) & 0x01;
 		bit2 = (g_data >> 2) & 0x01;
 		bit3 = (g_data >> 3) & 0x01;
-		g = combine_4_weights(gweights, bit0, bit1, bit2, bit3);
+		g = combine_weights(gweights, bit0, bit1, bit2, bit3);
 
 		/* blue component */
 		bit0 = (b_data >> 0) & 0x01;
 		bit1 = (b_data >> 1) & 0x01;
 		bit2 = (b_data >> 2) & 0x01;
 		bit3 = (b_data >> 3) & 0x01;
-		b = combine_4_weights(bweights, bit0, bit1, bit2, bit3);
+		b = combine_weights(bweights, bit0, bit1, bit2, bit3);
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
@@ -104,7 +104,7 @@ void kingofb_state::palette_init_common( palette_device &palette, const uint8_t 
 }
 
 
-void kingofb_state::kingofb_get_rgb_data( const uint8_t *color_prom, int i, int *r_data, int *g_data, int *b_data )
+void kingofb_state::kingofb_get_rgb_data(const uint8_t *color_prom, int i, int *r_data, int *g_data, int *b_data)
 {
 	*r_data = color_prom[i + 0x000] & 0x0f;
 	*g_data = color_prom[i + 0x100] & 0x0f;
@@ -112,7 +112,7 @@ void kingofb_state::kingofb_get_rgb_data( const uint8_t *color_prom, int i, int 
 }
 
 
-void kingofb_state::ringking_get_rgb_data( const uint8_t *color_prom, int i, int *r_data, int *g_data, int *b_data )
+void kingofb_state::ringking_get_rgb_data(const uint8_t *color_prom, int i, int *r_data, int *g_data, int *b_data)
 {
 	*r_data = (color_prom[i + 0x000] >> 4) & 0x0f;
 	*g_data = (color_prom[i + 0x000] >> 0) & 0x0f;
@@ -120,43 +120,43 @@ void kingofb_state::ringking_get_rgb_data( const uint8_t *color_prom, int i, int
 }
 
 
-PALETTE_INIT_MEMBER(kingofb_state,kingofb)
+void kingofb_state::kingofb_palette(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	palette_init_common(palette, color_prom, &kingofb_state::kingofb_get_rgb_data);
 }
 
-PALETTE_INIT_MEMBER(kingofb_state,ringking)
+void kingofb_state::ringking_palette(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	palette_init_common(palette, color_prom, &kingofb_state::ringking_get_rgb_data);
 }
 
-WRITE8_MEMBER(kingofb_state::kingofb_videoram_w)
+void kingofb_state::kingofb_videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(kingofb_state::kingofb_colorram_w)
+void kingofb_state::kingofb_colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(kingofb_state::kingofb_videoram2_w)
+void kingofb_state::kingofb_videoram2_w(offs_t offset, uint8_t data)
 {
 	m_videoram2[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(kingofb_state::kingofb_colorram2_w)
+void kingofb_state::kingofb_colorram2_w(offs_t offset, uint8_t data)
 {
 	m_colorram2[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(kingofb_state::kingofb_f800_w)
+void kingofb_state::kingofb_f800_w(uint8_t data)
 {
 	m_nmigate->in_w<1>(BIT(data, 5));
 
@@ -195,8 +195,8 @@ TILE_GET_INFO_MEMBER(kingofb_state::get_fg_tile_info)
 
 VIDEO_START_MEMBER(kingofb_state,kingofb)
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(kingofb_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS_FLIP_Y, 16, 16, 16, 16);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(kingofb_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS_FLIP_Y,  8,  8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(kingofb_state::get_bg_tile_info)), TILEMAP_SCAN_COLS_FLIP_Y, 16, 16, 16, 16);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(kingofb_state::get_fg_tile_info)), TILEMAP_SCAN_COLS_FLIP_Y,  8,  8, 32, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);
 }
@@ -259,8 +259,8 @@ TILE_GET_INFO_MEMBER(kingofb_state::ringking_get_bg_tile_info)
 
 VIDEO_START_MEMBER(kingofb_state,ringking)
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(kingofb_state::ringking_get_bg_tile_info),this), TILEMAP_SCAN_COLS_FLIP_Y, 16, 16, 16, 16);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(kingofb_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS_FLIP_Y, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(kingofb_state::ringking_get_bg_tile_info)), TILEMAP_SCAN_COLS_FLIP_Y, 16, 16, 16, 16);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(kingofb_state::get_fg_tile_info)), TILEMAP_SCAN_COLS_FLIP_Y, 8, 8, 32, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);
 }

@@ -18,10 +18,35 @@
 		</part>
 	</software>
 
+	<software name="naspen">
+		<description>NAS-Pen 1.0</description>
+		<year>1980</year>
+		<publisher>Lucas Logic</publisher>
+		<info name="usage" value="Enter EB800 to start" />
+		<part name="socket" interface="nascom_socket">
+			<dataarea name="b000" size="0x1000">
+				<!-- Normally supplied as 2 1k ROMs -->
+				<rom name="naspen.rom" size="0x0800" crc="279a100d" sha1="6e69b3eb679f1b6c7363aa1b751f3b17aac284b1" offset="0x0800" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nasprint">
+		<description>NAS-Print 80</description>
+		<year>1981</year>
+		<publisher>Program Power</publisher>
+		<info name="usage" value="Enter EB000 to start" />
+		<part name="socket" interface="nascom_socket">
+			<dataarea name="b000" size="0x1000">
+				<rom name="nasprint.rom" size="0x0800" crc="086aa1a9" sha1="9d4a912d7b4fda49690cb44ea317983cf12d6974" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="odebdis">
 		<description>Super-Debug 3.1 &amp; Nas-Dis</description>
-		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1980</year>
+		<publisher>Nascom</publisher>
 		<info name="usage" value="Enter EC000 to start Super-Debug or EC400 to start Nas-Dis" />
 		<part name="socket" interface="nascom_socket">
 			<dataarea name="c000" size="0x1000">
@@ -30,14 +55,26 @@
 		</part>
 	</software>
 
+	<software name="sysex">
+		<description>Sys-Ex</description>
+		<year>1983</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Enter EB000 to start" />
+		<part name="socket" interface="nascom_socket">
+			<dataarea name="b000" size="0x1000">
+				<rom name="sysex.rom" size="0x0800" crc="6c144399" sha1="3e8b9dcd1f42db00a11f68cde2fbc43aa3498646" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="zeap">
-		<description>ZEAP Z80 Editor-Assembler 2.1</description>
-		<year>1980?</year>
-		<publisher>Sigma Accouting &amp; Management Services</publisher>
+		<description>ZEAP 2.1</description>
+		<year>1980</year>
+		<publisher>Sigma Software</publisher>
 		<info name="usage" value="Enter ED000 to start" />
 		<part name="socket" interface="nascom_socket">
 			<dataarea name="d000" size="0x1000">
-				<rom name="zeap.rom" size="0x1000" crc="87ce8f68" sha1="e6dff4c30eecc9a5557395088d1d83776b9b4514" offset="0" />
+				<rom name="zeap21.rom" size="0x1000" crc="87ce8f68" sha1="e6dff4c30eecc9a5557395088d1d83776b9b4514" offset="0" />
 			</dataarea>
 		</part>
 	</software>

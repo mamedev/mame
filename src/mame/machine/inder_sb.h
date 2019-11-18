@@ -10,14 +10,11 @@
 
 #include "cpu/z80/z80.h"
 #include "machine/z80ctc.h"
-#include "cpu/z80/z80daisy.h"
+#include "machine/z80daisy.h"
 #include "sound/dac.h"
 
 
 DECLARE_DEVICE_TYPE(INDER_AUDIO, inder_sb_device)
-
-#define MCFG_INDER_AUDIO_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, INDER_AUDIO, 0)
 
 
 class inder_sb_device :  public device_t,
@@ -50,7 +47,7 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	required_device<cpu_device> m_audiocpu;
+	required_device<z80_device> m_audiocpu;
 	required_device<z80ctc_device> m_ctc;
 	required_region_ptr<uint8_t> m_audiocpu_rom;
 	required_memory_bank m_sounddata_bank;

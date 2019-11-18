@@ -92,10 +92,20 @@ okim6295_device::okim6295_device(const machine_config &mconfig, const char *tag,
 		m_region(*this, DEVICE_SELF),
 		m_command(-1),
 		m_stream(nullptr),
-		m_pin7_state(0)
+		m_pin7_state(~uint8_t(0))
 {
 }
 
+
+//-------------------------------------------------
+//  device_validity_check - device-specific checks
+//-------------------------------------------------
+
+void okim6295_device::device_validity_check(validity_checker &valid) const
+{
+	if ((PIN7_LOW != m_pin7_state) && (PIN7_HIGH != m_pin7_state))
+		osd_printf_error("Initial pin 7 state not configured\n");
+}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -103,6 +113,9 @@ okim6295_device::okim6295_device(const machine_config &mconfig, const char *tag,
 
 void okim6295_device::device_start()
 {
+	if ((PIN7_LOW != m_pin7_state) && (PIN7_HIGH != m_pin7_state))
+		m_pin7_state = 0;
+
 	// create the stream
 	int divisor = m_pin7_state ? 132 : 165;
 	m_stream = machine().sound().stream_alloc(*this, 0, 1, clock() / divisor);
@@ -190,16 +203,17 @@ void okim6295_device::rom_bank_updated()
 
 void okim6295_device::set_pin7(int pin7)
 {
-	m_pin7_state = pin7;
+	assert(started());
+	m_pin7_state = pin7 ? 1 : 0;
 	device_clock_changed();
 }
 
 
 //-------------------------------------------------
-//  read_status - read the status register
+//  read - read the status register
 //-------------------------------------------------
 
-uint8_t okim6295_device::read_status()
+uint8_t okim6295_device::read()
 {
 	uint8_t result = 0xf0;    // naname expects bits 4-7 to be 1
 
@@ -214,20 +228,10 @@ uint8_t okim6295_device::read_status()
 
 
 //-------------------------------------------------
-//  read - memory interface for read
+//  write - write to the command register
 //-------------------------------------------------
 
-READ8_MEMBER( okim6295_device::read )
-{
-	return read_status();
-}
-
-
-//-------------------------------------------------
-//  write_command - write to the command register
-//-------------------------------------------------
-
-void okim6295_device::write_command(uint8_t command)
+void okim6295_device::write(uint8_t command)
 {
 	// if a command is pending, process the second half
 	if (m_command != -1)
@@ -306,16 +310,6 @@ void okim6295_device::write_command(uint8_t command)
 			if (voicemask & 1)
 				m_voice[voicenum].m_playing = false;
 	}
-}
-
-
-//-------------------------------------------------
-//  write - memory interface for write
-//-------------------------------------------------
-
-WRITE8_MEMBER( okim6295_device::write )
-{
-	write_command(data);
 }
 
 

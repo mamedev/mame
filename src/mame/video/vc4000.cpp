@@ -641,7 +641,7 @@ INTERRUPT_GEN_MEMBER(vc4000_state::vc4000_video_line)
 		(m_video.sprites[1].finished_now) |
 		(m_video.sprites[0].finished_now)) && (!m_irq_pause))
 		{
-			m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, 3);
+			m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, 3); // S2650
 			m_irq_pause=1;
 		}
 }

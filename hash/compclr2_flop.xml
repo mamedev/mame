@@ -8,7 +8,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162822">
-				<rom name="action_soundware.ccvf" size="162822" crc="6ffabe32" sha1="87b9c5842ca4a8236374f6c236d6d9c3135a2606" offset="0"/>
+				<rom name="action_soundware.ccvf" size="162822" crc="6ffabe32" sha1="87b9c5842ca4a8236374f6c236d6d9c3135a2606"/>
 			</dataarea>
 		</part>
 	</software>
@@ -19,7 +19,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162834">
-				<rom name="agilis.ccvf" size="162834" crc="024876e2" sha1="be556664b114031923f004814d5a756f726efc5c" offset="0"/>
+				<rom name="agilis.ccvf" size="162834" crc="024876e2" sha1="be556664b114031923f004814d5a756f726efc5c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -30,7 +30,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163637">
-				<rom name="airraid.ccvf" size="163637" crc="aac74197" sha1="0e3e770538655c2e14e7aa4a93490f6c073831e0" offset="0"/>
+				<rom name="airraid.ccvf" size="163637" crc="aac74197" sha1="0e3e770538655c2e14e7aa4a93490f6c073831e0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -41,7 +41,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162879">
-				<rom name="alien_invasion_v1.4.ccvf" size="162879" crc="87e8d631" sha1="8309d2d8e37069a550631b28732ef3ad70571777" offset="0"/>
+				<rom name="alien_invasion_v1.4.ccvf" size="162879" crc="87e8d631" sha1="8309d2d8e37069a550631b28732ef3ad70571777"/>
 			</dataarea>
 		</part>
 	</software>
@@ -52,7 +52,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162879">
-				<rom name="alien_invasion_v1.4 (alt).ccvf" size="162879" crc="ba6ecb8c" sha1="7f5f24fafcc50c380f42f86fb502683259edfc40" offset="0" />
+				<rom name="alien_invasion_v1.4 (alt).ccvf" size="162879" crc="ba6ecb8c" sha1="7f5f24fafcc50c380f42f86fb502683259edfc40" />
 			</dataarea>
 		</part>
 	</software>
@@ -63,7 +63,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162831">
-				<rom name="alltronics.ccvf" size="162831" crc="b35c5bb8" sha1="7ce89d3ac445814452e97a9b6d44ba6b47f158a4" offset="0"/>
+				<rom name="alltronics.ccvf" size="162831" crc="b35c5bb8" sha1="7ce89d3ac445814452e97a9b6d44ba6b47f158a4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -74,7 +74,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162823">
-				<rom name="arcade_softwares.ccvf" size="162823" crc="0fd194df" sha1="cc3c3053af21cd65d9fbaf7013863b1c2442d58f" offset="0"/>
+				<rom name="arcade_softwares.ccvf" size="162823" crc="0fd194df" sha1="cc3c3053af21cd65d9fbaf7013863b1c2442d58f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -85,7 +85,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162833">
-				<rom name="asm_utilities_macros.ccvf" size="162833" crc="2b01a635" sha1="3caae8ce806464f0f70f351bf4ea4f12931d64db" offset="0"/>
+				<rom name="asm_utilities_macros.ccvf" size="162833" crc="2b01a635" sha1="3caae8ce806464f0f70f351bf4ea4f12931d64db"/>
 			</dataarea>
 		</part>
 	</software>
@@ -96,7 +96,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162848">
-				<rom name="asm_utility_3.ccvf" size="162848" crc="5fc1e5f4" sha1="7f7a235407a5a6b3cace8cc17d933cd09a525d02" offset="0"/>
+				<rom name="asm_utility_3.ccvf" size="162848" crc="5fc1e5f4" sha1="7f7a235407a5a6b3cace8cc17d933cd09a525d02"/>
 			</dataarea>
 		</part>
 	</software>
@@ -107,13 +107,13 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162871">
-				<rom name="asm_utility_4-sidea.ccvf" size="162871" crc="5c063bb3" sha1="f822d97a427369f983174f96e03fac74b268bfc5" offset="0"/>
+				<rom name="asm_utility_4-sidea.ccvf" size="162871" crc="5c063bb3" sha1="f822d97a427369f983174f96e03fac74b268bfc5"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="162871">
-				<rom name="asm_utility_4-sideb.ccvf" size="162871" crc="02070277" sha1="eb9ed55718d83a6c160919083a505484fb61efee" offset="0"/>
+				<rom name="asm_utility_4-sideb.ccvf" size="162871" crc="02070277" sha1="eb9ed55718d83a6c160919083a505484fb61efee"/>
 			</dataarea>
 		</part>
 	</software>
@@ -124,13 +124,13 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162882">
-				<rom name="asm_utility_routines-sidea.ccvf" size="162882" crc="4caa43b9" sha1="20f119335b34fceabef22e7cb6ba6005c1e66c90" offset="0"/>
+				<rom name="asm_utility_routines-sidea.ccvf" size="162882" crc="4caa43b9" sha1="20f119335b34fceabef22e7cb6ba6005c1e66c90"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="162882">
-				<rom name="asm_utility_routines-sideb.ccvf" size="162882" crc="f19adaaa" sha1="f66c7a57191e7672735aa718cdbd03d75dea5ffb" offset="0"/>
+				<rom name="asm_utility_routines-sideb.ccvf" size="162882" crc="f19adaaa" sha1="f66c7a57191e7672735aa718cdbd03d75dea5ffb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -141,31 +141,31 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162858">
-				<rom name="asmtut_disk1.ccvf" size="162858" crc="d1304e27" sha1="e54605117e1a024c18c3a19e278397dd71b637ab" offset="0"/>
+				<rom name="asmtut_disk1.ccvf" size="162858" crc="d1304e27" sha1="e54605117e1a024c18c3a19e278397dd71b637ab"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="162858">
-				<rom name="asmtut_disk2.ccvf" size="162858" crc="fe042207" sha1="be118e38be1b2918214b6531c69045749975cad5" offset="0"/>
+				<rom name="asmtut_disk2.ccvf" size="162858" crc="fe042207" sha1="be118e38be1b2918214b6531c69045749975cad5"/>
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="162858">
-				<rom name="asmtut_disk3.ccvf" size="162858" crc="7b935fea" sha1="b6f15bf93fe9a26fb0f3a0876c0d5b17dd8e4eae" offset="0"/>
+				<rom name="asmtut_disk3.ccvf" size="162858" crc="7b935fea" sha1="b6f15bf93fe9a26fb0f3a0876c0d5b17dd8e4eae"/>
 			</dataarea>
 		</part>
 
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="162852">
-				<rom name="asmtut_disk4.ccvf" size="162852" crc="19dea444" sha1="7ca0cb3239bf9a1d9d5d7ccc1b5156a1a346e498" offset="0"/>
+				<rom name="asmtut_disk4.ccvf" size="162852" crc="19dea444" sha1="7ca0cb3239bf9a1d9d5d7ccc1b5156a1a346e498"/>
 			</dataarea>
 		</part>
 
 		<part name="flop5" interface="floppy_5_25">
 			<dataarea name="flop" size="162884">
-				<rom name="asmtut_disk5.ccvf" size="162884" crc="391382d1" sha1="97415b9e1ff6d92695dcb523b1d9f0de53a351d8" offset="0"/>
+				<rom name="asmtut_disk5.ccvf" size="162884" crc="391382d1" sha1="97415b9e1ff6d92695dcb523b1d9f0de53a351d8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -176,14 +176,14 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163637">
-				<rom name="asteroids.ccvf" size="163637" crc="8836f1f3" sha1="57d6266d179fa1fef305460f6cf10792bf754be0" offset="0"/>
+				<rom name="asteroids.ccvf" size="163637" crc="8836f1f3" sha1="57d6266d179fa1fef305460f6cf10792bf754be0"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Source"/>
 			<dataarea name="flop" size="162886">
-				<rom name="asteriods_source.ccvf" size="162886" crc="14af4de7" sha1="43a76ffda8b4e2f5513c8cd9ac6390ab15854280" offset="0"/>
+				<rom name="asteriods_source.ccvf" size="162886" crc="14af4de7" sha1="43a76ffda8b4e2f5513c8cd9ac6390ab15854280"/>
 			</dataarea>
 		</part>
 	</software>
@@ -194,14 +194,14 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162935">
-				<rom name="asteroids (alt).ccvf" size="162935" crc="b51497b3" sha1="4944301634059ba51b35b2b9f6c021967c5fee26" offset="0" />
+				<rom name="asteroids (alt).ccvf" size="162935" crc="b51497b3" sha1="4944301634059ba51b35b2b9f6c021967c5fee26" />
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Source"/>
 			<dataarea name="flop" size="162886">
-				<rom name="asteriods_source.ccvf" size="162886" crc="14af4de7" sha1="43a76ffda8b4e2f5513c8cd9ac6390ab15854280" offset="0"/>
+				<rom name="asteriods_source.ccvf" size="162886" crc="14af4de7" sha1="43a76ffda8b4e2f5513c8cd9ac6390ab15854280"/>
 			</dataarea>
 		</part>
 	</software>
@@ -212,7 +212,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162830">
-				<rom name="ay-3-8910_programs.ccvf" size="162830" crc="a7f468c8" sha1="0e89e48f2704a6686d4b38c67afc8e50316ff9d8" offset="0"/>
+				<rom name="ay-3-8910_programs.ccvf" size="162830" crc="a7f468c8" sha1="0e89e48f2704a6686d4b38c67afc8e50316ff9d8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -223,14 +223,14 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162832">
-				<rom name="backgammon-sidea.ccvf" size="162832" crc="04d38cb2" sha1="930470a11e9fca2ce5db440252f08124960ca471" offset="0"/>
+				<rom name="backgammon-sidea.ccvf" size="162832" crc="04d38cb2" sha1="930470a11e9fca2ce5db440252f08124960ca471"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Source"/>
 			<dataarea name="flop" size="162832">
-				<rom name="backgammon-sideb.ccvf" size="162832" crc="7f9aca0c" sha1="a6b588e075c17f5d1ff10675de88f3c51a4ca35e" offset="0"/>
+				<rom name="backgammon-sideb.ccvf" size="162832" crc="7f9aca0c" sha1="a6b588e075c17f5d1ff10675de88f3c51a4ca35e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -241,7 +241,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162827">
-				<rom name="basic_compiler_v12.25.ccvf" size="162827" crc="0d4f276a" sha1="a297741e755b6b3e2278e5f5a33c1fb2603d90c4" offset="0"/>
+				<rom name="basic_compiler_v12.25.ccvf" size="162827" crc="0d4f276a" sha1="a297741e755b6b3e2278e5f5a33c1fb2603d90c4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -252,19 +252,19 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162841">
-				<rom name="basic_language_1-5.ccvf" size="162841" crc="3b907984" sha1="e1e0753f4881e47c3677360569169f308f84f9b2" offset="0"/>
+				<rom name="basic_language_1-5.ccvf" size="162841" crc="3b907984" sha1="e1e0753f4881e47c3677360569169f308f84f9b2"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="162843">
-				<rom name="basic_language_6-10.ccvf" size="162843" crc="50bb99df" sha1="acd4d3884dda2c358ad37d1abb1f2d08d258b742" offset="0"/>
+				<rom name="basic_language_6-10.ccvf" size="162843" crc="50bb99df" sha1="acd4d3884dda2c358ad37d1abb1f2d08d258b742"/>
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="163096">
-				<rom name="basic_language_11-15.ccvf" size="163096" crc="068785a2" sha1="bb7e07529ace70da8fdc3fdfe83c5b9a85c6df0b" offset="0"/>
+				<rom name="basic_language_11-15.ccvf" size="163096" crc="068785a2" sha1="bb7e07529ace70da8fdc3fdfe83c5b9a85c6df0b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -275,7 +275,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163610">
-				<rom name="basic_lessons.ccvf" size="163610" crc="17b2108f" sha1="ffcf55e683763f3a04f0a7afaa25406a3e4d04d9" offset="0"/>
+				<rom name="basic_lessons.ccvf" size="163610" crc="17b2108f" sha1="ffcf55e683763f3a04f0a7afaa25406a3e4d04d9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -286,7 +286,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162981">
-				<rom name="basic_lessons (alt).ccvf" size="162981" crc="a7062afc" sha1="d404c9f526a78f0d91c214f64bc05be8f35ea952" offset="0" />
+				<rom name="basic_lessons (alt).ccvf" size="162981" crc="a7062afc" sha1="d404c9f526a78f0d91c214f64bc05be8f35ea952" />
 			</dataarea>
 		</part>
 	</software>
@@ -297,7 +297,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163363">
-				<rom name="basic_utilities.ccvf" size="163363" crc="f4699e88" sha1="0d8897e9cffb85468477ff03d2c9479ce00e0120" offset="0"/>
+				<rom name="basic_utilities.ccvf" size="163363" crc="f4699e88" sha1="0d8897e9cffb85468477ff03d2c9479ce00e0120"/>
 			</dataarea>
 		</part>
 	</software>
@@ -308,7 +308,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163637">
-				<rom name="battleship.ccvf" size="163637" crc="94ca6a2b" sha1="92e4b8303ec4acd3113d35c6e04639892af8ab23" offset="0"/>
+				<rom name="battleship.ccvf" size="163637" crc="94ca6a2b" sha1="92e4b8303ec4acd3113d35c6e04639892af8ab23"/>
 			</dataarea>
 		</part>
 	</software>
@@ -319,7 +319,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162916">
-				<rom name="battleship (alt).ccvf" size="162916" crc="e0b169cc" sha1="265ccb3f19ebe1e35da1cda7f5c5ba3106df8313" offset="0" />
+				<rom name="battleship (alt).ccvf" size="162916" crc="e0b169cc" sha1="265ccb3f19ebe1e35da1cda7f5c5ba3106df8313" />
 			</dataarea>
 		</part>
 	</software>
@@ -330,7 +330,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162856">
-				<rom name="berts_bar.ccvf" size="162856" crc="7a041e32" sha1="cabe252f239c2437c5edc00afa62374224308336" offset="0"/>
+				<rom name="berts_bar.ccvf" size="162856" crc="7a041e32" sha1="cabe252f239c2437c5edc00afa62374224308336"/>
 			</dataarea>
 		</part>
 	</software>
@@ -341,7 +341,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163321">
-				<rom name="blackjack.ccvf" size="163321" crc="361e6c61" sha1="05fb769ec7c02f312605ac3bc3673fc70bf2d258" offset="0"/>
+				<rom name="blackjack.ccvf" size="163321" crc="361e6c61" sha1="05fb769ec7c02f312605ac3bc3673fc70bf2d258"/>
 			</dataarea>
 		</part>
 	</software>
@@ -352,7 +352,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163637">
-				<rom name="blank.ccvf" size="163637" crc="ac8cf7b9" sha1="bcb32019f8be27cbfb7c6ca8f0db509a2dd9a30d" offset="0"/>
+				<rom name="blank.ccvf" size="163637" crc="ac8cf7b9" sha1="bcb32019f8be27cbfb7c6ca8f0db509a2dd9a30d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -363,7 +363,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162818">
-				<rom name="blank (alt).ccvf" size="162818" crc="eac5f303" sha1="bd75191f6b4f9f6b75941851346860012f9fb486" offset="0" />
+				<rom name="blank (alt).ccvf" size="162818" crc="eac5f303" sha1="bd75191f6b4f9f6b75941851346860012f9fb486" />
 			</dataarea>
 		</part>
 	</software>
@@ -374,7 +374,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162822">
-				<rom name="board_softwares.ccvf" size="162822" crc="e489e277" sha1="6fdad9d9ac5f9e134bf3d8086bc35452d4e056e5" offset="0"/>
+				<rom name="board_softwares.ccvf" size="162822" crc="e489e277" sha1="6fdad9d9ac5f9e134bf3d8086bc35452d4e056e5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -385,7 +385,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163032">
-				<rom name="bonds_and_securities.ccvf" size="163032" crc="ca3d9c95" sha1="d91d326f4835fb96ee216047b2a0d980a03da89c" offset="0"/>
+				<rom name="bonds_and_securities.ccvf" size="163032" crc="ca3d9c95" sha1="d91d326f4835fb96ee216047b2a0d980a03da89c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -396,7 +396,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162925">
-				<rom name="bounce_ball.ccvf" size="162925" crc="a329db86" sha1="7c1a4dea7182b0aa4d9df0ace6c53c5aec697d3c" offset="0"/>
+				<rom name="bounce_ball.ccvf" size="162925" crc="a329db86" sha1="7c1a4dea7182b0aa4d9df0ace6c53c5aec697d3c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -407,7 +407,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162898">
-				<rom name="cards_miller.ccvf" size="162898" crc="0e543b56" sha1="9e6f78c40737c771152c82fae27f2802efdd9273" offset="0" />
+				<rom name="cards_miller.ccvf" size="162898" crc="0e543b56" sha1="9e6f78c40737c771152c82fae27f2802efdd9273" />
 			</dataarea>
 		</part>
 	</software>
@@ -418,7 +418,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162834">
-				<rom name="catalog_32.ccvf" size="162834" crc="9871e025" sha1="8f8bc961db67c85d863df1fa855ff9a245582596" offset="0"/>
+				<rom name="catalog_32.ccvf" size="162834" crc="9871e025" sha1="8f8bc961db67c85d863df1fa855ff9a245582596"/>
 			</dataarea>
 		</part>
 	</software>
@@ -429,7 +429,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162818">
-				<rom name="bitmaps.ccvf" size="162818" crc="03f6ee7f" sha1="f6651f3b4c3d709124782bccb1dafd7fbf557c9c" offset="0"/>
+				<rom name="bitmaps.ccvf" size="162818" crc="03f6ee7f" sha1="f6651f3b4c3d709124782bccb1dafd7fbf557c9c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -440,7 +440,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162848">
-				<rom name="ccug_14b.ccvf" size="162848" crc="1e371b3b" sha1="debd11e3ef42cf22c4e321e52977e5ab3136cd2c" offset="0"/>
+				<rom name="ccug_14b.ccvf" size="162848" crc="1e371b3b" sha1="debd11e3ef42cf22c4e321e52977e5ab3136cd2c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -451,7 +451,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163447">
-				<rom name="chess.ccvf" size="163447" crc="9b751ebe" sha1="e4acd152d12801eb658e9470294a160b40dc793d" offset="0"/>
+				<rom name="chess.ccvf" size="163447" crc="9b751ebe" sha1="e4acd152d12801eb658e9470294a160b40dc793d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -462,7 +462,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162813">
-				<rom name="chip_1.ccvf" size="162813" crc="36032a81" sha1="f53f42d6b80d884a443695f09d9ff0d73e4f6880" offset="0"/>
+				<rom name="chip_1.ccvf" size="162813" crc="36032a81" sha1="f53f42d6b80d884a443695f09d9ff0d73e4f6880"/>
 			</dataarea>
 		</part>
 	</software>
@@ -473,7 +473,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162826">
-				<rom name="chip_8.ccvf" size="162826" crc="182eaf6a" sha1="7a477a1a75775b7c08e732585e0f26ad50953104" offset="0"/>
+				<rom name="chip_8.ccvf" size="162826" crc="182eaf6a" sha1="7a477a1a75775b7c08e732585e0f26ad50953104"/>
 			</dataarea>
 		</part>
 	</software>
@@ -484,7 +484,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162813">
-				<rom name="chip_9.ccvf" size="162813" crc="30d385e1" sha1="10cd8fe780d47be6dfe52b9ea4ba822c97a6f69b" offset="0"/>
+				<rom name="chip_9.ccvf" size="162813" crc="30d385e1" sha1="10cd8fe780d47be6dfe52b9ea4ba822c97a6f69b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -495,7 +495,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162814">
-				<rom name="chip_10.ccvf" size="162814" crc="527a9191" sha1="bb79d1c28c3b280cbfae06a2ba3495ef021777eb" offset="0"/>
+				<rom name="chip_10.ccvf" size="162814" crc="527a9191" sha1="bb79d1c28c3b280cbfae06a2ba3495ef021777eb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -506,7 +506,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162814">
-				<rom name="chip_12.ccvf" size="162814" crc="c3c9e871" sha1="3d53ac91afadd5559caf31e01074cb105e0fdb80" offset="0"/>
+				<rom name="chip_12.ccvf" size="162814" crc="c3c9e871" sha1="3d53ac91afadd5559caf31e01074cb105e0fdb80"/>
 			</dataarea>
 		</part>
 	</software>
@@ -517,7 +517,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162814">
-				<rom name="chip_13.ccvf" size="162814" crc="c491f41b" sha1="16f580cd147c005e3dcfba24ca0dfcfd083c9062" offset="0"/>
+				<rom name="chip_13.ccvf" size="162814" crc="c491f41b" sha1="16f580cd147c005e3dcfba24ca0dfcfd083c9062"/>
 			</dataarea>
 		</part>
 	</software>
@@ -528,7 +528,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162814">
-				<rom name="chip_15.ccvf" size="162814" crc="bcf16deb" sha1="7708406e89784fbae752bef36fa2ee9ee93afe48" offset="0"/>
+				<rom name="chip_15.ccvf" size="162814" crc="bcf16deb" sha1="7708406e89784fbae752bef36fa2ee9ee93afe48"/>
 			</dataarea>
 		</part>
 	</software>
@@ -539,7 +539,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162814">
-				<rom name="chip_16.ccvf" size="162814" crc="032861c7" sha1="201443c1c800b663fe9c8bd2868d1bc03b72e375" offset="0"/>
+				<rom name="chip_16.ccvf" size="162814" crc="032861c7" sha1="201443c1c800b663fe9c8bd2868d1bc03b72e375"/>
 			</dataarea>
 		</part>
 	</software>
@@ -550,7 +550,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162814">
-				<rom name="chip_17.ccvf" size="162814" crc="394e3cd5" sha1="def68b4512ea2bd7d6d011c7dcfd33fdf28a88b5" offset="0"/>
+				<rom name="chip_17.ccvf" size="162814" crc="394e3cd5" sha1="def68b4512ea2bd7d6d011c7dcfd33fdf28a88b5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -561,7 +561,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162814">
-				<rom name="chip_21.ccvf" size="162814" crc="a74d454f" sha1="64590210d9ac2d259ee2fe6c543236c000aa48fe" offset="0"/>
+				<rom name="chip_21.ccvf" size="162814" crc="a74d454f" sha1="64590210d9ac2d259ee2fe6c543236c000aa48fe"/>
 			</dataarea>
 		</part>
 	</software>
@@ -572,7 +572,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162831">
-				<rom name="chip_22.ccvf" size="162831" crc="35011349" sha1="da2468909253f700c8b484b97519a3b8eb5b69a2" offset="0"/>
+				<rom name="chip_22.ccvf" size="162831" crc="35011349" sha1="da2468909253f700c8b484b97519a3b8eb5b69a2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -583,7 +583,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162814">
-				<rom name="chip_23.ccvf" size="162814" crc="ad8114a5" sha1="cce250643668e91973a69932f201b49252c4987e" offset="0"/>
+				<rom name="chip_23.ccvf" size="162814" crc="ad8114a5" sha1="cce250643668e91973a69932f201b49252c4987e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -594,7 +594,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162838">
-				<rom name="chip_24.ccvf" size="162838" crc="808fdfe0" sha1="878c29c89c92183f2339640578fd33b819440c36" offset="0"/>
+				<rom name="chip_24.ccvf" size="162838" crc="808fdfe0" sha1="878c29c89c92183f2339640578fd33b819440c36"/>
 			</dataarea>
 		</part>
 	</software>
@@ -605,7 +605,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162833">
-				<rom name="chip_25.ccvf" size="162833" crc="f6816d84" sha1="6bb92135f050ef3822e488d88d4bd9f8f65a1580" offset="0"/>
+				<rom name="chip_25.ccvf" size="162833" crc="f6816d84" sha1="6bb92135f050ef3822e488d88d4bd9f8f65a1580"/>
 			</dataarea>
 		</part>
 	</software>
@@ -616,7 +616,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162832">
-				<rom name="chip_27.ccvf" size="162832" crc="9e510dd7" sha1="7709796198e1896d9b643cb51a5a90ffe969cf3c" offset="0"/>
+				<rom name="chip_27.ccvf" size="162832" crc="9e510dd7" sha1="7709796198e1896d9b643cb51a5a90ffe969cf3c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -627,7 +627,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162833">
-				<rom name="chip_33.ccvf" size="162833" crc="ae4c688d" sha1="504f34781b30a934f04a5cb08d0683e074a91568" offset="0"/>
+				<rom name="chip_33.ccvf" size="162833" crc="ae4c688d" sha1="504f34781b30a934f04a5cb08d0683e074a91568"/>
 			</dataarea>
 		</part>
 	</software>
@@ -638,7 +638,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162836">
-				<rom name="chip_36.ccvf" size="162836" crc="0a0a381a" sha1="1f711835e99d0156302a7fe45f390d4611c5896f" offset="0"/>
+				<rom name="chip_36.ccvf" size="162836" crc="0a0a381a" sha1="1f711835e99d0156302a7fe45f390d4611c5896f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -649,7 +649,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162842">
-				<rom name="chip_39.ccvf" size="162842" crc="82485868" sha1="592db58c9c701034594dbe20bdbf9766e48291dd" offset="0"/>
+				<rom name="chip_39.ccvf" size="162842" crc="82485868" sha1="592db58c9c701034594dbe20bdbf9766e48291dd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -660,7 +660,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162852">
-				<rom name="chip_46.ccvf" size="162852" crc="10088bb0" sha1="c14f578a58d07eb1147b28953f42ba1d891a0c77" offset="0"/>
+				<rom name="chip_46.ccvf" size="162852" crc="10088bb0" sha1="c14f578a58d07eb1147b28953f42ba1d891a0c77"/>
 			</dataarea>
 		</part>
 	</software>
@@ -671,7 +671,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162849">
-				<rom name="chip_53.ccvf" size="162849" crc="75130b74" sha1="b080fbc4271cf3d4512b9ba5f2b48a10c3534168" offset="0"/>
+				<rom name="chip_53.ccvf" size="162849" crc="75130b74" sha1="b080fbc4271cf3d4512b9ba5f2b48a10c3534168"/>
 			</dataarea>
 		</part>
 	</software>
@@ -682,7 +682,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162814">
-				<rom name="chip_57.ccvf" size="162814" crc="beae7ee3" sha1="4f8fb7503f9944bd509482e318aed4d2530e4675" offset="0"/>
+				<rom name="chip_57.ccvf" size="162814" crc="beae7ee3" sha1="4f8fb7503f9944bd509482e318aed4d2530e4675"/>
 			</dataarea>
 		</part>
 	</software>
@@ -693,7 +693,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162839">
-				<rom name="chip_61.ccvf" size="162839" crc="07566ea3" sha1="7129b20b02478766892b32d94977dab22b2f9bbd" offset="0"/>
+				<rom name="chip_61.ccvf" size="162839" crc="07566ea3" sha1="7129b20b02478766892b32d94977dab22b2f9bbd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -704,7 +704,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162814">
-				<rom name="chip_62.ccvf" size="162814" crc="f27921ec" sha1="fc493d1cf1c53145a7a7ccbe21e723d84311021c" offset="0"/>
+				<rom name="chip_62.ccvf" size="162814" crc="f27921ec" sha1="fc493d1cf1c53145a7a7ccbe21e723d84311021c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -715,7 +715,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162835">
-				<rom name="chip_63.ccvf" size="162835" crc="12cceb87" sha1="9b01d926cf52ae00fc33082ccb5d3e811ebcc0bf" offset="0"/>
+				<rom name="chip_63.ccvf" size="162835" crc="12cceb87" sha1="9b01d926cf52ae00fc33082ccb5d3e811ebcc0bf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -726,7 +726,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162838">
-				<rom name="chip_64.ccvf" size="162838" crc="a9a140c7" sha1="19f4a3c7d26cd63bf2eac36864a2294973a43b27" offset="0"/>
+				<rom name="chip_64.ccvf" size="162838" crc="a9a140c7" sha1="19f4a3c7d26cd63bf2eac36864a2294973a43b27"/>
 			</dataarea>
 		</part>
 	</software>
@@ -737,7 +737,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162836">
-				<rom name="chip_75.ccvf" size="162836" crc="55a6904c" sha1="7fd62d534a20511c88c79ae95c018b09e5a87f3c" offset="0"/>
+				<rom name="chip_75.ccvf" size="162836" crc="55a6904c" sha1="7fd62d534a20511c88c79ae95c018b09e5a87f3c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -748,7 +748,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162832">
-				<rom name="chip_77.ccvf" size="162832" crc="afe57afb" sha1="acbc5b1c5173f9dc08945349ed6f378e06554d1c" offset="0"/>
+				<rom name="chip_77.ccvf" size="162832" crc="afe57afb" sha1="acbc5b1c5173f9dc08945349ed6f378e06554d1c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -759,7 +759,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162814">
-				<rom name="chip_78.ccvf" size="162814" crc="018497ed" sha1="0520a271cd8cd7e45ccc2a29bc9c88c7c02e0fa6" offset="0"/>
+				<rom name="chip_78.ccvf" size="162814" crc="018497ed" sha1="0520a271cd8cd7e45ccc2a29bc9c88c7c02e0fa6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -770,7 +770,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162827">
-				<rom name="chip_79.ccvf" size="162827" crc="2bcdcfa7" sha1="af24a0c365994d37d27d40e5c9ba2852afe0550a" offset="0"/>
+				<rom name="chip_79.ccvf" size="162827" crc="2bcdcfa7" sha1="af24a0c365994d37d27d40e5c9ba2852afe0550a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -781,7 +781,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162814">
-				<rom name="chip_81.ccvf" size="162814" crc="a84a5f02" sha1="f8a3641d19c622a29dbda95a847374e428932e0d" offset="0"/>
+				<rom name="chip_81.ccvf" size="162814" crc="a84a5f02" sha1="f8a3641d19c622a29dbda95a847374e428932e0d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -792,7 +792,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162983">
-				<rom name="chip_83.ccvf" size="162983" crc="0c70bf13" sha1="53cd2ea25866d2445ed011a844bee85f97d0b525" offset="0"/>
+				<rom name="chip_83.ccvf" size="162983" crc="0c70bf13" sha1="53cd2ea25866d2445ed011a844bee85f97d0b525"/>
 			</dataarea>
 		</part>
 	</software>
@@ -803,7 +803,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162913">
-				<rom name="chip_84.ccvf" size="162913" crc="20d865c4" sha1="77378e4cc39352d79de558b91b403bbbafc6201f" offset="0"/>
+				<rom name="chip_84.ccvf" size="162913" crc="20d865c4" sha1="77378e4cc39352d79de558b91b403bbbafc6201f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -814,7 +814,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162814">
-				<rom name="chip_85.ccvf" size="162814" crc="23550551" sha1="ff6d9738e142da6ac22cbbce90151f80de029663" offset="0"/>
+				<rom name="chip_85.ccvf" size="162814" crc="23550551" sha1="ff6d9738e142da6ac22cbbce90151f80de029663"/>
 			</dataarea>
 		</part>
 	</software>
@@ -825,7 +825,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162827">
-				<rom name="chip_90.ccvf" size="162827" crc="17311e29" sha1="845bb65a460d9a47f03d576f313505e2efc51739" offset="0"/>
+				<rom name="chip_90.ccvf" size="162827" crc="17311e29" sha1="845bb65a460d9a47f03d576f313505e2efc51739"/>
 			</dataarea>
 		</part>
 	</software>
@@ -836,7 +836,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162853">
-				<rom name="chip_91.ccvf" size="162853" crc="d24c530d" sha1="fb2c0ae5c9c50c20ab639397fb1a9fabae0db47c" offset="0"/>
+				<rom name="chip_91.ccvf" size="162853" crc="d24c530d" sha1="fb2c0ae5c9c50c20ab639397fb1a9fabae0db47c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -847,7 +847,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162814">
-				<rom name="chip_92.ccvf" size="162814" crc="013e8402" sha1="824cf53bc646762f723468fa45a0a4e6d0d7f119" offset="0"/>
+				<rom name="chip_92.ccvf" size="162814" crc="013e8402" sha1="824cf53bc646762f723468fa45a0a4e6d0d7f119"/>
 			</dataarea>
 		</part>
 	</software>
@@ -858,7 +858,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162828">
-				<rom name="chip_106.ccvf" size="162828" crc="2db8614d" sha1="ae20f74e4ac0cfc27c93c74fc504f8e8d1e71c90" offset="0"/>
+				<rom name="chip_106.ccvf" size="162828" crc="2db8614d" sha1="ae20f74e4ac0cfc27c93c74fc504f8e8d1e71c90"/>
 			</dataarea>
 		</part>
 	</software>
@@ -869,7 +869,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162845">
-				<rom name="chip_107.ccvf" size="162845" crc="9845ee1e" sha1="cbbb9b3bb9d844d3b9ff393b5b9abf2a9d247302" offset="0"/>
+				<rom name="chip_107.ccvf" size="162845" crc="9845ee1e" sha1="cbbb9b3bb9d844d3b9ff393b5b9abf2a9d247302"/>
 			</dataarea>
 		</part>
 	</software>
@@ -880,7 +880,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162844">
-				<rom name="chip_108.ccvf" size="162844" crc="7fc7ce87" sha1="82a95463255577d60ec8f07b23b421ab9ece4749" offset="0"/>
+				<rom name="chip_108.ccvf" size="162844" crc="7fc7ce87" sha1="82a95463255577d60ec8f07b23b421ab9ece4749"/>
 			</dataarea>
 		</part>
 	</software>
@@ -891,7 +891,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162838">
-				<rom name="chip_110.ccvf" size="162838" crc="51a48a24" sha1="326731da5a016fafbf1898f115520d06c16df6e7" offset="0"/>
+				<rom name="chip_110.ccvf" size="162838" crc="51a48a24" sha1="326731da5a016fafbf1898f115520d06c16df6e7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -902,7 +902,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162846">
-				<rom name="chip_114.ccvf" size="162846" crc="b3ec2517" sha1="2fa2fe1a4d30abf4eae4801e10d2ca66c8ae3cd9" offset="0"/>
+				<rom name="chip_114.ccvf" size="162846" crc="b3ec2517" sha1="2fa2fe1a4d30abf4eae4801e10d2ca66c8ae3cd9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -913,7 +913,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162832">
-				<rom name="chip_117.ccvf" size="162832" crc="edbcfb6c" sha1="7ad9829384e9133282ff97c7a3a9f2d50b2e7acd" offset="0"/>
+				<rom name="chip_117.ccvf" size="162832" crc="edbcfb6c" sha1="7ad9829384e9133282ff97c7a3a9f2d50b2e7acd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -924,7 +924,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162828">
-				<rom name="chip_119.ccvf" size="162828" crc="7f34ee3f" sha1="edb68f3462bfe18603034fefa3ed6a0df2ea9d66" offset="0"/>
+				<rom name="chip_119.ccvf" size="162828" crc="7f34ee3f" sha1="edb68f3462bfe18603034fefa3ed6a0df2ea9d66"/>
 			</dataarea>
 		</part>
 	</software>
@@ -935,7 +935,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162843">
-				<rom name="chip_120.ccvf" size="162843" crc="413d68d1" sha1="5be07bd4ea2aee0a38e22bb38fd77cd101881710" offset="0"/>
+				<rom name="chip_120.ccvf" size="162843" crc="413d68d1" sha1="5be07bd4ea2aee0a38e22bb38fd77cd101881710"/>
 			</dataarea>
 		</part>
 	</software>
@@ -946,7 +946,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162851">
-				<rom name="chip_121.ccvf" size="162851" crc="8a7cb479" sha1="ab8ff9d4b07c016a3640c57660677ca461b62cc2" offset="0"/>
+				<rom name="chip_121.ccvf" size="162851" crc="8a7cb479" sha1="ab8ff9d4b07c016a3640c57660677ca461b62cc2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -957,13 +957,13 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162815">
-				<rom name="chip_125.ccvf" size="162815" crc="ef47c0c6" sha1="1c8557bb4d5e825ea85949b7b51316df475b4976" offset="0"/>
+				<rom name="chip_125.ccvf" size="162815" crc="ef47c0c6" sha1="1c8557bb4d5e825ea85949b7b51316df475b4976"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="162830">
-				<rom name="chip_125-sideb.ccvf" size="162830" crc="4440e969" sha1="8040e0abe4c076a7a36f1f3d47d41341d1b319a4" offset="0"/>
+				<rom name="chip_125-sideb.ccvf" size="162830" crc="4440e969" sha1="8040e0abe4c076a7a36f1f3d47d41341d1b319a4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -974,7 +974,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162815">
-				<rom name="chip_128.ccvf" size="162815" crc="5bc2cf15" sha1="3e82aef8a638d822724021cb582d08513969cd77" offset="0"/>
+				<rom name="chip_128.ccvf" size="162815" crc="5bc2cf15" sha1="3e82aef8a638d822724021cb582d08513969cd77"/>
 			</dataarea>
 		</part>
 	</software>
@@ -985,7 +985,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162815">
-				<rom name="chip_129.ccvf" size="162815" crc="f7f8c8dd" sha1="f1bed1ce4413223450192cf62ef471e8bcbb1a60" offset="0"/>
+				<rom name="chip_129.ccvf" size="162815" crc="f7f8c8dd" sha1="f1bed1ce4413223450192cf62ef471e8bcbb1a60"/>
 			</dataarea>
 		</part>
 	</software>
@@ -996,13 +996,13 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162815">
-				<rom name="chip_138.ccvf" size="162815" crc="1f0bd8ae" sha1="8e31d8312d4eb65efbb9733cd65c84a981a8f6ae" offset="0"/>
+				<rom name="chip_138.ccvf" size="162815" crc="1f0bd8ae" sha1="8e31d8312d4eb65efbb9733cd65c84a981a8f6ae"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="162815">
-				<rom name="chip_138-sideb.ccvf" size="162815" crc="4be2634e" sha1="a8b79dbc8bf010390a78a18ba10b259cb551bf9e" offset="0"/>
+				<rom name="chip_138-sideb.ccvf" size="162815" crc="4be2634e" sha1="a8b79dbc8bf010390a78a18ba10b259cb551bf9e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1013,7 +1013,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162936">
-				<rom name="chomp.ccvf" size="162936" crc="a420feea" sha1="abfafe7c600e70e5030415a572488607b454ee71" offset="0"/>
+				<rom name="chomp.ccvf" size="162936" crc="a420feea" sha1="abfafe7c600e70e5030415a572488607b454ee71"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1024,7 +1024,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162837">
-				<rom name="cm_0-4_paddle_softwares-original.ccvf" size="162837" crc="dc37bd6c" sha1="071e009ffa9b07030dc5e861ed68ec6dfb9809e9" offset="0"/>
+				<rom name="cm_0-4_paddle_softwares-original.ccvf" size="162837" crc="dc37bd6c" sha1="071e009ffa9b07030dc5e861ed68ec6dfb9809e9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1035,7 +1035,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162837">
-				<rom name="cm_0-4_paddle_softwares.ccvf" size="162837" crc="7e56517e" sha1="b92b5ef00df511f2654be0dfe3195824db5578a7" offset="0"/>
+				<rom name="cm_0-4_paddle_softwares.ccvf" size="162837" crc="7e56517e" sha1="b92b5ef00df511f2654be0dfe3195824db5578a7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1046,13 +1046,13 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162865">
-				<rom name="color_graphics_1_suits.ccvf" size="162865" crc="7b14489c" sha1="a3bb7d837b215ed6a4e02d134eec657730daea0d" offset="0"/>
+				<rom name="color_graphics_1_suits.ccvf" size="162865" crc="7b14489c" sha1="a3bb7d837b215ed6a4e02d134eec657730daea0d"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="162865">
-				<rom name="color_graphics_2_suits.ccvf" size="162865" crc="ec1ae1f9" sha1="b83a0e2d2313ff9497b7eebb51e8c40ed7780faf" offset="0"/>
+				<rom name="color_graphics_2_suits.ccvf" size="162865" crc="ec1ae1f9" sha1="b83a0e2d2313ff9497b7eebb51e8c40ed7780faf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1063,7 +1063,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162812">
-				<rom name="colorcue.ccvf" size="162812" crc="bae76eb1" sha1="97a113e8afebee8a97a7b04063e2d2d2ccfd51d6" offset="0"/>
+				<rom name="colorcue.ccvf" size="162812" crc="bae76eb1" sha1="97a113e8afebee8a97a7b04063e2d2d2ccfd51d6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1074,7 +1074,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162852">
-				<rom name="colorgraph.ccvf" size="162852" crc="d6d99c50" sha1="83e3b1ca5e77ad4daefbf9f3ceecbf27a13c1b57" offset="0"/>
+				<rom name="colorgraph.ccvf" size="162852" crc="d6d99c50" sha1="83e3b1ca5e77ad4daefbf9f3ceecbf27a13c1b57"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1085,7 +1085,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162858">
-				<rom name="colossal_adventure.ccvf" size="162858" crc="d169b823" sha1="4bfae2ae444feb95efe8252da97f5ff9c4a7a9f2" offset="0"/>
+				<rom name="colossal_adventure.ccvf" size="162858" crc="d169b823" sha1="4bfae2ae444feb95efe8252da97f5ff9c4a7a9f2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1096,7 +1096,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162865">
-				<rom name="colossal_cave_epps.ccvf" size="162865" crc="3e7b98b3" sha1="109fcf8b94b866cb34f32e5aa46d6c3bb1946bbf" offset="0" />
+				<rom name="colossal_cave_epps.ccvf" size="162865" crc="3e7b98b3" sha1="109fcf8b94b866cb34f32e5aa46d6c3bb1946bbf" />
 			</dataarea>
 		</part>
 	</software>
@@ -1107,19 +1107,19 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162815">
-				<rom name="comm_pgms-sidea.ccvf" size="162815" crc="eb0c77d1" sha1="92b5ad6e6ecf6a53d2f96b0567a47e4416a0325b" offset="0"/>
+				<rom name="comm_pgms-sidea.ccvf" size="162815" crc="eb0c77d1" sha1="92b5ad6e6ecf6a53d2f96b0567a47e4416a0325b"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="162815">
-				<rom name="comm_pgms-sideb.ccvf" size="162815" crc="491f288f" sha1="794e75f5bb302f3f29f26cbdb8078da24142cf12" offset="0"/>
+				<rom name="comm_pgms-sideb.ccvf" size="162815" crc="491f288f" sha1="794e75f5bb302f3f29f26cbdb8078da24142cf12"/>
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="162850">
-				<rom name="comm_pgms_source_code.ccvf" size="162850" crc="bb76a7c6" sha1="37d505b680fa985a23cc9cf8ad2550329a0825d0" offset="0"/>
+				<rom name="comm_pgms_source_code.ccvf" size="162850" crc="bb76a7c6" sha1="37d505b680fa985a23cc9cf8ad2550329a0825d0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1130,7 +1130,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162904">
-				<rom name="compuwriter_2.ccvf" size="162904" crc="8948da3c" sha1="a7b2516c3d1df81a75844570f13078c8a705ebe9" offset="0"/>
+				<rom name="compuwriter_2.ccvf" size="162904" crc="8948da3c" sha1="a7b2516c3d1df81a75844570f13078c8a705ebe9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1141,7 +1141,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162892">
-				<rom name="compuwriter_1.ccvf" size="162892" crc="a030f3ea" sha1="5e9c7ab51a334b0effa1f4ccf18520aac2d29957" offset="0"/>
+				<rom name="compuwriter_1.ccvf" size="162892" crc="a030f3ea" sha1="5e9c7ab51a334b0effa1f4ccf18520aac2d29957"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1152,7 +1152,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162816">
-				<rom name="comtronics.ccvf" size="162816" crc="fd41cb38" sha1="10cb00b18e18c2e0892608657cbbd9ba1e28a52e" offset="0"/>
+				<rom name="comtronics.ccvf" size="162816" crc="fd41cb38" sha1="10cb00b18e18c2e0892608657cbbd9ba1e28a52e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1163,7 +1163,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162875">
-				<rom name="comtronics_sw.ccvf" size="162875" crc="d25cc3a1" sha1="eaa14502e527db92055a7fe9f9dfbf06c9f2f111" offset="0"/>
+				<rom name="comtronics_sw.ccvf" size="162875" crc="d25cc3a1" sha1="eaa14502e527db92055a7fe9f9dfbf06c9f2f111"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1174,7 +1174,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163041">
-				<rom name="cooltools.ccvf" size="163041" crc="cffc2cb4" sha1="79fff8725c3d7e277ae31cb54c55ce243aaecec8" offset="0" />
+				<rom name="cooltools.ccvf" size="163041" crc="cffc2cb4" sha1="79fff8725c3d7e277ae31cb54c55ce243aaecec8" />
 			</dataarea>
 		</part>
 	</software>
@@ -1185,7 +1185,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162824">
-				<rom name="demonstration.ccvf" size="162824" crc="ed431009" sha1="d507a36bbdb5a9bac4c39a8bc17c0659e3b98da8" offset="0"/>
+				<rom name="demonstration.ccvf" size="162824" crc="ed431009" sha1="d507a36bbdb5a9bac4c39a8bc17c0659e3b98da8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1196,7 +1196,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162812">
-				<rom name="demos.ccvf" size="162812" crc="60172977" sha1="b8cc49be5ac225b640ef20a9aca699abeafb85ac" offset="0"/>
+				<rom name="demos.ccvf" size="162812" crc="60172977" sha1="b8cc49be5ac225b640ef20a9aca699abeafb85ac"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1208,14 +1208,14 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="DISASM"/>
 			<dataarea name="flop" size="162853">
-				<rom name="disasm+mldp+sidea.ccvf" size="162853" crc="37e8ba02" sha1="de79e786fd29633a471de44aa700cf256cd6434b" offset="0"/>
+				<rom name="disasm+mldp+sidea.ccvf" size="162853" crc="37e8ba02" sha1="de79e786fd29633a471de44aa700cf256cd6434b"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="MLPD"/>
 			<dataarea name="flop" size="162853">
-				<rom name="disasm+mldp-sideb.ccvf" size="162853" crc="17628a85" sha1="90fdc00b6939cc54fc5095c6ee0e621a9767a539" offset="0"/>
+				<rom name="disasm+mldp-sideb.ccvf" size="162853" crc="17628a85" sha1="90fdc00b6939cc54fc5095c6ee0e621a9767a539"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1226,7 +1226,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162812">
-				<rom name="disasm-sidea.ccvf" size="162812" crc="debf5209" sha1="babfd5f127b3c08f1995092118fe69c94387b92b" offset="0"/>
+				<rom name="disasm-sidea.ccvf" size="162812" crc="debf5209" sha1="babfd5f127b3c08f1995092118fe69c94387b92b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1237,7 +1237,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162819">
-				<rom name="mldp_fix.ccvf" size="162819" crc="0871bd9d" sha1="c315b88c56a5186e27835800479eb41e013321b5" offset="0"/>
+				<rom name="mldp_fix.ccvf" size="162819" crc="0871bd9d" sha1="c315b88c56a5186e27835800479eb41e013321b5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1248,7 +1248,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162831">
-				<rom name="disassembler.ccvf" size="162831" crc="f018390c" sha1="53209bcdc8bcf17291066a036e36b1bbe1fc8ecc" offset="0"/>
+				<rom name="disassembler.ccvf" size="162831" crc="f018390c" sha1="53209bcdc8bcf17291066a036e36b1bbe1fc8ecc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1259,7 +1259,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162841">
-				<rom name="dogfight.ccvf" size="162841" crc="6e3f4b0c" sha1="e87b87388ff669f2e7e5737522c3bf1f9abff9e3" offset="0"/>
+				<rom name="dogfight.ccvf" size="162841" crc="6e3f4b0c" sha1="e87b87388ff669f2e7e5737522c3bf1f9abff9e3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1270,7 +1270,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163637">
-				<rom name="draw2.ccvf" size="163637" crc="6181431e" sha1="1937f2a630ed053bc21904139b0bb3be92c50ba5" offset="0"/>
+				<rom name="draw2.ccvf" size="163637" crc="6181431e" sha1="1937f2a630ed053bc21904139b0bb3be92c50ba5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1281,7 +1281,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162909">
-				<rom name="draw2 (alt).ccvf" size="162909" crc="ccd58029" sha1="7480bfb7fd0ed5991738cdca81a8450f40f88167" offset="0" />
+				<rom name="draw2 (alt).ccvf" size="162909" crc="ccd58029" sha1="7480bfb7fd0ed5991738cdca81a8450f40f88167" />
 			</dataarea>
 		</part>
 	</software>
@@ -1292,7 +1292,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162813">
-				<rom name="dukedom.ccvf" size="162813" crc="cb32f3e1" sha1="d3bfd30076484e5f4d0d182b54f035e18df32486" offset="0"/>
+				<rom name="dukedom.ccvf" size="162813" crc="cb32f3e1" sha1="d3bfd30076484e5f4d0d182b54f035e18df32486"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1303,7 +1303,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162845">
-				<rom name="eprom_programmer.ccvf" size="162845" crc="6c565f42" sha1="bbc660d1595880cdae67070e91ca049c71f9c494" offset="0"/>
+				<rom name="eprom_programmer.ccvf" size="162845" crc="6c565f42" sha1="bbc660d1595880cdae67070e91ca049c71f9c494"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1314,7 +1314,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162889">
-				<rom name="equity.ccvf" size="162889" crc="2184a78c" sha1="1b8fdf7db989894ebbb62a599c9bbea68c91247e" offset="0"/>
+				<rom name="equity.ccvf" size="162889" crc="2184a78c" sha1="1b8fdf7db989894ebbb62a599c9bbea68c91247e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1325,14 +1325,14 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162875">
-				<rom name="execugraph.ccvf" size="162875" crc="ed1ed891" sha1="37d8868d6f874125fa0a389413f0e9bee2f9889a" offset="0"/>
+				<rom name="execugraph.ccvf" size="162875" crc="ed1ed891" sha1="37d8868d6f874125fa0a389413f0e9bee2f9889a"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Instructions"/>
 			<dataarea name="flop" size="162874">
-				<rom name="execugraph_instructions.ccvf" size="162874" crc="0716e534" sha1="1ae67e4acec0175880698df9c792ea97eb6f7158" offset="0"/>
+				<rom name="execugraph_instructions.ccvf" size="162874" crc="0716e534" sha1="1ae67e4acec0175880698df9c792ea97eb6f7158"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1343,7 +1343,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162845">
-				<rom name="fcs_mods.ccvf" size="162845" crc="4801656d" sha1="035d644f815443cdff993169ca52aea53f532231" offset="0"/>
+				<rom name="fcs_mods.ccvf" size="162845" crc="4801656d" sha1="035d644f815443cdff993169ca52aea53f532231"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1354,13 +1354,13 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162872">
-				<rom name="file_maintenance_system-sidea.ccvf" size="162872" crc="c010a520" sha1="17fa968ff260906a5705752eae98faf8c0576562" offset="0"/>
+				<rom name="file_maintenance_system-sidea.ccvf" size="162872" crc="c010a520" sha1="17fa968ff260906a5705752eae98faf8c0576562"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="162872">
-				<rom name="file_maintenance_system-sideb.ccvf" size="162872" crc="5d9c4684" sha1="8d66f0feba9c54b5f0376109d766f5b2b8bfb76b" offset="0"/>
+				<rom name="file_maintenance_system-sideb.ccvf" size="162872" crc="5d9c4684" sha1="8d66f0feba9c54b5f0376109d766f5b2b8bfb76b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1371,7 +1371,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162836">
-				<rom name="final_frontier_startrek.ccvf" size="162836" crc="8d6ef487" sha1="002903369ef00e640c8688a553213e7b63dfdba9" offset="0"/>
+				<rom name="final_frontier_startrek.ccvf" size="162836" crc="8d6ef487" sha1="002903369ef00e640c8688a553213e7b63dfdba9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1382,7 +1382,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162939">
-				<rom name="formatter.ccvf" size="162939" crc="0396e7ac" sha1="bf228c0cf81f5dc95d79fae319512bea8f2b039e" offset="0"/>
+				<rom name="formatter.ccvf" size="162939" crc="0396e7ac" sha1="bf228c0cf81f5dc95d79fae319512bea8f2b039e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1393,7 +1393,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162837">
-				<rom name="fortran.ccvf" size="162837" crc="7869e193" sha1="0ea74e003d2600407da23f9d33a789888c82218e" offset="0"/>
+				<rom name="fortran.ccvf" size="162837" crc="7869e193" sha1="0ea74e003d2600407da23f9d33a789888c82218e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1404,7 +1404,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162834">
-				<rom name="fortran2.ccvf" size="162834" crc="b2c4a1e5" sha1="ae13a4ceb8da51ded33a64aede91e43cc833aaad" offset="0"/>
+				<rom name="fortran2.ccvf" size="162834" crc="b2c4a1e5" sha1="ae13a4ceb8da51ded33a64aede91e43cc833aaad"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1415,7 +1415,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162864">
-				<rom name="fortrek.ccvf" size="162864" crc="4f615758" sha1="0e481603794ed6a9f5ef9cf439b1937ca3639242" offset="0"/>
+				<rom name="fortrek.ccvf" size="162864" crc="4f615758" sha1="0e481603794ed6a9f5ef9cf439b1937ca3639242"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1426,7 +1426,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162830">
-				<rom name="strings_fortran.ccvf" size="162830" crc="389c4c75" sha1="24b6a44cb71373c68c6cec52e61258e96e76e20f" offset="0"/>
+				<rom name="strings_fortran.ccvf" size="162830" crc="389c4c75" sha1="24b6a44cb71373c68c6cec52e61258e96e76e20f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1438,7 +1438,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162812">
-				<rom name="strings_fortran_2.ccvf" size="162812" crc="7a821888" sha1="816b654bd70b0d0fa1c4f31fa43b0b4c70beafb0" offset="0"/>
+				<rom name="strings_fortran_2.ccvf" size="162812" crc="7a821888" sha1="816b654bd70b0d0fa1c4f31fa43b0b4c70beafb0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1449,7 +1449,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162864">
-				<rom name="forutil_1.ccvf" size="162864" crc="e672d230" sha1="8683e4b371f12679f1cffd08f6ff530b20954b6b" offset="0"/>
+				<rom name="forutil_1.ccvf" size="162864" crc="e672d230" sha1="8683e4b371f12679f1cffd08f6ff530b20954b6b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1460,7 +1460,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163637">
-				<rom name="galaxian.ccvf" size="163637" crc="70ce732b" sha1="5f0052d13031d279dcc547691d57b3bdf959ccb3" offset="0"/>
+				<rom name="galaxian.ccvf" size="163637" crc="70ce732b" sha1="5f0052d13031d279dcc547691d57b3bdf959ccb3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1471,7 +1471,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163112">
-				<rom name="galaxian (alt).ccvf" size="163112" crc="47fffa68" sha1="0bee0f0b3fda9733be42bed86769b90cb2c4748f" offset="0" />
+				<rom name="galaxian (alt).ccvf" size="163112" crc="47fffa68" sha1="0bee0f0b3fda9733be42bed86769b90cb2c4748f" />
 			</dataarea>
 		</part>
 	</software>
@@ -1482,7 +1482,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162874">
-				<rom name="ghost_crunchers.ccvf" size="162874" crc="126abdf4" sha1="80bc317041591391193c2c734030bd41c150ee12" offset="0" />
+				<rom name="ghost_crunchers.ccvf" size="162874" crc="126abdf4" sha1="80bc317041591391193c2c734030bd41c150ee12" />
 			</dataarea>
 		</part>
 	</software>
@@ -1493,7 +1493,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162811">
-				<rom name="softwares.ccvf" size="162811" crc="f9d7447f" sha1="52e79d5a30e9666b8ea790270da1b125eb810413" offset="0"/>
+				<rom name="softwares.ccvf" size="162811" crc="f9d7447f" sha1="52e79d5a30e9666b8ea790270da1b125eb810413"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1504,7 +1504,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162813">
-				<rom name="softwares2.ccvf" size="162813" crc="3dd8c480" sha1="dbb74e0ac9b9e60c74c6bd058160aab231217abe" offset="0"/>
+				<rom name="softwares2.ccvf" size="162813" crc="3dd8c480" sha1="dbb74e0ac9b9e60c74c6bd058160aab231217abe"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1515,7 +1515,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162813">
-				<rom name="softwares3.ccvf" size="162813" crc="c0586ace" sha1="3c2da892f7cdec1693911b00d03536bec63992ac" offset="0"/>
+				<rom name="softwares3.ccvf" size="162813" crc="c0586ace" sha1="3c2da892f7cdec1693911b00d03536bec63992ac"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1526,7 +1526,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162813">
-				<rom name="softwares4.ccvf" size="162813" crc="c3e4b215" sha1="a18a3429a5c730c01e976c4c4ccbdbd42ed57cff" offset="0"/>
+				<rom name="softwares4.ccvf" size="162813" crc="c3e4b215" sha1="a18a3429a5c730c01e976c4c4ccbdbd42ed57cff"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1537,7 +1537,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163331">
-				<rom name="hangman.ccvf" size="163331" crc="58a22048" sha1="707bd8ff2be4a55e490f1dac565fe2e2b8b57346" offset="0"/>
+				<rom name="hangman.ccvf" size="163331" crc="58a22048" sha1="707bd8ff2be4a55e490f1dac565fe2e2b8b57346"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1548,7 +1548,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162859">
-				<rom name="hardware_utilities.ccvf" size="162859" crc="ea97ec6b" sha1="cbb5a3bead7fe8a48557111456d7621d0d6e1f9c" offset="0"/>
+				<rom name="hardware_utilities.ccvf" size="162859" crc="ea97ec6b" sha1="cbb5a3bead7fe8a48557111456d7621d0d6e1f9c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1559,19 +1559,19 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162819">
-				<rom name="home_budget_1.ccvf" size="162819" crc="74f641ae" sha1="1a9d5632091215214a241147d756a38ff5a1a7c9" offset="0"/>
+				<rom name="home_budget_1.ccvf" size="162819" crc="74f641ae" sha1="1a9d5632091215214a241147d756a38ff5a1a7c9"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="162819">
-				<rom name="home_budget_2.ccvf" size="162819" crc="1ec4175b" sha1="24d5a3d0046a617b24f14d14939a76a29e1c14c2" offset="0"/>
+				<rom name="home_budget_2.ccvf" size="162819" crc="1ec4175b" sha1="24d5a3d0046a617b24f14d14939a76a29e1c14c2"/>
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="162819">
-				<rom name="home_budget_3.ccvf" size="162819" crc="66ab67f0" sha1="c5123c656733ce50852becd1f15d9b8c6c798cdf" offset="0"/>
+				<rom name="home_budget_3.ccvf" size="162819" crc="66ab67f0" sha1="c5123c656733ce50852becd1f15d9b8c6c798cdf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1582,7 +1582,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162925">
-				<rom name="home_video_library.ccvf" size="162925" crc="d4b1176f" sha1="9c3540d2ab04a3fccdc0b17de4e962feea14a08e" offset="0"/>
+				<rom name="home_video_library.ccvf" size="162925" crc="d4b1176f" sha1="9c3540d2ab04a3fccdc0b17de4e962feea14a08e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1593,13 +1593,13 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162890">
-				<rom name="ida_v2.6.ccvf" size="162890" crc="e15f4d66" sha1="4cb14073f3c6934c31b0a5af62cd3028def552d5" offset="0"/>
+				<rom name="ida_v2.6.ccvf" size="162890" crc="e15f4d66" sha1="4cb14073f3c6934c31b0a5af62cd3028def552d5"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="162890">
-				<rom name="ida_v2.6-sideb.ccvf" size="162890" crc="6a0dc149" sha1="845047f5a753a852f463eb60c4f160441415c936" offset="0"/>
+				<rom name="ida_v2.6-sideb.ccvf" size="162890" crc="6a0dc149" sha1="845047f5a753a852f463eb60c4f160441415c936"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1610,7 +1610,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162836">
-				<rom name="interface_software.ccvf" size="162836" crc="6a5c441a" sha1="b749fc92478bf45c586dce92ff3850493146d582" offset="0"/>
+				<rom name="interface_software.ccvf" size="162836" crc="6a5c441a" sha1="b749fc92478bf45c586dce92ff3850493146d582"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1621,7 +1621,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162892">
-				<rom name="intro_to_soundware.ccvf" size="162892" crc="cf7ca2b7" sha1="2b1ae9a70d034f842ea5a4920097ae682762a2c4" offset="0"/>
+				<rom name="intro_to_soundware.ccvf" size="162892" crc="cf7ca2b7" sha1="2b1ae9a70d034f842ea5a4920097ae682762a2c4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1632,7 +1632,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163637">
-				<rom name="invaders_epps.ccvf" size="163637" crc="ecee8918" sha1="7d348f37ebbd18a5cf74bfd277fd8221bac5e1bb" offset="0"/>
+				<rom name="invaders_epps.ccvf" size="163637" crc="ecee8918" sha1="7d348f37ebbd18a5cf74bfd277fd8221bac5e1bb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1643,7 +1643,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162840">
-				<rom name="invaders_epps (alt).ccvf" size="162840" crc="59e49cd6" sha1="13aeffa4015cb5cb0bfcd959ab8f7c5b606a27b6" offset="0" />
+				<rom name="invaders_epps (alt).ccvf" size="162840" crc="59e49cd6" sha1="13aeffa4015cb5cb0bfcd959ab8f7c5b606a27b6" />
 			</dataarea>
 		</part>
 	</software>
@@ -1654,7 +1654,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162884">
-				<rom name="inventory.ccvf" size="162884" crc="6be83d9f" sha1="b7177f27dd362ccf91fc3bd30c0040228065c4f8" offset="0"/>
+				<rom name="inventory.ccvf" size="162884" crc="6be83d9f" sha1="b7177f27dd362ccf91fc3bd30c0040228065c4f8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1665,7 +1665,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162917">
-				<rom name="invoice_order.ccvf" size="162917" crc="ac18e5ea" sha1="a29f2367c919f58bbd1d263cc99c604da550f199" offset="0"/>
+				<rom name="invoice_order.ccvf" size="162917" crc="ac18e5ea" sha1="a29f2367c919f58bbd1d263cc99c604da550f199"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1676,7 +1676,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162815">
-				<rom name="isc_demos.ccvf" size="162815" crc="9ff58d54" sha1="58363a13fd92bed7cc86e23a7ed9ca4239b57b93" offset="0"/>
+				<rom name="isc_demos.ccvf" size="162815" crc="9ff58d54" sha1="58363a13fd92bed7cc86e23a7ed9ca4239b57b93"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1687,13 +1687,13 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162814">
-				<rom name="joystick-sidea.ccvf" size="162814" crc="9530ed91" sha1="36052d74ec3fe9dd6a6497aa45ee6cafec8ef489" offset="0"/>
+				<rom name="joystick-sidea.ccvf" size="162814" crc="9530ed91" sha1="36052d74ec3fe9dd6a6497aa45ee6cafec8ef489"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="162814">
-				<rom name="joystick-sideb.ccvf" size="162814" crc="bec15db9" sha1="400a9729783ffff8c5d54bf08fc6318651265a7d" offset="0"/>
+				<rom name="joystick-sideb.ccvf" size="162814" crc="bec15db9" sha1="400a9729783ffff8c5d54bf08fc6318651265a7d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1704,7 +1704,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162843">
-				<rom name="joystick_sound.ccvf" size="162843" crc="a2377bd8" sha1="d3f1ab4a72437f2b6590e64647d90cc4dba7efba" offset="0"/>
+				<rom name="joystick_sound.ccvf" size="162843" crc="a2377bd8" sha1="d3f1ab4a72437f2b6590e64647d90cc4dba7efba"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1715,7 +1715,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162826">
-				<rom name="laser_gun_joystick.ccvf" size="162826" crc="d2319830" sha1="6427909124e398faff920432c996c478bb9cf7f6" offset="0"/>
+				<rom name="laser_gun_joystick.ccvf" size="162826" crc="d2319830" sha1="6427909124e398faff920432c996c478bb9cf7f6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1726,7 +1726,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162826">
-				<rom name="laser_gun_keyboard.ccvf" size="162826" crc="26cdf32e" sha1="e8f3e2d1772c399753f7179f455820ba2c87a3a3" offset="0"/>
+				<rom name="laser_gun_keyboard.ccvf" size="162826" crc="26cdf32e" sha1="e8f3e2d1772c399753f7179f455820ba2c87a3a3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1737,7 +1737,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162845">
-				<rom name="life.ccvf" size="162845" crc="62b0e5a0" sha1="b5cbb4512f8af18d545c45d657434674f98d3fff" offset="0"/>
+				<rom name="life.ccvf" size="162845" crc="62b0e5a0" sha1="b5cbb4512f8af18d545c45d657434674f98d3fff"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1748,7 +1748,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162810">
-				<rom name="life2.ccvf" size="162810" crc="21ecd246" sha1="8f3f7897d33e577b9034d484ba426c1add0bc604" offset="0"/>
+				<rom name="life2.ccvf" size="162810" crc="21ecd246" sha1="8f3f7897d33e577b9034d484ba426c1add0bc604"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1759,7 +1759,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163770">
-				<rom name="lunar_lander.ccvf" size="163770" crc="c771f165" sha1="7324a5ba2c2f769674d730b0969668a2af928187" offset="0"/>
+				<rom name="lunar_lander.ccvf" size="163770" crc="c771f165" sha1="7324a5ba2c2f769674d730b0969668a2af928187"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1770,7 +1770,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162872">
-				<rom name="mailing_list.ccvf" size="162872" crc="837d41f9" sha1="3e2bdce798ddfeadab7d1ddfe33f9fba31c31237" offset="0"/>
+				<rom name="mailing_list.ccvf" size="162872" crc="837d41f9" sha1="3e2bdce798ddfeadab7d1ddfe33f9fba31c31237"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1781,7 +1781,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162825">
-				<rom name="mazes_1.ccvf" size="162825" crc="991eb65c" sha1="6ba46269e993ef4f923d5bae8a72a1b557f82a75" offset="0"/>
+				<rom name="mazes_1.ccvf" size="162825" crc="991eb65c" sha1="6ba46269e993ef4f923d5bae8a72a1b557f82a75"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1792,7 +1792,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162825">
-				<rom name="mazes_2.ccvf" size="162825" crc="6490a597" sha1="e57f7a614b6c25588f56428ebe285faa4d29fd4a" offset="0"/>
+				<rom name="mazes_2.ccvf" size="162825" crc="6490a597" sha1="e57f7a614b6c25588f56428ebe285faa4d29fd4a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1803,7 +1803,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162914">
-				<rom name="mixed.ccvf" size="162914" crc="e2d13849" sha1="a79d48e2b4b224fe09f8344802393d91786ad47a" offset="0"/>
+				<rom name="mixed.ccvf" size="162914" crc="e2d13849" sha1="a79d48e2b4b224fe09f8344802393d91786ad47a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1814,7 +1814,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162841">
-				<rom name="modified_utilities.ccvf" size="162841" crc="5be33d9d" sha1="0cd1a6223ed1d0ebfd0d49ed34d0d1453ac035cc" offset="0"/>
+				<rom name="modified_utilities.ccvf" size="162841" crc="5be33d9d" sha1="0cd1a6223ed1d0ebfd0d49ed34d0d1453ac035cc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1825,7 +1825,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162878">
-				<rom name="multi_peripheral_interface_demo.ccvf" size="162878" crc="1dbd7f3a" sha1="877fa205e4f025426d1af9c5cc5c55ddf1ecacbf" offset="0"/>
+				<rom name="multi_peripheral_interface_demo.ccvf" size="162878" crc="1dbd7f3a" sha1="877fa205e4f025426d1af9c5cc5c55ddf1ecacbf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1836,7 +1836,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162828">
-				<rom name="ncc_1_5.ccvf" size="162828" crc="8a4bf1e5" sha1="98df027ed8be3a6819819e3a58d9898d5e8dde65" offset="0"/>
+				<rom name="ncc_1_5.ccvf" size="162828" crc="8a4bf1e5" sha1="98df027ed8be3a6819819e3a58d9898d5e8dde65"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1847,7 +1847,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162814">
-				<rom name="ncc_2.ccvf" size="162814" crc="2c27c8da" sha1="9096fcf57bd867662ebfd4b1f26e8bc4746a4c9d" offset="0"/>
+				<rom name="ncc_2.ccvf" size="162814" crc="2c27c8da" sha1="9096fcf57bd867662ebfd4b1f26e8bc4746a4c9d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1858,7 +1858,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162812">
-				<rom name="ncc_3.ccvf" size="162812" crc="ac44b202" sha1="e28d41b478c43a762476c27f2a33fbaeace7e738" offset="0"/>
+				<rom name="ncc_3.ccvf" size="162812" crc="ac44b202" sha1="e28d41b478c43a762476c27f2a33fbaeace7e738"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1869,7 +1869,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162814">
-				<rom name="ncc_4.ccvf" size="162814" crc="91eaf631" sha1="b1e1c5745ab7e93b5e7c0710bd4af293fc4e1a7d" offset="0"/>
+				<rom name="ncc_4.ccvf" size="162814" crc="91eaf631" sha1="b1e1c5745ab7e93b5e7c0710bd4af293fc4e1a7d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1880,7 +1880,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162816">
-				<rom name="ncc_4_11.ccvf" size="162816" crc="929d57ad" sha1="f5297ec772dc79b4c30889f4ceef908f327bb410" offset="0"/>
+				<rom name="ncc_4_11.ccvf" size="162816" crc="929d57ad" sha1="f5297ec772dc79b4c30889f4ceef908f327bb410"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1891,7 +1891,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162854">
-				<rom name="ncc_5.ccvf" size="162854" crc="e2161570" sha1="705bc3ff4440584a2156ffba14830e57a6fb593f" offset="0"/>
+				<rom name="ncc_5.ccvf" size="162854" crc="e2161570" sha1="705bc3ff4440584a2156ffba14830e57a6fb593f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1902,7 +1902,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162814">
-				<rom name="ncc_6_real.ccvf" size="162814" crc="0ca51665" sha1="1eb0feb76f0f1eddef2c7b5c7c4d1dc666b1c0c8" offset="0"/>
+				<rom name="ncc_6_real.ccvf" size="162814" crc="0ca51665" sha1="1eb0feb76f0f1eddef2c7b5c7c4d1dc666b1c0c8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1913,7 +1913,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162825">
-				<rom name="ncc_6.ccvf" size="162825" crc="f92a4138" sha1="bab59538bdf06c707548ec766d5ed349a6e2a166" offset="0"/>
+				<rom name="ncc_6.ccvf" size="162825" crc="f92a4138" sha1="bab59538bdf06c707548ec766d5ed349a6e2a166"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1924,7 +1924,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162825">
-				<rom name="ncc_7.ccvf" size="162825" crc="ef5f1eb0" sha1="643221839c6f0d7ba02555b3af5c79bcd328833a" offset="0"/>
+				<rom name="ncc_7.ccvf" size="162825" crc="ef5f1eb0" sha1="643221839c6f0d7ba02555b3af5c79bcd328833a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1935,7 +1935,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162827">
-				<rom name="ncc_8_real.ccvf" size="162827" crc="50f3440b" sha1="31a5be594999a4f64e5f6f98d906556459123b7e" offset="0"/>
+				<rom name="ncc_8_real.ccvf" size="162827" crc="50f3440b" sha1="31a5be594999a4f64e5f6f98d906556459123b7e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1946,7 +1946,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162830">
-				<rom name="ncc_8.ccvf" size="162830" crc="2c103b67" sha1="c15ca208f630abf4ee96df90f0dab28970f7d944" offset="0"/>
+				<rom name="ncc_8.ccvf" size="162830" crc="2c103b67" sha1="c15ca208f630abf4ee96df90f0dab28970f7d944"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1957,7 +1957,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162814">
-				<rom name="ncc_9.ccvf" size="162814" crc="4cdfb369" sha1="c5c05c4bd09b0c5d9338b6408a9c4693c3fbb228" offset="0"/>
+				<rom name="ncc_9.ccvf" size="162814" crc="4cdfb369" sha1="c5c05c4bd09b0c5d9338b6408a9c4693c3fbb228"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1968,7 +1968,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162813">
-				<rom name="ncc_10.ccvf" size="162813" crc="06feff21" sha1="d21e781b4fa8388410543db18780a13918723d56" offset="0"/>
+				<rom name="ncc_10.ccvf" size="162813" crc="06feff21" sha1="d21e781b4fa8388410543db18780a13918723d56"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1979,7 +1979,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162813">
-				<rom name="ncc_12.ccvf" size="162813" crc="e81b653d" sha1="1c7091177f66a4f486afdd7a9bbbc9e5b7950bf4" offset="0"/>
+				<rom name="ncc_12.ccvf" size="162813" crc="e81b653d" sha1="1c7091177f66a4f486afdd7a9bbbc9e5b7950bf4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1990,7 +1990,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162833">
-				<rom name="ncc_13.ccvf" size="162833" crc="e6e4969a" sha1="c3a86005b0545404c1f88e1a7eb6e6dc9baa1a83" offset="0"/>
+				<rom name="ncc_13.ccvf" size="162833" crc="e6e4969a" sha1="c3a86005b0545404c1f88e1a7eb6e6dc9baa1a83"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2001,7 +2001,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162844">
-				<rom name="ncc_14.ccvf" size="162844" crc="76bdcb4f" sha1="16bf8550d202b8c431301b79dd7c49b3c635b11c" offset="0"/>
+				<rom name="ncc_14.ccvf" size="162844" crc="76bdcb4f" sha1="16bf8550d202b8c431301b79dd7c49b3c635b11c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2012,7 +2012,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162813">
-				<rom name="ncc_15.ccvf" size="162813" crc="d2f692fb" sha1="5d84fed5d485216aa557fdefb7cc8a1f4f9d64f0" offset="0"/>
+				<rom name="ncc_15.ccvf" size="162813" crc="d2f692fb" sha1="5d84fed5d485216aa557fdefb7cc8a1f4f9d64f0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2023,7 +2023,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162845">
-				<rom name="ncc_16.ccvf" size="162845" crc="302adb3a" sha1="a47a710898c46522d55d457aa051de8b57140c80" offset="0"/>
+				<rom name="ncc_16.ccvf" size="162845" crc="302adb3a" sha1="a47a710898c46522d55d457aa051de8b57140c80"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2034,7 +2034,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162829">
-				<rom name="ncc_17.ccvf" size="162829" crc="4b8b53e5" sha1="b78386b25568d3a04642ffa8c43a9603510187fe" offset="0"/>
+				<rom name="ncc_17.ccvf" size="162829" crc="4b8b53e5" sha1="b78386b25568d3a04642ffa8c43a9603510187fe"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2045,7 +2045,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162813">
-				<rom name="ncc_18.ccvf" size="162813" crc="5ef86e49" sha1="b57de71dda895cd79407265d7b06c17083b6c2ac" offset="0"/>
+				<rom name="ncc_18.ccvf" size="162813" crc="5ef86e49" sha1="b57de71dda895cd79407265d7b06c17083b6c2ac"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2056,7 +2056,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162813">
-				<rom name="ncc_21.ccvf" size="162813" crc="108f506d" sha1="d3b92a3a3d161248047edcddd75ea6a399235bd0" offset="0"/>
+				<rom name="ncc_21.ccvf" size="162813" crc="108f506d" sha1="d3b92a3a3d161248047edcddd75ea6a399235bd0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2067,7 +2067,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162813">
-				<rom name="ncc_22.ccvf" size="162813" crc="d46ed975" sha1="7ef3457ff8f9cf24865c662a09467a986580394e" offset="0"/>
+				<rom name="ncc_22.ccvf" size="162813" crc="d46ed975" sha1="7ef3457ff8f9cf24865c662a09467a986580394e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2078,7 +2078,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162826">
-				<rom name="ncc_23.ccvf" size="162826" crc="4076f83a" sha1="8eba8856e9572343973c3dbc788945331d68976b" offset="0"/>
+				<rom name="ncc_23.ccvf" size="162826" crc="4076f83a" sha1="8eba8856e9572343973c3dbc788945331d68976b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2089,7 +2089,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162812">
-				<rom name="ncc_catalog_1.ccvf" size="162812" crc="d0465622" sha1="85cefa2c871ec34026381203939a058add1661f4" offset="0"/>
+				<rom name="ncc_catalog_1.ccvf" size="162812" crc="d0465622" sha1="85cefa2c871ec34026381203939a058add1661f4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2100,13 +2100,13 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162833">
-				<rom name="nsw_ug_1-sidea.ccvf" size="162833" crc="de985bf2" sha1="544a57142d226c955a9aec50cb57d9b9e143a69a" offset="0"/>
+				<rom name="nsw_ug_1-sidea.ccvf" size="162833" crc="de985bf2" sha1="544a57142d226c955a9aec50cb57d9b9e143a69a"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="162833">
-				<rom name="nsw_ug_1-sideb.ccvf" size="162833" crc="eb881e4c" sha1="1fdeba91bca2eee927b4ee62e6966fbafd79045e" offset="0"/>
+				<rom name="nsw_ug_1-sideb.ccvf" size="162833" crc="eb881e4c" sha1="1fdeba91bca2eee927b4ee62e6966fbafd79045e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2117,7 +2117,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163149">
-				<rom name="othello.ccvf" size="163149" crc="a7827794" sha1="5341678bffb61c9221e3af694733580feec57838" offset="0"/>
+				<rom name="othello.ccvf" size="163149" crc="a7827794" sha1="5341678bffb61c9221e3af694733580feec57838"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2128,7 +2128,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162874">
-				<rom name="pacman.ccvf" size="162874" crc="fd00e916" sha1="3c0975e675926cf6a44bf935bc30bab0db7a2c05" offset="0"/>
+				<rom name="pacman.ccvf" size="162874" crc="fd00e916" sha1="3c0975e675926cf6a44bf935bc30bab0db7a2c05"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2139,7 +2139,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162987">
-				<rom name="personal_finance_vol_1.ccvf" size="162987" crc="97889f2c" sha1="b90e970f0d7b87e34c1b4385bb43b05b01d47ea5" offset="0"/>
+				<rom name="personal_finance_vol_1.ccvf" size="162987" crc="97889f2c" sha1="b90e970f0d7b87e34c1b4385bb43b05b01d47ea5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2150,7 +2150,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162845">
-				<rom name="pert_planner.ccvf" size="162845" crc="e7a56989" sha1="c0d5a8b810186be41a14fdeb7548f2ce32420bd1" offset="0"/>
+				<rom name="pert_planner.ccvf" size="162845" crc="e7a56989" sha1="c0d5a8b810186be41a14fdeb7548f2ce32420bd1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2161,7 +2161,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162842">
-				<rom name="printer_pkg.ccvf" size="162842" crc="d4998bf0" sha1="abc216b8f2b2907289c83d555dd13bbaff8cfa6f" offset="0"/>
+				<rom name="printer_pkg.ccvf" size="162842" crc="d4998bf0" sha1="abc216b8f2b2907289c83d555dd13bbaff8cfa6f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2172,13 +2172,13 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162842">
-				<rom name="printer_pkg_src-sidea.ccvf" size="162842" crc="7d2436e8" sha1="9f1188fd7d707bd8dc04dca252ddda187b48ab05" offset="0"/>
+				<rom name="printer_pkg_src-sidea.ccvf" size="162842" crc="7d2436e8" sha1="9f1188fd7d707bd8dc04dca252ddda187b48ab05"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="162842">
-				<rom name="printer_pkg_src-sideb.ccvf" size="162842" crc="78d69675" sha1="55bcd7c91bdc78cffdd475caa8f8e217cc92a304" offset="0"/>
+				<rom name="printer_pkg_src-sideb.ccvf" size="162842" crc="78d69675" sha1="55bcd7c91bdc78cffdd475caa8f8e217cc92a304"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2189,7 +2189,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162925">
-				<rom name="driver_lister.ccvf" size="162925" crc="504740f6" sha1="f38611fb908e9986407309d7fb5eec769169c9cd" offset="0"/>
+				<rom name="driver_lister.ccvf" size="162925" crc="504740f6" sha1="f38611fb908e9986407309d7fb5eec769169c9cd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2200,7 +2200,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162812">
-				<rom name="ratfor.ccvf" size="162812" crc="d3b695bb" sha1="cab1ca8a440a24bd285514996a03c63c5cc31a6a" offset="0"/>
+				<rom name="ratfor.ccvf" size="162812" crc="d3b695bb" sha1="cab1ca8a440a24bd285514996a03c63c5cc31a6a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2211,7 +2211,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163561">
-				<rom name="sampler.ccvf" size="163561" crc="71b7c5f9" sha1="2442454b6e85adab43f345469464d76012a2a9fc" offset="0"/>
+				<rom name="sampler.ccvf" size="163561" crc="71b7c5f9" sha1="2442454b6e85adab43f345469464d76012a2a9fc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2222,7 +2222,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163561">
-				<rom name="sampler-3.31.78.ccvf" size="163561" crc="3df51056" sha1="954c5add7267f0c3d832422f8c93d770e0d9cd06" offset="0"/>
+				<rom name="sampler-3.31.78.ccvf" size="163561" crc="3df51056" sha1="954c5add7267f0c3d832422f8c93d770e0d9cd06"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2233,7 +2233,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162852">
-				<rom name="sargon_chess_1.ccvf" size="162852" crc="4fb4892a" sha1="00552ad5d20d7f25eea621c2f7e628d87c5bd4a7" offset="0"/>
+				<rom name="sargon_chess_1.ccvf" size="162852" crc="4fb4892a" sha1="00552ad5d20d7f25eea621c2f7e628d87c5bd4a7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2244,7 +2244,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162813">
-				<rom name="scratch.ccvf" size="162813" crc="ea2e3c90" sha1="5e7f62e612a589c746e5892988c5d6e3e55dbe71" offset="0"/>
+				<rom name="scratch.ccvf" size="162813" crc="ea2e3c90" sha1="5e7f62e612a589c746e5892988c5d6e3e55dbe71"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2255,7 +2255,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162825">
-				<rom name="selective_utilities.ccvf" size="162825" crc="6b16b0ce" sha1="2960ebe1d565f0acac42d450fdf823d4113143fb" offset="0"/>
+				<rom name="selective_utilities.ccvf" size="162825" crc="6b16b0ce" sha1="2960ebe1d565f0acac42d450fdf823d4113143fb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2266,7 +2266,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162841">
-				<rom name="sfssp_v1.3_stock.ccvf" size="162841" crc="07866db5" sha1="51d67e05617f5e48060dbf68a50fcb6a57277b4e" offset="0"/>
+				<rom name="sfssp_v1.3_stock.ccvf" size="162841" crc="07866db5" sha1="51d67e05617f5e48060dbf68a50fcb6a57277b4e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2277,7 +2277,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162862">
-				<rom name="sfssp_v1.3_nodata_docs.ccvf" size="162862" crc="21d05c4f" sha1="dc35e4d1ad361b69a922cd7ab0d8e629b5c49f67" offset="0"/>
+				<rom name="sfssp_v1.3_nodata_docs.ccvf" size="162862" crc="21d05c4f" sha1="dc35e4d1ad361b69a922cd7ab0d8e629b5c49f67"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2288,7 +2288,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163869">
-				<rom name="sharks.ccvf" size="163869" crc="8e94a162" sha1="48d390db09e6517ac33780b2d87aca7b1198a5e8" offset="0"/>
+				<rom name="sharks.ccvf" size="163869" crc="8e94a162" sha1="48d390db09e6517ac33780b2d87aca7b1198a5e8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2299,7 +2299,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162822">
-				<rom name="snakes_and_ladders.ccvf" size="162822" crc="00f4b547" sha1="07e3cb41d1642f9bd25f3a8037da1f1cc3328aeb" offset="0"/>
+				<rom name="snakes_and_ladders.ccvf" size="162822" crc="00f4b547" sha1="07e3cb41d1642f9bd25f3a8037da1f1cc3328aeb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2310,7 +2310,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162815">
-				<rom name="solitaire.ccvf" size="162815" crc="57b6263d" sha1="5e7759e3b28cabc824af2744eb3732089571066f" offset="0"/>
+				<rom name="solitaire.ccvf" size="162815" crc="57b6263d" sha1="5e7759e3b28cabc824af2744eb3732089571066f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2321,7 +2321,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162830">
-				<rom name="sound_light_pen.ccvf" size="162830" crc="42051eb3" sha1="5b13e1f2022d6b68d7e7500ec81e4744b82069e7" offset="0"/>
+				<rom name="sound_light_pen.ccvf" size="162830" crc="42051eb3" sha1="5b13e1f2022d6b68d7e7500ec81e4744b82069e7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2332,7 +2332,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162818">
-				<rom name="soundware_ii.ccvf" size="162818" crc="c265ab41" sha1="bd01b5c97a01d8ecacf61c6b03b733e593856cb6" offset="0"/>
+				<rom name="soundware_ii.ccvf" size="162818" crc="c265ab41" sha1="bd01b5c97a01d8ecacf61c6b03b733e593856cb6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2343,7 +2343,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162836">
-				<rom name="source.ccvf" size="162836" crc="62b91f72" sha1="c7ca467accebebbb92be6bcd13672c3215e23a27" offset="0"/>
+				<rom name="source.ccvf" size="162836" crc="62b91f72" sha1="c7ca467accebebbb92be6bcd13672c3215e23a27"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2354,7 +2354,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162854">
-				<rom name="source_1.ccvf" size="162854" crc="ce510c73" sha1="de173bf0a87cc98a1388ce8764071fa663ba0b52" offset="0"/>
+				<rom name="source_1.ccvf" size="162854" crc="ce510c73" sha1="de173bf0a87cc98a1388ce8764071fa663ba0b52"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2365,7 +2365,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162857">
-				<rom name="source_3.ccvf" size="162857" crc="54ccc70b" sha1="80747d498b5477def94f1f88f35ee41a52d71bd0" offset="0"/>
+				<rom name="source_3.ccvf" size="162857" crc="54ccc70b" sha1="80747d498b5477def94f1f88f35ee41a52d71bd0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2376,7 +2376,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162915">
-				<rom name="source_4.ccvf" size="162915" crc="6f29c3ea" sha1="bb048badf165d5429fce9b09784ee4acfe6c162b" offset="0"/>
+				<rom name="source_4.ccvf" size="162915" crc="6f29c3ea" sha1="bb048badf165d5429fce9b09784ee4acfe6c162b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2387,7 +2387,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162823">
-				<rom name="stamp_price_lists.ccvf" size="162823" crc="8bdb7111" sha1="25b71c215e0cb60a88ab98bbc8306491dd0c961f" offset="0"/>
+				<rom name="stamp_price_lists.ccvf" size="162823" crc="8bdb7111" sha1="25b71c215e0cb60a88ab98bbc8306491dd0c961f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2398,7 +2398,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163310">
-				<rom name="startrek.ccvf" size="163310" crc="8e6de7a9" sha1="ebf9f91cf1d7079873e3d7c6f2c309a109b2c904" offset="0"/>
+				<rom name="startrek.ccvf" size="163310" crc="8e6de7a9" sha1="ebf9f91cf1d7079873e3d7c6f2c309a109b2c904"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2409,7 +2409,7 @@
 		<publisher>Graham Epps</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163637">
-				<rom name="epps_trek.ccvf" size="163637" crc="0dad1114" sha1="4f4496c14c65d7b46640cecbdfefa8116de44b78" offset="0"/>
+				<rom name="epps_trek.ccvf" size="163637" crc="0dad1114" sha1="4f4496c14c65d7b46640cecbdfefa8116de44b78"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2420,7 +2420,7 @@
 		<publisher>Graham Epps</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162842">
-				<rom name="epps_trek (alt).ccvf" size="162842" crc="600fb885" sha1="1fdeaeb61f3fb1c08e803cdeb02f36c392713c7c" offset="0" />
+				<rom name="epps_trek (alt).ccvf" size="162842" crc="600fb885" sha1="1fdeaeb61f3fb1c08e803cdeb02f36c392713c7c" />
 			</dataarea>
 		</part>
 	</software>
@@ -2431,7 +2431,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163597">
-				<rom name="statistics_1.ccvf" size="163597" crc="b9f3f7df" sha1="d126675b36a91682f4bf82e34a002600a7ed0acc" offset="0"/>
+				<rom name="statistics_1.ccvf" size="163597" crc="b9f3f7df" sha1="d126675b36a91682f4bf82e34a002600a7ed0acc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2442,7 +2442,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163636">
-				<rom name="statistics_2.ccvf" size="163636" crc="5e41ccba" sha1="fafa25ee03f9b2be6b51648d3c78c9e0834e81a1" offset="0"/>
+				<rom name="statistics_2.ccvf" size="163636" crc="5e41ccba" sha1="fafa25ee03f9b2be6b51648d3c78c9e0834e81a1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2453,7 +2453,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163626">
-				<rom name="statistics_3.ccvf" size="163626" crc="63fe3762" sha1="7e2a782c32c6154a1ba4a1e983a2e775c53b73af" offset="0"/>
+				<rom name="statistics_3.ccvf" size="163626" crc="63fe3762" sha1="7e2a782c32c6154a1ba4a1e983a2e775c53b73af"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2464,7 +2464,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162872">
-				<rom name="super_monitor.ccvf" size="162872" crc="3bac76ba" sha1="bd154679aa33b6dda05d41337f7a9bbb891b2ba6" offset="0"/>
+				<rom name="super_monitor.ccvf" size="162872" crc="3bac76ba" sha1="bd154679aa33b6dda05d41337f7a9bbb891b2ba6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2475,7 +2475,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163599">
-				<rom name="swarms.ccvf" size="163599" crc="80876013" sha1="646c0739c9fd56bd190a45b374b36cc0e7b5cb94" offset="0"/>
+				<rom name="swarms.ccvf" size="163599" crc="80876013" sha1="646c0739c9fd56bd190a45b374b36cc0e7b5cb94"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2486,7 +2486,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162841">
-				<rom name="table_tennis_for_two.ccvf" size="162841" crc="e0fabda5" sha1="e15e60dd6a0661ea6e1d520d40c270dcb76ca196" offset="0"/>
+				<rom name="table_tennis_for_two.ccvf" size="162841" crc="e0fabda5" sha1="e15e60dd6a0661ea6e1d520d40c270dcb76ca196"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2497,13 +2497,13 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162812">
-				<rom name="taylor-sidea.ccvf" size="162812" crc="d6bb6eec" sha1="b20d419c3a96ef83b46d0e9ea9ad9ef84b8e2025" offset="0"/>
+				<rom name="taylor-sidea.ccvf" size="162812" crc="d6bb6eec" sha1="b20d419c3a96ef83b46d0e9ea9ad9ef84b8e2025"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="162812">
-				<rom name="taylor-sideb.ccvf" size="162812" crc="348d24da" sha1="dc2c67efe010f385bcc897b7bf2cbf171464c0d1" offset="0"/>
+				<rom name="taylor-sideb.ccvf" size="162812" crc="348d24da" sha1="dc2c67efe010f385bcc897b7bf2cbf171464c0d1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2514,7 +2514,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162832">
-				<rom name="taylor_1.ccvf" size="162832" crc="e5ba7ccc" sha1="69b994a9ddb24912fbe678bb874bbdf7d685f576" offset="0"/>
+				<rom name="taylor_1.ccvf" size="162832" crc="e5ba7ccc" sha1="69b994a9ddb24912fbe678bb874bbdf7d685f576"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2525,7 +2525,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162828">
-				<rom name="taylor_2.ccvf" size="162828" crc="2a3f870c" sha1="c7ca048db2eba2a0c36e3dcaf4c6dbd8ac73e1a3" offset="0"/>
+				<rom name="taylor_2.ccvf" size="162828" crc="2a3f870c" sha1="c7ca048db2eba2a0c36e3dcaf4c6dbd8ac73e1a3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2536,7 +2536,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162832">
-				<rom name="taylor_3.ccvf" size="162832" crc="3e8707f5" sha1="1fe7434b9c4d532bde5520481c96b56ba180fd6d" offset="0"/>
+				<rom name="taylor_3.ccvf" size="162832" crc="3e8707f5" sha1="1fe7434b9c4d532bde5520481c96b56ba180fd6d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2547,7 +2547,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162832">
-				<rom name="taylor_4.ccvf" size="162832" crc="e001acb0" sha1="9d8af31d9a090375eeb178bc79670064c97ed00c" offset="0"/>
+				<rom name="taylor_4.ccvf" size="162832" crc="e001acb0" sha1="9d8af31d9a090375eeb178bc79670064c97ed00c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2558,7 +2558,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162833">
-				<rom name="taylor_5.ccvf" size="162833" crc="4ce246d0" sha1="37dbbe31572f2888895f7d6051405bb15834461a" offset="0"/>
+				<rom name="taylor_5.ccvf" size="162833" crc="4ce246d0" sha1="37dbbe31572f2888895f7d6051405bb15834461a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2569,7 +2569,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162832">
-				<rom name="taylor_6.ccvf" size="162832" crc="5efc54a8" sha1="a4065e63e49b409fd1cc72adb71db3b64ea8f004" offset="0"/>
+				<rom name="taylor_6.ccvf" size="162832" crc="5efc54a8" sha1="a4065e63e49b409fd1cc72adb71db3b64ea8f004"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2580,7 +2580,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162832">
-				<rom name="taylor_7.ccvf" size="162832" crc="c804d912" sha1="341f143d2cf4661c5589e49441125d6fe4108b87" offset="0"/>
+				<rom name="taylor_7.ccvf" size="162832" crc="c804d912" sha1="341f143d2cf4661c5589e49441125d6fe4108b87"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2591,7 +2591,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162810">
-				<rom name="taylor_8.ccvf" size="162810" crc="a922c6a3" sha1="da2a2534fe6d5c0e8c85803a53a67508b66d42b5" offset="0"/>
+				<rom name="taylor_8.ccvf" size="162810" crc="a922c6a3" sha1="da2a2534fe6d5c0e8c85803a53a67508b66d42b5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2602,7 +2602,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162820">
-				<rom name="taylor_vol_2.ccvf" size="162820" crc="aa3138ea" sha1="b481d8fc59c27e7687688c99798ed60dc1caace2" offset="0"/>
+				<rom name="taylor_vol_2.ccvf" size="162820" crc="aa3138ea" sha1="b481d8fc59c27e7687688c99798ed60dc1caace2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2613,7 +2613,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162814">
-				<rom name="terminal.ccvf" size="162814" crc="e36e620f" sha1="1b668d2712a00bc88c4163cab2ed4513fcd5bfd9" offset="0"/>
+				<rom name="terminal.ccvf" size="162814" crc="e36e620f" sha1="1b668d2712a00bc88c4163cab2ed4513fcd5bfd9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2624,7 +2624,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162820">
-				<rom name="terminal_em.ccvf" size="162820" crc="6a7a3306" sha1="3db9d397a41121e86a16f24fd916fc9e532ab65f" offset="0"/>
+				<rom name="terminal_em.ccvf" size="162820" crc="6a7a3306" sha1="3db9d397a41121e86a16f24fd916fc9e532ab65f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2635,7 +2635,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162846">
-				<rom name="text_editor.ccvf" size="162846" crc="964a7196" sha1="097a8e91dc0e60442765a4ff299648a74b129e6e" offset="0"/>
+				<rom name="text_editor.ccvf" size="162846" crc="964a7196" sha1="097a8e91dc0e60442765a4ff299648a74b129e6e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2646,7 +2646,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162820">
-				<rom name="text_formatter.ccvf" size="162820" crc="7d10ce30" sha1="21e23b85a138f225729584826702a30f704e11ec" offset="0"/>
+				<rom name="text_formatter.ccvf" size="162820" crc="7d10ce30" sha1="21e23b85a138f225729584826702a30f704e11ec"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2657,7 +2657,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162859">
-				<rom name="the_editor_v2.ccvf" size="162859" crc="91a4754a" sha1="5ef348712de22c1a137c7649fcd18fdb252dfc0a" offset="0"/>
+				<rom name="the_editor_v2.ccvf" size="162859" crc="91a4754a" sha1="5ef348712de22c1a137c7649fcd18fdb252dfc0a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2668,7 +2668,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162851">
-				<rom name="tiny_c_v3.0.ccvf" size="162851" crc="722c5425" sha1="9be9245b7f61e72acd671e81d1373ead51205212" offset="0"/>
+				<rom name="tiny_c_v3.0.ccvf" size="162851" crc="722c5425" sha1="9be9245b7f61e72acd671e81d1373ead51205212"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2679,7 +2679,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162862">
-				<rom name="tiny_pascal.ccvf" size="162862" crc="e0a855cf" sha1="44c10b524c7129d92d3ac6d22dc0f6b3fdd3679c" offset="0"/>
+				<rom name="tiny_pascal.ccvf" size="162862" crc="e0a855cf" sha1="44c10b524c7129d92d3ac6d22dc0f6b3fdd3679c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2690,7 +2690,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162853">
-				<rom name="forth_pascal.ccvf" size="162853" crc="0545b0be" sha1="536d0b034ca44d7657bb36d38fff62832e8e5717" offset="0"/>
+				<rom name="forth_pascal.ccvf" size="162853" crc="0545b0be" sha1="536d0b034ca44d7657bb36d38fff62832e8e5717"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2701,7 +2701,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162813">
-				<rom name="utility.ccvf" size="162813" crc="4d7e00df" sha1="3ac9df8989b16b1047de1f786a473edda24799e4" offset="0"/>
+				<rom name="utility.ccvf" size="162813" crc="4d7e00df" sha1="3ac9df8989b16b1047de1f786a473edda24799e4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2712,7 +2712,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162815">
-				<rom name="utility_2.ccvf" size="162815" crc="53a29ded" sha1="55283840d628938dd570e3887618295932348601" offset="0"/>
+				<rom name="utility_2.ccvf" size="162815" crc="53a29ded" sha1="55283840d628938dd570e3887618295932348601"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2723,7 +2723,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162815">
-				<rom name="utility_3.ccvf" size="162815" crc="b86ddb9d" sha1="25fd34e2d71a0964b6df49e6bf7c0372568b6b6b" offset="0"/>
+				<rom name="utility_3.ccvf" size="162815" crc="b86ddb9d" sha1="25fd34e2d71a0964b6df49e6bf7c0372568b6b6b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2734,7 +2734,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162871">
-				<rom name="analiz_watals.ccvf" size="162871" crc="91bb3632" sha1="61472691a68688b3a9281385327a7d07e77c9d3b" offset="0"/>
+				<rom name="analiz_watals.ccvf" size="162871" crc="91bb3632" sha1="61472691a68688b3a9281385327a7d07e77c9d3b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2745,7 +2745,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162850">
-				<rom name="word_king_v1.6.ccvf" size="162850" crc="7f67ef68" sha1="2dc0d59aeefcf02a90d5624bcd57d471ebf05264" offset="0"/>
+				<rom name="word_king_v1.6.ccvf" size="162850" crc="7f67ef68" sha1="2dc0d59aeefcf02a90d5624bcd57d471ebf05264"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2756,7 +2756,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162849">
-				<rom name="word_processor_v2.1.ccvf" size="162849" crc="939d6bc2" sha1="3607f812b8b40aff9807f9641f341bc5e8004449" offset="0"/>
+				<rom name="word_processor_v2.1.ccvf" size="162849" crc="939d6bc2" sha1="3607f812b8b40aff9807f9641f341bc5e8004449"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2767,7 +2767,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162817">
-				<rom name="word_puzzle.ccvf" size="162817" crc="788f8547" sha1="84939e8159c43d50f2e77b383cdd2db36209fe17" offset="0"/>
+				<rom name="word_puzzle.ccvf" size="162817" crc="788f8547" sha1="84939e8159c43d50f2e77b383cdd2db36209fe17"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2778,19 +2778,19 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162894">
-				<rom name="wordy_disk_1.ccvf" size="162894" crc="cb96b2ce" sha1="b0e0727c7f3c09ccc83e7dfb744c877aeeee1681" offset="0"/>
+				<rom name="wordy_disk_1.ccvf" size="162894" crc="cb96b2ce" sha1="b0e0727c7f3c09ccc83e7dfb744c877aeeee1681"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="162870">
-				<rom name="wordy_disk_2.ccvf" size="162870" crc="3486e8e6" sha1="1e865ef7cb7d9bbffb6ec2477075c9ae5470b9c3" offset="0"/>
+				<rom name="wordy_disk_2.ccvf" size="162870" crc="3486e8e6" sha1="1e865ef7cb7d9bbffb6ec2477075c9ae5470b9c3"/>
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="162848">
-				<rom name="wordy_disk_3.ccvf" size="162848" crc="72906bc5" sha1="37a8895a24f372800700984c84fde66225cd0e35" offset="0"/>
+				<rom name="wordy_disk_3.ccvf" size="162848" crc="72906bc5" sha1="37a8895a24f372800700984c84fde66225cd0e35"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2801,7 +2801,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162844">
-				<rom name="zip_compiler.ccvf" size="162844" crc="b6f14c33" sha1="6ab0a4d81deebbef0bed7eacff72407571c9cc98" offset="0"/>
+				<rom name="zip_compiler.ccvf" size="162844" crc="b6f14c33" sha1="6ab0a4d81deebbef0bed7eacff72407571c9cc98"/>
 			</dataarea>
 		</part>
 	</software>

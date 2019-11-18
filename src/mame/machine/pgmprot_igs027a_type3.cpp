@@ -47,53 +47,53 @@
 #include "includes/pgm.h"
 #include "machine/pgmprot_igs027a_type3.h"
 
-WRITE32_MEMBER(pgm_arm_type3_state::svg_arm7_ram_sel_w )
+void pgm_arm_type3_state::svg_arm7_ram_sel_w(u32 data)
 {
 //  printf("svg_arm7_ram_sel_w %08x\n", data);
 	machine().scheduler().synchronize(); // force resync
 	m_svg_ram_sel = data & 1;
 }
 
-READ32_MEMBER(pgm_arm_type3_state::svg_arm7_shareram_r )
+u32 pgm_arm_type3_state::svg_arm7_shareram_r(offs_t offset)
 {
-	uint32_t retdata = m_svg_shareram[m_svg_ram_sel & 1][offset];
+	const u32 retdata = m_svg_shareram[m_svg_ram_sel & 1][offset];
 //  logerror("%s ARM7: shared read (bank %02x) offset - %08x retdata - %08x mask - %08x\n", machine().describe_context(), m_svg_ram_sel, offset*4, retdata, mem_mask );
 	return retdata;
 }
 
-WRITE32_MEMBER(pgm_arm_type3_state::svg_arm7_shareram_w )
+void pgm_arm_type3_state::svg_arm7_shareram_w(offs_t offset, u32 data, u32 mem_mask)
 {
 //  logerror("%s ARM7: shared write (bank %02x) offset - %08x retdata - %08x mask - %08x\n", machine().describe_context(), m_svg_ram_sel, offset*4, data, mem_mask );
 	COMBINE_DATA(&m_svg_shareram[m_svg_ram_sel & 1][offset]);
 }
 
-READ16_MEMBER(pgm_arm_type3_state::svg_m68k_ram_r )
+u16 pgm_arm_type3_state::svg_m68k_ram_r(offs_t offset)
 {
-	int ram_sel = (m_svg_ram_sel & 1) ^ 1;
-	uint16_t *share16 = (uint16_t *)(m_svg_shareram[ram_sel & 1].get());
+	const int ram_sel = (m_svg_ram_sel & 1) ^ 1;
+	const u16 *share16 = (u16 *)(m_svg_shareram[ram_sel & 1].get());
 
 	return share16[BYTE_XOR_LE(offset)];
 }
 
-WRITE16_MEMBER(pgm_arm_type3_state::svg_m68k_ram_w )
+void pgm_arm_type3_state::svg_m68k_ram_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	int ram_sel = (m_svg_ram_sel & 1) ^ 1;
-	uint16_t *share16 = (uint16_t *)(m_svg_shareram[ram_sel & 1].get());
+	const int ram_sel = (m_svg_ram_sel & 1) ^ 1;
+	u16 *share16 = (u16 *)(m_svg_shareram[ram_sel & 1].get());
 
 	COMBINE_DATA(&share16[BYTE_XOR_LE(offset)]);
 }
 
-READ16_MEMBER(pgm_arm_type3_state::svg_68k_nmi_r )
+u16 pgm_arm_type3_state::svg_68k_nmi_r()
 {
 	return 0;
 }
 
-WRITE16_MEMBER(pgm_arm_type3_state::svg_68k_nmi_w )
+void pgm_arm_type3_state::svg_68k_nmi_w(u16 data)
 {
 	m_prot->pulse_input_line(ARM7_FIRQ_LINE, m_prot->minimum_quantum_time());
 }
 
-WRITE16_MEMBER(pgm_arm_type3_state::svg_latch_68k_w )
+void pgm_arm_type3_state::svg_latch_68k_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (PGMARM7LOGERROR)
 		logerror("M68K: Latch write: %04x (%04x) %s\n", data & 0x0000ffff, mem_mask, machine().describe_context());
@@ -101,7 +101,7 @@ WRITE16_MEMBER(pgm_arm_type3_state::svg_latch_68k_w )
 }
 
 
-READ16_MEMBER(pgm_arm_type3_state::svg_latch_68k_r )
+u16 pgm_arm_type3_state::svg_latch_68k_r(offs_t offset, u16 mem_mask)
 {
 	if (PGMARM7LOGERROR)
 		logerror("M68K: Latch read: %04x (%04x) %s\n", m_svg_latchdata_arm_w & 0x0000ffff, mem_mask, machine().describe_context());
@@ -109,15 +109,14 @@ READ16_MEMBER(pgm_arm_type3_state::svg_latch_68k_r )
 }
 
 
-
-READ32_MEMBER(pgm_arm_type3_state::svg_latch_arm_r )
+u32 pgm_arm_type3_state::svg_latch_arm_r(offs_t offset, u32 mem_mask)
 {
 	if (PGMARM7LOGERROR)
 		logerror("ARM7: Latch read: %08x (%08x) %s\n", m_svg_latchdata_68k_w, mem_mask, machine().describe_context());
 	return m_svg_latchdata_68k_w;
 }
 
-WRITE32_MEMBER(pgm_arm_type3_state::svg_latch_arm_w )
+void pgm_arm_type3_state::svg_latch_arm_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	if (PGMARM7LOGERROR)
 		logerror("ARM7: Latch write: %08x (%08x) %s\n", data, mem_mask, machine().describe_context());
@@ -133,9 +132,9 @@ void pgm_arm_type3_state::svg_68k_mem(address_map &map)
 	pgm_mem(map);
 	map(0x100000, 0x1fffff).bankr("bank1");  /* Game ROM */
 
-	map(0x500000, 0x50ffff).rw(this, FUNC(pgm_arm_type3_state::svg_m68k_ram_r), FUNC(pgm_arm_type3_state::svg_m68k_ram_w));    /* ARM7 Shared RAM */
-	map(0x5c0000, 0x5c0001).rw(this, FUNC(pgm_arm_type3_state::svg_68k_nmi_r), FUNC(pgm_arm_type3_state::svg_68k_nmi_w));      /* ARM7 FIQ */
-	map(0x5c0300, 0x5c0301).rw(this, FUNC(pgm_arm_type3_state::svg_latch_68k_r), FUNC(pgm_arm_type3_state::svg_latch_68k_w)); /* ARM7 Latch */
+	map(0x500000, 0x50ffff).rw(FUNC(pgm_arm_type3_state::svg_m68k_ram_r), FUNC(pgm_arm_type3_state::svg_m68k_ram_w));    /* ARM7 Shared RAM */
+	map(0x5c0000, 0x5c0001).rw(FUNC(pgm_arm_type3_state::svg_68k_nmi_r), FUNC(pgm_arm_type3_state::svg_68k_nmi_w));      /* ARM7 FIQ */
+	map(0x5c0300, 0x5c0301).rw(FUNC(pgm_arm_type3_state::svg_latch_68k_r), FUNC(pgm_arm_type3_state::svg_latch_68k_w)); /* ARM7 Latch */
 }
 
 
@@ -145,19 +144,17 @@ void pgm_arm_type3_state::_55857G_arm7_map(address_map &map)
 	map(0x08000000, 0x087fffff).rom().region("user1", 0);
 	map(0x10000000, 0x100003ff).ram().share("arm_ram2");
 	map(0x18000000, 0x1803ffff).ram().share("arm_ram");
-	map(0x38000000, 0x3800ffff).rw(this, FUNC(pgm_arm_type3_state::svg_arm7_shareram_r), FUNC(pgm_arm_type3_state::svg_arm7_shareram_w));
-	map(0x48000000, 0x48000003).rw(this, FUNC(pgm_arm_type3_state::svg_latch_arm_r), FUNC(pgm_arm_type3_state::svg_latch_arm_w)); /* 68k Latch */
-	map(0x40000018, 0x4000001b).w(this, FUNC(pgm_arm_type3_state::svg_arm7_ram_sel_w)); /* RAM SEL */
+	map(0x38000000, 0x3800ffff).rw(FUNC(pgm_arm_type3_state::svg_arm7_shareram_r), FUNC(pgm_arm_type3_state::svg_arm7_shareram_w));
+	map(0x48000000, 0x48000003).rw(FUNC(pgm_arm_type3_state::svg_latch_arm_r), FUNC(pgm_arm_type3_state::svg_latch_arm_w)); /* 68k Latch */
+	map(0x40000018, 0x4000001b).w(FUNC(pgm_arm_type3_state::svg_arm7_ram_sel_w)); /* RAM SEL */
 	map(0x50000000, 0x500003ff).ram();
 }
 
 
-
-
-MACHINE_RESET_MEMBER(pgm_arm_type3_state, pgm_arm_type3_reset)
+void pgm_arm_type3_state::machine_reset()
 {
 	// internal roms aren't fully dumped
-	uint16_t *temp16 = (uint16_t *)memregion("prot")->base();
+	u16 *temp16 = (u16 *)memregion("prot")->base();
 	int base = -1;
 
 	if (!strcmp(machine().system().name, "theglad")) base = 0x3316;
@@ -165,67 +162,84 @@ MACHINE_RESET_MEMBER(pgm_arm_type3_state, pgm_arm_type3_reset)
 	if (!strcmp(machine().system().name, "theglad101")) base = 0x3316;
 	if (!strcmp(machine().system().name, "happy6")) base = 0x3586;
 	if (!strcmp(machine().system().name, "happy6101")) base = 0x3586;
+	if (!strcmp(machine().system().name, "happy6100hk")) base = 0x3586;
 	if (!strcmp(machine().system().name, "svgpcb")) base = 0x3a8e;
 	if (!strcmp(machine().system().name, "svg")) base = 0x3c3e;
 	if (!strcmp(machine().system().name, "svgtw")) base = 0x3a8e;
 
 	if (base != -1)
 	{
-		int regionhack = ioport("RegionHack")->read();
+		const int regionhack = m_regionhack->read();
 		if (regionhack != 0xff)
 		{
 //          printf("%04x\n", temp16[(base) / 2]);
 			temp16[(base) / 2] = regionhack; base += 2;
 		}
 	}
-	MACHINE_RESET_CALL_MEMBER(pgm);
-}
-
-MACHINE_START_MEMBER(pgm_arm_type3_state,pgm_arm_type3)
-{
-	MACHINE_START_CALL_MEMBER(pgm);
-	/* register type specific Save State stuff here */
+	pgm_state::machine_reset();
 }
 
 
 /******* ARM 55857G *******/
 
-MACHINE_CONFIG_START(pgm_arm_type3_state::pgm_arm_type3)
+void pgm_arm_type3_state::pgm_arm_type3(machine_config &config) // ARM7 Shared motherboard XTAL
+{
 	pgmbase(config);
 
-	MCFG_MACHINE_START_OVERRIDE(pgm_arm_type3_state, pgm_arm_type3 )
-
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(svg_68k_mem)
+	m_maincpu->set_addrmap(AS_PROGRAM, &pgm_arm_type3_state::svg_68k_mem);
 
 	/* protection CPU */
-	MCFG_CPU_ADD("prot", ARM7, XTAL(33'000'000))    // 55857G - 33Mhz Xtal, at least on SVG
-	MCFG_CPU_PROGRAM_MAP(_55857G_arm7_map)
+	ARM7(config, m_prot, 20000000);    // 55857G
+	m_prot->set_addrmap(AS_PROGRAM, &pgm_arm_type3_state::_55857G_arm7_map);
+}
 
-	MCFG_MACHINE_RESET_OVERRIDE(pgm_arm_type3_state, pgm_arm_type3_reset)
-MACHINE_CONFIG_END
+void pgm_arm_type3_state::pgm_arm_type3_22m(machine_config &config) // ARM7 uses 22MHz XTAL (dmnfrnt theglad)
+{
+	pgm_arm_type3(config);
 
+	m_prot->set_clock(22000000);
+}
+
+void pgm_arm_type3_state::pgm_arm_type3_24m(machine_config &config) // ARM7 uses 24MHz XTAL (dmnfrntpcb happy6)
+{
+	pgm_arm_type3(config);
+
+	m_prot->set_clock(24000000);
+}
+
+void pgm_arm_type3_state::pgm_arm_type3_33m(machine_config &config) // ARM7 uses 33MHz XTAL (thegladpcb svg)
+{
+	pgm_arm_type3(config);
+
+	m_prot->set_clock(XTAL(33'000'000));
+}
+
+void pgm_arm_type3_state::pgm_arm_type3_33_8688m(machine_config &config) // ARM7 uses 33.8688MHz XTAL (killbldp)
+{
+	pgm_arm_type3(config);
+
+	m_prot->set_clock(XTAL(33'868'800));
+}
 
 
 void pgm_arm_type3_state::svg_basic_init()
 {
 	pgm_basic_init();
-	m_svg_shareram[0] = std::make_unique<uint32_t[]>(0x20000 / 4);
-	m_svg_shareram[1] = std::make_unique<uint32_t[]>(0x20000 / 4);
+	m_svg_shareram[0] = std::make_unique<u32[]>(0x20000 / 4);
+	m_svg_shareram[1] = std::make_unique<u32[]>(0x20000 / 4);
 	m_svg_ram_sel = 0;
 
-	save_pointer(NAME(m_svg_shareram[0].get()), 0x20000 / 4);
-	save_pointer(NAME(m_svg_shareram[1].get()), 0x20000 / 4);
+	save_pointer(NAME(m_svg_shareram[0]), 0x20000 / 4);
+	save_pointer(NAME(m_svg_shareram[1]), 0x20000 / 4);
 	save_item(NAME(m_svg_ram_sel));
 }
 
 void pgm_arm_type3_state::pgm_create_dummy_internal_arm_region(int size)
 {
-	uint16_t *temp16 = (uint16_t *)memregion("prot")->base();
+	u16 *temp16 = (u16 *)memregion("prot")->base();
 
 	// fill with RX 14
-	int i;
-	for (i=0;i<size/2;i+=2)
+	for (int i = 0; i < size / 2; i += 2)
 	{
 		temp16[i] = 0xff1e;
 		temp16[i+1] = 0xe12f;
@@ -254,7 +268,7 @@ void pgm_arm_type3_state::svg_latch_init()
 
 READ32_MEMBER(pgm_arm_type3_state::theglad_speedup_r )
 {
-	int pc = m_prot->pc();
+	const int pc = m_prot->pc();
 	if (pc == 0x7c4) m_prot->eat_cycles(500);
 	//else printf("theglad_speedup_r %08x\n", pc);
 	return m_arm_ram2[0x00c/4];
@@ -263,7 +277,7 @@ READ32_MEMBER(pgm_arm_type3_state::theglad_speedup_r )
 
 READ32_MEMBER(pgm_arm_type3_state::happy6_speedup_r )
 {
-	int pc = m_prot->pc();
+	const int pc = m_prot->pc();
 	if (pc == 0x0a08) m_prot->eat_cycles(500);
 	//else printf("theglad_speedup_r %08x\n", pc);
 	return m_arm_ram2[0x00c/4];
@@ -272,14 +286,14 @@ READ32_MEMBER(pgm_arm_type3_state::happy6_speedup_r )
 // installed over rom
 READ32_MEMBER(pgm_arm_type3_state::svg_speedup_r )
 {
-	int pc = m_prot->pc();
+	const int pc = m_prot->pc();
 	if (pc == 0xb90) m_prot->eat_cycles(500);
 	return m_armrom[0xb90/4];
 }
 
 READ32_MEMBER(pgm_arm_type3_state::svgpcb_speedup_r )
 {
-	int pc = m_prot->pc();
+	const int pc = m_prot->pc();
 	if (pc == 0x9e0) m_prot->eat_cycles(500);
 	return m_armrom[0x9e0/4];
 }
@@ -287,13 +301,11 @@ READ32_MEMBER(pgm_arm_type3_state::svgpcb_speedup_r )
 
 void pgm_arm_type3_state::pgm_create_dummy_internal_arm_region_theglad(int is_svg)
 {
-	uint16_t *temp16 = (uint16_t *)memregion("prot")->base();
-	int i;
-	for (i=0;i<0x188/2;i+=2)
+	u16 *temp16 = (u16 *)memregion("prot")->base();
+	for (int i = 0; i < 0x188 / 2; i += 2)
 	{
 		temp16[i] = 0xFFFE;
 		temp16[i+1] = 0xEAFF;
-
 	}
 
 	// the interrupt code appears to be at 0x08000010
@@ -497,8 +509,6 @@ void pgm_arm_type3_state::pgm_create_dummy_internal_arm_region_theglad(int is_sv
 		temp16[(base) / 2] = 0xe59f; base += 2;
 	}
 
-
-
 	base = 0x150;
 	temp16[(base) /2] = 0xff1e; base += 2;
 	temp16[(base) /2] = 0xe12f; base += 2;
@@ -510,7 +520,7 @@ void pgm_arm_type3_state::pgm_create_dummy_internal_arm_region_theglad(int is_sv
 	temp16[(base) /2] = 0xE59F; base += 2;
 }
 
-DRIVER_INIT_MEMBER(pgm_arm_type3_state,theglad)
+void pgm_arm_type3_state::init_theglad()
 {
 	svg_basic_init();
 	pgm_theglad_decrypt(machine());
@@ -520,14 +530,14 @@ DRIVER_INIT_MEMBER(pgm_arm_type3_state,theglad)
 	pgm_create_dummy_internal_arm_region_theglad(0);
 
 
-	m_prot->space(AS_PROGRAM).install_read_handler(0x1000000c, 0x1000000f, read32_delegate(FUNC(pgm_arm_type3_state::theglad_speedup_r),this));
+	m_prot->space(AS_PROGRAM).install_read_handler(0x1000000c, 0x1000000f, read32_delegate(*this, FUNC(pgm_arm_type3_state::theglad_speedup_r)));
 }
 
 
 void pgm_arm_type3_state::pgm_patch_external_arm_rom_jumptable_theglada(int base)
 {
-	// we don't have the correct internal ROM for this version, so insead we use the one we have and patch the jump table in the external ROM
-	uint32_t subroutine_addresses[] =
+	// we don't have the correct internal ROM for this version, so instead we use the one we have and patch the jump table in the external ROM
+	u32 subroutine_addresses[] =
 	{
 		0x00FC, 0x00E8, 0x0110, 0x0150, 0x0194, 0x06C8, 0x071C, 0x0728,
 		0x0734, 0x0740, 0x0784, 0x0794, 0x07FC, 0x0840, 0x086C, 0x0988,
@@ -547,7 +557,7 @@ void pgm_arm_type3_state::pgm_patch_external_arm_rom_jumptable_theglada(int base
 		0x3050, 0x30A4, 0x30F8, 0x3120, 0x249C, 0x24C0, 0x27BC, 0x2B40,
 		0x2BF4, 0x2CD8, 0x2E2C
 	};
-	uint16_t *extprot = (uint16_t *)memregion("user1")->base();
+	u16 *extprot = (u16 *)memregion("user1")->base();
 	/*
 	0x00C8,0x00B4,0x00DC,0x011C,0x0160,0x02DC,0x0330,0x033C,
 	0x0348,0x0354,0x0398,0x03A8,0x0410,0x0454,0x0480,0x059C,
@@ -571,7 +581,7 @@ void pgm_arm_type3_state::pgm_patch_external_arm_rom_jumptable_theglada(int base
 
 	for (auto & subroutine_addresse : subroutine_addresses)
 	{
-//      uint32_t addr = extprot[(base/2)] | (extprot[(base/2) + 1] << 16);
+//      u32 addr = extprot[(base/2)] | (extprot[(base/2) + 1] << 16);
 		extprot[(base / 2)] = subroutine_addresse;
 
 		base += 4;
@@ -579,9 +589,9 @@ void pgm_arm_type3_state::pgm_patch_external_arm_rom_jumptable_theglada(int base
 	}
 }
 
-DRIVER_INIT_MEMBER(pgm_arm_type3_state, theglada)
+void pgm_arm_type3_state::init_theglada()
 {
-	DRIVER_INIT_CALL(theglad);
+	init_theglad();
 
 	pgm_patch_external_arm_rom_jumptable_theglada(0x82078);
 
@@ -594,7 +604,7 @@ INPUT_PORTS_START( theglad )
 	PORT_CONFNAME( 0x00ff, 0x00ff, DEF_STR( Region ) )
 	PORT_CONFSETTING(      0x0000, DEF_STR( China ) )
 	PORT_CONFSETTING(      0x0001, DEF_STR( Taiwan ) )
-	//PORT_CONFSETTING(      0x0002, DEF_STR( Japan ) ) // it doesn't appear that carts of the Japanese version were released, the PCB has an extra sample ROM used in Japanese mode for the music
+	//PORT_CONFSETTING(      0x0002, "Japan (Alta/AMI license)" ) // it doesn't appear that carts of the Japanese version were released, the PCB has an extra sample ROM used in Japanese mode for the music
 	PORT_CONFSETTING(      0x0003, DEF_STR( Korea ) )
 	PORT_CONFSETTING(      0x0004, DEF_STR( Hong_Kong ) )
 	PORT_CONFSETTING(      0x0005, "Spanish Territories" )
@@ -609,7 +619,7 @@ INPUT_PORTS_START( svg )
 	PORT_CONFNAME( 0x00ff, 0x00ff, DEF_STR( Region ) )
 	PORT_CONFSETTING(      0x0000, DEF_STR( China ) )
 	PORT_CONFSETTING(      0x0001, DEF_STR( Taiwan ) )
-	PORT_CONFSETTING(      0x0002, DEF_STR( Japan ) )
+	PORT_CONFSETTING(      0x0002, "Japan (AMI license)" )
 	PORT_CONFSETTING(      0x0003, DEF_STR( Korea ) )
 	PORT_CONFSETTING(      0x0004, DEF_STR( Hong_Kong ) )
 	PORT_CONFSETTING(      0x0005, "Spanish Territories" )
@@ -624,6 +634,21 @@ INPUT_PORTS_START( svgtw )
 	PORT_CONFNAME( 0x00ff, 0x0001, DEF_STR( Region ) )
 	PORT_CONFSETTING(      0x0000, DEF_STR( China ) )
 	PORT_CONFSETTING(      0x0001, DEF_STR( Taiwan ) )
+	PORT_CONFSETTING(      0x0002, "Japan (AMI license)" )
+	PORT_CONFSETTING(      0x0003, DEF_STR( Korea ) )
+	PORT_CONFSETTING(      0x0004, DEF_STR( Hong_Kong ) )
+	PORT_CONFSETTING(      0x0005, "Spanish Territories" )
+	PORT_CONFSETTING(      0x0006, DEF_STR( World ) )
+	PORT_CONFSETTING(      0x00ff, "Don't Change" ) // don't hack the region
+INPUT_PORTS_END
+
+INPUT_PORTS_START( svgpcb )
+	PORT_INCLUDE ( pgm )
+
+	PORT_START("RegionHack")    /* Region - actually supplied by protection device */
+	PORT_CONFNAME( 0x00ff, 0x00ff, DEF_STR( Region ) )
+	PORT_CONFSETTING(      0x0000, DEF_STR( China ) )
+	PORT_CONFSETTING(      0x0001, DEF_STR( Taiwan ) )
 	PORT_CONFSETTING(      0x0002, DEF_STR( Japan ) )
 	PORT_CONFSETTING(      0x0003, DEF_STR( Korea ) )
 	PORT_CONFSETTING(      0x0004, DEF_STR( Hong_Kong ) )
@@ -632,47 +657,44 @@ INPUT_PORTS_START( svgtw )
 	PORT_CONFSETTING(      0x00ff, "Don't Change" ) // don't hack the region
 INPUT_PORTS_END
 
-DRIVER_INIT_MEMBER(pgm_arm_type3_state,svg)
+void pgm_arm_type3_state::init_svg()
 {
 	svg_basic_init();
 	pgm_svg_decrypt(machine());
 	svg_latch_init();
 	pgm_create_dummy_internal_arm_region_theglad(1);
-	m_armrom = (uint32_t *)memregion("prot")->base();
-	m_prot->space(AS_PROGRAM).install_read_handler(0xB90, 0xB93, read32_delegate(FUNC(pgm_arm_type3_state::svg_speedup_r),this));
-
-
+	m_armrom = (u32 *)memregion("prot")->base();
+	m_prot->space(AS_PROGRAM).install_read_handler(0xB90, 0xB93, read32_delegate(*this, FUNC(pgm_arm_type3_state::svg_speedup_r)));
 }
 
-DRIVER_INIT_MEMBER(pgm_arm_type3_state,svgpcb)
+void pgm_arm_type3_state::init_svgpcb()
 {
 	svg_basic_init();
 	pgm_svgpcb_decrypt(machine());
 	svg_latch_init();
 	pgm_create_dummy_internal_arm_region_theglad(0);
-	m_armrom = (uint32_t *)memregion("prot")->base();
-	m_prot->space(AS_PROGRAM).install_read_handler(0x9e0, 0x9e3, read32_delegate(FUNC(pgm_arm_type3_state::svgpcb_speedup_r),this));
-
+	m_armrom = (u32 *)memregion("prot")->base();
+	m_prot->space(AS_PROGRAM).install_read_handler(0x9e0, 0x9e3, read32_delegate(*this, FUNC(pgm_arm_type3_state::svgpcb_speedup_r)));
 }
 
 
 READ32_MEMBER(pgm_arm_type3_state::killbldp_speedup_r )
 {
-	int pc = m_prot->pc();
+	const int pc = m_prot->pc();
 	if (pc == 0x7d8) m_prot->eat_cycles(500);
 	//else printf("killbldp_speedup_r %08x\n", pc);
 	return m_arm_ram2[0x00c/4];
 }
 
-DRIVER_INIT_MEMBER(pgm_arm_type3_state,killbldp)
+void pgm_arm_type3_state::init_killbldp()
 {
 	svg_basic_init();
 	pgm_killbldp_decrypt(machine());
 	svg_latch_init();
 
-	m_prot->space(AS_PROGRAM).install_read_handler(0x1000000c, 0x1000000f, read32_delegate(FUNC(pgm_arm_type3_state::killbldp_speedup_r),this));
+	m_prot->space(AS_PROGRAM).install_read_handler(0x1000000c, 0x1000000f, read32_delegate(*this, FUNC(pgm_arm_type3_state::killbldp_speedup_r)));
 
-//  uint16_t *temp16 = (uint16_t *)memregion("prot")->base();
+//  u16 *temp16 = (u16 *)memregion("prot")->base();
 //  int base = 0xfc; // startup table uploads
 //  temp16[(base) /2] = 0x0000; base += 2;
 //  temp16[(base) /2] = 0xE1A0; base += 2;
@@ -689,7 +711,7 @@ DRIVER_INIT_MEMBER(pgm_arm_type3_state,killbldp)
 
 READ32_MEMBER(pgm_arm_type3_state::dmnfrnt_speedup_r )
 {
-	int pc = m_prot->pc();
+	const int pc = m_prot->pc();
 	if (pc == 0x8000fea) m_prot->eat_cycles(500);
 //  else printf("dmn_speedup_r %08x\n", pc);
 	return m_arm_ram[0x000444/4];
@@ -697,14 +719,14 @@ READ32_MEMBER(pgm_arm_type3_state::dmnfrnt_speedup_r )
 
 READ16_MEMBER(pgm_arm_type3_state::dmnfrnt_main_speedup_r )
 {
-	uint16_t data = m_mainram[0xa03c/2];
-	int pc = m_maincpu->pc();
+	u16 data = m_mainram[0xa03c/2];
+	const int pc = m_maincpu->pc();
 	if (pc == 0x10193a) m_maincpu->spin_until_interrupt();
 	else if (pc == 0x1019a4) m_maincpu->spin_until_interrupt();
 	return data;
 }
 
-DRIVER_INIT_MEMBER(pgm_arm_type3_state,dmnfrnt)
+void pgm_arm_type3_state::init_dmnfrnt()
 {
 	svg_basic_init();
 	pgm_dfront_decrypt(machine());
@@ -713,18 +735,18 @@ DRIVER_INIT_MEMBER(pgm_arm_type3_state,dmnfrnt)
 	/* put some fake code for the ARM here ... */
 	pgm_create_dummy_internal_arm_region(0x4000);
 
-	m_prot->space(AS_PROGRAM).install_read_handler(0x18000444, 0x18000447, read32_delegate(FUNC(pgm_arm_type3_state::dmnfrnt_speedup_r),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80a03c, 0x80a03d, read16_delegate(FUNC(pgm_arm_type3_state::dmnfrnt_main_speedup_r),this));
+	m_prot->space(AS_PROGRAM).install_read_handler(0x18000444, 0x18000447, read32_delegate(*this, FUNC(pgm_arm_type3_state::dmnfrnt_speedup_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80a03c, 0x80a03d, read16_delegate(*this, FUNC(pgm_arm_type3_state::dmnfrnt_main_speedup_r)));
 
 	m_svg_ram_sel = 1;
 
 	// the internal rom probably also supplies the region here
 	// we have to copy it to both shared ram regions because it reads from a different one before the attract story?
 	// could be a timing error? or shared ram behavior isn't how we think it is?
-	uint16_t *share16;
-	share16 = (uint16_t *)(m_svg_shareram[1].get());
+	u16 *share16;
+	share16 = (u16 *)(m_svg_shareram[1].get());
 	share16[0x158/2] = 0x0005;
-	share16 = (uint16_t *)(m_svg_shareram[0].get());
+	share16 = (u16 *)(m_svg_shareram[0].get());
 	share16[0x158/2] = 0x0005;
 }
 
@@ -733,9 +755,9 @@ DRIVER_INIT_MEMBER(pgm_arm_type3_state,dmnfrnt)
 // buffer[i] = src[j]
 
 // todo, collapse these to an address swap
-void pgm_arm_type3_state::pgm_descramble_happy6(uint8_t* src)
+void pgm_arm_type3_state::pgm_descramble_happy6(u8* src)
 {
-	std::vector<uint8_t> buffer(0x800000);
+	std::vector<u8> buffer(0x800000);
 	int writeaddress = 0;
 
 	for (int j = 0; j < 0x800; j += 0x200)
@@ -751,9 +773,9 @@ void pgm_arm_type3_state::pgm_descramble_happy6(uint8_t* src)
 
 
 
-void pgm_arm_type3_state::pgm_descramble_happy6_2(uint8_t* src)
+void pgm_arm_type3_state::pgm_descramble_happy6_2(u8* src)
 {
-	std::vector<uint8_t> buffer(0x800000);
+	std::vector<u8> buffer(0x800000);
 	int writeaddress = 0;
 	for (int k = 0; k < 0x800000; k += 0x100000)
 	{
@@ -778,31 +800,42 @@ INPUT_PORTS_START( happy6 )
 	PORT_CONFSETTING(      0x0001, DEF_STR( Taiwan ) )
 	PORT_CONFSETTING(      0x0002, DEF_STR( Hong_Kong ) )
 	PORT_CONFSETTING(      0x0003, "Singapore" )
-	PORT_CONFSETTING(      0x0004, "Oversea" ) // unlikely this actually exists, there's no english anything!
+	PORT_CONFSETTING(      0x0004, "Oversea" ) // unlikely this actually exists, there's no English anything!
 	PORT_CONFSETTING(      0x00ff, "Don't Change" ) // don't hack the region
 INPUT_PORTS_END
 
-DRIVER_INIT_MEMBER(pgm_arm_type3_state,happy6)
+INPUT_PORTS_START( happy6hk )
+	PORT_INCLUDE ( pgm )
+
+	PORT_START("RegionHack")    /* Region - actually supplied by protection device */
+	PORT_CONFNAME( 0x00ff, 0x0002, DEF_STR( Region ) )
+	PORT_CONFSETTING(      0x0000, DEF_STR( China ) )
+	PORT_CONFSETTING(      0x0001, DEF_STR( Taiwan ) )
+	PORT_CONFSETTING(      0x0002, DEF_STR( Hong_Kong ) )
+	PORT_CONFSETTING(      0x0003, "Singapore" )
+	PORT_CONFSETTING(      0x0004, "Oversea" ) // unlikely this actually exists, there's no English anything!
+	PORT_CONFSETTING(      0x00ff, "Don't Change" ) // don't hack the region
+INPUT_PORTS_END
+
+void pgm_arm_type3_state::init_happy6()
 {
-	uint8_t *src;
-
-	src = (uint8_t *)(machine().root_device().memregion("tiles")->base()) + 0x180000;
+	u8 *src = (u8 *)(machine().root_device().memregion("tiles")->base()) + 0x180000;
 	pgm_descramble_happy6(src);
 	pgm_descramble_happy6_2(src);
 
-	src = (uint8_t *)(machine().root_device().memregion("sprcol")->base()) + 0x000000;
+	src = (u8 *)(machine().root_device().memregion("sprcol")->base()) + 0x000000;
 	pgm_descramble_happy6(src);
 	pgm_descramble_happy6_2(src);
 
-	src = (uint8_t *)(machine().root_device().memregion("sprcol")->base()) + 0x0800000;
+	src = (u8 *)(machine().root_device().memregion("sprcol")->base()) + 0x0800000;
 	pgm_descramble_happy6(src);
 	pgm_descramble_happy6_2(src);
 
-	src = (uint8_t *)(machine().root_device().memregion("sprmask")->base());
+	src = (u8 *)(machine().root_device().memregion("sprmask")->base());
 	pgm_descramble_happy6(src);
 	pgm_descramble_happy6_2(src);
 
-	src = (uint8_t *)(machine().root_device().memregion("ics")->base()) + 0x400000;
+	src = (u8 *)(machine().root_device().memregion("ics")->base()) + 0x400000;
 	pgm_descramble_happy6(src);
 	pgm_descramble_happy6_2(src);
 
@@ -811,5 +844,5 @@ DRIVER_INIT_MEMBER(pgm_arm_type3_state,happy6)
 	svg_latch_init();
 	pgm_create_dummy_internal_arm_region_theglad(0);
 
-	m_prot->space(AS_PROGRAM).install_read_handler(0x1000000c, 0x1000000f, read32_delegate(FUNC(pgm_arm_type3_state::happy6_speedup_r),this));
+	m_prot->space(AS_PROGRAM).install_read_handler(0x1000000c, 0x1000000f, read32_delegate(*this, FUNC(pgm_arm_type3_state::happy6_speedup_r)));
 }

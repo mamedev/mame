@@ -1,0 +1,20 @@
+# license:BSD-3-Clause
+# copyright-holders:David Haywood
+# Super XaviX (SSD 2000) - m6502 with custom opcodes
+brk_xav_imp ora_xav_idx  cmc_imp     oraj_imp   asr_xav_zpg ora_xav_zpg asl_xav_zpg orak_imp   php_xav_imp ora_imm     asl_acc     oral_imp   asr_aba     ora_aba     asl_aba     oram_imp
+bpl_rel     ora_xav_idy  phx_imp     orapa_imp  asr_xav_zpx ora_xav_zpx asl_xav_zpx orapb_imp  clc_imp     ora_aby     asr_acc     spa0_imp   asr_abx     ora_abx     asl_abx     spb0_imp
+jsr_xav_adr and_xav_idx  callf_xa3   andj_imp   bit_xav_zpg and_xav_zpg rol_xav_zpg andk_imp   plp_xav_imp and_imm     rol_acc     andl_imp   bit_aba     and_aba     rol_aba     andm_imp
+bmi_rel     and_xav_idy  plx_imp     andpa_imp  bit_xav_zpx and_xav_zpx rol_xav_zpx andpb_imp  sec_imp     and_aby     bit_imm     lpa0_imp   bit_abx     and_abx     rol_abx     lpb0_imp
+rti_xav_imp eor_xav_idx  nop_imp     eorj_imp   nop_imp     eor_xav_zpg lsr_xav_zpg eork_imp   pha_xav_imp eor_imm     lsr_acc     eorl_imp   jmp_adr     eor_aba     lsr_aba     eorm_imp
+bvc_rel     eor_xav_idy  phy_imp     eorpa_imp  nop_imp     eor_xav_zpx lsr_xav_zpx eorpb_imp  cli_imp     eor_aby     nop_imp     spa1_imp   jmp_xa3     eor_abx     lsr_abx     spb1_imp
+rts_xav_imp adc_xav_idx  nop_imp     adcj_imp   nop_imp     adc_xav_zpg ror_xav_zpg adck_imp   pla_xav_imp adc_imm     ror_acc     adcl_imp   jmp_ind     adc_aba     ror_aba     adcm_imp
+bvs_rel     adc_xav_idy  ply_imp     adcpa_imp  nop_imp     adc_xav_zpx ror_xav_zpx adcpb_imp  sei_imp     adc_aby     nop_imp     lpa1_imp   jmpf_ind    adc_abx     ror_abx     lpb1_imp
+retf_imp    sta_xav_idx  stz_xav_zpg staj_imp   sty_xav_zpg sta_xav_zpg stx_xav_zpg stak_imp   dey_imp     sev_imp     txa_imp     stal_imp   sty_aba     sta_aba     stx_aba     stam_imp
+bcc_rel     sta_xav_idy  stz_aba     stapa_imp  sty_xav_zpx sta_xav_zpx stx_xav_zpy stapb_imp  tya_imp     sta_aby     txs_imp     spa2_imp   sty_abx     sta_abx     stx_aby     spb2_imp
+ldy_imm     lda_xav_idx  ldx_imm     ldaj_imp   ldy_xav_zpg lda_xav_zpg ldx_xav_zpg ldak_imp   tay_imp     lda_imm     tax_imp     ldal_imp   ldy_aba     lda_aba     ldx_aba     ldam_imp
+bcs_rel     lda_xav_idy  clr_acc     ldapa_imp  ldy_xav_zpx lda_xav_zpx ldx_xav_zpy ldapb_imp  clv_imp     lda_aby     tsx_imp     lpa2_imp   ldy_abx     lda_abx     ldx_aby     lpb2_imp
+cpy_imm     cmp_xav_idx  dec_acc     cmpj_imp   cpy_xav_zpg cmp_xav_zpg dec_xav_zpg cmpk_imp   iny_imp     cmp_imm     dex_imp     cmpl_imp   cpy_aba     cmp_aba     dec_aba     cmpm_imp
+bne_rel     cmp_xav_idy  not_acc     cmppa_imp  nop_imp     cmp_xav_zpx dec_xav_zpx cmppb_imp  cld_imp     cmp_aby     nop_imp     decpa_imp  nop_imp     cmp_abx     dec_abx     decpb_imp
+cpx_imm     sbc_xav_idx  inc_acc     sbcj_imp   cpx_xav_zpg sbc_xav_zpg inc_xav_zpg sbck_imp   inx_imp     sbc_imm     nop_imp     sbcl_imp   cpx_aba     sbc_aba     inc_aba     sbcm_imp
+beq_rel     sbc_xav_idy  neg_acc     sbcpa_imp  nop_imp     sbc_xav_zpx inc_xav_zpx sbcpb_imp  sed_imp     sbc_aby     nop_imp     incpa_imp  nop_imp     sbc_abx     inc_abx     incpb_imp
+reset

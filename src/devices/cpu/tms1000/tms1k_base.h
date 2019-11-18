@@ -17,31 +17,6 @@
 #include "machine/pla.h"
 
 
-// K input pins
-#define MCFG_TMS1XXX_READ_K_CB(_devcb) \
-	devcb = &downcast<tms1k_base_device &>(*device).set_read_k_callback(DEVCB_##_devcb);
-
-// O/Segment output pins
-#define MCFG_TMS1XXX_WRITE_O_CB(_devcb) \
-	devcb = &downcast<tms1k_base_device &>(*device).set_write_o_callback(DEVCB_##_devcb);
-
-// Use this if the output PLA is unknown:
-// If the microinstructions (or other) PLA is unknown, try using one from another romset.
-#define MCFG_TMS1XXX_OUTPUT_PLA(_pla) \
-	downcast<tms1k_base_device &>(*device).set_output_pla(_pla);
-
-// R output pins (also called D on some chips)
-#define MCFG_TMS1XXX_WRITE_R_CB(_devcb) \
-	devcb = &downcast<tms1k_base_device &>(*device).set_write_r_callback(DEVCB_##_devcb);
-
-// OFF request on TMS0980 and up
-#define MCFG_TMS1XXX_POWER_OFF_CB(_devcb) \
-	devcb = &downcast<tms1k_base_device &>(*device).set_power_off_callback(DEVCB_##_devcb);
-
-// HALT input pin on CMOS chips (use set_input_line)
-#define TMS1XXX_INPUT_LINE_HALT 0
-
-
 // pinout reference
 
 /*
@@ -87,11 +62,28 @@
 class tms1k_base_device : public cpu_device
 {
 public:
-	// configuration helpers
-	template <class Object> devcb_base &set_read_k_callback(Object &&cb) { return m_read_k.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_write_o_callback(Object &&cb) { return m_write_o.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_write_r_callback(Object &&cb) { return m_write_r.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_power_off_callback(Object &&cb) { return m_power_off.set_callback(std::forward<Object>(cb)); }
+	// K input pins
+	auto k() { return m_read_k.bind(); }
+
+	// O/Segment output pins
+	auto o() { return m_write_o.bind(); }
+
+	// R output pins (also called D on some chips)
+	auto r() { return m_write_r.bind(); }
+
+	// OFF request on TMS0980 and up
+	auto power_off() { return m_power_off.bind(); }
+
+	// note: for HALT input pin on CMOS chips, use set_input_line with INPUT_LINE_HALT
+	// similarly with the INIT pin, simply use INPUT_LINE_RESET
+
+	// TMS0270 was designed to interface with TMS5100, set it up at driver level
+	auto read_ctl() { return m_read_ctl.bind(); }
+	auto write_ctl() { return m_write_ctl.bind(); }
+	auto write_pdc() { return m_write_pdc.bind(); }
+
+	// Use this if the output PLA is unknown:
+	// If the microinstructions (or other) PLA is unknown, try using one from another romset.
 	void set_output_pla(const u16 *output_pla) { m_output_pla_table = output_pla; }
 
 	u8 debug_peek_o_index() { return m_o_index; } // get output PLA index, for debugging (don't use in emulation)
@@ -105,10 +97,8 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual u32 execute_min_cycles() const override { return 1; }
-	virtual u32 execute_max_cycles() const override { return 1; }
-	virtual u32 execute_input_lines() const override { return 1; }
-	virtual void execute_set_input(int line, int state) override;
+	virtual u32 execute_min_cycles() const noexcept override { return 1; }
+	virtual u32 execute_max_cycles() const noexcept override { return 1; }
 	virtual void execute_run() override;
 	virtual void execute_one();
 
@@ -257,7 +247,6 @@ protected:
 	int m_subcycle;
 	int m_icount;
 	u8 m_o_index;
-	bool m_halt_pin;
 
 	u8 m_o_pins;    // how many O pins
 	u8 m_r_pins;    // how many R pins
@@ -273,6 +262,9 @@ protected:
 	devcb_write16 m_write_o;
 	devcb_write16 m_write_r;
 	devcb_write_line m_power_off;
+	devcb_read8 m_read_ctl;
+	devcb_write8 m_write_ctl;
+	devcb_write_line m_write_pdc;
 
 	u32 m_o_mask;
 	u32 m_r_mask;

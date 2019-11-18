@@ -29,8 +29,9 @@ DEFINE_DEVICE_TYPE(ECBBUS_SLOT, ecbbus_slot_device, "ecbbus_slot", "ECB bus slot
 
 ecbbus_slot_device::ecbbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ECBBUS_SLOT, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
-	m_bus_tag(nullptr), m_bus_num(0), m_bus(nullptr)
+	device_single_card_slot_interface<device_ecbbus_card_interface>(mconfig, *this),
+	m_bus(*this, finder_base::DUMMY_TAG),
+	m_bus_num(0)
 {
 }
 
@@ -41,9 +42,9 @@ ecbbus_slot_device::ecbbus_slot_device(const machine_config &mconfig, const char
 
 void ecbbus_slot_device::device_start()
 {
-	m_bus = machine().device<ecbbus_device>(m_bus_tag);
-	device_ecbbus_card_interface *dev = dynamic_cast<device_ecbbus_card_interface *>(get_card_device());
-	if (dev) m_bus->add_card(dev, m_bus_num);
+	device_ecbbus_card_interface *const dev = get_card_device();
+	if (dev)
+		m_bus->add_card(*dev, m_bus_num);
 }
 
 
@@ -65,7 +66,7 @@ DEFINE_DEVICE_TYPE(ECBBUS, ecbbus_device, "ecbbus", "ECB bus")
 //-------------------------------------------------
 
 device_ecbbus_card_interface::device_ecbbus_card_interface(const machine_config &mconfig, device_t &device) :
-	device_slot_card_interface(mconfig, device)
+	device_interface(device, "ecbbus")
 {
 	m_slot = dynamic_cast<ecbbus_slot_device *>(device.owner());
 }
@@ -105,9 +106,9 @@ void ecbbus_device::device_start()
 //  add_card - add ECB bus card
 //-------------------------------------------------
 
-void ecbbus_device::add_card(device_ecbbus_card_interface *card, int pos)
+void ecbbus_device::add_card(device_ecbbus_card_interface &card, int pos)
 {
-	m_ecbbus_device[pos] = card;
+	m_ecbbus_device[pos] = &card;
 }
 
 
@@ -190,11 +191,12 @@ WRITE8_MEMBER( ecbbus_device::io_w )
 // slot devices
 #include "grip.h"
 
-SLOT_INTERFACE_START( ecbbus_cards )
-	SLOT_INTERFACE("grip21", ECB_GRIP21)
-/*  SLOT_INTERFACE("grip25", ECB_GRIP25)
-    SLOT_INTERFACE("grip26", ECB_GRIP26)
-    SLOT_INTERFACE("grip31", ECB_GRIP31)
-    SLOT_INTERFACE("grip562", ECB_GRIP562)
-    SLOT_INTERFACE("grips115", ECB_GRIPS115)*/
-SLOT_INTERFACE_END
+void ecbbus_cards(device_slot_interface &device)
+{
+	device.option_add("grip21", ECB_GRIP21);
+/*  device.option_add("grip25", ECB_GRIP25);
+    device.option_add("grip26", ECB_GRIP26);
+    device.option_add("grip31", ECB_GRIP31);
+    device.option_add("grip562", ECB_GRIP562);
+    device.option_add("grips115", ECB_GRIPS115);*/
+}

@@ -36,7 +36,7 @@ DEFINE_DEVICE_TYPE(ADAM_EXPANSION_SLOT, adam_expansion_slot_device, "adam_expans
 //-------------------------------------------------
 
 device_adam_expansion_slot_card_interface::device_adam_expansion_slot_card_interface(const machine_config &mconfig, device_t &device) :
-	device_slot_card_interface(mconfig, device),
+	device_interface(device, "adamexp"),
 	m_rom(*this, "rom")
 {
 	m_slot = dynamic_cast<adam_expansion_slot_device *>(device.owner());
@@ -54,7 +54,7 @@ device_adam_expansion_slot_card_interface::device_adam_expansion_slot_card_inter
 
 adam_expansion_slot_device::adam_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ADAM_EXPANSION_SLOT, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_adam_expansion_slot_card_interface>(mconfig, *this),
 	device_image_interface(mconfig, *this),
 	m_write_irq(*this), m_card(nullptr)
 {
@@ -67,19 +67,10 @@ adam_expansion_slot_device::adam_expansion_slot_device(const machine_config &mco
 
 void adam_expansion_slot_device::device_start()
 {
-	m_card = dynamic_cast<device_adam_expansion_slot_card_interface *>(get_card_device());
+	m_card = get_card_device();
 
 	// resolve callbacks
 	m_write_irq.resolve_safe();
-}
-
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void adam_expansion_slot_device::device_reset()
-{
 }
 
 
@@ -123,11 +114,11 @@ std::string adam_expansion_slot_device::get_default_card_software(get_default_ca
 //  bd_r - buffered data read
 //-------------------------------------------------
 
-uint8_t adam_expansion_slot_device::bd_r(address_space &space, offs_t offset, uint8_t data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2)
+uint8_t adam_expansion_slot_device::bd_r(offs_t offset, uint8_t data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2)
 {
 	if (m_card != nullptr)
 	{
-		data = m_card->adam_bd_r(space, offset, data, bmreq, biorq, aux_rom_cs, cas1, cas2);
+		data = m_card->adam_bd_r(offset, data, bmreq, biorq, aux_rom_cs, cas1, cas2);
 	}
 
 	return data;
@@ -138,11 +129,11 @@ uint8_t adam_expansion_slot_device::bd_r(address_space &space, offs_t offset, ui
 //  cd_w - cartridge data write
 //-------------------------------------------------
 
-void adam_expansion_slot_device::bd_w(address_space &space, offs_t offset, uint8_t data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2)
+void adam_expansion_slot_device::bd_w(offs_t offset, uint8_t data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2)
 {
 	if (m_card != nullptr)
 	{
-		m_card->adam_bd_w(space, offset, data, bmreq, biorq, aux_rom_cs, cas1, cas2);
+		m_card->adam_bd_w(offset, data, bmreq, biorq, aux_rom_cs, cas1, cas2);
 	}
 }
 
@@ -156,24 +147,27 @@ void adam_expansion_slot_device::bd_w(address_space &space, offs_t offset, uint8
 //  SLOT_INTERFACE( adam_slot1_devices )
 //-------------------------------------------------
 
-SLOT_INTERFACE_START( adam_slot1_devices )
-	SLOT_INTERFACE("adamlink", ADAMLINK)
-SLOT_INTERFACE_END
+void adam_slot1_devices(device_slot_interface &device)
+{
+	device.option_add("adamlink", ADAMLINK);
+}
 
 
 //-------------------------------------------------
 //  SLOT_INTERFACE( adam_slot2_devices )
 //-------------------------------------------------
 
-SLOT_INTERFACE_START( adam_slot2_devices )
-	SLOT_INTERFACE("ide", ADAM_IDE)
-SLOT_INTERFACE_END
+void adam_slot2_devices(device_slot_interface &device)
+{
+	device.option_add("ide", ADAM_IDE);
+}
 
 
 //-------------------------------------------------
 //  SLOT_INTERFACE( adam_slot3_devices )
 //-------------------------------------------------
 
-SLOT_INTERFACE_START( adam_slot3_devices )
-	SLOT_INTERFACE("ram", ADAM_RAM)
-SLOT_INTERFACE_END
+void adam_slot3_devices(device_slot_interface &device)
+{
+	device.option_add("ram", ADAM_RAM);
+}

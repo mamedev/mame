@@ -75,8 +75,14 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_ppu(*this, "ppu") { }
 
+	void famibox(machine_config &config);
 
-	required_device<cpu_device> m_maincpu;
+	DECLARE_READ_LINE_MEMBER(coin_r);
+	DECLARE_INPUT_CHANGED_MEMBER(famibox_keyswitch_changed);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+
+private:
+	required_device<n2a03_device> m_maincpu;
 	required_device<ppu2c0x_device> m_ppu;
 
 	std::unique_ptr<uint8_t[]> m_nt_ram;
@@ -106,20 +112,13 @@ public:
 	DECLARE_READ8_MEMBER(famibox_IN1_r);
 	DECLARE_READ8_MEMBER(famibox_system_r);
 	DECLARE_WRITE8_MEMBER(famibox_system_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(famibox_coin_r);
-	DECLARE_INPUT_CHANGED_MEMBER(famibox_keyswitch_changed);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(famibox);
-	uint32_t screen_update_famibox(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(famicombox_attract_timer_callback);
 	TIMER_CALLBACK_MEMBER(famicombox_gameplay_timer_callback);
 	void famicombox_bankswitch(uint8_t bank);
 	void famicombox_reset();
-	void ppu_irq(int *ppu_regs);
-	void famibox(machine_config &config);
 	void famibox_map(address_map &map);
 };
 
@@ -380,10 +379,10 @@ void famibox_state::famibox_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
 	map(0x2000, 0x3fff).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));
-	map(0x4014, 0x4014).w(this, FUNC(famibox_state::sprite_dma_w));
-	map(0x4016, 0x4016).rw(this, FUNC(famibox_state::famibox_IN0_r), FUNC(famibox_state::famibox_IN0_w)); /* IN0 - input port 1 */
-	map(0x4017, 0x4017).r(this, FUNC(famibox_state::famibox_IN1_r));     /* IN1 - input port 2 / PSG second control register */
-	map(0x5000, 0x5fff).rw(this, FUNC(famibox_state::famibox_system_r), FUNC(famibox_state::famibox_system_w));
+	map(0x4014, 0x4014).w(FUNC(famibox_state::sprite_dma_w));
+	map(0x4016, 0x4016).rw(FUNC(famibox_state::famibox_IN0_r), FUNC(famibox_state::famibox_IN0_w)); /* IN0 - input port 1 */
+	map(0x4017, 0x4017).r(FUNC(famibox_state::famibox_IN1_r));     /* IN1 - input port 2 / PSG second control register */
+	map(0x5000, 0x5fff).rw(FUNC(famibox_state::famibox_system_r), FUNC(famibox_state::famibox_system_w));
 	map(0x6000, 0x7fff).ram();
 	map(0x8000, 0xbfff).bankr("cpubank1");
 	map(0xc000, 0xffff).bankr("cpubank2");
@@ -422,7 +421,7 @@ INPUT_CHANGED_MEMBER(famibox_state::coin_inserted)
 	}
 }
 
-CUSTOM_INPUT_MEMBER(famibox_state::famibox_coin_r)
+READ_LINE_MEMBER(famibox_state::coin_r)
 {
 	return m_coins > 0;
 }
@@ -481,7 +480,7 @@ static INPUT_PORTS_START( famibox )
 	PORT_DIPSETTING(    0x08, "Key position 4" )
 	PORT_DIPSETTING(    0x10, "Key position 5" )
 	PORT_DIPSETTING(    0x20, "Key position 6" )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, famibox_state,famibox_coin_r, nullptr)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(famibox_state, coin_r)
 
 	PORT_START("COIN")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, famibox_state,coin_inserted, 0)
@@ -494,30 +493,9 @@ INPUT_PORTS_END
 
 *******************************************************/
 
-PALETTE_INIT_MEMBER(famibox_state, famibox)
-{
-	m_ppu->init_palette(palette, 0);
-}
-
-void famibox_state::ppu_irq(int *ppu_regs)
-{
-	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
-
 void famibox_state::video_start()
 {
 }
-
-uint32_t famibox_state::screen_update_famibox(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	/* render the ppu */
-	m_ppu->render(bitmap, 0, 0, 0, 0);
-	return 0;
-}
-
-static GFXDECODE_START( famibox )
-	/* none, the ppu generates one */
-GFXDECODE_END
 
 void famibox_state::machine_reset()
 {
@@ -532,7 +510,7 @@ void famibox_state::machine_start()
 	m_nt_page[2] = m_nt_ram.get() + 0x800;
 	m_nt_page[3] = m_nt_ram.get() + 0xc00;
 
-	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8_delegate(FUNC(famibox_state::famibox_nt_r), this), write8_delegate(FUNC(famibox_state::famibox_nt_w), this));
+	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8_delegate(*this, FUNC(famibox_state::famibox_nt_r)), write8_delegate(*this, FUNC(famibox_state::famibox_nt_w)));
 	m_ppu->space(AS_PROGRAM).install_read_bank(0x0000, 0x1fff, "ppubank1");
 
 	famicombox_bankswitch(0);
@@ -547,30 +525,27 @@ void famibox_state::machine_start()
 	m_coins = 0;
 }
 
-MACHINE_CONFIG_START(famibox_state::famibox)
+void famibox_state::famibox(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", N2A03, NTSC_APU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(famibox_map)
+	N2A03(config, m_maincpu, NTSC_APU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &famibox_state::famibox_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(32*8, 262)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(famibox_state, screen_update_famibox)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_size(32*8, 262);
+	screen.set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
+	screen.set_screen_update("ppu", FUNC(ppu2c0x_device::screen_update));
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", famibox)
-	MCFG_PALETTE_ADD("palette", 8*4*16)
-	MCFG_PALETTE_INIT_OWNER(famibox_state, famibox)
-
-	MCFG_PPU2C04_ADD("ppu")
-	MCFG_PPU2C0X_CPU("maincpu")
-	MCFG_PPU2C0X_SET_NMI(famibox_state, ppu_irq)
+	PPU_2C02(config, m_ppu);
+	m_ppu->set_cpu_tag(m_maincpu);
+	m_ppu->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-MACHINE_CONFIG_END
+	SPEAKER(config, "mono").front_center();
+	m_maincpu->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
 ROM_START(famibox)
@@ -610,4 +585,4 @@ ROM_START(famibox)
 
 ROM_END
 
-GAME( 1986,  famibox,      0,  famibox,  famibox, famibox_state,  0, ROT0, "Nintendo", "FamicomBox", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)
+GAME( 1986, famibox, 0, famibox, famibox, famibox_state, empty_init, ROT0, "Nintendo", "FamicomBox", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)

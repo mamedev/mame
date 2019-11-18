@@ -281,7 +281,7 @@ Note: Roms for Tempest Analog Vector-Generator PCB Assembly A037383-03 or A03738
 #include "machine/watchdog.h"
 #include "video/avgdvg.h"
 #include "video/vector.h"
-#include "machine/atari_vg.h"
+#include "machine/er2055.h"
 #include "sound/pokey.h"
 #include "screen.h"
 #include "speaker.h"
@@ -298,25 +298,28 @@ static constexpr XTAL CLOCK_3KHZ   = MASTER_CLOCK / 4096;
 class tempest_state : public driver_device
 {
 public:
-	tempest_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	tempest_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_mathbox(*this, "mathbox"),
 		m_watchdog(*this, "watchdog"),
 		m_avg(*this, "avg"),
+		m_earom(*this, "earom"),
 		m_rom(*this, "maincpu"),
 		m_knob_p1(*this, TEMPEST_KNOB_P1_TAG),
 		m_knob_p2(*this, TEMPEST_KNOB_P2_TAG),
 		m_buttons_p1(*this, TEMPEST_BUTTONS_P1_TAG),
 		m_buttons_p2(*this, TEMPEST_BUTTONS_P2_TAG),
 		m_in1(*this, "IN1/DSW0"),
-		m_in2(*this, "IN2")
+		m_in2(*this, "IN2"),
+		m_leds(*this, "led%u", 0U)
 	{ }
+
+	void tempest(machine_config &config);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(tempest_knob_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(tempest_buttons_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(clock_r);
-	void tempest(machine_config &config);
+	DECLARE_READ_LINE_MEMBER(clock_r);
 
 protected:
 	DECLARE_WRITE8_MEMBER(wdclr_w);
@@ -325,16 +328,20 @@ protected:
 	DECLARE_READ8_MEMBER(input_port_1_bit_r);
 	DECLARE_READ8_MEMBER(input_port_2_bit_r);
 
+	DECLARE_READ8_MEMBER(earom_read);
+	DECLARE_WRITE8_MEMBER(earom_write);
+	DECLARE_WRITE8_MEMBER(earom_control_w);
+
 	DECLARE_READ8_MEMBER(rom_ae1f_r);
 
 	virtual void machine_start() override;
 	void main_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<mathbox_device> m_mathbox;
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<avg_tempest_device> m_avg;
+	required_device<er2055_device> m_earom;
 	required_region_ptr<uint8_t> m_rom;
 
 	required_ioport m_knob_p1;
@@ -343,6 +350,7 @@ private:
 	required_ioport m_buttons_p2;
 	required_ioport m_in1;
 	required_ioport m_in2;
+	output_finder<2> m_leds;
 
 	uint8_t m_player_select;
 };
@@ -350,6 +358,7 @@ private:
 
 void tempest_state::machine_start()
 {
+	m_leds.resolve();
 	save_item(NAME(m_player_select));
 }
 
@@ -382,7 +391,7 @@ CUSTOM_INPUT_MEMBER(tempest_state::tempest_buttons_r)
 }
 
 
-CUSTOM_INPUT_MEMBER(tempest_state::clock_r)
+READ_LINE_MEMBER(tempest_state::clock_r)
 {
 	/* Emulate the 3kHz source on bit 7 (divide 1.5MHz by 512) */
 	return (m_maincpu->total_cycles() & 0x100) ? 1 : 0;
@@ -410,8 +419,8 @@ READ8_MEMBER(tempest_state::input_port_2_bit_r)
 
 WRITE8_MEMBER(tempest_state::tempest_led_w)
 {
-	output().set_led_value(0, ~data & 0x02);
-	output().set_led_value(1, ~data & 0x01);
+	m_leds[0] = BIT(~data, 1);
+	m_leds[1] = BIT(~data, 0);
 	/* FLIP is bit 0x04 */
 	m_player_select = data & 0x04;
 }
@@ -430,6 +439,32 @@ WRITE8_MEMBER(tempest_state::tempest_coin_w)
 
 /*************************************
  *
+ *  High score EAROM
+ *
+ *************************************/
+
+READ8_MEMBER(tempest_state::earom_read)
+{
+	return m_earom->data();
+}
+
+WRITE8_MEMBER(tempest_state::earom_write)
+{
+	m_earom->set_address(offset & 0x3f);
+	m_earom->set_data(data);
+}
+
+WRITE8_MEMBER(tempest_state::earom_control_w)
+{
+	// CK = EDB0, C1 = /EDB2, C2 = EDB1, CS1 = EDB3, /CS2 = GND
+	m_earom->set_control(BIT(data, 3), 1, !BIT(data, 2), BIT(data, 1));
+	m_earom->set_clk(BIT(data, 0));
+}
+
+
+
+/*************************************
+ *
  *  Main CPU memory handlers
  *
  *************************************/
@@ -437,7 +472,7 @@ WRITE8_MEMBER(tempest_state::tempest_coin_w)
 READ8_MEMBER(tempest_state::rom_ae1f_r)
 {
 	// This is needed to ensure that the routine starting at ae1c passes checks and does not corrupt data;
-	// MCFG_QUANTUM_PERFECT_CPU("maincpu") would be very taxing on this driver.
+	// config.m_perfect_cpu_quantum = subtag("maincpu"); would be very taxing on this driver.
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 	machine().scheduler().abort_timeslice();
 
@@ -448,27 +483,27 @@ READ8_MEMBER(tempest_state::rom_ae1f_r)
 void tempest_state::main_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
-	map(0x0800, 0x080f).writeonly().share("colorram");
+	map(0x0800, 0x080f).writeonly().share("avg:colorram");
 	map(0x0c00, 0x0c00).portr("IN0");
 	map(0x0d00, 0x0d00).portr("DSW1");
 	map(0x0e00, 0x0e00).portr("DSW2");
-	map(0x2000, 0x2fff).ram().share("vectorram").region("maincpu", 0x2000);
+	map(0x2000, 0x2fff).ram().share("avg:vectorram").region("maincpu", 0x2000);
 	map(0x3000, 0x3fff).rom();
-	map(0x4000, 0x4000).w(this, FUNC(tempest_state::tempest_coin_w));
+	map(0x4000, 0x4000).w(FUNC(tempest_state::tempest_coin_w));
 	map(0x4800, 0x4800).w(m_avg, FUNC(avg_tempest_device::go_w));
-	map(0x5000, 0x5000).w(this, FUNC(tempest_state::wdclr_w));
+	map(0x5000, 0x5000).w(FUNC(tempest_state::wdclr_w));
 	map(0x5800, 0x5800).w(m_avg, FUNC(avg_tempest_device::reset_w));
-	map(0x6000, 0x603f).w("earom", FUNC(atari_vg_earom_device::write));
-	map(0x6040, 0x6040).r(m_mathbox, FUNC(mathbox_device::status_r)).w("earom", FUNC(atari_vg_earom_device::ctrl_w));
-	map(0x6050, 0x6050).r("earom", FUNC(atari_vg_earom_device::read));
+	map(0x6000, 0x603f).w(FUNC(tempest_state::earom_write));
+	map(0x6040, 0x6040).r(m_mathbox, FUNC(mathbox_device::status_r)).w(FUNC(tempest_state::earom_control_w));
+	map(0x6050, 0x6050).r(FUNC(tempest_state::earom_read));
 	map(0x6060, 0x6060).r(m_mathbox, FUNC(mathbox_device::lo_r));
 	map(0x6070, 0x6070).r(m_mathbox, FUNC(mathbox_device::hi_r));
 	map(0x6080, 0x609f).w(m_mathbox, FUNC(mathbox_device::go_w));
 	map(0x60c0, 0x60cf).rw("pokey1", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x60d0, 0x60df).rw("pokey2", FUNC(pokey_device::read), FUNC(pokey_device::write));
-	map(0x60e0, 0x60e0).w(this, FUNC(tempest_state::tempest_led_w));
+	map(0x60e0, 0x60e0).w(FUNC(tempest_state::tempest_led_w));
 	map(0x9000, 0xdfff).rom();
-	map(0xae1f, 0xae1f).r(this, FUNC(tempest_state::rom_ae1f_r));
+	map(0xae1f, 0xae1f).r(FUNC(tempest_state::rom_ae1f_r));
 	map(0xf000, 0xffff).rom(); /* for the reset / interrupt vectors */
 }
 
@@ -489,12 +524,12 @@ static INPUT_PORTS_START( tempest )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Diagnostic Step")
 	/* bit 6 is the VG HALT bit. We set it to "low" */
 	/* per default (busy vector processor). */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER("avg", avg_tempest_device, done_r, nullptr)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("avg", avg_tempest_device, done_r)
 	/* bit 7 is tied to a 3kHz (?) clock */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, tempest_state,clock_r, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(tempest_state, clock_r)
 
 	PORT_START("IN1/DSW0")
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, tempest_state,tempest_knob_r, nullptr)
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(tempest_state, tempest_knob_r)
 	/* The next one is reponsible for cocktail mode.
 	 * According to the documentation, this is not a switch, although
 	 * it may have been planned to put it on the Math Box PCB, D/E2 )
@@ -515,7 +550,7 @@ static INPUT_PORTS_START( tempest )
 	PORT_DIPNAME(  0x04, 0x04, "Rating" ) PORT_DIPLOCATION("DE2:2")
 	PORT_DIPSETTING(     0x04, "1, 3, 5, 7, 9" )
 	PORT_DIPSETTING(     0x00, "tied to high score" )
-	PORT_BIT(0x18, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, tempest_state,tempest_buttons_r, nullptr)
+	PORT_BIT(0x18, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(tempest_state, tempest_buttons_r)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -596,61 +631,58 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(tempest_state::tempest)
-
+void tempest_state::tempest(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 8)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(tempest_state, irq0_line_assert, CLOCK_3KHZ / 12)
+	M6502(config, m_maincpu, MASTER_CLOCK / 8);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tempest_state::main_map);
+	m_maincpu->set_periodic_int(FUNC(tempest_state::irq0_line_assert), attotime::from_hz(CLOCK_3KHZ / 12));
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz(CLOCK_3KHZ / 256))
+	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_hz(CLOCK_3KHZ / 256));
 
-	MCFG_ATARIVGEAROM_ADD("earom")
+	ER2055(config, m_earom);
 
 	/* video hardware */
-	MCFG_VECTOR_ADD("vector")
-	MCFG_SCREEN_ADD("screen", VECTOR)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(400, 300)
-	MCFG_SCREEN_VISIBLE_AREA(0, 580, 0, 570)
-	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
+	VECTOR(config, "vector");
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_VECTOR));
+	screen.set_refresh_hz(60);
+	screen.set_size(400, 300);
+	screen.set_visarea(0, 580, 0, 570);
+	screen.set_screen_update("vector", FUNC(vector_device::screen_update));
 
-	MCFG_DEVICE_ADD("avg", AVG_TEMPEST, 0)
-	MCFG_AVGDVG_VECTOR("vector")
+	AVG_TEMPEST(config, m_avg, 0);
+	m_avg->set_vector_tag("vector");
 
 	/* Drivers */
-	MCFG_MATHBOX_ADD("mathbox")
+	MATHBOX(config, m_mathbox, 0);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("pokey1", POKEY, MASTER_CLOCK / 8)
-	MCFG_POKEY_POT0_R_CB(READ8(tempest_state, input_port_1_bit_r))
-	MCFG_POKEY_POT1_R_CB(READ8(tempest_state, input_port_1_bit_r))
-	MCFG_POKEY_POT2_R_CB(READ8(tempest_state, input_port_1_bit_r))
-	MCFG_POKEY_POT3_R_CB(READ8(tempest_state, input_port_1_bit_r))
-	MCFG_POKEY_POT4_R_CB(READ8(tempest_state, input_port_1_bit_r))
-	MCFG_POKEY_POT5_R_CB(READ8(tempest_state, input_port_1_bit_r))
-	MCFG_POKEY_POT6_R_CB(READ8(tempest_state, input_port_1_bit_r))
-	MCFG_POKEY_POT7_R_CB(READ8(tempest_state, input_port_1_bit_r))
-	MCFG_POKEY_OUTPUT_RC(RES_K(10), CAP_U(0.015), 5.0)
+	pokey_device &pokey1(POKEY(config, "pokey1", MASTER_CLOCK / 8));
+	pokey1.pot_r<0>().set(FUNC(tempest_state::input_port_1_bit_r));
+	pokey1.pot_r<1>().set(FUNC(tempest_state::input_port_1_bit_r));
+	pokey1.pot_r<2>().set(FUNC(tempest_state::input_port_1_bit_r));
+	pokey1.pot_r<3>().set(FUNC(tempest_state::input_port_1_bit_r));
+	pokey1.pot_r<4>().set(FUNC(tempest_state::input_port_1_bit_r));
+	pokey1.pot_r<5>().set(FUNC(tempest_state::input_port_1_bit_r));
+	pokey1.pot_r<6>().set(FUNC(tempest_state::input_port_1_bit_r));
+	pokey1.pot_r<7>().set(FUNC(tempest_state::input_port_1_bit_r));
+	pokey1.set_output_rc(RES_K(10), CAP_U(0.015), 5.0);
+	pokey1.add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-
-	MCFG_SOUND_ADD("pokey2", POKEY, MASTER_CLOCK / 8)
-	MCFG_POKEY_POT0_R_CB(READ8(tempest_state, input_port_2_bit_r))
-	MCFG_POKEY_POT1_R_CB(READ8(tempest_state, input_port_2_bit_r))
-	MCFG_POKEY_POT2_R_CB(READ8(tempest_state, input_port_2_bit_r))
-	MCFG_POKEY_POT3_R_CB(READ8(tempest_state, input_port_2_bit_r))
-	MCFG_POKEY_POT4_R_CB(READ8(tempest_state, input_port_2_bit_r))
-	MCFG_POKEY_POT5_R_CB(READ8(tempest_state, input_port_2_bit_r))
-	MCFG_POKEY_POT6_R_CB(READ8(tempest_state, input_port_2_bit_r))
-	MCFG_POKEY_POT7_R_CB(READ8(tempest_state, input_port_2_bit_r))
-	MCFG_POKEY_OUTPUT_RC(RES_K(10), CAP_U(0.015), 5.0)
-
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-MACHINE_CONFIG_END
+	pokey_device &pokey2(POKEY(config, "pokey2", MASTER_CLOCK / 8));
+	pokey2.pot_r<0>().set(FUNC(tempest_state::input_port_2_bit_r));
+	pokey2.pot_r<1>().set(FUNC(tempest_state::input_port_2_bit_r));
+	pokey2.pot_r<2>().set(FUNC(tempest_state::input_port_2_bit_r));
+	pokey2.pot_r<3>().set(FUNC(tempest_state::input_port_2_bit_r));
+	pokey2.pot_r<4>().set(FUNC(tempest_state::input_port_2_bit_r));
+	pokey2.pot_r<5>().set(FUNC(tempest_state::input_port_2_bit_r));
+	pokey2.pot_r<6>().set(FUNC(tempest_state::input_port_2_bit_r));
+	pokey2.pot_r<7>().set(FUNC(tempest_state::input_port_2_bit_r));
+	pokey2.set_output_rc(RES_K(10), CAP_U(0.015), 5.0);
+	pokey2.add_route(ALL_OUTPUTS, "mono", 0.5);
+}
 
 
 
@@ -673,7 +705,7 @@ ROM_START( tempest ) /* rev 3 */
 	ROM_LOAD( "136002-138.np3", 0x3000, 0x1000, CRC(9995256d) SHA1(2b725ee1a57d423c7d7377a1744f48412e0f2f69) )
 
 	/* AVG PROM */
-	ROM_REGION( 0x100, "user1", 0 )
+	ROM_REGION( 0x100, "avg:prom", 0 )
 	ROM_LOAD( "136002-125.d7",   0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 
 	/* Mathbox PROMs */
@@ -703,7 +735,7 @@ ROM_START( tempest1r ) /* rev 1 */
 	ROM_LOAD( "136002-138.np3", 0x3000, 0x1000, CRC(9995256d) SHA1(2b725ee1a57d423c7d7377a1744f48412e0f2f69) )
 
 	/* AVG PROM */
-	ROM_REGION( 0x100, "user1", 0 )
+	ROM_REGION( 0x100, "avg:prom", 0 )
 	ROM_LOAD( "136002-125.d7",   0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 
 	/* Mathbox PROMs */
@@ -739,7 +771,7 @@ ROM_START( tempest3 ) /* rev 3 */
 	ROM_LOAD( "136002-124.r3",   0x3800, 0x0800, CRC(c16ec351) SHA1(a30a3662c740810c0f20e3712679606921b8ca06) ) /* May be labeled "136002-112", same data */
 
 	/* AVG PROM */
-	ROM_REGION( 0x100, "user1", 0 )
+	ROM_REGION( 0x100, "avg:prom", 0 )
 	ROM_LOAD( "136002-125.d7",   0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 
 	/* Mathbox PROMs */
@@ -775,7 +807,7 @@ ROM_START( tempest2 ) /* rev 2 */
 	ROM_LOAD( "136002-124.r3",   0x3800, 0x0800, CRC(c16ec351) SHA1(a30a3662c740810c0f20e3712679606921b8ca06) ) /* May be labeled "136002-112", same data */
 
 	/* AVG PROM */
-	ROM_REGION( 0x100, "user1", 0 )
+	ROM_REGION( 0x100, "avg:prom", 0 )
 	ROM_LOAD( "136002-125.d7",   0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 
 	/* Mathbox PROMs */
@@ -811,7 +843,7 @@ ROM_START( tempest1 ) /* rev 1 */
 	ROM_LOAD( "136002-124.r3",   0x3800, 0x0800, CRC(c16ec351) SHA1(a30a3662c740810c0f20e3712679606921b8ca06) ) /* May be labeled "136002-112", same data */
 
 	/* AVG PROM */
-	ROM_REGION( 0x100, "user1", 0 )
+	ROM_REGION( 0x100, "avg:prom", 0 )
 	ROM_LOAD( "136002-125.d7",   0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 
 	/* Mathbox PROMs */
@@ -847,7 +879,7 @@ ROM_START( temptube )
 	ROM_LOAD( "136002-124.r3",   0x3800, 0x0800, CRC(c16ec351) SHA1(a30a3662c740810c0f20e3712679606921b8ca06) ) /* May be labeled "136002-112", same data */
 
 	/* AVG PROM */
-	ROM_REGION( 0x100, "user1", 0 )
+	ROM_REGION( 0x100, "avg:prom", 0 )
 	ROM_LOAD( "136002-125.d7",   0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 
 	/* Mathbox PROMs */
@@ -870,9 +902,9 @@ ROM_END
  *
  *************************************/
 
-GAME( 1980, tempest,   0,       tempest, tempest, tempest_state, 0, ROT270, "Atari", "Tempest (rev 3, Revised Hardware)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, tempest3,  tempest, tempest, tempest, tempest_state, 0, ROT270, "Atari", "Tempest (rev 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, tempest2,  tempest, tempest, tempest, tempest_state, 0, ROT270, "Atari", "Tempest (rev 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, tempest1,  tempest, tempest, tempest, tempest_state, 0, ROT270, "Atari", "Tempest (rev 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, tempest1r, tempest, tempest, tempest, tempest_state, 0, ROT270, "Atari", "Tempest (rev 1, Revised Hardware)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, temptube,  tempest, tempest, tempest, tempest_state, 0, ROT270, "hack (Duncan Brown)", "Tempest Tubes", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, tempest,   0,       tempest, tempest, tempest_state, empty_init, ROT270, "Atari", "Tempest (rev 3, Revised Hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, tempest3,  tempest, tempest, tempest, tempest_state, empty_init, ROT270, "Atari", "Tempest (rev 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, tempest2,  tempest, tempest, tempest, tempest_state, empty_init, ROT270, "Atari", "Tempest (rev 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, tempest1,  tempest, tempest, tempest, tempest_state, empty_init, ROT270, "Atari", "Tempest (rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, tempest1r, tempest, tempest, tempest, tempest_state, empty_init, ROT270, "Atari", "Tempest (rev 1, Revised Hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, temptube,  tempest, tempest, tempest, tempest_state, empty_init, ROT270, "hack (Duncan Brown)", "Tempest Tubes", MACHINE_SUPPORTS_SAVE )

@@ -6,7 +6,8 @@
  */
 
 #include "nld_74166.h"
-#include "../nl_base.h"
+#include "netlist/nl_base.h"
+#include "nlid_system.h"
 
 namespace netlist
 {
@@ -25,6 +26,7 @@ namespace netlist
 		, m_shifter(*this, "m_shifter", 0)
 		, m_last_CLRQ(*this, "m_last_CLRQ", 0)
 		, m_last_CLK(*this, "m_last_CLK", 0)
+		, m_power_pins(*this)
 		{
 		}
 
@@ -43,6 +45,7 @@ namespace netlist
 		state_var<unsigned> m_shifter;
 		state_var<unsigned> m_last_CLRQ;
 		state_var<unsigned> m_last_CLK;
+		nld_power_pins m_power_pins;
 	};
 
 	NETLIB_OBJECT_DERIVED(74166_dip, 74166)
@@ -56,6 +59,7 @@ namespace netlist
 			register_subalias("5", m_DATA[4]);
 			register_subalias("6", m_CLKINH);
 			register_subalias("7", m_CLK);
+			register_subalias("8", "GND");
 
 			register_subalias("9", m_CLRQ);
 			register_subalias("10", m_DATA[3]);
@@ -64,7 +68,7 @@ namespace netlist
 			register_subalias("13", m_QH);
 			register_subalias("14", m_DATA[0]);
 			register_subalias("15", m_SH_LDQ);
-
+			register_subalias("16", "VCC");
 		}
 	};
 
@@ -121,8 +125,8 @@ namespace netlist
 		m_QH.push(qh, delay); //FIXME
 	}
 
-	NETLIB_DEVICE_IMPL(74166)
-	NETLIB_DEVICE_IMPL(74166_dip)
+	NETLIB_DEVICE_IMPL(74166,    "TTL_74166", "+CLK,+CLKINH,+SH_LDQ,+SER,+A,+B,+C,+D,+E,+F,+G,+H,+CLRQ,@VCC,@GND")
+	NETLIB_DEVICE_IMPL(74166_dip,"TTL_74166_DIP", "")
 
 	} //namespace devices
 } // namespace netlist

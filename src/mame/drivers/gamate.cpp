@@ -30,10 +30,14 @@ public:
 		, m_cartslot(*this, "cartslot")
 		, m_io_joy(*this, "JOY")
 		, m_bios(*this, "bios")
+		, m_ram(*this, "ram")
 	{ }
 
-	DECLARE_PALETTE_INIT(gamate);
+	void gamate(machine_config &config);
 
+	void init_gamate();
+
+private:
 	DECLARE_READ8_MEMBER(card_available_check);
 	DECLARE_READ8_MEMBER(card_available_set);
 	DECLARE_WRITE8_MEMBER(card_reset);
@@ -44,16 +48,11 @@ public:
 	DECLARE_WRITE8_MEMBER(write_cart);
 	DECLARE_READ8_MEMBER(read_cart);
 
-	DECLARE_DRIVER_INIT(gamate);
-
-	uint32_t screen_update_gamate(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
 	TIMER_CALLBACK_MEMBER(gamate_timer);
 	TIMER_CALLBACK_MEMBER(gamate_timer2);
 
-	void gamate(machine_config &config);
 	void gamate_mem(address_map &map);
-private:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -64,6 +63,7 @@ private:
 	required_device<gamate_cart_slot_device> m_cartslot;
 	required_ioport m_io_joy;
 	required_shared_ptr<uint8_t> m_bios;
+	required_shared_ptr<uint8_t> m_ram;
 	emu_timer *timer1;
 	emu_timer *timer2;
 };
@@ -96,14 +96,14 @@ READ8_MEMBER( gamate_state::gamate_nmi_r )
 
 READ8_MEMBER(gamate_state::sound_r)
 {
-	m_ay->address_w(space, 0, offset);
-	return m_ay->data_r(space, 0);
+	m_ay->address_w(offset);
+	return m_ay->data_r();
 }
 
 WRITE8_MEMBER(gamate_state::sound_w)
 {
-	m_ay->address_w(space, 0, offset);
-	m_ay->data_w(space, 0, data);
+	m_ay->address_w(offset);
+	m_ay->data_w(data);
 }
 
 WRITE8_MEMBER(gamate_state::write_cart)
@@ -118,15 +118,15 @@ READ8_MEMBER(gamate_state::read_cart)
 
 void gamate_state::gamate_mem(address_map &map)
 {
-	map(0x0000, 0x03ff).mirror(0x1c00).ram();
-	map(0x4000, 0x400f).mirror(0x03f0).rw(this, FUNC(gamate_state::sound_r), FUNC(gamate_state::sound_w));
+	map(0x0000, 0x03ff).mirror(0x1c00).ram().share("ram");
+	map(0x4000, 0x400f).mirror(0x03f0).rw(FUNC(gamate_state::sound_r), FUNC(gamate_state::sound_w));
 	map(0x4400, 0x4400).mirror(0x03ff).portr("JOY");
-	map(0x4800, 0x4800).mirror(0x03ff).r(this, FUNC(gamate_state::gamate_nmi_r));
+	map(0x4800, 0x4800).mirror(0x03ff).r(FUNC(gamate_state::gamate_nmi_r));
 	map(0x5000, 0x5007).mirror(0x03f8).m("video", FUNC(gamate_video_device::regs_map));
-	map(0x5800, 0x5800).r(this, FUNC(gamate_state::card_available_set));
-	map(0x5900, 0x5900).w(this, FUNC(gamate_state::card_reset));
-	map(0x5a00, 0x5a00).r(this, FUNC(gamate_state::card_available_check));
-	map(0x6000, 0xdfff).rw(this, FUNC(gamate_state::read_cart), FUNC(gamate_state::write_cart));
+	map(0x5800, 0x5800).r(FUNC(gamate_state::card_available_set));
+	map(0x5900, 0x5900).w(FUNC(gamate_state::card_reset));
+	map(0x5a00, 0x5a00).r(FUNC(gamate_state::card_available_check));
+	map(0x6000, 0xdfff).rw(FUNC(gamate_state::read_cart), FUNC(gamate_state::write_cart));
 
 	map(0xe000, 0xefff).mirror(0x1000).rom().share("bios").region("maincpu", 0);
 }
@@ -144,7 +144,7 @@ static INPUT_PORTS_START( gamate )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SELECT) PORT_NAME("Select")
 INPUT_PORTS_END
 
-DRIVER_INIT_MEMBER(gamate_state,gamate)
+void gamate_state::init_gamate()
 {
 	timer1 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gamate_state::gamate_timer),this));
 	timer2 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gamate_state::gamate_timer2),this));
@@ -152,6 +152,7 @@ DRIVER_INIT_MEMBER(gamate_state,gamate)
 
 void gamate_state::machine_start()
 {
+	memset(m_ram, 0xff, m_ram.bytes());  /* memory seems to contain 0xff at power up */
 	timer2->enable(true);
 	timer2->reset(m_maincpu->cycles_to_attotime(1000));
 
@@ -178,24 +179,26 @@ TIMER_CALLBACK_MEMBER(gamate_state::gamate_timer2)
 	timer2->reset(m_maincpu->cycles_to_attotime(32768/2));
 }
 
-MACHINE_CONFIG_START(gamate_state::gamate)
-	MCFG_CPU_ADD("maincpu", M6502, 4433000/2) // NCR 65CX02
-	MCFG_CPU_PROGRAM_MAP(gamate_mem)
+void gamate_state::gamate(machine_config &config)
+{
+	M6502(config, m_maincpu, 4433000/2); // NCR 65CX02
+	m_maincpu->set_addrmap(AS_PROGRAM, &gamate_state::gamate_mem);
 
-	MCFG_GAMATE_VIDEO_ADD("video")
+	GAMATE_VIDEO(config, "video", 0);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker") // Stereo headphone output
-	MCFG_SOUND_ADD("ay8910", AY8910, 4433000 / 4) // AY compatible, no actual AY chip present
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.5)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.5)
-	MCFG_SOUND_ROUTE(2, "lspeaker", 0.25)
-	MCFG_SOUND_ROUTE(2, "rspeaker", 0.25)
+	SPEAKER(config, "lspeaker").front_left(); // Stereo headphone output
+	SPEAKER(config, "rspeaker").front_right();
+	AY8910(config, m_ay, 4433000 / 4); // AY compatible, no actual AY chip present
+	m_ay->add_route(0, "lspeaker", 0.5);
+	m_ay->add_route(1, "rspeaker", 0.5);
+	m_ay->add_route(2, "lspeaker", 0.25);
+	m_ay->add_route(2, "rspeaker", 0.25);
 
-	MCFG_GAMATE_CARTRIDGE_ADD("cartslot", gamate_cart, nullptr)
+	GAMATE_CART_SLOT(config, m_cartslot, gamate_cart, nullptr);
 
-	MCFG_SOFTWARE_LIST_ADD("cart_list","gamate")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cart_list").set_original("gamate");
+}
 
 
 /* ROM notes:
@@ -221,11 +224,11 @@ as well as the PCB.
 ROM_START(gamate)
 	ROM_REGION(0x1000,"maincpu", 0)
 	ROM_SYSTEM_BIOS(0, "default", "DEFAULT")
-	ROMX_LOAD("gamate_bios_umc.bin", 0x0000, 0x1000, CRC(07090415) SHA1(ea449dc607601f9a68d855ad6ab53800d2e99297), ROM_BIOS(1) )
+	ROMX_LOAD("gamate_bios_umc.bin", 0x0000, 0x1000, CRC(07090415) SHA1(ea449dc607601f9a68d855ad6ab53800d2e99297), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "newer", "NEWER")
-	ROMX_LOAD("gamate_bios_bit.bin", 0x0000, 0x1000, CRC(03a5f3a7) SHA1(4e9dfbfe916ca485530ef4221593ab68738e2217), ROM_BIOS(2) )
+	ROMX_LOAD("gamate_bios_bit.bin", 0x0000, 0x1000, CRC(03a5f3a7) SHA1(4e9dfbfe916ca485530ef4221593ab68738e2217), ROM_BIOS(1))
 ROM_END
 
 
-//    YEAR  NAME     PARENT  COMPAT    MACHINE  INPUT   CLASS         INIT    COMPANY     FULLNAME  FLAGS
-CONS( 1990, gamate,  0,      0,        gamate,  gamate, gamate_state, gamate, "Bit Corp", "Gamate", 0 )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT         COMPANY     FULLNAME  FLAGS
+CONS( 1990, gamate, 0,      0,      gamate,  gamate, gamate_state, init_gamate, "Bit Corp", "Gamate", 0 )

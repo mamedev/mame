@@ -4,9 +4,16 @@
 /* 8080bw.c *******************************************/
 
 #include "emu.h"
+#include "includes/8080bw.h"
+
 #include "sound/samples.h"
 #include "sound/discrete.h"
-#include "includes/8080bw.h"
+#include "speaker.h"
+
+#include <cmath>
+
+//#define VERBOSE 1
+#include "logmacro.h"
 
 
 /*******************************************************/
@@ -20,6 +27,74 @@ MACHINE_START_MEMBER(_8080bw_state,extra_8080bw_sh)
 	save_item(NAME(m_port_1_last_extra));
 	save_item(NAME(m_port_2_last_extra));
 	save_item(NAME(m_port_3_last_extra));
+}
+
+/*************************************
+ *
+ *  Device type globals
+ *
+ *************************************/
+
+DEFINE_DEVICE_TYPE(CANE_AUDIO,  cane_audio_device,  "cane_audio",  "Model Racing Cane Audio")
+
+
+/*************************************
+ *
+ *  Space Invaders
+ *
+ *  Author      : Tormod Tjaberg
+ *  Created     : 1997-04-09
+ *  Description : Sound routines for the 'invaders' games
+ *
+ *  Note:
+ *  The samples were taken from Michael Strutt's (mstrutt@pixie.co.za)
+ *  excellent space invader emulator and converted to signed samples so
+ *  they would work under SEAL. The port info was also gleaned from
+ *  his emulator. These sounds should also work on all the invader games.
+ *
+ *************************************/
+
+static const char *const invaders_sample_names[] =
+{
+	"*invaders",
+	"1",        /* shot/missle */
+	"2",        /* base hit/explosion */
+	"3",        /* invader hit */
+	"4",        /* fleet move 1 */
+	"5",        /* fleet move 2 */
+	"6",        /* fleet move 3 */
+	"7",        /* fleet move 4 */
+	"8",        /* UFO/saucer hit */
+	"9",        /* bonus base */
+	nullptr
+};
+
+
+/* left in for all games that hack into invaders samples for audio */
+void _8080bw_state::invaders_samples_audio(machine_config &config)
+{
+	SPEAKER(config, "mono").front_center();
+
+	SN76477(config, m_sn);
+	m_sn->set_noise_params(0, 0, 0);
+	m_sn->set_decay_res(0);
+	m_sn->set_attack_params(0, RES_K(100));
+	m_sn->set_amp_res(RES_K(56));
+	m_sn->set_feedback_res(RES_K(10));
+	m_sn->set_vco_params(0, CAP_U(0.1), RES_K(8.2));
+	m_sn->set_pitch_voltage(5.0);
+	m_sn->set_slf_params(CAP_U(1.0), RES_K(120));
+	m_sn->set_oneshot_params(0, 0);
+	m_sn->set_vco_mode(1);
+	m_sn->set_mixer_params(0, 0, 0);
+	m_sn->set_envelope_params(1, 0);
+	m_sn->set_enable(1);
+	m_sn->add_route(ALL_OUTPUTS, "mono", 0.5);
+
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(6);
+	m_samples->set_samples_names(invaders_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 
@@ -213,7 +288,7 @@ static const discrete_dac_r1_ladder ballbomb_music_dac =
 /* Nodes - Sounds */
 #define BALLBOMB_MUSIC          NODE_11
 
-DISCRETE_SOUND_START(ballbomb)
+DISCRETE_SOUND_START(ballbomb_discrete)
 
 	DISCRETE_INPUT_DATA (BALLBOMB_MUSIC_DATA)
 
@@ -242,7 +317,7 @@ DISCRETE_SOUND_END
 
 WRITE8_MEMBER( _8080bw_state::ballbomb_01_w )
 {
-	m_discrete->write(space, BALLBOMB_MUSIC_DATA, data|0x80);
+	m_discrete->write(BALLBOMB_MUSIC_DATA, data|0x80);
 }
 
 WRITE8_MEMBER(_8080bw_state::ballbomb_sh_port_1_w)
@@ -293,7 +368,7 @@ static const discrete_dac_r1_ladder indianbt_music_dac =
 /* Nodes - Sounds */
 #define INDIANBT_MUSIC          NODE_11
 
-DISCRETE_SOUND_START(indianbt)
+DISCRETE_SOUND_START(indianbt_discrete)
 
 	DISCRETE_INPUT_DATA (INDIANBT_MUSIC_DATA)
 
@@ -351,7 +426,7 @@ WRITE8_MEMBER(_8080bw_state::indianbt_sh_port_2_w)
 
 WRITE8_MEMBER(_8080bw_state::indianbt_sh_port_3_w)
 {
-	m_discrete->write(space, INDIANBT_MUSIC_DATA, data);
+	m_discrete->write(INDIANBT_MUSIC_DATA, data);
 }
 
 WRITE8_MEMBER(_8080bw_state::indianbtbr_sh_port_1_w)
@@ -504,7 +579,7 @@ static const discrete_mixer_desc polaris_mixer_vr4_desc =
 #define POLARIS_ADJ_VR2         NODE_24
 #define POLARIS_ADJ_VR3         NODE_25
 
-DISCRETE_SOUND_START(polaris)
+DISCRETE_SOUND_START(polaris_discrete)
 
 	/************************************************/
 	/* Polaris sound system: 8 Sound Sources        */
@@ -695,27 +770,27 @@ DISCRETE_SOUND_END
 
 WRITE8_MEMBER(_8080bw_state::polaris_sh_port_1_w)
 {
-	m_discrete->write(space, POLARIS_MUSIC_DATA, data);
+	m_discrete->write(POLARIS_MUSIC_DATA, data);
 }
 
 WRITE8_MEMBER(_8080bw_state::polaris_sh_port_2_w)
 {
 	/* 0x01 - SX0 - Shot */
-	m_discrete->write(space, POLARIS_SX0_EN, data & 0x01);
+	m_discrete->write(POLARIS_SX0_EN, data & 0x01);
 
 	/* 0x02 - SX1 - Ship Hit (Sub) */
-	m_discrete->write(space, POLARIS_SX1_EN, data & 0x02);
+	m_discrete->write(POLARIS_SX1_EN, data & 0x02);
 
 	/* 0x04 - SX2 - Ship */
-	m_discrete->write(space, POLARIS_SX2_EN, data & 0x04);
+	m_discrete->write(POLARIS_SX2_EN, data & 0x04);
 
 	/* 0x08 - SX3 - Explosion */
-	m_discrete->write(space, POLARIS_SX3_EN, data & 0x08);
+	m_discrete->write(POLARIS_SX3_EN, data & 0x08);
 
 	/* 0x10 - SX4 */
 
 	/* 0x20 - SX5 - Sound Enable */
-	m_discrete->write(space, POLARIS_SX5_EN, data & 0x20);
+	m_discrete->write(POLARIS_SX5_EN, data & 0x20);
 }
 
 WRITE8_MEMBER(_8080bw_state::polaris_sh_port_3_w)
@@ -725,16 +800,16 @@ WRITE8_MEMBER(_8080bw_state::polaris_sh_port_3_w)
 	m_flip_screen = BIT(data, 5) & BIT(ioport("IN2")->read(), 2); /* SX11 */
 
 	/* 0x01 - SX6 - Plane Down */
-	m_discrete->write(space, POLARIS_SX6_EN, data & 0x01);
+	m_discrete->write(POLARIS_SX6_EN, data & 0x01);
 
 	/* 0x02 - SX7 - Plane Up */
-	m_discrete->write(space, POLARIS_SX7_EN, data & 0x02);
+	m_discrete->write(POLARIS_SX7_EN, data & 0x02);
 
 	/* 0x08 - SX9 - Hit */
-	m_discrete->write(space, POLARIS_SX9_EN, data & 0x08);
+	m_discrete->write(POLARIS_SX9_EN, data & 0x08);
 
 	/* 0x10 - SX10 - Hit */
-	m_discrete->write(space, POLARIS_SX10_EN, data & 0x10);
+	m_discrete->write(POLARIS_SX10_EN, data & 0x10);
 }
 
 
@@ -781,7 +856,7 @@ WRITE8_MEMBER(_8080bw_state::polaris_sh_port_3_w)
 #define SCHASER_EXP_SND     NODE_11
 #define SCHASER_MUSIC_SND   NODE_12
 
-DISCRETE_SOUND_START(schaser)
+DISCRETE_SOUND_START(schaser_discrete)
 	/************************************************/
 	/* Input register mapping for schaser           */
 	/************************************************/
@@ -859,8 +934,8 @@ WRITE8_MEMBER(_8080bw_state::schaser_sh_port_1_w)
 	    Note that the schematic has SX2 and SX4 the wrong way around.
 	    See MT 2662 for video proof. */
 
-	m_discrete->write(space, SCHASER_DOT_EN, data & 0x01);
-	m_discrete->write(space, SCHASER_DOT_SEL, data & 0x02);
+	m_discrete->write(SCHASER_DOT_EN, data & 0x01);
+	m_discrete->write(SCHASER_DOT_SEL, data & 0x02);
 
 	/* The effect is a variable rate 555 timer.  A diode/resistor array is used to
 	 * select the frequency.  Because of the diode voltage drop, we can not use the
@@ -921,9 +996,9 @@ WRITE8_MEMBER(_8080bw_state::schaser_sh_port_2_w)
 	   bit 4 - Field Control B (SX10)
 	   bit 5 - Flip Screen */
 
-	m_discrete->write(space, SCHASER_MUSIC_BIT, BIT(data, 0));
+	m_discrete->write(SCHASER_MUSIC_BIT, BIT(data, 0));
 
-	m_discrete->write(space, SCHASER_SND_EN, BIT(data, 1));
+	m_discrete->write(SCHASER_SND_EN, BIT(data, 1));
 	machine().sound().system_enable(BIT(data, 1));
 
 	machine().bookkeeping().coin_lockout_global_w(BIT(data, 2));
@@ -1000,12 +1075,12 @@ MACHINE_RESET_MEMBER(_8080bw_state,schaser_sh)
 /*                                                     */
 /*******************************************************/
 
-WRITE8_MEMBER(_8080bw_state::invrvnge_sh_port_1_w)
+WRITE8_MEMBER(_8080bw_state::invrvnge_port03_w)
 {
-	// probably latch+irq to audiocpu
+	m_sound_data = data;
 }
 
-WRITE8_MEMBER(_8080bw_state::invrvnge_sh_port_2_w)
+WRITE8_MEMBER(_8080bw_state::invrvnge_port05_w)
 {
 	/*
 	    00 - normal play
@@ -1020,6 +1095,12 @@ WRITE8_MEMBER(_8080bw_state::invrvnge_sh_port_2_w)
 		// no sound-related writes?
 }
 
+// The timer frequency controls the speed of the sounds
+TIMER_DEVICE_CALLBACK_MEMBER(_8080bw_state::nmi_timer)
+{
+	m_timer_state ^= 1;
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, m_timer_state ? ASSERT_LINE : CLEAR_LINE );
+}
 
 
 /****************************************************/
@@ -1061,7 +1142,7 @@ const char *const lupin3_sample_names[] =
 
 WRITE8_MEMBER( _8080bw_state::lupin3_00_w )
 {
-	m_discrete->write(space, INDIANBT_MUSIC_DATA, data);
+	m_discrete->write(INDIANBT_MUSIC_DATA, data);
 }
 
 WRITE8_MEMBER(_8080bw_state::lupin3_sh_port_1_w)
@@ -1151,10 +1232,10 @@ WRITE8_MEMBER(_8080bw_state::crashrd_port03_w)
 	   bit 4 - Dot Sound Enable (SX0)
 	   bit 5 - Effect Sound C (SX4) */
 
-	m_discrete->write(space, SCHASER_SND_EN, BIT(data,5));
+	m_discrete->write(SCHASER_SND_EN, BIT(data,5));
 	machine().sound().system_enable(BIT(data,5));
-	m_discrete->write(space, SCHASER_DOT_EN, BIT(data, 4));
-	m_discrete->write(space, SCHASER_DOT_SEL, BIT(data, 0));
+	m_discrete->write(SCHASER_DOT_EN, BIT(data, 4));
+	m_discrete->write(SCHASER_DOT_SEL, BIT(data, 0));
 
 	/* The effect is a variable rate 555 timer.  A diode/resistor array is used to
 	 * select the frequency.  Because of the diode voltage drop, we can not use the
@@ -1210,7 +1291,7 @@ WRITE8_MEMBER(_8080bw_state::crashrd_port05_w)
 {
 	// bit 0 = bitstream audio
 	// bit 4 = not sure
-	m_discrete->write(space, SCHASER_MUSIC_BIT, BIT(data, 0));
+	m_discrete->write(SCHASER_MUSIC_BIT, BIT(data, 0));
 }
 
 
@@ -1327,4 +1408,278 @@ WRITE8_MEMBER( _8080bw_state::darthvdr_08_w )
 	}
 
 	m_port_1_last_extra = data;
+}
+
+
+/*********************************************************/
+/*                                                       */
+/* Model Racing "Cane" (Slightly based on Claybuster hw) */
+/*                                                       */
+/*********************************************************/
+#define CANE_CLOCK   (19968000.0)
+#define CANE_H64     CANE_CLOCK /2 /2 /4
+
+/* Nodes - Sound enable */
+#define CANE_SND_EN        NODE_05
+
+/* Nodes - Adjusters */
+#define CANE_VR1           NODE_07	// Gain for 76477
+#define CANE_VR2           NODE_08	// VR attached to the output of the TOS
+#define CANE_VR3           NODE_09	// VR for SFX generated by the 555
+
+/* Nodes - sn76477 Sounds */
+#define CANE_EXP_STREAM    NODE_03
+#define CANE_EXP_SND       NODE_11
+
+/* Nodes - BGM */
+#define CANE_MUSIC_DATA    NODE_06
+#define CANE_MUSIC_NOTE    NODE_40
+#define CANE_MUSIC_NOTE_PF NODE_01
+#define CANE_MUSIC_SND     NODE_12
+
+/* Nodes - 555 sfx */
+#define CANE_76477_PIN6    NODE_13
+#define CANE_555_CLAMPED   NODE_14
+#define CANE_555_ONESHOT   NODE_15
+#define CANE_555_EN        NODE_16
+#define CANE_TMP_SND       NODE_17
+#define CANE_SFX_SND       NODE_18
+
+/* Node output */
+#define CANE_SOUND_OUT     NODE_90
+
+static INPUT_PORTS_START( cane_audio )
+	PORT_START("VR1")
+	PORT_ADJUSTER( 80, "VR1 - SFX from 76477" )
+
+	PORT_START("VR2")
+	PORT_ADJUSTER( 90, "VR2 - TOS music" )
+
+	PORT_START("VR3")
+	PORT_ADJUSTER( 70, "VR3 - Shoot SFX from 555" )
+INPUT_PORTS_END
+
+cane_audio_device::cane_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, CANE_AUDIO, tag, owner, clock),
+	m_vco_timer(*this, "vco_timer"),
+	m_sn(*this, "snsnd"),
+	m_discrete(*this, "discrete"),
+	m_vco_rc_chargetime(attotime::never)
+{
+}
+
+void cane_audio_device::device_add_mconfig(machine_config &config)
+{
+	TIMER(config, m_vco_timer).configure_periodic(FUNC(cane_audio_device::vco_voltage_timer), attotime::from_hz(1000));
+
+	SPEAKER(config, "mono").front_center();
+
+	SN76477(config, m_sn);
+	// Amplitude res in the schematic is connected to a 470K potentiometer, so from the schematic is impossible to know the real res.
+	// This parameter drives the amp just before the audio output pin 13.
+	m_sn->set_amp_res(100+RES_K(20));
+	m_sn->set_noise_params(RES_K(39), RES_K(1), CAP_P(1000));
+	m_sn->set_decay_res(RES_M(1));
+	m_sn->set_attack_params(CAP_U(1.0), RES_K(47));
+	m_sn->set_feedback_res(RES_K(4.7));
+	m_sn->set_vco_params(0, CAP_P(3300), RES_K(100));
+	m_sn->set_pitch_voltage(5.0);
+	m_sn->set_slf_params(CAP_U(1.0), RES_K(33));
+	m_sn->set_oneshot_params(CAP_U(10), RES_K(100));
+	m_sn->set_vco_mode(0);
+	m_sn->set_mixer_params(0, 0, 0);
+	m_sn->set_envelope_params(1, 0);
+	m_sn->set_enable(0);
+	m_sn->add_route(0, "discrete", 1.0, 0);
+
+	DISCRETE(config, m_discrete, cane_discrete);
+	m_discrete->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
+
+ioport_constructor cane_audio_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(cane_audio);
+}
+
+void cane_audio_device::device_start()
+{
+	// provare a commentare
+	m_vco_rc_chargetime = attotime::never;
+
+	save_item(NAME(m_vco_rc_chargetime));
+}
+
+void cane_audio_device::sh_port_1_w(u8 data)
+{
+	/*
+		bit 0 - SX0 - Sound enable on mixer
+		bit 1 - SX1 - SN76477 - Mixer select C - pin 27
+		bit 2 - SX2 - SN76477 - Mixer select A - pin 26
+		bit 3 - SX3 - SN76477 - Mixer select B - pin 25
+		bit 4 - SX4 - NE555 - Trigger (Step, high output level for 1.1*RC = 1.1*100K*0.47u = 51.7 ms)
+	*/
+
+	m_discrete->write(CANE_SND_EN, data & 0x01); // BIT(data, 0) - bit 0 - SX0 - Sound enable on mixer
+	m_discrete->write(CANE_555_EN, data & 0x10); // BIT(data, 4) - bit 4 - SX4 - NE555 - Trigger
+
+	// 76477 enable bit is connected to the select line of the out port 3 (inverted).
+	m_sn->enable_w(1);
+	m_sn->set_mixer_params(BIT(data, 2), BIT(data, 3), BIT(data, 1));
+
+	m_vco_timer->adjust(attotime::zero, m_vco_timer->param(), attotime::from_hz(1000));
+	m_vco_rc_chargetime = m_vco_timer->start_time();
+
+	// Little hack...
+	// To be precise I should enable the 76477 every time the CPU reads or write to a port different from port 3
+	// and disable it every time the CPU read/write from/to port 3.
+	// Actually this can not be done easily so I decided to enable it preemptively here after every port 3 access
+	m_sn->enable_w(0);
+}
+
+void cane_audio_device::music_w(u8 data)
+{
+	m_sn->enable_w(1);
+	m_discrete->write(CANE_MUSIC_DATA, data);
+}
+
+void cane_audio_device::sn76477_en_w(u8 data)
+{
+	m_sn->enable_w(0);
+}
+
+void cane_audio_device::sn76477_dis_w(u8 data)
+{
+	m_sn->enable_w(1);
+}
+
+/*******************************************************************************************************************************************************/
+/* Cane discrete implementation, slightly based on Claybuster hw.                                                                                      */
+/* This implementation doesn't pretend to be accurate thus trying to be at least functionally similar.                                                 */
+/*                                                                                                                                                     */
+/*                                                                       Port 1 - SX4              CANE_VR3                       Port 1 - SX0         */
+/*                                                                            |                        |                               |               */
+/*                                                                       CANE_555_EN                   |                               |               */
+/*                                                                            |                        |                               |               */
+/*                                                                  +------------------+               |                               |               */
+/*                                                                  | CANE_555_ONESHOT |               |                               |               */
+/*                                                                  +------------------+               |                               |               */
+/*                                                                            |                        |                               |               */
+/*                                                                            v                        v                               |               */
+/*                                    sn76477 pin 6   +------------------+  +---+  +--------------+  +---+  +--------------+           |               */
+/*                                     CLAMP(0, 5V) ->| CANE_555_CLAMPED |->| * |->| CANE_TMP_SND |->| * |->| CANE_SFX_SND |       CANE_SND_EN         */
+/*                                 (DISCRETE_NOISE)   +------------------+  +---+  +--------------+  +---+  +--------------+           |               */
+/*                                                                                                                       |             |               */
+/*                                                                                          CANE_VR1                     |             |               */
+/*                                                                                              |                        |             |               */
+/*                                                                                              v                        v             v               */
+/*                                                      sn76477 output   +-----------------+  +---+  +--------------+  +---+  +----------------+       */
+/*                                              DISCRETE_INPUTX_STREAM ->| CANE_EXP_STREAM |->| * |->| CANE_EXP_SND |->| + |->| CANE_SOUND_OUT |->OUT  */
+/*                                                                       +-----------------+  +---+  +--------------+  +---+  +----------------+       */
+/*                                                                                                                       ^                             */
+/*                                                                                                                       |                             */
+/*                   CANE_MUSIC_DATA   +--------------------+  +-----------+  +-----------------+  +---+  +----------------+                           */
+/* Port 5 data---DISCRETE_INPUT_DATA ->| CANE_MUSIC_NOTE_PF |->| CR_FILTER |->| CANE_MUSIC_NOTE |->| * |->| CANE_MUSIC_SND |                           */
+/*                     DISCRETE_NOTE   +--------------------+  +-----------+  +-----------------+  +---+  +----------------+                           */
+/*                                                                RES_K(10)                          ^                                                 */
+/*                                                               CAP_U(0.1)                          |                                                 */
+/*                                                                                               CANE_VR2                                              */
+/*                                                                                                                                                     */
+/*                                                                                                                                                     */
+/*******************************************************************************************************************************************************/
+DISCRETE_SOUND_START(cane_discrete)
+	/************************************************/
+	/* Input register mapping for cane           */
+	/************************************************/
+	DISCRETE_INPUT_DATA (CANE_MUSIC_DATA)
+
+	DISCRETE_INPUT_LOGIC  (CANE_555_EN)
+
+	// scale to 0-2.5V
+	DISCRETE_INPUTX_STREAM(CANE_EXP_STREAM, 0, 0.5, 0)
+
+	DISCRETE_INPUT_LOGIC  (CANE_SND_EN)
+
+	/************************************************/
+	/* Volume adjusters.                            */
+	/* We will set them to adjust the realitive     */
+	/* gains.                                       */
+	/************************************************/
+	DISCRETE_ADJUSTMENT(CANE_VR1, 0, 0.33*6, DISC_LINADJ, "VR1")      // Gain for 76477
+	DISCRETE_ADJUSTMENT(CANE_VR2, 0, 0.33*60000, DISC_LINADJ, "VR2")  // VR attached to the output of the TOS
+	DISCRETE_ADJUSTMENT(CANE_VR3, 0, 0.33*60000, DISC_LINADJ, "VR3")  // VR for SFX generated by the 555
+
+	/************************************************/
+	/* From 555 				                    */
+	/************************************************/
+	/* TODO: find real noise freq and amplitude */
+	/* width was simulated with ltspice using Claybuster schematic as a source and it's value is about 51ms */
+	DISCRETE_NOISE(CANE_76477_PIN6,
+				1,                  	    /* ENAB */
+				1280,                       /* FREQ - Guessed */
+				1,		                    /* AMP  */
+				0)                          /* BIAS - fake AC is fine*/
+	DISCRETE_CLAMP(CANE_555_CLAMPED,
+				CANE_76477_PIN6,			/* input node */
+				0.0,				 		/* minimum */
+				5.0)						/* maximum */
+	DISCRETE_ONESHOT(CANE_555_ONESHOT,
+					 CANE_555_EN,			/* trigger node */
+					 1,						/* amplitude node or static value */
+					 0.05,					/* width (in seconds) node or static value - 50 ms*/
+					 DISC_ONESHOT_FEDGE | DISC_ONESHOT_RETRIG)	/* type of oneshot static value */
+
+	DISCRETE_MULTIPLY(CANE_TMP_SND, CANE_555_CLAMPED, CANE_555_ONESHOT)
+	DISCRETE_MULTIPLY(CANE_SFX_SND, CANE_TMP_SND, CANE_VR3)
+
+/*****************************************************************************
+*
+* Music Generator (TOS)
+*
+* Values for this section of the sound hardware where derived from comments
+* in the source code and the analysis of TOS.ED sources.
+*
+* For further info look at the relevant comments reported into
+* drivers/8080bw.cpp
+*
+******************************************************************************/
+	DISCRETE_NOTE(CANE_MUSIC_NOTE_PF, 1, CANE_H64, CANE_MUSIC_DATA, 255, 1, DISC_CLK_IS_FREQ)
+	DISCRETE_CRFILTER(CANE_MUSIC_NOTE, CANE_MUSIC_NOTE_PF, RES_K(10), CAP_U(0.1))  // high pass filter
+	DISCRETE_MULTIPLY(CANE_MUSIC_SND, CANE_MUSIC_NOTE, CANE_VR2)
+
+/******************************************************************************
+*
+* From 76477 output
+*
+******************************************************************************/
+	DISCRETE_MULTIPLY(CANE_EXP_SND, CANE_EXP_STREAM, CANE_VR1)
+
+/******************************************************************************
+*
+* Final Mixing and Output
+*
+******************************************************************************/
+	DISCRETE_ADDER3(CANE_SOUND_OUT, CANE_SND_EN, CANE_SFX_SND, CANE_EXP_SND, CANE_MUSIC_SND)
+	DISCRETE_OUTPUT(CANE_SOUND_OUT, 1)
+
+//LOG
+/*
+	DISCRETE_WAVLOG1(CANE_EXP_STREAM, 1)
+	DISCRETE_WAVLOG1(CANE_EXP_SND, 1)
+	DISCRETE_WAVLOG1(CANE_TMP_SND, 1)
+	DISCRETE_WAVLOG1(CANE_SFX_SND, 1)
+	DISCRETE_WAVLOG1(CANE_MUSIC_NOTE, 1)
+	DISCRETE_WAVLOG1(CANE_MUSIC_SND, 1)
+	DISCRETE_WAVLOG1(CANE_SOUND_OUT, 1)
+*/
+DISCRETE_SOUND_END
+
+TIMER_DEVICE_CALLBACK_MEMBER(cane_audio_device::vco_voltage_timer)
+{
+	const double delta = (m_vco_timer->fire_time() - m_vco_rc_chargetime).as_double();
+	const double voltage = 5 * (1 - std::exp(-delta / 47));
+
+	LOG("t = %d\n", delta);
+	LOG("vco_voltage = %d\n", voltage);
+
+	m_sn->vco_voltage_w(voltage);
 }

@@ -197,22 +197,42 @@
 #include "cpu/tms9900/tms9980a.h"
 #include "machine/nvram.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 #define MASTER_CLOCK    XTAL(6'000'000)              /* confirmed */
-#define CPU_CLOCK      (MASTER_CLOCK / 2)      /* guess */
+#define CPU_CLOCK       MASTER_CLOCK           /* guess */
 #define CRTC_CLOCK     (MASTER_CLOCK / 8)      /* guess */
 
 
 class jubilee_state : public driver_device
 {
 public:
-	jubilee_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	jubilee_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoworkram"),
 		m_colorram(*this, "colorram"),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode"),
+		m_lamps(*this, "lamp%u", 0U)
+	{ }
+
+	void jubileep(machine_config &config);
+
+private:
+	DECLARE_WRITE8_MEMBER(jubileep_videoram_w);
+	DECLARE_WRITE8_MEMBER(jubileep_colorram_w);
+	DECLARE_WRITE8_MEMBER(unk_w);
+	DECLARE_READ8_MEMBER(mux_port_r);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	uint32_t screen_update_jubileep(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(jubileep_interrupt);
+	void jubileep_cru_map(address_map &map);
+	void jubileep_map(address_map &map);
+
+	virtual void machine_start() override { m_lamps.resolve(); }
+	virtual void video_start() override;
 
 	uint8_t mux_sel;
 	uint8_t muxlamps;
@@ -220,19 +240,9 @@ public:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 	tilemap_t *m_bg_tilemap;
-	DECLARE_WRITE8_MEMBER(jubileep_videoram_w);
-	DECLARE_WRITE8_MEMBER(jubileep_colorram_w);
-	DECLARE_WRITE8_MEMBER(unk_w);
-	DECLARE_READ8_MEMBER(mux_port_r);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void video_start() override;
-	uint32_t screen_update_jubileep(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(jubileep_interrupt);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
-	void jubileep(machine_config &config);
-	void jubileep_cru_map(address_map &map);
-	void jubileep_map(address_map &map);
+	output_finder<9> m_lamps;
 };
 
 
@@ -271,11 +281,11 @@ TILE_GET_INFO_MEMBER(jubilee_state::get_bg_tile_info)
 
 void jubilee_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(jubilee_state::get_bg_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(jubilee_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg_tilemap->set_scrolldx(8, 0); /* guess */
 }
 
-uint32_t jubilee_state::screen_update_jubileep(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t jubilee_state::screen_update_jubileep(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -305,8 +315,8 @@ void jubilee_state::jubileep_map(address_map &map)
     Working RAM = 3400-37FF
     Color RAM =   3800-3BFF (lower 4-bits)
 */
-	map(0x3000, 0x37ff).ram().w(this, FUNC(jubilee_state::jubileep_videoram_w)).share("videoworkram");  /* TC5517AP battery backed RAM */
-	map(0x3800, 0x3bff).ram().w(this, FUNC(jubilee_state::jubileep_colorram_w)).share("colorram");      /* Whole 2114 RAM */
+	map(0x3000, 0x37ff).ram().w(FUNC(jubilee_state::jubileep_videoram_w)).share("videoworkram");  /* TC5517AP battery backed RAM */
+	map(0x3800, 0x3bff).ram().w(FUNC(jubilee_state::jubileep_colorram_w)).share("colorram");      /* Whole 2114 RAM */
 
 /*  CRTC *is* mapped here. Read 00-01 and then write on them.
     Then does the same for 02-03. Initialization seems incomplete since
@@ -331,7 +341,7 @@ WRITE8_MEMBER(jubilee_state::unk_w)
     is set to one. Maybe this one clears the interrupt.
     TODO: Check the schematics.
 */
-	if (((offset<<1)==0x0ce2)&&(data==1))
+	if (((offset<<1)==0x0cf2)&&(data==1))
 	{
 		m_maincpu->set_input_line(INT_9980A_LEVEL1, CLEAR_LINE);
 	}
@@ -411,19 +421,19 @@ WRITE8_MEMBER(jubilee_state::unk_w)
 	{
 		if (muxlamps == 1)
 			{
-				output().set_lamp_value(0, (data & 1));  /* lamp */
+				m_lamps[0] = BIT(data, 0);  /* lamp */
 				logerror("CRU: LAAAAAAMP 0 write to address %04x: %d\n", offset<<1, data & 1);
 //              popmessage("LAMP 0");
 			}
 		if (muxlamps == 2)
 			{
-				output().set_lamp_value(3, (data & 1));  /* lamp */
+				m_lamps[3] = BIT(data, 0);  /* lamp */
 				logerror("CRU: LAAAAAAMP 3 write to address %04x: %d\n", offset<<1, data & 1);
 //              popmessage("LAMP 3");
 			}
 		if (muxlamps == 3)
 			{
-				output().set_lamp_value(6, (data & 1));  /* lamp */
+				m_lamps[6] = BIT(data, 0);  /* lamp */
 				logerror("CRU: LAAAAAAMP 6 write to address %04x: %d\n", offset<<1, data & 1);
 //              popmessage("LAMP 6");
 			}
@@ -433,19 +443,19 @@ WRITE8_MEMBER(jubilee_state::unk_w)
 	{
 		if (muxlamps == 1)
 			{
-				output().set_lamp_value(1, (data & 1));  /* lamp */
+				m_lamps[1] = BIT(data, 0);  /* lamp */
 				logerror("CRU: LAAAAAAMP 1 write to address %04x: %d\n", offset<<1, data & 1);
 //              popmessage("LAMP 1");
 			}
 		if (muxlamps == 2)
 			{
-				output().set_lamp_value(4, (data & 1));  /* lamp */
+				m_lamps[4] = BIT(data, 0);  /* lamp */
 				logerror("CRU: LAAAAAAMP 4 write to address %04x: %d\n", offset<<1, data & 1);
 //              popmessage("LAMP 4");
 			}
 		if (muxlamps == 3)
 			{
-				output().set_lamp_value(7, (data & 1));  /* lamp */
+				m_lamps[7] = BIT(data, 0);  /* lamp */
 				logerror("CRU: LAAAAAAMP 7 write to address %04x: %d\n", offset<<1, data & 1);
 //              popmessage("LAMP 7");
 			}
@@ -455,19 +465,19 @@ WRITE8_MEMBER(jubilee_state::unk_w)
 	{
 		if (muxlamps == 1)
 			{
-				output().set_lamp_value(2, (data & 1));  /* lamp */
+				m_lamps[2] = BIT(data, 0);  /* lamp */
 				logerror("CRU: LAAAAAAMP 2 write to address %04x: %d\n", offset<<1, data & 1);
 //              popmessage("LAMP 2");
 			}
 		if (muxlamps == 2)
 			{
-				output().set_lamp_value(5, (data & 1));  /* lamp */
+				m_lamps[5] = BIT(data, 0);  /* lamp */
 				logerror("CRU: LAAAAAAMP 5 write to address %04x: %d\n", offset<<1, data & 1);
 //              popmessage("LAMP 5");
 			}
 		if (muxlamps == 3)
 			{
-				output().set_lamp_value(8, (data & 1));  /* lamp */
+				m_lamps[8] = BIT(data, 0);  /* lamp */
 				logerror("CRU: LAAAAAAMP 8 write to address %04x: %d\n", offset<<1, data & 1);
 //              popmessage("LAMP 8");
 			}
@@ -560,19 +570,19 @@ READ8_MEMBER(jubilee_state::mux_port_r)
 {
 	switch( mux_sel )
 	{
-		case 0x01: return ioport("IN0")->read();
-		case 0x02: return ioport("IN1")->read();    /* muxed credits input is here! */
-		case 0x03: return ioport("IN2")->read();
+		case 0x01: return BIT(ioport("IN0")->read(), offset);
+		case 0x02: return BIT(ioport("IN1")->read(), offset);    /* muxed credits input is here! */
+		case 0x03: return BIT(ioport("IN2")->read(), offset);
 	}
 
-	return 0xff;
+	return 1;
 }
 
 
 void jubilee_state::jubileep_cru_map(address_map &map)
 {
-	map(0x00c8, 0x00c8).r(this, FUNC(jubilee_state::mux_port_r));    /* multiplexed input port */
-	map(0x0000, 0x07ff).w(this, FUNC(jubilee_state::unk_w));
+	map(0x0c80, 0x0c8f).r(FUNC(jubilee_state::mux_port_r));    /* multiplexed input port */
+	map(0x0000, 0x0fff).w(FUNC(jubilee_state::unk_w));
 }
 
 /* I/O byte R/W
@@ -649,7 +659,7 @@ static const gfx_layout tilelayout =
 * Graphics Decode Information *
 ******************************/
 
-static GFXDECODE_START( jubileep )      /* 4 different graphics banks */
+static GFXDECODE_START( gfx_jubileep )      /* 4 different graphics banks */
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout, 0, 1 )
 	GFXDECODE_ENTRY( "gfx1", 0x0800, tilelayout, 0, 1 )
 	GFXDECODE_ENTRY( "gfx1", 0x1000, tilelayout, 0, 1 )
@@ -661,30 +671,32 @@ GFXDECODE_END
 *    Machine Drivers     *
 *************************/
 
-MACHINE_CONFIG_START(jubilee_state::jubileep)
-
+void jubilee_state::jubileep(machine_config &config)
+{
 	// Main CPU TMS9980A, no line connections.
-	MCFG_TMS99xx_ADD("maincpu", TMS9980A, CPU_CLOCK, jubileep_map, jubileep_cru_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", jubilee_state,  jubileep_interrupt)
+	TMS9980A(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &jubilee_state::jubileep_map);
+	m_maincpu->set_addrmap(AS_IO, &jubilee_state::jubileep_cru_map);
+	m_maincpu->set_vblank_int("screen", FUNC(jubilee_state::jubileep_interrupt));
 
-	MCFG_NVRAM_ADD_0FILL("videoworkram")
+	NVRAM(config, "videoworkram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)                         /* (47+1*8, 38+1*8) from CRTC settings */
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)   /* (32*8, 32*8) from CRTC settings */
-	MCFG_SCREEN_UPDATE_DRIVER(jubilee_state, screen_update_jubileep)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);                         /* (47+1*8, 38+1*8) from CRTC settings */
+	screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);   /* (32*8, 32*8) from CRTC settings */
+	screen.set_screen_update(FUNC(jubilee_state::screen_update_jubileep));
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jubileep)
-	MCFG_PALETTE_ADD("palette",8)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_jubileep);
+	PALETTE(config, "palette").set_entries(8);
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-MACHINE_CONFIG_END
+	mc6845_device &crtc(MC6845(config, "crtc", CRTC_CLOCK));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+}
 
 
 /*************************
@@ -711,5 +723,5 @@ ROM_END
 *      Game Drivers      *
 *************************/
 
-//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE          INIT  ROT   COMPANY    FULLNAME                     FLAGS
-GAME( 1985, jubileep, 0,      jubileep, jubileep, jubilee_state, 0,    ROT0, "Jubilee", "Double-Up Poker (Jubilee)", MACHINE_NO_SOUND )
+//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE          INIT        ROT   COMPANY    FULLNAME                     FLAGS
+GAME( 1985, jubileep, 0,      jubileep, jubileep, jubilee_state, empty_init, ROT0, "Jubilee", "Double-Up Poker (Jubilee)", MACHINE_NO_SOUND )

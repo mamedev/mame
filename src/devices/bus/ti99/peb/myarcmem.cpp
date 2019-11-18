@@ -101,7 +101,7 @@ READ8Z_MEMBER(myarc_memory_expansion_device::readz)
 /*
     Memory write access. DSRROM does not allow writing.
 */
-WRITE8_MEMBER(myarc_memory_expansion_device::write)
+void myarc_memory_expansion_device::write(offs_t offset, uint8_t data)
 {
 	int base = get_base(offset);
 
@@ -142,7 +142,7 @@ READ8Z_MEMBER(myarc_memory_expansion_device::crureadz)
         1006 = bit 2 of RAM bank value (512K)
         1008 = bit 3 of RAM bank value (512K)
 */
-WRITE8_MEMBER(myarc_memory_expansion_device::cruwrite)
+void myarc_memory_expansion_device::cruwrite(offs_t offset, uint8_t data)
 {
 	if (((offset & 0xff00)==MYARCMEM_CRU_BASE1)||((offset & 0xff00)==MYARCMEM_CRU_BASE2))
 	{
@@ -195,11 +195,10 @@ ROM_START( myarc_exp )
 	ROM_LOAD("myarc512k_xb2_dsr.bin", 0x0000, 0x2000, CRC(41fbb96d) SHA1(4dc7fdfa46842957bcbb0cf2c37764e4bb6d877a)) /* DSR for Ramdisk etc. */
 ROM_END
 
-MACHINE_CONFIG_START(myarc_memory_expansion_device::device_add_mconfig)
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("512k")
-	MCFG_RAM_DEFAULT_VALUE(0)
-MACHINE_CONFIG_END
+void myarc_memory_expansion_device::device_add_mconfig(machine_config &config)
+{
+	RAM(config, RAM_TAG).set_default_size("512K").set_default_value(0);
+}
 
 
 const tiny_rom_entry *myarc_memory_expansion_device::device_rom_region() const

@@ -22,8 +22,6 @@ public:
 	DECLARE_WRITE8_MEMBER( m52_adpcm_w );
 	DECLARE_WRITE8_MEMBER( m62_adpcm_w );
 
-	netlist_mame_logic_input_device * m_audio_SINH;
-
 	DECLARE_READ8_MEMBER( soundlatch_r );
 	DECLARE_WRITE8_MEMBER( ay8910_45M_portb_w );
 	DECLARE_WRITE8_MEMBER( ay8910_45L_porta_w );
@@ -32,12 +30,21 @@ public:
 	void m52_large_sound_map(address_map &map);
 	void m52_small_sound_map(address_map &map);
 	void m62_sound_map(address_map &map);
+
+	optional_device<netlist_mame_logic_input_device> m_audio_SINH;
+
 protected:
 	irem_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	required_device<cpu_device> m_cpu;
+	required_device<msm5205_device> m_adpcm1;
+	optional_device<msm5205_device> m_adpcm2;
+	required_device<ay8910_device> m_ay_45L;
+	required_device<ay8910_device> m_ay_45M;
 
 private:
 	// internal state
@@ -46,11 +53,6 @@ private:
 
 	uint8_t           m_soundlatch;
 
-	required_device<cpu_device> m_cpu;
-	required_device<ay8910_device> m_ay_45L;
-	required_device<ay8910_device> m_ay_45M;
-	required_device<msm5205_device> m_adpcm1;
-	optional_device<msm5205_device> m_adpcm2;
 	optional_device<netlist_mame_logic_input_device> m_audio_BD;
 	optional_device<netlist_mame_logic_input_device> m_audio_SD;
 	optional_device<netlist_mame_logic_input_device> m_audio_OH;

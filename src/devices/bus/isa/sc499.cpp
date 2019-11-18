@@ -177,9 +177,10 @@ static INPUT_PORTS_START( sc499_port )
 
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(sc499_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(SC499_CTAPE_TAG, SC499_CTAPE, 0)
-MACHINE_CONFIG_END
+void sc499_device::device_add_mconfig(machine_config &config)
+{
+	SC499_CTAPE(config, m_image, 0);
+}
 
 
 //**************************************************************************
@@ -388,7 +389,7 @@ void sc499_device::device_reset()
 		m_irq = m_irqdrq->read() & 7;
 		m_drq = m_irqdrq->read()>>4;
 
-		m_isa->install_device(base, base+7, read8_delegate(FUNC(sc499_device::read), this), write8_delegate(FUNC(sc499_device::write), this));
+		m_isa->install_device(base, base+7, read8_delegate(*this, FUNC(sc499_device::read)), write8_delegate(*this, FUNC(sc499_device::write)));
 		m_isa->set_dma_channel(m_drq, this, true);
 
 		m_installed = true;

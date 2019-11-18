@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-// currently used by gstriker.c, apparently inufuku uses the same chip
+// currently used by gstriker.cpp, apparently inufuku uses the same chip
 
 /*** VS920A (score tilemap) **********************************************/
 
@@ -49,11 +49,11 @@ void vs920a_text_tilemap_device::device_start()
 		throw device_missing_dependencies();
 
 	m_vram = make_unique_clear<uint16_t[]>(0x1000/2);
-	save_pointer(NAME(m_vram.get()), 0x1000/2);
+	save_pointer(NAME(m_vram), 0x1000/2);
 	save_item(NAME(m_pal_base));
 
 
-	m_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(vs920a_text_tilemap_device::get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(vs920a_text_tilemap_device::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_tmap->set_transparent_pen(0);
 }
 

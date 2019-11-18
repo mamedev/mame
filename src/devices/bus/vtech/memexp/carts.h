@@ -11,6 +11,6 @@
 
 #pragma once
 
-SLOT_INTERFACE_EXTERN( vtech_memexp_carts );
+void vtech_memexp_carts(device_slot_interface &device);
 
 #endif // MAME_BUS_VTECH_MEMEXP_CARTS_H

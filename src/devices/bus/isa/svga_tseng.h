@@ -38,7 +38,8 @@ protected:
 private:
 	void map_io();
 	void map_ram();
-	tseng_vga_device *m_vga;
+	void map_rom();
+	required_device<tseng_vga_device> m_vga;
 };
 
 

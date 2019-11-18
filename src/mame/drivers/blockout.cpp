@@ -103,17 +103,17 @@ void blockout_state::main_map(address_map &map)
 	map(0x100004, 0x100005).portr("SYSTEM");
 	map(0x100006, 0x100007).portr("DSW1");
 	map(0x100008, 0x100009).portr("DSW2");
-	map(0x100010, 0x100011).w(this, FUNC(blockout_state::blockout_irq6_ack_w));
-	map(0x100012, 0x100013).w(this, FUNC(blockout_state::blockout_irq5_ack_w));
+	map(0x100010, 0x100011).w(FUNC(blockout_state::blockout_irq6_ack_w));
+	map(0x100012, 0x100013).w(FUNC(blockout_state::blockout_irq5_ack_w));
 	map(0x100015, 0x100015).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x100016, 0x100017).nopw();    /* don't know, maybe reset sound CPU */
-	map(0x180000, 0x1bffff).ram().w(this, FUNC(blockout_state::blockout_videoram_w)).share("videoram");
+	map(0x180000, 0x1bffff).rw(FUNC(blockout_state::videoram_r), FUNC(blockout_state::videoram_w)).share("videoram");
 	map(0x1d4000, 0x1dffff).ram(); /* work RAM */
 	map(0x1f4000, 0x1fffff).ram(); /* work RAM */
 	map(0x200000, 0x207fff).ram().share("frontvideoram");
 	map(0x208000, 0x21ffff).ram(); /* ??? */
-	map(0x280002, 0x280003).w(this, FUNC(blockout_state::blockout_frontcolor_w));
-	map(0x280200, 0x2805ff).ram().w(this, FUNC(blockout_state::blockout_paletteram_w)).share("paletteram");
+	map(0x280002, 0x280003).w(FUNC(blockout_state::frontcolor_w));
+	map(0x280200, 0x2805ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 }
 
 void blockout_state::agress_map(address_map &map)
@@ -124,17 +124,17 @@ void blockout_state::agress_map(address_map &map)
 	map(0x100004, 0x100005).portr("SYSTEM");
 	map(0x100006, 0x100007).portr("DSW1");
 	map(0x100008, 0x100009).portr("DSW2");
-	map(0x100010, 0x100011).w(this, FUNC(blockout_state::blockout_irq6_ack_w));
-	map(0x100012, 0x100013).w(this, FUNC(blockout_state::blockout_irq5_ack_w));
+	map(0x100010, 0x100011).w(FUNC(blockout_state::blockout_irq6_ack_w));
+	map(0x100012, 0x100013).w(FUNC(blockout_state::blockout_irq5_ack_w));
 	map(0x100015, 0x100015).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x100016, 0x100017).nopw();    /* don't know, maybe reset sound CPU */
-	map(0x180000, 0x1bffff).ram().w(this, FUNC(blockout_state::blockout_videoram_w)).share("videoram");
+	map(0x180000, 0x1bffff).rw(FUNC(blockout_state::videoram_r), FUNC(blockout_state::videoram_w)).share("videoram");
 	map(0x1d4000, 0x1dffff).ram(); /* work RAM */
 	map(0x1f4000, 0x1fffff).ram(); /* work RAM */
 	map(0x200000, 0x207fff).ram().share("frontvideoram");
 	map(0x208000, 0x21ffff).ram(); /* ??? */
-	map(0x280002, 0x280003).w(this, FUNC(blockout_state::blockout_frontcolor_w));
-	map(0x280200, 0x2805ff).ram().w(this, FUNC(blockout_state::blockout_paletteram_w)).share("paletteram");
+	map(0x280002, 0x280003).w(FUNC(blockout_state::frontcolor_w));
+	map(0x280200, 0x2805ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 }
 
 void blockout_state::audio_map(address_map &map)
@@ -273,7 +273,7 @@ INPUT_PORTS_END
 /* handler called by the 2151 emulator when the internal timers cause an IRQ */
 WRITE_LINE_MEMBER(blockout_state::irq_handler)
 {
-	m_audiocpu->set_input_line_and_vector(0, state ? ASSERT_LINE : CLEAR_LINE, 0xff);
+	m_audiocpu->set_input_line_and_vector(0, state ? ASSERT_LINE : CLEAR_LINE, 0xff); // Z80
 }
 
 
@@ -297,55 +297,54 @@ TIMER_DEVICE_CALLBACK_MEMBER(blockout_state::blockout_scanline)
 {
 	int scanline = param;
 
-	if(scanline == 250) // vblank-out irq
+	if (scanline == 250) // vblank-out irq
 		m_maincpu->set_input_line(6, ASSERT_LINE);
 
-	if(scanline == 0) // vblank-in irq or directly tied to coin inputs (TODO: check)
+	if (scanline == 0) // vblank-in irq or directly tied to coin inputs (TODO: check)
 		m_maincpu->set_input_line(5, ASSERT_LINE);
 }
 
-MACHINE_CONFIG_START(blockout_state::blockout)
-
+void blockout_state::blockout(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, MAIN_CLOCK)       /* MRH - 8.76 makes gfx/adpcm samples sync better -- but 10 is correct speed*/
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", blockout_state, blockout_scanline, "screen", 0, 1)
+	M68000(config, m_maincpu, MAIN_CLOCK);       /* MRH - 8.76 makes gfx/adpcm samples sync better -- but 10 is correct speed*/
+	m_maincpu->set_addrmap(AS_PROGRAM, &blockout_state::main_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(blockout_state::blockout_scanline), "screen", 0, 1);
 
-	MCFG_CPU_ADD("audiocpu", Z80, AUDIO_CLOCK)  /* 3.579545 MHz */
-	MCFG_CPU_PROGRAM_MAP(audio_map)
-
+	Z80(config, m_audiocpu, AUDIO_CLOCK);  /* 3.579545 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &blockout_state::audio_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	/* assume same as ddragon3 with adjusted visible display area */
-	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 448, 0, 320, 272, 10, 250)
-	MCFG_SCREEN_UPDATE_DRIVER(blockout_state, screen_update_blockout)
-	MCFG_SCREEN_PALETTE("palette")
+	m_screen->set_raw(XTAL(28'000'000) / 4, 448, 0, 320, 272, 10, 250);
+	m_screen->set_screen_update(FUNC(blockout_state::screen_update));
+	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 513)
-
+	PALETTE(config, m_palette).set_format(2, &blockout_state::blockout_xBGR_444, 513);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_YM2151_ADD("ymsnd", AUDIO_CLOCK)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(blockout_state,irq_handler))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", AUDIO_CLOCK));
+	ymsnd.irq_handler().set(FUNC(blockout_state::irq_handler));
+	ymsnd.add_route(0, "lspeaker", 0.60);
+	ymsnd.add_route(1, "rspeaker", 0.60);
 
-	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
-MACHINE_CONFIG_END
+	okim6295_device &oki(OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH));
+	oki.add_route(ALL_OUTPUTS, "lspeaker", 0.50);
+	oki.add_route(ALL_OUTPUTS, "rspeaker", 0.50);
+}
 
-MACHINE_CONFIG_START(blockout_state::agress)
+void blockout_state::agress(machine_config &config)
+{
 	blockout(config);
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_PROGRAM_MAP(agress_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &blockout_state::agress_map);
+}
 
 /*************************************
  *
@@ -383,19 +382,19 @@ ROM_START( blockout2 )
 	ROM_LOAD( "mb7114h.25",   0x0000, 0x0100, CRC(b25bbda7) SHA1(840f1470886bd0019db3cd29e3d1d80205a65f48) )    /* unknown */
 ROM_END
 
-ROM_START( blockoutj )
+ROM_START( blockout3 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 2*128k for 68000 code */
-	ROM_LOAD16_BYTE( "2.bin",         0x00000, 0x20000, CRC(e16cf065) SHA1(541b30b054cf08f10d6ca4746423759f4326c005) )
-	ROM_LOAD16_BYTE( "1.bin",         0x00001, 0x20000, CRC(950b28a3) SHA1(7d1635ac2a3fc1efdd2f78cd6038bd7b4c907b1b) )
+	ROM_LOAD16_BYTE( "blockout-1-27c010-ic81.bin", 0x00000, 0x20000, CRC(36fc13a0) SHA1(d7a7b5fb0c7c0ae2e61b94e313c3a972babc78c9) )
+	ROM_LOAD16_BYTE( "blockout-2-27c010-ic91.bin", 0x00001, 0x20000, CRC(48916a07) SHA1(e3d9907cb5333f41ed4811112aefe1424b0b3d32) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "bo29e3-0.bin", 0x0000, 0x8000, CRC(3ea01f78) SHA1(5fc4ad4d9f03d7c26d2afc3e7ede75589e40b0d8) )
+	ROM_LOAD( "blockout-3-27256-ic73.bin", 0x0000, 0x8000, CRC(3ea01f78) SHA1(5fc4ad4d9f03d7c26d2afc3e7ede75589e40b0d8) )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* 128k for ADPCM samples - sound chip is OKIM6295 */
-	ROM_LOAD( "bo29e2-0.bin", 0x0000, 0x20000, CRC(15c5a99d) SHA1(89091eda454a028fd1f17501584bd589baf6d523) )
+	ROM_LOAD( "blockout-4-27c010-ic78.bin", 0x0000, 0x20000, CRC(15c5a99d) SHA1(89091eda454a028fd1f17501584bd589baf6d523) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "mb7114h.25",   0x0000, 0x0100, CRC(b25bbda7) SHA1(840f1470886bd0019db3cd29e3d1d80205a65f48) )    /* unknown */
+	ROM_LOAD( "blockout-82s129-ic25.bin",   0x0000, 0x0100, CRC(b25bbda7) SHA1(840f1470886bd0019db3cd29e3d1d80205a65f48) )    /* unknown */
 ROM_END
 
 ROM_START( agress )
@@ -411,6 +410,21 @@ ROM_START( agress )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "82s129pr.25",   0x0000, 0x0100, CRC(b25bbda7) SHA1(840f1470886bd0019db3cd29e3d1d80205a65f48) )   /* unknown */
+ROM_END
+
+ROM_START( blockoutj )
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 2*128k for 68000 code */
+	ROM_LOAD16_BYTE( "2.bin",         0x00000, 0x20000, CRC(e16cf065) SHA1(541b30b054cf08f10d6ca4746423759f4326c005) )
+	ROM_LOAD16_BYTE( "1.bin",         0x00001, 0x20000, CRC(950b28a3) SHA1(7d1635ac2a3fc1efdd2f78cd6038bd7b4c907b1b) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "bo29e3-0.bin", 0x0000, 0x8000, CRC(3ea01f78) SHA1(5fc4ad4d9f03d7c26d2afc3e7ede75589e40b0d8) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* 128k for ADPCM samples - sound chip is OKIM6295 */
+	ROM_LOAD( "bo29e2-0.bin", 0x0000, 0x20000, CRC(15c5a99d) SHA1(89091eda454a028fd1f17501584bd589baf6d523) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "mb7114h.25",   0x0000, 0x0100, CRC(b25bbda7) SHA1(840f1470886bd0019db3cd29e3d1d80205a65f48) )    /* unknown */
 ROM_END
 
 // this is probably an original English version with copyright year hacked
@@ -436,7 +450,7 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(blockout_state,agress)
+void blockout_state::init_agress()
 {
 	/*
 	 * agress checks at F3A that this is mirrored, blockout glitches if you mirror to it
@@ -451,13 +465,14 @@ DRIVER_INIT_MEMBER(blockout_state,agress)
 	 * For now let's use D and just patch the TRACE exception that causes the bogus mirror check
 	 */
 
-	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
+	u16 *rom = (u16 *)memregion("maincpu")->base();
 
 	rom[0x82/2] = 0x2700;
 }
 
-GAME( 1989, blockout, 0,        blockout, blockout,  blockout_state, 0, ROT0, "Technos Japan / California Dreams", "Block Out (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, blockout2,blockout, blockout, blockout,  blockout_state, 0, ROT0, "Technos Japan / California Dreams", "Block Out (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, blockoutj,blockout, blockout, blockoutj, blockout_state, 0, ROT0, "Technos Japan / California Dreams", "Block Out (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, agress,   0,        agress,   agress,    blockout_state, agress, ROT0, "Palco",   "Agress - Missile Daisenryaku (Japan)",           MACHINE_SUPPORTS_SAVE )
-GAME( 2003, agressb,  agress,   agress,   agress,    blockout_state, agress, ROT0, "bootleg", "Agress - Missile Daisenryaku (English bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, blockout,  0,        blockout, blockout,  blockout_state, empty_init,  ROT0, "Technos Japan / California Dreams", "Block Out (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, blockout2, blockout, blockout, blockout,  blockout_state, empty_init,  ROT0, "Technos Japan / California Dreams", "Block Out (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, blockout3, blockout, blockout, blockout,  blockout_state, empty_init,  ROT0, "Technos Japan / California Dreams", "Block Out (Europe and Oceania)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, blockoutj, blockout, blockout, blockoutj, blockout_state, empty_init,  ROT0, "Technos Japan / California Dreams", "Block Out (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, agress,    0,        agress,   agress,    blockout_state, init_agress, ROT0, "Palco",   "Agress - Missile Daisenryaku (Japan)",           MACHINE_SUPPORTS_SAVE )
+GAME( 2003, agressb,   agress,   agress,   agress,    blockout_state, init_agress, ROT0, "bootleg", "Agress - Missile Daisenryaku (English bootleg)", MACHINE_SUPPORTS_SAVE )

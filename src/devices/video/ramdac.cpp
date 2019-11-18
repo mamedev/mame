@@ -19,10 +19,13 @@
 // default address map
 void ramdac_device::ramdac_palram(address_map &map)
 {
-	map(0x000, 0x0ff).ram(); // R bank
-	map(0x100, 0x1ff).ram(); // G bank
-	map(0x200, 0x2ff).ram(); // B bank
-	map(0x300, 0x3ff).noprw();
+	if (!has_configured_map(0))
+	{
+		map(0x000, 0x0ff).ram(); // R bank
+		map(0x100, 0x1ff).ram(); // G bank
+		map(0x200, 0x2ff).ram(); // B bank
+		map(0x300, 0x3ff).noprw();
+	}
 }
 
 //**************************************************************************
@@ -44,7 +47,7 @@ DEFINE_DEVICE_TYPE(RAMDAC, ramdac_device, "ramdac", "RAMDAC")
 ramdac_device::ramdac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, RAMDAC, tag, owner, clock),
 		device_memory_interface(mconfig, *this),
-		m_space_config("videoram", ENDIANNESS_LITTLE, 8, 10, 0, address_map_constructor(), address_map_constructor(FUNC(ramdac_device::ramdac_palram), this)),
+		m_space_config("videoram", ENDIANNESS_LITTLE, 8, 10, 0, address_map_constructor(FUNC(ramdac_device::ramdac_palram), this)),
 		m_palette(*this, finder_base::DUMMY_TAG),
 		m_color_base(0),
 		m_split_read_reg(0)

@@ -30,6 +30,9 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void techno(machine_config &config);
+
+private:
 	enum
 	{
 		IRQ_SET_TIMER,
@@ -51,11 +54,10 @@ public:
 	DECLARE_READ8_MEMBER(rd_r) { return 0; }
 	DECLARE_WRITE8_MEMBER(wr_w) {}
 
-	void techno(machine_config &config);
 	void techno_map(address_map &map);
 	void techno_sub_map(address_map &map);
+	void cpu_space_map(address_map &map);
 
-private:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -80,20 +82,20 @@ void techno_state::techno_map(address_map &map)
 	map(0x00000, 0x03fff).rom();
 	map(0x04000, 0x04fff).ram().share("nvram"); // battery backed-up
 	map(0x06000, 0x0ffff).rom();
-	map(0x14000, 0x147ff).rw(this, FUNC(techno_state::key_r), FUNC(techno_state::lamp1_w));
-	map(0x14800, 0x14fff).rw(this, FUNC(techno_state::sound_r), FUNC(techno_state::lamp2_w));
-	map(0x15000, 0x157ff).rw(this, FUNC(techno_state::rtrg_r), FUNC(techno_state::sol1_w));
-	map(0x15800, 0x15fff).nopr().w(this, FUNC(techno_state::sol2_w)); // reads from 15800, but shown as not connected
-	map(0x16000, 0x167ff).w(this, FUNC(techno_state::sound_w));
-	map(0x16800, 0x16fff).w(this, FUNC(techno_state::disp1_w));
-	map(0x17000, 0x177ff).w(this, FUNC(techno_state::disp2_w));
-	map(0x17800, 0x17fff).w(this, FUNC(techno_state::setout_w));
+	map(0x14000, 0x147ff).rw(FUNC(techno_state::key_r), FUNC(techno_state::lamp1_w));
+	map(0x14800, 0x14fff).rw(FUNC(techno_state::sound_r), FUNC(techno_state::lamp2_w));
+	map(0x15000, 0x157ff).rw(FUNC(techno_state::rtrg_r), FUNC(techno_state::sol1_w));
+	map(0x15800, 0x15fff).nopr().w(FUNC(techno_state::sol2_w)); // reads from 15800, but shown as not connected
+	map(0x16000, 0x167ff).w(FUNC(techno_state::sound_w));
+	map(0x16800, 0x16fff).w(FUNC(techno_state::disp1_w));
+	map(0x17000, 0x177ff).w(FUNC(techno_state::disp2_w));
+	map(0x17800, 0x17fff).w(FUNC(techno_state::setout_w));
 }
 
 void techno_state::techno_sub_map(address_map &map)
 { //       no ram here, must be internal to the cpu
-	map(0x0000, 0x3fff).r(this, FUNC(techno_state::rd_r)); // to TKY2016A audio processor which has its own 3.58MHz clock
-	map(0x4000, 0x7fff).w(this, FUNC(techno_state::wr_w)); // A11=LED;A12=WR2 (DAC) ;A13=WR1 (TKY2016A as above)
+	map(0x0000, 0x3fff).r(FUNC(techno_state::rd_r)); // to TKY2016A audio processor which has its own 3.58MHz clock
+	map(0x4000, 0x7fff).w(FUNC(techno_state::wr_w)); // A11=LED;A12=WR2 (DAC) ;A13=WR1 (TKY2016A as above)
 	map(0x4000, 0xbfff).rom(); // 4000-7FFF is same as 8000-BFFF; 4x 16k ROMS bankswitched
 	map(0xc000, 0xffff).rom(); // another 16k ROM
 }
@@ -251,6 +253,12 @@ static INPUT_PORTS_START( techno )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Fix top left target middle") PORT_CODE(KEYCODE_EQUALS)
 INPUT_PORTS_END
 
+void techno_state::cpu_space_map(address_map &map)
+{
+	map(0xfffff0, 0xffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));
+	map(0xfffff2, 0xfffff3).lr16(NAME([this] () -> u16 { return m_vector; }));
+}
+
 void techno_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	if (id == IRQ_ADVANCE_TIMER)
@@ -265,7 +273,7 @@ void techno_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 	}
 	else if (id == IRQ_SET_TIMER)
 	{
-		m_maincpu->set_input_line_and_vector(M68K_IRQ_1, ASSERT_LINE, m_vector);
+		m_maincpu->set_input_line(M68K_IRQ_1, ASSERT_LINE);
 		m_irq_advance_timer->adjust(attotime::from_hz(XTAL(8'000'000) / 32));
 	}
 }
@@ -287,18 +295,21 @@ void techno_state::machine_reset()
 	m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
 }
 
-MACHINE_CONFIG_START(techno_state::techno)
+void techno_state::techno(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(8'000'000))
-	MCFG_CPU_PROGRAM_MAP(techno_map)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	M68000(config, m_maincpu, XTAL(8'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &techno_state::techno_map);
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &techno_state::cpu_space_map);
 
-	//MCFG_CPU_ADD("cpu2", TMS7000, XTAL(4'000'000))
-	//MCFG_CPU_PROGRAM_MAP(techno_sub_map)
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
+	//tms7000_device &cpu2(TMS7000(config, "cpu2", XTAL(4'000'000)));
+	//cpu2.set_addrmap(AS_PROGRAM, &techno_state::techno_sub_map);
 
 	/* Video */
-	MCFG_DEFAULT_LAYOUT(layout_techno)
-MACHINE_CONFIG_END
+	config.set_default_layout(layout_techno);
+}
 
 ROM_START(xforce)
 	ROM_REGION(0x10000, "maincpu", 0)
@@ -319,5 +330,5 @@ ROM_START(spcteam)
 	ROM_RELOAD(0, 0x8000)
 ROM_END
 
-GAME(1987,  xforce,  0,  techno,  techno, techno_state,  0,  ROT0,  "Tecnoplay", "X Force",    MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1988,  spcteam, 0,  techno,  techno, techno_state,  0,  ROT0,  "Tecnoplay", "Space Team", MACHINE_IS_SKELETON_MECHANICAL) // needs correct layout
+GAME(1987,  xforce,  0,  techno,  techno, techno_state, empty_init, ROT0, "Tecnoplay", "X Force",    MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1988,  spcteam, 0,  techno,  techno, techno_state, empty_init, ROT0, "Tecnoplay", "Space Team", MACHINE_IS_SKELETON_MECHANICAL) // needs correct layout

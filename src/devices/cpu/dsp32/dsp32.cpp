@@ -175,7 +175,7 @@ dsp32c_device::dsp32c_device(const machine_config &mconfig, const char *tag, dev
 		m_lastpins(0),
 		m_ppc(0),
 		m_program(nullptr),
-		m_direct(nullptr),
+		m_cache(nullptr),
 		m_output_pins_changed(*this)
 {
 	// set our instruction counter
@@ -192,7 +192,7 @@ void dsp32c_device::device_start()
 
 	// get our address spaces
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<2, 0, ENDIANNESS_LITTLE>();
 
 	// register our state for the debugger
 	state_add(STATE_GENPC,     "GENPC",     m_r[15]).noshow();
@@ -415,7 +415,7 @@ std::unique_ptr<util::disasm_interface> dsp32c_device::create_disassembler()
 
 inline uint32_t dsp32c_device::ROPCODE(offs_t pc)
 {
-	return m_direct->read_dword(pc);
+	return m_cache->read_dword(pc);
 }
 
 inline uint8_t dsp32c_device::RBYTE(offs_t addr)
@@ -542,7 +542,7 @@ void dsp32c_device::update_pins(void)
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-uint32_t dsp32c_device::execute_min_cycles() const
+uint32_t dsp32c_device::execute_min_cycles() const noexcept
 {
 	return 4;
 }
@@ -553,7 +553,7 @@ uint32_t dsp32c_device::execute_min_cycles() const
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-uint32_t dsp32c_device::execute_max_cycles() const
+uint32_t dsp32c_device::execute_max_cycles() const noexcept
 {
 	return 4;
 }
@@ -564,7 +564,7 @@ uint32_t dsp32c_device::execute_max_cycles() const
 //  input/interrupt lines
 //-------------------------------------------------
 
-uint32_t dsp32c_device::execute_input_lines() const
+uint32_t dsp32c_device::execute_input_lines() const noexcept
 {
 	return 2;
 }

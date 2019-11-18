@@ -30,7 +30,7 @@ Known undumped:
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="beppin (1988)(cain)(nl).dsk" size="737280" crc="e151563d" sha1="db2364b83d8976d21b89aa4d34c092a5ce383269" offset="0" />
+				<rom name="beppin (1988)(cain)(nl).dsk" size="737280" crc="e151563d" sha1="db2364b83d8976d21b89aa4d34c092a5ce383269"/>
 			</dataarea>
 		</part>
 	</software>
@@ -45,19 +45,19 @@ Known undumped:
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Opening Disk"/>
 			<dataarea name="flop" size="737280">
-				<rom name="f-1 spirit 3d special (1988)(konami)(disk 1 of 3)(opening disk).dsk" size="737280" crc="69058209" sha1="155702d3d41b8f8b3d4659d42aa474ce12f4d3c9" offset="0" />
+				<rom name="f-1 spirit 3d special (1988)(konami)(disk 1 of 3)(opening disk).dsk" size="737280" crc="69058209" sha1="155702d3d41b8f8b3d4659d42aa474ce12f4d3c9"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Game Disk A"/>
 			<dataarea name="flop" size="737280">
-				<rom name="f-1 spirit 3d special (1988)(konami)(disk 2 of 3)(game disk a).dsk" size="737280" crc="96811cc3" sha1="9877150e691d41b615683684cf0b78fc84649d37" offset="0" />
+				<rom name="f-1 spirit 3d special (1988)(konami)(disk 2 of 3)(game disk a).dsk" size="737280" crc="96811cc3" sha1="9877150e691d41b615683684cf0b78fc84649d37"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Game Disk B"/>
 			<dataarea name="flop" size="737280">
-				<rom name="f-1 spirit 3d special (1988)(konami)(disk 3 of 3)(game disk b).dsk" size="737280" crc="72039928" sha1="9ab94b449cb3b2c7ea7f87c2f03eebfacddc4019" offset="0" />
+				<rom name="f-1 spirit 3d special (1988)(konami)(disk 3 of 3)(game disk b).dsk" size="737280" crc="72039928" sha1="9ab94b449cb3b2c7ea7f87c2f03eebfacddc4019"/>
 			</dataarea>
 		</part>
 	</software>
@@ -71,19 +71,19 @@ Known undumped:
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Opening Disk"/>
 			<dataarea name="flop" size="737280">
-				<rom name="f-1 spirit 3d special (1988)(konami)(disk 1 of 3)(opening disk).dsk" size="737280" crc="69058209" sha1="155702d3d41b8f8b3d4659d42aa474ce12f4d3c9" offset="0" />
+				<rom name="f-1 spirit 3d special (1988)(konami)(disk 1 of 3)(opening disk).dsk" size="737280" crc="69058209" sha1="155702d3d41b8f8b3d4659d42aa474ce12f4d3c9"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Game Disk A"/>
 			<dataarea name="flop" size="737280">
-				<rom name="f-1 spirit 3d special (1988)(konami)(disk 2 of 3)(game disk a)[a].dsk" size="737280" crc="b05f67a2" sha1="3fd1c3dacd8fc3b4fc4902ac35296ce30991ac9b" offset="0" />
+				<rom name="f-1 spirit 3d special (1988)(konami)(disk 2 of 3)(game disk a)[a].dsk" size="737280" crc="b05f67a2" sha1="3fd1c3dacd8fc3b4fc4902ac35296ce30991ac9b"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Game Disk B"/>
 			<dataarea name="flop" size="737280">
-				<rom name="f-1 spirit 3d special (1988)(konami)(disk 3 of 3)(game disk b)[a].dsk" size="737280" crc="94fc3831" sha1="a645c37119c59eab0d42f0a2cfbc47dc9678bc3c" offset="0" />
+				<rom name="f-1 spirit 3d special (1988)(konami)(disk 3 of 3)(game disk b)[a].dsk" size="737280" crc="94fc3831" sha1="a645c37119c59eab0d42f0a2cfbc47dc9678bc3c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -97,19 +97,19 @@ Known undumped:
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Opening Disk"/>
 			<dataarea name="flop" size="737280">
-				<rom name="f-1 spirit 3d special (1988)(konami)(disk 1 of 3)(opening disk).dsk" size="737280" crc="69058209" sha1="155702d3d41b8f8b3d4659d42aa474ce12f4d3c9" offset="0" />
+				<rom name="f-1 spirit 3d special (1988)(konami)(disk 1 of 3)(opening disk).dsk" size="737280" crc="69058209" sha1="155702d3d41b8f8b3d4659d42aa474ce12f4d3c9"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Game Disk A"/>
 			<dataarea name="flop" size="737280">
-				<rom name="f-1 spirit 3d special (1988)(konami)(disk 2 of 3)(game disk a)[a2].dsk" size="737280" crc="eb1d19a3" sha1="f3b1dafa72bdc5affaf49bac3481ad5276a51375" offset="0" />
+				<rom name="f-1 spirit 3d special (1988)(konami)(disk 2 of 3)(game disk a)[a2].dsk" size="737280" crc="eb1d19a3" sha1="f3b1dafa72bdc5affaf49bac3481ad5276a51375"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Game Disk B"/>
 			<dataarea name="flop" size="737280">
-				<rom name="f-1 spirit 3d special (1988)(konami)(disk 3 of 3)(game disk b).dsk" size="737280" crc="72039928" sha1="9ab94b449cb3b2c7ea7f87c2f03eebfacddc4019" offset="0" />
+				<rom name="f-1 spirit 3d special (1988)(konami)(disk 3 of 3)(game disk b).dsk" size="737280" crc="72039928" sha1="9ab94b449cb3b2c7ea7f87c2f03eebfacddc4019"/>
 			</dataarea>
 		</part>
 	</software>
@@ -122,7 +122,7 @@ Known undumped:
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="family stadium pro baseball - homerun contest (1989)(namcot)(jp).dsk" size="737280" crc="19a2ea6b" sha1="ebcabafe5936317f19b7db957f448a4952a17011" offset="0" />
+				<rom name="family stadium pro baseball - homerun contest (1989)(namcot)(jp).dsk" size="737280" crc="19a2ea6b" sha1="ebcabafe5936317f19b7db957f448a4952a17011"/>
 			</dataarea>
 		</part>
 	</software>
@@ -135,7 +135,7 @@ Known undumped:
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="family stadium pro baseball - homerun contest (1989)(namcot)(jp)[a].dsk" size="737280" crc="bd3d819d" sha1="53d1c26f5d87c53f8fa26154c2c568c657d314f6" offset="0" />
+				<rom name="family stadium pro baseball - homerun contest (1989)(namcot)(jp)[a].dsk" size="737280" crc="bd3d819d" sha1="53d1c26f5d87c53f8fa26154c2c568c657d314f6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -149,19 +149,19 @@ Known undumped:
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
-				<rom name="j.b. harold 3 - d.c. connection (1989)(riverhill soft)(jp)(disk 1 of 3)[mouse].dsk" size="737280" crc="79543c5d" sha1="9b2919c1c7725458305f8120975d94c2f6524d19" offset="0" />
+				<rom name="j.b. harold 3 - d.c. connection (1989)(riverhill soft)(jp)(disk 1 of 3)[mouse].dsk" size="737280" crc="79543c5d" sha1="9b2919c1c7725458305f8120975d94c2f6524d19"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="737280">
-				<rom name="j.b. harold 3 - d.c. connection (1989)(riverhill soft)(jp)(disk 2 of 3)[mouse].dsk" size="737280" crc="b3454990" sha1="6a6e5caaf72d3f9285bf5adc11e90ab7242f22c7" offset="0" />
+				<rom name="j.b. harold 3 - d.c. connection (1989)(riverhill soft)(jp)(disk 2 of 3)[mouse].dsk" size="737280" crc="b3454990" sha1="6a6e5caaf72d3f9285bf5adc11e90ab7242f22c7"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 3"/>
 			<dataarea name="flop" size="737280">
-				<rom name="j.b. harold 3 - d.c. connection (1989)(riverhill soft)(jp)(disk 3 of 3)[mouse].dsk" size="737280" crc="1eb4c4d6" sha1="c2bf5d6aff3b5b676fccdd010eedd67a4a2523ff" offset="0" />
+				<rom name="j.b. harold 3 - d.c. connection (1989)(riverhill soft)(jp)(disk 3 of 3)[mouse].dsk" size="737280" crc="1eb4c4d6" sha1="c2bf5d6aff3b5b676fccdd010eedd67a4a2523ff"/>
 			</dataarea>
 		</part>
 	</software>
@@ -175,19 +175,19 @@ Known undumped:
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
-				<rom name="j.b. harold 3 - d.c. connection (1989)(riverhill soft)(jp)(disk 1 of 3)[mouse].dsk" size="737280" crc="79543c5d" sha1="9b2919c1c7725458305f8120975d94c2f6524d19" offset="0" />
+				<rom name="j.b. harold 3 - d.c. connection (1989)(riverhill soft)(jp)(disk 1 of 3)[mouse].dsk" size="737280" crc="79543c5d" sha1="9b2919c1c7725458305f8120975d94c2f6524d19"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="737280">
-				<rom name="j.b. harold 3 - d.c. connection (1989)(riverhill soft)(jp)(disk 2 of 3)[a][mouse].dsk" size="737280" crc="952b3db8" sha1="319333dc9f37342802199fe576da759fef66501d" offset="0" />
+				<rom name="j.b. harold 3 - d.c. connection (1989)(riverhill soft)(jp)(disk 2 of 3)[a][mouse].dsk" size="737280" crc="952b3db8" sha1="319333dc9f37342802199fe576da759fef66501d"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 3"/>
 			<dataarea name="flop" size="737280">
-				<rom name="j.b. harold 3 - d.c. connection (1989)(riverhill soft)(jp)(disk 3 of 3)[a][mouse].dsk" size="737280" crc="4915e99b" sha1="c4f00d065f61f893a075e26b879dde68d2a493d5" offset="0" />
+				<rom name="j.b. harold 3 - d.c. connection (1989)(riverhill soft)(jp)(disk 3 of 3)[a][mouse].dsk" size="737280" crc="4915e99b" sha1="c4f00d065f61f893a075e26b879dde68d2a493d5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -202,17 +202,17 @@ Known undumped:
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="kohakuiro no yuigon. amber's will (1988)(riverhill soft)(jp)(disk 1 of 3).dsk" size="737280" crc="a7243795" sha1="db05159539daebe28b66921209161295999af6d3" offset="0" />
+				<rom name="kohakuiro no yuigon. amber's will (1988)(riverhill soft)(jp)(disk 1 of 3).dsk" size="737280" crc="a7243795" sha1="db05159539daebe28b66921209161295999af6d3"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="kohakuiro no yuigon. amber's will (1988)(riverhill soft)(jp)(disk 2 of 3).dsk" size="737280" crc="b0e1eae4" sha1="a7c082f99cfa46323e641a52962e7d673fd7a6bd" offset="0" />
+				<rom name="kohakuiro no yuigon. amber's will (1988)(riverhill soft)(jp)(disk 2 of 3).dsk" size="737280" crc="b0e1eae4" sha1="a7c082f99cfa46323e641a52962e7d673fd7a6bd"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="kohakuiro no yuigon. amber's will (1988)(riverhill soft)(jp)(disk 3 of 3).dsk" size="737280" crc="daaf92c2" sha1="fbe01190e5b674d08b39b7d3cbca136fe52bf8a5" offset="0" />
+				<rom name="kohakuiro no yuigon. amber's will (1988)(riverhill soft)(jp)(disk 3 of 3).dsk" size="737280" crc="daaf92c2" sha1="fbe01190e5b674d08b39b7d3cbca136fe52bf8a5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -225,17 +225,17 @@ Known undumped:
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="kohakuiro no yuigon. amber's will (1988)(riverhill soft)(jp)(disk 1 of 3)[a].dsk" size="737280" crc="a10009a9" sha1="f96e0998a5d01fabb85c89eb4b12898176397edf" offset="0" />
+				<rom name="kohakuiro no yuigon. amber's will (1988)(riverhill soft)(jp)(disk 1 of 3)[a].dsk" size="737280" crc="a10009a9" sha1="f96e0998a5d01fabb85c89eb4b12898176397edf"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="kohakuiro no yuigon. amber's will (1988)(riverhill soft)(jp)(disk 2 of 3)[a].dsk" size="737280" crc="a8c68a53" sha1="a33a4688b046e6af495735ca3ed13695c8d4af42" offset="0" />
+				<rom name="kohakuiro no yuigon. amber's will (1988)(riverhill soft)(jp)(disk 2 of 3)[a].dsk" size="737280" crc="a8c68a53" sha1="a33a4688b046e6af495735ca3ed13695c8d4af42"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="kohakuiro no yuigon. amber's will (1988)(riverhill soft)(jp)(disk 3 of 3)[a].dsk" size="737280" crc="3aa43fa7" sha1="06a250229e98a9467506f0ebb7de63d6ebb382e8" offset="0" />
+				<rom name="kohakuiro no yuigon. amber's will (1988)(riverhill soft)(jp)(disk 3 of 3)[a].dsk" size="737280" crc="3aa43fa7" sha1="06a250229e98a9467506f0ebb7de63d6ebb382e8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -250,13 +250,13 @@ Known undumped:
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
-				<rom name="laydock 2 - last attack (1988)(t&amp;e soft)(jp)(disk 1 of 2).dsk" size="737280" crc="02c2949e" sha1="c4217c7f0371e9c6f830d8a76f731123548c9719" offset="0" />
+				<rom name="laydock 2 - last attack (1988)(t&amp;e soft)(jp)(disk 1 of 2).dsk" size="737280" crc="02c2949e" sha1="c4217c7f0371e9c6f830d8a76f731123548c9719"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="737280">
-				<rom name="laydock 2 - last attack (1988)(t&amp;e soft)(jp)(disk 2 of 2).dsk" size="737280" crc="cd89e9d3" sha1="63daaadce6ef18938788f3d1e4b08deff15fe5da" offset="0" />
+				<rom name="laydock 2 - last attack (1988)(t&amp;e soft)(jp)(disk 2 of 2).dsk" size="737280" crc="cd89e9d3" sha1="63daaadce6ef18938788f3d1e4b08deff15fe5da"/>
 			</dataarea>
 		</part>
 	</software>
@@ -270,13 +270,13 @@ Known undumped:
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
-				<rom name="laydock 2 - last attack (1988)(t&amp;e soft)(jp)(disk 1 of 2)[a].dsk" size="737280" crc="1b68b1a9" sha1="db7cf4672f46017b69b02eb175b4a446a948c601" offset="0" />
+				<rom name="laydock 2 - last attack (1988)(t&amp;e soft)(jp)(disk 1 of 2)[a].dsk" size="737280" crc="1b68b1a9" sha1="db7cf4672f46017b69b02eb175b4a446a948c601"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="737280">
-				<rom name="laydock 2 - last attack (1988)(t&amp;e soft)(jp)(disk 2 of 2)[a].dsk" size="737280" crc="25777c4e" sha1="bbbc09ed823847b567caa1f321f578cbaf3a356f" offset="0" />
+				<rom name="laydock 2 - last attack (1988)(t&amp;e soft)(jp)(disk 2 of 2)[a].dsk" size="737280" crc="25777c4e" sha1="bbbc09ed823847b567caa1f321f578cbaf3a356f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -291,37 +291,37 @@ Known undumped:
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
-				<rom name="m2p_006a.dsk" size="737280" crc="9eef9228" sha1="a5c831306c86d445d42ec13f7551346f28814686" offset="0" />
+				<rom name="m2p_006a.dsk" size="737280" crc="9eef9228" sha1="a5c831306c86d445d42ec13f7551346f28814686"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="737280">
-				<rom name="m2p_006b.dsk" size="737280" crc="26f58049" sha1="5ba41719f93bd8dc55b6a1b027cf321a31dd0884" offset="0" />
+				<rom name="m2p_006b.dsk" size="737280" crc="26f58049" sha1="5ba41719f93bd8dc55b6a1b027cf321a31dd0884"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 3"/>
 			<dataarea name="flop" size="737280">
-				<rom name="m2p_006c.dsk" size="737280" crc="691c1eff" sha1="42cdf6f5bb4d7d39f4a11e7fec31b0a5ecf7ecd4" offset="0" />
+				<rom name="m2p_006c.dsk" size="737280" crc="691c1eff" sha1="42cdf6f5bb4d7d39f4a11e7fec31b0a5ecf7ecd4"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 4"/>
 			<dataarea name="flop" size="737280">
-				<rom name="m2p_006d.dsk" size="737280" crc="bdf45ec0" sha1="ee868c95dacc2edee29e7c390bcb2f87ec07b898" offset="0" />
+				<rom name="m2p_006d.dsk" size="737280" crc="bdf45ec0" sha1="ee868c95dacc2edee29e7c390bcb2f87ec07b898"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 5"/>
 			<dataarea name="flop" size="737280">
-				<rom name="m2p_006e.dsk" size="737280" crc="406f5f54" sha1="90b4f39cb440b2cb3b2479ee5e633818ebe54bb4" offset="0" />
+				<rom name="m2p_006e.dsk" size="737280" crc="406f5f54" sha1="90b4f39cb440b2cb3b2479ee5e633818ebe54bb4"/>
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 6"/>
 			<dataarea name="flop" size="737280">
-				<rom name="m2p_006f.dsk" size="737280" crc="c65264da" sha1="8c847557b7838afff2354eb8a9d7f02e5d70519c" offset="0" />
+				<rom name="m2p_006f.dsk" size="737280" crc="c65264da" sha1="8c847557b7838afff2354eb8a9d7f02e5d70519c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -334,13 +334,13 @@ Known undumped:
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
-				<rom name="pana amusement collection 1 (1988)(panasoft)(jp).dsk" size="737280" crc="4dee2cff" sha1="e4bc138daedac129c39923cbe4a07bf79a880f8b" offset="0" />
+				<rom name="pana amusement collection 1 (1988)(panasoft)(jp).dsk" size="737280" crc="4dee2cff" sha1="e4bc138daedac129c39923cbe4a07bf79a880f8b"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="737280">
-				<rom name="pana amusement collection 2 (1988)(panasoft)(jp).dsk" size="737280" crc="83f786e1" sha1="94c2cde50db86b91ad7d73cf6354a240c97ab3ea" offset="0" />
+				<rom name="pana amusement collection 2 (1988)(panasoft)(jp).dsk" size="737280" crc="83f786e1" sha1="94c2cde50db86b91ad7d73cf6354a240c97ab3ea"/>
 			</dataarea>
 		</part>
 	</software>
@@ -353,13 +353,13 @@ Known undumped:
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
-				<rom name="pana amusement collection 1 (1988)(panasoft)(jp)[a].dsk" size="737280" crc="340292e7" sha1="f86f628e6cef41b777796c4797b9153b5c722710" offset="0" />
+				<rom name="pana amusement collection 1 (1988)(panasoft)(jp)[a].dsk" size="737280" crc="340292e7" sha1="f86f628e6cef41b777796c4797b9153b5c722710"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="737280">
-				<rom name="pana amusement collection 2 (1988)(panasoft)(jp)[a].dsk" size="737280" crc="3ecc097d" sha1="552da3bf49e85911acc8f7a5c744ca86105bd081" offset="0" />
+				<rom name="pana amusement collection 2 (1988)(panasoft)(jp)[a].dsk" size="737280" crc="3ecc097d" sha1="552da3bf49e85911acc8f7a5c744ca86105bd081"/>
 			</dataarea>
 		</part>
 	</software>
@@ -372,13 +372,13 @@ Known undumped:
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
-				<rom name="pana amusement collection 1 (1988)(panasoft)(jp)[a2].dsk" size="737280" crc="441d35a8" sha1="fe949aa959949e478a22c93b67b2247a1cf3d7f9" offset="0" />
+				<rom name="pana amusement collection 1 (1988)(panasoft)(jp)[a2].dsk" size="737280" crc="441d35a8" sha1="fe949aa959949e478a22c93b67b2247a1cf3d7f9"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="737280">
-				<rom name="pana amusement collection 2 (1988)(panasoft)(jp)[a2].dsk" size="737280" crc="4bf555e3" sha1="5eeb6b2b85a19664ef9b21c130fe9b995c4b4784" offset="0" />
+				<rom name="pana amusement collection 2 (1988)(panasoft)(jp)[a2].dsk" size="737280" crc="4bf555e3" sha1="5eeb6b2b85a19664ef9b21c130fe9b995c4b4784"/>
 			</dataarea>
 		</part>
 	</software>
@@ -390,7 +390,7 @@ Known undumped:
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="sony hb-f1xv story disk (1990)(sony)(jp).dsk" size="737280" crc="f8db5647" sha1="1a27dbdfc863f91f504e5a478b6ea4bd324f93e2" offset="0" />
+				<rom name="sony hb-f1xv story disk (1990)(sony)(jp).dsk" size="737280" crc="f8db5647" sha1="1a27dbdfc863f91f504e5a478b6ea4bd324f93e2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -407,7 +407,7 @@ Known undumped:
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="twinkle star (1990)(msx magazine)(jp).dsk" size="737280" crc="c97eb5cd" sha1="d89cf80e53210ddd48e64a866d0b073713ba3160" offset="0" />
+				<rom name="twinkle star (1990)(msx magazine)(jp).dsk" size="737280" crc="c97eb5cd" sha1="d89cf80e53210ddd48e64a866d0b073713ba3160"/>
 			</dataarea>
 		</part>
 	</software>
@@ -420,7 +420,7 @@ Known undumped:
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="twinkle star (1990)(msx magazine)(jp)[a].dsk" size="737280" crc="06f4dde6" sha1="c27fadbc9188cf959ea74e83557143d9fe5e34fa" offset="0" />
+				<rom name="twinkle star (1990)(msx magazine)(jp)[a].dsk" size="737280" crc="06f4dde6" sha1="c27fadbc9188cf959ea74e83557143d9fe5e34fa"/>
 			</dataarea>
 		</part>
 	</software>
@@ -433,7 +433,7 @@ Known undumped:
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="yoshida kensetsu. super zelixer (1990)(msx magazine)(jp).dsk" size="737280" crc="0a42c38f" sha1="d5121af2a9db3b04c52334a200fdd9202f12a920" offset="0" />
+				<rom name="yoshida kensetsu. super zelixer (1990)(msx magazine)(jp).dsk" size="737280" crc="0a42c38f" sha1="d5121af2a9db3b04c52334a200fdd9202f12a920"/>
 			</dataarea>
 		</part>
 	</software>
@@ -446,7 +446,7 @@ Known undumped:
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="yoshida kensetsu. super zelixer (1990)(msx magazine)(jp)[a].dsk" size="737280" crc="ea733f7b" sha1="9eef34210d3ae9988f137cf70730a5a1c57a59ee" offset="0" />
+				<rom name="yoshida kensetsu. super zelixer (1990)(msx magazine)(jp)[a].dsk" size="737280" crc="ea733f7b" sha1="9eef34210d3ae9988f137cf70730a5a1c57a59ee"/>
 			</dataarea>
 		</part>
 	</software>
@@ -459,7 +459,7 @@ Known undumped:
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="yoshida kensetsu. super zelixer (1990)(msx magazine)(jp)[a2].dsk" size="737280" crc="44c87cea" sha1="3fdf86ccb98de95bd7b3775783257e377526e6ca" offset="0" />
+				<rom name="yoshida kensetsu. super zelixer (1990)(msx magazine)(jp)[a2].dsk" size="737280" crc="44c87cea" sha1="3fdf86ccb98de95bd7b3775783257e377526e6ca"/>
 			</dataarea>
 		</part>
 	</software>
@@ -472,7 +472,7 @@ Known undumped:
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="yoshida kensetsu. super zelixer (1990)(msx magazine)(jp)[a3].dsk" size="737280" crc="b6c1d954" sha1="055066483bcad253b0c79af6fa65ec68ea2c45e7" offset="0" />
+				<rom name="yoshida kensetsu. super zelixer (1990)(msx magazine)(jp)[a3].dsk" size="737280" crc="b6c1d954" sha1="055066483bcad253b0c79af6fa65ec68ea2c45e7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -485,7 +485,7 @@ Known undumped:
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="twinkle star ii (1990)(msx magazine)(jp).dsk" size="737280" crc="4e3c96ff" sha1="9f051f845904bf1cd1adf08cbc0ef4804d1f48a5" offset="0" />
+				<rom name="twinkle star ii (1990)(msx magazine)(jp).dsk" size="737280" crc="4e3c96ff" sha1="9f051f845904bf1cd1adf08cbc0ef4804d1f48a5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -498,7 +498,7 @@ Known undumped:
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="twinkle star ii (1990)(msx magazine)(jp)[a].dsk" size="737280" crc="e00896f1" sha1="987c59d42eb13ffff8a021d28f4cce1a31178667" offset="0" />
+				<rom name="twinkle star ii (1990)(msx magazine)(jp)[a].dsk" size="737280" crc="e00896f1" sha1="987c59d42eb13ffff8a021d28f4cce1a31178667"/>
 			</dataarea>
 		</part>
 	</software>
@@ -510,7 +510,7 @@ Known undumped:
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="lubeck (1990)(msx magazine)(jp).dsk" size="737280" crc="bc7f8e95" sha1="b143989e8c0a7826a21373b4271713a0465bbcac" offset="0" />
+				<rom name="lubeck (1990)(msx magazine)(jp).dsk" size="737280" crc="bc7f8e95" sha1="b143989e8c0a7826a21373b4271713a0465bbcac"/>
 			</dataarea>
 		</part>
 	</software>
@@ -522,7 +522,7 @@ Known undumped:
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="lubeck (1990)(msx magazine)(jp)[a].dsk" size="737280" crc="2ff5b9c9" sha1="8b41aac1d940fe06b2ae806eba1e5d3cebaf5134" offset="0" />
+				<rom name="lubeck (1990)(msx magazine)(jp)[a].dsk" size="737280" crc="2ff5b9c9" sha1="8b41aac1d940fe06b2ae806eba1e5d3cebaf5134"/>
 			</dataarea>
 		</part>
 	</software>
@@ -534,7 +534,7 @@ Known undumped:
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="sea sardine (1991)(msx magazine)(jp).dsk" size="737280" crc="f4c7f839" sha1="be457095238dbcac7b66103185c1a702b60e2255" offset="0" />
+				<rom name="sea sardine (1991)(msx magazine)(jp).dsk" size="737280" crc="f4c7f839" sha1="be457095238dbcac7b66103185c1a702b60e2255"/>
 			</dataarea>
 		</part>
 	</software>
@@ -546,7 +546,7 @@ Known undumped:
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="sea sardine (1991)(msx magazine)(jp)[a].dsk" size="737280" crc="17f83eb5" sha1="b23a12945e1bcb461be086cf9d0468952d79c703" offset="0" />
+				<rom name="sea sardine (1991)(msx magazine)(jp)[a].dsk" size="737280" crc="17f83eb5" sha1="b23a12945e1bcb461be086cf9d0468952d79c703"/>
 			</dataarea>
 		</part>
 	</software>
@@ -558,7 +558,7 @@ Known undumped:
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="wig, the (1989)(msx magazine)(jp).dsk" size="737280" crc="c88649e5" sha1="88411e1c1547d032c47bf41522bbadef634cc9f3" offset="0" />
+				<rom name="wig, the (1989)(msx magazine)(jp).dsk" size="737280" crc="c88649e5" sha1="88411e1c1547d032c47bf41522bbadef634cc9f3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -570,7 +570,7 @@ Known undumped:
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="wig, the (1989)(msx magazine)(jp)[a].dsk" size="737280" crc="781df33a" sha1="ec186a538f45fb22e42b83f5e16d494456879950" offset="0" />
+				<rom name="wig, the (1989)(msx magazine)(jp)[a].dsk" size="737280" crc="781df33a" sha1="ec186a538f45fb22e42b83f5e16d494456879950"/>
 			</dataarea>
 		</part>
 	</software>
@@ -586,7 +586,7 @@ Known undumped:
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="battle bomber.dsk" size="737280" crc="a318cfcd" sha1="75e6a558ac1f0346f951d9c6667e0b9ecb8557e8" offset="0" />
+				<rom name="battle bomber.dsk" size="737280" crc="a318cfcd" sha1="75e6a558ac1f0346f951d9c6667e0b9ecb8557e8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -599,7 +599,7 @@ Known undumped:
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="gladius (1992)(msx magazine)(de).dsk" size="737280" crc="c0c93a68" sha1="bf04414ea4891b03ef8c6484eebcc8d5dba4ef5e" offset="0" />
+				<rom name="gladius (1992)(msx magazine)(de).dsk" size="737280" crc="c0c93a68" sha1="bf04414ea4891b03ef8c6484eebcc8d5dba4ef5e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -612,7 +612,7 @@ Known undumped:
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="gradius iii legends (demo) (2001)(imanok).dsk" size="737280" crc="c72466e9" sha1="9e3ca9b729ebf31ebf72d64012297d13bd40691e" offset="0" />
+				<rom name="gradius iii legends (demo) (2001)(imanok).dsk" size="737280" crc="c72466e9" sha1="9e3ca9b729ebf31ebf72d64012297d13bd40691e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -625,7 +625,7 @@ Known undumped:
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="zukatto.dsk" size="737280" crc="302574ed" sha1="0513ce6664d2cea4e0eb863a68a923401ecaa0da" offset="0" />
+				<rom name="zukatto.dsk" size="737280" crc="302574ed" sha1="0513ce6664d2cea4e0eb863a68a923401ecaa0da"/>
 			</dataarea>
 		</part>
 	</software>
@@ -639,13 +639,13 @@ Known undumped:
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Opening Disk"/>
 			<dataarea name="flop" size="737280">
-				<rom name="megadoom (1992)(first class software)(nl)(disk 1 of 2)(opening disk).dsk" size="737280" crc="70a3494d" sha1="fa83f00dd2feb4a30d71616578ce553466d4d14e" offset="0" />
+				<rom name="megadoom (1992)(first class software)(nl)(disk 1 of 2)(opening disk).dsk" size="737280" crc="70a3494d" sha1="fa83f00dd2feb4a30d71616578ce553466d4d14e"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Game Disk"/>
 			<dataarea name="flop" size="737280">
-				<rom name="megadoom (1992)(first class software)(nl)(disk 2 of 2)(game disk).dsk" size="737280" crc="1d7716de" sha1="6c48f8dedd8494c3aabeea3af997363ed861ac0f" offset="0" />
+				<rom name="megadoom (1992)(first class software)(nl)(disk 2 of 2)(game disk).dsk" size="737280" crc="1d7716de" sha1="6c48f8dedd8494c3aabeea3af997363ed861ac0f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -659,13 +659,13 @@ Known undumped:
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="737280">
-				<rom name="megadoom (demo) (1992)(first class software)(nl).dsk" size="737280" crc="72aa680e" sha1="196f0e8d263d69215cfc634e0518e7206136468d" offset="0" />
+				<rom name="megadoom (demo) (1992)(first class software)(nl).dsk" size="737280" crc="72aa680e" sha1="196f0e8d263d69215cfc634e0518e7206136468d"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 2?"/>
 			<dataarea name="flop" size="737280">
-				<rom name="megadoom (demo) (1992)(first class software)(nl)[2 disks].dsk" size="737280" crc="f8554ee4" sha1="70d62bfb6505ae91b1afde000d7b5fb771a8b38d" offset="0" />
+				<rom name="megadoom (demo) (1992)(first class software)(nl)[2 disks].dsk" size="737280" crc="f8554ee4" sha1="70d62bfb6505ae91b1afde000d7b5fb771a8b38d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -678,7 +678,7 @@ Known undumped:
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="playboy strippoker (1992)(first class software)(nl).dsk" size="737280" crc="f98efc23" sha1="898a8cad406389b27a54f1cbbe77a922c225b2ba" offset="0" />
+				<rom name="playboy strippoker (1992)(first class software)(nl).dsk" size="737280" crc="f98efc23" sha1="898a8cad406389b27a54f1cbbe77a922c225b2ba"/>
 			</dataarea>
 		</part>
 	</software>
@@ -691,7 +691,7 @@ Known undumped:
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="sonyc (demo) (1995)(analogy)(es).dsk" size="737280" crc="2bb51edf" sha1="29acb7529bcaca5b2f82a208e501ca6352ae87f8" offset="0" />
+				<rom name="sonyc (demo) (1995)(analogy)(es).dsk" size="737280" crc="2bb51edf" sha1="29acb7529bcaca5b2f82a208e501ca6352ae87f8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -704,7 +704,7 @@ Known undumped:
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="turtle mania (demo) (1997)(wr)(de).dsk" size="737280" crc="6ac549ce" sha1="26f53fc39126975de5a607fd73c32b970a6124fc" offset="0" />
+				<rom name="turtle mania (demo) (1997)(wr)(de).dsk" size="737280" crc="6ac549ce" sha1="26f53fc39126975de5a607fd73c32b970a6124fc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -717,7 +717,7 @@ Known undumped:
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="witch iz, the (1991)(chihiro)[b].dsk" size="737280" crc="9eef4495" sha1="d096b1ef10c9d7b3ddffda0ec14b841c2c14cada" offset="0" />
+				<rom name="witch iz, the (1991)(chihiro)[b].dsk" size="737280" crc="9eef4495" sha1="d096b1ef10c9d7b3ddffda0ec14b841c2c14cada"/>
 			</dataarea>
 		</part>
 	</software>

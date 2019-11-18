@@ -361,10 +361,6 @@ void midtunit_state::init_tunit_generic(int sound)
 
 	/* load sound ROMs and set up sound handlers */
 	m_chip_type = sound;
-
-
-	/* default graphics functionality */
-	m_gfx_rom_large = 0;
 }
 
 
@@ -377,24 +373,24 @@ void midtunit_state::init_tunit_generic(int sound)
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(midtunit_state,mktunit)
+void midtunit_state::init_mktunit()
 {
 	/* common init */
 	init_tunit_generic(SOUND_ADPCM);
 
 	/* protection */
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1b00000, 0x1b6ffff, read16_delegate(FUNC(midtunit_state::mk_prot_r),this), write16_delegate(FUNC(midtunit_state::mk_prot_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1b00000, 0x1b6ffff, read16_delegate(*this, FUNC(midtunit_state::mk_prot_r)), write16_delegate(*this, FUNC(midtunit_state::mk_prot_w)));
 
 	/* sound chip protection (hidden RAM) */
-	machine().device("adpcm:cpu")->memory().space(AS_PROGRAM).install_ram(0xfb9c, 0xfbc6);
+	m_adpcm_sound->get_cpu()->space(AS_PROGRAM).install_ram(0xfb9c, 0xfbc6);
 }
 
-DRIVER_INIT_MEMBER(midtunit_state,mkturbo)
+void midtunit_state::init_mkturbo()
 {
 	/* protection */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xfffff400, 0xfffff40f, read16_delegate(FUNC(midtunit_state::mkturbo_prot_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xfffff400, 0xfffff40f, read16_delegate(*this, FUNC(midtunit_state::mkturbo_prot_r)));
 
-	DRIVER_INIT_CALL(mktunit);
+	init_mktunit();
 }
 
 
@@ -406,33 +402,33 @@ void midtunit_state::init_nbajam_common(int te_protection)
 	if (!te_protection)
 	{
 		m_nbajam_prot_table = nbajam_prot_values;
-		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1b14020, 0x1b2503f, read16_delegate(FUNC(midtunit_state::nbajam_prot_r),this), write16_delegate(FUNC(midtunit_state::nbajam_prot_w),this));
+		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1b14020, 0x1b2503f, read16_delegate(*this, FUNC(midtunit_state::nbajam_prot_r)), write16_delegate(*this, FUNC(midtunit_state::nbajam_prot_w)));
 	}
 	else
 	{
 		m_nbajam_prot_table = nbajamte_prot_values;
-		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1b15f40, 0x1b37f5f, read16_delegate(FUNC(midtunit_state::nbajam_prot_r),this), write16_delegate(FUNC(midtunit_state::nbajam_prot_w),this));
-		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1b95f40, 0x1bb7f5f, read16_delegate(FUNC(midtunit_state::nbajam_prot_r),this), write16_delegate(FUNC(midtunit_state::nbajam_prot_w),this));
+		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1b15f40, 0x1b37f5f, read16_delegate(*this, FUNC(midtunit_state::nbajam_prot_r)), write16_delegate(*this, FUNC(midtunit_state::nbajam_prot_w)));
+		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1b95f40, 0x1bb7f5f, read16_delegate(*this, FUNC(midtunit_state::nbajam_prot_r)), write16_delegate(*this, FUNC(midtunit_state::nbajam_prot_w)));
 	}
 
 	/* sound chip protection (hidden RAM) */
 	if (!te_protection)
-		machine().device("adpcm:cpu")->memory().space(AS_PROGRAM).install_ram(0xfbaa, 0xfbd4);
+		m_adpcm_sound->get_cpu()->space(AS_PROGRAM).install_ram(0xfbaa, 0xfbd4);
 	else
-		machine().device("adpcm:cpu")->memory().space(AS_PROGRAM).install_ram(0xfbec, 0xfc16);
+		m_adpcm_sound->get_cpu()->space(AS_PROGRAM).install_ram(0xfbec, 0xfc16);
 }
 
-DRIVER_INIT_MEMBER(midtunit_state,nbajam)
+void midtunit_state::init_nbajam()
 {
 	init_nbajam_common(0);
 }
 
-DRIVER_INIT_MEMBER(midtunit_state,nbajamte)
+void midtunit_state::init_nbajamte()
 {
 	init_nbajam_common(1);
 }
 
-DRIVER_INIT_MEMBER(midtunit_state,jdreddp)
+void midtunit_state::init_jdreddp()
 {
 	/* common init */
 	init_tunit_generic(SOUND_ADPCM_LARGE);
@@ -441,11 +437,11 @@ DRIVER_INIT_MEMBER(midtunit_state,jdreddp)
 	m_maincpu->space(AS_PROGRAM).nop_write(0x01d81060, 0x01d8107f);
 
 	/* protection */
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1b00000, 0x1bfffff, read16_delegate(FUNC(midtunit_state::jdredd_prot_r),this), write16_delegate(FUNC(midtunit_state::jdredd_prot_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1b00000, 0x1bfffff, read16_delegate(*this, FUNC(midtunit_state::jdredd_prot_r)), write16_delegate(*this, FUNC(midtunit_state::jdredd_prot_w)));
 
 	/* sound chip protection (hidden RAM) */
-	machine().device("adpcm:cpu")->memory().space(AS_PROGRAM).install_read_bank(0xfbcf, 0xfbf9, "bank7");
-	machine().device("adpcm:cpu")->memory().space(AS_PROGRAM).install_write_bank(0xfbcf, 0xfbf9, "bank9");
+	m_adpcm_sound->get_cpu()->space(AS_PROGRAM).install_read_bank(0xfbcf, 0xfbf9, "bank7");
+	m_adpcm_sound->get_cpu()->space(AS_PROGRAM).install_write_bank(0xfbcf, 0xfbf9, "bank9");
 	membank("adpcm:bank9")->set_base(auto_alloc_array(machine(), uint8_t, 0x80));
 }
 
@@ -459,20 +455,20 @@ DRIVER_INIT_MEMBER(midtunit_state,jdreddp)
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(midtunit_state,mk2)
+void midtunit_state::init_mk2()
 {
 	/* common init */
 	init_tunit_generic(SOUND_DCS);
-	m_gfx_rom_large = 1;
+	m_video->set_gfx_rom_large(true);
 
 	/* protection */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x00f20c60, 0x00f20c7f, write16_delegate(FUNC(midtunit_state::mk2_prot_w),this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x00f42820, 0x00f4283f, write16_delegate(FUNC(midtunit_state::mk2_prot_w),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x01a190e0, 0x01a190ff, read16_delegate(FUNC(midtunit_state::mk2_prot_r),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x01a191c0, 0x01a191df, read16_delegate(FUNC(midtunit_state::mk2_prot_shift_r),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x01a3d0c0, 0x01a3d0ff, read16_delegate(FUNC(midtunit_state::mk2_prot_r),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x01d9d1e0, 0x01d9d1ff, read16_delegate(FUNC(midtunit_state::mk2_prot_const_r),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x01def920, 0x01def93f, read16_delegate(FUNC(midtunit_state::mk2_prot_const_r),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x00f20c60, 0x00f20c7f, write16_delegate(*this, FUNC(midtunit_state::mk2_prot_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x00f42820, 0x00f4283f, write16_delegate(*this, FUNC(midtunit_state::mk2_prot_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x01a190e0, 0x01a190ff, read16_delegate(*this, FUNC(midtunit_state::mk2_prot_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x01a191c0, 0x01a191df, read16_delegate(*this, FUNC(midtunit_state::mk2_prot_shift_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x01a3d0c0, 0x01a3d0ff, read16_delegate(*this, FUNC(midtunit_state::mk2_prot_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x01d9d1e0, 0x01d9d1ff, read16_delegate(*this, FUNC(midtunit_state::mk2_prot_const_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x01def920, 0x01def93f, read16_delegate(*this, FUNC(midtunit_state::mk2_prot_const_r)));
 }
 
 
@@ -483,7 +479,7 @@ DRIVER_INIT_MEMBER(midtunit_state,mk2)
  *
  *************************************/
 
-MACHINE_RESET_MEMBER(midtunit_state,midtunit)
+void midtunit_state::machine_reset()
 {
 	/* reset sound */
 	switch (m_chip_type)
@@ -550,7 +546,7 @@ WRITE16_MEMBER(midtunit_state::midtunit_sound_w)
 			case SOUND_ADPCM:
 			case SOUND_ADPCM_LARGE:
 				m_adpcm_sound->reset_write(~data & 0x100);
-				m_adpcm_sound->write(space, offset, data & 0xff);
+				m_adpcm_sound->write(data & 0xff);
 
 				/* the games seem to check for $82 loops, so this should be just barely enough */
 				m_fake_sound_state = 128;

@@ -45,9 +45,9 @@ READ8_MEMBER(ladyfrog_state::ladyfrog_videoram_r)
 WRITE8_MEMBER(ladyfrog_state::ladyfrog_palette_w)
 {
 	if (offset & 0x100)
-		m_palette->write8_ext(space, (offset & 0xff) + (m_palette_bank << 8), data);
+		m_palette->write8_ext((offset & 0xff) + (m_palette_bank << 8), data);
 	else
-		m_palette->write8(space, (offset & 0xff) + (m_palette_bank << 8), data);
+		m_palette->write8((offset & 0xff) + (m_palette_bank << 8), data);
 }
 
 READ8_MEMBER(ladyfrog_state::ladyfrog_palette_r)
@@ -127,7 +127,7 @@ void ladyfrog_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 VIDEO_START_MEMBER(ladyfrog_state,ladyfrog_common)
 {
 	m_spriteram = std::make_unique<uint8_t[]>(160);
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ladyfrog_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ladyfrog_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_paletteram.resize(0x200);
 	m_paletteram_ext.resize(0x200);
@@ -137,7 +137,7 @@ VIDEO_START_MEMBER(ladyfrog_state,ladyfrog_common)
 	m_bg_tilemap->set_scroll_cols(32);
 	m_bg_tilemap->set_scrolldy(15, 15);
 
-	save_pointer(NAME(m_spriteram.get()), 160);
+	save_pointer(NAME(m_spriteram), 160);
 	save_item(NAME(m_paletteram));
 	save_item(NAME(m_paletteram_ext));
 }

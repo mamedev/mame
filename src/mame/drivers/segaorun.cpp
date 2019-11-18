@@ -74,7 +74,7 @@ Notes:
       68000     - Clock Input 10.000MHz [40/4]
       Z80A      - Clock Input 4.000MHz [16/4]
       YM2151    - Yamaha YM2151 FM Operator Type M (OPM) Sound Generator IC. Clock Input 4.000MHz [16/4]
-      YM3012    - Yamaha YM3012 2-Channel Serial Input Floating Point Digital to Analog Convertor (DIP16)
+      YM3012    - Yamaha YM3012 2-Channel Serial Input Floating Point Digital to Analog Converter (DIP16)
       TMM2063   - Toshiba TMM2063 8kx8 SRAM (NDIP28)
       TMM2115   - Toshiba TMM2115 2kx8 SRAM (NDIP24)
       TL084     - Texas Instruments TL084 Quad JFET-Input General-Purpose Operational Amplifier (DIP14)
@@ -303,7 +303,7 @@ const auto MASTER_CLOCK_25MHz = XTAL(25'174'800);
 READ8_MEMBER( segaorun_state::unknown_porta_r )
 {
 	//logerror("%06X:read from 8255 port A\n", m_maincpu->pc());
-	return 0;
+	return m_adc->intr_r() << 6;
 }
 
 READ8_MEMBER( segaorun_state::unknown_portb_r )
@@ -366,6 +366,7 @@ READ8_MEMBER( segaorun_state::bankmotor_limit_r )
 	uint8_t ret = 0xff;
 
 	// PPI Input port A:
+	//  D6: ADC interrupt
 	//  D5: left limit
 	//  D4: center
 	//  D3: right limit
@@ -384,6 +385,9 @@ READ8_MEMBER( segaorun_state::bankmotor_limit_r )
 		ret ^= 0x10;
 	else if (pos >= right_limit - tolerance)
 		ret ^= 0x08;
+
+	if (!m_adc->intr_r())
+		ret ^= 0x40;
 
 	return ret;
 }
@@ -441,32 +445,32 @@ void segaorun_state::memory_mapper(sega_315_5195_mapper_device &mapper, uint8_t 
 	switch (index)
 	{
 		case 5:
-			mapper.map_as_handler(0x90000, 0x10000, 0xf00000, read16_delegate(FUNC(segaorun_state::sega_road_control_0_r), this), write16_delegate(FUNC(segaorun_state::sega_road_control_0_w), this));
-			mapper.map_as_ram(0x80000, 0x01000, 0xf0f000, "roadram", write16_delegate());
-			mapper.map_as_ram(0x60000, 0x08000, 0xf18000, "cpu1ram", write16_delegate());
-			mapper.map_as_ram(0x00000, 0x60000, 0xf00000, "cpu1rom", write16_delegate(FUNC(segaorun_state::nop_w), this));
+			mapper.map_as_handler(0x90000, 0x10000, 0xf00000, read16_delegate(*this, FUNC(segaorun_state::sega_road_control_0_r)), write16_delegate(*this, FUNC(segaorun_state::sega_road_control_0_w)));
+			mapper.map_as_ram(0x80000, 0x01000, 0xf0f000, "segaic16road:roadram", write16_delegate(*this));
+			mapper.map_as_ram(0x60000, 0x08000, 0xf18000, "cpu1ram", write16_delegate(*this));
+			mapper.map_as_ram(0x00000, 0x60000, 0xf00000, "cpu1rom", write16_delegate(*this, FUNC(segaorun_state::nop_w)));
 			break;
 
 		case 4:
-			mapper.map_as_handler(0x90000, 0x10000, 0xf00000, read16_delegate(FUNC(segaorun_state::misc_io_r), this), write16_delegate(FUNC(segaorun_state::misc_io_w), this));
+			mapper.map_as_handler(0x90000, 0x10000, 0xf00000, read16_delegate(*this, FUNC(segaorun_state::misc_io_r)), write16_delegate(*this, FUNC(segaorun_state::misc_io_w)));
 			break;
 
 		case 3:
-			mapper.map_as_ram(0x00000, 0x01000, 0xfff000, "sprites", write16_delegate());
+			mapper.map_as_ram(0x00000, 0x01000, 0xfff000, "sprites", write16_delegate(*this));
 			break;
 
 		case 2:
-			mapper.map_as_ram(0x00000, 0x02000, 0xffe000, "paletteram", write16_delegate(FUNC(segaorun_state::paletteram_w), this));
+			mapper.map_as_ram(0x00000, 0x02000, 0xffe000, "paletteram", write16_delegate(*this, FUNC(segaorun_state::paletteram_w)));
 			break;
 
 		case 1:
-			mapper.map_as_ram(0x00000, 0x10000, 0xfe0000, "tileram", write16_delegate(FUNC(segaorun_state::tileram_w), this));
-			mapper.map_as_ram(0x10000, 0x01000, 0xfef000, "textram", write16_delegate(FUNC(segaorun_state::textram_w), this));
+			mapper.map_as_ram(0x00000, 0x10000, 0xfe0000, "tileram", write16_delegate(*this, FUNC(segaorun_state::tileram_w)));
+			mapper.map_as_ram(0x10000, 0x01000, 0xfef000, "textram", write16_delegate(*this, FUNC(segaorun_state::textram_w)));
 			break;
 
 		case 0:
-			mapper.map_as_ram(0x60000, 0x08000, 0xf98000, "workram", write16_delegate());
-			mapper.map_as_rom(0x00000, 0x60000, 0xf80000, "rom0base", "decrypted_rom0base", 0x00000, write16_delegate());
+			mapper.map_as_ram(0x60000, 0x08000, 0xf98000, "workram", write16_delegate(*this));
+			mapper.map_as_rom(0x00000, 0x60000, 0xf80000, "rom0base", "decrypted_rom0base", 0x00000, write16_delegate(*this));
 			break;
 	}
 }
@@ -487,7 +491,7 @@ READ16_MEMBER( segaorun_state::misc_io_r )
 		return m_custom_io_r(space, offset, mem_mask);
 
 	logerror("%06X:misc_io_r - unknown read access to address %04X\n", m_maincpu->pc(), offset * 2);
-	return open_bus_r(space, 0, mem_mask);
+	return m_mapper->open_bus_r();
 }
 
 
@@ -533,7 +537,7 @@ void segaorun_state::machine_reset()
 	m_segaic16vid->tilemap_reset(*m_screen);
 
 	// hook the RESET line, which resets CPU #1
-	m_maincpu->set_reset_callback(write_line_delegate(FUNC(segaorun_state::m68k_reset_callback),this));
+	m_maincpu->set_reset_callback(*this, FUNC(segaorun_state::m68k_reset_callback));
 
 	// start timers to track interrupts
 	m_scanline_timer->adjust(m_screen->time_until_pos(223), 223);
@@ -605,7 +609,7 @@ void segaorun_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		}
 
 		default:
-			assert_always(false, "Unknown id in segaorun_state::device_timer");
+			throw emu_fatalerror("Unknown id in segaorun_state::device_timer");
 	}
 }
 
@@ -642,7 +646,7 @@ READ16_MEMBER( segaorun_state::outrun_custom_io_r )
 	switch (offset & 0x70/2)
 	{
 		case 0x00/2:
-			return m_i8255->read(space, offset & 3);
+			return m_i8255->read(offset & 3);
 
 		case 0x10/2:
 		{
@@ -650,19 +654,17 @@ READ16_MEMBER( segaorun_state::outrun_custom_io_r )
 		}
 
 		case 0x30/2:
-		{
-			return m_adc_ports[m_adc_select].read_safe(0x0010);
-		}
+			return m_adc->read();
 
 		case 0x60/2:
-			return m_watchdog->reset_r(space, 0);
+			return m_watchdog->reset_r(space);
 
 		default:
 			break;
 	}
 
 	logerror("%06X:outrun_custom_io_r - unknown read access to address %04X\n", m_maincpu->pc(), offset * 2);
-	return open_bus_r(space, 0, mem_mask);
+	return m_mapper->open_bus_r();
 }
 
 
@@ -678,7 +680,7 @@ WRITE16_MEMBER( segaorun_state::outrun_custom_io_w )
 	{
 		case 0x00/2:
 			if (ACCESSING_BITS_0_7)
-				m_i8255->write(space, offset & 3, data);
+				m_i8255->write(offset & 3, data);
 			return;
 
 		case 0x20/2:
@@ -698,7 +700,7 @@ WRITE16_MEMBER( segaorun_state::outrun_custom_io_w )
 			return;
 
 		case 0x30/2:
-			// ADC trigger
+			m_adc->write();
 			return;
 
 		case 0x60/2:
@@ -736,16 +738,14 @@ READ16_MEMBER( segaorun_state::shangon_custom_io_r )
 		}
 
 		case 0x3020/2:
-		{
-			return m_adc_ports[m_adc_select].read_safe(0x0010);
-		}
+			return m_adc->read();
 
 		default:
 			break;
 	}
 
 	logerror("%06X:misc_io_r - unknown read access to address %04X\n", m_maincpu->pc(), offset * 2);
-	return open_bus_r(space,0,mem_mask);
+	return m_mapper->open_bus_r();
 }
 
 
@@ -789,7 +789,7 @@ WRITE16_MEMBER( segaorun_state::shangon_custom_io_w )
 			return;
 
 		case 0x3020/2:
-			// ADC trigger
+			m_adc->write();
 			return;
 
 		default:
@@ -797,6 +797,16 @@ WRITE16_MEMBER( segaorun_state::shangon_custom_io_w )
 	}
 
 	logerror("%06X:misc_io_w - unknown write access to address %04X = %04X & %04X\n", m_maincpu->pc(), offset * 2, data, mem_mask);
+}
+
+
+//-------------------------------------------------
+//  analog_r - read multiplexed analog ports
+//-------------------------------------------------
+
+uint8_t segaorun_state::analog_r()
+{
+	return m_adc_ports[m_adc_select].read_safe(0x10);
 }
 
 
@@ -830,7 +840,7 @@ void segaorun_state::update_main_irqs()
 
 WRITE_LINE_MEMBER(segaorun_state::m68k_reset_callback)
 {
-	m_subcpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+	m_subcpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
 
@@ -868,7 +878,7 @@ void segaorun_state::sub_map(address_map &map)
 	map.global_mask(0xfffff);
 	map(0x000000, 0x05ffff).rom().share("cpu1rom");
 	map(0x060000, 0x067fff).mirror(0x018000).ram().share("cpu1ram");
-	map(0x080000, 0x080fff).mirror(0x00f000).ram().share("roadram");
+	map(0x080000, 0x080fff).mirror(0x00f000).ram().share("segaic16road:roadram");
 	map(0x090000, 0x09ffff).rw(m_segaic16road, FUNC(segaic16_road_device::segaic16_road_control_0_r), FUNC(segaic16_road_device::segaic16_road_control_0_w));
 }
 
@@ -951,7 +961,7 @@ static INPUT_PORTS_START( outrun_generic )
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(40)
 
 	PORT_START("ADC.3")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, segaorun_state, bankmotor_pos_r, nullptr)
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(segaorun_state, bankmotor_pos_r)
 INPUT_PORTS_END
 
 
@@ -1134,7 +1144,7 @@ INPUT_PORTS_END
 //  GRAPHICS DEFINITIONS
 //**************************************************************************
 
-static GFXDECODE_START( segaorun )
+static GFXDECODE_START( gfx_segaorun )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x3_planar, 0, 1024 )
 GFXDECODE_END
 
@@ -1144,61 +1154,61 @@ GFXDECODE_END
 //  GENERIC MACHINE DRIVERS
 //**************************************************************************
 
-MACHINE_CONFIG_START(segaorun_state::outrun_base)
-
+void segaorun_state::outrun_base(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(outrun_map)
+	M68000(config, m_maincpu, MASTER_CLOCK/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &segaorun_state::outrun_map);
 
-	MCFG_CPU_ADD("subcpu", M68000, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(sub_map)
+	M68000(config, m_subcpu, MASTER_CLOCK/4);
+	m_subcpu->set_addrmap(AS_PROGRAM, &segaorun_state::sub_map);
 
-	MCFG_CPU_ADD("soundcpu", Z80, SOUND_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_IO_MAP(sound_portmap)
+	Z80(config, m_soundcpu, SOUND_CLOCK/4);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &segaorun_state::sound_map);
+	m_soundcpu->set_addrmap(AS_IO, &segaorun_state::sound_portmap);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
-	MCFG_DEVICE_ADD("i8255", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(segaorun_state, bankmotor_limit_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(segaorun_state, unknown_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(segaorun_state, unknown_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(segaorun_state, bankmotor_control_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(segaorun_state, unknown_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(segaorun_state, video_control_w))
+	I8255(config, m_i8255);
+	m_i8255->in_pa_callback().set(FUNC(segaorun_state::bankmotor_limit_r));
+	m_i8255->out_pa_callback().set(FUNC(segaorun_state::unknown_porta_w));
+	m_i8255->in_pb_callback().set(FUNC(segaorun_state::unknown_portb_r));
+	m_i8255->out_pb_callback().set(FUNC(segaorun_state::bankmotor_control_w));
+	m_i8255->in_pc_callback().set(FUNC(segaorun_state::unknown_portc_r));
+	m_i8255->out_pc_callback().set(FUNC(segaorun_state::video_control_w));
 
-	MCFG_DEVICE_ADD("mapper", SEGA_315_5195_MEM_MAPPER, MASTER_CLOCK/4)
-	MCFG_SEGA_315_5195_CPU("maincpu")
-	MCFG_SEGA_315_5195_MAPPER_HANDLER(segaorun_state, memory_mapper)
-	MCFG_SEGA_315_5195_PBF_CALLBACK(INPUTLINE("soundcpu", INPUT_LINE_NMI))
+	ADC0804(config, m_adc, MASTER_CLOCK_25MHz/4/6);
+	m_adc->vin_callback().set(FUNC(segaorun_state::analog_r));
+
+	SEGA_315_5195_MEM_MAPPER(config, m_mapper, MASTER_CLOCK/4, m_maincpu);
+	m_mapper->set_mapper(FUNC(segaorun_state::memory_mapper));
+	m_mapper->pbf().set_inputline(m_soundcpu, INPUT_LINE_NMI);
 
 	// video hardware
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", segaorun)
-	MCFG_PALETTE_ADD("palette", 4096*3)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_segaorun);
+	PALETTE(config, m_palette).set_entries(4096*2);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK_25MHz/4, 400, 0, 320, 262, 0, 224)
-	MCFG_SCREEN_UPDATE_DRIVER(segaorun_state, screen_update_outrun)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(MASTER_CLOCK_25MHz/4, 400, 0, 320, 262, 0, 224);
+	m_screen->set_screen_update(FUNC(segaorun_state::screen_update_outrun));
+	m_screen->set_palette(m_palette);
 
-	MCFG_SEGAIC16VID_ADD("segaic16vid")
-	MCFG_SEGAIC16VID_GFXDECODE("gfxdecode")
-	MCFG_SEGAIC16_ROAD_ADD("segaic16road")
+	SEGAIC16VID(config, m_segaic16vid, 0, "gfxdecode");
+	SEGAIC16_ROAD(config, m_segaic16road, 0);
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_YM2151_ADD("ymsnd", SOUND_CLOCK/4)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.43)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.43)
+	YM2151(config, "ymsnd", SOUND_CLOCK/4).add_route(0, "lspeaker", 0.43).add_route(1, "rspeaker", 0.43);
 
-	MCFG_SEGAPCM_ADD("pcm", SOUND_CLOCK/4)
-	MCFG_SEGAPCM_BANK(BANK_512)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	segapcm_device &pcm(SEGAPCM(config, "pcm", SOUND_CLOCK/4));
+	pcm.set_bank(segapcm_device::BANK_512);
+	pcm.add_route(0, "lspeaker", 1.0);
+	pcm.add_route(1, "rspeaker", 1.0);
+}
 
 
 
@@ -1206,71 +1216,72 @@ MACHINE_CONFIG_END
 //  GAME-SPECIFIC MACHINE DRIVERS
 //**************************************************************************
 
-MACHINE_CONFIG_START(segaorun_state::outrundx)
+void segaorun_state::outrundx(machine_config &config)
+{
 	outrun_base(config);
 
 	// basic machine hardware
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("bankmotor", segaorun_state, bankmotor_update, attotime::from_msec(10))
+	TIMER(config, "bankmotor").configure_periodic(FUNC(segaorun_state::bankmotor_update), attotime::from_msec(10));
 
 	// video hardware
-	MCFG_SEGA_OUTRUN_SPRITES_ADD("sprites")
-MACHINE_CONFIG_END
+	SEGA_OUTRUN_SPRITES(config, m_sprites, 0);
+}
 
-MACHINE_CONFIG_START(segaorun_state::outrun)
+void segaorun_state::outrun(machine_config &config)
+{
 	outrundx(config);
 
-	// basic machine hardware
-	MCFG_NVRAM_ADD_0FILL("nvram")
-MACHINE_CONFIG_END
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+}
 
-MACHINE_CONFIG_START(segaorun_state::outrun_fd1094)
+void segaorun_state::outrun_fd1094(machine_config &config)
+{
 	outrun(config);
 
 	// basic machine hardware
-	MCFG_CPU_REPLACE("maincpu", FD1094, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(outrun_map)
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
-MACHINE_CONFIG_END
+	FD1094(config.replace(), m_maincpu, MASTER_CLOCK/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &segaorun_state::outrun_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &segaorun_state::decrypted_opcodes_map);
+}
 
-MACHINE_CONFIG_START(segaorun_state::outrun_fd1089a)
+void segaorun_state::outrun_fd1089a(machine_config &config)
+{
 	outrun(config);
 
 	// basic machine hardware
-	MCFG_CPU_REPLACE("maincpu", FD1089A, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(outrun_map)
-MACHINE_CONFIG_END
+	FD1089A(config.replace(), m_maincpu, MASTER_CLOCK/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &segaorun_state::outrun_map);
+}
 
-
-MACHINE_CONFIG_START(segaorun_state::shangon)
+void segaorun_state::shangon(machine_config &config)
+{
 	outrun_base(config);
 
 	// basic machine hardware
-	MCFG_DEVICE_REMOVE("i8255")
-	MCFG_DEVICE_ADD("i8255", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(segaorun_state, unknown_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(segaorun_state, unknown_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(segaorun_state, unknown_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(segaorun_state, unknown_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(segaorun_state, unknown_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(segaorun_state, video_control_w))
+	m_i8255->in_pa_callback().set(FUNC(segaorun_state::unknown_porta_r));
+	m_i8255->out_pa_callback().set(FUNC(segaorun_state::unknown_porta_w));
+	m_i8255->in_pb_callback().set(FUNC(segaorun_state::unknown_portb_r));
+	m_i8255->out_pb_callback().set(FUNC(segaorun_state::unknown_portb_w));
+	m_i8255->in_pc_callback().set(FUNC(segaorun_state::unknown_portc_r));
+	m_i8255->out_pc_callback().set(FUNC(segaorun_state::video_control_w));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK_25MHz/4, 400, 0, 320, 262, 0, 224)
-	MCFG_SCREEN_UPDATE_DRIVER(segaorun_state, screen_update_shangon)
+	m_screen->set_raw(MASTER_CLOCK_25MHz/4, 400, 0, 320, 262, 0, 224);
+	m_screen->set_screen_update(FUNC(segaorun_state::screen_update_shangon));
 
-	MCFG_SEGA_SYS16B_SPRITES_ADD("sprites")
-MACHINE_CONFIG_END
+	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
+}
 
-MACHINE_CONFIG_START(segaorun_state::shangon_fd1089b)
+void segaorun_state::shangon_fd1089b(machine_config &config)
+{
 	shangon(config);
 
 	// basic machine hardware
-	MCFG_CPU_REPLACE("maincpu", FD1089B, MASTER_CLOCK/4)
-	MCFG_CPU_PROGRAM_MAP(outrun_map)
-MACHINE_CONFIG_END
+	FD1089B(config.replace(), m_maincpu, MASTER_CLOCK/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &segaorun_state::outrun_map);
+}
 
 
 
@@ -1295,7 +1306,7 @@ ROM_START( outrun )
 	ROM_REGION( 0x60000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "epr-10380b.133", 0x000000, 0x10000, CRC(1f6cadad) SHA1(31e870f307f44eb4f293b607123b623beee2bc3c) )
 	ROM_LOAD16_BYTE( "epr-10382b.118", 0x000001, 0x10000, CRC(c4c3fa1a) SHA1(69236cf9f27691dee290c79db1fc9b5e73ea77d7) )
-	ROM_LOAD16_BYTE( "epr-10381b.132", 0x020000, 0x10000, CRC(be8c412b) SHA1(bf3ff05bbf81bdd44567f3b9bb4919ed4a499624) ) // Same as the "A" version belown ???
+	ROM_LOAD16_BYTE( "epr-10381b.132", 0x020000, 0x10000, CRC(be8c412b) SHA1(bf3ff05bbf81bdd44567f3b9bb4919ed4a499624) ) // Same as the "A" version below ???
 	ROM_LOAD16_BYTE( "epr-10383b.117", 0x020001, 0x10000, CRC(10a2014a) SHA1(1970895145ad8b5735f66ed8c837d9d453ce9b23) )
 
 	ROM_REGION( 0x60000, "subcpu", 0 ) // second 68000 CPU
@@ -1313,7 +1324,7 @@ ROM_START( outrun )
 	ROM_LOAD( "opr-10230.104", 0x28000, 0x08000, CRC(686f5e50) SHA1(03697b892f911177968aa40de6c5f464eb0258e7) )
 
 	ROM_REGION32_LE( 0x100000, "sprites", 0 ) // sprites
-	// VIDEO BD 837-6064-02 uses mask roms four times the size of those used on VIDEO BD 837-6064-01, same data
+	// VIDEO BD 837-6064-02 uses mask ROMs four times the size of those used on VIDEO BD 837-6064-01, same data
 	ROM_LOAD32_BYTE( "mpr-10371.9",  0x00000, 0x20000, CRC(7cc86208) SHA1(21320f945f7c8e990c97c9b1232a0f4b6bd00f8f) )
 	ROM_LOAD32_BYTE( "mpr-10373.10", 0x00001, 0x20000, CRC(b0d26ac9) SHA1(3a9ce8547cd43b7b04abddf9a9ab5634e0bbfaba) )
 	ROM_LOAD32_BYTE( "mpr-10375.11", 0x00002, 0x20000, CRC(59b60bd7) SHA1(e5d8c67e020608edd24ba87b7687b2ac2483ee7f) )
@@ -1323,7 +1334,7 @@ ROM_START( outrun )
 	ROM_LOAD32_BYTE( "mpr-10376.15", 0x80002, 0x20000, CRC(f3b8f318) SHA1(a5f2532613f33a64441e0f75443c10ba78dccc6e) )
 	ROM_LOAD32_BYTE( "mpr-10378.16", 0x80003, 0x20000, CRC(a1062984) SHA1(4399030a155caf71f2dec7f75c4b65531ab53576) )
 
-	ROM_REGION( 0x10000, "gfx3", 0 ) // road gfx (2 identical roms, 1 for each road)
+	ROM_REGION( 0x10000, "segaic16road", 0 ) // road gfx (2 identical ROMs, 1 for each road)
 	ROM_LOAD( "opr-10186.47", 0x0000, 0x8000, CRC(22794426) SHA1(a554d4b68e71861a0d0da4d031b3b811b246f082) )
 	ROM_LOAD( "opr-10185.11", 0x8000, 0x8000, CRC(22794426) SHA1(a554d4b68e71861a0d0da4d031b3b811b246f082) )
 
@@ -1367,7 +1378,7 @@ ROM_START( outruneh )
 	ROM_LOAD( "opr-10230.104", 0x28000, 0x08000, CRC(686f5e50) SHA1(03697b892f911177968aa40de6c5f464eb0258e7) )
 
 	ROM_REGION32_LE( 0x100000, "sprites", 0 ) // sprites
-	// VIDEO BD 837-6064-02 uses mask roms four times the size of those used on VIDEO BD 837-6064-01, same data
+	// VIDEO BD 837-6064-02 uses mask ROMs four times the size of those used on VIDEO BD 837-6064-01, same data
 	ROM_LOAD32_BYTE( "mpr-10371.9",  0x00000, 0x20000, CRC(7cc86208) SHA1(21320f945f7c8e990c97c9b1232a0f4b6bd00f8f) )
 	ROM_LOAD32_BYTE( "mpr-10373.10", 0x00001, 0x20000, CRC(b0d26ac9) SHA1(3a9ce8547cd43b7b04abddf9a9ab5634e0bbfaba) )
 	ROM_LOAD32_BYTE( "mpr-10375.11", 0x00002, 0x20000, CRC(59b60bd7) SHA1(e5d8c67e020608edd24ba87b7687b2ac2483ee7f) )
@@ -1377,7 +1388,7 @@ ROM_START( outruneh )
 	ROM_LOAD32_BYTE( "mpr-10376.15", 0x80002, 0x20000, CRC(f3b8f318) SHA1(a5f2532613f33a64441e0f75443c10ba78dccc6e) )
 	ROM_LOAD32_BYTE( "mpr-10378.16", 0x80003, 0x20000, CRC(a1062984) SHA1(4399030a155caf71f2dec7f75c4b65531ab53576) )
 
-	ROM_REGION( 0x10000, "gfx3", 0 ) // road gfx (2 identical roms, 1 for each road)
+	ROM_REGION( 0x10000, "segaic16road", 0 ) // road gfx (2 identical ROMs, 1 for each road)
 	ROM_LOAD( "opr-10186.47", 0x0000, 0x8000, CRC(22794426) SHA1(a554d4b68e71861a0d0da4d031b3b811b246f082) )
 	ROM_LOAD( "opr-10185.11", 0x8000, 0x8000, CRC(22794426) SHA1(a554d4b68e71861a0d0da4d031b3b811b246f082) )
 
@@ -1410,7 +1421,7 @@ ROM_END
 //  Note: Starting with revision A and going forward Outrun added support for Cabinet styles: Moving, Up Cockpit & Mini Up
 //        as well as moving the Demo Sounds dipswitch down from SWB-2 to SWB-3 to make room for Cabinet settings.
 //
-//        The Outrun Standard & Upright Type Owner's Manuals show program roms as EPR-10380A through EPR-10383A
+//        The Outrun Standard & Upright Type Owner's Manuals show program ROMs as EPR-10380A through EPR-10383A
 //
 ROM_START( outrunra )
 	ROM_REGION( 0x60000, "maincpu", 0 ) // 68000 code
@@ -1434,7 +1445,7 @@ ROM_START( outrunra )
 	ROM_LOAD( "opr-10230.104", 0x28000, 0x08000, CRC(686f5e50) SHA1(03697b892f911177968aa40de6c5f464eb0258e7) )
 
 	ROM_REGION32_LE( 0x100000, "sprites", 0 ) // sprites
-	// VIDEO BD 837-6064-02 uses mask roms four times the size of those used on VIDEO BD 837-6064-01, same data
+	// VIDEO BD 837-6064-02 uses mask ROMs four times the size of those used on VIDEO BD 837-6064-01, same data
 	ROM_LOAD32_BYTE( "mpr-10371.9",  0x00000, 0x20000, CRC(7cc86208) SHA1(21320f945f7c8e990c97c9b1232a0f4b6bd00f8f) )
 	ROM_LOAD32_BYTE( "mpr-10373.10", 0x00001, 0x20000, CRC(b0d26ac9) SHA1(3a9ce8547cd43b7b04abddf9a9ab5634e0bbfaba) )
 	ROM_LOAD32_BYTE( "mpr-10375.11", 0x00002, 0x20000, CRC(59b60bd7) SHA1(e5d8c67e020608edd24ba87b7687b2ac2483ee7f) )
@@ -1444,7 +1455,7 @@ ROM_START( outrunra )
 	ROM_LOAD32_BYTE( "mpr-10376.15", 0x80002, 0x20000, CRC(f3b8f318) SHA1(a5f2532613f33a64441e0f75443c10ba78dccc6e) )
 	ROM_LOAD32_BYTE( "mpr-10378.16", 0x80003, 0x20000, CRC(a1062984) SHA1(4399030a155caf71f2dec7f75c4b65531ab53576) )
 
-	ROM_REGION( 0x10000, "gfx3", 0 ) // road gfx (2 identical roms, 1 for each road)
+	ROM_REGION( 0x10000, "segaic16road", 0 ) // road gfx (2 identical ROMs, 1 for each road)
 	ROM_LOAD( "opr-10186.47", 0x0000, 0x8000, CRC(22794426) SHA1(a554d4b68e71861a0d0da4d031b3b811b246f082) )
 	ROM_LOAD( "opr-10185.11", 0x8000, 0x8000, CRC(22794426) SHA1(a554d4b68e71861a0d0da4d031b3b811b246f082) )
 
@@ -1475,7 +1486,7 @@ ROM_END
 //
 //  Note: This is a Deluxe version. IE: Motor On / Off at SWB-1 and Demo Sounds at SWB-2
 //
-//        The Outrun Deluxe Type Owner's Manual show program roms as EPR-10380 through EPR-10383
+//        The Outrun Deluxe Type Owner's Manual show program ROMs as EPR-10380 through EPR-10383
 //
 ROM_START( outrundx )
 	ROM_REGION( 0x60000, "maincpu", 0 ) // 68000 code
@@ -1499,7 +1510,7 @@ ROM_START( outrundx )
 	ROM_LOAD( "opr-10230.104", 0x28000, 0x08000, CRC(686f5e50) SHA1(03697b892f911177968aa40de6c5f464eb0258e7) )
 
 	ROM_REGION32_LE( 0x100000, "sprites", 0 ) // sprites
-	// VIDEO BD 837-6064-01 uses eproms a fourth of the size of those used on VIDEO BD 837-6064-02, same data
+	// VIDEO BD 837-6064-01 uses EPROMs a fourth of the size of those used on VIDEO BD 837-6064-02, same data
 	ROM_LOAD32_BYTE( "epr-10194.26", 0x00000, 0x08000, CRC(f0eda3bd) SHA1(173e10a10372d42da81e6eb48c3e23a117638c0c) )
 	ROM_LOAD32_BYTE( "epr-10203.38", 0x00001, 0x08000, CRC(8445a622) SHA1(1187dee7db09a42446fc75872d49936310141eb8) )
 	ROM_LOAD32_BYTE( "epr-10212.52", 0x00002, 0x08000, CRC(dee7e731) SHA1(f09d18f8d8405025b87dd01488ad2098e28410b0) )
@@ -1533,7 +1544,7 @@ ROM_START( outrundx )
 	ROM_LOAD32_BYTE( "epr-10219.59", 0xe0002, 0x08000, CRC(e73b9224) SHA1(1904a71a0c18ab2a3a5929e72b1c215dbb0fa213) )
 	ROM_LOAD32_BYTE( "epr-10228.73", 0xe0003, 0x08000, CRC(25803978) SHA1(1a18922aeb516e8deb026d52e3cdcc4e69385af5) )
 
-	ROM_REGION( 0x10000, "gfx3", 0 ) // road gfx (2 identical roms, 1 for each road)
+	ROM_REGION( 0x10000, "segaic16road", 0 ) // road gfx (2 identical ROMs, 1 for each road)
 	ROM_LOAD( "opr-10186.47", 0x0000, 0x8000, CRC(22794426) SHA1(a554d4b68e71861a0d0da4d031b3b811b246f082) )
 	ROM_LOAD( "opr-10185.11", 0x8000, 0x8000, CRC(22794426) SHA1(a554d4b68e71861a0d0da4d031b3b811b246f082) )
 
@@ -1577,7 +1588,7 @@ ROM_START( outrundxeh )
 	ROM_LOAD( "opr-10230.104", 0x28000, 0x08000, CRC(686f5e50) SHA1(03697b892f911177968aa40de6c5f464eb0258e7) )
 
 	ROM_REGION32_LE( 0x100000, "sprites", 0 ) // sprites
-	// VIDEO BD 837-6064-01 uses eproms a fourth of the size of those used on VIDEO BD 837-6064-02, same data
+	// VIDEO BD 837-6064-01 uses EPROMs a fourth of the size of those used on VIDEO BD 837-6064-02, same data
 	ROM_LOAD32_BYTE( "epr-10194.26", 0x00000, 0x08000, CRC(f0eda3bd) SHA1(173e10a10372d42da81e6eb48c3e23a117638c0c) )
 	ROM_LOAD32_BYTE( "epr-10203.38", 0x00001, 0x08000, CRC(8445a622) SHA1(1187dee7db09a42446fc75872d49936310141eb8) )
 	ROM_LOAD32_BYTE( "epr-10212.52", 0x00002, 0x08000, CRC(dee7e731) SHA1(f09d18f8d8405025b87dd01488ad2098e28410b0) )
@@ -1611,7 +1622,7 @@ ROM_START( outrundxeh )
 	ROM_LOAD32_BYTE( "epr-10219.59", 0xe0002, 0x08000, CRC(e73b9224) SHA1(1904a71a0c18ab2a3a5929e72b1c215dbb0fa213) )
 	ROM_LOAD32_BYTE( "epr-10228.73", 0xe0003, 0x08000, CRC(25803978) SHA1(1a18922aeb516e8deb026d52e3cdcc4e69385af5) )
 
-	ROM_REGION( 0x10000, "gfx3", 0 ) // road gfx (2 identical roms, 1 for each road)
+	ROM_REGION( 0x10000, "segaic16road", 0 ) // road gfx (2 identical ROMs, 1 for each road)
 	ROM_LOAD( "opr-10186.47", 0x0000, 0x8000, CRC(22794426) SHA1(a554d4b68e71861a0d0da4d031b3b811b246f082) )
 	ROM_LOAD( "opr-10185.11", 0x8000, 0x8000, CRC(22794426) SHA1(a554d4b68e71861a0d0da4d031b3b811b246f082) )
 
@@ -1664,7 +1675,7 @@ ROM_START( outrundxj )
 	ROM_LOAD( "opr-10230.104", 0x28000, 0x08000, CRC(686f5e50) SHA1(03697b892f911177968aa40de6c5f464eb0258e7) )
 
 	ROM_REGION32_LE( 0x100000, "sprites", 0 ) // sprites
-	// VIDEO BD 837-6064-02 uses mask roms four times the size of those used on VIDEO BD 837-6064-01, same data
+	// VIDEO BD 837-6064-02 uses mask ROMs four times the size of those used on VIDEO BD 837-6064-01, same data
 	ROM_LOAD32_BYTE( "mpr-10371.9",  0x00000, 0x20000, CRC(7cc86208) SHA1(21320f945f7c8e990c97c9b1232a0f4b6bd00f8f) )
 	ROM_LOAD32_BYTE( "mpr-10373.10", 0x00001, 0x20000, CRC(b0d26ac9) SHA1(3a9ce8547cd43b7b04abddf9a9ab5634e0bbfaba) )
 	ROM_LOAD32_BYTE( "mpr-10375.11", 0x00002, 0x20000, CRC(59b60bd7) SHA1(e5d8c67e020608edd24ba87b7687b2ac2483ee7f) )
@@ -1674,7 +1685,7 @@ ROM_START( outrundxj )
 	ROM_LOAD32_BYTE( "mpr-10376.15", 0x80002, 0x20000, CRC(f3b8f318) SHA1(a5f2532613f33a64441e0f75443c10ba78dccc6e) )
 	ROM_LOAD32_BYTE( "mpr-10378.16", 0x80003, 0x20000, CRC(a1062984) SHA1(4399030a155caf71f2dec7f75c4b65531ab53576) )
 
-	ROM_REGION( 0x10000, "gfx3", 0 ) // road gfx (2 identical roms, 1 for each road)
+	ROM_REGION( 0x10000, "segaic16road", 0 ) // road gfx (2 identical ROMs, 1 for each road)
 	ROM_LOAD( "opr-10186.47", 0x0000, 0x8000, CRC(22794426) SHA1(a554d4b68e71861a0d0da4d031b3b811b246f082) )
 	ROM_LOAD( "opr-10185.11", 0x8000, 0x8000, CRC(22794426) SHA1(a554d4b68e71861a0d0da4d031b3b811b246f082) )
 
@@ -1696,12 +1707,11 @@ ROM_START( outrundxj )
 	ROM_RELOAD(               0x58000, 0x08000 )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-0019.key", 0x0000, 0x2000, CRC(6ff847c6) SHA1(e6b7bb77d0971c25eba3f168d939d0d5f1486537) )
-
+	ROM_LOAD( "317-0019.key", 0x0000, 0x2000, CRC(8ffbed98) SHA1(9c1147a1115c2b8555405bdbb5f04cae55b8ba29) )
 ROM_END
 
 //*************************************************************************************************************************
-//  Outrun Deluxe (ealier??)
+//  Outrun Deluxe (earlier??)
 //  CPU: 68000
 //   GAME BD  834-6065 Rev A
 //   CPU BD   837-6063
@@ -1711,7 +1721,7 @@ ROM_END
 //
 ROM_START( outrundxa )
 	ROM_REGION( 0x60000, "maincpu", 0 ) // 68000 code
-	// Earlier version of CPU BD?? uses half size eproms compared to the above sets
+	// Earlier version of CPU BD?? uses half size EPROMs compared to the above sets
 	ROM_LOAD16_BYTE( "epr-10183.115", 0x000000, 0x8000, CRC(3d992396) SHA1(8cef43799b71cfd36d3fea140afff7fe0bafcfc1) )
 	ROM_LOAD16_BYTE( "epr-10261.130", 0x000001, 0x8000, CRC(1d034847) SHA1(664b24c13f7885403328906682213e38c1ad994e) )
 	ROM_LOAD16_BYTE( "epr-10184.116", 0x010000, 0x8000, CRC(1a73dc46) SHA1(70f31619e80eb3d70747e7006e135c8bc0a31675) )
@@ -1740,7 +1750,7 @@ ROM_START( outrundxa )
 	ROM_LOAD( "opr-10230.104", 0x28000, 0x08000, CRC(686f5e50) SHA1(03697b892f911177968aa40de6c5f464eb0258e7) )
 
 	ROM_REGION32_LE( 0x100000, "sprites", 0 ) // sprites
-	// VIDEO BD 837-6064-01 uses eproms a fourth of the size of those used on VIDEO BD 837-6064-02, same data
+	// VIDEO BD 837-6064-01 uses EPROMs a fourth of the size of those used on VIDEO BD 837-6064-02, same data
 	ROM_LOAD32_BYTE( "epr-10194.26", 0x00000, 0x08000, CRC(f0eda3bd) SHA1(173e10a10372d42da81e6eb48c3e23a117638c0c) )
 	ROM_LOAD32_BYTE( "epr-10203.38", 0x00001, 0x08000, CRC(8445a622) SHA1(1187dee7db09a42446fc75872d49936310141eb8) )
 	ROM_LOAD32_BYTE( "epr-10212.52", 0x00002, 0x08000, CRC(dee7e731) SHA1(f09d18f8d8405025b87dd01488ad2098e28410b0) )
@@ -1774,7 +1784,7 @@ ROM_START( outrundxa )
 	ROM_LOAD32_BYTE( "epr-10219.59", 0xe0002, 0x08000, CRC(e73b9224) SHA1(1904a71a0c18ab2a3a5929e72b1c215dbb0fa213) )
 	ROM_LOAD32_BYTE( "epr-10228.73", 0xe0003, 0x08000, CRC(25803978) SHA1(1a18922aeb516e8deb026d52e3cdcc4e69385af5) )
 
-	ROM_REGION( 0x10000, "gfx3", 0 ) // road gfx (2 identical roms, 1 for each road)
+	ROM_REGION( 0x10000, "segaic16road", 0 ) // road gfx (2 identical ROMs, 1 for each road)
 	ROM_LOAD( "opr-10186.47", 0x0000, 0x8000, CRC(22794426) SHA1(a554d4b68e71861a0d0da4d031b3b811b246f082) )
 	ROM_LOAD( "opr-10185.11", 0x8000, 0x8000, CRC(22794426) SHA1(a554d4b68e71861a0d0da4d031b3b811b246f082) )
 
@@ -1811,20 +1821,20 @@ ROM_END
 //  1x 16mhz osc (near z80)
 //  2x pots
 //  1x PHILKO custom chip quad package soldered (gfx chip?). it's marked "Philko PK8702 8717".
-//  eproms from a-1 to a-14
+//  EPROMs from a-1 to a-14
 //
 //  Mid board contains:
 //  many TTLs and rams
 //  1x NEC D8255AC-2 (I/O chip?)
 //  5x Philko custom chips dip package (little as a ttl). They are all marked "Philko PK8701 8720"
-//  eproms a-15, a-16 and a-17
+//  EPROMs a-15, a-16 and a-17
 //
 //  Lower board contains:
 //  lots of rams
 //  1x custom Philko chip the size of a z80. it's marked "Philko PK8703"
 //  1x custom Philko chip the size of a z80. it's marked "Philko PK8704"
 //  1x custom Philko chip the size of a z80. it's marked "Philko PK8705"
-//  eproms from a-18 to a-33
+//  EPROMs from a-18 to a-33
 //
 //  Dumped by Corrado Tomaselli
 //
@@ -1864,7 +1874,7 @@ ROM_START( outrunb )
 	ROM_LOAD32_BYTE( "a-31.bin",    0xc0002, 0x10000, CRC(ef7d06fe) SHA1(541b5ba45f4140e2cc29a9da2592b476d414af5d) )
 	ROM_LOAD32_BYTE( "a-33.bin",    0xc0003, 0x10000, CRC(1222af9f) SHA1(2364bd54cbe21dd688efff32e93bf154546c93d6) )
 
-	ROM_REGION( 0x10000, "gfx3", 0 ) // road gfx - correct order unknown (identical after bitswapping)
+	ROM_REGION( 0x10000, "segaic16road", 0 ) // road gfx - correct order unknown (identical after bitswapping)
 	ROM_LOAD( "a-2.bin", 0x0000, 0x8000, CRC(ed5bda9c) SHA1(f09a34caf1f9f6b119700a00635ab8fa8244362d) )
 	ROM_LOAD( "a-3.bin", 0x8000, 0x8000, CRC(666fe754) SHA1(606090db53d658d7b04dca4748014a411e12f259) )
 
@@ -1886,7 +1896,7 @@ ROM_END
 //*************************************************************************************************************************
 //  Super Hangon
 //  CPU: 68000 (317-????)
-//   GAME BD SUPER HANG-ON  834-6277-07
+//   GAME BD SUPER HANG-ON  834-6277-07 SUPER HANG ON
 //   CPU BD SUPER HANG-ON   837-6278-01 (or 837-6278-03)
 //   VIDEO BD SUPER HANG-ON 837-6279-01
 //
@@ -1909,7 +1919,7 @@ ROM_START( shangon )
 	ROM_LOAD( "epr-10650.56", 0x10000, 0x08000, CRC(b236a403) SHA1(af02b8122794c083a66f2ab35d2c73b84b2df0be) )
 
 	ROM_REGION16_BE( 0x100000, "sprites", 0 ) // sprites
-	// Super Hang-On Video board 837-6279-01 (mask rom type), same data but mask roms twice the size as "EPR" counterparts
+	// Super Hang-On Video board 837-6279-01 (mask ROM type), same data but mask ROMs twice the size as "EPR" counterparts
 	ROM_LOAD16_BYTE( "mpr-10794.8",  0x000001, 0x020000, CRC(7c958e63) SHA1(ef79614e94280607a6cdf6e13db051accfd2add0) )
 	ROM_LOAD16_BYTE( "mpr-10798.16", 0x000000, 0x020000, CRC(7d58f807) SHA1(783c9929d27a0270b3f7d5eb799cee6b2e5b7ae5) )
 	ROM_LOAD16_BYTE( "mpr-10795.6",  0x040001, 0x020000, CRC(d9d31f8c) SHA1(3ce07b83e3aa2d8834c1a449fa31e003df5486a3) )
@@ -1919,7 +1929,7 @@ ROM_START( shangon )
 	ROM_LOAD16_BYTE( "mpr-10797.2",  0x0c0001, 0x020000, CRC(27f2870d) SHA1(40a34e4555885bf3c6a42e472b80d11c3bd4dcba) )
 	ROM_LOAD16_BYTE( "mpr-10801.10", 0x0c0000, 0x020000, CRC(12781795) SHA1(44bf6f657f32b9fab119557eb73c2fbf78700204) )
 
-	ROM_REGION( 0x10000, "gfx3", 0 ) // road gfx
+	ROM_REGION( 0x10000, "segaic16road", 0 ) // road gfx
 	ROM_LOAD( "epr-10642.47", 0x0000, 0x8000, CRC(7836bcc3) SHA1(26f308bf96224311ddf685799d7aa29aac42dd2f) )
 	// socket IC11 not populated
 
@@ -1942,12 +1952,12 @@ ROM_END
 //  CPU: FD1089B (317-0034)
 //   GAME BD SUPER HANG-ON  834-6277-02
 //   CPU BD SUPER HANG-ON   837-6278-01 (or 837-6278-03)
-//   VIDEO BD SUPER HANG-ON 837-6279 (or 837-6279-02, roms would be "OPR")
+//   VIDEO BD SUPER HANG-ON 837-6279 (or 837-6279-02, ROMs would be "OPR")
 //
 //  Manual states for this set:
-//      834-6277-01 (Object data (sprits) EPR type AKA EP-ROM type)
-//      834-6277-03 (Object data (sprits) MPR type AKA Mask-ROM type)
-//      834-6277-05 (Object data (sprits) OPR type AKA One Time ROM type)
+//      834-6277-01 (Object data (sprites) EPR type AKA EP-ROM type)
+//      834-6277-03 (Object data (sprites) MPR type AKA Mask-ROM type)
+//      834-6277-05 (Object data (sprites) OPR type AKA One Time ROM type)
 //
 ROM_START( shangon3 )
 	ROM_REGION( 0x60000, "maincpu", 0 ) // 68000 code - protected
@@ -1983,7 +1993,7 @@ ROM_START( shangon3 )
 	ROM_LOAD16_BYTE( "epr-10681.2",  0x0c0001, 0x010000, CRC(b176ea72) SHA1(7ec0eb0f13398d014c2e235773ded00351edb3e2) )
 	ROM_LOAD16_BYTE( "epr-10688.10", 0x0c0000, 0x010000, CRC(42fcd51d) SHA1(0eacb3527dc21746e5b901fcac83f2764a0f9e2c) )
 
-	ROM_REGION( 0x10000, "gfx3", 0 ) // road gfx
+	ROM_REGION( 0x10000, "segaic16road", 0 ) // road gfx
 	ROM_LOAD( "epr-10642.47", 0x0000, 0x8000, CRC(7836bcc3) SHA1(26f308bf96224311ddf685799d7aa29aac42dd2f) )
 	// socket IC11 not populated
 
@@ -2001,7 +2011,7 @@ ROM_START( shangon3 )
 	ROM_RELOAD(               0x38000, 0x08000 )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-0034.key", 0x0000, 0x2000, CRC(263ca773) SHA1(8e80d69d61cf54fd02b0ca59dd397fa60c713f3d) )
+	ROM_LOAD( "317-0034.key", 0x0000, 0x2000, CRC(ad61539a) SHA1(5db534ff3ce2736222e4475f9bf093b3d2d55f1a) )
 ROM_END
 
 ROM_START( shangon3d )
@@ -2038,7 +2048,7 @@ ROM_START( shangon3d )
 	ROM_LOAD16_BYTE( "epr-10681.2",  0x0c0001, 0x010000, CRC(b176ea72) SHA1(7ec0eb0f13398d014c2e235773ded00351edb3e2) )
 	ROM_LOAD16_BYTE( "epr-10688.10", 0x0c0000, 0x010000, CRC(42fcd51d) SHA1(0eacb3527dc21746e5b901fcac83f2764a0f9e2c) )
 
-	ROM_REGION( 0x10000, "gfx3", 0 ) // road gfx
+	ROM_REGION( 0x10000, "segaic16road", 0 ) // road gfx
 	ROM_LOAD( "epr-10642.47", 0x0000, 0x8000, CRC(7836bcc3) SHA1(26f308bf96224311ddf685799d7aa29aac42dd2f) )
 	// socket IC11 not populated
 
@@ -2060,7 +2070,7 @@ ROM_END
 //  Super Hangon
 //  CPU: FD1089B (317-0034)
 //   CPU BD SUPER HANG-ON   837-6278-01 (or 837-6278-03)
-//   VIDEO BD SUPER HANG-ON 837-6279 (or 837-6279-02, roms would be "OPR")
+//   VIDEO BD SUPER HANG-ON 837-6279 (or 837-6279-02, ROMs would be "OPR")
 //
 ROM_START( shangon2 )
 	ROM_REGION( 0x60000, "maincpu", 0 ) // 68000 code - protected
@@ -2096,7 +2106,7 @@ ROM_START( shangon2 )
 	ROM_LOAD16_BYTE( "epr-10681.2",  0x0c0001, 0x010000, CRC(b176ea72) SHA1(7ec0eb0f13398d014c2e235773ded00351edb3e2) )
 	ROM_LOAD16_BYTE( "epr-10688.10", 0x0c0000, 0x010000, CRC(42fcd51d) SHA1(0eacb3527dc21746e5b901fcac83f2764a0f9e2c) )
 
-	ROM_REGION( 0x10000, "gfx3", 0 ) // road gfx
+	ROM_REGION( 0x10000, "segaic16road", 0 ) // road gfx
 	ROM_LOAD( "epr-10642.47", 0x0000, 0x8000, CRC(7836bcc3) SHA1(26f308bf96224311ddf685799d7aa29aac42dd2f) )
 	// socket IC11 not populated
 
@@ -2114,14 +2124,14 @@ ROM_START( shangon2 )
 	ROM_RELOAD(               0x38000, 0x08000 )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-0034.key", 0x0000, 0x2000, CRC(263ca773) SHA1(8e80d69d61cf54fd02b0ca59dd397fa60c713f3d) )
+	ROM_LOAD( "317-0034.key", 0x0000, 0x2000, CRC(ad61539a) SHA1(5db534ff3ce2736222e4475f9bf093b3d2d55f1a) )
 ROM_END
 
 //*************************************************************************************************************************
 //  Super Hangon
 //  CPU: FD1089B (317-0034)
 //   CPU BD SUPER HANG-ON   837-6278-01 (or 837-6278-03)
-//   VIDEO BD SUPER HANG-ON 837-6279 (or 837-6279-02, roms would be "OPR")
+//   VIDEO BD SUPER HANG-ON 837-6279 (or 837-6279-02, ROMs would be "OPR")
 //
 ROM_START( shangon1 )
 	ROM_REGION( 0x60000, "maincpu", 0 ) // 68000 code - protected
@@ -2157,7 +2167,7 @@ ROM_START( shangon1 )
 	ROM_LOAD16_BYTE( "epr-10681.2",  0x0c0001, 0x010000, CRC(b176ea72) SHA1(7ec0eb0f13398d014c2e235773ded00351edb3e2) )
 	ROM_LOAD16_BYTE( "epr-10688.10", 0x0c0000, 0x010000, CRC(42fcd51d) SHA1(0eacb3527dc21746e5b901fcac83f2764a0f9e2c) )
 
-	ROM_REGION( 0x10000, "gfx3", 0 ) // road gfx
+	ROM_REGION( 0x10000, "segaic16road", 0 ) // road gfx
 	ROM_LOAD( "epr-10642.47", 0x0000, 0x8000, CRC(7836bcc3) SHA1(26f308bf96224311ddf685799d7aa29aac42dd2f) )
 	// socket IC11 not populated
 
@@ -2175,14 +2185,14 @@ ROM_START( shangon1 )
 	ROM_RELOAD(               0x38000, 0x08000 )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-0034.key", 0x0000, 0x2000, CRC(263ca773) SHA1(8e80d69d61cf54fd02b0ca59dd397fa60c713f3d) )
+	ROM_LOAD( "317-0034.key", 0x0000, 0x2000, CRC(ad61539a) SHA1(5db534ff3ce2736222e4475f9bf093b3d2d55f1a) )
 ROM_END
 
 //*************************************************************************************************************************
 //  Limited Edition Hangon
 //  CPU: 68000 (317-????)
 //   CPU BD SUPER HANG-ON   837-6278-01 (or 837-6278-03)
-//   VIDEO BD SUPER HANG-ON 837-6279 (or 837-6279-02, rom would be "OPR")
+//   VIDEO BD SUPER HANG-ON 837-6279 (or 837-6279-02, ROM would be "OPR")
 //
 ROM_START( shangonle )
 	ROM_REGION( 0x60000, "maincpu", 0 ) // 68000 code
@@ -2218,7 +2228,7 @@ ROM_START( shangonle )
 	ROM_LOAD16_BYTE( "epr-10681.2",  0x0c0001, 0x010000, CRC(b176ea72) SHA1(7ec0eb0f13398d014c2e235773ded00351edb3e2) )
 	ROM_LOAD16_BYTE( "epr-10688.10", 0x0c0000, 0x010000, CRC(42fcd51d) SHA1(0eacb3527dc21746e5b901fcac83f2764a0f9e2c) )
 
-	ROM_REGION( 0x10000, "gfx3", 0 ) // Road Graphics
+	ROM_REGION( 0x10000, "segaic16road", 0 ) // Road Graphics
 	ROM_LOAD( "epr-10642.47", 0x0000, 0x8000, CRC(7836bcc3) SHA1(26f308bf96224311ddf685799d7aa29aac42dd2f) )
 	// socket IC11 not populated
 
@@ -2270,7 +2280,7 @@ ROM_START( toutrun )
 	ROM_LOAD( "opr-12325.104", 0x20000, 0x10000, CRC(1405137a) SHA1(367db88d36852e35c5e839f692be5ea8c8e072d2) )
 
 	ROM_REGION32_LE( 0x100000, "sprites", 0 ) // sprites
-	// Video BD 837-6906-2, Mask Roms twice the size as EPR/OPR counterparts
+	// Video BD 837-6906-2, Mask ROMs twice the size as EPR/OPR counterparts
 	ROM_LOAD32_BYTE( "mpr-12336.9",   0x00000, 0x20000, CRC(dda465c7) SHA1(83acc12a387b004986f084f25964c15a9f88a41a) )
 	ROM_LOAD32_BYTE( "mpr-12337.10",  0x00001, 0x20000, CRC(828233d1) SHA1(d73a200af4245d590e1fd3ac436723f99cc50452) )
 	ROM_LOAD32_BYTE( "mpr-12338.11",  0x00002, 0x20000, CRC(46b4b5f4) SHA1(afeb2e5ac6792edafe7328993fe8dfcd4bce1924) )
@@ -2280,7 +2290,7 @@ ROM_START( toutrun )
 	ROM_LOAD32_BYTE( "mpr-12366.15",  0x80002, 0x20000, CRC(385cb3ab) SHA1(fec6d80d488bfe26524fa3a48b195a45a073e481) )
 	ROM_LOAD32_BYTE( "mpr-12367.16",  0x80003, 0x20000, CRC(4930254a) SHA1(00f24be3bf02b143fa554f4d32e283bdac79af6a) )
 
-	ROM_REGION( 0x10000, "gfx3", 0 ) // road gfx (2 identical roms, 1 for each road)
+	ROM_REGION( 0x10000, "segaic16road", 0 ) // road gfx (2 identical ROMs, 1 for each road)
 	ROM_LOAD( "epr-12299.47", 0x0000, 0x8000, CRC(fc9bc41b) SHA1(9af73e096253cf2c4f283f227530110a4b37fcee) ) // Manual shows both as EPR-12298
 	ROM_LOAD( "epr-12298.11", 0x8000, 0x8000, CRC(fc9bc41b) SHA1(9af73e096253cf2c4f283f227530110a4b37fcee) )
 
@@ -2317,7 +2327,7 @@ ROM_START( toutrund )
 	ROM_LOAD( "opr-12325.104", 0x20000, 0x10000, CRC(1405137a) SHA1(367db88d36852e35c5e839f692be5ea8c8e072d2) )
 
 	ROM_REGION32_LE( 0x100000, "sprites", 0 ) // sprites
-	// Video BD 837-6906-2, Mask Roms twice the size as EPR/OPR counterparts
+	// Video BD 837-6906-2, Mask ROMs twice the size as EPR/OPR counterparts
 	ROM_LOAD32_BYTE( "mpr-12336.9",   0x00000, 0x20000, CRC(dda465c7) SHA1(83acc12a387b004986f084f25964c15a9f88a41a) )
 	ROM_LOAD32_BYTE( "mpr-12337.10",  0x00001, 0x20000, CRC(828233d1) SHA1(d73a200af4245d590e1fd3ac436723f99cc50452) )
 	ROM_LOAD32_BYTE( "mpr-12338.11",  0x00002, 0x20000, CRC(46b4b5f4) SHA1(afeb2e5ac6792edafe7328993fe8dfcd4bce1924) )
@@ -2327,7 +2337,7 @@ ROM_START( toutrund )
 	ROM_LOAD32_BYTE( "mpr-12366.15",  0x80002, 0x20000, CRC(385cb3ab) SHA1(fec6d80d488bfe26524fa3a48b195a45a073e481) )
 	ROM_LOAD32_BYTE( "mpr-12367.16",  0x80003, 0x20000, CRC(4930254a) SHA1(00f24be3bf02b143fa554f4d32e283bdac79af6a) )
 
-	ROM_REGION( 0x10000, "gfx3", 0 ) // road gfx (2 identical roms, 1 for each road)
+	ROM_REGION( 0x10000, "segaic16road", 0 ) // road gfx (2 identical ROMs, 1 for each road)
 	ROM_LOAD( "epr-12299.47", 0x0000, 0x8000, CRC(fc9bc41b) SHA1(9af73e096253cf2c4f283f227530110a4b37fcee) ) // Manual shows both as EPR-12298
 	ROM_LOAD( "epr-12298.11", 0x8000, 0x8000, CRC(fc9bc41b) SHA1(9af73e096253cf2c4f283f227530110a4b37fcee) )
 
@@ -2375,7 +2385,7 @@ ROM_START( toutrunj )
 	ROM_LOAD( "opr-12325.104", 0x20000, 0x10000, CRC(1405137a) SHA1(367db88d36852e35c5e839f692be5ea8c8e072d2) )
 
 	ROM_REGION32_LE( 0x100000, "sprites", 0 ) // sprites
-	// Video BD 837-6906-2, Mask Roms twice the size as EPR/OPR counterparts
+	// Video BD 837-6906-2, Mask ROMs twice the size as EPR/OPR counterparts
 	ROM_LOAD32_BYTE( "mpr-12336.9",   0x00000, 0x20000, CRC(dda465c7) SHA1(83acc12a387b004986f084f25964c15a9f88a41a) )
 	ROM_LOAD32_BYTE( "mpr-12337.10",  0x00001, 0x20000, CRC(828233d1) SHA1(d73a200af4245d590e1fd3ac436723f99cc50452) )
 	ROM_LOAD32_BYTE( "mpr-12338.11",  0x00002, 0x20000, CRC(46b4b5f4) SHA1(afeb2e5ac6792edafe7328993fe8dfcd4bce1924) )
@@ -2385,7 +2395,7 @@ ROM_START( toutrunj )
 	ROM_LOAD32_BYTE( "mpr-12366.15",  0x80002, 0x20000, CRC(385cb3ab) SHA1(fec6d80d488bfe26524fa3a48b195a45a073e481) )
 	ROM_LOAD32_BYTE( "mpr-12367.16",  0x80003, 0x20000, CRC(4930254a) SHA1(00f24be3bf02b143fa554f4d32e283bdac79af6a) )
 
-	ROM_REGION( 0x10000, "gfx3", 0 ) // road gfx (2 identical roms, 1 for each road)
+	ROM_REGION( 0x10000, "segaic16road", 0 ) // road gfx (2 identical ROMs, 1 for each road)
 	ROM_LOAD( "epr-12299.47", 0x0000, 0x8000, CRC(fc9bc41b) SHA1(9af73e096253cf2c4f283f227530110a4b37fcee) ) // Manual shows both as EPR-12298
 	ROM_LOAD( "epr-12298.11", 0x8000, 0x8000, CRC(fc9bc41b) SHA1(9af73e096253cf2c4f283f227530110a4b37fcee) )
 
@@ -2423,7 +2433,7 @@ ROM_START( toutrunjd )
 	ROM_LOAD( "opr-12325.104", 0x20000, 0x10000, CRC(1405137a) SHA1(367db88d36852e35c5e839f692be5ea8c8e072d2) )
 
 	ROM_REGION32_LE( 0x100000, "sprites", 0 ) // sprites
-	// Video BD 837-6906-2, Mask Roms twice the size as EPR/OPR counterparts
+	// Video BD 837-6906-2, Mask ROMs twice the size as EPR/OPR counterparts
 	ROM_LOAD32_BYTE( "mpr-12336.9",   0x00000, 0x20000, CRC(dda465c7) SHA1(83acc12a387b004986f084f25964c15a9f88a41a) )
 	ROM_LOAD32_BYTE( "mpr-12337.10",  0x00001, 0x20000, CRC(828233d1) SHA1(d73a200af4245d590e1fd3ac436723f99cc50452) )
 	ROM_LOAD32_BYTE( "mpr-12338.11",  0x00002, 0x20000, CRC(46b4b5f4) SHA1(afeb2e5ac6792edafe7328993fe8dfcd4bce1924) )
@@ -2433,7 +2443,7 @@ ROM_START( toutrunjd )
 	ROM_LOAD32_BYTE( "mpr-12366.15",  0x80002, 0x20000, CRC(385cb3ab) SHA1(fec6d80d488bfe26524fa3a48b195a45a073e481) )
 	ROM_LOAD32_BYTE( "mpr-12367.16",  0x80003, 0x20000, CRC(4930254a) SHA1(00f24be3bf02b143fa554f4d32e283bdac79af6a) )
 
-	ROM_REGION( 0x10000, "gfx3", 0 ) // road gfx (2 identical roms, 1 for each road)
+	ROM_REGION( 0x10000, "segaic16road", 0 ) // road gfx (2 identical ROMs, 1 for each road)
 	ROM_LOAD( "epr-12299.47", 0x0000, 0x8000, CRC(fc9bc41b) SHA1(9af73e096253cf2c4f283f227530110a4b37fcee) ) // Manual shows both as EPR-12298
 	ROM_LOAD( "epr-12298.11", 0x8000, 0x8000, CRC(fc9bc41b) SHA1(9af73e096253cf2c4f283f227530110a4b37fcee) )
 
@@ -2500,7 +2510,7 @@ ROM_START( toutrun3 )
 	ROM_LOAD32_BYTE( "opr-12321.23", 0xc0002, 0x10000, CRC(830bacd4) SHA1(5a4816969437ee1edca5845006c0b8e9ba365491) )
 	ROM_LOAD32_BYTE( "opr-12322.24", 0xc0003, 0x10000, CRC(8b812492) SHA1(bf1f9e059c093c0991c7caf1b01c739ed54b8357) )
 
-	ROM_REGION( 0x10000, "gfx3", 0 ) // road gfx (2 identical roms, 1 for each road)
+	ROM_REGION( 0x10000, "segaic16road", 0 ) // road gfx (2 identical ROMs, 1 for each road)
 	ROM_LOAD( "epr-12299.47", 0x0000, 0x8000, CRC(fc9bc41b) SHA1(9af73e096253cf2c4f283f227530110a4b37fcee) ) // Manual shows both as EPR-12298
 	ROM_LOAD( "epr-12298.11", 0x8000, 0x8000, CRC(fc9bc41b) SHA1(9af73e096253cf2c4f283f227530110a4b37fcee) )
 
@@ -2554,7 +2564,7 @@ ROM_START( toutrun3d )
 	ROM_LOAD32_BYTE( "opr-12321.23", 0xc0002, 0x10000, CRC(830bacd4) SHA1(5a4816969437ee1edca5845006c0b8e9ba365491) )
 	ROM_LOAD32_BYTE( "opr-12322.24", 0xc0003, 0x10000, CRC(8b812492) SHA1(bf1f9e059c093c0991c7caf1b01c739ed54b8357) )
 
-	ROM_REGION( 0x10000, "gfx3", 0 ) // road gfx (2 identical roms, 1 for each road)
+	ROM_REGION( 0x10000, "segaic16road", 0 ) // road gfx (2 identical ROMs, 1 for each road)
 	ROM_LOAD( "epr-12299.47", 0x0000, 0x8000, CRC(fc9bc41b) SHA1(9af73e096253cf2c4f283f227530110a4b37fcee) ) // Manual shows both as EPR-12298
 	ROM_LOAD( "epr-12298.11", 0x8000, 0x8000, CRC(fc9bc41b) SHA1(9af73e096253cf2c4f283f227530110a4b37fcee) )
 
@@ -2621,7 +2631,7 @@ ROM_START( toutrun2 )
 	ROM_LOAD32_BYTE( "opr-12321.23", 0xc0002, 0x10000, CRC(830bacd4) SHA1(5a4816969437ee1edca5845006c0b8e9ba365491) )
 	ROM_LOAD32_BYTE( "opr-12322.24", 0xc0003, 0x10000, CRC(8b812492) SHA1(bf1f9e059c093c0991c7caf1b01c739ed54b8357) )
 
-	ROM_REGION( 0x10000, "gfx3", 0 ) // road gfx (2 identical roms, 1 for each road)
+	ROM_REGION( 0x10000, "segaic16road", 0 ) // road gfx (2 identical ROMs, 1 for each road)
 	ROM_LOAD( "epr-12299.47", 0x0000, 0x8000, CRC(fc9bc41b) SHA1(9af73e096253cf2c4f283f227530110a4b37fcee) ) // Manual shows both as EPR-12298
 	ROM_LOAD( "epr-12298.11", 0x8000, 0x8000, CRC(fc9bc41b) SHA1(9af73e096253cf2c4f283f227530110a4b37fcee) )
 
@@ -2676,7 +2686,7 @@ ROM_START( toutrun2d )
 	ROM_LOAD32_BYTE( "opr-12321.23", 0xc0002, 0x10000, CRC(830bacd4) SHA1(5a4816969437ee1edca5845006c0b8e9ba365491) )
 	ROM_LOAD32_BYTE( "opr-12322.24", 0xc0003, 0x10000, CRC(8b812492) SHA1(bf1f9e059c093c0991c7caf1b01c739ed54b8357) )
 
-	ROM_REGION( 0x10000, "gfx3", 0 ) // road gfx (2 identical roms, 1 for each road)
+	ROM_REGION( 0x10000, "segaic16road", 0 ) // road gfx (2 identical ROMs, 1 for each road)
 	ROM_LOAD( "epr-12299.47", 0x0000, 0x8000, CRC(fc9bc41b) SHA1(9af73e096253cf2c4f283f227530110a4b37fcee) ) // Manual shows both as EPR-12298
 	ROM_LOAD( "epr-12298.11", 0x8000, 0x8000, CRC(fc9bc41b) SHA1(9af73e096253cf2c4f283f227530110a4b37fcee) )
 
@@ -2696,15 +2706,15 @@ ROM_END
 //  Turbo Outrun (White cockpit/sitdown Deluxe version)
 //  CPU: FD1094 (317-0109)
 //
-// NOTE: 4 program roms EPR-12289 through EPR12291 conflicts with the Japan 317-0101 set. This set's program numbers
+// NOTE: 4 program ROMs EPR-12289 through EPR12291 conflicts with the Japan 317-0101 set. This set's program numbers
 //       needs to be verified, Sega was very good at using different numbers for different data / versions.
 //
 ROM_START( toutrun1 )
 	ROM_REGION( 0x60000, "maincpu", 0 ) // 68000 code
-	ROM_LOAD16_BYTE( "epr-12289.133", 0x000000, 0x10000, CRC(812fd035) SHA1(7bea9ba611333dfb86cfc2e2be8cff5f700b6f71) ) // Rom label conflicts with the 317-0101 set below
-	ROM_LOAD16_BYTE( "epr-12288.118", 0x000001, 0x10000, CRC(2f1151bb) SHA1(e91600d4f4e5d3d5a67cafb1ff34006f281434f1) ) // Rom label conflicts with the 317-0101 set below
-	ROM_LOAD16_BYTE( "epr-12291.132", 0x020000, 0x10000, CRC(8ca284d2) SHA1(93f71ec554ab000294aaa4de9ece0eecfcfe3c46) ) // Rom label conflicts with the 317-0101 set below
-	ROM_LOAD16_BYTE( "epr-12290.117", 0x020001, 0x10000, CRC(44dbf3cb) SHA1(ad867a66d97e9f5b9e14a8d05049581214a077bf) ) // Rom label conflicts with the 317-0101 set below
+	ROM_LOAD16_BYTE( "epr-12289.133", 0x000000, 0x10000, CRC(812fd035) SHA1(7bea9ba611333dfb86cfc2e2be8cff5f700b6f71) ) // ROM label conflicts with the 317-0101 set below
+	ROM_LOAD16_BYTE( "epr-12288.118", 0x000001, 0x10000, CRC(2f1151bb) SHA1(e91600d4f4e5d3d5a67cafb1ff34006f281434f1) ) // ROM label conflicts with the 317-0101 set below
+	ROM_LOAD16_BYTE( "epr-12291.132", 0x020000, 0x10000, CRC(8ca284d2) SHA1(93f71ec554ab000294aaa4de9ece0eecfcfe3c46) ) // ROM label conflicts with the 317-0101 set below
+	ROM_LOAD16_BYTE( "epr-12290.117", 0x020001, 0x10000, CRC(44dbf3cb) SHA1(ad867a66d97e9f5b9e14a8d05049581214a077bf) ) // ROM label conflicts with the 317-0101 set below
 	ROM_LOAD16_BYTE( "epr-12293.131", 0x040000, 0x10000, CRC(f4321eea) SHA1(64334acc82c14bb58b7d51719f34fd81cfb9fc6b) )
 	ROM_LOAD16_BYTE( "epr-12292.116", 0x040001, 0x10000, CRC(51d98af0) SHA1(6e7115706bfafb687faa23d55d4a8c8e498a4df2) )
 
@@ -2740,7 +2750,7 @@ ROM_START( toutrun1 )
 	ROM_LOAD32_BYTE( "opr-12321.23", 0xc0002, 0x10000, CRC(830bacd4) SHA1(5a4816969437ee1edca5845006c0b8e9ba365491) )
 	ROM_LOAD32_BYTE( "opr-12322.24", 0xc0003, 0x10000, CRC(8b812492) SHA1(bf1f9e059c093c0991c7caf1b01c739ed54b8357) )
 
-	ROM_REGION( 0x10000, "gfx3", 0 ) // road gfx (2 identical roms, 1 for each road)
+	ROM_REGION( 0x10000, "segaic16road", 0 ) // road gfx (2 identical ROMs, 1 for each road)
 	ROM_LOAD( "epr-12299.47", 0x0000, 0x8000, CRC(fc9bc41b) SHA1(9af73e096253cf2c4f283f227530110a4b37fcee) ) // Manual shows both as EPR-12298
 	ROM_LOAD( "epr-12298.11", 0x8000, 0x8000, CRC(fc9bc41b) SHA1(9af73e096253cf2c4f283f227530110a4b37fcee) )
 
@@ -2766,7 +2776,7 @@ ROM_END
 //   VIDEO BD 837-6906
 //
 // NOTE: This PCB set used EPROMs instead of the OPR (One time PRogram) used by other sets.
-//       Same data so the rom numbers are the same, just labeled EPR-xxxxx versus OPR-xxxxx
+//       Same data so the ROM numbers are the same, just labeled EPR-xxxxx versus OPR-xxxxx
 //
 ROM_START( toutrunj1 )
 	ROM_REGION( 0x60000, "maincpu", 0 ) // 68000 code
@@ -2809,7 +2819,7 @@ ROM_START( toutrunj1 )
 	ROM_LOAD32_BYTE( "epr-12321.ic23", 0xc0002, 0x10000, CRC(830bacd4) SHA1(5a4816969437ee1edca5845006c0b8e9ba365491) )
 	ROM_LOAD32_BYTE( "epr-12322.ic24", 0xc0003, 0x10000, CRC(8b812492) SHA1(bf1f9e059c093c0991c7caf1b01c739ed54b8357) )
 
-	ROM_REGION( 0x10000, "gfx3", 0 ) // road gfx (2 identical roms, 1 for each road)
+	ROM_REGION( 0x10000, "segaic16road", 0 ) // road gfx (2 identical ROMs, 1 for each road)
 	ROM_LOAD( "epr-12298.ic47", 0x0000, 0x8000, CRC(fc9bc41b) SHA1(9af73e096253cf2c4f283f227530110a4b37fcee) ) // Both are EPR-12298
 	ROM_LOAD( "epr-12298.ic28", 0x8000, 0x8000, CRC(fc9bc41b) SHA1(9af73e096253cf2c4f283f227530110a4b37fcee) )
 
@@ -2864,7 +2874,7 @@ ROM_START( toutrunj1d )
 	ROM_LOAD32_BYTE( "epr-12321.ic23", 0xc0002, 0x10000, CRC(830bacd4) SHA1(5a4816969437ee1edca5845006c0b8e9ba365491) )
 	ROM_LOAD32_BYTE( "epr-12322.ic24", 0xc0003, 0x10000, CRC(8b812492) SHA1(bf1f9e059c093c0991c7caf1b01c739ed54b8357) )
 
-	ROM_REGION( 0x10000, "gfx3", 0 ) // road gfx (2 identical roms, 1 for each road)
+	ROM_REGION( 0x10000, "segaic16road", 0 ) // road gfx (2 identical ROMs, 1 for each road)
 	ROM_LOAD( "epr-12298.ic47", 0x0000, 0x8000, CRC(fc9bc41b) SHA1(9af73e096253cf2c4f283f227530110a4b37fcee) ) // Both are EPR-12298
 	ROM_LOAD( "epr-12298.ic28", 0x8000, 0x8000, CRC(fc9bc41b) SHA1(9af73e096253cf2c4f283f227530110a4b37fcee) )
 
@@ -2888,7 +2898,7 @@ ROM_END
 //  init_generic - common initialization
 //-------------------------------------------------
 
-DRIVER_INIT_MEMBER(segaorun_state,generic)
+void segaorun_state::init_generic()
 {
 	// allocate a scanline timer
 	m_scanline_timer = timer_alloc(TID_SCANLINE);
@@ -2898,9 +2908,6 @@ DRIVER_INIT_MEMBER(segaorun_state,generic)
 	// configure the NVRAM to point to our workram
 	if (m_nvram != nullptr)
 		m_nvram->set_base(m_workram, m_workram.bytes());
-
-	// point globals to allocated memory regions
-	m_segaic16road->segaic16_roadram_0 = reinterpret_cast<uint16_t *>(memshare("roadram")->ptr());
 
 	// save state
 	save_item(NAME(m_adc_select));
@@ -2913,16 +2920,16 @@ DRIVER_INIT_MEMBER(segaorun_state,generic)
 //  init_* - game-specific initialization
 //-------------------------------------------------
 
-DRIVER_INIT_MEMBER(segaorun_state,outrun)
+void segaorun_state::init_outrun()
 {
-	DRIVER_INIT_CALL(generic);
-	m_custom_io_r = read16_delegate(FUNC(segaorun_state::outrun_custom_io_r), this);
-	m_custom_io_w = write16_delegate(FUNC(segaorun_state::outrun_custom_io_w), this);
+	init_generic();
+	m_custom_io_r = read16_delegate(*this, FUNC(segaorun_state::outrun_custom_io_r));
+	m_custom_io_w = write16_delegate(*this, FUNC(segaorun_state::outrun_custom_io_w));
 }
 
-DRIVER_INIT_MEMBER(segaorun_state,outrunb)
+void segaorun_state::init_outrunb()
 {
-	DRIVER_INIT_CALL(outrun);
+	init_outrun();
 
 	// hard code a memory map
 	static const uint8_t memory_map[] = { 0x02,0x00,0x0d,0x10,0x00,0x12,0x0c,0x13,0x08,0x14,0x0f,0x20,0x00,0x00,0x00,0x00 };
@@ -2941,10 +2948,10 @@ DRIVER_INIT_MEMBER(segaorun_state,outrunb)
 		word[i] = bitswap<16>(word[i], 14,15,13,12,11,10,9,8,7,6,5,4,2,3,1,0);
 
 	// road gfx
-	// rom a-2.bin: swap bits 6,7
-	// rom a-3.bin: swap bits 5,6
-	uint8_t *byte = memregion("gfx3")->base();
-	length = memregion("gfx3")->bytes() / 2;
+	// ROM a-2.bin: swap bits 6,7
+	// ROM a-3.bin: swap bits 5,6
+	uint8_t *byte = memregion("segaic16road")->base();
+	length = memregion("segaic16road")->bytes() / 2;
 	for (uint32_t i = 0; i < length; i++)
 	{
 		byte[i]        = bitswap<8>(byte[i],        6,7,5,4,3,2,1,0);
@@ -2958,12 +2965,12 @@ DRIVER_INIT_MEMBER(segaorun_state,outrunb)
 		byte[i] = bitswap<8>(byte[i], 7,5,6,4,3,2,1,0);
 }
 
-DRIVER_INIT_MEMBER(segaorun_state,shangon)
+void segaorun_state::init_shangon()
 {
-	DRIVER_INIT_CALL(generic);
+	init_generic();
 	m_shangon_video = true;
-	m_custom_io_r = read16_delegate(FUNC(segaorun_state::shangon_custom_io_r), this);
-	m_custom_io_w = write16_delegate(FUNC(segaorun_state::shangon_custom_io_w), this);
+	m_custom_io_r = read16_delegate(*this, FUNC(segaorun_state::shangon_custom_io_r));
+	m_custom_io_w = write16_delegate(*this, FUNC(segaorun_state::shangon_custom_io_w));
 }
 
 
@@ -2973,37 +2980,37 @@ DRIVER_INIT_MEMBER(segaorun_state,shangon)
 //**************************************************************************
 
 //    YEAR, NAME,     PARENT,  MACHINE,         INPUT,    INIT,                   MONITOR,COMPANY,FULLNAME,FLAGS,                                                  LAYOUT
-GAMEL(1986, outrun,    0,       outrun,          outrun,   segaorun_state,outrun,  ROT0,   "Sega",    "Out Run (sitdown/upright, Rev B)", 0,                        layout_outrun ) // Upright/Sitdown determined by dipswitch settings
-GAMEL(1986, outrunra,  outrun,  outrun,          outrun,   segaorun_state,outrun,  ROT0,   "Sega",    "Out Run (sitdown/upright, Rev A)", 0,                        layout_outrun ) // Upright/Sitdown determined by dipswitch settings
-GAMEL(1986, outrundx,  outrun,  outrun,          outrundx, segaorun_state,outrun,  ROT0,   "Sega",    "Out Run (deluxe sitdown)", 0,                                layout_outrun )
-GAMEL(1986, outrundxj, outrun,  outrun_fd1089a,  outrundx, segaorun_state,outrun,  ROT0,   "Sega",    "Out Run (Japan, deluxe sitdown) (FD1089A 317-0019)", 0,      layout_outrun ) // No Japanese text, different course order
-GAMEL(1986, outrundxa, outrun,  outrundx,        outrundx, segaorun_state,outrun,  ROT0,   "Sega",    "Out Run (deluxe sitdown earlier version)", 0,                layout_outrun )
-GAMEL(1986, outrunb,   outrun,  outrun,          outrun,   segaorun_state,outrunb, ROT0,   "bootleg", "Out Run (bootleg)", 0,                                       layout_outrun )
+GAMEL(1986, outrun,    0,       outrun,          outrun,     segaorun_state, init_outrun,  ROT0,   "Sega",    "Out Run (sitdown/upright, Rev B)", 0,                        layout_outrun ) // Upright/Sitdown determined by dipswitch settings
+GAMEL(1986, outrunra,  outrun,  outrun,          outrun,     segaorun_state, init_outrun,  ROT0,   "Sega",    "Out Run (sitdown/upright, Rev A)", 0,                        layout_outrun ) // Upright/Sitdown determined by dipswitch settings
+GAMEL(1986, outrundx,  outrun,  outrun,          outrundx,   segaorun_state, init_outrun,  ROT0,   "Sega",    "Out Run (deluxe sitdown)", 0,                                layout_outrun )
+GAMEL(1986, outrundxj, outrun,  outrun_fd1089a,  outrundx,   segaorun_state, init_outrun,  ROT0,   "Sega",    "Out Run (Japan, deluxe sitdown) (FD1089A 317-0019)", 0,      layout_outrun ) // No Japanese text, different course order
+GAMEL(1986, outrundxa, outrun,  outrundx,        outrundx,   segaorun_state, init_outrun,  ROT0,   "Sega",    "Out Run (deluxe sitdown earlier version)", 0,                layout_outrun )
+GAMEL(1986, outrunb,   outrun,  outrun,          outrun,     segaorun_state, init_outrunb, ROT0,   "bootleg", "Out Run (bootleg)", 0,                                       layout_outrun )
 
-GAME( 1987, shangon,   0,       shangon,         shangon,  segaorun_state,shangon, ROT0,   "Sega",    "Super Hang-On (sitdown/upright) (unprotected)", 0 )
-GAME( 1987, shangon3,  shangon, shangon_fd1089b, shangon,  segaorun_state,shangon, ROT0,   "Sega",    "Super Hang-On (sitdown/upright) (FD1089B 317-0034)", 0 )
-GAME( 1987, shangon2,  shangon, shangon_fd1089b, shangon,  segaorun_state,shangon, ROT0,   "Sega",    "Super Hang-On (mini ride-on, Rev A) (FD1089B 317-0034)", 0 )
-GAME( 1987, shangon1,  shangon, shangon_fd1089b, shangon,  segaorun_state,shangon, ROT0,   "Sega",    "Super Hang-On (mini ride-on) (FD1089B 317-0034)", 0 )
-GAME( 1991, shangonle, shangon, shangon,         shangon,  segaorun_state,shangon, ROT0,   "Sega",    "Limited Edition Hang-On", 0 )
+GAME( 1987, shangon,   0,       shangon,         shangon,    segaorun_state, init_shangon, ROT0,   "Sega",    "Super Hang-On (sitdown/upright) (unprotected)", 0 )
+GAME( 1987, shangon3,  shangon, shangon_fd1089b, shangon,    segaorun_state, init_shangon, ROT0,   "Sega",    "Super Hang-On (sitdown/upright) (FD1089B 317-0034)", 0 )
+GAME( 1987, shangon2,  shangon, shangon_fd1089b, shangon,    segaorun_state, init_shangon, ROT0,   "Sega",    "Super Hang-On (mini ride-on, Rev A) (FD1089B 317-0034)", 0 )
+GAME( 1987, shangon1,  shangon, shangon_fd1089b, shangon,    segaorun_state, init_shangon, ROT0,   "Sega",    "Super Hang-On (mini ride-on) (FD1089B 317-0034)", 0 )
+GAME( 1991, shangonle, shangon, shangon,         shangon,    segaorun_state, init_shangon, ROT0,   "Sega",    "Limited Edition Hang-On", 0 )
 
-GAMEL(1989, toutrun,   0,       outrun_fd1094,   toutrun,  segaorun_state,outrun,  ROT0,   "Sega",    "Turbo Out Run (Out Run upgrade) (FD1094 317-0118)", 0,        layout_outrun ) // Cabinet determined by dipswitch settings
-GAMEL(1989, toutrunj,  toutrun, outrun_fd1094,   toutrun,  segaorun_state,outrun,  ROT0,   "Sega",    "Turbo Out Run (Japan, Out Run upgrade) (FD1094 317-0117)", 0, layout_outrun ) // Cabinet determined by dipswitch settings
-GAMEL(1989, toutrun3,  toutrun, outrun_fd1094,   toutrunc, segaorun_state,outrun,  ROT0,   "Sega",    "Turbo Out Run (cockpit) (FD1094 317-0107)", 0,                layout_outrun )
-GAMEL(1989, toutrun2,  toutrun, outrun_fd1094,   toutrunct,segaorun_state,outrun,  ROT0,   "Sega",    "Turbo Out Run (cockpit) (FD1094 317-0106)", 0,                layout_outrun )
-GAMEL(1989, toutrun1,  toutrun, outrun_fd1094,   toutrunm, segaorun_state,outrun,  ROT0,   "Sega",    "Turbo Out Run (deluxe cockpit) (FD1094 317-0109)", 0,         layout_outrun )
-GAMEL(1989, toutrunj1, toutrun, outrun_fd1094,   toutrunct,segaorun_state,outrun,  ROT0,   "Sega",    "Turbo Out Run (Japan, cockpit) (FD1094 317-0101)", 0,         layout_outrun )
+GAMEL(1989, toutrun,   0,       outrun_fd1094,   toutrun,    segaorun_state, init_outrun,  ROT0,   "Sega",    "Turbo Out Run (Out Run upgrade) (FD1094 317-0118)", 0,        layout_outrun ) // Cabinet determined by dipswitch settings
+GAMEL(1989, toutrunj,  toutrun, outrun_fd1094,   toutrun,    segaorun_state, init_outrun,  ROT0,   "Sega",    "Turbo Out Run (Japan, Out Run upgrade) (FD1094 317-0117)", 0, layout_outrun ) // Cabinet determined by dipswitch settings
+GAMEL(1989, toutrun3,  toutrun, outrun_fd1094,   toutrunc,   segaorun_state, init_outrun,  ROT0,   "Sega",    "Turbo Out Run (cockpit) (FD1094 317-0107)", 0,                layout_outrun )
+GAMEL(1989, toutrun2,  toutrun, outrun_fd1094,   toutrunct,  segaorun_state, init_outrun,  ROT0,   "Sega",    "Turbo Out Run (cockpit) (FD1094 317-0106)", 0,                layout_outrun )
+GAMEL(1989, toutrun1,  toutrun, outrun_fd1094,   toutrunm,   segaorun_state, init_outrun,  ROT0,   "Sega",    "Turbo Out Run (deluxe cockpit) (FD1094 317-0109)", 0,         layout_outrun )
+GAMEL(1989, toutrunj1, toutrun, outrun_fd1094,   toutrunct,  segaorun_state, init_outrun,  ROT0,   "Sega",    "Turbo Out Run (Japan, cockpit) (FD1094 317-0101)", 0,         layout_outrun )
 
 // decrypted bootlegs
-GAMEL(1989, toutrund,  toutrun, outrun,   toutrun,  segaorun_state,outrun,  ROT0,   "bootleg",    "Turbo Out Run (Out Run upgrade) (bootleg of FD1094 317-0118 set)", 0,        layout_outrun ) // Cabinet determined by dipswitch settings
-GAMEL(1989, toutrunjd, toutrun, outrun,   toutrun,  segaorun_state,outrun,  ROT0,   "bootleg",    "Turbo Out Run (Japan, Out Run upgrade) (bootleg of FD1094 317-0117 set)", 0, layout_outrun ) // Cabinet determined by dipswitch settings
-GAMEL(1989, toutrun3d, toutrun, outrun,   toutrunc, segaorun_state,outrun,  ROT0,   "bootleg",    "Turbo Out Run (cockpit) (bootleg of FD1094 317-0107 set)", 0,                layout_outrun )
-GAMEL(1989, toutrunj1d,toutrun, outrun,   toutrunct,segaorun_state,outrun,  ROT0,   "bootleg",    "Turbo Out Run (Japan, cockpit) (bootleg of FD1094 317-0101 set)", 0,         layout_outrun )
-GAMEL(1989, toutrun2d, toutrun, outrun,   toutrunct,segaorun_state,outrun,  ROT0,   "bootleg",    "Turbo Out Run (cockpit) (bootleg of FD1094 317-0106 set)", 0,                layout_outrun )
+GAMEL(1989, toutrund,  toutrun, outrun,          toutrun,    segaorun_state, init_outrun,  ROT0,   "bootleg",    "Turbo Out Run (Out Run upgrade) (bootleg of FD1094 317-0118 set)", 0,        layout_outrun ) // Cabinet determined by dipswitch settings
+GAMEL(1989, toutrunjd, toutrun, outrun,          toutrun,    segaorun_state, init_outrun,  ROT0,   "bootleg",    "Turbo Out Run (Japan, Out Run upgrade) (bootleg of FD1094 317-0117 set)", 0, layout_outrun ) // Cabinet determined by dipswitch settings
+GAMEL(1989, toutrun3d, toutrun, outrun,          toutrunc,   segaorun_state, init_outrun,  ROT0,   "bootleg",    "Turbo Out Run (cockpit) (bootleg of FD1094 317-0107 set)", 0,                layout_outrun )
+GAMEL(1989, toutrunj1d,toutrun, outrun,          toutrunct,  segaorun_state, init_outrun,  ROT0,   "bootleg",    "Turbo Out Run (Japan, cockpit) (bootleg of FD1094 317-0101 set)", 0,         layout_outrun )
+GAMEL(1989, toutrun2d, toutrun, outrun,          toutrunct,  segaorun_state, init_outrun,  ROT0,   "bootleg",    "Turbo Out Run (cockpit) (bootleg of FD1094 317-0106 set)", 0,                layout_outrun )
 
 
-GAME( 1987, shangon3d, shangon, shangon,  shangon,  segaorun_state,shangon, ROT0,   "bootleg",    "Super Hang-On (sitdown/upright) (bootleg of FD1089B 317-0034 set)", 0 )
+GAME( 1987, shangon3d, shangon, shangon,         shangon,    segaorun_state, init_shangon, ROT0,   "bootleg",    "Super Hang-On (sitdown/upright) (bootleg of FD1089B 317-0034 set)", 0 )
 
 // aftermarket modifications, these fix various issues in the game, including making the attract mode work correctly when set to Free Play.
 // see http://reassembler.blogspot.co.uk/2011/08/outrun-enhanced-edition.html
-GAMEL(2013, outrundxeh,  outrun,  outrun,        outrundxeh, segaorun_state,outrun,  ROT0,   "hack (Chris White)",    "Out Run (deluxe sitdown) (Enhanced Edition v1.0.3)", 0,                                layout_outrun ) // Jan 2013
-GAMEL(2014, outruneh,    outrun,  outrun,        outruneh,   segaorun_state,outrun,  ROT0,   "hack (Chris White)",    "Out Run (sitdown/upright, Rev B) (Enhanced Edition v1.1.0)", 0,                        layout_outrun ) // Upright/Sitdown determined by dipswitch settings - July 2014
+GAMEL(2013, outrundxeh,  outrun,  outrun,        outrundxeh, segaorun_state, init_outrun,  ROT0,   "hack (Chris White)",    "Out Run (deluxe sitdown) (Enhanced Edition v1.0.3)", 0,                                layout_outrun ) // Jan 2013
+GAMEL(2014, outruneh,    outrun,  outrun,        outruneh,   segaorun_state, init_outrun,  ROT0,   "hack (Chris White)",    "Out Run (sitdown/upright, Rev B) (Enhanced Edition v1.1.0)", 0,                        layout_outrun ) // Upright/Sitdown determined by dipswitch settings - July 2014

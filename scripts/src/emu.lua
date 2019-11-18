@@ -105,7 +105,7 @@ files {
 	MAME_DIR .. "src/emu/divtlb.h",
 	MAME_DIR .. "src/emu/drawgfx.cpp",
 	MAME_DIR .. "src/emu/drawgfx.h",
-	MAME_DIR .. "src/emu/drawgfxm.h",
+	MAME_DIR .. "src/emu/drawgfxt.ipp",
 	MAME_DIR .. "src/emu/driver.cpp",
 	MAME_DIR .. "src/emu/driver.h",
 	MAME_DIR .. "src/emu/drivenum.cpp",
@@ -116,6 +116,33 @@ files {
 	MAME_DIR .. "src/emu/emucore.h",
 	MAME_DIR .. "src/emu/emumem.cpp",
 	MAME_DIR .. "src/emu/emumem.h",
+	MAME_DIR .. "src/emu/emumem_mud.cpp",
+	MAME_DIR .. "src/emu/emumem_mud.h",
+	MAME_DIR .. "src/emu/emumem_hea.h",
+	MAME_DIR .. "src/emu/emumem_hem.cpp",
+	MAME_DIR .. "src/emu/emumem_hem.h",
+	MAME_DIR .. "src/emu/emumem_hedp.cpp",
+	MAME_DIR .. "src/emu/emumem_hedp.h",
+	MAME_DIR .. "src/emu/emumem_heun.cpp",
+	MAME_DIR .. "src/emu/emumem_heun.h",
+	MAME_DIR .. "src/emu/emumem_heu.cpp",
+	MAME_DIR .. "src/emu/emumem_heu.h",
+	MAME_DIR .. "src/emu/emumem_hedr.ipp",
+	MAME_DIR .. "src/emu/emumem_hedr.h",
+	MAME_DIR .. "src/emu/emumem_hedr0.cpp",
+	MAME_DIR .. "src/emu/emumem_hedr1.cpp",
+	MAME_DIR .. "src/emu/emumem_hedr2.cpp",
+	MAME_DIR .. "src/emu/emumem_hedr3.cpp",
+	MAME_DIR .. "src/emu/emumem_hedw.ipp",
+	MAME_DIR .. "src/emu/emumem_hedw.h",
+	MAME_DIR .. "src/emu/emumem_hedw0.cpp",
+	MAME_DIR .. "src/emu/emumem_hedw1.cpp",
+	MAME_DIR .. "src/emu/emumem_hedw2.cpp",
+	MAME_DIR .. "src/emu/emumem_hedw3.cpp",
+	MAME_DIR .. "src/emu/emumem_hep.cpp",
+	MAME_DIR .. "src/emu/emumem_hep.h",
+	MAME_DIR .. "src/emu/emumem_het.cpp",
+	MAME_DIR .. "src/emu/emumem_het.h",
 	MAME_DIR .. "src/emu/emuopts.cpp",
 	MAME_DIR .. "src/emu/emuopts.h",
 	MAME_DIR .. "src/emu/emupal.cpp",
@@ -232,6 +259,12 @@ files {
 	MAME_DIR .. "src/emu/video/rgbvmx.h",
 }
 
+pchsource(MAME_DIR .. "src/emu/main.cpp")
+-- 3 files do not inlcude emu.h
+nopch(MAME_DIR .. "src/emu/emualloc.cpp")
+nopch(MAME_DIR .. "src/emu/attotime.cpp")
+nopch(MAME_DIR .. "src/emu/debug/textbuf.cpp")
+
 dependency {
 	--------------------------------------------------
 	-- additional dependencies
@@ -244,13 +277,8 @@ dependency {
 	{ MAME_DIR .. "src/emu/rendlay.cpp", GEN_DIR .. "emu/layout/dualhovu.lh" },
 	{ MAME_DIR .. "src/emu/rendlay.cpp", GEN_DIR .. "emu/layout/dualhsxs.lh" },
 	{ MAME_DIR .. "src/emu/rendlay.cpp", GEN_DIR .. "emu/layout/dualhuov.lh" },
-	{ MAME_DIR .. "src/emu/rendlay.cpp", GEN_DIR .. "emu/layout/horizont.lh" },
 	{ MAME_DIR .. "src/emu/rendlay.cpp", GEN_DIR .. "emu/layout/triphsxs.lh" },
 	{ MAME_DIR .. "src/emu/rendlay.cpp", GEN_DIR .. "emu/layout/quadhsxs.lh" },
-	{ MAME_DIR .. "src/emu/rendlay.cpp", GEN_DIR .. "emu/layout/vertical.lh" },
-	{ MAME_DIR .. "src/emu/rendlay.cpp", GEN_DIR .. "emu/layout/lcd.lh" },
-	{ MAME_DIR .. "src/emu/rendlay.cpp", GEN_DIR .. "emu/layout/lcd_rot.lh" },
-	{ MAME_DIR .. "src/emu/rendlay.cpp", GEN_DIR .. "emu/layout/svg.lh" },
 	{ MAME_DIR .. "src/emu/rendlay.cpp", GEN_DIR .. "emu/layout/noscreens.lh" },
 }
 
@@ -264,13 +292,8 @@ custombuildtask {
 	layoutbuildtask("emu/layout", "dualhovu"),
 	layoutbuildtask("emu/layout", "dualhsxs"),
 	layoutbuildtask("emu/layout", "dualhuov"),
-	layoutbuildtask("emu/layout", "horizont"),
 	layoutbuildtask("emu/layout", "triphsxs"),
 	layoutbuildtask("emu/layout", "quadhsxs"),
-	layoutbuildtask("emu/layout", "vertical"),
-	layoutbuildtask("emu/layout", "lcd"),
-	layoutbuildtask("emu/layout", "lcd_rot"),
-	layoutbuildtask("emu/layout", "svg"),
 	layoutbuildtask("emu/layout", "noscreens"),
 }
 
@@ -289,6 +312,9 @@ includedirs {
 files {
 	MAME_DIR .. "src/emu/drivers/empty.cpp",
 }
+
+pchsource(MAME_DIR .. "src/emu/drivers/empty.cpp")
+
 dependency {
 	{ "$(OBJDIR)/src/emu/drivers/empty.o", "$(GCH)", true  },
 }

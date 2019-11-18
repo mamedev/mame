@@ -22,25 +22,25 @@ ti99_single_cart_conn_device::ti99_single_cart_conn_device(const machine_config 
 READ8Z_MEMBER(ti99_single_cart_conn_device::readz)
 {
 	// Pass through
-	m_cartridge->readz(space, offset, value);
+	m_cartridge->readz(offset, value);
 }
 
-WRITE8_MEMBER(ti99_single_cart_conn_device::write)
+void ti99_single_cart_conn_device::write(offs_t offset, uint8_t data)
 {
 	// Pass through
-	m_cartridge->write(space, offset, data);
+	m_cartridge->write(offset, data);
 }
 
 READ8Z_MEMBER(ti99_single_cart_conn_device::crureadz)
 {
 	// Pass through
-	m_cartridge->crureadz(space, offset, value);
+	m_cartridge->crureadz(offset, value);
 }
 
-WRITE8_MEMBER(ti99_single_cart_conn_device::cruwrite)
+void ti99_single_cart_conn_device::cruwrite(offs_t offset, uint8_t data)
 {
 	// Pass through
-	m_cartridge->cruwrite(space, offset, data);
+	m_cartridge->cruwrite(offset, data);
 }
 
 WRITE_LINE_MEMBER(ti99_single_cart_conn_device::romgq_line)
@@ -52,10 +52,10 @@ WRITE_LINE_MEMBER(ti99_single_cart_conn_device::romgq_line)
 /*
     Combined select lines
 */
-WRITE8_MEMBER(ti99_single_cart_conn_device::set_gromlines)
+void ti99_single_cart_conn_device::set_gromlines(line_state mline, line_state moline, line_state gsq)
 {
 	// Pass through
-	m_cartridge->set_gromlines(space, offset, data);
+	m_cartridge->set_gromlines(mline, moline, gsq);
 }
 
 
@@ -83,9 +83,10 @@ void ti99_single_cart_conn_device::device_reset()
 	m_cartridge->set_slot(0);
 }
 
-MACHINE_CONFIG_START(ti99_single_cart_conn_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("cartridge", TI99_CART, 0)
-MACHINE_CONFIG_END
+void ti99_single_cart_conn_device::device_add_mconfig(machine_config &config)
+{
+	TI99_CART(config, "cartridge", 0);
+}
 
 } } } // end namespace bus::ti99::gromport
 

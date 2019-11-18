@@ -16,17 +16,18 @@ serial_printer_device::serial_printer_device(const machine_config &mconfig, cons
 {
 }
 
-MACHINE_CONFIG_START(serial_printer_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("printer", PRINTER, 0)
-	MCFG_PRINTER_ONLINE_CB(WRITELINE(serial_printer_device, printer_online))
-MACHINE_CONFIG_END
+void serial_printer_device::device_add_mconfig(machine_config &config)
+{
+	PRINTER(config, m_printer, 0);
+	m_printer->online_callback().set(FUNC(serial_printer_device::printer_online));
+}
 
 static INPUT_PORTS_START(serial_printer)
-	MCFG_RS232_BAUD("RS232_RXBAUD", RS232_BAUD_9600, "RX Baud", serial_printer_device, update_serial)
-	MCFG_RS232_STARTBITS("RS232_STARTBITS", RS232_STARTBITS_1, "Start Bits", serial_printer_device, update_serial)
-	MCFG_RS232_DATABITS("RS232_DATABITS", RS232_DATABITS_8, "Data Bits", serial_printer_device, update_serial)
-	MCFG_RS232_PARITY("RS232_PARITY", RS232_PARITY_NONE, "Parity", serial_printer_device, update_serial)
-	MCFG_RS232_STOPBITS("RS232_STOPBITS", RS232_STOPBITS_1, "Stop Bits", serial_printer_device, update_serial)
+	PORT_RS232_BAUD("RS232_RXBAUD", RS232_BAUD_9600, "RX Baud", serial_printer_device, update_serial)
+	PORT_RS232_STARTBITS("RS232_STARTBITS", RS232_STARTBITS_1, "Start Bits", serial_printer_device, update_serial)
+	PORT_RS232_DATABITS("RS232_DATABITS", RS232_DATABITS_8, "Data Bits", serial_printer_device, update_serial)
+	PORT_RS232_PARITY("RS232_PARITY", RS232_PARITY_NONE, "Parity", serial_printer_device, update_serial)
+	PORT_RS232_STOPBITS("RS232_STOPBITS", RS232_STOPBITS_1, "Stop Bits", serial_printer_device, update_serial)
 INPUT_PORTS_END
 
 ioport_constructor serial_printer_device::device_input_ports() const

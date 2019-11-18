@@ -79,7 +79,7 @@ WRITE32_MEMBER(saturn_state::minit_w)
 	machine().scheduler().boost_interleave(m_minit_boost_timeslice, attotime::from_usec(m_minit_boost));
 	machine().scheduler().trigger(1000);
 	machine().scheduler().synchronize(); // force resync
-	m_slave->sh2_set_frt_input(PULSE_LINE);
+	m_slave->pulse_frt_input();
 }
 
 WRITE32_MEMBER(saturn_state::sinit_w)
@@ -87,7 +87,7 @@ WRITE32_MEMBER(saturn_state::sinit_w)
 	//logerror("%s SINIT write = %08x\n", machine().describe_context(),data);
 	machine().scheduler().boost_interleave(m_sinit_boost_timeslice, attotime::from_usec(m_sinit_boost));
 	machine().scheduler().synchronize(); // force resync
-	m_maincpu->sh2_set_frt_input(PULSE_LINE);
+	m_maincpu->pulse_frt_input();
 }
 
 /*
@@ -120,7 +120,7 @@ WRITE32_MEMBER(saturn_state::saturn_minit_w)
 		machine().scheduler().trigger(1000);
 	}
 
-	m_slave->sh2_set_frt_input(PULSE_LINE);
+	m_slave->pulse_frt_input();
 }
 
 WRITE32_MEMBER(saturn_state::saturn_sinit_w)
@@ -131,7 +131,7 @@ WRITE32_MEMBER(saturn_state::saturn_sinit_w)
 	else
 		machine().scheduler().boost_interleave(m_sinit_boost_timeslice, attotime::from_usec(m_sinit_boost));
 
-	m_maincpu->sh2_set_frt_input(PULSE_LINE);
+	m_maincpu->pulse_frt_input();
 }
 
 
@@ -256,9 +256,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(saturn_state::saturn_slave_scanline )
 	y_step = get_ystep_count();
 
 	if(scanline == vblank_line*y_step)
-		m_slave->set_input_line_and_vector(0x6, HOLD_LINE, 0x43);
+		m_slave->set_input_line_and_vector(0x6, HOLD_LINE, 0x43); // SH2
 	else if((scanline % y_step) == 0 && scanline < vblank_line*y_step)
-		m_slave->set_input_line_and_vector(0x2, HOLD_LINE, 0x41);
+		m_slave->set_input_line_and_vector(0x2, HOLD_LINE, 0x41); // SH2
 }
 
 static const gfx_layout tiles8x8x4_layout =
@@ -319,7 +319,7 @@ static const gfx_layout tiles16x16x8_layout =
 
 
 
-GFXDECODE_START( stv )
+GFXDECODE_START( gfx_stv )
 	GFXDECODE_ENTRY( nullptr, 0, tiles8x8x4_layout,   0x00, (0x80*(2+1))  )
 	GFXDECODE_ENTRY( nullptr, 0, tiles16x16x4_layout, 0x00, (0x80*(2+1))  )
 	GFXDECODE_ENTRY( nullptr, 0, tiles8x8x8_layout,   0x00, (0x08*(2+1))  )
@@ -379,8 +379,8 @@ WRITE_LINE_MEMBER(saturn_state::dot_select_w)
 {
 	const XTAL &xtal = state ? MASTER_CLOCK_320 : MASTER_CLOCK_352;
 
-	machine().device("maincpu")->set_unscaled_clock(xtal/2);
-	machine().device("slave")->set_unscaled_clock(xtal/2);
+	m_maincpu->set_unscaled_clock(xtal/2);
+	m_slave->set_unscaled_clock(xtal/2);
 
 	m_vdp2.dotsel = state ^ 1;
 	stv_vdp2_dynamic_res_change();

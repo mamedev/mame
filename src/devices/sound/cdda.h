@@ -11,7 +11,7 @@
 class cdda_device : public device_t, public device_sound_interface
 {
 public:
-	cdda_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cdda_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 44'100);
 
 	void set_cdrom(void *file);
 

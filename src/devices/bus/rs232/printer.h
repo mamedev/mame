@@ -7,6 +7,7 @@
 
 #include "rs232.h"
 #include "imagedev/printer.h"
+#include "diserial.h"
 
 class serial_printer_device : public device_t,
 	public device_serial_interface,

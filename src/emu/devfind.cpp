@@ -9,6 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "romload.h"
 
 
 //**************************************************************************
@@ -21,6 +22,8 @@ template class object_finder_base<memory_bank, false>;
 template class object_finder_base<memory_bank, true>;
 template class object_finder_base<ioport_port, false>;
 template class object_finder_base<ioport_port, true>;
+template class object_finder_base<address_space, false>;
+template class object_finder_base<address_space, true>;
 
 template class object_finder_base<u8, false>;
 template class object_finder_base<u8, true>;
@@ -48,6 +51,9 @@ template class memory_bank_finder<true>;
 
 template class ioport_finder<false>;
 template class ioport_finder<true>;
+
+template class address_space_finder<false>;
+template class address_space_finder<true>;
 
 template class region_ptr_finder<u8, false>;
 template class region_ptr_finder<u8, true>;
@@ -98,10 +104,11 @@ constexpr char finder_base::DUMMY_TAG[];
 //  finder_base - constructor
 //-------------------------------------------------
 
-finder_base::finder_base(device_t &base, const char *tag)
+finder_base::finder_base(device_t &base, char const *tag)
 	: m_next(base.register_auto_finder(*this))
 	, m_base(base)
 	, m_tag(tag)
+	, m_resolved(false)
 {
 }
 
@@ -121,6 +128,7 @@ finder_base::~finder_base()
 
 void finder_base::set_tag(char const *tag)
 {
+	assert(!m_resolved);
 	m_base = m_base.get().mconfig().current_device();
 	m_tag = tag;
 }
@@ -227,29 +235,105 @@ void *finder_base::find_memshare(u8 width, size_t &bytes, bool required) const
 
 
 //-------------------------------------------------
+//  find_addrspace - find address space
+//-------------------------------------------------
+
+address_space *finder_base::find_addrspace(int spacenum, u8 width, bool required) const
+{
+	// look up the device and return nullptr if not found
+	device_t *const device(m_base.get().subdevice(m_tag));
+	if (device == nullptr)
+		return nullptr;
+
+	// check for memory interface and the specified space number
+	const device_memory_interface *memory;
+	if (!device->interface(memory))
+	{
+		if (required)
+			osd_printf_warning("Device '%s' found but lacks memory interface\n", m_tag);
+		return nullptr;
+	}
+	if (!memory->has_space(spacenum))
+	{
+		if (required)
+			osd_printf_warning("Device '%s' found but lacks address space #%d\n", m_tag, spacenum);
+		return nullptr;
+	}
+
+	// check data width
+	address_space &space(memory->space(spacenum));
+	if (width != 0 && width != space.data_width())
+	{
+		if (required)
+			osd_printf_warning("Device '%s' found but address space #%d has the wrong data width (expected %d, found %d)\n", m_tag, spacenum, width, space.data_width());
+		return nullptr;
+	}
+
+	// return result
+	return &space;
+}
+
+
+//-------------------------------------------------
+//  validate_addrspace - find address space
+//-------------------------------------------------
+
+bool finder_base::validate_addrspace(int spacenum, u8 width, bool required) const
+{
+	// look up the device and return false if not found
+	device_t *const device(m_base.get().subdevice(m_tag));
+	if (device == nullptr)
+		return report_missing(false, "address space", required);
+
+	// check for memory interface and a configuration for the designated space
+	const device_memory_interface *memory = nullptr;
+	const address_space_config *config = nullptr;
+	if (device->interface(memory))
+	{
+		config = memory->space_config(spacenum);
+		if (required)
+		{
+			if (config == nullptr)
+				osd_printf_warning("Device '%s' found but lacks address space #%d\n", m_tag, spacenum);
+			else if (width != 0 && width != config->data_width())
+				osd_printf_warning("Device '%s' found but space #%d has the wrong data width (expected %d, found %d)\n", m_tag, spacenum, width, config->data_width());
+		}
+	}
+	else if (required)
+		osd_printf_warning("Device '%s' found but lacks memory interface\n", m_tag);
+
+	// report result
+	return report_missing(config != nullptr && (width == 0 || width == config->data_width()), "address space", required);
+}
+
+
+//-------------------------------------------------
 //  report_missing - report missing objects and
 //  return true if it's ok
 //-------------------------------------------------
 
 bool finder_base::report_missing(bool found, const char *objname, bool required) const
 {
-	if (required && (strcmp(m_tag, DUMMY_TAG) == 0))
+	if (required && (DUMMY_TAG == m_tag))
 	{
 		osd_printf_error("Tag not defined for required %s\n", objname);
 		return false;
 	}
-
-	// just pass through in the found case
-	if (found)
+	else if (found)
+	{
+		// just pass through in the found case
 		return true;
-
-	// otherwise, report
-	std::string const region_fulltag(m_base.get().subtag(m_tag));
-	if (required)
-		osd_printf_error("Required %s '%s' not found\n", objname, region_fulltag.c_str());
+	}
 	else
-		osd_printf_verbose("Optional %s '%s' not found\n", objname, region_fulltag.c_str());
-	return !required;
+	{
+		// otherwise, report
+		std::string const region_fulltag(m_base.get().subtag(m_tag));
+		if (required)
+			osd_printf_error("Required %s '%s' not found\n", objname, region_fulltag);
+		else if (DUMMY_TAG != m_tag)
+			osd_printf_verbose("Optional %s '%s' not found\n", objname, region_fulltag);
+		return !required;
+	}
 }
 
 
@@ -258,7 +342,7 @@ void finder_base::printf_warning(const char *format, ...)
 	va_list argptr;
 	char buffer[1024];
 
-	/* do the output */
+	// do the output
 	va_start(argptr, format);
 	vsnprintf(buffer, 1024, format, argptr);
 	osd_printf_warning("%s", buffer);

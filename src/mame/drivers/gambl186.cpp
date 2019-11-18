@@ -64,6 +64,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_upd7759(*this, "7759") { }
 
+	void gambl186(machine_config &config);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<upd7759_device> m_upd7759;
 	int m_comms_state;
@@ -79,7 +82,6 @@ public:
 	DECLARE_WRITE16_MEMBER(comms_w);
 	DECLARE_WRITE16_MEMBER(data_bank_w);
 	DECLARE_WRITE16_MEMBER(upd_w);
-	void gambl186(machine_config &config);
 	void gambl186_io(address_map &map);
 	void gambl186_map(address_map &map);
 };
@@ -373,18 +375,18 @@ void gambl186_state::gambl186_io(address_map &map)
 	map(0x03b0, 0x03bf).rw("vga", FUNC(cirrus_gd5428_device::port_03b0_r), FUNC(cirrus_gd5428_device::port_03b0_w));
 	map(0x03c0, 0x03cf).rw("vga", FUNC(cirrus_gd5428_device::port_03c0_r), FUNC(cirrus_gd5428_device::port_03c0_w));
 	map(0x03d0, 0x03df).rw("vga", FUNC(cirrus_gd5428_device::port_03d0_r), FUNC(cirrus_gd5428_device::port_03d0_w));
-	map(0x0400, 0x0401).w(this, FUNC(gambl186_state::upd_w));      // upd7759 sample index/input
+	map(0x0400, 0x0401).w(FUNC(gambl186_state::upd_w));      // upd7759 sample index/input
 	map(0x0500, 0x0501).portr("IN0");
 	map(0x0502, 0x0503).portr("IN1");
 	map(0x0504, 0x0505).portr("IN2");  // Seems to writes more upd7759 params in MSB...
 
-	//AM_RANGE(0x0500, 0x050f) AM_READ(unk_r)
+	//map(0x0500, 0x050f).r(FUNC(gambl186_state::unk_r));
 	map(0x0580, 0x0581).portr("DSW1");
 	map(0x0582, 0x0583).portr("JOY");
 	map(0x0584, 0x0585).portr("DSW0").nopw(); // Watchdog: bit 8
-//  AM_RANGE(0x0600, 0x0603) AM_WRITENOP // lamps
-	map(0x0680, 0x0683).rw(this, FUNC(gambl186_state::comms_r), FUNC(gambl186_state::comms_w));
-	map(0x0700, 0x0701).w(this, FUNC(gambl186_state::data_bank_w));
+//  map(0x0600, 0x0603).nopw(); // lamps
+	map(0x0680, 0x0683).rw(FUNC(gambl186_state::comms_r), FUNC(gambl186_state::comms_w));
+	map(0x0700, 0x0701).w(FUNC(gambl186_state::data_bank_w));
 }
 
 
@@ -470,26 +472,25 @@ INPUT_PORTS_END
 
 
 
-MACHINE_CONFIG_START(gambl186_state::gambl186)
-	MCFG_CPU_ADD("maincpu", I80186, XTAL(40'000'000))
-	MCFG_CPU_PROGRAM_MAP(gambl186_map)
-	MCFG_CPU_IO_MAP(gambl186_io)
+void gambl186_state::gambl186(machine_config &config)
+{
+	I80186(config, m_maincpu, XTAL(40'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &gambl186_state::gambl186_map);
+	m_maincpu->set_addrmap(AS_IO, &gambl186_state::gambl186_io);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(25'174'800),900,0,640,526,0,480)
-	MCFG_SCREEN_UPDATE_DEVICE("vga", cirrus_gd5428_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(25'174'800),900,0,640,526,0,480);
+	screen.set_screen_update("vga", FUNC(cirrus_gd5428_device::screen_update));
 
-	MCFG_DEVICE_ADD("vga", CIRRUS_GD5428, 0)
-	MCFG_VIDEO_SET_SCREEN("screen")
+	CIRRUS_GD5428(config, "vga", 0).set_screen("screen");
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("7759", UPD7759, UPD7759_STANDARD_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-
-MACHINE_CONFIG_END
+	SPEAKER(config, "mono").front_center();
+	UPD7759(config, m_upd7759);
+	m_upd7759->add_route(ALL_OUTPUTS, "mono", 0.75);
+}
 
 
 
@@ -498,7 +499,7 @@ ROM_START( gambl186 )
 	ROM_LOAD16_BYTE( "ie398.u11", 0x00000, 0x80000, CRC(86ad7cab) SHA1(b701c3701db630d218a9b1700f216f795a1b1272) )
 	ROM_LOAD16_BYTE( "io398.u12", 0x00001, 0x80000, CRC(0a036f34) SHA1(63d0b87c7d4c902413f28c0b55d78e5fda511f4f) )
 
-	ROM_REGION( 0x40000, "ipl", 0 )
+	ROM_REGION16_LE( 0x40000, "ipl", 0 )
 	ROM_LOAD16_BYTE( "se403p.u9",  0x00000, 0x20000, CRC(1021cc20) SHA1(d9bb67676b05458ff813d608431ff06946ab7721) )
 	ROM_LOAD16_BYTE( "so403p.u10", 0x00001, 0x20000, CRC(af9746c9) SHA1(3f1ab8110cc5eadec661181779799693ad695e21) )
 
@@ -511,7 +512,7 @@ ROM_START( gambl186a )
 	ROM_LOAD16_BYTE( "ie399.u11", 0x00000, 0x80000, CRC(2a7bce20) SHA1(fbabaaa0d72b5dfccd33f5194d13009bdc44b5a7) )
 	ROM_LOAD16_BYTE( "io399.u12", 0x00001, 0x80000, CRC(9212f52b) SHA1(d970c59c1e0f5f7e94c1b632398bcfae278c143d) )
 
-	ROM_REGION( 0x40000, "ipl", 0 )
+	ROM_REGION16_LE( 0x40000, "ipl", 0 )
 	ROM_LOAD16_BYTE( "se403p.u9",  0x00000, 0x20000, CRC(1021cc20) SHA1(d9bb67676b05458ff813d608431ff06946ab7721) )
 	ROM_LOAD16_BYTE( "so403p.u10", 0x00001, 0x20000, CRC(af9746c9) SHA1(3f1ab8110cc5eadec661181779799693ad695e21) )
 
@@ -525,7 +526,7 @@ ROM_START( gambl186b )
 	ROM_LOAD16_BYTE( "ie3.7.8.bin", 0x00000, 0x80000, CRC(cc27886c) SHA1(cb27af74dffe86c564ba8a0ad711f4232330cf1b) )
 	ROM_LOAD16_BYTE( "io3.7.8.bin", 0x00001, 0x80000, CRC(c69bf3ad) SHA1(eb612e903a9b184c2dd363e081ee8f650a4f2f90) )
 
-	ROM_REGION( 0x40000, "ipl", 0 )
+	ROM_REGION16_LE( 0x40000, "ipl", 0 )
 	ROM_LOAD16_BYTE( "se3.8.6t.bin", 0x00000, 0x20000,CRC(158bd3a3) SHA1(846f382f145f8c4c36bd75fef12717b41e91c70b))
 	ROM_LOAD16_BYTE( "so3.8.6t.bin", 0x00001, 0x20000, CRC(4bd275d3) SHA1(6b84f54e723408b06b71e89f7de6a8014fd9ecfd) )
 
@@ -534,6 +535,6 @@ ROM_START( gambl186b )
 ROM_END
 
 // version numbering isn't clear, rom labels don't agree with test mode display.
-GAME( 1997, gambl186,  0,        gambl186, gambl186, gambl186_state, 0,    ROT0,  "EGD",     "Multi Game (Versione 4.0.3 - 1.5.7, 05-FEV-99(397)) (V398?)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Versione 4.0.3 (1.5.7), csmb15A, CSMB_0015A (IT), - 05-FEV-99(397)
-GAME( 1997, gambl186a, gambl186, gambl186, gambl186, gambl186_state, 0,    ROT0,  "EGD",     "Multi Game (Versione 4.0.3 - 1.5.7, 05-FEV-99(397)) (V399?)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // same?
-GAME( 1997, gambl186b, gambl186, gambl186, gambl186, gambl186_state, 0,    ROT0,  "EGD",     "Multi Game (Versione 3.8.6T - 1.5.6, 25-AUG-97) (V378?)",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Versione 3.8.6T (1.5.6), mult5_it, CSMB-0000F (IT), 25-AUG-97
+GAME( 1997, gambl186,  0,        gambl186, gambl186, gambl186_state, empty_init, ROT0, "EGD", "Multi Game (Versione 4.0.3 - 1.5.7, 05-FEV-99(397)) (V398?)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Versione 4.0.3 (1.5.7), csmb15A, CSMB_0015A (IT), - 05-FEV-99(397)
+GAME( 1997, gambl186a, gambl186, gambl186, gambl186, gambl186_state, empty_init, ROT0, "EGD", "Multi Game (Versione 4.0.3 - 1.5.7, 05-FEV-99(397)) (V399?)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // same?
+GAME( 1997, gambl186b, gambl186, gambl186, gambl186, gambl186_state, empty_init, ROT0, "EGD", "Multi Game (Versione 3.8.6T - 1.5.6, 25-AUG-97) (V378?)",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Versione 3.8.6T (1.5.6), mult5_it, CSMB-0000F (IT), 25-AUG-97

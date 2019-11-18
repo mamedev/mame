@@ -222,8 +222,8 @@ DEFINE_DEVICE_TYPE(CBM_IEC_SLOT, cbm_iec_slot_device, "cbm_iec_slot", "CBM IEC s
 //  device_cbm_iec_interface - constructor
 //-------------------------------------------------
 
-device_cbm_iec_interface::device_cbm_iec_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device), m_next(nullptr), m_bus(nullptr), m_slot(nullptr)
+device_cbm_iec_interface::device_cbm_iec_interface(const machine_config &mconfig, device_t &device) :
+	device_interface(device, "cbmiec"), m_next(nullptr), m_bus(nullptr), m_slot(nullptr)
 {
 }
 
@@ -247,8 +247,8 @@ device_cbm_iec_interface::~device_cbm_iec_interface()
 //-------------------------------------------------
 
 cbm_iec_slot_device::cbm_iec_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, CBM_IEC_SLOT, tag, owner, clock),
-		device_slot_interface(mconfig, *this), m_address(0)
+	device_t(mconfig, CBM_IEC_SLOT, tag, owner, clock),
+	device_slot_interface(mconfig, *this), m_address(0)
 {
 }
 
@@ -273,8 +273,6 @@ void cbm_iec_slot_device::device_start()
 	if (dev) bus->add_device(this, get_card_device());
 }
 
-
-
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -283,13 +281,13 @@ void cbm_iec_slot_device::device_start()
 //  cbm_iec_device - constructor
 //-------------------------------------------------
 
-cbm_iec_device::cbm_iec_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, CBM_IEC, tag, owner, clock),
-		m_write_srq(*this),
-		m_write_atn(*this),
-		m_write_clk(*this),
-		m_write_data(*this),
-		m_write_reset(*this)
+cbm_iec_device::cbm_iec_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, CBM_IEC, tag, owner, clock),
+	m_write_srq(*this),
+	m_write_atn(*this),
+	m_write_clk(*this),
+	m_write_data(*this),
+	m_write_reset(*this)
 {
 	for (auto & elem : m_line)
 	{
@@ -319,8 +317,8 @@ void cbm_iec_device::device_start()
 
 void cbm_iec_device::device_reset()
 {
-	reset_w(0);
-	reset_w(1);
+	host_reset_w(0);
+	host_reset_w(1);
 }
 
 
@@ -353,10 +351,10 @@ void cbm_iec_device::add_device(cbm_iec_slot_device *slot, device_t *target)
 //  daisy_entry - constructor
 //-------------------------------------------------
 
-cbm_iec_device::daisy_entry::daisy_entry(device_t *device)
-	: m_next(nullptr),
-		m_device(device),
-		m_interface(nullptr)
+cbm_iec_device::daisy_entry::daisy_entry(device_t *device) :
+	m_next(nullptr),
+	m_device(device),
+	m_interface(nullptr)
 {
 	for (auto & elem : m_line)
 	{
@@ -497,30 +495,38 @@ int cbm_iec_device::get_signal(int signal)
 #include "vic1520.h"
 #include "c1526.h"
 
-SLOT_INTERFACE_START( cbm_iec_devices )
-	SLOT_INTERFACE("c1540", C1540)
-	SLOT_INTERFACE("c1541", C1541)
-	SLOT_INTERFACE("c1541c", C1541C)
-	SLOT_INTERFACE("c1541ii", C1541II)
-	SLOT_INTERFACE("fsd1", FSD1)
-	SLOT_INTERFACE("fsd2", FSD2)
-	SLOT_INTERFACE("csd1", CSD1)
-	SLOT_INTERFACE("c1541dd", C1541_DOLPHIN_DOS)
-	SLOT_INTERFACE("c1541pd", C1541_PROFESSIONAL_DOS_V1)
-	SLOT_INTERFACE("c1541pdc", C1541_PROLOGIC_DOS_CLASSIC)
-	SLOT_INTERFACE("c1570", C1570)
-	SLOT_INTERFACE("c1571", C1571)
-	SLOT_INTERFACE("c1581", C1581)
-	SLOT_INTERFACE("indusgt", INDUS_GT)
-	SLOT_INTERFACE("cmdhd", CMD_HD)
-	SLOT_INTERFACE("fd2000", FD2000)
-	SLOT_INTERFACE("fd4000", FD4000)
-	SLOT_INTERFACE("interpod", INTERPOD)
-	SLOT_INTERFACE("minichief", MINI_CHIEF)
-	SLOT_INTERFACE("serialbox", SERIAL_BOX)
-	SLOT_INTERFACE("diag264", DIAG264_SERIAL_LOOPBACK)
-	SLOT_INTERFACE("nl10", C64_NL10_INTERFACE)
-	SLOT_INTERFACE("vic1515", VIC1515)
-	SLOT_INTERFACE("vic1520", VIC1520)
-	SLOT_INTERFACE("c1526", C1526)
-SLOT_INTERFACE_END
+void cbm_iec_devices(device_slot_interface &device)
+{
+	device.option_add("c1540", C1540);
+	device.option_add("c1541", C1541);
+	device.option_add("c1541c", C1541C);
+	device.option_add("c1541ii", C1541II);
+	device.option_add("fsd1", FSD1);
+	device.option_add("fsd2", FSD2);
+	device.option_add("csd1", CSD1);
+	device.option_add("c1541dd", C1541_DOLPHIN_DOS);
+	device.option_add("c1541pd", C1541_PROFESSIONAL_DOS_V1);
+	device.option_add("c1541pdc", C1541_PROLOGIC_DOS_CLASSIC);
+	device.option_add("c1570", C1570);
+	device.option_add("c1571", C1571);
+	device.option_add("c1581", C1581);
+	device.option_add("indusgt", INDUS_GT);
+	device.option_add("cmdhd", CMD_HD);
+	device.option_add("fd2000", FD2000);
+	device.option_add("fd4000", FD4000);
+	device.option_add("interpod", CBM_INTERPOD);
+	device.option_add("minichief", MINI_CHIEF);
+	device.option_add("serialbox", CBM_SERIAL_BOX);
+	device.option_add("diag264", DIAG264_SERIAL_LOOPBACK);
+	device.option_add("nl10", C64_NL10_INTERFACE);
+	device.option_add("vic1515", VIC1515);
+	device.option_add("vic1520", VIC1520);
+	device.option_add("c1526", C1526);
+	device.option_add("technica", TECHNICA);
+	device.option_add("bluechip", BLUE_CHIP);
+	device.option_add("cmdrc2", COMMANDER_C2);
+	device.option_add("enh2000", ENHANCER_2000);
+	device.option_add("fd148", FD148);
+	device.option_add("msdsd1", MSD_SD1);
+	device.option_add("msdsd2", MSD_SD2);
+}

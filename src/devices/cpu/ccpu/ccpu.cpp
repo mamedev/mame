@@ -23,7 +23,7 @@ DEFINE_DEVICE_TYPE(CCPU, ccpu_cpu_device, "ccpu", "Cinematronics CPU")
     MACROS
 ***************************************************************************/
 
-#define READOP(a)         (m_direct->read_byte(a))
+#define READOP(a)         (m_cache->read_byte(a))
 
 #define RDMEM(a)          (m_data->read_word((a) & 0xfff))
 #define WRMEM(a,v)        (m_data->write_word((a), (v)))
@@ -69,6 +69,7 @@ ccpu_cpu_device::ccpu_cpu_device(const machine_config &mconfig, const char *tag,
 	, m_data_config("data", ENDIANNESS_BIG, 16, 32, -1)
 	, m_io_config("io", ENDIANNESS_BIG, 8, 5, 0)
 	, m_external_input(*this)
+	, m_vector_callback(*this)
 	, m_flags(0)
 {
 }
@@ -103,11 +104,11 @@ void ccpu_cpu_device::device_start()
 {
 	/* copy input params */
 	m_external_input.resolve_safe(0);
-	m_vector_callback.bind_relative_to(*owner());
+	m_vector_callback.resolve();
 	assert(!m_vector_callback.isnull());
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
+	m_cache = m_program->cache<0, 0, ENDIANNESS_BIG>();
 	m_data = &space(AS_DATA);
 	m_io = &space(AS_IO);
 

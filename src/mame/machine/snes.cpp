@@ -69,7 +69,7 @@ void snes_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 		snes_hblank_tick(ptr, param);
 		break;
 	default:
-		assert_always(false, "Unknown id in snes_state::device_timer");
+		throw emu_fatalerror("Unknown id in snes_state::device_timer");
 	}
 }
 
@@ -102,15 +102,8 @@ TIMER_CALLBACK_MEMBER(snes_state::snes_hirq_tick_callback)
 
 TIMER_CALLBACK_MEMBER(snes_state::snes_reset_oam_address)
 {
-	// make sure we're in the 65816's context since we're messing with the OAM and stuff
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-
 	if (!m_ppu->screen_disabled()) //Reset OAM address, byuu says it happens at H=10
-	{
-		space.write_byte(OAMADDL, m_ppu->saved_oam_address_low()); /* Reset oam address */
-		space.write_byte(OAMADDH, m_ppu->saved_oam_address_high());
-		m_ppu->set_first_sprite();
-	}
+		m_ppu->oam_address_reset();
 }
 
 TIMER_CALLBACK_MEMBER(snes_state::snes_reset_hdma)
@@ -230,14 +223,12 @@ TIMER_CALLBACK_MEMBER(snes_state::snes_hblank_tick)
 	/* draw a scanline */
 	if (m_ppu->current_vert() <= m_ppu->last_visible_line())
 	{
-		if (m_screen->vpos() > 0)
-		{
-			/* Do HDMA */
-			if (SNES_CPU_REG(HDMAEN))
-				hdma(cpu0space);
+		/* Do HDMA */
+		if (SNES_CPU_REG(HDMAEN))
+			hdma(cpu0space);
 
+		if (m_screen->vpos() > 0)
 			m_screen->update_partial((m_ppu->interlace() == 2) ? (m_ppu->current_vert() * m_ppu->interlace()) : m_ppu->current_vert() - 1);
-		}
 	}
 
 	// signal hblank
@@ -259,11 +250,6 @@ TIMER_CALLBACK_MEMBER(snes_state::snes_hblank_tick)
     Input Handlers
 
 *************************************/
-
-READ8_MEMBER( snes_state::snes_open_bus_r )
-{
-	return snes_open_bus_r();
-}
 
 uint8_t snes_state::snes_open_bus_r()
 {
@@ -404,7 +390,7 @@ READ8_MEMBER( snes_state::snes_r_io )
 	// APU is mirrored from 2140 to 217f
 	if (offset >= APU00 && offset < WMDATA)
 	{
-		return m_spc700->spc_port_out(space, offset & 0x3);
+		return m_spc700->spc_port_out(offset & 0x3);
 	}
 
 	// DMA accesses are from 4300 to 437f
@@ -494,7 +480,7 @@ WRITE8_MEMBER( snes_state::snes_w_io )
 	if (offset >= APU00 && offset < WMDATA)
 	{
 //      printf("816: %02x to APU @ %d (PC=%06x)\n", data, offset & 3,m_maincpu->pc());
-		m_spc700->spc_port_in(space, offset & 0x3, data);
+		m_spc700->spc_port_in(offset & 0x3, data);
 		machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(20));
 		return;
 	}
@@ -565,7 +551,7 @@ WRITE8_MEMBER( snes_state::snes_w_io )
 			SNES_CPU_REG(MDMAEN) = 0;   /* Once DMA is done we need to reset all bits to 0 */
 			return;
 		case HDMAEN:    /* HDMA channel designation */
-			if (data) //if a HDMA is enabled, data is inited at the next scanline
+			if (data != SNES_CPU_REG(HDMAEN)) //if a HDMA is enabled, data is inited at the next scanline
 				timer_set(m_screen->time_until_pos(m_ppu->current_vert() + 1), TIMER_RESET_HDMA);
 			SNES_CPU_REG(HDMAEN) = data;
 			return;
@@ -1069,7 +1055,7 @@ void snes_state::snes_init_ram()
 	SNES_CPU_REG(WRIO) = 0xff;
 
 	// init frame counter so first line is 0
-	if (ATTOSECONDS_TO_HZ(m_screen->frame_period().attoseconds()) >= 59)
+	if (m_screen->frame_period().as_hz() >= 59.0)
 		m_ppu->set_current_vert(SNES_VTOTAL_NTSC);
 	else
 		m_ppu->set_current_vert(SNES_VTOTAL_PAL);
@@ -1171,7 +1157,7 @@ void snes_state::rom_map_setup(uint32_t size)
 }
 
 /* for mame we use an init, maybe we will need more for the different games */
-DRIVER_INIT_MEMBER(snes_state,snes)
+void snes_state::init_snes()
 {
 	m_cart.m_rom_size = memregion("user3")->bytes();
 	m_cart.m_rom = memregion("user3")->base();
@@ -1192,7 +1178,7 @@ DRIVER_INIT_MEMBER(snes_state,snes)
 	m_cart.mode = SNES_MODE_20;
 }
 
-DRIVER_INIT_MEMBER(snes_state,snes_hirom)
+void snes_state::init_snes_hirom()
 {
 	m_cart.m_rom_size = memregion("user3")->bytes();
 	m_cart.m_rom = memregion("user3")->base();

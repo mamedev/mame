@@ -8,6 +8,8 @@
 *********************************************************************/
 
 #include "emu.h"
+#include "romload.h"
+
 #include "emuopts.h"
 #include "drivenum.h"
 #include "softlist_dev.h"
@@ -30,14 +32,9 @@
 
 static osd_file::error common_process_file(emu_options &options, const char *location, const char *ext, const rom_entry *romp, emu_file &image_file)
 {
-	osd_file::error filerr;
-
-	if (location != nullptr && strcmp(location, "") != 0)
-		filerr = image_file.open(location, PATH_SEPARATOR, ROM_GETNAME(romp), ext);
-	else
-		filerr = image_file.open(ROM_GETNAME(romp), ext);
-
-	return filerr;
+	return (location && *location)
+			? image_file.open(location, PATH_SEPARATOR, ROM_GETNAME(romp), ext)
+			: image_file.open(ROM_GETNAME(romp), ext);
 }
 
 std::unique_ptr<emu_file> common_process_file(emu_options &options, const char *location, bool has_crc, u32 crc, const rom_entry *romp, osd_file::error &filerr)
@@ -68,7 +65,7 @@ std::unique_ptr<emu_file> common_process_file(emu_options &options, const char *
 const rom_entry *rom_first_region(const device_t &device)
 {
 	const rom_entry *romp = &device.rom_region_vector().front();
-	while (ROMENTRY_ISPARAMETER(romp))
+	while (ROMENTRY_ISPARAMETER(romp) || ROMENTRY_ISSYSTEM_BIOS(romp) || ROMENTRY_ISDEFAULT_BIOS(romp))
 		romp++;
 	return !ROMENTRY_ISEND(romp) ? romp : nullptr;
 }
@@ -473,15 +470,15 @@ void rom_load_manager::display_rom_load_results(bool from_list)
 	if (m_errors != 0)
 	{
 		/* create the error message and exit fatally */
-		osd_printf_error("%s", m_errorstring.c_str());
-		fatalerror_exitcode(machine(), EMU_ERR_MISSING_FILES, "Required files are missing, the machine cannot be run.");
+		osd_printf_error("%s", m_errorstring);
+		throw emu_fatalerror(EMU_ERR_MISSING_FILES, "Required files are missing, the machine cannot be run.");
 	}
 
 	/* if we had warnings, output them, but continue */
 	if ((m_warnings) || (m_knownbad))
 	{
 		m_errorstring.append("WARNING: the machine might not run correctly.");
-		osd_printf_warning("%s\n", m_errorstring.c_str());
+		osd_printf_warning("%s\n", m_errorstring);
 	}
 }
 
@@ -598,7 +595,7 @@ int rom_load_manager::open_rom_file(const char *regiontag, const rom_entry *romp
 		}
 
 		if (tag5.find_first_of('%') != -1)
-			fatalerror("We do not support clones of clones!\n");
+			throw emu_fatalerror("We do not support clones of clones!\n");
 
 		// try to load from the available location(s):
 		// - if we are not using lists, we have regiontag only;
@@ -691,11 +688,11 @@ int rom_load_manager::read_rom_data(const rom_entry *parent_region, const rom_en
 
 	/* make sure we only fill within the region space */
 	if (ROM_GETOFFSET(romp) + numgroups * groupsize + (numgroups - 1) * skip > m_region->bytes())
-		fatalerror("Error in RomModule definition: %s out of memory region space\n", ROM_GETNAME(romp));
+		throw emu_fatalerror("Error in RomModule definition: %s out of memory region space\n", ROM_GETNAME(romp));
 
 	/* make sure the length was valid */
 	if (numbytes == 0)
-		fatalerror("Error in RomModule definition: %s has an invalid length\n", ROM_GETNAME(romp));
+		throw emu_fatalerror("Error in RomModule definition: %s has an invalid length\n", ROM_GETNAME(romp));
 
 	/* special case for simple loads */
 	if (datamask == 0xff && (groupsize == 1 || !reversed) && skip == 0)
@@ -793,11 +790,11 @@ void rom_load_manager::fill_rom_data(const rom_entry *romp)
 
 	// make sure we fill within the region space
 	if (ROM_GETOFFSET(romp) + numbytes > m_region->bytes())
-		fatalerror("Error in RomModule definition: FILL out of memory region space\n");
+		throw emu_fatalerror("Error in RomModule definition: FILL out of memory region space\n");
 
 	// make sure the length was valid
 	if (numbytes == 0)
-		fatalerror("Error in RomModule definition: FILL has an invalid length\n");
+		throw emu_fatalerror("Error in RomModule definition: FILL has an invalid length\n");
 
 	// for fill bytes, the byte that gets filled is the first byte of the hashdata string
 	u8 fill_byte = u8(strtol(ROM_GETHASHDATA(romp), nullptr, 0));
@@ -826,20 +823,20 @@ void rom_load_manager::copy_rom_data(const rom_entry *romp)
 
 	/* make sure we copy within the region space */
 	if (ROM_GETOFFSET(romp) + numbytes > m_region->bytes())
-		fatalerror("Error in RomModule definition: COPY out of target memory region space\n");
+		throw emu_fatalerror("Error in RomModule definition: COPY out of target memory region space\n");
 
 	/* make sure the length was valid */
 	if (numbytes == 0)
-		fatalerror("Error in RomModule definition: COPY has an invalid length\n");
+		throw emu_fatalerror("Error in RomModule definition: COPY has an invalid length\n");
 
 	/* make sure the source was valid */
 	memory_region *region = machine().root_device().memregion(srcrgntag);
 	if (region == nullptr)
-		fatalerror("Error in RomModule definition: COPY from an invalid region\n");
+		throw emu_fatalerror("Error in RomModule definition: COPY from an invalid region\n");
 
 	/* make sure we find within the region space */
 	if (srcoffs + numbytes > region->bytes())
-		fatalerror("Error in RomModule definition: COPY out of source memory region space\n");
+		throw emu_fatalerror("Error in RomModule definition: COPY out of source memory region space\n");
 
 	/* fill the data */
 	memcpy(base, region->base() + srcoffs, numbytes);
@@ -858,29 +855,29 @@ void rom_load_manager::process_rom_entries(const char *regiontag, const rom_entr
 	/* loop until we hit the end of this region */
 	while (!ROMENTRY_ISREGIONEND(romp))
 	{
-		/* if this is a continue entry, it's invalid */
 		if (ROMENTRY_ISCONTINUE(romp))
-			fatalerror("Error in RomModule definition: ROM_CONTINUE not preceded by ROM_LOAD\n");
+			throw emu_fatalerror("Error in RomModule definition: ROM_CONTINUE not preceded by ROM_LOAD\n");
 
-		/* if this is an ignore entry, it's invalid */
 		if (ROMENTRY_ISIGNORE(romp))
-			fatalerror("Error in RomModule definition: ROM_IGNORE not preceded by ROM_LOAD\n");
+			throw emu_fatalerror("Error in RomModule definition: ROM_IGNORE not preceded by ROM_LOAD\n");
 
-		/* if this is a reload entry, it's invalid */
 		if (ROMENTRY_ISRELOAD(romp))
-			fatalerror("Error in RomModule definition: ROM_RELOAD not preceded by ROM_LOAD\n");
+			throw emu_fatalerror("Error in RomModule definition: ROM_RELOAD not preceded by ROM_LOAD\n");
 
-		/* handle fills */
 		if (ROMENTRY_ISFILL(romp))
-			fill_rom_data(romp++);
+		{
+			if (!ROM_GETBIOSFLAGS(romp) || ROM_GETBIOSFLAGS(romp) == device->system_bios())
+				fill_rom_data(romp);
 
-		/* handle copies */
+			romp++;
+		}
 		else if (ROMENTRY_ISCOPY(romp))
+		{
 			copy_rom_data(romp++);
-
-		/* handle files */
+		}
 		else if (ROMENTRY_ISFILE(romp))
 		{
+			/* handle files */
 			int irrelevantbios = (ROM_GETBIOSFLAGS(romp) != 0 && ROM_GETBIOSFLAGS(romp) != device->system_bios());
 			const rom_entry *baserom = romp;
 			int explength = 0;
@@ -939,7 +936,7 @@ void rom_load_manager::process_rom_entries(const char *regiontag, const rom_entr
 		}
 		else
 		{
-			romp++; /* something else; skip */
+			romp++; // something else - skip
 		}
 	}
 }
@@ -1008,7 +1005,7 @@ int open_disk_image(emu_options &options, const game_driver *gamedrv, const rom_
 		}
 
 		if (tag5.find_first_of('%') != -1)
-			fatalerror("We do not support clones of clones!\n");
+			throw emu_fatalerror("We do not support clones of clones!\n");
 
 		// try to load from the available location(s):
 		// - if we are not using lists, we have locationtag only;
@@ -1171,6 +1168,10 @@ chd_error rom_load_manager::open_disk_diff(emu_options &options, const rom_entry
 
 void rom_load_manager::process_disk_entries(const char *regiontag, const rom_entry *parent_region, const rom_entry *romp, const char *locationtag)
 {
+	/* remove existing disk entries for this region */
+	m_chd_list.erase(std::remove_if(m_chd_list.begin(), m_chd_list.end(),
+		[regiontag](std::unique_ptr<open_chd> &chd){ return !strcmp(chd->region(), regiontag); }), m_chd_list.end());
+
 	/* loop until we hit the end of this region */
 	for ( ; !ROMENTRY_ISREGIONEND(romp); romp++)
 	{
@@ -1239,11 +1240,11 @@ void rom_load_manager::process_disk_entries(const char *regiontag, const rom_ent
     flags for the given device
 -------------------------------------------------*/
 
-void rom_load_manager::normalize_flags_for_device(running_machine &machine, const char *rgntag, u8 &width, endianness_t &endian)
+void rom_load_manager::normalize_flags_for_device(const char *rgntag, u8 &width, endianness_t &endian)
 {
-	device_t *device = machine.device(rgntag);
+	device_t *device = machine().root_device().subdevice(rgntag);
 	device_memory_interface *memory;
-	if (device->interface(memory))
+	if (device != nullptr && device->interface(memory))
 	{
 		const address_space_config *spaceconfig = memory->space_config();
 		if (spaceconfig != nullptr)
@@ -1251,13 +1252,13 @@ void rom_load_manager::normalize_flags_for_device(running_machine &machine, cons
 			int buswidth;
 
 			/* set the endianness */
-			if (spaceconfig->m_endianness == ENDIANNESS_LITTLE)
+			if (spaceconfig->endianness() == ENDIANNESS_LITTLE)
 				endian = ENDIANNESS_LITTLE;
 			else
 				endian = ENDIANNESS_BIG;
 
 			/* set the width */
-			buswidth = spaceconfig->m_data_width;
+			buswidth = spaceconfig->data_width();
 			if (buswidth <= 8)
 				width = 1;
 			else if (buswidth <= 16)
@@ -1341,8 +1342,7 @@ void rom_load_manager::load_software_part_region(device_t &device, software_list
 		memory_region *memregion = machine().root_device().memregion(regiontag.c_str());
 		if (memregion != nullptr)
 		{
-			if (machine().device(regiontag.c_str()) != nullptr)
-				normalize_flags_for_device(machine(), regiontag.c_str(), width, endianness);
+			normalize_flags_for_device(regiontag.c_str(), width, endianness);
 
 			/* clear old region (todo: should be moved to an image unload function) */
 			machine().memory().region_free(memregion->name());
@@ -1418,8 +1418,7 @@ void rom_load_manager::process_region_list()
 				/* if this is a device region, override with the device width and endianness */
 				u8 width = ROMREGION_GETWIDTH(region) / 8;
 				endianness_t endianness = ROMREGION_ISBIGENDIAN(region) ? ENDIANNESS_BIG : ENDIANNESS_LITTLE;
-				if (machine().device(regiontag.c_str()) != nullptr)
-					normalize_flags_for_device(machine(), regiontag.c_str(), width, endianness);
+				normalize_flags_for_device(regiontag.c_str(), width, endianness);
 
 				/* remember the base and length */
 				m_region = machine().memory().region_alloc(regiontag.c_str(), regionlength, width, endianness);

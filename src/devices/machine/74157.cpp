@@ -35,7 +35,7 @@ DEFINE_DEVICE_TYPE(LS157_X2, ls157_x2_device, "ls157_x2", "74LS157 Quad 2-to-1 M
 //  ls157_device - constructor
 //-------------------------------------------------
 
-ls157_device::ls157_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ls157_device::ls157_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: ls157_device(mconfig, LS157, tag, owner, clock, 0x0f)
 {
 }
@@ -58,7 +58,7 @@ ls157_device::ls157_device(const machine_config &mconfig, device_type type, cons
 //  ls157_x2_device - constructor
 //-------------------------------------------------
 
-ls157_x2_device::ls157_x2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+ls157_x2_device::ls157_x2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: ls157_device(mconfig, LS157_X2, tag, owner, clock, 0xff)
 {
 }
@@ -92,11 +92,6 @@ void ls157_device::device_start()
 //  a_w -- write nibble to A1-A4
 //-------------------------------------------------
 
-WRITE8_MEMBER(ls157_device::a_w)
-{
-	a_w(data);
-}
-
 void ls157_device::a_w(u8 data)
 {
 	m_a = data & m_data_mask;
@@ -107,11 +102,6 @@ void ls157_device::a_w(u8 data)
 //-------------------------------------------------
 //  b_w -- write nibble to B1-B4
 //-------------------------------------------------
-
-WRITE8_MEMBER(ls157_device::b_w)
-{
-	b_w(data);
-}
 
 void ls157_device::b_w(u8 data)
 {
@@ -124,11 +114,6 @@ void ls157_device::b_w(u8 data)
 //  ab_w -- write high nibble to A1-A4 and write
 //  low nibble to B1-B4
 //-------------------------------------------------
-
-WRITE8_MEMBER(ls157_device::ab_w)
-{
-	ab_w(data);
-}
 
 void ls157_device::ab_w(u8 data)
 {
@@ -144,11 +129,6 @@ void ls157_device::ab_w(u8 data)
 //  low nibble to A1-A4
 //-------------------------------------------------
 
-WRITE8_MEMBER(ls157_device::ba_w)
-{
-	ba_w(data);
-}
-
 void ls157_device::ba_w(u8 data)
 {
 	assert(m_data_mask == 0x0f);
@@ -162,11 +142,6 @@ void ls157_device::ba_w(u8 data)
 //  interleave_w -- write even-numbered bits to
 //  A1-A4 and write odd-numbered bits to B1-B4
 //-------------------------------------------------
-
-WRITE8_MEMBER(ls157_device::interleave_w)
-{
-	interleave_w(data);
-}
 
 void ls157_device::interleave_w(u8 data)
 {
@@ -285,7 +260,7 @@ void ls157_device::update_output()
 //  DATA OUTPUTS
 //**************************************************************************
 
-READ8_MEMBER(ls157_device::output_r)
+u8 ls157_device::output_r()
 {
 	if (m_strobe)
 		return 0;
@@ -302,7 +277,7 @@ READ8_MEMBER(ls157_device::output_r)
 
 DEFINE_DEVICE_TYPE(HC157, hc157_device, "hc157", "74HC157 Quad 2-to-1 Multiplexer")
 
-hc157_device::hc157_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+hc157_device::hc157_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: ls157_device(mconfig, HC157, tag, owner, clock, 0x0f)
 {
 }
@@ -314,7 +289,7 @@ hc157_device::hc157_device(const machine_config &mconfig, const char *tag, devic
 
 DEFINE_DEVICE_TYPE(HCT157, hct157_device, "hct157", "74HCT157 Quad 2-to-1 Multiplexer")
 
-hct157_device::hct157_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+hct157_device::hct157_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: ls157_device(mconfig, HCT157, tag, owner, clock, 0x0f)
 {
 }

@@ -44,8 +44,10 @@ public:
 	gammagic_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pcat_base_state(mconfig, type, tag) { }
 
-	virtual void machine_start() override;
 	void gammagic(machine_config &config);
+
+private:
+	virtual void machine_start() override;
 	void gammagic_io(address_map &map);
 	void gammagic_map(address_map &map);
 };
@@ -128,23 +130,24 @@ void gammagic_state::machine_start()
 {
 }
 
-MACHINE_CONFIG_START(gammagic_state::gammagic)
-	MCFG_CPU_ADD("maincpu", PENTIUM, 133000000) // Intel Pentium 133
-	MCFG_CPU_PROGRAM_MAP(gammagic_map)
-	MCFG_CPU_IO_MAP(gammagic_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
+void gammagic_state::gammagic(machine_config &config)
+{
+	PENTIUM(config, m_maincpu, 133000000); // Intel Pentium 133
+	m_maincpu->set_addrmap(AS_PROGRAM, &gammagic_state::gammagic_map);
+	m_maincpu->set_addrmap(AS_IO, &gammagic_state::gammagic_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
 
 	pcat_common(config);
 
-//  MCFG_I82371SB_ADD("i82371sb")
-//  MCFG_I82439TX_ADD("i82439tx", "maincpu", "user")
-	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
-//  MCFG_PCI_BUS_DEVICE(0, "i82439tx", i82439tx_pci_read, i82439tx_pci_write)
-//  MCFG_PCI_BUS_DEVICE(1, "i82371sb", i82371sb_pci_read, i82371sb_pci_write)
+	PCI_BUS_LEGACY(config, "pcibus", 0, 0);
+//  pcibus.set_device_read (0, FUNC(gammagic_state::intel82439tx_pci_r), this);
+//  pcibus.set_device_write(0, FUNC(gammagic_state::intel82439tx_pci_w), this);
+//  pcibus.set_device_read (7, FUNC(gammagic_state::intel82371ab_pci_r), this);
+//  pcibus.set_device_write(7, FUNC(gammagic_state::intel82371ab_pci_w), this);
+
 	/* video hardware */
 	pcvideo_vga(config);
-
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( gammagic )
@@ -187,6 +190,6 @@ ROM_END
 *      Game Drivers      *
 *************************/
 
-//    YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT       ROT   COMPANY             FULLNAME              FLAGS
-GAME( 1999, gammagic,  0,        gammagic, gammagic, gammagic_state, 0,         ROT0, "Bally Gaming Co.", "Game Magic",         MACHINE_IS_SKELETON )
-GAME( 1999, 99bottles, gammagic, gammagic, gammagic, gammagic_state, 0,         ROT0, "Bally Gaming Co.", "99 Bottles of Beer", MACHINE_IS_SKELETON )
+//    YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT        ROT   COMPANY             FULLNAME              FLAGS
+GAME( 1999, gammagic,  0,        gammagic, gammagic, gammagic_state, empty_init, ROT0, "Bally Gaming Co.", "Game Magic",         MACHINE_IS_SKELETON )
+GAME( 1999, 99bottles, gammagic, gammagic, gammagic, gammagic_state, empty_init, ROT0, "Bally Gaming Co.", "99 Bottles of Beer", MACHINE_IS_SKELETON )

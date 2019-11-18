@@ -1,0 +1,169 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!-- ZX Spectrum Beta Disc / TR-DOS disk images
+    (currently only hooked up to Pentagon machine, but interfaces available for older systems too)
+
+    some original release TR-DOS images seem to be in SCL format, which does not appear to properly
+    define a disk but instead a list of files that are on the disk? (not currently added)
+
+    TODO: move Pentagon specific images to a different list?
+-->
+
+<softwarelist name="spectrum_betadisc_flop" description="ZX Spectrum Beta Disc / TR-DOS disk images">
+
+	<software name="mightyff">
+		<description>Mighty Final Fight (v1.2)</description>
+		<year>2018</year>
+		<publisher>SaNchez</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="mff_v1.2.trd" size="655360" crc="d44fdace" sha1="97b5d14999e8a9372083e5f769e685c437f4caaf" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mightyffa" cloneof="mightyff">
+		<description>Mighty Final Fight (v1.1)</description>
+		<year>2018</year>
+		<publisher>SaNchez</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="mff_v1.1.trd" size="655360" crc="71164ace" sha1="3bcd687d24551979567d6d4cd51e94490f4f86d0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mightyffb" cloneof="mightyff">
+		<description>Mighty Final Fight (v1.0)</description>
+		<year>2018</year>
+		<publisher>SaNchez</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="mff_v1.0.trd" size="655360" crc="6b8a67db" sha1="423a7777fd8f97584dccd55114d0e2284c2a84e8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mightyffh" cloneof="mightyff">
+		<description>Mighty Final Fight (v1.2, Wally music hack)</description>
+		<year>2018</year>
+		<publisher>hack</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="mffwally.trd" size="655360" crc="d8515942" sha1="2080ea5f529a0badc0208275fef0fd09aa0b9546" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lcdizzy">
+		<description>Log Cabin Dizzy (v1.04, English)</description>
+		<year>2018</year>
+		<publisher>Verm-V</publisher>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="log cabin dizzy v1.04 eng.trd" size="655360" crc="5da2c1e8" sha1="20d6de7d678882d4ba746fa5fca5bab86d9692a0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lcdizzya" cloneof="lcdizzy">
+		<description>Log Cabin Dizzy (v1.04, Russian)</description>
+		<year>2018</year>
+		<publisher>Verm-V</publisher>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="log cabin dizzy v1.04 rus.trd" size="655360" crc="ee927a33" sha1="a9dbb02328846b3d83d982c0ef7292655d0061c8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dwpentag">
+		<description>DreamWalker: Alter Ego 2 (Pentagon)</description>
+		<year>2014</year>
+		<publisher>RetroSouls</publisher>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="dwpentagon.trd" size="655360" crc="2598e5bd" sha1="87e2bfd71749ae127adaf1248896c84b21c5b8aa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gravibot">
+		<description>Gravibots</description>
+		<year>2014</year>
+		<publisher>RetroSouls</publisher>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="gravibots.trd" size="655360" crc="9d6d8e1b" sha1="edd0eb9a663783b5efc16e6512ad14efc418031f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lirus">
+		<description>Lirus</description>
+		<year>2016</year>
+		<publisher>RetroSouls</publisher>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="lirus.trd" size="655360" crc="43ecd3ff" sha1="dfd55f10333d3f5554985672d0c94e5c8f8759f5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="multidud">
+		<description>MultiDude (Pengaton)</description>
+		<year>2014</year>
+		<publisher>RetroSouls</publisher>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="multidude(pengaton).trd" size="655360" crc="e0b01c8d" sha1="6acf93a0bb8b579767aa645e998fd6874d00e4d7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sectorin">
+		<description>Sector: Invasion</description>
+		<year>2014</year>
+		<publisher>RetroSouls</publisher>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="sectorinvasion.trd" size="655360" crc="b95db2c6" sha1="796603b97c22aefaf5c00a20210798165574774b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="twinligh">
+		<description>Twinlight</description>
+		<year>2017</year>
+		<publisher>RetroSouls</publisher>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="twinlight.trd" size="655360" crc="db941a5c" sha1="51300fc042515d68a5e0b68df997bbdca612e2db"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bobcarot" supported="no"> <!-- won't load file? -->
+		<description>Bobby Carrot</description>
+		<year>2018</year>
+		<publisher>Aleksey Golubtsov</publisher>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="bc128.trd" size="655360" crc="56d6117c" sha1="187af2278b2c011ec4cc5b0ddc8d2c4b8471cd44"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="redshftt">
+		<description>Redshift</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="redshift.trd" size="655360" crc="3ce73e13" sha1="03d302feadd39e9123a807827c0000b77ba17245"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

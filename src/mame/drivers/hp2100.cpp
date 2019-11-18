@@ -249,8 +249,9 @@ private:
 static INPUT_PORTS_START( hp2100 )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(hp2100_state::hp2100)
-MACHINE_CONFIG_END
+void hp2100_state::hp2100(machine_config &config)
+{
+}
 
 ROM_START( hp2100 )
 	ROM_REGION( 0x0400, "maincpu", 0 )
@@ -341,4 +342,4 @@ ROM_START( hp2100 )
 	ROM_LOAD( "92835-80003.bin", 0x000000, 0x000400, CRC(1df52f66) SHA1(84fd048d50f6fde9a79e8df618b5a3435a087f85) )
 ROM_END
 
-COMP( 1966, hp2100, 0, 0, hp2100, hp2100, hp2100_state, 0, "Hewlett-Packard", "HP 2100", MACHINE_IS_SKELETON )
+COMP( 1966, hp2100, 0, 0, hp2100, hp2100, hp2100_state, empty_init, "Hewlett-Packard", "HP 2100", MACHINE_IS_SKELETON )

@@ -15,17 +15,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_SED1330_ADD(_tag, _clock, _screen_tag, _map) \
-	MCFG_DEVICE_ADD(_tag, SED1330, _clock) \
-	MCFG_DEVICE_ADDRESS_MAP(0, _map) \
-	MCFG_VIDEO_SET_SCREEN(_screen_tag)
-
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -105,12 +94,13 @@ private:
 
 	// address space configurations
 	const address_space_config      m_space_config;
+	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_cache;
 
 	inline uint8_t readbyte(offs_t address);
 	inline void writebyte(offs_t address, uint8_t m_data);
 	inline void increment_csr();
 
-	void draw_text_scanline(bitmap_ind16 &bitmap, const rectangle &cliprect, int y, uint16_t va);
+	void draw_text_scanline(bitmap_ind16 &bitmap, const rectangle &cliprect, int y, int r, uint16_t va, bool cursor);
 	void draw_graphics_scanline(bitmap_ind16 &bitmap, const rectangle &cliprect, int y, uint16_t va);
 	void update_graphics(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void update_text(bitmap_ind16 &bitmap, const rectangle &cliprect);

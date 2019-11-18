@@ -6,24 +6,11 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_SS50_INTERFACE_H
+#define MAME_BUS_SS50_INTERFACE_H
+
 #pragma once
 
-#ifndef MAME_DEVICES_BUS_SS50_INTERFACE_H
-#define MAME_DEVICES_BUS_SS50_INTERFACE_H
-
-//**************************************************************************
-//  CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_SS50_INTERFACE_PORT_ADD(_tag, _slot_intf, _def_slot) \
-	MCFG_DEVICE_ADD(_tag, SS50_INTERFACE, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(ss50_##_slot_intf, _def_slot, false)
-
-#define MCFG_SS50_INTERFACE_IRQ_CALLBACK(_devcb) \
-	devcb = &downcast<ss50_interface_port_device &>(*device).set_irq_cb(DEVCB_##_devcb);
-
-#define MCFG_SS50_INTERFACE_FIRQ_CALLBACK(_devcb) \
-	devcb = &downcast<ss50_interface_port_device &>(*device).set_firq_cb(DEVCB_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -34,21 +21,31 @@ class ss50_card_interface;
 
 // ======================> ss50_interface_port_device
 
-class ss50_interface_port_device : public device_t, public device_slot_interface
+class ss50_interface_port_device : public device_t, public device_single_card_slot_interface<ss50_card_interface>
 {
 	friend class ss50_card_interface;
 
 public:
 	// construction/destruction
-	ss50_interface_port_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	template <typename T>
+	ss50_interface_port_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
+		: ss50_interface_port_device(mconfig, tag, owner, 0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
+
+	ss50_interface_port_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// static configuration
-	template<class Object> devcb_base &set_irq_cb(Object &&object) { return m_irq_cb.set_callback(std::forward<Object>(object)); }
-	template<class Object> devcb_base &set_firq_cb(Object &&object) { return m_firq_cb.set_callback(std::forward<Object>(object)); }
+	auto irq_cb() { return m_irq_cb.bind(); }
+	auto firq_cb() { return m_firq_cb.bind(); }
 
 	// memory accesses
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
 
 	// baud rates
 	DECLARE_WRITE_LINE_MEMBER(f110_w);
@@ -73,7 +70,7 @@ private:
 
 // ======================> ss50_card_interface
 
-class ss50_card_interface : public device_slot_card_interface
+class ss50_card_interface : public device_interface
 {
 	friend class ss50_interface_port_device;
 
@@ -82,8 +79,8 @@ protected:
 	ss50_card_interface(const machine_config &mconfig, device_t &device);
 
 	// required overrides
-	virtual DECLARE_READ8_MEMBER(register_read) = 0;
-	virtual DECLARE_WRITE8_MEMBER(register_write) = 0;
+	virtual u8 register_read(offs_t offset) = 0;
+	virtual void register_write(offs_t offset, u8 data) = 0;
 
 	// optional overrides
 	virtual DECLARE_WRITE_LINE_MEMBER(f110_w) { }
@@ -97,6 +94,8 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(write_firq) { m_slot->m_firq_cb(state); }
 
 private:
+	virtual void interface_pre_start() override;
+
 	ss50_interface_port_device *m_slot;
 };
 
@@ -104,7 +103,7 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(SS50_INTERFACE, ss50_interface_port_device)
 
-SLOT_INTERFACE_EXTERN(ss50_default_2rs_devices);
-//SLOT_INTERFACE_EXTERN(ss50_default_4rs_devices);
+void ss50_default_2rs_devices(device_slot_interface &device);
+//void ss50_default_4rs_devices(device_slot_interface &device);
 
-#endif
+#endif // MAME_BUS_SS50_INTERFACE_H

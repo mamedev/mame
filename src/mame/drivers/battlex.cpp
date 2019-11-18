@@ -118,10 +118,10 @@ CUSTOM_INPUT_MEMBER(battlex_state::battlex_in0_b4_r)
 void battlex_state::battlex_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
-	map(0x8000, 0x8fff).ram().w(this, FUNC(battlex_state::battlex_videoram_w)).share("videoram");
+	map(0x8000, 0x8fff).ram().w(FUNC(battlex_state::battlex_videoram_w)).share("videoram");
 	map(0x9000, 0x91ff).ram().share("spriteram");
 	map(0xa000, 0xa3ff).ram();
-	map(0xe000, 0xe03f).ram().w(this, FUNC(battlex_state::battlex_palette_w));
+	map(0xe000, 0xe03f).ram().w(FUNC(battlex_state::battlex_palette_w));
 }
 
 
@@ -132,13 +132,13 @@ void battlex_state::io_map(address_map &map)
 	map(0x01, 0x01).portr("SYSTEM");
 	map(0x02, 0x02).portr("INPUTS");
 	map(0x03, 0x03).portr("DSW2");
-	map(0x10, 0x10).w(this, FUNC(battlex_state::battlex_flipscreen_w));
+	map(0x10, 0x10).w(FUNC(battlex_state::battlex_flipscreen_w));
 
 	/* verify all of these */
 	map(0x22, 0x23).w("ay1", FUNC(ay8910_device::data_address_w));
-	map(0x30, 0x30).w(this, FUNC(battlex_state::battlex_scroll_starfield_w));
-	map(0x32, 0x32).w(this, FUNC(battlex_state::battlex_scroll_x_lsb_w));
-	map(0x33, 0x33).w(this, FUNC(battlex_state::battlex_scroll_x_msb_w));
+	map(0x30, 0x30).w(FUNC(battlex_state::battlex_scroll_starfield_w));
+	map(0x32, 0x32).w(FUNC(battlex_state::battlex_scroll_x_lsb_w));
+	map(0x33, 0x33).w(FUNC(battlex_state::battlex_scroll_x_msb_w));
 }
 
 void battlex_state::dodgeman_io_map(address_map &map)
@@ -166,7 +166,7 @@ static INPUT_PORTS_START( battlex )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, battlex_state,battlex_in0_b4_r, nullptr)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(battlex_state, battlex_in0_b4_r)
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
@@ -262,7 +262,7 @@ static const gfx_layout battlex_spritelayout =
 	16*16
 };
 
-static GFXDECODE_START( battlex )
+static GFXDECODE_START( gfx_battlex )
 	GFXDECODE_ENTRY( "gfx1", 0, battlex_charlayout,   64, 8 )
 	GFXDECODE_ENTRY( "gfx2", 0, battlex_spritelayout, 0, 8 )
 GFXDECODE_END
@@ -291,44 +291,42 @@ void battlex_state::machine_reset()
 	m_in0_b4 = 0;
 }
 
-MACHINE_CONFIG_START(battlex_state::battlex)
-
+void battlex_state::battlex(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,XTAL(10'000'000)/4 )      // ?
-	MCFG_CPU_PROGRAM_MAP(battlex_map)
-	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(battlex_state, battlex_interrupt, 400) /* controls game speed? */
+	Z80(config, m_maincpu, XTAL(10'000'000)/4 );      // ?
+	m_maincpu->set_addrmap(AS_PROGRAM, &battlex_state::battlex_map);
+	m_maincpu->set_addrmap(AS_IO, &battlex_state::io_map);
+	m_maincpu->set_periodic_int(FUNC(battlex_state::battlex_interrupt), attotime::from_hz(400)); /* controls game speed? */
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(battlex_state, screen_update_battlex)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(battlex_state::screen_update_battlex));
+	screen.set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", battlex)
-	MCFG_PALETTE_ADD("palette", 64 + 128)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_battlex);
+	PALETTE(config, m_palette).set_entries(64 + 128);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL(10'000'000)/8)   // ?
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-MACHINE_CONFIG_END
+	SPEAKER(config, "mono").front_center();
+	AY8910(config, "ay1", XTAL(10'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.40);   // ?
+}
 
-MACHINE_CONFIG_START(battlex_state::dodgeman)
+void battlex_state::dodgeman(machine_config &config)
+{
 	battlex(config);
 
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(dodgeman_io_map)
+	m_maincpu->set_addrmap(AS_IO, &battlex_state::dodgeman_io_map);
 
 	MCFG_VIDEO_START_OVERRIDE(battlex_state, dodgeman)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL(10'000'000)/8)   // ?
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-MACHINE_CONFIG_END
+	AY8910(config, "ay2", XTAL(10'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.40);   // ?
+}
 
 
 /*************************************
@@ -390,37 +388,32 @@ ROM_END
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(battlex_state,battlex)
+void battlex_state::init_battlex()
 {
 	uint8_t *colormask = memregion("user1")->base();
 	uint8_t *gfxdata = memregion("user2")->base();
 	uint8_t *dest = memregion("gfx1")->base();
 	int tile_size = memregion("gfx1")->bytes() / 32;
 
-	int tile, line, bit;
 	int offset = 0;
-
-	for (tile = 0; tile < tile_size; tile++)
+	for (int tile = 0; tile < tile_size; tile++)
 	{
-		for (line = 0; line < 8; line ++)
+		for (int line = 0; line < 8; line ++)
 		{
-			for (bit = 0; bit < 8 ; bit ++)
+			for (int bit = 0; bit < 8 ; bit ++)
 			{
+				int color = colormask[(tile << 3) | ((line & 0x6) + (bit > 3 ? 1 : 0))];
+				int data = BIT(gfxdata[(tile << 3) | line], bit);
 
-				int color = colormask[(tile << 3 )| ((line&0x6) + (bit>3?1:0))  ];
-				int data = (gfxdata[(tile << 3 )| line] >> bit) & 1;
+				if (!data)
+					color >>= 4;
 
-				if(!data){
-					color>>=4;
-				}
+				color &= 0x0f;
 
-				color&=0x0f;
-
-				if(offset&1){
-					dest[ offset>>1 ] |= color;
-				} else {
-					dest[ offset>>1 ] = color<<4;
-				}
+				if (offset&1)
+					dest[offset >> 1] |= color;
+				else
+					dest[offset >> 1] = color<<4;
 				++offset;
 			}
 		}
@@ -433,5 +426,5 @@ DRIVER_INIT_MEMBER(battlex_state,battlex)
  *
  *************************************/
 
-GAME( 1982, battlex,   0,   battlex,  battlex,  battlex_state,  battlex, ROT180, "Omori Electric Co., Ltd.", "Battle Cross", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1983, dodgeman,  0,   dodgeman, dodgeman, battlex_state,  battlex, ROT180, "Omori Electric Co., Ltd.", "Dodge Man",    MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1982, battlex,  0, battlex,  battlex,  battlex_state, init_battlex, ROT180, "Omori Electric Co., Ltd.", "Battle Cross", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1983, dodgeman, 0, dodgeman, dodgeman, battlex_state, init_battlex, ROT180, "Omori Electric Co., Ltd.", "Dodge Man",    MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )

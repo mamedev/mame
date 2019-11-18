@@ -17,9 +17,9 @@ public:
 	// construction/destruction
 	nes_oekakids_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_WRITE8_MEMBER(write_h) override;
-	virtual DECLARE_READ8_MEMBER(nt_r) override;
-	virtual DECLARE_WRITE8_MEMBER(nt_w) override;
+	virtual void write_h(offs_t offset, uint8_t data) override;
+	virtual uint8_t nt_r(offs_t offset) override;
+	virtual void nt_w(offs_t offset, uint8_t data) override;
 
 	virtual void pcb_reset() override;
 
@@ -46,8 +46,8 @@ public:
 	nes_fcg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	virtual DECLARE_WRITE8_MEMBER(fcg_write);
-	virtual DECLARE_WRITE8_MEMBER(write_m) override;
+	void fcg_write(offs_t offset, uint8_t data);
+	virtual void write_m(offs_t offset, uint8_t data) override;
 
 	virtual void pcb_reset() override;
 
@@ -75,7 +75,7 @@ public:
 	nes_lz93d50_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual DECLARE_WRITE8_MEMBER(write_h) override { fcg_write(space, offset, data, mem_mask); }
+	virtual void write_h(offs_t offset, uint8_t data) override { fcg_write(offset, data); }
 
 protected:
 	nes_lz93d50_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -90,8 +90,8 @@ public:
 	// construction/destruction
 	nes_lz93d50_24c01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ8_MEMBER(read_m) override;
-	virtual DECLARE_WRITE8_MEMBER(write_h) override;
+	virtual uint8_t read_m(offs_t offset) override;
+	virtual void write_h(offs_t offset, uint8_t data) override;
 
 	virtual void pcb_reset() override;
 
@@ -131,9 +131,9 @@ public:
 	// construction/destruction
 	nes_fjump2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ8_MEMBER(read_m) override;
-	virtual DECLARE_WRITE8_MEMBER(write_m) override;
-	virtual DECLARE_WRITE8_MEMBER(write_h) override;
+	virtual uint8_t read_m(offs_t offset) override;
+	virtual void write_m(offs_t offset, uint8_t data) override;
+	virtual void write_h(offs_t offset, uint8_t data) override;
 
 	virtual void pcb_reset() override;
 

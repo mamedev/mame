@@ -417,47 +417,45 @@ INTERRUPT_GEN_MEMBER(truco_state::interrupt)
 *              Machine Driver              *
 *******************************************/
 
-MACHINE_CONFIG_START(truco_state::truco)
-
+void truco_state::truco(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", truco_state,  interrupt)
+	M6809(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &truco_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(truco_state::interrupt));
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(1.6))    /* 1.6 seconds */
+	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_msec(1600));    /* 1.6 seconds */
 
-	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(IOPORT("P1"))
-	MCFG_PIA_READPB_HANDLER(IOPORT("JMPRS"))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(truco_state,porta_w))
-	MCFG_PIA_WRITEPB_HANDLER(WRITE8(truco_state,portb_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(truco_state,pia_ca2_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(truco_state,pia_irqa_w))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(truco_state,pia_irqb_w))
+	pia6821_device &pia(PIA6821(config, "pia0", 0));
+	pia.readpa_handler().set_ioport("P1");
+	pia.readpb_handler().set_ioport("JMPRS");
+	pia.writepa_handler().set(FUNC(truco_state::porta_w));
+	pia.writepb_handler().set(FUNC(truco_state::portb_w));
+	pia.ca2_handler().set(FUNC(truco_state::pia_ca2_w));
+	pia.irqa_handler().set(FUNC(truco_state::pia_irqa_w));
+	pia.irqb_handler().set(FUNC(truco_state::pia_irqb_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(256, 192)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 192-1)
-	MCFG_SCREEN_UPDATE_DRIVER(truco_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(256, 192);
+	screen.set_visarea(0, 256-1, 0, 192-1);
+	screen.set_screen_update(FUNC(truco_state::screen_update));
 
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_INIT_OWNER(truco_state, truco)
+	PALETTE(config, "palette", FUNC(truco_state::truco_palette), 16);
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK)    /* Identified as UM6845 */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(4)
+	mc6845_device &crtc(MC6845(config, "crtc", CRTC_CLOCK));    /* Identified as UM6845 */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(4);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
-MACHINE_CONFIG_END
+	SPEAKER(config, "speaker").front_center();
+	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.4);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+}
 
 
 /***************************************************************************
@@ -472,5 +470,5 @@ ROM_START( truco )
 	ROM_LOAD( "truco.u2",   0x0c000, 0x4000, CRC(ff355750) SHA1(1538f20b1919928ffca439e4046a104ddfbc756c) )
 ROM_END
 
-//    YEAR  NAME     PARENT  MACHINE  INPUT    STATE          INIT  ROT   COMPANY           FULLNAME      FLAGS
-GAME( 198?, truco,   0,      truco,   truco,   truco_state,   0,    ROT0, "Playtronic SRL", "Truco-Tron", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME     PARENT  MACHINE  INPUT    STATE        INIT         ROT   COMPANY           FULLNAME      FLAGS
+GAME( 198?, truco,   0,      truco,   truco,   truco_state, empty_init, ROT0, "Playtronic SRL", "Truco-Tron", MACHINE_SUPPORTS_SAVE )

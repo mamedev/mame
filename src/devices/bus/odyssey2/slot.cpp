@@ -26,7 +26,7 @@ DEFINE_DEVICE_TYPE(O2_CART_SLOT, o2_cart_slot_device, "o2_cart_slot", "Odyssey 2
 //-------------------------------------------------
 
 device_o2_cart_interface::device_o2_cart_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device)
+	: device_interface(device, "odyssey2cart")
 	, m_rom(nullptr)
 	, m_rom_size(0)
 {
@@ -75,8 +75,9 @@ void device_o2_cart_interface::ram_alloc(uint32_t size)
 o2_cart_slot_device::o2_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, O2_CART_SLOT, tag, owner, clock)
 	, device_image_interface(mconfig, *this)
-	, device_slot_interface(mconfig, *this)
-	, m_type(O2_STD), m_cart(nullptr)
+	, device_single_card_slot_interface<device_o2_cart_interface>(mconfig, *this)
+	, m_type(O2_STD)
+	, m_cart(nullptr)
 {
 }
 
@@ -95,7 +96,7 @@ o2_cart_slot_device::~o2_cart_slot_device()
 
 void o2_cart_slot_device::device_start()
 {
-	m_cart = dynamic_cast<device_o2_cart_interface *>(get_card_device());
+	m_cart = get_card_device();
 }
 
 
@@ -244,10 +245,11 @@ WRITE8_MEMBER(o2_cart_slot_device::io_write)
 #include "bus/odyssey2/chess.h"
 #include "bus/odyssey2/voice.h"
 
-SLOT_INTERFACE_START(o2_cart)
-	SLOT_INTERFACE_INTERNAL("o2_rom",    O2_ROM_STD)
-	SLOT_INTERFACE_INTERNAL("o2_rom12",  O2_ROM_12K)
-	SLOT_INTERFACE_INTERNAL("o2_rom16",  O2_ROM_16K)
-	SLOT_INTERFACE_INTERNAL("o2_chess",  O2_ROM_CHESS)
-	SLOT_INTERFACE_INTERNAL("o2_voice",  O2_ROM_VOICE)
-SLOT_INTERFACE_END
+void o2_cart(device_slot_interface &device)
+{
+	device.option_add_internal("o2_rom",    O2_ROM_STD);
+	device.option_add_internal("o2_rom12",  O2_ROM_12K);
+	device.option_add_internal("o2_rom16",  O2_ROM_16K);
+	device.option_add_internal("o2_chess",  O2_ROM_CHESS);
+	device.option_add_internal("o2_voice",  O2_ROM_VOICE);
+}

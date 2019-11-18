@@ -9,9 +9,12 @@
 #include "emu.h"
 #include "hp98603b.h"
 
-DEFINE_DEVICE_TYPE(HPDIO_98603B, dio16_98603b_device, "dio98603b", "HP98603 BASIC ROM card")
+DEFINE_DEVICE_TYPE_NS(HPDIO_98603B, bus::hp_dio, dio16_98603b_device, "dio98603b", "HP98603 BASIC ROM card")
 
 #define HP98603B_ROM_REGION    "98603b_rom"
+
+namespace bus {
+	namespace hp_dio {
 
 ROM_START(hp98603b)
 	ROM_REGION(0x100000, HP98603B_ROM_REGION, 0)
@@ -31,8 +34,9 @@ ROM_START(hp98603b)
 	ROM_LOAD16_BYTE("u14.bin", 0xa0001, 65536, CRC(96527d4e) SHA1(6706ab97eab4465ea4fa2d6b07e8107468e83818))
 ROM_END
 
-MACHINE_CONFIG_START(dio16_98603b_device::device_add_mconfig)
-MACHINE_CONFIG_END
+void dio16_98603b_device::device_add_mconfig(machine_config &config)
+{
+}
 
 const tiny_rom_entry *dio16_98603b_device::device_rom_region() const
 {
@@ -52,14 +56,14 @@ dio16_98603b_device::dio16_98603b_device(const machine_config &mconfig, device_t
 
 void dio16_98603b_device::device_start()
 {
-	set_dio_device();
 }
 
 void dio16_98603b_device::device_reset()
 {
 		m_rom = device().machine().root_device().memregion(this->subtag(HP98603B_ROM_REGION).c_str())->base();
-		m_dio->install_memory(0x100000, 0x1fffff, read16_delegate(FUNC(dio16_98603b_device::rom_r), this),
-					  write16_delegate(FUNC(dio16_98603b_device::rom_w), this));
+		dio().install_memory(0x100000, 0x1fffff,
+				read16_delegate(*this, FUNC(dio16_98603b_device::rom_r)),
+				write16_delegate(*this, FUNC(dio16_98603b_device::rom_w)));
 }
 
 READ16_MEMBER(dio16_98603b_device::rom_r)
@@ -70,3 +74,6 @@ READ16_MEMBER(dio16_98603b_device::rom_r)
 WRITE16_MEMBER(dio16_98603b_device::rom_w)
 {
 }
+
+} // namespace bus::hp_dio
+} // namespace bus

@@ -772,7 +772,7 @@ static void UpdateChangeCountCallback(
 	NSMenu *submenu;
 	NSString *const appName = [(NSDictionary *)CFBundleGetInfoDictionary(CFBundleGetMainBundle()) objectForKey:@"CFBundleName"];
 
-	NSMenu *const menu = [[NSMenu allocWithZone:[NSMenu zone]] initWithTitle:@"Application"];
+	NSMenu *const menu = [[NSMenu alloc] initWithTitle:@"Application"];
 	item = [parent addItemWithTitle:@"Application" action:NULL keyEquivalent:@""];
 	[parent setSubmenu:menu forItem:item];
 	[menu release];
@@ -784,7 +784,7 @@ static void UpdateChangeCountCallback(
 	[menu addItem:[NSMenuItem separatorItem]];
 
 	item = [menu addItemWithTitle:@"Services" action:NULL keyEquivalent:@""];
-	submenu = [[NSMenu allocWithZone:[NSMenu zone]] initWithTitle:@"Services"];
+	submenu = [[NSMenu alloc] initWithTitle:@"Services"];
 	[menu setSubmenu:submenu forItem:item];
 	[submenu release];
 	[NSApp setServicesMenu:submenu];

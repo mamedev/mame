@@ -18,9 +18,6 @@
 #include <utility>
 
 
-#define MCFG_DEVICE_DISASSEMBLE_OVERRIDE(_class, _func) \
-		dynamic_cast<device_disasm_interface *>(device)->set_dasm_override(dasm_override_delegate(&_class::_func, #_class "::" #_func, nullptr, (_class *)nullptr));
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -38,7 +35,7 @@ public:
 	virtual ~device_disasm_interface() = default;
 
 	// Override
-	template <typename Obj> void set_dasm_override(Obj &&cb) { m_dasm_override = std::forward<Obj>(cb); }
+	template <typename... T> void set_dasm_override(T &&... args) { m_dasm_override.set(std::forward<T>(args)...); }
 
 	// disassembler request
 	util::disasm_interface &get_disassembler();

@@ -14,11 +14,6 @@
 
 //#define SMARTMEDIA_IMAGE_SAVE
 
-#define MCFG_NAND_TYPE(type) \
-	downcast<nand_device &>(*device).set_nand_type((nand_device::chip::type));
-
-#define MCFG_NAND_RNB_CALLBACK(write) \
-	devcb = &downcast<nand_device &>(*device).set_rnb_wr_callback(DEVCB_##write);
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -41,7 +36,7 @@ public:
 	// construction/destruction
 	nand_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_rnb_wr_callback(Object &&cb) { return m_write_rnb.set_callback(std::forward<Object>(cb)); }
+	auto rnb_wr_callback() { return m_write_rnb.bind(); }
 
 	void set_nand_type(chip type)
 	{
@@ -206,21 +201,22 @@ public:
 	smartmedia_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// image-level overrides
-	virtual iodevice_t image_type() const override { return IO_MEMCARD; }
+	virtual iodevice_t image_type() const noexcept override { return IO_MEMCARD; }
 
-	virtual bool is_readable()  const override { return 1; }
-	virtual bool is_writeable() const override { return 1; }
-	virtual bool is_creatable() const override { return 0; }
-	virtual bool must_be_loaded() const override { return 0; }
-	virtual bool is_reset_on_load() const override { return 0; }
-	virtual const char *image_interface() const override { return "sm_memc"; }
-	virtual const char *file_extensions() const override { return "smc"; }
+	virtual bool is_readable()  const noexcept override { return true; }
+	virtual bool is_writeable() const noexcept override { return true; }
+	virtual bool is_creatable() const noexcept override { return false; }
+	virtual bool must_be_loaded() const noexcept override { return false; }
+	virtual bool is_reset_on_load() const noexcept override { return false; }
+	virtual const char *image_interface() const noexcept override { return "sm_memc"; }
+	virtual const char *file_extensions() const noexcept override { return "smc"; }
 
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
-	virtual const software_list_loader &get_software_list_loader() const override { return image_software_list_loader::instance(); }
 
 protected:
+	virtual const software_list_loader &get_software_list_loader() const override { return image_software_list_loader::instance(); }
+
 	image_init_result smartmedia_format_1();
 	image_init_result smartmedia_format_2();
 	int detect_geometry(uint8_t id1, uint8_t id2);

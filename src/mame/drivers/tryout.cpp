@@ -35,7 +35,7 @@ WRITE8_MEMBER(tryout_state::nmi_ack_w)
 
 WRITE8_MEMBER(tryout_state::sound_w)
 {
-	m_soundlatch->write(space, 0, data);
+	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
@@ -59,22 +59,22 @@ WRITE8_MEMBER(tryout_state::bankswitch_w)
 void tryout_state::main_cpu(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
-	map(0x1000, 0x17ff).ram().w(this, FUNC(tryout_state::videoram_w)).share("videoram");
+	map(0x1000, 0x17ff).ram().w(FUNC(tryout_state::videoram_w)).share("videoram");
 	map(0x2000, 0x3fff).bankr("bank1");
 	map(0x4000, 0xbfff).rom();
 	map(0xc800, 0xc87f).ram().share("spriteram");
 	map(0xcc00, 0xcc7f).ram().share("spriteram2");
-	map(0xd000, 0xd7ff).rw(this, FUNC(tryout_state::vram_r), FUNC(tryout_state::vram_w));
+	map(0xd000, 0xd7ff).rw(FUNC(tryout_state::vram_r), FUNC(tryout_state::vram_w));
 	map(0xe000, 0xe000).portr("DSW");
 	map(0xe001, 0xe001).portr("P1");
 	map(0xe002, 0xe002).portr("P2");
 	map(0xe003, 0xe003).portr("SYSTEM");
-	map(0xe301, 0xe301).w(this, FUNC(tryout_state::flipscreen_w));
-	map(0xe302, 0xe302).w(this, FUNC(tryout_state::bankswitch_w));
-	map(0xe401, 0xe401).w(this, FUNC(tryout_state::vram_bankswitch_w));
+	map(0xe301, 0xe301).w(FUNC(tryout_state::flipscreen_w));
+	map(0xe302, 0xe302).w(FUNC(tryout_state::bankswitch_w));
+	map(0xe401, 0xe401).w(FUNC(tryout_state::vram_bankswitch_w));
 	map(0xe402, 0xe404).writeonly().share("gfx_control");
-	map(0xe414, 0xe414).w(this, FUNC(tryout_state::sound_w));
-	map(0xe417, 0xe417).w(this, FUNC(tryout_state::nmi_ack_w));
+	map(0xe414, 0xe414).w(FUNC(tryout_state::sound_w));
+	map(0xe417, 0xe417).w(FUNC(tryout_state::nmi_ack_w));
 	map(0xfff0, 0xffff).rom().region("maincpu", 0xbff0); /* reset vectors */
 }
 
@@ -83,7 +83,7 @@ void tryout_state::sound_cpu(address_map &map)
 	map(0x0000, 0x07ff).ram();
 	map(0x4000, 0x4001).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0xd000, 0xd000).w(this, FUNC(tryout_state::sound_irq_ack_w));
+	map(0xd000, 0xd000).w(FUNC(tryout_state::sound_irq_ack_w));
 	map(0xc000, 0xffff).rom();
 }
 
@@ -185,42 +185,41 @@ static const gfx_layout spritelayout =
 	32*8
 };
 
-static GFXDECODE_START( tryout )
+static GFXDECODE_START( gfx_tryout )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 8 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0, 4 )
 	GFXDECODE_ENTRY( nullptr,   0, vramlayout,   0, 4 )
 GFXDECODE_END
 
-MACHINE_CONFIG_START(tryout_state::tryout)
+void tryout_state::tryout(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 2000000)     /* ? */
-	MCFG_CPU_PROGRAM_MAP(main_cpu)
+	M6502(config, m_maincpu, 2000000);     /* ? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &tryout_state::main_cpu);
 
-	MCFG_CPU_ADD("audiocpu", M6502, 1500000)    /* ? */
-	MCFG_CPU_PROGRAM_MAP(sound_cpu)
-	MCFG_CPU_PERIODIC_INT_DRIVER(tryout_state, nmi_line_pulse, 1000) /* controls BGM tempo, 1000 is an hand-tuned value to match a side-by-side video */
+	M6502(config, m_audiocpu, 1500000);    /* ? */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &tryout_state::sound_cpu);
+	m_audiocpu->set_periodic_int(FUNC(tryout_state::nmi_line_pulse), attotime::from_hz(1000)); /* controls BGM tempo, 1000 is an hand-tuned value to match a side-by-side video */
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tryout_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(256, 256);
+	screen.set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(tryout_state::screen_update));
+	screen.set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tryout)
-	MCFG_PALETTE_ADD("palette", 0x20)
-	MCFG_PALETTE_INIT_OWNER(tryout_state, tryout)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tryout);
+	PALETTE(config, m_palette, FUNC(tryout_state::tryout_palette), 0x20);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	YM2203(config, "ymsnd", 1500000).add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 ROM_START( tryout )
 	ROM_REGION( 0x14000, "maincpu", 0 )
@@ -249,4 +248,4 @@ ROM_START( tryout )
 	ROM_LOAD( "ch14.bpr",     0x00000, 0x0020, CRC(8ce19925) SHA1(12f8f6022f1148b6ba1d019a34247452637063a7) )
 ROM_END
 
-GAME( 1985, tryout, 0, tryout, tryout, tryout_state, 0, ROT90, "Data East Corporation", "Pro Baseball Skill Tryout (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tryout, 0, tryout, tryout, tryout_state, empty_init, ROT90, "Data East Corporation", "Pro Baseball Skill Tryout (Japan)", MACHINE_SUPPORTS_SAVE )

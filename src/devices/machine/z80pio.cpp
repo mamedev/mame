@@ -186,7 +186,7 @@ void z80pio_device::z80daisy_irq_reti()
 //  read - register read
 //-------------------------------------------------
 
-READ8_MEMBER( z80pio_device::read )
+u8 z80pio_device::read(offs_t offset)
 {
 	int index = BIT(offset, 0);
 	return BIT(offset, 1) ? control_read() : data_read(index);
@@ -196,7 +196,7 @@ READ8_MEMBER( z80pio_device::read )
 //  write - register write
 //-------------------------------------------------
 
-WRITE8_MEMBER( z80pio_device::write )
+void z80pio_device::write(offs_t offset, u8 data)
 {
 	int index = BIT(offset, 0);
 	BIT(offset, 1) ? control_write(index, data) : data_write(index, data);
@@ -206,7 +206,7 @@ WRITE8_MEMBER( z80pio_device::write )
 //  read_alt - register read
 //-------------------------------------------------
 
-READ8_MEMBER( z80pio_device::read_alt )
+u8 z80pio_device::read_alt(offs_t offset)
 {
 	int index = BIT(offset, 1);
 	return BIT(offset, 0) ? control_read() : data_read(index);
@@ -216,7 +216,7 @@ READ8_MEMBER( z80pio_device::read_alt )
 //  write_alt - register write
 //-------------------------------------------------
 
-WRITE8_MEMBER( z80pio_device::write_alt )
+void z80pio_device::write_alt(offs_t offset, u8 data)
 {
 	int index = BIT(offset, 1);
 	BIT(offset, 0) ? control_write(index, data) : data_write(index, data);

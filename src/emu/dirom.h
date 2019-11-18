@@ -17,9 +17,6 @@
 #ifndef MAME_EMU_DIROM_H
 #define MAME_EMU_DIROM_H
 
-#define MCFG_DEVICE_ROM(_rom_tag) \
-	dynamic_cast<device_rom_interface &>(*device).set_device_rom_tag(_rom_tag);
-
 class device_rom_interface : public device_memory_interface
 {
 public:
@@ -28,10 +25,10 @@ public:
 
 	void set_device_rom_tag(const char *tag) { m_rom_tag = tag; }
 
-	inline u8 read_byte(offs_t byteaddress) { return m_rom_direct->read_byte(byteaddress); }
-	inline u16 read_word(offs_t byteaddress) { return m_rom_direct->read_word(byteaddress); }
-	inline u32 read_dword(offs_t byteaddress) { return m_rom_direct->read_dword(byteaddress); }
-	inline u64 read_qword(offs_t byteaddress) { return m_rom_direct->read_qword(byteaddress); }
+	inline u8 read_byte(offs_t byteaddress) { return m_r8(byteaddress); }
+	inline u16 read_word(offs_t byteaddress) { return m_r16(byteaddress); }
+	inline u32 read_dword(offs_t byteaddress) { return m_r32(byteaddress); }
+	inline u64 read_qword(offs_t byteaddress) { return m_r64(byteaddress); }
 
 	void set_rom(const void *base, u32 size);
 	void set_rom_bank(int bank);
@@ -47,7 +44,10 @@ protected:
 private:
 	const char *m_rom_tag;
 	address_space_config m_rom_config;
-	direct_read_data<0> *m_rom_direct;
+	std::function<u8 (offs_t)> m_r8;
+	std::function<u16 (offs_t)> m_r16;
+	std::function<u32 (offs_t)> m_r32;
+	std::function<u64 (offs_t)> m_r64;
 
 	memory_bank *m_bank;
 	int m_cur_bank, m_bank_count;

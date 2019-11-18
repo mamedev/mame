@@ -5,9 +5,6 @@
 #include "emu.h"
 #include "includes/namconb1.h"
 
-#include "machine/namcoic.h"
-
-
 /* nth_word32 is a general-purpose utility function, which allows us to
  * read from 32-bit aligned memory as if it were an array of 16 bit words.
  */
@@ -47,29 +44,44 @@ void namconb1_state::NB1TilemapCB(uint16_t code, int *tile, int *mask)
 	*mask = code;
 } /* NB1TilemapCB */
 
-void namconb1_state::NB2TilemapCB(uint16_t code, int *tile, int *mask )
+void namconb1_state::NB2TilemapCB_machbrkr(uint16_t code, int *tile, int *mask )
 {
-	int mangle;
+	/*  00010203 04050607 00010203 04050607 (normal) */
+	/*  00010718 191a1b07 00010708 090a0b07 (alt bank) */
+	int bank = nth_byte32( m_tilebank32, (code>>13)+8 );
+	int mangle = (code&0x1fff) | (bank<<13);
+	*tile = mangle;
+	*mask = mangle;
 
-	if( m_gametype == NAMCONB2_MACH_BREAKERS )
-	{
-		/*  00010203 04050607 00010203 04050607 (normal) */
-		/*  00010718 191a1b07 00010708 090a0b07 (alt bank) */
-		int bank = nth_byte32( m_tilebank32, (code>>13)+8 );
-		mangle = (code&0x1fff) + bank*0x2000;
-		*tile = mangle;
-		*mask = mangle;
-	}
-	else
-	{
-		/* the pixmap index is mangled, the transparency bitmask index is not */
-		mangle = code&~(0x140);
-		if( code&0x100 ) mangle |= 0x040;
-		if( code&0x040 ) mangle |= 0x100;
-		*tile = mangle;
-		*mask = code;
-	}
-} /* NB2TilemapCB */
+} /* NB2TilemapCB_machbrkr */
+
+void namconb1_state::NB2TilemapCB_outfxies(uint16_t code, int *tile, int *mask )
+{
+	/* the pixmap index is mangled, the transparency bitmask index is not */
+	*tile = bitswap<16>(code, 15, 14, 13, 12, 11, 10, 9, 6, 7, 8, 5, 4, 3, 2, 1, 0);
+	*mask = code;
+
+} /* NB2TilemapCB_outfxies */
+
+void namconb1_state::NB2RozCB_machbrkr(uint16_t code, int *tile, int *mask, int which )
+{
+	int bank = nth_byte32(&m_rozbank32[which * 8 / 4], (code >> 11) & 0x7);
+	int mangle = (code & 0x7ff) | (bank << 11);
+	*tile = mangle;
+	*mask = mangle;
+
+} /* NB2RozCB_machbrkr */
+
+void namconb1_state::NB2RozCB_outfxies(uint16_t code, int *tile, int *mask, int which )
+{
+	/* the pixmap index is mangled, the transparency bitmask index is not */
+	int bank = nth_byte32(&m_rozbank32[which * 8 / 4], (code >> 11) & 0x7);
+	int mangle = (code & 0x7ff) | (bank << 11);
+	*mask = mangle;
+	mangle = bitswap<19>(mangle & 0x7ffff, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 4, 5, 6, 3, 2, 1, 0);
+	*tile = mangle;
+
+} /* NB2RozCB_outfxies */
 
 void namconb1_state::video_update_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int bROZ )
 {
@@ -79,20 +91,20 @@ void namconb1_state::video_update_common(screen_device &screen, bitmap_ind16 &bi
 	{
 		for( pri=0; pri<16; pri++ )
 		{
-			c169_roz_draw(screen, bitmap, cliprect, pri);
-			if( (pri&1)==0 )
+			m_c169roz->draw(screen, bitmap, cliprect, pri);
+			if ((pri & 1) == 0)
 			{
-				c123_tilemap_draw( screen, bitmap, cliprect, pri/2 );
+				m_c123tmap->draw( screen, bitmap, cliprect, pri/2 );
 			}
-			c355_obj_draw(screen, bitmap, cliprect, pri );
+			m_c355spr->draw(screen, bitmap, cliprect, pri );
 		}
 	}
 	else
 	{
 		for( pri=0; pri<8; pri++ )
 		{
-			c123_tilemap_draw( screen, bitmap, cliprect, pri );
-			c355_obj_draw(screen, bitmap, cliprect, pri );
+			m_c123tmap->draw( screen, bitmap, cliprect, pri );
+			m_c355spr->draw(screen, bitmap, cliprect, pri );
 		}
 	}
 } /* video_update_common */
@@ -111,7 +123,7 @@ uint32_t namconb1_state::screen_update_namconb1(screen_device &screen, bitmap_in
 	/* intersect with master clip rectangle */
 	clip &= cliprect;
 
-	bitmap.fill(m_palette->black_pen(), cliprect );
+	bitmap.fill(m_c116->black_pen(), cliprect );
 
 	video_update_common( screen, bitmap, clip, 0 );
 
@@ -121,18 +133,23 @@ uint32_t namconb1_state::screen_update_namconb1(screen_device &screen, bitmap_in
 int namconb1_state::NB1objcode2tile( int code )
 {
 	int bank = nth_word32( m_spritebank32, code>>11 );
-	return (code&0x7ff) + bank*0x800;
+	return (code&0x7ff) | (bank<<11);
 }
 
 VIDEO_START_MEMBER(namconb1_state,namconb1)
 {
-	c123_tilemap_init(NAMCONB1_TILEGFX, memregion(NAMCONB1_TILEMASKREGION)->base(), namcos2_shared_state::c123_tilemap_delegate(&namconb1_state::NB1TilemapCB, this));
-	c355_obj_init(NAMCONB1_SPRITEGFX,0x0,namcos2_shared_state::c355_obj_code2tile_delegate(&namconb1_state::NB1objcode2tile, this));
-
 	save_item(NAME(m_tilemap_tile_bank));
 } /* namconb1 */
 
 /****************************************************************************************************/
+
+WRITE32_MEMBER(namconb1_state::rozbank32_w)
+{
+	uint32_t old_data = m_rozbank32[offset];
+	COMBINE_DATA(&m_rozbank32[offset]);
+	if (m_rozbank32[offset] != old_data)
+		m_c169roz->mark_all_dirty();
+}
 
 uint32_t namconb1_state::screen_update_namconb2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -146,47 +163,41 @@ uint32_t namconb1_state::screen_update_namconb2(screen_device &screen, bitmap_in
 	/* intersect with master clip rectangle */
 	clip &= cliprect;
 
-	bitmap.fill(m_palette->black_pen(), cliprect );
+	bitmap.fill(m_c116->black_pen(), cliprect );
 
 	if( memcmp(m_tilemap_tile_bank,m_tilebank32,sizeof(m_tilemap_tile_bank))!=0 )
 	{
-		c123_tilemap_invalidate();
+		m_c123tmap->mark_all_dirty();
 		memcpy(m_tilemap_tile_bank,m_tilebank32,sizeof(m_tilemap_tile_bank));
 	}
 	video_update_common( screen, bitmap, clip, 1 );
 	return 0;
 }
 
-int namconb1_state::NB2objcode2tile( int code )
+int namconb1_state::NB2objcode2tile_machbrkr( int code )
 {
 	int bank = nth_byte32( m_spritebank32, (code>>11)&0xf );
 	code &= 0x7ff;
-	if( m_gametype == NAMCONB2_MACH_BREAKERS )
-	{
-		if( bank&0x01 ) code |= 0x01*0x800;
-		if( bank&0x02 ) code |= 0x02*0x800;
-		if( bank&0x04 ) code |= 0x04*0x800;
-		if( bank&0x08 ) code |= 0x08*0x800;
-		if( bank&0x10 ) code |= 0x10*0x800;
-		if( bank&0x40 ) code |= 0x20*0x800;
-	}
-	else
-	{
-		if( bank&0x01 ) code |= 0x01*0x800;
-		if( bank&0x02 ) code |= 0x04*0x800;
-		if( bank&0x04 ) code |= 0x02*0x800;
-		if( bank&0x08 ) code |= 0x08*0x800;
-		if( bank&0x10 ) code |= 0x10*0x800;
-		if( bank&0x40 ) code |= 0x20*0x800;
-	}
+	code |= bitswap<6>(bank & 0x5f, 6, 4, 3, 2, 1, 0) << 11;
 	return code;
-} /* NB2objcode2tile */
+} /* NB2objcode2tile_machbrkr */
 
-VIDEO_START_MEMBER(namconb1_state,namconb2)
+int namconb1_state::NB2objcode2tile_outfxies( int code )
 {
-	c123_tilemap_init(NAMCONB1_TILEGFX, memregion(NAMCONB1_TILEMASKREGION)->base(), namcos2_shared_state::c123_tilemap_delegate(&namconb1_state::NB2TilemapCB, this));
-	c355_obj_init(NAMCONB1_SPRITEGFX,0x0,namcos2_shared_state::c355_obj_code2tile_delegate(&namconb1_state::NB2objcode2tile, this));
-	c169_roz_init(NAMCONB1_ROTGFX,NAMCONB1_ROTMASKREGION);
+	int bank = nth_byte32( m_spritebank32, (code>>11)&0xf );
+	code &= 0x7ff;
+	code |= bitswap<6>(bank & 0x5f, 6, 4, 3, 1, 2, 0) << 11;
+	return code;
+} /* NB2objcode2tile_outfxies */
 
+VIDEO_START_MEMBER(namconb1_state,machbrkr)
+{
 	save_item(NAME(m_tilemap_tile_bank));
-} /* namconb2_vh_start */
+} /* machbrkr */
+
+VIDEO_START_MEMBER(namconb1_state,outfxies)
+{
+	save_item(NAME(m_tilemap_tile_bank));
+} /* outfxies */
+
+

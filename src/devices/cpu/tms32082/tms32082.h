@@ -71,8 +71,7 @@ public:
 	DECLARE_READ32_MEMBER(mp_param_r);
 	DECLARE_WRITE32_MEMBER(mp_param_w);
 
-	void set_command_callback(write32_delegate callback);
-
+	template <typename... T> void set_command_callback(T &&... args) { m_cmd_callback.set(std::forward<T>(args)...); }
 
 	void mp_internal_map(address_map &map);
 protected:
@@ -81,9 +80,9 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override { return 1; }
-	virtual uint32_t execute_max_cycles() const override { return 1; }
-	virtual uint32_t execute_input_lines() const override { return 0; }
+	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 1; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 0; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -131,7 +130,7 @@ protected:
 	int m_icount;
 
 	address_space *m_program;
-	direct_read_data<0> * m_direct;
+	memory_access_cache<2, 0, ENDIANNESS_BIG> * m_cache;
 
 	write32_delegate m_cmd_callback;
 
@@ -169,9 +168,9 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override { return 1; }
-	virtual uint32_t execute_max_cycles() const override { return 1; }
-	virtual uint32_t execute_input_lines() const override { return 0; }
+	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 1; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 0; }
 	virtual void execute_run() override;
 
 	// device_memory_interface overrides
@@ -191,7 +190,7 @@ protected:
 	int m_icount;
 
 	address_space *m_program;
-	direct_read_data<0> * m_direct;
+	memory_access_cache<2, 0, ENDIANNESS_BIG> * m_cache;
 };
 
 

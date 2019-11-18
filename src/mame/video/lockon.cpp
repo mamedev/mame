@@ -67,7 +67,7 @@ WRITE16_MEMBER(lockon_state::lockon_crtc_w)
 TIMER_CALLBACK_MEMBER(lockon_state::cursor_callback)
 {
 	if (m_main_inten)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // V30
 
 	m_cursor_timer->adjust(m_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS));
 }
@@ -98,16 +98,15 @@ static const res_net_info lockon_pd_net_info =
 	}
 };
 
-PALETTE_INIT_MEMBER(lockon_state, lockon)
+void lockon_state::lockon_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
+	uint8_t const *const color_prom = memregion("proms")->base();
 
-	for (i = 0; i < 1024; ++i)
+	for (int i = 0; i < 1024; ++i)
 	{
 		uint8_t r, g, b;
-		uint8_t p1 = color_prom[i];
-		uint8_t p2 = color_prom[i + 0x400];
+		uint8_t const p1 = color_prom[i];
+		uint8_t const p2 = color_prom[i + 0x400];
 
 		if (p2 & 0x80)
 		{
@@ -282,7 +281,7 @@ WRITE16_MEMBER(lockon_state::lockon_ground_ctrl_w)
 
 TIMER_CALLBACK_MEMBER(lockon_state::bufend_callback)
 {
-	m_ground->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+	m_ground->set_input_line_and_vector(0, HOLD_LINE, 0xff); // V30
 	m_object->set_input_line(NEC_INPUT_LINE_POLL, ASSERT_LINE);
 }
 
@@ -887,7 +886,7 @@ void lockon_state::hud_draw( bitmap_ind16 &bitmap, const rectangle &cliprect )
 
 void lockon_state::video_start()
 {
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(lockon_state::get_lockon_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(lockon_state::get_lockon_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_tilemap->set_transparent_pen(0);
 
 	/* Allocate the two frame buffers for rotation */
@@ -906,7 +905,7 @@ void lockon_state::video_start()
 
 	save_item(NAME(*m_back_buffer));
 	save_item(NAME(*m_front_buffer));
-	save_pointer(NAME(m_obj_pal_ram.get()), 2048);
+	save_pointer(NAME(m_obj_pal_ram), 2048);
 }
 
 uint32_t lockon_state::screen_update_lockon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

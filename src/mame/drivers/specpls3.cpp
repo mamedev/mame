@@ -147,8 +147,6 @@ http://www.z88forever.org.uk/zxplus3e/
 *******************************************************************************/
 
 #include "emu.h"
-#include "includes/spectrum.h"
-#include "includes/spec128.h"
 #include "includes/specpls3.h"
 
 #include "sound/ay8910.h"
@@ -157,6 +155,9 @@ http://www.z88forever.org.uk/zxplus3e/
 #include "softlist.h"
 
 #include "formats/tzx_cas.h"
+
+#define VERBOSE 0
+#include "logmacro.h"
 
 /****************************************************************************************************/
 /* Spectrum + 3 specific functions */
@@ -172,100 +173,125 @@ static const int spectrum_plus3_memory_selections[]=
 		4,7,6,3
 };
 
-WRITE8_MEMBER( spectrum_state::spectrum_plus3_port_3ffd_w )
+void specpls3_state::port_3ffd_w(uint8_t data)
 {
-	if (m_floppy==1)
-		m_upd765->fifo_w(space, 0, data, 0xff);
+	if (m_upd765.found())
+		m_upd765->fifo_w(data);
 }
 
-READ8_MEMBER( spectrum_state::spectrum_plus3_port_3ffd_r )
+uint8_t specpls3_state::port_3ffd_r()
 {
-	if (m_floppy==0)
-		return 0xff;
+	if (m_upd765.found())
+		return m_upd765->fifo_r();
 	else
-		return m_upd765->fifo_r(space, 0, 0xff);
-}
-
-
-READ8_MEMBER( spectrum_state::spectrum_plus3_port_2ffd_r )
-{
-	if (m_floppy==0)
 		return 0xff;
-	else
-		return m_upd765->msr_r(space, 0, 0xff);
 }
 
 
-void spectrum_state::spectrum_plus3_update_memory()
+uint8_t specpls3_state::port_2ffd_r()
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	uint8_t *messram = m_ram->pointer();
+	if (m_upd765.found())
+		return m_upd765->msr_r();
+	else
+		return 0xff;
+}
 
+
+void specpls3_state::plus3_update_memory()
+{
 	if (m_port_7ffd_data & 8)
 	{
-		logerror("+3 SCREEN 1: BLOCK 7\n");
-		m_screen_location = messram + (7 << 14);
+		LOG("+3 SCREEN 1: BLOCK 7\n");
+		m_screen_location = m_ram->pointer() + (7 << 14);
 	}
 	else
 	{
-		logerror("+3 SCREEN 0: BLOCK 5\n");
-		m_screen_location = messram + (5 << 14);
+		LOG("+3 SCREEN 0: BLOCK 5\n");
+		m_screen_location = m_ram->pointer() + (5 << 14);
 	}
 
 	if ((m_port_1ffd_data & 0x01) == 0)
 	{
 		/* select ram at 0x0c000-0x0ffff */
 		int ram_page = m_port_7ffd_data & 0x07;
-		unsigned char *ram_data = messram + (ram_page<<14);
+		unsigned char *ram_data = m_ram->pointer() + (ram_page<<14);
 		membank("bank4")->set_base(ram_data);
 
-		logerror("RAM at 0xc000: %02x\n", ram_page);
+		LOG("RAM at 0xc000: %02x\n", ram_page);
 
 		/* Reset memory between 0x4000 - 0xbfff in case extended paging was being used */
 		/* Bank 5 in 0x4000 - 0x7fff */
-		membank("bank2")->set_base(messram + (5 << 14));
+		membank("bank2")->set_base(m_ram->pointer() + (5 << 14));
 
 		/* Bank 2 in 0x8000 - 0xbfff */
-		membank("bank3")->set_base(messram + (2 << 14));
-
-		/* ROM switching */
-		int ROMSelection = BIT(m_port_7ffd_data, 4) | ((m_port_1ffd_data >> 1) & 0x02);
-
-		/* rom 0 is editor, rom 1 is syntax, rom 2 is DOS, rom 3 is 48 BASIC */
-		unsigned char *ChosenROM = memregion("maincpu")->base() + 0x010000 + (ROMSelection << 14);
-
-		membank("bank1")->set_base(ChosenROM);
-		space.unmap_write(0x0000, 0x3fff);
-
-		logerror("rom switch: %02x\n", ROMSelection);
+		membank("bank3")->set_base(m_ram->pointer() + (2 << 14));
 	}
 	else
 	{
 		/* Extended memory paging */
 		int MemorySelection = (m_port_1ffd_data >> 1) & 0x03;
 		const int *memory_selection = &spectrum_plus3_memory_selections[(MemorySelection << 2)];
-		unsigned char *ram_data = messram + (memory_selection[0] << 14);
+		unsigned char *ram_data = m_ram->pointer() + (memory_selection[0] << 14);
 
-		membank("bank1")->set_base(ram_data);
-		/* allow writes to 0x0000-0x03fff */
-		space.install_write_bank(0x0000, 0x3fff, "bank1");
-
-		ram_data = messram + (memory_selection[1] << 14);
+		ram_data = m_ram->pointer() + (memory_selection[1] << 14);
 		membank("bank2")->set_base(ram_data);
 
-		ram_data = messram + (memory_selection[2] << 14);
+		ram_data = m_ram->pointer() + (memory_selection[2] << 14);
 		membank("bank3")->set_base(ram_data);
 
-		ram_data = messram + (memory_selection[3] << 14);
+		ram_data = m_ram->pointer() + (memory_selection[3] << 14);
 		membank("bank4")->set_base(ram_data);
 
-		logerror("extended memory paging: %02x\n", MemorySelection);
+		LOG("extended memory paging: %02x\n", MemorySelection);
 	}
 }
 
 
+void specpls3_state::bank1_w(offs_t offset, uint8_t data)
+{
+	if (m_exp->romcs())
+	{
+		m_exp->mreq_w(offset, data);
+	}
+	else if ((m_port_1ffd_data & 0x01) != 0)
+	{
+		/* Extended memory paging */
+		int MemorySelection = (m_port_1ffd_data >> 1) & 0x03;
+		const int *memory_selection = &spectrum_plus3_memory_selections[(MemorySelection << 2)];
+		m_ram->pointer()[(memory_selection[0] << 14) + offset] = data;
+	}
+}
 
-WRITE8_MEMBER( spectrum_state::spectrum_plus3_port_7ffd_w )
+uint8_t specpls3_state::bank1_r(offs_t offset)
+{
+	uint8_t data;
+
+	if (m_exp->romcs())
+	{
+		data = m_exp->mreq_r(offset);
+	}
+	else
+	{
+		if ((m_port_1ffd_data & 0x01) == 0)
+		{
+			/* ROM switching */
+			int ROMSelection = BIT(m_port_7ffd_data, 4) | ((m_port_1ffd_data >> 1) & 0x02);
+
+			/* rom 0 is editor, rom 1 is syntax, rom 2 is DOS, rom 3 is 48 BASIC */
+			data = memregion("maincpu")->base()[0x010000 + (ROMSelection << 14) + offset];
+		}
+		else
+		{
+			/* Extended memory paging */
+			int MemorySelection = (m_port_1ffd_data >> 1) & 0x03;
+			const int *memory_selection = &spectrum_plus3_memory_selections[(MemorySelection << 2)];
+			data = m_ram->pointer()[(memory_selection[0] << 14) + offset];
+		}
+	}
+	return data;
+}
+
+void specpls3_state::port_7ffd_w(uint8_t data)
 {
 		/* D0-D2: RAM page located at 0x0c000-0x0ffff */
 		/* D3 - Screen select (screen 0 in ram page 5, screen 1 in ram page 7 */
@@ -280,18 +306,22 @@ WRITE8_MEMBER( spectrum_state::spectrum_plus3_port_7ffd_w )
 	m_port_7ffd_data = data;
 
 	/* update memory */
-	spectrum_plus3_update_memory();
+	plus3_update_memory();
 }
 
-WRITE8_MEMBER( spectrum_state::spectrum_plus3_port_1ffd_w )
+void specpls3_state::port_1ffd_w(uint8_t data)
 {
 	/* D0-D1: ROM/RAM paging */
 	/* D2: Affects if d0-d1 work on ram/rom */
 	/* D3 - Disk motor on/off */
 	/* D4 - parallel port strobe */
 
-	m_upd765_0->get_device()->mon_w(!BIT(data, 3));
-	m_upd765_1->get_device()->mon_w(!BIT(data, 3));
+	if (m_upd765.found())
+	{
+		for (auto &flop : m_flop)
+			if (flop->get_device())
+				flop->get_device()->mon_w(!BIT(data, 3));
+	}
 
 	m_port_1ffd_data = data;
 
@@ -299,33 +329,33 @@ WRITE8_MEMBER( spectrum_state::spectrum_plus3_port_1ffd_w )
 	if ((m_port_7ffd_data & 0x20)==0)
 	{
 		/* no */
-		spectrum_plus3_update_memory();
+		plus3_update_memory();
 	}
 }
 
 /* ports are not decoded full.
 The function decodes the ports appropriately */
-void spectrum_state::spectrum_plus3_io(address_map &map)
+void specpls3_state::plus3_io(address_map &map)
 {
-	map.unmap_value_high();
-	map(0x0000, 0x0000).rw(this, FUNC(spectrum_state::spectrum_port_fe_r), FUNC(spectrum_state::spectrum_port_fe_w)).select(0xfffe);
-	map(0x4000, 0x4000).w(this, FUNC(spectrum_state::spectrum_plus3_port_7ffd_w)).mirror(0x3ffd);
+	map(0x0000, 0xffff).rw(m_exp, FUNC(spectrum_expansion_slot_device::iorq_r), FUNC(spectrum_expansion_slot_device::iorq_w));
+	map(0x0000, 0x0000).rw(FUNC(specpls3_state::spectrum_port_fe_r), FUNC(specpls3_state::spectrum_port_fe_w)).select(0xfffe);
+	map(0x4000, 0x4000).w(FUNC(specpls3_state::port_7ffd_w)).mirror(0x3ffd);
 	map(0x8000, 0x8000).w("ay8912", FUNC(ay8910_device::data_w)).mirror(0x3ffd);
 	map(0xc000, 0xc000).rw("ay8912", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w)).mirror(0x3ffd);
-	map(0x1000, 0x1000).w(this, FUNC(spectrum_state::spectrum_plus3_port_1ffd_w)).mirror(0x0ffd);
-	map(0x2000, 0x2000).r(this, FUNC(spectrum_state::spectrum_plus3_port_2ffd_r)).mirror(0x0ffd);
-	map(0x3000, 0x3000).rw(this, FUNC(spectrum_state::spectrum_plus3_port_3ffd_r), FUNC(spectrum_state::spectrum_plus3_port_3ffd_w)).mirror(0x0ffd);
+	map(0x1000, 0x1000).w(FUNC(specpls3_state::port_1ffd_w)).mirror(0x0ffd);
+	map(0x2000, 0x2000).r(FUNC(specpls3_state::port_2ffd_r)).mirror(0x0ffd);
+	map(0x3000, 0x3000).rw(FUNC(specpls3_state::port_3ffd_r), FUNC(specpls3_state::port_3ffd_w)).mirror(0x0ffd);
 }
 
-void spectrum_state::spectrum_plus3_mem(address_map &map)
+void specpls3_state::plus3_mem(address_map &map)
 {
-	map(0x0000, 0x3fff).bankr("bank1");
+	map(0x0000, 0x3fff).rw(FUNC(specpls3_state::bank1_r), FUNC(specpls3_state::bank1_w)); //.bankr("bank1");
 	map(0x4000, 0x7fff).bankrw("bank2");
 	map(0x8000, 0xbfff).bankrw("bank3");
 	map(0xc000, 0xffff).bankrw("bank4");
 }
 
-MACHINE_RESET_MEMBER(spectrum_state,spectrum_plus3)
+MACHINE_RESET_MEMBER(specpls3_state,spectrum_plus3)
 {
 	uint8_t *messram = m_ram->pointer();
 	memset(messram,0,128*1024);
@@ -335,22 +365,22 @@ MACHINE_RESET_MEMBER(spectrum_state,spectrum_plus3)
 	/* Initial configuration */
 	m_port_7ffd_data = 0;
 	m_port_1ffd_data = 0;
-	spectrum_plus3_update_memory();
+	plus3_update_memory();
 }
 
-DRIVER_INIT_MEMBER(spectrum_state,plus3)
+void specpls3_state::plus3_us_w(uint8_t data)
 {
-	m_floppy = 1;
+	// US1 is not connected, so US0 alone selects either drive
+	floppy_image_device *flop = m_flop[data & 1]->get_device();
+	m_upd765->set_floppy(flop);
+	if (flop)
+		flop->ds_w(data & 1);
 }
 
-DRIVER_INIT_MEMBER(spectrum_state,plus2)
+static void specpls3_floppies(device_slot_interface &device)
 {
-	m_floppy = 0;
+	device.option_add("3ssdd", FLOPPY_3_SSDD);
 }
-
-static SLOT_INTERFACE_START( specpls3_floppies )
-	SLOT_INTERFACE( "3ssdd", FLOPPY_3_SSDD )
-SLOT_INTERFACE_END
 
 /* F4 Character Displayer */
 static const gfx_layout spectrum_charlayout =
@@ -371,26 +401,35 @@ static GFXDECODE_START( specpls3 )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(spectrum_state::spectrum_plus3)
+void specpls3_state::spectrum_plus2(machine_config &config)
+{
 	spectrum_128(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(spectrum_plus3_mem)
-	MCFG_CPU_IO_MAP(spectrum_plus3_io)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(50.01)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", specpls3)
 
-	MCFG_MACHINE_RESET_OVERRIDE(spectrum_state, spectrum_plus3 )
+	m_maincpu->set_addrmap(AS_PROGRAM, &specpls3_state::plus3_mem);
+	m_maincpu->set_addrmap(AS_IO, &specpls3_state::plus3_io);
 
-	MCFG_UPD765A_ADD("upd765", true, true)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", specpls3_floppies, "3ssdd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", specpls3_floppies, "3ssdd", floppy_image_device::default_floppy_formats)
+	m_screen->set_refresh_hz(50.01);
 
-	MCFG_DEVICE_MODIFY("exp")
-	MCFG_DEVICE_SLOT_INTERFACE(specpls3_expansion_devices, nullptr, false)
+	subdevice<gfxdecode_device>("gfxdecode")->set_info(specpls3);
 
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "specpls3_flop")
-MACHINE_CONFIG_END
+	MCFG_MACHINE_RESET_OVERRIDE(specpls3_state, spectrum_plus3 )
+
+	SPECTRUM_EXPANSION_SLOT(config.replace(), m_exp, specpls3_expansion_devices, nullptr);
+	m_exp->irq_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_exp->nmi_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
+}
+
+void specpls3_state::spectrum_plus3(machine_config &config)
+{
+	spectrum_plus2(config);
+
+	UPD765A(config, m_upd765, 16_MHz_XTAL / 4, true, false); // clocked through SED9420
+	m_upd765->us_wr_callback().set(FUNC(specpls3_state::plus3_us_w));
+	FLOPPY_CONNECTOR(config, "upd765:0", specpls3_floppies, "3ssdd", floppy_image_device::default_floppy_formats); // internal drive
+	FLOPPY_CONNECTOR(config, "upd765:1", specpls3_floppies, "3ssdd", floppy_image_device::default_floppy_formats); // external drive
+
+	SOFTWARE_LIST(config, "flop_list").set_original("specpls3_flop");
+}
 
 /***************************************************************************
 
@@ -409,63 +448,63 @@ ROM_END
 ROM_START(specpls3)
 	ROM_REGION(0x20000,"maincpu",0)
 	ROM_SYSTEM_BIOS( 0, "en", "English v4.0" )
-	ROMX_LOAD("pl3-0.rom",0x10000,0x4000, CRC(17373da2) SHA1(e319ed08b4d53a5e421a75ea00ea02039ba6555b), ROM_BIOS(1))
-	ROMX_LOAD("pl3-1.rom",0x14000,0x4000, CRC(f1d1d99e) SHA1(c9969fc36095a59787554026a9adc3b87678c794), ROM_BIOS(1))
-	ROMX_LOAD("pl3-2.rom",0x18000,0x4000, CRC(3dbf351d) SHA1(22e50c6ba4157a3f6a821bd9937cd26e292775c6), ROM_BIOS(1))
-	ROMX_LOAD("pl3-3.rom",0x1c000,0x4000, CRC(04448eaa) SHA1(65f031caa8148a5493afe42c41f4929deab26b4e), ROM_BIOS(1))
+	ROMX_LOAD("pl3-0.rom",0x10000,0x4000, CRC(17373da2) SHA1(e319ed08b4d53a5e421a75ea00ea02039ba6555b), ROM_BIOS(0))
+	ROMX_LOAD("pl3-1.rom",0x14000,0x4000, CRC(f1d1d99e) SHA1(c9969fc36095a59787554026a9adc3b87678c794), ROM_BIOS(0))
+	ROMX_LOAD("pl3-2.rom",0x18000,0x4000, CRC(3dbf351d) SHA1(22e50c6ba4157a3f6a821bd9937cd26e292775c6), ROM_BIOS(0))
+	ROMX_LOAD("pl3-3.rom",0x1c000,0x4000, CRC(04448eaa) SHA1(65f031caa8148a5493afe42c41f4929deab26b4e), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "sp", "Spanish v.40" )
-	ROMX_LOAD("plus3sp0.rom",0x10000,0x4000, CRC(1f86147a) SHA1(e9b0a60a1a8def511d59090b945d175bdc646346), ROM_BIOS(2))
-	ROMX_LOAD("plus3sp1.rom",0x14000,0x4000, CRC(a8ac4966) SHA1(4e48f196427596c7990c175d135c15a039c274a4), ROM_BIOS(2))
-	ROMX_LOAD("plus3sp2.rom",0x18000,0x4000, CRC(f6bb0296) SHA1(09fc005625589ef5992515957ce7a3167dec24b2), ROM_BIOS(2))
-	ROMX_LOAD("plus3sp3.rom",0x1c000,0x4000, CRC(f6d25389) SHA1(ec8f644a81e2e9bcb58ace974103ea960361bad2), ROM_BIOS(2))
+	ROMX_LOAD("plus3sp0.rom",0x10000,0x4000, CRC(1f86147a) SHA1(e9b0a60a1a8def511d59090b945d175bdc646346), ROM_BIOS(1))
+	ROMX_LOAD("plus3sp1.rom",0x14000,0x4000, CRC(a8ac4966) SHA1(4e48f196427596c7990c175d135c15a039c274a4), ROM_BIOS(1))
+	ROMX_LOAD("plus3sp2.rom",0x18000,0x4000, CRC(f6bb0296) SHA1(09fc005625589ef5992515957ce7a3167dec24b2), ROM_BIOS(1))
+	ROMX_LOAD("plus3sp3.rom",0x1c000,0x4000, CRC(f6d25389) SHA1(ec8f644a81e2e9bcb58ace974103ea960361bad2), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 2, "en41", "English v4.1" )
-	ROMX_LOAD("plus341.rom",0x10000,0x10000, CRC(be0d9ec4) SHA1(500c0945760abeefcbd08bc22c0d07b14b336cf0), ROM_BIOS(3))
+	ROMX_LOAD("plus341.rom",0x10000,0x10000, CRC(be0d9ec4) SHA1(500c0945760abeefcbd08bc22c0d07b14b336cf0), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS( 3, "4ms", "Customize 3.5\" 4ms" )
-	ROMX_LOAD("p3_01_4m.rom",0x10000,0x8000, CRC(ad99380a) SHA1(4e5d114b72d464cefdde0566457f52a3c0c1cae2), ROM_BIOS(4))
-	ROMX_LOAD("p3_23_4m.rom",0x18000,0x8000, CRC(07727895) SHA1(752cdd6a083ab9910348995e483541d60bb6372b), ROM_BIOS(4))
+	ROMX_LOAD("p3_01_4m.rom",0x10000,0x8000, CRC(ad99380a) SHA1(4e5d114b72d464cefdde0566457f52a3c0c1cae2), ROM_BIOS(3))
+	ROMX_LOAD("p3_23_4m.rom",0x18000,0x8000, CRC(07727895) SHA1(752cdd6a083ab9910348995e483541d60bb6372b), ROM_BIOS(3))
 	ROM_SYSTEM_BIOS( 4, "12ms", "Customize 3.5\" 12ms" )
-	ROMX_LOAD("p3_01_cm.rom",0x10000,0x8000, CRC(ad99380a) SHA1(4e5d114b72d464cefdde0566457f52a3c0c1cae2), ROM_BIOS(5))
-	ROMX_LOAD("p3_23_cm.rom",0x18000,0x8000, CRC(61f2b50c) SHA1(d062765ceb1f3cd2c94ea51cb737cac7ad6151b4), ROM_BIOS(5))
+	ROMX_LOAD("p3_01_cm.rom",0x10000,0x8000, CRC(ad99380a) SHA1(4e5d114b72d464cefdde0566457f52a3c0c1cae2), ROM_BIOS(4))
+	ROMX_LOAD("p3_23_cm.rom",0x18000,0x8000, CRC(61f2b50c) SHA1(d062765ceb1f3cd2c94ea51cb737cac7ad6151b4), ROM_BIOS(4))
 ROM_END
 
 ROM_START(specpl3e)
 	ROM_REGION(0x20000,"maincpu",0)
 	ROM_SYSTEM_BIOS( 0, "en", "English" )
-	ROMX_LOAD("roma-en.rom",0x10000,0x8000, CRC(2d533344) SHA1(5ff2dae32eb745d87e0b54c595d1d20a866f316f), ROM_BIOS(1))
-	ROMX_LOAD("romb-en.rom",0x18000,0x8000, CRC(ef8d5d92) SHA1(983aa53aa76e25a3af123c896016bacf6829b72b), ROM_BIOS(1))
+	ROMX_LOAD("roma-en.rom",0x10000,0x8000, CRC(2d533344) SHA1(5ff2dae32eb745d87e0b54c595d1d20a866f316f), ROM_BIOS(0))
+	ROMX_LOAD("romb-en.rom",0x18000,0x8000, CRC(ef8d5d92) SHA1(983aa53aa76e25a3af123c896016bacf6829b72b), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "sp", "Spanish" )
-	ROMX_LOAD("roma-es.rom",0x10000,0x8000, CRC(ba694b4b) SHA1(d15d9e43950483cffc79f1cfa89ecb114a88f6c2), ROM_BIOS(2))
-	ROMX_LOAD("romb-es.rom",0x18000,0x8000, CRC(61ed94db) SHA1(935b14c13db75d872de8ad0d591aade0adbbc355), ROM_BIOS(2))
+	ROMX_LOAD("roma-es.rom",0x10000,0x8000, CRC(ba694b4b) SHA1(d15d9e43950483cffc79f1cfa89ecb114a88f6c2), ROM_BIOS(1))
+	ROMX_LOAD("romb-es.rom",0x18000,0x8000, CRC(61ed94db) SHA1(935b14c13db75d872de8ad0d591aade0adbbc355), ROM_BIOS(1))
 ROM_END
 
 ROM_START(sp3e8bit)
 	ROM_REGION(0x20000,"maincpu",0)
 	ROM_SYSTEM_BIOS( 0, "en", "English" )
-	ROMX_LOAD("3e8biten.rom",0x10000,0x10000, CRC(beee3bf6) SHA1(364ec903916282d5401901c5fb0cb93a142038b3), ROM_BIOS(1))
+	ROMX_LOAD("3e8biten.rom",0x10000,0x10000, CRC(beee3bf6) SHA1(364ec903916282d5401901c5fb0cb93a142038b3), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "sp", "Spanish" )
-	ROMX_LOAD("3e8bites.rom",0x10000,0x10000, CRC(cafe4c35) SHA1(8331d273d29d3e37ec1324053bb050874d2c1434), ROM_BIOS(2))
+	ROMX_LOAD("3e8bites.rom",0x10000,0x10000, CRC(cafe4c35) SHA1(8331d273d29d3e37ec1324053bb050874d2c1434), ROM_BIOS(1))
 ROM_END
 
 ROM_START(sp3ezcf)
 	ROM_REGION(0x20000,"maincpu",0)
 	ROM_SYSTEM_BIOS( 0, "en", "English" )
-	ROMX_LOAD("3ezcfen.rom",0x10000,0x10000, CRC(43993f11) SHA1(27cbfbe8b5ef9eec6056026fa0b84fe158ba2f45), ROM_BIOS(1))
+	ROMX_LOAD("3ezcfen.rom",0x10000,0x10000, CRC(43993f11) SHA1(27cbfbe8b5ef9eec6056026fa0b84fe158ba2f45), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "sp", "Spanish" )
-	ROMX_LOAD("3ezcfes.rom",0x10000,0x10000, CRC(1325a0d7) SHA1(521cf47e10f46c8a621c8889ef1f008454c7e10b), ROM_BIOS(2))
+	ROMX_LOAD("3ezcfes.rom",0x10000,0x10000, CRC(1325a0d7) SHA1(521cf47e10f46c8a621c8889ef1f008454c7e10b), ROM_BIOS(1))
 ROM_END
 
 ROM_START(sp3eata)
 	ROM_REGION(0x20000,"maincpu",0)
 	ROM_SYSTEM_BIOS( 0, "en", "English" )
-	ROMX_LOAD("3ezxaen.rom",0x10000,0x10000, CRC(dfb676dc) SHA1(37618bc66ae33dbf686be8a92867e4a9144b65dc), ROM_BIOS(1))
+	ROMX_LOAD("3ezxaen.rom",0x10000,0x10000, CRC(dfb676dc) SHA1(37618bc66ae33dbf686be8a92867e4a9144b65dc), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "sp", "Spanish" )
-	ROMX_LOAD("3ezxaes.rom",0x10000,0x10000, CRC(8f0ae91a) SHA1(71693e18b30c90914be58cba26682ca025c924ea), ROM_BIOS(2))
+	ROMX_LOAD("3ezxaes.rom",0x10000,0x10000, CRC(8f0ae91a) SHA1(71693e18b30c90914be58cba26682ca025c924ea), ROM_BIOS(1))
 ROM_END
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE         INPUT      STATE            INIT    COMPANY                 FULLNAME                         FLAGS */
-COMP( 1987, specpl2a, spec128,  0,      spectrum_plus3, spec_plus, spectrum_state,  plus2,  "Amstrad plc",          "ZX Spectrum +2a",               0 )
-COMP( 1987, specpls3, spec128,  0,      spectrum_plus3, spec_plus, spectrum_state,  plus3,  "Amstrad plc",          "ZX Spectrum +3",                0 )
-COMP( 2000, specpl3e, spec128,  0,      spectrum_plus3, spec_plus, spectrum_state,  plus3,  "Amstrad plc",          "ZX Spectrum +3e",               MACHINE_UNOFFICIAL )
-COMP( 2002, sp3e8bit, spec128,  0,      spectrum_plus3, spec_plus, spectrum_state,  plus3,  "Amstrad plc",          "ZX Spectrum +3e 8bit IDE",      MACHINE_UNOFFICIAL )
-COMP( 2002, sp3eata,  spec128,  0,      spectrum_plus3, spec_plus, spectrum_state,  plus3,  "Amstrad plc",          "ZX Spectrum +3e 8bit ZXATASP" , MACHINE_UNOFFICIAL )
-COMP( 2002, sp3ezcf,  spec128,  0,      spectrum_plus3, spec_plus, spectrum_state,  plus3,  "Amstrad plc",          "ZX Spectrum +3e 8bit ZXCF",     MACHINE_UNOFFICIAL )
+/*    YEAR  NAME      PARENT   COMPAT  MACHINE         INPUT      CLASS           INIT        COMPANY                 FULLNAME                         FLAGS */
+COMP( 1987, specpl2a, spec128, 0,      spectrum_plus2, spec_plus, specpls3_state, empty_init, "Amstrad plc",          "ZX Spectrum +2a",               0 )
+COMP( 1987, specpls3, spec128, 0,      spectrum_plus3, spec_plus, specpls3_state, empty_init, "Amstrad plc",          "ZX Spectrum +3",                0 )
+COMP( 2000, specpl3e, spec128, 0,      spectrum_plus3, spec_plus, specpls3_state, empty_init, "Amstrad plc",          "ZX Spectrum +3e",               MACHINE_UNOFFICIAL )
+COMP( 2002, sp3e8bit, spec128, 0,      spectrum_plus3, spec_plus, specpls3_state, empty_init, "Amstrad plc",          "ZX Spectrum +3e 8bit IDE",      MACHINE_UNOFFICIAL )
+COMP( 2002, sp3eata,  spec128, 0,      spectrum_plus3, spec_plus, specpls3_state, empty_init, "Amstrad plc",          "ZX Spectrum +3e 8bit ZXATASP" , MACHINE_UNOFFICIAL )
+COMP( 2002, sp3ezcf,  spec128, 0,      spectrum_plus3, spec_plus, specpls3_state, empty_init, "Amstrad plc",          "ZX Spectrum +3e 8bit ZXCF",     MACHINE_UNOFFICIAL )

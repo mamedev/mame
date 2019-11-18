@@ -5,13 +5,7 @@
 
 #pragma once
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_NAMCO_C45_ROAD_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, NAMCO_C45_ROAD, 0)
+#include "tilemap.h"
 
 
 //**************************************************************************
@@ -63,7 +57,7 @@ private:
 	required_shared_ptr<uint16_t> m_tmapram;
 	required_shared_ptr<uint16_t> m_tileram;
 	required_shared_ptr<uint16_t> m_lineram;
-	uint8_t *                     m_clut;
+	optional_region_ptr<uint8_t>  m_clut;
 	tilemap_t *                 m_tilemap;
 	pen_t                       m_transparent_color;
 };

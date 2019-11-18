@@ -96,31 +96,31 @@ ioport_device::ioport_device(const machine_config &mconfig, const char *tag, dev
 READ8Z_MEMBER(ioport_device::readz)
 {
 	if (m_connected != nullptr)
-		m_connected->readz(space, offset, value);
+		m_connected->readz(offset, value);
 }
 
-WRITE8_MEMBER(ioport_device::write)
+void ioport_device::write(offs_t offset, uint8_t data)
 {
 	if (m_connected != nullptr)
-		m_connected->write(space, offset, data);
+		m_connected->write(offset, data);
 }
 
 SETADDRESS_DBIN_MEMBER(ioport_device::setaddress_dbin)
 {
 	if (m_connected != nullptr)
-		m_connected->setaddress_dbin(space, offset, state);
+		m_connected->setaddress_dbin(offset, state);
 }
 
 READ8Z_MEMBER(ioport_device::crureadz)
 {
 	if (m_connected != nullptr)
-		m_connected->crureadz(space, offset, value);
+		m_connected->crureadz(offset, value);
 }
 
-WRITE8_MEMBER(ioport_device::cruwrite)
+void ioport_device::cruwrite(offs_t offset, uint8_t data)
 {
 	if (m_connected != nullptr)
-		m_connected->cruwrite(space, offset, data);
+		m_connected->cruwrite(offset, data);
 }
 
 WRITE_LINE_MEMBER(ioport_device::memen_in)
@@ -167,11 +167,12 @@ WRITE_LINE_MEMBER(ioport_attached_device::set_ready)
 
 }   }   } // end namespace bus::ti99::internal
 
-SLOT_INTERFACE_START( ti99_io_port )
-	SLOT_INTERFACE("peb", TI99_PERIBOX)
-SLOT_INTERFACE_END
+void ti99_ioport_options_plain(device_slot_interface &device)
+{
+	device.option_add("peb", TI99_PERIBOX);
+}
 
-SLOT_INTERFACE_START( ti99_io_port_ev )
-	SLOT_INTERFACE("peb", TI99_PERIBOX_EV)
-SLOT_INTERFACE_END
-
+void ti99_ioport_options_evpc(device_slot_interface &device)
+{
+	device.option_add("peb", TI99_PERIBOX_EV);
+}

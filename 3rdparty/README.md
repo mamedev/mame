@@ -6,6 +6,8 @@ benchmark - [Apache License, Version 2.0](http://opensource.org/licenses/Apache-
 
 bgfx - [The BSD 2-Clause License](http://opensource.org/licenses/BSD-2-Clause)
 
+bimg - [The BSD 2-Clause License](http://opensource.org/licenses/BSD-2-Clause)
+
 bx - [The BSD 2-Clause License](http://opensource.org/licenses/BSD-2-Clause)
 
 catch - [Boost Software License](http://www.boost.org/LICENSE_1_0.txt)
@@ -32,11 +34,15 @@ lsqlite3 - [The MIT License (MIT)](http://opensource.org/licenses/MIT)
 
 lua - [The MIT License (MIT)](http://opensource.org/licenses/MIT)
 
+lua-linenoise - [The MIT License (MIT)](http://opensource.org/licenses/MIT)
+
 lua-zlib - [The MIT License (MIT)](http://opensource.org/licenses/MIT)
 
 luafilesystem - [The MIT License (MIT)](http://opensource.org/licenses/MIT)
 
 lzma - [The GNU Lesser General Public License](http://opensource.org/licenses/LGPL-2.1)
+
+minimp3 - [Creative Commons Zero v1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/)
 
 nanosvg - [zlib license](http://opensource.org/licenses/Zlib)
 
@@ -50,11 +56,17 @@ rapidjson - [The BSD 3-Clause License](http://opensource.org/licenses/BSD-3-Clau
 
 sdl2 - [zlib license](http://opensource.org/licenses/Zlib)
 
-softfloat - [U.C. Berkeley open-source license](https://github.com/mamedev/mame/blob/master/3rdparty/softfloat/README.txt) MIT compatible
+softfloat - ["Softfloat 2b" U.C. Berkeley modified license](https://github.com/mamedev/mame/blob/master/3rdparty/softfloat/README.txt) MIT compatible
+
+softfloat3 - [The BSD 3-Clause License](http://opensource.org/licenses/BSD-3-Clause)
 
 sol2 - [The MIT License (MIT)](http://opensource.org/licenses/MIT)
 
 sqlite3 - Public Domain
+
+tap-windows6.h - Dual-licensed [The GNU General Public License, version 2](https://opensource.org/licenses/GPL-2.0) and [The MIT License (MIT)](http://opensource.org/licenses/MIT)
+
+utf8proc - [The MIT License (MIT)](http://opensource.org/licenses/MIT)
 
 winpcap - [The BSD 3-Clause License](http://opensource.org/licenses/BSD-3-Clause)
 

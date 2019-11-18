@@ -132,9 +132,9 @@ void paradise_state::base_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom(); /* ROM */
 	map(0x8000, 0xbfff).bankr("prgbank");    /* ROM (banked) */
-	map(0xc000, 0xc7ff).ram().w(this, FUNC(paradise_state::vram_2_w)).share("vram_2"); /* Background */
-	map(0xc800, 0xcfff).ram().w(this, FUNC(paradise_state::vram_1_w)).share("vram_1"); /* Midground */
-	map(0xd000, 0xd7ff).ram().w(this, FUNC(paradise_state::vram_0_w)).share("vram_0"); /* Foreground */
+	map(0xc000, 0xc7ff).ram().w(FUNC(paradise_state::vram_2_w)).share("vram_2"); /* Background */
+	map(0xc800, 0xcfff).ram().w(FUNC(paradise_state::vram_1_w)).share("vram_1"); /* Midground */
+	map(0xd000, 0xd7ff).ram().w(FUNC(paradise_state::vram_0_w)).share("vram_0"); /* Foreground */
 }
 
 void paradise_state::paradise_map(address_map &map)
@@ -162,24 +162,24 @@ void paradise_state::torus_map(address_map &map)
 
 void paradise_state::torus_io_map(address_map &map)
 {
-	map(0x0000, 0x17ff).ram().w(this, FUNC(paradise_state::palette_w)).share("paletteram");    // Palette
-	map(0x1800, 0x1800).w(this, FUNC(paradise_state::priority_w));  // Layers priority
-	map(0x2001, 0x2001).w(this, FUNC(paradise_state::flipscreen_w));    // Flip Screen
-	map(0x2004, 0x2004).w(this, FUNC(paradise_state::palbank_w));   // Layers palette bank
-	map(0x2006, 0x2006).w(this, FUNC(paradise_state::rombank_w));   // ROM bank
+	map(0x0000, 0x17ff).ram().w(FUNC(paradise_state::palette_w)).share("paletteram");    // Palette
+	map(0x1800, 0x1800).w(FUNC(paradise_state::priority_w));  // Layers priority
+	map(0x2001, 0x2001).w(FUNC(paradise_state::flipscreen_w));    // Flip Screen
+	map(0x2004, 0x2004).w(FUNC(paradise_state::palbank_w));   // Layers palette bank
+	map(0x2006, 0x2006).w(FUNC(paradise_state::rombank_w));   // ROM bank
 	map(0x2010, 0x2010).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write));  // OKI 0
 	map(0x2020, 0x2020).portr("DSW1");
 	map(0x2021, 0x2021).portr("DSW2");
 	map(0x2022, 0x2022).portr("P1");
 	map(0x2023, 0x2023).portr("P2");
 	map(0x2024, 0x2024).portr("SYSTEM");
-	map(0x8000, 0xffff).ram().w(this, FUNC(paradise_state::pixmap_w)).share("videoram");   // Pixmap
+	map(0x8000, 0xffff).ram().w(FUNC(paradise_state::pixmap_w)).share("videoram");   // Pixmap
 }
 
 void paradise_state::paradise_io_map(address_map &map)
 {
 	torus_io_map(map);
-	map(0x2007, 0x2007).w(this, FUNC(paradise_state::paradise_okibank_w));   // OKI 1 samples bank
+	map(0x2007, 0x2007).w(FUNC(paradise_state::paradise_okibank_w));   // OKI 1 samples bank
 	map(0x2030, 0x2030).rw(m_oki2, FUNC(okim6295_device::read), FUNC(okim6295_device::write));  // OKI 1
 }
 
@@ -549,51 +549,51 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( madball )
 	PORT_START("DSW1")  /* port $2020 */
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x0c, 0x08, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x0c, 0x08, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x0c, "3" )
 	PORT_DIPSETTING(    0x08, "4" )
 	PORT_DIPSETTING(    0x04, "5" )
 	PORT_DIPSETTING(    0x00, "6" )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "Control?" )
-	PORT_DIPSETTING(    0x20, "Disable / Spinner?" )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Controls ) ) PORT_DIPLOCATION("SW1:6") /* Spinner controls currently NOT hooked up */
+	PORT_DIPSETTING(    0x20, "Spinner" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Joystick ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Slide Show" ) /* Use P1 button to advance */
+	PORT_DIPNAME( 0x80, 0x80, "Slide Show" ) PORT_DIPLOCATION("SW1:8") /* Use P1 button to advance */
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW2")  /* port $2021 */
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -678,21 +678,21 @@ static const gfx_layout torus_layout_16x16x8 =
 	128*8
 };
 
-static GFXDECODE_START( paradise )
+static GFXDECODE_START( gfx_paradise )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8, 0x100, 1  ) // [0] Sprites
 	GFXDECODE_ENTRY( "gfx2", 0, layout_8x8x4,   0x400, 16 ) // [1] Background
 	GFXDECODE_ENTRY( "gfx3", 0, layout_8x8x8,   0x300, 1  ) // [2] Midground
 	GFXDECODE_ENTRY( "gfx4", 0, layout_8x8x8,   0x000, 1  ) // [3] Foreground
 GFXDECODE_END
 
-static GFXDECODE_START( torus )
+static GFXDECODE_START( gfx_torus )
 	GFXDECODE_ENTRY( "gfx1", 0, torus_layout_16x16x8, 0x100, 1  ) // [0] Sprites
 	GFXDECODE_ENTRY( "gfx2", 0, layout_8x8x4,        0x400, 16 ) // [1] Background
 	GFXDECODE_ENTRY( "gfx3", 0, layout_8x8x8,        0x300, 1  ) // [2] Midground
 	GFXDECODE_ENTRY( "gfx4", 0, layout_8x8x8,        0x000, 1  ) // [3] Foreground
 GFXDECODE_END
 
-static GFXDECODE_START( madball )
+static GFXDECODE_START( gfx_madball )
 	GFXDECODE_ENTRY( "gfx1", 0, torus_layout_16x16x8, 0x500, 1  ) // [0] Sprites
 	GFXDECODE_ENTRY( "gfx2", 0, layout_8x8x4,        0x400, 16 ) // [1] Background
 	GFXDECODE_ENTRY( "gfx3", 0, layout_8x8x8,        0x300, 1  ) // [2] Midground
@@ -731,87 +731,85 @@ INTERRUPT_GEN_MEMBER(paradise_state::irq)
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);
 }
 
-MACHINE_CONFIG_START(paradise_state::paradise)
-
+void paradise_state::paradise(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/2)          /* Z8400B - 6mhz Verified */
-	MCFG_CPU_PROGRAM_MAP(paradise_map)
-	MCFG_CPU_IO_MAP(paradise_io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(paradise_state, irq, 4*54)    /* No nmi routine, timing is confirmed (i.e. three timing irqs for each vblank irq */
+	Z80(config, m_maincpu, XTAL(12'000'000)/2);          /* Z8400B - 6mhz Verified */
+	m_maincpu->set_addrmap(AS_PROGRAM, &paradise_state::paradise_map);
+	m_maincpu->set_addrmap(AS_IO, &paradise_state::paradise_io_map);
+	m_maincpu->set_periodic_int(FUNC(paradise_state::irq), attotime::from_hz(4*54));    /* No nmi routine, timing is confirmed (i.e. three timing irqs for each vblank irq */
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(54) /* 54 verified */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */    /* we're using PORT_VBLANK */)
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-1-16)
-	MCFG_SCREEN_UPDATE_DRIVER(paradise_state, screen_update_paradise)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(54); /* 54 verified */
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */    /* we're using PORT_VBLANK */);
+	m_screen->set_size(256, 256);
+	m_screen->set_visarea(0, 256-1, 0+16, 256-1-16);
+	m_screen->set_screen_update(FUNC(paradise_state::screen_update_paradise));
+	m_screen->set_palette(m_palette);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", paradise)
-	MCFG_PALETTE_ADD("palette", 0x800 + 16)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_paradise);
+	PALETTE(config, m_palette).set_entries(0x800 + 16);
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_OKIM6295_ADD("oki1", XTAL(12'000'000)/12, PIN7_HIGH)    /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	OKIM6295(config, "oki1", XTAL(12'000'000)/12, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.50);    /* verified on pcb */
 
-	MCFG_OKIM6295_ADD("oki2", XTAL(12'000'000)/12, PIN7_HIGH) /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki2, XTAL(12'000'000)/12, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.50); /* verified on pcb */
+}
 
-MACHINE_CONFIG_START(paradise_state::tgtball)
+void paradise_state::tgtball(machine_config &config)
+{
 	paradise(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(tgtball_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &paradise_state::tgtball_map);
+}
 
-MACHINE_CONFIG_START(paradise_state::torus)
+void paradise_state::torus(machine_config &config)
+{
 	paradise(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(torus_map)
-	MCFG_CPU_IO_MAP(torus_io_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &paradise_state::torus_map);
+	m_maincpu->set_addrmap(AS_IO, &paradise_state::torus_io_map);
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", torus)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(paradise_state, screen_update_torus)
+	m_gfxdecode->set_info(gfx_torus);
+	m_screen->set_screen_update(FUNC(paradise_state::screen_update_torus));
 
-	MCFG_DEVICE_REMOVE("oki2")
-MACHINE_CONFIG_END
+	config.device_remove("oki2");
+}
 
-MACHINE_CONFIG_START(paradise_state::madball)
+void paradise_state::madball(machine_config &config)
+{
 	torus(config);
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", madball)
+	m_gfxdecode->set_info(gfx_madball);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(paradise_state, screen_update_madball)
-MACHINE_CONFIG_END
+	m_screen->set_screen_update(FUNC(paradise_state::screen_update_madball));
+}
 
-MACHINE_CONFIG_START(paradise_state::penky)
+void paradise_state::penky(machine_config &config)
+{
 	paradise(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(torus_map)
-	MCFG_CPU_IO_MAP(torus_io_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &paradise_state::torus_map);
+	m_maincpu->set_addrmap(AS_IO, &paradise_state::torus_io_map);
+}
 
 
-MACHINE_CONFIG_START(paradise_state::penkyi)
+void paradise_state::penkyi(machine_config &config)
+{
 	penky(config);
 
 	// TODO add ticket dispenser
 
-	MCFG_DEVICE_REMOVE("oki2")
-MACHINE_CONFIG_END
+	config.device_remove("oki2");
+}
 
 /***************************************************************************
 
@@ -1327,7 +1325,6 @@ RAM 4 Hyundai HY62256ALP-70
     6 UMC UM6116K-3
 DSW 2 8-switch DIP
 
-
 P.u1  Intel i27C010A - Program (next to Z80A)
 s.u28 ST M27C4001    - Sound (next to AD-65)
 
@@ -1339,6 +1336,20 @@ s.u28 ST M27C4001    - Sound (next to AD-65)
 6.u106 TI 27C040
 
 All roms read with manufacturer's IDs and routines
+
+NOTE: A version of Mad Ball has been seen with a YS-1302 daughtercard that plugs in through the Z80 processor:
+
+YS-1302 Spinner Daughtercard
++--------------------------+
+|   [Connector to Main]    |
+| CN1 R   Z8400B           |
+| CN2 S   GAL16V8  74LS669 |
+| CD4584  74LS374  74LS669 |
+| 74LS669 74LS374  74LS669 |
++--------------------------+
+
+CN1 & CN2 are 4 pin headers for spinner controls
+RS is a 4.7K 5 pin resistor pack
 
 */
 
@@ -1388,23 +1399,23 @@ ROM_START( madballn ) /* Even numbered stages show topless models.  Is nudity co
 	ROM_LOAD( "s.u28", 0x00000, 0x80000, CRC(78f02584) SHA1(70542e126db73a573db9ef41399d3a07fb7ea94b) )
 ROM_END
 
-DRIVER_INIT_MEMBER(paradise_state,paradise)
+void paradise_state::init_paradise()
 {
 	m_sprite_inc = 0x20;
 }
 
 // Inverted flipscreen and sprites are packed in less memory (same number though)
-DRIVER_INIT_MEMBER(paradise_state,tgtball)
+void paradise_state::init_tgtball()
 {
 	m_sprite_inc = 4;
-	m_maincpu->space(AS_IO).install_write_handler(0x2001, 0x2001, write8_delegate(FUNC(paradise_state::tgtball_flipscreen_w),this));
+	m_maincpu->space(AS_IO).install_write_handler(0x2001, 0x2001, write8_delegate(*this, FUNC(paradise_state::tgtball_flipscreen_w)));
 
 }
 
-DRIVER_INIT_MEMBER(paradise_state,torus)
+void paradise_state::init_torus()
 {
 	m_sprite_inc = 4;
-	m_maincpu->space(AS_IO).install_write_handler(0x2070, 0x2070, write8_delegate(FUNC(paradise_state::torus_coin_counter_w),this));
+	m_maincpu->space(AS_IO).install_write_handler(0x2070, 0x2070, write8_delegate(*this, FUNC(paradise_state::torus_coin_counter_w)));
 }
 
 
@@ -1414,16 +1425,16 @@ DRIVER_INIT_MEMBER(paradise_state,torus)
 
 ***************************************************************************/
 
-GAME( 1994,  paradise, 0,         paradise, paradise, paradise_state, paradise, ROT90, "Yun Sung", "Paradise (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994,  paradisea, paradise, paradise, paradise, paradise_state, paradise, ROT90, "Yun Sung", "Paradise (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994,  paradisee, paradise, paradise, paradise, paradise_state, paradise, ROT90, "Yun Sung (Escape license)", "Paradise (Escape)", MACHINE_SUPPORTS_SAVE )
-GAME( 199?,  paradlx,  0,         paradise, paradise, paradise_state, paradise, ROT90, "Yun Sung", "Paradise Deluxe", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // year not shown, but should be >=1994
-GAME( 199?,  para2dx,  0,         paradise, para2dx,  paradise_state, paradise, ROT90, "Yun Sung", "Paradise 2 Deluxe", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // year not shown, but should be >=1994
-GAME( 1996,  tgtbal96, 0,         tgtball,  tgtball,  paradise_state, tgtball,  ROT0,  "Yun Sung", "Target Ball '96", MACHINE_SUPPORTS_SAVE ) // With nudity
-GAME( 1995,  tgtball,  tgtbal96,  tgtball,  tgtball,  paradise_state, tgtball,  ROT0,  "Yun Sung", "Target Ball", MACHINE_SUPPORTS_SAVE )
-GAME( 1995,  tgtballn, tgtbal96,  tgtball,  tgtball,  paradise_state, tgtball,  ROT0,  "Yun Sung", "Target Ball (With Nudity)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996,  penky,    0,         penky,    penky,    paradise_state, tgtball,  ROT0,  "Yun Sung", "Penky", MACHINE_SUPPORTS_SAVE )
-GAME( 1996,  penkyi,   penky,     penkyi,   penkyi,   paradise_state, tgtball,  ROT0,  "Yun Sung (Impeuropex license)", "Penky (Italian)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996,  torus,    0,         torus,    torus,    paradise_state, torus,    ROT90, "Yun Sung", "Torus", MACHINE_SUPPORTS_SAVE )
-GAME( 1998,  madball,  0,         madball,  madball,  paradise_state, tgtball,  ROT0,  "Yun Sung", "Mad Ball V2.0", MACHINE_SUPPORTS_SAVE )
-GAME( 1997,  madballn, madball,   madball,  madball,  paradise_state, tgtball,  ROT0,  "Yun Sung", "Mad Ball V2.0 (With Nudity)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994,  paradise, 0,         paradise, paradise, paradise_state, init_paradise, ROT90, "Yun Sung", "Paradise (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994,  paradisea, paradise, paradise, paradise, paradise_state, init_paradise, ROT90, "Yun Sung", "Paradise (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994,  paradisee, paradise, paradise, paradise, paradise_state, init_paradise, ROT90, "Yun Sung (Escape license)", "Paradise (Escape)", MACHINE_SUPPORTS_SAVE )
+GAME( 199?,  paradlx,  0,         paradise, paradise, paradise_state, init_paradise, ROT90, "Yun Sung", "Paradise Deluxe", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // year not shown, but should be >=1994
+GAME( 199?,  para2dx,  0,         paradise, para2dx,  paradise_state, init_paradise, ROT90, "Yun Sung", "Paradise 2 Deluxe", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // year not shown, but should be >=1994
+GAME( 1996,  tgtbal96, 0,         tgtball,  tgtball,  paradise_state, init_tgtball,  ROT0,  "Yun Sung", "Target Ball '96", MACHINE_SUPPORTS_SAVE ) // With nudity
+GAME( 1995,  tgtball,  tgtbal96,  tgtball,  tgtball,  paradise_state, init_tgtball,  ROT0,  "Yun Sung", "Target Ball", MACHINE_SUPPORTS_SAVE )
+GAME( 1995,  tgtballn, tgtbal96,  tgtball,  tgtball,  paradise_state, init_tgtball,  ROT0,  "Yun Sung", "Target Ball (With Nudity)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996,  penky,    0,         penky,    penky,    paradise_state, init_tgtball,  ROT0,  "Yun Sung", "Penky", MACHINE_SUPPORTS_SAVE )
+GAME( 1996,  penkyi,   penky,     penkyi,   penkyi,   paradise_state, init_tgtball,  ROT0,  "Yun Sung (Impeuropex license)", "Penky (Italian)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996,  torus,    0,         torus,    torus,    paradise_state, init_torus,    ROT90, "Yun Sung", "Torus", MACHINE_SUPPORTS_SAVE )
+GAME( 1998,  madball,  0,         madball,  madball,  paradise_state, init_tgtball,  ROT0,  "Yun Sung", "Mad Ball V2.0", MACHINE_SUPPORTS_SAVE )
+GAME( 1997,  madballn, madball,   madball,  madball,  paradise_state, init_tgtball,  ROT0,  "Yun Sung", "Mad Ball V2.0 (With Nudity)", MACHINE_SUPPORTS_SAVE )

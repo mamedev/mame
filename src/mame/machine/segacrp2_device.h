@@ -8,27 +8,32 @@
 
 #include "cpu/z80/z80.h"
 
-
-#define MCFG_SEGAZ80_SET_DECRYPTED_TAG(_tag) \
-	downcast<segacrp2_z80_device &>(*device).set_decrypted_tag(_tag);
-
 // base class
 class segacrp2_z80_device : public z80_device
 {
 public:
-	void set_decrypted_tag(const char* decrypted_tag) { m_decrypted_tag = decrypted_tag; }
-	const char*         m_decrypted_tag;
+	template <typename T> void set_decrypted_tag(T &&decrypted_tag) { m_decrypted.set_tag(std::forward<T>(decrypted_tag)); }
+
 protected:
 	segacrp2_z80_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void decrypt();
+	virtual void decrypt() = 0;
+
+	required_shared_ptr<uint8_t> m_decrypted;
 };
 
 
 
 // actual encrypted CPUs
+class nec_315_5136_device : public segacrp2_z80_device
+{
+public:
+	nec_315_5136_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t);
+protected:
+	virtual void decrypt() override;
+};
+
 class sega_315_5179_device : public segacrp2_z80_device
 {
 public:
@@ -105,6 +110,7 @@ protected:
 };
 
 
+DECLARE_DEVICE_TYPE(NEC_315_5136,  nec_315_5136_device)
 DECLARE_DEVICE_TYPE(SEGA_315_5179, sega_315_5179_device)
 DECLARE_DEVICE_TYPE(SEGA_315_5178, sega_315_5178_device)
 DECLARE_DEVICE_TYPE(SEGA_315_5177, sega_315_5177_device)

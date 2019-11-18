@@ -28,7 +28,6 @@
 #include "emu.h"
 #include "mmc3.h"
 
-#include "cpu/m6502/m6502.h"
 #include "video/ppu2c0x.h"      // this has to be included so that IRQ functions can access ppu2c0x_device::BOTTOM_VISIBLE_SCANLINE
 #include "screen.h"
 
@@ -202,7 +201,7 @@ void nes_txrom_device::hblank_irq(int scanline, int vblank, int blanked)
 		if (m_irq_enable && !blanked && (m_irq_count == 0) && (prior_count || m_irq_clear /*|| !m_mmc3_alt_irq*/)) // according to blargg the latter should be present as well, but it breaks Rampart and Joe & Mac US: they probably use the alt irq!
 		{
 			LOG_MMC(("irq fired, scanline: %d\n", scanline));
-			m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+			set_irq_line(ASSERT_LINE);
 		}
 	}
 	m_irq_clear = 0;
@@ -245,7 +244,7 @@ void nes_txrom_device::set_chr( uint8_t chr, int chr_base, int chr_mask )
 	chr_cb(chr_page ^ 7, chr_base | (m_mmc_vrom_bank[5] & chr_mask), chr);
 }
 
-WRITE8_MEMBER(nes_txrom_device::txrom_write)
+void nes_txrom_device::txrom_write(offs_t offset, uint8_t data)
 {
 	uint8_t mmc_helper, cmd;
 
@@ -301,7 +300,7 @@ WRITE8_MEMBER(nes_txrom_device::txrom_write)
 
 		case 0x6000:
 			m_irq_enable = 0;
-			m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+			set_irq_line(CLEAR_LINE);
 			break;
 
 		case 0x6001:
@@ -314,7 +313,7 @@ WRITE8_MEMBER(nes_txrom_device::txrom_write)
 	}
 }
 
-WRITE8_MEMBER(nes_txrom_device::write_m)
+void nes_txrom_device::write_m(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("txrom write_m, offset: %04x, data: %02x\n", offset, data));
 
@@ -327,7 +326,7 @@ WRITE8_MEMBER(nes_txrom_device::write_m)
 	}
 }
 
-READ8_MEMBER(nes_txrom_device::read_m)
+uint8_t nes_txrom_device::read_m(offs_t offset)
 {
 	LOG_MMC(("txrom read_m, offset: %04x\n", offset));
 
@@ -339,7 +338,7 @@ READ8_MEMBER(nes_txrom_device::read_m)
 			return m_prgram[offset & (m_prgram.size() - 1)];
 	}
 
-	return m_open_bus;   // open bus
+	return get_open_bus();   // open bus
 }
 
 
@@ -351,7 +350,7 @@ READ8_MEMBER(nes_txrom_device::read_m)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_hkrom_device::write_m)
+void nes_hkrom_device::write_m(offs_t offset, uint8_t data)
 {
 	uint8_t write_hi, write_lo;
 	LOG_MMC(("hkrom write_m, offset: %04x, data: %02x\n", offset, data));
@@ -370,15 +369,15 @@ WRITE8_MEMBER(nes_hkrom_device::write_m)
 		m_mmc6_ram[offset & 0x3ff] = data;
 }
 
-READ8_MEMBER(nes_hkrom_device::read_m)
+uint8_t nes_hkrom_device::read_m(offs_t offset)
 {
 	LOG_MMC(("hkrom read_m, offset: %04x\n", offset));
 
 	if (offset < 0x1000)
-		return m_open_bus;    // open bus
+		return get_open_bus();    // open bus
 
 	if (!(m_mmc6_reg & 0xa0))
-		return m_open_bus;    // open bus
+		return get_open_bus();    // open bus
 
 	if (BIT(offset, 9) && BIT(m_mmc6_reg, 7))   // access to upper half of 1k when upper read is enabled
 		return m_mmc6_ram[offset & 0x3ff];
@@ -390,7 +389,7 @@ READ8_MEMBER(nes_hkrom_device::read_m)
 	return 0x00;
 }
 
-WRITE8_MEMBER(nes_hkrom_device::write_h)
+void nes_hkrom_device::write_h(offs_t offset, uint8_t data)
 {
 	uint8_t mmc6_helper;
 	LOG_MMC(("hkrom write_h, offset: %04x, data: %02x\n", offset, data));
@@ -424,7 +423,7 @@ WRITE8_MEMBER(nes_hkrom_device::write_h)
 			break;
 
 		default:
-			txrom_write(space, offset, data, mem_mask);
+			txrom_write(offset, data);
 			break;
 	}
 }
@@ -466,7 +465,7 @@ void nes_txsrom_device::chr_cb( int start, int bank, int source )
 	chr1_x(start, bank, source);
 }
 
-WRITE8_MEMBER(nes_txsrom_device::write_h)
+void nes_txsrom_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("txsrom write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -476,7 +475,7 @@ WRITE8_MEMBER(nes_txsrom_device::write_h)
 			break;
 
 		default:
-			txrom_write(space, offset, data, mem_mask);
+			txrom_write(offset, data);
 			break;
 	}
 }
@@ -525,7 +524,7 @@ void nes_tqrom_device::set_chr( uint8_t chr, int chr_base, int chr_mask )
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_qj_device::write_m)
+void nes_qj_device::write_m(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("qj write_m, offset: %04x, data: %02x\n", offset, data));
 
@@ -547,7 +546,7 @@ WRITE8_MEMBER(nes_qj_device::write_m)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_zz_device::write_m)
+void nes_zz_device::write_m(offs_t offset, uint8_t data)
 {
 	uint8_t mmc_helper = data & 0x07;
 	LOG_MMC(("zz write_m, offset: %04x, data: %02x\n", offset, data));

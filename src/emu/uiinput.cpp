@@ -33,18 +33,19 @@ enum
 //-------------------------------------------------
 
 ui_input_manager::ui_input_manager(running_machine &machine)
-	: m_machine(machine),
-		m_current_mouse_target(nullptr),
-		m_current_mouse_down(false),
-		m_current_mouse_field(nullptr),
-		m_events_start(0),
-		m_events_end(0)
+	: m_machine(machine)
+	, m_presses_enabled(true)
+	, m_current_mouse_target(nullptr)
+	, m_current_mouse_down(false)
+	, m_current_mouse_field(nullptr)
+	, m_events_start(0)
+	, m_events_end(0)
 {
-	/* create the private data */
+	// create the private data
 	m_current_mouse_x = -1;
 	m_current_mouse_y = -1;
 
-	/* add a frame callback to poll inputs */
+	// add a frame callback to poll inputs
 	machine.add_notifier(MACHINE_NOTIFY_FRAME, machine_notify_delegate(&ui_input_manager::frame_update, this));
 }
 
@@ -62,12 +63,20 @@ ui_input_manager::ui_input_manager(running_machine &machine)
 
 void ui_input_manager::frame_update()
 {
-	/* update the state of all the UI keys */
+	// update the state of all the UI keys
 	for (ioport_type code = ioport_type(IPT_UI_FIRST + 1); code < IPT_UI_LAST; ++code)
 	{
-		bool pressed = machine().ioport().type_pressed(code);
-		if (!pressed || m_seqpressed[code] != SEQ_PRESSED_RESET)
-			m_seqpressed[code] = pressed;
+		if (m_presses_enabled)
+		{
+			bool pressed = machine().ioport().type_pressed(code);
+			if (!pressed || m_seqpressed[code] != SEQ_PRESSED_RESET)
+				m_seqpressed[code] = pressed;
+		}
+		else
+		{
+			// UI key presses are disabled
+			m_seqpressed[code] = false;
+		}
 	}
 
 	// perform mouse hit testing
@@ -95,7 +104,7 @@ void ui_input_manager::frame_update()
 
 bool ui_input_manager::push_event(ui_event evt)
 {
-	/* some pre-processing (this is an icky place to do this stuff!) */
+	// some pre-processing (this is an icky place to do this stuff!)
 	switch (evt.event_type)
 	{
 		case ui_event::MOUSE_MOVE:
@@ -126,7 +135,7 @@ bool ui_input_manager::push_event(ui_event evt)
 			break;
 	}
 
-	/* is the queue filled up? */
+	// is the queue filled up?
 	if ((m_events_end + 1) % ARRAY_LENGTH(m_events) == m_events_start)
 		return false;
 

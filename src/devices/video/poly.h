@@ -132,7 +132,7 @@ private:
 	// number of profiling ticks before we consider a wait "long"
 	static constexpr osd_ticks_t POLY_LOG_WAIT_THRESHOLD = 1000;
 
-	static constexpr int SCANLINES_PER_BUCKET = 8;
+	static constexpr int SCANLINES_PER_BUCKET = 32;
 	static constexpr int CACHE_LINE_SIZE      = 64;          // this is a general guess
 	static constexpr int TOTAL_BUCKETS        = (512 / SCANLINES_PER_BUCKET);
 	static constexpr int UNITS_PER_POLY       = (100 / SCANLINES_PER_BUCKET);
@@ -322,6 +322,8 @@ poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::poly_manager(runnin
 	// create the work queue
 	if (!(flags & FLAG_NO_WORK_QUEUE))
 		m_queue = osd_work_queue_alloc(WORK_QUEUE_FLAG_MULTI | WORK_QUEUE_FLAG_HIGH_FREQ);
+
+	memset(m_unit_bucket, 0xff, sizeof(m_unit_bucket));
 
 	// request a pre-save callback for synchronization
 	machine.save().register_presave(save_prepost_delegate(FUNC(poly_manager::presave), this));
@@ -513,8 +515,8 @@ uint32_t poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_til
 	// clip coordinates
 	int32_t v1yclip = v1y;
 	int32_t v2yclip = v2y + ((m_flags & FLAG_INCLUDE_BOTTOM_EDGE) ? 1 : 0);
-	v1yclip = std::max(v1yclip, cliprect.min_y);
-	v2yclip = std::min(v2yclip, cliprect.max_y + 1);
+	v1yclip = std::max(v1yclip, cliprect.top());
+	v2yclip = std::min(v2yclip, cliprect.bottom() + 1);
 	if (v2yclip - v1yclip <= 0)
 		return 0;
 
@@ -558,10 +560,10 @@ uint32_t poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_til
 		istopx++;
 
 	// apply left/right clipping
-	if (istartx < cliprect.min_x)
-		istartx = cliprect.min_x;
-	if (istopx > cliprect.max_x)
-		istopx = cliprect.max_x + 1;
+	if (istartx < cliprect.left())
+		istartx = cliprect.left();
+	if (istopx > cliprect.right())
+		istopx = cliprect.right() + 1;
 	if (istartx >= istopx)
 		return 0;
 
@@ -658,8 +660,8 @@ uint32_t poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_tri
 	// clip coordinates
 	int32_t v1yclip = v1y;
 	int32_t v3yclip = v3y + ((m_flags & FLAG_INCLUDE_BOTTOM_EDGE) ? 1 : 0);
-	v1yclip = std::max(v1yclip, cliprect.min_y);
-	v3yclip = std::min(v3yclip, cliprect.max_y + 1);
+	v1yclip = std::max(v1yclip, cliprect.top());
+	v3yclip = std::min(v3yclip, cliprect.bottom() + 1);
 	if (v3yclip - v1yclip <= 0)
 		return 0;
 
@@ -772,10 +774,10 @@ uint32_t poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_tri
 				istopx++;
 
 			// apply left/right clipping
-			if (istartx < cliprect.min_x)
-				istartx = cliprect.min_x;
-			if (istopx > cliprect.max_x)
-				istopx = cliprect.max_x + 1;
+			if (istartx < cliprect.left())
+				istartx = cliprect.left();
+			if (istopx > cliprect.right())
+				istopx = cliprect.right() + 1;
 
 			// set the extent and update the total pixel count
 			if (istartx >= istopx)
@@ -848,8 +850,8 @@ template<typename _BaseType, class _ObjectData, int _MaxParams, int _MaxPolys>
 uint32_t poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_triangle_custom(const rectangle &cliprect, render_delegate callback, int startscanline, int numscanlines, const extent_t *extents)
 {
 	// clip coordinates
-	int32_t v1yclip = std::max(startscanline, cliprect.min_y);
-	int32_t v3yclip = std::min(startscanline + numscanlines, cliprect.max_y + 1);
+	int32_t v1yclip = std::max(startscanline, cliprect.top());
+	int32_t v3yclip = std::min(startscanline + numscanlines, cliprect.bottom() + 1);
 	if (v3yclip - v1yclip <= 0)
 		return 0;
 
@@ -883,14 +885,14 @@ uint32_t poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_tri
 			int32_t istartx = srcextent.startx, istopx = srcextent.stopx;
 
 			// apply left/right clipping
-			if (istartx < cliprect.min_x)
-				istartx = cliprect.min_x;
-			if (istartx > cliprect.max_x)
-				istartx = cliprect.max_x + 1;
-			if (istopx < cliprect.min_x)
-				istopx = cliprect.min_x;
-			if (istopx > cliprect.max_x)
-				istopx = cliprect.max_x + 1;
+			if (istartx < cliprect.left())
+				istartx = cliprect.left();
+			if (istartx > cliprect.right())
+				istartx = cliprect.right() + 1;
+			if (istopx < cliprect.left())
+				istopx = cliprect.left();
+			if (istopx > cliprect.right())
+				istopx = cliprect.right() + 1;
 
 			// set the extent and update the total pixel count
 			extent_t &extent = unit.extent[extnum];
@@ -956,8 +958,8 @@ uint32_t poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_pol
 	// clip coordinates
 	int32_t minyclip = miny;
 	int32_t maxyclip = maxy + ((m_flags & FLAG_INCLUDE_BOTTOM_EDGE) ? 1 : 0);
-	minyclip = std::max(minyclip, cliprect.min_y);
-	maxyclip = std::min(maxyclip, cliprect.max_y + 1);
+	minyclip = std::max(minyclip, cliprect.top());
+	maxyclip = std::min(maxyclip, cliprect.bottom() + 1);
 	if (maxyclip - minyclip <= 0)
 		return 0;
 
@@ -1092,14 +1094,14 @@ uint32_t poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::render_pol
 				istopx++;
 
 			// apply left/right clipping
-			if (istartx < cliprect.min_x)
+			if (istartx < cliprect.left())
 			{
 				for (int paramnum = 0; paramnum < paramcount; paramnum++)
-					extent.param[paramnum].start += (cliprect.min_x - istartx) * extent.param[paramnum].dpdx;
-				istartx = cliprect.min_x;
+					extent.param[paramnum].start += (cliprect.left() - istartx) * extent.param[paramnum].dpdx;
+				istartx = cliprect.left();
 			}
-			if (istopx > cliprect.max_x)
-				istopx = cliprect.max_x + 1;
+			if (istopx > cliprect.right())
+				istopx = cliprect.right() + 1;
 
 			// set the extent and update the total pixel count
 			if (istartx >= istopx)

@@ -60,8 +60,10 @@ public:
 	{ }
 
 	void ax80(machine_config &config);
-	void ax80_map(address_map &map);
+
 private:
+	void ax80_map(address_map &map);
+
 	virtual void machine_reset() override;
 	required_device<upd7810_device> m_maincpu;
 };
@@ -82,37 +84,38 @@ void ax80_state::ax80_map(address_map &map)
 	map(0x1060, 0x1060).mirror(0x000e).rw("kdc", FUNC(i8279_device::data_r), FUNC(i8279_device::data_w));   // IC11
 	map(0x1061, 0x1061).mirror(0x000e).rw("kdc", FUNC(i8279_device::status_r), FUNC(i8279_device::cmd_w));  // IC11
 	map(0x1070, 0x1073).mirror(0x000c).rw(PPI1_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));   // IC10
-	//AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x0dfe) AM_DEVREADWRITE(PPI0_TAG, i8255_device, read, write)   // IC9 - A9 connects to A1-pin
-	//AM_RANGE(0x2200, 0x2201) AM_MIRROR(0x0dfe) AM_DEVREADWRITE(PPI0_TAG, i8255_device, read, write)   // IC9 - A9 connects to A1-pin
-	//AM_RANGE(0x3000, 0x3fff) // steers audio to the various voice channels
+	//map(0x2000, 0x2001).mirror(0x0dfe).rw(PPI0_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));   // IC9 - A9 connects to A1-pin
+	//map(0x2200, 0x2201).mirror(0x0dfe).rw(PPI0_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));   // IC9 - A9 connects to A1-pin
+	//map(0x3000, 0x3fff) // steers audio to the various voice channels
 	map(0x4000, 0x5fff).mirror(0x2000).rom().region("maincpu", 0x1000);    // external program EPROM
 	map(0x8000, 0x87ff).mirror(0x3800).ram();
 	map(0xc000, 0xc7ff).mirror(0x3800).ram();
 }
 
-MACHINE_CONFIG_START(ax80_state::ax80)
-	MCFG_CPU_ADD("maincpu", UPD7810, XTAL(12'000'000))
-	MCFG_CPU_PROGRAM_MAP(ax80_map)
-	//MCFG_CPU_IO_MAP(ax80_io)
+void ax80_state::ax80(machine_config &config)
+{
+	UPD7810(config, m_maincpu, XTAL(12'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &ax80_state::ax80_map);
+	//m_maincpu->set_addrmap(AS_IO, &ax80_state::ax80_io);
 
-	MCFG_DEVICE_ADD(PIT0_TAG, PIT8253, 0)
-	MCFG_DEVICE_ADD(PIT1_TAG, PIT8253, 0)
-	MCFG_DEVICE_ADD(PIT2_TAG, PIT8253, 0)
-	MCFG_DEVICE_ADD(PIT3_TAG, PIT8253, 0)
-	MCFG_DEVICE_ADD(PIT4_TAG, PIT8253, 0)
-	MCFG_DEVICE_ADD(PIT5_TAG, PIT8253, 0)
+	PIT8253(config, PIT0_TAG, 0);
+	PIT8253(config, PIT1_TAG, 0);
+	PIT8253(config, PIT2_TAG, 0);
+	PIT8253(config, PIT3_TAG, 0);
+	PIT8253(config, PIT4_TAG, 0);
+	PIT8253(config, PIT5_TAG, 0);
 
-	MCFG_DEVICE_ADD(PPI0_TAG, I8255A, 0)
-	MCFG_DEVICE_ADD(PPI1_TAG, I8255A, 0)
+	I8255A(config, PPI0_TAG);
+	I8255A(config, PPI1_TAG);
 
-	MCFG_DEVICE_ADD("kdc", I8279, 6554800 / 8) // Keyboard/Display Controller
-	//MCFG_I8279_OUT_IRQ_CB(INPUTLINE("maincpu", UPD7810_INTF1))   // irq
-	//MCFG_I8279_OUT_SL_CB(WRITE8(ax80_state, scanlines_w))          // scan SL lines
-	//MCFG_I8279_OUT_DISP_CB(WRITE8(ax80_state, digit_w))            // display A&B
-	//MCFG_I8279_IN_RL_CB(READ8(ax80_state, kbd_r))                  // kbd RL lines
-	//MCFG_I8279_IN_SHIFT_CB(VCC) // not connected
-	//MCFG_I8279_IN_CTRL_CB(VCC)  // not connected
-MACHINE_CONFIG_END
+	I8279(config, "kdc", 6554800 / 8); // Keyboard/Display Controller
+	//kdc.out_irq_calback().set_inputline("maincpu", UPD7810_INTF1);    // irq
+	//kdc.out_sl_callback().set(FUNC(ax80_state::scanlines_w));         // scan SL lines
+	//kdc.out_disp_callback().set(FUNC(ax80_state::digit_w));           // display A&B
+	//kdc.in_rl_callback().set(FUNC(ax80_state::kbd_r))                 // kbd RL lines
+	//kdc.in_shift_callback().set_constant(1);                          // not connected
+	//kdc.in_ctrl_callback().set_constant(1);                           // not connected
+}
 
 static INPUT_PORTS_START( ax80 )
 INPUT_PORTS_END
@@ -123,11 +126,11 @@ ROM_START( ax80 )
 	ROM_LOAD( "akai ax80 main cpu mask rom.ic2", 0x000000, 0x001000, CRC(241c078f) SHA1(7f5d0d718f2d03ec446568ae440beaff0aac6bfd) )
 	// external program EPROM
 	ROM_SYSTEM_BIOS( 0, "k", "REV.K" )
-	ROMX_LOAD( "ax-80k.ic4", 0x001000, 0x002000, CRC(a2f95ccf) SHA1(4e5f2c4c9a08ec1d38146cae786b400261a3dbb7), ROM_BIOS(1) )
+	ROMX_LOAD( "ax-80k.ic4", 0x001000, 0x002000, CRC(a2f95ccf) SHA1(4e5f2c4c9a08ec1d38146cae786b400261a3dbb7), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "l", "REV.L" )
-	ROMX_LOAD( "ax-80l.ic4", 0x001000, 0x002000, CRC(bc3d21bd) SHA1(d6730ec33b28e705a0ff88946b7860fadcc37793), ROM_BIOS(2) )
+	ROMX_LOAD( "ax-80l.ic4", 0x001000, 0x002000, CRC(bc3d21bd) SHA1(d6730ec33b28e705a0ff88946b7860fadcc37793), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 2, "i", "REV.I" )
-	ROMX_LOAD( "ax-80i.ic4", 0x001000, 0x002000, CRC(d616e435) SHA1(84820522e6a96fc29966f82e76254e54df15d7e6), ROM_BIOS(3) )
+	ROMX_LOAD( "ax-80i.ic4", 0x001000, 0x002000, CRC(d616e435) SHA1(84820522e6a96fc29966f82e76254e54df15d7e6), ROM_BIOS(2) )
 ROM_END
 
-CONS( 1984, ax80, 0, 0, ax80, ax80, ax80_state, 0, "Akai", "AX80", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 1984, ax80, 0, 0, ax80, ax80, ax80_state, empty_init, "Akai", "AX80", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

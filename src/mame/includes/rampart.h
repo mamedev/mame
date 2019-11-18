@@ -26,7 +26,7 @@ public:
 		m_bitmap(*this, "bitmap")
 	{ }
 
-	DECLARE_DRIVER_INIT(rampart);
+	void init_rampart();
 	void rampart(machine_config &config);
 
 protected:

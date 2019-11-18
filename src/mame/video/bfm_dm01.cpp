@@ -267,10 +267,10 @@ WRITE8_MEMBER( bfm_dm01_device::unknown_w )
 void bfm_dm01_device::bfm_dm01_memmap(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();                             // 8k RAM
-	map(0x2000, 0x2000).rw(this, FUNC(bfm_dm01_device::control_r), FUNC(bfm_dm01_device::control_w));  // control reg
-	map(0x2800, 0x2800).rw(this, FUNC(bfm_dm01_device::mux_r), FUNC(bfm_dm01_device::mux_w));           // mux
-	map(0x3000, 0x3000).rw(this, FUNC(bfm_dm01_device::comm_r), FUNC(bfm_dm01_device::comm_w));     //
-	map(0x3800, 0x3800).rw(this, FUNC(bfm_dm01_device::unknown_r), FUNC(bfm_dm01_device::unknown_w));   // ???
+	map(0x2000, 0x2000).rw(FUNC(bfm_dm01_device::control_r), FUNC(bfm_dm01_device::control_w));  // control reg
+	map(0x2800, 0x2800).rw(FUNC(bfm_dm01_device::mux_r), FUNC(bfm_dm01_device::mux_w));           // mux
+	map(0x3000, 0x3000).rw(FUNC(bfm_dm01_device::comm_r), FUNC(bfm_dm01_device::comm_w));     //
+	map(0x3800, 0x3800).rw(FUNC(bfm_dm01_device::unknown_r), FUNC(bfm_dm01_device::unknown_w));   // ???
 	map(0x4000, 0xFfff).rom();                             // 48k  ROM
 }
 
@@ -288,22 +288,22 @@ INTERRUPT_GEN_MEMBER( bfm_dm01_device::nmi_line_assert )
 	m_matrixcpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-MACHINE_CONFIG_START(bfm_dm01_device::device_add_mconfig)
-	MCFG_CPU_ADD("matrix", M6809, 2000000 )        /* matrix board 6809 CPU at 2 Mhz ?? I don't know the exact freq.*/
-	MCFG_CPU_PROGRAM_MAP(bfm_dm01_memmap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(bfm_dm01_device, nmi_line_assert, 1500 )          /* generate 1500 NMI's per second ?? what is the exact freq?? */
+void bfm_dm01_device::device_add_mconfig(machine_config &config)
+{
+	MC6809(config, m_matrixcpu, 8000000); // MC68B09CP (clock unknown)
+	m_matrixcpu->set_addrmap(AS_PROGRAM, &bfm_dm01_device::bfm_dm01_memmap);
+	m_matrixcpu->set_periodic_int(FUNC(bfm_dm01_device::nmi_line_assert), attotime::from_hz(1500));          /* generate 1500 NMI's per second ?? what is the exact freq?? */
 
-	MCFG_PALETTE_ADD("palette_lcd", 3)
+	PALETTE(config, m_palette).set_entries(3);
 
-	MCFG_SCREEN_ADD("dmd", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(65*2, 21*2)
-	MCFG_SCREEN_VISIBLE_AREA(0, 65*2-1, 0, 21*2-1)
-	MCFG_SCREEN_UPDATE_DRIVER(bfm_dm01_device, screen_update)
-
-	MCFG_SCREEN_PALETTE("palette_lcd")
-MACHINE_CONFIG_END
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(65*2, 21*2);
+	m_screen->set_visarea(0, 65*2-1, 0, 21*2-1);
+	m_screen->set_screen_update(FUNC(bfm_dm01_device::screen_update));
+	m_screen->set_palette(m_palette);
+}
 
 ///////////////////////////////////////////////////////////////////////////
 

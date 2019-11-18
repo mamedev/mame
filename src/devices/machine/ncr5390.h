@@ -7,52 +7,45 @@
 
 #include "machine/nscsi_bus.h"
 
-#define MCFG_NCR5390_IRQ_HANDLER(_devcb) \
-	devcb = &downcast<ncr5390_device &>(*device).set_irq_handler(DEVCB_##_devcb);
-
-#define MCFG_NCR5390_DRQ_HANDLER(_devcb) \
-	devcb = &downcast<ncr5390_device &>(*device).set_drq_handler(DEVCB_##_devcb);
-
-class ncr5390_device : public nscsi_device
+class ncr5390_device : public nscsi_device, public nscsi_slot_card_interface
 {
 public:
 	ncr5390_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
-	template <class Object> devcb_base &set_irq_handler(Object &&cb) { return m_irq_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_drq_handler(Object &&cb) { return m_drq_handler.set_callback(std::forward<Object>(cb)); }
+	auto irq_handler_cb() { return m_irq_handler.bind(); }
+	auto drq_handler_cb() { return m_drq_handler.bind(); }
 
 	virtual void map(address_map &map);
 
-	DECLARE_READ8_MEMBER(tcounter_lo_r);
-	DECLARE_WRITE8_MEMBER(tcount_lo_w);
-	DECLARE_READ8_MEMBER(tcounter_hi_r);
-	DECLARE_WRITE8_MEMBER(tcount_hi_w);
-	DECLARE_READ8_MEMBER(fifo_r);
-	DECLARE_WRITE8_MEMBER(fifo_w);
-	DECLARE_READ8_MEMBER(command_r);
-	DECLARE_WRITE8_MEMBER(command_w);
-	DECLARE_READ8_MEMBER(status_r);
-	DECLARE_WRITE8_MEMBER(bus_id_w);
-	DECLARE_READ8_MEMBER(istatus_r);
-	DECLARE_WRITE8_MEMBER(timeout_w);
-	DECLARE_READ8_MEMBER(seq_step_r);
-	DECLARE_WRITE8_MEMBER(sync_period_w);
-	DECLARE_READ8_MEMBER(fifo_flags_r);
-	DECLARE_WRITE8_MEMBER(sync_offset_w);
-	DECLARE_READ8_MEMBER(conf_r);
-	DECLARE_WRITE8_MEMBER(conf_w);
-	DECLARE_WRITE8_MEMBER(test_w);
-	DECLARE_WRITE8_MEMBER(clock_w);
+	uint8_t tcounter_lo_r();
+	void tcount_lo_w(uint8_t data);
+	uint8_t tcounter_hi_r();
+	void tcount_hi_w(uint8_t data);
+	uint8_t fifo_r();
+	void fifo_w(uint8_t data);
+	uint8_t command_r();
+	void command_w(uint8_t data);
+	virtual uint8_t status_r();
+	void bus_id_w(uint8_t data);
+	uint8_t istatus_r();
+	void timeout_w(uint8_t data);
+	uint8_t seq_step_r();
+	void sync_period_w(uint8_t data);
+	uint8_t fifo_flags_r();
+	void sync_offset_w(uint8_t data);
+	uint8_t conf_r();
+	void conf_w(uint8_t data);
+	void test_w(uint8_t data);
+	void clock_w(uint8_t data);
+
+	virtual uint8_t read(offs_t offset);
+	virtual void write(offs_t offset, uint8_t data);
 
 	virtual void scsi_ctrl_changed() override;
 
 	uint8_t dma_r();
 	void dma_w(uint8_t val);
-
-	// memory mapped wrappers for dma read/write
-	DECLARE_READ8_MEMBER(mdma_r) { return dma_r(); }
-	DECLARE_WRITE8_MEMBER(mdma_w) { dma_w(data); }
 
 protected:
 	ncr5390_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -79,6 +72,7 @@ protected:
 		BUSRESET_RESET_BOARD,
 
 		// Disconnected state commands
+		DISC_SEL_ARBITRATION_INIT,
 		DISC_SEL_ARBITRATION,
 		DISC_SEL_ATN_WAIT_REQ,
 		DISC_SEL_ATN_SEND_BYTE,
@@ -172,6 +166,7 @@ protected:
 		CD_SELECT_ATN_STOP = 0x43,
 		CD_ENABLE_SEL      = 0x44,
 		CD_DISABLE_SEL     = 0x45,
+		CD_SELECT_ATN3     = 0x46, // 53c90a
 		CT_SEND_MSG        = 0x20,
 		CT_SEND_STATUS     = 0x21,
 		CT_SEND_DATA       = 0x22,
@@ -183,11 +178,13 @@ protected:
 		CT_RECV_CMD        = 0x29,
 		CT_RECV_DATA       = 0x2a,
 		CT_RECV_CMD_SEQ    = 0x2b,
+		CT_ABORT_DMA       = 0x04, // 53c90a
 		CI_XFER            = 0x10,
 		CI_COMPLETE        = 0x11,
 		CI_MSG_ACCEPT      = 0x12,
 		CI_PAD             = 0x18,
-		CI_SET_ATN         = 0x1a
+		CI_SET_ATN         = 0x1a,
+		CI_RESET_ATN       = 0x1b, // 53c90a
 	};
 
 	enum { DMA_NONE, DMA_IN, DMA_OUT };
@@ -210,13 +207,11 @@ protected:
 	bool test_mode;
 
 	void dma_set(int dir);
-	void drq_set();
-	void drq_clear();
+	virtual void check_drq();
 
 	void start_command();
 	void step(bool timeout);
-	bool check_valid_command(uint8_t cmd);
-	int derive_msg_size(uint8_t msg_id);
+	virtual bool check_valid_command(uint8_t cmd);
 	void function_complete();
 	void function_bus_complete();
 	void bus_complete();
@@ -225,10 +220,6 @@ protected:
 	void command_pop_and_chain();
 	void check_irq();
 
-protected:
-	void reset_soft();
-
-private:
 	void reset_disconnect();
 
 	uint8_t fifo_pop();
@@ -239,7 +230,7 @@ private:
 	void delay(int cycles);
 	void delay_cycles(int cycles);
 
-	void decrement_tcounter();
+	void decrement_tcounter(int count = 1);
 
 	devcb_write_line m_irq_handler;
 	devcb_write_line m_drq_handler;
@@ -252,20 +243,37 @@ public:
 
 	virtual void map(address_map &map) override;
 
-	DECLARE_READ8_MEMBER(status_r);
+	virtual uint8_t status_r() override;
 
-	DECLARE_READ8_MEMBER(conf2_r) { return config2; };
-	DECLARE_WRITE8_MEMBER(conf2_w) { config2 = data; };
+	uint8_t conf2_r() { return config2; };
+	void conf2_w(uint8_t data) { config2 = data; };
+
+	virtual uint8_t read(offs_t offset) override;
+	virtual void write(offs_t offset, uint8_t data) override;
 
 protected:
 	ncr53c90a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override;
-	void reset_soft();
+	virtual void device_reset() override;
+
+	virtual bool check_valid_command(uint8_t cmd) override;
 
 	// 53c90a uses a previously reserved bit as an interrupt flag
 	enum {
 		S_INTERRUPT = 0x80,
+	};
+
+	enum conf2_mask : u8
+	{
+		PGDP  = 0x01, // pass through/generate data parity
+		PGRP  = 0x02, // pass through/generate register parity
+		ACDPE = 0x04, // abort on command/data parity error
+		S2FE  = 0x08, // scsi-2 features enable
+		TSDR  = 0x10, // tri-state dma request
+		SBO   = 0x20, // select byte order
+		LSP   = 0x40, // latch scsi phase
+		DAE   = 0x80, // data alignment enable
 	};
 
 private:
@@ -277,23 +285,56 @@ class ncr53c94_device : public ncr53c90a_device
 public:
 	ncr53c94_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	enum busmd_t : u8
+	{
+		BUSMD_0 = 0, // single bus: 8-bit host, 8 bit dma
+		BUSMD_1 = 1, // single bus: 8 bit host, 16 bit dma
+		BUSMD_2 = 2, // two buses: 8 bit multiplexed host, 16 bit dma
+		BUSMD_3 = 3, // two buses: 8 bit host, 16 bit dma
+	};
+	void set_busmd(busmd_t const busmd) { m_busmd = busmd; }
+
 	virtual void map(address_map &map) override;
 
-	DECLARE_READ8_MEMBER(conf3_r) { return config3; };
-	DECLARE_WRITE8_MEMBER(conf3_w) { config3 = data; };
-	DECLARE_WRITE8_MEMBER(fifo_align_w) { fifo_align = data; };
+	uint8_t conf3_r() { return config3; };
+	void conf3_w(uint8_t data) { config3 = data; };
+	void fifo_align_w(uint8_t data) { fifo_align = data; };
+
+	virtual uint8_t read(offs_t offset) override;
+	virtual void write(offs_t offset, uint8_t data) override;
+
+	u16 dma16_r();
+	void dma16_w(u16 data);
 
 protected:
+	ncr53c94_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	enum conf3_mask : u8
+	{
+		BS8  = 0x01, // burst size 8
+		MDM  = 0x02, // modify dma mode
+		LBTM = 0x04, // last byte transfer mode
+	};
+
 	virtual void device_start() override;
-	void reset_soft();
+	virtual void device_reset() override;
+	virtual void check_drq() override;
 
 private:
 	u8 config3;
 	u8 fifo_align;
+	busmd_t m_busmd;
+};
+
+class ncr53cf94_device : public ncr53c94_device
+{
+public:
+	ncr53cf94_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 DECLARE_DEVICE_TYPE(NCR5390, ncr5390_device)
 DECLARE_DEVICE_TYPE(NCR53C90A, ncr53c90a_device)
 DECLARE_DEVICE_TYPE(NCR53C94, ncr53c94_device)
+DECLARE_DEVICE_TYPE(NCR53CF94, ncr53cf94_device)
 
 #endif // MAME_MACHINE_NCR5390_H

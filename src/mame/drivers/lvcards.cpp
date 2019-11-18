@@ -69,7 +69,7 @@ TODO:
 
 - What do the control ports do? Payout?
 - Input ports need to be cleaned up
-- NVRAM does not work for lvcards?
+- NVRAM does not work for lvcards? In lvcardsa it works
 
 ***************************************************************************/
 
@@ -83,59 +83,63 @@ TODO:
 #include "speaker.h"
 
 
-MACHINE_START_MEMBER(lvcards_state,lvpoker)
+void lvpoker_state::machine_start()
 {
+	lvcards_state::machine_start();
+
 	save_item(NAME(m_payout));
 	save_item(NAME(m_pulse));
 	save_item(NAME(m_result));
 }
 
-MACHINE_RESET_MEMBER(lvcards_state,lvpoker)
+void lvpoker_state::machine_reset()
 {
+	lvcards_state::machine_reset();
+
 	m_payout = 0;
 	m_pulse = 0;
 	m_result = 0;
 }
 
-WRITE8_MEMBER(lvcards_state::control_port_2_w)
+WRITE8_MEMBER(lvpoker_state::control_port_2_w)
 {
 	switch (data)
 	{
-		case 0x60:
+	case 0x60:
 		m_payout = 1;
 		break;
-		case 0xc0:
+	case 0xc0:
 		m_payout = 1;
 		break;
-		default:
+	default:
 		m_payout = 0;
 		break;
 	}
 }
 
-WRITE8_MEMBER(lvcards_state::control_port_2a_w)
+WRITE8_MEMBER(lvpoker_state::control_port_2a_w)
 {
 	switch (data)
 	{
-		case 0x60:
+	case 0x60:
 		m_payout = 1;
 		break;
-		case 0x80:
+	case 0x80:
 		m_payout = 1;
 		break;
-		default:
+	default:
 		m_payout = 0;
 		break;
 	}
 }
 
-READ8_MEMBER(lvcards_state::payout_r)
+READ8_MEMBER(lvpoker_state::payout_r)
 {
 	m_result = ioport("IN2")->read();
 
 	if (m_payout)
 	{
-		if ( m_pulse < 3 )
+		if (m_pulse < 3)
 		{
 			m_result = m_result | 0x40;
 			m_pulse++;
@@ -148,23 +152,23 @@ READ8_MEMBER(lvcards_state::payout_r)
 	return m_result;
 }
 
-void lvcards_state::ponttehk_map(address_map &map)
+void lvpoker_state::ponttehk_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
 	map(0x6000, 0x67ff).ram().share("nvram");
-	map(0x8000, 0x83ff).ram().w(this, FUNC(lvcards_state::lvcards_videoram_w)).share("videoram");
-	map(0x8400, 0x87ff).ram().w(this, FUNC(lvcards_state::lvcards_colorram_w)).share("colorram");
+	map(0x8000, 0x83ff).ram().w(FUNC(lvpoker_state::videoram_w)).share("videoram");
+	map(0x8400, 0x87ff).ram().w(FUNC(lvpoker_state::colorram_w)).share("colorram");
 	map(0xa000, 0xa000).portr("IN0");
 	map(0xa001, 0xa001).portr("IN1").nopw(); // lamps
-	map(0xa002, 0xa002).r(this, FUNC(lvcards_state::payout_r)).w(this, FUNC(lvcards_state::control_port_2a_w));//AM_WRITENOP // ???
+	map(0xa002, 0xa002).r(FUNC(lvpoker_state::payout_r)).w(FUNC(lvpoker_state::control_port_2a_w));//.nopw(); // ???
 }
 
 void lvcards_state::lvcards_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
 	map(0x6000, 0x67ff).ram().share("nvram");
-	map(0x9000, 0x93ff).ram().w(this, FUNC(lvcards_state::lvcards_videoram_w)).share("videoram");
-	map(0x9400, 0x97ff).ram().w(this, FUNC(lvcards_state::lvcards_colorram_w)).share("colorram");
+	map(0x9000, 0x93ff).ram().w(FUNC(lvcards_state::videoram_w)).share("videoram");
+	map(0x9400, 0x97ff).ram().w(FUNC(lvcards_state::colorram_w)).share("colorram");
 	map(0xa000, 0xa000).portr("IN0");
 	map(0xa001, 0xa001).portr("IN1").nopw();
 	map(0xa002, 0xa002).portr("IN2").nopw();
@@ -178,15 +182,21 @@ void lvcards_state::lvcards_io_map(address_map &map)
 	map(0x00, 0x01).w("aysnd", FUNC(ay8910_device::data_address_w));
 }
 
-void lvcards_state::lvpoker_map(address_map &map)
+void lvcards_state::lvcardsa_decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom().share("decrypted_opcodes");
+	map(0xc000, 0xdfff).rom().region("maincpu", 0xc000);
+}
+
+void lvpoker_state::lvpoker_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
 	map(0x6000, 0x67ff).ram().share("nvram");
-	map(0x9000, 0x93ff).ram().w(this, FUNC(lvcards_state::lvcards_videoram_w)).share("videoram");
-	map(0x9400, 0x97ff).ram().w(this, FUNC(lvcards_state::lvcards_colorram_w)).share("colorram");
+	map(0x9000, 0x93ff).ram().w(FUNC(lvpoker_state::videoram_w)).share("videoram");
+	map(0x9400, 0x97ff).ram().w(FUNC(lvpoker_state::colorram_w)).share("colorram");
 	map(0xa000, 0xa000).portr("IN0");
 	map(0xa001, 0xa001).portr("IN1").nopw(); // lamps
-	map(0xa002, 0xa002).r(this, FUNC(lvcards_state::payout_r)).w(this, FUNC(lvcards_state::control_port_2_w));
+	map(0xa002, 0xa002).r(FUNC(lvpoker_state::payout_r)).w(FUNC(lvpoker_state::control_port_2_w));
 	map(0xc000, 0xdfff).rom();
 }
 
@@ -449,65 +459,69 @@ static const gfx_layout charlayout =
 
 /* Graphics Decode Information */
 
-static GFXDECODE_START( lvcards )
+static GFXDECODE_START( gfx_lvcards )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 16 )
 GFXDECODE_END
 
 /* Sound Interfaces */
 
-MACHINE_CONFIG_START(lvcards_state::lvcards)
+void lvcards_state::lvcards(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu",Z80, 18432000/4) // unknown frequency, assume same as tehkanwc.cpp
-	MCFG_CPU_PROGRAM_MAP(lvcards_map)
-	MCFG_CPU_IO_MAP(lvcards_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", lvcards_state,  irq0_line_hold)
+	Z80(config, m_maincpu, 18432000/4); // unknown frequency, assume same as tehkanwc.cpp
+	m_maincpu->set_addrmap(AS_PROGRAM, &lvcards_state::lvcards_map);
+	m_maincpu->set_addrmap(AS_IO, &lvcards_state::lvcards_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(lvcards_state::irq0_line_hold));
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(8*0, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(lvcards_state, screen_update_lvcards)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(8*0, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(lvcards_state::screen_update_lvcards));
+	screen.set_palette("palette");
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", lvcards)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(lvcards_state, lvcards)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_lvcards);
+	PALETTE(config, "palette", FUNC(lvcards_state::lvcards_palette), 256);
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 18432000/12) // unknown frequency, assume same as tehkanwc.cpp
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW0"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	ay8910_device &aysnd(AY8910(config, "aysnd", 18432000/12)); // unknown frequency, assume same as tehkanwc.cpp
+	aysnd.port_a_read_callback().set_ioport("DSW0");
+	aysnd.port_b_read_callback().set_ioport("DSW1");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
-MACHINE_CONFIG_START(lvcards_state::lvpoker)
+void lvcards_state::lvcardsa(machine_config &config)
+{
+	lvcards(config);
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
+	m_maincpu->set_addrmap(AS_OPCODES, &lvpoker_state::lvcardsa_decrypted_opcodes_map);
+}
+
+void lvpoker_state::lvpoker(machine_config &config)
+{
 	lvcards(config);
 
 	// basic machine hardware
-	MCFG_NVRAM_ADD_1FILL("nvram")
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(lvpoker_map)
-	MCFG_MACHINE_START_OVERRIDE(lvcards_state,lvpoker)
-	MCFG_MACHINE_RESET_OVERRIDE(lvcards_state,lvpoker)
-MACHINE_CONFIG_END
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
+	m_maincpu->set_addrmap(AS_PROGRAM, &lvpoker_state::lvpoker_map);
+}
 
-MACHINE_CONFIG_START(lvcards_state::ponttehk)
+void lvpoker_state::ponttehk(machine_config &config)
+{
 	lvcards(config);
 
 	// basic machine hardware
-	MCFG_NVRAM_ADD_1FILL("nvram")
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(ponttehk_map)
-	MCFG_MACHINE_RESET_OVERRIDE(lvcards_state,lvpoker)
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
+	m_maincpu->set_addrmap(AS_PROGRAM, &lvpoker_state::ponttehk_map);
 
 	// video hardware
-	MCFG_DEVICE_REMOVE("palette")
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
-MACHINE_CONFIG_END
+	PALETTE(config.replace(), "palette", palette_device::RGB_444_PROMS, "proms", 256);
+}
 
 ROM_START( lvpoker )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -553,6 +567,59 @@ ROM_START( lvcards )
 	ROM_LOAD( "1.7a", 0x0200,  0x0100, CRC(e40f2363) SHA1(cea598b6ed037dd3b4306c2ca3b0b4d5197d42a4) )
 ROM_END
 
+/*
+>romcmp -d lvcards.zip lvcardsa.zip
+10 and 10 files
+3.7c                                            FIXED BITS (0000xxxx)
+2.7b                                            FIXED BITS (0000xxxx)
+1.7a                                            FIXED BITS (0000xxxx)
+                        7052.a7                 FIXED BITS (0000xxxx)
+                        7052.b7                 FIXED BITS (0000xxxx)
+                        7052.c7                 FIXED BITS (0000xxxx)
+lc4.bin                 4.f4                    IDENTICAL
+lc6.bin                 6.c4                    IDENTICAL
+lc7.bin                 7.a4                    IDENTICAL
+lc5.bin      [1/2]      5.d4         [1/2]      IDENTICAL
+3.7c         [1/2]      7052.c7      [1/2]      IDENTICAL
+2.7b         [1/2]      7052.b7      [1/2]      IDENTICAL
+1.7a         [1/2]      7052.a7      [1/2]      IDENTICAL
+lc3.bin      [2/2]      3.h4         [2/2]      IDENTICAL
+lc3.bin      [1/2]      3.h4         [1/2]      99.975586%
+lc5.bin      [2/2]      5.d4         [2/2]      99.963379%
+3.7c         [2/2]      7052.c7      [2/2]      96.875000%
+1.7a         [2/2]      7052.a7      [2/2]      94.531250%
+2.7b         [2/2]      7052.b7      [2/2]      93.750000%
+lc2.bin      [even 1/2] 2.k4         [even 1/2] 15.966797%
+lc1.bin      [1/4]      1.l4         [1/4]      10.009766%
+lc1.bin      [3/4]      1.l4         [3/4]      9.814453%
+lc2.bin      [odd 1/2]  2.k4         [even 2/2] 0.781250%
+lc2.bin      [odd 2/2]  2.k4         [odd 1/2]  0.488281%
+lc1.bin      [2/4]      1.l4         [4/4]      0.317383%
+lc1.bin      [4/4]      1.l4         [2/4]      0.317383%
+lc2.bin      [even 2/2] 2.k4         [odd 2/2]  0.146484%
+*/
+ROM_START( lvcardsa )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.l4", 0x0000, 0x4000, CRC(81a25f70) SHA1(ce8917674b3374e5e138420f062d9b7aba3f6e11) )
+	ROM_LOAD( "2.k4", 0x4000, 0x2000, CRC(d1c72fc2) SHA1(496606e129046d253d716254ef4e58a93ca10aa0) )
+	ROM_LOAD( "3.h4", 0xc000, 0x2000, CRC(45cb4b4f) SHA1(6eb5725c048efe729246c730d6576b19ee24eab7) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "4.f4", 0x0000, 0x2000, CRC(dd705389) SHA1(271c11c2bd9affd976d65e318fd9fb01dbdde040) )  // identical
+	ROM_CONTINUE(        0x8000, 0x2000 )
+	ROM_LOAD( "5.d4", 0x2000, 0x2000, CRC(60841508) SHA1(1da57c57ae01b8c93c32e6ffe7efd0852296eaf0) )  // 1st half: identical. 2nd half: 99.963379%
+	ROM_CONTINUE(        0xa000, 0x2000 )
+	ROM_LOAD( "6.c4", 0x4000, 0x2000, CRC(2991a6ec) SHA1(b2c32550884b7b708db48bb7f0854bbad504417d) )  // identical
+	ROM_RELOAD(          0xc000, 0x2000 )
+	ROM_LOAD( "7.a4", 0x6000, 0x2000, CRC(f1b84c56) SHA1(6834139400bf8aa8db17f65bfdcbdcb2433d5fdc) )  // identical
+	ROM_RELOAD(          0xe000, 0x2000 )
+
+	ROM_REGION( 0x0300, "proms", 0 )
+	ROM_LOAD( "7052.c7", 0x0000,  0x0100, CRC(c8ddd9d8) SHA1(511a575b9a0c66819754146f72eab075bbc0a06e) )
+	ROM_LOAD( "7052.b7", 0x0100,  0x0100, CRC(a7f37cb0) SHA1(236145e93af244a50ed66b9875ed019b1dde9027) )
+	ROM_LOAD( "7052.a7", 0x0200,  0x0100, CRC(dcb970fd) SHA1(ce88f5f49dbcf187ac9344235b035f742c820336) )
+ROM_END
+
 ROM_START( ponttehk )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ponttehk.001", 0x0000, 0x4000, CRC(1f8c1b38) SHA1(3776ddd695741223bd9ad41f74187bff31f2cd3b) )
@@ -570,6 +637,66 @@ ROM_START( ponttehk )
 	ROM_LOAD( "pon24s10.001", 0x0200, 0x0100, CRC(c64ecee8) SHA1(80c9ec21e135235f7f2d41ce7900cf3904123823) )  /* blue component */
 ROM_END
 
-GAME( 1985, lvcards,        0, lvcards,  lvcards,  lvcards_state, 0, ROT0, "Tehkan", "Lovely Cards",       0 )
-GAME( 1985, lvpoker,  lvcards, lvpoker,  lvpoker,  lvcards_state, 0, ROT0, "Tehkan", "Lovely Poker [BET]", 0 )
-GAME( 1985, ponttehk,       0, ponttehk, ponttehk, lvcards_state, 0, ROT0, "Tehkan", "Pontoon (Tehkan)",   0 )
+void lvcards_state::init_lvcardsa()
+{
+	uint8_t *ROM = memregion("maincpu")->base();
+
+	for (int i = 0; i < 0x6000; i++)
+	{
+		uint8_t x = ROM[i];
+
+		switch (i & 0x1111)
+		{
+			case 0x0000: x = bitswap<8>(x ^ 0xa8, 7, 6, 3, 4, 5, 2, 1, 0); break;
+			case 0x0001: x = bitswap<8>(x ^ 0xa8, 3, 6, 5, 4, 7, 2, 1, 0); break;
+			case 0x0010: x = bitswap<8>(x ^ 0x28, 5, 6, 3, 4, 7, 2, 1, 0); break;
+			case 0x0011: x = bitswap<8>(x ^ 0xa8, 7, 6, 5, 4, 3, 2, 1, 0); break; // xor ok, no swap?
+			case 0x0100: x = bitswap<8>(x ^ 0xa8, 3, 6, 5, 4, 7, 2, 1, 0); break;
+			case 0x0101: x = bitswap<8>(x ^ 0xa8, 3, 6, 5, 4, 7, 2, 1, 0); break;
+			case 0x0110: x = bitswap<8>(x ^ 0x28, 5, 6, 3, 4, 7, 2, 1, 0); break;
+			case 0x0111: x = bitswap<8>(x ^ 0xa8, 7, 6, 3, 4, 5, 2, 1, 0); break;
+			case 0x1000: x = bitswap<8>(x ^ 0xa8, 7, 6, 3, 4, 5, 2, 1, 0); break;
+			case 0x1001: x = bitswap<8>(x ^ 0x28, 5, 6, 7, 4, 3, 2, 1, 0); break;
+			case 0x1010: x = bitswap<8>(x ^ 0xa8, 3, 6, 5, 4, 7, 2, 1, 0); break;
+			case 0x1011: x = bitswap<8>(x ^ 0xa8, 3, 6, 5, 4, 7, 2, 1, 0); break;
+			case 0x1100: x = bitswap<8>(x ^ 0xa8, 3, 6, 5, 4, 7, 2, 1, 0); break;
+			case 0x1101: x = bitswap<8>(x ^ 0xa8, 7, 6, 3, 4, 5, 2, 1, 0); break;
+			case 0x1110: x = bitswap<8>(x ^ 0x28, 5, 6, 7, 4, 3, 2, 1, 0); break;
+			case 0x1111: x = bitswap<8>(x ^ 0xa8, 3, 6, 5, 4, 7, 2, 1, 0); break;
+		}
+
+		m_decrypted_opcodes[i] = x;
+	}
+
+	for (int A = 0; A < 0x6000; A++)
+	{
+		uint8_t x = ROM[A];
+
+		switch(A & 0x1111)
+		{
+			case 0x0000: x = bitswap<8>(x ^ 0xa8, 3, 6, 5, 4, 7, 2, 1, 0); break;
+			case 0x0001: x = bitswap<8>(x ^ 0xa8, 3, 6, 5, 4, 7, 2, 1, 0); break;
+			case 0x0010: x = bitswap<8>(x ^ 0x28, 5, 6, 3, 4, 7, 2, 1, 0); break;
+			case 0x0011: x = bitswap<8>(x ^ 0xa8, 7, 6, 5, 4, 3, 2, 1, 0); break; // xor ok, no swap?
+			case 0x0100: x = bitswap<8>(x ^ 0xa8, 3, 6, 7, 4, 5, 2, 1, 0); break;
+			case 0x0101: x = bitswap<8>(x ^ 0xa8, 3, 6, 5, 4, 7, 2, 1, 0); break;
+			case 0x0110: x = bitswap<8>(x ^ 0x28, 5, 6, 3, 4, 7, 2, 1, 0); break;
+			case 0x0111: x = bitswap<8>(x ^ 0xa8, 7, 6, 3, 4, 5, 2, 1, 0); break;
+			case 0x1000: x = bitswap<8>(x ^ 0xa8, 3, 6, 5, 4, 7, 2, 1, 0); break;
+			case 0x1001: x = bitswap<8>(x ^ 0x28, 5, 6, 7, 4, 3, 2, 1, 0); break;
+			case 0x1010: x = bitswap<8>(x ^ 0x28, 5, 6, 7, 4, 3, 2, 1, 0); break;
+			case 0x1011: x = bitswap<8>(x ^ 0xa8, 3, 6, 5, 4, 7, 2, 1, 0); break;
+			case 0x1100: x = bitswap<8>(x ^ 0xa8, 7, 6, 3, 4, 5, 2, 1, 0); break;
+			case 0x1101: x = bitswap<8>(x ^ 0x28, 5, 6, 7, 4, 3, 2, 1, 0); break;
+			case 0x1110: x = bitswap<8>(x ^ 0xa8, 3, 6, 5, 4, 7, 2, 1, 0); break;
+			case 0x1111: x = bitswap<8>(x ^ 0xa8, 7, 6, 3, 4, 5, 2, 1, 0); break;
+		}
+
+		ROM[A] = x;
+	}
+}
+
+GAME( 1985, lvcards,  0,       lvcards,  lvcards,  lvcards_state, empty_init,    ROT0, "Tehkan", "Lovely Cards",             MACHINE_SUPPORTS_SAVE )
+GAME( 1985, lvcardsa, lvcards, lvcardsa, lvcards,  lvcards_state, init_lvcardsa, ROT0, "Tehkan", "Lovely Cards (encrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, lvpoker,  lvcards, lvpoker,  lvpoker,  lvpoker_state, empty_init,    ROT0, "Tehkan", "Lovely Poker [BET]",       MACHINE_SUPPORTS_SAVE )
+GAME( 1985, ponttehk, 0,       ponttehk, ponttehk, lvpoker_state, empty_init,    ROT0, "Tehkan", "Pontoon (Tehkan)",         MACHINE_SUPPORTS_SAVE )

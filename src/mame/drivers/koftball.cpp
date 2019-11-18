@@ -34,8 +34,10 @@ ft5_v6_c4.u58 /
 #include "sound/okim6295.h"
 #include "sound/ym2413.h"
 #include "video/ramdac.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 #define NVRAM_HACK 1
@@ -43,15 +45,21 @@ ft5_v6_c4.u58 /
 class koftball_state : public driver_device
 {
 public:
-	koftball_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	koftball_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_main_ram(*this, "main_ram"),
 		m_bmc_1_videoram(*this, "bmc_1_videoram"),
 		m_bmc_2_videoram(*this, "bmc_2_videoram"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
+	void koftball(machine_config &config);
+
+	void init_koftball();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint16_t> m_main_ram;
 	required_shared_ptr<uint16_t> m_bmc_1_videoram;
@@ -67,13 +75,11 @@ public:
 	DECLARE_WRITE16_MEMBER(prot_w);
 	DECLARE_WRITE16_MEMBER(bmc_1_videoram_w);
 	DECLARE_WRITE16_MEMBER(bmc_2_videoram_w);
-	DECLARE_DRIVER_INIT(koftball);
 	TILE_GET_INFO_MEMBER(get_t1_tile_info);
 	TILE_GET_INFO_MEMBER(get_t2_tile_info);
 	virtual void video_start() override;
 	uint32_t screen_update_koftball(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(bmc_interrupt);
-	void koftball(machine_config &config);
 	void koftball_mem(address_map &map);
 	void ramdac_map(address_map &map);
 };
@@ -99,8 +105,8 @@ TILE_GET_INFO_MEMBER(koftball_state::get_t2_tile_info)
 
 void koftball_state::video_start()
 {
-	m_tilemap_1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(koftball_state::get_t1_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
-	m_tilemap_2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(koftball_state::get_t2_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_tilemap_1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(koftball_state::get_t1_tile_info)), TILEMAP_SCAN_ROWS, 8,8,64,32);
+	m_tilemap_2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(koftball_state::get_t2_tile_info)), TILEMAP_SCAN_ROWS, 8,8,64,32);
 
 	m_tilemap_1->set_transparent_pen(0);
 }
@@ -154,15 +160,15 @@ void koftball_state::koftball_mem(address_map &map)
 	map(0x000000, 0x01ffff).rom();
 	map(0x220000, 0x22ffff).ram().share("main_ram");
 
-	map(0x260000, 0x260fff).w(this, FUNC(koftball_state::bmc_1_videoram_w)).share("bmc_1_videoram");
-	map(0x261000, 0x261fff).w(this, FUNC(koftball_state::bmc_2_videoram_w)).share("bmc_2_videoram");
+	map(0x260000, 0x260fff).w(FUNC(koftball_state::bmc_1_videoram_w)).share("bmc_1_videoram");
+	map(0x261000, 0x261fff).w(FUNC(koftball_state::bmc_2_videoram_w)).share("bmc_2_videoram");
 	map(0x262000, 0x26ffff).ram();
 
 	map(0x280000, 0x28ffff).ram(); /* unused ? */
 	map(0x2a0000, 0x2a001f).nopw();
-	map(0x2a0000, 0x2a001f).r(this, FUNC(koftball_state::random_number_r));
-	map(0x2b0000, 0x2b0003).r(this, FUNC(koftball_state::random_number_r));
-	map(0x2d8000, 0x2d8001).r(this, FUNC(koftball_state::random_number_r));
+	map(0x2a0000, 0x2a001f).r(FUNC(koftball_state::random_number_r));
+	map(0x2b0000, 0x2b0003).r(FUNC(koftball_state::random_number_r));
+	map(0x2d8000, 0x2d8001).r(FUNC(koftball_state::random_number_r));
 	map(0x2da000, 0x2da003).w("ymsnd", FUNC(ym2413_device::write)).umask16(0xff00);
 
 	map(0x2db001, 0x2db001).w("ramdac", FUNC(ramdac_device::index_w));
@@ -173,8 +179,8 @@ void koftball_state::koftball_mem(address_map &map)
 	map(0x2f0000, 0x2f0003).portr("INPUTS");
 	map(0x300000, 0x300001).nopw();
 	map(0x320000, 0x320001).nopw();
-	map(0x340000, 0x340001).r(this, FUNC(koftball_state::prot_r));
-	map(0x360000, 0x360001).w(this, FUNC(koftball_state::prot_w));
+	map(0x340000, 0x340001).r(FUNC(koftball_state::prot_r));
+	map(0x360000, 0x360001).w(FUNC(koftball_state::prot_w));
 }
 
 void koftball_state::ramdac_map(address_map &map)
@@ -229,39 +235,42 @@ static const gfx_layout tilelayout =
 	8*32
 };
 
-static GFXDECODE_START( koftball )
+static GFXDECODE_START( gfx_koftball )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,  0, 1 )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(koftball_state::koftball)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(21'477'272) / 2)
-	MCFG_CPU_PROGRAM_MAP(koftball_mem)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", koftball_state, bmc_interrupt, "screen", 0, 1)
+void koftball_state::koftball(machine_config &config)
+{
+	M68000(config, m_maincpu, XTAL(21'477'272) / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &koftball_state::koftball_mem);
+	TIMER(config, "scantimer").configure_scanline(FUNC(koftball_state::bmc_interrupt), "screen", 0, 1);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_UPDATE_DRIVER(koftball_state, screen_update_koftball)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_screen_update(FUNC(koftball_state::screen_update_koftball));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 64*8-1, 0*8, 30*8-1);
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
+	PALETTE(config, m_palette).set_entries(256);
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
+	ramdac.set_addrmap(0, &koftball_state::ramdac_map);
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", koftball)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_koftball);
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))  // guessed chip type, clock not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	ym2413_device &ymsnd(YM2413(config, "ymsnd", XTAL(3'579'545)));  // guessed chip type, clock not verified
+	ymsnd.add_route(ALL_OUTPUTS, "lspeaker", 0.50);
+	ymsnd.add_route(ALL_OUTPUTS, "rspeaker", 0.50);
 
-	MCFG_OKIM6295_ADD("oki", 1122000, PIN7_LOW) /* clock frequency & pin 7 not verified */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
-MACHINE_CONFIG_END
+	okim6295_device &oki(OKIM6295(config, "oki", 1122000, okim6295_device::PIN7_LOW)); /* clock frequency & pin 7 not verified */
+	oki.add_route(ALL_OUTPUTS, "lspeaker", 0.50);
+	oki.add_route(ALL_OUTPUTS, "rspeaker", 0.50);
+}
 
 ROM_START( koftball )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* 68000 Code */
@@ -304,14 +313,14 @@ static const uint16_t nvram[]=
 };
 
 #endif
-DRIVER_INIT_MEMBER(koftball_state,koftball)
+void koftball_state::init_koftball()
 {
 	save_item(NAME(m_prot_data));
 
 #if NVRAM_HACK
 	{
-		int offset=0;
-		while(nvram[offset]!=0xffff)
+		int offset = 0;
+		while(nvram[offset] != 0xffff)
 		{
 			m_main_ram[offset]=nvram[offset];
 			++offset;
@@ -320,4 +329,4 @@ DRIVER_INIT_MEMBER(koftball_state,koftball)
 #endif
 }
 
-GAME( 1995, koftball,    0, koftball,    koftball, koftball_state,    koftball, ROT0,  "BMC", "King of Football", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, koftball, 0, koftball, koftball, koftball_state, init_koftball, ROT0, "BMC", "King of Football", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

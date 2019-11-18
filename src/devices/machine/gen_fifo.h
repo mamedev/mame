@@ -72,13 +72,6 @@
  */
 
 
-#define MCFG_GENERIC_FIFO_EMPTY_CALLBACK(_devcb) \
-	devcb = &downcast<screen_device &>(*device).set_empty_cb(DEVCB_##_devcb);
-
-#define MCFG_GENERIC_FIFO_FULL_CALLBACK(_devcb) \
-	devcb = &downcast<screen_device &>(*device).set_full_cb(DEVCB_##_devcb);
-
-
 template<typename T> class generic_fifo_device_base : public device_t {
 public:
 	/* The general setup.  Call be called multiple times, clears the fifo. */
@@ -118,8 +111,8 @@ public:
 	void clear();
 
 	/* Callbacks signalling empty (true)/nonempty (false) and full (true)/nonfull (false) */
-	template<class Object> devcb_base &set_empty_cb(Object &&object) { return m_empty_cb.set_callback(std::forward<Object>(object)); }
-	template<class Object> devcb_base &set_full_cb(Object &&object) { return m_full_cb.set_callback(std::forward<Object>(object)); }
+	auto empty_cb() { return m_empty_cb.bind(); }
+	auto full_cb() { return m_full_cb.bind(); }
 
 	/* Get the fifo current size - Note that real hardware usually
 	   can't do that.  May be bigger that the fifo size if some extra

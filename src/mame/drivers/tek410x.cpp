@@ -19,6 +19,7 @@
 
 #include "emu.h"
 #include "cpu/i86/i186.h"
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -29,14 +30,18 @@ class tek4107a_state : public driver_device
 {
 public:
 	tek4107a_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag)
+	{ }
 
-	virtual void machine_start() override;
-
-	virtual void video_start() override;
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void tek4109a(machine_config &config);
 	void tek4107a(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
+private:
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void tek4107a_io(address_map &map);
 	void tek4107a_mem(address_map &map);
 };
@@ -80,7 +85,7 @@ static const gfx_layout tek4107a_charlayout =
 	16*8
 };
 
-static GFXDECODE_START( tek4107a )
+static GFXDECODE_START( gfx_tek4107a )
 	GFXDECODE_ENTRY( "chargen", 0x0000, tek4107a_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -92,30 +97,32 @@ void tek4107a_state::machine_start()
 
 /* Machine Driver */
 
-MACHINE_CONFIG_START(tek4107a_state::tek4107a)
+void tek4107a_state::tek4107a(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD(I80188_TAG, I80188, 21000000)
-	MCFG_CPU_PROGRAM_MAP(tek4107a_mem)
-	MCFG_CPU_IO_MAP(tek4107a_io)
+	i80188_cpu_device &maincpu(I80188(config, I80188_TAG, 21000000));
+	maincpu.set_addrmap(AS_PROGRAM, &tek4107a_state::tek4107a_mem);
+	maincpu.set_addrmap(AS_IO, &tek4107a_state::tek4107a_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(tek4107a_state, screen_update)
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update(FUNC(tek4107a_state::screen_update));
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 640-1, 0, 480-1);
 
-	MCFG_PALETTE_ADD("palette", 64)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tek4107a)
-MACHINE_CONFIG_END
+	PALETTE(config, "palette").set_entries(64);
+	GFXDECODE(config, "gfxdecode", "palette", gfx_tek4107a);
+}
 
-MACHINE_CONFIG_START(tek4107a_state::tek4109a)
+void tek4107a_state::tek4109a(machine_config &config)
+{
 	tek4107a(config);
+
 	/* video hardware */
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(4096)
-MACHINE_CONFIG_END
+	subdevice<palette_device>("palette")->set_entries(4096);
+}
 
 /* ROMs */
 
@@ -152,6 +159,6 @@ ROM_END
 
 /* System Drivers */
 
-//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT     STATE           INIT  COMPANY      FULLNAME           FLAGS
-COMP( 1983, tek4107a,   0,          0,      tek4107a,   tek4107a, tek4107a_state, 0,    "Tektronix", "Tektronix 4107A", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1983, tek4109a,   tek4107a,   0,      tek4109a,   tek4107a, tek4107a_state, 0,    "Tektronix", "Tektronix 4109A", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY      FULLNAME           FLAGS
+COMP( 1983, tek4107a, 0,        0,      tek4107a, tek4107a, tek4107a_state, empty_init, "Tektronix", "Tektronix 4107A", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1983, tek4109a, tek4107a, 0,      tek4109a, tek4107a, tek4107a_state, empty_init, "Tektronix", "Tektronix 4109A", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

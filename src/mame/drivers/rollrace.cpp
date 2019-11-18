@@ -72,17 +72,17 @@ void rollrace_state::rollrace_map(address_map &map)
 	map(0x8000, 0x9fff).rom();          /* only rollace2 */
 	map(0xc000, 0xcfff).ram();
 	map(0xd806, 0xd806).nopr(); /* looks like a watchdog, bit4 checked*/
-	map(0xd900, 0xd900).rw(this, FUNC(rollrace_state::fake_d800_r), FUNC(rollrace_state::fake_d800_w)); /* protection ??*/
-	map(0xe000, 0xe3ff).ram().w(this, FUNC(rollrace_state::vram_w)).share("videoram");
-	map(0xe400, 0xe47f).ram().w(this, FUNC(rollrace_state::cram_w)).share("colorram");
+	map(0xd900, 0xd900).rw(FUNC(rollrace_state::fake_d800_r), FUNC(rollrace_state::fake_d800_w)); /* protection ??*/
+	map(0xe000, 0xe3ff).ram().w(FUNC(rollrace_state::vram_w)).share("videoram");
+	map(0xe400, 0xe47f).ram().w(FUNC(rollrace_state::cram_w)).share("colorram");
 	map(0xe800, 0xe800).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0xec00, 0xec0f).noprw(); /* Analog sound effects ?? ec00 sound enable ?*/
 	map(0xf000, 0xf0ff).ram().share("spriteram");
-	map(0xf400, 0xf400).w(this, FUNC(rollrace_state::backgroundcolor_w));
+	map(0xf400, 0xf400).w(FUNC(rollrace_state::backgroundcolor_w));
 	map(0xf800, 0xf800).portr("P1");
-	map(0xf801, 0xf801).portr("P2").w(this, FUNC(rollrace_state::bkgpen_w));
-	map(0xf802, 0xf802).portr("SYSTEM").w(this, FUNC(rollrace_state::backgroundpage_w));
-	map(0xf803, 0xf803).w(this, FUNC(rollrace_state::flipy_w));
+	map(0xf801, 0xf801).portr("P2").w(FUNC(rollrace_state::bkgpen_w));
+	map(0xf802, 0xf802).portr("SYSTEM").w(FUNC(rollrace_state::backgroundpage_w));
+	map(0xf803, 0xf803).w(FUNC(rollrace_state::flipy_w));
 	map(0xf804, 0xf804).portr("DSW1");
 	map(0xf805, 0xf805).portr("DSW2");
 	map(0xfc00, 0xfc07).w("mainlatch", FUNC(ls259_device::write_d0));
@@ -93,7 +93,7 @@ void rollrace_state::rollrace_sound_map(address_map &map)
 {
 	map(0x0000, 0x0fff).rom();
 	map(0x2000, 0x2fff).ram();
-	map(0x3000, 0x3000).r("soundlatch", FUNC(generic_latch_8_device::read)).w(this, FUNC(rollrace_state::sound_nmi_mask_w));
+	map(0x3000, 0x3000).r("soundlatch", FUNC(generic_latch_8_device::read)).w(FUNC(rollrace_state::sound_nmi_mask_w));
 	map(0x4000, 0x4001).w("ay1", FUNC(ay8910_device::address_data_w));
 	map(0x5000, 0x5001).w("ay2", FUNC(ay8910_device::address_data_w));
 	map(0x6000, 0x6001).w("ay3", FUNC(ay8910_device::address_data_w));
@@ -226,7 +226,7 @@ static const gfx_layout spritelayout =
 	32*32    /* every sprite takes 128 consecutive bytes */
 };
 
-static GFXDECODE_START( rollrace )
+static GFXDECODE_START( gfx_rollrace )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,    0,  32 ) /* foreground */
 	GFXDECODE_ENTRY( "gfx1", 0x0800, charlayout,    0,  32 )
 	GFXDECODE_ENTRY( "gfx1", 0x1000, charlayout,    0,  32 )
@@ -246,65 +246,62 @@ WRITE_LINE_MEMBER(rollrace_state::vblank_irq)
 INTERRUPT_GEN_MEMBER(rollrace_state::sound_timer_irq)
 {
 	if(m_sound_nmi_mask)
-		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-MACHINE_CONFIG_START(rollrace_state::rollrace)
-
+void rollrace_state::rollrace(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,XTAL(24'000'000)/8) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(rollrace_map)
+	Z80(config, m_maincpu, XTAL(24'000'000)/8); /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &rollrace_state::rollrace_map);
 
-	MCFG_CPU_ADD("audiocpu", Z80,XTAL(24'000'000)/16) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(rollrace_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(rollrace_state, sound_timer_irq, 4*60)
+	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(24'000'000)/16)); /* verified on pcb */
+	audiocpu.set_addrmap(AS_PROGRAM, &rollrace_state::rollrace_sound_map);
+	audiocpu.set_periodic_int(FUNC(rollrace_state::sound_timer_irq), attotime::from_hz(4*60));
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(rollrace_state, flipx_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(rollrace_state, nmi_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(rollrace_state, coin_counter_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(rollrace_state, coin_counter_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(rollrace_state, charbank_0_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(rollrace_state, charbank_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(rollrace_state, spritebank_w))
+	ls259_device &mainlatch(LS259(config, "mainlatch"));
+	mainlatch.q_out_cb<0>().set(FUNC(rollrace_state::flipx_w));
+	mainlatch.q_out_cb<1>().set(FUNC(rollrace_state::nmi_mask_w));
+	mainlatch.q_out_cb<2>().set(FUNC(rollrace_state::coin_counter_1_w));
+	mainlatch.q_out_cb<3>().set(FUNC(rollrace_state::coin_counter_2_w));
+	mainlatch.q_out_cb<4>().set(FUNC(rollrace_state::charbank_0_w));
+	mainlatch.q_out_cb<5>().set(FUNC(rollrace_state::charbank_1_w));
+	mainlatch.q_out_cb<6>().set(FUNC(rollrace_state::spritebank_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0,256-1,16, 255-16)
-	MCFG_SCREEN_UPDATE_DRIVER(rollrace_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(rollrace_state, vblank_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 256-1, 16, 255-16);
+	screen.set_screen_update(FUNC(rollrace_state::screen_update));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(rollrace_state::vblank_irq));
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", rollrace)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(rollrace_state, rollrace)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rollrace);
+	PALETTE(config, m_palette, FUNC(rollrace_state::rollrace_palette), 256);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_SOUND_ADD("ay1", AY8910,XTAL(24'000'000)/16) /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
+	AY8910(config, "ay1", XTAL(24'000'000)/16).add_route(ALL_OUTPUTS, "rspeaker", 0.10); /* verified on pcb */
 
-	MCFG_SOUND_ADD("ay2", AY8910,XTAL(24'000'000)/16) /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
+	AY8910(config, "ay2", XTAL(24'000'000)/16).add_route(ALL_OUTPUTS, "rspeaker", 0.10); /* verified on pcb */
 
-	MCFG_SOUND_ADD("ay3", AY8910,XTAL(24'000'000)/16) /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
-MACHINE_CONFIG_END
+	AY8910(config, "ay3", XTAL(24'000'000)/16).add_route(ALL_OUTPUTS, "lspeaker", 0.10); /* verified on pcb */
+}
 
-MACHINE_CONFIG_START(rollrace_state::rollace2)
+void rollrace_state::rollace2(machine_config &config)
+{
 	rollrace(config);
 
 	/* basic machine hardware */
 
-//  MCFG_SCREEN_MODIFY("screen")
-//  MCFG_SCREEN_VISIBLE_AREA(0,256-1,16, 255-16)
-MACHINE_CONFIG_END
+//  subdevice<screen_device>("screen")->set_visarea(0, 256-1, 16, 255-16);
+}
 
 
 /***************************************************************************
@@ -456,6 +453,6 @@ ROM_START( rollace2 )
 ROM_END
 
 
-GAME( 1983, fightrol, 0,        rollrace, rollrace, rollrace_state, 0, ROT270, "Kaneko (Taito license)",    "Fighting Roller",     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, rollace,  fightrol, rollrace, rollrace, rollrace_state, 0, ROT270, "Kaneko (Williams license)", "Roller Aces (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, rollace2, fightrol, rollace2, rollrace, rollrace_state, 0, ROT90,  "Kaneko (Williams license)", "Roller Aces (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, fightrol, 0,        rollrace, rollrace, rollrace_state, empty_init, ROT270, "Kaneko (Taito license)",    "Fighting Roller",     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, rollace,  fightrol, rollrace, rollrace, rollrace_state, empty_init, ROT270, "Kaneko (Williams license)", "Roller Aces (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, rollace2, fightrol, rollace2, rollrace, rollrace_state, empty_init, ROT90,  "Kaneko (Williams license)", "Roller Aces (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

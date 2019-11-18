@@ -189,20 +189,22 @@ public:
 			m_maincpu(*this, "maincpu")
 	{ }
 
+	void pluto5(machine_config &config);
+
+	void init_hb();
+
+private:
 	uint32_t* m_cpuregion;
 	std::unique_ptr<uint32_t[]> m_mainram;
 
 	DECLARE_READ32_MEMBER(pluto5_mem_r);
 	DECLARE_WRITE32_MEMBER(pluto5_mem_w);
 
-	void pluto5(machine_config &config);
 	void pluto5_map(address_map &map);
-protected:
 
 	// devices
 	required_device<m68340_cpu_device> m_maincpu;
-public:
-	DECLARE_DRIVER_INIT(hb);
+
 	virtual void machine_start() override;
 };
 
@@ -241,7 +243,7 @@ WRITE32_MEMBER(pluto5_state::pluto5_mem_w)
 
 void pluto5_state::pluto5_map(address_map &map)
 {
-	map(0x00000000, 0xffffffff).rw(this, FUNC(pluto5_state::pluto5_mem_r), FUNC(pluto5_state::pluto5_mem_w));
+	map(0x00000000, 0xffffffff).rw(FUNC(pluto5_state::pluto5_mem_r), FUNC(pluto5_state::pluto5_mem_w));
 }
 
 static INPUT_PORTS_START(  pluto5 )
@@ -254,15 +256,16 @@ void pluto5_state::machine_start()
 
 }
 
-MACHINE_CONFIG_START(pluto5_state::pluto5)
-	MCFG_CPU_ADD("maincpu", M68340, 16000000)
-	MCFG_CPU_PROGRAM_MAP(pluto5_map)
+void pluto5_state::pluto5(machine_config &config)
+{
+	M68340(config, m_maincpu, 16000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pluto5_state::pluto5_map);
 
 
-
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 	/* unknown sound */
-MACHINE_CONFIG_END
+}
 
 ROM_START( hb_cr )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
@@ -857,17 +860,16 @@ static void astra_addresslines( uint16_t* src, size_t srcsize, int small )
 }
 
 
-DRIVER_INIT_MEMBER(pluto5_state,hb)
+void pluto5_state::init_hb()
 {
 	astra_addresslines( (uint16_t*)memregion( "maincpu" )->base(), memregion( "maincpu" )->bytes(), 0 );
 
 	#if 0
 	{
 		uint8_t* ROM = memregion( "maincpu" )->base();
-		FILE *fp;
 		char filename[256];
 		sprintf(filename,"%s", machine().system().name);
-		fp=fopen(filename, "w+b");
+		FILE *fp = fopen(filename, "w+b");
 		if (fp)
 		{
 			fwrite(ROM,  memregion( "maincpu" )->bytes(), 1, fp);
@@ -877,117 +879,117 @@ DRIVER_INIT_MEMBER(pluto5_state,hb)
 	#endif
 }
 
-GAME( 200?, hb_cr       ,0,         pluto5, pluto5, pluto5_state, hb, ROT0, "Qps","Cash Raker (Qps) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_cra      ,hb_cr,     pluto5, pluto5, pluto5_state, hb, ROT0, "Qps","Cash Raker (Qps) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_crb      ,hb_cr,     pluto5, pluto5, pluto5_state, hb, ROT0, "Qps","Cash Raker (Qps) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_cr       ,0,         pluto5, pluto5, pluto5_state, init_hb, ROT0, "Qps","Cash Raker (Qps) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_cra      ,hb_cr,     pluto5, pluto5, pluto5_state, init_hb, ROT0, "Qps","Cash Raker (Qps) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_crb      ,hb_cr,     pluto5, pluto5, pluto5_state, init_hb, ROT0, "Qps","Cash Raker (Qps) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 200?, hb_bar7     ,0,         pluto5, pluto5, pluto5_state, hb, ROT0, "Fairgames","Bar Seven (Fairgames) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_bar7a    ,hb_bar7,   pluto5, pluto5, pluto5_state, hb, ROT0, "Fairgames","Bar Seven (Fairgames) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_bar7     ,0,         pluto5, pluto5, pluto5_state, init_hb, ROT0, "Fairgames","Bar Seven (Fairgames) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_bar7a    ,hb_bar7,   pluto5, pluto5, pluto5_state, init_hb, ROT0, "Fairgames","Bar Seven (Fairgames) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 200?, hb_bigx     ,0,         pluto5, pluto5, pluto5_state, hb, ROT0, "JPM","Big X (JPM) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_bigxa    ,hb_bigx,   pluto5, pluto5, pluto5_state, hb, ROT0, "JPM","Big X (JPM) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_bigxb    ,hb_bigx,   pluto5, pluto5, pluto5_state, hb, ROT0, "JPM","Big X (JPM) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_bigxc    ,hb_bigx,   pluto5, pluto5, pluto5_state, hb, ROT0, "JPM","Big X (JPM) (set 4)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_bigxd    ,hb_bigx,   pluto5, pluto5, pluto5_state, hb, ROT0, "JPM","Big X (JPM) (set 5)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_bigx     ,0,         pluto5, pluto5, pluto5_state, init_hb, ROT0, "JPM","Big X (JPM) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_bigxa    ,hb_bigx,   pluto5, pluto5, pluto5_state, init_hb, ROT0, "JPM","Big X (JPM) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_bigxb    ,hb_bigx,   pluto5, pluto5, pluto5_state, init_hb, ROT0, "JPM","Big X (JPM) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_bigxc    ,hb_bigx,   pluto5, pluto5, pluto5_state, init_hb, ROT0, "JPM","Big X (JPM) (set 4)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_bigxd    ,hb_bigx,   pluto5, pluto5, pluto5_state, init_hb, ROT0, "JPM","Big X (JPM) (set 5)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 200?, hb_ccow     ,0,         pluto5, pluto5, pluto5_state, hb, ROT0, "Qps","Cash Cow (Qps) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_ccowa    ,hb_ccow,   pluto5, pluto5, pluto5_state, hb, ROT0, "Qps","Cash Cow (Qps) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_ccowb    ,hb_ccow,   pluto5, pluto5, pluto5_state, hb, ROT0, "Qps","Cash Cow (Qps) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_ccow     ,0,         pluto5, pluto5, pluto5_state, init_hb, ROT0, "Qps","Cash Cow (Qps) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_ccowa    ,hb_ccow,   pluto5, pluto5, pluto5_state, init_hb, ROT0, "Qps","Cash Cow (Qps) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_ccowb    ,hb_ccow,   pluto5, pluto5, pluto5_state, init_hb, ROT0, "Qps","Cash Cow (Qps) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 200?, hb_cashc    ,0,         pluto5, pluto5, pluto5_state, hb, ROT0, "Qps","Cash Crusade (Qps) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_cashca   ,hb_cashc,  pluto5, pluto5, pluto5_state, hb, ROT0, "Qps","Cash Crusade (Qps) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_cashcb   ,hb_cashc,  pluto5, pluto5, pluto5_state, hb, ROT0, "Qps","Cash Crusade (Qps) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_cashc    ,0,         pluto5, pluto5, pluto5_state, init_hb, ROT0, "Qps","Cash Crusade (Qps) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_cashca   ,hb_cashc,  pluto5, pluto5, pluto5_state, init_hb, ROT0, "Qps","Cash Crusade (Qps) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_cashcb   ,hb_cashc,  pluto5, pluto5, pluto5_state, init_hb, ROT0, "Qps","Cash Crusade (Qps) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 200?, hb_cashx    ,0,         pluto5, pluto5, pluto5_state, hb, ROT0, "Fairgames","Cash X (Fairgames) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_cashxa   ,hb_cashx,  pluto5, pluto5, pluto5_state, hb, ROT0, "Fairgames","Cash X (Fairgames) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_cashx    ,0,         pluto5, pluto5, pluto5_state, init_hb, ROT0, "Fairgames","Cash X (Fairgames) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_cashxa   ,hb_cashx,  pluto5, pluto5, pluto5_state, init_hb, ROT0, "Fairgames","Cash X (Fairgames) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 200?, hb_cwf      ,0,         pluto5, pluto5, pluto5_state, hb, ROT0, "Fairgames","Cherry Win Falls (Fairgames) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_cwfa     ,hb_cwf,    pluto5, pluto5, pluto5_state, hb, ROT0, "Fairgames","Cherry Win Falls (Fairgames) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_cwf      ,0,         pluto5, pluto5, pluto5_state, init_hb, ROT0, "Fairgames","Cherry Win Falls (Fairgames) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_cwfa     ,hb_cwf,    pluto5, pluto5, pluto5_state, init_hb, ROT0, "Fairgames","Cherry Win Falls (Fairgames) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 200?, hb_dac      ,0,         pluto5, pluto5, pluto5_state, hb, ROT0, "Qps","Dough & Arrow Club (Qps, set 1)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_daca     ,hb_dac,    pluto5, pluto5, pluto5_state, hb, ROT0, "Qps","Dough & Arrow Club (Qps, set 2)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_dacb     ,hb_dac,    pluto5, pluto5, pluto5_state, hb, ROT0, "Qps","Dough & Arrow Club (Qps, set 3)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_dacc     ,hb_dac,    pluto5, pluto5, pluto5_state, hb, ROT0, "Qps","Dough & Arrow Club (Qps, set 4)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_dacd     ,hb_dac,    pluto5, pluto5, pluto5_state, hb, ROT0, "Qps","Dough & Arrow Club (Qps, set 5)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_dace     ,hb_dac,    pluto5, pluto5, pluto5_state, hb, ROT0, "Qps","Dough & Arrow Club (Qps, set 6)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_dacf     ,hb_dac,    pluto5, pluto5, pluto5_state, hb, ROT0, "Qps","Dough & Arrow Club (Qps, set 7)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_dacg     ,hb_dac,    pluto5, pluto5, pluto5_state, hb, ROT0, "Qps","Dough & Arrow Club (Qps, set 8)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_dacz     ,hb_dac,    pluto5, pluto5, pluto5_state, hb, ROT0, "Qps","Dough & Arrow Club (Qps, set 9)", MACHINE_IS_SKELETON_MECHANICAL ) // bad dump
+GAME( 200?, hb_dac      ,0,         pluto5, pluto5, pluto5_state, init_hb, ROT0, "Qps","Dough & Arrow Club (Qps, set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_daca     ,hb_dac,    pluto5, pluto5, pluto5_state, init_hb, ROT0, "Qps","Dough & Arrow Club (Qps, set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_dacb     ,hb_dac,    pluto5, pluto5, pluto5_state, init_hb, ROT0, "Qps","Dough & Arrow Club (Qps, set 3)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_dacc     ,hb_dac,    pluto5, pluto5, pluto5_state, init_hb, ROT0, "Qps","Dough & Arrow Club (Qps, set 4)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_dacd     ,hb_dac,    pluto5, pluto5, pluto5_state, init_hb, ROT0, "Qps","Dough & Arrow Club (Qps, set 5)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_dace     ,hb_dac,    pluto5, pluto5, pluto5_state, init_hb, ROT0, "Qps","Dough & Arrow Club (Qps, set 6)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_dacf     ,hb_dac,    pluto5, pluto5, pluto5_state, init_hb, ROT0, "Qps","Dough & Arrow Club (Qps, set 7)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_dacg     ,hb_dac,    pluto5, pluto5, pluto5_state, init_hb, ROT0, "Qps","Dough & Arrow Club (Qps, set 8)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_dacz     ,hb_dac,    pluto5, pluto5, pluto5_state, init_hb, ROT0, "Qps","Dough & Arrow Club (Qps, set 9)", MACHINE_IS_SKELETON_MECHANICAL ) // bad dump
 
-GAME( 200?, hb_frtcl    ,0,         pluto5, pluto5, pluto5_state, hb, ROT0, "Qps","Fruitopia Club (Qps) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_frtcla   ,hb_frtcl,  pluto5, pluto5, pluto5_state, hb, ROT0, "Qps","Fruitopia Club (Qps) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_frtclb   ,hb_frtcl,  pluto5, pluto5, pluto5_state, hb, ROT0, "Qps","Fruitopia Club (Qps) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_frtclc   ,hb_frtcl,  pluto5, pluto5, pluto5_state, hb, ROT0, "Qps","Fruitopia Club (Qps) (set 4)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_frtcld   ,hb_frtcl,  pluto5, pluto5, pluto5_state, hb, ROT0, "Qps","Fruitopia Club (Qps) (set 5)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_frtcle   ,hb_frtcl,  pluto5, pluto5, pluto5_state, hb, ROT0, "Qps","Fruitopia Club (Qps) (set 6)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_frtclf   ,hb_frtcl,  pluto5, pluto5, pluto5_state, hb, ROT0, "Qps","Fruitopia Club (Qps) (set 7)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_frtclg   ,hb_frtcl,  pluto5, pluto5, pluto5_state, hb, ROT0, "Qps","Fruitopia Club (Qps) (set 8)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_frtclh   ,hb_frtcl,  pluto5, pluto5, pluto5_state, hb, ROT0, "Qps","Fruitopia Club (Qps) (set 9)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_frtcli   ,hb_frtcl,  pluto5, pluto5, pluto5_state, hb, ROT0, "Qps","Fruitopia Club (Qps) (set 10)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_frtclj   ,hb_frtcl,  pluto5, pluto5, pluto5_state, hb, ROT0, "Qps","Fruitopia Club (Qps) (set 11)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_frtclk   ,hb_frtcl,  pluto5, pluto5, pluto5_state, hb, ROT0, "Qps","Fruitopia Club (Qps) (set 12)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_frtcll   ,hb_frtcl,  pluto5, pluto5, pluto5_state, hb, ROT0, "Qps","Fruitopia Club (Qps) (set 13)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_frtclm   ,hb_frtcl,  pluto5, pluto5, pluto5_state, hb, ROT0, "Qps","Fruitopia Club (Qps) (set 14)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_frtcln   ,hb_frtcl,  pluto5, pluto5, pluto5_state, hb, ROT0, "Qps","Fruitopia Club (Qps) (set 15)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_frtcl    ,0,         pluto5, pluto5, pluto5_state, init_hb, ROT0, "Qps","Fruitopia Club (Qps) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_frtcla   ,hb_frtcl,  pluto5, pluto5, pluto5_state, init_hb, ROT0, "Qps","Fruitopia Club (Qps) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_frtclb   ,hb_frtcl,  pluto5, pluto5, pluto5_state, init_hb, ROT0, "Qps","Fruitopia Club (Qps) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_frtclc   ,hb_frtcl,  pluto5, pluto5, pluto5_state, init_hb, ROT0, "Qps","Fruitopia Club (Qps) (set 4)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_frtcld   ,hb_frtcl,  pluto5, pluto5, pluto5_state, init_hb, ROT0, "Qps","Fruitopia Club (Qps) (set 5)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_frtcle   ,hb_frtcl,  pluto5, pluto5, pluto5_state, init_hb, ROT0, "Qps","Fruitopia Club (Qps) (set 6)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_frtclf   ,hb_frtcl,  pluto5, pluto5, pluto5_state, init_hb, ROT0, "Qps","Fruitopia Club (Qps) (set 7)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_frtclg   ,hb_frtcl,  pluto5, pluto5, pluto5_state, init_hb, ROT0, "Qps","Fruitopia Club (Qps) (set 8)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_frtclh   ,hb_frtcl,  pluto5, pluto5, pluto5_state, init_hb, ROT0, "Qps","Fruitopia Club (Qps) (set 9)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_frtcli   ,hb_frtcl,  pluto5, pluto5, pluto5_state, init_hb, ROT0, "Qps","Fruitopia Club (Qps) (set 10)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_frtclj   ,hb_frtcl,  pluto5, pluto5, pluto5_state, init_hb, ROT0, "Qps","Fruitopia Club (Qps) (set 11)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_frtclk   ,hb_frtcl,  pluto5, pluto5, pluto5_state, init_hb, ROT0, "Qps","Fruitopia Club (Qps) (set 12)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_frtcll   ,hb_frtcl,  pluto5, pluto5, pluto5_state, init_hb, ROT0, "Qps","Fruitopia Club (Qps) (set 13)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_frtclm   ,hb_frtcl,  pluto5, pluto5, pluto5_state, init_hb, ROT0, "Qps","Fruitopia Club (Qps) (set 14)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_frtcln   ,hb_frtcl,  pluto5, pluto5, pluto5_state, init_hb, ROT0, "Qps","Fruitopia Club (Qps) (set 15)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 200?, hb_gpal     ,0,         pluto5, pluto5, pluto5_state, hb, ROT0, "Qps","Golden Palace (Qps) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_gpala    ,hb_gpal,   pluto5, pluto5, pluto5_state, hb, ROT0, "Qps","Golden Palace (Qps) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_gpalb    ,hb_gpal,   pluto5, pluto5, pluto5_state, hb, ROT0, "Qps","Golden Palace (Qps) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_gpalc    ,hb_gpal,   pluto5, pluto5, pluto5_state, hb, ROT0, "Qps","Golden Palace (Qps) (set 4)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_gpald    ,hb_gpal,   pluto5, pluto5, pluto5_state, hb, ROT0, "Qps","Golden Palace (Qps) (set 5)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_gpale    ,hb_gpal,   pluto5, pluto5, pluto5_state, hb, ROT0, "Qps","Golden Palace (Qps) (set 6)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_gpalf    ,hb_gpal,   pluto5, pluto5, pluto5_state, hb, ROT0, "Qps","Golden Palace (Qps) (set 7)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_gpalg    ,hb_gpal,   pluto5, pluto5, pluto5_state, hb, ROT0, "Qps","Golden Palace (Qps) (set 8)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_gpalh    ,hb_gpal,   pluto5, pluto5, pluto5_state, hb, ROT0, "Qps","Golden Palace (Qps) (set 9)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_gpali    ,hb_gpal,   pluto5, pluto5, pluto5_state, hb, ROT0, "Qps","Golden Palace (Qps) (set 10)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_gpal     ,0,         pluto5, pluto5, pluto5_state, init_hb, ROT0, "Qps","Golden Palace (Qps) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_gpala    ,hb_gpal,   pluto5, pluto5, pluto5_state, init_hb, ROT0, "Qps","Golden Palace (Qps) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_gpalb    ,hb_gpal,   pluto5, pluto5, pluto5_state, init_hb, ROT0, "Qps","Golden Palace (Qps) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_gpalc    ,hb_gpal,   pluto5, pluto5, pluto5_state, init_hb, ROT0, "Qps","Golden Palace (Qps) (set 4)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_gpald    ,hb_gpal,   pluto5, pluto5, pluto5_state, init_hb, ROT0, "Qps","Golden Palace (Qps) (set 5)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_gpale    ,hb_gpal,   pluto5, pluto5, pluto5_state, init_hb, ROT0, "Qps","Golden Palace (Qps) (set 6)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_gpalf    ,hb_gpal,   pluto5, pluto5, pluto5_state, init_hb, ROT0, "Qps","Golden Palace (Qps) (set 7)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_gpalg    ,hb_gpal,   pluto5, pluto5, pluto5_state, init_hb, ROT0, "Qps","Golden Palace (Qps) (set 8)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_gpalh    ,hb_gpal,   pluto5, pluto5, pluto5_state, init_hb, ROT0, "Qps","Golden Palace (Qps) (set 9)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_gpali    ,hb_gpal,   pluto5, pluto5, pluto5_state, init_hb, ROT0, "Qps","Golden Palace (Qps) (set 10)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 200?, hb_gldpl    ,0,         pluto5, pluto5, pluto5_state, hb, ROT0, "Qps / Mazooma","Golden Palace (Qps / Mazooma) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_gldpla   ,hb_gldpl,  pluto5, pluto5, pluto5_state, hb, ROT0, "Qps / Mazooma","Golden Palace (Qps / Mazooma) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_gldpl    ,0,         pluto5, pluto5, pluto5_state, init_hb, ROT0, "Qps / Mazooma","Golden Palace (Qps / Mazooma) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_gldpla   ,hb_gldpl,  pluto5, pluto5, pluto5_state, init_hb, ROT0, "Qps / Mazooma","Golden Palace (Qps / Mazooma) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 200?, hb_gldwn    ,0,         pluto5, pluto5, pluto5_state, hb, ROT0, "Fairgames","Golden Winner (Fairgames) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_gldwna   ,hb_gldwn,  pluto5, pluto5, pluto5_state, hb, ROT0, "Fairgames","Golden Winner (Fairgames) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_gldwn    ,0,         pluto5, pluto5, pluto5_state, init_hb, ROT0, "Fairgames","Golden Winner (Fairgames) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_gldwna   ,hb_gldwn,  pluto5, pluto5, pluto5_state, init_hb, ROT0, "Fairgames","Golden Winner (Fairgames) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 200?, hb_jailb    ,0,         pluto5, pluto5, pluto5_state, hb, ROT0, "Qps","Jail Break (Qps) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_jailba   ,hb_jailb,  pluto5, pluto5, pluto5_state, hb, ROT0, "Qps","Jail Break (Qps) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_jailb    ,0,         pluto5, pluto5, pluto5_state, init_hb, ROT0, "Qps","Jail Break (Qps) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_jailba   ,hb_jailb,  pluto5, pluto5, pluto5_state, init_hb, ROT0, "Qps","Jail Break (Qps) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 200?, hb_jkrwl    ,0,         pluto5, pluto5, pluto5_state, hb, ROT0, "Fairgames","Jokers Wild (Fairgames) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_jkrwla   ,hb_jkrwl,  pluto5, pluto5, pluto5_state, hb, ROT0, "Fairgames","Jokers Wild (Fairgames) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_jkrwl    ,0,         pluto5, pluto5, pluto5_state, init_hb, ROT0, "Fairgames","Jokers Wild (Fairgames) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_jkrwla   ,hb_jkrwl,  pluto5, pluto5, pluto5_state, init_hb, ROT0, "Fairgames","Jokers Wild (Fairgames) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 200?, hb_mrmon    ,0,         pluto5, pluto5, pluto5_state, hb, ROT0, "Qps","Mr. Money (Qps) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_mrmona   ,hb_mrmon,  pluto5, pluto5, pluto5_state, hb, ROT0, "Qps","Mr. Money (Qps) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_mrmonb   ,hb_mrmon,  pluto5, pluto5, pluto5_state, hb, ROT0, "Qps","Mr. Money (Qps) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_mrmonc   ,hb_mrmon,  pluto5, pluto5, pluto5_state, hb, ROT0, "Qps","Mr. Money (Qps) (set 4)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_mrmon    ,0,         pluto5, pluto5, pluto5_state, init_hb, ROT0, "Qps","Mr. Money (Qps) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_mrmona   ,hb_mrmon,  pluto5, pluto5, pluto5_state, init_hb, ROT0, "Qps","Mr. Money (Qps) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_mrmonb   ,hb_mrmon,  pluto5, pluto5, pluto5_state, init_hb, ROT0, "Qps","Mr. Money (Qps) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_mrmonc   ,hb_mrmon,  pluto5, pluto5, pluto5_state, init_hb, ROT0, "Qps","Mr. Money (Qps) (set 4)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 200?, hb_rhv      ,0,         pluto5, pluto5, pluto5_state, hb, ROT0, "Qps","Red Hot Voucher (Qps) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_rhva     ,hb_rhv,    pluto5, pluto5, pluto5_state, hb, ROT0, "Qps","Red Hot Voucher (Qps) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_rhv      ,0,         pluto5, pluto5, pluto5_state, init_hb, ROT0, "Qps","Red Hot Voucher (Qps) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_rhva     ,hb_rhv,    pluto5, pluto5, pluto5_state, init_hb, ROT0, "Qps","Red Hot Voucher (Qps) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 200?, hb_ringb    ,0,         pluto5, pluto5, pluto5_state, hb, ROT0, "JPM","Ring A Bell (JPM) (set 1)", MACHINE_IS_SKELETON_MECHANICAL ) // this game might be on Astra hardware, bigger roms, and a game of this name is known to exist there
-GAME( 200?, hb_ringba   ,hb_ringb,  pluto5, pluto5, pluto5_state, hb, ROT0, "JPM","Ring A Bell (JPM) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_ringbb   ,hb_ringb,  pluto5, pluto5, pluto5_state, hb, ROT0, "JPM","Ring A Bell (JPM) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_ringbc   ,hb_ringb,  pluto5, pluto5, pluto5_state, hb, ROT0, "JPM","Ring A Bell (JPM) (set 4)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_ringbd   ,hb_ringb,  pluto5, pluto5, pluto5_state, hb, ROT0, "JPM","Ring A Bell (JPM) (set 5)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_ringbe   ,hb_ringb,  pluto5, pluto5, pluto5_state, hb, ROT0, "JPM","Ring A Bell (JPM) (set 6)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_ringb    ,0,         pluto5, pluto5, pluto5_state, init_hb, ROT0, "JPM","Ring A Bell (JPM) (set 1)", MACHINE_IS_SKELETON_MECHANICAL ) // this game might be on Astra hardware, bigger roms, and a game of this name is known to exist there
+GAME( 200?, hb_ringba   ,hb_ringb,  pluto5, pluto5, pluto5_state, init_hb, ROT0, "JPM","Ring A Bell (JPM) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_ringbb   ,hb_ringb,  pluto5, pluto5, pluto5_state, init_hb, ROT0, "JPM","Ring A Bell (JPM) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_ringbc   ,hb_ringb,  pluto5, pluto5, pluto5_state, init_hb, ROT0, "JPM","Ring A Bell (JPM) (set 4)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_ringbd   ,hb_ringb,  pluto5, pluto5, pluto5_state, init_hb, ROT0, "JPM","Ring A Bell (JPM) (set 5)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_ringbe   ,hb_ringb,  pluto5, pluto5, pluto5_state, init_hb, ROT0, "JPM","Ring A Bell (JPM) (set 6)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 200?, hb_rckrl    ,0,         pluto5, pluto5, pluto5_state, hb, ROT0, "Qps","Rock 'n' Roll (Qps) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_rckrla   ,hb_rckrl,  pluto5, pluto5, pluto5_state, hb, ROT0, "Qps","Rock 'n' Roll (Qps) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_rckrlb   ,hb_rckrl,  pluto5, pluto5, pluto5_state, hb, ROT0, "Qps","Rock 'n' Roll (Qps) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_rckrlc   ,hb_rckrl,  pluto5, pluto5, pluto5_state, hb, ROT0, "Qps","Rock 'n' Roll (Qps) (set 4)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_rckrld   ,hb_rckrl,  pluto5, pluto5, pluto5_state, hb, ROT0, "Qps","Rock 'n' Roll (Qps) (set 5)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_rckrle   ,hb_rckrl,  pluto5, pluto5, pluto5_state, hb, ROT0, "Qps","Rock 'n' Roll (Qps) (set 6)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_rckrlf   ,hb_rckrl,  pluto5, pluto5, pluto5_state, hb, ROT0, "Qps","Rock 'n' Roll (Qps) (set 7)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_rckrlg   ,hb_rckrl,  pluto5, pluto5, pluto5_state, hb, ROT0, "Qps","Rock 'n' Roll (Qps) (set 8)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_rckrl    ,0,         pluto5, pluto5, pluto5_state, init_hb, ROT0, "Qps","Rock 'n' Roll (Qps) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_rckrla   ,hb_rckrl,  pluto5, pluto5, pluto5_state, init_hb, ROT0, "Qps","Rock 'n' Roll (Qps) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_rckrlb   ,hb_rckrl,  pluto5, pluto5, pluto5_state, init_hb, ROT0, "Qps","Rock 'n' Roll (Qps) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_rckrlc   ,hb_rckrl,  pluto5, pluto5, pluto5_state, init_hb, ROT0, "Qps","Rock 'n' Roll (Qps) (set 4)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_rckrld   ,hb_rckrl,  pluto5, pluto5, pluto5_state, init_hb, ROT0, "Qps","Rock 'n' Roll (Qps) (set 5)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_rckrle   ,hb_rckrl,  pluto5, pluto5, pluto5_state, init_hb, ROT0, "Qps","Rock 'n' Roll (Qps) (set 6)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_rckrlf   ,hb_rckrl,  pluto5, pluto5, pluto5_state, init_hb, ROT0, "Qps","Rock 'n' Roll (Qps) (set 7)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_rckrlg   ,hb_rckrl,  pluto5, pluto5, pluto5_state, init_hb, ROT0, "Qps","Rock 'n' Roll (Qps) (set 8)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 200?, hb_ydd      ,0,         pluto5, pluto5, pluto5_state, hb, ROT0, "Qps","Yabba-Dabba-Dough (Qps) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_ydda     ,hb_ydd,    pluto5, pluto5, pluto5_state, hb, ROT0, "Qps","Yabba-Dabba-Dough (Qps) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_ydd      ,0,         pluto5, pluto5, pluto5_state, init_hb, ROT0, "Qps","Yabba-Dabba-Dough (Qps) (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_ydda     ,hb_ydd,    pluto5, pluto5, pluto5_state, init_hb, ROT0, "Qps","Yabba-Dabba-Dough (Qps) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 200?, hb_hotst    ,0,         pluto5, pluto5, pluto5_state, hb, ROT0, "JPM?","Hot Stuff (JPM?) (set 1)", MACHINE_IS_SKELETON_MECHANICAL ) // was in a Barcrest MPU5 set, but I doubt it is
-GAME( 200?, hb_hotsta   ,hb_hotst,  pluto5, pluto5, pluto5_state, hb, ROT0, "JPM?","Hot Stuff (JPM?) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_hotstb   ,hb_hotst,  pluto5, pluto5, pluto5_state, hb, ROT0, "JPM?","Hot Stuff (JPM?) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_hotstc   ,hb_hotst,  pluto5, pluto5, pluto5_state, hb, ROT0, "JPM?","Hot Stuff (JPM?) (set 4)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_hotstd   ,hb_hotst,  pluto5, pluto5, pluto5_state, hb, ROT0, "JPM?","Hot Stuff (JPM?) (set 5)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_hotste   ,hb_hotst,  pluto5, pluto5, pluto5_state, hb, ROT0, "JPM?","Hot Stuff (JPM?) (set 6)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_hotstf   ,hb_hotst,  pluto5, pluto5, pluto5_state, hb, ROT0, "JPM?","Hot Stuff (JPM?) (set 7)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_hotstg   ,hb_hotst,  pluto5, pluto5, pluto5_state, hb, ROT0, "JPM?","Hot Stuff (JPM?) (set 8)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 200?, hb_hotsth   ,hb_hotst,  pluto5, pluto5, pluto5_state, hb, ROT0, "JPM?","Hot Stuff (JPM?) (set 9)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_hotst    ,0,         pluto5, pluto5, pluto5_state, init_hb, ROT0, "JPM?","Hot Stuff (JPM?) (set 1)", MACHINE_IS_SKELETON_MECHANICAL ) // was in a Barcrest MPU5 set, but I doubt it is
+GAME( 200?, hb_hotsta   ,hb_hotst,  pluto5, pluto5, pluto5_state, init_hb, ROT0, "JPM?","Hot Stuff (JPM?) (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_hotstb   ,hb_hotst,  pluto5, pluto5, pluto5_state, init_hb, ROT0, "JPM?","Hot Stuff (JPM?) (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_hotstc   ,hb_hotst,  pluto5, pluto5, pluto5_state, init_hb, ROT0, "JPM?","Hot Stuff (JPM?) (set 4)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_hotstd   ,hb_hotst,  pluto5, pluto5, pluto5_state, init_hb, ROT0, "JPM?","Hot Stuff (JPM?) (set 5)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_hotste   ,hb_hotst,  pluto5, pluto5, pluto5_state, init_hb, ROT0, "JPM?","Hot Stuff (JPM?) (set 6)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_hotstf   ,hb_hotst,  pluto5, pluto5, pluto5_state, init_hb, ROT0, "JPM?","Hot Stuff (JPM?) (set 7)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_hotstg   ,hb_hotst,  pluto5, pluto5, pluto5_state, init_hb, ROT0, "JPM?","Hot Stuff (JPM?) (set 8)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 200?, hb_hotsth   ,hb_hotst,  pluto5, pluto5, pluto5_state, init_hb, ROT0, "JPM?","Hot Stuff (JPM?) (set 9)", MACHINE_IS_SKELETON_MECHANICAL )
 
-GAME( 200?, hb_medal    ,0,         pluto5, pluto5, pluto5_state, hb, ROT0, "Qps", "Medallion Job (Qps)", MACHINE_IS_SKELETON_MECHANICAL ) // was in an IMPACT set, strings indicate it's the same game, rebuild for this HW I guess
+GAME( 200?, hb_medal    ,0,         pluto5, pluto5, pluto5_state, init_hb, ROT0, "Qps", "Medallion Job (Qps)", MACHINE_IS_SKELETON_MECHANICAL ) // was in an IMPACT set, strings indicate it's the same game, rebuild for this HW I guess

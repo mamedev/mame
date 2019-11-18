@@ -25,7 +25,6 @@
 #include "machine/ram.h"
 #include "softlist.h"
 
-#define DBG_LOG(a,b,c)
 
 class iskr103x_state : public driver_device
 {
@@ -35,9 +34,11 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
-	required_device<cpu_device> m_maincpu;
 	void iskr1030m(machine_config &config);
 	void iskr1031(machine_config &config);
+
+private:
+	required_device<cpu_device> m_maincpu;
 	void iskr1031_io(address_map &map);
 	void iskr1031_map(address_map &map);
 };
@@ -66,38 +67,39 @@ static DEVICE_INPUT_DEFAULTS_START(iskr1031)
 DEVICE_INPUT_DEFAULTS_END
 
 // XXX
-MACHINE_CONFIG_START(iskr103x_state::iskr1030m)
+void iskr103x_state::iskr1030m(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",  I8086, 4772720)
-	MCFG_CPU_PROGRAM_MAP(iskr1031_map)
-	MCFG_CPU_IO_MAP(iskr1031_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
+	I8086(config, m_maincpu, 4772720);
+	m_maincpu->set_addrmap(AS_PROGRAM, &iskr103x_state::iskr1031_map);
+	m_maincpu->set_addrmap(AS_IO, &iskr103x_state::iskr1031_io);
+	m_maincpu->set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
-	MCFG_IBM5160_MOTHERBOARD_ADD("mb","maincpu")
-	MCFG_DEVICE_INPUT_DEFAULTS(iskr1030m)
+	ibm5160_mb_device &mb(IBM5160_MOTHERBOARD(config, "mb", 0));
+	mb.set_cputag(m_maincpu);
+	mb.int_callback().set_inputline(m_maincpu, 0);
+	mb.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	mb.set_input_default(DEVICE_INPUT_DEFAULTS_NAME(iskr1030m));
 
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", iskr103x_isa8_cards, "cga_iskr1030m", false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", iskr103x_isa8_cards, "fdc_xt", false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", iskr103x_isa8_cards, nullptr, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", iskr103x_isa8_cards, nullptr, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa5", iskr103x_isa8_cards, nullptr, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa6", iskr103x_isa8_cards, nullptr, false)
+	ISA8_SLOT(config, "isa1", 0, "mb:isa", iskr103x_isa8_cards, "cga_iskr1030m", false); // FIXME: determine IS bus clock
+	ISA8_SLOT(config, "isa2", 0, "mb:isa", iskr103x_isa8_cards, "fdc_xt", false);
+	ISA8_SLOT(config, "isa3", 0, "mb:isa", iskr103x_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa4", 0, "mb:isa", iskr103x_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa5", 0, "mb:isa", iskr103x_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa6", 0, "mb:isa", iskr103x_isa8_cards, nullptr, false);
 
-	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_EC_1841)
-//  MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_ISKR_1030)
+	PC_KBDC_SLOT(config, "kbd", pc_xt_keyboards, STR_KBD_EC_1841).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
+//  PC_KBDC_SLOT(config, "kbd", pc_xt_keyboards, STR_KBD_ISKR_1030).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("640K")
-	MCFG_RAM_EXTRA_OPTIONS("64K, 128K, 256K, 512K")
-MACHINE_CONFIG_END
+	RAM(config, RAM_TAG).set_default_size("640K").set_extra_options("64K, 128K, 256K, 512K");
+}
 
-MACHINE_CONFIG_START(iskr103x_state::iskr1031)
+void iskr103x_state::iskr1031(machine_config &config)
+{
 	iskr1030m(config);
-	MCFG_DEVICE_MODIFY("mb")
-	MCFG_DEVICE_INPUT_DEFAULTS(iskr1031)
-	MCFG_DEVICE_MODIFY("isa1")
-	MCFG_DEVICE_SLOT_INTERFACE(iskr103x_isa8_cards, "cga_iskr1031", false)
-MACHINE_CONFIG_END
+	subdevice<ibm5160_mb_device>("mb")->set_input_default(DEVICE_INPUT_DEFAULTS_NAME(iskr1031));
+	subdevice<isa8_slot_device>("isa1")->set_default_option("cga_iskr1031");
+}
 
 ROM_START( iskr1030m )
 	ROM_REGION16_LE(0x10000,"bios", 0)
@@ -108,11 +110,11 @@ ROM_END
 ROM_START( iskr1031 )
 	ROM_REGION16_LE(0x10000,"bios", 0)
 	ROM_SYSTEM_BIOS(0, "v1", "v1")
-	ROMX_LOAD( "150-02.bin", 0xc000, 0x2000, CRC(e33fb974) SHA1(f5f3ece67c025c0033716ff516e1a34fbeb32749), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD( "150-03.bin", 0xc001, 0x2000, CRC(8c482258) SHA1(90ef48955e0df556dc06a000a797ef42ccf430c5), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD( "150-02.bin", 0xc000, 0x2000, CRC(e33fb974) SHA1(f5f3ece67c025c0033716ff516e1a34fbeb32749), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD( "150-03.bin", 0xc001, 0x2000, CRC(8c482258) SHA1(90ef48955e0df556dc06a000a797ef42ccf430c5), ROM_SKIP(1) | ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "v2", "v2")
-	ROMX_LOAD( "150-06.bin", 0xc000, 0x2000, CRC(1adbf969) SHA1(08c0a0fc50a75e6207b1987bae389cca60893eac), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD( "150-07.bin", 0xc001, 0x2000, CRC(0dc4b65a) SHA1(c96f066251a7343eac8113ea9dcb2cb12d0334d5), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD( "150-06.bin", 0xc000, 0x2000, CRC(1adbf969) SHA1(08c0a0fc50a75e6207b1987bae389cca60893eac), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD( "150-07.bin", 0xc001, 0x2000, CRC(0dc4b65a) SHA1(c96f066251a7343eac8113ea9dcb2cb12d0334d5), ROM_SKIP(1) | ROM_BIOS(1))
 ROM_END
 
 /***************************************************************************
@@ -121,6 +123,6 @@ ROM_END
 
 ***************************************************************************/
 
-//     YEAR  NAME       PARENT   COMPAT  MACHINE     INPUT  STATE           INIT  COMPANY       FULLNAME      FLAGS
-COMP ( 1989, iskr1030m, ibm5150, 0,      iskr1030m,  0,     iskr103x_state, 0,    "Schetmash", "Iskra 1030M", MACHINE_NOT_WORKING )
-COMP ( 1989, iskr1031,  ibm5150, 0,      iskr1031,   0,     iskr103x_state, 0,    "<unknown>", "Iskra 1031",  0 )
+//     YEAR  NAME       PARENT   COMPAT  MACHINE    INPUT  CLASS           INIT        COMPANY      FULLNAME       FLAGS
+COMP ( 1989, iskr1030m, ibm5150, 0,      iskr1030m, 0,     iskr103x_state, empty_init, "Schetmash", "Iskra 1030M", MACHINE_NOT_WORKING )
+COMP ( 1989, iskr1031,  ibm5150, 0,      iskr1031,  0,     iskr103x_state, empty_init, "<unknown>", "Iskra 1031",  0 )

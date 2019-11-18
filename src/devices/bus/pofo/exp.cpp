@@ -28,7 +28,7 @@ DEFINE_DEVICE_TYPE(PORTFOLIO_EXPANSION_SLOT, portfolio_expansion_slot_device, "p
 //-------------------------------------------------
 
 device_portfolio_expansion_slot_interface::device_portfolio_expansion_slot_interface(const machine_config &mconfig, device_t &device) :
-	device_slot_card_interface(mconfig,device)
+	device_interface(device, "pofoexp")
 {
 	m_slot = dynamic_cast<portfolio_expansion_slot_device *>(device.owner());
 }
@@ -49,7 +49,7 @@ WRITE_LINE_MEMBER( device_portfolio_expansion_slot_interface::wake_w ) { m_slot-
 
 portfolio_expansion_slot_device::portfolio_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, PORTFOLIO_EXPANSION_SLOT, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_portfolio_expansion_slot_interface>(mconfig, *this),
 	m_write_eint(*this),
 	m_write_nmio(*this),
 	m_write_wake(*this),
@@ -64,7 +64,7 @@ portfolio_expansion_slot_device::portfolio_expansion_slot_device(const machine_c
 
 void portfolio_expansion_slot_device::device_start()
 {
-	m_card = dynamic_cast<device_portfolio_expansion_slot_interface *>(get_card_device());
+	m_card = get_card_device();
 
 	// resolve callbacks
 	m_write_eint.resolve_safe();
@@ -96,9 +96,10 @@ void portfolio_expansion_slot_device::device_reset()
 #include "hpc102.h"
 #include "hpc104.h"
 
-SLOT_INTERFACE_START( portfolio_expansion_cards )
-	SLOT_INTERFACE("lpt",  POFO_HPC101)
-	SLOT_INTERFACE("uart", POFO_HPC102)
-	SLOT_INTERFACE("ram",  POFO_HPC104)
-	SLOT_INTERFACE("ram2", POFO_HPC104_2)
-SLOT_INTERFACE_END
+void portfolio_expansion_cards(device_slot_interface &device)
+{
+	device.option_add("lpt",  POFO_HPC101);
+	device.option_add("uart", POFO_HPC102);
+	device.option_add("ram",  POFO_HPC104);
+	device.option_add("ram2", POFO_HPC104_2);
+}

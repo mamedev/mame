@@ -77,7 +77,7 @@ DEFINE_DEVICE_TYPE(NES_CONTROL_PORT, nes_control_port_device, "nes_control_port"
 //-------------------------------------------------
 
 device_nes_control_port_interface::device_nes_control_port_interface(const machine_config &mconfig, device_t &device) :
-	device_slot_card_interface(mconfig, device)
+	device_interface(device, "nesctrl")
 {
 	m_port = dynamic_cast<nes_control_port_device *>(device.owner());
 }
@@ -103,7 +103,8 @@ device_nes_control_port_interface::~device_nes_control_port_interface()
 
 nes_control_port_device::nes_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, NES_CONTROL_PORT, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_nes_control_port_interface>(mconfig, *this),
+	m_screen(*this, finder_base::DUMMY_TAG),
 	m_device(nullptr)
 {
 }
@@ -124,8 +125,7 @@ nes_control_port_device::~nes_control_port_device()
 
 void nes_control_port_device::device_start()
 {
-	m_device = dynamic_cast<device_nes_control_port_interface *>(get_card_device());
-	m_brightpixel_cb.bind_relative_to(*owner());
+	m_device = get_card_device();
 }
 
 
@@ -165,45 +165,60 @@ void nes_control_port_device::write(uint8_t data)
 //  SLOT_INTERFACE( nes_control_port_devices )
 //-------------------------------------------------
 
-SLOT_INTERFACE_START( nes_control_port1_devices )
-	SLOT_INTERFACE("joypad", NES_JOYPAD)
-	SLOT_INTERFACE("zapper", NES_ZAPPER)
-	SLOT_INTERFACE("4score_p1p3", NES_4SCORE_P1P3)
-	SLOT_INTERFACE("miracle_piano", NES_MIRACLE)
-SLOT_INTERFACE_END
+void nes_control_port1_devices(device_slot_interface &device)
+{
+	device.option_add("joypad", NES_JOYPAD);
+	device.option_add("zapper", NES_ZAPPER);
+	device.option_add("4score_p1p3", NES_4SCORE_P1P3);
+	device.option_add("miracle_piano", NES_MIRACLE);
+}
 
-SLOT_INTERFACE_START( nes_control_port2_devices )
-	SLOT_INTERFACE("joypad", NES_JOYPAD)
-	SLOT_INTERFACE("zapper", NES_ZAPPER)
-	SLOT_INTERFACE("vaus", NES_ARKPADDLE)
-	SLOT_INTERFACE("powerpad", NES_POWERPAD)
-	SLOT_INTERFACE("4score_p2p4", NES_4SCORE_P2P4)
-SLOT_INTERFACE_END
+void nes_control_port2_devices(device_slot_interface &device)
+{
+	device.option_add("joypad", NES_JOYPAD);
+	device.option_add("zapper", NES_ZAPPER);
+	device.option_add("vaus", NES_ARKPADDLE);
+	device.option_add("powerpad", NES_POWERPAD);
+	device.option_add("4score_p2p4", NES_4SCORE_P2P4);
+}
 
-SLOT_INTERFACE_START( fc_control_port1_devices )
-	SLOT_INTERFACE("joypad", NES_JOYPAD)
-	SLOT_INTERFACE("ccpad_left", NES_CCPAD_LEFT)
-SLOT_INTERFACE_END
+void fc_control_port1_devices(device_slot_interface &device)
+{
+	device.option_add("joypad", NES_JOYPAD);
+	device.option_add("ccpad_left", NES_CCPAD_LEFT);
+}
 
-SLOT_INTERFACE_START( fc_control_port2_devices )
-	SLOT_INTERFACE("joypad", NES_JOYPAD)
-	SLOT_INTERFACE("joypad_old", NES_FCPAD_P2)
-	SLOT_INTERFACE("ccpad_right", NES_CCPAD_RIGHT)
-SLOT_INTERFACE_END
+void fc_control_port2_devices(device_slot_interface &device)
+{
+	device.option_add("joypad", NES_JOYPAD);
+	device.option_add("joypad_old", NES_FCPAD_P2);
+	device.option_add("ccpad_right", NES_CCPAD_RIGHT);
+}
 
-SLOT_INTERFACE_START( fc_expansion_devices )
-	SLOT_INTERFACE("joypad", NES_JOYPAD)
-	SLOT_INTERFACE("arcstick", NES_ARCSTICK)
-	SLOT_INTERFACE("fc_keyboard", NES_FCKEYBOARD)
-	SLOT_INTERFACE("zapper", NES_ZAPPER)
-	SLOT_INTERFACE("vaus", NES_ARKPADDLE_FC)
-	SLOT_INTERFACE("family_trainer", NES_FTRAINER)
-	SLOT_INTERFACE("konamihs", NES_KONAMIHS)
-	SLOT_INTERFACE("mj_panel", NES_MJPANEL)
-	SLOT_INTERFACE("pachinko", NES_PACHINKO)
-	SLOT_INTERFACE("partytap", NES_PARTYTAP)
-	SLOT_INTERFACE("hori_twin", NES_HORITWIN)
-	SLOT_INTERFACE("hori_4p", NES_HORI4P)
-	SLOT_INTERFACE("barcode_battler", NES_BARCODE_BATTLER)
-	SLOT_INTERFACE("subor_keyboard", NES_SUBORKEYBOARD)
-SLOT_INTERFACE_END
+void fc_expansion_devices(device_slot_interface &device)
+{
+	device.option_add("joypad", NES_JOYPAD);
+	device.option_add("arcstick", NES_ARCSTICK);
+	device.option_add("fc_keyboard", NES_FCKEYBOARD);
+	device.option_add("zapper", NES_ZAPPER);
+	device.option_add("vaus", NES_ARKPADDLE_FC);
+	device.option_add("family_trainer", NES_FTRAINER);
+	device.option_add("konamihs", NES_KONAMIHS);
+	device.option_add("mj_panel", NES_MJPANEL);
+	device.option_add("pachinko", NES_PACHINKO);
+	device.option_add("partytap", NES_PARTYTAP);
+	device.option_add("hori_twin", NES_HORITWIN);
+	device.option_add("hori_4p", NES_HORI4P);
+	device.option_add("barcode_battler", NES_BARCODE_BATTLER);
+	device.option_add("subor_keyboard", NES_SUBORKEYBOARD);
+}
+
+void majesco_control_port1_devices(device_slot_interface &device)
+{
+	device.option_add("ddr", NES_VT_MAJESCO_DDR);
+}
+
+void majesco_control_port2_devices(device_slot_interface &device)
+{
+	// nothing?
+}

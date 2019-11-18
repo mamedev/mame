@@ -12,17 +12,6 @@
 #pragma once
 
 
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_HD61830_RD_CALLBACK(_read) \
-	devcb = &downcast<hd61830_device &>(*device).set_rd_rd_callback(DEVCB_##_read);
-
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -37,7 +26,7 @@ public:
 	// construction/destruction
 	hd61830_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_rd_rd_callback(Object &&cb) { return m_read_rd.set_callback(std::forward<Object>(cb)); }
+	auto rd_rd_callback() { return m_read_rd.bind(); }
 
 	DECLARE_READ8_MEMBER( status_r );
 	DECLARE_WRITE8_MEMBER( control_w );

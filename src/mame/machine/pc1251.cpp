@@ -8,121 +8,74 @@
 
 /* C-CE while reset, program will not be destroyed! */
 
-
-
-WRITE8_MEMBER(pc1251_state::pc1251_outa)
-{
-	m_outa = data;
-}
-
-WRITE8_MEMBER(pc1251_state::pc1251_outb)
+WRITE8_MEMBER(pc1251_state::out_b_w)
 {
 	m_outb = data;
 }
 
-WRITE8_MEMBER(pc1251_state::pc1251_outc)
+WRITE8_MEMBER(pc1251_state::out_c_w)
 {
 }
 
-READ8_MEMBER(pc1251_state::pc1251_ina)
+READ8_MEMBER(pc1251_state::in_a_r)
 {
 	int data = m_outa;
 
-	if (m_outb & 0x01)
+	if (BIT(m_outb, 0))
 	{
-		data |= ioport("KEY0")->read();
+		data |= m_keys[0]->read();
 
 		/* At Power Up we fake a 'CL' pressure */
 		if (m_power)
 			data |= 0x02;       // problem with the deg lcd
 	}
 
-	if (m_outb & 0x02)
-		data |= ioport("KEY1")->read();
+	if (BIT(m_outb, 1))
+		data |= m_keys[1]->read();
 
-	if (m_outb & 0x04)
-		data |= ioport("KEY2")->read();
+	if (BIT(m_outb, 2))
+		data |= m_keys[2]->read();
 
-	if (m_outa & 0x01)
-		data |= ioport("KEY3")->read();
-
-	if (m_outa & 0x02)
-		data |= ioport("KEY4")->read();
-
-	if (m_outa & 0x04)
-		data |= ioport("KEY5")->read();
-
-	if (m_outa & 0x08)
-		data |= ioport("KEY6")->read();
-
-	if (m_outa & 0x10)
-		data |= ioport("KEY7")->read();
-
-	if (m_outa & 0x20)
-		data |= ioport("KEY8")->read();
-
-	if (m_outa & 0x40)
-		data |= ioport("KEY9")->read();
+	for (int bit = 0, key = 3; bit < 7; bit++, key++)
+		if (BIT(m_outa, bit))
+			data |= m_keys[key]->read();
 
 	return data;
 }
 
-READ8_MEMBER(pc1251_state::pc1251_inb)
+READ8_MEMBER(pc1251_state::in_b_r)
 {
 	int data = m_outb;
 
-	if (m_outb & 0x08)
-		data |= (ioport("MODE")->read() & 0x07);
+	if (BIT(m_outb, 3))
+		data |= m_mode->read() & 0x07;
 
 	return data;
 }
 
-READ_LINE_MEMBER(pc1251_state::pc1251_brk)
+READ_LINE_MEMBER(pc1251_state::reset_r)
 {
-	return (ioport("EXTRA")->read() & 0x01);
-}
-
-READ_LINE_MEMBER(pc1251_state::pc1251_reset)
-{
-	return (ioport("EXTRA")->read() & 0x02);
+	return BIT(m_extra->read(), 1);
 }
 
 void pc1251_state::machine_start()
 {
-	uint8_t *ram = memregion("maincpu")->base() + 0x8000;
-	uint8_t *cpu = m_maincpu->internal_ram();
+	pocketc_state::machine_start();
 
-	machine().device<nvram_device>("cpu_nvram")->set_base(cpu, 96);
-	machine().device<nvram_device>("ram_nvram")->set_base(ram, 0x4800);
-}
+	m_ram_nvram->set_base(memregion("maincpu")->base() + 0x8000, 0x4800);
 
-MACHINE_START_MEMBER(pc1251_state,pc1260 )
-{
-	uint8_t *ram = memregion("maincpu")->base() + 0x4000;
-	uint8_t *cpu = m_maincpu->internal_ram();
-
-	machine().device<nvram_device>("cpu_nvram")->set_base(cpu, 96);
-	machine().device<nvram_device>("ram_nvram")->set_base(ram, 0x2800);
-}
-
-void pc1251_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	switch (id)
-	{
-	case TIMER_POWER_UP:
-		m_power = 0;
-		break;
-	default:
-		assert_always(false, "Unknown id in pc1251_state::device_timer");
-	}
-}
-
-DRIVER_INIT_MEMBER(pc1251_state,pc1251)
-{
-	int i;
 	uint8_t *gfx = memregion("gfx1")->base();
-	for (i=0; i<128; i++) gfx[i]=i;
+	for (int i = 0; i < 128; i++)
+		gfx[i] = i;
+}
 
-	m_power = 1;
-	timer_set(attotime::from_seconds(1), TIMER_POWER_UP);
+void pc1260_state::machine_start()
+{
+	pocketc_state::machine_start();
+
+	m_ram_nvram->set_base(memregion("maincpu")->base() + 0x4000, 0x2800);
+
+	uint8_t *gfx = memregion("gfx1")->base();
+	for (int i = 0; i < 128; i++)
+		gfx[i] = i;
 }

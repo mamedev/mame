@@ -67,16 +67,13 @@ Notes:
 //**************************************************************************
 
 #define R6502_TAG       "u1"
-#define R6532_TAG       "u3"
-#define R6522_TAG       "u4"
-#define MC6850_TAG      "u5"
 
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(INTERPOD, interpod_device, "interpod", "Interpod")
+DEFINE_DEVICE_TYPE(CBM_INTERPOD, cbm_interpod_device, "cbm_interpod", "Oxford Computer Systems Interpod")
 
 
 
@@ -90,8 +87,11 @@ DEFINE_DEVICE_TYPE(INTERPOD, interpod_device, "interpod", "Interpod")
 
 ROM_START( interpod )
 	ROM_REGION( 0x800, R6502_TAG, 0 )
-	ROM_LOAD( "1.4.u2", 0x000, 0x800, CRC(c5b71982) SHA1(614d677b7c6273f6b84fa61affaf91cfdaeed6a6) )
-	ROM_LOAD( "1.6.u2", 0x000, 0x800, CRC(67bb0436) SHA1(7659c45b73f577233f7657c4da9141dcfe8b6d97) )
+	ROM_DEFAULT_BIOS("v16")
+	ROM_SYSTEM_BIOS( 0, "v14", "Version 1.4" )
+	ROMX_LOAD( "1.4.u2", 0x000, 0x800, CRC(c5b71982) SHA1(614d677b7c6273f6b84fa61affaf91cfdaeed6a6), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS( 1, "v16", "Version 1.6" )
+	ROMX_LOAD( "1.6.u2", 0x000, 0x800, CRC(67bb0436) SHA1(7659c45b73f577233f7657c4da9141dcfe8b6d97), ROM_BIOS(1) )
 ROM_END
 
 
@@ -99,7 +99,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const tiny_rom_entry *interpod_device::device_rom_region() const
+const tiny_rom_entry *cbm_interpod_device::device_rom_region() const
 {
 	return ROM_NAME( interpod );
 }
@@ -109,13 +109,13 @@ const tiny_rom_entry *interpod_device::device_rom_region() const
 //  ADDRESS_MAP( interpod_mem )
 //-------------------------------------------------
 
-void interpod_device::interpod_mem(address_map &map)
+void cbm_interpod_device::interpod_mem(address_map &map)
 {
-	map(0x0000, 0x007f).mirror(0x3b80).m(R6532_TAG, FUNC(mos6532_new_device::ram_map));
-	map(0x0400, 0x041f).mirror(0x3be0).m(R6532_TAG, FUNC(mos6532_new_device::io_map));
-	map(0x2000, 0x2001).mirror(0x9ffe).rw(MC6850_TAG, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
+	map(0x0000, 0x007f).mirror(0x3b80).m(m_riot, FUNC(mos6532_new_device::ram_map));
+	map(0x0400, 0x041f).mirror(0x3be0).m(m_riot, FUNC(mos6532_new_device::io_map));
+	map(0x2000, 0x2001).mirror(0x9ffe).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
 	map(0x4000, 0x47ff).mirror(0xb800).rom().region(R6502_TAG, 0);
-	map(0x8000, 0x800f).mirror(0x5ff0).rw(R6522_TAG, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x8000, 0x800f).mirror(0x5ff0).m(m_via, FUNC(via6522_device::map));
 }
 
 
@@ -123,16 +123,22 @@ void interpod_device::interpod_mem(address_map &map)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(interpod_device::device_add_mconfig)
-	MCFG_CPU_ADD(R6502_TAG, M6502, 1000000)
-	MCFG_CPU_PROGRAM_MAP(interpod_mem)
+void cbm_interpod_device::device_add_mconfig(machine_config &config)
+{
+	M6502(config, m_maincpu, 1000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cbm_interpod_device::interpod_mem);
 
-	MCFG_DEVICE_ADD(R6522_TAG, VIA6522, 1000000)
-	MCFG_DEVICE_ADD(R6532_TAG, MOS6532_NEW, 1000000)
-	MCFG_DEVICE_ADD(MC6850_TAG, ACIA6850, 0)
+	VIA6522(config, m_via, 1000000);
 
-	MCFG_CBM_IEEE488_ADD(nullptr)
-MACHINE_CONFIG_END
+	MOS6532_NEW(config, m_riot, 1000000);
+
+	ACIA6850(config, m_acia, 0);
+
+	ieee488_device::add_cbm_devices(config, nullptr);
+
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
+}
+
 
 
 //**************************************************************************
@@ -140,25 +146,27 @@ MACHINE_CONFIG_END
 //**************************************************************************
 
 //-------------------------------------------------
-//  interpod_device - constructor
+//  cbm_interpod_device - constructor
 //-------------------------------------------------
 
-interpod_device::interpod_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, INTERPOD, tag, owner, clock),
-		device_cbm_iec_interface(mconfig, *this),
-		m_maincpu(*this, R6502_TAG),
-		m_via(*this, R6522_TAG),
-		m_riot(*this, R6532_TAG),
-		m_acia(*this, MC6850_TAG),
-		m_ieee(*this, IEEE488_TAG)
+cbm_interpod_device::cbm_interpod_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, CBM_INTERPOD, tag, owner, clock),
+	device_cbm_iec_interface(mconfig, *this),
+	m_maincpu(*this, R6502_TAG),
+	m_via(*this, "u4"),
+	m_riot(*this, "u3"),
+	m_acia(*this, "u5"),
+	m_ieee(*this, IEEE488_TAG),
+	m_rs232(*this, "rs232")
 {
 }
+
 
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void interpod_device::device_start()
+void cbm_interpod_device::device_start()
 {
 }
 
@@ -167,6 +175,6 @@ void interpod_device::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void interpod_device::device_reset()
+void cbm_interpod_device::device_reset()
 {
 }

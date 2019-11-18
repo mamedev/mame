@@ -374,14 +374,14 @@ private:
 	pin64_t m_capture;
 
 	static uint32_t s_special_9bit_clamptable[512];
-	static const z_decompress_entry_t m_z_dec_table[8];
+	static z_decompress_entry_t const m_z_dec_table[8];
 
-	static const uint8_t s_bayer_matrix[16];
-	static const uint8_t s_magic_matrix[16];
-	static const rdp_command_t m_commands[0x40];
-	static const int32_t s_rdp_command_length[];
-	static const char* s_image_format[];
-	static const char* s_image_size[];
+	static uint8_t const s_bayer_matrix[16];
+	static uint8_t const s_magic_matrix[16];
+	static rdp_command_t const m_commands[0x40];
+	static int32_t const s_rdp_command_length[];
+	static char const *const s_image_format[];
+	static char const *const s_image_size[];
 
 public:
 	bool ignore;

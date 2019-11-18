@@ -13,14 +13,6 @@
 
 
 /***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-#define MCFG_GENERIC_TERMINAL_KEYBOARD_CB(cb) \
-	downcast<generic_terminal_device &>(*device).set_keyboard_callback((KEYBOARDCB_##cb));
-
-
-/***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
@@ -31,9 +23,13 @@ class generic_terminal_device : public device_t
 public:
 	generic_terminal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> void set_keyboard_callback(Object &&cb) { m_keyboard_cb = std::forward<Object>(cb); }
+	template <typename... T>
+	void set_keyboard_callback(T &&... args)
+	{
+		m_keyboard_cb.set(std::forward<T>(args)...);
+	}
 
-	DECLARE_WRITE8_MEMBER(write) { term_write(data); }
+	void write(u8 data) { term_write(data); }
 
 	void kbd_put(u8 data);
 

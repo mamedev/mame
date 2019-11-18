@@ -8,7 +8,7 @@
 #define SIMM15(v) (int32_t)((v & 0x4000) ? (v | 0xffffe000) : (v))
 #define UIMM15(v) (v)
 
-const char *tms32082_mp_disassembler::BCND_CONDITION[32] =
+char const *const tms32082_mp_disassembler::BCND_CONDITION[32] =
 {
 	"nev.b",    "gt0.b",    "eq0.b",    "ge0.b",    "lt0.b",    "ne0.b",    "le0.b",    "alw.b",
 	"nev.h",    "gt0.h",    "eq0.h",    "ge0.h",    "lt0.h",    "ne0.h",    "le0.h",    "alw.h",
@@ -16,7 +16,7 @@ const char *tms32082_mp_disassembler::BCND_CONDITION[32] =
 	"nev.d",    "gt0.d",    "eq0.d",    "ge0.d",    "lt0.d",    "ne0.d",    "le0.d",    "alw.d",
 };
 
-const char *tms32082_mp_disassembler::BITNUM_CONDITION[32] =
+char const *const tms32082_mp_disassembler::BITNUM_CONDITION[32] =
 {
 	"eq.b",     "ne.b",     "gt.b",     "le.b",     "lt.b",     "ge.b",     "hi.b",     "ls.b",
 	"lo.b",     "hs.b",     "eq.h",     "ne.h",     "gt.h",     "le.h",     "lt.h",     "ge.h",
@@ -24,27 +24,27 @@ const char *tms32082_mp_disassembler::BITNUM_CONDITION[32] =
 	"lt.w",     "ge.w",     "hi.w",     "ls.w",     "lo.w",     "hs.w",     "?",        "?",
 };
 
-const char *tms32082_mp_disassembler::MEMOP_S[2] =
+char const *const tms32082_mp_disassembler::MEMOP_S[2] =
 {
 	":s", ""
 };
 
-const char *tms32082_mp_disassembler::MEMOP_M[2] =
+char const *const tms32082_mp_disassembler::MEMOP_M[2] =
 {
 	":m", ""
 };
 
-const char *tms32082_mp_disassembler::FLOATOP_PRECISION[4] =
+char const *const tms32082_mp_disassembler::FLOATOP_PRECISION[4] =
 {
 	"s", "d", "i", "u"
 };
 
-const char *tms32082_mp_disassembler::ACC_SEL[4] =
+char const *const tms32082_mp_disassembler::ACC_SEL[4] =
 {
 	"A0", "A1", "A2", "A3"
 };
 
-const char *tms32082_mp_disassembler::FLOATOP_ROUND[4] =
+char const *const tms32082_mp_disassembler::FLOATOP_ROUND[4] =
 {
 	"n", "z", "p", "m"
 };

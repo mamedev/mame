@@ -12,14 +12,6 @@
 
 
 //**************************************************************************
-//  MACROS/CONSTANTS
-//**************************************************************************
-
-#define LOG 0
-
-
-
-//**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
@@ -36,7 +28,7 @@ DEFINE_DEVICE_TYPE(VIDEOBRAIN_EXPANSION_SLOT, videobrain_expansion_slot_device, 
 //-------------------------------------------------
 
 device_videobrain_expansion_card_interface::device_videobrain_expansion_card_interface(const machine_config &mconfig, device_t &device) :
-	device_slot_card_interface(mconfig, device),
+	device_interface(device, "vidbrainexp"),
 	m_rom_mask(0),
 	m_ram_mask(0)
 {
@@ -89,7 +81,7 @@ uint8_t* device_videobrain_expansion_card_interface::videobrain_ram_pointer(runn
 
 videobrain_expansion_slot_device::videobrain_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, VIDEOBRAIN_EXPANSION_SLOT, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_videobrain_expansion_card_interface>(mconfig, *this),
 	device_image_interface(mconfig, *this),
 	m_write_extres(*this), m_cart(nullptr)
 {
@@ -102,7 +94,7 @@ videobrain_expansion_slot_device::videobrain_expansion_slot_device(const machine
 
 void videobrain_expansion_slot_device::device_start()
 {
-	m_cart = dynamic_cast<device_videobrain_expansion_card_interface *>(get_card_device());
+	m_cart = get_card_device();
 
 	// resolve callbacks
 	m_write_extres.resolve_safe();
@@ -150,36 +142,6 @@ std::string videobrain_expansion_slot_device::get_default_card_software(get_defa
 
 
 //-------------------------------------------------
-//  bo_r - cartridge data read
-//-------------------------------------------------
-
-uint8_t videobrain_expansion_slot_device::bo_r(address_space &space, offs_t offset, int cs1, int cs2)
-{
-	uint8_t data = 0;
-
-	if (m_cart != nullptr)
-	{
-		data = m_cart->videobrain_bo_r(space, offset, cs1, cs2);
-	}
-
-	return data;
-}
-
-
-//-------------------------------------------------
-//  bo_w - cartridge data write
-//-------------------------------------------------
-
-void videobrain_expansion_slot_device::bo_w(address_space &space, offs_t offset, uint8_t data, int cs1, int cs2)
-{
-	if (m_cart != nullptr)
-	{
-		m_cart->videobrain_bo_w(space, offset, data, cs1, cs2);
-	}
-}
-
-
-//-------------------------------------------------
 //  SLOT_INTERFACE_START( vidbrain_expansion_cards )
 //-------------------------------------------------
 
@@ -188,8 +150,9 @@ void videobrain_expansion_slot_device::bo_w(address_space &space, offs_t offset,
 #include "money_minder.h"
 #include "timeshare.h"
 
-SLOT_INTERFACE_START( vidbrain_expansion_cards )
-	SLOT_INTERFACE_INTERNAL("standard", VB_STD)
-	SLOT_INTERFACE_INTERNAL("moneyminder", VB_MONEY_MINDER)
-	SLOT_INTERFACE_INTERNAL("timeshare", VB_TIMESHARE)
-SLOT_INTERFACE_END
+void vidbrain_expansion_cards(device_slot_interface &device)
+{
+	device.option_add_internal("standard", VB_STD);
+	device.option_add_internal("moneyminder", VB_MONEY_MINDER);
+	device.option_add_internal("timeshare", VB_TIMESHARE);
+}

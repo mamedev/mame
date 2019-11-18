@@ -103,16 +103,17 @@ const tiny_rom_entry *ibm_3270pc_122_keyboard_device::device_rom_region() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(ibm_pc_at_84_keyboard_device::device_add_mconfig)
-	MCFG_CPU_ADD(I8048_TAG, I8048, 5364000)
-	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(ibm_pc_at_84_keyboard_device, bus_w))
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(ibm_pc_at_84_keyboard_device, p1_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(ibm_pc_at_84_keyboard_device, p1_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(ibm_pc_at_84_keyboard_device, p2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(ibm_pc_at_84_keyboard_device, p2_w))
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE(ibm_pc_at_84_keyboard_device, t0_r))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(ibm_pc_at_84_keyboard_device, t1_r))
-MACHINE_CONFIG_END
+void ibm_pc_at_84_keyboard_device::device_add_mconfig(machine_config &config)
+{
+	I8048(config, m_maincpu, 5364000);
+	m_maincpu->bus_out_cb().set(FUNC(ibm_pc_at_84_keyboard_device::bus_w));
+	m_maincpu->p1_in_cb().set(FUNC(ibm_pc_at_84_keyboard_device::p1_r));
+	m_maincpu->p1_out_cb().set(FUNC(ibm_pc_at_84_keyboard_device::p1_w));
+	m_maincpu->p2_in_cb().set(FUNC(ibm_pc_at_84_keyboard_device::p2_r));
+	m_maincpu->p2_out_cb().set(FUNC(ibm_pc_at_84_keyboard_device::p2_w));
+	m_maincpu->t0_in_cb().set(FUNC(ibm_pc_at_84_keyboard_device::t0_r));
+	m_maincpu->t1_in_cb().set(FUNC(ibm_pc_at_84_keyboard_device::t1_r));
+}
 
 
 //-------------------------------------------------
@@ -343,6 +344,7 @@ ibm_pc_at_84_keyboard_device::ibm_pc_at_84_keyboard_device(const machine_config 
 	m_dr(*this, "DR%02u", 0),
 	m_kbdida(*this, "KBDIDA"),
 	m_kbdidb(*this, "KBDIDB"),
+	m_leds(*this, "led%u", 0U),
 	m_db(0),
 	m_cnt(0),
 	m_sense(0),
@@ -368,6 +370,8 @@ ibm_3270pc_122_keyboard_device::ibm_3270pc_122_keyboard_device(const machine_con
 void ibm_pc_at_84_keyboard_device::device_start()
 {
 	set_pc_kbdc_device();
+
+	m_leds.resolve();
 
 	// state saving
 	save_item(NAME(m_db));
@@ -526,9 +530,9 @@ WRITE8_MEMBER( ibm_pc_at_84_keyboard_device::p2_w )
 
 	*/
 
-	machine().output().set_led_value(LED_SCROLL, BIT(data, 0));
-	machine().output().set_led_value(LED_NUM, BIT(data, 1));
-	machine().output().set_led_value(LED_CAPS, BIT(data, 2));
+	m_leds[LED_SCROLL] = BIT(data, 0);
+	m_leds[LED_NUM] = BIT(data, 1);
+	m_leds[LED_CAPS] = BIT(data, 2);
 
 	m_pc_kbdc->data_write_from_kb(!BIT(data, 7));
 	m_pc_kbdc->clock_write_from_kb(!BIT(data, 6));

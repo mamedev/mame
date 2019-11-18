@@ -16,7 +16,7 @@ constexpr double ATTACK_RATE = 10e-6 * 500;
 constexpr double DECAY_RATE = 10e-6 * 16000;
 
 
-void n8080_state::spacefev_update_SN76477_status()
+void spacefev_state::update_SN76477_status()
 {
 	double dblR0 = RES_M(1.0);
 	double dblR1 = RES_M(1.5);
@@ -45,7 +45,7 @@ void n8080_state::spacefev_update_SN76477_status()
 }
 
 
-void n8080_state::sheriff_update_SN76477_status()
+void sheriff_state::update_SN76477_status()
 {
 	if (m_mono_flop[1])
 	{
@@ -68,14 +68,6 @@ void n8080_state::sheriff_update_SN76477_status()
 
 void n8080_state::update_SN76477_status()
 {
-	if (m_n8080_hardware == 1)
-	{
-		spacefev_update_SN76477_status();
-	}
-	if (m_n8080_hardware == 2)
-	{
-		sheriff_update_SN76477_status();
-	}
 }
 
 
@@ -105,7 +97,7 @@ TIMER_CALLBACK_MEMBER( n8080_state::stop_mono_flop_callback )
 }
 
 
-void n8080_state::spacefev_sound_pins_changed()
+void spacefev_state::sound_pins_changed()
 {
 	uint16_t changes = ~m_curr_sound_pins & m_prev_sound_pins;
 
@@ -135,7 +127,7 @@ void n8080_state::spacefev_sound_pins_changed()
 }
 
 
-void n8080_state::sheriff_sound_pins_changed()
+void sheriff_state::sound_pins_changed()
 {
 	uint16_t changes = ~m_curr_sound_pins & m_prev_sound_pins;
 
@@ -157,7 +149,7 @@ void n8080_state::sheriff_sound_pins_changed()
 }
 
 
-void n8080_state::helifire_sound_pins_changed()
+void helifire_state::sound_pins_changed()
 {
 	//uint16_t changes = ~m_curr_sound_pins & m_prev_sound_pins;
 
@@ -172,18 +164,10 @@ void n8080_state::helifire_sound_pins_changed()
 
 void n8080_state::sound_pins_changed()
 {
-	if (m_n8080_hardware == 1)
-		spacefev_sound_pins_changed();
-	if (m_n8080_hardware == 2)
-		sheriff_sound_pins_changed();
-	if (m_n8080_hardware == 3)
-		helifire_sound_pins_changed();
-
-	m_prev_sound_pins = m_curr_sound_pins;
 }
 
 
-void n8080_state::delayed_sound_1( int data )
+void n8080_state::delayed_sound_1(int data)
 {
 	m_curr_sound_pins &= ~(
 		(1 << 0x7) |
@@ -200,19 +184,20 @@ void n8080_state::delayed_sound_1( int data )
 	if (~data & 0x10) m_curr_sound_pins |= 1 << 0x4; /* pulse (except in Helifire) */
 	if (~data & 0x20) m_curr_sound_pins |= 1 << 0x1;
 
-	if (m_n8080_hardware == 1)
-	{
-		if (data & ~m_prev_snd_data & 0x10)
-		{
-			spacefev_start_red_cannon();
-		}
-
-		m_spacefev_red_screen = data & 0x08;
-	}
-
 	sound_pins_changed();
 
+	m_prev_sound_pins = m_curr_sound_pins;
 	m_prev_snd_data = data;
+}
+
+void spacefev_state::delayed_sound_1(int data)
+{
+	if (data & ~m_prev_snd_data & 0x10)
+		start_red_cannon();
+
+	m_red_screen = data & 0x08;
+
+	n8080_state::delayed_sound_1(data);
 }
 
 
@@ -222,7 +207,7 @@ TIMER_CALLBACK_MEMBER( n8080_state::delayed_sound_1_callback )
 }
 
 
-void n8080_state::delayed_sound_2( int data )
+void n8080_state::delayed_sound_2(int data)
 {
 	m_curr_sound_pins &= ~(
 		(1 << 0x8) |
@@ -239,12 +224,23 @@ void n8080_state::delayed_sound_2( int data )
 	if (~data & 0x10) m_curr_sound_pins |= 1 << 0x2; /* pulse */
 	if (~data & 0x20) m_curr_sound_pins |= 1 << 0xc;
 
-	if (m_n8080_hardware == 1)
-		flip_screen_set(data & 0x20);
-	if (m_n8080_hardware == 3)
-		m_helifire_flash = data & 0x20;
-
 	sound_pins_changed();
+
+	m_prev_sound_pins = m_curr_sound_pins;
+}
+
+void spacefev_state::delayed_sound_2(int data)
+{
+	flip_screen_set(data & 0x20);
+
+	n8080_state::delayed_sound_2(data);
+}
+
+void helifire_state::delayed_sound_2(int data)
+{
+	m_flash = data & 0x20;
+
+	n8080_state::delayed_sound_2(data);
 }
 
 
@@ -254,18 +250,18 @@ TIMER_CALLBACK_MEMBER( n8080_state::delayed_sound_2_callback )
 }
 
 
-WRITE8_MEMBER(n8080_state::n8080_sound_1_w)
+void n8080_state::n8080_sound_1_w(uint8_t data)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(n8080_state::delayed_sound_1_callback), this), data); /* force CPUs to sync */
 }
 
-WRITE8_MEMBER(n8080_state::n8080_sound_2_w)
+void n8080_state::n8080_sound_2_w(uint8_t data)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(n8080_state::delayed_sound_2_callback), this), data); /* force CPUs to sync */
 }
 
 
-READ8_MEMBER(n8080_state::n8080_8035_p1_r)
+uint8_t n8080_state::n8080_8035_p1_r()
 {
 	uint8_t val = 0;
 
@@ -292,17 +288,17 @@ READ_LINE_MEMBER(n8080_state::n8080_8035_t1_r)
 }
 
 
-READ_LINE_MEMBER(n8080_state::helifire_8035_t0_r)
+READ_LINE_MEMBER(helifire_state::helifire_8035_t0_r)
 {
 	return (m_curr_sound_pins >> 0x3) & 1;
 }
-READ_LINE_MEMBER(n8080_state::helifire_8035_t1_r)
+READ_LINE_MEMBER(helifire_state::helifire_8035_t1_r)
 {
 	return (m_curr_sound_pins >> 0x4) & 1;
 }
 
 
-READ8_MEMBER(n8080_state::helifire_8035_external_ram_r)
+uint8_t helifire_state::helifire_8035_external_ram_r()
 {
 	uint8_t val = 0;
 
@@ -315,39 +311,39 @@ READ8_MEMBER(n8080_state::helifire_8035_external_ram_r)
 }
 
 
-READ8_MEMBER(n8080_state::helifire_8035_p2_r)
+uint8_t helifire_state::helifire_8035_p2_r()
 {
 	return ((m_curr_sound_pins >> 0xc) & 1) ? 0x10 : 0x00; /* not used */
 }
 
 
-WRITE8_MEMBER(n8080_state::n8080_dac_w)
+void n8080_state::n8080_dac_w(uint8_t data)
 {
 	m_n8080_dac->write(BIT(data, 7));
 }
 
 
-WRITE8_MEMBER(n8080_state::helifire_sound_ctrl_w)
+void helifire_state::sound_ctrl_w(uint8_t data)
 {
-	m_helifire_dac_phase = data & 0x80;
+	m_dac_phase = data & 0x80;
 
 	/* data & 0x40 not emulated */
 	/* data & 0x20 not emulated */
 
-	if (m_helifire_dac_phase)
+	if (m_dac_phase)
 	{
-		m_helifire_dac_timing = ATTACK_RATE * log(1 - m_helifire_dac_volume);
+		m_dac_timing = ATTACK_RATE * log(1 - m_dac_volume);
 	}
 	else
 	{
-		m_helifire_dac_timing = DECAY_RATE * log(m_helifire_dac_volume);
+		m_dac_timing = DECAY_RATE * log(m_dac_volume);
 	}
 
-	m_helifire_dac_timing += machine().time().as_double();
+	m_dac_timing += machine().time().as_double();
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(n8080_state::spacefev_vco_voltage_timer)
+TIMER_DEVICE_CALLBACK_MEMBER(spacefev_state::vco_voltage_timer)
 {
 	double voltage = 0;
 
@@ -360,40 +356,37 @@ TIMER_DEVICE_CALLBACK_MEMBER(n8080_state::spacefev_vco_voltage_timer)
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(n8080_state::helifire_dac_volume_timer)
+TIMER_DEVICE_CALLBACK_MEMBER(helifire_state::dac_volume_timer)
 {
-	double t = m_helifire_dac_timing - machine().time().as_double();
+	double t = m_dac_timing - machine().time().as_double();
 
-	if (m_helifire_dac_phase)
+	if (m_dac_phase)
 	{
-		m_helifire_dac_volume = 1 - exp(t / ATTACK_RATE);
+		m_dac_volume = 1 - exp(t / ATTACK_RATE);
 	}
 	else
 	{
-		m_helifire_dac_volume = exp(t / DECAY_RATE);
+		m_dac_volume = exp(t / DECAY_RATE);
 	}
 
-	m_helifire_dac->set_output_gain(ALL_OUTPUTS, m_helifire_dac_volume);
+	m_dac->set_output_gain(ALL_OUTPUTS, m_dac_volume);
 }
 
 
-SOUND_START_MEMBER(n8080_state,spacefev)
+void spacefev_state::sound_start()
 {
-	m_sound_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(n8080_state::stop_mono_flop_callback), this));
-	m_sound_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(n8080_state::stop_mono_flop_callback), this));
-	m_sound_timer[2] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(n8080_state::stop_mono_flop_callback), this));
+	m_sound_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(spacefev_state::stop_mono_flop_callback), this));
+	m_sound_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(spacefev_state::stop_mono_flop_callback), this));
+	m_sound_timer[2] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(spacefev_state::stop_mono_flop_callback), this));
 
 	save_item(NAME(m_prev_snd_data));
 	save_item(NAME(m_prev_sound_pins));
 	save_item(NAME(m_curr_sound_pins));
-	save_item(NAME(m_n8080_hardware));
 	save_item(NAME(m_mono_flop));
 }
 
-SOUND_RESET_MEMBER(n8080_state,spacefev)
+void spacefev_state::sound_reset()
 {
-	m_n8080_hardware = 1;
-
 	m_mono_flop[0] = 0;
 	m_mono_flop[1] = 0;
 	m_mono_flop[2] = 0;
@@ -406,22 +399,19 @@ SOUND_RESET_MEMBER(n8080_state,spacefev)
 }
 
 
-SOUND_START_MEMBER(n8080_state,sheriff)
+void sheriff_state::sound_start()
 {
-	m_sound_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(n8080_state::stop_mono_flop_callback), this));
-	m_sound_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(n8080_state::stop_mono_flop_callback), this));
+	m_sound_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sheriff_state::stop_mono_flop_callback), this));
+	m_sound_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sheriff_state::stop_mono_flop_callback), this));
 
 	save_item(NAME(m_prev_snd_data));
 	save_item(NAME(m_prev_sound_pins));
 	save_item(NAME(m_curr_sound_pins));
-	save_item(NAME(m_n8080_hardware));
 	save_item(NAME(m_mono_flop));
 }
 
-SOUND_RESET_MEMBER(n8080_state,sheriff)
+void sheriff_state::sound_reset()
 {
-	m_n8080_hardware = 2;
-
 	m_mono_flop[0] = 0;
 	m_mono_flop[1] = 0;
 	m_prev_snd_data = 0;
@@ -433,24 +423,21 @@ SOUND_RESET_MEMBER(n8080_state,sheriff)
 }
 
 
-SOUND_START_MEMBER(n8080_state,helifire)
+void helifire_state::sound_start()
 {
 	save_item(NAME(m_prev_snd_data));
 	save_item(NAME(m_prev_sound_pins));
 	save_item(NAME(m_curr_sound_pins));
-	save_item(NAME(m_n8080_hardware));
-	save_item(NAME(m_helifire_dac_volume));
-	save_item(NAME(m_helifire_dac_timing));
-	save_item(NAME(m_helifire_dac_phase));
+	save_item(NAME(m_dac_volume));
+	save_item(NAME(m_dac_timing));
+	save_item(NAME(m_dac_phase));
 }
 
-SOUND_RESET_MEMBER(n8080_state,helifire)
+void helifire_state::sound_reset()
 {
-	m_n8080_hardware = 3;
-
-	m_helifire_dac_volume = 1;
-	m_helifire_dac_timing = 0;
-	m_helifire_dac_phase = 0;
+	m_dac_volume = 1;
+	m_dac_timing = 0;
+	m_dac_phase = 0;
 	m_prev_snd_data = 0;
 	m_prev_sound_pins = 0;
 	m_curr_sound_pins = 0;
@@ -466,111 +453,99 @@ void n8080_state::n8080_sound_cpu_map(address_map &map)
 	map(0x0000, 0x03ff).rom();
 }
 
-
-void n8080_state::helifire_sound_io_map(address_map &map)
+void helifire_state::sound_io_map(address_map &map)
 {
-	map(0x00, 0x7f).r(this, FUNC(n8080_state::helifire_8035_external_ram_r));
+	map(0x00, 0x00).mirror(0x7f).r(FUNC(helifire_state::helifire_8035_external_ram_r));
 }
 
-
-MACHINE_CONFIG_START(n8080_state::spacefev_sound)
-
-	MCFG_SOUND_START_OVERRIDE(n8080_state,spacefev)
-	MCFG_SOUND_RESET_OVERRIDE(n8080_state,spacefev)
-
+void spacefev_state::spacefev_sound(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("audiocpu", I8035, 6000000)
-	MCFG_CPU_PROGRAM_MAP(n8080_sound_cpu_map)
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE(n8080_state, n8080_8035_t0_r))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(n8080_state, n8080_8035_t1_r))
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(n8080_state, n8080_8035_p1_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(n8080_state, n8080_dac_w))
+	I8035(config, m_audiocpu, 6000000);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &spacefev_state::n8080_sound_cpu_map);
+	m_audiocpu->t0_in_cb().set(FUNC(spacefev_state::n8080_8035_t0_r));
+	m_audiocpu->t1_in_cb().set(FUNC(spacefev_state::n8080_8035_t1_r));
+	m_audiocpu->p1_in_cb().set(FUNC(spacefev_state::n8080_8035_p1_r));
+	m_audiocpu->p2_out_cb().set(FUNC(spacefev_state::n8080_dac_w));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("vco_timer", n8080_state, spacefev_vco_voltage_timer, attotime::from_hz(1000))
+	TIMER(config, "vco_timer").configure_periodic(FUNC(spacefev_state::vco_voltage_timer), attotime::from_hz(1000));
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
-	MCFG_SOUND_ADD("n8080_dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "n8080_dac", 1.0, DAC_VREF_POS_INPUT)
+	DAC_1BIT(config, m_n8080_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.15);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.add_route(0, "n8080_dac", 1.0, DAC_VREF_POS_INPUT);
 
-	MCFG_SOUND_ADD("snsnd", SN76477, 0)
-	MCFG_SN76477_NOISE_PARAMS(RES_K(36), RES_K(150), CAP_N(1)) // noise + filter
-	MCFG_SN76477_DECAY_RES(RES_M(1))                    // decay_res
-	MCFG_SN76477_ATTACK_PARAMS(CAP_U(1.0), RES_K(20))   // attack_decay_cap + attack_res
-	MCFG_SN76477_AMP_RES(RES_K(150))                    // amplitude_res
-	MCFG_SN76477_FEEDBACK_RES(RES_K(47))                // feedback_res
-	MCFG_SN76477_VCO_PARAMS(0, CAP_N(1), RES_M(1.5))    // VCO volt + cap + res
-	MCFG_SN76477_PITCH_VOLTAGE(0)                       // pitch_voltage
-	MCFG_SN76477_SLF_PARAMS(CAP_N(47), RES_M(1))        // slf caps + res
-	MCFG_SN76477_ONESHOT_PARAMS(CAP_N(47), RES_K(820))  // oneshot caps + res
-	MCFG_SN76477_VCO_MODE(0)                            // VCO mode
-	MCFG_SN76477_MIXER_PARAMS(0, 0, 0)                  // mixer A, B, C
-	MCFG_SN76477_ENVELOPE_PARAMS(1, 0)                  // envelope 1, 2
-	MCFG_SN76477_ENABLE(1)                              // enable
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.35)
-MACHINE_CONFIG_END
+	SN76477(config, m_sn);
+	m_sn->set_noise_params(RES_K(36), RES_K(150), CAP_N(1));
+	m_sn->set_decay_res(RES_M(1));
+	m_sn->set_attack_params(CAP_U(1.0), RES_K(20));
+	m_sn->set_amp_res(RES_K(150));
+	m_sn->set_feedback_res(RES_K(47));
+	m_sn->set_vco_params(0, CAP_N(1), RES_M(1.5));
+	m_sn->set_pitch_voltage(0);
+	m_sn->set_slf_params(CAP_N(47), RES_M(1));
+	m_sn->set_oneshot_params(CAP_N(47), RES_K(820));
+	m_sn->set_vco_mode(0);
+	m_sn->set_mixer_params(0, 0, 0);
+	m_sn->set_envelope_params(1, 0);
+	m_sn->set_enable(1);
+	m_sn->add_route(ALL_OUTPUTS, "speaker", 0.35);
+}
 
-
-MACHINE_CONFIG_START(n8080_state::sheriff_sound)
-
-	MCFG_SOUND_START_OVERRIDE(n8080_state,sheriff)
-	MCFG_SOUND_RESET_OVERRIDE(n8080_state,sheriff)
-
+void sheriff_state::sheriff_sound(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("audiocpu", I8035, 6000000)
-	MCFG_CPU_PROGRAM_MAP(n8080_sound_cpu_map)
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE(n8080_state, n8080_8035_t0_r))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(n8080_state, n8080_8035_t1_r))
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(n8080_state, n8080_8035_p1_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(n8080_state, n8080_dac_w))
+	I8035(config, m_audiocpu, 6000000);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &sheriff_state::n8080_sound_cpu_map);
+	m_audiocpu->t0_in_cb().set(FUNC(sheriff_state::n8080_8035_t0_r));
+	m_audiocpu->t1_in_cb().set(FUNC(sheriff_state::n8080_8035_t1_r));
+	m_audiocpu->p1_in_cb().set(FUNC(sheriff_state::n8080_8035_p1_r));
+	m_audiocpu->p2_out_cb().set(FUNC(sheriff_state::n8080_dac_w));
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
-	MCFG_SOUND_ADD("n8080_dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "n8080_dac", 1.0, DAC_VREF_POS_INPUT)
+	DAC_1BIT(config, m_n8080_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.15);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.add_route(0, "n8080_dac", 1.0, DAC_VREF_POS_INPUT);
 
-	MCFG_SOUND_ADD("snsnd", SN76477, 0)
-	MCFG_SN76477_NOISE_PARAMS(RES_K(36), RES_K(100), CAP_N(1)) // noise + filter
-	MCFG_SN76477_DECAY_RES(RES_K(620))                  // decay_res
-	MCFG_SN76477_ATTACK_PARAMS(CAP_U(1.0), RES_K(20))   // attack_decay_cap + attack_res
-	MCFG_SN76477_AMP_RES(RES_K(150))                    // amplitude_res
-	MCFG_SN76477_FEEDBACK_RES(RES_K(47))                // feedback_res
-	MCFG_SN76477_VCO_PARAMS(0, CAP_N(1), RES_M(1.5))    // VCO volt + cap + res
-	MCFG_SN76477_PITCH_VOLTAGE(0)                       // pitch_voltage
-	MCFG_SN76477_SLF_PARAMS(CAP_N(47), RES_M(1.5))      // slf caps + res
-	MCFG_SN76477_ONESHOT_PARAMS(CAP_N(47), RES_K(560))  // oneshot caps + res
-	MCFG_SN76477_VCO_MODE(0)                            // VCO mode
-	MCFG_SN76477_MIXER_PARAMS(0, 0, 0)                  // mixer A, B, C
-	MCFG_SN76477_ENVELOPE_PARAMS(1, 0)                  // envelope 1, 2
-	MCFG_SN76477_ENABLE(1)                              // enable
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.35)
-MACHINE_CONFIG_END
+	SN76477(config, m_sn);
+	m_sn->set_noise_params(RES_K(36), RES_K(100), CAP_N(1));
+	m_sn->set_decay_res(RES_K(620));
+	m_sn->set_attack_params(CAP_U(1.0), RES_K(20));
+	m_sn->set_amp_res(RES_K(150));
+	m_sn->set_feedback_res(RES_K(47));
+	m_sn->set_vco_params(0, CAP_N(1), RES_M(1.5));
+	m_sn->set_pitch_voltage(0);
+	m_sn->set_slf_params(CAP_N(47), RES_M(1.5));
+	m_sn->set_oneshot_params(CAP_N(47), RES_K(560));
+	m_sn->set_vco_mode(0);
+	m_sn->set_mixer_params(0, 0, 0);
+	m_sn->set_envelope_params(1, 0);
+	m_sn->set_enable(1);
+	m_sn->add_route(ALL_OUTPUTS, "speaker", 0.35);
+}
 
-
-MACHINE_CONFIG_START(n8080_state::helifire_sound)
-
-	MCFG_SOUND_START_OVERRIDE(n8080_state,helifire)
-	MCFG_SOUND_RESET_OVERRIDE(n8080_state,helifire)
-
+void helifire_state::helifire_sound(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("audiocpu", I8035, 6000000)
-	MCFG_CPU_PROGRAM_MAP(n8080_sound_cpu_map)
-	MCFG_CPU_IO_MAP(helifire_sound_io_map)
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE(n8080_state, helifire_8035_t0_r))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(n8080_state, helifire_8035_t1_r))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(n8080_state, helifire_8035_p2_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(DEVWRITE8("helifire_dac", dac_byte_interface, write))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(n8080_state, helifire_sound_ctrl_w))
+	I8035(config, m_audiocpu, 6000000);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &helifire_state::n8080_sound_cpu_map);
+	m_audiocpu->set_addrmap(AS_IO, &helifire_state::sound_io_map);
+	m_audiocpu->t0_in_cb().set(FUNC(helifire_state::helifire_8035_t0_r));
+	m_audiocpu->t1_in_cb().set(FUNC(helifire_state::helifire_8035_t1_r));
+	m_audiocpu->p2_in_cb().set(FUNC(helifire_state::helifire_8035_p2_r));
+	m_audiocpu->p1_out_cb().set("helifire_dac", FUNC(dac_byte_interface::data_w));
+	m_audiocpu->p2_out_cb().set(FUNC(helifire_state::sound_ctrl_w));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("helifire_dac_volume_timer", n8080_state, helifire_dac_volume_timer, attotime::from_hz(1000))
+	TIMER(config, "helifire_dac_volume_timer").configure_periodic(FUNC(helifire_state::dac_volume_timer), attotime::from_hz(1000));
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("helifire_dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "helifire_dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "helifire_dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	SPEAKER(config, "speaker").front_center();
+	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.15); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.add_route(0, "helifire_dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "helifire_dac", -1.0, DAC_VREF_NEG_INPUT);
+}

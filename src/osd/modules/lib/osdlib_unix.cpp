@@ -62,9 +62,9 @@ void osd_process_kill()
 
 void *osd_alloc_executable(size_t size)
 {
-#if defined(SDLMAME_BSD) || defined(SDLMAME_MACOSX)
+#if defined(SDLMAME_BSD) || defined(SDLMAME_MACOSX) || defined(SDLMAME_EMSCRIPTEN)
 	return (void *)mmap(0, size, PROT_EXEC|PROT_READ|PROT_WRITE, MAP_ANON|MAP_SHARED, -1, 0);
-#elif defined(SDLMAME_UNIX)
+#else
 	return (void *)mmap(0, size, PROT_EXEC|PROT_READ|PROT_WRITE, MAP_ANON|MAP_SHARED, 0, 0);
 #endif
 }
@@ -90,40 +90,48 @@ void osd_free_executable(void *ptr, size_t size)
 
 void osd_break_into_debugger(const char *message)
 {
-	#ifdef MAME_DEBUG
+#ifdef MAME_DEBUG
 	printf("MAME exception: %s\n", message);
 	printf("Attempting to fall into debugger\n");
 	kill(getpid(), SIGTRAP);
-	#else
+#else
 	printf("Ignoring MAME exception: %s\n", message);
-	#endif
+#endif
 }
 
 #ifdef SDLMAME_ANDROID
-char *osd_get_clipboard_text(void)
+std::string osd_get_clipboard_text(void)
 {
-	return nullptr;
+	return std::string();
 }
 #else
 //============================================================
 //  osd_get_clipboard_text
 //============================================================
 
-char *osd_get_clipboard_text(void)
+std::string osd_get_clipboard_text(void)
 {
-	char *result = nullptr;
+	std::string result;
 
 	if (SDL_HasClipboardText())
 	{
 		char *temp = SDL_GetClipboardText();
-		result = (char *) malloc(strlen(temp) + 1);
-		strcpy(result, temp);
+		result.assign(temp);
 		SDL_free(temp);
 	}
 	return result;
 }
 
 #endif
+
+//============================================================
+//  osd_getpid
+//============================================================
+
+int osd_getpid(void)
+{
+	return getpid();
+}
 
 //============================================================
 //  dynamic_module_posix_impl

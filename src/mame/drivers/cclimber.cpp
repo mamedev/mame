@@ -242,14 +242,10 @@ Dip location verified from manual for: cclimber, guzzler, swimmer
 #include "audio/cclimber.h"
 
 #include "cpu/z80/z80.h"
-#include "machine/segacrpt_device.h"
 #include "sound/ay8910.h"
 #include "sound/samples.h"
 #include "screen.h"
 #include "speaker.h"
-
-
-#define MASTER_CLOCK            XTAL(18'432'000)
 
 
 void cclimber_state::machine_start()
@@ -259,8 +255,8 @@ void cclimber_state::machine_start()
 
 WRITE8_MEMBER(cclimber_state::swimmer_sh_soundlatch_w)
 {
-	m_soundlatch->write(space,offset,data);
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+	m_soundlatch->write(data);
+	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
 
@@ -331,11 +327,13 @@ void cclimber_state::cclimber_map(address_map &map)
 	map(0x9000, 0x93ff).mirror(0x0400).ram().share("videoram");
 	/* 9800-9bff and 9c00-9fff share the same RAM, interleaved */
 	/* (9800-981f for scroll, 9c20-9c3f for color RAM, and so on) */
-	map(0x9800, 0x9bff).ram();  /* not used, but initialized */
 	map(0x9800, 0x981f).ram().share("column_scroll");
+	map(0x9820, 0x987f).ram();  /* not used, but initialized */
 	map(0x9880, 0x989f).ram().share("spriteram");
+	map(0x98a0, 0x98db).ram();  /* not used, but initialized */
 	map(0x98dc, 0x98df).ram().share("bigspritectrl");
-	map(0x9c00, 0x9fff).ram().w(this, FUNC(cclimber_state::cclimber_colorram_w)).share("colorram");
+	map(0x98e0, 0x9bff).ram();  /* not used, but initialized */
+	map(0x9c00, 0x9fff).ram().w(FUNC(cclimber_state::cclimber_colorram_w)).share("colorram");
 	map(0xa000, 0xa007).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0xa000, 0xa000).portr("P1");
 	map(0xa800, 0xa800).portr("P2").w("cclimber_audio", FUNC(cclimber_audio_device::sample_rate_w));
@@ -355,15 +353,17 @@ void cclimber_state::cannonb_map(address_map &map)
 	map(0x6000, 0x6bff).ram();
 	map(0x8000, 0x83ff).ram();
 	map(0x8800, 0x88ff).nopr().writeonly().share("bigspriteram"); /* must not return what's written (game will reset after coin insert if it returns 0xff)*/
-//  AM_RANGE(0x8900, 0x8bff) AM_WRITEONLY  /* not used, but initialized */
+//  map(0x8900, 0x8bff).writeonly();  /* not used, but initialized */
 	map(0x9000, 0x93ff).mirror(0x0400).ram().share("videoram");
 	/* 9800-9bff and 9c00-9fff share the same RAM, interleaved */
 	/* (9800-981f for scroll, 9c20-9c3f for color RAM, and so on) */
-	map(0x9800, 0x9bff).ram();  /* not used, but initialized */
 	map(0x9800, 0x981f).ram().share("column_scroll");
+	map(0x9820, 0x987f).ram();  /* not used, but initialized */
 	map(0x9880, 0x989f).ram().share("spriteram");
+	map(0x98a0, 0x98db).ram();  /* not used, but initialized */
 	map(0x98dc, 0x98df).ram().share("bigspritectrl");
-	map(0x9c00, 0x9fff).ram().w(this, FUNC(cclimber_state::cclimber_colorram_w)).share("colorram");
+	map(0x98e0, 0x9bff).ram();  /* not used, but initialized */
+	map(0x9c00, 0x9fff).ram().w(FUNC(cclimber_state::cclimber_colorram_w)).share("colorram");
 	map(0xa000, 0xa007).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0xa000, 0xa000).portr("P1");
 	map(0xa800, 0xa800).portr("P2").w("cclimber_audio", FUNC(cclimber_audio_device::sample_rate_w));
@@ -380,10 +380,10 @@ void cclimber_state::swimmer_map(address_map &map)
 	map(0x9800, 0x981f).writeonly().share("column_scroll");
 	map(0x9880, 0x989f).writeonly().share("spriteram");
 	map(0x98fc, 0x98ff).writeonly().share("bigspritectrl");
-	map(0x9c00, 0x9fff).ram().w(this, FUNC(cclimber_state::cclimber_colorram_w)).share("colorram");
+	map(0x9c00, 0x9fff).ram().w(FUNC(cclimber_state::cclimber_colorram_w)).share("colorram");
 	map(0xa000, 0xa007).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0xa000, 0xa000).portr("P2");
-	map(0xa800, 0xa800).portr("P1").w(this, FUNC(cclimber_state::swimmer_sh_soundlatch_w));
+	map(0xa800, 0xa800).portr("P1").w(FUNC(cclimber_state::swimmer_sh_soundlatch_w));
 	map(0xb000, 0xb000).portr("DSW1");
 	map(0xb800, 0xb800).portr("DSW2").writeonly().share("bgcolor");
 	map(0xb880, 0xb880).portr("SYSTEM");
@@ -406,11 +406,13 @@ void cclimber_state::yamato_map(address_map &map)
 	map(0x9000, 0x93ff).mirror(0x0400).ram().share("videoram");
 	/* 9800-9bff and 9c00-9fff share the same RAM, interleaved */
 	/* (9800-981f for scroll, 9c20-9c3f for color RAM, and so on) */
-	map(0x9800, 0x9bff).ram();  /* not used, but initialized */
 	map(0x9800, 0x981f).ram().share("column_scroll");
+	map(0x9820, 0x987f).ram();  /* not used, but initialized */
 	map(0x9880, 0x989f).ram().share("spriteram");
+	map(0x98a0, 0x98db).ram();  /* not used, but initialized */
 	map(0x98dc, 0x98df).ram().share("bigspritectrl");
-	map(0x9c00, 0x9fff).ram().w(this, FUNC(cclimber_state::cclimber_colorram_w)).share("colorram");
+	map(0x98e0, 0x9bff).ram();  /* not used, but initialized */
+	map(0x9c00, 0x9fff).ram().w(FUNC(cclimber_state::cclimber_colorram_w)).share("colorram");
 	map(0xa000, 0xa007).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0xa000, 0xa000).portr("P1");
 	map(0xa800, 0xa800).portr("P2");
@@ -459,7 +461,7 @@ void cclimber_state::bagmanf_map(address_map &map)
 	map(0x9800, 0x9800).portr("SYSTEM");
 	map(0x98dc, 0x98df).ram().share("bigspritectrl"); // wrong
 	map(0x9c00, 0x9fff).ram();  /* not used, but initialized */
-	map(0xa000, 0xa000).r(this, FUNC(cclimber_state::bagmanf_a000_r));
+	map(0xa000, 0xa000).r(FUNC(cclimber_state::bagmanf_a000_r));
 	map(0xa000, 0xa007).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0xa800, 0xa800).nopr().w("cclimber_audio", FUNC(cclimber_audio_device::sample_rate_w));
 	map(0xb000, 0xb000).portr("DSW").w("cclimber_audio", FUNC(cclimber_audio_device::sample_volume_w));
@@ -482,8 +484,8 @@ void cclimber_state::cclimber_portmap(address_map &map)
 void cclimber_state::yamato_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(this, FUNC(cclimber_state::yamato_p0_w));  /* ??? */
-	map(0x01, 0x01).w(this, FUNC(cclimber_state::yamato_p1_w));  /* ??? */
+	map(0x00, 0x00).w(FUNC(cclimber_state::yamato_p0_w));  /* ??? */
+	map(0x01, 0x01).w(FUNC(cclimber_state::yamato_p1_w));  /* ??? */
 }
 
 
@@ -514,8 +516,8 @@ void cclimber_state::yamato_audio_portmap(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x01).w("ay1", FUNC(ay8910_device::address_data_w));
 	map(0x02, 0x03).w("ay2", FUNC(ay8910_device::address_data_w));
-	map(0x04, 0x04).r(this, FUNC(cclimber_state::yamato_p0_r));   /* ??? */
-	map(0x08, 0x08).r(this, FUNC(cclimber_state::yamato_p1_r));   /* ??? */
+	map(0x04, 0x04).r(FUNC(cclimber_state::yamato_p0_r));   /* ??? */
+	map(0x08, 0x08).r(FUNC(cclimber_state::yamato_p1_r));   /* ??? */
 }
 
 
@@ -669,6 +671,17 @@ static INPUT_PORTS_START( ckongb )
 	PORT_DIPSETTING(    0x01, "2" )
 	PORT_DIPSETTING(    0x02, "3" )
 	PORT_DIPSETTING(    0x03, "4" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( ckongb2 )
+	PORT_INCLUDE( ckong )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPSETTING(    0x01, "3" )
+	PORT_DIPSETTING(    0x02, "4" )
+	PORT_DIPSETTING(    0x03, "5" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cannonb )
@@ -1072,25 +1085,25 @@ static const gfx_layout swimmer_spritelayout =
 	32*8
 };
 
-static GFXDECODE_START( cclimber )
+static GFXDECODE_START( gfx_cclimber )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, cclimber_charlayout,      0, 16 ) /* characters */
 	GFXDECODE_ENTRY( "gfx1", 0x0000, cclimber_spritelayout,    0, 16 ) /* sprites */
 	GFXDECODE_ENTRY( "gfx2", 0x0000, cclimber_charlayout,   16*4,  8 ) /* big sprites */
 GFXDECODE_END
 
-static GFXDECODE_START( cannonb )
+static GFXDECODE_START( gfx_cannonb )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, cannonb_charlayout,       0, 16 ) /* characters */
 	GFXDECODE_ENTRY( "gfx1", 0x1000, cannonb_spritelayout,     0, 16 ) /* sprites */
 	GFXDECODE_ENTRY( "gfx2", 0x0000, cclimber_charlayout,   16*4,  8 ) /* big sprites */
 GFXDECODE_END
 
-static GFXDECODE_START( swimmer )
+static GFXDECODE_START( gfx_swimmer )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, swimmer_charlayout,       0, 32 ) /* characters */
 	GFXDECODE_ENTRY( "gfx1", 0x0000, swimmer_spritelayout,     0, 32 ) /* sprites */
 	GFXDECODE_ENTRY( "gfx2", 0x0000, swimmer_charlayout,    32*8,  4 ) /* big sprites */
 GFXDECODE_END
 
-static GFXDECODE_START( toprollr )
+static GFXDECODE_START( gfx_toprollr )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, cclimber_charlayout,      0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, cclimber_spritelayout,    0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, cclimber_charlayout,   16*4,  8 ) /* big sprites */
@@ -1100,7 +1113,7 @@ GFXDECODE_END
 WRITE_LINE_MEMBER(cclimber_state::vblank_irq)
 {
 	if (state && m_nmi_mask)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 WRITE_LINE_MEMBER(cclimber_state::bagmanf_vblank_irq)
@@ -1109,199 +1122,192 @@ WRITE_LINE_MEMBER(cclimber_state::bagmanf_vblank_irq)
 		m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
-MACHINE_CONFIG_START(cclimber_state::root)
-
+void cclimber_state::root(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/3/2)  /* 3.072 MHz */
-	MCFG_CPU_PROGRAM_MAP(cclimber_map)
-	MCFG_CPU_IO_MAP(cclimber_portmap)
+	Z80(config, m_maincpu, XTAL(18'432'000)/3/2);  /* 3.072 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &cclimber_state::cclimber_map);
+	m_maincpu->set_addrmap(AS_IO, &cclimber_state::cclimber_portmap);
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(cclimber_state, nmi_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(cclimber_state, flip_screen_x_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(cclimber_state, flip_screen_y_w))
+	LS259(config, m_mainlatch, 0);
+	m_mainlatch->q_out_cb<0>().set(FUNC(cclimber_state::nmi_mask_w));
+	m_mainlatch->q_out_cb<1>().set(FUNC(cclimber_state::flip_screen_x_w));
+	m_mainlatch->q_out_cb<2>().set(FUNC(cclimber_state::flip_screen_y_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cclimber_state, screen_update_cclimber)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(cclimber_state, vblank_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(cclimber_state::screen_update_cclimber));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(cclimber_state::vblank_irq));
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cclimber)
-	MCFG_PALETTE_ADD("palette", 16*4+8*4)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cclimber);
+	PALETTE(config, m_palette, FUNC(cclimber_state::cclimber_palette), 16*4+8*4);
 
-	MCFG_PALETTE_INIT_OWNER(cclimber_state,cclimber)
 	MCFG_VIDEO_START_OVERRIDE(cclimber_state,cclimber)
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(cclimber_state::cclimber)
+void cclimber_state::cclimber(machine_config &config)
+{
 	root(config);
-	MCFG_DEVICE_MODIFY("mainlatch") // 7J on CCG-1
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE("cclimber_audio", cclimber_audio_device, sample_trigger_w))
+
+	// 7J on CCG-1
+	m_mainlatch->q_out_cb<4>().set("cclimber_audio", FUNC(cclimber_audio_device::sample_trigger));
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
-	MCFG_CCLIMBER_AUDIO_ADD("cclimber_audio")
-MACHINE_CONFIG_END
+	CCLIMBER_AUDIO(config, "cclimber_audio", 0);
+}
 
-MACHINE_CONFIG_START(cclimber_state::cclimberx)
+void cclimber_state::cclimberx(machine_config &config)
+{
 	cclimber(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_OPCODES, &cclimber_state::decrypted_opcodes_map);
+}
 
-MACHINE_CONFIG_START(cclimber_state::ckongb)
+void cclimber_state::ckongb(machine_config &config)
+{
 	cclimber(config);
-	MCFG_DEVICE_MODIFY("mainlatch")
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(cclimber_state, nmi_mask_w)) //used by Crazy Kong Bootleg with alt levels and speed up
-MACHINE_CONFIG_END
+	m_mainlatch->q_out_cb<3>().set(FUNC(cclimber_state::nmi_mask_w)); //used by Crazy Kong Bootleg with alt levels and speed up
+}
 
 
-MACHINE_CONFIG_START(cclimber_state::cannonb)
+void cclimber_state::cannonb(machine_config &config)
+{
 	cclimber(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(cannonb_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &cclimber_state::cannonb_map);
 
-	MCFG_DEVICE_MODIFY("mainlatch")
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(cclimber_state, flip_screen_x_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(cclimber_state, flip_screen_y_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // not used
+	m_mainlatch->q_out_cb<1>().set(FUNC(cclimber_state::flip_screen_x_w));
+	m_mainlatch->q_out_cb<1>().append(FUNC(cclimber_state::flip_screen_y_w));
+	m_mainlatch->q_out_cb<2>().set_nop(); // not used
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", cannonb)
-MACHINE_CONFIG_END
+	m_gfxdecode->set_info(gfx_cannonb);
+}
 
-MACHINE_CONFIG_START(cclimber_state::bagmanf)
+void cclimber_state::bagmanf(machine_config &config)
+{
 	cclimber(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(bagmanf_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &cclimber_state::bagmanf_map);
 
-	MCFG_DEVICE_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(cclimber_state, bagmanf_vblank_irq))
-MACHINE_CONFIG_END
+	subdevice<screen_device>("screen")->screen_vblank().set(FUNC(cclimber_state::bagmanf_vblank_irq));
+}
 
 
-MACHINE_CONFIG_START(cclimber_state::yamato)
+void cclimber_state::yamato(machine_config &config)
+{
 	root(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5018, MASTER_CLOCK/3/2)  /* 3.072 MHz */
-	MCFG_CPU_PROGRAM_MAP(yamato_map)
-	MCFG_CPU_IO_MAP(yamato_portmap)
-	MCFG_CPU_OPCODES_MAP(yamato_decrypted_opcodes_map)
-	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
+	sega_315_5018_device &maincpu(SEGA_315_5018(config.replace(), m_maincpu, XTAL(18'432'000)/3/2));  /* 3.072 MHz */
+	maincpu.set_addrmap(AS_PROGRAM, &cclimber_state::yamato_map);
+	maincpu.set_addrmap(AS_IO, &cclimber_state::yamato_portmap);
+	maincpu.set_addrmap(AS_OPCODES, &cclimber_state::yamato_decrypted_opcodes_map);
+	maincpu.set_decrypted_tag(":decrypted_opcodes");
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3072000) /* 3.072 MHz ? */
-	MCFG_CPU_PROGRAM_MAP(yamato_audio_map)
-	MCFG_CPU_IO_MAP(yamato_audio_portmap)
+	Z80(config, m_audiocpu, 3072000); /* 3.072 MHz ? */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &cclimber_state::yamato_audio_map);
+	m_audiocpu->set_addrmap(AS_IO, &cclimber_state::yamato_audio_portmap);
 
 	/* video hardware */
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(16*4+8*4+256)
-	MCFG_PALETTE_INIT_OWNER(cclimber_state,yamato)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(cclimber_state, screen_update_yamato)
+	m_palette->set_entries(16*4+8*4+256);
+	m_palette->set_init(FUNC(cclimber_state::yamato_palette));
+
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(cclimber_state::screen_update_yamato));
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
-	MCFG_SOUND_ADD("ay1", AY8910, 1536000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	AY8910(config, "ay1", XTAL(18'432'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.25);  /* 1.536 MHz */
 
-	MCFG_SOUND_ADD("ay2", AY8910, 1536000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-MACHINE_CONFIG_END
+	AY8910(config, "ay2", XTAL(18'432'000)/12).add_route(ALL_OUTPUTS, "speaker", 0.25);  /* 1.536 MHz */
+}
 
 
-MACHINE_CONFIG_START(cclimber_state::toprollr)
+void cclimber_state::toprollr(machine_config &config)
+{
 	cclimber(config);
 
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5018, MASTER_CLOCK/3/2)  /* 3.072 MHz */
-	MCFG_CPU_PROGRAM_MAP(toprollr_map)
-	MCFG_CPU_IO_MAP(cclimber_portmap)
-	MCFG_CPU_OPCODES_MAP(toprollr_decrypted_opcodes_map)
-	MCFG_SEGACRPT_SET_SIZE(0)
-	MCFG_SEGACRPT_SET_NUMBANKS(3)
-	MCFG_SEGACRPT_SET_BANKSIZE(0x6000)
+	sega_315_5018_device &maincpu(SEGA_315_5018(config.replace(), m_maincpu, XTAL(18'432'000)/3/2));  /* 3.072 MHz */
+	maincpu.set_addrmap(AS_PROGRAM, &cclimber_state::toprollr_map);
+	maincpu.set_addrmap(AS_IO, &cclimber_state::cclimber_portmap);
+	maincpu.set_addrmap(AS_OPCODES, &cclimber_state::toprollr_decrypted_opcodes_map);
+	maincpu.set_size(0);
+	maincpu.set_numbanks(3);
+	maincpu.set_banksize(0x6000);
 
-	MCFG_DEVICE_MODIFY("mainlatch")
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(cclimber_state, toprollr_rombank_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(cclimber_state, toprollr_rombank_w))
+	m_mainlatch->q_out_cb<5>().set(FUNC(cclimber_state::toprollr_rombank_w));
+	m_mainlatch->q_out_cb<6>().set(FUNC(cclimber_state::toprollr_rombank_w));
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", toprollr)
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(32*5)
-	MCFG_PALETTE_INIT_OWNER(cclimber_state,toprollr)
+	m_gfxdecode->set_info(gfx_toprollr);
+	m_palette->set_entries(32*5);
+	m_palette->set_init(FUNC(cclimber_state::toprollr_palette));
 
 	MCFG_VIDEO_START_OVERRIDE(cclimber_state,toprollr)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(cclimber_state, screen_update_toprollr)
-MACHINE_CONFIG_END
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(cclimber_state::screen_update_toprollr));
+}
 
 
-MACHINE_CONFIG_START(cclimber_state::swimmer)
-
+void cclimber_state::swimmer(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(18'432'000)/6)    /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(swimmer_map)
+	Z80(config, m_maincpu, XTAL(18'432'000)/6);    /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &cclimber_state::swimmer_map);
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(cclimber_state, nmi_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(cclimber_state, flip_screen_x_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(cclimber_state, flip_screen_y_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(cclimber_state, sidebg_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(cclimber_state, palette_bank_w))
+	LS259(config, m_mainlatch, 0);
+	m_mainlatch->q_out_cb<0>().set(FUNC(cclimber_state::nmi_mask_w));
+	m_mainlatch->q_out_cb<1>().set(FUNC(cclimber_state::flip_screen_x_w));
+	m_mainlatch->q_out_cb<2>().set(FUNC(cclimber_state::flip_screen_y_w));
+	m_mainlatch->q_out_cb<3>().set(FUNC(cclimber_state::sidebg_enable_w));
+	m_mainlatch->q_out_cb<4>().set(FUNC(cclimber_state::palette_bank_w));
 
-	MCFG_CPU_ADD("audiocpu", Z80,XTAL(4'000'000)/2)  /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(swimmer_audio_map)
-	MCFG_CPU_IO_MAP(swimmer_audio_portmap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(cclimber_state, nmi_line_pulse,  (double)4000000/16384) /* IRQs are triggered by the main CPU */
+	Z80(config, m_audiocpu, XTAL(4'000'000)/2);  /* verified on pcb */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &cclimber_state::swimmer_audio_map);
+	m_audiocpu->set_addrmap(AS_IO, &cclimber_state::swimmer_audio_portmap);
+	m_audiocpu->set_periodic_int(FUNC(cclimber_state::nmi_line_pulse), attotime::from_hz((double)4000000/16384)); /* IRQs are triggered by the main CPU */
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60.57) /* verified on pcb */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cclimber_state, screen_update_swimmer)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(cclimber_state, vblank_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60.57); /* verified on pcb */
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(cclimber_state::screen_update_swimmer));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(cclimber_state::vblank_irq));
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", swimmer)
-	MCFG_PALETTE_ADD("palette", 32*8+4*8+1)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_swimmer);
+	PALETTE(config, m_palette, FUNC(cclimber_state::swimmer_palette), 32*8+4*8+1);
 
-	MCFG_PALETTE_INIT_OWNER(cclimber_state,swimmer)
 	MCFG_VIDEO_START_OVERRIDE(cclimber_state,swimmer)
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL(4'000'000)/2)  /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	AY8910(config, "ay1", XTAL(4'000'000)/2).add_route(ALL_OUTPUTS, "speaker", 0.25);  /* verified on pcb */
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL(4'000'000)/2)  /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-MACHINE_CONFIG_END
+	AY8910(config, "ay2", XTAL(4'000'000)/2).add_route(ALL_OUTPUTS, "speaker", 0.25);  /* verified on pcb */
+}
 
-MACHINE_CONFIG_START(cclimber_state::guzzler)
+void cclimber_state::guzzler(machine_config &config)
+{
 	swimmer(config);
+
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(guzzler_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &cclimber_state::guzzler_map);
+}
 
 
 /***************************************************************************
@@ -1720,7 +1726,34 @@ ROM_START( ckongpt2b )
 	ROM_LOAD( "13.5p",        0x1000, 0x1000, CRC(9003ffbd) SHA1(fd016056aabc23957643f37230f03842294f795e) )
 ROM_END
 
+ROM_START( ckongpt2b2 )
+	ROM_REGION( 0x6000, "maincpu", 0 )
+	ROM_LOAD( "0.bin",        0x0000, 0x1000, CRC(1c21386f) SHA1(ce1a0c469dd09d81485cede6c8fbaf6299a9decf) ) // unique
+	ROM_LOAD( "1.bin",        0x1000, 0x1000, CRC(5dc1aaba) SHA1(42b9e5946ffce7c156d114bde68f37c2c34853c4) )
+	ROM_LOAD( "2.bin",        0x2000, 0x1000, CRC(c9054c94) SHA1(1aa08d2501ee620759fd5c111e12f6d432c25294) )
+	ROM_LOAD( "3.bin",        0x3000, 0x1000, CRC(84903b9d) SHA1(60c3f3879da9f3cdcdc2313db1196c41132fb27f) ) // unique
+	ROM_LOAD( "4.bin",        0x4000, 0x1000, CRC(ae159192) SHA1(d467256a3a366e246243e7828ff4a45d4c146e2c) )
+	ROM_LOAD( "5.bin",        0x5000, 0x1000, CRC(966bc9ab) SHA1(4434fc620169ffea1b1f227b61674e1daf79b54b) )
 
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_LOAD( "d.bin",        0x0000, 0x1000, CRC(2dcedd12) SHA1(dfdcfc21bcba7c8e148ee54daae511ca78c58e70) )
+	ROM_LOAD( "c.bin",        0x1000, 0x1000, CRC(fa7cbd91) SHA1(0208d2ebc59f3600005476b6987472685bc99d67) )
+	ROM_LOAD( "b.bin",        0x2000, 0x1000, CRC(3375b3bd) SHA1(a00b3c31cff123aab6ac0833aabfdd663302971a) )
+	ROM_LOAD( "a.bin",        0x3000, 0x1000, CRC(5655cc11) SHA1(5195e9b2a60c54280b48b32ee8248090904dbc51) )
+
+	ROM_REGION( 0x1000, "gfx2", 0 )
+	ROM_LOAD( "9.bin",        0x0000, 0x0800, CRC(d1352c31) SHA1(da726a63a8be830d695afeddc1717749af8c9d47) )
+	ROM_LOAD( "8.bin",        0x0800, 0x0800, CRC(a7a2fdbd) SHA1(529865f8bbfbdbbf34ac39c70ef17e6d5bd0f845) )
+
+	ROM_REGION( 0x0060, "proms", 0 )
+	ROM_LOAD( "prom.bin",     0x0000, 0x0020, CRC(d3b84067) SHA1(1d025c28c47c4c7508b0dfd534de87e923262630) ) // unique, FIXED BITS (xxxxxxx1), verified on 4 boards, but gives red-ish backgrounds not present on PCB?
+	ROM_LOAD( "prom.t6",      0x0020, 0x0020, CRC(26aada9e) SHA1(f59645e606ea4f0dd0fc4ea47dd03f526c534941) )
+	ROM_LOAD( "prom.u6",      0x0040, 0x0020, CRC(676b3166) SHA1(29b9434cd34d43ea5664e436e2a24b54f8d88aac) )
+
+	ROM_REGION( 0x2000, "samples", 0 )  /* samples */
+	ROM_LOAD( "7.bin",        0x0000, 0x1000, CRC(5f0bcdfb) SHA1(7f79bf6de117348f606696ed7ea1937bbf926612) )
+	ROM_LOAD( "6.bin",        0x1000, 0x1000, CRC(9003ffbd) SHA1(fd016056aabc23957643f37230f03842294f795e) )
+ROM_END
 
 /* Sets below are 'Crazy Kong' without the extra Falcon screen or Pt. 2 subtitle, they also have worse colours */
 
@@ -2080,9 +2113,7 @@ ROM_START( ckongdks )
 	ROM_LOAD( "ck07.bin",    0x1000, 0x1000, CRC(9003ffbd) SHA1(fd016056aabc23957643f37230f03842294f795e) )
 ROM_END
 
-/* Original ORCA PCB, with a suicide battery attached
-
- */
+/* Original ORCA PCB, with a suicide battery attached */
 ROM_START( rpatrol )
 	ROM_REGION( 0x6000, "maincpu", 0 )  // encrypted
 	ROM_LOAD( "1.1h",    0x000000, 0x001000, CRC(065197f0) SHA1(6e482967949bdb126b7ac484abb84c24f4687a3a) )
@@ -2098,71 +2129,37 @@ ROM_START( rpatrol )
 	ROM_CONTINUE(             0x003000, 0x000800 )
 
 	ROM_REGION( 0x1000, "gfx2", 0 )
-	ROM_LOAD( "9.2t",    0x000000, 0x000800, CRC(d373fc48) SHA1(f06017190955d7458ac652b37c47cee033bc5498) )
+	ROM_LOAD( "9.2t",    0x000000, 0x000800, CRC(065651a5) SHA1(5c2f9b44d8819d2f792525c06b5c341fe07329c0) )
 	ROM_LOAD( "8.2s",    0x000800, 0x000800, CRC(59747c31) SHA1(92acf07489f3e17f0c1769a0df15b6ddb117830f) )
 
 	ROM_REGION( 0x0060, "proms", 0 )
-	// probably matches with existing sets
-	ROM_LOAD( "bprom1.9n",    0x0000, 0x0020, BAD_DUMP CRC(f9a2383b) SHA1(4d88c177740efdb27708474c9ee0fcdca5a78c36) )
-	ROM_LOAD( "bprom2.9p",    0x0020, 0x0020, BAD_DUMP CRC(1743bd26) SHA1(9bb50f6e24a7ac3c9ddf3923e57c5532603009e5) )
-	ROM_LOAD( "bprom3.9c",    0x0040, 0x0020, BAD_DUMP CRC(ee03bc96) SHA1(45e33e750a536a904f30136d84dd7993d97e8e54) )
+	ROM_LOAD( "mb7051.1b",    0x0000, 0x0020, CRC(f9a2383b) SHA1(4d88c177740efdb27708474c9ee0fcdca5a78c36) ) /* or compatible like 82S123 - Had a RED stipe across chip */
+	ROM_LOAD( "mb7051.1c",    0x0020, 0x0020, CRC(1743bd26) SHA1(9bb50f6e24a7ac3c9ddf3923e57c5532603009e5) ) /* or compatible like 82S123 - Had a BLUE stipe across chip */
+	ROM_LOAD( "mb7051.1u",    0x0040, 0x0020, CRC(ee03bc96) SHA1(45e33e750a536a904f30136d84dd7993d97e8e54) ) /* or compatible like 82S123 - Had a GREEN stipe across chip */
 ROM_END
 
-/* This set came from a 'Silver Land' board with Silver Land GFX roms, however, the program roms are nearly
-   the same as River Patrol but appear to have an original ORCA copyright
+ROM_START( rpatroln )
+	ROM_REGION( 0x6000, "maincpu", 0 ) /* located on an original ORCA OVG-51A PCB */
+	ROM_LOAD( "1_2.3k", 0x0000, 0x1000, CRC(33b01c90) SHA1(9c8da6dd963bfb0544ef99b8fdedcf86c32cdb6b) ) /* hand written "2" on original ORCA labels */
+	ROM_LOAD( "2_2.3l", 0x1000, 0x1000, CRC(03f53340) SHA1(35336945f4b634fc4c7791ac9c9e6643c8cd8006) )
+	ROM_LOAD( "3_2.3n", 0x2000, 0x1000, CRC(8fa300df) SHA1(5c3ba1ef6c1ce8df437b4fa464293208630b5e8d) )
+	ROM_LOAD( "4_2.3p", 0x3000, 0x1000, CRC(74a8f1f4) SHA1(6bbc4944e4b31425a6b82f370b6760e5a4b36f56) )
+	ROM_LOAD( "5_2.3r", 0x4000, 0x1000, CRC(d7ef6c87) SHA1(38e3b44b355907824919acc4f5064dcb98ebb1d0) )
 
-   I think the board was a half-converted board as 'Water Gage' and 'Bon Voyage' don't really fit the theme
-   of Silver Land so I'm loading the River Patrol GFX instead as they fit better
-*/
-ROM_START( rpatrola )
-	ROM_REGION( 0x6000, "maincpu", 0 )
-	ROM_LOAD( "sci1.bin",       0x0000, 0x1000, CRC(33b01c90) SHA1(9c8da6dd963bfb0544ef99b8fdedcf86c32cdb6b) )
-	ROM_LOAD( "sci2.bin",       0x1000, 0x1000, CRC(03f53340) SHA1(35336945f4b634fc4c7791ac9c9e6643c8cd8006) )
-	ROM_LOAD( "sci3.bin",       0x2000, 0x1000, CRC(8fa300df) SHA1(5c3ba1ef6c1ce8df437b4fa464293208630b5e8d) )
-	ROM_LOAD( "sci4.bin",       0x3000, 0x1000, CRC(74a8f1f4) SHA1(6bbc4944e4b31425a6b82f370b6760e5a4b36f56) )
-	ROM_LOAD( "sci5.bin",       0x4000, 0x1000, CRC(d7ef6c87) SHA1(38e3b44b355907824919acc4f5064dcb98ebb1d0) )
+	ROM_REGION( 0x4000, "gfx1", 0 ) /* located on an original ORCA OVG-50B PCB */
+	ROM_LOAD( "6.6l.2732", 0x000000, 0x000800, CRC(b38d8aca) SHA1(b93aa0010b0c0ab23284188a881d4a9bb0fd4582) )
+	ROM_CONTINUE(          0x001000, 0x000800 )
+	ROM_LOAD( "7.6p.2732", 0x002000, 0x000800, CRC(bc2bddf9) SHA1(4057fc535b1a2db943f893290afe9bfd865ac84b) )
+	ROM_CONTINUE(          0x003000, 0x000800 )
 
-	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "rp6.6n",       0x0000, 0x0800, CRC(19f18e9e) SHA1(a5500ac36bcda772f3ba79d9e9d37b1eec7bfd13) )
-	/* 0x0800-0x0fff - empty */
-	ROM_LOAD( "rp7.6l",       0x1000, 0x0800, CRC(07f2070d) SHA1(39df286fda9e48eba6e770fe23a603b5e10d88b6) )
-	/* 0x1800-0xffff - empty */
-	ROM_LOAD( "rp8.6k",       0x2000, 0x0800, CRC(008738c7) SHA1(a66d9daf31b0d9cf087b591c74f0aaee3d7607b5) )
-	/* 0x2800-0x2fff - empty */
-	ROM_LOAD( "rp9.6h",       0x3000, 0x0800, CRC(ea5aafca) SHA1(d8f8fe270680ae261d63bd4702107961cd904699) )
-	/* 0x3800-0x3fff - empty */
+	ROM_REGION( 0x1000, "gfx2", 0 ) /* located on an original ORCA OVG-50B PCB */
+	ROM_LOAD( "9.2t", 0x000000, 0x000800, CRC(065651a5) SHA1(5c2f9b44d8819d2f792525c06b5c341fe07329c0) )
+	ROM_LOAD( "8.2s", 0x000800, 0x000800, CRC(59747c31) SHA1(92acf07489f3e17f0c1769a0df15b6ddb117830f) )
 
-	ROM_REGION( 0x1000, "gfx2", 0 )
-	ROM_LOAD( "rp11.6c",      0x0000, 0x0800, CRC(065651a5) SHA1(5c2f9b44d8819d2f792525c06b5c341fe07329c0) )
-	ROM_LOAD( "rp10.6a",      0x0800, 0x0800, CRC(59747c31) SHA1(92acf07489f3e17f0c1769a0df15b6ddb117830f) )
-
-	ROM_REGION( 0x0060, "proms", 0 )
-	ROM_LOAD( "bprom1.9n",    0x0000, 0x0020, CRC(f9a2383b) SHA1(4d88c177740efdb27708474c9ee0fcdca5a78c36) )
-	ROM_LOAD( "bprom2.9p",    0x0020, 0x0020, CRC(1743bd26) SHA1(9bb50f6e24a7ac3c9ddf3923e57c5532603009e5) )
-	ROM_LOAD( "bprom3.9c",    0x0040, 0x0020, CRC(ee03bc96) SHA1(45e33e750a536a904f30136d84dd7993d97e8e54) )
-
-	// these are the GFX Roms found on the board, from Silver Land, but IMO not correct for this program
-#if 0
-	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "sci46.bin",    0x0000, 0x0800, CRC(affb804f) SHA1(9fc77804690e91773787e06f3329accef075f9f3) )
-	/* 0x0800-0x0fff - empty */
-	ROM_LOAD( "sci45.bin",    0x1000, 0x0800, CRC(ad4642e5) SHA1(f4de2d9ed0e69c002be07f47247e95167a3ffffb) )
-	/* 0x1800-0xffff - empty */
-	ROM_LOAD( "sci44.bin",    0x2000, 0x0800, CRC(e487579d) SHA1(aed59f15dbc904d73e19d914ccd0a86fda859085) )
-	/* 0x2800-0x2fff - empty */
-	ROM_LOAD( "sci43.bin",    0x3000, 0x0800, CRC(59125a1a) SHA1(37638fb690d6b4f11585f6a13586271c2f0e3743) )
-	/* 0x3800-0x3fff - empty */
-
-	ROM_REGION( 0x1000, "gfx2", 0 )
-	ROM_LOAD( "sci42.bin",         0x0000, 0x0800, CRC(c8d32b8e) SHA1(7d655d243ed13cf2537f3fdfde5bf34229f7cb84) )
-	ROM_LOAD( "sci41.bin",         0x0800, 0x0800, CRC(ee333daf) SHA1(b02998dccec9a4f841838874221caabae8380fcc) )
-
-	ROM_REGION( 0x0060, "proms", 0 )
-	ROM_LOAD( "mb7051.1v",    0x0000, 0x0020, CRC(1d2343b1) SHA1(294f22178af4532abf767c1ffe2dc831bbe683bf) )
-	ROM_LOAD( "mb7051.1u",    0x0020, 0x0020, CRC(c174753c) SHA1(303bfb1f470b525ccaeafa81a38a4bc3a7de5dbb) )
-	ROM_LOAD( "mb7051.1t",    0x0040, 0x0020, CRC(04a1be01) SHA1(9c270c04d374d46752ec99bd4e79fed1e2896bc0) )
-#endif
-	/* no samples */
+	ROM_REGION( 0x0060, "proms", 0 ) /* located on an original ORCA OVG-50B PCB */
+	ROM_LOAD( "mb7051.1b", 0x0000, 0x0020, CRC(f9a2383b) SHA1(4d88c177740efdb27708474c9ee0fcdca5a78c36) ) /* or compatible like 82S123 - Had a RED stipe across chip */
+	ROM_LOAD( "mb7051.1c", 0x0020, 0x0020, CRC(1743bd26) SHA1(9bb50f6e24a7ac3c9ddf3923e57c5532603009e5) ) /* or compatible like 82S123 - Had a BLUE stipe across chip */
+	ROM_LOAD( "mb7051.1u", 0x0040, 0x0020, CRC(ee03bc96) SHA1(45e33e750a536a904f30136d84dd7993d97e8e54) ) /* or compatible like 82S123 - Had a GREEN stipe across chip */
 ROM_END
 
 ROM_START( rpatrolb )
@@ -2658,29 +2655,20 @@ ROM_START( toprollr )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(cclimber_state,yamato)
+void cclimber_state::init_yamato()
 {
 	save_item(NAME(m_yamato_p0));
 	save_item(NAME(m_yamato_p1));
 }
 
 
-DRIVER_INIT_MEMBER(cclimber_state,toprollr)
+void cclimber_state::init_toprollr()
 {
 	m_opcodes = std::make_unique<uint8_t[]>(0x6000*3);
 
-	segacrpt_z80_device* cpu = (segacrpt_z80_device*)machine().device(":maincpu");
-
-	// this seems to be a messy abuse / use of the encryption, investigate
-	if (!cpu)
-	{
-		fatalerror("can't find cpu!\n");
-	}
-	else
-	{
-		cpu->set_region_p(memregion("user1")->base());
-		cpu->set_decrypted_p(m_opcodes.get());
-	}
+	segacrpt_z80_device &cpu = downcast<segacrpt_z80_device &>(*m_maincpu);
+	cpu.set_region_p(memregion("user1")->base());
+	cpu.set_decrypted_p(m_opcodes.get());
 
 	membank("bank1")->configure_entries(0, 3, memregion("user1")->base(), 0x6000);
 	membank("bank1d")->configure_entries(0, 3, m_opcodes.get(), 0x6000);
@@ -2691,21 +2679,18 @@ DRIVER_INIT_MEMBER(cclimber_state,toprollr)
 	save_item(NAME(m_toprollr_rombank));
 }
 
-DRIVER_INIT_MEMBER(cclimber_state,dking)
+void cclimber_state::init_dking()
 {
 	uint8_t *rom = memregion( "maincpu" )->base();
-	int i;
-	int j;
-
-	for (j=0;j<0x5000;j+=0x1000)
+	for (int j = 0; j < 0x5000; j += 0x1000)
 	{
-		for (i=0x0500;i<0x0800;i++)  rom[i+j] ^=0xff;
-		for (i=0x0d00;i<0x1000;i++)  rom[i+j] ^=0xff;
+		for (int i = 0x0500; i < 0x0800; i++)  rom[i+j] ^=0xff;
+		for (int i = 0x0d00; i < 0x1000; i++)  rom[i+j] ^=0xff;
 	}
 
 }
 
-DRIVER_INIT_MEMBER(cclimber_state,rpatrol)
+void cclimber_state::init_rpatrol()
 {
 	uint8_t *rom = memregion( "maincpu" )->base();
 
@@ -2719,59 +2704,60 @@ DRIVER_INIT_MEMBER(cclimber_state,rpatrol)
 }
 
 
-GAME( 1980, cclimber,    0,        cclimberx, cclimber, cclimber_state, cclimber, ROT0,   "Nichibutsu", "Crazy Climber (US set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, cclimbera,   cclimber, cclimberx, cclimber, cclimber_state, cclimber, ROT0,   "Nichibutsu", "Crazy Climber (US set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, cclimberj,   cclimber, cclimberx, cclimberj,cclimber_state, cclimberj,ROT0,   "Nichibutsu", "Crazy Climber (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, ccboot,      cclimber, cclimberx, cclimber, cclimber_state, cclimberj,ROT0,   "bootleg", "Crazy Climber (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, ccboot2,     cclimber, cclimberx, cclimber, cclimber_state, cclimberj,ROT0,   "bootleg", "Crazy Climber (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, ccbootmr,    cclimber, cclimberx, cclimber, cclimber_state, cclimberj,ROT0,   "bootleg (Model Racing)", "Crazy Climber (Model Racing bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, cclimbroper, cclimber, cclimber,  cclimber, cclimber_state, 0,        ROT0,   "bootleg (Operamatic)", "Crazy Climber (Spanish, Operamatic bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, cclimbrrod,  cclimber, cclimber,  cclimber, cclimber_state, 0,        ROT0,   "bootleg (Rodmar)", "Crazy Climber (Spanish, Rodmar bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, cclimber,    0,        cclimberx, cclimber,  cclimber_state, init_cclimber,  ROT0,   "Nichibutsu",             "Crazy Climber (US set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, cclimbera,   cclimber, cclimberx, cclimber,  cclimber_state, init_cclimber,  ROT0,   "Nichibutsu",             "Crazy Climber (US set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, cclimberj,   cclimber, cclimberx, cclimberj, cclimber_state, init_cclimberj, ROT0,   "Nichibutsu",             "Crazy Climber (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, ccboot,      cclimber, cclimberx, cclimber,  cclimber_state, init_cclimberj, ROT0,   "bootleg",                "Crazy Climber (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, ccboot2,     cclimber, cclimberx, cclimber,  cclimber_state, init_cclimberj, ROT0,   "bootleg",                "Crazy Climber (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, ccbootmr,    cclimber, cclimberx, cclimber,  cclimber_state, init_cclimberj, ROT0,   "bootleg (Model Racing)", "Crazy Climber (Model Racing bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, cclimbroper, cclimber, cclimber,  cclimber,  cclimber_state, empty_init,     ROT0,   "bootleg (Operamatic)",   "Crazy Climber (Spanish, Operamatic bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, cclimbrrod,  cclimber, cclimber,  cclimber,  cclimber_state, empty_init,     ROT0,   "bootleg (Rodmar)",       "Crazy Climber (Spanish, Rodmar bootleg)", MACHINE_SUPPORTS_SAVE )
 
 /* these sets have ugly colours, no extra attract screen, and no graphics for the extra attract screen in the BG roms
   - there is a Falcon logo in the text roms which is unused
   - does the code to display the extra screen still exist in the roms?  */
-GAME( 1981, ckong,       0,        cclimber, ckong,  cclimber_state,   0,        ROT270, "Kyoei / Falcon", "Crazy Kong", MACHINE_SUPPORTS_SAVE ) // on a Falcon FCK-01 PCB, but doesn't display any Falcon copyright
-GAME( 1981, ckongalc,    ckong,    cclimber, ckong,  cclimber_state,   0,        ROT270, "bootleg (Alca)", "Crazy Kong (Alca bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, monkeyd,     ckong,    cclimber, ckong,  cclimber_state,   0,        ROT270, "bootleg", "Monkey Donkey", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, dking,       ckong,    cclimber, ckong,  cclimber_state,   dking,    ROT270, "bootleg", "Donkey King", MACHINE_SUPPORTS_SAVE ) // supposedly, possibly by Hafasonic?
-GAME( 1981, ckongdks,    ckong,    cclimber, ckong,  cclimber_state,   dking,    ROT270, "bootleg", "Donkey Kong (Spanish Crazy Kong bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, ckong,       0,        cclimber,  ckong,     cclimber_state, empty_init,     ROT270, "Kyoei / Falcon", "Crazy Kong", MACHINE_SUPPORTS_SAVE ) // on a Falcon FCK-01 PCB, but doesn't display any Falcon copyright
+GAME( 1981, ckongalc,    ckong,    cclimber,  ckong,     cclimber_state, empty_init,     ROT270, "bootleg (Alca)", "Crazy Kong (Alca bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, monkeyd,     ckong,    cclimber,  ckong,     cclimber_state, empty_init,     ROT270, "bootleg",        "Monkey Donkey", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, dking,       ckong,    cclimber,  ckong,     cclimber_state, init_dking,     ROT270, "bootleg",        "Donkey King", MACHINE_SUPPORTS_SAVE ) // supposedly, possibly by Hafasonic?
+GAME( 1981, ckongdks,    ckong,    cclimber,  ckong,     cclimber_state, init_dking,     ROT270, "bootleg",        "Donkey Kong (Spanish Crazy Kong bootleg)", MACHINE_SUPPORTS_SAVE )
 
 /* these sets have correct colours, and also contain the graphics used for the extra attract screen in the BG roms, but it is unused
  - the Falcon logo in the text roms is still unused
  - does the code to display the extra screen still exist in the roms?  */
-GAME( 1981, ckongo,      ckong,    cclimber, ckong,  cclimber_state,   0,        ROT270, "bootleg (Orca)", "Crazy Kong (Orca bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, bigkong,     ckong,    cclimber, ckong,  cclimber_state,   0,        ROT270, "bootleg", "Big Kong", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, ckongo,      ckong,    cclimber,  ckong,     cclimber_state, empty_init,     ROT270, "bootleg (Orca)", "Crazy Kong (Orca bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, bigkong,     ckong,    cclimber,  ckong,     cclimber_state, empty_init,     ROT270, "bootleg", "Big Kong", MACHINE_SUPPORTS_SAVE )
 
 /* these sets have correct colours, and the extra attract screen, they also make use of the Falcon logo, some sets hack out the Falcon
    text on the extra screen */
-GAME( 1981, ckongpt2,    0,        cclimber, ckong,  cclimber_state,   0,        ROT270, "Falcon", "Crazy Kong Part II (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, ckongpt2a,   ckongpt2, cclimber, ckong,  cclimber_state,   0,        ROT270, "Falcon", "Crazy Kong Part II (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, ckongpt2j,   ckongpt2, cclimber, ckong,  cclimber_state,   0,        ROT270, "Falcon", "Crazy Kong Part II (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, ckongpt2jeu, ckongpt2, cclimber, ckong,  cclimber_state,   0,        ROT270, "bootleg (Jeutel)", "Crazy Kong Part II (Jeutel bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, ckongpt2b,   ckongpt2, ckongb,   ckongb, cclimber_state,   ckongb,   ROT270, "bootleg", "Crazy Kong Part II (alternative levels)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, ckongpt2,    0,        cclimber,  ckong,     cclimber_state, empty_init,     ROT270, "Falcon",           "Crazy Kong Part II (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, ckongpt2a,   ckongpt2, cclimber,  ckong,     cclimber_state, empty_init,     ROT270, "Falcon",           "Crazy Kong Part II (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, ckongpt2j,   ckongpt2, cclimber,  ckong,     cclimber_state, empty_init,     ROT270, "Falcon",           "Crazy Kong Part II (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, ckongpt2jeu, ckongpt2, cclimber,  ckong,     cclimber_state, empty_init,     ROT270, "bootleg (Jeutel)", "Crazy Kong Part II (Jeutel bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, ckongpt2b,   ckongpt2, ckongb,    ckongb,    cclimber_state, init_ckongb,    ROT270, "bootleg",          "Crazy Kong Part II (alternative levels)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, ckongpt2b2,  ckongpt2, cclimber,  ckongb2,   cclimber_state, empty_init,     ROT270, "bootleg",          "Crazy Kong Part II (bootleg)", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // one PROM differs and seems bad, but dump has been confirmed on multiple PCBs
 
 // see bagman.cpp for parent
-GAME( 1982, bagmanf,     bagman,   bagmanf,  bagmanf, cclimber_state,  0,        ROT270, "bootleg", "Le Bagnard (bootleg on Crazy Kong hardware)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bagmanf,     bagman,   bagmanf,   bagmanf,   cclimber_state, empty_init,     ROT270, "bootleg", "Le Bagnard (bootleg on Crazy Kong hardware)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1981, rpatrol,     0,        cclimber, rpatrol, cclimber_state,  rpatrol,  ROT0,   "Orca", "River Patrol (Japan)", MACHINE_SUPPORTS_SAVE)
-GAME( 1981, rpatrola,    rpatrol,  cclimber, rpatrol, cclimber_state,  0,        ROT0,   "bootleg", "River Patrol (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, rpatrolb,    rpatrol,  cclimber, rpatrol, cclimber_state,  0,        ROT0,   "bootleg", "River Patrol (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, silvland,    rpatrol,  cclimber, rpatrol, cclimber_state,  0,        ROT0,   "Falcon", "Silver Land", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, rpatrol,     0,        cclimber,  rpatrol,   cclimber_state, init_rpatrol,   ROT0,   "Orca",    "River Patrol (Japan)", MACHINE_SUPPORTS_SAVE)
+GAME( 1981, rpatroln,    rpatrol,  cclimber,  rpatrol,   cclimber_state, empty_init,     ROT0,   "Orca",    "River Patrol (Japan, unprotected)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, rpatrolb,    rpatrol,  cclimber,  rpatrol,   cclimber_state, empty_init,     ROT0,   "bootleg", "River Patrol (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, silvland,    rpatrol,  cclimber,  rpatrol,   cclimber_state, empty_init,     ROT0,   "Falcon",  "Silver Land", MACHINE_SUPPORTS_SAVE )
 
 // see pacman.cpp for parent
-GAME( 1985, cannonb,     cannonbp, cannonb,  cannonb, cclimber_state,  cannonb,  ROT90,  "bootleg (Soft)", "Cannon Ball (bootleg on Crazy Kong hardware) (set 1, buggy)" , MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // bootleggers missed protection after bonus game
-GAME( 1985, cannonb2,    cannonbp, cannonb,  cannonb, cclimber_state,  cannonb2, ROT90,  "bootleg (TV Game Gruenberg)", "Cannon Ball (bootleg on Crazy Kong hardware) (set 2, buggy)", MACHINE_SUPPORTS_SAVE ) // bootleggers missed protection after bonus game
-GAME( 1985, cannonb3,    cannonbp, cannonb,  cannonb, cclimber_state,  cannonb2, ROT90,  "bootleg (Soft)", "Cannon Ball (bootleg on Crazy Kong hardware) (set 3, no bonus game)", MACHINE_SUPPORTS_SAVE ) // the bonus game is patched out, thus avoiding the protection issue
+GAME( 1985, cannonb,     cannonbp, cannonb,   cannonb,   cclimber_state, init_cannonb,   ROT90,  "bootleg (Soft)",              "Cannon Ball (bootleg on Crazy Kong hardware) (set 1, buggy)" , MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // bootleggers missed protection after bonus game
+GAME( 1985, cannonb2,    cannonbp, cannonb,   cannonb,   cclimber_state, init_cannonb2,  ROT90,  "bootleg (TV Game Gruenberg)", "Cannon Ball (bootleg on Crazy Kong hardware) (set 2, buggy)", MACHINE_SUPPORTS_SAVE ) // bootleggers missed protection after bonus game
+GAME( 1985, cannonb3,    cannonbp, cannonb,   cannonb,   cclimber_state, init_cannonb2,  ROT90,  "bootleg (Soft)",              "Cannon Ball (bootleg on Crazy Kong hardware) (set 3, no bonus game)", MACHINE_SUPPORTS_SAVE ) // the bonus game is patched out, thus avoiding the protection issue
 
-GAME( 1982, swimmer,     0,        swimmer,  swimmer, cclimber_state,  0,        ROT0,   "Tehkan", "Swimmer (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, swimmera,    swimmer,  swimmer,  swimmer, cclimber_state,  0,        ROT0,   "Tehkan", "Swimmer (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, swimmerb,    swimmer,  swimmer,  swimmerb, cclimber_state, 0,        ROT0,   "Tehkan", "Swimmer (set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, swimmer,     0,        swimmer,   swimmer,   cclimber_state, empty_init,     ROT0,   "Tehkan", "Swimmer (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, swimmera,    swimmer,  swimmer,   swimmer,   cclimber_state, empty_init,     ROT0,   "Tehkan", "Swimmer (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, swimmerb,    swimmer,  swimmer,   swimmerb,  cclimber_state, empty_init,     ROT0,   "Tehkan", "Swimmer (set 3)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, guzzler,     0,        guzzler,  guzzler, cclimber_state,  0,        ROT90,  "Tehkan", "Guzzler", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, guzzlers,    guzzler,  guzzler,  guzzler, cclimber_state,  0,        ROT90,  "Tehkan", "Guzzler (Swimmer Conversion)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, guzzler,     0,        guzzler,   guzzler,   cclimber_state, empty_init,     ROT90,  "Tehkan", "Guzzler", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, guzzlers,    guzzler,  guzzler,   guzzler,   cclimber_state, empty_init,     ROT90,  "Tehkan", "Guzzler (Swimmer Conversion)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, yamato,      0,        yamato,   yamato,  cclimber_state,  yamato,   ROT90,  "Sega", "Yamato (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, yamato2,     yamato,   yamato,   yamato,  cclimber_state,  yamato,   ROT90,  "Sega", "Yamato (World?)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, yamato,      0,        yamato,    yamato,    cclimber_state, init_yamato,    ROT90,  "Sega",   "Yamato (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, yamato2,     yamato,   yamato,    yamato,    cclimber_state, init_yamato,    ROT90,  "Sega",   "Yamato (World?)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, toprollr,    0,        toprollr, toprollr, cclimber_state, toprollr, ROT90,  "Jaleco", "Top Roller", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, toprollr,    0,        toprollr,  toprollr,  cclimber_state, init_toprollr,  ROT90,  "Jaleco", "Top Roller", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )

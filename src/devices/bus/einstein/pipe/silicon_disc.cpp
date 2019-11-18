@@ -22,8 +22,8 @@ DEFINE_DEVICE_TYPE(EINSTEIN_SILICON_DISC, einstein_silicon_disc_device, "einstei
 
 void einstein_silicon_disc_device::map(address_map &map)
 {
-	map(0x08, 0x08).mirror(0xff00).w(this, FUNC(einstein_silicon_disc_device::sector_low_w));
-	map(0x09, 0x09).mirror(0xff00).w(this, FUNC(einstein_silicon_disc_device::sector_high_w));
+	map(0x08, 0x08).mirror(0xff00).w(FUNC(einstein_silicon_disc_device::sector_low_w));
+	map(0x09, 0x09).mirror(0xff00).w(FUNC(einstein_silicon_disc_device::sector_high_w));
 }
 
 //-------------------------------------------------
@@ -69,7 +69,7 @@ void einstein_silicon_disc_device::device_start()
 	memset(m_ram.get(), 0xff, 0x40000);
 
 	// register for save states
-	save_pointer(NAME(m_ram.get()), 0x40000);
+	save_pointer(NAME(m_ram), 0x40000);
 	save_item(NAME(m_sector));
 }
 
@@ -87,8 +87,8 @@ void einstein_silicon_disc_device::device_reset()
 	// install i/o ports
 	io_space().install_device(0xf0, 0xff, *this, &einstein_silicon_disc_device::map);
 	io_space().install_readwrite_handler(0xfa, 0xfa, 0, 0, 0xff00,
-		read8_delegate(FUNC(einstein_silicon_disc_device::ram_r), this),
-		write8_delegate(FUNC(einstein_silicon_disc_device::ram_w), this));
+			read8_delegate(*this, FUNC(einstein_silicon_disc_device::ram_r)),
+			write8_delegate(*this, FUNC(einstein_silicon_disc_device::ram_w)));
 }
 
 

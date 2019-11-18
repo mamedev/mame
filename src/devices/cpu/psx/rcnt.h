@@ -15,12 +15,6 @@
 
 DECLARE_DEVICE_TYPE(PSX_RCNT, psxrcnt_device)
 
-#define MCFG_PSX_RCNT_IRQ0_HANDLER(_devcb) \
-	devcb = &downcast<psxrcnt_device &>(*device).set_irq0_handler(DEVCB_##_devcb);
-#define MCFG_PSX_RCNT_IRQ1_HANDLER(_devcb) \
-	devcb = &downcast<psxrcnt_device &>(*device).set_irq1_handler(DEVCB_##_devcb);
-#define MCFG_PSX_RCNT_IRQ2_HANDLER(_devcb) \
-	devcb = &downcast<psxrcnt_device &>(*device).set_irq2_handler(DEVCB_##_devcb);
 #define PSX_RC_STOP ( 0x01 )
 #define PSX_RC_RESET ( 0x04 ) /* guess */
 #define PSX_RC_COUNTTARGET ( 0x08 )
@@ -36,9 +30,9 @@ public:
 	psxrcnt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
-	template <class Object> devcb_base &set_irq0_handler(Object &&cb) { return m_irq0_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_irq1_handler(Object &&cb) { return m_irq1_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_irq2_handler(Object &&cb) { return m_irq2_handler.set_callback(std::forward<Object>(cb)); }
+	auto irq0() { return m_irq0_handler.bind(); }
+	auto irq1() { return m_irq1_handler.bind(); }
+	auto irq2() { return m_irq2_handler.bind(); }
 
 	DECLARE_WRITE32_MEMBER( write );
 	DECLARE_READ32_MEMBER( read );

@@ -165,19 +165,19 @@ WRITE8_MEMBER(jackal_state::jackal_spriteram_w)
 void jackal_state::master_map(address_map &map)
 {
 	map(0x0000, 0x0003).ram().share("videoctrl");   // scroll + other things
-	map(0x0004, 0x0004).w(this, FUNC(jackal_state::jackal_flipscreen_w));
+	map(0x0004, 0x0004).w(FUNC(jackal_state::jackal_flipscreen_w));
 	map(0x0010, 0x0010).portr("DSW1");
 	map(0x0011, 0x0011).portr("IN1");
 	map(0x0012, 0x0012).portr("IN2");
 	map(0x0013, 0x0013).portr("IN0");
-	map(0x0014, 0x0015).r(this, FUNC(jackal_state::jackalr_rotary_r));
+	map(0x0014, 0x0015).r(FUNC(jackal_state::jackalr_rotary_r));
 	map(0x0018, 0x0018).portr("DSW2");
 	map(0x0019, 0x0019).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x001c, 0x001c).w(this, FUNC(jackal_state::jackal_rambank_w));
-	map(0x0020, 0x005f).rw(this, FUNC(jackal_state::jackal_zram_r), FUNC(jackal_state::jackal_zram_w));             // MAIN   Z RAM,SUB    Z RAM
+	map(0x001c, 0x001c).w(FUNC(jackal_state::jackal_rambank_w));
+	map(0x0020, 0x005f).rw(FUNC(jackal_state::jackal_zram_r), FUNC(jackal_state::jackal_zram_w));             // MAIN   Z RAM,SUB    Z RAM
 	map(0x0060, 0x1fff).ram().share("share1");                          // M COMMON RAM,S COMMON RAM
-	map(0x2000, 0x2fff).rw(this, FUNC(jackal_state::jackal_voram_r), FUNC(jackal_state::jackal_voram_w));           // MAIN V O RAM,SUB  V O RAM
-	map(0x3000, 0x3fff).rw(this, FUNC(jackal_state::jackal_spriteram_r), FUNC(jackal_state::jackal_spriteram_w));   // MAIN V O RAM,SUB  V O RAM
+	map(0x2000, 0x2fff).rw(FUNC(jackal_state::jackal_voram_r), FUNC(jackal_state::jackal_voram_w));           // MAIN V O RAM,SUB  V O RAM
+	map(0x3000, 0x3fff).rw(FUNC(jackal_state::jackal_spriteram_r), FUNC(jackal_state::jackal_spriteram_w));   // MAIN V O RAM,SUB  V O RAM
 	map(0x4000, 0xbfff).bankr("bank1");
 	map(0xc000, 0xffff).rom();
 }
@@ -302,7 +302,7 @@ static const gfx_layout spritelayout8 =
 	32*8
 };
 
-static GFXDECODE_START( jackal )
+static GFXDECODE_START( gfx_jackal )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,        0,  1 )    // colors 256-511 without lookup
 	GFXDECODE_ENTRY( "gfx1", 0x20000, spritelayout,  0x100, 16 )    // colors   0- 15 with lookup
 	GFXDECODE_ENTRY( "gfx1", 0x20000, spritelayout8, 0x100, 16 )    // to handle 8x8 sprites
@@ -321,7 +321,7 @@ WRITE_LINE_MEMBER(jackal_state::vblank_irq)
 	if (state && m_irq_enable)
 	{
 		m_mastercpu->set_input_line(0, HOLD_LINE);
-		m_slavecpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_slavecpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 }
 
@@ -357,43 +357,40 @@ void jackal_state::machine_reset()
 	m_irq_enable = 0;
 }
 
-MACHINE_CONFIG_START(jackal_state::jackal)
-
+void jackal_state::jackal(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("master", MC6809E, MASTER_CLOCK/12) // verified on pcb
-	MCFG_CPU_PROGRAM_MAP(master_map)
+	MC6809E(config, m_mastercpu, MASTER_CLOCK/12); // verified on pcb
+	m_mastercpu->set_addrmap(AS_PROGRAM, &jackal_state::master_map);
 
-	MCFG_CPU_ADD("slave", MC6809E, MASTER_CLOCK/12) // verified on pcb
-	MCFG_CPU_PROGRAM_MAP(slave_map)
+	MC6809E(config, m_slavecpu, MASTER_CLOCK/12); // verified on pcb
+	m_slavecpu->set_addrmap(AS_PROGRAM, &jackal_state::slave_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(jackal_state, screen_update_jackal)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(jackal_state, vblank_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(1*8, 31*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(jackal_state::screen_update_jackal));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(jackal_state::vblank_irq));
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jackal)
-	MCFG_PALETTE_ADD("palette", 0x300)
-	MCFG_PALETTE_INDIRECT_ENTRIES(0x200)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_PALETTE_INIT_OWNER(jackal_state, jackal)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_jackal);
+	PALETTE(config, m_palette, FUNC(jackal_state::jackal_palette));
+	m_palette->set_format(palette_device::xBGR_555, 0x300, 0x200);
+	m_palette->set_endianness(ENDIANNESS_LITTLE);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_YM2151_ADD("ymsnd", SOUND_CLOCK) // verified on pcb
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
-MACHINE_CONFIG_END
+	YM2151(config, "ymsnd", SOUND_CLOCK).add_route(0, "lspeaker", 0.50).add_route(1, "rspeaker", 0.50); // verified on pcb
+}
 
 /*************************************
  *
@@ -573,9 +570,9 @@ ROM_END
  *
  *************************************/
 
-GAME( 1986, jackal,   0,      jackal, jackal,  jackal_state, 0, ROT90, "Konami",  "Jackal (World, 8-way Joystick)",               0 )
-GAME( 1986, jackalr,  jackal, jackal, jackalr, jackal_state, 0, ROT90, "Konami",  "Jackal (World, Rotary Joystick)",              0 )
-GAME( 1986, topgunr,  jackal, jackal, jackal,  jackal_state, 0, ROT90, "Konami",  "Top Gunner (US, 8-way Joystick)",              0 )
-GAME( 1986, jackalj,  jackal, jackal, jackal,  jackal_state, 0, ROT90, "Konami",  "Tokushu Butai Jackal (Japan, 8-way Joystick)", 0 )
-GAME( 1986, jackalbl, jackal, jackal, jackalr, jackal_state, 0, ROT90, "bootleg", "Jackal (bootleg, Rotary Joystick)",            0 )
-GAME( 1986, topgunbl, jackal, jackal, jackalr, jackal_state, 0, ROT90, "bootleg", "Top Gunner (bootleg, Rotary Joystick)",        0 )
+GAME( 1986, jackal,   0,      jackal, jackal,  jackal_state, empty_init, ROT90, "Konami",  "Jackal (World, 8-way Joystick)",               0 )
+GAME( 1986, jackalr,  jackal, jackal, jackalr, jackal_state, empty_init, ROT90, "Konami",  "Jackal (World, Rotary Joystick)",              0 )
+GAME( 1986, topgunr,  jackal, jackal, jackal,  jackal_state, empty_init, ROT90, "Konami",  "Top Gunner (US, 8-way Joystick)",              0 )
+GAME( 1986, jackalj,  jackal, jackal, jackal,  jackal_state, empty_init, ROT90, "Konami",  "Tokushu Butai Jackal (Japan, 8-way Joystick)", 0 )
+GAME( 1986, jackalbl, jackal, jackal, jackalr, jackal_state, empty_init, ROT90, "bootleg", "Jackal (bootleg, Rotary Joystick)",            0 )
+GAME( 1986, topgunbl, jackal, jackal, jackalr, jackal_state, empty_init, ROT90, "bootleg", "Top Gunner (bootleg, Rotary Joystick)",        0 )

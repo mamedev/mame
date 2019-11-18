@@ -73,7 +73,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( super80_state::timer_k )
     bit 0 = original system (U79 and U1)
     bit 1 = MDS fast system
     bit 2 = CA3140 */
-TIMER_DEVICE_CALLBACK_MEMBER( super80_state::timer_p )
+TIMER_DEVICE_CALLBACK_MEMBER( super80_state::kansas_r )
 {
 	uint8_t cass_ws=0;
 
@@ -159,7 +159,7 @@ WRITE8_MEMBER( super80_state::port3f_w )
 	if (floppy)
 	{
 		floppy->mon_w(0);
-		floppy->ss_w(!BIT(data, 6));
+		floppy->ss_w(BIT(data, 6));
 	}
 
 	m_fdc->dden_w(BIT(data, 7));
@@ -176,7 +176,7 @@ READ8_MEMBER( super80_state::super80_f2_r )
 WRITE8_MEMBER( super80_state::super80_dc_w )
 {
 	/* hardware strobe driven from port select, bit 7..0 = data */
-	m_cent_data_out->write(space, 0, data);
+	m_cent_data_out->write(data);
 	m_centronics->write_strobe(0);
 	m_centronics->write_strobe(1);
 }
@@ -226,7 +226,7 @@ MACHINE_RESET_MEMBER( super80_state, super80r )
 	membank("boot")->set_entry(1);
 }
 
-DRIVER_INIT_MEMBER( super80_state,super80 )
+void super80_state::init_super80()
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0xc000);
@@ -237,7 +237,7 @@ DRIVER_INIT_MEMBER( super80_state,super80 )
     QUICKLOAD_LOAD_MEMBER( super80_state, super80 )
 -------------------------------------------------*/
 
-QUICKLOAD_LOAD_MEMBER( super80_state, super80 )
+QUICKLOAD_LOAD_MEMBER(super80_state::quickload_cb)
 {
 	uint16_t exec_addr, start_addr, end_addr;
 

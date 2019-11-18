@@ -39,8 +39,6 @@
 
 #include "avalnche.lh"
 
-#define MASTER_CLOCK XTAL(12'096'000)
-
 
 /*************************************
  *
@@ -107,7 +105,7 @@ void avalnche_state::main_map(address_map &map)
 	map(0x2003, 0x2003).mirror(0x0ffc).nopr();
 	map(0x3000, 0x3000).mirror(0x0fff).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x4000, 0x4007).mirror(0x0ff8).w("latch", FUNC(f9334_device::write_d0));
-	map(0x5000, 0x5000).mirror(0x0fff).w(this, FUNC(avalnche_state::avalnche_noise_amplitude_w));
+	map(0x5000, 0x5000).mirror(0x0fff).w(FUNC(avalnche_state::avalnche_noise_amplitude_w));
 	map(0x6000, 0x7fff).rom();
 }
 
@@ -121,7 +119,7 @@ void avalnche_state::catch_map(address_map &map)
 	map(0x2003, 0x2003).mirror(0x0ffc).nopr();
 	map(0x3000, 0x3000).mirror(0x0fff).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x4000, 0x4007).mirror(0x0ff8).w("latch", FUNC(f9334_device::write_d0));
-	map(0x6000, 0x6000).mirror(0x0fff).w(this, FUNC(avalnche_state::catch_coin_counter_w));
+	map(0x6000, 0x6000).mirror(0x0fff).w(FUNC(avalnche_state::catch_coin_counter_w));
 	map(0x7000, 0x7fff).rom();
 }
 
@@ -217,47 +215,45 @@ void avalnche_state::machine_start()
 	save_item(NAME(m_avalance_video_inverted));
 }
 
-MACHINE_CONFIG_START(avalnche_state::avalnche_base)
-
+void avalnche_state::avalnche_base(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502,MASTER_CLOCK/16)     /* clock input is the "2H" signal divided by two */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(avalnche_state, nmi_line_pulse, 8*60)
+	M6502(config, m_maincpu, 12.096_MHz_XTAL / 16);     /* clock input is the "2H" signal divided by two */
+	m_maincpu->set_addrmap(AS_PROGRAM, &avalnche_state::main_map);
+	m_maincpu->set_periodic_int(FUNC(avalnche_state::nmi_line_pulse), attotime::from_hz(8*60));
 
-	MCFG_DEVICE_ADD("latch", F9334, 0) // F8
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(OUTPUT("led0")) // 1 CREDIT LAMP
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(avalnche_state, video_invert_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(OUTPUT("led1")) // 2 CREDIT LAMP
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(OUTPUT("led2")) // START LAMP
+	F9334(config, m_latch); // F8
+	m_latch->q_out_cb<0>().set_output("led0"); // 1 CREDIT LAMP
+	m_latch->q_out_cb<2>().set(FUNC(avalnche_state::video_invert_w));
+	m_latch->q_out_cb<3>().set_output("led1"); // 2 CREDIT LAMP
+	m_latch->q_out_cb<7>().set_output("led2"); // START LAMP
 	// Q1, Q4, Q5, Q6 are configured in audio/avalnche.cpp
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(avalnche_state, screen_update_avalnche)
-MACHINE_CONFIG_END
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(12.096_MHz_XTAL / 2, 384, 0, 256, 262, 16, 256);
+	screen.set_screen_update(FUNC(avalnche_state::screen_update_avalnche));
+}
 
-MACHINE_CONFIG_START(avalnche_state::avalnche)
+void avalnche_state::avalnche(machine_config &config)
+{
 	avalnche_base(config);
 	/* sound hardware */
 	avalnche_sound(config);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(avalnche_state::acatch)
+void avalnche_state::acatch(machine_config &config)
+{
 	avalnche_base(config);
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(catch_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &avalnche_state::catch_map);
 
 	/* sound hardware... */
 	acatch_sound(config);
-MACHINE_CONFIG_END
+}
 
 
 /*************************************
@@ -268,12 +264,12 @@ MACHINE_CONFIG_END
 
 ROM_START( avalnche )
 	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD_NIB_HIGH(  "30612.d2",     0x6800, 0x0800, CRC(3f975171) SHA1(afe680865da97824f1ebade4c7a2ba5d7ee2cbab) )
-	ROM_LOAD_NIB_LOW (  "30615.d3",     0x6800, 0x0800, CRC(3e1a86b4) SHA1(3ff4cffea5b7a32231c0996473158f24c3bbe107) )
-	ROM_LOAD_NIB_HIGH(  "30613.e2",     0x7000, 0x0800, CRC(47a224d3) SHA1(9feb7444a2e5a3d90a4fe78ae5d23c3a5039bfaa) )
-	ROM_LOAD_NIB_LOW (  "30616.e3",     0x7000, 0x0800, CRC(f620f0f8) SHA1(7802b399b3469fc840796c3145b5f63781090956) )
-	ROM_LOAD_NIB_HIGH(  "30611.c2",     0x7800, 0x0800, CRC(0ad07f85) SHA1(5a1a873b14e63dbb69ee3686ba53f7ca831fe9d0) )
-	ROM_LOAD_NIB_LOW (  "30614.c3",     0x7800, 0x0800, CRC(a12d5d64) SHA1(1647d7416bf9266d07f066d3797bda943e004d24) )
+	ROM_LOAD_NIB_HIGH(  "30612-01.d2",     0x6800, 0x0800, CRC(3f975171) SHA1(afe680865da97824f1ebade4c7a2ba5d7ee2cbab) )
+	ROM_LOAD_NIB_LOW (  "30615-01.d3",     0x6800, 0x0800, CRC(3e1a86b4) SHA1(3ff4cffea5b7a32231c0996473158f24c3bbe107) )
+	ROM_LOAD_NIB_HIGH(  "30613-01.e2",     0x7000, 0x0800, CRC(47a224d3) SHA1(9feb7444a2e5a3d90a4fe78ae5d23c3a5039bfaa) )
+	ROM_LOAD_NIB_LOW (  "30616-01.e3",     0x7000, 0x0800, CRC(f620f0f8) SHA1(7802b399b3469fc840796c3145b5f63781090956) )
+	ROM_LOAD_NIB_HIGH(  "30611-01.c2",     0x7800, 0x0800, CRC(0ad07f85) SHA1(5a1a873b14e63dbb69ee3686ba53f7ca831fe9d0) )
+	ROM_LOAD_NIB_LOW (  "30614-01.c3",     0x7800, 0x0800, CRC(a12d5d64) SHA1(1647d7416bf9266d07f066d3797bda943e004d24) )
 ROM_END
 
 ROM_START( cascade )
@@ -304,6 +300,6 @@ ROM_END
  *
  *************************************/
 
-GAMEL( 1978, avalnche, 0,        avalnche, avalnche, avalnche_state, 0, ROT0, "Atari",            "Avalanche", MACHINE_SUPPORTS_SAVE, layout_avalnche )
-GAMEL( 1978, cascade,  avalnche, avalnche, cascade,  avalnche_state, 0, ROT0, "bootleg? (Sidam)", "Cascade", MACHINE_SUPPORTS_SAVE, layout_avalnche )
-GAME ( 1977, catchp,   0,        acatch,   catch,    avalnche_state, 0, ROT0, "Atari",            "Catch (prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND ) // pre-production board, evolved into Avalanche
+GAMEL( 1978, avalnche, 0,        avalnche, avalnche, avalnche_state, empty_init, ROT0, "Atari",            "Avalanche", MACHINE_SUPPORTS_SAVE, layout_avalnche )
+GAMEL( 1978, cascade,  avalnche, avalnche, cascade,  avalnche_state, empty_init, ROT0, "bootleg? (Sidam)", "Cascade", MACHINE_SUPPORTS_SAVE, layout_avalnche )
+GAME(  1977, catchp,   0,        acatch,   catch,    avalnche_state, empty_init, ROT0, "Atari",            "Catch (prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND ) // pre-production board, evolved into Avalanche

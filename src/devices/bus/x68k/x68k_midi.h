@@ -35,6 +35,9 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	// device_x68k_expansion_card_interface overrides
+	virtual uint8_t iack4() override;
+
 private:
 	x68k_expansion_slot_device *m_slot;
 	required_device<ym3802_device> m_midi;

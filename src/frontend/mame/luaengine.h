@@ -8,14 +8,14 @@
 
 ***************************************************************************/
 
+#ifndef MAME_FRONTEND_MAME_LUAENGINE_H
+#define MAME_FRONTEND_MAME_LUAENGINE_H
+
 #pragma once
 
 #ifndef __EMU_H__
 #error Dont include this file directly; include emu.h instead.
 #endif
-
-#ifndef __LUA_ENGINE_H__
-#define __LUA_ENGINE_H__
 
 #if defined(__GNUC__) && (__GNUC__ > 6)
 #pragma GCC diagnostic ignored "-Wnoexcept-type"
@@ -49,7 +49,10 @@ public:
 	std::vector<std::string> &get_menu() { return m_menu; }
 	void attach_notifiers();
 	void on_frame_done();
+	void on_sound_update();
 	void on_periodic();
+	bool on_missing_mandatory_image(const std::string &instance_name);
+	void on_machine_before_load_settings();
 
 	template<typename T, typename U>
 	bool call_plugin(const std::string &name, const T in, U &out)
@@ -126,6 +129,7 @@ private:
 
 	void resume(void *ptr, int nparam);
 	void register_function(sol::function func, const char *id);
+	int enumerate_functions(const char *id, std::function<bool(const sol::protected_function &func)> &&callback);
 	bool execute_function(const char *id);
 	sol::object call_plugin(const std::string &name, sol::object in);
 
@@ -138,7 +142,6 @@ private:
 		template<typename T> void log_mem_write(offs_t address, T val);
 		template<typename T> T direct_mem_read(offs_t address);
 		template<typename T> void direct_mem_write(offs_t address, T val);
-		const char *name() const { return space.name(); }
 
 		address_space &space;
 		device_memory_interface &dev;
@@ -167,6 +170,9 @@ private:
 		bool busy;
 		bool yield;
 	};
+
+	template<typename TFunc, typename... TArgs>
+	sol::protected_function_result invoke(TFunc &&func, TArgs&&... args);
 };
 
-#endif  /* __LUA_ENGINE_H__ */
+#endif // MAME_FRONTEND_MAME_LUAENGINE_H

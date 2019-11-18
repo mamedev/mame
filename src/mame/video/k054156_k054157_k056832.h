@@ -5,16 +5,10 @@
 
 #pragma once
 
+#include "video/k055555.h" // still needs k055555_get_palette_index
+#include "tilemap.h"
 
-typedef device_delegate<void (int layer, int *code, int *color, int *flags)> k056832_cb_delegate;
 #define K056832_CB_MEMBER(_name)   void _name(int layer, int *code, int *color, int *flags)
-
-#define MCFG_K056832_CB(_class, _method) \
-	downcast<k056832_device &>(*device).set_k056832_callback(k056832_cb_delegate(&_class::_method, #_class "::" #_method, this));
-
-#define MCFG_K056832_CONFIG(_gfx_reg, _bpp, _big, _djmain_hack, _k055555) \
-	downcast<k056832_device &>(*device).set_config(_gfx_reg, _bpp, _big, _djmain_hack, _k055555);
-
 
 #define K056832_PAGE_COUNT 16
 
@@ -37,46 +31,55 @@ class k055555_device;
 class k056832_device : public device_t, public device_gfx_interface
 {
 public:
+	using tile_delegate = device_delegate<void (int layer, int *code, int *color, int *flags)>;
+
+	template <typename T> k056832_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&mixer_tag)
+		: k056832_device(mconfig, tag, owner, clock)
+	{
+		m_k055555.set_tag(std::forward<T>(mixer_tag));
+	}
+
 	k056832_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void set_k056832_callback(k056832_cb_delegate callback) { m_k056832_cb = callback; }
-	void set_config(const char *gfx_reg, int bpp, int big, int djmain_hack, const char *k055555)
+	template <typename... T> void set_tile_callback(T &&... args) { m_k056832_cb.set(std::forward<T>(args)...); }
+
+	void set_config(int bpp, int big, int djmain_hack)
 	{
-		m_rombase.set_tag(gfx_reg);
 		m_bpp = bpp;
 		m_big = big;
 		m_djmain_hack = djmain_hack;
-		m_k055555_tag = k055555;
 	}
 
 	void SetExtLinescroll();    /* Lethal Enforcers */
 
-	DECLARE_READ16_MEMBER( ram_word_r );
-	DECLARE_WRITE16_MEMBER( ram_word_w );
-	DECLARE_READ16_MEMBER( ram_half_word_r );
-	DECLARE_WRITE16_MEMBER( ram_half_word_w );
-	DECLARE_READ16_MEMBER( k_5bpp_rom_word_r );
-	DECLARE_READ32_MEMBER( k_5bpp_rom_long_r );
-	DECLARE_READ32_MEMBER( k_6bpp_rom_long_r );
-	DECLARE_READ16_MEMBER( rom_word_r );
-	DECLARE_READ8_MEMBER( konmedal_rom_r );
-	DECLARE_READ16_MEMBER( piratesh_rom_r );
-	DECLARE_READ16_MEMBER( mw_rom_word_r );
-	DECLARE_READ16_MEMBER( bishi_rom_word_r );
-	DECLARE_READ16_MEMBER( old_rom_word_r );
-	DECLARE_READ16_MEMBER( rom_word_8000_r );
-	DECLARE_WRITE16_MEMBER( word_w ); // "VRAM" registers
-	DECLARE_WRITE16_MEMBER( b_word_w );
-	DECLARE_READ8_MEMBER( ram_code_lo_r );
-	DECLARE_READ8_MEMBER( ram_code_hi_r );
-	DECLARE_READ8_MEMBER( ram_attr_lo_r );
-	DECLARE_READ8_MEMBER( ram_attr_hi_r );
-	DECLARE_WRITE8_MEMBER( ram_code_lo_w );
-	DECLARE_WRITE8_MEMBER( ram_code_hi_w );
-	DECLARE_WRITE8_MEMBER( ram_attr_lo_w );
-	DECLARE_WRITE8_MEMBER( ram_attr_hi_w );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_WRITE8_MEMBER( b_w );
+	u16 ram_word_r(offs_t offset);
+	void ram_word_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 ram_half_word_r(offs_t offset);
+	void ram_half_word_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 unpaged_ram_word_r(offs_t offset);
+	void unpaged_ram_word_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 k_5bpp_rom_word_r(offs_t offset, u16 mem_mask = ~0);
+	u32 k_5bpp_rom_long_r(offs_t offset, u32 mem_mask = ~0);
+	u32 k_6bpp_rom_long_r(offs_t offset, u32 mem_mask = ~0);
+	u16 rom_word_r(offs_t offset);
+	u8 konmedal_rom_r(offs_t offset);
+	u16 piratesh_rom_r(offs_t offset);
+	u16 mw_rom_word_r(offs_t offset);
+	u16 bishi_rom_word_r(offs_t offset);
+	u16 old_rom_word_r(offs_t offset);
+	u16 rom_word_8000_r(offs_t offset);
+	void word_w(offs_t offset, u16 data, u16 mem_mask = ~0); // "VRAM" registers
+	void b_word_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u8 ram_code_lo_r(offs_t offset);
+	u8 ram_code_hi_r(offs_t offset);
+	u8 ram_attr_lo_r(offs_t offset);
+	u8 ram_attr_hi_r(offs_t offset);
+	void ram_code_lo_w(offs_t offset, u8 data);
+	void ram_code_hi_w(offs_t offset, u8 data);
+	void ram_attr_lo_w(offs_t offset, u8 data);
+	void ram_attr_hi_w(offs_t offset, u8 data);
+	void write(offs_t offset, u8 data);
+	void b_w(offs_t offset, u8 data);
 	void mark_plane_dirty(int num);
 	void mark_all_tilemaps_dirty();
 	void tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int num, uint32_t flags, uint32_t priority);
@@ -96,22 +99,14 @@ public:
 
 	int get_gfx_num() const { return m_gfx_num; }
 
-	DECLARE_READ32_MEMBER( ram_long_r );
-	DECLARE_READ32_MEMBER( rom_long_r );
-	DECLARE_WRITE32_MEMBER( ram_long_w );
-	DECLARE_READ32_MEMBER( unpaged_ram_long_r );
-	DECLARE_WRITE32_MEMBER( unpaged_ram_long_w );
-	DECLARE_WRITE32_MEMBER( long_w );
-	DECLARE_WRITE32_MEMBER( b_long_w );
-
-	DECLARE_READ16_MEMBER( word_r );        // VACSET
-	DECLARE_READ16_MEMBER( b_word_r );      // VSCCS  (board dependent)
-	DECLARE_READ32_MEMBER( long_r );        // VACSET
+	u16 word_r(offs_t offset);        // VACSET
+	u16 b_word_r(offs_t offset);      // VSCCS  (board dependent)
 
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_post_load() override;
 
 private:
 	// internal state
@@ -128,15 +123,12 @@ private:
 	int       m_num_gfx_banks;    // depends on size of graphics ROMs
 	int       m_cur_gfx_banks;        // cached info for K056832_regs[0x1a]
 
-	k056832_cb_delegate   m_k056832_cb;
+	tile_delegate      m_k056832_cb;
 
 	int                m_gfx_num;
 	int                m_bpp;
 	int                m_big;
 	int                m_djmain_hack;
-
-	const char         *m_k055555_tag;    // tbyahhoo uses the k056832 together with a k055555
-
 
 	// ROM readback involves reading 2 halves of a word
 	// from the same location in a row.  Reading the
@@ -167,10 +159,7 @@ private:
 	int       m_use_ext_linescroll;
 	int       m_uses_tile_banks, m_cur_tile_bank;
 
-
-
-
-	k055555_device *m_k055555;  /* used to choose colorbase */
+	optional_device<k055555_device> m_k055555;  /* used to choose colorbase */
 
 	void get_tile_info(  tile_data &tileinfo, int tile_index, int pageIndex );
 
@@ -195,7 +184,6 @@ private:
 	void update_page_layout();
 	void change_rambank();
 	void change_rombank();
-	void postload();
 	int rom_read_b(int offset, int blksize, int blksize2, int zerosec);
 
 	template<class _BitmapClass>
@@ -216,11 +204,6 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(K056832, k056832_device)
-
-
-#define MCFG_K056832_PALETTE(_palette_tag) \
-	MCFG_GFX_PALETTE(_palette_tag)
-
 
 #endif // MAME_VIDEO_K054156_K054157_K056832_H
 

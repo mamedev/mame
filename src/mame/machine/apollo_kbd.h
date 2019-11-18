@@ -15,6 +15,9 @@
 
 #include "sound/beep.h"
 
+#include "diserial.h"
+
+
 // BSD-derived systems get very sad when you party with system reserved names.
 #ifdef getchar
 #undef getchar
@@ -23,16 +26,6 @@
 #ifdef putchar
 #undef putchar
 #endif
-
-//**************************************************************************
-//  DEVICE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_APOLLO_KBD_TX_CALLBACK(_cb) \
-	devcb = &downcast<apollo_kbd_device &>(*device).set_tx_cb(DEVCB_##_cb);
-
-#define MCFG_APOLLO_KBD_GERMAN_CALLBACK(_cb) \
-	devcb = &downcast<apollo_kbd_device &>(*device).set_german_cb(DEVCB_##_cb);
 
 
 //**************************************************************************
@@ -47,12 +40,13 @@ public:
 	// construction/destruction
 	apollo_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_tx_cb(Object &&cb) { return m_tx_w.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_german_cb(Object &&cb) { return m_german_r.set_callback(std::forward<Object>(cb)); }
+	auto tx_cb() { return m_tx_w.bind(); }
+	auto german_cb() { return m_german_r.bind(); }
 
 private:
 	// device-level overrides
 	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -117,6 +111,7 @@ private:
 
 	static const int XMIT_RING_SIZE = 64;
 
+	required_device<beep_device> m_beep;
 	required_ioport_array<4> m_io_keyboard;
 	required_ioport_array<3> m_io_mouse;
 

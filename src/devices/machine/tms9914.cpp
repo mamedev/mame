@@ -7,7 +7,7 @@
     Texas Instruments TMS9914(A) GPIB Controller
 
     TODO:
-    - A few minor FSMs only used in non-controller devices (RL,SR,PP)
+    - A few minor FSMs only used in non-controller devices (SR,PP)
     - A few interface commands
     - A few auxiliary commands
 
@@ -20,15 +20,14 @@
 #include "tms9914.h"
 
 // Debugging
-#include "logmacro.h"
 #define LOG_NOISY_MASK  (LOG_GENERAL << 1)
 #define LOG_NOISY(...)  LOGMASKED(LOG_NOISY_MASK, __VA_ARGS__)
 #define LOG_REG_MASK    (LOG_NOISY_MASK << 1)
 #define LOG_REG(...)    LOGMASKED(LOG_REG_MASK, __VA_ARGS__)
 #define LOG_INT_MASK    (LOG_REG_MASK << 1)
 #define LOG_INT(...)    LOGMASKED(LOG_INT_MASK, __VA_ARGS__)
-#undef VERBOSE
-#define VERBOSE (LOG_GENERAL)
+//#define VERBOSE (LOG_GENERAL)
+#include "logmacro.h"
 
 // Bit manipulation
 namespace {
@@ -187,7 +186,8 @@ tms9914_device::tms9914_device(const machine_config &mconfig, const char *tag, d
 		  devcb_write_line(*this),
 		  devcb_write_line(*this),
 		  devcb_write_line(*this) },
-	  m_int_write_func(*this)
+	  m_int_write_func(*this),
+	  m_accrq_write_func(*this)
 {
 	// Silence compiler complaints about unused variables
 	(void)REG_INT0_RLC_BIT;
@@ -241,7 +241,7 @@ WRITE_LINE_MEMBER(tms9914_device::ren_w)
 }
 
 // Register I/O
-WRITE8_MEMBER(tms9914_device::reg8_w)
+void tms9914_device::write(offs_t offset, uint8_t data)
 {
 	LOG_REG("W %u=%02x\n" , offset , data);
 
@@ -284,6 +284,20 @@ WRITE8_MEMBER(tms9914_device::reg8_w)
 
 	case REG_W_DO:
 		m_reg_do = data;
+
+		if (m_next_eoi) {
+			m_next_eoi = false;
+			if (!m_swrst) {
+				if (m_t_eoi_state == FSM_T_ENIS) {
+					m_t_eoi_state = FSM_T_ENRS;
+				} else if (m_t_eoi_state == FSM_T_ENAS) {
+					m_t_eoi_state = FSM_T_ERAS;
+				}
+			}
+
+		}
+
+		set_accrq(false);
 		if (!m_swrst) {
 			BIT_CLR(m_reg_int0_status , REG_INT0_BO_BIT);
 			update_int();
@@ -292,8 +306,12 @@ WRITE8_MEMBER(tms9914_device::reg8_w)
 			} else if (m_t_eoi_state == FSM_T_ENAS) {
 				m_t_eoi_state = FSM_T_ENIS;
 			}
+			bool update = sh_active();
 			if (m_sh_shfs) {
 				m_sh_shfs = false;
+				update = true;
+			}
+			if (update) {
 				update_fsm();
 			}
 		}
@@ -305,7 +323,7 @@ WRITE8_MEMBER(tms9914_device::reg8_w)
 	}
 }
 
-READ8_MEMBER(tms9914_device::reg8_r)
+uint8_t tms9914_device::read(offs_t offset)
 {
 	uint8_t res;
 
@@ -384,6 +402,9 @@ READ8_MEMBER(tms9914_device::reg8_r)
 
 	case REG_R_DI:
 		res = m_reg_di;
+		BIT_CLR(m_reg_int0_status , REG_INT0_BI_BIT);
+		update_int();
+		set_accrq(false);
 		if (!m_hdfa && m_ah_anhs) {
 			m_ah_anhs = false;
 			update_fsm();
@@ -401,15 +422,70 @@ READ8_MEMBER(tms9914_device::reg8_r)
 	return res;
 }
 
+READ_LINE_MEMBER(tms9914_device::cont_r)
+{
+	return m_c_state != FSM_C_CIDS && m_c_state != FSM_C_CADS;
+}
+
 // device-level overrides
 void tms9914_device::device_start()
 {
+	save_item(NAME(m_int_line));
+	save_item(NAME(m_accrq_line));
+	save_item(NAME(m_dio));
+	save_item(NAME(m_signals));
+	save_item(NAME(m_ext_signals));
+	save_item(NAME(m_no_reflection));
+	save_item(NAME(m_ext_state_change));
+	save_item(NAME(m_reg_int0_status));
+	save_item(NAME(m_reg_int0_mask));
+	save_item(NAME(m_reg_int1_status));
+	save_item(NAME(m_reg_int1_mask));
+	save_item(NAME(m_reg_address));
+	save_item(NAME(m_reg_serial_p));
+	save_item(NAME(m_reg_parallel_p));
+	save_item(NAME(m_reg_2nd_parallel_p));
+	save_item(NAME(m_reg_di));
+	save_item(NAME(m_reg_do));
+	save_item(NAME(m_reg_ulpa));
+	save_item(NAME(m_swrst));
+	save_item(NAME(m_hdfa));
+	save_item(NAME(m_hdfe));
+	save_item(NAME(m_rtl));
+	save_item(NAME(m_gts));
+	save_item(NAME(m_rpp));
+	save_item(NAME(m_sic));
+	save_item(NAME(m_sre));
+	save_item(NAME(m_dai));
+	save_item(NAME(m_pts));
+	save_item(NAME(m_stdl));
+	save_item(NAME(m_shdw));
+	save_item(NAME(m_vstdl));
+	save_item(NAME(m_ah_state));
+	save_item(NAME(m_ah_adhs));
+	save_item(NAME(m_ah_anhs));
+	save_item(NAME(m_sh_state));
+	save_item(NAME(m_sh_shfs));
+	save_item(NAME(m_sh_vsts));
+	save_item(NAME(m_t_state));
+	save_item(NAME(m_t_tpas));
+	save_item(NAME(m_t_spms));
+	save_item(NAME(m_t_eoi_state));
+	save_item(NAME(m_l_state));
+	save_item(NAME(m_l_lpas));
+	save_item(NAME(m_sr_state));
+	save_item(NAME(m_rl_state));
+	save_item(NAME(m_pp_ppas));
+	save_item(NAME(m_c_state));
+	save_item(NAME(m_next_eoi));
+
 	m_dio_read_func.resolve_safe(0xff);
 	m_dio_write_func.resolve_safe();
 	for (auto& f : m_signal_wr_fns) {
 		f.resolve_safe();
 	}
 	m_int_write_func.resolve_safe();
+	m_accrq_write_func.resolve_safe();
 
 	m_sh_dly_timer = timer_alloc(SH_DELAY_TMR_ID);
 	m_ah_dly_timer = timer_alloc(AH_DELAY_TMR_ID);
@@ -423,6 +499,7 @@ void tms9914_device::device_reset()
 	m_swrst = true;
 	m_hdfa = false;
 	m_hdfe = false;
+	m_rtl = false;
 	m_rpp = false;
 	m_sic = false;
 	m_sre = false;
@@ -431,6 +508,7 @@ void tms9914_device::device_reset()
 	m_stdl = false;
 	m_shdw = false;
 	m_vstdl = false;
+	m_accrq_line = true;    // Ensure change is propagated
 
 	m_reg_serial_p = 0;
 	m_reg_parallel_p = 0;
@@ -530,8 +608,10 @@ void tms9914_device::do_swrst()
 	m_rl_state = FSM_RL_LOCS;
 	m_pp_ppas = false;
 	m_c_state = FSM_C_CIDS;
+	m_gts = false;
 
 	update_int();
+	set_accrq(false);
 }
 
 bool tms9914_device::listener_reset() const
@@ -547,6 +627,11 @@ bool tms9914_device::talker_reset() const
 bool tms9914_device::controller_reset() const
 {
 	return m_swrst || get_ifcin();
+}
+
+bool tms9914_device::sh_active() const
+{
+	return m_sh_state == FSM_SH_SDYS || m_sh_state == FSM_SH_STRS || m_sh_state == FSM_SH_SERS;
 }
 
 void tms9914_device::update_fsm()
@@ -630,7 +715,20 @@ void tms9914_device::update_fsm()
 					m_sh_vsts = true;
 				}
 				if (!get_signal(IEEE_488_NDAC)) {
-					LOG("%.6f TX %02x/%d\n" , machine().time().as_double() , m_dio , m_signals[ IEEE_488_EOI ]);
+					if (VERBOSE & LOG_GENERAL) {
+						bool const iscmd = m_signals[IEEE_488_ATN];
+						char cmd[16] = "";
+						if (iscmd) {
+							uint8_t tmp = m_dio & 0x7f;
+							if (tmp >= 0x20 && tmp <= 0x3f)
+								snprintf(cmd, 16, "MLA%d", tmp & 0x1f);
+							else if (tmp >= 0x40 && tmp <= 0x5f)
+								snprintf(cmd, 16, "MTA%d", tmp & 0x1f);
+							else if (tmp >= 0x60 && tmp <= 0x7f)
+								snprintf(cmd, 16, "MSA%d", tmp & 0x1f);
+						}
+						LOG("%.6f TX %s %02X/%d %s\n" , machine().time().as_double() , m_signals[IEEE_488_ATN] ? "C" : "D", m_dio , m_signals[ IEEE_488_EOI ], cmd);
+					}
 					m_sh_state = FSM_SH_SGNS;
 				}
 				break;
@@ -654,7 +752,7 @@ void tms9914_device::update_fsm()
 		bool eoi_signal = false;
 		uint8_t dio_byte = 0;
 		set_signal(IEEE_488_DAV , m_sh_state == FSM_SH_STRS);
-		if (m_sh_state == FSM_SH_SDYS || m_sh_state == FSM_SH_STRS) {
+		if (sh_active()) {
 			dio_byte = m_t_state == FSM_T_SPAS ? m_reg_serial_p : m_reg_do;
 			eoi_signal = m_t_eoi_state == FSM_T_ERAS || m_t_eoi_state == FSM_T_ENAS;
 		}
@@ -811,12 +909,20 @@ void tms9914_device::update_fsm()
 		}
 		// No direct L outputs
 
-		// TODO: SR, RL & PP FSMs
+		// TODO: SR & PP FSMs
+
+		// RL FSM
+		if (m_rl_state != FSM_RL_LOCS && (m_swrst || !get_signal(IEEE_488_REN))) {
+			m_rl_state = FSM_RL_LOCS;
+			changed = true;
+		}
+		// No direct RL outputs
 
 		// C outputs
 		prev_state = m_c_state;
 		if (controller_reset()) {
 			m_c_state = FSM_C_CIDS;
+			m_gts = false;
 			m_c_dly_timer->reset();
 		} else {
 			switch (m_c_state) {
@@ -833,8 +939,13 @@ void tms9914_device::update_fsm()
 			case FSM_C_CACS:
 				if (m_rpp) {
 					m_c_state = FSM_C_CPWS;
+					m_gts = false;
+				} else if (m_gts && !sh_active()) {
+					m_c_state = FSM_C_CSBS;
+					m_gts = false;
+					// This ensures a BO interrupt is generated if TACS is active
+					m_sh_state = FSM_SH_SIDS;
 				}
-				// gts -> CSBS
 				break;
 
 			case FSM_C_CSBS:
@@ -914,9 +1025,16 @@ void tms9914_device::do_LAF()
 		m_l_state = FSM_L_LADS;
 		m_ext_state_change = true;
 	}
-	if (m_t_state == FSM_T_TADS) {
+	if (m_t_state != FSM_T_TIDS) {
 		m_t_state = FSM_T_TIDS;
 		m_ext_state_change = true;
+	}
+	if (m_rl_state == FSM_RL_LWLS) {
+		m_rl_state = FSM_RL_RWLS;
+		set_int0_bit(REG_INT0_RLC_BIT);
+	} else if (m_rl_state == FSM_RL_LOCS && !m_rtl && get_signal(IEEE_488_REN)) {
+		m_rl_state = FSM_RL_REMS;
+		set_int0_bit(REG_INT0_RLC_BIT);
 	}
 }
 
@@ -926,7 +1044,7 @@ void tms9914_device::do_TAF()
 		m_t_state = FSM_T_TADS;
 		m_ext_state_change = true;
 	}
-	if (m_l_state == FSM_L_LADS) {
+	if (m_l_state != FSM_L_LIDS) {
 		m_l_state = FSM_L_LIDS;
 		m_ext_state_change = true;
 	}
@@ -946,7 +1064,15 @@ void tms9914_device::if_cmd_received(uint8_t if_cmd)
 
 	switch (if_cmd) {
 	case IFCMD_GTL:
-		// TODO:
+		if (m_l_state == FSM_L_LADS) {
+			if (m_rl_state == FSM_RL_REMS) {
+				m_rl_state = FSM_RL_LOCS;
+				set_int0_bit(REG_INT0_RLC_BIT);
+			} else if (m_rl_state == FSM_RL_RWLS) {
+				m_rl_state = FSM_RL_LWLS;
+				set_int0_bit(REG_INT0_RLC_BIT);
+			}
+		}
 		break;
 
 	case IFCMD_SDC:
@@ -968,7 +1094,11 @@ void tms9914_device::if_cmd_received(uint8_t if_cmd)
 		break;
 
 	case IFCMD_LLO:
-		// TODO:
+		if (m_rl_state == FSM_RL_LOCS && get_signal(IEEE_488_REN)) {
+			m_rl_state = FSM_RL_LWLS;
+		} else if (m_rl_state == FSM_RL_REMS) {
+			m_rl_state = FSM_RL_RWLS;
+		}
 		break;
 
 	case IFCMD_DCL:
@@ -1075,6 +1205,7 @@ void tms9914_device::if_cmd_received(uint8_t if_cmd)
 void tms9914_device::dab_received(uint8_t dab , bool eoi)
 {
 	LOG("%.6f RX DAB:%02x/%d\n" , machine().time().as_double() , dab , eoi);
+	m_reg_di = dab;
 	if (!m_shdw) {
 		m_ah_anhs = true;
 		set_int0_bit(REG_INT0_BI_BIT);
@@ -1085,7 +1216,6 @@ void tms9914_device::dab_received(uint8_t dab , bool eoi)
 	if (m_hdfe && eoi) {
 		m_ah_aehs = true;
 	}
-	m_reg_di = dab;
 }
 
 void tms9914_device::do_aux_cmd(unsigned cmd , bool set_bit)
@@ -1155,17 +1285,15 @@ void tms9914_device::do_aux_cmd(unsigned cmd , bool set_bit)
 		break;
 
 	case AUXCMD_RTL:
-		LOG("Unimplemented RTL cmd\n");
+		m_rtl = set_bit;
+		if (m_rtl && m_rl_state == FSM_RL_REMS) {
+			m_rl_state = FSM_RL_LOCS;
+			set_int0_bit(REG_INT0_RLC_BIT);
+		}
 		break;
 
 	case AUXCMD_FEOI:
-		if (!m_swrst) {
-			if (m_t_eoi_state == FSM_T_ENIS) {
-				m_t_eoi_state = FSM_T_ENRS;
-			} else if (m_t_eoi_state == FSM_T_ENAS) {
-				m_t_eoi_state = FSM_T_ERAS;
-			}
-		}
+		m_next_eoi = true;
 		break;
 
 	case AUXCMD_LON:
@@ -1193,11 +1321,8 @@ void tms9914_device::do_aux_cmd(unsigned cmd , bool set_bit)
 		break;
 
 	case AUXCMD_GTS:
-		if (m_c_state == FSM_C_CACS && m_sh_state != FSM_SH_SDYS && m_sh_state != FSM_SH_STRS) {
-			m_c_state = FSM_C_CSBS;
-			m_ext_state_change = true;
-			// This ensures a BO interrupt is generated if TACS is active
-			m_sh_state = FSM_SH_SIDS;
+		if (m_c_state == FSM_C_CACS) {
+			m_gts = true;
 			update_fsm();
 		}
 		break;
@@ -1206,7 +1331,10 @@ void tms9914_device::do_aux_cmd(unsigned cmd , bool set_bit)
 		if (m_c_state == FSM_C_CSBS) {
 			m_c_state = FSM_C_CSHS;
 			m_ext_state_change = true;
-			m_c_dly_timer->adjust(clocks_to_attotime(8));
+			// Manual says delay is 8 clock cycles, but 10 at least are needed
+			// to pass diagb hpib diagnostic
+			//m_c_dly_timer->adjust(clocks_to_attotime(8));
+			m_c_dly_timer->adjust(clocks_to_attotime(10));
 			update_fsm();
 		}
 		break;
@@ -1300,6 +1428,9 @@ void tms9914_device::set_int0_bit(unsigned bit_no)
 {
 	BIT_SET(m_reg_int0_status , bit_no);
 	update_int();
+	if (bit_no == REG_INT0_BI_BIT || (bit_no == REG_INT0_BO_BIT && m_c_state != FSM_C_CACS)) {
+		set_accrq(true);
+	}
 }
 
 void tms9914_device::set_int1_bit(unsigned bit_no)
@@ -1338,4 +1469,13 @@ void tms9914_device::update_ifc()
 void tms9914_device::update_ren()
 {
 	set_signal(IEEE_488_REN , m_sre);
+}
+
+void tms9914_device::set_accrq(bool state)
+{
+	if (state != m_accrq_line) {
+		LOG_INT("ACCRQ=%d\n" , state);
+		m_accrq_line = state;
+		m_accrq_write_func(m_accrq_line);
+	}
 }

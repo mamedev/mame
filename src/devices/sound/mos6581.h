@@ -29,20 +29,6 @@
 #pragma once
 
 
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_MOS6581_POTX_CALLBACK(_read) \
-	devcb = &downcast<mos6581_device &>(*device).set_potx_rd_callback(DEVCB_##_read);
-
-#define MCFG_MOS6581_POTY_CALLBACK(_read) \
-	devcb = &downcast<mos6581_device &>(*device).set_poty_rd_callback(DEVCB_##_read);
-
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -64,11 +50,11 @@ public:
 	mos6581_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~mos6581_device();
 
-	template <class Object> devcb_base &set_potx_rd_callback(Object &&cb) { return m_read_potx.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_poty_rd_callback(Object &&cb) { return m_read_poty.set_callback(std::forward<Object>(cb)); }
+	auto potx() { return m_read_potx.bind(); }
+	auto poty() { return m_read_poty.bind(); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 protected:
 	mos6581_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant);
@@ -76,10 +62,12 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_post_load() override;
 
 	// device_sound_interface overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
+	void save_state(SID6581_t *token);
 private:
 	devcb_read8  m_read_potx;
 	devcb_read8  m_read_poty;

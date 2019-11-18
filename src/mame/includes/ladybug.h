@@ -11,6 +11,8 @@
 #pragma once
 
 #include "video/ladybug.h"
+#include "emupal.h"
+#include "tilemap.h"
 
 
 class ladybug_base_state : public driver_device
@@ -18,7 +20,11 @@ class ladybug_base_state : public driver_device
 protected:
 	using driver_device::driver_device;
 
-	void palette_init_common(palette_device &palette, const uint8_t *color_prom, int r_bit0, int r_bit1, int g_bit0, int g_bit1, int b_bit0, int b_bit1);
+	void palette_init_common(
+			palette_device &palette, const uint8_t *color_prom,
+			int r_bit0, int r_bit1,
+			int g_bit0, int g_bit1,
+			int b_bit0, int b_bit1) const;
 };
 
 
@@ -43,13 +49,14 @@ public:
 
 protected:
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
-	DECLARE_PALETTE_INIT(ladybug);
+	void ladybug_palette(palette_device &palette) const;
 	uint32_t screen_update_ladybug(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void ladybug_map(address_map &map);
 
-private:
 	required_device<cpu_device> m_maincpu;
+
+private:
 	required_device<ladybug_video_device> m_video;
 
 	required_ioport m_port_dsw0;
@@ -67,7 +74,7 @@ public:
 		, m_decrypted_opcodes(*this, "decrypted_opcodes")
 	{ }
 
-	DECLARE_DRIVER_INIT(dorodon);
+	void init_dorodon();
 	void dorodon(machine_config &config);
 
 protected:
@@ -97,7 +104,7 @@ protected:
 	DECLARE_READ8_MEMBER(sraider_8005_r);
 	DECLARE_WRITE8_MEMBER(sraider_misc_w);
 	DECLARE_WRITE8_MEMBER(sraider_io_w);
-	DECLARE_PALETTE_INIT(sraider);
+	void sraider_palette(palette_device &palette) const;
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_sraider);
 	TILE_GET_INFO_MEMBER(get_grid_tile_info);
 

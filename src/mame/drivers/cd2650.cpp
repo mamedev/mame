@@ -28,19 +28,19 @@ scratch ram. All other ram is optional.
 
 Commands (must be in uppercase):
 A    Examine memory; press C to alter memory
-B    Set breakpoint?
-C    View breakpoint?
-D    Dump to tape
+B    Set breakpoint
+C    Clear unused breakpoint
+D    Dump to cassette (must save each block separately, then an empty block)
 E    Execute
-I    ?
-L    Load
-R    ?
-V    Verify?
+I    Inspect Registers after breakpoint
+L    Load from cassette
+R    Turn on cassette motor
+V    Verify cassette vs memory
 Press Esc to exit most commands.
 
 TODO
-- Lots, probably. The computer is a complete mystery. No manuals are known to exist.
-- Cassette doesn't work.
+- Cassette doesn't work. Saving is ok because the data can be loaded onto
+  the Super-80, but this system has great difficulty loading its own programs.
 
 ****************************************************************************/
 
@@ -55,8 +55,9 @@ TODO
 #include "imagedev/snapquik.h"
 #include "machine/74259.h"
 #include "machine/keyboard.h"
+#include "machine/timer.h"
 #include "sound/beep.h"
-#include "sound/wave.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -69,45 +70,72 @@ public:
 		, m_p_videoram(*this, "videoram")
 		, m_p_chargen(*this, "chargen")
 		, m_cass(*this, "cassette")
-	{
-	}
+	{ }
 
+	void cd2650(machine_config &config);
+
+private:
+	void cd2650_data(address_map &map);
+	void cd2650_io(address_map &map);
+	void cd2650_mem(address_map &map);
 	DECLARE_READ8_MEMBER(keyin_r);
 	void kbd_put(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(tape_deck_on_w);
 	DECLARE_READ_LINE_MEMBER(cass_r);
-	DECLARE_WRITE_LINE_MEMBER(cass_w);
-	DECLARE_QUICKLOAD_LOAD_MEMBER(cd2650);
+	TIMER_DEVICE_CALLBACK_MEMBER(kansas_w);
+	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	void cd2650(machine_config &config);
-	void cd2650_data(address_map &map);
-	void cd2650_io(address_map &map);
-	void cd2650_mem(address_map &map);
-private:
 	uint8_t m_term_data;
+	bool m_cassbit;
+	bool m_cassold;
+	uint8_t m_cass_data[4];
 	virtual void machine_reset() override;
-	required_device<cpu_device> m_maincpu;
+	required_device<s2650_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_region_ptr<u8> m_p_chargen;
 	required_device<cassette_image_device> m_cass;
 };
 
 
-WRITE_LINE_MEMBER(cd2650_state::tape_deck_on_w)
+TIMER_DEVICE_CALLBACK_MEMBER(cd2650_state::kansas_w)
 {
-	// output polarity not verified
-	logerror("Cassette tape deck turned %s\n", state ? "on" : "off");
+	m_cass_data[3]++;
+
+	if (m_cassbit != m_cassold)
+	{
+		m_cass_data[3] = 0;
+		m_cassold = m_cassbit;
+	}
+
+	if (m_cassbit)
+		m_cass->output(BIT(m_cass_data[3], 0) ? -1.0 : +1.0); // 2400Hz
+	else
+		m_cass->output(BIT(m_cass_data[3], 1) ? -1.0 : +1.0); // 1200Hz
 }
 
-WRITE_LINE_MEMBER(cd2650_state::cass_w)
+TIMER_DEVICE_CALLBACK_MEMBER(cd2650_state::kansas_r)
 {
-	m_cass->output(state ? -1.0 : +1.0);
+	/* cassette - turn 1200/2400Hz to a bit */
+	m_cass_data[1]++;
+	uint8_t cass_ws = (m_cass->input() > +0.03) ? 1 : 0;
+
+	if (cass_ws != m_cass_data[0])
+	{
+		m_cass_data[0] = cass_ws;
+		m_cass_data[2] = ((m_cass_data[1] < 12) ? 1 : 0);
+		m_cass_data[1] = 0;
+	}
+}
+
+WRITE_LINE_MEMBER(cd2650_state::tape_deck_on_w)
+{
+	m_cass->change_state(state ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 }
 
 READ_LINE_MEMBER(cd2650_state::cass_r)
 {
-	return (m_cass->input() > 0.03) ? 1 : 0;
+	return m_cass_data[2];
 }
 
 READ8_MEMBER(cd2650_state::keyin_r)
@@ -127,12 +155,12 @@ void cd2650_state::cd2650_mem(address_map &map)
 void cd2650_state::cd2650_io(address_map &map)
 {
 	map.unmap_value_high();
-	//AM_RANGE(0x80, 0x84) disk i/o
+	//map(0x80, 0x84) disk i/o
 }
 
 void cd2650_state::cd2650_data(address_map &map)
 {
-	map(S2650_DATA_PORT, S2650_DATA_PORT).r(this, FUNC(cd2650_state::keyin_r)).w("outlatch", FUNC(f9334_device::write_nibble_d3));
+	map(S2650_DATA_PORT, S2650_DATA_PORT).r(FUNC(cd2650_state::keyin_r)).w("outlatch", FUNC(f9334_device::write_nibble_d3));
 }
 
 /* Input ports */
@@ -206,7 +234,7 @@ static const gfx_layout cd2650_charlayout =
 	8*8                    /* every char takes 8 bytes */
 };
 
-static GFXDECODE_START( cd2650 )
+static GFXDECODE_START( gfx_cd2650 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, cd2650_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -216,7 +244,7 @@ void cd2650_state::kbd_put(u8 data)
 		m_term_data = data;
 }
 
-QUICKLOAD_LOAD_MEMBER( cd2650_state, cd2650 )
+QUICKLOAD_LOAD_MEMBER(cd2650_state::quickload_cb)
 {
 	int i;
 	image_init_result result = image_init_result::FAIL;
@@ -285,47 +313,49 @@ QUICKLOAD_LOAD_MEMBER( cd2650_state, cd2650 )
 	return result;
 }
 
-MACHINE_CONFIG_START(cd2650_state::cd2650)
+void cd2650_state::cd2650(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, XTAL(14'192'640) / 12) // 1.182720MHz according to RE schematic
-	MCFG_CPU_PROGRAM_MAP(cd2650_mem)
-	MCFG_CPU_IO_MAP(cd2650_io)
-	MCFG_CPU_DATA_MAP(cd2650_data)
-	MCFG_S2650_SENSE_INPUT(READLINE(cd2650_state, cass_r))
-	MCFG_S2650_FLAG_OUTPUT(WRITELINE(cd2650_state, cass_w))
+	S2650(config, m_maincpu, XTAL(14'192'640) / 12); // 1.182720MHz according to RE schematic
+	m_maincpu->set_addrmap(AS_PROGRAM, &cd2650_state::cd2650_mem);
+	m_maincpu->set_addrmap(AS_IO, &cd2650_state::cd2650_io);
+	m_maincpu->set_addrmap(AS_DATA, &cd2650_state::cd2650_data);
+	m_maincpu->sense_handler().set(FUNC(cd2650_state::cass_r));
+	m_maincpu->flag_handler().set([this] (bool state) { m_cassbit = state; });
 
-	MCFG_DEVICE_ADD("outlatch", F9334, 0) // IC26
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(cd2650_state, tape_deck_on_w)) // TD ON
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(DEVWRITELINE("beeper", beep_device, set_state)) // OUT6
+	f9334_device &outlatch(F9334(config, "outlatch")); // IC26
+	outlatch.q_out_cb<0>().set(FUNC(cd2650_state::tape_deck_on_w)); // TD ON
+	outlatch.q_out_cb<7>().set("beeper", FUNC(beep_device::set_state)); // OUT6
 	// Q1-Q7 = OUT 0-6, not defined in RE
 	// The connection of OUT6 to a 700-1200 Hz noise generator is suggested
 	// in Central Data 2650 Newsletter, Volume 1, Issue 3 for use with the
 	// "Morse Code" program by Mike Durham.
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(14'192'640), 112 * CHARACTER_WIDTH, 0, 80 * CHARACTER_WIDTH, 22 * CHARACTER_LINES, 0, 16 * CHARACTER_LINES)
-	MCFG_SCREEN_UPDATE_DRIVER(cd2650_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(14'192'640), 112 * CHARACTER_WIDTH, 0, 80 * CHARACTER_WIDTH, 22 * CHARACTER_LINES, 0, 16 * CHARACTER_LINES);
+	screen.set_screen_update(FUNC(cd2650_state::screen_update));
+	screen.set_palette("palette");
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cd2650)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	GFXDECODE(config, "gfxdecode", "palette", gfx_cd2650);
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", cd2650_state, cd2650, "pgm", 1)
+	QUICKLOAD(config, "quickload", "pgm", attotime::from_seconds(1)).set_load_callback(FUNC(cd2650_state::quickload_cb));
 
 	/* Sound */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("beeper", BEEP, 950) // guess
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER(config, "mono").front_center();
+	BEEP(config, "beeper", 950).add_route(ALL_OUTPUTS, "mono", 0.50); // guess
 
 	/* Devices */
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(cd2650_state, kbd_put))
-	MCFG_CASSETTE_ADD( "cassette" )
-MACHINE_CONFIG_END
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(cd2650_state::kbd_put));
+	CASSETTE(config, m_cass);
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.15);
+	TIMER(config, "kansas_w").configure_periodic(FUNC(cd2650_state::kansas_w), attotime::from_hz(4800));
+	TIMER(config, "kansas_r").configure_periodic(FUNC(cd2650_state::kansas_r), attotime::from_hz(40000));
+}
 
 /* ROM definition */
 ROM_START( cd2650 )
@@ -350,5 +380,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   CLASS          INIT  COMPANY         FULLNAME   FLAGS
-COMP( 1977, cd2650, 0,      0,       cd2650,    cd2650, cd2650_state,  0,    "Central Data", "2650 Computer System", 0 )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY         FULLNAME                FLAGS
+COMP( 1977, cd2650, 0,      0,      cd2650,  cd2650, cd2650_state, empty_init, "Central Data", "2650 Computer System", 0 )

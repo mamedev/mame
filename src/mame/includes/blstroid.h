@@ -13,6 +13,7 @@
 #include "machine/atarigen.h"
 #include "audio/atarijsa.h"
 #include "video/atarimo.h"
+#include "tilemap.h"
 
 class blstroid_state : public atarigen_state
 {
@@ -31,7 +32,7 @@ public:
 		m_priorityram(*this, "priorityram")
 	{ }
 
-	DECLARE_DRIVER_INIT(blstroid);
+	void init_blstroid();
 	void blstroid(machine_config &config);
 
 protected:

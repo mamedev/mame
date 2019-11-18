@@ -30,10 +30,13 @@
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
+#include "cpu/m6805/m68705.h"
 #include "bus/isa/aga.h"
+#include "bus/isa/fdc.h"
 #include "machine/genpc.h"
 #include "machine/nvram.h"
 #include "machine/pckeybrd.h"
+#include "machine/ram.h"
 
 #include "coreutil.h"
 
@@ -46,14 +49,22 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_mb(*this, "mb"),
 		m_keyboard(*this, "pc_keyboard"),
+		m_ram(*this, RAM_TAG),
 		m_jim_state(0),
 		m_port61(0)
 	{ }
 
+	void europc(machine_config &config);
+	void europc2(machine_config &config);
+	void euroxt(machine_config &config);
+
+	void init_europc();
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<pc_noppi_mb_device> m_mb;
 	required_device<pc_keyboard_device> m_keyboard;
-	isa8_aga_device *m_aga;
+	required_device<ram_device> m_ram;
 
 	DECLARE_WRITE8_MEMBER( europc_pio_w );
 	DECLARE_READ8_MEMBER( europc_pio_r );
@@ -65,13 +76,11 @@ public:
 	DECLARE_READ8_MEMBER( europc_rtc_r );
 	DECLARE_WRITE8_MEMBER( europc_rtc_w );
 
-	DECLARE_DRIVER_INIT(europc);
-
 	void europc_rtc_set_time();
 
 	uint8_t m_jim_data[16];
 	uint8_t m_jim_state;
-	AGA_MODE m_jim_mode;
+	isa8_aga_device::mode_t m_jim_mode;
 	int m_port61; // bit 0,1 must be 0 for startup; reset?
 	uint8_t m_rtc_data[0x10];
 	int m_rtc_reg;
@@ -84,10 +93,6 @@ public:
 	{
 		TIMER_RTC
 	};
-	static void cfg_builtin_720K(device_t *device);
-	void europc(machine_config &config);
-	void europc2(machine_config &config);
-	void euroxt(machine_config &config);
 	void europc_io(address_map &map);
 	void europc_map(address_map &map);
 };
@@ -182,16 +187,16 @@ WRITE8_MEMBER( europc_pc_state::europc_jim_w )
 			switch (data)
 			{
 			case 0x1f:
-			case 0x0b: m_jim_mode = AGA_MONO; break;
+			case 0x0b: m_jim_mode = isa8_aga_device::AGA_MONO; break;
 			case 0xe: //80 columns?
 			case 0xd: //40 columns?
 			case 0x18:
-			case 0x1a: m_jim_mode = AGA_COLOR; break;
-			default: m_jim_mode = AGA_OFF; break;
+			case 0x1a: m_jim_mode = isa8_aga_device::AGA_COLOR; break;
+			default: m_jim_mode = isa8_aga_device::AGA_OFF; break;
 			}
 		}
-//      mode= data&0x10?AGA_COLOR:AGA_MONO;
-//      mode= data&0x10?AGA_COLOR:AGA_OFF;
+//      mode = (data & 0x10) ? isa8_aga_device::AGA_COLOR : isa8_aga_device::AGA_MONO;
+//      mode = (data & 0x10) ? isa8_aga_device::AGA_COLOR : isa8_aga_device::AGA_OFF;
 		if (data & 0x80) m_jim_state = 0;
 		break;
 	case 4:
@@ -232,9 +237,9 @@ READ8_MEMBER( europc_pc_state::europc_jim2_r )
 		m_jim_state = 0;
 		switch (m_jim_mode)
 		{
-		case AGA_COLOR: return 0x87; // for color;
-		case AGA_MONO: return 0x90; //for mono
-		case AGA_OFF: return 0x80; // for vram
+		case isa8_aga_device::AGA_COLOR: return 0x87; // for color;
+		case isa8_aga_device::AGA_MONO: return 0x90; //for mono
+		case isa8_aga_device::AGA_OFF: return 0x80; // for vram
 //      return 0x97; //for error
 		}
 	}
@@ -359,20 +364,21 @@ WRITE8_MEMBER( europc_pc_state::europc_rtc_w )
 	}
 }
 
-DRIVER_INIT_MEMBER(europc_pc_state,europc)
+void europc_pc_state::init_europc()
 {
 	uint8_t *rom = &memregion("bios")->base()[0];
 
-	int i;
 	/*
 	  fix century rom bios bug !
 	  if year <79 month (and not CENTURY) is loaded with 0x20
 	*/
 	if (rom[0xf93e]==0xb6){ // mov dh,
-		uint8_t a;
 		rom[0xf93e]=0xb5; // mov ch,
-		for (i=0x8000, a=0; i<0xffff; i++ ) a+=rom[i];
-		rom[0xffff]=256-a;
+		uint8_t a = 0;
+		int i = 0x8000;
+		for (; i < 0xffff; i++)
+			a += rom[i];
+		rom[0xffff] = 256 - a;
 	}
 
 	memset(&m_rtc_data,0,sizeof(m_rtc_data));
@@ -384,9 +390,7 @@ DRIVER_INIT_MEMBER(europc_pc_state,europc)
 	m_rtc_timer->adjust(attotime::zero, 0, attotime(1,0));
 	//  europc_rtc_set_time();
 
-	machine().device<nvram_device>("nvram")->set_base(m_rtc_data, sizeof(m_rtc_data));
-	m_aga = machine().device<isa8_aga_device>("aga:aga");
-
+	subdevice<nvram_device>("nvram")->set_base(m_rtc_data, sizeof(m_rtc_data));
 }
 
 WRITE8_MEMBER( europc_pc_state::europc_pio_w )
@@ -506,103 +510,144 @@ void europc_pc_state::europc_io(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x00ff).m(m_mb, FUNC(pc_noppi_mb_device::map));
-	map(0x0060, 0x0063).rw(this, FUNC(europc_pc_state::europc_pio_r), FUNC(europc_pc_state::europc_pio_w));
-	map(0x0250, 0x025f).rw(this, FUNC(europc_pc_state::europc_jim_r), FUNC(europc_pc_state::europc_jim_w));
-	map(0x02e0, 0x02e0).r(this, FUNC(europc_pc_state::europc_jim2_r));
+	map(0x0060, 0x0063).rw(FUNC(europc_pc_state::europc_pio_r), FUNC(europc_pc_state::europc_pio_w));
+	map(0x0250, 0x025f).rw(FUNC(europc_pc_state::europc_jim_r), FUNC(europc_pc_state::europc_jim_w));
+	map(0x02e0, 0x02e0).r(FUNC(europc_pc_state::europc_jim2_r));
 }
 
-/* single built-in 3.5" 720K drive, connector for optional external 3.5" or 5.25" drive */
-void europc_pc_state::cfg_builtin_720K(device_t *device)
+class europc_fdc_device : public isa8_fdc_device
 {
-	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_default_option("35dd");
-	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_fixed(true);
-	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:1")).set_default_option("");
+public:
+	europc_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void device_add_mconfig(machine_config &config) override;
+};
+
+DEFINE_DEVICE_TYPE(EUROPC_FDC, europc_fdc_device, "europc_fdc", "EURO PC FDC hookup")
+
+europc_fdc_device::europc_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: isa8_fdc_device(mconfig, EUROPC_FDC, tag, owner, clock)
+{
+}
+
+static void pc_dd_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+	device.option_add("35dd", FLOPPY_35_DD);
+}
+
+void europc_fdc_device::device_add_mconfig(machine_config &config)
+{
+	wd37c65c_device &fdc(WD37C65C(config, m_fdc, 16_MHz_XTAL));
+	fdc.intrq_wr_callback().set(FUNC(isa8_fdc_device::irq_w));
+	fdc.drq_wr_callback().set(FUNC(isa8_fdc_device::drq_w));
+	// single built-in 3.5" 720K drive, connector for optional external 3.5" or 5.25" drive
+	FLOPPY_CONNECTOR(config, "fdc:0", pc_dd_floppies, "35dd", isa8_fdc_device::floppy_formats).set_fixed(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", pc_dd_floppies, nullptr, isa8_fdc_device::floppy_formats);
+}
+
+static void europc_fdc(device_slot_interface &device)
+{
+	device.option_add("fdc", EUROPC_FDC);
 }
 
 //Euro PC
-MACHINE_CONFIG_START(europc_pc_state::europc)
-	MCFG_CPU_ADD("maincpu", I8088, 4772720*2)
-	MCFG_CPU_PROGRAM_MAP(europc_map)
-	MCFG_CPU_IO_MAP(europc_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
+void europc_pc_state::europc(machine_config &config)
+{
+	I8088(config, m_maincpu, 4772720*2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &europc_pc_state::europc_map);
+	m_maincpu->set_addrmap(AS_IO, &europc_pc_state::europc_io);
+	m_maincpu->set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
-	MCFG_PCNOPPI_MOTHERBOARD_ADD("mb", "maincpu")
+	PCNOPPI_MOTHERBOARD(config, m_mb, 0).set_cputag(m_maincpu);
+	m_mb->int_callback().set_inputline(m_maincpu, 0);
+	m_mb->nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, "aga", false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", pc_isa8_cards, "lpt", false)
-	MCFG_SLOT_FIXED(true)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", pc_isa8_cards, "com", false)
-	MCFG_SLOT_FIXED(true)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", pc_isa8_cards, "fdc_xt", false)
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc_xt", cfg_builtin_720K)
-	MCFG_SLOT_FIXED(true)
-	MCFG_PC_KEYB_ADD("pc_keyboard", DEVWRITELINE("mb:pic8259", pic8259_device, ir1_w))
+	M6805U2(config, "kbdctrl", 16_MHz_XTAL / 4);
 
-	MCFG_NVRAM_ADD_0FILL("nvram");
+	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, "aga", false); // FIXME: determine ISA bus clock
+	ISA8_SLOT(config, "isa2", 0, "mb:isa", pc_isa8_cards, "lpt", true);
+	ISA8_SLOT(config, "isa3", 0, "mb:isa", pc_isa8_cards, "com", true);
+	ISA8_SLOT(config, "isa4", 0, "mb:isa", europc_fdc, "fdc", true);
+	PC_KEYB(config, m_keyboard);
+	m_keyboard->keypress().set("mb:pic8259", FUNC(pic8259_device::ir1_w));
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);;
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("512K")
-	MCFG_RAM_EXTRA_OPTIONS("256K, 640K") // Machine came with 512K standard, 640K via expansion card, but BIOS offers 256K as well
+	// Machine came with 512K standard, 640K via expansion card, but BIOS offers 256K as well
+	RAM(config, m_ram).set_default_size("512K").set_extra_options("256K, 640K");
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("disk_list", "ibm5150")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "disk_list").set_original("ibm5150");
+}
 
 //Euro PC II
-MACHINE_CONFIG_START(europc_pc_state::europc2)
+void europc_pc_state::europc2(machine_config &config)
+{
 	europc(config);
-	MCFG_DEVICE_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("768K") // could be configured by the BIOS as 640K, 640K+128K EMS or 512K+256K EMS
-MACHINE_CONFIG_END
+	// could be configured by the BIOS as 640K, 640K+128K EMS or 512K+256K EMS
+	m_ram->set_default_size("768K");
+}
 
 //Euro XT
-MACHINE_CONFIG_START(europc_pc_state::euroxt)
+void europc_pc_state::euroxt(machine_config &config)
+{
 	europc(config);
-	MCFG_DEVICE_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("768K")
-	MCFG_DEVICE_MODIFY("isa2")
-	MCFG_SLOT_DEFAULT_OPTION(nullptr)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa5", pc_isa8_cards, "xtide", false)
-	MCFG_SLOT_FIXED(true)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa6", pc_isa8_cards, "lpt", false)
-	MCFG_SLOT_FIXED(true)
-MACHINE_CONFIG_END
+
+	config.device_remove("kbdctrl");
+
+	m_ram->set_default_size("768K");
+
+	subdevice<isa8_slot_device>("isa2")->set_default_option(nullptr);
+	ISA8_SLOT(config, "isa5", 0, "mb:isa", pc_isa8_cards, "xtide", true); // FIXME: determine ISA bus clock
+	ISA8_SLOT(config, "isa6", 0, "mb:isa", pc_isa8_cards, "lpt", true);
+}
 
 ROM_START( europc )
 	ROM_REGION(0x10000,"bios", 0)
 	// hdd bios integrated!
 	ROM_SYSTEM_BIOS( 0, "v2.06", "EuroPC v2.06" )
-	ROMX_LOAD("bios_v2.06.bin", 0x8000, 0x8000, CRC(0a25a2eb) SHA1(d35f2f483d56b1eff558586e1d33d82f7efed639), ROM_BIOS(1))
+	ROMX_LOAD("bios_v2.06.bin", 0x8000, 0x8000, CRC(0a25a2eb) SHA1(d35f2f483d56b1eff558586e1d33d82f7efed639), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "v2.06b", "EuroPC v2.06b" )
-	ROMX_LOAD("bios_v2.06b.bin", 0x8000, 0x8000, CRC(05d8a4c2) SHA1(52c6fd22fb739e29a1f0aa3c96ede79cdc659f72), ROM_BIOS(2))
+	ROMX_LOAD("bios_v2.06b.bin", 0x8000, 0x8000, CRC(05d8a4c2) SHA1(52c6fd22fb739e29a1f0aa3c96ede79cdc659f72), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 2, "v2.07", "EuroPC v2.07" )
-	ROMX_LOAD("50145", 0x8000, 0x8000, CRC(1775a11d) SHA1(54430d4d0462860860397487c9c109e6f70db8e3), ROM_BIOS(3))
+	ROMX_LOAD("50145", 0x8000, 0x8000, CRC(1775a11d) SHA1(54430d4d0462860860397487c9c109e6f70db8e3), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS( 3, "v2.08", "EuroPC v2.08" )
-	ROMX_LOAD("bios_v2.08.bin", 0x8000, 0x8000, CRC(a7048349) SHA1(c2a0af7276c2ff6925abe5a5edef09c5a84106f2), ROM_BIOS(4))
+	ROMX_LOAD("bios_v2.08.bin", 0x8000, 0x8000, CRC(a7048349) SHA1(c2a0af7276c2ff6925abe5a5edef09c5a84106f2), ROM_BIOS(3))
 	ROM_SYSTEM_BIOS( 4, "v2.08a", "EuroPC v2.08a" )
-	ROMX_LOAD("bios_v2.08a.bin", 0x8000, 0x8000, CRC(872520b7) SHA1(9c94d33c0d454fab7bcd0c4516b50f1c3c6a30b8), ROM_BIOS(5))
+	ROMX_LOAD("bios_v2.08a.bin", 0x8000, 0x8000, CRC(872520b7) SHA1(9c94d33c0d454fab7bcd0c4516b50f1c3c6a30b8), ROM_BIOS(4))
 	ROM_SYSTEM_BIOS( 5, "v2.08b", "EuroPC v2.08b" )
-	ROMX_LOAD("bios_v2.08b.bin", 0x8000, 0x8000, CRC(668c0d19) SHA1(69412e58e0ed1d141e633f094af91ec5f7ae064b), ROM_BIOS(6))
+	ROMX_LOAD("bios_v2.08b.bin", 0x8000, 0x8000, CRC(668c0d19) SHA1(69412e58e0ed1d141e633f094af91ec5f7ae064b), ROM_BIOS(5))
 	ROM_SYSTEM_BIOS( 6, "v2.04", "EuroPC v2.04" )
-	ROMX_LOAD("bios_v2.04.bin", 0x8000, 0x8000, CRC(e623967c) SHA1(5196b14018da1f3198e2950af0e6eab41425f556), ROM_BIOS(7))
+	ROMX_LOAD("bios_v2.04.bin", 0x8000, 0x8000, CRC(e623967c) SHA1(5196b14018da1f3198e2950af0e6eab41425f556), ROM_BIOS(6))
 	ROM_SYSTEM_BIOS( 7, "v2.05", "EuroPC v2.05" )
-	ROMX_LOAD("bios_2.05.bin", 0x8000, 0x8000, CRC(372ceed6) SHA1(bb3d3957a22422f98be2225bdc47705bcab96f56), ROM_BIOS(8)) // v2.04 and v2.05 don't work yet, , see comment section
- ROM_END
+	ROMX_LOAD("bios_2.05.bin", 0x8000, 0x8000, CRC(372ceed6) SHA1(bb3d3957a22422f98be2225bdc47705bcab96f56), ROM_BIOS(7)) // v2.04 and v2.05 don't work yet, , see comment section
+
+	ROM_REGION(0x1000, "kbdctrl", 0)
+	ROM_LOAD("zc86115p-mc6805u2.bin", 0x0000, 0x1000, CRC(d90c1fab) SHA1(ddb7060abddee7294723833c303090de35c1e79c))
+ROM_END
 
 ROM_START( europc2 )
 	ROM_REGION(0x10000,"bios", 0)
 	// hdd bios integrated!
 	ROM_LOAD("europcii_bios_v3.01_500145.bin", 0x8000, 0x8000, CRC(ecca89c8) SHA1(802b89babdf0ab0a0a9c21d1234e529c8386d6fb))
+
+	ROM_REGION(0x1000, "kbdctrl", 0)
+	ROM_LOAD("zc86115p-mc6805u2.bin", 0x0000, 0x1000, CRC(d90c1fab) SHA1(ddb7060abddee7294723833c303090de35c1e79c))
 ROM_END
 
 ROM_START( euroxt )
 	ROM_REGION(0x10000,"bios", 0)
 	// hdd bios integrated!
-	ROM_LOAD("euroxt_bios_v1.01.bin", 0x8000, 0x8000, CRC(1e1fe931) SHA1(bb7cae224d66ae48045f323ecb9ad59bf49ed0a2))
+	ROM_SYSTEM_BIOS( 0, "v1.01", "EuroXT v1.01" )
+	ROMX_LOAD("euroxt_bios_v1.01.bin", 0x8000, 0x8000, CRC(1e1fe931) SHA1(bb7cae224d66ae48045f323ecb9ad59bf49ed0a2), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS( 1, "v1.02", "EuroXT v1.02" )
+	ROMX_LOAD("euro_xt_bios_id.nr.51463_v1.02.bin", 0x8000, 0x8000, CRC(c36de60e) SHA1(c668cc9c5f3325233f30eac654678e1b8b7a7847), ROM_BIOS(1))
 ROM_END
 
-//    YEAR  NAME        PARENT      COMPAT      MACHINE     INPUT   STATE                INIT        COMPANY              FULLNAME        FLAGS
-COMP( 1988, europc,     ibm5150,    0,          europc,     europc, europc_pc_state,     europc,     "Schneider Rdf. AG", "EURO PC", MACHINE_NOT_WORKING)
-COMP( 198?, europc2,    ibm5150,    0,         europc2,     europc, europc_pc_state,     europc,     "Schneider Rdf. AG", "EURO PC II", MACHINE_NOT_WORKING)
-COMP( 198?, euroxt,     ibm5150,    0,          euroxt,     europc, europc_pc_state,     europc,     "Schneider Rdf. AG", "EURO XT", MACHINE_NOT_WORKING)
+//    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT   CLASS            INIT         COMPANY              FULLNAME      FLAGS
+COMP( 1988, europc,  ibm5150, 0,      europc,  europc, europc_pc_state, init_europc, "Schneider Rdf. AG", "EURO PC",    MACHINE_NOT_WORKING)
+COMP( 198?, europc2, ibm5150, 0,      europc2, europc, europc_pc_state, init_europc, "Schneider Rdf. AG", "EURO PC II", MACHINE_NOT_WORKING)
+COMP( 198?, euroxt,  ibm5150, 0,      euroxt,  europc, europc_pc_state, init_europc, "Schneider Rdf. AG", "EURO XT",    MACHINE_NOT_WORKING)

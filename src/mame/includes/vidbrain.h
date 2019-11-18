@@ -27,7 +27,7 @@ public:
 		m_smi(*this, F3853_TAG),
 		m_uv(*this, UV201_TAG),
 		m_dac(*this, "dac"),
-		m_exp(*this, VIDEOBRAIN_EXPANSION_SLOT_TAG),
+		m_exp(*this, "exp"),
 		m_io(*this, "IO%02u", 0),
 		m_uv201_31(*this, "UV201-31"),
 		m_joy_r(*this, "JOY-R"),
@@ -41,6 +41,12 @@ public:
 		m_joy4_y(*this, "JOY4-Y")
 	{ }
 
+	void vidbrain(machine_config &config);
+	void vidbrain_video(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<f3853_device> m_smi;
 	required_device<uv201_device> m_uv;
@@ -70,23 +76,10 @@ public:
 	DECLARE_WRITE8_MEMBER( keyboard_w );
 	DECLARE_READ8_MEMBER( keyboard_r );
 	DECLARE_WRITE8_MEMBER( sound_w );
-	DECLARE_WRITE8_MEMBER( f3853_w );
-	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
+
 	DECLARE_WRITE_LINE_MEMBER( ext_int_w );
 	DECLARE_WRITE_LINE_MEMBER( hblank_w );
 	DECLARE_READ8_MEMBER(memory_read_byte);
-
-	F3853_INTERRUPT_REQ_CB(f3853_int_req_w);
-
-	IRQ_CALLBACK_MEMBER(vidbrain_int_ack);
-
-	void interrupt_check();
-
-	// F3853 SMI state
-	uint16_t m_vector;
-	int m_int_enable;
-	int m_ext_int_latch;
-	int m_timer_int_latch;
 
 	// keyboard state
 	uint8_t m_keylatch;
@@ -97,8 +90,6 @@ public:
 
 	// timers
 	emu_timer *m_timer_ne555;
-	void vidbrain(machine_config &config);
-	void vidbrain_video(machine_config &config);
 	void vidbrain_io(address_map &map);
 	void vidbrain_mem(address_map &map);
 };

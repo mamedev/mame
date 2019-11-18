@@ -9,7 +9,7 @@
 		<publisher>Tandy</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Disk01.img" size="368640" crc="ddd53ecc" sha1="6a13687c33cec90a81d20931057aa7c80643e274" offset="0"/>
+				<rom name="Disk01.img" size="368640" crc="ddd53ecc" sha1="6a13687c33cec90a81d20931057aa7c80643e274"/>
 			</dataarea>
 		</part>
 	</software>
@@ -20,7 +20,7 @@
 		<publisher>Tandy</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Disk01 alt.img" size="368640" crc="bdf729aa" sha1="725ae80df87211bba47e33596994ac05cebf9d40" offset="0"/>
+				<rom name="Disk01 alt.img" size="368640" crc="bdf729aa" sha1="725ae80df87211bba47e33596994ac05cebf9d40"/>
 			</dataarea>
 		</part>
 	</software>
@@ -32,7 +32,7 @@
 		<info name="developer" value="Microsoft" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="tandy_1000_tx_dos.img" size="737280" crc="c8ce9264" sha1="51a5bd4bec7fa3f0c4e956e904861973ae3fc67f" offset="0"/>
+				<rom name="tandy_1000_tx_dos.img" size="737280" crc="c8ce9264" sha1="51a5bd4bec7fa3f0c4e956e904861973ae3fc67f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -44,13 +44,13 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="MS-DOS/GW-Basic 3.30" />
 			<dataarea name="flop" size = "368640">
-				<rom name="Disk1.img" size="368640" crc="d4ef3158" sha1="c5b2f173a5392767b60903d56bf11acee854c091" offset="0"/>
+				<rom name="Disk1.img" size="368640" crc="d4ef3158" sha1="c5b2f173a5392767b60903d56bf11acee854c091"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Supplemental Programs" />
 			<dataarea name="flop" size = "368640">
-				<rom name="Disk2.img" size="368640" crc="8b491cdc" sha1="c14ea0f683a90b95d2be21a15813aad187280af2" offset="0"/>
+				<rom name="Disk2.img" size="368640" crc="8b491cdc" sha1="c14ea0f683a90b95d2be21a15813aad187280af2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -63,7 +63,7 @@
 		<info name="version" value="01.01.00" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Disk01.img" size="368640" crc="37853a62" sha1="198b017bf743f0a80d4dccaf4b061f3d0cae520b" offset="0"/>
+				<rom name="Disk01.img" size="368640" crc="37853a62" sha1="198b017bf743f0a80d4dccaf4b061f3d0cae520b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -75,12 +75,12 @@
 		<info name="version" value="01.00.00" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="3kdm2dk1.img" size="368640" crc="3d5062c7" sha1="7a5de2e2578ca81b118ae23b7dc33c6b5215faf8" offset="0"/>
+				<rom name="3kdm2dk1.img" size="368640" crc="3d5062c7" sha1="7a5de2e2578ca81b118ae23b7dc33c6b5215faf8"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="3kdm2dk2.img" size="368640" crc="16837ecf" sha1="4f5242aaf00e52b3c9d1350fb8fcbaf7f683293e" offset="0"/>
+				<rom name="3kdm2dk2.img" size="368640" crc="16837ecf" sha1="4f5242aaf00e52b3c9d1350fb8fcbaf7f683293e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -92,22 +92,22 @@
 		<info name="version" value="01.01.00" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="rom" size = "327680">
-				<rom name="disk1.img" size="327680" crc="a87e8486" sha1="12726ec6326c72959407a787642ffd28ebabcb83" offset="0"/>
+				<rom name="disk1.img" size="327680" crc="a87e8486" sha1="12726ec6326c72959407a787642ffd28ebabcb83"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="rom" size = "327680">
-				<rom name="disk2.img" size="327680" crc="62185391" sha1="cc8d1356e19662085360c9e6ec92ecac1b903262" offset="0"/>
+				<rom name="disk2.img" size="327680" crc="62185391" sha1="cc8d1356e19662085360c9e6ec92ecac1b903262"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="rom" size = "327680">
-				<rom name="disk3.img" size="327680" crc="0f2e9386" sha1="85c6f340e8e60b5c78e33e0fd925e4ce6da0a9ac" offset="0"/>
+				<rom name="disk3.img" size="327680" crc="0f2e9386" sha1="85c6f340e8e60b5c78e33e0fd925e4ce6da0a9ac"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="rom" size = "327680">
-				<rom name="disk4.img" size="327680" crc="8c9bc1ec" sha1="87c7eed7c0d8b0084a1d36808eefa5725d8f8c56" offset="0"/>
+				<rom name="disk4.img" size="327680" crc="8c9bc1ec" sha1="87c7eed7c0d8b0084a1d36808eefa5725d8f8c56"/>
 			</dataarea>
 		</part>
 	</software>
@@ -119,7 +119,7 @@
 		<info name="version" value="01.00.00" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="deskmate2.dsk" size="737280" crc="60b41a4a" sha1="89881aba7e217e986aac81a038f148b8c0ecc1db" offset="0"/>
+				<rom name="deskmate2.dsk" size="737280" crc="60b41a4a" sha1="89881aba7e217e986aac81a038f148b8c0ecc1db"/>
 			</dataarea>
 		</part>
 	</software>
@@ -131,7 +131,7 @@
 		<info name="version" value="01.00.00" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="rom" size = "737280">
-				<rom name="pdm2.img" size="737280" crc="deabce9d" sha1="2fc26931661204f90c4803fd9f4bbbe1e0f9faf3" offset="0"/>
+				<rom name="pdm2.img" size="737280" crc="deabce9d" sha1="2fc26931661204f90c4803fd9f4bbbe1e0f9faf3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -143,7 +143,7 @@
 		<info name="version" value="01.00.00" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="tandy_1000tx_personal_deskmate_2.img" size="737280" crc="cd3446cb" sha1="b0575ed4a3dbf3d15bfd7d36eaf95f4116adefba" offset="0"/>
+				<rom name="tandy_1000tx_personal_deskmate_2.img" size="737280" crc="cd3446cb" sha1="b0575ed4a3dbf3d15bfd7d36eaf95f4116adefba"/>
 			</dataarea>
 		</part>
 	</software>
@@ -156,7 +156,7 @@
 		<info name="version" value="01.01.00" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="kq1tandy.img" size="368640" crc="6c5508cb" sha1="ae3aed4e06213035558637742fa64594e7f5f02b" offset="0"/>
+				<rom name="kq1tandy.img" size="368640" crc="6c5508cb" sha1="ae3aed4e06213035558637742fa64594e7f5f02b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -167,7 +167,7 @@
 		<publisher>Polarware</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="transt1k.dsk" size="368640" crc="0bd2bbba" sha1="3a9fa90eaba2c3130d4a2fa029b5e6d9f8b5a859" offset="0"/>
+				<rom name="transt1k.dsk" size="368640" crc="0bd2bbba" sha1="3a9fa90eaba2c3130d4a2fa029b5e6d9f8b5a859"/>
 			</dataarea>
 		</part>
 	</software>

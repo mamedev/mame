@@ -164,7 +164,9 @@ Given CS numbers this is released after the other GunChamp
 
 #include "emu.h"
 #include "cpu/scmp/scmp.h"
+#include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 #include "gunchamps.lh"
 
@@ -172,12 +174,16 @@ Given CS numbers this is released after the other GunChamp
 class supershot_state : public driver_device
 {
 public:
-	supershot_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	supershot_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode")
+	{ }
 
+	void supershot(machine_config &config);
+
+private:
 	required_shared_ptr<uint8_t> m_videoram;
 	tilemap_t   *m_tilemap;
 	DECLARE_WRITE8_MEMBER(supershot_vidram_w);
@@ -188,7 +194,6 @@ public:
 	uint32_t screen_update_supershot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
-	void supershot(machine_config &config);
 	void supershot_map(address_map &map);
 };
 
@@ -207,7 +212,7 @@ TILE_GET_INFO_MEMBER(supershot_state::get_supershot_text_tile_info)
 
 void supershot_state::video_start()
 {
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(supershot_state::get_supershot_text_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(supershot_state::get_supershot_text_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 uint32_t supershot_state::screen_update_supershot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -271,14 +276,14 @@ WRITE8_MEMBER(supershot_state::supershot_output1_w)
 void supershot_state::supershot_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
-	map(0x2000, 0x23ff).ram().w(this, FUNC(supershot_state::supershot_vidram_w)).share("videoram");
+	map(0x2000, 0x23ff).ram().w(FUNC(supershot_state::supershot_vidram_w)).share("videoram");
 	map(0x4100, 0x41ff).ram();
 	map(0x4200, 0x4200).portr("GUNX");
 	map(0x4201, 0x4201).portr("GUNY");
 	map(0x4202, 0x4202).portr("IN0");
 	map(0x4203, 0x4203).portr("DSW");
-	map(0x4206, 0x4206).w(this, FUNC(supershot_state::supershot_output0_w));
-	map(0x4207, 0x4207).w(this, FUNC(supershot_state::supershot_output1_w));
+	map(0x4206, 0x4206).w(FUNC(supershot_state::supershot_output0_w));
+	map(0x4207, 0x4207).w(FUNC(supershot_state::supershot_output1_w));
 }
 
 
@@ -336,31 +341,31 @@ static const gfx_layout supershot_charlayout =
 	8*8
 };
 
-static GFXDECODE_START( supershot )
+static GFXDECODE_START( gfx_supershot )
 	GFXDECODE_ENTRY( "gfx", 0, supershot_charlayout,   0, 1  )
 GFXDECODE_END
 
-MACHINE_CONFIG_START(supershot_state::supershot)
-
+void supershot_state::supershot(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", SCMP, XTAL(11'289'000)/4)
-	MCFG_CPU_PROGRAM_MAP(supershot_map)
+	SCMP(config, m_maincpu, XTAL(11'289'000)/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &supershot_state::supershot_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE((32)*8, (32)*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(supershot_state, screen_update_supershot)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_size((32)*8, (32)*8);
+	screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);
+	screen.set_screen_update(FUNC(supershot_state::screen_update_supershot));
+	screen.set_palette("palette");
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", supershot)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_supershot);
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */
 	//...
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( sshot )
@@ -399,5 +404,5 @@ ROM_START( gunchamps )
 ROM_END
 
 
-GAME( 1979, sshot,     0,        supershot, supershot, supershot_state, 0, ROT0, "Model Racing", "Super Shot",                             MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
-GAMEL(1980, gunchamps, gunchamp, supershot, supershot, supershot_state, 0, ROT0, "Model Racing", "Gun Champ (newer, Super Shot hardware)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING, layout_gunchamps )
+GAME( 1979, sshot,     0,        supershot, supershot, supershot_state, empty_init, ROT0, "Model Racing", "Super Shot",                             MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+GAMEL(1980, gunchamps, gunchamp, supershot, supershot, supershot_state, empty_init, ROT0, "Model Racing", "Gun Champ (newer, Super Shot hardware)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_NOT_WORKING, layout_gunchamps )

@@ -60,7 +60,7 @@ void sns_pfest94_device::device_reset()
  mapper specific handlers
  -------------------------------------------------*/
 
-READ8_MEMBER(sns_pfest94_device::read_l)
+uint8_t sns_pfest94_device::read_l(offs_t offset)
 {
 	// menu
 	if ((offset & 0x208000) == 0x208000)
@@ -77,7 +77,7 @@ READ8_MEMBER(sns_pfest94_device::read_l)
 	}
 }
 
-READ8_MEMBER(sns_pfest94_device::read_h)
+uint8_t sns_pfest94_device::read_h(offs_t offset)
 {
 	// menu
 	if ((offset & 0x208000) == 0x208000)
@@ -103,7 +103,7 @@ READ8_MEMBER(sns_pfest94_device::read_h)
 
 
 // these are used for two diff effects: both to select game from menu and to access the DSP when running SMK!
-READ8_MEMBER( sns_pfest94_device::chip_read )
+uint8_t sns_pfest94_device::chip_read(offs_t offset)
 {
 	if (offset & 0x8000)
 	{
@@ -119,7 +119,7 @@ READ8_MEMBER( sns_pfest94_device::chip_read )
 }
 
 
-WRITE8_MEMBER( sns_pfest94_device::chip_write )
+void sns_pfest94_device::chip_write(offs_t offset, uint8_t data)
 {
 	if (offset & 0x8000)
 	{
@@ -186,12 +186,12 @@ void sns_pfest94_device::speedup_addon_bios_access()
 
 
 // DSP dump contains prg at offset 0 and data at offset 0x2000
-READ32_MEMBER( sns_pfest94_device::necdsp_prg_r )
+uint32_t sns_pfest94_device::necdsp_prg_r(offs_t offset)
 {
 	return get_prg(&m_bios[0], offset);
 }
 
-READ16_MEMBER( sns_pfest94_device::necdsp_data_r )
+uint16_t sns_pfest94_device::necdsp_data_r(offs_t offset)
 {
 	return get_data(&m_bios[0], offset + 0x2000/2);
 }
@@ -203,7 +203,7 @@ READ16_MEMBER( sns_pfest94_device::necdsp_data_r )
 
 void sns_pfest94_device::dsp_prg_map_lorom(address_map &map)
 {
-	map(0x0000, 0x07ff).r(this, FUNC(sns_pfest94_device::necdsp_prg_r));
+	map(0x0000, 0x07ff).r(FUNC(sns_pfest94_device::necdsp_prg_r));
 }
 
 
@@ -213,7 +213,7 @@ void sns_pfest94_device::dsp_prg_map_lorom(address_map &map)
 
 void sns_pfest94_device::dsp_data_map_lorom(address_map &map)
 {
-	map(0x0000, 0x03ff).r(this, FUNC(sns_pfest94_device::necdsp_data_r));
+	map(0x0000, 0x03ff).r(FUNC(sns_pfest94_device::necdsp_data_r));
 }
 
 
@@ -221,11 +221,12 @@ void sns_pfest94_device::dsp_data_map_lorom(address_map &map)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(sns_pfest94_device::device_add_mconfig)
-	MCFG_CPU_ADD("dsp", UPD7725, 8000000)
-	MCFG_CPU_PROGRAM_MAP(dsp_prg_map_lorom)
-	MCFG_CPU_DATA_MAP(dsp_data_map_lorom)
-MACHINE_CONFIG_END
+void sns_pfest94_device::device_add_mconfig(machine_config &config)
+{
+	UPD7725(config, m_upd7725, 8000000);
+	m_upd7725->set_addrmap(AS_PROGRAM, &sns_pfest94_device::dsp_prg_map_lorom);
+	m_upd7725->set_addrmap(AS_DATA, &sns_pfest94_device::dsp_data_map_lorom);
+}
 
 //-------------------------------------------------
 //  Dipswitch

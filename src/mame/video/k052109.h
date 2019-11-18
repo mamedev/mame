@@ -5,25 +5,12 @@
 
 #pragma once
 
-#include "screen.h"
+#include "tilemap.h"
 
-typedef device_delegate<void (int layer, int bank, int *code, int *color, int *flags, int *priority)> k052109_cb_delegate;
 #define K052109_CB_MEMBER(_name)   void _name(int layer, int bank, int *code, int *color, int *flags, int *priority)
 
-#define MCFG_K052109_CB(_class, _method) \
-	downcast<k052109_device &>(*device).set_k052109_callback(k052109_cb_delegate(&_class::_method, #_class "::" #_method, this));
 
-#define MCFG_K052109_CHARRAM(_ram) \
-	downcast<k052109_device &>(*device).set_ram(_ram);
-
-#define MCFG_K052109_SCREEN_TAG(_tag) \
-	downcast<k052109_device &>(*device).set_screen_tag(_tag);
-
-#define MCFG_K052109_IRQ_HANDLER(_devcb) \
-	devcb = &downcast<k052109_device &>(*device).set_irq_handler(DEVCB_##_devcb);
-
-
-class k052109_device : public device_t, public device_gfx_interface
+class k052109_device : public device_t, public device_gfx_interface, public device_video_interface
 {
 	static const gfx_layout charlayout;
 	static const gfx_layout charlayout_ram;
@@ -31,15 +18,16 @@ class k052109_device : public device_t, public device_gfx_interface
 	DECLARE_GFXDECODE_MEMBER(gfxinfo_ram);
 
 public:
+	using tile_delegate = device_delegate<void (int layer, int bank, int *code, int *color, int *flags, int *priority)>;
+
 	k052109_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~k052109_device() {}
 
-	template <class Object> devcb_base &set_irq_handler(Object &&cb)
-	{ return m_irq_handler.set_callback(std::forward<Object>(cb)); }
-
-	void set_k052109_callback(k052109_cb_delegate callback) { m_k052109_cb = callback; }
-	void set_ram(bool ram);
-	void set_screen_tag(const char *tag) { m_screen.set_tag(tag); }
+	auto irq_handler() { return m_irq_handler.bind(); }
+	auto firq_handler() { return m_firq_handler.bind(); }
+	auto nmi_handler() { return m_nmi_handler.bind(); }
+	template <typename... T> void set_tile_callback(T &&... args) { m_k052109_cb.set(std::forward<T>(args)...); }
+	void set_char_ram(bool ram);
 
 	/*
 	The callback is passed:
@@ -56,17 +44,15 @@ public:
 	chip so it must not be set by the callback.
 	*/
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ16_MEMBER( word_r );
-	DECLARE_WRITE16_MEMBER( word_w );
-	DECLARE_READ16_MEMBER( lsb_r );
-	DECLARE_WRITE16_MEMBER( lsb_w );
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
+	u16 word_r(offs_t offset);
+	void word_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	void set_rmrd_line(int state);
 	int get_rmrd_line();
 	void tilemap_update();
-	int is_irq_enabled();
+	int is_irq_enabled() { return m_irq_enabled; } // FIXME: remove
 	void tilemap_mark_dirty(int tmap_num);
 	void tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tmap_num, uint32_t flags, uint8_t priority);
 
@@ -76,6 +62,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_post_load() override;
 
 private:
 	// internal state
@@ -101,9 +88,7 @@ private:
 
 	optional_region_ptr<uint8_t> m_char_rom;
 
-	optional_device<screen_device> m_screen;
-
-	k052109_cb_delegate m_k052109_cb;
+	tile_delegate m_k052109_cb;
 
 	devcb_write_line m_irq_handler;
 	devcb_write_line m_firq_handler;

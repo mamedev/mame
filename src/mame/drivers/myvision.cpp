@@ -49,16 +49,18 @@ public:
 		, m_io_row3(*this, "ROW3")
 	{ }
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart );
+	void myvision(machine_config &config);
+
+private:
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart_load );
 	DECLARE_READ8_MEMBER( ay_port_a_r );
 	DECLARE_READ8_MEMBER( ay_port_b_r );
 	DECLARE_WRITE8_MEMBER( ay_port_a_w );
 	DECLARE_WRITE8_MEMBER( ay_port_b_w );
 
-	void myvision(machine_config &config);
 	void myvision_io(address_map &map);
 	void myvision_mem(address_map &map);
-private:
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -74,7 +76,7 @@ private:
 void myvision_state::myvision_mem(address_map &map)
 {
 	map.unmap_value_high();
-	//AM_RANGE(0x0000, 0x5fff)      // mapped by the cartslot
+	//map(0x0000, 0x5fff)      // mapped by the cartslot
 	map(0xa000, 0xa7ff).ram();
 	map(0xe000, 0xe000).rw("tms9918", FUNC(tms9918a_device::vram_read), FUNC(tms9918a_device::vram_write));
 	map(0xe002, 0xe002).rw("tms9918", FUNC(tms9918a_device::register_read), FUNC(tms9918a_device::register_write));
@@ -138,7 +140,7 @@ INPUT_PORTS_END
 void myvision_state::machine_start()
 {
 	if (m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x5fff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x5fff, read8sm_delegate(*m_cart, FUNC(generic_slot_device::read_rom)));
 
 	save_item(NAME(m_column));
 }
@@ -150,7 +152,7 @@ void myvision_state::machine_reset()
 }
 
 
-DEVICE_IMAGE_LOAD_MEMBER( myvision_state, cart )
+DEVICE_IMAGE_LOAD_MEMBER( myvision_state::cart_load )
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
@@ -212,36 +214,37 @@ WRITE8_MEMBER( myvision_state::ay_port_b_w )
 	m_column = data;
 }
 
-MACHINE_CONFIG_START(myvision_state::myvision)
+void myvision_state::myvision(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL(10'738'635)/3)  /* Not verified */
-	MCFG_CPU_PROGRAM_MAP(myvision_mem)
-	MCFG_CPU_IO_MAP(myvision_io)
+	Z80(config, m_maincpu, XTAL(10'738'635)/3);  /* Not verified */
+	m_maincpu->set_addrmap(AS_PROGRAM, &myvision_state::myvision_mem);
+	m_maincpu->set_addrmap(AS_IO, &myvision_state::myvision_io);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD( "tms9918", TMS9918A, XTAL(10'738'635) / 2 )  /* Exact model not verified */
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)  /* Not verified */
-	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
-	MCFG_SCREEN_UPDATE_DEVICE( "tms9918", tms9918a_device, screen_update )
+	tms9918a_device &vdp(TMS9918A(config, "tms9918", XTAL(10'738'635)));  /* Exact model not verified */
+	vdp.set_screen("screen");
+	vdp.set_vram_size(0x4000);  /* Not verified */
+	vdp.int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ay8910", AY8910, XTAL(10'738'635)/3/2)  /* Exact model and clock not verified */
-	MCFG_AY8910_PORT_A_READ_CB(READ8(myvision_state, ay_port_a_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(myvision_state, ay_port_b_r))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(myvision_state, ay_port_a_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(myvision_state, ay_port_b_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER(config, "mono").front_center();
+	ay8910_device &ay8910(AY8910(config, "ay8910", XTAL(10'738'635)/3/2));  /* Exact model and clock not verified */
+	ay8910.port_a_read_callback().set(FUNC(myvision_state::ay_port_a_r));
+	ay8910.port_b_read_callback().set(FUNC(myvision_state::ay_port_b_r));
+	ay8910.port_a_write_callback().set(FUNC(myvision_state::ay_port_a_w));
+	ay8910.port_b_write_callback().set(FUNC(myvision_state::ay_port_b_w));
+	ay8910.add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "myvision_cart")
-	MCFG_GENERIC_LOAD(myvision_state, cart)
-	//MCFG_GENERIC_MANDATORY
+	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "myvision_cart"));
+	cartslot.set_device_load(FUNC(myvision_state::cart_load));
+	//cartslot.set_must_be_loaded(true);
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","myvision")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cart_list").set_original("myvision");
+}
 
 /* ROM definition */
 ROM_START( myvision )
@@ -250,5 +253,5 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT     STATE           INIT  COMPANY       FULLN AME              FLAGS
-CONS( 1983, myvision, 0,      0,       myvision,  myvision, myvision_state, 0,    "Nichibutsu", "My Vision (KH-1000)", 0 )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     STATE           INIT        COMPANY       FULLN AME              FLAGS
+CONS( 1983, myvision, 0,      0,      myvision, myvision, myvision_state, empty_init, "Nichibutsu", "My Vision (KH-1000)", 0 )

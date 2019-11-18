@@ -9,13 +9,15 @@
  * Driver by Wilbert Pol
  *
  ****************************************************************************/
-
 #ifndef MAME_INCLUDES_ELECTRON_H
 #define MAME_INCLUDES_ELECTRON_H
+
+#pragma once
 
 #include "machine/ram.h"
 #include "imagedev/cassette.h"
 #include "sound/beep.h"
+#include "emupal.h"
 
 #include "bus/electron/exp.h"
 
@@ -31,13 +33,6 @@
 class electron_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_TAPE_HANDLER,
-		TIMER_SETUP_BEEP,
-		TIMER_SCANLINE_INTERRUPT
-	};
-
 	electron_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
@@ -51,6 +46,21 @@ public:
 		, m_ram(*this, RAM_TAG)
 		, m_mrb(*this, "MRB")
 	{ }
+
+	void electron(machine_config &config);
+	void btm2105(machine_config &config);
+
+	void electron64(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
+
+private:
+	enum
+	{
+		TIMER_TAPE_HANDLER,
+		TIMER_SETUP_BEEP,
+		TIMER_SCANLINE_INTERRUPT
+	};
 
 	emu_timer *m_tape_timer;
 	int m_map4[256];
@@ -70,7 +80,7 @@ public:
 	DECLARE_READ8_MEMBER(electron_sheila_r);
 	DECLARE_WRITE8_MEMBER(electron_sheila_w);
 
-	DECLARE_PALETTE_INIT(electron);
+	void electron_colours(palette_device &palette) const;
 	uint32_t screen_update_electron(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(electron_tape_timer_handler);
 	TIMER_CALLBACK_MEMBER(setup_beep);
@@ -79,23 +89,17 @@ public:
 	inline uint8_t read_vram( uint16_t addr );
 	inline void electron_plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint32_t color);
 	void electron_interrupt_handler(int mode, int interrupt);
-	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
 
-	void electron(machine_config &config);
-	void btm2105(machine_config &config);
 	void electron_mem(address_map &map);
 
-	void electron64(machine_config &config);
 	void electron64_opcodes(address_map &map);
 
-protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<cassette_image_device> m_cassette;

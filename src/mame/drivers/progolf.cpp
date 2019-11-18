@@ -59,6 +59,7 @@ Twenty four 8116 rams.
 #include "machine/deco222.h"
 #include "machine/decocpu6.h"
 #include "machine/gen_latch.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -66,15 +67,22 @@ Twenty four 8116 rams.
 class progolf_state : public driver_device
 {
 public:
-	progolf_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	progolf_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_videoram(*this, "videoram"),
-		m_fbram(*this, "fbram")  { }
+		m_fbram(*this, "fbram")
+	{ }
 
+	void progolfa(machine_config &config);
+	void progolf(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -98,15 +106,11 @@ public:
 	DECLARE_READ8_MEMBER(videoram_r);
 	DECLARE_WRITE8_MEMBER(videoram_w);
 
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(progolf);
+	void progolf_palette(palette_device &palette) const;
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void progolfa(machine_config &config);
-	void progolf(machine_config &config);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void main_cpu(address_map &map);
 	void sound_cpu(address_map &map);
 };
@@ -125,14 +129,14 @@ void progolf_state::video_start()
 
 	save_item(NAME(m_char_pen));
 	save_item(NAME(m_char_pen_vreg));
-	save_pointer(NAME(m_fg_fb.get()), 0x2000*8);
+	save_pointer(NAME(m_fg_fb), 0x2000*8);
 	save_item(NAME(m_scrollx_hi));
 	save_item(NAME(m_scrollx_lo));
 	save_item(NAME(m_gfx_switch));
 }
 
 
-uint32_t progolf_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t progolf_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int count,color,x,y,xi,yi;
 
@@ -171,7 +175,7 @@ uint32_t progolf_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 						color = m_fg_fb[(xi+yi*8)+count*0x40];
 
 						if(color != 0 && cliprect.contains(x+yi, 256-y+xi))
-							bitmap.pix16(x+yi, 256-y+xi) = m_palette->pen((color & 0x7));
+							bitmap.pix32(x+yi, 256-y+xi) = m_palette->pen((color & 0x7));
 					}
 				}
 
@@ -264,17 +268,17 @@ WRITE8_MEMBER(progolf_state::videoram_w)
 void progolf_state::main_cpu(address_map &map)
 {
 	map(0x0000, 0x5fff).ram();
-	map(0x6000, 0x7fff).ram().w(this, FUNC(progolf_state::charram_w)).share("fbram");
-	map(0x8000, 0x8fff).rw(this, FUNC(progolf_state::videoram_r), FUNC(progolf_state::videoram_w)).share("videoram");
-	map(0x9000, 0x9000).portr("IN2").w(this, FUNC(progolf_state::char_vregs_w));
-	map(0x9200, 0x9200).portr("P1").w(this, FUNC(progolf_state::scrollx_hi_w)); //p1 inputs
-	map(0x9400, 0x9400).portr("P2").w(this, FUNC(progolf_state::scrollx_lo_w)); //p2 inputs
-	map(0x9600, 0x9600).portr("IN0").w(this, FUNC(progolf_state::flip_screen_w));   /* VBLANK */
+	map(0x6000, 0x7fff).ram().w(FUNC(progolf_state::charram_w)).share("fbram");
+	map(0x8000, 0x8fff).rw(FUNC(progolf_state::videoram_r), FUNC(progolf_state::videoram_w)).share("videoram");
+	map(0x9000, 0x9000).portr("IN2").w(FUNC(progolf_state::char_vregs_w));
+	map(0x9200, 0x9200).portr("P1").w(FUNC(progolf_state::scrollx_hi_w)); //p1 inputs
+	map(0x9400, 0x9400).portr("P2").w(FUNC(progolf_state::scrollx_lo_w)); //p2 inputs
+	map(0x9600, 0x9600).portr("IN0").w(FUNC(progolf_state::flip_screen_w));   /* VBLANK */
 	map(0x9800, 0x9800).portr("DSW1");
 	map(0x9800, 0x9800).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x9801, 0x9801).w("crtc", FUNC(mc6845_device::register_w));
 	map(0x9a00, 0x9a00).portr("DSW2").w("soundlatch", FUNC(generic_latch_8_device::write));
-//  AM_RANGE(0x9e00, 0x9e00) AM_WRITENOP
+//  map(0x9e00, 0x9e00).nopw();
 	map(0xb000, 0xffff).rom();
 }
 
@@ -381,87 +385,85 @@ static const gfx_layout charlayout =
 	8*8     /* every char takes 8 consecutive bytes */
 };
 
-static GFXDECODE_START( progolf )
+static GFXDECODE_START( gfx_progolf )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout, 0, 8 ) /* sprites */
 GFXDECODE_END
 
 
-PALETTE_INIT_MEMBER(progolf_state, progolf)
+void progolf_state::progolf_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
 
-	for (i = 0;i < m_palette->entries();i++)
+	for (int i = 0; i < palette.entries(); i++)
 	{
-		int bit0,bit1,bit2,r,g,b;
+		int bit0, bit1, bit2;
 
-		/* red component */
-		bit0 = (color_prom[i] >> 0) & 0x01;
-		bit1 = (color_prom[i] >> 1) & 0x01;
-		bit2 = (color_prom[i] >> 2) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		/* green component */
-		bit0 = (color_prom[i] >> 3) & 0x01;
-		bit1 = (color_prom[i] >> 4) & 0x01;
-		bit2 = (color_prom[i] >> 5) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		/* blue component */
+		// red component
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		bit2 = BIT(color_prom[i], 2);
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		// green component
+		bit0 = BIT(color_prom[i], 3);
+		bit1 = BIT(color_prom[i], 4);
+		bit2 = BIT(color_prom[i], 5);
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		// blue component
 		bit0 = 0;
-		bit1 = (color_prom[i] >> 6) & 0x01;
-		bit2 = (color_prom[i] >> 7) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit1 = BIT(color_prom[i], 6);
+		bit2 = BIT(color_prom[i], 7);
+		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		m_palette->set_pen_color(i,rgb_t(r,g,b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
-MACHINE_CONFIG_START(progolf_state::progolf)
+void progolf_state::progolf(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", DECO_222, 3000000/2) /* guess, 3 Mhz makes the game to behave worse? */
-	MCFG_CPU_PROGRAM_MAP(main_cpu)
+	DECO_222(config, m_maincpu, 3000000/2); /* guess, 3 Mhz makes the game to behave worse? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &progolf_state::main_cpu);
 
-	MCFG_CPU_ADD("audiocpu", M6502, 500000)
-	MCFG_CPU_PROGRAM_MAP(sound_cpu)
+	M6502(config, m_audiocpu, 500000);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &progolf_state::sound_cpu);
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.set_perfect_quantum(m_maincpu);
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	generic_latch_8_device &soundlatch(GENERIC_LATCH_8(config, "soundlatch"));
+	soundlatch.data_pending_callback().set_inputline(m_audiocpu, 0);
+	soundlatch.set_separate_acknowledge(true);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(3072))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(progolf_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(57);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(3072));
+	screen.set_size(256, 256);
+	screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);
+	screen.set_screen_update(FUNC(progolf_state::screen_update));
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", progolf)
-	MCFG_PALETTE_ADD("palette", 32*3)
-	MCFG_PALETTE_INIT_OWNER(progolf_state, progolf)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_progolf);
+	PALETTE(config, m_palette, FUNC(progolf_state::progolf_palette), 32 * 3);
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 3000000/4) /* hand tuned to get ~57 fps */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
+	mc6845_device &crtc(MC6845(config, "crtc", 3000000/4)); /* hand tuned to get ~57 fps */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ay1", AY8910, 12000000/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
+	AY8910(config, "ay1", 12000000/8).add_route(ALL_OUTPUTS, "mono", 0.23);
 
-	MCFG_SOUND_ADD("ay2", AY8910, 12000000/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
-MACHINE_CONFIG_END
+	AY8910(config, "ay2", 12000000/8).add_route(ALL_OUTPUTS, "mono", 0.23);
+}
 
-MACHINE_CONFIG_START(progolf_state::progolfa)
+void progolf_state::progolfa(machine_config &config)
+{
 	progolf(config);
-	MCFG_DEVICE_REMOVE("maincpu") /* different encrypted cpu to progolf */
-	MCFG_CPU_ADD("maincpu", DECO_CPU6, 3000000/2) /* guess, 3 Mhz makes the game to behave worse? */
-	MCFG_CPU_PROGRAM_MAP(main_cpu)
-MACHINE_CONFIG_END
+	/* different encrypted cpu to progolf */
+	DECO_CPU6(config.replace(), m_maincpu, 3000000/2); /* guess, 3 Mhz makes the game to behave worse? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &progolf_state::main_cpu);
+}
 
 
 ROM_START( progolf )
@@ -513,6 +515,6 @@ ROM_END
 
 
 // this uses DECO222 style encryption
-GAME( 1981, progolf,  0,       progolf,  progolf, progolf_state, 0,       ROT270, "Data East Corporation", "18 Holes Pro Golf (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, progolf,  0,       progolf,  progolf, progolf_state, empty_init, ROT270, "Data East Corporation", "18 Holes Pro Golf (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 // this uses DECO CPU-6 as custom module CPU (the same as Zoar, are we sure? our Zoar has different encryption, CPU-7 style)
-GAME( 1981, progolfa, progolf, progolfa, progolf, progolf_state, 0,       ROT270, "Data East Corporation", "18 Holes Pro Golf (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, progolfa, progolf, progolfa, progolf, progolf_state, empty_init, ROT270, "Data East Corporation", "18 Holes Pro Golf (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

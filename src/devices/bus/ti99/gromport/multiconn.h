@@ -24,11 +24,11 @@ public:
 	ti99_multi_cart_conn_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ8Z_MEMBER(readz) override;
-	DECLARE_WRITE8_MEMBER(write) override;
+	void write(offs_t offset, uint8_t data) override;
 	DECLARE_READ8Z_MEMBER(crureadz) override;
-	DECLARE_WRITE8_MEMBER(cruwrite) override;
+	void cruwrite(offs_t offset, uint8_t data) override;
 	DECLARE_WRITE_LINE_MEMBER(romgq_line) override;
-	DECLARE_WRITE8_MEMBER(set_gromlines) override;
+	void set_gromlines(line_state mline, line_state moline, line_state gsq) override;
 	DECLARE_WRITE_LINE_MEMBER(gclock_in) override;
 
 	void insert(int index, ti99_cartridge_device* cart) override;

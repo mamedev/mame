@@ -26,6 +26,7 @@
 #include "bus/rs232/rs232.h"
 #include "machine/keyboard.h"
 
+#include "emupal.h"
 #include "screen.h"
 
 
@@ -52,7 +53,7 @@ public:
 
 	void att4425(machine_config &config);
 
-protected:
+private:
 	DECLARE_WRITE8_MEMBER(port10_w);
 	DECLARE_WRITE8_MEMBER(port14_w);
 	DECLARE_READ8_MEMBER(port14_r);
@@ -68,7 +69,6 @@ protected:
 	void att4425_io(address_map &map);
 	void att4425_mem(address_map &map);
 
-private:
 	required_device<z80_device> m_maincpu;
 	required_device<i8251_device> m_i8251;
 	required_device<z80sio_device> m_sio;
@@ -110,11 +110,10 @@ void att4425_state::att4425_mem(address_map &map)
 void att4425_state::att4425_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).rw(m_i8251, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x01, 0x01).rw(m_i8251, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x10, 0x10).w(this, FUNC(att4425_state::port10_w));
-	map(0x14, 0x14).rw(this, FUNC(att4425_state::port14_r), FUNC(att4425_state::port14_w));
-	map(0x15, 0x15).r(this, FUNC(att4425_state::port15_r));
+	map(0x00, 0x01).rw(m_i8251, FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x10, 0x10).w(FUNC(att4425_state::port10_w));
+	map(0x14, 0x14).rw(FUNC(att4425_state::port14_r), FUNC(att4425_state::port14_w));
+	map(0x15, 0x15).r(FUNC(att4425_state::port15_r));
 	map(0x18, 0x1b).rw(Z80CTC_TAG, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x1c, 0x1f).rw(m_sio, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
 }
@@ -178,18 +177,13 @@ uint32_t att4425_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 					gfx ^= 255;
 
 				/* Display a scanline of a character */
-				*p++ = BIT(gfx, 7) ? fg : bg;
-				*p++ = BIT(gfx, 6) ? fg : bg;
-				*p++ = BIT(gfx, 5) ? fg : bg;
-				*p++ = BIT(gfx, 4) ? fg : bg;
-				*p++ = BIT(gfx, 3) ? fg : bg;
-				*p++ = BIT(gfx, 2) ? fg : bg;
-				*p++ = BIT(gfx, 1) ? fg : bg;
-				*p++ = BIT(gfx, 0) ? fg : bg;
+				for (int i = 7; i >= 0; i--)
+				{
+					*p++ = BIT(gfx, i) ? fg : bg;
+				}
 				*p++ = bg;
 			}
 		}
-		ma += 160;
 	}
 	return 0;
 }
@@ -205,7 +199,7 @@ static const gfx_layout att4425_charlayout =
 	16*8
 };
 
-static GFXDECODE_START( att4425 )
+static GFXDECODE_START( gfx_att4425 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, att4425_charlayout, 0, 1 )
 GFXDECODE_END
 
@@ -238,72 +232,71 @@ static const z80_daisy_config att4425_daisy_chain[] =
 	{ nullptr }
 };
 
-MACHINE_CONFIG_START(att4425_state::att4425)
+void att4425_state::att4425(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(32'000'000)/8) // XXX
-	MCFG_CPU_PROGRAM_MAP(att4425_mem)
-	MCFG_CPU_IO_MAP(att4425_io)
-	MCFG_Z80_DAISY_CHAIN(att4425_daisy_chain)
+	Z80(config, m_maincpu, XTAL(32'000'000)/8); // XXX
+	m_maincpu->set_addrmap(AS_PROGRAM, &att4425_state::att4425_mem);
+	m_maincpu->set_addrmap(AS_IO, &att4425_state::att4425_io);
+	m_maincpu->set_daisy_config(att4425_daisy_chain);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(att4425_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_SIZE(720, 351)
-	MCFG_SCREEN_VISIBLE_AREA(0, 720-1, 0, 351-1)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", att4425)
-	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER, rgb_t::green());
+	m_screen->set_refresh_hz(50);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_screen_update(FUNC(att4425_state::screen_update));
+	m_screen->set_palette("palette");
+	m_screen->set_size(720, 351);
+	m_screen->set_visarea(0, 720-1, 0, 351-1);
+	GFXDECODE(config, "gfxdecode", "palette", gfx_att4425);
+	PALETTE(config, "palette", palette_device::MONOCHROME_HIGHLIGHT);
 
 	// ch.3 -- timer?
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL(32'000'000)) // XXX
-	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
+	z80ctc_device& ctc(Z80CTC(config, Z80CTC_TAG, XTAL(32'000'000))); // XXX;
+	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 #ifdef notdef
-	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE(Z80SIO_TAG, z80sio_device, rxca_w))
-	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(Z80SIO_TAG, z80sio_device, txca_w))
-	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE(Z80SIO_TAG, z80sio_device, rxtxcb_w))
+	ctc.zc_callback<0>().set(m_sio, FUNC(z80sio_device::rxca_w));
+	ctc.zc_callback<0>().append(m_sio, FUNC(z80sio_device::txca_w));
+	ctc.zc_callback<2>().set(m_sio, FUNC(z80sio_device::rxtxcb_w));
 #endif
 
-	MCFG_DEVICE_ADD(Z80SIO_TAG, Z80SIO, 4800) // XXX
-	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
-	MCFG_Z80SIO_OUT_RTSA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
-	MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE(RS232_B_TAG, rs232_port_device, write_txd))
+	Z80SIO(config, m_sio, 4800); // XXX
+	m_sio->out_int_callback().set_inputline(Z80_TAG, INPUT_LINE_IRQ0);
+	m_sio->out_txda_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_txd));
+	m_sio->out_dtra_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_dtr));
+	m_sio->out_rtsa_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_rts));
+	m_sio->out_txdb_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_txd));
 
 	// host
-	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, "null_modem")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(Z80SIO_TAG, z80sio_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(Z80SIO_TAG, z80sio_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(Z80SIO_TAG, z80sio_device, ctsa_w))
+	rs232_port_device &rs232a(RS232_PORT(config, RS232_A_TAG, default_rs232_devices, "null_modem"));
+	rs232a.rxd_handler().set(m_sio, FUNC(z80sio_device::rxa_w));
+	rs232a.dcd_handler().set(m_sio, FUNC(z80sio_device::dcda_w));
+	rs232a.cts_handler().set(m_sio, FUNC(z80sio_device::ctsa_w));
 
 	// aux printer?
-	MCFG_RS232_PORT_ADD(RS232_B_TAG, default_rs232_devices, "printer")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(Z80SIO_TAG, z80sio_device, rxb_w))
+	rs232_port_device &rs232b(RS232_PORT(config, RS232_B_TAG, default_rs232_devices, "printer"));
+	rs232b.rxd_handler().set(m_sio, FUNC(z80sio_device::rxb_w));
 
 	// XXX
-	MCFG_DEVICE_ADD("line_clock", CLOCK, 9600*64)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(att4425_state, write_line_clock))
+	clock_device &line_clock(CLOCK(config, "line_clock", 9600*64));
+	line_clock.signal_handler().set(FUNC(att4425_state::write_line_clock));
 
-	MCFG_DEVICE_ADD(I8251_TAG, I8251, 0)
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	I8251(config, m_i8251, 0);
+	m_i8251->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_i8251->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
+	m_i8251->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "keyboard")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_cts))
-	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_dsr))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "keyboard"));
+	rs232.rxd_handler().set(m_i8251, FUNC(i8251_device::write_rxd));
+	rs232.cts_handler().set(m_i8251, FUNC(i8251_device::write_cts));
+	rs232.dsr_handler().set(m_i8251, FUNC(i8251_device::write_dsr));
 
 	// XXX
-	MCFG_DEVICE_ADD("keyboard_clock", CLOCK, 4800*64)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(att4425_state, write_keyboard_clock))
+	clock_device &keyboard_clock(CLOCK(config, "keyboard_clock", 4800*64));
+	keyboard_clock.signal_handler().set(FUNC(att4425_state::write_keyboard_clock));
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("32K")
-	MCFG_RAM_DEFAULT_VALUE(0)
-MACHINE_CONFIG_END
+	RAM(config, RAM_TAG).set_default_size("32K").set_default_value(0);
+}
 
 /* ROMs */
 
@@ -320,5 +313,5 @@ ROM_END
 
 /* System Drivers */
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE    INPUT    STATE          INIT  COMPANY      FULLNAME           FLAGS
-COMP( 1983, att4425,  0,      0,      att4425,   att4425, att4425_state, 0,    "AT&T", "AT&T Teletype 4425", MACHINE_IS_SKELETON )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY  FULLNAME              FLAGS
+COMP( 1983, att4425, 0,      0,      att4425, att4425, att4425_state, empty_init, "AT&T",  "AT&T Teletype 4425", MACHINE_IS_SKELETON )

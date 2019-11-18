@@ -141,21 +141,18 @@ public:
 	{
 	}
 
+	void monacogp(machine_config &config);
+
+private:
 	// devices
 	required_device<netlist_mame_device> m_maincpu;
 	required_device<fixedfreq_device> m_video;
-
-	void monacogp(machine_config &config);
-protected:
 
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	virtual void video_start() override;
-
-private:
-
 };
 
 
@@ -186,20 +183,20 @@ void monacogp_state::video_start()
 {
 }
 
-MACHINE_CONFIG_START(monacogp_state::monacogp)
-
+void monacogp_state::monacogp(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)
-	MCFG_NETLIST_SETUP(monacogp)
+	NETLIST_CPU(config, m_maincpu, NETLIST_CLOCK).set_source(netlist_monacogp);
 
 	/* video hardware */
-	MCFG_FIXFREQ_ADD("fixfreq", "screen")
-	MCFG_FIXFREQ_MONITOR_CLOCK(MASTER_CLOCK)
-	MCFG_FIXFREQ_HORZ_PARAMS(H_TOTAL-67,H_TOTAL-40,H_TOTAL-8,H_TOTAL)
-	MCFG_FIXFREQ_VERT_PARAMS(V_TOTAL-22,V_TOTAL-19,V_TOTAL-12,V_TOTAL)
-	MCFG_FIXFREQ_FIELDCOUNT(1)
-	MCFG_FIXFREQ_SYNC_THRESHOLD(0.30)
-MACHINE_CONFIG_END
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	FIXFREQ(config, m_video).set_screen("screen");
+	m_video->set_monitor_clock(MASTER_CLOCK);
+	m_video->set_horz_params(H_TOTAL-67,H_TOTAL-40,H_TOTAL-8,H_TOTAL);
+	m_video->set_vert_params(V_TOTAL-22,V_TOTAL-19,V_TOTAL-12,V_TOTAL);
+	m_video->set_fieldcount(1);
+	m_video->set_threshold(0.30);
+}
 
 
 /***************************************************************************
@@ -270,5 +267,5 @@ ROM_END
 
 
 
-GAME( 1980, monacogp,  0,         monacogp, 0, monacogp_state,  0, ROT0, "Sega", "Monaco GP (Set 1) [TTL]", MACHINE_IS_SKELETON )
-GAME( 1980, monacogpa, monacogp,  monacogp, 0, monacogp_state,  0, ROT0, "Sega", "Monaco GP (Set 2) [TTL]", MACHINE_IS_SKELETON )
+GAME( 1980, monacogp,  0,         monacogp, 0, monacogp_state, empty_init, ROT0, "Sega", "Monaco GP (set 1) [TTL]", MACHINE_IS_SKELETON )
+GAME( 1980, monacogpa, monacogp,  monacogp, 0, monacogp_state, empty_init, ROT0, "Sega", "Monaco GP (set 2) [TTL]", MACHINE_IS_SKELETON )

@@ -116,7 +116,7 @@ void t10mmc::ExecCommand()
 	switch ( command[0] )
 	{
 	case T10SPC_CMD_INQUIRY:
-		m_device->logerror("T10MMC: INQUIRY\n");
+		//m_device->logerror("T10MMC: INQUIRY\n");
 		m_phase = SCSI_PHASE_DATAIN;
 		m_status_code = SCSI_STATUS_CODE_GOOD;
 		m_transfer_length = SCSILengthFromUINT8( &command[ 4 ] );
@@ -125,7 +125,7 @@ void t10mmc::ExecCommand()
 		break;
 
 	case T10SPC_CMD_MODE_SELECT_6:
-		m_device->logerror("T10MMC: MODE SELECT(6) length %x control %x\n", command[4], command[5]);
+		//m_device->logerror("T10MMC: MODE SELECT(6) length %x control %x\n", command[4], command[5]);
 		m_phase = SCSI_PHASE_DATAOUT;
 		m_status_code = SCSI_STATUS_CODE_GOOD;
 		m_transfer_length = SCSILengthFromUINT8( &command[ 4 ] );
@@ -160,7 +160,7 @@ void t10mmc::ExecCommand()
 		m_lba = command[2]<<24 | command[3]<<16 | command[4]<<8 | command[5];
 		m_blocks = SCSILengthFromUINT16( &command[7] );
 
-		m_device->logerror("T10MMC: READ(10) at LBA %x for %d blocks (%d bytes)\n", m_lba, m_blocks, m_blocks * m_sector_bytes);
+		//m_device->logerror("T10MMC: READ(10) at LBA %x for %d blocks (%d bytes)\n", m_lba, m_blocks, m_blocks * m_sector_bytes);
 
 		if (m_num_subblocks > 1)
 		{
@@ -234,7 +234,7 @@ void t10mmc::ExecCommand()
 			m_device->logerror("T10MMC: play audio from current not implemented!\n");
 		}
 
-		m_device->logerror("T10MMC: PLAY AUDIO(10) at LBA %x for %x blocks\n", m_lba, m_blocks);
+		//m_device->logerror("T10MMC: PLAY AUDIO(10) at LBA %x for %x blocks\n", m_lba, m_blocks);
 
 		trk = cdrom_get_track(m_cdrom, m_lba);
 
@@ -268,8 +268,8 @@ void t10mmc::ExecCommand()
 			m_device->logerror("T10MMC: play audio from current not implemented!\n");
 		}
 
-		m_device->logerror("T10MMC: PLAY AUDIO MSF at LBA %x for %x blocks (MSF %i:%i:%i - %i:%i:%i)\n",
-			m_lba, m_blocks, command[3], command[4], command[5], command[6], command[7], command[8]);
+		//m_device->logerror("T10MMC: PLAY AUDIO MSF at LBA %x for %x blocks (MSF %i:%i:%i - %i:%i:%i)\n",
+			//m_lba, m_blocks, command[3], command[4], command[5], command[6], command[7], command[8]);
 
 		trk = cdrom_get_track(m_cdrom, m_lba);
 
@@ -300,7 +300,7 @@ void t10mmc::ExecCommand()
 		{
 			// be careful: tracks here are zero-based, but the SCSI command
 			// uses the real CD track number which is 1-based!
-			m_device->logerror("T10MMC: PLAY AUDIO T/I: strk %d idx %d etrk %d idx %d frames %d\n", command[4], command[5], command[7], command[8], m_blocks);
+			//m_device->logerror("T10MMC: PLAY AUDIO T/I: strk %d idx %d etrk %d idx %d frames %d\n", command[4], command[5], command[7], command[8], m_blocks);
 			int end_track = cdrom_get_last_track(m_cdrom);
 			if (end_track > command[7])
 				end_track = command[7];
@@ -341,7 +341,7 @@ void t10mmc::ExecCommand()
 			m_cdda->pause_audio((command[8] & 0x01) ^ 0x01);
 		}
 
-		m_device->logerror("T10MMC: PAUSE/RESUME: %s\n", command[8]&1 ? "RESUME" : "PAUSE");
+		//m_device->logerror("T10MMC: PAUSE/RESUME: %s\n", command[8]&1 ? "RESUME" : "PAUSE");
 		m_phase = SCSI_PHASE_STATUS;
 		m_status_code = SCSI_STATUS_CODE_GOOD;
 		m_transfer_length = 0;
@@ -350,14 +350,14 @@ void t10mmc::ExecCommand()
 	case T10MMC_CMD_STOP_PLAY_SCAN:
 		abort_audio();
 
-		m_device->logerror("T10MMC: STOP_PLAY_SCAN\n");
+		//m_device->logerror("T10MMC: STOP_PLAY_SCAN\n");
 		m_phase = SCSI_PHASE_STATUS;
 		m_status_code = SCSI_STATUS_CODE_GOOD;
 		m_transfer_length = 0;
 		break;
 
 	case T10SPC_CMD_MODE_SELECT_10:
-		m_device->logerror("T10MMC: MODE SELECT length %x control %x\n", command[7]<<8 | command[8], command[1]);
+		//m_device->logerror("T10MMC: MODE SELECT length %x control %x\n", command[7]<<8 | command[8], command[1]);
 		m_phase = SCSI_PHASE_DATAOUT;
 		m_status_code = SCSI_STATUS_CODE_GOOD;
 		m_transfer_length = SCSILengthFromUINT16( &command[ 7 ] );
@@ -383,7 +383,7 @@ void t10mmc::ExecCommand()
 			m_device->logerror("T10MMC: play audio from current not implemented!\n");
 		}
 
-		m_device->logerror("T10MMC: PLAY AUDIO(12) at LBA %x for %x blocks\n", m_lba, m_blocks);
+		//m_device->logerror("T10MMC: PLAY AUDIO(12) at LBA %x for %x blocks\n", m_lba, m_blocks);
 
 		trk = cdrom_get_track(m_cdrom, m_lba);
 
@@ -407,7 +407,7 @@ void t10mmc::ExecCommand()
 		m_lba = command[2]<<24 | command[3]<<16 | command[4]<<8 | command[5];
 		m_blocks = command[7]<<16 | command[8]<<8 | command[9];
 
-		m_device->logerror("T10MMC: READ(12) at LBA %x for %x blocks (%x bytes)\n", m_lba, m_blocks, m_blocks * m_sector_bytes);
+		//m_device->logerror("T10MMC: READ(12) at LBA %x for %x blocks (%x bytes)\n", m_lba, m_blocks, m_blocks * m_sector_bytes);
 
 		if (m_num_subblocks > 1)
 		{
@@ -482,7 +482,7 @@ void t10mmc::ReadData( uint8_t *data, int dataLength )
 
 	case T10SBC_CMD_READ_10:
 	case T10SBC_CMD_READ_12:
-		m_device->logerror("T10MMC: read %x dataLength, \n", dataLength);
+		//m_device->logerror("T10MMC: read %x dataLength, \n", dataLength);
 		if ((m_cdrom) && (m_blocks))
 		{
 			while (dataLength > 0)
@@ -492,7 +492,7 @@ void t10mmc::ReadData( uint8_t *data, int dataLength )
 					m_device->logerror("T10MMC: CD read error!\n");
 				}
 
-				m_device->logerror("True LBA: %d, buffer half: %d\n", m_lba, m_cur_subblock * m_sector_bytes);
+				//m_device->logerror("True LBA: %d, buffer half: %d\n", m_lba, m_cur_subblock * m_sector_bytes);
 
 				memcpy(data, &tmp_buffer[m_cur_subblock * m_sector_bytes], m_sector_bytes);
 
@@ -713,6 +713,7 @@ void t10mmc::ReadData( uint8_t *data, int dataLength )
 		switch (command[2] & 0x3f)
 		{
 			case 0xe:   // CD Audio control page
+				data[1] = 0x0e;
 				data[0] = 0x8e; // page E, parameter is savable
 				data[1] = 0x0e; // page length
 				data[2] = (1 << 2) | (m_sotc << 1); // IMMED = 1
@@ -728,6 +729,7 @@ void t10mmc::ReadData( uint8_t *data, int dataLength )
 				data[9] = data[11] = data[13] = data[15] = 0xff;
 				break;
 			case 0x2a:  // Page capabilities
+				data[1] = 0x14;
 				data[0] = 0x2a;
 				data[1] = 0x14; // page length
 				data[2] = 0x00; data[3] = 0x00; // CD-R only
@@ -736,8 +738,7 @@ void t10mmc::ReadData( uint8_t *data, int dataLength )
 				data[6] = 0;
 				data[7] = 0;
 				data[8] = 0x02; data[9] = 0xc0; // 4x speed
-				data[10] = 0;
-				data[11] = 2; // two volumen levels
+				data[10] = 0x01; data[11] = 0x00; // 256 volume levels supported
 				data[12] = 0x00; data[13] = 0x00; // buffer
 				data[14] = 0x02; data[15] = 0xc0; // 4x read speed
 				data[16] = 0;
@@ -795,6 +796,8 @@ void t10mmc::WriteData( uint8_t *data, int dataLength )
 				m_device->logerror("Ch 1 route: %x vol: %x\n", data[10], data[11]);
 				m_device->logerror("Ch 2 route: %x vol: %x\n", data[12], data[13]);
 				m_device->logerror("Ch 3 route: %x vol: %x\n", data[14], data[15]);
+				m_cdda->set_output_gain(0, data[17] / 255.0f);
+				m_cdda->set_output_gain(1, data[19] / 255.0f);
 				break;
 		}
 		break;

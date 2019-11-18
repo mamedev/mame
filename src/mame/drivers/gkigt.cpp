@@ -86,7 +86,7 @@ PCB board that connects to 044 boards via J6 & J7
     or 039 EPROM + SIMM software
 
 More chips (from eBay auction):
-    2x Phillips / NXT 28C94 quad UART (8 serial channels total)
+    2x Philips / NXT 28C94 quad UART (8 serial channels total)
     ADV476 256 color RAMDAC
 */
 
@@ -97,6 +97,7 @@ More chips (from eBay auction):
 #include "video/ramdac.h"
 #include "sound/ymz280b.h"
 #include "bus/rs232/rs232.h"
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -113,7 +114,10 @@ public:
 		m_quart1(*this, "quart1")
 	{ }
 
+	void igt_gameking(machine_config &config);
+	void igt_ms72c(machine_config &config);
 
+private:
 	virtual void video_start() override;
 	uint32_t screen_update_igt_gameking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -137,12 +141,10 @@ public:
 	DECLARE_READ8_MEMBER(timer_r);
 	DECLARE_READ16_MEMBER(version_r);
 
-	void igt_gameking(machine_config &config);
-	void igt_ms72c(machine_config &config);
 	void igt_gameking_map(address_map &map);
 	void igt_ms72c_map(address_map &map);
 	void ramdac_map(address_map &map);
-private:
+
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
@@ -247,26 +249,26 @@ void igt_gameking_state::igt_gameking_map(address_map &map)
 	// 28060000: COLOR SEL
 	// 28070000: OUT SEL
 //  map(0x28010000, 0x2801007f).rw("quart1", FUNC(sc28c94_device::read), FUNC(sc28c94_device::write)).umask32(0x00ff00ff);
-	map(0x28010008, 0x2801000b).r(this, FUNC(igt_gameking_state::uart_status_r));
+	map(0x28010008, 0x2801000b).r(FUNC(igt_gameking_state::uart_status_r));
 	map(0x2801001c, 0x2801001f).nopw();
-	map(0x28010030, 0x28010033).r(this, FUNC(igt_gameking_state::uart_status_r)); // channel D
-	map(0x28010034, 0x28010037).w(this, FUNC(igt_gameking_state::uart_w));       // channel D
+	map(0x28010030, 0x28010033).r(FUNC(igt_gameking_state::uart_status_r)); // channel D
+	map(0x28010034, 0x28010037).w(FUNC(igt_gameking_state::uart_w));       // channel D
 	map(0x28020000, 0x280205ff).ram(); // CMOS?
-//  map(0x28020000, 0x2802007f).r(this, FUNC(igt_gameking_state::igt_gk_28010008_r)).nopw();
+//  map(0x28020000, 0x2802007f).r(FUNC(igt_gameking_state::igt_gk_28010008_r)).nopw();
 	map(0x28030000, 0x28030003).portr("IN0");
 //  map(0x28040000, 0x2804007f).rw("quart2", FUNC(sc28c94_device::read), FUNC(sc28c94_device::write)).umask32(0x00ff00ff);
-	map(0x2804000a, 0x2804000a).w(this, FUNC(igt_gameking_state::unk_w));
-	map(0x28040008, 0x28040008).rw(this, FUNC(igt_gameking_state::irq_vector_r), FUNC(igt_gameking_state::irq_enable_w));
+	map(0x2804000a, 0x2804000a).w(FUNC(igt_gameking_state::unk_w));
+	map(0x28040008, 0x28040008).rw(FUNC(igt_gameking_state::irq_vector_r), FUNC(igt_gameking_state::irq_enable_w));
 	map(0x28040018, 0x2804001b).portr("IN1").nopw();
 	map(0x2804001c, 0x2804001f).portr("IN4").nopw();
 	map(0x28040028, 0x2804002b).nopr();
-	map(0x2804002a, 0x2804002a).w(this, FUNC(igt_gameking_state::irq_ack_w));
-//  map(0x28040038, 0x2804003b).r(this, FUNC(igt_gameking_state::timer_r)).umask32(0x00ff0000);
+	map(0x2804002a, 0x2804002a).w(FUNC(igt_gameking_state::irq_ack_w));
+//  map(0x28040038, 0x2804003b).r(FUNC(igt_gameking_state::timer_r)).umask32(0x00ff0000);
 	map(0x28040038, 0x2804003b).portr("IN2").nopw();
 	map(0x2804003c, 0x2804003f).portr("IN3").nopw();
-	map(0x28040050, 0x28040050).r(this, FUNC(igt_gameking_state::frame_number_r));
+	map(0x28040050, 0x28040050).r(FUNC(igt_gameking_state::frame_number_r));
 	map(0x28040054, 0x28040057).nopw();
-//  map(0x28040054, 0x28040057).w(this, FUNC(igt_gameking_state::irq_ack_w).umask32(0x000000ff);
+//  map(0x28040054, 0x28040057).w(FUNC(igt_gameking_state::irq_ack_w).umask32(0x000000ff);
 
 	map(0x28050000, 0x28050003).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask32(0x00ff00ff);
 	map(0x28060000, 0x28060000).w("ramdac", FUNC(ramdac_device::index_w));
@@ -293,8 +295,8 @@ READ8_MEMBER(igt_gameking_state::timer_r)
 void igt_gameking_state::igt_ms72c_map(address_map &map)
 {
 	igt_gameking_map(map);
-	map(0x18200000, 0x18200001).r(this, FUNC(igt_gameking_state::version_r));
-	map(0x2804003a, 0x2804003a).r(this, FUNC(igt_gameking_state::timer_r));
+	map(0x18200000, 0x18200001).r(FUNC(igt_gameking_state::version_r));
+	map(0x2804003a, 0x2804003a).r(FUNC(igt_gameking_state::timer_r));
 }
 
 static INPUT_PORTS_START( igt_gameking )
@@ -567,7 +569,7 @@ static const gfx_layout igt_gameking_layout =
 };
 
 
-static GFXDECODE_START( igt_gameking )
+static GFXDECODE_START( gfx_igt_gameking )
 	GFXDECODE_ENTRY( "cg", 0, igt_gameking_layout,   0x0, 1  )
 GFXDECODE_END
 
@@ -605,52 +607,52 @@ static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
 DEVICE_INPUT_DEFAULTS_END
 
-MACHINE_CONFIG_START(igt_gameking_state::igt_gameking)
-
+void igt_gameking_state::igt_gameking(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I960, XTAL(24'000'000))
-	MCFG_CPU_PROGRAM_MAP(igt_gameking_map)
+	I960(config, m_maincpu, XTAL(24'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &igt_gameking_state::igt_gameking_map);
 
-	MCFG_SC28C94_ADD("quart1", XTAL(24'000'000) / 6)
-	MCFG_SC28C94_D_TX_CALLBACK(DEVWRITELINE("diag", rs232_port_device, write_txd))
+	SC28C94(config, m_quart1, XTAL(24'000'000) / 6);
+	m_quart1->d_tx_cb().set("diag", FUNC(rs232_port_device::write_txd));
 
-	MCFG_SC28C94_ADD("quart2", XTAL(24'000'000) / 6)
-	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", I960_IRQ0))
+	sc28c94_device &quart2(SC28C94(config, "quart2", XTAL(24'000'000) / 6));
+	quart2.irq_cb().set_inputline(m_maincpu, I960_IRQ0);
 
-	MCFG_RS232_PORT_ADD("diag", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("quart1", sc28c94_device, rx_d_w))
-	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	rs232_port_device &diag(RS232_PORT(config, "diag", default_rs232_devices, nullptr));
+	diag.rxd_handler().set("quart1", FUNC(sc28c94_device::rx_d_w));
+	diag.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", igt_gameking)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_igt_gameking);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(1024, 512)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_DRIVER(igt_gameking_state, screen_update_igt_gameking)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(igt_gameking_state, vblank_irq))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(1024, 512);
+	m_screen->set_visarea(0, 640-1, 0, 480-1);
+	m_screen->set_screen_update(FUNC(igt_gameking_state::screen_update_igt_gameking));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(igt_gameking_state::vblank_irq));
 	// Xilinx used as video chip XTAL(26'666'666) on board
 
-	MCFG_PALETTE_ADD("palette", 0x100)
+	PALETTE(config, m_palette).set_entries(0x100);
 
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
+	ramdac.set_addrmap(0, &igt_gameking_state::ramdac_map);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL(16'934'400)) // enhanced sound on optional Media-Lite sub board
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	YMZ280B(config, "ymz", XTAL(16'934'400)).add_route(ALL_OUTPUTS, "mono", 1.0); // enhanced sound on optional Media-Lite sub board
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
-MACHINE_CONFIG_END
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
+}
 
-MACHINE_CONFIG_START(igt_gameking_state::igt_ms72c)
+void igt_gameking_state::igt_ms72c(machine_config &config)
+{
 	igt_gameking(config);
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(igt_ms72c_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &igt_gameking_state::igt_ms72c_map);
+}
 
 ROM_START( ms3 )
 	ROM_REGION( 0x80000, "maincpu", 0 )
@@ -664,11 +666,11 @@ ROM_START( ms3 )
 	ROM_LOAD16_BYTE( "1g5032ax.u48", 0x000000, 0x040000, CRC(aba6002f) SHA1(2ed51aa8bbc1e703cd63f633d745dfa4fa7f3dd0) )
 	ROM_LOAD16_BYTE( "1g5032ax.u47", 0x000001, 0x040000, CRC(605a71ec) SHA1(13fe64c611c0903a7b79d8680de3ac81f3226a67) )
 
-	ROM_REGION( 0x200000, "plx", 0 )
+	ROM_REGION32_LE( 0x200000, "plx", 0 )
 	ROM_LOAD16_BYTE( "1g5032ax.u20", 0x000000, 0x100000, CRC(517e7478) SHA1(316a8e48ad6502f9508b06f900555d53ef40b464) )
 	ROM_LOAD16_BYTE( "1g5032ax.u4",  0x000001, 0x100000, CRC(e67c878f) SHA1(b03f8d28924351e96bb9f24d32f0e4a40a51910c) )
 
-	ROM_REGION( 0x200000, "snd", 0 )
+	ROM_REGION32_LE( 0x200000, "snd", 0 )
 	ROM_LOAD( "1h5053xx.u6",  0x000000, 0x080000, CRC(6735c65a) SHA1(198cacec5441aa615c0de63a0b4e47265636bcee) )
 
 	ROM_REGION( 0x20000, "nvram", 0 )
@@ -687,11 +689,11 @@ ROM_START( ms72c )
 	ROM_LOAD16_BYTE( "1g5019fa multistar 7 pub.u48", 0x000000, 0x80000, CRC(ac50a155) SHA1(50d07ba5ca176c97adde169fda6e6385c8ec8299) )
 	ROM_LOAD16_BYTE( "1g5019fa multistar 7 pub.u47", 0x000001, 0x80000, CRC(5fee078b) SHA1(a41591d14fbc12c68d773fbd1ac340d9427d68e9) )
 
-	ROM_REGION( 0x200000, "plx", 0 )
+	ROM_REGION32_LE( 0x200000, "plx", 0 )
 	ROM_LOAD16_BYTE( "1g5019fa multistar 7 pub.u20", 0x000000, 0x100000, CRC(806ec7d4) SHA1(b9263f942b3d7101797bf87ad18cfddac9582791) )
 	ROM_LOAD16_BYTE( "1g5019fa multistar 7 pub.u4",  0x000001, 0x100000, CRC(2e1e9c8a) SHA1(b6992f013f43debf43f4704396fc71e88449e365) )
 
-	ROM_REGION( 0x200000, "snd", 0 )
+	ROM_REGION32_LE( 0x200000, "snd", 0 )
 	ROM_LOAD( "1h5008fa multistar 7.u6", 0x000000, 0x100000, CRC(69656637) SHA1(28c2cf48856ee4f820146fdbd0f3c7e307892dc6) )
 
 	ROM_REGION( 0x20000, "nvram", 0 )
@@ -710,11 +712,11 @@ ROM_START( gkigt4 )
 	ROM_LOAD16_BYTE( "c0000330 cg1 1 of 4,2-40.bin", 0x000000, 0x80000, CRC(b92b8aa4) SHA1(05a1feac4012a73777eb28ab6e66e1dcadb9430f) )
 	ROM_LOAD16_BYTE( "c0000330 cg2 2 of 4,2-40.bin", 0x000001, 0x80000, CRC(4e0560b5) SHA1(109f0bd47cfb0ed593fc34c5904bc639b0097d12))
 
-	ROM_REGION( 0x200000, "plx", 0 )
+	ROM_REGION32_LE( 0x200000, "plx", 0 )
 	ROM_LOAD16_BYTE( "c0000330 plx1 3 of 4,2-80.bin", 0x000000, 0x100000, CRC(806ec7d4) SHA1(b9263f942b3d7101797bf87ad18cfddac9582791) )
 	ROM_LOAD16_BYTE( "c0000330 plx2 4 of 4,2-80.bin", 0x000001, 0x100000, CRC(c4ce5dc5) SHA1(cc5d090e88551550787b87d80aafe18ee1661dd7) )
 
-	ROM_REGION( 0x200000, "snd", 0 )
+	ROM_REGION32_LE( 0x200000, "snd", 0 )
 	ROM_LOAD( "swc00046 snd1 1 of 2,2-80.rom1", 0x000000, 0x100000, CRC(8213aeac) SHA1(4beff02fed64e607270e0e8e322a96f112bd2093) )
 	ROM_LOAD( "swc00046 snd2 2 of 2,2-80.rom2", 0x100000, 0x100000, CRC(a7ef9b46) SHA1(031373fb8e39c4ed828a58bb63a9395a205c6b6b) )
 ROM_END
@@ -731,11 +733,11 @@ ROM_START( gkigt4ms )
 	ROM_LOAD16_BYTE( "c000351 cg1 1 of 4,2-40,ms.u30", 0x000000, 0x80000, CRC(2e841b28) SHA1(492b54e092b0d4028fd8edcb981bd1fd25dca47d) )
 	ROM_LOAD16_BYTE( "c000351 cg2 2 of 4,2-40,ms.u53", 0x000001, 0x80000, CRC(673fc86c) SHA1(4d844330c5602d725253b4f78781fa9e213b8556) )
 
-	ROM_REGION( 0x200000, "plx", 0 )
+	ROM_REGION32_LE( 0x200000, "plx", 0 )
 	ROM_LOAD16_BYTE( "c000351 pxl1 3 of 4,2-80,ms.u14", 0x000000, 0x100000, CRC(438fb625) SHA1(369c860dffa323c2e9be155da1989252f6b0e694) )
 	ROM_LOAD16_BYTE( "c000351 pxl2 4 of 4,2-80,ms.u37", 0x000001, 0x100000, CRC(22ec9c65) SHA1(bd944ae79faa8ceb73ed8f6f244fce6ff543ccd1) )
 
-	ROM_REGION( 0x200000, "snd", 0 ) // same as gkigt4
+	ROM_REGION32_LE( 0x200000, "snd", 0 ) // same as gkigt4
 	ROM_LOAD( "swc00046 snd1 1 of 2,2-80.rom1", 0x000000, 0x100000, CRC(8213aeac) SHA1(4beff02fed64e607270e0e8e322a96f112bd2093) )
 	ROM_LOAD( "swc00046 snd2 2 of 2,2-80.rom2", 0x100000, 0x100000, CRC(a7ef9b46) SHA1(031373fb8e39c4ed828a58bb63a9395a205c6b6b) )
 ROM_END
@@ -752,11 +754,11 @@ ROM_START( gkigt43 )
 	ROM_LOAD16_BYTE( "c0000793 cg1 1 of 4,2-40.bin", 0x000000, 0x80000, CRC(582137cc) SHA1(66686a2332a3844f816cf7e988a346f5f593d8f6) )
 	ROM_LOAD16_BYTE( "c0000793 cg2 2 of 4,2-40.bin", 0x000001, 0x80000, CRC(5e0b6310) SHA1(4bf718dc9859e8c10c9dca967185c57738249319) )
 
-	ROM_REGION( 0x200000, "plx", 0 )
+	ROM_REGION32_LE( 0x200000, "plx", 0 )
 	ROM_LOAD16_BYTE( "c0000793 plx1 3 of 4,2-80.bin", 0x000000, 0x100000, CRC(6327a76e) SHA1(01ad5747788389d3d9d71a1c37472d33db3ba5fb) )
 	ROM_LOAD16_BYTE( "c0000793 plx2 4 of 4,2-80.bin", 0x000001, 0x100000, CRC(5a400e90) SHA1(c01be47d03e9ec418d0e4e1293fcf2c890301430) )
 
-	ROM_REGION( 0x200000, "snd", 0 ) // same as gkigt4
+	ROM_REGION32_LE( 0x200000, "snd", 0 ) // same as gkigt4
 	ROM_LOAD( "swc00046 snd1 1 of 2,2-80.rom1", 0x000000, 0x100000, CRC(8213aeac) SHA1(4beff02fed64e607270e0e8e322a96f112bd2093) )
 	ROM_LOAD( "swc00046 snd2 2 of 2,2-80.rom2", 0x100000, 0x100000, CRC(a7ef9b46) SHA1(031373fb8e39c4ed828a58bb63a9395a205c6b6b) )
 ROM_END
@@ -773,11 +775,11 @@ ROM_START( gkigt43n )
 	ROM_LOAD16_BYTE( "c0000770 cg1 1 of 4,2-40,nj.bin", 0x000000, 0x80000, CRC(35847c45) SHA1(9f6192a9cb43df1a32d13d09248f10d62cd5ad3c) )
 	ROM_LOAD16_BYTE( "c0000770 cg2 2 of 4,2-40,nj.bin", 0x000001, 0x80000, CRC(2207af01) SHA1(6f59d624fbbae56af081f2a2f4eb3f7a6e6c0ec1) )
 
-	ROM_REGION( 0x200000, "plx", 0 )
+	ROM_REGION32_LE( 0x200000, "plx", 0 )
 	ROM_LOAD16_BYTE( "c0000770 plx1 3 of 4,2-80,nj.bin", 0x000000, 0x100000, CRC(d1e673cd) SHA1(22d0234e3efb5238d60c9aab4ffc171f28f5abac) )
 	ROM_LOAD16_BYTE( "c0000770 plx2 4 of 4,2-80,nj.bin", 0x000001, 0x100000, CRC(d99074f3) SHA1(a5829761f558f8e543a1442128c0ae3520d42318) )
 
-	ROM_REGION( 0x200000, "snd", 0 ) // same as gkigt4
+	ROM_REGION32_LE( 0x200000, "snd", 0 ) // same as gkigt4
 	ROM_LOAD( "swc00046 snd1 1 of 2,2-80.rom1", 0x000000, 0x100000, CRC(8213aeac) SHA1(4beff02fed64e607270e0e8e322a96f112bd2093) )
 	ROM_LOAD( "swc00046 snd2 2 of 2,2-80.rom2", 0x100000, 0x100000, CRC(a7ef9b46) SHA1(031373fb8e39c4ed828a58bb63a9395a205c6b6b) )
 ROM_END
@@ -794,11 +796,11 @@ ROM_START( gkigtez )
 	ROM_LOAD16_BYTE( "c000351 cg1 1 of 4,2-40,ms.u30", 0x000000, 0x80000, CRC(2e841b28) SHA1(492b54e092b0d4028fd8edcb981bd1fd25dca47d) )
 	ROM_LOAD16_BYTE( "c000351 cg2 2 of 4,2-40,ms.u53", 0x000001, 0x80000, CRC(673fc86c) SHA1(4d844330c5602d725253b4f78781fa9e213b8556) )
 
-	ROM_REGION( 0x200000, "plx", 0 ) // same as gkigt4ms
+	ROM_REGION32_LE( 0x200000, "plx", 0 ) // same as gkigt4ms
 	ROM_LOAD16_BYTE( "c000351 pxl1 3 of 4,2-80,ms.u14", 0x000000, 0x100000, CRC(438fb625) SHA1(369c860dffa323c2e9be155da1989252f6b0e694) )
 	ROM_LOAD16_BYTE( "c000351 pxl2 4 of 4,2-80,ms.u37", 0x000001, 0x100000, CRC(22ec9c65) SHA1(bd944ae79faa8ceb73ed8f6f244fce6ff543ccd1) )
 
-	ROM_REGION( 0x200000, "snd", 0 ) // same as gkigt4
+	ROM_REGION32_LE( 0x200000, "snd", 0 ) // same as gkigt4
 	ROM_LOAD( "swc00046 snd1 1 of 2,2-80.rom1", 0x000000, 0x100000, CRC(8213aeac) SHA1(4beff02fed64e607270e0e8e322a96f112bd2093) )
 	ROM_LOAD( "swc00046 snd2 2 of 2,2-80.rom2", 0x100000, 0x100000, CRC(a7ef9b46) SHA1(031373fb8e39c4ed828a58bb63a9395a205c6b6b) )
 ROM_END
@@ -815,11 +817,11 @@ ROM_START( gkigtezms )
 	ROM_LOAD16_BYTE( "c000351 cg1 1 of 4,2-40,ms.u30", 0x000000, 0x80000, CRC(2e841b28) SHA1(492b54e092b0d4028fd8edcb981bd1fd25dca47d) )
 	ROM_LOAD16_BYTE( "c000351 cg2 2 of 4,2-40,ms.u53", 0x000001, 0x80000, CRC(673fc86c) SHA1(4d844330c5602d725253b4f78781fa9e213b8556) )
 
-	ROM_REGION( 0x200000, "plx", 0 ) // same as gkigt4ms
+	ROM_REGION32_LE( 0x200000, "plx", 0 ) // same as gkigt4ms
 	ROM_LOAD16_BYTE( "c000351 pxl1 3 of 4,2-80,ms.u14", 0x000000, 0x100000, CRC(438fb625) SHA1(369c860dffa323c2e9be155da1989252f6b0e694) )
 	ROM_LOAD16_BYTE( "c000351 pxl2 4 of 4,2-80,ms.u37", 0x000001, 0x100000, CRC(22ec9c65) SHA1(bd944ae79faa8ceb73ed8f6f244fce6ff543ccd1) )
 
-	ROM_REGION( 0x200000, "snd", 0 ) // same as gkigt4
+	ROM_REGION32_LE( 0x200000, "snd", 0 ) // same as gkigt4
 	ROM_LOAD( "swc00046 snd1 1 of 2,2-80.rom1", 0x000000, 0x100000, CRC(8213aeac) SHA1(4beff02fed64e607270e0e8e322a96f112bd2093) )
 	ROM_LOAD( "swc00046 snd2 2 of 2,2-80.rom2", 0x100000, 0x100000, CRC(a7ef9b46) SHA1(031373fb8e39c4ed828a58bb63a9395a205c6b6b) )
 ROM_END
@@ -836,11 +838,11 @@ ROM_START( gkigt5p )
 	ROM_LOAD16_BYTE( "c0000517 cg1 1 of 4,2-40.bin", 0x000000, 0x80000, CRC(26db44c9) SHA1(8afe145d1fb7535c651d78b23872b71c2c946509) )
 	ROM_LOAD16_BYTE( "c0000517 cg2 2 of 4,2-40.bin", 0x000001, 0x80000, CRC(3554ba38) SHA1(6e0b8506943559dbee4cfa7c9e4b60590c6529fb) )
 
-	ROM_REGION( 0x200000, "plx", 0 )
+	ROM_REGION32_LE( 0x200000, "plx", 0 )
 	ROM_LOAD16_BYTE( "c0000517 plx1 3 of 4,2-80.bin", 0x000000, 0x100000, CRC(956ba40c) SHA1(7d8ae934ef663ea6b3f342455d1e8c70a1ca4581) )
 	ROM_LOAD16_BYTE( "c0000517 plx2 4 of 4,2-80.bin", 0x000001, 0x100000, CRC(dff43975) SHA1(e1ca212e4e51175bcbab2af447863605f74ba77f) )
 
-	ROM_REGION( 0x200000, "snd", 0 ) // same as gkigt4
+	ROM_REGION32_LE( 0x200000, "snd", 0 ) // same as gkigt4
 	ROM_LOAD( "swc00046 snd1 1 of 2,2-80.rom1", 0x000000, 0x100000, CRC(8213aeac) SHA1(4beff02fed64e607270e0e8e322a96f112bd2093) )
 	ROM_LOAD( "swc00046 snd2 2 of 2,2-80.rom2", 0x100000, 0x100000, CRC(a7ef9b46) SHA1(031373fb8e39c4ed828a58bb63a9395a205c6b6b) )
 ROM_END
@@ -859,11 +861,11 @@ ROM_START( igtsc )
 	// uses a SIMM
 	ROM_LOAD( "c0000464 cgf.bin", 0x000000, 0x07ff9a3, BAD_DUMP CRC(52fcc9fd) SHA1(98089dcf550bc3670d29b7ee78e014154e672120) ) // should be 0x800000
 
-	ROM_REGION( 0x1000000, "plx", 0 )
+	ROM_REGION32_LE( 0x1000000, "plx", 0 )
 	// uses a SIMM
 	ROM_LOAD( "c000464 pxl3.bin", 0x000000, 0xff73bb, BAD_DUMP CRC(c6acb3cf) SHA1(0ea2d2a506be43a2a8b9d05d80f765c8351494a2) ) // should be 0x1000000
 
-	ROM_REGION( 0x1000000, "snd", 0 )
+	ROM_REGION32_LE( 0x1000000, "snd", 0 )
 	// uses a SIMM
 	ROM_LOAD( "dss00076.simm", 0x000000, 0xfd7f81, BAD_DUMP CRC(5dd889b4) SHA1(9a6cb7599d268d110645ac8fe5d41a733cbaadc5) ) // should be 0x1000000
 ROM_END
@@ -901,18 +903,18 @@ ROM_START( gkkey )
 
 	ROM_REGION32_LE( 0x200000, "game", ROMREGION_ERASEFF )
 	ROM_REGION( 0x100000, "cg", ROMREGION_ERASEFF )
-	ROM_REGION( 0x200000, "plx", ROMREGION_ERASEFF )
-	ROM_REGION( 0x200000, "snd", ROMREGION_ERASEFF )
+	ROM_REGION32_LE( 0x200000, "plx", ROMREGION_ERASEFF )
+	ROM_REGION32_LE( 0x200000, "snd", ROMREGION_ERASEFF )
 ROM_END
 
-GAME( 1994, ms3,       0,            igt_gameking, igt_gameking, igt_gameking_state,  0, ROT0, "IGT", "Multistar 3",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1994, ms72c,     0,            igt_ms72c,    igt_gameking, igt_gameking_state,  0, ROT0, "IGT", "Multistar 7 2c",               MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2003, gkigt4,    0,            igt_gameking, igt_gameking, igt_gameking_state,  0, ROT0, "IGT", "Game King (v4.x)",             MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2003, gkigt4ms,  gkigt4,       igt_gameking, igt_gameking, igt_gameking_state,  0, ROT0, "IGT", "Game King (v4.x, MS)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2003, gkigt43,   gkigt4,       igt_gameking, igt_gameking, igt_gameking_state,  0, ROT0, "IGT", "Game King (v4.3)",             MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2003, gkigt43n,  gkigt4,       igt_gameking, igt_gameking, igt_gameking_state,  0, ROT0, "IGT", "Game King (v4.3, NJ)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2003, gkigtez,   gkigt4,       igt_gameking, igt_gameking, igt_gameking_state,  0, ROT0, "IGT", "Game King (EZ Pay, v4.0)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2003, gkigtezms, gkigt4,       igt_gameking, igt_gameking, igt_gameking_state,  0, ROT0, "IGT", "Game King (EZ Pay, v4.0, MS)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2003, gkigt5p,   gkigt4,       igt_gameking, igt_gameking, igt_gameking_state,  0, ROT0, "IGT", "Game King (Triple-Five Play)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2003, igtsc,     0,            igt_gameking, igt_gameking, igt_gameking_state,  0, ROT0, "IGT", "Super Cherry",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // SIMM dumps are bad.
-GAME( 2003, gkkey,     0,            igt_gameking, igt_gameking, igt_gameking_state,  0, ROT0, "IGT", "Game King (Set Chips)",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // only 2 are good dumps
+GAME( 1994, ms3,       0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Multistar 3",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1994, ms72c,     0,      igt_ms72c,    igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Multistar 7 2c",               MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2003, gkigt4,    0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (v4.x)",             MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2003, gkigt4ms,  gkigt4, igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (v4.x, MS)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2003, gkigt43,   gkigt4, igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (v4.3)",             MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2003, gkigt43n,  gkigt4, igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (v4.3, NJ)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2003, gkigtez,   gkigt4, igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (EZ Pay, v4.0)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2003, gkigtezms, gkigt4, igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (EZ Pay, v4.0, MS)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2003, gkigt5p,   gkigt4, igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (Triple-Five Play)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2003, igtsc,     0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Super Cherry",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // SIMM dumps are bad.
+GAME( 2003, gkkey,     0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Game King (Set Chips)",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // only 2 are good dumps

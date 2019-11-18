@@ -14,12 +14,6 @@ class gaelco_ds5002fp_device : public device_t, public device_memory_interface
 public:
 	gaelco_ds5002fp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// not really public, but address map needs to get them
-	DECLARE_READ8_MEMBER(hostmem_r);
-	DECLARE_WRITE8_MEMBER(hostmem_w);
-
-	void dallas_ram(address_map &map);
-	void dallas_rom(address_map &map);
 protected:
 	// device_t implementation
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -29,8 +23,15 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 private:
+
+	void dallas_ram(address_map &map);
+	void dallas_rom(address_map &map);
+
 	address_space_config const m_hostmem_config;
 	address_space *m_hostmem;
+
+	DECLARE_READ8_MEMBER(hostmem_r);
+	DECLARE_WRITE8_MEMBER(hostmem_w);
 };
 
 #endif // MAME_MACHINE_GAELCO_DS5002FP_H

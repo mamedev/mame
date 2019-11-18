@@ -312,7 +312,7 @@ void x68k_state::x68k_keyboard_push_scancode(unsigned char code)
 			//if(ioport("options")->read() & 0x01)
 			//{
 			//  m_current_vector[6] = 0x4c;
-			//  m_maincpu->set_input_line_and_vector(6,ASSERT_LINE,0x4c);
+			//  m_maincpu->set_input_line(6,ASSERT_LINE);
 			//  logerror("MFP: Receive buffer full IRQ sent\n");
 			//}
 		}

@@ -7,9 +7,15 @@
 DEFINE_DEVICE_TYPE(MSX_AUDIO_KBDC_PORT, msx_audio_kbdc_port_device, "msx_audio_kbdc_port", "MSX Audio keyboard connector port")
 
 
+msx_audio_kb_port_interface::msx_audio_kb_port_interface(machine_config const &mconfig, device_t &device)
+	: device_interface(device, "msxaudiokb")
+{
+}
+
+
 msx_audio_kbdc_port_device::msx_audio_kbdc_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MSX_AUDIO_KBDC_PORT, tag, owner, clock)
-	, device_slot_interface(mconfig, *this)
+	, device_single_card_slot_interface<msx_audio_kb_port_interface>(mconfig, *this)
 	, m_keyboard(nullptr)
 {
 }
@@ -17,26 +23,23 @@ msx_audio_kbdc_port_device::msx_audio_kbdc_port_device(const machine_config &mco
 
 void msx_audio_kbdc_port_device::device_start()
 {
-	m_keyboard = dynamic_cast<msx_audio_kb_port_interface *>(get_card_device());
+	m_keyboard = get_card_device();
 }
 
 
-WRITE8_MEMBER(msx_audio_kbdc_port_device::write)
+void msx_audio_kbdc_port_device::write(uint8_t data)
 {
 	if (m_keyboard)
-	{
-		m_keyboard->write(space, offset, data);
-	}
+		m_keyboard->write(data);
 }
 
 
-READ8_MEMBER(msx_audio_kbdc_port_device::read)
+uint8_t msx_audio_kbdc_port_device::read()
 {
 	if (m_keyboard)
-	{
-		return m_keyboard->read(space, offset);
-	}
-	return 0xff;
+		return m_keyboard->read();
+	else
+		return 0xff;
 }
 
 
@@ -57,7 +60,7 @@ public:
 
 	virtual ioport_constructor device_input_ports() const override;
 
-	virtual DECLARE_READ8_MEMBER(read) override
+	virtual uint8_t read() override
 	{
 		uint8_t result = 0xff;
 
@@ -71,7 +74,7 @@ public:
 		return result;
 	}
 
-	virtual DECLARE_WRITE8_MEMBER(write) override
+	virtual void write(uint8_t data) override
 	{
 		m_row = data;
 	}
@@ -187,7 +190,7 @@ public:
 
 	virtual ioport_constructor device_input_ports() const override;
 
-	virtual DECLARE_READ8_MEMBER(read) override
+	virtual uint8_t read() override
 	{
 		uint8_t result = 0xff;
 
@@ -201,7 +204,7 @@ public:
 		return result;
 	}
 
-	virtual DECLARE_WRITE8_MEMBER(write) override
+	virtual void write(uint8_t data) override
 	{
 		logerror("msx_nms1160::write %02x\n", data);
 		m_row = data;
@@ -308,7 +311,8 @@ DEFINE_DEVICE_TYPE(MSX_AUDIO_KB_HXMU901, msx_hxmu901_device, "hxmu901", "Toshiba
 DEFINE_DEVICE_TYPE(MSX_AUDIO_KB_NMS1160, msx_nms1160_device, "nms1160", "Philips NMS-1160")
 
 
-SLOT_INTERFACE_START( msx_audio_keyboards )
-	SLOT_INTERFACE("hxmu901", MSX_AUDIO_KB_HXMU901)
-	SLOT_INTERFACE("nms1160", MSX_AUDIO_KB_NMS1160)
-SLOT_INTERFACE_END
+void msx_audio_keyboards(device_slot_interface &device)
+{
+	device.option_add("hxmu901", MSX_AUDIO_KB_HXMU901);
+	device.option_add("nms1160", MSX_AUDIO_KB_NMS1160);
+}

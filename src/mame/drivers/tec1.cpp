@@ -19,6 +19,8 @@ The cpu speed could be adjusted by using a potentiometer, the range being
 We emulate the original version. Later enhancements included more RAM, speech
 synthesis and various attachments, however I have no information on these.
 
+2018-11-08 Obtained fresh dumps from the original designers.
+
 Pasting:
         0-F : as is
         + (inc) : ^
@@ -34,7 +36,7 @@ GO (execute program at current address) is the X key.
 SHIFT - later monitor versions utilised an extra shift button. Hold
         it down and press another key (use Left Shift).
 
-Whenever a program listing mentions RESET, do a Soft Reset.
+Whenever a program listing mentions RESET, press Left-Alt key.
 
 Each key causes a beep to be heard. You may need to press more than once
 to get it to register.
@@ -75,7 +77,6 @@ JMON ToDo:
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
 #include "sound/spkrdev.h"
-#include "sound/wave.h"
 #include "speaker.h"
 
 #include "tec1.lh"
@@ -89,7 +90,6 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_speaker(*this, "speaker")
 		, m_cass(*this, "cassette")
-		, m_wave(*this, WAVE_TAG)
 		, m_key_pressed(0)
 		, m_io_line0(*this, "LINE0")
 		, m_io_line1(*this, "LINE1")
@@ -99,10 +99,15 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
+	void tec1(machine_config &config);
+	void tecjmon(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	optional_device<cassette_image_device> m_cass;
-	optional_device<wave_device> m_wave;
 	bool m_key_pressed;
 	required_ioport m_io_line0;
 	required_ioport m_io_line1;
@@ -125,8 +130,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	TIMER_CALLBACK_MEMBER(tec1_kbd_callback);
-	void tec1(machine_config &config);
-	void tecjmon(machine_config &config);
+
 	void tec1_io(address_map &map);
 	void tec1_map(address_map &map);
 	void tecjmon_io(address_map &map);
@@ -341,9 +345,9 @@ void tec1_state::tec1_map(address_map &map)
 void tec1_state::tec1_io(address_map &map)
 {
 	map.global_mask(0x07);
-	map(0x00, 0x00).r(this, FUNC(tec1_state::tec1_kbd_r));
-	map(0x01, 0x01).w(this, FUNC(tec1_state::tec1_digit_w));
-	map(0x02, 0x02).w(this, FUNC(tec1_state::tec1_segment_w));
+	map(0x00, 0x00).r(FUNC(tec1_state::tec1_kbd_r));
+	map(0x01, 0x01).w(FUNC(tec1_state::tec1_digit_w));
+	map(0x02, 0x02).w(FUNC(tec1_state::tec1_segment_w));
 }
 
 
@@ -358,12 +362,12 @@ void tec1_state::tecjmon_map(address_map &map)
 void tec1_state::tecjmon_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).r(this, FUNC(tec1_state::tec1_kbd_r));
-	map(0x01, 0x01).w(this, FUNC(tec1_state::tecjmon_digit_w));
-	map(0x02, 0x02).w(this, FUNC(tec1_state::tec1_segment_w));
-	map(0x03, 0x03).r(this, FUNC(tec1_state::latch_r));
-	//AM_RANGE(0x04, 0x04) AM_WRITE(lcd_en_w)
-	//AM_RANGE(0x84, 0x84) AM_WRITE(lcd_2nd_w)
+	map(0x00, 0x00).r(FUNC(tec1_state::tec1_kbd_r));
+	map(0x01, 0x01).w(FUNC(tec1_state::tecjmon_digit_w));
+	map(0x02, 0x02).w(FUNC(tec1_state::tec1_segment_w));
+	map(0x03, 0x03).r(FUNC(tec1_state::latch_r));
+	//map(0x04, 0x04).w(FUNC(tec1_state::lcd_en_w));
+	//map(0x84, 0x84).w(FUNC(tec1_state::lcd_2nd_w));
 }
 
 
@@ -406,7 +410,15 @@ static INPUT_PORTS_START( tec1 )
 	PORT_BIT(0x1f, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT)
 	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("RESET")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RESET") PORT_CODE(KEYCODE_LALT) PORT_CHANGED_MEMBER(DEVICE_SELF, tec1_state, reset_button, 0)
 INPUT_PORTS_END
+
+INPUT_CHANGED_MEMBER(tec1_state::reset_button)
+{
+	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
+}
 
 
 /***************************************************************************
@@ -415,40 +427,39 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-MACHINE_CONFIG_START(tec1_state::tec1)
+void tec1_state::tec1(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 1000000)   /* speed can be varied between 250kHz and 2MHz */
-	MCFG_CPU_PROGRAM_MAP(tec1_map)
-	MCFG_CPU_IO_MAP(tec1_io)
+	Z80(config, m_maincpu, 1000000);   /* speed can be varied between 250kHz and 2MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &tec1_state::tec1_map);
+	m_maincpu->set_addrmap(AS_IO, &tec1_state::tec1_io);
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_tec1)
+	config.set_default_layout(layout_tec1);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
-MACHINE_CONFIG_START(tec1_state::tecjmon)
+void tec1_state::tecjmon(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL(3'579'545) / 2)
-	MCFG_CPU_PROGRAM_MAP(tecjmon_map)
-	MCFG_CPU_IO_MAP(tecjmon_io)
+	Z80(config, m_maincpu, XTAL(3'579'545) / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tec1_state::tecjmon_map);
+	m_maincpu->set_addrmap(AS_IO, &tec1_state::tecjmon_io);
 
 	/* video hardware */
-	MCFG_DEFAULT_LAYOUT(layout_tec1)
+	config.set_default_layout(layout_tec1);
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Devices */
-	MCFG_CASSETTE_ADD( "cassette" )
-MACHINE_CONFIG_END
+	CASSETTE(config, m_cass);
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+}
 
 
 /***************************************************************************
@@ -460,11 +471,14 @@ MACHINE_CONFIG_END
 ROM_START(tec1)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_SYSTEM_BIOS(0, "mon1", "MON1")
-	ROMX_LOAD("mon1.rom",    0x0000, 0x0800, CRC(b3390c36) SHA1(18aabc68d473206b7fc4e365c6b57a4e218482c3), ROM_BIOS(1))
-	ROM_SYSTEM_BIOS(1, "mon1b", "MON1B")
-	ROMX_LOAD("mon1b.rom",   0x0000, 0x0800, CRC(60daea3c) SHA1(383b7e7f02e91fb18c87eb03c5949e31156771d4), ROM_BIOS(2))
-	ROM_SYSTEM_BIOS(2, "mon2", "MON2")
-	ROMX_LOAD("mon2.rom",   0x0000, 0x0800, CRC(082fd7e7) SHA1(7659add30ca22b15a03d1cbac0892a5c25e47ecd), ROM_BIOS(3))
+	ROMX_LOAD( "mon1.rom",   0x0000, 0x0800, CRC(5d379e6c) SHA1(5c810885a3f0d03c54aea74aaaa8fae8a2fd9ad4), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS(1, "mon1a", "MON1A")
+	ROMX_LOAD("mon1a.rom",   0x0000, 0x0800, CRC(b3390c36) SHA1(18aabc68d473206b7fc4e365c6b57a4e218482c3), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(2, "mon1b", "MON1B")
+	//ROMX_LOAD("mon1b.rom",   0x0000, 0x0800, CRC(60daea3c) SHA1(383b7e7f02e91fb18c87eb03c5949e31156771d4), ROM_BIOS(2))
+	ROMX_LOAD("mon1b.rom",   0x0000, 0x0800, CRC(6088811d) SHA1(2cec14a24fae769f22f6598b5a63fc79d90db394), ROM_BIOS(2))    // redump
+	ROM_SYSTEM_BIOS(3, "mon2", "MON2")
+	ROMX_LOAD("mon2.rom",    0x0000, 0x0800, CRC(082fd7e7) SHA1(7659add30ca22b15a03d1cbac0892a5c25e47ecd), ROM_BIOS(3))
 ROM_END
 
 ROM_START(tecjmon)
@@ -473,6 +487,6 @@ ROM_START(tecjmon)
 	ROM_LOAD("util.rom",    0x3800, 0x0800, CRC(7c19700d) SHA1(dc5b3ade66bb11c54430056966ed99cdd299d82b) )
 ROM_END
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT STATE       INIT  COMPANY                         FULLNAME            FLAGS
-COMP( 1984, tec1,     0,      0,      tec1,       tec1, tec1_state, 0,    "Talking Electronics magazine", "TEC-1",            0 )
-COMP( 1984, tecjmon,  tec1,   0,      tecjmon,    tec1, tec1_state, 0,    "Talking Electronics magazine", "TEC-1A with JMON", 0 )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY                         FULLNAME            FLAGS
+COMP( 1984, tec1,     0,      0,      tec1,    tec1,  tec1_state, empty_init, "Talking Electronics magazine", "TEC-1",            0 )
+COMP( 1984, tecjmon,  tec1,   0,      tecjmon, tec1,  tec1_state, empty_init, "Talking Electronics magazine", "TEC-1A with JMON", 0 )

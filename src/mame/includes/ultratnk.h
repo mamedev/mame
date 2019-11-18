@@ -12,16 +12,13 @@
 
 #include "machine/watchdog.h"
 #include "sound/discrete.h"
+#include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class ultratnk_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_NMI
-	};
-
 	ultratnk_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -30,14 +27,20 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_videoram(*this, "videoram")
+		m_videoram(*this, "videoram"),
+		m_joy(*this, "JOY-%c", 'W')
 	{ }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(get_collision);
-	DECLARE_CUSTOM_INPUT_MEMBER(get_joystick);
+	template <int N> DECLARE_READ_LINE_MEMBER(collision_flipflop_r);
+	template <int N> DECLARE_READ_LINE_MEMBER(joystick_r);
 	void ultratnk(machine_config &config);
 
 protected:
+	enum
+	{
+		TIMER_NMI
+	};
+
 	DECLARE_READ8_MEMBER(wram_r);
 	DECLARE_READ8_MEMBER(analog_r);
 	DECLARE_READ8_MEMBER(coin_r);
@@ -54,7 +57,7 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(ultratnk);
+	void ultratnk_palette(palette_device &palette) const;
 
 	TILE_GET_INFO_MEMBER(tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -72,6 +75,8 @@ protected:
 	required_device<palette_device> m_palette;
 
 	required_shared_ptr<uint8_t> m_videoram;
+
+	required_ioport_array<4> m_joy;
 
 	int m_da_latch;
 	int m_collision[4];
