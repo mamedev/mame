@@ -1032,11 +1032,16 @@ public:
 
 			physical_stick = m_joy_map.map[stick].physical;
 			SDL_Joystick *joy = SDL_JoystickOpen(physical_stick);
+			SDL_JoystickGUID guid = SDL_JoystickGetGUID(joy);
+			char guid_str[256];
+			guid_str[0] = '\0';
+			SDL_JoystickGetGUIDString(guid, guid_str, sizeof(guid_str)-1);
+
 			devinfo->sdl_state.device = joy;
 			devinfo->sdl_state.joystick_id = SDL_JoystickInstanceID(joy);
 			devinfo->sdl_state.hapdevice = SDL_HapticOpenFromJoystick(joy);
 
-			osd_printf_verbose("Joystick: %s\n", SDL_JoystickNameForIndex(physical_stick));
+			osd_printf_verbose("Joystick: %s [GUID %s]\n", SDL_JoystickNameForIndex(physical_stick), guid_str);
 			osd_printf_verbose("Joystick:   ...  %d axes, %d buttons %d hats %d balls\n", SDL_JoystickNumAxes(joy), SDL_JoystickNumButtons(joy), SDL_JoystickNumHats(joy), SDL_JoystickNumBalls(joy));
 			osd_printf_verbose("Joystick:   ...  Physical id %d mapped to logical id %d\n", physical_stick, stick + 1);
 			if (devinfo->sdl_state.hapdevice != nullptr)
@@ -1151,6 +1156,9 @@ private:
 	sdl_joystick_device* create_joystick_device(running_machine &machine, device_map_t *devmap, int index, input_device_class devclass)
 	{
 		char tempname[20];
+		char guid_str[256];
+		SDL_JoystickGUID guid = SDL_JoystickGetDeviceGUID(m_joy_map.map[index].physical);
+		SDL_JoystickGetGUIDString(guid, guid_str, sizeof(guid_str)-1);
 
 		if (devmap->map[index].name.empty())
 		{
@@ -1159,16 +1167,16 @@ private:
 			{
 				snprintf(tempname, ARRAY_LENGTH(tempname), "NC%d", index);
 				m_sixaxis_mode
-					? devicelist()->create_device<sdl_sixaxis_joystick_device>(machine, tempname, tempname, *this)
-					: devicelist()->create_device<sdl_joystick_device>(machine, tempname, tempname, *this);
+					? devicelist()->create_device<sdl_sixaxis_joystick_device>(machine, tempname, guid_str, *this)
+					: devicelist()->create_device<sdl_joystick_device>(machine, tempname, guid_str, *this);
 			}
 
 			return nullptr;
 		}
 
 		return m_sixaxis_mode
-			? devicelist()->create_device<sdl_sixaxis_joystick_device>(machine, devmap->map[index].name.c_str(), devmap->map[index].name.c_str(), *this)
-			: devicelist()->create_device<sdl_joystick_device>(machine, devmap->map[index].name.c_str(), devmap->map[index].name.c_str(), *this);
+			? devicelist()->create_device<sdl_sixaxis_joystick_device>(machine, devmap->map[index].name.c_str(), guid_str, *this)
+			: devicelist()->create_device<sdl_joystick_device>(machine, devmap->map[index].name.c_str(), guid_str, *this);
 	}
 };
 
