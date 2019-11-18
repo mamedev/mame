@@ -2876,6 +2876,8 @@ files {
 	MAME_DIR .. "src/mame/machine/m6502_vh2009.cpp",
 	MAME_DIR .. "src/mame/machine/m6502_vh2009.h",
 	MAME_DIR .. "src/mame/drivers/vt1682.cpp",
+	MAME_DIR .. "src/mame/machine/vt1682_io.h",
+	MAME_DIR .. "src/mame/machine/vt1682_io.cpp",
 	MAME_DIR .. "src/mame/machine/m6502_vt1682.cpp",
 	MAME_DIR .. "src/mame/machine/m6502_vt1682.h",
 }

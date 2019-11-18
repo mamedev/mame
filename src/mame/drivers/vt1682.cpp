@@ -12,6 +12,7 @@
 
 #include "emu.h"
 #include "machine/m6502_vt1682.h"
+#include "machine/vt1682_io.h"
 #include "machine/bankdev.h"
 #include "emupal.h"
 #include "screen.h"
@@ -32,6 +33,7 @@ class vt_vt1682_state : public driver_device
 public:
 	vt_vt1682_state(const machine_config& mconfig, device_type type, const char* tag) :
 		driver_device(mconfig, type, tag),
+		m_io(*this, "io"),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_screen(*this, "screen"),
@@ -45,13 +47,12 @@ public:
 
 	void vt_vt1682(machine_config& config);
 
-	void init_8in1();
-
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
+	required_device<vrt_vt1682_io_device> m_io;
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
@@ -320,7 +321,6 @@ private:
 
 	uint8_t m_2106_enable_reg;
 
-	uint8_t m_210d_ioconfig;
 
 	DECLARE_READ8_MEMBER(vt1682_2100_prgbank1_r3_r);
 	DECLARE_WRITE8_MEMBER(vt1682_2100_prgbank1_r3_w);
@@ -377,14 +377,6 @@ private:
 	DECLARE_READ8_MEMBER(vt1682_2106_enable_regs_r);
 	DECLARE_WRITE8_MEMBER(vt1682_2106_enable_regs_w);
 
-	DECLARE_READ8_MEMBER(vt1682_210e_io_ab_r);
-	DECLARE_READ8_MEMBER(vt1682_210f_io_cd_r);
-
-	DECLARE_WRITE8_MEMBER(vt1682_210e_io_ab_w);
-	DECLARE_WRITE8_MEMBER(vt1682_210f_io_cd_w);
-
-	DECLARE_READ8_MEMBER(vt1682_210d_ioconfig_r);
-	DECLARE_WRITE8_MEMBER(vt1682_210d_ioconfig_w);
 
 	/* System Helpers */
 
@@ -454,6 +446,30 @@ private:
 	void draw_tile(int segment, int tile, int x, int y, int palbase, int pal, int is16pix_high, int is16pix_wide, int bpp, int depth, int opaque, int flipx, int flipy, screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
 	void draw_layer(int which, int base, int opaque, screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
 	void draw_sprites(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
+};
+
+
+class intec_interact_state : public vt_vt1682_state
+{
+public:
+	intec_interact_state(const machine_config& mconfig, device_type type, const char* tag) :
+		vt_vt1682_state(mconfig, type, tag)
+	{ }
+
+	void intech_interact(machine_config& config);
+
+	DECLARE_READ8_MEMBER(porta_r) {	uint8_t ret = machine().rand() & 0xf; logerror("%s: porta_r returning: %1x\n", machine().describe_context(), ret); return ret; };
+	DECLARE_READ8_MEMBER(portb_r) {	uint8_t ret = machine().rand() & 0xf; logerror("%s: portb_r returning: %1x\n", machine().describe_context(), ret); return ret; };
+	DECLARE_READ8_MEMBER(portc_r) {	uint8_t ret = machine().rand() & 0xf; logerror("%s: portc_r returning: %1x\n", machine().describe_context(), ret); return ret; };
+	DECLARE_READ8_MEMBER(portd_r) {	uint8_t ret = machine().rand() & 0xf; logerror("%s: portd_r returning: %1x\n", machine().describe_context(), ret); return ret; };
+
+	DECLARE_WRITE8_MEMBER(porta_w) { logerror("%s: porta_w writing: %1x\n", machine().describe_context(), data & 0xf); };
+	DECLARE_WRITE8_MEMBER(portb_w) { logerror("%s: portb_w writing: %1x\n", machine().describe_context(), data & 0xf); };
+	DECLARE_WRITE8_MEMBER(portc_w) { logerror("%s: portc_w writing: %1x\n", machine().describe_context(), data & 0xf); };
+	DECLARE_WRITE8_MEMBER(portd_w) { logerror("%s: portd_w writing: %1x\n", machine().describe_context(), data & 0xf); };
+
+protected:
+private:
 };
 
 void vt_vt1682_state::video_start()
@@ -552,7 +568,6 @@ void vt_vt1682_state::machine_start()
 
 	save_item(NAME(m_2106_enable_reg));
 
-	save_item(NAME(m_210d_ioconfig));
 }
 
 void vt_vt1682_state::machine_reset()
@@ -649,7 +664,6 @@ void vt_vt1682_state::machine_reset()
 
 	m_2106_enable_reg = 0;
 
-	m_210d_ioconfig = 0;
 
 	update_banks();
 
@@ -2571,96 +2585,9 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_210c_prgbank1_r2_w)
 }
 
 
-/*
-    Address 0x210d r/w (MAIN CPU)
-
-    0x80 - IOD ENB
-    0x40 - IOD OE
-    0x20 - IOC ENB
-    0x10 - IOC OE
-    0x08 - IOB ENB
-    0x04 - IOB OE
-    0x02 - IOA ENB
-    0x01 - IOA OE
-*/
-
-READ8_MEMBER(vt_vt1682_state::vt1682_210d_ioconfig_r)
-{
-	uint8_t ret = m_210d_ioconfig;
-	logerror("%s: vt1682_210d_ioconfig_r returning: %02x\n", machine().describe_context(), ret);
-	return ret;
-}
-
-
-WRITE8_MEMBER(vt_vt1682_state::vt1682_210d_ioconfig_w)
-{
-	logerror("%s: vt1682_210d_ioconfig_w writing: %02x ( IOD_ENB:%1x IOD_OE:%1x | IOC_ENB:%1x IOC_OE:%1x | IOB_ENB:%1x IOB_OE:%1x | IOA_ENB:%1x IOA_OE:%1x )\n", machine().describe_context(), data,
-		(data & 0x80) ? 1 : 0,
-		(data & 0x40) ? 1 : 0,
-		(data & 0x20) ? 1 : 0,
-		(data & 0x10) ? 1 : 0,
-		(data & 0x08) ? 1 : 0,
-		(data & 0x04) ? 1 : 0,
-		(data & 0x02) ? 1 : 0,
-		(data & 0x01) ? 1 : 0);
-
-	m_210d_ioconfig = data;
-}
-
-
-/*
-    Address 0x210e r/w (MAIN CPU)
-
-    0x80 - IOB:3
-    0x40 - IOB:2
-    0x20 - IOB:1
-    0x10 - IOB:0
-    0x08 - IOA:3
-    0x04 - IOA:2
-    0x02 - IOA:1
-    0x01 - IOA:0
-*/
-
-READ8_MEMBER(vt_vt1682_state::vt1682_210e_io_ab_r)
-{
-	//uint8_t ret = ioport("IN0")->read();
-	uint8_t ret = machine().rand();
-//  logerror("%s: vt1682_210e_io_ab_r returning: %02x\n", machine().describe_context(), ret);
-	return ret;
-}
-
-WRITE8_MEMBER(vt_vt1682_state::vt1682_210e_io_ab_w)
-{
-	logerror("%s: vt1682_210e_io_ab_w writing: %02x (portb: %1x porta: %1x)\n", machine().describe_context(), data, (data & 0xf0) >> 4, data & 0x0f);
-}
-
-
-
-/*
-    Address 0x210f r/w (MAIN CPU)
-
-    0x80 - IOD:3
-    0x40 - IOD:2
-    0x20 - IOD:1
-    0x10 - IOD:0
-    0x08 - IOC:3
-    0x04 - IOC:2
-    0x02 - IOC:1
-    0x01 - IOC:0
-*/
-
-READ8_MEMBER(vt_vt1682_state::vt1682_210f_io_cd_r)
-{
-	//uint8_t ret = ioport("IN1")->read();
-	uint8_t ret = machine().rand();
-//  logerror("%s: vt1682_210f_io_cd_r returning: %02x\n", machine().describe_context(), ret);
-	return ret;
-}
-
-WRITE8_MEMBER(vt_vt1682_state::vt1682_210f_io_cd_w)
-{
-	logerror("%s: vt1682_210f_io_cd_w writing: %02x (portd: %1x portc: %1x)\n", machine().describe_context(), data, (data & 0xf0) >> 4, data & 0x0f);
-}
+/* 0x210d - see vt1682_io.cpp */
+/* 0x210e - see vt1682_io.cpp */
+/* 0x210f - see vt1682_io.cpp */
 
 
 /*
@@ -4884,9 +4811,9 @@ void vt_vt1682_state::vt_vt1682_map(address_map &map)
 	map(0x210a, 0x210a).rw(FUNC(vt_vt1682_state::vt1682_210a_prgbank0_r3_r), FUNC(vt_vt1682_state::vt1682_210a_prgbank0_r3_w));
 	map(0x210b, 0x210b).rw(FUNC(vt_vt1682_state::vt1682_210b_misc_cs_prg0_bank_sel_r), FUNC(vt_vt1682_state::vt1682_210b_misc_cs_prg0_bank_sel_w));
 	map(0x210c, 0x210c).rw(FUNC(vt_vt1682_state::vt1682_210c_prgbank1_r2_r), FUNC(vt_vt1682_state::vt1682_210c_prgbank1_r2_w));
-	map(0x210d, 0x210d).rw(FUNC(vt_vt1682_state::vt1682_210d_ioconfig_r),FUNC(vt_vt1682_state::vt1682_210d_ioconfig_w));
-	map(0x210e, 0x210e).rw(FUNC(vt_vt1682_state::vt1682_210e_io_ab_r),FUNC(vt_vt1682_state::vt1682_210e_io_ab_w));
-	map(0x210f, 0x210f).rw(FUNC(vt_vt1682_state::vt1682_210f_io_cd_r),FUNC(vt_vt1682_state::vt1682_210f_io_cd_w));
+	map(0x210d, 0x210d).rw(m_io, FUNC(vrt_vt1682_io_device::vt1682_210d_ioconfig_r),FUNC(vrt_vt1682_io_device::vt1682_210d_ioconfig_w));
+	map(0x210e, 0x210e).rw(m_io, FUNC(vrt_vt1682_io_device::vt1682_210e_io_ab_r),FUNC(vrt_vt1682_io_device::vt1682_210e_io_ab_w));
+	map(0x210f, 0x210f).rw(m_io, FUNC(vrt_vt1682_io_device::vt1682_210f_io_cd_r),FUNC(vrt_vt1682_io_device::vt1682_210f_io_cd_w));
 
 	// either reads/writes are on different addresses or our source info is incorrect
 	map(0x2110, 0x2110).rw(FUNC(vt_vt1682_state::vt1682_prgbank0_r4_r), FUNC(vt_vt1682_state::vt1682_prgbank1_r0_w));
@@ -5071,6 +4998,8 @@ void vt_vt1682_state::vt_vt1682(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_test);
 
+	VT_VT1682_IO(config, m_io, 0);
+
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
@@ -5081,11 +5010,21 @@ void vt_vt1682_state::vt_vt1682(machine_config &config)
 }
 
 
-
-
-
-void vt_vt1682_state::init_8in1()
+void intec_interact_state::intech_interact(machine_config& config)
 {
+	vt_vt1682_state::vt_vt1682(config);
+
+	m_io->porta_in().set(FUNC(intec_interact_state::porta_r));
+	m_io->porta_out().set(FUNC(intec_interact_state::porta_w));
+
+	m_io->portb_in().set(FUNC(intec_interact_state::portb_r));
+	m_io->portb_out().set(FUNC(intec_interact_state::portb_w));
+
+	m_io->portc_in().set(FUNC(intec_interact_state::portc_r));
+	m_io->portc_out().set(FUNC(intec_interact_state::portc_w));
+
+	m_io->portd_in().set(FUNC(intec_interact_state::portd_r));
+	m_io->portd_out().set(FUNC(intec_interact_state::portd_w));
 }
 
 
@@ -5104,8 +5043,8 @@ ROM_START( ii32in1 )
 ROM_END
 
 // TODO: this is a cartridge based system, move these to SL
-CONS( 200?, ii8in1,    0,  0,  vt_vt1682,    intec, vt_vt1682_state, init_8in1,  "Intec", "InterAct 8-in-1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-CONS( 200?, ii32in1,   0,  0,  vt_vt1682,    intec, vt_vt1682_state, init_8in1,  "Intec", "InterAct 32-in-1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 200?, ii8in1,    0,  0,  intech_interact,    intec, intec_interact_state, empty_init,  "Intec", "InterAct 8-in-1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 200?, ii32in1,   0,  0,  intech_interact,    intec, intec_interact_state, empty_init,  "Intec", "InterAct 32-in-1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 // a 40-in-1 also exists which combines the above
 
 // Intec Interact Infrazone 15 Shooting Games, 42 Mi kara, 96 Arcade Games + more should run here too
