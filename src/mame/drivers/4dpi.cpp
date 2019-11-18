@@ -273,7 +273,7 @@ private:
 	u8 m_lio_imr[2];
 	bool m_lio_int[2];
 
-	u8 m_sysid = 1; // FPPRES
+	//u8 m_sysid = 1; // FPPRES
 	u8 m_cpuauxctl = 0;
 };
 
