@@ -374,6 +374,8 @@ private:
 	DECLARE_READ8_MEMBER(vt1682_2106_enable_regs_r);
 	DECLARE_WRITE8_MEMBER(vt1682_2106_enable_regs_w);
 
+	DECLARE_READ8_MEMBER(vt1682_210e_io_ab_r);
+	DECLARE_READ8_MEMBER(vt1682_210f_io_cd_r);
 
 	/* System Helpers */
 
@@ -1122,8 +1124,7 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2007_vram_data_w)
 {
 	uint16_t vram_address = get_vram_addr();
 	m_vram->write8(vram_address, data);
-
-	logerror("%s: vt1682_2007_vram_data_w writing: %02x to VideoRam Address %04x\n", machine().describe_context(), data, vram_address);
+	//logerror("%s: vt1682_2007_vram_data_w writing: %02x to VideoRam Address %04x\n", machine().describe_context(), data, vram_address);
 	vram_address++; // auto inc
 	set_vram_addr(vram_address); // update registers
 }
@@ -2366,6 +2367,15 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2106_enable_regs_w)
 	logerror("%s: vt1682_2106_enable_regs_w writing: %02x (scpurn:%1x scpuon:%1x spion:%1x uarton:%1x tvon:%1x lcdon:%1x)\n", machine().describe_context(), data,
 		(data & 0x20) >> 5, (data & 0x10) >> 4, (data & 0x08) >> 3, (data & 0x04) >> 2, (data & 0x02) >> 1, (data & 0x01));
 	m_2106_enable_reg = data;
+
+	if (data & 0x20)
+	{
+		m_soundcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+	}
+	else
+	{
+		m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	}
 }
 
 
@@ -2563,6 +2573,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_210c_prgbank1_r2_w)
     0x01 - IOA:0
 */
 
+READ8_MEMBER(vt_vt1682_state::vt1682_210e_io_ab_r)
+{
+	uint8_t ret = machine().rand();
+//	logerror("%s: vt1682_210e_io_ab_r returning: %02x\n", machine().describe_context(), ret);
+	return ret;
+}
+
+
 /*
     Address 0x210f r/w (MAIN CPU)
 
@@ -2575,6 +2593,13 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_210c_prgbank1_r2_w)
     0x02 - IOC:1
     0x01 - IOC:0
 */
+
+READ8_MEMBER(vt_vt1682_state::vt1682_210f_io_cd_r)
+{
+	uint8_t ret = machine().rand();
+//	logerror("%s: vt1682_210f_io_cd_r returning: %02x\n", machine().describe_context(), ret);
+	return ret;
+}
 
 /*
    Address 0x2110 READ (MAIN CPU)
@@ -4290,9 +4315,20 @@ uint32_t vt_vt1682_state::screen_update(screen_device& screen, bitmap_rgb32& bit
 		
 			int count = 0;
 
-			int tilebase = segment / (bk1_tilesize ? 256 : 64);
+			int tilebase = 0;
+			
+			if (bk1_tilebpp == 3)
+				tilebase = segment / (bk1_tilesize ? 256 : 64);
+			else if (bk1_tilebpp == 2)
+				tilebase = segment / 192;
+
 			int gfxregion = bk1_tilesize ? 4 : 3;
+
+			if (bk1_tilebpp == 2)
+				gfxregion = 5;
+
 			gfx_element *gfx = m_gfxdecode1->gfx(gfxregion);
+
 
 			for (int y = 0; y < (bk1_tilesize ? 16 : 32); y++)
 			{
@@ -4305,6 +4341,11 @@ uint32_t vt_vt1682_state::screen_update(screen_device& screen, bitmap_rgb32& bit
 					
 					int pal = 0;
 					int tile = word & 0x0fff;
+
+					// to draw 4 4bpp pixels must read 2 bytes
+					// to draw 4 6bpp pixels must read 3 bytes
+					// to draw 4 8bpp pixels must read 4 bytes
+					  				
 
 					gfx->transpen(bitmap,cliprect,tilebase + tile,pal,0,0,x*(bk1_tilesize ? 16 : 8),y*(bk1_tilesize ? 16 : 8),0);
 					
@@ -4430,6 +4471,9 @@ void vt_vt1682_state::vt_vt1682_map(address_map &map)
 	map(0x210b, 0x210b).rw(FUNC(vt_vt1682_state::vt1682_210b_misc_cs_prg0_bank_sel_r), FUNC(vt_vt1682_state::vt1682_210b_misc_cs_prg0_bank_sel_w));
 	map(0x210c, 0x210c).rw(FUNC(vt_vt1682_state::vt1682_210c_prgbank1_r2_r), FUNC(vt_vt1682_state::vt1682_210c_prgbank1_r2_w));
 
+	map(0x210e, 0x210e).r(FUNC(vt_vt1682_state::vt1682_210e_io_ab_r));
+	map(0x210f, 0x210f).r(FUNC(vt_vt1682_state::vt1682_210f_io_cd_r));
+
 	// either reads/writes are on different addresses or our source info is incorrect
 	map(0x2110, 0x2110).rw(FUNC(vt_vt1682_state::vt1682_prgbank0_r4_r), FUNC(vt_vt1682_state::vt1682_prgbank1_r0_w));
 	map(0x2111, 0x2111).rw(FUNC(vt_vt1682_state::vt1682_prgbank0_r5_r), FUNC(vt_vt1682_state::vt1682_prgbank1_r1_w));
@@ -4462,9 +4506,11 @@ INPUT_PORTS_END
 
 INTERRUPT_GEN_MEMBER(vt_vt1682_state::nmi)
 {
-	if(m_2000 & 0x01)
+	if (m_2000 & 0x01)
+	{
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
-
+		m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+	}
 	// also generates on sound CPU
 }
 
@@ -4513,6 +4559,18 @@ static const gfx_layout helper_8bpp_16x16_layout =
 	16 * 16 * 8
 };
 
+static const gfx_layout helper_6bpp_16x16_layout =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	8,
+	{ 5,4,3,2,1,0 },
+	{ STEP16(0,6) },
+	{ STEP16(0,16*6) },
+	16 * 16 * 6
+};
+
+
 
 // hardware has line modes, so these views might be useful
 static const uint32_t texlayout_xoffset_8bpp[256] = { STEP256(0,8) };
@@ -4551,6 +4609,7 @@ static GFXDECODE_START( gfx_test )
 	GFXDECODE_ENTRY( "mainrom", 0, helper_8bpp_8_layout,  0x0, 1  )
 	GFXDECODE_ENTRY( "mainrom", 0, helper_8bpp_8x8_layout,  0x0, 1  )
 	GFXDECODE_ENTRY( "mainrom", 0, helper_8bpp_16x16_layout,  0x0, 1  )
+	GFXDECODE_ENTRY( "mainrom_swap", 0, helper_6bpp_16x16_layout,  0x0, 4  )
 	GFXDECODE_ENTRY( "mainrom", 0, texture_helper_8bpp_layout,  0x0, 1  )
 GFXDECODE_END
 
@@ -4586,7 +4645,7 @@ void vt_vt1682_state::vt_vt1682(machine_config &config)
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(256, 256);
-	m_screen->set_visarea(0, 256-1, 0, 256-1);
+	m_screen->set_visarea(0, 256-1, 0, 256-16-1);
 	m_screen->set_screen_update(FUNC(vt_vt1682_state::screen_update));
 }
 
@@ -4596,17 +4655,21 @@ void vt_vt1682_state::vt_vt1682(machine_config &config)
 
 void vt_vt1682_state::init_8in1()
 {
-	// wait loops, cause nested NMIs, wants a response from the sound cpu maybe?
 	uint8_t* rom = memregion("mainrom")->base();
-	rom[0x07cdac + 0] = 0x6E; rom[0x07cdac + 1] = 0x6E;
-	rom[0xf7cdac + 0] = 0x6E; rom[0xf7cdac + 1] = 0x6E;
-	rom[0xffcdac + 0] = 0x6E; rom[0xffcdac + 1] = 0x6E;
+	uint8_t* rom2 = memregion("mainrom_swap")->base();
+
+	for (int i = 0; i < 0x2000000; i++)
+	{
+		rom2[i] = bitswap<8>(rom[i], 0, 1, 2, 3, 4, 5, 6, 7);
+	}
 }
 
 
 ROM_START( ii8in1 )
 	ROM_REGION( 0x2000000, "mainrom", 0 )
 	ROM_LOAD( "ii8in1.bin", 0x00000, 0x2000000, CRC(7aee7464) SHA1(7a9cf7f54a350f0853a17459f2dcbef34f4f7c30) ) // 2ND HALF EMPTY
+	ROM_REGION( 0x2000000, "mainrom_swap", ROMREGION_ERASE00 )
+	// temp for 6bpp gfx decode
 
 	// possible undumped 0x1000 bytes of Internal ROM
 ROM_END
@@ -4614,13 +4677,15 @@ ROM_END
 ROM_START( ii32in1 )
 	ROM_REGION( 0x2000000, "mainrom", 0 )
 	ROM_LOAD( "ii32in1.bin", 0x00000, 0x2000000, CRC(ddee4eac) SHA1(828c0c18a66bb4872299f9a43d5e3647482c5925) )
+	ROM_REGION( 0x2000000, "mainrom_swap", ROMREGION_ERASE00 )
+	// temp for 6bpp gfx decode
 	                                    
 	// possible undumped 0x1000 bytes of Internal ROM
 ROM_END
 
 // TODO: this is a cartridge based system, move these to SL
 CONS( 200?, ii8in1,    0,  0,  vt_vt1682,    intec, vt_vt1682_state, init_8in1,  "Intec", "InterAct 8-in-1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-CONS( 200?, ii32in1,   0,  0,  vt_vt1682,    intec, vt_vt1682_state, empty_init, "Intec", "InterAct 32-in-1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 200?, ii32in1,   0,  0,  vt_vt1682,    intec, vt_vt1682_state, init_8in1,  "Intec", "InterAct 32-in-1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 // a 40-in-1 also exists which combines the above
 
 // Intec Interact Infrazone 15 Shooting Games, 42 Mi kara, 96 Arcade Games + more should run here too
