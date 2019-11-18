@@ -1637,6 +1637,12 @@ void menu_select_launch::handle_events(uint32_t flags, event &ev)
 					m_topline_datsview -= m_right_visible_lines - 1;
 				else if (hover() == HOVER_LPANEL_ARROW)
 				{
+					if (get_focus() == focused_menu::LEFT)
+					{
+						set_focus(focused_menu::MAIN);
+						select_prev();
+					}
+
 					if (ui_globals::panels_status == HIDE_LEFT_PANEL)
 						ui_globals::panels_status = SHOW_PANELS;
 					else if (ui_globals::panels_status == HIDE_BOTH)
@@ -1648,6 +1654,12 @@ void menu_select_launch::handle_events(uint32_t flags, event &ev)
 				}
 				else if (hover() == HOVER_RPANEL_ARROW)
 				{
+					if ((get_focus() == focused_menu::RIGHTTOP) || (get_focus() == focused_menu::RIGHTBOTTOM))
+					{
+						set_focus(focused_menu::MAIN);
+						select_prev();
+					}
+
 					if (ui_globals::panels_status == HIDE_RIGHT_PANEL)
 						ui_globals::panels_status = SHOW_PANELS;
 					else if (ui_globals::panels_status == HIDE_BOTH)
