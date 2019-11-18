@@ -2570,6 +2570,7 @@ WRITE8_MEMBER(apple2gs_state::c000_w)
 			{
 				m_bank0_atc->set_bank(1);
 				m_bank1_atc->set_bank(1);
+
 			}
 			break;
 
@@ -3443,6 +3444,11 @@ WRITE8_MEMBER(apple2gs_state::b1ram4000_w)
 
 READ8_MEMBER(apple2gs_state::bank0_c000_r)
 {
+	if (offset & 0x2000)
+	{
+		offset ^= 0x1000;
+	}
+
 	if (m_ramrd)
 	{
 		return m_ram_ptr[offset + 0x3c000];
@@ -3453,6 +3459,11 @@ READ8_MEMBER(apple2gs_state::bank0_c000_r)
 
 WRITE8_MEMBER(apple2gs_state::bank0_c000_w)
 {
+	if (offset & 0x2000)
+	{
+		offset ^= 0x1000;
+	}
+
 	if (m_ramwrt)
 	{
 		m_ram_ptr[offset + 0x3c000] = data;
@@ -3464,8 +3475,8 @@ WRITE8_MEMBER(apple2gs_state::bank0_c000_w)
 
 READ8_MEMBER(apple2gs_state::bank1_0000_r) { return m_ram_ptr[offset + 0x30000]; }
 WRITE8_MEMBER(apple2gs_state::bank1_0000_w) { m_ram_ptr[offset + 0x30000] = data; }
-READ8_MEMBER(apple2gs_state::bank1_c000_r) { return m_ram_ptr[offset + 0x3c000]; }
-WRITE8_MEMBER(apple2gs_state::bank1_c000_w) { m_ram_ptr[offset + 0x3c000] = data; }
+READ8_MEMBER(apple2gs_state::bank1_c000_r) { if (offset & 0x2000) offset ^= 0x1000; return m_ram_ptr[offset + 0x3c000]; }
+WRITE8_MEMBER(apple2gs_state::bank1_c000_w) { if (offset & 0x2000) offset ^= 0x1000; m_ram_ptr[offset + 0x3c000] = data; }
 WRITE8_MEMBER(apple2gs_state::bank1_0000_sh_w)
 {
 	m_ram_ptr[offset + 0x30000] = data;
