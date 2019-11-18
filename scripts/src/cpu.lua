@@ -2972,3 +2972,20 @@ if (CPUS["CR16B"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/cr16b/cr16bdasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/cr16b/cr16bdasm.h")
 end
+
+--------------------------------------------------
+-- Motorola DSP56000
+--@src/devices/cpu/dsp56000/dsp56000.h,CPUS["DSP56000"] = true
+--------------------------------------------------
+
+if (CPUS["DSP56000"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/cpu/dsp56000/dsp56000.cpp",
+		MAME_DIR .. "src/devices/cpu/dsp56000/dsp56000.h",
+	}
+end
+
+if (CPUS["DSP56000"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dsp56000/dsp56000d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dsp56000/dsp56000d.h")
+end
