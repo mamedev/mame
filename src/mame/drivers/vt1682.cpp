@@ -28,10 +28,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_vram(*this, "vram"),
 		m_sound_share(*this, "sound_share"),
-		m_gfxdecode1(*this, "gfxdecode1"),
-		m_gfxdecode2(*this, "gfxdecode2"),
-		m_palette1(*this, "palette1"),
-		m_palette2(*this, "palette2")
+		m_gfxdecode(*this, "gfxdecode2"),
+		m_palette(*this, "palette")
 	{ }
 
 	void vt_vt1682(machine_config& config);
@@ -41,6 +39,7 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -50,10 +49,8 @@ private:
 	required_device<address_map_bank_device> m_spriteram;
 	required_device<address_map_bank_device> m_vram;
 	required_shared_ptr<uint8_t> m_sound_share;
-	required_device<gfxdecode_device> m_gfxdecode1;
-	required_device<gfxdecode_device> m_gfxdecode2;
-	required_device<palette_device> m_palette1;
-	required_device<palette_device> m_palette2;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
 
 
 
@@ -79,21 +76,15 @@ private:
 	uint8_t m_201a_sp_segment_7_0;
 	uint8_t m_201b_sp_segment_11_8;
 
-	uint8_t m_201c_bk1_segment_7_0;
-	uint8_t m_201d_bk1_segment_11_8;
-	uint8_t m_201e_bk2_segment_7_0;
-	uint8_t m_201f_bk2_segment_11_8;
+	uint8_t m_segment_7_0_bk[2];
+	uint8_t m_segment_11_8_bk[2];
 
-	uint8_t m_2013_bk1_main_control;
-	uint8_t m_2017_bk2_main_control;
+	uint8_t m_main_control_bk[2];
 
-	uint8_t m_2012_bk1_scroll_control;
-	uint8_t m_2016_bk2_scroll_control;
+	uint8_t m_scroll_control_bk[2];
 
-	uint8_t m_2010_bk1_xscroll_7_0;
-	uint8_t m_2011_bk1_yscoll_7_0;
-	uint8_t m_2014_bk2_xscroll_7_0;
-	uint8_t m_2015_bk2_yscoll_7_0;
+	uint8_t m_xscroll_7_0_bk[2];
+	uint8_t m_ysrcoll_7_0_bk[2];
 
 	uint8_t m_200e_blend_pal_sel;
 	uint8_t m_200f_bk_pal_sel;
@@ -439,7 +430,18 @@ private:
 	DECLARE_READ8_MEMBER(rom_8000_to_ffff_r);
 
 	INTERRUPT_GEN_MEMBER(nmi);
+
+	bitmap_ind8 m_priority_bitmap;
+	void draw_layer(int which, int base, int opaque, screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
 };
+
+void vt_vt1682_state::video_start()
+{
+	m_screen->register_screen_bitmap(m_priority_bitmap);
+	m_priority_bitmap.fill(0xff);
+}
+
+
 
 void vt_vt1682_state::machine_start()
 {
@@ -455,21 +457,15 @@ void vt_vt1682_state::machine_start()
 
 	save_item(NAME(m_201a_sp_segment_7_0));
 	save_item(NAME(m_201b_sp_segment_11_8));
-	save_item(NAME(m_201c_bk1_segment_7_0));
-	save_item(NAME(m_201d_bk1_segment_11_8));
-	save_item(NAME(m_201e_bk2_segment_7_0));
-	save_item(NAME(m_201f_bk2_segment_11_8));
+	save_item(NAME(m_segment_7_0_bk));
+	save_item(NAME(m_segment_11_8_bk));
 
-	save_item(NAME(m_2013_bk1_main_control));
-	save_item(NAME(m_2017_bk2_main_control));
+	save_item(NAME(m_main_control_bk));
 
-	save_item(NAME(m_2012_bk1_scroll_control));
-	save_item(NAME(m_2016_bk2_scroll_control));
+	save_item(NAME(m_scroll_control_bk));
 
-	save_item(NAME(m_2010_bk1_xscroll_7_0));
-	save_item(NAME(m_2011_bk1_yscoll_7_0));
-	save_item(NAME(m_2014_bk2_xscroll_7_0));
-	save_item(NAME(m_2015_bk2_yscoll_7_0));
+	save_item(NAME(m_xscroll_7_0_bk));
+	save_item(NAME(m_ysrcoll_7_0_bk));
 
 	save_item(NAME(m_200e_blend_pal_sel));
 	save_item(NAME(m_200f_bk_pal_sel));
@@ -550,21 +546,21 @@ void vt_vt1682_state::machine_reset()
 
 	m_201a_sp_segment_7_0 = 0;
 	m_201b_sp_segment_11_8 = 0;
-	m_201c_bk1_segment_7_0 = 0;
-	m_201d_bk1_segment_11_8 = 0;
-	m_201e_bk2_segment_7_0 = 0;
-	m_201f_bk2_segment_11_8 = 0;
+	m_segment_7_0_bk[0] = 0;
+	m_segment_11_8_bk[0] = 0;
+	m_segment_7_0_bk[1] = 0;
+	m_segment_11_8_bk[1] = 0;
 
-	m_2013_bk1_main_control = 0;
-	m_2017_bk2_main_control = 0;
+	m_main_control_bk[0] = 0;
+	m_main_control_bk[1] = 0;
 
-	m_2012_bk1_scroll_control = 0;
-	m_2016_bk2_scroll_control = 0;
+	m_scroll_control_bk[0] = 0;
+	m_scroll_control_bk[1] = 0;
 
-	m_2010_bk1_xscroll_7_0 = 0;
-	m_2011_bk1_yscoll_7_0 = 0;
-	m_2014_bk2_xscroll_7_0 = 0;
-	m_2015_bk2_yscoll_7_0 = 0;
+	m_xscroll_7_0_bk[0] = 0;
+	m_ysrcoll_7_0_bk[0] = 0;
+	m_xscroll_7_0_bk[1] = 0;
+	m_ysrcoll_7_0_bk[1] = 0;
 
 	m_200e_blend_pal_sel = 0;
 	m_200f_bk_pal_sel = 0;
@@ -1355,7 +1351,7 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_200f_bk_pal_sel_w)
 
 READ8_MEMBER(vt_vt1682_state::vt1682_2010_bk1_xscroll_7_0_r)
 {
-	uint8_t ret = m_2010_bk1_xscroll_7_0;
+	uint8_t ret = m_xscroll_7_0_bk[0];
 	logerror("%s: vt1682_2010_bk1_xscroll_7_0_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
@@ -1363,7 +1359,7 @@ READ8_MEMBER(vt_vt1682_state::vt1682_2010_bk1_xscroll_7_0_r)
 WRITE8_MEMBER(vt_vt1682_state::vt1682_2010_bk1_xscroll_7_0_w)
 {
 	logerror("%s: vt1682_2010_bk1_xscroll_7_0_w writing: %02x\n", machine().describe_context(), data);
-	m_2010_bk1_xscroll_7_0 = data;
+	m_xscroll_7_0_bk[0] = data;
 }
 
 /*
@@ -1381,7 +1377,7 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2010_bk1_xscroll_7_0_w)
 
 READ8_MEMBER(vt_vt1682_state::vt1682_2011_bk1_yscoll_7_0_r)
 {
-	uint8_t ret = m_2011_bk1_yscoll_7_0;
+	uint8_t ret = m_ysrcoll_7_0_bk[0];
 	logerror("%s: vt1682_2011_bk1_yscoll_7_0_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
@@ -1389,7 +1385,7 @@ READ8_MEMBER(vt_vt1682_state::vt1682_2011_bk1_yscoll_7_0_r)
 WRITE8_MEMBER(vt_vt1682_state::vt1682_2011_bk1_yscoll_7_0_w)
 {
 	logerror("%s: vt1682_2011_bk1_yscoll_7_0_w writing: %02x\n", machine().describe_context(), data);
-	m_2011_bk1_yscoll_7_0 = data;
+	m_ysrcoll_7_0_bk[0] = data;
 }
 
 
@@ -1408,7 +1404,7 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2011_bk1_yscoll_7_0_w)
 
 READ8_MEMBER(vt_vt1682_state::vt1682_2012_bk1_scroll_control_r)
 {
-	uint8_t ret = m_2012_bk1_scroll_control;
+	uint8_t ret = m_scroll_control_bk[0];
 	logerror("%s: vt1682_2012_bk1_scroll_control_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
@@ -1419,7 +1415,7 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2012_bk1_scroll_control_w)
 	logerror("%s: vt1682_2012_bk1_scroll_control_w writing: %02x (hclr: %1x page_layout:%1x ymsb:%1x xmsb:%1x)\n", machine().describe_context(), data,
 		(data & 0x10) >> 4, (data & 0x0c) >> 2, (data & 0x02) >> 1, (data & 0x01) >> 0);
 
-	m_2012_bk1_scroll_control = data;
+	m_scroll_control_bk[0] = data;
 }
 
 
@@ -1438,7 +1434,7 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2012_bk1_scroll_control_w)
 
 READ8_MEMBER(vt_vt1682_state::vt1682_2013_bk1_main_control_r)
 {
-	uint8_t ret = m_2013_bk1_main_control;
+	uint8_t ret = m_main_control_bk[0];
 	logerror("%s: vt1682_2013_bk1_main_control_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
@@ -1448,7 +1444,7 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2013_bk1_main_control_w)
 	logerror("%s: vt1682_2013_bk1_main_control_w writing: %02x (enable:%01x palette:%01x depth:%01x bpp:%01x linemode:%01x tilesize:%01x)\n", machine().describe_context(), data,
 		(data & 0x80) >> 7, (data & 0x40) >> 6, (data & 0x30) >> 4, (data & 0x0c) >> 2, (data & 0x02) >> 1, (data & 0x01) >> 0 );
 
-	m_2013_bk1_main_control = data;
+	m_main_control_bk[0] = data;
 }
 
 /*
@@ -1467,7 +1463,7 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2013_bk1_main_control_w)
 
 READ8_MEMBER(vt_vt1682_state::vt1682_2014_bk2_xscroll_7_0_r)
 {
-	uint8_t ret = m_2014_bk2_xscroll_7_0;
+	uint8_t ret = m_xscroll_7_0_bk[1];
 	logerror("%s: vt1682_2014_bk2_xscroll_7_0_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
@@ -1475,7 +1471,7 @@ READ8_MEMBER(vt_vt1682_state::vt1682_2014_bk2_xscroll_7_0_r)
 WRITE8_MEMBER(vt_vt1682_state::vt1682_2014_bk2_xscroll_7_0_w)
 {
 	logerror("%s: vt1682_2014_bk2_xscroll_7_0_w writing: %02x\n", machine().describe_context(), data);
-	m_2014_bk2_xscroll_7_0 = data;
+	m_xscroll_7_0_bk[1] = data;
 }
 
 /*
@@ -1493,7 +1489,7 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2014_bk2_xscroll_7_0_w)
 
 READ8_MEMBER(vt_vt1682_state::vt1682_2015_bk2_yscoll_7_0_r)
 {
-	uint8_t ret = m_2015_bk2_yscoll_7_0;
+	uint8_t ret = m_ysrcoll_7_0_bk[1];
 	logerror("%s: vt1682_2015_bk2_yscoll_7_0_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
@@ -1501,7 +1497,7 @@ READ8_MEMBER(vt_vt1682_state::vt1682_2015_bk2_yscoll_7_0_r)
 WRITE8_MEMBER(vt_vt1682_state::vt1682_2015_bk2_yscoll_7_0_w)
 {
 	logerror("%s: vt1682_2015_bk2_yscoll_7_0_w writing: %02x\n", machine().describe_context(), data);
-	m_2015_bk2_yscoll_7_0 = data;
+	m_ysrcoll_7_0_bk[1] = data;
 }
 
 
@@ -1520,7 +1516,7 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2015_bk2_yscoll_7_0_w)
 
 READ8_MEMBER(vt_vt1682_state::vt1682_2016_bk2_scroll_control_r)
 {
-	uint8_t ret = m_2016_bk2_scroll_control;
+	uint8_t ret = m_scroll_control_bk[1];
 	logerror("%s: vt1682_2016_bk2_scroll_control_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
@@ -1531,7 +1527,7 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2016_bk2_scroll_control_w)
 	logerror("%s: vt1682_2016_bk2_scroll_control_w writing: %02x ((invalid): %1x page_layout:%1x ymsb:%1x xmsb:%1x)\n", machine().describe_context(), data,
 		(data & 0x10) >> 4, (data & 0x0c) >> 2, (data & 0x02) >> 1, (data & 0x01) >> 0);
 
-	m_2016_bk2_scroll_control = data;
+	m_scroll_control_bk[1] = data;
 }
 
 
@@ -1550,7 +1546,7 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2016_bk2_scroll_control_w)
 
 READ8_MEMBER(vt_vt1682_state::vt1682_2017_bk2_main_control_r)
 {
-	uint8_t ret = m_2017_bk2_main_control;
+	uint8_t ret = m_main_control_bk[1];
 	logerror("%s: vt1682_2017_bk2_main_control_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
@@ -1560,7 +1556,7 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2017_bk2_main_control_w)
 	logerror("%s: vt1682_2017_bk2_main_control_w writing: %02x (enable:%01x palette:%01x depth:%01x bpp:%01x (invalid):%01x tilesize:%01x)\n", machine().describe_context(), data,
 		(data & 0x80) >> 7, (data & 0x40) >> 6, (data & 0x30) >> 4, (data & 0x0c) >> 2, (data & 0x02) >> 1, (data & 0x01) >> 0 );
 
-	m_2017_bk2_main_control = data;
+	m_main_control_bk[1] = data;
 }
 
 
@@ -1685,7 +1681,7 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_201b_sp_segment_11_8_w)
 
 READ8_MEMBER(vt_vt1682_state::vt1682_201c_bk1_segment_7_0_r)
 {
-	uint8_t ret = m_201c_bk1_segment_7_0;
+	uint8_t ret = m_segment_7_0_bk[0];
 	logerror("%s: vt1682_201c_bk1_segment_7_0_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
@@ -1693,7 +1689,7 @@ READ8_MEMBER(vt_vt1682_state::vt1682_201c_bk1_segment_7_0_r)
 WRITE8_MEMBER(vt_vt1682_state::vt1682_201c_bk1_segment_7_0_w)
 {
 	logerror("%s: vt1682_201c_bk1_segment_7_0_w writing: %02x\n", machine().describe_context(), data);
-	m_201c_bk1_segment_7_0 = data;
+	m_segment_7_0_bk[0] = data;
 }
 
 /*
@@ -1711,7 +1707,7 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_201c_bk1_segment_7_0_w)
 
 READ8_MEMBER(vt_vt1682_state::vt1682_201d_bk1_segment_11_8_r)
 {
-	uint8_t ret = m_201d_bk1_segment_11_8;
+	uint8_t ret = m_segment_11_8_bk[0];
 	logerror("%s: vt1682_201d_bk1_segment_11_8_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
@@ -1719,7 +1715,7 @@ READ8_MEMBER(vt_vt1682_state::vt1682_201d_bk1_segment_11_8_r)
 WRITE8_MEMBER(vt_vt1682_state::vt1682_201d_bk1_segment_11_8_w)
 {
 	logerror("%s: vt1682_201d_bk1_segment_11_8_w writing: %02x\n", machine().describe_context(), data);
-	m_201d_bk1_segment_11_8 = data & 0x0f;
+	m_segment_11_8_bk[0] = data & 0x0f;
 }
 
 
@@ -1738,7 +1734,7 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_201d_bk1_segment_11_8_w)
 
 READ8_MEMBER(vt_vt1682_state::vt1682_201e_bk2_segment_7_0_r)
 {
-	uint8_t ret = m_201e_bk2_segment_7_0;
+	uint8_t ret = m_segment_7_0_bk[1];
 	logerror("%s: vt1682_201e_bk2_segment_7_0_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
@@ -1746,7 +1742,7 @@ READ8_MEMBER(vt_vt1682_state::vt1682_201e_bk2_segment_7_0_r)
 WRITE8_MEMBER(vt_vt1682_state::vt1682_201e_bk2_segment_7_0_w)
 {
 	logerror("%s: vt1682_201e_bk2_segment_7_0_w writing: %02x\n", machine().describe_context(), data);
-	m_201e_bk2_segment_7_0 = data;
+	m_segment_7_0_bk[1] = data;
 }
 
 /*
@@ -1764,7 +1760,7 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_201e_bk2_segment_7_0_w)
 
 READ8_MEMBER(vt_vt1682_state::vt1682_201f_bk2_segment_11_8_r)
 {
-	uint8_t ret = m_201f_bk2_segment_11_8;
+	uint8_t ret = m_segment_11_8_bk[1];
 	logerror("%s: vt1682_201f_bk2_segment_11_8_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
@@ -1772,7 +1768,7 @@ READ8_MEMBER(vt_vt1682_state::vt1682_201f_bk2_segment_11_8_r)
 WRITE8_MEMBER(vt_vt1682_state::vt1682_201f_bk2_segment_11_8_w)
 {
 	logerror("%s: vt1682_201f_bk2_segment_11_8_w writing: %02x\n", machine().describe_context(), data);
-	m_201f_bk2_segment_11_8 = data & 0x0f;
+	m_segment_11_8_bk[1] = data & 0x0f;
 }
 
 /*
@@ -4270,54 +4266,54 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2128_dma_sr_bank_addr_24_23_w)
     0x01 - IOB PLH
 */
 
-
-uint32_t vt_vt1682_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
+void vt_vt1682_state::draw_layer(int which, int base, int opaque, screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
 {
-
-	// m_2013_bk1_main_control
+	// m_main_control_bk[0]
 	// logerror("%s: vt1682_2013_bk1_main_control_w writing: %02x (enable:%01x palette:%01x depth:%01x bpp:%01x linemode:%01x tilesize:%01x)\n", machine().describe_context(), data,
 	//		(data & 0x80) >> 7, (data & 0x40) >> 6, (data & 0x30) >> 4, (data & 0x0c) >> 2, (data & 0x02) >> 1, (data & 0x01) >> 0 );
 
-	// m_2012_bk1_scroll_control
+	// m_scroll_control_bk[0]
 	// logerror("%s: vt1682_2012_bk1_scroll_control_w writing: %02x (hclr: %1x page_layout:%1x ymsb:%1x xmsb:%1x)\n", machine().describe_context(), data,
 	//		(data & 0x10) >> 4, (data & 0x0c) >> 2, (data & 0x02) >> 1, (data & 0x01) >> 0);
 
-	int bk1_tilesize = (m_2013_bk1_main_control & 0x01);
-	int bk1_line = (m_2013_bk1_main_control & 0x02) >> 1;
-	int bk1_tilebpp = (m_2013_bk1_main_control & 0x0c) >> 2;
-	int bk1_depth = (m_2013_bk1_main_control & 0x30) >> 4;
-	int bk1_palette = (m_2013_bk1_main_control & 0x40) >> 5;
-	int bk1_enable = (m_2013_bk1_main_control & 0x80) >> 7;
 
 
-	if (bk1_enable)
+	int bk_tilesize = (m_main_control_bk[which] & 0x01);
+	int bk_line = (m_main_control_bk[which] & 0x02) >> 1;
+	int bk_tilebpp = (m_main_control_bk[which] & 0x0c) >> 2;
+	int bk_depth = (m_main_control_bk[which] & 0x30) >> 4;
+	int bk_palette = (m_main_control_bk[which] & 0x40) >> 5;
+	int bk_enable = (m_main_control_bk[which] & 0x80) >> 7;
+
+
+	if (bk_enable)
 	{
 
-		int xscroll = m_2010_bk1_xscroll_7_0;
-		int yscroll = m_2011_bk1_yscoll_7_0;
-		int xscrollmsb = (m_2012_bk1_scroll_control & 0x01);
-		int yscrollmsb = (m_2012_bk1_scroll_control & 0x02) >> 1;
-		int page_layout = (m_2012_bk1_scroll_control & 0x0c) >> 2;;
-		int high_color = (m_2012_bk1_scroll_control & 0x10) >> 4;
+		int xscroll = m_xscroll_7_0_bk[which];
+		int yscroll = m_ysrcoll_7_0_bk[which];
+		int xscrollmsb = (m_scroll_control_bk[which] & 0x01);
+		int yscrollmsb = (m_scroll_control_bk[which] & 0x02) >> 1;
+		int page_layout = (m_scroll_control_bk[which] & 0x0c) >> 2;;
+		int high_color = (m_scroll_control_bk[which] & 0x10) >> 4;
 
-		int segment = m_201c_bk1_segment_7_0;
-		segment |= m_201d_bk1_segment_11_8 << 8;
+		int segment = m_segment_7_0_bk[which];
+		segment |= m_segment_11_8_bk[which] << 8;
 
 		segment = segment * 0x2000;
 
 		xscroll |= xscrollmsb << 8;
 		yscroll |= yscrollmsb << 8;
 
-		if (!bk1_line)
+		if (!bk_line)
 		{
 			// Character Mode
-			logerror("DRAWING ----- BK1, Character Mode Segment base %08x, TileSize %1x Bpp %1x, Depth %1x Palette %1x PageLayout:%1x XScroll %04x YScroll %04x\n", segment, bk1_tilesize, bk1_tilebpp, bk1_depth, bk1_palette, page_layout, xscroll, yscroll);
+			logerror("DRAWING ----- bk, Character Mode Segment base %08x, TileSize %1x Bpp %1x, Depth %1x Palette %1x PageLayout:%1x XScroll %04x YScroll %04x\n", segment, bk_tilesize, bk_tilebpp, bk_depth, bk_palette, page_layout, xscroll, yscroll);
 
-			int count = 0;
+			int count = base;
 
-			for (int y = 0; y < (bk1_tilesize ? 16 : 32); y++)
+			for (int y = 0; y < (bk_tilesize ? 16 : 32); y++)
 			{
-				for (int x = 0; x < (bk1_tilesize ? 16 : 32); x++)
+				for (int x = 0; x < (bk_tilesize ? 16 : 32); x++)
 				{
 					uint16_t word = m_vram->read8(count);
 					count++;
@@ -4328,15 +4324,15 @@ uint32_t vt_vt1682_state::screen_update(screen_device& screen, bitmap_rgb32& bit
 					int tile = word & 0x0fff;
 					uint8_t pal = (word & 0xf000) >> 12;
 
-					if (bk1_tilebpp == 3) pal = 0x0;
-					if (bk1_tilebpp == 2) pal &= 0xc;
+					if (bk_tilebpp == 3) pal = 0x0;
+					if (bk_tilebpp == 2) pal &= 0xc;
 
 					{
 						int startaddress = segment;
 
-						if (bk1_tilebpp == 3)
+						if (bk_tilebpp == 3)
 						{
-							if (bk1_tilesize)
+							if (bk_tilesize)
 							{
 								startaddress += 256 * tile;
 							}
@@ -4345,9 +4341,9 @@ uint32_t vt_vt1682_state::screen_update(screen_device& screen, bitmap_rgb32& bit
 								startaddress += 64 * tile;
 							}
 						}
-						else if (bk1_tilebpp == 2)
+						else if (bk_tilebpp == 2)
 						{
-							if (bk1_tilesize)
+							if (bk_tilesize)
 							{
 								startaddress += 192 * tile;
 							}
@@ -4356,20 +4352,36 @@ uint32_t vt_vt1682_state::screen_update(screen_device& screen, bitmap_rgb32& bit
 								startaddress += 48 * tile;
 							}
 						}
-
-						const pen_t* paldata = m_palette1->pens();
-						int currentadddress = startaddress;
-						for (int yy = 0; yy < (bk1_tilesize ? 16 : 8); yy++)
+						else //if (bk_tilebpp == 1) // or 0
 						{
-							int line = y * (bk1_tilesize ? 16 : 8) + yy;
+							if (bk_tilesize)
+							{
+								startaddress += 128 * tile;
+							}
+							else
+							{
+								startaddress += 32 * tile;
+							}
+						}
+
+						const pen_t* paldata = m_palette->pens();
+						int palbase;
+						
+						if (which == 0) palbase = 0x100;
+						else palbase = 0x000;
+
+						int currentadddress = startaddress;
+						for (int yy = 0; yy < (bk_tilesize ? 16 : 8); yy++)
+						{
+							int line = y * (bk_tilesize ? 16 : 8) + yy;
 
 							uint32_t* dstptr = &bitmap.pix32(line);
+							uint8_t* priptr = &m_priority_bitmap.pix8(line);
 
-
-							for (int xx = 0; xx < (bk1_tilesize ? 16 : 8); xx += 4)
+							for (int xx = 0; xx < (bk_tilesize ? 16 : 8); xx += 4)
 							{
 								uint32_t pixdata;
-								if (bk1_tilebpp == 3)
+								if (bk_tilebpp == 3)
 								{
 									pixdata = m_fullrom->read8(currentadddress) << 0; currentadddress++;
 									pixdata |= m_fullrom->read8(currentadddress) << 8; currentadddress++;
@@ -4377,48 +4389,45 @@ uint32_t vt_vt1682_state::screen_update(screen_device& screen, bitmap_rgb32& bit
 									pixdata |= m_fullrom->read8(currentadddress) << 24; currentadddress++;
 
 									uint8_t pen;
-									int xdraw = x * (bk1_tilesize ? 16 : 8);
-									pen = (pixdata >> 0) & 0xff;
-									dstptr[xdraw + xx + 0] = paldata[pen];
-									pen = (pixdata >> 8) & 0xff;
-									dstptr[xdraw + xx + 1] = paldata[pen];
-									pen = (pixdata >> 16) & 0xff;
-									dstptr[xdraw + xx + 2] = paldata[pen];
-									pen = (pixdata >> 24) & 0xff;
-									dstptr[xdraw + xx + 3] = paldata[pen];
+									int xdraw = x * (bk_tilesize ? 16 : 8);
+									int shift = 0;
+									for (int ii = 0; ii < 4; ii++)
+									{
+										pen = (pixdata >> shift) & 0xff;
+										if (opaque || pen) { int xoff = xdraw + xx + ii; if (bk_depth < priptr[xoff]) { dstptr[xoff] = paldata[palbase + pen]; priptr[xoff] = bk_depth; } }
+										shift += 8;
+									}
 								}
-								else if (bk1_tilebpp == 2)
+								else if (bk_tilebpp == 2)
 								{
 									pixdata = m_fullrom->read8(currentadddress) << 0; currentadddress++;
 									pixdata |= m_fullrom->read8(currentadddress) << 8; currentadddress++;
 									pixdata |= m_fullrom->read8(currentadddress) << 16; currentadddress++;
 
 									uint8_t pen;
-									int xdraw = x * (bk1_tilesize ? 16 : 8);
-									pen = ((pixdata >> 0) & 0x3f) | (pal << 4);
-									dstptr[xdraw + xx + 0] = paldata[pen];
-									pen = ((pixdata >> 6) & 0x3f) | (pal << 4);
-									dstptr[xdraw + xx + 1] = paldata[pen];
-									pen = ((pixdata >> 12) & 0x3f) | (pal << 4);
-									dstptr[xdraw + xx + 2] = paldata[pen];
-									pen = ((pixdata >> 18) & 0x3f) | (pal << 4);
-									dstptr[xdraw + xx + 3] = paldata[pen];
+									int xdraw = x * (bk_tilesize ? 16 : 8);
+									int shift = 0;
+									for (int ii = 0; ii < 4; ii++)
+									{
+										pen = ((pixdata >> shift) & 0x3f);
+										if (opaque || pen) { int xoff = xdraw + xx + ii; if (bk_depth < priptr[xoff]) { dstptr[xoff] = paldata[palbase + (pen | (pal << 4))]; priptr[xoff] = bk_depth; } }
+										shift += 6;
+									}
 								}
-								else //if (bk1_tilebpp == 1)// or 0
+								else //if (bk_tilebpp == 1)// or 0
 								{
 									pixdata = m_fullrom->read8(currentadddress) << 0; currentadddress++;
 									pixdata |= m_fullrom->read8(currentadddress) << 8; currentadddress++;
 
 									uint8_t pen;
-									int xdraw = x * (bk1_tilesize ? 16 : 8);
-									pen = ((pixdata >> 0) & 0x0f) | (pal << 4);
-									dstptr[xdraw + xx + 0] = paldata[pen];
-									pen = ((pixdata >> 4) & 0x0f) | (pal << 4);
-									dstptr[xdraw + xx + 1] = paldata[pen];
-									pen = ((pixdata >> 8) & 0x0f) | (pal << 4);
-									dstptr[xdraw + xx + 2] = paldata[pen];
-									pen = ((pixdata >> 12) & 0x0f) | (pal << 4);
-									dstptr[xdraw + xx + 3] = paldata[pen];
+									int xdraw = x * (bk_tilesize ? 16 : 8);
+									int shift = 0;
+									for (int ii = 0; ii < 4; ii++)
+									{
+										pen = ((pixdata >> shift) & 0x0f);
+										if (opaque || pen) { int xoff = xdraw + xx + ii; if (bk_depth < priptr[xoff]) { dstptr[xoff] = paldata[palbase + (pen | (pal << 4))]; priptr[xoff] = bk_depth; } }
+										shift += 4;
+									}
 								}
 							}
 						}
@@ -4437,6 +4446,17 @@ uint32_t vt_vt1682_state::screen_update(screen_device& screen, bitmap_rgb32& bit
 			}
 		}
 	}
+}
+
+
+uint32_t vt_vt1682_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
+{
+	m_priority_bitmap.fill(0xff, cliprect);
+	bitmap.fill(0, cliprect);
+
+	draw_layer(0, 0x000, 0, screen, bitmap, cliprect);
+
+	draw_layer(1, 0x800, 0, screen, bitmap, cliprect);
 
 	return 0;
 }
@@ -4458,8 +4478,7 @@ void vt_vt1682_state::vram_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram();
 	map(0x1000, 0x1bff).ram(); // this gets cleared, but apparently is 'reserved'
-	map(0x1c00, 0x1dff).ram().w("palette2", FUNC(palette_device::write8)).share("palette2"); // palette 2
-	map(0x1e00, 0x1fff).ram().w("palette1", FUNC(palette_device::write8)).share("palette1"); // palette 1
+	map(0x1c00, 0x1fff).ram().w("palette", FUNC(palette_device::write8)).share("palette"); // palette 2
 }
 
 // for the 2nd, faster, CPU
@@ -4587,28 +4606,6 @@ INTERRUPT_GEN_MEMBER(vt_vt1682_state::nmi)
 }
 
 
-static const gfx_layout helper_4bpp_8_layout =
-{
-	8,1,
-	RGN_FRAC(1,1),
-	4,
-	{ 0,1,2,3 },
-	{ STEP8(0,4) },
-	{ 0 },
-	8 * 4
-};
-
-static const gfx_layout helper_8bpp_8_layout =
-{
-	8,1,
-	RGN_FRAC(1,1),
-	8,
-	{ 0,1,2,3,4,5,6,7 },
-	{ STEP8(0,8) },
-	{ 0 },
-	8 * 8
-};
-
 static const gfx_layout helper_8bpp_8x8_layout =
 {
 	8,8,
@@ -4664,12 +4661,10 @@ static const gfx_layout texture_helper_4bpp_layout =
 
 // there are 6bpp gfx too, but they can't be decoded cleanly due to endian and alignment issues (start on what would be non-tile boundaries etc.)
 static GFXDECODE_START( gfx_test )
-	GFXDECODE_ENTRY( "mainrom", 0, helper_4bpp_8_layout,  0x0, 1  )
-	GFXDECODE_ENTRY( "mainrom", 0, texture_helper_4bpp_layout,  0x0, 1  )
-	GFXDECODE_ENTRY( "mainrom", 0, helper_8bpp_8_layout,  0x0, 1  )
-	GFXDECODE_ENTRY( "mainrom", 0, helper_8bpp_8x8_layout,  0x0, 1  )
-	GFXDECODE_ENTRY( "mainrom", 0, helper_8bpp_16x16_layout,  0x0, 1  )
-	GFXDECODE_ENTRY( "mainrom", 0, texture_helper_8bpp_layout,  0x0, 1  )
+	GFXDECODE_ENTRY( "mainrom", 0, texture_helper_4bpp_layout,  0x0, 2  )
+	GFXDECODE_ENTRY( "mainrom", 0, helper_8bpp_8x8_layout,  0x0, 2  )
+	GFXDECODE_ENTRY( "mainrom", 0, helper_8bpp_16x16_layout,  0x0, 2  )
+	GFXDECODE_ENTRY( "mainrom", 0, texture_helper_8bpp_layout,  0x0, 2  )
 GFXDECODE_END
 
 
@@ -4693,11 +4688,9 @@ void vt_vt1682_state::vt_vt1682(machine_config &config)
 	ADDRESS_MAP_BANK(config, m_spriteram).set_map(&vt_vt1682_state::spriteram_map).set_options(ENDIANNESS_NATIVE, 8, 11, 0x800);
 	ADDRESS_MAP_BANK(config, m_vram).set_map(&vt_vt1682_state::vram_map).set_options(ENDIANNESS_NATIVE, 8, 16, 0x10000);
 
-	PALETTE(config, m_palette2).set_format(palette_device::xRGB_555, 0x100).set_endianness(ENDIANNESS_LITTLE);
-	PALETTE(config, m_palette1).set_format(palette_device::xRGB_555, 0x100).set_endianness(ENDIANNESS_LITTLE);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x200).set_endianness(ENDIANNESS_LITTLE);
 
-	GFXDECODE(config, m_gfxdecode2, m_palette2, gfx_test);
-	GFXDECODE(config, m_gfxdecode1, m_palette1, gfx_test);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_test);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
