@@ -14,13 +14,15 @@
 	Centronics parallel interface
 	"magic button" style memory snapshot grabber
 	
-	It is a cost and feature reduced version of MGT's earlier "Disciple" unit.
+	MGT's second (and last) disk interface, a cost and feature reduced version of the earlier "Disciple" unit.
+	Rather than being a large plastic base unit like its predecessor (Interface I style), this unit is a small metal-cased
+	stand-alone unit which connects to ZX Spectrum's expansion slot via a ribbon cable.
 	A second "official" version exists which was licensed and produced by Datel following MGT's demise.
-	Also, many "unofficial" versions remain available today as both DIY-style projects/kits and some even commercially!
+	Many "unofficial" versions exist and the deisgn remains available today as DIY-style projects/kits.
 	It's said the device's design and roms were officially released into the public domain at some point?
 	
-	The official DOS was "G+DOS" and was compatible with the earlier Disciple's DOS "GDOS".
-	"SAM DOS" used by MGT's Sam Coupé was backwards-compatible with GDOS and G+DOS.
+	The official DOS was "G+DOS" and is compatible with the earlier "GDOS" for earlier Disciple unit.
+	Both these were superseded by "SAM DOS" used by MGT's Sam Coupé (which is backwards-compatible with both).
 	A 3rd party company SD Software released an alternative DOS "UNI-DOS" for both interfaces. (consisting of a disk and replacement ROM)
 	
 	Manual states any Shugart 400 DD drive should work (but not SD)
@@ -43,6 +45,8 @@
 	
 	The DOS must be loaded from a "System Disk" which is itself created from "System Tape" which was supplied with the unit.
 	The ROM provides just the RUN command, which boots the system disk and loads the full DOS.
+	Presumably the unit wasn't supplied with a system disk due to wide range of drives that can be used? (3", 3.5", 5.25")
+	The full DOS survives a reset, so reloading of system disk is only required after full power cycle.
 	
 	A few useful commands:
 	RUN                            Boots the system
@@ -75,15 +79,15 @@
 	issues with wd_fdc.cpp  see https://github.com/mamedev/mame/issues/5893
 	currently patching ROM to skip index pulse check which otherwise gives no disc error
 	
-	G+DOS:
+	G+DOS: (w/ patch)
 	disk read/write  ok
 	snapshot save/load  ok
 	disk format  ng
 	
-	UNIDOS:
-	No disk read/write (haven't patched)
+	UNIDOS: (no patch)
+	no disk read/write, won't boot uni-bios system disk
 	
-	Not working with 128K/+2
+	Not working with 128K/+2 yet...
 
 **********************************************************************/
 
@@ -97,7 +101,6 @@
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(SPECTRUM_PLUSD, spectrum_plusd_device, "spectrum_plusd", "MGT +D")
-
 
 //-------------------------------------------------
 //  INPUT_PORTS( plusd )
@@ -168,6 +171,9 @@ void spectrum_plusd_device::device_add_mconfig(machine_config &config)
 	/* printer port */
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->busy_handler().set(FUNC(spectrum_plusd_device::busy_w));
+	
+	/* software list */
+	SOFTWARE_LIST(config, "flop_list").set_original("spectrum_mgt_flop");
 }
 
 
@@ -248,7 +254,7 @@ uint8_t spectrum_plusd_device::iorq_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
-	if (m_romcs)
+	if (!machine().side_effects_disabled())
 	{
 		switch (offset & 0xff)
 		{
@@ -278,7 +284,7 @@ uint8_t spectrum_plusd_device::iorq_r(offs_t offset)
 
 void spectrum_plusd_device::iorq_w(offs_t offset, uint8_t data)
 {
-	if (m_romcs)
+	if (!machine().side_effects_disabled())
 	{
 		switch (offset & 0xff)
 		{
