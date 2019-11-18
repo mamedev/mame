@@ -4456,8 +4456,6 @@ void vt_vt1682_state::draw_tile(int segment, int tile, int x, int y, int palbase
 
 				for (int xx = 0; xx < tilesize_wide; xx += 4) // tile x pixels
 				{
-					int xdraw = xbase + xx; // tile position
-
 					// draw 4 pixels
 					uint32_t pixdata = 0;
 
@@ -4474,7 +4472,12 @@ void vt_vt1682_state::draw_tile(int segment, int tile, int x, int y, int palbase
 						uint8_t pen = (pixdata >> shift)& mask;
 						if (opaque || pen)
 						{
-							int xdraw_real = xdraw + ii; // pixel position
+							int xdraw_real;
+							if (!flipx)
+								xdraw_real = xbase + xx + ii; // pixel position
+							else
+								xdraw_real = xbase + ((tilesize_wide - 1) - xx - ii);
+
 							if (xdraw_real >= cliprect.min_x && xdraw_real <= cliprect.max_x)
 							{
 								if (depth < priptr[xdraw_real])
