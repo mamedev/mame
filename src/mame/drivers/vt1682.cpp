@@ -444,8 +444,9 @@ private:
 	INTERRUPT_GEN_MEMBER(nmi);
 
 	bitmap_ind8 m_priority_bitmap;
-	void draw_tile(int segment, int tile, int x, int y, int palbase, int pal, int is16pix, int bpp, int depth, int opaque, screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
+	void draw_tile(int segment, int tile, int x, int y, int palbase, int pal, int is16pix_high, int is16pix_wide, int bpp, int depth, int opaque, int flipx, int flipy, screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
 	void draw_layer(int which, int base, int opaque, screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
+	void draw_sprites(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
 };
 
 void vt_vt1682_state::video_start()
@@ -2337,6 +2338,12 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2100_prgbank1_r3_w)
     0x04 - Double
     0x02 - ROM SEL
     0x01 - PRAM
+
+	TV Mode settings 0 = NTSC, 1 = PAL M, 2 = PAL N, 3 = PAL
+	see clocks near machine_config
+
+	ROM SEL is which CPU the internal ROM maps to (if used)  0 = Main CPU, 1 = Sound CPU
+
 */
 
 WRITE8_MEMBER(vt_vt1682_state::vt1682_2105_comr6_tvmodes_w)
@@ -4311,7 +4318,7 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2128_dma_sr_bank_addr_24_23_w)
 */
 
 
-void vt_vt1682_state::draw_tile(int segment, int tile, int x, int y, int palbase, int pal, int is16pix, int bpp, int depth, int opaque, screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
+void vt_vt1682_state::draw_tile(int segment, int tile, int x, int y, int palbase, int pal, int is16pix_high, int is16pix_wide, int bpp, int depth, int opaque, int flipx, int flipy, screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
 {
 
 	if (bpp == 3) pal = 0x0;
@@ -4323,7 +4330,7 @@ void vt_vt1682_state::draw_tile(int segment, int tile, int x, int y, int palbase
 
 		if (bpp == 3)
 		{
-			if (is16pix)
+			if (is16pix_wide)
 			{
 				linebytes = 16;
 			}
@@ -4334,7 +4341,7 @@ void vt_vt1682_state::draw_tile(int segment, int tile, int x, int y, int palbase
 		}
 		else if (bpp == 2)
 		{
-			if (is16pix)
+			if (is16pix_wide)
 			{
 				linebytes = 12;
 			}
@@ -4345,7 +4352,7 @@ void vt_vt1682_state::draw_tile(int segment, int tile, int x, int y, int palbase
 		}
 		else //if (bpp == 1) // or 0
 		{
-			if (is16pix)
+			if (is16pix_wide)
 			{
 				linebytes = 8;
 			}
@@ -4354,15 +4361,21 @@ void vt_vt1682_state::draw_tile(int segment, int tile, int x, int y, int palbase
 				linebytes = 4;
 			}
 		}
-		int tilesize = is16pix ? 16 : 8;
+		int tilesize_wide = is16pix_wide ? 16 : 8;
+		int tilesize_high = is16pix_high ? 16 : 8;
 
-		int tilebytes = linebytes * tilesize;
+		int tilebytes = linebytes * tilesize_high;
 
 		startaddress += tilebytes * tile;
 
-		for (int yy = 0; yy < tilesize; yy++) // tile y lines
+		for (int yy = 0; yy < tilesize_high; yy++) // tile y lines
 		{
-			int currentadddress = startaddress + yy * linebytes;
+			int currentaddress;
+			
+			if (!flipy)
+				currentaddress = startaddress + yy * linebytes;
+			else
+				currentaddress = startaddress + ((tilesize_high - 1) - yy) * linebytes;
 
 			int line = y + yy;
 
@@ -4391,9 +4404,9 @@ void vt_vt1682_state::draw_tile(int segment, int tile, int x, int y, int palbase
 					bytes_in = 2;
 				}
 
-				int xbase = x;// *tilesize;
+				int xbase = x;;
 
-				for (int xx = 0; xx < tilesize; xx += 4) // tile x pixels
+				for (int xx = 0; xx < tilesize_wide; xx += 4) // tile x pixels
 				{
 					int xdraw = xbase + xx; // tile position
 
@@ -4403,7 +4416,7 @@ void vt_vt1682_state::draw_tile(int segment, int tile, int x, int y, int palbase
 					int shift = 0;
 					for (int i = 0; i < bytes_in; i++)
 					{
-						pixdata |= m_fullrom->read8(currentadddress) << shift; currentadddress++;
+						pixdata |= m_fullrom->read8(currentaddress) << shift; currentaddress++;
 						shift += 8;
 					}
 
@@ -4477,6 +4490,33 @@ void vt_vt1682_state::draw_layer(int which, int base, int opaque, screen_device&
 
 			int count = base;
 
+
+			int palselect;
+			if (which == 0) palselect = m_200f_bk_pal_sel & 0x03;
+			else palselect = (m_200f_bk_pal_sel & 0x0c)>>2;
+
+			int palbase;
+
+			if (palselect == 0)
+			{
+				// 'disable' ?
+				return;
+			}
+			else if (palselect == 1)
+			{
+				palbase = 0x100;
+			}
+			else if (palselect == 2)
+			{
+				palbase = 0x000;
+			}
+			else
+			{
+				// 'both' ? (how?)
+				palbase = machine().rand() & 0xff;
+			}
+
+
 			for (int y = 0; y < (bk_tilesize ? 16 : 32); y++)
 			{
 				for (int x = 0; x < (bk_tilesize ? 16 : 32); x++)
@@ -4490,14 +4530,13 @@ void vt_vt1682_state::draw_layer(int which, int base, int opaque, screen_device&
 					int tile = word & 0x0fff;
 					uint8_t pal = (word & 0xf000) >> 12;
 
-					int palbase;
-					if (which == 0) palbase = 0x100;
-					else palbase = 0x000;
+	
+
 
 					int xpos = x * (bk_tilesize ? 16 : 8);
 					int ypos = y * (bk_tilesize ? 16 : 8);
 
-					draw_tile(segment, tile, xpos, ypos, palbase, pal, bk_tilesize, bk_tilebpp, bk_depth, opaque, screen, bitmap, cliprect);
+					draw_tile(segment, tile, xpos, ypos, palbase, pal, bk_tilesize, bk_tilesize, bk_tilebpp, (bk_depth*2)+1, opaque, 0, 0, screen, bitmap, cliprect);
 				}
 			}
 		}
@@ -4513,6 +4552,55 @@ void vt_vt1682_state::draw_layer(int which, int base, int opaque, screen_device&
 	}
 }
 
+void vt_vt1682_state::draw_sprites(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
+{
+	int sp_en = (m_2018_spregs & 0x04) >> 2;
+	//int sp_pal_sel = (m_2018_spregs & 0x08) >> 3;
+	int sp_size = (m_2018_spregs & 0x03);
+
+	int segment = m_201a_sp_segment_7_0;
+	segment |= m_201b_sp_segment_11_8 << 8;
+	segment = segment * 0x2000;
+	// if we don't do the skipping in inc_spriteram_addr this would need to be 5 instead
+	const int SPRITE_STEP = 8;
+
+
+	if (sp_en)
+	{
+		for (int i = 0; i < 240; i++)
+		{
+			int tilenum = m_spriteram->read8((i * SPRITE_STEP) + 0);
+			int attr0 = m_spriteram->read8((i * SPRITE_STEP) + 1);
+			int x = m_spriteram->read8((i * SPRITE_STEP) + 2);
+			int attr1 = m_spriteram->read8((i * SPRITE_STEP) + 3);
+			int y = m_spriteram->read8((i * SPRITE_STEP) + 4);
+			int attr2 = m_spriteram->read8((i * SPRITE_STEP) + 5);
+
+			tilenum |= (attr0 & 0x0f) << 8;
+			int pal = (attr0 & 0xf0) >> 4;
+			
+			int flipx = (attr1 & 0x02) >> 1;
+			int flipy = (attr1 & 0x04) >> 2;
+
+			// sp_pal_sel also influences this
+			int palbase;
+			if (attr2 & 0x02)
+				palbase = 0x000;
+			else
+				palbase = 0x100;
+
+			if (attr2 & 0x01)
+				y -= 256;
+
+			if (attr1 & 0x01)
+				x -= 256;
+
+
+			draw_tile(segment, tilenum, x, y, palbase, pal, sp_size & 0x2, sp_size&0x1, 0, 0, 0, flipx, flipy, screen, bitmap, cliprect);
+		}
+	}
+	// if more than 16 sprites on any line 0x2001 bit 0x40 (SP_ERR) should be set (updated every line, can only be read in HBLANK)
+}
 
 uint32_t vt_vt1682_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
 {
@@ -4522,6 +4610,8 @@ uint32_t vt_vt1682_state::screen_update(screen_device& screen, bitmap_rgb32& bit
 	draw_layer(0, 0x000, 0, screen, bitmap, cliprect);
 
 	draw_layer(1, 0x800, 0, screen, bitmap, cliprect);
+
+	draw_sprites(screen, bitmap, cliprect);
 
 	return 0;
 }
@@ -4736,6 +4826,11 @@ GFXDECODE_END
 
 // NTSC uses XTAL(21'477'272) Sound CPU runs at exactly this, Main CPU runs at this / 4
 // PAL  uses XTAL(26'601'712) Sound CPU runs at exactly this, Main CPU runs at this / 5
+
+// can also be used with the following
+// PAL M 21.453669MHz
+// PAL N 21.492336MHz
+ 
 
 void vt_vt1682_state::vt_vt1682(machine_config &config)
 {
