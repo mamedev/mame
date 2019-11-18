@@ -536,7 +536,11 @@ TIMER_CALLBACK_MEMBER(epc_state::rxtxclk_w)
 	m_kbd8251->write_rxc(m_8251rxtx_clk_state);
 	m_kbd8251->write_txc(m_8251rxtx_clk_state);
 
-	if (!m_8251dtr_state) m_uart->rclk_w(m_8251rxtx_clk_state);
+	// The EPC PCB has an option to support a custom receive clock for the INS8250 apart from the TX clock through a mux controlled
+	// by the DTR pin of the I8251. The ins8250 device doesn't support RCLK as it is considerd implicitly as the same as BAUDOUT
+	// First attempt to support this in INS8250 by lifting out the BRG from deserial was reverted due to lots of regressions.
+	// We probably need to remove diserial dependencies completely from ins8250 or implement BRG hooks in diserial.cpp.  
+	// if (!m_8251dtr_state) m_uart->rclk_w(m_8251rxtx_clk_state); // TODO: fix RCLK support in INS8250
 
 	m_8251rxtx_clk_state = !m_8251rxtx_clk_state;
 
@@ -852,7 +856,7 @@ void epc_state::epc(machine_config &config)
 	});
 	m_kbd8251->dtr_handler().set([this](bool state) // Controls RCLK for INS8250, either 19.2KHz or INS8250 BAUDOUT
 	{
-		LOGCOM("KBD DTR: %d\n", state ? 1 : 0); // TODO: Implement clock selection mux, need to check what state does what
+		LOGCOM("KBD DTR: %d\n", state ? 1 : 0);
 		m_8251dtr_state = state;
 	});
 
@@ -934,7 +938,7 @@ void epc_state::epc(machine_config &config)
 	FLOPPY_CONNECTOR(config, m_floppy_connectors[1], epc_sd_floppies, "525sd", epc_floppy_formats);
 	//SOFTWARE_LIST(config, "epc_flop_list").set_original("epc_flop");
 
-	// system board UART TODO: Implement the descrete "Baud Rate Clock" from schematics that generates clocks for the 8250
+	// system board UART
 	INS8250(config, m_uart, XTAL(18'432'000) / 10); // TEW crystal marked X2 verified. TODO: Let 8051 DTR control RCLK (see above)
 	m_uart->out_tx_callback().set("com1", FUNC(rs232_port_device::write_txd));
 	m_uart->out_dtr_callback().set("com1", FUNC(rs232_port_device::write_dtr));
@@ -946,7 +950,7 @@ void epc_state::epc(machine_config &config)
 		if ((m_io_j10->read() & 0x30) == 0x20) { LOGCOM("UART IRQ4: %d\n", state); m_pic8259->ir4_w(state); } // Factory setting
 		if ((m_io_j10->read() & 0xc0) == 0x80) { LOGCOM("UART IRQ7: %d\n", state); m_pic8259->ir7_w(state); }
 	});
-	m_uart->out_baudout_callback().set([this](int state){ if (m_8251dtr_state) m_uart->rclk_w(state); });
+	// m_uart->out_baudout_callback().set([this](int state){ if (m_8251dtr_state) m_uart->rclk_w(state); }); // TODO: Fix INS8250 BAUDOUT pin support
 
 	rs232_port_device &rs232(RS232_PORT(config, "com1", default_rs232_devices, nullptr));
 	rs232.rxd_handler().set(m_uart, FUNC(ins8250_uart_device::rx_w));
