@@ -450,23 +450,40 @@ class intec_interact_state : public vt_vt1682_state
 {
 public:
 	intec_interact_state(const machine_config& mconfig, device_type type, const char* tag) :
-		vt_vt1682_state(mconfig, type, tag)
+		vt_vt1682_state(mconfig, type, tag),
+		m_io_p1(*this, "IN0"),
+		m_io_p2(*this, "IN1"),
+		m_io_p3(*this, "IN2"),
+		m_io_p4(*this, "IN3")
 	{ }
 
 	void intech_interact(machine_config& config);
 
-	DECLARE_READ8_MEMBER(porta_r) {	uint8_t ret = machine().rand() & 0xf; logerror("%s: porta_r returning: %1x\n", machine().describe_context(), ret); return ret; };
-	DECLARE_READ8_MEMBER(portb_r) {	uint8_t ret = machine().rand() & 0xf; logerror("%s: portb_r returning: %1x\n", machine().describe_context(), ret); return ret; };
-	DECLARE_READ8_MEMBER(portc_r) {	uint8_t ret = machine().rand() & 0xf; logerror("%s: portc_r returning: %1x\n", machine().describe_context(), ret); return ret; };
-	DECLARE_READ8_MEMBER(portd_r) {	uint8_t ret = machine().rand() & 0xf; logerror("%s: portd_r returning: %1x\n", machine().describe_context(), ret); return ret; };
+	DECLARE_READ8_MEMBER(porta_r);
+	DECLARE_READ8_MEMBER(portb_r) { return 0x00;/*uint8_t ret = machine().rand() & 0xf; logerror("%s: portb_r returning: %1x\n", machine().describe_context(), ret); return ret;*/ };
+	DECLARE_READ8_MEMBER(portc_r);
+	DECLARE_READ8_MEMBER(portd_r) { return 0x00;/*uint8_t ret = machine().rand() & 0xf; logerror("%s: portd_r returning: %1x\n", machine().describe_context(), ret); return ret;*/ };
 
-	DECLARE_WRITE8_MEMBER(porta_w) { logerror("%s: porta_w writing: %1x\n", machine().describe_context(), data & 0xf); };
-	DECLARE_WRITE8_MEMBER(portb_w) { logerror("%s: portb_w writing: %1x\n", machine().describe_context(), data & 0xf); };
+	DECLARE_WRITE8_MEMBER(porta_w);
+	DECLARE_WRITE8_MEMBER(portb_w);
 	DECLARE_WRITE8_MEMBER(portc_w) { logerror("%s: portc_w writing: %1x\n", machine().describe_context(), data & 0xf); };
 	DECLARE_WRITE8_MEMBER(portd_w) { logerror("%s: portd_w writing: %1x\n", machine().describe_context(), data & 0xf); };
 
 protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
+	uint8_t m_previous_port_b;
+	int m_input_sense;
+	int m_input_pos;
+
+	required_ioport m_io_p1;
+	required_ioport m_io_p2;
+	required_ioport m_io_p3;
+	required_ioport m_io_p4;
+
+
 };
 
 void vt_vt1682_state::video_start()
@@ -4838,60 +4855,6 @@ void vt_vt1682_state::vt_vt1682_map(address_map &map)
 
 
 
-static INPUT_PORTS_START( intec )
-	PORT_START("IN0")
-	PORT_DIPNAME( 0x01, 0x01, "IN0" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("IN1")
-	PORT_DIPNAME( 0x01, 0x01, "IN1" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
-
 
 INTERRUPT_GEN_MEMBER(vt_vt1682_state::nmi)
 {
@@ -5005,6 +4968,168 @@ void vt_vt1682_state::vt_vt1682(machine_config &config)
 	m_screen->set_visarea(0, 256-1, 0, 256-16-1);
 	m_screen->set_screen_update(FUNC(vt_vt1682_state::screen_update));
 }
+
+void intec_interact_state::machine_start()
+{
+	vt_vt1682_state::machine_start();
+
+	save_item(NAME(m_previous_port_b));
+	save_item(NAME(m_input_sense));
+	save_item(NAME(m_input_pos));
+}
+
+void intec_interact_state::machine_reset()
+{
+	vt_vt1682_state::machine_reset();
+	m_previous_port_b = 0x0;
+	m_input_sense = 0;
+	m_input_pos = 0;
+}
+
+WRITE8_MEMBER(intec_interact_state::porta_w)
+{
+	if (data != 0xf)
+	{
+		logerror("%s: porta_w writing: %1x\n", machine().describe_context(), data & 0xf);
+	}
+}
+
+
+static INPUT_PORTS_START( intec )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 ) PORT_PLAYER(1) // Selects games
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("Select") // used on first screen to choose which set of games
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) 
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) // Fires in Tank
+
+	PORT_START("IN2") // are these used? 2 player games all seem to be turn based? (Aqua-Mix looks like it should be 2 player but nothing here starts a 2 player game, maybe mapped in some other way?)
+	PORT_DIPNAME( 0x01, 0x01, "IN2" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	
+	PORT_START("IN3")
+	PORT_DIPNAME( 0x01, 0x01, "IN3" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
+// this controller code is just designed to feed the games with data they're happy with, it probably has no grounds in reality
+// as I don't know how they really work.  presumably wireless with timeouts, sending signals for brief periods that need to be
+// picked up on, although that said, there are some very short (128 read on status) timeout loops in the code that will force
+// input to 0 if they fail
+
+// note, the real hardware has multiple 'motion' accessories, but in reality they all just act like a button press
+
+READ8_MEMBER(intec_interact_state::porta_r)
+{	
+	uint8_t ret = 0x0;// = machine().rand() & 0xf;
+
+	switch (m_input_pos)
+	{
+	case 0x1: ret = m_io_p1->read(); break;
+	case 0x2: ret = m_io_p2->read(); break;
+	case 0x3: ret = m_io_p3->read(); break;
+	case 0x4: ret = m_io_p4->read(); break;
+	}
+
+	logerror("%s: porta_r returning: %1x (INPUTS) (with input position %d)\n", machine().describe_context(), ret, m_input_pos);
+	return ret;
+}
+
+READ8_MEMBER(intec_interact_state::portc_r)
+{
+	uint8_t ret = 0x0;
+	ret |= m_input_sense ^1;
+	logerror("%s: portc_r returning: %1x (CONTORLLER INPUT SENSE)\n", machine().describe_context(), ret);
+	return ret;
+}
+
+WRITE8_MEMBER(intec_interact_state::portb_w)
+{
+	logerror("%s: portb_w writing: %1x\n", machine().describe_context(), data & 0xf);
+
+	if ((m_previous_port_b & 0x1) && (!(data & 0x1)))
+	{
+		// 0x1 high -> low
+		logerror("high to low\n");
+
+		if (m_input_sense == 1)
+		{
+			m_input_pos++;
+		}
+		else
+		{
+			m_input_sense = 1;
+		}
+		logerror("input pos is %d\n", m_input_pos);
+
+	}
+	else if ((m_previous_port_b & 0x1) && (data & 0x1))
+	{
+		// 0x1 high -> high
+		logerror("high to high\n");
+		m_input_pos = 0;
+	}
+	else if ((!(m_previous_port_b & 0x1)) && (!(data & 0x1)))
+	{
+		// 0x1 low -> low
+		logerror("low to low\n");
+
+		if (m_input_sense == 1)
+		{
+			m_input_pos = 0;
+		}
+	}
+	else if ((!(m_previous_port_b & 0x1)) && (data & 0x1))
+	{
+		// 0x1 low -> high
+		logerror("low to high\n");
+
+		if (m_input_sense == 1)
+		{
+			m_input_pos++;
+		}
+
+		if (m_input_pos == 5)
+		{
+			m_input_sense = 0;
+		}
+
+		logerror("input pos is %d\n", m_input_pos);
+
+	}
+
+	m_previous_port_b = data;
+};
+
+
+
+
 
 
 void intec_interact_state::intech_interact(machine_config& config)
