@@ -810,9 +810,9 @@ uint32_t mame_ui_manager::handler_messagebox_anykey(render_container &container)
 	draw_text_box(container, messagebox_text.c_str(), ui::text_layout::LEFT, 0.5f, 0.5f, messagebox_backcolor);
 
 	// if the user cancels, exit out completely
-	if (machine().ui_input().pressed(IPT_UI_CANCEL))
+	if (machine().ui_input().pressed(IPT_UI_QUIT) || machine().ui_input().pressed(IPT_UI_FORCE_QUIT))
 	{
-		machine().schedule_exit();
+		machine().schedule_force_exit();
 		state = UI_HANDLER_CANCEL;
 	}
 
@@ -1113,9 +1113,15 @@ uint32_t mame_ui_manager::handler_ingame(render_container &container)
 
 	if (ui_disabled) return ui_disabled;
 
-	if (machine().ui_input().pressed(IPT_UI_CANCEL))
+	if (machine().ui_input().pressed(IPT_UI_QUIT))
 	{
 		request_quit();
+		return 0;
+	}
+
+	if (machine().ui_input().pressed(IPT_UI_FORCE_QUIT))
+	{
+		machine().schedule_force_exit();
 		return 0;
 	}
 

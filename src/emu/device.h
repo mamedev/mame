@@ -634,6 +634,7 @@ protected:
 	void debug_setup();
 	void pre_save();
 	void post_load();
+	void power_fail();
 	void notify_clock_changed();
 	finder_base *register_auto_finder(finder_base &autodev);
 	void register_callback(devcb_base &callback);
@@ -769,6 +770,16 @@ protected:
 	/// #device_interface mix-in interface_post_load members are called.
 	/// \sa device_pre_save device_interface::interface_post_load
 	virtual void device_post_load() ATTR_COLD;
+
+	/// \brief Device power failure handler
+	///
+	/// Implement this member to notify a device that the machine will
+	/// stop running shortly.  For instance it may be necessary to
+	/// signal an interrupt that the program will service by saving
+	/// user data to non-volatile memory.  This is called after all
+	/// #device_interface mix-in interface_power_fail members are called.
+	/// \sa device_power_fail device_interface::interface_power_fail
+	virtual void device_power_fail() ATTR_COLD;
 
 	virtual void device_clock_changed();
 	virtual void device_debug_setup();
@@ -976,6 +987,16 @@ public:
 	/// device_post_load is called for the device.
 	/// \sa interface_pre_save device_t::device_post_load
 	virtual void interface_post_load() ATTR_COLD;
+
+	/// \brief Mix-in power failure handler
+	///
+	/// Implement this member to notify a device that the machine will
+	/// stop running shortly.  For instance it may be necessary to
+	/// signal an interrupt that the program will service by saving
+	/// user data to non-volatile memory.  This is called before
+	/// device_power_fail is called for the device.
+	/// \sa interface_power_fail device_t::device_power_fail
+	virtual void interface_power_fail() ATTR_COLD;
 
 	virtual void interface_clock_changed();
 	virtual void interface_debug_setup();

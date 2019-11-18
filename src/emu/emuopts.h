@@ -167,6 +167,7 @@
 #define OPTION_UI                   "ui"
 #define OPTION_RAMSIZE              "ramsize"
 #define OPTION_NVRAM_SAVE           "nvram_save"
+#define OPTION_SHUTDOWN_DELAY       "shutdown_delay"
 
 // core comm options
 #define OPTION_COMM_LOCAL_HOST      "comm_localhost"
@@ -443,6 +444,7 @@ public:
 	ui_option ui() const { return m_ui; }
 	const char *ram_size() const { return value(OPTION_RAMSIZE); }
 	bool nvram_save() const { return bool_value(OPTION_NVRAM_SAVE); }
+	int shutdown_delay() const { return int_value(OPTION_SHUTDOWN_DELAY); }
 
 	// core comm options
 	const char *comm_localhost() const { return value(OPTION_COMM_LOCAL_HOST); }

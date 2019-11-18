@@ -270,11 +270,11 @@ int mame_machine_manager::execute()
 		}
 		else
 		{
-			if (machine.exit_pending())
+			if (!machine.hard_reset_pending())
 				m_options.set_system_name("");
 		}
 
-		if (machine.exit_pending() && (!started_empty || is_empty))
+		if (!machine.hard_reset_pending() && (!started_empty || is_empty))
 			exit_pending = true;
 
 		// machine will go away when we exit scope

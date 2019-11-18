@@ -659,6 +659,22 @@ void device_t::post_load()
 
 
 //-------------------------------------------------
+//  power_fail - tell the device and its interfaces
+//  that the machine is about to lose power
+//-------------------------------------------------
+
+void device_t::power_fail()
+{
+	// notify the interfaces
+	for (device_interface &intf : interfaces())
+		intf.interface_power_fail();
+
+	// notify the device
+	device_power_fail();
+}
+
+
+//-------------------------------------------------
 //  notify_clock_changed - notify all interfaces
 //  that the clock has changed
 //-------------------------------------------------
@@ -799,6 +815,17 @@ void device_t::device_pre_save()
 //-------------------------------------------------
 
 void device_t::device_post_load()
+{
+	// do nothing by default
+}
+
+
+//-------------------------------------------------
+//  device_power_fail - called to warn that the
+//  machine will stop running shortly
+//-------------------------------------------------
+
+void device_t::device_power_fail()
 {
 	// do nothing by default
 }
@@ -1082,6 +1109,17 @@ void device_interface::interface_pre_save()
 //-------------------------------------------------
 
 void device_interface::interface_post_load()
+{
+	// do nothing by default
+}
+
+
+//-------------------------------------------------
+//  interface_power_fail - called to warn that the
+//  machine will stop running shortly
+//-------------------------------------------------
+
+void device_interface::interface_power_fail()
 {
 	// do nothing by default
 }

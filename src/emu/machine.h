@@ -193,7 +193,8 @@ public:
 	machine_phase phase() const { return m_current_phase; }
 	bool paused() const { return m_paused || (m_current_phase != machine_phase::RUNNING); }
 	bool exit_pending() const { return m_exit_pending; }
-	bool hard_reset_pending() const { return m_hard_reset_pending; }
+	bool exit_forced() const { return m_exit_forced; }
+	bool hard_reset_pending() const { return m_reset_after_exit; }
 	bool ui_active() const { return m_ui_active; }
 	const char *basename() const { return m_basename.c_str(); }
 	int sample_rate() const { return m_sample_rate; }
@@ -207,7 +208,7 @@ public:
 	// additional helpers
 	emu_options &options() const { return m_config.options(); }
 	attotime time() const noexcept { return m_scheduler.time(); }
-	bool scheduled_event_pending() const { return m_exit_pending || m_hard_reset_pending; }
+	bool scheduled_event_pending() const { return m_exit_pending; }
 	bool allow_logging() const { return !m_logerror_list.empty(); }
 
 	// fetch items by name
@@ -237,6 +238,7 @@ public:
 
 	// scheduled operations
 	void schedule_exit();
+	void schedule_force_exit();
 	void schedule_hard_reset();
 	void schedule_soft_reset();
 	void schedule_save(std::string &&filename);
@@ -296,6 +298,7 @@ private:
 	void set_saveload_filename(std::string &&filename);
 	void handle_saveload();
 	void soft_reset(void *ptr = nullptr, s32 param = 0);
+	void delayed_exit(void *ptr = nullptr, s32 param = 0);
 	std::string nvram_filename(device_t &device) const;
 	void nvram_load();
 	void nvram_save();
@@ -337,9 +340,11 @@ private:
 	// system state
 	machine_phase           m_current_phase;        // current execution phase
 	bool                    m_paused;               // paused?
-	bool                    m_hard_reset_pending;   // is a hard reset pending?
+	bool                    m_reset_after_exit;     // is a hard reset pending?
 	bool                    m_exit_pending;         // is an exit pending?
+	bool                    m_exit_forced;          // is a forced exit pending?
 	emu_timer *             m_soft_reset_timer;     // timer used to schedule a soft reset
+	emu_timer *             m_shutdown_timer;       // timer used to schedule a delayed exit
 
 	// misc state
 	u32                     m_rand_seed;            // current random number seed

@@ -677,7 +677,7 @@ void device_image_interface::battery_save(const void *buffer, int length)
 	if (!buffer || (length <= 0))
 		throw emu_fatalerror("device_image_interface::battery_save: Must specify sensical buffer/length");
 
-	if (!device().machine().options().nvram_save())
+	if (!device().machine().options().nvram_save() || device().machine().exit_forced())
 		return;
 
 	std::string fname = std::string(device().machine().system().name).append(PATH_SEPARATOR).append(m_basename_noext.c_str()).append(".nv");

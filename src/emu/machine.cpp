@@ -116,9 +116,11 @@ running_machine::running_machine(const machine_config &_config, machine_manager 
 		m_manager(manager),
 		m_current_phase(machine_phase::PREINIT),
 		m_paused(false),
-		m_hard_reset_pending(false),
+		m_reset_after_exit(false),
 		m_exit_pending(false),
+		m_exit_forced(false),
 		m_soft_reset_timer(nullptr),
+		m_shutdown_timer(nullptr),
 		m_rand_seed(0x9d14abd7),
 		m_ui_active(_config.options().ui_active()),
 		m_basename(_config.gamedrv().name),
@@ -195,8 +197,9 @@ void running_machine::start()
 	m_render = std::make_unique<render_manager>(*this);
 	m_bookkeeping = std::make_unique<bookkeeping_manager>(*this);
 
-	// allocate a soft_reset timer
+	// allocate soft reset and shutdown timers
 	m_soft_reset_timer = m_scheduler.timer_alloc(timer_expired_delegate(FUNC(running_machine::soft_reset), this));
+	m_shutdown_timer = m_scheduler.timer_alloc(timer_expired_delegate(FUNC(running_machine::delayed_exit), this));
 
 	// initialize UI input
 	m_ui_input = make_unique_clear<ui_input_manager>(*this);
@@ -350,15 +353,13 @@ int running_machine::run(bool quiet)
 
 		export_http_api();
 
-		m_hard_reset_pending = false;
-
 #if defined(__EMSCRIPTEN__)
 		// break out to our async javascript loop and halt
 		emscripten_set_running_machine(this);
 #endif
 
 		// run the CPUs until a reset or exit
-		while ((!m_hard_reset_pending && !m_exit_pending) || m_saveload_schedule != saveload_schedule::NONE)
+		while (!m_exit_pending || m_saveload_schedule != saveload_schedule::NONE)
 		{
 			g_profiler.start(PROFILER_EXTRA);
 
@@ -382,9 +383,12 @@ int running_machine::run(bool quiet)
 
 		// save the NVRAM and configuration
 		sound().ui_mute(true);
-		if (options().nvram_save())
-			nvram_save();
-		m_configuration->save_settings();
+		if (!m_exit_forced)
+		{
+			if (options().nvram_save())
+				nvram_save();
+			m_configuration->save_settings();
+		}
 	}
 	catch (emu_fatalerror &fatal)
 	{
@@ -438,14 +442,56 @@ int running_machine::run(bool quiet)
 
 void running_machine::schedule_exit()
 {
-	m_exit_pending = true;
+	// don't shut down if we're already shutting down
+	if (m_exit_pending || m_shutdown_timer->enabled())
+		return;
 
-	// if we're executing, abort out immediately
-	m_scheduler.eat_all_cycles();
+	// notify all devices
+	for (device_t &device : device_iterator(root_device()))
+		device.power_fail();
+
+	// set a timer for the delayed shutdown
+	const int delay = std::max(options().shutdown_delay(), 0);
+	m_shutdown_timer->adjust(attotime::from_msec(delay));
+
+	// we can't be paused since the timer needs to fire
+	resume();
+}
+
+
+//-------------------------------------------------
+//  delayed_exit - exit after the shutdown delay
+//-------------------------------------------------
+
+void running_machine::delayed_exit(void *ptr, s32 param)
+{
+	m_exit_pending = true;
 
 	// if we're autosaving on exit, schedule a save as well
 	if (options().autosave() && (m_system.flags & MACHINE_SUPPORTS_SAVE) && this->time() > attotime::zero)
 		schedule_save("auto");
+}
+
+
+//-------------------------------------------------
+//  schedule_force_exit - schedule a force quit
+//-------------------------------------------------
+
+void running_machine::schedule_force_exit()
+{
+	m_exit_pending = true;
+	m_exit_forced = true;
+	osd_printf_warning("%s: Force quit\n", options().system_name());
+
+	// if we're executing, abort out immediately
+	m_scheduler.eat_all_cycles();
+
+	// if we're in the middle of shutting down, abort that process
+	m_shutdown_timer->adjust(attotime::never);
+
+	// don't save or hard reset
+	m_saveload_schedule = saveload_schedule::NONE;
+	m_reset_after_exit = false;
 }
 
 
@@ -456,10 +502,11 @@ void running_machine::schedule_exit()
 
 void running_machine::schedule_hard_reset()
 {
-	m_hard_reset_pending = true;
+	if (m_exit_forced)
+		return;
 
-	// if we're executing, abort out immediately
-	m_scheduler.eat_all_cycles();
+	m_reset_after_exit = true;
+	schedule_exit();
 }
 
 

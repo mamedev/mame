@@ -1255,6 +1255,7 @@ void lua_engine::initialize()
  * machine.paused - get paused state
  * machine.samplerate - get audio sample rate
  * machine.exit_pending
+ * machine.exit_forced
  * machine.hard_reset_pending
  *
  * machine.devices[] - get device table (k=tag, v=device_t)
@@ -1287,6 +1288,7 @@ void lua_engine::initialize()
 	machine_type.set("paused", sol::property(&running_machine::paused));
 	machine_type.set("samplerate", sol::property(&running_machine::sample_rate));
 	machine_type.set("exit_pending", sol::property(&running_machine::exit_pending));
+	machine_type.set("exit_forced", sol::property(&running_machine::exit_forced));
 	machine_type.set("hard_reset_pending", sol::property(&running_machine::hard_reset_pending));
 	machine_type.set("devices", sol::property([this](running_machine &m) {
 			std::function<void(device_t &, sol::table)> tree;
