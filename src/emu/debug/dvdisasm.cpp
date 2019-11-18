@@ -22,8 +22,8 @@
 //  debug_view_disasm_source - constructor
 //-------------------------------------------------
 
-debug_view_disasm_source::debug_view_disasm_source(const char *name, device_t &device)
-	: debug_view_source(name, &device),
+debug_view_disasm_source::debug_view_disasm_source(std::string &&name, device_t &device)
+	: debug_view_source(std::move(name), &device),
 		m_space(device.memory().space(AS_PROGRAM)),
 		m_decrypted_space(device.memory().has_space(AS_OPCODES) ? device.memory().space(AS_OPCODES) : device.memory().space(AS_PROGRAM))
 {
@@ -89,12 +89,15 @@ void debug_view_disasm::enumerate_sources()
 	m_source_list.clear();
 
 	// iterate over devices with disassembly interfaces
-	std::string name;
-	for(device_disasm_interface &dasm : disasm_interface_iterator(machine().root_device()))
+	for (device_disasm_interface &dasm : disasm_interface_iterator(machine().root_device()))
 	{
-		name = string_format("%s '%s'", dasm.device().name(), dasm.device().tag());
-		if(dasm.device().memory().space_config(AS_PROGRAM)!=nullptr)
-			m_source_list.emplace_back(std::make_unique<debug_view_disasm_source>(name.c_str(), dasm.device()));
+		if (dasm.device().memory().space_config(AS_PROGRAM))
+		{
+			m_source_list.emplace_back(
+					std::make_unique<debug_view_disasm_source>(
+						util::string_format("%s '%s'", dasm.device().name(), dasm.device().tag()),
+						dasm.device()));
+		}
 	}
 
 	// reset the source to a known good entry

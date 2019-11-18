@@ -31,8 +31,8 @@ const int debug_view_state::REG_FRAME;
 //  debug_view_state_source - constructor
 //-------------------------------------------------
 
-debug_view_state_source::debug_view_state_source(const char *name, device_t &device)
-	: debug_view_source(name, &device)
+debug_view_state_source::debug_view_state_source(std::string &&name, device_t &device)
+	: debug_view_source(std::move(name), &device)
 	, m_stateintf(dynamic_cast<device_state_interface *>(&device))
 	, m_execintf(dynamic_cast<device_execute_interface *>(&device))
 {
@@ -81,11 +81,12 @@ void debug_view_state::enumerate_sources()
 	m_source_list.clear();
 
 	// iterate over devices that have state interfaces
-	std::string name;
 	for (device_state_interface &state : state_interface_iterator(machine().root_device()))
 	{
-		name = string_format("%s '%s'", state.device().name(), state.device().tag());
-		m_source_list.emplace_back(std::make_unique<debug_view_state_source>(name.c_str(), state.device()));
+		m_source_list.emplace_back(
+				std::make_unique<debug_view_state_source>(
+					util::string_format("%s '%s'", state.device().name(), state.device().tag()),
+					state.device()));
 	}
 
 	// reset the source to a known good entry

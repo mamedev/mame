@@ -31,8 +31,8 @@
 //  debug_view_source - constructor
 //-------------------------------------------------
 
-debug_view_source::debug_view_source(const char *name, device_t *device)
-	: m_name(name),
+debug_view_source::debug_view_source(std::string &&name, device_t *device)
+	: m_name(std::move(name)),
 		m_device(device)
 {
 }

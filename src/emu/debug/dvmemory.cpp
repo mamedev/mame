@@ -49,39 +49,39 @@ const debug_view_memory::memory_view_pos debug_view_memory::s_memory_pos_table[1
 //  debug_view_memory_source - constructors
 //-------------------------------------------------
 
-debug_view_memory_source::debug_view_memory_source(const char *name, address_space &space)
-	: debug_view_source(name, &space.device()),
-		m_space(&space),
-		m_memintf(dynamic_cast<device_memory_interface *>(&space.device())),
-		m_base(nullptr),
-		m_length(0),
-		m_offsetxor(0),
-		m_endianness(space.endianness()),
-		m_prefsize(space.data_width() / 8)
+debug_view_memory_source::debug_view_memory_source(std::string &&name, address_space &space)
+	: debug_view_source(std::move(name), &space.device())
+	, m_space(&space)
+	, m_memintf(dynamic_cast<device_memory_interface *>(&space.device()))
+	, m_base(nullptr)
+	, m_length(0)
+	, m_offsetxor(0)
+	, m_endianness(space.endianness())
+	, m_prefsize(space.data_width() / 8)
 {
 }
 
-debug_view_memory_source::debug_view_memory_source(const char *name, memory_region &region)
-	: debug_view_source(name),
-		m_space(nullptr),
-		m_memintf(nullptr),
-		m_base(region.base()),
-		m_length(region.bytes()),
-		m_offsetxor(ENDIAN_VALUE_NE_NNE(region.endianness(), 0, region.bytewidth() - 1)),
-		m_endianness(region.endianness()),
-		m_prefsize(std::min<u8>(region.bytewidth(), 8))
+debug_view_memory_source::debug_view_memory_source(std::string &&name, memory_region &region)
+	: debug_view_source(std::move(name))
+	, m_space(nullptr)
+	, m_memintf(nullptr)
+	, m_base(region.base())
+	, m_length(region.bytes())
+	, m_offsetxor(ENDIAN_VALUE_NE_NNE(region.endianness(), 0, region.bytewidth() - 1))
+	, m_endianness(region.endianness())
+	, m_prefsize(std::min<u8>(region.bytewidth(), 8))
 {
 }
 
-debug_view_memory_source::debug_view_memory_source(const char *name, void *base, int element_size, int num_elements)
-	: debug_view_source(name),
-		m_space(nullptr),
-		m_memintf(nullptr),
-		m_base(base),
-		m_length(element_size * num_elements),
-		m_offsetxor(0),
-		m_endianness(ENDIANNESS_NATIVE),
-		m_prefsize(std::min(element_size, 8))
+debug_view_memory_source::debug_view_memory_source(std::string &&name, void *base, int element_size, int num_elements)
+	: debug_view_source(std::move(name))
+	, m_space(nullptr)
+	, m_memintf(nullptr)
+	, m_base(base)
+	, m_length(element_size * num_elements)
+	, m_offsetxor(0)
+	, m_endianness(ENDIANNESS_NATIVE)
+	, m_prefsize(std::min(element_size, 8))
 {
 }
 
@@ -136,45 +136,51 @@ void debug_view_memory::enumerate_sources()
 {
 	// start with an empty list
 	m_source_list.clear();
-	std::string name;
+	m_source_list.reserve(machine().save().registration_count());
 
 	// first add all the devices' address spaces
 	for (device_memory_interface &memintf : memory_interface_iterator(machine().root_device()))
+	{
 		for (int spacenum = 0; spacenum < memintf.max_space_count(); ++spacenum)
+		{
 			if (memintf.has_space(spacenum))
 			{
-				address_space &space = memintf.space(spacenum);
-				name = string_format("%s '%s' %s space memory", memintf.device().name(), memintf.device().tag(), space.name());
-				m_source_list.emplace_back(std::make_unique<debug_view_memory_source>(name.c_str(), space));
+				address_space &space(memintf.space(spacenum));
+				m_source_list.emplace_back(
+						std::make_unique<debug_view_memory_source>(
+							util::string_format("%s '%s' %s space memory", memintf.device().name(), memintf.device().tag(), space.name()),
+							space));
 			}
+		}
+	}
 
 	// then add all the memory regions
 	for (auto &region : machine().memory().regions())
 	{
-		name = string_format("Region '%s'", region.second->name());
-		m_source_list.emplace_back(std::make_unique<debug_view_memory_source>(name.c_str(), *region.second.get()));
+		m_source_list.emplace_back(
+				std::make_unique<debug_view_memory_source>(
+					util::string_format("Region '%s'", region.second->name()),
+					*region.second.get()));
 	}
 
-	// finally add all global array symbols in alphabetical order
-	std::vector<std::tuple<std::string, void *, u32, u32> > itemnames;
-	itemnames.reserve(machine().save().registration_count());
-
+	// finally add all global array symbols in ASCII order
+	std::string name;
+	std::size_t const firstsave = m_source_list.size();
 	for (int itemnum = 0; itemnum < machine().save().registration_count(); itemnum++)
 	{
 		u32 valsize, valcount;
 		void *base;
-		std::string name_string(machine().save().indexed_item(itemnum, base, valsize, valcount));
+		name = machine().save().indexed_item(itemnum, base, valsize, valcount);
 
 		// add pretty much anything that's not a timer (we may wish to cull other items later)
 		// also, don't trim the front of the name, it's important to know which VIA6522 we're looking at, e.g.
-		if (strncmp(name_string.c_str(), "timer/", 6))
-			itemnames.emplace_back(std::move(name_string), base, valsize, valcount);
+		if (strncmp(name.c_str(), "timer/", 6))
+			m_source_list.emplace_back(std::make_unique<debug_view_memory_source>(std::move(name), base, valsize, valcount));
 	}
-
-	std::sort(itemnames.begin(), itemnames.end(), [] (auto const &x, auto const &y) { return std::get<0>(x) < std::get<0>(y); });
-
-	for (auto const &item : itemnames)
-		m_source_list.emplace_back(std::make_unique<debug_view_memory_source>(std::get<0>(item).c_str(), std::get<1>(item), std::get<2>(item), std::get<3>(item)));
+	std::sort(
+			std::next(m_source_list.begin(), firstsave),
+			m_source_list.end(),
+			[] (auto const &x, auto const &y) { return 0 > std::strcmp(x->name(), y->name()); });
 
 	// reset the source to a known good entry
 	if (!m_source_list.empty())

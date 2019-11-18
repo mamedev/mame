@@ -45,7 +45,7 @@ class debug_view_disasm_source : public debug_view_source
 
 public:
 	// construction/destruction
-	debug_view_disasm_source(const char *name, device_t &device);
+	debug_view_disasm_source(std::string &&name, device_t &device);
 
 	// getters
 	address_space &space() const { return m_space; }

@@ -136,13 +136,14 @@ void debug_view_watchpoints::enumerate_sources()
 {
 	// start with an empty list
 	m_source_list.clear();
-	std::string name;
 
 	// iterate over devices with disassembly interfaces
 	for (device_disasm_interface &dasm : disasm_interface_iterator(machine().root_device()))
 	{
-		name = string_format("%s '%s'", dasm.device().name(), dasm.device().tag());
-		m_source_list.emplace_back(std::make_unique<debug_view_source>(name.c_str(), &dasm.device()));
+		m_source_list.emplace_back(
+				std::make_unique<debug_view_source>(
+					util::string_format("%s '%s'", dasm.device().name(), dasm.device().tag()),
+					&dasm.device()));
 	}
 
 	// reset the source to a known good entry
