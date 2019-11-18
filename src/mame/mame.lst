@@ -95,7 +95,7 @@ undoukai                        // A17 (c) 1984 Taito
 @source:4dpi.cpp
 4d20                            //  IP6: Personal Iris 4D/20, R2000 @12.5MHz
 4d25                            // IP10: Personal Iris 4D/25, R3000 @20MHz
-4d30                            // IP12: Personal Iris 4D/30, R3000A @30MHz
+4d30                            // IP14: Personal Iris 4D/30, R3000A @30MHz
 4d35                            // IP12: Personal Iris 4D/35, R3000A @36MHz
 
 @source:4enlinea.cpp
