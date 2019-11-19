@@ -20,12 +20,14 @@
 #include "emu.h"
 #include "machine/mb8421.h"
 
-
-DEFINE_DEVICE_TYPE(MB8421, mb8421_device, "mb8421", "MB8421 8-bit Dual-Port SRAM with Interrupts")
-DEFINE_DEVICE_TYPE(IDT7130, idt7130_device, "idt7130", "IDT7130 8-bit Dual-Port SRAM with Interrupts")
-DEFINE_DEVICE_TYPE(CY7C131, cy7c131_device, "cy7c131", "CY7C131 8-bit Dual-Port SRAM with Interrupts")
-DEFINE_DEVICE_TYPE(IDT71321, idt71321_device, "idt71321", "IDT71321 8-bit Dual-Port SRAM with Interrupts")
-DEFINE_DEVICE_TYPE(MB8421_MB8431_16BIT, mb8421_mb8431_16_device, "mb8421_mb8431_16", "MB8421/MB8431 16-bit Dual-Port SRAM with Interrupts")
+// 1Kx8
+DEFINE_DEVICE_TYPE(IDT7130,             idt7130_device,          "idt7130",          "IDT 7130 8-bit Dual-Port SRAM with Interrupts")
+DEFINE_DEVICE_TYPE(CY7C131,             cy7c131_device,          "cy7c131",          "Cypress CY7C131 8-bit Dual-Port SRAM with Interrupts")
+// 2Kx8
+DEFINE_DEVICE_TYPE(MB8421,              mb8421_device,           "mb8421",           "Fujitsu MB8421 8-bit Dual-Port SRAM with Interrupts")
+DEFINE_DEVICE_TYPE(IDT71321,            idt71321_device,         "idt71321",         "IDT 71321 8-bit Dual-Port SRAM with Interrupts")
+// 2Kx16
+DEFINE_DEVICE_TYPE(MB8421_MB8431_16BIT, mb8421_mb8431_16_device, "mb8421_mb8431_16", "Fujitsu MB8421/MB8431 16-bit Dual-Port SRAM with Interrupts")
 
 //-------------------------------------------------
 //  dual_port_mailbox_ram_base - constructor
