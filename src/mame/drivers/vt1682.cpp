@@ -5061,7 +5061,7 @@ READ8_MEMBER(intec_interact_state::porta_r)
 	case 0x4: ret = m_io_p4->read(); break;
 	}
 
-	logerror("%s: porta_r returning: %1x (INPUTS) (with input position %d)\n", machine().describe_context(), ret, m_input_pos);
+	//logerror("%s: porta_r returning: %1x (INPUTS) (with input position %d)\n", machine().describe_context(), ret, m_input_pos);
 	return ret;
 }
 
@@ -5069,7 +5069,7 @@ READ8_MEMBER(intec_interact_state::portc_r)
 {
 	uint8_t ret = 0x0;
 	ret |= m_input_sense ^1;
-	logerror("%s: portc_r returning: %1x (CONTORLLER INPUT SENSE)\n", machine().describe_context(), ret);
+	//logerror("%s: portc_r returning: %1x (CONTROLLER INPUT SENSE)\n", machine().describe_context(), ret);
 	return ret;
 }
 
