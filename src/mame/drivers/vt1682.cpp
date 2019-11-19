@@ -576,6 +576,7 @@ private:
 
 	bitmap_ind8 m_priority_bitmap;
 	void setup_video_pages(int which, int tilesize, int vs, int hs, int y8, int x8, uint16_t* pagebases);
+	int get_address_for_tilepos(int x, int y, int tilesize, uint16_t* pagebases);
 
 	void draw_tile_pixline(int segment, int tile, int yy, int x, int y, int palbase, int pal, int is16pix_high, int is16pix_wide, int bpp, int depth, int opaque, int flipx, int flipy, screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
 	void draw_tile(int segment, int tile, int x, int y, int palbase, int pal, int is16pix_high, int is16pix_wide, int bpp, int depth, int opaque, int flipx, int flipy, screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
@@ -5372,6 +5373,90 @@ void vt_vt1682_state::setup_video_pages(int which, int tilesize, int vs, int hs,
 	}
 	*/
 }
+
+int vt_vt1682_state::get_address_for_tilepos(int x, int y, int tilesize, uint16_t* pagebases)
+{
+	if (!tilesize) // 8x8 mode
+	{
+		// in 8x8 mode each page is 32 tiles wide and 32 tiles high
+		// the pagebases structure is for 2x2 pages, so 64 tiles in each direction, pre-mirrored for smaller sizes
+		// each page is 0x800 bytes
+		// 0x40 bytes per line (0x2 bytes per tile, 0x20 tiles)
+
+		x &= 0x3f;
+		y &= 0x3f;
+
+		if (x & 0x20) // right set of pages
+		{
+			x &= 0x1f;
+			if (y & 0x20)// bottom set of pages
+			{
+				y &= 0x1f;
+				return pagebases[3] + (y * 0x20 * 0x02) + (x * 0x2);
+			}
+			else // top set of pages
+			{
+				y &= 0x1f;
+				return pagebases[1] + (y * 0x20 * 0x02) + (x * 0x2);
+			}
+		}
+		else // left set of pages
+		{
+			x &= 0x1f;
+			if (y & 0x20)// bottom set of pages
+			{
+				y &= 0x1f;
+				return pagebases[2] + (y * 0x20 * 0x02) + (x * 0x2);
+			}
+			else // top set of pages
+			{
+				y &= 0x1f;
+				return pagebases[0] + (y * 0x20 * 0x02) + (x * 0x2);
+			}
+		}
+	}
+	else // 16x16 mode
+	{
+		// in 16x16 mode each page is 16 tiles wide and 16 tiles high
+		// the pagebases structure is for 2x2 pages, so 32 tiles in each direction, pre-mirrored for smaller sizes
+		// each page is 0x100 bytes
+		// 0x10 bytes per line (0x2 bytes per tile, 0x10 tiles)
+		x &= 0x1f;
+		y &= 0x1f;
+
+		if (x & 0x10) // right set of pages
+		{
+			x &= 0x0f;
+			if (y & 0x10)// bottom set of pages
+			{
+				y &= 0x0f;
+				return pagebases[3] + (y * 0x10 * 0x02) + (x * 0x2);
+			}
+			else // top set of pages
+			{
+				y &= 0x0f;
+				return pagebases[1] + (y * 0x10 * 0x02) + (x * 0x2);
+			}
+		}
+		else // left set of pages
+		{
+			x &= 0x0f;
+			if (y & 0x10)// bottom set of pages
+			{
+				y &= 0x0f;
+				return pagebases[2] + (y * 0x10 * 0x02) + (x * 0x2);
+			}
+			else // top set of pages
+			{
+				y &= 0x0f;
+				return pagebases[0] + (y * 0x10 * 0x02) + (x * 0x2);
+			}
+		}
+	}
+	// should never get here
+	return 0x00;
+}
+
 /*
     Page Setups
 
@@ -5530,17 +5615,12 @@ void vt_vt1682_state::draw_layer(int which, int opaque, screen_device& screen, b
 
 		setup_video_pages(which, bk_tilesize, page_layout_v, page_layout_h, yscrollmsb, xscrollmsb, bases);
 
-		// until we implement scrolling, draw the top left page
-		int base = bases[0];
-
 		//logerror("layer %d bases %04x %04x %04x %04x (scrolls x:%02x y:%02x)\n", which, bases[0], bases[1], bases[2], bases[3], xscroll, yscroll);
 
 		if (!bk_line)
 		{
 			// Character Mode
 			logerror("DRAWING ----- bk, Character Mode Segment base %08x, TileSize %1x Bpp %1x, Depth %1x Palette %1x PageLayout_V:%1x PageLayout_H:%1x XScroll %04x YScroll %04x\n", segment, bk_tilesize, bk_tilebpp, bk_depth, bk_palette, page_layout_v, page_layout_h, xscroll, yscroll);
-
-
 
 			int palselect;
 			if (which == 0) palselect = m_200f_bk_pal_sel & 0x03;
@@ -5566,10 +5646,6 @@ void vt_vt1682_state::draw_layer(int which, int opaque, screen_device& screen, b
 				// 'both' ? (how?)
 				palbase = machine().rand() & 0xff;
 			}
-
-			int pagewidth_bytes = (bk_tilesize ? 16 : 32) * 2;
-
-			//for (int y = 0; y < (bk_tilesize ? 16 : 32); y++)
 			
 			for (int y=0;y<240;y++)
 			{
@@ -5588,20 +5664,17 @@ void vt_vt1682_state::draw_layer(int which, int opaque, screen_device& screen, b
 
 				for (int xtile = 0; xtile < (bk_tilesize ? 16 : 32); xtile++)
 				{
-					int count = base + (pagewidth_bytes * ytile); // y part;
-					count += (2 * xtile); // xpart;
+					int count = get_address_for_tilepos(xtile, ytile, bk_tilesize, bases);
 
 					uint16_t word = m_vram->read8(count);
 					count++;
 					word |= m_vram->read8(count) << 8;
 					count++;
 
-					//int pal = 0;
 					int tile = word & 0x0fff;
 					uint8_t pal = (word & 0xf000) >> 12;
 
 					int xpos = xtile * (bk_tilesize ? 16 : 8);
-					//int ypos = ytile * (bk_tilesize ? 16 : 8);
 
 					draw_tile_pixline(segment, tile, ytileline, xpos, y, palbase, pal, bk_tilesize, bk_tilesize, bk_tilebpp, (bk_depth*2)+1, opaque, 0, 0, screen, bitmap, cliprect);
 				}
