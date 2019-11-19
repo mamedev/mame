@@ -14,6 +14,7 @@
 #include "machine/m6502_vt1682.h"
 #include "machine/vt1682_io.h"
 #include "machine/bankdev.h"
+#include "machine/timer.h"
 #include "emupal.h"
 #include "screen.h"
 
@@ -39,7 +40,10 @@ public:
 		m_vram(*this, "vram"),
 		m_sound_share(*this, "sound_share"),
 		m_gfxdecode(*this, "gfxdecode2"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_soundcpu_timer_a(*this, "snd_timera"),
+		m_soundcpu_timer_b(*this, "snd_timerb"),
+		m_system_timer(*this, "sys_timer")
 	{ }
 
 	void vt_vt1682(machine_config& config);
@@ -60,7 +64,10 @@ private:
 	required_shared_ptr<uint8_t> m_sound_share;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-
+	required_device<timer_device> m_soundcpu_timer_a;
+	required_device<timer_device> m_soundcpu_timer_b;
+	required_device<timer_device> m_system_timer;
+	
 
 
 	uint32_t screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
@@ -327,6 +334,8 @@ private:
 	uint8_t m_2104_timer_preload_15_8;
 
 
+
+
 	DECLARE_READ8_MEMBER(vt1682_2100_prgbank1_r3_r);
 	DECLARE_WRITE8_MEMBER(vt1682_2100_prgbank1_r3_w);
 	DECLARE_READ8_MEMBER(vt1682_210c_prgbank1_r2_r);
@@ -407,6 +416,7 @@ private:
 	DECLARE_READ8_MEMBER(vt1682_2104_timer_preload_15_8_r);
 	DECLARE_WRITE8_MEMBER(vt1682_2104_timer_preload_15_8_w);
 
+	TIMER_DEVICE_CALLBACK_MEMBER(system_timer_expired);
 
 	/* System Helpers */
 
@@ -468,7 +478,41 @@ private:
 
 	/* Sound CPU Related*/
 
+	uint8_t m_soundcpu_2100_timer_a_preload_7_0;
+	uint8_t m_soundcpu_2101_timer_a_preload_15_8;
+	uint8_t m_soundcpu_2102_timer_a_enable;
+	uint8_t m_soundcpu_2110_timer_b_preload_7_0;
+	uint8_t m_soundcpu_2111_timer_b_preload_15_8;
+	uint8_t m_soundcpu_2112_timer_b_enable;
+
+	DECLARE_READ8_MEMBER(vt1682_soundcpu_2100_timer_a_preload_7_0_r);
+	DECLARE_WRITE8_MEMBER(vt1682_soundcpu_2100_timer_a_preload_7_0_w);
+
+	DECLARE_READ8_MEMBER(vt1682_soundcpu_2101_timer_a_preload_15_8_r);
+	DECLARE_WRITE8_MEMBER(vt1682_soundcpu_2101_timer_a_preload_15_8_w);
+
+	DECLARE_READ8_MEMBER(vt1682_soundcpu_2102_timer_a_enable_r);
+	DECLARE_WRITE8_MEMBER(vt1682_soundcpu_2102_timer_a_enable_w);
+
+	DECLARE_WRITE8_MEMBER(vt1682_soundcpu_2103_timer_a_irqclear_w);
+
+	DECLARE_READ8_MEMBER(vt1682_soundcpu_2110_timer_b_preload_7_0_r);
+	DECLARE_WRITE8_MEMBER(vt1682_soundcpu_2110_timer_b_preload_7_0_w);
+
+	DECLARE_READ8_MEMBER(vt1682_soundcpu_2111_timer_b_preload_15_8_r);
+	DECLARE_WRITE8_MEMBER(vt1682_soundcpu_2111_timer_b_preload_15_8_w);
+
+	DECLARE_READ8_MEMBER(vt1682_soundcpu_2112_timer_b_enable_r);
+	DECLARE_WRITE8_MEMBER(vt1682_soundcpu_2112_timer_b_enable_w);
+
+	DECLARE_WRITE8_MEMBER(vt1682_soundcpu_2113_timer_b_irqclear_w);
+
+
 	DECLARE_WRITE8_MEMBER(vt1682_soundcpu_211c_reg_irqctrl_w);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(soundcpu_timer_a_expired);
+	TIMER_DEVICE_CALLBACK_MEMBER(soundcpu_timer_b_expired);
+
 
 	/* Support */
 
@@ -634,6 +678,16 @@ void vt_vt1682_state::machine_start()
 	save_item(NAME(m_2101_timer_preload_7_0));
 	save_item(NAME(m_2102_timer_enable));
 	save_item(NAME(m_2104_timer_preload_15_8));
+
+	/* Sound CPU */
+
+	save_item(NAME(m_soundcpu_2100_timer_a_preload_7_0));
+	save_item(NAME(m_soundcpu_2101_timer_a_preload_15_8));
+	save_item(NAME(m_soundcpu_2102_timer_a_enable));
+	save_item(NAME(m_soundcpu_2110_timer_b_preload_7_0));
+	save_item(NAME(m_soundcpu_2111_timer_b_preload_15_8));
+	save_item(NAME(m_soundcpu_2112_timer_b_enable));
+
 }
 
 void vt_vt1682_state::machine_reset()
@@ -742,6 +796,17 @@ void vt_vt1682_state::machine_reset()
 	m_2101_timer_preload_7_0 = 0;
 	m_2102_timer_enable = 0;
 	m_2104_timer_preload_15_8 = 0;
+
+	/* Sound CPU */
+
+	m_soundcpu_2100_timer_a_preload_7_0 = 0;
+	m_soundcpu_2101_timer_a_preload_15_8 = 0;
+	m_soundcpu_2102_timer_a_enable = 0;
+	m_soundcpu_2110_timer_b_preload_7_0 = 0;
+	m_soundcpu_2111_timer_b_preload_15_8 = 0;
+	m_soundcpu_2112_timer_b_enable = 0;
+
+	/* Misc */
 
 	update_banks();
 
@@ -2430,6 +2495,11 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2102_timer_enable_w)
 	m_2102_timer_enable = data;
 }
 
+TIMER_DEVICE_CALLBACK_MEMBER(vt_vt1682_state::system_timer_expired)
+{
+	
+}
+
 
 /*
     Address 0x2103 r/w (MAIN CPU)
@@ -4048,6 +4118,20 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2137_alu_div_opr6_trigger_w)
     0x01 - Timer A Preload:0
 */
 
+READ8_MEMBER(vt_vt1682_state::vt1682_soundcpu_2100_timer_a_preload_7_0_r)
+{
+	uint8_t ret = m_soundcpu_2100_timer_a_preload_7_0;
+	logerror("%s: vt1682_soundcpu_2100_timer_a_preload_7_0_r returning: %02x\n", machine().describe_context(), ret);
+	return ret;
+}
+
+WRITE8_MEMBER(vt_vt1682_state::vt1682_soundcpu_2100_timer_a_preload_7_0_w)
+{
+	logerror("%s: vt1682_soundcpu_2100_timer_a_preload_7_0_w writing: %02x\n", machine().describe_context(), data);
+	m_soundcpu_2100_timer_a_preload_7_0 = data;
+}
+
+
 /*
     Address 0x2101 r/w (SOUND CPU)
 
@@ -4061,6 +4145,20 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2137_alu_div_opr6_trigger_w)
     0x01 - Timer A Preload:8
 */
 
+READ8_MEMBER(vt_vt1682_state::vt1682_soundcpu_2101_timer_a_preload_15_8_r)
+{
+	uint8_t ret = m_soundcpu_2101_timer_a_preload_15_8;
+	logerror("%s: vt1682_soundcpu_2101_timer_a_preload_15_8_r returning: %02x\n", machine().describe_context(), ret);
+	return ret;
+}
+
+WRITE8_MEMBER(vt_vt1682_state::vt1682_soundcpu_2101_timer_a_preload_15_8_w)
+{
+	logerror("%s: vt1682_soundcpu_2101_timer_a_preload_15_8_w writing: %02x\n", machine().describe_context(), data);
+	m_soundcpu_2101_timer_a_preload_15_8 = data;
+}
+
+
 /*
     Address 0x2102 r/w (SOUND CPU)
 
@@ -4073,6 +4171,47 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2137_alu_div_opr6_trigger_w)
     0x02 - TMRA IRQ
     0x01 - TMRA EN
 */
+
+READ8_MEMBER(vt_vt1682_state::vt1682_soundcpu_2102_timer_a_enable_r)
+{
+	uint8_t ret = m_soundcpu_2102_timer_a_enable;
+	logerror("%s: vt1682_soundcpu_2102_timer_a_enable_r returning: %02x\n", machine().describe_context(), ret);
+	return ret;
+}
+
+WRITE8_MEMBER(vt_vt1682_state::vt1682_soundcpu_2102_timer_a_enable_w)
+{
+	// For NTSC
+
+	//Period = (65536 - Timer _PreLoad) / 21.4772 MHz
+	//Timer PreLoad = 65536 – (Period in seconds) * 21.4772 * 1000000 )
+
+	// For PAL
+	// Period = (65536 - Timer PreLoad) / 26.601712 MHz
+	//Timer PreLoad = 65536 – (Period in seconds) * 26.601712 * 1000000 )
+
+	/*
+	uint16_t preload = (m_soundcpu_2101_timer_a_preload_15_8 << 8) | m_soundcpu_2100_timer_a_preload_7_0;
+
+	double newval = 65536 - preload;
+	double soundclock = m_soundcpu->clock();
+	soundclock = soundclock / 1000000;
+
+	double period = newval / soundclock; // in microseconds?
+
+	printf("sound clock %f preload %d  newval %f period %f\n", soundclock, preload, newval, period );
+	*/
+
+	logerror("%s: vt1682_soundcpu_2102_timer_a_enable_w writing: %02x\n", machine().describe_context(), data);
+	m_soundcpu_2102_timer_a_enable = data;
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(vt_vt1682_state::soundcpu_timer_a_expired)
+{
+
+}
+
+
 
 /*
     Address 0x2103 r/w (SOUND CPU)
@@ -4100,6 +4239,11 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2137_alu_div_opr6_trigger_w)
 /* Address 0x210e Unused (SOUND CPU) */
 /* Address 0x210f Unused (SOUND CPU) */
 
+WRITE8_MEMBER(vt_vt1682_state::vt1682_soundcpu_2103_timer_a_irqclear_w)
+{
+	logerror("%s: vt1682_soundcpu_2103_timer_a_irqclear_w writing: %02x\n", machine().describe_context(), data);
+}
+
 
 /*
     Address 0x2110 r/w (SOUND CPU)
@@ -4114,6 +4258,20 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2137_alu_div_opr6_trigger_w)
     0x01 - Timer B Preload:0
 */
 
+READ8_MEMBER(vt_vt1682_state::vt1682_soundcpu_2110_timer_b_preload_7_0_r)
+{
+	uint8_t ret = m_soundcpu_2110_timer_b_preload_7_0;
+	logerror("%s: vt1682_soundcpu_2110_timer_b_preload_7_0_r returning: %02x\n", machine().describe_context(), ret);
+	return ret;
+}
+
+WRITE8_MEMBER(vt_vt1682_state::vt1682_soundcpu_2110_timer_b_preload_7_0_w)
+{
+	logerror("%s: vt1682_soundcpu_2110_timer_b_preload_7_0_w writing: %02x\n", machine().describe_context(), data);
+	m_soundcpu_2110_timer_b_preload_7_0 = data;
+}
+
+
 /*
     Address 0x2111 r/w (SOUND CPU)
 
@@ -4126,6 +4284,21 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2137_alu_div_opr6_trigger_w)
     0x02 - Timer B Preload:9
     0x01 - Timer B Preload:8
 */
+
+READ8_MEMBER(vt_vt1682_state::vt1682_soundcpu_2111_timer_b_preload_15_8_r)
+{
+	uint8_t ret = m_soundcpu_2111_timer_b_preload_15_8;
+	logerror("%s: vt1682_soundcpu_2111_timer_b_preload_15_8_r returning: %02x\n", machine().describe_context(), ret);
+	return ret;
+}
+
+WRITE8_MEMBER(vt_vt1682_state::vt1682_soundcpu_2111_timer_b_preload_15_8_w)
+{
+	logerror("%s: vt1682_soundcpu_2111_timer_b_preload_15_8_w writing: %02x\n", machine().describe_context(), data);
+	m_soundcpu_2111_timer_b_preload_15_8 = data;
+}
+
+
 
 /*
     Address 0x2112 r/w (SOUND CPU)
@@ -4140,6 +4313,24 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2137_alu_div_opr6_trigger_w)
     0x01 - TMRB EN
 */
 
+READ8_MEMBER(vt_vt1682_state::vt1682_soundcpu_2112_timer_b_enable_r)
+{
+	uint8_t ret = m_soundcpu_2112_timer_b_enable;
+	logerror("%s: vt1682_soundcpu_2112_timer_b_enable_r returning: %02x\n", machine().describe_context(), ret);
+	return ret;
+}
+
+WRITE8_MEMBER(vt_vt1682_state::vt1682_soundcpu_2112_timer_b_enable_w)
+{
+	logerror("%s: vt1682_soundcpu_2112_timer_b_enable_w writing: %02x\n", machine().describe_context(), data);
+	m_soundcpu_2112_timer_b_enable = data;
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(vt_vt1682_state::soundcpu_timer_b_expired)
+{
+
+}
+
 /*
     Address 0x2113 r/w (SOUND CPU)
 
@@ -4152,6 +4343,12 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2137_alu_div_opr6_trigger_w)
     0x02 - Timer B IRQ Clear
     0x01 - Timer B IRQ Clear
 */
+
+WRITE8_MEMBER(vt_vt1682_state::vt1682_soundcpu_2113_timer_b_irqclear_w)
+{
+	logerror("%s: vt1682_soundcpu_2113_timer_b_irqclear_w writing: %02x\n", machine().describe_context(), data);
+}
+
 
 /* Address 0x2114 Unused (SOUND CPU) */
 /* Address 0x2115 Unused (SOUND CPU) */
@@ -5206,6 +5403,16 @@ void vt_vt1682_state::vt_vt1682_sound_map(address_map& map)
 	map(0x1000, 0x1fff).ram().share("sound_share");
 	// 3000-3fff internal ROM if enabled
 
+	map(0x2100, 0x2100).rw(FUNC(vt_vt1682_state::vt1682_soundcpu_2100_timer_a_preload_7_0_r), FUNC(vt_vt1682_state::vt1682_soundcpu_2100_timer_a_preload_7_0_w));
+	map(0x2101, 0x2101).rw(FUNC(vt_vt1682_state::vt1682_soundcpu_2101_timer_a_preload_15_8_r), FUNC(vt_vt1682_state::vt1682_soundcpu_2101_timer_a_preload_15_8_w));
+	map(0x2102, 0x2102).rw(FUNC(vt_vt1682_state::vt1682_soundcpu_2102_timer_a_enable_r), FUNC(vt_vt1682_state::vt1682_soundcpu_2102_timer_a_enable_w));
+	map(0x2103, 0x2103).w(FUNC(vt_vt1682_state::vt1682_soundcpu_2103_timer_a_irqclear_w));
+
+	map(0x2110, 0x2110).rw(FUNC(vt_vt1682_state::vt1682_soundcpu_2110_timer_b_preload_7_0_r), FUNC(vt_vt1682_state::vt1682_soundcpu_2110_timer_b_preload_7_0_w));
+	map(0x2111, 0x2111).rw(FUNC(vt_vt1682_state::vt1682_soundcpu_2111_timer_b_preload_15_8_r), FUNC(vt_vt1682_state::vt1682_soundcpu_2111_timer_b_preload_15_8_w));
+	map(0x2112, 0x2112).rw(FUNC(vt_vt1682_state::vt1682_soundcpu_2112_timer_b_enable_r), FUNC(vt_vt1682_state::vt1682_soundcpu_2112_timer_b_enable_w));
+	map(0x2113, 0x2113).w(FUNC(vt_vt1682_state::vt1682_soundcpu_2113_timer_b_irqclear_w));
+
 	map(0x211c, 0x211c).w(FUNC(vt_vt1682_state::vt1682_soundcpu_211c_reg_irqctrl_w));
 
 	map(0xf000, 0xffff).ram().share("sound_share"); // doesn't actually map here, the CPU fetches vectors from 0x0ff0 - 0x0fff!
@@ -5451,6 +5658,11 @@ void vt_vt1682_state::vt_vt1682(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_test);
 
 	VT_VT1682_IO(config, m_io, 0);
+
+	TIMER(config, m_soundcpu_timer_a).configure_periodic(FUNC(vt_vt1682_state::soundcpu_timer_a_expired), attotime::never);
+	TIMER(config, m_soundcpu_timer_b).configure_periodic(FUNC(vt_vt1682_state::soundcpu_timer_b_expired), attotime::never);
+	TIMER(config, m_system_timer).configure_periodic(FUNC(vt_vt1682_state::system_timer_expired), attotime::never);
+
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
