@@ -577,6 +577,7 @@ private:
 	bitmap_ind8 m_priority_bitmap;
 	void setup_video_pages(int which, int tilesize, int vs, int hs, int y8, int x8, uint16_t* pagebases);
 
+	void draw_tile_pixline(int segment, int tile, int yy, int x, int y, int palbase, int pal, int is16pix_high, int is16pix_wide, int bpp, int depth, int opaque, int flipx, int flipy, screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
 	void draw_tile(int segment, int tile, int x, int y, int palbase, int pal, int is16pix_high, int is16pix_wide, int bpp, int depth, int opaque, int flipx, int flipy, screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
 	void draw_layer(int which, int opaque, screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
 	void draw_sprites(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
@@ -5022,134 +5023,138 @@ WRITE8_MEMBER(vt_vt1682_state::soundcpu_alu_oprand_6_div_w)
     0x01 - IOB PLH
 */
 
+void vt_vt1682_state::draw_tile_pixline(int segment, int tile, int yy, int x, int y, int palbase, int pal, int is16pix_high, int is16pix_wide, int bpp, int depth, int opaque, int flipx, int flipy, screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
+{
+	int tilesize_high = is16pix_high ? 16 : 8;
+	int line = y + yy;
 
+	if (line >= cliprect.min_y && line <= cliprect.max_y)
+	{
+
+		if (bpp == 3) pal = 0x0;
+		if (bpp == 2) pal &= 0xc;
+
+		int startaddress = segment;
+		int linebytes;
+
+		if (bpp == 3)
+		{
+			if (is16pix_wide)
+			{
+				linebytes = 16;
+			}
+			else
+			{
+				linebytes = 8;
+			}
+		}
+		else if (bpp == 2)
+		{
+			if (is16pix_wide)
+			{
+				linebytes = 12;
+			}
+			else
+			{
+				linebytes = 6;
+			}
+		}
+		else //if (bpp == 1) // or 0
+		{
+			if (is16pix_wide)
+			{
+				linebytes = 8;
+			}
+			else
+			{
+				linebytes = 4;
+			}
+		}
+		int tilesize_wide = is16pix_wide ? 16 : 8;
+
+		int tilebytes = linebytes * tilesize_high;
+
+		startaddress += tilebytes * tile;
+
+		int currentaddress;
+
+		if (!flipy)
+			currentaddress = startaddress + yy * linebytes;
+		else
+			currentaddress = startaddress + ((tilesize_high - 1) - yy) * linebytes;
+
+
+		uint32_t* dstptr = &bitmap.pix32(line);
+		uint8_t* priptr = &m_priority_bitmap.pix8(line);
+
+		int shift_amount, mask, bytes_in;
+		if (bpp == 3) // (8bpp)
+		{
+			shift_amount = 8;
+			mask = 0xff;
+			bytes_in = 4;
+		}
+		else if (bpp == 2) // (6bpp)
+		{
+			shift_amount = 6;
+			mask = 0x3f;
+			bytes_in = 3;
+		}
+		else // 1 / 0 (4bpp)
+		{
+			shift_amount = 4;
+			mask = 0x0f;
+			bytes_in = 2;
+		}
+
+		int xbase = x;;
+
+		for (int xx = 0; xx < tilesize_wide; xx += 4) // tile x pixels
+		{
+			// draw 4 pixels
+			uint32_t pixdata = 0;
+
+			int shift = 0;
+			for (int i = 0; i < bytes_in; i++)
+			{
+				pixdata |= m_fullrom->read8(currentaddress) << shift; currentaddress++;
+				shift += 8;
+			}
+
+			shift = 0;
+			for (int ii = 0; ii < 4; ii++)
+			{
+				uint8_t pen = (pixdata >> shift)& mask;
+				if (opaque || pen)
+				{
+					int xdraw_real;
+					if (!flipx)
+						xdraw_real = xbase + xx + ii; // pixel position
+					else
+						xdraw_real = xbase + ((tilesize_wide - 1) - xx - ii);
+
+					if (xdraw_real >= cliprect.min_x && xdraw_real <= cliprect.max_x)
+					{
+						if (depth < priptr[xdraw_real])
+						{
+							const pen_t* paldata = m_palette->pens();
+							dstptr[xdraw_real] = paldata[(palbase + pen) | (pal << 4)];
+							priptr[xdraw_real] = depth;
+						}
+					}
+				}
+				shift += shift_amount;
+			}
+		}
+	}
+}
 void vt_vt1682_state::draw_tile(int segment, int tile, int x, int y, int palbase, int pal, int is16pix_high, int is16pix_wide, int bpp, int depth, int opaque, int flipx, int flipy, screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
 {
 	int tilesize_high = is16pix_high ? 16 : 8;
 
 	for (int yy = 0; yy < tilesize_high; yy++) // tile y lines
 	{
-		int line = y + yy;
-
-		if (line >= cliprect.min_y && line <= cliprect.max_y)
-		{
-
-			if (bpp == 3) pal = 0x0;
-			if (bpp == 2) pal &= 0xc;
-
-			int startaddress = segment;
-			int linebytes;
-
-			if (bpp == 3)
-			{
-				if (is16pix_wide)
-				{
-					linebytes = 16;
-				}
-				else
-				{
-					linebytes = 8;
-				}
-			}
-			else if (bpp == 2)
-			{
-				if (is16pix_wide)
-				{
-					linebytes = 12;
-				}
-				else
-				{
-					linebytes = 6;
-				}
-			}
-			else //if (bpp == 1) // or 0
-			{
-				if (is16pix_wide)
-				{
-					linebytes = 8;
-				}
-				else
-				{
-					linebytes = 4;
-				}
-			}
-			int tilesize_wide = is16pix_wide ? 16 : 8;
-
-			int tilebytes = linebytes * tilesize_high;
-
-			startaddress += tilebytes * tile;
-
-			int currentaddress;
-
-			if (!flipy)
-				currentaddress = startaddress + yy * linebytes;
-			else
-				currentaddress = startaddress + ((tilesize_high - 1) - yy) * linebytes;
-
-
-			uint32_t* dstptr = &bitmap.pix32(line);
-			uint8_t* priptr = &m_priority_bitmap.pix8(line);
-
-			int shift_amount, mask, bytes_in;
-			if (bpp == 3) // (8bpp)
-			{
-				shift_amount = 8;
-				mask = 0xff;
-				bytes_in = 4;
-			}
-			else if (bpp == 2) // (6bpp)
-			{
-				shift_amount = 6;
-				mask = 0x3f;
-				bytes_in = 3;
-			}
-			else // 1 / 0 (4bpp)
-			{
-				shift_amount = 4;
-				mask = 0x0f;
-				bytes_in = 2;
-			}
-
-			int xbase = x;;
-
-			for (int xx = 0; xx < tilesize_wide; xx += 4) // tile x pixels
-			{
-				// draw 4 pixels
-				uint32_t pixdata = 0;
-
-				int shift = 0;
-				for (int i = 0; i < bytes_in; i++)
-				{
-					pixdata |= m_fullrom->read8(currentaddress) << shift; currentaddress++;
-					shift += 8;
-				}
-
-				shift = 0;
-				for (int ii = 0; ii < 4; ii++)
-				{
-					uint8_t pen = (pixdata >> shift)& mask;
-					if (opaque || pen)
-					{
-						int xdraw_real;
-						if (!flipx)
-							xdraw_real = xbase + xx + ii; // pixel position
-						else
-							xdraw_real = xbase + ((tilesize_wide - 1) - xx - ii);
-
-						if (xdraw_real >= cliprect.min_x && xdraw_real <= cliprect.max_x)
-						{
-							if (depth < priptr[xdraw_real])
-							{
-								const pen_t* paldata = m_palette->pens();
-								dstptr[xdraw_real] = paldata[(palbase + pen) | (pal << 4)];
-								priptr[xdraw_real] = depth;
-							}
-						}
-					}
-					shift += shift_amount;
-				}
-			}
-		}
+		draw_tile_pixline(segment, tile, yy, x, y, palbase, pal, is16pix_high, is16pix_wide, bpp, depth, opaque, flipx, flipy, screen, bitmap, cliprect);
 	}
 }
 
