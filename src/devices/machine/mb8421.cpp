@@ -33,10 +33,10 @@ DEFINE_DEVICE_TYPE(MB8421_MB8431_16BIT, mb8421_mb8431_16_device, "mb8421_mb8431_
 //  dual_port_mailbox_ram_base - constructor
 //-------------------------------------------------
 
-dual_port_mailbox_ram_base::dual_port_mailbox_ram_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, size_t ram_size, u8 data_bits)
+dual_port_mailbox_ram_base::dual_port_mailbox_ram_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, size_t addr_bits, u8 data_bits)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_data_mask((1 << data_bits) - 1)
-	, m_ram_size(ram_size)
+	, m_ram_size(1 << addr_bits)
 	, m_ram_mask(m_ram_size - 1)
 	, m_int_addr_left(m_ram_mask - 1) // max RAM word size - 2
 	, m_int_addr_right(m_ram_mask) // max RAM word size - 1
@@ -49,8 +49,8 @@ dual_port_mailbox_ram_base::dual_port_mailbox_ram_base(const machine_config &mco
 //  dual_port_mailbox_ram_8bit_base - constructor
 //-------------------------------------------------
 
-dual_port_mailbox_ram_8bit_base::dual_port_mailbox_ram_8bit_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, size_t ram_size, u8 data_bits)
-	: dual_port_mailbox_ram_base(mconfig, type, tag, owner, clock, ram_size, data_bits)
+dual_port_mailbox_ram_8bit_base::dual_port_mailbox_ram_8bit_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, size_t addr_bits, u8 data_bits)
+	: dual_port_mailbox_ram_base(mconfig, type, tag, owner, clock, addr_bits, data_bits)
 {
 }
 
@@ -58,8 +58,8 @@ dual_port_mailbox_ram_8bit_base::dual_port_mailbox_ram_8bit_base(const machine_c
 //  dual_port_mailbox_ram_16bit_base - constructor
 //-------------------------------------------------
 
-dual_port_mailbox_ram_16bit_base::dual_port_mailbox_ram_16bit_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, size_t ram_size, u8 data_bits)
-	: dual_port_mailbox_ram_base(mconfig, type, tag, owner, clock, ram_size >> 1, data_bits)
+dual_port_mailbox_ram_16bit_base::dual_port_mailbox_ram_16bit_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, size_t addr_bits, u8 data_bits)
+	: dual_port_mailbox_ram_base(mconfig, type, tag, owner, clock, addr_bits, data_bits)
 {
 }
 
@@ -68,7 +68,7 @@ dual_port_mailbox_ram_16bit_base::dual_port_mailbox_ram_16bit_base(const machine
 //-------------------------------------------------
 
 cy7c131_device::cy7c131_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: dual_port_mailbox_ram_8bit_base(mconfig, CY7C131, tag, owner, clock, 0x400)
+	: dual_port_mailbox_ram_8bit_base(mconfig, CY7C131, tag, owner, clock, 10, 8) // 1kx8
 {
 }
 
@@ -77,7 +77,7 @@ cy7c131_device::cy7c131_device(const machine_config &mconfig, const char *tag, d
 //-------------------------------------------------
 
 idt7130_device::idt7130_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: dual_port_mailbox_ram_8bit_base(mconfig, IDT7130, tag, owner, clock, 0x400)
+	: dual_port_mailbox_ram_8bit_base(mconfig, IDT7130, tag, owner, clock, 10, 8) // 1kx8
 {
 }
 
@@ -86,7 +86,7 @@ idt7130_device::idt7130_device(const machine_config &mconfig, const char *tag, d
 //-------------------------------------------------
 
 mb8421_device::mb8421_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: dual_port_mailbox_ram_8bit_base(mconfig, MB8421, tag, owner, clock, 0x800)
+	: dual_port_mailbox_ram_8bit_base(mconfig, MB8421, tag, owner, clock, 11, 8) // 2kx8
 {
 }
 
@@ -95,7 +95,7 @@ mb8421_device::mb8421_device(const machine_config &mconfig, const char *tag, dev
 //-------------------------------------------------
 
 idt71321_device::idt71321_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: dual_port_mailbox_ram_8bit_base(mconfig, IDT71321, tag, owner, clock, 0x800)
+	: dual_port_mailbox_ram_8bit_base(mconfig, IDT71321, tag, owner, clock, 11, 8) // 2kx8
 {
 }
 
@@ -104,7 +104,7 @@ idt71321_device::idt71321_device(const machine_config &mconfig, const char *tag,
 //-------------------------------------------------
 
 mb8421_mb8431_16_device::mb8421_mb8431_16_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: dual_port_mailbox_ram_16bit_base(mconfig, MB8421_MB8431_16BIT, tag, owner, clock, 0x1000)
+	: dual_port_mailbox_ram_16bit_base(mconfig, MB8421_MB8431_16BIT, tag, owner, clock, 11, 16) // 2kx16
 {
 }
 

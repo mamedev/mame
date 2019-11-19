@@ -90,7 +90,7 @@ public:
 	DECLARE_READ_LINE_MEMBER(busy_r) { return 0; } // _BUSY pin - not emulated
 
 protected:
-	dual_port_mailbox_ram_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, size_t ram_size, u8 data_bits);
+	dual_port_mailbox_ram_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, size_t addr_bits, u8 data_bits);
 
 	// device-level overrides
 	virtual void device_resolve_objects() override;
@@ -123,7 +123,7 @@ public:
 	u8 right_r(offs_t offset);
 
 protected:
-	dual_port_mailbox_ram_8bit_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, size_t ram_size, u8 data_bits = 8);
+	dual_port_mailbox_ram_8bit_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, size_t addr_bits, u8 data_bits = 8);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -145,7 +145,7 @@ public:
 	u16 right_r(offs_t offset, u16 mem_mask = ~0);
 
 protected:
-	dual_port_mailbox_ram_16bit_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, size_t ram_size, u8 data_bits = 16);
+	dual_port_mailbox_ram_16bit_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, size_t addr_bits, u8 data_bits = 16);
 
 	// device-level overrides
 	virtual void device_start() override;
