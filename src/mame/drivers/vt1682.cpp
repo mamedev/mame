@@ -464,8 +464,10 @@ private:
 	INTERRUPT_GEN_MEMBER(nmi);
 
 	bitmap_ind8 m_priority_bitmap;
+	void setup_video_pages(int which, int tilesize, int vs, int hs, int y8, int x8, uint16_t* pagebases);
+
 	void draw_tile(int segment, int tile, int x, int y, int palbase, int pal, int is16pix_high, int is16pix_wide, int bpp, int depth, int opaque, int flipx, int flipy, screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
-	void draw_layer(int which, int base, int opaque, screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
+	void draw_layer(int which, int opaque, screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
 	void draw_sprites(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
 };
 
@@ -4582,6 +4584,221 @@ void vt_vt1682_state::draw_tile(int segment, int tile, int x, int y, int palbase
 	}
 }
 
+void vt_vt1682_state::setup_video_pages(int which, int tilesize, int vs, int hs, int y8, int x8, uint16_t* pagebases)
+{
+	int vs_hs = (vs << 1) | hs;
+	int y8_x8 = (y8 << 1) | x8;
+
+	pagebases[0] = 0xffff;
+	pagebases[1] = 0xffff;
+	pagebases[2] = 0xffff;
+	pagebases[3] = 0xffff;
+
+
+	if (!tilesize) // 8x8 mode
+	{
+		if (vs_hs == 0)
+		{
+			// 1x1 mode
+			switch (y8_x8)
+			{
+			case 0x0:
+				pagebases[0] = 0x000; /* 0x000-0x7ff */
+				break;
+			case 0x1:
+				pagebases[0] = 0x800; /* 0x800-0xfff */
+				break;
+			case 0x2:
+				pagebases[0] = 0x800; /* 0x800-0xfff */ // technically invalid?
+				break;
+			case 0x3:
+				pagebases[0] = 0x800; /* 0x800-0xfff */ // technically invalid?
+				break;
+			}
+
+			// mirror for rendering
+			pagebases[1] = pagebases[0];
+			pagebases[2] = pagebases[0];
+			pagebases[3] = pagebases[0];
+		}
+		else if (vs_hs == 1)
+		{
+			// 2x1 mode
+			switch (y8_x8)
+			{
+			case 0x0:
+				pagebases[0] = 0x000; /* 0x000-0x7ff */ pagebases[1] = 0x800; /* 0x800-0xfff */
+				break;
+			case 0x1:
+				pagebases[0] = 0x800; /* 0x800-0xfff */ pagebases[1] = 0x000; /* 0x000-0x7ff */
+				break;
+			case 0x2:
+				pagebases[0] = 0x000; /* 0x000-0x7ff */ pagebases[1] = 0x800; /* 0x800-0xfff */
+				break;
+			case 0x3:
+				pagebases[0] = 0x800; /* 0x800-0xfff */ pagebases[1] = 0x000; /* 0x000-0x7ff */
+				break;
+			}
+
+			// mirror for rendering
+			pagebases[2] = pagebases[0];
+			pagebases[3] = pagebases[1];
+		}
+		else if (vs_hs == 2)
+		{
+			// 1x2 mode
+			switch (y8_x8)
+			{
+			case 0x0:
+				pagebases[0] = 0x000; /* 0x000-0x7ff */
+				pagebases[2] = 0x800; /* 0x800-0xfff */
+				break;
+			case 0x1:
+				pagebases[0] = 0x000; /* 0x000-0x7ff */
+				pagebases[2] = 0x800; /* 0x800-0xfff */
+				break;
+			case 0x2:
+				pagebases[0] = 0x800; /* 0x800-0xfff */
+				pagebases[2] = 0x000; /* 0x000-0x7ff */
+				break;
+			case 0x3:
+				pagebases[0] = 0x800; /* 0x800-0xfff */
+				pagebases[2] = 0x000; /* 0x000-0x7ff */
+				break;
+			}
+
+			// mirror for rendering
+			pagebases[1] = pagebases[0];
+			pagebases[3] = pagebases[2];
+		}
+		else if (vs_hs == 3)
+		{
+			// 2x2 mode
+
+			// 4 pages in 8x8 is an INVALID MODE, set all bases to 0?
+			pagebases[0] = 0x000;
+			pagebases[1] = 0x000;
+			pagebases[2] = 0x000;
+			pagebases[3] = 0x000;
+		}
+	}
+	else // 16x16 mode
+	{
+		if (vs_hs == 0)
+		{
+			// 1x1 mode
+			switch (y8_x8)
+			{
+			case 0x0:
+				pagebases[0] = 0x000; /* 0x000 - 0x1ff */
+				break;
+			case 0x1:
+				pagebases[0] = 0x200; /* 0x200 - 0x3ff */
+				break;
+			case 0x2:
+				pagebases[0] = 0x400; /* 0x400 - 0x5ff */
+				break;
+			case 0x3:
+				pagebases[0] = 0x600; /* 0x600 - 0x7ff */
+				break;
+			}
+
+			// mirror for rendering
+			pagebases[1] = pagebases[0];
+			pagebases[2] = pagebases[0];
+			pagebases[3] = pagebases[0];
+		}
+		else if (vs_hs == 1)
+		{
+			// 2x1 mode
+			switch (y8_x8)
+			{
+			case 0x0:
+				pagebases[0] = 0x000; /* 0x000 - 0x1ff */ pagebases[1] = 0x200; /* 0x200 - 0x3ff */
+				break;
+			case 0x1:
+				pagebases[0] = 0x200; /* 0x200 - 0x3ff */ pagebases[1] = 0x000; /* 0x000 - 0x1ff */
+				break;
+			case 0x2:
+				pagebases[0] = 0x000; /* 0x000 - 0x1ff */ pagebases[1] = 0x200; /* 0x200 - 0x3ff */
+				break;
+			case 0x3:
+				pagebases[0] = 0x200; /* 0x200 - 0x3ff */ pagebases[1] = 0x000; /* 0x000 - 0x1ff */
+				break;
+			}
+
+			// mirror for rendering
+			pagebases[2] = pagebases[0];
+			pagebases[3] = pagebases[1];
+		}
+		else if (vs_hs == 2)
+		{
+			// 1x2 mode
+			switch (y8_x8)
+			{
+			case 0x0:
+				pagebases[0] = 0x000; /* 0x000 - 0x1ff */
+				pagebases[2] = 0x200; /* 0x200 - 0x3ff */
+				break;
+			case 0x1:
+				pagebases[0] = 0x000; /* 0x000 - 0x1ff */
+				pagebases[2] = 0x200; /* 0x200 - 0x3ff */
+				break;
+			case 0x2:
+				pagebases[0] = 0x200; /* 0x200 - 0x3ff */
+				pagebases[2] = 0x000; /* 0x000 - 0x1ff */
+				break;
+			case 0x3:
+				pagebases[0] = 0x200; /* 0x200 - 0x3ff */
+				pagebases[2] = 0x000; /* 0x000 - 0x1ff */
+				break;
+			}
+
+			// mirror for rendering
+			pagebases[1] = pagebases[0];
+			pagebases[3] = pagebases[2];
+		}
+		else if (vs_hs == 3)
+		{
+			// 2x2 mode
+			switch (y8_x8)
+			{
+			case 0x0:
+				pagebases[0] = 0x000; /* 0x000 - 0x1ff */ pagebases[1] = 0x200; /* 0x200 - 0x3ff */
+				pagebases[2] = 0x400; /* 0x400 - 0x5ff */ pagebases[3] = 0x600; /* 0x600 - 0x7ff */
+				break;
+			case 0x1:
+				pagebases[0] = 0x200; /* 0x200 - 0x3ff */ pagebases[1] = 0x000; /* 0x000 - 0x1ff */
+				pagebases[2] = 0x600; /* 0x600 - 0x7ff */ pagebases[3] = 0x400; /* 0x400 - 0x5ff */
+				break;
+			case 0x2:
+				pagebases[0] = 0x400; /* 0x400 - 0x5ff */ pagebases[1] = 0x600; /* 0x600 - 0x7ff */
+				pagebases[2] = 0x000; /* 0x000 - 0x1ff */ pagebases[3] = 0x200; /* 0x200 - 0x3ff */
+				break;
+			case 0x3:
+				pagebases[0] = 0x600; /* 0x600 - 0x7ff */ pagebases[1] = 0x400; /* 0x400 - 0x5ff */
+				pagebases[2] = 0x200; /* 0x200 - 0x3ff */ pagebases[3] = 0x000; /* 0x000 - 0x1ff */
+				break;
+			}
+		}
+	}
+
+	// for BK2 layer, in 16x16 mode, all tilebases are 0x800 higher
+	if (tilesize && (which == 1))
+	{
+		pagebases[0] += 0x800;
+		pagebases[1] += 0x800;
+		pagebases[2] += 0x800;
+		pagebases[3] += 0x800;
+	}
+
+	/*
+	if ((pagebases[0] == 0xffff) || (pagebases[1] == 0xffff) || (pagebases[2] == 0xffff) || (pagebases[3] == 0xffff))
+	{
+		fatalerror("failed to set config for tilemap:%1x, size:%1x vs:%1x hs:%1x y8:%1x x8:%1x", which, tilesize, vs, hs, y8, x8);
+	}
+	*/
+}
 /*
     Page Setups
 
@@ -4698,7 +4915,7 @@ void vt_vt1682_state::draw_tile(int segment, int tile, int x, int y, int palbase
     =================================================================================================================================
 */
 
-void vt_vt1682_state::draw_layer(int which, int base, int opaque, screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
+void vt_vt1682_state::draw_layer(int which, int opaque, screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
 {
 	// m_main_control_bk[0]
 	// logerror("%s: vt1682_2013_bk1_main_control_w writing: %02x (enable:%01x palette:%01x depth:%01x bpp:%01x linemode:%01x tilesize:%01x)\n", machine().describe_context(), data,
@@ -4720,12 +4937,12 @@ void vt_vt1682_state::draw_layer(int which, int base, int opaque, screen_device&
 
 	if (bk_enable)
 	{
-
 		int xscroll = m_xscroll_7_0_bk[which];
 		int yscroll = m_ysrcoll_7_0_bk[which];
 		int xscrollmsb = (m_scroll_control_bk[which] & 0x01);
 		int yscrollmsb = (m_scroll_control_bk[which] & 0x02) >> 1;
-		int page_layout = (m_scroll_control_bk[which] & 0x0c) >> 2;;
+		int page_layout_h = (m_scroll_control_bk[which] & 0x04) >> 2;
+		int page_layout_v = (m_scroll_control_bk[which] & 0x08) >> 3;
 		int high_color = (m_scroll_control_bk[which] & 0x10) >> 4;
 
 		int segment = m_segment_7_0_bk[which];
@@ -4733,13 +4950,22 @@ void vt_vt1682_state::draw_layer(int which, int base, int opaque, screen_device&
 
 		segment = segment * 0x2000;
 
-		xscroll |= xscrollmsb << 8;
-		yscroll |= yscrollmsb << 8;
+		//xscroll |= xscrollmsb << 8;
+		//yscroll |= yscrollmsb << 8;
+
+		uint16_t bases[4];
+
+		setup_video_pages(which, bk_tilesize, page_layout_v, page_layout_h, yscrollmsb, xscrollmsb, bases);
+
+		// until we implement scrolling, draw the top left page
+		int base = bases[0];
+
+		//logerror("layer %d bases %04x %04x %04x %04x (scrolls x:%02x y:%02x)\n", which, bases[0], bases[1], bases[2], bases[3], xscroll, yscroll);
 
 		if (!bk_line)
 		{
 			// Character Mode
-			logerror("DRAWING ----- bk, Character Mode Segment base %08x, TileSize %1x Bpp %1x, Depth %1x Palette %1x PageLayout:%1x XScroll %04x YScroll %04x\n", segment, bk_tilesize, bk_tilebpp, bk_depth, bk_palette, page_layout, xscroll, yscroll);
+			logerror("DRAWING ----- bk, Character Mode Segment base %08x, TileSize %1x Bpp %1x, Depth %1x Palette %1x PageLayout_V:%1x PageLayout_H:%1x XScroll %04x YScroll %04x\n", segment, bk_tilesize, bk_tilebpp, bk_depth, bk_palette, page_layout_v, page_layout_h, xscroll, yscroll);
 
 			int count = base;
 
@@ -4860,9 +5086,9 @@ uint32_t vt_vt1682_state::screen_update(screen_device& screen, bitmap_rgb32& bit
 	m_priority_bitmap.fill(0xff, cliprect);
 	bitmap.fill(0, cliprect);
 
-	draw_layer(0, 0x000, 0, screen, bitmap, cliprect);
+	draw_layer(0, 0, screen, bitmap, cliprect);
 
-	draw_layer(1, 0x800, 0, screen, bitmap, cliprect);
+	draw_layer(1, 0, screen, bitmap, cliprect);
 
 	draw_sprites(screen, bitmap, cliprect);
 
