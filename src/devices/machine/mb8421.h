@@ -99,7 +99,7 @@ protected:
 	// internal helpers
 	template<read_or_write row, bool is_right> void update_intr(offs_t offset);
 
-	const u64 m_data_mask; // for 9/18/36bit RAMs
+	const u64 m_data_mask; // for DPRAMs with 9/18/36bit data buses
 	const size_t m_ram_size;
 	const size_t m_ram_mask;
 	const size_t m_int_addr_left;
