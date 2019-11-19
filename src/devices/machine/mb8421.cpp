@@ -29,7 +29,7 @@ DEFINE_DEVICE_TYPE(MB8421_MB8431_16BIT, mb8421_mb8431_16_device, "mb8421_mb8431_
 //  mb8421_master_device - constructor
 //-------------------------------------------------
 
-mb8421_master_device::mb8421_master_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, size_t ram_size, u64 data_bits)
+mb8421_master_device::mb8421_master_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, size_t ram_size, u8 data_bits)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_intl_callback(*this)
 	, m_intr_callback(*this)
