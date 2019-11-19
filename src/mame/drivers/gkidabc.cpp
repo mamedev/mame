@@ -6,6 +6,8 @@
     Mis Primeras Lecciones
 
     TODO: identify CPU type (16-bit processor internally, but with 8-bit external bus?)
+    It might be that the dumped ROMs contain no actual code, only graphics data and
+    sound samples.
 
 ***************************************************************************************/
 
