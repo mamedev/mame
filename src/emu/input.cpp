@@ -1483,7 +1483,7 @@ input_seq input_manager::seq_clean(const input_seq &seq) const
 				clean_index--;
 			}
 		}
-		else if (clean_index > 0 || !code.internal())
+		else if (clean_index > 0 || !code.internal() || code == input_seq::not_code)
 		{
 			clean_codes += code;
 			clean_index++;
