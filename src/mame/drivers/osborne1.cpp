@@ -291,8 +291,7 @@ void osborne1_state::osborne1(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &osborne1_state::osborne1_io);
 	m_maincpu->irqack_cb().set(FUNC(osborne1_state::irqack_w));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_color(rgb_t::green());
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER, rgb_t::green());
 	m_screen->set_screen_update(FUNC(osborne1_state::screen_update));
 	m_screen->set_raw(MAIN_CLOCK, 1024, 0, 104*8, 260, 0, 24*10);
 	m_screen->set_palette("palette");

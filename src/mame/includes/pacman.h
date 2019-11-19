@@ -37,8 +37,7 @@ public:
 		, m_palette(*this, "palette")
 	{ }
 
-	required_device<cpu_device> m_maincpu;
-
+protected:
 	void _8bpm_portmap(address_map &map);
 	void alibaba_map(address_map &map);
 	void bigbucks_map(address_map &map);
@@ -49,8 +48,6 @@ public:
 	void dremshpr_map(address_map &map);
 	void dremshpr_portmap(address_map &map);
 	void drivfrcp_portmap(address_map &map);
-	void epos_map(address_map &map);
-	void epos_portmap(address_map &map);
 	void mschamp_map(address_map &map);
 	void mschamp_portmap(address_map &map);
 	void mspacman_map(address_map &map);
@@ -67,7 +64,8 @@ public:
 	void vanvan_portmap(address_map &map);
 	void woodpek_map(address_map &map);
 	void writeport(address_map &map);
-protected:
+
+	required_device<cpu_device> m_maincpu;
 	optional_device<ls259_device> m_mainlatch;
 	optional_device<namco_device> m_namco_sound;
 	required_device<watchdog_timer_device> m_watchdog;
@@ -99,7 +97,6 @@ protected:
 	uint8_t m_maketrax_offset;
 	int m_maketrax_disable_protection;
 
-public:
 	uint8_t m_irq_mask;
 
 	DECLARE_WRITE8_MEMBER(pacman_interrupt_vector_w);
@@ -158,6 +155,8 @@ public:
 	DECLARE_WRITE8_MEMBER(jrpacman_scroll_w);
 	DECLARE_WRITE_LINE_MEMBER(jrpacman_bgpriority_w);
 	DECLARE_WRITE8_MEMBER(superabc_bank_w);
+
+public:
 	void init_maketrax();
 	void init_drivfrcp();
 	void init_mspacmbe();
@@ -177,6 +176,8 @@ public:
 	void init_mbrush();
 	void init_pengomc1();
 	void init_clubpacma();
+
+protected:
 	TILEMAP_MAPPER_MEMBER(pacman_scan_rows);
 	TILE_GET_INFO_MEMBER(pacman_get_tile_info);
 	TILE_GET_INFO_MEMBER(s2650_get_tile_info);
@@ -206,28 +207,16 @@ private:
 	void mspacman_install_patches(uint8_t *ROM);
 
 public:
-	// epos.c
-	DECLARE_READ8_MEMBER(epos_decryption_w);
-	DECLARE_MACHINE_START(theglobp);
-	DECLARE_MACHINE_RESET(theglobp);
-	DECLARE_MACHINE_START(eeekkp);
-	DECLARE_MACHINE_RESET(eeekkp);
-	DECLARE_MACHINE_START(acitya);
-	DECLARE_MACHINE_RESET(acitya);
-
 	void birdiy(machine_config &config);
 	void rocktrv2(machine_config &config);
 	void mspacman(machine_config &config);
 	void dremshpr(machine_config &config);
 	void mschamp(machine_config &config);
-	void acitya(machine_config &config);
-	void theglobp(machine_config &config);
 	void nmouse(machine_config &config);
 	void vanvan(machine_config &config);
 	void s2650games(machine_config &config);
 	void woodpek(machine_config &config);
 	void crushs(machine_config &config);
-	void eeekkp(machine_config &config);
 	void superabc(machine_config &config);
 	void numcrash(machine_config &config);
 	void crush4(machine_config &config);
@@ -250,6 +239,29 @@ private:
 	// jumpshot.c
 	uint8_t jumpshot_decrypt(int addr, uint8_t e);
 	void jumpshot_decode();
+};
+
+
+class epospm_state : public pacman_state
+{
+public:
+	using pacman_state::pacman_state;
+
+	void acitya(machine_config &config);
+	void theglobp(machine_config &config);
+	void eeekkp(machine_config &config);
+
+protected:
+	DECLARE_READ8_MEMBER(epos_decryption_w);
+	DECLARE_MACHINE_START(theglobp);
+	DECLARE_MACHINE_RESET(theglobp);
+	DECLARE_MACHINE_START(eeekkp);
+	DECLARE_MACHINE_RESET(eeekkp);
+	DECLARE_MACHINE_START(acitya);
+	DECLARE_MACHINE_RESET(acitya);
+
+	void epos_map(address_map &map);
+	void epos_portmap(address_map &map);
 };
 
 #endif // MAME_INCLUDES_PACMAN_H
