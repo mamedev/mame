@@ -5662,9 +5662,23 @@ void vt_vt1682_state::draw_layer(int which, int opaque, screen_device& screen, b
 					ytile = y >> 3;
 				}
 
-				for (int xtile = 0; xtile < (bk_tilesize ? 16 : 32); xtile++)
+				for (int xtile = -1; xtile < (bk_tilesize ? (16) : (32)); xtile++) // -1 due to possible need for partial tile during scrolling
 				{
-					int count = get_address_for_tilepos(xtile, ytile, bk_tilesize, bases);
+					int xscrolltile_part;
+					int xscrolltile;
+					if (bk_tilesize)
+					{
+						xscrolltile = xscroll >> 4;
+						xscrolltile_part = xscroll & 0x0f;
+					}
+					else
+					{
+						xscrolltile = xscroll >> 3;
+						xscrolltile_part = xscroll & 0x07;
+					}
+					
+
+					int count = get_address_for_tilepos(xtile - xscrolltile, ytile, bk_tilesize, bases);
 
 					uint16_t word = m_vram->read8(count);
 					count++;
@@ -5676,7 +5690,7 @@ void vt_vt1682_state::draw_layer(int which, int opaque, screen_device& screen, b
 
 					int xpos = xtile * (bk_tilesize ? 16 : 8);
 
-					draw_tile_pixline(segment, tile, ytileline, xpos, y, palbase, pal, bk_tilesize, bk_tilesize, bk_tilebpp, (bk_depth*2)+1, opaque, 0, 0, screen, bitmap, cliprect);
+					draw_tile_pixline(segment, tile, ytileline, xpos + xscrolltile_part, y, palbase, pal, bk_tilesize, bk_tilesize, bk_tilebpp, (bk_depth*2)+1, opaque, 0, 0, screen, bitmap, cliprect);
 				}
 			}
 		}
