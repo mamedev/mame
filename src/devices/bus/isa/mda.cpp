@@ -19,7 +19,7 @@
 #define LOG_CHRG    (1U << 5)
 #define LOG_STAT    (1U << 6)
 
-//#define VERBOSE (LOG_MODE|LOG_SETUP|LOG_ROW)
+//#define VERBOSE (LOG_MODE|LOG_STAT)
 //#define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
@@ -1175,7 +1175,10 @@ void isa8_epc_mda_device::device_reset()
 
 	if (m_installed == false)
 	{
-		m_isa->install_device(0x3b0, 0x3bf, read8_delegate(*this, FUNC(isa8_epc_mda_device::io_read)), write8_delegate(*this, FUNC(isa8_epc_mda_device::io_write)));
+		m_isa->install_device(0x3b0, 0x3bb, read8_delegate(*this, FUNC(isa8_epc_mda_device::io_read)), write8_delegate(*this, FUNC(isa8_epc_mda_device::io_write)));
+		// The Ericsson PC MDA card 1070 doesn't respond to the LPT device addresses 3bc-3be because
+		// the LPT device is on the main PCB, but requires 3bf for mode register 2 so need to create a hole here - needs verification on hw as docs are wrong 
+		m_isa->install_device(0x3bf, 0x3bf, read8_delegate(*this, FUNC(isa8_epc_mda_device::io_read2)), write8_delegate(*this, FUNC(isa8_epc_mda_device::io_write2)));
 		m_isa->install_bank(0xb0000, 0xb7fff, "bank_epc", &m_videoram[0]); // Monochrome emulation mode VRAM address
 
 		// This check allows a color monitor adapter to be installed at this address range if color emulation is disabled
@@ -1198,7 +1201,15 @@ void isa8_epc_mda_device::device_reset()
  * Mode Register 2        0x3bf      0x3df     rw CRT/CPU page reg (incompatible w PCjr only)
  * Status Register        0x3ba      0x3da     r  CGA/MDA status reg (incompatible)
  *                                              w EGA/VGA feature ccontrol reg (not used by this board)
+ *
+ * NOTE: The LPT device resides on the Ericsson PC main board in the 3bc-3be address range
  */
+
+WRITE8_MEMBER(isa8_epc_mda_device::io_write2 )
+{
+	io_write(space, offset + 0x0f, data);
+}
+
 WRITE8_MEMBER(isa8_epc_mda_device::io_write )
 {
 	LOG("%s: %04x <- %02x\n", FUNCNAME, offset, data);
@@ -1249,6 +1260,11 @@ WRITE8_MEMBER(isa8_epc_mda_device::io_write )
 		default:
 			LOG("EPC MDA: io_write at wrong offset:%02x\n", offset);
 	}
+}
+
+READ8_MEMBER( isa8_epc_mda_device::io_read2 )
+{
+	return io_read(space, offset + 0x0f);
 }
 
 READ8_MEMBER( isa8_epc_mda_device::io_read )

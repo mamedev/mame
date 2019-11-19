@@ -27,7 +27,8 @@
  * - Complete the Ericsson 1070 MDA ISA board and test all the graphics modes including 640x400 (aka HR)
  * - Add the Ericsson 1065 HDC and boot from a hard drive
  * - Add softlist
- * - Pass the diagnostics software at EPC5.IMD
+ * - Pass the diagnostics software system test at EPC2.IMD, it currently hangs the keyboard. 
+ *   A later version of the test on EPC5.IMD works though so need to verify EPC2.IMD on real hardware first.
  *
  * CREDITS  The driver code is inspired from m24.cpp, myb3k.cpp and genpc.cpp. Information about the EPC has
  *          been contributed by many, mainly the people at Dalby Computer museum http://www.datormuseum.se/
@@ -86,7 +87,7 @@
 #define LOG_FPU     (1U << 11)
 #define LOG_COM     (1U << 12)
 
-//#define VERBOSE (LOG_COM)
+//#define VERBOSE (LOG_LPT)
 //#define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
@@ -1073,6 +1074,5 @@ ROM_START( epc )
 	ROMX_LOAD("epcbios3.bin",  0xc000, 0x02000, CRC(70483280) SHA1(b44b09da94d77b0269fc48f07d130b2d74c4bb8f), ROM_BIOS(1))
 ROM_END
 
-
-COMP( 1985, epc,     0,      0,      epc,     epc_ports, epc_state, init_epc,    "Ericsson Information System",     "Ericsson PC" ,          MACHINE_NOT_WORKING )
+COMP( 1985, epc,     0,      0,      epc,     epc_ports, epc_state, init_epc,    "Ericsson Information System",     "Ericsson PC" ,          0)
 //COMP( 1985, eppc,   ibm5150, 0,  pccga,         pccga,  pc_state, empty_init,    "Ericsson Information System",     "Ericsson Portable PC",  MACHINE_NOT_WORKING )
