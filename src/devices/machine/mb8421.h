@@ -94,11 +94,11 @@ protected:
 	// internal helpers
 	template<read_or_write row, bool is_right> void update_intr(offs_t offset);
 
-  u64 m_data_mask; // for 9/18/36bit rams
-  size_t m_ram_size;
-  size_t m_ram_mask;
-  size_t m_int_addr_left;
-  size_t m_int_addr_right;
+	u64 m_data_mask; // for 9/18/36bit rams
+	size_t m_ram_size;
+	size_t m_ram_mask;
+	size_t m_int_addr_left;
+	size_t m_int_addr_right;
 
 private:
 	devcb_write_line m_intl_callback;
@@ -117,8 +117,8 @@ public:
 	void right_w(offs_t offset, u8 data);
 	u8 right_r(offs_t offset);
 
-  void ram_w(offs_t offset, u8 data) { m_ram[offset] = data & m_data_mask; }
-  u8 ram_r(offs_t offset) { return m_ram[offset] & m_data_mask; }
+	void ram_w(offs_t offset, u8 data) { m_ram[offset] = data & m_data_mask; }
+	u8 ram_r(offs_t offset) { return m_ram[offset] & m_data_mask; }
 
 protected:
 	mb8421_master_8bit_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, size_t ram_size, u8 data_bits = 8);
@@ -142,8 +142,8 @@ public:
 	void right_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 right_r(offs_t offset, u16 mem_mask = ~0);
 
-  void ram_w(offs_t offset, u16 data, u16 mem_mask = ~0) { data &= m_data_mask; mem_mask &= m_data_mask; COMBINE_DATA(&m_ram[offset]); }
-  u16 ram_r(offs_t offset) { return m_ram[offset] & m_data_mask; }
+	void ram_w(offs_t offset, u16 data, u16 mem_mask = ~0) { data &= m_data_mask; mem_mask &= m_data_mask; COMBINE_DATA(&m_ram[offset]); }
+	u16 ram_r(offs_t offset) { return m_ram[offset] & m_data_mask; }
 
 protected:
 	mb8421_master_16bit_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, size_t ram_size, u8 data_bits = 16);
