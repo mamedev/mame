@@ -5045,6 +5045,10 @@ INPUT_PORTS_END
 
 // note, the real hardware has multiple 'motion' accessories, but in reality they all just act like a button press
 
+// inputs aren't working correctly on ii8in1, you can change to the bowling game, and select that, but select doesn't continue
+// to move between games, why not?  ram address 0x6c contains current selection if you want to manually change it to start
+// other games.  maybe it's waiting on some status from the sound cpu?
+
 READ8_MEMBER(intec_interact_state::porta_r)
 {	
 	uint8_t ret = 0x0;// = machine().rand() & 0xf;
