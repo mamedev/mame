@@ -428,7 +428,7 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(system_timer_expired);
 
 	/* Hacky */
-	
+
 	DECLARE_READ8_MEMBER(irq_vector_hack_r);
 
 	/* System Helpers */
@@ -2575,7 +2575,7 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2102_timer_enable_w)
 
 TIMER_DEVICE_CALLBACK_MEMBER(vt_vt1682_state::system_timer_expired)
 {
-	
+
 }
 
 
@@ -4271,11 +4271,11 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_soundcpu_2102_timer_a_enable_w)
 	// For NTSC
 
 	//Period = (65536 - Timer _PreLoad) / 21.4772 MHz
-	//Timer PreLoad = 65536 – (Period in seconds) * 21.4772 * 1000000 )
+	//Timer PreLoad = 65536 ï¿½ (Period in seconds) * 21.4772 * 1000000 )
 
 	// For PAL
 	// Period = (65536 - Timer PreLoad) / 26.601712 MHz
-	//Timer PreLoad = 65536 – (Period in seconds) * 26.601712 * 1000000 )
+	//Timer PreLoad = 65536 ï¿½ (Period in seconds) * 26.601712 * 1000000 )
 
 	/*
 	uint16_t preload = (m_soundcpu_2101_timer_a_preload_15_8 << 8) | m_soundcpu_2100_timer_a_preload_7_0;
@@ -4467,7 +4467,7 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_soundcpu_2113_timer_b_irqclear_w)
     0x02 - Audio DAC Left:1
     0x01 - Audio DAC Left:0
 
-	actually 12 bits precision so only 15 to 4 are used
+    actually 12 bits precision so only 15 to 4 are used
 */
 
 READ8_MEMBER(vt_vt1682_state::vt1682_soundcpu_2118_dacleft_7_0_r)
@@ -5827,7 +5827,7 @@ void vt_vt1682_state::vt_vt1682_map(address_map &map)
 	map(0x2135, 0x2135).rw(FUNC(vt_vt1682_state::alu_out_6_r), FUNC(vt_vt1682_state::alu_oprand_6_mult_w));
 	map(0x2136, 0x2136).w(FUNC(vt_vt1682_state::alu_oprand_5_div_w));
 	map(0x2137, 0x2137).w(FUNC(vt_vt1682_state::alu_oprand_6_div_w));
-	
+
 	// 3000-3fff internal ROM if enabled
 	map(0x4000, 0x7fff).r(FUNC(vt_vt1682_state::rom_4000_to_7fff_r));
 	map(0x8000, 0xffff).r(FUNC(vt_vt1682_state::rom_8000_to_ffff_r));
@@ -5984,7 +5984,7 @@ void vt_vt1682_state::vt_vt1682(machine_config &config)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	
+
 	DAC_12BIT_R2R(config, m_leftdac, 0).add_route(0, "lspeaker", 0.5); // unknown 12-bit DAC
 	voltage_regulator_device &leftvref(VOLTAGE_REGULATOR(config, "leftvref", 0));
 	leftvref.add_route(0, "leftdac", 1.0, DAC_VREF_POS_INPUT);
