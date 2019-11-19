@@ -1,11 +1,11 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
-<!-- ZX Spectrum Disc images
-    for +3 machines etc.
+<!-- Sinclair ZX Spectrum +3 disc images
+    For +3 machines, etc.
 -->
 
-<softwarelist name="specpls3_flop" description="ZX Spectrum +3 disk images">
+<softwarelist name="specpls3_flop" description="Sinclair ZX Spectrum +3 disk images">
 
 	<!-- SPS / CAPS Releases -->
 
