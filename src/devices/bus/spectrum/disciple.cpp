@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Twisted Tom
+// copyright-holders:TwistedTom
 /**********************************************************************
 
     MGT DISCiPLE Multi-purpose Interface
@@ -11,7 +11,7 @@
 	8KB ROM
 	8KB RAM
 	single floppy disk interface (2 drives)
-	Centronics parallel interface
+	Centronics parallel printer interface
 	"magic button" style memory snapshot grabber
 	2 ATARI joystick ports (Sinclair 1/Kempston, Sinclair 2)
 	2 network connectors (Interface 1 compatible, 3.5mm mono jack)
@@ -22,10 +22,10 @@
 	Unit is a large plastic base unit which the ZX Spectrum sits on top of, similar to Sinclair's official Interface 1.
 	
 	The official DOS was "GDOS", an earlier version of MGT's "G+DOS" which was used on the later +D unit.
-	Both these were superseded by "SAM DOS" used by MGT's Sam Coupé (which is backwards-compatible with both).
+	Both of these were superseded by "SAM DOS" used by MGT's Sam Coupé (which is backwards-compatible with both).
 	A 3rd party company SD Software released an alternative DOS "UNI-DOS" for both interfaces. (consisting of a disk and replacement ROM)
 	
-	Manual states any Shugart 400 DD drive should work
+	Manual states any Shugart 400 SD/DD drive should work
 	"The disciple will accept 5.25" or 3.5" drives, whether they are 40 track or 80 track,
 	 single sided or double sided, single density or double density."
 	 
@@ -36,7 +36,7 @@
 	40 track, 1 side = 204,800 bytes (512*10*40*1)
 	40 track, 2 side = 409,600 bytes
 	80 track, 1 side = 409,600 bytes
-	80 track, 2 side = 819,200 bytes  
+	80 track, 2 side = 819,200 bytes  <-- only this one supported so far
 	
 	.mgt files work ok
 	.img files don't work (not in coupedsk.cpp)
@@ -92,17 +92,11 @@
 	
 	Current status:
 	--------------
-	issues with wd_fdc.cpp  see https://github.com/mamedev/mame/issues/5893
-	wd1772 must spin-up disk in response to 0xd0 (force interrupt) command
-	currently patching ROM to skip index pulse check which otherwise gives no disc error
-	
 	GDOS v3: all ok, occassional "no system file" when loading system disk, ok on 2nd attempt
 	GDOS v2: all ok
 	UNIDOS:  all ok
 	
 	Not working with 128K/+2 yet...
-	
-	todo: add .img support to coupedisk.cpp
 
 **********************************************************************/
 
@@ -187,8 +181,6 @@ ROM_START(disciple)
 	
 	ROM_SYSTEM_BIOS(0, "gdos", "GDOS v3")
 	ROMX_LOAD("disciple_g.rom", 0x0000, 0x2000, CRC(82047489) SHA1(9a75ed4b293f968985be4c9aa893cd88276d1ced), ROM_BIOS(0))
-	// ROM_FILL(0x1059, 1, 0x18)
-	// ROM_FILL(0x105a, 1, 0x0c)  // jr $3067
 	
 	ROM_SYSTEM_BIOS(1, "gdos2", "GDOS v2")
 	ROMX_LOAD("disciple_g2.rom", 0x0000, 0x2000, CRC(9d971781) SHA1(a03e67e4ee275a85153843f42269fa980875d551), ROM_BIOS(1))
@@ -328,7 +320,7 @@ uint8_t spectrum_disciple_device::iorq_r(offs_t offset)
 			break;
 		case 0x1f: // bit 0-4: kempston joystick, bit 6: printer busy, bit 7: network
 			data = m_kjoy->read() & 0x1f;
-			data |= !m_centronics_busy << 6;  // inverted IC10 74ls240
+			data |= !m_centronics_busy << 6;  // inverted by IC10 74ls240
 			break;
 		case 0x7b: // reset boot
 			m_map = false;

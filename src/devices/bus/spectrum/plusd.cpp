@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Twisted Tom
+// copyright-holders:TwistedTom
 /**********************************************************************
 
     MGT +D Disk and Printer Interface
@@ -11,18 +11,18 @@
 	8KB ROM
 	8KB RAM
 	single floppy disk interface (2 drives)
-	Centronics parallel interface
+	Centronics parallel printer interface
 	"magic button" style memory snapshot grabber
 	
 	MGT's second (and last) disk interface, a cost and feature reduced version of the earlier "Disciple" unit.
-	Rather than being a large plastic base unit like its predecessor (Interface I style), this unit is a small metal-cased
+	Rather than being a large plastic base unit (Interface I style) like its predecessor, this unit is a small metal-cased
 	stand-alone unit which connects to ZX Spectrum's expansion slot via a ribbon cable.
 	A second "official" version exists which was licensed and produced by Datel following MGT's demise.
-	Many "unofficial" versions exist and the deisgn remains available today as DIY-style projects/kits.
+	Many "unofficial" versions exist and the design remains available today as DIY-style projects/kits.
 	It's said the device's design and roms were officially released into the public domain at some point?
 	
 	The official DOS was "G+DOS" and is compatible with the earlier "GDOS" for earlier Disciple unit.
-	Both these were superseded by "SAM DOS" used by MGT's Sam Coupé (which is backwards-compatible with both).
+	Both of these were superseded by "SAM DOS" used by MGT's Sam Coupé (which is backwards-compatible with both).
 	A 3rd party company SD Software released an alternative DOS "UNI-DOS" for both interfaces. (consisting of a disk and replacement ROM)
 	
 	Manual states any Shugart 400 DD drive should work (but not SD)
@@ -38,7 +38,7 @@
 	40 track, 1 side = 204,800 bytes (512*10*40*1)
 	40 track, 2 side = 409,600 bytes
 	80 track, 1 side = 409,600 bytes
-	80 track, 2 side = 819,200 bytes  
+	80 track, 2 side = 819,200 bytes  <-- only this one supported so far
 	
 	.mgt files work ok
 	.img files don't work (not in coupedsk.cpp)
@@ -83,16 +83,10 @@
 	
 	Current status:
 	--------------
-	issues with wd_fdc.cpp  see https://github.com/mamedev/mame/issues/5893
-	wd1772 must spin-up disk in response to 0xd0 (force interrupt) command
-	currently patching ROM to skip index pulse check which otherwise gives no disc error
-	
 	G+DOS:  all ok
 	UNIDOS: all ok
 	
 	Not working with 128K/+2 yet...
-	
-	todo: add .img support to coupedisk.cpp
 
 **********************************************************************/
 
@@ -153,8 +147,6 @@ ROM_START(plusd)
 	
 	ROM_SYSTEM_BIOS(0, "gdos", "G+DOS v1a")
 	ROMX_LOAD("plusd_g.rom", 0x0000, 0x2000, CRC(569f7e55) SHA1(6b841dc5797ef7eb219ad455cd1e434ca3b9d30d), ROM_BIOS(0))
-	//ROM_FILL(0x06c8, 1, 0x18)
-	//ROM_FILL(0x06c9, 1, 0x11)  // jr $06db
 	
 	ROM_SYSTEM_BIOS(1, "unidos", "UNI-DOS v2")
 	ROMX_LOAD("plusd_uni.rom", 0x0000, 0x2000, CRC(60920496) SHA1(399c8c7c8335bc59849a2182c32347603fd0288a), ROM_BIOS(1))
