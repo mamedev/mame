@@ -322,6 +322,11 @@ private:
 	uint8_t m_alu_oprand_mult[2];
 	uint8_t m_alu_out[6];
 
+	uint8_t m_2101_timer_preload_7_0;
+	uint8_t m_2102_timer_enable;
+	uint8_t m_2104_timer_preload_15_8;
+
+
 	DECLARE_READ8_MEMBER(vt1682_2100_prgbank1_r3_r);
 	DECLARE_WRITE8_MEMBER(vt1682_2100_prgbank1_r3_w);
 	DECLARE_READ8_MEMBER(vt1682_210c_prgbank1_r2_r);
@@ -393,6 +398,16 @@ private:
 	DECLARE_WRITE8_MEMBER(alu_oprand_6_mult_w);
 	DECLARE_WRITE8_MEMBER(vt1682_2137_alu_div_opr6_trigger_w);
 
+	DECLARE_READ8_MEMBER(vt1682_2101_timer_preload_7_0_r);
+	DECLARE_WRITE8_MEMBER(vt1682_2101_timer_preload_7_0_w);
+
+	DECLARE_READ8_MEMBER(vt1682_2102_timer_enable_r);
+	DECLARE_WRITE8_MEMBER(vt1682_2102_timer_enable_w);
+
+	DECLARE_READ8_MEMBER(vt1682_2104_timer_preload_15_8_r);
+	DECLARE_WRITE8_MEMBER(vt1682_2104_timer_preload_15_8_w);
+
+
 	/* System Helpers */
 
 	uint16_t get_dma_sr_addr()
@@ -450,6 +465,10 @@ private:
 
 	void do_dma_external_to_internal(int data, bool is_video);
 	void do_dma_internal_to_internal(int data, bool is_video);
+
+	/* Sound CPU Related*/
+
+	DECLARE_WRITE8_MEMBER(vt1682_soundcpu_211c_reg_irqctrl_w);
 
 	/* Support */
 
@@ -611,6 +630,10 @@ void vt_vt1682_state::machine_start()
 	save_item(NAME(m_alu_oprand));
 	save_item(NAME(m_alu_oprand_mult));
 	save_item(NAME(m_alu_out));
+
+	save_item(NAME(m_2101_timer_preload_7_0));
+	save_item(NAME(m_2102_timer_enable));
+	save_item(NAME(m_2104_timer_preload_15_8));
 }
 
 void vt_vt1682_state::machine_reset()
@@ -716,6 +739,9 @@ void vt_vt1682_state::machine_reset()
 	for (int i=0;i<6;i++)
 		m_alu_out[i] = 0;
 
+	m_2101_timer_preload_7_0 = 0;
+	m_2102_timer_enable = 0;
+	m_2104_timer_preload_15_8 = 0;
 
 	update_banks();
 
@@ -2364,6 +2390,20 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2100_prgbank1_r3_w)
     0x01 - Timer Preload:0
 */
 
+READ8_MEMBER(vt_vt1682_state::vt1682_2101_timer_preload_7_0_r)
+{
+	uint8_t ret = m_2101_timer_preload_7_0;
+	logerror("%s: vt1682_2101_timer_preload_7_0_r returning: %02x\n", machine().describe_context(), ret);
+	return ret;
+}
+
+WRITE8_MEMBER(vt_vt1682_state::vt1682_2101_timer_preload_7_0_w)
+{
+	logerror("%s: vt1682_2101_timer_preload_7_0_w writing: %02x\n", machine().describe_context(), data);
+	m_2101_timer_preload_7_0 = data;
+}
+
+
 /*
     Address 0x2102 r/w (MAIN CPU)
 
@@ -2376,6 +2416,20 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2100_prgbank1_r3_w)
     0x02 - TMR_IRQ
     0x01 - TMR_EN
 */
+
+READ8_MEMBER(vt_vt1682_state::vt1682_2102_timer_enable_r)
+{
+	uint8_t ret = m_2102_timer_enable;
+	logerror("%s: vt1682_2102_timer_enable_r returning: %02x\n", machine().describe_context(), ret);
+	return ret;
+}
+
+WRITE8_MEMBER(vt_vt1682_state::vt1682_2102_timer_enable_w)
+{
+	logerror("%s: vt1682_2102_timer_enable_w writing: %02x\n", machine().describe_context(), data);
+	m_2102_timer_enable = data;
+}
+
 
 /*
     Address 0x2103 r/w (MAIN CPU)
@@ -2402,6 +2456,20 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2100_prgbank1_r3_w)
     0x02 - Timer Preload:9
     0x01 - Timer Preload:8
 */
+
+READ8_MEMBER(vt_vt1682_state::vt1682_2104_timer_preload_15_8_r)
+{
+	uint8_t ret = m_2104_timer_preload_15_8;
+	logerror("%s: vt1682_2104_timer_preload_15_8_r returning: %02x\n", machine().describe_context(), ret);
+	return ret;
+}
+
+WRITE8_MEMBER(vt_vt1682_state::vt1682_2104_timer_preload_15_8_w)
+{
+	logerror("%s: vt1682_2104_timer_preload_15_8_w writing: %02x\n", machine().describe_context(), data);
+	m_2104_timer_preload_15_8 = data;
+}
+
 
 /*
     Address 0x2105 WRITE ONLY (MAIN CPU)
@@ -2980,6 +3048,11 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_211c_regs_ext2421_w)
 	logerror("%s: vt1682_211c_regs_ext2421_w writing: %02x\n", machine().describe_context(), data);
 	m_211c_regs_ext2421 = data;
 	update_banks();
+
+	if (data & 0x10)
+	{
+		printf("Sound CPU IRQ Request\n");
+	}
 }
 
 
@@ -4161,6 +4234,17 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2137_alu_div_opr6_trigger_w)
     0x01 - Clear_CPU_IRQ
 */
 
+WRITE8_MEMBER(vt_vt1682_state::vt1682_soundcpu_211c_reg_irqctrl_w)
+{
+	// EXT2421EN is used for ROM banking
+	logerror("%s: vt1682_soundcpu_211c_reg_irqctrl_w writing: %02x\n", machine().describe_context(), data);
+
+	if (data & 0x10)
+	{
+		printf("Main CPU IRQ Request from Sound CPU\n");
+	}
+}
+
 /*
     Address 0x211d r/w (SOUND CPU)
 
@@ -4795,7 +4879,7 @@ void vt_vt1682_state::setup_video_pages(int which, int tilesize, int vs, int hs,
 	/*
 	if ((pagebases[0] == 0xffff) || (pagebases[1] == 0xffff) || (pagebases[2] == 0xffff) || (pagebases[3] == 0xffff))
 	{
-		fatalerror("failed to set config for tilemap:%1x, size:%1x vs:%1x hs:%1x y8:%1x x8:%1x", which, tilesize, vs, hs, y8, x8);
+	    fatalerror("failed to set config for tilemap:%1x, size:%1x vs:%1x hs:%1x y8:%1x x8:%1x", which, tilesize, vs, hs, y8, x8);
 	}
 	*/
 }
@@ -5122,6 +5206,7 @@ void vt_vt1682_state::vt_vt1682_sound_map(address_map& map)
 	map(0x1000, 0x1fff).ram().share("sound_share");
 	// 3000-3fff internal ROM if enabled
 
+	map(0x211c, 0x211c).w(FUNC(vt_vt1682_state::vt1682_soundcpu_211c_reg_irqctrl_w));
 
 	map(0xf000, 0xffff).ram().share("sound_share"); // doesn't actually map here, the CPU fetches vectors from 0x0ff0 - 0x0fff!
 }
@@ -5187,7 +5272,10 @@ void vt_vt1682_state::vt_vt1682_map(address_map &map)
 
 	/* System */
 	map(0x2100, 0x2100).rw(FUNC(vt_vt1682_state::vt1682_2100_prgbank1_r3_r), FUNC(vt_vt1682_state::vt1682_2100_prgbank1_r3_w));
+	map(0x2101, 0x2101).rw(FUNC(vt_vt1682_state::vt1682_2101_timer_preload_7_0_r), FUNC(vt_vt1682_state::vt1682_2101_timer_preload_7_0_w));
+	map(0x2102, 0x2102).rw(FUNC(vt_vt1682_state::vt1682_2102_timer_enable_r), FUNC(vt_vt1682_state::vt1682_2102_timer_enable_w));
 
+	map(0x2104, 0x2104).rw(FUNC(vt_vt1682_state::vt1682_2104_timer_preload_15_8_r), FUNC(vt_vt1682_state::vt1682_2104_timer_preload_15_8_w));
 	map(0x2105, 0x2105).w(FUNC(vt_vt1682_state::vt1682_2105_comr6_tvmodes_w));
 	map(0x2106, 0x2106).rw(FUNC(vt_vt1682_state::vt1682_2106_enable_regs_r), FUNC(vt_vt1682_state::vt1682_2106_enable_regs_w));
 	map(0x2107, 0x2107).rw(FUNC(vt_vt1682_state::vt1682_2107_prgbank0_r0_r), FUNC(vt_vt1682_state::vt1682_2107_prgbank0_r0_w));
@@ -5234,7 +5322,30 @@ void vt_vt1682_state::vt_vt1682_map(address_map &map)
 	map(0x8000, 0xffff).r(FUNC(vt_vt1682_state::rom_8000_to_ffff_r));
 }
 
+/*
 
+Vectors / IRQ Levels
+
+MAIN CPU:
+
+SPI IRQ         0x7fff2 - 0x7fff3 (0xfff2 - 0xfff3)
+UART IRQ        0x7fff4 - 0x7fff5 (0xfff4 - 0xfff5)
+SCPU IRQ        0x7fff6 - 0x7fff7 (0xfff6 - 0xfff7)
+Timer IRQ       0x7fff8 - 0x7fff9 (0xfff8 - 0xfff9)
+NMI             0x7fffa - 0x7fffb (0xfffa - 0xfffb)
+RESET           0x7fffc - 0x7fffd (0xfffc - 0xfffd)
+Ext IRQ         0x7fffe - 0x7ffff (0xfffe - 0xffff)
+
+SOUND CPU:
+
+CPU IRQ         0x0ff4 - 0x0ff5
+Timer2 IRQ      0x0ff6 - 0x0ff7
+Timer1 IRQ      0x0ff8 - 0x0ff9
+NMI             0x0ffa - 0x0ffb
+RESET           0x0ffc - 0x0ffd
+Ext IRQ         0x0ffe - 0x0fff
+
+*/
 
 
 INTERRUPT_GEN_MEMBER(vt_vt1682_state::nmi)
@@ -5386,7 +5497,7 @@ static INPUT_PORTS_START( intec )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 ) PORT_PLAYER(1) // Selects games
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("Select") // used on first screen to choose which set of games
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) 
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) // Fires in Tank
 
 	PORT_START("IN2") // are these used? 2 player games all seem to be turn based? (Aqua-Mix looks like it should be 2 player but nothing here starts a 2 player game, maybe mapped in some other way?)
@@ -5402,7 +5513,7 @@ static INPUT_PORTS_START( intec )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	
+
 	PORT_START("IN3")
 	PORT_DIPNAME( 0x01, 0x01, "IN3" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -5431,7 +5542,7 @@ INPUT_PORTS_END
 // other games.  maybe it's waiting on some status from the sound cpu?
 
 READ8_MEMBER(intec_interact_state::porta_r)
-{	
+{
 	uint8_t ret = 0x0;// = machine().rand() & 0xf;
 
 	switch (m_input_pos)
