@@ -85,7 +85,7 @@ public:
 	DECLARE_READ_LINE_MEMBER(busy_r) { return 0; } // _BUSY pin - not emulated
 
 protected:
-	mb8421_master_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, size_t ram_size, u64 data_mask = ~0);
+	mb8421_master_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, size_t ram_size, u8 data_bits);
 
 	// device-level overrides
 	virtual void device_resolve_objects() override;
@@ -121,7 +121,7 @@ public:
   u8 ram_r(offs_t offset) { return m_ram[offset] & m_data_mask; }
 
 protected:
-	mb8421_master_8bit_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, size_t ram_size, u8 data_mask = ~0);
+	mb8421_master_8bit_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, size_t ram_size, u8 data_bits = 8);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -146,7 +146,7 @@ public:
   u16 ram_r(offs_t offset) { return m_ram[offset] & m_data_mask; }
 
 protected:
-	mb8421_master_16bit_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, size_t ram_size, u16 data_mask = ~0);
+	mb8421_master_16bit_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, size_t ram_size, u8 data_bits = 16);
 
 	// device-level overrides
 	virtual void device_start() override;

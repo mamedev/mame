@@ -29,7 +29,7 @@ DEFINE_DEVICE_TYPE(MB8421_MB8431_16BIT, mb8421_mb8431_16_device, "mb8421_mb8431_
 //  mb8421_master_device - constructor
 //-------------------------------------------------
 
-mb8421_master_device::mb8421_master_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, size_t ram_size, u64 data_mask)
+mb8421_master_device::mb8421_master_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, size_t ram_size, u64 data_bits)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_intl_callback(*this)
 	, m_intr_callback(*this)
@@ -38,15 +38,15 @@ mb8421_master_device::mb8421_master_device(const machine_config &mconfig, device
 	m_ram_mask = ram_size - 1;
 	m_int_addr_left = ram_size - 2;
 	m_int_addr_right = ram_size - 1;
-	m_data_mask = data_mask;
+	m_data_mask = (1 << data_bits) - 1;
 }
 
 //-------------------------------------------------
 //  mb8421_master_8bit_device - constructor
 //-------------------------------------------------
 
-mb8421_master_8bit_device::mb8421_master_8bit_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, size_t ram_size, u8 data_mask)
-	: mb8421_master_device(mconfig, type, tag, owner, clock, ram_size, data_mask)
+mb8421_master_8bit_device::mb8421_master_8bit_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, size_t ram_size, u8 data_bits)
+	: mb8421_master_device(mconfig, type, tag, owner, clock, ram_size, data_bits)
 {
 }
 
@@ -54,8 +54,8 @@ mb8421_master_8bit_device::mb8421_master_8bit_device(const machine_config &mconf
 //  mb8421_master_16bit_device - constructor
 //-------------------------------------------------
 
-mb8421_master_16bit_device::mb8421_master_16bit_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, size_t ram_size, u16 data_mask)
-	: mb8421_master_device(mconfig, type, tag, owner, clock, ram_size >> 1, data_mask)
+mb8421_master_16bit_device::mb8421_master_16bit_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, size_t ram_size, u8 data_bits)
+	: mb8421_master_device(mconfig, type, tag, owner, clock, ram_size >> 1, data_bits)
 {
 }
 
