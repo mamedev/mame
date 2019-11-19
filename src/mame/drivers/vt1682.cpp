@@ -5624,7 +5624,7 @@ void vt_vt1682_state::draw_layer(int which, int opaque, screen_device& screen, b
 
 			int palselect;
 			if (which == 0) palselect = m_200f_bk_pal_sel & 0x03;
-			else palselect = (m_200f_bk_pal_sel & 0x0c)>>2;
+			else palselect = (m_200f_bk_pal_sel & 0x0c) >> 2;
 
 			int palbase;
 
@@ -5646,20 +5646,23 @@ void vt_vt1682_state::draw_layer(int which, int opaque, screen_device& screen, b
 				// 'both' ? (how?)
 				palbase = machine().rand() & 0xff;
 			}
-			
-			for (int y=0;y<240;y++)
+
+			for (int y = 0; y < 240; y++)
 			{
 				int ytile, ytileline;
+
+				int ywithscroll = y - yscroll;
+
 				if (bk_tilesize)
 				{
-					ytileline = y & 0xf;
-					ytile = y >> 4;
+					ytileline = ywithscroll & 0xf;
+					ytile = ywithscroll >> 4;
 
 				}
 				else
 				{
-					ytileline = y & 0x07;
-					ytile = y >> 3;
+					ytileline = ywithscroll & 0x07;
+					ytile = ywithscroll >> 3;
 				}
 
 				for (int xtile = -1; xtile < (bk_tilesize ? (16) : (32)); xtile++) // -1 due to possible need for partial tile during scrolling
@@ -5676,7 +5679,7 @@ void vt_vt1682_state::draw_layer(int which, int opaque, screen_device& screen, b
 						xscrolltile = xscroll >> 3;
 						xscrolltile_part = xscroll & 0x07;
 					}
-					
+
 
 					int count = get_address_for_tilepos(xtile - xscrolltile, ytile, bk_tilesize, bases);
 
@@ -5690,7 +5693,7 @@ void vt_vt1682_state::draw_layer(int which, int opaque, screen_device& screen, b
 
 					int xpos = xtile * (bk_tilesize ? 16 : 8);
 
-					draw_tile_pixline(segment, tile, ytileline, xpos + xscrolltile_part, y, palbase, pal, bk_tilesize, bk_tilesize, bk_tilebpp, (bk_depth*2)+1, opaque, 0, 0, screen, bitmap, cliprect);
+					draw_tile_pixline(segment, tile, ytileline, xpos + xscrolltile_part, y, palbase, pal, bk_tilesize, bk_tilesize, bk_tilebpp, (bk_depth * 2) + 1, opaque, 0, 0, screen, bitmap, cliprect);
 				}
 			}
 		}
