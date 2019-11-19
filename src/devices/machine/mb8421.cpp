@@ -21,11 +21,11 @@
 #include "machine/mb8421.h"
 
 // 1Kx8
-DEFINE_DEVICE_TYPE(IDT7130,             idt7130_device,          "idt7130",          "IDT 7130 8-bit Dual-Port SRAM with Interrupts")
 DEFINE_DEVICE_TYPE(CY7C131,             cy7c131_device,          "cy7c131",          "Cypress CY7C131 8-bit Dual-Port SRAM with Interrupts")
+DEFINE_DEVICE_TYPE(IDT7130,             idt7130_device,          "idt7130",          "IDT 7130 8-bit Dual-Port SRAM with Interrupts")
 // 2Kx8
-DEFINE_DEVICE_TYPE(MB8421,              mb8421_device,           "mb8421",           "Fujitsu MB8421 8-bit Dual-Port SRAM with Interrupts")
 DEFINE_DEVICE_TYPE(IDT71321,            idt71321_device,         "idt71321",         "IDT 71321 8-bit Dual-Port SRAM with Interrupts")
+DEFINE_DEVICE_TYPE(MB8421,              mb8421_device,           "mb8421",           "Fujitsu MB8421 8-bit Dual-Port SRAM with Interrupts")
 // 2Kx16
 DEFINE_DEVICE_TYPE(MB8421_MB8431_16BIT, mb8421_mb8431_16_device, "mb8421_mb8431_16", "Fujitsu MB8421/MB8431 16-bit Dual-Port SRAM with Interrupts")
 
@@ -33,7 +33,8 @@ DEFINE_DEVICE_TYPE(MB8421_MB8431_16BIT, mb8421_mb8431_16_device, "mb8421_mb8431_
 //  dual_port_mailbox_ram_base - constructor
 //-------------------------------------------------
 
-dual_port_mailbox_ram_base::dual_port_mailbox_ram_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, size_t addr_bits, u8 data_bits)
+template <typename Type>
+dual_port_mailbox_ram_base<Type>::dual_port_mailbox_ram_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, size_t addr_bits, u8 data_bits)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_data_mask((1 << data_bits) - 1)
 	, m_ram_size(1 << addr_bits)
@@ -42,24 +43,7 @@ dual_port_mailbox_ram_base::dual_port_mailbox_ram_base(const machine_config &mco
 	, m_int_addr_right(m_ram_mask) // max RAM word size - 1
 	, m_intl_callback(*this)
 	, m_intr_callback(*this)
-{
-}
-
-//-------------------------------------------------
-//  dual_port_mailbox_ram_8bit_base - constructor
-//-------------------------------------------------
-
-dual_port_mailbox_ram_8bit_base::dual_port_mailbox_ram_8bit_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, size_t addr_bits, u8 data_bits)
-	: dual_port_mailbox_ram_base(mconfig, type, tag, owner, clock, addr_bits, data_bits)
-{
-}
-
-//-------------------------------------------------
-//  dual_port_mailbox_ram_16bit_base - constructor
-//-------------------------------------------------
-
-dual_port_mailbox_ram_16bit_base::dual_port_mailbox_ram_16bit_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, size_t addr_bits, u8 data_bits)
-	: dual_port_mailbox_ram_base(mconfig, type, tag, owner, clock, addr_bits, data_bits)
+	, m_ram(nullptr)
 {
 }
 
@@ -68,7 +52,7 @@ dual_port_mailbox_ram_16bit_base::dual_port_mailbox_ram_16bit_base(const machine
 //-------------------------------------------------
 
 cy7c131_device::cy7c131_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: dual_port_mailbox_ram_8bit_base(mconfig, CY7C131, tag, owner, clock, 10, 8) // 1kx8
+	: dual_port_mailbox_ram_base<u8>(mconfig, CY7C131, tag, owner, clock, 10, 8) // 1kx8
 {
 }
 
@@ -77,16 +61,7 @@ cy7c131_device::cy7c131_device(const machine_config &mconfig, const char *tag, d
 //-------------------------------------------------
 
 idt7130_device::idt7130_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: dual_port_mailbox_ram_8bit_base(mconfig, IDT7130, tag, owner, clock, 10, 8) // 1kx8
-{
-}
-
-//-------------------------------------------------
-//  mb8421_device - constructor
-//-------------------------------------------------
-
-mb8421_device::mb8421_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: dual_port_mailbox_ram_8bit_base(mconfig, MB8421, tag, owner, clock, 11, 8) // 2kx8
+	: dual_port_mailbox_ram_base<u8>(mconfig, IDT7130, tag, owner, clock, 10, 8) // 1kx8
 {
 }
 
@@ -95,7 +70,16 @@ mb8421_device::mb8421_device(const machine_config &mconfig, const char *tag, dev
 //-------------------------------------------------
 
 idt71321_device::idt71321_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: dual_port_mailbox_ram_8bit_base(mconfig, IDT71321, tag, owner, clock, 11, 8) // 2kx8
+	: dual_port_mailbox_ram_base<u8>(mconfig, IDT71321, tag, owner, clock, 11, 8) // 2kx8
+{
+}
+
+//-------------------------------------------------
+//  mb8421_device - constructor
+//-------------------------------------------------
+
+mb8421_device::mb8421_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: dual_port_mailbox_ram_base<u8>(mconfig, MB8421, tag, owner, clock, 11, 8) // 2kx8
 {
 }
 
@@ -104,7 +88,7 @@ idt71321_device::idt71321_device(const machine_config &mconfig, const char *tag,
 //-------------------------------------------------
 
 mb8421_mb8431_16_device::mb8421_mb8431_16_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: dual_port_mailbox_ram_16bit_base(mconfig, MB8421_MB8431_16BIT, tag, owner, clock, 11, 16) // 2kx16
+	: dual_port_mailbox_ram_base<u16>(mconfig, MB8421_MB8431_16BIT, tag, owner, clock, 11, 16) // 2kx16
 {
 }
 
@@ -114,7 +98,8 @@ mb8421_mb8431_16_device::mb8421_mb8431_16_device(const machine_config &mconfig, 
 //  initial conditions at start time
 //-------------------------------------------------
 
-void dual_port_mailbox_ram_base::device_resolve_objects()
+template <typename Type>
+void dual_port_mailbox_ram_base<Type>::device_resolve_objects()
 {
 	// resolve callbacks
 	m_intl_callback.resolve_safe();
@@ -125,17 +110,10 @@ void dual_port_mailbox_ram_base::device_resolve_objects()
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void dual_port_mailbox_ram_8bit_base::device_start()
+template <typename Type>
+void dual_port_mailbox_ram_base<Type>::device_start()
 {
-	m_ram = make_unique_clear<u8[]>(m_ram_size);
-
-	// state save
-	save_pointer(NAME(m_ram), m_ram_size);
-}
-
-void dual_port_mailbox_ram_16bit_base::device_start()
-{
-	m_ram = make_unique_clear<u16[]>(m_ram_size);
+	m_ram = make_unique_clear<Type[]>(m_ram_size);
 
 	// state save
 	save_pointer(NAME(m_ram), m_ram_size);
@@ -145,105 +123,9 @@ void dual_port_mailbox_ram_16bit_base::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void dual_port_mailbox_ram_base::device_reset()
+template <typename Type>
+void dual_port_mailbox_ram_base<Type>::device_reset()
 {
 	m_intl_callback(CLEAR_LINE);
 	m_intr_callback(CLEAR_LINE);
-}
-
-//-------------------------------------------------
-//  update_intr - update interrupt lines upon
-//  read or write accesses to special locations
-//-------------------------------------------------
-
-template<read_or_write row, bool is_right>
-void dual_port_mailbox_ram_base::update_intr(offs_t offset)
-{
-	if (machine().side_effects_disabled())
-		return;
-
-	if (row == read_or_write::WRITE && offset == (is_right ? m_int_addr_left : m_int_addr_right))
-		(is_right ? m_intl_callback : m_intr_callback)(ASSERT_LINE);
-	else if (row == read_or_write::READ && offset == (is_right ? m_int_addr_right : m_int_addr_left))
-		(is_right ? m_intr_callback : m_intl_callback)(CLEAR_LINE);
-}
-
-//-------------------------------------------------
-//  left_w - write access for left-side bus
-//  (write to 7FF asserts INTR)
-//-------------------------------------------------
-
-void dual_port_mailbox_ram_8bit_base::left_w(offs_t offset, u8 data)
-{
-	offset &= m_ram_mask;
-	data &= m_data_mask;
-	m_ram[offset] = data;
-	update_intr<read_or_write::WRITE, false>(offset);
-}
-
-void dual_port_mailbox_ram_16bit_base::left_w(offs_t offset, u16 data, u16 mem_mask)
-{
-	offset &= m_ram_mask;
-	data &= m_data_mask;
-	COMBINE_DATA(&m_ram[offset]);
-	update_intr<read_or_write::WRITE, false>(offset);
-}
-
-//-------------------------------------------------
-//  left_r - read access for left-side bus
-//  (read from 7FE acknowledges INTL)
-//-------------------------------------------------
-
-u8 dual_port_mailbox_ram_8bit_base::left_r(offs_t offset)
-{
-	offset &= m_ram_mask;
-	update_intr<read_or_write::READ, false>(offset);
-	return m_ram[offset];
-}
-
-u16 dual_port_mailbox_ram_16bit_base::left_r(offs_t offset, u16 mem_mask)
-{
-	offset &= m_ram_mask;
-	update_intr<read_or_write::READ, false>(offset);
-	return m_ram[offset];
-}
-
-//-------------------------------------------------
-//  right_w - write access for right-side bus
-//  (write to 7FE asserts INTL)
-//-------------------------------------------------
-
-void dual_port_mailbox_ram_8bit_base::right_w(offs_t offset, u8 data)
-{
-	offset &= m_ram_mask;
-	data &= m_data_mask;
-	m_ram[offset] = data;
-	update_intr<read_or_write::WRITE, true>(offset);
-}
-
-void dual_port_mailbox_ram_16bit_base::right_w(offs_t offset, u16 data, u16 mem_mask)
-{
-	offset &= m_ram_mask;
-	data &= m_data_mask;
-	COMBINE_DATA(&m_ram[offset]);
-	update_intr<read_or_write::WRITE, true>(offset);
-}
-
-//-------------------------------------------------
-//  right_r - read access for right-side bus
-//  (read from 7FF acknowledges INTR)
-//-------------------------------------------------
-
-u8 dual_port_mailbox_ram_8bit_base::right_r(offs_t offset)
-{
-	offset &= m_ram_mask;
-	update_intr<read_or_write::READ, true>(offset);
-	return m_ram[offset];
-}
-
-u16 dual_port_mailbox_ram_16bit_base::right_r(offs_t offset, u16 mem_mask)
-{
-	offset &= m_ram_mask;
-	update_intr<read_or_write::READ, true>(offset);
-	return m_ram[offset];
 }
