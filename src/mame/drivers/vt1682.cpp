@@ -5029,124 +5029,123 @@ void vt_vt1682_state::draw_tile(int segment, int tile, int x, int y, int palbase
 	if (bpp == 3) pal = 0x0;
 	if (bpp == 2) pal &= 0xc;
 
+
+	int startaddress = segment;
+	int linebytes;
+
+	if (bpp == 3)
 	{
-		int startaddress = segment;
-		int linebytes;
-
-		if (bpp == 3)
+		if (is16pix_wide)
 		{
-			if (is16pix_wide)
-			{
-				linebytes = 16;
-			}
-			else
-			{
-				linebytes = 8;
-			}
+			linebytes = 16;
 		}
-		else if (bpp == 2)
+		else
 		{
-			if (is16pix_wide)
-			{
-				linebytes = 12;
-			}
-			else
-			{
-				linebytes = 6;
-			}
+			linebytes = 8;
 		}
-		else //if (bpp == 1) // or 0
+	}
+	else if (bpp == 2)
+	{
+		if (is16pix_wide)
 		{
-			if (is16pix_wide)
-			{
-				linebytes = 8;
-			}
-			else
-			{
-				linebytes = 4;
-			}
+			linebytes = 12;
 		}
-		int tilesize_wide = is16pix_wide ? 16 : 8;
-		int tilesize_high = is16pix_high ? 16 : 8;
-
-		int tilebytes = linebytes * tilesize_high;
-
-		startaddress += tilebytes * tile;
-
-		for (int yy = 0; yy < tilesize_high; yy++) // tile y lines
+		else
 		{
-			int currentaddress;
+			linebytes = 6;
+		}
+	}
+	else //if (bpp == 1) // or 0
+	{
+		if (is16pix_wide)
+		{
+			linebytes = 8;
+		}
+		else
+		{
+			linebytes = 4;
+		}
+	}
+	int tilesize_wide = is16pix_wide ? 16 : 8;
+	int tilesize_high = is16pix_high ? 16 : 8;
 
-			if (!flipy)
-				currentaddress = startaddress + yy * linebytes;
-			else
-				currentaddress = startaddress + ((tilesize_high - 1) - yy) * linebytes;
+	int tilebytes = linebytes * tilesize_high;
 
-			int line = y + yy;
+	startaddress += tilebytes * tile;
 
-			if (line >= cliprect.min_y && line <= cliprect.max_y)
+	for (int yy = 0; yy < tilesize_high; yy++) // tile y lines
+	{
+		int currentaddress;
+
+		if (!flipy)
+			currentaddress = startaddress + yy * linebytes;
+		else
+			currentaddress = startaddress + ((tilesize_high - 1) - yy) * linebytes;
+
+		int line = y + yy;
+
+		if (line >= cliprect.min_y && line <= cliprect.max_y)
+		{
+			uint32_t* dstptr = &bitmap.pix32(line);
+			uint8_t* priptr = &m_priority_bitmap.pix8(line);
+
+			int shift_amount, mask, bytes_in;
+			if (bpp == 3) // (8bpp)
 			{
-				uint32_t* dstptr = &bitmap.pix32(line);
-				uint8_t* priptr = &m_priority_bitmap.pix8(line);
+				shift_amount = 8;
+				mask = 0xff;
+				bytes_in = 4;
+			}
+			else if (bpp == 2) // (6bpp)
+			{
+				shift_amount = 6;
+				mask = 0x3f;
+				bytes_in = 3;
+			}
+			else // 1 / 0 (4bpp)
+			{
+				shift_amount = 4;
+				mask = 0x0f;
+				bytes_in = 2;
+			}
 
-				int shift_amount, mask, bytes_in;
-				if (bpp == 3) // (8bpp)
+			int xbase = x;;
+
+			for (int xx = 0; xx < tilesize_wide; xx += 4) // tile x pixels
+			{
+				// draw 4 pixels
+				uint32_t pixdata = 0;
+
+				int shift = 0;
+				for (int i = 0; i < bytes_in; i++)
 				{
-					shift_amount = 8;
-					mask = 0xff;
-					bytes_in = 4;
+					pixdata |= m_fullrom->read8(currentaddress) << shift; currentaddress++;
+					shift += 8;
 				}
-				else if (bpp == 2) // (6bpp)
-				{
-					shift_amount = 6;
-					mask = 0x3f;
-					bytes_in = 3;
-				}
-				else // 1 / 0 (4bpp)
-				{
-					shift_amount = 4;
-					mask = 0x0f;
-					bytes_in = 2;
-				}
 
-				int xbase = x;;
-
-				for (int xx = 0; xx < tilesize_wide; xx += 4) // tile x pixels
+				shift = 0;
+				for (int ii = 0; ii < 4; ii++)
 				{
-					// draw 4 pixels
-					uint32_t pixdata = 0;
-
-					int shift = 0;
-					for (int i = 0; i < bytes_in; i++)
+					uint8_t pen = (pixdata >> shift)& mask;
+					if (opaque || pen)
 					{
-						pixdata |= m_fullrom->read8(currentaddress) << shift; currentaddress++;
-						shift += 8;
-					}
+						int xdraw_real;
+						if (!flipx)
+							xdraw_real = xbase + xx + ii; // pixel position
+						else
+							xdraw_real = xbase + ((tilesize_wide - 1) - xx - ii);
 
-					shift = 0;
-					for (int ii = 0; ii < 4; ii++)
-					{
-						uint8_t pen = (pixdata >> shift)& mask;
-						if (opaque || pen)
+						if (xdraw_real >= cliprect.min_x && xdraw_real <= cliprect.max_x)
 						{
-							int xdraw_real;
-							if (!flipx)
-								xdraw_real = xbase + xx + ii; // pixel position
-							else
-								xdraw_real = xbase + ((tilesize_wide - 1) - xx - ii);
-
-							if (xdraw_real >= cliprect.min_x && xdraw_real <= cliprect.max_x)
+							if (depth < priptr[xdraw_real])
 							{
-								if (depth < priptr[xdraw_real])
-								{
-									const pen_t* paldata = m_palette->pens();
-									dstptr[xdraw_real] = paldata[(palbase + pen) | (pal << 4)];
-									priptr[xdraw_real] = depth;
-								}
+								const pen_t* paldata = m_palette->pens();
+								dstptr[xdraw_real] = paldata[(palbase + pen) | (pal << 4)];
+								priptr[xdraw_real] = depth;
 							}
 						}
-						shift += shift_amount;
 					}
+					shift += shift_amount;
 				}
 			}
 		}
