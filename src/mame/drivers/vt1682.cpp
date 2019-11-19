@@ -5023,12 +5023,11 @@ WRITE8_MEMBER(vt_vt1682_state::soundcpu_alu_oprand_6_div_w)
     0x01 - IOB PLH
 */
 
-void vt_vt1682_state::draw_tile_pixline(int segment, int tile, int yy, int x, int y, int palbase, int pal, int is16pix_high, int is16pix_wide, int bpp, int depth, int opaque, int flipx, int flipy, screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
+void vt_vt1682_state::draw_tile_pixline(int segment, int tile, int tileline, int x, int y, int palbase, int pal, int is16pix_high, int is16pix_wide, int bpp, int depth, int opaque, int flipx, int flipy, screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
 {
 	int tilesize_high = is16pix_high ? 16 : 8;
-	int line = y + yy;
 
-	if (line >= cliprect.min_y && line <= cliprect.max_y)
+	if (y >= cliprect.min_y && y <= cliprect.max_y)
 	{
 
 		if (bpp == 3) pal = 0x0;
@@ -5079,13 +5078,13 @@ void vt_vt1682_state::draw_tile_pixline(int segment, int tile, int yy, int x, in
 		int currentaddress;
 
 		if (!flipy)
-			currentaddress = startaddress + yy * linebytes;
+			currentaddress = startaddress + tileline * linebytes;
 		else
-			currentaddress = startaddress + ((tilesize_high - 1) - yy) * linebytes;
+			currentaddress = startaddress + ((tilesize_high - 1) - tileline) * linebytes;
 
 
-		uint32_t* dstptr = &bitmap.pix32(line);
-		uint8_t* priptr = &m_priority_bitmap.pix8(line);
+		uint32_t* dstptr = &bitmap.pix32(y);
+		uint8_t* priptr = &m_priority_bitmap.pix8(y);
 
 		int shift_amount, mask, bytes_in;
 		if (bpp == 3) // (8bpp)
@@ -5154,7 +5153,7 @@ void vt_vt1682_state::draw_tile(int segment, int tile, int x, int y, int palbase
 
 	for (int yy = 0; yy < tilesize_high; yy++) // tile y lines
 	{
-		draw_tile_pixline(segment, tile, yy, x, y, palbase, pal, is16pix_high, is16pix_wide, bpp, depth, opaque, flipx, flipy, screen, bitmap, cliprect);
+		draw_tile_pixline(segment, tile, yy, x, y+yy, palbase, pal, is16pix_high, is16pix_wide, bpp, depth, opaque, flipx, flipy, screen, bitmap, cliprect);
 	}
 }
 
