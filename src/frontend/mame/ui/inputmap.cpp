@@ -295,9 +295,16 @@ void menu_input::handle()
 		{
 			// if UI_CANCEL is pressed, abort
 			pollingitem = nullptr;
-			record_next = false;
-			toggle_none_default(item->seq, starting_seq, *item->defseq);
-			seqchangeditem = item;
+			if (machine().input().seq_poll_final() == init_poll_seq)
+			{
+				record_next = false;
+				toggle_none_default(item->seq, starting_seq, *item->defseq);
+				seqchangeditem = item;
+			}
+			else
+			{
+				invalidate = true;
+			}
 		}
 		else if (machine().input().seq_poll())
 		{
@@ -319,6 +326,7 @@ void menu_input::handle()
 			lastitem = item;
 			starting_seq = item->seq;
 			machine().input().seq_poll_start((item->type == INPUT_TYPE_ANALOG) ? ITEM_CLASS_ABSOLUTE : ITEM_CLASS_SWITCH, record_next ? &item->seq : nullptr);
+			init_poll_seq = machine().input().seq_poll_final();
 			invalidate = true;
 			break;
 
