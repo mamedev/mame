@@ -5025,56 +5025,55 @@ WRITE8_MEMBER(vt_vt1682_state::soundcpu_alu_oprand_6_div_w)
 
 void vt_vt1682_state::draw_tile(int segment, int tile, int x, int y, int palbase, int pal, int is16pix_high, int is16pix_wide, int bpp, int depth, int opaque, int flipx, int flipy, screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
 {
-
-	if (bpp == 3) pal = 0x0;
-	if (bpp == 2) pal &= 0xc;
-
-
-	int startaddress = segment;
-	int linebytes;
-
-	if (bpp == 3)
-	{
-		if (is16pix_wide)
-		{
-			linebytes = 16;
-		}
-		else
-		{
-			linebytes = 8;
-		}
-	}
-	else if (bpp == 2)
-	{
-		if (is16pix_wide)
-		{
-			linebytes = 12;
-		}
-		else
-		{
-			linebytes = 6;
-		}
-	}
-	else //if (bpp == 1) // or 0
-	{
-		if (is16pix_wide)
-		{
-			linebytes = 8;
-		}
-		else
-		{
-			linebytes = 4;
-		}
-	}
-	int tilesize_wide = is16pix_wide ? 16 : 8;
 	int tilesize_high = is16pix_high ? 16 : 8;
-
-	int tilebytes = linebytes * tilesize_high;
-
-	startaddress += tilebytes * tile;
 
 	for (int yy = 0; yy < tilesize_high; yy++) // tile y lines
 	{
+		if (bpp == 3) pal = 0x0;
+		if (bpp == 2) pal &= 0xc;
+
+		int startaddress = segment;
+		int linebytes;
+
+		if (bpp == 3)
+		{
+			if (is16pix_wide)
+			{
+				linebytes = 16;
+			}
+			else
+			{
+				linebytes = 8;
+			}
+		}
+		else if (bpp == 2)
+		{
+			if (is16pix_wide)
+			{
+				linebytes = 12;
+			}
+			else
+			{
+				linebytes = 6;
+			}
+		}
+		else //if (bpp == 1) // or 0
+		{
+			if (is16pix_wide)
+			{
+				linebytes = 8;
+			}
+			else
+			{
+				linebytes = 4;
+			}
+		}
+		int tilesize_wide = is16pix_wide ? 16 : 8;
+
+		int tilebytes = linebytes * tilesize_high;
+
+		startaddress += tilebytes * tile;
+
 		int currentaddress;
 
 		if (!flipy)
