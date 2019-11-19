@@ -4269,13 +4269,12 @@ READ8_MEMBER(vt_vt1682_state::vt1682_soundcpu_2102_timer_a_enable_r)
 WRITE8_MEMBER(vt_vt1682_state::vt1682_soundcpu_2102_timer_a_enable_w)
 {
 	// For NTSC
-
 	//Period = (65536 - Timer _PreLoad) / 21.4772 MHz
-	//Timer PreLoad = 65536 � (Period in seconds) * 21.4772 * 1000000 )
+	//Timer PreLoad = 65536 - (Period in seconds) * 21.4772 * 1000000 )
 
 	// For PAL
 	// Period = (65536 - Timer PreLoad) / 26.601712 MHz
-	//Timer PreLoad = 65536 � (Period in seconds) * 26.601712 * 1000000 )
+	//Timer PreLoad = 65536 - (Period in seconds) * 26.601712 * 1000000 )
 
 	/*
 	uint16_t preload = (m_soundcpu_2101_timer_a_preload_15_8 << 8) | m_soundcpu_2100_timer_a_preload_7_0;
