@@ -12,6 +12,7 @@
 
 #include "emu.h"
 #include "machine/m6502_vt1682.h"
+#include "machine/vt1682_io.h"
 #include "machine/bankdev.h"
 #include "emupal.h"
 #include "screen.h"
@@ -24,14 +25,12 @@
 #define VERBOSE             (0)
 #include "logmacro.h"
 
-
-
-
 class vt_vt1682_state : public driver_device
 {
 public:
 	vt_vt1682_state(const machine_config& mconfig, device_type type, const char* tag) :
 		driver_device(mconfig, type, tag),
+		m_io(*this, "io"),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_screen(*this, "screen"),
@@ -45,13 +44,12 @@ public:
 
 	void vt_vt1682(machine_config& config);
 
-	void init_8in1();
-
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
+	required_device<vrt_vt1682_io_device> m_io;
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
@@ -320,7 +318,9 @@ private:
 
 	uint8_t m_2106_enable_reg;
 
-	uint8_t m_210d_ioconfig;
+	uint8_t m_alu_oprand[4];
+	uint8_t m_alu_oprand_mult[2];
+	uint8_t m_alu_out[6];
 
 	DECLARE_READ8_MEMBER(vt1682_2100_prgbank1_r3_r);
 	DECLARE_WRITE8_MEMBER(vt1682_2100_prgbank1_r3_w);
@@ -377,14 +377,21 @@ private:
 	DECLARE_READ8_MEMBER(vt1682_2106_enable_regs_r);
 	DECLARE_WRITE8_MEMBER(vt1682_2106_enable_regs_w);
 
-	DECLARE_READ8_MEMBER(vt1682_210e_io_ab_r);
-	DECLARE_READ8_MEMBER(vt1682_210f_io_cd_r);
 
-	DECLARE_WRITE8_MEMBER(vt1682_210e_io_ab_w);
-	DECLARE_WRITE8_MEMBER(vt1682_210f_io_cd_w);
+	DECLARE_READ8_MEMBER(alu_out_1_r);
+	DECLARE_READ8_MEMBER(alu_out_2_r);
+	DECLARE_READ8_MEMBER(alu_out_3_r);
+	DECLARE_READ8_MEMBER(alu_out_4_r);
+	DECLARE_READ8_MEMBER(alu_out_5_r);
+	DECLARE_READ8_MEMBER(alu_out_6_r);
 
-	DECLARE_READ8_MEMBER(vt1682_210d_ioconfig_r);
-	DECLARE_WRITE8_MEMBER(vt1682_210d_ioconfig_w);
+	DECLARE_WRITE8_MEMBER(alu_oprand_1_w);
+	DECLARE_WRITE8_MEMBER(alu_oprand_2_w);
+	DECLARE_WRITE8_MEMBER(alu_oprand_3_w);
+	DECLARE_WRITE8_MEMBER(alu_oprand_4_w);
+	DECLARE_WRITE8_MEMBER(alu_oprand_5_mult_w);
+	DECLARE_WRITE8_MEMBER(alu_oprand_6_mult_w);
+	DECLARE_WRITE8_MEMBER(vt1682_2137_alu_div_opr6_trigger_w);
 
 	/* System Helpers */
 
@@ -404,6 +411,12 @@ private:
 	uint16_t get_dma_dt_addr()
 	{
 		return ((m_2122_dma_dt_addr_7_0 ) | (m_2123_dma_dt_addr_15_8 << 8)) & 0x7fff;
+	}
+
+	void set_dma_dt_addr(uint16_t addr)
+	{
+		m_2122_dma_dt_addr_7_0 = addr & 0xff;
+		m_2123_dma_dt_addr_15_8 = (m_2123_dma_dt_addr_15_8 & 0x80) | (addr >> 8); // don't change the external flag
 	}
 
 	bool get_dma_sr_isext()
@@ -454,6 +467,47 @@ private:
 	void draw_tile(int segment, int tile, int x, int y, int palbase, int pal, int is16pix_high, int is16pix_wide, int bpp, int depth, int opaque, int flipx, int flipy, screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
 	void draw_layer(int which, int base, int opaque, screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
 	void draw_sprites(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
+};
+
+
+class intec_interact_state : public vt_vt1682_state
+{
+public:
+	intec_interact_state(const machine_config& mconfig, device_type type, const char* tag) :
+		vt_vt1682_state(mconfig, type, tag),
+		m_io_p1(*this, "IN0"),
+		m_io_p2(*this, "IN1"),
+		m_io_p3(*this, "IN2"),
+		m_io_p4(*this, "IN3")
+	{ }
+
+	void intech_interact(machine_config& config);
+
+	DECLARE_READ8_MEMBER(porta_r);
+	DECLARE_READ8_MEMBER(portb_r) { return 0x00;/*uint8_t ret = machine().rand() & 0xf; logerror("%s: portb_r returning: %1x\n", machine().describe_context(), ret); return ret;*/ };
+	DECLARE_READ8_MEMBER(portc_r);
+	DECLARE_READ8_MEMBER(portd_r) { return 0x00;/*uint8_t ret = machine().rand() & 0xf; logerror("%s: portd_r returning: %1x\n", machine().describe_context(), ret); return ret;*/ };
+
+	DECLARE_WRITE8_MEMBER(porta_w);
+	DECLARE_WRITE8_MEMBER(portb_w);
+	DECLARE_WRITE8_MEMBER(portc_w) { logerror("%s: portc_w writing: %1x\n", machine().describe_context(), data & 0xf); };
+	DECLARE_WRITE8_MEMBER(portd_w) { logerror("%s: portd_w writing: %1x\n", machine().describe_context(), data & 0xf); };
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+	uint8_t m_previous_port_b;
+	int m_input_sense;
+	int m_input_pos;
+
+	required_ioport m_io_p1;
+	required_ioport m_io_p2;
+	required_ioport m_io_p3;
+	required_ioport m_io_p4;
+
+
 };
 
 void vt_vt1682_state::video_start()
@@ -552,7 +606,9 @@ void vt_vt1682_state::machine_start()
 
 	save_item(NAME(m_2106_enable_reg));
 
-	save_item(NAME(m_210d_ioconfig));
+	save_item(NAME(m_alu_oprand));
+	save_item(NAME(m_alu_oprand_mult));
+	save_item(NAME(m_alu_out));
 }
 
 void vt_vt1682_state::machine_reset()
@@ -649,7 +705,15 @@ void vt_vt1682_state::machine_reset()
 
 	m_2106_enable_reg = 0;
 
-	m_210d_ioconfig = 0;
+	for (int i=0;i<4;i++)
+		m_alu_oprand[i] = 0;
+
+	for (int i=0;i<2;i++)
+		m_alu_oprand_mult[i] = 0;
+
+	for (int i=0;i<6;i++)
+		m_alu_out[i] = 0;
+
 
 	update_banks();
 
@@ -2349,10 +2413,10 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2100_prgbank1_r3_w)
     0x02 - ROM SEL
     0x01 - PRAM
 
-	TV Mode settings 0 = NTSC, 1 = PAL M, 2 = PAL N, 3 = PAL
-	see clocks near machine_config
+    TV Mode settings 0 = NTSC, 1 = PAL M, 2 = PAL N, 3 = PAL
+    see clocks near machine_config
 
-	ROM SEL is which CPU the internal ROM maps to (if used)  0 = Main CPU, 1 = Sound CPU
+    ROM SEL is which CPU the internal ROM maps to (if used)  0 = Main CPU, 1 = Sound CPU
 
 */
 
@@ -2571,96 +2635,9 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_210c_prgbank1_r2_w)
 }
 
 
-/*
-    Address 0x210d r/w (MAIN CPU)
-
-    0x80 - IOD ENB
-    0x40 - IOD OE
-    0x20 - IOC ENB
-    0x10 - IOC OE
-    0x08 - IOB ENB
-    0x04 - IOB OE
-    0x02 - IOA ENB
-    0x01 - IOA OE
-*/
-
-READ8_MEMBER(vt_vt1682_state::vt1682_210d_ioconfig_r)
-{
-	uint8_t ret = m_210d_ioconfig;
-	logerror("%s: vt1682_210d_ioconfig_r returning: %02x\n", machine().describe_context(), ret);
-	return ret;
-}
-
-
-WRITE8_MEMBER(vt_vt1682_state::vt1682_210d_ioconfig_w)
-{
-	logerror("%s: vt1682_210d_ioconfig_w writing: %02x ( IOD_ENB:%1x IOD_OE:%1x | IOC_ENB:%1x IOC_OE:%1x | IOB_ENB:%1x IOB_OE:%1x | IOA_ENB:%1x IOA_OE:%1x )\n", machine().describe_context(), data,
-		(data & 0x80) ? 1 : 0,
-		(data & 0x40) ? 1 : 0,
-		(data & 0x20) ? 1 : 0,
-		(data & 0x10) ? 1 : 0,
-		(data & 0x08) ? 1 : 0,
-		(data & 0x04) ? 1 : 0,
-		(data & 0x02) ? 1 : 0,
-		(data & 0x01) ? 1 : 0);
-
-	m_210d_ioconfig = data;
-}
-
-
-/*
-    Address 0x210e r/w (MAIN CPU)
-
-    0x80 - IOB:3
-    0x40 - IOB:2
-    0x20 - IOB:1
-    0x10 - IOB:0
-    0x08 - IOA:3
-    0x04 - IOA:2
-    0x02 - IOA:1
-    0x01 - IOA:0
-*/
-
-READ8_MEMBER(vt_vt1682_state::vt1682_210e_io_ab_r)
-{
-	//uint8_t ret = ioport("IN0")->read();
-	uint8_t ret = machine().rand();
-//	logerror("%s: vt1682_210e_io_ab_r returning: %02x\n", machine().describe_context(), ret);
-	return ret;
-}
-
-WRITE8_MEMBER(vt_vt1682_state::vt1682_210e_io_ab_w)
-{
-	logerror("%s: vt1682_210e_io_ab_w writing: %02x (portb: %1x porta: %1x)\n", machine().describe_context(), data, (data & 0xf0) >> 4, data & 0x0f);
-}
-
-
-
-/*
-    Address 0x210f r/w (MAIN CPU)
-
-    0x80 - IOD:3
-    0x40 - IOD:2
-    0x20 - IOD:1
-    0x10 - IOD:0
-    0x08 - IOC:3
-    0x04 - IOC:2
-    0x02 - IOC:1
-    0x01 - IOC:0
-*/
-
-READ8_MEMBER(vt_vt1682_state::vt1682_210f_io_cd_r)
-{
-	//uint8_t ret = ioport("IN1")->read();
-	uint8_t ret = machine().rand();
-//	logerror("%s: vt1682_210f_io_cd_r returning: %02x\n", machine().describe_context(), ret);
-	return ret;
-}
-
-WRITE8_MEMBER(vt_vt1682_state::vt1682_210f_io_cd_w)
-{
-	logerror("%s: vt1682_210f_io_cd_w writing: %02x (portd: %1x portc: %1x)\n", machine().describe_context(), data, (data & 0xf0) >> 4, data & 0x0f);
-}
+/* 0x210d - see vt1682_io.cpp */
+/* 0x210e - see vt1682_io.cpp */
+/* 0x210f - see vt1682_io.cpp */
 
 
 /*
@@ -3290,6 +3267,7 @@ void vt_vt1682_state::do_dma_external_to_internal(int data, bool is_video)
 	for (int i = 0; i < count; i++)
 	{
 		srcaddr = get_dma_sr_addr();
+		dstaddr = get_dma_dt_addr();
 		uint8_t dat = m_fullrom->read8(srcaddr | srcbank<<15);
 		srcaddr++;
 
@@ -3300,6 +3278,7 @@ void vt_vt1682_state::do_dma_external_to_internal(int data, bool is_video)
 			dstaddr++;
 
 		// update registers
+		set_dma_dt_addr(dstaddr);;
 		set_dma_sr_addr(srcaddr);
 	}
 }
@@ -3321,6 +3300,7 @@ void vt_vt1682_state::do_dma_internal_to_internal(int data, bool is_video)
 	for (int i = 0; i < count; i++)
 	{
 		address_space &mem = m_maincpu->space(AS_PROGRAM);
+		dstaddr = get_dma_dt_addr();
 
 		srcaddr = get_dma_sr_addr();
 		uint8_t dat = mem.read_byte(srcaddr);
@@ -3332,6 +3312,7 @@ void vt_vt1682_state::do_dma_internal_to_internal(int data, bool is_video)
 			dstaddr++;
 
 		// update registers
+		set_dma_dt_addr(dstaddr);
 		set_dma_sr_addr(srcaddr);
 	}
 }
@@ -3567,6 +3548,19 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2128_dma_sr_bank_addr_24_23_w)
     0x01 - ALU Output 1
 */
 
+READ8_MEMBER(vt_vt1682_state::alu_out_1_r)
+{
+	uint8_t ret = m_alu_out[0];
+	logerror("%s: alu_out_1_r returning: %02x\n", machine().describe_context(), ret);
+	return ret;
+}
+
+WRITE8_MEMBER(vt_vt1682_state::alu_oprand_1_w)
+{
+	logerror("%s: alu_oprand_1_w writing: %02x\n", machine().describe_context(), data);
+	m_alu_oprand[0] = data;
+}
+
 /*
     Address 0x2131 WRITE (MAIN CPU)
 
@@ -3590,6 +3584,19 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2128_dma_sr_bank_addr_24_23_w)
     0x02 - ALU Output 2
     0x01 - ALU Output 2
 */
+
+READ8_MEMBER(vt_vt1682_state::alu_out_2_r)
+{
+	uint8_t ret = m_alu_out[1];
+	logerror("%s: alu_out_2_r returning: %02x\n", machine().describe_context(), ret);
+	return ret;
+}
+
+WRITE8_MEMBER(vt_vt1682_state::alu_oprand_2_w)
+{
+	logerror("%s: alu_oprand_2_w writing: %02x\n", machine().describe_context(), data);
+	m_alu_oprand[1] = data;
+}
 
 /*
     Address 0x2132 WRITE (MAIN CPU)
@@ -3615,6 +3622,20 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2128_dma_sr_bank_addr_24_23_w)
     0x01 - ALU Output 3
 */
 
+READ8_MEMBER(vt_vt1682_state::alu_out_3_r)
+{
+	uint8_t ret = m_alu_out[2];
+	logerror("%s: alu_out_3_r returning: %02x\n", machine().describe_context(), ret);
+	return ret;
+}
+
+WRITE8_MEMBER(vt_vt1682_state::alu_oprand_3_w)
+{
+	logerror("%s: alu_oprand_3_w writing: %02x\n", machine().describe_context(), data);
+	m_alu_oprand[2] = data;
+}
+
+
 /*
     Address 0x2133 WRITE (MAIN CPU)
 
@@ -3638,6 +3659,20 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2128_dma_sr_bank_addr_24_23_w)
     0x02 - ALU Output 4
     0x01 - ALU Output 4
 */
+
+READ8_MEMBER(vt_vt1682_state::alu_out_4_r)
+{
+	uint8_t ret = m_alu_out[3];
+	logerror("%s: alu_out_4_r returning: %02x\n", machine().describe_context(), ret);
+	return ret;
+}
+
+
+WRITE8_MEMBER(vt_vt1682_state::alu_oprand_4_w)
+{
+	logerror("%s: alu_oprand_4_w writing: %02x\n", machine().describe_context(), data);
+	m_alu_oprand[3] = data;
+}
 
 /*
     Address 0x2134 WRITE (MAIN CPU)
@@ -3663,6 +3698,21 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2128_dma_sr_bank_addr_24_23_w)
     0x01 - ALU Output 5
 */
 
+READ8_MEMBER(vt_vt1682_state::alu_out_5_r)
+{
+	uint8_t ret = m_alu_out[4];
+	logerror("%s: alu_out_5_r returning: %02x\n", machine().describe_context(), ret);
+	return ret;
+}
+
+
+WRITE8_MEMBER(vt_vt1682_state::alu_oprand_5_mult_w)
+{
+	logerror("%s: alu_oprand_5_mult_w writing: %02x\n", machine().describe_context(), data);
+	m_alu_oprand_mult[0] = data;
+}
+
+
 /*
     Address 0x2135 WRITE (MAIN CPU)
 
@@ -3686,6 +3736,35 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2128_dma_sr_bank_addr_24_23_w)
     0x02 - ALU Output 6
     0x01 - ALU Output 6
 */
+
+READ8_MEMBER(vt_vt1682_state::alu_out_6_r)
+{
+	uint8_t ret = m_alu_out[5];
+	logerror("%s: alu_out_6_r returning: %02x\n", machine().describe_context(), ret);
+	return ret;
+}
+
+WRITE8_MEMBER(vt_vt1682_state::alu_oprand_6_mult_w)
+{
+	// used one of the 32in1 menus
+
+	logerror("%s: alu_oprand_6_mult_w writing: %02x\n", machine().describe_context(), data);
+	logerror("------------------------------------------ MULTIPLICATION REQUESTED ------------------------------------\n");
+	m_alu_oprand_mult[1] = data;
+
+	int param1 = (m_alu_oprand_mult[1] << 8) | m_alu_oprand_mult[0];
+	int param2 = (m_alu_oprand[1] << 8) | m_alu_oprand[0];
+
+	uint32_t result = param1 * param2;
+
+	m_alu_out[0] = result & 0xff;
+	m_alu_out[1] = (result >> 8) & 0xff;
+	m_alu_out[2] = (result >> 16) & 0xff;
+	m_alu_out[3] = (result >> 24) & 0xff;
+
+	// oprands 5/6 cleared?
+}
+
 
 /*
     Address 0x2136 WRITE ONLY (MAIN CPU)
@@ -3713,6 +3792,13 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2128_dma_sr_bank_addr_24_23_w)
     0x02 - ALU Div Oprand 6
     0x01 - ALU Div Oprand 6
 */
+
+WRITE8_MEMBER(vt_vt1682_state::vt1682_2137_alu_div_opr6_trigger_w)
+{
+	logerror("%s: vt1682_2137_alu_div_opr6_trigger_w writing: %02x\n", machine().describe_context(), data);
+	popmessage("------------------------------------------ DIVISION REQUESTED ------------------------------------\n");
+}
+
 
 /* Address 0x2138 Unused */
 /* Address 0x2139 Unused */
@@ -4419,7 +4505,7 @@ void vt_vt1682_state::draw_tile(int segment, int tile, int x, int y, int palbase
 		for (int yy = 0; yy < tilesize_high; yy++) // tile y lines
 		{
 			int currentaddress;
-			
+
 			if (!flipy)
 				currentaddress = startaddress + yy * linebytes;
 			else
@@ -4496,15 +4582,131 @@ void vt_vt1682_state::draw_tile(int segment, int tile, int x, int y, int palbase
 	}
 }
 
+/*
+    Page Setups
+
+    8x8 Mode  (Note, BK2 RAM arrangements are the same as BK1 in 8x8 mode)
+
+    ---------------------------------------------------------------------------------------------------------------------------------
+    |   Bk1 Reg |   Bk1 Reg |   Layout                              |   Bk2 Reg |   Bk2 Reg |                                       |
+    ---------------------------------------------------------------------------------------------------------------------------------
+    |   Vs  Hs  |   Y8  X8  |   resulting config                    |   Vs  Hs  |   Y8  X8  |   resulting config                    |
+    ---------------------------------------------------------------------------------------------------------------------------------
+    |   0   0   |   0   0   |   0x000 - 0x7ff                       |   0   0   |   0   0   |   0x000 - 0x7ff                       |
+    |           |           |                                       |           |           |                                       |
+    ---------------------------------------------------------------------------------------------------------------------------------
+    |           |   0   1   |   0x800 - 0x800                       |           |   0   1   |   0x800 - 0x800                       |
+    |           |           |                                       |           |           |                                       |
+    ---------------------------------------------------------------------------------------------------------------------------------
+    |           |   1   0   |   0x800 - 0x800                       |           |   1   0   |   0x800 - 0x800                       |
+    |           |           |   (technically invalid?)              |           |           |   (technically invalid?)              |
+    ---------------------------------------------------------------------------------------------------------------------------------
+    |           |   1   1   |   0x800 - 0x800                       |           |   1   1   |   0x800 - 0x800                       |
+    |           |           |   (technically invalid?)              |           |           |   (technically invalid?)              |
+    =================================================================================================================================
+    |   0   1   |   0   0   |   0x000 - 0x7ff   0x800 - 0xfff       |   0   1   |   0   0   |   0x000 - 0x7ff   0x800 - 0xfff       |
+    |           |           |                                       |           |           |                                       |
+    ---------------------------------------------------------------------------------------------------------------------------------
+    |           |   0   1   |   0x800 - 0xfff   0x000 - 0xfff       |           |   0   1   |   0x800 - 0xfff   0x000 - 0xfff       |
+    |           |           |                                       |           |           |                                       |
+    ---------------------------------------------------------------------------------------------------------------------------------
+    |           |   1   0   |   0x000 - 0x7ff   0x800 - 0xfff       |           |   1   0   |   0x000 - 0x7ff   0x800 - 0xfff       |
+    |           |           |                                       |           |           |                                       |
+    ---------------------------------------------------------------------------------------------------------------------------------
+    |           |   1   1   |   0x800 - 0xfff   0x000 - 0xfff       |           |   1   1   |   0x800 - 0xfff   0x000 - 0xfff       |
+    |           |           |                                       |           |           |                                       |
+    =================================================================================================================================
+    |   1   0   |   0   0   |   0x000 - 0x7ff                       |   1   0   |   0   0   |   0x000 - 0x7ff                       |
+    |           |           |   0x800 - 0xfff                       |           |           |   0x800 - 0xfff                       |
+    ---------------------------------------------------------------------------------------------------------------------------------
+    |           |   0   1   |   0x000 - 0x7ff                       |           |   0   1   |   0x000 - 0x7ff                       |
+    |           |           |   0x800 - 0xfff                       |           |           |   0x800 - 0xfff                       |
+    ---------------------------------------------------------------------------------------------------------------------------------
+    |           |   1   0   |   0x800 - 0xfff                       |           |   1   0   |   0x800 - 0xfff                       |
+    |           |           |   0x000 - 0x7ff                       |           |           |   0x000 - 0x7ff                       |
+    ---------------------------------------------------------------------------------------------------------------------------------
+    |           |   1   1   |   0x800 - 0xfff                       |           |   1   1   |   0x800 - 0xfff                       |
+    |           |           |   0x000 - 0x7ff                       |           |           |   0x000 - 0x7ff                       |
+    =================================================================================================================================
+    |   1   1   |   0   0   |   Invalid (each page is 0x800 bytes,  |   1   1   |   0   0   |   Invalid (each page is 0x800 bytes,  |
+    |           |           |    so not enough RAM for 4 pages)     |           |           |    so not enough RAM for 4 pages)     |
+    ---------------------------------------------------------------------------------------------------------------------------------
+    |           |   0   1   |   Invalid (each page is 0x800 bytes,  |           |   0   1   |   Invalid (each page is 0x800 bytes,  |
+    |           |           |    so not enough RAM for 4 pages)     |           |           |    so not enough RAM for 4 pages)     |
+    ---------------------------------------------------------------------------------------------------------------------------------
+    |           |   1   0   |   Invalid (each page is 0x800 bytes,  |           |   1   0   |   Invalid (each page is 0x800 bytes,  |
+    |           |           |    so not enough RAM for 4 pages)     |           |           |    so not enough RAM for 4 pages)     |
+    ---------------------------------------------------------------------------------------------------------------------------------
+    |           |   1   1   |   Invalid (each page is 0x800 bytes,  |           |   1   1   |   Invalid (each page is 0x800 bytes,  |
+    |           |           |    so not enough RAM for 4 pages)     |           |           |    so not enough RAM for 4 pages)     |
+    =================================================================================================================================
+
+    16x16 Mode  (Note, BK2 RAM base is different, with 0x800 added, compared to BK1 in 16x16 mode)
+
+    ---------------------------------------------------------------------------------------------------------------------------------
+    |   Bk1 Reg |   Bk1 Reg |   Layout                              |   Bk2 Reg |   Bk2 Reg |                                       |
+    ---------------------------------------------------------------------------------------------------------------------------------
+    |   Vs  Hs  |   Y8  X8  |   resulting config                    |   Vs  Hs  |   Y8  X8  |   resulting config                    |
+    ---------------------------------------------------------------------------------------------------------------------------------
+    |   0   0   |   0   0   |   0x000 - 0x1ff                       |   0   0   |   0   0   |   0x800 - 0x9ff                       |
+    |           |           |                                       |           |           |                                       |
+    ---------------------------------------------------------------------------------------------------------------------------------
+    |           |   0   1   |   0x200 - 0x3ff                       |           |   0   1   |   0xa00 - 0xbff                       |
+    |           |           |                                       |           |           |                                       |
+    ---------------------------------------------------------------------------------------------------------------------------------
+    |           |   1   0   |   0x400 - 0x5ff                       |           |   1   0   |   0xc00 - 0xdff                       |
+    |           |           |                                       |           |           |                                       |
+    ---------------------------------------------------------------------------------------------------------------------------------
+    |           |   1   1   |   0x600 - 0x7ff                       |           |   1   1   |   0xe00 - 0xfff                       |
+    |           |           |                                       |           |           |                                       |
+    =================================================================================================================================
+    |   0   1   |   0   0   |   0x000 - 0x1ff   0x200 - 0x3ff       |   0   1   |   0   0   |   0x800 - 0x9ff   0xa00 - 0xbff       |
+    |           |           |                                       |           |           |                                       |
+    ---------------------------------------------------------------------------------------------------------------------------------
+    |           |   0   1   |   0x200 - 0x3ff   0x000 - 0x1ff       |           |   0   1   |   0xa00 - 0xbff   0x800 - 0x9ff       |
+    |           |           |                                       |           |           |                                       |
+    ---------------------------------------------------------------------------------------------------------------------------------
+    |           |   1   0   |   0x000 - 0x1ff   0x200 - 0x3ff       |           |   1   0   |   0x800 - 0x9ff   0xa00 - 0xbff       |
+    |           |           |                                       |           |           |                                       |
+    ---------------------------------------------------------------------------------------------------------------------------------
+    |           |   1   1   |   0x200 - 0x3ff   0x000 - 0x1ff       |           |   1   1   |   0xa00 - 0xbff   0x800 - 0x9ff       |
+    |           |           |                                       |           |           |                                       |
+    =================================================================================================================================
+    |   1   0   |   0   0   |   0x000 - 0x1ff                       |   1   0   |   0   0   |   0x800 - 0x9ff                       |
+    |           |           |   0x200 - 0x3ff                       |           |           |   0xa00 - 0xbff                       |
+    ---------------------------------------------------------------------------------------------------------------------------------
+    |           |   0   1   |   0x000 - 0x1ff                       |           |   0   1   |   0x800 - 0x9ff                       |
+    |           |           |   0x200 - 0x3ff                       |           |           |   0xa00 - 0xbff                       |
+    ---------------------------------------------------------------------------------------------------------------------------------
+    |           |   1   0   |   0x200 - 0x3ff                       |           |   1   0   |   0xa00 - 0xbff                       |
+    |           |           |   0x000 - 0x1ff                       |           |           |   0x800 - 0x9ff                       |
+    ---------------------------------------------------------------------------------------------------------------------------------
+    |           |   1   1   |   0x200 - 0x3ff                       |           |   1   1   |   0xa00 - 0xbff                       |
+    |           |           |   0x000 - 0x1ff                       |           |           |   0x800 - 0x9ff                       |
+    =================================================================================================================================
+    |   1   1   |   0   0   |   0x000 - 0x1ff   0x200 - 0x3ff       |   1   1   |   0   0   |   0x800 - 0x9ff   0xa00 - 0xbff       |
+    |           |           |   0x400 - 0x5ff   0x600 - 0x7ff       |           |           |   0xc00 - 0xdff   0xe00 - 0xfff       |
+    ---------------------------------------------------------------------------------------------------------------------------------
+    |           |   0   1   |   0x200 - 0x3ff   0x000 - 0x1ff       |           |   0   1   |   0xa00 - 0xbff   0x800 - 0x9ff       |
+    |           |           |   0x600 - 0x7ff   0x400 - 0x5ff       |           |           |   0xe00 - 0xfff   0xc00 - 0xdff       |
+    ---------------------------------------------------------------------------------------------------------------------------------
+    |           |   1   0   |   0x400 - 0x5ff   0x600 - 0x7ff       |           |   1   0   |   0xc00 - 0xdff   0xe00 - 0xfff       |
+    |           |           |   0x000 - 0x1ff   0x200 - 0x3ff       |           |           |   0x800 - 0x9ff   0xa00 - 0xbff       |
+    ---------------------------------------------------------------------------------------------------------------------------------
+    |           |   1   1   |   0x600 - 0x7ff   0x400 - 0x5ff       |           |   1   1   |   0xe00 - 0xfff   0xc00 - 0xdff       |
+    |           |           |   0x200 - 0x3ff   0x000 - 0x1ff       |           |           |   0xa00 - 0xbff   0x800 - 0x9ff       |
+    =================================================================================================================================
+*/
+
 void vt_vt1682_state::draw_layer(int which, int base, int opaque, screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
 {
 	// m_main_control_bk[0]
 	// logerror("%s: vt1682_2013_bk1_main_control_w writing: %02x (enable:%01x palette:%01x depth:%01x bpp:%01x linemode:%01x tilesize:%01x)\n", machine().describe_context(), data,
-	//		(data & 0x80) >> 7, (data & 0x40) >> 6, (data & 0x30) >> 4, (data & 0x0c) >> 2, (data & 0x02) >> 1, (data & 0x01) >> 0 );
+	//      (data & 0x80) >> 7, (data & 0x40) >> 6, (data & 0x30) >> 4, (data & 0x0c) >> 2, (data & 0x02) >> 1, (data & 0x01) >> 0 );
 
 	// m_scroll_control_bk[0]
 	// logerror("%s: vt1682_2012_bk1_scroll_control_w writing: %02x (hclr: %1x page_layout:%1x ymsb:%1x xmsb:%1x)\n", machine().describe_context(), data,
-	//		(data & 0x10) >> 4, (data & 0x0c) >> 2, (data & 0x02) >> 1, (data & 0x01) >> 0);
+	//      (data & 0x10) >> 4, (data & 0x0c) >> 2, (data & 0x02) >> 1, (data & 0x01) >> 0);
 
 
 
@@ -4581,7 +4783,7 @@ void vt_vt1682_state::draw_layer(int which, int base, int opaque, screen_device&
 					int tile = word & 0x0fff;
 					uint8_t pal = (word & 0xf000) >> 12;
 
-	
+
 
 
 					int xpos = x * (bk_tilesize ? 16 : 8);
@@ -4629,7 +4831,7 @@ void vt_vt1682_state::draw_sprites(screen_device& screen, bitmap_rgb32& bitmap, 
 
 			tilenum |= (attr0 & 0x0f) << 8;
 			int pal = (attr0 & 0xf0) >> 4;
-			
+
 			int flipx = (attr1 & 0x02) >> 1;
 			int flipy = (attr1 & 0x04) >> 2;
 
@@ -4768,9 +4970,9 @@ void vt_vt1682_state::vt_vt1682_map(address_map &map)
 	map(0x210a, 0x210a).rw(FUNC(vt_vt1682_state::vt1682_210a_prgbank0_r3_r), FUNC(vt_vt1682_state::vt1682_210a_prgbank0_r3_w));
 	map(0x210b, 0x210b).rw(FUNC(vt_vt1682_state::vt1682_210b_misc_cs_prg0_bank_sel_r), FUNC(vt_vt1682_state::vt1682_210b_misc_cs_prg0_bank_sel_w));
 	map(0x210c, 0x210c).rw(FUNC(vt_vt1682_state::vt1682_210c_prgbank1_r2_r), FUNC(vt_vt1682_state::vt1682_210c_prgbank1_r2_w));
-	map(0x210d, 0x210d).rw(FUNC(vt_vt1682_state::vt1682_210d_ioconfig_r),FUNC(vt_vt1682_state::vt1682_210d_ioconfig_w));
-	map(0x210e, 0x210e).rw(FUNC(vt_vt1682_state::vt1682_210e_io_ab_r),FUNC(vt_vt1682_state::vt1682_210e_io_ab_w));
-	map(0x210f, 0x210f).rw(FUNC(vt_vt1682_state::vt1682_210f_io_cd_r),FUNC(vt_vt1682_state::vt1682_210f_io_cd_w));
+	map(0x210d, 0x210d).rw(m_io, FUNC(vrt_vt1682_io_device::vt1682_210d_ioconfig_r),FUNC(vrt_vt1682_io_device::vt1682_210d_ioconfig_w));
+	map(0x210e, 0x210e).rw(m_io, FUNC(vrt_vt1682_io_device::vt1682_210e_io_ab_r),FUNC(vrt_vt1682_io_device::vt1682_210e_io_ab_w));
+	map(0x210f, 0x210f).rw(m_io, FUNC(vrt_vt1682_io_device::vt1682_210f_io_cd_r),FUNC(vrt_vt1682_io_device::vt1682_210f_io_cd_w));
 
 	// either reads/writes are on different addresses or our source info is incorrect
 	map(0x2110, 0x2110).rw(FUNC(vt_vt1682_state::vt1682_prgbank0_r4_r), FUNC(vt_vt1682_state::vt1682_prgbank1_r0_w));
@@ -4791,66 +4993,22 @@ void vt_vt1682_state::vt_vt1682_map(address_map &map)
 	map(0x2127, 0x2127).rw(FUNC(vt_vt1682_state::vt1682_2127_dma_status_r), FUNC(vt_vt1682_state::vt1682_2127_dma_size_trigger_w));
 	map(0x2128, 0x2128).rw(FUNC(vt_vt1682_state::vt1682_2128_dma_sr_bank_addr_24_23_r), FUNC(vt_vt1682_state::vt1682_2128_dma_sr_bank_addr_24_23_w));
 
+	map(0x2130, 0x2130).rw(FUNC(vt_vt1682_state::alu_out_1_r), FUNC(vt_vt1682_state::alu_oprand_1_w));
+	map(0x2131, 0x2131).rw(FUNC(vt_vt1682_state::alu_out_2_r), FUNC(vt_vt1682_state::alu_oprand_2_w));
+	map(0x2132, 0x2132).rw(FUNC(vt_vt1682_state::alu_out_3_r), FUNC(vt_vt1682_state::alu_oprand_3_w));
+	map(0x2133, 0x2133).rw(FUNC(vt_vt1682_state::alu_out_4_r), FUNC(vt_vt1682_state::alu_oprand_4_w));
+	map(0x2134, 0x2134).rw(FUNC(vt_vt1682_state::alu_out_5_r), FUNC(vt_vt1682_state::alu_oprand_5_mult_w));
+	map(0x2135, 0x2135).rw(FUNC(vt_vt1682_state::alu_out_6_r), FUNC(vt_vt1682_state::alu_oprand_6_mult_w));
+
+	map(0x2137, 0x2137).w(FUNC(vt_vt1682_state::vt1682_2137_alu_div_opr6_trigger_w));
+
+
 	// 3000-3fff internal ROM if enabled
 	map(0x4000, 0x7fff).r(FUNC(vt_vt1682_state::rom_4000_to_7fff_r));
 	map(0x8000, 0xffff).r(FUNC(vt_vt1682_state::rom_8000_to_ffff_r));
 }
 
 
-
-static INPUT_PORTS_START( intec )
-	PORT_START("IN0")
-	PORT_DIPNAME( 0x01, 0x01, "IN0" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("IN1")
-	PORT_DIPNAME( 0x01, 0x01, "IN1" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
 
 
 INTERRUPT_GEN_MEMBER(vt_vt1682_state::nmi)
@@ -4932,7 +5090,7 @@ GFXDECODE_END
 // can also be used with the following
 // PAL M 21.453669MHz
 // PAL N 21.492336MHz
- 
+
 
 void vt_vt1682_state::vt_vt1682(machine_config &config)
 {
@@ -4955,6 +5113,8 @@ void vt_vt1682_state::vt_vt1682(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_test);
 
+	VT_VT1682_IO(config, m_io, 0);
+
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
@@ -4964,12 +5124,188 @@ void vt_vt1682_state::vt_vt1682(machine_config &config)
 	m_screen->set_screen_update(FUNC(vt_vt1682_state::screen_update));
 }
 
-
-
-
-
-void vt_vt1682_state::init_8in1()
+void intec_interact_state::machine_start()
 {
+	vt_vt1682_state::machine_start();
+
+	save_item(NAME(m_previous_port_b));
+	save_item(NAME(m_input_sense));
+	save_item(NAME(m_input_pos));
+}
+
+void intec_interact_state::machine_reset()
+{
+	vt_vt1682_state::machine_reset();
+	m_previous_port_b = 0x0;
+	m_input_sense = 0;
+	m_input_pos = 0;
+}
+
+WRITE8_MEMBER(intec_interact_state::porta_w)
+{
+	if (data != 0xf)
+	{
+		logerror("%s: porta_w writing: %1x\n", machine().describe_context(), data & 0xf);
+	}
+}
+
+
+static INPUT_PORTS_START( intec )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 ) PORT_PLAYER(1) // Selects games
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("Select") // used on first screen to choose which set of games
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) 
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) // Fires in Tank
+
+	PORT_START("IN2") // are these used? 2 player games all seem to be turn based? (Aqua-Mix looks like it should be 2 player but nothing here starts a 2 player game, maybe mapped in some other way?)
+	PORT_DIPNAME( 0x01, 0x01, "IN2" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	
+	PORT_START("IN3")
+	PORT_DIPNAME( 0x01, 0x01, "IN3" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
+// this controller code is just designed to feed the games with data they're happy with, it probably has no grounds in reality
+// as I don't know how they really work.  presumably wireless with timeouts, sending signals for brief periods that need to be
+// picked up on, although that said, there are some very short (128 read on status) timeout loops in the code that will force
+// input to 0 if they fail
+
+// note, the real hardware has multiple 'motion' accessories, but in reality they all just act like a button press
+
+// inputs aren't working correctly on ii8in1, you can change to the bowling game, and select that, but select doesn't continue
+// to move between games, why not?  ram address 0x6c contains current selection if you want to manually change it to start
+// other games.  maybe it's waiting on some status from the sound cpu?
+
+READ8_MEMBER(intec_interact_state::porta_r)
+{	
+	uint8_t ret = 0x0;// = machine().rand() & 0xf;
+
+	switch (m_input_pos)
+	{
+	case 0x1: ret = m_io_p1->read(); break;
+	case 0x2: ret = m_io_p2->read(); break;
+	case 0x3: ret = m_io_p3->read(); break;
+	case 0x4: ret = m_io_p4->read(); break;
+	}
+
+	//logerror("%s: porta_r returning: %1x (INPUTS) (with input position %d)\n", machine().describe_context(), ret, m_input_pos);
+	return ret;
+}
+
+READ8_MEMBER(intec_interact_state::portc_r)
+{
+	uint8_t ret = 0x0;
+	ret |= m_input_sense ^1;
+	//logerror("%s: portc_r returning: %1x (CONTROLLER INPUT SENSE)\n", machine().describe_context(), ret);
+	return ret;
+}
+
+WRITE8_MEMBER(intec_interact_state::portb_w)
+{
+	logerror("%s: portb_w writing: %1x\n", machine().describe_context(), data & 0xf);
+
+	if ((m_previous_port_b & 0x1) && (!(data & 0x1)))
+	{
+		// 0x1 high -> low
+		logerror("high to low\n");
+
+		if (m_input_sense == 1)
+		{
+			m_input_pos++;
+		}
+		else
+		{
+			m_input_sense = 1;
+		}
+		logerror("input pos is %d\n", m_input_pos);
+
+	}
+	else if ((m_previous_port_b & 0x1) && (data & 0x1))
+	{
+		// 0x1 high -> high
+		logerror("high to high\n");
+		m_input_pos = 0;
+	}
+	else if ((!(m_previous_port_b & 0x1)) && (!(data & 0x1)))
+	{
+		// 0x1 low -> low
+		logerror("low to low\n");
+
+		if (m_input_sense == 1)
+		{
+			m_input_pos = 0;
+		}
+	}
+	else if ((!(m_previous_port_b & 0x1)) && (data & 0x1))
+	{
+		// 0x1 low -> high
+		logerror("low to high\n");
+
+		if (m_input_sense == 1)
+		{
+			m_input_pos++;
+		}
+
+		if (m_input_pos == 5)
+		{
+			m_input_sense = 0;
+		}
+
+		logerror("input pos is %d\n", m_input_pos);
+
+	}
+
+	m_previous_port_b = data;
+};
+
+
+
+
+
+
+void intec_interact_state::intech_interact(machine_config& config)
+{
+	vt_vt1682_state::vt_vt1682(config);
+
+	m_io->porta_in().set(FUNC(intec_interact_state::porta_r));
+	m_io->porta_out().set(FUNC(intec_interact_state::porta_w));
+
+	m_io->portb_in().set(FUNC(intec_interact_state::portb_r));
+	m_io->portb_out().set(FUNC(intec_interact_state::portb_w));
+
+	m_io->portc_in().set(FUNC(intec_interact_state::portc_r));
+	m_io->portc_out().set(FUNC(intec_interact_state::portc_w));
+
+	m_io->portd_in().set(FUNC(intec_interact_state::portd_r));
+	m_io->portd_out().set(FUNC(intec_interact_state::portd_w));
 }
 
 
@@ -4983,13 +5319,13 @@ ROM_END
 ROM_START( ii32in1 )
 	ROM_REGION( 0x2000000, "mainrom", 0 )
 	ROM_LOAD( "ii32in1.bin", 0x00000, 0x2000000, CRC(ddee4eac) SHA1(828c0c18a66bb4872299f9a43d5e3647482c5925) )
-	                                    
+
 	// possible undumped 0x1000 bytes of Internal ROM
 ROM_END
 
 // TODO: this is a cartridge based system, move these to SL
-CONS( 200?, ii8in1,    0,  0,  vt_vt1682,    intec, vt_vt1682_state, init_8in1,  "Intec", "InterAct 8-in-1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-CONS( 200?, ii32in1,   0,  0,  vt_vt1682,    intec, vt_vt1682_state, init_8in1,  "Intec", "InterAct 32-in-1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 200?, ii8in1,    0,  0,  intech_interact,    intec, intec_interact_state, empty_init,  "Intec", "InterAct 8-in-1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 200?, ii32in1,   0,  0,  intech_interact,    intec, intec_interact_state, empty_init,  "Intec", "InterAct 32-in-1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 // a 40-in-1 also exists which combines the above
 
 // Intec Interact Infrazone 15 Shooting Games, 42 Mi kara, 96 Arcade Games + more should run here too
