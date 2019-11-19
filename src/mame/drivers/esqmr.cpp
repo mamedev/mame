@@ -280,7 +280,7 @@ void esqmr_state::mr(machine_config &config)
 	duart.a_tx_cb().set(FUNC(esqmr_state::duart_tx_a));
 	duart.b_tx_cb().set(FUNC(esqmr_state::duart_tx_b));
 
-    //IDT7130(config, "dpram"); // present in PCB, but unknown purpose (mcu communication?)
+	//IDT7130(config, "dpram"); // present in PCB, but unknown purpose (mcu communication?)
 
 	ESQPANEL2X40_VFX(config, m_panel);
 	m_panel->write_tx().set(duart, FUNC(mc68340_serial_module_device::rx_b_w));
