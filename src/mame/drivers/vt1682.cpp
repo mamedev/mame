@@ -5569,10 +5569,22 @@ void vt_vt1682_state::draw_layer(int which, int opaque, screen_device& screen, b
 
 			int pagewidth_bytes = (bk_tilesize ? 16 : 32) * 2;
 
-			for (int y = 0; y < (bk_tilesize ? 16 : 32); y++)
+			//for (int y = 0; y < (bk_tilesize ? 16 : 32); y++)
+			
+			for (int y=0;y<240;y++)
 			{
+				int ytile, ytileline;
+				if (bk_tilesize)
+				{
+					ytileline = y & 0xf;
+					ytile = y >> 4;
 
-				int ytile = y;
+				}
+				else
+				{
+					ytileline = y & 0x07;
+					ytile = y >> 3;
+				}
 
 				for (int xtile = 0; xtile < (bk_tilesize ? 16 : 32); xtile++)
 				{
@@ -5589,9 +5601,9 @@ void vt_vt1682_state::draw_layer(int which, int opaque, screen_device& screen, b
 					uint8_t pal = (word & 0xf000) >> 12;
 
 					int xpos = xtile * (bk_tilesize ? 16 : 8);
-					int ypos = ytile * (bk_tilesize ? 16 : 8);
+					//int ypos = ytile * (bk_tilesize ? 16 : 8);
 
-					draw_tile(segment, tile, xpos, ypos, palbase, pal, bk_tilesize, bk_tilesize, bk_tilebpp, (bk_depth*2)+1, opaque, 0, 0, screen, bitmap, cliprect);
+					draw_tile_pixline(segment, tile, ytileline, xpos, y, palbase, pal, bk_tilesize, bk_tilesize, bk_tilebpp, (bk_depth*2)+1, opaque, 0, 0, screen, bitmap, cliprect);
 				}
 			}
 		}
