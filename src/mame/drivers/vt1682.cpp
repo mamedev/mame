@@ -5029,62 +5029,64 @@ void vt_vt1682_state::draw_tile(int segment, int tile, int x, int y, int palbase
 
 	for (int yy = 0; yy < tilesize_high; yy++) // tile y lines
 	{
-		if (bpp == 3) pal = 0x0;
-		if (bpp == 2) pal &= 0xc;
-
-		int startaddress = segment;
-		int linebytes;
-
-		if (bpp == 3)
-		{
-			if (is16pix_wide)
-			{
-				linebytes = 16;
-			}
-			else
-			{
-				linebytes = 8;
-			}
-		}
-		else if (bpp == 2)
-		{
-			if (is16pix_wide)
-			{
-				linebytes = 12;
-			}
-			else
-			{
-				linebytes = 6;
-			}
-		}
-		else //if (bpp == 1) // or 0
-		{
-			if (is16pix_wide)
-			{
-				linebytes = 8;
-			}
-			else
-			{
-				linebytes = 4;
-			}
-		}
-		int tilesize_wide = is16pix_wide ? 16 : 8;
-
-		int tilebytes = linebytes * tilesize_high;
-
-		startaddress += tilebytes * tile;
-
-		int currentaddress;
-
-		if (!flipy)
-			currentaddress = startaddress + yy * linebytes;
-		else
-			currentaddress = startaddress + ((tilesize_high - 1) - yy) * linebytes;
-
 		int line = y + yy;
 
 		if (line >= cliprect.min_y && line <= cliprect.max_y)
 		{
+
+			if (bpp == 3) pal = 0x0;
+			if (bpp == 2) pal &= 0xc;
+
+			int startaddress = segment;
+			int linebytes;
+
+			if (bpp == 3)
+			{
+				if (is16pix_wide)
+				{
+					linebytes = 16;
+				}
+				else
+				{
+					linebytes = 8;
+				}
+			}
+			else if (bpp == 2)
+			{
+				if (is16pix_wide)
+				{
+					linebytes = 12;
+				}
+				else
+				{
+					linebytes = 6;
+				}
+			}
+			else //if (bpp == 1) // or 0
+			{
+				if (is16pix_wide)
+				{
+					linebytes = 8;
+				}
+				else
+				{
+					linebytes = 4;
+				}
+			}
+			int tilesize_wide = is16pix_wide ? 16 : 8;
+
+			int tilebytes = linebytes * tilesize_high;
+
+			startaddress += tilebytes * tile;
+
+			int currentaddress;
+
+			if (!flipy)
+				currentaddress = startaddress + yy * linebytes;
+			else
+				currentaddress = startaddress + ((tilesize_high - 1) - yy) * linebytes;
+
+
 			uint32_t* dstptr = &bitmap.pix32(line);
 			uint8_t* priptr = &m_priority_bitmap.pix8(line);
 
