@@ -395,6 +395,12 @@ private:
 		return ((m_2122_dma_dt_addr_7_0 ) | (m_2123_dma_dt_addr_15_8 << 8)) & 0x7fff;
 	}
 
+	void set_dma_dt_addr(uint16_t addr)
+	{
+		m_2122_dma_dt_addr_7_0 = addr & 0xff;
+		m_2123_dma_dt_addr_15_8 = (m_2123_dma_dt_addr_15_8 & 0x80) | (addr >> 8); // don't change the external flag
+	}
+
 	bool get_dma_sr_isext()
 	{
 		return m_2125_dma_sr_addr_15_8 & 0x80 ? true : false;
@@ -3231,6 +3237,7 @@ void vt_vt1682_state::do_dma_external_to_internal(int data, bool is_video)
 	for (int i = 0; i < count; i++)
 	{
 		srcaddr = get_dma_sr_addr();
+		dstaddr = get_dma_dt_addr();
 		uint8_t dat = m_fullrom->read8(srcaddr | srcbank<<15);
 		srcaddr++;
 
@@ -3241,6 +3248,7 @@ void vt_vt1682_state::do_dma_external_to_internal(int data, bool is_video)
 			dstaddr++;
 
 		// update registers
+		set_dma_dt_addr(dstaddr);;
 		set_dma_sr_addr(srcaddr);
 	}
 }
@@ -3262,6 +3270,7 @@ void vt_vt1682_state::do_dma_internal_to_internal(int data, bool is_video)
 	for (int i = 0; i < count; i++)
 	{
 		address_space &mem = m_maincpu->space(AS_PROGRAM);
+		dstaddr = get_dma_dt_addr();
 
 		srcaddr = get_dma_sr_addr();
 		uint8_t dat = mem.read_byte(srcaddr);
@@ -3273,6 +3282,7 @@ void vt_vt1682_state::do_dma_internal_to_internal(int data, bool is_video)
 			dstaddr++;
 
 		// update registers
+		set_dma_dt_addr(dstaddr);;
 		set_dma_sr_addr(srcaddr);
 	}
 }
