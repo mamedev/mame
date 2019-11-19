@@ -73,21 +73,26 @@
 			  X    do nothing, return to running program
 	Caps Shift + number saves to drive 2 (or 1 if running from 2)
 	
+	GDOS versions:
+	a v1 (-non a) exists but has yet to be found/dumped,
+	from "pick-poke-it" user manual:
+	 "A few PLUS D users are still using Version 1 of the ROM which was used in PLUS D's sold in December 1987-January 1988.
+	  ... check the serial number on the bottom of your PLUS D. If it's a 4-figure number commencing with 1,
+	  then you have a PLUS D with the Version 1 ROM."
+	
 	
 	Current status:
 	--------------
 	issues with wd_fdc.cpp  see https://github.com/mamedev/mame/issues/5893
+	wd1772 must spin-up disk in response to 0xd0 (force interrupt) command
 	currently patching ROM to skip index pulse check which otherwise gives no disc error
 	
-	G+DOS: (w/ patch)
-	disk read/write  ok
-	snapshot save/load  ok
-	disk format  ng
-	
-	UNIDOS: (no patch)
-	no disk read/write, won't boot uni-bios system disk
+	G+DOS:  all ok
+	UNIDOS: all ok
 	
 	Not working with 128K/+2 yet...
+	
+	todo: add .img support to coupedisk.cpp
 
 **********************************************************************/
 
@@ -148,10 +153,10 @@ ROM_START(plusd)
 	
 	ROM_SYSTEM_BIOS(0, "gdos", "G+DOS v1a")
 	ROMX_LOAD("plusd_g.rom", 0x0000, 0x2000, CRC(569f7e55) SHA1(6b841dc5797ef7eb219ad455cd1e434ca3b9d30d), ROM_BIOS(0))
-	ROM_FILL(0x06c8, 1, 0x18)
-	ROM_FILL(0x06c9, 1, 0x11)  // jr $06db
+	//ROM_FILL(0x06c8, 1, 0x18)
+	//ROM_FILL(0x06c9, 1, 0x11)  // jr $06db
 	
-	ROM_SYSTEM_BIOS(1, "unidos", "UNI-DOS")
+	ROM_SYSTEM_BIOS(1, "unidos", "UNI-DOS v2")
 	ROMX_LOAD("plusd_uni.rom", 0x0000, 0x2000, CRC(60920496) SHA1(399c8c7c8335bc59849a2182c32347603fd0288a), ROM_BIOS(1))
 	
 	ROM_REGION( 0x200, "plds", 0 )

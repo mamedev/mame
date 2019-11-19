@@ -93,25 +93,16 @@
 	Current status:
 	--------------
 	issues with wd_fdc.cpp  see https://github.com/mamedev/mame/issues/5893
-	currently patching ROM to skip index pulse check,
-	without patch: drive 2 doesn't work, drive 1 doesn't work if images loaded in 1 + 2
-	disk read/write are a bit temperamental!
+	wd1772 must spin-up disk in response to 0xd0 (force interrupt) command
+	currently patching ROM to skip index pulse check which otherwise gives no disc error
 	
-	GDOS v3: (w/ patch)
-	disk read/write  ok
-	snapshot save/load  ok
-	disk format  ng
-	
-	GDOS v2: (no patch)
-	disk read/write  ok
-	snapshot save/load  ok
-	disk format  ok
-	"without patch" issue above
-	
-	UNIDOS: (no patch)
-	boots uni-bios system disk but then no disk read/write
+	GDOS v3: all ok, occassional "no system file" when loading system disk, ok on 2nd attempt
+	GDOS v2: all ok
+	UNIDOS:  all ok
 	
 	Not working with 128K/+2 yet...
+	
+	todo: add .img support to coupedisk.cpp
 
 **********************************************************************/
 
@@ -196,8 +187,8 @@ ROM_START(disciple)
 	
 	ROM_SYSTEM_BIOS(0, "gdos", "GDOS v3")
 	ROMX_LOAD("disciple_g.rom", 0x0000, 0x2000, CRC(82047489) SHA1(9a75ed4b293f968985be4c9aa893cd88276d1ced), ROM_BIOS(0))
-	ROM_FILL(0x1059, 1, 0x18)
-	ROM_FILL(0x105a, 1, 0x0c)  // jr $3067
+	// ROM_FILL(0x1059, 1, 0x18)
+	// ROM_FILL(0x105a, 1, 0x0c)  // jr $3067
 	
 	ROM_SYSTEM_BIOS(1, "gdos2", "GDOS v2")
 	ROMX_LOAD("disciple_g2.rom", 0x0000, 0x2000, CRC(9d971781) SHA1(a03e67e4ee275a85153843f42269fa980875d551), ROM_BIOS(1))

@@ -1122,6 +1122,7 @@ void wd_fdc_device_base::cmd_w(uint8_t val)
 	{
 		// checkme
 		delay_cycles(t_cmd, dden ? delay_register_commit * 2 : delay_register_commit);
+		spinup();
 	}
 	else
 	{
