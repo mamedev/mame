@@ -444,7 +444,6 @@ bool input_seq::is_valid() const
 	for (auto code : m_code)
 	{
 		// invalid codes are never permitted
-
 		if (code == INPUT_CODE_INVALID)
 			return false;
 
@@ -1375,13 +1374,13 @@ void input_manager::seq_poll_start(input_item_class itemclass, const input_seq *
 
 bool input_manager::seq_poll()
 {
-	int curlen = m_poll_seq.length();
+	const int curlen = m_poll_seq.length();
 	input_code lastcode = m_poll_seq[curlen - 1];
 
-	// switch case: see if we have a new code to process
 	input_code newcode;
 	if (m_poll_seq_class == ITEM_CLASS_SWITCH)
 	{
+		// switch case: see if we have a new code to process
 		newcode = poll_switches();
 		if (newcode != INPUT_CODE_INVALID)
 		{
@@ -1399,10 +1398,9 @@ bool input_manager::seq_poll()
 			}
 		}
 	}
-
-	// absolute/relative case: see if we have an analog change of sufficient amount
 	else
 	{
+		// absolute/relative case: see if we have an analog change of sufficient amount
 		bool has_or = false;
 		if (lastcode == input_seq::or_code)
 		{
@@ -1470,6 +1468,8 @@ bool input_manager::seq_poll()
 
 input_seq input_manager::seq_clean(const input_seq &seq) const
 {
+	// make a copy of our sequence, removing any invalid bits
+	input_seq clean_codes;
 	int clean_index = 0;
 	for (int codenum = 0; seq[codenum] != input_seq::end_code; codenum++)
 	{
@@ -1477,17 +1477,19 @@ input_seq input_manager::seq_clean(const input_seq &seq) const
 		input_code code = seq[codenum];
 		if (!code.internal() && code_name(code).empty())
 		{
-			while (clean_index > 0 && seq[clean_index - 1].internal())
+			while (clean_index > 0 && clean_codes[clean_index - 1].internal())
+			{
+				clean_codes.backspace();
 				clean_index--;
+			}
 		}
 		else if (clean_index > 0 || !code.internal())
+		{
+			clean_codes += code;
 			clean_index++;
+		}
 	}
-
-	input_seq cleaned_seq;
-	for (int i = 0; i < clean_index; i++)
-		cleaned_seq += seq[i];
-	return cleaned_seq;
+	return clean_codes;
 }
 
 

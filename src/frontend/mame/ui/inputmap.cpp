@@ -291,18 +291,17 @@ void menu_input::handle()
 		// if we are polling, handle as a special case
 		input_item_data *item = pollingitem;
 
-		// if UI_CANCEL is pressed, abort
 		if (machine().ui_input().pressed(IPT_UI_CANCEL))
 		{
+			// if UI_CANCEL is pressed, abort
 			pollingitem = nullptr;
 			record_next = false;
 			toggle_none_default(item->seq, starting_seq, *item->defseq);
 			seqchangeditem = item;
 		}
-
-		// poll again; if finished, update the sequence
-		if (machine().input().seq_poll())
+		else if (machine().input().seq_poll())
 		{
+			// poll again; if finished, update the sequence
 			pollingitem = nullptr;
 			record_next = true;
 			item->seq = machine().input().seq_poll_final();
