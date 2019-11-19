@@ -5540,7 +5540,6 @@ void vt_vt1682_state::draw_layer(int which, int opaque, screen_device& screen, b
 			// Character Mode
 			logerror("DRAWING ----- bk, Character Mode Segment base %08x, TileSize %1x Bpp %1x, Depth %1x Palette %1x PageLayout_V:%1x PageLayout_H:%1x XScroll %04x YScroll %04x\n", segment, bk_tilesize, bk_tilebpp, bk_depth, bk_palette, page_layout_v, page_layout_h, xscroll, yscroll);
 
-			int count = base;
 
 
 			int palselect;
@@ -5568,9 +5567,12 @@ void vt_vt1682_state::draw_layer(int which, int opaque, screen_device& screen, b
 				palbase = machine().rand() & 0xff;
 			}
 
+			int pagewidth_bytes = (bk_tilesize ? 16 : 32) * 2;
 
 			for (int y = 0; y < (bk_tilesize ? 16 : 32); y++)
 			{
+				int count = base + (pagewidth_bytes * y);
+
 				for (int x = 0; x < (bk_tilesize ? 16 : 32); x++)
 				{
 					uint16_t word = m_vram->read8(count);
@@ -5581,9 +5583,6 @@ void vt_vt1682_state::draw_layer(int which, int opaque, screen_device& screen, b
 					//int pal = 0;
 					int tile = word & 0x0fff;
 					uint8_t pal = (word & 0xf000) >> 12;
-
-
-
 
 					int xpos = x * (bk_tilesize ? 16 : 8);
 					int ypos = y * (bk_tilesize ? 16 : 8);
