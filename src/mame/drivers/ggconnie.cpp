@@ -363,5 +363,21 @@ ROM_START(smf)
 	ROM_LOAD( "gal16v8b.u8", 0x400, 0x117, NO_DUMP )
 ROM_END
 
+ROM_START(fishingm)
+	ROM_REGION( 0x180000, "maincpu", 0 )
+	ROM_LOAD( "fim03-u3.bin", 0x000000, 0x80000, CRC(d70db2fc) SHA1(9f2f417665089da7d745dfcb311e97818b1d3c11) )
+	ROM_LOAD( "fim05-u4.bin", 0x080000, 0x80000, CRC(1bd8344f) SHA1(4e082d40af83fb5f6313c61ffbc47bc71373a9cf) )
+	// u5 not populated
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "fim01-u31.bin", 0x00000, 0x80000, CRC(8aeb062c) SHA1(ce3a63cdb03b82c43bb30119814b25beab362a9f) )
+
+	ROM_REGION( 0x600, "plds", 0 ) // protected
+	ROM_LOAD( "gal16v8b.u6", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8b.u7", 0x200, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8b.u8", 0x400, 0x117, NO_DUMP )
+ROM_END
+
 GAME( 1996, ggconnie, 0, ggconnie, ggconnie, ggconnie_state, init_pce_common, ROT0, "Eighting", "Go! Go! Connie chan Jaka Jaka Janken", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 1997, smf,      0, ggconnie, smf,      ggconnie_state, init_pce_common, ROT0, "Eighting (Capcom license)", "Super Medal Fighters (Japan 970228)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1997, fishingm, 0, ggconnie, ggconnie, ggconnie_state, init_pce_common, ROT0, "Capcom", "Fishing Master (971107 JPN)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // Hopper Jam Error

@@ -14457,6 +14457,7 @@ pcmda                           // 1987 PC with MDA
 pcvga                           // 198? PC-XT (VGA, MF2 Keyboard)
 
 @source:ggconnie.cpp
+fishingm                        // (c) 1997 Capcom
 ggconnie                        // (c) ???? Capcom
 smf                             // (c) 1997 Capcom
 
@@ -19271,6 +19272,7 @@ macjungn                        //
 nbamac                          //
 spcpnthr                        //
 spctrain                        //
+spctraino                       //
 
 @source:macpci.cpp
 pippin                          //
@@ -21936,6 +21938,7 @@ lastfortea                      // (c) 1994
 lastfortg                       // (c) 1994 - VG460-(A) PCB version
 lastfortj                       // (c) 1994 - VG460-(A) PCB version
 lastfortk                       // (c) 1994
+metabee                         // (c) 2001 Natsume
 moegonta                        // (c) 1993 Yanyaka (Japan) (Arcade TV Game List - P.101, Right, 2 from Bottom)
 mouja                           // (c) 1996 Etona (Japan)
 msgogo                          // (c) 1995 Metro
@@ -37536,6 +37539,7 @@ mrblack1                        //
 mrblkz80                        //
 obaoba                          //
 obaoba1                         //
+obaobao                         //
 polar                           //
 rally                           //
 sharkt                          //
