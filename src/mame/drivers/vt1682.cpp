@@ -15,8 +15,11 @@
 #include "machine/vt1682_io.h"
 #include "machine/bankdev.h"
 #include "machine/timer.h"
+#include "sound/volt_reg.h"
+#include "sound/dac.h"
 #include "emupal.h"
 #include "screen.h"
+#include "speaker.h"
 
 #define LOG_VRAM_WRITES      (1U << 1)
 #define LOG_SRAM_WRITES      (1U << 2)
@@ -32,6 +35,8 @@ public:
 	vt_vt1682_state(const machine_config& mconfig, device_type type, const char* tag) :
 		driver_device(mconfig, type, tag),
 		m_io(*this, "io"),
+		m_leftdac(*this, "leftdac"),
+		m_rightdac(*this, "rightdac"),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_screen(*this, "screen"),
@@ -54,6 +59,8 @@ protected:
 	virtual void video_start() override;
 
 	required_device<vrt_vt1682_io_device> m_io;
+	required_device<dac_12bit_r2r_device> m_leftdac;
+	required_device<dac_12bit_r2r_device> m_rightdac;
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
@@ -67,7 +74,7 @@ private:
 	required_device<timer_device> m_soundcpu_timer_a;
 	required_device<timer_device> m_soundcpu_timer_b;
 	required_device<timer_device> m_system_timer;
-	
+
 
 
 	uint32_t screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
@@ -4320,7 +4327,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(vt_vt1682_state::soundcpu_timer_a_expired)
 
 WRITE8_MEMBER(vt_vt1682_state::vt1682_soundcpu_2103_timer_a_irqclear_w)
 {
-	logerror("%s: vt1682_soundcpu_2103_timer_a_irqclear_w writing: %02x\n", machine().describe_context(), data);
+	//logerror("%s: vt1682_soundcpu_2103_timer_a_irqclear_w writing: %02x\n", machine().describe_context(), data);
 	m_soundcpu->set_input_line(0, CLEAR_LINE);
 }
 
@@ -4500,6 +4507,9 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_soundcpu_2119_dacleft_15_8_w)
 {
 	//logerror("%s: vt1682_soundcpu_2119_dacleft_15_8_r writing: %02x\n", machine().describe_context(), data);
 	m_soundcpu_2119_dacleft_15_8 = data;
+
+	uint16_t dacdata = (m_soundcpu_2119_dacleft_15_8 << 8) | m_soundcpu_2118_dacleft_7_0;
+	m_leftdac->write(dacdata >> 4);
 }
 
 /*
@@ -4552,6 +4562,9 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_soundcpu_211b_dacright_15_8_w)
 {
 	//logerror("%s: vt1682_soundcpu_211b_dacright_15_8_r writing: %02x\n", machine().describe_context(), data);
 	m_soundcpu_211b_dacright_15_8 = data;
+
+	uint16_t dacdata = (m_soundcpu_211b_dacright_15_8 << 8) | m_soundcpu_211a_dacright_7_0;
+	m_rightdac->write(dacdata >> 4);
 }
 
 
@@ -4899,7 +4912,26 @@ WRITE8_MEMBER(vt_vt1682_state::soundcpu_alu_oprand_6_div_w)
 	//logerror("%s: soundcpu_alu_oprand_6_div_w writing: %02x\n", machine().describe_context(), data);
 	m_soundcpu_alu_oprand_div[1] = data;
 
-	popmessage("------------------------------------------ SOUND CPU DIVISION REQUESTED ------------------------------------\n");
+	uint32_t param1 = (m_soundcpu_alu_oprand[3] << 24) | (m_soundcpu_alu_oprand[2] << 16) | (m_soundcpu_alu_oprand[1] << 8) | m_soundcpu_alu_oprand[0];
+	// sources say the mult registers areu sed here, but that makes little sense?
+	uint32_t param2 = (m_soundcpu_alu_oprand_div[1] << 8) | m_soundcpu_alu_oprand_div[0];
+
+	if (param2 != 0)
+	{
+		//popmessage("------------------------------------------ SOUND CPU DIVISION REQUESTED ------------------------------------\n");
+
+		uint32_t result = param1 / param2;
+
+		m_soundcpu_alu_out[0] = result & 0xff;
+		m_soundcpu_alu_out[1] = (result >> 8) & 0xff;
+		m_soundcpu_alu_out[2] = (result >> 16) & 0xff;
+		m_soundcpu_alu_out[3] = (result >> 24) & 0xff;
+
+		// should be the remainder?
+		m_soundcpu_alu_out[4] = 0x00;// machine().rand();
+		m_soundcpu_alu_out[5] = 0x00;// machine().rand();
+
+	}
 }
 
 /* Address 0x2138 Unused (SOUND CPU) */
@@ -5949,6 +5981,19 @@ void vt_vt1682_state::vt_vt1682(machine_config &config)
 	m_screen->set_size(256, 256);
 	m_screen->set_visarea(0, 256-1, 0, 256-16-1);
 	m_screen->set_screen_update(FUNC(vt_vt1682_state::screen_update));
+
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	
+	DAC_12BIT_R2R(config, m_leftdac, 0).add_route(0, "lspeaker", 0.5); // unknown 12-bit DAC
+	voltage_regulator_device &leftvref(VOLTAGE_REGULATOR(config, "leftvref", 0));
+	leftvref.add_route(0, "leftdac", 1.0, DAC_VREF_POS_INPUT);
+	leftvref.add_route(0, "leftdac", -1.0, DAC_VREF_NEG_INPUT);
+
+	DAC_12BIT_R2R(config, m_rightdac, 0).add_route(0, "rspeaker", 0.5); // unknown 12-bit DAC
+	voltage_regulator_device &rightvref(VOLTAGE_REGULATOR(config, "rightvref", 0));
+	rightvref.add_route(0, "rightdac", 1.0, DAC_VREF_POS_INPUT);
+	rightvref.add_route(0, "rightdac", -1.0, DAC_VREF_NEG_INPUT);
 }
 
 void intec_interact_state::machine_start()
@@ -6133,6 +6178,16 @@ void intec_interact_state::intech_interact(machine_config& config)
 
 	m_io->portd_in().set(FUNC(intec_interact_state::portd_r));
 	m_io->portd_out().set(FUNC(intec_interact_state::portd_w));
+
+	m_leftdac->reset_routes();
+	m_rightdac->reset_routes();
+
+	config.device_remove(":lspeaker");
+	config.device_remove(":rspeaker");
+
+	SPEAKER(config, "mono").front_center();
+	m_leftdac->add_route(0, "mono", 0.5);
+	m_rightdac->add_route(0, "mono", 0.5);
 }
 
 
