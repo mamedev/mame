@@ -13,6 +13,7 @@
 #include "emu.h"
 #include "machine/m6502_vt1682.h"
 #include "machine/vt1682_io.h"
+#include "machine/vt1682_alu.h"
 #include "machine/bankdev.h"
 #include "machine/timer.h"
 #include "sound/volt_reg.h"
@@ -39,6 +40,8 @@ public:
 		m_rightdac(*this, "rightdac"),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
+		m_maincpu_alu(*this, "mainalu"),
+		m_soundcpu_alu(*this, "soundalu"),
 		m_screen(*this, "screen"),
 		m_fullrom(*this, "fullrom"),
 		m_spriteram(*this, "spriteram"),
@@ -64,6 +67,8 @@ protected:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
+	required_device<vrt_vt1682_alu_device> m_maincpu_alu;
+	required_device<vrt_vt1682_alu_device> m_soundcpu_alu;
 	required_device<screen_device> m_screen;
 	required_device<address_map_bank_device> m_fullrom;
 	required_device<address_map_bank_device> m_spriteram;
@@ -332,10 +337,6 @@ private:
 
 	uint8_t m_2106_enable_reg;
 
-	uint8_t m_alu_oprand[4];
-	uint8_t m_alu_oprand_mult[2];
-	uint8_t m_alu_oprand_div[2];
-	uint8_t m_alu_out[6];
 
 	uint8_t m_2101_timer_preload_7_0;
 	uint8_t m_2102_timer_enable;
@@ -400,21 +401,6 @@ private:
 	DECLARE_WRITE8_MEMBER(vt1682_2106_enable_regs_w);
 
 
-	DECLARE_READ8_MEMBER(alu_out_1_r);
-	DECLARE_READ8_MEMBER(alu_out_2_r);
-	DECLARE_READ8_MEMBER(alu_out_3_r);
-	DECLARE_READ8_MEMBER(alu_out_4_r);
-	DECLARE_READ8_MEMBER(alu_out_5_r);
-	DECLARE_READ8_MEMBER(alu_out_6_r);
-
-	DECLARE_WRITE8_MEMBER(alu_oprand_1_w);
-	DECLARE_WRITE8_MEMBER(alu_oprand_2_w);
-	DECLARE_WRITE8_MEMBER(alu_oprand_3_w);
-	DECLARE_WRITE8_MEMBER(alu_oprand_4_w);
-	DECLARE_WRITE8_MEMBER(alu_oprand_5_mult_w);
-	DECLARE_WRITE8_MEMBER(alu_oprand_6_mult_w);
-	DECLARE_WRITE8_MEMBER(alu_oprand_5_div_w);
-	DECLARE_WRITE8_MEMBER(alu_oprand_6_div_w);
 
 	DECLARE_READ8_MEMBER(vt1682_2101_timer_preload_7_0_r);
 	DECLARE_WRITE8_MEMBER(vt1682_2101_timer_preload_7_0_w);
@@ -498,10 +484,6 @@ private:
 	uint8_t m_soundcpu_2111_timer_b_preload_15_8;
 	uint8_t m_soundcpu_2112_timer_b_enable;
 
-	uint8_t m_soundcpu_alu_oprand[4];
-	uint8_t m_soundcpu_alu_oprand_mult[2];
-	uint8_t m_soundcpu_alu_oprand_div[2];
-	uint8_t m_soundcpu_alu_out[6];
 
 	uint8_t m_soundcpu_2118_dacleft_7_0;
 	uint8_t m_soundcpu_2119_dacleft_15_8;
@@ -536,22 +518,6 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(soundcpu_timer_a_expired);
 	TIMER_DEVICE_CALLBACK_MEMBER(soundcpu_timer_b_expired);
-
-	DECLARE_READ8_MEMBER(soundcpu_alu_out_1_r);
-	DECLARE_READ8_MEMBER(soundcpu_alu_out_2_r);
-	DECLARE_READ8_MEMBER(soundcpu_alu_out_3_r);
-	DECLARE_READ8_MEMBER(soundcpu_alu_out_4_r);
-	DECLARE_READ8_MEMBER(soundcpu_alu_out_5_r);
-	DECLARE_READ8_MEMBER(soundcpu_alu_out_6_r);
-
-	DECLARE_WRITE8_MEMBER(soundcpu_alu_oprand_1_w);
-	DECLARE_WRITE8_MEMBER(soundcpu_alu_oprand_2_w);
-	DECLARE_WRITE8_MEMBER(soundcpu_alu_oprand_3_w);
-	DECLARE_WRITE8_MEMBER(soundcpu_alu_oprand_4_w);
-	DECLARE_WRITE8_MEMBER(soundcpu_alu_oprand_5_mult_w);
-	DECLARE_WRITE8_MEMBER(soundcpu_alu_oprand_6_mult_w);
-	DECLARE_WRITE8_MEMBER(soundcpu_alu_oprand_5_div_w);
-	DECLARE_WRITE8_MEMBER(soundcpu_alu_oprand_6_div_w);
 
 	DECLARE_READ8_MEMBER(vt1682_soundcpu_2118_dacleft_7_0_r);
 	DECLARE_WRITE8_MEMBER(vt1682_soundcpu_2118_dacleft_7_0_w);
@@ -721,10 +687,6 @@ void vt_vt1682_state::machine_start()
 
 	save_item(NAME(m_2106_enable_reg));
 
-	save_item(NAME(m_alu_oprand));
-	save_item(NAME(m_alu_oprand_mult));
-	save_item(NAME(m_alu_oprand_div));
-	save_item(NAME(m_alu_out));
 
 	save_item(NAME(m_2101_timer_preload_7_0));
 	save_item(NAME(m_2102_timer_enable));
@@ -738,11 +700,6 @@ void vt_vt1682_state::machine_start()
 	save_item(NAME(m_soundcpu_2110_timer_b_preload_7_0));
 	save_item(NAME(m_soundcpu_2111_timer_b_preload_15_8));
 	save_item(NAME(m_soundcpu_2112_timer_b_enable));
-
-	save_item(NAME(m_soundcpu_alu_oprand));
-	save_item(NAME(m_soundcpu_alu_oprand_mult));
-	save_item(NAME(m_soundcpu_alu_oprand_div));
-	save_item(NAME(m_soundcpu_alu_out));
 
 	save_item(NAME(m_soundcpu_2118_dacleft_7_0));
 	save_item(NAME(m_soundcpu_2119_dacleft_15_8));
@@ -844,17 +801,7 @@ void vt_vt1682_state::machine_reset()
 
 	m_2106_enable_reg = 0;
 
-	for (int i=0;i<4;i++)
-		m_alu_oprand[i] = 0;
 
-	for (int i = 0; i < 2; i++)
-	{
-		m_alu_oprand_mult[i] = 0;
-		m_alu_oprand_div[i] = 0;
-	}
-
-	for (int i=0;i<6;i++)
-		m_alu_out[i] = 0;
 
 	m_2101_timer_preload_7_0 = 0;
 	m_2102_timer_enable = 0;
@@ -868,18 +815,6 @@ void vt_vt1682_state::machine_reset()
 	m_soundcpu_2110_timer_b_preload_7_0 = 0;
 	m_soundcpu_2111_timer_b_preload_15_8 = 0;
 	m_soundcpu_2112_timer_b_enable = 0;
-
-	for (int i=0;i<4;i++)
-		m_soundcpu_alu_oprand[i] = 0;
-
-	for (int i = 0; i < 2; i++)
-	{
-		m_soundcpu_alu_oprand_mult[i] = 0;
-		m_soundcpu_alu_oprand_div[i] = 0;
-	}
-
-	for (int i=0;i<6;i++)
-		m_soundcpu_alu_out[i] = 0;
 
 	m_soundcpu_2118_dacleft_7_0 = 0;
 	m_soundcpu_2119_dacleft_15_8 = 0;
@@ -3749,290 +3684,7 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2128_dma_sr_bank_addr_24_23_w)
 /* Address 0x212e Unused */
 /* Address 0x212f Unused */
 
-/*
-    Address 0x2130 WRITE (MAIN CPU)
-
-    0x80 - ALU Oprand 1
-    0x40 - ALU Oprand 1
-    0x20 - ALU Oprand 1
-    0x10 - ALU Oprand 1
-    0x08 - ALU Oprand 1
-    0x04 - ALU Oprand 1
-    0x02 - ALU Oprand 1
-    0x01 - ALU Oprand 1
-
-    Address 0x2130 READ (MAIN CPU)
-
-    0x80 - ALU Output 1
-    0x40 - ALU Output 1
-    0x20 - ALU Output 1
-    0x10 - ALU Output 1
-    0x08 - ALU Output 1
-    0x04 - ALU Output 1
-    0x02 - ALU Output 1
-    0x01 - ALU Output 1
-*/
-
-READ8_MEMBER(vt_vt1682_state::alu_out_1_r)
-{
-	uint8_t ret = m_alu_out[0];
-	logerror("%s: alu_out_1_r returning: %02x\n", machine().describe_context(), ret);
-	return ret;
-}
-
-WRITE8_MEMBER(vt_vt1682_state::alu_oprand_1_w)
-{
-	logerror("%s: alu_oprand_1_w writing: %02x\n", machine().describe_context(), data);
-	m_alu_oprand[0] = data;
-}
-
-/*
-    Address 0x2131 WRITE (MAIN CPU)
-
-    0x80 - ALU Oprand 2
-    0x40 - ALU Oprand 2
-    0x20 - ALU Oprand 2
-    0x10 - ALU Oprand 2
-    0x08 - ALU Oprand 2
-    0x04 - ALU Oprand 2
-    0x02 - ALU Oprand 2
-    0x01 - ALU Oprand 2
-
-    Address 0x2131 READ (MAIN CPU)
-
-    0x80 - ALU Output 2
-    0x40 - ALU Output 2
-    0x20 - ALU Output 2
-    0x10 - ALU Output 2
-    0x08 - ALU Output 2
-    0x04 - ALU Output 2
-    0x02 - ALU Output 2
-    0x01 - ALU Output 2
-*/
-
-READ8_MEMBER(vt_vt1682_state::alu_out_2_r)
-{
-	uint8_t ret = m_alu_out[1];
-	logerror("%s: alu_out_2_r returning: %02x\n", machine().describe_context(), ret);
-	return ret;
-}
-
-WRITE8_MEMBER(vt_vt1682_state::alu_oprand_2_w)
-{
-	logerror("%s: alu_oprand_2_w writing: %02x\n", machine().describe_context(), data);
-	m_alu_oprand[1] = data;
-}
-
-/*
-    Address 0x2132 WRITE (MAIN CPU)
-
-    0x80 - ALU Oprand 3
-    0x40 - ALU Oprand 3
-    0x20 - ALU Oprand 3
-    0x10 - ALU Oprand 3
-    0x08 - ALU Oprand 3
-    0x04 - ALU Oprand 3
-    0x02 - ALU Oprand 3
-    0x01 - ALU Oprand 3
-
-    Address 0x2132 READ (MAIN CPU)
-
-    0x80 - ALU Output 3
-    0x40 - ALU Output 3
-    0x20 - ALU Output 3
-    0x10 - ALU Output 3
-    0x08 - ALU Output 3
-    0x04 - ALU Output 3
-    0x02 - ALU Output 3
-    0x01 - ALU Output 3
-*/
-
-READ8_MEMBER(vt_vt1682_state::alu_out_3_r)
-{
-	uint8_t ret = m_alu_out[2];
-	logerror("%s: alu_out_3_r returning: %02x\n", machine().describe_context(), ret);
-	return ret;
-}
-
-WRITE8_MEMBER(vt_vt1682_state::alu_oprand_3_w)
-{
-	logerror("%s: alu_oprand_3_w writing: %02x\n", machine().describe_context(), data);
-	m_alu_oprand[2] = data;
-}
-
-
-/*
-    Address 0x2133 WRITE (MAIN CPU)
-
-    0x80 - ALU Oprand 4
-    0x40 - ALU Oprand 4
-    0x20 - ALU Oprand 4
-    0x10 - ALU Oprand 4
-    0x08 - ALU Oprand 4
-    0x04 - ALU Oprand 4
-    0x02 - ALU Oprand 4
-    0x01 - ALU Oprand 4
-
-    Address 0x2133 READ (MAIN CPU)
-
-    0x80 - ALU Output 4
-    0x40 - ALU Output 4
-    0x20 - ALU Output 4
-    0x10 - ALU Output 4
-    0x08 - ALU Output 4
-    0x04 - ALU Output 4
-    0x02 - ALU Output 4
-    0x01 - ALU Output 4
-*/
-
-READ8_MEMBER(vt_vt1682_state::alu_out_4_r)
-{
-	uint8_t ret = m_alu_out[3];
-	logerror("%s: alu_out_4_r returning: %02x\n", machine().describe_context(), ret);
-	return ret;
-}
-
-
-WRITE8_MEMBER(vt_vt1682_state::alu_oprand_4_w)
-{
-	logerror("%s: alu_oprand_4_w writing: %02x\n", machine().describe_context(), data);
-	m_alu_oprand[3] = data;
-}
-
-/*
-    Address 0x2134 WRITE (MAIN CPU)
-
-    0x80 - ALU Mul Oprand 5
-    0x40 - ALU Mul Oprand 5
-    0x20 - ALU Mul Oprand 5
-    0x10 - ALU Mul Oprand 5
-    0x08 - ALU Mul Oprand 5
-    0x04 - ALU Mul Oprand 5
-    0x02 - ALU Mul Oprand 5
-    0x01 - ALU Mul Oprand 5
-
-    Address 0x2134 READ (MAIN CPU)
-
-    0x80 - ALU Output 5
-    0x40 - ALU Output 5
-    0x20 - ALU Output 5
-    0x10 - ALU Output 5
-    0x08 - ALU Output 5
-    0x04 - ALU Output 5
-    0x02 - ALU Output 5
-    0x01 - ALU Output 5
-*/
-
-READ8_MEMBER(vt_vt1682_state::alu_out_5_r)
-{
-	uint8_t ret = m_alu_out[4];
-	logerror("%s: alu_out_5_r returning: %02x\n", machine().describe_context(), ret);
-	return ret;
-}
-
-
-WRITE8_MEMBER(vt_vt1682_state::alu_oprand_5_mult_w)
-{
-	logerror("%s: alu_oprand_5_mult_w writing: %02x\n", machine().describe_context(), data);
-	m_alu_oprand_mult[0] = data;
-}
-
-
-/*
-    Address 0x2135 WRITE (MAIN CPU)
-
-    0x80 - ALU Mul Oprand 6
-    0x40 - ALU Mul Oprand 6
-    0x20 - ALU Mul Oprand 6
-    0x10 - ALU Mul Oprand 6
-    0x08 - ALU Mul Oprand 6
-    0x04 - ALU Mul Oprand 6
-    0x02 - ALU Mul Oprand 6
-    0x01 - ALU Mul Oprand 6
-
-    Address 0x2135 READ (MAIN CPU)
-
-    0x80 - ALU Output 6
-    0x40 - ALU Output 6
-    0x20 - ALU Output 6
-    0x10 - ALU Output 6
-    0x08 - ALU Output 6
-    0x04 - ALU Output 6
-    0x02 - ALU Output 6
-    0x01 - ALU Output 6
-*/
-
-READ8_MEMBER(vt_vt1682_state::alu_out_6_r)
-{
-	uint8_t ret = m_alu_out[5];
-	logerror("%s: alu_out_6_r returning: %02x\n", machine().describe_context(), ret);
-	return ret;
-}
-
-WRITE8_MEMBER(vt_vt1682_state::alu_oprand_6_mult_w)
-{
-	// used one of the 32in1 menus
-
-	logerror("%s: alu_oprand_6_mult_w writing: %02x\n", machine().describe_context(), data);
-	logerror("------------------------------------------ MULTIPLICATION REQUESTED ------------------------------------\n");
-	m_alu_oprand_mult[1] = data;
-
-	int param1 = (m_alu_oprand_mult[1] << 8) | m_alu_oprand_mult[0];
-	int param2 = (m_alu_oprand[1] << 8) | m_alu_oprand[0];
-
-	uint32_t result = param1 * param2;
-
-	m_alu_out[0] = result & 0xff;
-	m_alu_out[1] = (result >> 8) & 0xff;
-	m_alu_out[2] = (result >> 16) & 0xff;
-	m_alu_out[3] = (result >> 24) & 0xff;
-
-	// oprands 5/6 cleared?
-}
-
-
-/*
-    Address 0x2136 WRITE ONLY (MAIN CPU)
-
-    0x80 - ALU Div Oprand 5
-    0x40 - ALU Div Oprand 5
-    0x20 - ALU Div Oprand 5
-    0x10 - ALU Div Oprand 5
-    0x08 - ALU Div Oprand 5
-    0x04 - ALU Div Oprand 5
-    0x02 - ALU Div Oprand 5
-    0x01 - ALU Div Oprand 5
-
-*/
-
-WRITE8_MEMBER(vt_vt1682_state::alu_oprand_5_div_w)
-{
-	logerror("%s: alu_oprand_5_div_w writing: %02x\n", machine().describe_context(), data);
-	m_alu_oprand_div[0] = data;
-}
-
-
-/*
-    Address 0x2137 WRITE ONLY (MAIN CPU)
-
-    0x80 - ALU Div Oprand 6
-    0x40 - ALU Div Oprand 6
-    0x20 - ALU Div Oprand 6
-    0x10 - ALU Div Oprand 6
-    0x08 - ALU Div Oprand 6
-    0x04 - ALU Div Oprand 6
-    0x02 - ALU Div Oprand 6
-    0x01 - ALU Div Oprand 6
-*/
-
-WRITE8_MEMBER(vt_vt1682_state::alu_oprand_6_div_w)
-{
-	logerror("%s: alu_oprand_6_div_w writing: %02x\n", machine().describe_context(), data);
-	m_alu_oprand_div[1] = data;
-
-	popmessage("------------------------------------------ DIVISION REQUESTED ------------------------------------\n");
-}
-
+/* Address 0x2130 - 0x2137 - see v1682_alu.cpp */
 
 /* Address 0x2138 Unused */
 /* Address 0x2139 Unused */
@@ -4636,304 +4288,7 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_soundcpu_211c_reg_irqctrl_w)
 /* Address 0x212e Unused (SOUND CPU) */
 /* Address 0x212f Unused (SOUND CPU) */
 
-/*
-    Address 0x2130 WRITE (SOUND CPU)
-
-    0x80 - ALU Oprand 1
-    0x40 - ALU Oprand 1
-    0x20 - ALU Oprand 1
-    0x10 - ALU Oprand 1
-    0x08 - ALU Oprand 1
-    0x04 - ALU Oprand 1
-    0x02 - ALU Oprand 1
-    0x01 - ALU Oprand 1
-
-    Address 0x2130 READ (SOUND CPU)
-
-    0x80 - ALU Output 1
-    0x40 - ALU Output 1
-    0x20 - ALU Output 1
-    0x10 - ALU Output 1
-    0x08 - ALU Output 1
-    0x04 - ALU Output 1
-    0x02 - ALU Output 1
-    0x01 - ALU Output 1
-*/
-
-READ8_MEMBER(vt_vt1682_state::soundcpu_alu_out_1_r)
-{
-	uint8_t ret = m_soundcpu_alu_out[0];
-	//logerror("%s: soundcpu_alu_out_1_r returning: %02x\n", machine().describe_context(), ret);
-	return ret;
-}
-
-WRITE8_MEMBER(vt_vt1682_state::soundcpu_alu_oprand_1_w)
-{
-	//logerror("%s: soundcpu_alu_oprand_1_w writing: %02x\n", machine().describe_context(), data);
-	m_soundcpu_alu_oprand[0] = data;
-}
-
-/*
-    Address 0x2131 WRITE (SOUND CPU)
-
-    0x80 - ALU Oprand 2
-    0x40 - ALU Oprand 2
-    0x20 - ALU Oprand 2
-    0x10 - ALU Oprand 2
-    0x08 - ALU Oprand 2
-    0x04 - ALU Oprand 2
-    0x02 - ALU Oprand 2
-    0x01 - ALU Oprand 2
-
-    Address 0x2131 READ (SOUND CPU)
-
-    0x80 - ALU Output 2
-    0x40 - ALU Output 2
-    0x20 - ALU Output 2
-    0x10 - ALU Output 2
-    0x08 - ALU Output 2
-    0x04 - ALU Output 2
-    0x02 - ALU Output 2
-    0x01 - ALU Output 2
-*/
-
-READ8_MEMBER(vt_vt1682_state::soundcpu_alu_out_2_r)
-{
-	uint8_t ret = m_soundcpu_alu_out[1];
-	//logerror("%s: soundcpu_alu_out_2_r returning: %02x\n", machine().describe_context(), ret);
-	return ret;
-}
-
-WRITE8_MEMBER(vt_vt1682_state::soundcpu_alu_oprand_2_w)
-{
-	//logerror("%s: soundcpu_alu_oprand_2_w writing: %02x\n", machine().describe_context(), data);
-	m_soundcpu_alu_oprand[1] = data;
-}
-
-/*
-    Address 0x2132 WRITE (SOUND CPU)
-
-    0x80 - ALU Oprand 3
-    0x40 - ALU Oprand 3
-    0x20 - ALU Oprand 3
-    0x10 - ALU Oprand 3
-    0x08 - ALU Oprand 3
-    0x04 - ALU Oprand 3
-    0x02 - ALU Oprand 3
-    0x01 - ALU Oprand 3
-
-    Address 0x2132 READ (SOUND CPU)
-
-    0x80 - ALU Output 3
-    0x40 - ALU Output 3
-    0x20 - ALU Output 3
-    0x10 - ALU Output 3
-    0x08 - ALU Output 3
-    0x04 - ALU Output 3
-    0x02 - ALU Output 3
-    0x01 - ALU Output 3
-*/
-
-READ8_MEMBER(vt_vt1682_state::soundcpu_alu_out_3_r)
-{
-	uint8_t ret = m_soundcpu_alu_out[2];
-	//logerror("%s: soundcpu_alu_out_3_r returning: %02x\n", machine().describe_context(), ret);
-	return ret;
-}
-
-WRITE8_MEMBER(vt_vt1682_state::soundcpu_alu_oprand_3_w)
-{
-	//logerror("%s: soundcpu_alu_oprand_3_w writing: %02x\n", machine().describe_context(), data);
-	m_soundcpu_alu_oprand[2] = data;
-}
-
-/*
-    Address 0x2133 WRITE (SOUND CPU)
-
-    0x80 - ALU Oprand 4
-    0x40 - ALU Oprand 4
-    0x20 - ALU Oprand 4
-    0x10 - ALU Oprand 4
-    0x08 - ALU Oprand 4
-    0x04 - ALU Oprand 4
-    0x02 - ALU Oprand 4
-    0x01 - ALU Oprand 4
-
-    Address 0x2133 READ (SOUND CPU)
-
-    0x80 - ALU Output 4
-    0x40 - ALU Output 4
-    0x20 - ALU Output 4
-    0x10 - ALU Output 4
-    0x08 - ALU Output 4
-    0x04 - ALU Output 4
-    0x02 - ALU Output 4
-    0x01 - ALU Output 4
-*/
-
-READ8_MEMBER(vt_vt1682_state::soundcpu_alu_out_4_r)
-{
-	uint8_t ret = m_soundcpu_alu_out[3];
-	//logerror("%s: soundcpu_alu_out_4_r returning: %02x\n", machine().describe_context(), ret);
-	return ret;
-}
-
-
-WRITE8_MEMBER(vt_vt1682_state::soundcpu_alu_oprand_4_w)
-{
-	//logerror("%s: soundcpu_alu_oprand_4_w writing: %02x\n", machine().describe_context(), data);
-	m_soundcpu_alu_oprand[3] = data;
-}
-
-/*
-    Address 0x2134 WRITE (SOUND CPU)
-
-    0x80 - ALU Mul Oprand 5
-    0x40 - ALU Mul Oprand 5
-    0x20 - ALU Mul Oprand 5
-    0x10 - ALU Mul Oprand 5
-    0x08 - ALU Mul Oprand 5
-    0x04 - ALU Mul Oprand 5
-    0x02 - ALU Mul Oprand 5
-    0x01 - ALU Mul Oprand 5
-
-    Address 0x2134 READ (SOUND CPU)
-
-    0x80 - ALU Output 5
-    0x40 - ALU Output 5
-    0x20 - ALU Output 5
-    0x10 - ALU Output 5
-    0x08 - ALU Output 5
-    0x04 - ALU Output 5
-    0x02 - ALU Output 5
-    0x01 - ALU Output 5
-*/
-
-READ8_MEMBER(vt_vt1682_state::soundcpu_alu_out_5_r)
-{
-	uint8_t ret = m_soundcpu_alu_out[4];
-	//logerror("%s: soundcpu_alu_out_5_r returning: %02x\n", machine().describe_context(), ret);
-	return ret;
-}
-
-
-WRITE8_MEMBER(vt_vt1682_state::soundcpu_alu_oprand_5_mult_w)
-{
-	//logerror("%s: soundcpu_alu_oprand_5_mult_w writing: %02x\n", machine().describe_context(), data);
-	m_soundcpu_alu_oprand_mult[0] = data;
-}
-
-/*
-    Address 0x2135 WRITE (SOUND CPU)
-
-    0x80 - ALU Mul Oprand 6
-    0x40 - ALU Mul Oprand 6
-    0x20 - ALU Mul Oprand 6
-    0x10 - ALU Mul Oprand 6
-    0x08 - ALU Mul Oprand 6
-    0x04 - ALU Mul Oprand 6
-    0x02 - ALU Mul Oprand 6
-    0x01 - ALU Mul Oprand 6
-
-    Address 0x2135 READ (SOUND CPU)
-
-    0x80 - ALU Output 6
-    0x40 - ALU Output 6
-    0x20 - ALU Output 6
-    0x10 - ALU Output 6
-    0x08 - ALU Output 6
-    0x04 - ALU Output 6
-    0x02 - ALU Output 6
-    0x01 - ALU Output 6
-*/
-
-READ8_MEMBER(vt_vt1682_state::soundcpu_alu_out_6_r)
-{
-	uint8_t ret = m_soundcpu_alu_out[5];
-	//logerror("%s: soundcpu_alu_out_6_r returning: %02x\n", machine().describe_context(), ret);
-	return ret;
-}
-
-WRITE8_MEMBER(vt_vt1682_state::soundcpu_alu_oprand_6_mult_w)
-{
-	// used one of the 32in1 menus
-
-	//logerror("%s: soundcpu_alu_oprand_6_mult_w writing: %02x\n", machine().describe_context(), data);
-	//logerror("------------------------------------------ SOUND CPU MULTIPLICATION REQUESTED ------------------------------------\n");
-	m_soundcpu_alu_oprand_mult[1] = data;
-
-	int param1 = (m_soundcpu_alu_oprand_mult[1] << 8) | m_soundcpu_alu_oprand_mult[0];
-	int param2 = (m_soundcpu_alu_oprand[1] << 8) | m_soundcpu_alu_oprand[0];
-
-	uint32_t result = param1 * param2;
-
-	m_soundcpu_alu_out[0] = result & 0xff;
-	m_soundcpu_alu_out[1] = (result >> 8) & 0xff;
-	m_soundcpu_alu_out[2] = (result >> 16) & 0xff;
-	m_soundcpu_alu_out[3] = (result >> 24) & 0xff;
-
-	// oprands 5/6 cleared?
-}
-
-/*
-    Address 0x2136 WRITE ONLY (SOUND CPU)
-
-    0x80 - ALU Div Oprand 5
-    0x40 - ALU Div Oprand 5
-    0x20 - ALU Div Oprand 5
-    0x10 - ALU Div Oprand 5
-    0x08 - ALU Div Oprand 5
-    0x04 - ALU Div Oprand 5
-    0x02 - ALU Div Oprand 5
-    0x01 - ALU Div Oprand 5
-
-*/
-
-WRITE8_MEMBER(vt_vt1682_state::soundcpu_alu_oprand_5_div_w)
-{
-	//logerror("%s: soundcpu_alu_oprand_5_div_w writing: %02x\n", machine().describe_context(), data);
-	m_soundcpu_alu_oprand_div[0] = data;
-}
-
-/*
-    Address 0x2137 WRITE ONLY (SOUND CPU)
-
-    0x80 - ALU Div Oprand 6
-    0x40 - ALU Div Oprand 6
-    0x20 - ALU Div Oprand 6
-    0x10 - ALU Div Oprand 6
-    0x08 - ALU Div Oprand 6
-    0x04 - ALU Div Oprand 6
-    0x02 - ALU Div Oprand 6
-    0x01 - ALU Div Oprand 6
-*/
-
-WRITE8_MEMBER(vt_vt1682_state::soundcpu_alu_oprand_6_div_w)
-{
-	//logerror("%s: soundcpu_alu_oprand_6_div_w writing: %02x\n", machine().describe_context(), data);
-	m_soundcpu_alu_oprand_div[1] = data;
-
-	uint32_t param1 = (m_soundcpu_alu_oprand[3] << 24) | (m_soundcpu_alu_oprand[2] << 16) | (m_soundcpu_alu_oprand[1] << 8) | m_soundcpu_alu_oprand[0];
-	// sources say the mult registers areu sed here, but that makes little sense?
-	uint32_t param2 = (m_soundcpu_alu_oprand_div[1] << 8) | m_soundcpu_alu_oprand_div[0];
-
-	if (param2 != 0)
-	{
-		//popmessage("------------------------------------------ SOUND CPU DIVISION REQUESTED ------------------------------------\n");
-
-		uint32_t result = param1 / param2;
-
-		m_soundcpu_alu_out[0] = result & 0xff;
-		m_soundcpu_alu_out[1] = (result >> 8) & 0xff;
-		m_soundcpu_alu_out[2] = (result >> 16) & 0xff;
-		m_soundcpu_alu_out[3] = (result >> 24) & 0xff;
-
-		// should be the remainder?
-		m_soundcpu_alu_out[4] = 0x00;// machine().rand();
-		m_soundcpu_alu_out[5] = 0x00;// machine().rand();
-
-	}
-}
+/* Address 0x2130 - 0x2137 - see v1682_alu.cpp (device identical to main CPU device) */
 
 /* Address 0x2138 Unused (SOUND CPU) */
 /* Address 0x2139 Unused (SOUND CPU) */
@@ -5689,6 +5044,10 @@ void vt_vt1682_state::draw_layer(int which, int opaque, screen_device& screen, b
 					count++;
 
 					int tile = word & 0x0fff;
+
+					if (!tile) // Golden Gate in ii32in1 changes tiles to 0 when destroyed, which is garbage (TODO: check this isn't division related, or a priority thing)
+						continue;
+
 					uint8_t pal = (word & 0xf000) >> 12;
 
 					int xpos = xtile * (bk_tilesize ? 16 : 8);
@@ -5734,6 +5093,11 @@ void vt_vt1682_state::draw_sprites(screen_device& screen, bitmap_rgb32& bitmap, 
 			int attr2 = m_spriteram->read8((i * SPRITE_STEP) + 5);
 
 			tilenum |= (attr0 & 0x0f) << 8;
+
+			// maybe "Duel Soccer" in ii32in1 has a bad tile otherwise, and it matches other guessed behavior of skipping tile 0 for tilemaps too
+			if (!tilenum)
+				continue;
+
 			int pal = (attr0 & 0xf0) >> 4;
 
 			int flipx = (attr1 & 0x02) >> 1;
@@ -5817,14 +5181,14 @@ void vt_vt1682_state::vt_vt1682_sound_map(address_map& map)
 
 	map(0x211c, 0x211c).w(FUNC(vt_vt1682_state::vt1682_soundcpu_211c_reg_irqctrl_w));
 
-	map(0x2130, 0x2130).rw(FUNC(vt_vt1682_state::soundcpu_alu_out_1_r), FUNC(vt_vt1682_state::soundcpu_alu_oprand_1_w));
-	map(0x2131, 0x2131).rw(FUNC(vt_vt1682_state::soundcpu_alu_out_2_r), FUNC(vt_vt1682_state::soundcpu_alu_oprand_2_w));
-	map(0x2132, 0x2132).rw(FUNC(vt_vt1682_state::soundcpu_alu_out_3_r), FUNC(vt_vt1682_state::soundcpu_alu_oprand_3_w));
-	map(0x2133, 0x2133).rw(FUNC(vt_vt1682_state::soundcpu_alu_out_4_r), FUNC(vt_vt1682_state::soundcpu_alu_oprand_4_w));
-	map(0x2134, 0x2134).rw(FUNC(vt_vt1682_state::soundcpu_alu_out_5_r), FUNC(vt_vt1682_state::soundcpu_alu_oprand_5_mult_w));
-	map(0x2135, 0x2135).rw(FUNC(vt_vt1682_state::soundcpu_alu_out_6_r), FUNC(vt_vt1682_state::soundcpu_alu_oprand_6_mult_w));
-	map(0x2136, 0x2136).w(FUNC(vt_vt1682_state::soundcpu_alu_oprand_5_div_w));
-	map(0x2137, 0x2137).w(FUNC(vt_vt1682_state::soundcpu_alu_oprand_6_div_w));
+	map(0x2130, 0x2130).rw(m_soundcpu_alu, FUNC(vrt_vt1682_alu_device::alu_out_1_r), FUNC(vrt_vt1682_alu_device::alu_oprand_1_w));
+	map(0x2131, 0x2131).rw(m_soundcpu_alu, FUNC(vrt_vt1682_alu_device::alu_out_2_r), FUNC(vrt_vt1682_alu_device::alu_oprand_2_w));
+	map(0x2132, 0x2132).rw(m_soundcpu_alu, FUNC(vrt_vt1682_alu_device::alu_out_3_r), FUNC(vrt_vt1682_alu_device::alu_oprand_3_w));
+	map(0x2133, 0x2133).rw(m_soundcpu_alu, FUNC(vrt_vt1682_alu_device::alu_out_4_r), FUNC(vrt_vt1682_alu_device::alu_oprand_4_w));
+	map(0x2134, 0x2134).rw(m_soundcpu_alu, FUNC(vrt_vt1682_alu_device::alu_out_5_r), FUNC(vrt_vt1682_alu_device::alu_oprand_5_mult_w));
+	map(0x2135, 0x2135).rw(m_soundcpu_alu, FUNC(vrt_vt1682_alu_device::alu_out_6_r), FUNC(vrt_vt1682_alu_device::alu_oprand_6_mult_w));
+	map(0x2136, 0x2136).w(m_soundcpu_alu, FUNC(vrt_vt1682_alu_device::alu_oprand_5_div_w));
+	map(0x2137, 0x2137).w(m_soundcpu_alu, FUNC(vrt_vt1682_alu_device::alu_oprand_6_div_w));
 
 	map(0xf000, 0xffff).ram().share("sound_share"); // doesn't actually map here, the CPU fetches vectors from 0x0ff0 - 0x0fff!
 
@@ -5927,14 +5291,14 @@ void vt_vt1682_state::vt_vt1682_map(address_map &map)
 	map(0x2127, 0x2127).rw(FUNC(vt_vt1682_state::vt1682_2127_dma_status_r), FUNC(vt_vt1682_state::vt1682_2127_dma_size_trigger_w));
 	map(0x2128, 0x2128).rw(FUNC(vt_vt1682_state::vt1682_2128_dma_sr_bank_addr_24_23_r), FUNC(vt_vt1682_state::vt1682_2128_dma_sr_bank_addr_24_23_w));
 
-	map(0x2130, 0x2130).rw(FUNC(vt_vt1682_state::alu_out_1_r), FUNC(vt_vt1682_state::alu_oprand_1_w));
-	map(0x2131, 0x2131).rw(FUNC(vt_vt1682_state::alu_out_2_r), FUNC(vt_vt1682_state::alu_oprand_2_w));
-	map(0x2132, 0x2132).rw(FUNC(vt_vt1682_state::alu_out_3_r), FUNC(vt_vt1682_state::alu_oprand_3_w));
-	map(0x2133, 0x2133).rw(FUNC(vt_vt1682_state::alu_out_4_r), FUNC(vt_vt1682_state::alu_oprand_4_w));
-	map(0x2134, 0x2134).rw(FUNC(vt_vt1682_state::alu_out_5_r), FUNC(vt_vt1682_state::alu_oprand_5_mult_w));
-	map(0x2135, 0x2135).rw(FUNC(vt_vt1682_state::alu_out_6_r), FUNC(vt_vt1682_state::alu_oprand_6_mult_w));
-	map(0x2136, 0x2136).w(FUNC(vt_vt1682_state::alu_oprand_5_div_w));
-	map(0x2137, 0x2137).w(FUNC(vt_vt1682_state::alu_oprand_6_div_w));
+	map(0x2130, 0x2130).rw(m_maincpu_alu, FUNC(vrt_vt1682_alu_device::alu_out_1_r), FUNC(vrt_vt1682_alu_device::alu_oprand_1_w));
+	map(0x2131, 0x2131).rw(m_maincpu_alu, FUNC(vrt_vt1682_alu_device::alu_out_2_r), FUNC(vrt_vt1682_alu_device::alu_oprand_2_w));
+	map(0x2132, 0x2132).rw(m_maincpu_alu, FUNC(vrt_vt1682_alu_device::alu_out_3_r), FUNC(vrt_vt1682_alu_device::alu_oprand_3_w));
+	map(0x2133, 0x2133).rw(m_maincpu_alu, FUNC(vrt_vt1682_alu_device::alu_out_4_r), FUNC(vrt_vt1682_alu_device::alu_oprand_4_w));
+	map(0x2134, 0x2134).rw(m_maincpu_alu, FUNC(vrt_vt1682_alu_device::alu_out_5_r), FUNC(vrt_vt1682_alu_device::alu_oprand_5_mult_w));
+	map(0x2135, 0x2135).rw(m_maincpu_alu, FUNC(vrt_vt1682_alu_device::alu_out_6_r), FUNC(vrt_vt1682_alu_device::alu_oprand_6_mult_w));
+	map(0x2136, 0x2136).w(m_maincpu_alu, FUNC(vrt_vt1682_alu_device::alu_oprand_5_div_w));
+	map(0x2137, 0x2137).w(m_maincpu_alu, FUNC(vrt_vt1682_alu_device::alu_oprand_6_div_w));
 
 	// 3000-3fff internal ROM if enabled
 	map(0x4000, 0x7fff).r(FUNC(vt_vt1682_state::rom_4000_to_7fff_r));
@@ -6063,6 +5427,10 @@ void vt_vt1682_state::vt_vt1682(machine_config &config)
 
 	M6502(config, m_soundcpu, XTAL(21'477'272));
 	m_soundcpu->set_addrmap(AS_PROGRAM, &vt_vt1682_state::vt_vt1682_sound_map);
+
+	VT_VT1682_ALU(config, m_maincpu_alu, 0);
+	VT_VT1682_ALU(config, m_soundcpu_alu, 0);
+	m_soundcpu_alu->set_sound_alu(); // different logging conditions
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
