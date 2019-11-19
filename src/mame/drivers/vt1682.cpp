@@ -5571,10 +5571,14 @@ void vt_vt1682_state::draw_layer(int which, int opaque, screen_device& screen, b
 
 			for (int y = 0; y < (bk_tilesize ? 16 : 32); y++)
 			{
-				int count = base + (pagewidth_bytes * y);
 
-				for (int x = 0; x < (bk_tilesize ? 16 : 32); x++)
+				int ytile = y;
+
+				for (int xtile = 0; xtile < (bk_tilesize ? 16 : 32); xtile++)
 				{
+					int count = base + (pagewidth_bytes * ytile); // y part;
+					count += (2 * xtile); // xpart;
+
 					uint16_t word = m_vram->read8(count);
 					count++;
 					word |= m_vram->read8(count) << 8;
@@ -5584,8 +5588,8 @@ void vt_vt1682_state::draw_layer(int which, int opaque, screen_device& screen, b
 					int tile = word & 0x0fff;
 					uint8_t pal = (word & 0xf000) >> 12;
 
-					int xpos = x * (bk_tilesize ? 16 : 8);
-					int ypos = y * (bk_tilesize ? 16 : 8);
+					int xpos = xtile * (bk_tilesize ? 16 : 8);
+					int ypos = ytile * (bk_tilesize ? 16 : 8);
 
 					draw_tile(segment, tile, xpos, ypos, palbase, pal, bk_tilesize, bk_tilesize, bk_tilebpp, (bk_depth*2)+1, opaque, 0, 0, screen, bitmap, cliprect);
 				}
