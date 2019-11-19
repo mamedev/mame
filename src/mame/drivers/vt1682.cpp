@@ -318,6 +318,9 @@ private:
 
 	uint8_t m_2106_enable_reg;
 
+	uint8_t m_alu_oprand[4];
+	uint8_t m_alu_oprand_mult[2];
+	uint8_t m_alu_out[6];
 
 	DECLARE_READ8_MEMBER(vt1682_2100_prgbank1_r3_r);
 	DECLARE_WRITE8_MEMBER(vt1682_2100_prgbank1_r3_w);
@@ -374,6 +377,21 @@ private:
 	DECLARE_READ8_MEMBER(vt1682_2106_enable_regs_r);
 	DECLARE_WRITE8_MEMBER(vt1682_2106_enable_regs_w);
 
+
+	DECLARE_READ8_MEMBER(alu_out_1_r);
+	DECLARE_READ8_MEMBER(alu_out_2_r);
+	DECLARE_READ8_MEMBER(alu_out_3_r);
+	DECLARE_READ8_MEMBER(alu_out_4_r);
+	DECLARE_READ8_MEMBER(alu_out_5_r);
+	DECLARE_READ8_MEMBER(alu_out_6_r);
+
+	DECLARE_WRITE8_MEMBER(alu_oprand_1_w);
+	DECLARE_WRITE8_MEMBER(alu_oprand_2_w);
+	DECLARE_WRITE8_MEMBER(alu_oprand_3_w);
+	DECLARE_WRITE8_MEMBER(alu_oprand_4_w);
+	DECLARE_WRITE8_MEMBER(alu_oprand_5_mult_w);
+	DECLARE_WRITE8_MEMBER(alu_oprand_6_mult_w);
+	DECLARE_WRITE8_MEMBER(vt1682_2137_alu_div_opr6_trigger_w);
 
 	/* System Helpers */
 
@@ -588,6 +606,9 @@ void vt_vt1682_state::machine_start()
 
 	save_item(NAME(m_2106_enable_reg));
 
+	save_item(NAME(m_alu_oprand));
+	save_item(NAME(m_alu_oprand_mult));
+	save_item(NAME(m_alu_out));
 }
 
 void vt_vt1682_state::machine_reset()
@@ -683,6 +704,15 @@ void vt_vt1682_state::machine_reset()
 	m_2128_dma_sr_bank_addr_24_23 = 0;
 
 	m_2106_enable_reg = 0;
+
+	for (int i=0;i<4;i++)
+		m_alu_oprand[i] = 0;
+
+	for (int i=0;i<2;i++)
+		m_alu_oprand_mult[i] = 0;
+
+	for (int i=0;i<6;i++)
+		m_alu_out[i] = 0;
 
 
 	update_banks();
@@ -3282,7 +3312,7 @@ void vt_vt1682_state::do_dma_internal_to_internal(int data, bool is_video)
 			dstaddr++;
 
 		// update registers
-		set_dma_dt_addr(dstaddr);;
+		set_dma_dt_addr(dstaddr);
 		set_dma_sr_addr(srcaddr);
 	}
 }
@@ -3518,6 +3548,19 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2128_dma_sr_bank_addr_24_23_w)
     0x01 - ALU Output 1
 */
 
+READ8_MEMBER(vt_vt1682_state::alu_out_1_r)
+{
+	uint8_t ret = m_alu_out[0];
+	logerror("%s: alu_out_1_r returning: %02x\n", machine().describe_context(), ret);
+	return ret;
+}
+
+WRITE8_MEMBER(vt_vt1682_state::alu_oprand_1_w)
+{
+	logerror("%s: alu_oprand_1_w writing: %02x\n", machine().describe_context(), data);
+	m_alu_oprand[0] = data;
+}
+
 /*
     Address 0x2131 WRITE (MAIN CPU)
 
@@ -3541,6 +3584,19 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2128_dma_sr_bank_addr_24_23_w)
     0x02 - ALU Output 2
     0x01 - ALU Output 2
 */
+
+READ8_MEMBER(vt_vt1682_state::alu_out_2_r)
+{
+	uint8_t ret = m_alu_out[1];
+	logerror("%s: alu_out_2_r returning: %02x\n", machine().describe_context(), ret);
+	return ret;
+}
+
+WRITE8_MEMBER(vt_vt1682_state::alu_oprand_2_w)
+{
+	logerror("%s: alu_oprand_2_w writing: %02x\n", machine().describe_context(), data);
+	m_alu_oprand[1] = data;
+}
 
 /*
     Address 0x2132 WRITE (MAIN CPU)
@@ -3566,6 +3622,20 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2128_dma_sr_bank_addr_24_23_w)
     0x01 - ALU Output 3
 */
 
+READ8_MEMBER(vt_vt1682_state::alu_out_3_r)
+{
+	uint8_t ret = m_alu_out[2];
+	logerror("%s: alu_out_3_r returning: %02x\n", machine().describe_context(), ret);
+	return ret;
+}
+
+WRITE8_MEMBER(vt_vt1682_state::alu_oprand_3_w)
+{
+	logerror("%s: alu_oprand_3_w writing: %02x\n", machine().describe_context(), data);
+	m_alu_oprand[2] = data;
+}
+
+
 /*
     Address 0x2133 WRITE (MAIN CPU)
 
@@ -3589,6 +3659,20 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2128_dma_sr_bank_addr_24_23_w)
     0x02 - ALU Output 4
     0x01 - ALU Output 4
 */
+
+READ8_MEMBER(vt_vt1682_state::alu_out_4_r)
+{
+	uint8_t ret = m_alu_out[3];
+	logerror("%s: alu_out_4_r returning: %02x\n", machine().describe_context(), ret);
+	return ret;
+}
+
+
+WRITE8_MEMBER(vt_vt1682_state::alu_oprand_4_w)
+{
+	logerror("%s: alu_oprand_4_w writing: %02x\n", machine().describe_context(), data);
+	m_alu_oprand[3] = data;
+}
 
 /*
     Address 0x2134 WRITE (MAIN CPU)
@@ -3614,6 +3698,21 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2128_dma_sr_bank_addr_24_23_w)
     0x01 - ALU Output 5
 */
 
+READ8_MEMBER(vt_vt1682_state::alu_out_5_r)
+{
+	uint8_t ret = m_alu_out[4];
+	logerror("%s: alu_out_5_r returning: %02x\n", machine().describe_context(), ret);
+	return ret;
+}
+
+
+WRITE8_MEMBER(vt_vt1682_state::alu_oprand_5_mult_w)
+{
+	logerror("%s: alu_oprand_5_mult_w writing: %02x\n", machine().describe_context(), data);
+	m_alu_oprand_mult[0] = data;
+}
+
+
 /*
     Address 0x2135 WRITE (MAIN CPU)
 
@@ -3637,6 +3736,35 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2128_dma_sr_bank_addr_24_23_w)
     0x02 - ALU Output 6
     0x01 - ALU Output 6
 */
+
+READ8_MEMBER(vt_vt1682_state::alu_out_6_r)
+{
+	uint8_t ret = m_alu_out[5];
+	logerror("%s: alu_out_6_r returning: %02x\n", machine().describe_context(), ret);
+	return ret;
+}
+
+WRITE8_MEMBER(vt_vt1682_state::alu_oprand_6_mult_w)
+{
+	// used one of the 32in1 menus
+
+	logerror("%s: alu_oprand_6_mult_w writing: %02x\n", machine().describe_context(), data);
+	logerror("------------------------------------------ MULTIPLICATION REQUESTED ------------------------------------\n");
+	m_alu_oprand_mult[1] = data;
+
+	int param1 = (m_alu_oprand_mult[1] << 8) | m_alu_oprand_mult[0];
+	int param2 = (m_alu_oprand[1] << 8) | m_alu_oprand[0];
+
+	uint32_t result = param1 * param2;
+
+	m_alu_out[0] = result & 0xff;
+	m_alu_out[1] = (result >> 8) & 0xff;
+	m_alu_out[2] = (result >> 16) & 0xff;
+	m_alu_out[3] = (result >> 24) & 0xff;
+
+	// oprands 5/6 cleared?
+}
+
 
 /*
     Address 0x2136 WRITE ONLY (MAIN CPU)
@@ -3664,6 +3792,13 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2128_dma_sr_bank_addr_24_23_w)
     0x02 - ALU Div Oprand 6
     0x01 - ALU Div Oprand 6
 */
+
+WRITE8_MEMBER(vt_vt1682_state::vt1682_2137_alu_div_opr6_trigger_w)
+{
+	logerror("%s: vt1682_2137_alu_div_opr6_trigger_w writing: %02x\n", machine().describe_context(), data);
+	popmessage("------------------------------------------ DIVISION REQUESTED ------------------------------------\n");
+}
+
 
 /* Address 0x2138 Unused */
 /* Address 0x2139 Unused */
@@ -4857,6 +4992,16 @@ void vt_vt1682_state::vt_vt1682_map(address_map &map)
 	map(0x2126, 0x2126).rw(FUNC(vt_vt1682_state::vt1682_2126_dma_sr_bank_addr_22_15_r), FUNC(vt_vt1682_state::vt1682_2126_dma_sr_bank_addr_22_15_w));
 	map(0x2127, 0x2127).rw(FUNC(vt_vt1682_state::vt1682_2127_dma_status_r), FUNC(vt_vt1682_state::vt1682_2127_dma_size_trigger_w));
 	map(0x2128, 0x2128).rw(FUNC(vt_vt1682_state::vt1682_2128_dma_sr_bank_addr_24_23_r), FUNC(vt_vt1682_state::vt1682_2128_dma_sr_bank_addr_24_23_w));
+
+	map(0x2130, 0x2130).rw(FUNC(vt_vt1682_state::alu_out_1_r), FUNC(vt_vt1682_state::alu_oprand_1_w));
+	map(0x2131, 0x2131).rw(FUNC(vt_vt1682_state::alu_out_2_r), FUNC(vt_vt1682_state::alu_oprand_2_w));
+	map(0x2132, 0x2132).rw(FUNC(vt_vt1682_state::alu_out_3_r), FUNC(vt_vt1682_state::alu_oprand_3_w));
+	map(0x2133, 0x2133).rw(FUNC(vt_vt1682_state::alu_out_4_r), FUNC(vt_vt1682_state::alu_oprand_4_w));
+	map(0x2134, 0x2134).rw(FUNC(vt_vt1682_state::alu_out_5_r), FUNC(vt_vt1682_state::alu_oprand_5_mult_w));
+	map(0x2135, 0x2135).rw(FUNC(vt_vt1682_state::alu_out_6_r), FUNC(vt_vt1682_state::alu_oprand_6_mult_w));
+
+	map(0x2137, 0x2137).w(FUNC(vt_vt1682_state::vt1682_2137_alu_div_opr6_trigger_w));
+
 
 	// 3000-3fff internal ROM if enabled
 	map(0x4000, 0x7fff).r(FUNC(vt_vt1682_state::rom_4000_to_7fff_r));
