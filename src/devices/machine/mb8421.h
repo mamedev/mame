@@ -115,7 +115,7 @@ private:
 class dual_port_mailbox_ram_8bit_base : public dual_port_mailbox_ram_base
 {
 public:
-	u8 peek(offs_t offset) const { return m_ram[offset]; }
+	u8 peek(offs_t offset) const { return m_ram[offset & m_ram_mask]; }
 
 	void left_w(offs_t offset, u8 data);
 	u8 left_r(offs_t offset);
@@ -137,7 +137,7 @@ private:
 class dual_port_mailbox_ram_16bit_base : public dual_port_mailbox_ram_base
 {
 public:
-	u16 peek(offs_t offset) const { return m_ram[offset]; }
+	u16 peek(offs_t offset) const { return m_ram[offset & m_ram_mask]; }
 
 	void left_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 left_r(offs_t offset, u16 mem_mask = ~0);
