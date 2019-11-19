@@ -10,6 +10,8 @@
     32-bit expansion. It makes sure there are no clashes with the _BUSY pin.
 
     IDT71321 is function compatible, but not pin compatible with MB8421
+    IDT7130 is 1KB variation of IDT71321
+	CY7C131 is similar as IDT7130
 
 **********************************************************************/
 
@@ -18,6 +20,8 @@
 
 
 DEFINE_DEVICE_TYPE(MB8421, mb8421_device, "mb8421", "MB8421 8-bit Dual-Port SRAM with Interrupts")
+DEFINE_DEVICE_TYPE(IDT7130, idt7130_device, "idt7130", "IDT7130 8-bit Dual-Port SRAM with Interrupts")
+DEFINE_DEVICE_TYPE(CY7C131, cy7c131_device, "cy7c131", "CY7C131 8-bit Dual-Port SRAM with Interrupts")
 DEFINE_DEVICE_TYPE(IDT71321, idt71321_device, "idt71321", "IDT71321 8-bit Dual-Port SRAM with Interrupts")
 DEFINE_DEVICE_TYPE(MB8421_MB8431_16BIT, mb8421_mb8431_16_device, "mb8421_mb8431_16", "MB8421/MB8431 16-bit Dual-Port SRAM with Interrupts")
 
@@ -25,10 +29,42 @@ DEFINE_DEVICE_TYPE(MB8421_MB8431_16BIT, mb8421_mb8431_16_device, "mb8421_mb8431_
 //  mb8421_master_device - constructor
 //-------------------------------------------------
 
-mb8421_master_device::mb8421_master_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+mb8421_master_device::mb8421_master_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, size_t ram_size, u64 data_mask)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_intl_callback(*this)
 	, m_intr_callback(*this)
+{
+	m_ram_size = ram_size;
+	m_ram_mask = ram_size - 1;
+	m_int_addr_left = ram_size - 2;
+	m_int_addr_right = ram_size - 1;
+	m_data_mask = data_mask;
+}
+
+//-------------------------------------------------
+//  mb8421_master_8bit_device - constructor
+//-------------------------------------------------
+
+mb8421_master_8bit_device::mb8421_master_8bit_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, size_t ram_size, u8 data_mask)
+	: mb8421_master_device(mconfig, type, tag, owner, clock, ram_size, data_mask)
+{
+}
+
+//-------------------------------------------------
+//  mb8421_master_16bit_device - constructor
+//-------------------------------------------------
+
+mb8421_master_16bit_device::mb8421_master_16bit_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, size_t ram_size, u16 data_mask)
+	: mb8421_master_device(mconfig, type, tag, owner, clock, ram_size >> 1, data_mask)
+{
+}
+
+//-------------------------------------------------
+//  cy7c131_device - constructor
+//-------------------------------------------------
+
+cy7c131_device::cy7c131_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: mb8421_master_8bit_device(mconfig, IDT7130, tag, owner, clock, 0x400)
 {
 }
 
@@ -37,12 +73,16 @@ mb8421_master_device::mb8421_master_device(const machine_config &mconfig, device
 //-------------------------------------------------
 
 mb8421_device::mb8421_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: mb8421_master_device(mconfig, MB8421, tag, owner, clock)
+	: mb8421_master_8bit_device(mconfig, MB8421, tag, owner, clock, 0x800)
 {
 }
 
-mb8421_device::mb8421_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
-	: mb8421_master_device(mconfig, type, tag, owner, clock)
+//-------------------------------------------------
+//  idt7130_device - constructor
+//-------------------------------------------------
+
+idt7130_device::idt7130_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: mb8421_master_8bit_device(mconfig, IDT7130, tag, owner, clock, 0x400)
 {
 }
 
@@ -51,7 +91,7 @@ mb8421_device::mb8421_device(const machine_config &mconfig, device_type type, co
 //-------------------------------------------------
 
 idt71321_device::idt71321_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: mb8421_device(mconfig, IDT71321, tag, owner, clock)
+	: mb8421_master_8bit_device(mconfig, IDT71321, tag, owner, clock, 0x800)
 {
 }
 
@@ -60,7 +100,7 @@ idt71321_device::idt71321_device(const machine_config &mconfig, const char *tag,
 //-------------------------------------------------
 
 mb8421_mb8431_16_device::mb8421_mb8431_16_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: mb8421_master_device(mconfig, MB8421_MB8431_16BIT, tag, owner, clock)
+	: mb8421_master_16bit_device(mconfig, MB8421_MB8431_16BIT, tag, owner, clock, 0x1000)
 {
 }
 
@@ -81,20 +121,20 @@ void mb8421_master_device::device_resolve_objects()
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void mb8421_device::device_start()
+void mb8421_master_8bit_device::device_start()
 {
-	m_ram = make_unique_clear<u8[]>(0x800);
+	m_ram = make_unique_clear<u8[]>(m_ram_size);
 
 	// state save
-	save_pointer(NAME(m_ram), 0x800);
+	save_pointer(NAME(m_ram), m_ram_size);
 }
 
-void mb8421_mb8431_16_device::device_start()
+void mb8421_master_16bit_device::device_start()
 {
-	m_ram = make_unique_clear<u16[]>(0x800);
+	m_ram = make_unique_clear<u16[]>(m_ram_size);
 
 	// state save
-	save_pointer(NAME(m_ram), 0x800);
+	save_pointer(NAME(m_ram), m_ram_size);
 }
 
 //-------------------------------------------------
@@ -118,9 +158,9 @@ void mb8421_master_device::update_intr(offs_t offset)
 	if (machine().side_effects_disabled())
 		return;
 
-	if (row == read_or_write::WRITE && offset == (is_right ? 0x7fe : 0x7ff))
+	if (row == read_or_write::WRITE && offset == (is_right ? m_int_addr_left : m_int_addr_right))
 		(is_right ? m_intl_callback : m_intr_callback)(ASSERT_LINE);
-	else if (row == read_or_write::READ && offset == (is_right ? 0x7ff : 0x7fe))
+	else if (row == read_or_write::READ && offset == (is_right ? m_int_addr_right : m_int_addr_left))
 		(is_right ? m_intr_callback : m_intl_callback)(CLEAR_LINE);
 }
 
@@ -129,17 +169,17 @@ void mb8421_master_device::update_intr(offs_t offset)
 //  (write to 7FF asserts INTR)
 //-------------------------------------------------
 
-void mb8421_device::left_w(offs_t offset, u8 data)
+void mb8421_master_8bit_device::left_w(offs_t offset, u8 data)
 {
-	offset &= 0x7ff;
-	m_ram[offset] = data;
+	offset &= m_ram_mask;
+	ram_w(offset, data);
 	update_intr<read_or_write::WRITE, false>(offset);
 }
 
-void mb8421_mb8431_16_device::left_w(offs_t offset, u16 data, u16 mem_mask)
+void mb8421_master_16bit_device::left_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	offset &= 0x7ff;
-	COMBINE_DATA(&m_ram[offset]);
+	offset &= m_ram_mask;
+	ram_w(offset, data, mem_mask);
 	update_intr<read_or_write::WRITE, false>(offset);
 }
 
@@ -148,18 +188,18 @@ void mb8421_mb8431_16_device::left_w(offs_t offset, u16 data, u16 mem_mask)
 //  (read from 7FE acknowledges INTL)
 //-------------------------------------------------
 
-u8 mb8421_device::left_r(offs_t offset)
+u8 mb8421_master_8bit_device::left_r(offs_t offset)
 {
-	offset &= 0x7ff;
+	offset &= m_ram_mask;
 	update_intr<read_or_write::READ, false>(offset);
-	return m_ram[offset];
+	return ram_r(offset);
 }
 
-u16 mb8421_mb8431_16_device::left_r(offs_t offset, u16 mem_mask)
+u16 mb8421_master_16bit_device::left_r(offs_t offset, u16 mem_mask)
 {
-	offset &= 0x7ff;
+	offset &= m_ram_mask;
 	update_intr<read_or_write::READ, false>(offset);
-	return m_ram[offset];
+	return ram_r(offset);
 }
 
 //-------------------------------------------------
@@ -167,17 +207,17 @@ u16 mb8421_mb8431_16_device::left_r(offs_t offset, u16 mem_mask)
 //  (write to 7FE asserts INTL)
 //-------------------------------------------------
 
-void mb8421_device::right_w(offs_t offset, u8 data)
+void mb8421_master_8bit_device::right_w(offs_t offset, u8 data)
 {
-	offset &= 0x7ff;
-	m_ram[offset] = data;
+	offset &= m_ram_mask;
+	ram_w(offset, data);
 	update_intr<read_or_write::WRITE, true>(offset);
 }
 
-void mb8421_mb8431_16_device::right_w(offs_t offset, u16 data, u16 mem_mask)
+void mb8421_master_16bit_device::right_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	offset &= 0x7ff;
-	COMBINE_DATA(&m_ram[offset]);
+	offset &= m_ram_mask;
+	ram_w(offset, data, mem_mask);
 	update_intr<read_or_write::WRITE, true>(offset);
 }
 
@@ -186,16 +226,16 @@ void mb8421_mb8431_16_device::right_w(offs_t offset, u16 data, u16 mem_mask)
 //  (read from 7FF acknowledges INTR)
 //-------------------------------------------------
 
-u8 mb8421_device::right_r(offs_t offset)
+u8 mb8421_master_8bit_device::right_r(offs_t offset)
 {
-	offset &= 0x7ff;
+	offset &= m_ram_mask;
 	update_intr<read_or_write::READ, true>(offset);
-	return m_ram[offset];
+	return ram_r(offset);
 }
 
-u16 mb8421_mb8431_16_device::right_r(offs_t offset, u16 mem_mask)
+u16 mb8421_master_16bit_device::right_r(offs_t offset, u16 mem_mask)
 {
-	offset &= 0x7ff;
+	offset &= m_ram_mask;
 	update_intr<read_or_write::READ, true>(offset);
-	return m_ram[offset];
+	return ram_r(offset);
 }

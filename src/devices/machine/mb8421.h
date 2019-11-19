@@ -72,7 +72,7 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> mb8421_device
+// ======================> mb8421_master_device
 
 class mb8421_master_device : public device_t
 {
@@ -85,7 +85,7 @@ public:
 	DECLARE_READ_LINE_MEMBER(busy_r) { return 0; } // _BUSY pin - not emulated
 
 protected:
-	mb8421_master_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	mb8421_master_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, size_t ram_size, u64 data_mask = ~0);
 
 	// device-level overrides
 	virtual void device_resolve_objects() override;
@@ -94,27 +94,34 @@ protected:
 	// internal helpers
 	template<read_or_write row, bool is_right> void update_intr(offs_t offset);
 
+  u64 m_data_mask; // for 9/18/36bit rams
+  size_t m_ram_size;
+  size_t m_ram_mask;
+  size_t m_int_addr_left;
+  size_t m_int_addr_right;
+
 private:
 	devcb_write_line m_intl_callback;
 	devcb_write_line m_intr_callback;
 };
 
-// ======================> mb8421_device
+// ======================> mb8421_master_8bit_device
 
-class mb8421_device : public mb8421_master_device
+class mb8421_master_8bit_device : public mb8421_master_device
 {
 public:
-	mb8421_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
-
-	u8 peek(offs_t offset) const { return m_ram[offset & 0x7ff]; }
+	u8 peek(offs_t offset) const { return m_ram[offset] & m_data_mask; }
 
 	void left_w(offs_t offset, u8 data);
 	u8 left_r(offs_t offset);
 	void right_w(offs_t offset, u8 data);
 	u8 right_r(offs_t offset);
 
+  void ram_w(offs_t offset, u8 data) { m_ram[offset] = data & m_data_mask; }
+  u8 ram_r(offs_t offset) { return m_ram[offset] & m_data_mask; }
+
 protected:
-	mb8421_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	mb8421_master_8bit_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, size_t ram_size, u8 data_mask = ~0);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -123,29 +130,24 @@ private:
 	std::unique_ptr<u8[]> m_ram;
 };
 
-// ======================> mb8421_device
+// ======================> mb8421_master_16bit_device
 
-class idt71321_device : public mb8421_device
+class mb8421_master_16bit_device : public mb8421_master_device
 {
 public:
-	idt71321_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
-};
+	u16 peek(offs_t offset) const { return m_ram[offset] & m_data_mask; }
 
-// ======================> mb8421_mb8431_16_device
+	void left_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 left_r(offs_t offset, u16 mem_mask = ~0);
+	void right_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 right_r(offs_t offset, u16 mem_mask = ~0);
 
-class mb8421_mb8431_16_device : public mb8421_master_device
-{
-public:
-	mb8421_mb8431_16_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
-
-	u16 peek(offs_t offset) const { return m_ram[offset & 0x7ff]; }
-
-	void left_w(offs_t offset, u16 data, u16 mem_mask = 0xffff);
-	u16 left_r(offs_t offset, u16 mem_mask = 0xffff);
-	void right_w(offs_t offset, u16 data, u16 mem_mask = 0xffff);
-	u16 right_r(offs_t offset, u16 mem_mask = 0xffff);
+  void ram_w(offs_t offset, u16 data, u16 mem_mask = ~0) { data &= m_data_mask; mem_mask &= m_data_mask; COMBINE_DATA(&m_ram[offset]); }
+  u16 ram_r(offs_t offset) { return m_ram[offset] & m_data_mask; }
 
 protected:
+	mb8421_master_16bit_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, size_t ram_size, u16 data_mask = ~0);
+
 	// device-level overrides
 	virtual void device_start() override;
 
@@ -153,8 +155,50 @@ private:
 	std::unique_ptr<u16[]> m_ram;
 };
 
+// ======================> mb8421_device
+
+class mb8421_device : public mb8421_master_8bit_device
+{
+public:
+	mb8421_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+};
+
+// ======================> idt7130_device
+
+class cy7c131_device : public mb8421_master_8bit_device
+{
+public:
+	cy7c131_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+};
+
+// ======================> idt7130_device
+
+class idt7130_device : public mb8421_master_8bit_device
+{
+public:
+	idt7130_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+};
+
+// ======================> idt71321_device
+
+class idt71321_device : public mb8421_master_8bit_device
+{
+public:
+	idt71321_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+};
+
+// ======================> mb8421_mb8431_16_device
+
+class mb8421_mb8431_16_device : public mb8421_master_16bit_device
+{
+public:
+	mb8421_mb8431_16_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+};
+
 // device type definition
 DECLARE_DEVICE_TYPE(MB8421, mb8421_device)
+DECLARE_DEVICE_TYPE(IDT7130, idt7130_device)
+DECLARE_DEVICE_TYPE(CY7C131, cy7c131_device)
 DECLARE_DEVICE_TYPE(IDT71321, idt71321_device)
 DECLARE_DEVICE_TYPE(MB8421_MB8431_16BIT, mb8421_mb8431_16_device)
 
