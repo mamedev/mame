@@ -576,7 +576,9 @@ private:
 
 	bitmap_ind8 m_priority_bitmap;
 	void setup_video_pages(int which, int tilesize, int vs, int hs, int y8, int x8, uint16_t* pagebases);
+	int get_address_for_tilepos(int x, int y, int tilesize, uint16_t* pagebases);
 
+	void draw_tile_pixline(int segment, int tile, int yy, int x, int y, int palbase, int pal, int is16pix_high, int is16pix_wide, int bpp, int depth, int opaque, int flipx, int flipy, screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
 	void draw_tile(int segment, int tile, int x, int y, int palbase, int pal, int is16pix_high, int is16pix_wide, int bpp, int depth, int opaque, int flipx, int flipy, screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
 	void draw_layer(int which, int opaque, screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
 	void draw_sprites(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
@@ -4269,13 +4271,12 @@ READ8_MEMBER(vt_vt1682_state::vt1682_soundcpu_2102_timer_a_enable_r)
 WRITE8_MEMBER(vt_vt1682_state::vt1682_soundcpu_2102_timer_a_enable_w)
 {
 	// For NTSC
-
 	//Period = (65536 - Timer _PreLoad) / 21.4772 MHz
-	//Timer PreLoad = 65536 � (Period in seconds) * 21.4772 * 1000000 )
+	//Timer PreLoad = 65536 - (Period in seconds) * 21.4772 * 1000000 )
 
 	// For PAL
 	// Period = (65536 - Timer PreLoad) / 26.601712 MHz
-	//Timer PreLoad = 65536 � (Period in seconds) * 26.601712 * 1000000 )
+	//Timer PreLoad = 65536 - (Period in seconds) * 26.601712 * 1000000 )
 
 	/*
 	uint16_t preload = (m_soundcpu_2101_timer_a_preload_15_8 << 8) | m_soundcpu_2100_timer_a_preload_7_0;
@@ -5023,14 +5024,16 @@ WRITE8_MEMBER(vt_vt1682_state::soundcpu_alu_oprand_6_div_w)
     0x01 - IOB PLH
 */
 
-
-void vt_vt1682_state::draw_tile(int segment, int tile, int x, int y, int palbase, int pal, int is16pix_high, int is16pix_wide, int bpp, int depth, int opaque, int flipx, int flipy, screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
+void vt_vt1682_state::draw_tile_pixline(int segment, int tile, int tileline, int x, int y, int palbase, int pal, int is16pix_high, int is16pix_wide, int bpp, int depth, int opaque, int flipx, int flipy, screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
 {
+	int tilesize_high = is16pix_high ? 16 : 8;
 
-	if (bpp == 3) pal = 0x0;
-	if (bpp == 2) pal &= 0xc;
-
+	if (y >= cliprect.min_y && y <= cliprect.max_y)
 	{
+
+		if (bpp == 3) pal = 0x0;
+		if (bpp == 2) pal &= 0xc;
+
 		int startaddress = segment;
 		int linebytes;
 
@@ -5068,89 +5071,90 @@ void vt_vt1682_state::draw_tile(int segment, int tile, int x, int y, int palbase
 			}
 		}
 		int tilesize_wide = is16pix_wide ? 16 : 8;
-		int tilesize_high = is16pix_high ? 16 : 8;
 
 		int tilebytes = linebytes * tilesize_high;
 
 		startaddress += tilebytes * tile;
 
-		for (int yy = 0; yy < tilesize_high; yy++) // tile y lines
+		int currentaddress;
+
+		if (!flipy)
+			currentaddress = startaddress + tileline * linebytes;
+		else
+			currentaddress = startaddress + ((tilesize_high - 1) - tileline) * linebytes;
+
+
+		uint32_t* dstptr = &bitmap.pix32(y);
+		uint8_t* priptr = &m_priority_bitmap.pix8(y);
+
+		int shift_amount, mask, bytes_in;
+		if (bpp == 3) // (8bpp)
 		{
-			int currentaddress;
+			shift_amount = 8;
+			mask = 0xff;
+			bytes_in = 4;
+		}
+		else if (bpp == 2) // (6bpp)
+		{
+			shift_amount = 6;
+			mask = 0x3f;
+			bytes_in = 3;
+		}
+		else // 1 / 0 (4bpp)
+		{
+			shift_amount = 4;
+			mask = 0x0f;
+			bytes_in = 2;
+		}
 
-			if (!flipy)
-				currentaddress = startaddress + yy * linebytes;
-			else
-				currentaddress = startaddress + ((tilesize_high - 1) - yy) * linebytes;
+		int xbase = x;;
 
-			int line = y + yy;
+		for (int xx = 0; xx < tilesize_wide; xx += 4) // tile x pixels
+		{
+			// draw 4 pixels
+			uint32_t pixdata = 0;
 
-			if (line >= cliprect.min_y && line <= cliprect.max_y)
+			int shift = 0;
+			for (int i = 0; i < bytes_in; i++)
 			{
-				uint32_t* dstptr = &bitmap.pix32(line);
-				uint8_t* priptr = &m_priority_bitmap.pix8(line);
+				pixdata |= m_fullrom->read8(currentaddress) << shift; currentaddress++;
+				shift += 8;
+			}
 
-				int shift_amount, mask, bytes_in;
-				if (bpp == 3) // (8bpp)
+			shift = 0;
+			for (int ii = 0; ii < 4; ii++)
+			{
+				uint8_t pen = (pixdata >> shift)& mask;
+				if (opaque || pen)
 				{
-					shift_amount = 8;
-					mask = 0xff;
-					bytes_in = 4;
-				}
-				else if (bpp == 2) // (6bpp)
-				{
-					shift_amount = 6;
-					mask = 0x3f;
-					bytes_in = 3;
-				}
-				else // 1 / 0 (4bpp)
-				{
-					shift_amount = 4;
-					mask = 0x0f;
-					bytes_in = 2;
-				}
+					int xdraw_real;
+					if (!flipx)
+						xdraw_real = xbase + xx + ii; // pixel position
+					else
+						xdraw_real = xbase + ((tilesize_wide - 1) - xx - ii);
 
-				int xbase = x;;
-
-				for (int xx = 0; xx < tilesize_wide; xx += 4) // tile x pixels
-				{
-					// draw 4 pixels
-					uint32_t pixdata = 0;
-
-					int shift = 0;
-					for (int i = 0; i < bytes_in; i++)
+					if (xdraw_real >= cliprect.min_x && xdraw_real <= cliprect.max_x)
 					{
-						pixdata |= m_fullrom->read8(currentaddress) << shift; currentaddress++;
-						shift += 8;
-					}
-
-					shift = 0;
-					for (int ii = 0; ii < 4; ii++)
-					{
-						uint8_t pen = (pixdata >> shift)& mask;
-						if (opaque || pen)
+						if (depth < priptr[xdraw_real])
 						{
-							int xdraw_real;
-							if (!flipx)
-								xdraw_real = xbase + xx + ii; // pixel position
-							else
-								xdraw_real = xbase + ((tilesize_wide - 1) - xx - ii);
-
-							if (xdraw_real >= cliprect.min_x && xdraw_real <= cliprect.max_x)
-							{
-								if (depth < priptr[xdraw_real])
-								{
-									const pen_t* paldata = m_palette->pens();
-									dstptr[xdraw_real] = paldata[(palbase + pen) | (pal << 4)];
-									priptr[xdraw_real] = depth;
-								}
-							}
+							const pen_t* paldata = m_palette->pens();
+							dstptr[xdraw_real] = paldata[(palbase + pen) | (pal << 4)];
+							priptr[xdraw_real] = depth;
 						}
-						shift += shift_amount;
 					}
 				}
+				shift += shift_amount;
 			}
 		}
+	}
+}
+void vt_vt1682_state::draw_tile(int segment, int tile, int x, int y, int palbase, int pal, int is16pix_high, int is16pix_wide, int bpp, int depth, int opaque, int flipx, int flipy, screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
+{
+	int tilesize_high = is16pix_high ? 16 : 8;
+
+	for (int yy = 0; yy < tilesize_high; yy++) // tile y lines
+	{
+		draw_tile_pixline(segment, tile, yy, x, y+yy, palbase, pal, is16pix_high, is16pix_wide, bpp, depth, opaque, flipx, flipy, screen, bitmap, cliprect);
 	}
 }
 
@@ -5369,6 +5373,90 @@ void vt_vt1682_state::setup_video_pages(int which, int tilesize, int vs, int hs,
 	}
 	*/
 }
+
+int vt_vt1682_state::get_address_for_tilepos(int x, int y, int tilesize, uint16_t* pagebases)
+{
+	if (!tilesize) // 8x8 mode
+	{
+		// in 8x8 mode each page is 32 tiles wide and 32 tiles high
+		// the pagebases structure is for 2x2 pages, so 64 tiles in each direction, pre-mirrored for smaller sizes
+		// each page is 0x800 bytes
+		// 0x40 bytes per line (0x2 bytes per tile, 0x20 tiles)
+
+		x &= 0x3f;
+		y &= 0x3f;
+
+		if (x & 0x20) // right set of pages
+		{
+			x &= 0x1f;
+			if (y & 0x20)// bottom set of pages
+			{
+				y &= 0x1f;
+				return pagebases[3] + (y * 0x20 * 0x02) + (x * 0x2);
+			}
+			else // top set of pages
+			{
+				y &= 0x1f;
+				return pagebases[1] + (y * 0x20 * 0x02) + (x * 0x2);
+			}
+		}
+		else // left set of pages
+		{
+			x &= 0x1f;
+			if (y & 0x20)// bottom set of pages
+			{
+				y &= 0x1f;
+				return pagebases[2] + (y * 0x20 * 0x02) + (x * 0x2);
+			}
+			else // top set of pages
+			{
+				y &= 0x1f;
+				return pagebases[0] + (y * 0x20 * 0x02) + (x * 0x2);
+			}
+		}
+	}
+	else // 16x16 mode
+	{
+		// in 16x16 mode each page is 16 tiles wide and 16 tiles high
+		// the pagebases structure is for 2x2 pages, so 32 tiles in each direction, pre-mirrored for smaller sizes
+		// each page is 0x100 bytes
+		// 0x10 bytes per line (0x2 bytes per tile, 0x10 tiles)
+		x &= 0x1f;
+		y &= 0x1f;
+
+		if (x & 0x10) // right set of pages
+		{
+			x &= 0x0f;
+			if (y & 0x10)// bottom set of pages
+			{
+				y &= 0x0f;
+				return pagebases[3] + (y * 0x10 * 0x02) + (x * 0x2);
+			}
+			else // top set of pages
+			{
+				y &= 0x0f;
+				return pagebases[1] + (y * 0x10 * 0x02) + (x * 0x2);
+			}
+		}
+		else // left set of pages
+		{
+			x &= 0x0f;
+			if (y & 0x10)// bottom set of pages
+			{
+				y &= 0x0f;
+				return pagebases[2] + (y * 0x10 * 0x02) + (x * 0x2);
+			}
+			else // top set of pages
+			{
+				y &= 0x0f;
+				return pagebases[0] + (y * 0x10 * 0x02) + (x * 0x2);
+			}
+		}
+	}
+	// should never get here
+	return 0x00;
+}
+
 /*
     Page Setups
 
@@ -5527,9 +5615,6 @@ void vt_vt1682_state::draw_layer(int which, int opaque, screen_device& screen, b
 
 		setup_video_pages(which, bk_tilesize, page_layout_v, page_layout_h, yscrollmsb, xscrollmsb, bases);
 
-		// until we implement scrolling, draw the top left page
-		int base = bases[0];
-
 		//logerror("layer %d bases %04x %04x %04x %04x (scrolls x:%02x y:%02x)\n", which, bases[0], bases[1], bases[2], bases[3], xscroll, yscroll);
 
 		if (!bk_line)
@@ -5537,12 +5622,9 @@ void vt_vt1682_state::draw_layer(int which, int opaque, screen_device& screen, b
 			// Character Mode
 			logerror("DRAWING ----- bk, Character Mode Segment base %08x, TileSize %1x Bpp %1x, Depth %1x Palette %1x PageLayout_V:%1x PageLayout_H:%1x XScroll %04x YScroll %04x\n", segment, bk_tilesize, bk_tilebpp, bk_depth, bk_palette, page_layout_v, page_layout_h, xscroll, yscroll);
 
-			int count = base;
-
-
 			int palselect;
 			if (which == 0) palselect = m_200f_bk_pal_sel & 0x03;
-			else palselect = (m_200f_bk_pal_sel & 0x0c)>>2;
+			else palselect = (m_200f_bk_pal_sel & 0x0c) >> 2;
 
 			int palbase;
 
@@ -5565,27 +5647,53 @@ void vt_vt1682_state::draw_layer(int which, int opaque, screen_device& screen, b
 				palbase = machine().rand() & 0xff;
 			}
 
-
-			for (int y = 0; y < (bk_tilesize ? 16 : 32); y++)
+			for (int y = 0; y < 240; y++)
 			{
-				for (int x = 0; x < (bk_tilesize ? 16 : 32); x++)
+				int ytile, ytileline;
+
+				int ywithscroll = y - yscroll;
+
+				if (bk_tilesize)
 				{
+					ytileline = ywithscroll & 0xf;
+					ytile = ywithscroll >> 4;
+
+				}
+				else
+				{
+					ytileline = ywithscroll & 0x07;
+					ytile = ywithscroll >> 3;
+				}
+
+				for (int xtile = -1; xtile < (bk_tilesize ? (16) : (32)); xtile++) // -1 due to possible need for partial tile during scrolling
+				{
+					int xscrolltile_part;
+					int xscrolltile;
+					if (bk_tilesize)
+					{
+						xscrolltile = xscroll >> 4;
+						xscrolltile_part = xscroll & 0x0f;
+					}
+					else
+					{
+						xscrolltile = xscroll >> 3;
+						xscrolltile_part = xscroll & 0x07;
+					}
+
+
+					int count = get_address_for_tilepos(xtile - xscrolltile, ytile, bk_tilesize, bases);
+
 					uint16_t word = m_vram->read8(count);
 					count++;
 					word |= m_vram->read8(count) << 8;
 					count++;
 
-					//int pal = 0;
 					int tile = word & 0x0fff;
 					uint8_t pal = (word & 0xf000) >> 12;
 
+					int xpos = xtile * (bk_tilesize ? 16 : 8);
 
-
-
-					int xpos = x * (bk_tilesize ? 16 : 8);
-					int ypos = y * (bk_tilesize ? 16 : 8);
-
-					draw_tile(segment, tile, xpos, ypos, palbase, pal, bk_tilesize, bk_tilesize, bk_tilebpp, (bk_depth*2)+1, opaque, 0, 0, screen, bitmap, cliprect);
+					draw_tile_pixline(segment, tile, ytileline, xpos + xscrolltile_part, y, palbase, pal, bk_tilesize, bk_tilesize, bk_tilebpp, (bk_depth * 2) + 1, opaque, 0, 0, screen, bitmap, cliprect);
 				}
 			}
 		}
