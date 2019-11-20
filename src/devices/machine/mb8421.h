@@ -79,7 +79,7 @@
 
 // ======================> dual_port_mailbox_ram_base
 
-template <typename Type>
+template <typename Type, unsigned AddrBits, unsigned DataBits>
 class dual_port_mailbox_ram_base : public device_t
 {
 public:
@@ -88,7 +88,7 @@ public:
 	auto intl_callback() { return m_intl_callback.bind(); }
 	auto intr_callback() { return m_intr_callback.bind(); }
 
-	Type peek(offs_t offset) const { return m_ram[offset & m_ram_mask]; }
+	Type peek(offs_t offset) const { return m_ram[offset & RAM_MASK]; }
 
 	//-------------------------------------------------
 	//  left_w - write access for left-side bus
@@ -97,8 +97,8 @@ public:
 
 	void left_w(offs_t offset, Type data, Type mem_mask = ~Type(0))
 	{
-		offset &= m_ram_mask;
-		data &= m_data_mask;
+		offset &= RAM_MASK;
+		data &= DATA_MASK;
 		COMBINE_DATA(&m_ram[offset]);
 		update_intr(read_or_write::WRITE, false, offset);
 	}
@@ -110,7 +110,7 @@ public:
 
 	Type left_r(offs_t offset)
 	{
-		offset &= m_ram_mask;
+		offset &= RAM_MASK;
 		update_intr(read_or_write::READ, false, offset);
 		return m_ram[offset];
 	}
@@ -122,8 +122,8 @@ public:
 
 	void right_w(offs_t offset, Type data, Type mem_mask = ~Type(0))
 	{
-		offset &= m_ram_mask;
-		data &= m_data_mask;
+		offset &= RAM_MASK;
+		data &= DATA_MASK;
 		COMBINE_DATA(&m_ram[offset]);
 		update_intr(read_or_write::WRITE, true, offset);
 	}
@@ -135,7 +135,7 @@ public:
 
 	Type right_r(offs_t offset)
 	{
-		offset &= m_ram_mask;
+		offset &= RAM_MASK;
 		update_intr(read_or_write::READ, true, offset);
 		return m_ram[offset];
 	}
@@ -143,14 +143,21 @@ public:
 	DECLARE_READ_LINE_MEMBER(busy_r) { return 0; } // _BUSY pin - not emulated
 
 protected:
-	dual_port_mailbox_ram_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, size_t addr_bits, u8 data_bits);
+	dual_port_mailbox_ram_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device-level overrides
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+private:
 	// internal helpers
+	static constexpr Type DATA_MASK = make_bitmask<Type>(DataBits); // for DPRAMs with 9/18/36bit data buses
+	static constexpr size_t RAM_SIZE = make_bitmask<offs_t>(AddrBits); // max RAM word size
+	static constexpr size_t RAM_MASK = RAM_SIZE - 1;
+	static constexpr size_t INT_ADDR_LEFT = RAM_MASK - 1; // max RAM word size - 2
+	static constexpr size_t INT_ADDR_RIGHT = RAM_MASK; // max RAM word size - 1
+
 	//-------------------------------------------------
 	//  update_intr - update interrupt lines upon
 	//  read or write accesses to special locations
@@ -161,19 +168,12 @@ protected:
 		if (machine().side_effects_disabled())
 			return;
 
-		if (row == read_or_write::WRITE && offset == (is_right ? m_int_addr_left : m_int_addr_right))
+		if (row == read_or_write::WRITE && offset == (is_right ? INT_ADDR_LEFT : INT_ADDR_RIGHT))
 			(is_right ? m_intl_callback : m_intr_callback)(ASSERT_LINE);
-		else if (row == read_or_write::READ && offset == (is_right ? m_int_addr_right : m_int_addr_left))
+		else if (row == read_or_write::READ && offset == (is_right ? INT_ADDR_RIGHT : INT_ADDR_LEFT))
 			(is_right ? m_intr_callback : m_intl_callback)(CLEAR_LINE);
 	}
 
-	const Type m_data_mask; // for DPRAMs with 9/18/36bit data buses
-	const size_t m_ram_size;
-	const size_t m_ram_mask;
-	const size_t m_int_addr_left;
-	const size_t m_int_addr_right;
-
-private:
 	devcb_write_line m_intl_callback;
 	devcb_write_line m_intr_callback;
 	std::unique_ptr<Type[]> m_ram;
@@ -181,7 +181,7 @@ private:
 
 // ======================> cy7c131_device
 
-class cy7c131_device : public dual_port_mailbox_ram_base<u8>
+class cy7c131_device : public dual_port_mailbox_ram_base<u8, 10, 8>
 {
 public:
 	cy7c131_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
@@ -189,7 +189,7 @@ public:
 
 // ======================> idt7130_device
 
-class idt7130_device : public dual_port_mailbox_ram_base<u8>
+class idt7130_device : public dual_port_mailbox_ram_base<u8, 10, 8>
 {
 public:
 	idt7130_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
@@ -197,7 +197,7 @@ public:
 
 // ======================> idt71321_device
 
-class idt71321_device : public dual_port_mailbox_ram_base<u8>
+class idt71321_device : public dual_port_mailbox_ram_base<u8, 11, 8>
 {
 public:
 	idt71321_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
@@ -205,7 +205,7 @@ public:
 
 // ======================> mb8421_device
 
-class mb8421_device : public dual_port_mailbox_ram_base<u8>
+class mb8421_device : public dual_port_mailbox_ram_base<u8, 11, 8>
 {
 public:
 	mb8421_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
@@ -213,7 +213,7 @@ public:
 
 // ======================> mb8421_mb8431_16_device
 
-class mb8421_mb8431_16_device : public dual_port_mailbox_ram_base<u16>
+class mb8421_mb8431_16_device : public dual_port_mailbox_ram_base<u16, 11, 16>
 {
 public:
 	mb8421_mb8431_16_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
