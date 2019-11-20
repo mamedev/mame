@@ -2880,6 +2880,8 @@ files {
 	MAME_DIR .. "src/mame/machine/vt1682_io.cpp",
 	MAME_DIR .. "src/mame/machine/vt1682_alu.h",
 	MAME_DIR .. "src/mame/machine/vt1682_alu.cpp",
+	MAME_DIR .. "src/mame/machine/vt1682_timer.h",
+	MAME_DIR .. "src/mame/machine/vt1682_timer.cpp",
 	MAME_DIR .. "src/mame/machine/m6502_vt1682.cpp",
 	MAME_DIR .. "src/mame/machine/m6502_vt1682.h",
 }

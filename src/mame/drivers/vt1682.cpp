@@ -14,6 +14,7 @@
 #include "machine/m6502_vt1682.h"
 #include "machine/vt1682_io.h"
 #include "machine/vt1682_alu.h"
+#include "machine/vt1682_timer.h"
 #include "machine/bankdev.h"
 #include "machine/timer.h"
 #include "sound/volt_reg.h"
@@ -42,6 +43,9 @@ public:
 		m_soundcpu(*this, "soundcpu"),
 		m_maincpu_alu(*this, "mainalu"),
 		m_soundcpu_alu(*this, "soundalu"),
+		m_soundcpu_timer_a_dev(*this, "snd_timera_dev"),
+		m_soundcpu_timer_b_dev(*this, "snd_timerb_dev"),
+		m_system_timer_dev(*this, "sys_timer_dev"),
 		m_screen(*this, "screen"),
 		m_fullrom(*this, "fullrom"),
 		m_spriteram(*this, "spriteram"),
@@ -69,6 +73,11 @@ private:
 	required_device<cpu_device> m_soundcpu;
 	required_device<vrt_vt1682_alu_device> m_maincpu_alu;
 	required_device<vrt_vt1682_alu_device> m_soundcpu_alu;
+
+	required_device<vrt_vt1682_timer_device> m_soundcpu_timer_a_dev;
+	required_device<vrt_vt1682_timer_device> m_soundcpu_timer_b_dev;
+	required_device<vrt_vt1682_timer_device> m_system_timer_dev;
+
 	required_device<screen_device> m_screen;
 	required_device<address_map_bank_device> m_fullrom;
 	required_device<address_map_bank_device> m_spriteram;
@@ -5417,20 +5426,31 @@ GFXDECODE_END
 // PAL M 21.453669MHz
 // PAL N 21.492336MHz
 
+#define MAIN_CPU_CLOCK_NTSC XTAL(21'477'272)/4
+#define SOUND_CPU_CLOCK_NTSC XTAL(21'477'272)
+
+#define MAIN_CPU_CLOCK_PAL XTAL(26'601'712)/5
+#define SOUND_CPU_CLOCK_PAL XTAL(26'601'712)
+
 
 void vt_vt1682_state::vt_vt1682(machine_config &config)
 {
 	/* basic machine hardware */
-	M6502_VT1682(config, m_maincpu, XTAL(21'477'272)/4);
+	M6502_VT1682(config, m_maincpu, MAIN_CPU_CLOCK_NTSC);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vt_vt1682_state::vt_vt1682_map);
 	m_maincpu->set_vblank_int("screen", FUNC(vt_vt1682_state::nmi));
 
-	M6502(config, m_soundcpu, XTAL(21'477'272));
+	M6502(config, m_soundcpu, SOUND_CPU_CLOCK_NTSC);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &vt_vt1682_state::vt_vt1682_sound_map);
 
 	VT_VT1682_ALU(config, m_maincpu_alu, 0);
 	VT_VT1682_ALU(config, m_soundcpu_alu, 0);
 	m_soundcpu_alu->set_sound_alu(); // different logging conditions
+
+	VT_VT1682_TIMER(config, m_soundcpu_timer_a_dev, SOUND_CPU_CLOCK_NTSC);
+	m_soundcpu_timer_a_dev->set_sound_timer(); // different logging conditions
+	VT_VT1682_TIMER(config, m_soundcpu_timer_b_dev, SOUND_CPU_CLOCK_NTSC);
+	VT_VT1682_TIMER(config, m_system_timer_dev, MAIN_CPU_CLOCK_NTSC);
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
