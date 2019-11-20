@@ -256,16 +256,10 @@ uint8_t spectrum_plusd_device::iorq_r(offs_t offset)
 		switch (offset & 0xff)
 		{
 		case 0xe3: // fdc status reg
-			data = m_fdc->read(0);
-			break;
 		case 0xeb: // fdc track reg
-			data = m_fdc->read(1);
-			break;
 		case 0xf3: // fdc sector reg
-			data = m_fdc->read(2);
-			break;
 		case 0xfb: // fdc data reg
-			data = m_fdc->read(3);
+			data = m_fdc->read((offset >> 3) & 0x03);
 			break;
 		case 0xe7: // page in
 			m_romcs = 1;
@@ -286,16 +280,10 @@ void spectrum_plusd_device::iorq_w(offs_t offset, uint8_t data)
 		switch (offset & 0xff)
 		{
 		case 0xe3: // fdc command reg
-			m_fdc->write(0, data);
-			break;
 		case 0xeb: // fdc track reg
-			m_fdc->write(1, data);
-			break;
 		case 0xf3: // fdc sector reg
-			m_fdc->write(2, data);
-			break;
 		case 0xfb: // fdc data reg
-			m_fdc->write(3, data);
+			m_fdc->write((offset >> 3) & 0x03, data);
 			break;
 		case 0xef: // bit 0-1: drive select, 6: printer strobe, 7: side select
 			{

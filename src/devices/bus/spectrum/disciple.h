@@ -56,9 +56,8 @@ private:
 	required_device_array<floppy_connector, 2> m_floppy;
 	required_device<centronics_device> m_centronics;
 	required_device<spectrum_expansion_slot_device> m_exp;
-	required_ioport m_kjoy;
-	required_ioport m_sjoy1;
-	required_ioport m_sjoy2;
+	required_ioport m_joy1;
+	required_ioport m_joy2;
 
 	int m_romcs;
 	uint8_t m_ram[8 * 1024];

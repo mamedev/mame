@@ -122,21 +122,14 @@ INPUT_PORTS_START(disciple)
 	// Joystick 1 (right hand) is both Kempston (port 0x1f) and Sinclair 1 (keys 6,7,8,9,0)
 	// Joystick 2 (left hand) is Sinclair 2 (keys 1,2,3,4,5)
 	
-	PORT_START("KJOY") /* Kempston 0x1f */
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT) PORT_8WAY PORT_PLAYER(1) PORT_NAME("Kempston Right")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT)  PORT_8WAY PORT_PLAYER(1) PORT_NAME("Kempston Left")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN)  PORT_8WAY PORT_PLAYER(1) PORT_NAME("Kempston Down")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP)    PORT_8WAY PORT_PLAYER(1) PORT_NAME("Kempston Up")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON1)                  PORT_PLAYER(1) PORT_NAME("Kempston Button 1")
-
-	PORT_START("SJOY1") /* Sinclair 1 (keys 6,7,8,9,0) 0xeffe */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1)                  PORT_PLAYER(1) PORT_NAME("Sinclair P1 Button 1")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_8WAY PORT_PLAYER(1) PORT_NAME("Sinclair P1 Up")
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_8WAY PORT_PLAYER(1) PORT_NAME("Sinclair P1 Down")
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_8WAY PORT_PLAYER(1) PORT_NAME("Sinclair P1 Right")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_8WAY PORT_PLAYER(1) PORT_NAME("Sinclair P1 Left")
+	PORT_START("JOY1") /* Sinclair 1 (keys 6,7,8,9,0) 0xeffe , Kempston 0x1f */
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1)                  PORT_PLAYER(1) PORT_NAME("Kempston\\Sinclair P1 Button 1")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_8WAY PORT_PLAYER(1) PORT_NAME("Kempston\\Sinclair P1 Up")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_8WAY PORT_PLAYER(1) PORT_NAME("Kempston\\Sinclair P1 Down")
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_8WAY PORT_PLAYER(1) PORT_NAME("Kempston\\Sinclair P1 Right")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_8WAY PORT_PLAYER(1) PORT_NAME("Kempston\\Sinclair P1 Left")
 	
-	PORT_START("SJOY2") /* Sinclair 2 (keys 1,2,3,4,5) 0xf7fe */
+	PORT_START("JOY2") /* Sinclair 2 (keys 1,2,3,4,5) 0xf7fe */
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_8WAY PORT_PLAYER(2) PORT_NAME("Sinclair P2 Left")     PORT_CODE(KEYCODE_4_PAD)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_8WAY PORT_PLAYER(2) PORT_NAME("Sinclair P2 Right")    PORT_CODE(KEYCODE_6_PAD)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_8WAY PORT_PLAYER(2) PORT_NAME("Sinclair P2 Down")     PORT_CODE(KEYCODE_2_PAD)
@@ -239,9 +232,8 @@ spectrum_disciple_device::spectrum_disciple_device(const machine_config &mconfig
 	, m_floppy(*this, "fdc:%u", 0)
 	, m_centronics(*this, "centronics")
 	, m_exp(*this, "exp")
-	, m_kjoy(*this, "KJOY")
-	, m_sjoy1(*this, "SJOY1")
-	, m_sjoy2(*this, "SJOY2")
+	, m_joy1(*this, "JOY1")
+	, m_joy2(*this, "JOY2")
 {
 }
 
@@ -307,20 +299,15 @@ uint8_t spectrum_disciple_device::iorq_r(offs_t offset)
 		switch (offset & 0xff)
 		{
 		case 0x1b: // fdc status reg
-			data = m_fdc->read(0);
-			break;
 		case 0x5b: // fdc track reg
-			data = m_fdc->read(1);
-			break;
 		case 0x9b: // fdc sector reg
-			data = m_fdc->read(2);
-			break;
 		case 0xdb: // fdc data reg
-			data = m_fdc->read(3);
+			data = m_fdc->read((offset >> 6) & 0x03);
 			break;
 		case 0x1f: // bit 0-4: kempston joystick, bit 6: printer busy, bit 7: network
-			data = m_kjoy->read() & 0x1f;
+			data = bitswap<8>(~m_joy1->read(), 7, 6, 5, 0, 1, 2, 4, 3 ) & 0x1f;
 			data |= !m_centronics_busy << 6;  // inverted by IC10 74ls240
+			// 7: network...
 			break;
 		case 0x7b: // reset boot
 			m_map = false;
@@ -330,9 +317,9 @@ uint8_t spectrum_disciple_device::iorq_r(offs_t offset)
 			break;
 		case 0xfe: // sinclair joysticks
 			if (((offset >> 8) & 16) == 0)
-				data = m_sjoy1->read() | (0xff ^ 0x1f);
+				data = m_joy1->read() | (0xff ^ 0x1f);
 			if (((offset >> 8) & 8) == 0)
-				data = m_sjoy2->read() | (0xff ^ 0x1f);
+				data = m_joy2->read() | (0xff ^ 0x1f);
 			break;
 		}
 	}
@@ -347,16 +334,10 @@ void spectrum_disciple_device::iorq_w(offs_t offset, uint8_t data)
 		switch (offset & 0xff)
 		{
 		case 0x1b: // fdc command reg
-			m_fdc->write(0, data);
-			break;
 		case 0x5b: // fdc track reg
-			m_fdc->write(1, data);
-			break;
 		case 0x9b: // fdc sector reg
-			m_fdc->write(2, data);
-			break;
 		case 0xdb: // fdc data reg
-			m_fdc->write(3, data);
+			m_fdc->write((offset >> 6) & 0x03, data);
 			break;
 		case 0x1f: // bit 0: drive select, 1: side select, 2: density, 3: rom bank, 4: inhibit switch control, 5: exp select, 6: printer strobe, 7: network
 			{
