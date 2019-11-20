@@ -144,6 +144,7 @@ Keyboard Mania 2nd Mix - dongle, program CD, audio CD
 #include "cpu/powerpc/ppc.h"
 #include "machine/ins8250.h"
 #include "machine/intelfsh.h"
+#include "machine/mb8421.h"
 #include "machine/midikbd.h"
 #include "machine/rtc65271.h"
 #include "machine/timer.h"
@@ -172,7 +173,7 @@ struct IBUTTON
 };
 
 
-#define PRINT_SPU_MEM 0
+//#define PRINT_SPU_MEM 0
 
 class firebeat_state : public driver_device
 {
@@ -187,6 +188,7 @@ public:
 		m_kbd(*this, "kbd%u", 0),
 		m_ata(*this, "ata"),
 		m_gcu(*this, "gcu%u", 0),
+		m_dpram(*this, "spuram"),
 		m_spuata(*this, "spu_ata")
 	{ }
 
@@ -207,6 +209,7 @@ private:
 	optional_device_array<midi_keyboard_device, 2> m_kbd;
 	required_device<ata_interface_device> m_ata;
 	optional_device_array<k057714_device, 2> m_gcu;
+	optional_device<cy7c131_device> m_dpram;
 	optional_device<ata_interface_device> m_spuata;
 
 	uint8_t m_extend_board_irq_enable;
@@ -216,7 +219,6 @@ private:
 	int m_cab_data_ptr;
 	const int * m_cur_cab_data;
 //  int m_keyboard_state[2];
-	uint8_t m_spu_shared_ram[0x400];
 	IBUTTON m_ibutton;
 	int m_ibutton_state;
 	int m_ibutton_read_subkey_ptr;
@@ -250,14 +252,10 @@ private:
 	DECLARE_WRITE32_MEMBER(lamp_output2_ppp_w);
 	DECLARE_WRITE32_MEMBER(lamp_output3_w);
 	DECLARE_WRITE32_MEMBER(lamp_output3_ppp_w);
-	DECLARE_READ32_MEMBER(ppc_spu_share_r);
-	DECLARE_WRITE32_MEMBER(ppc_spu_share_w);
 	DECLARE_READ16_MEMBER(spu_unk_r);
 	DECLARE_WRITE16_MEMBER(spu_irq_ack_w);
 	DECLARE_WRITE16_MEMBER(spu_220000_w);
 	DECLARE_WRITE16_MEMBER(spu_sdram_bank_w);
-	DECLARE_READ16_MEMBER(m68k_spu_share_r);
-	DECLARE_WRITE16_MEMBER(m68k_spu_share_w);
 	DECLARE_WRITE_LINE_MEMBER(spu_ata_interrupt);
 //  TIMER_CALLBACK_MEMBER(keyboard_timer_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(spu_timer_callback);
@@ -274,6 +272,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(gcu1_interrupt);
 	static void cdrom_config(device_t *device);
 	void firebeat_map(address_map &map);
+	void firebeat_spu_map(address_map &map);
 	void firebeat2_map(address_map &map);
 	void spu_map(address_map &map);
 	void ymz280b_map(address_map &map);
@@ -765,76 +764,6 @@ WRITE32_MEMBER(firebeat_state::lamp_output3_ppp_w )
 /*****************************************************************************/
 
 
-READ32_MEMBER(firebeat_state::ppc_spu_share_r)
-{
-	uint32_t r = 0;
-
-#if PRINT_SPU_MEM
-	printf("ppc_spu_share_r: %08X, %08X at %08X\n", offset, mem_mask, m_maincpu->pc());
-#endif
-
-	if (ACCESSING_BITS_24_31)
-	{
-		r |= m_spu_shared_ram[(offset * 4) + 0] << 24;
-	}
-	if (ACCESSING_BITS_16_23)
-	{
-		r |= m_spu_shared_ram[(offset * 4) + 1] << 16;
-	}
-	if (ACCESSING_BITS_8_15)
-	{
-		r |= m_spu_shared_ram[(offset * 4) + 2] <<  8;
-	}
-	if (ACCESSING_BITS_0_7)
-	{
-		r |= m_spu_shared_ram[(offset * 4) + 3] <<  0;
-
-		if (offset == 0xff)     // address 0x3ff clears PPC interrupt
-		{
-			m_maincpu->set_input_line(INPUT_LINE_IRQ3, CLEAR_LINE);
-		}
-	}
-
-	return r;
-}
-
-WRITE32_MEMBER(firebeat_state::ppc_spu_share_w)
-{
-#if PRINT_SPU_MEM
-	printf("ppc_spu_share_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, m_maincpu->pc());
-#endif
-
-	if (ACCESSING_BITS_24_31)
-	{
-		m_spu_shared_ram[(offset * 4) + 0] = (data >> 24) & 0xff;
-	}
-	if (ACCESSING_BITS_16_23)
-	{
-		m_spu_shared_ram[(offset * 4) + 1] = (data >> 16) & 0xff;
-	}
-	if (ACCESSING_BITS_8_15)
-	{
-		m_spu_shared_ram[(offset * 4) + 2] = (data >>  8) & 0xff;
-
-		if (offset == 0xff)     // address 0x3fe triggers M68K interrupt
-		{
-			m_audiocpu->set_input_line(INPUT_LINE_IRQ4, ASSERT_LINE);
-
-			printf("SPU command %02X%02X\n", m_spu_shared_ram[0], m_spu_shared_ram[1]);
-
-			uint16_t cmd = ((uint16_t)(m_spu_shared_ram[0]) << 8) | m_spu_shared_ram[1];
-			if (cmd == 0x1110)
-			{
-				printf("   [%02X %02X %02X %02X %02X]\n", m_spu_shared_ram[0x10], m_spu_shared_ram[0x11], m_spu_shared_ram[0x12], m_spu_shared_ram[0x13], m_spu_shared_ram[0x14]);
-			}
-		}
-	}
-	if (ACCESSING_BITS_0_7)
-	{
-		m_spu_shared_ram[(offset * 4) + 3] = (data >>  0) & 0xff;
-	}
-}
-
 /*  SPU board M68K IRQs
 
     IRQ1: ?
@@ -846,41 +775,6 @@ WRITE32_MEMBER(firebeat_state::ppc_spu_share_w)
 
     IRQ6: ATA
 */
-
-READ16_MEMBER(firebeat_state::m68k_spu_share_r)
-{
-#if PRINT_SPU_MEM
-	printf("m68k_spu_share_r: %08X, %08X\n", offset, mem_mask);
-#endif
-	uint16_t r = 0;
-
-	if (ACCESSING_BITS_0_7)
-	{
-		r |= m_spu_shared_ram[offset];
-
-		if (offset == 0x3fe)            // address 0x3fe clears M68K interrupt
-		{
-			m_audiocpu->set_input_line(INPUT_LINE_IRQ4, CLEAR_LINE);
-		}
-	}
-	return r;
-}
-
-WRITE16_MEMBER(firebeat_state::m68k_spu_share_w)
-{
-#if PRINT_SPU_MEM
-	printf("m68k_spu_share_w: %04X, %08X, %08X\n", data, offset, mem_mask);
-#endif
-	if (ACCESSING_BITS_0_7)
-	{
-		m_spu_shared_ram[offset] = data & 0xff;
-
-		if (offset == 0x3ff)            // address 0x3ff triggers PPC interrupt
-		{
-			m_maincpu->set_input_line(INPUT_LINE_IRQ3, ASSERT_LINE);
-		}
-	}
-}
 
 READ16_MEMBER(firebeat_state::spu_unk_r)
 {
@@ -943,7 +837,7 @@ void firebeat_state::firebeat_map(address_map &map)
 	map(0x70006000, 0x70006003).w(FUNC(firebeat_state::extend_board_irq_w));
 	map(0x70008000, 0x7000800f).r(FUNC(firebeat_state::keyboard_wheel_r));
 	map(0x7000a000, 0x7000a003).r(FUNC(firebeat_state::extend_board_irq_r));
-	map(0x74000000, 0x740003ff).rw(FUNC(firebeat_state::ppc_spu_share_r), FUNC(firebeat_state::ppc_spu_share_w)); // SPU shared RAM
+	map(0x74000000, 0x740003ff).noprw(); // SPU shared RAM
 	map(0x7d000200, 0x7d00021f).r(FUNC(firebeat_state::cabinet_r));
 	map(0x7d000340, 0x7d000347).r(FUNC(firebeat_state::sensor_r));
 	map(0x7d000400, 0x7d000401).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write));
@@ -960,6 +854,12 @@ void firebeat_state::firebeat_map(address_map &map)
 	map(0x7ff80000, 0x7fffffff).rom().region("user1", 0);       /* System BIOS */
 }
 
+void firebeat_state::firebeat_spu_map(address_map &map)
+{
+	firebeat_map(map);
+	map(0x74000000, 0x740003ff).rw(m_dpram, FUNC(cy7c131_device::right_r), FUNC(cy7c131_device::right_w)); // SPU shared RAM
+}
+
 void firebeat_state::firebeat2_map(address_map &map)
 {
 	firebeat_map(map);
@@ -974,7 +874,7 @@ void firebeat_state::spu_map(address_map &map)
 	map(0x220000, 0x220001).w(FUNC(firebeat_state::spu_220000_w));
 	map(0x230000, 0x230001).w(FUNC(firebeat_state::spu_irq_ack_w));
 	map(0x260000, 0x260001).w(FUNC(firebeat_state::spu_sdram_bank_w));
-	map(0x280000, 0x2807ff).rw(FUNC(firebeat_state::m68k_spu_share_r), FUNC(firebeat_state::m68k_spu_share_w));
+	map(0x280000, 0x2807ff).rw(m_dpram, FUNC(cy7c131_device::left_r), FUNC(cy7c131_device::left_w)).umask16(0x00ff);
 	map(0x300000, 0x30000f).rw(m_spuata, FUNC(ata_interface_device::cs0_r), FUNC(ata_interface_device::cs0_w));
 	map(0x340000, 0x34000f).rw(m_spuata, FUNC(ata_interface_device::cs1_r), FUNC(ata_interface_device::cs1_w));
 	map(0x400000, 0x400fff).rw("rf5c400", FUNC(rf5c400_device::rf5c400_r), FUNC(rf5c400_device::rf5c400_w));
@@ -1306,8 +1206,14 @@ void firebeat_state::firebeat_spu(machine_config &config)
 	firebeat(config);
 
 	/* basic machine hardware */
+	m_maincpu->set_addrmap(AS_PROGRAM, &firebeat_state::firebeat_spu_map);
+
 	M68000(config, m_audiocpu, 16000000);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &firebeat_state::spu_map);
+
+	CY7C131(config, m_dpram);
+	m_dpram->intl_callback().set_inputline(m_audiocpu, INPUT_LINE_IRQ4); // address 0x3fe triggers M68K interrupt
+	m_dpram->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ3); // address 0x3ff triggers PPC interrupt
 
 	TIMER(config, "sputimer").configure_periodic(FUNC(firebeat_state::spu_timer_callback), attotime::from_hz(1000));
 
