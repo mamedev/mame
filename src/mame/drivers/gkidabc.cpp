@@ -5,6 +5,10 @@
     Genius KID ABC Fan
     Mis Primeras Lecciones
 
+    Other known undumped international versions:
+    - Genius Junior Profi (German version of Mis Primeras Lecciones)
+    - Smart Start Elite (English version of Genius Junior Profi)
+
     TODO: identify CPU type (16-bit processor internally, but with 8-bit external bus?)
     It might be that the dumped ROMs contain no actual code, only graphics data and
     sound samples.
