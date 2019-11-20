@@ -21,16 +21,16 @@ public:
 	// so that we can filter logging, sound timer gets used hundreds of times a frame, so logging it is unwise
 	void set_sound_timer() { m_is_sound_timer = true; }
 
-	DECLARE_READ8_MEMBER(vt1682_soundcpu_2100_timer_a_preload_7_0_r);
-	DECLARE_WRITE8_MEMBER(vt1682_soundcpu_2100_timer_a_preload_7_0_w);
+	DECLARE_READ8_MEMBER(vt1682_timer_preload_7_0_r);
+	DECLARE_WRITE8_MEMBER(vt1682_timer_preload_7_0_w);
 
-	DECLARE_READ8_MEMBER(vt1682_soundcpu_2101_timer_a_preload_15_8_r);
-	DECLARE_WRITE8_MEMBER(vt1682_soundcpu_2101_timer_a_preload_15_8_w);
+	DECLARE_READ8_MEMBER(vt1682_timer_preload_15_8_r);
+	DECLARE_WRITE8_MEMBER(vt1682_timer_preload_15_8_w);
 
-	DECLARE_READ8_MEMBER(vt1682_soundcpu_2102_timer_a_enable_r);
-	DECLARE_WRITE8_MEMBER(vt1682_soundcpu_2102_timer_a_enable_w);
+	DECLARE_READ8_MEMBER(vt1682_timer_enable_r);
+	DECLARE_WRITE8_MEMBER(vt1682_timer_enable_w);
 
-	DECLARE_WRITE8_MEMBER(vt1682_soundcpu_2103_timer_a_irqclear_w);
+	DECLARE_WRITE8_MEMBER(vt1682_timer_irqclear_w);
 
 
 protected:
@@ -40,14 +40,14 @@ protected:
 
 private:
 	bool m_is_sound_timer;
-	required_device<timer_device> m_soundcpu_timer_a;
+	required_device<timer_device> m_timer;
 
 
-	uint8_t m_soundcpu_2100_timer_a_preload_7_0;
-	uint8_t m_soundcpu_2101_timer_a_preload_15_8;
-	uint8_t m_soundcpu_2102_timer_a_enable;
+	uint8_t m_timer_preload_7_0;
+	uint8_t m_timer_preload_15_8;
+	uint8_t m_timer_enable;
 
-	TIMER_DEVICE_CALLBACK_MEMBER(soundcpu_timer_a_expired);
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_expired);
 
 	devcb_write_line m_irq_cb;
 };

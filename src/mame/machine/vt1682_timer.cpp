@@ -17,25 +17,25 @@ DEFINE_DEVICE_TYPE(VT_VT1682_TIMER, vrt_vt1682_timer_device, "vt1682timer", "VRT
 
 vrt_vt1682_timer_device::vrt_vt1682_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, VT_VT1682_TIMER, tag, owner, clock),
-	m_soundcpu_timer_a(*this, "snd_timera"),
+	m_timer(*this, "snd_timera"),
 	m_irq_cb(*this)
 {
 }
 
 void vrt_vt1682_timer_device::device_start()
 {
-	save_item(NAME(m_soundcpu_2100_timer_a_preload_7_0));
-	save_item(NAME(m_soundcpu_2101_timer_a_preload_15_8));
-	save_item(NAME(m_soundcpu_2102_timer_a_enable));
+	save_item(NAME(m_timer_preload_7_0));
+	save_item(NAME(m_timer_preload_15_8));
+	save_item(NAME(m_timer_enable));
 
 	m_irq_cb.resolve();
 }
 
 void vrt_vt1682_timer_device::device_reset()
 {
-	m_soundcpu_2100_timer_a_preload_7_0 = 0;
-	m_soundcpu_2101_timer_a_preload_15_8 = 0;
-	m_soundcpu_2102_timer_a_enable = 0;
+	m_timer_preload_7_0 = 0;
+	m_timer_preload_15_8 = 0;
+	m_timer_enable = 0;
 }
 
 
@@ -56,17 +56,17 @@ void vrt_vt1682_timer_device::device_reset()
     0x01 - Timer xx Preload:0
 */
 
-READ8_MEMBER(vrt_vt1682_timer_device::vt1682_soundcpu_2100_timer_a_preload_7_0_r)
+READ8_MEMBER(vrt_vt1682_timer_device::vt1682_timer_preload_7_0_r)
 {
-	uint8_t ret = m_soundcpu_2100_timer_a_preload_7_0;
-	if (!m_is_sound_timer) LOGMASKED(LOG_TIMER,"%s: vt1682_soundcpu_2100_timer_a_preload_7_0_r returning: %02x\n", machine().describe_context(), ret);
+	uint8_t ret = m_timer_preload_7_0;
+	if (!m_is_sound_timer) LOGMASKED(LOG_TIMER,"%s: vt1682_timer_preload_7_0_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vrt_vt1682_timer_device::vt1682_soundcpu_2100_timer_a_preload_7_0_w)
+WRITE8_MEMBER(vrt_vt1682_timer_device::vt1682_timer_preload_7_0_w)
 {
-	if (!m_is_sound_timer) LOGMASKED(LOG_TIMER,"%s: vt1682_soundcpu_2100_timer_a_preload_7_0_w writing: %02x\n", machine().describe_context(), data);
-	m_soundcpu_2100_timer_a_preload_7_0 = data;
+	if (!m_is_sound_timer) LOGMASKED(LOG_TIMER,"%s: vt1682_timer_preload_7_0_w writing: %02x\n", machine().describe_context(), data);
+	m_timer_preload_7_0 = data;
 }
 
 
@@ -86,17 +86,17 @@ WRITE8_MEMBER(vrt_vt1682_timer_device::vt1682_soundcpu_2100_timer_a_preload_7_0_
     0x01 - Timer xx Preload:8
 */
 
-READ8_MEMBER(vrt_vt1682_timer_device::vt1682_soundcpu_2101_timer_a_preload_15_8_r)
+READ8_MEMBER(vrt_vt1682_timer_device::vt1682_timer_preload_15_8_r)
 {
-	uint8_t ret = m_soundcpu_2101_timer_a_preload_15_8;
-	if (!m_is_sound_timer) LOGMASKED(LOG_TIMER,"%s: vt1682_soundcpu_2101_timer_a_preload_15_8_r returning: %02x\n", machine().describe_context(), ret);
+	uint8_t ret = m_timer_preload_15_8;
+	if (!m_is_sound_timer) LOGMASKED(LOG_TIMER,"%s: vt1682_timer_preload_15_8_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vrt_vt1682_timer_device::vt1682_soundcpu_2101_timer_a_preload_15_8_w)
+WRITE8_MEMBER(vrt_vt1682_timer_device::vt1682_timer_preload_15_8_w)
 {
-	if (!m_is_sound_timer) LOGMASKED(LOG_TIMER,"%s: vt1682_soundcpu_2101_timer_a_preload_15_8_w writing: %02x\n", machine().describe_context(), data);
-	m_soundcpu_2101_timer_a_preload_15_8 = data;
+	if (!m_is_sound_timer) LOGMASKED(LOG_TIMER,"%s: vt1682_timer_preload_15_8_w writing: %02x\n", machine().describe_context(), data);
+	m_timer_preload_15_8 = data;
 }
 
 
@@ -116,14 +116,14 @@ WRITE8_MEMBER(vrt_vt1682_timer_device::vt1682_soundcpu_2101_timer_a_preload_15_8
     0x01 - TMRxx EN
 */
 
-READ8_MEMBER(vrt_vt1682_timer_device::vt1682_soundcpu_2102_timer_a_enable_r)
+READ8_MEMBER(vrt_vt1682_timer_device::vt1682_timer_enable_r)
 {
-	uint8_t ret = m_soundcpu_2102_timer_a_enable;
-	if (!m_is_sound_timer) LOGMASKED(LOG_TIMER,"%s: vt1682_soundcpu_2102_timer_a_enable_r returning: %02x\n", machine().describe_context(), ret);
+	uint8_t ret = m_timer_enable;
+	if (!m_is_sound_timer) LOGMASKED(LOG_TIMER,"%s: vt1682_timer_enable_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(vrt_vt1682_timer_device::vt1682_soundcpu_2102_timer_a_enable_w)
+WRITE8_MEMBER(vrt_vt1682_timer_device::vt1682_timer_enable_w)
 {
 	// Timer A notes
 	// For NTSC
@@ -135,7 +135,7 @@ WRITE8_MEMBER(vrt_vt1682_timer_device::vt1682_soundcpu_2102_timer_a_enable_w)
 	//Timer PreLoad = 65536 - (Period in seconds) * 26.601712 * 1000000 )
 
 	/*
-	uint16_t preload = (m_soundcpu_2101_timer_a_preload_15_8 << 8) | m_soundcpu_2100_timer_a_preload_7_0;
+	uint16_t preload = (m_timer_preload_15_8 << 8) | m_timer_preload_7_0;
 
 	double newval = 65536 - preload;
 	double soundclock = m_soundcpu->clock();
@@ -147,23 +147,23 @@ WRITE8_MEMBER(vrt_vt1682_timer_device::vt1682_soundcpu_2102_timer_a_enable_w)
 	*/
 
 
-	if (!m_is_sound_timer) LOGMASKED(LOG_TIMER, "%s: vt1682_soundcpu_2102_timer_a_enable_w writing: %02x\n", machine().describe_context(), data);
-	m_soundcpu_2102_timer_a_enable = data;
+	if (!m_is_sound_timer) LOGMASKED(LOG_TIMER, "%s: vt1682_timer_enable_w writing: %02x\n", machine().describe_context(), data);
+	m_timer_enable = data;
 
-	if (m_soundcpu_2102_timer_a_enable & 0x01)
+	if (m_timer_enable & 0x01)
 	{
-		m_soundcpu_timer_a->adjust(attotime::from_hz(16000), 0, attotime::from_hz(16000));
+		m_timer->adjust(attotime::from_hz(16000), 0, attotime::from_hz(16000));
 	}
 	else
 	{
-		m_soundcpu_timer_a->adjust(attotime::never);
+		m_timer->adjust(attotime::never);
 	}
 
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(vrt_vt1682_timer_device::soundcpu_timer_a_expired)
+TIMER_DEVICE_CALLBACK_MEMBER(vrt_vt1682_timer_device::timer_expired)
 {
-	if (m_soundcpu_2102_timer_a_enable & 0x02)
+	if (m_timer_enable & 0x02)
 	{
 		m_irq_cb(true);
 	}
@@ -186,13 +186,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(vrt_vt1682_timer_device::soundcpu_timer_a_expired)
 
 */
 
-WRITE8_MEMBER(vrt_vt1682_timer_device::vt1682_soundcpu_2103_timer_a_irqclear_w)
+WRITE8_MEMBER(vrt_vt1682_timer_device::vt1682_timer_irqclear_w)
 {
-	//if (!m_is_sound_timer) LOGMASKED(LOG_TIMER,"%s: vt1682_soundcpu_2103_timer_a_irqclear_w writing: %02x\n", machine().describe_context(), data);
+	//if (!m_is_sound_timer) LOGMASKED(LOG_TIMER,"%s: vt1682_timer_irqclear_w writing: %02x\n", machine().describe_context(), data);
 	m_irq_cb(false);
 }
 
 void vrt_vt1682_timer_device::device_add_mconfig(machine_config& config)
 {
-	TIMER(config, m_soundcpu_timer_a).configure_periodic(FUNC(vrt_vt1682_timer_device::soundcpu_timer_a_expired), attotime::never);
+	TIMER(config, m_timer).configure_periodic(FUNC(vrt_vt1682_timer_device::timer_expired), attotime::never);
 }
