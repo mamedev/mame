@@ -20,17 +20,17 @@
 #include "ui/selsoft.h"
 #include "ui/ui.h"
 
-#include "../info.h"
+#include "infoxml.h"
+#include "luaengine.h"
+#include "mame.h"
 
 #include "audit.h"
 #include "drivenum.h"
 #include "emuopts.h"
-#include "mame.h"
 #include "rendutil.h"
 #include "romload.h"
 #include "softlist_dev.h"
 #include "uiinput.h"
-#include "luaengine.h"
 
 #include <atomic>
 #include <condition_variable>

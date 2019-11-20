@@ -239,6 +239,9 @@ menu_input::menu_input(mame_ui_manager &mui, render_container &container)
 	: menu(mui, container)
 	, data()
 	, pollingitem(nullptr)
+	, seq_poll(machine().input())
+	, errormsg()
+	, erroritem(nullptr)
 	, lastitem(nullptr)
 	, record_next(false)
 {
@@ -255,12 +258,9 @@ menu_input::~menu_input()
 
 void menu_input::toggle_none_default(input_seq &selected_seq, input_seq &original_seq, const input_seq &selected_defseq)
 {
-	/* if we used to be "none", toggle to the default value */
-	if (original_seq.length() == 0)
+	if (original_seq.empty()) // if we used to be "none", toggle to the default value
 		selected_seq = selected_defseq;
-
-	/* otherwise, toggle to "none" */
-	else
+	else // otherwise, toggle to "none"
 		selected_seq.reset();
 }
 
@@ -268,14 +268,44 @@ void menu_input::custom_render(void *selectedref, float top, float bottom, float
 {
 	if (pollingitem)
 	{
-		const std::string seqname = machine().input().seq_name(
-					machine().input().seq_poll_final()); // relying on the fact that this exposes the sequence polled so far and has no side effects
+		const std::string seqname = machine().input().seq_name(seq_poll.sequence());
 		char const *const text[] = { seqname.c_str() };
 		draw_text_box(
 				std::begin(text), std::end(text),
 				x1, x2, y2 + ui().box_tb_border(), y2 + bottom,
 				ui::text_layout::CENTER, ui::text_layout::NEVER, false,
 				ui().colors().text_color(), ui().colors().background_color(), 1.0f);
+	}
+	else
+	{
+		if (erroritem && (selectedref != erroritem))
+		{
+			errormsg.clear();
+			erroritem = nullptr;
+		}
+
+		if (erroritem)
+		{
+			char const *const text[] = { errormsg.c_str() };
+			draw_text_box(
+					std::begin(text), std::end(text),
+					x1, x2, y2 + ui().box_tb_border(), y2 + bottom,
+					ui::text_layout::CENTER, ui::text_layout::NEVER, false,
+					ui().colors().text_color(), UI_RED_COLOR, 1.0f);
+		}
+		else if (selectedref)
+		{
+			const input_item_data &item = *reinterpret_cast<input_item_data *>(selectedref);
+			if ((INPUT_TYPE_ANALOG != item.type) && machine().input().seq_pressed(item.seq))
+			{
+				char const *const text[] = { _("Pressed") };
+				draw_text_box(
+						std::begin(text), std::end(text),
+						x1, x2, y2 + ui().box_tb_border(), y2 + bottom,
+						ui::text_layout::CENTER, ui::text_layout::NEVER, false,
+						ui().colors().text_color(), ui().colors().background_color(), 1.0f);
+			}
+		}
 	}
 }
 
@@ -289,58 +319,82 @@ void menu_input::handle()
 	if (pollingitem)
 	{
 		// if we are polling, handle as a special case
-		input_item_data *item = pollingitem;
+		input_item_data *const item = pollingitem;
 
 		if (machine().ui_input().pressed(IPT_UI_CANCEL))
 		{
 			// if UI_CANCEL is pressed, abort
 			pollingitem = nullptr;
-			if (machine().input().seq_poll_final() == init_poll_seq)
+			if (!seq_poll.modified())
 			{
+				// cancelled immediately - toggle between default and none
 				record_next = false;
 				toggle_none_default(item->seq, starting_seq, *item->defseq);
 				seqchangeditem = item;
 			}
 			else
 			{
+				// entered something before cancelling - abandon change
 				invalidate = true;
 			}
 		}
-		else if (machine().input().seq_poll())
+		else if (seq_poll.poll()) // poll again; if finished, update the sequence
 		{
-			// poll again; if finished, update the sequence
 			pollingitem = nullptr;
-			record_next = true;
-			item->seq = machine().input().seq_poll_final();
-			seqchangeditem = item;
+			if (seq_poll.valid())
+			{
+				record_next = true;
+				item->seq = seq_poll.sequence();
+				seqchangeditem = item;
+			}
+			else
+			{
+				// entered invalid sequence - abandon change
+				invalidate = true;
+				errormsg = _("Invalid sequence entered");
+				erroritem = item;
+			}
 		}
 	}
-	else if (menu_event != nullptr && menu_event->itemref != nullptr)
+	else if (menu_event && menu_event->itemref)
 	{
 		// otherwise, handle the events
-		input_item_data *item = (input_item_data *)menu_event->itemref;
+		input_item_data &item = *reinterpret_cast<input_item_data *>(menu_event->itemref);
 		switch (menu_event->iptkey)
 		{
 		case IPT_UI_SELECT: // an item was selected: begin polling
-			pollingitem = item;
-			lastitem = item;
-			starting_seq = item->seq;
-			machine().input().seq_poll_start((item->type == INPUT_TYPE_ANALOG) ? ITEM_CLASS_ABSOLUTE : ITEM_CLASS_SWITCH, record_next ? &item->seq : nullptr);
-			init_poll_seq = machine().input().seq_poll_final();
+			errormsg.clear();
+			erroritem = nullptr;
+			pollingitem = &item;
+			lastitem = &item;
+			starting_seq = item.seq;
+			if (record_next)
+				seq_poll.start((item.type == INPUT_TYPE_ANALOG) ? ITEM_CLASS_ABSOLUTE : ITEM_CLASS_SWITCH, item.seq);
+			else
+				seq_poll.start((item.type == INPUT_TYPE_ANALOG) ? ITEM_CLASS_ABSOLUTE : ITEM_CLASS_SWITCH);
 			invalidate = true;
 			break;
 
 		case IPT_UI_CLEAR: // if the clear key was pressed, reset the selected item
-			toggle_none_default(item->seq, item->seq, *item->defseq);
+			errormsg.clear();
+			erroritem = nullptr;
+			toggle_none_default(item.seq, item.seq, *item.defseq);
 			record_next = false;
-			seqchangeditem = item;
+			seqchangeditem = &item;
 			break;
 		}
 
 		// if the selection changed, reset the "record next" flag
-		if (item != lastitem)
+		if (&item != lastitem)
+		{
+			if (erroritem)
+			{
+				errormsg.clear();
+				erroritem = nullptr;
+			}
 			record_next = false;
-		lastitem = item;
+			lastitem = &item;
+		}
 	}
 
 	// if the sequence changed, update it

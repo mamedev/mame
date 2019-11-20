@@ -2133,7 +2133,7 @@ void ioport_manager::load_config(config_type cfg_type, util::xml::data_node cons
 			if (seqtype != -1 && seqnode->get_value() != nullptr)
 			{
 				if (strcmp(seqnode->get_value(), "NONE") == 0)
-					newseq[seqtype].set();
+					newseq[seqtype].reset();
 				else
 					machine().input().seq_from_tokens(newseq[seqtype], seqnode->get_value());
 			}

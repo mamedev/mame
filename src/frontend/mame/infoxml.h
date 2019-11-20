@@ -8,17 +8,15 @@
 
 ***************************************************************************/
 
-#ifndef MAME_FRONTEND_MAME_INFO_H
-#define MAME_FRONTEND_MAME_INFO_H
+#ifndef MAME_FRONTEND_MAME_INFOXML_H
+#define MAME_FRONTEND_MAME_INFOXML_H
 
 #pragma once
 
 #include "emuopts.h"
 
+#include <functional>
 #include <vector>
-
-
-class driver_enumerator;
 
 
 //**************************************************************************
@@ -42,4 +40,4 @@ private:
 	bool            m_dtd;
 };
 
-#endif // MAME_FRONTEND_MAME_INFO_H
+#endif // MAME_FRONTEND_MAME_INFOXML_H
