@@ -5072,16 +5072,16 @@ ROM_START( puzzlet )
 	ROM_LOAD( "sound4.u23", 0x000000, 0x200000, CRC(9a611369) SHA1(97b9188354292b120a1bd0f01b4d884461bfa298) )
 ROM_END
 
-ROM_START( metabee )
+ROM_START( metabee ) // handwritten labels, unpopulated sound chips and ROM. Still the dumper says it has sound.
 	ROM_REGION( 0x200000, "maincpu", 0 )    /* H8/3007 Code */
-	ROM_LOAD16_WORD_SWAP( "metabee-2way-u9.bin", 0x000000, 0x200000, CRC(aba51e0f) SHA1(99f18d772a73c499b1b33222b9bae8c1e1d4114b) ) // ST-M27C160
+	ROM_LOAD16_WORD_SWAP( "medabee2way.u9", 0x000000, 0x200000, CRC(aba51e0f) SHA1(99f18d772a73c499b1b33222b9bae8c1e1d4114b) ) // ST-M27C160
 
 	ROM_REGION( 0x200, "z86e02", 0 )    /* Zilog Z8 family 8-bit MCU */
 	ROM_LOAD( "z86e02.mcu", 0x000, 0x200, NO_DUMP )
 
 	ROM_REGION( 0x800000, "vdp2", 0 )   /* Gfx + Data (Addressable by CPU & Blitter) */
-	ROM_LOAD32_WORD( "metabee-chara1-u2.bin", 0x000000, 0x400000, CRC(d56918bd) SHA1(bcb3f4624a6f92e5c48273638bdb3f71608ac5b4) ) // ST-M27C322
-	ROM_LOAD32_WORD( "metabee-chara2-u1.bin", 0x000002, 0x400000, CRC(81a3c0cb) SHA1(970978f07bb9e9dddd13b3946fb7230c2b205769) ) // ST-M27C322
+	ROM_LOAD32_WORD( "medabeechara1.u2", 0x000000, 0x400000, CRC(d56918bd) SHA1(bcb3f4624a6f92e5c48273638bdb3f71608ac5b4) ) // ST-M27C322
+	ROM_LOAD32_WORD( "medabeechara2.u1", 0x000002, 0x400000, CRC(81a3c0cb) SHA1(970978f07bb9e9dddd13b3946fb7230c2b205769) ) // ST-M27C322
 
 	ROM_REGION( 0x200000, "oki", ROMREGION_ERASEFF )    /* Samples */
 	// not populated on the dumped PCB
