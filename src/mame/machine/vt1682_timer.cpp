@@ -136,15 +136,6 @@ WRITE8_MEMBER(vrt_vt1682_timer_device::vt1682_timer_enable_w)
 	//Timer PreLoad = 65536 - (Period in seconds) * 26.601712 * 1000000 )
 
 	/*
-	uint16_t preload = (m_timer_preload_15_8 << 8) | m_timer_preload_7_0;
-
-	double newval = 65536 - preload;
-	double soundclock = m_soundcpu->clock();
-	soundclock = soundclock / 1000000;
-
-	double period = newval / soundclock; // in microseconds?
-
-	printf("sound clock %f preload %d  newval %f period %f\n", soundclock, preload, newval, period );
 	*/
 
 
@@ -153,7 +144,11 @@ WRITE8_MEMBER(vrt_vt1682_timer_device::vt1682_timer_enable_w)
 
 	if (m_timer_enable & 0x01)
 	{
-		m_timer->adjust(attotime::from_hz(16000), 0, attotime::from_hz(16000));
+		uint16_t preload = (m_timer_preload_15_8 << 8) | m_timer_preload_7_0;
+
+		double period = (double)(65536 - preload) / (clock() / 1000000); // in microseconds?
+		if (!m_is_sound_timer) LOGMASKED(LOG_TIMER, "preload %d period in usec %f\n",  preload, period );
+		m_timer->adjust(attotime::from_usec(period), 0, attotime::from_usec(period));
 	}
 	else
 	{
