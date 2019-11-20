@@ -480,6 +480,13 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER(maincpu_timer_irq);
 
+	DECLARE_WRITE8_MEMBER(vt1682_timer_enable_trampoline_w)
+	{
+		// this is used for raster interrpt effects, despite not being a scanline timer, so knowing when it triggers is useful, so trampoline it to avoid passing m_screen to the device
+		logerror("%s: vt1682_timer_enable_trampoline_w: %02x @ position y%d, x%d\n", machine().describe_context(), data, m_screen->vpos(), m_screen->hpos());
+		m_system_timer_dev->vt1682_timer_enable_w(space, offset, data);
+	};
+
 	void update_banks();
 	uint8_t translate_prg0select(uint8_t tp20_tp13);
 	uint32_t translate_address_4000_to_7fff(uint16_t address);
@@ -4844,7 +4851,8 @@ void vt_vt1682_state::vt_vt1682_map(address_map &map)
 	/* System */
 	map(0x2100, 0x2100).rw(FUNC(vt_vt1682_state::vt1682_2100_prgbank1_r3_r), FUNC(vt_vt1682_state::vt1682_2100_prgbank1_r3_w));
 	map(0x2101, 0x2101).rw(m_system_timer_dev, FUNC(vrt_vt1682_timer_device::vt1682_timer_preload_15_8_r), FUNC(vrt_vt1682_timer_device::vt1682_timer_preload_15_8_w));
-	map(0x2102, 0x2102).rw(m_system_timer_dev, FUNC(vrt_vt1682_timer_device::vt1682_timer_enable_r),       FUNC(vrt_vt1682_timer_device::vt1682_timer_enable_w));
+	map(0x2102, 0x2102).r(m_system_timer_dev, FUNC(vrt_vt1682_timer_device::vt1682_timer_enable_r));
+	map(0x2102, 0x2102).w(FUNC(vt_vt1682_state::vt1682_timer_enable_trampoline_w));
 	map(0x2103, 0x2103).w( m_system_timer_dev, FUNC(vrt_vt1682_timer_device::vt1682_timer_irqclear_w));
 	map(0x2104, 0x2104).rw(m_system_timer_dev, FUNC(vrt_vt1682_timer_device::vt1682_timer_preload_7_0_r),  FUNC(vrt_vt1682_timer_device::vt1682_timer_preload_7_0_w)); // not on 2100 as you might expect
 	map(0x2105, 0x2105).w(FUNC(vt_vt1682_state::vt1682_2105_comr6_tvmodes_w));
