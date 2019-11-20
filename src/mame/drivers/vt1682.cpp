@@ -16,7 +16,7 @@
 #include "machine/vt1682_alu.h"
 #include "machine/vt1682_timer.h"
 #include "machine/bankdev.h"
-//#include "machine/timer.h"
+#include "machine/timer.h"
 #include "sound/volt_reg.h"
 #include "sound/dac.h"
 #include "emupal.h"
@@ -395,7 +395,8 @@ private:
 
 	/* Hacky */
 
-	DECLARE_READ8_MEMBER(irq_vector_hack_r);
+	DECLARE_READ8_MEMBER(soundcpu_irq_vector_hack_r);
+	DECLARE_READ8_MEMBER(maincpu_irq_vector_hack_r);
 
 	/* System Helpers */
 
@@ -495,7 +496,8 @@ private:
 	DECLARE_READ8_MEMBER(rom_4000_to_7fff_r);
 	DECLARE_READ8_MEMBER(rom_8000_to_ffff_r);
 
-	INTERRUPT_GEN_MEMBER(nmi);
+	//INTERRUPT_GEN_MEMBER(nmi);
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 
 	bitmap_ind8 m_priority_bitmap;
 	void setup_video_pages(int which, int tilesize, int vs, int hs, int y8, int x8, uint16_t* pagebases);
@@ -1484,6 +1486,8 @@ READ8_MEMBER(vt_vt1682_state::vt1682_2010_bk1_xscroll_7_0_r)
 
 WRITE8_MEMBER(vt_vt1682_state::vt1682_2010_bk1_xscroll_7_0_w)
 {
+ 	m_screen->update_partial(m_screen->vpos());
+
 	logerror("%s: vt1682_2010_bk1_xscroll_7_0_w writing: %02x\n", machine().describe_context(), data);
 	m_xscroll_7_0_bk[0] = data;
 }
@@ -1538,6 +1542,8 @@ READ8_MEMBER(vt_vt1682_state::vt1682_2012_bk1_scroll_control_r)
 
 WRITE8_MEMBER(vt_vt1682_state::vt1682_2012_bk1_scroll_control_w)
 {
+ 	m_screen->update_partial(m_screen->vpos());
+
 	logerror("%s: vt1682_2012_bk1_scroll_control_w writing: %02x (hclr: %1x page_layout:%1x ymsb:%1x xmsb:%1x)\n", machine().describe_context(), data,
 		(data & 0x10) >> 4, (data & 0x0c) >> 2, (data & 0x02) >> 1, (data & 0x01) >> 0);
 
@@ -1567,6 +1573,8 @@ READ8_MEMBER(vt_vt1682_state::vt1682_2013_bk1_main_control_r)
 
 WRITE8_MEMBER(vt_vt1682_state::vt1682_2013_bk1_main_control_w)
 {
+ 	m_screen->update_partial(m_screen->vpos());
+
 	logerror("%s: vt1682_2013_bk1_main_control_w writing: %02x (enable:%01x palette:%01x depth:%01x bpp:%01x linemode:%01x tilesize:%01x)\n", machine().describe_context(), data,
 		(data & 0x80) >> 7, (data & 0x40) >> 6, (data & 0x30) >> 4, (data & 0x0c) >> 2, (data & 0x02) >> 1, (data & 0x01) >> 0 );
 
@@ -1596,6 +1604,8 @@ READ8_MEMBER(vt_vt1682_state::vt1682_2014_bk2_xscroll_7_0_r)
 
 WRITE8_MEMBER(vt_vt1682_state::vt1682_2014_bk2_xscroll_7_0_w)
 {
+ 	m_screen->update_partial(m_screen->vpos());
+
 	logerror("%s: vt1682_2014_bk2_xscroll_7_0_w writing: %02x\n", machine().describe_context(), data);
 	m_xscroll_7_0_bk[1] = data;
 }
@@ -1650,6 +1660,8 @@ READ8_MEMBER(vt_vt1682_state::vt1682_2016_bk2_scroll_control_r)
 
 WRITE8_MEMBER(vt_vt1682_state::vt1682_2016_bk2_scroll_control_w)
 {
+ 	m_screen->update_partial(m_screen->vpos());
+
 	logerror("%s: vt1682_2016_bk2_scroll_control_w writing: %02x ((invalid): %1x page_layout:%1x ymsb:%1x xmsb:%1x)\n", machine().describe_context(), data,
 		(data & 0x10) >> 4, (data & 0x0c) >> 2, (data & 0x02) >> 1, (data & 0x01) >> 0);
 
@@ -1679,6 +1691,8 @@ READ8_MEMBER(vt_vt1682_state::vt1682_2017_bk2_main_control_r)
 
 WRITE8_MEMBER(vt_vt1682_state::vt1682_2017_bk2_main_control_w)
 {
+ 	m_screen->update_partial(m_screen->vpos());
+
 	logerror("%s: vt1682_2017_bk2_main_control_w writing: %02x (enable:%01x palette:%01x depth:%01x bpp:%01x (invalid):%01x tilesize:%01x)\n", machine().describe_context(), data,
 		(data & 0x80) >> 7, (data & 0x40) >> 6, (data & 0x30) >> 4, (data & 0x0c) >> 2, (data & 0x02) >> 1, (data & 0x01) >> 0 );
 
@@ -1919,8 +1933,13 @@ READ8_MEMBER(vt_vt1682_state::vt1682_2020_bk_linescroll_r)
 
 WRITE8_MEMBER(vt_vt1682_state::vt1682_2020_bk_linescroll_w)
 {
+ 	m_screen->update_partial(m_screen->vpos());
+
 	logerror("%s: vt1682_2020_bk_linescroll_w writing: %02x\n", machine().describe_context(), data);
 	m_2020_bk_linescroll = data;
+
+	if (data)
+		popmessage("linescroll %02x!\n", data);
 }
 
 /*
@@ -4596,7 +4615,7 @@ void vt_vt1682_state::draw_layer(int which, int opaque, screen_device& screen, b
 				palbase = machine().rand() & 0xff;
 			}
 
-			for (int y = 0; y < 240; y++)
+			for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 			{
 				int ytile, ytileline;
 
@@ -4786,7 +4805,7 @@ void vt_vt1682_state::vt_vt1682_sound_map(address_map& map)
 
 	map(0xf000, 0xffff).ram().share("sound_share"); // doesn't actually map here, the CPU fetches vectors from 0x0ff0 - 0x0fff!
 
-	map(0xfffe, 0xffff).r(FUNC(vt_vt1682_state::irq_vector_hack_r)); // probably need custom IRQ support in the core instead...
+	map(0xfffe, 0xffff).r(FUNC(vt_vt1682_state::soundcpu_irq_vector_hack_r)); // probably need custom IRQ support in the core instead...
 }
 
 void vt_vt1682_state::vt_vt1682_map(address_map &map)
@@ -4898,6 +4917,8 @@ void vt_vt1682_state::vt_vt1682_map(address_map &map)
 	// 3000-3fff internal ROM if enabled
 	map(0x4000, 0x7fff).r(FUNC(vt_vt1682_state::rom_4000_to_7fff_r));
 	map(0x8000, 0xffff).r(FUNC(vt_vt1682_state::rom_8000_to_ffff_r));
+
+	map(0xfffe, 0xffff).r(FUNC(vt_vt1682_state::maincpu_irq_vector_hack_r)); // probably need custom IRQ support in the core instead...
 }
 
 /*
@@ -4926,11 +4947,18 @@ Ext IRQ         0x0ffe - 0x0fff
 */
 
 
-READ8_MEMBER(vt_vt1682_state::irq_vector_hack_r)
+READ8_MEMBER(vt_vt1682_state::soundcpu_irq_vector_hack_r)
 {
 	// redirect to Timer IRQ!
 	return m_sound_share[0x0ff8 + offset];
 }
+
+READ8_MEMBER(vt_vt1682_state::maincpu_irq_vector_hack_r)
+{
+	// redirect to Timer IRQ!
+	return rom_8000_to_ffff_r(space, (0xfff8 - 0x8000)+offset);
+}
+
 
 WRITE_LINE_MEMBER(vt_vt1682_state::soundcpu_timera_irq)
 {
@@ -4953,16 +4981,44 @@ WRITE_LINE_MEMBER(vt_vt1682_state::soundcpu_timerb_irq)
 
 WRITE_LINE_MEMBER(vt_vt1682_state::maincpu_timer_irq)
 {
-// need to set proper vector (need IRQ priority manager function?)
-/*
+	// need to set proper vector (need IRQ priority manager function?)
+
+	/* rasters are used on:
+	  
+	   Highway Racing (title screen - scrolling split)
+	   Fire Man (title screen - scrolling split)
+	   Bee Fighting (title screen - scrolling split)
+	   Over Speed (ingame rendering - road)
+	   Motor Storm (ingame rendering - road)
+	   Fish War (ingame rendering - status bar split)
+	   Duel Soccer (ingame rendering - status bar split)
+	*/
+
 	if (state)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
 	else
 		m_maincpu->set_input_line(0, CLEAR_LINE);
-*/
 }
 
 
+TIMER_DEVICE_CALLBACK_MEMBER(vt_vt1682_state::scanline)
+{
+	int scanline = param;
+
+	//m_screen->update_partial(m_screen->vpos());
+
+	if (scanline == 240) // 255 aligns the raster for bee fighting title, but that's not logical, on the NES it doesn't fire on the line after the display, but the one after that, likely the timer calc logic is off?
+	{
+		if (m_2000 & 0x01)
+		{
+			m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+			m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero); // same enable? (NMI_EN on sub is 'wakeup NMI')
+		}
+	}
+}
+
+
+/*
 INTERRUPT_GEN_MEMBER(vt_vt1682_state::nmi)
 {
 	if (m_2000 & 0x01)
@@ -4971,7 +5027,7 @@ INTERRUPT_GEN_MEMBER(vt_vt1682_state::nmi)
 		m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero); // same enable? (NMI_EN on sub is 'wakeup NMI')
 	}
 }
-
+*/
 
 static const gfx_layout helper_8bpp_8x8_layout =
 {
@@ -5035,7 +5091,6 @@ static GFXDECODE_START( gfx_test )
 GFXDECODE_END
 
 
-
 // NTSC uses XTAL(21'477'272) Sound CPU runs at exactly this, Main CPU runs at this / 4
 // PAL  uses XTAL(26'601'712) Sound CPU runs at exactly this, Main CPU runs at this / 5
 
@@ -5055,10 +5110,12 @@ void vt_vt1682_state::vt_vt1682(machine_config &config)
 	/* basic machine hardware */
 	M6502_VT1682(config, m_maincpu, MAIN_CPU_CLOCK_NTSC);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vt_vt1682_state::vt_vt1682_map);
-	m_maincpu->set_vblank_int("screen", FUNC(vt_vt1682_state::nmi));
+	//m_maincpu->set_vblank_int("screen", FUNC(vt_vt1682_state::nmi));
 
 	M6502(config, m_soundcpu, SOUND_CPU_CLOCK_NTSC);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &vt_vt1682_state::vt_vt1682_sound_map);
+
+	TIMER(config, "scantimer").configure_scanline(FUNC(vt_vt1682_state::scanline), "screen", 0, 1);
 
 	VT_VT1682_ALU(config, m_maincpu_alu, 0);
 	VT_VT1682_ALU(config, m_soundcpu_alu, 0);
@@ -5090,7 +5147,7 @@ void vt_vt1682_state::vt_vt1682(machine_config &config)
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(256, 256);
-	m_screen->set_visarea(0, 256-1, 0, 256-16-1);
+	m_screen->set_visarea(0, 256-1, 0, 240-1);
 	m_screen->set_screen_update(FUNC(vt_vt1682_state::screen_update));
 
 	SPEAKER(config, "lspeaker").front_left();
