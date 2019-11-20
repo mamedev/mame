@@ -19,7 +19,11 @@
 
 #include <algorithm>
 #include <array>
+#include <cassert>
 #include <iterator>
+#include <map>
+#include <memory>
+#include <string>
 
 
 //**************************************************************************
