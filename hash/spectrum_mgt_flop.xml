@@ -17,14 +17,14 @@
 	v3 rom -> system disk/system tape ver 3a, 3b or 3d
 -->
 
-<softwarelist name="spectrum_mgt_flop" description="ZX Spectrum MGT Disciple/+D disks">
+<softwarelist name="spectrum_mgt_flop" description="ZX Spectrum MGT Disciple/Plus D disks">
 	<software name="plusdsys">
-		<description>+D System Disk v2a</description>
+		<description>Plus D System Disk v2a</description>
 		<year>1986</year>
 		<publisher>Miles Gordon Technology</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
-				<rom name="+d system disk v2a.mgt" size="819200" crc="abaeb064" sha1="d98dbf3bbdecd48e33a5c191ecaca29358984394"/>
+				<rom name="plus d system disk v2a.mgt" size="819200" crc="abaeb064" sha1="d98dbf3bbdecd48e33a5c191ecaca29358984394"/>
 			</dataarea>
 		</part>
 	</software>

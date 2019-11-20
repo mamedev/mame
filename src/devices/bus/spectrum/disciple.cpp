@@ -234,6 +234,7 @@ spectrum_disciple_device::spectrum_disciple_device(const machine_config &mconfig
 	, m_exp(*this, "exp")
 	, m_joy1(*this, "JOY1")
 	, m_joy2(*this, "JOY2")
+	, m_centronics_busy(false)
 {
 }
 
@@ -243,7 +244,7 @@ spectrum_disciple_device::spectrum_disciple_device(const machine_config &mconfig
 
 void spectrum_disciple_device::device_start()
 {
-	memset(m_ram, 0, sizeof(m_ram));
+	std::fill(std::begin(m_ram), std::end(m_ram), 0);
 
 	save_item(NAME(m_romcs));
 	save_item(NAME(m_ram));
@@ -258,7 +259,6 @@ void spectrum_disciple_device::device_start()
 void spectrum_disciple_device::device_reset()
 {
 	m_romcs = 0;
-	m_centronics_busy = false;
 	m_map = false;
 }
 
@@ -306,7 +306,7 @@ uint8_t spectrum_disciple_device::iorq_r(offs_t offset)
 			break;
 		case 0x1f: // bit 0-4: kempston joystick, bit 6: printer busy, bit 7: network
 			data = bitswap<8>(~m_joy1->read(), 7, 6, 5, 0, 1, 2, 4, 3 ) & 0x1f;
-			data |= !m_centronics_busy << 6;  // inverted by IC10 74ls240
+			data |= m_centronics_busy ? 0x00 : 0x40;  // inverted by IC10 74ls240
 			// 7: network...
 			break;
 		case 0x7b: // reset boot

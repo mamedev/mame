@@ -195,6 +195,7 @@ spectrum_plusd_device::spectrum_plusd_device(const machine_config &mconfig, cons
 	, m_fdc(*this, "fdc")
 	, m_floppy(*this, "fdc:%u", 0)
 	, m_centronics(*this, "centronics")
+	, m_centronics_busy(false)
 {
 }
 
@@ -204,7 +205,7 @@ spectrum_plusd_device::spectrum_plusd_device(const machine_config &mconfig, cons
 
 void spectrum_plusd_device::device_start()
 {
-	memset(m_ram, 0, sizeof(m_ram));
+	std::fill(std::begin(m_ram), std::end(m_ram), 0);
 
 	save_item(NAME(m_romcs));
 	save_item(NAME(m_ram));
@@ -218,7 +219,6 @@ void spectrum_plusd_device::device_start()
 void spectrum_plusd_device::device_reset()
 {
 	m_romcs = 0;
-	m_centronics_busy = false;
 }
 
 
@@ -265,7 +265,7 @@ uint8_t spectrum_plusd_device::iorq_r(offs_t offset)
 			m_romcs = 1;
 			break;
 		case 0xf7: // bit 7: printer busy
-			data = m_centronics_busy << 7;
+			data = m_centronics_busy ? 0x80 : 0x00;
 			break;
 		}
 	}
