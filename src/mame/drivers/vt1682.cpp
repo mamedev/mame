@@ -546,8 +546,20 @@ private:
 	required_ioport m_io_p2;
 	required_ioport m_io_p3;
 	required_ioport m_io_p4;
+};
 
+class zone40_state : public vt_vt1682_state
+{
+public:
+	zone40_state(const machine_config& mconfig, device_type type, const char* tag) :
+		vt_vt1682_state(mconfig, type, tag)
+	{ }
 
+	void init_zone40();
+
+protected:
+
+private:
 };
 
 void vt_vt1682_state::video_start()
@@ -5232,6 +5244,8 @@ static INPUT_PORTS_START( intec )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( zone40 )
+INPUT_PORTS_END
 
 // this controller code is just designed to feed the games with data they're happy with, it probably has no grounds in reality
 // as I don't know how they really work.  presumably wireless with timeouts, sending signals for brief periods that need to be
@@ -5363,20 +5377,43 @@ ROM_START( ii8in1 )
 	ROM_REGION( 0x2000000, "mainrom", 0 )
 	ROM_LOAD( "ii8in1.bin", 0x00000, 0x2000000, CRC(7aee7464) SHA1(7a9cf7f54a350f0853a17459f2dcbef34f4f7c30) ) // 2ND HALF EMPTY
 
-	// possible undumped 0x1000 bytes of Internal ROM
+	// possible undumped 0x1000 bytes of Internal ROM (software doesn't appear to make use of it)
 ROM_END
 
 ROM_START( ii32in1 )
 	ROM_REGION( 0x2000000, "mainrom", 0 )
 	ROM_LOAD( "ii32in1.bin", 0x00000, 0x2000000, CRC(ddee4eac) SHA1(828c0c18a66bb4872299f9a43d5e3647482c5925) )
 
-	// possible undumped 0x1000 bytes of Internal ROM
+	// possible undumped 0x1000 bytes of Internal ROM (software doesn't appear to make use of it)
 ROM_END
 
-// TODO: this is a cartridge based system, move these to SL
+// TODO: this is a cartridge based system (actually, verify this, it seems some versions simply had built in games) move these to SL if verified as from cartridge config
 CONS( 200?, ii8in1,    0,  0,  intech_interact,    intec, intec_interact_state, empty_init,  "Intec", "InterAct 8-in-1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 CONS( 200?, ii32in1,   0,  0,  intech_interact,    intec, intec_interact_state, empty_init,  "Intec", "InterAct 32-in-1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 // a 40-in-1 also exists which combines the above
 
 // Intec Interact Infrazone 15 Shooting Games, 42 Mi kara, 96 Arcade Games + more should run here too
 // MiWi(2?) and other Mi Kara units should fit here as well
+
+
+void zone40_state::init_zone40()
+{
+	uint16_t *ROM = (uint16_t*)memregion("mainrom")->base();
+	int size = memregion("mainrom")->bytes();
+
+	for (int i = 0; i < size/2; i++)
+	{
+		ROM[i] = ROM[i] ^ 0xbb88;
+	}
+}
+
+ROM_START( zone40 )
+	ROM_REGION( 0x4000000, "mainrom", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "zone40.bin", 0x0000, 0x4000000, CRC(4ba1444f) SHA1(de83046ab93421486668a247972ad6d3cda19440) )
+
+	// possible undumped internal ROM
+ROM_END
+
+// this has higher resolution version (320 pixel width) of many of the same games, and twice the usual capacity vt1682 can address, so while it can't be vt1682 it's most likely something related
+// probably an evolution of it even if the first 0x8000 block is blanked out like many SunPlus systems
+CONS( 2009, zone40,    0,       0,        vt_vt1682, zone40, zone40_state, init_zone40, "Jungle Soft / Ultimate Products (HK) Ltd",          "Zone 40",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
