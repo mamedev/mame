@@ -429,7 +429,11 @@ class input_seq
 {
 public:
 	// construction/destruction
-	template <typename... T> constexpr input_seq(input_code code_0 = end_code, T... code_n) noexcept
+	constexpr input_seq() noexcept
+	{
+		reset();
+	}
+	template <typename... T> constexpr input_seq(input_code code_0, T... code_n) noexcept
 	{
 		set(code_0, code_n...);
 	}
