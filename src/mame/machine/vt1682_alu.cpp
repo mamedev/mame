@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
+#include "emu.h"
 #include "machine/vt1682_alu.h"
 
 #define LOG_ALU     (1U << 1)
