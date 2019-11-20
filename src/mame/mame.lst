@@ -31103,6 +31103,7 @@ zdog
 @source:vt1682.cpp
 ii8in1
 ii32in1
+zone40                          // Zone 40
 
 @source:newbrain.cpp
 newbrain                        //
@@ -39548,7 +39549,6 @@ jak_sbfc                        //
 lexizeus                        // Lexibook
 vii                             // KenSingTon / Jungle Soft / Siatronics Vii
 wirels60                        // Wireless 60
-zone40                          // Zone 40
 zone60                          // Zone 60
 rad_skat                        //
 rad_skatp                       //
