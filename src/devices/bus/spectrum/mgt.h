@@ -29,13 +29,14 @@ class spectrum_plusd_device: public device_t, public device_spectrum_expansion_i
 {
 public:
 	// construction/destruction
-	spectrum_plusd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	spectrum_plusd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 	DECLARE_INPUT_CHANGED_MEMBER(snapshot_button);
 
 protected:
+	spectrum_plusd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;

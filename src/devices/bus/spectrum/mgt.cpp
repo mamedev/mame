@@ -427,11 +427,11 @@ void spectrum_plusd_device::iorq_w(offs_t offset, uint8_t data)
 		break;
 	case 0xef: // bit 0-1: drive select, 6: printer strobe, 7: side select
 		{
-		uint8_t drive = data & 3;
-		floppy_image_device* floppy = m_floppy[drive > 0 ? drive-1 : drive]->get_device();
-		m_fdc->set_floppy(floppy);
-		m_centronics->write_strobe(BIT(data, 6));
-		if (floppy) floppy->ss_w(BIT(data, 7));
+			uint8_t drive = data & 3;
+			floppy_image_device* floppy = m_floppy[drive > 0 ? drive-1 : drive]->get_device();
+			m_fdc->set_floppy(floppy);
+			m_centronics->write_strobe(BIT(data, 6));
+			if (floppy) floppy->ss_w(BIT(data, 7));
 		}
 		break;
 	case 0xe7: // page out
@@ -575,15 +575,15 @@ void spectrum_disciple_device::iorq_w(offs_t offset, uint8_t data)
 		break;
 	case 0x1f: // bit 0: drive select, 1: side select, 2: density, 3: rom bank, 4: inhibit switch control, 5: exp select, 6: printer strobe, 7: network
 		{
-		floppy_image_device* floppy = m_floppy[~data & 1]->get_device();
-		m_fdc->set_floppy(floppy);
-		if (floppy) floppy->ss_w(BIT(data, 1));
-		m_fdc->dden_w(BIT(data, 2));
-		// 3: rom bank...
-		// 4: inhibit switch control...
-		// 5: exp select...
-		m_centronics->write_strobe(BIT(data, 6));
-		// 7: network...
+			floppy_image_device* floppy = m_floppy[~data & 1]->get_device();
+			m_fdc->set_floppy(floppy);
+			if (floppy) floppy->ss_w(BIT(data, 1));
+			m_fdc->dden_w(BIT(data, 2));
+			// 3: rom bank...
+			// 4: inhibit switch control...
+			// 5: exp select...
+			m_centronics->write_strobe(BIT(data, 6));
+			// 7: network...
 		}
 		break;
 	case 0x3b: // wait when net=1
