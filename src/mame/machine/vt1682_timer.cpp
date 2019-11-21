@@ -45,10 +45,10 @@ void vrt_vt1682_timer_device::device_reset()
 
 
 /*
-    Address 0x2100 r/w (SOUND CPU, Timer A) 
-	Address 0x2110 r/w (SOUND CPU, Timer B)
+    Address 0x2100 r/w (SOUND CPU, Timer A)
+    Address 0x2110 r/w (SOUND CPU, Timer B)
 
-	Address 0x2101 r/w (MAIN CPU, Timer)
+    Address 0x2101 r/w (MAIN CPU, Timer)
 
     0x80 - Timer xx Preload:7
     0x40 - Timer xx Preload:6
@@ -76,7 +76,7 @@ WRITE8_MEMBER(vrt_vt1682_timer_device::vt1682_timer_preload_7_0_w)
 
 /*
     Address 0x2101 r/w (SOUND CPU, Timer A)
-	Address 0x2111 r/w (SOUND CPU, Timer B)
+    Address 0x2111 r/w (SOUND CPU, Timer B)
 
     Address 0x2104 r/w (MAIN CPU, Timer)
 
@@ -121,7 +121,7 @@ WRITE8_MEMBER(vrt_vt1682_timer_device::vt1682_timer_preload_15_8_w)
 
 /*
     Address 0x2102 r/w (SOUND CPU, Timer A)
-	Address 0x2112 r/w (SOUND CPU, Timer B)
+    Address 0x2112 r/w (SOUND CPU, Timer B)
 
     Address 0x2102 r/w (MAIN CPU, Timer)
 
@@ -176,10 +176,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(vrt_vt1682_timer_device::timer_expired)
 
 /*
     Address 0x2103 r/w (SOUND CPU, Timer A)
-	Address 0x2113 r/w (SOUND CPU, Timer B)
+    Address 0x2113 r/w (SOUND CPU, Timer B)
 
-	Address 0x2103 r/w (MAIN CPU, Timer) (read or write?)
-	   
+    Address 0x2103 r/w (MAIN CPU, Timer) (read or write?)
+
     0x80 - Timer xx IRQ Clear
     0x40 - Timer xx IRQ Clear
     0x20 - Timer xx IRQ Clear
