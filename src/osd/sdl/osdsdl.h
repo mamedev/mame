@@ -127,7 +127,7 @@ public:
 	virtual void input_update() override;
 
 	// input overridables
-	virtual void customize_input_type_list(simple_list<input_type_entry> &typelist) override;
+	virtual void customize_input_type_list(std::vector<input_type_entry> &typelist) override;
 
 	virtual void video_register() override;
 

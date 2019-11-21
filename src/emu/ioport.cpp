@@ -305,7 +305,7 @@ u8 const inp_header::MAGIC[inp_header::OFFS_BASETIME - inp_header::OFFS_MAGIC] =
 //  BUILT-IN CORE MAPPINGS
 //**************************************************************************
 
-#include "inpttype.h"
+#include "inpttype.ipp"
 
 
 
@@ -350,9 +350,8 @@ void ioport_list::append(device_t &device, std::string &errorbuf)
 //  input_type_entry - constructors
 //-------------------------------------------------
 
-input_type_entry::input_type_entry(ioport_type type, ioport_group group, int player, const char *token, const char *name, input_seq standard)
-	: m_next(nullptr),
-		m_type(type),
+input_type_entry::input_type_entry(ioport_type type, ioport_group group, int player, const char *token, const char *name, input_seq standard) noexcept
+	: m_type(type),
 		m_group(group),
 		m_player(player),
 		m_token(token),
@@ -361,9 +360,8 @@ input_type_entry::input_type_entry(ioport_type type, ioport_group group, int pla
 	m_defseq[SEQ_TYPE_STANDARD] = m_seq[SEQ_TYPE_STANDARD] = standard;
 }
 
-input_type_entry::input_type_entry(ioport_type type, ioport_group group, int player, const char *token, const char *name, input_seq standard, input_seq decrement, input_seq increment)
-	: m_next(nullptr),
-		m_type(type),
+input_type_entry::input_type_entry(ioport_type type, ioport_group group, int player, const char *token, const char *name, input_seq standard, input_seq decrement, input_seq increment) noexcept
+	: m_type(type),
 		m_group(group),
 		m_player(player),
 		m_token(token),
@@ -376,11 +374,23 @@ input_type_entry::input_type_entry(ioport_type type, ioport_group group, int pla
 
 
 //-------------------------------------------------
+//  replace_code - replace all instances of
+//   oldcodewith newcode in all sequences
+//-------------------------------------------------
+
+void input_type_entry::replace_code(input_code oldcode, input_code newcode) noexcept
+{
+	for (input_seq &seq : m_seq)
+		seq.replace(oldcode, newcode);
+}
+
+
+//-------------------------------------------------
 //  configure_osd - set the token and name of an
 //  OSD entry
 //-------------------------------------------------
 
-void input_type_entry::configure_osd(const char *token, const char *name)
+void input_type_entry::configure_osd(const char *token, const char *name) noexcept
 {
 	assert(m_type >= IPT_OSD_1 && m_type <= IPT_OSD_16);
 	m_token = token;
@@ -393,10 +403,9 @@ void input_type_entry::configure_osd(const char *token, const char *name)
 //  from the default
 //-------------------------------------------------
 
-void input_type_entry::restore_default_seq()
+void input_type_entry::restore_default_seq() noexcept
 {
-	for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
-		m_seq[seqtype] = defseq(seqtype);
+	m_seq = m_defseq;
 }
 
 
@@ -677,7 +686,7 @@ const char *ioport_field::name() const
 //  given input field
 //-------------------------------------------------
 
-const input_seq &ioport_field::seq(input_seq_type seqtype) const
+const input_seq &ioport_field::seq(input_seq_type seqtype) const noexcept
 {
 	// if no live state, return default
 	if (m_live == nullptr)
@@ -697,7 +706,7 @@ const input_seq &ioport_field::seq(input_seq_type seqtype) const
 //  the given input field
 //-------------------------------------------------
 
-const input_seq &ioport_field::defseq(input_seq_type seqtype) const
+const input_seq &ioport_field::defseq(input_seq_type seqtype) const noexcept
 {
 	// if the sequence is the special default code, return the expanded default value
 	if (m_seq[seqtype].is_default())
@@ -731,7 +740,7 @@ void ioport_field::set_defseq(input_seq_type seqtype, const input_seq &newseq)
 //  field
 //-------------------------------------------------
 
-ioport_type_class ioport_field::type_class() const
+ioport_type_class ioport_field::type_class() const noexcept
 {
 	// inputs associated with specific players
 	ioport_group group = manager().type_group(m_type, m_player);
@@ -860,10 +869,10 @@ std::string ioport_field::key_name(int which) const
 //  settings for the given input field
 //-------------------------------------------------
 
-void ioport_field::get_user_settings(user_settings &settings)
+void ioport_field::get_user_settings(user_settings &settings) const noexcept
 {
 	// zap the entire structure
-	memset(&settings, 0, sizeof(settings));
+	settings = user_settings();
 
 	// copy the basics
 	for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
@@ -894,7 +903,7 @@ void ioport_field::get_user_settings(user_settings &settings)
 //  settings for the given input field
 //-------------------------------------------------
 
-void ioport_field::set_user_settings(const user_settings &settings)
+void ioport_field::set_user_settings(const user_settings &settings) noexcept
 {
 	// copy the basics
 	for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
@@ -1760,7 +1769,7 @@ time_t ioport_manager::initialize()
 void ioport_manager::init_port_types()
 {
 	// convert the array into a list of type states that can be modified
-	construct_core_types(m_typelist);
+	emplace_core_types(m_typelist);
 
 	// ask the OSD to customize the list
 	machine().osd().customize_input_type_list(m_typelist);
@@ -1847,7 +1856,7 @@ ioport_manager::~ioport_manager()
 //  type/player
 //-------------------------------------------------
 
-const char *ioport_manager::type_name(ioport_type type, u8 player)
+const char *ioport_manager::type_name(ioport_type type, u8 player) const noexcept
 {
 	// if we have a machine, use the live state and quick lookup
 	input_type_entry *entry = m_type_to_entry[type][player];
@@ -1864,7 +1873,7 @@ const char *ioport_manager::type_name(ioport_type type, u8 player)
 //  type/player
 //-------------------------------------------------
 
-ioport_group ioport_manager::type_group(ioport_type type, int player)
+ioport_group ioport_manager::type_group(ioport_type type, int player) const noexcept
 {
 	input_type_entry *entry = m_type_to_entry[type][player];
 	if (entry != nullptr)
@@ -1880,7 +1889,7 @@ ioport_group ioport_manager::type_group(ioport_type type, int player)
 //  given type/player
 //-------------------------------------------------
 
-const input_seq &ioport_manager::type_seq(ioport_type type, int player, input_seq_type seqtype)
+const input_seq &ioport_manager::type_seq(ioport_type type, int player, input_seq_type seqtype) const noexcept
 {
 	assert(type >= 0 && type < IPT_COUNT);
 	assert(player >= 0 && player < MAX_PLAYERS);
@@ -1900,11 +1909,11 @@ const input_seq &ioport_manager::type_seq(ioport_type type, int player, input_se
 //  the given type/player
 //-------------------------------------------------
 
-void ioport_manager::set_type_seq(ioport_type type, int player, input_seq_type seqtype, const input_seq &newseq)
+void ioport_manager::set_type_seq(ioport_type type, int player, input_seq_type seqtype, const input_seq &newseq) noexcept
 {
-	input_type_entry *entry = m_type_to_entry[type][player];
-	if (entry != nullptr)
-		entry->m_seq[seqtype] = newseq;
+	input_type_entry *const entry = m_type_to_entry[type][player];
+	if (entry)
+		entry->set_seq(seqtype, newseq);
 }
 
 
@@ -1924,7 +1933,7 @@ bool ioport_manager::type_pressed(ioport_type type, int player)
 //  ioport_type_class exists in at least one port
 //-------------------------------------------------
 
-bool ioport_manager::type_class_present(ioport_type_class inputclass)
+bool ioport_manager::type_class_present(ioport_type_class inputclass) const noexcept
 {
 	for (auto &port : m_portlist)
 		for (ioport_field &field : port.second->fields())
@@ -1939,7 +1948,7 @@ bool ioport_manager::type_class_present(ioport_type_class inputclass)
 //  players
 //-------------------------------------------------
 
-int ioport_manager::count_players() const
+int ioport_manager::count_players() const noexcept
 {
 	int max_player = 0;
 	for (auto &port : m_portlist)
@@ -2191,8 +2200,7 @@ void ioport_manager::load_remap_table(util::xml::data_node const *parentnode)
 		// loop over the remapping table, then over default ports, replacing old with new
 		for (int remapnum = 0; remapnum < count; remapnum++)
 			for (input_type_entry &entry : m_typelist)
-				for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
-					entry.m_seq[seqtype].replace(oldtable[remapnum], newtable[remapnum]);
+				entry.replace_code(oldtable[remapnum], newtable[remapnum]);
 	}
 }
 
@@ -2210,7 +2218,7 @@ bool ioport_manager::load_default_config(util::xml::data_node const *portnode, i
 		{
 			for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
 				if (newseq[seqtype][0] != INPUT_CODE_INVALID)
-					entry.m_seq[seqtype] = newseq[seqtype];
+					entry.set_seq(seqtype, newseq[seqtype]);
 			return true;
 		}
 
@@ -3686,7 +3694,7 @@ ioport_type ioport_manager::token_to_input_type(const char *string, int &player)
 		return ioport_type(ipnum);
 
 	// find the token in the list
-	for (input_type_entry &entry : m_typelist)
+	for (const input_type_entry &entry : m_typelist)
 		if (entry.token() != nullptr && !strcmp(entry.token(), string))
 		{
 			player = entry.player();

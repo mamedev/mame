@@ -50,7 +50,7 @@ protected:
 	// internal input menu item data
 	struct input_item_data
 	{
-		void *              ref = nullptr;              // reference to type description for global inputs or field for game inputs
+		const void *        ref = nullptr;              // reference to type description for global inputs or field for game inputs
 		input_seq_type      seqtype = SEQ_TYPE_INVALID; // sequence type
 		input_seq           seq;                        // copy of the live sequence
 		const input_seq *   defseq = nullptr;           // pointer to the default sequence

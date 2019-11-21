@@ -77,7 +77,7 @@ public:
 	virtual bool no_sound() = 0;
 
 	// input overridables
-	virtual void customize_input_type_list(simple_list<input_type_entry> &typelist) = 0;
+	virtual void customize_input_type_list(std::vector<input_type_entry> &typelist) = 0;
 
 	// video overridables
 	virtual void add_audio_to_recording(const int16_t *buffer, int samples_this_frame) = 0;

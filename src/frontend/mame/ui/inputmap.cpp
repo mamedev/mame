@@ -75,7 +75,7 @@ void menu_input_general::populate(float &customtop, float &custombottom)
 		assert(!pollingitem);
 
 		// iterate over the input ports and add menu items
-		for (input_type_entry &entry : machine().ioport().types())
+		for (const input_type_entry &entry : machine().ioport().types())
 		{
 			// add if we match the group and we have a valid name
 			if ((entry.group() == group) && entry.name() && entry.name()[0])
@@ -226,9 +226,10 @@ void menu_input_specific::update_input(input_item_data &seqchangeditem)
 {
 	ioport_field::user_settings settings;
 
-	reinterpret_cast<ioport_field *>(seqchangeditem.ref)->get_user_settings(settings);
+	// yeah, the const_cast is naughty, but we know we stored a non-const reference in it
+	reinterpret_cast<const ioport_field *>(seqchangeditem.ref)->get_user_settings(settings);
 	settings.seq[seqchangeditem.seqtype] = seqchangeditem.seq;
-	reinterpret_cast<ioport_field *>(seqchangeditem.ref)->set_user_settings(settings);
+	reinterpret_cast<ioport_field *>(const_cast<void *>(seqchangeditem.ref))->set_user_settings(settings);
 }
 
 
