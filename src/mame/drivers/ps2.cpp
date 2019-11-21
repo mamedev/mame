@@ -25,6 +25,7 @@ public:
 
 	void ps2m30286(machine_config &config);
 	void ps2386(machine_config &config);
+	void ps2386sx(machine_config &config);
 	void at_softlists(machine_config &config);
 	void ps2_16_io(address_map &map);
 	void ps2_16_map(address_map &map);
@@ -142,8 +143,17 @@ void ps2_state::ps2386(machine_config &config)
 	RAM(config, RAM_TAG).set_default_size("1664K").set_extra_options("2M,4M,8M,15M,16M,32M,64M,128M,256M");
 }
 
+void ps2_state::ps2386sx(machine_config &config)
+{
+	ps2386(config);
+	I386SX(config.replace(), m_maincpu, 12000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ps2_state::ps2_16_map);
+	m_maincpu->set_addrmap(AS_IO, &ps2_state::ps2_16_io);
+	m_maincpu->set_irq_acknowledge_callback("mb:pic8259_master", FUNC(pic8259_device::inta_cb));
+}
+
 ROM_START( i8530286 )
-	ROM_REGION(0x20000,"bios", 0)
+	ROM_REGION16_LE(0x20000, "bios", 0)
 	// saved from running machine
 	ROM_LOAD16_BYTE("ps2m30.0", 0x00000, 0x10000, CRC(9965a634) SHA1(c237b1760f8a4561ec47dc70fe2e9df664e56596))
 	ROM_LOAD16_BYTE("ps2m30.1", 0x00001, 0x10000, CRC(1448d3cb) SHA1(13fa26d895ce084278cd5ab1208fc16c80115ebe))
@@ -158,19 +168,19 @@ ROM_END
 
 */
 ROM_START( i8530h31 )
-	ROM_REGION(0x20000,"bios", 0)
+	ROM_REGION16_LE(0x20000, "bios", 0)
 	ROM_LOAD( "33f5381a.bin", 0x00000, 0x20000, CRC(ff57057d) SHA1(d7f1777077a8df43c3c14d175b9709bd3969c4b1))
 ROM_END
 
 /*
-8535-043 (Model 35)
+8535-043 (Model 35SX)
 ===================
   P/N    Checksum     Date
 04G2021    C26C       1991    ODD
 04G2022    9B94       1991    EVEN
 */
 ROM_START( i8535043 )
-	ROM_REGION(0x20000,"bios", 0)
+	ROM_REGION16_LE(0x20000, "bios", 0)
 	ROM_LOAD16_BYTE( "04g2021.bin", 0x00001, 0x10000, CRC(4069b2eb) SHA1(9855c84c81d1f07e1da66b1ca45c1c10c0717a90))
 	ROM_LOAD16_BYTE( "04g2022.bin", 0x00000, 0x10000, CRC(35c1af65) SHA1(7d2445cc463969c808fdd78e0a27a03db5dfc698))
 ROM_END
@@ -191,7 +201,7 @@ IBM Personal System/2 Model 65 SX (8565-061 and 8565-121)
 
 */
 ROM_START( i8550021 )
-	ROM_REGION(0x20000,"bios", 0)
+	ROM_REGION16_LE(0x20000, "bios", 0)
 	ROM_LOAD16_BYTE( "90x7423.zm14", 0x00000, 0x8000, CRC(2c1633e0) SHA1(1af7faa526585a7cfb69e71d90a75e1f1c541586))
 	ROM_LOAD16_BYTE( "90x7426.zm16", 0x00001, 0x8000, CRC(e7c762ce) SHA1(228f67dc915d84519da7fc1a59b7f9254278f3a0))
 	ROM_LOAD16_BYTE( "90x7420.zm13", 0x10000, 0x8000, CRC(19a57cc1) SHA1(5b31ba66cd3690e651a450619a32b7210769945d))
@@ -213,7 +223,7 @@ http://ps-2.kev009.com:8081/ohlandl/8550/8550z_Planar.html
 
 */
 ROM_START( i8550061 )
-	ROM_REGION(0x20000,"bios", 0)
+	ROM_REGION16_LE(0x20000, "bios", 0)
 	ROM_LOAD16_BYTE( "15f8365.zm5", 0x00001, 0x10000, CRC(35aa3ecf) SHA1(a122531092a9cb08600b276da9c9c3ce385aab7b))
 	ROM_LOAD16_BYTE( "15f8366.zm6", 0x00000, 0x10000, CRC(11bf564d) SHA1(0dda6a7ca9294cfaab5bdf4c05973be13b2766fc))
 ROM_END
@@ -233,7 +243,7 @@ EVEN    AMI 9203MGS     92F0626 EC32680 88 --> 33F8152
 
 */
 ROM_START( i8555081 )
-	ROM_REGION(0x20000,"bios", 0)
+	ROM_REGION16_LE(0x20000, "bios", 0)
 	ROM_LOAD16_BYTE("33f8145.zm40", 0x00001, 0x10000, CRC(0895894c) SHA1(7cee77828867ad1bdbe0ac223bc25d23c65b28a0))
 	ROM_LOAD16_BYTE("33f8146.zm41", 0x00000, 0x10000, CRC(c6020680) SHA1(b25a64e4b2dca07c567648401100e04e89bbcddb))
 ROM_END
@@ -248,7 +258,7 @@ AMI 8924MBG     90X8550   1987  --> 72X7557
 AMI 8921MBK     90X8551   1987  --> 72X7560
 */
 ROM_START( i8580071 )
-	ROM_REGION(0x20000,"bios", 0)
+	ROM_REGION32_LE(0x20000, "bios", 0)
 	ROM_LOAD32_BYTE( "90x8548.bin", 0x00000, 0x8000, CRC(1f13eea5) SHA1(0bf53ad86f47db3825a713ea2e4ef23715cc4f79))
 	ROM_LOAD32_BYTE( "90x8549.bin", 0x00001, 0x8000, CRC(9e0f4a99) SHA1(b8600f04159ed281a57416274390ba9302be541b))
 	ROM_LOAD32_BYTE( "90x8550.bin", 0x00002, 0x8000, CRC(cb21df96) SHA1(0c2765f6becfa3f9171c4f13f7b74d19c4c9acc2))
@@ -263,16 +273,16 @@ AMI 8934MDL     15F6637  1987 --> 15F6597
 AMI 8944MDI     15F6639  1987 --> 15F6600
 */
 ROM_START( i8580111 )
-	ROM_REGION(0x20000,"bios", 0)
+	ROM_REGION32_LE(0x20000, "bios", 0)
 	ROM_LOAD16_BYTE( "15f6637.bin", 0x00000, 0x10000, CRC(76c36d1a) SHA1(c68d52a2e5fbd303225ebb006f91869b29ef700a))
 	ROM_LOAD16_BYTE( "15f6639.bin", 0x00001, 0x10000, CRC(82cf0f7d) SHA1(13bb39225757b89749af70e881af0228673dbe0c))
 ROM_END
 
-COMP( 1990, i8530h31, ibm5170, 0, ps2m30286, 0, ps2_state, empty_init, "International Business Machines", "IBM PS/2 8530-H31 (Model 30/286)", MACHINE_NOT_WORKING )
-COMP( 1988, i8530286, ibm5170, 0, ps2m30286, 0, ps2_state, empty_init, "International Business Machines", "IBM PS/2 Model 30-286", MACHINE_NOT_WORKING )
-COMP( 198?, i8535043, ibm5170, 0, ps2386,    0, ps2_state, empty_init, "International Business Machines", "IBM PS/2 8535-043 (Model 35)", MACHINE_NOT_WORKING )
-COMP( 198?, i8550021, ibm5170, 0, ps2386,    0, ps2_state, empty_init, "International Business Machines", "IBM PS/2 8550-021 (Model 50)", MACHINE_NOT_WORKING )
-COMP( 198?, i8550061, ibm5170, 0, ps2386,    0, ps2_state, empty_init, "International Business Machines", "IBM PS/2 8550-061 (Model 50Z)", MACHINE_NOT_WORKING )
-COMP( 1989, i8555081, ibm5170, 0, ps2386,    0, ps2_state, empty_init, "International Business Machines", "IBM PS/2 8550-081 (Model 55SX)", MACHINE_NOT_WORKING )
-COMP( 198?, i8580071, ibm5170, 0, ps2386,    0, ps2_state, empty_init, "International Business Machines", "IBM PS/2 8580-071 (Model 80)", MACHINE_NOT_WORKING )
-COMP( 198?, i8580111, ibm5170, 0, ps2386,    0, ps2_state, empty_init, "International Business Machines", "IBM PS/2 8580-111 (Model 80)", MACHINE_NOT_WORKING )
+COMP( 1990, i8530h31, 0,        ibm5170, ps2m30286, 0, ps2_state, empty_init, "International Business Machines", "IBM PS/2 8530-H31 (Model 30/286)", MACHINE_NOT_WORKING )
+COMP( 1988, i8530286, i8530h31, 0,       ps2m30286, 0, ps2_state, empty_init, "International Business Machines", "IBM PS/2 Model 30-286", MACHINE_NOT_WORKING )
+COMP( 198?, i8535043, 0,        ibm5170, ps2386sx,  0, ps2_state, empty_init, "International Business Machines", "IBM PS/2 8535-043 (Model 35SX)", MACHINE_NOT_WORKING )
+COMP( 198?, i8550021, i8550061, 0,       ps2m30286, 0, ps2_state, empty_init, "International Business Machines", "IBM PS/2 8550-021 (Model 50)", MACHINE_NOT_WORKING )
+COMP( 198?, i8550061, 0,        ibm5170, ps2m30286, 0, ps2_state, empty_init, "International Business Machines", "IBM PS/2 8550-061 (Model 50Z)", MACHINE_NOT_WORKING )
+COMP( 1989, i8555081, 0,        ibm5170, ps2386sx,  0, ps2_state, empty_init, "International Business Machines", "IBM PS/2 8555-081 (Model 55SX)", MACHINE_NOT_WORKING )
+COMP( 198?, i8580071, 0,        ibm5170, ps2386,    0, ps2_state, empty_init, "International Business Machines", "IBM PS/2 8580-071 (Model 80)", MACHINE_NOT_WORKING )
+COMP( 198?, i8580111, 0,        ibm5170, ps2386,    0, ps2_state, empty_init, "International Business Machines", "IBM PS/2 8580-111 (Model 80)", MACHINE_NOT_WORKING )

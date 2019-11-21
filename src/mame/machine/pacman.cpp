@@ -4,7 +4,7 @@
 #include "emu.h"
 #include "includes/pacman.h"
 
-READ8_MEMBER(pacman_state::epos_decryption_w)
+READ8_MEMBER(epospm_state::epos_decryption_w)
 {
 	if (offset & 0x01)
 	{
@@ -99,7 +99,7 @@ each IN($xx) command, as opposed to dynamically decrypting every byte.
 
 */
 
-MACHINE_START_MEMBER(pacman_state, theglobp)
+MACHINE_START_MEMBER(epospm_state, theglobp)
 {
 	/*  Note: D2 is inverted and connected to D1, D5 is inverted and
 	connected to D0.  The other six data bits are converted by a
@@ -127,7 +127,7 @@ MACHINE_START_MEMBER(pacman_state, theglobp)
 	save_item(NAME(m_counter));
 }
 
-MACHINE_RESET_MEMBER(pacman_state, theglobp)
+MACHINE_RESET_MEMBER(epospm_state, theglobp)
 {
 	m_counter = 0x0A;
 	membank("bank1")->set_entry(m_counter & 3);
@@ -145,7 +145,7 @@ David Widel d_widel@hotmail.com
 
 */
 
-MACHINE_START_MEMBER(pacman_state, acitya)
+MACHINE_START_MEMBER(epospm_state, acitya)
 {
 	/*  Note: D2 is inverted and connected to D1, D5 is inverted and
 	connected to D0.  The other six data bits are converted by a
@@ -173,14 +173,14 @@ MACHINE_START_MEMBER(pacman_state, acitya)
 	save_item(NAME(m_counter));
 }
 
-MACHINE_RESET_MEMBER(pacman_state, acitya)
+MACHINE_RESET_MEMBER(epospm_state, acitya)
 {
 	m_counter = 0x0B;
 	membank("bank1")->set_entry(m_counter & 3);
 }
 
 
-MACHINE_START_MEMBER(pacman_state, eeekkp)
+MACHINE_START_MEMBER(epospm_state, eeekkp)
 {
 	/*  Note: D2 is inverted and connected to D1, D5 is inverted and
 	connected to D0.  The other six data bits are converted by a
@@ -208,7 +208,7 @@ MACHINE_START_MEMBER(pacman_state, eeekkp)
 	save_item(NAME(m_counter));
 }
 
-MACHINE_RESET_MEMBER(pacman_state, eeekkp)
+MACHINE_RESET_MEMBER(epospm_state, eeekkp)
 {
 	m_counter = 0x09;
 	membank("bank1")->set_entry(m_counter & 3);

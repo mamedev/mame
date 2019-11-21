@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Mike Balfour, Ben Bruscella, Sean Young
+// copyright-holders:Mike Balfour, Ben Bruscella, Sean Young, Frank Palazzolo
 /*******************************************************************************************************
 
   coleco.c
@@ -61,6 +61,11 @@
 
     - Dina SG-1000 mode
 
+	- Bit90:
+		Add support for memory expansion (documented)
+		Add support for printer interface (documented)
+		Add tape Support
+
 */
 
 #include "emu.h"
@@ -68,6 +73,7 @@
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
+#include "logmacro.h"
 
 /* Read/Write Handlers */
 
@@ -91,6 +97,44 @@ WRITE8_MEMBER( coleco_state::paddle_on_w )
 	m_joy_mode = 1;
 }
 
+READ8_MEMBER( bit90_state::bankswitch_u4_r )
+{
+	if (!machine().side_effects_disabled()) {
+		LOG("Bankswitch to u4\n");
+		m_bank->set_entry(0);
+	}
+	return space.unmap();
+}
+
+READ8_MEMBER( bit90_state::bankswitch_u3_r )
+{
+	if (!machine().side_effects_disabled()) {
+		LOG("Bankswitch to u3\n");
+		m_bank->set_entry(1);
+	}
+	return space.unmap();
+}
+
+READ8_MEMBER( bit90_state::keyboard_r )
+{
+	if (m_keyselect < 8) {
+		return m_io_keyboard[m_keyselect]->read();
+	}
+	return space.unmap();
+}
+
+WRITE8_MEMBER( bit90_state::u32_w )
+{
+	// Write to a 74LS174 at u32
+	// Bits 4-7 are connected for keyboard scanning (actually only 4-6 are used)
+	// Bits 0-1 unknown (probably tape?)
+	m_keyselect = (data >> 4) & 0x0f;
+	uint8_t temp = data & 0x03;
+	if (m_unknown != temp) {
+		m_unknown = temp;
+		LOG("m_unknown -> 0x%02x\n",m_unknown);
+	}
+}
 
 /* Memory Maps */
 
@@ -99,6 +143,15 @@ void coleco_state::coleco_map(address_map &map)
 	map(0x0000, 0x1fff).rom();
 	map(0x6000, 0x63ff).ram().mirror(0x1c00).share("ram");
 	map(0x8000, 0xffff).rom();
+}
+
+void bit90_state::bit90_map(address_map &map)
+{
+	map(0x0000, 0x1fff).bankr("bank");
+	map(0x2000, 0x3fff).rom();
+	map(0x4000, 0x5fff).rom();  // Decoded through pin 5 of the Bit90 expansion port
+	map(0x6000, 0x67ff).ram().mirror(0x1800).share("ram");
+	map(0x8000, 0xffff).rom();  // More RAM could also appear here (TBD)
 }
 
 void coleco_state::coleco_io_map(address_map &map)
@@ -112,13 +165,39 @@ void coleco_state::coleco_io_map(address_map &map)
 	map(0xe2, 0xe2).mirror(0x1d).r(FUNC(coleco_state::paddle_2_r));
 }
 
+void bit90_state::bit90_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x80, 0x80).mirror(0x17).r(FUNC(bit90_state::bankswitch_u4_r));
+	map(0x88, 0x88).mirror(0x17).r(FUNC(bit90_state::bankswitch_u3_r));
+	map(0x80, 0x80).mirror(0x1f).w(FUNC(coleco_state::paddle_off_w));
+	map(0xa0, 0xa1).mirror(0x1e).rw("tms9928a", FUNC(tms9928a_device::read), FUNC(tms9928a_device::write));
+	map(0xc0, 0xc0).mirror(0x1f).r(FUNC(bit90_state::keyboard_r));
+	map(0xc0, 0xc0).mirror(0x1f).w(FUNC(coleco_state::paddle_on_w));
+	map(0xe0, 0xe0).mirror(0x1d).r(FUNC(coleco_state::paddle_1_r));
+	map(0xe0, 0xe0).mirror(0x1b).w(FUNC(bit90_state::u32_w));  	     // bits7-4 for keyscan, (to bcd decoder) and bits1-0 tape out
+	map(0xe2, 0xe2).mirror(0x1d).r(FUNC(coleco_state::paddle_2_r));  // also, bit7 is tape read?
+	map(0xe4, 0xe4).mirror(0x1b).w("sn76489a", FUNC(sn76489a_device::write));
+
+	// IORQ goes to pin 55 of the Bit90 expansion port,
+	// So ports < 0x80 can be decoded there
+
+	// External Printer Interface
+	//map(0x48, 0x48).w(FUNC(bit90_state::printer_data_w));  // data to latch here
+	//map(0x4a, 0x4a).r(FUNC(bit90_state::printer_control_r));  // bit0 is busy bit
+	//map(0x4a, 0x4a).w(FUNC(bit90_state::printer_control_w));  // bit0 is reset (active low), bit1 is latch (active low)
+
+	// External/(Internal?) RAM Interface
+	//map(0x4e, 0x4f).w(FUNC(bit90_state::external_ram_control_w)); // 0x4e enable, 0x4f disable
+	// RAM can appear, starting at 0x8000 up to 0xffff
+}
+
 void coleco_state::czz50_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x6000, 0x63ff).ram().mirror(0x1c00).share("ram");
 	map(0x8000, 0xffff).rom();
 }
-
 
 /* Input Ports */
 
@@ -162,6 +241,90 @@ static INPUT_PORTS_START( czz50 )
 	PORT_BIT( 0xb0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( bit90 )
+	PORT_INCLUDE( coleco )
+
+	PORT_START("ROW0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("-") PORT_CODE(KEYCODE_MINUS)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7") PORT_CODE(KEYCODE_7)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3") PORT_CODE(KEYCODE_3)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\\") PORT_CODE(KEYCODE_BACKSLASH)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("INS") PORT_CODE(KEYCODE_INSERT)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1") PORT_CODE(KEYCODE_1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5") PORT_CODE(KEYCODE_5)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9") PORT_CODE(KEYCODE_9)
+
+	PORT_START("ROW1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("^") PORT_CODE(KEYCODE_TILDE)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8") PORT_CODE(KEYCODE_8)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4") PORT_CODE(KEYCODE_4)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("BS") PORT_CODE(KEYCODE_BACKSPACE)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("DEL") PORT_CODE(KEYCODE_DEL)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2") PORT_CODE(KEYCODE_2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6") PORT_CODE(KEYCODE_6)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0") PORT_CODE(KEYCODE_0)
+
+	PORT_START("ROW2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("P") PORT_CODE(KEYCODE_P)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Y") PORT_CODE(KEYCODE_Y)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("W") PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("]") PORT_CODE(KEYCODE_CLOSEBRACE)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("UP") PORT_CODE(KEYCODE_UP)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ESC") PORT_CODE(KEYCODE_ESC)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("R") PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("I") PORT_CODE(KEYCODE_I)
+
+	PORT_START("ROW3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("[") PORT_CODE(KEYCODE_OPENBRACE)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("U") PORT_CODE(KEYCODE_U)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("E") PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RUBOUT") PORT_CODE(KEYCODE_HOME)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RIGHT") PORT_CODE(KEYCODE_RIGHT)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Q") PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("T") PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("O") PORT_CODE(KEYCODE_O)
+
+	PORT_START("ROW4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(";") PORT_CODE(KEYCODE_COLON)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("H") PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("S") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("@") PORT_CODE(KEYCODE_END)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("/") PORT_CODE(KEYCODE_SLASH)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CAPS") PORT_CODE(KEYCODE_CAPSLOCK)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F") PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("K") PORT_CODE(KEYCODE_K)
+
+	PORT_START("ROW5")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(":") PORT_CODE(KEYCODE_QUOTE)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("J") PORT_CODE(KEYCODE_J)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D") PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RETURN") PORT_CODE(KEYCODE_ENTER)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(".") PORT_CODE(KEYCODE_STOP)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("G") PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("L") PORT_CODE(KEYCODE_L)
+
+	PORT_START("ROW6")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("N") PORT_CODE(KEYCODE_N)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("V") PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("X") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("M") PORT_CODE(KEYCODE_M)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(",") PORT_CODE(KEYCODE_COMMA)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Z") PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("B") PORT_CODE(KEYCODE_B)
+
+	PORT_START("ROW7")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("META") PORT_CODE(KEYCODE_RALT)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("BASIC") PORT_CODE(KEYCODE_LALT)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("LEFT") PORT_CODE(KEYCODE_LEFT)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("DOWN") PORT_CODE(KEYCODE_DOWN)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SPACE") PORT_CODE(KEYCODE_SPACE)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("FCTN") PORT_CODE(KEYCODE_RCONTROL)
+
+INPUT_PORTS_END
 
 /* Interrupts */
 
@@ -352,9 +515,22 @@ void coleco_state::machine_start()
 	save_item(NAME(m_joy_analog_reload));
 }
 
+void bit90_state::machine_start()
+{
+	coleco_state::machine_start();
+	uint8_t *banked = memregion("banked")->base();
+	m_bank->configure_entries(0, 0x02, banked, 0x2000);
+}
+
 void coleco_state::machine_reset()
 {
 	m_last_nmi_state = 0;
+}
+
+void bit90_state::machine_reset()
+{
+	coleco_state::machine_reset();
+	m_bank->set_entry(0);
 }
 
 //static image_verify_result coleco_cart_verify(const uint8_t *cartdata, size_t size)
@@ -412,6 +588,36 @@ void coleco_state::colecop(machine_config &config)
 	vdp.set_screen("screen");
 	vdp.set_vram_size(0x4000);
 	vdp.int_callback().set(FUNC(coleco_state::coleco_vdp_interrupt));
+}
+
+void bit90_state::bit90(machine_config &config)
+{
+	/* basic machine hardware */
+	Z80(config, m_maincpu, XTAL(7'159'090)/2); // 3.579545 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &bit90_state::bit90_map);
+	m_maincpu->set_addrmap(AS_IO, &bit90_state::bit90_io_map);
+
+	/* video hardware */
+	tms9929a_device &vdp(TMS9929A(config, "tms9928a", XTAL(10'738'635)));
+	vdp.set_screen("screen");
+	vdp.set_vram_size(0x4000);
+	vdp.int_callback().set(FUNC(coleco_state::coleco_vdp_interrupt));
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	sn76489a_device &psg(SN76489A(config, "sn76489a", XTAL(7'159'090)/2)); // 3.579545 MHz
+	psg.add_route(ALL_OUTPUTS, "mono", 1.00);
+	// TODO: enable when Z80 has better WAIT pin emulation, this currently breaks pitfall2 for example
+	//psg.ready_cb().set_inputline("maincpu", Z80_INPUT_LINE_WAIT).invert();
+
+	/* cartridge */
+	COLECOVISION_CARTRIDGE_SLOT(config, m_cart, colecovision_cartridges, nullptr);
+
+	/* software lists */
+	SOFTWARE_LIST(config, "cart_list").set_original("coleco");
+
+	TIMER(config, "paddle_timer").configure_periodic(FUNC(coleco_state::paddle_update_callback), attotime::from_msec(20));
 }
 
 void coleco_state::czz50(machine_config &config)
@@ -485,6 +691,44 @@ ROM_END
 #define rom_dina rom_czz50
 #define rom_prsarcde rom_czz50
 
+/* BIT90 BIOS
+
+Circuit board is labelled: BIT90C-PAL-90002
+
+Units have 2764-compatible pinouts at U2,U3, and U4
+Some units have 2764 EPROMS, Mask ROMs, or a combination
+
+Mask ROMs are labelled:
+
+@U4:
+D32351E
+BIT-99C1
+
+@U3:
+D32521E
+MONITOR2
+
+@U2:
+D32522E
+MONITOR3
+
+*/
+
+ROM_START( bit90 )
+	ROM_DEFAULT_BIOS( "3.0" )
+	ROM_SYSTEM_BIOS( 0, "3.0", "BASIC 3.0" )
+	ROM_SYSTEM_BIOS( 1, "3.1", "BASIC 3.1" )
+
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROMX_LOAD("bit90b3.u2",  0x2000, 0x2000, CRC(b992b940) SHA1(c7dd96a1944fac40cbae20630f303a69de7e6313), ROM_BIOS(0))
+	ROMX_LOAD("d32522e.u2",  0x2000, 0x2000, NO_DUMP, ROM_BIOS(1)) // MONITOR3
+
+	ROM_REGION( 0x4000, "banked", 0 )
+	ROMX_LOAD("bit90b3.u4", 0x0000, 0x2000, CRC(06d21fc2) SHA1(6d296b09b661babd4c2ef6993f8e768a67932388), ROM_BIOS(0))
+	ROMX_LOAD("bit90b3.u3", 0x2000, 0x2000, CRC(61fdccbb) SHA1(25cac13627c0916d3ed2b92f0b2218b405de5be4), ROM_BIOS(0))
+	ROMX_LOAD("d32351e.u4", 0x0000, 0x2000, NO_DUMP, ROM_BIOS(1)) // BIT-99C1
+	ROMX_LOAD("d32521e.u3", 0x2000, 0x2000, NO_DUMP, ROM_BIOS(1)) // MONITOR2
+ROM_END
 
 /* System Drivers */
 
@@ -495,3 +739,7 @@ CONS( 1983, colecop,  coleco, 0,      colecop,  coleco, coleco_state, empty_init
 CONS( 1986, czz50,    0,      coleco, czz50,    czz50,  coleco_state, empty_init, "Bit Corporation",  "Chuang Zao Zhe 50",                0 )
 CONS( 1988, dina,     czz50,  0,      dina,     czz50,  coleco_state, empty_init, "Telegames",        "Dina",                             0 )
 CONS( 1988, prsarcde, czz50,  0,      czz50,    czz50,  coleco_state, empty_init, "Telegames",        "Personal Arcade",                  0 )
+COMP( 1983, bit90,    0,      coleco, bit90,    bit90,  bit90_state,  empty_init, "Bit Corporation",  "Bit90",                            0 )
+
+
+

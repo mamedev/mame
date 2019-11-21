@@ -13,7 +13,9 @@
 #pragma once
 
 #include "ui/menu.h"
+#include "iptseqpoll.h"
 
+#include <string>
 #include <vector>
 
 
@@ -29,6 +31,7 @@ private:
 	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 };
+
 
 class menu_input : public menu
 {
@@ -60,20 +63,25 @@ protected:
 	using data_vector = std::vector<input_item_data>;
 
 	menu_input(mame_ui_manager &mui, render_container &container);
-	void populate_sorted();
+	void populate_sorted(float &customtop, float &custombottom);
 	void toggle_none_default(input_seq &selected_seq, input_seq &original_seq, const input_seq &selected_defseq);
 
-	data_vector         data;
-	input_item_data *   pollingitem;
+	data_vector data;
+	input_item_data *pollingitem;
 
 private:
-	input_item_data *   lastitem;
-	bool                record_next;
-	input_seq           starting_seq;
+	input_sequence_poller seq_poll;
+	std::string errormsg;
+	input_item_data *erroritem;
+	input_item_data *lastitem;
+	bool record_next;
+	input_seq starting_seq;
 
+	virtual void custom_render(void *selectedref, float top, float bottom, float x1, float y1, float x2, float y2) override;
 	virtual void handle() override;
-	virtual void update_input(struct input_item_data *seqchangeditem) = 0;
+	virtual void update_input(input_item_data &seqchangeditem) = 0;
 };
+
 
 class menu_input_general : public menu_input
 {
@@ -83,10 +91,11 @@ public:
 
 private:
 	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void update_input(struct input_item_data *seqchangeditem) override;
+	virtual void update_input(input_item_data &seqchangeditem) override;
 
 	const int group;
 };
+
 
 class menu_input_specific : public menu_input
 {
@@ -96,7 +105,7 @@ public:
 
 private:
 	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void update_input(struct input_item_data *seqchangeditem) override;
+	virtual void update_input(input_item_data &seqchangeditem) override;
 };
 
 } // namespace ui

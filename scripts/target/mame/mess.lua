@@ -132,7 +132,7 @@ CPUS["E0C6200"] = true
 CPUS["MELPS4"] = true
 CPUS["HPHYBRID"] = true
 CPUS["SM510"] = true
-CPUS["MB86901"] = true
+CPUS["SPARC"] = true
 CPUS["NANOPROCESSOR"] = true
 CPUS["CLIPPER"] = true
 CPUS["CAPRICORN"] = true
@@ -147,6 +147,7 @@ CPUS["BCP"] = true
 CPUS["F2MC16"] = true
 CPUS["CR16B"] = true
 CPUS["FR"] = true
+CPUS["DSP56000"] = true
 
 --------------------------------------------------
 -- specify available sound cores; some of these are
@@ -2875,6 +2876,12 @@ files {
 	MAME_DIR .. "src/mame/machine/m6502_vh2009.cpp",
 	MAME_DIR .. "src/mame/machine/m6502_vh2009.h",
 	MAME_DIR .. "src/mame/drivers/vt1682.cpp",
+	MAME_DIR .. "src/mame/machine/vt1682_io.h",
+	MAME_DIR .. "src/mame/machine/vt1682_io.cpp",
+	MAME_DIR .. "src/mame/machine/vt1682_alu.h",
+	MAME_DIR .. "src/mame/machine/vt1682_alu.cpp",
+	MAME_DIR .. "src/mame/machine/vt1682_timer.h",
+	MAME_DIR .. "src/mame/machine/vt1682_timer.cpp",
 	MAME_DIR .. "src/mame/machine/m6502_vt1682.cpp",
 	MAME_DIR .. "src/mame/machine/m6502_vt1682.h",
 }
@@ -3851,6 +3858,7 @@ files {
 	MAME_DIR .. "src/mame/audio/nl_gamemachine.cpp",
 	MAME_DIR .. "src/mame/drivers/geniusiq.cpp",
 	MAME_DIR .. "src/mame/drivers/geniusjr.cpp",
+	MAME_DIR .. "src/mame/drivers/gkidabc.cpp",
 	MAME_DIR .. "src/mame/drivers/glcx.cpp",
 	MAME_DIR .. "src/mame/drivers/vtech_eu3a12.cpp",
 	MAME_DIR .. "src/mame/drivers/iqunlim.cpp",

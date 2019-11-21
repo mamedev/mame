@@ -24,7 +24,10 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(A2065, a2065_device, "a2065", "CBM A2065 Ethernet Card")
+DEFINE_DEVICE_TYPE_NS(ZORRO_A2065, bus::amiga::zorro, a2065_device, "zorro_a2065", "CBM A2065 Ethernet Card")
+
+
+namespace bus { namespace amiga { namespace zorro {
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
@@ -48,7 +51,7 @@ void a2065_device::device_add_mconfig(machine_config &config)
 //-------------------------------------------------
 
 a2065_device::a2065_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, A2065, tag, owner, clock),
+	device_t(mconfig, ZORRO_A2065, tag, owner, clock),
 	device_zorro2_card_interface(mconfig, *this),
 	m_lance(*this, "lance")
 {
@@ -66,8 +69,6 @@ void a2065_device::device_start()
 
 	// register for save states
 	save_pointer(NAME(m_ram), 0x4000);
-
-	set_zorro_device();
 }
 
 
@@ -77,7 +78,7 @@ void a2065_device::device_start()
 
 void a2065_device::autoconfig_base_address(offs_t address)
 {
-	LOG("%s('%s'): autoconfig_base_address received: 0x%06x\n", shortname(), basetag(), address);
+	LOG("%s: autoconfig_base_address received: 0x%06x\n", shortname(), address);
 	LOG("-> installing a2065\n");
 
 	// stop responding to default autoconfig
@@ -104,7 +105,7 @@ void a2065_device::autoconfig_base_address(offs_t address)
 
 WRITE_LINE_MEMBER( a2065_device::cfgin_w )
 {
-	LOG("%s('%s'): configin_w (%d)\n", shortname(), basetag(), state);
+	LOG("%s: configin_w (%d)\n", shortname(), state);
 
 	if (state == 0)
 	{
@@ -160,3 +161,5 @@ WRITE_LINE_MEMBER( a2065_device::lance_irq_w )
 	// default is irq 2, can be changed via jumper
 	m_slot->int2_w(!state);
 }
+
+} } } // namespace bus::amiga::zorro

@@ -5,12 +5,12 @@
 //  debugbaseinfo.h - Win32 debug window handling
 //
 //============================================================
+#ifndef MAME_DEBUGGER_WIN_DEBUGBASEINFO_H
+#define MAME_DEBUGGER_WIN_DEBUGBASEINFO_H
 
-#ifndef __DEBUG_WIN_DEBUG_BASE_INFO_H__
-#define __DEBUG_WIN_DEBUG_BASE_INFO_H__
+#pragma once
 
 #include "debugwin.h"
-
 
 
 class debugbase_info
@@ -34,6 +34,5 @@ private:
 	ui_metrics const            &m_metrics;
 	bool const                  &m_waiting_for_debugger;
 };
-
 
 #endif

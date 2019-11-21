@@ -12,24 +12,22 @@
 #include "sparcdasm.h"
 #include "sparc_intf.h"
 
-#define SPARCV8         (1)
 #define LOG_FCODES      (0)
 
 #if LOG_FCODES
 #include <map>
 #endif
 
-class mb86901_device : public cpu_device, public sparc_mmu_host_interface, protected sparc_disassembler::config
+class sparc_base_device : public cpu_device, public sparc_mmu_host_interface, protected sparc_disassembler::config
 {
 public:
-	mb86901_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sparc_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	template <typename T> void set_mmu(T &&tag) { m_mmu.set_tag(std::forward<T>(tag)); }
 
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_stop() override;
 	virtual void device_post_load() override;
 	virtual void device_resolve_objects() override;
 
@@ -75,11 +73,8 @@ protected:
 	void execute_rett(uint32_t op);
 	void execute_saverestore(uint32_t op);
 	void execute_jmpl(uint32_t op);
-#if SPARCV8
-	void execute_mul(uint32_t op);
-	void execute_div(uint32_t op);
-#endif
 	inline void execute_group2(uint32_t op);
+	virtual bool execute_extra_group2(uint32_t op) = 0;
 
 	inline void execute_ldd(uint32_t op);
 	inline void execute_ld(uint32_t op);
@@ -102,10 +97,8 @@ protected:
 
 	void execute_store(uint32_t op);
 	void execute_ldstub(uint32_t op);
-#if SPARCV8
-	void execute_swap(uint32_t op);
-#endif
 	inline void execute_group3(uint32_t op);
+	virtual bool execute_extra_group3(uint32_t op) = 0;
 
 	enum set_cc
 	{
@@ -122,12 +115,21 @@ protected:
 
 	bool evaluate_condition(uint32_t op);
 	inline void execute_bicc(uint32_t op);
+	bool evaluate_fp_condition(uint32_t op);
+	inline void execute_fbfcc(uint32_t op);
 	void execute_ticc(uint32_t op);
 	void select_trap();
 	void execute_trap();
+	virtual void update_tt() = 0;
+
+	void check_fdiv_zero_exception();
+	bool check_fp_exceptions();
+	bool set_fpr32(const uint32_t rd, const uint32_t data);
+	bool set_fpr64(const uint32_t rd, const uint64_t data);
 
 	void complete_instruction_execution(uint32_t op);
 	inline void dispatch_instruction(uint32_t op);
+	virtual bool dispatch_extra_instruction(uint32_t op) = 0;
 	void complete_fp_execution(uint32_t /*op*/);
 	inline void execute_step();
 
@@ -198,17 +200,11 @@ protected:
 	bool m_illegal_instruction;
 	bool m_mem_address_not_aligned;
 	bool m_fp_disabled;
+	bool m_cp_disabled;
 	bool m_fp_exception;
-	bool m_cp_disabled; // SPARCv8
-	bool m_cp_exception; // SPARCv8
-	bool m_unimplemented_FLUSH; // SPARCv8
-	bool m_r_register_access_error; // SPARCv8
-	bool m_instruction_access_error; // SPARCv8
+	bool m_cp_exception;
 	bool m_instruction_access_exception;
-	bool m_data_access_error; // SPARCv8
-	bool m_data_store_error; // SPARCv8
 	bool m_data_access_exception;
-	bool m_division_by_zero; // SPARCv8
 	bool m_trap_instruction;
 	bool m_window_underflow;
 	bool m_window_overflow;
@@ -221,8 +217,8 @@ protected:
 	uint8_t m_cp_sequence_err;
 
 	// fields separated out from PSR (Processor State Register)
-	uint8_t m_impl;   // implementation (always 0 in MB86901)
-	uint8_t m_ver;    // version (always 0 in MB86901)
+	uint8_t m_impl;   // implementation (always 0 in SPARCv7)
+	uint8_t m_ver;    // version (always 0 in SPARCv7)
 	uint8_t m_icc;    // integer condition codes
 	bool m_ec;      // enable coprocessor
 	bool m_ef;      // enable FPU
@@ -269,8 +265,48 @@ protected:
 	std::function<void (sparc_disassembler *)> m_asi_desc_adder;
 };
 
+class sparcv7_device : public sparc_base_device
+{
+public:
+	sparcv7_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual bool execute_extra_group2(uint32_t op) override;
+	virtual bool execute_extra_group3(uint32_t op) override;
+	virtual bool dispatch_extra_instruction(uint32_t op) override;
+	virtual void update_tt() override;
+};
+
+class sparcv8_device : public sparc_base_device
+{
+public:
+	sparcv8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	virtual bool execute_extra_group2(uint32_t op) override;
+	virtual bool execute_extra_group3(uint32_t op) override;
+	virtual bool dispatch_extra_instruction(uint32_t op) override;
+	virtual void update_tt() override;
+
+private:
+	void execute_mul(uint32_t op);
+	void execute_div(uint32_t op);
+	void execute_swap(uint32_t op);
+
+	bool m_unimplemented_FLUSH;
+	bool m_r_register_access_error;
+	bool m_instruction_access_error;
+	bool m_data_access_error;
+	bool m_data_store_error;
+	bool m_division_by_zero;
+};
+
 // device type definition
-DECLARE_DEVICE_TYPE(MB86901, mb86901_device)
+DECLARE_DEVICE_TYPE(SPARCV7, sparcv7_device)
+DECLARE_DEVICE_TYPE(SPARCV8, sparcv8_device)
 
 enum
 {
@@ -296,6 +332,12 @@ enum
 	SPARC_PIL,
 	SPARC_S,
 	SPARC_PS,
+
+	SPARC_FSR,
+	SPARC_F0,	SPARC_F1,	SPARC_F2,	SPARC_F3,	SPARC_F4,	SPARC_F5,	SPARC_F6,	SPARC_F7,
+	SPARC_F8,	SPARC_F9,	SPARC_F10,	SPARC_F11,	SPARC_F12,	SPARC_F13,	SPARC_F14,	SPARC_F15,
+	SPARC_F16,	SPARC_F17,	SPARC_F18,	SPARC_F19,	SPARC_F20,	SPARC_F21,	SPARC_F22,	SPARC_F23,
+	SPARC_F24,	SPARC_F25,	SPARC_F26,	SPARC_F27,	SPARC_F28,	SPARC_F29,	SPARC_F30,	SPARC_F31,
 
 	SPARC_R0,   SPARC_R1,   SPARC_R2,   SPARC_R3,   SPARC_R4,   SPARC_R5,   SPARC_R6,   SPARC_R7,   SPARC_R8,   SPARC_R9,   SPARC_R10,  SPARC_R11,  SPARC_R12,  SPARC_R13,  SPARC_R14,  SPARC_R15,
 	SPARC_R16,  SPARC_R17,  SPARC_R18,  SPARC_R19,  SPARC_R20,  SPARC_R21,  SPARC_R22,  SPARC_R23,  SPARC_R24,  SPARC_R25,  SPARC_R26,  SPARC_R27,  SPARC_R28,  SPARC_R29,  SPARC_R30,  SPARC_R31,

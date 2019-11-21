@@ -65,6 +65,7 @@ flagrall                        // ?
 4in1a                           // MAME based bootleg
 4in1b                           // MAME based bootleg
 60in1                           // MAME based bootleg
+rodent                          // (c) 2005 The Game Room
 
 @source:3do.cpp
 3do                             // 3DO consoles
@@ -95,6 +96,8 @@ undoukai                        // A17 (c) 1984 Taito
 @source:4dpi.cpp
 4d20                            //  IP6: Personal Iris 4D/20, R2000 @12.5MHz
 4d25                            // IP10: Personal Iris 4D/25, R3000 @20MHz
+4d30                            // IP14: Personal Iris 4D/30, R3000A @30MHz
+4d35                            // IP12: Personal Iris 4D/35, R3000A @36MHz
 
 @source:4enlinea.cpp
 4enlinea                        // (c) 1991 System Compumatic
@@ -2644,6 +2647,11 @@ hot307h                         // Shuttle HOT-307H motherboard (486)
 mb1433ucv                       // Biostar MB-1433UCV motherboard (486)
 gc10a                           // EAGLEN486 GC10A motherboard (486)
 hot419                          // Shuttle HOT-419 motherboard (486)
+ts34t25                         // Highscreen 486-25 aka Midwest Micro Elite TS34T-25 notebook
+wpc250                          // Wang PC-250/16 (286)
+suntac303                       // motherboards using the Suntac ST62C303 chipset
+abah4                           // Abit AH4(T) motherboard (486)
+abpi4                           // Abit PI4(T) motherboard (486)
 
 @source:atari_s1.cpp
 aavenger                        //
@@ -10313,6 +10321,7 @@ czz50                           // Bit Corporation Chuang Zao Zhe 50
 dina                            // Telegames Dina
 onyx                            // Microdigital ONYX (Brazilian Coleco clone / unreleased prototype)
 prsarcde                        // Telegames Personal Arcade
+bit90                           // Bit Corporation Bit90
 
 @source:combatsc.cpp
 bootcamp                        // GX611 (c) 1987
@@ -11002,7 +11011,7 @@ cps3booto                       // bootleg
 cps3booto2                      // bootleg
 cps3bs32                        //
 cps3bs32a                       //
-jojo                            // 28/01/1999 (c) 1998 (USA)
+jojo                            // 28/01/1999 (c) 1998 (Euro)
 jojoba                          // 27/09/1999 (c) 1999 (Japan)
 jojoban                         // 27/09/1999 (c) 1999 (Japan)
 jojobane                        // 27/09/1999 (c) 1999 (Euro)
@@ -11015,8 +11024,11 @@ jojojr2                         // 02/12/1998 (c) 1998 (Japan)
 jojon                           // 28/01/1999 (c) 1998 (Asia)
 jojonr1                         // 08/01/1999 (c) 1998 (Asia)
 jojonr2                         // 02/12/1998 (c) 1998 (Asia)
-jojor1                          // 08/01/1999 (c) 1998 (USA)
-jojor2                          // 02/12/1998 (c) 1998 (USA)
+jojor1                          // 08/01/1999 (c) 1998 (Euro)
+jojor2                          // 02/12/1998 (c) 1998 (Euro)
+jojou                           // 28/01/1999 (c) 1998 (USA)
+jojour1                         // 08/01/1999 (c) 1998 (USA)
+jojour2                         // 02/12/1998 (c) 1998 (USA)
 redearth                        // 21/11/1996 (c) 1996 (Euro)
 redearthr1                      // 23/10/1996 (c) 1996 (Euro)
 sfiii                           // 04/02/1997 (c) 1997 (Euro)
@@ -14452,6 +14464,7 @@ pcmda                           // 1987 PC with MDA
 pcvga                           // 198? PC-XT (VGA, MF2 Keyboard)
 
 @source:ggconnie.cpp
+fishingm                        // (c) 1997 Capcom
 ggconnie                        // (c) ???? Capcom
 smf                             // (c) 1997 Capcom
 
@@ -14480,6 +14493,10 @@ ginganina                       // (c) 1987 Jaleco
 
 @source:gizmondo.cpp
 gizmondo                        //
+
+@source:gkidabc.cpp
+gkidabc                         // Genius KID ABC Fan (Germany)
+miprimlec                       // Mis Primeras Lecciones (Spain)
 
 @source:gkigt.cpp
 gkigt4                          //
@@ -19262,6 +19279,7 @@ macjungn                        //
 nbamac                          //
 spcpnthr                        //
 spctrain                        //
+spctraino                       //
 
 @source:macpci.cpp
 pippin                          //
@@ -21927,6 +21945,7 @@ lastfortea                      // (c) 1994
 lastfortg                       // (c) 1994 - VG460-(A) PCB version
 lastfortj                       // (c) 1994 - VG460-(A) PCB version
 lastfortk                       // (c) 1994
+metabee                         // (c) 2001 Natsume
 moegonta                        // (c) 1993 Yanyaka (Japan) (Arcade TV Game List - P.101, Right, 2 from Bottom)
 mouja                           // (c) 1996 Etona (Japan)
 msgogo                          // (c) 1995 Metro
@@ -31091,6 +31110,7 @@ zdog
 @source:vt1682.cpp
 ii8in1
 ii32in1
+zone40                          // Zone 40
 
 @source:newbrain.cpp
 newbrain                        //
@@ -31831,6 +31851,7 @@ ataripc3                        // Atari PC3
 bw230                           // 1985 Bondwell (CGA)
 cadd810                         // CompuAdd 810
 comport                         // Compaq Portable
+coppc400                        // Cordata PPC-400 portable
 dgone                           // 1984 Data General/One
 eagle1600                       //
 eaglespirit                     // Eagle PC Spirit
@@ -31852,13 +31873,17 @@ mk88                            //
 ncrpc4i                         // NCR PC4i
 nixpc01                         // Nixdorf 8810/25 - PC01
 olivm15                         // Olivetti M15
+olystar20f                      // AEG Olympia Olystar 20F
 olytext30                       // AEG Olympia Olytext 30
 pc7000                          // 1985 Sharp PC-7000
 poisk2                          //
 sicpc1605                       // Siemens Sicomp PC16-05
 ssam88s                         //
 sx16                            // Sanyo SX-16
-zdsupers                        //
+zdsupers                        // Zenith SuperSport
+zdz150                          // Zenith Z-150 series
+zdz160                          // Zenith Z-160 series
+ledgmodd                        // Leading Edge Model D
 ledgmodm                        // Leading Edge Model M
 eaglepc2                        // Eagle PC-2
 mpx16                           // Ciarcia's Circuit Cellar Micromint MPX-16
@@ -33396,7 +33421,6 @@ prehisleu                       // A8003 'GT' (c) 1989
 prehisleb                       // bootleg
 
 @source:prestige.cpp
-gkidabc                         // Genius KID ABC Fan (Germany)
 gl6000sl                        // Genius Leader 6000SL (Germany)
 gl7007sl                        // Genius Leader 7007SL (Germany)
 glcolor                         // Genius Leader Color (Germany)
@@ -37528,6 +37552,7 @@ mrblack1                        //
 mrblkz80                        //
 obaoba                          //
 obaoba1                         //
+obaobao                         //
 polar                           //
 rally                           //
 sharkt                          //
@@ -39536,7 +39561,6 @@ jak_sbfc                        //
 lexizeus                        // Lexibook
 vii                             // KenSingTon / Jungle Soft / Siatronics Vii
 wirels60                        // Wireless 60
-zone40                          // Zone 40
 zone60                          // Zone 60
 rad_skat                        //
 rad_skatp                       //

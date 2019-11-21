@@ -59,7 +59,6 @@ public:
 	ddz_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_workram(*this, "workram"),
-		m_ipl(*this, "ipl"),
 		m_encdata(*this, "enc_data"),
 		m_maincpu(*this, "maincpu"),
 		m_vr0soc(*this, "vr0soc")
@@ -73,7 +72,6 @@ private:
 
 	/* memory pointers */
 	required_shared_ptr<uint32_t> m_workram;
-	required_region_ptr<uint8_t> m_ipl;
 	required_region_ptr<uint8_t> m_encdata;
 
 	/* devices */
@@ -160,12 +158,13 @@ ROM_END
 
 void ddz_state::init_ddz()
 {
+	uint8_t *ipl = reinterpret_cast<uint8_t *>(memregion("ipl")->base());
 	for(uint32_t x=0;x<m_encdata.bytes();x+=16)
 	{
 		// TBD
 		for(int y=0;y<16;y++)
-			m_ipl[x+(y)] = m_encdata[x+y];
-//          m_ipl[x+(15-y)] = m_encdata[x+y];
+			ipl[BYTE4_XOR_LE(x+y)] = m_encdata[x+y];
+//          ipl[BYTE4_XOR_LE(x+15-y)] = m_encdata[x+y];
 	}
 }
 

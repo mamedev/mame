@@ -8,27 +8,26 @@
     special thanks to Dirk Best for various wd17xx fixes
 
     TODO:
+    - clean-ups, split components into devices if necessary and maybe separate turbo/turboz features into specific file(s);
+	- refactor base video into a true scanline renderer, expect it to break 6845 drawing delegation support badly;
+	- support extended x1turboz video features (need more test cases?);
     - Rewrite keyboard input hook-up and decap/dump the keyboard MCU if possible;
     - Fix the 0xe80/0xe83 kanji ROM readback;
     - x1turbo keyboard inputs are currently broken, use x1turbo40 for now;
     - Hook-up remaining .tap image formats;
     - Implement APSS tape commands;
-    - Sort out / redump the BIOS gfx roms;
+    - Sort out / redump the BIOS gfx roms, and understand if TurboZ really have same BIOS as 
+	  vanilla Turbo like Jp emulators seems to suggest;
     - X1Turbo: Implement SIO.
     - Implement true 400 lines mode (i.e. Chatnoir no Mahjong v2.1, Casablanca)
     - Implement SASI HDD interface;
-    - clean-ups!
-    - There are various unclear video things, these are:
-        - Implement the remaining scrn regs;
-        - Implement the new features of the x1turboz, namely the 4096 color feature amongst other things
-        - (anything else?)
     - Driver Configuration switches:
         - OPN for X1
         - EMM, and hook-up for X1 too
         - RAM size for EMM
         - specific x1turboz features?
 
-    per-game/program specific TODO:
+    per-game/program specific TODO (to be moved to hash file):
     - CZ8FB02 / CZ8FB03: doesn't load at all, they are 2hd floppies apparently;
     - Chack'n Pop: game is too fast, presumably missing wait states;
     - Dragon Buster: it crashed to me once with a obj flag hang;
@@ -976,7 +975,21 @@ WRITE8_MEMBER( x1_state::x1turboz_4096_palette_w )
 	{
 		if (m_turbo_reg.gfx_pal & 0x80) // APEN bit
 		{
-			uint32_t const pal_entry = ((offset & 0xff) << 4) | ((data & 0xf0) >> 4);
+			if (m_turbo_reg.gfx_pal & 0x08) // APRD bit
+			{
+				// TODO: writing here on APRD condition just fetch offset index that reads back on this I/O
+				popmessage("APRD enabled, contact MAMEdev");
+				return;
+			}
+			// TODO: unlike normal operation this cannot do mid-frame scanline update 
+			// (-> bus request signal when accessing this on non-vblank time)
+			uint32_t pal_entry = ((offset & 0xff) << 4) | ((data & 0xf0) >> 4);
+			// TODO: more complex condition
+			if ((m_turbo_reg.pal & 0x10) == 0) // C64 bit
+			{
+				pal_entry &= 0xccc;
+				pal_entry |= pal_entry >> 2;
+			}
 
 			m_pal_4096[pal_entry+((offset & 0x300)<<4)] = data & 0xf;
 
@@ -984,7 +997,7 @@ WRITE8_MEMBER( x1_state::x1turboz_4096_palette_w )
 			uint8_t const g = m_pal_4096[pal_entry+(2<<12)];
 			uint8_t const b = m_pal_4096[pal_entry+(0<<12)];
 
-			m_palette->set_pen_color(pal_entry+16, pal3bit(r), pal3bit(g), pal3bit(b));
+			m_palette->set_pen_color(pal_entry+16, pal4bit(r), pal4bit(g), pal4bit(b));
 		}
 	}
 	else //compatible mode
@@ -1672,7 +1685,7 @@ INPUT_CHANGED_MEMBER(x1_state::ipl_reset)
 	//anything else?
 }
 
-/* Apparently most games doesn't support this (not even the Konami ones!), one that does is...177 :o */
+// on 177 this makes the game to reset, on other games sending a NMI signal just causes a jump to la-la-land (including the Konami ones)
 INPUT_CHANGED_MEMBER(x1_state::nmi_reset)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
@@ -1683,12 +1696,14 @@ INPUT_PORTS_START( x1 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, x1_state, ipl_reset,0) PORT_NAME("IPL reset")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, x1_state, nmi_reset,0) PORT_NAME("NMI reset")
 
-	PORT_START("SOUND_SW") //FIXME: this is X1Turbo specific
+	PORT_START("SOUND_SW")
+	// TODO: this is X1Turbo specific and likely OPN busy flag instead
 	PORT_DIPNAME( 0x80, 0x80, "OPM Sound Setting?" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("IOSYS") //TODO: implement front-panel DIP-SW here
+	PORT_START("IOSYS")
+	// TODO: route front-panel DIP-SW here
 	PORT_DIPNAME( 0x01, 0x01, "IOSYS" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )

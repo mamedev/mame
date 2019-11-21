@@ -454,8 +454,8 @@ private:
 	void update_scan_bitmap_size(int y);
 	void pre_update_scanline(int y);
 	void create_composited_bitmap();
-    void destroy_scan_bitmaps();
-    void allocate_scan_bitmaps();
+	void destroy_scan_bitmaps();
+	void allocate_scan_bitmaps();
 
 	// inline configuration data
 	screen_type_enum    m_type;                     // type of screen

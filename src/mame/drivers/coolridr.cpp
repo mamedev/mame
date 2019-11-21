@@ -15,7 +15,6 @@
 
     TODO:
     - Understand what the 0x400000c reads on SH-2 really do.
-    - Remove SH-2 watchdog hack, if we ever bother about it ...
     - improve sound emulation
     - i8237 purpose is unknown (missing ROM for comms?).
     - verify zooming etc. our current algorithm is a bit ugly for text

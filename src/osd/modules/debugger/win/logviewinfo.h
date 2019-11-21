@@ -5,9 +5,10 @@
 //  logviewinfo.h - Win32 debug log window handling
 //
 //============================================================
+#ifndef MAME_DEBUGGER_WIN_LOGVIEWINFO_H
+#define MAME_DEBUGGER_WIN_LOGVIEWINFO_H
 
-#ifndef __DEBUG_WIN_LOG_VIEW_INFO_H__
-#define __DEBUG_WIN_LOG_VIEW_INFO_H__
+#pragma once
 
 #include "debugwin.h"
 

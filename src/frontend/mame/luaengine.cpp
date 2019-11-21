@@ -624,6 +624,13 @@ bool lua_engine::menu_callback(const std::string &menu, int index, const std::st
 	return ret;
 }
 
+void lua_engine::set_machine(running_machine *machine)
+{
+	if (!machine || (machine != m_machine))
+		m_seq_poll.reset();
+	m_machine = machine;
+}
+
 int lua_engine::enumerate_functions(const char *id, std::function<bool(const sol::protected_function &func)> &&callback)
 {
 	int count = 0;
@@ -2085,7 +2092,10 @@ void lua_engine::initialize()
 	input_type.set("seq_to_tokens", [](input_manager &input, sol::user<input_seq> seq) { return input.seq_to_tokens(seq); });
 	input_type.set("seq_name", [](input_manager &input, sol::user<input_seq> seq) { return input.seq_name(seq); });
 	input_type.set("seq_clean", [](input_manager &input, sol::user<input_seq> seq) { input_seq cleaned_seq = input.seq_clean(seq); return sol::make_user(cleaned_seq); });
-	input_type.set("seq_poll_start", [](input_manager &input, const char *cls_string, sol::object seq) {
+	input_type.set("seq_poll_start", [this](input_manager &input, const char *cls_string, sol::object seq) {
+			if (!m_seq_poll)
+				m_seq_poll.reset(new input_sequence_poller(input));
+
 			input_item_class cls;
 			if (!strcmp(cls_string, "switch"))
 				cls = ITEM_CLASS_SWITCH;
@@ -2098,13 +2108,36 @@ void lua_engine::initialize()
 			else
 				cls = ITEM_CLASS_INVALID;
 
-			input_seq *start = nullptr;
-			if(seq.is<sol::user<input_seq>>())
-				start = &seq.as<sol::user<input_seq>>();
-			input.seq_poll_start(cls, start);
+			if (seq.is<sol::user<input_seq>>())
+				m_seq_poll->start(cls, seq.as<sol::user<input_seq>>());
+			else
+				m_seq_poll->start(cls);
 		});
-	input_type.set("seq_poll", &input_manager::seq_poll);
-	input_type.set("seq_poll_final", [](input_manager &input) { return sol::make_user(input.seq_poll_final()); });
+	input_type.set("seq_poll", [this](input_manager &input) -> sol::object {
+			if (!m_seq_poll)
+				return sol::make_object(sol(), sol::nil);
+			return sol::make_object(sol(), m_seq_poll->poll());
+		});
+	input_type.set("seq_poll_final", [this](input_manager &input) -> sol::object {
+			if (!m_seq_poll)
+				return sol::make_object(sol(), sol::nil);
+			return sol::make_object(sol(), sol::make_user(m_seq_poll->valid() ? m_seq_poll->sequence() : input_seq()));
+		});
+	input_type.set("seq_poll_modified", [this](input_manager &input) -> sol::object {
+			if (!m_seq_poll)
+				return sol::make_object(sol(), sol::nil);
+			return sol::make_object(sol(), m_seq_poll->modified());
+		});
+	input_type.set("seq_poll_valid", [this](input_manager &input) -> sol::object {
+			if (!m_seq_poll)
+				return sol::make_object(sol(), sol::nil);
+			return sol::make_object(sol(), m_seq_poll->valid());
+		});
+	input_type.set("seq_poll_sequence", [this](input_manager &input) -> sol::object {
+			if (!m_seq_poll)
+				return sol::make_object(sol(), sol::nil);
+			return sol::make_object(sol(), sol::make_user(m_seq_poll->sequence()));
+	});
 	input_type.set("device_classes", sol::property([this](input_manager &input) {
 			sol::table result = sol().create_table();
 			for (input_device_class devclass_id = DEVICE_CLASS_FIRST_VALID; devclass_id <= DEVICE_CLASS_LAST_VALID; devclass_id++)

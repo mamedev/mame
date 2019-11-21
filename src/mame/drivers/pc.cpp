@@ -43,6 +43,7 @@ public:
 	{ }
 
 	void ataripc1(machine_config &config);
+	void coppc400(machine_config &config);
 	void ncrpc4i(machine_config &config);
 	void kaypro16(machine_config &config);
 	void kaypropc(machine_config &config);
@@ -55,11 +56,10 @@ public:
 	void pccga(machine_config &config);
 	void mk88(machine_config &config);
 	void eppc(machine_config &config);
+	void olystar20f(machine_config &config);
 	void olytext30(machine_config &config);
-	void laser_xt3(machine_config &config);
 	void zenith(machine_config &config);
 	void eagle1600(machine_config &config);
-	void eaglespirit(machine_config &config);
 	void laser_turbo_xt(machine_config &config);
 	void ibm5550(machine_config &config);
 	void comport(machine_config &config);
@@ -67,8 +67,6 @@ public:
 	void ittxtra(machine_config &config);
 	void cadd810(machine_config &config);
 	void juko16(machine_config &config);
-	void hyo88t(machine_config &config);
-	void kyoxt(machine_config &config);
 
 	void init_bondwell();
 
@@ -198,7 +196,7 @@ void pc_state::cfg_single_720K(device_t *device)
 void pc_state::pccga(machine_config &config)
 {
 	/* basic machine hardware */
-	i8088_cpu_device &maincpu(I8088(config, "maincpu", 4772720)); /* 4.77 MHz */
+	i8088_cpu_device &maincpu(I8088(config, "maincpu", XTAL(14'318'181)/3)); /* 4.77 MHz */
 	maincpu.set_addrmap(AS_PROGRAM, &pc_state::pc8_map);
 	maincpu.set_addrmap(AS_IO, &pc_state::pc8_io);
 	maincpu.set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
@@ -1046,39 +1044,6 @@ Options: 8087 FPU
 
 ******************************************************************************/
 
-void pc_state::laser_turbo_xt(machine_config &config)
-{
-	i8088_cpu_device &maincpu(I8088(config, "maincpu", XTAL(14'318'181)/3)); /* 4.77 MHz */
-	maincpu.set_addrmap(AS_PROGRAM, &pc_state::pc8_map);
-	maincpu.set_addrmap(AS_IO, &pc_state::pc8_io);
-	maincpu.set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
-
-	ibm5160_mb_device &mb(IBM5160_MOTHERBOARD(config, "mb", 0));
-	mb.set_cputag(m_maincpu);
-	mb.int_callback().set_inputline(m_maincpu, 0);
-	mb.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
-	mb.set_input_default(DEVICE_INPUT_DEFAULTS_NAME(pccga));
-
-	// FIXME: determine ISA bus clock
-	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, "cga", false);
-	ISA8_SLOT(config, "isa2", 0, "mb:isa", pc_isa8_cards, "com", false); // Multi I/O card (includes FDC)
-	ISA8_SLOT(config, "isa3", 0, "mb:isa", pc_isa8_cards, "fdc_xt", false);
-	ISA8_SLOT(config, "isa4", 0, "mb:isa", pc_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa5", 0, "mb:isa", pc_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa6", 0, "mb:isa", pc_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa7", 0, "mb:isa", pc_isa8_cards, nullptr, false);
-	ISA8_SLOT(config, "isa8", 0, "mb:isa", pc_isa8_cards, nullptr, false);
-
-	/* keyboard */
-	PC_KBDC_SLOT(config, "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
-
-	/* internal ram */
-	RAM(config, RAM_TAG).set_default_size("640K").set_extra_options("512K,768K,896K,1024K,1408K,1536K,1664K");
-
-	/* software lists */
-	SOFTWARE_LIST(config, "disk_list").set_original("ibm5150");
-}
-
 ROM_START( laser_turbo_xt )
 	ROM_REGION(0x10000, "bios", 0)
 	ROM_LOAD("laser_turbo_xt.bin", 0x0e000, 0x02000, CRC(0a6121d3) SHA1(59b1f8dd6fe981ef9a7700adebf6e1adda7cee90)) // version 1.11 - 27c64d
@@ -1166,6 +1131,29 @@ ROM_START( zdsupers )
 	ROMX_LOAD("z184m v3.1d.10d", 0x8000, 0x8000, CRC(44012c3b) SHA1(f2f28979798874386ca8ba3dd3ead24ae7c2aeb4), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "v29e", "v2.9e" )
 	ROMX_LOAD("z184m v2.9e.10d", 0x8000, 0x8000, CRC(de2f200b) SHA1(ad5ce601669a82351e412fc6c1c70c47779a1e55), ROM_BIOS(1))
+ROM_END
+
+/****************************************************** Zenith Z-150 series ***
+
+Form factor: Desktop
+
+******************************************************************************/
+
+ROM_START( zdz150 )
+	ROM_REGION(0x10000, "bios", 0)
+	ROM_LOAD("444-260-18.bin", 0x8000, 0x4000, CRC(685208fe) SHA1(a1384627e8ecfd93842f6eabda4a417dd92be6df))
+	ROM_LOAD("444-229-18.bin", 0xc000, 0x4000, CRC(a6078b8a) SHA1(9a970013f5109a5003365eb2923cc26f08516dcb))
+ROM_END
+
+/****************************************************** Zenith Z-160 series ***
+
+Form factor: (Trans-)Portable
+
+******************************************************************************/
+
+ROM_START( zdz160 )
+	ROM_REGION(0x10000, "bios", 0)
+	ROM_LOAD("f800ffff.rom", 0x8000, 0x8000, CRC(46dd9695) SHA1(beaf6b45cecdadf630a94902fa84006bf00e2b3d))
 ROM_END
 
 /************************************************************** CompuAdd 810 **
@@ -1272,6 +1260,26 @@ ROM_START( nixpc01 )
 	ROM_LOAD( "nx01.bin", 0xc000, 0x4000, CRC(b0a75d1f) SHA1(7c2890eced917969968fc2e7491cda90a9734e03))
 ROM_END
 
+/***************************************************** Leading Edge Model D ***
+
+Those use an Intel Wildcard 88, a XT computer sans slots and DRAM on a SIMM like module
+Chipset: Faraday FE2010A
+
+******************************************************************************/
+
+ROM_START( ledgmodd )
+	ROM_REGION(0x10000, "bios", 0)
+	// 0: blank display
+	ROM_SYSTEM_BIOS(0, "le", "Leading Edge")
+	ROMX_LOAD( "wildcard_88-the_leading_edge-model_d-le_303-27.bin", 0xc000, 0x4000, CRC(cc05347d) SHA1(c44f3ce56472e0894ab955a14f6a91a3fb876baf), ROM_BIOS(0) )
+	// 1: blank display
+	ROM_SYSTEM_BIOS(1, "daewoo", "Daewoo")
+	ROMX_LOAD( "wildcard_88-the_leading_edge-model_d-daewoo-pn_23096023.bin", 0xc000, 0x4000, CRC(34f5fa32) SHA1(73c0489532a1f9a0b23bdd1865cd8b0c6f131ad9), ROM_BIOS(1) )
+	// 2: Phoenix 8088 ROM BIOS Version 2.52 / P E Nelson - No scancode from keyboard
+	ROM_SYSTEM_BIOS(2, "wildcard", "Wildcard")
+	ROMX_LOAD( "wildcard7354-1001rev2.52.05.bin", 0x8000, 0x8000, CRC(ea0c4c2f) SHA1(d817f57dd5332a943b33826dbe67b23e4c94a6ca), ROM_BIOS(2) )
+ROM_END
+
 /******************************************************Leading Edge Model M ***
 
 aka the Sperry PC, the "Sperry HT - 4.71 Bios" that can be found online is identical to the v.4.71 below
@@ -1330,6 +1338,62 @@ ROM_START( nms9100 )
 	ROMX_LOAD("philipsxt.bin", 0x8000, 0x8000, CRC(2f3135e7) SHA1(d2fc4c06cf09e2c5a62017f0977b084be8bf9bbd), ROM_BIOS(2))
 ROM_END
 
+/************************************************* AEG Olympia Olystar 20F ***
+Form Factor: Desktop
+uses an Acer 710IIN motherboard, BIOS-Version 4.06
+CPU: AMD P8088-1, FPU socket available
+Chips: Acer M1101, 2201A, UM8250B, WD37C65B-PL , Paradise PVC4
+OSC: 14.31818, 30.000000MHz, 16.000, 1.832
+RAM: 640K (256K, 512K, 768K, 1024K)
+Bus: two ISA8 slots on a riser card
+Video: Hercules/CGA compatible, on board
+Mass storage: Floppy 720KB, HD 20MB on WD MFM-controller
+On board ports: parallel, serial, Video, keyboard (Mini-DIN)
+
+*****************************************************************************/
+
+void pc_state::olystar20f(machine_config &config)
+{
+	pccga(config);
+
+	subdevice<isa8_slot_device>("isa2")->set_option_machine_config("fdc_xt", cfg_single_720K);
+	subdevice<isa8_slot_device>("isa3")->set_default_option(nullptr);
+	subdevice<isa8_slot_device>("isa5")->set_default_option("hdc");
+	subdevice<ram_device>(RAM_TAG)->set_default_size("640K").set_extra_options("64K, 128K, 256K, 512K, 768K, 1024K"); // the BIOS detects 2432KB extension RAM in the 640K setting ...
+}
+
+ROM_START( olystar20f )
+	ROM_REGION(0x10000, "bios", 0)
+	ROM_LOAD("20f_ebios_u43_v4.06.bin", 0x8000, 0x8000, CRC(0dddb623) SHA1(d821f48ddc7c77868b3f5952fa12f41911bea406))
+
+	ROM_REGION(0x2000,"gfx1", 0) // on board PVC4 based graphics card (similar to Commodore PC AGA and Schneider EuroPC)
+	ROM_LOAD("20f_u11_v1.3.bin", 0x0000, 0x2000, CRC(d252ee8d) SHA1(035385521abc3d1b79967b5302a87d08f9383215))
+ROM_END
+
+/********************************************************* Cordata PPC-400 ***
+Form factor: Luggable
+Links: https://www.system-cfg.com/detailcollection.php?ident=243
+CPU: 8088/4.77MHz
+RAM: 256K or 512K
+Mass storage: 1/2 floppy disks 5.25" DD, 10MB or 20MB harddisk
+On board: serial, parallel, video (CGA, Hercules, 640x400 mode)
+Monitor: 9" monochrome
+
+*****************************************************************************/
+
+void pc_state::coppc400(machine_config &config)
+{
+	pccga(config);
+
+	subdevice<ram_device>(RAM_TAG)->set_default_size("512K").set_extra_options("256K");
+	// the top 16K of the 512K are used for graphics even if a RAM expansion card is used
+}
+
+ROM_START( coppc400 )
+	ROM_REGION(0x10000, "bios", 0)
+	ROM_LOAD("f800ffff.rom", 0x8000, 0x8000, CRC(3d9b6594) SHA1(41f85e692e2020326fd580f7c436c23c76840119))
+ROM_END
+
 /***************************************************************************
 
   Game driver(s)
@@ -1340,11 +1404,13 @@ ROM_END
 COMP( 1989, mk88,           ibm5150, 0,      mk88,           pccga,    pc_state, empty_init,    "<unknown>",                       "MK-88",                 MACHINE_NOT_WORKING )
 COMP( 1991, poisk2,         ibm5150, 0,      poisk2,         pccga,    pc_state, empty_init,    "<unknown>",                       "Poisk-2",               MACHINE_NOT_WORKING )
 COMP( 1990, mc1702,         ibm5150, 0,      eagle1600,      pccga,    pc_state, empty_init,    "<unknown>",                       "Elektronika MC-1702",   MACHINE_NOT_WORKING )
+COMP( 198?, olystar20f,     ibm5150, 0,      olystar20f,     pccga,    pc_state, empty_init,    "AEG Olympia",                     "Olystar 20F",           MACHINE_NOT_WORKING )
 COMP( 198?, olytext30,      ibm5150, 0,      olytext30,      pccga,    pc_state, empty_init,    "AEG Olympia",                     "Olytext 30",            MACHINE_NOT_WORKING )
 COMP( 1987, ataripc1,       ibm5150, 0,      ataripc1,       pccga,    pc_state, empty_init,    "Atari",                           "PC1",                   0 )
 COMP( 1988, ataripc3,       ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Atari",                           "PC3",                   0 )
 COMP( 1985, bw230,          ibm5150, 0,      bondwell,       bondwell, pc_state, init_bondwell, "Bondwell Holding",                "BW230 (PRO28 Series)",  0 )
 COMP( 1982, mpc1600,        ibm5150, 0,      mpc1600,        pccga,    pc_state, empty_init,    "Columbia Data Products",          "MPC 1600",              0 )
+COMP( 198?, coppc400,       ibm5150, 0,      coppc400,       pccga,    pc_state, empty_init,    "Corona Data Systems, Inc.",       "Cordata PPC-400",       MACHINE_NOT_WORKING )
 COMP( 1983, comport,        ibm5150, 0,      comport,        pccga,    pc_state, empty_init,    "Compaq",                          "Compaq Portable",       MACHINE_NOT_WORKING )
 COMP( 198?, cadd810,        ibm5150, 0,      cadd810,        pccga,    pc_state, empty_init,    "CompuAdd",                        "810",                   MACHINE_NOT_WORKING )
 COMP( 1984, dgone,          ibm5150, 0,      dgone,          pccga,    pc_state, empty_init,    "Data General",                    "Data General/One" ,     MACHINE_NOT_WORKING )
@@ -1359,7 +1425,8 @@ COMP( 198?, juko16,         ibm5150, 0,      juko16,         pccga,    pc_state,
 COMP( 1985, kaypro16,       ibm5150, 0,      kaypro16,       pccga,    pc_state, empty_init,    "Kaypro Corporation",              "Kaypro 16",             0 )
 COMP( 198?, kaypropc,       ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Kaypro Corporation",              "PC",                    MACHINE_NOT_WORKING )
 COMP( 198?, kyoxt,          ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Kyocera",                         "XT",                    MACHINE_NOT_WORKING )
-COMP( 198?, ledgmodm,       ibm5150, 0,      siemens,        pccga,    pc_state, empty_init,    "Leading Edge",                    "Model M",               MACHINE_NOT_WORKING )
+COMP( 198?, ledgmodd,       ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Leading Edge Hardware Products, Inc.", "Model D",          MACHINE_NOT_WORKING )
+COMP( 198?, ledgmodm,       ibm5150, 0,      siemens,        pccga,    pc_state, empty_init,    "Leading Edge Hardware Products, Inc.", "Model M",          MACHINE_NOT_WORKING )
 COMP( 198?, mpx16,          ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Micromint",                       "MPX-16",                MACHINE_NOT_WORKING )
 COMP( 1985, ncrpc4i,        ibm5150, 0,      ncrpc4i,        pccga,    pc_state, empty_init,    "NCR",                             "PC4i",                  MACHINE_NOT_WORKING )
 COMP( 198?, nixpc01,        ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Nixdorf Computer AG",             "8810/25 CPC - PC01",    MACHINE_NOT_WORKING )
@@ -1372,6 +1439,8 @@ COMP( 1992, iskr3104,       ibm5150, 0,      iskr3104,       pccga,    pc_state,
 COMP( 1985, sicpc1605,      ibm5150, 0,      siemens,        pccga,    pc_state, empty_init,    "Siemens",                         "Sicomp PC16-05",        MACHINE_NOT_WORKING )
 COMP( 1985, pc7000,         ibm5150, 0,      eagle1600,      pccga,    pc_state, empty_init,    "Sharp",                           "PC-7000",               MACHINE_NOT_WORKING )
 COMP( 198?, hstrtpls,       ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Vendex",                          "HeadStart Plus",        MACHINE_NOT_WORKING )
-COMP( 1988, laser_turbo_xt, ibm5150, 0,      laser_turbo_xt, 0,        pc_state, empty_init,    "VTech",                           "Laser Turbo XT",        0 )
-COMP( 1989, laser_xt3,      ibm5150, 0,      laser_turbo_xt, 0,        pc_state, empty_init,    "VTech",                           "Laser XT/3",            0 )
+COMP( 1988, laser_turbo_xt, ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "VTech",                           "Laser Turbo XT",        0 )
+COMP( 1989, laser_xt3,      ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "VTech",                           "Laser XT/3",            0 )
 COMP( 1987, zdsupers,       ibm5150, 0,      zenith,         pccga,    pc_state, empty_init,    "Zenith Data Systems",             "SuperSport",            0 )
+COMP( 198?, zdz150,         ibm5150, 0,      zenith,         pccga,    pc_state, empty_init,    "Zenith Data Systems",             "Z-150 series",          0 )
+COMP( 198?, zdz160,         ibm5150, 0,      zenith,         pccga,    pc_state, empty_init,    "Zenith Data Systems",             "Z-160 series",          0 )

@@ -615,14 +615,17 @@ void qix_state::qix_base(machine_config &config)
 
 	PIA6821(config, m_pia0, 0);
 	m_pia0->readpa_handler().set_ioport("P1");
+	m_pia0->set_port_a_input_overrides_output_mask(0xff);
 	m_pia0->readpb_handler().set_ioport("COIN");
 
 	PIA6821(config, m_pia1, 0);
 	m_pia1->readpa_handler().set_ioport("SPARE");
+	m_pia1->set_port_a_input_overrides_output_mask(0xff);
 	m_pia1->readpb_handler().set_ioport("IN0");
 
 	PIA6821(config, m_pia2, 0);
 	m_pia2->readpa_handler().set_ioport("P2");
+	m_pia2->set_port_a_input_overrides_output_mask(0xff);
 	m_pia2->writepb_handler().set(FUNC(qix_state::qix_coinctl_w));
 
 	/* video hardware */

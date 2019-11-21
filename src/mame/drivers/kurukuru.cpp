@@ -137,7 +137,7 @@
             Coin B (10Y) meter |08| Coin A (100Y) meter
                   hopper motor |09| unknown out (ULN2003, pin15)
                      speaker - |10| speaker +
- (ULN2003, pin13) unknown out |11| unknown out (ULN2003, pin12)
+  (ULN2003, pin13) unknown out |11| unknown out (ULN2003, pin12)
                          green |12| red
                           sync |13| blue
   (ULN2003, pin13) unknown out |14| video gnd

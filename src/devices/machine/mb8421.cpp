@@ -2,6 +2,8 @@
 // copyright-holders:hap,AJR
 /**********************************************************************
 
+    Dual port RAM with Mailbox emulation
+
     Fujitsu MB8421/22/31/32-90/-90L/-90LL/-12/-12L/-12LL
     CMOS 16K-bit (2KB) dual-port SRAM
 
@@ -10,192 +12,34 @@
     32-bit expansion. It makes sure there are no clashes with the _BUSY pin.
 
     IDT71321 is function compatible, but not pin compatible with MB8421
+    IDT7130 is 1KB variation of IDT71321
+	CY7C131 is similar as IDT7130
 
 **********************************************************************/
 
 #include "emu.h"
 #include "machine/mb8421.h"
 
+template class dual_port_mailbox_ram_base<u8, 10, 8>;
+template class dual_port_mailbox_ram_base<u8, 11, 8>;
+template class dual_port_mailbox_ram_base<u16, 11, 16>;
 
-DEFINE_DEVICE_TYPE(MB8421, mb8421_device, "mb8421", "MB8421 8-bit Dual-Port SRAM with Interrupts")
-DEFINE_DEVICE_TYPE(IDT71321, idt71321_device, "idt71321", "IDT71321 8-bit Dual-Port SRAM with Interrupts")
-DEFINE_DEVICE_TYPE(MB8421_MB8431_16BIT, mb8421_mb8431_16_device, "mb8421_mb8431_16", "MB8421/MB8431 16-bit Dual-Port SRAM with Interrupts")
+template <typename Type, unsigned AddrBits, unsigned DataBits>
+constexpr Type dual_port_mailbox_ram_base<Type, AddrBits, DataBits>::DATA_MASK;
+template <typename Type, unsigned AddrBits, unsigned DataBits>
+constexpr size_t dual_port_mailbox_ram_base<Type, AddrBits, DataBits>::RAM_SIZE;
+template <typename Type, unsigned AddrBits, unsigned DataBits>
+constexpr offs_t dual_port_mailbox_ram_base<Type, AddrBits, DataBits>::ADDR_MASK;
+template <typename Type, unsigned AddrBits, unsigned DataBits>
+constexpr offs_t dual_port_mailbox_ram_base<Type, AddrBits, DataBits>::INT_ADDR_LEFT;
+template <typename Type, unsigned AddrBits, unsigned DataBits>
+constexpr offs_t dual_port_mailbox_ram_base<Type, AddrBits, DataBits>::INT_ADDR_RIGHT;
 
-//-------------------------------------------------
-//  mb8421_master_device - constructor
-//-------------------------------------------------
-
-mb8421_master_device::mb8421_master_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, type, tag, owner, clock)
-	, m_intl_callback(*this)
-	, m_intr_callback(*this)
-{
-}
-
-//-------------------------------------------------
-//  mb8421_device - constructor
-//-------------------------------------------------
-
-mb8421_device::mb8421_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: mb8421_master_device(mconfig, MB8421, tag, owner, clock)
-{
-}
-
-mb8421_device::mb8421_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
-	: mb8421_master_device(mconfig, type, tag, owner, clock)
-{
-}
-
-//-------------------------------------------------
-//  idt71321_device - constructor
-//-------------------------------------------------
-
-idt71321_device::idt71321_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: mb8421_device(mconfig, IDT71321, tag, owner, clock)
-{
-}
-
-//-------------------------------------------------
-//  mb8421_mb8431_16_device - constructor
-//-------------------------------------------------
-
-mb8421_mb8431_16_device::mb8421_mb8431_16_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: mb8421_master_device(mconfig, MB8421_MB8431_16BIT, tag, owner, clock)
-{
-}
-
-//-------------------------------------------------
-//  device_resolve_objects - resolve objects that
-//  may be needed for other devices to set
-//  initial conditions at start time
-//-------------------------------------------------
-
-void mb8421_master_device::device_resolve_objects()
-{
-	// resolve callbacks
-	m_intl_callback.resolve_safe();
-	m_intr_callback.resolve_safe();
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void mb8421_device::device_start()
-{
-	m_ram = make_unique_clear<u8[]>(0x800);
-
-	// state save
-	save_pointer(NAME(m_ram), 0x800);
-}
-
-void mb8421_mb8431_16_device::device_start()
-{
-	m_ram = make_unique_clear<u16[]>(0x800);
-
-	// state save
-	save_pointer(NAME(m_ram), 0x800);
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void mb8421_master_device::device_reset()
-{
-	m_intl_callback(CLEAR_LINE);
-	m_intr_callback(CLEAR_LINE);
-}
-
-//-------------------------------------------------
-//  update_intr - update interrupt lines upon
-//  read or write accesses to special locations
-//-------------------------------------------------
-
-template<read_or_write row, bool is_right>
-void mb8421_master_device::update_intr(offs_t offset)
-{
-	if (machine().side_effects_disabled())
-		return;
-
-	if (row == read_or_write::WRITE && offset == (is_right ? 0x7fe : 0x7ff))
-		(is_right ? m_intl_callback : m_intr_callback)(ASSERT_LINE);
-	else if (row == read_or_write::READ && offset == (is_right ? 0x7ff : 0x7fe))
-		(is_right ? m_intr_callback : m_intl_callback)(CLEAR_LINE);
-}
-
-//-------------------------------------------------
-//  left_w - write access for left-side bus
-//  (write to 7FF asserts INTR)
-//-------------------------------------------------
-
-void mb8421_device::left_w(offs_t offset, u8 data)
-{
-	offset &= 0x7ff;
-	m_ram[offset] = data;
-	update_intr<read_or_write::WRITE, false>(offset);
-}
-
-void mb8421_mb8431_16_device::left_w(offs_t offset, u16 data, u16 mem_mask)
-{
-	offset &= 0x7ff;
-	COMBINE_DATA(&m_ram[offset]);
-	update_intr<read_or_write::WRITE, false>(offset);
-}
-
-//-------------------------------------------------
-//  left_r - read access for left-side bus
-//  (read from 7FE acknowledges INTL)
-//-------------------------------------------------
-
-u8 mb8421_device::left_r(offs_t offset)
-{
-	offset &= 0x7ff;
-	update_intr<read_or_write::READ, false>(offset);
-	return m_ram[offset];
-}
-
-u16 mb8421_mb8431_16_device::left_r(offs_t offset, u16 mem_mask)
-{
-	offset &= 0x7ff;
-	update_intr<read_or_write::READ, false>(offset);
-	return m_ram[offset];
-}
-
-//-------------------------------------------------
-//  right_w - write access for right-side bus
-//  (write to 7FE asserts INTL)
-//-------------------------------------------------
-
-void mb8421_device::right_w(offs_t offset, u8 data)
-{
-	offset &= 0x7ff;
-	m_ram[offset] = data;
-	update_intr<read_or_write::WRITE, true>(offset);
-}
-
-void mb8421_mb8431_16_device::right_w(offs_t offset, u16 data, u16 mem_mask)
-{
-	offset &= 0x7ff;
-	COMBINE_DATA(&m_ram[offset]);
-	update_intr<read_or_write::WRITE, true>(offset);
-}
-
-//-------------------------------------------------
-//  right_r - read access for right-side bus
-//  (read from 7FF acknowledges INTR)
-//-------------------------------------------------
-
-u8 mb8421_device::right_r(offs_t offset)
-{
-	offset &= 0x7ff;
-	update_intr<read_or_write::READ, true>(offset);
-	return m_ram[offset];
-}
-
-u16 mb8421_mb8431_16_device::right_r(offs_t offset, u16 mem_mask)
-{
-	offset &= 0x7ff;
-	update_intr<read_or_write::READ, true>(offset);
-	return m_ram[offset];
-}
+// 1Kx8
+DEFINE_DEVICE_TYPE(CY7C131,             cy7c131_device,          "cy7c131",          "Cypress CY7C131 8-bit Dual-Port SRAM with Interrupts")
+DEFINE_DEVICE_TYPE(IDT7130,             idt7130_device,          "idt7130",          "IDT 7130 8-bit Dual-Port SRAM with Interrupts")
+// 2Kx8
+DEFINE_DEVICE_TYPE(IDT71321,            idt71321_device,         "idt71321",         "IDT 71321 8-bit Dual-Port SRAM with Interrupts")
+DEFINE_DEVICE_TYPE(MB8421,              mb8421_device,           "mb8421",           "Fujitsu MB8421 8-bit Dual-Port SRAM with Interrupts")
+// 2Kx16
+DEFINE_DEVICE_TYPE(MB8421_MB8431_16BIT, mb8421_mb8431_16_device, "mb8421_mb8431_16", "Fujitsu MB8421/MB8431 16-bit Dual-Port SRAM with Interrupts")

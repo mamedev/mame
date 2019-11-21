@@ -40,10 +40,19 @@ zorro_slot_device::zorro_slot_device(const machine_config &mconfig, device_type 
 
 void zorro_slot_device::device_start()
 {
-	device_zorro_card_interface *dev = dynamic_cast<device_zorro_card_interface *>(get_card_device());
+	device_t *const card(get_card_device());
+	device_zorro_card_interface *const dev(dynamic_cast<device_zorro_card_interface *>(card));
 
 	if (dev)
-		m_zorro_bus->add_card(dev);
+	{
+		m_zorro_bus->add_card(*dev);
+	}
+	else if (card)
+	{
+		throw emu_fatalerror(
+				"zorro slot '%s' card device %s (%s) does not implement device_zorro_card_interface\n",
+				tag(), card->tag(), card->name());
+	}
 }
 
 
@@ -55,7 +64,7 @@ void zorro_slot_device::device_start()
 //  exp_slot_device - constructor
 //-------------------------------------------------
 
-zorro_device::zorro_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+zorro_bus_device_base::zorro_bus_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_space(*this, finder_base::DUMMY_TAG, -1),
 	m_ovr_handler(*this),
@@ -70,7 +79,7 @@ zorro_device::zorro_device(const machine_config &mconfig, device_type type, cons
 //  initial conditions at start time
 //-------------------------------------------------
 
-void zorro_device::device_resolve_objects()
+void zorro_bus_device_base::device_resolve_objects()
 {
 	// resolve callbacks
 	m_ovr_handler.resolve_safe();
@@ -82,14 +91,14 @@ void zorro_device::device_resolve_objects()
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void zorro_device::device_start()
+void zorro_bus_device_base::device_start()
 {
 }
 
 // from slot device
-WRITE_LINE_MEMBER( zorro_device::ovr_w ) { m_ovr_handler(state); }
-WRITE_LINE_MEMBER( zorro_device::int2_w ) { m_int2_handler(state); }
-WRITE_LINE_MEMBER( zorro_device::int6_w ) { m_int6_handler(state); }
+WRITE_LINE_MEMBER( zorro_bus_device_base::ovr_w ) { m_ovr_handler(state); }
+WRITE_LINE_MEMBER( zorro_bus_device_base::int2_w ) { m_int2_handler(state); }
+WRITE_LINE_MEMBER( zorro_bus_device_base::int6_w ) { m_int6_handler(state); }
 
 
 //**************************************************************************
@@ -103,14 +112,12 @@ DEFINE_DEVICE_TYPE(EXP_SLOT, exp_slot_device, "exp_slot", "86-pin expansion slot
 //-------------------------------------------------
 
 exp_slot_device::exp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	zorro_device(mconfig, EXP_SLOT, tag, owner, clock),
-	m_ipl_handler(*this),
-	m_dev(nullptr)
+	exp_slot_device(mconfig, EXP_SLOT, tag, owner, clock)
 {
 }
 
 exp_slot_device::exp_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-	zorro_device(mconfig, type, tag, owner, clock),
+	zorro_bus_device_base(mconfig, type, tag, owner, clock),
 	m_ipl_handler(*this),
 	m_dev(nullptr)
 {
@@ -124,11 +131,11 @@ exp_slot_device::exp_slot_device(const machine_config &mconfig, device_type type
 
 void exp_slot_device::device_resolve_objects()
 {
+	// call base device
+	zorro_bus_device_base::device_resolve_objects();
+
 	// resolve callbacks
 	m_ipl_handler.resolve_safe();
-
-	// call base device
-	zorro_device::device_resolve_objects();
 }
 
 //-------------------------------------------------
@@ -137,6 +144,9 @@ void exp_slot_device::device_resolve_objects()
 
 void exp_slot_device::device_reset()
 {
+	// call base device
+	zorro_bus_device_base::device_reset();
+
 	// if we have a device, start the autoconfig chain
 	if (m_dev)
 		m_dev->cfgin_w(0);
@@ -146,10 +156,16 @@ void exp_slot_device::device_reset()
 //  add_card - add new card to our bus
 //-------------------------------------------------
 
-void exp_slot_device::add_card(device_zorro_card_interface *card)
+void exp_slot_device::add_card(device_zorro_card_interface &card)
 {
-	m_dev = downcast<device_exp_card_interface *>(card);
-	card->set_zorro_bus(this);
+	m_dev = dynamic_cast<device_exp_card_interface *>(&card);
+	if (!m_dev)
+	{
+		throw emu_fatalerror(
+				"exp slot '%s' card device %s (%s) does not implement device_exp_card_interface\n",
+				tag(), card.device().tag(), card.device().name());
+	}
+	card.set_zorro_bus(*this);
 }
 
 // from slot device
@@ -163,19 +179,19 @@ void exp_slot_device::fc_w(int code) { if (m_dev) m_dev->fc_w(code); }
 //  ZORRO2 DEVICE
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(ZORRO2, zorro2_device, "zorro2", "Zorro-II bus")
+DEFINE_DEVICE_TYPE(ZORRO2, zorro2_bus_device, "zorro2", "Zorro-II bus")
 
 //-------------------------------------------------
-//  zorro2_device - constructor
+//  zorro2_bus_device - constructor
 //-------------------------------------------------
 
-zorro2_device::zorro2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	zorro2_device(mconfig, ZORRO2, tag, owner, clock)
+zorro2_bus_device::zorro2_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	zorro2_bus_device(mconfig, ZORRO2, tag, owner, clock)
 {
 }
 
-zorro2_device::zorro2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-	zorro_device(mconfig, type, tag, owner, clock),
+zorro2_bus_device::zorro2_bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	zorro_bus_device_base(mconfig, type, tag, owner, clock),
 	m_eint1_handler(*this),
 	m_eint4_handler(*this),
 	m_eint5_handler(*this),
@@ -185,10 +201,10 @@ zorro2_device::zorro2_device(const machine_config &mconfig, device_type type, co
 }
 
 //-------------------------------------------------
-//  zorro2_device - destructor
+//  zorro2_bus_device - destructor
 //-------------------------------------------------
 
-zorro2_device::~zorro2_device()
+zorro2_bus_device::~zorro2_bus_device()
 {
 	m_dev.detach_all();
 }
@@ -199,24 +215,27 @@ zorro2_device::~zorro2_device()
 //  initial conditions at start time
 //-------------------------------------------------
 
-void zorro2_device::device_resolve_objects()
+void zorro2_bus_device::device_resolve_objects()
 {
+	// call base device
+	zorro_bus_device_base::device_resolve_objects();
+
 	// resolve callbacks
 	m_eint1_handler.resolve_safe();
 	m_eint4_handler.resolve_safe();
 	m_eint5_handler.resolve_safe();
 	m_eint7_handler.resolve_safe();
-
-	// call base device
-	zorro_device::device_resolve_objects();
 }
 
 //-------------------------------------------------
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void zorro2_device::device_reset()
+void zorro2_bus_device::device_reset()
 {
+	// call base device
+	zorro_bus_device_base::device_reset();
+
 	// initiate autoconfig
 	m_autoconfig_device = m_dev.first();
 
@@ -229,20 +248,26 @@ void zorro2_device::device_reset()
 //  add_card - add new card to our bus
 //-------------------------------------------------
 
-void zorro2_device::add_card(device_zorro_card_interface *card)
+void zorro2_bus_device::add_card(device_zorro_card_interface &card)
 {
-	device_zorro2_card_interface *zorro2_card = downcast<device_zorro2_card_interface *>(card);
-	card->set_zorro_bus(this);
+	device_zorro2_card_interface *const zorro2_card(dynamic_cast<device_zorro2_card_interface *>(&card));
+	if (!zorro2_card)
+	{
+		throw emu_fatalerror(
+				"zorro2 slot '%s' card device %s (%s) does not implement device_zorro2_card_interface\n",
+				tag(), card.device().tag(), card.device().name());
+	}
+	card.set_zorro_bus(*this);
 	m_dev.append(*zorro2_card);
 }
 
 // from slot device
-WRITE_LINE_MEMBER( zorro2_device::eint1_w ) { m_eint1_handler(state); }
-WRITE_LINE_MEMBER( zorro2_device::eint4_w ) { m_eint4_handler(state); }
-WRITE_LINE_MEMBER( zorro2_device::eint5_w ) { m_eint5_handler(state); }
-WRITE_LINE_MEMBER( zorro2_device::eint7_w ) { m_eint7_handler(state); }
+WRITE_LINE_MEMBER( zorro2_bus_device::eint1_w ) { m_eint1_handler(state); }
+WRITE_LINE_MEMBER( zorro2_bus_device::eint4_w ) { m_eint4_handler(state); }
+WRITE_LINE_MEMBER( zorro2_bus_device::eint5_w ) { m_eint5_handler(state); }
+WRITE_LINE_MEMBER( zorro2_bus_device::eint7_w ) { m_eint7_handler(state); }
 
-WRITE_LINE_MEMBER( zorro2_device::cfgout_w )
+WRITE_LINE_MEMBER( zorro2_bus_device::cfgout_w )
 {
 	m_autoconfig_device = m_autoconfig_device->next();
 
@@ -252,7 +277,7 @@ WRITE_LINE_MEMBER( zorro2_device::cfgout_w )
 }
 
 // from host
-void zorro2_device::fc_w(int code)
+void zorro2_bus_device::fc_w(int code)
 {
 	device_zorro2_card_interface *entry = m_dev.first();
 
@@ -286,9 +311,10 @@ device_zorro_card_interface::~device_zorro_card_interface()
 {
 }
 
-void device_zorro_card_interface::set_zorro_bus(zorro_device *device)
+void device_zorro_card_interface::set_zorro_bus(zorro_bus_device_base &device)
 {
-	m_zorro = device;
+	assert(!m_zorro);
+	m_zorro = &device;
 }
 
 void device_zorro_card_interface::fc_w(int code)
@@ -322,9 +348,20 @@ device_exp_card_interface::~device_exp_card_interface()
 {
 }
 
-void device_exp_card_interface::set_zorro_device()
+void device_exp_card_interface::interface_pre_start()
 {
+	device_zorro_card_interface::interface_pre_start();
+
+	if (!m_zorro)
+		throw device_missing_dependencies();
+
 	m_slot = dynamic_cast<exp_slot_device *>(m_zorro);
+	if (!m_slot)
+	{
+		throw emu_fatalerror(
+				"exp card '%s' zorro device %s (%s) does not derive from exp_slot_device\n",
+				device().tag(), m_zorro->tag(), m_zorro->name());
+	}
 }
 
 
@@ -351,7 +388,18 @@ device_zorro2_card_interface::~device_zorro2_card_interface()
 {
 }
 
-void device_zorro2_card_interface::set_zorro_device()
+void device_zorro2_card_interface::interface_pre_start()
 {
-	m_slot = dynamic_cast<zorro2_device *>(m_zorro);
+	device_zorro_card_interface::interface_pre_start();
+
+	if (!m_zorro)
+		throw device_missing_dependencies();
+
+	m_slot = dynamic_cast<zorro2_bus_device *>(m_zorro);
+	if (!m_slot)
+	{
+		throw emu_fatalerror(
+				"zorro2 card '%s' zorro device %s (%s) does not derive from zorro2_bus_device\n",
+				device().tag(), m_zorro->tag(), m_zorro->name());
+	}
 }

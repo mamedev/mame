@@ -31,9 +31,8 @@
 //  debug_view_source - constructor
 //-------------------------------------------------
 
-debug_view_source::debug_view_source(const char *name, device_t *device)
-	: m_next(nullptr),
-		m_name(name),
+debug_view_source::debug_view_source(std::string &&name, device_t *device)
+	: m_name(std::move(name)),
 		m_device(device)
 {
 }
@@ -232,10 +231,10 @@ void debug_view::set_source(const debug_view_source &source)
 
 const debug_view_source *debug_view::source_for_device(device_t *device) const
 {
-	for (debug_view_source &source : m_source_list)
-		if (device == source.device())
-			return &source;
-	return m_source_list.first();
+	for (auto &source : m_source_list)
+		if (device == source->device())
+			return source.get();
+	return first_source();
 }
 
 

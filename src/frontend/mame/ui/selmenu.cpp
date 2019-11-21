@@ -715,7 +715,7 @@ void menu_select_launch::custom_render(void *selectedref, float top, float botto
 }
 
 
-void menu_select_launch::inkey_navigation()
+void menu_select_launch::rotate_focus(int dir)
 {
 	switch (get_focus())
 	{
@@ -723,28 +723,31 @@ void menu_select_launch::inkey_navigation()
 		if (selected_index() <= m_available_items)
 		{
 			m_prev_selected = get_selection_ref();
-			set_selected_index(m_available_items + 1);
+			if ((0 < dir) || (ui_globals::panels_status == HIDE_BOTH))
+				set_selected_index(m_available_items + 1);
+			else if (ui_globals::panels_status == HIDE_RIGHT_PANEL)
+				set_focus(focused_menu::LEFT);
+			else
+				set_focus(focused_menu::RIGHTBOTTOM);
 		}
 		else
 		{
-			if (ui_globals::panels_status != HIDE_LEFT_PANEL)
-				set_focus(focused_menu::LEFT);
-
-			else if (ui_globals::panels_status == HIDE_BOTH)
-			{
-				for (int x = 0; x < item_count(); ++x)
-					if (item(x).ref == m_prev_selected)
-						set_selected_index(x);
-			}
-			else
-			{
+			if ((0 > dir) || (ui_globals::panels_status == HIDE_BOTH))
+				select_prev();
+			else if (ui_globals::panels_status == HIDE_LEFT_PANEL)
 				set_focus(focused_menu::RIGHTTOP);
-			}
+			else
+				set_focus(focused_menu::LEFT);
 		}
 		break;
 
 	case focused_menu::LEFT:
-		if (ui_globals::panels_status != HIDE_RIGHT_PANEL)
+		if (0 > dir)
+		{
+			set_focus(focused_menu::MAIN);
+			set_selected_index(m_available_items + 1);
+		}
+		else if (ui_globals::panels_status != HIDE_RIGHT_PANEL)
 		{
 			set_focus(focused_menu::RIGHTTOP);
 		}
@@ -756,12 +759,31 @@ void menu_select_launch::inkey_navigation()
 		break;
 
 	case focused_menu::RIGHTTOP:
-		set_focus(focused_menu::RIGHTBOTTOM);
+		if (0 < dir)
+		{
+			set_focus(focused_menu::RIGHTBOTTOM);
+		}
+		else if (ui_globals::panels_status != HIDE_LEFT_PANEL)
+		{
+			set_focus(focused_menu::LEFT);
+		}
+		else
+		{
+			set_focus(focused_menu::MAIN);
+			set_selected_index(m_available_items + 1);
+		}
 		break;
 
 	case focused_menu::RIGHTBOTTOM:
-		set_focus(focused_menu::MAIN);
-		select_prev();
+		if (0 > dir)
+		{
+			set_focus(focused_menu::RIGHTTOP);
+		}
+		else
+		{
+			set_focus(focused_menu::MAIN);
+			select_prev();
+		}
 		break;
 	}
 }
@@ -1486,6 +1508,20 @@ void menu_select_launch::handle_keys(uint32_t flags, int &iptkey)
 			set_selected_index(top_line = m_available_items - 1);
 	}
 
+	// focus next rotates throw targets forward
+	if (exclusive_input_pressed(iptkey, IPT_UI_FOCUS_NEXT, 12))
+	{
+		if (!m_ui_error)
+			rotate_focus(1);
+	}
+
+	// focus next rotates throw targets forward
+	if (exclusive_input_pressed(iptkey, IPT_UI_FOCUS_PREV, 12))
+	{
+		if (!m_ui_error)
+			rotate_focus(-1);
+	}
+
 	// pause enables/disables pause
 	if (!m_ui_error && !ignorepause && exclusive_input_pressed(iptkey, IPT_UI_PAUSE, 0))
 	{
@@ -1504,8 +1540,27 @@ void menu_select_launch::handle_keys(uint32_t flags, int &iptkey)
 	{
 		for (int code = IPT_UI_FIRST + 1; code < IPT_UI_LAST; code++)
 		{
-			if (m_ui_error || code == IPT_UI_CONFIGURE || (code == IPT_UI_LEFT && ignoreleft) || (code == IPT_UI_RIGHT && ignoreright) || (code == IPT_UI_PAUSE && ignorepause))
+			if (m_ui_error)
 				continue;
+
+			switch (code)
+			{
+			case IPT_UI_FOCUS_NEXT:
+			case IPT_UI_FOCUS_PREV:
+				continue;
+			case IPT_UI_LEFT:
+				if (ignoreleft)
+					continue;
+				break;
+			case IPT_UI_RIGHT:
+				if (ignoreright)
+					continue;
+				break;
+			case IPT_UI_PAUSE:
+				if (ignorepause)
+					continue;
+				break;
+			}
 
 			if (exclusive_input_pressed(iptkey, code, 0))
 				break;
@@ -1582,6 +1637,12 @@ void menu_select_launch::handle_events(uint32_t flags, event &ev)
 					m_topline_datsview -= m_right_visible_lines - 1;
 				else if (hover() == HOVER_LPANEL_ARROW)
 				{
+					if (get_focus() == focused_menu::LEFT)
+					{
+						set_focus(focused_menu::MAIN);
+						select_prev();
+					}
+
 					if (ui_globals::panels_status == HIDE_LEFT_PANEL)
 						ui_globals::panels_status = SHOW_PANELS;
 					else if (ui_globals::panels_status == HIDE_BOTH)
@@ -1593,6 +1654,12 @@ void menu_select_launch::handle_events(uint32_t flags, event &ev)
 				}
 				else if (hover() == HOVER_RPANEL_ARROW)
 				{
+					if ((get_focus() == focused_menu::RIGHTTOP) || (get_focus() == focused_menu::RIGHTBOTTOM))
+					{
+						set_focus(focused_menu::MAIN);
+						select_prev();
+					}
+
 					if (ui_globals::panels_status == HIDE_RIGHT_PANEL)
 						ui_globals::panels_status = SHOW_PANELS;
 					else if (ui_globals::panels_status == HIDE_BOTH)
@@ -1680,9 +1747,8 @@ void menu_select_launch::handle_events(uint32_t flags, event &ev)
 
 		// translate CHAR events into specials
 		case ui_event::IME_CHAR:
-			if (exclusive_input_pressed(ev.iptkey, IPT_UI_CONFIGURE, 0))
+			if (exclusive_input_pressed(ev.iptkey, IPT_UI_FOCUS_NEXT, 0) || exclusive_input_pressed(ev.iptkey, IPT_UI_FOCUS_PREV, 0))
 			{
-				ev.iptkey = IPT_UI_CONFIGURE;
 				stop = true;
 			}
 			else if (m_ui_error)

@@ -9,27 +9,30 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "luaengine.h"
-#include "mame.h"
-#include "chd.h"
-#include "emuopts.h"
-#include "mameopts.h"
-#include "audit.h"
-#include "info.h"
-#include "romload.h"
-#include "unzip.h"
-#include "validity.h"
-#include "sound/samples.h"
 #include "clifront.h"
-#include "xmlfile.h"
-#include "media_ident.h"
-
-#include "osdepend.h"
-#include "softlist_dev.h"
 
 #include "ui/moptions.h"
+
+#include "audit.h"
+#include "infoxml.h"
 #include "language.h"
+#include "luaengine.h"
+#include "mame.h"
+#include "media_ident.h"
 #include "pluginopts.h"
+
+#include "emuopts.h"
+#include "mameopts.h"
+#include "romload.h"
+#include "softlist_dev.h"
+#include "validity.h"
+#include "sound/samples.h"
+
+#include "chd.h"
+#include "unzip.h"
+#include "xmlfile.h"
+
+#include "osdepend.h"
 
 #include <algorithm>
 #include <new>

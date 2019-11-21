@@ -123,7 +123,6 @@ protected:
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 
 	// handlers
-	void inkey_navigation();
 	virtual void inkey_export() = 0;
 	void inkey_dats();
 
@@ -250,6 +249,7 @@ private:
 			}
 		}
 	}
+	void rotate_focus(int dir);
 
 	void draw_toolbar(float x1, float y1, float x2, float y2);
 	void draw_star(float x0, float y0);

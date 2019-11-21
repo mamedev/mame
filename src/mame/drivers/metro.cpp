@@ -60,6 +60,7 @@ Year + Game                       PCB           Video  Sub CPU  Sound         Is
 98  Mahjong Gakuensai 2           VG340-A       I4300   -       YM2413+M6295
 
 00  Puzzlet                       VG2200-(B)    I4300  Z86E02   YM2413+M6295  H8/3007 CPU
+01  Metabee Shot                  VG2200-(B)    I4300  Z86E02   not populated H8/3007 CPU
 ------------------------------------------------------------------------------------------------
 
 Mouse Shooter GoGo, Bal Cube, Bang Bang Ball & Daitoride (YMF278B) PCBs have
@@ -5064,13 +5065,27 @@ ROM_START( puzzlet )
 	ROM_LOAD( "z86e02.mcu", 0x000, 0x200, CRC(399fa417) SHA1(f6c57020ea394c858742759050bf4f4b2f1e1fc5) )
 
 	ROM_REGION( 0x400000, "vdp2", 0 )   /* Gfx + Data (Addressable by CPU & Blitter) */
-	ROMX_LOAD( "cg2.u2", 0x000000, 0x200000, CRC(7720f2d8) SHA1(8e0ccd1e8efe00df909327aefdb1e23e50487524), ROM_GROUPWORD | ROM_SKIP(2))
-	ROMX_LOAD( "cg3.u1", 0x000002, 0x200000, CRC(77d39d12) SHA1(4bb339e479f0425931cff4eef3a6bc6ad1fac1f5), ROM_GROUPWORD | ROM_SKIP(2))
+	ROM_LOAD32_WORD( "cg2.u2", 0x000000, 0x200000, CRC(7720f2d8) SHA1(8e0ccd1e8efe00df909327aefdb1e23e50487524) )
+	ROM_LOAD32_WORD( "cg3.u1", 0x000002, 0x200000, CRC(77d39d12) SHA1(4bb339e479f0425931cff4eef3a6bc6ad1fac1f5) )
 
 	ROM_REGION( 0x200000, "oki", 0 )    /* Samples */
 	ROM_LOAD( "sound4.u23", 0x000000, 0x200000, CRC(9a611369) SHA1(97b9188354292b120a1bd0f01b4d884461bfa298) )
 ROM_END
 
+ROM_START( metabee ) // handwritten labels, unpopulated sound chips and ROM. Still the dumper says it has sound.
+	ROM_REGION( 0x200000, "maincpu", 0 )    /* H8/3007 Code */
+	ROM_LOAD16_WORD_SWAP( "medabee2way.u9", 0x000000, 0x200000, CRC(aba51e0f) SHA1(99f18d772a73c499b1b33222b9bae8c1e1d4114b) ) // ST-M27C160 handwritten "メダビー2WAY"
+
+	ROM_REGION( 0x200, "z86e02", 0 )    /* Zilog Z8 family 8-bit MCU */
+	ROM_LOAD( "z86e02.mcu", 0x000, 0x200, NO_DUMP )
+
+	ROM_REGION( 0x800000, "vdp2", 0 )   /* Gfx + Data (Addressable by CPU & Blitter) */
+	ROM_LOAD32_WORD( "medabeechara1.u2", 0x000000, 0x400000, CRC(d56918bd) SHA1(bcb3f4624a6f92e5c48273638bdb3f71608ac5b4) ) // ST-M27C322 handwritten "メダビーキャラ1"
+	ROM_LOAD32_WORD( "medabeechara2.u1", 0x000002, 0x400000, CRC(81a3c0cb) SHA1(970978f07bb9e9dddd13b3946fb7230c2b205769) ) // ST-M27C322 handwritten "メダビーキャラ2"
+
+	ROM_REGION( 0x200000, "oki", ROMREGION_ERASEFF )    /* Samples */
+	// not populated on the dumped PCB
+ROM_END
 
 /***************************************************************************
 
@@ -5668,3 +5683,4 @@ GAME( 1995, vmetaln,   vmetal,   vmetal,    vmetal,     metro_state, init_vmetal
 
 // VG2200
 GAME( 2000, puzzlet,   0,        puzzlet,   puzzlet,    metro_state, init_puzzlet,  ROT0,   "Unies Corporation",                               "Puzzlet (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2001, metabee,   0,        puzzlet,   puzzlet,    metro_state, init_puzzlet,  ROT0,   "Natsume / Banpresto",                             "Metabee Shot", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // Hopper problem

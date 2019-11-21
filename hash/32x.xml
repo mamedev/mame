@@ -78,7 +78,8 @@
 		</part>
 	</software>
 
-	<software name="toughman">
+	<!-- boot OK -->
+	<software name="toughman" supported="yes">
 		<description>Toughman Contest (Euro, USA)</description>
 		<year>1995</year>
 		<publisher>Electronic Arts</publisher>
@@ -95,6 +96,7 @@
 		</part>
 	</software>
 
+    <!-- Has 3d geometry bugs on attract mode with SH2 DRC, crashes if you attempt to enter into main menu -->
 	<software name="vrdx" supported="no">
 		<description>Virtua Racing Deluxe (Euro)</description>
 		<year>1994</year>
@@ -1633,6 +1635,7 @@
 		</part>
 	</software>
 
+	<!--  missing I2C hookup so POST fails with blue/black vertical stripes (same I2C type as plain MD version) -->
 	<software name="nbajamte" supported="no">
 		<description>NBA Jam T.E. - Tournament Edition (World)</description>
 		<year>1995</year>
@@ -1647,6 +1650,7 @@
 		</part>
 	</software>
 
+	<!-- black screen, missing h irq? -->
 	<software name="nflqb" supported="no">
 		<description>NFL Quarterback Club ~ NFL Quarterback '95 (World)</description>
 		<year>1995</year>
@@ -1697,6 +1701,7 @@
 		</part>
 	</software>
 
+	<!-- black screen after Sega logo -->
 	<software name="sangoku4" supported="no">
 		<description>Sangokushi IV (Jpn)</description>
 		<year>1994</year>
@@ -1822,7 +1827,8 @@
 		</part>
 	</software>
 
-	<software name="soulstar">
+	<!-- boot OK, OSD and player sprite aren't drawn -->
+	<software name="soulstar" supported="no">
 	<!-- The dumper also released larger size files, which were this exact dump padded with 0xff up to the end of the file -->
 		<description>SoulStar X (USA, Prototype)</description>
 		<year>1995</year>
@@ -2454,6 +2460,7 @@
 		</part>
 	</software>
 
+	<!-- invisible 32x layer -->
 	<software name="wwfag" supported="no">
 		<description>WWF WrestleMania - The Arcade Game (USA)</description>
 		<year>1995</year>
@@ -2465,6 +2472,7 @@
 		</part>
 	</software>
 
+    <!-- black screen after choosing a level, requires SH2 SCI support -->
 	<software name="xmen" supported="no">
 		<description>X-Men (USA, Prototype)</description>
 		<year>1995</year>

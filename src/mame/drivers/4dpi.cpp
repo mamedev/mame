@@ -1,26 +1,14 @@
 // license:BSD-3-Clause
-// copyright-holders:Ryan Holtz
-/****************************************************************************
-
-    drivers/4dpi.cpp
-    SGI Personal IRIS family skeleton driver
-
-    by Ryan Holtz
-
-        0x1fc00000 - 0x1fc3ffff     ROM
-
-    Interrupts:
-        R2000:
-            NYI
-
-    Year  Model  Board  CPU    Clock    I/D Cache
-    1988  4D/20  IP6    R2000  12.5MHz  16KiB/8KiB
-          4D/25  IP10   R3000  20MHz    64KiB/32KiB
-          4D/30  IP14   R3000  30MHz
-    1991  4D/35  IP12   R3000  36MHz
-
-****************************************************************************/
+// copyright-holders:Patrick Mackinlay
 /*
+ * SGI Personal IRIS family driver
+ *
+ *   Year  Model  Board  Type  CPU    Clock    I/D Cache    Code Name
+ *   1988  4D/20  IP6    IP6   R2000  12.5MHz  16KiB/8KiB   Eclipse
+ *   1989  4D/25  IP10   IP6   R3000  20MHz    64KiB/32KiB  Eclipse
+ *   1991  4D/30  IP14   IP12  R3000  30MHz    64KiB/64KiB  Magnum
+ *   1991  4D/35  IP12   IP12  R3000  36MHz    64KiB/64KiB  Magnum
+ *
  * Sources:
  *   - http://bitsavers.org/pdf/sgi/personal_iris/VME-Eclipse_CPU_VIP10_Specification.pdf
  *   - http://www.bitsavers.org/pdf/sgi/personal_iris/SGI_IP-6_Schematic.pdf
@@ -33,6 +21,7 @@
  * TODO:
  *   - audio, printer
  *   - devicify ioc1 and ctl1
+ *   - 4d30/35 skeleton only
  *
  * Status:
  *   - parity and cache diagnostics fail
@@ -47,6 +36,7 @@
 
 // cpu and memory
 #include "cpu/mips/mips1.h"
+#include "cpu/dsp56000/dsp56000.h"
 #include "machine/ram.h"
 #include "machine/eepromser.h"
 
@@ -56,6 +46,9 @@
 #include "machine/mc68681.h"
 #include "machine/pit8253.h"
 #include "machine/dp8573.h"
+#include "machine/z80scc.h"
+#include "machine/edlc.h"
+#include "machine/input_merger.h"
 
 // buses and connectors
 #include "machine/nscsi_bus.h"
@@ -232,6 +225,58 @@ private:
 	u16 m_gdma_buflen; // buffer length
 };
 
+class pi4d3x_state : public driver_device
+{
+public:
+	pi4d3x_state(machine_config const &mconfig, device_type type, char const *tag)
+		: driver_device(mconfig, type, tag)
+		, m_cpu(*this, "maincpu")
+		, m_ram(*this, "ram")
+		, m_eprom(*this, "boot")
+		, m_eeprom(*this, "eeprom")
+		, m_rtc(*this, "rtc")
+		, m_pit(*this, "pit")
+		, m_scsi(*this, "scsi:0:wd33c93a")
+		, m_enet(*this, "enet")
+		, m_duart(*this, "duart%u", 0U)
+		, m_serial(*this, "serial%u", 1U)
+		, m_dsp(*this, "dsp")
+	{
+	}
+
+	void pi4d30(machine_config &config);
+	void pi4d35(machine_config &config);
+
+	void initialize();
+
+private:
+	required_device<mips1_device_base> m_cpu;
+	required_device<ram_device> m_ram;
+	required_region_ptr<u16> m_eprom;
+	required_device<eeprom_serial_93c56_16bit_device> m_eeprom;
+
+	required_device<dp8573_device> m_rtc;
+	required_device<pit8254_device> m_pit;
+	required_device<wd33c9x_base_device> m_scsi;
+	required_device<seeq8003_device> m_enet;
+	required_device_array<z80scc_device, 3> m_duart;
+	required_device_array<rs232_port_device, 4> m_serial;
+	required_device<dsp56001_device> m_dsp;
+
+	void common(machine_config &config);
+	void map(address_map &map);
+
+	template <unsigned LIO, unsigned N> void lio_interrupt(int state) { lio_interrupt(LIO, N, state); }
+	void lio_interrupt(unsigned const lio, unsigned const number, int state);
+
+	u8 m_lio_isr[2];
+	u8 m_lio_imr[2];
+	bool m_lio_int[2];
+
+	//u8 m_sysid = 1; // FPPRES
+	u8 m_cpuauxctl = 0;
+};
+
 void pi4d2x_state::map(address_map &map)
 {
 	// silence local memory
@@ -347,7 +392,7 @@ void pi4d2x_state::map(address_map &map)
 
 			// update interrupt line
 			bool const lio_int = ~m_lio_isr & m_lio_imr;
-			if (m_lio_imr ^ lio_int)
+			if (m_lio_int ^ lio_int)
 			{
 				m_lio_int = lio_int;
 				m_cpu->set_input_line(INPUT_LINE_IRQ1, m_lio_int);
@@ -449,6 +494,109 @@ void pi4d2x_state::map(address_map &map)
 	map(0x40000000, 0xffffffff).rw(FUNC(pi4d2x_state::buserror_r), FUNC(pi4d2x_state::buserror_w));
 }
 
+void pi4d3x_state::map(address_map &map)
+{
+
+	//map(0x1fa00000, 0x1fa00003).noprw().umask32(0xffff0000); // CPUCTRL
+	// RSTCONFIG
+	//map(0x1fa00008, 0x1fa0000b).lr8([this](){ return m_sysid; }, "sysid").umask32(0xff000000);
+	// MEMCFG0
+	// MEMCFG1
+	// REFTIM
+	// PARERR
+	//map(0x1fa10210, 0x1fa10213).nopw(); // CLERERR
+
+	map(0x1fb80000, 0x1fb800bf).ram(); // FIXME: stub out ethernet, scsi and parallel registers
+
+	map(0x1fb80100, 0x1fb8011f).m(m_enet, FUNC(seeq8003_device::map)).umask32(0x000000ff);
+
+	map(0x1fb80120, 0x1fb80123).rw(m_scsi, FUNC(wd33c93_device::indir_addr_r), FUNC(wd33c93_device::indir_addr_w)).umask32(0x0000ff00);
+	map(0x1fb80124, 0x1fb80127).rw(m_scsi, FUNC(wd33c93_device::indir_reg_r), FUNC(wd33c93_device::indir_reg_w)).umask32(0x0000ff00);
+
+	map(0x1fb80180, 0x1fb801bb).ram(); // FIXME: stub out pbus registers
+	map(0x1fb801bc, 0x1fb801bf).lrw8(
+		[this]()
+		{
+			u8 data = m_cpuauxctl & ~0x10;
+
+			// serial eeprom data in
+			if (m_eeprom->do_read())
+				data |= 0x10;
+
+			return data;
+		}, "cpu_aux_ctrl_r",
+		[this](u8 data)
+		{
+			// console LED / protection register enable (PRE)
+			//m_leds[LED_CON] = BIT(data, 0);
+
+			// serial eeprom chip select, clock and data out
+			m_eeprom->cs_write(BIT(data, 1));
+			m_eeprom->clk_write(BIT(data, 2));
+			m_eeprom->di_write(BIT(data, 3));
+
+			m_cpuauxctl = data;
+		}, "cpu_aux_ctrl_w").umask32(0x000000ff);
+
+	map(0x1fb801c0, 0x1fb801c3).lr8(NAME([this]() { return m_lio_isr[0]; })).umask32(0x000000ff);
+	map(0x1fb801c4, 0x1fb801c7).lrw8(
+		NAME([this]() { return m_lio_imr[0]; }),
+		[this](u8 data)
+		{
+			m_lio_imr[0] = data;
+
+			// update interrupt line
+			bool const lio_int = m_lio_isr[0] & m_lio_imr[0];
+			if (m_lio_int[0] ^ lio_int)
+			{
+				m_lio_int[0] = lio_int;
+				m_cpu->set_input_line(INPUT_LINE_IRQ1, lio_int);
+			}
+		}, "lio0_imr_w").umask32(0x000000ff);
+
+	map(0x1fb801c8, 0x1fb801cb).lr8(NAME([this]() { return m_lio_isr[1]; })).umask32(0x000000ff);
+	map(0x1fb801cc, 0x1fb801cf).lrw8(
+		NAME([this]() { return m_lio_imr[1]; }),
+		[this](u8 data)
+		{
+			m_lio_imr[1] = data;
+
+			// update interrupt line
+			bool const lio_int = m_lio_isr[1] & m_lio_imr[1];
+			if (m_lio_int[1] ^ lio_int)
+			{
+				m_lio_int[1] = lio_int;
+				m_cpu->set_input_line(INPUT_LINE_IRQ2, lio_int);
+			}
+		}, "lio1_imr_w").umask32(0x000000ff);
+
+	map(0x1fb801d0, 0x1fb801df).ram(); // FIXME: stub out int2 registers
+	map(0x1fb801e0, 0x1fb801e3).lw8(
+		[this](u8 data)
+		{
+			// timer 0 acknowledge
+			if (BIT(data, 0))
+				m_cpu->set_input_line(INPUT_LINE_IRQ3, 0);
+
+			// timer 1 acknowledge
+			if (BIT(data, 1))
+				m_cpu->set_input_line(INPUT_LINE_IRQ4, 0);
+		}, "timer_ack").umask32(0x000000ff);
+	map(0x1fb801f0, 0x1fb801ff).rw(m_pit, FUNC(pit8254_device::read), FUNC(pit8254_device::write)).umask32(0x000000ff);
+
+	map(0x1fb80d00, 0x1fb80d0f).rw(m_duart[0], FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask32(0x000000ff);
+	map(0x1fb80d10, 0x1fb80d1f).rw(m_duart[1], FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask32(0x000000ff);
+	map(0x1fb80d20, 0x1fb80d2f).rw(m_duart[2], FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask32(0x000000ff);
+
+	map(0x1fb80e00, 0x1fb80e7f).rw(m_rtc, FUNC(dp8573_device::read), FUNC(dp8573_device::write)).umask32(0x000000ff);
+
+	map(0x1fbe0000, 0x1fbfffff).ram().share("dsp_sram"); // 3xTC55328J-25 32KiB CMOS static RAM
+
+	map(0x1fbd0000, 0x1fbd0003).nopr(); // FIXME: board revision register
+
+	map(0x1fc00000, 0x1fc7ffff).lr16([this](offs_t offset) { return m_eprom[offset]; }, "boot");
+}
+
 static void scsi_devices(device_slot_interface &device)
 {
 	device.option_add("cdrom", NSCSI_CDROM_SGI).machine_config(
@@ -471,6 +619,22 @@ void pi4d2x_state::pi4d25(machine_config &config)
 {
 	R3000(config, m_cpu, 20_MHz_XTAL, 32768, 65536);
 	m_cpu->set_fpu(mips1_device_base::MIPS_R3010);
+
+	common(config);
+}
+
+void pi4d3x_state::pi4d30(machine_config &config)
+{
+	R3000A(config, m_cpu, 30_MHz_XTAL, 65536, 65536);
+	m_cpu->set_fpu(mips1_device_base::MIPS_R3010A);
+
+	common(config);
+}
+
+void pi4d3x_state::pi4d35(machine_config &config)
+{
+	R3000A(config, m_cpu, 36_MHz_XTAL, 65536, 65536);
+	m_cpu->set_fpu(mips1_device_base::MIPS_R3010A);
 
 	common(config);
 }
@@ -602,6 +766,124 @@ void pi4d2x_state::common(machine_config &config)
 	// TODO: vme slot, cpu interrupt 0
 }
 
+void pi4d3x_state::common(machine_config &config)
+{
+	m_cpu->set_endianness(ENDIANNESS_BIG);
+	m_cpu->set_addrmap(AS_PROGRAM, &pi4d3x_state::map);
+	m_cpu->in_brcond<0>().set([]() { return 1; }); // writeback complete
+
+	RAM(config, m_ram);
+	m_ram->set_default_size("16M");
+	m_ram->set_extra_options("8M,32M,64M,128M");
+	m_ram->set_default_value(0);
+
+	EEPROM_93C56_16BIT(config, m_eeprom);
+
+	DP8573(config, m_rtc); // DP8572AV
+
+	// 1: local0
+	// 2: local1
+	// 3: 8254.0
+	// 4: 8254.1
+	// int 7, 11 -> mappable?
+	// level < 8 -> local0
+	// level < 16 -> local1
+	// level < 24 -> map0
+	// level < 32 -> map1
+
+	// FIXME: part of INT2 asic
+	PIT8254(config, m_pit);
+	m_pit->set_clk<2>(1_MHz_XTAL);
+	m_pit->out_handler<0>().set([this](int state) { if (state) m_cpu->set_input_line(INPUT_LINE_IRQ3, 1); });
+	m_pit->out_handler<1>().set([this](int state) { if (state) m_cpu->set_input_line(INPUT_LINE_IRQ4, 1); });
+	m_pit->out_handler<2>().set(m_pit, FUNC(pit8254_device::write_clk0));
+	m_pit->out_handler<2>().append(m_pit, FUNC(pit8254_device::write_clk1));
+
+	NSCSI_BUS(config, "scsi");
+	NSCSI_CONNECTOR(config, "scsi:0").option_set("wd33c93a", WD33C93A).machine_config(
+		[this](device_t *device)
+		{
+			wd33c9x_base_device &wd33c93(downcast<wd33c9x_base_device &>(*device));
+
+			wd33c93.set_clock(10'000'000);
+			wd33c93.irq_cb().set(*this, &pi4d3x_state::lio_interrupt<0, 2>, "lio0.2");
+			//wd33c93.drq_cb().set(*this, FUNC(pi4d2x_state::scsi_drq));
+		});
+	NSCSI_CONNECTOR(config, "scsi:1", scsi_devices, "harddisk", false);
+	NSCSI_CONNECTOR(config, "scsi:2", scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsi:3", scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsi:4", scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsi:5", scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsi:6", scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsi:7", scsi_devices, nullptr, false);
+
+	SEEQ8003(config, m_enet, 0);
+	m_enet->out_int_cb().set(&pi4d3x_state::lio_interrupt<0, 3>, "lio0.3");
+
+	input_merger_device &duart_int(INPUT_MERGER_ANY_HIGH(config, "duart_int"));
+	duart_int.output_handler().set(&pi4d3x_state::lio_interrupt<0, 5>, "lio0.5");
+
+	// duart 0: keyboard/mouse
+	SCC85C30(config, m_duart[0], 10_MHz_XTAL); // Z8513010VSC ESCC
+	m_duart[0]->out_int_callback().set(duart_int, FUNC(input_merger_device::in_w<0>));
+
+	// keyboard
+	sgi_keyboard_port_device &keyboard_port(SGIKBD_PORT(config, "keyboard_port", default_sgi_keyboard_devices, "hlekbd"));
+	m_duart[0]->out_txdb_callback().set(keyboard_port, FUNC(sgi_keyboard_port_device::write_txd));
+	keyboard_port.rxd_handler().set(m_duart[0], FUNC(z80scc_device::rxb_w));
+
+	// mouse
+	rs232_port_device &mouse_port(RS232_PORT(config, "mouse_port",
+		[](device_slot_interface &device)
+		{
+			device.option_add("mouse", SGI_HLE_SERIAL_MOUSE);
+		},
+		"mouse"));
+	m_duart[0]->out_txda_callback().set(mouse_port, FUNC(rs232_port_device::write_txd));
+	mouse_port.rxd_handler().set(m_duart[0], FUNC(z80scc_device::rxa_w));
+
+	// duart 1: serial ports
+	SCC85C30(config, m_duart[1], 10_MHz_XTAL); // Z8513010VSC ESCC
+	m_duart[1]->configure_channels(3'686'400, 0, 3'686'400, 0);
+	m_duart[1]->out_int_callback().set(duart_int, FUNC(input_merger_device::in_w<1>));
+
+	// serial port 1
+	RS232_PORT(config, m_serial[0], default_rs232_devices, nullptr);
+	m_duart[1]->out_dtra_callback().set(m_serial[0], FUNC(rs232_port_device::write_dtr));
+	m_duart[1]->out_rtsa_callback().set(m_serial[0], FUNC(rs232_port_device::write_rts));
+	m_duart[1]->out_txda_callback().set(m_serial[0], FUNC(rs232_port_device::write_txd));
+	m_serial[0]->cts_handler().set(m_duart[1], FUNC(z80scc_device::ctsa_w));
+	m_serial[0]->dcd_handler().set(m_duart[1], FUNC(z80scc_device::dcda_w));
+	m_serial[0]->rxd_handler().set(m_duart[1], FUNC(z80scc_device::rxa_w));
+
+	// serial port 2
+	RS232_PORT(config, m_serial[1], default_rs232_devices, "terminal");
+	m_duart[1]->out_dtrb_callback().set(m_serial[1], FUNC(rs232_port_device::write_dtr));
+	m_duart[1]->out_rtsb_callback().set(m_serial[1], FUNC(rs232_port_device::write_rts));
+	m_duart[1]->out_txdb_callback().set(m_serial[1], FUNC(rs232_port_device::write_txd));
+	m_serial[1]->cts_handler().set(m_duart[1], FUNC(z80scc_device::ctsb_w));
+	m_serial[1]->dcd_handler().set(m_duart[1], FUNC(z80scc_device::dcdb_w));
+	m_serial[1]->rxd_handler().set(m_duart[1], FUNC(z80scc_device::rxb_w));
+
+	// duart 2: "Apple" RS-422 serial ports
+	SCC85C30(config, m_duart[2], 10_MHz_XTAL); // Z8513010VSC ESCC
+	m_duart[2]->out_int_callback().set(duart_int, FUNC(input_merger_device::in_w<2>));
+
+	// serial port 3
+	// FIXME: HSKO/HSKI/GPI
+	RS232_PORT(config, m_serial[2], default_rs232_devices, nullptr);
+	m_duart[2]->out_txda_callback().set(m_serial[2], FUNC(rs232_port_device::write_txd));
+	m_serial[2]->rxd_handler().set(m_duart[2], FUNC(z80scc_device::rxa_w));
+
+	// serial port 4
+	// FIXME: HSKO/HSKI/GPI
+	RS232_PORT(config, m_serial[3], default_rs232_devices, nullptr);
+	m_duart[2]->out_txdb_callback().set(m_serial[3], FUNC(rs232_port_device::write_txd));
+	m_serial[3]->rxd_handler().set(m_duart[2], FUNC(z80scc_device::rxb_w));
+
+	DSP56001(config, m_dsp, 20_MHz_XTAL);
+}
+
 void pi4d2x_state::initialize()
 {
 	// map the configured ram
@@ -619,6 +901,12 @@ void pi4d2x_state::initialize()
 	m_dmahi = make_unique_clear<u16 []>(2048);
 
 	m_leds.resolve();
+}
+
+void pi4d3x_state::initialize()
+{
+	// map the configured ram
+	m_cpu->space(0).install_ram(0x00000000, m_ram->mask(), m_ram->pointer());
 }
 
 void pi4d2x_state::lio_interrupt(unsigned number, int state)
@@ -646,6 +934,26 @@ void pi4d2x_state::lio_interrupt(unsigned number, int state)
 	{
 		m_lio_int = lio_int;
 		m_cpu->set_input_line(INPUT_LINE_IRQ1, m_lio_int);
+	}
+}
+
+void pi4d3x_state::lio_interrupt(unsigned const lio, unsigned const number, int state)
+{
+	u8 const mask = 1 << number;
+
+	// record interrupt state
+	if (state)
+		m_lio_isr[lio] |= mask;
+	else
+		m_lio_isr[lio] &= ~mask;
+
+	// update interrupt line
+	bool const lio_int = m_lio_isr[lio] & m_lio_imr[lio];
+	if (m_lio_int[lio] ^ lio_int)
+	{
+		m_lio_int[lio] = lio_int;
+
+		m_cpu->set_input_line(lio ? INPUT_LINE_IRQ2 : INPUT_LINE_IRQ1, lio_int);
 	}
 }
 
@@ -698,6 +1006,27 @@ ROM_START(4d25)
 	ROMX_LOAD("070_8000_007_boot_3.h1e6", 0x000003, 0x010000, CRC(682977c3) SHA1(d9bcf7cdc5caef4221929fe26eccf34253fa7f29), ROM_BIOS(0) | ROM_SKIP(3))
 ROM_END
 
+ROM_START(4d30)
+	ROM_REGION16_BE(0x80000, "boot", 0)
+	ROM_SYSTEM_BIOS(0, "4.0.1c", "SGI Version 4.0.1 Rev C GR1/GR2/LG1,  Feb 14, 1992")
+	ROMX_LOAD("ip14prom.bin", 0x000000, 0x080000, NO_DUMP, ROM_BIOS(0))
+ROM_END
+
+ROM_START(4d35)
+	ROM_REGION16_BE(0x80000, "boot", 0) // TC574096D-120 (262,144x16-bit EEPROM)
+
+	ROM_SYSTEM_BIOS(0, "4.0.1d", "SGI Version 4.0.1 Rev D LG1/GR2,  Mar 24, 1992")
+	ROMX_LOAD("ip12prom.002be.u61", 0x000000, 0x040000, CRC(d35f105c) SHA1(3d08dfb961d7512bd8ed41cb6e01e89d14134f09), ROM_BIOS(0))
+
+	ROM_SYSTEM_BIOS(1, "4.0.1c", "SGI Version 4.0.1 Rev C GR1/GR2/LG1,  Feb 14, 1992")
+	ROMX_LOAD("ip12prom.070-8086-002.u61", 0x000000, 0x080000, CRC(543cfc3f) SHA1(a7331876f11bff40c960f822923503eca17191c5), ROM_BIOS(1))
+
+	ROM_SYSTEM_BIOS(2, "4.0a", "SGI Version 4.0 Rev A IP12,  Aug 22, 1991")
+	ROMX_LOAD("ip12prom.070-8045-002.u61", 0x000000, 0x040000, CRC(fe999bae) SHA1(eb054c365a6e018be3b9ae44169c0ffc6447c6f0), ROM_BIOS(2))
+ROM_END
+
 //   YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT        COMPANY                 FULLNAME                FLAGS
-COMP(1988, 4d20, 0,      0,      pi4d20,  0,     pi4d2x_state, initialize, "Silicon Graphics Inc", "Personal Iris 4D/20",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP(1989, 4d25, 0,      0,      pi4d25,  0,     pi4d2x_state, initialize, "Silicon Graphics Inc", "Personal Iris 4D/25",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP(1988, 4d20, 0,      0,      pi4d20,  0,     pi4d2x_state, initialize, "Silicon Graphics Inc", "Personal IRIS 4D/20",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP(1989, 4d25, 0,      0,      pi4d25,  0,     pi4d2x_state, initialize, "Silicon Graphics Inc", "Personal IRIS 4D/25",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP(1991, 4d30, 0,      0,      pi4d30,  0,     pi4d3x_state, initialize, "Silicon Graphics Inc", "Personal IRIS 4D/30",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP(1991, 4d35, 0,      0,      pi4d35,  0,     pi4d3x_state, initialize, "Silicon Graphics Inc", "Personal IRIS 4D/35",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

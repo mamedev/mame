@@ -9,8 +9,8 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "infoxml.h"
 
-#include "info.h"
 #include "mameopts.h"
 
 #include "machine/ram.h"

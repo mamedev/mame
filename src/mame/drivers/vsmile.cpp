@@ -153,20 +153,20 @@ void vsmile_base_state::mem_map(address_map &map)
 
 void vsmile_state::banked_map(address_map &map)
 {
-	map(0x0000000, 0x00fffff).rom().region("bios", 0);
-	map(0x0100000, 0x01fffff).rom().region("bios", 0);
-	map(0x0200000, 0x02fffff).rom().region("bios", 0);
-	map(0x0300000, 0x03fffff).rom().region("bios", 0);
+	map(0x0000000, 0x00fffff).rom().region("sysrom", 0);
+	map(0x0100000, 0x01fffff).rom().region("sysrom", 0);
+	map(0x0200000, 0x02fffff).rom().region("sysrom", 0);
+	map(0x0300000, 0x03fffff).rom().region("sysrom", 0);
 
-	map(0x0400000, 0x04fffff).rom().region("bios", 0);
-	map(0x0500000, 0x05fffff).rom().region("bios", 0);
-	map(0x0600000, 0x06fffff).rom().region("bios", 0);
-	map(0x0700000, 0x07fffff).rom().region("bios", 0);
+	map(0x0400000, 0x04fffff).rom().region("sysrom", 0);
+	map(0x0500000, 0x05fffff).rom().region("sysrom", 0);
+	map(0x0600000, 0x06fffff).rom().region("sysrom", 0);
+	map(0x0700000, 0x07fffff).rom().region("sysrom", 0);
 
-	map(0x0800000, 0x08fffff).rom().region("bios", 0);
-	map(0x0900000, 0x09fffff).rom().region("bios", 0);
-	map(0x0a00000, 0x0afffff).rom().region("bios", 0);
-	map(0x0b00000, 0x0bfffff).rom().region("bios", 0);
+	map(0x0800000, 0x08fffff).rom().region("sysrom", 0);
+	map(0x0900000, 0x09fffff).rom().region("sysrom", 0);
+	map(0x0a00000, 0x0afffff).rom().region("sysrom", 0);
+	map(0x0b00000, 0x0bfffff).rom().region("sysrom", 0);
 
 	map(0x1000000, 0x13fffff).rw(m_cart, FUNC(vsmile_cart_slot_device::bank0_r), FUNC(vsmile_cart_slot_device::bank0_w));
 
@@ -187,7 +187,7 @@ void vsmile_state::banked_map(address_map &map)
 
 static INPUT_PORTS_START( vsmile )
 	PORT_START("REGION")
-	PORT_DIPNAME( 0x0f, 0x04, "BIOS Region" )
+	PORT_DIPNAME( 0x0f, 0x04, "sysrom Region" )
 	PORT_DIPSETTING(    0x04, "UK/US" )
 	PORT_DIPSETTING(    0x07, "China" )
 	PORT_DIPSETTING(    0x08, "Mexico" )
@@ -226,7 +226,7 @@ void vsmile_base_state::vsmile_base(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	ADDRESS_MAP_BANK(config, m_bankdev);
-	m_bankdev->set_endianness(ENDIANNESS_LITTLE);
+	m_bankdev->set_endianness(ENDIANNESS_BIG);
 	m_bankdev->set_data_width(16);
 	m_bankdev->set_shift(-1);
 	m_bankdev->set_stride(0x400000);
@@ -284,22 +284,22 @@ void vsmilem_state::vsmilem(machine_config &config)
 
 // TODO: decide on a dump endian, these likely differ in endianess due to different dumping technqiues
 ROM_START( vsmile )
-	ROM_REGION16_LE( 0x800000, "bios", ROMREGION_ERASEFF )
+	ROM_REGION16_BE( 0x800000, "sysrom", ROMREGION_ERASEFF )
 	ROM_LOAD( "vsmilebios.bin", 0x000000, 0x200000, CRC(11f1b416) SHA1(11f77c4973d29c962567390e41879c86a759c93b) )
 ROM_END
 
 ROM_START( vsmileg )
-	ROM_REGION16_LE( 0x800000, "bios", ROMREGION_ERASEFF )
-	ROM_LOAD16_WORD_SWAP( "bios german.bin", 0x000000, 0x200000, CRC(205c5296) SHA1(7fbcf761b5885c8b1524607aabaf364b4559c8cc) )
+	ROM_REGION16_BE( 0x800000, "sysrom", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "sysrom german.bin", 0x000000, 0x200000, CRC(205c5296) SHA1(7fbcf761b5885c8b1524607aabaf364b4559c8cc) )
 ROM_END
 
 ROM_START( vsmilef )
-	ROM_REGION16_LE( 0x800000, "bios", ROMREGION_ERASEFF )
+	ROM_REGION16_BE( 0x800000, "sysrom", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "sysrom_france", 0x000000, 0x200000, CRC(0cd0bdf5) SHA1(5c8d1eada1b6b545555b8d2b09325d7127681af8) )
 ROM_END
 
 ROM_START( vsmilem )
-	ROM_REGION16_LE( 0x800000, "bios", ROMREGION_ERASEFF )
+	ROM_REGION16_BE( 0x800000, "sysrom", ROMREGION_ERASEFF )
 	ROM_LOAD( "vsmilebios.bin", 0x000000, 0x200000, BAD_DUMP CRC(11f1b416) SHA1(11f77c4973d29c962567390e41879c86a759c93b) )
 ROM_END
 

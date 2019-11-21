@@ -16,7 +16,9 @@
 #include "ui/submenu.h"
 #include "ui/ui.h"
 
+#include "infoxml.h"
 #include "mame.h"
+
 #include "osdnet.h"
 #include "mameopts.h"
 #include "pluginopts.h"
@@ -25,8 +27,6 @@
 #include "romload.h"
 
 #include "uiinput.h"
-
-#include "../info.h"
 
 #include <algorithm>
 #include <cstring>
