@@ -1544,96 +1544,93 @@ SH2_DMA_FIFO_DATA_AVAILABLE_CB(sega_32x_device::_32x_fifo_available_callback)
 bool sega_32x_device::render_videobuffer_to_screenbuffer_helper(int scanline, bool height_240, bool width_320)
 {
 	bool const height_240_mode = m_32x_240mode;
-	if ((!width_320) || (height_240 != height_240_mode))
+	if ((!width_320) || (height_240 != height_240_mode) || (m_32x_displaymode == 0))
 		return false;
 
 	int x;
 
 	/* render 32x output to a buffer */
-	if (m_32x_displaymode != 0)
+	if (m_32x_displaymode==1)
 	{
-		if (m_32x_displaymode==1)
+		uint32_t lineoffs;
+		int start;
+
+		lineoffs = m_32x_display_dram[scanline];
+
+		if (m_32x_screenshift == 0) start=0;
+		else start = -1;
+
+		for (x=start;x<320;x++)
 		{
-			uint32_t lineoffs;
-			int start;
+			uint16_t coldata;
+			coldata = m_32x_display_dram[lineoffs];
 
-			lineoffs = m_32x_display_dram[scanline];
-
-			if (m_32x_screenshift == 0) start=0;
-			else start = -1;
-
-			for (x=start;x<320;x++)
-			{
-				uint16_t coldata;
-				coldata = m_32x_display_dram[lineoffs];
-
-				{
-					if (x>=0)
-					{
-						m_32x_linerender[x] = m_32x_palette[(coldata & 0xff00)>>8];
-					}
-
-					x++;
-
-					if (x>=0)
-					{
-						m_32x_linerender[x] = m_32x_palette[(coldata & 0x00ff)];
-					}
-				}
-
-				lineoffs++;
-
-			}
-		}
-		else if (m_32x_displaymode==3) // mode 3 = RLE  (used by BRUTAL intro)
-		{
-			uint32_t lineoffs;
-			int start;
-
-			lineoffs = m_32x_display_dram[scanline];
-
-			if (m_32x_screenshift == 0) start=0;
-			else start = -1;
-
-			x = start;
-			while (x<320)
-			{
-				uint16_t coldata, length, l;
-				coldata = m_32x_display_dram[lineoffs];
-				length = ((coldata & 0xff00)>>8)+1;
-				coldata = (coldata & 0x00ff)>>0;
-				for (l=0;l<length;l++)
-				{
-					if (x>=0)
-					{
-						m_32x_linerender[x] = m_32x_palette[(coldata)];
-					}
-					x++;
-				}
-
-				lineoffs++;
-
-			}
-		}
-		else // MODE 2 - 15bpp mode, not used by any commercial games?
-		{
-			uint32_t lineoffs;
-			int start;
-
-			lineoffs = m_32x_display_dram[scanline];
-
-			if (m_32x_screenshift == 0) start=0;
-			else start = -1;
-
-			x = start;
-			while (x<320)
 			{
 				if (x>=0)
-					m_32x_linerender[x] = m_32x_display_dram[lineoffs&0xffff];
+				{
+					m_32x_linerender[x] = m_32x_palette[(coldata & 0xff00)>>8];
+				}
 
 				x++;
-				lineoffs++;
+
+				if (x>=0)
+				{
+					m_32x_linerender[x] = m_32x_palette[(coldata & 0x00ff)];
+				}
 			}
+
+			lineoffs++;
+
+		}
+	}
+	else if (m_32x_displaymode==3) // mode 3 = RLE  (used by BRUTAL intro)
+	{
+		uint32_t lineoffs;
+		int start;
+
+		lineoffs = m_32x_display_dram[scanline];
+
+		if (m_32x_screenshift == 0) start=0;
+		else start = -1;
+
+		x = start;
+		while (x<320)
+		{
+			uint16_t coldata, length, l;
+			coldata = m_32x_display_dram[lineoffs];
+			length = ((coldata & 0xff00)>>8)+1;
+			coldata = (coldata & 0x00ff)>>0;
+			for (l=0;l<length;l++)
+			{
+				if (x>=0)
+				{
+					m_32x_linerender[x] = m_32x_palette[(coldata)];
+				}
+				x++;
+			}
+
+			lineoffs++;
+
+		}
+	}
+	else // MODE 2 - 15bpp mode, not used by any commercial games?
+	{
+		uint32_t lineoffs;
+		int start;
+
+		lineoffs = m_32x_display_dram[scanline];
+
+		if (m_32x_screenshift == 0) start=0;
+		else start = -1;
+
+		x = start;
+		while (x<320)
+		{
+			if (x>=0)
+				m_32x_linerender[x] = m_32x_display_dram[lineoffs&0xffff];
+
+			x++;
+			lineoffs++;
 		}
 	}
 	return true;
