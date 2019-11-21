@@ -91,6 +91,7 @@ wd_fdc_device_base::wd_fdc_device_base(const machine_config &mconfig, device_typ
 {
 	force_ready = false;
 	disable_motor_control = false;
+	spinup_on_interrupt = false;
 }
 
 void wd_fdc_device_base::set_force_ready(bool _force_ready)
@@ -1122,6 +1123,8 @@ void wd_fdc_device_base::cmd_w(uint8_t val)
 	{
 		// checkme
 		delay_cycles(t_cmd, dden ? delay_register_commit * 2 : delay_register_commit);
+		if (spinup_on_interrupt)  // see note in WD1772 constructor
+			spinup();
 	}
 	else
 	{
@@ -2895,6 +2898,11 @@ wd1772_device::wd1772_device(const machine_config &mconfig, const char *tag, dev
 	head_control = false;
 	motor_control = true;
 	ready_hooked = false;
+	
+	/* Sam Coupe/+D/Disciple expect a 0xd0 force interrupt command to cause a spin-up.
+	   eg. +D issues 2x 0xd0, then waits for index pulses to start, bails out with no disk error if that doesn't happen.
+	   Not sure if other chips should do this too? */
+	spinup_on_interrupt = true;
 }
 
 int wd1772_device::settle_time() const

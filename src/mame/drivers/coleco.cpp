@@ -64,7 +64,7 @@
 	- Bit90:
 		Add support for memory expansion (documented)
 		Add support for printer interface (documented)
-		Add tape support
+		Add tape Support
 
 */
 
@@ -705,6 +705,7 @@ ROM_START( bit90 )
 	ROMX_LOAD("d32521e.u3", 0x12000, 0x2000, NO_DUMP, ROM_BIOS(1)) // MONITOR2
 	ROMX_LOAD("d32522e.u2",  0x2000, 0x2000, NO_DUMP, ROM_BIOS(1)) // MONITOR3
 ROM_END
+ROM_END
 
 /* System Drivers */
 
@@ -716,5 +717,6 @@ CONS( 1986, czz50,    0,      coleco, czz50,    czz50,  coleco_state, empty_init
 CONS( 1988, dina,     czz50,  0,      dina,     czz50,  coleco_state, empty_init, "Telegames",        "Dina",                             0 )
 CONS( 1988, prsarcde, czz50,  0,      czz50,    czz50,  coleco_state, empty_init, "Telegames",        "Personal Arcade",                  0 )
 COMP( 1983, bit90,    0,      coleco, bit90,    bit90,  bit90_state,  empty_init, "Bit Corporation",  "Bit90",                            0 )
+
 
 

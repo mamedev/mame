@@ -564,7 +564,7 @@ void osd_common_t::set_mastervolume(int attenuation)
 //  additions/modifications to the input list
 //-------------------------------------------------
 
-void osd_common_t::customize_input_type_list(simple_list<input_type_entry> &typelist)
+void osd_common_t::customize_input_type_list(std::vector<input_type_entry> &typelist)
 {
 	//
 	// inptport.c defines some general purpose defaults for key and joystick bindings.

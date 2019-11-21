@@ -449,7 +449,10 @@ bool input_seq::is_valid() const noexcept
 	// scan the sequence for valid codes
 	input_item_class lastclass = ITEM_CLASS_INVALID;
 	input_code lastcode = INPUT_CODE_INVALID;
-	int positive_code_count = 0;
+	decltype(m_code) positive_codes;
+	decltype(m_code) negative_codes;
+	auto positive_codes_end = positive_codes.begin();
+	auto negative_codes_end = negative_codes.begin();
 	for (input_code code : m_code)
 	{
 		// invalid codes are never permitted
@@ -460,7 +463,7 @@ bool input_seq::is_valid() const noexcept
 		if (code == or_code || code == end_code)
 		{
 			// must be at least one positive code
-			if (!positive_code_count)
+			if (positive_codes.begin() == positive_codes_end)
 				return false;
 
 			// last code must not have been an internal code
@@ -472,7 +475,8 @@ bool input_seq::is_valid() const noexcept
 				return true;
 
 			// reset the state for the next chunk
-			positive_code_count = 0;
+			positive_codes_end = positive_codes.begin();
+			negative_codes_end = negative_codes.begin();
 			lastclass = ITEM_CLASS_INVALID;
 		}
 		else if (code == not_code)
@@ -483,9 +487,19 @@ bool input_seq::is_valid() const noexcept
 		}
 		else
 		{
-			// count positive codes
+			// track positive codes, and don't allow positive and negative for the same code
 			if (lastcode != not_code)
-				positive_code_count++;
+			{
+				*positive_codes_end++ = code;
+				if (std::find(negative_codes.begin(), negative_codes_end, code) != negative_codes_end)
+					return false;
+			}
+			else
+			{
+				*negative_codes_end++ = code;
+				if (std::find(positive_codes.begin(), positive_codes_end, code) != positive_codes_end)
+					return false;
+			}
 
 			// non-switch items can't have a NOT
 			input_item_class itemclass = code.item_class();

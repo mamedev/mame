@@ -31,6 +31,23 @@
 #define VERBOSE             (0)
 #include "logmacro.h"
 
+// NTSC uses XTAL(21'477'272) Sound CPU runs at exactly this, Main CPU runs at this / 4
+// PAL  uses XTAL(26'601'712) Sound CPU runs at exactly this, Main CPU runs at this / 5
+
+// can also be used with the following
+// PAL M 21.453669MHz
+// PAL N 21.492336MHz
+
+#define MAIN_CPU_CLOCK_NTSC XTAL(21'477'272)/4
+#define SOUND_CPU_CLOCK_NTSC XTAL(21'477'272)
+#define TIMER_ALT_SPEED_NTSC (15746)
+
+#define MAIN_CPU_CLOCK_PAL XTAL(26'601'712)/5
+#define SOUND_CPU_CLOCK_PAL XTAL(26'601'712)
+#define TIMER_ALT_SPEED_PAL (15602)
+
+
+
 class vt_vt1682_state : public driver_device
 {
 public:
@@ -487,6 +504,13 @@ private:
 		logerror("%s: vt1682_timer_enable_trampoline_w: %02x @ position y%d, x%d\n", machine().describe_context(), data, m_screen->vpos(), m_screen->hpos());
 		m_system_timer_dev->vt1682_timer_enable_w(space, offset, data);
 	};
+
+	DECLARE_WRITE8_MEMBER(vt1682_timer_preload_15_8_trampoline_w)
+	{
+		logerror("%s: vt1682_timer_preload_15_8_trampoline_w: %02x @ position y%d, x%d\n", machine().describe_context(), data, m_screen->vpos(), m_screen->hpos());
+		m_system_timer_dev->vt1682_timer_preload_15_8_w(space, offset, data);
+	};
+
 
 	void update_banks();
 	uint8_t translate_prg0select(uint8_t tp20_tp13);
@@ -1498,7 +1522,7 @@ READ8_MEMBER(vt_vt1682_state::vt1682_2010_bk1_xscroll_7_0_r)
 
 WRITE8_MEMBER(vt_vt1682_state::vt1682_2010_bk1_xscroll_7_0_w)
 {
- 	m_screen->update_partial(m_screen->vpos());
+	m_screen->update_partial(m_screen->vpos());
 
 	logerror("%s: vt1682_2010_bk1_xscroll_7_0_w writing: %02x\n", machine().describe_context(), data);
 	m_xscroll_7_0_bk[0] = data;
@@ -1554,7 +1578,7 @@ READ8_MEMBER(vt_vt1682_state::vt1682_2012_bk1_scroll_control_r)
 
 WRITE8_MEMBER(vt_vt1682_state::vt1682_2012_bk1_scroll_control_w)
 {
- 	m_screen->update_partial(m_screen->vpos());
+	m_screen->update_partial(m_screen->vpos());
 
 	logerror("%s: vt1682_2012_bk1_scroll_control_w writing: %02x (hclr: %1x page_layout:%1x ymsb:%1x xmsb:%1x)\n", machine().describe_context(), data,
 		(data & 0x10) >> 4, (data & 0x0c) >> 2, (data & 0x02) >> 1, (data & 0x01) >> 0);
@@ -1585,7 +1609,7 @@ READ8_MEMBER(vt_vt1682_state::vt1682_2013_bk1_main_control_r)
 
 WRITE8_MEMBER(vt_vt1682_state::vt1682_2013_bk1_main_control_w)
 {
- 	m_screen->update_partial(m_screen->vpos());
+	m_screen->update_partial(m_screen->vpos());
 
 	logerror("%s: vt1682_2013_bk1_main_control_w writing: %02x (enable:%01x palette:%01x depth:%01x bpp:%01x linemode:%01x tilesize:%01x)\n", machine().describe_context(), data,
 		(data & 0x80) >> 7, (data & 0x40) >> 6, (data & 0x30) >> 4, (data & 0x0c) >> 2, (data & 0x02) >> 1, (data & 0x01) >> 0 );
@@ -1616,7 +1640,7 @@ READ8_MEMBER(vt_vt1682_state::vt1682_2014_bk2_xscroll_7_0_r)
 
 WRITE8_MEMBER(vt_vt1682_state::vt1682_2014_bk2_xscroll_7_0_w)
 {
- 	m_screen->update_partial(m_screen->vpos());
+	m_screen->update_partial(m_screen->vpos());
 
 	logerror("%s: vt1682_2014_bk2_xscroll_7_0_w writing: %02x\n", machine().describe_context(), data);
 	m_xscroll_7_0_bk[1] = data;
@@ -1672,7 +1696,7 @@ READ8_MEMBER(vt_vt1682_state::vt1682_2016_bk2_scroll_control_r)
 
 WRITE8_MEMBER(vt_vt1682_state::vt1682_2016_bk2_scroll_control_w)
 {
- 	m_screen->update_partial(m_screen->vpos());
+	m_screen->update_partial(m_screen->vpos());
 
 	logerror("%s: vt1682_2016_bk2_scroll_control_w writing: %02x ((invalid): %1x page_layout:%1x ymsb:%1x xmsb:%1x)\n", machine().describe_context(), data,
 		(data & 0x10) >> 4, (data & 0x0c) >> 2, (data & 0x02) >> 1, (data & 0x01) >> 0);
@@ -1703,7 +1727,7 @@ READ8_MEMBER(vt_vt1682_state::vt1682_2017_bk2_main_control_r)
 
 WRITE8_MEMBER(vt_vt1682_state::vt1682_2017_bk2_main_control_w)
 {
- 	m_screen->update_partial(m_screen->vpos());
+	m_screen->update_partial(m_screen->vpos());
 
 	logerror("%s: vt1682_2017_bk2_main_control_w writing: %02x (enable:%01x palette:%01x depth:%01x bpp:%01x (invalid):%01x tilesize:%01x)\n", machine().describe_context(), data,
 		(data & 0x80) >> 7, (data & 0x40) >> 6, (data & 0x30) >> 4, (data & 0x0c) >> 2, (data & 0x02) >> 1, (data & 0x01) >> 0 );
@@ -1945,7 +1969,7 @@ READ8_MEMBER(vt_vt1682_state::vt1682_2020_bk_linescroll_r)
 
 WRITE8_MEMBER(vt_vt1682_state::vt1682_2020_bk_linescroll_w)
 {
- 	m_screen->update_partial(m_screen->vpos());
+	m_screen->update_partial(m_screen->vpos());
 
 	logerror("%s: vt1682_2020_bk_linescroll_w writing: %02x\n", machine().describe_context(), data);
 	m_2020_bk_linescroll = data;
@@ -2600,7 +2624,7 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_210a_prgbank0_r3_w)
 /*
     Address 0x210b r/w (MAIN CPU)
 
-    0x80 - TSYSN Enable
+    0x80 - TSYSN En (Timer Clock Select)
     0x40 - PQ2 Enable
     0x20 - BUS Tristate
     0x10 - CS Control:1
@@ -2623,6 +2647,17 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_210b_misc_cs_prg0_bank_sel_w)
 
 	logerror("%s: vt1682_210b_misc_cs_prg0_bank_sel_w writing: %02x\n", machine().describe_context(), data);
 	m_210b_misc_cs_prg0_bank_sel = data;
+
+	// TODO: allow PAL
+	if (data & 0x80)
+	{
+		m_system_timer_dev->set_clock(TIMER_ALT_SPEED_NTSC);
+	}
+	else
+	{
+		m_system_timer_dev->set_clock(MAIN_CPU_CLOCK_NTSC);
+	}
+
 	update_banks();
 }
 
@@ -4881,11 +4916,12 @@ void vt_vt1682_state::vt_vt1682_map(address_map &map)
 
 	/* System */
 	map(0x2100, 0x2100).rw(FUNC(vt_vt1682_state::vt1682_2100_prgbank1_r3_r), FUNC(vt_vt1682_state::vt1682_2100_prgbank1_r3_w));
-	map(0x2101, 0x2101).rw(m_system_timer_dev, FUNC(vrt_vt1682_timer_device::vt1682_timer_preload_15_8_r), FUNC(vrt_vt1682_timer_device::vt1682_timer_preload_15_8_w));
+	map(0x2101, 0x2101).rw(m_system_timer_dev, FUNC(vrt_vt1682_timer_device::vt1682_timer_preload_7_0_r),  FUNC(vrt_vt1682_timer_device::vt1682_timer_preload_7_0_w));
 	map(0x2102, 0x2102).r(m_system_timer_dev, FUNC(vrt_vt1682_timer_device::vt1682_timer_enable_r));
 	map(0x2102, 0x2102).w(FUNC(vt_vt1682_state::vt1682_timer_enable_trampoline_w));
 	map(0x2103, 0x2103).w( m_system_timer_dev, FUNC(vrt_vt1682_timer_device::vt1682_timer_irqclear_w));
-	map(0x2104, 0x2104).rw(m_system_timer_dev, FUNC(vrt_vt1682_timer_device::vt1682_timer_preload_7_0_r),  FUNC(vrt_vt1682_timer_device::vt1682_timer_preload_7_0_w)); // not on 2100 as you might expect
+	map(0x2104, 0x2104).r(m_system_timer_dev, FUNC(vrt_vt1682_timer_device::vt1682_timer_preload_15_8_r));
+	map(0x2104, 0x2104).w(FUNC(vt_vt1682_state::vt1682_timer_preload_15_8_trampoline_w));
 	map(0x2105, 0x2105).w(FUNC(vt_vt1682_state::vt1682_2105_comr6_tvmodes_w));
 	map(0x2106, 0x2106).rw(FUNC(vt_vt1682_state::vt1682_2106_enable_regs_r), FUNC(vt_vt1682_state::vt1682_2106_enable_regs_w));
 	map(0x2107, 0x2107).rw(FUNC(vt_vt1682_state::vt1682_2107_prgbank0_r0_r), FUNC(vt_vt1682_state::vt1682_2107_prgbank0_r0_w));
@@ -4984,10 +5020,10 @@ WRITE_LINE_MEMBER(vt_vt1682_state::soundcpu_timerb_irq)
 {
 // need to set proper vector (need IRQ priority manager function?)
 /*
-	if (state)
-		m_soundcpu->set_input_line(0, ASSERT_LINE);
-	else
-		m_soundcpu->set_input_line(0, CLEAR_LINE);
+    if (state)
+        m_soundcpu->set_input_line(0, ASSERT_LINE);
+    else
+        m_soundcpu->set_input_line(0, CLEAR_LINE);
 */
 }
 
@@ -4996,7 +5032,7 @@ WRITE_LINE_MEMBER(vt_vt1682_state::maincpu_timer_irq)
 	// need to set proper vector (need IRQ priority manager function?)
 
 	/* rasters are used on:
-	  
+
 	   Highway Racing (title screen - scrolling split)
 	   Fire Man (title screen - scrolling split)
 	   Bee Fighting (title screen - scrolling split)
@@ -5033,11 +5069,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(vt_vt1682_state::scanline)
 /*
 INTERRUPT_GEN_MEMBER(vt_vt1682_state::nmi)
 {
-	if (m_2000 & 0x01)
-	{
-		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
-		m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero); // same enable? (NMI_EN on sub is 'wakeup NMI')
-	}
+    if (m_2000 & 0x01)
+    {
+        m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+        m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero); // same enable? (NMI_EN on sub is 'wakeup NMI')
+    }
 }
 */
 
@@ -5103,18 +5139,6 @@ static GFXDECODE_START( gfx_test )
 GFXDECODE_END
 
 
-// NTSC uses XTAL(21'477'272) Sound CPU runs at exactly this, Main CPU runs at this / 4
-// PAL  uses XTAL(26'601'712) Sound CPU runs at exactly this, Main CPU runs at this / 5
-
-// can also be used with the following
-// PAL M 21.453669MHz
-// PAL N 21.492336MHz
-
-#define MAIN_CPU_CLOCK_NTSC XTAL(21'477'272)/4
-#define SOUND_CPU_CLOCK_NTSC XTAL(21'477'272)
-
-#define MAIN_CPU_CLOCK_PAL XTAL(26'601'712)/5
-#define SOUND_CPU_CLOCK_PAL XTAL(26'601'712)
 
 
 void vt_vt1682_state::vt_vt1682(machine_config &config)
@@ -5158,7 +5182,7 @@ void vt_vt1682_state::vt_vt1682(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(256, 256);
+	m_screen->set_size(256, 262); // 262 for NTSC, might be 261 if Vblank line is changed
 	m_screen->set_visarea(0, 256-1, 0, 240-1);
 	m_screen->set_screen_update(FUNC(vt_vt1682_state::screen_update));
 

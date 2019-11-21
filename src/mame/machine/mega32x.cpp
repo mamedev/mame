@@ -11,16 +11,8 @@
      - bcracers: write to undefined PWM register?
      - fifa96 / nbajamte: dies on the gameplay, waiting for a comm change that never occurs;
      - marsch1: doesn't boot, Master / Slave communicates through SCI
-     - nbajamte: missing I2C hookup, startup fails due of that (same I2C type as plain MD version);
-     - nflquart: black screen, missing h irq?
-     - sangoku4: black screen after the Sega logo
-     - soulstar: OSD and player sprite isn't drawn;
      - tempo: intro is too fast, mostly noticeable with the PWM sound that cuts off too early when it gets to the title screen;
      - tmek: gameplay is clearly too fast
-     - vrdxu: has 3d geometry bugs, caused by a SH-2 DRC bug;
-     - vrdxu: crashes if you attempt to enter into main menu;
-     - wwfwre: no 32x gfxs
-     - xmen: black screen after that you choose the level, needs bare minimum SH-2 SCI support
 
 
 32x Marsch tests documentation (keep start pressed at start-up for individual tests):
