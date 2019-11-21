@@ -140,9 +140,8 @@ private:
 	DECLARE_WRITE8_MEMBER(slave_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(scrollx_w);
 	DECLARE_WRITE8_MEMBER(scrolly_w);
-	DECLARE_WRITE8_MEMBER(coin_count_w);
+	DECLARE_WRITE8_MEMBER(slave_ack_w);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
-	DECLARE_READ8_MEMBER(mermaid_p0_r);
 	DECLARE_WRITE8_MEMBER(mermaid_p0_w);
 	DECLARE_READ8_MEMBER(mermaid_p1_r);
 	DECLARE_WRITE8_MEMBER(mermaid_p1_w);
@@ -182,6 +181,7 @@ void hvyunit_state::machine_start()
 	m_slavebank->configure_entries(0, 4, memregion("slave")->base(), 0x4000);
 	m_soundbank->configure_entries(0, 4, memregion("soundcpu")->base(), 0x4000);
 
+	std::fill_n(&m_mermaid_p[0], 4, 0xff);
 	save_item(NAME(m_mermaid_p));
 }
 
@@ -207,7 +207,7 @@ TILE_GET_INFO_MEMBER(hvyunit_state::get_bg_tile_info)
 
 void hvyunit_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(hvyunit_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(hvyunit_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	save_item(NAME(m_scrollx));
 	save_item(NAME(m_scrolly));
@@ -216,8 +216,8 @@ void hvyunit_state::video_start()
 
 uint32_t hvyunit_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-#define SX_POS  96
-#define SY_POS  0
+	constexpr int SX_POS = 96;
+	constexpr int SY_POS = 0;
 
 	m_bg_tilemap->set_scrollx(0, ((m_port0_data & 0x40) << 2) + m_scrollx + SX_POS); // TODO
 	m_bg_tilemap->set_scrolly(0, ((m_port0_data & 0x80) << 1) + m_scrolly + SY_POS); // TODO
@@ -294,10 +294,9 @@ WRITE8_MEMBER(hvyunit_state::scrolly_w)
 	m_scrolly = data;
 }
 
-WRITE8_MEMBER(hvyunit_state::coin_count_w)
+WRITE8_MEMBER(hvyunit_state::slave_ack_w)
 {
-	machine().bookkeeping().coin_counter_w(0, data & 1);
-	machine().bookkeeping().coin_counter_w(1, data & 2);
+	m_slavecpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
 
@@ -319,12 +318,6 @@ WRITE8_MEMBER(hvyunit_state::sound_bankswitch_w)
  *
  *************************************/
 
-READ8_MEMBER(hvyunit_state::mermaid_p0_r)
-{
-	// ?
-	return 0;
-}
-
 WRITE8_MEMBER(hvyunit_state::mermaid_p0_w)
 {
 	if (!BIT(m_mermaid_p[0], 1) && BIT(data, 1))
@@ -332,6 +325,14 @@ WRITE8_MEMBER(hvyunit_state::mermaid_p0_w)
 
 	if (BIT(data, 0) == 0)
 		m_mermaid_p[1] = m_mermaidlatch->read();
+
+	if (!BIT(m_mermaid_p[0], 4) && BIT(data, 4))
+	{
+		machine().bookkeeping().coin_counter_w(0, BIT(m_mermaid_p[2], 0));
+		machine().bookkeeping().coin_counter_w(1, BIT(m_mermaid_p[2], 1));
+		machine().bookkeeping().coin_lockout_w(0, !BIT(m_mermaid_p[2], 2));
+		machine().bookkeeping().coin_lockout_w(1, !BIT(m_mermaid_p[2], 3));
+	}
 
 	m_mermaid_p[0] = data;
 }
@@ -433,10 +434,10 @@ void hvyunit_state::slave_io(address_map &map)
 	map(0x06, 0x06).w(FUNC(hvyunit_state::scrolly_w));
 	map(0x08, 0x08).w(FUNC(hvyunit_state::scrollx_w));
 	map(0x0c, 0x0c).r(FUNC(hvyunit_state::mermaid_status_r));
-	map(0x0e, 0x0e).w(FUNC(hvyunit_state::coin_count_w));
+	map(0x0e, 0x0e).w(FUNC(hvyunit_state::slave_ack_w));
 
-//  AM_RANGE(0x22, 0x22) AM_READ(hu_scrolly_hi_reset) //22/a2 taken from ram $f065
-//  AM_RANGE(0xa2, 0xa2) AM_READ(hu_scrolly_hi_set)
+//  map(0x22, 0x22).r(FUNC(hvyunit_state::hu_scrolly_hi_reset)); //22/a2 taken from ram $f065
+//  map(0xa2, 0xa2).r(FUNC(hvyunit_state::hu_scrolly_hi_set));
 }
 
 
@@ -613,14 +614,13 @@ void hvyunit_state::hvyunit(machine_config &config)
 	Z80(config, m_slavecpu, XTAL(12'000'000)/2); /* 6MHz verified on PCB */
 	m_slavecpu->set_addrmap(AS_PROGRAM, &hvyunit_state::slave_memory);
 	m_slavecpu->set_addrmap(AS_IO, &hvyunit_state::slave_io);
-	m_slavecpu->set_vblank_int("screen", FUNC(hvyunit_state::irq0_line_hold));
+	m_slavecpu->set_vblank_int("screen", FUNC(hvyunit_state::irq0_line_assert));
 
 	Z80(config, m_soundcpu, XTAL(12'000'000)/2); /* 6MHz verified on PCB */
 	m_soundcpu->set_addrmap(AS_PROGRAM, &hvyunit_state::sound_memory);
 	m_soundcpu->set_addrmap(AS_IO, &hvyunit_state::sound_io);
 
 	I80C51(config, m_mermaid, XTAL(12'000'000)/2); /* 6MHz verified on PCB */
-	m_mermaid->port_in_cb<0>().set(FUNC(hvyunit_state::mermaid_p0_r));
 	m_mermaid->port_out_cb<0>().set(FUNC(hvyunit_state::mermaid_p0_w));
 	m_mermaid->port_in_cb<1>().set(FUNC(hvyunit_state::mermaid_p1_r));
 	m_mermaid->port_out_cb<1>().set(FUNC(hvyunit_state::mermaid_p1_w));
@@ -634,7 +634,7 @@ void hvyunit_state::hvyunit(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_slavelatch);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(58);
@@ -669,6 +669,8 @@ void hvyunit_state::hvyunit(machine_config &config)
  *  ROM definition(s)
  *
  *************************************/
+
+/* There is likely a World version using the newer (B73_25 - B73_28) graphics ROMs with a program ROM labeled B73_29 */
 
 ROM_START( hvyunit )
 	ROM_REGION( 0x20000, "master", 0 )
@@ -712,17 +714,43 @@ ROM_START( hvyunitj )
 	ROM_REGION( 0x1000, "mermaid", 0 )
 	ROM_LOAD( "mermaid.bin",  0x0000, 0x0e00, CRC(88c5dd27) SHA1(5043fed7fd192891be7e4096f2c5daaae1538bc4) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 ) /* note, the rom ordering on this is different to the other Japan set */
+	ROM_REGION( 0x200000, "gfx1", 0 )
 	ROM_LOAD( "b73_08.2f",  0x000000, 0x080000, CRC(f83dd808) SHA1(09d5f1e86fad3a0d2d3ac1845103d3f2833c6793) )
-	ROM_LOAD( "b73_07.2c",  0x100000, 0x010000, CRC(5cffa42c) SHA1(687e047345039479b35d5099e56dbc1d57284ed9) )
-	ROM_LOAD( "b73_06.2b",  0x110000, 0x010000, CRC(a98e4aea) SHA1(560fef03ad818894c9c7578c6282d55b646e8129) )
-	ROM_LOAD( "b73_01.1b",  0x120000, 0x010000, CRC(3a8a4489) SHA1(a01d7300015f90ce6dd571ad93e7a58270a99e47) )
-	ROM_LOAD( "b73_02.1c",  0x130000, 0x010000, CRC(025c536c) SHA1(075e95cc39e792049ae656404e7f7440df064391) )
-	ROM_LOAD( "b73_03.1d",  0x140000, 0x010000, CRC(ec6020cf) SHA1(2973aa2dc3deb2f27c9f1bad07a7664bad95b3f2) )
-	ROM_LOAD( "b73_04.1f",  0x150000, 0x010000, CRC(f7badbb2) SHA1(d824ab4aba94d7ca02401f4f6f34213143c282ec) )
-	ROM_LOAD( "b73_05.1h",  0x160000, 0x010000, CRC(b8e829d2) SHA1(31102358500d7b58173d4f18647decf5db744416) )
+	ROM_LOAD( "b73_28.2c",  0x100000, 0x020000, CRC(a02e08d6) SHA1(72764d4e8474aaac0674fd1c20278a706da7ade2) ) /* == b73_22.2c, despite the different label */
+	ROM_LOAD( "b73_27.2b",  0x120000, 0x020000, CRC(8708f97c) SHA1(ccddc7f2fa53c5e35345c2db0520f515c512b723) ) /* == b73_21.2b, despite the different label */
+	ROM_LOAD( "b73_25.0b",  0x140000, 0x020000, CRC(2f13f81e) SHA1(9d9c1869bf582a0bc0581cdf5b65237124b9e456) ) /* == b73_15.0b, despite the different label */
+	ROM_LOAD( "b73_26.0c",  0x160000, 0x010000, CRC(b8e829d2) SHA1(31102358500d7b58173d4f18647decf5db744416) ) /* == b73_16.0c, despite the different label */
 
 	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD( "b73_09.2p",  0x000000, 0x080000, CRC(537c647f) SHA1(941c0f4e251bc68e53d62e70b033a3a6c145bb7e) )
+ROM_END
+
+ROM_START( hvyunitja )
+	ROM_REGION( 0x20000, "master", 0 )
+	ROM_LOAD( "b73_24.5c",  0x00000, 0x20000, CRC(60122f5a) SHA1(f9abccc8c4f65c613f901c7baebe02881ea8bf60) )
+
+	ROM_REGION( 0x10000, "slave", 0 )
+	ROM_LOAD( "b73_14.5p",  0x00000, 0x10000, CRC(0dfb51d4) SHA1(0e6f3b3d4558f12fe1b1620f57a0f4ac2065fd1a) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "b73_12.7e",  0x000000, 0x010000, CRC(d1d24fab) SHA1(ed0312535d0b136d79aa885b9e6eea19ebde6409) )
+
+	ROM_REGION( 0x1000, "mermaid", 0 )
+	ROM_LOAD( "mermaid.bin",  0x0000, 0x0e00, CRC(88c5dd27) SHA1(5043fed7fd192891be7e4096f2c5daaae1538bc4) )
+
+	ROM_REGION( 0x200000, "gfx1", 0 ) /* The data in first half of b73_15.0b actually differs slightly to the other sets, a 0x22 fill is replaced by 0xff on empty tiles */
+	ROM_LOAD( "b73_22.2c",  0x100000, 0x020000, CRC(a02e08d6) SHA1(72764d4e8474aaac0674fd1c20278a706da7ade2) ) // == b73_28.2c, despite the different label - M5M27C101P mask ROM
+	ROM_LOAD( "b73_21.2b",  0x120000, 0x020000, CRC(8708f97c) SHA1(ccddc7f2fa53c5e35345c2db0520f515c512b723) ) // == b73_27.2b, despite the different label - M5M27C101P mask ROM
+	ROM_LOAD( "b73_15.0b",  0x140000, 0x020000, CRC(2f13f81e) SHA1(9d9c1869bf582a0bc0581cdf5b65237124b9e456) ) // == b73_25.0b, despite the different label - M5M27C101P mask ROM
+	ROM_LOAD( "b73_16.0c",  0x160000, 0x010000, CRC(b8e829d2) SHA1(31102358500d7b58173d4f18647decf5db744416) ) // == b73_26.0c, despite the different label - HN27512P mask ROM
+	/* The data below is moved from 0x000000-0x080000 to 0x180000-0x200000 compared to other sets */
+	ROM_LOAD( "b73_17.0d",  0x180000, 0x020000, CRC(a8ec5309) SHA1(55418711fd9ca38f1c41c8c7dd7984920702c5e9) ) // == 1/4 b73_08.2f - M5M27C101P mask ROM
+	ROM_LOAD( "b73_18.0f",  0x1a0000, 0x020000, CRC(dc955a69) SHA1(f476f449c1a6b1d0212e16827c121713451c1918) ) // == 2/4 b73_08.2f - M5M27C101P mask ROM
+	ROM_LOAD( "b73_19.0h",  0x1c0000, 0x020000, CRC(2fb1b3e3) SHA1(f25e8a432721a772b62eff52a0b97e89f56d79af) ) // == 3/4 b73_08.2f - M5M27C101P mask ROM
+	ROM_LOAD( "b73_20.0k",  0x1e0000, 0x020000, CRC(0662d0dd) SHA1(323b3f1d8fc034e22e8ac8dcc17b080ecaeaf3ed) ) // == 4/4 b73_08.2f - M5M27C101P mask ROM
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD( "b73_23.2p",  0x000000, 0x080000, NO_DUMP )
 	ROM_LOAD( "b73_09.2p",  0x000000, 0x080000, CRC(537c647f) SHA1(941c0f4e251bc68e53d62e70b033a3a6c145bb7e) )
 ROM_END
 
@@ -770,10 +798,10 @@ ROM_START( hvyunitu )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )
 	ROM_LOAD( "b73_08.2f",  0x000000, 0x080000, CRC(f83dd808) SHA1(09d5f1e86fad3a0d2d3ac1845103d3f2833c6793) )
-	ROM_LOAD( "b73_28.2c",  0x100000, 0x020000, CRC(a02e08d6) SHA1(72764d4e8474aaac0674fd1c20278a706da7ade2) )
-	ROM_LOAD( "b73_27.2b",  0x120000, 0x020000, CRC(8708f97c) SHA1(ccddc7f2fa53c5e35345c2db0520f515c512b723) )
-	ROM_LOAD( "b73_25.0b",  0x140000, 0x020000, CRC(2f13f81e) SHA1(9d9c1869bf582a0bc0581cdf5b65237124b9e456) ) /* the data in first half of this actually differs slightly to the other sets, a 0x22 fill is replaced by 0xff on empty tiles */
-	ROM_LOAD( "b73_26.0c",  0x160000, 0x010000, CRC(b8e829d2) SHA1(31102358500d7b58173d4f18647decf5db744416) ) /* == b73_05.1h, despite the different label */
+	ROM_LOAD( "b73_28.2c",  0x100000, 0x020000, CRC(a02e08d6) SHA1(72764d4e8474aaac0674fd1c20278a706da7ade2) ) /* == b73_22.2c, despite the different label */
+	ROM_LOAD( "b73_27.2b",  0x120000, 0x020000, CRC(8708f97c) SHA1(ccddc7f2fa53c5e35345c2db0520f515c512b723) ) /* == b73_21.2b, despite the different label */
+	ROM_LOAD( "b73_25.0b",  0x140000, 0x020000, CRC(2f13f81e) SHA1(9d9c1869bf582a0bc0581cdf5b65237124b9e456) ) /* == b73_15.0b, despite the different label */
+	ROM_LOAD( "b73_26.0c",  0x160000, 0x010000, CRC(b8e829d2) SHA1(31102358500d7b58173d4f18647decf5db744416) ) /* == b73_16.0c, despite the different label */
 
 	ROM_REGION( 0x80000, "gfx2", 0 )
 	ROM_LOAD( "b73_09.2p",  0x000000, 0x080000, CRC(537c647f) SHA1(941c0f4e251bc68e53d62e70b033a3a6c145bb7e) )
@@ -788,5 +816,6 @@ ROM_END
 
 GAME( 1988, hvyunit,   0,       hvyunit, hvyunit,  hvyunit_state, empty_init, ROT0, "Kaneko / Taito", "Heavy Unit (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1988, hvyunitj,  hvyunit, hvyunit, hvyunitj, hvyunit_state, empty_init, ROT0, "Kaneko / Taito", "Heavy Unit (Japan, Newer)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, hvyunitja, hvyunit, hvyunit, hvyunitj, hvyunit_state, empty_init, ROT0, "Kaneko / Taito", "Heavy Unit (Japan, Alternate ROM format)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1988, hvyunitjo, hvyunit, hvyunit, hvyunitj, hvyunit_state, empty_init, ROT0, "Kaneko / Taito", "Heavy Unit (Japan, Older)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1988, hvyunitu,  hvyunit, hvyunit, hvyunitj, hvyunit_state, empty_init, ROT0, "Kaneko / Taito", "Heavy Unit -U.S.A. Version- (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

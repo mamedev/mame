@@ -204,7 +204,7 @@ void tankbust_state::main_map(address_map &map)
 	map(0xe803, 0xe803).rw(FUNC(tankbust_state::some_changing_input), FUNC(tankbust_state::soundlatch_w));   /*unknown. Game expects this to change so this is not player input */
 	map(0xe804, 0xe804).nopw();    /* watchdog ? ; written in long-lasting loops */
 	map(0xf000, 0xf7ff).ram();
-	//AM_RANGE(0xf800, 0xffff) AM_READ(read_from_unmapped_memory)   /* a bug in game code ? */
+	//map(0xf800, 0xffff).r(FUNC(tankbust_state::read_from_unmapped_memory));   /* a bug in game code ? */
 }
 
 void tankbust_state::port_map_cpu2(address_map &map)
@@ -341,7 +341,7 @@ void tankbust_state::tankbust(machine_config &config)
 	m_subcpu->set_addrmap(AS_PROGRAM, &tankbust_state::map_cpu2);
 	m_subcpu->set_addrmap(AS_IO, &tankbust_state::port_map_cpu2);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 
 	/* video hardware */

@@ -3949,7 +3949,7 @@ void namcos22s_state::namcos22s(machine_config &config)
 	m_mcu->an2_cb().set(FUNC(namcos22s_state::mcu_adc_r<2>));
 	m_mcu->an3_cb().set(FUNC(namcos22s_state::mcu_adc_r<3>));
 	TIMER(config, "mcu_irq").configure_scanline(FUNC(namcos22s_state::mcu_irq), "screen", 0, 240);
-	config.m_minimum_quantum = attotime::from_hz(9000); // erratic inputs otherwise, probably mcu vs maincpu shareram
+	config.set_maximum_quantum(attotime::from_hz(9000)); // erratic inputs otherwise, probably mcu vs maincpu shareram
 
 	config.device_remove("iomcu");
 
@@ -3966,9 +3966,8 @@ void namcos22s_state::airco22b(machine_config &config)
 {
 	namcos22s(config);
 
-	SPEAKER(config, "bodysonic").subwoofer();
-
-	m_c352->add_route(2, "bodysonic", 0.50); // to subwoofer
+	SPEAKER(config, "bodysonic").backrest();
+	m_c352->add_route(2, "bodysonic", 0.50); // to subwoofer behind back
 }
 
 void namcos22s_state::alpine(machine_config &config)
@@ -3992,7 +3991,6 @@ void namcos22s_state::cybrcycc(machine_config &config)
 	namcos22s(config);
 
 	SPEAKER(config, "tank", 0.0, 0.0, 0.0);
-
 	m_c352->add_route(2, "tank", 1.00);
 }
 
@@ -4001,7 +3999,6 @@ void namcos22s_state::dirtdash(machine_config &config)
 	namcos22s(config);
 
 	SPEAKER(config, "road", 0.0, 0.0, 0.0);
-
 	m_c352->add_route(3, "road", 1.00);
 }
 
@@ -4016,8 +4013,8 @@ void namcos22s_state::tokyowar(machine_config &config)
 {
 	namcos22s(config);
 
-	SPEAKER(config, "vibration").subwoofer();
-	SPEAKER(config, "seat").rear_center();
+	SPEAKER(config, "vibration").seat();
+	SPEAKER(config, "seat").headrest_center();
 
 	m_c352->add_route(2, "vibration", 0.50); // to "bass shaker"
 	m_c352->add_route(3, "seat", 1.00);
@@ -5643,21 +5640,21 @@ READ16_MEMBER(namcos22_state::mcuc74_speedup_r)
 void namcos22_state::install_c74_speedup()
 {
 	if (MCU_SPEEDUP)
-		m_mcu->space(AS_PROGRAM).install_readwrite_handler(0x80, 0x81, read16_delegate(FUNC(namcos22_state::mcuc74_speedup_r),this), write16_delegate(FUNC(namcos22_state::mcu_speedup_w),this));
+		m_mcu->space(AS_PROGRAM).install_readwrite_handler(0x80, 0x81, read16_delegate(*this, FUNC(namcos22_state::mcuc74_speedup_r)), write16_delegate(*this, FUNC(namcos22_state::mcu_speedup_w)));
 }
 
 void namcos22s_state::install_130_speedup()
 {
 	// install speedup cheat for 1.20/1.30 MCU BIOS
 	if (MCU_SPEEDUP)
-		m_mcu->space(AS_PROGRAM).install_readwrite_handler(0x82, 0x83, read16_delegate(FUNC(namcos22s_state::mcu130_speedup_r),this), write16_delegate(FUNC(namcos22s_state::mcu_speedup_w),this));
+		m_mcu->space(AS_PROGRAM).install_readwrite_handler(0x82, 0x83, read16_delegate(*this, FUNC(namcos22s_state::mcu130_speedup_r)), write16_delegate(*this, FUNC(namcos22s_state::mcu_speedup_w)));
 }
 
 void namcos22s_state::install_141_speedup()
 {
 	// install speedup cheat for 1.41 MCU BIOS
 	if (MCU_SPEEDUP)
-		m_mcu->space(AS_PROGRAM).install_readwrite_handler(0x82, 0x83, read16_delegate(FUNC(namcos22s_state::mcu141_speedup_r),this), write16_delegate(FUNC(namcos22s_state::mcu_speedup_w),this));
+		m_mcu->space(AS_PROGRAM).install_readwrite_handler(0x82, 0x83, read16_delegate(*this, FUNC(namcos22s_state::mcu141_speedup_r)), write16_delegate(*this, FUNC(namcos22s_state::mcu_speedup_w)));
 }
 
 

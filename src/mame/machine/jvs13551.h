@@ -24,6 +24,12 @@ public:
 
 	template <uint8_t Which, typename T>
 	void set_port_tag(T &&port_tag) { port[Which].set_tag(std::forward<T>(port_tag)); }
+	template <uint8_t First = 0U, typename T, typename... U>
+	void set_port_tags(T &&first_tag, U &&... other_tags)
+	{
+		set_port_tag<First>(std::forward<T>(first_tag));
+		set_port_tags<First + 1>(std::forward<U>(other_tags)...);
+	}
 
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
@@ -32,6 +38,8 @@ public:
 	void inc_coin(int coin);
 
 protected:
+	template <uint8_t First> void set_port_tags() { }
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;

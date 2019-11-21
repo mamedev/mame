@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco
+// thanks-to:rfka01
 #ifndef MAME_BUS_DMV_K801_H
 #define MAME_BUS_DMV_K801_H
 
@@ -45,8 +46,6 @@ protected:
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(epci_irq_w);
-
-	dmvcart_slot_device * m_bus;
 };
 
 

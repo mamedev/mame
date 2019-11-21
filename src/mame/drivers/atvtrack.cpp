@@ -518,7 +518,7 @@ void atvtrack_state::atvtrack_main_map(address_map &map)
 {
 	map(0x00000000, 0x000003ff).ram().share("sharedmem");
 	map(0x00020000, 0x00020007).rw(FUNC(atvtrack_state::control_r), FUNC(atvtrack_state::control_w)); // control registers
-//  AM_RANGE(0x00020040, 0x0002007f) // audio DAC buffer
+//  map(0x00020040, 0x0002007f) // audio DAC buffer
 	map(0x14000000, 0x14000007).rw(FUNC(atvtrack_state::nand_data_r), FUNC(atvtrack_state::nand_data_w));
 	map(0x14100000, 0x14100007).w(FUNC(atvtrack_state::nand_cmd_w));
 	map(0x14200000, 0x14200007).w(FUNC(atvtrack_state::nand_addr_w));

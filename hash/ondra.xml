@@ -9,7 +9,7 @@
 		<info name="usage" value="Works only on the Ondra ViLi" />
 		<part name="cass" interface="ondra_cass">
 			<dataarea name="cass" size="112800">
-				<rom name="copyfile.wav" size="112800" crc="b3049df0" sha1="9172a09b22d2e532c96f87ffab098f8b292fecf3" offset="0" />
+				<rom name="copyfile.wav" size="112800" crc="b3049df0" sha1="9172a09b22d2e532c96f87ffab098f8b292fecf3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -21,7 +21,7 @@
 		<info name="usage" value="Works only on the Ondra ViLi" />
 		<part name="cass" interface="ondra_cass">
 			<dataarea name="cass" size="1015968">
-				<rom name="editasm.wav" size="1015968" crc="62b18cc1" sha1="71850e204e17c44d3dcd7cda9e9d8717d96063a8" offset="0" />
+				<rom name="editasm.wav" size="1015968" crc="62b18cc1" sha1="71850e204e17c44d3dcd7cda9e9d8717d96063a8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -33,7 +33,7 @@
 		<info name="usage" value="Works only on the Ondra ViLi" />
 		<part name="cass" interface="ondra_cass">
 			<dataarea name="cass" size="1449244">
-				<rom name="galaxians.wav" size="1449244" crc="e9245841" sha1="bc24392a6ac9db4730363cea8efda4f090d3d1b1" offset="0" />
+				<rom name="galaxians.wav" size="1449244" crc="e9245841" sha1="bc24392a6ac9db4730363cea8efda4f090d3d1b1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -45,7 +45,7 @@
 		<info name="usage" value="Works only on the Ondra ViLi" />
 		<part name="cass" interface="ondra_cass">
 			<dataarea name="cass" size="1304736">
-				<rom name="jetpac.wav" size="1304736" crc="d69d30d2" sha1="9919166ce9b954188af163bcfe52db6df4da8df6" offset="0" />
+				<rom name="jetpac.wav" size="1304736" crc="d69d30d2" sha1="9919166ce9b954188af163bcfe52db6df4da8df6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -57,7 +57,7 @@
 		<info name="usage" value="Works only on the Ondra ViLi" />
 		<part name="cass" interface="ondra_cass">
 			<dataarea name="cass" size="2308256">
-				<rom name="jetsetwilly.wav" size="2308256" crc="753c51fd" sha1="4342dc96eb60fe5ee92222542c714dc22eda77a0" offset="0" />
+				<rom name="jetsetwilly.wav" size="2308256" crc="753c51fd" sha1="4342dc96eb60fe5ee92222542c714dc22eda77a0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -69,7 +69,7 @@
 		<info name="usage" value="Works only on the Ondra ViLi" />
 		<part name="cass" interface="ondra_cass">
 			<dataarea name="cass" size="385184">
-				<rom name="karel.wav" size="385184" crc="c10354de" sha1="e640e63e5fc4fe34af33ecfaf57196cc00917b71" offset="0" />
+				<rom name="karel.wav" size="385184" crc="c10354de" sha1="e640e63e5fc4fe34af33ecfaf57196cc00917b71"/>
 			</dataarea>
 		</part>
 	</software>
@@ -81,7 +81,7 @@
 		<info name="usage" value="Works only on the Ondra ViLi" />
 		<part name="cass" interface="ondra_cass">
 			<dataarea name="cass" size="297120">
-				<rom name="mikos.wav" size="297120" crc="4ba186d4" sha1="56e15d9e064afa2196a235ff25f504256779ca5a" offset="0" />
+				<rom name="mikos.wav" size="297120" crc="4ba186d4" sha1="56e15d9e064afa2196a235ff25f504256779ca5a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -93,7 +93,7 @@
 		<info name="usage" value="Works only on the Ondra ViLi" />
 		<part name="cass" interface="ondra_cass">
 			<dataarea name="cass" size="1732768">
-				<rom name="pascal.wav" size="1732768" crc="e9b74b24" sha1="6ba4fd152e8c2e60483f7725ab73f8e5bf39445d" offset="0" />
+				<rom name="pascal.wav" size="1732768" crc="e9b74b24" sha1="6ba4fd152e8c2e60483f7725ab73f8e5bf39445d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -105,7 +105,7 @@
 		<info name="usage" value="Works only on the Ondra ViLi" />
 		<part name="cass" interface="ondra_cass">
 			<dataarea name="cass" size="1355936">
-				<rom name="planetoids.wav" size="1355936" crc="8d517fd8" sha1="e34600276d188018b66a1077697c9a63b9565692" offset="0" />
+				<rom name="planetoids.wav" size="1355936" crc="8d517fd8" sha1="e34600276d188018b66a1077697c9a63b9565692"/>
 			</dataarea>
 		</part>
 	</software>
@@ -117,7 +117,7 @@
 		<info name="usage" value="Works only on the Ondra ViLi" />
 		<part name="cass" interface="ondra_cass">
 			<dataarea name="cass" size="1380112">
-				<rom name="pssst.wav" size="1380112" crc="745ed80b" sha1="2bab363cc8efbac52c46d1ecc09184a667c9c1f3" offset="0" />
+				<rom name="pssst.wav" size="1380112" crc="745ed80b" sha1="2bab363cc8efbac52c46d1ecc09184a667c9c1f3"/>
 			</dataarea>
 		</part>
 	</software>

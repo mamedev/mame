@@ -224,7 +224,7 @@ WRITE8_MEMBER(tp84_state::sub_irq_mask_w)
 
 void tp84_state::cpu2_map(address_map &map)
 {
-//  AM_RANGE(0x0000, 0x0000) AM_RAM /* Watch dog ?*/
+//  map(0x0000, 0x0000).ram(); /* Watch dog ?*/
 	map(0x2000, 0x2000).r(FUNC(tp84_state::tp84_scanline_r)); /* beam position */
 	map(0x4000, 0x4000).w(FUNC(tp84_state::sub_irq_mask_w));
 	map(0x6000, 0x679f).ram();
@@ -341,7 +341,7 @@ void tp84_state::tp84(machine_config &config)
 	Z80(config, m_audiocpu, XTAL(14'318'181)/4); /* verified on pcb */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &tp84_state::audio_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);  /* 100 CPU slices per frame - a high value to ensure proper */
+	config.set_maximum_quantum(attotime::from_hz(6000));  /* 100 CPU slices per frame - a high value to ensure proper */
 							/* synchronization of the CPUs */
 
 	ls259_device &mainlatch(LS259(config, "mainlatch", 0)); // 3B

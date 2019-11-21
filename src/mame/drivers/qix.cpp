@@ -607,9 +607,9 @@ void qix_state::qix_base(machine_config &config)
 	MC6809E(config, m_maincpu, MAIN_CLOCK_OSC/4/4);  /* 1.25 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &qix_state::main_map);
 
-	/* high interleave needed to ensure correct text in service mode */
-	/* Zookeeper settings and high score table seem especially sensitive to this */
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	// high interleave needed to ensure correct text in service mode
+	// Zookeeper settings and high score table seem especially sensitive to this
+	config.set_perfect_quantum(m_maincpu);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

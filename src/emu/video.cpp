@@ -91,6 +91,7 @@ video_manager::video_manager(running_machine &machine)
 	, m_seconds_to_run(machine.options().seconds_to_run())
 	, m_auto_frameskip(machine.options().auto_frameskip())
 	, m_speed(original_speed_setting())
+	, m_low_latency(machine.options().low_latency())
 	, m_empty_skip_count(0)
 	, m_frameskip_level(machine.options().frameskip())
 	, m_frameskip_counter(0)
@@ -167,15 +168,6 @@ video_manager::video_manager(running_machine &machine)
 	if (sscanf(machine.options().snap_size(), "%dx%d", &m_snap_width, &m_snap_height) != 2)
 		m_snap_width = m_snap_height = 0;
 
-	// start recording movie if specified
-	const char *filename = machine.options().mng_write();
-	if (filename[0] != 0)
-		begin_recording(filename, MF_MNG);
-
-	filename = machine.options().avi_write();
-	if (filename[0] != 0)
-		begin_recording(filename, MF_AVI);
-
 	// if no screens, create a periodic timer to drive updates
 	if (no_screens)
 	{
@@ -238,13 +230,20 @@ void video_manager::frame_update(bool from_debugger)
 
 	// if we're throttling, synchronize before rendering
 	attotime current_time = machine().time();
-	if (!from_debugger && !skipped_it && effective_throttle())
+	if (!from_debugger && !skipped_it && !m_low_latency && effective_throttle())
 		update_throttle(current_time);
 
 	// ask the OSD to update
 	g_profiler.start(PROFILER_BLIT);
 	machine().osd().update(!from_debugger && skipped_it);
 	g_profiler.stop();
+
+	// we synchronize after rendering instead of before, if low latency mode is enabled
+	if (!from_debugger && !skipped_it && m_low_latency && effective_throttle())
+		update_throttle(current_time);
+
+	// get most recent input now
+	machine().osd().input_update();
 
 	emulator_info::periodic_check();
 

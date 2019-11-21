@@ -722,6 +722,19 @@ ROM_START(obaoba1)
 	ROM_LOAD("ob_s1a.bin", 0x1800, 0x0800, CRC(fa106de6) SHA1(be4dee9c2f10cf64a3b71cf65386e02323f040c7))
 ROM_END
 
+ROM_START(obaobao)
+	ROM_REGION(0x2000, "roms", 0)
+	ROM_LOAD( "oba01.bin", 0x0000, 0x0400, CRC(fd5d5b73) SHA1(06996254637a71a0543b66e87516372ccea1cfd6))
+	ROM_LOAD( "oba02.bin", 0x0400, 0x0400, CRC(068b84c7) SHA1(622bd3b24df175cd783cdf46e5b7e910159d2bea))
+	ROM_LOAD( "oba03.bin", 0x0800, 0x0400, CRC(a7f0e116) SHA1(bdb5d6120f7802ce4e1dad434158010b3150233a))
+	ROM_LOAD( "oba04.bin", 0x0c00, 0x0400, CRC(efede794) SHA1(7efb5e13f8dd631a65bc47e2d765308fe7d1a82b))
+	ROM_LOAD( "oba05.bin", 0x1800, 0x0400, CRC(838f7323) SHA1(84636a237014231c056e7eb80bd3f4013f4c6579))
+
+	ROM_REGION(0x2000, "cpu2", 0)
+	ROM_LOAD("ob_s2.bin", 0x1000, 0x0800, CRC(f7dbb715) SHA1(70d1331612fe497f48520726c5f39accdcbdb205))
+	ROM_LOAD("ob_s1.bin", 0x1800, 0x0800, CRC(812a362b) SHA1(22b5f5f2d467ca1b0ab55db2e01ef6579f8ee390))
+ROM_END
+
 /*--------------------------------
 / Polar Explorer
 /-------------------------------*/
@@ -1003,6 +1016,7 @@ GAME(198?,  taitest,    0,          taito,  taito, taito_state, init_taito,  ROT
 GAME(1979,  shock,      0,          shock,  taito, taito_state, init_taito,  ROT0,   "Taito do Brasil",  "Shock",                         MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 GAME(1980,  obaoba,     0,          taito,  taito, taito_state, init_taito,  ROT0,   "Taito do Brasil",  "Oba-Oba (set 1)",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 GAME(1980,  obaoba1,    obaoba,     taito,  taito, taito_state, init_taito,  ROT0,   "Taito do Brasil",  "Oba-Oba (set 2)",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME(1980,  obaobao,    obaoba,     shock,  taito, taito_state, init_taito,  ROT0,   "Taito do Brasil",  "Oba-Oba (old hardware)",        MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 GAME(1980,  drakor,     0,          taito,  taito, taito_state, init_taito,  ROT0,   "Taito do Brasil",  "Drakor",                        MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 GAME(1980,  meteort,    0,          taito,  taito, taito_state, init_taito,  ROT0,   "Taito do Brasil",  "Meteor (Taito)",                MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 GAME(1981,  sureshop,   0,          taito,  taito, taito_state, init_taito,  ROT0,   "Taito do Brasil",  "Sure Shot (Pinball)",           MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

@@ -340,7 +340,7 @@ void pc100_state::pc100_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x03).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff); // i8259
-//  AM_RANGE(0x04, 0x07) i8237?
+//  map(0x04, 0x07) i8237?
 	map(0x08, 0x0b).m(m_fdc, FUNC(upd765a_device::map)).umask16(0x00ff); // upd765
 	map(0x10, 0x17).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff); // i8255 #1
 	map(0x18, 0x1f).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff); // i8255 #2
@@ -353,8 +353,9 @@ void pc100_state::pc100_io(address_map &map)
 	map(0x3a, 0x3a).w(FUNC(pc100_state::pc100_crtc_data_w)); //crtc data reg
 	map(0x3c, 0x3f).rw(FUNC(pc100_state::pc100_vs_vreg_r), FUNC(pc100_state::pc100_vs_vreg_w)).umask16(0x00ff); //crtc vertical start position
 	map(0x40, 0x5f).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x60, 0x61).r(read16_delegate([this](address_space &s, offs_t o, u8 mm) { return m_crtc.cmd; }, "pc100_crtc_cmd_r")).
-					w(write16_delegate([this](address_space &s, offs_t o, u16 d, u8 mm) { m_crtc.cmd = d; }, "pc100_crtc_cmd_w"));
+	map(0x60, 0x61).lrw16(
+			NAME([this] () { return m_crtc.cmd; }),
+			NAME([this] (u16 d) { m_crtc.cmd = d; }));
 	map(0x80, 0x81).rw(FUNC(pc100_state::pc100_kanji_r), FUNC(pc100_state::pc100_kanji_w));
 	map(0x82, 0x83).nopw(); //kanji-related?
 	map(0x84, 0x87).nopw(); //kanji "strobe" signal 0/1

@@ -435,8 +435,8 @@ void casloopy_state::casloopy_map(address_map &map)
 	map(0x04051000, 0x040511ff).rw(FUNC(casloopy_state::pal_r), FUNC(casloopy_state::pal_w));
 	map(0x04058000, 0x04058007).rw(FUNC(casloopy_state::vregs_r), FUNC(casloopy_state::vregs_w));
 	map(0x0405b000, 0x0405b00f).ram().share("vregs"); // RGB555 brightness control plus scrolling
-//  AM_RANGE(0x05ffff00, 0x05ffffff) AM_READWRITE16(sh7021_r, sh7021_w, 0xffffffff)
-//  AM_RANGE(0x05ffff00, 0x05ffffff) - SH7021 internal i/o
+//  map(0x05ffff00, 0x05ffffff).rw(FUNC(casloopy_state::sh7021_r), FUNC(casloopy_state::sh7021_w));
+//  map(0x05ffff00, 0x05ffffff) - SH7021 internal i/o
 	map(0x06000000, 0x062fffff).r(FUNC(casloopy_state::cart_r));
 	map(0x07000000, 0x070003ff).ram().share("oram");// on-chip RAM, actually at 0xf000000 (1 kb)
 	map(0x09000000, 0x0907ffff).ram().share("wram");
@@ -544,7 +544,7 @@ void casloopy_state::casloopy(machine_config &config)
 	cartslot.set_width(GENERIC_ROM32_WIDTH);
 	cartslot.set_endian(ENDIANNESS_LITTLE);
 	cartslot.set_must_be_loaded(true);
-	cartslot.set_device_load(FUNC(casloopy_state::cart_load), this);
+	cartslot.set_device_load(FUNC(casloopy_state::cart_load));
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("casloopy");

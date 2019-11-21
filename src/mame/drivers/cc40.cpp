@@ -611,7 +611,7 @@ void cc40_state::cc40(machine_config &config)
 
 	hd44780_device &hd44780(HD44780(config, "hd44780", 0));
 	hd44780.set_lcd_size(2, 16); // 2*16 internal
-	hd44780.set_pixel_update_cb(FUNC(cc40_state::cc40_pixel_update), this);
+	hd44780.set_pixel_update_cb(FUNC(cc40_state::cc40_pixel_update));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -619,7 +619,7 @@ void cc40_state::cc40(machine_config &config)
 	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
 	/* cartridge */
-	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "cc40_cart", "bin,rom,256").set_device_load(FUNC(cc40_state::cart_load), this);
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "cc40_cart", "bin,rom,256").set_device_load(FUNC(cc40_state::cart_load));
 	SOFTWARE_LIST(config, "cart_list").set_original("cc40_cart");
 }
 

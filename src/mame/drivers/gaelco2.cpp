@@ -210,6 +210,7 @@ void gaelco2_state::maniacsq_d5002fp(machine_config &config)
 {
 	maniacsq(config);
 	GAELCO_DS5002FP(config, "gaelco_ds5002fp", XTAL(24'000'000) / 2).set_addrmap(0, &gaelco2_state::mcu_hostmem_map); // clock unknown
+	config.set_perfect_quantum("gaelco_ds5002fp:mcu");
 }
 
 
@@ -686,7 +687,7 @@ void gaelco2_state::play2000_map(address_map &map)
 	map(0x218000, 0x218003).ram();                                                                                         /* Written to, but unused? */
 	map(0x218004, 0x218009).ram().w(FUNC(gaelco2_state::vregs_w)).share("vregs");                                          /* Video Registers */
 	map(0x21800a, 0x218fff).ram();                                                                                         /* Written to, but unused? */
-	// AM_RANGE(0x843100, 0x84315e)  ?
+	// map(0x843100, 0x84315e)  ?
 	map(0xfe0000, 0xfe7fff).ram();                                                                                         /* Work RAM */
 	map(0xfe8000, 0xfeffff).ram().share("shareram");                                                                       /* Work RAM */
 }

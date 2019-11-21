@@ -81,7 +81,7 @@ bgfx_target* target_manager::target(uint32_t screen, std::string name)
 	bgfx_target* target = m_targets[full_name];
 	if (target == nullptr)
 	{
-		osd_printf_verbose("Warning: Attempting to retrieve a nonexistent target '%s' for screen %d\n", name.c_str(), screen);
+		osd_printf_verbose("Warning: Attempting to retrieve a nonexistent target '%s' for screen %d\n", name, screen);
 	}
 	return target;
 }

@@ -14,37 +14,57 @@
 #include "render.h"
 
 
-const bgfx::Memory* bgfx_util::mame_texture_data_to_bgfx_texture_data(uint32_t format, int width, int height, int rowpixels, const rgb_t *palette, void *base)
+const bgfx::Memory* bgfx_util::mame_texture_data_to_bgfx_texture_data(bgfx::TextureFormat::Enum &dst_format, uint32_t src_format, int width, int height, int rowpixels, const rgb_t *palette, void *base, uint16_t *out_pitch)
 {
-	const bgfx::Memory* mem = bgfx::alloc(width * height * 4);
-	uint32_t* data = reinterpret_cast<uint32_t*>(mem->data);
+	bgfx::TextureInfo info;
+	switch (src_format)
+	{
+		case PRIMFLAG_TEXFORMAT(TEXFORMAT_PALETTE16):
+		case PRIMFLAG_TEXFORMAT(TEXFORMAT_YUY16):
+			dst_format = bgfx::TextureFormat::RG8;
+			if (out_pitch)
+				*out_pitch = rowpixels * 2;
+			break;
+		case PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32):
+		case PRIMFLAG_TEXFORMAT(TEXFORMAT_RGB32):
+			dst_format = bgfx::TextureFormat::BGRA8;
+			if (out_pitch)
+				*out_pitch = rowpixels * 4;
+			break;
+	}
+	bgfx::calcTextureSize(info, rowpixels, height, 1, false, false, 1, dst_format);
+	return bgfx::copy(base, info.storageSize);
+	/*const bgfx::Memory* mem = bgfx::alloc(width * height * 4);
+	uint32_t* dst = reinterpret_cast<uint32_t*>(mem->data);
 	uint16_t* src16 = reinterpret_cast<uint16_t*>(base);
 	uint32_t* src32 = reinterpret_cast<uint32_t*>(base);
 
 	for (int y = 0; y < height; y++)
 	{
-		uint32_t* dst_line = data + y * width;
-		uint16_t* src_line16 = src16 + y * rowpixels;
-		uint32_t* src_line32 = src32 + y * rowpixels;
-		switch (format)
-		{
-			case PRIMFLAG_TEXFORMAT(TEXFORMAT_PALETTE16):
-				copy_util::copyline_palette16(dst_line, src_line16, width, palette);
-				break;
-			case PRIMFLAG_TEXFORMAT(TEXFORMAT_YUY16):
-				copy_util::copyline_yuy16_to_argb(dst_line, src_line16, width, palette, 1);
-				break;
-			case PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32):
-				copy_util::copyline_argb32(dst_line, src_line32, width, palette);
-				break;
-			case PRIMFLAG_TEXFORMAT(TEXFORMAT_RGB32):
-				copy_util::copyline_rgb32(dst_line, src_line32, width, palette);
-				break;
-			default:
-				break;
-		}
+	    switch (format)
+	    {
+	    case PRIMFLAG_TEXFORMAT(TEXFORMAT_PALETTE16):
+	        copy_util::copyline_palette16(dst, src16, width, palette);
+	        src16 += rowpixels;
+	        break;
+	    case PRIMFLAG_TEXFORMAT(TEXFORMAT_YUY16):
+	        copy_util::copyline_yuy16_to_argb(dst, src16, width, palette, 1);
+	        src16 += rowpixels;
+	        break;
+	    case PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32):
+	        copy_util::copyline_argb32(dst, src32, width, palette);
+	        src32 += rowpixels;
+	        break;
+	    case PRIMFLAG_TEXFORMAT(TEXFORMAT_RGB32):
+	        copy_util::copyline_rgb32(dst, src32, width, palette);
+	        src32 += rowpixels;
+	        break;
+	    default:
+	        break;
+	    }
+	    dst += width;
 	}
-	return mem;
+	return mem;*/
 }
 
 uint64_t bgfx_util::get_blend_state(uint32_t blend)

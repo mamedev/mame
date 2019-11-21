@@ -334,7 +334,7 @@ void crgolf_state::mastrglf_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x07).w("mainlatch", FUNC(ls259_device::write_d0));
-//  AM_RANGE(0x20, 0x20) AM_WRITE(rom_bank_select_w)
+//  map(0x20, 0x20).w(FUNC(crgolf_state::rom_bank_select_w));
 	map(0x40, 0x40).w("soundlatch1", FUNC(generic_latch_8_device::write));
 	map(0xa0, 0xa0).r("soundlatch2", FUNC(generic_latch_8_device::read));
 }
@@ -476,7 +476,7 @@ void crgolf_state::crgolf(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &crgolf_state::sound_map);
 	m_audiocpu->set_vblank_int("screen", FUNC(crgolf_state::irq0_line_hold));
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // 1H
 	mainlatch.q_out_cb<3>().set(FUNC(crgolf_state::color_select_w));
@@ -757,7 +757,7 @@ ROM_END
 
 void crgolf_state::init_crgolfhi()
 {
-	m_audiocpu->space(AS_PROGRAM).install_write_handler(0xa000, 0xa003, write8_delegate(FUNC(crgolf_state::crgolfhi_sample_w),this));
+	m_audiocpu->space(AS_PROGRAM).install_write_handler(0xa000, 0xa003, write8_delegate(*this, FUNC(crgolf_state::crgolfhi_sample_w)));
 }
 
 

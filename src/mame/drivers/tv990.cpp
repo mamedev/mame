@@ -219,12 +219,15 @@ uint32_t tv990_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 			if((y < starty) || (y >= endy))
 				continue;
 
-			curchar = &vram[tvi1111_regs[i + 0x50]];
+			uint16_t row_offset = tvi1111_regs[i + 0x50];
+			curchar = &vram[row_offset];
 			int minx = tvi1111_regs[i + 0x30] >> 8;
 			int maxx = tvi1111_regs[i + 0x30] & 0xff;
 
 			if(maxx > m_width)
 				maxx = m_width;
+
+			uint16_t cursor_x = tvi1111_regs[0x16] - row_offset;
 
 			for (x = minx; x < maxx; x++)
 			{
@@ -237,8 +240,7 @@ uint32_t tv990_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 
 				uint32_t palette[2];
 
-				int cursor_pos = tvi1111_regs[0x16] + 133;
-				if(BIT(tvi1111_regs[0x1b], 0) && (x == (cursor_pos % 134)) && (y == (cursor_pos / 134)))
+				if (BIT(tvi1111_regs[0x1b], 0) && x == cursor_x)
 				{
 					uint8_t attrchg;
 					if(tvi1111_regs[0x15] & 0xff00) // what does this really mean? it looks like a mask but that doesn't work in 8line char mode
@@ -331,10 +333,10 @@ void tv990_state::tv990_mem(address_map &map)
 static INPUT_PORTS_START( tv990 )
 	PORT_INCLUDE( at_keyboard )
 	PORT_START("Screen")
-	PORT_CONFNAME( 0x30, 0x00, "Color")
-	PORT_CONFSETTING(    0x00, "Green") PORT_CHANGED_MEMBER(DEVICE_SELF, tv990_state, color, 0)
-	PORT_CONFSETTING(    0x10, "Amber") PORT_CHANGED_MEMBER(DEVICE_SELF, tv990_state, color, 0)
-	PORT_CONFSETTING(    0x20, "White") PORT_CHANGED_MEMBER(DEVICE_SELF, tv990_state, color, 0)
+	PORT_CONFNAME( 0x30, 0x00, "Color") PORT_CHANGED_MEMBER(DEVICE_SELF, tv990_state, color, 0)
+	PORT_CONFSETTING(    0x00, "Green")
+	PORT_CONFSETTING(    0x10, "Amber")
+	PORT_CONFSETTING(    0x20, "White")
 INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER(tv990_state::color)

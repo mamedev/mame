@@ -348,7 +348,7 @@ void bigbord2_state::bigbord2_io(address_map &map)
 	map(0xcc, 0xcf).w(FUNC(bigbord2_state::syslatch2_w));
 	map(0xd0, 0xd3).r(FUNC(bigbord2_state::kbd_r)); // u1
 	map(0xd4, 0xd7).rw(m_fdc, FUNC(mb8877_device::read), FUNC(mb8877_device::write)); // u10
-	//AM_RANGE(0xd8, 0xdb) AM_READWRITE(portd8_r, portd8_w) // various external data ports; DB = centronics printer
+	//map(0xd8, 0xdb).rw(FUNC(bigbord2_state::portd8_r), FUNC(bigbord2_state::portd8_w)); // various external data ports; DB = centronics printer
 	map(0xd9, 0xd9).w("outlatch1", FUNC(ls259_device::write_nibble_d3)); // u96
 	map(0xdc, 0xdc).mirror(2).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w)); // u30
 	map(0xdd, 0xdd).mirror(2).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
@@ -598,7 +598,7 @@ void bigbord2_state::bigbord2(machine_config &config)
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
-	crtc.set_update_row_callback(FUNC(bigbord2_state::crtc_update_row), this);
+	crtc.set_update_row_callback(FUNC(bigbord2_state::crtc_update_row));
 	crtc.out_vsync_callback().set(m_ctc1, FUNC(z80ctc_device::trg3));
 
 	ls259_device &proglatch(LS259(config, "proglatch")); // U41

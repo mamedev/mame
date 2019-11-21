@@ -1448,7 +1448,7 @@ end
 
 ---------------------------------------------------
 -- Intelligent Designs DAVE
---@src/devices/sound/dave.h,MACHINES["DAVE"] = true
+--@src/devices/sound/dave.h,SOUNDS["DAVE"] = true
 ---------------------------------------------------
 
 if (SOUNDS["DAVE"]~=null) then

@@ -5,13 +5,13 @@
     Trivia R Us (c) 2009 AGT
 
     driver by Angelo Salese, based off original crystal.cpp by ElSemi
-	original mods on this driver by Luca Elia
+    original mods on this driver by Luca Elia
 
     TODO:
-    - touch panel, according to service mode can be generic, atouch or 3M 
-	  (microtouch?). It interfaces thru UART0 port;
+    - touch panel, according to service mode can be generic, atouch or 3M
+      (microtouch?). It interfaces thru UART0 port;
     - RTC (unknown type);
-	- Split romset or add a slot option supporting debug terminal mode;
+    - Split romset or add a slot option supporting debug terminal mode;
 
 =============================================================================
 
@@ -303,7 +303,7 @@ void trivrus_state::trivrus(machine_config &config)
 	m_vr0soc->set_host_cpu_tag(m_maincpu);
 	m_vr0soc->set_external_vclk(28636360);
 	m_vr0soc->tx_callback<0>().set(m_microtouch, FUNC(microtouch_device::rx));
-	
+
 	// TODO: 3M from service mode, most likely wrong?
 	MICROTOUCH(config, m_microtouch, 9600).stx().set(m_vr0soc, FUNC(vrender0soc_device::rx_w<0>));
 }

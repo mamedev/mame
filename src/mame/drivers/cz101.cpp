@@ -405,7 +405,7 @@ void cz101_state::cz101(machine_config &config)
 
 	HD44780(config, m_hd44780, 0);
 	m_hd44780->set_lcd_size(2, 16);
-	m_hd44780->set_pixel_update_cb(FUNC(cz101_state::lcd_pixel_update), this);
+	m_hd44780->set_pixel_update_cb(FUNC(cz101_state::lcd_pixel_update));
 
 	config.set_default_layout(layout_cz101);
 }

@@ -80,7 +80,7 @@ private:
 
 	uint8_t m_jim_data[16];
 	uint8_t m_jim_state;
-	AGA_MODE m_jim_mode;
+	isa8_aga_device::mode_t m_jim_mode;
 	int m_port61; // bit 0,1 must be 0 for startup; reset?
 	uint8_t m_rtc_data[0x10];
 	int m_rtc_reg;
@@ -187,16 +187,16 @@ WRITE8_MEMBER( europc_pc_state::europc_jim_w )
 			switch (data)
 			{
 			case 0x1f:
-			case 0x0b: m_jim_mode = AGA_MONO; break;
+			case 0x0b: m_jim_mode = isa8_aga_device::AGA_MONO; break;
 			case 0xe: //80 columns?
 			case 0xd: //40 columns?
 			case 0x18:
-			case 0x1a: m_jim_mode = AGA_COLOR; break;
-			default: m_jim_mode = AGA_OFF; break;
+			case 0x1a: m_jim_mode = isa8_aga_device::AGA_COLOR; break;
+			default: m_jim_mode = isa8_aga_device::AGA_OFF; break;
 			}
 		}
-//      mode= data&0x10?AGA_COLOR:AGA_MONO;
-//      mode= data&0x10?AGA_COLOR:AGA_OFF;
+//      mode = (data & 0x10) ? isa8_aga_device::AGA_COLOR : isa8_aga_device::AGA_MONO;
+//      mode = (data & 0x10) ? isa8_aga_device::AGA_COLOR : isa8_aga_device::AGA_OFF;
 		if (data & 0x80) m_jim_state = 0;
 		break;
 	case 4:
@@ -237,9 +237,9 @@ READ8_MEMBER( europc_pc_state::europc_jim2_r )
 		m_jim_state = 0;
 		switch (m_jim_mode)
 		{
-		case AGA_COLOR: return 0x87; // for color;
-		case AGA_MONO: return 0x90; //for mono
-		case AGA_OFF: return 0x80; // for vram
+		case isa8_aga_device::AGA_COLOR: return 0x87; // for color;
+		case isa8_aga_device::AGA_MONO: return 0x90; //for mono
+		case isa8_aga_device::AGA_OFF: return 0x80; // for vram
 //      return 0x97; //for error
 		}
 	}
@@ -544,7 +544,7 @@ void europc_fdc_device::device_add_mconfig(machine_config &config)
 	fdc.drq_wr_callback().set(FUNC(isa8_fdc_device::drq_w));
 	// single built-in 3.5" 720K drive, connector for optional external 3.5" or 5.25" drive
 	FLOPPY_CONNECTOR(config, "fdc:0", pc_dd_floppies, "35dd", isa8_fdc_device::floppy_formats).set_fixed(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", pc_dd_floppies, "", isa8_fdc_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", pc_dd_floppies, nullptr, isa8_fdc_device::floppy_formats);
 }
 
 static void europc_fdc(device_slot_interface &device)
@@ -560,7 +560,9 @@ void europc_pc_state::europc(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &europc_pc_state::europc_io);
 	m_maincpu->set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
-	PCNOPPI_MOTHERBOARD(config, "mb", 0).set_cputag(m_maincpu);
+	PCNOPPI_MOTHERBOARD(config, m_mb, 0).set_cputag(m_maincpu);
+	m_mb->int_callback().set_inputline(m_maincpu, 0);
+	m_mb->nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	M6805U2(config, "kbdctrl", 16_MHz_XTAL / 4);
 

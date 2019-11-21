@@ -114,12 +114,12 @@ void vrender0soc_device::device_add_mconfig(machine_config &config)
 		VRENDER0_UART(config, uart, 3579500);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-    // evolution soccer defaults
-	m_screen->set_raw((XTAL(14'318'180)*2)/4, 455, 0, 320, 262, 0, 240);
-    m_screen->set_screen_update(FUNC(vrender0soc_device::screen_update));
-    m_screen->screen_vblank().set(FUNC(vrender0soc_device::screen_vblank));
-    m_screen->set_palette(m_palette);
-	
+	// evolution soccer defaults
+	m_screen->set_raw((XTAL(14'318'181)*2)/4, 455, 0, 320, 262, 0, 240);
+	m_screen->set_screen_update(FUNC(vrender0soc_device::screen_update));
+	m_screen->screen_vblank().set(FUNC(vrender0soc_device::screen_vblank));
+	m_screen->set_palette(m_palette);
+
 	VIDEO_VRENDER0(config, m_vr0vid, 14318180);
 	#ifdef IDLE_LOOP_SPEEDUP
 	m_vr0vid->idleskip_cb().set(FUNC(vrender0soc_device::idle_skip_speedup_w));
@@ -145,7 +145,7 @@ void vrender0soc_device::device_start()
 	int i;
 	m_textureram = auto_alloc_array_clear(machine(), uint16_t, 0x00800000/2);
 	m_frameram = auto_alloc_array_clear(machine(), uint16_t, 0x00800000/2);
-	
+
 	m_vr0vid->set_areas(m_textureram, m_frameram);
 	m_vr0snd->set_areas(m_textureram, m_frameram);
 	m_host_space = &m_host_cpu->space(AS_PROGRAM);
@@ -164,7 +164,7 @@ void vrender0soc_device::device_start()
 		m_uart[i]->set_channel_num(i);
 		m_uart[i]->set_parent(this);
 	}
-	
+
 	save_item(NAME(m_inten));
 	save_item(NAME(m_intst));
 	save_item(NAME(m_IntHigh));
@@ -180,7 +180,7 @@ void vrender0soc_device::device_start()
 	save_item(NAME(m_dma[1].src));
 	save_item(NAME(m_dma[1].dst));
 	save_item(NAME(m_dma[1].size));
-	
+
 #ifdef IDLE_LOOP_SPEEDUP
 	save_item(NAME(m_FlipCntRead));
 #endif
@@ -634,7 +634,7 @@ void vrender0soc_device::crtc_update()
 	uint32_t pixel_clock = (BIT(m_crtcregs[0x04 / 4], 3)) ? 14318180 : m_ext_vclk;
 	if (pixel_clock == 0)
 		fatalerror("%s: Accessing external vclk in CRTC parameters, please set it up via setter in config\n",this->tag());
-	
+
 	if (BIT(m_crtcregs[0x04 / 4], 7))
 		pixel_clock *= 2;
 	// TODO: divider setting = 0 is reserved, guess it just desyncs the signal?
@@ -673,7 +673,7 @@ READ32_MEMBER(vrender0soc_device::sysid_r)
 
 READ32_MEMBER(vrender0soc_device::cfgr_r)
 {
-	// TODO: this truly needs real HW verification, 
+	// TODO: this truly needs real HW verification,
 	//       only Cross Puzzle reads this so far so leaving a logerror
 	// -x-- ---- Main Clock select (0 -> External Clock)
 	// --xx x--- Reserved for Chip Test Mode

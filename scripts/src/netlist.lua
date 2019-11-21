@@ -13,16 +13,16 @@ project "netlist"
 	uuid "665ef8ac-2a4c-4c3e-a05f-fd1e5db11de9"
 	kind (LIBTYPE)
 
-  if _OPTIONS["targetos"]=="windows" then
-	configuration { "mingw* or vs*" }
-	  defines {
-		"UNICODE",
-		"_UNICODE",
-		"_WIN32_WINNT=0x0501",
-		"WIN32_LEAN_AND_MEAN",
-		"NOMINMAX",
-	  }
-  end
+	if _OPTIONS["targetos"]=="windows" then
+		configuration { "mingw* or vs*" }
+		defines {
+			"UNICODE",
+			"_UNICODE",
+			"_WIN32_WINNT=0x0501",
+			"WIN32_LEAN_AND_MEAN",
+			"NOMINMAX",
+		}
+	end
 
 	addprojectflags()
 
@@ -32,7 +32,7 @@ project "netlist"
 
 	includedirs {
 		MAME_DIR .. "src/lib",
-	MAME_DIR .. "src/lib/netlist",
+		MAME_DIR .. "src/lib/netlist",
 	}
 
 	files {
@@ -43,15 +43,13 @@ project "netlist"
 		MAME_DIR .. "src/lib/netlist/nl_dice_compat.h",
 		MAME_DIR .. "src/lib/netlist/nl_factory.cpp",
 		MAME_DIR .. "src/lib/netlist/nl_factory.h",
-		MAME_DIR .. "src/lib/netlist/nl_lists.h",
 		MAME_DIR .. "src/lib/netlist/nl_parser.cpp",
 		MAME_DIR .. "src/lib/netlist/nl_parser.h",
 		MAME_DIR .. "src/lib/netlist/nl_setup.cpp",
 		MAME_DIR .. "src/lib/netlist/nl_setup.h",
-	MAME_DIR .. "src/lib/netlist/nl_types.h",
+		MAME_DIR .. "src/lib/netlist/nl_types.h",
 		MAME_DIR .. "src/lib/netlist/plib/pconfig.h",
 		MAME_DIR .. "src/lib/netlist/plib/palloc.h",
-		MAME_DIR .. "src/lib/netlist/plib/pchrono.cpp",
 		MAME_DIR .. "src/lib/netlist/plib/pchrono.h",
 		MAME_DIR .. "src/lib/netlist/plib/pexception.cpp",
 		MAME_DIR .. "src/lib/netlist/plib/pexception.h",
@@ -64,20 +62,23 @@ project "netlist"
 		MAME_DIR .. "src/lib/netlist/plib/pdynlib.h",
 		MAME_DIR .. "src/lib/netlist/plib/pmain.cpp",
 		MAME_DIR .. "src/lib/netlist/plib/pmain.h",
+    MAME_DIR .. "src/lib/netlist/plib/pmath.h",
 		MAME_DIR .. "src/lib/netlist/plib/pmempool.h",
 		MAME_DIR .. "src/lib/netlist/plib/pomp.h",
 		MAME_DIR .. "src/lib/netlist/plib/poptions.cpp",
 		MAME_DIR .. "src/lib/netlist/plib/poptions.h",
-		MAME_DIR .. "src/lib/netlist/plib/pparser.cpp",
-		MAME_DIR .. "src/lib/netlist/plib/pparser.h",
 		MAME_DIR .. "src/lib/netlist/plib/ppmf.h",
-		MAME_DIR .. "src/lib/netlist/plib/pstate.cpp",
-		MAME_DIR .. "src/lib/netlist/plib/pstate.h",
+    MAME_DIR .. "src/lib/netlist/plib/ppreprocessor.cpp",
+    MAME_DIR .. "src/lib/netlist/plib/ppreprocessor.h",
+    MAME_DIR .. "src/lib/netlist/plib/pstate.h",
+		MAME_DIR .. "src/lib/netlist/plib/pstonum.h",
 		MAME_DIR .. "src/lib/netlist/plib/pstring.cpp",
 		MAME_DIR .. "src/lib/netlist/plib/pstring.h",
-		MAME_DIR .. "src/lib/netlist/plib/pstream.cpp",
+		MAME_DIR .. "src/lib/netlist/plib/pstrutil.h",
 		MAME_DIR .. "src/lib/netlist/plib/pstream.h",
-	MAME_DIR .. "src/lib/netlist/plib/ptime.h",
+		MAME_DIR .. "src/lib/netlist/plib/ptime.h",
+    MAME_DIR .. "src/lib/netlist/plib/ptokenizer.cpp",
+    MAME_DIR .. "src/lib/netlist/plib/ptokenizer.h",
 		MAME_DIR .. "src/lib/netlist/plib/ptypes.h",
 		MAME_DIR .. "src/lib/netlist/plib/putil.cpp",
 		MAME_DIR .. "src/lib/netlist/plib/putil.h",
@@ -85,9 +86,9 @@ project "netlist"
 		MAME_DIR .. "src/lib/netlist/tools/nl_convert.h",
 		MAME_DIR .. "src/lib/netlist/analog/nld_bjt.cpp",
 		MAME_DIR .. "src/lib/netlist/analog/nld_bjt.h",
-	MAME_DIR .. "src/lib/netlist/analog/nld_generic_models.h",
-	MAME_DIR .. "src/lib/netlist/analog/nld_mosfet.cpp",
-	MAME_DIR .. "src/lib/netlist/analog/nld_mosfet.h",
+		MAME_DIR .. "src/lib/netlist/analog/nld_generic_models.h",
+		MAME_DIR .. "src/lib/netlist/analog/nld_mosfet.cpp",
+		MAME_DIR .. "src/lib/netlist/analog/nld_mosfet.h",
 		MAME_DIR .. "src/lib/netlist/analog/nlid_fourterm.cpp",
 		MAME_DIR .. "src/lib/netlist/analog/nlid_fourterm.h",
 		MAME_DIR .. "src/lib/netlist/analog/nld_fourterm.h",
@@ -227,4 +228,4 @@ project "netlist"
 		MAME_DIR .. "src/lib/netlist/macro/nlm_opamp.h",
 		MAME_DIR .. "src/lib/netlist/macro/nlm_other.cpp",
 		MAME_DIR .. "src/lib/netlist/macro/nlm_other.h",
-}
+	}

@@ -1065,7 +1065,7 @@ void namcos86_state::hopmappy(machine_config &config)
 	m_mcu->out_p2_cb().set(FUNC(namcos86_state::led_w));
 	m_mcu->set_vblank_int("screen", FUNC(namcos86_state::irq0_line_hold));   /* ??? */
 
-	config.m_minimum_quantum = attotime::from_hz(48000); /* heavy interleaving needed to avoid hangs in rthunder */
+	config.set_maximum_quantum(attotime::from_hz(48000)); /* heavy interleaving needed to avoid hangs in rthunder */
 
 	WATCHDOG_TIMER(config, m_watchdog);
 

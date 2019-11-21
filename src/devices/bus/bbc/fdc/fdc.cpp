@@ -25,8 +25,8 @@ DEFINE_DEVICE_TYPE(BBC_FDC_SLOT, bbc_fdc_slot_device, "bbc_fdc_slot", "BBC Micro
 //  device_bbc_fdc_interface - constructor
 //-------------------------------------------------
 
-device_bbc_fdc_interface::device_bbc_fdc_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device)
+device_bbc_fdc_interface::device_bbc_fdc_interface(const machine_config &mconfig, device_t &device) :
+	device_interface(device, "bbcfdc")
 {
 	m_slot = dynamic_cast<bbc_fdc_slot_device *>(device.owner());
 }
@@ -42,7 +42,7 @@ device_bbc_fdc_interface::device_bbc_fdc_interface(const machine_config &mconfig
 
 bbc_fdc_slot_device::bbc_fdc_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, BBC_FDC_SLOT, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_bbc_fdc_interface>(mconfig, *this),
 	m_card(nullptr),
 	m_intrq_cb(*this),
 	m_drq_cb(*this)
@@ -51,38 +51,16 @@ bbc_fdc_slot_device::bbc_fdc_slot_device(const machine_config &mconfig, const ch
 
 
 //-------------------------------------------------
-//  device_validity_check -
-//-------------------------------------------------
-
-void bbc_fdc_slot_device::device_validity_check(validity_checker &valid) const
-{
-	device_t *const carddev = get_card_device();
-	if (carddev && !dynamic_cast<device_bbc_fdc_interface *>(carddev))
-		osd_printf_error("Card device %s (%s) does not implement device_bbc_fdc_interface\n", carddev->tag(), carddev->name());
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void bbc_fdc_slot_device::device_start()
 {
-	device_t *const carddev = get_card_device();
-	m_card = dynamic_cast<device_bbc_fdc_interface *>(get_card_device());
-	if (carddev && !m_card)
-		osd_printf_error("Card device %s (%s) does not implement device_bbc_fdc_interface\n", carddev->tag(), carddev->name());
+	m_card = get_card_device();
 
 	// resolve callbacks
 	m_intrq_cb.resolve_safe();
 	m_drq_cb.resolve_safe();
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void bbc_fdc_slot_device::device_reset()
-{
 }
 
 //-------------------------------------------------

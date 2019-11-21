@@ -865,7 +865,7 @@ void nwktr_state::nwktr(machine_config &config)
 	m_dsp2->set_boot_mode(adsp21062_device::BOOT_MODE_EPROM);
 	m_dsp2->set_addrmap(AS_DATA, &nwktr_state::sharc1_map);
 
-	config.m_minimum_quantum = attotime::from_hz(9000);
+	config.set_maximum_quantum(attotime::from_hz(9000));
 
 	M48T58(config, "m48t58", 0);
 

@@ -120,13 +120,13 @@ MACHINE_RESET_MEMBER(pce_state,mess_pce)
 	if (m_cartslot->get_type() == PCE_CDSYS3J)
 	{
 		m_sys3_card = 1;
-		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x080000, 0x087fff, read8_delegate(FUNC(pce_state::pce_cd_acard_wram_r),this),write8_delegate(FUNC(pce_state::pce_cd_acard_wram_w),this));
+		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x080000, 0x087fff, read8_delegate(*this, FUNC(pce_state::pce_cd_acard_wram_r)), write8_delegate(*this, FUNC(pce_state::pce_cd_acard_wram_w)));
 	}
 
 	if (m_cartslot->get_type() == PCE_CDSYS3U)
 	{
 		m_sys3_card = 3;
-		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x080000, 0x087fff, read8_delegate(FUNC(pce_state::pce_cd_acard_wram_r),this),write8_delegate(FUNC(pce_state::pce_cd_acard_wram_w),this));
+		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x080000, 0x087fff, read8_delegate(*this, FUNC(pce_state::pce_cd_acard_wram_r)), write8_delegate(*this, FUNC(pce_state::pce_cd_acard_wram_w)));
 	}
 }
 

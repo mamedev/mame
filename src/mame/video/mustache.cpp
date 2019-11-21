@@ -54,7 +54,7 @@ TILE_GET_INFO_MEMBER(mustache_state::get_bg_tile_info)
 
 void mustache_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mustache_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS_FLIP_X,
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(mustache_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS_FLIP_X,
 			8, 8, 64, 32);
 
 	m_bg_tilemap->set_scroll_rows(4);

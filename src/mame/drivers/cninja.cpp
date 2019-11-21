@@ -777,6 +777,8 @@ void cninja_state::cninja(machine_config &config)
 	irq.raster2_irq_callback().set_inputline(m_maincpu, 4);
 	irq.vblank_irq_callback().set_inputline(m_maincpu, 5);
 
+	MCFG_VIDEO_START_OVERRIDE(cninja_state,cninja)
+
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(XTAL(24'000'000) / 4, 376, 0, 256, 274, 8, 248);
@@ -810,15 +812,15 @@ void cninja_state::cninja(machine_config &config)
 	m_deco_tilegen[1]->set_pf2_col_bank(0x30);
 	m_deco_tilegen[1]->set_pf1_col_mask(0x0f);
 	m_deco_tilegen[1]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[1]->set_bank1_callback(FUNC(cninja_state::cninja_bank_callback), this);
-	m_deco_tilegen[1]->set_bank2_callback(FUNC(cninja_state::cninja_bank_callback), this);
+	m_deco_tilegen[1]->set_bank1_callback(FUNC(cninja_state::cninja_bank_callback));
+	m_deco_tilegen[1]->set_bank2_callback(FUNC(cninja_state::cninja_bank_callback));
 	m_deco_tilegen[1]->set_pf12_8x8_bank(0);
 	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
 	m_deco_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO_SPRITE(config, m_sprgen[0], 0);
 	m_sprgen[0]->set_gfx_region(3);
-	m_sprgen[0]->set_pri_callback(FUNC(cninja_state::pri_callback), this);
+	m_sprgen[0]->set_pri_callback(FUNC(cninja_state::pri_callback));
 	m_sprgen[0]->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO104PROT(config, m_ioprot, 0);
@@ -897,15 +899,15 @@ void cninja_state::stoneage(machine_config &config)
 	m_deco_tilegen[1]->set_pf2_col_bank(0x30);
 	m_deco_tilegen[1]->set_pf1_col_mask(0x0f);
 	m_deco_tilegen[1]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[1]->set_bank1_callback(FUNC(cninja_state::cninja_bank_callback), this);
-	m_deco_tilegen[1]->set_bank2_callback(FUNC(cninja_state::cninja_bank_callback), this);
+	m_deco_tilegen[1]->set_bank1_callback(FUNC(cninja_state::cninja_bank_callback));
+	m_deco_tilegen[1]->set_bank2_callback(FUNC(cninja_state::cninja_bank_callback));
 	m_deco_tilegen[1]->set_pf12_8x8_bank(0);
 	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
 	m_deco_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO_SPRITE(config, m_sprgen[0], 0);
 	m_sprgen[0]->set_gfx_region(3);
-	m_sprgen[0]->set_pri_callback(FUNC(cninja_state::pri_callback), this);
+	m_sprgen[0]->set_pri_callback(FUNC(cninja_state::pri_callback));
 	m_sprgen[0]->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO104PROT(config, m_ioprot, 0);
@@ -957,6 +959,8 @@ void cninja_state::cninjabl(machine_config &config)
 	irq.raster2_irq_callback().set_inputline(m_maincpu, 4);
 	irq.vblank_irq_callback().set_inputline(m_maincpu, 5);
 
+	MCFG_VIDEO_START_OVERRIDE(cninja_state,cninja)
+
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(XTAL(24'000'000) / 4, 376, 0, 256, 274, 8, 248);
@@ -990,8 +994,8 @@ void cninja_state::cninjabl(machine_config &config)
 	m_deco_tilegen[1]->set_pf2_col_bank(0x30);
 	m_deco_tilegen[1]->set_pf1_col_mask(0x0f);
 	m_deco_tilegen[1]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[1]->set_bank1_callback(FUNC(cninja_state::cninja_bank_callback), this);
-	m_deco_tilegen[1]->set_bank2_callback(FUNC(cninja_state::cninja_bank_callback), this);
+	m_deco_tilegen[1]->set_bank1_callback(FUNC(cninja_state::cninja_bank_callback));
+	m_deco_tilegen[1]->set_bank2_callback(FUNC(cninja_state::cninja_bank_callback));
 	m_deco_tilegen[1]->set_pf12_8x8_bank(0);
 	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
 	m_deco_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
@@ -1060,15 +1064,15 @@ void cninja_state::edrandy(machine_config &config)
 	m_deco_tilegen[1]->set_pf2_col_bank(0x30);
 	m_deco_tilegen[1]->set_pf1_col_mask(0x0f);
 	m_deco_tilegen[1]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[1]->set_bank1_callback(FUNC(cninja_state::cninja_bank_callback), this);
-	m_deco_tilegen[1]->set_bank2_callback(FUNC(cninja_state::cninja_bank_callback), this);
+	m_deco_tilegen[1]->set_bank1_callback(FUNC(cninja_state::cninja_bank_callback));
+	m_deco_tilegen[1]->set_bank2_callback(FUNC(cninja_state::cninja_bank_callback));
 	m_deco_tilegen[1]->set_pf12_8x8_bank(0);
 	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
 	m_deco_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO_SPRITE(config, m_sprgen[0], 0);
 	m_sprgen[0]->set_gfx_region(3);
-	m_sprgen[0]->set_pri_callback(FUNC(cninja_state::pri_callback), this);
+	m_sprgen[0]->set_pri_callback(FUNC(cninja_state::pri_callback));
 	m_sprgen[0]->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO146PROT(config, m_ioprot, 0);
@@ -1134,7 +1138,7 @@ void cninja_state::robocop2(machine_config &config)
 	m_deco_tilegen[0]->set_pf2_col_bank(0x10);
 	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
 	m_deco_tilegen[0]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[0]->set_bank2_callback(FUNC(cninja_state::robocop2_bank_callback), this);
+	m_deco_tilegen[0]->set_bank2_callback(FUNC(cninja_state::robocop2_bank_callback));
 	m_deco_tilegen[0]->set_pf12_8x8_bank(0);
 	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
 	m_deco_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
@@ -1148,15 +1152,15 @@ void cninja_state::robocop2(machine_config &config)
 	m_deco_tilegen[1]->set_pf2_col_bank(0x30);
 	m_deco_tilegen[1]->set_pf1_col_mask(0x0f);
 	m_deco_tilegen[1]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[1]->set_bank1_callback(FUNC(cninja_state::robocop2_bank_callback), this);
-	m_deco_tilegen[1]->set_bank2_callback(FUNC(cninja_state::robocop2_bank_callback), this);
+	m_deco_tilegen[1]->set_bank1_callback(FUNC(cninja_state::robocop2_bank_callback));
+	m_deco_tilegen[1]->set_bank2_callback(FUNC(cninja_state::robocop2_bank_callback));
 	m_deco_tilegen[1]->set_pf12_8x8_bank(0);
 	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
 	m_deco_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO_SPRITE(config, m_sprgen[0], 0);
 	m_sprgen[0]->set_gfx_region(3);
-	m_sprgen[0]->set_pri_callback(FUNC(cninja_state::pri_callback), this);
+	m_sprgen[0]->set_pri_callback(FUNC(cninja_state::pri_callback));
 	m_sprgen[0]->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO146PROT(config, m_ioprot, 0);
@@ -1226,8 +1230,8 @@ void cninja_state::mutantf(machine_config &config)
 	m_deco_tilegen[0]->set_pf2_col_bank(0x30);
 	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
 	m_deco_tilegen[0]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[0]->set_bank1_callback(FUNC(cninja_state::mutantf_1_bank_callback), this);
-	m_deco_tilegen[0]->set_bank2_callback(FUNC(cninja_state::mutantf_2_bank_callback), this);
+	m_deco_tilegen[0]->set_bank1_callback(FUNC(cninja_state::mutantf_1_bank_callback));
+	m_deco_tilegen[0]->set_bank2_callback(FUNC(cninja_state::mutantf_2_bank_callback));
 	m_deco_tilegen[0]->set_pf12_8x8_bank(0);
 	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
 	m_deco_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
@@ -1241,8 +1245,8 @@ void cninja_state::mutantf(machine_config &config)
 	m_deco_tilegen[1]->set_pf2_col_bank(0x40);
 	m_deco_tilegen[1]->set_pf1_col_mask(0x0f);
 	m_deco_tilegen[1]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[1]->set_bank1_callback(FUNC(cninja_state::mutantf_1_bank_callback), this);
-	m_deco_tilegen[1]->set_bank2_callback(FUNC(cninja_state::mutantf_1_bank_callback), this);
+	m_deco_tilegen[1]->set_bank1_callback(FUNC(cninja_state::mutantf_1_bank_callback));
+	m_deco_tilegen[1]->set_bank2_callback(FUNC(cninja_state::mutantf_1_bank_callback));
 	m_deco_tilegen[1]->set_pf12_8x8_bank(0);
 	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
 	m_deco_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
@@ -2217,7 +2221,7 @@ ROM_END
 void cninja_state::init_cninjabl2()
 {
 	m_maincpu->space(AS_PROGRAM).install_ram(0x180000, 0x18ffff);
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x1b4000, 0x1b4001, read16_delegate(FUNC(cninja_state::cninjabl2_sprite_dma_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x1b4000, 0x1b4001, read16_delegate(*this, FUNC(cninja_state::cninjabl2_sprite_dma_r)));
 
 	m_okibank->configure_entries(0, 8, memregion("oki2")->base(), 0x10000);
 }

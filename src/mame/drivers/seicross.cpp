@@ -406,7 +406,7 @@ void seicross_state::no_nvram(machine_config &config)
 	NSC8105(config, m_mcu, XTAL(18'432'000) / 6);   /* ??? */
 	m_mcu->set_addrmap(AS_PROGRAM, &seicross_state::mcu_no_nvram_map);
 
-	config.m_minimum_quantum = attotime::from_hz(1200);  /* 20 CPU slices per frame - a high value to ensure proper */
+	config.set_maximum_quantum(attotime::from_hz(1200));  /* 20 CPU slices per frame - a high value to ensure proper */
 						/* synchronization of the CPUs */
 
 	WATCHDOG_TIMER(config, "watchdog");

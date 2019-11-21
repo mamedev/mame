@@ -85,7 +85,7 @@ uint8_t voyager_state::mtxc_config_r(int function, int reg)
 
 void voyager_state::mtxc_config_w(int function, int reg, uint8_t data)
 {
-//  osd_printf_debug("%s:MTXC: write %d, %02X, %02X\n", machine().describe_context().c_str(), function, reg, data);
+//  osd_printf_debug("%s:MTXC: write %d, %02X, %02X\n", machine().describe_context(), function, reg, data);
 
 	switch(reg)
 	{
@@ -184,7 +184,7 @@ uint8_t voyager_state::piix4_config_r(int function, int reg)
 
 void voyager_state::piix4_config_w(int function, int reg, uint8_t data)
 {
-//  osd_printf_debug("%s:PIIX4: write %d, %02X, %02X\n", machine().describe_context().c_str(), function, reg, data);
+//  osd_printf_debug("%s:PIIX4: write %d, %02X, %02X\n", machine().describe_context(), function, reg, data);
 	m_piix4_config_reg[function][reg] = data;
 }
 
@@ -249,26 +249,26 @@ void voyager_state::voyager_map(address_map &map)
 	map(0x000a0000, 0x000bffff).rw("vga", FUNC(trident_vga_device::mem_r), FUNC(trident_vga_device::mem_w)); // VGA VRAM
 	map(0x000c0000, 0x000c7fff).ram().region("video_bios", 0);
 	map(0x000c8000, 0x000cffff).noprw();
-	//AM_RANGE(0x000d0000, 0x000d0003) AM_RAM  // XYLINX - Sincronus serial communication
+	//map(0x000d0000, 0x000d0003).ram();  // XYLINX - Sincronus serial communication
 	map(0x000d0008, 0x000d000b).nopw(); // ???
 	map(0x000d0800, 0x000d0fff).rom().region("nvram", 0); //
-//  AM_RANGE(0x000d0800, 0x000d0fff) AM_RAM  // GAME_CMOS
+//  map(0x000d0800, 0x000d0fff).ram();  // GAME_CMOS
 
-	//GRULL AM_RANGE(0x000e0000, 0x000effff) AM_RAM
-	//GRULL-AM_RANGE(0x000f0000, 0x000fffff) AM_ROMBANK("bank1")
-	//GRULL AM_RANGE(0x000f0000, 0x000fffff) AM_WRITE(bios_ram_w)
+	//GRULL map(0x000e0000, 0x000effff).ram();
+	//GRULL-map(0x000f0000, 0x000fffff).bankr("bank1");
+	//GRULL map(0x000f0000, 0x000fffff).w(FUNC(voyager_state::bios_ram_w));
 	map(0x000e0000, 0x000fffff).bankr("bank1");
 	map(0x000e0000, 0x000fffff).w(FUNC(voyager_state::bios_ram_w));
 	map(0x00100000, 0x03ffffff).ram();  // 64MB
 	map(0x04000000, 0x28ffffff).noprw();
-	//AM_RANGE(0x04000000, 0x040001ff) AM_RAM
-	//AM_RANGE(0x08000000, 0x080001ff) AM_RAM
-	//AM_RANGE(0x0c000000, 0x0c0001ff) AM_RAM
-	//AM_RANGE(0x10000000, 0x100001ff) AM_RAM
-	//AM_RANGE(0x14000000, 0x140001ff) AM_RAM
-	//AM_RANGE(0x18000000, 0x180001ff) AM_RAM
-	//AM_RANGE(0x20000000, 0x200001ff) AM_RAM
-	//AM_RANGE(0x28000000, 0x280001ff) AM_RAM
+	//map(0x04000000, 0x040001ff).ram();
+	//map(0x08000000, 0x080001ff).ram();
+	//map(0x0c000000, 0x0c0001ff).ram();
+	//map(0x10000000, 0x100001ff).ram();
+	//map(0x14000000, 0x140001ff).ram();
+	//map(0x18000000, 0x180001ff).ram();
+	//map(0x20000000, 0x200001ff).ram();
+	//map(0x28000000, 0x280001ff).ram();
 	map(0xfffe0000, 0xffffffff).rom().region("bios", 0);    /* System BIOS */
 }
 
@@ -276,13 +276,13 @@ void voyager_state::voyager_io(address_map &map)
 {
 	pcat32_io_common(map);
 
-	//AM_RANGE(0x00e8, 0x00eb) AM_NOP
+	//map(0x00e8, 0x00eb).noprw();
 	map(0x00e8, 0x00ef).noprw(); //AMI BIOS write to this ports as delays between I/O ports operations sending al value -> NEWIODELAY
 	map(0x0170, 0x0177).noprw(); //To debug
 	map(0x01f0, 0x01f7).rw("ide", FUNC(ide_controller_device::cs0_r), FUNC(ide_controller_device::cs0_w));
 	map(0x0200, 0x021f).noprw(); //To debug
 	map(0x0260, 0x026f).noprw(); //To debug
-	map(0x0278, 0x027b).nopw();//AM_WRITE(pnp_config_w)
+	map(0x0278, 0x027b).nopw();//.w(FUNC(voyager_state::pnp_config_w));
 	map(0x0280, 0x0287).noprw(); //To debug
 	map(0x02a0, 0x02a7).noprw(); //To debug
 	map(0x02c0, 0x02c7).noprw(); //To debug
@@ -295,11 +295,11 @@ void voyager_state::voyager_io(address_map &map)
 	map(0x03d0, 0x03df).rw("vga", FUNC(trident_vga_device::port_03d0_r), FUNC(trident_vga_device::port_03d0_w));
 	map(0x03e0, 0x03ef).noprw(); //To debug
 	map(0x0378, 0x037f).noprw(); //To debug
-	// AM_RANGE(0x0300, 0x03af) AM_NOP
-	// AM_RANGE(0x03b0, 0x03df) AM_NOP
+	// map(0x0300, 0x03af).noprw();
+	// map(0x03b0, 0x03df).noprw();
 	map(0x03f0, 0x03f7).rw("ide", FUNC(ide_controller_device::cs1_r), FUNC(ide_controller_device::cs1_w));
 	map(0x03f8, 0x03ff).noprw(); // To debug Serial Port COM1:
-	map(0x0a78, 0x0a7b).nopw();//AM_WRITE(pnp_data_w)
+	map(0x0a78, 0x0a7b).nopw();//.w(FUNC(voyager_state::pnp_data_w));
 	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_legacy_device::read), FUNC(pci_bus_legacy_device::write));
 	map(0x42e8, 0x43ef).noprw(); //To debug
 	map(0x43c0, 0x43cf).ram().share("share1");
@@ -515,10 +515,8 @@ void voyager_state::voyager(machine_config &config)
 	ide.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir6_w));
 
 	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
-	pcibus.set_device_read (0, FUNC(voyager_state::intel82439tx_pci_r), this);
-	pcibus.set_device_write(0, FUNC(voyager_state::intel82439tx_pci_w), this);
-	pcibus.set_device_read (7, FUNC(voyager_state::intel82371ab_pci_r), this);
-	pcibus.set_device_write(7, FUNC(voyager_state::intel82371ab_pci_w), this);
+	pcibus.set_device(0, FUNC(voyager_state::intel82439tx_pci_r), FUNC(voyager_state::intel82439tx_pci_w));
+	pcibus.set_device(7, FUNC(voyager_state::intel82371ab_pci_r), FUNC(voyager_state::intel82371ab_pci_w));
 
 	/* video hardware */
 	pcvideo_trident_vga(config);

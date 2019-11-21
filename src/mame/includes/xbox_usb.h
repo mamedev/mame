@@ -328,7 +328,7 @@ struct usb_device_interfac
 {
 	uint8_t *position;
 	int size;
-	std::forward_list<usb_device_interfac_alternate *> alternate_settings;
+	std::forward_list<usb_device_interfac_alternate> alternate_settings;
 	int selected_alternate;
 };
 
@@ -337,21 +337,21 @@ struct usb_device_configuration
 	USBStandardConfigurationDescriptor configuration_descriptor;
 	uint8_t *position;
 	int size;
-	std::forward_list<usb_device_interfac *> interfaces;
+	std::forward_list<usb_device_interfac> interfaces;
 };
 
 /*
  * OHCI Usb Controller
  */
 
-class ohci_function; // forward declaration
+class device_usb_ohci_function_interface; // forward declaration
 
 class ohci_usb_controller
 {
 public:
 	ohci_usb_controller();
 	~ohci_usb_controller() {}
-	void usb_ohci_plug(int port, ohci_function *function);
+	void usb_ohci_plug(int port, device_usb_ohci_function_interface *function);
 	void usb_ohci_device_address_changed(int old_address, int new_address);
 	void set_cpu(cpu_device *cpu) { m_maincpu = cpu; }
 	void set_timer(emu_timer *timer) { ohcist.timer = timer; }
@@ -377,13 +377,13 @@ private:
 	struct {
 		uint32_t hc_regs[256];
 		struct {
-			ohci_function *function;
+			device_usb_ohci_function_interface *function;
 			int address;
 			int delay;
 		} ports[4 + 1];
 		struct
 		{
-			ohci_function *function;
+			device_usb_ohci_function_interface *function;
 			int port;
 		} address[256];
 		emu_timer *timer;
@@ -405,26 +405,26 @@ private:
  * Base class for usb devices
  */
 
-class ohci_function {
+class device_usb_ohci_function_interface : public device_interface {
 public:
-	ohci_function();
-	virtual void initialize(running_machine &machine);
+	virtual void initialize();
 	virtual void execute_reset();
-	virtual void execute_connect() {};
-	virtual void execute_disconnect() {};
+	virtual void execute_connect() {}
+	virtual void execute_disconnect() {}
 	void set_bus_manager(ohci_usb_controller *usb_bus_manager);
 	int execute_transfer(int endpoint, int pid, uint8_t *buffer, int size);
 protected:
-	virtual int handle_nonstandard_request(int endpoint, USBSetupPacket *setup) { return -1; };
-	virtual int handle_get_status_request(int endpoint, USBSetupPacket *setup) { return 0; };
-	virtual int handle_clear_feature_request(int endpoint, USBSetupPacket *setup) { return 0; };
-	virtual int handle_set_feature_request(int endpoint, USBSetupPacket *setup) { return 0; };
-	virtual int handle_set_descriptor_request(int endpoint, USBSetupPacket *setup) { return 0; };
-	virtual int handle_synch_frame_request(int endpoint, USBSetupPacket *setup) { return 0; };
-	virtual void handle_status_stage(int endpoint) { return; };
-	virtual int handle_bulk_pid(int endpoint, int pid, uint8_t *buffer, int size) { return 0; };
-	virtual int handle_interrupt_pid(int endpoint, int pid, uint8_t *buffer, int size) { return 0; };
-	virtual int handle_isochronous_pid(int endpoint, int pid, uint8_t *buffer, int size) { return 0; };
+	device_usb_ohci_function_interface(const machine_config &config, device_t &device);
+	virtual int handle_nonstandard_request(int endpoint, USBSetupPacket *setup) { return -1; }
+	virtual int handle_get_status_request(int endpoint, USBSetupPacket *setup) { return 0; }
+	virtual int handle_clear_feature_request(int endpoint, USBSetupPacket *setup) { return 0; }
+	virtual int handle_set_feature_request(int endpoint, USBSetupPacket *setup) { return 0; }
+	virtual int handle_set_descriptor_request(int endpoint, USBSetupPacket *setup) { return 0; }
+	virtual int handle_synch_frame_request(int endpoint, USBSetupPacket *setup) { return 0; }
+	virtual void handle_status_stage(int endpoint) { return; }
+	virtual int handle_bulk_pid(int endpoint, int pid, uint8_t *buffer, int size) { return 0; }
+	virtual int handle_interrupt_pid(int endpoint, int pid, uint8_t *buffer, int size) { return 0; }
+	virtual int handle_isochronous_pid(int endpoint, int pid, uint8_t *buffer, int size) { return 0; }
 
 	void add_device_descriptor(const USBStandardDeviceDescriptor &descriptor);
 	void add_configuration_descriptor(const USBStandardConfigurationDescriptor &descriptor);
@@ -452,12 +452,12 @@ protected:
 	int newaddress;
 	int address;
 	int configurationvalue;
-	uint8_t *descriptors;
+	std::unique_ptr<uint8_t []> descriptors;
 	int descriptors_pos;
 	bool wantstatuscallback;
 	USBStandardDeviceDescriptor device_descriptor;
-	std::forward_list<usb_device_configuration *> configurations;
-	std::forward_list<usb_device_string *> device_strings;
+	std::forward_list<usb_device_configuration> configurations;
+	std::forward_list<usb_device_string> device_strings;
 	usb_device_configuration *latest_configuration;
 	usb_device_interfac_alternate *latest_alternate;
 	usb_device_configuration *selected_configuration;
@@ -467,7 +467,7 @@ protected:
  * Usb port connector
  */
 
-class ohci_usb_connector : public device_t, public device_slot_interface
+class ohci_usb_connector : public device_t, public device_single_card_slot_interface<device_usb_ohci_function_interface>
 {
 public:
 	template <typename T>
@@ -483,8 +483,6 @@ public:
 	ohci_usb_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~ohci_usb_connector();
 
-	ohci_function *get_device();
-
 protected:
 	virtual void device_start() override;
 };
@@ -497,11 +495,11 @@ DECLARE_DEVICE_TYPE(OHCI_USB_CONNECTOR, ohci_usb_connector)
 
 DECLARE_DEVICE_TYPE(OHCI_GAME_CONTROLLER, ohci_game_controller_device)
 
-class ohci_game_controller_device : public device_t, public ohci_function, public device_slot_card_interface
+class ohci_game_controller_device : public device_t, public device_usb_ohci_function_interface
 {
 public:
 	ohci_game_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	void initialize(running_machine &machine) override;
+	void initialize() override;
 	int handle_nonstandard_request(int endpoint, USBSetupPacket *setup) override;
 	int handle_interrupt_pid(int endpoint, int pid, uint8_t *buffer, int size) override;
 

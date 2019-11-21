@@ -200,29 +200,24 @@
  *
  *************************************/
 
-void segas32_state::common_start(int multi32)
+void segas32_state::device_start()
 {
-	if(!m_gfxdecode->started())
+	if (!m_gfxdecode->started())
 		throw device_missing_dependencies();
 
 	m_vblank_end_int_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(segas32_state::end_of_vblank_int), this));
 	m_update_sprites_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(segas32_state::update_sprites), this));
-
-	int tmap;
-
-	/* remember whether or not we are multi32 */
-	m_is_multi32 = multi32;
 
 	/* allocate a copy of spriteram in 32-bit format */
 	m_spriteram_32bit = std::make_unique<uint32_t[]>(0x20000/4);
 
 	/* allocate the tilemap cache */
 	m_cache_head = nullptr;
-	for (tmap = 0; tmap < TILEMAP_CACHE_SIZE; tmap++)
+	for (int tmap = 0; tmap < TILEMAP_CACHE_SIZE; tmap++)
 	{
 		struct cache_entry *entry = auto_alloc(machine(), struct cache_entry);
 
-		entry->tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(segas32_state::get_tile_info),this), TILEMAP_SCAN_ROWS,  16,16, 32,16);
+		entry->tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(segas32_state::get_tile_info)), TILEMAP_SCAN_ROWS,  16,16, 32,16);
 		entry->page = 0xff;
 		entry->bank = 0;
 		entry->next = m_cache_head;
@@ -231,12 +226,11 @@ void segas32_state::common_start(int multi32)
 		m_cache_head = entry;
 	}
 
-
 	/* allocate the bitmaps (a few extra for multi32) */
-	for (tmap = 0; tmap < 9 + 2 * multi32; tmap++)
+	for (int bmap = 0; bmap < 9 + (m_is_multi32 ? 2 : 0); bmap++)
 	{
-		m_layer_data[tmap].bitmap = auto_alloc(machine(), bitmap_ind16(416, 224));
-		m_layer_data[tmap].transparent = auto_alloc_array_clear(machine(), uint8_t, 256);
+		m_layer_data[bmap].bitmap = auto_alloc(machine(), bitmap_ind16(416, 224));
+		m_layer_data[bmap].transparent = auto_alloc_array_clear(machine(), uint8_t, 256);
 	}
 
 	/* allocate pre-rendered solid lines of 0's and ffff's */
@@ -249,6 +243,10 @@ void segas32_state::common_start(int multi32)
 	m_videoram[0x1ff00/2] = 0x8000;
 
 	memset(m_mixer_control, 0xff, sizeof(m_mixer_control[0][0]) * 0x80 );
+
+	/* needs to be initialized to 0xff, otherwise f1en has bad sound (MT04531) */
+	if (m_soundram)
+		std::fill_n(&m_soundram[0], m_soundram.bytes() / sizeof(m_soundram[0]), 0xff);
 }
 
 

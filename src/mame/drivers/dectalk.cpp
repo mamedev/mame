@@ -484,7 +484,7 @@ void dectalk_state::machine_start()
 void dectalk_state::machine_reset()
 {
 	/* hook the RESET line, which resets a slew of other components */
-	m_maincpu->set_reset_callback(write_line_delegate(FUNC(dectalk_state::dectalk_reset),this));
+	m_maincpu->set_reset_callback(*this, FUNC(dectalk_state::dectalk_reset));
 }
 
 /* Begin 68k i/o handlers */
@@ -816,7 +816,7 @@ void dectalk_state::tms32010_io(address_map &map)
 {
 	map(0, 0).w(FUNC(dectalk_state::spc_latch_outfifo_error_stats)); // *set* the outfifo_status_r semaphore, and also latch the error bit at D0.
 	map(1, 1).rw(FUNC(dectalk_state::spc_infifo_data_r), FUNC(dectalk_state::spc_outfifo_data_w)); //read from input fifo, write to sound fifo
-	//AM_RANGE(8, 8) //the newer firmware seems to want something mapped here?
+	//map(8, 8) //the newer firmware seems to want something mapped here?
 }
 
 /******************************************************************************
@@ -854,7 +854,7 @@ void dectalk_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		outfifo_read_cb(ptr, param);
 		break;
 	default:
-		assert_always(false, "Unknown id in dectalk_state::device_timer");
+		throw emu_fatalerror("Unknown id in dectalk_state::device_timer");
 	}
 }
 
@@ -893,7 +893,7 @@ void dectalk_state::dectalk(machine_config &config)
 	m_dsp->bio().set(FUNC(dectalk_state::spc_semaphore_r)); //read infifo-has-data-in-it fifo readable status
 
 #ifdef USE_LOOSE_TIMING
-	config.m_minimum_quantum = attotime::from_hz(100);
+	config.set_maximum_quantum(attotime::from_hz(100));
 #else
 	config.m_perfect_cpu_quantum = subtag("dsp");
 #endif

@@ -333,7 +333,7 @@ void sigmab52_state::jwildb52_map(address_map &map)
 
 	map(0xf760, 0xf760).r(FUNC(sigmab52_state::unk_f760_r));
 
-//  AM_RANGE(0xf770, 0xf77f)  Bill validator
+//  map(0xf770, 0xf77f)  Bill validator
 
 	map(0xf780, 0xf780).w(FUNC(sigmab52_state::audiocpu_cmd_irq_w));
 	map(0xf790, 0xf790).w("soundlatch", FUNC(generic_latch_8_device::write));

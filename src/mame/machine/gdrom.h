@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include "machine/atapicdr.h"
+#include "bus/ata/atapicdr.h"
 
 class gdrom_device : public atapi_cdrom_device
 {

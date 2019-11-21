@@ -3633,8 +3633,8 @@ void dkong_state::init_strtheat()
 	drakton_decrypt_rom(0x88, 0x1c000, bs[3]);
 
 	/* custom handlers supporting Joystick or Steering Wheel */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x7c00, 0x7c00, read8_delegate(FUNC(dkong_state::strtheat_inputport_0_r),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x7c80, 0x7c80, read8_delegate(FUNC(dkong_state::strtheat_inputport_1_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x7c00, 0x7c00, read8_delegate(*this, FUNC(dkong_state::strtheat_inputport_0_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x7c80, 0x7c80, read8_delegate(*this, FUNC(dkong_state::strtheat_inputport_1_r)));
 }
 
 void dkong_state::dk_braze_decrypt()
@@ -3657,8 +3657,8 @@ void dkong_state::init_dkonghs()
 	dk_braze_decrypt();
 
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.install_read_handler(0xc000, 0xc000, read8_delegate(FUNC(dkong_state::braze_eeprom_r), this));
-	space.install_write_handler(0xc000, 0xc000, write8_delegate(FUNC(dkong_state::braze_eeprom_w), this));
+	space.install_read_handler(0xc000, 0xc000, read8_delegate(*this, FUNC(dkong_state::braze_eeprom_r)));
+	space.install_write_handler(0xc000, 0xc000, write8_delegate(*this, FUNC(dkong_state::braze_eeprom_w)));
 }
 
 void dkong_state::init_dkongx()
@@ -3666,10 +3666,10 @@ void dkong_state::init_dkongx()
 	dk_braze_decrypt();
 
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.install_write_handler(0xe000, 0xe000, write8_delegate(FUNC(dkong_state::dk_braze_a15_w),this));
+	space.install_write_handler(0xe000, 0xe000, write8_delegate(*this, FUNC(dkong_state::dk_braze_a15_w)));
 
-	space.install_read_handler(0xc800, 0xc800, read8_delegate(FUNC(dkong_state::braze_eeprom_r),this));
-	space.install_write_handler(0xc800, 0xc800, write8_delegate(FUNC(dkong_state::braze_eeprom_w),this));
+	space.install_read_handler(0xc800, 0xc800, read8_delegate(*this, FUNC(dkong_state::braze_eeprom_r)));
+	space.install_write_handler(0xc800, 0xc800, write8_delegate(*this, FUNC(dkong_state::braze_eeprom_w)));
 }
 
 void dkong_state::init_dkong3hs()
@@ -3682,8 +3682,8 @@ void dkong_state::init_dkong3hs()
 	m_maincpu->space(AS_PROGRAM).install_rom(0x8000, 0xffff, m_decrypted.get() + 0x8000);
 
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.install_read_handler(0xc000, 0xc000, read8_delegate(FUNC(dkong_state::braze_eeprom_r), this));
-	space.install_write_handler(0xc000, 0xc000, write8_delegate(FUNC(dkong_state::braze_eeprom_w), this));
+	space.install_read_handler(0xc000, 0xc000, read8_delegate(*this, FUNC(dkong_state::braze_eeprom_r)));
+	space.install_write_handler(0xc000, 0xc000, write8_delegate(*this, FUNC(dkong_state::braze_eeprom_w)));
 }
 
 void dkong_state::init_dkingjr()

@@ -64,23 +64,23 @@ void tbowl_state::_6206B_map(address_map &map)
 	map(0xa000, 0xbfff).ram().w(FUNC(tbowl_state::bg2videoram_w)).share("bg2videoram");
 	map(0xc000, 0xdfff).ram().w(FUNC(tbowl_state::bgvideoram_w)).share("bgvideoram");
 	map(0xe000, 0xefff).ram().w(FUNC(tbowl_state::txvideoram_w)).share("txvideoram");
-//  AM_RANGE(0xf000, 0xf000) AM_WRITE(unknown_write) * written during start-up, not again */
+//  map(0xf000, 0xf000).w(FUNC(tbowl_state::unknown_write)); * written during start-up, not again */
 	map(0xf000, 0xf7ff).bankr("mainbank");
 	map(0xf800, 0xfbff).ram().share("shared_ram"); /* check */
 	map(0xfc00, 0xfc00).portr("P1").w(FUNC(tbowl_state::boardb_bankswitch_w));
 	map(0xfc01, 0xfc01).portr("P2");
-//  AM_RANGE(0xfc01, 0xfc01) AM_WRITE(unknown_write) /* written during start-up, not again */
+//  map(0xfc01, 0xfc01).w(FUNC(tbowl_state::unknown_write)); /* written during start-up, not again */
 	map(0xfc02, 0xfc02).portr("P3");
-//  AM_RANGE(0xfc02, 0xfc02) AM_WRITE(unknown_write) /* written during start-up, not again */
+//  map(0xfc02, 0xfc02).w(FUNC(tbowl_state::unknown_write)); /* written during start-up, not again */
 	map(0xfc03, 0xfc03).portr("P4").w(FUNC(tbowl_state::coincounter_w));
-//  AM_RANGE(0xfc05, 0xfc05) AM_WRITE(unknown_write) /* no idea */
-//  AM_RANGE(0xfc06, 0xfc06) AM_READ(dummy_r)        /* Read During NMI */
+//  map(0xfc05, 0xfc05).w(FUNC(tbowl_state::unknown_write)); /* no idea */
+//  map(0xfc06, 0xfc06).r(FUNC(tbowl_state::dummy_r));        /* Read During NMI */
 	map(0xfc07, 0xfc07).portr("SYSTEM");
 	map(0xfc08, 0xfc08).portr("DSW1");
-//  AM_RANGE(0xfc08, 0xfc08) AM_WRITE(unknown_write) /* hardly used .. */
+//  map(0xfc08, 0xfc08).w(FUNC(tbowl_state::unknown_write)); /* hardly used .. */
 	map(0xfc09, 0xfc09).portr("DSW2");
 	map(0xfc0a, 0xfc0a).portr("DSW3");
-//  AM_RANGE(0xfc0a, 0xfc0a) AM_WRITE(unknown_write) /* hardly used .. */
+//  map(0xfc0a, 0xfc0a).w(FUNC(tbowl_state::unknown_write)); /* hardly used .. */
 	map(0xfc0d, 0xfc0d).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xfc10, 0xfc10).w(FUNC(tbowl_state::bg2xscroll_lo));
 	map(0xfc11, 0xfc11).w(FUNC(tbowl_state::bg2xscroll_hi));
@@ -445,7 +445,7 @@ void tbowl_state::tbowl(machine_config &config)
 	Z80(config, m_audiocpu, 4000000); /* Actual Z80 */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &tbowl_state::_6206A_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tbowl);

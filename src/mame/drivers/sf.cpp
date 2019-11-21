@@ -172,7 +172,7 @@ void sf_state::sfan_map(address_map &map)
 	map(0xc00018, 0xc00019).w(FUNC(sf_state::bg_scroll_w));
 	map(0xc0001a, 0xc0001b).w(FUNC(sf_state::gfxctrl_w));
 	map(0xc0001d, 0xc0001d).w(FUNC(sf_state::soundcmd_w));
-//  AM_RANGE(0xc0001e, 0xc0001f) AM_WRITE(protection_w)
+//  map(0xc0001e, 0xc0001f).w(FUNC(sf_state::protection_w));
 	map(0xff8000, 0xffdfff).ram();
 	map(0xffe000, 0xffffff).ram().share("objectram");
 }
@@ -196,7 +196,7 @@ void sf_state::sfus_map(address_map &map)
 	map(0xc00018, 0xc00019).w(FUNC(sf_state::bg_scroll_w));
 	map(0xc0001a, 0xc0001b).w(FUNC(sf_state::gfxctrl_w));
 	map(0xc0001d, 0xc0001d).w(FUNC(sf_state::soundcmd_w));
-//  AM_RANGE(0xc0001e, 0xc0001f) AM_WRITE(protection_w)
+//  map(0xc0001e, 0xc0001f).w(FUNC(sf_state::protection_w));
 	map(0xff8000, 0xffdfff).ram();
 	map(0xffe000, 0xffffff).ram().share("objectram");
 }

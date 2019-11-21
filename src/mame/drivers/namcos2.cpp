@@ -1757,7 +1757,7 @@ void namcos2_state::base_noio(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &namcos2_state::sound_default_am);
 	m_audiocpu->set_periodic_int(FUNC(namcos2_state::irq0_line_hold), attotime::from_hz(2*60));
 
-	config.m_minimum_quantum = attotime::from_hz(12000); /* CPU slices per frame */
+	config.set_maximum_quantum(attotime::from_hz(12000)); /* CPU slices per frame */
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
@@ -1822,7 +1822,7 @@ void namcos2_state::assaultp(machine_config &config)
 {
 	base2(config);
 
-	config.m_minimum_quantum = attotime::from_hz(12000*8); /* CPU slices per frame - boosted (along with MCU speed) so that the Mode Select works */
+	config.set_maximum_quantum(attotime::from_hz(12000*8)); /* CPU slices per frame - boosted (along with MCU speed) so that the Mode Select works */
 }
 
 void namcos2_state::base3(machine_config &config)
@@ -1851,7 +1851,7 @@ void namcos2_state::gollygho(machine_config &config)
 
 	configure_c65_standard(config);
 
-	config.m_minimum_quantum = attotime::from_hz(6000); /* CPU slices per frame */
+	config.set_maximum_quantum(attotime::from_hz(6000)); /* CPU slices per frame */
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
@@ -1904,7 +1904,7 @@ void namcos2_state::finallap_noio(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &namcos2_state::sound_default_am);
 	m_audiocpu->set_periodic_int(FUNC(namcos2_state::irq0_line_hold), attotime::from_hz(2*60));
 
-	config.m_minimum_quantum = attotime::from_hz(6000); /* CPU slices per frame */
+	config.set_maximum_quantum(attotime::from_hz(6000)); /* CPU slices per frame */
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
@@ -1985,7 +1985,7 @@ void namcos2_state::sgunner(machine_config &config)
 
 	configure_c65_standard(config);
 
-	config.m_minimum_quantum = attotime::from_hz(6000); /* CPU slices per frame */
+	config.set_maximum_quantum(attotime::from_hz(6000)); /* CPU slices per frame */
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
@@ -2038,7 +2038,7 @@ void namcos2_state::sgunner2(machine_config &config)
 
 	configure_c68_standard(config);
 
-	config.m_minimum_quantum = attotime::from_hz(6000); /* CPU slices per frame */
+	config.set_maximum_quantum(attotime::from_hz(6000)); /* CPU slices per frame */
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
@@ -2091,7 +2091,7 @@ void namcos2_state::suzuka8h(machine_config &config)
 
 	configure_c68_standard(config);
 
-	config.m_minimum_quantum = attotime::from_hz(6000); /* CPU slices per frame */
+	config.set_maximum_quantum(attotime::from_hz(6000)); /* CPU slices per frame */
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
@@ -2163,7 +2163,7 @@ void namcos2_state::metlhawk(machine_config &config)
 
 	configure_c65_standard(config);
 
-	config.m_minimum_quantum = attotime::from_hz(6000); /* CPU slices per frame */
+	config.set_maximum_quantum(attotime::from_hz(6000)); /* CPU slices per frame */
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
@@ -3858,9 +3858,8 @@ ROM_START( marvland )
 	ROM_LOAD16_BYTE( "mv2_spr0",  0x000000, 0x010000, CRC(aa418f29) SHA1(413798d9c1d98cfcadb045a5436aaee61ce6718f) )
 	ROM_LOAD16_BYTE( "mv2_spr1",  0x000001, 0x010000, CRC(dbd94def) SHA1(56a8d7acd483bc4d12c8bc5b7e90ffdb132be670) )
 
-	// This needs re-dumping, sound is very poor in this version and doesn't match Japanese version or any of the ports.  High res photos of PCB required too.
 	ROM_REGION( 0x020000, "audiocpu", 0 ) /* Sound CPU (Banked) */
-	ROM_LOAD( "mv2_snd0",  0x000000, 0x020000, BAD_DUMP CRC(a5b99162) SHA1(cafe8d1dae1e981c7ff9b70076b3e1d52cd806f7) )
+	ROM_LOAD( "mv2_snd0",  0x000000, 0x020000, CRC(a5b99162) SHA1(cafe8d1dae1e981c7ff9b70076b3e1d52cd806f7) )
 
 	ROM_REGION( 0x8000, "c65mcu:external", ROMREGION_ERASE00 ) /* I/O MCU */
 	ROM_LOAD( "sys2c65c.bin",  0x000000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
@@ -3894,7 +3893,7 @@ ROM_START( marvland )
 	NAMCOS2_DATA_LOAD_O_128K( "mv2_dat3.13n",  0x100000, CRC(6df76955) SHA1(fcfb520399acdd3776f66944121d6980552d3100) )
 
 	ROM_REGION( 0x100000, "c140", 0 ) /* Sound voices */
-	ROM_LOAD( "mv1-voi1.bin",  0x000000, 0x080000, CRC(de5cac09) SHA1(2d73e54c4f159e52db2c403a59d6c137cce6f53e) )
+	ROM_LOAD( "mv1-voi1.bin",  0x000000, 0x080000, BAD_DUMP CRC(de5cac09) SHA1(2d73e54c4f159e52db2c403a59d6c137cce6f53e) ) // either undumped, or PCB was wrongly populated with JP samples ROM?
 ROM_END
 
 /* MARVEL LAND (JAPAN) */
@@ -5825,9 +5824,9 @@ GAMEL( 1987, finallapc,  finallap, finallap, finallap, namcos2_state, init_final
 GAMEL( 1987, finallapjc, finallap, finallap, finallap, namcos2_state, init_finallap, ROT0,   "Namco", "Final Lap (Japan, Rev C)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN, layout_finallap )
 GAMEL( 1987, finallapjb, finallap, finallap, finallap, namcos2_state, init_finallap, ROT0,   "Namco", "Final Lap (Japan, Rev B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN, layout_finallap )
 
-GAME(  1988, assault,    0,        base2,    assault,  namcos2_state, init_assault,       ROT90, "Namco", "Assault (Rev B)", 0 )
-GAME(  1988, assaultj,   assault,  base2,    assault,  namcos2_state, init_assaultj,      ROT90, "Namco", "Assault (Japan)", 0 )
-GAME(  1988, assaultp,   assault,  assaultp, assault,  namcos2_state, init_assaultp,      ROT90, "Namco", "Assault Plus (Japan)", 0)
+GAME(  1988, assault,    0,        base2,    assault,  namcos2_state, init_assault,  ROT90,  "Namco", "Assault (Rev B)", 0 )
+GAME(  1988, assaultj,   assault,  base2,    assault,  namcos2_state, init_assaultj, ROT90,  "Namco", "Assault (Japan)", 0 )
+GAME(  1988, assaultp,   assault,  assaultp, assault,  namcos2_state, init_assaultp, ROT90,  "Namco", "Assault Plus (Japan)", 0)
 
 GAME(  1988, metlhawk,   0,        metlhawk, metlhawk, namcos2_state, init_metlhawk, ROT90,  "Namco", "Metal Hawk (Rev C)", 0 )
 GAME(  1988, metlhawkj,  metlhawk, metlhawk, metlhawk, namcos2_state, init_metlhawk, ROT90,  "Namco", "Metal Hawk (Japan, Rev F)", 0 )
@@ -5854,7 +5853,7 @@ GAME(  1989, finehour,   0,        base2,    base,     namcos2_state, init_fineh
 GAME(  1989, burnforc,   0,        base3,    base,     namcos2_state, init_burnforc, ROT0,   "Namco", "Burning Force (Japan, new version (Rev C))", 0 )
 GAME(  1989, burnforco,  burnforc, base3,    base,     namcos2_state, init_burnforc, ROT0,   "Namco", "Burning Force (Japan, old version)", 0 )
 
-GAME(  1989, marvland,   0,        base,     base,     namcos2_state, init_marvland, ROT0,   "Namco", "Marvel Land (US)", MACHINE_IMPERFECT_SOUND )
+GAME(  1989, marvland,   0,        base,     base,     namcos2_state, init_marvland, ROT0,   "Namco", "Marvel Land (US, prototype?)", MACHINE_IMPERFECT_SOUND )
 GAME(  1989, marvlandj,  marvland, base,     base,     namcos2_state, init_marvlanj, ROT0,   "Namco", "Marvel Land (Japan)", 0 )
 
 GAME(  1990, kyukaidk,   0,        base,     kyukaidk, namcos2_state, init_kyukaidk, ROT0,   "Namco", "Kyuukai Douchuuki (Japan, new version (Rev B))", 0 )

@@ -978,6 +978,15 @@ void lwings_state::lwings(machine_config &config)
 	ym2203b.add_route(3, "mono", 0.10);
 }
 
+void lwings_state::sectionz(machine_config &config)
+{
+	lwings(config);
+
+	m_maincpu->set_clock(XTAL(12'000'000)/4);     // XTAL and clock verified on an original PCB and on a bootleg with ROMs matching those of sectionza
+
+	subdevice<screen_device>("screen")->set_refresh_hz(55.37); // verified on an original PCB
+}
+
 void lwings_state::fball(machine_config &config)
 {
 	/* basic machine hardware */
@@ -1768,8 +1777,8 @@ ROM_END
 
 void lwings_state::init_avengersb()
 {
-	/* set up protection handlers */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xf80c, 0xf80c, write8smo_delegate(FUNC(generic_latch_8_device::write), (generic_latch_8_device*)m_soundlatch));
+	// set up protection handlers
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xf80c, 0xf80c, write8smo_delegate(*m_soundlatch, FUNC(generic_latch_8_device::write)));
 }
 
 
@@ -1779,8 +1788,8 @@ void lwings_state::init_avengersb()
  *
  *************************************/
 
-GAME( 1985, sectionz,  0,        lwings,    sectionz, lwings_state, empty_init,     ROT0,  "Capcom",           "Section Z (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, sectionza, sectionz, lwings,    sectionz, lwings_state, empty_init,     ROT0,  "Capcom",           "Section Z (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, sectionz,  0,        sectionz,  sectionz, lwings_state, empty_init,     ROT0,  "Capcom",           "Section Z (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, sectionza, sectionz, sectionz,  sectionz, lwings_state, empty_init,     ROT0,  "Capcom",           "Section Z (set 2)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1986, lwings,    0,        lwings,    lwings,   lwings_state, empty_init,     ROT90, "Capcom",           "Legendary Wings (US set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, lwings2,   lwings,   lwings,    lwings,   lwings_state, empty_init,     ROT90, "Capcom",           "Legendary Wings (US set 2)", MACHINE_SUPPORTS_SAVE )

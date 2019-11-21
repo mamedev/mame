@@ -15,8 +15,7 @@
 
 #include "debugvw.h"
 
-#include "softfloat/mamesf.h"
-#include "softfloat/softfloat.h"
+#include "softfloat3/source/include/softfloat.h"
 
 
 //**************************************************************************
@@ -28,11 +27,11 @@ class debug_view_memory_source : public debug_view_source
 {
 	friend class debug_view_memory;
 
-	debug_view_memory_source(const char *name, address_space &space);
-	debug_view_memory_source(const char *name, memory_region &region);
-	debug_view_memory_source(const char *name, void *base, int element_size, int num_elements);
-
 public:
+	debug_view_memory_source(std::string &&name, address_space &space);
+	debug_view_memory_source(std::string &&name, memory_region &region);
+	debug_view_memory_source(std::string &&name, void *base, int element_size, int num_elements);
+
 	address_space *space() const { return m_space; }
 
 private:
@@ -101,7 +100,7 @@ private:
 	// memory access
 	bool read(u8 size, offs_t offs, u64 &data);
 	void write(u8 size, offs_t offs, u64 data);
-	bool read(u8 size, offs_t offs, floatx80 &data);
+	bool read(u8 size, offs_t offs, extFloat80_t &data);
 	bool read_chunk(offs_t address, int chunknum, u64 &chunkdata);
 
 	// internal state

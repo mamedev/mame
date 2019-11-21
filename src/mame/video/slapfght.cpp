@@ -53,15 +53,15 @@ TILE_GET_INFO_MEMBER(slapfght_state::get_fix_tile_info)
 
 VIDEO_START_MEMBER(slapfght_state, perfrman)
 {
-	m_pf1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(slapfght_state::get_pf_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_pf1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(slapfght_state::get_pf_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	m_pf1_tilemap->set_transparent_pen(0);
 }
 
 VIDEO_START_MEMBER(slapfght_state, slapfight)
 {
-	m_pf1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(slapfght_state::get_pf1_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(slapfght_state::get_fix_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_pf1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(slapfght_state::get_pf1_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(slapfght_state::get_fix_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	m_fix_tilemap->set_scrolldy(0, 15);
 	m_pf1_tilemap->set_scrolldy(0, 14);

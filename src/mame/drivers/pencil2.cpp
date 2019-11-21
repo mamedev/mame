@@ -137,7 +137,7 @@ void pencil2_state::mem_map(address_map &map)
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x5fff).nopw();  // stop error log filling up
 	map(0x6000, 0x67ff).mirror(0x1800).ram();
-	//AM_RANGE(0x8000, 0xffff)      // mapped by the cartslot
+	//map(0x8000, 0xffff)      // mapped by the cartslot
 }
 
 void pencil2_state::io_map(address_map &map)
@@ -306,7 +306,7 @@ INPUT_PORTS_END
 void pencil2_state::machine_start()
 {
 	if (m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0xffff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0xffff, read8sm_delegate(*m_cart, FUNC(generic_slot_device::read_rom)));
 }
 
 void pencil2_state::pencil2(machine_config &config)

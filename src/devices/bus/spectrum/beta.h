@@ -5,8 +5,8 @@
     Technology Research Beta Disk interface
 
 *********************************************************************/
-#ifndef MAME_BUS_SPECTRUM_BETAV2_H
-#define MAME_BUS_SPECTRUM_BETAV2_H
+#ifndef MAME_BUS_SPECTRUM_BETA_H
+#define MAME_BUS_SPECTRUM_BETA_H
 
 #include "exp.h"
 #include "softlist.h"
@@ -55,7 +55,7 @@ protected:
 
 	int m_romcs;
 	int m_romlatch;
-//	int m_masterportdisable;
+//  int m_masterportdisable;
 
 	void fetch(offs_t offset);
 };
@@ -95,5 +95,4 @@ DECLARE_DEVICE_TYPE(SPECTRUM_BETAV2, spectrum_betav2_device)
 DECLARE_DEVICE_TYPE(SPECTRUM_BETAV3, spectrum_betav3_device)
 DECLARE_DEVICE_TYPE(SPECTRUM_BETAPLUS, spectrum_betaplus_device)
 
-
-#endif // MAME_BUS_SPECTRUM_BETAV2_H
+#endif // MAME_BUS_SPECTRUM_BETA_H

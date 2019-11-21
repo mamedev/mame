@@ -592,7 +592,7 @@ void triforce_state::triforce_base(machine_config &config)
 	PPC603(config, m_maincpu, 64000000); /* Correct CPU is a PowerPC 750 (what Apple called "G3") with paired-single vector instructions added */
 	m_maincpu->set_addrmap(AS_PROGRAM, &triforce_state::gc_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 
 	/* video hardware */
@@ -908,7 +908,7 @@ ROM_START( tfupdate )
 	TRIFORCE_BIOS
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdt-0011", 0, SHA1(834e261f2752883ceac0220a0305f9b09c3b5a9b) )
+	DISK_IMAGE_READONLY( "gdt-0011", 0, SHA1(fbfd7960ca7070721e25c08ccc428a2e0cf4766f) )
 
 	ROM_REGION( 0x50, "pic", ROMREGION_ERASE)
 	ROM_LOAD("317-0371-jpn.data", 0x00, 0x50, CRC(08434e5e) SHA1(2121999e851f6f62ab845e6de40849d850ac9d1c) )

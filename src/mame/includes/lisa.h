@@ -141,7 +141,7 @@ private:
 	required_device<via6522_device> m_via0;
 	required_device<via6522_device> m_via1;
 	optional_device<applefdc_base_device> m_fdc;
-	required_device<scc8530_t> m_scc;
+	required_device<scc8530_legacy_device> m_scc;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<nvram_device> m_nvram;
 	required_device<ls259_device> m_latch;

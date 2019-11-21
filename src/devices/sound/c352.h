@@ -44,7 +44,8 @@ protected:
 	virtual void rom_bank_updated() override;
 
 private:
-	enum {
+	enum
+	{
 		C352_FLG_BUSY       = 0x8000,   // channel is busy
 		C352_FLG_KEYON      = 0x4000,   // Keyon
 		C352_FLG_KEYOFF     = 0x2000,   // Keyoff
@@ -64,8 +65,8 @@ private:
 		C352_FLG_REVERSE    = 0x0001    // play sample backwards
 	};
 
-	struct c352_voice_t {
-
+	struct c352_voice_t
+	{
 		uint32_t pos;
 		uint32_t counter;
 
@@ -86,8 +87,8 @@ private:
 
 	};
 
-	void fetch_sample(c352_voice_t* v);
-	void ramp_volume(c352_voice_t* v,int ch,uint8_t val);
+	void fetch_sample(c352_voice_t &v);
+	void ramp_volume(c352_voice_t &v, int ch, uint8_t val);
 
 	unsigned short read_reg16(unsigned long address);
 	void write_reg16(unsigned long address, unsigned short val);

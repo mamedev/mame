@@ -30,16 +30,60 @@ public:
 		RII_CPUCON,
 		RII_STATUS,
 		RII_PROD,
-		RII_POST_ID
+		RII_PFS,
+		RII_INTCON,
+		RII_INTSTA,
+		RII_POST_ID,
+		RII_PORTB, RII_PORTC, RII_PORTD, RII_PORTE, RII_PORTF, RII_PORTG, RII_PORTH, RII_PORTI, RII_PORTJ, RII_PORTK,
+		RII_STBCON,
+		RII_PAINTEN, RII_PAINTSTA, RII_PAWAKE,
+		RII_DCRB, RII_DCRC, RII_DCRDE, RII_DCRFG, RII_DCRHI, RII_DCRJK,
+		RII_PBCON, RII_PCCON,
+		RII_UARTCON, RII_UARTSTA,
+		RII_SPICON, RII_SPISTA,
+		RII_TRL0, RII_TRL1, RII_TRL2,
+		RII_TR01CON,
+		RII_TR2CON,
+		RII_TRLIR,
+		RII_SFCR,
+		RII_ADD1, RII_ADD2, RII_ADD3, RII_ADD4,
+		RII_ENV1, RII_ENV2, RII_ENV3, RII_ENV4,
+		RII_MTCON1, RII_MTCON2, RII_MTCON3, RII_MTCON4,
+		RII_MTRL1, RII_MTRL2, RII_MTRL3, RII_MTRL4,
+		RII_SPHDR,
+		RII_SPHTCON,
+		RII_SPHTRL,
+		RII_VOCON
 	};
 
-	// construction/destruction
-	riscii_series_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	// callback configuration
+	auto in_porta_cb() { return m_porta_in_cb.bind(); }
+	auto in_portb_cb() { return m_port_in_cb[0].bind(); }
+	auto out_portb_cb() { return m_port_out_cb[0].bind(); }
+	auto in_portc_cb() { return m_port_in_cb[1].bind(); }
+	auto out_portc_cb() { return m_port_out_cb[1].bind(); }
+	auto in_portd_cb() { return m_port_in_cb[2].bind(); }
+	auto out_portd_cb() { return m_port_out_cb[2].bind(); }
+	auto in_porte_cb() { return m_port_in_cb[3].bind(); }
+	auto out_porte_cb() { return m_port_out_cb[3].bind(); }
+	auto in_portf_cb() { return m_port_in_cb[4].bind(); }
+	auto out_portf_cb() { return m_port_out_cb[4].bind(); }
+	auto in_portg_cb() { return m_port_in_cb[5].bind(); }
+	auto out_portg_cb() { return m_port_out_cb[5].bind(); }
+	auto in_porth_cb() { return m_port_in_cb[6].bind(); }
+	auto out_porth_cb() { return m_port_out_cb[6].bind(); }
+	auto in_porti_cb() { return m_port_in_cb[7].bind(); }
+	auto out_porti_cb() { return m_port_out_cb[7].bind(); }
+	auto in_portj_cb() { return m_port_in_cb[8].bind(); }
+	auto out_portj_cb() { return m_port_out_cb[8].bind(); }
+	auto in_portk_cb() { return m_port_in_cb[9].bind(); }
+	auto out_portk_cb() { return m_port_out_cb[9].bind(); }
 
 protected:
-	riscii_series_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, unsigned prgbits, unsigned bankbits, uint8_t maxbank);
+	riscii_series_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, unsigned addrbits, unsigned pcbits, u32 datastart, unsigned bankbits, u8 maxbank, u8 post_id_mask, address_map_constructor regs);
 
 	// device-level overrides
+	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -47,16 +91,14 @@ protected:
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
-	// device_disasm_interface overrides
-	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
-
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
-private:
+	void core_regs_map(address_map &map);
+
 	// register handlers
 	u8 fsr0_r();
 	void fsr0_w(u8 data);
@@ -90,12 +132,92 @@ private:
 	void prodl_w(u8 data);
 	u8 prodh_r();
 	void prodh_w(u8 data);
+	u8 pfs_r();
+	void pfs_w(u8 data);
+	u8 intcon_r();
+	void intcon_w(u8 data);
+	u8 intsta_r();
+	void intsta_w(u8 data);
 	u8 post_id_r();
 	void post_id_w(u8 data);
+	u8 porta_r();
+	u8 port_r(offs_t offset);
+	void port_w(offs_t offset, u8 data);
+	u8 stbcon_r();
+	void stbcon_w(u8 data);
+	u8 painten_r();
+	void painten_w(u8 data);
+	u8 paintsta_r();
+	void paintsta_w(u8 data);
+	u8 pawake_r();
+	void pawake_w(u8 data);
+	u8 portjk_r(offs_t offset);
+	void portjk_w(offs_t offset, u8 data);
+	u8 dcr_r(offs_t offset);
+	void dcr_w(offs_t offset, u8 data);
+	u8 pcon_r(offs_t offset);
+	void pcon_w(offs_t offset, u8 data);
+	void uarttx_w(u8 data);
+	u8 uartrx_r();
+	u8 uartcon_r();
+	void uartcon_w(u8 data);
+	u8 uartsta_r();
+	void uartsta_w(u8 data);
+	u8 spicon_r();
+	void spicon_w(u8 data);
+	u8 spista_r();
+	void spista_w(u8 data);
+	u8 sprl_r();
+	void sprl_w(u8 data);
+	u8 sprm_r();
+	void sprm_w(u8 data);
+	u8 sprh_r();
+	void sprh_w(u8 data);
+	u8 trl0l_r();
+	void trl0l_w(u8 data);
+	u8 trl0h_r();
+	void trl0h_w(u8 data);
+	u8 trl1_r();
+	void trl1_w(u8 data);
+	u8 trl2_r();
+	void trl2_w(u8 data);
+	u8 tr01con_r();
+	void tr01con_w(u8 data);
+	u8 tr2con_r();
+	void tr2con_w(u8 data);
+	u8 trlir_r();
+	void trlir_w(u8 data);
+	u8 t0cl_r();
+	u8 t0ch_r();
+	u8 tr1c_r();
+	u8 tr2c_r();
+	u8 sfcr_r();
+	void sfcr_w(u8 data);
+	u8 addl_r();
+	void addl_w(u8 data);
+	u8 addm_r();
+	void addm_w(u8 data);
+	u8 addh_r();
+	void addh_w(u8 data);
+	u8 env_sphdr_r();
+	void env_sphdr_w(u8 data);
+	u8 mtcon_sphtcon_r();
+	void mtcon_sphtcon_w(u8 data);
+	u8 mtrl_sphtrl_r();
+	void mtrl_sphtrl_w(u8 data);
+	u8 vocon_r();
+	void vocon_w(u8 data);
+
+private:
+	// debugging helpers
+	void debug_set_pc(u32 pc);
 
 	// memory helpers
+	u16 fetch_program_word();
 	u16 get_banked_address(u8 reg);
 	u32 tabptr_offset(int offset) const;
+	void multi_byte_carry(u16 addr, bool cy);
+	void multi_byte_borrow(u16 addr, bool cy);
 
 	// execution
 	void execute_move(u8 dstreg, u8 srcreg);
@@ -141,8 +263,13 @@ private:
 	void execute_cycle1(u16 opcode);
 	void execute_tbrd(u32 ptr);
 
+	// interrupt helpers
+	bool interrupt_active() const;
+	u32 vector_interrupt() const;
+
 	enum exec_state : u8 {
 		EXEC_CYCLE1,
+		EXEC_ADCPCM, EXEC_SBCPCM,
 		EXEC_TBRD0, EXEC_TBRD1, EXEC_TBRD2, EXEC_TBRDA,
 		EXEC_NOJMP,
 		EXEC_L0JMP, EXEC_L1JMP, EXEC_L2JMP, EXEC_L3JMP,
@@ -155,8 +282,6 @@ private:
 		EXEC_LCCALL, EXEC_LDCALL, EXEC_LECALL, EXEC_LFCALL
 	};
 
-	void regs_map(address_map &map);
-
 	// address spaces
 	address_space_config m_program_config;
 	address_space_config m_regs_config;
@@ -164,10 +289,18 @@ private:
 	address_space *m_regs;
 	memory_access_cache<1, -1, ENDIANNESS_LITTLE> *m_cache;
 
+	// device callbacks
+	devcb_read8 m_porta_in_cb;
+	devcb_read8 m_port_in_cb[10];
+	devcb_write8 m_port_out_cb[10];
+
 	// model-specific parameters
-	const unsigned m_prgbits;
-	const uint8_t m_bankmask;
-	const uint8_t m_maxbank;
+	const u32 m_pcmask;
+	const u32 m_datastart;
+	const u32 m_tbptmask;
+	const u8 m_bankmask;
+	const u8 m_maxbank;
+	const u8 m_post_id_mask;
 
 	// internal state
 	u32 m_pc;
@@ -177,10 +310,50 @@ private:
 	u8 m_bsr[2];
 	u32 m_tabptr;
 	u8 m_stkptr;
+	std::unique_ptr<u8[]> m_pchstack;
 	u8 m_cpucon;
 	u8 m_status;
 	u16 m_prod;
+	u8 m_pfs;
+	u8 m_intcon;
+	u8 m_intsta;
 	u8 m_post_id;
+
+	// port state
+	u8 m_port_data[10];
+	u8 m_port_dcr[6];
+	u8 m_port_control[2];
+	u8 m_stbcon;
+	u8 m_painten;
+	u8 m_paintsta;
+	u8 m_pawake;
+
+	// UART state
+	u8 m_uartcon;
+	u8 m_uartsta;
+
+	// SPI state
+	u8 m_spicon;
+	u8 m_spista;
+
+	// timer state
+	u16 m_trl0;
+	u8 m_trl1;
+	u8 m_trl2;
+	u8 m_tr01con;
+	u8 m_tr2con;
+	u8 m_trlir;
+	u8 m_sfcr;
+
+	// synthesizer state
+	u32 m_add[4];
+	u8 m_env[4];
+	u8 m_mtcon[4];
+	u8 m_mtrl[4];
+	u8 m_sphdr;
+	u8 m_sphtcon;
+	u8 m_sphtrl;
+	u8 m_vocon;
 
 	// execution sequencing
 	s32 m_icount;
@@ -189,6 +362,20 @@ private:
 	u8 m_curreg;
 };
 
-DECLARE_DEVICE_TYPE(RISCII, riscii_series_device)
+class epg3231_device : public riscii_series_device
+{
+public:
+	// construction/destruction
+	epg3231_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	// device_disasm_interface overrides
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+
+private:
+	void regs_map(address_map &map);
+};
+
+DECLARE_DEVICE_TYPE(EPG3231, epg3231_device)
 
 #endif // MAME_CPU_RII_RISCII_H

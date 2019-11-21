@@ -625,7 +625,7 @@ void pc1512_state::pc1512_io(address_map &map)
 	// schematic calls for a stock 8086 and the I/O and data lines are multiplexed onto the same bus,
 	// plus address lines 20-10 are towards the middle of a standard ISA slot. If it turns out that this
 	// is not in fact accurate to hardware, please add this back in.
-	// ADDRESS_MAP_GLOBAL_MASK(0x3ff)
+	// map.global_mask(0x3ff);
 	map(0x000, 0x00f).rw(m_dmac, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
 	map(0x020, 0x021).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x040, 0x043).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
@@ -1174,7 +1174,7 @@ void pc1512_state::pc1512(machine_config &config)
 	m_kb->clock_wr_callback().set(FUNC(pc1512_state::kbclk_w));
 	m_kb->data_wr_callback().set(FUNC(pc1512_state::kbdata_w));
 
-	pc1512_mouse_port_device &mouse(PC1512_MOUSE_PORT(config, PC1512_MOUSE_PORT_TAG, pc1512_mouse_port_devices, "mouse"));
+	pc1512_mouse_port_device &mouse(PC1512_MOUSE_PORT(config, "mous", pc1512_mouse_port_devices, "mouse"));
 	mouse.x_wr_callback().set(FUNC(pc1512_base_state::mouse_x_w));
 	mouse.y_wr_callback().set(FUNC(pc1512_base_state::mouse_y_w));
 	mouse.m1_wr_callback().set(m_kb, FUNC(pc1512_keyboard_device::m1_w));
@@ -1309,7 +1309,7 @@ void pc1640_state::pc1640(machine_config &config)
 	m_kb->clock_wr_callback().set(FUNC(pc1512_base_state::kbclk_w));
 	m_kb->data_wr_callback().set(FUNC(pc1512_base_state::kbdata_w));
 
-	pc1512_mouse_port_device &mouse(PC1512_MOUSE_PORT(config, PC1512_MOUSE_PORT_TAG, pc1512_mouse_port_devices, "mouse"));
+	pc1512_mouse_port_device &mouse(PC1512_MOUSE_PORT(config, "mous", pc1512_mouse_port_devices, "mouse"));
 	mouse.x_wr_callback().set(FUNC(pc1512_base_state::mouse_x_w));
 	mouse.y_wr_callback().set(FUNC(pc1512_base_state::mouse_y_w));
 	mouse.m1_wr_callback().set(m_kb, FUNC(pc1512_keyboard_device::m1_w));

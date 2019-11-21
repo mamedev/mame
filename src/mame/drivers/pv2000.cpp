@@ -186,8 +186,8 @@ void pv2000_state::pv2000_map(address_map &map)
 	map(0x4000, 0x4001).rw("tms9928a", FUNC(tms9928a_device::read), FUNC(tms9928a_device::write));
 
 	map(0x7000, 0x7fff).ram();
-	//AM_RANGE(0x8000, 0xbfff) ext ram?
-	//AM_RANGE(0xc000, 0xffff)      // mapped by the cartslot
+	//map(0x8000, 0xbfff) ext ram?
+	//map(0xc000, 0xffff)      // mapped by the cartslot
 }
 
 
@@ -354,7 +354,7 @@ WRITE_LINE_MEMBER( pv2000_state::pv2000_vdp_interrupt )
 void pv2000_state::machine_start()
 {
 	if (m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000, 0xffff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000, 0xffff, read8sm_delegate(*m_cart, FUNC(generic_slot_device::read_rom)));
 }
 
 void pv2000_state::machine_reset()
@@ -408,7 +408,7 @@ void pv2000_state::pv2000(machine_config &config)
 	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* cartridge */
-	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "pv2000_cart", "bin,rom,col").set_device_load(FUNC(pv2000_state::cart_load), this);
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "pv2000_cart", "bin,rom,col").set_device_load(FUNC(pv2000_state::cart_load));
 
 	/* Software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("pv2000");

@@ -348,7 +348,7 @@ void multi8_state::mem_map(address_map &map)
 
 void multi8_state::io_map(address_map &map)
 {
-//  ADDRESS_MAP_UNMAP_HIGH
+//  map.unmap_value_high();
 	map.global_mask(0xff);
 	map(0x00, 0x00).r(FUNC(multi8_state::key_input_r)); //keyboard
 	map(0x01, 0x01).r(FUNC(multi8_state::key_status_r)); //keyboard
@@ -363,8 +363,8 @@ void multi8_state::io_map(address_map &map)
 	map(0x2c, 0x2d).rw("pic", FUNC(pic8259_device::read), FUNC(pic8259_device::write)); //i8259
 	map(0x30, 0x37).rw(FUNC(multi8_state::pal_r), FUNC(multi8_state::pal_w));
 	map(0x40, 0x41).rw(FUNC(multi8_state::kanji_r), FUNC(multi8_state::kanji_w)); //kanji regs
-//  AM_RANGE(0x70, 0x74) //upd765a fdc
-//  AM_RANGE(0x78, 0x78) //memory banking
+//  map(0x70, 0x74) //upd765a fdc
+//  map(0x78, 0x78) //memory banking
 }
 
 /* Input ports */
@@ -646,7 +646,7 @@ void multi8_state::multi8(machine_config &config)
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(multi8_state::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(multi8_state::crtc_update_row));
 
 	I8255(config, m_ppi);
 	m_ppi->in_pa_callback().set(FUNC(multi8_state::porta_r));

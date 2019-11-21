@@ -749,7 +749,7 @@ void nycaptor_state::nycaptor(machine_config &config)
 
 	TAITO68705_MCU(config, m_bmcu, 2000000);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);  /* 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs */
+	config.set_maximum_quantum(attotime::from_hz(6000));  /* 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs */
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -821,7 +821,7 @@ void nycaptor_state::cyclshtg(machine_config &config)
 	TAITO68705_MCU(config, m_bmcu, 2000000);
 #endif
 
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
@@ -888,7 +888,7 @@ void nycaptor_state::bronx(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nycaptor_state::sound_map);
 	m_audiocpu->set_periodic_int(FUNC(nycaptor_state::irq0_line_hold), attotime::from_hz(2*60));
 
-	config.m_minimum_quantum = attotime::from_hz(120);
+	config.set_maximum_quantum(attotime::from_hz(120));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);

@@ -71,12 +71,12 @@ TILE_GET_INFO_MEMBER(battlex_state::get_dodgeman_bg_tile_info)
 
 void battlex_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(battlex_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(battlex_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 }
 
 void battlex_state::video_start_dodgeman()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(battlex_state::get_dodgeman_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(battlex_state::get_dodgeman_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 }
 
 void battlex_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )

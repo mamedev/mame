@@ -239,7 +239,7 @@ void trackfld_state::main_map(address_map &map)
 	map(0x1281, 0x1281).mirror(0x007c).portr("IN0");
 	map(0x1282, 0x1282).mirror(0x007c).portr("IN1");
 	map(0x1283, 0x1283).mirror(0x007c).portr("DSW1");
-	/* not used according to schems: AM_RANGE(0x1300, 0x1300) AM_MIRROR(0x007f) AM_READ_PORT("DSW3") */
+	/* not used according to schems: map(0x1300, 0x1300).mirror(0x007f).portr("DSW3"); */
 	map(0x1800, 0x183f).ram().share(m_spriteram2);
 	map(0x1840, 0x185f).ram().share(m_scroll);
 	map(0x1860, 0x1bff).ram();
@@ -283,7 +283,7 @@ void trackfld_state::yieartf_map(address_map &map)
 	map(0x0003, 0x0003).w(m_vlm, FUNC(vlm5030_device::data_w));
 	map(0x1000, 0x1000).mirror(0x007f).w("watchdog", FUNC(watchdog_timer_device::reset_w));       /* AFE */
 	map(0x1080, 0x1087).mirror(0x0078).w(m_mainlatch, FUNC(ls259_device::write_d0));
-//  AM_RANGE(0x1100, 0x1100) AM_MIRROR(0x007f) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)     /* 32 */
+//  map(0x1100, 0x1100).mirror(0x007f).w("soundlatch", FUNC(generic_latch_8_device::write));     /* 32 */
 	map(0x1200, 0x1200).mirror(0x007f).portr("DSW2");
 	map(0x1280, 0x1280).mirror(0x007c).portr("SYSTEM");
 	map(0x1281, 0x1281).mirror(0x007c).portr("IN0");
@@ -344,7 +344,7 @@ void trackfld_state::mastkin_map(address_map &map)
 	map(0x1200, 0x1200).portr("DSW2");
 	map(0x1280, 0x1280).portr("SYSTEM");
 	map(0x1281, 0x1281).portr("IN0");
-//  AM_RANGE(0x1282, 0x1282) AM_READ_PORT("IN1") /* unused */
+//  map(0x1282, 0x1282).portr("IN1"); /* unused */
 	map(0x1283, 0x1283).portr("DSW1");
 	map(0x1800, 0x183f).ram().share(m_spriteram2);
 	map(0x1840, 0x185f).ram().share(m_scroll);
@@ -1658,7 +1658,7 @@ void trackfld_state::init_atlantol()
 
 	downcast<konami1_device &>(*m_maincpu).set_encryption_boundary(0x6000);
 
-	space.install_write_handler(0x0800, 0x0800, write8_delegate(FUNC(trackfld_state::atlantol_gfxbank_w),this));
+	space.install_write_handler(0x0800, 0x0800, write8_delegate(*this, FUNC(trackfld_state::atlantol_gfxbank_w)));
 	space.nop_write(0x1000, 0x1000);
 
 	/* unmapped areas read as ROM */

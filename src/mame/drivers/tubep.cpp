@@ -261,7 +261,7 @@ void tubep_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 		rjammer_scanline_callback(ptr, param);
 		break;
 	default:
-		assert_always(false, "Unknown id in tubep_state::device_timer");
+		throw emu_fatalerror("Unknown id in tubep_state::device_timer");
 	}
 }
 
@@ -838,7 +838,7 @@ void tubep_state::tubep(machine_config &config)
 	NSC8105(config, m_mcu, 6000000);        /* 6 MHz Xtal - divided internally ??? */
 	m_mcu->set_addrmap(AS_PROGRAM, &tubep_state::nsc_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	ls259_device &mainlatch(LS259(config, "mainlatch"));
 	mainlatch.q_out_cb<0>().set(FUNC(tubep_state::coin1_counter_w));

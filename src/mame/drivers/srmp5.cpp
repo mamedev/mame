@@ -401,8 +401,8 @@ void srmp5_state::st0016_mem(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("soundbank");
-	//AM_RANGE(0xe900, 0xe9ff) // sound - internal
-	//AM_RANGE(0xec00, 0xec1f) AM_READ(st0016_character_ram_r) AM_WRITE(st0016_character_ram_w)
+	//map(0xe900, 0xe9ff) // sound - internal
+	//map(0xec00, 0xec1f).rw(FUNC(srmp5_state::st0016_character_ram_r), FUNC(srmp5_state::st0016_character_ram_w));
 	map(0xf000, 0xffff).ram();
 }
 
@@ -432,13 +432,13 @@ WRITE8_MEMBER(srmp5_state::st0016_rom_bank_w)
 void srmp5_state::st0016_io(address_map &map)
 {
 	map.global_mask(0xff);
-	//AM_RANGE(0x00, 0xbf) AM_READ(st0016_vregs_r) AM_WRITE(st0016_vregs_w)
+	//map(0x00, 0xbf).rw(FUNC(srmp5_state::st0016_vregs_r), FUNC(srmp5_state::st0016_vregs_w));
 	map(0xc0, 0xc0).r(FUNC(srmp5_state::cmd1_r));
 	map(0xc1, 0xc1).r(FUNC(srmp5_state::cmd2_r));
 	map(0xc2, 0xc2).r(FUNC(srmp5_state::cmd_stat8_r));
 	map(0xe1, 0xe1).w(FUNC(srmp5_state::st0016_rom_bank_w));
 	map(0xe7, 0xe7).w(FUNC(srmp5_state::st0016_rom_bank_w));
-	//AM_RANGE(0xf0, 0xf0) AM_READ(st0016_dma_r)
+	//map(0xf0, 0xf0).r(FUNC(srmp5_state::st0016_dma_r));
 }
 
 
@@ -579,7 +579,7 @@ void srmp5_state::srmp5(machine_config &config)
 	m_soundcpu->set_addrmap(AS_IO, &srmp5_state::st0016_io);
 	m_soundcpu->set_vblank_int("screen", FUNC(srmp5_state::irq0_line_hold));
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

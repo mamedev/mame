@@ -17,7 +17,7 @@
 #pragma once
 
 #include "peribox.h"
-#include "machine/ataintf.h"
+#include "bus/ata/ataintf.h"
 #include "machine/ram.h"
 #include "machine/rtc65271.h"
 

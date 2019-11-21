@@ -163,7 +163,7 @@ void bloodbro_state::common_map(address_map &map)
 	map(0x08e800, 0x08f7ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x08f800, 0x08ffff).ram();
 	map(0x0a0000, 0x0a000d).rw(m_seibu_sound, FUNC(seibu_sound_device::main_r), FUNC(seibu_sound_device::main_w)).umask16(0x00ff);
-//  AM_RANGE(0x0c0000, 0x0c007f) AM_RAM AM_SHARE("scroll")
+//  map(0x0c0000, 0x0c007f).ram().share("scroll");
 	map(0x0c0080, 0x0c0081).nopw(); // ??? IRQ Ack VBL?
 	map(0x0c00c0, 0x0c00c1).nopw(); // ??? watchdog?
 	map(0x0c0100, 0x0c0101).nopw(); // ??? written once
@@ -576,7 +576,7 @@ void bloodbro_state::weststry(machine_config &config)
 
 	m_audiocpu->set_clock(XTAL(20'000'000)/4); /* 5MHz - verified on PCB */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &bloodbro_state::weststry_sound_map);
-	m_audiocpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate());
+	m_audiocpu->remove_irq_acknowledge_callback();
 
 	m_gfxdecode->set_info(gfx_weststry);
 	m_palette->set_format(palette_device::xBGR_444, 1024);

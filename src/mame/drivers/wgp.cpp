@@ -402,6 +402,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
 
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/adc0808.h"
 #include "sound/2610intf.h"
 #include "screen.h"
 #include "speaker.h"
@@ -442,15 +443,12 @@ void wgp_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 	case TIMER_INTERRUPT4:
 		m_maincpu->set_input_line(4, HOLD_LINE);
 		break;
-	case TIMER_INTERRUPT6:
-		m_maincpu->set_input_line(6, HOLD_LINE);
-		break;
 	/* 68000 B */
 	case TIMER_CPUB_INTERRUPT6:
 		m_subcpu->set_input_line(6, HOLD_LINE); /* assumes Z80 sandwiched between the 68Ks */
 		break;
 	default:
-		assert_always(false, "Unknown id in wgp_state::device_timer");
+		throw emu_fatalerror("Unknown id in wgp_state::device_timer");
 	}
 }
 
@@ -513,79 +511,63 @@ void wgp_state::rotate_port_w(offs_t offset, u16 data)
 	}
 }
 
+u8 wgp_state::accel_r()
+{
+	if (m_fake.read_safe(0) & 0x40)    // pressing accel
+		return 0xff;
+	else
+		return 0x00;
+}
 
-#define STEER_PORT_TAG   "STEER"
-#define UNKNOWN_PORT_TAG "UNKNOWN"
-#define FAKE_PORT_TAG    "FAKE"
-
-u16 wgp_state::adinput_r(offs_t offset)
+u8 wgp_state::steer_r()
 {
 	int steer = 0x40;
 	int fake = m_fake.read_safe(0);
 
-	if (!(fake & 0x10)) /* Analogue steer (the real control method) */
+	if (!(fake & 0x10)) // Analogue steer (the real control method)
 	{
-		/* Reduce span to 0x80 */
+		// Reduce span to 0x80
 		steer = (m_steer.read_safe(0) * 0x80) / 0x100;
 	}
-	else    /* Digital steer */
+	else    // Digital steer
 	{
-		if (fake & 0x08)    /* pressing down */
+		if (fake & 0x08)    // pressing down
 			steer = 0x20;
 
-		if (fake & 0x04)    /* pressing up */
+		if (fake & 0x04)    // pressing up
 			steer = 0x60;
 
-		if (fake & 0x02)    /* pressing right */
+		if (fake & 0x02)    // pressing right
 			steer = 0x00;
 
-		if (fake & 0x01)    /* pressing left */
+		if (fake & 0x01)    // pressing left
 			steer = 0x80;
 	}
 
-	switch (offset)
-	{
-		case 0x00:
-		{
-			if (fake & 0x40)    /* pressing accel */
-				return 0xff;
-			else
-				return 0x00;
-		}
-
-		case 0x01:
-			return steer;
-
-		case 0x02:
-			return 0xc0;    /* steer offset, correct acc. to service mode */
-
-		case 0x03:
-			return 0xbf;    /* accel offset, correct acc. to service mode */
-
-		case 0x04:
-		{
-			if (fake & 0x80)    /* pressing brake */
-				return 0xcf;
-			else
-				return 0xff;
-		}
-
-		case 0x05:
-			return m_unknown.read_safe(0);   /* unknown */
-	}
-
-logerror("CPU #0 PC %06x: warning - read unmapped a/d input offset %06x\n",m_maincpu->pc(),offset);
-
-	return 0xff;
+	return steer;
 }
 
-void wgp_state::adinput_w(u16 data)
+u8 wgp_state::steer_offset_r()
 {
-	/* Each write invites a new interrupt as soon as the
-	   hardware has got the next a/d conversion ready. We set a token
-	   delay of 10000 cycles although our inputs are always ready. */
+	return 0xc0;    // steer offset, correct acc. to service mode
+}
 
-	m_int6_timer->adjust(m_maincpu->cycles_to_attotime(10000));
+u8 wgp_state::accel_offset_r()
+{
+	return 0xbf;    // accel offset, correct acc. to service mode
+}
+
+u8 wgp_state::brake_r()
+{
+	if (m_fake.read_safe(0) & 0x80)    // pressing brake
+		return 0xcf;
+	else
+		return 0xff;
+}
+
+u8 wgp_state::unknown_r()
+{
+	return m_unknown.read_safe(0);   // unknown
 }
 
 void wgp_state::coins_w(u8 data)
@@ -617,7 +599,7 @@ void wgp_state::main_map(address_map &map)
 	map(0x140000, 0x143fff).ram().share("sharedram");
 	map(0x180000, 0x18000f).rw(m_tc0220ioc, FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0xff00);
 	map(0x1c0000, 0x1c0001).w(FUNC(wgp_state::cpua_ctrl_w));
-	map(0x200000, 0x20000f).rw(FUNC(wgp_state::adinput_r), FUNC(wgp_state::adinput_w));
+	map(0x200000, 0x20000f).rw("adc", FUNC(adc0809_device::data_r), FUNC(adc0809_device::address_offset_start_w)).umask16(0x00ff);
 	map(0x300000, 0x30ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));            /* tilemaps */
 	map(0x320000, 0x32000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
 	map(0x400000, 0x40bfff).ram().share("spritemap");   /* sprite tilemaps */
@@ -757,14 +739,14 @@ static INPUT_PORTS_START( wgp_no_joy_generic )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
 
-	PORT_START(STEER_PORT_TAG)
+	PORT_START("STEER")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(20) PORT_KEYDELTA(25) PORT_REVERSE PORT_PLAYER(1)
 
-	PORT_START(UNKNOWN_PORT_TAG)
+	PORT_START("UNKNOWN")
 	PORT_BIT( 0xff, 0x00, IPT_AD_STICK_Y ) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_PLAYER(2)
 
 	/* fake inputs, allowing digital steer etc. */
-	PORT_START(FAKE_PORT_TAG)
+	PORT_START("FAKE")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_4WAY PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_4WAY PORT_PLAYER(1)
@@ -869,7 +851,6 @@ void wgp_state::machine_start()
 {
 	m_z80bank->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
 
-	m_int6_timer = timer_alloc(TIMER_INTERRUPT6);
 	m_cpub_int6_timer = timer_alloc(TIMER_CPUB_INTERRUPT6);
 
 	save_item(NAME(m_cpua_ctrl));
@@ -890,7 +871,7 @@ void wgp_state::wgp(machine_config &config)
 	m_subcpu->set_addrmap(AS_PROGRAM, &wgp_state::cpu2_map);
 	m_subcpu->set_vblank_int("screen", FUNC(wgp_state::cpub_interrupt));
 
-	config.m_minimum_quantum = attotime::from_hz(30000);
+	config.set_maximum_quantum(attotime::from_hz(30000));
 
 	TC0220IOC(config, m_tc0220ioc, 0);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
@@ -899,6 +880,15 @@ void wgp_state::wgp(machine_config &config)
 	m_tc0220ioc->read_3_callback().set_ioport("IN1");
 	m_tc0220ioc->write_4_callback().set(FUNC(wgp_state::coins_w));
 	m_tc0220ioc->read_7_callback().set_ioport("IN2");
+
+	adc0809_device &adc(ADC0809(config, "adc", 16_MHz_XTAL / 32)); // TODO: verify divider
+	adc.eoc_ff_callback().set_inputline(m_maincpu, M68K_IRQ_6);
+	adc.in_callback<0>().set(FUNC(wgp_state::accel_r));
+	adc.in_callback<1>().set(FUNC(wgp_state::steer_r));
+	adc.in_callback<2>().set(FUNC(wgp_state::steer_offset_r));
+	adc.in_callback<3>().set(FUNC(wgp_state::accel_offset_r));
+	adc.in_callback<4>().set(FUNC(wgp_state::brake_r));
+	adc.in_callback<5>().set(FUNC(wgp_state::unknown_r));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -935,7 +925,7 @@ void wgp_state::wgp2(machine_config &config)
 {
 	wgp(config);
 
-	config.m_minimum_quantum = attotime::from_hz(12000);
+	config.set_maximum_quantum(attotime::from_hz(12000));
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(wgp_state, wgp2)

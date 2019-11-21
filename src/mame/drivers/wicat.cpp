@@ -551,9 +551,9 @@ READ8_MEMBER(wicat_state::video_r)
 	switch(offset)
 	{
 	case 0x00:
-		return m_crtc->read(space,0);
+		return m_crtc->read(0);
 	case 0x02:
-		return m_crtc->read(space,1);
+		return m_crtc->read(1);
 	default:
 		return 0xff;
 	}
@@ -564,10 +564,10 @@ WRITE8_MEMBER(wicat_state::video_w)
 	switch(offset)
 	{
 	case 0x00:
-		m_crtc->write(space,0,data);
+		m_crtc->write(0,data);
 		break;
 	case 0x02:
-		m_crtc->write(space,1,data);
+		m_crtc->write(1,data);
 		break;
 	}
 }
@@ -832,7 +832,7 @@ void wicat_state::wicat(machine_config &config)
 
 	I8275(config, m_crtc, 19.6608_MHz_XTAL/10);
 	m_crtc->set_character_width(10);
-	m_crtc->set_display_callback(FUNC(wicat_state::wicat_display_pixels), this);
+	m_crtc->set_display_callback(FUNC(wicat_state::wicat_display_pixels));
 	m_crtc->drq_wr_callback().set(m_videodma, FUNC(am9517a_device::dreq0_w));
 	m_crtc->vrtc_wr_callback().set(FUNC(wicat_state::crtc_irq_w));
 	m_crtc->set_screen("screen");

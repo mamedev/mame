@@ -34,7 +34,7 @@ template class device_finder<device_amiga_keyboard_interface, true>;
 
 amiga_keyboard_bus_device::amiga_keyboard_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, AMIGA_KEYBOARD_INTERFACE, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_amiga_keyboard_interface>(mconfig, *this),
 	m_kbd(nullptr),
 	m_kclk_handler(*this), m_kdat_handler(*this), m_krst_handler(*this)
 {
@@ -55,7 +55,7 @@ amiga_keyboard_bus_device::~amiga_keyboard_bus_device()
 void amiga_keyboard_bus_device::device_start()
 {
 	// get connected keyboard
-	m_kbd = dynamic_cast<device_amiga_keyboard_interface *>(get_card_device());
+	m_kbd = get_card_device();
 
 	// resolve callbacks
 	m_kclk_handler.resolve_safe();
@@ -91,7 +91,7 @@ WRITE_LINE_MEMBER( amiga_keyboard_bus_device::kdat_in_w )
 //-------------------------------------------------
 
 device_amiga_keyboard_interface::device_amiga_keyboard_interface(const machine_config &mconfig, device_t &device) :
-	device_slot_card_interface(mconfig, device)
+	device_interface(device, "amigakbd")
 {
 	m_host = dynamic_cast<amiga_keyboard_bus_device *>(device.owner());
 }

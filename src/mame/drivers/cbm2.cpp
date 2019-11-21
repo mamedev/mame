@@ -37,7 +37,6 @@
 #include "video/mc6845.h"
 #include "video/mos6566.h"
 
-#define M6509_TAG       "u13"
 #define PLA1_TAG        "u78"
 #define PLA2_TAG        "u88"
 #define MOS6567_TAG     "u23"
@@ -67,7 +66,7 @@ class cbm2_state : public driver_device
 public:
 	cbm2_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_maincpu(*this, M6509_TAG),
+		m_maincpu(*this, "u13"),
 		m_pla1(*this, PLA1_TAG),
 		m_crtc(*this, MC68B45_TAG),
 		m_palette(*this, "palette"),
@@ -2249,15 +2248,14 @@ void p500_state::p500_ntsc(machine_config &config)
 
 	// basic hardware
 	M6509(config, m_maincpu, XTAL(14'318'181)/14);
-	m_maincpu->disable_cache(); // address decoding is 100% dynamic, no RAM/ROM banks
 	m_maincpu->set_addrmap(AS_PROGRAM, &p500_state::p500_mem);
-	config.m_perfect_cpu_quantum = subtag(M6509_TAG);
+	config.set_perfect_quantum(m_maincpu);
 
 	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, m6509_device::IRQ_LINE);
 
 	// video hardware
 	mos6567_device &mos6567(MOS6567(config, MOS6567_TAG, XTAL(14'318'181)/14));
-	mos6567.set_cpu(M6509_TAG);
+	mos6567.set_cpu(m_maincpu);
 	mos6567.irq_callback().set("mainirq", FUNC(input_merger_device::in_w<0>));
 	mos6567.set_screen(SCREEN_TAG);
 	mos6567.set_addrmap(0, &p500_state::vic_videoram_map);
@@ -2361,16 +2359,14 @@ void p500_state::p500_ntsc(machine_config &config)
 	rs232.dsr_handler().set(m_acia, FUNC(mos6551_device::write_dsr));
 	rs232.cts_handler().set(m_acia, FUNC(mos6551_device::write_cts));
 
-	QUICKLOAD(config, "quickload", "p00,prg", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(p500_state::quickload_p500), this);
+	QUICKLOAD(config, "quickload", "p00,prg", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(p500_state::quickload_p500));
 
 	// internal ram
 	_128k(config);
 
 	// software list
-	SOFTWARE_LIST(config, "cart_list").set_original("cbm2_cart");
-	SOFTWARE_LIST(config, "flop_list").set_original("p500_flop");
-	subdevice<software_list_device>("cart_list")->set_filter("NTSC");
-	subdevice<software_list_device>("flop_list")->set_filter("NTSC");
+	SOFTWARE_LIST(config, "cart_list").set_original("cbm2_cart").set_filter("NTSC");
+	SOFTWARE_LIST(config, "flop_list").set_original("p500_flop").set_filter("NTSC");
 }
 
 
@@ -2385,15 +2381,14 @@ void p500_state::p500_pal(machine_config &config)
 
 	// basic hardware
 	M6509(config, m_maincpu, XTAL(17'734'472)/18);
-	m_maincpu->disable_cache(); // address decoding is 100% dynamic, no RAM/ROM banks
 	m_maincpu->set_addrmap(AS_PROGRAM, &p500_state::p500_mem);
-	config.m_perfect_cpu_quantum = subtag(M6509_TAG);
+	config.set_perfect_quantum(m_maincpu);
 
 	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, m6509_device::IRQ_LINE);
 
 	// video hardware
 	mos6569_device &mos6569(MOS6569(config, MOS6569_TAG, XTAL(17'734'472)/18));
-	mos6569.set_cpu(M6509_TAG);
+	mos6569.set_cpu(m_maincpu);
 	mos6569.irq_callback().set("mainirq", FUNC(input_merger_device::in_w<0>));
 	mos6569.set_screen(SCREEN_TAG);
 	mos6569.set_addrmap(0, &p500_state::vic_videoram_map);
@@ -2494,16 +2489,14 @@ void p500_state::p500_pal(machine_config &config)
 	rs232.dsr_handler().set(m_acia, FUNC(mos6551_device::write_dsr));
 	rs232.cts_handler().set(m_acia, FUNC(mos6551_device::write_cts));
 
-	QUICKLOAD(config, "quickload", "p00,prg", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(p500_state::quickload_p500), this);
+	QUICKLOAD(config, "quickload", "p00,prg", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(p500_state::quickload_p500));
 
 	// internal ram
 	_128k(config);
 
 	// software list
-	SOFTWARE_LIST(config, "cart_list").set_original("cbm2_cart");
-	SOFTWARE_LIST(config, "flop_list").set_original("p500_flop");
-	subdevice<software_list_device>("cart_list")->set_filter("PAL");
-	subdevice<software_list_device>("flop_list")->set_filter("PAL");
+	SOFTWARE_LIST(config, "cart_list").set_original("cbm2_cart").set_filter("PAL");
+	SOFTWARE_LIST(config, "flop_list").set_original("p500_flop").set_filter("PAL");
 }
 
 
@@ -2518,9 +2511,8 @@ void cbm2_state::cbm2lp_ntsc(machine_config &config)
 
 	// basic hardware
 	M6509(config, m_maincpu, XTAL(18'000'000)/9);
-	m_maincpu->disable_cache(); // address decoding is 100% dynamic, no RAM/ROM banks
 	m_maincpu->set_addrmap(AS_PROGRAM, &cbm2_state::cbm2_mem);
-	config.m_perfect_cpu_quantum = subtag(M6509_TAG);
+	config.set_perfect_quantum(m_maincpu);
 
 	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, m6509_device::IRQ_LINE);
 
@@ -2539,7 +2531,7 @@ void cbm2_state::cbm2lp_ntsc(machine_config &config)
 	m_crtc->set_screen(SCREEN_TAG);
 	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(9);
-	m_crtc->set_update_row_callback(FUNC(cbm2_state::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(cbm2_state::crtc_update_row));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -2626,13 +2618,11 @@ void cbm2_state::cbm2lp_ntsc(machine_config &config)
 	rs232.dsr_handler().set(m_acia, FUNC(mos6551_device::write_dsr));
 	rs232.cts_handler().set(m_acia, FUNC(mos6551_device::write_cts));
 
-	QUICKLOAD(config, "quickload", "p00,prg,t64", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(cbm2_state::quickload_cbmb), this);
+	QUICKLOAD(config, "quickload", "p00,prg,t64", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(cbm2_state::quickload_cbmb));
 
 	// software list
-	SOFTWARE_LIST(config, "cart_list").set_original("cbm2_cart");
-	SOFTWARE_LIST(config, "flop_list").set_original("cbm2_flop");
-	subdevice<software_list_device>("cart_list")->set_filter("NTSC");
-	subdevice<software_list_device>("flop_list")->set_filter("NTSC");
+	SOFTWARE_LIST(config, "cart_list").set_original("cbm2_cart").set_filter("NTSC");
+	SOFTWARE_LIST(config, "flop_list").set_original("cbm2_flop").set_filter("NTSC");
 }
 
 

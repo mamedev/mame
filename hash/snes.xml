@@ -2297,7 +2297,7 @@ Beyond that last category are the roms waiting to be classified.
 			<feature name="u5" value="U5 CIC(F411)" />
 			<feature name="battery" value="none" />
 			<feature name="cart_model" value="unknown" /> <!-- similar to SHVC-006 -->
-			<feature name="slot" value="lorom_sfx" />
+			<feature name="slot" value="lorom_gsu1" />
 			<dataarea name="rom" size="1048576">
 				<rom name="921222 pm2355 sns fo ver. 02 f6b9.u1" size="1048576" crc="0bae0941" sha1="1f5355534ccfaf26ae6c8f055f3e4768f9d72a7e" offset="0x000000" />
 			</dataarea>
@@ -2325,7 +2325,7 @@ Beyond that last category are the roms waiting to be classified.
 			<!-- end of epoxy version -->
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
-			<feature name="slot" value="lorom_sfx" />
+			<feature name="slot" value="lorom_gsu1" />
 			<dataarea name="rom" size="1048576">
 				<rom name="sns-fu-0.u1" size="1048576" crc="cd1f04b8" sha1="2ba5f446dcb56d1164e28b337ae7b4833278b6d9" offset="0x000000" />
 			</dataarea>
@@ -2410,7 +2410,7 @@ Beyond that last category are the roms waiting to be classified.
 			<feature name="lockout" value="" />
 			<feature name="battery" value="BT1" />
 			<feature name="cart_model" value="n/a" /> <!-- similar to SNSP-006 -->
-			<feature name="slot" value="lorom_sfx" />
+			<feature name="slot" value="lorom_gsu1" />
 			<dataarea name="rom" size="1048576">
 				<rom name="snsp p-cq.u1" size="1048576" crc="24935769" sha1="de21be64fde447d9c6a2f1b063d2f2e0d4034ca0" offset="0x000000" />
 			</dataarea>
@@ -2756,7 +2756,7 @@ Beyond that last category are the roms waiting to be classified.
 			<feature name="dipswitch" value="SW3" />
 			<feature name="battery" value="BT1" />
 			<feature name="cart_model" value="n/a" />
-			<feature name="slot" value="lorom_sfx" />
+			<feature name="slot" value="lorom_gsu2" />
 			<dataarea name="rom" size="2097152">
 				<rom name="sns-p yi 0.u1" size="524288" crc="7581f685" sha1="8e16f2ae29d0b2ba709a2d4fe401daa09e2f9d60" offset="0x000000" />
 				<rom name="sns-p yi 1.u2" size="524288" crc="b64aaba4" sha1="c25aebc384f3ee2867b84a57826e762a08aa8e5e" offset="0x080000" />
@@ -3620,7 +3620,7 @@ Beyond that last category are the roms waiting to be classified.
 			<feature name="lockout" value="" />
 			<feature name="battery" value="BT1" />
 			<feature name="cart_model" value="unknown" />
-			<feature name="slot" value="lorom_sfx" />
+			<feature name="slot" value="lorom_gsu1" />
 			<dataarea name="rom" size="524288">
 				<rom name="powerslide sfx 12-4-94 rn 0010.u1" size="524288" crc="65ce3729" sha1="30115db2558060d9293684f3d5810d063a0c710e" offset="0x000000" />
 			</dataarea>
@@ -10486,7 +10486,7 @@ more investigation needed...
 			<feature name="battery" value="none" />
 			<feature name="cart_model" value="SNSP-006" />
 			<feature name="cart_back_label" value="SNSP-EUR" />
-			<feature name="slot" value="lorom_sfx" />
+			<feature name="slot" value="lorom_gsu1" />
 			<dataarea name="rom" size="524288">
 				<rom name="spal-adip-0.u1" size="524288" crc="0354f4b1" sha1="5e38dd23cdd68754b6469da0725688d0af34f867" offset="0x000000" />
 			</dataarea>
@@ -10512,7 +10512,7 @@ more investigation needed...
 			<feature name="battery" value="none" />
 			<feature name="cart_model" value="SNSP-006" />
 			<feature name="cart_back_label" value="SNSP-EUR" />
-			<feature name="slot" value="lorom_sfx" />
+			<feature name="slot" value="lorom_gsu1" />
 			<dataarea name="rom" size="524288">
 				<rom name="spal-af9p-0.u1" size="524288" crc="9dbc2330" sha1="d2940767de799fcd7a2ee0995f072930475ab88f" offset="0x000000" />
 			</dataarea>
@@ -10892,7 +10892,7 @@ more investigation needed...
 			<feature name="battery" value="none" />
 			<feature name="cart_model" value="SNSP-006" />
 			<feature name="cart_back_label" value="SNSP-FAH, SNSP-NOE" />
-			<feature name="slot" value="lorom_sfx" />
+			<feature name="slot" value="lorom_gsu2" />
 			<dataarea name="rom" size="2097152">
 				<rom name="spal-ad8p-0.u1" size="2097152" crc="360243e4" sha1="3ffb94cdd6a47683980999d723a93bee9ba156f8" offset="0x000000" />
 			</dataarea>
@@ -23790,7 +23790,7 @@ more investigation needed...
 -->
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
-			<feature name="slot" value="lorom_sfx" />
+			<feature name="slot" value="lorom_gsu1" />
 			<dataarea name="rom" size="1048576">
 				<rom name="shvc-fo-0.u1" size="1048576" crc="41a60b3f" sha1="a2dceab341ef20c836d4d3426f37f0ec396bbdcb" offset="0x000000" />
 			</dataarea>
@@ -23828,7 +23828,7 @@ more investigation needed...
 <!-- end of epoxy version -->
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
-			<feature name="slot" value="lorom_sfx" />
+			<feature name="slot" value="lorom_gsu1" />
 			<dataarea name="rom" size="1048576">
 				<rom name="sns-fo-0.u1" size="1048576" crc="0bae0941" sha1="1f5355534ccfaf26ae6c8f055f3e4768f9d72a7e" offset="0x000000" />
 			</dataarea>
@@ -23857,7 +23857,7 @@ more investigation needed...
 			<feature name="cart_revision" value="B" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
-			<feature name="slot" value="lorom_sfx" />
+			<feature name="slot" value="lorom_gsu1" />
 			<dataarea name="rom" size="1048576">
 				<rom name="sns-fo-2.u1" size="1048576" crc="8fc4e6d0" sha1="cf08148cd8f26d51f8c67c956179dfc594e7a4f1" offset="0x000000" />
 			</dataarea>
@@ -23930,7 +23930,7 @@ more investigation needed...
 			<feature name="battery" value="none" />
 			<feature name="cart_model" value="SNSP-006(-02)" />
 			<feature name="cart_back_label" value="02-SNSP-FAH" />
-			<feature name="slot" value="lorom_sfx" />
+			<feature name="slot" value="lorom_gsu1" />
 			<dataarea name="rom" size="1048576">
 				<rom name="spal-fo-0.u1" size="1048576" crc="865f1a71" sha1="7ba89019f33f690715bdbd52e13d888228ee4b9c" offset="0x000000" />
 			</dataarea>
@@ -23956,7 +23956,7 @@ more investigation needed...
 			<feature name="cart_revision" value="A" />
 			<feature name="cart_model" value="SNSP-006(-02)" />
 			<feature name="cart_back_label" value="02-SNSP-FAH" />
-			<feature name="slot" value="lorom_sfx" />
+			<feature name="slot" value="lorom_gsu1" />
 			<dataarea name="rom" size="1048576">
 				<rom name="spal-fo-1.u1" size="1048576" crc="ba64da2b" sha1="0510647f8cf9b87fac1c08a7009932ceeae1e0bd" offset="0x000000" />
 			</dataarea>
@@ -23981,7 +23981,7 @@ more investigation needed...
 			<feature name="battery" value="none" />
 			<feature name="cart_model" value="SNSP-006" />
 			<feature name="cart_back_label" value="SNSP-NOE" />
-			<feature name="slot" value="lorom_sfx" />
+			<feature name="slot" value="lorom_gsu1" />
 			<dataarea name="rom" size="1048576">
 				<rom name="sfrg-fo-0.u1" size="1048576" crc="b48ca238" sha1="7c365c325b3ce27a17fc88744b6928741fab1996" offset="0x000000" />
 			</dataarea>
@@ -24422,7 +24422,7 @@ more investigation needed...
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNSP-006(-03)" />
 			<feature name="cart_back_label" value="03-SNSP-FAH" />
-			<feature name="slot" value="lorom_sfx" />
+			<feature name="slot" value="lorom_gsu1" />
 			<dataarea name="rom" size="1048576">
 				<rom name="spal-cq-0.u1" size="1048576" crc="24935769" sha1="de21be64fde447d9c6a2f1b063d2f2e0d4034ca0" offset="0x000000" />
 			</dataarea>
@@ -27040,7 +27040,7 @@ more investigation needed...
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNSP-006" />
 			<feature name="cart_back_label" value="SNSP-NOE" />
-			<feature name="slot" value="lorom_sfx" />
+			<feature name="slot" value="lorom_gsu2" />
 			<dataarea name="rom" size="2097152">
 				<rom name="spal-yi-0.u1" size="2097152" crc="857980b2" sha1="512e0b2ab74081fda5ff5459162948d28226fc0b" offset="0x000000" />
 			</dataarea>
@@ -27069,7 +27069,7 @@ more investigation needed...
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006, SNSN-006" />
 			<feature name="cart_back_label" value="SNS-USA/CAN-1, SNSN-HKG" />
-			<feature name="slot" value="lorom_sfx" />
+			<feature name="slot" value="lorom_gsu2" />
 			<dataarea name="rom" size="2097152">
 				<rom name="sns-y1-1.u1" size="2097152" crc="cf98ddaa" sha1="34612a93741f156d6e497462ab7f253cb8a959a0" offset="0x000000" />
 			</dataarea>
@@ -27099,7 +27099,7 @@ more investigation needed...
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
-			<feature name="slot" value="lorom_sfx" />
+			<feature name="slot" value="lorom_gsu2" />
 			<dataarea name="rom" size="2097152">
 				<rom name="shvc-yi-0.u1" size="2097152" crc="343e0dfb" sha1="abacca9b1be88b082e7dd8a50e809aef6ab4d0ef" offset="0x000000" />
 			</dataarea>
@@ -30749,7 +30749,7 @@ Alternate board (XL-1)
 			<feature name="battery" value="none" />
 			<feature name="cart_model" value="SNSP-006" />
 			<feature name="cart_back_label" value="SNSP-EUR" />
-			<feature name="slot" value="lorom_sfx" />
+			<feature name="slot" value="lorom_gsu1" />
 			<dataarea name="rom" size="524288">
 				<rom name="spal-4v-0.u1" size="524288" crc="c6867604" sha1="92daba15d422654c29c01457b572c07f06a2c1bc" offset="0x000000" />
 			</dataarea>
@@ -30777,7 +30777,7 @@ Alternate board (XL-1)
 			<feature name="battery" value="none" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
-			<feature name="slot" value="lorom_sfx" />
+			<feature name="slot" value="lorom_gsu1" />
 			<dataarea name="rom" size="524288">
 				<rom name="shvc-4v-0.u1" size="524288" crc="51e8a19c" sha1="1479432ea185db8ecb109f6e5422e1464b5bdf3c" offset="0x000000" />
 			</dataarea>
@@ -31070,7 +31070,7 @@ Alternate board (XL-1)
 			<feature name="cart_revision" value="Ø" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
-			<feature name="slot" value="lorom_sfx" />
+			<feature name="slot" value="lorom_gsu1" />
 			<dataarea name="rom" size="1048576">
 				<rom name="shvc-cq-1.u1" size="1048576" crc="017c68c5" sha1="b51199fa2afb0a161d6afdabfa0575513913dde1" offset="0x000000" />
 			</dataarea>
@@ -31239,7 +31239,7 @@ Alternate board (XL-1)
 			<feature name="battery" value="none" />
 			<feature name="cart_model" value="SNSP-006(-03)" />
 			<feature name="cart_back_label" value="SNSP-EUR" />
-			<feature name="slot" value="lorom_sfx" />
+			<feature name="slot" value="lorom_gsu2" />
 			<dataarea name="rom" size="2097152">
 				<rom name="spal-axsp-0.u1" size="2097152" crc="0f8378a6" sha1="dc7f33e6bb587d7290f6a2587bb31af15724dfa3" offset="0x000000" />
 			</dataarea>
@@ -33144,7 +33144,7 @@ Alternate board (XL-1)
 		<info name="serial" value="SHVC-AKYJ-JPN" />
 		<info name="release" value="19950630" />
 		<info name="alt_title" value="スーパー競艇" />
-		<part name="cart" interface="snes_cart" >
+		<part name="cart" interface="snes_cart">
 			<feature name="pcb" value="SHVC-2A3M-20" />
 			<feature name="u1" value="U1 P0" />
 			<feature name="u2" value="U2 P1" />
@@ -33500,7 +33500,7 @@ Alternate board (XL-1)
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
 			<feature name="enhancement" value="GSU-1" />
-			<feature name="slot" value="lorom_sfx" />
+			<feature name="slot" value="lorom_gsu1" />
 			<dataarea name="rom" size="1048576">
 				<rom name="shvc-fo-1.ic20" size="1048576" crc="ad668a41" sha1="39ff7354a7fa02295c899b7a7ec3556998ac2636" offset="0x000000" />
 			</dataarea>
@@ -37471,7 +37471,7 @@ List of unclassified roms
 		<info name="release" value="199511xx" />
 		<part name="cart" interface="snes_cart">
 			<feature name="enhancement" value="GSU-1" />
-			<feature name="slot" value="lorom_sfx" />
+			<feature name="slot" value="lorom_gsu1" />
 			<dataarea name="rom" size="524288">
 				<rom name="dirt trax fx (usa).sfc" size="524288" crc="61a86c7f" sha1="d36e3e949c46939029c82b19b2f99a098efdab76" offset="0x000000" />
 			</dataarea>
@@ -37642,7 +37642,7 @@ List of unclassified roms
 		<info name="alt_title" value="ドゥーム" />
 		<part name="cart" interface="snes_cart">
 			<feature name="enhancement" value="GSU-2" />
-			<feature name="slot" value="lorom_sfx" />
+			<feature name="slot" value="lorom_gsu2" />
 			<dataarea name="rom" size="2097152">
 				<rom name="doom (japan).sfc" size="2097152" crc="e5d722b2" sha1="78d3f9346dc861f216063e2259ed17a9dbd85087" offset="0x000000" />
 			</dataarea>
@@ -37658,7 +37658,7 @@ List of unclassified roms
 		<info name="release" value="199509xx" />
 		<part name="cart" interface="snes_cart">
 			<feature name="enhancement" value="GSU-2" />
-			<feature name="slot" value="lorom_sfx" />
+			<feature name="slot" value="lorom_gsu2" />
 			<dataarea name="rom" size="2097152">
 				<rom name="doom (usa).sfc" size="2097152" crc="09e85ea6" sha1="736b9b994f506de0893ceb181f942739da089b05" offset="0x000000" />
 			</dataarea>
@@ -45852,7 +45852,7 @@ List of unclassified roms
 		<publisher>Sunsoft</publisher>
 		<info name="release" value="199203xx" />
 		<part name="cart" interface="snes_cart">
-			<feature name="slot" value="lorom_sfx" />
+			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
 				<rom name="lemmings (usa) (rev 1).sfc" size="1048576" crc="51e3d566" sha1="10fcf1268cf9bc53e7815c843ea506a77d5e1a9e" offset="0x000000" />
 			</dataarea>
@@ -45865,7 +45865,7 @@ List of unclassified roms
 		<publisher>Sunsoft</publisher>
 		<info name="release" value="199203xx" />
 		<part name="cart" interface="snes_cart">
-			<feature name="slot" value="lorom_sfx" />
+			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
 				<rom name="lemmings (usa).sfc" size="1048576" crc="7f8b51a1" sha1="385152eba550e19a15f691f77f7880bf359ec209" offset="0x000000" />
 			</dataarea>
@@ -47990,7 +47990,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<publisher>Planning Office WADA</publisher>
 		<info name="serial" value="SHVC-AFAJ-JPN" />
 		<info name="release" value="19950421" />
-		<info name="alt_title" value=" 宮路社長のパチンコファン勝利 宣言2" />
+		<info name="alt_title" value="宮路社長のパチンコファン勝利 宣言2" />
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
@@ -55718,7 +55718,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
         <publisher>&lt;homebrew&gt;</publisher>
         <part name="cart" interface="snes_cart">
             <feature name="enhancement" value="GSU-2" />
-            <feature name="slot" value="lorom_sfx" />
+            <feature name="slot" value="lorom_gsu2" />
                     <dataarea name="rom" size="1048576">
                 <rom name="star fox 2 (japan) (proto) (alt 1).sfc" size="1048576" crc="79f3433d" sha1="aea7a00c52c0f4e102b98cd5fa6710e6282e0dee" offset="0x000000" />
             </dataarea>
@@ -55735,7 +55735,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<publisher>Argonaut</publisher> <!-- cancelled -->
 		<part name="cart" interface="snes_cart">
 			<feature name="enhancement" value="GSU-2" />
-			<feature name="slot" value="lorom_sfx" />
+			<feature name="slot" value="lorom_gsu2" />
 			<dataarea name="rom" size="1048576">
 				<rom name="binary" size="1048576" crc="1fb1cf76" sha1="60f45d5ca95247294120080359639eb3a7e505c3" offset="0x000000" />
 			</dataarea>
@@ -55751,7 +55751,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<publisher>Argonaut</publisher> <!-- cancelled -->
 		<part name="cart" interface="snes_cart">
 			<feature name="enhancement" value="GSU-2" />
-			<feature name="slot" value="lorom_sfx" />
+			<feature name="slot" value="lorom_gsu2" />
 			<dataarea name="rom" size="1046983">
 				<rom name="binary-a" size="1046983" crc="1b3bc708" sha1="6669899a6c9c3bb71c41d90c36932ddfc1f4f208" offset="0x000000" />
 			</dataarea>
@@ -55923,7 +55923,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<info name="serial" value="SNSP-FU-EEC" />
 		<part name="cart" interface="snes_cart">
 			<feature name="enhancement" value="GSU-1" />
-			<feature name="slot" value="lorom_sfx" />
+			<feature name="slot" value="lorom_gsu1" />
 			<dataarea name="rom" size="1048576">
 				<rom name="starwing (europe) (super weekend competition).sfc" size="1048576" crc="17c8fe56" sha1="c7d4f1a7a5261fc3b95280f302056226fd8aa68a" offset="0x000000" />
 			</dataarea>
@@ -55939,7 +55939,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<info name="serial" value="SNSP-FU-EEC" />
 		<part name="cart" interface="snes_cart">
 			<feature name="enhancement" value="GSU-1" />
-			<feature name="slot" value="lorom_sfx" />
+			<feature name="slot" value="lorom_gsu1" />
 			<dataarea name="rom" size="1048576">
 				<rom name="starwing (germany) (competition edition).sfc" size="1048576" crc="b25f606a" sha1="daf6c7bdbf8c9733705b1c586c85be9edd864a23" offset="0x000000" />
 			</dataarea>
@@ -56130,7 +56130,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="snes_cart">
 			<feature name="enhancement" value="GSU-1" />
-			<feature name="slot" value="lorom_sfx" />
+			<feature name="slot" value="lorom_gsu1" />
 			<dataarea name="rom" size="1048576">
 				<rom name="stunt race fx (usa) (rev 1).sfc" size="1048576" crc="380c2635" sha1="781e376ff453a83c7bcf72339abe6b842efd9c86" offset="0x000000" />
 			</dataarea>
@@ -58131,7 +58131,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="snes_cart">
 			<feature name="enhancement" value="GSU-2" />
-			<feature name="slot" value="lorom_sfx" />
+			<feature name="slot" value="lorom_gsu2" />
 			<dataarea name="rom" size="2097152">
 				<rom name="super mario - yossy island (japan) (rev 1).sfc" size="2097152" crc="0f66698b" sha1="e1279e5701e4880b666982c9c056419500835952" offset="0x000000" />
 			</dataarea>
@@ -58150,7 +58150,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="snes_cart">
 			<feature name="enhancement" value="GSU-2" />
-			<feature name="slot" value="lorom_sfx" />
+			<feature name="slot" value="lorom_gsu2" />
 			<dataarea name="rom" size="2097152">
 				<rom name="super mario - yossy island (japan) (rev 2).sfc" size="2097152" crc="f1063fad" sha1="53188bc4623f5b8c9df5c1c54bd187347a2ad969" offset="0x000000" />
 			</dataarea>
@@ -58200,7 +58200,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="snes_cart">
 			<feature name="enhancement" value="GSU-2" />
-			<feature name="slot" value="lorom_sfx" />
+			<feature name="slot" value="lorom_gsu2" />
 			<dataarea name="rom" size="2097152">
 				<rom name="super mario world 2 - yoshi's island (europe) (en,fr,de) (rev 1).sfc" size="2097152" crc="07e01ef9" sha1="1e1dc02c684652f9e927f3873af65ea4b374bb80" offset="0x000000" />
 			</dataarea>
@@ -58217,7 +58217,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="snes_cart">
 			<feature name="enhancement" value="GSU-2" />
-			<feature name="slot" value="lorom_sfx" />
+			<feature name="slot" value="lorom_gsu2" />
 			<dataarea name="rom" size="2097152">
 				<rom name="super mario world 2 - yoshi's island (usa).sfc" size="2097152" crc="d138f224" sha1="c807f2856f44fb84326fac5b462340dcdd0471f8" offset="0x000000" />
 			</dataarea>
@@ -61523,7 +61523,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<publisher>Tecmo</publisher>
 		<info name="serial" value="SHVC-ATUJ-JPN" />
 		<info name="release" value="19950321" />
-		<info name="alt_title" value=" ターフヒーロー" />
+		<info name="alt_title" value="ターフヒーロー" />
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
@@ -62404,7 +62404,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<info name="release" value="199409xx" />
 		<part name="cart" interface="snes_cart">
 			<feature name="enhancement" value="GSU-1" />
-			<feature name="slot" value="lorom_sfx" />
+			<feature name="slot" value="lorom_gsu1" />
 			<dataarea name="rom" size="524288">
 				<rom name="vortex (usa) (en,es).sfc" size="524288" crc="31b1ad00" sha1="3a71b63605ddecf827d60554c2ddaccdd85b9624" offset="0x000000" />
 			</dataarea>

@@ -169,7 +169,7 @@ void tehkanwc_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 		break;
 	default:
-		assert_always(false, "Unknown id in tehkanwc_state::device_timer");
+		throw emu_fatalerror("Unknown id in tehkanwc_state::device_timer");
 	}
 }
 
@@ -681,7 +681,7 @@ void tehkanwc_state::tehkanwc(machine_config &config)
 	m_audiocpu->set_addrmap(AS_IO, &tehkanwc_state::sound_port);
 	m_audiocpu->set_vblank_int("screen", FUNC(tehkanwc_state::irq0_line_hold));
 
-	config.m_minimum_quantum = attotime::from_hz(600);  /* 10 CPU slices per frame - seems enough to keep the CPUs in sync */
+	config.set_maximum_quantum(attotime::from_hz(600));  /* 10 CPU slices per frame - seems enough to keep the CPUs in sync */
 
 	WATCHDOG_TIMER(config, "watchdog");
 

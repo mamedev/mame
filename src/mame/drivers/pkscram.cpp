@@ -263,9 +263,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(pkscram_state::scanline_callback)
 
 void pkscram_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(pkscram_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8,32,32);
-	m_md_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(pkscram_state::get_md_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8,32,32);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(pkscram_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8,32,32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(pkscram_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8,32,32);
+	m_md_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(pkscram_state::get_md_tile_info)), TILEMAP_SCAN_ROWS, 8, 8,32,32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(pkscram_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8,32,32);
 
 	m_md_tilemap->set_transparent_pen(15);
 	m_fg_tilemap->set_transparent_pen(15);

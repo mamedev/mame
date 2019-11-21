@@ -238,7 +238,7 @@ bool validity_checker::check_all_matching(const char *string)
 
 	// if we failed to match anything, it
 	if (string && !validated_any)
-		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching systems found for '%s'", string);
+		throw emu_fatalerror(EMU_ERR_NO_SUCH_SYSTEM, "No matching systems found for '%s'", string);
 
 	return !(m_errors > 0 || m_warnings > 0);
 }
@@ -318,7 +318,7 @@ void validity_checker::validate_one(const game_driver &driver)
 	}
 	catch (emu_fatalerror &err)
 	{
-		osd_printf_error("Fatal error %s", err.string());
+		osd_printf_error("Fatal error %s", err.what());
 	}
 
 	// if we had warnings or errors, output
@@ -430,32 +430,32 @@ void validity_checker::validate_inlines()
 	resulti64 = mul_32x32(testi32a, testi32b);
 	expectedi64 = s64(testi32a) * s64(testi32b);
 	if (resulti64 != expectedi64)
-		osd_printf_error("Error testing mul_32x32 (%08X x %08X) = %08X%08X (expected %08X%08X)\n", testi32a, testi32b, u32(resulti64 >> 32), u32(resulti64), u32(expectedi64 >> 32), u32(expectedi64));
+		osd_printf_error("Error testing mul_32x32 (%08X x %08X) = %16X (expected %16X)\n", s32(testi32a), s32(testi32b), resulti64, expectedi64);
 
 	resultu64 = mulu_32x32(testu32a, testu32b);
 	expectedu64 = u64(testu32a) * u64(testu32b);
 	if (resultu64 != expectedu64)
-		osd_printf_error("Error testing mulu_32x32 (%08X x %08X) = %08X%08X (expected %08X%08X)\n", testu32a, testu32b, u32(resultu64 >> 32), u32(resultu64), u32(expectedu64 >> 32), u32(expectedu64));
+		osd_printf_error("Error testing mulu_32x32 (%08X x %08X) = %16X (expected %16X)\n", u32(testu32a), u32(testu32b), resultu64, expectedu64);
 
 	resulti32 = mul_32x32_hi(testi32a, testi32b);
 	expectedi32 = (s64(testi32a) * s64(testi32b)) >> 32;
 	if (resulti32 != expectedi32)
-		osd_printf_error("Error testing mul_32x32_hi (%08X x %08X) = %08X (expected %08X)\n", testi32a, testi32b, resulti32, expectedi32);
+		osd_printf_error("Error testing mul_32x32_hi (%08X x %08X) = %08X (expected %08X)\n", s32(testi32a), s32(testi32b), resulti32, expectedi32);
 
 	resultu32 = mulu_32x32_hi(testu32a, testu32b);
 	expectedu32 = (s64(testu32a) * s64(testu32b)) >> 32;
 	if (resultu32 != expectedu32)
-		osd_printf_error("Error testing mulu_32x32_hi (%08X x %08X) = %08X (expected %08X)\n", testu32a, testu32b, resultu32, expectedu32);
+		osd_printf_error("Error testing mulu_32x32_hi (%08X x %08X) = %08X (expected %08X)\n", u32(testu32a), u32(testu32b), resultu32, expectedu32);
 
 	resulti32 = mul_32x32_shift(testi32a, testi32b, 7);
 	expectedi32 = (s64(testi32a) * s64(testi32b)) >> 7;
 	if (resulti32 != expectedi32)
-		osd_printf_error("Error testing mul_32x32_shift (%08X x %08X) >> 7 = %08X (expected %08X)\n", testi32a, testi32b, resulti32, expectedi32);
+		osd_printf_error("Error testing mul_32x32_shift (%08X x %08X) >> 7 = %08X (expected %08X)\n", s32(testi32a), s32(testi32b), resulti32, expectedi32);
 
 	resultu32 = mulu_32x32_shift(testu32a, testu32b, 7);
 	expectedu32 = (s64(testu32a) * s64(testu32b)) >> 7;
 	if (resultu32 != expectedu32)
-		osd_printf_error("Error testing mulu_32x32_shift (%08X x %08X) >> 7 = %08X (expected %08X)\n", testu32a, testu32b, resultu32, expectedu32);
+		osd_printf_error("Error testing mulu_32x32_shift (%08X x %08X) >> 7 = %08X (expected %08X)\n", u32(testu32a), u32(testu32b), resultu32, expectedu32);
 
 	while (s64(testi32a) * s64(0x7fffffff) < testi64a)
 		testi64a /= 2;
@@ -465,34 +465,34 @@ void validity_checker::validate_inlines()
 	resulti32 = div_64x32(testi64a, testi32a);
 	expectedi32 = testi64a / s64(testi32a);
 	if (resulti32 != expectedi32)
-		osd_printf_error("Error testing div_64x32 (%08X%08X / %08X) = %08X (expected %08X)\n", u32(testi64a >> 32), u32(testi64a), testi32a, resulti32, expectedi32);
+		osd_printf_error("Error testing div_64x32 (%16X / %08X) = %08X (expected %08X)\n", s64(testi64a), s32(testi32a), resulti32, expectedi32);
 
 	resultu32 = divu_64x32(testu64a, testu32a);
 	expectedu32 = testu64a / u64(testu32a);
 	if (resultu32 != expectedu32)
-		osd_printf_error("Error testing divu_64x32 (%08X%08X / %08X) = %08X (expected %08X)\n", u32(testu64a >> 32), u32(testu64a), testu32a, resultu32, expectedu32);
+		osd_printf_error("Error testing divu_64x32 (%16X / %08X) = %08X (expected %08X)\n", u64(testu64a), u32(testu32a), resultu32, expectedu32);
 
 	resulti32 = div_64x32_rem(testi64a, testi32a, &remainder);
 	expectedi32 = testi64a / s64(testi32a);
 	expremainder = testi64a % s64(testi32a);
 	if (resulti32 != expectedi32 || remainder != expremainder)
-		osd_printf_error("Error testing div_64x32_rem (%08X%08X / %08X) = %08X,%08X (expected %08X,%08X)\n", u32(testi64a >> 32), u32(testi64a), testi32a, resulti32, remainder, expectedi32, expremainder);
+		osd_printf_error("Error testing div_64x32_rem (%16X / %08X) = %08X,%08X (expected %08X,%08X)\n", s64(testi64a), s32(testi32a), resulti32, remainder, expectedi32, expremainder);
 
 	resultu32 = divu_64x32_rem(testu64a, testu32a, &uremainder);
 	expectedu32 = testu64a / u64(testu32a);
 	expuremainder = testu64a % u64(testu32a);
 	if (resultu32 != expectedu32 || uremainder != expuremainder)
-		osd_printf_error("Error testing divu_64x32_rem (%08X%08X / %08X) = %08X,%08X (expected %08X,%08X)\n", u32(testu64a >> 32), u32(testu64a), testu32a, resultu32, uremainder, expectedu32, expuremainder);
+		osd_printf_error("Error testing divu_64x32_rem (%16X / %08X) = %08X,%08X (expected %08X,%08X)\n", u64(testu64a), u32(testu32a), resultu32, uremainder, expectedu32, expuremainder);
 
 	resulti32 = mod_64x32(testi64a, testi32a);
 	expectedi32 = testi64a % s64(testi32a);
 	if (resulti32 != expectedi32)
-		osd_printf_error("Error testing mod_64x32 (%08X%08X / %08X) = %08X (expected %08X)\n", u32(testi64a >> 32), u32(testi64a), testi32a, resulti32, expectedi32);
+		osd_printf_error("Error testing mod_64x32 (%16X / %08X) = %08X (expected %08X)\n", s64(testi64a), s32(testi32a), resulti32, expectedi32);
 
 	resultu32 = modu_64x32(testu64a, testu32a);
 	expectedu32 = testu64a % u64(testu32a);
 	if (resultu32 != expectedu32)
-		osd_printf_error("Error testing modu_64x32 (%08X%08X / %08X) = %08X (expected %08X)\n", u32(testu64a >> 32), u32(testu64a), testu32a, resultu32, expectedu32);
+		osd_printf_error("Error testing modu_64x32 (%16X / %08X) = %08X (expected %08X)\n", u64(testu64a), u32(testu32a), resultu32, expectedu32);
 
 	while (s64(testi32a) * s64(0x7fffffff) < (s32(testi64a) << 3))
 		testi64a /= 2;
@@ -502,12 +502,12 @@ void validity_checker::validate_inlines()
 	resulti32 = div_32x32_shift(s32(testi64a), testi32a, 3);
 	expectedi32 = (s64(s32(testi64a)) << 3) / s64(testi32a);
 	if (resulti32 != expectedi32)
-		osd_printf_error("Error testing div_32x32_shift (%08X << 3) / %08X = %08X (expected %08X)\n", s32(testi64a), testi32a, resulti32, expectedi32);
+		osd_printf_error("Error testing div_32x32_shift (%08X << 3) / %08X = %08X (expected %08X)\n", s32(testi64a), s32(testi32a), resulti32, expectedi32);
 
 	resultu32 = divu_32x32_shift(u32(testu64a), testu32a, 3);
 	expectedu32 = (u64(u32(testu64a)) << 3) / u64(testu32a);
 	if (resultu32 != expectedu32)
-		osd_printf_error("Error testing divu_32x32_shift (%08X << 3) / %08X = %08X (expected %08X)\n", u32(testu64a), testu32a, resultu32, expectedu32);
+		osd_printf_error("Error testing divu_32x32_shift (%08X << 3) / %08X = %08X (expected %08X)\n", u32(testu64a), u32(testu32a), resultu32, expectedu32);
 
 	if (fabsf(recip_approx(100.0f) - 0.01f) > 0.0001f)
 		osd_printf_error("Error testing recip_approx\n");
@@ -582,10 +582,10 @@ void validity_checker::validate_rgb()
 		const volatile s32 r = rgb.get_r32();
 		const volatile s32 g = rgb.get_g32();
 		const volatile s32 b = rgb.get_b32();
-		if (a != expected_a) osd_printf_error("Error testing %s get_a32() = %d (expected %d)\n", desc, a, expected_a);
-		if (r != expected_r) osd_printf_error("Error testing %s get_r32() = %d (expected %d)\n", desc, r, expected_r);
-		if (g != expected_g) osd_printf_error("Error testing %s get_g32() = %d (expected %d)\n", desc, g, expected_g);
-		if (b != expected_b) osd_printf_error("Error testing %s get_b32() = %d (expected %d)\n", desc, b, expected_b);
+		if (a != expected_a) osd_printf_error("Error testing %s get_a32() = %d (expected %d)\n", desc, s32(a), s32(expected_a));
+		if (r != expected_r) osd_printf_error("Error testing %s get_r32() = %d (expected %d)\n", desc, s32(r), s32(expected_r));
+		if (g != expected_g) osd_printf_error("Error testing %s get_g32() = %d (expected %d)\n", desc, s32(g), s32(expected_g));
+		if (b != expected_b) osd_printf_error("Error testing %s get_b32() = %d (expected %d)\n", desc, s32(b), s32(expected_b));
 	};
 
 	// check set/get
@@ -901,10 +901,10 @@ void validity_checker::validate_rgb()
 	actual_r = s32(u32(rgb.get_r()));
 	actual_g = s32(u32(rgb.get_g()));
 	actual_b = s32(u32(rgb.get_b()));
-	if (actual_a != expected_a) osd_printf_error("Error testing rgbaint_t::get_a() = %d (expected %d)\n", actual_a, expected_a);
-	if (actual_r != expected_r) osd_printf_error("Error testing rgbaint_t::get_r() = %d (expected %d)\n", actual_r, expected_r);
-	if (actual_g != expected_g) osd_printf_error("Error testing rgbaint_t::get_g() = %d (expected %d)\n", actual_g, expected_g);
-	if (actual_b != expected_b) osd_printf_error("Error testing rgbaint_t::get_b() = %d (expected %d)\n", actual_b, expected_b);
+	if (actual_a != expected_a) osd_printf_error("Error testing rgbaint_t::get_a() = %d (expected %d)\n", s32(actual_a), s32(expected_a));
+	if (actual_r != expected_r) osd_printf_error("Error testing rgbaint_t::get_r() = %d (expected %d)\n", s32(actual_r), s32(expected_r));
+	if (actual_g != expected_g) osd_printf_error("Error testing rgbaint_t::get_g() = %d (expected %d)\n", s32(actual_g), s32(expected_g));
+	if (actual_b != expected_b) osd_printf_error("Error testing rgbaint_t::get_b() = %d (expected %d)\n", s32(actual_b), s32(expected_b));
 
 	// test set from packed RGBA
 	imm = random_i32();
@@ -1406,14 +1406,14 @@ void validity_checker::validate_driver()
 	if (!m_names_map.insert(std::make_pair(m_current_driver->name, m_current_driver)).second)
 	{
 		const game_driver *match = m_names_map.find(m_current_driver->name)->second;
-		osd_printf_error("Driver name is a duplicate of %s(%s)\n", core_filename_extract_base(match->type.source()).c_str(), match->name);
+		osd_printf_error("Driver name is a duplicate of %s(%s)\n", core_filename_extract_base(match->type.source()), match->name);
 	}
 
 	// check for duplicate descriptions
 	if (!m_descriptions_map.insert(std::make_pair(m_current_driver->type.fullname(), m_current_driver)).second)
 	{
 		const game_driver *match = m_descriptions_map.find(m_current_driver->type.fullname())->second;
-		osd_printf_error("Driver description is a duplicate of %s(%s)\n", core_filename_extract_base(match->type.source()).c_str(), match->name);
+		osd_printf_error("Driver description is a duplicate of %s(%s)\n", core_filename_extract_base(match->type.source()), match->name);
 	}
 
 	// determine if we are a clone
@@ -1551,7 +1551,7 @@ void validity_checker::validate_roms(device_t &root)
 				// attempt to add it to the map, reporting duplicates as errors
 				current_length = ROMREGION_GETLENGTH(romp);
 				if (!m_region_map.insert(std::make_pair(fulltag, current_length)).second)
-					osd_printf_error("Multiple ROM_REGIONs with the same tag '%s' defined\n", fulltag.c_str());
+					osd_printf_error("Multiple ROM_REGIONs with the same tag '%s' defined\n", fulltag);
 			}
 			else if (ROMENTRY_ISSYSTEM_BIOS(romp)) // If this is a system bios, make sure it is using the next available bios number
 			{
@@ -1579,7 +1579,7 @@ void validity_checker::validate_roms(device_t &root)
 					osd_printf_error("Duplicate BIOS name %s specified (%d and %d)\n", biosname, nameins.first->second, bios_flags - 1);
 				auto const descins = bios_descs.emplace(romp->hashdata, biosname);
 				if (!descins.second)
-					osd_printf_error("BIOS %s has duplicate description '%s' (was %s)\n", biosname, romp->hashdata, descins.first->second.c_str());
+					osd_printf_error("BIOS %s has duplicate description '%s' (was %s)\n", biosname, romp->hashdata, descins.first->second);
 			}
 			else if (ROMENTRY_ISDEFAULT_BIOS(romp)) // if this is a default BIOS setting, remember it so it to check at the end
 			{
@@ -1623,7 +1623,7 @@ void validity_checker::validate_roms(device_t &root)
 		if (defbios && (bios_names.find(defbios) == bios_names.end()))
 			osd_printf_error("Default BIOS '%s' not found\n", defbios);
 		if (!device.get_default_bios_tag().empty() && (bios_names.find(device.get_default_bios_tag()) == bios_names.end()))
-			osd_printf_error("Configured BIOS '%s' not found\n", device.get_default_bios_tag().c_str());
+			osd_printf_error("Configured BIOS '%s' not found\n", device.get_default_bios_tag());
 
 		// check that there aren't ROMs for a non-existent BIOS option
 		if (max_bios > last_bios)
@@ -1828,7 +1828,7 @@ void validity_checker::validate_inputs()
 
 		// report any errors during construction
 		if (!errorbuf.empty())
-			osd_printf_error("I/O port error during construction:\n%s\n", errorbuf.c_str());
+			osd_printf_error("I/O port error during construction:\n%s\n", errorbuf);
 
 		// do a first pass over ports to add their names and find duplicates
 		for (auto &port : portlist)
@@ -2053,7 +2053,7 @@ void validity_checker::validate_device_types()
 		// ensure shortname exists
 		if (!dev->shortname() || !*dev->shortname())
 		{
-			osd_printf_error("Device %s does not have short name defined\n", description.c_str());
+			osd_printf_error("Device %s does not have short name defined\n", description);
 		}
 		else
 		{
@@ -2066,7 +2066,7 @@ void validity_checker::validate_device_types()
 			{
 				if (((*s < '0') || (*s > '9')) && ((*s < 'a') || (*s > 'z')) && (*s != '_'))
 				{
-					osd_printf_error("Device %s short name contains invalid characters\n", description.c_str());
+					osd_printf_error("Device %s short name contains invalid characters\n", description);
 					break;
 				}
 			}
@@ -2078,12 +2078,12 @@ void validity_checker::validate_device_types()
 			if (m_names_map.end() != drvname)
 			{
 				game_driver const &dup(*drvname->second);
-				osd_printf_error("Device %s short name is a duplicate of %s(%s)\n", description.c_str(), core_filename_extract_base(dup.type.source()).c_str(), dup.name);
+				osd_printf_error("Device %s short name is a duplicate of %s(%s)\n", description, core_filename_extract_base(dup.type.source()), dup.name);
 			}
 			else if (!devname.second)
 			{
 				device_t *const dup = config.device_add("_dup", *devname.first->second, 0);
-				osd_printf_error("Device %s short name is a duplicate of %s(%s)\n", description.c_str(), core_filename_extract_base(dup->source()).c_str(), dup->shortname());
+				osd_printf_error("Device %s short name is a duplicate of %s(%s)\n", description, core_filename_extract_base(dup->source()), dup->shortname());
 				config.device_remove("_dup");
 			}
 		}
@@ -2091,7 +2091,7 @@ void validity_checker::validate_device_types()
 		// ensure name exists
 		if (!dev->name() || !*dev->name())
 		{
-			osd_printf_error("Device %s does not have name defined\n", description.c_str());
+			osd_printf_error("Device %s does not have name defined\n", description);
 		}
 		else
 		{
@@ -2102,23 +2102,23 @@ void validity_checker::validate_device_types()
 			if (m_descriptions_map.end() != drvdesc)
 			{
 				game_driver const &dup(*drvdesc->second);
-				osd_printf_error("Device %s name '%s' is a duplicate of %s(%s)\n", description.c_str(), dev->name(), core_filename_extract_base(dup.type.source()).c_str(), dup.name);
+				osd_printf_error("Device %s name '%s' is a duplicate of %s(%s)\n", description, dev->name(), core_filename_extract_base(dup.type.source()), dup.name);
 			}
 			else if (!devdesc.second)
 			{
 				device_t *const dup = config.device_add("_dup", *devdesc.first->second, 0);
-				osd_printf_error("Device %s name '%s' is a duplicate of %s(%s)\n", description.c_str(), dev->name(), core_filename_extract_base(dup->source()).c_str(), dup->shortname());
+				osd_printf_error("Device %s name '%s' is a duplicate of %s(%s)\n", description, dev->name(), core_filename_extract_base(dup->source()), dup->shortname());
 				config.device_remove("_dup");
 			}
 		}
 
 		// ensure source exists
 		if (!dev->source() || !*dev->source())
-			osd_printf_error("Device %s does not have source defined\n", description.c_str());
+			osd_printf_error("Device %s does not have source defined\n", description);
 
 		// check that reported type matches supplied type
 		if (dev->type().type() != type.type())
-			osd_printf_error("Device %s reports type '%s' (created with '%s')\n", description.c_str(), dev->type().type().name(), type.type().name());
+			osd_printf_error("Device %s reports type '%s' (created with '%s')\n", description, dev->type().type().name(), type.type().name());
 
 		// catch invalid flag combinations
 		device_t::feature_type const unemulated(dev->type().unemulated_features());
@@ -2154,18 +2154,15 @@ void validity_checker::validate_device_types()
 //  and device
 //-------------------------------------------------
 
-void validity_checker::build_output_prefix(std::string &str)
+void validity_checker::build_output_prefix(std::ostream &str) const
 {
-	// start empty
-	str.clear();
-
 	// if we have a current (non-root) device, indicate that
-	if (m_current_device != nullptr && m_current_device->owner() != nullptr)
-		str.append(m_current_device->name()).append(" device '").append(m_current_device->tag() + 1).append("': ");
+	if (m_current_device && m_current_device->owner())
+		util::stream_format(str, "%s device '%s': ", m_current_device->name(), m_current_device->tag() + 1);
 
 	// if we have a current port, indicate that as well
-	if (m_current_ioport != nullptr)
-		str.append("ioport '").append(m_current_ioport).append("': ");
+	if (m_current_ioport)
+		util::stream_format(str, "ioport '%s': ", m_current_ioport);
 }
 
 
@@ -2173,9 +2170,9 @@ void validity_checker::build_output_prefix(std::string &str)
 //  error_output - error message output override
 //-------------------------------------------------
 
-void validity_checker::output_callback(osd_output_channel channel, const char *msg, va_list args)
+void validity_checker::output_callback(osd_output_channel channel, const util::format_argument_pack<std::ostream> &args)
 {
-	std::string output;
+	std::ostringstream output;
 	switch (channel)
 	{
 	case OSD_OUTPUT_CHANNEL_ERROR:
@@ -2186,8 +2183,8 @@ void validity_checker::output_callback(osd_output_channel channel, const char *m
 		build_output_prefix(output);
 
 		// generate the string
-		strcatvprintf(output, msg, args);
-		m_error_text.append(output);
+		util::stream_format(output, args);
+		m_error_text.append(output.str());
 		break;
 
 	case OSD_OUTPUT_CHANNEL_WARNING:
@@ -2198,8 +2195,8 @@ void validity_checker::output_callback(osd_output_channel channel, const char *m
 		build_output_prefix(output);
 
 		// generate the string and output to the original target
-		strcatvprintf(output, msg, args);
-		m_warning_text.append(output);
+		util::stream_format(output, args);
+		m_warning_text.append(output.str());
 		break;
 
 	case OSD_OUTPUT_CHANNEL_VERBOSE:
@@ -2210,12 +2207,12 @@ void validity_checker::output_callback(osd_output_channel channel, const char *m
 		build_output_prefix(output);
 
 		// generate the string and output to the original target
-		strcatvprintf(output, msg, args);
-		m_verbose_text.append(output);
+		util::stream_format(output, args);
+		m_verbose_text.append(output.str());
 		break;
 
 	default:
-		chain_output(channel, msg, args);
+		chain_output(channel, args);
 		break;
 	}
 }
@@ -2226,14 +2223,11 @@ void validity_checker::output_callback(osd_output_channel channel, const char *m
 //  can be forwarded onto the given delegate
 //-------------------------------------------------
 
-void validity_checker::output_via_delegate(osd_output_channel channel, const char *format, ...)
+template <typename Format, typename... Params>
+void validity_checker::output_via_delegate(osd_output_channel channel, Format &&fmt, Params &&...args)
 {
-	va_list argptr;
-
 	// call through to the delegate with the proper parameters
-	va_start(argptr, format);
-	chain_output(channel, format, argptr);
-	va_end(argptr);
+	chain_output(channel, util::make_format_argument_pack(std::forward<Format>(fmt), std::forward<Params>(args)...));
 }
 
 //-------------------------------------------------

@@ -280,7 +280,7 @@ TILE_GET_INFO_MEMBER(supercrd_state::get_bg_tile_info)
 
 void supercrd_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(supercrd_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 4, 8, 96, 29);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(supercrd_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 4, 8, 96, 29);
 }
 
 
@@ -300,9 +300,9 @@ void supercrd_state::supercrd_map(address_map &map)
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xcfff).ram().w(FUNC(supercrd_state::supercrd_videoram_w)).share("videoram"); // wrong
 	map(0xd000, 0xdfff).ram().w(FUNC(supercrd_state::supercrd_colorram_w)).share("colorram"); // wrong
-//  AM_RANGE(0x0000, 0x0000) AM_RAM AM_SHARE("nvram")
-//  AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("crtc", mc6845_device, address_w)
-//  AM_RANGE(0xe001, 0xe001) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
+//  map(0x0000, 0x0000).ram().share("nvram");
+//  map(0xe000, 0xe000).w("crtc", FUNC(mc6845_device::address_w));
+//  map(0xe001, 0xe001).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 }
 
 

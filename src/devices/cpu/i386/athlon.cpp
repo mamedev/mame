@@ -31,7 +31,7 @@ void athlonxp_device::device_start()
 	m_data = &space(AS_DATA);
 	m_opcodes = &space(AS_OPCODES);
 	mmacache32 = m_data->cache<2, 0, ENDIANNESS_LITTLE>();
-	m_opcodes->install_read_handler(0, 0xffffffff, read32_delegate(FUNC(athlonxp_device::debug_read_memory), this));
+	m_opcodes->install_read_handler(0, 0xffffffff, read32_delegate(*this, FUNC(athlonxp_device::debug_read_memory)));
 
 	build_x87_opcode_table();
 	build_opcode_table(OP_I386 | OP_FPU | OP_I486 | OP_PENTIUM | OP_PPRO | OP_MMX | OP_SSE);

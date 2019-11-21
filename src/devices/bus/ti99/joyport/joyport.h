@@ -36,7 +36,7 @@ class joyport_device;
 /********************************************************************
     Common parent class of all devices attached to the joystick port
 ********************************************************************/
-class device_ti99_joyport_interface : public device_slot_card_interface
+class device_ti99_joyport_interface : public device_interface
 {
 public:
 	virtual uint8_t read_dev() = 0;
@@ -44,16 +44,16 @@ public:
 	virtual void pulse_clock() { }
 
 protected:
-	using device_slot_card_interface::device_slot_card_interface;
+	device_ti99_joyport_interface(const machine_config &mconfig, device_t &device);
 
 	virtual void interface_config_complete() override;
-	joyport_device* m_joyport = nullptr;
+	joyport_device* m_joyport;
 };
 
 /********************************************************************
     Joystick port
 ********************************************************************/
-class joyport_device : public device_t, public device_slot_interface
+class joyport_device : public device_t, public device_single_card_slot_interface<device_ti99_joyport_interface>
 {
 public:
 	template <typename U>

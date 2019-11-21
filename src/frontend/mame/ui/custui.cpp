@@ -37,7 +37,9 @@ const char *const menu_custom_ui::HIDE_STATUS[] = {
 //  ctor
 //-------------------------------------------------
 
-menu_custom_ui::menu_custom_ui(mame_ui_manager &mui, render_container &container) : menu(mui, container)
+menu_custom_ui::menu_custom_ui(mame_ui_manager &mui, render_container &container, std::function<void ()> &&handler)
+	: menu(mui, container)
+	, m_handler(std::move(handler))
 {
 	// load languages
 	file_enumerator path(mui.machine().options().language_path());
@@ -72,6 +74,9 @@ menu_custom_ui::~menu_custom_ui()
 		load_translation(machine().options());
 	}
 	ui_globals::reset = true;
+
+	if (m_handler)
+		m_handler();
 }
 
 //-------------------------------------------------
@@ -91,7 +96,14 @@ void menu_custom_ui::handle()
 		{
 		case FONT_MENU:
 			if (menu_event->iptkey == IPT_UI_SELECT)
-				menu::stack_push<menu_font_ui>(ui(), container());
+				menu::stack_push<menu_font_ui>(
+						ui(),
+						container(),
+						[this] (bool changed)
+						{
+							if (changed)
+							reset(reset_options::REMEMBER_REF);
+						});
 			break;
 		case COLORS_MENU:
 			if (menu_event->iptkey == IPT_UI_SELECT)
@@ -182,9 +194,19 @@ void menu_custom_ui::custom_render(void *selectedref, float top, float bottom, f
 //  ctor
 //-------------------------------------------------
 
-menu_font_ui::menu_font_ui(mame_ui_manager &mui, render_container &container) : menu(mui, container)
+menu_font_ui::menu_font_ui(mame_ui_manager &mui, render_container &container, std::function<void (bool)> &&handler)
+	: menu(mui, container)
+	, m_handler(std::move(handler))
+	, m_fonts()
+	, m_font_min(atof(mui.options().get_entry(OPTION_FONT_ROWS)->minimum()))
+	, m_font_max(atof(mui.options().get_entry(OPTION_FONT_ROWS)->maximum()))
+	, m_font_size(mui.options().font_rows())
+	, m_info_min(atof(mui.options().get_entry(OPTION_INFOS_SIZE)->minimum()))
+	, m_info_max(atof(mui.options().get_entry(OPTION_INFOS_SIZE)->maximum()))
+	, m_info_size(mui.options().infos_size())
+	, m_changed(false)
+	, m_actual(0U)
 {
-	ui_options &moptions = mui.options();
 	std::string name(mui.machine().options().ui_font());
 	list();
 
@@ -192,7 +214,6 @@ menu_font_ui::menu_font_ui(mame_ui_manager &mui, render_container &container) : 
 	m_bold = (strreplace(name, "[B]", "") + strreplace(name, "[b]", "") > 0);
 	m_italic = (strreplace(name, "[I]", "") + strreplace(name, "[i]", "") > 0);
 #endif
-	m_actual = 0;
 
 	for (std::size_t index = 0; index < m_fonts.size(); index++)
 	{
@@ -202,13 +223,6 @@ menu_font_ui::menu_font_ui(mame_ui_manager &mui, render_container &container) : 
 			break;
 		}
 	}
-
-	m_info_size = moptions.infos_size();
-	m_font_size = moptions.font_rows();
-	m_info_max = atof(moptions.get_entry(OPTION_INFOS_SIZE)->maximum());
-	m_info_min = atof(moptions.get_entry(OPTION_INFOS_SIZE)->minimum());
-	m_font_max = atof(moptions.get_entry(OPTION_FONT_ROWS)->maximum());
-	m_font_min = atof(moptions.get_entry(OPTION_FONT_ROWS)->minimum());
 }
 
 //-------------------------------------------------
@@ -229,25 +243,30 @@ void menu_font_ui::list()
 
 menu_font_ui::~menu_font_ui()
 {
-	std::string error_string;
-	ui_options &moptions = ui().options();
-
-	std::string name(m_fonts[m_actual].first);
-#ifdef UI_WINDOWS
-	if (name != "default")
+	if (m_changed)
 	{
-		if (m_italic)
-			name.insert(0, "[I]");
-		if (m_bold)
-			name.insert(0, "[B]");
-	}
-#endif
-	machine().options().set_value(OPTION_UI_FONT, name, OPTION_PRIORITY_CMDLINE);
-	moptions.set_value(OPTION_INFOS_SIZE, m_info_size, OPTION_PRIORITY_CMDLINE);
-	moptions.set_value(OPTION_FONT_ROWS, m_font_size, OPTION_PRIORITY_CMDLINE);
+		ui_options &moptions = ui().options();
 
-	// OPTION_FONT_ROWS was changed; update the font info
-	ui().update_target_font_height();
+		std::string name(m_fonts[m_actual].first);
+#ifdef UI_WINDOWS
+		if (name != "default")
+		{
+			if (m_italic)
+				name.insert(0, "[I]");
+			if (m_bold)
+				name.insert(0, "[B]");
+		}
+#endif
+		machine().options().set_value(OPTION_UI_FONT, name, OPTION_PRIORITY_CMDLINE);
+		moptions.set_value(OPTION_INFOS_SIZE, m_info_size, OPTION_PRIORITY_CMDLINE);
+		moptions.set_value(OPTION_FONT_ROWS, m_font_size, OPTION_PRIORITY_CMDLINE);
+
+		// OPTION_FONT_ROWS was changed; update the font info
+		ui().update_target_font_height();
+	}
+
+	if (m_handler)
+		m_handler(m_changed);
 }
 
 //-------------------------------------------------
@@ -261,7 +280,8 @@ void menu_font_ui::handle()
 	// process the menu
 	const event *menu_event = process(PROCESS_LR_REPEAT);
 
-	if (menu_event != nullptr && menu_event->itemref != nullptr)
+	if (menu_event && menu_event->itemref)
+	{
 		switch ((uintptr_t)menu_event->itemref)
 		{
 			case INFOS_SIZE:
@@ -297,10 +317,10 @@ void menu_font_ui::handle()
 							ui(), container(), std::move(display_names), m_actual,
 							[this] (int selection)
 							{
+								m_changed = true;
 								m_actual = selection;
 								reset(reset_options::REMEMBER_REF);
 							});
-					changed = true;
 				}
 				break;
 
@@ -315,9 +335,13 @@ void menu_font_ui::handle()
 				break;
 #endif
 		}
+	}
 
 	if (changed)
+	{
+		m_changed = true;
 		reset(reset_options::REMEMBER_REF);
+	}
 }
 
 //-------------------------------------------------

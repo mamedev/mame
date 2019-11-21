@@ -140,12 +140,12 @@ void ecb_grip21_device::grip_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).rw(FUNC(ecb_grip21_device::cxstb_r), FUNC(ecb_grip21_device::cxstb_w));
-//  AM_RANGE(0x10, 0x10) AM_WRITE(ccon_w)
+//  map(0x10, 0x10).w(FUNC(ecb_grip21_device::ccon_w));
 	map(0x11, 0x11).w(FUNC(ecb_grip21_device::vol0_w));
-//  AM_RANGE(0x12, 0x12) AM_WRITE(rts_w)
+//  map(0x12, 0x12).w(FUNC(ecb_grip21_device::rts_w));
 	map(0x13, 0x13).w(FUNC(ecb_grip21_device::page_w));
-//  AM_RANGE(0x14, 0x14) AM_WRITE(cc1_w)
-//  AM_RANGE(0x15, 0x15) AM_WRITE(cc2_w)
+//  map(0x14, 0x14).w(FUNC(ecb_grip21_device::cc1_w));
+//  map(0x15, 0x15).w(FUNC(ecb_grip21_device::cc2_w));
 	map(0x16, 0x16).w(FUNC(ecb_grip21_device::flash_w));
 	map(0x17, 0x17).w(FUNC(ecb_grip21_device::vol1_w));
 	map(0x20, 0x2f).rw(m_sti, FUNC(z80sti_device::read), FUNC(z80sti_device::write));
@@ -156,14 +156,14 @@ void ecb_grip21_device::grip_io(address_map &map)
 	map(0x53, 0x53).r(MC6845_TAG, FUNC(mc6845_device::register_r));
 	map(0x60, 0x60).w("cent_data_out", FUNC(output_latch_device::bus_w));
 	map(0x70, 0x73).rw(I8255A_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
-//  AM_RANGE(0x80, 0x80) AM_WRITE(bl2out_w)
-//  AM_RANGE(0x90, 0x90) AM_WRITE(gr2out_w)
-//  AM_RANGE(0xa0, 0xa0) AM_WRITE(rd2out_w)
-//  AM_RANGE(0xb0, 0xb0) AM_WRITE(clrg2_w)
-//  AM_RANGE(0xc0, 0xc0) AM_WRITE(bluout_w)
-//  AM_RANGE(0xd0, 0xd0) AM_WRITE(grnout_w)
-//  AM_RANGE(0xe0, 0xe0) AM_WRITE(redout_w)
-//  AM_RANGE(0xf0, 0xf0) AM_WRITE(clrg1_w)
+//  map(0x80, 0x80).w(FUNC(ecb_grip21_device::bl2out_w));
+//  map(0x90, 0x90).w(FUNC(ecb_grip21_device::gr2out_w));
+//  map(0xa0, 0xa0).w(FUNC(ecb_grip21_device::rd2out_w));
+//  map(0xb0, 0xb0).w(FUNC(ecb_grip21_device::clrg2_w));
+//  map(0xc0, 0xc0).w(FUNC(ecb_grip21_device::bluout_w));
+//  map(0xd0, 0xd0).w(FUNC(ecb_grip21_device::grnout_w));
+//  map(0xe0, 0xe0).w(FUNC(ecb_grip21_device::redout_w));
+//  map(0xf0, 0xf0).w(FUNC(ecb_grip21_device::clrg1_w));
 }
 
 
@@ -435,7 +435,7 @@ void ecb_grip21_device::device_add_mconfig(machine_config &config)
 	m_crtc->set_screen(SCREEN_TAG);
 	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(ecb_grip21_device::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(ecb_grip21_device::crtc_update_row));
 	m_crtc->out_de_callback().set(m_sti, FUNC(z80sti_device::i1_w));
 	m_crtc->out_cur_callback().set(m_sti, FUNC(z80sti_device::i1_w));
 

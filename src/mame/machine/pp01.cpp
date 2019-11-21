@@ -93,28 +93,27 @@ void pp01_state::set_memory(uint8_t block, uint8_t data)
 		// This is RAM
 		space.install_read_bank (startaddr, endaddr, bank);
 		switch(data) {
-			case 0xe6 :
-					space.install_write_handler(startaddr, endaddr, write8_delegate(FUNC(pp01_state::video_r_1_w),this));
-					break;
-			case 0xe7 :
-					space.install_write_handler(startaddr, endaddr, write8_delegate(FUNC(pp01_state::video_r_2_w),this));
-					break;
-			case 0xea :
-					space.install_write_handler(startaddr, endaddr, write8_delegate(FUNC(pp01_state::video_g_1_w),this));
-					break;
-			case 0xeb :
-					space.install_write_handler(startaddr, endaddr, write8_delegate(FUNC(pp01_state::video_g_2_w),this));
-					break;
-			case 0xee :
-					space.install_write_handler(startaddr, endaddr, write8_delegate(FUNC(pp01_state::video_b_1_w),this));
-					break;
-			case 0xef :
-					space.install_write_handler(startaddr, endaddr, write8_delegate(FUNC(pp01_state::video_b_2_w),this));
-					break;
-
-			default :
-					space.install_write_bank(startaddr, endaddr, bank);
-					break;
+		case 0xe6 :
+			space.install_write_handler(startaddr, endaddr, write8_delegate(*this, FUNC(pp01_state::video_r_1_w)));
+			break;
+		case 0xe7:
+			space.install_write_handler(startaddr, endaddr, write8_delegate(*this, FUNC(pp01_state::video_r_2_w)));
+			break;
+		case 0xea:
+			space.install_write_handler(startaddr, endaddr, write8_delegate(*this, FUNC(pp01_state::video_g_1_w)));
+			break;
+		case 0xeb:
+			space.install_write_handler(startaddr, endaddr, write8_delegate(*this, FUNC(pp01_state::video_g_2_w)));
+			break;
+		case 0xee:
+			space.install_write_handler(startaddr, endaddr, write8_delegate(*this, FUNC(pp01_state::video_b_1_w)));
+			break;
+		case 0xef:
+			space.install_write_handler(startaddr, endaddr, write8_delegate(*this, FUNC(pp01_state::video_b_2_w)));
+			break;
+		default:
+			space.install_write_bank(startaddr, endaddr, bank);
+			break;
 		}
 
 		membank(bank)->set_base(m_ram->pointer() + (data & 0x0F)* 0x1000);

@@ -113,7 +113,7 @@ TILE_GET_INFO_MEMBER(spartanxtec_state::get_kungfum_bg_tile_info)
 
 void spartanxtec_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(spartanxtec_state::get_kungfum_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(spartanxtec_state::get_kungfum_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_bg_tilemap->set_scroll_rows(32);
 }
 
@@ -404,30 +404,30 @@ void spartanxtec_state::spartanxtec(machine_config &config)
 
 ROM_START( spartanxtec )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "1.bin", 0x00000, 0x04000, CRC(d5d6cddf) SHA1(baaec83be455bf2267d51ea2a2c1fcda22f27bd5) )
-	ROM_LOAD( "2.bin", 0x04000, 0x04000, CRC(2803bb72) SHA1(d0f93c61f3f08fb866e2a4617a7824e72f61c97f) )
+	ROM_LOAD( "1.ic13", 0x00000, 0x04000, CRC(d5d6cddf) SHA1(baaec83be455bf2267d51ea2a2c1fcda22f27bd5) )
+	ROM_LOAD( "2.ic14", 0x04000, 0x04000, CRC(2803bb72) SHA1(d0f93c61f3f08fb866e2a4617a7824e72f61c97f) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "3.bin", 0x00000, 0x01000, CRC(9a18af94) SHA1(1644295aa0c837dced5934360e41d77e0a93ccd1) )
+	ROM_LOAD( "3.ic8", 0x00000, 0x01000, CRC(9a18af94) SHA1(1644295aa0c837dced5934360e41d77e0a93ccd1) )
 
 	ROM_REGION( 0x6000, "gfx1", ROMREGION_INVERT )
-	ROM_LOAD( "5.bin", 0x00000, 0x0800, CRC(8a3d2978) SHA1(e50ba8d63e894c6a555d92c3144682be68f111b0))
+	ROM_LOAD( "5.ic26", 0x00000, 0x0800, CRC(8a3d2978) SHA1(e50ba8d63e894c6a555d92c3144682be68f111b0))
 	ROM_CONTINUE(0x1000, 0x0800)
 	ROM_CONTINUE(0x0800, 0x0800)
 	ROM_CONTINUE(0x1800, 0x0800)
-	ROM_LOAD( "6.bin", 0x02000, 0x0800, CRC(b1570b6b) SHA1(380a692309690e6ff6b57fda657192fff95167e0) )
+	ROM_LOAD( "6.ic27", 0x02000, 0x0800, CRC(b1570b6b) SHA1(380a692309690e6ff6b57fda657192fff95167e0) )
 	ROM_CONTINUE(0x3000, 0x0800)
 	ROM_CONTINUE(0x2800, 0x0800)
 	ROM_CONTINUE(0x3800, 0x0800)
-	ROM_LOAD( "4.bin", 0x04000, 0x0800, CRC(b55672ef) SHA1(7bd556a76e130be1262aa7db09df84c6463ce9ef) )
+	ROM_LOAD( "4.ic25", 0x04000, 0x0800, CRC(b55672ef) SHA1(7bd556a76e130be1262aa7db09df84c6463ce9ef) )
 	ROM_CONTINUE(0x5000, 0x0800)
 	ROM_CONTINUE(0x4800, 0x0800)
 	ROM_CONTINUE(0x5800, 0x0800)
 
 	ROM_REGION( 0x18000, "gfx2", ROMREGION_INVERT )
-	ROM_LOAD( "7.bin", 0x00000, 0x08000, CRC(aa897e30) SHA1(90b3b316800be106d3baa6783ca894703f369d4e) )
-	ROM_LOAD( "8.bin", 0x08000, 0x08000, CRC(98a1803b) SHA1(3edfc45c289f850b07a0231ce0b792cbec6fb245) )
-	ROM_LOAD( "9.bin", 0x10000, 0x08000, CRC(e3bf0d73) SHA1(4562422c07399e240081792b96b9018d1e7dd97b) )
+	ROM_LOAD( "7.bin",  0x00000, 0x08000, CRC(aa897e30) SHA1(90b3b316800be106d3baa6783ca894703f369d4e) )
+	ROM_LOAD( "8.bin",  0x08000, 0x08000, CRC(98a1803b) SHA1(3edfc45c289f850b07a0231ce0b792cbec6fb245) )
+	ROM_LOAD( "9.ic43", 0x10000, 0x08000, CRC(e3bf0d73) SHA1(4562422c07399e240081792b96b9018d1e7dd97b) )
 
 	ROM_REGION( 0x600, "cprom", 0 )
 	// first half of all of these is empty
@@ -441,6 +441,11 @@ ROM_START( spartanxtec )
 	ROM_REGION( 0x18000, "unkprom", 0 ) // just linear increasing value
 	ROM_LOAD( "1_tbp24s10_82s129.bin", 0x0000, 0x0100, CRC(b6135ee0) SHA1(248a978987cff86c2bbad10ef332f63a6abd5bee) )
 	ROM_LOAD( "2_tbp24s10_82s129.bin", 0x0000, 0x0100, CRC(b6135ee0) SHA1(248a978987cff86c2bbad10ef332f63a6abd5bee) )
+
+	ROM_REGION( 0x00228, "plds", 0 )
+	ROM_LOAD( "pal16r8acn.ic12", 0x0000, 0x0114, NO_DUMP )
+	ROM_LOAD( "pal16r6acn.ic33", 0x0114, 0x0114, NO_DUMP )
+
 ROM_END
 
 

@@ -44,7 +44,7 @@ INPUT_PORTS_END
 
 void daryde_state::pandart(machine_config &config)
 {
-	cpu_device &maincpu(Z180(config, "maincpu", XTAL(18'432'000)));
+	cpu_device &maincpu(Z80180(config, "maincpu", XTAL(18'432'000)));
 	maincpu.set_addrmap(AS_PROGRAM, &daryde_state::mem_map);
 	maincpu.set_addrmap(AS_IO, &daryde_state::io_map);
 
@@ -90,7 +90,8 @@ CN11 = 10 pins
 CN12 = 9 pins (DB9)
 CN13 = 16 pins, but no connector, 2200μF25V capacitor between last pins
 CN14 = 6 pins
-CN15 = 5 pins */
+CN15 = 5 pins
+*/
 ROM_START(pandart)
 	ROM_REGION(0x80000, "program", 0)
 	ROM_LOAD("27c040.ic5", 0x00000, 0x80000, CRC(b1bd5c14) SHA1(7164dcaebf0f23f5330b225e44ee87d9a8c79f4f))
@@ -129,7 +130,8 @@ JP1 (4 bridges):
  2: VDD
  1: GND
  2: VDD
- 1: GND */
+ 1: GND
+*/
 ROM_START(cricket)
 	ROM_REGION(0x80000, "program", 0)
 	ROM_LOAD("daryde_cricket_red_1.0.ic3", 0x00000, 0x80000, CRC(6abaa50e) SHA1(f128ed9cd9926684bd77ec708a5d3edf2736e39c)) // AM27C040
@@ -138,9 +140,48 @@ ROM_START(cricket)
 	ROM_LOAD("a_palce16v8h.ic4", 0x000, 0x117, NO_DUMP)
 	ROM_LOAD("b_palce16v8h.ic5", 0x117, 0x117, NO_DUMP)
 
-		ROM_REGION(0x2000, "nvram", 0)
+	ROM_REGION(0x2000, "nvram", 0)
 	ROM_LOAD("ds1225y.ic7", 0x0000, 0x2000, BAD_DUMP CRC(3a7f0f6f) SHA1(b672859399db854bc049c75beea482b5afb3d2bb)) // NVRAM dumped from a working machine, but may not be the default
+ROM_END
+
+/* Kursaal Darts PCB
+ __________________________________________________
+ |    __________________   _____                   |
+ |    |_CN13 (12 pins)__|  |CN10|         |H606014 |
+ |__        _____________        XTAL 18.432MHz __ |
+ || |       |U632H64BD1C |     ____________     |C||
+ ||C|       |____________|     |           |    |N||
+ ||N|       _____________      |Z8018010VSC|    |1||
+ ||3|       |IC5 27C4001 |     |Z180 MPU   |    __ |
+ || |       |____________|     |___________|    |C||
+ || |          __________                       |N||
+ ||_|          |PAL16V8H_|      __________      __ |
+ |                              |74HC138AN|     | ||
+ |__           __________       __________      |C||
+ ||C|          |74HC244N_|      |__2803___|     |N||
+ ||N|          __________       __________      |6||
+ ||4|          |74HC244N_|      |74HC273N_|     | ||
+ |__           __________       __________      | ||
+ ||C|          |74HC244N_|      |74HC273N_|     |_||
+ ||N|                           __________      __ |
+ ||1|                           |74HC273N_|  CN7|_||
+ ||3|          __________       __________      __ |
+ ||_|          |74HC244B1|      |74HC273N_|  CN5|_||
+ |__                                             o |
+ || |                                           __ |
+ ||_|CN14                                     CN|_||
+ |_________________________________________________|
+*/
+ROM_START(kurdart)
+	ROM_REGION(0x80000, "program", 0)
+	ROM_LOAD("kursaal_m27c4001.ic5", 0x00000, 0x80000, CRC(6adece55) SHA1(4d0060ec0fe9c18ade27d1b78adf8fd3391d4e1f)) // M27C4001
+
+	ROM_REGION(0x117, "pal", 0)
+	ROM_LOAD("palce16v8h-25.ic2", 0x000, 0x117, NO_DUMP)
+
+	// No NVRAM on this PCB
 ROM_END
 
 GAME(1995, cricket, 0, pandart, pandart, daryde_state, empty_init, ROT0, "Daryde S. L.", "Cricket",       MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1999, pandart, 0, pandart, pandart, daryde_state, empty_init, ROT0, "Daryde S. L.", "Panther Darts", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(199?, kurdart, 0, pandart, pandart, daryde_state, empty_init, ROT0, "K7 Kursaal",   "Kursaal Darts", MACHINE_IS_SKELETON_MECHANICAL)

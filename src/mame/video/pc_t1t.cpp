@@ -128,7 +128,7 @@ void pcvideo_t1000_device::device_add_mconfig(machine_config &config)
 	m_mc6845->set_screen(T1000_SCREEN_NAME);
 	m_mc6845->set_show_border_area(false);
 	m_mc6845->set_char_width(8);
-	m_mc6845->set_update_row_callback(FUNC(pc_t1t_device::crtc_update_row), this);
+	m_mc6845->set_update_row_callback(FUNC(pc_t1t_device::crtc_update_row));
 	m_mc6845->out_de_callback().set(FUNC(pc_t1t_device::t1000_de_changed));
 	m_mc6845->out_vsync_callback().set(FUNC(pcvideo_t1000_device::t1000_vsync_changed));
 
@@ -148,7 +148,7 @@ void pcvideo_pcjr_device::device_add_mconfig(machine_config &config)
 	m_mc6845->set_screen(T1000_SCREEN_NAME);
 	m_mc6845->set_show_border_area(false);
 	m_mc6845->set_char_width(8);
-	m_mc6845->set_update_row_callback(FUNC(pcvideo_pcjr_device::crtc_update_row), this);
+	m_mc6845->set_update_row_callback(FUNC(pcvideo_pcjr_device::crtc_update_row));
 	m_mc6845->out_de_callback().set(FUNC(pc_t1t_device::t1000_de_changed));
 	m_mc6845->out_vsync_callback().set(FUNC(pcvideo_pcjr_device::pcjr_vsync_changed));
 

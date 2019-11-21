@@ -121,7 +121,7 @@ void side116_device::device_reset()
 
 	// install io access
 	if ((m_config->read() & 0x20) == 0x20)
-		m_isa->install_device(0x360, 0x36f, read8_delegate(FUNC(side116_device::read), this), write8_delegate(FUNC(side116_device::write), this));
+		m_isa->install_device(0x360, 0x36f, read8_delegate(*this, FUNC(side116_device::read)), write8_delegate(*this, FUNC(side116_device::write)));
 }
 
 

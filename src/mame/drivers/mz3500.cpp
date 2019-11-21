@@ -604,12 +604,12 @@ void mz3500_state::mz3500_master_map(address_map &map)
 void mz3500_state::mz3500_master_io(address_map &map)
 {
 	map.global_mask(0xff);
-//  ADDRESS_MAP_UNMAP_HIGH
-//  AM_RANGE(0xe4, 0xe7) SFD upd765
-//  AM_RANGE(0xe8, 0xeb) SFD I/O port and DMAC chip select
-//  AM_RANGE(0xec, 0xef) irq signal from slave to master CPU
+//  map.unmap_value_high();
+//  map(0xe4, 0xe7) SFD upd765
+//  map(0xe8, 0xeb) SFD I/O port and DMAC chip select
+//  map(0xec, 0xef) irq signal from slave to master CPU
 	map(0xf4, 0xf5).m(m_fdc, FUNC(upd765a_device::map)); // MFD upd765
-//  AM_RANGE(0xf8, 0xfb) MFD I/O port
+//  map(0xf8, 0xfb) MFD I/O port
 	map(0xf8, 0xf8).rw(FUNC(mz3500_state::mz3500_fdc_r), FUNC(mz3500_state::mz3500_fdc_w));
 	map(0xf9, 0xf9).r(FUNC(mz3500_state::mz3500_fdc_dma_r));
 	map(0xfc, 0xff).rw(FUNC(mz3500_state::mz3500_io_r), FUNC(mz3500_state::mz3500_io_w)); // memory mapper
@@ -626,9 +626,9 @@ void mz3500_state::mz3500_slave_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
-//  AM_RANGE(0x00, 0x0f) f/f and irq to master CPU
-//  AM_RANGE(0x10, 0x1f) i8251
-//  AM_RANGE(0x20, 0x2f) pit8253
+//  map(0x00, 0x0f) f/f and irq to master CPU
+//  map(0x10, 0x1f) i8251
+//  map(0x20, 0x2f) pit8253
 	map(0x30, 0x33).rw("i8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x40, 0x40).portr("DSW");
 	map(0x50, 0x5f).ram().w(FUNC(mz3500_state::mz3500_crtc_w));
@@ -800,7 +800,7 @@ void mz3500_state::upd7220_1_map(address_map &map)
 
 void mz3500_state::upd7220_2_map(address_map &map)
 {
-	map(0x00000, 0x3ffff).ram(); // AM_SHARE("video_ram_2")
+	map(0x00000, 0x3ffff).ram(); // .share("video_ram_2");
 }
 
 static void mz3500_floppies(device_slot_interface &device)
@@ -820,7 +820,7 @@ void mz3500_state::mz3500(machine_config &config)
 	m_slave->set_addrmap(AS_PROGRAM, &mz3500_state::mz3500_slave_map);
 	m_slave->set_addrmap(AS_IO, &mz3500_state::mz3500_slave_io);
 
-	config.m_perfect_cpu_quantum = subtag("master");
+	config.set_perfect_quantum(m_master);
 
 	i8255_device &ppi(I8255A(config, "i8255"));
 	ppi.out_pa_callback().set(FUNC(mz3500_state::mz3500_pa_w));

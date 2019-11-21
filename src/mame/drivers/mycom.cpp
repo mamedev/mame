@@ -37,14 +37,25 @@
       toggles between English and Kana.
 
     TODO/info:
-    - Sound not working. The info makes its way to the audio chip but for
-      some unknown reason, nothing is heard.
     - FDC, little info, guessing (143kb, single sided, 525sd)
     - Cassette doesn't load
     - Printer
     - Keyboard lookup table for Kana and Shifted Kana
     - Keyboard autorepeat
     - Need software
+
+    Basic:
+    - To enter Basic, type BASIC. To quit, type EXIT.
+
+    Cassette:
+    - Bios 0: you can SAVE and LOAD from the monitor, but not from Basic. (see ToDo)
+    - Bios 1: Doesn't seem to be supported.
+
+    Sound:
+    - Bios 0: Sound is initialised with the volume turned off. In Basic, you
+              can POKE 4382,144 to enable sound.
+    - Bios 1: Doesn't appear to support sound. The included Basic has a SOUND
+              command (e.g SOUND 127,80), but no sound is heard.
 
 *******************************************************************************/
 
@@ -540,12 +551,12 @@ void mycom_state::mycom(machine_config &config)
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_mycom);
 
 	/* Manual states clock is 1.008mhz for 40 cols, and 2.016 mhz for 80 cols.
-	The CRTC is a HD46505S - same as a 6845. The start registers need to be readable. */
-	MC6845(config, m_crtc, 1008000);
+	The manual states the CRTC is a HD46505S (apparently same as HD6845S). The start registers need to be readable. */
+	HD6845S(config, m_crtc, 1008000);
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(mycom_state::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(mycom_state::crtc_update_row));
 
 	SPEAKER(config, "mono").front_center();
 	SN76489(config, m_audio, 10_MHz_XTAL / 4).add_route(ALL_OUTPUTS, "mono", 1.50);
@@ -586,4 +597,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY                      FULLNAME      FLAGS
-COMP( 1981, mycom, 0,      0,      mycom,   mycom, mycom_state, init_mycom, "Japan Electronics College", "MYCOMZ-80A", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1981, mycom, 0,      0,      mycom,   mycom, mycom_state, init_mycom, "Japan Electronics College", "MYCOMZ-80A", MACHINE_NOT_WORKING )

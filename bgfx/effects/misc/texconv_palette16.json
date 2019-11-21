@@ -1,0 +1,26 @@
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz
+//===============================================================
+//
+//  texconv_palette16.json: A palettized texture-to-target copy.
+//
+//===============================================================
+{
+    "blend": {
+    	"equation": "add",
+    	"srcColor": "srcalpha",
+    	"dstColor": "1-srcalpha",
+    	"srcAlpha": "srcalpha",
+    	"dstAlpha": "1-srcalpha"
+    },
+    "depth": { "function": "always", "writeenable": false },
+    "cull": { "mode": "none" },    
+    "write": { "rgb": true, "alpha": true },
+    "vertex": "chains/misc/vs_blit",
+    "fragment": "chains/misc/fs_blit_palette16",
+    "uniforms": [    	
+    	{ "name": "s_tex", "type": "int", "values": [ 1.0 ] },
+    	{ "name": "s_pal", "type": "int", "values": [ 1.0 ] },
+    	{ "name": "u_inv_tex_size1", "type": "vec4", "values": [ 1.0, 1.0, 0.0, 0.0 ] }
+    ]
+}

@@ -8,7 +8,7 @@
 		<publisher>Wang</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="bootdisk.img" size="368640" crc="ca822bf0" sha1="c0a60e47bd76d981922cde199f639cf9ead02336" offset="0" />
+				<rom name="bootdisk.img" size="368640" crc="ca822bf0" sha1="c0a60e47bd76d981922cde199f639cf9ead02336"/>
 			</dataarea>
 		</part>
 	</software>
@@ -21,7 +21,7 @@
 		<publisher>Wang</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="70344">
-				<rom name="wng-ibm.td0" size="70344" crc="cf401405" sha1="386b07878c38e36fc3dc362c445e067f8cfa03dc" offset="0" />
+				<rom name="wng-ibm.td0" size="70344" crc="cf401405" sha1="386b07878c38e36fc3dc362c445e067f8cfa03dc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -32,17 +32,17 @@
 		<publisher>Wang</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="150470">
-				<rom name="wng-sys1.td0" size="150470" crc="cc7421e2" sha1="3e3528d0a6c46c279db1eb3b1cd8c9a5a3d99a15" offset="0" />
+				<rom name="wng-sys1.td0" size="150470" crc="cc7421e2" sha1="3e3528d0a6c46c279db1eb3b1cd8c9a5a3d99a15"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="133976">
-				<rom name="wng-sys2.td0" size="133976" crc="111843ca" sha1="d2853059fcdc07fa642c9c6bda778a5e945045b8" offset="0" />
+				<rom name="wng-sys2.td0" size="133976" crc="111843ca" sha1="d2853059fcdc07fa642c9c6bda778a5e945045b8"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="157352">
-				<rom name="wng-sys3.td0" size="157352" crc="9603876c" sha1="6f14d56ada062abe88c0fd6f91b1a5a06c749086" offset="0" />
+				<rom name="wng-sys3.td0" size="157352" crc="9603876c" sha1="6f14d56ada062abe88c0fd6f91b1a5a06c749086"/>
 			</dataarea>
 		</part>
 	</software>
@@ -53,7 +53,7 @@
 		<publisher>Wang</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="71808">
-				<rom name="wng-prn.td0" size="71808" crc="96bdba1e" sha1="87b0cd89ff43ee6f15e5a83e037e576230501112" offset="0" />
+				<rom name="wng-prn.td0" size="71808" crc="96bdba1e" sha1="87b0cd89ff43ee6f15e5a83e037e576230501112"/>
 			</dataarea>
 		</part>
 	</software>
@@ -64,7 +64,7 @@
 		<publisher>Wang</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="9780">
-				<rom name="wng-sfmt.td0" size="9780" crc="40ca46d5" sha1="0af9d72493fc0df01bae64473bd65e58808c8561" offset="0" />
+				<rom name="wng-sfmt.td0" size="9780" crc="40ca46d5" sha1="0af9d72493fc0df01bae64473bd65e58808c8561"/>
 			</dataarea>
 		</part>
 	</software>
@@ -75,7 +75,7 @@
 		<publisher>Wang</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="156472">
-				<rom name="wng-wutl.td0" size="156472" crc="0ba41a72" sha1="51e7db72a44ab39a514f8cd9598e7e8b8564218f" offset="0" />
+				<rom name="wng-wutl.td0" size="156472" crc="0ba41a72" sha1="51e7db72a44ab39a514f8cd9598e7e8b8564218f"/>
 			</dataarea>
 		</part>
 	</software>

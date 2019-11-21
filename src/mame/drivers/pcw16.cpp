@@ -1016,7 +1016,7 @@ void pcw16_state::pcw16(machine_config &config)
 	Z80(config, m_maincpu, 16000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pcw16_state::pcw16_map);
 	m_maincpu->set_addrmap(AS_IO, &pcw16_state::pcw16_io);
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	ns16550_device &uart1(NS16550(config, "ns16550_1", XTAL(1'843'200)));     /* TODO: Verify uart model */
 	uart1.out_tx_callback().set("serport1", FUNC(rs232_port_device::write_txd));

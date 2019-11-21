@@ -252,11 +252,11 @@ void apf_state::machine_start()
 		switch (m_cart->get_type())
 		{
 			case APF_BASIC:
-				m_maincpu->space(AS_PROGRAM).install_read_handler(0x6800, 0x7fff, read8_delegate(FUNC(apf_cart_slot_device::extra_rom),(apf_cart_slot_device*)m_cart));
+				m_maincpu->space(AS_PROGRAM).install_read_handler(0x6800, 0x7fff, read8_delegate(*m_cart, FUNC(apf_cart_slot_device::extra_rom)));
 				break;
 			case APF_SPACEDST:
 				m_maincpu->space(AS_PROGRAM).unmap_readwrite(0x9800, 0x9fff);
-				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x9800, 0x9bff, read8_delegate(FUNC(apf_cart_slot_device::read_ram),(apf_cart_slot_device*)m_cart), write8_delegate(FUNC(apf_cart_slot_device::write_ram),(apf_cart_slot_device*)m_cart));
+				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x9800, 0x9bff, read8_delegate(*m_cart, FUNC(apf_cart_slot_device::read_ram)), write8_delegate(*m_cart, FUNC(apf_cart_slot_device::write_ram)));
 				m_has_cart_ram = true;
 				break;
 		}

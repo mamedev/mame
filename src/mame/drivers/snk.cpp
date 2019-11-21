@@ -1413,7 +1413,7 @@ void snk_state::hal21_sound_map(address_map &map)
 	map(0xa000, 0xa000).r(FUNC(snk_state::sgladiat_soundlatch_r));
 	map(0xc000, 0xc000).r(FUNC(snk_state::sgladiat_sound_nmi_ack_r));
 	map(0xe000, 0xe001).w("ay1", FUNC(ay8910_device::address_data_w));
-//  AM_RANGE(0xe002, 0xe002) AM_WRITENOP    // bitfielded(0-5) details unknown. Filter enable?
+//  map(0xe002, 0xe002).nopw();    // bitfielded(0-5) details unknown. Filter enable?
 	map(0xe008, 0xe009).w("ay2", FUNC(ay8910_device::address_data_w));
 }
 
@@ -1442,7 +1442,7 @@ void snk_state::aso_YM3526_sound_map(address_map &map)
 	map(0xd000, 0xd000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0xe000, 0xe000).r(FUNC(snk_state::tnk3_busy_clear_r));
 	map(0xf000, 0xf001).rw("ym1", FUNC(ym3526_device::read), FUNC(ym3526_device::write));
-//  AM_RANGE(0xf002, 0xf002) AM_READNOP unknown
+//  map(0xf002, 0xf002).nopr(); unknown
 	map(0xf004, 0xf004).r(FUNC(snk_state::tnk3_cmdirq_ack_r));
 	map(0xf006, 0xf006).r(FUNC(snk_state::tnk3_ymirq_ack_r));
 }
@@ -3622,7 +3622,7 @@ void snk_state::marvins(machine_config &config)
 	m_audiocpu->set_addrmap(AS_IO, &snk_state::marvins_sound_portmap);
 	m_audiocpu->set_periodic_int(FUNC(snk_state::nmi_line_assert), attotime::from_hz(244));  // schematics show a separate 244Hz timer
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -3684,7 +3684,7 @@ void snk_state::jcross(machine_config &config)
 	m_audiocpu->set_addrmap(AS_IO, &snk_state::jcross_sound_portmap);
 	m_audiocpu->set_periodic_int(FUNC(snk_state::irq0_line_assert), attotime::from_hz(244)); // Marvin's frequency, sounds ok
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -3755,7 +3755,7 @@ void snk_state::tnk3(machine_config &config)
 	Z80(config, m_audiocpu, XTAL(8'000'000)/2); /* verified on pcb */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &snk_state::tnk3_YM3526_sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -3848,7 +3848,7 @@ void snk_state::ikari(machine_config &config)
 	Z80(config, m_audiocpu, XTAL(8'000'000)/2); /* verified on pcb */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &snk_state::YM3526_YM3526_sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -3905,7 +3905,7 @@ void snk_state::bermudat(machine_config &config)
 	Z80(config, m_audiocpu, XTAL(8'000'000)/2); /* verified on pcb */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &snk_state::YM3526_Y8950_sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(24000);
+	config.set_maximum_quantum(attotime::from_hz(24000));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -3988,7 +3988,7 @@ void snk_state::tdfever(machine_config &config)
 	Z80(config, m_audiocpu, 4000000);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &snk_state::YM3526_Y8950_sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

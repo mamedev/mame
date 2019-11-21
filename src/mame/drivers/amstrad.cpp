@@ -810,7 +810,7 @@ void amstrad_state::cpcplus_cartslot(machine_config &config)
 {
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "gx4000_cart", "bin,cpr"));
 	cartslot.set_must_be_loaded(true);
-	cartslot.set_device_load(FUNC(amstrad_state::amstrad_plus_cartridge), this);
+	cartslot.set_device_load(FUNC(amstrad_state::amstrad_plus_cartridge));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("gx4000");
 }
@@ -914,7 +914,7 @@ void amstrad_state::amstrad_base(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &amstrad_state::amstrad_io);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(amstrad_state::amstrad_cpu_acknowledge_int));
 
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	MCFG_MACHINE_START_OVERRIDE(amstrad_state, amstrad )
 	MCFG_MACHINE_RESET_OVERRIDE(amstrad_state, amstrad )
@@ -957,7 +957,7 @@ void amstrad_state::amstrad_base(machine_config &config)
 	m_centronics->busy_handler().set(FUNC(amstrad_state::write_centronics_busy));
 
 	/* snapshot */
-	SNAPSHOT(config, "snapshot", "sna").set_load_callback(FUNC(amstrad_state::snapshot_cb), this);
+	SNAPSHOT(config, "snapshot", "sna").set_load_callback(FUNC(amstrad_state::snapshot_cb));
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(cdt_cassette_formats);
@@ -1040,7 +1040,7 @@ void amstrad_state::cpcplus(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &amstrad_state::amstrad_io);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(amstrad_state::amstrad_cpu_acknowledge_int));
 
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	MCFG_MACHINE_START_OVERRIDE(amstrad_state, plus )
 	MCFG_MACHINE_RESET_OVERRIDE(amstrad_state, plus )
@@ -1082,7 +1082,7 @@ void amstrad_state::cpcplus(machine_config &config)
 	m_centronics->busy_handler().set(FUNC(amstrad_state::write_centronics_busy));
 
 	/* snapshot */
-	SNAPSHOT(config, "snapshot", "sna").set_load_callback(FUNC(amstrad_state::snapshot_cb), this);
+	SNAPSHOT(config, "snapshot", "sna").set_load_callback(FUNC(amstrad_state::snapshot_cb));
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(cdt_cassette_formats);
@@ -1119,7 +1119,7 @@ void amstrad_state::gx4000(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &amstrad_state::amstrad_io);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(amstrad_state::amstrad_cpu_acknowledge_int));
 
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	MCFG_MACHINE_START_OVERRIDE(amstrad_state, gx4000 )
 	MCFG_MACHINE_RESET_OVERRIDE(amstrad_state, gx4000 )

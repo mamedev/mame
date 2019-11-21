@@ -95,7 +95,7 @@
 
 class device_rs232_port_interface;
 
-class rs232_port_device : public device_t, public device_slot_interface
+class rs232_port_device : public device_t, public device_single_card_slot_interface<device_rs232_port_interface>
 {
 	friend class device_rs232_port_interface;
 
@@ -141,6 +141,7 @@ protected:
 	rs232_port_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_resolve_objects() override;
+	virtual void device_reset() override;
 	virtual void device_start() override;
 	virtual void device_config_complete() override;
 
@@ -166,7 +167,7 @@ private:
 	device_rs232_port_interface *m_dev;
 };
 
-class device_rs232_port_interface : public device_slot_card_interface
+class device_rs232_port_interface : public device_interface
 {
 	friend class rs232_port_device;
 

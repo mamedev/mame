@@ -25,7 +25,7 @@ The "rc" feature is used to indicate the source of the clock signal
 			<feature name="paddle" value="yes" />
 			<feature name="rc" value="100pf/23.2K" />
 			<dataarea name="rom" size="2048">
-				<rom name="m34009-n1" size="2048" crc="b1632712" sha1="515040a3bf6386590c025e12a9512c98efdd7e1e" offset="0" />
+				<rom name="m34009-n1" size="2048" crc="b1632712" sha1="515040a3bf6386590c025e12a9512c98efdd7e1e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -40,7 +40,7 @@ The "rc" feature is used to indicate the source of the clock signal
 			<feature name="paddle" value="yes" />
 			<feature name="rc" value="100pf/23.2K" />
 			<dataarea name="rom" size="2048">
-				<rom name="mp3479-n1nll_4063" size="2048" crc="40e3327a" sha1="c1b52a081c7fe6a51c5cfe41a4d446f1f8cfe24e" offset="0" />
+				<rom name="mp3479-n1nll_4063" size="2048" crc="40e3327a" sha1="c1b52a081c7fe6a51c5cfe41a4d446f1f8cfe24e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -55,7 +55,7 @@ The "rc" feature is used to indicate the source of the clock signal
 			<feature name="paddle" value="yes" />
 			<feature name="rc" value="100pf/23.2K" />
 			<dataarea name="rom" size="2048">
-				<rom name="mp3450a" size="2048" crc="fd18ea6d" sha1="30203278d7f2b0817e59bdf7e451be2d64a90f5a" offset="0" />
+				<rom name="mp3450a" size="2048" crc="fd18ea6d" sha1="30203278d7f2b0817e59bdf7e451be2d64a90f5a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -72,7 +72,7 @@ The "rc" feature is used to indicate the source of the clock signal
 			<feature name="paddle" value="no" />
 			<feature name="rc" value="100pf/23.2K" />
 			<dataarea name="rom" size="2048">
-				<rom name="mp3475nll_4972" size="2048" crc="460ac30e" sha1="93ffb75b82d1f48f451e0e1158d5a8d1cd465fe5" offset="0" />
+				<rom name="mp3475nll_4972" size="2048" crc="460ac30e" sha1="93ffb75b82d1f48f451e0e1158d5a8d1cd465fe5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -87,7 +87,7 @@ The "rc" feature is used to indicate the source of the clock signal
 			<feature name="paddle" value="yes" />
 			<dataarea name="rom" size="1024">
 				<!-- 8021 on cart has no label -->
-				<rom name="connect4.bin" size="1024" crc="bdd8660b" sha1="971f9117dc809f7b9796134208b47ea34990ae71" offset="0" />
+				<rom name="connect4.bin" size="1024" crc="bdd8660b" sha1="971f9117dc809f7b9796134208b47ea34990ae71"/>
 			</dataarea>
 		</part>
 	</software>
@@ -102,7 +102,7 @@ The "rc" feature is used to indicate the source of the clock signal
 			<feature name="pcb" value="4952-79 REV-B" />  <!-- correct? -->
 			<feature name="paddle" value="yes" />
 			<dataarea name="rom" size="2048">
-				<rom name="connect4t.bin" size="2048" crc="6a4cf60b" sha1="e93d848784205ab49234ad26718e04d267b776ed" offset="0" />
+				<rom name="connect4t.bin" size="2048" crc="6a4cf60b" sha1="e93d848784205ab49234ad26718e04d267b776ed"/>
 			</dataarea>
 		</part>
 	</software>
@@ -118,7 +118,7 @@ The "rc" feature is used to indicate the source of the clock signal
 			<feature name="paddle" value="no" />
 			<feature name="rc" value="100pf/23.2K" />
 			<dataarea name="rom" size="2048">
-				<rom name="m34017-n1" size="2048" crc="d8ba1377" sha1="a8dabd296aefc46849db2b7d2d8e0de7c77b5b38" offset="0" />
+				<rom name="m34017-n1" size="2048" crc="d8ba1377" sha1="a8dabd296aefc46849db2b7d2d8e0de7c77b5b38"/>
 			</dataarea>
 		</part>
 	</software>
@@ -133,7 +133,7 @@ The "rc" feature is used to indicate the source of the clock signal
 			<feature name="paddle" value="no" />
 			<feature name="rc" value="100pf/21.0K" />
 			<dataarea name="rom" size="2048">
-				<rom name="mp3457nll_4976" size="2048" crc="d5dc1f7d" sha1="9e53bd7e9b718ced3bffbdd50cf9ea1547183ea3" offset="0" />
+				<rom name="mp3457nll_4976" size="2048" crc="d5dc1f7d" sha1="9e53bd7e9b718ced3bffbdd50cf9ea1547183ea3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -148,7 +148,7 @@ The "rc" feature is used to indicate the source of the clock signal
 			<feature name="paddle" value="no" />
 			<feature name="rc" value="100pf/21.0K" />
 			<dataarea name="rom" size="2048">
-				<rom name="mp3454" size="2048" crc="c7768d04" sha1="e477d49fc835649164cff5ed158ee31dcf244efc" offset="0" />
+				<rom name="mp3454" size="2048" crc="c7768d04" sha1="e477d49fc835649164cff5ed158ee31dcf244efc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -163,7 +163,7 @@ The "rc" feature is used to indicate the source of the clock signal
 			<feature name="paddle" value="yes" />
 			<feature name="rc" value="100pf/21.0K" />
 			<dataarea name="rom" size="2048">
-				<rom name="mp3455nll_4974" size="2048" crc="906544ea" sha1="7ba8460369e1bb0708b0ef076342774059fd03d2" offset="0" />
+				<rom name="mp3455nll_4974" size="2048" crc="906544ea" sha1="7ba8460369e1bb0708b0ef076342774059fd03d2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -179,7 +179,7 @@ The "rc" feature is used to indicate the source of the clock signal
 			<feature name="paddle" value="no" />
 			<feature name="rc" value="100pf/39.4K" />
 			<dataarea name="rom" size="2048">
-				<rom name="mp3496-n1_4064" size="2048" crc="77a8f71b" sha1="1f95ecf3b1ec6a17db92e1ae903be269aa0b47d8" offset="0" />
+				<rom name="mp3496-n1_4064" size="2048" crc="77a8f71b" sha1="1f95ecf3b1ec6a17db92e1ae903be269aa0b47d8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -195,7 +195,7 @@ The "rc" feature is used to indicate the source of the clock signal
 			<feature name="paddle" value="yes" />
 			<feature name="rc" value="100pf/23.2K" />
 			<dataarea name="rom" size="2048">
-				<rom name="m34047-n2ll_4241" size="2048" crc="796660e3" sha1="1b758369849cc7dea3918774244f747895607377" offset="0" />
+				<rom name="m34047-n2ll_4241" size="2048" crc="796660e3" sha1="1b758369849cc7dea3918774244f747895607377"/>
 			</dataarea>
 		</part>
 	</software>
@@ -211,7 +211,7 @@ The "rc" feature is used to indicate the source of the clock signal
 			<feature name="paddle" value="no" />
 			<feature name="rc" value="100pf/23.2K" />
 			<dataarea name="rom" size="2048">
-				<rom name="mp3474nll_4975" size="2048" crc="4500c1d9" sha1="d49522dbe265e71b86488b5533d01bc9050811c9" offset="0" />
+				<rom name="mp3474nll_4975" size="2048" crc="4500c1d9" sha1="d49522dbe265e71b86488b5533d01bc9050811c9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -227,7 +227,7 @@ The "rc" feature is used to indicate the source of the clock signal
 			<feature name="paddle" value="no" />
 			<feature name="rc" value="100pf/23.2K" />
 			<dataarea name="rom" size="2048">
-				<rom name="bomber.bin" size="2048" crc="badbd0f8" sha1="3c31c24b58b1d6ac1c7313b690ec796cc5010cb7" offset="0" />
+				<rom name="bomber.bin" size="2048" crc="badbd0f8" sha1="3c31c24b58b1d6ac1c7313b690ec796cc5010cb7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -241,7 +241,7 @@ The "rc" feature is used to indicate the source of the clock signal
 			<feature name="paddle" value="no" />
 			<feature name="rc" value="100pf/23.2K" />
 			<dataarea name="rom" size="2048">
-				<rom name="demo.bin" size="2048" crc="54f1b288" sha1="9fcd930dff5f09979d3ed1278a928330b7000068" offset="0" />
+				<rom name="demo.bin" size="2048" crc="54f1b288" sha1="9fcd930dff5f09979d3ed1278a928330b7000068"/>
 			</dataarea>
 		</part>
 	</software>
@@ -255,7 +255,7 @@ The "rc" feature is used to indicate the source of the clock signal
 			<feature name="paddle" value="no" />
 			<feature name="rc" value="100pf/23.2K" />
 			<dataarea name="rom" size="2048">
-				<rom name="invaders.bin" size="2048" crc="d520ff6e" sha1="c979d7004fc205ee050045f13e2d6f2c31e2083e" offset="0" />
+				<rom name="invaders.bin" size="2048" crc="d520ff6e" sha1="c979d7004fc205ee050045f13e2d6f2c31e2083e"/>
 			</dataarea>
 		</part>
 	</software>

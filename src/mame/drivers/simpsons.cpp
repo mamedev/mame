@@ -178,7 +178,7 @@ void simpsons_state::device_timer(emu_timer &timer, device_timer_id id, int para
 			m_maincpu->set_input_line(KONAMI_FIRQ_LINE, HOLD_LINE);
 		break;
 	default:
-		assert_always(false, "Unknown id in simpsons_state::device_timer");
+		throw emu_fatalerror("Unknown id in simpsons_state::device_timer");
 	}
 }
 
@@ -350,11 +350,11 @@ void simpsons_state::simpsons(machine_config &config)
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette("palette");
 	m_k052109->set_screen("screen");
-	m_k052109->set_tile_callback(FUNC(simpsons_state::tile_callback), this);
+	m_k052109->set_tile_callback(FUNC(simpsons_state::tile_callback));
 	m_k052109->irq_handler().set_inputline(m_maincpu, KONAMI_IRQ_LINE);
 
 	K053246(config, m_k053246, 0);
-	m_k053246->set_sprite_callback(FUNC(simpsons_state::sprite_callback), this);
+	m_k053246->set_sprite_callback(FUNC(simpsons_state::sprite_callback));
 	m_k053246->set_config(NORMAL_PLANE_ORDER, 53, 23);
 	m_k053246->set_palette("palette");
 

@@ -54,6 +54,7 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 WRITE8_MEMBER(powerins_state::flipscreen_w)
 {
 	flip_screen_set(data & 1);
+	m_spritegen->set_flip_screen(flip_screen());
 }
 
 WRITE8_MEMBER(powerins_state::tilebank_w)
@@ -148,8 +149,8 @@ void powerins_state::video_start()
 	m_spritebuffer[0] = make_unique_clear<uint16_t[]>(0x1000/2);
 	m_spritebuffer[1] = make_unique_clear<uint16_t[]>(0x1000/2);
 
-	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(powerins_state::get_tile_info_0),this),tilemap_mapper_delegate(FUNC(powerins_state::get_memory_offset_0),this),16,16,256,32);
-	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(powerins_state::get_tile_info_1),this),TILEMAP_SCAN_COLS,8,8,64,32);
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(powerins_state::get_tile_info_0)), tilemap_mapper_delegate(*this, FUNC(powerins_state::get_memory_offset_0)), 16, 16, 256, 32);
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(powerins_state::get_tile_info_1)), TILEMAP_SCAN_COLS, 8, 8, 64, 32);
 
 	m_tilemap[1]->set_transparent_pen(15);
 
@@ -201,66 +202,16 @@ Offset:     Format:                 Value:
 ------------------------------------------------------------------------ */
 
 
-void powerins_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
+void powerins_state::get_colour_6bit(u32 &colour, u32 &pri_mask)
 {
-	uint16_t *source = m_spritebuffer[1].get();
-	uint16_t *finish = m_spritebuffer[1].get() + 0x1000/2;
+	colour &= 0x3f;
+	pri_mask |= GFX_PMASK_2; // under foreground
+}
 
-	int screen_w = m_screen->width();
-	int screen_h = m_screen->height();
-
-	for ( ; source < finish; source += 16/2 )
-	{
-		int x,y,inc;
-
-		int attr    =   source[ 0x0/2 ];
-		int size    =   source[ 0x2/2 ];
-		int code    =   source[ 0x6/2 ];
-		int sx      =   source[ 0x8/2 ];
-		int sy      =   source[ 0xc/2 ];
-		int color   =   source[ 0xe/2 ];
-
-		int flipx   =   size & 0x1000;
-		int flipy   =   0;  // ??
-
-		int dimx    =   ((size >> 0) & 0xf ) + 1;
-		int dimy    =   ((size >> 4) & 0xf ) + 1;
-
-		if (!(attr&1)) continue;
-
-		sx = (sx & 0x1ff) - (sx & 0x200);
-		sy = (sy & 0x1ff) - (sy & 0x200);
-
-		/* Handle flip_screen. Apply a global offset of 32 pixels along x too */
-
-		if (flip_screen())
-		{
-			sx = screen_w - sx - dimx*16 - 32;  flipx = !flipx;
-			sy = screen_h - sy - dimy*16;       flipy = !flipy;
-			code += dimx*dimy-1;            inc = -1;
-		}
-		else
-		{
-			sx += 32;                       inc = +1;
-		}
-
-		code = (code & 0x7fff) | ( (size & 0x0100) << 7 );
-
-		for (x = 0 ; x < dimx ; x++)
-		{
-			for (y = 0 ; y < dimy ; y++)
-			{
-				m_gfxdecode->gfx(2)->transpen(bitmap,cliprect,
-						code,
-						color,
-						flipx, flipy,
-						sx + x*16,
-						sy + y*16,15);
-
-				code += inc;
-			}
-		}
-	}
+void powerins_state::get_flip_extcode(u16 attr, int &flipx, int &flipy, int &code)
+{
+	flipx = (attr & 0x1000) >> 12;
+	code = (code & 0x7fff) | ((attr & 0x100) << 7);
 }
 
 
@@ -298,10 +249,11 @@ if (machine().input().code_pressed(KEYCODE_Z))
 }
 #endif
 
-	if (layers_ctrl&1)      m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
+	screen.priority().fill(0, cliprect);
+	if (layers_ctrl&1)      m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 1);
 	else                    bitmap.fill(0, cliprect);
-	if (layers_ctrl&8)      draw_sprites(bitmap,cliprect);
-	if (layers_ctrl&2)      m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
+	if (layers_ctrl&2)      m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 2);
+	if (layers_ctrl&8)      m_spritegen->draw_sprites(screen, bitmap, cliprect, m_gfxdecode->gfx(2), m_spritebuffer[1].get(), 0x1000/2);
 	return 0;
 }
 

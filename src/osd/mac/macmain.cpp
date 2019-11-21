@@ -62,15 +62,12 @@ mac_options::mac_options()
 }
 
 //============================================================
-//  main
+//  mac_run_emulator - this is the MAME entry point from the
+//                     Cocoa shell
 //============================================================
 
-// we do some special sauce on Win32...
-int mac_run_emulator()
+int mac_run_emulator(int argc, char *argv[])
 {
-	int argc = *_NSGetArgc();
-	char **argv = *_NSGetArgv();
-
 	std::vector<std::string> args = osd_get_command_line(argc, argv);
 	int res = 0;
 
@@ -81,14 +78,12 @@ int mac_run_emulator()
 	// Initialize crash diagnostics
 	diagnostics_module::get_instance()->init_crash_diagnostics();
 
-	{
-		mac_options options;
-		mac_osd_interface osd(options);
-		osd.register_options();
-		res = emulator_info::start_frontend(options, osd, args);
-	}
+	mac_options options;
+	mac_osd_interface osd(options);
+	osd.register_options();
+	res = emulator_info::start_frontend(options, osd, args);
 
-	exit(res);
+	return res;
 }
 
 //============================================================

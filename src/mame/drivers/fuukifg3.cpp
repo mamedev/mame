@@ -241,10 +241,10 @@ void fuuki32_state::fuuki32_map(address_map &map)
 	map(0x600000, 0x601fff).rw(FUNC(fuuki32_state::sprram_r), FUNC(fuuki32_state::sprram_w)).share("spriteram"); // Sprites
 	map(0x700000, 0x703fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette"); // Palette
 
-	map(0x800000, 0x800003).lr16("800000", [this]() { return u16(m_system->read()); }).nopw();  // Coin
-	map(0x810000, 0x810003).lr16("810000", [this]() { return u16(m_inputs->read()); }).nopw();  // Player Inputs
-	map(0x880000, 0x880003).lr16("880000", [this]() { return u16(m_dsw1->read()); });           // Service + DIPS
-	map(0x890000, 0x890003).lr16("890000", [this]() { return u16(m_dsw2->read()); });           // More DIPS
+	map(0x800000, 0x800003).lr16(NAME([this] () { return u16(m_system->read()); })).nopw();  // Coin
+	map(0x810000, 0x810003).lr16(NAME([this] () { return u16(m_inputs->read()); })).nopw();  // Player Inputs
+	map(0x880000, 0x880003).lr16(NAME([this] () { return u16(m_dsw1->read()); }));           // Service + DIPS
+	map(0x890000, 0x890003).lr16(NAME([this] () { return u16(m_dsw2->read()); }));           // More DIPS
 
 	map(0x8c0000, 0x8c001f).rw(FUNC(fuuki32_state::vregs_r), FUNC(fuuki32_state::vregs_w)).share("vregs");        // Video Registers
 	map(0x8d0000, 0x8d0003).ram();                                                                     // Flipscreen Related
@@ -492,7 +492,7 @@ void fuuki32_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		m_raster_interrupt_timer->adjust(m_screen->frame_period());
 		break;
 	default:
-		assert_always(false, "Unknown id in fuuki32_state::device_timer");
+		throw emu_fatalerror("Unknown id in fuuki32_state::device_timer");
 	}
 }
 
@@ -546,8 +546,8 @@ void fuuki32_state::fuuki32(machine_config &config)
 	m_fuukivid->set_palette(m_palette);
 	m_fuukivid->set_color_base(0x400*2);
 	m_fuukivid->set_color_num(0x40);
-	m_fuukivid->set_tile_callback(FUNC(fuuki32_state::fuuki32_tile_cb), this);
-	m_fuukivid->set_colpri_callback(FUNC(fuuki32_state::fuuki32_colpri_cb), this);
+	m_fuukivid->set_tile_callback(FUNC(fuuki32_state::fuuki32_tile_cb));
+	m_fuukivid->set_colpri_callback(FUNC(fuuki32_state::fuuki32_colpri_cb));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

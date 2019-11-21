@@ -431,7 +431,7 @@ void armedf_state::common_map(address_map &map)
 	map(0x078002, 0x078003).portr("P2");
 	map(0x078004, 0x078005).portr("DSW1");
 	map(0x078006, 0x078007).portr("DSW2");
-//  AM_RANGE(0x07c000, 0x07c001) AM_WRITE(terraf_io_w) handled in DRIVER_INIT
+//  map(0x07c000, 0x07c001).w(FUNC(armedf_state::terraf_io_w)); handled in DRIVER_INIT
 	map(0x07c002, 0x07c003).w(FUNC(armedf_state::armedf_bg_scrollx_w));
 	map(0x07c004, 0x07c005).w(FUNC(armedf_state::armedf_bg_scrolly_w));
 	map(0x07c00a, 0x07c00b).w(FUNC(armedf_state::sound_command_w));
@@ -451,9 +451,9 @@ void armedf_state::kozure_map(address_map &map)
 	common_map(map);
 	map(0x060000, 0x060fff).ram().share("spriteram");
 	map(0x061000, 0x063fff).ram();
-//  AM_RANGE(0x07c000, 0x07c001) AM_WRITE(kozure_io_w)
-//  AM_RANGE(0x0c0000, 0x0c0001) AM_WRITENOP /* watchdog? */
-//  AM_RANGE(0xffd000, 0xffd001) AM_WRITENOP /* passes crc ROM information to MCU, I guess */
+//  map(0x07c000, 0x07c001).w(FUNC(armedf_state::kozure_io_w));
+//  map(0x0c0000, 0x0c0001).nopw(); /* watchdog? */
+//  map(0xffd000, 0xffd001).nopw(); /* passes crc ROM information to MCU, I guess */
 }
 
 void armedf_state::cclimbr2_map(address_map &map)
@@ -471,7 +471,7 @@ void armedf_state::cclimbr2_map(address_map &map)
 	map(0x078002, 0x078003).portr("P2");
 	map(0x078004, 0x078005).portr("DSW1");
 	map(0x078006, 0x078007).portr("DSW2");
-//  AM_RANGE(0x07c000, 0x07c001) AM_WRITE(io_w)
+//  map(0x07c000, 0x07c001).w(FUNC(armedf_state::io_w));
 	map(0x07c002, 0x07c003).w(FUNC(armedf_state::armedf_bg_scrollx_w));
 	map(0x07c004, 0x07c005).w(FUNC(armedf_state::armedf_bg_scrolly_w));
 	map(0x07c00a, 0x07c00b).w(FUNC(armedf_state::sound_command_w));
@@ -2135,24 +2135,24 @@ void armedf_state::init_terraf()
 {
 	m_scroll_type = 0;
 
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x07c000, 0x07c001, write16_delegate(FUNC(armedf_state::bootleg_io_w),this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x07c006, 0x07c007, write16_delegate(FUNC(armedf_state::terraf_fg_scrolly_w),this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x07c008, 0x07c009, write16_delegate(FUNC(armedf_state::terraf_fg_scrollx_w),this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0c0001, write16_delegate(FUNC(armedf_state::terraf_fg_scroll_msb_arm_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x07c000, 0x07c001, write16_delegate(*this, FUNC(armedf_state::bootleg_io_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x07c006, 0x07c007, write16_delegate(*this, FUNC(armedf_state::terraf_fg_scrolly_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x07c008, 0x07c009, write16_delegate(*this, FUNC(armedf_state::terraf_fg_scrollx_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0c0001, write16_delegate(*this, FUNC(armedf_state::terraf_fg_scroll_msb_arm_w)));
 }
 
 void armedf_state::init_terrafu()
 {
 	m_scroll_type = 0;
 
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x07c000, 0x07c001, write16_delegate(FUNC(armedf_state::terraf_io_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x07c000, 0x07c001, write16_delegate(*this, FUNC(armedf_state::terraf_io_w)));
 }
 
 void armedf_state::init_terrafjb()
 {
 	m_scroll_type = 0;
 
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x07c000, 0x07c001, write16_delegate(FUNC(armedf_state::terrafjb_io_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x07c000, 0x07c001, write16_delegate(*this, FUNC(armedf_state::terrafjb_io_w)));
 }
 
 void armedf_state::init_armedf()
@@ -2171,7 +2171,7 @@ void armedf_state::init_kozure()
 	ROM[0x04fc6/2] = 0x4e71;
 	m_scroll_type = 0;
 
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x07c000, 0x07c001, write16_delegate(FUNC(armedf_state::terraf_io_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x07c000, 0x07c001, write16_delegate(*this, FUNC(armedf_state::terraf_io_w)));
 
 }
 
@@ -2206,7 +2206,7 @@ void armedf_state::init_legionjb()
 
 void armedf_state::init_cclimbr2()
 {
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x07c000, 0x07c001, write16_delegate(FUNC(armedf_state::terraf_io_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x07c000, 0x07c001, write16_delegate(*this, FUNC(armedf_state::terraf_io_w)));
 
 	m_scroll_type = 3;
 }
@@ -2234,7 +2234,7 @@ GAME( 1987, kozure,    0,        kozure,    kozure,   armedf_state,   init_kozur
 GAME( 1988, cclimbr2,  0,        cclimbr2,  cclimbr2, armedf_state,   init_cclimbr2, ROT0,   "Nichibutsu",                    "Crazy Climber 2 (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, cclimbr2a, cclimbr2, cclimbr2,  cclimbr2, armedf_state,   init_cclimbr2, ROT0,   "Nichibutsu",                    "Crazy Climber 2 (Japan, Harder)", MACHINE_SUPPORTS_SAVE  )
 
-GAME( 1988, armedf,    0,        armedf,    armedf,   armedf_state,   init_armedf,   ROT270, "Nichibutsu",                    "Armed Formation", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, armedf,    0,        armedf,    armedf,   armedf_state,   init_armedf,   ROT270, "Nichibutsu",                    "Armed Formation (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, armedff,   armedf,   armedf,    armedf,   armedf_state,   init_armedf,   ROT270, "Nichibutsu (Fillmore license)", "Armed Formation (Fillmore license)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1989, skyrobo,   0,        bigfghtr,  bigfghtr, bigfghtr_state, init_armedf,   ROT0,   "Nichibutsu",                    "Sky Robo", MACHINE_SUPPORTS_SAVE )

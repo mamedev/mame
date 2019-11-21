@@ -82,7 +82,7 @@ void sega_segacd_device::segacd_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).ram().share("prgram");
 	map(0x080000, 0x0bffff).rw(FUNC(sega_segacd_device::segacd_sub_dataram_part1_r), FUNC(sega_segacd_device::segacd_sub_dataram_part1_w)).share("dataram");
-	map(0x0c0000, 0x0dffff).rw(FUNC(sega_segacd_device::segacd_sub_dataram_part2_r), FUNC(sega_segacd_device::segacd_sub_dataram_part2_w)); //AM_SHARE("dataram2")
+	map(0x0c0000, 0x0dffff).rw(FUNC(sega_segacd_device::segacd_sub_dataram_part2_r), FUNC(sega_segacd_device::segacd_sub_dataram_part2_w)); //.share("dataram2");
 
 	map(0xfe0000, 0xfe3fff).rw(FUNC(sega_segacd_device::backupram_r), FUNC(sega_segacd_device::backupram_w)).umask16(0x00ff); // backup RAM, odd bytes only!
 
@@ -118,10 +118,10 @@ void sega_segacd_device::segacd_map(address_map &map)
 	map(0xff8062, 0xff8063).rw(FUNC(sega_segacd_device::segacd_imagebuffer_hdot_size_r), FUNC(sega_segacd_device::segacd_imagebuffer_hdot_size_w)); // Image buffer H dot size
 	map(0xff8064, 0xff8065).rw(FUNC(sega_segacd_device::segacd_imagebuffer_vdot_size_r), FUNC(sega_segacd_device::segacd_imagebuffer_vdot_size_w)); // Image buffer V dot size
 	map(0xff8066, 0xff8067).w(FUNC(sega_segacd_device::segacd_trace_vector_base_address_w));// Trace vector base address
-//  AM_RANGE(0xff8068, 0xff8069) // Subcode address
+//  map(0xff8068, 0xff8069) // Subcode address
 
-//  AM_RANGE(0xff8100, 0xff817f) // Subcode buffer area
-//  AM_RANGE(0xff8180, 0xff81ff) // mirror of subcode buffer area
+//  map(0xff8100, 0xff817f) // Subcode buffer area
+//  map(0xff8180, 0xff81ff) // mirror of subcode buffer area
 
 }
 
@@ -297,17 +297,17 @@ void sega_segacd_device::device_add_mconfig(machine_config &config)
 {
 	M68000(config, m_scdcpu, SEGACD_CLOCK); /* 12.5 MHz */
 	m_scdcpu->set_addrmap(AS_PROGRAM, &sega_segacd_device::segacd_map);
-	m_scdcpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(sega_segacd_device::segacd_sub_int_callback),this));
+	m_scdcpu->set_irq_acknowledge_callback(FUNC(sega_segacd_device::segacd_sub_int_callback));
 
 	LC89510(config, "cdc", 0); // cd controller
 
 	// temporary until things are cleaned up
 	LC89510_TEMP(config, m_lc89510_temp, 0); // cd controller
-	m_lc89510_temp->set_cdc_do_dma_callback(FUNC(sega_segacd_device::SegaCD_CDC_Do_DMA), this); // hack
+	m_lc89510_temp->set_cdc_do_dma_callback(FUNC(sega_segacd_device::SegaCD_CDC_Do_DMA)); // hack
 	m_lc89510_temp->set_cdrom_tag("^cdrom");
 	m_lc89510_temp->set_68k_tag(m_scdcpu);
 
-	TIMER(config, m_stopwatch_timer).configure_generic(timer_device::expired_delegate()); //stopwatch timer
+	TIMER(config, m_stopwatch_timer).configure_generic(nullptr); //stopwatch timer
 	TIMER(config, m_stamp_timer).configure_generic(FUNC(sega_segacd_device::stamp_timer_callback));
 	TIMER(config, m_irq3_timer).configure_generic(FUNC(sega_segacd_device::irq3_timer_callback));
 	TIMER(config, m_dma_timer).configure_generic(FUNC(sega_segacd_device::dma_timer_callback));
@@ -320,8 +320,6 @@ void sega_segacd_device::device_add_mconfig(machine_config &config)
 	m_rfsnd->set_addrmap(0, &sega_segacd_device::segacd_pcm_map);
 
 	NVRAM(config, "backupram", nvram_device::DEFAULT_ALL_0);
-
-	config.m_perfect_cpu_quantum = subtag("segacd_68k"); // perfect sync to the fastest cpu
 }
 
 
@@ -1737,33 +1735,33 @@ void sega_segacd_device::device_start()
 
 	space.unmap_readwrite        (0x020000,0x3fffff);
 
-	space.install_read_handler (0x0020000, 0x003ffff, read16_delegate(FUNC(sega_segacd_device::scd_4m_prgbank_ram_r),this) );
-	space.install_write_handler (0x0020000, 0x003ffff, write16_delegate(FUNC(sega_segacd_device::scd_4m_prgbank_ram_w),this) );
+	space.install_read_handler (0x0020000, 0x003ffff, read16_delegate(*this, FUNC(sega_segacd_device::scd_4m_prgbank_ram_r)) );
+	space.install_write_handler (0x0020000, 0x003ffff, write16_delegate(*this, FUNC(sega_segacd_device::scd_4m_prgbank_ram_w)) );
 
 
-	space.install_readwrite_handler(0x200000, 0x23ffff, read16_delegate(FUNC(sega_segacd_device::segacd_main_dataram_part1_r),this), write16_delegate(FUNC(sega_segacd_device::segacd_main_dataram_part1_w),this)); // RAM shared with sub
-	space.install_readwrite_handler(0xa12000, 0xa12001, read16_delegate(FUNC(sega_segacd_device::scd_a12000_halt_reset_r),this), write16_delegate(FUNC(sega_segacd_device::scd_a12000_halt_reset_w),this)); // sub-cpu control
-	space.install_readwrite_handler(0xa12002, 0xa12003, read16_delegate(FUNC(sega_segacd_device::scd_a12002_memory_mode_r),this), write16_delegate(FUNC(sega_segacd_device::scd_a12002_memory_mode_w),this)); // memory mode / write protect
-	//space.install_readwrite_handler(0xa12004, 0xa12005, read16_delegate(FUNC(sega_segacd_device::segacd_cdc_mode_address_r),this), write16_delegate(FUNC(sega_segacd_device::segacd_cdc_mode_address_w),this));
-	space.install_readwrite_handler(0xa12006, 0xa12007, read16_delegate(FUNC(sega_segacd_device::scd_a12006_hint_register_r),this), write16_delegate(FUNC(sega_segacd_device::scd_a12006_hint_register_w),this)); // where HINT points on main CPU
-	//space.install_read_handler     (0xa12008, 0xa12009, read16_delegate(FUNC(sega_segacd_device::cdc_data_main_r),this));
+	space.install_readwrite_handler(0x200000, 0x23ffff, read16_delegate(*this, FUNC(sega_segacd_device::segacd_main_dataram_part1_r)), write16_delegate(*this, FUNC(sega_segacd_device::segacd_main_dataram_part1_w))); // RAM shared with sub
+	space.install_readwrite_handler(0xa12000, 0xa12001, read16_delegate(*this, FUNC(sega_segacd_device::scd_a12000_halt_reset_r)), write16_delegate(*this, FUNC(sega_segacd_device::scd_a12000_halt_reset_w))); // sub-cpu control
+	space.install_readwrite_handler(0xa12002, 0xa12003, read16_delegate(*this, FUNC(sega_segacd_device::scd_a12002_memory_mode_r)), write16_delegate(*this, FUNC(sega_segacd_device::scd_a12002_memory_mode_w))); // memory mode / write protect
+	//space.install_readwrite_handler(0xa12004, 0xa12005, read16_delegate(*this, FUNC(sega_segacd_device::segacd_cdc_mode_address_r)), write16_delegate(*this, FUNC(sega_segacd_device::segacd_cdc_mode_address_w)));
+	space.install_readwrite_handler(0xa12006, 0xa12007, read16_delegate(*this, FUNC(sega_segacd_device::scd_a12006_hint_register_r)), write16_delegate(*this, FUNC(sega_segacd_device::scd_a12006_hint_register_w))); // where HINT points on main CPU
+	//space.install_read_handler     (0xa12008, 0xa12009, read16_delegate(*this, FUNC(sega_segacd_device::cdc_data_main_r)));
 
 
-	space.install_readwrite_handler(0xa1200c, 0xa1200d, read16_delegate(FUNC(sega_segacd_device::segacd_stopwatch_timer_r),this), write16_delegate(FUNC(sega_segacd_device::segacd_stopwatch_timer_w),this)); // starblad
+	space.install_readwrite_handler(0xa1200c, 0xa1200d, read16_delegate(*this, FUNC(sega_segacd_device::segacd_stopwatch_timer_r)), write16_delegate(*this, FUNC(sega_segacd_device::segacd_stopwatch_timer_w))); // starblad
 
-	space.install_readwrite_handler(0xa1200e, 0xa1200f, read16_delegate(FUNC(sega_segacd_device::segacd_comms_flags_r),this), write16_delegate(FUNC(sega_segacd_device::segacd_comms_flags_maincpu_w),this)); // communication flags block
+	space.install_readwrite_handler(0xa1200e, 0xa1200f, read16_delegate(*this, FUNC(sega_segacd_device::segacd_comms_flags_r)), write16_delegate(*this, FUNC(sega_segacd_device::segacd_comms_flags_maincpu_w))); // communication flags block
 
-	space.install_readwrite_handler(0xa12010, 0xa1201f, read16_delegate(FUNC(sega_segacd_device::segacd_comms_main_part1_r),this), write16_delegate(FUNC(sega_segacd_device::segacd_comms_main_part1_w),this));
-	space.install_readwrite_handler(0xa12020, 0xa1202f, read16_delegate(FUNC(sega_segacd_device::segacd_comms_main_part2_r),this), write16_delegate(FUNC(sega_segacd_device::segacd_comms_main_part2_w),this));
+	space.install_readwrite_handler(0xa12010, 0xa1201f, read16_delegate(*this, FUNC(sega_segacd_device::segacd_comms_main_part1_r)), write16_delegate(*this, FUNC(sega_segacd_device::segacd_comms_main_part1_w)));
+	space.install_readwrite_handler(0xa12020, 0xa1202f, read16_delegate(*this, FUNC(sega_segacd_device::segacd_comms_main_part2_r)), write16_delegate(*this, FUNC(sega_segacd_device::segacd_comms_main_part2_w)));
 
 
 
-	space.install_read_handler (0x0000070, 0x0000073, read16_delegate(FUNC(sega_segacd_device::scd_hint_vector_r),this) );
+	space.install_read_handler (0x0000070, 0x0000073, read16_delegate(*this, FUNC(sega_segacd_device::scd_hint_vector_r)) );
 
-	segacd_stampmap[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(sega_segacd_device::get_stampmap_16x16_1x1_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
-	segacd_stampmap[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(sega_segacd_device::get_stampmap_32x32_1x1_tile_info),this), TILEMAP_SCAN_ROWS, 32, 32, 8, 8);
-	segacd_stampmap[2] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(sega_segacd_device::get_stampmap_16x16_16x16_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 256, 256); // 128kb!
-	segacd_stampmap[3] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(sega_segacd_device::get_stampmap_32x32_16x16_tile_info),this), TILEMAP_SCAN_ROWS, 32, 32, 128, 128); // 32kb!
+	segacd_stampmap[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(sega_segacd_device::get_stampmap_16x16_1x1_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
+	segacd_stampmap[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(sega_segacd_device::get_stampmap_32x32_1x1_tile_info)), TILEMAP_SCAN_ROWS, 32, 32, 8, 8);
+	segacd_stampmap[2] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(sega_segacd_device::get_stampmap_16x16_16x16_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 256, 256); // 128kb!
+	segacd_stampmap[3] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(sega_segacd_device::get_stampmap_32x32_16x16_tile_info)), TILEMAP_SCAN_ROWS, 32, 32, 128, 128); // 32kb!
 
 	// todo register save state stuff
 }

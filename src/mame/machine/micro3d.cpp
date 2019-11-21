@@ -133,7 +133,7 @@ void micro3d_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		mac_done_callback(ptr, param);
 		break;
 	default:
-		assert_always(false, "Unknown id in micro3d_state::device_timer");
+		throw emu_fatalerror("Unknown id in micro3d_state::device_timer");
 	}
 }
 
@@ -524,8 +524,8 @@ void micro3d_state::init_botss()
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	/* Required to pass the hardware version check */
-	space.install_read_handler(0x140000, 0x140001, read16_delegate(FUNC(micro3d_state::botss_140000_r),this));
-	space.install_read_handler(0x180000, 0x180001, read16_delegate(FUNC(micro3d_state::botss_180000_r),this));
+	space.install_read_handler(0x140000, 0x140001, read16_delegate(*this, FUNC(micro3d_state::botss_140000_r)));
+	space.install_read_handler(0x180000, 0x180001, read16_delegate(*this, FUNC(micro3d_state::botss_180000_r)));
 
 	init_micro3d();
 }

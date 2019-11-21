@@ -74,7 +74,7 @@ Notes:
       68000     - Clock Input 10.000MHz [40/4]
       Z80A      - Clock Input 4.000MHz [16/4]
       YM2151    - Yamaha YM2151 FM Operator Type M (OPM) Sound Generator IC. Clock Input 4.000MHz [16/4]
-      YM3012    - Yamaha YM3012 2-Channel Serial Input Floating Point Digital to Analog Convertor (DIP16)
+      YM3012    - Yamaha YM3012 2-Channel Serial Input Floating Point Digital to Analog Converter (DIP16)
       TMM2063   - Toshiba TMM2063 8kx8 SRAM (NDIP28)
       TMM2115   - Toshiba TMM2115 2kx8 SRAM (NDIP24)
       TL084     - Texas Instruments TL084 Quad JFET-Input General-Purpose Operational Amplifier (DIP14)
@@ -303,7 +303,7 @@ const auto MASTER_CLOCK_25MHz = XTAL(25'174'800);
 READ8_MEMBER( segaorun_state::unknown_porta_r )
 {
 	//logerror("%06X:read from 8255 port A\n", m_maincpu->pc());
-	return 0;
+	return m_adc->intr_r() << 6;
 }
 
 READ8_MEMBER( segaorun_state::unknown_portb_r )
@@ -366,6 +366,7 @@ READ8_MEMBER( segaorun_state::bankmotor_limit_r )
 	uint8_t ret = 0xff;
 
 	// PPI Input port A:
+	//  D6: ADC interrupt
 	//  D5: left limit
 	//  D4: center
 	//  D3: right limit
@@ -384,6 +385,9 @@ READ8_MEMBER( segaorun_state::bankmotor_limit_r )
 		ret ^= 0x10;
 	else if (pos >= right_limit - tolerance)
 		ret ^= 0x08;
+
+	if (!m_adc->intr_r())
+		ret ^= 0x40;
 
 	return ret;
 }
@@ -441,32 +445,32 @@ void segaorun_state::memory_mapper(sega_315_5195_mapper_device &mapper, uint8_t 
 	switch (index)
 	{
 		case 5:
-			mapper.map_as_handler(0x90000, 0x10000, 0xf00000, read16_delegate(FUNC(segaorun_state::sega_road_control_0_r), this), write16_delegate(FUNC(segaorun_state::sega_road_control_0_w), this));
-			mapper.map_as_ram(0x80000, 0x01000, 0xf0f000, "segaic16road:roadram", write16_delegate());
-			mapper.map_as_ram(0x60000, 0x08000, 0xf18000, "cpu1ram", write16_delegate());
-			mapper.map_as_ram(0x00000, 0x60000, 0xf00000, "cpu1rom", write16_delegate(FUNC(segaorun_state::nop_w), this));
+			mapper.map_as_handler(0x90000, 0x10000, 0xf00000, read16_delegate(*this, FUNC(segaorun_state::sega_road_control_0_r)), write16_delegate(*this, FUNC(segaorun_state::sega_road_control_0_w)));
+			mapper.map_as_ram(0x80000, 0x01000, 0xf0f000, "segaic16road:roadram", write16_delegate(*this));
+			mapper.map_as_ram(0x60000, 0x08000, 0xf18000, "cpu1ram", write16_delegate(*this));
+			mapper.map_as_ram(0x00000, 0x60000, 0xf00000, "cpu1rom", write16_delegate(*this, FUNC(segaorun_state::nop_w)));
 			break;
 
 		case 4:
-			mapper.map_as_handler(0x90000, 0x10000, 0xf00000, read16_delegate(FUNC(segaorun_state::misc_io_r), this), write16_delegate(FUNC(segaorun_state::misc_io_w), this));
+			mapper.map_as_handler(0x90000, 0x10000, 0xf00000, read16_delegate(*this, FUNC(segaorun_state::misc_io_r)), write16_delegate(*this, FUNC(segaorun_state::misc_io_w)));
 			break;
 
 		case 3:
-			mapper.map_as_ram(0x00000, 0x01000, 0xfff000, "sprites", write16_delegate());
+			mapper.map_as_ram(0x00000, 0x01000, 0xfff000, "sprites", write16_delegate(*this));
 			break;
 
 		case 2:
-			mapper.map_as_ram(0x00000, 0x02000, 0xffe000, "paletteram", write16_delegate(FUNC(segaorun_state::paletteram_w), this));
+			mapper.map_as_ram(0x00000, 0x02000, 0xffe000, "paletteram", write16_delegate(*this, FUNC(segaorun_state::paletteram_w)));
 			break;
 
 		case 1:
-			mapper.map_as_ram(0x00000, 0x10000, 0xfe0000, "tileram", write16_delegate(FUNC(segaorun_state::tileram_w), this));
-			mapper.map_as_ram(0x10000, 0x01000, 0xfef000, "textram", write16_delegate(FUNC(segaorun_state::textram_w), this));
+			mapper.map_as_ram(0x00000, 0x10000, 0xfe0000, "tileram", write16_delegate(*this, FUNC(segaorun_state::tileram_w)));
+			mapper.map_as_ram(0x10000, 0x01000, 0xfef000, "textram", write16_delegate(*this, FUNC(segaorun_state::textram_w)));
 			break;
 
 		case 0:
-			mapper.map_as_ram(0x60000, 0x08000, 0xf98000, "workram", write16_delegate());
-			mapper.map_as_rom(0x00000, 0x60000, 0xf80000, "rom0base", "decrypted_rom0base", 0x00000, write16_delegate());
+			mapper.map_as_ram(0x60000, 0x08000, 0xf98000, "workram", write16_delegate(*this));
+			mapper.map_as_rom(0x00000, 0x60000, 0xf80000, "rom0base", "decrypted_rom0base", 0x00000, write16_delegate(*this));
 			break;
 	}
 }
@@ -487,7 +491,7 @@ READ16_MEMBER( segaorun_state::misc_io_r )
 		return m_custom_io_r(space, offset, mem_mask);
 
 	logerror("%06X:misc_io_r - unknown read access to address %04X\n", m_maincpu->pc(), offset * 2);
-	return open_bus_r(space);
+	return m_mapper->open_bus_r();
 }
 
 
@@ -533,7 +537,7 @@ void segaorun_state::machine_reset()
 	m_segaic16vid->tilemap_reset(*m_screen);
 
 	// hook the RESET line, which resets CPU #1
-	m_maincpu->set_reset_callback(write_line_delegate(FUNC(segaorun_state::m68k_reset_callback),this));
+	m_maincpu->set_reset_callback(*this, FUNC(segaorun_state::m68k_reset_callback));
 
 	// start timers to track interrupts
 	m_scanline_timer->adjust(m_screen->time_until_pos(223), 223);
@@ -605,7 +609,7 @@ void segaorun_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		}
 
 		default:
-			assert_always(false, "Unknown id in segaorun_state::device_timer");
+			throw emu_fatalerror("Unknown id in segaorun_state::device_timer");
 	}
 }
 
@@ -650,9 +654,7 @@ READ16_MEMBER( segaorun_state::outrun_custom_io_r )
 		}
 
 		case 0x30/2:
-		{
-			return m_adc_ports[m_adc_select].read_safe(0x0010);
-		}
+			return m_adc->read();
 
 		case 0x60/2:
 			return m_watchdog->reset_r(space);
@@ -662,7 +664,7 @@ READ16_MEMBER( segaorun_state::outrun_custom_io_r )
 	}
 
 	logerror("%06X:outrun_custom_io_r - unknown read access to address %04X\n", m_maincpu->pc(), offset * 2);
-	return open_bus_r(space);
+	return m_mapper->open_bus_r();
 }
 
 
@@ -698,7 +700,7 @@ WRITE16_MEMBER( segaorun_state::outrun_custom_io_w )
 			return;
 
 		case 0x30/2:
-			// ADC trigger
+			m_adc->write();
 			return;
 
 		case 0x60/2:
@@ -736,16 +738,14 @@ READ16_MEMBER( segaorun_state::shangon_custom_io_r )
 		}
 
 		case 0x3020/2:
-		{
-			return m_adc_ports[m_adc_select].read_safe(0x0010);
-		}
+			return m_adc->read();
 
 		default:
 			break;
 	}
 
 	logerror("%06X:misc_io_r - unknown read access to address %04X\n", m_maincpu->pc(), offset * 2);
-	return open_bus_r(space);
+	return m_mapper->open_bus_r();
 }
 
 
@@ -789,7 +789,7 @@ WRITE16_MEMBER( segaorun_state::shangon_custom_io_w )
 			return;
 
 		case 0x3020/2:
-			// ADC trigger
+			m_adc->write();
 			return;
 
 		default:
@@ -797,6 +797,16 @@ WRITE16_MEMBER( segaorun_state::shangon_custom_io_w )
 	}
 
 	logerror("%06X:misc_io_w - unknown write access to address %04X = %04X & %04X\n", m_maincpu->pc(), offset * 2, data, mem_mask);
+}
+
+
+//-------------------------------------------------
+//  analog_r - read multiplexed analog ports
+//-------------------------------------------------
+
+uint8_t segaorun_state::analog_r()
+{
+	return m_adc_ports[m_adc_select].read_safe(0x10);
 }
 
 
@@ -1157,7 +1167,7 @@ void segaorun_state::outrun_base(machine_config &config)
 	m_soundcpu->set_addrmap(AS_PROGRAM, &segaorun_state::sound_map);
 	m_soundcpu->set_addrmap(AS_IO, &segaorun_state::sound_portmap);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	WATCHDOG_TIMER(config, m_watchdog);
 
@@ -1169,8 +1179,11 @@ void segaorun_state::outrun_base(machine_config &config)
 	m_i8255->in_pc_callback().set(FUNC(segaorun_state::unknown_portc_r));
 	m_i8255->out_pc_callback().set(FUNC(segaorun_state::video_control_w));
 
+	ADC0804(config, m_adc, MASTER_CLOCK_25MHz/4/6);
+	m_adc->vin_callback().set(FUNC(segaorun_state::analog_r));
+
 	SEGA_315_5195_MEM_MAPPER(config, m_mapper, MASTER_CLOCK/4, m_maincpu);
-	m_mapper->set_mapper(FUNC(segaorun_state::memory_mapper), this);
+	m_mapper->set_mapper(FUNC(segaorun_state::memory_mapper));
 	m_mapper->pbf().set_inputline(m_soundcpu, INPUT_LINE_NMI);
 
 	// video hardware
@@ -1293,7 +1306,7 @@ ROM_START( outrun )
 	ROM_REGION( 0x60000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "epr-10380b.133", 0x000000, 0x10000, CRC(1f6cadad) SHA1(31e870f307f44eb4f293b607123b623beee2bc3c) )
 	ROM_LOAD16_BYTE( "epr-10382b.118", 0x000001, 0x10000, CRC(c4c3fa1a) SHA1(69236cf9f27691dee290c79db1fc9b5e73ea77d7) )
-	ROM_LOAD16_BYTE( "epr-10381b.132", 0x020000, 0x10000, CRC(be8c412b) SHA1(bf3ff05bbf81bdd44567f3b9bb4919ed4a499624) ) // Same as the "A" version belown ???
+	ROM_LOAD16_BYTE( "epr-10381b.132", 0x020000, 0x10000, CRC(be8c412b) SHA1(bf3ff05bbf81bdd44567f3b9bb4919ed4a499624) ) // Same as the "A" version below ???
 	ROM_LOAD16_BYTE( "epr-10383b.117", 0x020001, 0x10000, CRC(10a2014a) SHA1(1970895145ad8b5735f66ed8c837d9d453ce9b23) )
 
 	ROM_REGION( 0x60000, "subcpu", 0 ) // second 68000 CPU
@@ -1698,7 +1711,7 @@ ROM_START( outrundxj )
 ROM_END
 
 //*************************************************************************************************************************
-//  Outrun Deluxe (ealier??)
+//  Outrun Deluxe (earlier??)
 //  CPU: 68000
 //   GAME BD  834-6065 Rev A
 //   CPU BD   837-6063
@@ -1942,9 +1955,9 @@ ROM_END
 //   VIDEO BD SUPER HANG-ON 837-6279 (or 837-6279-02, ROMs would be "OPR")
 //
 //  Manual states for this set:
-//      834-6277-01 (Object data (sprits) EPR type AKA EP-ROM type)
-//      834-6277-03 (Object data (sprits) MPR type AKA Mask-ROM type)
-//      834-6277-05 (Object data (sprits) OPR type AKA One Time ROM type)
+//      834-6277-01 (Object data (sprites) EPR type AKA EP-ROM type)
+//      834-6277-03 (Object data (sprites) MPR type AKA Mask-ROM type)
+//      834-6277-05 (Object data (sprites) OPR type AKA One Time ROM type)
 //
 ROM_START( shangon3 )
 	ROM_REGION( 0x60000, "maincpu", 0 ) // 68000 code - protected
@@ -2910,8 +2923,8 @@ void segaorun_state::init_generic()
 void segaorun_state::init_outrun()
 {
 	init_generic();
-	m_custom_io_r = read16_delegate(FUNC(segaorun_state::outrun_custom_io_r), this);
-	m_custom_io_w = write16_delegate(FUNC(segaorun_state::outrun_custom_io_w), this);
+	m_custom_io_r = read16_delegate(*this, FUNC(segaorun_state::outrun_custom_io_r));
+	m_custom_io_w = write16_delegate(*this, FUNC(segaorun_state::outrun_custom_io_w));
 }
 
 void segaorun_state::init_outrunb()
@@ -2956,8 +2969,8 @@ void segaorun_state::init_shangon()
 {
 	init_generic();
 	m_shangon_video = true;
-	m_custom_io_r = read16_delegate(FUNC(segaorun_state::shangon_custom_io_r), this);
-	m_custom_io_w = write16_delegate(FUNC(segaorun_state::shangon_custom_io_w), this);
+	m_custom_io_r = read16_delegate(*this, FUNC(segaorun_state::shangon_custom_io_r));
+	m_custom_io_w = write16_delegate(*this, FUNC(segaorun_state::shangon_custom_io_w));
 }
 
 

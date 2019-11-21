@@ -59,7 +59,6 @@ The known games that use this CPU are:
 
 CPU #    Game                      Notes              Seed   Upper Limit
 -------- ------------------------- ------------------ ------ -----
-317-5014 DakkoChan Jansoh          NEC MC-8123B       206850  1C00
 317-0029 Block Gal                 NEC MC-8123B 651   091755  1800?
 317-0030 Perfect Billiard                             9451EC  1C00
 317-0040 Toki no Senshi - Chrono Soldier              068713  1c00
@@ -69,11 +68,15 @@ CPU #    Game                      Notes              Seed   Upper Limit
 317-0057 Fantasy Zone 2                               ADFACE  1800
 317-0064 Ufo Senshi Yohko Chan                        880603  1C00
 317-0066 Altered Beast (sound CPU) NEC MC-8123B 704   ED8600  1800
-317-5002 Gigas                     NEC MC-8123 638    234567  1C00
+317-5002 Gigas 1 & 2               NEC MC-8123 638    234567  1C00
+317-5004 Eagle Writer              Not Dumped
+317-5005 Astro Flash               Not Dumped
+317-5008 Perfect Billiard                             9451EC  1C00
 317-5012 Ganbare Chinsan Ooshoubu  NEC MC-8123A       804B54  1C00
+317-5014 DakkoChan Jansoh          NEC MC-8123B       206850  1C00
 317-5??? Ninja Kid II (sound CPU)  NEC MC-8123A 646   27998D  1800
 317-???? Center Court (sound CPU)  NEC MC-8123B 703   640506  1800
-312-???? Omega                                        861226  1C00?
+317-???? Omega                                        861226  1C00?
 
 ***************************************************************************/
 

@@ -95,30 +95,31 @@
 // Info for bank switcher
 struct bank_info_entry
 {
-	write8_delegate func;   // Pointer to write handler
-	offs_t start;       // Offset of start of block
-	offs_t end;     // offset of end of block
+	void (dgn_beta_state::*func)(address_space &, offs_t, u8, u8);  // pointer to write handler
+	char const *name;                                               // write handler name
+	offs_t start;                                                   // offset of start of block
+	offs_t end;                                                     // offset of end of block
 };
 
 static const struct bank_info_entry bank_info[] =
 {
-	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_b0_w),(dgn_beta_state*)nullptr), 0x0000, 0x0fff },
-	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_b1_w),(dgn_beta_state*)nullptr), 0x1000, 0x1fff },
-	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_b2_w),(dgn_beta_state*)nullptr), 0x2000, 0x2fff },
-	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_b3_w),(dgn_beta_state*)nullptr), 0x3000, 0x3fff },
-	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_b4_w),(dgn_beta_state*)nullptr), 0x4000, 0x4fff },
-	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_b5_w),(dgn_beta_state*)nullptr), 0x5000, 0x5fff },
-	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_b6_w),(dgn_beta_state*)nullptr), 0x6000, 0x6fff },
-	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_b7_w),(dgn_beta_state*)nullptr), 0x7000, 0x7fff },
-	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_b8_w),(dgn_beta_state*)nullptr), 0x8000, 0x8fff },
-	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_b9_w),(dgn_beta_state*)nullptr), 0x9000, 0x9fff },
-	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_bA_w),(dgn_beta_state*)nullptr), 0xA000, 0xAfff },
-	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_bB_w),(dgn_beta_state*)nullptr), 0xB000, 0xBfff },
-	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_bC_w),(dgn_beta_state*)nullptr), 0xC000, 0xCfff },
-	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_bD_w),(dgn_beta_state*)nullptr), 0xD000, 0xDfff },
-	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_bE_w),(dgn_beta_state*)nullptr), 0xE000, 0xEfff },
-	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_bF_w),(dgn_beta_state*)nullptr), 0xF000, 0xFBff },
-	{ write8_delegate(FUNC(dgn_beta_state::dgnbeta_ram_bG_w),(dgn_beta_state*)nullptr), 0xFF00, 0xFfff }
+	{ FUNC(dgn_beta_state::dgnbeta_ram_b0_w), 0x0000, 0x0fff },
+	{ FUNC(dgn_beta_state::dgnbeta_ram_b1_w), 0x1000, 0x1fff },
+	{ FUNC(dgn_beta_state::dgnbeta_ram_b2_w), 0x2000, 0x2fff },
+	{ FUNC(dgn_beta_state::dgnbeta_ram_b3_w), 0x3000, 0x3fff },
+	{ FUNC(dgn_beta_state::dgnbeta_ram_b4_w), 0x4000, 0x4fff },
+	{ FUNC(dgn_beta_state::dgnbeta_ram_b5_w), 0x5000, 0x5fff },
+	{ FUNC(dgn_beta_state::dgnbeta_ram_b6_w), 0x6000, 0x6fff },
+	{ FUNC(dgn_beta_state::dgnbeta_ram_b7_w), 0x7000, 0x7fff },
+	{ FUNC(dgn_beta_state::dgnbeta_ram_b8_w), 0x8000, 0x8fff },
+	{ FUNC(dgn_beta_state::dgnbeta_ram_b9_w), 0x9000, 0x9fff },
+	{ FUNC(dgn_beta_state::dgnbeta_ram_bA_w), 0xA000, 0xAfff },
+	{ FUNC(dgn_beta_state::dgnbeta_ram_bB_w), 0xB000, 0xBfff },
+	{ FUNC(dgn_beta_state::dgnbeta_ram_bC_w), 0xC000, 0xCfff },
+	{ FUNC(dgn_beta_state::dgnbeta_ram_bD_w), 0xD000, 0xDfff },
+	{ FUNC(dgn_beta_state::dgnbeta_ram_bE_w), 0xE000, 0xEfff },
+	{ FUNC(dgn_beta_state::dgnbeta_ram_bF_w), 0xF000, 0xFBff },
+	{ FUNC(dgn_beta_state::dgnbeta_ram_bG_w), 0xFF00, 0xFfff }
 };
 
 #define is_last_page(page)  (((page==LastPage) || (page==LastPage+1)) ? 1 : 0)
@@ -179,8 +180,7 @@ void dgn_beta_state::UpdateBanks(int first, int last)
 				readbank = &m_ram->pointer()[(MapPage*RamPageSize)-256];
 				logerror("Error RAM in Last page !\n");
 			}
-			write8_delegate func = bank_info[Page].func;
-			if (!func.isnull()) func.late_bind(*this);
+			write8_delegate func(*this, bank_info[Page].func, bank_info[Page].name);
 			space_0.install_write_handler(bank_start, bank_end, func);
 			space_1.install_write_handler(bank_start, bank_end, func);
 		}

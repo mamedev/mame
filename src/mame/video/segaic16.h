@@ -10,15 +10,46 @@
 
 #pragma once
 
+#include "emupal.h"
 #include "tilemap.h"
 
 typedef device_delegate<void (int, uint16_t*, uint16_t*, uint16_t*, uint16_t*)> segaic16_video_pagelatch_delegate;
 
 
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
 
+
+// ======================> sega_16bit_common_base
+
+class sega_16bit_common_base : public driver_device
+{
+public:
+	// palette helpers
+	DECLARE_WRITE16_MEMBER( paletteram_w );
+	DECLARE_WRITE16_MEMBER( hangon_paletteram_w );
+	DECLARE_WRITE16_MEMBER( philko_paletteram_w );
+
+protected:
+	// construction/destruction
+	sega_16bit_common_base(const machine_config &mconfig, device_type type, const char *tag);
+
+	// internal helpers
+	void palette_init();
+
+public: // -- stupid system16.cpp
+	// memory pointers
+	required_shared_ptr<u16> m_paletteram;
+protected:
+
+	// internal state
+	u32      m_palette_entries;          // number of palette entries
+	u8       m_palette_normal[32];       // RGB translations for normal pixels
+	u8       m_palette_shadow[32];       // RGB translations for shadowed pixels
+	u8       m_palette_hilight[32];      // RGB translations for hilighted pixels
+	required_device<palette_device> m_palette;
+};
 
 
 class segaic16_video_device :   public device_t,
@@ -98,7 +129,7 @@ public:
 	segaic16_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	template <typename... T> void set_pagelatch_cb(T &&... args) { m_pagelatch_cb = segaic16_video_pagelatch_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_pagelatch_cb(T &&... args) { m_pagelatch_cb.set(std::forward<T>(args)...); }
 
 	uint8_t m_display_enable;
 	optional_shared_ptr<uint16_t> m_tileram;

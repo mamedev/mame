@@ -55,7 +55,7 @@ TILE_GET_INFO_MEMBER(flstory_state::get_rumba_tile_info)
 
 VIDEO_START_MEMBER(flstory_state,flstory)
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(flstory_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(flstory_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 //  m_bg_tilemap->set_transparent_pen(15);
 	m_bg_tilemap->set_transmask(0, 0x3fff, 0xc000); /* split type 0 has pens 0-13 transparent in front half */
 	m_bg_tilemap->set_transmask(1, 0x8000, 0x7fff); /* split type 1 has pen 15 transparent in front half */
@@ -72,7 +72,7 @@ VIDEO_START_MEMBER(flstory_state,flstory)
 
 VIDEO_START_MEMBER(flstory_state,rumba)
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(flstory_state::get_rumba_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(flstory_state::get_rumba_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 //  m_bg_tilemap->set_transparent_pen(15);
 	m_bg_tilemap->set_transmask(0, 0x3fff, 0xc000); /* split type 0 has pens 0-13 transparent in front half */
 	m_bg_tilemap->set_transmask(1, 0x8000, 0x7fff); /* split type 1 has pen 15 transparent in front half */
@@ -89,7 +89,7 @@ VIDEO_START_MEMBER(flstory_state,rumba)
 
 VIDEO_START_MEMBER(flstory_state,victnine)
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(flstory_state::victnine_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(flstory_state::victnine_get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg_tilemap->set_scroll_cols(32);
 
 	m_paletteram.resize(m_palette->entries());

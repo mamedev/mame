@@ -947,11 +947,11 @@ void fromance_state::nekkyoku(machine_config &config)
 void fromance_state::idolmj(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(12'000'000) / 2);   /* 6.00 Mhz ? */
+	Z80(config, m_maincpu, 12_MHz_XTAL / 2);   /* 6.00 Mhz ? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &fromance_state::fromance_main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(fromance_state::irq0_line_hold));
 
-	Z80(config, m_subcpu, XTAL(12'000'000) / 2);    /* 6.00 Mhz ? */
+	Z80(config, m_subcpu, 12_MHz_XTAL / 2);    /* 6.00 Mhz ? */
 	m_subcpu->set_addrmap(AS_PROGRAM, &fromance_state::fromance_sub_map);
 	m_subcpu->set_addrmap(AS_IO, &fromance_state::idolmj_sub_io_map);
 
@@ -980,7 +980,7 @@ void fromance_state::idolmj(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	YM2149(config, "aysnd", 12000000/6).add_route(ALL_OUTPUTS, "mono", 0.15);
+	YM2149(config, "aysnd", 12_MHz_XTAL / 6).add_route(ALL_OUTPUTS, "mono", 0.15);
 
 	MSM5205(config, m_msm, 384000);
 	m_msm->vck_legacy_callback().set(FUNC(fromance_state::fromance_adpcm_int)); /* IRQ handler */

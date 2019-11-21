@@ -41,11 +41,11 @@ DEFINE_DEVICE_TYPE(A78_CART_SLOT, a78_cart_slot_device, "a78_cart_slot", "Atari 
 //-------------------------------------------------
 
 device_a78_cart_interface::device_a78_cart_interface (const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device),
-		m_rom(nullptr),
-		m_rom_size(0),
-		m_base_rom(0x8000),
-		m_bank_mask(0)
+	: device_interface(device, "a78cart")
+	, m_rom(nullptr)
+	, m_rom_size(0)
+	, m_base_rom(0x8000)
+	, m_bank_mask(0)
 {
 }
 

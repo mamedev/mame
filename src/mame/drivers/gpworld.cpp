@@ -332,9 +332,9 @@ void gpworld_state::mainmem(address_map &map)
 	map(0xc800, 0xcfff).ram().w(FUNC(gpworld_state::palette_write)).share("palette_ram"); /* The memory test reads at 0xc800 */
 	map(0xd000, 0xd7ff).ram().share("tile_ram");
 	map(0xd800, 0xd800).rw(FUNC(gpworld_state::ldp_read), FUNC(gpworld_state::ldp_write));
-/*  AM_RANGE(0xd801,0xd801) AM_READ(???) */
+/*  map(0xd801, 0xd801).r(FUNC(gpworld_state::???)); */
 	map(0xda00, 0xda00).portr("INWHEEL"); //8255 here....
-/*  AM_RANGE(0xda01,0xda01) AM_WRITE(???) */                 /* These inputs are interesting - there are writes and reads all over these addr's */
+/*  map(0xda01, 0xda01).w(FUNC(gpworld_state::???)); */                 /* These inputs are interesting - there are writes and reads all over these addr's */
 	map(0xda02, 0xda02).w(FUNC(gpworld_state::brake_gas_write));               /*bit 0 select gas/brake input */
 	map(0xda20, 0xda20).r(FUNC(gpworld_state::pedal_in));
 
@@ -462,7 +462,7 @@ void gpworld_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 		break;
 	default:
-		assert_always(false, "Unknown id in gpworld_state::device_timer");
+		throw emu_fatalerror("Unknown id in gpworld_state::device_timer");
 	}
 }
 

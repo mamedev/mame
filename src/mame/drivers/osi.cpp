@@ -918,7 +918,7 @@ void c1p_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 		m_beeper->set_clock(300);
 		break;
 	default:
-		assert_always(false, "Unknown id in sb2m600_state::device_timer");
+		throw emu_fatalerror("Unknown id in c1p_state::device_timer");
 	}
 }
 

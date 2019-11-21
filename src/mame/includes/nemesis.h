@@ -94,7 +94,7 @@ private:
 	int       m_irq1_on;
 	int       m_irq2_on;
 	int       m_irq4_on;
-	uint16_t    m_selected_ip; /* Copied from WEC Le Mans 24 driver, explicity needed for Hyper Crash */
+	uint8_t    m_selected_ip; // needed for Hyper Crash
 	int       m_gx400_irq1_cnt;
 	uint8_t     m_frame_counter;
 	uint16_t    m_scanline_counter;
@@ -124,8 +124,8 @@ private:
 	DECLARE_READ16_MEMBER(gx400_sharedram_word_r);
 	DECLARE_WRITE16_MEMBER(gx400_sharedram_word_w);
 	DECLARE_READ16_MEMBER(konamigt_input_word_r);
-	DECLARE_WRITE16_MEMBER(selected_ip_word_w);
-	DECLARE_READ16_MEMBER(selected_ip_word_r);
+	void selected_ip_w(uint8_t data);
+	uint8_t selected_ip_r();
 	DECLARE_WRITE16_MEMBER(bubsys_mcu_w);
 	DECLARE_READ8_MEMBER(wd_r);
 	DECLARE_WRITE_LINE_MEMBER(gfx_flipx_w);

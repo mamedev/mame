@@ -124,10 +124,10 @@ uint32_t tomy_princ_state::screen_update_tomy_princ(screen_device &screen, bitma
 // fe2d25
 void tomy_princ_state::princ_map(address_map &map)
 {
-	map(0x000001, 0x000001).lw8("free2", [](u8 data) { return 0xff; });
+	map(0x000001, 0x000001).lw8([](u8 data) { return 0xff; }, "free2");
 	map(0x000008, 0x000008).r(FUNC(tomy_princ_state::read_gpu_status));
-	map(0x68ff00, 0x68ff00).lw8("free1", [this](u8 data) { bFirstPort8Read = true; });
-	map(0x68ff44, 0x68ff44).lr8("free0", [this]() -> u8 { return m_screen->vblank() ? 0x11 : 0x10; });
+	map(0x68ff00, 0x68ff00).lw8([this](u8 data) { bFirstPort8Read = true; }, "free1");
+	map(0x68ff44, 0x68ff44).lr8([this]() -> u8 { return m_screen->vblank() ? 0x11 : 0x10; }, "free0");
 	map(0xe00000, 0xe07fff).ram();  // stacks are placed here
 	map(0xf00000, 0xffffff).rom().region("maincpu", 0x00000);
 }

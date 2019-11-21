@@ -7,7 +7,7 @@ Driver-in-progress by R. Belmont and Miodrag Milanovic.
 Portions (2013 - 2018) by Karl-Ludwig Deisenhofer (Floppy, ClikClok RTC, NVRAM, DIPs, hard disk, Color Graphics).
 Baud rate generator by AJR (2018) and Shattered (2016), keyboard & GDC fixes by Cracyc (June - Nov. 2016).
 
-To unlock floppy drives A-D compile with WORKAROUND_RAINBOW_B (prevents a side effect of ERROR 13).
+Model B implementation has a workaround prevents a side effect of ERROR 13 to unlock floppy drives A-D.
 
 Native single sided 5.25" images with 80 tracks, 10 sectors are well tested (*.IMD / *.TD0=TeleDisk / *.IMG with 400 K).
 VT180 images (184.320 Bytes) are very unreliable in CP/M - though a real machine can read them.
@@ -144,7 +144,7 @@ To obtain pixel exact graphics use 'Graphics Only' in Video Options and cmd.line
 CURRENTY UNEMULATED
 -------------------
 (a) the serial printer on port B prints garbage. It is worth to mention that port B relies on XON/XOFF,
-    while DTR_L (CTS B) means 'printer ready'. There is also a ROM patch in place (WORKAROUND macro)...
+    while DTR_L (CTS B) means 'printer ready'. There is also a ROM patch in place...
 
 (b1) LOOPBACK circuit not emulated (used in startup tests).
 
@@ -349,6 +349,7 @@ W17 pulls J1 serial  port pin 1 to GND when set (chassis to logical GND).
 #include "machine/nvram.h"
 #include "machine/ripple_counter.h"
 #include "machine/timer.h"
+#include "machine/ram.h"
 
 #include "machine/ds1315.h"
 #include "emupal.h"
@@ -372,26 +373,7 @@ W17 pulls J1 serial  port pin 1 to GND when set (chassis to logical GND).
 
 // (Y2K) DS1315 unit only holds 2 digits, so Vincent Esser's freeware employs a windowing technique.
 //       While Suitable's DOS 3.10 accepts dates > 2000, don't take that for granted with software from the 80s.
-#ifdef      ASSUME_MODEL_A_HARDWARE
-	#define RTC_BASE 0xED000
-
-	// Define standard and maximum RAM sizes (A model):
-	#define MOTHERBOARD_RAM 0x0ffff  // 64 K base RAM  (100-A)
-	#define END_OF_RAM 0xcffff // Very last byte (theretical; on 100-A) DO NOT CHANGE.
-
-	// Pretend to emulate older RAM board (no NMI, also affects presence bit in 'system_parameter_r'):
-	#define OLD_RAM_BOARD_PRESENT
-#else
-	#define RTC_BASE 0xFC000 // (default configuration, also covers FE000+)
-//  #define RTC_BASE 0xF4000 // (alternate configuration) - ClikClok V1.0 / CLIKF4.COM
-
-	// DEC-100-B probes until a 'flaky' area is found (BOOT ROM around F400:0E04).
-	// It is no longer possible to key in the RAM size from within the 100-B BIOS.
-	#define MOTHERBOARD_RAM 0x1ffff  // 128 K base RAM (100-B)
-	#define END_OF_RAM 0xdffff // very last byte (100-B theoretical max.) DO NOT CHANGE.
-
-	#define WORKAROUND_RAINBOW_B // work around DRIVE ERROR (tested on 100-B ROM only)
- #endif
+//  Model B can have an RTC mapped at 0xF4000 instead - ClikClok V1.0 / CLIKF4.COM
 
 // ----------------------------------------------------------------------------------------------
 // * MHFU disabled by writing a _sensible_ value to port 0x10C (instead of port 0x0c)
@@ -466,10 +448,10 @@ static constexpr int COLOR_MONITOR = 0x02; // DEC recommendation. GWBASIC and mo
 static constexpr int DUAL_MONITOR = 0x03;  // Debugging, AutoCad, 'newer' freeware. Green is missing with unpatched software (for technical reasons)
 static constexpr int AUTODETECT_MONITOR = 0x04;  // Snoop palette, then choose best output.
 
-class rainbow_state : public driver_device
+class rainbow_base_state : public driver_device
 {
 public:
-	rainbow_state(const machine_config &mconfig, device_type type, const char *tag) :
+	rainbow_base_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 
 		m_inp1(*this, "W13"),
@@ -479,7 +461,6 @@ public:
 		m_inp5(*this, "DEC HARD DISK"), // DO NOT CHANGE ORDER
 		m_inp6(*this, "CORVUS HARD DISKS"), // DO NOT CHANGE ORDER
 		m_inp7(*this, "GRAPHICS OPTION"),   // DO NOT CHANGE ORDER
-		m_inp8(*this, "MEMORY PRESENT"),    // DO NOT CHANGE ORDER
 		m_inp9(*this, "MONO MONITOR TYPE"),
 		m_inp10(*this, "J17"),
 		m_inp11(*this, "CLIKCLOK"),
@@ -490,6 +471,7 @@ public:
 
 		m_i8088(*this, "maincpu"),
 		m_z80(*this, "subcpu"),
+		m_ram(*this, "ram"),
 
 		m_fdc(*this, FD1793_TAG),
 		m_floppies(*this, FD1793_TAG ":%u", 0U),
@@ -508,9 +490,6 @@ public:
 		m_p_vol_ram(*this, "vol_ram"),
 		m_p_nvram(*this, "nvram"),
 
-		m_shared(*this, "sh_ram"),
-		m_ext_ram(*this, "ext_ram"),
-
 		m_rtc(*this, "rtc"),
 		m_hgdc(*this, "upd7220"), // GDC
 
@@ -522,13 +501,19 @@ public:
 	{
 	}
 
-	void rainbow(machine_config &config);
+	void rainbow_base(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-private:
+	void rainbow8088_base_map(address_map &map);
+	void rainbow8088_base_io(address_map &map);
+
+	DECLARE_READ8_MEMBER(ext_ram_r);
+
+	DECLARE_WRITE8_MEMBER(rtc_w);
 
 	DECLARE_READ8_MEMBER(read_video_ram_r);
 	DECLARE_WRITE_LINE_MEMBER(video_interrupt);
@@ -579,20 +564,12 @@ private:
 	DECLARE_READ8_MEMBER(z80_diskstatus_r);
 	DECLARE_WRITE8_MEMBER(z80_diskcontrol_w);
 
-	DECLARE_READ8_MEMBER(system_parameter_r);
-
 	DECLARE_WRITE_LINE_MEMBER(kbd_tx);
 	DECLARE_WRITE_LINE_MEMBER(kbd_rxready_w);
 	DECLARE_WRITE_LINE_MEMBER(kbd_txready_w);
 
-	DECLARE_WRITE_LINE_MEMBER(irq_hi_w);
-
 	DECLARE_READ8_MEMBER(rtc_reset);
 	DECLARE_READ8_MEMBER(rtc_enable);
-	DECLARE_READ8_MEMBER(rtc_r);
-	DECLARE_WRITE8_MEMBER(rtc_w);
-
-	DECLARE_WRITE8_MEMBER(ext_ram_w);
 
 	DECLARE_WRITE_LINE_MEMBER(mpsc_irq);
 	DECLARE_WRITE8_MEMBER(comm_bitrate_w);
@@ -616,8 +593,6 @@ private:
 	DECLARE_WRITE16_MEMBER(vram_w);
 	DECLARE_WRITE_LINE_MEMBER(GDC_vblank_irq);
 
-	void rainbow8088_io(address_map &map);
-	void rainbow8088_map(address_map &map);
 	void rainbowz80_io(address_map &map);
 	void rainbowz80_mem(address_map &map);
 	void upd7220_map(address_map &map);
@@ -643,7 +618,6 @@ private:
 	required_ioport m_inp5;
 	required_ioport m_inp6;
 	required_ioport m_inp7;
-	required_ioport m_inp8;
 	required_ioport m_inp9;
 	required_ioport m_inp10;
 	required_ioport m_inp11;
@@ -652,6 +626,7 @@ private:
 	required_device<rainbow_video_device> m_crtc;
 	required_device<cpu_device> m_i8088;
 	required_device<cpu_device> m_z80;
+	required_device<ram_device> m_ram;
 
 	required_device<fd1793_device> m_fdc;
 	required_device_array<floppy_connector, 4> m_floppies;
@@ -668,8 +643,6 @@ private:
 	required_shared_ptr<uint8_t> m_p_ram;
 	required_shared_ptr<uint8_t> m_p_vol_ram;
 	required_shared_ptr<uint8_t> m_p_nvram;
-	required_shared_ptr<uint8_t> m_shared;
-	required_shared_ptr<uint8_t> m_ext_ram;
 
 	optional_device<ds1315_device> m_rtc;
 
@@ -732,7 +705,6 @@ private:
 	uint8_t m_z80_mailbox, m_8088_mailbox;
 
 	void update_kbd_irq();
-	virtual void machine_reset() override;
 
 	int m_present_drive;
 	floppy_image_device *m_floppy;
@@ -769,6 +741,50 @@ private:
 	const int comm_rates[16] = { 50,75,110,134,150,200,300,600,1200,1800,2000,2400,3600,4800,9600,19200 };
 };
 
+class rainbow_modela_state : public rainbow_base_state
+{
+public:
+	rainbow_modela_state(const machine_config &mconfig, device_type type, const char *tag) :
+		rainbow_base_state(mconfig, type, tag)
+	{
+	}
+
+	void rainbow_modela(machine_config &config);
+
+private:
+	virtual void machine_reset() override;
+
+	void rainbow8088_map(address_map &map);
+	void rainbow8088_io(address_map &map);
+
+	DECLARE_WRITE8_MEMBER(ext_ram_w);
+	DECLARE_READ8_MEMBER(rtc_r);
+	DECLARE_WRITE_LINE_MEMBER(irq_hi_w);
+	DECLARE_READ8_MEMBER(system_parameter_r);
+};
+
+class rainbow_modelb_state : public rainbow_base_state
+{
+public:
+	rainbow_modelb_state(const machine_config &mconfig, device_type type, const char *tag) :
+		rainbow_base_state(mconfig, type, tag)
+	{
+	}
+
+	void rainbow_modelb(machine_config &config);
+
+private:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	void rainbow8088_map(address_map &map);
+	void rainbow8088_io(address_map &map);
+
+	DECLARE_WRITE8_MEMBER(ext_ram_w);
+	DECLARE_READ8_MEMBER(rtc_r);
+	DECLARE_WRITE_LINE_MEMBER(irq_hi_w);
+	DECLARE_READ8_MEMBER(system_parameter_r);
+};
 
 // It * should be * OK to RESET the SCROLL_BUFFER and the COLOR_MAP (at least with WELL WRITTEN programs)
 
@@ -800,7 +816,7 @@ private:
 	m_gdc_mode_register |= GDC_MODE_ENABLE_VIDEO;           \
 	logerror("\n** OPTION GRFX. RESET **\n");
 
-UPD7220_DISPLAY_PIXELS_MEMBER( rainbow_state::hgdc_display_pixels )
+UPD7220_DISPLAY_PIXELS_MEMBER( rainbow_base_state::hgdc_display_pixels )
 {
 	if(m_inp7->read() == 0)
 		return;
@@ -853,7 +869,7 @@ UPD7220_DISPLAY_PIXELS_MEMBER( rainbow_state::hgdc_display_pixels )
 	}
 }
 
-FLOPPY_FORMATS_MEMBER(rainbow_state::floppy_formats)
+FLOPPY_FORMATS_MEMBER(rainbow_base_state::floppy_formats)
 FLOPPY_RX50IMG_FORMAT,
 FLOPPY_TD0_FORMAT,
 FLOPPY_IMD_FORMAT,
@@ -868,7 +884,7 @@ static void rainbow_floppies(device_slot_interface &device)
 	device.option_add("525ssdd", FLOPPY_525_SSDD); // to read a single sided, (160K) PC-DOS 1 disk with MediaMaster
 }
 
-void rainbow_state::machine_start()
+void rainbow_base_state::machine_start()
 {
 	m_power_good = false; // Simulate AC_OK signal from power supply.
 	cmd_timer = timer_alloc(0);
@@ -894,8 +910,12 @@ void rainbow_state::machine_start()
 	save_item(NAME(m_kbd_rx_ready));
 	save_item(NAME(m_irq_high));
 	save_item(NAME(m_irq_mask));
+}
 
-#ifdef WORKAROUND_RAINBOW_B
+void rainbow_modelb_state::machine_start()
+{
+	rainbow_base_state::machine_start();
+
 	uint8_t *rom = memregion("maincpu")->base();
 	if (rom[0xf4000 + 0x3ffc] == 0x31) // 100-B (5.01)    0x35 would test for V5.05
 	{
@@ -908,14 +928,11 @@ void rainbow_state::machine_start()
 		rom[0xf4000 + 0x315E] = 0xe2;
 		rom[0xf4000 + 0x315F] = 0x02;
 	}
-#endif
 }
 
-void rainbow_state::rainbow8088_map(address_map &map)
+void rainbow_base_state::rainbow8088_base_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x00000, 0x0ffff).ram().share("sh_ram");
-	map(0x10000, END_OF_RAM).ram().share("ext_ram").w(FUNC(rainbow_state::ext_ram_w));
 
 	// There is a 2212 (256 x 4 bit) NVRAM from 0xed000 to 0xed0ff (*)
 	// shadowed at $ec000 - $ecfff and from $ed100 - $edfff.
@@ -926,29 +943,56 @@ void rainbow_state::rainbow8088_map(address_map &map)
 	//    So NVRAM is hidden and loads & saves are triggered within the
 	//    'diagnostic_w' handler (similar to real hardware).
 
-	//  - Address bits 8-12 are ignored (-> AM_MIRROR).
-	map(0xed000, 0xed0ff).ram().share("vol_ram"); //AM_MIRROR(0x1f00)
+	//  - Address bits 8-12 are ignored (-> mirror()).
+	map(0xed000, 0xed0ff).ram().share("vol_ram"); //.mirror(0x1f00);
 	map(0xed100, 0xed1ff).ram().share("nvram");
 
 	map(0xee000, 0xeffff).ram().share("p_ram");
 	map(0xf0000, 0xfffff).rom();
 }
 
-void rainbow_state::rainbow8088_io(address_map &map)
+void rainbow_modela_state::rainbow8088_map(address_map &map)
+{
+	rainbow8088_base_map(map);
+	map(0x00000, 0xcffff).rw(FUNC(rainbow_modela_state::ext_ram_r), FUNC(rainbow_modela_state::ext_ram_w));
+
+#ifdef RTC_ENABLED
+	// *********************************** / DS1315 'PHANTOM CLOCK' IMPLEMENTATION FOR 'DEC-100-A' ***************************************
+	map(0xed000, 0xed000).r(FUNC(rainbow_modela_state::rtc_r));
+	map(0xed0fe, 0xed0ff).w(FUNC(rainbow_modela_state::rtc_w));
+	// *********************************** / DS1315 'PHANTOM CLOCK' IMPLEMENTATION FOR 'DEC-100-A' ***************************************
+#endif
+}
+
+// DEC-100-B probes until a 'flaky' area is found (BOOT ROM around F400:0E04).
+// It is no longer possible to key in the RAM size from within the 100-B BIOS.
+void rainbow_modelb_state::rainbow8088_map(address_map &map)
+{
+	rainbow8088_base_map(map);
+	map(0x00000, 0xdffff).rw(FUNC(rainbow_modelb_state::ext_ram_r), FUNC(rainbow_modelb_state::ext_ram_w));
+
+#ifdef RTC_ENABLED
+	// *********************************** / DS1315 'PHANTOM CLOCK' IMPLEMENTATION FOR 'DEC-100-B' ***************************************
+	// No address space needed ( -> IRQs must be disabled to block ROM accesses during reads ).
+	map(0xfc000, 0xfe104).r(FUNC(rainbow_modelb_state::rtc_r));
+	// *********************************** / DS1315 'PHANTOM CLOCK' IMPLEMENTATION FOR 'DEC-100-B' ***************************************
+#endif
+}
+
+void rainbow_base_state::rainbow8088_base_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0x1ff);
-	map(0x00, 0x00).rw(FUNC(rainbow_state::i8088_latch_r), FUNC(rainbow_state::i8088_latch_w));
-	map(0x02, 0x02).rw(FUNC(rainbow_state::comm_control_r), FUNC(rainbow_state::comm_control_w)); // Communication status / control register (8088)
+	map(0x00, 0x00).rw(FUNC(rainbow_base_state::i8088_latch_r), FUNC(rainbow_base_state::i8088_latch_w));
+	map(0x02, 0x02).rw(FUNC(rainbow_base_state::comm_control_r), FUNC(rainbow_base_state::comm_control_w)); // Communication status / control register (8088)
 	map(0x04, 0x04).w(m_crtc, FUNC(rainbow_video_device::dc011_w));
 
-	map(0x06, 0x06).w(FUNC(rainbow_state::comm_bitrate_w));
+	map(0x06, 0x06).w(FUNC(rainbow_base_state::comm_bitrate_w));
 
-	map(0x08, 0x08).r(FUNC(rainbow_state::system_parameter_r));
-	map(0x0a, 0x0a).rw(FUNC(rainbow_state::diagnostic_r), FUNC(rainbow_state::diagnostic_w));
+	map(0x0a, 0x0a).rw(FUNC(rainbow_base_state::diagnostic_r), FUNC(rainbow_base_state::diagnostic_w));
 	map(0x0c, 0x0c).select(0x100).w(m_crtc, FUNC(rainbow_video_device::dc012_w));
 
-	map(0x0e, 0x0e).w(FUNC(rainbow_state::printer_bitrate_w));
+	map(0x0e, 0x0e).w(FUNC(rainbow_base_state::printer_bitrate_w));
 
 	map(0x10, 0x11).rw(m_kbd8251, FUNC(i8251_device::read), FUNC(i8251_device::write));
 
@@ -964,7 +1008,7 @@ void rainbow_state::rainbow8088_io(address_map &map)
 
 	// Corvus B/H harddisk controller (incompatible with EXT.COMM OPTION):
 	map(0x20, 0x20).rw(m_corvus_hdc, FUNC(corvus_hdc_device::read), FUNC(corvus_hdc_device::write));
-	map(0x21, 0x21).r(FUNC(rainbow_state::corvus_status_r));
+	map(0x21, 0x21).r(FUNC(rainbow_base_state::corvus_status_r));
 
 	// ===========================================================
 	// 0x30 -> 0x3f ***** Option Select 3
@@ -979,15 +1023,15 @@ void rainbow_state::rainbow8088_io(address_map &map)
 	// * Color graphics option (NEC upd7220 GDC plus external hw.). See Programmer's Reference AA-AE36A-TV.
 	// Either 384 x 240 x 16 or 800 x 240 x 4 colors (out of 4096). 8 x 64 K video RAM.
 	// (Write Buffer, Pattern Register/Multiplier, ALU/PS, Color Map, readback and offset/scroll hardware):
-	map(0x50, 0x57).rw(FUNC(rainbow_state::GDC_EXTRA_REGISTER_r), FUNC(rainbow_state::GDC_EXTRA_REGISTER_w));
+	map(0x50, 0x57).rw(FUNC(rainbow_base_state::GDC_EXTRA_REGISTER_r), FUNC(rainbow_base_state::GDC_EXTRA_REGISTER_w));
 
 	// ===========================================================
 	// 0x60 -> 0x6f ***** EXTENDED COMM. OPTION / Option Select 2.
 	// ===========================================================
 	// 0x60 -> 0x6f ***** RD51 HD. CONTROLLER   / Option Select 2.
 	map(0x60, 0x67).rw(m_hdc, FUNC(wd2010_device::read), FUNC(wd2010_device::write)).mirror(0x100);
-	map(0x68, 0x68).rw(FUNC(rainbow_state::hd_status_68_r), FUNC(rainbow_state::hd_status_68_w));
-	map(0x69, 0x69).r(FUNC(rainbow_state::hd_status_69_r));
+	map(0x68, 0x68).rw(FUNC(rainbow_base_state::hd_status_68_r), FUNC(rainbow_base_state::hd_status_68_w));
+	map(0x69, 0x69).r(FUNC(rainbow_base_state::hd_status_69_r));
 	// ===========================================================
 	// THE RD51 CONTROLLER: WD1010AL - 00 (WDC '83)
 	// + 2 K x 8 SRAM (SY2128-4 or Japan 8328) 21-17872-01
@@ -1022,30 +1066,42 @@ void rainbow_state::rainbow8088_io(address_map &map)
 	// ===========================================================
 	// 0x70 -> 0x7f ***** Option Select 4
 	// ===========================================================
-	// 0x10c -> (MHFU disable register handled by 0x0c + AM_SELECT)
+	// 0x10c -> (MHFU disable register handled by 0x0c + select())
 }
 
-void rainbow_state::rainbowz80_mem(address_map &map)
+void rainbow_modela_state::rainbow8088_io(address_map &map)
+{
+	rainbow_base_state::rainbow8088_base_io(map);
+	map(0x08, 0x08).r(FUNC(rainbow_modela_state::system_parameter_r));
+}
+
+void rainbow_modelb_state::rainbow8088_io(address_map &map)
+{
+	rainbow_base_state::rainbow8088_base_io(map);
+	map(0x08, 0x08).r(FUNC(rainbow_modelb_state::system_parameter_r));
+}
+
+void rainbow_base_state::rainbowz80_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xffff).rw(FUNC(rainbow_state::share_z80_r), FUNC(rainbow_state::share_z80_w));
+	map(0x0000, 0xffff).rw(FUNC(rainbow_base_state::share_z80_r), FUNC(rainbow_base_state::share_z80_w));
 }
 
-void rainbow_state::rainbowz80_io(address_map &map)
+void rainbow_base_state::rainbowz80_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x00, 0x00).rw(FUNC(rainbow_state::z80_latch_r), FUNC(rainbow_state::z80_latch_w));
-	map(0x20, 0x20).rw(FUNC(rainbow_state::z80_generalstat_r), FUNC(rainbow_state::z80_diskdiag_read_w)); // read to port 0x20 used by MS-DOS 2.x diskette loader.
-	map(0x21, 0x21).rw(FUNC(rainbow_state::z80_generalstat_r), FUNC(rainbow_state::z80_diskdiag_write_w));
-	map(0x40, 0x40).rw(FUNC(rainbow_state::z80_diskstatus_r), FUNC(rainbow_state::z80_diskcontrol_w));
+	map(0x00, 0x00).rw(FUNC(rainbow_base_state::z80_latch_r), FUNC(rainbow_base_state::z80_latch_w));
+	map(0x20, 0x20).rw(FUNC(rainbow_base_state::z80_generalstat_r), FUNC(rainbow_base_state::z80_diskdiag_read_w)); // read to port 0x20 used by MS-DOS 2.x diskette loader.
+	map(0x21, 0x21).rw(FUNC(rainbow_base_state::z80_generalstat_r), FUNC(rainbow_base_state::z80_diskdiag_write_w));
+	map(0x40, 0x40).rw(FUNC(rainbow_base_state::z80_diskstatus_r), FUNC(rainbow_base_state::z80_diskcontrol_w));
 	map(0x60, 0x63).rw(m_fdc, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
 
 	// Z80 I/O shadow area > $80
-	map(0x80, 0x80).rw(FUNC(rainbow_state::z80_latch_r), FUNC(rainbow_state::z80_latch_w));
-	map(0xA0, 0xA0).rw(FUNC(rainbow_state::z80_generalstat_r), FUNC(rainbow_state::z80_diskdiag_read_w)); // read to port 0x20 used by MS-DOS 2.x diskette loader.
-	map(0xA1, 0xA1).rw(FUNC(rainbow_state::z80_generalstat_r), FUNC(rainbow_state::z80_diskdiag_write_w));
-	map(0xC0, 0xC0).rw(FUNC(rainbow_state::z80_diskstatus_r), FUNC(rainbow_state::z80_diskcontrol_w));
+	map(0x80, 0x80).rw(FUNC(rainbow_base_state::z80_latch_r), FUNC(rainbow_base_state::z80_latch_w));
+	map(0xA0, 0xA0).rw(FUNC(rainbow_base_state::z80_generalstat_r), FUNC(rainbow_base_state::z80_diskdiag_read_w)); // read to port 0x20 used by MS-DOS 2.x diskette loader.
+	map(0xA1, 0xA1).rw(FUNC(rainbow_base_state::z80_generalstat_r), FUNC(rainbow_base_state::z80_diskdiag_write_w));
+	map(0xC0, 0xC0).rw(FUNC(rainbow_base_state::z80_diskstatus_r), FUNC(rainbow_base_state::z80_diskcontrol_w));
 	map(0xE0, 0xE3).rw(m_fdc, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
 }
 
@@ -1060,23 +1116,7 @@ static INPUT_PORTS_START(rainbow100b_in)
 	PORT_DIPSETTING(0x02, "GREEN (VR201-B)")
 	PORT_DIPSETTING(0x03, "AMBER (VR201-C)")
 
-	// MEMORY, FLOPPY, BUNDLE, GRAPHICS affect 'system_parameter_r':
-	PORT_START("MEMORY PRESENT")
-	PORT_DIPNAME(0xF0000, 0x20000, "MEMORY PRESENT")
-	PORT_DIPSETTING(0x10000, "64  K (MINIMUM ON 100-A)") // see MOTHERBOARD_RAM
-	PORT_DIPSETTING(0x20000, "128 K (MINIMUM ON 100-B)")
-	PORT_DIPSETTING(0x30000, "192 K (w. MEMORY OPTION)")
-	PORT_DIPSETTING(0x40000, "256 K (w. MEMORY OPTION)")
-	PORT_DIPSETTING(0x50000, "320 K (100-B MEMORY OPTION)")
-	PORT_DIPSETTING(0x60000, "384 K (100-B MEMORY OPTION)")
-	PORT_DIPSETTING(0x70000, "448 K (100-B MEMORY OPTION)")
-	PORT_DIPSETTING(0x80000, "512 K (100-B MEMORY OPTION)")
-	PORT_DIPSETTING(0x90000, "576 K (100-B MEMORY OPTION)")
-	PORT_DIPSETTING(0xA0000, "640 K (100-B MEMORY OPTION)")
-	PORT_DIPSETTING(0xB0000, "704 K (100-B MEMORY OPTION)")
-	PORT_DIPSETTING(0xC0000, "768 K (100-B MEMORY OPTION)")
-	PORT_DIPSETTING(0xD0000, "832 K (100-B MEMORY OPTION)") // see END_OF_RAM
-	PORT_DIPSETTING(0xE0000, "896 K (100-B MAX.   MEMORY)")
+	// FLOPPY, BUNDLE, GRAPHICS affect 'system_parameter_r':
 
 	// EXT.COMM.card -or- RD51 HD. controller (marketed later).
 	PORT_START("DEC HARD DISK") // BUNDLE_OPTION
@@ -1139,62 +1179,11 @@ static INPUT_PORTS_START(rainbow100b_in)
 	PORT_DIPSETTING(0x03, "DUAL MONITOR (SCREEN 1: TEXT;  SCREEN 2: R-G-B)")
 INPUT_PORTS_END
 
-void rainbow_state::machine_reset()
+void rainbow_base_state::machine_reset()
 {
 	// 'F3' (in partial emulation) here replaces 'CTRL-SETUP' (soft reboot on an original Rainbow)
 	// FIXME: BIOS reports error 19 when CTRL-SETUP is pressed (Z80 or flags aren't fully reset then?)
 	popmessage("Reset");
-
-	// Configure RAM
-	address_space &program = m_i8088->space(AS_PROGRAM);
-	uint32_t unmap_start = m_inp8->read();
-
-	// Verify RAM size matches hardware (DIP switches)
-
-#ifdef ASSUME_RAINBOW_A_HARDWARE
-	printf("\n*** RAINBOW A MODEL ASSUMED (64 - 832 K RAM).\n");
-	if (unmap_start > 0xD0000)
-	{
-		unmap_start = 0xD0000; // hardware limit 832 K (possibly as low as 256 K)     [?]
-		printf("\nWARNING: 896 K is not a valid memory configuration on Rainbow 100 A!\n");
-	}
-
-	uint32_t check = (unmap_start >> 16)-1;  // guess.
-	uint8_t nvram_location = m_p_nvram[0x84];   // location not verified yet. DMT RAM check tests offset $84 !
-
-	#ifdef RTC_ENABLED
-	// *********************************** / DS1315 'PHANTOM CLOCK' IMPLEMENTATION FOR 'DEC-100-A' ***************************************
-	program.install_read_handler(RTC_BASE, RTC_BASE, read8_delegate(FUNC(rainbow_state::rtc_r), this));
-	program.install_write_handler(RTC_BASE + 0xFE, RTC_BASE + 0xFF, write8_delegate(FUNC(rainbow_state::rtc_w), this));
-	// *********************************** / DS1315 'PHANTOM CLOCK' IMPLEMENTATION FOR 'DEC-100-A' ***************************************
-	#endif
-
-#else
-	printf("\n*** RAINBOW B MODEL ASSUMED (128 - 896 K RAM)\n");
-	if (unmap_start < 0x20000)
-	{
-		unmap_start = 0x20000; // 128 K minimum
-		printf("\nWARNING: 64 K is not a valid memory size on Rainbow 100-B!\n");
-	}
-
-	uint32_t check = (unmap_start >> 16) - 2;
-	uint8_t nvram_location = m_p_nvram[0xdb];
-
-	#ifdef RTC_ENABLED
-	// *********************************** / DS1315 'PHANTOM CLOCK' IMPLEMENTATION FOR 'DEC-100-B' ***************************************
-	// No address space needed ( -> IRQs must be disabled to block ROM accesses during reads ).
-	program.install_read_handler(RTC_BASE, RTC_BASE + 0x2104, read8_delegate(FUNC(rainbow_state::rtc_r), this));
-	// *********************************** / DS1315 'PHANTOM CLOCK' IMPLEMENTATION FOR 'DEC-100-B' ***************************************
-	#endif
-#endif
-	if (check != nvram_location)
-		printf("\nNOTE: RAM configuration does not match NVRAM.\nUNMAP_START = %05x   NVRAM VALUE = %02x   SHOULD BE: %02x\n", unmap_start, nvram_location, check);
-
-	if (END_OF_RAM > unmap_start)
-	{
-		logerror("\nUnmapping from %x to %x",unmap_start, END_OF_RAM);
-		program.unmap_readwrite(unmap_start, END_OF_RAM);
-	}
 
 	m_crtc->MHFU(MHFU_RESET_and_DISABLE);
 
@@ -1206,8 +1195,8 @@ void rainbow_state::machine_reset()
 	{
 		// Install 8088 read / write handler
 		io.unmap_readwrite(0x60, 0x60);
-		io.install_read_handler(0x60, 0x60, read8_delegate(FUNC(rainbow_state::hd_status_60_r), this));
-		io.install_write_handler(0x60, 0x60, write8_delegate(FUNC(rainbow_state::hd_status_60_w), this));
+		io.install_read_handler(0x60, 0x60, read8_delegate(*this, FUNC(rainbow_base_state::hd_status_60_r)));
+		io.install_write_handler(0x60, 0x60, write8_delegate(*this, FUNC(rainbow_base_state::hd_status_60_w)));
 
 		hdc_reset();
 		m_hdc_drive_ready = true;
@@ -1294,8 +1283,20 @@ void rainbow_state::machine_reset()
 	output().set_value("led_hold", 0);    // led11
 }
 
+void rainbow_modela_state::machine_reset()
+{
+	rainbow_base_state::machine_reset();
+	logerror("*** RAINBOW A MODEL ASSUMED (64 - 832 K RAM).\n");
+}
+
+void rainbow_modelb_state::machine_reset()
+{
+	rainbow_base_state::machine_reset();
+	logerror("*** RAINBOW B MODEL ASSUMED (128 - 896 K RAM)\n");
+}
+
 // Simulate AC_OK signal (power good) and RESET after ~ 108 ms.
-void rainbow_state::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
+void rainbow_base_state::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
 {
 	switch (tid)
 	{
@@ -1305,11 +1306,11 @@ void rainbow_state::device_timer(emu_timer &timer, device_timer_id tid, int para
 		if (m_power_good == false)
 		{
 			m_power_good = true;
-			printf("\n**** POWER GOOD ****\n");
+			logerror("**** POWER GOOD ****\n");
 		}
 		else
 		{
-			printf("\n**** WATCHDOG: CPU RESET ****\n");
+			logerror("**** WATCHDOG: CPU RESET ****\n");
 			m_i8088->reset(); // gives 'ERROR_16 - INTERRUPTS OFF' (indicates hardware failure or software bug).
 		}
 		break; // case 0
@@ -1331,7 +1332,7 @@ void rainbow_state::device_timer(emu_timer &timer, device_timer_id tid, int para
 	} // switch (timer ID)
 }
 
-uint32_t rainbow_state::screen_update_rainbow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t rainbow_base_state::screen_update_rainbow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	static int old_monitor;
 
@@ -1366,7 +1367,7 @@ uint32_t rainbow_state::screen_update_rainbow(screen_device &screen, bitmap_ind1
 }
 
 // Interrupt handling and arbitration.  See 3.1.3.8 OF PC-100 spec.
-void rainbow_state::update_8088_irqs()
+void rainbow_base_state::update_8088_irqs()
 {
 	if (m_irq_mask != 0)
 	{
@@ -1386,13 +1387,13 @@ void rainbow_state::update_8088_irqs()
 }
 
 
-void rainbow_state::raise_8088_irq(int ref)
+void rainbow_base_state::raise_8088_irq(int ref)
 {
 	m_irq_mask |= (1 << ref);
 	update_8088_irqs();
 }
 
-void rainbow_state::lower_8088_irq(int ref)
+void rainbow_base_state::lower_8088_irq(int ref)
 {
 	m_irq_mask &= ~(1 << ref);
 	update_8088_irqs();
@@ -1400,7 +1401,7 @@ void rainbow_state::lower_8088_irq(int ref)
 
 
 // IRQ service for 7201 (commm / printer)
-void rainbow_state::update_mpsc_irq()
+void rainbow_base_state::update_mpsc_irq()
 {
 	if (m_mpsc_irq == 0)
 		lower_8088_irq(IRQ_COMM_PTR_INTR_L);
@@ -1408,14 +1409,14 @@ void rainbow_state::update_mpsc_irq()
 		raise_8088_irq(IRQ_COMM_PTR_INTR_L);
 }
 
-WRITE_LINE_MEMBER(rainbow_state::mpsc_irq)
+WRITE_LINE_MEMBER(rainbow_base_state::mpsc_irq)
 {
 	m_mpsc_irq = state;
 	update_mpsc_irq();
 }
 
 // PORT 0x06 : Communication bit rates (see page 21 of PC 100 SPEC)
-WRITE8_MEMBER(rainbow_state::comm_bitrate_w)
+WRITE8_MEMBER(rainbow_base_state::comm_bitrate_w)
 {
 	m_dbrg->str_w(data & 0x0f);  // PDF is wrong, low nibble is RECEIVE clock (verified in SETUP).
 	logerror("\n(COMM.) receive bitrate = %d ($%02x)\n", comm_rates[data & 0x0f] , data & 0x0f);
@@ -1425,7 +1426,7 @@ WRITE8_MEMBER(rainbow_state::comm_bitrate_w)
 }
 
 // PORT 0x0e : Printer bit rates
-WRITE8_MEMBER(rainbow_state::printer_bitrate_w)
+WRITE8_MEMBER(rainbow_base_state::printer_bitrate_w)
 {
 	m_printer_bitrate = data & 7;
 	// bits 0 - 2 = 0: nominally 75 bps, actually 75.35 bps
@@ -1443,17 +1444,17 @@ WRITE8_MEMBER(rainbow_state::printer_bitrate_w)
 	logerror(" - CLOCK (0 = internal): %02x", data & 8);
 }
 
-WRITE_LINE_MEMBER(rainbow_state::dbrg_fr_w)
+WRITE_LINE_MEMBER(rainbow_base_state::dbrg_fr_w)
 {
 	m_mpsc->rxca_w(state);
 }
 
-WRITE_LINE_MEMBER(rainbow_state::dbrg_ft_w)
+WRITE_LINE_MEMBER(rainbow_base_state::dbrg_ft_w)
 {
 	m_mpsc->txca_w(state);
 }
 
-WRITE8_MEMBER(rainbow_state::bitrate_counter_w)
+WRITE8_MEMBER(rainbow_base_state::bitrate_counter_w)
 {
 	bool prt_rxtxc = BIT(data, 7 - m_printer_bitrate);
 	bool kbd_rxtxc = BIT(data, 1);
@@ -1470,20 +1471,20 @@ WRITE8_MEMBER(rainbow_state::bitrate_counter_w)
 
 // Shared memory is contended by refresh, concurrent
 //    8088 accesses and arbitration logic (DMA).
-READ8_MEMBER(rainbow_state::share_z80_r)
+READ8_MEMBER(rainbow_base_state::share_z80_r)
 {
 	if (m_zflip)
 	{
 		if (offset < 0x8000)
 		{
-			return m_shared[offset + 0x8000];
+			return m_ram->read(offset + 0x8000);
 		}
 		else if (offset < 0x8800)
 		{
 			return m_z80_private[offset & 0x7ff]; // SRAM
 		}
 
-		return m_shared[offset ^ 0x8000];
+		return m_ram->read(offset ^ 0x8000);
 	}
 	else
 	{
@@ -1492,17 +1493,17 @@ READ8_MEMBER(rainbow_state::share_z80_r)
 			return m_z80_private[offset]; // SRAM
 		}
 
-		return m_shared[offset];
+		return m_ram->read(offset);
 	}
 }
 
-WRITE8_MEMBER(rainbow_state::share_z80_w)
+WRITE8_MEMBER(rainbow_base_state::share_z80_w)
 {
 	if (m_zflip)
 	{
 		if (offset < 0x8000)
 		{
-			m_shared[offset + 0x8000] = data;
+			m_ram->write(offset + 0x8000, data);
 			return; // [!]
 		}
 		else if (offset < 0x8800)
@@ -1511,28 +1512,40 @@ WRITE8_MEMBER(rainbow_state::share_z80_w)
 			return; // [!]
 		}
 
-		m_shared[offset ^ 0x8000] = data;
+		m_ram->write(offset ^ 0x8000, data);
 	}
 	else
 	{
 		if (offset < 0x800)
 			m_z80_private[offset] = data; // SRAM
 		else
-			m_shared[offset] = data;
+			m_ram->write(offset, data);
 	}
 	return;
 }
 
-// NMI logic (parity test)
-WRITE8_MEMBER(rainbow_state::ext_ram_w)
+READ8_MEMBER(rainbow_base_state::ext_ram_r)
 {
-	m_ext_ram[offset] = data;
+	if (offset < m_ram->size())
+		return m_ram->read(offset);
+	return 0;
+}
 
-#ifndef OLD_RAM_BOARD_PRESENT
+WRITE8_MEMBER(rainbow_modela_state::ext_ram_w)
+{
+	if (offset < m_ram->size())
+		m_ram->write(offset, data);
+}
+
+// NMI logic (parity test)
+WRITE8_MEMBER(rainbow_modelb_state::ext_ram_w)
+{
+	if (offset < m_ram->size())
+		m_ram->write(offset, data);
+
 	if (m_diagnostic & 0x08)
-		if ((offset + 0x10000) >= (MOTHERBOARD_RAM + 1))
+		if (offset >= 0x10000)
 			m_i8088->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
-#endif
 }
 
 // ------------------------ClikClok (for 100-A; DS1315) ------------------------------------------
@@ -1540,7 +1553,7 @@ WRITE8_MEMBER(rainbow_state::ext_ram_w)
 
 // Requires a short program from the Suitable Solutions ClikClok distribution disk (CLIKA.COM)
 // - also needed to set time/date (*).                   Reads $ed000, writes ed0fe/ed0ff.
-WRITE8_MEMBER(rainbow_state::rtc_w)
+WRITE8_MEMBER(rainbow_base_state::rtc_w)
 {
 	if (m_inp11->read() == 0x01) // if enabled...
 	{
@@ -1567,19 +1580,28 @@ WRITE8_MEMBER(rainbow_state::rtc_w)
 // ------------------------ClikClok (for 100-B; DS1315)  ------------------------------------------------
 // Add-on hardware, occupies one of the EPROM sockets of the 100-B. TODO: check address decoders on board
 // Requires CLIKCLOK.COM or RBCLIK21.COM (freeware from Latrobe).                       Uses FC000/FE000.
-READ8_MEMBER(rainbow_state::rtc_r)
+READ8_MEMBER(rainbow_modela_state::rtc_r)
+{
+	if (m_inp11->read() == 0x01) // if enabled...
+	{
+		if (offset == 0x00) // read time/date from 0xED000 (ClikClok for 100-A)
+		{
+			if (m_rtc->chip_enable())
+				return m_rtc->read_data() & 0x01;
+			 else
+				m_rtc->chip_reset();
+		}
+	}
+
+	return m_p_vol_ram[offset];  // return volatile RAM
+}
+
+READ8_MEMBER(rainbow_modelb_state::rtc_r)
 {
 	if (m_inp11->read() == 0x01) // if enabled...
 	{
 		switch (offset)
 		{
-#ifdef ASSUME_RAINBOW_A_HARDWARE
-		case 0x00: // read time/date from 0xED000 (ClikClok for 100-A)
-			if (m_rtc->chip_enable())
-				return m_rtc->read_data() & 0x01;
-			 else
-				m_rtc->chip_reset();
-#else
 		// Transfer data to DS1315 (data = offset):
 		case 0x0000:  // RTC_WRITE_DATA_0 0xFC000
 		case 0x2000:  // RTC_WRITE_DATA_0 0xFE000 (MIRROR)
@@ -1612,23 +1634,18 @@ READ8_MEMBER(rainbow_state::rtc_r)
 		case 0x2104:  // 0xFE104 (MIRROR)
 			m_rtc->chip_reset();
 			break;
-#endif
 		}
 	}
 
-#ifdef ASSUME_RAINBOW_A_HARDWARE
-	return m_p_vol_ram[offset];  // return volatile RAM
-#else
 	uint8_t *rom = memregion("maincpu")->base();
-	return rom[RTC_BASE + offset];  // return ROM
-#endif
+	return rom[0xfc000 + offset];  // return ROM
 }
 // ------------------------/ ClikClok (for model B; DS1315)  -------------------------------
 
 
 // --------------------------------- Corvus (B/H)  -----------------------------------------
 // PORT 0x21 : Corvus status register (ready / direction)
-READ8_MEMBER(rainbow_state::corvus_status_r)
+READ8_MEMBER(rainbow_base_state::corvus_status_r)
 {
 	if (m_inp6->read() == 0) // Corvus controller
 	{
@@ -1652,7 +1669,7 @@ READ8_MEMBER(rainbow_state::corvus_status_r)
 // ---------------------------- RD51 HARD DISK CONTROLLER ----------------------------------
 static const int SECTOR_SIZES[4] = { 256, 512, 1024, 128 };
 
-void rainbow_state::hdc_reset()
+void rainbow_base_state::hdc_reset()
 {
 //  logerror(">> HARD DISC CONTROLLER RESET <<\n");
 	m_hdc->reset();
@@ -1672,7 +1689,7 @@ void rainbow_state::hdc_reset()
 
 // Return 'hard_disk_file' object for harddisk 1 (fixed).
 // < nullptr if geometry is insane or other errors occured >
-hard_disk_file *rainbow_state::rainbow_hdc_file(int drv)
+hard_disk_file *rainbow_base_state::rainbow_hdc_file(int drv)
 {
 	m_hdc_drive_ready = false;
 
@@ -1712,7 +1729,7 @@ hard_disk_file *rainbow_state::rainbow_hdc_file(int drv)
 					info->cylinders, RD51_MAX_CYLINDER,
 					info->sectors, RD51_SECTORS_PER_TRACK,
 					info->sectorbytes);
-		printf("\n <<< === HARD DISK IMAGE REJECTED = (invalid geometry) === >>> \n");
+		logerror("<<< === HARD DISK IMAGE REJECTED = (invalid geometry) === >>>\n");
 		return nullptr;
 	}
 }
@@ -1734,7 +1751,7 @@ static uint32_t get_and_print_lbasector(device_t *device, hard_disk_info *info, 
 }
 
 // READ SECTOR (on BCS 1 -> 0 transition)
-WRITE_LINE_MEMBER(rainbow_state::hdc_read_sector)
+WRITE_LINE_MEMBER(rainbow_base_state::hdc_read_sector)
 {
 	static int last_state;
 	int read_status = 1;
@@ -1802,7 +1819,7 @@ WRITE_LINE_MEMBER(rainbow_state::hdc_read_sector)
 // ...IF WRITE_GATE (WG) TRANSITS FROM 1 -> 0
 
 // NO PROVISIONS for  sector sizes != 512 or MULTIPLE DRIVES (> 0) !!!
-WRITE_LINE_MEMBER(rainbow_state::hdc_write_sector)
+WRITE_LINE_MEMBER(rainbow_base_state::hdc_write_sector)
 {
 	int success = 0;
 	static int wg_last;
@@ -1850,7 +1867,7 @@ WRITE_LINE_MEMBER(rainbow_state::hdc_write_sector)
 //  99 = SUCCESS : SECTOR WRITTEN
 
 // * RELIES * ON THE FACT THAT THERE WILL BE NO MULTI SECTOR TRANSFERS (!)
-int rainbow_state::do_write_sector()
+int rainbow_base_state::do_write_sector()
 {
 	int feedback = 0; // no error
 	output().set_value("led1", 0); // ON
@@ -1899,7 +1916,7 @@ int rainbow_state::do_write_sector()
 }
 
 
-READ8_MEMBER(rainbow_state::hd_status_60_r)
+READ8_MEMBER(rainbow_base_state::hd_status_60_r)
 {
 	int data = m_hdc_buffer[m_hdc_buf_offset];
 	//logerror("HARD DISK DISK BUFFER: READ offset %04x | data = %02x\n", m_hdc_buf_offset, data); // ! DO NOT CHANGE ORDER !
@@ -1913,7 +1930,7 @@ READ8_MEMBER(rainbow_state::hd_status_60_r)
 	return data;
 }
 
-WRITE8_MEMBER(rainbow_state::hd_status_60_w)
+WRITE8_MEMBER(rainbow_base_state::hd_status_60_w)
 {
 	//logerror("HARD DISK BUFFER: WRITE offset %04x | data = %02x\n", m_hdc_buf_offset, data);
 
@@ -1935,7 +1952,7 @@ WRITE8_MEMBER(rainbow_state::hd_status_60_w)
 // - 3 hard-wired controller module identification bits.
 // - signals from the WD1010 chip,
 // - disk drive(latched status signals)
-READ8_MEMBER(rainbow_state::hd_status_68_r)
+READ8_MEMBER(rainbow_base_state::hd_status_68_r)
 {
 	// (*) Bits 5-7 : HARD WIRED IDENTIFICATION BITS, bits 5+7 = 1 and bit 6 = 0  (= 101 f?r RD51 module)
 	int data = 0xe0; // 111 gives DRIVE NOT READY (when W is pressed on boot screen)
@@ -1981,7 +1998,7 @@ READ8_MEMBER(rainbow_state::hd_status_68_r)
 
 // 68 (WRITE): Secondary Command Registers (68H) - -  "write-only register for commands"
 // - see TABLE 4.8 (4-24)
-WRITE8_MEMBER(rainbow_state::hd_status_68_w)
+WRITE8_MEMBER(rainbow_base_state::hd_status_68_w)
 {
 	// Bit 4-7 : --- not used / reserved
 
@@ -2041,7 +2058,7 @@ inhibited.
 7 Track 0 - The disk drive sets this bit high (1) when the R/W heads are
 positioned over cylinder 0 (the data track furthest away from the spindle).
 */
-READ8_MEMBER(rainbow_state::hd_status_69_r)
+READ8_MEMBER(rainbow_base_state::hd_status_69_r)
 {
 	int hs = m_hdc->read(0x06) & (1 + 2 + 4); // SDH bits 0-2 = HEAD #
 //  logerror("(x69 READ) %i = HEAD SELECT WD1010\n", hs);
@@ -2071,7 +2088,7 @@ READ8_MEMBER(rainbow_state::hd_status_69_r)
 }
 
 // TREAT SIGNALS FROM / TO CONTROLLER
-WRITE_LINE_MEMBER(rainbow_state::hdc_step)
+WRITE_LINE_MEMBER(rainbow_base_state::hdc_step)
 {
 	m_hdc_step_latch = true;
 
@@ -2079,23 +2096,23 @@ WRITE_LINE_MEMBER(rainbow_state::hdc_step)
 	switch_off_timer->adjust(attotime::from_msec(500));
 }
 
-WRITE_LINE_MEMBER(rainbow_state::hdc_direction)
+WRITE_LINE_MEMBER(rainbow_base_state::hdc_direction)
 {
 	m_hdc_direction = state; // (0 = OUT)
 }
 
-READ_LINE_MEMBER(rainbow_state::hdc_drive_ready)
+READ_LINE_MEMBER(rainbow_base_state::hdc_drive_ready)
 {
 	return m_hdc_drive_ready;
 }
 
-READ_LINE_MEMBER(rainbow_state::hdc_write_fault)
+READ_LINE_MEMBER(rainbow_base_state::hdc_write_fault)
 {
 	return m_hdc_write_fault;
 }
 
 // Buffer counter reset when BCR goes from 0 -> 1
-WRITE_LINE_MEMBER(rainbow_state::hdc_bcr)
+WRITE_LINE_MEMBER(rainbow_base_state::hdc_bcr)
 {
 	static int bcr_state;
 	if (bcr_state == 0 && state == 1)
@@ -2103,7 +2120,7 @@ WRITE_LINE_MEMBER(rainbow_state::hdc_bcr)
 	bcr_state = state;
 }
 
-void rainbow_state::hdc_buffer_counter_reset()
+void rainbow_base_state::hdc_buffer_counter_reset()
 {
 	m_hdc->buffer_ready(false);
 	m_hdc_buf_offset = 0;
@@ -2115,7 +2132,7 @@ void rainbow_state::hdc_buffer_counter_reset()
 
 // On a WRITE / FORMAT command, signal goes high when the WD1010
 // chip is READY TO ACCESS the information in the sector buffer.
-WRITE_LINE_MEMBER(rainbow_state::hdc_bdrq)
+WRITE_LINE_MEMBER(rainbow_base_state::hdc_bdrq)
 {
 	static int old_state;
 //  logerror("BDRQ - BUFFER DATA REQUEST OBTAINED: %u\n", state);
@@ -2133,7 +2150,7 @@ WRITE_LINE_MEMBER(rainbow_state::hdc_bdrq)
 
 
 // IRQ service for both RD51 and COMM. OPTION
-void rainbow_state::update_bundle_irq()
+void rainbow_base_state::update_bundle_irq()
 {
 	if (m_bdl_irq == 0)
 	{
@@ -2148,14 +2165,14 @@ void rainbow_state::update_bundle_irq()
 	}
 }
 
-WRITE_LINE_MEMBER(rainbow_state::bundle_irq)
+WRITE_LINE_MEMBER(rainbow_base_state::bundle_irq)
 {
 	m_bdl_irq = state;
 	update_bundle_irq();
 }
 
 
-READ8_MEMBER(rainbow_state::system_parameter_r)
+READ8_MEMBER(rainbow_modela_state::system_parameter_r)
 {
 	/*  Info about option boards is in bits 0 - 3:
 	SYSTEM PARAMETER INFORMATION: see AA-P308A-TV page 92 section 14.0
@@ -2171,12 +2188,27 @@ READ8_MEMBER(rainbow_state::system_parameter_r)
 	*/
 	return ((m_inp5->read() == 1 ? 0 : 1) |
 			(m_inp7->read() == 1 ? 0 : 4) | // Floppy is always present (bit 1 zero)
-#ifdef OLD_RAM_BOARD_PRESENT
-			(m_inp8->read() > MOTHERBOARD_RAM ? 0 : 8) |
-#else
-			 8  |  // unverified
-#endif
-			 16 | 32 | 64 | 128); // unverified
+			(m_ram->size() > 0x10000 ? 0 : 8) |
+			0xf0); // unverified
+}
+
+READ8_MEMBER(rainbow_modelb_state::system_parameter_r)
+{
+	/*  Info about option boards is in bits 0 - 3:
+	SYSTEM PARAMETER INFORMATION: see AA-P308A-TV page 92 section 14.0
+	Bundle card (1) | Floppy (2) | Graphics (4) | Memory option (8)
+	0 1 2 3 4 5 6 7
+	B F G M
+	(bit SET means NOT present; 4-7 reserved )
+
+	B : no separation between the 2 available 'bundle cards' (HD controller / COMM.OPTION) ?
+
+	M : old RAM extension (128 / 192 K ?) detected with OPTION_PRESENT bit, newer models 'by presence'.
+	BIOS uses a seperate IRQ vector for RAM board detection (at least on a 100-B).
+	*/
+	return ((m_inp5->read() == 1 ? 0 : 1) |
+			(m_inp7->read() == 1 ? 0 : 4) | // Floppy is always present (bit 1 zero)
+			0xf8); // unverified
 }
 
 //  [02] COMMUNICATIONS STATUS REGISTER - PAGE 154 (**** READ **** )
@@ -2188,7 +2220,7 @@ READ8_MEMBER(rainbow_state::system_parameter_r)
 // 2 COMM DSR  (reflects status of DSR at COMM)
 // 3 COMM CTS  (reflects status of CTS at COMM)
 // 4 COMM RLSD (receive line signal detect at COMM; also connected to DCDA on MPSC)
-READ8_MEMBER(rainbow_state::comm_control_r)
+READ8_MEMBER(rainbow_base_state::comm_control_r)
 {
 	bool is_mhfu_enabled = false;
 	if (m_power_good)
@@ -2211,7 +2243,7 @@ READ8_MEMBER(rainbow_state::comm_control_r)
 // 1 COMM SRTS H     (controls secondary request to send line of COMM)
 // 2 COMM DTR L      (controls terminal ready line of COMM)
 // 3 COMM RTS        (controls request to send line of COMM)
-WRITE8_MEMBER(rainbow_state::comm_control_w)
+WRITE8_MEMBER(rainbow_base_state::comm_control_w)
 {
 	logerror("%02x to COMM.CONTROL REGISTER ", data);
 
@@ -2233,7 +2265,7 @@ WRITE8_MEMBER(rainbow_state::comm_control_w)
 
 // 8088 writes to port 0x00 (interrupts Z80)
 // See page 133 (4-34)
-WRITE8_MEMBER(rainbow_state::i8088_latch_w)
+WRITE8_MEMBER(rainbow_base_state::i8088_latch_w)
 {
 	// logerror("%02x to Z80 mailbox\n", data);
 
@@ -2248,7 +2280,7 @@ WRITE8_MEMBER(rainbow_state::i8088_latch_w)
 
 // Z80 reads port 0x00
 // See page 134 (4-35)
-READ8_MEMBER(rainbow_state::z80_latch_r)
+READ8_MEMBER(rainbow_base_state::z80_latch_r)
 {
 	// logerror("Read %02x from Z80 mailbox\n", m_z80_mailbox);
 	m_z80->set_input_line(0, CLEAR_LINE);
@@ -2259,7 +2291,7 @@ READ8_MEMBER(rainbow_state::z80_latch_r)
 
 // Z80 writes to port 0x00 (interrupts 8088)
 // See page 134 (4-35)
-WRITE8_MEMBER(rainbow_state::z80_latch_w)
+WRITE8_MEMBER(rainbow_base_state::z80_latch_w)
 {
 	// logerror("%02x to 8088 mailbox\n", data);
 	raise_8088_irq(IRQ_8088_MAILBOX);
@@ -2269,7 +2301,7 @@ WRITE8_MEMBER(rainbow_state::z80_latch_w)
 }
 
 // 8088 reads port 0x00. See page 133 (4-34)
-READ8_MEMBER(rainbow_state::i8088_latch_r)
+READ8_MEMBER(rainbow_base_state::i8088_latch_r)
 {
 	// logerror("Read %02x from 8088 mailbox\n", m_8088_mailbox);
 	lower_8088_irq(IRQ_8088_MAILBOX);
@@ -2279,13 +2311,13 @@ READ8_MEMBER(rainbow_state::i8088_latch_r)
 }
 
 // (Z80) : WRITE to 0x20
-WRITE8_MEMBER(rainbow_state::z80_diskdiag_read_w)
+WRITE8_MEMBER(rainbow_base_state::z80_diskdiag_read_w)
 {
 	m_zflip = true; //  "a write to 20H will _SET_ ZFLIP"
 }
 
 // (Z80) : PORT 21H * WRITE *
-WRITE8_MEMBER(rainbow_state::z80_diskdiag_write_w)
+WRITE8_MEMBER(rainbow_base_state::z80_diskdiag_write_w)
 {
 	/*   Z80 LEDs:
 	4   5   6  <- bit #
@@ -2300,7 +2332,7 @@ WRITE8_MEMBER(rainbow_state::z80_diskdiag_write_w)
 }
 
 // (Z80) : PORT 20H / 21H  _READ_
-READ8_MEMBER(rainbow_state::z80_generalstat_r)
+READ8_MEMBER(rainbow_base_state::z80_generalstat_r)
 {
 	/*
 	General / diag.status register Z80 / see page 157 (table 4-18).
@@ -2366,7 +2398,7 @@ READ8_MEMBER(rainbow_state::z80_generalstat_r)
 
 // (Z80) : PORT 40H _READ_
 // 40H diskette status Register **** READ ONLY *** ( 4-60 of TM100.pdf )
-READ8_MEMBER(rainbow_state::z80_diskstatus_r)
+READ8_MEMBER(rainbow_base_state::z80_diskstatus_r)
 {
 	int track = 0xEE;
 	int data = m_z80_diskcontrol & (255 - 0x80 - 0x40 - 0x20 - 0x04); // 00011011
@@ -2414,7 +2446,7 @@ READ8_MEMBER(rainbow_state::z80_diskstatus_r)
 
 // ALL SIGNALS ARE HIGH ACTIVE (H), EXCEPT:
 // BIT 5 : SIDE 0 L : For single sided drives, this bit is always set to 0 for side O.
-WRITE8_MEMBER(rainbow_state::z80_diskcontrol_w)
+WRITE8_MEMBER(rainbow_base_state::z80_diskcontrol_w)
 {
 	int enable_start;
 	int disable_start; // set defaults
@@ -2497,7 +2529,7 @@ WRITE8_MEMBER(rainbow_state::z80_diskcontrol_w)
 	data = (data & (255 - 3)); // invalid drive = DRIVE 0 ?!
 
 	if (m_present_drive == INVALID_DRIVE)
-		printf("\n**** INVALID DRIVE ****");
+		logerror("**** INVALID DRIVE ****\n");
 	else
 		data = data | m_present_drive;
 
@@ -2505,7 +2537,7 @@ WRITE8_MEMBER(rainbow_state::z80_diskcontrol_w)
 }
 // --------- END OF Z80 --------------------
 
-READ8_MEMBER(rainbow_state::read_video_ram_r)
+READ8_MEMBER(rainbow_base_state::read_video_ram_r)
 {
 	return m_p_ram[offset];
 }
@@ -2518,7 +2550,7 @@ READ8_MEMBER(rainbow_state::read_video_ram_r)
 // **************************************************
 
 // CPU acknowledge of VBL IRQ resets counter
-IRQ_CALLBACK_MEMBER(rainbow_state::irq_callback)
+IRQ_CALLBACK_MEMBER(rainbow_base_state::irq_callback)
 {
 	int intnum = -1;
 	for (int i = IRQ_8088_VBL; i >= 0; i--)
@@ -2538,7 +2570,7 @@ IRQ_CALLBACK_MEMBER(rainbow_state::irq_callback)
 // NEC7220 Vsync IRQ ***************************************** GDC
 
 // VERIFY: SCROLL_MAP & COLOR_MAP are updated at the next VSYNC (not immediately)... Are there more registers?
-WRITE_LINE_MEMBER(rainbow_state::GDC_vblank_irq)
+WRITE_LINE_MEMBER(rainbow_base_state::GDC_vblank_irq)
 {
 	// VERIFICATION NEEDED: IRQ raised before or after new palette loaded...?
 	if (m_gdc_mode_register & GDC_MODE_ENABLE_VSYNC_IRQ) // 0x40
@@ -2630,7 +2662,7 @@ WRITE_LINE_MEMBER(rainbow_state::GDC_vblank_irq)
 } // 7220 vblank IRQ
 
 
-WRITE_LINE_MEMBER(rainbow_state::video_interrupt)
+WRITE_LINE_MEMBER(rainbow_base_state::video_interrupt)
 {
 	if (state == ASSERT_LINE)
 		raise_8088_irq(IRQ_8088_VBL);
@@ -2651,12 +2683,12 @@ WRITE_LINE_MEMBER(rainbow_state::video_interrupt)
 }
 
 // Reflects bits from 'diagnostic_w' (1:1), except test jumpers
-READ8_MEMBER(rainbow_state::diagnostic_r) // 8088 (port 0A READ). Fig.4-29 + table 4-15
+READ8_MEMBER(rainbow_base_state::diagnostic_r) // 8088 (port 0A READ). Fig.4-29 + table 4-15
 {
 	return ((m_diagnostic & 0xf1) | m_inp1->read() | m_inp2->read() | m_inp3->read());
 }
 
-WRITE8_MEMBER(rainbow_state::diagnostic_w) // 8088 (port 0A WRITTEN). Fig.4-28 + table 4-15
+WRITE8_MEMBER(rainbow_base_state::diagnostic_w) // 8088 (port 0A WRITTEN). Fig.4-28 + table 4-15
 {
 	//    logerror("%02x to diag port (PC=%x)\n", data, m_i8088->pc());
 
@@ -2678,13 +2710,13 @@ WRITE8_MEMBER(rainbow_state::diagnostic_w) // 8088 (port 0A WRITTEN). Fig.4-28 +
 
 	if ((m_diagnostic & 1) && !(data & 1)) // ZRESET goes LOW...
 	{
-		printf("\nFDC ** RESET ** ");
+		logerror("FDC ** RESET **\n");
 		m_fdc->reset();
 	}
 
 	if (!(m_diagnostic & 1) && (data & 1)) // ZRESET goes HIGH...
 	{
-		printf("\nFDC RESTORE ");
+		logerror("FDC RESTORE\n");
 		m_fdc->reset(); // See formatter description p.197 or 5-13
 	}
 
@@ -2698,10 +2730,10 @@ WRITE8_MEMBER(rainbow_state::diagnostic_w) // 8088 (port 0A WRITTEN). Fig.4-28 +
 	{
 		if (m_inp7->read() == 1)
 		{
-			printf("\nHINT: GRAPHICS OPTION ON. TEXT ONLY (DC011/DC012) OUTPUT NOW DISABLED.\n");
+			logerror("HINT: GRAPHICS OPTION ON. TEXT ONLY (DC011/DC012) OUTPUT NOW DISABLED.\n");
 		}
 		else
-		{       printf("\nALARM: GRAPHICS OPTION * SWITCHED OFF * VIA DIP. TEXT OUTPUT STILL ENABLED!\n");
+		{       logerror("ALARM: GRAPHICS OPTION * SWITCHED OFF * VIA DIP. TEXT OUTPUT STILL ENABLED!\n");
 			m_onboard_video_selected = true;
 		}
 		logerror("DATA: %x (PC=%x)\n", data, m_i8088->pc());
@@ -2709,7 +2741,7 @@ WRITE8_MEMBER(rainbow_state::diagnostic_w) // 8088 (port 0A WRITTEN). Fig.4-28 +
 
 	// BIT 3: PARITY (1 enables parity test on memory board. Usually 64K per bank). -> ext_ram_w.
 	if (data & 0x08)
-		logerror("\n*** PARITY TEST [on RAM EXTENSION] - (bit 3 - diagnostic_w) ");
+		logerror("*** PARITY TEST [on RAM EXTENSION] - (bit 3 - diagnostic_w)\n");
 
 	// MISSING BITS (* not vital for normal operation, see diag.disk) -
 	// * BIT 4: DIAG LOOPBACK (0 at power-up; 1 directs RX50 and DC12 output to printer port)
@@ -2735,7 +2767,7 @@ WRITE8_MEMBER(rainbow_state::diagnostic_w) // 8088 (port 0A WRITTEN). Fig.4-28 +
 	*/
 	if (data & 16)
 	{
-		logerror("\nWARNING: UNEMULATED DIAG LOOPBACK (directs RX50 and DC12 output to printer port) **** ");
+		logerror("WARNING: UNEMULATED DIAG LOOPBACK (directs RX50 and DC12 output to printer port) ****\n");
 	}
 
 	address_space &io = m_i8088->space(AS_IO);
@@ -2748,7 +2780,7 @@ WRITE8_MEMBER(rainbow_state::diagnostic_w) // 8088 (port 0A WRITTEN). Fig.4-28 +
 		PRT  RCV DATA.......KBD TXD...........PRT RDATA
 		KBD  RCV DATA.......PRT TXD...........KBD RXD
 		*/
-		logerror("\nWARNING: UNEMULATED PORT LOOPBACK (COMM, PRINTER, KEYBOARD ports) **** ");
+		logerror("WARNING: UNEMULATED PORT LOOPBACK (COMM, PRINTER, KEYBOARD ports) ****\n");
 
 		io.unmap_readwrite(0x40, 0x43);  // unmap MPSC handlers to prevent CPU crashes ("INTERRUPTS OFF")
 	}
@@ -2756,7 +2788,7 @@ WRITE8_MEMBER(rainbow_state::diagnostic_w) // 8088 (port 0A WRITTEN). Fig.4-28 +
 	// Install 8088 read / write handler once loopback test is over
 	if ( !(data & 32) && (m_diagnostic & 32) )
 	{
-			io.install_readwrite_handler(0x40, 0x43, read8sm_delegate(FUNC(upd7201_new_device::cd_ba_r), &*m_mpsc), write8sm_delegate(FUNC(upd7201_new_device::cd_ba_w), &*m_mpsc));
+			io.install_readwrite_handler(0x40, 0x43, read8sm_delegate(*m_mpsc, FUNC(upd7201_new_device::cd_ba_r)), write8sm_delegate(*m_mpsc, FUNC(upd7201_new_device::cd_ba_w)));
 			logerror("\n **** COMM HANDLER INSTALLED **** ");
 			//popmessage("Autoboot from drive %c", m_p_nvram[0xab] ? (64 + m_p_nvram[0xab]) : 0x3F );
 	}
@@ -2773,7 +2805,7 @@ WRITE8_MEMBER(rainbow_state::diagnostic_w) // 8088 (port 0A WRITTEN). Fig.4-28 +
 }
 
 // KEYBOARD
-void rainbow_state::update_kbd_irq()
+void rainbow_base_state::update_kbd_irq()
 {
 	if ((m_kbd_rx_ready) || (m_kbd_tx_ready))
 		raise_8088_irq(IRQ_8088_KBD);
@@ -2781,24 +2813,24 @@ void rainbow_state::update_kbd_irq()
 		lower_8088_irq(IRQ_8088_KBD);
 }
 
-WRITE_LINE_MEMBER(rainbow_state::kbd_tx)
+WRITE_LINE_MEMBER(rainbow_base_state::kbd_tx)
 {
 	m_lk201->rx_w(state);
 }
 
-WRITE_LINE_MEMBER(rainbow_state::kbd_rxready_w)
+WRITE_LINE_MEMBER(rainbow_base_state::kbd_rxready_w)
 {
 	m_kbd_rx_ready = (state == 1) ? true : false;
 	update_kbd_irq();
 }
 
-WRITE_LINE_MEMBER(rainbow_state::kbd_txready_w)
+WRITE_LINE_MEMBER(rainbow_base_state::kbd_txready_w)
 {
 	m_kbd_tx_ready = (state == 1) ? true : false;
 	update_kbd_irq();
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(rainbow_state::hd_motor_tick)
+TIMER_DEVICE_CALLBACK_MEMBER(rainbow_base_state::hd_motor_tick)
 {
 	if (m_power_good)
 		m_crtc->MHFU(MHFU_COUNT); // // Increment IF ENABLED and POWER_GOOD, return count
@@ -2806,14 +2838,15 @@ TIMER_DEVICE_CALLBACK_MEMBER(rainbow_state::hd_motor_tick)
 	m_hdc_index_latch = true; // HDC drive index signal (not working ?)
 }
 
-// on 100-B, DTR from the keyboard 8051 controls bit 7 of IRQ vectors
-WRITE_LINE_MEMBER(rainbow_state::irq_hi_w)
+WRITE_LINE_MEMBER(rainbow_modela_state::irq_hi_w)
 {
-#ifdef      ASSUME_MODEL_A_HARDWARE
 	m_irq_high = 0;
-#else
+}
+
+// on 100-B, DTR from the keyboard 8051 controls bit 7 of IRQ vectors
+WRITE_LINE_MEMBER(rainbow_modelb_state::irq_hi_w)
+{
 	m_irq_high = (state == ASSERT_LINE) ? 0x80 : 0;
-#endif
 }
 
 
@@ -2823,7 +2856,7 @@ WRITE_LINE_MEMBER(rainbow_state::irq_hi_w)
 // NOTE: "More than one plane at a time can be enabled for a write operation; however,
 //        only one plane can be enabled for a read operation at anyone time."
 
-READ16_MEMBER(rainbow_state::vram_r)
+READ16_MEMBER(rainbow_base_state::vram_r)
 {
 	if ((!(m_gdc_mode_register & GDC_MODE_VECTOR)) || machine().side_effects_disabled())  // (NOT VECTOR MODE)
 	{
@@ -2844,7 +2877,7 @@ READ16_MEMBER(rainbow_state::vram_r)
 }
 
 // NOTE: Rainbow has separate registers for fore and background.
-WRITE16_MEMBER(rainbow_state::vram_w)
+WRITE16_MEMBER(rainbow_base_state::vram_w)
 {
 	if (m_gdc_mode_register & GDC_MODE_HIGHRES)
 		offset = (m_gdc_scroll_buffer[(offset & 0x3FC0) >> 6] << 6) | (offset & 0x3F);
@@ -2925,7 +2958,7 @@ WRITE16_MEMBER(rainbow_state::vram_w)
 
 // (READ)
 // Read  scroll buffer (see GDC Diagnostic Disk, SCROLL BUFFER test)
-READ8_MEMBER(rainbow_state::GDC_EXTRA_REGISTER_r)
+READ8_MEMBER(rainbow_base_state::GDC_EXTRA_REGISTER_r)
 {
 	uint8_t data = 0;
 	switch (offset)
@@ -2958,7 +2991,7 @@ READ8_MEMBER(rainbow_state::GDC_EXTRA_REGISTER_r)
 	return data;
 }
 
-WRITE8_MEMBER(rainbow_state::GDC_EXTRA_REGISTER_w)
+WRITE8_MEMBER(rainbow_base_state::GDC_EXTRA_REGISTER_w)
 {
 	static int last_message, last_mode, last_readback, last_scroll_index;
 
@@ -3004,7 +3037,7 @@ WRITE8_MEMBER(rainbow_state::GDC_EXTRA_REGISTER_w)
 			{
 				m_gdc_color_map_index = 0; // 0...31  (CPU accesses 32 bytes
 
-				printf("\n * COLOR MAP FULLY LOADED *");
+				logerror("* COLOR MAP FULLY LOADED *\n");
 				for (int zi = 0; zi < 16; zi++)
 				{
 					int g =  m_gdc_color_map[zi] & 0x0F;
@@ -3012,9 +3045,9 @@ WRITE8_MEMBER(rainbow_state::GDC_EXTRA_REGISTER_w)
 
 					int b =  m_gdc_color_map[zi + 16] & 0x0F;
 					int m =  (m_gdc_color_map[zi + 16] & 0xF0) >> 4;
-					printf("\n[%d] %1x %1x %1x  %1x (1:1)", zi, r   , g   , b   , m);
+					logerror("[%d] %1x %1x %1x  %1x (1:1)\n", zi, r, g, b, m);
 				}
-				printf("\n------------------------------");
+				logerror("------------------------------\n");
 			} // if all colors present
 			break;
 		}
@@ -3026,7 +3059,7 @@ WRITE8_MEMBER(rainbow_state::GDC_EXTRA_REGISTER_w)
 				m_gdc_scroll_buffer[m_gdc_scroll_index] = data; // // WRITE TO SCROLL_MAP ( 256 x 8 )
 
 				if (m_gdc_scroll_index == 255)
-					printf("\n ---- SCROLL MAP FULLY LOADED ---*");
+					logerror("---- SCROLL MAP FULLY LOADED ---*\n");
 				m_gdc_scroll_index++;
 				m_gdc_scroll_index &= 0xFF; // 0...255  (CPU accesses 256 bytes)
 			}
@@ -3070,7 +3103,7 @@ WRITE8_MEMBER(rainbow_state::GDC_EXTRA_REGISTER_w)
 				if (last_message != 2)
 				{
 					last_message = 2;
-					printf(" * HIGH RESOLUTION * ");
+					logerror("* HIGH RESOLUTION *\n");
 				}
 			}
 			else
@@ -3078,7 +3111,7 @@ WRITE8_MEMBER(rainbow_state::GDC_EXTRA_REGISTER_w)
 				if (last_message != 3)
 				{
 					last_message = 3;
-					printf(" MEDIUM RESOLUTION ");
+					logerror("MEDIUM RESOLUTION\n");
 				}
 			}
 
@@ -3192,45 +3225,43 @@ static GFXDECODE_START(gfx_rainbow)
 GFXDECODE_END
 
 // Allocate 512 K (4 x 64 K x 16 bit) of memory (GDC):
-void rainbow_state::upd7220_map(address_map &map)
+void rainbow_base_state::upd7220_map(address_map &map)
 {
-	map(0x00000, 0x3ffff).rw(FUNC(rainbow_state::vram_r), FUNC(rainbow_state::vram_w)).share("vram");
+	map(0x00000, 0x3ffff).rw(FUNC(rainbow_base_state::vram_r), FUNC(rainbow_base_state::vram_w)).share("vram");
 }
 
-void rainbow_state::rainbow(machine_config &config)
+void rainbow_base_state::rainbow_base(machine_config &config)
 {
 	config.set_default_layout(layout_rainbow);
 
 	/* basic machine hardware */
 	I8088(config, m_i8088, 24.0734_MHz_XTAL / 5); // approximately 4.815 MHz
-	m_i8088->set_addrmap(AS_PROGRAM, &rainbow_state::rainbow8088_map);
-	m_i8088->set_addrmap(AS_IO, &rainbow_state::rainbow8088_io);
-	m_i8088->set_irq_acknowledge_callback(FUNC(rainbow_state::irq_callback));
+	m_i8088->set_irq_acknowledge_callback(FUNC(rainbow_base_state::irq_callback));
 
 	Z80(config, m_z80, 24.0734_MHz_XTAL / 6);
-	m_z80->set_addrmap(AS_PROGRAM, &rainbow_state::rainbowz80_mem);
-	m_z80->set_addrmap(AS_IO, &rainbow_state::rainbowz80_io);
+	m_z80->set_addrmap(AS_PROGRAM, &rainbow_base_state::rainbowz80_mem);
+	m_z80->set_addrmap(AS_IO, &rainbow_base_state::rainbowz80_io);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(24.0734_MHz_XTAL / 6, 442, 0, 400, 264, 0, 240); // ~NTSC compatible video timing (?)
-	screen.set_screen_update(FUNC(rainbow_state::screen_update_rainbow));
+	screen.set_screen_update(FUNC(rainbow_base_state::screen_update_rainbow));
 	screen.set_palette("vt100_video:palette");
 	GFXDECODE(config, "gfxdecode", "vt100_video:palette", gfx_rainbow);
 
 	RAINBOW_VIDEO(config, m_crtc, 24.0734_MHz_XTAL);
 	m_crtc->set_screen("screen");
 	m_crtc->set_chargen("chargen");
-	m_crtc->ram_rd_callback().set(FUNC(rainbow_state::read_video_ram_r));
-	m_crtc->vert_freq_intr_wr_callback().set(FUNC(rainbow_state::video_interrupt));
+	m_crtc->ram_rd_callback().set(FUNC(rainbow_base_state::read_video_ram_r));
+	m_crtc->vert_freq_intr_wr_callback().set(FUNC(rainbow_base_state::video_interrupt));
 
 	// *************************** COLOR GRAPHICS (OPTION) **************************************
 	// While the OSC frequency is confirmed, the divider is not (refresh rate is ~60 Hz with 32).
 	UPD7220(config, m_hgdc, 31188000 / 32); // Duell schematics shows a 31.188 Mhz oscillator (confirmed by RFKA).
-	m_hgdc->vsync_wr_callback().set(FUNC(rainbow_state::GDC_vblank_irq)); // "The vsync callback line needs to be below the 7220 DEVICE_ADD line."
+	m_hgdc->vsync_wr_callback().set(FUNC(rainbow_base_state::GDC_vblank_irq)); // "The vsync callback line needs to be below the 7220 DEVICE_ADD line."
 
-	m_hgdc->set_addrmap(0, &rainbow_state::upd7220_map);
-	m_hgdc->set_display_pixels(FUNC(rainbow_state::hgdc_display_pixels));
+	m_hgdc->set_addrmap(0, &rainbow_base_state::upd7220_map);
+	m_hgdc->set_display_pixels(FUNC(rainbow_base_state::hgdc_display_pixels));
 	m_hgdc->set_screen(m_screen2); // set_screen needs to be added after 7720 device in the machine config, not after the screen.
 
 	PALETTE(config, m_palette2).set_entries(32);
@@ -3248,30 +3279,30 @@ void rainbow_state::rainbow(machine_config &config)
 	m_screen2->set_screen_update("upd7220", FUNC(upd7220_device::screen_update));
 
 	FD1793(config, m_fdc, 24.0734_MHz_XTAL / 24); // no separate 1 Mhz quartz
-	FLOPPY_CONNECTOR(config, FD1793_TAG ":0", rainbow_floppies, "525qd", rainbow_state::floppy_formats);
-	FLOPPY_CONNECTOR(config, FD1793_TAG ":1", rainbow_floppies, "525qd", rainbow_state::floppy_formats);
-	FLOPPY_CONNECTOR(config, FD1793_TAG ":2", rainbow_floppies, "525qd", rainbow_state::floppy_formats);
-	FLOPPY_CONNECTOR(config, FD1793_TAG ":3", rainbow_floppies, "525qd", rainbow_state::floppy_formats);
-	//FLOPPY_CONNECTOR(config, FD1793_TAG ":2", rainbow_floppies, "525dd", rainbow_state::floppy_formats);
-	//FLOPPY_CONNECTOR(config, FD1793_TAG ":3", rainbow_floppies, "35dd", rainbow_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, FD1793_TAG ":0", rainbow_floppies, "525qd", rainbow_base_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, FD1793_TAG ":1", rainbow_floppies, "525qd", rainbow_base_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, FD1793_TAG ":2", rainbow_floppies, "525qd", rainbow_base_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, FD1793_TAG ":3", rainbow_floppies, "525qd", rainbow_base_state::floppy_formats);
+	//FLOPPY_CONNECTOR(config, FD1793_TAG ":2", rainbow_floppies, "525dd", rainbow_base_state::floppy_formats);
+	//FLOPPY_CONNECTOR(config, FD1793_TAG ":3", rainbow_floppies, "35dd", rainbow_base_state::floppy_formats);
 	SOFTWARE_LIST(config, "flop_list").set_original("rainbow");
 
 	/// ********************************* HARD DISK CONTROLLER *****************************************
 	WD2010(config, m_hdc, 5000000); // 10 Mhz quartz on controller (divided by 2 for WCLK)
-	m_hdc->out_intrq_callback().set(FUNC(rainbow_state::bundle_irq)); // FIRST IRQ SOURCE (OR'ed with DRQ)
-	m_hdc->out_bdrq_callback().set(FUNC(rainbow_state::hdc_bdrq));  // BUFFER DATA REQUEST
+	m_hdc->out_intrq_callback().set(FUNC(rainbow_base_state::bundle_irq)); // FIRST IRQ SOURCE (OR'ed with DRQ)
+	m_hdc->out_bdrq_callback().set(FUNC(rainbow_base_state::hdc_bdrq));  // BUFFER DATA REQUEST
 
 	// SIGNALS -FROM- WD CONTROLLER:
-	m_hdc->out_bcs_callback().set(FUNC(rainbow_state::hdc_read_sector)); // Problem: OUT_BCS_CB = WRITE8 ... (!)
-	m_hdc->out_bcr_callback().set(FUNC(rainbow_state::hdc_bcr));         // BUFFER COUNTER RESET (pulses)
+	m_hdc->out_bcs_callback().set(FUNC(rainbow_base_state::hdc_read_sector)); // Problem: OUT_BCS_CB = WRITE8 ... (!)
+	m_hdc->out_bcr_callback().set(FUNC(rainbow_base_state::hdc_bcr));         // BUFFER COUNTER RESET (pulses)
 
-	m_hdc->out_wg_callback().set(FUNC(rainbow_state::hdc_write_sector));   // WRITE GATE
-	m_hdc->out_step_callback().set(FUNC(rainbow_state::hdc_step));         // STEP PULSE
-	m_hdc->out_dirin_callback().set(FUNC(rainbow_state::hdc_direction));
+	m_hdc->out_wg_callback().set(FUNC(rainbow_base_state::hdc_write_sector));   // WRITE GATE
+	m_hdc->out_step_callback().set(FUNC(rainbow_base_state::hdc_step));         // STEP PULSE
+	m_hdc->out_dirin_callback().set(FUNC(rainbow_base_state::hdc_direction));
 
 	// WF + DRDY are actually wired to a routine here:
-	m_hdc->in_wf_callback().set(FUNC(rainbow_state::hdc_write_fault));   // WRITE FAULT (fatal until next reset)
-	m_hdc->in_drdy_callback().set(FUNC(rainbow_state::hdc_drive_ready)); // DRIVE_READY (VCC = ready)
+	m_hdc->in_wf_callback().set(FUNC(rainbow_base_state::hdc_write_fault));   // WRITE FAULT (fatal until next reset)
+	m_hdc->in_drdy_callback().set(FUNC(rainbow_base_state::hdc_drive_ready)); // DRIVE_READY (VCC = ready)
 
 	// Always set seek complete and track 00 signal (not super clean, but does not affect operation):
 	m_hdc->in_sc_callback().set_constant(1);                             // SEEK COMPLETE (VCC = complete)
@@ -3289,11 +3320,11 @@ void rainbow_state::rainbow(machine_config &config)
 	DS1315(config, m_rtc, 0); // DS1315 (ClikClok for DEC-100 B)   * OPTIONAL *
 
 	COM8116_003(config, m_dbrg, 24.0734_MHz_XTAL / 4); // 6.01835 MHz (nominally 6 MHz)
-	m_dbrg->fr_handler().set(FUNC(rainbow_state::dbrg_fr_w));
-	m_dbrg->ft_handler().set(FUNC(rainbow_state::dbrg_ft_w));
+	m_dbrg->fr_handler().set(FUNC(rainbow_base_state::dbrg_fr_w));
+	m_dbrg->ft_handler().set(FUNC(rainbow_base_state::dbrg_ft_w));
 
 	UPD7201_NEW(config, m_mpsc, 24.0734_MHz_XTAL / 5 / 2); // 2.4073 MHz (nominally 2.5 MHz)
-	m_mpsc->out_int_callback().set(FUNC(rainbow_state::mpsc_irq));
+	m_mpsc->out_int_callback().set(FUNC(rainbow_base_state::mpsc_irq));
 	m_mpsc->out_txda_callback().set(m_comm_port, FUNC(rs232_port_device::write_txd));
 	m_mpsc->out_txdb_callback().set("printer", FUNC(rs232_port_device::write_txd));
 	// RTS and DTR outputs are not connected
@@ -3315,10 +3346,9 @@ void rainbow_state::rainbow(machine_config &config)
 	printer.set_default_option("printer");
 
 	I8251(config, m_kbd8251, 24.0734_MHz_XTAL / 5 / 2);
-	m_kbd8251->txd_handler().set(FUNC(rainbow_state::kbd_tx));
-	m_kbd8251->dtr_handler().set(FUNC(rainbow_state::irq_hi_w));
-	m_kbd8251->rxrdy_handler().set(FUNC(rainbow_state::kbd_rxready_w));
-	m_kbd8251->txrdy_handler().set(FUNC(rainbow_state::kbd_txready_w));
+	m_kbd8251->txd_handler().set(FUNC(rainbow_base_state::kbd_tx));
+	m_kbd8251->rxrdy_handler().set(FUNC(rainbow_base_state::kbd_rxready_w));
+	m_kbd8251->txrdy_handler().set(FUNC(rainbow_base_state::kbd_txready_w));
 
 	LK201(config, m_lk201, 0);
 	m_lk201->tx_handler().set(m_kbd8251, FUNC(i8251_device::write_rxd));
@@ -3326,11 +3356,29 @@ void rainbow_state::rainbow(machine_config &config)
 	ripple_counter_device &prtbrg(RIPPLE_COUNTER(config, "prtbrg", 24.0734_MHz_XTAL / 6 / 13)); // 74LS393 at E17 (both halves)
 	// divided clock should ideally be 307.2 kHz, but is actually approximately 308.6333 kHz
 	prtbrg.set_stages(8);
-	prtbrg.count_out_cb().set(FUNC(rainbow_state::bitrate_counter_w));
+	prtbrg.count_out_cb().set(FUNC(rainbow_base_state::bitrate_counter_w));
 
-	TIMER(config, "motor").configure_periodic(FUNC(rainbow_state::hd_motor_tick), attotime::from_hz(60));
+	TIMER(config, "motor").configure_periodic(FUNC(rainbow_base_state::hd_motor_tick), attotime::from_hz(60));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+}
+
+void rainbow_modela_state::rainbow_modela(machine_config &config)
+{
+	rainbow_base(config);
+	m_i8088->set_addrmap(AS_PROGRAM, &rainbow_modela_state::rainbow8088_map);
+	m_i8088->set_addrmap(AS_IO, &rainbow_modela_state::rainbow8088_io);
+	RAM(config, m_ram).set_default_size("64K").set_extra_options("64K,128K,192K,256K,320K,384K,448K,512K,576K,640K,704K,768K");
+	m_kbd8251->dtr_handler().set(FUNC(rainbow_modela_state::irq_hi_w));
+}
+
+void rainbow_modelb_state::rainbow_modelb(machine_config &config)
+{
+	rainbow_base(config);
+	m_i8088->set_addrmap(AS_PROGRAM, &rainbow_modelb_state::rainbow8088_map);
+	m_i8088->set_addrmap(AS_IO, &rainbow_modelb_state::rainbow8088_io);
+	RAM(config, m_ram).set_default_size("128K").set_extra_options("128K,192K,256K,320K,384K,448K,512K,576K,640K,704K,768K,832K,896K");
+	m_kbd8251->dtr_handler().set(FUNC(rainbow_modelb_state::irq_hi_w));
 }
 
 //----------------------------------------------------------------------------------------
@@ -3437,7 +3485,7 @@ ROM_END
 
 /* Driver */
 
-/*   YEAR  NAME         PARENT   COMPAT  MACHINE  INPUT           STATE          INIT        COMPANY                          FULLNAME         FLAGS */
-COMP(1982, rainbow100a, rainbow, 0,      rainbow, rainbow100b_in, rainbow_state, empty_init, "Digital Equipment Corporation", "Rainbow 100-A", MACHINE_IS_SKELETON)
-COMP(1983, rainbow,     0,       0,      rainbow, rainbow100b_in, rainbow_state, empty_init, "Digital Equipment Corporation", "Rainbow 100-B", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS)
-COMP(1985, rainbow190,  rainbow, 0,      rainbow, rainbow100b_in, rainbow_state, empty_init, "Digital Equipment Corporation", "Rainbow 190-B", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_COLORS)
+/*   YEAR  NAME         PARENT   COMPAT  MACHINE         INPUT           STATE                 INIT        COMPANY                          FULLNAME         FLAGS */
+COMP(1982, rainbow100a, rainbow, 0,      rainbow_modela, rainbow100b_in, rainbow_modela_state, empty_init, "Digital Equipment Corporation", "Rainbow 100-A", MACHINE_IS_SKELETON)
+COMP(1983, rainbow,     0,       0,      rainbow_modelb, rainbow100b_in, rainbow_modelb_state, empty_init, "Digital Equipment Corporation", "Rainbow 100-B", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS)
+COMP(1985, rainbow190,  rainbow, 0,      rainbow_modelb, rainbow100b_in, rainbow_modelb_state, empty_init, "Digital Equipment Corporation", "Rainbow 190-B", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_COLORS)

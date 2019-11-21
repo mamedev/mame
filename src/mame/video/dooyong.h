@@ -62,7 +62,7 @@ public:
 	void set_transparent_pen(unsigned pen) { m_transparent_pen = pen; }
 
 	typedef device_delegate<void (u16 attr, u32 &code, u32 &color)> dooyong_tmap_cb_delegate;
-	void set_tile_callback(dooyong_tmap_cb_delegate cb) { m_tmap_cb = cb; }
+	template <typename... T> void set_tile_callback(T &&... args) { m_tmap_cb.set(std::forward<T>(args)...); }
 
 	void ctrl_w(offs_t offset, u8 data);
 
@@ -85,12 +85,12 @@ protected:
 
 private:
 	required_region_ptr<u16> m_tilerom;
+	dooyong_tmap_cb_delegate m_tmap_cb;
 	int m_tilerom_offset;
 	int m_tilerom_length;
 	unsigned m_transparent_pen;
 
 	u8 m_registers[0x10];
-	dooyong_tmap_cb_delegate   m_tmap_cb;
 };
 
 class rshark_rom_tilemap_device : public dooyong_rom_tilemap_device

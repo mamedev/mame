@@ -9,14 +9,14 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="723227">
-				<rom name="prof003.td0" size="723227" crc="79dde297" sha1="7ac8ff275cde1d9be946101226072f86ff529334" offset="0"/>
+				<rom name="prof003.td0" size="723227" crc="79dde297" sha1="7ac8ff275cde1d9be946101226072f86ff529334"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Daten und Software zu Grip 2.5 / 5 / 5.6"/>
 			<dataarea name="flop" size="772270">
-				<rom name="prof_001.td0" size="772270" crc="e4e1ac49" sha1="de355846929add60c4998280a53f8c7b5dfe46d2" offset="0"/>
+				<rom name="prof_001.td0" size="772270" crc="e4e1ac49" sha1="de355846929add60c4998280a53f8c7b5dfe46d2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -28,7 +28,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="662339">
-				<rom name="prof002.td0" size="662339" crc="fc26fd91" sha1="32aa0ff903ba792cc3c0531a6078302bb6c4398f" offset="0"/>
+				<rom name="prof002.td0" size="662339" crc="fc26fd91" sha1="32aa0ff903ba792cc3c0531a6078302bb6c4398f"/>
 			</dataarea>
 		</part>
 	</software>

@@ -35,7 +35,6 @@ To do:
 - Add sound to SS9804/SS9904 games.
 - ptrain: missing scroll in race screens.
 - humlan: empty reels when bonus image should scroll in via L0 scroll. The image (crown/fruits) is at y > 0x100 in the tilemap.
-- saklove, xplan: remove IRQ hacks (when an AM188-EM core will be available).
 - bishjan, new2001, humlan, saklove, squeenb: game is sometimes too fast (can bishjan read the VBLANK state? saklove and xplan can).
 - xtrain: it runs faster than a video from the real thing. It doesn't use vblank irqs (but reads the vblank bit).
 - mtrain: implement hopper. Double up does not work?
@@ -58,12 +57,14 @@ To do:
 #include "tilemap.h"
 
 
-enum tilesize_t
+enum tilesize_t : uint8_t
 {
 	TILE_8x8,
 	TILE_8x32,
 	TILE_64x32
 };
+
+ALLOW_SAVE_TYPE(tilesize_t);
 
 enum vram_t
 {
@@ -75,9 +76,9 @@ enum vram_t
 // Layers
 struct layer_t
 {
-	std::unique_ptr<uint8_t[]> videorams[2];
+	std::unique_ptr<uint16_t[]> videoram;
 
-	std::unique_ptr<uint8_t[]> scrollrams[2];
+	std::unique_ptr<uint16_t[]> scrollram;
 	int scroll_x;
 	int scroll_y;
 
@@ -136,6 +137,9 @@ public:
 	void init_treacity();
 	void init_treacity202();
 
+protected:
+	virtual void video_start() override;
+
 private:
 	DECLARE_WRITE8_MEMBER(ss9601_byte_lo_w);
 	DECLARE_WRITE8_MEMBER(ss9601_byte_lo2_w);
@@ -193,9 +197,7 @@ private:
 
 	TILE_GET_INFO_MEMBER(ss9601_get_tile_info_0);
 	TILE_GET_INFO_MEMBER(ss9601_get_tile_info_1);
-	DECLARE_VIDEO_START(subsino2);
 	uint32_t screen_update_subsino2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(am188em_int0_irq);
 
 	void bishjan_map(address_map &map);
 	void expcard_io(address_map &map);
@@ -217,8 +219,8 @@ private:
 	layer_t m_layers[2];
 	uint8_t m_ss9601_byte_lo;
 	uint8_t m_ss9601_byte_lo2;
-	std::unique_ptr<uint8_t[]> m_ss9601_reelrams[2];
-	std::unique_ptr<bitmap_ind16> m_reelbitmap;
+	std::unique_ptr<uint16_t[]> m_ss9601_reelram;
+	bitmap_ind16 m_reelbitmap;
 	uint8_t m_ss9601_scrollctrl;
 	uint8_t m_ss9601_tilesize;
 	uint8_t m_ss9601_disable;
@@ -260,7 +262,7 @@ inline void subsino2_state::ss9601_get_tile_info(layer_t *l, tile_data &tileinfo
 		case TILE_8x32:     addr = tile_index & (~0x180);   offs = (tile_index/0x80) & 3;                           break;
 		case TILE_64x32:    addr = tile_index & (~0x187);   offs = ((tile_index/0x80) & 3) + (tile_index & 7) * 4;  break;
 	}
-	SET_TILE_INFO_MEMBER(0, (l->videorams[VRAM_HI][addr] << 8) + l->videorams[VRAM_LO][addr] + offs, 0, 0);
+	SET_TILE_INFO_MEMBER(0, l->videoram[addr] + offs, 0, 0);
 }
 
 // Layer 0
@@ -288,27 +290,36 @@ WRITE8_MEMBER(subsino2_state::ss9601_byte_lo2_w)
 
 static inline void ss9601_videoram_w(layer_t *l, vram_t vram, address_space &space, offs_t offset, uint8_t data)
 {
-	l->videorams[vram][offset] = data;
+	switch (vram)
+	{
+	case VRAM_HI:
+		l->videoram[offset] = uint8_t(data) << 8 | (l->videoram[offset] & 0xff);
+		break;
+
+	case VRAM_LO:
+		l->videoram[offset] = data | (l->videoram[offset] & 0xff00);
+		break;
+	}
 
 	switch (l->tilesize)
 	{
-		default:
-		case TILE_8x8:
-			l->tmap->mark_tile_dirty(offset);
-			break;
+	default:
+	case TILE_8x8:
+		l->tmap->mark_tile_dirty(offset);
+		break;
 
-		case TILE_8x32:
-			offset &= ~0x180;
+	case TILE_8x32:
+		offset &= ~0x180;
+		for (int y = 0; y < 0x80*4; y += 0x80)
+			l->tmap->mark_tile_dirty(offset + y);
+		break;
+
+	case TILE_64x32:
+		offset &= ~0x187;
+		for (int x = 0; x < 8; x++)
 			for (int y = 0; y < 0x80*4; y += 0x80)
-				l->tmap->mark_tile_dirty(offset + y);
-			break;
-
-		case TILE_64x32:
-			offset &= ~0x187;
-			for (int x = 0; x < 8; x++)
-				for (int y = 0; y < 0x80*4; y += 0x80)
-					l->tmap->mark_tile_dirty(offset + y + x);
-			break;
+				l->tmap->mark_tile_dirty(offset + y + x);
+		break;
 	}
 }
 
@@ -337,12 +348,12 @@ WRITE8_MEMBER(subsino2_state::ss9601_videoram_0_hi_lo2_w)
 
 READ8_MEMBER(subsino2_state::ss9601_videoram_0_hi_r)
 {
-	return m_layers[0].videorams[VRAM_HI][offset];
+	return m_layers[0].videoram[offset] >> 8;
 }
 
 READ8_MEMBER(subsino2_state::ss9601_videoram_0_lo_r)
 {
-	return m_layers[0].videorams[VRAM_LO][offset];
+	return m_layers[0].videoram[offset] & 0xff;
 }
 
 // Layer 1
@@ -370,28 +381,27 @@ WRITE8_MEMBER(subsino2_state::ss9601_videoram_1_hi_lo2_w)
 
 READ8_MEMBER(subsino2_state::ss9601_videoram_1_hi_r)
 {
-	return m_layers[1].videorams[VRAM_HI][offset];
+	return m_layers[1].videoram[offset] >> 8;
 }
 
 READ8_MEMBER(subsino2_state::ss9601_videoram_1_lo_r)
 {
-	return m_layers[1].videorams[VRAM_LO][offset];
+	return m_layers[1].videoram[offset] & 0xff;
 }
 
 // Layer 0 Reels
 
 WRITE8_MEMBER(subsino2_state::ss9601_reelram_hi_lo_w)
 {
-	m_ss9601_reelrams[VRAM_HI][offset] = data;
-	m_ss9601_reelrams[VRAM_LO][offset] = m_ss9601_byte_lo;
+	m_ss9601_reelram[offset] = uint16_t(data) << 8 | m_ss9601_byte_lo;
 }
 READ8_MEMBER(subsino2_state::ss9601_reelram_hi_r)
 {
-	return m_ss9601_reelrams[VRAM_HI][offset];
+	return m_ss9601_reelram[offset] >> 8;
 }
 READ8_MEMBER(subsino2_state::ss9601_reelram_lo_r)
 {
-	return m_ss9601_reelrams[VRAM_LO][offset];
+	return m_ss9601_reelram[offset] & 0xff;
 }
 
 
@@ -593,55 +603,53 @@ WRITE8_MEMBER(subsino2_state::ss9601_scroll_w)
 // Layer 0
 WRITE8_MEMBER(subsino2_state::ss9601_scrollram_0_hi_w)
 {
-	m_layers[0].scrollrams[VRAM_HI][offset] = data;
+	m_layers[0].scrollram[offset] = uint16_t(data) << 8 | (m_layers[0].scrollram[offset] & 0xff);
 }
 
 WRITE8_MEMBER(subsino2_state::ss9601_scrollram_0_lo_w)
 {
-	m_layers[0].scrollrams[VRAM_LO][offset] = data;
+	m_layers[0].scrollram[offset] = data | (m_layers[0].scrollram[offset] & 0xff00);
 }
 
 WRITE8_MEMBER(subsino2_state::ss9601_scrollram_0_hi_lo_w)
 {
-	m_layers[0].scrollrams[VRAM_HI][offset] = data;
-	m_layers[0].scrollrams[VRAM_LO][offset] = m_ss9601_byte_lo;
+	m_layers[0].scrollram[offset] = uint16_t(data) << 8 | m_ss9601_byte_lo;
 }
 
 READ8_MEMBER(subsino2_state::ss9601_scrollram_0_hi_r)
 {
-	return m_layers[0].scrollrams[VRAM_HI][offset];
+	return m_layers[0].scrollram[offset] >> 8;
 }
 
 READ8_MEMBER(subsino2_state::ss9601_scrollram_0_lo_r)
 {
-	return m_layers[0].scrollrams[VRAM_LO][offset];
+	return m_layers[0].scrollram[offset] & 0xff;
 }
 
 // Layer 1
 WRITE8_MEMBER(subsino2_state::ss9601_scrollram_1_hi_w)
 {
-	m_layers[1].scrollrams[VRAM_HI][offset] = data;
+	m_layers[1].scrollram[offset] = uint16_t(data) << 8 | (m_layers[1].scrollram[offset] & 0xff);
 }
 
 WRITE8_MEMBER(subsino2_state::ss9601_scrollram_1_lo_w)
 {
-	m_layers[1].scrollrams[VRAM_LO][offset] = data;
+	m_layers[1].scrollram[offset] = data | (m_layers[1].scrollram[offset] & 0xff00);
 }
 
 WRITE8_MEMBER(subsino2_state::ss9601_scrollram_1_hi_lo_w)
 {
-	m_layers[1].scrollrams[VRAM_HI][offset] = data;
-	m_layers[1].scrollrams[VRAM_LO][offset] = m_ss9601_byte_lo;
+	m_layers[1].scrollram[offset] = uint16_t(data) << 8 | m_ss9601_byte_lo;
 }
 
 READ8_MEMBER(subsino2_state::ss9601_scrollram_1_hi_r)
 {
-	return m_layers[1].scrollrams[VRAM_HI][offset];
+	return m_layers[1].scrollram[offset] >> 8;
 }
 
 READ8_MEMBER(subsino2_state::ss9601_scrollram_1_lo_r)
 {
-	return m_layers[1].scrollrams[VRAM_LO][offset];
+	return m_layers[1].scrollram[offset] & 0xff;
 }
 
 
@@ -659,13 +667,19 @@ WRITE8_MEMBER(subsino2_state::ss9601_disable_w)
                                 Video Update
 ***************************************************************************/
 
-VIDEO_START_MEMBER(subsino2_state,subsino2)
+void subsino2_state::video_start()
 {
 	// SS9601 Regs:
 
 	m_ss9601_tilesize       =   TILE_8x8;
 	m_ss9601_scrollctrl     =   0xfd;   // not written by mtrain, default to reels on
 	m_ss9601_disable        =   0x00;
+
+	save_item(NAME(m_ss9601_byte_lo));
+	save_item(NAME(m_ss9601_byte_lo2));
+	save_item(NAME(m_ss9601_tilesize));
+	save_item(NAME(m_ss9601_scrollctrl));
+	save_item(NAME(m_ss9601_disable));
 
 	// SS9601 Layers:
 
@@ -674,8 +688,8 @@ VIDEO_START_MEMBER(subsino2_state,subsino2)
 		layer_t *l = &m_layers[i];
 
 		l->tmap = &machine().tilemap().create(*m_gfxdecode, i ?
-												tilemap_get_info_delegate(FUNC(subsino2_state::ss9601_get_tile_info_1),this) :
-												tilemap_get_info_delegate(FUNC(subsino2_state::ss9601_get_tile_info_0),this),
+												tilemap_get_info_delegate(*this, FUNC(subsino2_state::ss9601_get_tile_info_1)) :
+												tilemap_get_info_delegate(*this, FUNC(subsino2_state::ss9601_get_tile_info_0)),
 												TILEMAP_SCAN_ROWS, 8,8, 0x80,0x40);
 
 		l->tmap->set_transparent_pen(0);
@@ -683,32 +697,29 @@ VIDEO_START_MEMBER(subsino2_state,subsino2)
 		// line scroll
 		l->tmap->set_scroll_rows(0x200);
 
-		l->videorams[VRAM_HI] = std::make_unique<uint8_t[]>(0x80 * 0x40);
-		l->videorams[VRAM_LO] = std::make_unique<uint8_t[]>(0x80 * 0x40);
+		l->videoram = std::make_unique<uint16_t[]>(0x80 * 0x40);
 
-		l->scrollrams[VRAM_HI] = std::make_unique<uint8_t[]>(0x200);
-		l->scrollrams[VRAM_LO] = std::make_unique<uint8_t[]>(0x200);
-		memset(l->scrollrams[VRAM_HI].get(), 0, 0x200);
-		memset(l->scrollrams[VRAM_LO].get(), 0, 0x200);
+		l->scrollram = make_unique_clear<uint16_t[]>(0x200);
+
+		save_pointer(NAME(l->videoram), 0x80 * 0x40, i);
+		save_pointer(NAME(l->scrollram), 0x200, i);
+
+		save_item(NAME(l->scroll_x), i);
+		save_item(NAME(l->scroll_y), i);
+		save_item(NAME(l->tilesize), i);
 	}
 
 	// SS9601 Reels:
 
-	m_ss9601_reelrams[VRAM_HI] = std::make_unique<uint8_t[]>(0x2000);
-	m_ss9601_reelrams[VRAM_LO] = std::make_unique<uint8_t[]>(0x2000);
-	memset(m_ss9601_reelrams[VRAM_HI].get(), 0, 0x2000);
-	memset(m_ss9601_reelrams[VRAM_LO].get(), 0, 0x2000);
-	m_reelbitmap = std::make_unique<bitmap_ind16>(0x80*8, 0x40*8);
-/*
-    save_pointer(NAME(m_ss9601_reelrams[VRAM_HI]), 0x2000);
-    save_pointer(NAME(m_ss9601_reelrams[VRAM_LO]), 0x2000);
+	m_ss9601_reelram = make_unique_clear<uint16_t[]>(0x2000);
 
-    save_pointer(NAME(m_layers[0].scrollrams[VRAM_HI]), 0x200);
-    save_pointer(NAME(m_layers[0].scrollrams[VRAM_LO]), 0x200);
+	m_reelbitmap.allocate(0x80*8, 0x40*8);
 
-    save_pointer(NAME(m_layers[1].scrollrams[VRAM_HI]), 0x200);
-    save_pointer(NAME(m_layers[1].scrollrams[VRAM_LO]), 0x200);
-*/
+	save_pointer(NAME(m_ss9601_reelram), 0x2000);
+
+	save_item(NAME(m_dsw_mask));
+	save_item(NAME(m_bishjan_sound));
+	save_item(NAME(m_bishjan_input));
 }
 
 uint32_t subsino2_state::screen_update_subsino2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -762,7 +773,7 @@ uint32_t subsino2_state::screen_update_subsino2(screen_device &screen, bitmap_in
 		for (y = 0; y < 0x200; y++)
 		{
 			if (mask_y[i])
-				scroll_dx = (l->scrollrams[VRAM_HI][y & mask_y[i]] << 8) + l->scrollrams[VRAM_LO][y & mask_y[i]];
+				scroll_dx = l->scrollram[y & mask_y[i]];
 
 			l->tmap->set_scrollx(y, l->scroll_x + scroll_dx);
 		}
@@ -790,7 +801,7 @@ uint32_t subsino2_state::screen_update_subsino2(screen_device &screen, bitmap_in
 					visible.max_y = 4 * 0x10 * (y+1) - 1;
 
 					int reeladdr = y * 0x80 * 4 + x;
-					uint16_t reelscroll = (m_ss9601_reelrams[VRAM_HI][reeladdr] << 8) + m_ss9601_reelrams[VRAM_LO][reeladdr];
+					uint16_t reelscroll = m_ss9601_reelram[reeladdr];
 
 					l->tmap->set_scrollx(0, (reelscroll >> 9) * 8 - visible.min_x);
 
@@ -798,6 +809,7 @@ uint32_t subsino2_state::screen_update_subsino2(screen_device &screen, bitmap_in
 					int reelscroll_y = (reelscroll & 0x100) + ((reelscroll - visible.min_y) & 0xff);
 					int reelwrap_y = 0x100 - (reelscroll_y & 0xff);
 
+					//visible &= cliprect;
 					rectangle tmp = visible;
 
 					// draw above the wrap around y
@@ -806,7 +818,7 @@ uint32_t subsino2_state::screen_update_subsino2(screen_device &screen, bitmap_in
 						if ( reelwrap_y-1 <= visible.max_y )
 							tmp.max_y = reelwrap_y-1;
 						l->tmap->set_scrolly(0, reelscroll_y);
-						l->tmap->draw(screen, *m_reelbitmap, tmp, TILEMAP_DRAW_OPAQUE);
+						l->tmap->draw(screen, m_reelbitmap, tmp, TILEMAP_DRAW_OPAQUE);
 						tmp.max_y = visible.max_y;
 					}
 
@@ -816,7 +828,7 @@ uint32_t subsino2_state::screen_update_subsino2(screen_device &screen, bitmap_in
 						if ( reelwrap_y >= visible.min_y )
 							tmp.min_y = reelwrap_y;
 						l->tmap->set_scrolly(0, -((reelwrap_y &0xff) | (reelscroll_y & 0x100)));
-						l->tmap->draw(screen, *m_reelbitmap, tmp, TILEMAP_DRAW_OPAQUE);
+						l->tmap->draw(screen, m_reelbitmap, tmp, TILEMAP_DRAW_OPAQUE);
 						tmp.min_y = visible.min_y;
 					}
 				}
@@ -824,7 +836,7 @@ uint32_t subsino2_state::screen_update_subsino2(screen_device &screen, bitmap_in
 
 			int32_t sx = -l->scroll_x;
 			int32_t sy = -(l->scroll_y + 1);
-			copyscrollbitmap(bitmap, *m_reelbitmap, 1, &sx, 1, &sy, cliprect);
+			copyscrollbitmap(bitmap, m_reelbitmap, 1, &sx, 1, &sy, cliprect);
 		}
 		else
 		{
@@ -876,11 +888,6 @@ WRITE8_MEMBER(subsino2_state::oki_bank_bit4_w)
 {
 	// it writes 0x23 or 0x33
 	m_oki->set_rom_bank((data >> 4) & 1);
-}
-
-INTERRUPT_GEN_MEMBER(subsino2_state::am188em_int0_irq)
-{
-	downcast<i80186_cpu_device *>(m_maincpu.target())->int0_w(1);
 }
 
 
@@ -1214,13 +1221,22 @@ WRITE8_MEMBER(subsino2_state::mtrain_videoram_w)
 	vram_t vram = (m_ss9601_byte_lo & 0x08) ? VRAM_HI : VRAM_LO;
 	switch (m_ss9601_byte_lo & (~0x08))
 	{
-		case 0x00:  ss9601_videoram_w(&m_layers[1], vram, space, offset,        data);
-					ss9601_videoram_w(&m_layers[1], vram, space, offset+0x1000, data);  break;
+	case 0x00:
+		ss9601_videoram_w(&m_layers[1], vram, space, offset,        data);
+		ss9601_videoram_w(&m_layers[1], vram, space, offset+0x1000, data);
+		break;
 
-		case 0x04:  ss9601_videoram_w(&m_layers[0], vram, space, offset,        data);
-					ss9601_videoram_w(&m_layers[0], vram, space, offset+0x1000, data);  break;
+	case 0x04:
+		ss9601_videoram_w(&m_layers[0], vram, space, offset,        data);
+		ss9601_videoram_w(&m_layers[0], vram, space, offset+0x1000, data);
+		break;
 
-		case 0x06:  m_ss9601_reelrams[vram][offset] = data; break;
+	case 0x06:
+		if (vram == VRAM_HI)
+			m_ss9601_reelram[offset] = uint16_t(data) << 8 | (m_ss9601_reelram[offset] & 0xff);
+		else
+			m_ss9601_reelram[offset] = uint16_t(data) | (m_ss9601_reelram[offset] & 0xff00);
+		break;
 	}
 }
 
@@ -2877,7 +2893,6 @@ void subsino2_state::bishjan(machine_config &config)
 {
 	H83044(config, m_maincpu, XTAL(44'100'000) / 3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &subsino2_state::bishjan_map);
-	m_maincpu->set_vblank_int("screen", FUNC(subsino2_state::irq0_line_hold));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
@@ -2889,14 +2904,13 @@ void subsino2_state::bishjan(machine_config &config)
 	m_screen->set_refresh_hz(60);
 	m_screen->set_screen_update(FUNC(subsino2_state::screen_update_subsino2));
 	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set_inputline(m_maincpu, 0); // edge-triggered interrupt
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ss9601);
 	PALETTE(config, m_palette).set_entries(256);
 
 	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette)); // HMC HM86171 VGA 256 colour RAMDAC
 	ramdac.set_addrmap(0, &subsino2_state::ramdac_map);
-
-	MCFG_VIDEO_START_OVERRIDE(subsino2_state, subsino2 )
 
 	// sound hardware
 	// SS9904
@@ -2916,7 +2930,6 @@ void subsino2_state::humlan(machine_config &config)
 	bishjan(config);
 	H83044(config.replace(), m_maincpu, XTAL(48'000'000) / 3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &subsino2_state::humlan_map);
-	m_maincpu->set_vblank_int("screen", FUNC(subsino2_state::irq0_line_hold));
 
 	// sound hardware
 	// SS9804
@@ -2928,7 +2941,7 @@ void subsino2_state::humlan(machine_config &config)
 
 void subsino2_state::mtrain(machine_config &config)
 {
-	Z180(config, m_maincpu, XTAL(12'000'000) / 8);   /* Unknown clock */
+	Z80180(config, m_maincpu, XTAL(12'000'000));   /* Unknown clock */
 	m_maincpu->set_addrmap(AS_PROGRAM, &subsino2_state::mtrain_map);
 	m_maincpu->set_addrmap(AS_IO, &subsino2_state::mtrain_io);
 
@@ -2948,8 +2961,6 @@ void subsino2_state::mtrain(machine_config &config)
 
 	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette)); // HMC HM86171 VGA 256 colour RAMDAC
 	ramdac.set_addrmap(0, &subsino2_state::ramdac_map);
-
-	MCFG_VIDEO_START_OVERRIDE(subsino2_state, subsino2 )
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -2985,8 +2996,6 @@ void subsino2_state::saklove(machine_config &config)
 	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette)); // HMC HM86171 VGA 256 colour RAMDAC
 	ramdac.set_addrmap(0, &subsino2_state::ramdac_map);
 
-	MCFG_VIDEO_START_OVERRIDE(subsino2_state, subsino2 )
-
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
@@ -3004,7 +3013,6 @@ void subsino2_state::xplan(machine_config &config)
 	I80188(config, m_maincpu, XTAL(20'000'000)*2);    // !! AMD AM188-EM !!
 	m_maincpu->set_addrmap(AS_PROGRAM, &subsino2_state::xplan_map);
 	m_maincpu->set_addrmap(AS_IO, &subsino2_state::xplan_io);
-	m_maincpu->set_vblank_int("screen", FUNC(subsino2_state::am188em_int0_irq));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -3016,14 +3024,13 @@ void subsino2_state::xplan(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);   // game reads vblank state
 	m_screen->set_screen_update(FUNC(subsino2_state::screen_update_subsino2));
 	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set("maincpu", FUNC(i80188_cpu_device::int0_w));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ss9601);
 	PALETTE(config, m_palette).set_entries(256);
 
 	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette)); // HMC HM86171 VGA 256 colour RAMDAC
 	ramdac.set_addrmap(0, &subsino2_state::ramdac_map);
-
-	MCFG_VIDEO_START_OVERRIDE(subsino2_state, subsino2 )
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

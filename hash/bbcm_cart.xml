@@ -10,17 +10,164 @@
 
 <softwarelist name="bbcm_cart" description="Acorn BBC Master cartridges">
 
+	<software name="abr">
+		<description>Advanced Battery-Backed RAM v1.10</description>
+		<year>1987</year>
+		<publisher>Advanced Computer Products</publisher>
+		<part name="cart" interface="bbcm_cart">
+			<feature name="slot" value="abr" />
+			<dataarea name="nvram" size="32768">
+				<rom name="PRES-ABR-Utils-1.10.rom" size="16360" crc="e5aec5c1" sha1="b0066d9ee83a9144eb5942f106776174ae5df0d9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="abr104" cloneof="abr">
+		<description>Advanced Battery-Backed RAM v1.04</description>
+		<year>1987</year>
+		<publisher>Advanced Computer Products</publisher>
+		<part name="cart" interface="bbcm_cart">
+			<feature name="slot" value="abr" />
+			<dataarea name="nvram" size="32768">
+				<rom name="PRES-ABR-Utils-1.04.rom" size="16384" crc="2c009b06" sha1="be245a32bba1f18614963587a61bcb622f404c95" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aqr">
+		<description>Advanced Quarter Meg RAM</description>
+		<year>1987</year>
+		<publisher>Advanced Computer Products</publisher>
+		<part name="cart" interface="bbcm_cart">
+			<feature name="slot" value="aqr" />
+			<dataarea name="ram" size="262144" />
+		</part>
+	</software>
+
+	<software name="click100" cloneof="click">
+		<description>Click v1.00</description>
+		<year>1990</year>
+		<publisher>Slogger</publisher>
+		<part name="cart" interface="bbcm_cart">
+			<feature name="slot" value="click" />
+			<dataarea name="rom" size="16384">
+				<rom name="Click_M128-1.00.rom" size="16384" crc="8c633300" sha1="e7223334fd5cb5b3ed715421aa278b96b3ea39af"/>
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+				<rom value="0x00" size="8192" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="click">
+		<description>Click v1.01</description>
+		<year>1990</year>
+		<publisher>Slogger</publisher>
+		<part name="cart" interface="bbcm_cart">
+			<feature name="slot" value="click" />
+			<dataarea name="rom" size="16384">
+				<rom name="Click_M128-1.01.rom" size="16384" crc="bab5539c" sha1="39732aad5fbb22c4ef3ac85d00e50a7f231d03bb"/>
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+				<rom value="0x00" size="8192" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="demo">
 		<description>BBC Master Demonstration Cartridge</description>
 		<year>1986</year>
 		<publisher>Acorn</publisher>
 		<part name="cart" interface="bbcm_cart">
-			<dataarea name="uprom" size="16384">
+			<dataarea name="lorom" size="16384">
 				<rom name="bbcmasterdemonstrationcartridge_1.rom" size="16384" crc="fc40c0e8" sha1="970ff4721e707f3c843f4fb09ce7f03e7ab265ae" />
 			</dataarea>
-			<dataarea name="lorom" size="16384">
+			<dataarea name="uprom" size="16384">
 				<rom name="bbcmasterdemonstrationcartridge_2.rom" size="16384" crc="2e73522d" sha1="ff39620d93b18fd36a4718474495211a46ef8184" />
 			</dataarea>
+		</part>
+	</software>
+
+	<software name="isopascal">
+		<description>ISO-Pascal</description>
+		<year>1986</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SQL18" />
+		<part name="cart" interface="bbcm_cart">
+			<dataarea name="lorom" size="16384">
+				<rom name="ISO-Pascal1-1.1.rom" size="16384" crc="ed1a7497" sha1="44cfe2d7fb0895a6c8858f09aaf5a96bcdcc3767" />
+			</dataarea>
+			<dataarea name="uprom" size="16384">
+				<rom name="ISO-Pascal2-1.1.rom" size="16384" crc="73455b67" sha1="0e2354e8d93d9858dbd9d24dfa0aa96a206b0b25" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lisp">
+		<description>LISP</description>
+		<year>1986</year>
+		<publisher>Acornsoft</publisher>
+		<info name="release" value="SQL14" />
+		<part name="cart" interface="bbcm_cart">
+			<dataarea name="lorom" size="16384">
+				<rom name="Lisp_1.rom" size="16384" crc="fda4c546" sha1="24c7062fc3666cd6814d72e417146e32eb995b04" />
+			</dataarea>
+			<dataarea name="uprom" size="16384">
+				<rom name="Lisp_2.rom" size="16384" crc="2eb56fc0" sha1="bdf09e553578d27a0cc202d409484dd8c2c3c085" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mega256">
+		<description>Master Mega 256</description>
+		<year>1987</year>
+		<publisher>Solidisk</publisher>
+		<info name="usage" value="Use only in slot cart2." />
+		<part name="cart" interface="bbcm_cart">
+			<feature name="slot" value="mega256" />
+			<dataarea name="rom" size="8192">
+				<rom name="Mega256-1.00.rom" size="8192" crc="4b8a1a44" sha1="d19b29fd849182901ec5755e9578e23382b4f479"/>
+			</dataarea>
+			<dataarea name="ram" size="262144">
+				<rom value="0x00" size="262144" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mr8000">
+		<description>MR8000 Master RAM Cartridge</description>
+		<year>1987</year>
+		<publisher>Peartree Computers</publisher>
+		<part name="cart" interface="bbcm_cart">
+			<feature name="slot" value="mr8000" />
+			<dataarea name="nvram" size="65536">
+				<rom name="MR8000_1.1.rom" size="16384" crc="796085ac" sha1="0128c978754ae3ba723e98e230e5c36a84f5f03e" offset="0x4000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mr8000a" cloneof="mr8000">
+		<description>MR8000 Master RAM Cartridge (alt)</description>
+		<year>1987</year>
+		<publisher>Peartree Computers</publisher>
+		<part name="cart" interface="bbcm_cart">
+			<feature name="slot" value="mr8000" />
+			<dataarea name="nvram" size="65536">
+				<rom name="MR8000_1.1_alt.rom" size="16384" crc="28b4e469" sha1="5a259291551c9fc3708ea6585092450a7cc6ccd4" offset="0x4000"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msc">
+		<description>Master Smart Cartridge</description>
+		<year>1987</year>
+		<publisher>Care Electronics</publisher>
+		<part name="cart" interface="bbcm_cart">
+			<feature name="slot" value="msc" />
+			<dataarea name="rom" size="16384">
+				<rom name="smart_v2.rom" size="16384" crc="e9a8139e" sha1="26d6bbfe4b43f76be1f0cb2d96143112d3503840" />
+			</dataarea>
+			<dataarea name="ram" size="2048" />
 		</part>
 	</software>
 
@@ -39,13 +186,16 @@
 		</part>
 	</software>
 
-	<software name="smart" supported="no">
-		<description>Smart Cartridge</description>
-		<year>1987</year>
-		<publisher>Care Electronics</publisher>
+	<software name="techcad">
+		<description>TechnoCAD</description>
+		<year>1988</year>
+		<publisher>Technomatic</publisher>
 		<part name="cart" interface="bbcm_cart">
 			<dataarea name="lorom" size="16384">
-				<rom name="smart_v2.rom" size="16384" crc="e9a8139e" sha1="26d6bbfe4b43f76be1f0cb2d96143112d3503840" />
+				<rom name="TechnoCAD-R1-1.00.rom" size="16384" crc="662a4f28" sha1="3a8a9c5c72212aeadf0c1f2ba8b3ff7f4a08ea2a" />
+			</dataarea>
+			<dataarea name="uprom" size="16384">
+				<rom name="TechnoCAD-R2-1.00.rom" size="16384" crc="19fd969a" sha1="845f73dad31635a307db2d16a61b20ca4561f659" />
 			</dataarea>
 		</part>
 	</software>

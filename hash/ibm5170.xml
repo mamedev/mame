@@ -8742,7 +8742,7 @@
 	</software>
 
 	<software name="aitd">
-		<description>Alone in the Dark</description>
+		<description>Alone in the Dark (USA)</description>
 		<year>1992</year>
 		<publisher>I·Motion</publisher>
 		<info name="developer" value="Infogrames" />
@@ -8769,9 +8769,9 @@
 	</software>
 
 	<software name="aitdfr" cloneof="aitd">
-		<description>Alone in the Dark (French)</description>
+		<description>Alone in the Dark (France)</description>
 		<year>1992</year>
-		<publisher>I·Motion</publisher>
+		<publisher>Infogrames</publisher>
 		<info name="developer" value="Infogrames" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
@@ -9356,6 +9356,23 @@
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Corncob Deluxe (1992)(Personal Companion Software).dsk" size="737280" crc="1020897e" sha1="800e3adc74674d7433f1519b906dd35f3d996567"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="corridr7">
+		<description>Corridor 7: Alien Invasion</description>
+		<year>1994</year>
+		<publisher>Capstone Software</publisher>
+		<info name="developer" value="Capstone Software" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Corridor 7 [Capstone Software] [1994] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="bd119818" sha1="e7fb3e97e70aaaa3b67d400172bf1d717581e03d"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Corridor 7 [Capstone Software] [1994] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="6fb8e981" sha1="e7b1584b1e6597964d60eda42c1c0a275aad1333"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10994,6 +11011,22 @@
 		</part>
 	</software>
 
+	<software name="kickoff3">
+		<description>Kick Off 3: European Challenge</description>
+		<year>1994</year>
+		<publisher>Anco Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "4256441">
+				<rom name="Kick Off 3 - European Challenge [Anco] [1994] [3.5HD] [Disk 1 of 2].mfm" size="4256441" crc="547a62d3" sha1="b64cc65f47b7fadb67f7d53983d086cd74113583"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "4246196">
+				<rom name="Kick Off 3 - European Challenge [Anco] [1994] [3.5HD] [Disk 2 of 2].mfm" size="4246196" crc="97c90251" sha1="d23fa86200b7e3536f13d859158728e76c04a7d9"/>
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="kilo1">
 		<description>Kiloblaster: Death of a Starship (Shareware, B&amp;N)</description>
 		<year>1994</year>
@@ -11184,6 +11217,22 @@
 			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size = "737280">
 				<rom name="Lightspeed (1990)(MicroProse)(Disk 3 of 3).dsk" size="737280" crc="b4eea9dc" sha1="fd90aad687eb9a5b248abf4ced745a6286c82f92"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="links">
+		<description>Links - The Challenge of Golf (5.25" HD)</description>
+		<year>1990</year>
+		<publisher>Access Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Links - The Challenge of Golf [Access Software] [1990] [5.25HD] [Disk 1 of 2].img" size="1228800" crc="1c00c462" sha1="1ce067957287b805d5d4e84450c550f62eb9bcd2"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Links - The Challenge of Golf [Access Software] [1990] [5.25HD] [Disk 2 of 2].img" size="1228800" crc="e43beb80" sha1="f5b658d86b4d5593119de5f46cb32460b38ca616"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12092,6 +12141,22 @@
 		</part>
 	</software>
 
+	<software name="settlers">
+		<description>The Settlers</description>
+		<year>1994</year>
+		<publisher>Blue Byte</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Settlers [Blue Byte] [1994] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="73d2c2c0" sha1="a8e2ea92022792828b6364c80670d35e3d73536e"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="The Settlers [Blue Byte] [1994] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="f18040c0" sha1="2bdf4dde6ff0b3e8b58099fb8597e17fb699d0e3"/>
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="sserv2">
 		<!-- Dumped via Kryoflux, shows as good and unmodified -->
 		<description>Silent Service II (Version 457.01)</description>
@@ -12634,6 +12699,38 @@
 		</part>
 	</software>
 
+	<software name="syndicate">
+		<description>Syndicate</description>
+		<year>1993</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Bullfrog Productions" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Syndicate [Bullfrog] [1993] [3.5HD] [Disk 1 of 5].img" size="1474560" crc="1f88694e" sha1="ce392619acc8d00d611d7aee450bc6d34a24e9f4"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Syndicate [Bullfrog] [1993] [3.5HD] [Disk 2 of 5].img" size="1474560" crc="a3ba3bf9" sha1="9150bcdb953f5b324522da3ff3876aec061ce766"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Syndicate [Bullfrog] [1993] [3.5HD] [Disk 3 of 5].img" size="1474560" crc="a724d555" sha1="e4b7fe3a523dc070b2111d15da75d60df1428676"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Syndicate [Bullfrog] [1993] [3.5HD] [Disk 4 of 5].img" size="1474560" crc="576d07e1" sha1="2519e3039f667e5b3701dfe957267b527386740f"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Syndicate [Bullfrog] [1993] [3.5HD] [Disk 5 of 5].img" size="1474560" crc="4d3e6946" sha1="85e5cfdf3a5a5a71e3f21d356cc9683afdc7e8b0"/>
+			</dataarea>
+		</part>
+	</software>
+	
 	<software name="thndrhwk">
 		<description>Thunderhawk AH-73M</description>
 		<year>1991</year>
@@ -13103,7 +13200,7 @@
 
 	<software name="wolf3d">
 		<!-- Dumped via Kryoflux, track 0 shows as modified on both disks -->
-		<description>Wolfenstein 3-D (v1.4)</description>
+		<description>Wolfenstein 3-D (v1.4, 3.5" DD)</description>
 		<year>1992</year>
 		<publisher>GT Software</publisher>
 		<info name="developer" value="id Software" />

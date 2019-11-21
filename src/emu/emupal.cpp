@@ -21,83 +21,82 @@ DEFINE_DEVICE_TYPE(PALETTE, palette_device, "palette", "palette")
 palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, init_delegate &&init, u32 entries, u32 indirect)
 	: palette_device(mconfig, tag, owner, 0U)
 {
-	set_entries(entries);
-	set_indirect_entries(indirect);
-	set_init(std::move(init));
+	set_entries(entries, indirect);
+	m_init = std::move(init);
 }
 
 palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, black_t, u32 entries)
-	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_all_black), tag, this), entries)
+	: palette_device(mconfig, tag, owner, init_delegate(*this, FUNC(palette_device::palette_init_all_black)), entries)
 {
 }
 
 palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, mono_t)
-	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_monochrome), tag, this), 2)
+	: palette_device(mconfig, tag, owner, init_delegate(*this, FUNC(palette_device::palette_init_monochrome)), 2)
 {
 }
 
 palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, mono_inv_t)
-	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_monochrome_inverted), tag, this), 2)
+	: palette_device(mconfig, tag, owner, init_delegate(*this, FUNC(palette_device::palette_init_monochrome_inverted)), 2)
 {
 }
 
 palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, mono_hi_t)
-	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_monochrome_highlight), tag, this), 3)
+	: palette_device(mconfig, tag, owner, init_delegate(*this, FUNC(palette_device::palette_init_monochrome_highlight)), 3)
 {
 }
 
 palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, rgb_3b_t)
-	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_3bit_rgb), tag, this), 8)
+	: palette_device(mconfig, tag, owner, init_delegate(*this, FUNC(palette_device::palette_init_3bit_rgb)), 8)
 {
 }
 
 palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, rbg_3b_t)
-	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_3bit_rbg), tag, this), 8)
+	: palette_device(mconfig, tag, owner, init_delegate(*this, FUNC(palette_device::palette_init_3bit_rbg)), 8)
 {
 }
 
 palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, grb_3b_t)
-	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_3bit_grb), tag, this), 8)
+	: palette_device(mconfig, tag, owner, init_delegate(*this, FUNC(palette_device::palette_init_3bit_grb)), 8)
 {
 }
 
 palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, gbr_3b_t)
-	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_3bit_gbr), tag, this), 8)
+	: palette_device(mconfig, tag, owner, init_delegate(*this, FUNC(palette_device::palette_init_3bit_gbr)), 8)
 {
 }
 
 palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, brg_3b_t)
-	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_3bit_brg), tag, this), 8)
+	: palette_device(mconfig, tag, owner, init_delegate(*this, FUNC(palette_device::palette_init_3bit_brg)), 8)
 {
 }
 
 palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, bgr_3b_t)
-	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_3bit_bgr), tag, this), 8)
+	: palette_device(mconfig, tag, owner, init_delegate(*this, FUNC(palette_device::palette_init_3bit_bgr)), 8)
 {
 }
 
 palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, rgb_555_t)
-	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_rgb_555), tag, this), 32768)
+	: palette_device(mconfig, tag, owner, init_delegate(*this, FUNC(palette_device::palette_init_rgb_555)), 32768)
 {
 }
 
 palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, grb_555_t)
-	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_grb_555), tag, this), 32768)
+	: palette_device(mconfig, tag, owner, init_delegate(*this, FUNC(palette_device::palette_init_grb_555)), 32768)
 {
 }
 
 palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, bgr_555_t)
-	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_bgr_555), tag, this), 32768)
+	: palette_device(mconfig, tag, owner, init_delegate(*this, FUNC(palette_device::palette_init_bgr_555)), 32768)
 {
 }
 
 palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, rgb_565_t)
-	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_rgb_565), tag, this), 65536)
+	: palette_device(mconfig, tag, owner, init_delegate(*this, FUNC(palette_device::palette_init_rgb_565)), 65536)
 {
 }
 
 palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, bgr_565_t)
-	: palette_device(mconfig, tag, owner, init_delegate(FUNC(palette_device::palette_init_bgr_565), tag, this), 65536)
+	: palette_device(mconfig, tag, owner, init_delegate(*this, FUNC(palette_device::palette_init_bgr_565)), 65536)
 {
 }
 
@@ -114,7 +113,7 @@ palette_device::palette_device(const machine_config &mconfig, const char *tag, d
 	, m_endianness()
 	, m_endianness_supplied(false)
 	, m_prom_region(*this, finder_base::DUMMY_TAG)
-	, m_init()
+	, m_init(*this)
 	, m_raw_to_rgb()
 {
 }
@@ -495,7 +494,7 @@ void palette_device::write_indirect_ext(offs_t offset, u8 data)
 void palette_device::device_start()
 {
 	// bind the init function
-	m_init.bind_relative_to(*owner());
+	m_init.resolve();
 
 	// find the memory, if present
 	const memory_share *share = memshare(tag());
@@ -506,7 +505,8 @@ void palette_device::device_start()
 		const memory_share *share_ext = memshare(tag_ext.c_str());
 
 		// make sure we have specified a format
-		assert_always(m_raw_to_rgb.bytes_per_entry() > 0, "Palette has memory share but no format specified");
+		if (m_raw_to_rgb.bytes_per_entry() <= 0)
+			throw emu_fatalerror("palette_device(%s): Palette has memory share but no format specified", tag());
 
 		// determine bytes per entry and configure
 		int bytes_per_entry = m_raw_to_rgb.bytes_per_entry();
@@ -522,7 +522,8 @@ void palette_device::device_start()
 		if (m_membits_supplied)
 		{
 			// forcing width only makes sense when narrower than the native bus width
-			assert_always(m_membits < share->bitwidth(), "Improper use of MCFG_PALETTE_MEMBITS");
+			if (m_membits >= share->bitwidth())
+				throw emu_fatalerror("palette_device(%s): Improper use of MCFG_PALETTE_MEMBITS", tag());
 			m_paletteram.set_membits(m_membits);
 			if (share_ext != nullptr)
 				m_paletteram_ext.set_membits(m_membits);
@@ -532,7 +533,8 @@ void palette_device::device_start()
 		if (m_endianness_supplied)
 		{
 			// forcing endianness only makes sense when the RAM is narrower than the palette format and not split
-			assert_always((share_ext == nullptr && m_paletteram.membits() / 8 < bytes_per_entry), "Improper use of MCFG_PALETTE_ENDIANNESS");
+			if (share_ext || (m_paletteram.membits() / 8) >= bytes_per_entry)
+				throw emu_fatalerror("palette_device(%s): Improper use of MCFG_PALETTE_ENDIANNESS", tag());
 			m_paletteram.set_endianness(m_endianness);
 		}
 	}

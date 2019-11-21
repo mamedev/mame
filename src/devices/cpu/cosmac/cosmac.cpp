@@ -711,7 +711,7 @@ offs_t cosmac_device::get_memory_address()
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-uint32_t cosmac_device::execute_min_cycles() const
+uint32_t cosmac_device::execute_min_cycles() const noexcept
 {
 	return 8 * 2;
 }
@@ -722,7 +722,7 @@ uint32_t cosmac_device::execute_min_cycles() const
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-uint32_t cosmac_device::execute_max_cycles() const
+uint32_t cosmac_device::execute_max_cycles() const noexcept
 {
 	return 8 * 3;
 }
@@ -733,7 +733,7 @@ uint32_t cosmac_device::execute_max_cycles() const
 //  input/interrupt lines
 //-------------------------------------------------
 
-uint32_t cosmac_device::execute_input_lines() const
+uint32_t cosmac_device::execute_input_lines() const noexcept
 {
 	return 7;
 }

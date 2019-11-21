@@ -211,7 +211,7 @@ void mekd2_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 		break;
 	default:
-		assert_always(false, "Unknown id in mekd2_state::device_timer");
+		throw emu_fatalerror("Unknown id in mekd2_state::device_timer");
 	}
 }
 
@@ -408,7 +408,7 @@ void mekd2_state::mekd2(machine_config &config)
 	TIMER(config, "kansas_w").configure_periodic(FUNC(mekd2_state::kansas_w), attotime::from_hz(4800));
 	TIMER(config, "kansas_r").configure_periodic(FUNC(mekd2_state::kansas_r), attotime::from_hz(40000));
 
-	QUICKLOAD(config, "quickload", "d2", attotime::from_seconds(1)).set_load_callback(FUNC(mekd2_state::quickload_cb), this);
+	QUICKLOAD(config, "quickload", "d2", attotime::from_seconds(1)).set_load_callback(FUNC(mekd2_state::quickload_cb));
 }
 
 /***********************************************************

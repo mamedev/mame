@@ -178,6 +178,8 @@ pokey_device::pokey_device(const machine_config &mconfig, const char *tag, devic
 		m_allpot_r_cb(*this),
 		m_serin_r_cb(*this),
 		m_serout_w_cb(*this),
+		m_keyboard_r(*this),
+		m_irq_f(*this),
 		m_output_type(LEGACY_LINEAR)
 {
 }
@@ -189,10 +191,9 @@ pokey_device::pokey_device(const machine_config &mconfig, const char *tag, devic
 void pokey_device::device_start()
 {
 	//int sample_rate = clock();
-	int i;
 
 	/* Setup channels */
-	for (i=0; i<POKEY_CHANNELS; i++)
+	for (int i=0; i<POKEY_CHANNELS; i++)
 	{
 		m_channel[i].m_parent = this;
 		m_channel[i].m_INTMask = 0;
@@ -202,8 +203,8 @@ void pokey_device::device_start()
 	m_channel[CHAN4].m_INTMask = IRQ_TIMR4;
 
 	// bind callbacks
-	m_keyboard_r.bind_relative_to(*owner());
-	m_irq_f.bind_relative_to(*owner());
+	m_keyboard_r.resolve();
+	m_irq_f.resolve();
 
 	/* calculate the A/D times
 	 * In normal, slow mode (SKCTL bit SK_PADDLE is clear) the conversion
@@ -247,15 +248,8 @@ void pokey_device::device_start()
 	m_kbd_state = 0;
 
 	/* reset more internal state */
-	for (i=0; i<3; i++)
-	{
-		m_clock_cnt[i] = 0;
-	}
-
-	for (i=0; i<8; i++)
-	{
-		m_POTx[i] = 0;
-	}
+	std::fill(std::begin(m_clock_cnt), std::end(m_clock_cnt), 0);
+	std::fill(std::begin(m_POTx), std::end(m_POTx), 0);
 
 	for (devcb_read8 &cb : m_pot_r_cb)
 		cb.resolve();
@@ -270,7 +264,7 @@ void pokey_device::device_start()
 	timer_alloc(SYNC_POT);
 	timer_alloc(SYNC_SET_IRQST);
 
-	for (i=0; i<POKEY_CHANNELS; i++)
+	for (int i=0; i<POKEY_CHANNELS; i++)
 	{
 		save_item(NAME(m_channel[i].m_borrow_cnt), i);
 		save_item(NAME(m_channel[i].m_counter), i);
@@ -417,7 +411,7 @@ void pokey_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 		m_IRQST |=  (param & 0xff);
 		break;
 	default:
-		assert_always(false, "Unknown id in pokey_device::device_timer");
+		throw emu_fatalerror("Unknown id in pokey_device::device_timer");
 	}
 }
 

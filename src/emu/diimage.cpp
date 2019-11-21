@@ -19,6 +19,7 @@
 #include "softlist_dev.h"
 #include "formats/ioprocs.h"
 
+#include <cstring>
 #include <regex>
 
 
@@ -27,26 +28,27 @@
 //**************************************************************************
 const image_device_type_info device_image_interface::m_device_info_array[] =
 	{
-		{ IO_UNKNOWN,   "unknown",      "unkn" },
-		{ IO_CARTSLOT,  "cartridge",    "cart" }, /*  0 */
-		{ IO_FLOPPY,    "floppydisk",   "flop" }, /*  1 */
-		{ IO_HARDDISK,  "harddisk",     "hard" }, /*  2 */
-		{ IO_CYLINDER,  "cylinder",     "cyln" }, /*  3 */
-		{ IO_CASSETTE,  "cassette",     "cass" }, /*  4 */
-		{ IO_PUNCHCARD, "punchcard",    "pcrd" }, /*  5 */
-		{ IO_PUNCHTAPE, "punchtape",    "ptap" }, /*  6 */
-		{ IO_PRINTER,   "printout",     "prin" }, /*  7 */
-		{ IO_SERIAL,    "serial",       "serl" }, /*  8 */
-		{ IO_PARALLEL,  "parallel",     "parl" }, /*  9 */
-		{ IO_SNAPSHOT,  "snapshot",     "dump" }, /* 10 */
-		{ IO_QUICKLOAD, "quickload",    "quik" }, /* 11 */
-		{ IO_MEMCARD,   "memcard",      "memc" }, /* 12 */
-		{ IO_CDROM,     "cdrom",        "cdrm" }, /* 13 */
-		{ IO_MAGTAPE,   "magtape",      "magt" }, /* 14 */
-		{ IO_ROM,       "romimage",     "rom"  }, /* 15 */
-		{ IO_MIDIIN,    "midiin",       "min"  }, /* 16 */
-		{ IO_MIDIOUT,   "midiout",      "mout" }, /* 17 */
-		{ IO_PICTURE,   "picture",      "pic"  }  /* 18 */
+		{ IO_UNKNOWN,   "unknown",      "unkn" }, /*  0 */
+		{ IO_CARTSLOT,  "cartridge",    "cart" }, /*  1 */
+		{ IO_FLOPPY,    "floppydisk",   "flop" }, /*  2 */
+		{ IO_HARDDISK,  "harddisk",     "hard" }, /*  3 */
+		{ IO_CYLINDER,  "cylinder",     "cyln" }, /*  4 */
+		{ IO_CASSETTE,  "cassette",     "cass" }, /*  5 */
+		{ IO_PUNCHCARD, "punchcard",    "pcrd" }, /*  6 */
+		{ IO_PUNCHTAPE, "punchtape",    "ptap" }, /*  7 */
+		{ IO_PRINTER,   "printout",     "prin" }, /*  8 */
+		{ IO_SERIAL,    "serial",       "serl" }, /*  9 */
+		{ IO_PARALLEL,  "parallel",     "parl" }, /* 10 */
+		{ IO_SNAPSHOT,  "snapshot",     "dump" }, /* 11 */
+		{ IO_QUICKLOAD, "quickload",    "quik" }, /* 12 */
+		{ IO_MEMCARD,   "memcard",      "memc" }, /* 13 */
+		{ IO_CDROM,     "cdrom",        "cdrm" }, /* 14 */
+		{ IO_MAGTAPE,   "magtape",      "magt" }, /* 15 */
+		{ IO_ROM,       "romimage",     "rom"  }, /* 16 */
+		{ IO_MIDIIN,    "midiin",       "min"  }, /* 17 */
+		{ IO_MIDIOUT,   "midiout",      "mout" }, /* 18 */
+		{ IO_PICTURE,   "picture",      "pic"  }, /* 19 */
+		{ IO_VIDEO,     "vidfile",      "vid"  }  /* 20 */
 	};
 
 
@@ -217,7 +219,7 @@ void device_image_interface::set_image_filename(const std::string &filename)
 //  image creation by name
 //-------------------------------------------------
 
-const image_device_format *device_image_interface::device_get_named_creatable_format(const std::string &format_name)
+const image_device_format *device_image_interface::device_get_named_creatable_format(const std::string &format_name) noexcept
 {
 	for (auto &format : m_formatlist)
 		if (format->name() == format_name)
@@ -430,7 +432,7 @@ const std::string &device_image_interface::working_directory()
 //  software_info structure from the softlist
 //-------------------------------------------------
 
-const software_info *device_image_interface::software_entry() const
+const software_info *device_image_interface::software_entry() const noexcept
 {
 	return !m_software_part_ptr ? nullptr : &m_software_part_ptr->info();
 }
@@ -587,7 +589,7 @@ u32 device_image_interface::crc()
 //  end command line?
 //-------------------------------------------------
 
-bool device_image_interface::support_command_line_image_creation() const
+bool device_image_interface::support_command_line_image_creation() const noexcept
 {
 	bool result;
 	switch (image_type())
@@ -625,7 +627,8 @@ bool device_image_interface::support_command_line_image_creation() const
 
 void device_image_interface::battery_load(void *buffer, int length, int fill)
 {
-	assert_always(buffer && (length > 0), "Must specify sensical buffer/length");
+	if (!buffer || (length <= 0))
+		throw emu_fatalerror("device_image_interface::battery_load: Must specify sensical buffer/length");
 
 	osd_file::error filerr;
 	int bytes_read = 0;
@@ -641,9 +644,10 @@ void device_image_interface::battery_load(void *buffer, int length, int fill)
 	memset(((char *)buffer) + bytes_read, fill, length - bytes_read);
 }
 
-void device_image_interface::battery_load(void *buffer, int length, void *def_buffer)
+void device_image_interface::battery_load(void *buffer, int length, const void *def_buffer)
 {
-	assert_always(buffer && (length > 0), "Must specify sensical buffer/length");
+	if (!buffer || (length <= 0))
+		throw emu_fatalerror("device_image_interface::battery_load: Must specify sensical buffer/length");
 
 	osd_file::error filerr;
 	int bytes_read = 0;
@@ -655,9 +659,9 @@ void device_image_interface::battery_load(void *buffer, int length, void *def_bu
 	if (filerr == osd_file::error::NONE)
 		bytes_read = file.read(buffer, length);
 
-	// if no file was present, copy the default battery
-	if (bytes_read == 0 && def_buffer)
-		memcpy((char *)buffer, (char *)def_buffer, length);
+	// if no file was present, copy the default contents
+	if (!bytes_read && def_buffer)
+		std::memcpy(buffer, def_buffer, length);
 }
 
 
@@ -670,7 +674,8 @@ void device_image_interface::battery_load(void *buffer, int length, void *def_bu
 
 void device_image_interface::battery_save(const void *buffer, int length)
 {
-	assert_always(buffer && (length > 0), "Must specify sensical buffer/length");
+	if (!buffer || (length <= 0))
+		throw emu_fatalerror("device_image_interface::battery_save: Must specify sensical buffer/length");
 
 	if (!device().machine().options().nvram_save())
 		return;
@@ -838,8 +843,8 @@ std::vector<u32> device_image_interface::determine_open_plan(bool is_create)
 
 static void dump_wrong_and_correct_checksums(const util::hash_collection &hashes, const util::hash_collection &acthashes)
 {
-	osd_printf_error("    EXPECTED: %s\n", hashes.macro_string().c_str());
-	osd_printf_error("       FOUND: %s\n", acthashes.macro_string().c_str());
+	osd_printf_error("    EXPECTED: %s\n", hashes.macro_string());
+	osd_printf_error("       FOUND: %s\n", acthashes.macro_string());
 }
 
 
@@ -914,9 +919,9 @@ bool device_image_interface::load_software(software_list_device &swlist, const c
 
 				u32 supported = swinfo->supported();
 				if (supported == SOFTWARE_SUPPORTED_PARTIAL)
-					osd_printf_error("WARNING: support for software %s (in list %s) is only partial\n", swname, swlist.list_name().c_str());
+					osd_printf_error("WARNING: support for software %s (in list %s) is only partial\n", swname, swlist.list_name());
 				if (supported == SOFTWARE_SUPPORTED_NO)
-					osd_printf_error("WARNING: support for software %s (in list %s) is only preliminary\n", swname, swlist.list_name().c_str());
+					osd_printf_error("WARNING: support for software %s (in list %s) is only preliminary\n", swname, swlist.list_name());
 
 				// attempt reading up the chain through the parents and create a locationtag std::string in the format
 				// " swlist % clonename % parentname "
@@ -1047,7 +1052,7 @@ done:
 			if (device().machine().phase() == machine_phase::RUNNING)
 				device().popmessage("Error: Unable to %s image '%s': %s", is_create ? "create" : "load", path, error());
 			else
-				osd_printf_error("Error: Unable to %s image '%s': %s\n", is_create ? "create" : "load", path.c_str(), error());
+				osd_printf_error("Error: Unable to %s image '%s': %s\n", is_create ? "create" : "load", path, error());
 		}
 		clear();
 	}

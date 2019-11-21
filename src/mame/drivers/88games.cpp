@@ -323,17 +323,17 @@ void _88games_state::_88games(machine_config &config)
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette("palette");
 	m_k052109->set_screen("screen");
-	m_k052109->set_tile_callback(FUNC(_88games_state::tile_callback), this);
+	m_k052109->set_tile_callback(FUNC(_88games_state::tile_callback));
 	m_k052109->irq_handler().set_inputline(m_maincpu, KONAMI_IRQ_LINE);
 
 	K051960(config, m_k051960, 0);
 	m_k051960->set_palette("palette");
 	m_k051960->set_screen("screen");
-	m_k051960->set_sprite_callback(FUNC(_88games_state::sprite_callback), this);
+	m_k051960->set_sprite_callback(FUNC(_88games_state::sprite_callback));
 
 	K051316(config, m_k051316, 0);
 	m_k051316->set_palette("palette");
-	m_k051316->set_zoom_callback(FUNC(_88games_state::zoom_callback), this);
+	m_k051316->set_zoom_callback(FUNC(_88games_state::zoom_callback));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -809,13 +809,13 @@ void midnrun_state::midnrun(machine_config &config)
 	zr107(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &midnrun_state::main_memmap);
 
-	config.m_minimum_quantum = attotime::from_hz(750000); // Very high sync needed to prevent lockups - why?
+	config.set_maximum_quantum(attotime::from_hz(750000)); // Very high sync needed to prevent lockups - why?
 
 	/* video hardware */
 	m_screen->set_screen_update(FUNC(midnrun_state::screen_update));
 
 	K056832(config, m_k056832, 0);
-	m_k056832->set_tile_callback(FUNC(midnrun_state::tile_callback), this);
+	m_k056832->set_tile_callback(FUNC(midnrun_state::tile_callback));
 	m_k056832->set_config(K056832_BPP_8, 1, 0);
 	m_k056832->set_palette(m_palette);
 }
@@ -825,7 +825,7 @@ void jetwave_state::jetwave(machine_config &config)
 	zr107(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &jetwave_state::main_memmap);
 
-	config.m_minimum_quantum = attotime::from_hz(2000000); // Very high sync needed to prevent lockups - why?
+	config.set_maximum_quantum(attotime::from_hz(2000000)); // Very high sync needed to prevent lockups - why?
 
 	/* video hardware */
 	m_screen->set_screen_update(FUNC(jetwave_state::screen_update));

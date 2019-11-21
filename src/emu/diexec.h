@@ -114,62 +114,50 @@ public:
 
 	// inline configuration helpers
 	void set_disable() { m_disabled = true; }
-	template <typename Object> void set_vblank_int(Object &&cb, const char *tag)
+
+	template <typename... T> void set_vblank_int(const char *tag, T &&... args)
 	{
-		m_vblank_interrupt = std::forward<Object>(cb);
+		m_vblank_interrupt.set(std::forward<T>(args)...);
 		m_vblank_interrupt_screen = tag;
 	}
-	void set_vblank_int(device_interrupt_delegate callback, const char *tag)
+	void remove_vblank_int()
 	{
-		m_vblank_interrupt = callback;
-		m_vblank_interrupt_screen = tag;
-	}
-	template <class FunctionClass> void set_vblank_int(const char *tag, const char *devname, void (FunctionClass::*callback)(device_t &), const char *name)
-	{
-		set_vblank_int(device_interrupt_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)), tag);
-	}
-	template <class FunctionClass> void set_vblank_int(const char *tag, void (FunctionClass::*callback)(device_t &), const char *name)
-	{
-		set_vblank_int(device_interrupt_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)), tag);
+		m_vblank_interrupt = device_interrupt_delegate(*this);
+		m_vblank_interrupt_screen = nullptr;
 	}
 
-	template <typename Object> void set_periodic_int(Object &&cb, const attotime &rate)
+	template <typename F> void set_periodic_int(F &&cb, const char *name, const attotime &rate)
 	{
-		m_timed_interrupt = std::forward<Object>(cb);
+		m_timed_interrupt.set(std::forward<F>(cb), name);
 		m_timed_interrupt_period = rate;
 	}
-	void set_periodic_int(device_interrupt_delegate callback, const attotime &rate)
+	template <typename T, typename F> void set_periodic_int(T &&target, F &&cb, const char *name, const attotime &rate)
 	{
-		m_timed_interrupt = callback;
+		m_timed_interrupt.set(std::forward<T>(target), std::forward<F>(cb), name);
 		m_timed_interrupt_period = rate;
 	}
-	template <class FunctionClass> void set_periodic_int(const char *devname, void (FunctionClass::*callback)(device_t &), const char *name, const attotime &rate)
+	void remove_periodic_int()
 	{
-		set_periodic_int(device_interrupt_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)), rate);
-	}
-	template <class FunctionClass> void set_periodic_int(void (FunctionClass::*callback)(device_t &), const char *name, const attotime &rate)
-	{
-		set_periodic_int(device_interrupt_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)), rate);
+		m_timed_interrupt = device_interrupt_delegate(*this);
+		m_timed_interrupt_period = attotime();
 	}
 
-	template <typename Object> void set_irq_acknowledge_callback(Object &&cb) { m_driver_irq = std::forward<Object>(cb); }
-	void set_irq_acknowledge_callback(device_irq_acknowledge_delegate callback) { m_driver_irq = callback; }
-	template <class FunctionClass> void set_irq_acknowledge_callback(const char *devname, int (FunctionClass::*callback)(device_t &, int), const char *name)
+	template <typename... T> void set_irq_acknowledge_callback(T &&... args)
 	{
-		set_irq_acknowledge_callback(device_irq_acknowledge_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
+		m_driver_irq.set(std::forward<T>(args)...);
 	}
-	template <class FunctionClass> void set_irq_acknowledge_callback(int (FunctionClass::*callback)(device_t &, int), const char *name)
+	void remove_irq_acknowledge_callback()
 	{
-		set_irq_acknowledge_callback(device_irq_acknowledge_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
+		m_driver_irq = device_irq_acknowledge_delegate(*this);
 	}
 
 	// execution management
-	device_scheduler &scheduler() const { assert(m_scheduler != nullptr); return *m_scheduler; }
-	bool executing() const { return scheduler().currently_executing() == this; }
-	s32 cycles_remaining() const { return executing() ? *m_icountptr : 0; } // cycles remaining in this timeslice
-	void eat_cycles(int cycles) { if (executing()) *m_icountptr = (cycles > *m_icountptr) ? 0 : (*m_icountptr - cycles); }
-	void adjust_icount(int delta) { if (executing()) *m_icountptr += delta; }
-	void abort_timeslice();
+	device_scheduler &scheduler() const noexcept { assert(m_scheduler != nullptr); return *m_scheduler; }
+	bool executing() const noexcept { return scheduler().currently_executing() == this; }
+	s32 cycles_remaining() const noexcept { return executing() ? *m_icountptr : 0; } // cycles remaining in this timeslice
+	void eat_cycles(int cycles) noexcept { if (executing()) *m_icountptr = (cycles > *m_icountptr) ? 0 : (*m_icountptr - cycles); }
+	void adjust_icount(int delta) noexcept { if (executing()) *m_icountptr += delta; }
+	void abort_timeslice() noexcept;
 
 	// input and interrupt management
 	void set_input_line(int linenum, int state) { m_input[linenum].set_state_synced(state); }
@@ -182,7 +170,7 @@ public:
 	// suspend/resume
 	void suspend(u32 reason, bool eatcycles);
 	void resume(u32 reason);
-	bool suspended(u32 reason = SUSPEND_ANY_REASON) const { return (m_nextsuspend & reason) != 0; }
+	bool suspended(u32 reason = SUSPEND_ANY_REASON) const noexcept { return (m_nextsuspend & reason) != 0; }
 	void yield() { suspend(SUSPEND_REASON_TIMESLICE, false); }
 	void spin() { suspend(SUSPEND_REASON_TIMESLICE, true); }
 	void spin_until_trigger(int trigid) { suspend_until_trigger(trigid, true); }
@@ -195,8 +183,8 @@ public:
 	void signal_interrupt_trigger() { trigger(m_inttrigger); }
 
 	// time and cycle accounting
-	attotime local_time() const;
-	u64 total_cycles() const;
+	attotime local_time() const noexcept;
+	u64 total_cycles() const noexcept;
 
 	// required operation overrides
 	void run() { execute_run(); }
@@ -207,15 +195,15 @@ public:
 
 protected:
 	// clock and cycle information getters
-	virtual u64 execute_clocks_to_cycles(u64 clocks) const;
-	virtual u64 execute_cycles_to_clocks(u64 cycles) const;
-	virtual u32 execute_min_cycles() const;
-	virtual u32 execute_max_cycles() const;
+	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept;
+	virtual u64 execute_cycles_to_clocks(u64 cycles) const noexcept;
+	virtual u32 execute_min_cycles() const noexcept;
+	virtual u32 execute_max_cycles() const noexcept;
 
 	// input line information getters
-	virtual u32 execute_input_lines() const;
-	virtual u32 execute_default_irq_vector(int linenum) const;
-	virtual bool execute_input_edge_triggered(int linenum) const;
+	virtual u32 execute_input_lines() const noexcept;
+	virtual u32 execute_default_irq_vector(int linenum) const noexcept;
+	virtual bool execute_input_edge_triggered(int linenum) const noexcept;
 
 	// optional operation overrides
 	virtual void execute_run() = 0;

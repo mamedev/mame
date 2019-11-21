@@ -373,7 +373,7 @@ void savant_state::savant(machine_config &config)
 	m_psu->write_a().set(FUNC(savant_state::lcd_w));
 	m_psu->read_b().set(FUNC(savant_state::input_r));
 
-	config.m_perfect_cpu_quantum = subtag("mcu");
+	config.set_perfect_quantum(m_mcu);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->set_ui_enable(false); // no chesspieces
@@ -414,8 +414,8 @@ ROM_START( savant )
 	ROM_REGION( 0x0800, "mcu", 0 )
 	ROM_LOAD("sl90547.u29", 0x0000, 0x0800, CRC(6fbf2aa0) SHA1(18e673ba5b806b397dd3d350525b5467c25a0d94) )
 
-	ROM_REGION( 763850, "screen", 0)
-	ROM_LOAD("savant.svg", 0, 763850, CRC(f29a5ca4) SHA1(9fabfb86e6235057b60232e987872a645ee4112e) )
+	ROM_REGION( 763958, "screen", 0)
+	ROM_LOAD("savant.svg", 0, 763958, CRC(44e6fa08) SHA1(26779470f83982ab150cd3d343c04a9ce5b93365) )
 ROM_END
 
 ROM_START( savant2 )
@@ -428,8 +428,8 @@ ROM_START( savant2 )
 	ROM_REGION( 0x0800, "mcu", 0 )
 	ROM_LOAD("sl90547.u29", 0x0000, 0x0800, CRC(6fbf2aa0) SHA1(18e673ba5b806b397dd3d350525b5467c25a0d94) )
 
-	ROM_REGION( 763850, "screen", 0)
-	ROM_LOAD("savant.svg", 0, 763850, CRC(f29a5ca4) SHA1(9fabfb86e6235057b60232e987872a645ee4112e) )
+	ROM_REGION( 763958, "screen", 0)
+	ROM_LOAD("savant.svg", 0, 763958, CRC(44e6fa08) SHA1(26779470f83982ab150cd3d343c04a9ce5b93365) )
 ROM_END
 
 } // anonymous namespace

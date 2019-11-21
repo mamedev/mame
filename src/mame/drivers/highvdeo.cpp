@@ -423,7 +423,7 @@ void highvdeo_state::nyjoker_io(address_map &map)
 	map(0x0000, 0x0001).w(FUNC(highvdeo_state::write1_w));    // lamps
 	map(0x0002, 0x0003).nopw();            // alternate coin counter (bits 0 and 2)
 	map(0x0004, 0x0005).w(FUNC(highvdeo_state::nyj_write2_w)); // coin and note counter
-//  AM_RANGE(0x0006, 0x0007) AM_WRITENOP
+//  map(0x0006, 0x0007).nopw();
 	map(0x0008, 0x0008).w(m_okim6376, FUNC(okim6376_device::write));
 	map(0x000a, 0x000b).w(FUNC(highvdeo_state::tv_ncf_oki6376_st_w));
 	map(0x000c, 0x000d).portr("IN0");
@@ -702,7 +702,7 @@ void highvdeo_state::brasil_io(address_map &map)
 	map(0x0008, 0x0009).r(FUNC(highvdeo_state::read0_r));
 	map(0x000a, 0x000b).r(FUNC(highvdeo_state::read1_r));
 	map(0x000e, 0x000e).rw(FUNC(highvdeo_state::read2_nmi_clear_r), FUNC(highvdeo_state::nmi_clear_w));
-//  AM_RANGE(0xffa2, 0xffa3) AM_WRITE
+//  map(0xffa2, 0xffa3).w(FUNC(highvdeo_state::));
 }
 
 WRITE16_MEMBER(highvdeo_state::fashion_output_w)
@@ -734,7 +734,7 @@ void highvdeo_state::grancapi_io(address_map &map)
 	map(0x0008, 0x0009).r(FUNC(highvdeo_state::read0_r));
 	map(0x000a, 0x000b).r(FUNC(highvdeo_state::read1_r));
 	map(0x000e, 0x000e).rw(FUNC(highvdeo_state::read2_nmi_clear_r), FUNC(highvdeo_state::nmi_clear_w));
-//  AM_RANGE(0xffa2, 0xffa3) AM_WRITE
+//  map(0xffa2, 0xffa3).w(FUNC(highvdeo_state::));
 }
 
 void highvdeo_state::magicbom_io(address_map &map)
@@ -748,7 +748,7 @@ void highvdeo_state::magicbom_io(address_map &map)
 	map(0x0008, 0x0009).r(FUNC(highvdeo_state::read0_r));
 	map(0x000a, 0x000b).r(FUNC(highvdeo_state::read1_r));
 	map(0x000e, 0x000e).rw(FUNC(highvdeo_state::read2_nmi_clear_r), FUNC(highvdeo_state::nmi_clear_w));
-//  AM_RANGE(0xffa2, 0xffa3) AM_WRITE
+//  map(0xffa2, 0xffa3).w(FUNC(highvdeo_state::));
 }
 
 

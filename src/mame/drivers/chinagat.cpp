@@ -309,8 +309,8 @@ void chinagat_state::video_start()
 {
 	ddragon_state::video_start();
 
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(chinagat_state::get_bg_tile_info),this),tilemap_mapper_delegate(FUNC(chinagat_state::background_scan),this), 16, 16, 32, 32);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(chinagat_state::get_fg_16color_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(chinagat_state::get_bg_tile_info)), tilemap_mapper_delegate(*this, FUNC(chinagat_state::background_scan)), 16, 16, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(chinagat_state::get_fg_16color_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);
 	m_fg_tilemap->set_scrolldy(-8, -8);
@@ -545,8 +545,8 @@ void chinagat_state::sub_map(address_map &map)
 	map(0x0000, 0x1fff).ram().share("share1");
 	map(0x2000, 0x2000).w(FUNC(chinagat_state::sub_bankswitch_w));
 	map(0x2800, 0x2800).w(FUNC(chinagat_state::sub_irq_ack_w)); /* Called on CPU start and after return from jump table */
-//  AM_RANGE(0x2a2b, 0x2a2b) AM_READNOP /* What lives here? */
-//  AM_RANGE(0x2a30, 0x2a30) AM_READNOP /* What lives here? */
+//  map(0x2a2b, 0x2a2b).nopr(); /* What lives here? */
+//  map(0x2a30, 0x2a30).nopr(); /* What lives here? */
 	map(0x4000, 0x7fff).bankr("bank4");
 	map(0x8000, 0xffff).rom();
 }
@@ -568,14 +568,14 @@ void chinagat_state::ym2203c_sound_map(address_map &map)
 // but only on the title screen....
 
 	map(0x8800, 0x8801).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-//  AM_RANGE(0x8802, 0x8802) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-//  AM_RANGE(0x8803, 0x8803) AM_DEVWRITE("oki", okim6295_device, write)
+//  map(0x8802, 0x8802).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+//  map(0x8803, 0x8803).w("oki", FUNC(okim6295_device::write));
 	map(0x8804, 0x8805).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-//  AM_RANGE(0x8804, 0x8804) AM_WRITEONLY
-//  AM_RANGE(0x8805, 0x8805) AM_WRITEONLY
+//  map(0x8804, 0x8804).writeonly();
+//  map(0x8805, 0x8805).writeonly();
 
-//  AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-//  AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+//  map(0x8800, 0x8801).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+//  map(0x9800, 0x9800).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xA000, 0xA000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }
 
@@ -758,7 +758,7 @@ void chinagat_state::chinagat(machine_config &config)
 	Z80(config, m_soundcpu, XTAL(3'579'545));     /* 3.579545 MHz */
 	m_soundcpu->set_addrmap(AS_PROGRAM, &chinagat_state::sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000); /* heavy interleaving to sync up sprite<->main cpu's */
+	config.set_maximum_quantum(attotime::from_hz(6000)); /* heavy interleaving to sync up sprite<->main cpu's */
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -805,7 +805,7 @@ void chinagat_state::saiyugoub1(machine_config &config)
 	mcu.p1_out_cb().set(FUNC(chinagat_state::saiyugoub1_adpcm_rom_addr_w));
 	mcu.p2_out_cb().set(FUNC(chinagat_state::saiyugoub1_adpcm_control_w));
 
-	config.m_minimum_quantum = attotime::from_hz(6000);  /* heavy interleaving to sync up sprite<->main cpu's */
+	config.set_maximum_quantum(attotime::from_hz(6000));  /* heavy interleaving to sync up sprite<->main cpu's */
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -846,7 +846,7 @@ void chinagat_state::saiyugoub2(machine_config &config)
 	Z80(config, m_soundcpu, XTAL(3'579'545));       /* 3.579545 MHz oscillator */
 	m_soundcpu->set_addrmap(AS_PROGRAM, &chinagat_state::ym2203c_sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000); /* heavy interleaving to sync up sprite<->main cpu's */
+	config.set_maximum_quantum(attotime::from_hz(6000)); /* heavy interleaving to sync up sprite<->main cpu's */
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

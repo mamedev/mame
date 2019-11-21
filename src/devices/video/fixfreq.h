@@ -60,7 +60,14 @@ struct fixedfreq_monitor_intf
 {
 	virtual ~fixedfreq_monitor_intf() = default;
 	virtual void vsync_start_cb(double refresh_time) = 0;
-	virtual void plot_hline(int x, int y, int w, uint32_t col) = 0;
+};
+
+struct fixedfreq_monitor_line
+{
+	float y;
+	float x;
+	float xr;
+	uint32_t col;
 };
 
 struct fixedfreq_monitor_state
@@ -84,7 +91,8 @@ struct fixedfreq_monitor_state
 	m_vsync_filter_timeconst(0),
 	m_sig_vsync(0),
 	m_sig_composite(0),
-	m_sig_field(0)
+	m_sig_field(0),
+	m_min_frame_period(time_type(0))
 	{}
 
 	/***
@@ -124,17 +132,32 @@ struct fixedfreq_monitor_state
 		//LOG("trigger %f with len %f\n", m_vsync_threshold, 1e6 / m_vsync_filter_timeconst);
 
 		m_clock_period = 1.0 / m_desc.m_monitor_clock;
-		m_intf.vsync_start_cb(m_clock_period * m_desc.m_vbackporch * m_desc.m_hbackporch);
+		// Minimum frame period to be passed to video system ?
+		m_min_frame_period = 0.25 * m_clock_period * m_desc.m_vbackporch * m_desc.m_hbackporch;
 
+		m_fragments.clear();
+
+		m_intf.vsync_start_cb(m_min_frame_period);
 	}
 
 	void reset()
 	{
-		m_last_sync_time = time_type(0);
-		m_line_time = time_type(0);
-		m_last_hsync_time = time_type(0);
-		m_last_vsync_time = time_type(0);
+		m_sync_signal = 0;
+		m_col = 0;
+		m_last_x = 0;
+		m_last_y = 0;
+		//m_last_sync_time = time_type(0);
+		//m_line_time = time_type(0);
+		//m_last_hsync_time = time_type(0);
+		//m_last_vsync_time = time_type(0);
+		//m_clock_period = time_type(0);
 		m_vsync_filter = 0;
+		//m_vsync_threshold = 0;
+		//m_vsync_filter_timeconst = 0;
+		m_sig_vsync = 0;
+		m_sig_composite = 0;
+		m_sig_field = 0;
+		m_fragments.clear();
 	}
 
 	void update_sync_channel(const time_type &time, const double newval);
@@ -150,7 +173,7 @@ struct fixedfreq_monitor_state
 
 	double m_sync_signal;
 	uint32_t m_col;
-	int m_last_x;
+	float m_last_x;
 	int m_last_y;
 	time_type m_last_sync_time;
 	time_type m_line_time;
@@ -166,7 +189,8 @@ struct fixedfreq_monitor_state
 	int m_sig_vsync;
 	int m_sig_composite;
 	int m_sig_field;
-
+	time_type m_min_frame_period;
+	std::vector<fixedfreq_monitor_line> m_fragments;
 };
 
 // ======================> fixedfreq_device
@@ -241,12 +265,9 @@ protected:
 	//virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	void vsync_start_cb(double refresh_time) override;
-	void plot_hline(int x, int y, int w, uint32_t col) override;
 
 private:
 
-	std::unique_ptr<bitmap_rgb32> m_bitmap[2];
-	int m_cur_bm;
 	int m_htotal;
 	int m_vtotal;
 

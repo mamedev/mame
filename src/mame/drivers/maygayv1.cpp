@@ -827,7 +827,7 @@ INPUT_PORTS_END
 void maygayv1_state::cpu_space_map(address_map &map)
 {
 	map(0xfffff0, 0xffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));
-	map(0xfffffa, 0xfffffb).lr16("duart irq", [this]() -> u16 { return m_duart68681->get_irq_vector(); });
+	map(0xfffffa, 0xfffffb).lr16(NAME([this] () -> u16 { return m_duart68681->get_irq_vector(); }));
 }
 
 WRITE_LINE_MEMBER(maygayv1_state::duart_irq_handler)

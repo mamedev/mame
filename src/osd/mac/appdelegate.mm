@@ -10,29 +10,13 @@
 
 #import "appdelegate.h"
 
-extern int mac_run_emulator();
-
-@interface MAMEThread : NSThread
-@end
-
-@implementation MAMEThread
-- (void)main
-{
-	mac_run_emulator();
-}
-@end
-
 @interface MAMEAppDelegate ()
 @end
 
 @implementation MAMEAppDelegate
-MAMEThread *appThread;
 
 - (void)applicationDidFinishLaunching:(NSNotification *)notification
 {
-	// run MAME on a thread so event dispatching happens normally
-	appThread = [[MAMEThread alloc] init];
-	[appThread start];
 }
 
 - (void)applicationWillTerminate:(NSNotification *)notification

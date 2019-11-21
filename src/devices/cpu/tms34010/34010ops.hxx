@@ -2076,9 +2076,9 @@ void tms340x0_device::blmove(uint16_t op)
 	}
 
 	/*
-		TODO: We do not currently emulate precisely how B0 and B2 are modified during the operation:
-		if D == 0, then B0 and B2 remain fixed during execution and are only incremented after operation completes.
-		if D == 1, then B2 is incremented during move, B0 remains fixed until operation completes.
+	    TODO: We do not currently emulate precisely how B0 and B2 are modified during the operation:
+	    if D == 0, then B0 and B2 remain fixed during execution and are only incremented after operation completes.
+	    if D == 1, then B2 is incremented during move, B0 remains fixed until operation completes.
 	*/
 
 	BREG(0) = src;
@@ -2107,7 +2107,60 @@ void tms340x0_device::cexec_s(uint16_t op)
 void tms340x0_device::clip(uint16_t op)
 {
 	if (!m_is_34020) { unimpl(op); return; }
-	logerror("020:clip\n");
+	XY daddr = DADDR_XY();
+	XY wstart = WSTART_XY();
+	XY wend = WEND_XY();
+	XY dydx = DYDX_XY();
+	// logerror("020:clip PC=0x%08x: WSTART=(%dx%d) WEND=(%dx%d) DADDR=(%dx%d) DYDX=(%dx%d)\n",
+	//      m_pc, wstart.x, wstart.y, wend.x, wend.y, daddr.x, daddr.y, dydx.x, dydx.y);
+
+	// Check whether array intersects with window...
+	bool is_l = wstart.x < (daddr.x + dydx.x);
+	bool is_r = wend.x > daddr.x;
+	bool is_t = wstart.y < (daddr.y + dydx.y);
+	bool is_b = wend.y > daddr.y;
+	if (!(is_l || is_r || is_t || is_b))
+	{
+		// ...no itersection, set flags and return
+		m_st |= STBIT_Z | STBIT_V;
+		// TODO: manual does not specify cycles, only states that this is complex instruction
+		COUNT_CYCLES(3);
+		return;
+	}
+
+	CLR_V();
+	CLR_Z();
+
+	// Handle clipping if needed
+	bool array_clipped = false;
+
+	if (wstart.x > daddr.x)
+	{
+		DADDR_X() = wstart.x;
+		array_clipped = true;
+	}
+	if (wend.x < (daddr.x + dydx.x - 1))
+	{
+		DYDX_X() = wend.x - daddr.x;
+		array_clipped = true;
+	}
+
+	if (wstart.y > daddr.y)
+	{
+		DADDR_Y() = wstart.y;
+		array_clipped = true;
+	}
+	if (wend.y < (daddr.y + dydx.y - 1))
+	{
+		DYDX_Y() = wend.y - daddr.y;
+		array_clipped = true;
+	}
+
+	if (array_clipped)
+		m_st |= STBIT_V;
+
+	// TODO: manual does not specify cycles, only states that this is complex instruction
+	COUNT_CYCLES(3);
 }
 
 void tms340x0_device::cmovcg_a(uint16_t op)
@@ -2395,7 +2448,36 @@ void tms340x0_device::rpix_b(uint16_t op)
 void tms340x0_device::setcdp(uint16_t op)
 {
 	if (!m_is_34020) { unimpl(op); return; }
-	logerror("020:setcdp\n");
+	off_t dptch = DPTCH();
+
+	// Check whether we're dealing with an even number
+	if ((dptch & 1) == 0)
+	{
+		switch(population_count_32(dptch))
+		{
+			// .. only single bit set, pitch is power of two!
+			case 1:
+			{
+				m_convdp = 32 - count_leading_zeros(dptch);
+				COUNT_CYCLES(4);
+				return;
+			}
+			// .. two bits, we can decompose it to sum of two power of two numbers
+			case 2:
+			{
+				uint8_t first_one = count_leading_zeros(dptch);
+				uint8_t v1 = 32 - first_one;
+				uint8_t v2 = 32 - count_leading_zeros(dptch & ~(1 << (first_one - 1)));
+
+				m_convdp = v2 | (v1 << 8);
+				COUNT_CYCLES(6);
+				return;
+			}
+		}
+	}
+	// Default to arbitrary number, setting pitch to 0
+	m_convdp = 0;
+	COUNT_CYCLES(3);
 }
 
 void tms340x0_device::setcmp(uint16_t op)

@@ -191,6 +191,9 @@ bool unsp_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 					case 12:
 					case 14:
 					case 37:
+
+					case 4: // should be 1.2 only but jak_care triggers, see notes in non-drc
+					case 5: // ^^
 						return true;
 				}
 				return false;

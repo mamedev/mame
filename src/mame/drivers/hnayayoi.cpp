@@ -571,7 +571,7 @@ void hnayayoi_state::hnayayoi(machine_config &config)
 	crtc.set_char_width(4);
 	crtc.set_show_border_area(false);
 	crtc.out_vsync_callback().set_inputline(m_maincpu, 0);
-	crtc.set_update_row_callback(FUNC(hnayayoi_state::hnayayoi_update_row), this);
+	crtc.set_update_row_callback(FUNC(hnayayoi_state::hnayayoi_update_row));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -611,7 +611,7 @@ void hnayayoi_state::untoucha(machine_config &config)
 	m_mainlatch->q_out_cb<3>().set(m_msm, FUNC(msm5205_device::reset_w)).invert();
 	m_mainlatch->q_out_cb<4>().set_nop(); // ?
 
-	subdevice<hd6845s_device>("crtc")->set_update_row_callback(FUNC(hnayayoi_state::untoucha_update_row), this);
+	subdevice<hd6845s_device>("crtc")->set_update_row_callback(FUNC(hnayayoi_state::untoucha_update_row));
 
 	MCFG_VIDEO_START_OVERRIDE(hnayayoi_state,untoucha)
 }

@@ -116,7 +116,7 @@ WRITE16_MEMBER( dreambal_state::dreambal_protection_region_0_104_w )
 
 void dreambal_state::dreambal_map(address_map &map)
 {
-//ADDRESS_MAP_UNMAP_HIGH
+//map.unmap_value_high();
 	map(0x000000, 0x07ffff).rom();
 	map(0x100000, 0x100fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w));
 	map(0x101000, 0x101fff).ram();
@@ -345,8 +345,8 @@ void dreambal_state::dreambal(machine_config &config)
 	m_deco_tilegen->set_pf2_col_bank(0x10);
 	m_deco_tilegen->set_pf1_col_mask(0x0f);
 	m_deco_tilegen->set_pf2_col_mask(0x0f);
-	m_deco_tilegen->set_bank1_callback(FUNC(dreambal_state::bank_callback), this);
-	m_deco_tilegen->set_bank2_callback(FUNC(dreambal_state::bank_callback), this);
+	m_deco_tilegen->set_bank1_callback(FUNC(dreambal_state::bank_callback));
+	m_deco_tilegen->set_bank2_callback(FUNC(dreambal_state::bank_callback));
 	m_deco_tilegen->set_pf12_8x8_bank(0);
 	m_deco_tilegen->set_pf12_16x16_bank(1);
 	m_deco_tilegen->set_gfxdecode_tag("gfxdecode");

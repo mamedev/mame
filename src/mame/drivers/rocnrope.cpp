@@ -359,8 +359,8 @@ ROM_START( ropeman )
 	ROM_LOAD( "2.16b",            0x0020, 0x0100, CRC(750a9677) SHA1(7a5b4aed5f87180850657b8852bb3f3138d58b5b) ) /* TBP24S10N */
 	ROM_LOAD( "3.16g",            0x0120, 0x0100, CRC(b5c75a27) SHA1(923d6ccf015fd7458494416cc05426cc922a9238) ) /* TBP24S10N */
 
-	ROM_REGION( 0x0001, "pal_cpuvidbd", 0 ) /* MMI PAL10L8 located on the cpu/video board */
-	ROM_LOAD( "pal10l8.6g",       0x0000, 0x0001, NO_DUMP )
+	ROM_REGION( 0x002c, "pal_cpuvidbd", 0 ) /* MMI PAL10L8 located on the cpu/video board */
+	ROM_LOAD( "pal10l8.6g",       0x0000, 0x002c, CRC(82e98da9) SHA1(a49cb9713c6553969de75dc60fc7981d8aa8a4d6) )
 
 	ROM_REGION( 0x01D6, "pals_daughterbd", 0 ) /* N82S153's located on the daughterboard of the cpu/video board */
 	ROM_LOAD( "n82s153.pal1.bin", 0x0000, 0x00eb, CRC(baebe804) SHA1(c2e084b4df8a5c6d12cc34106583b532cd7a697b) ) /* Signetics N82S153 */

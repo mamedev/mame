@@ -156,13 +156,19 @@ void menu_sliders::populate(float &customtop, float &custombottom)
 		if (item.type == menu_item_type::SLIDER)
 		{
 			slider_state* slider = reinterpret_cast<slider_state *>(item.ref);
-			int32_t curval = slider->update(machine(), slider->arg, slider->id, &tempstring, SLIDER_NOCHANGE);
-			uint32_t flags = 0;
-			if (curval > slider->minval)
-				flags |= FLAG_LEFT_ARROW;
-			if (curval < slider->maxval)
-				flags |= FLAG_RIGHT_ARROW;
-			item_append(slider->description, tempstring, flags, (void *)slider, menu_item_type::SLIDER);
+			bool display(true);
+			if (slider->id >= SLIDER_ID_ADJUSTER && slider->id <= SLIDER_ID_ADJUSTER_LAST)
+				display = reinterpret_cast<ioport_field *>(slider->arg)->enabled();
+			if (display)
+			{
+				int32_t curval = slider->update(machine(), slider->arg, slider->id, &tempstring, SLIDER_NOCHANGE);
+				uint32_t flags = 0;
+				if (curval > slider->minval)
+					flags |= FLAG_LEFT_ARROW;
+				if (curval < slider->maxval)
+					flags |= FLAG_RIGHT_ARROW;
+				item_append(slider->description, tempstring, flags, (void *)slider, menu_item_type::SLIDER);
+			}
 		}
 		else
 		{

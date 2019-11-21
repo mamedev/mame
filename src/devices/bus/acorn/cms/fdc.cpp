@@ -75,8 +75,8 @@ void cms_fdc_device::device_start()
 {
 	address_space &space = m_bus->memspace();
 
-	space.install_readwrite_handler(0xfc50, 0xfc5f, read8_delegate(FUNC(cms_fdc_device::wd1770_state_r), this), write8_delegate(FUNC(cms_fdc_device::wd1770_control_w), this));
-	space.install_readwrite_handler(0xfc40, 0xfc4f, read8sm_delegate(FUNC(wd1770_device::read), m_fdc.target()), write8sm_delegate(FUNC(wd1770_device::write), m_fdc.target()));
+	space.install_readwrite_handler(0xfc50, 0xfc5f, read8_delegate(*this, FUNC(cms_fdc_device::wd1770_state_r)), write8_delegate(*this, FUNC(cms_fdc_device::wd1770_control_w)));
+	space.install_readwrite_handler(0xfc40, 0xfc4f, read8sm_delegate(*m_fdc, FUNC(wd1770_device::read)), write8sm_delegate(*m_fdc, FUNC(wd1770_device::write)));
 }
 
 

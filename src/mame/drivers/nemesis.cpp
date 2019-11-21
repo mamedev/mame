@@ -15,14 +15,14 @@ This entire hardware series is generally called 'GX400'
     Salamander (Version J)  (Game 587) PWB(B) 201012A GX587
     Lifeforce (US)          (Game 587) PWB(B) 201012A GX587
     Lifeforce (Japan)       (Game 587) PWB(B) 201012A GX587
+    City Bomber (World)     (Game 787) PWB(B) 250102A
+    City Bomber (Japan)     (Game 787) PWB(B) 250102A
+    Kitten Kaboodle         (Game 712) PWB(B) 250102A
+    Nyan Nyan Panic (Japan) (Game 712) PWB(B) 250102A
+    Hyper Crash (Version D) (Game 790) GX790 PWB(B) 250093A
+    Hyper Crash (Version C) (Game 790) GX790 PWB(B) 250093A
 TODO: find pcb pics for below
     Black Panther           (Game 604)
-    City Bomber (World)     (Game 787)
-    City Bomber (Japan)     (Game 787)
-    Hyper Crash (Version D) (Game 790)
-    Hyper Crash (Version C) (Game 790)
-    Kitten Kaboodle         (Game 712)
-    Nyan Nyan Panic (Japan) (Game 712)
 Most of these boards share the same bottom/gfx board, labeled 'GX400PWB // (A)200204B'
 
 driver by Bryan McPhail
@@ -110,7 +110,9 @@ initials
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"
+#include "machine/adc0804.h"
 #include "machine/gen_latch.h"
+#include "machine/rescap.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "sound/ym2151.h"
@@ -328,13 +330,12 @@ READ16_MEMBER(nemesis_state::konamigt_input_word_r)
 	return ret;
 }
 
-WRITE16_MEMBER(nemesis_state::selected_ip_word_w)
+void nemesis_state::selected_ip_w(uint8_t data)
 {
-	if (ACCESSING_BITS_0_7)
-		m_selected_ip = data & 0xff;    // latch the value
+	m_selected_ip = data;    // latch the value
 }
 
-READ16_MEMBER(nemesis_state::selected_ip_word_r)
+uint8_t nemesis_state::selected_ip_r()
 {
 	switch (m_selected_ip & 0xf)
 	{                                               // From WEC Le Mans Schems:
@@ -672,7 +673,7 @@ void nemesis_state::citybomb_map(address_map &map)
 	map(0x0f0008, 0x0f0009).portr("DSW0");
 	map(0x0f0011, 0x0f0011).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x0f0018, 0x0f0019).w("watchdog", FUNC(watchdog_timer_device::reset16_w));   /* probably */
-	map(0x0f0020, 0x0f0021).r(FUNC(nemesis_state::selected_ip_word_r)).nopw();    /* WEC Le Mans 24 control? */
+	map(0x0f0021, 0x0f0021).rw("adc", FUNC(adc0804_device::read), FUNC(adc0804_device::write));
 	map(0x0f8000, 0x0f8001).w(FUNC(nemesis_state::salamand_control_port_word_w));     /* irq enable, flipscreen, etc. */
 	map(0x100000, 0x1bffff).rom();
 	map(0x200000, 0x20ffff).ram().w(FUNC(nemesis_state::nemesis_charram_word_w)).share("charram");
@@ -779,8 +780,9 @@ void nemesis_state::hcrash_map(address_map &map)
 	map(0x0c000a, 0x0c000b).portr("IN0");
 	map(0x0c2000, 0x0c2001).r(FUNC(nemesis_state::konamigt_input_word_r)); /* Konami GT control */
 	map(0x0c2800, 0x0c280f).w("intlatch", FUNC(ls259_device::write_d0)).umask16(0x00ff); // ???
-	map(0x0c4000, 0x0c4001).portr("IN1").w(FUNC(nemesis_state::selected_ip_word_w));
-	map(0x0c4002, 0x0c4003).r(FUNC(nemesis_state::selected_ip_word_r)).nopw();    /* WEC Le Mans 24 control. latches the value read previously */
+	map(0x0c4000, 0x0c4001).portr("IN1");
+	map(0x0c4001, 0x0c4001).w(FUNC(nemesis_state::selected_ip_w));
+	map(0x0c4003, 0x0c4003).rw("adc", FUNC(adc0804_device::read), FUNC(adc0804_device::write));    /* WEC Le Mans 24 control */
 	map(0x100000, 0x100fff).ram().w(FUNC(nemesis_state::nemesis_videoram2_word_w)).share("videoram2");       /* VRAM */
 	map(0x101000, 0x101fff).ram().w(FUNC(nemesis_state::nemesis_videoram1_word_w)).share("videoram1");
 	map(0x102000, 0x102fff).ram().w(FUNC(nemesis_state::nemesis_colorram2_word_w)).share("colorram2");
@@ -1359,7 +1361,8 @@ static INPUT_PORTS_START( citybomb )
 	PORT_DIPSETTING(    0x80, DEF_STR( Joystick ) )
 
 	PORT_START("IN2")
-	KONAMI8_B123_UNK(2)
+	KONAMI8_B123(2)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("adc", adc0804_device, intr_r)
 
 	PORT_START("DSW0")
 	KONAMI_COINAGE_LOC(DEF_STR( Free_Play ), "Invalid", SW1)
@@ -1447,7 +1450,7 @@ static INPUT_PORTS_START( hcrash )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CONDITION("DSW1", 0x03, NOTEQUALS, 0x02) // player 2?
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON3 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM )   // must be 0 otherwise game freezes when using WEC Le Mans 24 cabinet
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("adc", adc0804_device, intr_r)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("IN2")
@@ -2080,6 +2083,9 @@ void nemesis_state::citybomb(machine_config &config)
 	Z80(config, m_audiocpu, 3579545); /* 3.579545 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nemesis_state::city_sound_map);
 
+	adc0804_device &adc(ADC0804(config, "adc", RES_K(10), CAP_P(150)));
+	adc.vin_callback().set(FUNC(nemesis_state::selected_ip_r));
+
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
@@ -2170,6 +2176,9 @@ void nemesis_state::hcrash(machine_config &config)
 
 	Z80(config, m_audiocpu, 14318180/4); /* 3.579545 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nemesis_state::sal_sound_map);
+
+	adc0804_device &adc(ADC0804(config, "adc", 640000)); // unknown clock (doesn't seem to be R/C here)
+	adc.vin_callback().set(FUNC(nemesis_state::selected_ip_r));
 
 	ls259_device &intlatch(LS259(config, "intlatch"));
 	intlatch.q_out_cb<0>().set_nop(); // ?

@@ -152,7 +152,7 @@ TILE_GET_INFO_MEMBER(m52_state::get_tile_info)
 
 void m52_state::video_start()
 {
-	m_tx_tilemap = &machine().tilemap().create(*m_tx_gfxdecode, tilemap_get_info_delegate(FUNC(m52_state::get_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
+	m_tx_tilemap = &machine().tilemap().create(*m_tx_gfxdecode, tilemap_get_info_delegate(*this, FUNC(m52_state::get_tile_info)), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
 
 	m_tx_tilemap->set_transparent_pen(0);
 	m_tx_tilemap->set_scrolldx(127, 127);

@@ -345,7 +345,7 @@ void konmedal68k_state::kzaurus(machine_config &config)
 	PALETTE(config, "palette").set_format(palette_device::xBGR_888, 8192).enable_shadows();
 
 	K056832(config, m_k056832, 0);
-	m_k056832->set_tile_callback(FUNC(konmedal68k_state::tile_callback), this);
+	m_k056832->set_tile_callback(FUNC(konmedal68k_state::tile_callback));
 	m_k056832->set_config(K056832_BPP_4dj, 1, 0);
 	m_k056832->set_palette(m_palette);
 

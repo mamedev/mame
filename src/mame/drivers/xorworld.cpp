@@ -163,7 +163,7 @@ void xorworld_state::xorworld(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(xorworld_state::irq2_line_assert)); // irq 4 or 6
 	m_maincpu->set_periodic_int(FUNC(xorworld_state::irq6_line_assert), attotime::from_hz(3*60)); //timed irq, unknown timing
 
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	EEPROM_93C46_16BIT(config, m_eeprom);
 

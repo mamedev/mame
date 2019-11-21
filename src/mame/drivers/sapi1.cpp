@@ -218,9 +218,9 @@ void sapi_state::sapi1_mem(address_map &map)
 	map(0x1000, 0x1fff).rom(); // Extension ROM
 	map(0x2000, 0x23ff).ram();
 	map(0x2400, 0x27ff).rw(FUNC(sapi_state::sapi1_keyboard_r), FUNC(sapi_state::sapi1_keyboard_w)); // PORT 0 - keyboard
-	//map(0x2800, 0x2bff) AM_NOP // PORT 1
-	//map(0x2c00, 0x2fff) AM_NOP // PORT 2
-	//map(0x3000, 0x33ff) AM_NOP // 3214
+	//map(0x2800, 0x2bff).noprw(); // PORT 1
+	//map(0x2c00, 0x2fff).noprw(); // PORT 2
+	//map(0x3000, 0x33ff).noprw(); // 3214
 	map(0x3800, 0x3fff).ram().share("videoram"); // AND-1 (video RAM)
 	map(0x4000, 0x7fff).ram(); // REM-1
 }
@@ -846,10 +846,10 @@ void sapi_state::sapi3b(machine_config &config)
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(6);
-	crtc.set_update_row_callback(FUNC(sapi_state::crtc_update_row), this);
+	crtc.set_update_row_callback(FUNC(sapi_state::crtc_update_row));
 
 	subdevice<screen_device>("screen")->set_screen_update("crtc", FUNC(mc6845_device::screen_update));
-	subdevice<screen_device>("screen")->set_palette(finder_base::DUMMY_TAG);
+	subdevice<screen_device>("screen")->set_no_palette();
 }
 
 static DEVICE_INPUT_DEFAULTS_START( terminal )

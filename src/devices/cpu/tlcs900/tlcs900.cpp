@@ -1919,16 +1919,12 @@ void tmp95c063_device::device_start()
 	m_portd_write.resolve_safe();
 	m_porte_read.resolve_safe(0);
 	m_porte_write.resolve_safe();
-	for (int i = 0; i < 8; i++)
-	{
-		m_an_read[i].resolve_safe(0);
-	}
+	for (devcb_read16 &an_read : m_an_read)
+		an_read.resolve_safe(0);
 }
 
 void tmp95c063_device::device_reset()
 {
-	int i;
-
 	m_pc.b.l = RDMEM( 0xFFFF00 );
 	m_pc.b.h = RDMEM( 0xFFFF01 );
 	m_pc.b.h2 = RDMEM( 0xFFFF02 );
@@ -2011,10 +2007,9 @@ void tmp95c063_device::device_reset()
 	m_reg[TMP95C063_ADREG37H] = 0x00;
 	m_reg[TMP95C063_WDMOD] = 0x80;
 
-	for ( i = 0; i < TLCS900_NUM_INPUTS; i++ )
-	{
+	for (int i = 0; i < TLCS900_NUM_INPUTS; i++)
 		m_level[i] = CLEAR_LINE;
-	}
+
 	m_prefetch_clear = true;
 }
 

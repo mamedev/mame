@@ -69,14 +69,6 @@ void eprom_state::machine_reset()
  *
  *************************************/
 
-READ16_MEMBER(eprom_state::special_port1_r)
-{
-	int result = ioport("260010")->read();
-	result ^= 0x0010;
-	return result;
-}
-
-
 READ8_MEMBER(eprom_state::adc_r)
 {
 	if (!m_adc.found())
@@ -147,7 +139,7 @@ void eprom_state::main_map(address_map &map)
 	map(0x16cc00, 0x16cc01).w(FUNC(eprom_state::sync_w<true>));
 	map(0x1f0000, 0x1fffff).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
 	map(0x260000, 0x26000f).portr("260000");
-	map(0x260010, 0x26001f).r(FUNC(eprom_state::special_port1_r));
+	map(0x260010, 0x26001f).portr("260010");
 	map(0x260020, 0x260027).mirror(0x8).r(FUNC(eprom_state::adc_r)).umask16(0x00ff);
 	map(0x260031, 0x260031).r(m_jsa, FUNC(atari_jsa_base_device::main_response_r));
 	map(0x2e0000, 0x2e0001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
@@ -173,12 +165,12 @@ void eprom_state::guts_map(address_map &map)
 	map(0x16cc00, 0x16cc01).w(FUNC(eprom_state::sync_w<true>));
 	map(0x1f0000, 0x1fffff).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
 	map(0x260000, 0x26000f).portr("260000");
-	map(0x260010, 0x26001f).r(FUNC(eprom_state::special_port1_r));
+	map(0x260010, 0x26001f).portr("260010");
 	map(0x260020, 0x260027).mirror(0x8).r(FUNC(eprom_state::adc_r)).umask16(0x00ff);
 	map(0x260031, 0x260031).r(m_jsa, FUNC(atari_jsa_ii_device::main_response_r));
 	map(0x2e0000, 0x2e0001).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0x360000, 0x360001).w(FUNC(eprom_state::video_int_ack_w));
-//  AM_RANGE(0x360010, 0x360011) AM_WRITE(eprom_latch_w)
+//  map(0x360010, 0x360011).w(FUNC(eprom_state::eprom_latch_w));
 	map(0x360020, 0x360021).w(m_jsa, FUNC(atari_jsa_ii_device::sound_reset_w));
 	map(0x360031, 0x360031).w(m_jsa, FUNC(atari_jsa_ii_device::main_command_w));
 	map(0x3e0000, 0x3e0fff).ram().share("paletteram");
@@ -204,7 +196,7 @@ void eprom_state::extra_map(address_map &map)
 	map(0x160000, 0x16ffff).ram().share("share1");
 	map(0x16cc00, 0x16cc01).w(FUNC(eprom_state::sync_w<false>));
 	map(0x260000, 0x26000f).portr("260000");
-	map(0x260010, 0x26001f).r(FUNC(eprom_state::special_port1_r));
+	map(0x260010, 0x26001f).portr("260010");
 	map(0x260020, 0x260027).mirror(0x8).r(FUNC(eprom_state::adc_r)).umask16(0x00ff);
 	map(0x260031, 0x260031).r(m_jsa, FUNC(atari_jsa_base_device::main_response_r));
 	map(0x360000, 0x360001).w(FUNC(eprom_state::video_int_ack_w));
@@ -383,7 +375,7 @@ void eprom_state::eprom(machine_config &config)
 	M68000(config, m_extra, ATARI_CLOCK_14MHz/2);
 	m_extra->set_addrmap(AS_PROGRAM, &eprom_state::extra_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	ADC0809(config, m_adc, ATARI_CLOCK_14MHz/16);
 	m_adc->in_callback<0>().set_ioport("ADC0");
@@ -433,7 +425,7 @@ void eprom_state::klaxp(machine_config &config)
 	M68000(config, m_maincpu, ATARI_CLOCK_14MHz/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &eprom_state::main_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	EEPROM_2804(config, "eeprom").lock_after_write(true);
 
@@ -476,7 +468,7 @@ void eprom_state::guts(machine_config &config)
 	M68000(config, m_maincpu, ATARI_CLOCK_14MHz/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &eprom_state::guts_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	ADC0809(config, m_adc, ATARI_CLOCK_14MHz/16);
 	m_adc->in_callback<0>().set_ioport("ADC0");

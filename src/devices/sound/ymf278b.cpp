@@ -225,6 +225,14 @@ void ymf278b_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 	{
 		// TODO : FM only output is DO0, DO2 is actually mixed FM+PCM outputs
 		ymf262_update_one(m_ymf262, outputs, samples);
+		vl = m_mix_level[m_fm_l];
+		vr = m_mix_level[m_fm_r];
+		for (i = 0; i < samples; i++)
+		{
+			// DO2 mixing
+			outputs[0][i] = (outputs[0][i] * vl) >> 16;
+			outputs[1][i] = (outputs[1][i] * vr) >> 16;
+		}
 		return;
 	}
 
@@ -1038,7 +1046,8 @@ void ymf278b_device::device_start()
 	/* stream system initialize */
 	int ymf262_clock = clock() / (19/8.0);
 	m_ymf262 = ymf262_init(this, ymf262_clock, ymf262_clock / 288);
-	assert_always(m_ymf262 != nullptr, "Error creating YMF262 chip");
+	if (!m_ymf262)
+		throw emu_fatalerror("ymf278b_device(%s): Error creating YMF262 chip", tag());
 
 	m_stream_ymf262 = machine().sound().stream_alloc(*this, 0, 4, ymf262_clock / 288);
 

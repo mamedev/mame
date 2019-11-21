@@ -141,19 +141,12 @@ void nscsi_bus_device::device_resolve_objects()
 
 nscsi_connector::nscsi_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, NSCSI_CONNECTOR, tag, owner, clock),
-	device_slot_interface(mconfig, *this)
+	device_single_card_slot_interface<nscsi_slot_card_interface>(mconfig, *this)
 {
 }
 
 nscsi_connector::~nscsi_connector()
 {
-}
-
-void nscsi_connector::device_validity_check(validity_checker &valid) const
-{
-	device_t *const carddev = get_card_device();
-	if (carddev && !dynamic_cast<nscsi_slot_card_interface *>(carddev))
-		osd_printf_error("Card device %s (%s) does not implement nscsi_slot_card_interface\n", carddev->tag(), carddev->name());
 }
 
 void nscsi_connector::device_start()
@@ -162,7 +155,7 @@ void nscsi_connector::device_start()
 
 nscsi_device *nscsi_connector::get_device()
 {
-	nscsi_slot_card_interface *connected = dynamic_cast<nscsi_slot_card_interface *>(get_card_device());
+	nscsi_slot_card_interface *const connected = get_card_device();
 	if (connected)
 		return connected->device().subdevice<nscsi_device>(connected->m_nscsi.finder_tag());
 	else
@@ -170,7 +163,7 @@ nscsi_device *nscsi_connector::get_device()
 }
 
 nscsi_slot_card_interface::nscsi_slot_card_interface(const machine_config &mconfig, device_t &device, const char *nscsi_tag) :
-	device_slot_card_interface(mconfig, device),
+	device_interface(device, "nscsi"),
 	m_nscsi(device, nscsi_tag)
 {
 }

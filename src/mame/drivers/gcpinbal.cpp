@@ -376,7 +376,7 @@ void gcpinbal_state::gcpinbal(machine_config &config)
 	EXCELLENT_SPRITE(config, m_sprgen, 0);
 	m_sprgen->set_palette(m_palette);
 	m_sprgen->set_color_base(0x600);
-	m_sprgen->set_colpri_callback(FUNC(gcpinbal_state::gcpinbal_colpri_cb), this);
+	m_sprgen->set_colpri_callback(FUNC(gcpinbal_state::gcpinbal_colpri_cb));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

@@ -11,8 +11,7 @@
 #pragma once
 
 #include "cpu/mips/mips1.h"
-#include "machine/ataintf.h"
-#include "machine/idehd.h"
+#include "bus/ata/ataintf.h"
 #include "emupal.h"
 #include "speaker.h"
 #include "screen.h"

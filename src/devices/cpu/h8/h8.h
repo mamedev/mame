@@ -95,10 +95,10 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override;
-	virtual uint32_t execute_max_cycles() const override;
-	virtual uint32_t execute_input_lines() const override;
-	virtual bool execute_input_edge_triggered(int inputnum) const override;
+	virtual uint32_t execute_min_cycles() const noexcept override;
+	virtual uint32_t execute_max_cycles() const noexcept override;
+	virtual uint32_t execute_input_lines() const noexcept override;
+	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override;
 	virtual void execute_run() override;
 
 	// device_memory_interface overrides
@@ -164,8 +164,8 @@ protected:
 	inline void prefetch() { prefetch_start(); prefetch_done(); }
 	inline void prefetch_noirq() { prefetch_start(); prefetch_done_noirq(); }
 	inline void prefetch_noirq_notrace() { prefetch_start(); prefetch_done_noirq_notrace(); }
-	void prefetch_start() { NPC = PC; PIR = fetch(); }
-	void prefetch_switch(uint32_t pc, uint16_t ir) { NPC = pc; PC = pc+2; PIR = ir; }
+	void prefetch_start() { NPC = PC & 0xffffff; PIR = fetch(); }
+	void prefetch_switch(uint32_t pc, uint16_t ir) { NPC = pc & 0xffffff; PC = pc+2; PIR = ir; }
 	void prefetch_done();
 	void prefetch_done_noirq();
 	void prefetch_done_noirq_notrace();

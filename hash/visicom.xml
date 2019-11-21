@@ -6,25 +6,72 @@ Toshiba Visicom games list
 ID      Title                                           Dumped
 _________________________________________________________________
 
-CAS-110 Arithmetic Drill (Math Fun & Fun with Numbers)  no       算数ドリル
+CAS-110 Arithmetic Drill (Math Fun & Fun with Numbers)  yes      算数ドリル
 CAS-130 Sports Fan (Baseball & Sumo Wrestling)          yes      スポーツファン
-CAS-140 Gambler I (Blackjack)                           no       ギャンブラーI
-CAS-141 Gambler II (Slot Machine and Dice)              no       ギャンブラーII
-CAS-160 Space Command (Space War)                       no       スペースコマンド
+CAS-140 Gambler I (Blackjack)                           yes      ギャンブラーI
+CAS-141 Gambler II (Slot Machine and Dice)              yes      ギャンブラーII
+CAS-160 Space Command (Space War)                       yes      スペースコマンド
 CAS-190 Inspiration (Bagua and Biorhythm)               no       霊感
 -->
 <softwarelist name="visicom" description="Toshiba Visicom cartridges">
 
+	<software name="aridrill">
+		<description>Arithmetic Drill</description><!-- Dumper called it Maths Drill -->
+		<year>1978</year>
+		<publisher>Toshiba</publisher>
+		<info name="serial" value="CAS-110" />
+		<info name="alt_title" value="算数ドリル"/>
+		<part name="cart" interface="visicom_cart">
+			<dataarea name="rom" size="0x800">
+				<rom name="cas110.rom" size="0x800" crc="009cfaa2" sha1="fb567b904ded23a1c9256b39565b8a2bc3e35736"/>
+			</dataarea>
+		</part>
+	</software>
 	<software name="sportfan">
 		<description>Sports Fan</description>
 		<year>1978</year>
 		<publisher>Toshiba</publisher>
 		<info name="serial" value="CAS-130" />
 		<info name="alt_title" value="スポーツファン"/>
-
 		<part name="cart" interface="visicom_cart">
 			<dataarea name="rom" size="0x800">
-				<rom name="cas130.rom" size="0x800" crc="9da5c845" sha1="438d9fc67de1ef408718b4737c0d0fd48844dacb" offset="0" />
+				<rom name="cas130.rom" size="0x800" crc="9da5c845" sha1="438d9fc67de1ef408718b4737c0d0fd48844dacb"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="gambler1">
+		<description>Gambler I</description>
+		<year>1978</year>
+		<publisher>Toshiba</publisher>
+		<info name="serial" value="CAS-140" />
+		<info name="alt_title" value="ギャンブラーI"/>
+		<part name="cart" interface="visicom_cart">
+			<dataarea name="rom" size="0x800">
+				<rom name="cas140.rom" size="0x800" crc="1f218f46" sha1="af9c7e707cba98bea30b0c9e886652f2fedcb284"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="gambler2">
+		<description>Gambler II</description>
+		<year>1978</year>
+		<publisher>Toshiba</publisher>
+		<info name="serial" value="CAS-141" />
+		<info name="alt_title" value="ギャンブラーII"/>
+		<part name="cart" interface="visicom_cart">
+			<dataarea name="rom" size="0x800">
+				<rom name="cas141.rom" size="0x800" crc="565be7c2" sha1="561fb51db880e3a668231fddd4c4a10d1a981c80"/>
+			</dataarea>
+		</part>
+	</software>
+	<software name="spacecom">
+		<description>Space Command</description>
+		<year>1978</year>
+		<publisher>Toshiba</publisher>
+		<info name="serial" value="CAS-160" />
+		<info name="alt_title" value="スペースコマンド"/>
+		<part name="cart" interface="visicom_cart">
+			<dataarea name="rom" size="0x800">
+				<rom name="cas160.rom" size="0x800" crc="566dcc8a" sha1="b5e0313b7d4aacd9444c1987c51eaaba88fdc6bb"/>
 			</dataarea>
 		</part>
 	</software>

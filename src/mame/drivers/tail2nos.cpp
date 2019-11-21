@@ -266,7 +266,7 @@ void tail2nos_state::tail2nos(machine_config &config)
 	m_k051316->set_bpp(-4);
 	m_k051316->set_offsets(-89, -14);
 	m_k051316->set_wrap(1);
-	m_k051316->set_zoom_callback(FUNC(tail2nos_state::zoom_callback), this);
+	m_k051316->set_zoom_callback(FUNC(tail2nos_state::zoom_callback));
 
 	VSYSTEM_GGA(config, "gga", XTAL(14'318'181) / 2); // divider not verified
 

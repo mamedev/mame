@@ -71,7 +71,7 @@ TILE_GET_INFO_MEMBER(lvcards_state::get_bg_tile_info)
 
 void lvcards_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(lvcards_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(lvcards_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS,
 			8, 8, 32, 32);
 }
 

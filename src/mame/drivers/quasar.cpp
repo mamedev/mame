@@ -314,7 +314,7 @@ void quasar_state::quasar(machine_config &config)
 	soundcpu.t1_in_cb().set(FUNC(quasar_state::audio_t1_r));
 	soundcpu.p1_out_cb().set("dac", FUNC(dac_byte_interface::data_w));
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

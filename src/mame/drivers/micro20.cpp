@@ -84,7 +84,7 @@ void micro20_state::machine_reset()
 	pRAM[1] = pROM[3];
 	m_maincpu->reset();
 
-	m_maincpu->set_reset_callback(write_line_delegate(FUNC(micro20_state::m68k_reset_callback),this));
+	m_maincpu->set_reset_callback(*this, FUNC(micro20_state::m68k_reset_callback));
 
 	m_tin = 0;
 }
@@ -92,10 +92,9 @@ void micro20_state::machine_reset()
 TIMER_DEVICE_CALLBACK_MEMBER(micro20_state::micro20_timer)
 {
 	m_pit->update_tin(m_tin ? ASSERT_LINE : CLEAR_LINE);
-	if ((!m_h4) && (m_tin))
-	{
+	if (!m_h4 && m_tin)
 		m_maincpu->set_input_line(M68K_IRQ_6, HOLD_LINE);
-	}
+
 	m_tin ^= 1;
 }
 

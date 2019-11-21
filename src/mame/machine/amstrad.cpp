@@ -235,7 +235,7 @@ void amstrad_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		cb_set_resolution(ptr, param);
 		break;
 	default:
-		assert_always(false, "Unknown id in amstrad_state::device_timer");
+		throw emu_fatalerror("Unknown id in amstrad_state::device_timer");
 	}
 }
 
@@ -1160,10 +1160,10 @@ void amstrad_state::amstrad_setLowerRom()
 
 /*      if ( m_asic.enabled && ( m_asic.rmr2 & 0x18 ) == 0x18 )
         {
-            space.install_read_handler(0x4000, 0x5fff, read8_delegate(FUNC(amstrad_state::amstrad_plus_asic_4000_r),this));
-            space.install_read_handler(0x6000, 0x7fff, read8_delegate(FUNC(amstrad_state::amstrad_plus_asic_6000_r),this));
-            space.install_write_handler(0x4000, 0x5fff, write8_delegate(FUNC(amstrad_state::amstrad_plus_asic_4000_w),this));
-            space.install_write_handler(0x6000, 0x7fff, write8_delegate(FUNC(amstrad_state::amstrad_plus_asic_6000_w),this));
+            space.install_read_handler(0x4000, 0x5fff, read8_delegate(*this, FUNC(amstrad_state::amstrad_plus_asic_4000_r)));
+            space.install_read_handler(0x6000, 0x7fff, read8_delegate(*this, FUNC(amstrad_state::amstrad_plus_asic_6000_r)));
+            space.install_write_handler(0x4000, 0x5fff, write8_delegate(*this, FUNC(amstrad_state::amstrad_plus_asic_4000_w)));
+            space.install_write_handler(0x6000, 0x7fff, write8_delegate(*this, FUNC(amstrad_state::amstrad_plus_asic_6000_w)));
         }
         else
         {
@@ -1646,8 +1646,8 @@ Mode changing is synchronised with HSYNC. If the mode is changed, it will take e
 
 Rom configuration selection :
 -----------------------------
-Bit 2 is used to enable or disable the lower rom area. The lower rom area occupies memory addressess &0000-&3fff and is used to access the operating system rom. When the lower rom area is is enabled, reading from &0000-&3FFF will return data in the rom. When a value is written to &0000-&3FFF, it will be written to the ram underneath the rom. When it is disabled, data read from &0000-&3FFF will return the data in the ram.
-Similarly, bit 3 controls enabling or disabling of the upper rom area. The upper rom area occupies memory addressess &C000-&FFFF and is BASIC or any expansion roms which may be plugged into a rom board/box. See the document on upper rom selection for more details. When the upper rom area enabled, reading from &c000-&ffff, will return data in the rom. When data is written to &c000-&FFFF, it will be written to the ram at the same address as the rom. When the upper rom area is disabled, and data is read from &c000-&ffff the data returned will be the data in the ram.
+Bit 2 is used to enable or disable the lower rom area. The lower rom area occupies memory addressess &0000-&3fff and is used to access the operating system rom. When the lower rom area is enabled, reading from &0000-&3FFF will return data in the rom. When a value is written to &0000-&3FFF, it will be written to the ram underneath the rom. When it is disabled, data read from &0000-&3FFF will return the data in the ram.
+Similarly, bit 3 controls enabling or disabling of the upper rom area. The upper rom area occupies memory addressess &C000-&FFFF and is BASIC or any expansion roms which may be plugged into a rom board/box. See the document on upper rom selection for more details. When the upper rom area is enabled, reading from &c000-&ffff will return data in the rom. When data is written to &c000-&FFFF, it will be written to the ram at the same address as the rom. When the upper rom area is disabled, and data is read from &c000-&ffff, the data returned will be the data in the ram.
 
 Bit 4 controls the interrupt generation. It can be used to delay interrupts.*/
 	case 0x02:
@@ -3144,10 +3144,10 @@ MACHINE_RESET_MEMBER(amstrad_state,plus)
 	AmstradCPC_GA_SetRamConfiguration();
 	amstrad_GateArray_write(0x081); // Epyx World of Sports requires upper ROM to be enabled by default
 
-	space.install_read_handler(0x4000, 0x5fff, read8_delegate(FUNC(amstrad_state::amstrad_plus_asic_4000_r),this));
-	space.install_read_handler(0x6000, 0x7fff, read8_delegate(FUNC(amstrad_state::amstrad_plus_asic_6000_r),this));
-	space.install_write_handler(0x4000, 0x5fff, write8_delegate(FUNC(amstrad_state::amstrad_plus_asic_4000_w),this));
-	space.install_write_handler(0x6000, 0x7fff, write8_delegate(FUNC(amstrad_state::amstrad_plus_asic_6000_w),this));
+	space.install_read_handler(0x4000, 0x5fff, read8_delegate(*this, FUNC(amstrad_state::amstrad_plus_asic_4000_r)));
+	space.install_read_handler(0x6000, 0x7fff, read8_delegate(*this, FUNC(amstrad_state::amstrad_plus_asic_6000_r)));
+	space.install_write_handler(0x4000, 0x5fff, write8_delegate(*this, FUNC(amstrad_state::amstrad_plus_asic_4000_w)));
+	space.install_write_handler(0x6000, 0x7fff, write8_delegate(*this, FUNC(amstrad_state::amstrad_plus_asic_6000_w)));
 
 	//  multiface_init();
 	timer_set(attotime::zero, TIMER_SET_RESOLUTION);
@@ -3187,10 +3187,10 @@ MACHINE_RESET_MEMBER(amstrad_state,gx4000)
 	AmstradCPC_GA_SetRamConfiguration();
 	amstrad_GateArray_write(0x081); // Epyx World of Sports requires upper ROM to be enabled by default
 	//  multiface_init();
-	space.install_read_handler(0x4000, 0x5fff, read8_delegate(FUNC(amstrad_state::amstrad_plus_asic_4000_r),this));
-	space.install_read_handler(0x6000, 0x7fff, read8_delegate(FUNC(amstrad_state::amstrad_plus_asic_6000_r),this));
-	space.install_write_handler(0x4000, 0x5fff, write8_delegate(FUNC(amstrad_state::amstrad_plus_asic_4000_w),this));
-	space.install_write_handler(0x6000, 0x7fff, write8_delegate(FUNC(amstrad_state::amstrad_plus_asic_6000_w),this));
+	space.install_read_handler(0x4000, 0x5fff, read8_delegate(*this, FUNC(amstrad_state::amstrad_plus_asic_4000_r)));
+	space.install_read_handler(0x6000, 0x7fff, read8_delegate(*this, FUNC(amstrad_state::amstrad_plus_asic_6000_r)));
+	space.install_write_handler(0x4000, 0x5fff, write8_delegate(*this, FUNC(amstrad_state::amstrad_plus_asic_4000_w)));
+	space.install_write_handler(0x6000, 0x7fff, write8_delegate(*this, FUNC(amstrad_state::amstrad_plus_asic_6000_w)));
 
 	timer_set(attotime::zero, TIMER_SET_RESOLUTION);
 }

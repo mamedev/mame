@@ -1,19 +1,20 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * vector_ops.h
- *
- * Base vector operations
- *
- */
 
 #ifndef PLIB_VECTOR_OPS_H_
 #define PLIB_VECTOR_OPS_H_
 
+///
+/// \file vector_ops.h
+///
+/// Base vector operations
+///
+///
 #include "pconfig.h"
+#include "pmath.h"
 
 #include <algorithm>
-#include <cmath>
+#include <array>
 #include <type_traits>
 
 #if !defined(__clang__) && !defined(_MSC_VER) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ > 6))
@@ -26,7 +27,7 @@
 namespace plib
 {
 	template<typename VT, typename T>
-	void vec_set_scalar(const std::size_t n, VT &v, T && scalar)
+	void vec_set_scalar(const std::size_t n, VT &v, T && scalar) noexcept
 	{
 		const typename std::remove_reference<decltype(v[0])>::type s(std::forward<T>(scalar));
 		for ( std::size_t i = 0; i < n; i++ )
@@ -34,14 +35,14 @@ namespace plib
 	}
 
 	template<typename VT, typename VS>
-	void vec_set(const std::size_t n, VT &v, const VS & source)
+	void vec_set(const std::size_t n, VT &v, const VS & source) noexcept
 	{
 		for ( std::size_t i = 0; i < n; i++ )
 			v[i] = source[i];
 	}
 
 	template<typename T, typename V1, typename V2>
-	T vec_mult(const std::size_t n, const V1 & v1, const V2 & v2 )
+	T vec_mult(const std::size_t n, const V1 & v1, const V2 & v2 ) noexcept
 	{
 		using b8 = std::array<T, 8>;
 		PALIGNAS_VECTOROPT() b8 value = {0};
@@ -53,7 +54,7 @@ namespace plib
 	}
 
 	template<typename T, typename VT>
-	T vec_mult2(const std::size_t n, const VT &v)
+	T vec_mult2(const std::size_t n, const VT &v) noexcept
 	{
 		using b8 = std::array<T, 8>;
 		PALIGNAS_VECTOROPT() b8 value = {0};
@@ -65,7 +66,7 @@ namespace plib
 	}
 
 	template<typename T, typename VT>
-	T vec_sum(const std::size_t n, const VT &v)
+	T vec_sum(const std::size_t n, const VT &v) noexcept
 	{
 		if (n<8)
 		{
@@ -87,7 +88,7 @@ namespace plib
 	}
 
 	template<typename VV, typename T, typename VR>
-	void vec_mult_scalar(const std::size_t n, VR & result, const VV & v, T && scalar)
+	void vec_mult_scalar(const std::size_t n, VR & result, const VV & v, T && scalar) noexcept
 	{
 		const typename std::remove_reference<decltype(v[0])>::type s(std::forward<T>(scalar));
 		for ( std::size_t i = 0; i < n; i++ )
@@ -95,7 +96,7 @@ namespace plib
 	}
 
 	template<typename VR, typename VV, typename T>
-	void vec_add_mult_scalar(const std::size_t n, VR & result, const VV & v, T && scalar)
+	void vec_add_mult_scalar(const std::size_t n, VR & result, const VV & v, T && scalar) noexcept
 	{
 		const typename std::remove_reference<decltype(v[0])>::type s(std::forward<T>(scalar));
 		for ( std::size_t i = 0; i < n; i++ )
@@ -103,28 +104,28 @@ namespace plib
 	}
 
 	template<typename T>
-	void vec_add_mult_scalar_p(const std::size_t n, T * result, const T * v, T scalar)
+	void vec_add_mult_scalar_p(const std::size_t n, T * result, const T * v, T scalar) noexcept
 	{
 		for ( std::size_t i = 0; i < n; i++ )
 			result[i] += scalar * v[i];
 	}
 
 	template<typename R, typename V>
-	void vec_add_ip(const std::size_t n, R & result, const V & v)
+	void vec_add_ip(const std::size_t n, R & result, const V & v) noexcept
 	{
 		for ( std::size_t i = 0; i < n; i++ )
 			result[i] += v[i];
 	}
 
 	template<typename VR, typename V1, typename V2>
-	void vec_sub(const std::size_t n, VR & result, const V1 &v1, const V2 & v2)
+	void vec_sub(const std::size_t n, VR & result, const V1 &v1, const V2 & v2) noexcept
 	{
 		for ( std::size_t i = 0; i < n; i++ )
 			result[i] = v1[i] - v2[i];
 	}
 
 	template<typename V, typename T>
-	void vec_scale(const std::size_t n, V & v, T &&scalar)
+	void vec_scale(const std::size_t n, V & v, T &&scalar) noexcept
 	{
 		const typename std::remove_reference<decltype(v[0])>::type s(std::forward<T>(scalar));
 		for ( std::size_t i = 0; i < n; i++ )
@@ -132,11 +133,11 @@ namespace plib
 	}
 
 	template<typename T, typename V>
-	T vec_maxabs(const std::size_t n, const V & v)
+	T vec_maxabs(const std::size_t n, const V & v) noexcept
 	{
 		T ret = 0.0;
 		for ( std::size_t i = 0; i < n; i++ )
-			ret = std::max(ret, std::abs(v[i]));
+			ret = std::max(ret, plib::abs(v[i]));
 
 		return ret;
 	}
@@ -148,4 +149,4 @@ namespace plib
 #endif
 #endif
 
-#endif /* PLIB_VECTOR_OPS_H_ */
+#endif // PLIB_VECTOR_OPS_H_

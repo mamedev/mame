@@ -342,7 +342,7 @@ void bpmmicro_state::i286_mem(address_map &map)
 	map(0x08401a, 0x8401b).w(FUNC(bpmmicro_state::unknown_8401a_w));
 	map(0x08401c, 0x8401d).w(FUNC(bpmmicro_state::eeprom_8401c_w));
 	map(0x0f0000, 0x0fffff).rom().region("bios", 0x10000);
-	//AM_RANGE(0xfe0000, 0xffffff) AM_ROM AM_REGION("bios", 0) //?
+	//map(0xfe0000, 0xffffff).rom().region("bios", 0); //?
 	map(0xfffff0, 0xffffff).rom().region("bios", 0x1fff0); //?
 }
 
@@ -379,7 +379,7 @@ void bpmmicro_state::bpmmicro(machine_config &config)
 ******************************************************************************/
 
 ROM_START(bp1200)
-	ROM_REGION(0x20000, "bios", 0)
+	ROM_REGION16_LE(0x20000, "bios", 0)
 	// note about roms: the BP-1200 has two jumpers controlling what type of rom is installed;
 	// it needs 120ns or faster roms
 	// the "W1" and "W2" labels are next to pins A on the pcb

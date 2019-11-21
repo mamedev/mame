@@ -98,7 +98,7 @@ TILE_GET_INFO_MEMBER(wink_state::get_bg_tile_info)
 
 void wink_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wink_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wink_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 uint32_t wink_state::screen_update_wink(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -207,7 +207,7 @@ void wink_state::wink_io(address_map &map)
 	map(0xa0, 0xa0).r(FUNC(wink_state::player_inputs_r));
 	map(0xa4, 0xa4).portr("DSW1");   //dipswitch bank2
 	map(0xa8, 0xa8).portr("DSW2");   //dipswitch bank1
-//  AM_RANGE(0xac, 0xac) AM_WRITENOP            //protection - loads video xor unit (written only once at startup)
+//  map(0xac, 0xac).nopw();            //protection - loads video xor unit (written only once at startup)
 	map(0xb0, 0xb0).portr("DSW3");   //unused inputs
 	map(0xb4, 0xb4).portr("DSW4");   //dipswitch bank3
 	map(0xc0, 0xdf).w(FUNC(wink_state::prot_w));       //load load protection-buffer from upper address bus

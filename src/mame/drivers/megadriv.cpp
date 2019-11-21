@@ -277,10 +277,10 @@ MACHINE_START_MEMBER(md_cons_state, md_common)
 void md_cons_state::install_cartslot()
 {
 	// for now m_cartslot is only in MD and not 32x and SegaCD
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x000000, 0x7fffff, read16_delegate(FUNC(base_md_cart_slot_device::read),(base_md_cart_slot_device*)m_cart), write16_delegate(FUNC(base_md_cart_slot_device::write),(base_md_cart_slot_device*)m_cart));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa13000, 0xa130ff, read16_delegate(FUNC(base_md_cart_slot_device::read_a13),(base_md_cart_slot_device*)m_cart), write16_delegate(FUNC(base_md_cart_slot_device::write_a13),(base_md_cart_slot_device*)m_cart));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa15000, 0xa150ff, read16_delegate(FUNC(base_md_cart_slot_device::read_a15),(base_md_cart_slot_device*)m_cart), write16_delegate(FUNC(base_md_cart_slot_device::write_a15),(base_md_cart_slot_device*)m_cart));
-//  m_maincpu->space(AS_PROGRAM).install_write_handler(0xa14000, 0xa14003, write16_delegate(FUNC(base_md_cart_slot_device::write_tmss_bank),(base_md_cart_slot_device*)m_cart));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x000000, 0x7fffff, read16_delegate(*m_cart, FUNC(base_md_cart_slot_device::read)), write16_delegate(*m_cart, FUNC(base_md_cart_slot_device::write)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa13000, 0xa130ff, read16_delegate(*m_cart, FUNC(base_md_cart_slot_device::read_a13)), write16_delegate(*m_cart, FUNC(base_md_cart_slot_device::write_a13)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa15000, 0xa150ff, read16_delegate(*m_cart, FUNC(base_md_cart_slot_device::read_a15)), write16_delegate(*m_cart, FUNC(base_md_cart_slot_device::write_a15)));
+//  m_maincpu->space(AS_PROGRAM).install_write_handler(0xa14000, 0xa14003, write16_delegate(*m_cart, FUNC(base_md_cart_slot_device::write_tmss_bank)));
 }
 
 READ16_MEMBER( md_cons_state::tmss_r )
@@ -296,7 +296,7 @@ WRITE16_MEMBER( md_cons_state::tmss_swap_w )
 	if (data & 0x0001)
 	{
 		install_cartslot();
-		m_maincpu->space(AS_PROGRAM).install_write_handler(0xa14100, 0xa14101, write16_delegate(FUNC(md_cons_state::tmss_swap_w),this));
+		m_maincpu->space(AS_PROGRAM).install_write_handler(0xa14100, 0xa14101, write16_delegate(*this, FUNC(md_cons_state::tmss_swap_w)));
 	}
 	else
 	{
@@ -308,9 +308,9 @@ WRITE16_MEMBER( md_cons_state::tmss_swap_w )
 void md_cons_state::install_tmss()
 {
 	m_maincpu->space(AS_PROGRAM).unmap_readwrite(0x000000, 0x7fffff);
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x000000, 0x7fffff, read16_delegate(FUNC(md_cons_state::tmss_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x000000, 0x7fffff, read16_delegate(*this, FUNC(md_cons_state::tmss_r)));
 
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa14100, 0xa14101, write16_delegate(FUNC(md_cons_state::tmss_swap_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa14100, 0xa14101, write16_delegate(*this, FUNC(md_cons_state::tmss_swap_w)));
 
 }
 
@@ -469,8 +469,8 @@ ROM_END
 
 void md_cons_state::init_mess_md_common()
 {
-	m_megadrive_io_read_data_port_ptr = read8_delegate(FUNC(md_cons_state::mess_md_io_read_data_port),this);
-	m_megadrive_io_write_data_port_ptr = write16_delegate(FUNC(md_cons_state::mess_md_io_write_data_port),this);
+	m_megadrive_io_read_data_port_ptr = read8_delegate(*this, FUNC(md_cons_state::mess_md_io_read_data_port));
+	m_megadrive_io_write_data_port_ptr = write16_delegate(*this, FUNC(md_cons_state::mess_md_io_write_data_port));
 }
 
 void md_cons_state::init_genesis()
@@ -605,9 +605,9 @@ void md_cons_state::genesis_32x(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(md_cons_state, md_common)
 	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, ms_megadriv)
 
-	m_vdp->set_md_32x_scanline(FUNC(md_cons_state::_32x_scanline_callback), this);
-	m_vdp->set_md_32x_scanline_helper(FUNC(md_cons_state::_32x_scanline_helper_callback), this);
-	m_vdp->set_md_32x_interrupt(FUNC(md_cons_state::_32x_interrupt_callback), this);
+	m_vdp->set_md_32x_scanline(FUNC(md_cons_state::_32x_scanline_callback));
+	m_vdp->set_md_32x_scanline_helper(FUNC(md_cons_state::_32x_scanline_helper_callback));
+	m_vdp->set_md_32x_interrupt(FUNC(md_cons_state::_32x_interrupt_callback));
 	m_vdp->reset_routes();
 	m_vdp->add_route(ALL_OUTPUTS, "lspeaker", (0.50)/2);
 	m_vdp->add_route(ALL_OUTPUTS, "rspeaker", (0.50)/2);
@@ -627,7 +627,7 @@ void md_cons_state::genesis_32x(machine_config &config)
 
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "_32x_cart", "32x,bin"));
 	cartslot.set_must_be_loaded(true);
-	cartslot.set_device_load(FUNC(md_cons_state::_32x_cart), this);
+	cartslot.set_device_load(FUNC(md_cons_state::_32x_cart));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("32x").set_filter("NTSC-U");
 }
@@ -640,9 +640,9 @@ void md_cons_state::mdj_32x(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(md_cons_state, md_common)
 	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, ms_megadriv)
 
-	m_vdp->set_md_32x_scanline(FUNC(md_cons_state::_32x_scanline_callback), this);
-	m_vdp->set_md_32x_scanline_helper(FUNC(md_cons_state::_32x_scanline_helper_callback), this);
-	m_vdp->set_md_32x_interrupt(FUNC(md_cons_state::_32x_interrupt_callback), this);
+	m_vdp->set_md_32x_scanline(FUNC(md_cons_state::_32x_scanline_callback));
+	m_vdp->set_md_32x_scanline_helper(FUNC(md_cons_state::_32x_scanline_helper_callback));
+	m_vdp->set_md_32x_interrupt(FUNC(md_cons_state::_32x_interrupt_callback));
 	m_vdp->reset_routes();
 	m_vdp->add_route(ALL_OUTPUTS, "lspeaker", (0.50)/2);
 	m_vdp->add_route(ALL_OUTPUTS, "rspeaker", (0.50)/2);
@@ -662,7 +662,7 @@ void md_cons_state::mdj_32x(machine_config &config)
 
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "_32x_cart", "32x,bin"));
 	cartslot.set_must_be_loaded(true);
-	cartslot.set_device_load(FUNC(md_cons_state::_32x_cart), this);
+	cartslot.set_device_load(FUNC(md_cons_state::_32x_cart));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("32x").set_filter("NTSC-J");
 }
@@ -675,9 +675,9 @@ void md_cons_state::md_32x(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(md_cons_state, md_common)
 	MCFG_MACHINE_RESET_OVERRIDE(md_cons_state, ms_megadriv)
 
-	m_vdp->set_md_32x_scanline(FUNC(md_cons_state::_32x_scanline_callback), this);
-	m_vdp->set_md_32x_scanline_helper(FUNC(md_cons_state::_32x_scanline_helper_callback), this);
-	m_vdp->set_md_32x_interrupt(FUNC(md_cons_state::_32x_interrupt_callback), this);
+	m_vdp->set_md_32x_scanline(FUNC(md_cons_state::_32x_scanline_callback));
+	m_vdp->set_md_32x_scanline_helper(FUNC(md_cons_state::_32x_scanline_helper_callback));
+	m_vdp->set_md_32x_interrupt(FUNC(md_cons_state::_32x_interrupt_callback));
 	m_vdp->reset_routes();
 	m_vdp->add_route(ALL_OUTPUTS, "lspeaker", (0.50)/2);
 	m_vdp->add_route(ALL_OUTPUTS, "rspeaker", (0.50)/2);
@@ -697,7 +697,7 @@ void md_cons_state::md_32x(machine_config &config)
 
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "_32x_cart", "32x,bin"));
 	cartslot.set_must_be_loaded(true);
-	cartslot.set_device_load(FUNC(md_cons_state::_32x_cart), this);
+	cartslot.set_device_load(FUNC(md_cons_state::_32x_cart));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("32x").set_filter("PAL");
 }
@@ -749,6 +749,8 @@ void md_cons_state::genesis_scd(machine_config &config)
 	m_segacd->set_hostcpu(m_maincpu);
 	m_segacd->set_screen("megadriv");
 
+	config.set_perfect_quantum("segacd:segacd_68k"); // perfect sync to the fastest cpu
+
 	CDROM(config, "cdrom").set_interface("scd_cdrom");
 
 	SOFTWARE_LIST(config, "cd_list").set_original("segacd");
@@ -767,6 +769,8 @@ void md_cons_state::md_scd(machine_config &config)
 	m_segacd->set_palette("gen_vdp:gfx_palette");
 	m_segacd->set_hostcpu(m_maincpu);
 	m_segacd->set_screen("megadriv");
+
+	config.set_perfect_quantum("segacd:segacd_68k"); // perfect sync to the fastest cpu
 
 	CDROM(config, "cdrom").set_interface("scd_cdrom");
 
@@ -787,6 +791,8 @@ void md_cons_state::mdj_scd(machine_config &config)
 	m_segacd->set_hostcpu(m_maincpu);
 	m_segacd->set_screen("megadriv");
 
+	config.set_perfect_quantum("segacd:segacd_68k"); // perfect sync to the fastest cpu
+
 	CDROM(config, "cdrom").set_interface("scd_cdrom");
 
 	SOFTWARE_LIST(config, "cd_list").set_original("megacdj");
@@ -803,12 +809,14 @@ void md_cons_state::genesis_32x_scd(machine_config &config)
 	m_segacd->set_hostcpu(m_maincpu);
 	m_segacd->set_screen("megadriv");
 
+	config.set_perfect_quantum("segacd:segacd_68k"); // perfect sync to the fastest cpu
+
 	CDROM(config, "cdrom").set_interface("scd_cdrom");
 
 	MCFG_MACHINE_START_OVERRIDE(md_cons_state, ms_megacd)
 
 	config.device_remove("cartslot");
-	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "_32x_cart", "32x,bin").set_device_load(FUNC(md_cons_state::_32x_cart), this);
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "_32x_cart", "32x,bin").set_device_load(FUNC(md_cons_state::_32x_cart));
 
 	//config.m_perfect_cpu_quantum = subtag("32x_master_sh2");
 	SOFTWARE_LIST(config, "cd_list").set_original("segacd");
@@ -823,12 +831,14 @@ void md_cons_state::md_32x_scd(machine_config &config)
 	m_segacd->set_hostcpu(m_maincpu);
 	m_segacd->set_screen("megadriv");
 
+	config.set_perfect_quantum("segacd:segacd_68k"); // perfect sync to the fastest cpu
+
 	CDROM(config, "cdrom").set_interface("scd_cdrom");
 
 	MCFG_MACHINE_START_OVERRIDE(md_cons_state, ms_megacd)
 
 	config.device_remove("cartslot");
-	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "_32x_cart", "32x,bin").set_device_load(FUNC(md_cons_state::_32x_cart), this);
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "_32x_cart", "32x,bin").set_device_load(FUNC(md_cons_state::_32x_cart));
 
 	//config.m_perfect_cpu_quantum = subtag("32x_master_sh2");
 	SOFTWARE_LIST(config, "cd_list").set_original("megacd");
@@ -843,12 +853,14 @@ void md_cons_state::mdj_32x_scd(machine_config &config)
 	m_segacd->set_hostcpu(m_maincpu);
 	m_segacd->set_screen("megadriv");
 
+	config.set_perfect_quantum("segacd:segacd_68k"); // perfect sync to the fastest cpu
+
 	CDROM(config, "cdrom").set_interface("scd_cdrom");
 
 	MCFG_MACHINE_START_OVERRIDE(md_cons_state, ms_megacd)
 
 	config.device_remove("cartslot");
-	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "_32x_cart", "32x,bin").set_device_load(FUNC(md_cons_state::_32x_cart), this);
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "_32x_cart", "32x,bin").set_device_load(FUNC(md_cons_state::_32x_cart));
 
 	//config.m_perfect_cpu_quantum = subtag("32x_master_sh2");
 	SOFTWARE_LIST(config, "cd_list").set_original("megacdj");

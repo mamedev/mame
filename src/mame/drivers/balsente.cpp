@@ -238,7 +238,7 @@ void balsente_state::cpu1_base_map(address_map &map)
 	map(0x8000, 0x8fff).ram().w(FUNC(balsente_state::paletteram_w)).share("paletteram");
 	map(0x9000, 0x9007).w(FUNC(balsente_state::adc_select_w));
 	map(0x9400, 0x9401).r(FUNC(balsente_state::adc_data_r));
-	map(0x9800, 0x981f).mirror(0x0060).lw8("outlatch_w", [this](offs_t offset, u8 data) { m_outlatch->write_d7(offset >> 2, data); });
+	map(0x9800, 0x981f).mirror(0x0060).lw8(NAME([this] (offs_t offset, u8 data) { m_outlatch->write_d7(offset >> 2, data); }));
 	map(0x9880, 0x989f).w(FUNC(balsente_state::random_reset_w));
 	map(0x98a0, 0x98bf).w(FUNC(balsente_state::rombank_select_w));
 	map(0x98c0, 0x98df).w(FUNC(balsente_state::palette_select_w));
@@ -1351,7 +1351,7 @@ void balsente_state::balsente(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	TIMER(config, m_scanline_timer, 0).configure_generic(timer_device::expired_delegate(FUNC(balsente_state::interrupt_timer), this));
+	TIMER(config, m_scanline_timer, 0).configure_generic(FUNC(balsente_state::interrupt_timer));
 
 	LS259(config, m_outlatch); // U9H
 	// these outputs are generally used to control the various lamps
@@ -1419,7 +1419,7 @@ void balsente_state::shrike(machine_config &config)
 	M68000(config, m_68k, 8000000);
 	m_68k->set_addrmap(AS_PROGRAM, &balsente_state::shrike68k_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 }
 
 

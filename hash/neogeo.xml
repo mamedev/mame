@@ -401,7 +401,7 @@
 		<part name="cart" interface="neo_cart">
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="006-pg1.p1" offset="0x000000" size="0x080000" status="baddump" crc="52445646" sha1="647bb31f2f68453c1366cb6e2e867e37d1df7a54" />
-				<!-- Chip label p1h does not exist, renamed temporarly to pg1, marked BAD_DUMP. This needs to be verified. -->
+				<!-- Chip label p1h does not exist, renamed temporarily to pg1, marked BAD_DUMP. This needs to be verified. -->
 			</dataarea>
 			<dataarea name="mcu" size="0x2000">
 				<!-- dumped from a prototype with external ROM, not 100% confirmed as being the same on a final, or other games (lbowling, trally) -->
@@ -1696,7 +1696,7 @@
 		<part name="cart" interface="neo_cart">
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="030-pg1.p1" offset="0x000000" size="0x080000" status="baddump" crc="12d048d7" sha1="ee0d03a565b11ca3bee2d24f62ff46a85ef18d90" />
-				<!-- Chip label p1h does not exist, renamed temporarly to pg1, marked BAD_DUMP. This needs to be verified. -->
+				<!-- Chip label p1h does not exist, renamed temporarily to pg1, marked BAD_DUMP. This needs to be verified. -->
 			</dataarea>
 			<dataarea name="fixed" size="0x040000">
 				<rom offset="0x000000" size="0x020000" name="030-s1.s1" crc="7015b8fc" sha1="8c09bc3e6c62e0f7c9557c1e10c901be325bae7f" />   <!-- TC531000 -->
@@ -5054,6 +5054,49 @@
 				<!-- the rom below acts as a patch to the program rom in the cart, replacing the first 512kb -->
 				<rom loadflag="load16_word_swap" name="095-epr.ep1" offset="0x000000" size="0x080000" crc="be0060a3" sha1="fa741d34898ad5004a23e280139d1446f1a082c7" /> <!-- M27C4002 -->
 				<!-- P is on eprom, correct chip label unknown -->
+			</dataarea>
+			<dataarea name="fixed" size="0x040000">
+				<rom offset="0x000000" size="0x020000" name="095-s1.s1" crc="b6bf5e08" sha1="b527355c35ea097f3448676f2ffa65b8e56ae30c" />   <!-- TC531000 -->
+			</dataarea>
+			<dataarea name="audiocpu" size="0x020000">
+				<rom offset="0x000000" size="0x020000" name="095-m1.m1" crc="653492a7" sha1="39e511fb9ed5d2135dc8428a31d0baafb2ab36e0" />   <!-- TC531001 -->
+			</dataarea>
+			<dataarea name="ymsnd" size="0xc00000">
+				<rom name="069-v1.v1" offset="0x000000" size="0x400000" crc="2bdbd4db" sha1="5f4fecf69c2329d699cbd45829c19303b1e2a80e" />   <!-- TC5332204 -->
+				<rom name="069-v2.v2" offset="0x400000" size="0x400000" crc="a698a487" sha1="11b8bc53bc26a51f4a408e900e3769958625c4ed" />   <!-- TC5332204 -->
+				<rom name="095-v3.v3" offset="0x800000" size="0x400000" crc="189d1c6c" sha1="f0b8cd1ee40ea3feeb2800f0723b451ec8240203" />   <!-- TC5332201 -->
+			</dataarea>
+			<dataarea name="sprites" size="0x1c00000">
+				<rom loadflag="load16_byte" name="069-c1.c1" offset="0x000000" size="0x400000" crc="e302f93c" sha1="d8610b14900b2b8fe691b67ca9b1abb335dbff74" />    <!-- TC5332205 -->
+				<rom loadflag="load16_byte" name="069-c2.c2" offset="0x000001" size="0x400000" crc="1053a455" sha1="69501bfac68739e63d798045b812badd251d57b8" />    <!-- TC5332205 -->
+				<rom loadflag="load16_byte" name="069-c3.c3" offset="0x800000" size="0x400000" crc="1c0fde2f" sha1="cf6c2ef56c03a861de3b0b6dc0d7c9204d947f9d" />    <!-- TC5332205 -->
+				<rom loadflag="load16_byte" name="069-c4.c4" offset="0x800001" size="0x400000" crc="a25fc3d0" sha1="83cb349e2f1032652060b233e741fb893be5af16" />    <!-- TC5332205 -->
+				<rom loadflag="load16_byte" name="095-c5.c5" offset="0x1000000" size="0x400000" crc="8b9b65df" sha1="e2a7e20855501f240bcd22f5cc92fcb4a9806abe" />   <!-- TC5332202 -->
+				<rom loadflag="load16_byte" name="095-c6.c6" offset="0x1000001" size="0x400000" crc="3e164718" sha1="53217f938c8964c1ca68a6fd5249c4169a5ac8e6" />   <!-- TC5332202 -->
+				<rom loadflag="load16_byte" name="095-c7.c7" offset="0x1800000" size="0x200000" crc="ca605e12" sha1="5150b835247fd705bc1dece97d423d9c20a51416" />   <!-- TC5316200 -->
+				<rom loadflag="load16_byte" name="095-c8.c8" offset="0x1800001" size="0x200000" crc="4e6beb6c" sha1="c0ac7cfc832ace6ad52c58f5da3a8101baead749" />   <!-- TC5316200 -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbff1ka" cloneof="rbff1">
+		<description>Real Bout Fatal Fury / Real Bout Garou Densetsu (Korean release, bug fix revision)</description>
+		<year>1995</year>
+		<publisher>SNK</publisher>
+		<info name="serial" value="NGM-095 (MVS), NGH-095 (AES)"/>
+		<info name="release" value="19951221 (MVS), 19960126 (AES)"/>
+		<info name="alt_title" value="リアルバウト 餓狼伝説"/>
+		<sharedfeat name="release" value="MVS,AES" />
+		<sharedfeat name="compatibility" value="MVS,AES" />
+		<part name="cart" interface="neo_cart">
+			<!-- This is a bug fixed revision applied over the original cart. The original P1 and P2 stayed in the cart and this -->
+			<!-- 512k ROM was added to replace the first 512k of P1. -->
+			<dataarea name="maincpu" width="16" endianness="big" size="0x300000">
+				<rom loadflag="load16_word_swap" name="095-p1k.p1" offset="0x000000" size="0x100000" crc="f705364b" sha1="2668e15663a2c7ec7396f40e4f5f454505968ce8" />  <!-- TC538200 -->
+				<rom loadflag="load16_word_swap" name="095-p2.sp2" offset="0x100000" size="0x200000" crc="cc15826e" sha1="44d6ac6c0ca697a6f367dcfd809b1e1771cb0635" />  <!-- TC5316200 -->
+				<!-- the rom below acts as a patch to the program rom in the cart, replacing the first 512kb -->
+				<rom loadflag="load16_word_swap" name="095-eprk.ep1" offset="0x000000" size="0x080000" crc="422093ed" sha1="1b4cceec9b622d35f1bfdf01e314771b98483348" /> <!-- M27C4002 -->
+				<!-- no label on eprom, correct chip label unknown -->
 			</dataarea>
 			<dataarea name="fixed" size="0x040000">
 				<rom offset="0x000000" size="0x020000" name="095-s1.s1" crc="b6bf5e08" sha1="b527355c35ea097f3448676f2ffa65b8e56ae30c" />   <!-- TC531000 -->
@@ -9346,7 +9389,7 @@
 	     p1.bin                  270-p1c.p1              90.607002%
 	     p2.bin                  270-p2c.sp2             99.999763% (all bytes that differ do so by only bits 0x20 or 0x02, which is suspicious)
 	-->
-	<software name="samsho5a" cloneof="samsho5" >
+	<software name="samsho5a" cloneof="samsho5">
 		<description>Samurai Shodown V / Samurai Spirits Zero (NGM-2700, set 2)</description>
 		<year>2003</year>
 		<publisher>Yuki Enterprise / SNK Playmore</publisher>
@@ -11001,7 +11044,7 @@
 		</part>
 	</software>
 
-	<software name="kf2k3bla" cloneof="kof2003" >
+	<software name="kf2k3bla" cloneof="kof2003">
 		<description>The King of Fighters 2003 (bootleg, set 2)</description>
 		<year>2003</year>
 		<publisher>bootleg</publisher>

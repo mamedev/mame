@@ -2071,7 +2071,7 @@ void zeus2_device::check_tex(uint32_t &texmode, float &zObj, float &zMat, float 
 		infoStr += tex_info();
 
 		tex_map.insert(std::pair<uint32_t, std::string>(zeus_texbase, infoStr));
-		osd_printf_info("%s\n", infoStr.c_str());
+		osd_printf_info("%s\n", infoStr);
 	}
 }
 

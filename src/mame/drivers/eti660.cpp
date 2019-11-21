@@ -336,7 +336,7 @@ void eti660_state::eti660(machine_config &config)
 	RAM(config, RAM_TAG).set_default_size("3K");
 
 	/* quickload */
-	QUICKLOAD(config, "quickload", "bin,c8,ch8", attotime::from_seconds(2)).set_load_callback(FUNC(eti660_state::quickload_cb), this);
+	QUICKLOAD(config, "quickload", "bin,c8,ch8", attotime::from_seconds(2)).set_load_callback(FUNC(eti660_state::quickload_cb));
 }
 
 /* ROMs */

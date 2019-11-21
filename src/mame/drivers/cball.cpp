@@ -82,7 +82,7 @@ WRITE8_MEMBER(cball_state::vram_w)
 
 void cball_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cball_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cball_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 
@@ -110,7 +110,7 @@ void cball_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 		interrupt_callback(ptr, param);
 		break;
 	default:
-		assert_always(false, "Unknown id in cball_state::device_timer");
+		throw emu_fatalerror("Unknown id in cball_state::device_timer");
 	}
 }
 

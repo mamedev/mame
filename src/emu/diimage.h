@@ -51,7 +51,8 @@ enum iodevice_t
 	IO_MIDIIN,      /* 17 - MIDI In port */
 	IO_MIDIOUT,     /* 18 - MIDI Out port */
 	IO_PICTURE,     /* 19 - A single-frame image */
-	IO_COUNT        /* 20 - Total Number of IO_devices for searching */
+	IO_VIDEO,       /* 20 - A video file */
+	IO_COUNT        /* 21 - Total Number of IO_devices for searching */
 };
 
 enum image_error_t
@@ -79,10 +80,10 @@ public:
 	image_device_format(const std::string &name, const std::string &description, const std::string &extensions, const std::string &optspec);
 	~image_device_format();
 
-	const std::string &name() const { return m_name; }
-	const std::string &description() const { return m_description; }
-	const std::vector<std::string> &extensions() const { return m_extensions; }
-	const std::string &optspec() const { return m_optspec; }
+	const std::string &name() const noexcept { return m_name; }
+	const std::string &description() const noexcept { return m_description; }
+	const std::vector<std::string> &extensions() const noexcept { return m_extensions; }
+	const std::string &optspec() const noexcept { return m_optspec; }
 
 private:
 	std::string                 m_name;
@@ -129,39 +130,39 @@ public:
 	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) { return image_init_result::PASS; }
 	virtual void call_unload() { }
 	virtual std::string call_display() { return std::string(); }
-	virtual u32 unhashed_header_length() const { return 0; }
-	virtual bool core_opens_image_file() const { return true; }
-	virtual iodevice_t image_type()  const = 0;
-	virtual bool is_readable()  const = 0;
-	virtual bool is_writeable() const = 0;
-	virtual bool is_creatable() const = 0;
-	virtual bool must_be_loaded() const = 0;
-	virtual bool is_reset_on_load() const = 0;
-	virtual bool support_command_line_image_creation() const;
-	virtual const char *image_interface() const { return nullptr; }
-	virtual const char *file_extensions() const = 0;
+	virtual u32 unhashed_header_length() const noexcept { return 0; }
+	virtual bool core_opens_image_file() const noexcept { return true; }
+	virtual iodevice_t image_type() const noexcept = 0;
+	virtual bool is_readable()  const noexcept = 0;
+	virtual bool is_writeable() const noexcept = 0;
+	virtual bool is_creatable() const noexcept = 0;
+	virtual bool must_be_loaded() const noexcept = 0;
+	virtual bool is_reset_on_load() const noexcept = 0;
+	virtual bool support_command_line_image_creation() const noexcept;
+	virtual const char *image_interface() const noexcept { return nullptr; }
+	virtual const char *file_extensions() const noexcept = 0;
 	virtual const util::option_guide &create_option_guide() const;
-	virtual const char *custom_instance_name() const { return nullptr; }
-	virtual const char *custom_brief_instance_name() const { return nullptr; }
+	virtual const char *custom_instance_name() const noexcept { return nullptr; }
+	virtual const char *custom_brief_instance_name() const noexcept { return nullptr; }
 
-	const image_device_format *device_get_indexed_creatable_format(int index) const { if (index < m_formatlist.size()) return m_formatlist.at(index).get(); else return nullptr;  }
-	const image_device_format *device_get_named_creatable_format(const std::string &format_name);
+	const image_device_format *device_get_indexed_creatable_format(int index) const noexcept { return (index < m_formatlist.size()) ? m_formatlist.at(index).get() : nullptr;  }
+	const image_device_format *device_get_named_creatable_format(const std::string &format_name) noexcept;
 	const util::option_guide &device_get_creation_option_guide() const { return create_option_guide(); }
 
 	const char *error();
 	void seterror(image_error_t err, const char *message);
 	void message(const char *format, ...) ATTR_PRINTF(2,3);
 
-	bool exists() const { return !m_image_name.empty(); }
-	const char *filename() const { if (m_image_name.empty()) return nullptr; else return m_image_name.c_str(); }
-	const char *basename() const { if (m_basename.empty()) return nullptr; else return m_basename.c_str(); }
-	const char *basename_noext()  const { if (m_basename_noext.empty()) return nullptr; else return m_basename_noext.c_str(); }
-	const std::string &filetype() const { return m_filetype; }
+	bool exists() const noexcept { return !m_image_name.empty(); }
+	const char *filename() const noexcept { return m_image_name.empty() ? nullptr : m_image_name.c_str(); }
+	const char *basename() const noexcept { return m_basename.empty() ? nullptr : m_basename.c_str(); }
+	const char *basename_noext()  const noexcept { return m_basename_noext.empty() ? nullptr : m_basename_noext.c_str(); }
+	const std::string &filetype() const noexcept { return m_filetype; }
 	bool is_filetype(const std::string &candidate_filetype) { return !core_stricmp(filetype().c_str(), candidate_filetype.c_str()); }
-	bool is_open() const { return bool(m_file); }
-	util::core_file &image_core_file() const { return *m_file; }
+	bool is_open() const noexcept { return bool(m_file); }
+	util::core_file &image_core_file() const noexcept { return *m_file; }
 	u64 length() { check_for_file(); return m_file->size(); }
-	bool is_readonly() const { return m_readonly; }
+	bool is_readonly() const noexcept { return m_readonly; }
 	u32 fread(void *buffer, u32 length) { check_for_file(); return m_file->read(buffer, length); }
 	u32 fread(optional_shared_ptr<u8> &ptr, u32 length) { ptr.allocate(length); return fread(ptr.target(), length); }
 	u32 fread(optional_shared_ptr<u8> &ptr, u32 length, offs_t offset) { ptr.allocate(length); return fread(ptr + offset, length - offset); }
@@ -174,15 +175,15 @@ public:
 	void *ptr() {check_for_file(); return const_cast<void *>(m_file->buffer()); }
 	// configuration access
 
-	const std::string &longname() const { return m_longname; }
-	const std::string &manufacturer() const { return m_manufacturer; }
-	const std::string &year() const { return m_year; }
-	u32 supported() const { return m_supported; }
+	const std::string &longname() const noexcept { return m_longname; }
+	const std::string &manufacturer() const noexcept { return m_manufacturer; }
+	const std::string &year() const noexcept { return m_year; }
+	u32 supported() const noexcept { return m_supported; }
 
-	const software_info *software_entry() const;
-	const software_part *part_entry() const { return m_software_part_ptr; }
-	const char *software_list_name() const { return m_software_list_name.c_str(); }
-	bool loaded_through_softlist() const { return m_software_part_ptr != nullptr; }
+	const software_info *software_entry() const noexcept;
+	const software_part *part_entry() const noexcept { return m_software_part_ptr; }
+	const char *software_list_name() const noexcept { return m_software_list_name.c_str(); }
+	bool loaded_through_softlist() const noexcept { return m_software_part_ptr != nullptr; }
 
 	void set_working_directory(const char *working_directory) { m_working_directory = working_directory; }
 	const std::string &working_directory();
@@ -197,7 +198,7 @@ public:
 	util::hash_collection calculate_hash_on_file(util::core_file &file) const;
 
 	void battery_load(void *buffer, int length, int fill);
-	void battery_load(void *buffer, int length, void *def_buffer);
+	void battery_load(void *buffer, int length, const void *def_buffer);
 	void battery_save(const void *buffer, int length);
 
 	const char *image_type_name()  const { return device_typename(image_type()); }
@@ -223,9 +224,9 @@ public:
 
 	void set_user_loadable(bool user_loadable) { m_user_loadable = user_loadable; }
 
-	bool user_loadable() const { return m_user_loadable; }
-	bool is_reset_and_loading() const { return m_is_reset_and_loading; }
-	const std::string &full_software_name() const { return m_full_software_name; }
+	bool user_loadable() const noexcept { return m_user_loadable; }
+	bool is_reset_and_loading() const noexcept { return m_is_reset_and_loading; }
+	const std::string &full_software_name() const noexcept { return m_full_software_name; }
 
 protected:
 	// interface-level overrides
@@ -243,12 +244,12 @@ protected:
 
 	void clear_error();
 
-	void check_for_file() const { assert_always(m_file, "Illegal operation on unmounted image"); }
+	void check_for_file() const { if (!m_file) throw emu_fatalerror("%s(%s): Illegal operation on unmounted image", device().shortname(), device().tag()); }
 
 	void setup_working_directory();
 	bool try_change_working_directory(const std::string &subdir);
 
-	void make_readonly() { m_readonly = true; }
+	void make_readonly() noexcept { m_readonly = true; }
 
 	bool image_checkhash();
 

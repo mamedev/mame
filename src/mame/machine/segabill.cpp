@@ -1,14 +1,63 @@
 // license: BSD-3-Clause
 // copyright-holders: Dirk Best
+// thanks-to: Rob Krum
 /***************************************************************************
 
     Sega Billboard
 
-	TODO: Timing, vs298 needs a higher interrupt frequency, but then
-	the animations seem to fast?
+    TODO: Timing, vs298 needs a higher interrupt frequency, but then
+    the animations seem to fast?
+    Document and add support for Blast City Billboard with EPR-19158.IC3
+    ( https://www.arcade-projects.com/forums/index.php?attachment/1477-blast-city-billboard-pcb-jpg/ )
 
 ***************************************************************************/
 
+/*
+Sega VERSUS CITY BILLBOARD CONTROL BD 837-11854 (C) 1991
+( https://www.arcade-projects.com/forums/index.php?attachment/7044-vs-pcb-top-jpg/ )
+|-----------------------------------------------------------------------------|
+|      |---------------|  |---------------|    |---------------------------|  |
+|--    |---------------|  |---------------|    |---------------------------|  |
+|||S          CN5                CN4                        CN3               |
+|||W                        PS2501  PS2501        M54583P   M54583P   M54583P |
+|||1                                                        M54583P   M54583P |
+|--      74F74N  M74LS393P  HD74HC4040P   315-5338A                           |
+|                                                                             |
+|     z                                                                    -- |
+|     8  M27C512                   32.000MHz                              C|| |
+|     0           LH5268AD                                                N|| |
+|                                                                         2|| |
+|                     GAL16V8B         SN74LS32N SN74LS04N MB3771          -- |
+|    LED                                                                      |
+|-----------------------------------------------------------------------------|
+   Setup:
+    Z80         ZILOG Z0840008PSC Z80 CPU (DIP40)
+    LH5268A     SHARP LH5268AD-10LL 8k x8 SRAM (DIP28, labeled as MB8464A-15LL on PCB silkscreen)
+    PS2501      NEC PS2501-4 ISOLATOR (DIP16)
+    M54583P     MITSUBISHI M54583P DARLINGTON TRANSISTOR ARRAY (DIP18)
+    74F74N      PHILLIPS 74F74N DUAL D-TYPE FLIP-FLIP (DIP14)
+    M74LS393P   MITSUBISHI M74LS393P DUAL BINARY COUNTER (DIP14)
+    HD74HC4040P RENESAS HD74HC4040P 12-STAGE BINARY COUNTER (DIP16)
+    315-5338A   SEGA CUSTOM (QFP100)
+    M27C512     ST MICROELECTRONICS M27C512-15F1 (DIP28, labeled 'EPR-18022', socketed)
+    GAL16V8B    LATTICE GAL16V8B-25LP HIGH PERFORMANCE E2CMOS PLD GENERIC ARRAY LOGIC (DIP28, socketed)
+    SN74LS32N   MOTOROLA SN74LS32N QUAD 2-INPUT OR GATE (DIP14)
+    SN74LS04N   MOTOROLA SN74LS04N HEX INVERTER (DIP14)
+    MB3771      FUJITSU MB3771 POWER SUPPLY VOLTAGE MONITOR (SOP8)
+    Board:
+        837-11854  Sega VERSUS CITY BILLBOARD CONTROL BD
+    EEPROM:
+        EPR-18022.IC2    Sega VERSUS CITY BILLBOARD
+    Notes:
+        SW1     8-DIP switch
+        CN2     10 pin connector for power input (5v)
+        CN3 J50 pin connector for two 7-SEG UNITs (VSC-0220, connects at VSC-0221 7SEG BASE)
+    CN4 J20 pin connector to BLUE(U-P) PANEL
+        (600-6770-005 WIRE HARN BILLBOARD FLT BD, CN7(?) and CN11 for Model3, CN6 and CN12 for Model2)
+        CN5 has no connector soldered and as such is unused and has two silkscreened PS2501-4 ICs below,
+        similar to the ICs under CN4
+        171-6218B is printed to right of (C) SEGA 1991 on bottom of board
+*/
 #include "emu.h"
 #include "segabill.h"
 #include "cpu/z80/z80.h"
@@ -99,7 +148,7 @@ const tiny_rom_entry *sega_billboard_device::device_rom_region() const
 
 void sega_billboard_device::device_add_mconfig(machine_config &config)
 {
-	Z80(config, m_billcpu, 32_MHz_XTAL / 8); // divisor guessed
+	Z80(config, m_billcpu, 32_MHz_XTAL / 4); // Z0840008PSC 8MHz rated part - not verified
 	m_billcpu->set_addrmap(AS_PROGRAM, &sega_billboard_device::mem_map);
 	m_billcpu->set_addrmap(AS_IO, &sega_billboard_device::io_map);
 	m_billcpu->set_periodic_int(FUNC(sega_billboard_device::irq0_line_hold), attotime::from_hz(32_MHz_XTAL/65536)); // timing?

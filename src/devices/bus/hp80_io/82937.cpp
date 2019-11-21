@@ -56,7 +56,8 @@ constexpr unsigned P1_NDAC_BIT = 1;
 constexpr unsigned P1_NRFD_BIT = 0;
 
 hp82937_io_card_device::hp82937_io_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: hp80_io_card_device(mconfig , HP82937_IO_CARD , tag , owner , clock),
+	: device_t(mconfig , HP82937_IO_CARD , tag , owner , clock),
+	  device_hp80_io_interface(mconfig, *this),
 	  m_cpu(*this , "cpu"),
 	  m_translator(*this , "xlator"),
 	  m_sw1(*this , "sw1"),
@@ -70,7 +71,7 @@ hp82937_io_card_device::~hp82937_io_card_device()
 
 void hp82937_io_card_device::install_read_write_handlers(address_space& space , uint16_t base_addr)
 {
-	space.install_readwrite_handler(base_addr , base_addr + 1 , READ8_DEVICE_DELEGATE(m_translator , hp_1mb5_device , cpu_r) , WRITE8_DEVICE_DELEGATE(m_translator , hp_1mb5_device , cpu_w));
+	space.install_readwrite_handler(base_addr, base_addr + 1, read8_delegate(*m_translator, FUNC(hp_1mb5_device::cpu_r)), write8_delegate(*m_translator, FUNC(hp_1mb5_device::cpu_w)));
 }
 
 void hp82937_io_card_device::inten()
@@ -243,8 +244,6 @@ void hp82937_io_card_device::device_start()
 
 void hp82937_io_card_device::device_reset()
 {
-	hp80_io_card_device::device_reset();
-
 	m_latch = 0;
 	m_updating = false;
 	update_signals();

@@ -72,7 +72,7 @@ void fgoal_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 		interrupt_callback(ptr, param);
 		break;
 	default:
-		assert_always(false, "Unknown id in fgoal_state::device_timer");
+		throw emu_fatalerror("Unknown id in fgoal_state::device_timer");
 	}
 }
 
@@ -142,13 +142,13 @@ READ8_MEMBER(fgoal_state::row_r)
 WRITE8_MEMBER(fgoal_state::row_w)
 {
 	m_row = data;
-	m_mb14241->shift_data_w(space, 0, 0);
+	m_mb14241->shift_data_w(0);
 }
 
 WRITE8_MEMBER(fgoal_state::col_w)
 {
 	m_col = data;
-	m_mb14241->shift_count_w(space, 0, data);
+	m_mb14241->shift_count_w(data);
 }
 
 READ8_MEMBER(fgoal_state::address_hi_r)
@@ -163,14 +163,14 @@ READ8_MEMBER(fgoal_state::address_lo_r)
 
 READ8_MEMBER(fgoal_state::shifter_r)
 {
-	uint8_t v = m_mb14241->shift_result_r(space, 0);
+	uint8_t v = m_mb14241->shift_result_r();
 
 	return bitswap<8>(v, 7, 6, 5, 4, 3, 2, 1, 0);
 }
 
 READ8_MEMBER(fgoal_state::shifter_reverse_r)
 {
-	uint8_t v = m_mb14241->shift_result_r(space, 0);
+	uint8_t v = m_mb14241->shift_result_r();
 
 	return bitswap<8>(v, 0, 1, 2, 3, 4, 5, 6, 7);
 }

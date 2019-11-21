@@ -333,7 +333,7 @@ void gal3_state::cpu_mst_map(address_map &map)
 {
 	map(0x00000000, 0x001fffff).rom();
 	map(0x20000000, 0x20001fff).ram().share("nvmem");   //NVRAM
-/// AM_RANGE(0x40000000, 0x4000ffff) AM_WRITE() //
+/// map(0x40000000, 0x4000ffff).w(FUNC(gal3_state::)); //
 	map(0x44000000, 0x44000003).portr("DSW_CPU_mst");
 	map(0x44800000, 0x44800003).r(FUNC(gal3_state::led_mst_r)).w(FUNC(gal3_state::led_mst_w)); //LEDs
 	map(0x48000000, 0x48000003).nopr(); //irq1 v-blank ack
@@ -341,21 +341,21 @@ void gal3_state::cpu_mst_map(address_map &map)
 	map(0x60000000, 0x60007fff).ram().share("share1");  //CRAM
 	map(0x60010000, 0x60017fff).ram().share("share1");  //Mirror
 	map(0x80000000, 0x8007ffff).ram(); //512K Local RAM
-/// AM_RANGE(0xc0000000, 0xc000000b) AM_WRITENOP    //upload?
+/// map(0xc0000000, 0xc000000b).nopw();    //upload?
 	map(0xc000000c, 0xc000000f).nopr(); //irq2 ack
-/// AM_RANGE(0xd8000000, 0xd800000f) AM_RAM // protection or 68681?
+/// map(0xd8000000, 0xd800000f).ram(); // protection or 68681?
 	map(0xf2800000, 0xf2800fff).rw(FUNC(gal3_state::rso_r), FUNC(gal3_state::rso_w)); //RSO PCB
 }
 
 void gal3_state::cpu_slv_map(address_map &map)
 {
 	map(0x00000000, 0x0007ffff).rom();
-/// AM_RANGE(0x40000000, 0x4000ffff) AM_WRITE() //
+/// map(0x40000000, 0x4000ffff).w(FUNC(gal3_state::)); //
 	map(0x44000000, 0x44000003).portr("DSW_CPU_slv");
 	map(0x44800000, 0x44800003).r(FUNC(gal3_state::led_slv_r)).w(FUNC(gal3_state::led_slv_w)); //LEDs
 	map(0x48000000, 0x48000003).nopr(); //irq1 ack
-/// AM_RANGE(0x50000000, 0x50000003) AM_READ() AM_WRITE()
-/// AM_RANGE(0x54000000, 0x54000003) AM_READ() AM_WRITE()
+/// map(0x50000000, 0x50000003).rw(FUNC(gal3_state::), FUNC(gal3_state::));
+/// map(0x54000000, 0x54000003).rw(FUNC(gal3_state::), FUNC(gal3_state::));
 	map(0x60000000, 0x60007fff).ram().share("share1");
 	map(0x60010000, 0x60017fff).ram().share("share1");
 	map(0x80000000, 0x8007ffff).ram(); //512K Local RAM
@@ -392,7 +392,7 @@ void gal3_state::rs_cpu_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x100000, 0x10ffff).ram(); //64K working RAM
 
-/// AM_RANGE(0x180000, 0x183fff) AM_RAM //Nvram
+/// map(0x180000, 0x183fff).ram(); //Nvram
 
 	map(0x1c0000, 0x1c0001).ram(); //148?
 	map(0x1c2000, 0x1c2001).ram(); //?
@@ -449,24 +449,24 @@ void gal3_state::rs_cpu_map(address_map &map)
 	map(0xc00000, 0xc0000f).ram(); //?
 	map(0xc40000, 0xc43fff).ram(); //8 bit
 
-/// AM_RANGE(0xc44000, 0xffffff) AM_RAM /////////////
+/// map(0xc44000, 0xffffff).ram(); /////////////
 }
 
 void gal3_state::sound_cpu_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x080000, 0x08ffff).ram();
-/// AM_RANGE(0x0c0000, 0x0cffff) AM_RAM //00, 20, 30, 40, 50
-/// AM_RANGE(0x100000, 0x10000f) AM_RAM
+/// map(0x0c0000, 0x0cffff).ram(); //00, 20, 30, 40, 50
+/// map(0x100000, 0x10000f).ram();
 	map(0x110000, 0x113fff).ram();
-/// AM_RANGE(0x120000, 0x120003) AM_RAM //2ieme byte
-/// AM_RANGE(0x200000, 0x20017f) AM_RAM //C140
+/// map(0x120000, 0x120003).ram(); //2ieme byte
+/// map(0x200000, 0x20017f).ram(); //C140
 	map(0x200000, 0x2037ff).rw(m_c140_16a, FUNC(c140_device::c140_r), FUNC(c140_device::c140_w)).umask16(0x00ff);    //C140///////////
-/// AM_RANGE(0x201000, 0x20117f) AM_RAM //C140
-/// AM_RANGE(0x202000, 0x20217f) AM_RAM //C140
-/// AM_RANGE(0x203000, 0x20317f) AM_RAM //C140
+/// map(0x201000, 0x20117f).ram(); //C140
+/// map(0x202000, 0x20217f).ram(); //C140
+/// map(0x203000, 0x20317f).ram(); //C140
 	map(0x204000, 0x2047ff).rw(m_c140_16g, FUNC(c140_device::c140_r), FUNC(c140_device::c140_w)).umask16(0x00ff);    //C140
-/// AM_RANGE(0x090000, 0xffffff) AM_RAM
+/// map(0x090000, 0xffffff).ram();
 }
 
 void gal3_state::psn_b1_cpu_map(address_map &map)
@@ -605,7 +605,7 @@ void gal3_state::gal3(machine_config &config)
     m68000_device &psn_b3_cpu(M68000(config, "psn_b3_cpu", 12000000)); // ??
     psn_b3_cpu.set_addrmap(AS_PROGRAM, &gal3_state::psn_b1_cpu_map);
 */
-	config.m_minimum_quantum = attotime::from_hz(60*8000); /* 8000 CPU slices per frame */
+	config.set_maximum_quantum(attotime::from_hz(60*8000)); /* 8000 CPU slices per frame */
 
 	NVRAM(config, "nvmem", nvram_device::DEFAULT_ALL_0);
 

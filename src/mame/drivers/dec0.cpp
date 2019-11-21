@@ -54,21 +54,7 @@ ToDo:
 - Hook up the 68705 in Midnight Resistance (bootleg) (it might not be used, leftover from the Fighting Fantasy bootleg on the same PCB?)
 - Get rid of ROM patch in Hippodrome;
 - background pen in Birdie Try is presumably wrong.
-- Pixel clock frequency isn't verified;
-- Finally, get a proper decap of the MCU used by Dragonninja
-
-
-The current Dragonninja MCU program was made by hacking the expected startup
-synchronisation command in the Bad Dudes MCU program (location $09A4 changed
-from $0B to $03).  There may be other differences in a real Dragonninja MCU.
-The table of expected values for command 7 is the same for Dragonninja (from
-debugging main CPU program).
-
-Bad Dudes only seems to use commands $0B (sync), $01 (reset if parameter is not
-$3B), $07 (return table index if parameter matches table otherwise reset) and
-$09 (set table index to zero).  Dragonninja only seems to use commands $03 (on
-startup), $07 (same function as Bad Dudes) and $09 (same function as Bad
-Dudes).  Most of the MCU program isn't utilised.
+- Pixel clock frequency isn't verified
 
 
 Guru-Readme for Data East 16 bit games (Updated 7-Feb-2017)
@@ -1874,7 +1860,7 @@ void dec0_automat_state::automat(machine_config &config)
 	m_tilegen[2]->set_gfxdecode_tag("gfxdecode");
 
 	DECO_MXC06(config, m_spritegen, 0);
-	m_spritegen->set_colpri_callback(FUNC(dec0_automat_state::robocop_colpri_cb), this);
+	m_spritegen->set_colpri_callback(FUNC(dec0_automat_state::robocop_colpri_cb));
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 1024);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_automat);
@@ -2000,7 +1986,7 @@ void dec0_state::hbarrel(machine_config &config)
 
 	/* video hardware */
 	m_screen->set_screen_update(FUNC(dec0_state::screen_update_hbarrel));
-	m_spritegen->set_colpri_callback(FUNC(dec0_state::hbarrel_colpri_cb), this);
+	m_spritegen->set_colpri_callback(FUNC(dec0_state::hbarrel_colpri_cb));
 }
 
 void dec0_state::bandit(machine_config &config)
@@ -2026,7 +2012,7 @@ void dec0_state::bandit(machine_config &config)
 
 	/* video hardware */
 	m_screen->set_screen_update(FUNC(dec0_state::screen_update_bandit));
-	m_spritegen->set_colpri_callback(FUNC(dec0_state::bandit_colpri_cb), this);
+	m_spritegen->set_colpri_callback(FUNC(dec0_state::bandit_colpri_cb));
 }
 
 void dec0_state::baddudes(machine_config &config)
@@ -2059,7 +2045,7 @@ void dec0_state::birdtry(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &dec0_state::dec0_tb_map);
 
 	// needs a tight sync with the mcu
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 
 	i8751_device &mcu(I8751(config, m_mcu, XTAL(8'000'000)));
 	mcu.port_in_cb<0>().set(FUNC(dec0_state::dec0_mcu_port0_r));
@@ -2090,11 +2076,11 @@ void dec0_state::robocop(machine_config &config)
 	m_subcpu->set_addrmap(AS_PROGRAM, &dec0_state::robocop_sub_map);
 	m_subcpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
-	config.m_minimum_quantum = attotime::from_hz(3000);  /* Interleave between HuC6280 & 68000 */
+	config.set_maximum_quantum(attotime::from_hz(3000));  /* Interleave between HuC6280 & 68000 */
 
 	/* video hardware */
 	m_screen->set_screen_update(FUNC(dec0_state::screen_update_robocop));
-	m_spritegen->set_colpri_callback(FUNC(dec0_state::robocop_colpri_cb), this);
+	m_spritegen->set_colpri_callback(FUNC(dec0_state::robocop_colpri_cb));
 }
 
 void dec0_state::robocopb(machine_config &config)
@@ -2103,7 +2089,7 @@ void dec0_state::robocopb(machine_config &config)
 
 	/* video hardware */
 	m_screen->set_screen_update(FUNC(dec0_state::screen_update_robocop));
-	m_spritegen->set_colpri_callback(FUNC(dec0_state::robocop_colpri_cb), this);
+	m_spritegen->set_colpri_callback(FUNC(dec0_state::robocop_colpri_cb));
 }
 
 void dec0_state::hippodrm(machine_config &config)
@@ -2116,7 +2102,7 @@ void dec0_state::hippodrm(machine_config &config)
 	m_subcpu->set_addrmap(AS_PROGRAM, &dec0_state::hippodrm_sub_map);
 	m_subcpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
-	config.m_minimum_quantum = attotime::from_hz(300);   /* Interleave between H6280 & 68000 */
+	config.set_maximum_quantum(attotime::from_hz(300));   /* Interleave between H6280 & 68000 */
 
 	/* video hardware */
 	m_screen->set_screen_update(FUNC(dec0_state::screen_update_hippodrm));
@@ -2132,7 +2118,7 @@ void dec0_state::ffantasybl(machine_config &config)
 //  m_subcpu->set_addrmap(AS_PROGRAM, &dec0_state::hippodrm_sub_map);
 //  m_subcpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
-//  config.m_minimum_quantum = attotime::from_hz(300);   /* Interleave between H6280 & 68000 */
+//  config.set_maximum_quantum(attotime::from_hz(300));   /* Interleave between H6280 & 68000 */
 
 	/* video hardware */
 	m_screen->set_screen_update(FUNC(dec0_state::screen_update_hippodrm));
@@ -2185,7 +2171,7 @@ void dec0_state::midres(machine_config &config)
 
 	/* video hardware */
 	m_screen->set_screen_update(FUNC(dec0_state::screen_update_midres));
-	m_spritegen->set_colpri_callback(FUNC(dec0_state::midres_colpri_cb), this);
+	m_spritegen->set_colpri_callback(FUNC(dec0_state::midres_colpri_cb));
 
 	m_gfxdecode->set_info(gfx_midres);
 }
@@ -2386,9 +2372,8 @@ ROM_START( drgninja ) /* DE-0297-0 main board, DE-0299-0 sub/rom board */
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound CPU */
 	ROM_LOAD( "eg07.8a",   0x8000, 0x8000, CRC(001d2f51) SHA1(f186671f0450ccf9201577a5caf0efc490c6645e) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )  /* i8751 microcontroller - using hacked baddudes program */
-	ROM_LOAD( "eg31.9a",   0x0000, 0x1000, CRC(c3f6bc70) SHA1(3c80197dc70c6cb283df5d11d29a9d9baabcd99b) BAD_DUMP ) // Hand crafted, needs real dump
-
+	ROM_REGION( 0x1000, "mcu", 0 )  /* i8751 microcontroller */
+	ROM_LOAD( "eg31.9a",   0x0000, 0x1000, CRC(657aab2d) SHA1(c3b3837d1208596509e09ddd8e3e58845a4e07b2) )
 	/* various graphic and sound roms also differ when compared to baddudes */
 
 	ROM_REGION( 0x10000, "gfx1", 0 ) /* chars */
@@ -2569,6 +2554,56 @@ ROM_END
 
 
 ROM_START( birdtry ) /* DE-0311-0 main board, DE-0299-2 sub/rom board */
+	ROM_REGION( 0x60000, "maincpu", 0 ) /* 6*64k for 68000 code */
+	ROM_LOAD16_BYTE( "ek-04-2.3c", 0x00000, 0x10000, CRC(5f0f4686) SHA1(5eea74f5626339ebd50e623029f21f1cd0f93135) )
+	ROM_LOAD16_BYTE( "ek-01-2.3a", 0x00001, 0x10000, CRC(47f470db) SHA1(8fcb043d02e1c04c8517781715da4dd4ee3bb8fb) )
+	ROM_LOAD16_BYTE( "ek-05-1.4c", 0x20000, 0x10000, CRC(b508cffd) SHA1(c1861a2420d99e19d889881f9164fe4ff667a1be) )
+	ROM_LOAD16_BYTE( "ek-02-1.4a", 0x20001, 0x10000, CRC(0195d989) SHA1(cff48d57b2085263e12413ae19757cdcc7028282) )
+	ROM_LOAD16_BYTE( "ek-06-1.6c", 0x40000, 0x10000, CRC(301d57d8) SHA1(64fd77aa2fbb235c86f0f84603e5272b4f4bba85) )
+	ROM_LOAD16_BYTE( "ek-03-1.6a", 0x40001, 0x10000, CRC(73b0acc5) SHA1(76b79c9f02de2e53093ded66a1639b40cd2640e8) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 6502 Sound */
+	ROM_LOAD( "ek-07.8a", 0x8000, 0x8000, CRC(236549bc) SHA1(1f664a277b3451b7905638abdf98c7e428b2e935) )
+
+	ROM_REGION( 0x1000, "mcu", 0 )  /* i8751 microcontroller */
+	ROM_LOAD( "ek-31-1.9a", 0x0000, 0x1000, CRC(3bf41abb) SHA1(d1833f5b59547c17f2683f4f2dced7ead3608d49) ) /* revised code / game data */
+
+	ROM_REGION( 0x10000, "gfx1", 0 ) /* chars */
+	ROM_LOAD( "ek-25.15h", 0x00000, 0x08000, CRC(4df134ad) SHA1(f2cfa7e3fc4a2ac40897c2600c901ff75237e081) )
+	ROM_LOAD( "ek-26.16h", 0x08000, 0x08000, CRC(a00d3e8e) SHA1(3ac8511d55a684a5b2bc05d8d520169447a66840) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 ) /* tiles */
+	ROM_LOAD( "ek-18.14d", 0x00000, 0x10000, CRC(9886fb70) SHA1(d36c41bfe217affab7f9deec64ff3f12e3efa28c) )
+	ROM_LOAD( "ek-17.12d", 0x10000, 0x10000, CRC(bed91bf7) SHA1(f0ffc557a4c216a5a2e180b4c2366e7b49630064) )
+	ROM_LOAD( "ek-20.17d", 0x20000, 0x10000, CRC(45d53965) SHA1(d54d33cc82e099bcb511de8ee26cdcc64a0b8f1d) )
+	ROM_LOAD( "ek-19.15d", 0x30000, 0x10000, CRC(c2949dd2) SHA1(d4317f8e0d9957feda54ee6d05aafb3f74f243d1) )
+	ROM_LOAD( "ek-22.14f", 0x40000, 0x10000, CRC(7f2cc80a) SHA1(f2539515fcf0b6dc90134d399baf779c50b19c0d) )
+	ROM_LOAD( "ek-21.12f", 0x50000, 0x10000, CRC(281bc793) SHA1(836fc2900b7197c886c23d9eeb1a80aed85c4d13) )
+	ROM_LOAD( "ek-24.17f", 0x60000, 0x10000, CRC(2244cc75) SHA1(67c9868927319abe80a932203e8ac6595ae455b3) )
+	ROM_LOAD( "ek-23.15f", 0x70000, 0x10000, CRC(d0ed0116) SHA1(a35e64ecac57585b83e830a1bf90a402c931f071) )
+
+	ROM_REGION( 0x10000, "gfx3", ROMREGION_ERASEFF ) /* tiles */
+	/* This game doesn't have the extra playfield chip, so no roms */
+
+	ROM_REGION( 0x80000, "gfx4", 0 ) /* sprites */
+	ROM_LOAD( "ek-15.16c", 0x00000, 0x10000, CRC(a6a041a3) SHA1(3b8d18d5821e6d354ed97a4f547f1b2bee8674f5) )
+	ROM_LOAD( "ek-16.17c", 0x10000, 0x08000, CRC(784f62b0) SHA1(b68b234a5f469149d481645290a3251667bdab27) )
+	ROM_LOAD( "ek-11.16a", 0x20000, 0x10000, CRC(9224a6b9) SHA1(547c22db1728a85035a682eb54ce654a98a4ba3d) )
+	ROM_LOAD( "ek-12.17a", 0x30000, 0x08000, CRC(12deecfa) SHA1(22e33ccc6623957533028f720e9a746f36217ded) )
+	ROM_LOAD( "ek-13.13c", 0x40000, 0x10000, CRC(1f023459) SHA1(e502edb4078168df4677a6d3aa43770eb8e49caa) )
+	ROM_LOAD( "ek-14.14c", 0x50000, 0x08000, CRC(57d54943) SHA1(9639fad61919652c1564b24926845d228d016ca0) )
+	ROM_LOAD( "ek-09.13a", 0x60000, 0x10000, CRC(6d2d488a) SHA1(40b21a4bc8a4641a6f80d7579e32fe9d69eb42f1) )
+	ROM_LOAD( "ek-10.14a", 0x70000, 0x08000, CRC(580ba206) SHA1(8e57e4ef8c732b85e494bd6ec5da6566f27540e6) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
+	ROM_LOAD( "ek-08.2c", 0x0000, 0x10000, CRC(be3db6cb) SHA1(4e8b8e0bef3a3f36d7e641e27b5f48c8fe9a8b7f) )
+
+	ROM_REGION( 0x600, "proms", 0 ) /* PROMs */
+	ROM_LOAD( "mb7116e.12c", 0x000, 0x200, CRC(86e775f8) SHA1(e8dee3d56fb5ca0fd7f9ce05a84674abb139d008) ) /* Also known to be labeled as A-1 */
+	ROM_LOAD( "mb7122e.17e", 0x200, 0x400, CRC(a5cda23e) SHA1(d6c8534ae3c95b47a0701047fef67f15dd71f3fe) ) /* Also known to be labeled as A-2 */
+ROM_END
+
+ROM_START( birdtrya ) /* DE-0311-0 main board, DE-0299-2 sub/rom board */
 	ROM_REGION( 0x60000, "maincpu", 0 ) /* 6*64k for 68000 code */
 	ROM_LOAD16_BYTE( "ek-04-2.3c", 0x00000, 0x10000, CRC(5f0f4686) SHA1(5eea74f5626339ebd50e623029f21f1cd0f93135) )
 	ROM_LOAD16_BYTE( "ek-01-2.3a", 0x00001, 0x10000, CRC(47f470db) SHA1(8fcb043d02e1c04c8517781715da4dd4ee3bb8fb) )
@@ -3983,10 +4018,10 @@ ROM_END
 
 void dec0_state::init_midresb()
 {
-//  m_maincpu->space(AS_PROGRAM).install_read_handler(0x00180000, 0x0018000f, read16_delegate(FUNC(dec0_state::dec0_controls_r),this));
-//  m_maincpu->space(AS_PROGRAM).install_read_handler(0x001a0000, 0x001a000f, read16_delegate(FUNC(dec0_state::dec0_rotary_r),this));
+//  m_maincpu->space(AS_PROGRAM).install_read_handler(0x00180000, 0x0018000f, read16_delegate(*this, FUNC(dec0_state::dec0_controls_r)));
+//  m_maincpu->space(AS_PROGRAM).install_read_handler(0x001a0000, 0x001a000f, read16_delegate(*this, FUNC(dec0_state::dec0_rotary_r)));
 
-//  m_maincpu->space(AS_PROGRAM).install_write_handler(0x00180014, 0x00180015, write16_delegate(FUNC(dec0_state::midres_sound_w),this));
+//  m_maincpu->space(AS_PROGRAM).install_write_handler(0x00180014, 0x00180015, write16_delegate(*this, FUNC(dec0_state::midres_sound_w)));
 }
 
 READ16_MEMBER(dec0_state::ffantasybl_242024_r)
@@ -4006,7 +4041,7 @@ void dec0_state::init_ffantasybl()
 {
 	m_maincpu->space(AS_PROGRAM).install_ram(0x24c880, 0x24cbff); // what is this? layer 3-related??
 
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00242024, 0x00242025, read16_delegate(FUNC(dec0_state::ffantasybl_242024_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00242024, 0x00242025, read16_delegate(*this, FUNC(dec0_state::ffantasybl_242024_r)));
 	m_maincpu->space(AS_PROGRAM).install_read_port(0x00ff87ee, 0x00ff87ef, "VBLANK");
 }
 
@@ -4017,7 +4052,8 @@ GAME( 1987, hbarrel,    0,        hbarrel,    hbarrel,    dec0_state, init_hbarr
 GAME( 1987, hbarrelu,   hbarrel,  hbarrel,    hbarrel,    dec0_state, init_hbarrel,    ROT270, "Data East USA",         "Heavy Barrel (US)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, baddudes,   0,        baddudes,   baddudes,   dec0_state, init_hbarrel,    ROT0,   "Data East USA",         "Bad Dudes vs. Dragonninja (US revision 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, drgninja,   baddudes, baddudes,   drgninja,   dec0_state, init_hbarrel,    ROT0,   "Data East Corporation", "Dragonninja (Japan revision 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, birdtry,    0,        birdtry,    birdtry,    dec0_state, init_hbarrel,    ROT270, "Data East Corporation", "Birdie Try (Japan revision 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, birdtry,    0,        birdtry,    birdtry,    dec0_state, init_hbarrel,    ROT270, "Data East Corporation", "Birdie Try (Japan revision 2, revision 1 MCU)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, birdtrya,   birdtry,  birdtry,    birdtry,    dec0_state, init_hbarrel,    ROT270, "Data East Corporation", "Birdie Try (Japan revision 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, robocop,    0,        robocop,    robocop,    dec0_state, empty_init,      ROT0,   "Data East Corporation", "Robocop (World revision 4)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, robocopw,   robocop,  robocop,    robocop,    dec0_state, empty_init,      ROT0,   "Data East Corporation", "Robocop (World revision 3)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, robocopj,   robocop,  robocop,    robocop,    dec0_state, empty_init,      ROT0,   "Data East Corporation", "Robocop (Japan)", MACHINE_SUPPORTS_SAVE )

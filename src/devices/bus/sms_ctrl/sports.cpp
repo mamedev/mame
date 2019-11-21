@@ -74,7 +74,7 @@ void sms_sports_pad_device::device_timer(emu_timer &timer, device_timer_id id, i
 
 		break;
 	default:
-		assert_always(false, "Unknown id in sms_sports_pad_device::device_timer");
+		throw emu_fatalerror("sms_sports_pad_device(%s): Unknown timer ID", tag());
 	}
 }
 

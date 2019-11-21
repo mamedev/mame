@@ -94,7 +94,7 @@ void is48x_state::is482(machine_config &config)
 	m_crtc->set_char_width(14); // guess
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
-	m_crtc->set_update_row_callback(FUNC(is48x_state::update_row), this);
+	m_crtc->set_update_row_callback(FUNC(is48x_state::update_row));
 }
 
 ROM_START(is482) // "IS-488-A" on case

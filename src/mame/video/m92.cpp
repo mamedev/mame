@@ -55,7 +55,7 @@ void m92_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 		m_upd71059c->ir1_w(1);
 		break;
 	default:
-		assert_always(false, "Unknown id in m92_state::device_timer");
+		throw emu_fatalerror("Unknown id in m92_state::device_timer");
 	}
 }
 
@@ -241,8 +241,8 @@ VIDEO_START_MEMBER(m92_state,m92)
 		M92_pf_layer_info *layer = &m_pf_layer[laynum];
 
 		/* allocate two tilemaps per layer, one normal, one wide */
-		layer->tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m92_state::get_pf_tile_info),this), TILEMAP_SCAN_ROWS,  8,8, 64,64);
-		layer->wide_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m92_state::get_pf_tile_info),this), TILEMAP_SCAN_ROWS,  8,8, 128,64);
+		layer->tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(m92_state::get_pf_tile_info)), TILEMAP_SCAN_ROWS,  8,8, 64,64);
+		layer->wide_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(m92_state::get_pf_tile_info)), TILEMAP_SCAN_ROWS,  8,8, 128,64);
 
 		/* set the user data for each one to point to the layer */
 		layer->tmap->set_user_data(&m_pf_layer[laynum]);

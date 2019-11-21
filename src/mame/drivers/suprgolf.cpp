@@ -114,7 +114,7 @@ TILE_GET_INFO_MEMBER(suprgolf_state::get_tile_info)
 
 void suprgolf_state::video_start()
 {
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(suprgolf_state::get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32 );
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(suprgolf_state::get_tile_info)), TILEMAP_SCAN_ROWS,8,8,32,32 );
 	m_paletteram = std::make_unique<uint8_t[]>(0x1000);
 	m_bg_vram = std::make_unique<uint8_t[]>(0x2000*0x20);
 	m_bg_fb = std::make_unique<uint16_t[]>(0x2000*0x20);

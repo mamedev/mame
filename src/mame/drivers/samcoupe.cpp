@@ -65,7 +65,7 @@ void samcoupe_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		sam_video_update_callback(ptr, param);
 		break;
 	default:
-		assert_always(false, "Unknown id in samcoupe_state::device_timer");
+		throw emu_fatalerror("Unknown id in samcoupe_state::device_timer");
 	}
 }
 
@@ -291,10 +291,10 @@ WRITE8_MEMBER(samcoupe_state::samcoupe_lpt2_strobe_w)
 
 void samcoupe_state::samcoupe_mem(address_map &map)
 {
-	map(0x0000, 0x3fff).ram().rw(FUNC(samcoupe_state::sam_bank1_r), FUNC(samcoupe_state::sam_bank1_w)); // AM_RAMBANK("bank1")
-	map(0x4000, 0x7fff).ram().rw(FUNC(samcoupe_state::sam_bank2_r), FUNC(samcoupe_state::sam_bank2_w)); // AM_RAMBANK("bank2")
-	map(0x8000, 0xbfff).ram().rw(FUNC(samcoupe_state::sam_bank3_r), FUNC(samcoupe_state::sam_bank3_w)); // AM_RAMBANK("bank3")
-	map(0xc000, 0xffff).ram().rw(FUNC(samcoupe_state::sam_bank4_r), FUNC(samcoupe_state::sam_bank4_w)); // AM_RAMBANK("bank4")
+	map(0x0000, 0x3fff).ram().rw(FUNC(samcoupe_state::sam_bank1_r), FUNC(samcoupe_state::sam_bank1_w)); // .bankrw("bank1");
+	map(0x4000, 0x7fff).ram().rw(FUNC(samcoupe_state::sam_bank2_r), FUNC(samcoupe_state::sam_bank2_w)); // .bankrw("bank2");
+	map(0x8000, 0xbfff).ram().rw(FUNC(samcoupe_state::sam_bank3_r), FUNC(samcoupe_state::sam_bank3_w)); // .bankrw("bank3");
+	map(0xc000, 0xffff).ram().rw(FUNC(samcoupe_state::sam_bank4_r), FUNC(samcoupe_state::sam_bank4_w)); // .bankrw("bank4");
 }
 
 void samcoupe_state::samcoupe_io(address_map &map)

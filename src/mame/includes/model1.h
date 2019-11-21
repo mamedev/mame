@@ -159,7 +159,7 @@ private:
 	u32 m_copro_isqrt_base;
 	u32 m_copro_atan_base[4];
 	u32 m_copro_data_base;
-	u32 m_copro_ram_adr;
+	u32 m_copro_ram_adr[4];
 
 	uint16_t m_r360_state;
 	DECLARE_READ8_MEMBER(r360_r);

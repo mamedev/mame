@@ -672,10 +672,6 @@ Notes:
 
 TODO:
 ----
-- bosco & galaga:
-  - the starfield is wrong.
-  - The function of STARCLR is unknown. It is not latched and there are no data bits
-    used...
 
 - bosco: is the scrolling tilemap placement correct? It is currently aligned so that
   the test grid shown on startup is correct, but this way an unerased grey strip
@@ -721,6 +717,12 @@ TODO:
 
 #define MASTER_CLOCK (XTAL(18'432'000))
 
+
+#define STARFIELD_X_OFFSET_GALAGA       16
+#define STARFIELD_X_LIMIT_GALAGA 	256 + STARFIELD_X_OFFSET_GALAGA
+
+#define STARFIELD_Y_OFFSET_BOSCO        16
+#define STARFIELD_X_LIMIT_BOSCO		224
 
 
 READ8_MEMBER(galaga_state::bosco_dsw_r)
@@ -796,7 +798,7 @@ TIMER_CALLBACK_MEMBER(galaga_state::cpu3_interrupt_callback)
 	int scanline = param;
 
 	if(m_sub2_nmi_mask)
-		nmi_line_pulse(*m_subcpu2);
+		m_subcpu2->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 
 	scanline = scanline + 128;
 	if (scanline >= 272)
@@ -1651,7 +1653,7 @@ void bosco_state::bosco(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 8);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);  /* 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs */
+	config.set_maximum_quantum(attotime::from_hz(6000));  /* 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs */
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -1663,6 +1665,9 @@ void bosco_state::bosco(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bosco);
 	PALETTE(config, m_palette, FUNC(bosco_state::bosco_palette), 64*4 + 64*4 + 4 + 64, 32+64);
+
+	STARFIELD_05XX(config, m_starfield, 0);
+	m_starfield->set_starfield_config(0, STARFIELD_Y_OFFSET_BOSCO, STARFIELD_X_LIMIT_BOSCO);
 
 	MCFG_VIDEO_START_OVERRIDE(bosco_state,bosco)
 
@@ -1721,7 +1726,7 @@ void galaga_state::galaga(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 8);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);  /* 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs */
+	config.set_maximum_quantum(attotime::from_hz(6000));  /* 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs */
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -1733,6 +1738,9 @@ void galaga_state::galaga(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_galaga);
 	PALETTE(config, m_palette, FUNC(galaga_state::galaga_palette), 64*4 + 64*4 + 4 + 64, 32+64);
+
+	STARFIELD_05XX(config, m_starfield, 0);
+	m_starfield->set_starfield_config(STARFIELD_X_OFFSET_GALAGA, 0, STARFIELD_X_LIMIT_GALAGA);
 
 	MCFG_VIDEO_START_OVERRIDE(galaga_state,galaga)
 
@@ -1823,7 +1831,7 @@ void xevious_state::xevious(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 8);
 
-	config.m_minimum_quantum = attotime::from_hz(60000); /* 1000 CPU slices per frame - a high value to ensure proper synchronization of the CPUs */
+	config.set_maximum_quantum(attotime::from_hz(60000)); /* 1000 CPU slices per frame - a high value to ensure proper synchronization of the CPUs */
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -1931,7 +1939,7 @@ void digdug_state::digdug(machine_config &config)
 	m_videolatch->q_out_cb<3>().set(FUNC(digdug_state::bg_disable_w));
 	m_videolatch->q_out_cb<7>().set(FUNC(digdug_state::flip_screen_w));
 
-	config.m_minimum_quantum = attotime::from_hz(6000);  /* 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs */
+	config.set_maximum_quantum(attotime::from_hz(6000));  /* 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs */
 
 	ER2055(config, m_earom);
 
@@ -3462,8 +3470,8 @@ void xevious_state::init_xevios()
 void battles_state::driver_init()
 {
 	/* replace the Namco I/O handlers with interface to the 4th CPU */
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x7000, 0x700f, read8_delegate(FUNC(battles_state::customio_data0_r),this), write8_delegate(FUNC(battles_state::customio_data0_w),this) );
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x7100, 0x7100, read8_delegate(FUNC(battles_state::customio0_r),this), write8_delegate(FUNC(battles_state::customio0_w),this) );
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x7000, 0x700f, read8_delegate(*this, FUNC(battles_state::customio_data0_r)), write8_delegate(*this, FUNC(battles_state::customio_data0_w)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x7100, 0x7100, read8_delegate(*this, FUNC(battles_state::customio0_r)), write8_delegate(*this, FUNC(battles_state::customio0_w)));
 
 	init_xevious();
 }
@@ -3478,11 +3486,11 @@ GAME( 1981, boscoo2,   bosco,   bosco,   bosco,    bosco_state,   empty_init,   
 GAME( 1981, boscomd,   bosco,   bosco,   boscomd,  bosco_state,   empty_init,   ROT0,   "Namco (Midway license)", "Bosconian (Midway, new version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1981, boscomdo,  bosco,   bosco,   boscomd,  bosco_state,   empty_init,   ROT0,   "Namco (Midway license)", "Bosconian (Midway, old version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1981, galaga,    0,       galaga,  galaga,   galaga_state,  init_galaga,  ROT90,  "Namco", "Galaga (Namco rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1981, galagao,   galaga,  galaga,  galaga,   galaga_state,  init_galaga,  ROT90,  "Namco", "Galaga (Namco)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1981, galagamw,  galaga,  galaga,  galagamw, galaga_state,  init_galaga,  ROT90,  "Namco (Midway license)", "Galaga (Midway set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1981, galagamk,  galaga,  galaga,  galaga,   galaga_state,  init_galaga,  ROT90,  "Namco (Midway license)", "Galaga (Midway set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1981, galagamf,  galaga,  galaga,  galaga,   galaga_state,  init_galaga,  ROT90,  "Namco (Midway license)", "Galaga (Midway set 1 with fast shoot hack)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1981, galaga,    0,       galaga,  galaga,   galaga_state,  init_galaga,  ROT90,  "Namco", "Galaga (Namco rev. B)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, galagao,   galaga,  galaga,  galaga,   galaga_state,  init_galaga,  ROT90,  "Namco", "Galaga (Namco)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, galagamw,  galaga,  galaga,  galagamw, galaga_state,  init_galaga,  ROT90,  "Namco (Midway license)", "Galaga (Midway set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, galagamk,  galaga,  galaga,  galaga,   galaga_state,  init_galaga,  ROT90,  "Namco (Midway license)", "Galaga (Midway set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, galagamf,  galaga,  galaga,  galaga,   galaga_state,  init_galaga,  ROT90,  "Namco (Midway license)", "Galaga (Midway set 1 with fast shoot hack)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1982, xevious,   0,       xevious, xevious,  xevious_state, init_xevious, ROT90,  "Namco", "Xevious (Namco)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, xeviousa,  xevious, xevious, xeviousa, xevious_state, init_xevious, ROT90,  "Namco (Atari license)", "Xevious (Atari, harder)", MACHINE_SUPPORTS_SAVE )
@@ -3499,9 +3507,9 @@ GAME( 1982, digsid,    digdug,  digdug,  digdug,   digdug_state,  empty_init,   
 
 /* Bootlegs with replacement I/O chips */
 
-GAME( 1982, gallag,    galaga,  galagab, galaga,   galaga_state,  init_galaga,  ROT90,  "bootleg", "Gallag", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1984, gatsbee,   galaga,  gatsbee, gatsbee,  galaga_state,  init_galaga,  ROT90,  "hack (Uchida)", "Gatsbee", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1981, nebulbee,  galaga,  galagab, galaga,   galaga_state,  init_galaga,  ROT90,  "bootleg", "Nebulous Bee", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1982, gallag,    galaga,  galagab, galaga,   galaga_state,  init_galaga,  ROT90,  "bootleg", "Gallag", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1984, gatsbee,   galaga,  gatsbee, gatsbee,  galaga_state,  init_galaga,  ROT90,  "hack (Uchida)", "Gatsbee", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1981, nebulbee,  galaga,  galagab, galaga,   galaga_state,  init_galaga,  ROT90,  "bootleg", "Nebulous Bee", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
 GAME( 1982, xevios,    xevious, xevious, xevious,  xevious_state, init_xevios,  ROT90,  "bootleg", "Xevios", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, battles,   xevious, battles, xevious,  battles_state, driver_init,  ROT90,  "bootleg", "Battles (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

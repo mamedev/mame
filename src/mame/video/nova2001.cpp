@@ -149,30 +149,30 @@ TILE_GET_INFO_MEMBER(nova2001_state::raiders5_get_fg_tile_info)
 
 VIDEO_START_MEMBER(nova2001_state,nova2001)
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nova2001_state::nova2001_get_bg_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nova2001_state::nova2001_get_fg_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(nova2001_state::nova2001_get_bg_tile_info)), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(nova2001_state::nova2001_get_fg_tile_info)), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 	m_bg_tilemap->set_scrolldx(0, -7);
 }
 
 VIDEO_START_MEMBER(nova2001_state,pkunwar)
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nova2001_state::pkunwar_get_bg_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(nova2001_state::pkunwar_get_bg_tile_info)), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
 	m_bg_tilemap->set_transparent_pen(0);
 }
 
 VIDEO_START_MEMBER(nova2001_state,ninjakun)
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nova2001_state::ninjakun_get_bg_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nova2001_state::ninjakun_get_fg_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(nova2001_state::ninjakun_get_bg_tile_info)), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(nova2001_state::ninjakun_get_fg_tile_info)), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 	m_bg_tilemap->set_scrolldx(7, 0);
 }
 
 VIDEO_START_MEMBER(nova2001_state,raiders5)
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nova2001_state::raiders5_get_bg_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nova2001_state::raiders5_get_fg_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(nova2001_state::raiders5_get_bg_tile_info)), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(nova2001_state::raiders5_get_fg_tile_info)), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 	m_bg_tilemap->set_scrolldx(7, 0);
 }

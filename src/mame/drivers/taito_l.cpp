@@ -541,7 +541,7 @@ void taitol_1cpu_state::puzznici_map(address_map &map)
 	map(0xa000, 0xa003).r(FUNC(taitol_1cpu_state::extport_select_and_ym2203_r)).w(m_ymsnd, FUNC(ym2203_device::write));
 	map(0xa800, 0xa800).nopr(); // Watchdog
 	map(0xb801, 0xb801).r(FUNC(taitol_1cpu_state::mcu_control_r));
-//  AM_RANGE(0xb801, 0xb801) AM_WRITE(mcu_control_w)
+//  map(0xb801, 0xb801).w(FUNC(taitol_1cpu_state::mcu_control_w));
 	map(0xbc00, 0xbc00).nopw();    // Control register, function unknown
 }
 
@@ -584,10 +584,10 @@ void horshoes_state::horshoes_map(address_map &map)
 	common_banks_map(map);
 	map(0x8000, 0x9fff).ram();
 	map(0xa000, 0xa003).r(FUNC(horshoes_state::extport_select_and_ym2203_r)).w(m_ymsnd, FUNC(ym2203_device::write));
-	map(0xa800, 0xa800).select(0x000c).lr8("upd4701_r",
+	map(0xa800, 0xa800).select(0x000c).lr8(NAME(
 										   [this](address_space &space, offs_t offset, u8 mem_mask) {
 											   return m_upd4701->read_xy(space, offset >> 2, mem_mask);
-										   });
+										   }));
 	map(0xa802, 0xa802).r(m_upd4701, FUNC(upd4701_device::reset_x_r));
 	map(0xa803, 0xa803).r(m_upd4701, FUNC(upd4701_device::reset_y_r));
 	map(0xb801, 0xb801).nopr(); // Watchdog or interrupt ack
@@ -1488,7 +1488,7 @@ void fhawk_state::fhawk(machine_config &config)
 	slave.set_addrmap(AS_PROGRAM, &fhawk_state::fhawk_2_map);
 	slave.set_vblank_int("screen", FUNC(taitol_state::irq0_line_hold));
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_main_cpu);
 
 	tc0220ioc_device &tc0220ioc(TC0220IOC(config, "tc0220ioc", 0));
 	tc0220ioc.read_0_callback().set_ioport("DSWA");
@@ -1553,7 +1553,7 @@ void taitol_2cpu_state::raimais(machine_config &config)
 	slave.set_addrmap(AS_PROGRAM, &taitol_2cpu_state::raimais_2_map);
 	slave.set_vblank_int("screen", FUNC(taitol_state::irq0_line_hold));
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_main_cpu);
 
 	tc0040ioc_device &tc0040ioc(TC0040IOC(config, "tc0040ioc", 0));
 	tc0040ioc.read_0_callback().set_ioport("DSWA");
@@ -1596,7 +1596,7 @@ void taitol_2cpu_state::kurikint(machine_config &config)
 	m_audio_cpu->set_addrmap(AS_PROGRAM, &taitol_2cpu_state::kurikint_2_map);
 	m_audio_cpu->set_vblank_int("screen", FUNC(taitol_state::irq0_line_hold));
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	tc0040ioc_device &tc0040ioc(TC0040IOC(config, "tc0040ioc", 0));
 	tc0040ioc.read_0_callback().set_ioport("DSWA");
@@ -1739,7 +1739,7 @@ void taitol_2cpu_state::evilston(machine_config &config)
 	m_audio_cpu->set_addrmap(AS_PROGRAM, &taitol_2cpu_state::evilston_2_map);
 	m_audio_cpu->set_vblank_int("screen", FUNC(taitol_state::irq0_line_hold));
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	tc0510nio_device &tc0510nio(TC0510NIO(config, "tc0510nio", 0));
 	tc0510nio.read_0_callback().set_ioport("DSWA");

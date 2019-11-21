@@ -11,7 +11,7 @@ public:
 	using uX = typename emu::detail::handler_entry_size<Width>::uX;
 	using inh = handler_entry_read_address<Width, AddrShift, Endian>;
 
-	handler_entry_read_delegate(address_space *space, READ delegate) : handler_entry_read_address<Width, AddrShift, Endian>(space, 0), m_delegate(delegate) {}
+	handler_entry_read_delegate(address_space *space, const READ &delegate) : handler_entry_read_address<Width, AddrShift, Endian>(space, 0), m_delegate(delegate) {}
 	~handler_entry_read_delegate() = default;
 
 	uX read(offs_t offset, uX mem_mask) override;
@@ -70,7 +70,7 @@ public:
 	using uX = typename emu::detail::handler_entry_size<Width>::uX;
 	using inh = handler_entry_write_address<Width, AddrShift, Endian>;
 
-	handler_entry_write_delegate(address_space *space, WRITE delegate) : handler_entry_write_address<Width, AddrShift, Endian>(space, 0), m_delegate(delegate) {}
+	handler_entry_write_delegate(address_space *space, const WRITE &delegate) : handler_entry_write_address<Width, AddrShift, Endian>(space, 0), m_delegate(delegate) {}
 	~handler_entry_write_delegate() = default;
 
 	void write(offs_t offset, uX data, uX mem_mask) override;

@@ -69,7 +69,7 @@ DEFINE_DEVICE_TYPE(SNS_BSX_CART_SLOT,    sns_bsx_cart_slot_device,    "sns_bsx_c
 //-------------------------------------------------
 
 device_sns_cart_interface::device_sns_cart_interface(const machine_config &mconfig, device_t &device) :
-	device_slot_card_interface(mconfig, device),
+	device_interface(device, "snescart"),
 	m_rom(nullptr),
 	m_rom_size(0),
 	m_slot(nullptr)
@@ -268,7 +268,8 @@ static const sns_slot slot_list[] =
 	{ SNES_OBC1,        "lorom_obc1"},
 	{ SNES_SA1,         "lorom_sa1"},
 	{ SNES_SDD1,        "lorom_sdd1"},
-	{ SNES_SFX,         "lorom_sfx"},
+	{ SNES_GSU1,        "lorom_gsu1"},
+	{ SNES_GSU2,        "lorom_gsu2"},
 	{ SNES_Z80GB,       "lorom_sgb"},
 	{ SNES_ST010,       "lorom_st010"},
 	{ SNES_ST011,       "lorom_st011"},
@@ -522,9 +523,9 @@ static uint32_t snes_find_hilo_mode(const device_t *device, const uint8_t *buffe
 }
 
 
-static int snes_find_addon_chip( const uint8_t *buffer, uint32_t start_offs )
+static int snes_find_addon_chip(const uint8_t *buffer, uint32_t start_offs, uint32_t len)
 {
-	/* Info mostly taken from http://snesemu.black-ship.net/misc/hardware/-from%20nsrt.edgeemu.com-chipinfo.htm */
+	/* Info mostly taken from http://black-ship.net/~tukuyomi/snesemu/misc/hardware/-from%20nsrt.edgeemu.com-chipinfo.htm */
 	switch (buffer[start_offs + 0x16])
 	{
 		case 0x00:
@@ -558,7 +559,12 @@ static int snes_find_addon_chip( const uint8_t *buffer, uint32_t start_offs )
 		case 0x15:  // GSU-x
 		case 0x1a:  // GSU-1 (21 MHz at start)
 			if (buffer[start_offs + 0x15] == 0x20)
-				return ADDON_SFX;
+			{
+				if (len > 1048576)
+					return ADDON_GSU2;
+				else
+					return ADDON_GSU1;
+			}
 			break;
 
 		case 0x25:
@@ -868,7 +874,7 @@ void base_sns_cart_slot_device::setup_nvram()
 	if (!loaded_through_softlist())
 	{
 		int hilo_mode = snes_find_hilo_mode(this, ROM, m_cart->get_rom_size());
-		uint8_t sram_size = (m_type == SNES_SFX) ? (ROM[0x00ffbd] & 0x07) : (ROM[hilo_mode + 0x18] & 0x07);
+		uint8_t sram_size = (m_type == SNES_GSU1 || m_type == SNES_GSU2) ? (ROM[0x00ffbd] & 0x07) : (ROM[hilo_mode + 0x18] & 0x07);
 		if (sram_size)
 		{
 			uint32_t max = (hilo_mode == 0x007fc0) ? 0x80000 : 0x20000;   // MODE20 vs MODE21
@@ -944,7 +950,7 @@ void base_sns_cart_slot_device::get_cart_type_addon(const uint8_t *ROM, uint32_t
 	// check for add-on chips...
 	if (len >= hilo_mode + 0x1a)
 	{
-		addon = snes_find_addon_chip(ROM, hilo_mode);
+		addon = snes_find_addon_chip(ROM, hilo_mode, len);
 		if (addon != -1)
 		{
 			// m_type handles DSP1,2,3 in the same way, but snes_add requires them to be separate...
@@ -976,8 +982,11 @@ void base_sns_cart_slot_device::get_cart_type_addon(const uint8_t *ROM, uint32_t
 				case ADDON_SDD1:
 					type = SNES_SDD1;
 					break;
-				case ADDON_SFX:
-					type = SNES_SFX;
+				case ADDON_GSU1:
+					type = SNES_GSU1;
+					break;
+				case ADDON_GSU2:
+					type = SNES_GSU2;
 					break;
 				case ADDON_SPC7110:
 					type = SNES_SPC7110;
@@ -1294,7 +1303,7 @@ void base_sns_cart_slot_device::internal_header_logging(uint8_t *ROM, uint32_t l
 		}
 	}
 
-	addon = snes_find_addon_chip(ROM, hilo_mode);
+	addon = snes_find_addon_chip(ROM, hilo_mode, len);
 	if (addon != -1)
 	{
 		if (type == SNES_MODE20 && addon == SNES_DSP)

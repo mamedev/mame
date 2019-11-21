@@ -18,7 +18,7 @@
 #include "bus/ieee488/ieee488.h"
 #include "machine/1mb5.h"
 
-class hp82937_io_card_device : public hp80_io_card_device
+class hp82937_io_card_device : public device_t, public device_hp80_io_interface
 {
 public:
 	// construction/destruction

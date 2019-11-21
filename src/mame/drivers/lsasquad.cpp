@@ -568,7 +568,7 @@ void lsasquad_state::lsasquad(machine_config &config)
 	TAITO68705_MCU(config, m_bmcu, MASTER_CLOCK / 8);
 
 
-	config.m_minimum_quantum = attotime::from_hz(30000); /* 500 CPU slices per frame - a high value to ensure proper */
+	config.set_maximum_quantum(attotime::from_hz(30000)); /* 500 CPU slices per frame - a high value to ensure proper */
 							/* synchronization of the CPUs */
 							/* main<->sound synchronization depends on this */
 
@@ -633,7 +633,7 @@ void lsasquad_state::daikaiju(machine_config &config)
 
 	TAITO68705_MCU(config, m_bmcu, MASTER_CLOCK / 8);
 
-	config.m_minimum_quantum = attotime::from_hz(30000); /* 500 CPU slices per frame - a high value to ensure proper */
+	config.set_maximum_quantum(attotime::from_hz(30000)); /* 500 CPU slices per frame - a high value to ensure proper */
 							/* synchronization of the CPUs */
 							/* main<->sound synchronization depends on this */
 

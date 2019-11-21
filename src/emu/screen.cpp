@@ -15,7 +15,10 @@
 
 #include <nanosvg/src/nanosvg.h>
 #include <nanosvg/src/nanosvgrast.h>
+
+#include <clocale>
 #include <set>
+
 
 //**************************************************************************
 //  DEBUGGING
@@ -69,7 +72,7 @@ private:
 	NSVGimage *m_image;
 	NSVGrasterizer *m_rasterizer;
 	std::vector<bool> m_key_state;
-	std::vector<std::list<NSVGshape *>> m_keyed_shapes;
+	std::vector<std::vector<NSVGshape *>> m_keyed_shapes;
 	std::unordered_map<std::string, int> m_key_ids;
 	int m_key_count;
 
@@ -91,23 +94,30 @@ private:
 
 screen_device::svg_renderer::svg_renderer(memory_region *region)
 {
-	char *s = new char[region->bytes()+1];
-	memcpy(s, region->base(), region->bytes());
-	s[region->bytes()] = 0;
-	m_image = nsvgParse(s, "px", 72);
-	delete[] s;
+	// nanosvg makes assumptions about the global locale
+	{
+		const std::unique_ptr<char []> s(new char[region->bytes() + 1]);
+		memcpy(s.get(), region->base(), region->bytes());
+		s[region->bytes()] = 0;
+		const std::string lcctype(std::setlocale(LC_CTYPE, nullptr));
+		const std::string lcnumeric(std::setlocale(LC_NUMERIC, nullptr));
+		std::setlocale(LC_CTYPE, "C");
+		std::setlocale(LC_NUMERIC, "C");
+		m_image = nsvgParse(s.get(), "px", 72);
+		std::setlocale(LC_CTYPE, lcctype.c_str());
+		std::setlocale(LC_NUMERIC, lcnumeric.c_str());
+	}
 	m_rasterizer = nsvgCreateRasterizer();
 
 	m_key_count = 0;
 
-	for (NSVGshape *shape = m_image->shapes; shape != nullptr; shape = shape->next)
+	for (NSVGshape *shape = m_image->shapes; shape; shape = shape->next)
 		if(shape->title[0]) {
-			auto it = m_key_ids.find(shape->title);
+			const auto it = m_key_ids.find(shape->title);
 			if(it != m_key_ids.end())
 				m_keyed_shapes[it->second].push_back(shape);
 			else {
-				int id = m_key_count;
-				m_key_count++;
+				const int id = m_key_count++;
 				m_keyed_shapes.resize(m_key_count);
 				m_keyed_shapes[id].push_back(shape);
 				m_key_ids[shape->title] = id;
@@ -542,12 +552,15 @@ screen_device::screen_device(const machine_config &mconfig, const char *tag, dev
 	, m_yoffset(0.0f)
 	, m_xscale(1.0f)
 	, m_yscale(1.0f)
+	, m_screen_update_ind16(*this)
+	, m_screen_update_rgb32(*this)
 	, m_screen_vblank(*this)
 	, m_scanline_cb(*this)
 	, m_palette(*this, finder_base::DUMMY_TAG)
 	, m_video_attributes(0)
-	, m_svg_region(tag)
+	, m_svg_region(*this, DEVICE_SELF)
 	, m_container(nullptr)
+	, m_max_width(100)
 	, m_width(100)
 	, m_height(100)
 	, m_visarea(0, 99, 0, 99)
@@ -584,8 +597,79 @@ screen_device::screen_device(const machine_config &mconfig, const char *tag, dev
 
 screen_device::~screen_device()
 {
+    destroy_scan_bitmaps();
 }
 
+
+//-------------------------------------------------
+//  destroy_scan_bitmaps - destroy per-scanline
+//  bitmaps if applicable
+//-------------------------------------------------
+
+void screen_device::destroy_scan_bitmaps()
+{
+    if (m_video_attributes & VIDEO_VARIABLE_WIDTH)
+    {
+        const bool screen16 = !m_screen_update_ind16.isnull();
+        for (int j = 0; j < 2; j++)
+        {
+            for (bitmap_t* bitmap : m_scan_bitmaps[j])
+            {
+                if (screen16)
+                    delete (bitmap_ind16*)bitmap;
+                else
+                    delete (bitmap_rgb32*)bitmap;
+            }
+            m_scan_bitmaps[j].clear();
+        }
+    }
+}
+
+
+//-------------------------------------------------
+//  allocate_scan_bitmaps - allocate per-scanline
+//  bitmaps if applicable
+//-------------------------------------------------
+
+void screen_device::allocate_scan_bitmaps()
+{
+    if (m_video_attributes & VIDEO_VARIABLE_WIDTH)
+    {
+        const bool screen16 = !m_screen_update_ind16.isnull();
+        s32 effwidth = std::max(m_max_width, m_visarea.right() + 1);
+        const s32 old_height = (s32)m_scan_widths.size();
+        s32 effheight = std::max(m_height, m_visarea.bottom() + 1);
+        if (old_height < effheight)
+        {
+			for (int i = old_height; i < effheight; i++)
+			{
+				for (int j = 0; j < 2; j++)
+				{
+					if (screen16)
+						m_scan_bitmaps[j].push_back(new bitmap_ind16(effwidth, 1));
+					else
+						m_scan_bitmaps[j].push_back(new bitmap_rgb32(effwidth, 1));
+				}
+				m_scan_widths.push_back(m_width);
+			}
+		}
+		else
+		{
+			for (int i = effheight; i < old_height; i++)
+			{
+				for (int j = 0; j < 2; j++)
+				{
+					if (screen16)
+						delete (bitmap_ind16 *)m_scan_bitmaps[j][i];
+					else
+						delete (bitmap_rgb32 *)m_scan_bitmaps[j][i];
+					m_scan_bitmaps[j].erase(m_scan_bitmaps[j].begin() + i);
+				}
+				m_scan_widths.erase(m_scan_widths.begin() + i);
+			}
+		}
+    }
+}
 
 //-------------------------------------------------
 //  device_validity_check - verify device
@@ -607,6 +691,11 @@ void screen_device::device_validity_check(validity_checker &valid) const
 		// sanity check screen formats
 		if (m_screen_update_ind16.isnull() && m_screen_update_rgb32.isnull())
 			osd_printf_error("Missing SCREEN_UPDATE function\n");
+	}
+	else
+	{
+		if (m_video_attributes & VIDEO_VARIABLE_WIDTH)
+			osd_printf_error("Non-raster display cannot have a variable width\n");
 	}
 
 	// check for zero frame rate
@@ -694,8 +783,8 @@ std::pair<unsigned, unsigned> screen_device::physical_aspect() const
 void screen_device::device_resolve_objects()
 {
 	// bind our handlers
-	m_screen_update_ind16.bind_relative_to(*owner());
-	m_screen_update_rgb32.bind_relative_to(*owner());
+	m_screen_update_ind16.resolve();
+	m_screen_update_rgb32.resolve();
 	m_screen_vblank.resolve_safe();
 	m_scanline_cb.resolve();
 
@@ -717,10 +806,9 @@ void screen_device::device_start()
 
 	if (m_type == SCREEN_TYPE_SVG)
 	{
-		memory_region *reg = owner()->memregion(m_svg_region);
-		if (!reg)
-			fatalerror("%s: SVG region \"%s\" does not exist\n", tag(), m_svg_region);
-		m_svg = std::make_unique<svg_renderer>(reg);
+		if (!m_svg_region)
+			fatalerror("%s: SVG region \"%s\" does not exist\n", tag(), m_svg_region.finder_tag());
+		m_svg = std::make_unique<svg_renderer>(m_svg_region);
 		machine().output().set_notifier(nullptr, svg_renderer::output_notifier, m_svg.get());
 
 		// don't do this - SVG units are arbitrary and interpreting them as pixels causes bad things to happen
@@ -736,7 +824,8 @@ void screen_device::device_start()
 
 	// configure bitmap formats and allocate screen bitmaps
 	// svg is RGB32 too, and doesn't have any update method
-	texture_format texformat = !m_screen_update_ind16.isnull() ? TEXFORMAT_PALETTE16 : TEXFORMAT_RGB32;
+	const bool screen16 = !m_screen_update_ind16.isnull();
+	texture_format texformat = screen16 ? TEXFORMAT_PALETTE16 : TEXFORMAT_RGB32;
 
 	for (auto & elem : m_bitmap)
 	{
@@ -878,10 +967,18 @@ void screen_device::device_timer(emu_timer &timer, device_timer_id id, int param
 		// first scanline
 		case TID_SCANLINE0:
 			reset_partial_updates();
+			if (m_video_attributes & VIDEO_VARIABLE_WIDTH)
+			{
+				pre_update_scanline(0);
+			}
 			break;
 
 		// subsequent scanlines when scanline updates are enabled
 		case TID_SCANLINE:
+			if (m_video_attributes & VIDEO_VARIABLE_WIDTH)
+			{
+				pre_update_scanline(param);
+			}
 			if (m_video_attributes & VIDEO_UPDATE_SCANLINE)
 			{
 				// force a partial update to the current scanline
@@ -918,12 +1015,14 @@ void screen_device::configure(int width, int height, const rectangle &visarea, a
 	assert(frame_period > 0);
 
 	// fill in the new parameters
+	m_max_width = std::max(m_max_width, width);
 	m_width = width;
 	m_height = height;
 	m_visarea = visarea;
 
-	// reallocate bitmap if necessary
-	realloc_screen_bitmaps();
+	// reallocate bitmap(s) if necessary
+    realloc_screen_bitmaps();
+    if (machine().input().code_pressed(KEYCODE_E)) printf("CONFIGURE\n");
 
 	// compute timing parameters
 	m_frame_period = frame_period;
@@ -989,6 +1088,28 @@ void screen_device::reset_origin(int beamy, int beamx)
 
 
 //-------------------------------------------------
+//  update_scan_bitmap_size - reallocate the
+//  bitmap for a specific scanline
+//-------------------------------------------------
+
+void screen_device::update_scan_bitmap_size(int y)
+{
+    // don't update this line if it exceeds the allocated size, which can happen on initial configuration
+    if (y >= m_scan_widths.size())
+		return;
+
+	// determine effective size to allocate
+	s32 effwidth = std::max(m_max_width, m_visarea.right() + 1);
+
+	if (m_scan_widths[y] == effwidth)
+		return;
+
+	m_scan_bitmaps[m_curbitmap][y]->resize(effwidth, 1);
+	m_scan_widths[y] = effwidth;
+}
+
+
+//-------------------------------------------------
 //  realloc_screen_bitmaps - reallocate bitmaps
 //  and textures as necessary
 //-------------------------------------------------
@@ -1000,7 +1121,8 @@ void screen_device::realloc_screen_bitmaps()
 		return;
 
 	// determine effective size to allocate
-	s32 effwidth = std::max(m_width, m_visarea.right() + 1);
+	const bool per_scanline = (m_video_attributes & VIDEO_VARIABLE_WIDTH);
+	s32 effwidth = std::max(per_scanline ? m_max_width : m_width, m_visarea.right() + 1);
 	s32 effheight = std::max(m_height, m_visarea.bottom() + 1);
 
 	// reize all registered screen bitmaps
@@ -1015,6 +1137,19 @@ void screen_device::realloc_screen_bitmaps()
 	}
 	m_texture[0]->set_bitmap(m_bitmap[0], m_visarea, m_bitmap[0].texformat());
 	m_texture[1]->set_bitmap(m_bitmap[1], m_visarea, m_bitmap[1].texformat());
+
+    allocate_scan_bitmaps();
+}
+
+
+//-------------------------------------------------
+//  pre_update_scanline - check if the bitmap for
+//  a specific scanline needs its size updated
+//-------------------------------------------------
+
+void screen_device::pre_update_scanline(int y)
+{
+	update_scan_bitmap_size(y);
 }
 
 
@@ -1067,9 +1202,7 @@ bool screen_device::update_partial(int scanline)
 
 	// set the range of scanlines to render
 	rectangle clip(m_visarea);
-	clip.sety(
-			(std::max)(clip.top(), m_last_partial_scan),
-			(std::min)(clip.bottom(), scanline));
+	clip.sety((std::max)(clip.top(), m_last_partial_scan), (std::min)(clip.bottom(), scanline));
 
 	// skip if entirely outside of visible area
 	if (clip.top() > clip.bottom())
@@ -1082,23 +1215,45 @@ bool screen_device::update_partial(int scanline)
 	LOG_PARTIAL_UPDATES(("updating %d-%d\n", clip.top(), clip.bottom()));
 	g_profiler.start(PROFILER_VIDEO);
 
-	u32 flags;
-	if (m_type != SCREEN_TYPE_SVG)
+	u32 flags = 0;
+	if (m_video_attributes & VIDEO_VARIABLE_WIDTH)
 	{
-		screen_bitmap &curbitmap = m_bitmap[m_curbitmap];
-		switch (curbitmap.format())
+		rectangle scan_clip(clip);
+		for (int y = clip.top(); y <= clip.bottom(); y++)
 		{
-			default:
-			case BITMAP_FORMAT_IND16:   flags = m_screen_update_ind16(*this, curbitmap.as_ind16(), clip);   break;
-			case BITMAP_FORMAT_RGB32:   flags = m_screen_update_rgb32(*this, curbitmap.as_rgb32(), clip);   break;
+			scan_clip.sety(y, y);
+			pre_update_scanline(y);
+
+			screen_bitmap &curbitmap = m_bitmap[m_curbitmap];
+			switch (curbitmap.format())
+			{
+				default:
+				case BITMAP_FORMAT_IND16:   flags |= m_screen_update_ind16(*this, *(bitmap_ind16 *)m_scan_bitmaps[m_curbitmap][y], scan_clip);   break;
+				case BITMAP_FORMAT_RGB32:   flags |= m_screen_update_rgb32(*this, *(bitmap_rgb32 *)m_scan_bitmaps[m_curbitmap][y], scan_clip);   break;
+			}
+
+			m_partial_updates_this_frame++;
 		}
 	}
 	else
 	{
-		flags = m_svg->render(*this, m_bitmap[m_curbitmap].as_rgb32(), clip);
+		if (m_type != SCREEN_TYPE_SVG)
+		{
+			screen_bitmap &curbitmap = m_bitmap[m_curbitmap];
+			switch (curbitmap.format())
+			{
+				default:
+				case BITMAP_FORMAT_IND16:   flags = m_screen_update_ind16(*this, curbitmap.as_ind16(), clip);   break;
+				case BITMAP_FORMAT_RGB32:   flags = m_screen_update_rgb32(*this, curbitmap.as_rgb32(), clip);   break;
+			}
+		}
+		else
+		{
+			flags = m_svg->render(*this, m_bitmap[m_curbitmap].as_rgb32(), clip);
+		}
+		m_partial_updates_this_frame++;
 	}
 
-	m_partial_updates_this_frame++;
 	g_profiler.stop();
 
 	// if we modified the bitmap, we have to commit
@@ -1148,11 +1303,10 @@ void screen_device::update_now()
 		if (m_partial_scan_hpos > 0)
 		{
 			// now finish the previous partial scanline
-			clip.set(
-					(std::max)(clip.left(), m_partial_scan_hpos),
-					clip.right(),
-					(std::max)(clip.top(), m_last_partial_scan),
-					(std::min)(clip.bottom(), m_last_partial_scan));
+			clip.set((std::max)(clip.left(), m_partial_scan_hpos),
+					 clip.right(),
+					 (std::max)(clip.top(), m_last_partial_scan),
+					 (std::min)(clip.bottom(), m_last_partial_scan));
 
 			// if there's something to draw, do it
 			if (!clip.empty())
@@ -1160,11 +1314,24 @@ void screen_device::update_now()
 				g_profiler.start(PROFILER_VIDEO);
 
 				screen_bitmap &curbitmap = m_bitmap[m_curbitmap];
-				switch (curbitmap.format())
+				if (m_video_attributes & VIDEO_VARIABLE_WIDTH)
 				{
-					default:
-					case BITMAP_FORMAT_IND16: m_screen_update_ind16(*this, curbitmap.as_ind16(), clip);   break;
-					case BITMAP_FORMAT_RGB32: m_screen_update_rgb32(*this, curbitmap.as_rgb32(), clip);   break;
+					pre_update_scanline(m_last_partial_scan);
+					switch (curbitmap.format())
+					{
+						default:
+						case BITMAP_FORMAT_IND16: m_screen_update_ind16(*this, *(bitmap_ind16 *)m_scan_bitmaps[m_curbitmap][m_last_partial_scan], clip);   break;
+						case BITMAP_FORMAT_RGB32: m_screen_update_rgb32(*this, *(bitmap_rgb32 *)m_scan_bitmaps[m_curbitmap][m_last_partial_scan], clip);   break;
+					}
+				}
+				else
+				{
+					switch (curbitmap.format())
+					{
+						default:
+						case BITMAP_FORMAT_IND16: m_screen_update_ind16(*this, curbitmap.as_ind16(), clip);   break;
+						case BITMAP_FORMAT_RGB32: m_screen_update_rgb32(*this, curbitmap.as_rgb32(), clip);   break;
+					}
 				}
 
 				m_partial_updates_this_frame++;
@@ -1182,11 +1349,10 @@ void screen_device::update_now()
 	// now draw this partial scanline
 	clip = m_visarea;
 
-	clip.set(
-			(std::max)(clip.left(), m_partial_scan_hpos),
-			(std::min)(clip.right(), current_hpos),
-			(std::max)(clip.top(), current_vpos),
-			(std::min)(clip.bottom(), current_vpos));
+	clip.set((std::max)(clip.left(), m_partial_scan_hpos),
+			 (std::min)(clip.right(), current_hpos),
+			 (std::max)(clip.top(), current_vpos),
+			 (std::min)(clip.bottom(), current_vpos));
 
 	// and if there's something to draw, do it
 	if (!clip.empty())
@@ -1195,13 +1361,26 @@ void screen_device::update_now()
 
 		LOG_PARTIAL_UPDATES(("doing scanline partial draw: Y %d X %d-%d\n", clip.bottom(), clip.left(), clip.right()));
 
-		u32 flags;
+		u32 flags = 0;
 		screen_bitmap &curbitmap = m_bitmap[m_curbitmap];
-		switch (curbitmap.format())
+		if (m_video_attributes & VIDEO_VARIABLE_WIDTH)
 		{
-			default:
-			case BITMAP_FORMAT_IND16:   flags = m_screen_update_ind16(*this, curbitmap.as_ind16(), clip);   break;
-			case BITMAP_FORMAT_RGB32:   flags = m_screen_update_rgb32(*this, curbitmap.as_rgb32(), clip);   break;
+			pre_update_scanline(current_vpos);
+			switch (curbitmap.format())
+			{
+				default:
+				case BITMAP_FORMAT_IND16:   flags = m_screen_update_ind16(*this, *(bitmap_ind16 *)m_scan_bitmaps[m_curbitmap][current_vpos], clip);   break;
+				case BITMAP_FORMAT_RGB32:   flags = m_screen_update_rgb32(*this, *(bitmap_rgb32 *)m_scan_bitmaps[m_curbitmap][current_vpos], clip);   break;
+			}
+		}
+		else
+		{
+			switch (curbitmap.format())
+			{
+				default:
+				case BITMAP_FORMAT_IND16:   flags = m_screen_update_ind16(*this, curbitmap.as_ind16(), clip);   break;
+				case BITMAP_FORMAT_RGB32:   flags = m_screen_update_rgb32(*this, curbitmap.as_rgb32(), clip);   break;
+			}
 		}
 
 		m_partial_updates_this_frame++;
@@ -1255,21 +1434,28 @@ u32 screen_device::pixel(s32 x, s32 y)
 	if (x < 0 || y < 0 || x >= srcwidth || y >= srcheight)
 		return 0;
 
+	const bool per_scanline = (m_video_attributes & VIDEO_VARIABLE_WIDTH);
+
 	switch (curbitmap.format())
 	{
 		case BITMAP_FORMAT_IND16:
 		{
-			bitmap_ind16 &srcbitmap = curbitmap.as_ind16();
-			const u16 src = srcbitmap.pix(y, x);
+			bitmap_ind16 &srcbitmap = per_scanline ? *(bitmap_ind16 *)m_scan_bitmaps[m_curbitmap][y] : curbitmap.as_ind16();
+			const u16 src = per_scanline ? srcbitmap.pix(0, x) : srcbitmap.pix(y, x);
 			const rgb_t *palette = m_palette->palette()->entry_list_adjusted();
 			return (u32)palette[src];
 		}
 
 		case BITMAP_FORMAT_RGB32:
 		{
-			// iterate over rows in the destination
-			bitmap_rgb32 &srcbitmap = curbitmap.as_rgb32();
-			return (u32)srcbitmap.pix(y, x);
+			if (per_scanline)
+			{
+				return (u32)(*(bitmap_rgb32 *)m_scan_bitmaps[m_curbitmap][y]).pix(0, x);
+			}
+			else
+			{
+				return (u32)curbitmap.as_rgb32().pix(y, x);
+			}
 		}
 
 		default:
@@ -1291,15 +1477,17 @@ void screen_device::pixels(u32 *buffer)
 
 	const rectangle &visarea = visible_area();
 
+	const bool per_scanline = (m_video_attributes & VIDEO_VARIABLE_WIDTH);
+
 	switch (curbitmap.format())
 	{
 		case BITMAP_FORMAT_IND16:
 		{
-			bitmap_ind16 &srcbitmap = curbitmap.as_ind16();
 			const rgb_t *palette = m_palette->palette()->entry_list_adjusted();
 			for (int y = visarea.min_y; y <= visarea.max_y; y++)
 			{
-				const u16 *src = &srcbitmap.pix(y, visarea.min_x);
+				bitmap_ind16 &srcbitmap = per_scanline ? *(bitmap_ind16 *)m_scan_bitmaps[m_curbitmap][y] : curbitmap.as_ind16();
+				const u16 *src = &srcbitmap.pix(per_scanline ? 0 : y, visarea.min_x);
 				for (int x = visarea.min_x; x <= visarea.max_x; x++)
 				{
 					*buffer++ = palette[*src++];
@@ -1310,10 +1498,10 @@ void screen_device::pixels(u32 *buffer)
 
 		case BITMAP_FORMAT_RGB32:
 		{
-			bitmap_rgb32 &srcbitmap = curbitmap.as_rgb32();
 			for (int y = visarea.min_y; y <= visarea.max_y; y++)
 			{
-				const u32 *src = &srcbitmap.pix(y, visarea.min_x);
+				bitmap_rgb32 &srcbitmap = per_scanline ? *(bitmap_rgb32 *)m_scan_bitmaps[m_curbitmap][y] : curbitmap.as_rgb32();
+				const u32 *src = &srcbitmap.pix(per_scanline ? 0 : y, visarea.min_x);
 				for (int x = visarea.min_x; x <= visarea.max_x; x++)
 				{
 					*buffer++ = *src++;
@@ -1510,6 +1698,57 @@ void screen_device::vblank_end()
 
 
 //-------------------------------------------------
+//  create_composited_bitmap - composite scanline
+//  bitmaps into the output bitmap
+//-------------------------------------------------
+
+void screen_device::create_composited_bitmap()
+{
+	screen_bitmap &curbitmap = m_bitmap[m_curtexture];
+	if (!curbitmap.valid())
+		return;
+
+	s32 dstwidth = std::max(m_max_width, m_visarea.right() + 1);
+	int dstheight = curbitmap.height();
+
+	switch (curbitmap.format())
+	{
+		default:
+		case BITMAP_FORMAT_IND16:
+		{
+			for (int y = 0; y < dstheight; y++)
+			{
+				bitmap_ind16 &srcbitmap = *(bitmap_ind16 *)m_scan_bitmaps[m_curbitmap][y];
+				u16 *dst = &curbitmap.as_ind16().pix16(y);
+				const u16 *src = &srcbitmap.pix16(0);
+				const int dx = (m_scan_widths[y] << 15) / dstwidth;
+				for (int x = 0; x < m_scan_widths[y]; x += dx)
+				{
+					*dst++ = src[x >> 15];
+				}
+			}
+		}
+
+		case BITMAP_FORMAT_RGB32:
+		{
+			for (int y = 0; y < dstheight; y++)
+			{
+				bitmap_rgb32 &srcbitmap = *(bitmap_rgb32 *)m_scan_bitmaps[m_curbitmap][y];
+				u32 *dst = &curbitmap.as_rgb32().pix32(y);
+				const u32 *src = &srcbitmap.pix32(0);
+				const int dx = (m_scan_widths[y] << 15) / dstwidth;
+				for (int x = 0; x < dstwidth << 15; x += dx)
+				{
+					*dst++ = src[x >> 15];
+				}
+			}
+			break;
+		}
+	}
+}
+
+
+//-------------------------------------------------
 //  update_quads - set up the quads for this
 //  screen
 //-------------------------------------------------
@@ -1525,6 +1764,10 @@ bool screen_device::update_quads()
 			// if we're not skipping the frame and if the screen actually changed, then update the texture
 			if (!machine().video().skip_this_frame() && m_changed)
 			{
+				if (m_video_attributes & VIDEO_VARIABLE_WIDTH)
+				{
+					create_composited_bitmap();
+				}
 				m_texture[m_curbitmap]->set_bitmap(m_bitmap[m_curbitmap], m_visarea, m_bitmap[m_curbitmap].texformat());
 				m_curtexture = m_curbitmap;
 				m_curbitmap = 1 - m_curbitmap;
@@ -1569,8 +1812,8 @@ void screen_device::update_burnin()
 	int ystep = (srcheight << 16) / dstheight;
 	int xstart = (u32(rand()) % 32767) * xstep / 32767;
 	int ystart = (u32(rand()) % 32767) * ystep / 32767;
-	int srcx, srcy;
-	int x, y;
+
+	bool per_scanline = (m_video_attributes & VIDEO_VARIABLE_WIDTH);
 
 	switch (curbitmap.format())
 	{
@@ -1578,13 +1821,13 @@ void screen_device::update_burnin()
 		case BITMAP_FORMAT_IND16:
 		{
 			// iterate over rows in the destination
-			bitmap_ind16 &srcbitmap = curbitmap.as_ind16();
-			for (y = 0, srcy = ystart; y < dstheight; y++, srcy += ystep)
+			for (int y = 0, srcy = ystart; y < dstheight; y++, srcy += ystep)
 			{
+				bitmap_ind16 &srcbitmap = per_scanline ? *(bitmap_ind16 *)m_scan_bitmaps[m_curbitmap][y] : curbitmap.as_ind16();
 				u64 *dst = &m_burnin.pix64(y);
-				const u16 *src = &srcbitmap.pix16(srcy >> 16);
+				const u16 *src = &srcbitmap.pix16(per_scanline ? 0 : (srcy >> 16));
 				const rgb_t *palette = m_palette->palette()->entry_list_adjusted();
-				for (x = 0, srcx = xstart; x < dstwidth; x++, srcx += xstep)
+				for (int x = 0, srcx = xstart; x < dstwidth; x++, srcx += xstep)
 				{
 					rgb_t pixel = palette[src[srcx >> 16]];
 					dst[x] += pixel.g() + pixel.r() + pixel.b();
@@ -1596,12 +1839,12 @@ void screen_device::update_burnin()
 		case BITMAP_FORMAT_RGB32:
 		{
 			// iterate over rows in the destination
-			bitmap_rgb32 &srcbitmap = curbitmap.as_rgb32();
-			for (y = 0, srcy = ystart; y < dstheight; y++, srcy += ystep)
+			for (int y = 0, srcy = ystart; y < dstheight; y++, srcy += ystep)
 			{
+				bitmap_rgb32 &srcbitmap = per_scanline ? *(bitmap_rgb32 *)m_scan_bitmaps[m_curbitmap][y] : curbitmap.as_rgb32();
 				u64 *dst = &m_burnin.pix64(y);
-				const u32 *src = &srcbitmap.pix32(srcy >> 16);
-				for (x = 0, srcx = xstart; x < dstwidth; x++, srcx += xstep)
+				const u32 *src = &srcbitmap.pix32(per_scanline ? 0 : (srcy >> 16));
+				for (int x = 0, srcx = xstart; x < dstwidth; x++, srcx += xstep)
 				{
 					rgb_t pixel = src[srcx >> 16];
 					dst[x] += pixel.g() + pixel.r() + pixel.b();
@@ -1707,5 +1950,5 @@ void screen_device::load_effect_overlay(const char *filename)
 	if (m_screen_overlay_bitmap.valid())
 		m_container->set_overlay(&m_screen_overlay_bitmap);
 	else
-		osd_printf_warning("Unable to load effect PNG file '%s'\n", fullname.c_str());
+		osd_printf_warning("Unable to load effect PNG file '%s'\n", fullname);
 }

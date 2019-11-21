@@ -3,13 +3,13 @@
 #ifndef MAME_BUS_ASTROCADE_EXP_H
 #define MAME_BUS_ASTROCADE_EXP_H
 
-// ======================> device_astrocade_card_interface
+// ======================> device_astrocade_exp_interface
 
-class device_astrocade_card_interface : public device_slot_card_interface
+class device_astrocade_exp_interface : public device_interface
 {
 public:
 	// construction/destruction
-	virtual ~device_astrocade_card_interface();
+	virtual ~device_astrocade_exp_interface();
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read) { return 0xff; }
@@ -18,13 +18,13 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(write_io) { }
 
 protected:
-	device_astrocade_card_interface(const machine_config &mconfig, device_t &device);
+	device_astrocade_exp_interface(const machine_config &mconfig, device_t &device);
 };
 
 
 // ======================> astrocade_exp_device
 
-class astrocade_exp_device : public device_t, public device_slot_interface
+class astrocade_exp_device : public device_t, public device_single_card_slot_interface<device_astrocade_exp_interface>
 {
 public:
 	// construction/destruction
@@ -53,7 +53,7 @@ public:
 
 protected:
 	bool m_card_mounted;
-	device_astrocade_card_interface* m_card;
+	device_astrocade_exp_interface* m_card;
 };
 
 // device type definition

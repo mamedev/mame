@@ -513,7 +513,7 @@ void stratos_state::stratos(machine_config &config)
 
 	/* extension rom */
 	GENERIC_CARTSLOT(config, m_extrom, generic_plain_slot, "saitek_egr", "bin");
-	m_extrom->set_device_load(FUNC(stratos_state::extrom_load), this);
+	m_extrom->set_device_load(FUNC(stratos_state::extrom_load));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("saitek_egr");
 }

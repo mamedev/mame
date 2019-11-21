@@ -1,12 +1,12 @@
 /*
- * Copyright 2010-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2019 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
 #include "bx_p.h"
 #include <bx/allocator.h>
+#include <bx/file.h>
 #include <bx/hash.h>
-#include <bx/readerwriter.h>
 #include <bx/string.h>
 
 namespace bx
@@ -188,7 +188,12 @@ namespace bx
 			}
 		}
 
-		return 0 == max && _lhsMax == _rhsMax ? 0 : fn(*_lhs) - fn(*_rhs);
+		if (0 == max)
+		{
+			return _lhsMax == _rhsMax ? 0 : _lhsMax > _rhsMax ? 1 : -1;
+		}
+
+		return fn(*_lhs) - fn(*_rhs);
 	}
 
 	int32_t strCmp(const StringView& _lhs, const StringView& _rhs, int32_t _max)
@@ -370,7 +375,7 @@ namespace bx
 
 	inline const char* strRFindUnsafe(const char* _str, int32_t _len, char _ch)
 	{
-		for (int32_t ii = _len; 0 <= ii; --ii)
+		for (int32_t ii = _len-1; 0 <= ii; --ii)
 		{
 			if (_str[ii] == _ch)
 			{
@@ -687,9 +692,10 @@ namespace bx
 		return StringView(_str.getTerm(), _str.getTerm() );
 	}
 
-	StringView findIdentifierMatch(const StringView& _str, const char** _words)
+	StringView findIdentifierMatch(const StringView& _str, const char** _words, int32_t _num)
 	{
-		for (StringView word = *_words; !word.isEmpty(); ++_words, word = *_words)
+		int32_t ii = 0;
+		for (StringView word = *_words; ii < _num && !word.isEmpty(); ++ii, ++_words, word = *_words)
 		{
 			StringView match = findIdentifierMatch(_str, word);
 			if (!match.isEmpty() )
@@ -1147,10 +1153,10 @@ namespace bx
 		SizerWriter sizer;
 		va_list argListCopy;
 		va_copy(argListCopy, _argList);
-		int32_t size = write(&sizer, _format, argListCopy, &err);
+		int32_t total = write(&sizer, _format, argListCopy, &err);
 		va_end(argListCopy);
 
-		return size;
+		return total;
 	}
 
 	int32_t snprintf(char* _out, int32_t _max, const char* _format, ...)
@@ -1159,6 +1165,28 @@ namespace bx
 		va_start(argList, _format);
 		int32_t total = vsnprintf(_out, _max, _format, argList);
 		va_end(argList);
+
+		return total;
+	}
+
+	int32_t vprintf(const char* _format, va_list _argList)
+	{
+		Error err;
+		va_list argListCopy;
+		va_copy(argListCopy, _argList);
+		int32_t total = write(getStdOut(), _format, argListCopy, &err);
+		va_end(argListCopy);
+
+		return total;
+	}
+
+	int32_t printf(const char* _format, ...)
+	{
+		va_list argList;
+		va_start(argList, _format);
+		int32_t total = vprintf(_format, argList);
+		va_end(argList);
+
 		return total;
 	}
 

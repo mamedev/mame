@@ -89,7 +89,7 @@ void save_manager::allow_registration(bool allowed)
 		{
 			if (m_entry_list[i]->m_name == m_entry_list[i + 1]->m_name)
 			{
-				osd_printf_error("Duplicate save state registration entry (%s)\n", m_entry_list[i]->m_name.c_str());
+				osd_printf_error("Duplicate save state registration entry (%s)\n", m_entry_list[i]->m_name);
 				dupes_found++;
 			}
 		}

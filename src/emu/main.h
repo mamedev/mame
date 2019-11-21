@@ -23,19 +23,17 @@
 //    CONSTANTS
 //**************************************************************************
 
-enum
-{
-	EMU_ERR_NONE             = 0,    /* no error */
-	EMU_ERR_FAILED_VALIDITY  = 1,    /* failed validity checks */
-	EMU_ERR_MISSING_FILES    = 2,    /* missing files */
-	EMU_ERR_FATALERROR       = 3,    /* some other fatal error */
-	EMU_ERR_DEVICE           = 4,    /* device initialization error (MESS-specific) */
-	EMU_ERR_NO_SUCH_GAME     = 5,    /* game was specified but doesn't exist */
-	EMU_ERR_INVALID_CONFIG   = 6,    /* some sort of error in configuration */
-	EMU_ERR_IDENT_NONROMS    = 7,    /* identified all non-ROM files */
-	EMU_ERR_IDENT_PARTIAL    = 8,    /* identified some files but not all */
-	EMU_ERR_IDENT_NONE       = 9     /* identified no files */
-};
+constexpr int EMU_ERR_NONE             = 0;    // no error
+constexpr int EMU_ERR_FAILED_VALIDITY  = 1;    // failed validity checks
+constexpr int EMU_ERR_MISSING_FILES    = 2;    // missing files
+constexpr int EMU_ERR_FATALERROR       = 3;    // some other fatal error
+constexpr int EMU_ERR_DEVICE           = 4;    // device initialization error
+constexpr int EMU_ERR_NO_SUCH_SYSTEM   = 5;    // system was specified but doesn't exist
+constexpr int EMU_ERR_INVALID_CONFIG   = 6;    // some sort of error in configuration
+constexpr int EMU_ERR_IDENT_NONROMS    = 7;    // identified all non-ROM files
+constexpr int EMU_ERR_IDENT_PARTIAL    = 8;    // identified some files but not all
+constexpr int EMU_ERR_IDENT_NONE       = 9;    // identified no files
+
 
 //**************************************************************************
 //    TYPE DEFINITIONS
@@ -60,6 +58,7 @@ public:
 	static void draw_user_interface(running_machine& machine);
 	static void periodic_check();
 	static bool frame_hook();
+	static void sound_hook();
 	static void layout_file_cb(util::xml::data_node const &layout);
 	static bool standalone();
 };

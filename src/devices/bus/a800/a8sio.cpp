@@ -53,7 +53,7 @@ DEFINE_DEVICE_TYPE(A8SIO, a8sio_device, "a8sio", "Atari 8 bit SIO Slot")
 
 a8sio_device::a8sio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, A8SIO, tag, owner, clock)
-	, device_slot_interface(mconfig, *this)
+	, device_single_card_slot_interface<device_a8sio_card_interface>(mconfig, *this)
 	, m_out_clock_in_cb(*this)
 	, m_out_data_in_cb(*this)
 	, m_out_proceed_cb(*this)
@@ -71,12 +71,9 @@ a8sio_device::a8sio_device(const machine_config &mconfig, const char *tag, devic
 
 void a8sio_device::device_resolve_objects()
 {
-	m_device = dynamic_cast<device_a8sio_card_interface *>(get_card_device());
-
+	m_device = get_card_device();
 	if (m_device)
-	{
 		m_device->set_a8sio_device(this);
-	}
 
 	// resolve callbacks
 	m_out_clock_in_cb.resolve_safe();
@@ -166,7 +163,7 @@ WRITE_LINE_MEMBER( a8sio_device::interrupt_w )
 //-------------------------------------------------
 
 device_a8sio_card_interface::device_a8sio_card_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device)
+	: device_interface(device, "a8sio")
 	, m_a8sio(nullptr)
 {
 }

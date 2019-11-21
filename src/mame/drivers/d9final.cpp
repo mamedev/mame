@@ -90,7 +90,7 @@ TILE_GET_INFO_MEMBER(d9final_state::get_sc0_tile_info)
 
 void d9final_state::video_start()
 {
-	m_sc0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(d9final_state::get_sc0_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_sc0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(d9final_state::get_sc0_tile_info)), TILEMAP_SCAN_ROWS, 8,8,64,32);
 }
 
 uint32_t d9final_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -141,14 +141,14 @@ void d9final_state::d9final_map(address_map &map)
 	map(0xd000, 0xd7ff).ram().w(FUNC(d9final_state::sc0_lovram)).share("lo_vram");
 	map(0xd800, 0xdfff).ram().w(FUNC(d9final_state::sc0_hivram)).share("hi_vram");
 	map(0xe000, 0xe7ff).ram().w(FUNC(d9final_state::sc0_cram)).share("cram");
-	map(0xf000, 0xf007).r(FUNC(d9final_state::prot_latch_r)); //AM_DEVREADWRITE("essnd", es8712_device, read, write)
+	map(0xf000, 0xf007).r(FUNC(d9final_state::prot_latch_r)); //.rw("essnd", FUNC(es8712_device::read), FUNC(es8712_device::write));
 	map(0xf800, 0xf80f).rw("rtc", FUNC(rtc62421_device::read), FUNC(rtc62421_device::write));
 }
 
 void d9final_state::d9final_io(address_map &map)
 {
 	map.global_mask(0xff);
-//  AM_RANGE(0x00, 0x00) AM_WRITENOP //bit 0: irq enable? screen enable?
+//  map(0x00, 0x00).nopw(); //bit 0: irq enable? screen enable?
 	map(0x00, 0x00).portr("DSWA");
 	map(0x20, 0x20).portr("DSWB");
 	map(0x40, 0x40).portr("DSWC");

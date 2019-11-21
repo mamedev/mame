@@ -2675,7 +2675,7 @@
 		<!-- budget, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1989</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1159)arkanoid-revengeofdoh.ipf" size="1049612" crc="7ae40e8f" sha1="0f7d7c566e06c0b6f5737f136b419789f47ec625"/>
@@ -3748,7 +3748,7 @@
 		<!-- budget, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1990</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1238)badlands.ipf" size="1049612" crc="000effe9" sha1="41d499320cdfb35c7b60fe4b1009e161d84d76a5"/>
@@ -4268,7 +4268,7 @@
 		<!-- budget, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1989</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1730)batman-themovie.ipf" size="1049612" crc="d4e22fcb" sha1="f7d2d0ccfadf2831830351170747490de4a7f017"/>
@@ -4296,7 +4296,7 @@
 		<!-- budget, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1988</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049180">
 				<rom name="(sps1939)batman-thecapedcrusader.ipf" size="1049180" crc="70902ecd" sha1="b92fd8a1a1912cc734af35956c99a5c244c695f4"/>
@@ -6878,7 +6878,7 @@
 		<!-- budget, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1989</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049180">
 				<rom name="(sps1344)bubblebobble.ipf" size="1049180" crc="6dc5d808" sha1="55eca2f5936e5231418d8b741a272d26447f0054"/>
@@ -8061,7 +8061,7 @@
 		<!-- budget, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1990</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049180">
 				<rom name="(sps2773)castlemaster.ipf" size="1049180" crc="05cb22c1" sha1="8d914f15ff9fb67272396d35c80b26087552b7d3"/>
@@ -8680,7 +8680,7 @@
 		<!-- budget, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1989</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps2209)chaseh.q..ipf" size="1049612" crc="609ba2b9" sha1="9d6891f313f7dfc48b6da21664751ee4c0f2a444"/>
@@ -11050,7 +11050,7 @@
 		<!-- budget, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1988</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049180">
 				<rom name="(sps957)daleythompsonsolympicchallenge.ipf" size="1049180" crc="d669d368" sha1="53fb49531785ff8c5523cd0272b27ffe22d85d41"/>
@@ -21270,7 +21270,7 @@
 		<!-- budget, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1988</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049180">
 				<rom name="(sps2063)ik+.ipf" size="1049180" crc="eefd220d" sha1="702c31441a3d9ff0c7c0d9959bd49e814b7c55c8"/>
@@ -26307,7 +26307,7 @@
 		<!-- budget, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1988</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049180">
 				<rom name="(sps1144)lombardracrally.ipf" size="1049180" crc="ead0da67" sha1="cd266dd5c0319713ada9c47040478d814a6fc459"/>
@@ -29974,7 +29974,7 @@
 		<!-- budget, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1990</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -32210,7 +32210,7 @@
 		</part>
 	</software>
 
-	<software name="pbdreams" >
+	<software name="pbdreams">
 		<!-- SPS (CAPS) release 377 -->
 		<description>Pinball Dreams (Euro)</description>
 		<!-- retail, standalone -->
@@ -32816,7 +32816,7 @@
 		<!-- budget, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1989</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps2898)populous.ipf" size="1049612" crc="ca5f9bca" sha1="60ecc33c2174a0f46eb7dcf1be92b54e5f7fcca5"/>
@@ -32859,7 +32859,7 @@
 		<!-- budget, addon -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1989</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 		<info name="usage" value="Requires &quot;Populous&quot; to work" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
@@ -33085,7 +33085,7 @@
 		<!-- budget, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1990</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1886)powermonger.ipf" size="1049612" crc="eb1d5709" sha1="96e63c59672b4808872b8c7bd1c70480a9e9714c"/>
@@ -33517,7 +33517,7 @@
 		<!-- budget, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1989</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="991626">
 				<rom name="(sps1875)protennistour.ipf" size="991626" crc="fade8ee4" sha1="c50539ea55aa5d1b757f4893998dc481f096f238"/>
@@ -34359,7 +34359,7 @@
 		<!-- budget, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1991</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps2155)r.b.i.twobaseball.ipf" size="1049612" crc="015eab29" sha1="e9ccffea71659de928ef8961e3c140b919af2891"/>
@@ -34513,7 +34513,7 @@
 		<!-- budget, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1989</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1311)rainbowislands.ipf" size="1049612" crc="741161ec" sha1="86680b4e0782bba651d068d58d0ea52c242e49cb"/>
@@ -34527,7 +34527,7 @@
 		<!-- budget, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1989</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps2433)ramboiii.ipf" size="1049612" crc="d3aa03a2" sha1="129928fff3dc791c6ae9c441844275328776aa79"/>
@@ -34898,7 +34898,7 @@
 		<!-- budget, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1989</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049180">
 				<rom name="(sps1154)redheat.ipf" size="1049180" crc="891a370d" sha1="d00b48e1888b783fab0a9f1735b7776e5452af51"/>
@@ -35020,7 +35020,7 @@
 		<!-- budget, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1989</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049180">
 				<rom name="(sps2183)renegade.ipf" size="1049180" crc="8d20091a" sha1="a56e7725b46f858ef74e3acde4fdfc1600e93e8e"/>
@@ -35531,7 +35531,7 @@
 		<!-- budget, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1989</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1621)robocop.ipf" size="1049612" crc="717a7ec8" sha1="dc825cb30b7e7cad3c9d4ec9ddd957300b658ba6"/>
@@ -44517,7 +44517,7 @@ Because according to available sources v1.1 was always boxed as 'European Champi
 		<!-- budget, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1990</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049180">
 				<rom name="(sps1770)totalrecall.ipf" size="1049180" crc="f4381a36" sha1="ba5e84e9b6e0744dd8dc7b27d1eafb4a55dbae8e"/>
@@ -46226,7 +46226,7 @@ Because according to available sources v1.1 was always boxed as 'European Champi
 		<!-- budget, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1989</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049180">
 				<rom name="(sps1155)voyager.ipf" size="1049180" crc="5fa8b34f" sha1="7d007a0ed3229e937f253bc009d42cc2b1679967"/>
@@ -47603,7 +47603,7 @@ Because according to available sources v1.1 was always boxed as 'European Champi
 		<!-- budget, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1988</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049180">
 				<rom name="(sps1544)wizball.ipf" size="1049180" crc="047608f5" sha1="d36c7cb70340dc5bea09078e6c385450771cb69c"/>
@@ -48018,7 +48018,7 @@ Because according to available sources v1.1 was always boxed as 'European Champi
 		<!-- budget, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1991</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="852144">

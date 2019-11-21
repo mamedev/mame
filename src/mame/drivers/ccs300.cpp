@@ -153,7 +153,7 @@ void ccs300_state::ccs300(machine_config & config)
 	ctc.set_clk<0>(16_MHz_XTAL / 8);
 	ctc.set_clk<1>(16_MHz_XTAL / 8);
 	ctc.set_clk<2>(16_MHz_XTAL / 8);
-	ctc.set_clk<3>(16_MHz_XTAL / 8);
+	//ctc.set_clk<3>(16_MHz_XTAL / 8);   // this causes an IRQ storm, hanging the machine
 	ctc.zc_callback<0>().set("sio", FUNC(z80sio_device::txca_w));
 	ctc.zc_callback<0>().append("sio", FUNC(z80sio_device::rxca_w));
 	ctc.zc_callback<2>().append("sio", FUNC(z80sio_device::rxtxcb_w));

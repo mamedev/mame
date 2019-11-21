@@ -13,6 +13,10 @@
 
 #pragma once
 
+#include "bitmap.h"
+#include "imagedev/picture.h"
+#include "imagedev/avivideo.h"
+
 class vino_device : public device_t
 {
 public:
@@ -24,13 +28,21 @@ public:
 	auto i2c_data_out() { return m_i2c_data_out.bind(); }
 	auto i2c_data_in() { return m_i2c_data_in.bind(); }
 	auto i2c_stop() { return m_i2c_stop.bind(); }
+	auto interrupt_cb() { return m_interrupt_cb.bind(); }
+
+	template <typename T> void set_gio64_space(T &&tag, int space) { m_space.set_tag(std::forward<T>(tag), space); }
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
+	static constexpr device_timer_id TIMER_FETCH_CHA = 0;
+	static constexpr device_timer_id TIMER_FETCH_CHB = 1;
+
 	enum channel_num_t : uint32_t
 	{
 		CHAN_A,
@@ -87,6 +99,7 @@ private:
 		ISR_CHB_EOF                 = (1 << 3),
 		ISR_CHB_FIFO                = (1 << 4),
 		ISR_CHB_DESC                = (1 << 5),
+		ISR_MASK                    = 0x3f,
 
 		ALPHA_MASK                  = 0xff,
 
@@ -132,11 +145,20 @@ private:
 		I2C_BUS_ERROR               = (1 << 7),
 		I2C_CTRL_MASK               = 0xb7,
 
-		I2C_DATA_MASK               = 0xff
+		I2C_DATA_MASK               = 0xff,
+	};
+
+	enum pixel_format_t : uint8_t
+	{
+		FORMAT_RGBA32,
+		FORMAT_YUV422,
+		FORMAT_RGBA8,
+		FORMAT_Y8
 	};
 
 	struct channel_t
 	{
+		// Externally-visible state
 		uint32_t m_alpha;
 		uint32_t m_clip_start;
 		uint32_t m_clip_end;
@@ -151,7 +173,67 @@ private:
 		uint32_t m_fifo_threshold;
 		uint32_t m_fifo_gio_ptr;
 		uint32_t m_fifo_video_ptr;
+
+		// Internal state
+		uint64_t m_fifo[128];
+		uint32_t m_active_alpha;
+		uint32_t m_curr_line;
+		uint16_t m_frame_mask_shift;
+		uint16_t m_frame_mask_shifter;
+		uint32_t m_pixel_size;
+		uint64_t m_next_fifo_word;
+		uint32_t m_word_pixel_counter;
+		uint32_t m_decimation;
+
+		// Kludges for picture input
+		uint32_t m_field_width;
+		uint32_t m_field_height[2];
+		uint32_t m_field_x;
+		uint32_t m_field_y;
+
+		// Kludges in order to trigger end-of-field
+		int32_t m_pixels_per_even_field;
+		int32_t m_pixels_per_odd_field;
+		int32_t m_field_pixels_remaining[2];
+		bool m_end_of_field;
+
+		emu_timer *m_fetch_timer;
 	};
+
+	void do_dma_transfer(int channel);
+
+	//bool decimate(int channel);
+	bool is_interleaved(int channel);
+	bool is_even_field(int channel);
+	void end_of_field(int channel);
+
+	void push_fifo(int channel);
+
+	void count_pixel(int channel);
+	void argb_to_yuv(uint32_t argb, int32_t &y, int32_t &u, int32_t &v);
+	uint32_t yuv_to_abgr(int channel, int32_t y, int32_t u, int32_t v);
+	bool merge_pixel(int channel, int32_t y, int32_t u, int32_t v, pixel_format_t format);
+	pixel_format_t get_current_format(int channel);
+	void process_pixel(int channel, int32_t y, int32_t u, int32_t v);
+	uint32_t linear_rgb(uint32_t a, uint32_t b, float f);
+	uint32_t bilinear_pixel(float s, float t);
+	void input_pixel(int channel, int32_t &y, int32_t &u, int32_t &v);
+	void fetch_pixel(int channel);
+	attotime calculate_field_rate(int channel);
+	attotime calculate_fetch_rate(int channel);
+
+	void shift_dma_descriptors(int channel);
+	void load_dma_descriptors(int channel, uint32_t addr);
+	void invalidate_dma_descriptors(int channel);
+
+	void load_frame_mask_shifter(int channel);
+
+	bool line_count_w(int channel, uint32_t data);
+	void frame_rate_w(int channel, uint32_t data);
+	bool page_index_w(int channel, uint32_t data);
+	void next_desc_w(int channel, uint32_t data);
+	void control_w(uint32_t data);
+	void interrupts_w(uint32_t new_int);
 
 	uint32_t m_rev_id;
 	uint32_t m_control;
@@ -163,6 +245,13 @@ private:
 	devcb_write8 m_i2c_data_out;
 	devcb_read8 m_i2c_data_in;
 	devcb_write_line m_i2c_stop;
+	devcb_write_line m_interrupt_cb;
+
+	required_device<picture_image_device> m_picture;
+	required_device<avivideo_image_device> m_avivideo;
+	required_address_space m_space;
+
+	bitmap_argb32 *m_input_bitmap;
 };
 
 DECLARE_DEVICE_TYPE(VINO, vino_device)

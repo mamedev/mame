@@ -10,7 +10,6 @@
 
 #include "emu.h"
 #include "machine/timer.h"
-#include "screen.h"
 
 
 /***************************************************************************
@@ -37,13 +36,12 @@ DEFINE_DEVICE_TYPE(TIMER, timer_device, "timer", "Timer")
 timer_device::timer_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, TIMER, tag, owner, clock),
 		m_type(TIMER_TYPE_GENERIC),
-		m_callback(),
+		m_callback(*this),
 		m_ptr(nullptr),
 		m_start_delay(attotime::zero),
 		m_period(attotime::zero),
 		m_param(0),
-		m_screen_tag(nullptr),
-		m_screen(nullptr),
+		m_screen(*this, finder_base::DUMMY_TAG),
 		m_first_vpos(0),
 		m_increment(0),
 		m_timer(nullptr),
@@ -63,14 +61,14 @@ void timer_device::device_validity_check(validity_checker &valid) const
 	switch (m_type)
 	{
 		case TIMER_TYPE_GENERIC:
-			if (m_screen_tag != nullptr || m_first_vpos != 0 || m_start_delay != attotime::zero)
+			if (m_screen.finder_tag() != finder_base::DUMMY_TAG || m_first_vpos != 0 || m_start_delay != attotime::zero)
 				osd_printf_warning("Generic timer specified parameters for a scanline timer\n");
 			if (m_period != attotime::zero || m_start_delay != attotime::zero)
 				osd_printf_warning("Generic timer specified parameters for a periodic timer\n");
 			break;
 
 		case TIMER_TYPE_PERIODIC:
-			if (m_screen_tag != nullptr || m_first_vpos != 0)
+			if (m_screen.finder_tag() != finder_base::DUMMY_TAG || m_first_vpos != 0)
 				osd_printf_warning("Periodic timer specified parameters for a scanline timer\n");
 			if (m_period <= attotime::zero)
 				osd_printf_error("Periodic timer specified invalid period\n");
@@ -81,10 +79,10 @@ void timer_device::device_validity_check(validity_checker &valid) const
 				osd_printf_warning("Scanline timer specified parameters for a periodic timer\n");
 			if (m_param != 0)
 				osd_printf_warning("Scanline timer specified parameter which is ignored\n");
-			if (m_screen_tag == nullptr)
+			if (m_screen.finder_tag() == finder_base::DUMMY_TAG)
 				osd_printf_error("Scanline timer has no screen specified\n");
-			else if (dynamic_cast<screen_device *>(siblingdevice(m_screen_tag)) == nullptr)
-				osd_printf_error("Scanline timer specifies nonexistent screen %s\n", m_screen_tag);
+			else if (!m_screen)
+				osd_printf_error("Scanline timer specifies nonexistent screen %s\n", m_screen.finder_tag());
 //          if (m_first_vpos < 0)
 //              osd_printf_error("Scanline timer specified invalid initial position\n");
 //          if (m_increment < 0)
@@ -105,14 +103,10 @@ void timer_device::device_validity_check(validity_checker &valid) const
 
 void timer_device::device_start()
 {
-	// fetch the screen
-	if (m_screen_tag != nullptr)
-		m_screen = siblingdevice<screen_device>(m_screen_tag);
-
 	// allocate the timer
 	m_timer = timer_alloc();
 
-	m_callback.bind_relative_to(*owner());
+	m_callback.resolve();
 
 	// register for save states
 	save_item(NAME(m_first_time));
@@ -149,8 +143,8 @@ void timer_device::device_reset()
 		}
 
 		case TIMER_TYPE_SCANLINE:
-			if (m_screen == nullptr)
-				fatalerror("timer '%s': unable to find screen '%s'\n", tag(), m_screen_tag);
+			if (!m_screen)
+				fatalerror("timer '%s': unable to find screen '%s'\n", tag(), m_screen.finder_tag());
 
 			// set the timer to fire immediately
 			m_first_time = true;

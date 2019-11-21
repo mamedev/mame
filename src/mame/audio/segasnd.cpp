@@ -882,8 +882,9 @@ void usb_sound_device::device_add_mconfig(machine_config &config)
 	m_ourcpu->p2_out_cb().set(FUNC(usb_sound_device::p2_w));
 	m_ourcpu->t1_in_cb().set(FUNC(usb_sound_device::t1_r));
 
-	TIMER(config, "usb_timer", 0).configure_periodic(timer_device::expired_delegate(FUNC(usb_sound_device::increment_t1_clock_timer_cb), this)
-		, attotime::from_hz(USB_2MHZ_CLOCK / 256));
+	TIMER(config, "usb_timer", 0).configure_periodic(
+			FUNC(usb_sound_device::increment_t1_clock_timer_cb),
+			attotime::from_hz(USB_2MHZ_CLOCK / 256));
 }
 
 

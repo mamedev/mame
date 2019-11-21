@@ -58,7 +58,7 @@ void vme_hcpu30_card_device::hcpu30_mem(address_map &map)
 	map(0x00000000, 0x00000007).ram().w(FUNC(vme_hcpu30_card_device::bootvect_w));   /* After first write we act as RAM */
 	map(0x00000000, 0x00000007).rom().r(FUNC(vme_hcpu30_card_device::bootvect_r));   /* ROM mirror just during reset */
 	map(0x00000008, 0x001fffff).ram(); // local bus DRAM, 4MB
-	map(0x00200000, 0x00201fff).ram(); // AM_SHARE("iocpu")
+	map(0x00200000, 0x00201fff).ram(); // .share("iocpu");
 	map(0xff000000, 0xff007fff).rom().mirror(0x8000).region("user1", 0);
 	map(0xff020000, 0xff027fff).ram().mirror(0x8000); // SRAM 32KB
 	map(0xffff8000, 0xffff8fff).unmaprw(); // shared memory with iocpu

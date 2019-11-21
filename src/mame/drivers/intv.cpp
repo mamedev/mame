@@ -361,7 +361,7 @@ void intv_state::intvecs_mem(address_map &map)
 {
 	map(0x0000, 0x003f).rw(FUNC(intv_state::intv_stic_r), FUNC(intv_state::intv_stic_w));
 	map(0x0080, 0x0081).rw("speech", FUNC(sp0256_device::spb640_r), FUNC(sp0256_device::spb640_w)); /* Intellivoice */
-	// AM_RANGE(0x00E0, 0x00E3) AM_READWRITE( intv_ecs_uart_r, intv_ecs_uart_w )
+	// map(0x00e0, 0x00e3).rw(FUNC(intv_state::intv_ecs_uart_r), FUNC(intv_state::intv_ecs_uart_w));
 	map(0x00f0, 0x00ff).rw("ecs", FUNC(intv_ecs_device::read_ay), FUNC(intv_ecs_device::write_ay)); /* ecs psg */
 	map(0x0100, 0x01ef).rw(FUNC(intv_state::intv_ram8_r), FUNC(intv_state::intv_ram8_w));
 	map(0x01f0, 0x01ff).rw(m_sound, FUNC(ay8914_device::read), FUNC(ay8914_device::write)).umask16(0x00ff);
@@ -438,7 +438,7 @@ void intv_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 		intv_btb_fill(ptr, param);
 		break;
 	default:
-		assert_always(false, "Unknown id in intv_state::device_timer");
+		throw emu_fatalerror("Unknown id in intv_state::device_timer");
 	}
 }
 
@@ -463,7 +463,7 @@ void intv_state::intv(machine_config &config)
 	CP1610(config, m_maincpu, XTAL(3'579'545)/4);        /* Colorburst/4 */
 	m_maincpu->set_addrmap(AS_PROGRAM, &intv_state::intv_mem);
 	m_maincpu->set_vblank_int("screen", FUNC(intv_state::intv_interrupt));
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	/* video hardware */
 	STIC(config, m_stic, XTAL(3'579'545));
@@ -542,7 +542,7 @@ void intv_state::intvkbd(machine_config &config)
 	m_keyboard->set_addrmap(AS_PROGRAM, &intv_state::intvkbd2_mem);
 	m_keyboard->set_vblank_int("screen", FUNC(intv_state::intv_interrupt2));
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_intvkbd);

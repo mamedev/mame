@@ -10,8 +10,8 @@ DEFINE_DEVICE_TYPE(LINEAR_FLASH_PCCARD_64MB, linear_flash_pccard_64mb_device, "l
 
 linear_flash_pccard_device::linear_flash_pccard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
+	device_pccard_interface(mconfig, *this),
 	device_memory_interface(mconfig, *this),
-	device_slot_card_interface(mconfig, *this),
 	m_space(nullptr)
 {
 }
@@ -23,9 +23,7 @@ void linear_flash_pccard_device::device_start()
 
 device_memory_interface::space_config_vector linear_flash_pccard_device::memory_space_config() const
 {
-	return space_config_vector {
-		std::make_pair(0, &m_space_config)
-	};
+	return space_config_vector{ std::make_pair(0, &m_space_config) };
 }
 
 READ16_MEMBER( linear_flash_pccard_device::read_memory )

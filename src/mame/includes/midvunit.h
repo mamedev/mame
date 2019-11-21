@@ -7,8 +7,8 @@
 **************************************************************************/
 
 #include "audio/dcs.h"
+#include "bus/ata/ataintf.h"
 #include "machine/adc0844.h"
-#include "machine/ataintf.h"
 #include "machine/midwayic.h"
 #include "machine/timer.h"
 #include "machine/watchdog.h"

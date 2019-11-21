@@ -192,8 +192,8 @@ void mzr8105_state::mzr8105_mem(address_map &map)
 	map(0x000000, 0x003fff).rom().region("roms", 0x000000); /* System EPROM Area 16Kb OS9 DEBUG - not verified     */
 	map(0x004000, 0x01ffff).rom().region("roms", 0x004000);/* System EPROM Area 112Kb for System ROM - not verified    */
 	map(0x020000, 0x03ffff).ram(); /* Not verified */
-//  AM_RANGE (0x100000, 0xfeffff)  AM_READWRITE(vme_a24_r, vme_a24_w) /* VMEbus Rev B addresses (24 bits) - not verified */
-//  AM_RANGE (0xff0000, 0xffffff)  AM_READWRITE(vme_a16_r, vme_a16_w) /* VMEbus Rev B addresses (16 bits) - not verified */
+//  map(0x100000, 0xfeffff).rw(FUNC(mzr8105_state::vme_a24_r), FUNC(mzr8105_state::vme_a24_w)); /* VMEbus Rev B addresses (24 bits) - not verified */
+//  map(0xff0000, 0xffffff).rw(FUNC(mzr8105_state::vme_a16_r), FUNC(mzr8105_state::vme_a16_w)); /* VMEbus Rev B addresses (16 bits) - not verified */
 }
 
 /* Input ports */
@@ -226,9 +226,9 @@ void mzr8105_state::mzr8105(machine_config &config)
  * :upd B Reg 05 <- 68 Tx 8 bit chars + Tx enable
  */
 ROM_START (mzr8105)
-	ROM_REGION (0x20000, "roms", 0)
-	ROM_LOAD16_BYTE ("mzros9lb.bin", 0x000000, 0x2000, CRC (7c6a354d) SHA1 (2721eb649c8046dbcb517a36a97dc0816cd133f2))
-	ROM_LOAD16_BYTE ("mzros9hb.bin", 0x000001, 0x2000, CRC (d18e69a6) SHA1 (a00b68f4d649bcc09a29361f8692e52be12b3792))
+	ROM_REGION16_BE(0x20000, "roms", 0)
+	ROM_LOAD16_BYTE ("mzros9lb.bin", 0x000001, 0x2000, CRC (7c6a354d) SHA1 (2721eb649c8046dbcb517a36a97dc0816cd133f2))
+	ROM_LOAD16_BYTE ("mzros9hb.bin", 0x000000, 0x2000, CRC (d18e69a6) SHA1 (a00b68f4d649bcc09a29361f8692e52be12b3792))
 ROM_END
 
 /* Driver */

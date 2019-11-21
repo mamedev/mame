@@ -443,7 +443,7 @@ const char *const blockade_sample_names[] =
 
 void blockade_state::machine_start()
 {
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(blockade_state::tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(blockade_state::tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_vblank_timer = timer_alloc(0);
 

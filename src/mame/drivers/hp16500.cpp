@@ -429,7 +429,7 @@ void hp16500_state::hp1650(machine_config &config)
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
-	crtc.set_update_row_callback(FUNC(hp16500_state::crtc_update_row_1650), this);
+	crtc.set_update_row_callback(FUNC(hp16500_state::crtc_update_row_1650));
 	crtc.out_vsync_callback().set(FUNC(hp16500_state::vsync_changed));
 
 	MC2661(config, "epci", 5000000);
@@ -452,7 +452,7 @@ void hp16500_state::hp1651(machine_config &config)
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
-	crtc.set_update_row_callback(FUNC(hp16500_state::crtc_update_row_1650), this);
+	crtc.set_update_row_callback(FUNC(hp16500_state::crtc_update_row_1650));
 	crtc.out_vsync_callback().set(FUNC(hp16500_state::vsync_changed));
 
 	MC2661(config, "epci", 5000000);
@@ -475,7 +475,7 @@ void hp16500_state::hp16500a(machine_config &config)
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
-	crtc.set_update_row_callback(FUNC(hp16500_state::crtc_update_row), this);
+	crtc.set_update_row_callback(FUNC(hp16500_state::crtc_update_row));
 	crtc.out_vsync_callback().set(FUNC(hp16500_state::vsync_changed));
 
 	SPEAKER(config, "lspeaker").front_left();

@@ -228,7 +228,7 @@ void aha1542c_device::z84c0010_mem(address_map &map)
 	map(0xa000, 0xa000).portr("SWITCHES");
 	map(0xb000, 0xb000).w(FUNC(aha1542c_device::local_latch_w));
 	map(0xe000, 0xe0ff).ram();        // probably PC<->Z80 communication area
-	map(0xe003, 0xe003).lr8("e003_r", []() { return 0x20; });
+	map(0xe003, 0xe003).lr8(NAME([] () { return 0x20; }));
 }
 
 u8 aha1542cp_device::eeprom_r()
@@ -377,8 +377,9 @@ void aha1542c_device::device_start()
 {
 	set_isa_device();
 	m_isa->install_rom(this, 0xdc000, 0xdffff, "aha1542", "aha1542");
-	m_isa->install_device(0x330, 0x333, read8_delegate(FUNC( aha1542cf_device::aha1542_r ), this),
-	write8_delegate(FUNC( aha1542cf_device::aha1542_w ), this) );
+	m_isa->install_device(0x330, 0x333,
+			read8_delegate(*this, FUNC(aha1542cf_device::aha1542_r)),
+			write8_delegate(*this, FUNC(aha1542cf_device::aha1542_w)));
 }
 
 

@@ -42,7 +42,7 @@ NSString *const MAMESaveDebuggerConfigurationNotification = @"MAMESaveDebuggerCo
 	NSMenuItem *runParentItem = [menu addItemWithTitle:@"Run"
 												action:@selector(debugRun:)
 										 keyEquivalent:[NSString stringWithFormat:@"%C", (short)NSF5FunctionKey]];
-	NSMenu *runMenu = [[NSMenu allocWithZone:[NSMenu menuZone]] initWithTitle:@"Run"];
+	NSMenu *runMenu = [[NSMenu alloc] initWithTitle:@"Run"];
 	[runParentItem setSubmenu:runMenu];
 	[runMenu release];
 	[runParentItem setKeyEquivalentModifierMask:0];
@@ -64,7 +64,7 @@ NSString *const MAMESaveDebuggerConfigurationNotification = @"MAMESaveDebuggerCo
 	 setKeyEquivalentModifierMask:0];
 
 	NSMenuItem *stepParentItem = [menu addItemWithTitle:@"Step" action:NULL keyEquivalent:@""];
-	NSMenu *stepMenu = [[NSMenu allocWithZone:[NSMenu menuZone]] initWithTitle:@"Step"];
+	NSMenu *stepMenu = [[NSMenu alloc] initWithTitle:@"Step"];
 	[stepParentItem setSubmenu:stepMenu];
 	[stepMenu release];
 	[[stepMenu addItemWithTitle:@"Into"
@@ -81,7 +81,7 @@ NSString *const MAMESaveDebuggerConfigurationNotification = @"MAMESaveDebuggerCo
 	 setKeyEquivalentModifierMask:NSShiftKeyMask];
 
 	NSMenuItem *resetParentItem = [menu addItemWithTitle:@"Reset" action:NULL keyEquivalent:@""];
-	NSMenu *resetMenu = [[NSMenu allocWithZone:[NSMenu menuZone]] initWithTitle:@"Reset"];
+	NSMenu *resetMenu = [[NSMenu alloc] initWithTitle:@"Reset"];
 	[resetParentItem setSubmenu:resetMenu];
 	[resetMenu release];
 	[[resetMenu addItemWithTitle:@"Soft"
@@ -96,7 +96,7 @@ NSString *const MAMESaveDebuggerConfigurationNotification = @"MAMESaveDebuggerCo
 	[menu addItem:[NSMenuItem separatorItem]];
 
 	NSMenuItem *newParentItem = [menu addItemWithTitle:@"New" action:NULL keyEquivalent:@""];
-	NSMenu *newMenu = [[NSMenu allocWithZone:[NSMenu menuZone]] initWithTitle:@"New"];
+	NSMenu *newMenu = [[NSMenu alloc] initWithTitle:@"New"];
 	[newParentItem setSubmenu:newMenu];
 	[newMenu release];
 	[newMenu addItemWithTitle:@"Memory Window"

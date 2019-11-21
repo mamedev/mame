@@ -255,7 +255,7 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 
 	[self setFont:[[self class] defaultFontForMachine:m]];
 
-	NSMenu *contextMenu = [[NSMenu allocWithZone:[NSMenu menuZone]] initWithTitle:@"Context"];
+	NSMenu *contextMenu = [[NSMenu alloc] initWithTitle:@"Context"];
 	[self addContextMenuItemsToMenu:contextMenu];
 	[self setMenu:contextMenu];
 	[contextMenu release];

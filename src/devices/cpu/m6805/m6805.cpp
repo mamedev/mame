@@ -265,6 +265,13 @@ void m6805_base_device::device_start()
 	m_program = &space(AS_PROGRAM);
 	m_cache = m_program->cache<0, 0, ENDIANNESS_BIG>();
 
+	// get the minimum not including the zero placeholders for illegal instructions
+	m_min_cycles = *std::min_element(
+			std::begin(m_params.m_cycles),
+			std::end(m_params.m_cycles),
+			[] (u8 x, u8 y) { return u8(x - 1) < u8(y - 1); });
+	m_max_cycles = *std::max_element(std::begin(m_params.m_cycles), std::end(m_params.m_cycles));
+
 	// set our instruction counter
 	set_icountptr(m_icount);
 
@@ -424,7 +431,7 @@ std::unique_ptr<util::disasm_interface> m6805_base_device::create_disassembler()
 //  clock into cycles per second
 //-------------------------------------------------
 
-uint64_t m6805_base_device::execute_clocks_to_cycles(uint64_t clocks) const
+uint64_t m6805_base_device::execute_clocks_to_cycles(uint64_t clocks) const noexcept
 {
 	return (clocks + 3) / 4;
 }
@@ -435,7 +442,7 @@ uint64_t m6805_base_device::execute_clocks_to_cycles(uint64_t clocks) const
 //  count back to raw clocks
 //-------------------------------------------------
 
-uint64_t m6805_base_device::execute_cycles_to_clocks(uint64_t cycles) const
+uint64_t m6805_base_device::execute_cycles_to_clocks(uint64_t cycles) const noexcept
 {
 	return cycles * 4;
 }
@@ -446,14 +453,9 @@ uint64_t m6805_base_device::execute_cycles_to_clocks(uint64_t cycles) const
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-uint32_t m6805_base_device::execute_min_cycles() const
+uint32_t m6805_base_device::execute_min_cycles() const noexcept
 {
-	// get the minimum not including the zero placeholders for illegal instructions
-	u32 const result(*std::min_element(
-			std::begin(m_params.m_cycles),
-			std::end(m_params.m_cycles),
-			[] (u8 x, u8 y) { return u8(x - 1) < u8(y - 1); }));
-	return result;
+	return m_min_cycles;
 }
 
 
@@ -462,10 +464,9 @@ uint32_t m6805_base_device::execute_min_cycles() const
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-uint32_t m6805_base_device::execute_max_cycles() const
+uint32_t m6805_base_device::execute_max_cycles() const noexcept
 {
-	u32 const result(*std::max_element(std::begin(m_params.m_cycles), std::end(m_params.m_cycles)));
-	return result;
+	return m_max_cycles;
 }
 
 
@@ -474,7 +475,7 @@ uint32_t m6805_base_device::execute_max_cycles() const
 //  input/interrupt lines
 //-------------------------------------------------
 
-uint32_t m6805_base_device::execute_input_lines() const
+uint32_t m6805_base_device::execute_input_lines() const noexcept
 {
 	return 9;
 }

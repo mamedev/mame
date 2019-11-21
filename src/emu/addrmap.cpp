@@ -61,21 +61,69 @@ static char *core_i64_hex_format(u64 value, u8 mindigits)
 //-------------------------------------------------
 
 address_map_entry::address_map_entry(device_t &device, address_map &map, offs_t start, offs_t end)
-	: m_next(nullptr),
-		m_map(map),
-		m_devbase(device),
-		m_addrstart(start),
-		m_addrend(end),
-		m_addrmirror(0),
-		m_addrmask(0),
-		m_addrselect(0),
-		m_mask(0),
-		m_cswidth(0),
-		m_share(nullptr),
-		m_region(nullptr),
-		m_rgnoffs(0),
-		m_submap_device(nullptr),
-		m_memory(nullptr)
+	: m_next(nullptr)
+	, m_map(map)
+	, m_devbase(device)
+	, m_addrstart(start)
+	, m_addrend(end)
+	, m_addrmirror(0)
+	, m_addrmask(0)
+	, m_addrselect(0)
+	, m_mask(0)
+	, m_cswidth(0)
+	, m_share(nullptr)
+	, m_region(nullptr)
+	, m_rgnoffs(0)
+	, m_rproto8(device)
+	, m_rproto16(device)
+	, m_rproto32(device)
+	, m_rproto64(device)
+	, m_wproto8(device)
+	, m_wproto16(device)
+	, m_wproto32(device)
+	, m_wproto64(device)
+	, m_rproto8m(device)
+	, m_rproto16m(device)
+	, m_rproto32m(device)
+	, m_rproto64m(device)
+	, m_wproto8m(device)
+	, m_wproto16m(device)
+	, m_wproto32m(device)
+	, m_wproto64m(device)
+	, m_rproto8s(device)
+	, m_rproto16s(device)
+	, m_rproto32s(device)
+	, m_rproto64s(device)
+	, m_wproto8s(device)
+	, m_wproto16s(device)
+	, m_wproto32s(device)
+	, m_wproto64s(device)
+	, m_rproto8sm(device)
+	, m_rproto16sm(device)
+	, m_rproto32sm(device)
+	, m_rproto64sm(device)
+	, m_wproto8sm(device)
+	, m_wproto16sm(device)
+	, m_wproto32sm(device)
+	, m_wproto64sm(device)
+	, m_rproto8mo(device)
+	, m_rproto16mo(device)
+	, m_rproto32mo(device)
+	, m_rproto64mo(device)
+	, m_wproto8mo(device)
+	, m_wproto16mo(device)
+	, m_wproto32mo(device)
+	, m_wproto64mo(device)
+	, m_rproto8smo(device)
+	, m_rproto16smo(device)
+	, m_rproto32smo(device)
+	, m_rproto64smo(device)
+	, m_wproto8smo(device)
+	, m_wproto16smo(device)
+	, m_wproto32smo(device)
+	, m_wproto64smo(device)
+	, m_submap_device(nullptr)
+	, m_memory(nullptr)
 {
 }
 
@@ -686,7 +734,7 @@ bool address_map_entry::unitmask_is_appropriate(u8 width, u64 unitmask, const ch
 	// if map is narrower than 64 bits, check the mask width as well
 	if (m_map.m_databits < 64 && (unitmask >> m_map.m_databits) != 0)
 	{
-		osd_printf_error("Handler %s specified a mask of %08X%08X, too wide to be used in a %d-bit address map\n", string, (u32)(unitmask >> 32), (u32)unitmask, m_map.m_databits);
+		osd_printf_error("Handler %s specified a mask of %016X, too wide to be used in a %d-bit address map\n", string, unitmask, m_map.m_databits);
 		return false;
 	}
 
@@ -700,7 +748,7 @@ bool address_map_entry::unitmask_is_appropriate(u8 width, u64 unitmask, const ch
 			count++;
 		else if ((unitmask & singlemask) != 0)
 		{
-			osd_printf_error("Handler %s specified a mask of %08X%08X; needs to be in even chunks of %X\n", string, (u32)(unitmask >> 32), (u32)unitmask, basemask);
+			osd_printf_error("Handler %s specified a mask of %016X; needs to be in even chunks of %X\n", string, unitmask, basemask);
 			return false;
 		}
 		singlemask <<= width;
@@ -718,7 +766,7 @@ bool address_map_entry::unitmask_is_appropriate(u8 width, u64 unitmask, const ch
 		|| (unitmask_wh != 0 && unitmask_wl != 0 && unitmask_wh != unitmask_wl)
 		|| (unitmask_dh != 0 && unitmask_dl != 0 && unitmask_dh != unitmask_dl))
 	{
-		osd_printf_error("Handler %s specified an asymmetrical mask of %08X%08X\n", string, (u32)(unitmask >> 32), (u32)unitmask);
+		osd_printf_error("Handler %s specified an asymmetrical mask of %016X\n", string, unitmask);
 		return false;
 	}
 #endif
@@ -1111,7 +1159,7 @@ void address_map::map_validity_check(validity_checker &valid, int spacenum) cons
 		{
 			// address map entries that reference regions but are NOPs are pointless
 			if (entry.m_read.m_type == AMH_NONE && entry.m_write.m_type == AMH_NONE)
-				osd_printf_error("%s space references memory region %s, but is AM_NOP\n", spaceconfig.m_name, entry.m_region);
+				osd_printf_error("%s space references memory region %s, but is noprw()\n", spaceconfig.m_name, entry.m_region);
 
 			// make sure we can resolve the full path to the region
 			bool found = false;
@@ -1142,71 +1190,71 @@ void address_map::map_validity_check(validity_checker &valid, int spacenum) cons
 		if (entry.m_read.m_type == AMH_DEVICE_DELEGATE || entry.m_read.m_type == AMH_DEVICE_DELEGATE_M || entry.m_read.m_type == AMH_DEVICE_DELEGATE_S || entry.m_read.m_type == AMH_DEVICE_DELEGATE_SM || entry.m_read.m_type == AMH_DEVICE_DELEGATE_MO || entry.m_read.m_type == AMH_DEVICE_DELEGATE_SMO)
 		{
 			// extract the device tag from the proto-delegate
-			const char *devtag = nullptr;
+			std::pair<std::reference_wrapper<device_t>, const char *> devtag(entry.m_devbase, nullptr);
 			switch (entry.m_read.m_bits)
 			{
 				case 8:
 					if (entry.m_read.m_type == AMH_DEVICE_DELEGATE)
-						devtag = entry.m_rproto8.device_name();
+						devtag = entry.m_rproto8.finder_target();
 					else if (entry.m_read.m_type == AMH_DEVICE_DELEGATE_M)
-						devtag = entry.m_rproto8m.device_name();
+						devtag = entry.m_rproto8m.finder_target();
 					else if (entry.m_read.m_type == AMH_DEVICE_DELEGATE_S)
-						devtag = entry.m_rproto8s.device_name();
+						devtag = entry.m_rproto8s.finder_target();
 					else if (entry.m_read.m_type == AMH_DEVICE_DELEGATE_SM)
-						devtag = entry.m_rproto8sm.device_name();
+						devtag = entry.m_rproto8sm.finder_target();
 					else if (entry.m_read.m_type == AMH_DEVICE_DELEGATE_MO)
-						devtag = entry.m_rproto8mo.device_name();
+						devtag = entry.m_rproto8mo.finder_target();
 					else
-						devtag = entry.m_rproto8smo.device_name();
+						devtag = entry.m_rproto8smo.finder_target();
 					break;
 
 				case 16:
 					if (entry.m_read.m_type == AMH_DEVICE_DELEGATE)
-						devtag = entry.m_rproto16.device_name();
+						devtag = entry.m_rproto16.finder_target();
 					else if (entry.m_read.m_type == AMH_DEVICE_DELEGATE_M)
-						devtag = entry.m_rproto16m.device_name();
+						devtag = entry.m_rproto16m.finder_target();
 					else if (entry.m_read.m_type == AMH_DEVICE_DELEGATE_S)
-						devtag = entry.m_rproto16s.device_name();
+						devtag = entry.m_rproto16s.finder_target();
 					else if (entry.m_read.m_type == AMH_DEVICE_DELEGATE_SM)
-						devtag = entry.m_rproto16sm.device_name();
+						devtag = entry.m_rproto16sm.finder_target();
 					else if (entry.m_read.m_type == AMH_DEVICE_DELEGATE_MO)
-						devtag = entry.m_rproto16mo.device_name();
+						devtag = entry.m_rproto16mo.finder_target();
 					else
-						devtag = entry.m_rproto16smo.device_name();
+						devtag = entry.m_rproto16smo.finder_target();
 					break;
 
 				case 32:
 					if (entry.m_read.m_type == AMH_DEVICE_DELEGATE)
-						devtag = entry.m_rproto32.device_name();
+						devtag = entry.m_rproto32.finder_target();
 					else if (entry.m_read.m_type == AMH_DEVICE_DELEGATE_M)
-						devtag = entry.m_rproto32m.device_name();
+						devtag = entry.m_rproto32m.finder_target();
 					else if (entry.m_read.m_type == AMH_DEVICE_DELEGATE_S)
-						devtag = entry.m_rproto32s.device_name();
+						devtag = entry.m_rproto32s.finder_target();
 					else if (entry.m_read.m_type == AMH_DEVICE_DELEGATE_SM)
-						devtag = entry.m_rproto32sm.device_name();
+						devtag = entry.m_rproto32sm.finder_target();
 					else if (entry.m_read.m_type == AMH_DEVICE_DELEGATE_MO)
-						devtag = entry.m_rproto32mo.device_name();
+						devtag = entry.m_rproto32mo.finder_target();
 					else
-						devtag = entry.m_rproto32smo.device_name();
+						devtag = entry.m_rproto32smo.finder_target();
 					break;
 
 				case 64:
 					if (entry.m_read.m_type == AMH_DEVICE_DELEGATE)
-						devtag = entry.m_rproto64.device_name();
+						devtag = entry.m_rproto64.finder_target();
 					else if (entry.m_read.m_type == AMH_DEVICE_DELEGATE_M)
-						devtag = entry.m_rproto64m.device_name();
+						devtag = entry.m_rproto64m.finder_target();
 					else if (entry.m_read.m_type == AMH_DEVICE_DELEGATE_S)
-						devtag = entry.m_rproto64s.device_name();
+						devtag = entry.m_rproto64s.finder_target();
 					else if (entry.m_read.m_type == AMH_DEVICE_DELEGATE_SM)
-						devtag = entry.m_rproto64sm.device_name();
+						devtag = entry.m_rproto64sm.finder_target();
 					else if (entry.m_read.m_type == AMH_DEVICE_DELEGATE_MO)
-						devtag = entry.m_rproto64mo.device_name();
+						devtag = entry.m_rproto64mo.finder_target();
 					else
-						devtag = entry.m_rproto64smo.device_name();
+						devtag = entry.m_rproto64smo.finder_target();
 					break;
 			}
-			if (entry.m_devbase.subdevice(devtag) == nullptr)
-				osd_printf_error("%s space memory map entry reads from nonexistent device '%s'\n", spaceconfig.m_name, devtag ? devtag : "<unspecified>");
+			if (devtag.second && !devtag.first.get().subdevice(devtag.second))
+				osd_printf_error("%s space memory map entry reads from nonexistent device '%s'\n", spaceconfig.m_name, devtag.first.get().subtag(devtag.second).c_str());
 #ifndef MAME_DEBUG // assert will catch this earlier
 			(void)entry.unitmask_is_appropriate(entry.m_read.m_bits, entry.m_mask, entry.m_read.m_name);
 #endif
@@ -1214,71 +1262,71 @@ void address_map::map_validity_check(validity_checker &valid, int spacenum) cons
 		if (entry.m_write.m_type == AMH_DEVICE_DELEGATE || entry.m_read.m_type == AMH_DEVICE_DELEGATE_M || entry.m_write.m_type == AMH_DEVICE_DELEGATE_S || entry.m_write.m_type == AMH_DEVICE_DELEGATE_SM || entry.m_read.m_type == AMH_DEVICE_DELEGATE_MO || entry.m_write.m_type == AMH_DEVICE_DELEGATE_SMO)
 		{
 			// extract the device tag from the proto-delegate
-			const char *devtag = nullptr;
+			std::pair<std::reference_wrapper<device_t>, const char *> devtag(entry.m_devbase, nullptr);
 			switch (entry.m_write.m_bits)
 			{
 				case 8:
 					if (entry.m_write.m_type == AMH_DEVICE_DELEGATE)
-						devtag = entry.m_wproto8.device_name();
+						devtag = entry.m_wproto8.finder_target();
 					else if (entry.m_write.m_type == AMH_DEVICE_DELEGATE_M)
-						devtag = entry.m_wproto8m.device_name();
+						devtag = entry.m_wproto8m.finder_target();
 					else if (entry.m_write.m_type == AMH_DEVICE_DELEGATE_S)
-						devtag = entry.m_wproto8s.device_name();
+						devtag = entry.m_wproto8s.finder_target();
 					else if (entry.m_write.m_type == AMH_DEVICE_DELEGATE_SM)
-						devtag = entry.m_wproto8sm.device_name();
+						devtag = entry.m_wproto8sm.finder_target();
 					else if (entry.m_write.m_type == AMH_DEVICE_DELEGATE_MO)
-						devtag = entry.m_wproto8mo.device_name();
+						devtag = entry.m_wproto8mo.finder_target();
 					else
-						devtag = entry.m_wproto8smo.device_name();
+						devtag = entry.m_wproto8smo.finder_target();
 					break;
 
 				case 16:
 					if (entry.m_write.m_type == AMH_DEVICE_DELEGATE)
-						devtag = entry.m_wproto16.device_name();
+						devtag = entry.m_wproto16.finder_target();
 					else if (entry.m_write.m_type == AMH_DEVICE_DELEGATE_M)
-						devtag = entry.m_wproto16m.device_name();
+						devtag = entry.m_wproto16m.finder_target();
 					else if (entry.m_write.m_type == AMH_DEVICE_DELEGATE_S)
-						devtag = entry.m_wproto16s.device_name();
+						devtag = entry.m_wproto16s.finder_target();
 					else if (entry.m_write.m_type == AMH_DEVICE_DELEGATE_SM)
-						devtag = entry.m_wproto16sm.device_name();
+						devtag = entry.m_wproto16sm.finder_target();
 					else if (entry.m_write.m_type == AMH_DEVICE_DELEGATE_MO)
-						devtag = entry.m_wproto16mo.device_name();
+						devtag = entry.m_wproto16mo.finder_target();
 					else
-						devtag = entry.m_wproto16smo.device_name();
+						devtag = entry.m_wproto16smo.finder_target();
 					break;
 
 				case 32:
 					if (entry.m_write.m_type == AMH_DEVICE_DELEGATE)
-						devtag = entry.m_wproto32.device_name();
+						devtag = entry.m_wproto32.finder_target();
 					else if (entry.m_write.m_type == AMH_DEVICE_DELEGATE_M)
-						devtag = entry.m_wproto32m.device_name();
+						devtag = entry.m_wproto32m.finder_target();
 					else if (entry.m_write.m_type == AMH_DEVICE_DELEGATE_S)
-						devtag = entry.m_wproto32s.device_name();
+						devtag = entry.m_wproto32s.finder_target();
 					else if (entry.m_write.m_type == AMH_DEVICE_DELEGATE_SM)
-						devtag = entry.m_wproto32sm.device_name();
+						devtag = entry.m_wproto32sm.finder_target();
 					else if (entry.m_write.m_type == AMH_DEVICE_DELEGATE_MO)
-						devtag = entry.m_wproto32mo.device_name();
+						devtag = entry.m_wproto32mo.finder_target();
 					else
-						devtag = entry.m_wproto32smo.device_name();
+						devtag = entry.m_wproto32smo.finder_target();
 					break;
 
 				case 64:
 					if (entry.m_write.m_type == AMH_DEVICE_DELEGATE)
-						devtag = entry.m_wproto64.device_name();
+						devtag = entry.m_wproto64.finder_target();
 					else if (entry.m_write.m_type == AMH_DEVICE_DELEGATE_M)
-						devtag = entry.m_wproto64m.device_name();
+						devtag = entry.m_wproto64m.finder_target();
 					else if (entry.m_write.m_type == AMH_DEVICE_DELEGATE_S)
-						devtag = entry.m_wproto64s.device_name();
+						devtag = entry.m_wproto64s.finder_target();
 					else if (entry.m_write.m_type == AMH_DEVICE_DELEGATE_SM)
-						devtag = entry.m_wproto64sm.device_name();
+						devtag = entry.m_wproto64sm.finder_target();
 					else if (entry.m_write.m_type == AMH_DEVICE_DELEGATE_MO)
-						devtag = entry.m_wproto64mo.device_name();
+						devtag = entry.m_wproto64mo.finder_target();
 					else
-						devtag = entry.m_wproto64smo.device_name();
+						devtag = entry.m_wproto64smo.finder_target();
 					break;
 			}
-			if (entry.m_devbase.subdevice(devtag) == nullptr)
-				osd_printf_error("%s space memory map entry writes to nonexistent device '%s'\n", spaceconfig.m_name, devtag ? devtag : "<unspecified>");
+			if (devtag.second && !devtag.first.get().subdevice(devtag.second))
+				osd_printf_error("%s space memory map entry writes to nonexistent device '%s'\n", spaceconfig.m_name, devtag.first.get().subtag(devtag.second).c_str());
 #ifndef MAME_DEBUG // assert will catch this earlier
 			(void)entry.unitmask_is_appropriate(entry.m_write.m_bits, entry.m_mask, entry.m_write.m_name);
 #endif

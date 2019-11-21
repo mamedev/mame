@@ -542,7 +542,7 @@ void atarigen_state::slapstic_configure(cpu_device &device, offs_t base, offs_t 
 
 	// install the memory handlers
 	address_space &program = device.space(AS_PROGRAM);
-	program.install_readwrite_handler(base, base + 0x7fff, 0, mirror, 0, read16_delegate(FUNC(atarigen_state::slapstic_r), this), write16_delegate(FUNC(atarigen_state::slapstic_w), this));
+	program.install_readwrite_handler(base, base + 0x7fff, 0, mirror, 0, read16_delegate(*this, FUNC(atarigen_state::slapstic_r)), write16_delegate(*this, FUNC(atarigen_state::slapstic_w)));
 	m_slapstic = (u16 *)mem;
 
 	// allocate memory for a copy of bank 0

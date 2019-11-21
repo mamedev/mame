@@ -310,8 +310,8 @@ void miragemj_state::mirage(machine_config &config)
 	m_deco_tilegen->set_pf2_col_bank(0x10);
 	m_deco_tilegen->set_pf1_col_mask(0x0f);
 	m_deco_tilegen->set_pf2_col_mask(0x0f);
-	m_deco_tilegen->set_bank1_callback(FUNC(miragemj_state::bank_callback), this);
-	m_deco_tilegen->set_bank2_callback(FUNC(miragemj_state::bank_callback), this);
+	m_deco_tilegen->set_bank1_callback(FUNC(miragemj_state::bank_callback));
+	m_deco_tilegen->set_bank2_callback(FUNC(miragemj_state::bank_callback));
 	m_deco_tilegen->set_pf12_8x8_bank(0);
 	m_deco_tilegen->set_pf12_16x16_bank(1);
 	m_deco_tilegen->set_gfxdecode_tag("gfxdecode");

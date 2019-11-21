@@ -4,31 +4,31 @@
 
     Technology Research Beta 128 Disk interface
 
-	This hardware type runs TR-DOS 5.xx (official) and newer
-	unofficial updates.  It was designed to work properly with
-	the 128k machines that had issues with the original Beta Disk
-	due to changes in the 128k ROM structure etc. (enable address
-	is moved from 3cxx to 3dxx for example)
+    This hardware type runs TR-DOS 5.xx (official) and newer
+    unofficial updates.  It was designed to work properly with
+    the 128k machines that had issues with the original Beta Disk
+    due to changes in the 128k ROM structure etc. (enable address
+    is moved from 3cxx to 3dxx for example)
 
-	Issues:
+    Issues:
 
-	Using the FD1793 device a 'CAT' operation in the 'spectrum' driver
-	will always report 'No Disk' but using the Soviet clone KR1818VG93
-	it properly gives the disk catalogue.  Despite this files can still
-	be loaded from disk.
+    Using the FD1793 device a 'CAT' operation in the 'spectrum' driver
+    will always report 'No Disk' but using the Soviet clone KR1818VG93
+    it properly gives the disk catalogue.  Despite this files can still
+    be loaded from disk.
 
-	The 128k Spectrum drivers have a similar issues, although even if
-	you replace the controller doing a 'CAT' operation seems to have
-	an adverse effect on the system memory setup as things become
-	corrupt (LOADing or MERGEing a program afterwards can cause a reset)
+    The 128k Spectrum drivers have a similar issues, although even if
+    you replace the controller doing a 'CAT' operation seems to have
+    an adverse effect on the system memory setup as things become
+    corrupt (LOADing or MERGEing a program afterwards can cause a reset)
 
-	Neither of these issues occur in other Spectrum emulators using
-	the same ROMs and floppy images.
+    Neither of these issues occur in other Spectrum emulators using
+    the same ROMs and floppy images.
 
-	TODO:
+    TODO:
 
-	there were many unofficial ROMs available for this, make them
-	available for use.
+    there were many unofficial ROMs available for this, make them
+    available for use.
 
 *********************************************************************/
 

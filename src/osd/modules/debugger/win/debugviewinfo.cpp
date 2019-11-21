@@ -111,9 +111,9 @@ uint32_t debugview_info::maxwidth()
 {
 	uint32_t max = m_view->total_size().x;
 	debug_view_source const *const cursource = m_view->source();
-	for (const debug_view_source &source : m_view->source_list())
+	for (auto &source : m_view->source_list())
 	{
-		m_view->set_source(source);
+		m_view->set_source(*source);
 		uint32_t const chars = m_view->total_size().x;
 		if (max < chars)
 			max = chars;
@@ -217,7 +217,7 @@ bool debugview_info::set_source_index(int index)
 {
 	if (m_view != nullptr)
 	{
-		const debug_view_source *const source = m_view->source_list().find(index);
+		const debug_view_source *const source = m_view->source(index);
 		if (source != nullptr)
 		{
 			m_view->set_source(*source);
@@ -264,7 +264,7 @@ HWND debugview_info::create_source_combobox(HWND parent, LONG_PTR userdata)
 	// populate the combobox
 	debug_view_source const *const cursource = m_view->source();
 	int maxlength = 0;
-	for (debug_view_source const *source = m_view->first_source(); source != nullptr; source = source->next())
+	for (auto &source : m_view->source_list())
 	{
 		int const length = strlen(source->name());
 		if (length > maxlength)
@@ -274,7 +274,7 @@ HWND debugview_info::create_source_combobox(HWND parent, LONG_PTR userdata)
 	}
 	if (cursource != nullptr)
 	{
-		SendMessage(result, CB_SETCURSEL, m_view->source_list().indexof(*cursource), 0);
+		SendMessage(result, CB_SETCURSEL, m_view->source_index(*cursource), 0);
 		SendMessage(result, CB_SETDROPPEDWIDTH, ((maxlength + 2) * metrics().debug_font_width()) + metrics().vscroll_width(), 0);
 		m_view->set_source(*cursource);
 	}

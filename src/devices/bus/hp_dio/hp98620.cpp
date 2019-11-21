@@ -75,8 +75,8 @@ void dio16_98620_device::device_reset()
 	if (!m_installed_io)
 	{
 		program_space().install_readwrite_handler(0x500000, 0x50020f,
-				read16_delegate(FUNC(dio16_98620_device::dma_r), this),
-				write16_delegate(FUNC(dio16_98620_device::dma_w), this));
+				read16_delegate(*this, FUNC(dio16_98620_device::dma_r)),
+				write16_delegate(*this, FUNC(dio16_98620_device::dma_w)));
 		m_installed_io = true;
 	}
 	m_control = 0;

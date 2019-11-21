@@ -22,40 +22,27 @@ m6507_device::m6507_device(const machine_config &mconfig, const char *tag, devic
 
 void m6507_device::device_start()
 {
-	if(cache_disabled)
-		mintf = std::make_unique<mi_6507_nd>();
-	else
-		mintf = std::make_unique<mi_6507_normal>();
+	mintf = std::make_unique<mi_6507>();
 
 	init();
 }
 
-uint8_t m6507_device::mi_6507_normal::read(uint16_t adr)
+uint8_t m6507_device::mi_6507::read(uint16_t adr)
 {
 	return program->read_byte(adr & 0x1fff);
 }
 
-uint8_t m6507_device::mi_6507_normal::read_sync(uint16_t adr)
+uint8_t m6507_device::mi_6507::read_sync(uint16_t adr)
 {
 	return scache->read_byte(adr & 0x1fff);
 }
 
-uint8_t m6507_device::mi_6507_normal::read_arg(uint16_t adr)
+uint8_t m6507_device::mi_6507::read_arg(uint16_t adr)
 {
 	return cache->read_byte(adr & 0x1fff);
 }
 
-void m6507_device::mi_6507_normal::write(uint16_t adr, uint8_t val)
+void m6507_device::mi_6507::write(uint16_t adr, uint8_t val)
 {
 	program->write_byte(adr & 0x1fff, val);
-}
-
-uint8_t m6507_device::mi_6507_nd::read_sync(uint16_t adr)
-{
-	return sprogram->read_byte(adr & 0x1fff);
-}
-
-uint8_t m6507_device::mi_6507_nd::read_arg(uint16_t adr)
-{
-	return program->read_byte(adr & 0x1fff);
 }

@@ -149,7 +149,7 @@ void dec8_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 		break;
 	default:
-		assert_always(false, "Unknown id in dec8_state::device_timer");
+		throw emu_fatalerror("Unknown id in dec8_state::device_timer");
 	}
 }
 
@@ -1904,7 +1904,7 @@ void dec8_state::lastmisn(machine_config &config)
 	m_mcu->port_out_cb<2>().set(FUNC(dec8_state::shackled_mcu_to_main_w));
 	m_mcu->port_in_cb<3>().set_ioport("I8751");
 
-	config.m_minimum_quantum = attotime::from_hz(12000);
+	config.set_maximum_quantum(attotime::from_hz(12000));
 
 	INPUT_MERGER_ANY_LOW(config, "coin").output_handler().set(FUNC(dec8_state::shackled_coin_irq));
 
@@ -1963,8 +1963,8 @@ void dec8_state::shackled(machine_config &config)
 	m_mcu->port_out_cb<2>().set(FUNC(dec8_state::shackled_mcu_to_main_w));
 	m_mcu->port_in_cb<3>().set_ioport("I8751");
 
-//  config.m_minimum_quantum = attotime::from_hz(100000);
-	config.m_perfect_cpu_quantum = subtag("maincpu"); // needs heavy sync, otherwise one of the two CPUs will miss an IRQ and cause the game to hang
+//  config.set_maximum_quantum(attotime::from_hz(100000));
+	config.set_perfect_quantum(m_maincpu); // needs heavy sync, otherwise one of the two CPUs will miss an IRQ and cause the game to hang
 
 	INPUT_MERGER_ANY_LOW(config, "coin").output_handler().set(FUNC(dec8_state::shackled_coin_irq));
 
@@ -2024,7 +2024,7 @@ void dec8_state::gondo(machine_config &config)
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
 	DECO_KARNOVSPRITES(config, m_spritegen_krn, 0);
-	m_spritegen_krn->set_colpri_callback(FUNC(dec8_state::gondo_colpri_cb), this);
+	m_spritegen_krn->set_colpri_callback(FUNC(dec8_state::gondo_colpri_cb));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 //  m_screen->set_refresh_hz(58);
@@ -2119,13 +2119,13 @@ void dec8_state::garyoret(machine_config &config)
 void dec8_state::ghostb(machine_config &config)
 {
 	/* basic machine hardware */
-	HD6309E(config, m_maincpu, 3000000);  /* HD63C09EP */
+	HD6309E(config, m_maincpu, XTAL(12'000'000) / 4);  /* HD63C09EP, clock verified */
 	m_maincpu->set_addrmap(AS_PROGRAM, &dec8_state::meikyuh_map);
 
-	DECO_222(config, m_audiocpu, 1500000);
+	DECO_222(config, m_audiocpu, XTAL(12'000'000) / 8); /* also seen with stock M6502, clock verified */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &dec8_state::dec8_s_map); /* NMIs are caused by the main CPU */
 
-	I8751(config, m_mcu, 3000000*4);
+	I8751(config, m_mcu, XTAL(8'000'000)); /* 8.0MHz OSC next to MCU - clock verified */
 	m_mcu->port_in_cb<0>().set(FUNC(dec8_state::i8751_port0_r));
 	m_mcu->port_out_cb<0>().set(FUNC(dec8_state::i8751_port0_w));
 	m_mcu->port_in_cb<1>().set(FUNC(dec8_state::i8751_port1_r));
@@ -2156,7 +2156,7 @@ void dec8_state::ghostb(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ghostb);
 	DECO_RMC3(config, m_palette, 0, 1024); // xxxxBBBBGGGGRRRR with custom weighting
 	m_palette->set_prom_region("proms");
-	m_palette->set_init("palette", FUNC(deco_rmc3_device::palette_init_proms));
+	m_palette->set_init(m_palette, FUNC(deco_rmc3_device::palette_init_proms));
 	MCFG_VIDEO_START_OVERRIDE(dec8_state,ghostb)
 
 	/* sound hardware */
@@ -2164,13 +2164,13 @@ void dec8_state::ghostb(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	ym2203_device &ym1(YM2203(config, "ym1", 1500000));
+	ym2203_device &ym1(YM2203(config, "ym1", XTAL(12'000'000) / 8)); // clock verified
 	ym1.add_route(0, "mono", 0.23);
 	ym1.add_route(1, "mono", 0.23);
 	ym1.add_route(2, "mono", 0.23);
 	ym1.add_route(3, "mono", 0.20);
 
-	ym3812_device &ym2(YM3812(config, "ym2", 3000000));
+	ym3812_device &ym2(YM3812(config, "ym2", XTAL(12'000'000) / 4)); // clock verified
 	ym2.irq_handler().set_inputline(m_audiocpu, m6502_device::IRQ_LINE);
 	ym2.add_route(ALL_OUTPUTS, "mono", 0.70);
 }
@@ -2194,7 +2194,7 @@ void dec8_state::csilver(machine_config &config)
 	M6502(config, m_audiocpu, XTAL(12'000'000)/8); /* verified on pcb */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &dec8_state::csilver_s_map); /* NMIs are caused by the main CPU */
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
 	BUFFERED_SPRITERAM8(config, m_spriteram);
@@ -2249,7 +2249,7 @@ void dec8_state::oscar(machine_config &config)
 	DECO_222(config, m_audiocpu, XTAL(12'000'000)/8); // IC labeled "C10707-1"
 	m_audiocpu->set_addrmap(AS_PROGRAM, &dec8_state::oscar_s_map); /* NMIs are caused by the main CPU */
 
-	config.m_minimum_quantum = attotime::from_hz(2400); /* 40 CPU slices per frame */
+	config.set_maximum_quantum(attotime::from_hz(2400)); /* 40 CPU slices per frame */
 
 	INPUT_MERGER_ANY_LOW(config, "coin").output_handler().set(FUNC(dec8_state::oscar_coin_irq)); // 1S1588 x3 (D1-D3) + RCDM-I5
 
@@ -2308,7 +2308,7 @@ void dec8_state::srdarwin(machine_config &config)
 	m_mcu->port_out_cb<2>().set(FUNC(dec8_state::srdarwin_mcu_to_main_w));
 	m_mcu->port_in_cb<3>().set_ioport("I8751");
 
-	config.m_perfect_cpu_quantum = subtag("maincpu"); /* needed for stability with emulated MCU or sometimes commands get missed and game crashes at bosses */
+	config.set_perfect_quantum(m_maincpu); /* needed for stability with emulated MCU or sometimes commands get missed and game crashes at bosses */
 
 	/* video hardware */
 	BUFFERED_SPRITERAM8(config, m_spriteram);
@@ -2365,7 +2365,7 @@ void dec8_state::cobracom(machine_config &config)
 	m_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO_MXC06(config, m_spritegen_mxc, 0);
-	m_spritegen_mxc->set_colpri_callback(FUNC(dec8_state::cobracom_colpri_cb), this);
+	m_spritegen_mxc->set_colpri_callback(FUNC(dec8_state::cobracom_colpri_cb));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 //  m_screen->set_refresh_hz(58);
@@ -2411,8 +2411,8 @@ ROM_START( lastmisn )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "last_mission_dl05-.5h",    0x8000, 0x8000, CRC(1a5df8c0) SHA1(83d36b1d5fb87f50c44f3110804d6bbdbbc0da99) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )    /* ID8751H MCU */
-	ROM_LOAD( "last_mission_dl00-e.18a", 0x0000, 0x1000, CRC(6be57487) SHA1(f9efd7c4ad2802c1116045d2d8f6409cdef5f39c) BAD_DUMP ) /* not verified to be the same data as the "A" MCU dump */
+	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 microcontroller */
+	ROM_LOAD( "last_mission_dl00-e.18a", 0x0000, 0x1000, CRC(e97481c6) SHA1(5c6b0e3585712c03b1b657c814c502c396ffa333) BAD_DUMP ) /* not verified to be the same data as the "A" MCU dump */
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
 	ROM_LOAD( "last_mission_dl01-.2a",    0x00000, 0x2000, CRC(f3787a5d) SHA1(3701df42cb2aca951963703e72c6c7b272eed82b) )
@@ -2447,8 +2447,8 @@ ROM_START( lastmisnu6 )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "last_mission_dl05-.5h",    0x8000, 0x8000, CRC(1a5df8c0) SHA1(83d36b1d5fb87f50c44f3110804d6bbdbbc0da99) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )    /* ID8751H MCU */
-	ROM_LOAD( "last_mission_dl00-a.18a", 0x0000, 0x1000, CRC(6be57487) SHA1(f9efd7c4ad2802c1116045d2d8f6409cdef5f39c) ) /* Hand written "A", some MCUs are known to be labeled DL00-7, it's not verified to be the same data */
+	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 microcontroller */
+	ROM_LOAD( "last_mission_dl00-a.18a", 0x0000, 0x1000, CRC(e97481c6) SHA1(5c6b0e3585712c03b1b657c814c502c396ffa333) ) /* Hand written "A", some MCUs are known to be labeled DL00-7, it's not verified to be the same data */
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
 	ROM_LOAD( "last_mission_dl01-.2a",    0x00000, 0x2000, CRC(f3787a5d) SHA1(3701df42cb2aca951963703e72c6c7b272eed82b) )
@@ -2483,8 +2483,8 @@ ROM_START( lastmisnu5 )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "last_mission_dl05-.5h",    0x8000, 0x8000, CRC(1a5df8c0) SHA1(83d36b1d5fb87f50c44f3110804d6bbdbbc0da99) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )    /* ID8751H MCU */
-	ROM_LOAD( "last_mission_dl00-a.18a", 0x0000, 0x1000, CRC(6be57487) SHA1(f9efd7c4ad2802c1116045d2d8f6409cdef5f39c) ) /* Hand written "A", some MCUs are known to be labeled DL00-7, it's not verified to be the same data */
+	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 microcontroller */
+	ROM_LOAD( "last_mission_dl00-a.18a", 0x0000, 0x1000, CRC(e97481c6) SHA1(5c6b0e3585712c03b1b657c814c502c396ffa333) ) /* Hand written "A", some MCUs are known to be labeled DL00-7, it's not verified to be the same data */
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
 	ROM_LOAD( "last_mission_dl01-.2a",    0x00000, 0x2000, CRC(f3787a5d) SHA1(3701df42cb2aca951963703e72c6c7b272eed82b) )
@@ -2600,7 +2600,7 @@ ROM_START( breywood )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "dj07-1.5h", 0x8000, 0x8000, CRC(4a471c38) SHA1(963ed7b6afeefdfc2cf0d65b0998f973330e6495) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )    /* ID8751H MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 microcontroller */
 	ROM_LOAD( "dj.18a", 0x0000, 0x1000, CRC(4cb20332) SHA1(e0bbba7be22e7bcff82fb0ae441410e559ec4566) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
@@ -2636,7 +2636,7 @@ ROM_START( gondo )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "dt-05.256", 0x8000, 0x8000, CRC(ec08aa29) SHA1(ce83974ae095d9518d1ebf9f7e712f0cbc2c1b42) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )    /* ID8751H MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 microcontroller */
 	ROM_LOAD( "dt-a.b1", 0x0000, 0x1000, CRC(03abceeb) SHA1(a16b779d7cea1c1437f85fa6b6e08894a46a5674) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
@@ -2680,7 +2680,7 @@ ROM_START( makyosen )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "ds05.h5",  0x8000, 0x8000, CRC(e6e28ca9) SHA1(3b1f8219331db1910bfb428f8964f8fc1063df6f) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )    /* ID8751H MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 microcontroller */
 	ROM_LOAD( "ds-a.b1",  0x0000, 0x1000, CRC(08f36e35) SHA1(e8913da71704a89fad41d5bfba45682119166681))
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
@@ -2779,8 +2779,8 @@ ROM_START( ghostb )
 	ROM_REGION( 2*0x10000, "audiocpu", 0 )    /* 64K for sound CPU + 64k for decrypted opcodes */
 	ROM_LOAD( "dz06.5f", 0x8000, 0x8000, CRC(798f56df) SHA1(aee33cd0c102015114e17f6cb98945e7cc806f55) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )    /* ID8751H (fake) MCU */
-	ROM_LOAD( "dz-1.1b", 0x0000, 0x1000, BAD_DUMP CRC(18b7e1e6) SHA1(46b6d914ecee5e743ac805be1545ca44fb016d7d) ) /* Verified label, but is it different the other DZ */
+	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 microcontroller */
+	ROM_LOAD( "dz-1.1b", 0x0000, 0x1000, CRC(9f5f3cb5) SHA1(5ef2b8a5411dde28277d9364db014763019ecf15) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
 	ROM_LOAD( "dz00.16b", 0x00000, 0x08000, CRC(992b4f31) SHA1(a9f255286193ccc261a9b6983aabf3c76ebe5ce5) )
@@ -2817,8 +2817,8 @@ ROM_START( ghostb2a )
 	ROM_REGION( 2*0x10000, "audiocpu", 0 )    /* 64K for sound CPU + 64k for decrypted opcodes */
 	ROM_LOAD( "dz06.5f", 0x8000, 0x8000, CRC(798f56df) SHA1(aee33cd0c102015114e17f6cb98945e7cc806f55) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )    /* ID8751H (fake) MCU */
-	ROM_LOAD( "dz.1b", 0x0000, 0x1000, BAD_DUMP CRC(18b7e1e6) SHA1(46b6d914ecee5e743ac805be1545ca44fb016d7d) )
+	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 microcontroller */
+	ROM_LOAD( "dz-1.1b", 0x0000, 0x1000, CRC(9f5f3cb5) SHA1(5ef2b8a5411dde28277d9364db014763019ecf15) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
 	ROM_LOAD( "dz00.16b", 0x00000, 0x08000, CRC(992b4f31) SHA1(a9f255286193ccc261a9b6983aabf3c76ebe5ce5) )
@@ -2855,8 +2855,8 @@ ROM_START( ghostb3 )
 	ROM_REGION( 2*0x10000, "audiocpu", 0 )    /* 64K for sound CPU + 64k for decrypted opcodes */
 	ROM_LOAD( "dz06.5f", 0x8000, 0x8000, CRC(798f56df) SHA1(aee33cd0c102015114e17f6cb98945e7cc806f55) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )    /* ID8751H (fake) MCU */
-	ROM_LOAD( "dz.1b", 0x0000, 0x1000, BAD_DUMP CRC(18b7e1e6) SHA1(46b6d914ecee5e743ac805be1545ca44fb016d7d) )
+	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 microcontroller */
+	ROM_LOAD( "dz-1.1b", 0x0000, 0x1000, CRC(9f5f3cb5) SHA1(5ef2b8a5411dde28277d9364db014763019ecf15) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
 	ROM_LOAD( "dz00.16b", 0x00000, 0x08000, CRC(992b4f31) SHA1(a9f255286193ccc261a9b6983aabf3c76ebe5ce5) )
@@ -2893,8 +2893,8 @@ ROM_START( ghostb3a )
 	ROM_REGION( 2*0x10000, "audiocpu", 0 )    /* 64K for sound CPU + 64k for decrypted opcodes */
 	ROM_LOAD( "dz06.5f", 0x8000, 0x8000, CRC(798f56df) SHA1(aee33cd0c102015114e17f6cb98945e7cc806f55) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )    /* ID8751H (fake) MCU */
-	ROM_LOAD( "dz.1b", 0x0000, 0x1000, BAD_DUMP CRC(18b7e1e6) SHA1(46b6d914ecee5e743ac805be1545ca44fb016d7d) )
+	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 microcontroller */
+	ROM_LOAD( "dz-1.1b", 0x0000, 0x1000, CRC(9f5f3cb5) SHA1(5ef2b8a5411dde28277d9364db014763019ecf15) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
 	ROM_LOAD( "dz00.16b", 0x00000, 0x08000, CRC(992b4f31) SHA1(a9f255286193ccc261a9b6983aabf3c76ebe5ce5) )
@@ -3015,7 +3015,7 @@ ROM_START( meikyuh )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "dw05.5f", 0x8000, 0x8000, CRC(c28c4d82) SHA1(ad88506bcbc9763e39d6e6bb25ef2bd6aa929f30) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )    /* ID8751H MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 microcontroller */
 	ROM_LOAD( "dw.1b", 0x0000, 0x1000, CRC(28e9ced9) SHA1(a3d6dfa1e44fa93c0f30fa0a88b6dd3d6e5c4dda) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
@@ -3110,7 +3110,7 @@ ROM_START( meikyuha )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "27256.5f", 0x8000, 0x8000, CRC(c28c4d82) SHA1(ad88506bcbc9763e39d6e6bb25ef2bd6aa929f30) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )    /* ID8751H MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 microcontroller */
 	ROM_LOAD( "dw.1b", 0x0000, 0x1000, CRC(28e9ced9) SHA1(a3d6dfa1e44fa93c0f30fa0a88b6dd3d6e5c4dda) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
@@ -3196,7 +3196,7 @@ ROM_START( csilver )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "dx05.3f", 0x00000, 0x10000,  CRC(eb32cf25) SHA1(9390c88033259c65eb15320e31f5d696970987cc) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )    /* ID8751H MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 microcontroller */
 	// 017F: B4 4C 0D : cjne  a,#$4C,$018F   (ID code 0x4c = World version)
 	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, CRC(ca663965) SHA1(a5fb7afdfd324761bde4bb90ba12efc9954627af) ) // dx-8.19a ?
 
@@ -3234,7 +3234,7 @@ ROM_START( csilverj )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "dx05.a6", 0x00000, 0x10000,  CRC(eb32cf25) SHA1(9390c88033259c65eb15320e31f5d696970987cc) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )    /* ID8751H MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 microcontroller */
 	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
@@ -3272,7 +3272,7 @@ ROM_START( csilverja ) // DE-0250-3 + DE-0251-2
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "dx05.3f", 0x00000, 0x10000,  CRC(eb32cf25) SHA1(9390c88033259c65eb15320e31f5d696970987cc) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )    /* ID8751H MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 microcontroller */
 	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
@@ -3422,7 +3422,7 @@ ROM_START( srdarwin )
 	ROM_REGION( 2*0x10000, "audiocpu", 0 )    /* 64K for sound CPU + 64k for decrypted opcodes */
 	ROM_LOAD( "dy04.d7", 0x8000, 0x8000, CRC(2ae3591c) SHA1(f21b06d84e2c3d3895be0812024641fd006e45cf) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )    /* ID8751H MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 microcontroller */
 	// 0160: B4 6B 0D : cjne  a,#$6B,$0170   (ID code 0x6b = World version)
 	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, CRC(11cd6ca4) SHA1(ec70f84228e37f9fc1bda85fa52a009f61c500b2) )
 
@@ -3460,7 +3460,7 @@ ROM_START( srdarwinj )
 	ROM_REGION( 2*0x10000, "audiocpu", 0 )    /* 64K for sound CPU + 64k for decrypted opcodes */
 	ROM_LOAD( "dy04.d7", 0x8000, 0x8000, CRC(2ae3591c) SHA1(f21b06d84e2c3d3895be0812024641fd006e45cf) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )    /* ID8751H MCU */
+	ROM_REGION( 0x1000, "mcu", 0 )    /* i8751 microcontroller */
 	ROM_LOAD( "id8751h_japan.mcu", 0x0000, 0x1000, BAD_DUMP CRC(4ac2ca9d) SHA1(6e07788df9fcf4248a9d3e87b8c5f54776bd269e) ) // hand-modified copy of world version to correct region + coinage
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
@@ -3615,8 +3615,8 @@ GAME( 1987, makyosen,   gondo,    gondo,    gondo,     dec8_state, init_dec8,   
 GAME( 1987, garyoret,   0,        garyoret, garyoret,  dec8_state, init_dec8,    ROT0,   "Data East Corporation", "Garyo Retsuden (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, ghostb,     0,        ghostb,   ghostb,    dec8_state, init_dec8,    ROT0,   "Data East USA",         "The Real Ghostbusters (US 2 Players, revision 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, ghostb2a,   ghostb,   ghostb,   ghostb2a,  dec8_state, init_dec8,    ROT0,   "Data East USA",         "The Real Ghostbusters (US 2 Players)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ghostb3,    ghostb,   ghostb,   ghostb3,   dec8_state, init_dec8,    ROT0,   "Data East USA",         "The Real Ghostbusters (US 3 Players)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, ghostb3a,   ghostb,   ghostb,   ghostb3,   dec8_state, init_dec8,    ROT0,   "Data East USA",         "The Real Ghostbusters (US 3 Players, revision ?)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // ROMs confirmed working on PCB, confirmed problem with the fake MCU ROM
+GAME( 1987, ghostb3,    ghostb,   ghostb,   ghostb3,   dec8_state, init_dec8,    ROT0,   "Data East USA",         "The Real Ghostbusters (US 3 Players, revision 3B?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, ghostb3a,   ghostb,   ghostb,   ghostb3,   dec8_state, init_dec8,    ROT0,   "Data East USA",         "The Real Ghostbusters (US 3 Players, revision 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // ROMs confirmed working on PCB - stalls in demo mode
 GAME( 1987, meikyuh,    ghostb,   meikyuh,  meikyuh,   dec8_state, init_dec8,    ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, meikyuha,   ghostb,   meikyuh,  meikyuh,   dec8_state, init_dec8,    ROT0,   "Data East Corporation", "Meikyuu Hunter G (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, csilver,    0,        csilver,  csilver,   dec8_state, init_csilver, ROT0,   "Data East Corporation", "Captain Silver (World)", MACHINE_SUPPORTS_SAVE )

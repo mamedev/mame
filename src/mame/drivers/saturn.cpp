@@ -530,9 +530,9 @@ void sat_console_state::saturn_mem(address_map &map)
 	map(0x00200000, 0x002fffff).ram().mirror(0x20100000).share("workram_l");
 	map(0x01000000, 0x017fffff).w(FUNC(sat_console_state::saturn_minit_w));
 	map(0x01800000, 0x01ffffff).w(FUNC(sat_console_state::saturn_sinit_w));
-//  AM_RANGE(0x02000000, 0x023fffff) AM_ROM AM_MIRROR(0x20000000) // Cartridge area
-//  AM_RANGE(0x02400000, 0x027fffff) AM_RAM // External Data RAM area
-//  AM_RANGE(0x04000000, 0x047fffff) AM_RAM // External Battery RAM area
+//  map(0x02000000, 0x023fffff).rom().mirror(0x20000000); // Cartridge area
+//  map(0x02400000, 0x027fffff).ram(); // External Data RAM area
+//  map(0x04000000, 0x047fffff).ram(); // External Battery RAM area
 	map(0x04ffffff, 0x04ffffff).r(FUNC(sat_console_state::saturn_cart_type_r));
 	map(0x05000000, 0x057fffff).r(FUNC(sat_console_state::abus_dummy_r));
 	map(0x05800000, 0x0589ffff).rw(m_stvcd, FUNC(stvcd_device::stvcd_r), FUNC(stvcd_device::stvcd_w));
@@ -546,7 +546,7 @@ void sat_console_state::saturn_mem(address_map &map)
 	map(0x05e00000, 0x05e7ffff).mirror(0x80000).rw(FUNC(sat_console_state::saturn_vdp2_vram_r), FUNC(sat_console_state::saturn_vdp2_vram_w));
 	map(0x05f00000, 0x05f7ffff).rw(FUNC(sat_console_state::saturn_vdp2_cram_r), FUNC(sat_console_state::saturn_vdp2_cram_w));
 	map(0x05f80000, 0x05fbffff).rw(FUNC(sat_console_state::saturn_vdp2_regs_r), FUNC(sat_console_state::saturn_vdp2_regs_w));
-	map(0x05fe0000, 0x05fe00cf).m(m_scu, FUNC(sega_scu_device::regs_map)); //AM_READWRITE(saturn_scu_r, saturn_scu_w)
+	map(0x05fe0000, 0x05fe00cf).m(m_scu, FUNC(sega_scu_device::regs_map)); //rw(FUNC(sat_console_state::saturn_scu_r), FUNC(sat_console_state::saturn_scu_w));
 	map(0x06000000, 0x060fffff).ram().mirror(0x21f00000).share("workram_h");
 	map(0x45000000, 0x46ffffff).nopw();
 	map(0x60000000, 0x600003ff).nopw(); // cache address array
@@ -606,8 +606,8 @@ void sat_console_state::nvram_init(nvram_device &nvram, void *data, size_t size)
 
 MACHINE_START_MEMBER(sat_console_state, saturn)
 {
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x02400000, 0x027fffff, read32_delegate(FUNC(sat_console_state::saturn_null_ram_r),this), write32_delegate(FUNC(sat_console_state::saturn_null_ram_w),this));
-	m_slave->space(AS_PROGRAM).install_readwrite_handler(0x02400000, 0x027fffff, read32_delegate(FUNC(sat_console_state::saturn_null_ram_r),this), write32_delegate(FUNC(sat_console_state::saturn_null_ram_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x02400000, 0x027fffff, read32_delegate(*this, FUNC(sat_console_state::saturn_null_ram_r)), write32_delegate(*this, FUNC(sat_console_state::saturn_null_ram_w)));
+	m_slave->space(AS_PROGRAM).install_readwrite_handler(0x02400000, 0x027fffff, read32_delegate(*this, FUNC(sat_console_state::saturn_null_ram_r)), write32_delegate(*this, FUNC(sat_console_state::saturn_null_ram_w)));
 
 	m_maincpu->space(AS_PROGRAM).nop_readwrite(0x04000000, 0x047fffff);
 	m_slave->space(AS_PROGRAM).nop_readwrite(0x04000000, 0x047fffff);
@@ -622,39 +622,39 @@ MACHINE_START_MEMBER(sat_console_state, saturn)
 			case 0x22:
 			case 0x23:
 			case 0x24:
-				m_maincpu->space(AS_PROGRAM).install_read_handler(0x04000000, 0x047fffff, read32_delegate(FUNC(sat_cart_slot_device::read_ext_bram), (sat_cart_slot_device*)m_exp));
-				m_maincpu->space(AS_PROGRAM).install_write_handler(0x04000000, 0x047fffff, write32_delegate(FUNC(sat_cart_slot_device::write_ext_bram), (sat_cart_slot_device*)m_exp));
-				m_slave->space(AS_PROGRAM).install_read_handler(0x04000000, 0x047fffff, read32_delegate(FUNC(sat_cart_slot_device::read_ext_bram), (sat_cart_slot_device*)m_exp));
-				m_slave->space(AS_PROGRAM).install_write_handler(0x04000000, 0x047fffff, write32_delegate(FUNC(sat_cart_slot_device::write_ext_bram), (sat_cart_slot_device*)m_exp));
-				m_maincpu->space(AS_PROGRAM).install_read_handler(0x24000000, 0x247fffff, read32_delegate(FUNC(sat_cart_slot_device::read_ext_bram), (sat_cart_slot_device*)m_exp));
-				m_maincpu->space(AS_PROGRAM).install_write_handler(0x24000000, 0x247fffff, write32_delegate(FUNC(sat_cart_slot_device::write_ext_bram), (sat_cart_slot_device*)m_exp));
-				m_slave->space(AS_PROGRAM).install_read_handler(0x24000000, 0x247fffff, read32_delegate(FUNC(sat_cart_slot_device::read_ext_bram), (sat_cart_slot_device*)m_exp));
-				m_slave->space(AS_PROGRAM).install_write_handler(0x24000000, 0x247fffff, write32_delegate(FUNC(sat_cart_slot_device::write_ext_bram), (sat_cart_slot_device*)m_exp));
+				m_maincpu->space(AS_PROGRAM).install_read_handler(0x04000000, 0x047fffff, read32_delegate(*m_exp, FUNC(sat_cart_slot_device::read_ext_bram)));
+				m_maincpu->space(AS_PROGRAM).install_write_handler(0x04000000, 0x047fffff, write32_delegate(*m_exp, FUNC(sat_cart_slot_device::write_ext_bram)));
+				m_slave->space(AS_PROGRAM).install_read_handler(0x04000000, 0x047fffff, read32_delegate(*m_exp, FUNC(sat_cart_slot_device::read_ext_bram)));
+				m_slave->space(AS_PROGRAM).install_write_handler(0x04000000, 0x047fffff, write32_delegate(*m_exp, FUNC(sat_cart_slot_device::write_ext_bram)));
+				m_maincpu->space(AS_PROGRAM).install_read_handler(0x24000000, 0x247fffff, read32_delegate(*m_exp, FUNC(sat_cart_slot_device::read_ext_bram)));
+				m_maincpu->space(AS_PROGRAM).install_write_handler(0x24000000, 0x247fffff, write32_delegate(*m_exp, FUNC(sat_cart_slot_device::write_ext_bram)));
+				m_slave->space(AS_PROGRAM).install_read_handler(0x24000000, 0x247fffff, read32_delegate(*m_exp, FUNC(sat_cart_slot_device::read_ext_bram)));
+				m_slave->space(AS_PROGRAM).install_write_handler(0x24000000, 0x247fffff, write32_delegate(*m_exp, FUNC(sat_cart_slot_device::write_ext_bram)));
 				break;
 			case 0x5a:  // Data RAM cart
 			case 0x5c:
-				m_maincpu->space(AS_PROGRAM).install_read_handler(0x02400000, 0x025fffff, read32_delegate(FUNC(sat_cart_slot_device::read_ext_dram0), (sat_cart_slot_device*)m_exp));
-				m_maincpu->space(AS_PROGRAM).install_write_handler(0x02400000, 0x025fffff, write32_delegate(FUNC(sat_cart_slot_device::write_ext_dram0), (sat_cart_slot_device*)m_exp));
-				m_maincpu->space(AS_PROGRAM).install_read_handler(0x02600000, 0x027fffff, read32_delegate(FUNC(sat_cart_slot_device::read_ext_dram1), (sat_cart_slot_device*)m_exp));
-				m_maincpu->space(AS_PROGRAM).install_write_handler(0x02600000, 0x027fffff, write32_delegate(FUNC(sat_cart_slot_device::write_ext_dram1), (sat_cart_slot_device*)m_exp));
-				m_slave->space(AS_PROGRAM).install_read_handler(0x02400000, 0x025fffff, read32_delegate(FUNC(sat_cart_slot_device::read_ext_dram0), (sat_cart_slot_device*)m_exp));
-				m_slave->space(AS_PROGRAM).install_write_handler(0x02400000, 0x025fffff, write32_delegate(FUNC(sat_cart_slot_device::write_ext_dram0), (sat_cart_slot_device*)m_exp));
-				m_slave->space(AS_PROGRAM).install_read_handler(0x02600000, 0x027fffff, read32_delegate(FUNC(sat_cart_slot_device::read_ext_dram1), (sat_cart_slot_device*)m_exp));
-				m_slave->space(AS_PROGRAM).install_write_handler(0x02600000, 0x027fffff, write32_delegate(FUNC(sat_cart_slot_device::write_ext_dram1), (sat_cart_slot_device*)m_exp));
-				m_maincpu->space(AS_PROGRAM).install_read_handler(0x22400000, 0x225fffff, read32_delegate(FUNC(sat_cart_slot_device::read_ext_dram0), (sat_cart_slot_device*)m_exp));
-				m_maincpu->space(AS_PROGRAM).install_write_handler(0x22400000, 0x225fffff, write32_delegate(FUNC(sat_cart_slot_device::write_ext_dram0), (sat_cart_slot_device*)m_exp));
-				m_maincpu->space(AS_PROGRAM).install_read_handler(0x22600000, 0x227fffff, read32_delegate(FUNC(sat_cart_slot_device::read_ext_dram1), (sat_cart_slot_device*)m_exp));
-				m_maincpu->space(AS_PROGRAM).install_write_handler(0x22600000, 0x227fffff, write32_delegate(FUNC(sat_cart_slot_device::write_ext_dram1), (sat_cart_slot_device*)m_exp));
-				m_slave->space(AS_PROGRAM).install_read_handler(0x22400000, 0x225fffff, read32_delegate(FUNC(sat_cart_slot_device::read_ext_dram0), (sat_cart_slot_device*)m_exp));
-				m_slave->space(AS_PROGRAM).install_write_handler(0x22400000, 0x225fffff, write32_delegate(FUNC(sat_cart_slot_device::write_ext_dram0), (sat_cart_slot_device*)m_exp));
-				m_slave->space(AS_PROGRAM).install_read_handler(0x22600000, 0x227fffff, read32_delegate(FUNC(sat_cart_slot_device::read_ext_dram1), (sat_cart_slot_device*)m_exp));
-				m_slave->space(AS_PROGRAM).install_write_handler(0x22600000, 0x227fffff, write32_delegate(FUNC(sat_cart_slot_device::write_ext_dram1), (sat_cart_slot_device*)m_exp));
+				m_maincpu->space(AS_PROGRAM).install_read_handler(0x02400000, 0x025fffff, read32_delegate(*m_exp, FUNC(sat_cart_slot_device::read_ext_dram0)));
+				m_maincpu->space(AS_PROGRAM).install_write_handler(0x02400000, 0x025fffff, write32_delegate(*m_exp, FUNC(sat_cart_slot_device::write_ext_dram0)));
+				m_maincpu->space(AS_PROGRAM).install_read_handler(0x02600000, 0x027fffff, read32_delegate(*m_exp, FUNC(sat_cart_slot_device::read_ext_dram1)));
+				m_maincpu->space(AS_PROGRAM).install_write_handler(0x02600000, 0x027fffff, write32_delegate(*m_exp, FUNC(sat_cart_slot_device::write_ext_dram1)));
+				m_slave->space(AS_PROGRAM).install_read_handler(0x02400000, 0x025fffff, read32_delegate(*m_exp, FUNC(sat_cart_slot_device::read_ext_dram0)));
+				m_slave->space(AS_PROGRAM).install_write_handler(0x02400000, 0x025fffff, write32_delegate(*m_exp, FUNC(sat_cart_slot_device::write_ext_dram0)));
+				m_slave->space(AS_PROGRAM).install_read_handler(0x02600000, 0x027fffff, read32_delegate(*m_exp, FUNC(sat_cart_slot_device::read_ext_dram1)));
+				m_slave->space(AS_PROGRAM).install_write_handler(0x02600000, 0x027fffff, write32_delegate(*m_exp, FUNC(sat_cart_slot_device::write_ext_dram1)));
+				m_maincpu->space(AS_PROGRAM).install_read_handler(0x22400000, 0x225fffff, read32_delegate(*m_exp, FUNC(sat_cart_slot_device::read_ext_dram0)));
+				m_maincpu->space(AS_PROGRAM).install_write_handler(0x22400000, 0x225fffff, write32_delegate(*m_exp, FUNC(sat_cart_slot_device::write_ext_dram0)));
+				m_maincpu->space(AS_PROGRAM).install_read_handler(0x22600000, 0x227fffff, read32_delegate(*m_exp, FUNC(sat_cart_slot_device::read_ext_dram1)));
+				m_maincpu->space(AS_PROGRAM).install_write_handler(0x22600000, 0x227fffff, write32_delegate(*m_exp, FUNC(sat_cart_slot_device::write_ext_dram1)));
+				m_slave->space(AS_PROGRAM).install_read_handler(0x22400000, 0x225fffff, read32_delegate(*m_exp, FUNC(sat_cart_slot_device::read_ext_dram0)));
+				m_slave->space(AS_PROGRAM).install_write_handler(0x22400000, 0x225fffff, write32_delegate(*m_exp, FUNC(sat_cart_slot_device::write_ext_dram0)));
+				m_slave->space(AS_PROGRAM).install_read_handler(0x22600000, 0x227fffff, read32_delegate(*m_exp, FUNC(sat_cart_slot_device::read_ext_dram1)));
+				m_slave->space(AS_PROGRAM).install_write_handler(0x22600000, 0x227fffff, write32_delegate(*m_exp, FUNC(sat_cart_slot_device::write_ext_dram1)));
 				break;
 			case 0xff: // ROM cart + mirror
-				m_maincpu->space(AS_PROGRAM).install_read_handler(0x02000000, 0x023fffff, read32_delegate(FUNC(sat_cart_slot_device::read_rom), (sat_cart_slot_device*)m_exp));
-				m_maincpu->space(AS_PROGRAM).install_read_handler(0x22000000, 0x223fffff, read32_delegate(FUNC(sat_cart_slot_device::read_rom), (sat_cart_slot_device*)m_exp));
-				m_slave->space(AS_PROGRAM).install_read_handler(0x02000000, 0x023fffff, read32_delegate(FUNC(sat_cart_slot_device::read_rom), (sat_cart_slot_device*)m_exp));
-				m_slave->space(AS_PROGRAM).install_read_handler(0x22000000, 0x223fffff, read32_delegate(FUNC(sat_cart_slot_device::read_rom), (sat_cart_slot_device*)m_exp));
+				m_maincpu->space(AS_PROGRAM).install_read_handler(0x02000000, 0x023fffff, read32_delegate(*m_exp, FUNC(sat_cart_slot_device::read_rom)));
+				m_maincpu->space(AS_PROGRAM).install_read_handler(0x22000000, 0x223fffff, read32_delegate(*m_exp, FUNC(sat_cart_slot_device::read_rom)));
+				m_slave->space(AS_PROGRAM).install_read_handler(0x02000000, 0x023fffff, read32_delegate(*m_exp, FUNC(sat_cart_slot_device::read_rom)));
+				m_slave->space(AS_PROGRAM).install_read_handler(0x22000000, 0x223fffff, read32_delegate(*m_exp, FUNC(sat_cart_slot_device::read_rom)));
 				break;
 		}
 	}
@@ -666,7 +666,7 @@ MACHINE_START_MEMBER(sat_console_state, saturn)
 	save_item(NAME(m_vdp2.odd));
 
 	// TODO: trampoline
-	m_audiocpu->set_reset_callback(write_line_delegate(FUNC(saturn_state::m68k_reset_callback),this));
+	m_audiocpu->set_reset_callback(*this, FUNC(saturn_state::m68k_reset_callback));
 }
 
 /* Die Hard Trilogy tests RAM address 0x25e7ffe bit 2 with Slave during FRT minit irq, in-development tool for breaking execution of it? */

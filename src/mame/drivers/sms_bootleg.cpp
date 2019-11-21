@@ -240,7 +240,7 @@ void smsbootleg_state::sms_supergame_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xfff7).ram();
-//  AM_RANGE(0xfffc, 0xffff) AM_READWRITE(sms_mapper_r, sms_mapper_w)       /* Bankswitch control */
+//  map(0xfffc, 0xffff).rw(FUNC(smsbootleg_state::sms_mapper_r), FUNC(smsbootleg_state::sms_mapper_w));       /* Bankswitch control */
 }
 
 WRITE8_MEMBER(smsbootleg_state::port08_w)
@@ -259,9 +259,9 @@ void smsbootleg_state::sms_supergame_io(address_map &map)
 	map.global_mask(0xff);
 	map.unmap_value_high();
 
-	map(0x04, 0x04).nopr(); //AM_READ_PORT("IN0") // these
+	map(0x04, 0x04).nopr(); //portr("IN0"); // these
 	map(0x08, 0x08).w(FUNC(smsbootleg_state::port08_w));
-	map(0x14, 0x14).nopr(); //AM_READ_PORT("IN1") // seem to be from a coinage / timer MCU, changing them directly changes the credits / time value
+	map(0x14, 0x14).nopr(); //portr("IN1"); // seem to be from a coinage / timer MCU, changing them directly changes the credits / time value
 	map(0x18, 0x18).w(FUNC(smsbootleg_state::port18_w));
 
 	map(0x40, 0x7f).r(FUNC(smsbootleg_state::sms_count_r)).w(m_vdp, FUNC(sega315_5124_device::psg_w));
@@ -280,7 +280,7 @@ void smsbootleg_state::sms_supergame(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &smsbootleg_state::sms_supergame_map);
 	m_maincpu->set_addrmap(AS_IO, &smsbootleg_state::sms_supergame_io);
 
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

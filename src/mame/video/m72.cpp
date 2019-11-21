@@ -95,8 +95,8 @@ void m72_state::register_savestate()
 
 VIDEO_START_MEMBER(m72_state,m72)
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m72_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m72_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(m72_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 64,64);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(m72_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 64,64);
 
 	m_fg_tilemap->set_transmask(0,0xffff,0x0001);
 	m_fg_tilemap->set_transmask(1,0x00ff,0xff01);
@@ -107,8 +107,6 @@ VIDEO_START_MEMBER(m72_state,m72)
 
 	//m_bg_tilemap->set_transmask(2,0x0001,0xfffe);
 	m_bg_tilemap->set_transmask(2,0x0007,0xfff8); // needed for lohtj japan warning to look correct
-	//m_bg_tilemap->set_transmask(2,0x001f,0xffe0); // needed for nspiritj japan warning to look correct
-	// not sure what is needed to be able to see the imgfghto warning message
 
 	memset(m_spriteram->buffer(),0,m_spriteram->bytes());
 
@@ -151,7 +149,23 @@ VIDEO_START_MEMBER(m72_state,hharry)
 	m_bg_tilemap->set_scrolldy(-128,16);
 }
 
+VIDEO_START_MEMBER(m72_state,imgfightj)
+{
+	VIDEO_START_CALL_MEMBER(m72);
+	m_bg_tilemap->set_transmask(2,0xff00,0x00ff); // for japan message
+}
 
+VIDEO_START_MEMBER(m72_state,nspiritj)
+{
+	VIDEO_START_CALL_MEMBER(m72);
+	m_bg_tilemap->set_transmask(2,0x001f,0xffe0); // for japan message
+}
+
+VIDEO_START_MEMBER(m72_state,mrheli)
+{
+	VIDEO_START_CALL_MEMBER(m72);
+	m_bg_tilemap->set_transmask(2,0x00ff,0xff00); // for japan message
+}
 
 
 /* Major Title has a larger background RAM, and rowscroll */
@@ -164,11 +178,11 @@ TILEMAP_MAPPER_MEMBER(m72_state::m82_scan_rows)
 
 VIDEO_START_MEMBER(m72_state,m82)
 {
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m72_state::rtype2_get_tile_info<0>),this),TILEMAP_SCAN_ROWS,8,8,64,64);
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m72_state::rtype2_get_tile_info<1>),this),TILEMAP_SCAN_ROWS,8,8,64,64);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(m72_state::rtype2_get_tile_info<0>)), TILEMAP_SCAN_ROWS, 8,8, 64,64);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(m72_state::rtype2_get_tile_info<1>)), TILEMAP_SCAN_ROWS, 8,8, 64,64);
 // The tilemap can be 256x64, but seems to be used at 128x64 (scroll wraparound).
 // The layout ramains 256x64, the right half is just not displayed.
-	m_bg_tilemap_large = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m72_state::rtype2_get_tile_info<1>),this),tilemap_mapper_delegate(FUNC(m72_state::m82_scan_rows),this),8,8,128,64);
+	m_bg_tilemap_large = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(m72_state::rtype2_get_tile_info<1>)), tilemap_mapper_delegate(*this, FUNC(m72_state::m82_scan_rows)), 8,8, 128,64);
 
 	m_fg_tilemap->set_transmask(0,0xffff,0x0001);
 	m_fg_tilemap->set_transmask(1,0x00ff,0xff01);
@@ -202,8 +216,8 @@ VIDEO_START_MEMBER(m72_state,m82)
 // M84
 VIDEO_START_MEMBER(m72_state,rtype2)
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m72_state::rtype2_get_tile_info<1>),this),TILEMAP_SCAN_ROWS,8,8,64,64);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m72_state::rtype2_get_tile_info<0>),this),TILEMAP_SCAN_ROWS,8,8,64,64);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(m72_state::rtype2_get_tile_info<1>)), TILEMAP_SCAN_ROWS, 8,8, 64,64);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(m72_state::rtype2_get_tile_info<0>)), TILEMAP_SCAN_ROWS, 8,8, 64,64);
 
 	m_fg_tilemap->set_transmask(0,0xffff,0x0001);
 	m_fg_tilemap->set_transmask(1,0x00ff,0xff01);

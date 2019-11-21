@@ -432,7 +432,7 @@ void taito_f3_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		m_maincpu->set_input_line(3, HOLD_LINE);    // some signal from video hardware?
 		break;
 	default:
-		assert_always(false, "Unknown id in taito_f3_state::device_timer");
+		throw emu_fatalerror("Unknown id in taito_f3_state::device_timer");
 	}
 }
 

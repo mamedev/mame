@@ -187,7 +187,7 @@ void molecula_state::molecula_file_map(address_map &map)
 void molecula_state::molecula_file_io(address_map &map)
 {
 	map.global_mask(0xff);
-//  AM_RANGE(0x40, 0x43) AM_READWRITE(sio_r,sio_w)
+//  map(0x40, 0x43).rw(FUNC(molecula_state::sio_r), FUNC(molecula_state::sio_w));
 	map(0x72, 0x73).w(FUNC(molecula_state::file_output_w)); // unknown
 }
 

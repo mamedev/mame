@@ -20,17 +20,17 @@
 #include "ui/selsoft.h"
 #include "ui/ui.h"
 
-#include "../info.h"
+#include "infoxml.h"
+#include "luaengine.h"
+#include "mame.h"
 
 #include "audit.h"
 #include "drivenum.h"
 #include "emuopts.h"
-#include "mame.h"
 #include "rendutil.h"
 #include "romload.h"
 #include "softlist_dev.h"
 #include "uiinput.h"
-#include "luaengine.h"
 
 #include <atomic>
 #include <condition_variable>
@@ -371,10 +371,6 @@ void menu_select_game::handle()
 		case IPT_UI_END:
 			if (get_focus() == focused_menu::LEFT)
 				m_filter_highlight = machine_filter::LAST;
-			break;
-
-		case IPT_UI_CONFIGURE:
-			inkey_navigation();
 			break;
 
 		case IPT_UI_EXPORT:
@@ -1396,7 +1392,7 @@ void menu_select_game::make_topbox_text(std::string &line0, std::string &line1, 
 	line0 = string_format(_("%1$s %2$s ( %3$d / %4$d machines (%5$d BIOS) )"),
 			emulator_info::get_appname(),
 			bare_build_version,
-			visible_items,
+			m_available_items,
 			(driver_list::total() - 1),
 			m_persistent_data.bios_count());
 

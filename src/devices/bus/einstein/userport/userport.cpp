@@ -31,7 +31,7 @@ DEFINE_DEVICE_TYPE(EINSTEIN_USERPORT, einstein_userport_device, "einstein_userpo
 
 einstein_userport_device::einstein_userport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, EINSTEIN_USERPORT, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_einstein_userport_interface>(mconfig, *this),
 	m_card(nullptr),
 	m_bstb_handler(*this)
 {
@@ -54,15 +54,7 @@ void einstein_userport_device::device_start()
 	// resolve callbacks
 	m_bstb_handler.resolve_safe();
 
-	m_card = dynamic_cast<device_einstein_userport_interface *>(get_card_device());
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void einstein_userport_device::device_reset()
-{
+	m_card = get_card_device();
 }
 
 
@@ -100,7 +92,7 @@ WRITE_LINE_MEMBER( einstein_userport_device::brdy_w )
 //-------------------------------------------------
 
 device_einstein_userport_interface::device_einstein_userport_interface(const machine_config &mconfig, device_t &device) :
-	device_slot_card_interface(mconfig, device)
+	device_interface(device, "einsteinuser")
 {
 	m_slot = dynamic_cast<einstein_userport_device *>(device.owner());
 }

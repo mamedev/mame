@@ -10,7 +10,7 @@
 		<publisher>Logi'stick</publisher>
 		<part name="cass" interface="x07_cass">
 			<dataarea name="cass" size="957292">
-				<rom name="x07_calc_logistick.wav" size="957292" crc="626b14be" sha1="b4f30523b3c40170c2b2781a73dffb29e5c67d42" offset="0" />
+				<rom name="x07_calc_logistick.wav" size="957292" crc="626b14be" sha1="b4f30523b3c40170c2b2781a73dffb29e5c67d42"/>
 			</dataarea>
 		</part>
 	</software>
@@ -28,7 +28,7 @@
 		<info name="author" value="M. Grillet" />
 		<part name="cass" interface="x07_cass">
 			<dataarea name="cass" size="13406">
-				<rom name="labyrinthe 3d.cas" size="13406" crc="bcb4213e" sha1="22a4faa1bed2594885f55d0aa41ffd75e75563ba" offset="0" />
+				<rom name="labyrinthe 3d.cas" size="13406" crc="bcb4213e" sha1="22a4faa1bed2594885f55d0aa41ffd75e75563ba"/>
 			</dataarea>
 		</part>
 	</software>
@@ -42,12 +42,12 @@
 		<info name="author" value="Ignace Vantorre" />
 		<part name="cass1" interface="x07_cass">
 			<dataarea name="cass" size="2833">
-				<rom name="3dmunch#1.cas" size="2833" crc="e78972cc" sha1="affcc1b24159a2f8a6d5dbb948010c95c831ea4c" offset="0" />
+				<rom name="3dmunch#1.cas" size="2833" crc="e78972cc" sha1="affcc1b24159a2f8a6d5dbb948010c95c831ea4c"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="x07_cass">
 			<dataarea name="cass" size="6263">
-				<rom name="3dmunch#2.cas" size="6263" crc="c6d3f9d9" sha1="58c1bbd5e98d3f6d73b0a68507648b3140ed31c0" offset="0" />
+				<rom name="3dmunch#2.cas" size="6263" crc="c6d3f9d9" sha1="58c1bbd5e98d3f6d73b0a68507648b3140ed31c0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -61,12 +61,12 @@
 		<info name="author" value="Emmanuel De Lapparent" />
 		<part name="cass1" interface="x07_cass">
 			<dataarea name="cass" size="5361">
-				<rom name="turbo1.cas" size="5361" crc="ca6ec209" sha1="ea199a6f83741f79222d46266340ec552bf4f40d" offset="0" />
+				<rom name="turbo1.cas" size="5361" crc="ca6ec209" sha1="ea199a6f83741f79222d46266340ec552bf4f40d"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="x07_cass">
 			<dataarea name="cass" size="5732">
-				<rom name="turbo2.cas" size="5732" crc="90d8a0e2" sha1="d2da55977ecfeb5496263ce5e45f022128a4a11c" offset="0" />
+				<rom name="turbo2.cas" size="5732" crc="90d8a0e2" sha1="d2da55977ecfeb5496263ce5e45f022128a4a11c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -80,7 +80,7 @@
 		<info name="author" value="Pascal Aoumade" />
 		<part name="cass" interface="x07_cass">
 			<dataarea name="cass" size="11467">
-				<rom name="adventure land.cas" size="11467" crc="6f5cfa75" sha1="822426b512a493a1e5c33cb6c7017edbeaa270c5" offset="0" />
+				<rom name="adventure land.cas" size="11467" crc="6f5cfa75" sha1="822426b512a493a1e5c33cb6c7017edbeaa270c5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -95,12 +95,12 @@
 		<info name="author" value="N. Allaire" />
 		<part name="cass1" interface="x07_cass">
 			<dataarea name="cass" size="5025">
-				<rom name="amer1 gold.cas" size="5025" crc="dbbdbccc" sha1="ec7a8eab7cd4fb33f0fde5ab38addbb65fc288a1" offset="0" />
+				<rom name="amer1 gold.cas" size="5025" crc="dbbdbccc" sha1="ec7a8eab7cd4fb33f0fde5ab38addbb65fc288a1"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="x07_cass">
 			<dataarea name="cass" size="6103">
-				<rom name="amer2 gold.cas" size="6103" crc="50f9bb93" sha1="d6b31fcc6e8a9e2650cfd49d07d54594343a765b" offset="0" />
+				<rom name="amer2 gold.cas" size="6103" crc="50f9bb93" sha1="d6b31fcc6e8a9e2650cfd49d07d54594343a765b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -115,7 +115,7 @@
 		<info name="author" value="P. Breton" />
 		<part name="cass" interface="x07_cass">
 			<dataarea name="cass" size="8811">
-				<rom name="painter.cas" size="8811" crc="1d9410f5" sha1="9c54fbcbdd9b0b47988b4f5cff609e7eab698220" offset="0" />
+				<rom name="painter.cas" size="8811" crc="1d9410f5" sha1="9c54fbcbdd9b0b47988b4f5cff609e7eab698220"/>
 			</dataarea>
 		</part>
 	</software>
@@ -130,7 +130,7 @@
 		<info name="author" value="S. Doczekaski" />
 		<part name="cass" interface="x07_cass">
 			<dataarea name="cass" size="10058">
-				<rom name="assdes_as.cas" size="10058" crc="281dfe99" sha1="d7f8f01246d6e8edafb22f6b748c7deffa57300b" offset="0" />
+				<rom name="assdes_as.cas" size="10058" crc="281dfe99" sha1="d7f8f01246d6e8edafb22f6b748c7deffa57300b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -144,7 +144,7 @@
 		<info name="author" value="Pierre Dor" />
 		<part name="cass" interface="x07_cass">
 			<dataarea name="cass" size="9412">
-				<rom name="aventurier.cas" size="9412" crc="0e5897ee" sha1="66bb20b82f6be5c9ca171ff60cb7b9b623311a29" offset="0" />
+				<rom name="aventurier.cas" size="9412" crc="0e5897ee" sha1="66bb20b82f6be5c9ca171ff60cb7b9b623311a29"/>
 			</dataarea>
 		</part>
 	</software>
@@ -158,7 +158,7 @@
 		<info name="author" value="R. Van Leeuwen" />
 		<part name="cass" interface="x07_cass">
 			<dataarea name="cass" size="2592">
-				<rom name="extbas.cas" size="2592" crc="dfc2d408" sha1="94dbe746d3cdb436a5492808dcb3151cd3868020" offset="0" />
+				<rom name="extbas.cas" size="2592" crc="dfc2d408" sha1="94dbe746d3cdb436a5492808dcb3151cd3868020"/>
 			</dataarea>
 		</part>
 	</software>
@@ -172,7 +172,7 @@
 		<info name="author" value="Stephane Shirvanian" />
 		<part name="cass" interface="x07_cass">
 			<dataarea name="cass" size="4121">
-				<rom name="basix-07.cas" size="4121" crc="8e4de221" sha1="706d40ce2d434c5b1aaea93e1ef03bcdf7ea15f4" offset="0" />
+				<rom name="basix-07.cas" size="4121" crc="8e4de221" sha1="706d40ce2d434c5b1aaea93e1ef03bcdf7ea15f4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -186,7 +186,7 @@
 		<info name="author" value="J. P. Blanchard" />
 		<part name="cass" interface="x07_cass">
 			<dataarea name="cass" size="3788">
-				<rom name="bataille dans la galaxie.cas" size="3788" crc="889efc64" sha1="b2c2887a8b20abc23e957ef0fd2957b26e496eda" offset="0" />
+				<rom name="bataille dans la galaxie.cas" size="3788" crc="889efc64" sha1="b2c2887a8b20abc23e957ef0fd2957b26e496eda"/>
 			</dataarea>
 		</part>
 	</software>
@@ -201,12 +201,12 @@
 		<info name="author" value="S. Doczekaski" />
 		<part name="cass1" interface="x07_cass">
 			<dataarea name="cass" size="3811">
-				<rom name="beach1_head.cas" size="3811" crc="414bae15" sha1="9d550544753c441a815efc2a1b330ba2cfe94057" offset="0" />
+				<rom name="beach1_head.cas" size="3811" crc="414bae15" sha1="9d550544753c441a815efc2a1b330ba2cfe94057"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="x07_cass">
 			<dataarea name="cass" size="1807">
-				<rom name="beach2_head[incomplet].cas" size="1807" crc="61f83215" sha1="989f2a74219a2c7799592f9b85a7f35b1881a469" offset="0" />
+				<rom name="beach2_head[incomplet].cas" size="1807" crc="61f83215" sha1="989f2a74219a2c7799592f9b85a7f35b1881a469"/>
 			</dataarea>
 		</part>
 	</software>
@@ -220,7 +220,7 @@
 		<info name="author" value="J. C. Adagas Cau" />
 		<part name="cass" interface="x07_cass">
 			<dataarea name="cass" size="9082">
-				<rom name="belote.cas" size="9082" crc="a86e4fdf" sha1="a5370ff8c4dc1f3593864fdb2efd3694f23f44e3" offset="0" />
+				<rom name="belote.cas" size="9082" crc="a86e4fdf" sha1="a5370ff8c4dc1f3593864fdb2efd3694f23f44e3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -234,7 +234,7 @@
 		<info name="author" value="E. Madeuf" />
 		<part name="cass" interface="x07_cass">
 			<dataarea name="cass" size="5857">
-				<rom name="calcul.cas" size="5857" crc="edf90613" sha1="de5ab65ecb4263b050e82f1ac8a980627cf45e35" offset="0" />
+				<rom name="calcul.cas" size="5857" crc="edf90613" sha1="de5ab65ecb4263b050e82f1ac8a980627cf45e35"/>
 			</dataarea>
 		</part>
 	</software>
@@ -248,7 +248,7 @@
 		<info name="author" value="M. Lameyse" />
 		<part name="cass" interface="x07_cass">
 			<dataarea name="cass" size="5200">
-				<rom name="calculatrice.cas" size="5200" crc="e6615324" sha1="e4f8f2f0c2fd013c26958d0ce3e2c5deb10c390a" offset="0" />
+				<rom name="calculatrice.cas" size="5200" crc="e6615324" sha1="e4f8f2f0c2fd013c26958d0ce3e2c5deb10c390a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -262,7 +262,7 @@
 		<info name="author" value="Pierre Dor" />
 		<part name="cass" interface="x07_cass">
 			<dataarea name="cass" size="5142">
-				<rom name="canon burger.cas" size="5142" crc="ef232f49" sha1="d96776fcdf11c183c833f14324e402c55be6132d" offset="0" />
+				<rom name="canon burger.cas" size="5142" crc="ef232f49" sha1="d96776fcdf11c183c833f14324e402c55be6132d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -276,12 +276,12 @@
 		<info name="author" value="C. Gautier" />
 		<part name="cass1" interface="x07_cass">
 			<dataarea name="cass" size="7965">
-				<rom name="canon runner1.cas" size="7965" crc="119bf353" sha1="644d52edd3d249f5b6a9d4c2a605fb4e3b2b6a4b" offset="0" />
+				<rom name="canon runner1.cas" size="7965" crc="119bf353" sha1="644d52edd3d249f5b6a9d4c2a605fb4e3b2b6a4b"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="x07_cass">
 			<dataarea name="cass" size="4879">
-				<rom name="canon runner2.cas" size="4879" crc="fcc5e6a6" sha1="423653b7df8336f2cd0da4905214f0ceac5d72fa" offset="0" />
+				<rom name="canon runner2.cas" size="4879" crc="fcc5e6a6" sha1="423653b7df8336f2cd0da4905214f0ceac5d72fa"/>
 			</dataarea>
 		</part>
 	</software>
@@ -295,7 +295,7 @@
 		<info name="author" value="François Bernez" />
 		<part name="cass" interface="x07_cass">
 			<dataarea name="cass" size="8500">
-				<rom name="canon-calc.cas" size="8500" crc="f3308e5d" sha1="a03f369f560b07ba2f397faa1d92cff6bc563891" offset="0" />
+				<rom name="canon-calc.cas" size="8500" crc="f3308e5d" sha1="a03f369f560b07ba2f397faa1d92cff6bc563891"/>
 			</dataarea>
 		</part>
 	</software>
@@ -309,7 +309,7 @@
 		<info name="author" value="F. Devargas" />
 		<part name="cass" interface="x07_cass">
 			<dataarea name="cass" size="5434">
-				<rom name="canon-graff.cas" size="5434" crc="eea27bcd" sha1="338f7ef5753897a7905e50027137f2b33cd6ccbd" offset="0" />
+				<rom name="canon-graff.cas" size="5434" crc="eea27bcd" sha1="338f7ef5753897a7905e50027137f2b33cd6ccbd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -323,7 +323,7 @@
 		<info name="author" value="M. Bollaert" />
 		<part name="cass" interface="x07_cass">
 			<dataarea name="cass" size="1809">
-				<rom name="carre diabolique2.cas" size="1809" crc="20d3ae95" sha1="16ee404143a4b8072071ea516ebd3772fc0571dd" offset="0" />
+				<rom name="carre diabolique2.cas" size="1809" crc="20d3ae95" sha1="16ee404143a4b8072071ea516ebd3772fc0571dd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -337,7 +337,7 @@
 		<info name="author" value="G. Bouquet" />
 		<part name="cass" interface="x07_cass">
 			<dataarea name="cass" size="3621">
-				<rom name="carwar.cas" size="3621" crc="046666ed" sha1="9fc30dd1eee95d1fc0c131cb33084eb4a1714623" offset="0" />
+				<rom name="carwar.cas" size="3621" crc="046666ed" sha1="9fc30dd1eee95d1fc0c131cb33084eb4a1714623"/>
 			</dataarea>
 		</part>
 	</software>
@@ -351,12 +351,12 @@
 		<info name="author" value="F. Trancart" />
 		<part name="cass1" interface="x07_cass">
 			<dataarea name="cass" size="2079">
-				<rom name="catch1-mean.cas" size="2079" crc="fce4704f" sha1="4e1cb7cf94f02c7797f502fac7e0b81dcf2477d7" offset="0" />
+				<rom name="catch1-mean.cas" size="2079" crc="fce4704f" sha1="4e1cb7cf94f02c7797f502fac7e0b81dcf2477d7"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="x07_cass">
 			<dataarea name="cass" size="6052">
-				<rom name="catch2-mean.cas" size="6052" crc="54f1b4f0" sha1="f96a7a542d73ed90136523cd4d3fb71eb88ef2e9" offset="0" />
+				<rom name="catch2-mean.cas" size="6052" crc="54f1b4f0" sha1="f96a7a542d73ed90136523cd4d3fb71eb88ef2e9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -370,7 +370,7 @@
 		<info name="author" value="O. Beranger" />
 		<part name="cass" interface="x07_cass">
 			<dataarea name="cass" size="1942">
-				<rom name="chenille.cas" size="1942" crc="06422b4a" sha1="8f2ee920d3b7beb3238543b0fac977401549feff" offset="0" />
+				<rom name="chenille.cas" size="1942" crc="06422b4a" sha1="8f2ee920d3b7beb3238543b0fac977401549feff"/>
 			</dataarea>
 		</part>
 	</software>
@@ -384,12 +384,12 @@
 		<info name="author" value="I. Hary" />
 		<part name="cass1" interface="x07_cass">
 			<dataarea name="cass" size="2478">
-				<rom name="cheva1_lancelot.cas" size="2478" crc="7ab67b9e" sha1="a32c41d92445006f04c29a8181bbaee0511d9c8b" offset="0" />
+				<rom name="cheva1_lancelot.cas" size="2478" crc="7ab67b9e" sha1="a32c41d92445006f04c29a8181bbaee0511d9c8b"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="x07_cass">
 			<dataarea name="cass" size="7625">
-				<rom name="cheva2_lancelot.cas" size="7625" crc="40d296a8" sha1="add91d92f5a1dd231db86947250ded246a25b40e" offset="0" />
+				<rom name="cheva2_lancelot.cas" size="7625" crc="40d296a8" sha1="add91d92f5a1dd231db86947250ded246a25b40e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -403,12 +403,12 @@
 		<info name="author" value="Emmanuel De Lapparent" />
 		<part name="cass1" interface="x07_cass">
 			<dataarea name="cass" size="4447">
-				<rom name="cm1_chateaumaudit.cas" size="4447" crc="043254fa" sha1="1e50e09acbf7265bf9674c8ef6d60a5c188cb991" offset="0" />
+				<rom name="cm1_chateaumaudit.cas" size="4447" crc="043254fa" sha1="1e50e09acbf7265bf9674c8ef6d60a5c188cb991"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="x07_cass">
 			<dataarea name="cass" size="6359">
-				<rom name="cm2_chateaumaudit.cas" size="6359" crc="7c696f3e" sha1="8b6b6b7a570a2b117d3673f58803f8f2ae34cc83" offset="0" />
+				<rom name="cm2_chateaumaudit.cas" size="6359" crc="7c696f3e" sha1="8b6b6b7a570a2b117d3673f58803f8f2ae34cc83"/>
 			</dataarea>
 		</part>
 	</software>
@@ -423,7 +423,7 @@
 		<info name="author" value="A. Nogues" />
 		<part name="cass" interface="x07_cass">
 			<dataarea name="cass" size="10185">
-				<rom name="courbes.cas" size="10185" crc="e30ceaa1" sha1="d6506ccdc1d60108856128b316d7df94f79f0505" offset="0" />
+				<rom name="courbes.cas" size="10185" crc="e30ceaa1" sha1="d6506ccdc1d60108856128b316d7df94f79f0505"/>
 			</dataarea>
 		</part>
 	</software>
@@ -437,7 +437,7 @@
 		<info name="author" value="G. Forest" />
 		<part name="cass" interface="x07_cass">
 			<dataarea name="cass" size="9975">
-				<rom name="defenseur.cas" size="9975" crc="cf0bace2" sha1="b7c8f8282f3da6aaabaaaad96a1d137bf6edbedf" offset="0" />
+				<rom name="defenseur.cas" size="9975" crc="cf0bace2" sha1="b7c8f8282f3da6aaabaaaad96a1d137bf6edbedf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -452,7 +452,7 @@
 		<info name="author" value="Y. E. Proy" />
 		<part name="cass" interface="x07_cass">
 			<dataarea name="cass" size="4639">
-				<rom name="desass.cas" size="4639" crc="ae98dba9" sha1="d3b13a0d181295366c51bc07cba8d69770e47a8a" offset="0" />
+				<rom name="desass.cas" size="4639" crc="ae98dba9" sha1="d3b13a0d181295366c51bc07cba8d69770e47a8a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -466,12 +466,12 @@
 		<info name="author" value="Emmanuel De Lapparent" />
 		<part name="cass1" interface="x07_cass">
 			<dataarea name="cass" size="191">
-				<rom name="desassembleur[loader].cas" size="191" crc="beff77d6" sha1="bb2d3f4de3a3d0c2faecff21effa058c61ecafa9" offset="0" />
+				<rom name="desassembleur[loader].cas" size="191" crc="beff77d6" sha1="bb2d3f4de3a3d0c2faecff21effa058c61ecafa9"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="x07_cass">
 			<dataarea name="cass" size="2317">
-				<rom name="desassembleur[codes].cas" size="2317" crc="5559879b" sha1="6c42a850aeed5d61308ef55d2cc86eb7f5ab97ef" offset="0" />
+				<rom name="desassembleur[codes].cas" size="2317" crc="5559879b" sha1="6c42a850aeed5d61308ef55d2cc86eb7f5ab97ef"/>
 			</dataarea>
 		</part>
 	</software>
@@ -485,17 +485,17 @@
 		<info name="author" value="F. Fargeot" />
 		<part name="cass1" interface="x07_cass">
 			<dataarea name="cass" size="2318">
-				<rom name="destr1_destruction.cas" size="2318" crc="7e383541" sha1="104db3a013b2bec3df6999edaa19eaa1260de1de" offset="0" />
+				<rom name="destr1_destruction.cas" size="2318" crc="7e383541" sha1="104db3a013b2bec3df6999edaa19eaa1260de1de"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="x07_cass">
 			<dataarea name="cass" size="5488">
-				<rom name="destr2_destruction.cas" size="5488" crc="3d2ed37c" sha1="f78e7940a515c6d4b6e93afcee47fe5a91743886" offset="0" />
+				<rom name="destr2_destruction.cas" size="5488" crc="3d2ed37c" sha1="f78e7940a515c6d4b6e93afcee47fe5a91743886"/>
 			</dataarea>
 		</part>
 		<part name="cass3" interface="x07_cass">
 			<dataarea name="cass" size="4805">
-				<rom name="destr3_destruction.cas" size="4805" crc="d9860e13" sha1="455f612d1e9eecf0c3c7a3d6f33ce2af35c6d52e" offset="0" />
+				<rom name="destr3_destruction.cas" size="4805" crc="d9860e13" sha1="455f612d1e9eecf0c3c7a3d6f33ce2af35c6d52e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -509,7 +509,7 @@
 		<info name="author" value="I. Hary" />
 		<part name="cass" interface="x07_cass">
 			<dataarea name="cass" size="5617">
-				<rom name="donjon.cas" size="5617" crc="2f6103d1" sha1="bd869c8164b2813ab6dda9b63e2bf28b911db65d" offset="0" />
+				<rom name="donjon.cas" size="5617" crc="2f6103d1" sha1="bd869c8164b2813ab6dda9b63e2bf28b911db65d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -523,12 +523,12 @@
 		<info name="author" value="M. Bollaert" />
 		<part name="cass1" interface="x07_cass">
 			<dataarea name="cass" size="2136">
-				<rom name="edf1.cas" size="2136" crc="e3101e24" sha1="aef2bae2382e2ed1ba3aab3f6d5dbc312000c5ed" offset="0" />
+				<rom name="edf1.cas" size="2136" crc="e3101e24" sha1="aef2bae2382e2ed1ba3aab3f6d5dbc312000c5ed"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="x07_cass">
 			<dataarea name="cass" size="14334">
-				<rom name="edf2.cas" size="14334" crc="3c600f67" sha1="5fb93f970847b8df2109cd604495f9feff4d4c89" offset="0" />
+				<rom name="edf2.cas" size="14334" crc="3c600f67" sha1="5fb93f970847b8df2109cd604495f9feff4d4c89"/>
 			</dataarea>
 		</part>
 	</software>
@@ -542,7 +542,7 @@
 		<info name="author" value="Stephane Shirvanian" />
 		<part name="cass" interface="x07_cass">
 			<dataarea name="cass" size="4708">
-				<rom name="eudipe.cas" size="4708" crc="3416daf4" sha1="1fcf066ec54bac4851a27d100174ee7ef31e2359" offset="0" />
+				<rom name="eudipe.cas" size="4708" crc="3416daf4" sha1="1fcf066ec54bac4851a27d100174ee7ef31e2359"/>
 			</dataarea>
 		</part>
 	</software>
@@ -556,7 +556,7 @@
 		<info name="author" value="B. Rouleau" />
 		<part name="cass" interface="x07_cass">
 			<dataarea name="cass" size="6001">
-				<rom name="fifine la tortue.cas" size="6001" crc="de092ba4" sha1="3f788248cc5e18f1db34f522a25b14a268b7dae5" offset="0" />
+				<rom name="fifine la tortue.cas" size="6001" crc="de092ba4" sha1="3f788248cc5e18f1db34f522a25b14a268b7dae5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -570,7 +570,7 @@
 		<info name="author" value="C. Bureau" />
 		<part name="cass" interface="x07_cass">
 			<dataarea name="cass" size="5574">
-				<rom name="finances.cas" size="5574" crc="cd0992fe" sha1="48e4612b81a0c0daaeadaf5b15dc7daa9e88abb9" offset="0" />
+				<rom name="finances.cas" size="5574" crc="cd0992fe" sha1="48e4612b81a0c0daaeadaf5b15dc7daa9e88abb9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -584,7 +584,7 @@
 		<info name="author" value="P. Diogo" />
 		<part name="cass" interface="x07_cass">
 			<dataarea name="cass" size="2803">
-				<rom name="fontix+_asm.cas" size="2803" crc="00c66e4c" sha1="ba8982331a4fb3c286720849d94584fd5cbc43bf" offset="0" />
+				<rom name="fontix+_asm.cas" size="2803" crc="00c66e4c" sha1="ba8982331a4fb3c286720849d94584fd5cbc43bf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -598,7 +598,7 @@
 		<info name="author" value="M. Boucher" />
 		<part name="cass" interface="x07_cass">
 			<dataarea name="cass" size="9070">
-				<rom name="force8.cas" size="9070" crc="085272a4" sha1="c86a7fd6e37715e47588974aa36ea93d167957ca" offset="0" />
+				<rom name="force8.cas" size="9070" crc="085272a4" sha1="c86a7fd6e37715e47588974aa36ea93d167957ca"/>
 			</dataarea>
 		</part>
 	</software>
@@ -612,12 +612,12 @@
 		<info name="author" value="A. Fousse" />
 		<part name="cass1" interface="x07_cass">
 			<dataarea name="cass" size="8029">
-				<rom name="formule1_loader.cas" size="8029" crc="ece2373c" sha1="fce835cbdb28d3b8d96748d05a430d117f5d4c36" offset="0" />
+				<rom name="formule1_loader.cas" size="8029" crc="ece2373c" sha1="fce835cbdb28d3b8d96748d05a430d117f5d4c36"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="x07_cass">
 			<dataarea name="cass" size="10518">
-				<rom name="formule1_car3.cas" size="10518" crc="7f8e2d51" sha1="b1231a72baef84044b980dae848f196a4c79ec3e" offset="0" />
+				<rom name="formule1_car3.cas" size="10518" crc="7f8e2d51" sha1="b1231a72baef84044b980dae848f196a4c79ec3e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -631,7 +631,7 @@
 		<info name="author" value="C. Danes" />
 		<part name="cass" interface="x07_cass">
 			<dataarea name="cass" size="3154">
-				<rom name="france.cas" size="3154" crc="4d703f4e" sha1="8b57f83ffc62b872ab85ae5ef9bf5f8422475c28" offset="0" />
+				<rom name="france.cas" size="3154" crc="4d703f4e" sha1="8b57f83ffc62b872ab85ae5ef9bf5f8422475c28"/>
 			</dataarea>
 		</part>
 	</software>
@@ -645,7 +645,7 @@
 		<info name="author" value="P. Lotz" />
 		<part name="cass" interface="x07_cass">
 			<dataarea name="cass" size="2343">
-				<rom name="generateur musical.cas" size="2343" crc="4fab9406" sha1="2d7f96604680caba36fab49559f397d4508a7054" offset="0" />
+				<rom name="generateur musical.cas" size="2343" crc="4fab9406" sha1="2d7f96604680caba36fab49559f397d4508a7054"/>
 			</dataarea>
 		</part>
 	</software>
@@ -660,7 +660,7 @@
 		<info name="author" value="S. Madrange" />
 		<part name="cass" interface="x07_cass">
 			<dataarea name="cass" size="14656">
-				<rom name="gentleman cambrioleur.cas" size="14656" crc="4bd81683" sha1="2a4d98470ae6f3a795cb797e89ded2cf74d6b2a7" offset="0" />
+				<rom name="gentleman cambrioleur.cas" size="14656" crc="4bd81683" sha1="2a4d98470ae6f3a795cb797e89ded2cf74d6b2a7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -674,7 +674,7 @@
 		<info name="author" value="Philippe Desmartin" />
 		<part name="cass" interface="x07_cass">
 			<dataarea name="cass" size="5904">
-				<rom name="mini-golf.cas" size="5904" crc="6dc32653" sha1="a8393c9b4460087c7396e6a995c11527d23dc07e" offset="0" />
+				<rom name="mini-golf.cas" size="5904" crc="6dc32653" sha1="a8393c9b4460087c7396e6a995c11527d23dc07e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -688,7 +688,7 @@
 		<info name="author" value="F. M. Bollaert" />
 		<part name="cass" interface="x07_cass">
 			<dataarea name="cass" size="3498">
-				<rom name="ponts.cas" size="3498" crc="d11481d4" sha1="5628f66f185b7f21f52bd7690ad3efd32a35b374" offset="0" />
+				<rom name="ponts.cas" size="3498" crc="d11481d4" sha1="5628f66f185b7f21f52bd7690ad3efd32a35b374"/>
 			</dataarea>
 		</part>
 	</software>
@@ -702,12 +702,12 @@
 		<info name="author" value="Emmanuel De Lapparent" />
 		<part name="cass1" interface="x07_cass">
 			<dataarea name="cass" size="4245">
-				<rom name="jeux olympiques d'hivers1.cas" size="4245" crc="71e0b058" sha1="e9314180607a52b6aedf8384a57144859327a084" offset="0" />
+				<rom name="jeux olympiques d'hivers1.cas" size="4245" crc="71e0b058" sha1="e9314180607a52b6aedf8384a57144859327a084"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="x07_cass">
 			<dataarea name="cass" size="6162">
-				<rom name="jeux olympiques d'hivers2.cas" size="6162" crc="1c479bac" sha1="ea5fefc11c0e5864c639bd7639c9e316b3575e41" offset="0" />
+				<rom name="jeux olympiques d'hivers2.cas" size="6162" crc="1c479bac" sha1="ea5fefc11c0e5864c639bd7639c9e316b3575e41"/>
 			</dataarea>
 		</part>
 	</software>
@@ -721,12 +721,12 @@
 		<info name="author" value="P. Fagnant" />
 		<part name="cass1" interface="x07_cass">
 			<dataarea name="cass" size="4008">
-				<rom name="joe1_joe dalt'kid.cas" size="4008" crc="65523d35" sha1="f3c4a832cdfef89768f00ea0baeee98aeb047033" offset="0" />
+				<rom name="joe1_joe dalt'kid.cas" size="4008" crc="65523d35" sha1="f3c4a832cdfef89768f00ea0baeee98aeb047033"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="x07_cass">
 			<dataarea name="cass" size="6289">
-				<rom name="joe2_joe dalt'kid.cas" size="6289" crc="f1177d7f" sha1="cf64a88d8763d5e70e9bd7635a97bdcd67b14d16" offset="0" />
+				<rom name="joe2_joe dalt'kid.cas" size="6289" crc="f1177d7f" sha1="cf64a88d8763d5e70e9bd7635a97bdcd67b14d16"/>
 			</dataarea>
 		</part>
 	</software>
@@ -740,7 +740,7 @@
 		<info name="author" value="Pierre Dor" />
 		<part name="cass" interface="x07_cass">
 			<dataarea name="cass" size="6151">
-				<rom name="judoka.cas" size="6151" crc="85221b8e" sha1="2992b9e7887099034e462e9ef7190a46820fd840" offset="0" />
+				<rom name="judoka.cas" size="6151" crc="85221b8e" sha1="2992b9e7887099034e462e9ef7190a46820fd840"/>
 			</dataarea>
 		</part>
 	</software>
@@ -754,7 +754,7 @@
 		<info name="author" value="F. Trancart" />
 		<part name="cass" interface="x07_cass">
 			<dataarea name="cass" size="5293">
-				<rom name="jump.cas" size="5293" crc="1283d8a1" sha1="11d2fd1476898771bac0f4bfecd6cbf14b28324b" offset="0" />
+				<rom name="jump.cas" size="5293" crc="1283d8a1" sha1="11d2fd1476898771bac0f4bfecd6cbf14b28324b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -768,7 +768,7 @@
 		<info name="author" value="A. Jacquot" />
 		<part name="cass" interface="x07_cass">
 			<dataarea name="cass" size="3681">
-				<rom name="key programmer.cas" size="3681" crc="87a59f55" sha1="d16deda00b3ed76345a61f2842e82cada5e0e902" offset="0" />
+				<rom name="key programmer.cas" size="3681" crc="87a59f55" sha1="d16deda00b3ed76345a61f2842e82cada5e0e902"/>
 			</dataarea>
 		</part>
 	</software>
@@ -782,7 +782,7 @@
 		<info name="author" value="F. Benoist" />
 		<part name="cass" interface="x07_cass">
 			<dataarea name="cass" size="2592">
-				<rom name="labyr.cas" size="2592" crc="6200bdad" sha1="91b75344e87b8ea9385a1cd70f1183fcad35a720" offset="0" />
+				<rom name="labyr.cas" size="2592" crc="6200bdad" sha1="91b75344e87b8ea9385a1cd70f1183fcad35a720"/>
 			</dataarea>
 		</part>
 	</software>
@@ -796,7 +796,7 @@
 		<info name="author" value="C. Flores" />
 		<part name="cass" interface="x07_cass">
 			<dataarea name="cass" size="6212">
-				<rom name="liaisons.cas" size="6212" crc="1865efb1" sha1="4c63c50be58cacc85d8e55cc7a8dd52361b3ae7b" offset="0" />
+				<rom name="liaisons.cas" size="6212" crc="1865efb1" sha1="4c63c50be58cacc85d8e55cc7a8dd52361b3ae7b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -810,7 +810,7 @@
 		<info name="author" value="Emmanuel Lecharny" />
 		<part name="cass" interface="x07_cass">
 			<dataarea name="cass" size="5402">
-				<rom name="lion.cas" size="5402" crc="610d18ca" sha1="ea0d5126fc20d6877fb73af91a11c3d95ac64cb5" offset="0" />
+				<rom name="lion.cas" size="5402" crc="610d18ca" sha1="ea0d5126fc20d6877fb73af91a11c3d95ac64cb5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -824,7 +824,7 @@
 		<info name="author" value="M. Salaum" />
 		<part name="cass" interface="x07_cass">
 			<dataarea name="cass" size="4864">
-				<rom name="lucky joe.cas" size="4864" crc="a6c45719" sha1="6d8468290ca15aea374c79f8c56663bcdad5bdb6" offset="0" />
+				<rom name="lucky joe.cas" size="4864" crc="a6c45719" sha1="6d8468290ca15aea374c79f8c56663bcdad5bdb6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -837,7 +837,7 @@
 		<info name="release" value="19850322" />
 		<part name="cass" interface="x07_cass">
 			<dataarea name="cass" size="12569">
-				<rom name="mathematiques.cas" size="12569" crc="1f634d41" sha1="c647020112d53434894eeed50739135ddbc70771" offset="0" />
+				<rom name="mathematiques.cas" size="12569" crc="1f634d41" sha1="c647020112d53434894eeed50739135ddbc70771"/>
 			</dataarea>
 		</part>
 	</software>
@@ -851,7 +851,7 @@
 		<info name="author" value="S. Guiochon" />
 		<part name="cass" interface="x07_cass">
 			<dataarea name="cass" size="4611">
-				<rom name="mines.cas" size="4611" crc="d3bdd399" sha1="c41455447d337db79177e4345d6fdc8aa49055cf" offset="0" />
+				<rom name="mines.cas" size="4611" crc="d3bdd399" sha1="c41455447d337db79177e4345d6fdc8aa49055cf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -865,7 +865,7 @@
 		<info name="author" value="Philippe Desmartin" />
 		<part name="cass" interface="x07_cass">
 			<dataarea name="cass" size="7315">
-				<rom name="mini-geographe.cas" size="7315" crc="c7e9aa4a" sha1="0eaf1bf43f93949412319eec4903798807d214b1" offset="0" />
+				<rom name="mini-geographe.cas" size="7315" crc="c7e9aa4a" sha1="0eaf1bf43f93949412319eec4903798807d214b1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -879,7 +879,7 @@
 		<info name="author" value="Olivier Faugeras" />
 		<part name="cass" interface="x07_cass">
 			<dataarea name="cass" size="6491">
-				<rom name="multigraph.cas" size="6491" crc="1f413ac2" sha1="ec7ffa7fe34d7cad11e851beb6baa28c603c5d71" offset="0" />
+				<rom name="multigraph.cas" size="6491" crc="1f413ac2" sha1="ec7ffa7fe34d7cad11e851beb6baa28c603c5d71"/>
 			</dataarea>
 		</part>
 	</software>
@@ -893,12 +893,12 @@
 		<info name="author" value="S. Friedelmeyer" />
 		<part name="cass1" interface="x07_cass">
 			<dataarea name="cass" size="6738">
-				<rom name="music1 maker.cas" size="6738" crc="5e315fca" sha1="d178d5bfed16f49393b8ad66893d872f57920f57" offset="0" />
+				<rom name="music1 maker.cas" size="6738" crc="5e315fca" sha1="d178d5bfed16f49393b8ad66893d872f57920f57"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="x07_cass">
 			<dataarea name="cass" size="4566">
-				<rom name="music2 maker.cas" size="4566" crc="65935eae" sha1="3016e51310bae5d97a0665bd8cc0a065d63f2e78" offset="0" />
+				<rom name="music2 maker.cas" size="4566" crc="65935eae" sha1="3016e51310bae5d97a0665bd8cc0a065d63f2e78"/>
 			</dataarea>
 		</part>
 	</software>
@@ -913,7 +913,7 @@
 		<info name="author" value="S. Doczekaski" />
 		<part name="cass" interface="x07_cass">
 			<dataarea name="cass" size="3873">
-				<rom name="bacman.cas" size="3873" crc="618431f1" sha1="8357e1aed5b9e116caf0939c7bdf48b29a17e7ac" offset="0" />
+				<rom name="bacman.cas" size="3873" crc="618431f1" sha1="8357e1aed5b9e116caf0939c7bdf48b29a17e7ac"/>
 			</dataarea>
 		</part>
 	</software>
@@ -927,12 +927,12 @@
 		<info name="author" value="E. Capellari" />
 		<part name="cass1" interface="x07_cass">
 			<dataarea name="cass" size="1932">
-				<rom name="panic1 bank.cas" size="1932" crc="b287bed7" sha1="dfaf30c541654b0a220e88b152c52ada5ab35ec6" offset="0" />
+				<rom name="panic1 bank.cas" size="1932" crc="b287bed7" sha1="dfaf30c541654b0a220e88b152c52ada5ab35ec6"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="x07_cass">
 			<dataarea name="cass" size="5268">
-				<rom name="panic2 bank.cas" size="5268" crc="9c595c9f" sha1="dd069484435482ae1845a063dffab6b488c6ca8d" offset="0" />
+				<rom name="panic2 bank.cas" size="5268" crc="9c595c9f" sha1="dd069484435482ae1845a063dffab6b488c6ca8d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -946,12 +946,12 @@
 		<info name="author" value="X. Vannerau" />
 		<part name="cass1" interface="x07_cass">
 			<dataarea name="cass" size="2317">
-				<rom name="patr1_patrouilleur de l espace.cas" size="2317" crc="7a3d1252" sha1="3a6e3b2780230c2ff2fa72cb48b1c8ea6b9c194c" offset="0" />
+				<rom name="patr1_patrouilleur de l espace.cas" size="2317" crc="7a3d1252" sha1="3a6e3b2780230c2ff2fa72cb48b1c8ea6b9c194c"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="x07_cass">
 			<dataarea name="cass" size="6067">
-				<rom name="patr2_patrouilleur de l espace.cas" size="6067" crc="b60b25c1" sha1="28d09765da024a815ae905bcb297f86b3e30c4a1" offset="0" />
+				<rom name="patr2_patrouilleur de l espace.cas" size="6067" crc="b60b25c1" sha1="28d09765da024a815ae905bcb297f86b3e30c4a1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -965,7 +965,7 @@
 		<info name="author" value="Philippe Desmartin" />
 		<part name="cass" interface="x07_cass">
 			<dataarea name="cass" size="13091">
-				<rom name="pin-up.cas" size="13091" crc="e9c72785" sha1="477dc6603142fb3649dad9464d022933d6f313c1" offset="0" />
+				<rom name="pin-up.cas" size="13091" crc="e9c72785" sha1="477dc6603142fb3649dad9464d022933d6f313c1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -979,7 +979,7 @@
 		<info name="author" value="C. Peletier" />
 		<part name="cass" interface="x07_cass">
 			<dataarea name="cass" size="1391">
-				<rom name="piste.cas" size="1391" crc="20c4ce2c" sha1="d9a93b119ddd3a23ae893c5fac6d51314659e341" offset="0" />
+				<rom name="piste.cas" size="1391" crc="20c4ce2c" sha1="d9a93b119ddd3a23ae893c5fac6d51314659e341"/>
 			</dataarea>
 		</part>
 	</software>
@@ -993,7 +993,7 @@
 		<info name="author" value="F. Bernez" />
 		<part name="cass" interface="x07_cass">
 			<dataarea name="cass" size="5895">
-				<rom name="le prix du danger.cas" size="5895" crc="5bd08843" sha1="e8ef2fc908a1bbedd0ccc182cb78ab305c29202f" offset="0" />
+				<rom name="le prix du danger.cas" size="5895" crc="5bd08843" sha1="e8ef2fc908a1bbedd0ccc182cb78ab305c29202f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1007,7 +1007,7 @@
 		<info name="author" value="E. Lapouyade" />
 		<part name="cass" interface="x07_cass">
 			<dataarea name="cass" size="6357">
-				<rom name="puzzle.cas" size="6357" crc="f878e0b6" sha1="0e8bfe129ba42abbace0fd63ec5206d3c263c7b0" offset="0" />
+				<rom name="puzzle.cas" size="6357" crc="f878e0b6" sha1="0e8bfe129ba42abbace0fd63ec5206d3c263c7b0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1021,12 +1021,12 @@
 		<info name="author" value="J. L. Vitre" />
 		<part name="cass1" interface="x07_cass">
 			<dataarea name="cass" size="3439">
-				<rom name="rendez-vous1.cas" size="3439" crc="5624de8e" sha1="b36b088335699bb6b3eb0f0762496d8d444eaffd" offset="0" />
+				<rom name="rendez-vous1.cas" size="3439" crc="5624de8e" sha1="b36b088335699bb6b3eb0f0762496d8d444eaffd"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="x07_cass">
 			<dataarea name="cass" size="12168">
-				<rom name="rendez-vous2.cas" size="12168" crc="654836c9" sha1="8d52f3694267b38aa0341da994ecbd021ff16f14" offset="0" />
+				<rom name="rendez-vous2.cas" size="12168" crc="654836c9" sha1="8d52f3694267b38aa0341da994ecbd021ff16f14"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1040,7 +1040,7 @@
 		<info name="author" value="R. Santini" />
 		<part name="cass" interface="x07_cass">
 			<dataarea name="cass" size="1816">
-				<rom name="renumauto.cas" size="1816" crc="cf404520" sha1="2801cf02ccb435f00b545ac8283ab575a5a3b0de" offset="0" />
+				<rom name="renumauto.cas" size="1816" crc="cf404520" sha1="2801cf02ccb435f00b545ac8283ab575a5a3b0de"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1054,7 +1054,7 @@
 		<info name="author" value="M. Marciacq" />
 		<part name="cass" interface="x07_cass">
 			<dataarea name="cass" size="9044">
-				<rom name="runner.cas" size="9044" crc="55fc5340" sha1="2a96fc3e60594a44d1c8d11132e8239bec1c5a4b" offset="0" />
+				<rom name="runner.cas" size="9044" crc="55fc5340" sha1="2a96fc3e60594a44d1c8d11132e8239bec1c5a4b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1069,7 +1069,7 @@
 		<info name="author" value="F. Costa Dos Santos" />
 		<part name="cass" interface="x07_cass">
 			<dataarea name="cass" size="13903">
-				<rom name="sante7.cas" size="13903" crc="b1ae8127" sha1="9ff5feb84968596e901874c8b4cc8635efc127f6" offset="0" />
+				<rom name="sante7.cas" size="13903" crc="b1ae8127" sha1="9ff5feb84968596e901874c8b4cc8635efc127f6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1083,12 +1083,12 @@
 		<info name="author" value="F. Trancart" />
 		<part name="cass1" interface="x07_cass">
 			<dataarea name="cass" size="2823">
-				<rom name="seawar 1_loader.cas" size="2823" crc="ec39ba2c" sha1="58814335387a9bfabe13c9953cc8f22f86e89f05" offset="0" />
+				<rom name="seawar 1_loader.cas" size="2823" crc="ec39ba2c" sha1="58814335387a9bfabe13c9953cc8f22f86e89f05"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="x07_cass">
 			<dataarea name="cass" size="4910">
-				<rom name="seawar 1.cas" size="4910" crc="8bf81881" sha1="b5f5d4d63d109b1d941655dd9c52ca70b2c3e535" offset="0" />
+				<rom name="seawar 1.cas" size="4910" crc="8bf81881" sha1="b5f5d4d63d109b1d941655dd9c52ca70b2c3e535"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1102,12 +1102,12 @@
 		<info name="author" value="F. X. Jorden" />
 		<part name="cass1" interface="x07_cass">
 			<dataarea name="cass" size="6857">
-				<rom name="seawar_presentation_l1.cas" size="6857" crc="679ff2f6" sha1="d4c427ccfb35d98be7338a003bec6fdb40e94331" offset="0" />
+				<rom name="seawar_presentation_l1.cas" size="6857" crc="679ff2f6" sha1="d4c427ccfb35d98be7338a003bec6fdb40e94331"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="x07_cass">
 			<dataarea name="cass" size="12644">
-				<rom name="seawar_seawar_l2.cas" size="12644" crc="bebef275" sha1="51bbb5a6d2375ae3c2aa52b4c921f32e2d67b2c2" offset="0" />
+				<rom name="seawar_seawar_l2.cas" size="12644" crc="bebef275" sha1="51bbb5a6d2375ae3c2aa52b4c921f32e2d67b2c2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1121,12 +1121,12 @@
 		<info name="author" value="F. Vacher" />
 		<part name="cass1" interface="x07_cass">
 			<dataarea name="cass" size="4818">
-				<rom name="serpentine_loader.cas" size="4818" crc="ced74fd6" sha1="18723d2e7393f6b97e52905491e9708121d32725" offset="0" />
+				<rom name="serpentine_loader.cas" size="4818" crc="ced74fd6" sha1="18723d2e7393f6b97e52905491e9708121d32725"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="x07_cass">
 			<dataarea name="cass" size="615">
-				<rom name="serpentine_auto_datas.cas" size="615" crc="328c035e" sha1="81159c395c87fe4ecd37fae6864311bcb7969b86" offset="0" />
+				<rom name="serpentine_auto_datas.cas" size="615" crc="328c035e" sha1="81159c395c87fe4ecd37fae6864311bcb7969b86"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1140,12 +1140,12 @@
 		<info name="author" value="Emmanuel De Lapparent" />
 		<part name="cass1" interface="x07_cass">
 			<dataarea name="cass" size="6104">
-				<rom name="le sorcier maudit1.cas" size="6104" crc="99f96d33" sha1="789be9860b0562c2128c2deca2a7310a17da29d0" offset="0" />
+				<rom name="le sorcier maudit1.cas" size="6104" crc="99f96d33" sha1="789be9860b0562c2128c2deca2a7310a17da29d0"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="x07_cass">
 			<dataarea name="cass" size="10157">
-				<rom name="le sorcier maudit2.cas" size="10157" crc="60cfd3ab" sha1="2917f6e6e64df4cb18f0ffb8791272af454bb1ea" offset="0" />
+				<rom name="le sorcier maudit2.cas" size="10157" crc="60cfd3ab" sha1="2917f6e6e64df4cb18f0ffb8791272af454bb1ea"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1159,7 +1159,7 @@
 		<info name="author" value="J. M. Joudrier" />
 		<part name="cass" interface="x07_cass">
 			<dataarea name="cass" size="6018">
-				<rom name="space.cas" size="6018" crc="99a8b56e" sha1="2011713b7f0968759b020e874a595d9bcc004651" offset="0" />
+				<rom name="space.cas" size="6018" crc="99a8b56e" sha1="2011713b7f0968759b020e874a595d9bcc004651"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1173,17 +1173,17 @@
 		<info name="author" value="H. Cimadomo" />
 		<part name="cass1" interface="x07_cass">
 			<dataarea name="cass" size="1121">
-				<rom name="panik1_space panik.cas" size="1121" crc="d558063d" sha1="5015e73cb00cb7f1dd32e2b3b67791cc2e4bbdd0" offset="0" />
+				<rom name="panik1_space panik.cas" size="1121" crc="d558063d" sha1="5015e73cb00cb7f1dd32e2b3b67791cc2e4bbdd0"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="x07_cass">
 			<dataarea name="cass" size="4943">
-				<rom name="panik2_space panik.cas" size="4943" crc="9cb639b5" sha1="bf3a208b751294ccfc76b69a294f7eec9ea74558" offset="0" />
+				<rom name="panik2_space panik.cas" size="4943" crc="9cb639b5" sha1="bf3a208b751294ccfc76b69a294f7eec9ea74558"/>
 			</dataarea>
 		</part>
 		<part name="cass3" interface="x07_cass">
 			<dataarea name="cass" size="3985">
-				<rom name="panik3_space panik.cas" size="3985" crc="4feb422c" sha1="ae3bec50e6a6e6546f3df5b999e952f2aab16bcf" offset="0" />
+				<rom name="panik3_space panik.cas" size="3985" crc="4feb422c" sha1="ae3bec50e6a6e6546f3df5b999e952f2aab16bcf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1197,7 +1197,7 @@
 		<info name="author" value="Y. Burgalieres" />
 		<part name="cass" interface="x07_cass">
 			<dataarea name="cass" size="5406">
-				<rom name="starwar.cas" size="5406" crc="87d68cbb" sha1="e59eb2b9733f0d8b5e9532a086f160ede1011430" offset="0" />
+				<rom name="starwar.cas" size="5406" crc="87d68cbb" sha1="e59eb2b9733f0d8b5e9532a086f160ede1011430"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1212,7 +1212,7 @@
 		<info name="author" value="F. Berthet" />
 		<part name="cass" interface="x07_cass">
 			<dataarea name="cass" size="2096">
-				<rom name="stat.cas" size="2096" crc="3f117b61" sha1="b218de49081c4ede7885da412c79bcf625065eb7" offset="0" />
+				<rom name="stat.cas" size="2096" crc="3f117b61" sha1="b218de49081c4ede7885da412c79bcf625065eb7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1226,7 +1226,7 @@
 		<info name="author" value="C. Marguet" />
 		<part name="cass" interface="x07_cass">
 			<dataarea name="cass" size="11693">
-				<rom name="strip x07.cas" size="11693" crc="34f2320f" sha1="ba2e8b82f2452a8ad1b6a19f3bb0dafd83bae802" offset="0" />
+				<rom name="strip x07.cas" size="11693" crc="34f2320f" sha1="ba2e8b82f2452a8ad1b6a19f3bb0dafd83bae802"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1240,12 +1240,12 @@
 		<info name="author" value="J. Chauvin" />
 		<part name="cass1" interface="x07_cass">
 			<dataarea name="cass" size="2243">
-				<rom name="super1_loader.cas" size="2243" crc="ab55c3f3" sha1="bf9d44f3ba25caa67c948c128607d6a19c828b62" offset="0" />
+				<rom name="super1_loader.cas" size="2243" crc="ab55c3f3" sha1="bf9d44f3ba25caa67c948c128607d6a19c828b62"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="x07_cass">
 			<dataarea name="cass" size="5187">
-				<rom name="super2_super glouton.cas" size="5187" crc="4fe78828" sha1="9d4219d830062a4a3161547744cc79136f7e6560" offset="0" />
+				<rom name="super2_super glouton.cas" size="5187" crc="4fe78828" sha1="9d4219d830062a4a3161547744cc79136f7e6560"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1259,7 +1259,7 @@
 		<info name="author" value="S. Madrange" />
 		<part name="cass" interface="x07_cass">
 			<dataarea name="cass" size="5288">
-				<rom name="synthetiseur.cas" size="5288" crc="7b4760a8" sha1="b5d43b28b432c1774e641eb8aed93799f20aa0cc" offset="0" />
+				<rom name="synthetiseur.cas" size="5288" crc="7b4760a8" sha1="b5d43b28b432c1774e641eb8aed93799f20aa0cc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1273,7 +1273,7 @@
 		<info name="author" value="P. Leon" />
 		<part name="cass" interface="x07_cass">
 			<dataarea name="cass" size="3249">
-				<rom name="temple.cas" size="3249" crc="79c08cc7" sha1="adf2cc98258f731281dbcbf042ac897f75eb1e24" offset="0" />
+				<rom name="temple.cas" size="3249" crc="79c08cc7" sha1="adf2cc98258f731281dbcbf042ac897f75eb1e24"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1288,7 +1288,7 @@
 		<info name="author" value="C. Gautier" />
 		<part name="cass" interface="x07_cass">
 			<dataarea name="cass" size="4948">
-				<rom name="tridi4.cas" size="4948" crc="c95fb36a" sha1="f2062db2fe281c22c0b99f7e664035f337bdb618" offset="0" />
+				<rom name="tridi4.cas" size="4948" crc="c95fb36a" sha1="f2062db2fe281c22c0b99f7e664035f337bdb618"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1302,7 +1302,7 @@
 		<info name="author" value="Jean Spriet" />
 		<part name="cass" interface="x07_cass">
 			<dataarea name="cass" size="3224">
-				<rom name="tron.cas" size="3224" crc="63ec9046" sha1="4bf08d39e8d7bd03fa056bb1967911fd8b54fc3e" offset="0" />
+				<rom name="tron.cas" size="3224" crc="63ec9046" sha1="4bf08d39e8d7bd03fa056bb1967911fd8b54fc3e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1316,7 +1316,7 @@
 		<info name="author" value="G. Combret" />
 		<part name="cass" interface="x07_cass">
 			<dataarea name="cass" size="3253">
-				<rom name="uboat1.cas" size="3253" crc="bf7fcdb3" sha1="d55e91e7fef23c99cda9f9b94396c595bd81617c" offset="0" />
+				<rom name="uboat1.cas" size="3253" crc="bf7fcdb3" sha1="d55e91e7fef23c99cda9f9b94396c595bd81617c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1330,7 +1330,7 @@
 		<info name="author" value="Cyril Giroux &amp; Denis Leluc" />
 		<part name="cass" interface="x07_cass">
 			<dataarea name="cass" size="12197">
-				<rom name="un homme a abattre.cas" size="12197" crc="2b7d3490" sha1="1d5d696b0d58655492afe641725f7f63e9e60237" offset="0" />
+				<rom name="un homme a abattre.cas" size="12197" crc="2b7d3490" sha1="1d5d696b0d58655492afe641725f7f63e9e60237"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1344,7 +1344,7 @@
 		<info name="author" value="G. Bouquet" />
 		<part name="cass" interface="x07_cass">
 			<dataarea name="cass" size="1803">
-				<rom name="x07car.cas" size="1803" crc="81cdfce6" sha1="e841ed70f7a10cda1d87b359be869b0473bcae28" offset="0" />
+				<rom name="x07car.cas" size="1803" crc="81cdfce6" sha1="e841ed70f7a10cda1d87b359be869b0473bcae28"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1359,25 +1359,25 @@
 		<part name="cass1" interface="x07_cass">
 			<feature name="part_id" value="DIR" />
 			<dataarea name="cass" size="289">
-				<rom name="4utilitaires_dir.cas" size="289" crc="1884630b" sha1="b175b2e2271b92fbafecd3bb172924271eef1f7b" offset="0" />
+				<rom name="4utilitaires_dir.cas" size="289" crc="1884630b" sha1="b175b2e2271b92fbafecd3bb172924271eef1f7b"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="x07_cass">
 			<feature name="part_id" value="DATEUR" />
 			<dataarea name="cass" size="250">
-				<rom name="4utilitaires_dateur.cas" size="250" crc="77b155ff" sha1="38f535eacbaf8e5cc5e0e6b435ab9c8e4dd9b24d" offset="0" />
+				<rom name="4utilitaires_dateur.cas" size="250" crc="77b155ff" sha1="38f535eacbaf8e5cc5e0e6b435ab9c8e4dd9b24d"/>
 			</dataarea>
 		</part>
 		<part name="cass3" interface="x07_cass">
 			<feature name="part_id" value="NUMERO" />
 			<dataarea name="cass" size="244">
-				<rom name="4utilitaires_numero.cas" size="244" crc="24b49d0d" sha1="aaaf368ae838e7c948767782f4ff1b1958ccf5ff" offset="0" />
+				<rom name="4utilitaires_numero.cas" size="244" crc="24b49d0d" sha1="aaaf368ae838e7c948767782f4ff1b1958ccf5ff"/>
 			</dataarea>
 		</part>
 		<part name="cass4" interface="x07_cass">
 			<feature name="part_id" value="DATE" />
 			<dataarea name="cass" size="278">
-				<rom name="4utilitaires_date.cas" size="278" crc="f2840be8" sha1="ce75ecdd3e5cfdd87afbc563570e446d2a601090" offset="0" />
+				<rom name="4utilitaires_date.cas" size="278" crc="f2840be8" sha1="ce75ecdd3e5cfdd87afbc563570e446d2a601090"/>
 			</dataarea>
 		</part>
 	</software>

@@ -220,7 +220,7 @@ void chsuper_state::chsuper_prg_map(address_map &map)
 	map(0xfb000, 0xfbfff).ram().share("nvram");
 }
 
-//  AM_RANGE(0xaff8, 0xaff8) AM_DEVWRITE_MODERN("oki", okim6295_device, write)
+//  map(0xaff8, 0xaff8).w("oki", FUNC(okim6295_device::write));
 
 void chsuper_state::chsuper_portmap(address_map &map)
 {
@@ -367,7 +367,7 @@ void chsuper_state::ramdac_map(address_map &map)
 void chsuper_state::chsuper(machine_config &config)
 {
 	/* basic machine hardware */
-	Z180(config, m_maincpu, XTAL(12'000'000) / 4);   /* HD64180RP8, 8 MHz? */
+	Z80180(config, m_maincpu, 16_MHz_XTAL); // Z8018006VSC (but can actually take 8 MHz?)
 	m_maincpu->set_addrmap(AS_PROGRAM, &chsuper_state::chsuper_prg_map);
 	m_maincpu->set_addrmap(AS_IO, &chsuper_state::chsuper_portmap);
 	m_maincpu->set_vblank_int("screen", FUNC(chsuper_state::irq0_line_hold));
@@ -386,13 +386,13 @@ void chsuper_state::chsuper(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_chsuper);
 	PALETTE(config, m_palette).set_entries(0x100);
 
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette)); // ADV476KP50
 	ramdac.set_addrmap(0, &chsuper_state::ramdac_map);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // 74HC273 latch + R2R network (unknown values)
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);

@@ -560,7 +560,7 @@ void namcos11_state::driver_start()
 	{
 		m_su_83 = 0;
 		save_item( NAME(m_su_83) );
-		m_mcu->space(AS_PROGRAM).install_readwrite_handler(0x82, 0x83, read16_delegate(FUNC(namcos11_state::c76_speedup_r),this), write16_delegate(FUNC(namcos11_state::c76_speedup_w),this));
+		m_mcu->space(AS_PROGRAM).install_readwrite_handler(0x82, 0x83, read16_delegate(*this, FUNC(namcos11_state::c76_speedup_r)), write16_delegate(*this, FUNC(namcos11_state::c76_speedup_w)));
 	}
 
 	if( m_bankedroms != nullptr )

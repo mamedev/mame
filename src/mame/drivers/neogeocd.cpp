@@ -6,8 +6,7 @@
     Neo-Geo CD hardware
 
     Thanks to:
-        * The FBA team (Barry Harris) for much of the CDC / CDD code and system details.
-          ( http://www.barryharris.me.uk/ )
+        * Jan Klaassen (of the former FBA team) for much of the CDC / CDD code and system details.
         * Mirko Buffoni for a commented disassembly of the NeoCD bios rom.
 
     Current status:
@@ -542,7 +541,7 @@ int32_t ngcd_state::SekIdle(int32_t nCycles)
  *  DMA
 
     FF0061  Write 0x40 means start DMA transfer
-    FF0064  Source address (in copy mode), Target address (in filll mode)
+    FF0064  Source address (in copy mode), Target address (in fill mode)
     FF0068  Target address (in copy mode)
     FF006C  Fill word
     FF0070  Words count
@@ -586,7 +585,7 @@ void ngcd_state::do_dma(address_space& curr_space)
 {
 	// The LC8953 chip has a programmable DMA controller, which is not properly emulated.
 	// Since the software only uses it in a limited way, we can apply a simple heuristic
-	// to determnine the requested operation.
+	// to determine the requested operation.
 
 	// Additionally, we don't know how many cycles DMA operations take.
 	// Here, only bus access is used to get a rough approximation --
@@ -926,7 +925,7 @@ void ngcd_state::neocd_audio_io_map(address_map &map)
 	map(0x04, 0x07).mirror(0xff00).rw(m_ym, FUNC(ym2610_device::read), FUNC(ym2610_device::write));
 	map(0x08, 0x08).mirror(0xff00).select(0x0010).w(FUNC(ngcd_state::audio_cpu_enable_nmi_w));
 	// banking reads are actually NOP on NeoCD? but some games still access them
-//  AM_RANGE(0x08, 0x0b) AM_MIRROR(0x00f0) AM_SELECT(0xff00) AM_READ(audio_cpu_bank_select_r)
+//  map(0x08, 0x0b).mirror(0x00f0).select(0xff00).r(FUNC(ngcd_state::audio_cpu_bank_select_r));
 	map(0x0c, 0x0c).mirror(0xff00).w(m_soundlatch2, FUNC(generic_latch_8_device::write));
 
 	// ??
@@ -1056,9 +1055,9 @@ void ngcd_state::neocd(machine_config &config)
 	LC89510_TEMP(config, m_tempcdc, 0); // cd controller
 	m_tempcdc->set_cdrom_tag("cdrom");
 	m_tempcdc->set_is_neoCD(true);
-	m_tempcdc->set_type1_interrupt_callback(FUNC(ngcd_state::interrupt_callback_type1), this);
-	m_tempcdc->set_type2_interrupt_callback(FUNC(ngcd_state::interrupt_callback_type2), this);
-	m_tempcdc->set_type3_interrupt_callback(FUNC(ngcd_state::interrupt_callback_type3), this);
+	m_tempcdc->set_type1_interrupt_callback(FUNC(ngcd_state::interrupt_callback_type1));
+	m_tempcdc->set_type2_interrupt_callback(FUNC(ngcd_state::interrupt_callback_type2));
+	m_tempcdc->set_type3_interrupt_callback(FUNC(ngcd_state::interrupt_callback_type3));
 
 	NVRAM(config, "saveram", nvram_device::DEFAULT_ALL_0);
 

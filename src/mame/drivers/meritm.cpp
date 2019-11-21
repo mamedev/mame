@@ -1175,7 +1175,7 @@ void meritm_state::crt250_crt252_crt258(machine_config &config)
 	m_uart->out_tx_callback().set(m_microtouch, FUNC(microtouch_device::rx));
 
 	MICROTOUCH(config, m_microtouch, 9600).stx().set(m_uart, FUNC(ins8250_uart_device::rx_w));
-	m_microtouch->set_touch_callback(FUNC(meritm_state::touch_coord_transform), this);
+	m_microtouch->set_touch_callback(FUNC(meritm_state::touch_coord_transform));
 }
 
 void meritm_state::crt260(machine_config &config)
@@ -1194,7 +1194,7 @@ void meritm_state::crt260(machine_config &config)
 	m_uart->out_tx_callback().set(m_microtouch, FUNC(microtouch_device::rx));
 
 	MICROTOUCH(config, m_microtouch, 9600).stx().set(m_uart, FUNC(ins8250_uart_device::rx_w));
-	m_microtouch->set_touch_callback(FUNC(meritm_state::touch_coord_transform), this);
+	m_microtouch->set_touch_callback(FUNC(meritm_state::touch_coord_transform));
 }
 
 
@@ -1924,6 +1924,25 @@ ROM_START( megat3te ) /* Dallas DS1204V security key at U5 labeled 9255-30-01 U5
 	ROM_LOAD( "sc3981-0a.u51",  0x000, 0x117, CRC(4fc750d0) SHA1(d09ff7a8c66aeb5c49e9fec84bd1521e3f5d8d0a) )
 ROM_END
 
+ROM_START( megat3tg ) /* Dallas DS1204V security key at U5 labeled 9255-30-50 U5-RO1 C1995 MII */
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD( "9255-30-01_u32-r0",  0x000000, 0x100000, CRC(31ac0004) SHA1(4bec97a852a7dadb0ab4f193bc376ed149102082) ) /* Location U32 */
+	ROM_LOAD( "qs9255-01_u36-r0",   0x100000, 0x080000, CRC(96bb501e) SHA1(f48ef238e8543676c42e3b85464a25ac179dcdd1) ) /* Location U36 */
+	ROM_RELOAD(                     0x180000, 0x080000)
+	ROM_LOAD( "qs9255-01_u37-r0",   0x200000, 0x100000, CRC(273560bd) SHA1(5de8b9f5a7c4b676f131dd7d47ec71d35fa1755c) ) /* Location U37 */
+	ROM_LOAD( "9255-30-50_u38-r0f", 0x300000, 0x080000, CRC(dbab32d9) SHA1(c05f31c4aad0ba9ff74aa68e80e0376b014d52a1) ) /* Location U38, 03/13/1996 11:34:57 - Bi-Lingual GER/ENG Version */
+	ROM_RELOAD(                     0x380000, 0x080000)
+
+	ROM_REGION( 0x000022, "ds1204", 0 )
+	ROM_LOAD( "9255-30-50_u5-r01_c1995_mii", 0x000000, 0x000022, BAD_DUMP CRC(6b5d2ac2) SHA1(463ab84972a065598e35e3d31176770afdebfbeb) )
+
+	ROM_REGION( 0x1000, "user2", 0 ) // PALs
+	ROM_LOAD( "sc3943.u20",     0x000, 0x117, CRC(5a72fe78) SHA1(4b1a36904eb7048518507fe14bdade5c2589dbd7) )
+	ROM_LOAD( "sc3944-0a.u19",  0x000, 0x2dd, CRC(4cc46c5e) SHA1(0bab970df1539ce905f43603ad13171b05449a01) )
+	ROM_LOAD( "sc3980.u40",     0x000, 0x117, CRC(ee0cdab5) SHA1(216fef50a8a0f6a33b704d3501a4c5c3cbac2bad) )
+	ROM_LOAD( "sc3981-0a.u51",  0x000, 0x117, CRC(4fc750d0) SHA1(d09ff7a8c66aeb5c49e9fec84bd1521e3f5d8d0a) )
+ROM_END
+
 ROM_START( megat4 ) /* Dallas DS1204V security key at U5 labeled 9255-40-01 U5-B-RO1 C1996 MII */
 	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD( "9255-40-01_u32-r0",  0x000000, 0x100000, CRC(08b1b8fe) SHA1(c562f2e065d6d7f753f6fd1d0b8355b01cb089ec) ) /* Location U32 */
@@ -2367,7 +2386,7 @@ ROM_END
 
 void meritm_state::init_megat3te()
 {
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfff8, 0xffff, read8_delegate(FUNC(meritm_state::ds1644_r), this), write8_delegate(FUNC(meritm_state::ds1644_w), this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfff8, 0xffff, read8_delegate(*this, FUNC(meritm_state::ds1644_r)), write8_delegate(*this, FUNC(meritm_state::ds1644_w)));
 }
 
 /* CRT-250 */
@@ -2413,6 +2432,7 @@ GAME( 1996, megat3ca,  megat3, crt260, meritm_crt260, meritm_state, empty_init, 
 GAME( 1995, megat3caa, megat3, crt260, meritm_crt260, meritm_state, empty_init,    ROT0, "Merit", "Megatouch III (9255-20-06 R0D, California version)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, megat3nj,  megat3, crt260, meritm_crt260, meritm_state, empty_init,    ROT0, "Merit", "Megatouch III (9255-20-07 R0G, New Jersey version)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, megat3te,  megat3, crt260, meritm_crt260, meritm_state, init_megat3te, ROT0, "Merit", "Megatouch III Tournament Edition (9255-30-01 R0E, Standard version)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, megat3tg,  megat3, crt260, meritm_crt260, meritm_state, init_megat3te, ROT0, "Merit", "Megatouch III Turnier Edition (9255-30-50 R0F, Bi-Lingual GER/ENG version)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, megat4,    0,      crt260, meritm_crt260, meritm_state, empty_init,    ROT0, "Merit", "Megatouch IV (9255-40-01 R0E, Standard version)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, megat4a,   megat4, crt260, meritm_crt260, meritm_state, empty_init,    ROT0, "Merit", "Megatouch IV (9255-40-01 R0D, Standard version)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, megat4b,   megat4, crt260, meritm_crt260, meritm_state, empty_init,    ROT0, "Merit", "Megatouch IV (9255-40-01 R0B, Standard version)", MACHINE_IMPERFECT_GRAPHICS )

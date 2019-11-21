@@ -252,7 +252,7 @@ coco_multipak_device::coco_multipak_device(const machine_config &mconfig, const 
 void coco_multipak_device::device_start()
 {
 	// install $FF7F handler
-	install_readwrite_handler(0xFF7F, 0xFF7F, read8_delegate(FUNC(coco_multipak_device::ff7f_read), this),write8_delegate(FUNC(coco_multipak_device::ff7f_write), this));
+	install_readwrite_handler(0xFF7F, 0xFF7F, read8_delegate(*this, FUNC(coco_multipak_device::ff7f_read)), write8_delegate(*this, FUNC(coco_multipak_device::ff7f_write)));
 
 	// initial state
 	m_select = 0xFF;

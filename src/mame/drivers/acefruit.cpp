@@ -101,7 +101,7 @@ void acefruit_state::acefruit_update_irq(int vpos)
 		switch( color )
 		{
 		case 0x0c:
-			m_maincpu->set_input_line(0, HOLD_LINE );
+			m_maincpu->set_input_line(0, HOLD_LINE);
 			break;
 		}
 	}
@@ -116,15 +116,15 @@ void acefruit_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	{
 	case TIMER_ACEFRUIT_REFRESH:
 
-			m_screen->update_partial(vpos );
-			acefruit_update_irq(vpos);
+		m_screen->update_partial(vpos);
+		acefruit_update_irq(vpos);
 
-			vpos = ( ( vpos / 8 ) + 1 ) * 8;
+		vpos = ((vpos / 8) + 1) * 8;
 
-			m_refresh_timer->adjust( m_screen->time_until_pos(vpos) );
-			break;
+		m_refresh_timer->adjust(m_screen->time_until_pos(vpos));
+		break;
 	default:
-			assert_always(false, "Unknown id in acefruit_state::device_timer");
+		throw emu_fatalerror("Unknown id in acefruit_state::device_timer");
 	}
 }
 

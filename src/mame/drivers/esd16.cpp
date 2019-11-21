@@ -637,7 +637,7 @@ void esd16_state::esd16(machine_config &config)
 	DECO_SPRITE(config, m_sprgen, 0);
 	m_sprgen->set_gfx_region(0);
 	m_sprgen->set_is_bootleg(true);
-	m_sprgen->set_pri_callback(FUNC(esd16_state::pri_callback), this);
+	m_sprgen->set_pri_callback(FUNC(esd16_state::pri_callback));
 	m_sprgen->set_flipallx(1);
 	m_sprgen->set_gfxdecode_tag(m_gfxdecode);
 

@@ -140,7 +140,10 @@ bool sdl_osd_interface::window_init()
 
 	osd_printf_verbose("\nHints:\n");
 	for (int i = 0; hints[i] != nullptr; i++)
-		osd_printf_verbose("\t%-40s %s\n", hints[i], SDL_GetHint(hints[i]));
+	{
+		char const *const hint(SDL_GetHint(hints[i]));
+		osd_printf_verbose("\t%-40s %s\n", hints[i], hint ? hint : "(NULL)");
+	}
 
 	// set up the window list
 	osd_printf_verbose("Leave sdlwindow_init\n");
@@ -600,9 +603,6 @@ void sdl_window_info::update()
 			render_primitive_list &primlist = *renderer().get_primitives();
 
 			// and redraw now
-
-			// Some configurations require events to be polled in the worker thread
-			downcast< sdl_osd_interface& >(machine().osd()).process_events_buf();
 
 			// Check whether window has vector screens
 

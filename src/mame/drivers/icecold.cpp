@@ -392,10 +392,10 @@ void icecold_state::icecold(machine_config &config)
 	kbdc.in_rl_callback().set(FUNC(icecold_state::kbd_r));              // kbd RL lines
 
 	// 30Hz signal from CH-C of ay0
-	TIMER(config, "sint_timer", 0).configure_periodic(timer_device::expired_delegate(FUNC(icecold_state::icecold_sint_timer), this), attotime::from_hz(30));
+	TIMER(config, "sint_timer", 0).configure_periodic(FUNC(icecold_state::icecold_sint_timer), attotime::from_hz(30));
 
 	// for update motors position
-	TIMER(config, "motors_timer", 0).configure_periodic(timer_device::expired_delegate(FUNC(icecold_state::icecold_motors_timer), this), attotime::from_msec(50));
+	TIMER(config, "motors_timer", 0).configure_periodic(FUNC(icecold_state::icecold_motors_timer), attotime::from_msec(50));
 
 	// video hardware
 	config.set_default_layout(layout_icecold);

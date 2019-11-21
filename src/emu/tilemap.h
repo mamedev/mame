@@ -298,10 +298,14 @@
 
 ***************************************************************************/
 
-#pragma once
-
 #ifndef MAME_EMU_TILEMAP_H
 #define MAME_EMU_TILEMAP_H
+
+#pragma once
+
+#include <type_traits>
+#include <utility>
+#include <vector>
 
 
 //**************************************************************************
@@ -419,17 +423,19 @@ class tilemap_t
 	// maximum index in each array
 	static const pen_t MAX_PEN_TO_FLAGS = 256;
 
+	void init_common(tilemap_manager &manager, device_gfx_interface &decoder, tilemap_get_info_delegate tile_get_info, u16 tilewidth, u16 tileheight, u32 cols, u32 rows);
+
 protected:
 	// tilemap_manager controls our allocations
-	tilemap_t();
+	tilemap_t(device_t &owner);
 	virtual ~tilemap_t();
 
 	tilemap_t &init(tilemap_manager &manager, device_gfx_interface &decoder, tilemap_get_info_delegate tile_get_info, tilemap_mapper_delegate mapper, u16 tilewidth, u16 tileheight, u32 cols, u32 rows);
+	tilemap_t &init(tilemap_manager &manager, device_gfx_interface &decoder, tilemap_get_info_delegate tile_get_info, tilemap_standard_mapper mapper, u16 tilewidth, u16 tileheight, u32 cols, u32 rows);
 
 public:
 	// getters
 	running_machine &machine() const;
-	tilemap_device *device() const { return m_device; }
 	device_palette_interface &palette() const { return *m_palette; }
 	device_gfx_interface &decoder() const { return *m_tileinfo.decoder; }
 
@@ -554,7 +560,7 @@ private:
 
 	// managers and devices
 	tilemap_manager *           m_manager;              // reference to the owning manager
-	tilemap_device *            m_device;               // pointer to our owning device
+	device_t *                  m_device;               // pointer to our owning device
 	device_palette_interface *  m_palette;              // palette used for drawing
 	tilemap_t *                 m_next;                 // pointer to next tilemap
 	void *                      m_user_data;            // user data value
@@ -621,8 +627,12 @@ public:
 	running_machine &machine() const { return m_machine; }
 
 	// tilemap creation
-	tilemap_t &create(device_gfx_interface &decoder, tilemap_get_info_delegate tile_get_info, tilemap_mapper_delegate mapper, u16 tilewidth, u16 tileheight, u32 cols, u32 rows, tilemap_t *allocated = nullptr);
-	tilemap_t &create(device_gfx_interface &decoder, tilemap_get_info_delegate tile_get_info, tilemap_standard_mapper mapper, u16 tilewidth, u16 tileheight, u32 cols, u32 rows, tilemap_t *allocated = nullptr);
+	template <typename T, typename U>
+	tilemap_t &create(device_gfx_interface &decoder, T &&tile_get_info, U &&mapper, u16 tilewidth, u16 tileheight, u32 cols, u32 rows)
+	{ return create(decoder, std::forward<T>(tile_get_info), std::forward<U>(mapper), tilewidth, tileheight, cols, rows, nullptr); }
+	template <typename T, typename U, class V>
+	std::enable_if_t<std::is_base_of<device_t, V>::value, tilemap_t &> create(device_gfx_interface &decoder, T &&tile_get_info, U &&mapper, u16 tilewidth, u16 tileheight, u32 cols, u32 rows, V &allocated)
+	{ return create(decoder, std::forward<T>(tile_get_info), std::forward<U>(mapper), tilewidth, tileheight, cols, rows, &static_cast<tilemap_t &>(allocated)); }
 
 	// tilemap list information
 	tilemap_t *find(int index) { return m_tilemap_list.find(index); }
@@ -633,6 +643,10 @@ public:
 	void set_flip_all(u32 attributes);
 
 private:
+	// tilemap creation
+	tilemap_t &create(device_gfx_interface &decoder, tilemap_get_info_delegate tile_get_info, tilemap_mapper_delegate mapper, u16 tilewidth, u16 tileheight, u32 cols, u32 rows, tilemap_t *allocated);
+	tilemap_t &create(device_gfx_interface &decoder, tilemap_get_info_delegate tile_get_info, tilemap_standard_mapper mapper, u16 tilewidth, u16 tileheight, u32 cols, u32 rows, tilemap_t *allocated);
+
 	// allocate an instance index
 	int alloc_instance() { return ++m_instance; }
 
@@ -689,29 +703,28 @@ public:
 	template <typename T> void set_gfxdecode(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
 	void set_bytes_per_entry(int bpe) { m_bytes_per_entry = bpe; }
 
-	void set_info_callback(tilemap_get_info_delegate tile_get_info) { m_get_info = tile_get_info; }
-	template <class FunctionClass> void set_info_callback(const char *devname, void (FunctionClass::*callback)(tilemap_t &, tile_data &, tilemap_memory_index), const char *name)
-	{
-		set_info_callback(tilemap_get_info_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
-	}
-	template <class FunctionClass> void set_info_callback(void (FunctionClass::*callback)(tilemap_t &, tile_data &, tilemap_memory_index), const char *name)
-	{
-		set_info_callback(tilemap_get_info_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
+	template <typename... T> void set_info_callback(T &&... args) { m_get_info.set(std::forward<T>(args)...); }
 
-	template <class FunctionClass> void set_layout(tilemap_memory_index (FunctionClass::*callback)(u32, u32, u32, u32), const char *name, u32 columns, u32 rows)
+	void set_layout(tilemap_standard_mapper mapper, u32 columns, u32 rows)
 	{
-		set_layout(tilemap_mapper_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)), columns, rows);
-	}
-
-	void set_layout(tilemap_standard_mapper mapper, u32 columns, u32 rows) {
+		assert(TILEMAP_STANDARD_COUNT > mapper);
 		m_standard_mapper = mapper;
 		m_num_columns = columns;
 		m_num_rows = rows;
 	}
-	void set_layout(tilemap_mapper_delegate mapper, u32 columns, u32 rows) {
+	template <typename F>
+	void set_layout(F &&callback, const char *name, u32 columns, u32 rows)
+	{
 		m_standard_mapper = TILEMAP_STANDARD_COUNT;
-		m_mapper = mapper;
+		m_mapper.set(std::forward<F>(callback), name);
+		m_num_columns = columns;
+		m_num_rows = rows;
+	}
+	template <typename T, typename F>
+	void set_layout(T &&target, F &&callback, const char *name, u32 columns, u32 rows)
+	{
+		m_standard_mapper = TILEMAP_STANDARD_COUNT;
+		m_mapper.set(std::forward<T>(target), std::forward<F>(callback), name);
 		m_num_columns = columns;
 		m_num_rows = rows;
 	}

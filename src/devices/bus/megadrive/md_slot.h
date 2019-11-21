@@ -89,7 +89,7 @@ enum
 
 // ======================> device_md_cart_interface
 
-class device_md_cart_interface : public device_slot_card_interface
+class device_md_cart_interface : public device_interface
 {
 	friend class base_md_cart_slot_device;
 public:
@@ -106,8 +106,8 @@ public:
 
 	virtual int read_test() { return 0; }   // used by Virtua Racing test
 
-	/* this probably should do more, like make Genesis V2 'die' if the SEGA string is not written promptly */
-	virtual DECLARE_WRITE16_MEMBER(write_tmss_bank) { m_device.logerror("Write to TMSS bank: offset %x data %x\n", 0xa14000 + (offset << 1), data); };
+	// this probably should do more, like make Genesis V2 'die' if the SEGA string is not written promptly
+	virtual DECLARE_WRITE16_MEMBER(write_tmss_bank) { device().logerror("Write to TMSS bank: offset %x data %x\n", 0xa14000 + (offset << 1), data); };
 
 	virtual void rom_alloc(size_t size, const char *tag);
 	virtual void nvram_alloc(size_t size);
@@ -148,27 +148,22 @@ protected:
 
 class base_md_cart_slot_device : public device_t,
 								public device_image_interface,
-								public device_slot_interface
+								public device_single_card_slot_interface<device_md_cart_interface>
 {
 public:
 	// construction/destruction
-	base_md_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~base_md_cart_slot_device();
-
-	// device-level overrides
-	virtual void device_start() override;
 
 	// image-level overrides
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
-	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
-	virtual iodevice_t image_type() const override { return IO_CARTSLOT; }
-	virtual bool is_readable()  const override { return 1; }
-	virtual bool is_writeable() const override { return 0; }
-	virtual bool is_creatable() const override { return 0; }
-	virtual bool must_be_loaded() const override { return m_must_be_loaded; }
-	virtual bool is_reset_on_load() const override { return 1; }
+	virtual iodevice_t image_type() const noexcept override { return IO_CARTSLOT; }
+	virtual bool is_readable()  const noexcept override { return true; }
+	virtual bool is_writeable() const noexcept override { return false; }
+	virtual bool is_creatable() const noexcept override { return false; }
+	virtual bool must_be_loaded() const noexcept override { return m_must_be_loaded; }
+	virtual bool is_reset_on_load() const noexcept override { return true; }
 
 	// slot interface overrides
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
@@ -203,6 +198,16 @@ public:
 	int m_type;
 	device_md_cart_interface*       m_cart;
 	bool                            m_must_be_loaded;
+
+protected:
+	base_md_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	// device-level overrides
+	virtual void device_start() override;
+
+	// device_image_interface implementation
+	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
+
 };
 
 // ======================> md_cart_slot_device
@@ -222,8 +227,8 @@ public:
 	}
 
 	md_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual const char *image_interface() const override { return "megadriv_cart"; }
-	virtual const char *file_extensions() const override { return "smd,bin,md,gen"; }
+	virtual const char *image_interface() const noexcept override { return "megadriv_cart"; }
+	virtual const char *file_extensions() const noexcept override { return "smd,bin,md,gen"; }
 };
 
 // ======================> pico_cart_slot_device
@@ -242,8 +247,8 @@ public:
 		set_fixed(false);
 	}
 	pico_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual const char *image_interface() const override { return "pico_cart"; }
-	virtual const char *file_extensions() const override { return "bin,md"; }
+	virtual const char *image_interface() const noexcept override { return "pico_cart"; }
+	virtual const char *file_extensions() const noexcept override { return "bin,md"; }
 };
 
 // ======================> copera_cart_slot_device
@@ -262,8 +267,8 @@ public:
 		set_fixed(false);
 	}
 	copera_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual const char *image_interface() const override { return "copera_cart"; }
-	virtual const char *file_extensions() const override { return "bin,md"; }
+	virtual const char *image_interface() const noexcept override { return "copera_cart"; }
+	virtual const char *file_extensions() const noexcept override { return "bin,md"; }
 };
 
 

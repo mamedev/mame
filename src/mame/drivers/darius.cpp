@@ -705,7 +705,7 @@ void darius_state::darius(machine_config &config)
 	m_adpcm->set_addrmap(AS_PROGRAM, &darius_state::darius_sound2_map);
 	m_adpcm->set_addrmap(AS_IO, &darius_state::darius_sound2_io_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);   /* 10 CPU slices per frame ? */
+	config.set_maximum_quantum(attotime::from_hz(600));   /* 10 CPU slices per frame ? */
 
 	WATCHDOG_TIMER(config, "watchdog");
 

@@ -27,15 +27,18 @@ There also are unpopulated locations that might fit a YM3812 and YM3014.
 */
 
 #include "emu.h"
-#include "screen.h"
-#include "speaker.h"
-#include "tilemap.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
 #include "sound/ay8910.h"
 #include "video/ramdac.h"
+
+#include "screen.h"
+#include "speaker.h"
+#include "tilemap.h"
+
 
 class clpoker_state : public driver_device
 {
@@ -49,6 +52,12 @@ public:
 	{
 	}
 
+	void clpoker(machine_config &config);
+
+protected:
+	virtual void video_start() override;
+
+private:
 	DECLARE_WRITE8_MEMBER(output_a_w);
 	DECLARE_WRITE8_MEMBER(output_b_w);
 	DECLARE_WRITE8_MEMBER(output_c_w);
@@ -58,14 +67,10 @@ public:
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void clpoker(machine_config &config);
 	void io_map(address_map &map);
 	void prg_map(address_map &map);
 	void ramdac_map(address_map &map);
-protected:
-	virtual void video_start() override;
 
-private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
@@ -215,8 +220,8 @@ WRITE8_MEMBER(clpoker_state::videoram_w)
 
 void clpoker_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(clpoker_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(clpoker_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(clpoker_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(clpoker_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 
 	m_nmi_enable = false;

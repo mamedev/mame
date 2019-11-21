@@ -525,10 +525,10 @@ void camplynx_state::lynx128k_io(address_map &map)
 	map(0x0050, 0x0053).mirror(0xff80).r("fdc", FUNC(fd1793_device::read));
 	map(0x0054, 0x0057).mirror(0xff80).w("fdc", FUNC(fd1793_device::write));
 	map(0x0058, 0x0058).mirror(0xff80).w(FUNC(camplynx_state::port58_w));
-//  AM_RANGE(0x007a,0x007b) AM_MIRROR(0xff80) AM_READ(lynx128k_joysticks_r)
-//  AM_RANGE(0x007c,0x007c) AM_MIRROR(0xff80) AM_READ(lynx128k_printer_r)
-//  AM_RANGE(0x007d,0x007d) AM_MIRROR(0xff80) AM_WRITE(lynx128k_printer_init_w) // this is rw
-//  AM_RANGE(0x007e,0x007e) AM_MIRROR(0xff80) AM_WRITE(lynx128k_printer_w)
+//  map(0x007a, 0x007b).mirror(0xff80).r(FUNC(camplynx_state::lynx128k_joysticks_r));
+//  map(0x007c, 0x007c).mirror(0xff80).r(FUNC(camplynx_state::lynx128k_printer_r));
+//  map(0x007d, 0x007d).mirror(0xff80).w(FUNC(camplynx_state::lynx128k_printer_init_w)); // this is rw
+//  map(0x007e, 0x007e).mirror(0xff80).w(FUNC(camplynx_state::lynx128k_printer_w));
 	map(0x0080, 0x0080).mirror(0xff00).w(FUNC(camplynx_state::port80_w));
 	map(0x0080, 0x0080).mirror(0xf000).portr("LINE0");
 	map(0x0180, 0x0180).mirror(0xf000).portr("LINE1");
@@ -895,7 +895,7 @@ void camplynx_state::lynx48k(machine_config &config)
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(camplynx_state::lynx48k_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(camplynx_state::lynx48k_update_row));
 	m_crtc->out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	/* software lists */
@@ -944,7 +944,7 @@ void camplynx_state::lynx128k(machine_config &config)
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(camplynx_state::lynx128k_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(camplynx_state::lynx128k_update_row));
 	m_crtc->out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	lynx_disk(config);

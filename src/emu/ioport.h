@@ -368,7 +368,6 @@ enum ioport_type
 		IPT_UI_EXPORT,
 		IPT_UI_AUDIT_FAST,
 		IPT_UI_AUDIT_ALL,
-		IPT_UI_TOGGLE_AUTOFIRE,
 
 		// additional OSD-specified UI port types (up to 16)
 		IPT_OSD_1,
@@ -1095,7 +1094,6 @@ public:
 	struct user_settings
 	{
 		ioport_value    value;                  // for DIP switches
-		bool            autofire;               // for autofire settings
 		input_seq       seq[SEQ_TYPE_TOTAL];    // sequences of all types
 		s32             sensitivity;            // for analog controls
 		s32             delta;                  // for analog controls
@@ -1171,8 +1169,6 @@ struct ioport_field_live
 	bool                    last;               // were we pressed last time?
 	bool                    toggle;             // current toggle setting
 	digital_joystick::direction_t joydir;       // digital joystick direction index
-	bool                    autofire;           // autofire
-	int                     autopressed;        // autofire status
 	bool                    lockout;            // user lockout
 	std::string             name;               // overridden name
 };
@@ -1406,12 +1402,6 @@ public:
 	ioport_type token_to_input_type(const char *string, int &player) const;
 	std::string input_type_to_token(ioport_type type, int player);
 
-	// autofire
-	bool get_autofire_toggle() { return m_autofire_toggle; }
-	void set_autofire_toggle(bool toggle) { m_autofire_toggle = toggle; }
-	int get_autofire_delay() { return m_autofire_delay; }
-	void set_autofire_delay(int delay) { m_autofire_delay = delay; }
-
 private:
 	// internal helpers
 	void init_port_types();
@@ -1477,10 +1467,6 @@ private:
 	emu_file                m_timecode_file;        // timecode/frames playback file (nullptr if not recording)
 	int                     m_timecode_count;
 	attotime                m_timecode_last_time;
-
-	// autofire
-	bool                    m_autofire_toggle;      // autofire toggle
-	int                     m_autofire_delay;       // autofire delay
 };
 
 
@@ -1710,25 +1696,45 @@ ATTR_COLD void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, s
 
 // read callbacks
 #define PORT_CUSTOM_MEMBER(_class, _member) \
-	configurer.field_set_dynamic_read(ioport_field_read_delegate(&_class::_member, #_class "::" #_member, DEVICE_SELF, (_class *)nullptr));
+	configurer.field_set_dynamic_read(ioport_field_read_delegate(owner, DEVICE_SELF, &_class::_member, #_class "::" #_member));
 #define PORT_CUSTOM_DEVICE_MEMBER(_device, _class, _member) \
-	configurer.field_set_dynamic_read(ioport_field_read_delegate(&_class::_member, #_class "::" #_member, _device, (_class *)nullptr));
+	configurer.field_set_dynamic_read(ioport_field_read_delegate(owner, _device, &_class::_member, #_class "::" #_member));
 
 // write callbacks
 #define PORT_CHANGED_MEMBER(_device, _class, _member, _param) \
-	configurer.field_set_dynamic_write(ioport_field_write_delegate(&_class::_member, #_class "::" #_member, _device, (_class *)nullptr), (_param));
+	configurer.field_set_dynamic_write(ioport_field_write_delegate(owner, _device, &_class::_member, #_class "::" #_member), (_param));
 
 // input device handler
 #define PORT_READ_LINE_MEMBER(_class, _member) \
-	configurer.field_set_dynamic_read(ioport_field_read_delegate([](_class &device)->ioport_value { return (device._member() & 1) ? ~ioport_value(0) : 0; } , #_class "::" #_member, DEVICE_SELF, (_class *)nullptr));
+	configurer.field_set_dynamic_read( \
+			ioport_field_read_delegate( \
+				owner, \
+				DEVICE_SELF, \
+				static_cast<ioport_value (*)(_class &)>([] (_class &device) -> ioport_value { return (device._member() & 1) ? ~ioport_value(0) : 0; }), \
+				#_class "::" #_member));
 #define PORT_READ_LINE_DEVICE_MEMBER(_device, _class, _member) \
-	configurer.field_set_dynamic_read(ioport_field_read_delegate([](_class &device)->ioport_value { return (device._member() & 1) ? ~ioport_value(0) : 0; } , #_class "::" #_member, _device, (_class *)nullptr));
+	configurer.field_set_dynamic_read( \
+			ioport_field_read_delegate( \
+				owner, \
+				_device, \
+				static_cast<ioport_value (*)(_class &)>([] (_class &device) -> ioport_value { return (device._member() & 1) ? ~ioport_value(0) : 0; }), \
+				#_class "::" #_member));
 
 // output device handler
 #define PORT_WRITE_LINE_MEMBER(_class, _member) \
-	configurer.field_set_dynamic_write(ioport_field_write_delegate([](_class &device, ioport_field &field, u32 param, ioport_value oldval, ioport_value newval) { device._member(newval); }, #_class "::" #_member, DEVICE_SELF, (_class *)nullptr));
+	configurer.field_set_dynamic_write( \
+			ioport_field_write_delegate( \
+				owner, \
+				DEVICE_SELF, \
+				static_cast<void (*)(_class &, ioport_field &, u32, ioport_value, ioport_value)>([] (_class &device, ioport_field &field, u32 param, ioport_value oldval, ioport_value newval) { device._member(newval); }), \
+				#_class "::" #_member));
 #define PORT_WRITE_LINE_DEVICE_MEMBER(_device, _class, _member) \
-	configurer.field_set_dynamic_write(ioport_field_write_delegate([](_class &device, ioport_field &field, u32 param, ioport_value oldval, ioport_value newval) { device._member(newval); }, #_class "::" #_member, _device, (_class *)nullptr));
+	configurer.field_set_dynamic_write( \
+			ioport_field_write_delegate( \
+				owner, \
+				_device, \
+				static_cast<void (*)(_class &, ioport_field &, u32, ioport_value, ioport_value)>([] (_class &device, ioport_field &field, u32 param, ioport_value oldval, ioport_value newval) { device._member(newval); }), \
+				#_class "::" #_member));
 
 // dip switch definition
 #define PORT_DIPNAME(_mask, _default, _name) \

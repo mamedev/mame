@@ -102,6 +102,7 @@ void at586_state::at_softlists(machine_config &config)
 	SOFTWARE_LIST(config, "pc_disk_list").set_original("ibm5150");
 	SOFTWARE_LIST(config, "at_disk_list").set_original("ibm5170");
 	SOFTWARE_LIST(config, "at_cdrom_list").set_original("ibm5170_cdrom");
+	SOFTWARE_LIST(config, "midi_disk_list").set_compatible("midi_flop");
 }
 
 void at586_state::at586(machine_config &config)

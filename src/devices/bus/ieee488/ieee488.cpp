@@ -41,7 +41,7 @@ DEFINE_DEVICE_TYPE(IEEE488_SLOT, ieee488_slot_device, "ieee488_slot", "IEEE-488 
 //-------------------------------------------------
 
 device_ieee488_interface::device_ieee488_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device), m_bus(nullptr), m_slot(nullptr), m_next(nullptr)
+	: device_interface(device, "ieee488"), m_bus(nullptr), m_slot(nullptr), m_next(nullptr)
 {
 }
 

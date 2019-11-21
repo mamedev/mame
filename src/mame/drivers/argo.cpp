@@ -132,7 +132,7 @@ READ8_MEMBER(argo_state::argo_io_r)
 	case 0xC0:
 	case 0xC4:
 		offset >>= 2;
-		return m_crtc->read(space, offset&1);
+		return m_crtc->read(offset&1);
 
 	case 0xE8: // wants bit 4 low then high
 		{
@@ -175,7 +175,7 @@ WRITE8_MEMBER(argo_state::argo_io_w)
 	case 0xC0:
 	case 0xC4:
 		offset >>= 2;
-		m_crtc->write(space, offset&1, data);
+		m_crtc->write(offset&1, data);
 		break;
 
 	case 0xE8: // hardware scroll
@@ -434,7 +434,7 @@ void argo_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 		membank("boot")->set_entry(0);
 		break;
 	default:
-		assert_always(false, "Unknown id in argo_state::device_timer");
+		throw emu_fatalerror("Unknown id in argo_state::device_timer");
 	}
 }
 
@@ -495,7 +495,7 @@ void argo_state::argo(machine_config &config)
 
 	i8275_device &crtc(I8275(config, "crtc", XTAL(20'000'000) / 12));  // unknown frequency
 	crtc.set_character_width(6);
-	crtc.set_display_callback(FUNC(argo_state::display_pixels), this);
+	crtc.set_display_callback(FUNC(argo_state::display_pixels));
 	crtc.drq_wr_callback().set(m_dma, FUNC(i8257_device::dreq2_w));
 	crtc.set_screen("screen");
 }

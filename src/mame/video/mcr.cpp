@@ -94,25 +94,25 @@ void mcr_state::video_start()
 	/* the tilemap callback is based on the CPU board */
 	switch (m_mcr_cpu_board)
 	{
-		case 90009:
-			m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mcr_state::mcr_90009_get_tile_info),this), TILEMAP_SCAN_ROWS,  16,16, 32,30);
-			break;
+	case 90009:
+		m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(mcr_state::mcr_90009_get_tile_info)), TILEMAP_SCAN_ROWS, 16,16, 32,30);
+		break;
 
-		case 90010:
-			m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mcr_state::mcr_90010_get_tile_info),this), TILEMAP_SCAN_ROWS,  16,16, 32,30);
-			break;
+	case 90010:
+		m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(mcr_state::mcr_90010_get_tile_info)), TILEMAP_SCAN_ROWS, 16,16, 32,30);
+		break;
 
-		case 91475:
-			m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mcr_state::mcr_90010_get_tile_info),this), TILEMAP_SCAN_ROWS,  16,16, 32,30);
-			break;
+	case 91475:
+		m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(mcr_state::mcr_90010_get_tile_info)), TILEMAP_SCAN_ROWS, 16,16, 32,30);
+		break;
 
-		case 91490:
-			m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mcr_state::mcr_91490_get_tile_info),this), TILEMAP_SCAN_ROWS,  16,16, 32,30);
-			break;
+	case 91490:
+		m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(mcr_state::mcr_91490_get_tile_info)), TILEMAP_SCAN_ROWS, 16,16, 32,30);
+		break;
 
-		default:
-			assert_always(0, "Unknown mcr board");
-			break;
+	default:
+		throw emu_fatalerror("mcr_state::video_start: Unknown mcr board");
+		break;
 	}
 }
 
@@ -392,20 +392,20 @@ uint32_t mcr_state::screen_update_mcr(screen_device &screen, bitmap_ind16 &bitma
 	/* update the sprites and render them */
 	switch (m_mcr_sprite_board)
 	{
-		case 91399:
-			render_sprites_91399(screen, bitmap, cliprect);
-			break;
+	case 91399:
+		render_sprites_91399(screen, bitmap, cliprect);
+		break;
 
-		case 91464:
-			if (m_mcr_cpu_board == 91442)
-				render_sprites_91464(screen, bitmap, cliprect, 0x00, 0x30, 0x00);
-			else if (m_mcr_cpu_board == 91475)
-				render_sprites_91464(screen, bitmap, cliprect, 0x00, 0x30, 0x40);
-			else if (m_mcr_cpu_board == 91490)
-				render_sprites_91464(screen, bitmap, cliprect, 0x00, 0x30, 0x00);
-			else if (m_mcr_cpu_board == 91721)
-				render_sprites_91464(screen, bitmap, cliprect, 0x00, 0x30, 0x00);
-			break;
+	case 91464:
+		if (m_mcr_cpu_board == 91442)
+			render_sprites_91464(screen, bitmap, cliprect, 0x00, 0x30, 0x00);
+		else if (m_mcr_cpu_board == 91475)
+			render_sprites_91464(screen, bitmap, cliprect, 0x00, 0x30, 0x40);
+		else if (m_mcr_cpu_board == 91490)
+			render_sprites_91464(screen, bitmap, cliprect, 0x00, 0x30, 0x00);
+		else if (m_mcr_cpu_board == 91721)
+			render_sprites_91464(screen, bitmap, cliprect, 0x00, 0x30, 0x00);
+		break;
 	}
 	return 0;
 }

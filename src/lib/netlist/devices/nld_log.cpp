@@ -19,21 +19,25 @@ namespace netlist
 	{
 		NETLIB_CONSTRUCTOR(log)
 		, m_I(*this, "I")
-		, m_strm(pstring(plib::pfmt("{1}.log")(this->name())))
+		, m_strm(plib::filesystem::u8path(plib::pfmt("{1}.log")(this->name())))
 		, m_writer(&m_strm)
 		{
+			if (m_strm.fail())
+				plib::pthrow<plib::file_open_e>(plib::pfmt("{1}.log")(this->name()));
+
+			m_strm.imbue(std::locale::classic());
 		}
 
 		NETLIB_UPDATEI()
 		{
 			/* use pstring::sprintf, it is a LOT faster */
-			m_writer.writeline(plib::pfmt("{1:.9} {2}").e(exec().time().as_double()).e(static_cast<double>(m_I())));
+			m_writer.writeline(plib::pfmt("{1:.9} {2}").e(exec().time().as_fp<nl_fptype>()).e(static_cast<nl_fptype>(m_I())));
 		}
 
 		NETLIB_RESETI() { }
 	protected:
 		analog_input_t m_I;
-		plib::pofilestream m_strm;
+		std::ofstream m_strm;
 		plib::putf8_writer m_writer;
 	};
 
@@ -46,7 +50,7 @@ namespace netlist
 
 		NETLIB_UPDATEI()
 		{
-			m_writer.writeline(plib::pfmt("{1:.9} {2}").e(exec().time().as_double()).e(static_cast<double>(m_I() - m_I2())));
+			m_writer.writeline(plib::pfmt("{1:.9} {2}").e(exec().time().as_fp<nl_fptype>()).e(static_cast<nl_fptype>(m_I() - m_I2())));
 		}
 
 		NETLIB_RESETI() { }
@@ -79,7 +83,7 @@ namespace netlist
 
 	NETLIB_UPDATE(wav)
 	{
-		fprintf(m_file, "%e %e\n", netlist().time().as_double(), m_I());
+		fprintf(m_file, "%e %e\n", netlist().time().as_fp<nl_fptype>(), m_I());
 	}
 
 	NETLIB_NAME(log)::~NETLIB_NAME(wav)()

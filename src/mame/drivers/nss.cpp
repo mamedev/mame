@@ -842,7 +842,7 @@ void nss_state::nss(machine_config &config)
 	SPC700(config, m_soundcpu, XTAL(24'576'000) / 12);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &nss_state::spc_mem);
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 
 	/* nss hardware */
 	Z80(config, m_bioscpu, 4000000);
@@ -867,7 +867,8 @@ void nss_state::nss(machine_config &config)
 
 	// SNES PPU
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(DOTCLK_NTSC, SNES_HTOTAL, 0, SNES_SCR_WIDTH, SNES_VTOTAL_NTSC, 0, SNES_SCR_HEIGHT_NTSC);
+	m_screen->set_raw(DOTCLK_NTSC * 2, SNES_HTOTAL * 2, 0, SNES_SCR_WIDTH * 2, SNES_VTOTAL_NTSC, 0, SNES_SCR_HEIGHT_NTSC);
+	m_screen->set_video_attributes(VIDEO_VARIABLE_WIDTH);
 	m_screen->set_screen_update(FUNC(snes_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(nss_state::nss_vblank_irq));
 

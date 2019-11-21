@@ -610,7 +610,7 @@ Stephh's and AWJ's notes (based on the games M68000 and Z80 code and some tests)
 #include "includes/toaplipt.h"
 
 #include "cpu/z80/z80.h"
-#include "cpu/z180/z180.h"
+#include "cpu/z180/hd647180x.h"
 #include "machine/74259.h"
 #include "speaker.h"
 
@@ -945,27 +945,23 @@ void toaplan1_demonwld_state::dsp_io_map(address_map &map)
 
 void toaplan1_state::vimana_hd647180_mem_map(address_map &map)
 {
-	map(0x00000, 0x03fff).rom();   /* Internal 16k byte ROM */
 	map(0x08000, 0x087ff).ram().share("sharedram"); /* 2048 bytes of shared ram w/maincpu */
-	map(0x0fe00, 0x0ffff).ram();   /* Internal 512 byte RAM */
 }
 
 void toaplan1_state::vimana_hd647180_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	// lots of low level 647180 peripherals are not emulated yet, ddr regs, timer regs etc, see comments below
-	// also see http://bitsavers.trailing-edge.com/pdf/hitachi/_dataBooks/U94_HD647180X_8-Bit_Microcontroller_Hardware_Manual_Jan88.pdf particularly page 38 (pdf page 56)
 	map(0x32, 0x32).nopw(); // DMA WAIT/Control register
 	map(0x33, 0x33).nopw(); // IL (int vector low) register
 	map(0x36, 0x36).nopw(); // refresh control register for RFSH pin
 	// 53: disable reg for port A
-	map(0x60, 0x60).r(FUNC(toaplan1_state::vimana_dswb_invert_r)); // read/write port A; note these inputs seem to be inverted, unlike the DSWA ones.
+	map(0x60, 0x60).nopr(); // read/write port A
 	// 61: read/write port B
 	// 62: read/write port C
 	// 63: read/write port D
 	// 64: read/write port E
 	// 65: read/write port F
-	map(0x66, 0x66).r(FUNC(toaplan1_state::vimana_tjump_invert_r)); // read/write port G, bits 7 and 6 ALWAYS read as 1 due to port G being just 6 bits; note these inputs seem to be inverted, unlike the DSWA ones.
+	map(0x66, 0x66).nopr(); // read port G
 	// 70: ddr for port A
 	map(0x71, 0x71).nopw(); // ddr for port B
 	map(0x72, 0x72).nopw(); // ddr for port C
@@ -1014,17 +1010,11 @@ u8 toaplan1_samesame_state::cmdavailable_r()
 	else return 0x00;
 };
 
-void toaplan1_samesame_state::hd647180_mem_map(address_map &map)
-{
-	map(0x00000, 0x03fff).rom();   /* Internal 16k byte ROM */
-	map(0x0fe00, 0x0ffff).ram();   /* Internal 512 byte RAM */
-}
-
 void toaplan1_samesame_state::hd647180_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 
-	map(0x63, 0x63).r(FUNC(toaplan1_samesame_state::cmdavailable_r));
+	map(0x63, 0x63).nopr();
 	map(0xa0, 0xa0).r(FUNC(toaplan1_samesame_state::soundlatch_r));
 	map(0xb0, 0xb0).w(FUNC(toaplan1_samesame_state::sound_done_w));
 
@@ -1950,7 +1940,7 @@ void toaplan1_rallybik_state::rallybik(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &toaplan1_rallybik_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &toaplan1_rallybik_state::rallybik_sound_io_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	ls259_device &coinlatch(LS259(config, "coinlatch")); // 19L
 	coinlatch.q_out_cb<4>().set(FUNC(toaplan1_rallybik_state::coin_counter_1_w));
@@ -1990,7 +1980,7 @@ void toaplan1_state::truxton(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &toaplan1_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &toaplan1_state::truxton_sound_io_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -2020,7 +2010,7 @@ void toaplan1_state::hellfire(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &toaplan1_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &toaplan1_state::hellfire_sound_io_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -2050,7 +2040,7 @@ void toaplan1_state::zerowing(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &toaplan1_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &toaplan1_state::zerowing_sound_io_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	MCFG_MACHINE_RESET_OVERRIDE(toaplan1_state,zerowing)
 
@@ -2087,7 +2077,7 @@ void toaplan1_demonwld_state::demonwld(machine_config &config)
 	m_dsp->set_addrmap(AS_IO, &toaplan1_demonwld_state::dsp_io_map);
 	m_dsp->bio().set(FUNC(toaplan1_demonwld_state::bio_r));
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -2113,11 +2103,12 @@ void toaplan1_samesame_state::samesame(machine_config &config)
 	M68000(config, m_maincpu, XTAL(10'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan1_samesame_state::main_map);
 
-	Z180(config, m_audiocpu, XTAL(28'000'000) / 8);   /* HD647180XOFS6 CPU */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &toaplan1_samesame_state::hd647180_mem_map);
-	m_audiocpu->set_addrmap(AS_IO, &toaplan1_samesame_state::hd647180_io_map);
+	hd647180x_device &audiocpu(HD647180X(config, m_audiocpu, XTAL(28'000'000) / 4));   /* HD647180XOFS6 CPU */
+	// 16k byte ROM and 512 byte RAM are internal
+	audiocpu.set_addrmap(AS_IO, &toaplan1_samesame_state::hd647180_io_map);
+	audiocpu.in_pd_callback().set(FUNC(toaplan1_samesame_state::cmdavailable_r));
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 
 	MCFG_MACHINE_RESET_OVERRIDE(toaplan1_samesame_state,zerowing)
 
@@ -2149,7 +2140,7 @@ void toaplan1_state::outzone(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &toaplan1_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &toaplan1_state::outzone_sound_io_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	MCFG_MACHINE_RESET_OVERRIDE(toaplan1_state,zerowing)
 
@@ -2181,7 +2172,7 @@ void toaplan1_state::outzonecv(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &toaplan1_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &toaplan1_state::zerowing_sound_io_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	MCFG_MACHINE_RESET_OVERRIDE(toaplan1_state,zerowing)
 
@@ -2209,11 +2200,13 @@ void toaplan1_state::vimana(machine_config &config)
 	M68000(config, m_maincpu, XTAL(10'000'000));    /* verified on pcb */
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan1_state::vimana_main_map);
 
-	Z180(config, m_audiocpu, XTAL(28'000'000) / 8);   /* HD647180XOFS6 CPU */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &toaplan1_state::vimana_hd647180_mem_map);
-	m_audiocpu->set_addrmap(AS_IO, &toaplan1_state::vimana_hd647180_io_map);
+	hd647180x_device &audiocpu(HD647180X(config, m_audiocpu, XTAL(28'000'000) / 4));   /* HD647180XOFS6 CPU */
+	audiocpu.set_addrmap(AS_PROGRAM, &toaplan1_state::vimana_hd647180_mem_map);
+	audiocpu.set_addrmap(AS_IO, &toaplan1_state::vimana_hd647180_io_map);
+	audiocpu.in_pa_callback().set(FUNC(toaplan1_state::vimana_dswb_invert_r)); // note these inputs seem to be inverted, unlike the DSWA ones.
+	audiocpu.in_pg_callback().set(FUNC(toaplan1_state::vimana_tjump_invert_r)); // note these inputs seem to be inverted, unlike the DSWA ones.
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	MCFG_MACHINE_RESET_OVERRIDE(toaplan1_state,zerowing)
 

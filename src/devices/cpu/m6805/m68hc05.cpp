@@ -74,6 +74,19 @@ std::pair<u16, char const *> const m68hc705j1a_syms[] = {
 	{ 0x0014, "EPROG"  },
 	{ 0x07f0, "COPR"   }, { 0x07f1, "MOR"   } };
 
+std::pair<u16, char const *> const m68hc05l9_syms[] = {
+	{ 0x0000, "PORTA"  }, { 0x0001, "PORTB"  }, { 0x0002, "PORTC"  }, { 0x0003, "PORTD"  },
+	{ 0x0004, "DDRA"   }, { 0x0005, "DDRB"   }, { 0x0006, "DDRC"   }, { 0x0007, "DDRD"   },
+	{ 0x0008, "COUNT"  },
+	{ 0x0009, "GCR1"   }, { 0x000a, "GCR2"   },
+	{ 0x000b, "MINA"   }, { 0x000c, "HOURA"  },
+	{ 0x000d, "BAUD"   }, { 0x000e, "SCCR1"  }, { 0x000f, "SCCR2"  }, { 0x0010, "SCSR"   }, { 0x0011, "SCDR"   },
+	{ 0x0012, "TCR"    }, { 0x0013, "TSR"    },
+	{ 0x0014, "ICRH"   }, { 0x0015, "ICRL"   }, { 0x0016, "OCRH"   }, { 0x0017, "OCRL"   },
+	{ 0x0018, "TRH"    }, { 0x0019, "TRL"    }, { 0x001a, "ATRH"   }, { 0x001b, "ATRL"   },
+	{ 0x001c, "RTCSR"  },
+	{ 0x001d, "HOUR"   }, { 0x001e, "MIN"    }, { 0x001f, "SEC"    } };
+
 
 ROM_START( m68hc705c8a )
 	ROM_REGION(0x00f0, "bootstrap", 0)
@@ -548,12 +561,12 @@ void m68hc05_device::execute_set_input(int inputnum, int state)
 	}
 }
 
-u64 m68hc05_device::execute_clocks_to_cycles(u64 clocks) const
+u64 m68hc05_device::execute_clocks_to_cycles(u64 clocks) const noexcept
 {
 	return (clocks + 1) / 2;
 }
 
-u64 m68hc05_device::execute_cycles_to_clocks(u64 cycles) const
+u64 m68hc05_device::execute_cycles_to_clocks(u64 cycles) const noexcept
 {
 	return cycles * 2;
 }
@@ -1045,7 +1058,7 @@ void m68hc05l9_device::l9_map(address_map &map)
 	map(0x0014, 0x0015).r(FUNC(m68hc05l9_device::icr_r));
 	map(0x0016, 0x0017).rw(FUNC(m68hc05l9_device::ocr_r), FUNC(m68hc05l9_device::ocr_w));
 	map(0x0018, 0x001b).r(FUNC(m68hc05l9_device::timer_r));
-	// 0x001c RTC flags
+	// 0x001c RTC status and clock control
 	// 0x001d hours
 	// 0x001e minutes
 	// 0x001f seconds
@@ -1089,7 +1102,7 @@ void m68hc05l9_device::device_start()
 
 std::unique_ptr<util::disasm_interface> m68hc05l9_device::create_disassembler()
 {
-	return std::make_unique<m68hc05_disassembler>(m68hc05c4_syms);
+	return std::make_unique<m68hc05_disassembler>(m68hc05l9_syms);
 }
 
 

@@ -29,8 +29,7 @@
 		PARAM(name.IN, v)
 
 #define MAINCLOCK(name, freq)                                                   \
-		NET_REGISTER_DEV(MAINCLOCK, name)                                       \
-		PARAM(name.FREQ, freq)
+		NET_REGISTER_DEVEXT(MAINCLOCK, name, freq)
 
 #define CLOCK(name, freq)                                                       \
 		NET_REGISTER_DEV(CLOCK, name)                                           \
@@ -48,8 +47,8 @@
 #define GNDA()                                                                  \
 		NET_REGISTER_DEV(GNDA, GND)
 
-#define DUMMY_INPUT(name)                                                       \
-		NET_REGISTER_DEV(DUMMY_INPUT, name)
+#define NC_PIN(name)                                                            \
+		NET_REGISTER_DEV(NC_PIN, name)
 
 //FIXME: Usage discouraged, use OPTIMIZE_FRONTIER instead
 #define FRONTIER_DEV(name, cIN, cG, cOUT)                                       \

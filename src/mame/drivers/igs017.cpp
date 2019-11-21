@@ -98,7 +98,7 @@ public:
 	void data_w(u8 data);
 	u8 data_r();
 
-	void set_m3_bits(int m3, u8 b0, u8 b1, u8 b2, u8 b3);
+	template <unsigned N> void set_m3_bits(u8 b0, u8 b1, u8 b2, u8 b3);
 	void set_mf_bits(u8 b0, u8 b1, u8 b2, u8 b3);
 	void set_val_xor(u16 val_xor);
 
@@ -123,12 +123,12 @@ private:
 	u16 m_val_xor;
 };
 
-void igs_bitswap_device::set_m3_bits(int m3, u8 b0, u8 b1, u8 b2, u8 b3)
+template <unsigned N> void igs_bitswap_device::set_m3_bits(u8 b0, u8 b1, u8 b2, u8 b3)
 {
-	m_m3_bits[m3][0] = b0;
-	m_m3_bits[m3][1] = b1;
-	m_m3_bits[m3][2] = b2;
-	m_m3_bits[m3][3] = b3;
+	m_m3_bits[N][0] = b0;
+	m_m3_bits[N][1] = b1;
+	m_m3_bits[N][2] = b2;
+	m_m3_bits[N][3] = b3;
 
 #if 0
 	printf("igs_bitswap: INIT m3_bits[%x] =", m3);
@@ -1251,7 +1251,7 @@ void igs017_state::init_lhzb2()
 	lhzb2_patch_rom();
 
 	// install and configure protection device(s)
-//  m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xda5610, 0xda5613, read16_delegate(FUNC(igs025_device::killbld_igs025_prot_r), (igs025_device*)m_igs025), write16_delegate(FUNC(igs025_device::killbld_igs025_prot_w), (igs025_device*)m_igs025));
+//  m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xda5610, 0xda5613, read16_delegate(*m_igs025, FUNC(igs025_device::killbld_igs025_prot_r)), write16_delegate(*m_igs025, FUNC(igs025_device::killbld_igs025_prot_w)));
 //  m_igs025->m_kb_source_data = dw3_source_data;
 //  m_igs025->m_kb_source_data_offset = 0;
 //  m_igs025->m_kb_game_id = 0x00060000;
@@ -1424,7 +1424,7 @@ void igs017_state::init_slqz2()
 	slqz2_patch_rom();
 
 	// install and configure protection device(s)
-//  m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xda5610, 0xda5613, read16_delegate(FUNC(igs025_device::killbld_igs025_prot_r), (igs025_device*)m_igs025), write16_delegate(FUNC(igs025_device::killbld_igs025_prot_w), (igs025_device*)m_igs025));
+//  m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xda5610, 0xda5613, read16_delegate(*m_igs025, FUNC(igs025_device::killbld_igs025_prot_r)), write16_delegate(*m_igs025, FUNC(igs025_device::killbld_igs025_prot_w)));
 //  m_igs025->m_kb_source_data = dw3_source_data;
 //  m_igs025->m_kb_source_data_offset = 0;
 //  m_igs025->m_kb_game_id = 0x00060000;
@@ -1525,10 +1525,10 @@ void igs017_state::iqblocka_remap_addr_w(offs_t offset, u8 data)
 
 		// Add new memory ranges
 		address_space &prg_space = m_maincpu->space(AS_PROGRAM);
-		prg_space.install_write_handler(m_remap_addr + 0x0, m_remap_addr + 0x0, write8smo_delegate(FUNC(igs_incdec_device::reset_w), &(*m_igs_incdec)));
-		prg_space.install_write_handler(m_remap_addr + 0x1, m_remap_addr + 0x1, write8smo_delegate(FUNC(igs_incdec_device::dec_w),   &(*m_igs_incdec)));
-		prg_space.install_write_handler(m_remap_addr + 0x3, m_remap_addr + 0x3, write8smo_delegate(FUNC(igs_incdec_device::inc_w),   &(*m_igs_incdec)));
-		prg_space.install_read_handler (m_remap_addr + 0x5, m_remap_addr + 0x5, read8smo_delegate (FUNC(igs_incdec_device::val_r),   &(*m_igs_incdec)));
+		prg_space.install_write_handler(m_remap_addr + 0x0, m_remap_addr + 0x0, write8smo_delegate(*m_igs_incdec, FUNC(igs_incdec_device::reset_w)));
+		prg_space.install_write_handler(m_remap_addr + 0x1, m_remap_addr + 0x1, write8smo_delegate(*m_igs_incdec, FUNC(igs_incdec_device::dec_w)));
+		prg_space.install_write_handler(m_remap_addr + 0x3, m_remap_addr + 0x3, write8smo_delegate(*m_igs_incdec, FUNC(igs_incdec_device::inc_w)));
+		prg_space.install_read_handler (m_remap_addr + 0x5, m_remap_addr + 0x5, read8smo_delegate (*m_igs_incdec, FUNC(igs_incdec_device::val_r)));
 
 		logerror("%s: incdec protection remapped at %04x\n", machine().describe_context(), m_remap_addr);
 	}
@@ -2254,11 +2254,11 @@ void igs017_state::lhzb2a_remap_addr_w(address_space &space, u16 data)
 	m_remap_addr = data & 0xff;
 
 	// Add new memory ranges
-	space.install_write_handler    (m_remap_addr * 0x10000 + 0x4001, m_remap_addr * 0x10000 + 0x4001, write8smo_delegate(FUNC(igs_bitswap_device::address_w), &(*m_igs_bitswap)));
-	space.install_readwrite_handler(m_remap_addr * 0x10000 + 0x4003, m_remap_addr * 0x10000 + 0x4003, read8smo_delegate (FUNC(igs_bitswap_device::data_r),    &(*m_igs_bitswap)), write8smo_delegate(FUNC(igs_bitswap_device::data_w), &(*m_igs_bitswap)));
+	space.install_write_handler    (m_remap_addr * 0x10000 + 0x4001, m_remap_addr * 0x10000 + 0x4001, write8smo_delegate(*m_igs_bitswap, FUNC(igs_bitswap_device::address_w)));
+	space.install_readwrite_handler(m_remap_addr * 0x10000 + 0x4003, m_remap_addr * 0x10000 + 0x4003, read8smo_delegate (*m_igs_bitswap, FUNC(igs_bitswap_device::data_r)), write8smo_delegate(*m_igs_bitswap, FUNC(igs_bitswap_device::data_w)));
 
-	space.install_read_handler     (m_remap_addr * 0x10000 + 0x8000, m_remap_addr * 0x10000 + 0x8005, read16sm_delegate (FUNC(igs017_state::lhzb2a_input_r),      this));
-	space.install_write_handler    (m_remap_addr * 0x10000 + 0xc000, m_remap_addr * 0x10000 + 0xc001, write16mo_delegate(FUNC(igs017_state::lhzb2a_remap_addr_w), this));
+	space.install_read_handler     (m_remap_addr * 0x10000 + 0x8000, m_remap_addr * 0x10000 + 0x8005, read16sm_delegate (*this, FUNC(igs017_state::lhzb2a_input_r)));
+	space.install_write_handler    (m_remap_addr * 0x10000 + 0xc000, m_remap_addr * 0x10000 + 0xc001, write16mo_delegate(*this, FUNC(igs017_state::lhzb2a_remap_addr_w)));
 
 	logerror("%s: inputs and protection remapped at %02xxxxx\n", machine().describe_context(), m_remap_addr);
 }
@@ -2292,7 +2292,7 @@ void igs017_state::lhzb2a_map(address_map &map)
 	map(0x00320a, 0x00320b).r(m_igs_incdec, FUNC(igs_incdec_device::val_r));
 
 	map(0x500000, 0x503fff).ram();
-//  AM_RANGE(0x910000, 0x910003) accesses appear to be from leftover code where the final checks were disabled
+//  map(0x910000, 0x910003) accesses appear to be from leftover code where the final checks were disabled
 
 	map(0xb00000, 0xb0ffff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write)).umask16(0x00ff);
 
@@ -3497,7 +3497,7 @@ MACHINE_RESET_MEMBER(igs017_state,iqblocka)
 
 void igs017_state::iqblocka(machine_config &config)
 {
-	Z180(config, m_maincpu, XTAL(16'000'000) / 2);
+	HD64180RP(config, m_maincpu, XTAL(16'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs017_state::iqblocka_map);
 	m_maincpu->set_addrmap(AS_IO, &igs017_state::iqblocka_io);
 	TIMER(config, "scantimer").configure_scanline(FUNC(igs017_state::iqblocka_interrupt), "screen", 0, 1);
@@ -3518,10 +3518,10 @@ void igs017_state::iqblocka(machine_config &config)
 	m_igs_bitswap->out_pa_callback().set(FUNC(igs017_state::iqblocka_keyin_w));
 	m_igs_bitswap->set_val_xor(0x15d6);
 	m_igs_bitswap->set_mf_bits(3, 5, 9, 11);
-	m_igs_bitswap->set_m3_bits(0, ~5,  8, ~10, ~15);
-	m_igs_bitswap->set_m3_bits(1,  3, ~8, ~12, ~15);
-	m_igs_bitswap->set_m3_bits(2,  2, ~6, ~11, ~15);
-	m_igs_bitswap->set_m3_bits(3,  0, ~1, ~3,  ~15);
+	m_igs_bitswap->set_m3_bits<0>(~5,  8, ~10, ~15);
+	m_igs_bitswap->set_m3_bits<1>( 3, ~8, ~12, ~15);
+	m_igs_bitswap->set_m3_bits<2>( 2, ~6, ~11, ~15);
+	m_igs_bitswap->set_m3_bits<3>( 0, ~1, ~3,  ~15);
 
 	IGS_INCDEC(config, m_igs_incdec, 0);
 
@@ -3547,6 +3547,7 @@ void igs017_state::iqblocka(machine_config &config)
 void igs017_state::iqblockf(machine_config &config)
 {
 	iqblocka(config);
+
 	// tweaked protection bitswap
 	m_igs_bitswap->out_pb_callback().set(FUNC(igs017_state::iqblockf_keyout_w));
 	m_igs_bitswap->set_mf_bits(0, 5, 9, 13);
@@ -3555,12 +3556,13 @@ void igs017_state::iqblockf(machine_config &config)
 void igs017_state::genius6(machine_config &config)
 {
 	iqblockf(config);
+
 	// tweaked protection bitswap
 	m_igs_bitswap->set_mf_bits(2, 7, 9, 13);
-	m_igs_bitswap->set_m3_bits(0, ~5,  6,  ~7, ~15);
-	m_igs_bitswap->set_m3_bits(1,  1, ~6,  ~9, ~15);
-	m_igs_bitswap->set_m3_bits(2,  4, ~8, ~12, ~15);
-	m_igs_bitswap->set_m3_bits(3,  3, ~5,  ~6, ~15);
+	m_igs_bitswap->set_m3_bits<0>(~5,  6,  ~7, ~15);
+	m_igs_bitswap->set_m3_bits<1>( 1, ~6,  ~9, ~15);
+	m_igs_bitswap->set_m3_bits<2>( 4, ~8, ~12, ~15);
+	m_igs_bitswap->set_m3_bits<3>( 3, ~5,  ~6, ~15);
 }
 
 void igs017_state::starzan(machine_config &config)
@@ -3616,7 +3618,7 @@ void igs017_state::mgcs(machine_config &config)
 	m_screen->set_palette("igs017_igs031:palette");
 
 	IGS017_IGS031(config, m_igs017_igs031, 0);
-	m_igs017_igs031->set_palette_scramble_cb(FUNC(igs017_state::mgcs_palette_bitswap), this);
+	m_igs017_igs031->set_palette_scramble_cb(FUNC(igs017_state::mgcs_palette_bitswap));
 	m_igs017_igs031->set_i8255_tag("ppi8255");
 
 	// sound
@@ -3643,7 +3645,7 @@ void igs017_state::lhzb2(machine_config &config)
 
 	// protection
 	IGS025(config, m_igs025, 0);
-	m_igs025->set_external_cb(FUNC(igs017_state::igs025_to_igs022_callback), this);
+	m_igs025->set_external_cb(FUNC(igs017_state::igs025_to_igs022_callback));
 
 	IGS022(config, m_igs022, 0);
 
@@ -3657,7 +3659,7 @@ void igs017_state::lhzb2(machine_config &config)
 	m_screen->set_palette("igs017_igs031:palette");
 
 	IGS017_IGS031(config, m_igs017_igs031, 0);
-	m_igs017_igs031->set_palette_scramble_cb(FUNC(igs017_state::lhzb2a_palette_bitswap), this);
+	m_igs017_igs031->set_palette_scramble_cb(FUNC(igs017_state::lhzb2a_palette_bitswap));
 	m_igs017_igs031->set_i8255_tag("ppi8255");
 
 	// sound
@@ -3689,10 +3691,10 @@ void igs017_state::lhzb2a(machine_config &config)
 	IGS_BITSWAP(config, m_igs_bitswap, 0);
 	m_igs_bitswap->set_val_xor(0x289a);
 	m_igs_bitswap->set_mf_bits(4, 7,  10, 13);
-	m_igs_bitswap->set_m3_bits(0, ~3,   8, ~12, ~15);
-	m_igs_bitswap->set_m3_bits(1, ~3,  ~6,  ~9, ~15);
-	m_igs_bitswap->set_m3_bits(2, ~3,   4,  ~5, ~15);
-	m_igs_bitswap->set_m3_bits(3, ~9, ~11,  12, ~15);
+	m_igs_bitswap->set_m3_bits<0>(~3,   8, ~12, ~15);
+	m_igs_bitswap->set_m3_bits<1>(~3,  ~6,  ~9, ~15);
+	m_igs_bitswap->set_m3_bits<2>(~3,   4,  ~5, ~15);
+	m_igs_bitswap->set_m3_bits<3>(~9, ~11,  12, ~15);
 
 	IGS_INCDEC(config, m_igs_incdec, 0);
 
@@ -3706,7 +3708,7 @@ void igs017_state::lhzb2a(machine_config &config)
 	m_screen->set_palette("igs017_igs031:palette");
 
 	IGS017_IGS031(config, m_igs017_igs031, 0);
-	m_igs017_igs031->set_palette_scramble_cb(FUNC(igs017_state::lhzb2a_palette_bitswap), this);
+	m_igs017_igs031->set_palette_scramble_cb(FUNC(igs017_state::lhzb2a_palette_bitswap));
 //  m_igs017_igs031->set_i8255_tag("ppi8255");
 
 	// sound
@@ -3733,7 +3735,7 @@ void igs017_state::slqz2(machine_config &config)
 
 	// protection
 	IGS025(config, m_igs025, 0);
-	m_igs025->set_external_cb(FUNC(igs017_state::igs025_to_igs022_callback), this);
+	m_igs025->set_external_cb(FUNC(igs017_state::igs025_to_igs022_callback));
 
 	IGS022(config, m_igs022, 0);
 
@@ -3747,7 +3749,7 @@ void igs017_state::slqz2(machine_config &config)
 	m_screen->set_palette("igs017_igs031:palette");
 
 	IGS017_IGS031(config, m_igs017_igs031, 0);
-	m_igs017_igs031->set_palette_scramble_cb(FUNC(igs017_state::slqz2_palette_bitswap), this);
+	m_igs017_igs031->set_palette_scramble_cb(FUNC(igs017_state::slqz2_palette_bitswap));
 	m_igs017_igs031->set_i8255_tag("ppi8255");
 
 	// sound
@@ -3836,7 +3838,7 @@ void igs017_state::mgdha(machine_config &config)
 
 void igs017_state::tjsb(machine_config &config)
 {
-	Z180(config, m_maincpu, XTAL(16'000'000) / 2);
+	HD64180RP(config, m_maincpu, XTAL(16'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs017_state::tjsb_map);
 	m_maincpu->set_addrmap(AS_IO, &igs017_state::tjsb_io);
 	TIMER(config, "scantimer").configure_scanline(FUNC(igs017_state::iqblocka_interrupt), "screen", 0, 1);
@@ -3859,7 +3861,7 @@ void igs017_state::tjsb(machine_config &config)
 	m_screen->set_palette("igs017_igs031:palette");
 
 	IGS017_IGS031(config, m_igs017_igs031, 0);
-	m_igs017_igs031->set_palette_scramble_cb(FUNC(igs017_state::tjsb_palette_bitswap), this);
+	m_igs017_igs031->set_palette_scramble_cb(FUNC(igs017_state::tjsb_palette_bitswap));
 	m_igs017_igs031->set_i8255_tag("ppi8255");
 
 	// sound
@@ -3874,7 +3876,7 @@ void igs017_state::tjsb(machine_config &config)
 
 void igs017_state::spkrform(machine_config &config)
 {
-	Z180(config, m_maincpu, XTAL(16'000'000) / 2);
+	HD64180RP(config, m_maincpu, XTAL(16'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs017_state::spkrform_map);
 	m_maincpu->set_addrmap(AS_IO, &igs017_state::spkrform_io);
 	TIMER(config, "scantimer").configure_scanline(FUNC(igs017_state::iqblocka_interrupt), "screen", 0, 1);

@@ -169,7 +169,7 @@ TILE_GET_INFO_MEMBER(sanremo_state::get_tile_info)
 
 void sanremo_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sanremo_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 48, 40);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sanremo_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 48, 40);
 
 	m_lamps.resolve();
 

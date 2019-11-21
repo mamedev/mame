@@ -248,7 +248,7 @@ void rzone_state::rzbatfor(machine_config &config)
 {
 	/* basic machine hardware */
 	SM512(config, m_maincpu); // no external XTAL
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->write_segs().set(FUNC(rzone_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(rzone_state::input_r));
 	m_maincpu->write_s().set(FUNC(rzone_state::t2_write_s));
 	m_maincpu->write_r().set(FUNC(rzone_state::t2_write_r));
@@ -272,7 +272,7 @@ void rzone_state::rztoshden(machine_config &config)
 	/* basic machine hardware */
 	SM510(config, m_maincpu);
 	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT);
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->write_segs().set(FUNC(rzone_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(rzone_state::input_r));
 	m_maincpu->write_s().set(FUNC(rzone_state::t1_write_s));
 	m_maincpu->write_r().set(FUNC(rzone_state::t1_write_r));
@@ -296,7 +296,7 @@ void rzone_state::rzindy500(machine_config &config)
 	/* basic machine hardware */
 	SM510(config, m_maincpu); // no external XTAL
 	m_maincpu->set_r_mask_option(sm510_base_device::RMASK_DIRECT); // confirmed
-	m_maincpu->write_segs().set(FUNC(hh_sm510_state::sm510_lcd_segment_w));
+	m_maincpu->write_segs().set(FUNC(rzone_state::sm510_lcd_segment_w));
 	m_maincpu->read_k().set(FUNC(rzone_state::input_r));
 	m_maincpu->write_s().set(FUNC(rzone_state::t1_write_s));
 	m_maincpu->write_r().set(FUNC(rzone_state::t1_write_r));

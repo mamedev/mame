@@ -97,18 +97,18 @@ void einstein_speculator_device::device_reset()
 {
 	// ram: range 0x1f, 0x3f, 0x5f, 0x7f, 0x9f, 0xbf, 0xdf, 0xff
 	io_space().install_readwrite_handler(0x1f, 0x1f, 0, 0, 0xffe0,
-		read8_delegate(FUNC(einstein_speculator_device::ram_r), this),
-		write8_delegate(FUNC(einstein_speculator_device::ram_w), this));
+			read8_delegate(*this, FUNC(einstein_speculator_device::ram_r)),
+			write8_delegate(*this, FUNC(einstein_speculator_device::ram_w)));
 
 	// ram: range 0x60 - 0xff
 	io_space().install_readwrite_handler(0x60, 0x60, 0, 0, 0xff9f,
-		read8_delegate(FUNC(einstein_speculator_device::ram_r), this),
-		write8_delegate(FUNC(einstein_speculator_device::ram_w), this));
+			read8_delegate(*this, FUNC(einstein_speculator_device::ram_r)),
+			write8_delegate(*this, FUNC(einstein_speculator_device::ram_w)));
 
 	// tape read/nmi write register: range 0xff
 	io_space().install_readwrite_handler(0xff, 0xff, 0, 0, 0xff00,
-		read8_delegate(FUNC(einstein_speculator_device::tape_r), this),
-		write8_delegate(FUNC(einstein_speculator_device::nmi_w), this));
+			read8_delegate(*this, FUNC(einstein_speculator_device::tape_r)),
+			write8_delegate(*this, FUNC(einstein_speculator_device::nmi_w)));
 }
 
 

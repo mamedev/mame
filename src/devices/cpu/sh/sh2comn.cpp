@@ -18,6 +18,7 @@
 #include "logmacro.h"
 
 static const int div_tab[4] = { 3, 5, 7, 0 };
+static const int wdtclk_tab[8] = { 1, 6, 7, 8, 9, 10, 12, 13 };
 
 
 void sh2_device::sh2_timer_resync()
@@ -100,6 +101,32 @@ TIMER_CALLBACK_MEMBER( sh2_device::sh2_timer_callback )
 	sh2_timer_activate();
 }
 
+void sh2_device::sh2_wtcnt_recalc()
+{
+	if (m_wdtimer->expire() != attotime::never)
+		m_wtcnt = 0x100 - (attotime_to_cycles(m_wdtimer->remaining()) >> wdtclk_tab[m_wtcsr & 7]);
+}
+
+void sh2_device::sh2_wdt_activate()
+{
+	m_wdtimer->adjust(cycles_to_attotime((0x100 - m_wtcnt) << wdtclk_tab[m_wtcsr & 7]));
+}
+
+TIMER_CALLBACK_MEMBER(sh2_device::sh2_wdtimer_callback)
+{
+	m_wtcnt = 0;
+	if (!(m_wtcsr & 0x40))  // timer mode
+	{
+		m_wtcsr |= 0x80;
+		sh2_recalc_irq();
+		sh2_wdt_activate();
+	}
+	else // watchdog mode
+	{
+		m_rstcsr |= 0x80;
+		// TODO reset and /WDTOVF out
+	}
+}
 
 /*
   We have to do DMA on a timer (or at least, in chunks) due to the way some systems use it.
@@ -841,6 +868,7 @@ WRITE32_MEMBER( sh2_device::dvdntl_w )
 
 READ16_MEMBER( sh2_device::wtcnt_r )
 {
+	sh2_wtcnt_recalc();
 	return ((m_wtcsr | 0x18) << 8) | (m_wtcnt & 0xff);
 }
 
@@ -856,6 +884,8 @@ WRITE16_MEMBER( sh2_device::wtcnt_w )
 	{
 		case 0x5a00:
 			m_wtcnt = m_wtcw[0] & 0xff;
+			if (m_wtcsr & 0x20)
+				sh2_wdt_activate();
 			break;
 		case 0xa500:
 			/*
@@ -866,7 +896,17 @@ WRITE16_MEMBER( sh2_device::wtcnt_w )
 			---1 1---
 			---- -xxx Clock select
 			*/
-			m_wtcsr = m_wtcw[0] & 0xff;
+			sh2_wtcnt_recalc();
+			m_wtcsr &= m_wtcw[0] & 0x80;
+			m_wtcsr |= m_wtcw[0] & 0x7f;
+			if (m_wtcsr & 0x20)
+				sh2_wdt_activate();
+			else
+			{
+				m_wtcnt = 0;
+				m_wdtimer->adjust(attotime::never);
+			}
+			sh2_recalc_irq();
 			break;
 	}
 }
@@ -1046,6 +1086,17 @@ void sh2_device::sh2_recalc_irq()
 				vector = m_irq_vector.foc & 0x7f;
 			else
 				vector = m_irq_vector.fov & 0x7f;
+		}
+	}
+
+	// WDT irqs
+	if (m_wtcsr & 0x80)
+	{
+		level = m_irq_level.wdt & 15;
+		if (level > irq)
+		{
+			irq = level;
+			vector = (m_vcrwdt >> 8) & 0x7f;
 		}
 	}
 

@@ -69,7 +69,7 @@ void snes_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 		snes_hblank_tick(ptr, param);
 		break;
 	default:
-		assert_always(false, "Unknown id in snes_state::device_timer");
+		throw emu_fatalerror("Unknown id in snes_state::device_timer");
 	}
 }
 
@@ -102,15 +102,8 @@ TIMER_CALLBACK_MEMBER(snes_state::snes_hirq_tick_callback)
 
 TIMER_CALLBACK_MEMBER(snes_state::snes_reset_oam_address)
 {
-	// make sure we're in the 65816's context since we're messing with the OAM and stuff
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-
 	if (!m_ppu->screen_disabled()) //Reset OAM address, byuu says it happens at H=10
-	{
-		space.write_byte(OAMADDL, m_ppu->saved_oam_address_low()); /* Reset oam address */
-		space.write_byte(OAMADDH, m_ppu->saved_oam_address_high());
-		m_ppu->set_first_sprite();
-	}
+		m_ppu->oam_address_reset();
 }
 
 TIMER_CALLBACK_MEMBER(snes_state::snes_reset_hdma)
@@ -230,14 +223,12 @@ TIMER_CALLBACK_MEMBER(snes_state::snes_hblank_tick)
 	/* draw a scanline */
 	if (m_ppu->current_vert() <= m_ppu->last_visible_line())
 	{
-		if (m_screen->vpos() > 0)
-		{
-			/* Do HDMA */
-			if (SNES_CPU_REG(HDMAEN))
-				hdma(cpu0space);
+		/* Do HDMA */
+		if (SNES_CPU_REG(HDMAEN))
+			hdma(cpu0space);
 
+		if (m_screen->vpos() > 0)
 			m_screen->update_partial((m_ppu->interlace() == 2) ? (m_ppu->current_vert() * m_ppu->interlace()) : m_ppu->current_vert() - 1);
-		}
 	}
 
 	// signal hblank

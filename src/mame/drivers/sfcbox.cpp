@@ -294,12 +294,12 @@ void sfcbox_state::sfcbox_io(address_map &map)
 	map(0x0b, 0x0b).w(m_mb90082, FUNC(mb90082_device::write));
 	map(0x80, 0x80).portr("KEY").w(FUNC(sfcbox_state::port_80_w)); // Keyswitch and Button Inputs / SNES Transfer and Misc Output
 	map(0x81, 0x81).rw(FUNC(sfcbox_state::port_81_r), FUNC(sfcbox_state::port_81_w)); // SNES Transfer and Misc Input / Misc Output
-//  AM_RANGE(0x82, 0x82) // Unknown/unused
+//  map(0x82, 0x82) // Unknown/unused
 	map(0x83, 0x83).rw(FUNC(sfcbox_state::port_83_r), FUNC(sfcbox_state::port_83_w)); // Joypad Input/Status / Joypad Output/Control
-//  AM_RANGE(0x84, 0x84) // Joypad 1, MSB (1st 8 bits) (eg. Bit7=ButtonB, 0=Low=Pressed)
-//  AM_RANGE(0x85, 0x85) // Joypad 1, LSB (2nd 8 bits) (eg. Bit0=LSB of ID, 0=Low=One)
-//  AM_RANGE(0x86, 0x86) // Joypad 2, MSB (1st 8 bits) (eg. Bit7=ButtonB, 0=Low=Pressed)
-//  AM_RANGE(0x87, 0x87) // Joypad 2, LSB (2nd 8 bits) (eg. Bit0=LSB of ID, 0=Low=One)
+//  map(0x84, 0x84) // Joypad 1, MSB (1st 8 bits) (eg. Bit7=ButtonB, 0=Low=Pressed)
+//  map(0x85, 0x85) // Joypad 1, LSB (2nd 8 bits) (eg. Bit0=LSB of ID, 0=Low=One)
+//  map(0x86, 0x86) // Joypad 2, MSB (1st 8 bits) (eg. Bit7=ButtonB, 0=Low=Pressed)
+//  map(0x87, 0x87) // Joypad 2, LSB (2nd 8 bits) (eg. Bit0=LSB of ID, 0=Low=One)
 	map(0xa0, 0xa0).portr("RTC_R").portw("RTC_W"); //  Real Time Clock
 	map(0xc0, 0xc0).w(FUNC(sfcbox_state::snes_map_0_w)); // SNES Mapping Register 0
 	map(0xc1, 0xc1).w(FUNC(sfcbox_state::snes_map_1_w)); // SNES Mapping Register 1
@@ -466,10 +466,10 @@ void sfcbox_state::sfcbox(machine_config &config)
 	SPC700(config, m_soundcpu, XTAL(24'576'000) / 12);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &sfcbox_state::spc_mem);
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 
 	/* sfcbox hardware */
-	Z180(config, m_bios, XTAL(12'000'000) / 2);  /* HD64180RF6X */
+	Z80180(config, m_bios, XTAL(12'000'000));  /* HD64180RF6X */
 	m_bios->set_addrmap(AS_PROGRAM, &sfcbox_state::sfcbox_map);
 	m_bios->set_addrmap(AS_IO, &sfcbox_state::sfcbox_io);
 
@@ -489,7 +489,8 @@ void sfcbox_state::sfcbox(machine_config &config)
 
 	// SNES PPU
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(DOTCLK_NTSC, SNES_HTOTAL, 0, SNES_SCR_WIDTH, SNES_VTOTAL_NTSC, 0, SNES_SCR_HEIGHT_NTSC);
+	screen.set_raw(DOTCLK_NTSC * 2, SNES_HTOTAL * 2, 0, SNES_SCR_WIDTH * 2, SNES_VTOTAL_NTSC, 0, SNES_SCR_HEIGHT_NTSC);
+	screen.set_video_attributes(VIDEO_VARIABLE_WIDTH);
 	screen.set_screen_update(FUNC(snes_state::screen_update));
 
 	SNES_PPU(config, m_ppu, MCLK_NTSC);

@@ -157,7 +157,7 @@ void slapshot_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		m_maincpu->set_input_line(6, HOLD_LINE);
 		break;
 	default:
-		assert_always(false, "Unknown id in slapshot_state::device_timer");
+		throw emu_fatalerror("Unknown id in slapshot_state::device_timer");
 	}
 }
 
@@ -414,7 +414,7 @@ void slapshot_state::slapshot(machine_config &config)
 	z80_device &audiocpu(Z80(config, "audiocpu", 32000000/8));    /* 4 MHz */
 	audiocpu.set_addrmap(AS_PROGRAM, &slapshot_state::sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	TC0640FIO(config, m_tc0640fio, 0);
 	m_tc0640fio->read_1_callback().set_ioport("COINS");
@@ -473,7 +473,7 @@ void slapshot_state::opwolf3(machine_config &config)
 	z80_device &audiocpu(Z80(config, "audiocpu", 32000000/8));    /* 4 MHz */
 	audiocpu.set_addrmap(AS_PROGRAM, &slapshot_state::sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	adc0809_device &adc(ADC0809(config, "adc", 500000)); // unknown clock
 	adc.eoc_ff_callback().set_inputline("maincpu", 3);

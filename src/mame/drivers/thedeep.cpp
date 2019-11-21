@@ -347,7 +347,7 @@ void thedeep_state::thedeep(machine_config &config)
 	/* IRQ by YM2203, NMI by when sound latch written by main cpu */
 
 	// needs a tight sync with the mcu
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 
 	// Intel C8751H-88 @ 8 MHz
 	I8751(config, m_mcu, 8_MHz_XTAL);

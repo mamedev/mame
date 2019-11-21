@@ -52,7 +52,7 @@ void concept_state::concept_memmap(address_map &map)
 	map(0x020000, 0x021fff).rom().region("macsbug", 0x0);       /* macsbugs ROM (optional) */
 	map(0x030000, 0x03ffff).rw(FUNC(concept_state::io_r), FUNC(concept_state::io_w)).umask16(0x00ff);    /* I/O space */
 
-	map(0x080000, 0x0fffff).ram().share("videoram");/* AM_RAMBANK(2) */ /* DRAM */
+	map(0x080000, 0x0fffff).ram().share("videoram"); /* .bankrw(2); */ /* DRAM */
 }
 
 
@@ -213,7 +213,7 @@ void concept_state::concept(machine_config &config)
 	M68000(config, m_maincpu, 16.364_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &concept_state::concept_memmap);
 
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

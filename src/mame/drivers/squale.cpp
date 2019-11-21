@@ -829,6 +829,8 @@ void squale_state::squale(machine_config &config)
 	m_ef9365->set_palette_tag("palette");
 	m_ef9365->set_nb_bitplanes(4);
 	m_ef9365->set_display_mode(ef9365_device::DISPLAY_MODE_256x256);
+	m_ef9365->irq_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
+
 	TIMER(config, "squale_sl").configure_scanline(FUNC(squale_state::squale_scanline), "screen", 0, 10);
 
 	/* Floppy */
@@ -838,7 +840,7 @@ void squale_state::squale(machine_config &config)
 	SOFTWARE_LIST(config, "flop525_list").set_original("squale");
 
 	/* Cartridge slot */
-	GENERIC_CARTSLOT(config, "cartslot", generic_linear_slot, "squale_cart").set_device_load(FUNC(squale_state::cart_load), this);
+	GENERIC_CARTSLOT(config, "cartslot", generic_linear_slot, "squale_cart").set_device_load(FUNC(squale_state::cart_load));
 	SOFTWARE_LIST(config, "cart_list").set_original("squale_cart");
 }
 

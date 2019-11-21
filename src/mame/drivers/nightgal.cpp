@@ -799,7 +799,7 @@ void nightgal_state::royalqn(machine_config &config)
 	NSC8105(config, m_subcpu, MASTER_CLOCK / 8);
 	m_subcpu->set_addrmap(AS_PROGRAM, &nightgal_state::royalqn_nsc_map);
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 
 	JANGOU_BLITTER(config, m_blitter, MASTER_CLOCK/4);
 
@@ -1325,8 +1325,8 @@ READ8_MEMBER(nightgal_state::ngalsumr_prot_value_r)
 
 void nightgal_state::init_ngalsumr()
 {
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x6000, 0x6000, write8_delegate(FUNC(nightgal_state::ngalsumr_prot_latch_w), this) );
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x6001, 0x6001, read8_delegate(FUNC(nightgal_state::ngalsumr_prot_value_r), this) );
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x6000, 0x6000, write8_delegate(*this, FUNC(nightgal_state::ngalsumr_prot_latch_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x6001, 0x6001, read8_delegate(*this, FUNC(nightgal_state::ngalsumr_prot_value_r)));
 	// 0x6003 some kind of f/f state
 }
 

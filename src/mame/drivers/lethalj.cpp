@@ -150,7 +150,7 @@ Pin #11(+) | | R               |
 #define MASTER_CLOCK            XTAL(40'000'000)
 #define SOUND_CLOCK             XTAL(2'000'000)
 
-#define VIDEO_CLOCK             XTAL(11'289'000)
+#define VIDEO_CLOCK             XTAL(11'289'600)
 #define VIDEO_CLOCK_LETHALJ     XTAL(11'059'200)
 
 
@@ -216,7 +216,7 @@ void lethalj_state::lethalj_map(address_map &map)
 	map(0x04000000, 0x0400000f).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
 	map(0x04000010, 0x0400001f).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
 	map(0x04100000, 0x0410000f).rw("oki3", FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
-//  AM_RANGE(0x04100010, 0x0410001f) AM_READNOP     /* read but never examined */
+//  map(0x04100010, 0x0410001f).nopr();     /* read but never examined */
 	map(0x04200000, 0x0420001f).nopw();    /* clocks bits through here */
 	map(0x04300000, 0x0430007f).r(FUNC(lethalj_state::lethalj_gun_r));
 	map(0x04400000, 0x0440000f).nopw();    /* clocks bits through here */
@@ -1015,19 +1015,19 @@ ROM_END
 
 void lethalj_state::init_ripribit()
 {
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x04100010, 0x0410001f, write16_delegate(FUNC(lethalj_state::ripribit_control_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x04100010, 0x0410001f, write16_delegate(*this, FUNC(lethalj_state::ripribit_control_w)));
 }
 
 
 void lethalj_state::init_cfarm()
 {
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x04100010, 0x0410001f, write16_delegate(FUNC(lethalj_state::cfarm_control_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x04100010, 0x0410001f, write16_delegate(*this, FUNC(lethalj_state::cfarm_control_w)));
 }
 
 
 void lethalj_state::init_cclownz()
 {
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x04100010, 0x0410001f, write16_delegate(FUNC(lethalj_state::cclownz_control_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x04100010, 0x0410001f, write16_delegate(*this, FUNC(lethalj_state::cclownz_control_w)));
 }
 
 

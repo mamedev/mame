@@ -397,7 +397,7 @@ void rungun_state::rng(machine_config &config)
 	Z80(config, m_soundcpu, 8000000);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &rungun_state::rungun_sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000); // higher if sound stutters
+	config.set_maximum_quantum(attotime::from_hz(6000)); // higher if sound stutters
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rungun);
 
@@ -422,7 +422,7 @@ void rungun_state::rng(machine_config &config)
 	m_k053936->set_offsets(34, 9);
 
 	K055673(config, m_k055673, 0);
-	m_k055673->set_sprite_callback(FUNC(rungun_state::sprite_callback), this);
+	m_k055673->set_sprite_callback(FUNC(rungun_state::sprite_callback));
 	m_k055673->set_config(K055673_LAYOUT_RNG, -8, -15);
 	m_k055673->set_palette(m_palette);
 	m_k055673->set_screen(m_screen);

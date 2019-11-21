@@ -32,14 +32,15 @@ public:
 	auto lv6_irq() { return m_lv6irqline_callback.bind(); }
 	auto lv4_irq() { return m_lv4irqline_callback.bind(); }
 
+	void set_lcm_scaling(bool lcm_scaling) { m_lcm_scaling = lcm_scaling; }
 	void set_alt_timing(int use_alt_timing) { m_use_alt_timing = use_alt_timing; }
 	void set_pal_write_base(int palwrite_base) { m_palwrite_base = palwrite_base; }
 	template <typename T> void set_ext_palette(T &&tag) { m_ext_palette.set_tag(std::forward<T>(tag)); }
 
 	// Temporary solution while 32x VDP mixing and scanline interrupting is moved outside MD VDP
-	template <typename... T> void set_md_32x_scanline(T &&... args) { m_32x_scanline_func = md_32x_scanline_delegate(std::forward<T>(args)...); }
-	template <typename... T> void set_md_32x_interrupt(T &&... args) { m_32x_interrupt_func = md_32x_interrupt_delegate(std::forward<T>(args)...); }
-	template <typename... T> void set_md_32x_scanline_helper(T &&... args) { m_32x_scanline_helper_func = md_32x_scanline_helper_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_md_32x_scanline(T &&... args) { m_32x_scanline_func.set(std::forward<T>(args)...); }
+	template <typename... T> void set_md_32x_interrupt(T &&... args) { m_32x_interrupt_func.set(std::forward<T>(args)...); }
+	template <typename... T> void set_md_32x_scanline_helper(T &&... args) { m_32x_scanline_helper_func.set(std::forward<T>(args)...); }
 
 	int m_use_alt_timing; // use MAME scanline timer instead, render only one scanline to a single line buffer, to be rendered by a partial update call.. experimental
 
@@ -116,6 +117,7 @@ protected:
 	md_32x_interrupt_delegate m_32x_interrupt_func;
 	md_32x_scanline_helper_delegate m_32x_scanline_helper_func;
 
+	virtual int screen_hpos() override;
 private:
 	// vdp code defines
 	const u8 CODE_DMA()         { return m_vdp_code & 0x20; }
@@ -142,6 +144,7 @@ private:
 	void get_nametable(gfx_element *tile_gfx, u16 tile_base, nametable_t &tile, int vcolumn);
 	inline void draw_tile(nametable_t tile, int start, int end, int &dpos, bool is_fg);
 
+	inline u8 get_hres();
 	int m_command_pending; // 2nd half of command pending..
 	u16 m_command_part1;
 	u16 m_command_part2;
@@ -159,6 +162,7 @@ private:
 
 	int m_imode;
 
+	bool m_lcm_scaling;
 	int m_visible_scanlines;
 	int m_irq6_scanline;
 	int m_z80irq_scanline;

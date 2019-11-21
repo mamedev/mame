@@ -197,7 +197,7 @@ void quickpick5_state::video_start()
 	m_gfxdecode->set_gfx(gfx_index, std::make_unique<gfx_element>(m_palette, charlayout, memregion("ttl")->base(), 0, m_palette->entries() / 16, 0));
 	m_ttl_gfx_index = gfx_index;
 
-	m_ttl_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(quickpick5_state::ttl_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_ttl_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(quickpick5_state::ttl_get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_ttl_tilemap->set_transparent_pen(0);
 	m_ttl_tilemap->set_scrollx(80);
 	m_ttl_tilemap->set_scrolly(28);
@@ -428,7 +428,7 @@ void quickpick5_state::quickpick5(machine_config &config)
 	K053245(config, m_k053245, 0);
 	m_k053245->set_palette(m_palette);
 	m_k053245->set_offsets(-(44+80), 20);
-	m_k053245->set_sprite_callback(FUNC(quickpick5_state::sprite_callback), this);
+	m_k053245->set_sprite_callback(FUNC(quickpick5_state::sprite_callback));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfxdecode_device::empty);
 

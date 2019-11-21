@@ -57,7 +57,7 @@ TILEMAP_MAPPER_MEMBER(jack_state::tilemap_scan_cols_flipy)
 
 void jack_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(jack_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(jack_state::tilemap_scan_cols_flipy),this), 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(jack_state::get_bg_tile_info)), tilemap_mapper_delegate(*this, FUNC(jack_state::tilemap_scan_cols_flipy)), 8, 8, 32, 32);
 }
 
 
@@ -175,7 +175,7 @@ TILE_GET_INFO_MEMBER(jack_state::joinem_get_bg_tile_info)
 
 VIDEO_START_MEMBER(jack_state,joinem)
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(jack_state::joinem_get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(jack_state::tilemap_scan_cols_flipy),this), 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(jack_state::joinem_get_bg_tile_info)), tilemap_mapper_delegate(*this, FUNC(jack_state::tilemap_scan_cols_flipy)), 8, 8, 32, 32);
 	m_bg_tilemap->set_scroll_cols(32);
 }
 

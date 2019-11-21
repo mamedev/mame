@@ -184,7 +184,7 @@ private:
 
 void pv1000_state::pv1000_mem(address_map &map)
 {
-	//AM_RANGE(0x0000, 0x7fff)      // mapped by the cartslot
+	//map(0x0000, 0x7fff)      // mapped by the cartslot
 	map(0xb800, 0xbbff).ram().share("videoram");
 	map(0xbc00, 0xbfff).ram().w(FUNC(pv1000_state::gfxram_w)).region("gfxram", 0);
 }
@@ -395,7 +395,7 @@ void pv1000_state::machine_start()
 
 	if (m_cart->exists())
 	{
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x7fff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x7fff, read8sm_delegate(*m_cart, FUNC(generic_slot_device::read_rom)));
 
 		// FIXME: this is needed for gfx decoding, but there is probably a cleaner solution!
 		std::string region_tag;
@@ -462,7 +462,7 @@ void pv1000_state::pv1000(machine_config &config)
 	/* Cartridge slot */
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_linear_slot, "pv1000_cart"));
 	cartslot.set_must_be_loaded(true);
-	cartslot.set_device_load(FUNC(pv1000_state::cart_load), this);
+	cartslot.set_device_load(FUNC(pv1000_state::cart_load));
 
 	/* Software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("pv1000");

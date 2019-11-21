@@ -462,21 +462,21 @@ INPUT_PORTS_END
 void stfight_state::stfight_base(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(12'000'000) / 4);
+	Z80(config, m_maincpu, 12_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &stfight_state::cpu1_map);
 	m_maincpu->set_vblank_int("stfight_vid:screen", FUNC(stfight_state::stfight_vb_interrupt));
 
-	Z80(config, m_audiocpu, XTAL(12'000'000) / 4);
+	Z80(config, m_audiocpu, 12_MHz_XTAL / 4);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &stfight_state::cpu2_map);
 	m_audiocpu->set_periodic_int(FUNC(stfight_state::irq0_line_hold), attotime::from_hz(120));
 
-	M68705P5(config, m_mcu, XTAL(12'000'000) / 4);
+	M68705P5(config, m_mcu, 12_MHz_XTAL / 4);
 	m_mcu->portb_r().set(FUNC(stfight_state::stfight_68705_port_b_r));
 	m_mcu->porta_w().set(FUNC(stfight_state::stfight_68705_port_a_w));
 	m_mcu->portb_w().set(FUNC(stfight_state::stfight_68705_port_b_w));
 	m_mcu->portc_w().set(FUNC(stfight_state::stfight_68705_port_c_w));
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	PALETTE(config, "palette").set_format(palette_device::xBRG_444, 256);
 
@@ -484,19 +484,19 @@ void stfight_state::stfight_base(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	// YM2203_PITCH_HACK - These should be clocked at 1.5Mhz (see TODO list)
-	ym2203_device &ym1(YM2203(config, "ym1", XTAL(12'000'000) / 8 * 3));
+	ym2203_device &ym1(YM2203(config, "ym1", 12_MHz_XTAL / 8 * 3));
 	ym1.add_route(0, "mono", 0.15);
 	ym1.add_route(1, "mono", 0.15);
 	ym1.add_route(2, "mono", 0.15);
 	ym1.add_route(3, "mono", 0.10);
 
-	ym2203_device &ym2(YM2203(config, "ym2", XTAL(12'000'000) / 8 * 3));
+	ym2203_device &ym2(YM2203(config, "ym2", 12_MHz_XTAL / 8 * 3));
 	ym2.add_route(0, "mono", 0.15);
 	ym2.add_route(1, "mono", 0.15);
 	ym2.add_route(2, "mono", 0.15);
 	ym2.add_route(3, "mono", 0.10);
 
-	MSM5205(config, m_msm, XTAL(384'000));
+	MSM5205(config, m_msm, 384_kHz_XTAL);
 	m_msm->vck_callback().set(FUNC(stfight_state::stfight_adpcm_int)); // Interrupt function
 	m_msm->set_prescaler_selector(msm5205_device::S48_4B);  // 8KHz, 4-bit
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.50);

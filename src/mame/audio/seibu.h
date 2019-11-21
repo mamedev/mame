@@ -35,6 +35,8 @@
 class seibu_sound_common {
 public:
 	virtual ~seibu_sound_common() = default;
+
+protected:
 	void seibu_sound_map(address_map &map);
 };
 
@@ -42,7 +44,7 @@ class seibu_sound_device : public device_t
 {
 public:
 	seibu_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~seibu_sound_device() {}
+	~seibu_sound_device() { }
 
 	//  configuration
 	template <typename T> void set_rom_tag(T &&tag) { m_sound_rom.set_tag(std::forward<T>(tag)); }
@@ -131,7 +133,7 @@ class seibu_adpcm_device : public device_t,
 {
 public:
 	seibu_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~seibu_adpcm_device() {}
+	~seibu_adpcm_device() { }
 
 	void decrypt();
 	void adr_w(offs_t offset, u8 data);

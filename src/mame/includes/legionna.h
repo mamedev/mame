@@ -54,29 +54,6 @@ public:
 	void init_olysoc92();
 
 private:
-	required_shared_ptr<u16> m_spriteram;
-	optional_shared_ptr<u16> m_swappal;
-	std::unique_ptr<u16[]> m_back_data;
-	std::unique_ptr<u16[]> m_fore_data;
-	std::unique_ptr<u16[]> m_mid_data;
-	std::unique_ptr<u16[]> m_textram;
-	std::unique_ptr<u16[]> m_scrollram16;
-	std::unique_ptr<u16[]> m_paletteram;
-	u16 m_layer_disable;
-	std::unique_ptr<u16[]> m_layer_config;
-	int m_sprite_xoffs;
-	int m_sprite_yoffs;
-	tilemap_t *m_background_layer;
-	tilemap_t *m_foreground_layer;
-	tilemap_t *m_midground_layer;
-	tilemap_t *m_text_layer;
-	bool m_has_extended_banking;
-	bool m_has_extended_priority;
-	u16 m_sprite_pri_mask[4];
-	u16 m_back_gfx_bank;
-	u16 m_fore_gfx_bank;
-	u16 m_mid_gfx_bank;
-	u16 m_scrollvals[6];
 	void tilemap_enable_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void tile_scroll_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void tile_scroll_base_w(offs_t offset, u16 data);
@@ -112,14 +89,7 @@ private:
 	void descramble_legionnaire_gfx(u8* src);
 	void common_video_start(bool split, bool has_extended_banking, bool has_extended_priority);
 	void common_video_allocate_ptr();
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
-	optional_device<seibu_sound_device> m_seibu_sound;
-	required_device<okim6295_device> m_oki;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-	required_device<seibu_crtc_device> m_crtc;
-	optional_device<raiden2cop_device> m_raiden2cop;
+
 	void cupsoc_map(address_map &map);
 	void cupsocs_map(address_map &map);
 	void denjinmk_map(address_map &map);
@@ -129,6 +99,39 @@ private:
 	void legionna_cop_map(address_map &map);
 	void legionna_map(address_map &map);
 	void godzilla_sound_io_map(address_map &map);
+
+	required_shared_ptr<u16> m_spriteram;
+	optional_shared_ptr<u16> m_swappal;
+	std::unique_ptr<u16[]> m_back_data;
+	std::unique_ptr<u16[]> m_fore_data;
+	std::unique_ptr<u16[]> m_mid_data;
+	std::unique_ptr<u16[]> m_textram;
+	std::unique_ptr<u16[]> m_scrollram16;
+	std::unique_ptr<u16[]> m_paletteram;
+	u16 m_layer_disable;
+	std::unique_ptr<u16[]> m_layer_config;
+	int m_sprite_xoffs;
+	int m_sprite_yoffs;
+	tilemap_t *m_background_layer;
+	tilemap_t *m_foreground_layer;
+	tilemap_t *m_midground_layer;
+	tilemap_t *m_text_layer;
+	bool m_has_extended_banking;
+	bool m_has_extended_priority;
+	u16 m_sprite_pri_mask[4];
+	u16 m_back_gfx_bank;
+	u16 m_fore_gfx_bank;
+	u16 m_mid_gfx_bank;
+	u16 m_scrollvals[6];
+
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	optional_device<seibu_sound_device> m_seibu_sound;
+	required_device<okim6295_device> m_oki;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device<seibu_crtc_device> m_crtc;
+	optional_device<raiden2cop_device> m_raiden2cop;
 };
 
 #endif // MAME_INCLUDES_LEGIONNA_H

@@ -440,7 +440,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<year>1983</year>
 		<publisher>&lt;unknown;&gt;</publisher>
 		<part name="cart" interface="coco_cart">
-      <!-- <feature name="slot" value="soaktest" /> -->
+			<!-- <feature name="slot" value="soaktest" /> -->
 			<dataarea name="rom" size="4096">
 				<rom name="d32soaktest.rom" size="4096" crc="41c61438" sha1="6db94922a458ae292d7a5c3333d86f2d935212b6"/>
 			</dataarea>

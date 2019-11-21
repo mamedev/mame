@@ -143,9 +143,9 @@ const gfx_layout gfx_16x16x4_packed_lsb =
 GFXLAYOUT_RAW(gfx_16x16x8_raw, 16, 16, 16*8, 16*16*8);
 
 /*
-	16x16; grouped of 4 8x8 tiles (row align)
-	0 1
-	2 3
+    16x16; grouped of 4 8x8 tiles (row align)
+    0 1
+    2 3
 */
 const gfx_layout gfx_8x8x4_row_2x2_group_packed_msb =
 {
@@ -173,9 +173,9 @@ const gfx_layout gfx_8x8x4_row_2x2_group_packed_lsb =
 };
 
 /*
-	16x16; grouped of 4 8x8 tiles (col align)
-	0 2
-	1 3
+    16x16; grouped of 4 8x8 tiles (col align)
+    0 2
+    1 3
 */
 const gfx_layout gfx_8x8x4_col_2x2_group_packed_msb =
 {

@@ -948,7 +948,7 @@ void gticlub_state::gticlub(machine_config &config)
 	m_dsp->set_boot_mode(adsp21062_device::BOOT_MODE_EPROM);
 	m_dsp->set_addrmap(AS_DATA, &gticlub_state::sharc_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	EEPROM_93C56_16BIT(config, "eeprom");
 
@@ -1050,7 +1050,7 @@ void gticlub_state::hangplt(machine_config &config)
 	m_dsp2->set_boot_mode(adsp21062_device::BOOT_MODE_EPROM);
 	m_dsp2->set_addrmap(AS_DATA, &gticlub_state::hangplt_sharc1_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	EEPROM_93C56_16BIT(config, "eeprom");
 

@@ -14,9 +14,7 @@
 #include "machine/aakart.h"
 #include "machine/i2cmem.h"
 #include "machine/wd_fdc.h"
-#include "sound/dac.h"
-#include "emupal.h"
-#include "screen.h"
+#include "machine/acorn_vidc.h"
 
 // interrupt definitions.  these are for the real Archimedes computer - arcade
 // and gambling knockoffs likely are a bit different.
@@ -53,15 +51,12 @@ public:
 		m_kart(*this, "kart"),
 		m_maincpu(*this, "maincpu"),
 		m_i2cmem(*this, "i2cmem"),
+		m_vidc(*this, "vidc"),
 		m_fdc(*this, "fdc"),
 		m_floppy0(*this, "fdc:0"),
 		m_floppy1(*this, "fdc:1"),
 		m_region_maincpu(*this, "maincpu"),
-		m_region_vram(*this, "vram"),
-		m_screen(*this, "screen"),
-		m_palette(*this, "palette"),
-		m_joy(*this, "joy_p%u",1),
-		m_dac(*this, { "dac0", "dac1", "dac2", "dac3", "dac4", "dac5", "dac6", "dac7" })
+		m_joy(*this, "joy_p%u",1)
 		{ }
 
 	optional_device<aakart_device> m_kart;
@@ -79,24 +74,16 @@ public:
 	DECLARE_READ32_MEMBER(aristmk5_drame_memc_logical_r);
 	DECLARE_READ32_MEMBER(archimedes_memc_logical_r);
 	DECLARE_WRITE32_MEMBER(archimedes_memc_logical_w);
-	DECLARE_READ32_MEMBER(archimedes_memc_r);
 	DECLARE_WRITE32_MEMBER(archimedes_memc_w);
 	DECLARE_WRITE32_MEMBER(archimedes_memc_page_w);
 	DECLARE_READ32_MEMBER(archimedes_ioc_r);
 	DECLARE_WRITE32_MEMBER(archimedes_ioc_w);
-	DECLARE_READ32_MEMBER(archimedes_vidc_r);
-	DECLARE_WRITE32_MEMBER(archimedes_vidc_w);
 	DECLARE_WRITE_LINE_MEMBER( a310_kart_rx_w );
 	DECLARE_WRITE_LINE_MEMBER( a310_kart_tx_w );
 
 	uint8_t m_i2c_clk;
 	int16_t m_memc_pages[0x2000]; // the logical RAM area is 32 megs, and the smallest page size is 4k
-	uint32_t m_vidc_regs[256];
-	uint8_t m_cursor_vram[0x8000]; // size -> max(VCER) - min(VCSR) * 32 = 0x7fe0
 	uint8_t m_ioc_regs[0x80/4];
-	uint8_t m_vidc_bpp_mode;
-	uint8_t m_vidc_interlace;
-	uint16_t m_vidc_vblank_time;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -104,29 +91,25 @@ public:
 protected:
 	required_device<arm_cpu_device> m_maincpu;
 	optional_device<i2cmem_device> m_i2cmem;
+	required_device<acorn_vidc10_device> m_vidc;
 	optional_device<wd1772_device> m_fdc;
 	optional_device<floppy_connector> m_floppy0;
 	optional_device<floppy_connector> m_floppy1;
 	required_memory_region m_region_maincpu;
-	required_memory_region m_region_vram;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
 	optional_ioport_array<2> m_joy;
-	required_device_array<dac_16bit_r2r_twos_complement_device, 8> m_dac;
+
+	DECLARE_WRITE_LINE_MEMBER( vblank_irq );
+	DECLARE_WRITE_LINE_MEMBER( sound_drq );
 
 private:
 
-	static const device_timer_id TIMER_VBLANK = 0;
-	static const device_timer_id TIMER_VIDEO = 1;
-	static const device_timer_id TIMER_AUDIO = 2;
 	static const device_timer_id TIMER_IOC = 3;
 
-	void vidc_vblank();
+//  void vidc_vblank();
 	void vidc_video_tick();
 	void vidc_audio_tick();
 	void ioc_timer(int param);
 
-	void vidc_dynamic_res_change();
 	void latch_timer_cnt(int tmr);
 	void a310_set_timer(int tmr);
 	DECLARE_READ32_MEMBER(ioc_ctrl_r);
@@ -136,14 +119,11 @@ private:
 	uint32_t m_memc_pagesize;
 	int m_memc_latchrom;
 	uint32_t m_ioc_timercnt[4], m_ioc_timerout[4];
-	uint32_t m_vidc_vidstart, m_vidc_vidend, m_vidc_vidinit, m_vidc_vidcur,m_vidc_cinit;
+	uint32_t m_vidc_vidstart, m_vidc_vidend, m_vidc_vidinit, m_vidc_vidcur, m_vidc_cinit;
 	uint32_t m_vidc_sndstart, m_vidc_sndend, m_vidc_sndcur, m_vidc_sndendcur;
 	uint8_t m_video_dma_on,m_audio_dma_on;
-	uint8_t m_vidc_pixel_clk;
-	uint8_t m_vidc_stereo_reg[8];
 	bool m_cursor_enabled;
-	emu_timer *m_timer[4], *m_snd_timer, *m_vid_timer;
-	emu_timer *m_vbl_timer;
+	emu_timer *m_timer[4];
 	uint8_t m_floppy_select;
 	bool check_floppy_ready();
 	uint8_t m_joy_serial_data;
@@ -184,23 +164,5 @@ private:
 #define T3_LATCH_HI 0x74/4
 #define T3_GO       0x78/4
 #define T3_LATCH    0x7c/4
-
-#define VIDC_HCR        0x80
-#define VIDC_HSWR       0x84
-#define VIDC_HBSR       0x88
-#define VIDC_HDSR       0x8c
-#define VIDC_HDER       0x90
-#define VIDC_HBER       0x94
-#define VIDC_HCSR       0x98
-#define VIDC_HIR        0x9c
-
-#define VIDC_VCR        0xa0
-#define VIDC_VSWR       0xa4
-#define VIDC_VBSR       0xa8
-#define VIDC_VDSR       0xac
-#define VIDC_VDER       0xb0
-#define VIDC_VBER       0xb4
-#define VIDC_VCSR       0xb8
-#define VIDC_VCER       0xbc
 
 #endif // MAME_INCLUDES_ARCHIMEDES_H

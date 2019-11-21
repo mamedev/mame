@@ -193,17 +193,17 @@ TILE_GET_INFO_MEMBER(warpwarp_state::warpwarp_get_tile_info)
 
 VIDEO_START_MEMBER(warpwarp_state,geebee)
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(warpwarp_state::geebee_get_tile_info),this),tilemap_mapper_delegate(FUNC(warpwarp_state::tilemap_scan),this),8,8,34,28);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(warpwarp_state::geebee_get_tile_info)), tilemap_mapper_delegate(*this, FUNC(warpwarp_state::tilemap_scan)), 8,8, 34,28);
 }
 
 VIDEO_START_MEMBER(warpwarp_state,navarone)
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(warpwarp_state::navarone_get_tile_info),this),tilemap_mapper_delegate(FUNC(warpwarp_state::tilemap_scan),this),8,8,34,28);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(warpwarp_state::navarone_get_tile_info)), tilemap_mapper_delegate(*this, FUNC(warpwarp_state::tilemap_scan)), 8,8, 34,28);
 }
 
 VIDEO_START_MEMBER(warpwarp_state,warpwarp)
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(warpwarp_state::warpwarp_get_tile_info),this),tilemap_mapper_delegate(FUNC(warpwarp_state::tilemap_scan),this),8,8,34,28);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(warpwarp_state::warpwarp_get_tile_info)), tilemap_mapper_delegate(*this, FUNC(warpwarp_state::tilemap_scan)), 8,8, 34,28);
 }
 
 

@@ -149,7 +149,7 @@ void freeway_state::freeway(machine_config &config)
 	crtc.set_char_width(8);
 	crtc.set_show_border_area(false);
 	crtc.set_screen("screen");
-	crtc.set_update_row_callback(FUNC(freeway_state::update_row), this);
+	crtc.set_update_row_callback(FUNC(freeway_state::update_row));
 	crtc.out_hsync_callback().set("pit", FUNC(pit8254_device::write_clk0)); // guess
 
 	ns16450_device &uart(NS16450(config, "uart", 10_MHz_XTAL / 8)); // type unknown

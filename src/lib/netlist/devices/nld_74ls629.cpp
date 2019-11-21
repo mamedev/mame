@@ -85,7 +85,7 @@ namespace netlist
 		, m_ENQ(*this, "ENQ")
 		, m_RNG(*this, "RNG")
 		, m_FC(*this, "FC")
-		, m_CAP(*this, "CAP", 1e-6)
+		, m_CAP(*this, "CAP", nlconst::magic(1e-6))
 		{
 			register_subalias("GND",    m_R_FC.m_N);
 
@@ -98,8 +98,8 @@ namespace netlist
 
 		NETLIB_RESETI()
 		{
-			m_R_FC.set_R(90000.0);
-			m_R_RNG.set_R(90000.0);
+			m_R_FC.set_R( nlconst::magic(90000.0));
+			m_R_RNG.set_R(nlconst::magic(90000.0));
 			m_clock.reset();
 		}
 		NETLIB_UPDATEI();
@@ -118,7 +118,7 @@ namespace netlist
 		analog_input_t m_RNG;
 		analog_input_t m_FC;
 
-		param_double_t m_CAP;
+		param_fp_t m_CAP;
 	};
 
 	NETLIB_OBJECT(SN74LS629_dip)
@@ -175,31 +175,29 @@ namespace netlist
 	{
 		{
 			// recompute
-			nl_double  freq;
-			nl_double  v_freq_2, v_freq_3, v_freq_4;
-			nl_double  v_freq = m_FC();
-			nl_double  v_rng = m_RNG();
+			nl_fptype  v_freq = m_FC();
+			nl_fptype  v_rng = m_RNG();
 
 			/* coefficients */
-			const nl_double k1 = 1.9904769024796283E+03;
-			const nl_double k2 = 1.2070059213983407E+03;
-			const nl_double k3 = 1.3266985579561108E+03;
-			const nl_double k4 = -1.5500979825922698E+02;
-			const nl_double k5 = 2.8184536266938172E+00;
-			const nl_double k6 = -2.3503421582744556E+02;
-			const nl_double k7 = -3.3836786704527788E+02;
-			const nl_double k8 = -1.3569136703258670E+02;
-			const nl_double k9 = 2.9914575453819188E+00;
-			const nl_double k10 = 1.6855569086173170E+00;
+			const nl_fptype k1 =  nlconst::magic( 1.9904769024796283E+03);
+			const nl_fptype k2 =  nlconst::magic( 1.2070059213983407E+03);
+			const nl_fptype k3 =  nlconst::magic( 1.3266985579561108E+03);
+			const nl_fptype k4 =  nlconst::magic(-1.5500979825922698E+02);
+			const nl_fptype k5 =  nlconst::magic( 2.8184536266938172E+00);
+			const nl_fptype k6 =  nlconst::magic(-2.3503421582744556E+02);
+			const nl_fptype k7 =  nlconst::magic(-3.3836786704527788E+02);
+			const nl_fptype k8 =  nlconst::magic(-1.3569136703258670E+02);
+			const nl_fptype k9 =  nlconst::magic( 2.9914575453819188E+00);
+			const nl_fptype k10 = nlconst::magic( 1.6855569086173170E+00);
 
 			/* scale due to input resistance */
 
 			/* Polyfunctional3D_model created by zunzun.com using sum of squared absolute error */
 
-			v_freq_2 = v_freq * v_freq;
-			v_freq_3 = v_freq_2 * v_freq;
-			v_freq_4 = v_freq_3 * v_freq;
-			freq = k1;
+			nl_fptype v_freq_2 = v_freq * v_freq;
+			nl_fptype v_freq_3 = v_freq_2 * v_freq;
+			nl_fptype v_freq_4 = v_freq_3 * v_freq;
+			nl_fptype freq = k1;
 			freq += k2 * v_freq;
 			freq += k3 * v_freq_2;
 			freq += k4 * v_freq_3;
@@ -210,11 +208,11 @@ namespace netlist
 			freq += k9 * v_rng * v_freq_3;
 			freq += k10 * v_rng * v_freq_4;
 
-			freq *= plib::constants<nl_double>::cast(0.1e-6) / m_CAP();
+			freq *= nlconst::magic(0.1e-6) / m_CAP();
 
 			// FIXME: we need a possibility to remove entries from queue ...
 			//        or an exact model ...
-			m_clock.m_inc = netlist_time::from_double(0.5 / freq);
+			m_clock.m_inc = netlist_time::from_fp(nlconst::half() / freq);
 			//m_clock.update();
 
 			//NL_VERBOSE_OUT(("{1} {2} {3} {4}\n", name(), v_freq, v_rng, freq));

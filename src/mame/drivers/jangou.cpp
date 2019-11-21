@@ -422,7 +422,7 @@ void jangou_state::nsc_map(address_map &map)
 void jangou_state::cntrygrl_cpu0_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-//  AM_RANGE(0xc000, 0xc7ff) AM_RAM
+//  map(0xc000, 0xc7ff).ram();
 	map(0xe000, 0xefff).ram();
 }
 
@@ -437,7 +437,7 @@ void jangou_state::cntrygrl_cpu0_io(address_map &map)
 	map(0x12, 0x17).m(m_blitter, FUNC(jangou_blitter_device::blit_v1_regs));
 	map(0x20, 0x2f).w(m_blitter, FUNC(jangou_blitter_device::vregs_w));
 	map(0x30, 0x30).nopw(); //? polls 0x03 continuously
-//  AM_RANGE(0x31,0x31) AM_WRITE(sound_latch_w)
+//  map(0x31, 0x31).w(FUNC(jangou_state::sound_latch_w));
 }
 
 /*************************************
@@ -1272,7 +1272,7 @@ READ8_MEMBER(jangou_state::jngolady_rng_r)
 
 void jangou_state::init_jngolady()
 {
-	m_nsc->space(AS_PROGRAM).install_read_handler(0x08, 0x08, read8_delegate(FUNC(jangou_state::jngolady_rng_r),this) );
+	m_nsc->space(AS_PROGRAM).install_read_handler(0x08, 0x08, read8_delegate(*this, FUNC(jangou_state::jngolady_rng_r)));
 }
 
 void jangou_state::init_luckygrl()

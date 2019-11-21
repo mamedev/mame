@@ -390,11 +390,11 @@ void ssingles_state::atamanot_map(address_map &map)
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x47ff).ram();
 	map(0x6000, 0x60ff).ram(); //kanji tilemap?
-//  AM_RANGE(0x6000, 0x7fff) AM_ROM
+//  map(0x6000, 0x7fff).rom();
 	map(0x8000, 0x83ff).r(FUNC(ssingles_state::atamanot_prot_r));
-//  AM_RANGE(0x8000, 0x9fff) AM_ROM AM_REGION("question",0x10000)
-//  AM_RANGE(0xc000, 0xc000) AM_READ(c000_r )
-//  AM_RANGE(0xc001, 0xc001) AM_READWRITE(c001_r, c001_w )
+//  map(0x8000, 0x9fff).rom().region("question", 0x10000);
+//  map(0xc000, 0xc000).r(FUNC(ssingles_state::c000_r));
+//  map(0xc001, 0xc001).rw(FUNC(ssingles_state::c001_r), FUNC(ssingles_state::c001_w));
 }
 
 void ssingles_state::ssingles_io_map(address_map &map)
@@ -408,7 +408,7 @@ void ssingles_state::ssingles_io_map(address_map &map)
 	map(0x16, 0x16).portr("DSW0");
 	map(0x18, 0x18).portr("DSW1");
 	map(0x1c, 0x1c).portr("INPUTS");
-//  AM_RANGE(0x1a, 0x1a) AM_WRITENOP //video/crt related
+//  map(0x1a, 0x1a).nopw(); //video/crt related
 	map(0xfe, 0xfe).w("crtc", FUNC(mc6845_device::address_w));
 	map(0xff, 0xff).w("crtc", FUNC(mc6845_device::register_w));
 }
@@ -424,7 +424,7 @@ void ssingles_state::atamanot_io_map(address_map &map)
 	map(0x16, 0x16).portr("DSW0");
 	map(0x18, 0x18).portr("DSW1").w(FUNC(ssingles_state::atamanot_prot_w));
 	map(0x1c, 0x1c).portr("INPUTS");
-//  AM_RANGE(0x1a, 0x1a) AM_WRITENOP //video/crt related
+//  map(0x1a, 0x1a).nopw(); //video/crt related
 	map(0xfe, 0xfe).w("crtc", FUNC(mc6845_device::address_w));
 	map(0xff, 0xff).w("crtc", FUNC(mc6845_device::register_w));
 }
@@ -571,7 +571,7 @@ void ssingles_state::ssingles(machine_config &config)
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
-	crtc.set_update_row_callback(FUNC(ssingles_state::ssingles_update_row), this);
+	crtc.set_update_row_callback(FUNC(ssingles_state::ssingles_update_row));
 	crtc.out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	/* sound hardware */
@@ -595,7 +595,7 @@ void ssingles_state::atamanot(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &ssingles_state::atamanot_io_map);
 
 	mc6845_device &crtc(*subdevice<mc6845_device>("crtc"));
-	crtc.set_update_row_callback(FUNC(ssingles_state::atamanot_update_row), this);
+	crtc.set_update_row_callback(FUNC(ssingles_state::atamanot_update_row));
 	crtc.out_vsync_callback().set(FUNC(ssingles_state::atamanot_irq));
 
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_atamanot);

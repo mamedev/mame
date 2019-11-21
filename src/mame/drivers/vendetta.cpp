@@ -173,7 +173,7 @@ void vendetta_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 		break;
 	default:
-		assert_always(false, "Unknown id in vendetta_state::device_timer");
+		throw emu_fatalerror("Unknown id in vendetta_state::device_timer");
 	}
 }
 
@@ -457,10 +457,10 @@ void vendetta_state::vendetta(machine_config &config)
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette(m_palette);
-	m_k052109->set_tile_callback(FUNC(vendetta_state::vendetta_tile_callback), this);
+	m_k052109->set_tile_callback(FUNC(vendetta_state::vendetta_tile_callback));
 
 	K053246(config, m_k053246, 0);
-	m_k053246->set_sprite_callback(FUNC(vendetta_state::sprite_callback), this);
+	m_k053246->set_sprite_callback(FUNC(vendetta_state::sprite_callback));
 	m_k053246->set_config(NORMAL_PLANE_ORDER, 53, 6);
 	m_k053246->set_palette(m_palette);
 
@@ -494,7 +494,7 @@ void vendetta_state::esckids(machine_config &config)
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette(m_palette);
-	m_k052109->set_tile_callback(FUNC(vendetta_state::esckids_tile_callback), this);
+	m_k052109->set_tile_callback(FUNC(vendetta_state::esckids_tile_callback));
 
 	m_k053246->set_config(NORMAL_PLANE_ORDER, 101, 6);
 

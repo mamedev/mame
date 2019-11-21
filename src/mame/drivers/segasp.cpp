@@ -206,12 +206,12 @@ void segasp_state::segasp_map(address_map &map)
 	/* External Device */
 	map(0x01000000, 0x0100ffff).ram(); // banked access to ROM/NET board address space, mainly backup SRAM and ATA
 	map(0x01010000, 0x01010007).rw(FUNC(segasp_state::sp_bank_r), FUNC(segasp_state::sp_bank_w));
-//  AM_RANGE(0x01010080, 0x01010087) IRQ pending/reset, ATA control
+//  map(0x01010080, 0x01010087) IRQ pending/reset, ATA control
 	map(0x01010100, 0x01010127).r(FUNC(segasp_state::sp_io_r));
 	map(0x01010128, 0x0101012f).rw(FUNC(segasp_state::sp_eeprom_r), FUNC(segasp_state::sp_eeprom_w));
 	map(0x01010150, 0x01010157).r(FUNC(segasp_state::sp_rombdflg_r));
-//  AM_RANGE(0x01010180, 0x010101af) custom UART 1
-//  AM_RANGE(0x010101c0, 0x010101ef) custom UART 2
+//  map(0x01010180, 0x010101af) custom UART 1
+//  map(0x010101c0, 0x010101ef) custom UART 2
 
 	/* Area 1 */
 	map(0x04000000, 0x04ffffff).mirror(0x02000000).ram().share("dc_texture_ram");      // texture memory 64 bit access
@@ -231,13 +231,13 @@ void segasp_state::segasp_map(address_map &map)
 	map(0x13000000, 0x13ffffff).w(m_powervr2, FUNC(powervr2_device::ta_texture_directpath1_w)); // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE1 register - cannot be written directly, only through dma / store queue)
 
 	/* Area 5 */
-	//AM_RANGE(0x14000000, 0x17ffffff) AM_NOP // MPX Ext.
+	//map(0x14000000, 0x17ffffff).noprw(); // MPX Ext.
 
 	/* Area 6 */
-	//AM_RANGE(0x18000000, 0x1bffffff) AM_NOP // Unassigned
+	//map(0x18000000, 0x1bffffff).noprw(); // Unassigned
 
 	/* Area 7 */
-	//AM_RANGE(0x1c000000, 0x1fffffff) AM_NOP // SH4 Internal
+	//map(0x1c000000, 0x1fffffff).noprw(); // SH4 Internal
 }
 
 void segasp_state::onchip_port(address_map &map)

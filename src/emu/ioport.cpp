@@ -106,6 +106,7 @@
 
 
 namespace {
+
 // temporary: set this to 1 to enable the originally defined behavior that
 // a field specified via PORT_MODIFY which intersects a previously-defined
 // field completely wipes out the previous definition
@@ -289,7 +290,7 @@ const struct
 	{ INPUT_STRING_None, "None" },
 };
 
-} // TODO: anonymous namespace
+} // anonymous namespace
 
 
 // XML attributes for the different types
@@ -597,6 +598,8 @@ ioport_field::ioport_field(ioport_port &port, ioport_type type, ioport_value def
 		m_flags(0),
 		m_impulse(0),
 		m_name(name),
+		m_read(port.device()),
+		m_write(port.device()),
 		m_write_param(0),
 		m_digital_value(false),
 		m_min(0),
@@ -608,6 +611,7 @@ ioport_field::ioport_field(ioport_port &port, ioport_type type, ioport_value def
 		m_crosshair_scale(1.0),
 		m_crosshair_offset(0),
 		m_crosshair_altaxis(0),
+		m_crosshair_mapper(port.device()),
 		m_full_turn_count(0),
 		m_remap_table(nullptr),
 		m_way(0)
@@ -869,20 +873,18 @@ void ioport_field::get_user_settings(user_settings &settings)
 	if (!m_settinglist.empty() || m_type == IPT_ADJUSTER)
 		settings.value = m_live->value;
 
-	// if there's analog data, extract the analog settings
 	if (m_live->analog != nullptr)
 	{
+		// if there's analog data, extract the analog settings
 		settings.sensitivity = m_live->analog->sensitivity();
 		settings.delta = m_live->analog->delta();
 		settings.centerdelta = m_live->analog->centerdelta();
 		settings.reverse = m_live->analog->reverse();
 	}
-
-	// non-analog settings
 	else
 	{
+		// non-analog settings
 		settings.toggle = m_live->toggle;
-		settings.autofire = m_live->autofire;
 	}
 }
 
@@ -908,20 +910,18 @@ void ioport_field::set_user_settings(const user_settings &settings)
 	if (!m_settinglist.empty() || m_type == IPT_ADJUSTER)
 		m_live->value = settings.value;
 
-	// if there's analog data, extract the analog settings
 	if (m_live->analog != nullptr)
 	{
+		// if there's analog data, extract the analog settings
 		m_live->analog->m_sensitivity = settings.sensitivity;
 		m_live->analog->m_delta = settings.delta;
 		m_live->analog->m_centerdelta = settings.centerdelta;
 		m_live->analog->m_reverse = settings.reverse;
 	}
-
-	// non-analog settings
 	else
 	{
+		// non-analog settings
 		m_live->toggle = settings.toggle;
-		m_live->autofire = settings.autofire;
 	}
 }
 
@@ -1098,19 +1098,6 @@ void ioport_field::frame_update(ioport_value &result)
 
 	// if the state changed, look for switch down/switch up
 	bool curstate = m_digital_value || machine().input().seq_pressed(seq());
-	if (m_live->autofire && !machine().ioport().get_autofire_toggle())
-	{
-		if (curstate)
-		{
-			if (m_live->autopressed > machine().ioport().get_autofire_delay())
-				m_live->autopressed = 0;
-			else if (m_live->autopressed > machine().ioport().get_autofire_delay() / 2)
-				curstate = false;
-			m_live->autopressed++;
-		}
-		else
-			m_live->autopressed = 0;
-	}
 	bool changed = false;
 	if (curstate != m_live->last)
 	{
@@ -1329,9 +1316,9 @@ void ioport_field::expand_diplocation(const char *location, std::string &errorbu
 void ioport_field::init_live_state(analog_field *analog)
 {
 	// resolve callbacks
-	m_read.bind_relative_to(device());
-	m_write.bind_relative_to(device());
-	m_crosshair_mapper.bind_relative_to(device());
+	m_read.resolve();
+	m_write.resolve();
+	m_crosshair_mapper.resolve();
 
 	// allocate live state
 	m_live = std::make_unique<ioport_field_live>(*this, analog);
@@ -1360,8 +1347,6 @@ ioport_field_live::ioport_field_live(ioport_field &field, analog_field *analog)
 		last(0),
 		toggle(field.toggle()),
 		joydir(digital_joystick::JOYDIR_COUNT),
-		autofire(false),
-		autopressed(0),
 		lockout(false)
 {
 	// fill in the basic values
@@ -1468,7 +1453,8 @@ ioport_field *ioport_port::field(ioport_value mask) const
 
 ioport_value ioport_port::read()
 {
-	assert_always(manager().safe_to_read(), "Input ports cannot be read at init time!");
+	if (!manager().safe_to_read())
+		throw emu_fatalerror("Input ports cannot be read at init time!");
 
 	// start with the digital state
 	ioport_value result = m_live->digital;
@@ -1676,9 +1662,7 @@ ioport_manager::ioport_manager(running_machine &machine)
 		m_playback_accumulated_frames(0),
 		m_timecode_file(machine.options().input_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS),
 		m_timecode_count(0),
-		m_timecode_last_time(attotime::zero),
-		m_autofire_toggle(false),
-		m_autofire_delay(3)                 // 1 seems too fast for a bunch of games
+		m_timecode_last_time(attotime::zero)
 {
 	memset(m_type_to_entry, 0, sizeof(m_type_to_entry));
 }
@@ -1705,7 +1689,7 @@ time_t ioport_manager::initialize()
 		std::string errors;
 		m_portlist.append(device, errors);
 		if (!errors.empty())
-			osd_printf_error("Input port errors:\n%s", errors.c_str());
+			osd_printf_error("Input port errors:\n%s", errors);
 	}
 
 	// renumber player numbers for controller ports
@@ -2027,7 +2011,7 @@ void ioport_manager::frame_update_callback()
 
 void ioport_manager::frame_update()
 {
-g_profiler.start(PROFILER_INPUT);
+	g_profiler.start(PROFILER_INPUT);
 
 	// record/playback information about the current frame
 	attotime curtime = machine().time();
@@ -2065,7 +2049,7 @@ g_profiler.start(PROFILER_INPUT);
 				dynfield.write(newvalue);
 	}
 
-g_profiler.stop();
+	g_profiler.stop();
 }
 
 
@@ -2149,7 +2133,7 @@ void ioport_manager::load_config(config_type cfg_type, util::xml::data_node cons
 			if (seqtype != -1 && seqnode->get_value() != nullptr)
 			{
 				if (strcmp(seqnode->get_value(), "NONE") == 0)
-					newseq[seqtype].set();
+					newseq[seqtype].reset();
 				else
 					machine().input().seq_from_tokens(newseq[seqtype], seqnode->get_value());
 			}
@@ -2557,12 +2541,12 @@ time_t ioport_manager::playback_init()
 	osd_printf_info("INP version %u.%u\n", header.get_majversion(), header.get_minversion());
 	time_t basetime = header.get_basetime();
 	osd_printf_info("Created %s\n", ctime(&basetime));
-	osd_printf_info("Recorded using %s\n", header.get_appdesc().c_str());
+	osd_printf_info("Recorded using %s\n", header.get_appdesc());
 
 	// verify the header against the current game
 	std::string const sysname = header.get_sysname();
 	if (sysname != machine().system().name)
-		osd_printf_info("Input file is for machine '%s', not for current machine '%s'\n", sysname.c_str(), machine().system().name);
+		osd_printf_info("Input file is for machine '%s', not for current machine '%s'\n", sysname, machine().system().name);
 
 	// enable compression
 	m_playback_file.compress(FCOMPRESS_MEDIUM);
@@ -2716,7 +2700,8 @@ void ioport_manager::record_init()
 
 	// open the record file
 	osd_file::error filerr = m_record_file.open(filename);
-	assert_always(filerr == osd_file::error::NONE, "Failed to open file for recording");
+	if (filerr != osd_file::error::NONE)
+		throw emu_fatalerror("ioport_manager::record_init: Failed to open file for recording");
 
 	// get the base time
 	system_time systime;
@@ -2738,15 +2723,18 @@ void ioport_manager::record_init()
 }
 
 
-void ioport_manager::timecode_init() {
+void ioport_manager::timecode_init()
+{
 	// check if option -record_timecode is enabled
-	if (!machine().options().record_timecode()) {
+	if (!machine().options().record_timecode())
+	{
 		machine().video().set_timecode_enabled(false);
 		return;
 	}
 	// if no file, nothing to do
 	const char *record_filename = machine().options().record();
-	if (record_filename[0] == 0) {
+	if (record_filename[0] == 0)
+	{
 		machine().video().set_timecode_enabled(false);
 		return;
 	}
@@ -2759,7 +2747,8 @@ void ioport_manager::timecode_init() {
 	osd_printf_info("Record input timecode file: %s\n", record_filename);
 
 	osd_file::error filerr = m_timecode_file.open(filename.c_str());
-	assert_always(filerr == osd_file::error::NONE, "Failed to open file for input timecode recording");
+	if (filerr != osd_file::error::NONE)
+		throw emu_fatalerror("ioport_manager::timecode_init: Failed to open file for input timecode recording");
 
 	m_timecode_file.puts(std::string("# ==========================================\n").c_str());
 	m_timecode_file.puts(std::string("# TIMECODE FILE FOR VIDEO PREVIEW GENERATION\n").c_str());
@@ -2901,15 +2890,15 @@ void ioport_manager::record_frame(const attotime &curtime)
 			timecode_key = string_format("EXTRA_STOP_%03d", (m_timecode_count-4)/2);
 		}
 
-		osd_printf_info("%s \n", message.c_str());
-		machine().popmessage("%s \n", message.c_str());
+		osd_printf_info("%s \n", message);
+		machine().popmessage("%s \n", message);
 
 		m_timecode_file.printf(
 				"%-19s %s %s %s %s %s %s\n",
-				timecode_key.c_str(),
-				current_time_str.c_str(), elapsed_time_str.c_str(),
-				mseconds_start_str.c_str(), mseconds_elapsed_str.c_str(),
-				frame_start_str.c_str(), frame_elapsed_str.c_str());
+				timecode_key,
+				current_time_str, elapsed_time_str,
+				mseconds_start_str, mseconds_elapsed_str,
+				frame_start_str, frame_elapsed_str);
 
 		machine().video().set_timecode_write(false);
 		machine().video().set_timecode_text(timecode_text);

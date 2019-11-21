@@ -65,7 +65,8 @@ FIX: PK Tetris have an input named AMUSE which I couldn't map.  Maybe it is
 TODO:
 
 - Sets cpoker & cpokert spit 660K of whatever they have in the hopper when keyout...
-- Check if the cpoker sets lock randomly due to protection.
+- Check if the cpoker sets still lock at some point due to protection.
+- Fix lamps to cpoker101.
 
 *****************************************************************************/
 
@@ -242,8 +243,8 @@ WRITE8_MEMBER(igspoker_state::fg_color_w)
 
 void igspoker_state::video_start()
 {
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(igspoker_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,   8,  8,  64, 32);
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(igspoker_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,   8,  32, 64, 8);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(igspoker_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS,   8,  8,  64, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(igspoker_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS,   8,  32, 64, 8);
 
 	m_fg_tilemap->set_transparent_pen(0);
 }
@@ -262,7 +263,7 @@ uint32_t igspoker_state::screen_update_igs_video(screen_device &screen, bitmap_i
 
 VIDEO_START_MEMBER(igspoker_state,cpokerpk)
 {
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(igspoker_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,   8,  8,  64, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(igspoker_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS,   8,  8,  64, 32);
 }
 
 uint32_t igspoker_state::screen_update_cpokerpk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -559,11 +560,11 @@ static INPUT_PORTS_START( cpoker )
 
 	PORT_START("BUTTONS2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME("Hold 1 / High / Low")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME("Hold 1 / Low / Black")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("Hold 5 / Bet")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) PORT_NAME("Hold 4 / Take")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_NAME("Hold 3 / W-Up")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) PORT_NAME("Hold 2 / Red / Black")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) PORT_NAME("Hold 2 / High / Red")
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -2141,7 +2142,7 @@ void igspoker_state::init_cpoker300us()
 	}
 }
 
-void igspoker_state::init_cpokert()  // same decryption as cpokert
+void igspoker_state::init_cpokert()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 	/* decrypt the program ROM */
@@ -2211,6 +2212,27 @@ void igspoker_state::init_cpoker101()  // same decryption as cpokert
 			rom[i] ^= 0x02;
 		}
 	}
+
+/*  Patch to avoid traps at $0ec5 (cpoker101),
+    $0ef0 (cpoker201f), $0f20 (cpoker210ks) and
+    $206e (cpoker101, cpoker201f & cpoker210ks),
+    that run subs in RAM, operate registers,
+    and finally lock the game at $732e (cpoker101),
+    $72c2 (cpoker201f) & $72c6 (cpoker210ks).
+
+    All these are triggered if RAM contents of $ff18
+    matches the $ff19 (normally 0x20 due to an AND
+    against the $ff1b contents)
+*/
+//      this NOP the $0ec5 call...
+		rom[0x214a] = 0x00;
+		rom[0x214b] = 0x00;
+		rom[0x214c] = 0x00;
+
+//      this NOP the conditional jump to $206e
+		rom[0x214d] = 0x00;
+		rom[0x214e] = 0x00;
+		rom[0x214f] = 0x00;
 }
 
 void igspoker_state::init_cska()
@@ -3003,10 +3025,10 @@ void igspoker_state::init_kungfu()
 GAMEL( 1993?,cpoker,      0,      igspoker, cpoker,   igspoker_state, init_cpoker,      ROT0, "IGS",                  "Champion Poker (v220I)",                       0, layout_igspoker )
 GAMEL( 1993?,cpokert,     cpoker, igspoker, cpoker,   igspoker_state, init_cpokert,     ROT0, "IGS (Tuning license)", "Champion Poker (v200G)",                       0, layout_igspoker )
 GAMEL( 1993, cpokerx,     cpoker, igspoker, cpokerx,  igspoker_state, init_cpokert,     ROT0, "IGS",                  "Champion Poker (v100)",                        0, layout_igspoker )
-GAMEL( 1993, cpoker101,   cpoker, igspoker, cpokerx,  igspoker_state, init_cpoker101,   ROT0, "IGS",                  "Champion Poker (v101)",                        MACHINE_NOT_WORKING, layout_igspoker ) // need to verify protection handling and inputs/outputs
-GAMEL( 1993, cpoker201f,  cpoker, igspoker, cpokerx,  igspoker_state, init_cpoker101,   ROT0, "IGS",                  "Champion Poker (v201F)",                       MACHINE_NOT_WORKING, layout_igspoker ) //                   "
-GAMEL( 1993, cpoker210ks, cpoker, igspoker, cpokerx,  igspoker_state, init_cpoker101,   ROT0, "IGS",                  "Champion Poker (v210KS)",                      MACHINE_NOT_WORKING, layout_igspoker ) //                   "
-GAMEL( 1993, cpoker300us, cpoker, igspoker, cpoker,   igspoker_state, init_cpoker300us, ROT0, "IGS",                  "Champion Poker (v300US)",                      MACHINE_NOT_WORKING, layout_igspoker ) //                   "
+GAMEL( 1993, cpoker101,   cpoker, igspoker, cpokerx,  igspoker_state, init_cpoker101,   ROT0, "IGS",                  "Champion Poker (v101)",                        0, layout_igspoker ) // need to fix lamps/layout
+GAMEL( 1993, cpoker201f,  cpoker, igspoker, cpoker,   igspoker_state, init_cpoker101,   ROT0, "IGS",                  "Champion Poker (v201F)",                       0, layout_igspoker )
+GAMEL( 1993, cpoker210ks, cpoker, igspoker, cpokerx,  igspoker_state, init_cpoker101,   ROT0, "IGS",                  "Champion Poker (v210KS)",                      MACHINE_NOT_WORKING, layout_igspoker ) // need to verify protection handling and inputs/outputs
+GAMEL( 1993, cpoker300us, cpoker, igspoker, cpoker,   igspoker_state, init_cpoker300us, ROT0, "IGS",                  "Champion Poker (v300US)",                      MACHINE_NOT_WORKING, layout_igspoker ) // need to verify protection handling and inputs/outputs
 
 GAMEL( 2000, chleague,    0,        igspoker, chleague, igspoker_state, init_chleague,  ROT0, "IGS",                  "Champion League (v220I, Poker)",               0, layout_igspoker )
 GAMEL( 2000, chleagul,    chleague, igspoker, chleague, igspoker_state, init_chleague,  ROT0, "IGS",                  "Champion League (v220I, Lattine)",             0, layout_igspoker )

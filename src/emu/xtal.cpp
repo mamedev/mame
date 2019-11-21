@@ -139,7 +139,7 @@ const double XTAL::known_xtals[] = {
 	  8'867'236, /* 8.867236_MHz_XTAL      RCA CDP1869 PAL color clock (~2x PAL subcarrier) */
 	  8'867'238, /* 8.867238_MHz_XTAL      ETI-660 (~2x PAL subcarrier) */
 	  8'945'000, /* 8.945_MHz_XTAL         Hit Me */
-	  9'216'000, /* 9.216_MHz_XTAL         Conitec PROF-180X */
+	  9'216'000, /* 9.216_MHz_XTAL         Univac UTS 20 */
 	  9'600'000, /* 9.6_MHz_XTAL           WD37C65 second clock (for 300 KB/sec rate) */
 	  9'828'000, /* 9.828_MHz_XTAL         Universal PCBs */
 	  9'830'400, /* 9.8304_MHz_XTAL        Epson PX-8 */
@@ -169,6 +169,7 @@ const double XTAL::known_xtals[] = {
 	 11'059'200, /* 11.0592_MHz_XTAL       Used with MCS-51 to generate common baud rates */
 	 11'200'000, /* 11.2_MHz_XTAL          New York, New York */
 	 11'289'000, /* 11.289_MHz_XTAL        Vanguard */
+	 11'289'600, /* 11.2896_MHz_XTAL       Frantic Fred */
 	 11'400'000, /* 11.4_MHz_XTAL          HP 9845 */
 	 11'668'800, /* 11.6688_MHz_XTAL       Gameplan pixel clock */
 	 11'800'000, /* 11.8_MHz_XTAL          IBM PC Music Feature Card */
@@ -243,6 +244,7 @@ const double XTAL::known_xtals[] = {
 	 16'934'400, /* 16.9344_MHz_XTAL       Usually used to drive 90's Yamaha OPL/FM chips (44100 * 384) */
 	 17'010'000, /* 17.01_MHz_XTAL         Epic 14E */
 	 17'064'000, /* 17.064_MHz_XTAL        Memorex 1377 */
+	 17'074'800, /* 17.0748_MHz_XTAL       SWTPC 8212 */
 	 17'350'000, /* 17.35_MHz_XTAL         ITT Courier 1700 */
 	 17'360'000, /* 17.36_MHz_XTAL         OMTI Series 10 SCSI controller */
 	 17'430'000, /* 17.43_MHz_XTAL         Videx Videoterm */
@@ -256,9 +258,11 @@ const double XTAL::known_xtals[] = {
 	 18'432'000, /* 18.432_MHz_XTAL        Extremely common, used on 100's of PCBs (48000 * 384) */
 	 18'480'000, /* 18.48_MHz_XTAL         Wyse WY-100 video */
 	 18'575'000, /* 18.575_MHz_XTAL        Visual 102, Visual 220 */
+	 18'600'000, /* 18.6_MHz_XTAL          Teleray Model 10 */
 	 18'720'000, /* 18.72_MHz_XTAL         Nokia MikroMikko 1 */
 	 18'867'000, /* 18.867_MHz_XTAL        Decision Data IS-482 */
 	 18'869'600, /* 18.8696_MHz_XTAL       Memorex 2178 */
+	 19'170'000, /* 19.17_MHz_XTAL         Ericsson ISA8 Monochrome HR Graphics Board */
 	 19'339'600, /* 19.3396_MHz_XTAL       TeleVideo TVI-955 80-column display clock */
 	 19'584'000, /* 19.584_MHz_XTAL        ADM-42 */
 	 19'600'000, /* 19.6_MHz_XTAL          Universal Mr. Do - Model 8021 PCB */
@@ -331,9 +335,11 @@ const double XTAL::known_xtals[] = {
 	 29'491'200, /* 29.4912_MHz_XTAL       Xerox Alto-II system clock (tagged 29.4MHz in the schematics) */
 	 30'000'000, /* 30_MHz_XTAL            Impera Magic Card */
 	 30'209'800, /* 30.2098_MHz_XTAL       Philips CD-i NTSC (1920x NTSC line rate) */
-	 30'476'100, /* 30.4761_MHz_XTAL       Taito JC */
+	 30'240'000, /* 30.24_MHz_XTAL         Macintosh IIci RBV, 12- or 13-inch display */
+	 30'476'180, /* 30.47618_MHz_XTAL      Taito F3, JC, Under Fire */
 	 30'800'000, /* 30.8_MHz_XTAL          15IE-00-013 */
 	 31'279'500, /* 31.2795_MHz_XTAL       Wyse WY-30+ */
+	 31'334'400, /* 31.3344_MHz_XTAL       Macintosh II */
 	 31'684'000, /* 31.684_MHz_XTAL        TeleVideo TVI-955 132-column display clock */
 	 31'948'800, /* 31.9488_MHz_XTAL       NEC PC-88xx, PC-98xx */
 	 32'000'000, /* 32_MHz_XTAL            - */
@@ -395,6 +401,7 @@ const double XTAL::known_xtals[] = {
 	 54'000'000, /* 54_MHz_XTAL            Taito JC */
 	 55'000'000, /* 55_MHz_XTAL            Eolith Vega */
 	 57'272'727, /* 57.272727_MHz_XTAL     Psikyo SH2 with /2 divider (16x NTSC subcarrier)*/
+	 57'283'200, /* 57.2832_MHz_XTAL       Macintosh IIci RBV, 15-inch portrait display */
 	 58'000'000, /* 58_MHz_XTAL            Magic Reel (Play System) */
 	 59'292'000, /* 59.292_MHz_XTAL        Data General D461 */
 	 60'000'000, /* 60_MHz_XTAL            ARM610 */
@@ -415,6 +422,7 @@ const double XTAL::known_xtals[] = {
 	 99'522'000, /* 99.522_MHz_XTAL        Radius Two Page Display */
 	100'000'000, /* 100_MHz_XTAL           PSX-based Namco System 12, Vegas, Sony ZN1-2-based */
 	101'491'200, /* 101.4912_MHz_XTAL      PSX-based Namco System 10 */
+	105'561'000, /* 105.561_MHz_XTAL       Sun cgsix */
 	108'108'000, /* 108.108_MHz_XTAL       HP 98550 high-res color card */
 	200'000'000  /* 200_MHz_XTAL           Base SH4 CPU (Naomi, Hikaru etc.) */
 };

@@ -233,9 +233,9 @@ void gottlieb_state::machine_start()
 	if (m_laserdisc != nullptr)
 	{
 		/* attach to the I/O ports */
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x05805, 0x05807, 0, 0x07f8, 0, read8_delegate(FUNC(gottlieb_state::laserdisc_status_r),this));
-		m_maincpu->space(AS_PROGRAM).install_write_handler(0x05805, 0x05805, 0, 0x07f8, 0, write8_delegate(FUNC(gottlieb_state::laserdisc_command_w),this));    /* command for the player */
-		m_maincpu->space(AS_PROGRAM).install_write_handler(0x05806, 0x05806, 0, 0x07f8, 0, write8_delegate(FUNC(gottlieb_state::laserdisc_select_w),this));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x05805, 0x05807, 0, 0x07f8, 0, read8_delegate(*this, FUNC(gottlieb_state::laserdisc_status_r)));
+		m_maincpu->space(AS_PROGRAM).install_write_handler(0x05805, 0x05805, 0, 0x07f8, 0, write8_delegate(*this, FUNC(gottlieb_state::laserdisc_command_w)));    /* command for the player */
+		m_maincpu->space(AS_PROGRAM).install_write_handler(0x05806, 0x05806, 0, 0x07f8, 0, write8_delegate(*this, FUNC(gottlieb_state::laserdisc_select_w)));
 
 		/* allocate a timer for serial transmission, and one for philips code processing */
 		m_laserdisc_bit_timer = timer_alloc(TIMER_LASERDISC_BIT);
@@ -707,7 +707,7 @@ void gottlieb_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		nmi_clear(ptr, param);
 		break;
 	default:
-		assert_always(false, "Unknown id in gottlieb_state::device_timer");
+		throw emu_fatalerror("Unknown id in gottlieb_state::device_timer");
 	}
 }
 
@@ -757,7 +757,7 @@ void gottlieb_state::reactor_map(address_map &map)
 	map(0x2000, 0x20ff).mirror(0x0f00).writeonly().share("spriteram");                           /* FRSEL */
 	map(0x3000, 0x33ff).mirror(0x0c00).ram().w(FUNC(gottlieb_state::videoram_w)).share("videoram");       /* BRSEL */
 	map(0x4000, 0x4fff).ram().w(FUNC(gottlieb_state::charram_w)).share("charram");               /* BOJRSEL1 */
-/*  AM_RANGE(0x5000, 0x5fff) AM_WRITE() */                                                               /* BOJRSEL2 */
+//  map(0x5000, 0x5fff).w(FUNC(gottlieb_state::));                                                   /* BOJRSEL2 */
 	map(0x6000, 0x601f).mirror(0x0fe0).w(FUNC(gottlieb_state::palette_w)).share("paletteram");       /* COLSEL */
 	map(0x7000, 0x7000).mirror(0x0ff8).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x7001, 0x7001).mirror(0x0ff8).w(FUNC(gottlieb_state::analog_reset_w));                        /* A1J2 interface */
@@ -786,7 +786,7 @@ void gottlieb_state::gottlieb_map(address_map &map)
 	map(0x5801, 0x5801).mirror(0x07f8).w(FUNC(gottlieb_state::analog_reset_w));                        /* A1J2 interface */
 	map(0x5802, 0x5802).mirror(0x07f8).w(FUNC(gottlieb_state::sound_w));                                  /* OP20-27 */
 	map(0x5803, 0x5803).mirror(0x07f8).w(FUNC(gottlieb_state::general_output_w));                               /* OP30-37 */
-/*  AM_RANGE(0x5804, 0x5804) AM_MIRROR(0x07f8) AM_WRITE()*/                                              /* OP40-47 */
+//  map(0x5804, 0x5804).mirror(0x07f8).w(FUNC(gottlieb_state::));                                            /* OP40-47 */
 	map(0x5800, 0x5800).mirror(0x07f8).portr("DSW");
 	map(0x5801, 0x5801).mirror(0x07f8).portr("IN1");                                      /* IP10-17 */
 	map(0x5802, 0x5802).mirror(0x07f8).portr("IN2");                                      /* trackball H */
@@ -1797,7 +1797,7 @@ void gottlieb_state::g2laser(machine_config &config)
 	GOTTLIEB_SOUND_REV2(config, m_r2_sound, 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
 
 	PIONEER_PR8210(config, m_laserdisc, 0);
-	m_laserdisc->set_audio(FUNC(gottlieb_state::laserdisc_audio_process), this);
+	m_laserdisc->set_audio(FUNC(gottlieb_state::laserdisc_audio_process));
 	m_laserdisc->set_overlay(GOTTLIEB_VIDEO_HCOUNT, GOTTLIEB_VIDEO_VCOUNT, FUNC(gottlieb_state::screen_update));
 	m_laserdisc->set_overlay_clip(0, GOTTLIEB_VIDEO_HBLANK-1, 0, GOTTLIEB_VIDEO_VBLANK-8);
 	m_laserdisc->add_route(0, "speaker", 1.0);
@@ -1862,7 +1862,7 @@ void gottlieb_state::cobram3(machine_config &config)
 	m_r2_sound->enable_cobram3_mods();
 
 	PIONEER_PR8210(config, m_laserdisc, 0);
-	m_laserdisc->set_audio(FUNC(gottlieb_state::laserdisc_audio_process), this);
+	m_laserdisc->set_audio(FUNC(gottlieb_state::laserdisc_audio_process));
 	m_laserdisc->set_overlay(GOTTLIEB_VIDEO_HCOUNT, GOTTLIEB_VIDEO_VCOUNT, FUNC(gottlieb_state::screen_update));
 	m_laserdisc->set_overlay_clip(0, GOTTLIEB_VIDEO_HBLANK-1, 0, GOTTLIEB_VIDEO_VBLANK-8);
 	m_laserdisc->add_route(0, "speaker", 1.0);
@@ -2599,21 +2599,21 @@ void gottlieb_state::init_romtiles()
 void gottlieb_state::init_qbert()
 {
 	init_romtiles();
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x5803, 0x5803, 0, 0x07f8, 0, write8_delegate(FUNC(gottlieb_state::qbert_output_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x5803, 0x5803, 0, 0x07f8, 0, write8_delegate(*this, FUNC(gottlieb_state::qbert_output_w)));
 }
 
 
 void gottlieb_state::init_qbertqub()
 {
 	init_romtiles();
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x5803, 0x5803, 0, 0x07f8, 0, write8_delegate(FUNC(gottlieb_state::qbertqub_output_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x5803, 0x5803, 0, 0x07f8, 0, write8_delegate(*this, FUNC(gottlieb_state::qbertqub_output_w)));
 }
 
 
 void gottlieb_state::init_stooges()
 {
 	init_ramtiles();
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x5803, 0x5803, 0, 0x07f8, 0, write8_delegate(FUNC(gottlieb_state::stooges_output_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x5803, 0x5803, 0, 0x07f8, 0, write8_delegate(*this, FUNC(gottlieb_state::stooges_output_w)));
 }
 
 

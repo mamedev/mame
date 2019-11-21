@@ -237,7 +237,7 @@ WRITE8_MEMBER(p1_state::p1_ppi2_porta_w)
 		else
 		{
 			program.install_read_bank(0xb8000, 0xbbfff, "bank11");
-			program.install_write_handler(0xb8000, 0xbbfff, WRITE8_DELEGATE(p1_state, p1_vram_w));
+			program.install_write_handler(0xb8000, 0xbbfff, write8_delegate(*this, FUNC(p1_state::p1_vram_w)));
 		}
 	}
 	// DISPLAY BANK
@@ -624,7 +624,7 @@ void p1_state::poisk1_io(address_map &map)
 	map(0x0020, 0x0021).rw(m_pic8259, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x0028, 0x002B).rw(FUNC(p1_state::p1_trap_r), FUNC(p1_state::p1_trap_w));
 	map(0x0040, 0x0043).rw(m_pit8253, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
-	// can't use regular AM_DEVREADWRITE, because THIS IS SPARTA!
+	// can't use regular rw(), because THIS IS SPARTA!
 	// 1st PPI occupies ports 60, 69, 6A and 6B; 2nd PPI -- 68, 61, 62 and 63.
 	map(0x0060, 0x006F).rw(FUNC(p1_state::p1_ppi_r), FUNC(p1_state::p1_ppi_w));
 	map(0x03D0, 0x03DF).rw(FUNC(p1_state::p1_cga_r), FUNC(p1_state::p1_cga_w));
@@ -701,7 +701,7 @@ void p1_state::poisk1(machine_config &config)
 }
 
 ROM_START( poisk1 )
-	ROM_REGION16_LE(0x10000,"bios", 0)
+	ROM_REGION(0x10000, "bios", 0)
 
 	ROM_DEFAULT_BIOS("v91")
 	ROM_SYSTEM_BIOS(0, "v89r0", "1989r0")

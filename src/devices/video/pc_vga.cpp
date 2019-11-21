@@ -134,6 +134,7 @@ vga_device::vga_device(const machine_config &mconfig, device_type type, const ch
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, device_palette_interface(mconfig, *this)
+	, vga(*this)
 {
 }
 
@@ -252,7 +253,7 @@ void vga_device::device_start()
 
 
 	// copy over interfaces
-	vga.read_dipswitch = read8_delegate(); //read_dipswitch;
+	vga.read_dipswitch.set(nullptr); //read_dipswitch;
 	vga.svga_intf.seq_regcount = 0x05;
 	vga.svga_intf.crtc_regcount = 0x19;
 	vga.svga_intf.vram_size = 0x100000;

@@ -106,7 +106,7 @@ public:
 		, m_user_pia(*this, "user_pia")
 		, m_display(*this, "display")
 		, m_brg(*this, "brg")
-		, m_baud_rate(*this, "baud_rate")
+		, m_baud_rate(*this, "BAUD_RATE")
 		, m_acia(*this, "acia")
 		, m_cass(*this, "cassette")
 		, m_keypad_columns(*this, "COL%u", 0)
@@ -223,14 +223,14 @@ static INPUT_PORTS_START(mekd5)
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, mekd5_state, keypad_changed, 0) PORT_NAME("D") PORT_CODE(KEYCODE_D)
 
 	/* RS232 baud rates available via J5. */
-	PORT_START("baud_rate")
+	PORT_START("BAUD_RATE")
 	PORT_CONFNAME(0x3f, 1, "RS232 Baud Rate")
-	PORT_CONFSETTING(0x01, "9600")
-	PORT_CONFSETTING(0x02, "4800")
-	PORT_CONFSETTING(0x04, "2400")
-	PORT_CONFSETTING(0x08, "1200")
-	PORT_CONFSETTING(0x10, "300")
 	PORT_CONFSETTING(0x20, "110")
+	PORT_CONFSETTING(0x10, "300")
+	PORT_CONFSETTING(0x08, "1200")
+	PORT_CONFSETTING(0x04, "2400")
+	PORT_CONFSETTING(0x02, "4800")
+	PORT_CONFSETTING(0x01, "9600")
 
 INPUT_PORTS_END
 
@@ -253,7 +253,7 @@ void mekd5_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 		m_kpd_pia->cb2_w(0);
 		break;
 	default:
-		assert_always(false, "Unknown id in mekd5_state::device_timer");
+		throw emu_fatalerror("Unknown id in mekd5_state::device_timer");
 	}
 }
 
@@ -423,6 +423,8 @@ void mekd5_state::init_mekd5()
 
 void mekd5_state::machine_start()
 {
+	save_item(NAME(m_segment));
+	save_item(NAME(m_digit));
 }
 
 void mekd5_state::machine_reset()

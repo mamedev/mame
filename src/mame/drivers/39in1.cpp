@@ -198,7 +198,7 @@ READ32_MEMBER(_39in1_state::prot_cheater_r)
 void _39in1_state::driver_init()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.install_read_handler (0xa0151648, 0xa015164b, read32_delegate(FUNC(_39in1_state::prot_cheater_r), this));
+	space.install_read_handler (0xa0151648, 0xa015164b, read32_delegate(*this, FUNC(_39in1_state::prot_cheater_r)));
 }
 
 void _39in1_state::_39in1_map(address_map &map)

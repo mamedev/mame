@@ -213,6 +213,7 @@ gp9001vdp_device::gp9001vdp_device(const machine_config &mconfig, const char *ta
 	, m_space_config("gp9001vdp", ENDIANNESS_BIG, 16, 14, 0, address_map_constructor(FUNC(gp9001vdp_device::map), this))
 	, m_vram(*this, "vram_%u", 0)
 	, m_spriteram(*this, "spriteram")
+	, m_gp9001_cb(*this)
 	, m_vint_out_cb(*this)
 {
 }
@@ -258,9 +259,9 @@ void gp9001vdp_device::device_add_mconfig(machine_config &config)
 
 void gp9001vdp_device::create_tilemaps()
 {
-	m_tm[2].tmap = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(gp9001vdp_device::get_tile_info<2>),this),TILEMAP_SCAN_ROWS,16,16,32,32);
-	m_tm[1].tmap = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(gp9001vdp_device::get_tile_info<1>),this),TILEMAP_SCAN_ROWS,16,16,32,32);
-	m_tm[0].tmap = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(gp9001vdp_device::get_tile_info<0>),this),TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_tm[2].tmap = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(gp9001vdp_device::get_tile_info<2>)), TILEMAP_SCAN_ROWS, 16,16,32,32);
+	m_tm[1].tmap = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(gp9001vdp_device::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 16,16,32,32);
+	m_tm[0].tmap = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(gp9001vdp_device::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 16,16,32,32);
 
 	m_tm[2].tmap->set_transparent_pen(0);
 	m_tm[1].tmap->set_transparent_pen(0);
@@ -272,7 +273,7 @@ void gp9001vdp_device::device_start()
 {
 	create_tilemaps();
 
-	m_gp9001_cb.bind_relative_to(*owner());
+	m_gp9001_cb.resolve();
 	m_vint_out_cb.resolve();
 
 	m_raise_irq_timer = timer_alloc(TIMER_RAISE_IRQ);
@@ -883,6 +884,6 @@ void gp9001vdp_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 		m_vint_out_cb(1);
 		break;
 	default:
-		assert_always(false, "Unknown id in gp9001vdp_device::device_timer");
+		throw emu_fatalerror("Unknown id in gp9001vdp_device::device_timer");
 	}
 }

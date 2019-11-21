@@ -212,7 +212,7 @@ WRITE8_MEMBER(cmmb_state::cmmb_output_w)
 void cmmb_state::cmmb_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram(); /* zero page address */
-//  AM_RANGE(0x13c0, 0x13ff) AM_RAM //spriteram
+//  map(0x13c0, 0x13ff).ram(); //spriteram
 	map(0x1000, 0x1fff).ram().share("videoram");
 	map(0x2000, 0x9fff).m(m_bnk2000, FUNC(address_map_bank_device::amap8));
 	map(0xa000, 0xafff).ram();

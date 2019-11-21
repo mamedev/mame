@@ -63,7 +63,7 @@ DEFINE_DEVICE_TYPE(APPLE2_GAMEIO, apple2_gameio_device, "a2gameio", "Apple II Ga
 
 apple2_gameio_device::apple2_gameio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, APPLE2_GAMEIO, tag, owner, clock)
-	, device_slot_interface(mconfig, *this)
+	, device_single_card_slot_interface<device_a2gameio_interface>(mconfig, *this)
 	, m_intf(nullptr)
 {
 }
@@ -83,12 +83,12 @@ void apple2_gameio_device::default_options(device_slot_interface &slot)
 
 void apple2_gameio_device::device_config_complete()
 {
-	m_intf = dynamic_cast<device_a2gameio_interface *>(get_card_device());
+	m_intf = get_card_device();
 }
 
 void apple2_gameio_device::device_resolve_objects()
 {
-	if (m_intf != nullptr)
+	if (m_intf)
 		m_intf->m_connector = this;
 }
 
@@ -207,7 +207,7 @@ WRITE_LINE_MEMBER(apple2_gameio_device::strobe_w)
 //**************************************************************************
 
 device_a2gameio_interface::device_a2gameio_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device)
+	: device_interface(device, "a2gameio")
 	, m_connector(nullptr)
 {
 }

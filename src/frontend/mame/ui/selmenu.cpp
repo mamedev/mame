@@ -63,7 +63,8 @@ enum
 	SCORES_VIEW,
 	SELECT_VIEW,
 	MARQUEES_VIEW,
-	LAST_VIEW = MARQUEES_VIEW
+	COVERS_VIEW,
+	LAST_VIEW = COVERS_VIEW
 };
 
 std::pair<char const *, char const *> const arts_info[] =
@@ -714,36 +715,39 @@ void menu_select_launch::custom_render(void *selectedref, float top, float botto
 }
 
 
-void menu_select_launch::inkey_navigation()
+void menu_select_launch::rotate_focus(int dir)
 {
 	switch (get_focus())
 	{
 	case focused_menu::MAIN:
-		if (selected_index() <= visible_items)
+		if (selected_index() <= m_available_items)
 		{
 			m_prev_selected = get_selection_ref();
-			set_selected_index(visible_items + 1);
+			if ((0 < dir) || (ui_globals::panels_status == HIDE_BOTH))
+				set_selected_index(m_available_items + 1);
+			else if (ui_globals::panels_status == HIDE_RIGHT_PANEL)
+				set_focus(focused_menu::LEFT);
+			else
+				set_focus(focused_menu::RIGHTBOTTOM);
 		}
 		else
 		{
-			if (ui_globals::panels_status != HIDE_LEFT_PANEL)
-				set_focus(focused_menu::LEFT);
-
-			else if (ui_globals::panels_status == HIDE_BOTH)
-			{
-				for (int x = 0; x < item_count(); ++x)
-					if (item(x).ref == m_prev_selected)
-						set_selected_index(x);
-			}
-			else
-			{
+			if ((0 > dir) || (ui_globals::panels_status == HIDE_BOTH))
+				select_prev();
+			else if (ui_globals::panels_status == HIDE_LEFT_PANEL)
 				set_focus(focused_menu::RIGHTTOP);
-			}
+			else
+				set_focus(focused_menu::LEFT);
 		}
 		break;
 
 	case focused_menu::LEFT:
-		if (ui_globals::panels_status != HIDE_RIGHT_PANEL)
+		if (0 > dir)
+		{
+			set_focus(focused_menu::MAIN);
+			set_selected_index(m_available_items + 1);
+		}
+		else if (ui_globals::panels_status != HIDE_RIGHT_PANEL)
 		{
 			set_focus(focused_menu::RIGHTTOP);
 		}
@@ -755,12 +759,31 @@ void menu_select_launch::inkey_navigation()
 		break;
 
 	case focused_menu::RIGHTTOP:
-		set_focus(focused_menu::RIGHTBOTTOM);
+		if (0 < dir)
+		{
+			set_focus(focused_menu::RIGHTBOTTOM);
+		}
+		else if (ui_globals::panels_status != HIDE_LEFT_PANEL)
+		{
+			set_focus(focused_menu::LEFT);
+		}
+		else
+		{
+			set_focus(focused_menu::MAIN);
+			set_selected_index(m_available_items + 1);
+		}
 		break;
 
 	case focused_menu::RIGHTBOTTOM:
-		set_focus(focused_menu::MAIN);
-		select_prev();
+		if (0 > dir)
+		{
+			set_focus(focused_menu::RIGHTTOP);
+		}
+		else
+		{
+			set_focus(focused_menu::MAIN);
+			select_prev();
+		}
 		break;
 	}
 }
@@ -1013,7 +1036,7 @@ void menu_select_launch::check_for_icons(char const *listname)
 				current.append(PATH_SEPARATOR);
 			current.append(listname);
 		}
-		osd_printf_verbose("Checking for icons in directory %s\n", current.c_str());
+		osd_printf_verbose("Checking for icons in directory %s\n", current);
 
 		// open and walk the directory
 		osd::directory::ptr const dir(osd::directory::open(current));
@@ -1382,7 +1405,7 @@ void menu_select_launch::handle_keys(uint32_t flags, int &iptkey)
 			m_topline_datsview--;
 			return;
 		}
-		else if (selected_index() == visible_items + 1 || is_first_selected() || m_ui_error)
+		else if (selected_index() == m_available_items + 1 || is_first_selected() || m_ui_error)
 		{
 			return;
 		}
@@ -1405,7 +1428,7 @@ void menu_select_launch::handle_keys(uint32_t flags, int &iptkey)
 			m_topline_datsview++;
 			return;
 		}
-		else if (is_last_selected() || selected_index() == visible_items - 1 || m_ui_error)
+		else if (is_last_selected() || selected_index() == m_available_items - 1 || m_ui_error)
 		{
 			return;
 		}
@@ -1425,11 +1448,11 @@ void menu_select_launch::handle_keys(uint32_t flags, int &iptkey)
 			return;
 		}
 
-		if (selected_index() < visible_items && !m_ui_error)
+		if (selected_index() < m_available_items && !m_ui_error)
 		{
 			set_selected_index(std::max(selected_index() - m_visible_items, 0));
 
-			top_line -= m_visible_items - (top_line + m_visible_lines == visible_items);
+			top_line -= m_visible_items - (top_line + m_visible_lines == m_available_items);
 		}
 	}
 
@@ -1443,9 +1466,9 @@ void menu_select_launch::handle_keys(uint32_t flags, int &iptkey)
 			return;
 		}
 
-		if (selected_index() < visible_items && !m_ui_error)
+		if (selected_index() < m_available_items && !m_ui_error)
 		{
-			set_selected_index(std::min(selected_index() + m_visible_lines - 2 + (selected_index() == 0), visible_items - 1));
+			set_selected_index(std::min(selected_index() + m_visible_lines - 2 + (selected_index() == 0), m_available_items - 1));
 
 			top_line += m_visible_lines - 2;
 		}
@@ -1464,7 +1487,7 @@ void menu_select_launch::handle_keys(uint32_t flags, int &iptkey)
 			return;
 		}
 
-		if (selected_index() < visible_items && !m_ui_error)
+		if (selected_index() < m_available_items && !m_ui_error)
 			select_first_item();
 	}
 
@@ -1481,8 +1504,22 @@ void menu_select_launch::handle_keys(uint32_t flags, int &iptkey)
 			return;
 		}
 
-		if (selected_index() < visible_items && !m_ui_error)
-			set_selected_index(top_line = visible_items - 1);
+		if (selected_index() < m_available_items && !m_ui_error)
+			set_selected_index(top_line = m_available_items - 1);
+	}
+
+	// focus next rotates throw targets forward
+	if (exclusive_input_pressed(iptkey, IPT_UI_FOCUS_NEXT, 12))
+	{
+		if (!m_ui_error)
+			rotate_focus(1);
+	}
+
+	// focus next rotates throw targets forward
+	if (exclusive_input_pressed(iptkey, IPT_UI_FOCUS_PREV, 12))
+	{
+		if (!m_ui_error)
+			rotate_focus(-1);
 	}
 
 	// pause enables/disables pause
@@ -1503,8 +1540,27 @@ void menu_select_launch::handle_keys(uint32_t flags, int &iptkey)
 	{
 		for (int code = IPT_UI_FIRST + 1; code < IPT_UI_LAST; code++)
 		{
-			if (m_ui_error || code == IPT_UI_CONFIGURE || (code == IPT_UI_LEFT && ignoreleft) || (code == IPT_UI_RIGHT && ignoreright) || (code == IPT_UI_PAUSE && ignorepause))
+			if (m_ui_error)
 				continue;
+
+			switch (code)
+			{
+			case IPT_UI_FOCUS_NEXT:
+			case IPT_UI_FOCUS_PREV:
+				continue;
+			case IPT_UI_LEFT:
+				if (ignoreleft)
+					continue;
+				break;
+			case IPT_UI_RIGHT:
+				if (ignoreright)
+					continue;
+				break;
+			case IPT_UI_PAUSE:
+				if (ignorepause)
+					continue;
+				break;
+			}
 
 			if (exclusive_input_pressed(iptkey, code, 0))
 				break;
@@ -1554,7 +1610,7 @@ void menu_select_launch::handle_events(uint32_t flags, event &ev)
 			{
 				if (hover() >= 0 && hover() < item_count())
 				{
-					if (hover() >= visible_items - 1 && selected_index() < visible_items)
+					if (hover() >= m_available_items - 1 && selected_index() < m_available_items)
 						m_prev_selected = get_selection_ref();
 					set_selected_index(hover());
 					m_focus = focused_menu::MAIN;
@@ -1562,12 +1618,12 @@ void menu_select_launch::handle_events(uint32_t flags, event &ev)
 				else if (hover() == HOVER_ARROW_UP)
 				{
 					set_selected_index(std::max(selected_index() - m_visible_items, 0));
-					top_line -= m_visible_items - (top_line + m_visible_lines == visible_items);
+					top_line -= m_visible_items - (top_line + m_visible_lines == m_available_items);
 					set_pressed();
 				}
 				else if (hover() == HOVER_ARROW_DOWN)
 				{
-					set_selected_index(std::min(selected_index() + m_visible_lines - 2 + (selected_index() == 0), visible_items - 1));
+					set_selected_index(std::min(selected_index() + m_visible_lines - 2 + (selected_index() == 0), m_available_items - 1));
 					top_line += m_visible_lines - 2;
 					set_pressed();
 				}
@@ -1581,6 +1637,12 @@ void menu_select_launch::handle_events(uint32_t flags, event &ev)
 					m_topline_datsview -= m_right_visible_lines - 1;
 				else if (hover() == HOVER_LPANEL_ARROW)
 				{
+					if (get_focus() == focused_menu::LEFT)
+					{
+						set_focus(focused_menu::MAIN);
+						select_prev();
+					}
+
 					if (ui_globals::panels_status == HIDE_LEFT_PANEL)
 						ui_globals::panels_status = SHOW_PANELS;
 					else if (ui_globals::panels_status == HIDE_BOTH)
@@ -1592,6 +1654,12 @@ void menu_select_launch::handle_events(uint32_t flags, event &ev)
 				}
 				else if (hover() == HOVER_RPANEL_ARROW)
 				{
+					if ((get_focus() == focused_menu::RIGHTTOP) || (get_focus() == focused_menu::RIGHTBOTTOM))
+					{
+						set_focus(focused_menu::MAIN);
+						select_prev();
+					}
+
 					if (ui_globals::panels_status == HIDE_RIGHT_PANEL)
 						ui_globals::panels_status = SHOW_PANELS;
 					else if (ui_globals::panels_status == HIDE_BOTH)
@@ -1653,7 +1721,7 @@ void menu_select_launch::handle_events(uint32_t flags, event &ev)
 			{
 				if (local_menu_event.zdelta > 0)
 				{
-					if (selected_index() >= visible_items || is_first_selected() || m_ui_error)
+					if (selected_index() >= m_available_items || is_first_selected() || m_ui_error)
 						break;
 					set_selected_index(selected_index() - local_menu_event.num_lines);
 					if (selected_index() < top_line + (top_line != 0))
@@ -1661,9 +1729,9 @@ void menu_select_launch::handle_events(uint32_t flags, event &ev)
 				}
 				else
 				{
-					if (selected_index() >= visible_items - 1 || m_ui_error)
+					if (selected_index() >= m_available_items - 1 || m_ui_error)
 						break;
-					set_selected_index(std::min(selected_index() + local_menu_event.num_lines, visible_items - 1));
+					set_selected_index(std::min(selected_index() + local_menu_event.num_lines, m_available_items - 1));
 					if (selected_index() >= top_line + m_visible_items + (top_line != 0))
 						top_line += local_menu_event.num_lines;
 				}
@@ -1679,9 +1747,8 @@ void menu_select_launch::handle_events(uint32_t flags, event &ev)
 
 		// translate CHAR events into specials
 		case ui_event::IME_CHAR:
-			if (exclusive_input_pressed(ev.iptkey, IPT_UI_CONFIGURE, 0))
+			if (exclusive_input_pressed(ev.iptkey, IPT_UI_FOCUS_NEXT, 0) || exclusive_input_pressed(ev.iptkey, IPT_UI_FOCUS_PREV, 0))
 			{
-				ev.iptkey = IPT_UI_CONFIGURE;
 				stop = true;
 			}
 			else if (m_ui_error)
@@ -1759,7 +1826,7 @@ void menu_select_launch::draw(uint32_t flags)
 	draw_background();
 
 	clear_hover();
-	visible_items = (m_is_swlist) ? item_count() - 2 : item_count() - 2 - skip_main_items;
+	m_available_items = (m_is_swlist) ? item_count() - 2 : item_count() - 2 - skip_main_items;
 	float extra_height = (m_is_swlist) ? 2.0f * line_height : (2.0f + skip_main_items) * line_height;
 	float visible_extra_menu_height = get_customtop() + get_custombottom() + extra_height;
 
@@ -1802,21 +1869,21 @@ void menu_select_launch::draw(uint32_t flags)
 	float line = visible_top + (float(m_visible_lines) * line_height);
 	ui().draw_outlined_box(container(), x1, y1, x2, y2, ui().colors().background_color());
 
-	if (visible_items < m_visible_lines)
-		m_visible_lines = visible_items;
+	if (m_available_items < m_visible_lines)
+		m_visible_lines = m_available_items;
 	if (top_line < 0 || is_first_selected())
 		top_line = 0;
-	if (selected_index() < visible_items && top_line + m_visible_lines >= visible_items)
-		top_line = visible_items - m_visible_lines;
+	if (selected_index() < m_available_items && top_line + m_visible_lines >= m_available_items)
+		top_line = m_available_items - m_visible_lines;
 
 	// determine effective positions taking into account the hilighting arrows
 	float effective_width = visible_width - 2.0f * gutter_width;
 	float effective_left = visible_left + gutter_width;
 
-	if ((m_focus == focused_menu::MAIN) && (selected_index() < visible_items))
+	if ((m_focus == focused_menu::MAIN) && (selected_index() < m_available_items))
 		m_prev_selected = nullptr;
 
-	int const n_loop = (std::min)(m_visible_lines, visible_items);
+	int const n_loop = (std::min)(m_visible_lines, m_available_items);
 	for (int linenum = 0; linenum < n_loop; linenum++)
 	{
 		float line_y = visible_top + (float)linenum * line_height;
@@ -1871,7 +1938,7 @@ void menu_select_launch::draw(uint32_t flags)
 			if (hover() == itemnum)
 				set_hover(HOVER_ARROW_UP);
 		}
-		else if (linenum == m_visible_lines - 1 && itemnum != visible_items - 1)
+		else if (linenum == m_visible_lines - 1 && itemnum != m_available_items - 1)
 		{
 			// if we're on the bottom line, display the down arrow
 			draw_arrow(0.5f * (x1 + x2) - 0.5f * ud_arrow_width, line_y + 0.25f * line_height,
@@ -1938,7 +2005,7 @@ void menu_select_launch::draw(uint32_t flags)
 		}
 	}
 
-	for (size_t count = visible_items; count < item_count(); count++)
+	for (size_t count = m_available_items; count < item_count(); count++)
 	{
 		const menu_item &pitem = item(count);
 		const char *itemtext = pitem.text.c_str();
@@ -1993,7 +2060,7 @@ void menu_select_launch::draw(uint32_t flags)
 	custom_render(get_selection_ref(), get_customtop(), get_custombottom(), x1, y1, x2, y2);
 
 	// return the number of visible lines, minus 1 for top arrow and 1 for bottom arrow
-	m_visible_items = m_visible_lines - (top_line != 0) - (top_line + m_visible_lines != visible_items);
+	m_visible_items = m_visible_lines - (top_line != 0) - (top_line + m_visible_lines != m_available_items);
 
 	// noinput
 	if (noinput)

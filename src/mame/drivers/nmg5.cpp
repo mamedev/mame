@@ -861,8 +861,8 @@ TILE_GET_INFO_MEMBER(nmg5_state::get_tile_info){ SET_TILE_INFO_MEMBER(0, m_vram[
 
 void nmg5_state::video_start()
 {
-	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nmg5_state::get_tile_info<0>),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nmg5_state::get_tile_info<1>),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(nmg5_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(nmg5_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	m_tilemap[1]->set_transparent_pen(0);
 
 	m_pixmap = std::make_unique<bitmap_ind16>(512, 256);

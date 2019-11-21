@@ -152,8 +152,6 @@ public:
 	void ibm6580(machine_config &config);
 
 private:
-	void ibm6580_palette(palette_device &palette) const;
-
 	DECLARE_WRITE16_MEMBER(pic_latch_w);
 	DECLARE_WRITE16_MEMBER(unk_latch_w);
 
@@ -823,13 +821,6 @@ uint32_t ibm6580_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 }
 
 
-void ibm6580_state::ibm6580_palette(palette_device &palette) const
-{
-	palette.set_pen_color(0, 0, 0, 0 );     // Black
-	palette.set_pen_color(1, 0, 192, 0 );   // Normal
-	palette.set_pen_color(2, 0, 255, 0 );   // Bright
-}
-
 void ibm6580_state::machine_start()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
@@ -879,7 +870,7 @@ void ibm6580_state::ibm6580(machine_config &config)
 
 	RAM(config, RAM_TAG).set_default_size("128K").set_extra_options("160K,192K,224K,256K,320K,384K");
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER, rgb_t::green());
 	m_screen->set_raw(25_MHz_XTAL / 2, 833, 0, 640, 428, 0, 400);
 	m_screen->set_screen_update(FUNC(ibm6580_state::screen_update));
 	m_screen->set_palette("palette");
@@ -887,7 +878,7 @@ void ibm6580_state::ibm6580(machine_config &config)
 
 	config.set_default_layout(layout_ibm6580);
 
-	PALETTE(config, "palette", FUNC(ibm6580_state::ibm6580_palette), 3);
+	PALETTE(config, "palette", palette_device::MONOCHROME_HIGHLIGHT);
 
 	PIC8259(config, m_pic8259, 0);
 	m_pic8259->out_int_callback().set_inputline(m_maincpu, 0);

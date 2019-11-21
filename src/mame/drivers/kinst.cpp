@@ -180,10 +180,10 @@ Notes:
 #include "emu.h"
 #include "audio/dcs.h"
 
+#include "bus/ata/ataintf.h"
+#include "bus/ata/idehd.h"
 #include "cpu/adsp2100/adsp2100.h"
 #include "cpu/mips/mips3.h"
-#include "machine/ataintf.h"
-#include "machine/idehd.h"
 #include "emupal.h"
 #include "screen.h"
 
@@ -354,7 +354,7 @@ void kinst_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 		break;
 	default:
-		assert_always(false, "Unknown id in kinst_state::device_timer");
+		throw emu_fatalerror("Unknown id in kinst_state::device_timer");
 	}
 }
 

@@ -381,11 +381,11 @@ void bml3_state::bml3_mem(address_map &map)
 	// TIMER - System timer enable
 	map(0xffca, 0xffca).r(FUNC(bml3_state::firq_status_r)); // timer irq
 	// LPFLG - Light pen interrupt
-//  AM_RANGE(0xffcb, 0xffcb)
+//  map(0xffcb, 0xffcb)
 	// MODE_SEL - Graphics mode select
 	map(0xffd0, 0xffd0).w(FUNC(bml3_state::hres_reg_w));
 	// TRACE - Trace counter
-//  AM_RANGE(0xffd1, 0xffd1)
+//  map(0xffd1, 0xffd1)
 	// REMOTE - Remote relay control for cassette - bit 7
 	map(0xffd2, 0xffd2).w(FUNC(bml3_state::relay_w));
 	// MUSIC_SEL - Music select: toggle audio output level when rising
@@ -396,14 +396,14 @@ void bml3_state::bml3_mem(address_map &map)
 	map(0xffd5, 0xffd5).noprw();
 	// INTERLACE_SEL - Interlaced video mode (manual has "INTERACE SEL"!)
 	map(0xffd6, 0xffd6).w(FUNC(bml3_state::vres_reg_w));
-//  AM_RANGE(0xffd7, 0xffd7) baud select
+//  map(0xffd7, 0xffd7) baud select
 	// C_REG_SEL - Attribute register (character/video mode and colours)
 	map(0xffd8, 0xffd8).rw(FUNC(bml3_state::vram_attr_r), FUNC(bml3_state::vram_attr_w));
 	// KB - Keyboard mode register, interrupt control, keyboard LEDs
 	map(0xffe0, 0xffe0).rw(FUNC(bml3_state::keyboard_r), FUNC(bml3_state::keyboard_w));
-//  AM_RANGE(0xffe8, 0xffe8) bank register
-//  AM_RANGE(0xffe9, 0xffe9) IG mode register
-//  AM_RANGE(0xffea, 0xffea) IG enable register
+//  map(0xffe8, 0xffe8) bank register
+//  map(0xffe9, 0xffe9) IG mode register
+//  map(0xffea, 0xffea) IG enable register
 	map(0xa000, 0xfeff).rom().region("maincpu", 0xa000);
 	map(0xfff0, 0xffff).rom().region("maincpu", 0xfff0);
 	map(0xa000, 0xbfff).w(FUNC(bml3_state::a000_w));
@@ -766,11 +766,11 @@ void bml3_state::machine_reset()
 	/* defaults */
 	mem.install_rom(0xa000, 0xfeff,memregion("maincpu")->base() + 0xa000);
 	mem.install_rom(0xfff0, 0xffff,memregion("maincpu")->base() + 0xfff0);
-	mem.install_write_handler(0xa000, 0xbfff, write8_delegate(FUNC(bml3_state::a000_w), this),0);
-	mem.install_write_handler(0xc000, 0xdfff, write8_delegate(FUNC(bml3_state::c000_w), this),0);
-	mem.install_write_handler(0xe000, 0xefff, write8_delegate(FUNC(bml3_state::e000_w), this),0);
-	mem.install_write_handler(0xf000, 0xfeff, write8_delegate(FUNC(bml3_state::f000_w), this),0);
-	mem.install_write_handler(0xfff0, 0xffff, write8_delegate(FUNC(bml3_state::fff0_w), this),0);
+	mem.install_write_handler(0xa000, 0xbfff, write8_delegate(*this, FUNC(bml3_state::a000_w)), 0);
+	mem.install_write_handler(0xc000, 0xdfff, write8_delegate(*this, FUNC(bml3_state::c000_w)), 0);
+	mem.install_write_handler(0xe000, 0xefff, write8_delegate(*this, FUNC(bml3_state::e000_w)), 0);
+	mem.install_write_handler(0xf000, 0xfeff, write8_delegate(*this, FUNC(bml3_state::f000_w)), 0);
+	mem.install_write_handler(0xfff0, 0xffff, write8_delegate(*this, FUNC(bml3_state::fff0_w)), 0);
 
 	m_firq_mask = -1; // disable firq
 }
@@ -798,16 +798,17 @@ WRITE8_MEMBER(bml3_state::piaA_w)
 		if(data & 0x40)
 		{
 			mem.install_readwrite_handler(0xa000, 0xbfff,
-				read8_delegate(FUNC(bml3_state::a000_r), this),
-				write8_delegate(FUNC(bml3_state::a000_w), this), 0);
+					read8_delegate(*this, FUNC(bml3_state::a000_r)),
+					write8_delegate(*this, FUNC(bml3_state::a000_w)),
+					0);
 		}
 		else
 		{
 			mem.install_rom(0xa000, 0xbfff,
-				memregion("maincpu")->base() + 0xa000);
+					memregion("maincpu")->base() + 0xa000);
 			mem.install_write_handler(0xa000, 0xbfff,
-				write8_delegate(FUNC(bml3_state::a000_w), this),
-				0);
+					write8_delegate(*this, FUNC(bml3_state::a000_w)),
+					0);
 		}
 	}
 
@@ -816,16 +817,17 @@ WRITE8_MEMBER(bml3_state::piaA_w)
 		if(data & 0x40)
 		{
 			mem.install_readwrite_handler(0xc000, 0xdfff,
-				read8_delegate(FUNC(bml3_state::c000_r), this),
-				write8_delegate(FUNC(bml3_state::c000_w), this), 0);
+					read8_delegate(*this, FUNC(bml3_state::c000_r)),
+					write8_delegate(*this, FUNC(bml3_state::c000_w)),
+					0);
 		}
 		else
 		{
 			mem.install_rom(0xc000, 0xdfff,
-				memregion("maincpu")->base() + 0xc000);
+					memregion("maincpu")->base() + 0xc000);
 			mem.install_write_handler(0xc000, 0xdfff,
-				write8_delegate(FUNC(bml3_state::c000_w), this),
-				0);
+					write8_delegate(*this, FUNC(bml3_state::c000_w)),
+					0);
 		}
 	}
 
@@ -834,47 +836,50 @@ WRITE8_MEMBER(bml3_state::piaA_w)
 		if(data & 0x80)
 		{
 			mem.install_readwrite_handler(0xe000, 0xefff,
-				read8_delegate(FUNC(bml3_state::e000_r), this),
-				write8_delegate(FUNC(bml3_state::e000_w), this), 0);
+					read8_delegate(*this, FUNC(bml3_state::e000_r)),
+					write8_delegate(*this, FUNC(bml3_state::e000_w)),
+					0);
 		}
 		else
 		{
 			mem.install_rom(0xe000, 0xefff,
-				memregion("maincpu")->base() + 0xe000);
+					memregion("maincpu")->base() + 0xe000);
 			mem.install_write_handler(0xe000, 0xefff,
-				write8_delegate(FUNC(bml3_state::e000_w), this),
-				0);
+					write8_delegate(*this, FUNC(bml3_state::e000_w)),
+					0);
 		}
 	}
 
 	if(data & 1)
 	{
 		mem.install_readwrite_handler(0xf000, 0xfeff,
-			read8_delegate(FUNC(bml3_state::f000_r), this),
-			write8_delegate(FUNC(bml3_state::f000_w), this), 0);
+				read8_delegate(*this, FUNC(bml3_state::f000_r)),
+				write8_delegate(*this, FUNC(bml3_state::f000_w)),
+				0);
 	}
 	else
 	{
 		mem.install_rom(0xf000, 0xfeff,
-			memregion("maincpu")->base() + 0xf000);
+				memregion("maincpu")->base() + 0xf000);
 		mem.install_write_handler(0xf000, 0xfeff,
-			write8_delegate(FUNC(bml3_state::f000_w), this),
-			0);
+				write8_delegate(*this, FUNC(bml3_state::f000_w)),
+				0);
 	}
 
 	if(data & 2)
 	{
 		mem.install_readwrite_handler(0xfff0, 0xffff,
-			read8_delegate(FUNC(bml3_state::fff0_r), this),
-			write8_delegate(FUNC(bml3_state::fff0_w), this), 0);
+				read8_delegate(*this, FUNC(bml3_state::fff0_r)),
+				write8_delegate(*this, FUNC(bml3_state::fff0_w)),
+				0);
 	}
 	else
 	{
 		mem.install_rom(0xfff0, 0xffff,
-			memregion("maincpu")->base() + 0xfff0);
+				memregion("maincpu")->base() + 0xfff0);
 		mem.install_write_handler(0xfff0, 0xffff,
-			write8_delegate(FUNC(bml3_state::fff0_w), this),
-			0);
+				write8_delegate(*this, FUNC(bml3_state::fff0_w)),
+				0);
 	}
 }
 
@@ -936,7 +941,7 @@ void bml3_state::bml3_common(machine_config &config)
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(bml3_state::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(bml3_state::crtc_update_row));
 
 	// fire once per scan of an individual key
 	// According to the service manual (p.65), the keyboard timer is driven by the horizontal video sync clock.
@@ -965,22 +970,21 @@ void bml3_state::bml3_common(machine_config &config)
 	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* slot devices */
-	bml3bus_device &bus(BML3BUS(config, "bml3bus", 0));
-	bus.set_space(m_maincpu, AS_PROGRAM);
-	bus.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
-	bus.irq_callback().set_inputline(m_maincpu, M6809_IRQ_LINE);
-	bus.firq_callback().set_inputline(m_maincpu, M6809_FIRQ_LINE);
-	/* Default to MP-1805 disk (3" or 5.25" SS/SD), as our MB-6892 ROM dump includes
-	   the MP-1805 ROM.
+	BML3BUS(config, m_bml3bus, 0);
+	m_bml3bus->set_space(m_maincpu, AS_PROGRAM);
+	m_bml3bus->nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_bml3bus->irq_callback().set_inputline(m_maincpu, M6809_IRQ_LINE);
+	m_bml3bus->firq_callback().set_inputline(m_maincpu, M6809_FIRQ_LINE);
+	/* Default to MP-1805 disk (3" or 5.25" SS/SD), as our MB-6892 ROM dump includes the MP-1805 ROM.
 	   User may want to switch this to MP-1802 (5.25" DS/DD).
 	   Note it isn't feasible to use both, as they each place boot ROM at F800.
 	 */
-	BML3BUS_SLOT(config, "sl1", "bml3bus", bml3_cards, "bml3mp1805");
-	BML3BUS_SLOT(config, "sl2", "bml3bus", bml3_cards, nullptr);
-	BML3BUS_SLOT(config, "sl3", "bml3bus", bml3_cards, nullptr);
-	BML3BUS_SLOT(config, "sl4", "bml3bus", bml3_cards, nullptr);
-	BML3BUS_SLOT(config, "sl5", "bml3bus", bml3_cards, nullptr);
-	BML3BUS_SLOT(config, "sl6", "bml3bus", bml3_cards, "bml3kanji");
+	BML3BUS_SLOT(config, "sl1", m_bml3bus, bml3_cards, "bml3mp1805");
+	BML3BUS_SLOT(config, "sl2", m_bml3bus, bml3_cards, nullptr);
+	BML3BUS_SLOT(config, "sl3", m_bml3bus, bml3_cards, nullptr);
+	BML3BUS_SLOT(config, "sl4", m_bml3bus, bml3_cards, nullptr);
+	BML3BUS_SLOT(config, "sl5", m_bml3bus, bml3_cards, nullptr);
+	BML3BUS_SLOT(config, "sl6", m_bml3bus, bml3_cards, "bml3kanji");
 }
 
 void bml3_state::bml3(machine_config &config)

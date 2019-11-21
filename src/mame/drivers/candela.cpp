@@ -643,7 +643,7 @@ void can09_state::can09_map(address_map &map)
  * Port A=0x18 B=0x00
  * Port A=0x10 B=
 */
-//  AM_RANGE(0x0000, 0x7fff) AM_RAM
+//  map(0x0000, 0x7fff).ram();
 	map(0x0000, 0x7fff).ram().bankrw("bank1");
 	map(0xe000, 0xffff).rom().region("roms", 0);
 	map(0xe020, 0xe020).w(m_crtc, FUNC(hd6845s_device::address_w));

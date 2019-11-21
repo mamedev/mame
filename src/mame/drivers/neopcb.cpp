@@ -469,7 +469,7 @@ void neopcb_state::install_common()
 	membank("cpu_bank")->set_base(m_region_maincpu->base() + 0x100000);
 
 	// install protection handlers + bankswitch handler
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x2fe000, 0x2fffff, read16_delegate(FUNC(pvc_prot_device::protection_r),(pvc_prot_device*)m_pvc_prot), write16_delegate(FUNC(neopcb_state::write_bankpvc),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x2fe000, 0x2fffff, read16_delegate(*m_pvc_prot, FUNC(pvc_prot_device::protection_r)), write16_delegate(*this, FUNC(neopcb_state::write_bankpvc)));
 
 	// perform basic memory initialization that are usually done on-cart
 	m_curr_slot = 0;

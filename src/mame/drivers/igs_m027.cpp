@@ -413,7 +413,7 @@ ROM_START( slqz3 )
 	/* Internal rom of IGS027A type G ARM based MCU */
 	ROM_LOAD( "slqz3_igs027a", 0x00000, 0x4000, NO_DUMP )
 
-	ROM_REGION( 0x200000, "user1", 0 ) // external ARM data / prg
+	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "u29", 0x000000, 0x200000, CRC(215fed1e) SHA1(c85d8695e0be1044ac206118c3fc0ddc7063aaf6) ) // 11xxxxxxxxxxxxxxxxxxx = 0xFF
 
 	ROM_REGION( 0x080000, "igs017_igs031:tilemaps", 0 )
@@ -466,7 +466,7 @@ ROM_START( fruitpar )
 	/* Internal rom of IGS027A type G ARM based MCU */
 	ROM_LOAD( "fruitpar_igs027a", 0x00000, 0x4000, NO_DUMP )
 
-	ROM_REGION( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "fruit_paradise_v214.u23", 0x00000, 0x80000, CRC(e37bc4e0) SHA1(f5580e6007dc60f32efd3b3e7e64c5ee446ede8a) )
 
 	ROM_REGION( 0x080000, "igs017_igs031:tilemaps", 0 )
@@ -503,7 +503,7 @@ ROM_START( amazonia )
 	/* Internal rom of IGS027A type G ARM based MCU */
 	ROM_LOAD( "amazonia_igs027a", 0x00000, 0x4000, NO_DUMP )
 
-	ROM_REGION( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "amazonia_v-104br.u23", 0x00000, 0x80000, CRC(103d465e) SHA1(68d088f24171e27c0a9b0660f81d3334f730637a) )
 
 	ROM_REGION( 0x480000, "igs017_igs031:tilemaps", 0 )
@@ -522,7 +522,7 @@ ROM_START( amazonkp )
 	/* Internal rom of IGS027A type G ARM based MCU */
 	ROM_LOAD( "amazonia_igs027a", 0x00000, 0x4000, NO_DUMP )
 
-	ROM_REGION( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "ak_plus_v-204br.u23", 0x00000, 0x80000, CRC(e71f6272) SHA1(1717cc4dad9858f1a54988b7459631de8bac8ebd) )
 
 	ROM_REGION( 0x480000, "igs017_igs031:tilemaps", 0 )
@@ -557,7 +557,7 @@ ROM_START( amazoni2 )
 	/* Internal rom of IGS027A ARM based MCU */
 	ROM_LOAD( "sdwx_igs027a", 0x00000, 0x4000, NO_DUMP )
 
-	ROM_REGION( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "27c4096_akii_b-202br.u23", 0x000000, 0x80000, CRC(7147b43c) SHA1(29a4a20867595650918c4ab892ddb71440bd3f4b) )
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
@@ -581,7 +581,7 @@ ROM_START( sdwx )
 	/* Internal rom of IGS027A ARM based MCU */
 	ROM_LOAD( "sdwx_igs027a", 0x00000, 0x4000, NO_DUMP )
 
-	ROM_REGION( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "prg.u16", 0x000000, 0x80000, CRC(c94ef6a8) SHA1(69f2f356e05206b0866a9020253d9a112b56316c) )
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
@@ -599,7 +599,7 @@ ROM_START( klxyj )
 	/* Internal rom of IGS027A ARM based MCU */
 	ROM_LOAD( "klxyj_igs027a", 0x00000, 0x4000, NO_DUMP )
 
-	ROM_REGION( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "klxyj_104.u16", 0x000000, 0x80000, CRC(8cb9bdc2) SHA1(5a13d0ff6488a938617a9ea89e7cf607539a1f49) )
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
@@ -624,7 +624,7 @@ ROM_START( lhzb3 )
 	/* Internal rom of IGS027A ARM based MCU */
 	ROM_LOAD( "lhzb3_igs027a", 0x00000, 0x4000, NO_DUMP )
 
-	ROM_REGION( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "lhzb3_104.u9", 0x000000, 0x80000, CRC(70d61846) SHA1(662b59702ef6f26129de6b16346786df92f99097) )
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
@@ -691,7 +691,7 @@ ROM_START( zhongguo )
 	/* Internal rom of IGS027A ARM based MCU */
 	ROM_LOAD( "zhongguo_igs027a", 0x00000, 0x4000, NO_DUMP )
 
-	ROM_REGION( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "p2600.u10", 0x000000, 0x80000, CRC(9ad34135) SHA1(54717753d1296efe49946369fd4a27181f19dbc0) )
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
@@ -712,7 +712,7 @@ ROM_START( mgfx )
 	/* Internal rom of IGS027A ARM based MCU */
 	ROM_LOAD( "mgfx_igs027a", 0x00000, 0x4000, NO_DUMP )
 
-	ROM_REGION( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "mgfx_101.u10", 0x000000, 0x80000, CRC(897c88a1) SHA1(0f7a7808b9503ff28ad32c0b8e071cb24cff59b1) )
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
@@ -795,7 +795,7 @@ ROM_START( gonefsh2 )
 	/* Internal rom of IGS027A ARM based MCU */
 	ROM_LOAD( "gonefsh2_igs027a", 0x00000, 0x4000, NO_DUMP )
 
-	ROM_REGION( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "gfii_v-904uso.u12", 0x000000, 0x80000, CRC(ef0f6735) SHA1(0add92599b0989f3e50dc64e32ce234b4bd87d33) )
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
@@ -876,7 +876,7 @@ ROM_START( chessc2 )
 	/* Internal rom of IGS027A ARM based MCU */
 	ROM_LOAD( "chessc2_igs027a", 0x00000, 0x4000, NO_DUMP )
 
-	ROM_REGION( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "ccii_v-707uso.u12", 0x000000, 0x80000, CRC(5937b67b) SHA1(967b3adf6f5bf92d63ec460d595e473898a78372) )
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
@@ -901,7 +901,7 @@ ROM_START( haunthig )
 	/* Internal rom of IGS027A ARM based MCU */
 	ROM_LOAD( "haunthig_igs027a", 0x00000, 0x4000, NO_DUMP ) // sticker marked 'H2'
 
-	ROM_REGION( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "hauntedhouse_ver-101us.u34", 0x000000, 0x80000, CRC(4bf045d4) SHA1(78c848fd69961df8d9b75f92ad57c3534fbf08db) )
 
 	ROM_REGION( 0x10000, "plcc", 0 )
@@ -931,7 +931,7 @@ ROM_START( sddz )
 	/* Internal rom of IGS027A ARM based MCU */
 	ROM_LOAD( "sddz_igs027a", 0x00000, 0x4000, NO_DUMP )
 
-	ROM_REGION( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "ddz_218cn.u17", 0x000000, 0x80000, CRC(3cfe38d5) SHA1(9c7f82ecffbc22879583519d5f753bb35e973ee3) )
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
@@ -949,7 +949,7 @@ ROM_START( lhzb4 )
 	/* Internal rom of IGS027A ARM based MCU */
 	ROM_LOAD( "lhzb4_igs027a", 0x00000, 0x4000, NO_DUMP )
 
-	ROM_REGION( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "lhzb4_104.u17", 0x000000, 0x80000, CRC(6f349bbb) SHA1(54cf895889ef0f208637ba732ede696ca3603ee0) )
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )

@@ -14,7 +14,7 @@ Mark VI/Philidor was released a year later, it was a plug-in module for the Mark
 It's not much stronger than Mark V(retroactively called Mark V/Travemunde).
 
 When using the MAME sensorboard interface with MK VI, reset the board by pressing
-CLEAR before RESET, needed on 1st power-on or when starting a new game. 
+CLEAR before RESET, needed on 1st power-on or when starting a new game.
 
 Hardware notes:
 - SY6502A @ ~2MHz (19.6608MHz XTAL, bunch of 74113 dividers)
@@ -472,8 +472,8 @@ ROM_START( ccmk5 )
 	ROM_LOAD("c47026_syp_2364-3-y5c", 0xc000, 0x2000, CRC(1754ccab) SHA1(d246b6aa2e2a1858dd6608a4dbf496778f79b22e) ) // "
 	ROM_LOAD("c47027_syp_2364-3-y5d", 0xe000, 0x2000, CRC(7c0f7bd8) SHA1(68b4566f0501005f6b1739bb24a4bec990421a6f) ) // "
 
-	ROM_REGION( 1887311, "screen", 0)
-	ROM_LOAD( "ccmk5.svg", 0, 1887311, CRC(3261bcb2) SHA1(46b38a2877faa36ef1adea2b8f484a97b46ea529) )
+	ROM_REGION( 1887415, "screen", 0)
+	ROM_LOAD( "ccmk5.svg", 0, 1887415, CRC(656a2263) SHA1(4557979c62b1240f7a0d813ec5f4d54b8a27218e) )
 ROM_END
 
 ROM_START( ccmk6 )
@@ -486,8 +486,8 @@ ROM_START( ccmk6 )
 	ROM_REGION( 0x1000, "chessboard", 0 )
 	ROM_LOAD("d2732c-e.u1", 0x0000, 0x1000, CRC(93221b4c) SHA1(8561b52c80cab7c04d30eaa14f9520a362d7f822) ) // no label, identical halves
 
-	ROM_REGION( 1887311, "screen", 0)
-	ROM_LOAD( "ccmk5.svg", 0, 1887311, CRC(3261bcb2) SHA1(46b38a2877faa36ef1adea2b8f484a97b46ea529) )
+	ROM_REGION( 1887415, "screen", 0)
+	ROM_LOAD( "ccmk5.svg", 0, 1887415, CRC(656a2263) SHA1(4557979c62b1240f7a0d813ec5f4d54b8a27218e) )
 ROM_END
 
 } // anonymous namespace

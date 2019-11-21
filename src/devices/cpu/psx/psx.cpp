@@ -1338,11 +1338,11 @@ void psxcpu_device::update_scratchpad()
 {
 	if( ( m_biu & BIU_RAM ) == 0 )
 	{
-		m_program->install_readwrite_handler( 0x1f800000, 0x1f8003ff, read32_delegate( FUNC( psxcpu_device::berr_r ), this ), write32_delegate( FUNC( psxcpu_device::berr_w ), this ) );
+		m_program->install_readwrite_handler( 0x1f800000, 0x1f8003ff, read32_delegate(*this, FUNC(psxcpu_device::berr_r)), write32_delegate(*this, FUNC(psxcpu_device::berr_w)) );
 	}
 	else if( ( m_biu & BIU_DS ) == 0 )
 	{
-		m_program->install_read_handler( 0x1f800000, 0x1f8003ff, read32_delegate( FUNC( psxcpu_device::berr_r ), this ) );
+		m_program->install_read_handler( 0x1f800000, 0x1f8003ff, read32_delegate(*this, FUNC(psxcpu_device::berr_r)) );
 		m_program->nop_write( 0x1f800000, 0x1f8003ff );
 	}
 	else
@@ -1397,9 +1397,9 @@ void psxcpu_device::update_ram_config()
 		}
 	}
 
-	m_program->install_readwrite_handler( 0x00000000 + window_size, 0x1effffff, read32_delegate( FUNC( psxcpu_device::berr_r ), this ), write32_delegate( FUNC( psxcpu_device::berr_w ), this ) );
-	m_program->install_readwrite_handler( 0x80000000 + window_size, 0x9effffff, read32_delegate( FUNC( psxcpu_device::berr_r ), this ), write32_delegate( FUNC( psxcpu_device::berr_w ), this ) );
-	m_program->install_readwrite_handler( 0xa0000000 + window_size, 0xbeffffff, read32_delegate( FUNC( psxcpu_device::berr_r ), this ), write32_delegate( FUNC( psxcpu_device::berr_w ), this ) );
+	m_program->install_readwrite_handler( 0x00000000 + window_size, 0x1effffff, read32_delegate(*this, FUNC(psxcpu_device::berr_r)), write32_delegate(*this, FUNC(psxcpu_device::berr_w)) );
+	m_program->install_readwrite_handler( 0x80000000 + window_size, 0x9effffff, read32_delegate(*this, FUNC(psxcpu_device::berr_r)), write32_delegate(*this, FUNC(psxcpu_device::berr_w)) );
+	m_program->install_readwrite_handler( 0xa0000000 + window_size, 0xbeffffff, read32_delegate(*this, FUNC(psxcpu_device::berr_r)), write32_delegate(*this, FUNC(psxcpu_device::berr_w)) );
 }
 
 void psxcpu_device::update_rom_config()
@@ -1434,9 +1434,9 @@ void psxcpu_device::update_rom_config()
 
 	if( window_size < max_window_size && !m_disable_rom_berr)
 	{
-		m_program->install_readwrite_handler( 0x1fc00000 + window_size, 0x1fffffff, read32_delegate( FUNC( psxcpu_device::berr_r ), this ), write32_delegate( FUNC( psxcpu_device::berr_w ), this ) );
-		m_program->install_readwrite_handler( 0x9fc00000 + window_size, 0x9fffffff, read32_delegate( FUNC( psxcpu_device::berr_r ), this ), write32_delegate( FUNC( psxcpu_device::berr_w ), this ) );
-		m_program->install_readwrite_handler( 0xbfc00000 + window_size, 0xbfffffff, read32_delegate( FUNC( psxcpu_device::berr_r ), this ), write32_delegate( FUNC( psxcpu_device::berr_w ), this ) );
+		m_program->install_readwrite_handler( 0x1fc00000 + window_size, 0x1fffffff, read32_delegate(*this, FUNC(psxcpu_device::berr_r)), write32_delegate(*this, FUNC(psxcpu_device::berr_w)) );
+		m_program->install_readwrite_handler( 0x9fc00000 + window_size, 0x9fffffff, read32_delegate(*this, FUNC(psxcpu_device::berr_r)), write32_delegate(*this, FUNC(psxcpu_device::berr_w)) );
+		m_program->install_readwrite_handler( 0xbfc00000 + window_size, 0xbfffffff, read32_delegate(*this, FUNC(psxcpu_device::berr_r)), write32_delegate(*this, FUNC(psxcpu_device::berr_w)) );
 	}
 }
 

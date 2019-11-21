@@ -5,19 +5,19 @@
 #include "includes/tmnt.h"
 #include "screen.h"
 
-TILE_GET_INFO_MEMBER(tmnt_state::glfgreat_get_roz_tile_info)
+TILE_GET_INFO_MEMBER(glfgreat_state::glfgreat_get_roz_tile_info)
 {
 	uint8_t *rom = memregion("user1")->base();
 	int code;
 
-	tile_index += 0x40000 * m_glfgreat_roz_rom_bank;
+	tile_index += 0x40000 * m_roz_rom_bank;
 
 	code = rom[tile_index + 0x80000] + 256 * rom[tile_index] + 256 * 256 * ((rom[tile_index / 4 + 0x100000] >> (2 * (tile_index & 3))) & 3);
 
 	SET_TILE_INFO_MEMBER(0, code & 0x3fff, code >> 14, 0);
 }
 
-TILE_GET_INFO_MEMBER(tmnt_state::prmrsocr_get_roz_tile_info)
+TILE_GET_INFO_MEMBER(prmrsocr_state::prmrsocr_get_roz_tile_info)
 {
 	uint8_t *rom = memregion("user1")->base();
 	int code = rom[tile_index + 0x20000] + 256 * rom[tile_index];
@@ -184,7 +184,7 @@ if (machine().input().code_pressed(KEYCODE_E) && (*color & 0x80)) *color = machi
 	*color = m_sprite_colorbase + (*color & 0x1f);
 }
 
-K05324X_CB_MEMBER(tmnt_state::prmrsocr_sprite_callback)
+K05324X_CB_MEMBER(prmrsocr_state::prmrsocr_sprite_callback)
 {
 	int pri = 0x20 | ((*color & 0x60) >> 2);
 	if (pri <= m_layerpri[2])
@@ -196,7 +196,7 @@ K05324X_CB_MEMBER(tmnt_state::prmrsocr_sprite_callback)
 	else
 		*priority = 0xf0 | 0xcc | 0xaa;
 
-	*code |= m_prmrsocr_sprite_bank << 14;
+	*code |= m_sprite_bank << 14;
 	*color = m_sprite_colorbase + (*color & 0x1f);
 }
 
@@ -252,28 +252,30 @@ VIDEO_START_MEMBER(tmnt_state,lgtnfght)/* also tmnt2, ssriders */
 	save_item(NAME(m_lasten));
 }
 
-VIDEO_START_MEMBER(tmnt_state,glfgreat)
+VIDEO_START_MEMBER(glfgreat_state,glfgreat)
 {
-	m_roz_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tmnt_state::glfgreat_get_roz_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 512, 512);
+	m_roz_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(glfgreat_state::glfgreat_get_roz_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 512, 512);
 	m_roz_tilemap->set_transparent_pen(0);
 
-	m_glfgreat_roz_rom_bank = 0;
-	m_glfgreat_roz_char_bank = 0;
-	m_glfgreat_roz_rom_mode = 0;
-	save_item(NAME(m_glfgreat_roz_rom_bank));
-	save_item(NAME(m_glfgreat_roz_char_bank));
-	save_item(NAME(m_glfgreat_roz_rom_mode));
+	m_controller_select = 0;
+	m_roz_rom_bank = 0;
+	m_roz_char_bank = 0;
+	m_roz_rom_mode = 0;
+	save_item(NAME(m_controller_select));
+	save_item(NAME(m_roz_rom_bank));
+	save_item(NAME(m_roz_char_bank));
+	save_item(NAME(m_roz_rom_mode));
 }
 
-VIDEO_START_MEMBER(tmnt_state,prmrsocr)
+VIDEO_START_MEMBER(prmrsocr_state,prmrsocr)
 {
-	m_roz_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tmnt_state::prmrsocr_get_roz_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 512, 256);
+	m_roz_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(prmrsocr_state::prmrsocr_get_roz_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 512, 256);
 	m_roz_tilemap->set_transparent_pen(0);
 
-	m_prmrsocr_sprite_bank = 0;
-	m_glfgreat_roz_char_bank = 0;
-	save_item(NAME(m_prmrsocr_sprite_bank));
-	save_item(NAME(m_glfgreat_roz_char_bank));
+	m_sprite_bank = 0;
+	m_roz_char_bank = 0;
+	save_item(NAME(m_sprite_bank));
+	save_item(NAME(m_roz_char_bank));
 }
 
 VIDEO_START_MEMBER(tmnt_state,blswhstl)
@@ -373,20 +375,20 @@ WRITE16_MEMBER(tmnt_state::blswhstl_700300_w)
 }
 
 
-READ16_MEMBER(tmnt_state::glfgreat_rom_r)
+READ16_MEMBER(glfgreat_state::glfgreat_rom_r)
 {
-	if (m_glfgreat_roz_rom_mode)
-		return memregion("zoom")->base()[m_glfgreat_roz_char_bank * 0x80000 + offset];
+	if (m_roz_rom_mode)
+		return memregion("zoom")->base()[m_roz_char_bank * 0x80000 + offset];
 	else if (offset < 0x40000)
 	{
 		uint8_t *usr = memregion("user1")->base();
-		return usr[offset + 0x80000 + m_glfgreat_roz_rom_bank * 0x40000] + 256 * usr[offset + m_glfgreat_roz_rom_bank * 0x40000];
+		return usr[offset + 0x80000 + m_roz_rom_bank * 0x40000] + 256 * usr[offset + m_roz_rom_bank * 0x40000];
 	}
 	else
-		return memregion("user1")->base()[((offset & 0x3ffff) >> 2) + 0x100000 + m_glfgreat_roz_rom_bank * 0x10000];
+		return memregion("user1")->base()[((offset & 0x3ffff) >> 2) + 0x100000 + m_roz_rom_bank * 0x10000];
 }
 
-WRITE16_MEMBER(tmnt_state::glfgreat_122000_w)
+WRITE16_MEMBER(glfgreat_state::glfgreat_122000_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -394,25 +396,25 @@ WRITE16_MEMBER(tmnt_state::glfgreat_122000_w)
 		machine().bookkeeping().coin_counter_w(0, data & 0x01);
 		machine().bookkeeping().coin_counter_w(1, data & 0x02);
 
+		m_controller_select = (data & 0x0c) >> 2;
+
 		/* bit 4 = enable char ROM reading through the video RAM */
 		m_k052109->set_rmrd_line((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 
 		/* bit 5 = 53596 tile rom bank selection */
-		if (m_glfgreat_roz_rom_bank != (data & 0x20) >> 5)
+		if (m_roz_rom_bank != (data & 0x20) >> 5)
 		{
-			m_glfgreat_roz_rom_bank = (data & 0x20) >> 5;
+			m_roz_rom_bank = (data & 0x20) >> 5;
 			m_roz_tilemap->mark_all_dirty();
 		}
 
 		/* bit 6,7 = 53596 char bank selection for ROM test */
-		m_glfgreat_roz_char_bank = (data & 0xc0) >> 6;
-
-		/* other bits unknown */
+		m_roz_char_bank = (data & 0xc0) >> 6;
 	}
 	if (ACCESSING_BITS_8_15)
 	{
 		/* bit 8 = 53596 char/rom selection for ROM test */
-		m_glfgreat_roz_rom_mode = data & 0x100;
+		m_roz_rom_mode = data & 0x100;
 	}
 }
 
@@ -452,7 +454,7 @@ WRITE16_MEMBER(tmnt_state::ssriders_1c0300_w)
 	}
 }
 
-WRITE16_MEMBER(tmnt_state::prmrsocr_122000_w)
+WRITE16_MEMBER(prmrsocr_state::prmrsocr_122000_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -464,19 +466,19 @@ WRITE16_MEMBER(tmnt_state::prmrsocr_122000_w)
 		m_k052109->set_rmrd_line((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 
 		/* bit 6 = sprite ROM bank */
-		m_prmrsocr_sprite_bank = (data & 0x40) >> 6;
-		m_k053245->bankselect(m_prmrsocr_sprite_bank << 2);
+		m_sprite_bank = (data & 0x40) >> 6;
+		m_k053245->bankselect(m_sprite_bank << 2);
 
 		/* bit 7 = 53596 region selector for ROM test */
-		m_glfgreat_roz_char_bank = (data & 0x80) >> 7;
+		m_roz_char_bank = (data & 0x80) >> 7;
 
 		/* other bits unknown (unused?) */
 	}
 }
 
-READ16_MEMBER(tmnt_state::prmrsocr_rom_r)
+READ16_MEMBER(prmrsocr_state::prmrsocr_rom_r)
 {
-	if(m_glfgreat_roz_char_bank)
+	if(m_roz_char_bank)
 		return memregion("zoom")->base()[offset];
 	else
 	{
@@ -606,7 +608,7 @@ uint32_t tmnt_state::screen_update_lgtnfght(screen_device &screen, bitmap_ind16 
 }
 
 
-READ16_MEMBER(tmnt_state::glfgreat_ball_r)
+READ16_MEMBER(glfgreat_state::glfgreat_ball_r)
 {
 #ifdef MAME_DEBUG
 popmessage("%04x", m_glfgreat_pixel);

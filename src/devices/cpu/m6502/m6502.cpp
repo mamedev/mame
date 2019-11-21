@@ -27,15 +27,11 @@ m6502_device::m6502_device(const machine_config &mconfig, device_type type, cons
 	sprogram_config("decrypted_opcodes", ENDIANNESS_LITTLE, 8, 16), PPC(0), NPC(0), PC(0), SP(0), TMP(0), TMP2(0), A(0), X(0), Y(0), P(0), IR(0), inst_state_base(0), mintf(nullptr),
 	inst_state(0), inst_substate(0), icount(0), nmi_state(false), irq_state(false), apu_irq_state(false), v_state(false), irq_taken(false), sync(false), inhibit_interrupts(false)
 {
-	cache_disabled = false;
 }
 
 void m6502_device::device_start()
 {
-	if(cache_disabled)
-		mintf = std::make_unique<mi_default_nd>();
-	else
-		mintf = std::make_unique<mi_default_normal>();
+	mintf = std::make_unique<mi_default>();
 
 	init();
 }
@@ -126,22 +122,22 @@ void m6502_device::device_reset()
 }
 
 
-uint32_t m6502_device::execute_min_cycles() const
+uint32_t m6502_device::execute_min_cycles() const noexcept
 {
 	return 1;
 }
 
-uint32_t m6502_device::execute_max_cycles() const
+uint32_t m6502_device::execute_max_cycles() const noexcept
 {
 	return 10;
 }
 
-uint32_t m6502_device::execute_input_lines() const
+uint32_t m6502_device::execute_input_lines() const noexcept
 {
 	return NMI_LINE+1;
 }
 
-bool m6502_device::execute_input_edge_triggered(int inputnum) const
+bool m6502_device::execute_input_edge_triggered(int inputnum) const noexcept
 {
 	return inputnum == NMI_LINE;
 }
@@ -524,36 +520,26 @@ void m6502_device::memory_interface::write_9(uint16_t adr, uint8_t val)
 }
 
 
-uint8_t m6502_device::mi_default_normal::read(uint16_t adr)
+uint8_t m6502_device::mi_default::read(uint16_t adr)
 {
 	return program->read_byte(adr);
 }
 
-uint8_t m6502_device::mi_default_normal::read_sync(uint16_t adr)
+uint8_t m6502_device::mi_default::read_sync(uint16_t adr)
 {
 	return scache->read_byte(adr);
 }
 
-uint8_t m6502_device::mi_default_normal::read_arg(uint16_t adr)
+uint8_t m6502_device::mi_default::read_arg(uint16_t adr)
 {
 	return cache->read_byte(adr);
 }
 
-
-void m6502_device::mi_default_normal::write(uint16_t adr, uint8_t val)
+void m6502_device::mi_default::write(uint16_t adr, uint8_t val)
 {
 	program->write_byte(adr, val);
 }
 
-uint8_t m6502_device::mi_default_nd::read_sync(uint16_t adr)
-{
-	return sprogram->read_byte(adr);
-}
-
-uint8_t m6502_device::mi_default_nd::read_arg(uint16_t adr)
-{
-	return program->read_byte(adr);
-}
 
 m6502_mcu_device::m6502_mcu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	m6502_device(mconfig, type, tag, owner, clock)

@@ -368,7 +368,7 @@ void sothello_state::sothello(machine_config &config)
 	MC6809(config, m_subcpu, XTAL(8'000'000)); // divided by 4 internally
 	m_subcpu->set_addrmap(AS_PROGRAM, &sothello_state::subcpu_mem_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	/* video hardware */
 	v9938_device &v9938(V9938(config, "v9938", XTAL(21'477'272)));

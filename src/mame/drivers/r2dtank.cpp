@@ -466,7 +466,7 @@ void r2dtank_state::r2dtank(machine_config &config)
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
-	crtc.set_update_row_callback(FUNC(r2dtank_state::crtc_update_row), this);
+	crtc.set_update_row_callback(FUNC(r2dtank_state::crtc_update_row));
 	crtc.out_de_callback().set("74123", FUNC(ttl74123_device::a_w));
 
 	/* 74LS123 */

@@ -167,19 +167,19 @@ constexpr int upd765_family_device::rates[4];
 
 upd765_family_device::upd765_family_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	pc_fdc_interface(mconfig, type, tag, owner, clock),
+	ready_connected(true),
+	ready_polled(true),
+	select_connected(true),
+	select_multiplexed(true),
+	external_ready(false),
+	mode(mode_t::AT),
 	intrq_cb(*this),
 	drq_cb(*this),
 	hdl_cb(*this),
 	idx_cb(*this),
-	us_cb(*this)
+	us_cb(*this),
+	dor_reset(0x00)
 {
-	ready_polled = true;
-	ready_connected = true;
-	select_connected = true;
-	select_multiplexed = true;
-	external_ready = false;
-	dor_reset = 0x00;
-	mode = MODE_AT;
 }
 
 void upd765_family_device::set_ready_line_connected(bool _ready)
@@ -192,7 +192,7 @@ void upd765_family_device::set_select_lines_connected(bool _select)
 	select_connected = _select;
 }
 
-void upd765_family_device::set_mode(int _mode)
+void upd765_family_device::set_mode(mode_t _mode)
 {
 	mode = _mode;
 }
@@ -379,7 +379,7 @@ uint8_t upd765_family_device::sra_r()
 	sra |= 0x40;
 	if(cur_irq)
 		sra |= 0x80;
-	if(mode == MODE_M30)
+	if(mode == mode_t::M30)
 		sra ^= 0x1f;
 	return sra;
 }
@@ -2362,7 +2362,7 @@ void upd765_family_device::check_irq()
 {
 	bool old_irq = cur_irq;
 	cur_irq = data_irq || other_irq || internal_drq;
-	cur_irq = cur_irq && (dor & 4) && (mode != MODE_AT || (dor & 8));
+	cur_irq = cur_irq && (dor & 4) && (mode != mode_t::AT || (dor & 8));
 	if(cur_irq != old_irq) {
 		LOGTCIRQ("irq = %d\n", cur_irq);
 		intrq_cb(cur_irq);

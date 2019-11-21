@@ -172,8 +172,8 @@ TILE_GET_INFO_MEMBER(yunsung8_state::get_fg_tile_info)
 
 void yunsung8_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(yunsung8_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, DIM_NX_0, DIM_NY_0 );
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(yunsung8_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, DIM_NX_1, DIM_NY_1 );
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(yunsung8_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, DIM_NX_0, DIM_NY_0 );
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(yunsung8_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, DIM_NX_1, DIM_NY_1 );
 
 	m_fg_tilemap->set_transparent_pen(0);
 }

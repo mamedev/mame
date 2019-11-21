@@ -168,7 +168,7 @@ void amust_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 		m_beep->set_state(0);
 		break;
 	default:
-		assert_always(false, "Unknown id in amust_state::device_timer");
+		throw emu_fatalerror("Unknown id in amust_state::device_timer");
 	}
 }
 
@@ -459,7 +459,7 @@ void amust_state::amust(machine_config &config)
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
-	crtc.set_update_row_callback(FUNC(amust_state::crtc_update_row), this);
+	crtc.set_update_row_callback(FUNC(amust_state::crtc_update_row));
 	crtc.out_hsync_callback().set(FUNC(amust_state::hsync_w));
 	crtc.out_vsync_callback().set(FUNC(amust_state::vsync_w));
 

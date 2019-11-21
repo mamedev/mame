@@ -24,7 +24,7 @@ void mbee_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 		timer_newkb(ptr, param);
 		break;
 	default:
-		assert_always(false, "Unknown id in mbee_state::device_timer");
+		throw emu_fatalerror("Unknown id in mbee_state::device_timer");
 	}
 }
 
@@ -309,8 +309,8 @@ void mbee_state::setup_banks(uint8_t data, bool first_time, uint8_t b_mask)
 				if (!BIT(b_byte, 4))
 				{
 					// select video
-					mem.install_read_handler (b_vid, b_vid + 0x7ff, read8_delegate(FUNC(mbee_state::video_low_r), this));
-					mem.install_read_handler (b_vid + 0x800, b_vid + 0xfff, read8_delegate(FUNC(mbee_state::video_high_r), this));
+					mem.install_read_handler (b_vid, b_vid + 0x7ff, read8_delegate(*this, FUNC(mbee_state::video_low_r)));
+					mem.install_read_handler (b_vid + 0x800, b_vid + 0xfff, read8_delegate(*this, FUNC(mbee_state::video_high_r)));
 				}
 				else
 				{
@@ -341,8 +341,8 @@ void mbee_state::setup_banks(uint8_t data, bool first_time, uint8_t b_mask)
 				if (!BIT(b_byte, 4))
 				{
 					// select video
-					mem.install_write_handler (b_vid, b_vid + 0x7ff, write8_delegate(FUNC(mbee_state::video_low_w), this));
-					mem.install_write_handler (b_vid + 0x800, b_vid + 0xfff, write8_delegate(FUNC(mbee_state::video_high_w), this));
+					mem.install_write_handler (b_vid, b_vid + 0x7ff, write8_delegate(*this, FUNC(mbee_state::video_low_w)));
+					mem.install_write_handler (b_vid + 0x800, b_vid + 0xfff, write8_delegate(*this, FUNC(mbee_state::video_high_w)));
 				}
 				else
 				{

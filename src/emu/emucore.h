@@ -29,6 +29,7 @@
 // standard C++ includes
 #include <cassert>
 #include <exception>
+#include <string>
 #include <type_traits>
 #include <typeinfo>
 
@@ -37,6 +38,7 @@
 #include "emualloc.h"
 #include "corestr.h"
 #include "bitmap.h"
+#include "strformat.h"
 
 #include "emufwd.h"
 
@@ -220,18 +222,6 @@ inline TYPE &operator|=(TYPE &a, TYPE b) { return a = a | b; }
 #define FUNC(x) &x, #x
 
 
-// standard assertion macros
-#undef assert_always
-
-#if defined(MAME_DEBUG_FAST)
-#define assert_always(x, msg)   do { if (!(x)) throw emu_fatalerror("%s\nCaused by assert: %s:%d: %s", msg, __FILE__, __LINE__, #x); } while (0)
-#elif defined(MAME_DEBUG)
-#define assert_always(x, msg)   do { if (!(x)) throw emu_fatalerror("%s\nCaused by assert: %s:%d: %s", msg, __FILE__, __LINE__, #x); } while (0)
-#else
-#define assert_always(x, msg)   do { if (!(x)) throw emu_fatalerror("%s (%s:%d)", msg, __FILE__, __LINE__); } while (0)
-#endif
-
-
 // macros to convert radians to degrees and degrees to radians
 template <typename T> constexpr auto RADIAN_TO_DEGREE(T const &x) { return (180.0 / M_PI) * x; }
 template <typename T> constexpr auto DEGREE_TO_RADIAN(T const &x) { return (M_PI / 180.0) * x; }
@@ -259,17 +249,26 @@ class emu_exception : public std::exception { };
 class emu_fatalerror : public emu_exception
 {
 public:
-	emu_fatalerror(const char *format, ...) ATTR_PRINTF(2,3);
-	emu_fatalerror(const char *format, va_list ap);
-	emu_fatalerror(int _exitcode, const char *format, ...) ATTR_PRINTF(3,4);
-	emu_fatalerror(int _exitcode, const char *format, va_list ap);
+	emu_fatalerror(util::format_argument_pack<std::ostream> const &args);
+	emu_fatalerror(int _exitcode, util::format_argument_pack<std::ostream> const &args);
 
-	const char *string() const { return text; }
-	int exitcode() const { return code; }
+	template <typename Format, typename... Params>
+	emu_fatalerror(Format const &fmt, Params &&... args)
+		: emu_fatalerror(static_cast<util::format_argument_pack<std::ostream> const &>(util::make_format_argument_pack(fmt, std::forward<Params>(args)...)))
+	{
+	}
+	template <typename Format, typename... Params>
+	emu_fatalerror(int _exitcode, Format const &fmt, Params &&... args)
+		: emu_fatalerror(_exitcode, static_cast<util::format_argument_pack<std::ostream> const &>(util::make_format_argument_pack(fmt, std::forward<Params>(args)...)))
+	{
+	}
+
+	virtual char const *what() const noexcept override { return m_text.c_str(); }
+	int exitcode() const noexcept { return m_code; }
 
 private:
-	char text[1024];
-	int code;
+	std::string m_text;
+	int m_code;
 };
 
 class tag_add_exception
@@ -281,12 +280,13 @@ private:
 	std::string m_tag;
 };
 
+
 //**************************************************************************
 //  CASTING TEMPLATES
 //**************************************************************************
 
-void report_bad_cast(const std::type_info &src_type, const std::type_info &dst_type);
-void report_bad_device_cast(const device_t *dev, const std::type_info &src_type, const std::type_info &dst_type);
+[[noreturn]] void report_bad_cast(const std::type_info &src_type, const std::type_info &dst_type);
+[[noreturn]] void report_bad_device_cast(const device_t *dev, const std::type_info &src_type, const std::type_info &dst_type);
 
 template <typename Dest, typename Source>
 inline std::enable_if_t<std::is_base_of<device_t, Source>::value> report_bad_cast(Source *const src)
@@ -328,15 +328,15 @@ inline Dest downcast(Source &src)
 
 
 //**************************************************************************
-//  FUNCTION PROTOTYPES
-//**************************************************************************
-
-[[noreturn]] void fatalerror(const char *format, ...) ATTR_PRINTF(1,2);
-[[noreturn]] void fatalerror_exitcode(running_machine &machine, int exitcode, const char *format, ...) ATTR_PRINTF(3,4);
-
-//**************************************************************************
 //  INLINE FUNCTIONS
 //**************************************************************************
+
+template <typename... T>
+[[noreturn]] inline void fatalerror(T &&... args)
+{
+	throw emu_fatalerror(std::forward<T>(args)...);
+}
+
 
 // convert a series of 32 bits into a float
 inline float u2f(u32 v)
@@ -385,4 +385,4 @@ inline u64 d2u(double d)
 	return u.vv;
 }
 
-#endif  /* MAME_EMU_EMUCORE_H */
+#endif // MAME_EMU_EMUCORE_H

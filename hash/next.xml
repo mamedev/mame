@@ -8,19 +8,19 @@
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Moto Boot Disk"/>
 			<dataarea name="flop" size="1474560">
-				<rom name="3.2_moto_boot_disk.img" size="1474560" crc="c69fa186" sha1="4ee82cb5b706678def1399479f13a9f70566df46" offset="0" />
+				<rom name="3.2_moto_boot_disk.img" size="1474560" crc="c69fa186" sha1="4ee82cb5b706678def1399479f13a9f70566df46"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Boot Disk"/>
 			<dataarea name="flop" size="1474560">
-				<rom name="3.2_boot_disk.img" size="1474560" crc="6f20cb64" sha1="f05a0033ced36906e31c770201d4f5620c160d1f" offset="0" />
+				<rom name="3.2_boot_disk.img" size="1474560" crc="6f20cb64" sha1="f05a0033ced36906e31c770201d4f5620c160d1f"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Addl Drivers"/>
 			<dataarea name="flop" size="1474560">
-				<rom name="3.2_addl_drivers.img" size="1474560" crc="e287714a" sha1="c575de462b53c57e844cfbdcf9655f158bd6ff8b" offset="0" />
+				<rom name="3.2_addl_drivers.img" size="1474560" crc="e287714a" sha1="c575de462b53c57e844cfbdcf9655f158bd6ff8b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -32,43 +32,43 @@
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Moto Boot Disk"/>
 			<dataarea name="flop" size="1474560">
-				<rom name="3.3_moto_boot_disk.img" size="1474560" crc="59bcb5ff" sha1="77d00a22278bdc41e6eb33b97bb8287c21faf811" offset="0" />
+				<rom name="3.3_moto_boot_disk.img" size="1474560" crc="59bcb5ff" sha1="77d00a22278bdc41e6eb33b97bb8287c21faf811"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Boot Disk"/>
 			<dataarea name="flop" size="1474560">
-				<rom name="3.3_boot_disk.img" size="1474560" crc="b853e7f0" sha1="643f917af24502fa293814fa756af920537275b3" offset="0" />
+				<rom name="3.3_boot_disk.img" size="1474560" crc="b853e7f0" sha1="643f917af24502fa293814fa756af920537275b3"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="PCCard Install"/>
 			<dataarea name="flop" size="1474560">
-				<rom name="3.3_pccard_install.img" size="1474560" crc="7e2b4c23" sha1="d20f6c2380cf1903bcbbd43a2b82c8c9ac8f6c28" offset="0" />
+				<rom name="3.3_pccard_install.img" size="1474560" crc="7e2b4c23" sha1="d20f6c2380cf1903bcbbd43a2b82c8c9ac8f6c28"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<feature name="part_id" value="Driver Disk"/>
 			<dataarea name="flop" size="1474560">
-				<rom name="3.3_driver_disk.img" size="1474560" crc="25c72d93" sha1="99c461dc2ea58a2e1da046db6939375016bdc1c9" offset="0" />
+				<rom name="3.3_driver_disk.img" size="1474560" crc="25c72d93" sha1="99c461dc2ea58a2e1da046db6939375016bdc1c9"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
 			<feature name="part_id" value="Core Drivers"/>
 			<dataarea name="flop" size="1474560">
-				<rom name="3.3_core_drivers.img" size="1474560" crc="3e285c7b" sha1="7385a3ca988747cab570d0a4f069938bdfe5e42e" offset="0" />
+				<rom name="3.3_core_drivers.img" size="1474560" crc="3e285c7b" sha1="7385a3ca988747cab570d0a4f069938bdfe5e42e"/>
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_3_5">
 			<feature name="part_id" value="Addl Drivers"/>
 			<dataarea name="flop" size="1474560">
-				<rom name="3.3_addl_drivers.img" size="1474560" crc="d85f2bb5" sha1="7fddbda62679645eeeb12537a710072db4df7d41" offset="0" />
+				<rom name="3.3_addl_drivers.img" size="1474560" crc="d85f2bb5" sha1="7fddbda62679645eeeb12537a710072db4df7d41"/>
 			</dataarea>
 		</part>
 		<part name="flop7" interface="floppy_3_5">
 			<feature name="part_id" value="Beta Drivers"/>
 			<dataarea name="flop" size="1474560">
-				<rom name="3.3_beta_drivers.img" size="1474560" crc="19330f77" sha1="b9e62ebcfbb63555a2981ff5d585502690d5ab3d" offset="0" />
+				<rom name="3.3_beta_drivers.img" size="1474560" crc="19330f77" sha1="b9e62ebcfbb63555a2981ff5d585502690d5ab3d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -80,25 +80,25 @@
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Install Disk"/>
 			<dataarea name="flop" size="1474560">
-				<rom name="4.2_install_disk.img" size="1474560" crc="89449fec" sha1="e770862968560068659648d8dc93e8f72568ad32" offset="0" />
+				<rom name="4.2_install_disk.img" size="1474560" crc="89449fec" sha1="e770862968560068659648d8dc93e8f72568ad32"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Driver Disk"/>
 			<dataarea name="flop" size="1474560">
-				<rom name="4.2_driver_disk.img" size="1474560" crc="713c7465" sha1="ffa259f0205fe02adce53be6fb5056259b37ab0f" offset="0" />
+				<rom name="4.2_driver_disk.img" size="1474560" crc="713c7465" sha1="ffa259f0205fe02adce53be6fb5056259b37ab0f"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Beta Drivers 1"/>
 			<dataarea name="flop" size="1474560">
-				<rom name="4.2_beta_drivers_1.img" size="1474560" crc="1a72934d" sha1="7b7f84943d7598f10f334bb32af3eae2aa209101" offset="0" />
+				<rom name="4.2_beta_drivers_1.img" size="1474560" crc="1a72934d" sha1="7b7f84943d7598f10f334bb32af3eae2aa209101"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<feature name="part_id" value="Beta Drivers 2"/>
 			<dataarea name="flop" size="1474560">
-				<rom name="4.2_beta_drivers_2.img" size="1474560" crc="38868340" sha1="6a5c2c8bc0c8208821391086cae2eac4591add0f" offset="0" />
+				<rom name="4.2_beta_drivers_2.img" size="1474560" crc="38868340" sha1="6a5c2c8bc0c8208821391086cae2eac4591add0f"/>
 			</dataarea>
 		</part>
 	</software>

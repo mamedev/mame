@@ -586,7 +586,7 @@ mcpx_ohci_device::mcpx_ohci_device(const machine_config &mconfig, const char *ta
 	set_ids(0x10de01c2, 0, 0, 0);
 }
 
-void mcpx_ohci_device::plug_usb_device(int port, ohci_function *function)
+void mcpx_ohci_device::plug_usb_device(int port, device_usb_ohci_function_interface *function)
 {
 	function->set_bus_manager(ohci_usb);
 	ohci_usb->usb_ohci_plug(port, function);
@@ -631,7 +631,7 @@ void mcpx_ohci_device::device_config_complete()
 		ohci_usb_connector *conn = downcast<ohci_usb_connector *>(subdevice(id));
 		if (conn)
 		{
-			ohci_function *func = conn->get_device();
+			device_usb_ohci_function_interface *func = conn->get_card_device();
 			if (func)
 			{
 				connecteds[connecteds_count].dev = func;
@@ -1050,7 +1050,7 @@ void mcpx_ide_device::ide_pri_command(address_map &map)
 void mcpx_ide_device::ide_pri_control(address_map &map)
 {
 	// 3f6
-	map(2, 2).rw(*this, FUNC(mcpx_ide_device::pri_read_cs1_r), FUNC(mcpx_ide_device::pri_write_cs1_w));
+	map(2, 2).rw(FUNC(mcpx_ide_device::pri_read_cs1_r), FUNC(mcpx_ide_device::pri_write_cs1_w));
 }
 
 void mcpx_ide_device::ide_sec_command(address_map &map)
@@ -1061,7 +1061,7 @@ void mcpx_ide_device::ide_sec_command(address_map &map)
 void mcpx_ide_device::ide_sec_control(address_map &map)
 {
 	// 376
-	map(2, 2).rw(*this, FUNC(mcpx_ide_device::sec_read_cs1_r), FUNC(mcpx_ide_device::sec_write_cs1_w));
+	map(2, 2).rw(FUNC(mcpx_ide_device::sec_read_cs1_r), FUNC(mcpx_ide_device::sec_write_cs1_w));
 }
 
 void mcpx_ide_device::ide_io(address_map &map)

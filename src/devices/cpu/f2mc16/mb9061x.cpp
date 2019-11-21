@@ -324,7 +324,7 @@ READ8_MEMBER(mb9061x_device::tbtc_r)
 
 WRITE8_MEMBER(mb9061x_device::tbtc_w)
 {
-	static const float periods[4] = { 1.024, 4.096, 16.384, 131.072 };
+	static const float periods[4] = { 1.024f, 4.096f, 16.384f, 131.072f };
 
 	//printf("%02x to TBTC\n", data);
 //  if ((!(data & TBTC_TBR)) || ((data & (TBTC_TBC1|TBTC_TBC0)) != (m_tbtc & (TBTC_TBC1|TBTC_TBC0))))

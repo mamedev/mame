@@ -1542,7 +1542,7 @@ void tnzs_base_state::tnzs_base(machine_config &config)
 
 	tnzs_mainbank(config);
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 
 	/* video hardware */
 	SETA001_SPRITE(config, m_seta001, 0);

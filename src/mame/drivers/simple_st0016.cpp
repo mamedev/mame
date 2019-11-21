@@ -498,7 +498,7 @@ void st0016_state::mayjinsn(machine_config &config)
 	V810(config, m_subcpu, 10000000); //25 Mhz ?
 	m_subcpu->set_addrmap(AS_PROGRAM, &st0016_state::v810_mem);
 
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 }
 
 void st0016_state::renju(machine_config &config)

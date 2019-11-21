@@ -488,7 +488,7 @@ void m10_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 		interrupt_callback(ptr, param);
 		break;
 	default:
-		assert_always(false, "Unknown id in m10_state::device_timer");
+		throw emu_fatalerror("Unknown id in m10_state::device_timer");
 	}
 }
 

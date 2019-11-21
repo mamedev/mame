@@ -32,9 +32,7 @@
 
 // global allocation helpers -- use these instead of new and delete
 #define global_alloc(Type)                          new Type
-#define global_alloc_nothrow(Type)                  new (std::nothrow) Type
 #define global_alloc_array(Type, Num)               new Type[Num]
-#define global_alloc_array_nothrow(Type, Num)       new (std::nothrow) Type[Num]
 #define global_free(Ptr)                            do { delete Ptr; } while (0)
 #define global_free_array(Ptr)                      do { delete[] Ptr; } while (0)
 

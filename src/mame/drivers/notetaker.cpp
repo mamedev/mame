@@ -251,7 +251,7 @@ void notetaker_state::device_timer(emu_timer &timer, device_timer_id id, int par
 		timer_fifoclk(ptr, param);
 		break;
 	default:
-		assert_always(false, "Unknown id in notetaker_state::device_timer");
+		throw emu_fatalerror("Unknown id in notetaker_state::device_timer");
 	}
 }
 
@@ -731,9 +731,9 @@ void notetaker_state::ep_io(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x800, 0x803).mirror(0x07fc).rw(m_ep_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
-	//map(0x1000, 0x1001) AM_MIRROR(0x07fe) AM_DEVREADWRITE("debug8255", 8255_device, read, write) // debugger board 8255, is this the same one as the iop accesses? or are these two 8255s on separate cards?
+	//map(0x1000, 0x1001).mirror(0x07fe).rw("debug8255", FUNC(8255_device::read), FUNC(8255_device::write)); // debugger board 8255, is this the same one as the iop accesses? or are these two 8255s on separate cards?
 	map(0x2000, 0x2001).mirror(0x07fe).w(FUNC(notetaker_state::EPConReg_w)); // emu processor control reg & leds
-	//map(0x4000, 0x4001) AM_MIRROR(0x07fe) AM_WRITE(EmuClearParity_w) // writes here clear the local 8k-ram parity error register
+	//map(0x4000, 0x4001).mirror(0x07fe).w(FUNC(notetaker_state::EmuClearParity_w)); // writes here clear the local 8k-ram parity error register
 }
 
 /* Input ports */

@@ -8,14 +8,16 @@
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
+#include "machine/315_5195.h"
+#include "machine/adc0804.h"
 #include "machine/i8255.h"
 #include "machine/nvram.h"
-#include "machine/segaic16.h"
 #include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "video/segaic16.h"
 #include "video/segaic16_road.h"
 #include "video/sega16sp.h"
+#include "screen.h"
 
 
 // ======================> segaorun_state
@@ -24,15 +26,17 @@ class segaorun_state : public sega_16bit_common_base
 {
 public:
 	// construction/destruction
-	segaorun_state(const machine_config &mconfig, device_type type, const char *tag)
-		: sega_16bit_common_base(mconfig, type, tag),
+	segaorun_state(const machine_config &mconfig, device_type type, const char *tag) :
+		sega_16bit_common_base(mconfig, type, tag),
 		m_mapper(*this, "mapper"),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "subcpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_i8255(*this, "i8255"),
+		m_adc(*this, "adc"),
 		m_nvram(*this, "nvram"),
 		m_watchdog(*this, "watchdog"),
+		m_screen(*this, "screen"),
 		m_sprites(*this, "sprites"),
 		m_segaic16vid(*this, "segaic16vid"),
 		m_segaic16road(*this, "segaic16road"),
@@ -40,6 +44,8 @@ public:
 		m_digital_ports(*this, { { "SERVICE", "UNKNOWN", "COINAGE", "DSW" } }),
 		m_adc_ports(*this, "ADC.%u", 0),
 		m_workram(*this, "workram"),
+		m_custom_io_r(*this),
+		m_custom_io_w(*this),
 		m_custom_map(nullptr),
 		m_shangon_video(false),
 		m_scanline_timer(nullptr),
@@ -124,6 +130,7 @@ protected:
 	DECLARE_WRITE16_MEMBER( outrun_custom_io_w );
 	DECLARE_READ16_MEMBER( shangon_custom_io_r );
 	DECLARE_WRITE16_MEMBER( shangon_custom_io_w );
+	uint8_t analog_r();
 
 	// devices
 	required_device<sega_315_5195_mapper_device> m_mapper;
@@ -131,8 +138,10 @@ protected:
 	required_device<m68000_device> m_subcpu;
 	required_device<z80_device> m_soundcpu;
 	required_device<i8255_device> m_i8255;
+	required_device<adc0804_device> m_adc;
 	optional_device<nvram_device> m_nvram;
 	required_device<watchdog_timer_device> m_watchdog;
+	required_device<screen_device> m_screen;
 	required_device<sega_16bit_sprite_device> m_sprites;
 	required_device<segaic16_video_device> m_segaic16vid;
 	required_device<segaic16_road_device> m_segaic16road;
@@ -148,15 +157,15 @@ protected:
 	// configuration
 	read16_delegate     m_custom_io_r;
 	write16_delegate    m_custom_io_w;
-	const uint8_t *       m_custom_map;
+	const uint8_t *     m_custom_map;
 	bool                m_shangon_video;
 
 	// internal state
 	emu_timer *         m_scanline_timer;
 	emu_timer *         m_irq2_gen_timer;
-	uint8_t               m_irq2_state;
-	uint8_t               m_adc_select;
-	uint8_t               m_vblank_irq_state;
+	uint8_t             m_irq2_state;
+	uint8_t             m_adc_select;
+	uint8_t             m_vblank_irq_state;
 	int                 m_bankmotor_pos;
 	int                 m_bankmotor_delta;
 };

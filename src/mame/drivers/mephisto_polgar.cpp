@@ -331,7 +331,7 @@ void mephisto_risc_state::mrisc(machine_config &config)
 	maincpu.set_periodic_int(FUNC(mephisto_risc_state::irq0_line_hold), attotime::from_hz(XTAL(10'000'000) / (1 << 14)));
 
 	CHESSMACHINE(config, m_chessm, 14'000'000); // Tasc ChessMachine EC PCB, Mephisto manual says 14MHz (no XTAL)
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum("maincpu");
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

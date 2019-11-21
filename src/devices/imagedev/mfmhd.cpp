@@ -309,7 +309,6 @@ std::string mfm_harddisk_device::tts(const attotime &t)
 
 mfm_harddisk_device::mfm_harddisk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: harddisk_image_device(mconfig, type, tag, owner, clock),
-		device_slot_card_interface(mconfig, *this),
 		m_index_timer(nullptr),
 		m_spinup_timer(nullptr),
 		m_seek_timer(nullptr),

@@ -37,11 +37,23 @@
  *   - http://archive.irix.cc/sgistuff/hardware/graphics/eclipse.html
  *
  * TODO:
- *   - ge5/hq1
- *   - raster engine
- *   - dma
+ *   - host dma
+ *   - display registers
+ *   - save state
  *   - slotify (SGI, MCA, ISA)
- *   - everything else
+ *   - separate raster and display systems?
+ */
+/*
+ * Irix 4.0.5 IDE WIP
+ *
+ * usage: buffon; ge5load; <test>; gr_exit; buffoff
+ *
+ * these diagnostics fail (all others pass):
+ *   bitp  - options not detected
+ *   ctl2  - graphics strobe
+ *   gedma - ge5 failed to finish
+ *   re    - fails line drawing test
+ *   redma - ge5 failed to finish
  */
 
 #include "emu.h"
@@ -54,98 +66,87 @@
 
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE(SGI_GR11, sgi_gr11_device, "sgi_gr11", "SGI GR1.1 Graphics")
-DEFINE_DEVICE_TYPE(SGI_GR12, sgi_gr12_device, "sgi_gr12", "SGI GR1.2 Graphics")
+DEFINE_DEVICE_TYPE(SGI_GR1, sgi_gr1_device, "sgi_gr1", "SGI GR1 Graphics")
 
-sgi_gr1_device::sgi_gr1_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, type, tag, owner, clock)
+sgi_gr1_device::sgi_gr1_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, SGI_GR1, tag, owner, clock)
+	, m_bank(*this, "bank")
 	, m_screen(*this, "screen")
-	, m_re(*this, "re2")
 	, m_ge(*this, "ge5")
+	, m_re(*this, "re2")
+	, m_xmap(*this, "xmap%u", 0U)
 	, m_cursor(*this, "cursor%u", 0U)
-	, m_vblank_cb(*this)
+	, m_ramdac(*this, "ramdac%u", 0U)
 	, m_int_fifo_cb(*this)
 {
 }
 
-sgi_gr11_device::sgi_gr11_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
-	: sgi_gr1_device(mconfig, SGI_GR11, tag, owner, clock)
-	, m_ramdac(*this, "ramdac")
-{
-}
-
-sgi_gr12_device::sgi_gr12_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
-	: sgi_gr1_device(mconfig, SGI_GR12, tag, owner, clock)
-	, m_ramdac(*this, "ramdac%u", 0U)
-{
-}
+static INPUT_PORTS_START(sgi_gr1)
+	PORT_START("options")
+	PORT_CONFNAME(0x08, 0x08, "Turbo")
+	PORT_CONFSETTING(0x00, DEF_STR(Yes))
+	PORT_CONFSETTING(0x08, DEF_STR(No))
+	PORT_CONFNAME(0x10, 0x00, "Z Buffer")
+	PORT_CONFSETTING(0x00, DEF_STR(Yes))
+	PORT_CONFSETTING(0x10, DEF_STR(No))
+INPUT_PORTS_END
 
 void sgi_gr1_device::map(address_map &map)
 {
-	// TODO: bank based on mar_msb
+	map(0x0000, 0x7fff).m(m_bank, FUNC(address_map_bank_device::amap32));
+}
 
-	map(0x0000, 0x03ff).rw(m_ge, FUNC(sgi_ge5_device::code_r), FUNC(sgi_ge5_device::code_w));
+void sgi_gr1_device::map_bank(address_map &map)
+{
+	// bit 15 of the map offset represents mar_msb
+	map(0x0000, 0x03ff).rw(m_ge, FUNC(sgi_ge5_device::code_r<false>), FUNC(sgi_ge5_device::code_w<false>));
+	map(0x8000, 0x83ff).rw(m_ge, FUNC(sgi_ge5_device::code_r<true>), FUNC(sgi_ge5_device::code_w<true>));
 
-	map(0x04c0, 0x04c3).rw(FUNC(sgi_gr1_device::dr1_r), FUNC(sgi_gr1_device::dr1_w)).umask32(0xff000000);
-	map(0x04e0, 0x04e3).rw(FUNC(sgi_gr1_device::dr0_r), FUNC(sgi_gr1_device::dr0_w)).umask32(0xff000000);
+	map(0x8400, 0x841f).rw(m_xmap[0], FUNC(sgi_xmap2_device::reg_r), FUNC(sgi_xmap2_device::reg_w)).umask32(0x000000ff);
+	map(0x8420, 0x843f).rw(m_xmap[1], FUNC(sgi_xmap2_device::reg_r), FUNC(sgi_xmap2_device::reg_w)).umask32(0x000000ff);
+	map(0x8440, 0x845f).rw(m_xmap[2], FUNC(sgi_xmap2_device::reg_r), FUNC(sgi_xmap2_device::reg_w)).umask32(0x000000ff);
+	map(0x8460, 0x847f).rw(m_xmap[3], FUNC(sgi_xmap2_device::reg_r), FUNC(sgi_xmap2_device::reg_w)).umask32(0x000000ff);
+	map(0x8480, 0x849f).rw(m_xmap[4], FUNC(sgi_xmap2_device::reg_r), FUNC(sgi_xmap2_device::reg_w)).umask32(0x000000ff);
+	map(0x84a0, 0x84bf).lw8(
+			[this](offs_t offset, u8 data)
+			{
+				for (sgi_xmap2_device *xmap : m_xmap)
+					xmap->reg_w(offset, data);
+			}, "xmap_broadcast").umask32(0x000000ff);
 
-	map(0x0560, 0x056f).m(m_cursor[0], FUNC(bt431_device::map)).umask32(0xff000000);
-	map(0x0580, 0x058f).m(m_cursor[1], FUNC(bt431_device::map)).umask32(0xff000000);
+	map(0x84c0, 0x84c3).rw(FUNC(sgi_gr1_device::dr1_r), FUNC(sgi_gr1_device::dr1_w)).umask32(0xff000000);
+	map(0x84e0, 0x84e3).rw(FUNC(sgi_gr1_device::dr0_r), FUNC(sgi_gr1_device::dr0_w)).umask32(0xff000000);
 
-	map(0x05a0, 0x05a3).rw(FUNC(sgi_gr1_device::dr4_r), FUNC(sgi_gr1_device::dr4_w)).umask32(0xff000000);
-	map(0x05c0, 0x05c3).rw(FUNC(sgi_gr1_device::dr3_r), FUNC(sgi_gr1_device::dr3_w)).umask32(0xff000000);
-	map(0x05e0, 0x05e3).rw(FUNC(sgi_gr1_device::dr2_r), FUNC(sgi_gr1_device::dr2_w)).umask32(0xff000000);
+	map(0x8500, 0x850f).m(m_ramdac[0], FUNC(bt457_device::map)).umask32(0x000000ff);
+	map(0x8520, 0x852f).m(m_ramdac[1], FUNC(bt457_device::map)).umask32(0x000000ff);
+	map(0x8540, 0x854f).m(m_ramdac[2], FUNC(bt457_device::map)).umask32(0x000000ff);
 
-	map(0x0640, 0x783).w(m_ge, FUNC(sgi_ge5_device::command_w)).umask32(0xffff0000);
-	map(0x0740, 0x743).r(m_ge, FUNC(sgi_ge5_device::pc_r)).umask32(0xffff0000);
+	map(0x8560, 0x856f).m(m_cursor[0], FUNC(bt431_device::map)).umask32(0x000000ff);
+	map(0x8580, 0x858f).m(m_cursor[1], FUNC(bt431_device::map)).umask32(0x000000ff);
 
-	map(0x0800, 0x0bff).w(FUNC(sgi_gr1_device::fifo_w));
-	map(0x0c00, 0x0dff).w(m_ge, FUNC(sgi_ge5_device::mar_w));
-	map(0x0e00, 0x0e07).w(m_ge, FUNC(sgi_ge5_device::mar_msb_w));
+	map(0x85a0, 0x85a3).rw(FUNC(sgi_gr1_device::dr4_r), FUNC(sgi_gr1_device::dr4_w)).umask32(0xff000000);
+	map(0x85c0, 0x85c3).rw(FUNC(sgi_gr1_device::dr3_r), FUNC(sgi_gr1_device::dr3_w)).umask32(0xff000000);
+	map(0x85e0, 0x85e3).rw(FUNC(sgi_gr1_device::dr2_r), FUNC(sgi_gr1_device::dr2_w)).umask32(0xff000000);
+
+	map(0x8640, 0x8783).w(m_ge, FUNC(sgi_ge5_device::command_w)).umask32(0xffff0000);
+	map(0x8740, 0x8743).r(m_ge, FUNC(sgi_ge5_device::pc_r)).umask32(0xffff0000);
+
+	map(0x0800, 0x0bff).r(m_ge, FUNC(sgi_ge5_device::buffer_r)).mirror(0x8000);
+	map(0x0800, 0x0bff).w(FUNC(sgi_gr1_device::fifo_w)).mirror(0x8000);
+	map(0x0c00, 0x0dff).w(m_ge, FUNC(sgi_ge5_device::mar_w)).mirror(0x8000);
+	map(0x0e00, 0x0e07).lw32([this](offs_t offset, u32 data) { m_bank->set_bank(offset); }, "mar_msb").mirror(0x8000);
 
 	map(0x1400, 0x17ff).rw(m_ge, FUNC(sgi_ge5_device::data_r), FUNC(sgi_ge5_device::data_w));
-	map(0x2000, 0x2007).lrw32("ff",
-		[this](offs_t offset) { LOG("read finish flag %d\n", offset); return m_ff[offset]; },
-		[this](offs_t offset, u32 data, u32 mem_mask) { LOG("write finish flag %d data %d\n", offset, data); m_ff[offset] = data; });
+	map(0x2000, 0x2007).rw(m_ge, FUNC(sgi_ge5_device::finish_r), FUNC(sgi_ge5_device::finish_w)).mirror(0x8000);
+
 	//map(0x207c, 0x207f); // gr1 vs gr2
-}
-
-void sgi_gr11_device::map(address_map &map)
-{
-	sgi_gr1_device::map(map);
-
-	map(0x0510, 0x0517).rw(FUNC(sgi_gr11_device::xpc1_r<0>), FUNC(sgi_gr11_device::xpc1_w<0>)).umask32(0x000000ff);
-	map(0x0530, 0x0537).rw(FUNC(sgi_gr11_device::xpc1_r<1>), FUNC(sgi_gr11_device::xpc1_w<1>)).umask32(0x000000ff);
-	map(0x0550, 0x0557).rw(FUNC(sgi_gr11_device::xpc1_r<2>), FUNC(sgi_gr11_device::xpc1_w<2>)).umask32(0x000000ff);
-	map(0x0570, 0x0577).rw(FUNC(sgi_gr11_device::xpc1_r<3>), FUNC(sgi_gr11_device::xpc1_w<3>)).umask32(0x000000ff);
-	map(0x0590, 0x0597).rw(FUNC(sgi_gr11_device::xpc1_r<4>), FUNC(sgi_gr11_device::xpc1_w<4>)).umask32(0x000000ff);
-
-	map(0x05b0, 0x05b7).w(FUNC(sgi_gr11_device::xpc1_bc_w)).umask32(0x000000ff);
-
-	map(0x05d0, 0x05df).m(m_ramdac, FUNC(bt458_device::map));
-}
-
-void sgi_gr12_device::map(address_map &map)
-{
-	sgi_gr1_device::map(map);
-
-	map(0x0400, 0x041f).rw(FUNC(sgi_gr12_device::xmap2_r<0>), FUNC(sgi_gr12_device::xmap2_w<0>)).umask32(0x000000ff);
-	map(0x0420, 0x043f).rw(FUNC(sgi_gr12_device::xmap2_r<1>), FUNC(sgi_gr12_device::xmap2_w<1>)).umask32(0x000000ff);
-	map(0x0440, 0x045f).rw(FUNC(sgi_gr12_device::xmap2_r<2>), FUNC(sgi_gr12_device::xmap2_w<2>)).umask32(0x000000ff);
-	map(0x0460, 0x047f).rw(FUNC(sgi_gr12_device::xmap2_r<3>), FUNC(sgi_gr12_device::xmap2_w<3>)).umask32(0x000000ff);
-	map(0x0480, 0x049f).rw(FUNC(sgi_gr12_device::xmap2_r<4>), FUNC(sgi_gr12_device::xmap2_w<4>)).umask32(0x000000ff);
-	map(0x04a0, 0x04bf).w(FUNC(sgi_gr12_device::xmap2_bc_w)).umask32(0x000000ff);
-
-	map(0x0500, 0x050f).m(m_ramdac[0], FUNC(bt457_device::map)).umask32(0x000000ff);
-	map(0x0520, 0x052f).m(m_ramdac[1], FUNC(bt457_device::map)).umask32(0x000000ff);
-	map(0x0540, 0x054f).m(m_ramdac[2], FUNC(bt457_device::map)).umask32(0x000000ff);
 }
 
 void sgi_gr1_device::device_add_mconfig(machine_config &config)
 {
 	unsigned pixel_clock = 107'352'000;
 
-	//ADDRESS_MAP_BANK(config, m_ext).set_map(&lle_device_base::ext_map).set_options(ENDIANNESS_NATIVE, 8, 12, 0x100);
+	ADDRESS_MAP_BANK(config, m_bank).set_map(&sgi_gr1_device::map_bank).set_options(ENDIANNESS_NATIVE, 32, 32, 0x8000);
 
 	/*
 	 * 1280x1024 @ 60Hz
@@ -164,309 +165,178 @@ void sgi_gr1_device::device_add_mconfig(machine_config &config)
 	 */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(pixel_clock, 1680, 246, 246 + 1280, 1065, 39, 39 + 1024);
-	m_screen->set_screen_update(FUNC(sgi_gr1_device::screen_update));
-	m_screen->screen_vblank().set([this](int state) { m_vblank_cb(state); });
-
-	SGI_RE2(config, m_re, 0);
+	m_screen->set_screen_update(m_re.finder_tag(), FUNC(sgi_re2_device::screen_update));
 
 	SGI_GE5(config, m_ge, 10_MHz_XTAL);
 	m_ge->fifo_empty().set([this]() { return int(m_fifo.empty()); });
-	m_ge->fifo_read().set([this]() { return m_fifo.dequeue(); });
+	m_ge->fifo_read().set(FUNC(sgi_gr1_device::fifo_r));
 	m_ge->re_r().set(m_re, FUNC(sgi_re2_device::reg_r));
 	m_ge->re_w().set(m_re, FUNC(sgi_re2_device::reg_w));
 
+	SGI_RE2(config, m_re, 0);
+	m_re->out_rdy().set(m_ge, FUNC(sgi_ge5_device::re_rdy_w));
+	m_re->out_drq().set(m_ge, FUNC(sgi_ge5_device::re_drq_w));
+
+	SGI_XMAP2(config, m_xmap[0], pixel_clock / 5);
+	SGI_XMAP2(config, m_xmap[1], pixel_clock / 5);
+	SGI_XMAP2(config, m_xmap[2], pixel_clock / 5);
+	SGI_XMAP2(config, m_xmap[3], pixel_clock / 5);
+	SGI_XMAP2(config, m_xmap[4], pixel_clock / 5);
+
 	BT431(config, m_cursor[0], pixel_clock / 5);
 	BT431(config, m_cursor[1], pixel_clock / 5);
+
+	BT457(config, m_ramdac[0], pixel_clock);
+	BT457(config, m_ramdac[1], pixel_clock);
+	BT457(config, m_ramdac[2], pixel_clock);
 }
 
-void sgi_gr11_device::device_add_mconfig(machine_config &config)
+
+ioport_constructor sgi_gr1_device::device_input_ports() const
 {
-	sgi_gr1_device::device_add_mconfig(config);
-
-	BT458(config, m_ramdac, 107'352'000);
-}
-
-void sgi_gr12_device::device_add_mconfig(machine_config &config)
-{
-	sgi_gr1_device::device_add_mconfig(config);
-
-	BT457(config, m_ramdac[0], 107'352'000);
-	BT457(config, m_ramdac[1], 107'352'000);
-	BT457(config, m_ramdac[2], 107'352'000);
+	return INPUT_PORTS_NAME(sgi_gr1);
 }
 
 void sgi_gr1_device::device_start()
 {
-	m_vblank_cb.resolve_safe();
 	m_int_fifo_cb.resolve_safe();
 
 	//save_item(NAME());
-}
 
-void sgi_gr11_device::device_start()
-{
-	sgi_gr1_device::device_start();
-}
-
-void sgi_gr12_device::device_start()
-{
-	sgi_gr1_device::device_start();
-
-	m_vram = std::make_unique<u32[]>(1280 * 1024);
+	m_reset = true;
 }
 
 void sgi_gr1_device::device_reset()
 {
-	//m_dr0 = DR0_ZBIN;
-	//m_dr2 = DR2_BPIN;
-	//m_dr3 = DR3_MS;
-	m_dr4 = 0;
+	m_bank->set_bank(0);
+
+	m_dr0 = DR0_GRF1EN | DR0_SMALLMON0;
+	m_dr1 = DR1_TURBO;
+	//m_dr2 = 0;
+	//m_dr3 = DR3_FIFOFULL;
+	m_dr4 = DR4_MEGOPT;
 
 	m_fifo.clear();
 }
 
-void sgi_gr11_device::device_reset()
+u8 sgi_gr1_device::dr0_r()
 {
-	sgi_gr1_device::device_reset();
+	LOG("dr0_r 0x%02x (%s)\n", m_dr0, machine().describe_context());
+
+	return m_dr0;
 }
 
-void sgi_gr12_device::device_reset()
+u8 sgi_gr1_device::dr1_r()
 {
-	sgi_gr1_device::device_reset();
+	LOG("dr1_r 0x%02x (%s)\n", m_dr1, machine().describe_context());
 
-	//m_dr0 &= ~DR0_ZBIN;
-	//m_dr2 &= ~DR2_BPIN;
+	return m_dr1;
 }
 
-u32 sgi_gr11_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect)
+u8 sgi_gr1_device::dr2_r()
 {
-	/*
-	 * fb_pixel (8) bits, cursor (2 bits), pup (2 bits), wid (2 bits)
-	 *
-	 * iterate through 5 xpc1 channels
-	 *   mode = xpc1[channel][wid]
-	 *
-	 */
+	LOG("dr2_r 0x%02x (%s)\n", m_dr2, machine().describe_context());
 
-	return 0;
+	return m_dr2;
 }
 
-u32 sgi_gr12_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect)
+u8 sgi_gr1_device::dr3_r()
 {
-	// TODO: underlay
+	LOG("dr3_r 0x%02x (%s)\n", m_dr3, machine().describe_context());
 
-	unsigned offset = 0;
+	return m_dr3;
+}
 
-	for (unsigned y = screen.visible_area().min_y; y <= screen.visible_area().max_y; y++)
-		for (unsigned x = screen.visible_area().min_x; x <= screen.visible_area().max_x; x += 5)
-			for (unsigned c = 0; c < 5; c++)
-			{
-				u8 const overlay = (m_cursor[0]->cur_r(x + c, y) ? 1 : 0) | (m_cursor[1]->cur_r(x + c, y) ? 2 : 0);
-				u32 const data = m_vram[offset++];
-				u16 const mode = m_xmap2[c].mode[data >> 28];
+u8 sgi_gr1_device::dr4_r()
+{
+	LOG("dr4_r 0x%02x (%s)\n", m_dr4, machine().describe_context());
 
-				switch (mode & 0x07)
-				{
-				case 0: // 8 bit ci single buffer
-					{
-						u16 const ci = BIT(mode, 9) ? (mode & 0x0f00) | u8(data) : u8(data);
-						rgb_t const cm = m_xmap2[c].color[(m_dr4 & DR4_MS) ? ci | 0x1000 : ci];
+	return (m_dr4 | (m_ge->suspended() ? 0 : DR4_GESTALL)) & DR4_RM;
+}
 
-						bitmap.pix(y, x) = rgb_t(
-							m_ramdac[0]->lookup(cm.r(), overlay),
-							m_ramdac[1]->lookup(cm.g(), overlay),
-							m_ramdac[2]->lookup(cm.b(), overlay));
-					}
-					break;
+void sgi_gr1_device::dr0_w(u8 data)
+{
+	LOG("dr0_w 0x%02x (%s)\n", data, machine().describe_context());
 
-				case 1: // 4 bit ci double buffer
-					{
-						u8 const fb = BIT(mode, 3) ? u8(data) >> 4 : data & 0x0f;
-						u16 const ci = BIT(mode, 9) ? (mode & 0x0f00) | fb : fb;
-						rgb_t const cm = m_xmap2[c].color[(m_dr4 & DR4_MS) ? ci | 0x1000 : ci];
+	m_dr0 = (m_dr0 & ~DR0_WM) | (data & DR0_WM);
+}
 
-						bitmap.pix(y, x) = rgb_t(
-							m_ramdac[0]->lookup(cm.r(), overlay),
-							m_ramdac[1]->lookup(cm.g(), overlay),
-							m_ramdac[2]->lookup(cm.b(), overlay));
-					}
-					break;
+void sgi_gr1_device::dr1_w(u8 data)
+{
+	LOG("dr1_w 0x%02x (%s)\n", data, machine().describe_context());
 
-				case 2: // 12 bit ci double buffer
-					{
-						u8 const fb = u16(BIT(mode, 3) ? data >> 12 : data) & 0x0fff;
-						u16 const ci = BIT(mode, 9) ? (mode & 0x0f00) | (fb & 0xff) : fb;
-						rgb_t const cm = m_xmap2[c].color[(m_dr4 & DR4_MS) ? ci | 0x1000 : ci];
+	m_dr1 = (m_dr1 & ~DR1_WM) | (data & DR1_WM);
 
-						bitmap.pix(y, x) = rgb_t(
-							m_ramdac[0]->lookup(cm.r(), overlay),
-							m_ramdac[1]->lookup(cm.g(), overlay),
-							m_ramdac[2]->lookup(cm.b(), overlay));
-					}
-					break;
+	m_ge->cwen_w(BIT(data, 1));
+}
 
-				case 4: // 24 bit rgb single buffer
-					bitmap.pix(y, x) = rgb_t(
-						m_ramdac[0]->lookup(u8(data >> 0), overlay),
-						m_ramdac[1]->lookup(u8(data >> 8), overlay),
-						m_ramdac[2]->lookup(u8(data >> 16), overlay));
-					break;
+void sgi_gr1_device::dr2_w(u8 data)
+{
+	LOG("dr2_w 0x%02x (%s)\n", data, machine().describe_context());
 
-				case 5: // 12 bit rgb double buffer
-					bitmap.pix(y, x) = BIT(mode, 3) ?
-						rgb_t(
-							m_ramdac[0]->lookup((u8(data >> 0) & 0xf0) | (u8(data >> 4) & 0x0f), overlay),
-							m_ramdac[1]->lookup((u8(data >> 8) & 0xf0) | (u8(data >> 12) & 0x0f), overlay),
-							m_ramdac[2]->lookup((u8(data >> 16) & 0xf0) | (u8(data >> 20) & 0x0f), overlay)) :
-						rgb_t(
-							m_ramdac[0]->lookup((u8(data << 4) & 0xf0) | (u8(data >> 0) & 0x0f), overlay),
-							m_ramdac[1]->lookup((u8(data >> 4) & 0xf0) | (u8(data >> 8) & 0x0f), overlay),
-							m_ramdac[2]->lookup((u8(data >> 12) & 0xf0) | (u8(data >> 16) & 0x0f), overlay));
-					break;
-				}
-			}
+	m_dr2 = (m_dr2 & ~DR2_WM) | (data & DR2_WM);
+}
 
-	return 0;
+void sgi_gr1_device::dr3_w(u8 data)
+{
+	LOG("dr3_w 0x%02x (%s)\n", data, machine().describe_context());
+
+	m_dr3 = (m_dr3 & ~DR3_WM) | (data & DR3_WM);
+}
+
+void sgi_gr1_device::dr4_w(u8 data)
+{
+	LOG("dr4_w 0x%02x (%s)\n", data, machine().describe_context());
+
+	m_dr4 = (m_dr4 & ~DR4_WM) | (data & DR4_WM);
+
+	for (sgi_xmap2_device *xmap : m_xmap)
+		xmap->map_select_w(m_dr4 & DR4_MS);
+}
+
+u64 sgi_gr1_device::fifo_r()
+{
+	u64 data = m_fifo.dequeue();
+
+	if (m_fifo.empty())
+		m_dr3 &= DR3_FIFOEMPTY;
+
+	if (!(m_dr3 & DR3_FIFOFULL) && (m_fifo.queue_length() <= 256))
+	{
+		m_dr3 |= DR3_FIFOFULL;
+		m_int_fifo_cb(CLEAR_LINE);
+	}
+
+	return data;
 }
 
 void sgi_gr1_device::fifo_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	if (m_fifo.full())
-		fatalerror("fifo_w: fifo overflow (%s)", machine().describe_context().c_str());
-
-	LOG("fifo_w 0x%010x\n", (u64(offset) << 32) | data);
+	LOG("fifo_w 0x%010x (%s)\n", (u64(offset) << 32) | data, machine().describe_context());
 
 	m_fifo.enqueue((u64(offset) << 32) | data);
 
-	if (m_fifo.queue_length() > 256)
-		m_int_fifo_cb(ASSERT_LINE);
+	if (!(m_dr3 & DR3_FIFOEMPTY))
+		m_dr3 |= DR3_FIFOEMPTY;
 
-	//if (m_ge->suspended())
-	//  m_ge->resume(SUSPEND_REASON_HALT);
+	if ((m_dr3 & DR3_FIFOFULL) && (m_fifo.queue_length() > 256))
+	{
+		m_dr3 &= ~DR3_FIFOFULL;
+		m_int_fifo_cb(ASSERT_LINE);
+	}
+
+	if (m_ge->suspended())
+		m_ge->resume(SUSPEND_REASON_TRIGGER);
 }
 
 void sgi_gr1_device::reset_w(int state)
 {
-	if (state)
+	if (!m_reset && !state)
 	{
-		LOG("reset_w %d\n", state);
+		LOG("reset_w %d (%s)\n", state, machine().describe_context());
 		m_ge->pulse_input_line(INPUT_LINE_RESET, attotime::from_ticks(1, 10_MHz_XTAL));
-	}
-}
-
-template <unsigned Channel> u8 sgi_gr12_device::xmap2_r(offs_t offset)
-{
-	xmap2 const x = m_xmap2[Channel];
-
-	switch (offset)
-	{
-	case 0: // nop
-		break;
-
-	case 1: // blue data
-		if (x.addr & 0x1000)
-			return x.color[(m_dr4 & DR4_MS) ? x.addr : (x.addr & 0xfff)].b();
-		else if (x.addr < 0x10)
-			return x.overlay[x.addr].b();
-		break;
-
-	case 2: // green data
-		if (x.addr & 0x1000)
-			return x.color[(m_dr4 & DR4_MS) ? x.addr : (x.addr & 0xfff)].g();
-		else if (x.addr < 0x10)
-			return x.overlay[x.addr].g();
-		break;
-
-	case 3: // red data
-		if (x.addr & 0x1000)
-			return x.color[(m_dr4 & DR4_MS) ? x.addr : (x.addr & 0xfff)].r();
-		else if (x.addr < 0x10)
-			return x.overlay[x.addr].r();
-		break;
-
-	case 4: // increment address
-		// TODO: should reading increment the address register?
-		//x.addr = (x.addr + 1) & 0x1fff;
-		LOG("read address increment\n");
-		break;
-
-	case 5: // other data
-		if (x.addr < 0x20)
-		{
-			u16 const mode = x.mode[(x.addr >> 1) & 0xf];
-
-			return BIT(x.addr, 0) ? (mode >> 8) : u8(mode);
-		}
-		else if (x.addr == 0x20)
-			return x.wid_aux;
-		else if (x.addr == 0x21)
-			return 0x18; // z-buffer and bit-plane expansion not present?
-		break;
-
-	case 6: // address msb
-		return x.addr >> 8;
-
-	case 7: // address lsb
-		return u8(x.addr);
+		m_re->reset();
 	}
 
-	return 0;
-}
-
-template <unsigned Channel> void sgi_gr12_device::xmap2_w(offs_t offset, u8 data)
-{
-	xmap2 &x = m_xmap2[Channel];
-
-	switch (offset)
-	{
-	case 0: // nop
-		break;
-
-	case 1: // blue data
-		if (x.addr & 0x1000)
-			x.color[(m_dr4 & DR4_MS) ? x.addr : (x.addr & 0xfff)].set_b(data);
-		else if (x.addr < 0x10)
-			x.overlay[x.addr].set_b(data);
-		break;
-
-	case 2: // green data
-		if (x.addr & 0x1000)
-			x.color[(m_dr4 & DR4_MS) ? x.addr : (x.addr & 0xfff)].set_g(data);
-		else if (x.addr < 0x10)
-			x.overlay[x.addr].set_g(data);
-		break;
-
-	case 3: // red data
-		if (x.addr & 0x1000)
-			x.color[(m_dr4 & DR4_MS) ? x.addr : (x.addr & 0xfff)].set_r(data);
-		else if (x.addr < 0x10)
-			x.overlay[x.addr].set_r(data);
-		break;
-
-	case 4: // increment address
-		x.addr = (x.addr + 1) & 0x1fff;
-		break;
-
-	case 5: // other data
-		if (x.addr < 0x20)
-		{
-			u16 &mode = x.mode[(x.addr >> 1) & 0xf];
-
-			if (BIT(x.addr, 0))
-				mode = (u16(data & 0x3f) << 8) | (mode & 0x00ff);
-			else
-				mode = (mode & 0x3f00) | data;
-		}
-		else if (x.addr == 0x20)
-			x.wid_aux = BIT(data, 0);
-		break;
-
-	case 6: // address msb
-		x.addr = u16((data & 0x1f) << 8) | (x.addr & 0x00ff);
-		break;
-
-	case 7: // address lsb
-		x.addr = (x.addr & 0x1f00) | data;
-		break;
-	}
+	m_reset = !state;
 }

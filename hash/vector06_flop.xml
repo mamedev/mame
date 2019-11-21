@@ -8,7 +8,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="839680">
-				<rom name="os-t34.fdd" size="839680" crc="6405dafa" sha1="c3b0503c06b541641ae7501ff1123758a7e7d8ab" offset="0" />
+				<rom name="os-t34.fdd" size="839680" crc="6405dafa" sha1="c3b0503c06b541641ae7501ff1123758a7e7d8ab"/>
 			</dataarea>
 		</part>
 	</software>
@@ -19,7 +19,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="839680">
-				<rom name="os-t72.fdd" size="839680" crc="cbb25106" sha1="ca2d3fa54cebe2fe29fb9b4bcd9bf7a54977ee50" offset="0" />
+				<rom name="os-t72.fdd" size="839680" crc="cbb25106" sha1="ca2d3fa54cebe2fe29fb9b4bcd9bf7a54977ee50"/>
 			</dataarea>
 		</part>
 	</software>
@@ -30,7 +30,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="839680">
-				<rom name="card.fdd" size="839680" crc="334e1379" sha1="2c15dac696942b0f3abe051a30bd954169344ad7" offset="0" />
+				<rom name="card.fdd" size="839680" crc="334e1379" sha1="2c15dac696942b0f3abe051a30bd954169344ad7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -42,7 +42,7 @@
 	<!--- title music plays too fast because of unemulated RAM access latency -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="839680">
-				<rom name="cdpacman.fdd" size="839680" crc="c429fa01" sha1="4513907202e22e795eb6c6af7eb9a4795795275e" offset="0" />
+				<rom name="cdpacman.fdd" size="839680" crc="c429fa01" sha1="4513907202e22e795eb6c6af7eb9a4795795275e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -54,7 +54,7 @@
 	<!--- hold Ctrl while booting -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="839680">
-				<rom name="game-15.fdd" size="839680" crc="259fcb8e" sha1="4cec8e06d147b74a43784c7389ed86ba02bdf952" offset="0" />
+				<rom name="game-15.fdd" size="839680" crc="259fcb8e" sha1="4cec8e06d147b74a43784c7389ed86ba02bdf952"/>
 			</dataarea>
 		</part>
 	</software>
@@ -65,7 +65,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="839680">
-				<rom name="komrab.fdd" size="839680" crc="59f8d7ee" sha1="ba95d78add7bf0cda05694763f0c72abcc6737de" offset="0" />
+				<rom name="komrab.fdd" size="839680" crc="59f8d7ee" sha1="ba95d78add7bf0cda05694763f0c72abcc6737de"/>
 			</dataarea>
 		</part>
 	</software>
@@ -76,7 +76,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="839680">
-				<rom name="lemmings.fdd" size="839680" crc="06ac97ba" sha1="3c6e7e226ae5dc7fd57bdf48bda17a50f5c21943" offset="0" />
+				<rom name="lemmings.fdd" size="839680" crc="06ac97ba" sha1="3c6e7e226ae5dc7fd57bdf48bda17a50f5c21943"/>
 			</dataarea>
 		</part>
 	</software>
@@ -87,7 +87,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="839680">
-				<rom name="lines.fdd" size="839680" crc="d21ed39f" sha1="2a073ab4dd6cb3bc587dd50c1ec3a40fb1be1632" offset="0" />
+				<rom name="lines.fdd" size="839680" crc="d21ed39f" sha1="2a073ab4dd6cb3bc587dd50c1ec3a40fb1be1632"/>
 			</dataarea>
 		</part>
 	</software>
@@ -98,7 +98,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="839680">
-				<rom name="mreversi.fdd" size="839680" crc="0175f570" sha1="c13eed04a92da8dd814dae0bc3079c2689c8cbb3" offset="0" />
+				<rom name="mreversi.fdd" size="839680" crc="0175f570" sha1="c13eed04a92da8dd814dae0bc3079c2689c8cbb3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -109,7 +109,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="839680">
-				<rom name="puzznic.fdd" size="839680" crc="5c228353" sha1="8ab681e04045af9a5614f09546b281e73576730a" offset="0" />
+				<rom name="puzznic.fdd" size="839680" crc="5c228353" sha1="8ab681e04045af9a5614f09546b281e73576730a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -120,7 +120,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="839680">
-				<rom name="robocop.fdd" size="839680" crc="52dcfa15" sha1="ed2dd0a48a2cdbfc08c1036d62ac48fb8ae69b11" offset="0" />
+				<rom name="robocop.fdd" size="839680" crc="52dcfa15" sha1="ed2dd0a48a2cdbfc08c1036d62ac48fb8ae69b11"/>
 			</dataarea>
 		</part>
 	</software>
@@ -131,7 +131,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="839680">
-				<rom name="tet3d.fdd" size="839680" crc="1d17f27f" sha1="47f2ffb350650974de0a1e992b6eda5346e81426" offset="0" />
+				<rom name="tet3d.fdd" size="839680" crc="1d17f27f" sha1="47f2ffb350650974de0a1e992b6eda5346e81426"/>
 			</dataarea>
 		</part>
 	</software>
@@ -142,7 +142,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="839680">
-				<rom name="zoo.fdd" size="839680" crc="7def2d07" sha1="80b8103b2c349d7993e5365453ca88c7685753d7" offset="0" />
+				<rom name="zoo.fdd" size="839680" crc="7def2d07" sha1="80b8103b2c349d7993e5365453ca88c7685753d7"/>
 			</dataarea>
 		</part>
 	</software>

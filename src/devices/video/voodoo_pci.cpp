@@ -178,7 +178,7 @@ void voodoo_banshee_pci_device::map_extra(uint64_t memory_window_start, uint64_t
 	// Should really be dependent on voodoo VGAINIT0 bit 8 and IO base + 0xc3 bit 0
 	uint64_t start = io_offset + 0x3b0;
 	uint64_t end = io_offset + 0x3df;
-	io_space->install_readwrite_handler(start, end, read32_delegate(FUNC(voodoo_pci_device::vga_r), this), write32_delegate(FUNC(voodoo_pci_device::vga_w), this));
+	io_space->install_readwrite_handler(start, end, read32_delegate(*this, FUNC(voodoo_pci_device::vga_r)), write32_delegate(*this, FUNC(voodoo_pci_device::vga_w)));
 	logerror("%s: map %s at %0*x-%0*x\n", this->tag(), "vga_r/w", 4, uint32_t(start), 4, uint32_t(end));
 }
 
@@ -191,7 +191,7 @@ void voodoo_3_pci_device::map_extra(uint64_t memory_window_start, uint64_t memor
 	// Should really be dependent on voodoo VGAINIT0 bit 8 and IO base + 0xc3 bit 0
 	uint64_t start = io_offset + 0x3b0;
 	uint64_t end = io_offset + 0x3df;
-	io_space->install_readwrite_handler(start, end, read32_delegate(FUNC(voodoo_pci_device::vga_r), this), write32_delegate(FUNC(voodoo_pci_device::vga_w), this));
+	io_space->install_readwrite_handler(start, end, read32_delegate(*this, FUNC(voodoo_pci_device::vga_r)), write32_delegate(*this, FUNC(voodoo_pci_device::vga_w)));
 	logerror("%s: map %s at %0*x-%0*x\n", this->tag(), "vga_r/w", 4, uint32_t(start), 4, uint32_t(end));
 }
 

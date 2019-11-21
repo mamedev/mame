@@ -281,13 +281,13 @@ WRITE8_MEMBER(igs009_state::fg_color_w)
 
 void igs009_state::video_start()
 {
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(igs009_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8,  8,  0x80,0x20);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(igs009_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8,  8,  0x80,0x20);
 	m_fg_tilemap->set_transparent_pen(0);
 
-	m_reel1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(igs009_state::get_jingbell_reel1_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 128, 8);
-	m_reel2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(igs009_state::get_jingbell_reel2_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 128, 8);
-	m_reel3_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(igs009_state::get_jingbell_reel3_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 128, 8);
-	m_reel4_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(igs009_state::get_jingbell_reel4_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 128, 8);
+	m_reel1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(igs009_state::get_jingbell_reel1_tile_info)),TILEMAP_SCAN_ROWS,8,32, 128, 8);
+	m_reel2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(igs009_state::get_jingbell_reel2_tile_info)),TILEMAP_SCAN_ROWS,8,32, 128, 8);
+	m_reel3_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(igs009_state::get_jingbell_reel3_tile_info)),TILEMAP_SCAN_ROWS,8,32, 128, 8);
+	m_reel4_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(igs009_state::get_jingbell_reel4_tile_info)),TILEMAP_SCAN_ROWS,8,32, 128, 8);
 
 	m_reel1_tilemap->set_scroll_cols(128);
 	m_reel2_tilemap->set_scroll_cols(128);
@@ -298,13 +298,13 @@ void igs009_state::video_start()
 
 VIDEO_START_MEMBER(igs009_state,gp98)
 {
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(igs009_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8,  8,  0x80,0x20);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(igs009_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8,  8,  0x80,0x20);
 	m_fg_tilemap->set_transparent_pen(0);
 
-	m_reel1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(igs009_state::get_gp98_reel1_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 128, 8);
-	m_reel2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(igs009_state::get_gp98_reel2_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 128, 8);
-	m_reel3_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(igs009_state::get_gp98_reel3_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 128, 8);
-	m_reel4_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(igs009_state::get_gp98_reel4_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 128, 8);
+	m_reel1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(igs009_state::get_gp98_reel1_tile_info)),TILEMAP_SCAN_ROWS,8,32, 128, 8);
+	m_reel2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(igs009_state::get_gp98_reel2_tile_info)),TILEMAP_SCAN_ROWS,8,32, 128, 8);
+	m_reel3_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(igs009_state::get_gp98_reel3_tile_info)),TILEMAP_SCAN_ROWS,8,32, 128, 8);
+	m_reel4_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(igs009_state::get_gp98_reel4_tile_info)),TILEMAP_SCAN_ROWS,8,32, 128, 8);
 
 	m_reel1_tilemap->set_scroll_cols(128);
 	m_reel2_tilemap->set_scroll_cols(128);
@@ -832,7 +832,7 @@ WRITE_LINE_MEMBER(igs009_state::vblank_irq)
 void igs009_state::jingbell(machine_config &config)
 {
 	/* basic machine hardware */
-	Z180(config, m_maincpu, XTAL(12'000'000) / 2);   /* HD64180RP8, 8 MHz? */
+	HD64180RP(config, m_maincpu, XTAL(12'000'000));   /* HD64180RP8, 8 MHz? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs009_state::jingbell_map);
 	m_maincpu->set_addrmap(AS_IO, &igs009_state::jingbell_portmap);
 

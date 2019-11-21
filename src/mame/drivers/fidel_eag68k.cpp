@@ -621,7 +621,7 @@ void eag_state::eag_base(machine_config &config)
 
 	/* cartridge */
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "fidel_scc", "bin,dat");
-	m_cart->set_device_load(FUNC(eag_state::cart_load), this);
+	m_cart->set_device_load(FUNC(eag_state::cart_load));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("fidel_scc");
 }
@@ -660,7 +660,7 @@ void eagv5_state::eagv5(machine_config &config)
 
 	// gen_latch syncs on write, but this is still needed with tight cpu comms
 	// (not that it locks up or anything, but it will calculate moves much slower if timing is off)
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 }
 
 void eag_state::eagv7(machine_config &config)
@@ -762,11 +762,11 @@ ROM_START( feagv3 )
 ROM_END
 
 ROM_START( feagv5 )
-	ROM_REGION( 0x20000, "maincpu", 0 ) // PCB label 510.1136A01
+	ROM_REGION16_BE( 0x20000, "maincpu", 0 ) // PCB label 510.1136A01
 	ROM_LOAD16_BYTE("master_e", 0x00000, 0x10000, CRC(e424bddc) SHA1(ff03656addfe5c47f06df2efb4602f43a9e19d96) )
 	ROM_LOAD16_BYTE("master_o", 0x00001, 0x10000, CRC(33a00894) SHA1(849460332b1ac10d452ca3631eb99f5597511b73) )
 
-	ROM_REGION( 0x10000, "subcpu", 0 ) // PCB label 510.1138B01
+	ROM_REGION16_BE( 0x10000, "subcpu", 0 ) // PCB label 510.1138B01
 	ROM_LOAD16_BYTE("slave_e", 0x00000, 0x08000, CRC(eea4de52) SHA1(a64ca8a44b431e2fa7f00e44cab7e6aa2d4a9403) )
 	ROM_LOAD16_BYTE("slave_o", 0x00001, 0x08000, CRC(35fe2fdf) SHA1(731da12ee290bad9bc03cffe281c8cc48e555dfb) )
 ROM_END

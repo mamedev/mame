@@ -119,13 +119,13 @@ void macs_state::macs_mem(address_map &map)
 {
 	map(0x0000, 0x7fff).bankr("rombank1");
 	map(0x8000, 0xbfff).bankr("rombank2");
-	//AM_RANGE(0xc000, 0xcfff) AM_READ(st0016_sprite_ram_r) AM_WRITE(st0016_sprite_ram_w)
-	//AM_RANGE(0xd000, 0xdfff) AM_READ(st0016_sprite2_ram_r) AM_WRITE(st0016_sprite2_ram_w)
+	//map(0xc000, 0xcfff).rw(FUNC(macs_state::st0016_sprite_ram_r), FUNC(macs_state::st0016_sprite_ram_w));
+	//map(0xd000, 0xdfff).rw(FUNC(macs_state::st0016_sprite2_ram_r), FUNC(macs_state::st0016_sprite2_ram_w));
 	map(0xe000, 0xe7ff).ram(); /* work ram ? */
 	map(0xe800, 0xe87f).ram().share("ram2");
-	//AM_RANGE(0xe900, 0xe9ff) // sound - internal
-	//AM_RANGE(0xea00, 0xebff) AM_READ(st0016_palette_ram_r) AM_WRITE(st0016_palette_ram_w)
-	//AM_RANGE(0xec00, 0xec1f) AM_READ(st0016_character_ram_r) AM_WRITE(st0016_character_ram_w)
+	//map(0xe900, 0xe9ff) // sound - internal
+	//map(0xea00, 0xebff).rw(FUNC(macs_state::st0016_palette_ram_r), FUNC(macs_state::st0016_palette_ram_w));
+	//map(0xec00, 0xec1f).rw(FUNC(macs_state::st0016_character_ram_r), FUNC(macs_state::st0016_character_ram_w));
 	map(0xf000, 0xf7ff).bankrw("rambank1"); /* common /backup ram ?*/
 	map(0xf800, 0xffff).bankrw("rambank2"); /* common /backup ram ?*/
 }
@@ -205,16 +205,16 @@ WRITE8_MEMBER(macs_state::macs_output_w)
 void macs_state::macs_io(address_map &map)
 {
 	map.global_mask(0xff);
-	//AM_RANGE(0x00, 0xbf) AM_READ(st0016_vregs_r) AM_WRITE(st0016_vregs_w) /* video/crt regs ? */
+	//map(0x00, 0xbf).rw(FUNC(macs_state::st0016_vregs_r), FUNC(macs_state::st0016_vregs_w)); /* video/crt regs ? */
 	map(0xc0, 0xc7).rw(FUNC(macs_state::macs_input_r), FUNC(macs_state::macs_output_w));
 	map(0xe0, 0xe0).nopw(); /* renju = $40, neratte = 0 */
 	map(0xe1, 0xe1).w(FUNC(macs_state::macs_rom_bank_w));
-	//AM_RANGE(0xe2, 0xe2) AM_WRITE(st0016_sprite_bank_w)
-	//AM_RANGE(0xe3, 0xe4) AM_WRITE(st0016_character_bank_w)
-	//AM_RANGE(0xe5, 0xe5) AM_WRITE(st0016_palette_bank_w)
+	//map(0xe2, 0xe2).w(FUNC(macs_state::st0016_sprite_bank_w));
+	//map(0xe3, 0xe4).w(FUNC(macs_state::st0016_character_bank_w));
+	//map(0xe5, 0xe5).w(FUNC(macs_state::st0016_palette_bank_w));
 	map(0xe6, 0xe6).w(FUNC(macs_state::rambank_w)); /* banking ? ram bank ? shared rambank ? */
 	map(0xe7, 0xe7).nopw(); /* watchdog */
-	//AM_RANGE(0xf0, 0xf0) AM_READ(st0016_dma_r)
+	//map(0xf0, 0xf0).rw(FUNC(macs_state::st0016_dma_r));
 }
 
 //static GFXDECODE_START( macs )
@@ -508,7 +508,7 @@ void macs_state::macs(machine_config &config)
 	ST0016_CPU(config, m_maincpu, 8000000); // 8 MHz ?
 	m_maincpu->set_memory_map(&macs_state::macs_mem);
 	m_maincpu->set_io_map(&macs_state::macs_io);
-	m_maincpu->set_dma_offs_callback(FUNC(macs_state::dma_offset), this);
+	m_maincpu->set_dma_offs_callback(FUNC(macs_state::dma_offset));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

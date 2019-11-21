@@ -388,8 +388,8 @@ void goldngam_state::swisspkr_map(address_map &map)
 void goldngam_state::cpu_space_map(address_map &map)
 {
 	map(0xfffff0, 0xffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));
-	map(0xfffff4, 0xfffff5).lr16("duart0 int", [this]() -> u16 { return m_duart[0]->get_irq_vector(); });
-	map(0xfffff8, 0xfffff9).lr16("duart0 int", [this]() -> u16 { return m_duart[1]->get_irq_vector(); });
+	map(0xfffff4, 0xfffff5).lr16(NAME([this] () -> u16 { return m_duart[0]->get_irq_vector(); }));
+	map(0xfffff8, 0xfffff9).lr16(NAME([this] () -> u16 { return m_duart[1]->get_irq_vector(); }));
 }
 
 void goldngam_state::moviecrd_map(address_map &map)

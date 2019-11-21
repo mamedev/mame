@@ -31,27 +31,27 @@ void dio16_98543_device::device_add_mconfig(machine_config &config)
 	screen_device &screen(SCREEN(config, HP98543_SCREEN_NAME, SCREEN_TYPE_RASTER));
 	screen.set_screen_update(FUNC(dio16_98543_device::screen_update));
 	screen.screen_vblank().set(FUNC(dio16_98543_device::vblank_w));
-	screen.set_raw(XTAL(39'504'000), 1408, 0, 1024, 425, 0, 400);
+	screen.set_raw(35.904_MHz_XTAL, 1408, 0, 1024, 425, 0, 400);
 
-	topcat_device &topcat0(TOPCAT(config, "topcat0", XTAL(35904000)));
+	topcat_device &topcat0(TOPCAT(config, "topcat0", 35.904_MHz_XTAL));
 	topcat0.set_fb_width(1024);
 	topcat0.set_fb_height(400);
 	topcat0.set_planemask(1);
 	topcat0.irq_out_cb().set(FUNC(dio16_98543_device::int0_w));
 
-	topcat_device &topcat1(TOPCAT(config, "topcat1", XTAL(35904000)));
+	topcat_device &topcat1(TOPCAT(config, "topcat1", 35.904_MHz_XTAL));
 	topcat1.set_fb_width(1024);
 	topcat1.set_fb_height(400);
 	topcat1.set_planemask(2);
 	topcat1.irq_out_cb().set(FUNC(dio16_98543_device::int1_w));
 
-	topcat_device &topcat2(TOPCAT(config, "topcat2", XTAL(35904000)));
+	topcat_device &topcat2(TOPCAT(config, "topcat2", 35.904_MHz_XTAL));
 	topcat2.set_fb_width(1024);
 	topcat2.set_fb_height(400);
 	topcat2.set_planemask(4);
 	topcat2.irq_out_cb().set(FUNC(dio16_98543_device::int2_w));
 
-	topcat_device &topcat3(TOPCAT(config, "topcat3", XTAL(35904000)));
+	topcat_device &topcat3(TOPCAT(config, "topcat3", 35.904_MHz_XTAL));
 	topcat3.set_fb_width(1024);
 	topcat3.set_fb_height(400);
 	topcat3.set_planemask(8);
@@ -102,21 +102,21 @@ void dio16_98543_device::device_start()
 
 	dio().install_memory(
 			0x200000, 0x27ffff,
-			read16_delegate(FUNC(dio16_98543_device::vram_r), this),
-			write16_delegate(FUNC(dio16_98543_device::vram_w), this));
+			read16_delegate(*this, FUNC(dio16_98543_device::vram_r)),
+			write16_delegate(*this, FUNC(dio16_98543_device::vram_w)));
 	dio().install_memory(
 			0x560000, 0x563fff,
-			read16_delegate(FUNC(dio16_98543_device::rom_r), this),
-			write16_delegate(FUNC(dio16_98543_device::rom_w), this));
+			read16_delegate(*this, FUNC(dio16_98543_device::rom_r)),
+			write16_delegate(*this, FUNC(dio16_98543_device::rom_w)));
 	dio().install_memory(
 			0x564000, 0x565fff,
-			read16_delegate(FUNC(dio16_98543_device::ctrl_r), this),
-			write16_delegate(FUNC(dio16_98543_device::ctrl_w), this));
+			read16_delegate(*this, FUNC(dio16_98543_device::ctrl_r)),
+			write16_delegate(*this, FUNC(dio16_98543_device::ctrl_w)));
 
 	dio().install_memory(
 			0x566000, 0x567fff,
-			read16_delegate(FUNC(nereid_device::ctrl_r), static_cast<nereid_device*>(m_nereid)),
-			write16_delegate(FUNC(nereid_device::ctrl_w), static_cast<nereid_device*>(m_nereid)));
+			read16_delegate(*m_nereid, FUNC(nereid_device::ctrl_r)),
+			write16_delegate(*m_nereid, FUNC(nereid_device::ctrl_w)));
 }
 
 void dio16_98543_device::device_reset()

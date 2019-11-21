@@ -1,6 +1,6 @@
 /*! \page primer_1 nltool primer
 
-## First example
+# First example
 
 Let's start with a simple charge/discharge circuit. I denotes the input,
 O denotes the output.
@@ -53,7 +53,7 @@ Next, run
 
 and enjoy the results.
 
-##Recap
+# Recap
 
 We have created our first netlist fragment. nltool was used to model the
 periodically forced charge/discharge circuit for 50ms. Finally we plotted both input

@@ -467,7 +467,7 @@ void fs3216_state::fs3216(machine_config &config)
 	M68000(config, m_maincpu, 44.2368_MHz_XTAL / 8); // 5.5 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &fs3216_state::main_map);
 	m_maincpu->set_addrmap(m68000_device::AS_CPU_SPACE, &fs3216_state::fc7_map);
-	m_maincpu->set_reset_callback(write_line_delegate(FUNC(fs3216_state::mmu_reset_w), this));
+	m_maincpu->set_reset_callback(FUNC(fs3216_state::mmu_reset_w));
 
 	ADDRESS_MAP_BANK(config, m_clb);
 	m_clb->set_addrmap(0, &fs3216_state::clb_map);
@@ -501,7 +501,7 @@ void fs3216_state::fs3216(machine_config &config)
 	mc6845_device &crtc(MC6845(config, "crtc", 14.58_MHz_XTAL / 9)); // HD46505RP
 	crtc.set_char_width(9);
 	crtc.set_show_border_area(false);
-	crtc.set_update_row_callback(FUNC(fs3216_state::crt_update_row), this);
+	crtc.set_update_row_callback(FUNC(fs3216_state::crt_update_row));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_color(rgb_t::green());

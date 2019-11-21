@@ -148,7 +148,7 @@ void raiden_state::raidenu_sub_map(address_map &map)
 
 /******************************************************************************/
 
-void raiden_state::raidenb_main_map(address_map &map)
+void raidenb_state::raidenb_main_map(address_map &map)
 {
 	map(0x00000, 0x06fff).ram();
 	map(0x07000, 0x07fff).ram().share("spriteram");
@@ -156,8 +156,8 @@ void raiden_state::raidenb_main_map(address_map &map)
 	map(0x0b000, 0x0b001).portr("P1_P2");
 	map(0x0b002, 0x0b003).portr("DSW");
 	map(0x0b004, 0x0b005).nopw(); // watchdog?
-	map(0x0b006, 0x0b006).w(FUNC(raiden_state::raidenb_control_w));
-	map(0x0c000, 0x0c7ff).w(FUNC(raiden_state::raiden_text_w)).share("videoram");
+	map(0x0b006, 0x0b006).w(FUNC(raidenb_state::raidenb_control_w));
+	map(0x0c000, 0x0c7ff).w(FUNC(raidenb_state::raiden_text_w)).share("videoram");
 	map(0x0d000, 0x0d00d).rw(m_seibu_sound, FUNC(seibu_sound_device::main_r), FUNC(seibu_sound_device::main_w)).umask16(0x00ff);
 	map(0x0d040, 0x0d08f).rw("crtc", FUNC(seibu_crtc_device::read), FUNC(seibu_crtc_device::write));
 	map(0xa0000, 0xfffff).rom();
@@ -347,7 +347,7 @@ void raiden_state::raiden(machine_config &config)
 	audiocpu.set_addrmap(AS_PROGRAM, &raiden_state::seibu_sound_map);
 	audiocpu.set_irq_acknowledge_callback("seibu_sound", FUNC(seibu_sound_device::im0_vector_cb));
 
-	config.m_minimum_quantum = attotime::from_hz(12000);
+	config.set_maximum_quantum(attotime::from_hz(12000));
 
 	/* video hardware */
 	BUFFERED_SPRITERAM16(config, m_spriteram);
@@ -400,7 +400,7 @@ void raiden_state::raidenu(machine_config &config)
 	m_subcpu->set_addrmap(AS_PROGRAM, &raiden_state::raidenu_sub_map);
 }
 
-WRITE16_MEMBER( raiden_state::raidenb_layer_scroll_w )
+WRITE16_MEMBER( raidenb_state::raidenb_layer_scroll_w )
 {
 	COMBINE_DATA(&m_raidenb_scroll_ram[offset]);
 }
@@ -412,21 +412,19 @@ void raiden_state::raidenkb(machine_config &config)
 	m_subcpu->set_clock(XTAL(32'000'000) / 4); // Xtal and clock verified
 }
 
-void raiden_state::raidenb(machine_config &config)
+void raidenb_state::raidenb(machine_config &config)
 {
 	raiden(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &raiden_state::raidenb_main_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &raidenb_state::raidenb_main_map);
 
 	/* video hardware */
-	MCFG_VIDEO_START_OVERRIDE(raiden_state,raidenb)
-
 	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc", 0));
-	crtc.layer_en_callback().set(FUNC(raiden_state::raidenb_layer_enable_w));
-	crtc.layer_scroll_callback().set(FUNC(raiden_state::raidenb_layer_scroll_w));
+	crtc.layer_en_callback().set(FUNC(raidenb_state::raidenb_layer_enable_w));
+	crtc.layer_scroll_callback().set(FUNC(raidenb_state::raidenb_layer_scroll_w));
 
-	subdevice<screen_device>("screen")->set_screen_update(FUNC(raiden_state::screen_update_raidenb));
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(raidenb_state::screen_update_raidenb));
 }
 
 
@@ -856,8 +854,8 @@ GAME( 1990, raidenk,  raiden, raiden,   raiden, raiden_state,  init_raiden,  ROT
 GAME( 1990, raidenkb, raiden, raidenkb, raiden, raiden_state,  init_raiden,  ROT270, "bootleg", "Raiden (Korea, bootleg)", MACHINE_SUPPORTS_SAVE )
 
 /* Alternate hardware; SEI8904 + SEI9008 PCBs. Main & Sub CPU code not encrypted */
-GAME( 1990, raidenua, raiden, raidenu,  raiden, raiden_state,  empty_init,   ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden (US set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, raidenua, raiden, raidenu,  raiden, raiden_state,  empty_init,   ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden (US set 2, SEI8904 hardware)", MACHINE_SUPPORTS_SAVE )
 
 /* Alternate hardware. Main, Sub & Sound CPU code not encrypted. It also sports Seibu custom CRTC. */
-GAME( 1990, raidenb,  raiden, raidenb,  raiden, raiden_state,  empty_init,   ROT270, "Seibu Kaihatsu", "Raiden (set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, raidenub, raiden, raidenb,  raiden, raiden_state,  empty_init,   ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden (US set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, raidenb,  raiden, raidenb,  raiden, raidenb_state, empty_init,   ROT270, "Seibu Kaihatsu", "Raiden (set 3, newer hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, raidenub, raiden, raidenb,  raiden, raidenb_state, empty_init,   ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden (US set 3, newer hardware)", MACHINE_SUPPORTS_SAVE )

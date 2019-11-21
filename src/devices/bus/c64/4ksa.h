@@ -22,8 +22,7 @@
 
 // ======================> c64_4ksa_device
 
-class c64_4ksa_device : public device_t,
-	public device_pet_user_port_interface
+class c64_4ksa_device : public device_t, public device_pet_user_port_interface
 {
 public:
 	// construction/destruction

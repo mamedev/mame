@@ -295,12 +295,12 @@ TILE_GET_INFO_MEMBER(skylncr_state::get_reel_4_tile_info)
 
 void skylncr_state::video_start()
 {
-	m_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(skylncr_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 0x40, 0x20    );
+	m_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(skylncr_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 0x40, 0x20    );
 
-	m_reel_1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(skylncr_state::get_reel_1_tile_info),this), TILEMAP_SCAN_ROWS, 8, 32, 64, 8 );
-	m_reel_2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(skylncr_state::get_reel_2_tile_info),this), TILEMAP_SCAN_ROWS, 8, 32, 64, 8 );
-	m_reel_3_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(skylncr_state::get_reel_3_tile_info),this), TILEMAP_SCAN_ROWS, 8, 32, 64, 8 );
-	m_reel_4_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(skylncr_state::get_reel_4_tile_info),this), TILEMAP_SCAN_ROWS, 8, 32, 64, 8 );
+	m_reel_1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(skylncr_state::get_reel_1_tile_info)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8 );
+	m_reel_2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(skylncr_state::get_reel_2_tile_info)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8 );
+	m_reel_3_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(skylncr_state::get_reel_3_tile_info)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8 );
+	m_reel_4_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(skylncr_state::get_reel_4_tile_info)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8 );
 
 	m_reel_2_tilemap->set_scroll_cols(0x40);
 	m_reel_3_tilemap->set_scroll_cols(0x40);

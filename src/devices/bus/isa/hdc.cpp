@@ -987,7 +987,7 @@ isa8_hdc_ec1841_device::isa8_hdc_ec1841_device(const machine_config &mconfig, co
 void isa8_hdc_device::device_start()
 {
 	set_isa_device();
-	m_isa->install_device(0x0320, 0x0323, read8_delegate( FUNC(isa8_hdc_device::pc_hdc_r), this ), write8_delegate( FUNC(isa8_hdc_device::pc_hdc_w), this ) );
+	m_isa->install_device(0x0320, 0x0323, read8_delegate(*this, FUNC(isa8_hdc_device::pc_hdc_r)), write8_delegate(*this, FUNC(isa8_hdc_device::pc_hdc_w)));
 	m_isa->set_dma_channel(3, this, false);
 }
 

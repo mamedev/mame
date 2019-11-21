@@ -120,7 +120,7 @@ TILE_GET_INFO_MEMBER(zac2650_state::get_bg_tile_info)
 void zac2650_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(
-			*m_gfxdecode, tilemap_get_info_delegate(FUNC(zac2650_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,
+			*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(zac2650_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS,
 			24, 24, 32, 32);
 
 	m_screen->register_screen_bitmap(m_bitmap);

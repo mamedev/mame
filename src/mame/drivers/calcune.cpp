@@ -123,7 +123,7 @@ void calcune_state::calcune_map(address_map &map)
 
 	map(0x710000, 0x710001).portr("710000");
 	map(0x720000, 0x720001).portr("720000");
-//  AM_RANGE(0x730000, 0x730001) possible Z80 control?
+//  map(0x730000, 0x730001) possible Z80 control?
 	map(0x760000, 0x760003).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask16(0xff00);
 
 	map(0x770000, 0x770001).w(FUNC(calcune_state::cal_770000_w));
@@ -287,8 +287,8 @@ void calcune_state::calcune(machine_config &config)
 	m_vdp[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
 	m_vdp[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
 
-	TIMER(config, "scantimer").configure_scanline("gen_vdp1", FUNC(sega315_5313_device::megadriv_scanline_timer_callback_alt_timing), "megadriv", 0, 1);
-	TIMER(config, "scantimer2").configure_scanline("gen_vdp2", FUNC(sega315_5313_device::megadriv_scanline_timer_callback_alt_timing), "megadriv", 0, 1);
+	TIMER(config, "scantimer").configure_scanline(m_vdp[0], FUNC(sega315_5313_device::megadriv_scanline_timer_callback_alt_timing), "megadriv", 0, 1);
+	TIMER(config, "scantimer2").configure_scanline(m_vdp[1], FUNC(sega315_5313_device::megadriv_scanline_timer_callback_alt_timing), "megadriv", 0, 1);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

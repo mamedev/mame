@@ -111,6 +111,8 @@ void asst128_state::asst128(machine_config &config)
 
 	asst128_mb_device &mb(ASST128_MOTHERBOARD(config, "mb", 0));
 	mb.set_cputag(m_maincpu);
+	mb.int_callback().set_inputline(m_maincpu, 0);
+	mb.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	mb.set_input_default(DEVICE_INPUT_DEFAULTS_NAME(asst128));
 
 	subdevice<cassette_image_device>("mb:cassette")->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);

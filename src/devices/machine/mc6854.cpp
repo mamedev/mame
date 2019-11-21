@@ -166,10 +166,11 @@ static const int word_length[4] = { 5, 6, 7, 8 };
 
 DEFINE_DEVICE_TYPE(MC6854, mc6854_device, "mc6854", "Motorola MC6854 ADLC")
 
-mc6854_device::mc6854_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MC6854, tag, owner, clock),
+mc6854_device::mc6854_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, MC6854, tag, owner, clock),
 	m_out_irq_cb(*this),
 	m_out_txd_cb(*this),
+	m_out_frame_cb(*this),
 	m_out_rts_cb(*this),
 	m_out_dtr_cb(*this),
 	m_cr1(0),
@@ -210,7 +211,7 @@ void mc6854_device::device_start()
 {
 	m_out_irq_cb.resolve_safe();
 	m_out_txd_cb.resolve();
-	m_out_frame_cb.bind_relative_to(*owner());
+	m_out_frame_cb.resolve();
 	m_out_rts_cb.resolve_safe();
 	m_out_dtr_cb.resolve_safe();
 

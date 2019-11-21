@@ -335,7 +335,7 @@ void skimaxx_state::m68030_1_map(address_map &map)
 	map(0x00000000, 0x001fffff).rom();
 	map(0x10000000, 0x10000003).w(FUNC(skimaxx_state::sub_ctrl_w));
 	map(0x10100000, 0x1010000f).rw(m_tms, FUNC(tms34010_device::host_r), FUNC(tms34010_device::host_w)).umask32(0x0000ffff);
-//  AM_RANGE(0x10180000, 0x10187fff) AM_RAM AM_SHARE("share1")
+//  map(0x10180000, 0x10187fff).ram().share("share1");
 	map(0x10180000, 0x1018ffff).ram().share("share1");  // above 10188000 accessed at level end (game bug?)
 	map(0x20000000, 0x20000003).nopr(); // watchdog_r?
 
@@ -374,9 +374,9 @@ void skimaxx_state::m68030_2_map(address_map &map)
 	map(0x40000000, 0x40000003).w(FUNC(skimaxx_state::fpga_ctrl_w)).share("fpga_ctrl");
 
 	map(0x50000000, 0x5007ffff).bankrw("bgrambank");    // background ram allocated here at video_start (skimaxx_bg_buffer_back/front)
-//  AM_RANGE(0xfffc0000, 0xfffc7fff) AM_RAM AM_SHARE("share1")
+//  map(0xfffc0000, 0xfffc7fff).ram().share("share1");
 	map(0xfffc0000, 0xfffcffff).ram().share("share1");
-//  AM_RANGE(0xfffe0000, 0xffffffff) AM_RAM // I think this is banked with the shared RAM? (see CPU sync routines)
+//  map(0xfffe0000, 0xffffffff).ram(); // I think this is banked with the shared RAM? (see CPU sync routines)
 	map(0xfffe0000, 0xfffeffff).ram().share("share1");  // HACK
 	//  map(0xfffe0010, 0xfffeffff).ram();             // HACK
 	map(0xffff0000, 0xffffffff).ram();
@@ -589,7 +589,7 @@ ROM_START( skimaxx )
 	ROM_LOAD16_BYTE( "vc8v-2_0", 0x000000, 0x80000, CRC(a6e9ef81) SHA1(59a0fb149e17d3773adb980428a0b107647bd4fa) )
 	ROM_LOAD16_BYTE( "vc9v-2_0", 0x000001, 0x80000, CRC(b1e8ba65) SHA1(b91cf93ecd9b6067664780ab2c1b69f632c7ae05) )
 
-	ROM_REGION( 0x100000, "tmsgfx", 0 )
+	ROM_REGION16_LE( 0x100000, "tmsgfx", 0 )
 	ROM_LOAD16_BYTE( "vc10v2_0", 0x000000, 0x80000, CRC(433651cd) SHA1(9b9801703d16adbbca2b03e1714490fb166d48a0) )
 	ROM_LOAD16_BYTE( "vc11v2_0", 0x000001, 0x80000, CRC(a906fc72) SHA1(c61ad560f203c7f507cc7b7dc8834f529a6501a7) )
 

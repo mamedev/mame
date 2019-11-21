@@ -671,21 +671,21 @@ WRITE16_MEMBER( sega_32x_device::m68k_a15100_w )
 			space.install_rom(0x0000000, 0x03fffff, machine().root_device().memregion("32x_68k_bios")->base());
 
 			/* VDP area */
-			space.install_readwrite_handler(0x0a15180, 0x0a1518b, read16_delegate(FUNC(sega_32x_device::common_vdp_regs_r), this),     write16_delegate(FUNC(sega_32x_device::common_vdp_regs_w),this)); // common / shared VDP regs
-			space.install_readwrite_handler(0x0a15200, 0x0a153ff, read16_delegate(FUNC(sega_32x_device::m68k_palette_r), this),         write16_delegate(FUNC(sega_32x_device::m68k_palette_w),this)); // access to 'palette' xRRRRRGGGGGBBBBB
-			space.install_readwrite_handler(0x0840000, 0x085ffff, read16_delegate(FUNC(sega_32x_device::m68k_dram_r), this),            write16_delegate(FUNC(sega_32x_device::m68k_dram_w),this)); // access to 'display ram' (framebuffer)
-			space.install_readwrite_handler(0x0860000, 0x087ffff, read16_delegate(FUNC(sega_32x_device::m68k_dram_overwrite_r),this),   write16_delegate(FUNC(sega_32x_device::m68k_dram_overwrite_w),this)); // access to 'display ram' (framebuffer)
+			space.install_readwrite_handler(0x0a15180, 0x0a1518b, read16_delegate(*this, FUNC(sega_32x_device::common_vdp_regs_r)),     write16_delegate(*this, FUNC(sega_32x_device::common_vdp_regs_w))); // common / shared VDP regs
+			space.install_readwrite_handler(0x0a15200, 0x0a153ff, read16_delegate(*this, FUNC(sega_32x_device::m68k_palette_r)),        write16_delegate(*this, FUNC(sega_32x_device::m68k_palette_w))); // access to 'palette' xRRRRRGGGGGBBBBB
+			space.install_readwrite_handler(0x0840000, 0x085ffff, read16_delegate(*this, FUNC(sega_32x_device::m68k_dram_r)),           write16_delegate(*this, FUNC(sega_32x_device::m68k_dram_w))); // access to 'display ram' (framebuffer)
+			space.install_readwrite_handler(0x0860000, 0x087ffff, read16_delegate(*this, FUNC(sega_32x_device::m68k_dram_overwrite_r)), write16_delegate(*this, FUNC(sega_32x_device::m68k_dram_overwrite_w))); // access to 'display ram' (framebuffer)
 
 
 
-			m_main_cpu->space(AS_PROGRAM).install_readwrite_handler(0x000070, 0x000073, read16_delegate(FUNC(sega_32x_device::m68k_m_hint_vector_r),this), write16_delegate(FUNC(sega_32x_device::m68k_m_hint_vector_w),this)); // h interrupt vector
+			m_main_cpu->space(AS_PROGRAM).install_readwrite_handler(0x000070, 0x000073, read16_delegate(*this, FUNC(sega_32x_device::m68k_m_hint_vector_r)), write16_delegate(*this, FUNC(sega_32x_device::m68k_m_hint_vector_w))); // h interrupt vector
 		}
 		else
 		{
 			m_32x_adapter_enabled = 0;
 
 			space.install_rom(0x0000000, 0x03fffff, machine().root_device().memregion("gamecart")->base());
-			m_main_cpu->space(AS_PROGRAM).install_readwrite_handler(0x000070, 0x000073, read16_delegate(FUNC(sega_32x_device::m68k_m_hint_vector_r),this), write16_delegate(FUNC(sega_32x_device::m68k_m_hint_vector_w),this)); // h interrupt vector
+			m_main_cpu->space(AS_PROGRAM).install_readwrite_handler(0x000070, 0x000073, read16_delegate(*this, FUNC(sega_32x_device::m68k_m_hint_vector_r)), write16_delegate(*this, FUNC(sega_32x_device::m68k_m_hint_vector_w))); // h interrupt vector
 		}
 	}
 
@@ -1683,7 +1683,7 @@ const rom_entry *sega_32x_device::device_rom_region() const
 // some games appear to dislike 'perfect' levels of interleave, probably due to
 // non-emulated cache, ram waitstates and other issues?
 #define _32X_INTERLEAVE_LEVEL \
-	config.m_minimum_quantum = attotime::from_hz(1800000);
+	config.set_maximum_quantum(attotime::from_hz(1800000));
 
 void sega_32x_device::device_add_mconfig(machine_config &config)
 {
@@ -1817,23 +1817,23 @@ void sega_32x_device::device_reset()
 	if (m_32x_adapter_enabled == 0)
 	{
 		m_main_cpu->space(AS_PROGRAM).install_rom(0x0000000, 0x03fffff, machine().root_device().memregion(":gamecart")->base());
-		m_main_cpu->space(AS_PROGRAM).install_readwrite_handler(0x000070, 0x000073, read16_delegate(FUNC(sega_32x_device::m68k_m_hint_vector_r),this), write16_delegate(FUNC(sega_32x_device::m68k_m_hint_vector_w),this)); // h interrupt vector
+		m_main_cpu->space(AS_PROGRAM).install_readwrite_handler(0x000070, 0x000073, read16_delegate(*this, FUNC(sega_32x_device::m68k_m_hint_vector_r)), write16_delegate(*this, FUNC(sega_32x_device::m68k_m_hint_vector_w))); // h interrupt vector
 	};
 
 
 	m_a15100_reg = 0x0000;
-	m_main_cpu->space(AS_PROGRAM).install_readwrite_handler(0xa15100, 0xa15101, read16_delegate(FUNC(sega_32x_device::m68k_a15100_r),this), write16_delegate(FUNC(sega_32x_device::m68k_a15100_w),this)); // framebuffer control regs
-	m_main_cpu->space(AS_PROGRAM).install_readwrite_handler(0xa15102, 0xa15103, read16_delegate(FUNC(sega_32x_device::m68k_a15102_r),this), write16_delegate(FUNC(sega_32x_device::m68k_a15102_w),this)); // send irq to sh2
-	m_main_cpu->space(AS_PROGRAM).install_readwrite_handler(0xa15104, 0xa15105, read16_delegate(FUNC(sega_32x_device::m68k_a15104_r),this), write16_delegate(FUNC(sega_32x_device::m68k_a15104_w),this)); // 68k BANK rom set
-	m_main_cpu->space(AS_PROGRAM).install_readwrite_handler(0xa15106, 0xa15107, read16_delegate(FUNC(sega_32x_device::m68k_a15106_r),this), write16_delegate(FUNC(sega_32x_device::m68k_a15106_w),this)); // dreq stuff
-	m_main_cpu->space(AS_PROGRAM).install_readwrite_handler(0xa15108, 0xa15113, read16_delegate(FUNC(sega_32x_device::dreq_common_r),this), write16_delegate(FUNC(sega_32x_device::dreq_common_w),this)); // dreq src / dst / length /fifo
+	m_main_cpu->space(AS_PROGRAM).install_readwrite_handler(0xa15100, 0xa15101, read16_delegate(*this, FUNC(sega_32x_device::m68k_a15100_r)), write16_delegate(*this, FUNC(sega_32x_device::m68k_a15100_w))); // framebuffer control regs
+	m_main_cpu->space(AS_PROGRAM).install_readwrite_handler(0xa15102, 0xa15103, read16_delegate(*this, FUNC(sega_32x_device::m68k_a15102_r)), write16_delegate(*this, FUNC(sega_32x_device::m68k_a15102_w))); // send irq to sh2
+	m_main_cpu->space(AS_PROGRAM).install_readwrite_handler(0xa15104, 0xa15105, read16_delegate(*this, FUNC(sega_32x_device::m68k_a15104_r)), write16_delegate(*this, FUNC(sega_32x_device::m68k_a15104_w))); // 68k BANK rom set
+	m_main_cpu->space(AS_PROGRAM).install_readwrite_handler(0xa15106, 0xa15107, read16_delegate(*this, FUNC(sega_32x_device::m68k_a15106_r)), write16_delegate(*this, FUNC(sega_32x_device::m68k_a15106_w))); // dreq stuff
+	m_main_cpu->space(AS_PROGRAM).install_readwrite_handler(0xa15108, 0xa15113, read16_delegate(*this, FUNC(sega_32x_device::dreq_common_r)), write16_delegate(*this, FUNC(sega_32x_device::dreq_common_w))); // dreq src / dst / length /fifo
 
-	m_main_cpu->space(AS_PROGRAM).install_readwrite_handler(0xa1511a, 0xa1511b, read16_delegate(FUNC(sega_32x_device::m68k_a1511a_r),this), write16_delegate(FUNC(sega_32x_device::m68k_a1511a_w),this)); // SEGA TV
+	m_main_cpu->space(AS_PROGRAM).install_readwrite_handler(0xa1511a, 0xa1511b, read16_delegate(*this, FUNC(sega_32x_device::m68k_a1511a_r)), write16_delegate(*this, FUNC(sega_32x_device::m68k_a1511a_w))); // SEGA TV
 
-	m_main_cpu->space(AS_PROGRAM).install_readwrite_handler(0xa15120, 0xa1512f, read16_delegate(FUNC(sega_32x_device::m68k_m_commsram_r),this), write16_delegate(FUNC(sega_32x_device::m68k_m_commsram_w),this)); // comms reg 0-7
-	m_main_cpu->space(AS_PROGRAM).install_readwrite_handler(0xa15130, 0xa1513f, read16_delegate(FUNC(sega_32x_device::pwm_r),this), write16_delegate(FUNC(sega_32x_device::m68k_pwm_w),this));
+	m_main_cpu->space(AS_PROGRAM).install_readwrite_handler(0xa15120, 0xa1512f, read16_delegate(*this, FUNC(sega_32x_device::m68k_m_commsram_r)), write16_delegate(*this, FUNC(sega_32x_device::m68k_m_commsram_w))); // comms reg 0-7
+	m_main_cpu->space(AS_PROGRAM).install_readwrite_handler(0xa15130, 0xa1513f, read16_delegate(*this, FUNC(sega_32x_device::pwm_r)), write16_delegate(*this, FUNC(sega_32x_device::m68k_pwm_w)));
 
-	m_main_cpu->space(AS_PROGRAM).install_read_handler(0x0a130ec, 0x0a130ef, read16_delegate(FUNC(sega_32x_device::m68k_MARS_r),this)); // system ID
+	m_main_cpu->space(AS_PROGRAM).install_read_handler(0x0a130ec, 0x0a130ef, read16_delegate(*this, FUNC(sega_32x_device::m68k_MARS_r))); // system ID
 
 
 
@@ -1852,8 +1852,8 @@ void sega_32x_device::device_reset()
 
 
 // install these now, otherwise we'll get the following (incorrect) warnings on startup..
-//   SH-2 device ':sega32x:32x_slave_sh2': program space memory map entry 0-3FFF references non-existant region ':slave'
-//   SH-2 device ':sega32x:32x_master_sh2': program space memory map entry 0-3FFF references non-existant region ':master'
+//   SH-2 device ':sega32x:32x_slave_sh2': program space memory map entry 0-3FFF references non-existent region ':slave'
+//   SH-2 device ':sega32x:32x_master_sh2': program space memory map entry 0-3FFF references non-existent region ':master'
 	uint8_t* masterbios = (uint8_t*)machine().root_device().memregion(":master")->base();
 	uint8_t* slavebios = (uint8_t*)machine().root_device().memregion(":slave")->base();
 	membank("masterbios")->configure_entries(0, 1, masterbios, 0x4000);

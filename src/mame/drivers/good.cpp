@@ -107,8 +107,8 @@ TILE_GET_INFO_MEMBER(good_state::get_bg_tile_info)
 
 void good_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(good_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(good_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(good_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(good_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 	m_fg_tilemap->set_transparent_pen(0xf);
 }
 
@@ -123,7 +123,7 @@ void good_state::good_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom();
 
-	//AM_RANGE(0x270000, 0x270007) AM_RAM // scroll?
+	//map(0x270000, 0x270007).ram(); // scroll?
 	map(0x270001, 0x270001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 
 	map(0x280000, 0x280001).portr("IN0");

@@ -413,6 +413,11 @@ bool emulator_info::frame_hook()
 	return mame_machine_manager::instance()->lua()->frame_hook();
 }
 
+void emulator_info::sound_hook()
+{
+	return mame_machine_manager::instance()->lua()->on_sound_update();
+}
+
 void emulator_info::layout_file_cb(util::xml::data_node const &layout)
 {
 	util::xml::data_node const *const mamelayout = layout.get_child("mamelayout");

@@ -429,8 +429,8 @@ void geniusiq_state::geniusiq_mem(address_map &map)
 	map(0x310000, 0x31FFFF).ram();
 	map(0x400000, 0x41ffff).mirror(0x0e0000).rw("flash", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write)).umask16(0x00ff);
 	map(0x600300, 0x600301).r(FUNC(geniusiq_state::input_r));
-	//AM_RANGE(0x600500, 0x60050f)                      // read during IRQ 5
-	//AM_RANGE(0x600600, 0x600605)                      // sound ??
+	//map(0x600500, 0x60050f)                      // read during IRQ 5
+	//map(0x600600, 0x600605)                      // sound ??
 	map(0x600606, 0x600609).w(FUNC(geniusiq_state::gfx_base_w));
 	map(0x60060a, 0x60060b).w(FUNC(geniusiq_state::gfx_idx_w));
 	map(0x600802, 0x600803).r(FUNC(geniusiq_state::cart_state_r));  // cartridge state
@@ -721,8 +721,8 @@ void geniusiq_state::iq128(machine_config &config)
 
 	/* cartridge */
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "iq128_cart"));
-	cartslot.set_device_load(FUNC(geniusiq_state::cart_load), this);
-	cartslot.set_device_unload(FUNC(geniusiq_state::cart_unload), this);
+	cartslot.set_device_load(FUNC(geniusiq_state::cart_load));
+	cartslot.set_device_unload(FUNC(geniusiq_state::cart_unload));
 
 	/* Software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("iq128");

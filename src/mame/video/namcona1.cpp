@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Phil Stroffolino
-/*  Namco System NA1 / 2 Video Hardware */
+/*  Namco System NA1/2 Video Hardware */
 
 /*
 Notes:
@@ -191,13 +191,13 @@ void namcona1_state::gfxram_w(offs_t offset, u16 data, u16 mem_mask)
 void namcona1_state::video_start()
 {
 	// normal tilemaps
-	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcona1_state::tilemap_get_info0),this), TILEMAP_SCAN_ROWS, 8,8,64,64);
-	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcona1_state::tilemap_get_info1),this), TILEMAP_SCAN_ROWS, 8,8,64,64);
-	m_bg_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcona1_state::tilemap_get_info2),this), TILEMAP_SCAN_ROWS, 8,8,64,64);
-	m_bg_tilemap[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcona1_state::tilemap_get_info3),this), TILEMAP_SCAN_ROWS, 8,8,64,64);
+	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(namcona1_state::tilemap_get_info0)), TILEMAP_SCAN_ROWS, 8,8,64,64);
+	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(namcona1_state::tilemap_get_info1)), TILEMAP_SCAN_ROWS, 8,8,64,64);
+	m_bg_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(namcona1_state::tilemap_get_info2)), TILEMAP_SCAN_ROWS, 8,8,64,64);
+	m_bg_tilemap[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(namcona1_state::tilemap_get_info3)), TILEMAP_SCAN_ROWS, 8,8,64,64);
 
 	// roz tilemap
-	m_bg_tilemap[4] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(namcona1_state::roz_get_info),this), TILEMAP_SCAN_ROWS, 8,8,64,64);
+	m_bg_tilemap[4] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(namcona1_state::roz_get_info)), TILEMAP_SCAN_ROWS, 8,8,64,64);
 
 	m_shaperam.resize(0x8000);
 

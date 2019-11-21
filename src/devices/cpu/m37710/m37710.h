@@ -191,11 +191,11 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override { return (clocks + 2 - 1) / 2; }
-	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override { return (cycles * 2); }
-	virtual uint32_t execute_min_cycles() const override { return 1; }
-	virtual uint32_t execute_max_cycles() const override { return 20; /* rough guess */ }
-	virtual uint32_t execute_input_lines() const override { return M37710_LINE_MAX; }
+	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 2 - 1) / 2; }
+	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * 2); }
+	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 20; /* rough guess */ }
+	virtual uint32_t execute_input_lines() const noexcept override { return M37710_LINE_MAX; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -2168,10 +2168,20 @@ protected:
 	void map(address_map &map);
 };
 
+class m37730s2_device : public m37710_cpu_device
+{
+public:
+	// construction/destruction
+	m37730s2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+protected:
+	void map(address_map &map);
+};
+
 DECLARE_DEVICE_TYPE(M37702M2, m37702m2_device)
 DECLARE_DEVICE_TYPE(M37702S1, m37702s1_device)
 DECLARE_DEVICE_TYPE(M37710S4, m37710s4_device)
 DECLARE_DEVICE_TYPE(M37720S1, m37720s1_device)
+DECLARE_DEVICE_TYPE(M37730S2, m37730s2_device)
 
 
 /* ======================================================================== */

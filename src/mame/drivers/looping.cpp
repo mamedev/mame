@@ -252,7 +252,7 @@ TILE_GET_INFO_MEMBER(looping_state::get_tile_info)
 
 void looping_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(looping_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8,8, 32,32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(looping_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 32,32);
 
 	m_bg_tilemap->set_scroll_cols(0x20);
 }
@@ -933,7 +933,7 @@ void looping_state::init_looping()
 		rom[i] = bitswap<8>(rom[i], 0,1,2,3,4,5,6,7);
 
 	/* install protection handlers */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x7000, 0x7007, read8_delegate(FUNC(looping_state::protection_r), this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x7000, 0x7007, read8_delegate(*this, FUNC(looping_state::protection_r)));
 }
 
 

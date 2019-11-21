@@ -454,12 +454,12 @@ void arcadia_state::machine_start()
 	{
 		switch (m_cart->get_type())
 		{
-			case ARCADIA_STD:
-				m_maincpu->space(AS_PROGRAM).install_read_handler(0x2000, 0x7fff, read8_delegate(FUNC(arcadia_cart_slot_device::extra_rom),(arcadia_cart_slot_device*)m_cart));
-				break;
-			case ARCADIA_GOLF:
-				m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0x4fff, read8_delegate(FUNC(arcadia_cart_slot_device::extra_rom),(arcadia_cart_slot_device*)m_cart));
-				break;
+		case ARCADIA_STD:
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0x2000, 0x7fff, read8_delegate(*m_cart, FUNC(arcadia_cart_slot_device::extra_rom)));
+			break;
+		case ARCADIA_GOLF:
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0x4fff, read8_delegate(*m_cart, FUNC(arcadia_cart_slot_device::extra_rom)));
+			break;
 		}
 	}
 }
@@ -479,7 +479,7 @@ void arcadia_state::arcadia(machine_config &config)
 	m_maincpu->sense_handler().set(FUNC(arcadia_state::vsync_r));
 	m_maincpu->set_periodic_int(FUNC(arcadia_state::video_line), attotime::from_hz(262*60));
 
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

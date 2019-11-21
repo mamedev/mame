@@ -544,6 +544,8 @@ private:
 
 	int m_inh_bank;
 
+	bool m_slot_irq;
+
 	double m_x_calibration, m_y_calibration;
 
 	device_a2bus_card_interface *m_slotdevice[8];
@@ -641,6 +643,7 @@ WRITE_LINE_MEMBER(apple2gs_state::a2bus_irq_w)
 	if (state == ASSERT_LINE)
 	{
 		raise_irq(IRQS_SLOT);
+		m_slot_irq = true;
 	}
 	else
 	{
@@ -1349,6 +1352,8 @@ void apple2gs_state::machine_reset()
 	m_mouse_y = 0x00;
 	m_mouse_dx = 0x00;
 	m_mouse_dy = 0x00;
+
+	m_slot_irq = false;
 
 	#if !RUN_ADB_MICRO
 	m_adb_state = ADBSTATE_IDLE;
@@ -2206,9 +2211,15 @@ READ8_MEMBER(apple2gs_state::c000_r)
 			return adb_read_datareg();
 
 		case 0x27:  // KMSTATUS
-		// hack to let one-second IRQs get through in Nucleus
+			// hack to let one-second IRQs get through in Nucleus
 			if (m_vgcint & VGCINT_SECOND)
 				return 0;
+			// secondary hack for slot IRQs
+			if (m_slot_irq)
+			{
+				m_slot_irq = false;
+				return 0;
+			}
 
 			return adb_read_kmstatus();
 #endif
@@ -2559,6 +2570,7 @@ WRITE8_MEMBER(apple2gs_state::c000_w)
 			{
 				m_bank0_atc->set_bank(1);
 				m_bank1_atc->set_bank(1);
+
 			}
 			break;
 
@@ -3432,6 +3444,11 @@ WRITE8_MEMBER(apple2gs_state::b1ram4000_w)
 
 READ8_MEMBER(apple2gs_state::bank0_c000_r)
 {
+	if (offset & 0x2000)
+	{
+		offset ^= 0x1000;
+	}
+
 	if (m_ramrd)
 	{
 		return m_ram_ptr[offset + 0x3c000];
@@ -3442,6 +3459,11 @@ READ8_MEMBER(apple2gs_state::bank0_c000_r)
 
 WRITE8_MEMBER(apple2gs_state::bank0_c000_w)
 {
+	if (offset & 0x2000)
+	{
+		offset ^= 0x1000;
+	}
+
 	if (m_ramwrt)
 	{
 		m_ram_ptr[offset + 0x3c000] = data;
@@ -3453,8 +3475,8 @@ WRITE8_MEMBER(apple2gs_state::bank0_c000_w)
 
 READ8_MEMBER(apple2gs_state::bank1_0000_r) { return m_ram_ptr[offset + 0x30000]; }
 WRITE8_MEMBER(apple2gs_state::bank1_0000_w) { m_ram_ptr[offset + 0x30000] = data; }
-READ8_MEMBER(apple2gs_state::bank1_c000_r) { return m_ram_ptr[offset + 0x3c000]; }
-WRITE8_MEMBER(apple2gs_state::bank1_c000_w) { m_ram_ptr[offset + 0x3c000] = data; }
+READ8_MEMBER(apple2gs_state::bank1_c000_r) { if (offset & 0x2000) offset ^= 0x1000; return m_ram_ptr[offset + 0x3c000]; }
+WRITE8_MEMBER(apple2gs_state::bank1_c000_w) { if (offset & 0x2000) offset ^= 0x1000; m_ram_ptr[offset + 0x3c000] = data; }
 WRITE8_MEMBER(apple2gs_state::bank1_0000_sh_w)
 {
 	m_ram_ptr[offset + 0x30000] = data;
@@ -4525,7 +4547,7 @@ void apple2gs_state::apple2gs(machine_config &config)
 	m_maincpu->set_dasm_override(FUNC(apple2gs_state::dasm_trampoline));
 	TIMER(config, m_scantimer, 0);
 	m_scantimer->configure_scanline(FUNC(apple2gs_state::apple2_interrupt), "screen", 0, 1);
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	M50741(config, m_adbmicro, A2GS_MASTER_CLOCK/8);
 	m_adbmicro->read_p<0>().set(FUNC(apple2gs_state::adbmicro_p0_in));

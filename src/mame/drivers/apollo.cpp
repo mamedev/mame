@@ -444,7 +444,7 @@ WRITE32_MEMBER(apollo_state::ram_with_parity_w){
 			// no more than 192 read/write handlers may be used
 			// see table_assign_handler in memory.c
 			if (parity_error_handler_install_counter < 40) {
-				m_maincpu->space(AS_PROGRAM).install_read_handler(ram_base_address+offset*4, ram_base_address+offset*4+3, read32_delegate(FUNC(apollo_state::ram_with_parity_r),this));
+				m_maincpu->space(AS_PROGRAM).install_read_handler(ram_base_address+offset*4, ram_base_address+offset*4+3, read32_delegate(*this, FUNC(apollo_state::ram_with_parity_r)));
 				parity_error_handler_is_installed = 1;
 				parity_error_handler_install_counter++;
 			}
@@ -699,7 +699,7 @@ void apollo_state::dn3500_map(address_map &map)
 		map(ATBUS_MEMORY_BASE, ATBUS_MEMORY_END).rw(FUNC(apollo_state::apollo_atbus_memory_r), FUNC(apollo_state::apollo_atbus_memory_w));
 
 		// FIXME: must match with RAM size in driver/apollo_sio.c
-		// AM_RANGE(DN3500_RAM_BASE, DN3500_RAM_END) AM_RAM /* 8MB RAM */
+		// map(DN3500_RAM_BASE, DN3500_RAM_END).ram(); /* 8MB RAM */
 		map(DN3500_RAM_BASE, DN3500_RAM_END).ram().w(FUNC(apollo_state::ram_with_parity_w)).share(RAM_TAG);
 
 		map(0x05d800, 0x05dc07).rw(m_graphics, FUNC(apollo_graphics_15i::apollo_mcr_r), FUNC(apollo_graphics_15i::apollo_mcr_w));
@@ -708,11 +708,11 @@ void apollo_state::dn3500_map(address_map &map)
 		map(0x05e800, 0x05ec07).rw(m_graphics, FUNC(apollo_graphics_15i::apollo_ccr_r), FUNC(apollo_graphics_15i::apollo_ccr_w));
 		map(0x0a0000, 0x0bffff).rw(m_graphics, FUNC(apollo_graphics_15i::apollo_cgm_r), FUNC(apollo_graphics_15i::apollo_cgm_w));
 
-//      AM_RANGE(0x03020000, 0x0303ffff) Cache Tag Store (DN4500 only)
-//      AM_RANGE(0x04000000, 0x0400ffff) Cache Tag Data (DN4500 only)
-//      AM_RANGE(0x0e000000, 0x0fffffff) FPA address space
+//      map(0x03020000, 0x0303ffff) Cache Tag Store (DN4500 only)
+//      map(0x04000000, 0x0400ffff) Cache Tag Data (DN4500 only)
+//      map(0x0e000000, 0x0fffffff) FPA address space
 
-//      AM_RANGE(0xf8000000, 0xffffffff) AM_READWRITE(apollo_f8_r, apollo_f8_w)
+//      map(0xf8000000, 0xffffffff).rw(FUNC(apollo_state::apollo_f8_r), FUNC(apollo_state::apollo_f8_w));
 }
 
 void apollo_state::dsp3500_map(address_map &map)
@@ -745,7 +745,7 @@ void apollo_state::dsp3500_map(address_map &map)
 
 		map(ATBUS_MEMORY_BASE, ATBUS_MEMORY_END).rw(FUNC(apollo_state::apollo_atbus_memory_r), FUNC(apollo_state::apollo_atbus_memory_w));
 
-//      AM_RANGE(0xf8000000, 0xffffffff) AM_READWRITE(apollo_f8_r, apollo_f8_w)
+//      map(0xf8000000, 0xffffffff).rw(FUNC(apollo_state::apollo_f8_r), FUNC(apollo_state::apollo_f8_w));
 }
 
 void apollo_state::dn3000_map(address_map &map)
@@ -771,7 +771,7 @@ void apollo_state::dn3000_map(address_map &map)
 		map(ATBUS_MEMORY_BASE, ATBUS_MEMORY_END).rw(FUNC(apollo_state::apollo_atbus_memory_r), FUNC(apollo_state::apollo_atbus_memory_w));
 
 		// FIXME: must match with RAM size in driver/apollo_sio.c
-		// AM_RANGE(DN3000_RAM_BASE, DN3000_RAM_END) AM_RAM  /* 8MB RAM */
+		// map(DN3000_RAM_BASE, DN3000_RAM_END).ram();  /* 8MB RAM */
 		map(DN3000_RAM_BASE, DN3000_RAM_END).ram().w(FUNC(apollo_state::ram_with_parity_w)).share(RAM_TAG);
 
 		map(0x05d800, 0x05dc07).rw(m_graphics, FUNC(apollo_graphics_15i::apollo_mcr_r), FUNC(apollo_graphics_15i::apollo_mcr_w));
@@ -805,7 +805,7 @@ void apollo_state::dsp3000_map(address_map &map)
 		map(ATBUS_MEMORY_BASE, ATBUS_MEMORY_END).rw(FUNC(apollo_state::apollo_atbus_memory_r), FUNC(apollo_state::apollo_atbus_memory_w));
 
 		// FIXME: must match with RAM size in driver/apollo_sio.c
-		// AM_RANGE(DN3000_RAM_BASE, DN3000_RAM_END) AM_RAM  /* 8MB RAM */
+		// map(DN3000_RAM_BASE, DN3000_RAM_END).ram();  /* 8MB RAM */
 		map(DN3000_RAM_BASE, DN3000_RAM_END).ram().w(FUNC(apollo_state::ram_with_parity_w)).share(RAM_TAG);
 
 }
@@ -841,7 +841,7 @@ void apollo_state::dn5500_map(address_map &map)
 	map(ATBUS_MEMORY_BASE, ATBUS_MEMORY_END).rw(FUNC(apollo_state::apollo_atbus_memory_r), FUNC(apollo_state::apollo_atbus_memory_w));
 
 	// FIXME: must match with RAM size in driver/apollo_sio.c
-	// AM_RANGE(DN3500_RAM_BASE, DN3500_RAM_END) AM_RAM  /* 8MB RAM */
+	// map(DN3500_RAM_BASE, DN3500_RAM_END).ram();  /* 8MB RAM */
 	map(DN5500_RAM_BASE, DN5500_RAM_END).ram().w(FUNC(apollo_state::ram_with_parity_w)).share(RAM_TAG);
 
 	map(0x05d800, 0x05dc07).rw(m_graphics, FUNC(apollo_graphics_15i::apollo_mcr_r), FUNC(apollo_graphics_15i::apollo_mcr_w));
@@ -850,12 +850,12 @@ void apollo_state::dn5500_map(address_map &map)
 	map(0x05e800, 0x05ec07).rw(m_graphics, FUNC(apollo_graphics_15i::apollo_ccr_r), FUNC(apollo_graphics_15i::apollo_ccr_w));
 	map(0x0a0000, 0x0bffff).rw(m_graphics, FUNC(apollo_graphics_15i::apollo_cgm_r), FUNC(apollo_graphics_15i::apollo_cgm_w));
 
-//  AM_RANGE(0x03020000, 0x0303ffff) Cache Tag Store (DN4500 only)
-//  AM_RANGE(0x04000000, 0x0400ffff) Cache Tag Data (DN4500 only)
+//  map(0x03020000, 0x0303ffff) Cache Tag Store (DN4500 only)
+//  map(0x04000000, 0x0400ffff) Cache Tag Data (DN4500 only)
 	map(0x07000000, 0x0700FFFF).rw(FUNC(apollo_state::dn5500_io_protection_map_r), FUNC(apollo_state::dn5500_io_protection_map_w));
-//  AM_RANGE(0x0e000000, 0x0fffffff) FPA address space
+//  map(0x0e000000, 0x0fffffff) FPA address space
 
-//  AM_RANGE(0xf8000000, 0xffffffff) AM_READWRITE(apollo_f8_r, apollo_f8_w)
+//  map(0xf8000000, 0xffffffff).rw(FUNC(apollo_state::apollo_f8_r), FUNC(apollo_state::apollo_f8_w));
 }
 
 void apollo_state::dsp5500_map(address_map &map)
@@ -891,7 +891,7 @@ void apollo_state::dsp5500_map(address_map &map)
 	map(DN5500_RAM_BASE, DN5500_RAM_END).ram().w(FUNC(apollo_state::ram_with_parity_w)).share(RAM_TAG);
 
 	map(0x07000000, 0x0700FFFF).rw(FUNC(apollo_state::dn5500_io_protection_map_r), FUNC(apollo_state::dn5500_io_protection_map_w));
-//  AM_RANGE(0xf8000000, 0xffffffff) AM_READWRITE(apollo_f8_r, apollo_f8_w)
+//  map(0xf8000000, 0xffffffff).rw(FUNC(apollo_state::apollo_f8_r), FUNC(apollo_state::apollo_f8_w));
 }
 
 /***************************************************************************
@@ -917,7 +917,7 @@ void apollo_state::machine_reset()
 	}
 
 #if 0
-	m_maincpu->set_instruction_hook(read32_delegate(FUNC(apollo_state::apollo_instruction_hook),this));
+	m_maincpu->set_instruction_hook(read32_delegate(*this, FUNC(apollo_state::apollo_instruction_hook)));
 #endif
 }
 
@@ -955,8 +955,8 @@ void apollo_state::machine_start(){
 	MACHINE_START_CALL_MEMBER(apollo);
 
 	// install nop handlers for unmapped ISA bus addresses
-	m_isa->install16_device((ATBUS_IO_BASE - 0x40000) >> 7, (ATBUS_IO_END - 0x40000) >> 7, read16_delegate(FUNC(apollo_state::apollo_atbus_unmap_io_r), this), write16_delegate(FUNC(apollo_state::apollo_atbus_unmap_io_w), this));
-	m_isa->install_memory(0, ATBUS_MEMORY_END, read8_delegate(FUNC(apollo_state::apollo_atbus_unmap_r), this), write8_delegate(FUNC(apollo_state::apollo_atbus_unmap_w), this));
+	m_isa->install16_device((ATBUS_IO_BASE - 0x40000) >> 7, (ATBUS_IO_END - 0x40000) >> 7, read16_delegate(*this, FUNC(apollo_state::apollo_atbus_unmap_io_r)), write16_delegate(*this, FUNC(apollo_state::apollo_atbus_unmap_io_w)));
+	m_isa->install_memory(0, ATBUS_MEMORY_END, read8_delegate(*this, FUNC(apollo_state::apollo_atbus_unmap_r)), write8_delegate(*this, FUNC(apollo_state::apollo_atbus_unmap_w)));
 }
 
 /***************************************************************************
@@ -968,7 +968,7 @@ void apollo_state::init_dn3500()
 //  MLOG1(("driver_init_dn3500"));
 
 	/* hook the RESET line, which resets a slew of other components */
-	m_maincpu->set_reset_callback(write_line_delegate(FUNC(apollo_state::apollo_reset_instr_callback),this));
+	m_maincpu->set_reset_callback(FUNC(apollo_state::apollo_reset_instr_callback));
 
 	ram_base_address = DN3500_RAM_BASE;
 	ram_end_address = DN3500_RAM_END;
@@ -1052,7 +1052,7 @@ void apollo_state::dn3500(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &apollo_state::dn3500_map);
 	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &apollo_state::cpu_space_map);
 
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	apollo(config);
 
@@ -1070,7 +1070,7 @@ void apollo_state::dsp3500(machine_config &config)
 	M68030(config, m_maincpu, 25000000); /* 25 MHz 68030 */
 	m_maincpu->set_addrmap(AS_PROGRAM, &apollo_state::dsp3500_map);
 	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &apollo_state::cpu_space_map);
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	apollo_terminal(config);
 
@@ -1119,7 +1119,7 @@ void apollo_state::dsp3000(machine_config &config)
 	M68020PMMU(config, m_maincpu, 12000000); /* 12 MHz */
 	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &apollo_state::cpu_space_map);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apollo_state::dsp3000_map);
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	apollo_terminal(config);
 
@@ -1164,7 +1164,7 @@ void apollo_state::dsp5500(machine_config &config)
 	M68040(config, m_maincpu, 25000000); /* 25 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &apollo_state::dsp5500_map);
 	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &apollo_state::cpu_space_map);
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	apollo_terminal(config);
 

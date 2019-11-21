@@ -335,7 +335,7 @@ void megasys1_state::megasys1B_edfbl_map(address_map &map)
 	map(0x0e0006, 0x0e0007).portr("P2");
 	map(0x0e0008, 0x0e0009).portr("DSW1");
 	map(0x0e000a, 0x0e000b).portr("DSW2");
-	//AM_RANGE(0x0e000e, 0x0e000f) AM_WRITE(soundlatch_w)
+	//map(0x0e000e, 0x0e000f).w(FUNC(megasys1_state::soundlatch_w));
 }
 
 void megasys1_state::megasys1B_monkelf_map(address_map &map)
@@ -410,7 +410,7 @@ void megasys1_state::megasys1D_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x0c2000, 0x0c2005).rw("scroll0", FUNC(megasys1_tilemap_device::scroll_r), FUNC(megasys1_tilemap_device::scroll_w));
 	map(0x0c2008, 0x0c200d).rw("scroll1", FUNC(megasys1_tilemap_device::scroll_r), FUNC(megasys1_tilemap_device::scroll_w));
-	map(0x0c2108, 0x0c2109).nopw(); //AM_WRITE(sprite_bank_w)
+	map(0x0c2108, 0x0c2109).nopw(); //.w(FUNC(megasys1_state::sprite_bank_w));
 	map(0x0c2200, 0x0c2201).rw(FUNC(megasys1_state::sprite_flag_r), FUNC(megasys1_state::sprite_flag_w));
 	map(0x0c2208, 0x0c2209).w(FUNC(megasys1_state::active_layers_w));
 	map(0x0c2308, 0x0c2309).w(FUNC(megasys1_state::screen_flag_w));
@@ -504,6 +504,15 @@ READ8_MEMBER(megasys1_state::oki_status_r)
 		return m_oki[Chip]->read();
 }
 
+void megasys1_state::p47b_adpcm_w(offs_t offset, u8 data)
+{
+	// bit 6 is always set
+	m_p47b_adpcm[offset]->reset_w(BIT(data, 7));
+	m_p47b_adpcm[offset]->write_data(data & 0x0f);
+	m_p47b_adpcm[offset]->vclk_w(1);
+	m_p47b_adpcm[offset]->vclk_w(0);
+}
+
 /***************************************************************************
                             [ Sound CPU - System A ]
 ***************************************************************************/
@@ -531,7 +540,7 @@ void megasys1_state::megasys1A_jitsupro_sound_map(address_map &map)
 }
 
 void megasys1_state::kickoffb_sound_map(address_map &map)
-{ // TODO: wrong, needs to be checked range for range
+{
 	map(0x000000, 0x01ffff).rom();
 	map(0x040000, 0x040001).r(m_soundlatch[0], FUNC(generic_latch_16_device::read));
 	map(0x060000, 0x060001).w(m_soundlatch[1], FUNC(generic_latch_16_device::write));   // to main cpu
@@ -541,6 +550,29 @@ void megasys1_state::kickoffb_sound_map(address_map &map)
 	map(0x0e0000, 0x0fffff).ram();
 }
 
+void megasys1_state::p47b_sound_map(address_map &map)
+{
+	map(0x000000, 0x01ffff).rom();
+	map(0x040000, 0x040001).r(m_soundlatch[0], FUNC(generic_latch_16_device::read));
+	map(0x060000, 0x060001).w(m_soundlatch[1], FUNC(generic_latch_16_device::write));   // to main cpu?
+	map(0x080000, 0x080003).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write)).umask16(0x00ff);
+	map(0x0a0000, 0x0a0003).noprw(); // OKI1 on the original
+	map(0x0c0001, 0x0c0001).w("soundlatch3", FUNC(generic_latch_8_device::write));
+	map(0x0c0002, 0x0c0003).noprw(); // OKI2 on the original
+	map(0x0e0000, 0x0fffff).ram();
+}
+
+void megasys1_state::p47b_extracpu_prg_map(address_map &map) // TODO
+{
+	map(0x0000, 0xffff).rom().nopw();
+}
+
+void megasys1_state::p47b_extracpu_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x01).w(FUNC(megasys1_state::p47b_adpcm_w));
+	map(0x01, 0x01).r("soundlatch3", FUNC(generic_latch_8_device::read));
+}
 
 /***************************************************************************
                         [ Sound CPU - System B / C ]
@@ -571,7 +603,7 @@ void megasys1_state::z80_sound_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0xc000, 0xc7ff).ram();
-	map(0xe000, 0xe000).lr8("soundlatch_r_z", [this](){ return m_soundlatch[0]->read() & 0xff; });
+	map(0xe000, 0xe000).lr8(NAME([this] () { return m_soundlatch[0]->read() & 0xff; }));
 	map(0xf000, 0xf000).nopw(); /* ?? */
 }
 
@@ -1673,7 +1705,7 @@ void megasys1_state::system_A(machine_config &config)
 	M68000(config, m_audiocpu, SOUND_CPU_CLOCK); /* 7MHz verified */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &megasys1_state::megasys1A_sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(120000);
+	config.set_maximum_quantum(attotime::from_hz(120000));
 
 	MCFG_MACHINE_RESET_OVERRIDE(megasys1_state,megasys1)
 
@@ -1745,13 +1777,42 @@ void megasys1_state::kickoffb(machine_config &config)
 	system_A(config);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &megasys1_state::kickoffb_sound_map);
 
-	config.device_remove("ymsnd");
 	config.device_remove("oki2");
 
-	ym2203_device &ymsnd(YM2203(config, "ymsnd", SOUND_CPU_CLOCK / 2));
-	ymsnd.irq_handler().set(FUNC(megasys1_state::sound_irq)); // TODO: needs to be checked
-	ymsnd.add_route(0, "lspeaker", 0.80);
-	ymsnd.add_route(1, "rspeaker", 0.80);
+	ym2203_device &ymsnd(YM2203(config.replace(), "ymsnd", SOUND_CPU_CLOCK / 2));
+	ymsnd.irq_handler().set(FUNC(megasys1_state::sound_irq));
+	ymsnd.add_route(ALL_OUTPUTS, "lspeaker", 0.80);
+	ymsnd.add_route(ALL_OUTPUTS, "rspeaker", 0.80);
+}
+
+void megasys1_state::p47b(machine_config &config)
+{
+	kickoffb(config);
+	m_audiocpu->set_clock(7.2_MHz_XTAL);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &megasys1_state::p47b_sound_map);
+
+	config.device_remove("oki1");
+
+	subdevice<ym2203_device>("ymsnd")->set_clock(7.2_MHz_XTAL / 2);
+
+	// probably for driving the OKI M5205
+	z80_device &extracpu(Z80(config, "extracpu", 7.2_MHz_XTAL / 2)); // divisor not verified
+	extracpu.set_periodic_int(FUNC(megasys1_state::irq0_line_hold), attotime::from_hz(8000));
+	extracpu.set_addrmap(AS_PROGRAM, &megasys1_state::p47b_extracpu_prg_map);
+	extracpu.set_addrmap(AS_IO, &megasys1_state::p47b_extracpu_io_map);
+
+	GENERIC_LATCH_8(config, "soundlatch3");
+
+	// OKI M5205
+	MSM5205(config, m_p47b_adpcm[0], 384000);
+	m_p47b_adpcm[0]->set_prescaler_selector(msm5205_device::SEX_4B);
+	m_p47b_adpcm[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_p47b_adpcm[0]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+
+	MSM5205(config, m_p47b_adpcm[1], 384000);
+	m_p47b_adpcm[1]->set_prescaler_selector(msm5205_device::SEX_4B);
+	m_p47b_adpcm[1]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_p47b_adpcm[1]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 }
 
 void megasys1_state::system_B(machine_config &config)
@@ -3565,6 +3626,58 @@ ROM_START( p47je )
 	ROM_LOAD( "p-47.14m",    0x0000, 0x0200, CRC(1d877538) SHA1(a5be0dc65dcfc36fbba10d1fddbe155e24b6122f) )
 ROM_END
 
+ROM_START( p47b ) // very similar to original hardware but for the sound system (a YM2203 with a Y3014B DAC with unpopulated spaces for another pair + an OKI M5205) and an extra Z80
+	ROM_REGION( 0x60000, "maincpu", 0 )     /* Main CPU Code, identical to p47 set but with smaller ROMs */
+	ROM_LOAD16_BYTE( "12.bin", 0x000000, 0x010000, CRC(cc81abd8) SHA1(223d205ee5120d16b997b0788fcb81c0de52da04) )
+	ROM_LOAD16_BYTE( "13.bin", 0x020000, 0x010000, CRC(f3ea8a3e) SHA1(b2ea6661f7a3653ac6d92e07176546a41178eaff) )
+	ROM_LOAD16_BYTE( "10.bin", 0x000001, 0x010000, CRC(8ebff1d8) SHA1(48c9c686fe77087ca122707f99598947b3ef675b) )
+	ROM_LOAD16_BYTE( "11.bin", 0x020001, 0x010000, CRC(7e0033af) SHA1(1e36d963e1738fab4ab081c6ce50dd6f8251bcee) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Sound CPU Code, first 3/4 almost identical to p47 */
+	ROM_LOAD16_BYTE( "3.bin", 0x000000, 0x010000, CRC(617906d6) SHA1(79b43de70a51840f9980b5e3b9c769df0ec23060) )
+	ROM_LOAD16_BYTE( "2.bin", 0x000001, 0x010000, CRC(cde8f971) SHA1(dc529799584065749d43c79a42a0296db015f810) )
+
+	ROM_REGION( 0x10000, "extracpu", 0 )        /* Extra Z80 CPU Code, code very similar to Street Fighter */
+	ROM_LOAD( "1.bin", 0x000000, 0x010000, CRC(5c38bf63) SHA1(8d4750e0b54602c38041ee6dd17007c3cc5cc938) )
+
+	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0, identical to p47 set but with smaller ROMs */
+	ROM_LOAD( "20.bin",  0x000000, 0x010000, CRC(c10eac26) SHA1(4ce91e6ebeec67c87321a6b4f1c0758b63676287) )
+	ROM_LOAD( "21.bin",  0x010000, 0x010000, CRC(653f1115) SHA1(c95e0092040992b87d904f33782797e36f83051f) )
+	ROM_LOAD( "19.bin",  0x020000, 0x010000, CRC(5cbace5d) SHA1(21217fd5b87b283c363589d18de8bfd48dc94cac) )
+	// empty?
+	ROM_LOAD( "22.bin",  0x040000, 0x010000, CRC(f3b1850a) SHA1(d12c61f647aaad53d745ba66d50d22cdf8065c00) )
+	// empty?
+
+	ROM_REGION( 0x080000, "scroll1", 0 ) /* Scroll 1, identical to p47 set but with smaller ROMs */
+	ROM_LOAD( "14.bin", 0x000000, 0x010000, CRC(74c1c930) SHA1(14be54f739b34c06d51298906724ab01675d1dc2) )
+	ROM_RELOAD(         0x020000, 0x010000 )   /* why? */
+	ROM_LOAD( "15.bin", 0x010000, 0x010000, CRC(1f470ae9) SHA1(c85abc097a8609b7ffa949722b3036b06670b41e) )
+	ROM_RELOAD(         0x030000, 0x010000 )   /* why? */
+	ROM_LOAD( "17.bin", 0x040000, 0x010000, CRC(99afbdf5) SHA1(2ee2e21ecae47b5aa98f106a54a44d9651adc6f3) )
+	ROM_LOAD( "16.bin", 0x050000, 0x010000, CRC(333f2164) SHA1(85f8582728c4b07c4aac39ac43e145db48a821b1) )
+
+	ROM_REGION( 0x020000, "scroll2", 0 ) /* Scroll 2, identical to p47j (!) */
+	ROM_LOAD( "18.bin", 0x000000, 0x010000, CRC(30e44375) SHA1(62a4bb217b6aad5fd4760a0f4999cb63559549a5) )
+
+	ROM_REGION( 0x080000, "sprites", 0 ) /* Sprites, identical to p47 set but with smaller ROMs */
+	ROM_LOAD( "4.bin", 0x000000, 0x010000, CRC(c94b1e7b) SHA1(7670710afaa7ffefbc66701bbe219bf55539cb1d) )
+	ROM_LOAD( "5.bin", 0x010000, 0x010000, CRC(0060f8d1) SHA1(796ec06662d6e2f8f0ea2053fa3ed0fdc80777c1) )
+	ROM_LOAD( "6.bin", 0x020000, 0x010000, CRC(46969c51) SHA1(87ce216544446a5e8545a0c2c305768a86803bb5) )
+	ROM_LOAD( "7.bin", 0x030000, 0x010000, CRC(df28c273) SHA1(92ebb0416d122d59686cda766ddfab037f6692f6) )
+	ROM_LOAD( "8.bin", 0x040000, 0x010000, CRC(f206218a) SHA1(28856cd4512e5f2bbe06f672ad857a6ccb112b17) )
+	ROM_RELOAD(        0x060000, 0x010000 )   /* why? */
+	ROM_LOAD( "9.bin", 0x050000, 0x010000, CRC(96194148) SHA1(6e58f605139a8442fd2ed45ecb3348070baf0221) )
+	ROM_RELOAD(        0x070000, 0x010000 )   /* why? */
+
+	// no OKIs
+
+	ROM_REGION( 0x0200, "proms", 0 )        /* Priority PROM  (N82S131N compatible type BPROM) */
+	ROM_LOAD( "82s131n",    0x0000, 0x0200, BAD_DUMP CRC(1d877538) SHA1(a5be0dc65dcfc36fbba10d1fddbe155e24b6122f) ) // taken from original, needs to be dumped for this set
+
+	ROM_REGION( 0x0400, "pld", 0 )
+	ROM_LOAD( "pal16l8.c131", 0x0000, 0x0104, NO_DUMP )
+	ROM_LOAD( "pal16l8.c159", 0x0200, 0x0104, NO_DUMP )
+ROM_END
 
 /***************************************************************************
 
@@ -4508,8 +4621,8 @@ WRITE16_MEMBER(megasys1_state::megasys1A_mcu_hs_w)
 void megasys1_state::init_astyanax()
 {
 	astyanax_rom_decode(machine(), "maincpu");
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00000, 0x3ffff, read16_delegate(FUNC(megasys1_state::megasys1A_mcu_hs_r),this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x20000, 0x20009, write16_delegate(FUNC(megasys1_state::megasys1A_mcu_hs_w),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00000, 0x3ffff, read16_delegate(*this, FUNC(megasys1_state::megasys1A_mcu_hs_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x20000, 0x20009, write16_delegate(*this, FUNC(megasys1_state::megasys1A_mcu_hs_w)));
 
 	m_mcu_hs = 0;
 	memset(m_mcu_hs_ram, 0, sizeof(m_mcu_hs_ram));
@@ -4653,8 +4766,8 @@ void megasys1_state::init_iganinju()
 {
 	phantasm_rom_decode(machine(), "maincpu");
 
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00000, 0x3ffff, read16_delegate(FUNC(megasys1_state::iganinju_mcu_hs_r),this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x2f000, 0x2f009, write16_delegate(FUNC(megasys1_state::iganinju_mcu_hs_w),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00000, 0x3ffff, read16_delegate(*this, FUNC(megasys1_state::iganinju_mcu_hs_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x2f000, 0x2f009, write16_delegate(*this, FUNC(megasys1_state::iganinju_mcu_hs_w)));
 
 	//m_rom_maincpu[0x00006e/2] = 0x0420; // the only game that does
 										// not like lev 3 interrupts
@@ -4672,8 +4785,8 @@ void megasys1_state::init_jitsupro()
 
 	jitsupro_gfx_unmangle("scroll0");   // Gfx
 	jitsupro_gfx_unmangle("sprites");
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00000, 0x3ffff, read16_delegate(FUNC(megasys1_state::megasys1A_mcu_hs_r),this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x20000, 0x20009, write16_delegate(FUNC(megasys1_state::megasys1A_mcu_hs_w),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00000, 0x3ffff, read16_delegate(*this, FUNC(megasys1_state::megasys1A_mcu_hs_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x20000, 0x20009, write16_delegate(*this, FUNC(megasys1_state::megasys1A_mcu_hs_w)));
 
 	m_mcu_hs = 0;
 	memset(m_mcu_hs_ram, 0, sizeof(m_mcu_hs_ram));
@@ -4689,7 +4802,7 @@ void megasys1_state::init_peekaboo()
 	m_okibank->configure_entry(7, &ROM[0x20000]);
 	m_okibank->configure_entries(0, 7, &ROM[0x20000], 0x20000);
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x100000, 0x100001, read16_delegate(FUNC(megasys1_state::protection_peekaboo_r),this), write16_delegate(FUNC(megasys1_state::protection_peekaboo_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x100000, 0x100001, read16_delegate(*this, FUNC(megasys1_state::protection_peekaboo_r)), write16_delegate(*this, FUNC(megasys1_state::protection_peekaboo_w)));
 
 	save_item(NAME(m_protection_val));
 }
@@ -4740,14 +4853,14 @@ void megasys1_state::init_soldamj()
 {
 	astyanax_rom_decode(machine(), "maincpu");
 	/* Sprite RAM is mirrored */
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x8c000, 0x8cfff, read16_delegate(FUNC(megasys1_state::soldamj_spriteram16_r),this), write16_delegate(FUNC(megasys1_state::soldamj_spriteram16_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x8c000, 0x8cfff, read16_delegate(*this, FUNC(megasys1_state::soldamj_spriteram16_r)), write16_delegate(*this, FUNC(megasys1_state::soldamj_spriteram16_w)));
 }
 
 void megasys1_state::init_soldam()
 {
 	phantasm_rom_decode(machine(), "maincpu");
 	/* Sprite RAM is mirrored */
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x8c000, 0x8cfff, read16_delegate(FUNC(megasys1_state::soldamj_spriteram16_r),this), write16_delegate(FUNC(megasys1_state::soldamj_spriteram16_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x8c000, 0x8cfff, read16_delegate(*this, FUNC(megasys1_state::soldamj_spriteram16_r)), write16_delegate(*this, FUNC(megasys1_state::soldamj_spriteram16_w)));
 }
 
 
@@ -4781,8 +4894,8 @@ WRITE16_MEMBER(megasys1_state::stdragon_mcu_hs_w)
 void megasys1_state::init_stdragon()
 {
 	phantasm_rom_decode(machine(), "maincpu");
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00000, 0x3ffff, read16_delegate(FUNC(megasys1_state::stdragon_mcu_hs_r),this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x23ff0, 0x23ff9, write16_delegate(FUNC(megasys1_state::stdragon_mcu_hs_w),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00000, 0x3ffff, read16_delegate(*this, FUNC(megasys1_state::stdragon_mcu_hs_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x23ff0, 0x23ff9, write16_delegate(*this, FUNC(megasys1_state::stdragon_mcu_hs_w)));
 
 	m_mcu_hs = 0;
 	memset(m_mcu_hs_ram, 0, sizeof(m_mcu_hs_ram));
@@ -4798,8 +4911,8 @@ void megasys1_state::init_stdragona()
 	stdragona_gfx_unmangle("scroll0");
 	stdragona_gfx_unmangle("sprites");
 
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00000, 0x3ffff, read16_delegate(FUNC(megasys1_state::stdragon_mcu_hs_r),this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x23ff0, 0x23ff9, write16_delegate(FUNC(megasys1_state::stdragon_mcu_hs_w),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00000, 0x3ffff, read16_delegate(*this, FUNC(megasys1_state::stdragon_mcu_hs_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x23ff0, 0x23ff9, write16_delegate(*this, FUNC(megasys1_state::stdragon_mcu_hs_w)));
 
 	m_mcu_hs = 0;
 	memset(m_mcu_hs_ram, 0, sizeof(m_mcu_hs_ram));
@@ -4844,8 +4957,9 @@ GAME( 1988, makaiden, lomakai,  system_Z,          lomakai,  megasys1_state, emp
 GAME( 1988, p47,      0,        system_A,          p47,      megasys1_state, empty_init,    ROT0,   "Jaleco", "P-47 - The Phantom Fighter (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, p47j,     p47,      system_A,          p47,      megasys1_state, empty_init,    ROT0,   "Jaleco", "P-47 - The Freedom Fighter (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, p47je,    p47,      system_A,          p47,      megasys1_state, empty_init,    ROT0,   "Jaleco", "P-47 - The Freedom Fighter (Japan, Export)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, p47b,     p47,      p47b,              p47,      megasys1_state, empty_init,    ROT0,   "bootleg","P-47 - The Freedom Fighter (World, bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, kickoff,  0,        system_A,          kickoff,  megasys1_state, empty_init,    ROT0,   "Jaleco", "Kick Off (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, kickoffb, kickoff,  kickoffb,          kickoff,  megasys1_state, empty_init,    ROT0,   "bootleg (Comodo)", "Kick Off (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // YM2203 isn't hooked up, OKI needs to be checked
+GAME( 1988, kickoffb, kickoff,  kickoffb,          kickoff,  megasys1_state, empty_init,    ROT0,   "bootleg (Comodo)", "Kick Off (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // OKI needs to be checked
 GAME( 1988, tshingen, 0,        system_A,          tshingen, megasys1_state, init_phantasm, ROT0,   "Jaleco", "Shingen Samurai-Fighter (Japan, English)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1988, tshingena,tshingen, system_A,          tshingen, megasys1_state, init_phantasm, ROT0,   "Jaleco", "Takeda Shingen (Japan, Japanese)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1988, kazan,    0,        system_A_iganinju, kazan,    megasys1_state, init_iganinju, ROT0,   "Jaleco", "Ninja Kazan (World)", MACHINE_SUPPORTS_SAVE )

@@ -1415,10 +1415,10 @@ ROM_END
 
 ROM_START( solarq )
 	ROM_REGION( 0x4000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "solar.6t", 0x0000, 0x1000, CRC(1f3c5333) SHA1(58d847b5f009a0363ae116768b22d0bcfb3d60a4) )
-	ROM_LOAD16_BYTE( "solar.6p", 0x0001, 0x1000, CRC(d6c16bcc) SHA1(6953bdc698da060d37f6bc33a810ba44595b1257) )
-	ROM_LOAD16_BYTE( "solar.6u", 0x2000, 0x1000, CRC(a5970e5c) SHA1(9ac07924ca86d003964022cffdd6a0436dde5624) )
-	ROM_LOAD16_BYTE( "solar.6r", 0x2001, 0x1000, CRC(b763fff2) SHA1(af1fd978e46a4aee3048e6e36c409821d986f7ee) )
+	ROM_LOAD16_BYTE( "sq-2_le.6t", 0x0000, 0x1000, CRC(1f3c5333) SHA1(58d847b5f009a0363ae116768b22d0bcfb3d60a4) )
+	ROM_LOAD16_BYTE( "sq-2_lo.6p", 0x0001, 0x1000, CRC(d6c16bcc) SHA1(6953bdc698da060d37f6bc33a810ba44595b1257) )
+	ROM_LOAD16_BYTE( "sq-2_ue.6u", 0x2000, 0x1000, CRC(a5970e5c) SHA1(9ac07924ca86d003964022cffdd6a0436dde5624) )
+	ROM_LOAD16_BYTE( "sq-2_uo.6r", 0x2001, 0x1000, CRC(b763fff2) SHA1(af1fd978e46a4aee3048e6e36c409821d986f7ee) )
 
 	CCPU_PROMS
 ROM_END
@@ -1499,21 +1499,21 @@ ROM_END
 void cinemat_state::init_speedfrk()
 {
 	m_gear = 0xe;
-	m_maincpu->space(AS_IO).install_read_handler(0x00, 0x03, read8_delegate(FUNC(cinemat_state::speedfrk_wheel_r),this));
-	m_maincpu->space(AS_IO).install_read_handler(0x04, 0x06, read8_delegate(FUNC(cinemat_state::speedfrk_gear_r),this));
+	m_maincpu->space(AS_IO).install_read_handler(0x00, 0x03, read8_delegate(*this, FUNC(cinemat_state::speedfrk_wheel_r)));
+	m_maincpu->space(AS_IO).install_read_handler(0x04, 0x06, read8_delegate(*this, FUNC(cinemat_state::speedfrk_gear_r)));
 	save_item(NAME(m_gear));
 }
 
 
 void cinemat_16level_state::init_sundance()
 {
-	m_maincpu->space(AS_IO).install_read_handler(0x00, 0x0f, read8_delegate(FUNC(cinemat_16level_state::sundance_inputs_r),this));
+	m_maincpu->space(AS_IO).install_read_handler(0x00, 0x0f, read8_delegate(*this, FUNC(cinemat_16level_state::sundance_inputs_r)));
 }
 
 
 void cinemat_color_state::init_boxingb()
 {
-	m_maincpu->space(AS_IO).install_read_handler(0x0c, 0x0f, read8_delegate(FUNC(cinemat_color_state::boxingb_dial_r),this));
+	m_maincpu->space(AS_IO).install_read_handler(0x0c, 0x0f, read8_delegate(*this, FUNC(cinemat_color_state::boxingb_dial_r)));
 }
 
 
@@ -1556,7 +1556,7 @@ GAMEL( 1980, starcasp, starcas,  starcas,  starcas,  cinemat_state,         empt
 GAMEL( 1980, starcase, starcas,  starcas,  starcas,  cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics (Mottoeis license)", "Star Castle (Mottoeis)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_starcas )
 GAMEL( 1980, stellcas, starcas,  starcas,  starcas,  cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "bootleg (Elettronolo)", "Stellar Castle (Elettronolo)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_starcas )
 GAMEL( 1981, spaceftr, starcas,  starcas,  starcas,  cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics (Zaccaria license)", "Space Fortress (Zaccaria)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_starcas )
-GAMEL( 1981, solarq,   0,        solarq,   solarq,   cinemat_64level_state, init_solarq,   ORIENTATION_FLIP_Y ^ ORIENTATION_FLIP_X, "Cinematronics", "Solar Quest", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_solarq )
+GAMEL( 1981, solarq,   0,        solarq,   solarq,   cinemat_64level_state, init_solarq,   ORIENTATION_FLIP_Y ^ ORIENTATION_FLIP_X, "Cinematronics", "Solar Quest (rev 10 8 81)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_solarq )
 GAME(  1981, boxingb,  0,        boxingb,  boxingb,  cinemat_color_state,   init_boxingb,  ORIENTATION_FLIP_Y,   "Cinematronics", "Boxing Bugs", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAMEL( 1981, wotw,     0,        wotw,     wotw,     cinemat_state,         empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics", "War of the Worlds", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_wotw )
 GAME(  1981, wotwc,    wotw,     wotwc,    wotw,     cinemat_color_state,   empty_init,    ORIENTATION_FLIP_Y,   "Cinematronics", "War of the Worlds (color)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
