@@ -1,6 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
+// Do timers auto reload?
+// Does writing to Enable actually turn on the timer, or writing to preload MSB? (which appears to be done AFTER turning on in many cases)
+
 #include "emu.h"
 #include "machine/vt1682_timer.h"
 
@@ -37,6 +40,7 @@ void vrt_vt1682_timer_device::device_reset()
 	m_timer_preload_7_0 = 0;
 	m_timer_preload_15_8 = 0;
 	m_timer_enable = 0;
+	m_using_alt_clock = false;
 }
 
 
@@ -94,11 +98,43 @@ READ8_MEMBER(vrt_vt1682_timer_device::vt1682_timer_preload_15_8_r)
 	return ret;
 }
 
+void vrt_vt1682_timer_device::update_timer()
+{
+	if (m_timer_enable & 0x01)
+	{
+		uint16_t preload = (m_timer_preload_15_8 << 8) | m_timer_preload_7_0;
+		int realpreload = 65536 - preload;
+
+		double period;
+		
+
+		if (!m_using_alt_clock)
+		{
+			period = (double)(realpreload) / (clock() / 1000000); // in microseconds?
+			m_timer->adjust(attotime::from_usec(period), 0, attotime::from_usec(period));
+		}
+		else
+		{
+			if (!m_is_sound_timer) printf("update_timer real preload %04x\n", realpreload);
+
+			m_timer->adjust(attotime::from_hz(clock()) * realpreload, 0, attotime::from_hz(clock()) * realpreload);
+		}
+
+
+		//if (!m_is_sound_timer) printf("clock %d, preload %d period in usec %f\n", clock(), preload, period);
+	}
+}
+
 WRITE8_MEMBER(vrt_vt1682_timer_device::vt1682_timer_preload_15_8_w)
 {
 	if (!m_is_sound_timer) LOGMASKED(LOG_TIMER,"%s: vt1682_timer_preload_15_8_w writing: %02x\n", machine().describe_context(), data);
 	m_timer_preload_15_8 = data;
+
+	update_timer();
 }
+
+
+
 
 
 /*
@@ -135,26 +171,17 @@ WRITE8_MEMBER(vrt_vt1682_timer_device::vt1682_timer_enable_w)
 	// Period = (65536 - Timer PreLoad) / 26.601712 MHz
 	//Timer PreLoad = 65536 - (Period in seconds) * 26.601712 * 1000000 )
 
-	/*
-	*/
-
-
 	if (!m_is_sound_timer) LOGMASKED(LOG_TIMER, "%s: vt1682_timer_enable_w writing: %02x\n", machine().describe_context(), data);
 	m_timer_enable = data;
 
 	if (m_timer_enable & 0x01)
 	{
-		uint16_t preload = (m_timer_preload_15_8 << 8) | m_timer_preload_7_0;
-
-		double period = (double)(65536 - preload) / (clock() / 1000000); // in microseconds?
-		if (!m_is_sound_timer) LOGMASKED(LOG_TIMER, "preload %d period in usec %f\n",  preload, period );
-		m_timer->adjust(attotime::from_usec(period), 0, attotime::from_usec(period));
+		update_timer();
 	}
 	else
 	{
 		m_timer->adjust(attotime::never);
 	}
-
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(vrt_vt1682_timer_device::timer_expired)
@@ -191,4 +218,10 @@ WRITE8_MEMBER(vrt_vt1682_timer_device::vt1682_timer_irqclear_w)
 void vrt_vt1682_timer_device::device_add_mconfig(machine_config& config)
 {
 	TIMER(config, m_timer).configure_periodic(FUNC(vrt_vt1682_timer_device::timer_expired), attotime::never);
+}
+
+void vrt_vt1682_timer_device::change_clock(bool alt_clock)
+{
+	m_using_alt_clock = alt_clock; 
+	notify_clock_changed();
 }
