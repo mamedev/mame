@@ -129,17 +129,17 @@
  */
 
 /* Esselte 100 driver class */
-class e100_state : public driver_device // public didact_state
+class e100_state : public driver_device
 {
 public:
 	e100_state(const machine_config &mconfig, device_type type, const char * tag)
-	//      : didact_state(mconfig, type, tag)
 		: driver_device(mconfig, type, tag)
 		,m_maincpu(*this, "maincpu")
 		,m_kbd_74145(*this, "kbd_74145")
-		,m_videoram(*this, "videoram")
+		,m_vram(*this, "vram")
 		,m_cassette(*this, "cassette")
 		,m_rs232(*this, "rs232")
+		,m_chargen(*this, "chargen")
 		,m_io_line0(*this, "LINE0")
 		,m_io_line1(*this, "LINE1")
 		,m_io_line2(*this, "LINE2")
@@ -161,11 +161,10 @@ public:
 private:
 	required_device<m6802_cpu_device> m_maincpu;
 	required_device<ttl74145_device> m_kbd_74145;
-	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_vram;
 	required_device<cassette_image_device> m_cassette;
 	optional_device<rs232_port_device> m_rs232;
-	uint8_t *m_char_ptr;
-	uint8_t *m_vram;
+	required_region_ptr<uint8_t> m_chargen;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	virtual void machine_reset() override { m_maincpu->reset(); LOG("--->%s()\n", FUNCNAME); };
 	virtual void machine_start() override;
@@ -206,12 +205,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(e100_state::rtc_w)
 void e100_state::machine_start()
 {
 	LOG("%s()\n", FUNCNAME);
-	m_char_ptr  = memregion("chargen")->base();
-	m_vram      = (uint8_t *)m_videoram.target();
 
 	/* register for state saving */
-	save_pointer (NAME (m_char_ptr), sizeof(m_char_ptr));
-	save_pointer (NAME (m_vram), sizeof(m_vram));
 	save_item(NAME(m_50hz));
 	save_item(NAME(m_pia1_B));
 }
@@ -232,7 +227,7 @@ uint32_t e100_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 			/* look up the character data */
 			charcode = m_vram[vramad];
 			if (VERBOSE && charcode != 0x20 && charcode != 0) LOGSCREEN("\n %c at X=%d Y=%d: ", charcode, col, row);
-			chardata = &m_char_ptr[(charcode * 8)];
+			chardata = &m_chargen[(charcode * 8)];
 			/* plot the character */
 			for (y = 0; y < 8; y++)
 			{
@@ -424,7 +419,7 @@ void e100_state::e100_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
 	map(0x8000, 0x87ff).rom().region("roms", 0);
-	map(0xc000, 0xc3ff).ram().share("videoram");
+	map(0xc000, 0xc3ff).ram().share(m_vram);
 	map(0xc800, 0xc81f).rw(FUNC(e100_state::pia_r), FUNC(e100_state::pia_w)).mirror(0x07e0);
 	map(0xd000, 0xffff).rom().region("roms", 0x1000);
 }

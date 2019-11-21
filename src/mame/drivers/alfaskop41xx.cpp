@@ -58,11 +58,11 @@ public:
 		, m_crtc(*this, "crtc")
 		, m_screen(*this, "screen")
 		, m_vram(*this, "vram")
+		, m_chargen(*this, "chargen")
 	{ }
 
 	void alfaskop4110(machine_config &config);
 private:
-	virtual void machine_start() override;
 	void mem_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
@@ -74,7 +74,7 @@ private:
 	required_shared_ptr<uint8_t> m_vram;
 
 	/* Video controller */
-	uint8_t *m_chargen;
+	required_region_ptr<uint8_t> m_chargen;
 	MC6845_UPDATE_ROW(crtc_update_row);
 };
 
@@ -172,11 +172,6 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( alfaskop4101 )
 INPUT_PORTS_END
 
-void alfaskop4110_state::machine_start()
-{
-	m_chargen  = memregion("roms")->base();
-}
-
 /* Simplified chargen, no attributes or special formats/features yet  */
 MC6845_UPDATE_ROW( alfaskop4110_state::crtc_update_row )
 {
@@ -189,7 +184,7 @@ MC6845_UPDATE_ROW( alfaskop4110_state::crtc_update_row )
 		rgb_t bg = rgb_t::white();
 		rgb_t fg = rgb_t::black();
 
-		u8 dots = m_chargen[0x800 + chr * 16 + ra];
+		u8 dots = m_chargen[chr * 16 + ra];
 
 		for (int n = 8; n > 0; n--, dots <<= 1)
 			*px++ = BIT(dots, 7) ? fg : bg;
@@ -257,10 +252,11 @@ void alfaskop4101_state::alfaskop4101(machine_config &config)
 
 /* ROM definitions */
 ROM_START( alfaskop4110 ) // Display Unit 
-	ROM_REGION( 0x1000, "roms", ROMREGION_ERASEFF )
+	ROM_REGION( 0x800, "roms", ROMREGION_ERASEFF )
 	ROM_LOAD( "e3405870205201.bin", 0x0000, 0x0800, CRC(23f20f7f) SHA1(6ed008e309473ab966c6b0d42a4f87c76a7b1d6e))
-	ROM_LOAD( "e3405972067500.bin", 0x0800, 0x0400, CRC(fb12b549) SHA1(53783f62c5e51320a53e053fbcf8b3701d8a805f))
-	ROM_LOAD( "e3405972067600.bin", 0x0c00, 0x0400, CRC(c7069d65) SHA1(587efcbee036d4c0c5b936cc5d7b1f97b6fe6dba))
+	ROM_REGION( 0x800, "chargen", ROMREGION_ERASEFF )
+	ROM_LOAD( "e3405972067500.bin", 0x0000, 0x0400, CRC(fb12b549) SHA1(53783f62c5e51320a53e053fbcf8b3701d8a805f))
+	ROM_LOAD( "e3405972067600.bin", 0x0400, 0x0400, CRC(c7069d65) SHA1(587efcbee036d4c0c5b936cc5d7b1f97b6fe6dba))
 ROM_END
 
 ROM_START( alfaskop4120 ) // Flexible Disk Unit
