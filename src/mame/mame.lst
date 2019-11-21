@@ -2651,6 +2651,7 @@ wpc250                          // Wang PC-250/16 (286)
 suntac303                       // motherboards using the Suntac ST62C303 chipset
 abah4                           // Abit AH4(T) motherboard (486)
 abpi4                           // Abit PI4(T) motherboard (486)
+so4saw2
 
 @source:atari_s1.cpp
 aavenger                        //
