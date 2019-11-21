@@ -3282,10 +3282,11 @@ ROM_END
 //  80486 motherboard
 //**************************************************************************
 
-// SOYO 4SAW2
-ROM_START( so4saw2 )
+// FIC 486 KVD - Chipset: VIA VT82C485 - CPU: 486, solder pad for 486sx present - RAM: 8xSIMM30, Cache: 4xIS61C256A-20N+1xCY7C185-20PC, 4 empty sockets (28pin)
+// ISA16: 5, ISA16/VL: 2 - BIOS: AMI 486DX ISA BIOS AA7211137 - Keyboard-BIOS: MEGA-KB-H-WP
+ROM_START( fic486kvd )
 	ROM_REGION32_LE(0x20000, "bios", 0)
-	ROM_LOAD( "4sa2_bios_isa_486_488755.bin", 0x00000, 0x20000, CRC(21708d9c) SHA1(be4596507df1f5cc8a4e1baafce52b96417ac029))
+	ROM_LOAD( "486kvd_aa72111137.bin", 0x10000, 0x10000, CRC(A1F1810F) SHA1(405AFBF1635C6B41343AABFEEB3CF4CDC947A5BA))
 ROM_END
 
 // Eagle EAGLEN486 GC10A - Chipset: NEC ADC006, LGS Prime 3B 9543 - CPU: Socket 3 - RAM: 2xSIMM72, Cache: fake (not connected, marked write back)
@@ -3332,18 +3333,6 @@ ROM_END
 ROM_START( gete486vl )
 	ROM_REGION32_LE(0x20000, "bios", 0)
 	ROM_LOAD( "486-genoa_vlb.bin", 0x10000, 0x10000, CRC(9be0f329) SHA1(3b1adedd6aad40c623757e4976e0dcadb253f255))
-ROM_END
-
-// QDI PX486P3 - Chipset: OPTi 82C495SLC, F82C206 - CPU: 486 - BIOS: 11/11/92 AMI (28pin)
-// Keyboard-BIOS: AMIKEY - ISA8: 1, ISA16: 3, ISA16/VL: 3 (one marked MASTER/SLAVE, two marked SLAVE)
-ROM_START( px486p3 )
-	ROM_REGION32_LE(0x20000, "bios", 0)
-	// 0: BIOS-String: 40-0402-428003-00101111-111192-OP495SLC-0 / PX486DX33/50P3 IVN 2.0 19/11/1993
-	ROM_SYSTEM_BIOS(0, "ivn20", "IVN 2.0")
-	ROM_LOAD( "px486p3.bin", 0x10000, 0x10000, CRC(4d717aad) SHA1(2d84cf197845d58781f77e4d539ca994fd8733c8))
-	// 1: BIOS-String: 40-0401-428003-00101111-111192-OP495SLC-0 / PX486DX33/50P3 IVN 1.0 25/06/1993
-	ROM_SYSTEM_BIOS(1, "ivn10", "IVN 1.0")
-	ROMX_LOAD( "qdi_px486.u23", 0x10000, 0x10000, CRC(c80ecfb6) SHA1(34cc9ef68ff719cd0771297bf184efa83a805f3e), ROM_BIOS(1))
 ROM_END
 
 // UNICHIP 486 WB 4407 REV 1.0 - Chipset: KS83C206Q UNICHIP U4800-VLX - BIOS: AMI 486 ISA BIOS AA6562949, 28pin - Keyboard-BIOS: AMI 2050778
@@ -3555,6 +3544,27 @@ ROM_START( 486ccv )
 	ROM_LOAD( "contaq.bin", 0x10000, 0x10000, CRC(2ac46033) SHA1(a121c22ded4932e3ba8d65c2b097b898f02147c7))
 ROM_END
 
+// ***** 486 motherboards using the OPTi495SLC chipset
+
+// QDI PX486P3 - Chipset: OPTi 82C495SLC, F82C206 - CPU: 486 - BIOS: 11/11/92 AMI (28pin)
+// Keyboard-BIOS: AMIKEY - ISA8: 1, ISA16: 3, ISA16/VL: 3 (one marked MASTER/SLAVE, two marked SLAVE)
+ROM_START( px486p3 )
+	ROM_REGION32_LE(0x20000, "bios", 0)
+	// 0: BIOS-String: 40-0402-428003-00101111-111192-OP495SLC-0 / PX486DX33/50P3 IVN 2.0 19/11/1993
+	ROM_SYSTEM_BIOS(0, "ivn20", "IVN 2.0")
+	ROM_LOAD( "px486p3.bin", 0x10000, 0x10000, CRC(4d717aad) SHA1(2d84cf197845d58781f77e4d539ca994fd8733c8))
+	// 1: BIOS-String: 40-0401-428003-00101111-111192-OP495SLC-0 / PX486DX33/50P3 IVN 1.0 25/06/1993
+	ROM_SYSTEM_BIOS(1, "ivn10", "IVN 1.0")
+	ROMX_LOAD( "qdi_px486.u23", 0x10000, 0x10000, CRC(c80ecfb6) SHA1(34cc9ef68ff719cd0771297bf184efa83a805f3e), ROM_BIOS(1))
+ROM_END
+
+// NAT48PV-1.0 VL - Chipset:82C495SLC, Chips F82C206J - RAM: 8xSIMM30, Cache: 9xIS61C256A - OSC: 14.31818 - BIOS: AMI 486DX ISA BIOS (28pin) AA5312581
+// Keyboard-BIOS: MEGA-KB-F-WP P8042AHP - ISA8: 2, ISA16: 3, ISA16/VL: 2
+ROM_START( nat48pv )
+	ROM_REGION32_LE(0x20000, "bios", 0)
+	ROM_LOAD( "amibios_aa5312581.bin", 0x10000, 0x10000, CRC(8A788C79) SHA1(050972B7A369A463D6654EC52C0804002E9BCB37))
+ROM_END
+
 
 // ***** 486 motherboards using the OPTi OPTi 82C392, 82C493, 82C206 chipset
 
@@ -3637,6 +3647,13 @@ ROM_START( a486sp3 )
 	// 3: lands in Award BootBlock BIOS V1.0
 	ROM_SYSTEM_BIOS(3, "v307", "ASUA PVI-486SP3 V3.07")
 	ROMX_LOAD( "si4i0307h.bin", 0x00000, 0x20000, CRC(99473cc0) SHA1(a01d253cf434a31e0ca6f6cd2b9026ca424eb463), ROM_BIOS(3))
+ROM_END
+
+// SOYO 4SAW2 - Chipset: SiS 85C497, 85C496, Winbond W83787F - CPU: Socket 3 - RAM: 4xSIMM72, Cache: 4xUM61512AK-15+W24129AK-15
+// BIOS: Award (32pin) - Keyboard-BIOS: Via VT82C42N - ISA16: 3, ISA16/VL: 1, PCI: 4 - On board: 2xser, par, 2xIDE, Floppy
+ROM_START( so4saw2 )
+	ROM_REGION32_LE(0x20000, "bios", 0)
+	ROM_LOAD( "4sa2_bios_isa_486_488755.bin", 0x00000, 0x20000, CRC(21708d9c) SHA1(be4596507df1f5cc8a4e1baafce52b96417ac029))
 ROM_END
 
 // ZIDA Tomato board 4DPS - Chipset: SIS 85C497, SIS 85C496, Winbond W83787IF, W83768F, MX8318-01PC - CPU: 486/5x86 - BIOS: Winbond W29EE011-15 / AWARD PCI/PNP
@@ -4263,6 +4280,7 @@ COMP( 199?, sy019hi,   ibm5170, 0,       at386,     0,     at_state,     init_at
 COMP( 199?, uni386w,   ibm5170, 0,       at386,     0,     at_state,     init_at,        "UNICHIP", "386W 367C REV 1.0", MACHINE_NOT_WORKING )
 COMP( 1992, walk386dx, ibm5170, 0,       at386,     0,     at_state,     init_at,        "Triumph-Adler", "Walkstation 386DX", MACHINE_NOT_WORKING ) // screen remains blank
 COMP( 199?, via4386vio,ibm5170, 0,       at486,     0,     at_state,     init_at,        "<unknown>", "Via 4386 VIO / Highscreen universal board", MACHINE_NOT_WORKING )
+COMP( 199?, nat48pv,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "<unknown>", "NAT48PV-1.00 VL", MACHINE_NOT_WORKING )
 COMP( 199?, alim1489,  ibm5170, 0,       at486,     0,     at_state,     init_at,        "<unknown>", "486 motherboards using the ALi 1487/1489 chipset", MACHINE_NOT_WORKING )
 COMP( 199?, op82c392,  ibm5170, 0,       at486,     0,     at_state,     init_at,        "<unknown>", "486 motherboards using the OPTi OPTi 82C392, 82C493 chipset", MACHINE_NOT_WORKING )
 COMP( 199?, sis85c471, ibm5170, 0,       at486,     0,     at_state,     init_at,        "<unknown>", "486 motherboards using the SiS 85C471/85C407 chipset", MACHINE_NOT_WORKING )
@@ -4295,6 +4313,7 @@ COMP( 199?, ec4915aio, ibm5170, 0,       at486,     0,     at_state,     init_at
 COMP( 199?, ec4913,    ibm5170, 0,       at486,     0,     at_state,     init_at,        "Elitegroup", "UC4913 REV:1.1", MACHINE_NOT_WORKING )
 COMP( 199?, fic4386vcv,ibm5170, 0,       at486,     0,     at_state,     init_at,        "First International Computer", "4386-VC-V", MACHINE_NOT_WORKING )
 COMP( 1994, ficgiovt2, ibm5170, 0,       at486,     0,     at_state,     init_at,        "First International Computer", "486-GIO-VT2", MACHINE_NOT_WORKING )
+COMP( 199?, fic486kvd, ibm5170, 0,       at486,     0,     at_state,     init_at,        "First International Computer", "486 KVD", MACHINE_NOT_WORKING )
 COMP( 1994, ficvipio,  ibm5170, 0,       at486,     0,     at_state,     init_at,        "First International Computer", "486-VIP-IO", MACHINE_NOT_WORKING )
 COMP( 199?, ficvipio2, ibm5170, 0,       at486,     0,     at_state,     init_at,        "First International Computer", "486-VIP-IO2", MACHINE_NOT_WORKING )
 COMP( 1995, ficpio2,   ibm5170, 0,       ficpio2,   0,     at_state,     init_atpci,     "First International Computer", "486-PIO-2", MACHINE_NOT_WORKING )

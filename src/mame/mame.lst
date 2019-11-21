@@ -2480,9 +2480,12 @@ ev1806                          // Everex EV-1806
 ev1815                          // Everex EV-1815
 ews286                          // 1986 Ericsson WS286
 ficgiovt2                       // FIC 486-GIO-VT2
+fic486kvd						// FIC 486 KVD motherboard (486)
 ficpio2                         // 1995 FIC 486-PIO-2
 ficvipio                        // FIC 486-VIP-IO
 ficvipio2                       // FIC 486-VIP-IO2
+fic4386vchd                     // FIC 4386-VC-HD motherboard (386)
+fic4386vcv                      // FIC 4386-VC-V motherboard (486)
 ftsserv                         // 1991 Apricot FTs (Scorpion)
 aubam12s2                       // AUVA COMPUTER, INC. BAM/12-S2 motherboard (286)
 bi025c                          // BI-025C HT 12 286 motherboard (286)
@@ -2511,7 +2514,6 @@ mx83c305                        // motherboards using the MX83C305(A)(FC), MX83C
 td60c                           // TD60C motherboard (286)
 td70n                           // TD70N motherboard (386sx)
 td70a                           // TD70A and TD70AN motherboards (386sx)
-fic4386vchd                     // FIC 4386-VC-HD motherboard (386)
 opti495slc                      // motherboards using the OPTi495SLC chipset (386)
 opti495xlc                      // motherboards using the OPTi 82C495XLC chipset (386)
 op82c283                        // motherboards using the Opti F82C206, Opti 82C283 chipset (386sx)
@@ -2632,7 +2634,6 @@ alaleolx                        // RYC Alaris LEOPARD LX REV D (486)
 alim1489                        // 486 motherboards using the ALi 1487/1489 chipset
 ms4125                          // MSI MS-4125 motherboard (486)
 pkm0038s                        // DTK PKM-0038S aka Gemlight GMB-486SG motherboard (486)
-fic4386vcv                      // FIC 4386-VC-V motherboard (486)
 v4p895p3                        // QDI V4P895P3/SMT V5.0 motherboard (486)
 op82c392                        // 486 motherboards using the OPTi OPTi 82C392, 82C493, 82C206 chipset
 ls486e                          // LuckyStar LS-486E Rev:C motherboard (486)
@@ -2651,7 +2652,8 @@ wpc250                          // Wang PC-250/16 (286)
 suntac303                       // motherboards using the Suntac ST62C303 chipset
 abah4                           // Abit AH4(T) motherboard (486)
 abpi4                           // Abit PI4(T) motherboard (486)
-so4saw2
+so4saw2                         // SOYO SY-4SAW2 motherboard (486)
+nat48pv                         // NAT48PV-1.00 VL motherboard (486)
 
 @source:atari_s1.cpp
 aavenger                        //
