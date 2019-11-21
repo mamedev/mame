@@ -19,6 +19,8 @@
 #include <CoreFoundation/CoreFoundation.h>
 #include <CoreServices/CoreServices.h>
 
+#include <memory>
+#include <new>
 #include <string.h>
 
 
@@ -44,7 +46,7 @@ public:
 		m_sample_bytes(0),
 		m_headroom(0),
 		m_buffer_size(0),
-		m_buffer(nullptr),
+		m_buffer(),
 		m_playpos(0),
 		m_writepos(0),
 		m_in_underrun(false),
@@ -125,8 +127,8 @@ private:
 	}
 
 	bool get_output_device_id(char const *name, AudioDeviceID &id) const;
-	char *get_device_uid(AudioDeviceID id) const;
-	char *get_device_name(AudioDeviceID id) const;
+	std::unique_ptr<char []> get_device_uid(AudioDeviceID id) const;
+	std::unique_ptr<char []> get_device_name(AudioDeviceID id) const;
 	UInt32 get_output_stream_count(
 			AudioDeviceID id,
 			char const *uid,
@@ -141,17 +143,14 @@ private:
 			CFPropertyListRef   &class_info) const;
 	CFPropertyListRef load_property_list(char const *name) const;
 
-	char *convert_cfstring_to_utf8(CFStringRef str) const
+	std::unique_ptr<char []> convert_cfstring_to_utf8(CFStringRef str) const
 	{
 		CFIndex const len = CFStringGetMaximumSizeForEncoding(
 				CFStringGetLength(str),
 				kCFStringEncodingUTF8);
-		char *const result = global_alloc_array_clear<char>(len + 1);
-		if (!CFStringGetCString(str, result, len + 1, kCFStringEncodingUTF8))
-		{
-			global_free_array(result);
-			return nullptr;
-		}
+		std::unique_ptr<char []> result = std::make_unique<char []>(len + 1);
+		if (!CFStringGetCString(str, result.get(), len + 1, kCFStringEncodingUTF8))
+			result.reset()
 		return result;
 	}
 
@@ -177,7 +176,7 @@ private:
 	uint32_t      m_sample_bytes;
 	uint32_t      m_headroom;
 	uint32_t      m_buffer_size;
-	int8_t        *m_buffer;
+	std::unique_ptr<int8_t []> m_buffer;
 	uint32_t      m_playpos;
 	uint32_t      m_writepos;
 	bool        m_in_underrun;
@@ -229,8 +228,11 @@ int sound_coreaudio::init(const osd_options &options)
 	// Allocate buffer
 	m_headroom = m_sample_bytes * (clamped_latency() * sample_rate() / 40);
 	m_buffer_size = m_sample_bytes * std::max<uint32_t>(sample_rate() * (clamped_latency() + 3) / 40, 256U);
-	m_buffer = global_alloc_array_clear<int8_t>(m_buffer_size);
-	if (!m_buffer)
+	try
+	{
+		m_buffer = std::make_unique<int8_t []>(m_buffer_size);
+	}
+	catch (std::bad_alloc const &)
 	{
 		osd_printf_error("Could not allocate stream buffer\n");
 		goto close_graph_and_return_error;
@@ -246,23 +248,21 @@ int sound_coreaudio::init(const osd_options &options)
 	if (noErr != err)
 	{
 		osd_printf_error("Could not initialize AudioUnit graph (%ld)\n", (long)err);
-		goto free_buffer_and_return_error;
+		goto close_graph_and_return_error;
 	}
 	err = AUGraphStart(m_graph);
 	if (noErr != err)
 	{
 		osd_printf_error("Could not start AudioUnit graph (%ld)\n", (long)err);
 		AUGraphUninitialize(m_graph);
-		goto free_buffer_and_return_error;
+		goto close_graph_and_return_error;
 	}
 	osd_printf_verbose("Audio: End initialization\n");
 	return 0;
 
-free_buffer_and_return_error:
-	global_free_array(m_buffer);
-	m_buffer_size = 0;
-	m_buffer = nullptr;
 close_graph_and_return_error:
+	m_buffer_size = 0;
+	m_buffer.reset();
 	AUGraphClose(m_graph);
 	DisposeAUGraph(m_graph);
 	m_graph = nullptr;
@@ -283,11 +283,7 @@ void sound_coreaudio::exit()
 		m_graph = nullptr;
 		m_node_count = 0;
 	}
-	if (m_buffer)
-	{
-		global_free_array(m_buffer);
-		m_buffer = nullptr;
-	}
+	m_buffer.reset();
 	if (m_overflows || m_underflows)
 		osd_printf_verbose("Sound buffer: overflows=%u underflows=%u\n", m_overflows, m_underflows);
 	osd_printf_verbose("Audio: End deinitialization\n");
@@ -307,7 +303,7 @@ void sound_coreaudio::update_audio_stream(bool is_throttled, int16_t const *buff
 	}
 
 	uint32_t const chunk = std::min(m_buffer_size - m_writepos, bytes_this_frame);
-	memcpy(m_buffer + m_writepos, (int8_t *)buffer, chunk);
+	memcpy(&m_buffer[m_writepos], (int8_t *)buffer, chunk);
 	m_writepos += chunk;
 	if (m_writepos >= m_buffer_size)
 		m_writepos = 0;
@@ -316,7 +312,7 @@ void sound_coreaudio::update_audio_stream(bool is_throttled, int16_t const *buff
 	{
 		assert(0U == m_writepos);
 		assert(m_playpos > (bytes_this_frame - chunk));
-		memcpy(m_buffer, (int8_t *)buffer + chunk, bytes_this_frame - chunk);
+		memcpy(&m_buffer[0], (int8_t *)buffer + chunk, bytes_this_frame - chunk);
 		m_writepos += bytes_this_frame - chunk;
 	}
 }
@@ -648,7 +644,7 @@ bool sound_coreaudio::get_output_device_id(
 		return false;
 	}
 	property_size /= sizeof(AudioDeviceID);
-	AudioDeviceID *const devices = global_alloc_array_clear<AudioDeviceID>(property_size);
+	std::unique_ptr<AudioDeviceID []> const devices = std::make_unique<AudioDeviceID []>(property_size);
 	property_size *= sizeof(AudioDeviceID);
 	err = AudioObjectGetPropertyData(
 			kAudioObjectSystemObject,
@@ -656,20 +652,19 @@ bool sound_coreaudio::get_output_device_id(
 			0,
 			nullptr,
 			&property_size,
-			devices);
+			devices.get());
 	UInt32 const device_count = property_size / sizeof(AudioDeviceID);
 	if (noErr != err)
 	{
 		osd_printf_error("Error getting audio device list (%ld)\n", (long)err);
-		global_free_array(devices);
 		return false;
 	}
 
 	for (UInt32 i = 0; device_count > i; i++)
 	{
-		char *const device_uid = get_device_uid(devices[i]);
-		char *const device_name = get_device_name(devices[i]);
-		if ((nullptr == device_uid) && (nullptr == device_name))
+		std::unique_ptr<char []> const device_uid = get_device_uid(devices[i]);
+		std::unique_ptr<char []> const device_name = get_device_name(devices[i]);
+		if (!device_uid && !device_name)
 		{
 			osd_printf_warning(
 					"Could not get UID or name for device %lu - skipping\n",
@@ -679,52 +674,46 @@ bool sound_coreaudio::get_output_device_id(
 
 		UInt32 const streams = get_output_stream_count(
 				devices[i],
-				device_uid,
-				device_name);
+				device_uid.get(),
+				device_name.get());
 		if (1U > streams)
 		{
 			osd_printf_verbose(
 					"No output streams found for device %s (%s) - skipping\n",
-					(nullptr != device_name) ? device_name : "<anonymous>",
-					(nullptr != device_uid) ? device_uid : "<unknown>");
-			if (nullptr != device_uid) global_free_array(device_uid);
-			if (nullptr != device_name) global_free_array(device_name);
+					device_name ? device_name.get() : "<anonymous>",
+					device_uid ? device_uid.get() : "<unknown>");
 			continue;
 		}
 
-		for (std::size_t j = strlen(device_uid); (0 < j) && (' ' == device_uid[j - 1]); j--)
+		for (std::size_t j = strlen(device_uid.get()); (0 < j) && (' ' == device_uid[j - 1]); j--)
 			device_uid[j - 1] = '\0';
-		for (std::size_t j = strlen(device_name); (0 < j) && (' ' == device_name[j - 1]); j--)
+		for (std::size_t j = strlen(device_name.get()); (0 < j) && (' ' == device_name[j - 1]); j--)
 			device_name[j - 1] = '\0';
 
-		bool const matched_uid = (nullptr != device_uid) && !strcmp(name, device_uid);
-		bool const matched_name = (nullptr != device_name) && !strcmp(name, device_name);
+		bool const matched_uid = device_uid && !strcmp(name, device_uid.get());
+		bool const matched_name = device_name && !strcmp(name, device_name.get());
 		if (matched_uid || matched_name)
 		{
 			osd_printf_verbose(
 					"Matched device %s (%s) with %lu output stream(s)\n",
-					(nullptr != device_name) ? device_name : "<anonymous>",
-					(nullptr != device_uid) ? device_uid : "<unknown>",
+					device_name ? device_name.get() : "<anonymous>",
+					device_uid ? device_uid.get() : "<unknown>",
 					(unsigned long)streams);
 		}
-		global_free_array(device_uid);
-		global_free_array(device_name);
 
 		if (matched_uid || matched_name)
 		{
 			id = devices[i];
-			global_free_array(devices);
 			return true;
 		}
 	}
 
 	osd_printf_verbose("No audio output devices match %s\n", name);
-	global_free_array(devices);
 	return false;
 }
 
 
-char *sound_coreaudio::get_device_uid(AudioDeviceID id) const
+std::unique_ptr<char []> sound_coreaudio::get_device_uid(AudioDeviceID id) const
 {
 	AudioObjectPropertyAddress const uid_addr = {
 			kAudioDevicePropertyDeviceUID,
@@ -747,9 +736,9 @@ char *sound_coreaudio::get_device_uid(AudioDeviceID id) const
 				(long)err);
 		return nullptr;
 	}
-	char *const result = convert_cfstring_to_utf8(device_uid);
+	std::unique_ptr<char []> result = convert_cfstring_to_utf8(device_uid);
 	CFRelease(device_uid);
-	if (nullptr == result)
+	if (!result)
 	{
 		osd_printf_warning(
 				"Error converting UID for audio device %lu to UTF-8\n",
@@ -759,7 +748,7 @@ char *sound_coreaudio::get_device_uid(AudioDeviceID id) const
 }
 
 
-char *sound_coreaudio::get_device_name(AudioDeviceID id) const
+std::unique_ptr<char []> sound_coreaudio::get_device_name(AudioDeviceID id) const
 {
 	AudioObjectPropertyAddress const name_addr = {
 			kAudioDevicePropertyDeviceNameCFString,
@@ -782,9 +771,9 @@ char *sound_coreaudio::get_device_name(AudioDeviceID id) const
 				(long)err);
 		return nullptr;
 	}
-	char *const result = convert_cfstring_to_utf8(device_name);
+	std::unique_ptr<char []> result = convert_cfstring_to_utf8(device_name);
 	CFRelease(device_name);
-	if (nullptr == result)
+	if (!result)
 	{
 		osd_printf_warning(
 				"Error converting name for audio device %lu to UTF-8\n",
@@ -947,17 +936,16 @@ CFPropertyListRef sound_coreaudio::load_property_list(char const *name) const
 	CFRelease(data);
 	if ((nullptr == result) || (nullptr != msg))
 	{
-		char *buf = (nullptr != msg) ? convert_cfstring_to_utf8(msg) : nullptr;
+		std::unique_ptr<char []> const buf = (nullptr != msg) ? convert_cfstring_to_utf8(msg) : nullptr;
 		if (nullptr != msg)
 			CFRelease(msg);
 
-		if (nullptr != buf)
+		if (buf)
 		{
 			osd_printf_error(
 					"Error creating property list from %s: %s\n",
 					name,
-					buf);
-			global_free_array(buf);
+					buf.get());
 		}
 		else
 		{
@@ -997,7 +985,7 @@ OSStatus sound_coreaudio::render(
 	}
 
 	uint32_t const chunk = std::min(m_buffer_size - m_playpos, number_bytes);
-	copy_scaled((int8_t *)data->mBuffers[0].mData, m_buffer + m_playpos, chunk);
+	copy_scaled((int8_t *)data->mBuffers[0].mData, &m_buffer[m_playpos], chunk);
 	m_playpos += chunk;
 	if (m_playpos >= m_buffer_size)
 		m_playpos = 0;
@@ -1006,7 +994,7 @@ OSStatus sound_coreaudio::render(
 	{
 		assert(0U == m_playpos);
 		assert(m_writepos >= (number_bytes - chunk));
-		copy_scaled((int8_t *)data->mBuffers[0].mData + chunk, m_buffer, number_bytes - chunk);
+		copy_scaled((int8_t *)data->mBuffers[0].mData + chunk, &m_buffer[0], number_bytes - chunk);
 		m_playpos += number_bytes - chunk;
 	}
 
