@@ -130,8 +130,7 @@ public:
 		m_dac(*this, "dac"),
 		m_fdc(*this, "wd1791"),
 		m_floppy0(*this, "wd1791:0"),
-		m_floppy(nullptr),
-		m_mainram(*this, "mainram")
+		m_floppy(nullptr)
 	{
 	}
 
@@ -158,7 +157,7 @@ private:
 	required_device<floppy_connector> m_floppy0;
 	floppy_image_device *m_floppy;
 
-	required_shared_ptr<uint16_t> m_mainram;
+	std::unique_ptr<uint16_t[]> m_mainram;
 
 //declarations
 	// screen
@@ -497,7 +496,7 @@ READ16_MEMBER(notetaker_state::iop_r)
 {
 	uint16_t *rom = (uint16_t *)(memregion("iop")->base());
 	rom += 0x7f800;
-	uint16_t *ram = m_mainram.target();
+	uint16_t *ram = m_mainram.get();
 	if ( (m_BootSeqDone == 0) || ((m_DisableROM == 0) && ((offset&0x7F800) == 0)) )
 	{
 		rom += (offset&0x7FF);
@@ -515,7 +514,7 @@ READ16_MEMBER(notetaker_state::iop_r)
 WRITE16_MEMBER(notetaker_state::iop_w)
 {
 	//uint16_t tempword;
-	uint16_t *ram = m_mainram.target();
+	uint16_t *ram = m_mainram.get();
 	if ( (m_BootSeqDone == 0) || ((m_DisableROM == 0) && ((offset&0x7F800) == 0)) )
 	{
 		logerror("attempt to write %04X to ROM-mapped area at %06X ignored\n", data, offset<<1);
@@ -762,6 +761,8 @@ static void notetaker_floppies(device_slot_interface &device)
 /* Machine Start; allocate timers and savestate stuff */
 void notetaker_state::machine_start()
 {
+	// allocate RAM
+	m_mainram = make_unique_clear<uint16_t[]>(0x100000/2);
 	// allocate the DAC timer, and set it to fire NEVER. We'll set it up properly in IPReset.
 	m_FIFO_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(notetaker_state::timer_fifoclk),this));
 	m_FIFO_timer->adjust(attotime::never);
