@@ -199,7 +199,7 @@ GFX check (these don't explicitly fails):
 // way
 #define _32X_SWAP_MASTER_SLAVE_HACK
 #define _32X_COMMS_PORT_SYNC 0
-#define MAX_HPOSITION 480 // 450; 100 + 27 + 3 pixel blank and 320 pixel visible
+#define MAX_HPOSITION 480 // 450; 100 + 27 + 3 pixel hblank and 320 pixel visible
 /* need to make some pwm stuff part of device */
 
 
