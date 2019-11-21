@@ -1070,7 +1070,7 @@ ROM_START( victnine )
 	ROM_LOAD( "a16-17.39",    0xa000, 0x2000, CRC(872270b3) SHA1(2298cb8ced6c3e9afb430faab1b38ba8f2fa93b5) )
 
 	ROM_REGION( 0x0800, "bmcu:mcu", 0 ) /* 2k for the microcontroller */
-	ROM_LOAD( "a16-18.mcu",   0x0000, 0x0800, BAD_DUMP CRC(5198ef59) SHA1(05bde731ff580984dcf5a66e8465377c6dc03ec0) ) // dumped via m68705 dumper and hand-verified, might still be imperfect
+	ROM_LOAD( "a16-18.53",   0x0000, 0x0800, BAD_DUMP CRC(5198ef59) SHA1(05bde731ff580984dcf5a66e8465377c6dc03ec0) ) // dumped via m68705 dumper and hand-verified, might still be imperfect
 
 	ROM_REGION( 0x10000, "gfx1", ROMREGION_INVERT )
 	ROM_LOAD( "a16-06-1.7",   0x00000, 0x2000, CRC(b708134d) SHA1(9732be463cfbbe81ea0ad06da5a48b660ca429d0) )
