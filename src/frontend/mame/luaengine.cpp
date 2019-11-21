@@ -2113,12 +2113,31 @@ void lua_engine::initialize()
 			else
 				m_seq_poll->start(cls);
 		});
-	input_type.set("seq_poll", [this](input_manager &input) {
-			return m_seq_poll->poll();
+	input_type.set("seq_poll", [this](input_manager &input) -> sol::object {
+			if (!m_seq_poll)
+				return sol::make_object(sol(), sol::nil);
+			return sol::make_object(sol(), m_seq_poll->poll());
 		});
-	input_type.set("seq_poll_final", [this](input_manager &input) {
-			return sol::make_user(m_seq_poll->valid() ? m_seq_poll->sequence() : input_seq());
+	input_type.set("seq_poll_final", [this](input_manager &input) -> sol::object {
+			if (!m_seq_poll)
+				return sol::make_object(sol(), sol::nil);
+			return sol::make_object(sol(), sol::make_user(m_seq_poll->valid() ? m_seq_poll->sequence() : input_seq()));
 		});
+	input_type.set("seq_poll_modified", [this](input_manager &input) -> sol::object {
+			if (!m_seq_poll)
+				return sol::make_object(sol(), sol::nil);
+			return sol::make_object(sol(), m_seq_poll->modified());
+		});
+	input_type.set("seq_poll_valid", [this](input_manager &input) -> sol::object {
+			if (!m_seq_poll)
+				return sol::make_object(sol(), sol::nil);
+			return sol::make_object(sol(), m_seq_poll->valid());
+		});
+	input_type.set("seq_poll_sequence", [this](input_manager &input) -> sol::object {
+		if (!m_seq_poll)
+			return sol::make_object(sol(), sol::nil);
+		return sol::make_object(sol(), sol::make_user(m_seq_poll->sequence()));
+	});
 	input_type.set("device_classes", sol::property([this](input_manager &input) {
 			sol::table result = sol().create_table();
 			for (input_device_class devclass_id = DEVICE_CLASS_FIRST_VALID; devclass_id <= DEVICE_CLASS_LAST_VALID; devclass_id++)
