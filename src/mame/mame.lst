@@ -1044,6 +1044,11 @@ sr16                            //
 @source:alesis_qs.cpp
 alesqs7                         //
 
+@source:alfaskop41xx.cpp
+alfaskop4110                    //
+alfaskop4120                    //
+alfaskop4101                    //
+
 @source:alg.cpp
 alg_bios                        //
 aplatoon                        // (c) 199? Nova?
