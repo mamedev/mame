@@ -1804,7 +1804,7 @@ void sega_32x_device::device_reset()
 	m_lch_size = 0;
 	m_rch_size = 0;
 
-	m_total_scanlines = 262;
+	m_total_scanlines = m_32x_pal ? 313 : 262;
 
 // moved from init
 
