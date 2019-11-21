@@ -64,7 +64,7 @@
 	- Bit90:
 		Add support for memory expansion (documented)
 		Add support for printer interface (documented)
-		Add tape Support
+		Add tape support
 
 */
 
@@ -73,6 +73,7 @@
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
+#include "logmacro.h"
 
 /* Read/Write Handlers */
 
@@ -98,16 +99,20 @@ WRITE8_MEMBER( coleco_state::paddle_on_w )
 
 READ8_MEMBER( bit90_state::bankswitch_u4_r )
 {
-	//osd_printf_verbose("Bankswitch to u4\n");
-	m_bank->set_entry(0);
-	return 0xff;
+	if (!machine().side_effects_disabled()) {
+		LOG("Bankswitch to u4\n");
+		m_bank->set_entry(0);
+	}
+	return space.unmap();
 }
 
 READ8_MEMBER( bit90_state::bankswitch_u3_r )
 {
-	//osd_printf_verbose("Bankswitch to u3\n");
-	m_bank->set_entry(1);
-	return 0xff;
+	if (!machine().side_effects_disabled()) {
+		LOG("Bankswitch to u3\n");
+		m_bank->set_entry(1);
+	}
+	return space.unmap();
 }
 
 READ8_MEMBER( bit90_state::keyboard_r )
@@ -115,7 +120,7 @@ READ8_MEMBER( bit90_state::keyboard_r )
 	if (m_keyselect < 8) {
 		return m_io_keyboard[m_keyselect]->read();
 	}
-	return 0xff;
+	return space.unmap();
 }
 
 WRITE8_MEMBER( bit90_state::u32_w )
@@ -127,7 +132,7 @@ WRITE8_MEMBER( bit90_state::u32_w )
 	uint8_t temp = data & 0x03;
 	if (m_unknown != temp) {
 		m_unknown = temp;
-		osd_printf_verbose("m_unknown -> 0x%02x\n",m_unknown);
+		LOG("m_unknown -> 0x%02x\n",m_unknown);
 	}
 }
 
@@ -513,8 +518,8 @@ void coleco_state::machine_start()
 void bit90_state::machine_start()
 {
 	coleco_state::machine_start();
-	uint8_t *banked = memregion("banked")->base();
-	m_bank->configure_entries(0, 0x02, banked, 0x2000);
+	uint8_t *banked = memregion("maincpu")->base();
+	m_bank->configure_entries(0, 0x02, &banked[0x10000], 0x2000);
 }
 
 void coleco_state::machine_reset()
@@ -686,20 +691,19 @@ ROM_END
 #define rom_dina rom_czz50
 #define rom_prsarcde rom_czz50
 
-ROM_START( bit90b3 )
-	ROM_REGION( 0x4000, "banked", 0 )
-	ROM_LOAD("bit90b3.u4", 0x0000, 0x2000, CRC(06d21fc2) SHA1(6d296b09b661babd4c2ef6993f8e768a67932388))
-	ROM_LOAD("bit90b3.u3", 0x2000, 0x2000, CRC(61fdccbb) SHA1(25cac13627c0916d3ed2b92f0b2218b405de5be4))
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("bit90b3.u2", 0x2000, 0x2000, CRC(b992b940) SHA1(c7dd96a1944fac40cbae20630f303a69de7e6313))
-ROM_END
-
 ROM_START( bit90 )
-	ROM_REGION( 0x4000, "banked", 0 )
-	ROM_LOAD("d32351e.u4", 0x0000, 0x2000, NO_DUMP) // BIT-99C1
-	ROM_LOAD("d32521e.u3", 0x2000, 0x2000, NO_DUMP) // MONITOR2
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("d32522e.u2", 0x2000, 0x2000, NO_DUMP) // MONITOR3
+	ROM_REGION( 0x14000, "maincpu", 0 )
+	ROM_DEFAULT_BIOS( "3.0" )
+
+	ROM_SYSTEM_BIOS( 0, "3.0", "BASIC 3.0" )
+	ROMX_LOAD("bit90b3.u4", 0x10000, 0x2000, CRC(06d21fc2) SHA1(6d296b09b661babd4c2ef6993f8e768a67932388), ROM_BIOS(0))
+	ROMX_LOAD("bit90b3.u3", 0x12000, 0x2000, CRC(61fdccbb) SHA1(25cac13627c0916d3ed2b92f0b2218b405de5be4), ROM_BIOS(0))
+	ROMX_LOAD("bit90b3.u2",  0x2000, 0x2000, CRC(b992b940) SHA1(c7dd96a1944fac40cbae20630f303a69de7e6313), ROM_BIOS(0))
+
+	ROM_SYSTEM_BIOS( 1, "3.1", "BASIC 3.1" )
+	ROMX_LOAD("d32351e.u4", 0x10000, 0x2000, NO_DUMP, ROM_BIOS(1)) // BIT-99C1
+	ROMX_LOAD("d32521e.u3", 0x12000, 0x2000, NO_DUMP, ROM_BIOS(1)) // MONITOR2
+	ROMX_LOAD("d32522e.u2",  0x2000, 0x2000, NO_DUMP, ROM_BIOS(1)) // MONITOR3
 ROM_END
 
 /* System Drivers */
@@ -711,7 +715,6 @@ CONS( 1983, colecop,  coleco, 0,      colecop,  coleco, coleco_state, empty_init
 CONS( 1986, czz50,    0,      coleco, czz50,    czz50,  coleco_state, empty_init, "Bit Corporation",  "Chuang Zao Zhe 50",                0 )
 CONS( 1988, dina,     czz50,  0,      dina,     czz50,  coleco_state, empty_init, "Telegames",        "Dina",                             0 )
 CONS( 1988, prsarcde, czz50,  0,      czz50,    czz50,  coleco_state, empty_init, "Telegames",        "Personal Arcade",                  0 )
-COMP( 1983, bit90,    0,      coleco, bit90,    bit90,  bit90_state,  empty_init, "Bit Corporation",  "Bit90 (BASIC 3.1)",                0 )
-COMP( 1983, bit90b3,  bit90,  0,      bit90,    bit90,  bit90_state,  empty_init, "Bit Corporation",  "Bit90 (BASIC 3.0)",                0 )
+COMP( 1983, bit90,    0,      coleco, bit90,    bit90,  bit90_state,  empty_init, "Bit Corporation",  "Bit90",                            0 )
 
 
