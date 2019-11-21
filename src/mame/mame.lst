@@ -65,6 +65,7 @@ flagrall                        // ?
 4in1a                           // MAME based bootleg
 4in1b                           // MAME based bootleg
 60in1                           // MAME based bootleg
+rodent                          // (c) 2005 The Game Room
 
 @source:3do.cpp
 3do                             // 3DO consoles
