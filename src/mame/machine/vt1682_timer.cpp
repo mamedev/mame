@@ -1,6 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
+// Do timers auto reload?
+// Does writing to Enable actually turn on the timer, or writing to preload MSB? (which appears to be done AFTER turning on in many cases)
+
 #include "emu.h"
 #include "machine/vt1682_timer.h"
 
@@ -42,10 +45,10 @@ void vrt_vt1682_timer_device::device_reset()
 
 
 /*
-    Address 0x2100 r/w (SOUND CPU, Timer A) 
-	Address 0x2110 r/w (SOUND CPU, Timer B)
+    Address 0x2100 r/w (SOUND CPU, Timer A)
+    Address 0x2110 r/w (SOUND CPU, Timer B)
 
-	Address 0x2101 r/w (MAIN CPU, Timer)
+    Address 0x2101 r/w (MAIN CPU, Timer)
 
     0x80 - Timer xx Preload:7
     0x40 - Timer xx Preload:6
@@ -73,7 +76,7 @@ WRITE8_MEMBER(vrt_vt1682_timer_device::vt1682_timer_preload_7_0_w)
 
 /*
     Address 0x2101 r/w (SOUND CPU, Timer A)
-	Address 0x2111 r/w (SOUND CPU, Timer B)
+    Address 0x2111 r/w (SOUND CPU, Timer B)
 
     Address 0x2104 r/w (MAIN CPU, Timer)
 
@@ -94,16 +97,31 @@ READ8_MEMBER(vrt_vt1682_timer_device::vt1682_timer_preload_15_8_r)
 	return ret;
 }
 
+void vrt_vt1682_timer_device::update_timer()
+{
+	if (m_timer_enable & 0x01)
+	{
+		uint16_t preload = (m_timer_preload_15_8 << 8) | m_timer_preload_7_0;
+		int realpreload = 65536 - preload;
+		m_timer->adjust(attotime::from_hz(clock()) * realpreload, 0, attotime::from_hz(clock()) * realpreload);
+	}
+}
+
 WRITE8_MEMBER(vrt_vt1682_timer_device::vt1682_timer_preload_15_8_w)
 {
 	if (!m_is_sound_timer) LOGMASKED(LOG_TIMER,"%s: vt1682_timer_preload_15_8_w writing: %02x\n", machine().describe_context(), data);
 	m_timer_preload_15_8 = data;
+
+	update_timer();
 }
+
+
+
 
 
 /*
     Address 0x2102 r/w (SOUND CPU, Timer A)
-	Address 0x2112 r/w (SOUND CPU, Timer B)
+    Address 0x2112 r/w (SOUND CPU, Timer B)
 
     Address 0x2102 r/w (MAIN CPU, Timer)
 
@@ -135,26 +153,17 @@ WRITE8_MEMBER(vrt_vt1682_timer_device::vt1682_timer_enable_w)
 	// Period = (65536 - Timer PreLoad) / 26.601712 MHz
 	//Timer PreLoad = 65536 - (Period in seconds) * 26.601712 * 1000000 )
 
-	/*
-	*/
-
-
 	if (!m_is_sound_timer) LOGMASKED(LOG_TIMER, "%s: vt1682_timer_enable_w writing: %02x\n", machine().describe_context(), data);
 	m_timer_enable = data;
 
 	if (m_timer_enable & 0x01)
 	{
-		uint16_t preload = (m_timer_preload_15_8 << 8) | m_timer_preload_7_0;
-
-		double period = (double)(65536 - preload) / (clock() / 1000000); // in microseconds?
-		if (!m_is_sound_timer) LOGMASKED(LOG_TIMER, "preload %d period in usec %f\n",  preload, period );
-		m_timer->adjust(attotime::from_usec(period), 0, attotime::from_usec(period));
+		update_timer();
 	}
 	else
 	{
 		m_timer->adjust(attotime::never);
 	}
-
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(vrt_vt1682_timer_device::timer_expired)
@@ -167,10 +176,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(vrt_vt1682_timer_device::timer_expired)
 
 /*
     Address 0x2103 r/w (SOUND CPU, Timer A)
-	Address 0x2113 r/w (SOUND CPU, Timer B)
+    Address 0x2113 r/w (SOUND CPU, Timer B)
 
-	Address 0x2103 r/w (MAIN CPU, Timer) (read or write?)
-	   
+    Address 0x2103 r/w (MAIN CPU, Timer) (read or write?)
+
     0x80 - Timer xx IRQ Clear
     0x40 - Timer xx IRQ Clear
     0x20 - Timer xx IRQ Clear
@@ -191,4 +200,9 @@ WRITE8_MEMBER(vrt_vt1682_timer_device::vt1682_timer_irqclear_w)
 void vrt_vt1682_timer_device::device_add_mconfig(machine_config& config)
 {
 	TIMER(config, m_timer).configure_periodic(FUNC(vrt_vt1682_timer_device::timer_expired), attotime::never);
+}
+
+void vrt_vt1682_timer_device::change_clock()
+{
+	notify_clock_changed();
 }

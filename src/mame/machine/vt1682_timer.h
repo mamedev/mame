@@ -32,6 +32,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(vt1682_timer_irqclear_w);
 
+	void change_clock();
 
 protected:
 	virtual void device_start() override;
@@ -42,6 +43,7 @@ private:
 	bool m_is_sound_timer;
 	required_device<timer_device> m_timer;
 
+	void update_timer(void);
 
 	uint8_t m_timer_preload_7_0;
 	uint8_t m_timer_preload_15_8;
