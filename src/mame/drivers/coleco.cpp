@@ -61,6 +61,11 @@
 
     - Dina SG-1000 mode
 
+	- Bit90:
+		Add support for memory expansion (documented)
+		Add support for printer interface (documented)
+		Add tape Support
+
 */
 
 #include "emu.h"
