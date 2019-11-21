@@ -41486,6 +41486,30 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
+	<!-- boot OK -->
+	<software name="dekirugc" supported="partial">
+		<!-- 
+		Unknown source
+		-->
+		<description>Dekiru! Game Center (Jpn)</description>
+		<year>1999</year>
+		<publisher>Shoeisha</publisher>
+		<info name="serial" value="SLPS-01810" />
+		<info name="release" value="19990114" />
+		<info name="alt_title" value="できる！ゲームセンター"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom1" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="dekiru game center (japan) (disc 1) [slps-01810]" sha1="8a5caf9c4b17bd600c67c742af7bfe66836ab7a5" status="baddump"/>
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="dekiru game center (japan) (disc 2) [slps-01811]" status="nodump"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="dendaisu" supported="no">
 		<!-- Unknown source
 		<rom name="Densha Daisuki (Japan) [SLPS-01753].bin" size="233473632" crc="abaf63a4" sha1="a5afc173700c8fc15d5f1efc307f51603b30f313"/>
