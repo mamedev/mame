@@ -3284,6 +3284,7 @@ ROM_END
 
 // FIC 486 KVD - Chipset: VIA VT82C485 - CPU: 486, solder pad for 486sx present - RAM: 8xSIMM30, Cache: 4xIS61C256A-20N+1xCY7C185-20PC, 4 empty sockets (28pin)
 // ISA16: 5, ISA16/VL: 2 - BIOS: AMI 486DX ISA BIOS AA7211137 - Keyboard-BIOS: MEGA-KB-H-WP
+// BIOS-String: X0-0100-001121-00101111-021993-VIA-0
 ROM_START( fic486kvd )
 	ROM_REGION32_LE(0x20000, "bios", 0)
 	ROM_LOAD( "486kvd_aa72111137.bin", 0x10000, 0x10000, CRC(A1F1810F) SHA1(405AFBF1635C6B41343AABFEEB3CF4CDC947A5BA))
@@ -3560,6 +3561,7 @@ ROM_END
 
 // NAT48PV-1.0 VL - Chipset:82C495SLC, Chips F82C206J - RAM: 8xSIMM30, Cache: 9xIS61C256A - OSC: 14.31818 - BIOS: AMI 486DX ISA BIOS (28pin) AA5312581
 // Keyboard-BIOS: MEGA-KB-F-WP P8042AHP - ISA8: 2, ISA16: 3, ISA16/VL: 2
+// 40-040A-001291-00101111-111192-OP495SLC-0 / 486DX-OP-WBq-25/33/50-K2-ZZ
 ROM_START( nat48pv )
 	ROM_REGION32_LE(0x20000, "bios", 0)
 	ROM_LOAD( "amibios_aa5312581.bin", 0x10000, 0x10000, CRC(8A788C79) SHA1(050972B7A369A463D6654EC52C0804002E9BCB37))
@@ -3649,8 +3651,9 @@ ROM_START( a486sp3 )
 	ROMX_LOAD( "si4i0307h.bin", 0x00000, 0x20000, CRC(99473cc0) SHA1(a01d253cf434a31e0ca6f6cd2b9026ca424eb463), ROM_BIOS(3))
 ROM_END
 
-// SOYO 4SAW2 - Chipset: SiS 85C497, 85C496, Winbond W83787F - CPU: Socket 3 - RAM: 4xSIMM72, Cache: 4xUM61512AK-15+W24129AK-15
+// SOYO SY-4SAW2 - Chipset: SiS 85C497, 85C496, Winbond W83787F - CPU: Socket 3 - RAM: 4xSIMM72, Cache: 4xUM61512AK-15+W24129AK-15
 // BIOS: Award (32pin) - Keyboard-BIOS: Via VT82C42N - ISA16: 3, ISA16/VL: 1, PCI: 4 - On board: 2xser, par, 2xIDE, Floppy
+// BIOS-String: 04/15/95-SiS-496-497/A/B-2A4IBS22-00 / REV IO-A
 ROM_START( so4saw2 )
 	ROM_REGION32_LE(0x20000, "bios", 0)
 	ROM_LOAD( "4sa2_bios_isa_486_488755.bin", 0x00000, 0x20000, CRC(21708d9c) SHA1(be4596507df1f5cc8a4e1baafce52b96417ac029))
@@ -4342,7 +4345,7 @@ COMP( 199?, sto486wb,  ibm5170, 0,       at486,     0,     at_state,     init_at
 COMP( 199?, hot409,    ibm5170, 0,       at486,     0,     at_state,     init_at,        "Shuttle Computer International", "HOT-409", MACHINE_NOT_WORKING )
 COMP( 199?, hot419,    ibm5170, 0,       at486,     0,     at_state,     init_at,        "Shuttle Computer International", "HOT-419", MACHINE_NOT_WORKING )
 COMP( 199?, hot433,    ibm5170, 0,       at486,     0,     at_state,     init_at,        "Shuttle Computer International", "HOT-433", MACHINE_NOT_WORKING )
-COMP( 199?, so4saw2,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "SOYO", "4SAW2", MACHINE_NOT_WORKING )
+COMP( 199?, so4saw2,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "SOYO", "SY-4SAW2", MACHINE_NOT_WORKING )
 COMP( 199?, uniwb4407, ibm5170, 0,       at486,     0,     at_state,     init_at,        "UNICHIP", "486 WB 4407 REV 1.0", MACHINE_NOT_WORKING )
 COMP( 199?, sm48650usc,ibm5170, 0,       at486,     0,     at_state,     init_at,        "Vintage Sprite", "SM 486-50USC", MACHINE_NOT_WORKING )
 COMP( 199?, zito4dps,  ibm5170, 0,       at486,     0,     at_state,     init_at,        "ZIDA", "Tomato board 4DPS", MACHINE_NOT_WORKING )

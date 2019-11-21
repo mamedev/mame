@@ -2480,7 +2480,7 @@ ev1806                          // Everex EV-1806
 ev1815                          // Everex EV-1815
 ews286                          // 1986 Ericsson WS286
 ficgiovt2                       // FIC 486-GIO-VT2
-fic486kvd						// FIC 486 KVD motherboard (486)
+fic486kvd                       // FIC 486 KVD motherboard (486)
 ficpio2                         // 1995 FIC 486-PIO-2
 ficvipio                        // FIC 486-VIP-IO
 ficvipio2                       // FIC 486-VIP-IO2
