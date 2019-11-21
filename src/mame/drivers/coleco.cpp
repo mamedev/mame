@@ -518,8 +518,8 @@ void coleco_state::machine_start()
 void bit90_state::machine_start()
 {
 	coleco_state::machine_start();
-	uint8_t *banked = memregion("maincpu")->base();
-	m_bank->configure_entries(0, 0x02, &banked[0x10000], 0x2000);
+	uint8_t *banked = memregion("banked")->base();
+	m_bank->configure_entries(0, 0x02, banked, 0x2000);
 }
 
 void coleco_state::machine_reset()
@@ -691,20 +691,43 @@ ROM_END
 #define rom_dina rom_czz50
 #define rom_prsarcde rom_czz50
 
+/* BIT90 BIOS
+
+Circuit board is labelled: BIT90C-PAL-90002
+
+Units have 2764-compatible pinouts at U2,U3, and U4
+Some units have 2764 EPROMS, Mask ROMs, or a combination
+
+Mask ROMs are labelled:
+
+@U4:
+D32351E
+BIT-99C1
+
+@U3:
+D32521E
+MONITOR2
+
+@U2:
+D32522E
+MONITOR3
+
+*/
+
 ROM_START( bit90 )
-	ROM_REGION( 0x14000, "maincpu", 0 )
 	ROM_DEFAULT_BIOS( "3.0" )
-
 	ROM_SYSTEM_BIOS( 0, "3.0", "BASIC 3.0" )
-	ROMX_LOAD("bit90b3.u4", 0x10000, 0x2000, CRC(06d21fc2) SHA1(6d296b09b661babd4c2ef6993f8e768a67932388), ROM_BIOS(0))
-	ROMX_LOAD("bit90b3.u3", 0x12000, 0x2000, CRC(61fdccbb) SHA1(25cac13627c0916d3ed2b92f0b2218b405de5be4), ROM_BIOS(0))
-	ROMX_LOAD("bit90b3.u2",  0x2000, 0x2000, CRC(b992b940) SHA1(c7dd96a1944fac40cbae20630f303a69de7e6313), ROM_BIOS(0))
-
 	ROM_SYSTEM_BIOS( 1, "3.1", "BASIC 3.1" )
-	ROMX_LOAD("d32351e.u4", 0x10000, 0x2000, NO_DUMP, ROM_BIOS(1)) // BIT-99C1
-	ROMX_LOAD("d32521e.u3", 0x12000, 0x2000, NO_DUMP, ROM_BIOS(1)) // MONITOR2
+
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROMX_LOAD("bit90b3.u2",  0x2000, 0x2000, CRC(b992b940) SHA1(c7dd96a1944fac40cbae20630f303a69de7e6313), ROM_BIOS(0))
 	ROMX_LOAD("d32522e.u2",  0x2000, 0x2000, NO_DUMP, ROM_BIOS(1)) // MONITOR3
-ROM_END
+
+	ROM_REGION( 0x4000, "banked", 0 )
+	ROMX_LOAD("bit90b3.u4", 0x0000, 0x2000, CRC(06d21fc2) SHA1(6d296b09b661babd4c2ef6993f8e768a67932388), ROM_BIOS(0))
+	ROMX_LOAD("bit90b3.u3", 0x2000, 0x2000, CRC(61fdccbb) SHA1(25cac13627c0916d3ed2b92f0b2218b405de5be4), ROM_BIOS(0))
+	ROMX_LOAD("d32351e.u4", 0x0000, 0x2000, NO_DUMP, ROM_BIOS(1)) // BIT-99C1
+	ROMX_LOAD("d32521e.u3", 0x2000, 0x2000, NO_DUMP, ROM_BIOS(1)) // MONITOR2
 ROM_END
 
 /* System Drivers */
