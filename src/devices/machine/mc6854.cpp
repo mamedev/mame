@@ -57,92 +57,54 @@ constexpr unsigned mc6854_device::MAX_FRAME_LENGTH;
 
 /* control register 1 */
 
-#define AC ( m_cr1 & 1 )
+#define AC ( m_cr1 & 1 )        /* extra register select bits */
 #define FCTDRA ( m_cr2 & 8 )
-/* extra register select bits */
 
-#define RRESET ( m_cr1 & 0x40 )
+#define RRESET ( m_cr1 & 0x40 ) /* transmit / reset condition */
 #define TRESET ( m_cr1 & 0x80 )
-/* transmit / reset condition */
 
-#define RIE ( m_cr1 & 2 )
+#define RIE ( m_cr1 & 2 )       /* interrupt enable */
 #define TIE ( m_cr1 & 4 )
-/* interrupt enable */
 
-#define DISCONTINUE ( m_cr1 & 0x20 )
-/* discontinue received frame */
-
+#define DISCONTINUE ( m_cr1 & 0x20 ) /* discontinue received frame */
 
 
 /* control register 2 */
 
-#define PSE ( m_cr2 & 1 )
-/* prioritize status bits (TODO) */
-
-#define TWOBYTES ( m_cr2 & 2 )
-/* two-bytes mode */
-
-#define FMIDLE ( m_cr2 & 4 )
-/* flag time fill (vs. mark idle) */
-
-#define TLAST ( m_cr2 & 0x10 )
-/* transmit last byte of frame */
-
-#define RTS ( m_cr2 & 0x80 )
-/* request-to-send */
-
+#define PSE ( m_cr2 & 1 ) /* prioritize status bits (TODO) */
+#define TWOBYTES ( m_cr2 & 2 ) /* two-bytes mode */
+#define FMIDLE ( m_cr2 & 4 )   /* flag time fill (vs. mark idle) */
+#define TLAST ( m_cr2 & 0x10 ) /* transmit last byte of frame */
+#define RTS ( m_cr2 & 0x80 )   /* request-to-send */
 
 
 /* control register 3 */
 
-#define LCF ( m_cr3 & 1 )
-/* logical control field select */
-
-#define CEX ( m_cr3 & 2 )
-/* control field is 16 bits instead of 8 */
-
-#define AEX ( m_cr3 & 4 )
-/* extended address mode (vs normal 8-bit address mode) */
-
-#define IDL0 ( m_cr3 & 8 )
-/* idle condition begins with a '0' instead of a '1" */
-
-#define FDSE ( m_cr3 & 0x10 )
-/* enable the flag detect status in SR1 */
-
-#define LOOP ( m_cr3 & 0x20 )
-/* loop mode */
-
-#define TST ( m_cr3 & 0x40 )
-/* test mode (or go active on poll) */
-
-#define DTR ( m_cr3 & 0x80 )
-/* data-transmit-ready (or loop on-line control) */
-
+#define LCF ( m_cr3 & 1 ) /* logical control field select */
+#define CEX ( m_cr3 & 2 ) /* control field is 16 bits instead of 8 */
+#define AEX ( m_cr3 & 4 ) /* extended address mode (vs normal 8-bit address mode) */
+#define IDL0 ( m_cr3 & 8 ) /* idle condition begins with a '0' instead of a '1" */
+#define FDSE ( m_cr3 & 0x10 ) /* enable the flag detect status in SR1 */
+#define LOOP ( m_cr3 & 0x20 ) /* loop mode */
+#define TST ( m_cr3 & 0x40 ) /* test mode (or go active on poll) */
+#define DTR ( m_cr3 & 0x80 ) /* data-transmit-ready (or loop on-line control) */
 
 
 /* control register 4 */
 
-#define TWOINTER ( m_cr4 & 1 )
-/* both an openning and a closing inter-frame are sent */
+#define TWOINTER ( m_cr4 & 1 ) /* both an openning and a closing inter-frame are sent */
 
-static const int word_length[4] = { 5, 6, 7, 8 };
+static const int word_length[4] = { 5, 6, 7, 8 }; /* transmit / receive word length */
 #define TWL word_length[ ( m_cr4 >> 1 ) & 3 ]
 #define RWL word_length[ ( m_cr4 >> 3 ) & 3 ]
-/* transmit / receive word length */
 
-#define ABT ( m_cr4 & 0x20 )
-/* aborts */
-
-#define ABTEX ( m_cr4 & 0x40 )
-/* abort generates 16 '1' bits instead of 8 */
-
-#define NRZ ( m_cr4 & 0x80 )
-/* zero complement / non-zero complement data format */
-
+#define ABT ( m_cr4 & 0x20 ) /* aborts */
+#define ABTEX ( m_cr4 & 0x40 ) /* abort generates 16 '1' bits instead of 8 */
+#define NRZ ( m_cr4 & 0x80 ) /* zero complement / non-zero complement data format */
 
 
 /* status register 1 */
+
 #define RDA  0x01  /* receiver data available */
 #define S2RQ 0x02  /* status register #2 read request */
 #define FD   0x04  /* flag detect */
@@ -153,6 +115,7 @@ static const int word_length[4] = { 5, 6, 7, 8 };
 
 
 /* status register 2 */
+
 #define AP    0x01  /* address present */
 #define FV    0x02  /* frame valid */
 #define RIDLE 0x04  /* receiver idle */
@@ -161,7 +124,6 @@ static const int word_length[4] = { 5, 6, 7, 8 };
 #define DCD   0x20  /* data carrier detect (ignored) */
 #define OVRN  0x40  /* receiver overrun */
 #define RDA2  0x80  /* copy of RDA */
-
 
 
 DEFINE_DEVICE_TYPE(MC6854, mc6854_device, "mc6854", "Motorola MC6854 ADLC")
