@@ -2199,17 +2199,18 @@ void sega315_5313_device::render_videobuffer_to_screenbuffer(int scanline)
 		}
 	}
 
-	if (!m_32x_scanline_helper_func.isnull())
-		m_32x_scanline_helper_func(scanline);
-	if (!m_32x_scanline_func.isnull())
+	if (!m_32x_scanline_helper_func.isnull() && !m_32x_scanline_func.isnull())
 	{
-		for (int srcx = 0, xx = 0, dstx = 0; srcx < horz; dstx++)
+		if (m_32x_scanline_helper_func(scanline, MEGADRIVE_REG01_240_LINE, hres[get_hres()] == 320))
 		{
-			m_32x_scanline_func(srcx, m_video_renderline[srcx] & 0x20000, lineptr[dstx]);
-			if (++xx >= mul)
+			for (int srcx = 0, xx = 0, dstx = 0; srcx < horz; dstx++)
 			{
-				srcx++;
-				xx = 0;
+				m_32x_scanline_func(srcx, m_video_renderline[srcx] & 0x20000, lineptr[dstx]);
+				if (++xx >= mul)
+				{
+					srcx++;
+					xx = 0;
+				}
 			}
 		}
 	}

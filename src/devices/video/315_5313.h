@@ -26,7 +26,7 @@ public:
 
 	typedef device_delegate<void (int x, u32 priority, u32 &lineptr)> md_32x_scanline_delegate;
 	typedef device_delegate<void (int scanline, int irq6)> md_32x_interrupt_delegate;
-	typedef device_delegate<void (int scanline)> md_32x_scanline_helper_delegate;
+	typedef device_delegate<bool (int scanline, bool height_240, bool width_320)> md_32x_scanline_helper_delegate;
 
 	auto snd_irq() { return m_sndirqline_callback.bind(); }
 	auto lv6_irq() { return m_lv6irqline_callback.bind(); }

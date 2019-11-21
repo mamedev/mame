@@ -894,25 +894,25 @@ WRITE16_MEMBER( sega_32x_device::pwm_w )
 		case 0x04/2:
 			if (m_lch_size == PWM_FIFO_SIZE)
 				lch_pop();
-			m_cur_lch[m_lch_size++] = data;
+			m_cur_lch[m_lch_size++] = data & 0xfff;
 
 			m_lch_fifo_state = (m_lch_size == PWM_FIFO_SIZE) ? 0x8000 : 0x0000;
 			break;
 		case 0x06/2:
 			if (m_rch_size == PWM_FIFO_SIZE)
 				rch_pop();
-			m_cur_rch[m_rch_size++] = data;
+			m_cur_rch[m_rch_size++] = data & 0xfff;
 
 			m_rch_fifo_state = (m_rch_size == PWM_FIFO_SIZE) ? 0x8000 : 0x0000;
 			break;
 		case 0x08/2:
 			if (m_lch_size == PWM_FIFO_SIZE)
 				lch_pop();
-			m_cur_lch[m_lch_size++] = data;
+			m_cur_lch[m_lch_size++] = data & 0xfff;
 
 			if (m_rch_size == PWM_FIFO_SIZE)
 				rch_pop();
-			m_cur_rch[m_rch_size++] = data;
+			m_cur_rch[m_rch_size++] = data & 0xfff;
 
 			m_lch_fifo_state = (m_lch_size == PWM_FIFO_SIZE) ? 0x8000 : 0x0000;
 			m_rch_fifo_state = (m_rch_size == PWM_FIFO_SIZE) ? 0x8000 : 0x0000;
@@ -1541,8 +1541,12 @@ SH2_DMA_FIFO_DATA_AVAILABLE_CB(sega_32x_device::_32x_fifo_available_callback)
 
 
 
-void sega_32x_device::render_videobuffer_to_screenbuffer_helper(int scanline)
+bool sega_32x_device::render_videobuffer_to_screenbuffer_helper(int scanline, bool height_240, bool width_320)
 {
+	bool const height_240_mode = m_32x_240mode;
+	if ((!width_320) || (height_240 != height_240_mode))
+		return false;
+
 	int x;
 
 	/* render 32x output to a buffer */
@@ -1632,6 +1636,7 @@ void sega_32x_device::render_videobuffer_to_screenbuffer_helper(int scanline)
 			}
 		}
 	}
+	return true;
 }
 
 void sega_32x_device::render_videobuffer_to_screenbuffer(int x, uint32_t priority, uint32_t &lineptr)

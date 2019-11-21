@@ -85,7 +85,7 @@ public:
 
 	SH2_DMA_FIFO_DATA_AVAILABLE_CB(_32x_fifo_available_callback);
 
-	void render_videobuffer_to_screenbuffer_helper(int scanline);
+	bool render_videobuffer_to_screenbuffer_helper(int scanline, bool height_240, bool width_320);
 	void render_videobuffer_to_screenbuffer(int x, uint32_t priority, uint32_t &lineptr);
 	int sh2_master_pwmint_enable, sh2_slave_pwmint_enable;
 
