@@ -180,9 +180,9 @@ void vme_mvme350_card_device::mvme350_mem(address_map &map)
 }
 
 ROM_START( mvme350 )
-	ROM_REGION (0x20000, MVME350_ROM, 0)
-	ROM_LOAD16_BYTE ("mvme350u40v2.3.bin", 0x0001, 0x4000, CRC (bcef82ef) SHA1 (e6fdf26e4714cbaeb3e97d7b5acf02d64d8ad744))
-	ROM_LOAD16_BYTE ("mvme350u47v2.3.bin", 0x0000, 0x4000, CRC (582ce095) SHA1 (d0929dbfeb0cfda63df6b5bc29ee27fbf665def7))
+	ROM_REGION16_BE(0x20000, MVME350_ROM, 0)
+	ROM_LOAD16_BYTE("mvme350u40v2.3.bin", 0x0000, 0x4000, CRC (bcef82ef) SHA1 (e6fdf26e4714cbaeb3e97d7b5acf02d64d8ad744))
+	ROM_LOAD16_BYTE("mvme350u47v2.3.bin", 0x0001, 0x4000, CRC (582ce095) SHA1 (d0929dbfeb0cfda63df6b5bc29ee27fbf665def7))
 ROM_END
 
 //-------------------------------------------------
