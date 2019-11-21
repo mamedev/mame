@@ -395,23 +395,21 @@ uint8_t spectrum_plusd_device::iorq_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
-	if (!machine().side_effects_disabled())
+	switch (offset & 0xff)
 	{
-		switch (offset & 0xff)
-		{
-		case 0xe3: // fdc status reg
-		case 0xeb: // fdc track reg
-		case 0xf3: // fdc sector reg
-		case 0xfb: // fdc data reg
-			data = m_fdc->read((offset >> 3) & 0x03);
-			break;
-		case 0xe7: // page in
+	case 0xe3: // fdc status reg
+	case 0xeb: // fdc track reg
+	case 0xf3: // fdc sector reg
+	case 0xfb: // fdc data reg
+		data = m_fdc->read((offset >> 3) & 0x03);
+		break;
+	case 0xe7: // page in
+		if (!machine().side_effects_disabled())
 			m_romcs = 1;
-			break;
-		case 0xf7: // bit 7: printer busy
-			data = m_centronics_busy ? 0x80 : 0x00;
-			break;
-		}
+		break;
+	case 0xf7: // bit 7: printer busy
+		data = m_centronics_busy ? 0x80 : 0x00;
+		break;
 	}
 	
 	return data;
@@ -419,39 +417,36 @@ uint8_t spectrum_plusd_device::iorq_r(offs_t offset)
 
 void spectrum_plusd_device::iorq_w(offs_t offset, uint8_t data)
 {
-	if (!machine().side_effects_disabled())
+	switch (offset & 0xff)
 	{
-		switch (offset & 0xff)
+	case 0xe3: // fdc command reg
+	case 0xeb: // fdc track reg
+	case 0xf3: // fdc sector reg
+	case 0xfb: // fdc data reg
+		m_fdc->write((offset >> 3) & 0x03, data);
+		break;
+	case 0xef: // bit 0-1: drive select, 6: printer strobe, 7: side select
 		{
-		case 0xe3: // fdc command reg
-		case 0xeb: // fdc track reg
-		case 0xf3: // fdc sector reg
-		case 0xfb: // fdc data reg
-			m_fdc->write((offset >> 3) & 0x03, data);
-			break;
-		case 0xef: // bit 0-1: drive select, 6: printer strobe, 7: side select
-			{
-			uint8_t drive = data & 3;
-			floppy_image_device* floppy = m_floppy[drive > 0 ? drive-1 : drive]->get_device();
-			m_fdc->set_floppy(floppy);
-			m_centronics->write_strobe(BIT(data, 6));
-			if (floppy) floppy->ss_w(BIT(data, 7));
-			}
-			break;
-		case 0xe7: // page out
-			m_romcs = 0;
-			break;
-		case 0xf7: // printer data
-			m_centronics->write_data0(BIT(data, 0));
-			m_centronics->write_data1(BIT(data, 1));
-			m_centronics->write_data2(BIT(data, 2));
-			m_centronics->write_data3(BIT(data, 3));
-			m_centronics->write_data4(BIT(data, 4));
-			m_centronics->write_data5(BIT(data, 5));
-			m_centronics->write_data6(BIT(data, 6));
-			m_centronics->write_data7(BIT(data, 7));
-			break;
+		uint8_t drive = data & 3;
+		floppy_image_device* floppy = m_floppy[drive > 0 ? drive-1 : drive]->get_device();
+		m_fdc->set_floppy(floppy);
+		m_centronics->write_strobe(BIT(data, 6));
+		if (floppy) floppy->ss_w(BIT(data, 7));
 		}
+		break;
+	case 0xe7: // page out
+		m_romcs = 0;
+		break;
+	case 0xf7: // printer data
+		m_centronics->write_data0(BIT(data, 0));
+		m_centronics->write_data1(BIT(data, 1));
+		m_centronics->write_data2(BIT(data, 2));
+		m_centronics->write_data3(BIT(data, 3));
+		m_centronics->write_data4(BIT(data, 4));
+		m_centronics->write_data5(BIT(data, 5));
+		m_centronics->write_data6(BIT(data, 6));
+		m_centronics->write_data7(BIT(data, 7));
+		break;
 	}
 }
 
@@ -536,34 +531,33 @@ uint8_t spectrum_disciple_device::iorq_r(offs_t offset)
 {
 	uint8_t data = m_exp->iorq_r(offset);
 
-	if (!machine().side_effects_disabled())
+	switch (offset & 0xff)
 	{
-		switch (offset & 0xff)
-		{
-		case 0x1b: // fdc status reg
-		case 0x5b: // fdc track reg
-		case 0x9b: // fdc sector reg
-		case 0xdb: // fdc data reg
-			data = m_fdc->read((offset >> 6) & 0x03);
-			break;
-		case 0x1f: // bit 0-4: kempston joystick, bit 6: printer busy, bit 7: network
-			data = bitswap<8>(~m_joy1->read(), 7, 6, 5, 0, 1, 2, 4, 3 ) & 0x1f;
-			data |= m_centronics_busy ? 0x00 : 0x40;  // inverted by IC10 74ls240
-			// 7: network...
-			break;
-		case 0x7b: // reset boot
+	case 0x1b: // fdc status reg
+	case 0x5b: // fdc track reg
+	case 0x9b: // fdc sector reg
+	case 0xdb: // fdc data reg
+		data = m_fdc->read((offset >> 6) & 0x03);
+		break;
+	case 0x1f: // bit 0-4: kempston joystick, bit 6: printer busy, bit 7: network
+		data = bitswap<8>(~m_joy1->read(), 7, 6, 5, 0, 1, 2, 4, 3 ) & 0x1f;
+		data |= m_centronics_busy ? 0x00 : 0x40;  // inverted by IC10 74ls240
+		// 7: network...
+		break;
+	case 0x7b: // reset boot
+		if (!machine().side_effects_disabled())
 			m_map = false;
-			break;
-		case 0xbb: // page in
+		break;
+	case 0xbb: // page in
+		if (!machine().side_effects_disabled())
 			m_romcs = 1;
-			break;
-		case 0xfe: // sinclair joysticks
-			if (((offset >> 8) & 16) == 0)
-				data = m_joy1->read() | (0xff ^ 0x1f);
-			if (((offset >> 8) & 8) == 0)
-				data = m_joy2->read() | (0xff ^ 0x1f);
-			break;
-		}
+		break;
+	case 0xfe: // sinclair joysticks
+		if (((offset >> 8) & 16) == 0)
+			data = m_joy1->read() | (0xff ^ 0x1f);
+		if (((offset >> 8) & 8) == 0)
+			data = m_joy2->read() | (0xff ^ 0x1f);
+		break;
 	}
 	
 	return data;
@@ -571,49 +565,46 @@ uint8_t spectrum_disciple_device::iorq_r(offs_t offset)
 
 void spectrum_disciple_device::iorq_w(offs_t offset, uint8_t data)
 {
-	if (!machine().side_effects_disabled())
+	switch (offset & 0xff)
 	{
-		switch (offset & 0xff)
+	case 0x1b: // fdc command reg
+	case 0x5b: // fdc track reg
+	case 0x9b: // fdc sector reg
+	case 0xdb: // fdc data reg
+		m_fdc->write((offset >> 6) & 0x03, data);
+		break;
+	case 0x1f: // bit 0: drive select, 1: side select, 2: density, 3: rom bank, 4: inhibit switch control, 5: exp select, 6: printer strobe, 7: network
 		{
-		case 0x1b: // fdc command reg
-		case 0x5b: // fdc track reg
-		case 0x9b: // fdc sector reg
-		case 0xdb: // fdc data reg
-			m_fdc->write((offset >> 6) & 0x03, data);
-			break;
-		case 0x1f: // bit 0: drive select, 1: side select, 2: density, 3: rom bank, 4: inhibit switch control, 5: exp select, 6: printer strobe, 7: network
-			{
-			floppy_image_device* floppy = m_floppy[~data & 1]->get_device();
-			m_fdc->set_floppy(floppy);
-			if (floppy) floppy->ss_w(BIT(data, 1));
-			m_fdc->dden_w(BIT(data, 2));
-			// 3: rom bank...
-			// 4: inhibit switch control...
-			// 5: exp select...
-			m_centronics->write_strobe(BIT(data, 6));
-			// 7: network...
-			}
-			break;
-		case 0x3b: // wait when net=1
-			// ...
-			break;
-		case 0x7b: // set boot
-			m_map = true;
-			break;
-		case 0xbb: // page out
-			m_romcs = 0;
-			break;
-		case 0xfb: // printer data
-			m_centronics->write_data0(BIT(data, 0));
-			m_centronics->write_data1(BIT(data, 1));
-			m_centronics->write_data2(BIT(data, 2));
-			m_centronics->write_data3(BIT(data, 3));
-			m_centronics->write_data4(BIT(data, 4));
-			m_centronics->write_data5(BIT(data, 5));
-			m_centronics->write_data6(BIT(data, 6));
-			m_centronics->write_data7(BIT(data, 7));
-			break;
+		floppy_image_device* floppy = m_floppy[~data & 1]->get_device();
+		m_fdc->set_floppy(floppy);
+		if (floppy) floppy->ss_w(BIT(data, 1));
+		m_fdc->dden_w(BIT(data, 2));
+		// 3: rom bank...
+		// 4: inhibit switch control...
+		// 5: exp select...
+		m_centronics->write_strobe(BIT(data, 6));
+		// 7: network...
 		}
+		break;
+	case 0x3b: // wait when net=1
+		// ...
+		break;
+	case 0x7b: // set boot
+		m_map = true;
+		break;
+	case 0xbb: // page out
+		m_romcs = 0;
+		break;
+	case 0xfb: // printer data
+		m_centronics->write_data0(BIT(data, 0));
+		m_centronics->write_data1(BIT(data, 1));
+		m_centronics->write_data2(BIT(data, 2));
+		m_centronics->write_data3(BIT(data, 3));
+		m_centronics->write_data4(BIT(data, 4));
+		m_centronics->write_data5(BIT(data, 5));
+		m_centronics->write_data6(BIT(data, 6));
+		m_centronics->write_data7(BIT(data, 7));
+		break;
 	}
 	
 	m_exp->iorq_w(offset, data);
