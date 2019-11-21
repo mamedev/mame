@@ -2134,9 +2134,9 @@ void lua_engine::initialize()
 			return sol::make_object(sol(), m_seq_poll->valid());
 		});
 	input_type.set("seq_poll_sequence", [this](input_manager &input) -> sol::object {
-		if (!m_seq_poll)
-			return sol::make_object(sol(), sol::nil);
-		return sol::make_object(sol(), sol::make_user(m_seq_poll->sequence()));
+			if (!m_seq_poll)
+				return sol::make_object(sol(), sol::nil);
+			return sol::make_object(sol(), sol::make_user(m_seq_poll->sequence()));
 	});
 	input_type.set("device_classes", sol::property([this](input_manager &input) {
 			sol::table result = sol().create_table();
