@@ -501,13 +501,13 @@ private:
 	DECLARE_WRITE8_MEMBER(vt1682_timer_enable_trampoline_w)
 	{
 		// this is used for raster interrpt effects, despite not being a scanline timer, so knowing when it triggers is useful, so trampoline it to avoid passing m_screen to the device
-		printf("%s: vt1682_timer_enable_trampoline_w: %02x @ position y%d, x%d\n", machine().describe_context().c_str(), data, m_screen->vpos(), m_screen->hpos());
+		logerror("%s: vt1682_timer_enable_trampoline_w: %02x @ position y%d, x%d\n", machine().describe_context(), data, m_screen->vpos(), m_screen->hpos());
 		m_system_timer_dev->vt1682_timer_enable_w(space, offset, data);
 	};
 
 	DECLARE_WRITE8_MEMBER(vt1682_timer_preload_15_8_trampoline_w)
 	{
-		printf("%s: vt1682_timer_preload_15_8_trampoline_w: %02x @ position y%d, x%d\n", machine().describe_context().c_str(), data, m_screen->vpos(), m_screen->hpos());
+		logerror("%s: vt1682_timer_preload_15_8_trampoline_w: %02x @ position y%d, x%d\n", machine().describe_context(), data, m_screen->vpos(), m_screen->hpos());
 		m_system_timer_dev->vt1682_timer_preload_15_8_w(space, offset, data);
 	};
 
@@ -2648,15 +2648,14 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_210b_misc_cs_prg0_bank_sel_w)
 	logerror("%s: vt1682_210b_misc_cs_prg0_bank_sel_w writing: %02x\n", machine().describe_context(), data);
 	m_210b_misc_cs_prg0_bank_sel = data;
 
+	// TODO: allow PAL
 	if (data & 0x80)
 	{
 		m_system_timer_dev->set_clock(TIMER_ALT_SPEED_NTSC);
-		m_system_timer_dev->change_clock(true);
 	}
 	else
 	{
 		m_system_timer_dev->set_clock(MAIN_CPU_CLOCK_NTSC);
-		m_system_timer_dev->change_clock(false);
 	}
 
 	update_banks();
@@ -5056,17 +5055,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(vt_vt1682_state::scanline)
 
 	//m_screen->update_partial(m_screen->vpos());
 
-	if (scanline == 30)
-	{
-		attotime plusone = m_screen->time_until_pos(scanline + 1);
-		attotime plustwo = m_screen->time_until_pos(scanline + 2);
-
-		attotime scanlinetime = plustwo - plusone;
-
-		printf("attotime as hz %f\n", scanlinetime.as_hz());
-
-	}
-
 	if (scanline == 240) // 255 aligns the raster for bee fighting title, but that's not logical, on the NES it doesn't fire on the line after the display, but the one after that, likely the timer calc logic is off?
 	{
 		if (m_2000 & 0x01)
@@ -5194,7 +5182,7 @@ void vt_vt1682_state::vt_vt1682(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(256, 256+8);
+	m_screen->set_size(256, 262); // 262 for NTSC, might be 261 if Vblank line is changed
 	m_screen->set_visarea(0, 256-1, 0, 240-1);
 	m_screen->set_screen_update(FUNC(vt_vt1682_state::screen_update));
 

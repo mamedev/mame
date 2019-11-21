@@ -32,8 +32,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(vt1682_timer_irqclear_w);
 
-	void change_clock(bool alt_clock);
-	bool m_using_alt_clock;
+	void change_clock();
 
 protected:
 	virtual void device_start() override;
