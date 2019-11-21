@@ -125,7 +125,6 @@ WRITE8_MEMBER(k007232_device::write)
 		case 0: // address step, LSB
 		case 1: // address step, MSB
 			m_step[channel] = m_fncode[(BIT(m_wreg[reg_index + 1], 0) << 8) | m_wreg[reg_index]];
-			if (machine().input().code_pressed(KEYCODE_K)) printf("Step: %02x, %02x = %04x (%08x)\n", m_wreg[reg_index + 1], m_wreg[reg_index], (BIT(m_wreg[reg_index + 1], 0) << 8) | m_wreg[reg_index], m_step[channel]);
 			break;
 		case 2:
 		case 3:
@@ -134,7 +133,6 @@ WRITE8_MEMBER(k007232_device::write)
 			break;
 		case 5: // start address
 			m_start[channel] = get_start_address(channel);
-			if (machine().input().code_pressed(KEYCODE_K)) printf("Start: %08x\n", m_start[channel]);
 			if (m_start[channel] < m_pcmlimit)
 			{
 				m_play[channel] = 1;
