@@ -434,8 +434,8 @@ class input_seq
 {
 public:
 	// construction/destruction
-	constexpr input_seq() noexcept : input_seq(std::make_index_sequence<std::tuple_size<decltype(m_code)>::value>()) { }
-	template <typename... T> constexpr input_seq(input_code code_0, T... code_n) noexcept : input_seq(std::make_index_sequence<std::tuple_size<decltype(m_code)>::value - sizeof...(T) - 1>(), code_0, code_n...) { }
+	input_seq() noexcept : input_seq(std::make_index_sequence<std::tuple_size<decltype(m_code)>::value>()) { }
+	template <typename... T> input_seq(input_code code_0, T... code_n) noexcept : input_seq(std::make_index_sequence<std::tuple_size<decltype(m_code)>::value - sizeof...(T) - 1>(), code_0, code_n...) { }
 	constexpr input_seq(const input_seq &rhs) noexcept = default;
 
 	// operators
@@ -475,7 +475,8 @@ public:
 private:
 	static constexpr input_code get_end_code(size_t) noexcept { return end_code; }
 
-	template <typename... T, size_t... N> constexpr input_seq(std::integer_sequence<size_t, N...>, T... code) noexcept : m_code({ code..., get_end_code(N)... }) { }
+	template <size_t... N, typename... T> input_seq(std::integer_sequence<size_t, N...>, T... code) noexcept : m_code({ code..., get_end_code(N)... }) { }
+	template <size_t... N> input_seq(std::integer_sequence<size_t, N...>) noexcept : m_code({ get_end_code(N)... }) { }
 
 	template <unsigned N> void set() noexcept
 	{
