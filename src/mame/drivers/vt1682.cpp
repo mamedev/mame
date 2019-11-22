@@ -10,6 +10,46 @@
     can also be configured as boot device
 */
 
+/*
+	UNIMPLEMENTED / TODO
+	
+	General VT1862:
+
+	Sound Quality (currently crackles)
+	Verify timer enable / disable behavior
+	Line Modes, High Colour Line Mode
+	Tile rowscroll modes
+	0x8000 bit in palette is 'cut through' mode, which isn't the same as transpen, some kind of palette manipulation
+	It seems Pal1 and Pal2 should actually be separate render buffers for each palette, on which layers / sprites can be enabled, that are mixed later and can be output independently to LCD and TV?
+		(how does this work with high colour line mode?)
+	CCIR effects (only apply to 'palette 2'?)
+	LCD Control registers
+	Internal to External DMA (glitchy)
+	Sprite limits
+	Other hardware limits (video DMA should be delayed until Vblank, some registers only take effect at Hblank)
+	Verify raster timing (might be off by a line)
+	Hardware glitches (scroll layers + sprites get offset under specific conditions, sprites sometimes missing in 2 rightmost column, bk sometimes missing in rightmost column during scroll)
+	Sleep functionality on sound cpu (broken on hardware?)
+	Interrupt controller / proper interrupt support (currently a bit hacky, only main timer and sub-timer a supported)
+	Proper IO support (enables / disables) UART, I2C etc.
+	'Capture' mode
+
+	Refactor into a device
+
+	+ more
+
+	Intec InterAct:
+
+	Is there meant to be a 2nd player? (many games prompt a 2nd player to start, but inputs don't appear to be read?)
+	Verify that internal ROM is blank (it isn't used)
+
+	Zone 40:
+
+	Decrypt, verify it's a good dump, verify that it's 6502 code, see how close the architecture is to 1682 (many games are the same)
+	If it has an internal ROM dump it (I don't see any obvious encrypted boot vectors in current dump)
+
+*/
+
 #include "emu.h"
 #include "machine/m6502_vt1682.h"
 #include "machine/vt1682_io.h"
@@ -520,7 +560,6 @@ private:
 	DECLARE_READ8_MEMBER(rom_4000_to_7fff_r);
 	DECLARE_READ8_MEMBER(rom_8000_to_ffff_r);
 
-	//INTERRUPT_GEN_MEMBER(nmi);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 
 	bitmap_ind8 m_priority_bitmap;
@@ -1190,7 +1229,7 @@ READ8_MEMBER(vt_vt1682_state::vt1682_2004_sprram_data_r)
 	uint8_t ret = m_spriteram->read8(spriteram_address);
 	logerror("%s: vt1682_2004_sprram_data_r returning: %02x from SpriteRam Address %04x\n", machine().describe_context(), ret, spriteram_address);
 	// no increment on read?
-
+	// documentation indicates this doesn't work
 	return ret;
 }
 
@@ -1276,7 +1315,7 @@ READ8_MEMBER(vt_vt1682_state::vt1682_2007_vram_data_r)
 	uint8_t ret = m_vram->read8(vram_address);
 	logerror("%s: vt1682_2007_vram_data_r returning: %02x from VideoRam Address %04x\n", machine().describe_context(), ret, vram_address);
 	// no increment on read?
-
+	// documentation indicates this doesn't work
 	return ret;
 }
 
@@ -1453,12 +1492,12 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_200d_misc_vregs2_w)
 
     0x80 - (unused)
     0x40 - (unused)
-    0x20 - Blend2
-    0x10 - Blend1
-    0x08 - Palette 2 Out Sel
-    0x04 - Palette 2 Out Sel
-    0x02 - Palette 1 Out Sel
-    0x01 - Palette 1 Out Sel
+    0x20 - Blend2 - LCD output blending  0 = Overlapped (use depth) 1 = 50% blend Pal1/Pal2
+    0x10 - Blend1 - TV output blending   0 = Overlapped (use depth) 1 = 50% blend Pal1/Pal2
+    0x08 - Palette 2 Out Sel 'SB4' \
+    0x04 - Palette 2 Out Sel 'SB6' /- 0 = output Palette 2 Disable, 1 = output Palette 2 to LCD only, 2 = Output Palette 2 to TV only, 3 = Output Palette 2 to both
+    0x02 - Palette 1 Out Sel 'SB3' \
+    0x01 - Palette 1 Out Sel 'SB5' /- 0 = output Palette 1 Disable, 1 = output Palette 1 to LCD only, 2 = Output Palette 1 to TV only, 3 = Output Palette 1 to both
 */
 
 READ8_MEMBER(vt_vt1682_state::vt1682_200e_blend_pal_sel_r)
@@ -1481,10 +1520,10 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_200e_blend_pal_sel_w)
     0x40 - (unused)
     0x20 - (unused)
     0x10 - (unused)
-    0x08 - Bk2 Palette Select
-    0x04 - Bk2 Palette Select
-    0x02 - Bk1 Palette Select
-    0x01 - Bk1 Palette Select
+    0x08 - Bk2 Palette Select 'BK2 SB2'
+    0x04 - Bk2 Palette Select 'BK2 SB1'
+    0x02 - Bk1 Palette Select 'BK1 SB2'
+    0x01 - Bk1 Palette Select 'BK1 SB1'
 */
 
 READ8_MEMBER(vt_vt1682_state::vt1682_200f_bk_pal_sel_r)
@@ -4604,9 +4643,8 @@ void vt_vt1682_state::draw_layer(int which, int opaque, screen_device& screen, b
 	int bk_line = (m_main_control_bk[which] & 0x02) >> 1;
 	int bk_tilebpp = (m_main_control_bk[which] & 0x0c) >> 2;
 	int bk_depth = (m_main_control_bk[which] & 0x30) >> 4;
-	int bk_palette = (m_main_control_bk[which] & 0x40) >> 5;
+	int bk_paldepth_mode = (m_main_control_bk[which] & 0x40) >> 5; // called bkpal in places, bk_pal_select in others (in conflict with palselect below)
 	int bk_enable = (m_main_control_bk[which] & 0x80) >> 7;
-
 
 	if (bk_enable)
 	{
@@ -4635,7 +4673,7 @@ void vt_vt1682_state::draw_layer(int which, int opaque, screen_device& screen, b
 		if (!bk_line)
 		{
 			// Character Mode
-			logerror("DRAWING ----- bk, Character Mode Segment base %08x, TileSize %1x Bpp %1x, Depth %1x Palette %1x PageLayout_V:%1x PageLayout_H:%1x XScroll %04x YScroll %04x\n", segment, bk_tilesize, bk_tilebpp, bk_depth, bk_palette, page_layout_v, page_layout_h, xscroll, yscroll);
+			logerror("DRAWING ----- bk, Character Mode Segment base %08x, TileSize %1x Bpp %1x, Depth %1x Palette %1x PageLayout_V:%1x PageLayout_H:%1x XScroll %04x YScroll %04x\n", segment, bk_tilesize, bk_tilebpp, bk_depth, bk_paldepth_mode, page_layout_v, page_layout_h, xscroll, yscroll);
 
 			int palselect;
 			if (which == 0) palselect = m_200f_bk_pal_sel & 0x03;
@@ -4659,6 +4697,7 @@ void vt_vt1682_state::draw_layer(int which, int opaque, screen_device& screen, b
 			else
 			{
 				// 'both' ? (how?)
+				// this only really makes sense if pal1 and pal2 are separate render buffers (which based on the blending stuff, is logical, but then you have the 'high colour' bitmap mode which bypasses palette entirely?)
 				palbase = machine().rand() & 0xff;
 			}
 
@@ -4712,7 +4751,25 @@ void vt_vt1682_state::draw_layer(int which, int opaque, screen_device& screen, b
 
 					int xpos = xtile * (bk_tilesize ? 16 : 8);
 
-					draw_tile_pixline(segment, tile, ytileline, xpos + xscrolltile_part, y, palbase, pal, bk_tilesize, bk_tilesize, bk_tilebpp, (bk_depth * 2) + 1, opaque, 0, 0, screen, bitmap, cliprect);
+					uint8_t realpal, realdepth;
+
+					if (bk_paldepth_mode)
+					{
+						// this mode isn't tested, not seen it used
+						//if (bk_paldepth_mode)
+						//	popmessage("bk_paldepth_mode set\n");
+						realdepth = pal & 0x03;
+
+						// depth might instead be the high 2 bits in 4bpp mode
+						realpal = (pal & 0x0c) | bk_depth;
+					}
+					else
+					{
+						realpal = pal;
+						realdepth = bk_depth;
+					}
+
+					draw_tile_pixline(segment, tile, ytileline, xpos + xscrolltile_part, y, palbase, realpal, bk_tilesize, bk_tilesize, bk_tilebpp, (realdepth * 2) + 1, opaque, 0, 0, screen, bitmap, cliprect);
 				}
 			}
 		}
@@ -4760,8 +4817,10 @@ void vt_vt1682_state::draw_sprites(screen_device& screen, bitmap_rgb32& bitmap, 
 
 			int pal = (attr0 & 0xf0) >> 4;
 
-			int flipx = (attr1 & 0x02) >> 1;
+			int flipx = (attr1 & 0x02) >> 1; // might not function correctly on hardware
 			int flipy = (attr1 & 0x04) >> 2;
+
+			int depth = (attr1 & 0x18) >> 3;
 
 			// sp_pal_sel also influences this
 			int palbase;
@@ -4776,8 +4835,7 @@ void vt_vt1682_state::draw_sprites(screen_device& screen, bitmap_rgb32& bitmap, 
 			if (attr1 & 0x01)
 				x -= 256;
 
-
-			draw_tile(segment, tilenum, x, y, palbase, pal, sp_size & 0x2, sp_size&0x1, 0, 0, 0, flipx, flipy, screen, bitmap, cliprect);
+			draw_tile(segment, tilenum, x, y, palbase, pal, sp_size & 0x2, sp_size&0x1, 0, depth * 2, 0, flipx, flipy, screen, bitmap, cliprect);
 		}
 	}
 	// if more than 16 sprites on any line 0x2001 bit 0x40 (SP_ERR) should be set (updated every line, can only be read in HBLANK)
@@ -5055,7 +5113,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(vt_vt1682_state::scanline)
 
 	//m_screen->update_partial(m_screen->vpos());
 
-	if (scanline == 240) // 255 aligns the raster for bee fighting title, but that's not logical, on the NES it doesn't fire on the line after the display, but the one after that, likely the timer calc logic is off?
+	if (scanline == 239) // 239 aligns highway racing title, but could actually depend on when registers get latched
 	{
 		if (m_2000 & 0x01)
 		{
@@ -5064,18 +5122,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(vt_vt1682_state::scanline)
 		}
 	}
 }
-
-
-/*
-INTERRUPT_GEN_MEMBER(vt_vt1682_state::nmi)
-{
-    if (m_2000 & 0x01)
-    {
-        m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
-        m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero); // same enable? (NMI_EN on sub is 'wakeup NMI')
-    }
-}
-*/
 
 static const gfx_layout helper_8bpp_8x8_layout =
 {
