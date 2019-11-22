@@ -34,14 +34,18 @@ const bgfx::Memory* bgfx_util::mame_texture_data_to_bgfx_texture_data(bgfx::Text
 	}
 	bgfx::calcTextureSize(info, rowpixels, height, 1, false, false, 1, dst_format);
 	return bgfx::copy(base, info.storageSize);
-	/*const bgfx::Memory* mem = bgfx::alloc(width * height * 4);
+}
+
+const bgfx::Memory* bgfx_util::mame_texture_data_to_argb32(uint32_t src_format, int width, int height, int rowpixels, const rgb_t *palette, void *base)
+{
+	const bgfx::Memory* mem = bgfx::alloc(width * height * 4);
 	uint32_t* dst = reinterpret_cast<uint32_t*>(mem->data);
 	uint16_t* src16 = reinterpret_cast<uint16_t*>(base);
 	uint32_t* src32 = reinterpret_cast<uint32_t*>(base);
 
 	for (int y = 0; y < height; y++)
 	{
-	    switch (format)
+	    switch (src_format)
 	    {
 	    case PRIMFLAG_TEXFORMAT(TEXFORMAT_PALETTE16):
 	        copy_util::copyline_palette16(dst, src16, width, palette);
@@ -64,7 +68,7 @@ const bgfx::Memory* bgfx_util::mame_texture_data_to_bgfx_texture_data(bgfx::Text
 	    }
 	    dst += width;
 	}
-	return mem;*/
+	return mem;
 }
 
 uint64_t bgfx_util::get_blend_state(uint32_t blend)
