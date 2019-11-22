@@ -3180,6 +3180,8 @@ if (BUSES["BML3"]~=null) then
 		MAME_DIR .. "src/devices/bus/bml3/bml3mp1805.h",
 		MAME_DIR .. "src/devices/bus/bml3/bml3kanji.cpp",
 		MAME_DIR .. "src/devices/bus/bml3/bml3kanji.h",
+		MAME_DIR .. "src/devices/bus/bml3/bml3rtc.cpp",
+		MAME_DIR .. "src/devices/bus/bml3/bml3rtc.h",
 	}
 end
 
