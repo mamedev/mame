@@ -450,6 +450,9 @@ private:
 	DECLARE_READ8_MEMBER(vt1682_2106_enable_regs_r);
 	DECLARE_WRITE8_MEMBER(vt1682_2106_enable_regs_w);
 
+	DECLARE_READ8_MEMBER(vt1682_212c_prng_r);
+	DECLARE_WRITE8_MEMBER(vt1682_212c_prng_seed_w);
+
 	/* Hacky */
 
 	DECLARE_READ8_MEMBER(soundcpu_irq_vector_hack_r);
@@ -3607,6 +3610,20 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2128_dma_sr_bank_addr_24_23_w)
     0x01 - Pseudo Random Number Seed
 */
 
+READ8_MEMBER(vt_vt1682_state::vt1682_212c_prng_r)
+{
+	uint8_t ret = machine().rand();
+	logerror("%s: vt1682_212c_prng_r returning: %02x\n", machine().describe_context(), ret);
+	return ret;
+}
+
+WRITE8_MEMBER(vt_vt1682_state::vt1682_212c_prng_seed_w)
+{
+	logerror("%s: vt1682_212c_prng_seed_w writing: %02x\n", machine().describe_context(), data);
+	// don't know the algorithm
+}
+
+
 /*
     Address 0x212d WRITE ONLY (MAIN CPU)
 
@@ -4629,16 +4646,6 @@ int vt_vt1682_state::get_address_for_tilepos(int x, int y, int tilesize, uint16_
 
 void vt_vt1682_state::draw_layer(int which, int opaque, screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
 {
-	// m_main_control_bk[0]
-	// logerror("%s: vt1682_2013_bk1_main_control_w writing: %02x (enable:%01x palette:%01x depth:%01x bpp:%01x linemode:%01x tilesize:%01x)\n", machine().describe_context(), data,
-	//      (data & 0x80) >> 7, (data & 0x40) >> 6, (data & 0x30) >> 4, (data & 0x0c) >> 2, (data & 0x02) >> 1, (data & 0x01) >> 0 );
-
-	// m_scroll_control_bk[0]
-	// logerror("%s: vt1682_2012_bk1_scroll_control_w writing: %02x (hclr: %1x page_layout:%1x ymsb:%1x xmsb:%1x)\n", machine().describe_context(), data,
-	//      (data & 0x10) >> 4, (data & 0x0c) >> 2, (data & 0x02) >> 1, (data & 0x01) >> 0);
-
-
-
 	int bk_tilesize = (m_main_control_bk[which] & 0x01);
 	int bk_line = (m_main_control_bk[which] & 0x02) >> 1;
 	int bk_tilebpp = (m_main_control_bk[which] & 0x0c) >> 2;
@@ -4656,6 +4663,20 @@ void vt_vt1682_state::draw_layer(int which, int opaque, screen_device& screen, b
 		int page_layout_v = (m_scroll_control_bk[which] & 0x08) >> 3;
 		int high_color = (m_scroll_control_bk[which] & 0x10) >> 4;
 
+		/* must be some condition for this, as Maze Pac does not want this offset (confirmed no offset on hardware) but some others do (see Snake title for example)
+		   documentation says it's a hw bug, for bk2 (+2 pixels), but conditions aren't understood, and bk1 clearly needs offset too
+		   sprites and tilemaps on the select menu need to align too, without left edge scrolling glitches
+		   judging this from videos is tricky, because there's another bug that causes the right-most column of pixels to not render for certain scroll values
+		   and the right-most 2 columns of sprites to not render
+		   
+		   does this come down to pal1/pal2 output mixing rather than specific layers?
+		*/
+		//if (which == 0)
+		//	xscroll += 1;
+
+		//if (which == 1)
+		//	xscroll += 1;
+
 		int segment = m_segment_7_0_bk[which];
 		segment |= m_segment_11_8_bk[which] << 8;
 
@@ -4672,12 +4693,13 @@ void vt_vt1682_state::draw_layer(int which, int opaque, screen_device& screen, b
 
 		if (!bk_line)
 		{
-			// Character Mode
-			logerror("DRAWING ----- bk, Character Mode Segment base %08x, TileSize %1x Bpp %1x, Depth %1x Palette %1x PageLayout_V:%1x PageLayout_H:%1x XScroll %04x YScroll %04x\n", segment, bk_tilesize, bk_tilebpp, bk_depth, bk_paldepth_mode, page_layout_v, page_layout_h, xscroll, yscroll);
-
 			int palselect;
 			if (which == 0) palselect = m_200f_bk_pal_sel & 0x03;
 			else palselect = (m_200f_bk_pal_sel & 0x0c) >> 2;
+
+			// Character Mode
+			logerror("DRAWING ----- bk, Character Mode Segment base %08x, TileSize %1x Bpp %1x, Depth %1x PalDepthMode:%1x PalSelect:%1 PageLayout_V:%1x PageLayout_H:%1x XScroll %04x YScroll %04x\n", segment, bk_tilesize, bk_tilebpp, bk_depth, bk_paldepth_mode, palselect, page_layout_v, page_layout_h, xscroll, yscroll);
+
 
 			int palbase;
 
@@ -4744,7 +4766,7 @@ void vt_vt1682_state::draw_layer(int which, int opaque, screen_device& screen, b
 
 					int tile = word & 0x0fff;
 
-					if (!tile) // Golden Gate in ii32in1 changes tiles to 0 when destroyed, which is garbage (TODO: check this isn't division related, or a priority thing)
+					if (!tile) // verified
 						continue;
 
 					uint8_t pal = (word & 0xf000) >> 12;
@@ -4811,8 +4833,7 @@ void vt_vt1682_state::draw_sprites(screen_device& screen, bitmap_rgb32& bitmap, 
 
 			tilenum |= (attr0 & 0x0f) << 8;
 
-			// maybe "Duel Soccer" in ii32in1 has a bad tile otherwise, and it matches other guessed behavior of skipping tile 0 for tilemaps too
-			if (!tilenum)
+			if (!tilenum) // verified
 				continue;
 
 			int pal = (attr0 & 0xf0) >> 4;
@@ -4834,6 +4855,10 @@ void vt_vt1682_state::draw_sprites(screen_device& screen, bitmap_rgb32& bitmap, 
 
 			if (attr1 & 0x01)
 				x -= 256;
+
+			// guess! Maze Pac needs sprites shifted left by 1, but actual conditions might be more complex
+			//if ((!sp_size & 0x01))
+			//	x -= 1;
 
 			draw_tile(segment, tilenum, x, y, palbase, pal, sp_size & 0x2, sp_size&0x1, 0, depth * 2, 0, flipx, flipy, screen, bitmap, cliprect);
 		}
@@ -4991,18 +5016,24 @@ void vt_vt1682_state::vt_vt1682_map(address_map &map)
 	map(0x210d, 0x210d).rw(m_io, FUNC(vrt_vt1682_io_device::vt1682_210d_ioconfig_r),FUNC(vrt_vt1682_io_device::vt1682_210d_ioconfig_w));
 	map(0x210e, 0x210e).rw(m_io, FUNC(vrt_vt1682_io_device::vt1682_210e_io_ab_r),FUNC(vrt_vt1682_io_device::vt1682_210e_io_ab_w));
 	map(0x210f, 0x210f).rw(m_io, FUNC(vrt_vt1682_io_device::vt1682_210f_io_cd_r),FUNC(vrt_vt1682_io_device::vt1682_210f_io_cd_w));
-
-	// either reads/writes are on different addresses or our source info is incorrect
-	map(0x2110, 0x2110).rw(FUNC(vt_vt1682_state::vt1682_prgbank0_r4_r), FUNC(vt_vt1682_state::vt1682_prgbank1_r0_w));
-	map(0x2111, 0x2111).rw(FUNC(vt_vt1682_state::vt1682_prgbank0_r5_r), FUNC(vt_vt1682_state::vt1682_prgbank1_r1_w));
-	map(0x2112, 0x2112).rw(FUNC(vt_vt1682_state::vt1682_prgbank1_r0_r), FUNC(vt_vt1682_state::vt1682_prgbank0_r4_w));
-	map(0x2113, 0x2113).rw(FUNC(vt_vt1682_state::vt1682_prgbank1_r1_r), FUNC(vt_vt1682_state::vt1682_prgbank0_r5_w));
-
+	map(0x2110, 0x2110).rw(FUNC(vt_vt1682_state::vt1682_prgbank0_r4_r), FUNC(vt_vt1682_state::vt1682_prgbank1_r0_w)); // either reads/writes are on different addresses or our source info is incorrect
+	map(0x2111, 0x2111).rw(FUNC(vt_vt1682_state::vt1682_prgbank0_r5_r), FUNC(vt_vt1682_state::vt1682_prgbank1_r1_w)); // ^
+	map(0x2112, 0x2112).rw(FUNC(vt_vt1682_state::vt1682_prgbank1_r0_r), FUNC(vt_vt1682_state::vt1682_prgbank0_r4_w)); // ^
+	map(0x2113, 0x2113).rw(FUNC(vt_vt1682_state::vt1682_prgbank1_r1_r), FUNC(vt_vt1682_state::vt1682_prgbank0_r5_w)); // ^
+	// 2114 baud rade
+	// 2115 baud rate
+	// 2116 SPI
+	// 2117 SPI
 	map(0x2118, 0x2118).rw(FUNC(vt_vt1682_state::vt1682_2118_prgbank1_r4_r5_r), FUNC(vt_vt1682_state::vt1682_2118_prgbank1_r4_r5_w));
-
-
+	// 2119 UART
+	// 211a UART
+	// 211b UART
 	map(0x211c, 0x211c).w(FUNC(vt_vt1682_state::vt1682_211c_regs_ext2421_w));
-
+	// 211d misc enable regs
+	// 211e ADC
+	// 211f voice gain
+	// 2120 sleep period
+	// 2121 misc interrupt masks / clears
 	map(0x2122, 0x2122).rw(FUNC(vt_vt1682_state::vt1682_2122_dma_dt_addr_7_0_r), FUNC(vt_vt1682_state::vt1682_2122_dma_dt_addr_7_0_w));
 	map(0x2123, 0x2123).rw(FUNC(vt_vt1682_state::vt1682_2123_dma_dt_addr_15_8_r), FUNC(vt_vt1682_state::vt1682_2123_dma_dt_addr_15_8_w));
 	map(0x2124, 0x2124).rw(FUNC(vt_vt1682_state::vt1682_2124_dma_sr_addr_7_0_r), FUNC(vt_vt1682_state::vt1682_2124_dma_sr_addr_7_0_w));
@@ -5010,7 +5041,13 @@ void vt_vt1682_state::vt_vt1682_map(address_map &map)
 	map(0x2126, 0x2126).rw(FUNC(vt_vt1682_state::vt1682_2126_dma_sr_bank_addr_22_15_r), FUNC(vt_vt1682_state::vt1682_2126_dma_sr_bank_addr_22_15_w));
 	map(0x2127, 0x2127).rw(FUNC(vt_vt1682_state::vt1682_2127_dma_status_r), FUNC(vt_vt1682_state::vt1682_2127_dma_size_trigger_w));
 	map(0x2128, 0x2128).rw(FUNC(vt_vt1682_state::vt1682_2128_dma_sr_bank_addr_24_23_r), FUNC(vt_vt1682_state::vt1682_2128_dma_sr_bank_addr_24_23_w));
-
+	// 2129 UIO
+	// 212a UIO
+	// 212b UIO
+	map(0x212c, 0x212c).rw(FUNC(vt_vt1682_state::vt1682_212c_prng_r), FUNC(vt_vt1682_state::vt1682_212c_prng_seed_w));
+	// 212d PLL
+	// 212e unused
+	// 212f unused
 	map(0x2130, 0x2130).rw(m_maincpu_alu, FUNC(vrt_vt1682_alu_device::alu_out_1_r), FUNC(vrt_vt1682_alu_device::alu_oprand_1_w));
 	map(0x2131, 0x2131).rw(m_maincpu_alu, FUNC(vrt_vt1682_alu_device::alu_out_2_r), FUNC(vrt_vt1682_alu_device::alu_oprand_2_w));
 	map(0x2132, 0x2132).rw(m_maincpu_alu, FUNC(vrt_vt1682_alu_device::alu_out_3_r), FUNC(vrt_vt1682_alu_device::alu_oprand_3_w));
