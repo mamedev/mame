@@ -7,7 +7,6 @@
     added Victorious Nine by BUT
 
     TODO:
-    - hook up m68705 dump for Victorious Nine
     - TA7630 emulation needs filter support (bass sounds from MSM5232 should be about 2 times louder)
 
 ***************************************************************************/
@@ -31,6 +30,23 @@ READ8_MEMBER(flstory_state::snd_flag_r)
 WRITE8_MEMBER(flstory_state::snd_reset_w)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 1 ) ? ASSERT_LINE : CLEAR_LINE);
+}
+
+READ8_MEMBER(flstory_state::flstory_mcu_status_r)
+{
+	// bit 0 = when 1, MCU is ready to receive data from main CPU
+	// bit 1 = when 1, MCU has sent data to the main CPU
+	return
+		((CLEAR_LINE == m_bmcu->host_semaphore_r()) ? 0x01 : 0x00) |
+		((CLEAR_LINE != m_bmcu->mcu_semaphore_r()) ? 0x02 : 0x00);
+}
+
+
+READ8_MEMBER(flstory_state::victnine_mcu_status_r)
+{
+	uint8_t ret = flstory_mcu_status_r(space, offset) & 0x03;
+	ret |= m_extraio1->read() & 0xfc;
+	return ret;
 }
 
 void flstory_state::base_map(address_map &map)
@@ -93,19 +109,12 @@ void flstory_state::onna34ro_mcu_map(address_map &map)
 	map(0xd805, 0xd805).r(FUNC(flstory_state::flstory_mcu_status_r));
 }
 
-CUSTOM_INPUT_MEMBER(flstory_state::victnine_mcu_status_bit01_r)
-{
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-
-	return (victnine_mcu_status_r(space, 0) & 3);
-}
-
 void flstory_state::victnine_map(address_map &map)
 {
 	base_map(map);
-	map(0xd000, 0xd000).rw(FUNC(flstory_state::victnine_mcu_r), FUNC(flstory_state::victnine_mcu_w));
+	map(0xd000, 0xd000).rw(m_bmcu, FUNC(taito68705_mcu_device::data_r), FUNC(taito68705_mcu_device::data_w));
 
-	map(0xd805, 0xd805).portr("EXTRA_P1");   /* also mcu */
+	map(0xd805, 0xd805).r(FUNC(flstory_state::victnine_mcu_status_r));
 	map(0xd807, 0xd807).portr("EXTRA_P2");
 //  map(0xda00, 0xda00).writeonly();
 	map(0xdce0, 0xdce0).rw(FUNC(flstory_state::victnine_gfxctrl_r), FUNC(flstory_state::victnine_gfxctrl_w));
@@ -507,7 +516,6 @@ static INPUT_PORTS_START( victnine )
 	/* bits 0,1 are MCU related:
 	    - bit 0: mcu is ready to receive data from main cpu
 	    - bit 1: mcu has sent data to the main cpu       */
-	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(flstory_state, victnine_mcu_status_bit01_r)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 )
@@ -830,6 +838,8 @@ void flstory_state::victnine(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_clock(XTAL(8'000'000)/2);      /* 4 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &flstory_state::victnine_map);
+
+	TAITO68705_MCU(config, m_bmcu, XTAL(18'432'000)/6);
 
 	MCFG_MACHINE_RESET_OVERRIDE(flstory_state,flstory)
 
@@ -1154,5 +1164,5 @@ GAME( 1985, flstory,   0,        flstory,      flstory,  flstory_state, empty_in
 GAME( 1985, flstoryj,  flstory,  flstory,      flstory,  flstory_state, empty_init, ROT180, "Taito", "The FairyLand Story (Japan)",            MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1985, onna34ro,  0,        onna34ro_mcu, onna34ro, flstory_state, empty_init, ROT0,   "Taito", "Onna Sanshirou - Typhoon Gal",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1985, onna34roa, onna34ro, onna34ro,     onna34ro, flstory_state, empty_init, ROT0,   "Taito", "Onna Sanshirou - Typhoon Gal (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, victnine,  0,        victnine,     victnine, flstory_state, empty_init, ROT0,   "Taito", "Victorious Nine",                        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // MCU still simulated
+GAME( 1984, victnine,  0,        victnine,     victnine, flstory_state, empty_init, ROT0,   "Taito", "Victorious Nine",                        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, rumba,     0,        rumba,        rumba,    flstory_state, empty_init, ROT270, "Taito", "Rumba Lumber",                           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
