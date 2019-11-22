@@ -2988,7 +2988,7 @@ ROM_START( gnw_dkcirc )
 	ROM_LOAD( "mk-96.program", 0x0000, 0x1000, CRC(39dd864a) SHA1(25c67dac7320fe00990989cd42438461950a68ec) )
 
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
-	ROM_LOAD( "mk-96.melody", 0x000, 0x100, BAD_DUMP CRC(2908380f) SHA1(8361bbe4df28b17e791035d077e892f29149c777) ) // decap needed for verification
+	ROM_LOAD( "mk-96.melody", 0x000, 0x100, BAD_DUMP CRC(6ccde8e3) SHA1(4e704a1d61126465b14e3889b4a0179c5568b90b) ) // decap needed for verification
 
 	ROM_REGION( 367718, "screen", 0)
 	ROM_LOAD( "gnw_dkcirc.svg", 0, 367718, CRC(f8571437) SHA1(bc000267deab83dfd460aea5c4102a23ac51f169) )
