@@ -150,7 +150,7 @@ private:
 				kCFStringEncodingUTF8);
 		std::unique_ptr<char []> result = std::make_unique<char []>(len + 1);
 		if (!CFStringGetCString(str, result.get(), len + 1, kCFStringEncodingUTF8))
-			result.reset()
+			result.reset();
 		return result;
 	}
 

@@ -61,7 +61,7 @@
 //#include "bus/isa/isa.h"
 //#include "bus/isa/isa_cards.h"
 #include "bus/isa/ega.h"
-#include "bus/isa/mda.h"
+#include "bus/isa/eis_hgb107x.h"
 #include "bus/isa/eis_twib.h"
 #include "machine/pc_lpt.h"
 

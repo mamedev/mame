@@ -5,18 +5,21 @@
     ui/floppycntrl.h
 
 ***************************************************************************/
-
-#pragma once
-
 #ifndef MAME_FRONTEND_UI_FLOPPYCNTRL_H
 #define MAME_FRONTEND_UI_FLOPPYCNTRL_H
+
+#pragma once
 
 #include "ui/imgcntrl.h"
 
 #include "imagedev/floppy.h"
 #include "formats/flopimg.h"
 
+#include <memory>
+
+
 namespace ui {
+
 class menu_control_floppy_image : public menu_control_device_image
 {
 public:
@@ -26,7 +29,8 @@ public:
 private:
 	enum { SELECT_FORMAT = LAST_ID, SELECT_MEDIA, SELECT_RW };
 
-	floppy_image_format_t **format_array;
+	floppy_image_device &fd;
+	std::unique_ptr<floppy_image_format_t * []> format_array;
 	floppy_image_format_t *input_format, *output_format;
 	std::string input_filename, output_filename;
 
