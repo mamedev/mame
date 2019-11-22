@@ -22,6 +22,7 @@
 #include "uiinput.h"
 
 #include <algorithm>
+#include <iterator>
 #include <utility>
 
 
@@ -43,22 +44,27 @@ menu_custom_ui::menu_custom_ui(mame_ui_manager &mui, render_container &container
 {
 	// load languages
 	file_enumerator path(mui.machine().options().language_path());
-	auto lang = mui.machine().options().language();
+	const char *const lang = mui.machine().options().language();
 	const osd::directory::entry *dirent;
-	std::size_t cnt = 0;
+	std::string name;
 	while ((dirent = path.next()))
 	{
 		if (dirent->type == osd::directory::entry::entry_type::DIR && strcmp(dirent->name, ".") != 0 && strcmp(dirent->name, "..") != 0)
 		{
-			auto name = std::string(dirent->name);
+			name = dirent->name;
 			auto i = strreplace(name, "_", " (");
-			if (i > 0) name = name.append(")");
-			m_lang.push_back(name);
-			if (strcmp(name.c_str(), lang) == 0)
-				m_currlang = cnt;
-			++cnt;
+			if (i > 0)
+				name.append(")");
+			m_lang.emplace_back(std::move(name));
 		}
 	}
+	std::sort(
+			m_lang.begin(),
+			m_lang.end(),
+			[] (const std::string &x, const std::string &y) { return 0 > core_stricmp(x.c_str(), y.c_str()); });
+	const auto found = std::lower_bound(m_lang.begin(), m_lang.end(), lang, [] (std::string const &x, const char *y) { return 0 > core_stricmp(x.c_str(), y); });
+	if ((m_lang.end() != found) && !core_stricmp(found->c_str(), lang))
+		m_currlang = std::distance(m_lang.begin(), found);
 }
 
 //-------------------------------------------------
@@ -527,10 +533,11 @@ void menu_colors_ui::custom_render(void *selectedref, float top, float bottom, f
 	// compute maxwidth
 	char const *const topbuf = _("Menu Preview");
 
+	const float lr_border = ui().box_lr_border() * machine().render().ui_aspect(&container());
 	float width;
 	ui().draw_text_full(container(), topbuf, 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::NEVER,
 									mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), &width, nullptr);
-	float maxwidth = width + 2.0f * ui().box_lr_border();
+	float maxwidth = width + 2.0f * lr_border;
 
 	std::string sampletxt[5];
 
@@ -544,12 +551,12 @@ void menu_colors_ui::custom_render(void *selectedref, float top, float bottom, f
 	{
 		ui().draw_text_full(container(), elem.c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::NEVER,
 										mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), &width, nullptr);
-		width += 2 * ui().box_lr_border();
+		width += 2 * lr_border;
 		maxwidth = std::max(maxwidth, width);
 	}
 
 	// compute our bounds for header
-	float x1 = origx2 + 2.0f * ui().box_lr_border();
+	float x1 = origx2 + 2.0f * lr_border;
 	float x2 = x1 + maxwidth;
 	float y1 = origy1;
 	float y2 = y1 + bottom - ui().box_tb_border();
@@ -558,8 +565,8 @@ void menu_colors_ui::custom_render(void *selectedref, float top, float bottom, f
 	ui().draw_outlined_box(container(), x1, y1, x2, y2, UI_GREEN_COLOR);
 
 	// take off the borders
-	x1 += ui().box_lr_border();
-	x2 -= ui().box_lr_border();
+	x1 += lr_border;
+	x2 -= lr_border;
 	y1 += ui().box_tb_border();
 	y2 -= ui().box_tb_border();
 
@@ -569,8 +576,8 @@ void menu_colors_ui::custom_render(void *selectedref, float top, float bottom, f
 
 	// compute our bounds for menu preview
 	float line_height = ui().get_line_height();
-	x1 -= ui().box_lr_border();
-	x2 += ui().box_lr_border();
+	x1 -= lr_border;
+	x2 += lr_border;
 	y1 = y2 + 2.0f * ui().box_tb_border();
 	y2 = y1 + 5.0f * line_height + 2.0f * ui().box_tb_border();
 
@@ -578,8 +585,8 @@ void menu_colors_ui::custom_render(void *selectedref, float top, float bottom, f
 	ui().draw_outlined_box(container(), x1, y1, x2, y2, m_color_table[MUI_BACKGROUND_COLOR].color);
 
 	// take off the borders
-	x1 += ui().box_lr_border();
-	x2 -= ui().box_lr_border();
+	x1 += lr_border;
+	x2 -= lr_border;
 	y1 += ui().box_tb_border();
 
 	// draw normal text
@@ -819,7 +826,8 @@ void menu_rgb_ui::custom_render(void *selectedref, float top, float bottom, floa
 	// top text
 	ui().draw_text_full(container(), m_title.c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::NEVER,
 						mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), &width);
-	width += 2 * ui().box_lr_border();
+	const float lr_border = ui().box_lr_border() * machine().render().ui_aspect(&container());
+	width += 2 * lr_border;
 	maxwidth = std::max(maxwidth, width);
 
 	// compute our bounds
@@ -832,8 +840,8 @@ void menu_rgb_ui::custom_render(void *selectedref, float top, float bottom, floa
 	ui().draw_outlined_box(container(), x1, y1, x2, y2, UI_GREEN_COLOR);
 
 	// take off the borders
-	x1 += ui().box_lr_border();
-	x2 -= ui().box_lr_border();
+	x1 += lr_border;
+	x2 -= lr_border;
 	y1 += ui().box_tb_border();
 
 	// draw the text within it
@@ -843,7 +851,7 @@ void menu_rgb_ui::custom_render(void *selectedref, float top, float bottom, floa
 	std::string sampletxt(_("Color preview ="));
 	ui().draw_text_full(container(), sampletxt.c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::NEVER,
 						mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), &width);
-	width += 2 * ui().box_lr_border();
+	width += 2 * lr_border;
 	maxwidth = std::max(origx2 - origx1, width);
 
 	// compute our bounds
@@ -856,14 +864,14 @@ void menu_rgb_ui::custom_render(void *selectedref, float top, float bottom, floa
 	ui().draw_outlined_box(container(), x1, y1, x1 + width, y2, UI_RED_COLOR);
 
 	// take off the borders
-	x1 += ui().box_lr_border();
+	x1 += lr_border;
 	y1 += ui().box_tb_border();
 
 	// draw the normal text
-	ui().draw_text_full(container(), sampletxt.c_str(), x1, y1, width - ui().box_lr_border(), ui::text_layout::CENTER, ui::text_layout::NEVER,
+	ui().draw_text_full(container(), sampletxt.c_str(), x1, y1, width - lr_border, ui::text_layout::CENTER, ui::text_layout::NEVER,
 						mame_ui_manager::NORMAL, rgb_t::white(), rgb_t::black());
 
-	x1 += width + ui().box_lr_border();
+	x1 += width + lr_border;
 	y1 -= ui().box_tb_border();
 
 	// draw color box
