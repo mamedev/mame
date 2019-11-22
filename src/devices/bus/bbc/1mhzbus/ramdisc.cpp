@@ -31,6 +31,10 @@ static INPUT_PORTS_START(ramdisc)
 	PORT_CONFNAME(0x01, 0x01, "Power") PORT_CHANGED_MEMBER(DEVICE_SELF, bbc_ramdisc_device, power_changed, 0)
 	PORT_CONFSETTING(0x00, DEF_STR(Off))
 	PORT_CONFSETTING(0x01, DEF_STR(On))
+	PORT_START("SIZE")
+	PORT_CONFNAME(0x03, 0x02, "RAM Disk Capacity")
+	PORT_CONFSETTING(0x01, "1MB")
+	PORT_CONFSETTING(0x02, "2MB")
 INPUT_PORTS_END
 
 //-------------------------------------------------
@@ -87,6 +91,7 @@ bbc_ramdisc_device::bbc_ramdisc_device(const machine_config &mconfig, const char
 	, device_bbc_1mhzbus_interface(mconfig, *this)
 	, m_1mhzbus(*this, "1mhzbus")
 	, m_nvram(*this, "nvram")
+	, m_ram_size(*this, "SIZE")
 	, m_power(*this, "POWER")
 	, m_sector(0)
 {
@@ -99,11 +104,11 @@ bbc_ramdisc_device::bbc_ramdisc_device(const machine_config &mconfig, const char
 void bbc_ramdisc_device::device_start()
 {
 	/* define 2mb ram */
-	m_ram = std::make_unique<uint8_t[]>(RAM_SIZE);
-	m_nvram->set_base(m_ram.get(), RAM_SIZE);
+	m_ram = std::make_unique<uint8_t[]>(0x200000);
+	m_nvram->set_base(m_ram.get(), 0x200000);
 
 	/* register for save states */
-	save_pointer(NAME(m_ram), RAM_SIZE);
+	save_pointer(NAME(m_ram), 0x200000);
 	save_item(NAME(m_sector));
 }
 
@@ -117,7 +122,7 @@ INPUT_CHANGED_MEMBER(bbc_ramdisc_device::power_changed)
 	/* clear RAM on power off */
 	if (!newval)
 	{
-		memset(m_ram.get(), 0xff, RAM_SIZE);
+		memset(m_ram.get(), 0xff, 0x200000);
 	}
 }
 
@@ -181,7 +186,7 @@ uint8_t bbc_ramdisc_device::jim_r(offs_t offset)
 	uint8_t data = 0xff;
 
 	/* power on and sector < 2mb */
-	if (m_power->read() && m_sector < RAM_SIZE)
+	if (m_power->read() && m_sector < (m_ram_size->read() << 8))
 	{
 		data &= m_ram[(m_sector << 8) | offset];
 	}
@@ -194,7 +199,7 @@ uint8_t bbc_ramdisc_device::jim_r(offs_t offset)
 void bbc_ramdisc_device::jim_w(offs_t offset, uint8_t data)
 {
 	/* power on and sector < 2mb */
-	if (m_power->read() && m_sector < RAM_SIZE)
+	if (m_power->read() && m_sector < (m_ram_size->read() << 8))
 	{
 		m_ram[(m_sector << 8) | offset] = data;
 	}
