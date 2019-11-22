@@ -90,7 +90,7 @@ PG-92*    p    SM511?  Popeye          "
 CJ-93     p    SM511   Donkey Kong Jr. "
 TB-94     p    SM511   Mario's Bombs Away
 DC-95     p    SM511   Mickey Mouse
-MK-96     p    SM511   Donkey Kong Circus (same ROM as DC-95)
+MK-96     p    SM511   Donkey Kong Circus (same ROM as DC-95, LCD is different)
 DJ-101    nws  SM510   Donkey Kong Jr.
 ML-102    nws  SM510   Mario's Cement Factory
 NH-103    nws  SM510   Manhole
@@ -2930,7 +2930,7 @@ ROM_END
 
 /***************************************************************************
 
-  Nintendo Game & Watch: Mickey Mouse (model MC-95),
+  Nintendo Game & Watch: Mickey Mouse (model DC-95),
   Nintendo Game & Watch: Donkey Kong Circus (model MK-96)
   * PCB labels: DC-95M (main board), DC-95C (controller board)
   * Sharp SM511
@@ -2941,7 +2941,7 @@ ROM_END
   This is the panorama version of Mickey Mouse. There's also a wide screen
   version which is a different game.
 
-  MC-95 and MK-96 are the same game, it's assumed that the latter was for
+  DC-95 and MK-96 are the same game, it's assumed that the latter was for
   regions where Nintendo wasn't able to license from Disney.
 
 ***************************************************************************/
@@ -3000,10 +3000,10 @@ void gnw_mmousep_state::gnw_dkcirc(machine_config &config)
 
 ROM_START( gnw_mmousep )
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "mc-95.program", 0x0000, 0x1000, CRC(39dd864a) SHA1(25c67dac7320fe00990989cd42438461950a68ec) )
+	ROM_LOAD( "dc-95.program", 0x0000, 0x1000, CRC(39dd864a) SHA1(25c67dac7320fe00990989cd42438461950a68ec) )
 
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
-	ROM_LOAD( "mc-95.melody", 0x000, 0x100, BAD_DUMP CRC(6ccde8e3) SHA1(4e704a1d61126465b14e3889b4a0179c5568b90b) ) // decap needed for verification
+	ROM_LOAD( "dc-95.melody", 0x000, 0x100, BAD_DUMP CRC(6ccde8e3) SHA1(4e704a1d61126465b14e3889b4a0179c5568b90b) ) // decap needed for verification
 
 	ROM_REGION( 275609, "screen", 0)
 	ROM_LOAD( "gnw_mmousep.svg", 0, 275609, CRC(bac13689) SHA1(3ddcb4416bc5b8615b2854434ef78acac204a583) )
