@@ -566,14 +566,18 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 
-	bitmap_ind8 m_priority_bitmap;
+	bitmap_ind8 m_pal2_priority_bitmap;
+	bitmap_ind8 m_pal1_priority_bitmap;
+	bitmap_ind8 m_pal2_pix_bitmap;
+	bitmap_ind8 m_pal1_pix_bitmap;
+
 	void setup_video_pages(int which, int tilesize, int vs, int hs, int y8, int x8, uint16_t* pagebases);
 	int get_address_for_tilepos(int x, int y, int tilesize, uint16_t* pagebases);
 
-	void draw_tile_pixline(int segment, int tile, int yy, int x, int y, int palbase, int pal, int is16pix_high, int is16pix_wide, int bpp, int depth, int opaque, int flipx, int flipy, screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
-	void draw_tile(int segment, int tile, int x, int y, int palbase, int pal, int is16pix_high, int is16pix_wide, int bpp, int depth, int opaque, int flipx, int flipy, screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
-	void draw_layer(int which, int opaque, screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
-	void draw_sprites(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
+	void draw_tile_pixline(int segment, int tile, int yy, int x, int y, int palselect, int palbase, int pal, int is16pix_high, int is16pix_wide, int bpp, int depth, int opaque, int flipx, int flipy, const rectangle& cliprect);
+	void draw_tile(int segment, int tile, int x, int y, int palselect, int palbase, int pal, int is16pix_high, int is16pix_wide, int bpp, int depth, int opaque, int flipx, int flipy, const rectangle& cliprect);
+	void draw_layer(int which, int opaque, const rectangle& cliprect);
+	void draw_sprites(const rectangle& cliprect);
 };
 
 
@@ -631,8 +635,15 @@ private:
 
 void vt_vt1682_state::video_start()
 {
-	m_screen->register_screen_bitmap(m_priority_bitmap);
-	m_priority_bitmap.fill(0xff);
+	m_screen->register_screen_bitmap(m_pal2_priority_bitmap);
+	m_screen->register_screen_bitmap(m_pal1_priority_bitmap);
+	m_screen->register_screen_bitmap(m_pal2_pix_bitmap);
+	m_screen->register_screen_bitmap(m_pal1_pix_bitmap);
+
+	m_pal2_priority_bitmap.fill(0xff);
+	m_pal1_priority_bitmap.fill(0xff);
+	m_pal2_pix_bitmap.fill(0xff);
+	m_pal1_pix_bitmap.fill(0xff);
 }
 
 
@@ -4096,7 +4107,7 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_soundcpu_211c_reg_irqctrl_w)
     0x01 - IOB PLH
 */
 
-void vt_vt1682_state::draw_tile_pixline(int segment, int tile, int tileline, int x, int y, int palbase, int pal, int is16pix_high, int is16pix_wide, int bpp, int depth, int opaque, int flipx, int flipy, screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
+void vt_vt1682_state::draw_tile_pixline(int segment, int tile, int tileline, int x, int y, int palselect, int palbase, int pal, int is16pix_high, int is16pix_wide, int bpp, int depth, int opaque, int flipx, int flipy, const rectangle& cliprect)
 {
 	int tilesize_high = is16pix_high ? 16 : 8;
 
@@ -4155,9 +4166,12 @@ void vt_vt1682_state::draw_tile_pixline(int segment, int tile, int tileline, int
 		else
 			currentaddress = startaddress + ((tilesize_high - 1) - tileline) * linebytes;
 
+		uint8_t* pri2ptr = &m_pal2_priority_bitmap.pix8(y);
+		uint8_t* pri1ptr = &m_pal1_priority_bitmap.pix8(y);
 
-		uint32_t* dstptr = &bitmap.pix32(y);
-		uint8_t* priptr = &m_priority_bitmap.pix8(y);
+		uint8_t* pix2ptr = &m_pal2_pix_bitmap.pix8(y);
+		uint8_t* pix1ptr = &m_pal1_pix_bitmap.pix8(y);
+
 
 		int shift_amount, mask, bytes_in;
 		if (bpp == 3) // (8bpp)
@@ -4207,12 +4221,23 @@ void vt_vt1682_state::draw_tile_pixline(int segment, int tile, int tileline, int
 
 					if (xdraw_real >= cliprect.min_x && xdraw_real <= cliprect.max_x)
 					{
-						if (depth < priptr[xdraw_real])
+						if (palselect & 1)
 						{
-							const pen_t* paldata = m_palette->pens();
-							dstptr[xdraw_real] = paldata[(palbase + pen) | (pal << 4)];
-							priptr[xdraw_real] = depth;
+							if (depth < pri1ptr[xdraw_real])
+							{
+								pix1ptr[xdraw_real] = pen | (pal << 4);
+								pri1ptr[xdraw_real] = depth;
+							}
 						}
+						if (palselect & 2)
+						{
+							if (depth < pri2ptr[xdraw_real])
+							{
+								pix2ptr[xdraw_real] = pen | (pal << 4);
+								pri2ptr[xdraw_real] = depth;
+							}
+						}
+
 					}
 				}
 				shift += shift_amount;
@@ -4220,13 +4245,13 @@ void vt_vt1682_state::draw_tile_pixline(int segment, int tile, int tileline, int
 		}
 	}
 }
-void vt_vt1682_state::draw_tile(int segment, int tile, int x, int y, int palbase, int pal, int is16pix_high, int is16pix_wide, int bpp, int depth, int opaque, int flipx, int flipy, screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
+void vt_vt1682_state::draw_tile(int segment, int tile, int x, int y, int palselect, int palbase, int pal, int is16pix_high, int is16pix_wide, int bpp, int depth, int opaque, int flipx, int flipy, const rectangle& cliprect)
 {
 	int tilesize_high = is16pix_high ? 16 : 8;
 
 	for (int yy = 0; yy < tilesize_high; yy++) // tile y lines
 	{
-		draw_tile_pixline(segment, tile, yy, x, y+yy, palbase, pal, is16pix_high, is16pix_wide, bpp, depth, opaque, flipx, flipy, screen, bitmap, cliprect);
+		draw_tile_pixline(segment, tile, yy, x, y+yy, palselect, palbase, pal, is16pix_high, is16pix_wide, bpp, depth, opaque, flipx, flipy, cliprect);
 	}
 }
 
@@ -4645,7 +4670,7 @@ int vt_vt1682_state::get_address_for_tilepos(int x, int y, int tilesize, uint16_
     =================================================================================================================================
 */
 
-void vt_vt1682_state::draw_layer(int which, int opaque, screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
+void vt_vt1682_state::draw_layer(int which, int opaque, const rectangle& cliprect)
 {
 	int bk_tilesize = (m_main_control_bk[which] & 0x01);
 	int bk_line = (m_main_control_bk[which] & 0x02) >> 1;
@@ -4792,7 +4817,7 @@ void vt_vt1682_state::draw_layer(int which, int opaque, screen_device& screen, b
 						realdepth = bk_depth;
 					}
 
-					draw_tile_pixline(segment, tile, ytileline, xpos + xscrolltile_part, y, palbase, realpal, bk_tilesize, bk_tilesize, bk_tilebpp, (realdepth * 2) + 1, opaque, 0, 0, screen, bitmap, cliprect);
+					draw_tile_pixline(segment, tile, ytileline, xpos + xscrolltile_part, y, palselect, palbase, realpal, bk_tilesize, bk_tilesize, bk_tilebpp, (realdepth * 2) + 1, opaque, 0, 0, cliprect);
 				}
 			}
 		}
@@ -4808,10 +4833,10 @@ void vt_vt1682_state::draw_layer(int which, int opaque, screen_device& screen, b
 	}
 }
 
-void vt_vt1682_state::draw_sprites(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
+void vt_vt1682_state::draw_sprites(const rectangle& cliprect)
 {
 	int sp_en = (m_2018_spregs & 0x04) >> 2;
-	//int sp_pal_sel = (m_2018_spregs & 0x08) >> 3;
+	int sp_pal_sel = (m_2018_spregs & 0x08) >> 3;
 	int sp_size = (m_2018_spregs & 0x03);
 
 	int segment = m_201a_sp_segment_7_0;
@@ -4861,7 +4886,21 @@ void vt_vt1682_state::draw_sprites(screen_device& screen, bitmap_rgb32& bitmap, 
 			//if ((!sp_size & 0x01))
 			//	x -= 1;
 
-			draw_tile(segment, tilenum, x, y, palbase, pal, sp_size & 0x2, sp_size&0x1, 0, depth * 2, 0, flipx, flipy, screen, bitmap, cliprect);
+			int palselect = 0;
+			if (sp_pal_sel)
+			{
+				// sprites are rendered to both buffers
+				palselect = 3;
+			}
+			else
+			{
+				if (attr2 & 0x02)
+					palselect = 2;
+				else
+					palselect = 1;
+			}
+
+			draw_tile(segment, tilenum, x, y, palselect, palbase, pal, sp_size & 0x2, sp_size&0x1, 0, depth * 2, 0, flipx, flipy, cliprect);
 		}
 	}
 	// if more than 16 sprites on any line 0x2001 bit 0x40 (SP_ERR) should be set (updated every line, can only be read in HBLANK)
@@ -4869,14 +4908,49 @@ void vt_vt1682_state::draw_sprites(screen_device& screen, bitmap_rgb32& bitmap, 
 
 uint32_t vt_vt1682_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
 {
-	m_priority_bitmap.fill(0xff, cliprect);
+	m_pal2_priority_bitmap.fill(0xff, cliprect);
+	m_pal1_priority_bitmap.fill(0xff, cliprect);
+	m_pal2_pix_bitmap.fill(0xff, cliprect);
+	m_pal1_pix_bitmap.fill(0xff, cliprect);
+
 	bitmap.fill(0, cliprect);
 
-	draw_layer(0, 0, screen, bitmap, cliprect);
+	draw_layer(0, 0, cliprect);
 
-	draw_layer(1, 0, screen, bitmap, cliprect);
+	draw_layer(1, 0, cliprect);
 
-	draw_sprites(screen, bitmap, cliprect);
+	draw_sprites(cliprect);
+
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		const pen_t* paldata = m_palette->pens();
+		uint8_t* pri2ptr = &m_pal2_priority_bitmap.pix8(y);
+		uint8_t* pri1ptr = &m_pal1_priority_bitmap.pix8(y);
+		uint8_t* pix2ptr = &m_pal2_pix_bitmap.pix8(y);
+		uint8_t* pix1ptr = &m_pal1_pix_bitmap.pix8(y);
+		uint32_t* dstptr = &bitmap.pix32(y);
+
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		{
+			uint8_t pix1 = pix1ptr[x];
+			uint8_t pix2 = pix2ptr[x];
+			uint8_t pri1 = pri1ptr[x];
+			uint8_t pri2 = pri2ptr[x];
+			// TODO: bit 0x8000 in palette can cause the layer to 'dig through'
+			// palette layers can also be turned off, or just sent to lcd / just sent to tv
+			// layers can also blend 50/50 rather than using depth
+			if (pri1 <= pri2)
+			{
+				if (pix1) dstptr[x] = paldata[pix1 | 0x100];
+				else dstptr[x] = paldata[pix2];
+			}
+			else
+			{
+				if (pix2) dstptr[x] = paldata[pix2];
+				else dstptr[x] = paldata[pix1 | 0x100];
+			}
+		}
+	}
 
 	return 0;
 }
