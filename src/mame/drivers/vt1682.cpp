@@ -4882,8 +4882,8 @@ uint32_t vt_vt1682_state::screen_update(screen_device& screen, bitmap_rgb32& bit
 {
 	m_pal2_priority_bitmap.fill(0xff, cliprect);
 	m_pal1_priority_bitmap.fill(0xff, cliprect);
-	m_pal2_pix_bitmap.fill(0xff, cliprect);
-	m_pal1_pix_bitmap.fill(0xff, cliprect);
+	m_pal2_pix_bitmap.fill(0x00, cliprect);
+	m_pal1_pix_bitmap.fill(0x00, cliprect);
 
 	bitmap.fill(0, cliprect);
 
@@ -4914,12 +4914,12 @@ uint32_t vt_vt1682_state::screen_update(screen_device& screen, bitmap_rgb32& bit
 			if (pri1 <= pri2)
 			{
 				if (pix1) dstptr[x] = paldata[pix1 | 0x100];
-				else dstptr[x] = paldata[pix2];
+				else if (pix2) dstptr[x] = paldata[pix2];
 			}
 			else
 			{
 				if (pix2) dstptr[x] = paldata[pix2];
-				else dstptr[x] = paldata[pix1 | 0x100];
+				else if (pix1) dstptr[x] = paldata[pix1 | 0x100];
 			}
 		}
 	}
