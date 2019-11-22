@@ -5458,8 +5458,8 @@ ROM_START( ii32in1 )
 ROM_END
 
 // TODO: this is a cartridge based system (actually, verify this, it seems some versions simply had built in games) move these to SL if verified as from cartridge config
-CONS( 200?, ii8in1,    0,  0,  intech_interact,    intec, intec_interact_state, empty_init,  "Intec", "InterAct 8-in-1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-CONS( 200?, ii32in1,   0,  0,  intech_interact,    intec, intec_interact_state, empty_init,  "Intec", "InterAct 32-in-1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 200?, ii8in1,    0,  0,  intech_interact,    intec, intec_interact_state, empty_init,  "Intec", "InterAct 8-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, ii32in1,   0,  0,  intech_interact,    intec, intec_interact_state, empty_init,  "Intec", "InterAct 32-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 // a 40-in-1 also exists which combines the above
 
 // Intec Interact Infrazone 15 Shooting Games, 42 Mi kara, 96 Arcade Games + more should run here too
