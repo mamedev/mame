@@ -20,7 +20,7 @@
 	Line Modes, High Colour Line Mode
 	Tile rowscroll modes
 	0x8000 bit in palette is 'cut through' mode, which isn't the same as transpen, some kind of palette manipulation
-	It seems Pal1 and Pal2 should actually be separate render buffers for each palette, on which layers / sprites can be enabled, that are mixed later and can be output independently to LCD and TV?
+	**DONE** It seems Pal1 and Pal2 should actually be separate render buffers for each palette, on which layers / sprites can be enabled, that are mixed later and can be output independently to LCD and TV? 
 		(how does this work with high colour line mode?)
 	CCIR effects (only apply to 'palette 2'?)
 	LCD Control registers
@@ -33,6 +33,7 @@
 	Interrupt controller / proper interrupt support (currently a bit hacky, only main timer and sub-timer a supported)
 	Proper IO support (enables / disables) UART, I2C etc.
 	'Capture' mode
+	Gain (zoom) for Tilemaps
 
 	Refactor into a device
 
@@ -574,8 +575,8 @@ private:
 	void setup_video_pages(int which, int tilesize, int vs, int hs, int y8, int x8, uint16_t* pagebases);
 	int get_address_for_tilepos(int x, int y, int tilesize, uint16_t* pagebases);
 
-	void draw_tile_pixline(int segment, int tile, int yy, int x, int y, int palselect, int palbase, int pal, int is16pix_high, int is16pix_wide, int bpp, int depth, int opaque, int flipx, int flipy, const rectangle& cliprect);
-	void draw_tile(int segment, int tile, int x, int y, int palselect, int palbase, int pal, int is16pix_high, int is16pix_wide, int bpp, int depth, int opaque, int flipx, int flipy, const rectangle& cliprect);
+	void draw_tile_pixline(int segment, int tile, int yy, int x, int y, int palselect, int pal, int is16pix_high, int is16pix_wide, int bpp, int depth, int opaque, int flipx, int flipy, const rectangle& cliprect);
+	void draw_tile(int segment, int tile, int x, int y, int palselect, int pal, int is16pix_high, int is16pix_wide, int bpp, int depth, int opaque, int flipx, int flipy, const rectangle& cliprect);
 	void draw_layer(int which, int opaque, const rectangle& cliprect);
 	void draw_sprites(const rectangle& cliprect);
 };
@@ -4107,7 +4108,7 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_soundcpu_211c_reg_irqctrl_w)
     0x01 - IOB PLH
 */
 
-void vt_vt1682_state::draw_tile_pixline(int segment, int tile, int tileline, int x, int y, int palselect, int palbase, int pal, int is16pix_high, int is16pix_wide, int bpp, int depth, int opaque, int flipx, int flipy, const rectangle& cliprect)
+void vt_vt1682_state::draw_tile_pixline(int segment, int tile, int tileline, int x, int y, int palselect, int pal, int is16pix_high, int is16pix_wide, int bpp, int depth, int opaque, int flipx, int flipy, const rectangle& cliprect)
 {
 	int tilesize_high = is16pix_high ? 16 : 8;
 
@@ -4245,13 +4246,13 @@ void vt_vt1682_state::draw_tile_pixline(int segment, int tile, int tileline, int
 		}
 	}
 }
-void vt_vt1682_state::draw_tile(int segment, int tile, int x, int y, int palselect, int palbase, int pal, int is16pix_high, int is16pix_wide, int bpp, int depth, int opaque, int flipx, int flipy, const rectangle& cliprect)
+void vt_vt1682_state::draw_tile(int segment, int tile, int x, int y, int palselect, int pal, int is16pix_high, int is16pix_wide, int bpp, int depth, int opaque, int flipx, int flipy, const rectangle& cliprect)
 {
 	int tilesize_high = is16pix_high ? 16 : 8;
 
 	for (int yy = 0; yy < tilesize_high; yy++) // tile y lines
 	{
-		draw_tile_pixline(segment, tile, yy, x, y+yy, palselect, palbase, pal, is16pix_high, is16pix_wide, bpp, depth, opaque, flipx, flipy, cliprect);
+		draw_tile_pixline(segment, tile, yy, x, y+yy, palselect, pal, is16pix_high, is16pix_wide, bpp, depth, opaque, flipx, flipy, cliprect);
 	}
 }
 
@@ -4726,29 +4727,6 @@ void vt_vt1682_state::draw_layer(int which, int opaque, const rectangle& cliprec
 			// Character Mode
 			LOGMASKED(LOG_OTHER, "DRAWING ----- bk, Character Mode Segment base %08x, TileSize %1x Bpp %1x, Depth %1x PalDepthMode:%1x PalSelect:%1 PageLayout_V:%1x PageLayout_H:%1x XScroll %04x YScroll %04x\n", segment, bk_tilesize, bk_tilebpp, bk_depth, bk_paldepth_mode, palselect, page_layout_v, page_layout_h, xscroll, yscroll);
 
-
-			int palbase;
-
-			if (palselect == 0)
-			{
-				// 'disable' ?
-				return;
-			}
-			else if (palselect == 1)
-			{
-				palbase = 0x100;
-			}
-			else if (palselect == 2)
-			{
-				palbase = 0x000;
-			}
-			else
-			{
-				// 'both' ? (how?)
-				// this only really makes sense if pal1 and pal2 are separate render buffers (which based on the blending stuff, is logical, but then you have the 'high colour' bitmap mode which bypasses palette entirely?)
-				palbase = machine().rand() & 0xff;
-			}
-
 			for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 			{
 				int ytile, ytileline;
@@ -4817,7 +4795,7 @@ void vt_vt1682_state::draw_layer(int which, int opaque, const rectangle& cliprec
 						realdepth = bk_depth;
 					}
 
-					draw_tile_pixline(segment, tile, ytileline, xpos + xscrolltile_part, y, palselect, palbase, realpal, bk_tilesize, bk_tilesize, bk_tilebpp, (realdepth * 2) + 1, opaque, 0, 0, cliprect);
+					draw_tile_pixline(segment, tile, ytileline, xpos + xscrolltile_part, y, palselect, realpal, bk_tilesize, bk_tilesize, bk_tilebpp, (realdepth * 2) + 1, opaque, 0, 0, cliprect);
 				}
 			}
 		}
@@ -4869,12 +4847,6 @@ void vt_vt1682_state::draw_sprites(const rectangle& cliprect)
 
 			int depth = (attr1 & 0x18) >> 3;
 
-			// sp_pal_sel also influences this
-			int palbase;
-			if (attr2 & 0x02)
-				palbase = 0x000;
-			else
-				palbase = 0x100;
 
 			if (attr2 & 0x01)
 				y -= 256;
@@ -4900,7 +4872,7 @@ void vt_vt1682_state::draw_sprites(const rectangle& cliprect)
 					palselect = 1;
 			}
 
-			draw_tile(segment, tilenum, x, y, palselect, palbase, pal, sp_size & 0x2, sp_size&0x1, 0, depth * 2, 0, flipx, flipy, cliprect);
+			draw_tile(segment, tilenum, x, y, palselect, pal, sp_size & 0x2, sp_size&0x1, 0, depth * 2, 0, flipx, flipy, cliprect);
 		}
 	}
 	// if more than 16 sprites on any line 0x2001 bit 0x40 (SP_ERR) should be set (updated every line, can only be read in HBLANK)
