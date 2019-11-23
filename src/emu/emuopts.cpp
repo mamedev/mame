@@ -237,7 +237,7 @@ namespace
 		{
 		}
 
-		virtual const char *value() const override
+		virtual const char *value() const noexcept override
 		{
 			// This is returning an empty string instead of nullptr to signify that
 			// specifying the value is a meaningful operation.  The option types that
@@ -287,7 +287,7 @@ namespace
 		{
 		}
 
-		virtual const char *value() const override
+		virtual const char *value() const noexcept override
 		{
 			const char *result = nullptr;
 			if (m_host.specified())
@@ -298,6 +298,7 @@ namespace
 				// happen in practice
 				//
 				// In reality, I want to really return std::optional<std::string> here
+				// FIXME: the std::string assignment can throw exceptions, and returning std::optional<std::string> also isn't safe in noexcept
 				m_temp = m_host.specified_value();
 				result = m_temp.c_str();
 			}
@@ -325,7 +326,7 @@ namespace
 		{
 		}
 
-		virtual const char *value() const override
+		virtual const char *value() const noexcept override
 		{
 			return m_host.value().c_str();
 		}
