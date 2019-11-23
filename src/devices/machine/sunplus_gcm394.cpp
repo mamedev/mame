@@ -398,6 +398,11 @@ void sunplus_gcm394_base_device::device_start()
 	m_porta_in.resolve_safe(0);
 	m_portb_in.resolve_safe(0);
 
+	m_space_read_cb.resolve_safe(0);
+	m_space_write_cb.resolve();
+	m_bank_write_cb.resolve();
+
+
 	m_unk_timer = timer_alloc(0);
 	m_unk_timer->adjust(attotime::never);
 }

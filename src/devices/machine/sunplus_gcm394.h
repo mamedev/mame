@@ -21,14 +21,17 @@
 class sunplus_gcm394_base_device : public unsp_20_device, public device_mixer_interface
 {
 public:
-	sunplus_gcm394_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: unsp_20_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(sunplus_gcm394_base_device::internal_map), this))
-	, device_mixer_interface(mconfig, *this, 2)
-	, m_screen(*this, finder_base::DUMMY_TAG)
-	, m_spg_video(*this, "spgvideo")
-	, m_spg_audio(*this, "spgaudio")
-	, m_porta_in(*this)
-	, m_portb_in(*this)
+	sunplus_gcm394_base_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock) :
+		unsp_20_device(mconfig, type, tag, owner, clock, address_map_constructor(FUNC(sunplus_gcm394_base_device::internal_map), this)),
+		device_mixer_interface(mconfig, *this, 2),
+		m_screen(*this, finder_base::DUMMY_TAG),
+		m_spg_video(*this, "spgvideo"),
+		m_spg_audio(*this, "spgaudio"),
+		m_porta_in(*this),
+		m_portb_in(*this),
+		m_space_read_cb(*this),
+		m_space_write_cb(*this),
+		m_bank_write_cb(*this)
 	{
 	}
 
@@ -36,6 +39,11 @@ public:
 
 	auto porta_in() { return m_porta_in.bind(); }
 	auto portb_in() { return m_portb_in.bind(); }
+
+	auto space_read_callback() { return m_space_read_cb.bind(); }
+	auto space_write_callback() { return m_space_write_cb.bind(); }
+	auto bank_write_callback() { return m_bank_write_cb.bind(); }
+
 
 	DECLARE_WRITE_LINE_MEMBER(vblank) { m_spg_video->vblank(state); }
 
@@ -124,6 +132,10 @@ protected:
 	uint16_t m_7961;
 
 private:
+	devcb_read16 m_space_read_cb;
+	devcb_write16 m_space_write_cb;
+	devcb_write16 m_bank_write_cb;
+
 	DECLARE_READ16_MEMBER(unk_r);
 	DECLARE_WRITE16_MEMBER(unk_w);
 
