@@ -119,7 +119,7 @@ void gcm394_game_state::machine_reset()
 
 void gcm394_game_state::mem_map_4m(address_map &map)
 {
-	map(0x000000, 0x01ffff).bankr("cartbank");
+	map(0x000000, 0x01ffff).rom().region("maincpu", 0); // non-banked area on this SoC?
 
 	// smartfp really expects the ROM at 0 to map here, so maybe this is how the newer SoC works
 	map(0x020000, 0x3fffff).bankr("cartbank");
