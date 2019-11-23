@@ -21243,7 +21243,7 @@
 	</software>
 
 	<software name="rrworks">
-		<description>The Railroad Works (cleanly cracked)</description>
+		<description>The Railroad Works (Thunder Mountain) (cleanly cracked)</description>
 		<year>1984</year>
 		<publisher>Thunder Mountain</publisher>
 		<info name="release" value="2019-06-02"/>
@@ -35617,6 +35617,46 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="korg-800 4 track midi sequencer (4am and san inc crack).dsk" size="143360" crc="64b0622c" sha1="0a51b1ee8f9dec7e0f5120f9f21abf1d1d53257c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="certmore">
+		<description>Certificates and More! (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>Mindscape</publisher>
+		<info name="release" value="2019-11-21"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Program"/>
+			<dataarea name="flop" size="143360">
+				<rom name="certificates and more (4am crack) disk 1 - program.dsk" size="143360" crc="41e32298" sha1="895ceebcc95c97cec1ba9558c0ff17caaae2c3a1"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Templates"/>
+			<dataarea name="flop" size="143360">
+				<rom name="certificates and more (4am crack) disk 2 - templates.dsk" size="143360" crc="a4f43948" sha1="72c15e0c21abf599dd1e9ba4de53503f1fc942b8"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 - Borders and fonts"/>
+			<dataarea name="flop" size="143360">
+				<rom name="certificates and more (4am crack) disk 3 - borders and fonts.dsk" size="143360" crc="c89753e1" sha1="e8545509b0f94025ab3ef9c93c93078fca619971"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rrworks">
+		<description>The Railroad Works (CBS Version) (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>CBS</publisher>
+		<info name="release" value="2019-11-22"/>
+		<!-- No compatibility data known at this time. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the railroad works (clean crack).do" size="143360" crc="779b1050" sha1="9be6c43573692aa3042439fc27f34b622ea963f4" />
 			</dataarea>
 		</part>
 	</software>

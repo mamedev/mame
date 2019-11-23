@@ -6710,4 +6710,32 @@
 		</part>
 	</software>
 
+	<software name="bestmuse">
+		<description>Best of Muse (16 Sector + LC Patch)</description>
+		<year>1988</year>
+		<publisher>Mindscape</publisher>
+		<info name="release" value="2019-11-21"/>
+		<!-- The original doesn't work on 64K Apples because of the way it
+		checks which BASIC ROMs are installed. It will work with either
+		Integer or Applesoft BASIC, and will utilize both if available
+		(via one set of ROMs on the motherboard and the other set on a
+		firmware card in slot 0)
+
+		The problem arises because it can't tell the difference between a
+		language card (which is a 16K RAM card) and a firmware card. When it
+		finds the language card, it assumes both BASICs are present and tries to
+		use both, which fails.
+		
+		Additionally, newer Apples cannot directly book 13-sector disks, 
+		so this patch converts the program to a 16-sector disk and patches the
+		program to ignore a blank language card while preserving the ability to
+		utilize both BASICs. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="best of muse (16 sector+lc patch).dsk" size="143360" crc="7a89cc5c" sha1="3b87ae2e0742b7368d9c41595ec67ef2199ae892" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
