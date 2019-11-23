@@ -123,7 +123,7 @@ void tilemap038_device::vram_16x16_writeonly_map(address_map &map)
     4000-7fff range for tiles, so we have to write the data there. */
 void tilemap038_device::vram_8x8_map(address_map &map)
 {
-	map(0x0000, 0x3fff).mirror(0x4000).rw(FUNC(tilemap038_device::vram_8x8_r), FUNC(tilemap038_device::vram_8x8_w)).share("vram_8x8");
+	map(0x0000, 0x3fff).rw(FUNC(tilemap038_device::vram_8x8_r), FUNC(tilemap038_device::vram_8x8_w)).share("vram_8x8");
 }
 
 DEFINE_DEVICE_TYPE(TMAP038, tilemap038_device, "tmap038", "038 Tilemap generator")
@@ -143,9 +143,9 @@ tilemap038_device::tilemap038_device(const machine_config &mconfig, const char *
 
 TILE_GET_INFO_MEMBER(tilemap038_device::get_tile_info)
 {
-	u32 tile, code, color, pri;
+	u32 tile, code = 0, color = 0, pri = 0;
 
-	if (m_tiledim)
+	if (tile_is_16x16())
 	{
 		tile  = (tile_index % (512 / 8)) / 2 + ((tile_index / (512 / 8)) / 2) * (512 / 16);
 		tile  = (m_vram_16x16 != nullptr) ? ((m_vram_16x16[tile * 2] << 16) + m_vram_16x16[(tile * 2) + 1]) : 0;
@@ -160,7 +160,7 @@ TILE_GET_INFO_MEMBER(tilemap038_device::get_tile_info)
 		if (!m_038_cb.isnull())
 			m_038_cb(true, color, pri, code);
 	}
-	else
+	else if (tile_is_8x8())
 	{
 		tile  = (m_vram_8x8 != nullptr) ? ((m_vram_8x8[tile_index * 2] << 16) + m_vram_8x8[(tile_index * 2) + 1]) : 0;
 
@@ -184,11 +184,6 @@ void tilemap038_device::device_start()
 
 	if (m_vram_16x16 == nullptr && m_vram_8x8 == nullptr)
 		fatalerror("Tilemap 038 %s: VRAM not found",this->tag());
-
-	if (m_vram_8x8 == nullptr)
-		m_tiledim = true;
-	else if (m_vram_16x16 == nullptr)
-		m_tiledim = false;
 
 	m_tmap = &machine().tilemap().create(
 			*m_gfxdecode,
@@ -217,8 +212,8 @@ u16 tilemap038_device::vram_8x8_r(offs_t offset)
 void tilemap038_device::vram_8x8_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_vram_8x8[offset]);
-	if (!m_tiledim)
-		m_tmap->mark_tile_dirty(offset/2);
+	if (tile_is_8x8())
+		m_tmap->mark_tile_dirty(offset >> 1);
 }
 
 u16 tilemap038_device::vram_16x16_r(offs_t offset)
@@ -229,9 +224,9 @@ u16 tilemap038_device::vram_16x16_r(offs_t offset)
 void tilemap038_device::vram_16x16_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_vram_16x16[offset]);
-	if (m_tiledim)
+	if (tile_is_16x16())
 	{
-		offset /= 2;
+		offset >>= 1;
 		offset = (offset % (512 / 16)) * 2 + (offset / (512 / 16)) * (512 / 8) * 2;
 		m_tmap->mark_tile_dirty(offset + 0);
 		m_tmap->mark_tile_dirty(offset + 1);
@@ -242,9 +237,6 @@ void tilemap038_device::vram_16x16_w(offs_t offset, u16 data, u16 mem_mask)
 
 void tilemap038_device::prepare()
 {
-	/* Enable layers */
-	m_tmap->enable(enable());
-
 	// refresh tile size
 	if (m_vram_8x8 != nullptr && m_vram_16x16 != nullptr)
 	{
