@@ -24,14 +24,16 @@
 class gcm394_game_state : public driver_device
 {
 public:
-	gcm394_game_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_screen(*this, "screen")
-		, m_bank(*this, "cartbank")
-		, m_io_p1(*this, "P1")
-		, m_io_p2(*this, "P2")
-	{ }
+	gcm394_game_state(const machine_config& mconfig, device_type type, const char* tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_screen(*this, "screen"),
+		m_bank(*this, "cartbank"),
+		m_io_p1(*this, "P1"),
+		m_io_p2(*this, "P2"),
+		m_romregion(*this, "maincpu")
+	{
+	}
 
 	void base(machine_config &config);
 
@@ -52,6 +54,8 @@ protected:
 	virtual void mem_map_4m(address_map &map);
 
 private:
+	required_region_ptr<uint16_t> m_romregion;
+
 	uint32_t m_current_bank;
 	int m_numbanks;
 	std::vector<uint16_t> m_prgram;
@@ -111,9 +115,9 @@ void gcm394_game_state::machine_start()
 	m_prgram.resize(0x800000);
 
 	int i;
-	for (i = 0; i < (memregion("maincpu")->bytes() / 0x800000); i++)
+	for (i = 0; i < (m_romregion.bytes() / 0x800000); i++)
 	{
-		m_bank->configure_entry(i, &memregion("maincpu")->base()[i*0x800000]);
+		m_bank->configure_entry(i, &m_romregion[i*0x800000]);
 	}
 	
 	m_bank->configure_entry(i, &m_prgram[0]);
