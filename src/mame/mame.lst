@@ -10292,6 +10292,7 @@ lzcolor64                       // Novo Tempo / LZ Equipamentos Color64
 mx1600                          // Dynacom MX-1600
 cd6809                          // Codimex CD-6809
 t4426                           // Terco 4426 CNC programming station
+trsvidtx                        // TRS-80 Videotex
 
 @source:coco3.cpp
 coco3                           // Color Computer 3 (NTSC)
