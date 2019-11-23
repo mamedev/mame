@@ -12,6 +12,8 @@
 #include "emupal.h"
 #include "tilemap.h"
 
+#include <array>
+
 class tnx1_state : public driver_device
 {
 public:
@@ -26,6 +28,7 @@ public:
 		m_colorram(*this, "colorram"),
 		m_color_prom(*this, "proms"),
 		m_color_prom_spr(*this, "sprpal"),
+		m_io_mconf(*this, "MCONF"),
 		m_background_scroll{0,0,0},
 		m_fg_tilemap(nullptr),
 		m_palette_bank(0),
@@ -53,6 +56,7 @@ protected:
 	required_shared_ptr<uint8_t> m_colorram;
 	required_region_ptr<uint8_t> m_color_prom;
 	required_region_ptr<uint8_t> m_color_prom_spr;
+	required_ioport m_io_mconf;
 
 	static const res_net_decode_info mb7051_decode_info;
 	static const res_net_decode_info mb7052_decode_info;
@@ -74,7 +78,7 @@ protected:
 	uint8_t m_dswbit;
 	bool m_nmi_enabled;
 	int   m_field;
-	std::unique_ptr<bitmap_ind16>  m_bitmap[2];    // bitmaps for fields
+	std::array<bitmap_ind16, 2>  m_bitmap;    // bitmaps for fields
 
 	virtual DECLARE_WRITE8_MEMBER(refresh_w);
 	DECLARE_READ8_MEMBER(protection_r);

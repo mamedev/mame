@@ -249,8 +249,8 @@ void tnx1_state::video_start()
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tnx1_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 
-	m_bitmap[0] = std::make_unique<bitmap_ind16>(512, 512);
-	m_bitmap[1] = std::make_unique<bitmap_ind16>(512, 512);
+	m_bitmap[0].resize(512, 512);
+	m_bitmap[1].resize(512, 512);
 
 	m_field = 0;
 
@@ -450,8 +450,8 @@ void tpp2_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect
 
 uint32_t tnx1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	const auto ilmode(ioport("MCONF")->read());
-	bitmap_ind16 &bm((ilmode == 0) ? bitmap : *m_bitmap[m_field]);
+	const auto ilmode(m_io_mconf->read());
+	bitmap_ind16 &bm((ilmode == 0) ? bitmap : m_bitmap[m_field]);
 
 	update_palette();
 	draw_background(bm, cliprect);
@@ -473,7 +473,7 @@ uint32_t tnx1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 	{
 		for (int y=(cliprect.min_y); y<=cliprect.max_y; y ++)
 		{
-			auto &bm_last(*m_bitmap[m_field ^ 1]);
+			auto &bm_last(m_bitmap[m_field ^ 1]);
 			if ((y & 1) == m_field)
 				for (int x=cliprect.min_x; x<=cliprect.max_x; x++)
 					bitmap.pix(y, x) = bm_last.pix(y, x);
