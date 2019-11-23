@@ -78,10 +78,19 @@ READ16_MEMBER(gcm394_game_state::read_external_space)
 
 WRITE16_MEMBER(gcm394_game_state::write_external_space)
 {
+	logerror("DMA writing to external space (RAM?) %08x %04x\n", offset, data);
+
+	if (offset & 0x0800000)
+	{
+		offset &= 0x07fffff;
+		m_prgram[offset] = data;
+	}
 }
 
 WRITE16_MEMBER(gcm394_game_state::change_external_bank)
 {
+	logerror("change bank hack\n");
+	m_bank->set_entry(0x10);
 }
 
 

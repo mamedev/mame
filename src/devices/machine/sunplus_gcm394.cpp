@@ -79,8 +79,15 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::system_dma_trigger_w)
 				val = m_space_read_cb(space, source - 0x20000);
 			}
 
+			if (dest < 0x20000)
+			{
+				mem.write_word(dest, val);
+			}
+			else
+			{
+				m_space_write_cb(space, dest - 0x20000, val);
+			}
 
-			mem.write_word(dest, val);
 			dest += 1;
 			if (mode == 0x0009)
 				source += 1;
