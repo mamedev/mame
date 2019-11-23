@@ -72,7 +72,8 @@ private:
 
 READ16_MEMBER(gcm394_game_state::read_external_space)
 {
-	return 0x0000;
+	//logerror("reading offset %04x\n", offset * 2);
+	return m_romregion[offset];
 }
 
 WRITE16_MEMBER(gcm394_game_state::write_external_space)
@@ -105,6 +106,9 @@ void gcm394_game_state::base(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &gcm394_game_state::mem_map_4m);
 	m_maincpu->porta_in().set(FUNC(gcm394_game_state::porta_r));
 	m_maincpu->portb_in().set(FUNC(gcm394_game_state::portb_r));
+	m_maincpu->space_read_callback().set(FUNC(gcm394_game_state::read_external_space));
+	m_maincpu->space_write_callback().set(FUNC(gcm394_game_state::write_external_space));
+	m_maincpu->bank_write_callback().set(FUNC(gcm394_game_state::change_external_bank));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);

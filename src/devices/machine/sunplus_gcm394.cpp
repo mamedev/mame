@@ -66,8 +66,20 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::system_dma_trigger_w)
 	{
 		for (int i = 0; i < length; i++)
 		{
-			address_space &mem = this->space(AS_PROGRAM);
-			uint16_t val = mem.read_word(source);
+			uint16_t val = 0x0000;
+
+			address_space& mem = this->space(AS_PROGRAM);
+
+			if (source < 0x20000)
+			{
+				val = mem.read_word(source);
+			}
+			else
+			{
+				val = m_space_read_cb(space, source - 0x20000);
+			}
+
+
 			mem.write_word(dest, val);
 			dest += 1;
 			if (mode == 0x0009)
