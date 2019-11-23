@@ -142,6 +142,8 @@ project "netlist"
 		MAME_DIR .. "src/lib/netlist/devices/nld_7485.h",
 		MAME_DIR .. "src/lib/netlist/devices/nld_7490.cpp",
 		MAME_DIR .. "src/lib/netlist/devices/nld_7490.h",
+		MAME_DIR .. "src/lib/netlist/devices/nld_7492.cpp",
+		MAME_DIR .. "src/lib/netlist/devices/nld_7492.h",
 		MAME_DIR .. "src/lib/netlist/devices/nld_7493.cpp",
 		MAME_DIR .. "src/lib/netlist/devices/nld_7493.h",
 		MAME_DIR .. "src/lib/netlist/devices/nld_7497.cpp",
