@@ -54,6 +54,7 @@ protected:
 private:
 	uint32_t m_current_bank;
 	int m_numbanks;
+	std::vector<uint16_t> m_prgram;
 
 	DECLARE_READ16_MEMBER(porta_r);
 	DECLARE_READ16_MEMBER(portb_r);
@@ -107,13 +108,15 @@ void gcm394_game_state::switch_bank(uint32_t bank)
 
 void gcm394_game_state::machine_start()
 {
+	m_prgram.resize(0x800000);
+
 	int i;
 	for (i = 0; i < (memregion("maincpu")->bytes() / 0x800000); i++)
 	{
 		m_bank->configure_entry(i, &memregion("maincpu")->base()[i*0x800000]);
 	}
 	
-//	m_bank->configure_entry(i, &m_prgram[0]);
+	m_bank->configure_entry(i, &m_prgram[0]);
 	
 	m_numbanks = i;
 
