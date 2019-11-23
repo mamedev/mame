@@ -56,7 +56,7 @@
 #include "netlist/nl_setup.h"
 
 #define TTL_7492(name, cA, cB, cR1, cR2)                           \
-		NET_REGISTER_DEV(TTL_7490, name)                           \
+		NET_REGISTER_DEV(TTL_7492, name)                           \
 		NET_CONNECT(name, GND, GND)                                \
 		NET_CONNECT(name, VCC, VCC)                                \
 		NET_CONNECT(name, A, cA)                                   \
