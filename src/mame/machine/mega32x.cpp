@@ -1545,7 +1545,7 @@ bool sega_32x_device::render_videobuffer_to_screenbuffer_helper(int scanline, bo
 {
 	bool const height_240_mode = m_32x_240mode;
 	if ((!width_320) || (height_240 != height_240_mode) || (m_32x_displaymode == 0))
-		return false;
+		return false; // disable this layer
 
 	int x;
 
@@ -1633,7 +1633,7 @@ bool sega_32x_device::render_videobuffer_to_screenbuffer_helper(int scanline, bo
 			lineoffs++;
 		}
 	}
-	return true;
+	return true; // draw this layer
 }
 
 void sega_32x_device::render_videobuffer_to_screenbuffer(int x, uint32_t priority, uint32_t &lineptr)
