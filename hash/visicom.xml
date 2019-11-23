@@ -15,7 +15,7 @@ CAS-190 Reikan (Bagua and Biorhythm)                    no       霊感
 -->
 <softwarelist name="visicom" description="Toshiba Visicom cartridges">
 
-	<software name="aridrill">
+	<software name="sandrill">
 		<description>Sansuu Drill</description>
 		<year>1978</year>
 		<publisher>Toshiba</publisher>
