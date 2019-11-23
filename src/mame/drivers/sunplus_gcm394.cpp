@@ -53,6 +53,7 @@ protected:
 
 private:
 	uint32_t m_current_bank;
+	int m_numbanks;
 
 	DECLARE_READ16_MEMBER(porta_r);
 	DECLARE_READ16_MEMBER(portb_r);
@@ -106,7 +107,18 @@ void gcm394_game_state::switch_bank(uint32_t bank)
 
 void gcm394_game_state::machine_start()
 {
-	m_bank->configure_entries(0, (memregion("maincpu")->bytes() + 0x7fffff) / 0x800000, memregion("maincpu")->base(), 0x800000);
+	int i;
+	for (i = 0; i < (memregion("maincpu")->bytes() / 0x800000); i++)
+	{
+		m_bank->configure_entry(i, &memregion("maincpu")->base()[i*0x800000]);
+	}
+	
+//	m_bank->configure_entry(i, &m_prgram[0]);
+	
+	m_numbanks = i;
+
+	printf("number of banks %02x\n", m_numbanks);
+
 	m_bank->set_entry(0);
 
 	save_item(NAME(m_current_bank));

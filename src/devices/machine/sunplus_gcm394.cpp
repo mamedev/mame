@@ -46,16 +46,20 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::system_dma_params_w)
 WRITE16_MEMBER(sunplus_gcm394_base_device::system_dma_trigger_w)
 {
 	uint16_t mode = m_dma_params[0];
-	uint16_t sourcelow = m_dma_params[1];
-	uint16_t dest = m_dma_params[2];
-	uint16_t length = m_dma_params[3];
-	uint16_t srchigh = m_dma_params[4];
+	uint32_t source = m_dma_params[1] | (m_dma_params[4] << 16);
+	uint32_t dest = m_dma_params[2] | (m_dma_params[5] << 16) ;
+	uint32_t length = m_dma_params[3] | (m_dma_params[6] << 16);
 
-	LOGMASKED(LOG_GCM394_SYSDMA, "%s:possible DMA operation (7abf) (trigger %04x) with params mode:%04x source:%04x dest:%04x length:%04x srchigh:%04x unk:%04x unk:%04x\n", machine().describe_context(), data, mode, sourcelow, dest, length, srchigh, m_dma_params[5], m_dma_params[6]);
+	LOGMASKED(LOG_GCM394_SYSDMA, "%s:possible DMA operation (7abf) (trigger %04x) with params mode:%04x source:%08x (word offset) dest:%08x (word offset) length:%08x (words)\n", machine().describe_context(), data, mode, source, dest, length );  
 
-	uint32_t source = sourcelow | (srchigh << 16);
+	if (source >= 0x20000)
+		LOGMASKED(LOG_GCM394_SYSDMA, " likely transfer from ROM %08x - %08x\n", (source * 2) - 0x20000, (source * 2) + (length * 2) - 0x20000 - 1);
 
 	// wrlshunt uses the extra params, might be doing very large ROM -> RAM transfers with even more upper address bits?
+
+	// wrlshunt first transfer has 0x4000 set on trigger, and could mean treat source address as an unmodified (no - 0x20000) byte offset instead of word offset
+	// in that case it would be pointing at the block we currently execute from ROM and copying it to RAM
+
 
 	if (mode == 0x0089) // no source inc, used for memory clear operations? (source usually points at stack value)
 	{
