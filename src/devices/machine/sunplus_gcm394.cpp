@@ -60,8 +60,9 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::system_dma_trigger_w)
 	// wrlshunt first transfer has 0x4000 set on trigger, and could mean treat source address as an unmodified (no - 0x20000) byte offset instead of word offset
 	// in that case it would be pointing at the block we currently execute from ROM and copying it to RAM
 
-
-	if (mode == 0x0089) // no source inc, used for memory clear operations? (source usually points at stack value)
+	// 0x0089 == no source inc, used for memory clear operations? (source usually points at stack value)
+	// 0x0009 == regular copy? (smartfp does 2 copies like this after the initial clears, source definitely points at a correctly sized data structure)
+	if ((mode == 0x0089) || (mode == 0x0009)) 
 	{
 		for (int i = 0; i < length; i++)
 		{
@@ -69,17 +70,8 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::system_dma_trigger_w)
 			uint16_t val = mem.read_word(source);
 			mem.write_word(dest, val);
 			dest += 1;
-		}
-	}
-	else if (mode == 0x0009) // regular copy? (smartfp does 2 copies like this after the initial clears, source definitely points at a correctly sized data structure)
-	{
-		for (int i = 0; i < length; i++)
-		{
-			address_space &mem = this->space(AS_PROGRAM);
-			uint16_t val = mem.read_word(source);
-			mem.write_word(dest, val);
-			dest += 1;
-			source += 1;
+			if (mode == 0x0009)
+				source += 1;
 		}
 	}
 	else

@@ -62,7 +62,27 @@ private:
 
 	DECLARE_READ16_MEMBER(porta_r);
 	DECLARE_READ16_MEMBER(portb_r);
+
+	DECLARE_READ16_MEMBER(read_external_space);
+	DECLARE_WRITE16_MEMBER(write_external_space);
+
+	DECLARE_WRITE16_MEMBER(change_external_bank);
+
 };
+
+READ16_MEMBER(gcm394_game_state::read_external_space)
+{
+	return 0x0000;
+}
+
+WRITE16_MEMBER(gcm394_game_state::write_external_space)
+{
+}
+
+WRITE16_MEMBER(gcm394_game_state::change_external_bank)
+{
+}
+
 
 READ16_MEMBER(gcm394_game_state::porta_r)
 {
@@ -123,8 +143,6 @@ void gcm394_game_state::machine_start()
 	m_bank->configure_entry(i, &m_prgram[0]);
 	
 	m_numbanks = i;
-
-	printf("number of banks %02x\n", m_numbanks);
 
 	m_bank->set_entry(0);
 
