@@ -31904,6 +31904,7 @@ eaglepc2                        // Eagle PC-2
 mpx16                           // Ciarcia's Circuit Cellar Micromint MPX-16
 hstrtpls                        // Vendex HeadStart Plus
 nms9100                         // Philips NMS 9100 series
+to16							// Thomson TO16
 
 @source:pc100.cpp
 pc100                           //
