@@ -1200,7 +1200,8 @@ uint32_t renderer_bgfx::get_texture_hash(render_primitive *prim)
 	}
 	return hash;
 #else
-	return (reinterpret_cast<size_t>(prim->texture.base)) & 0xffffffff;
+	//return (reinterpret_cast<size_t>(prim->texture.base)) & 0xffffffff;
+	return (reinterpret_cast<size_t>(prim->texture.base) ^ reinterpret_cast<size_t>(prim->texture.palette)) & 0xffffffff;
 #endif
 }
 
