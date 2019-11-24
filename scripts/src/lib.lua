@@ -47,6 +47,7 @@ project "utils"
 		MAME_DIR .. "src/lib/util/client_https.hpp",
 		MAME_DIR .. "src/lib/util/client_ws.hpp",
 		MAME_DIR .. "src/lib/util/client_wss.hpp",
+		MAME_DIR .. "src/lib/util/corealloc.cpp",
 		MAME_DIR .. "src/lib/util/corealloc.h",
 		MAME_DIR .. "src/lib/util/corefile.cpp",
 		MAME_DIR .. "src/lib/util/corefile.h",
