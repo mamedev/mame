@@ -17734,24 +17734,24 @@ void cmaster_state::init_chthree()
 
 	uint8_t *rom = memregion("maincpu")->base();
 
-	for (int i = 0000; i < 0x8000; i++)
+	for (int i = 0x0000; i < 0x8000; i++)
 	{
 		uint8_t row = i & 0x07;
 		uint16_t addr;
 
 		switch (row)
 		{
-			case 0x00:  addr = 0x0c; break;
-			case 0x01:  addr = 0x09; break;
-			case 0x02:  addr = 0x0b; break;
-			case 0x03:  addr = 0x0a; break;
-			case 0x04:  addr = 0x08; break;
-			case 0x05:  addr = 0x0d; break;
-			case 0x06:  addr = 0x0f; break;
-			case 0x07:  addr = 0x0e; break;
+			case 0x00: addr = 0x0c; break;
+			case 0x01: addr = 0x09; break;
+			case 0x02: addr = 0x0b; break;
+			case 0x03: addr = 0x0a; break;
+			case 0x04: addr = 0x08; break;
+			case 0x05: addr = 0x0d; break;
+			case 0x06: addr = 0x0f; break;
+			case 0x07: addr = 0x0e; break;
 		}
 
-		addr = (i & 0xfff0) | addr;
+		addr = (i & 0x7ff0) | addr;
 
 		if (!BIT(i, 3))
 			std::swap(rom[i], rom[addr]);
@@ -17761,6 +17761,56 @@ void cmaster_state::init_chthree()
 	rom[0x1ff] = 0xbd;
 	rom[0x209] = 0x9b;
 	rom[0x20d] = 0x9b;
+
+	// TODO: can the following be done with GFXDECODE?
+
+	uint8_t *gfx1 = memregion("gfx1")->base();
+
+	for (int i = 0x00000; i < 0x18000; i++)
+	{
+		uint8_t row = i & 0x0f;
+		uint32_t addr;
+
+		switch (row)
+		{
+			case 0x01: addr = 0x04; break;
+			case 0x02: addr = 0x01; break;
+			case 0x03: addr = 0x06; break;
+			case 0x05: addr = 0x06; break;
+			case 0x09: addr = 0x0c; break;
+			case 0x0a: addr = 0x09; break;
+			case 0x0b: addr = 0x0e; break;
+			case 0x0d: addr = 0x0e; break;
+			default: addr = row; break;
+		}
+
+		addr = (i & 0x1fff0) | addr;
+
+		std::swap(gfx1[i], gfx1[addr]);
+	}
+
+	uint8_t *gfx2 = memregion("gfx2")->base();
+
+	for (int i = 0x00000; i < 0x8000; i++)
+	{
+		uint8_t row = i & 0x0f;
+		uint16_t addr;
+
+		switch (row)
+		{
+			case 0x01: addr = 0x02; break;
+			case 0x04: addr = 0x08; break;
+			case 0x05: addr = 0x0a; break;
+			case 0x06: addr = 0x09; break;
+			case 0x07: addr = 0x0b; break;
+			case 0x0d: addr = 0x0e; break;
+			default: addr = row; break;
+		}
+
+		addr = (i & 0x7ff0) | addr;
+
+		std::swap(gfx2[i], gfx2[addr]);
+	}
 }
 
 /*
@@ -17967,7 +18017,7 @@ GAME(  1999, jkrmasta,  jkrmast,  pkrmast,  pkrmast,  goldstar_state, init_jkrma
 GAME(  199?, pkrmast,   jkrmast,  pkrmast,  pkrmast,  goldstar_state, init_pkrmast,   ROT0, "Fun USA",           "Poker Master (ED-1993 set 1)",                MACHINE_NOT_WORKING ) // needs inputs / dips fixed, puts FUN USA 95H N/G  V2.20 in NVRAM
 GAME(  1993, pkrmasta,  jkrmast,  pkrmast,  pkrmast,  goldstar_state, init_pkrmast,   ROT0, "Fun USA",           "Poker Master (ED-1993 set 2)",                MACHINE_NOT_WORKING ) // needs inputs / dips fixed, puts PM93 JAN 29/1996 V1.52 in NVRAM
 
-GAME(  199?, chthree,   cmaster,  cm,       cmaster,  cmaster_state,  init_chthree,   ROT0, "Promat",            "Channel Three",                               MACHINE_NOT_WORKING)  // GFX scrambled
+GAME(  199?, chthree,   cmaster,  cm,       cmaster,  cmaster_state,  init_chthree,   ROT0, "Promat",            "Channel Three",                               0 ) // hack of cmaster, still shows DYNA CM-1 V1.01 in book-keeping
 
 GAME(  1991, cmast91,   0,        cmast91,  cmast91,  goldstar_state, init_cmast91,   ROT0, "Dyna",              "Cherry Master '91 (ver.1.30)",                0 )
 GAME(  1992, cmast92,   0,        cmast91,  cmast91,  goldstar_state, init_cmast91,   ROT0, "Dyna",              "Cherry Master '92",                           MACHINE_NOT_WORKING ) // no gfx roms are dumped
