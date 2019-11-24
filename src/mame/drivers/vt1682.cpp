@@ -4916,12 +4916,20 @@ uint32_t vt_vt1682_state::screen_update(screen_device& screen, bitmap_rgb32& bit
 			if (pri1 <= pri2)
 			{
 				if (pix1) dstptr[x] = paldata[pix1 | 0x100];
-				else if (pix2) dstptr[x] = paldata[pix2];
+				else
+				{
+					if (pix2) dstptr[x] = paldata[pix2];
+					else dstptr[x] = paldata[0x000];
+				}
 			}
 			else
 			{
 				if (pix2) dstptr[x] = paldata[pix2];
-				else if (pix1) dstptr[x] = paldata[pix1 | 0x100];
+				else
+				{
+					if (pix1) dstptr[x] = paldata[pix1 | 0x100];
+					else dstptr[x] = paldata[0x100];
+				}
 			}
 		}
 	}
