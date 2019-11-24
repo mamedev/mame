@@ -60,7 +60,7 @@ private:
 	int64_t                             m_current_time;
 	uint32_t                            m_screen_index;
 	bool                                m_has_converter;
-	bool								m_has_adjuster;
+	bool                                m_has_adjuster;
 };
 
 #endif // __DRAWBGFX_CHAIN__

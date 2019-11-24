@@ -69,7 +69,7 @@ private:
 	std::vector<bgfx_entry_uniform*>    m_uniforms;
 	target_manager&                     m_targets;
 	std::string                         m_output;
-	bool								m_apply_tint;
+	bool                                m_apply_tint;
 };
 
 #endif // __DRAWBGFX_CHAIN_ENTRY__
