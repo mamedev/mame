@@ -15,10 +15,10 @@ std::uint8_t g_mame_new_prefill_byte(0xcd);
 void *operator new(std::size_t n)
 {
 	void *const result(std::malloc(n));
-	if (ptr)
+	if (result)
 	{
-		std::fill_n(reinterpret_cast<std::uint8_t volatile *>(ptr), n, g_mame_new_prefill_byte);
-		return ptr;
+		std::fill_n(reinterpret_cast<std::uint8_t volatile *>(result), n, g_mame_new_prefill_byte);
+		return result;
 	}
 	else
 	{
