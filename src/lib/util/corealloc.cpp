@@ -17,7 +17,7 @@ void *operator new(std::size_t n)
 	void *const result(std::malloc(n));
 	if (result)
 	{
-		std::fill_n(reinterpret_cast<std::uint8_t volatile *>(result), n, g_mame_new_prefill_byte);
+		std::fill_n(reinterpret_cast<std::uint8_t *>(result), n, g_mame_new_prefill_byte);
 		return result;
 	}
 	else
