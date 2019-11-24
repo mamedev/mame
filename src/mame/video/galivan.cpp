@@ -38,7 +38,7 @@ background: 0x4000 bytes of ROM:    76543210    tile code low bits
    7 selects text off/on
    6 selects background off/on
    5 controls sprite priority (active only on title screen,
-	 not for scores or push start nor game)
+     not for scores or push start nor game)
 */
 
 
@@ -55,7 +55,7 @@ background: 0x4000 bytes of ROM:    76543210    tile code low bits
 
 ***************************************************************************/
 
-void galivan_state::galivan_palette(palette_device& palette) const
+void galivan_state::galivan_palette(palette_device &palette) const
 {
 	const uint8_t* color_prom = memregion("proms")->base();
 
