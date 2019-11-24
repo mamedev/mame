@@ -111,7 +111,8 @@ public:
 		m_vram(*this, "vram"),
 		m_sound_share(*this, "sound_share"),
 		m_gfxdecode(*this, "gfxdecode2"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_render_timer(*this, "render_timer")
 	{ }
 
 	void vt_vt1682(machine_config& config);
@@ -141,6 +142,7 @@ private:
 	required_shared_ptr<uint8_t> m_sound_share;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<timer_device> m_render_timer;
 
 	uint32_t screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
 	void vt_vt1682_map(address_map& map);
@@ -172,7 +174,7 @@ private:
 	uint8_t m_scroll_control_bk[2];
 
 	uint8_t m_xscroll_7_0_bk[2];
-	uint8_t m_ysrcoll_7_0_bk[2];
+	uint8_t m_yscroll_7_0_bk[2];
 
 	uint8_t m_200e_blend_pal_sel;
 	uint8_t m_200f_bk_pal_sel;
@@ -566,6 +568,7 @@ private:
 	DECLARE_READ8_MEMBER(rom_8000_to_ffff_r);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+	TIMER_DEVICE_CALLBACK_MEMBER(line_render_start);
 
 	bitmap_ind8 m_pal2_priority_bitmap;
 	bitmap_ind8 m_pal1_priority_bitmap;
@@ -671,7 +674,7 @@ void vt_vt1682_state::machine_start()
 	save_item(NAME(m_scroll_control_bk));
 
 	save_item(NAME(m_xscroll_7_0_bk));
-	save_item(NAME(m_ysrcoll_7_0_bk));
+	save_item(NAME(m_yscroll_7_0_bk));
 
 	save_item(NAME(m_200e_blend_pal_sel));
 	save_item(NAME(m_200f_bk_pal_sel));
@@ -771,9 +774,9 @@ void vt_vt1682_state::machine_reset()
 	m_scroll_control_bk[1] = 0;
 
 	m_xscroll_7_0_bk[0] = 0;
-	m_ysrcoll_7_0_bk[0] = 0;
+	m_yscroll_7_0_bk[0] = 0;
 	m_xscroll_7_0_bk[1] = 0;
-	m_ysrcoll_7_0_bk[1] = 0;
+	m_yscroll_7_0_bk[1] = 0;
 
 	m_200e_blend_pal_sel = 0;
 	m_200f_bk_pal_sel = 0;
@@ -1596,7 +1599,7 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2010_bk1_xscroll_7_0_w)
 
 READ8_MEMBER(vt_vt1682_state::vt1682_2011_bk1_yscoll_7_0_r)
 {
-	uint8_t ret = m_ysrcoll_7_0_bk[0];
+	uint8_t ret = m_yscroll_7_0_bk[0];
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2011_bk1_yscoll_7_0_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
@@ -1604,7 +1607,7 @@ READ8_MEMBER(vt_vt1682_state::vt1682_2011_bk1_yscoll_7_0_r)
 WRITE8_MEMBER(vt_vt1682_state::vt1682_2011_bk1_yscoll_7_0_w)
 {
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2011_bk1_yscoll_7_0_w writing: %02x\n", machine().describe_context(), data);
-	m_ysrcoll_7_0_bk[0] = data;
+	m_yscroll_7_0_bk[0] = data;
 }
 
 
@@ -1709,7 +1712,7 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2014_bk2_xscroll_7_0_w)
 
 READ8_MEMBER(vt_vt1682_state::vt1682_2015_bk2_yscoll_7_0_r)
 {
-	uint8_t ret = m_ysrcoll_7_0_bk[1];
+	uint8_t ret = m_yscroll_7_0_bk[1];
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2015_bk2_yscoll_7_0_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
@@ -1717,7 +1720,7 @@ READ8_MEMBER(vt_vt1682_state::vt1682_2015_bk2_yscoll_7_0_r)
 WRITE8_MEMBER(vt_vt1682_state::vt1682_2015_bk2_yscoll_7_0_w)
 {
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2015_bk2_yscoll_7_0_w writing: %02x\n", machine().describe_context(), data);
-	m_ysrcoll_7_0_bk[1] = data;
+	m_yscroll_7_0_bk[1] = data;
 }
 
 
@@ -4670,7 +4673,7 @@ void vt_vt1682_state::draw_layer(int which, int opaque, const rectangle& cliprec
 	if (bk_enable)
 	{
 		int xscroll = m_xscroll_7_0_bk[which];
-		int yscroll = m_ysrcoll_7_0_bk[which];
+		int yscroll = m_yscroll_7_0_bk[which];
 		int xscrollmsb = (m_scroll_control_bk[which] & 0x01);
 		int yscrollmsb = (m_scroll_control_bk[which] & 0x02) >> 1;
 		int page_layout_h = (m_scroll_control_bk[which] & 0x04) >> 2;
@@ -4910,6 +4913,7 @@ uint32_t vt_vt1682_state::screen_update(screen_device& screen, bitmap_rgb32& bit
 			uint8_t pix2 = pix2ptr[x];
 			uint8_t pri1 = pri1ptr[x];
 			uint8_t pri2 = pri2ptr[x];
+
 			// TODO: bit 0x8000 in palette can cause the layer to 'dig through'
 			// palette layers can also be turned off, or just sent to lcd / just sent to tv
 			// layers can also blend 50/50 rather than using depth
@@ -4919,7 +4923,7 @@ uint32_t vt_vt1682_state::screen_update(screen_device& screen, bitmap_rgb32& bit
 				else
 				{
 					if (pix2) dstptr[x] = paldata[pix2];
-					else dstptr[x] = paldata[0x000];
+					else dstptr[x] = paldata[0x100];
 				}
 			}
 			else
@@ -4928,7 +4932,7 @@ uint32_t vt_vt1682_state::screen_update(screen_device& screen, bitmap_rgb32& bit
 				else
 				{
 					if (pix1) dstptr[x] = paldata[pix1 | 0x100];
-					else dstptr[x] = paldata[0x100];
+					else dstptr[x] = paldata[0x000];
 				}
 			}
 		}
@@ -5200,14 +5204,23 @@ WRITE_LINE_MEMBER(vt_vt1682_state::maincpu_timer_irq)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
+TIMER_DEVICE_CALLBACK_MEMBER(vt_vt1682_state::line_render_start)
+{
+	// some video reigsters latched in hblank, exact signal timings of irqs etc. is unknown
+	// note Fireman titlescreen effect is off by one line on real hardware, as it is with this setup
+	if ((param>=0) && (param<240))
+		m_screen->update_partial(m_screen->vpos());
+
+	m_render_timer->adjust(attotime::never);
+}
 
 TIMER_DEVICE_CALLBACK_MEMBER(vt_vt1682_state::scanline)
 {
 	int scanline = param;
 
-	m_screen->update_partial(m_screen->vpos());
+	m_render_timer->adjust(m_screen->time_until_pos(m_screen->vpos(), 156), scanline);
 
-	if (scanline == 239) // 239 aligns highway racing title, but could actually depend on when registers get latched
+	if (scanline == 240)
 	{
 		if (m_2000 & 0x01)
 		{
@@ -5292,6 +5305,7 @@ void vt_vt1682_state::vt_vt1682(machine_config &config)
 	m_soundcpu->set_addrmap(AS_PROGRAM, &vt_vt1682_state::vt_vt1682_sound_map);
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(vt_vt1682_state::scanline), "screen", 0, 1);
+	TIMER(config, m_render_timer).configure_periodic(FUNC(vt_vt1682_state::line_render_start), attotime::never);
 
 	VT_VT1682_ALU(config, m_maincpu_alu, 0);
 	VT_VT1682_ALU(config, m_soundcpu_alu, 0);
@@ -5322,7 +5336,7 @@ void vt_vt1682_state::vt_vt1682(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(256, 262); // 262 for NTSC, might be 261 if Vblank line is changed
+	m_screen->set_size(300, 262); // 262 for NTSC, might be 261 if Vblank line is changed
 	m_screen->set_visarea(0, 256-1, 0, 240-1);
 	m_screen->set_screen_update(FUNC(vt_vt1682_state::screen_update));
 
