@@ -1577,8 +1577,6 @@ READ8_MEMBER(vt_vt1682_state::vt1682_2010_bk1_xscroll_7_0_r)
 
 WRITE8_MEMBER(vt_vt1682_state::vt1682_2010_bk1_xscroll_7_0_w)
 {
-	m_screen->update_partial(m_screen->vpos());
-
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2010_bk1_xscroll_7_0_w writing: %02x\n", machine().describe_context(), data);
 	m_xscroll_7_0_bk[0] = data;
 }
@@ -1633,7 +1631,6 @@ READ8_MEMBER(vt_vt1682_state::vt1682_2012_bk1_scroll_control_r)
 
 WRITE8_MEMBER(vt_vt1682_state::vt1682_2012_bk1_scroll_control_w)
 {
-	m_screen->update_partial(m_screen->vpos());
 
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2012_bk1_scroll_control_w writing: %02x (hclr: %1x page_layout:%1x ymsb:%1x xmsb:%1x)\n", machine().describe_context(), data,
 		(data & 0x10) >> 4, (data & 0x0c) >> 2, (data & 0x02) >> 1, (data & 0x01) >> 0);
@@ -1664,8 +1661,6 @@ READ8_MEMBER(vt_vt1682_state::vt1682_2013_bk1_main_control_r)
 
 WRITE8_MEMBER(vt_vt1682_state::vt1682_2013_bk1_main_control_w)
 {
-	m_screen->update_partial(m_screen->vpos());
-
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2013_bk1_main_control_w writing: %02x (enable:%01x palette:%01x depth:%01x bpp:%01x linemode:%01x tilesize:%01x)\n", machine().describe_context(), data,
 		(data & 0x80) >> 7, (data & 0x40) >> 6, (data & 0x30) >> 4, (data & 0x0c) >> 2, (data & 0x02) >> 1, (data & 0x01) >> 0 );
 
@@ -1695,8 +1690,6 @@ READ8_MEMBER(vt_vt1682_state::vt1682_2014_bk2_xscroll_7_0_r)
 
 WRITE8_MEMBER(vt_vt1682_state::vt1682_2014_bk2_xscroll_7_0_w)
 {
-	m_screen->update_partial(m_screen->vpos());
-
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2014_bk2_xscroll_7_0_w writing: %02x\n", machine().describe_context(), data);
 	m_xscroll_7_0_bk[1] = data;
 }
@@ -1751,8 +1744,6 @@ READ8_MEMBER(vt_vt1682_state::vt1682_2016_bk2_scroll_control_r)
 
 WRITE8_MEMBER(vt_vt1682_state::vt1682_2016_bk2_scroll_control_w)
 {
-	m_screen->update_partial(m_screen->vpos());
-
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2016_bk2_scroll_control_w writing: %02x ((invalid): %1x page_layout:%1x ymsb:%1x xmsb:%1x)\n", machine().describe_context(), data,
 		(data & 0x10) >> 4, (data & 0x0c) >> 2, (data & 0x02) >> 1, (data & 0x01) >> 0);
 
@@ -1782,8 +1773,6 @@ READ8_MEMBER(vt_vt1682_state::vt1682_2017_bk2_main_control_r)
 
 WRITE8_MEMBER(vt_vt1682_state::vt1682_2017_bk2_main_control_w)
 {
-	m_screen->update_partial(m_screen->vpos());
-
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2017_bk2_main_control_w writing: %02x (enable:%01x palette:%01x depth:%01x bpp:%01x (invalid):%01x tilesize:%01x)\n", machine().describe_context(), data,
 		(data & 0x80) >> 7, (data & 0x40) >> 6, (data & 0x30) >> 4, (data & 0x0c) >> 2, (data & 0x02) >> 1, (data & 0x01) >> 0 );
 
@@ -2024,8 +2013,6 @@ READ8_MEMBER(vt_vt1682_state::vt1682_2020_bk_linescroll_r)
 
 WRITE8_MEMBER(vt_vt1682_state::vt1682_2020_bk_linescroll_w)
 {
-	m_screen->update_partial(m_screen->vpos());
-
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2020_bk_linescroll_w writing: %02x\n", machine().describe_context(), data);
 	m_2020_bk_linescroll = data;
 
@@ -4826,56 +4813,71 @@ void vt_vt1682_state::draw_sprites(const rectangle& cliprect)
 
 	if (sp_en)
 	{
-		for (int i = 0; i < 240; i++)
+		for (int line = cliprect.min_y; line <= cliprect.max_y; line++)
 		{
-			int tilenum = m_spriteram->read8((i * SPRITE_STEP) + 0);
-			int attr0 = m_spriteram->read8((i * SPRITE_STEP) + 1);
-			int x = m_spriteram->read8((i * SPRITE_STEP) + 2);
-			int attr1 = m_spriteram->read8((i * SPRITE_STEP) + 3);
-			int y = m_spriteram->read8((i * SPRITE_STEP) + 4);
-			int attr2 = m_spriteram->read8((i * SPRITE_STEP) + 5);
-
-			tilenum |= (attr0 & 0x0f) << 8;
-
-			if (!tilenum) // verified
-				continue;
-
-			int pal = (attr0 & 0xf0) >> 4;
-
-			int flipx = (attr1 & 0x02) >> 1; // might not function correctly on hardware
-			int flipy = (attr1 & 0x04) >> 2;
-
-			int depth = (attr1 & 0x18) >> 3;
-
-
-			if (attr2 & 0x01)
-				y -= 256;
-
-			if (attr1 & 0x01)
-				x -= 256;
-
-			// guess! Maze Pac needs sprites shifted left by 1, but actual conditions might be more complex
-			//if ((!sp_size & 0x01))
-			//	x -= 1;
-
-			int palselect = 0;
-			if (sp_pal_sel)
+			for (int i = 0; i < 240; i++)
 			{
-				// sprites are rendered to both buffers
-				palselect = 3;
-			}
-			else
-			{
-				if (attr2 & 0x02)
-					palselect = 2;
-				else
-					palselect = 1;
-			}
+				int attr2 = m_spriteram->read8((i * SPRITE_STEP) + 5);
 
-			draw_tile(segment, tilenum, x, y, palselect, pal, sp_size & 0x2, sp_size&0x1, 0, depth * 2, 0, flipx, flipy, cliprect);
+				int ystart = m_spriteram->read8((i * SPRITE_STEP) + 4);
+
+				if (attr2 & 0x01)
+					ystart -= 256;
+
+				int yend = ystart + ((sp_size & 0x2) ? 16 : 8);
+
+				// TODO, cache first 16 sprites per scanline which meet the critera to a list during hblank, set overflow flag if more requested
+				// (do tilenum = 0 sprites count against this limit?)
+
+				if (line >= ystart && line < yend)
+				{
+					int ytileline = line - ystart;
+
+					int tilenum = m_spriteram->read8((i * SPRITE_STEP) + 0);
+					int attr0 = m_spriteram->read8((i * SPRITE_STEP) + 1);
+					int x = m_spriteram->read8((i * SPRITE_STEP) + 2);
+					int attr1 = m_spriteram->read8((i * SPRITE_STEP) + 3);
+
+					tilenum |= (attr0 & 0x0f) << 8;
+
+					if (!tilenum) // verified
+						continue;
+
+					int pal = (attr0 & 0xf0) >> 4;
+
+					int flipx = (attr1 & 0x02) >> 1; // might not function correctly on hardware
+					int flipy = (attr1 & 0x04) >> 2;
+
+					int depth = (attr1 & 0x18) >> 3;
+
+					if (attr1 & 0x01)
+						x -= 256;
+
+					// guess! Maze Pac needs sprites shifted left by 1, but actual conditions might be more complex
+					//if ((!sp_size & 0x01))
+					//	x -= 1;
+
+					int palselect = 0;
+					if (sp_pal_sel)
+					{
+						// sprites are rendered to both buffers
+						palselect = 3;
+					}
+					else
+					{
+						if (attr2 & 0x02)
+							palselect = 2;
+						else
+							palselect = 1;
+					}
+
+					draw_tile_pixline(segment, tilenum, ytileline, x, line, palselect, pal, sp_size & 0x2, sp_size & 0x1, 0, depth * 2, 0, flipx, flipy, cliprect);
+
+				}
+			}
 		}
+		// if more than 16 sprites on any line 0x2001 bit 0x40 (SP_ERR) should be set (updated every line, can only be read in HBLANK)
 	}
-	// if more than 16 sprites on any line 0x2001 bit 0x40 (SP_ERR) should be set (updated every line, can only be read in HBLANK)
 }
 
 uint32_t vt_vt1682_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
@@ -5195,7 +5197,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(vt_vt1682_state::scanline)
 {
 	int scanline = param;
 
-	//m_screen->update_partial(m_screen->vpos());
+	m_screen->update_partial(m_screen->vpos());
 
 	if (scanline == 239) // 239 aligns highway racing title, but could actually depend on when registers get latched
 	{
