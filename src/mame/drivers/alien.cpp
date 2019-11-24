@@ -252,7 +252,7 @@ ROM_START( masmario )
 	ROM_LOAD32_WORD( "mpf_m04f.ic30", 0x000000, 0x200000, CRC(f83ffb1a) SHA1(fa0ec83c21d81288b69e23ee46db359a3902648e) )
 	ROM_LOAD32_WORD( "mpf_m05f.ic33", 0x000002, 0x200000, CRC(fe19dfb7) SHA1(2fdc2feb86840448eb9e47f7bd4dcc9adfc36bdf) )
 
-	ROM_REGION( 0x800000, "ymz770b", 0 ) // not populated
+	ROM_REGION( 0x800000, "ymz770b", ROMREGION_ERASEFF ) // not populated
 
 	ROM_REGION( 0x8000, "nvram", ROMREGION_ERASEFF) //timekeeper device
 	ROM_LOAD( "m48t35y.ic26", 0x000000, 0x008000, CRC(47b9480a) SHA1(9f8a6c7212ee410485e403db57e25d478fb4ae07) )
