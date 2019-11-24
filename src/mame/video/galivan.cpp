@@ -57,7 +57,7 @@ background: 0x4000 bytes of ROM:    76543210    tile code low bits
 
 void galivan_state::galivan_palette(palette_device &palette) const
 {
-	const uint8_t* color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 
 	// create a lookup table for the palette
 	for (int i = 0; i < 0x100; i++)
@@ -107,7 +107,7 @@ void galivan_state::galivan_palette(palette_device &palette) const
 
 void galivan_state::ninjemak_palette(palette_device& palette) const
 {
-	const uint8_t* color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 
 	// create a lookup table for the palette
 	for (int i = 0; i < 0x100; i++)
