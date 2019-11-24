@@ -168,6 +168,7 @@ public:
 	void n8810m55(machine_config &config);
 	void ews286(machine_config &config);
 	void olyport40(machine_config &config);
+	void micral45(machine_config &config);
 
 	void init_at();
 	void init_atpci();
@@ -892,6 +893,14 @@ void at_state::olyport40(machine_config &config)
 	neat(config);
 	m_maincpu->set_clock(12'000'000);
 	subdevice<isa16_slot_device>("isa1")->set_default_option("cga");
+}
+
+// Bull Micral 45
+void at_state::micral45(machine_config &config)
+{
+	atturbo(config);
+	m_maincpu->set_clock(12'000'000);
+	subdevice<isa16_slot_device>("isa1")->set_default_option("ega");
 }
 
 //**************************************************************************
@@ -1995,6 +2004,19 @@ ROM_END
 //**************************************************************************
 //  80286 Desktop
 //**************************************************************************
+
+// Bull Micral 45 - Chipset: VLSI 8842AV / R2622 / VC2730-0001, VLSI 8832VB / L81711 / VL16C452-QC, MBL8042N, MC146818AP, ???, 900110003 V1.1 1986 MICROSOFT, FDC9268, NCR 53C80,
+// CPU: 286, FPU socket proided, 12MHz/8MHz RAM: 6xSIMM30 (1.152MB - 6MB) - ROM: 64KB, 16KB Video BIOS - On board video: Paradise PEGA2A, 256KB video RAM
+// On board: Floppy (2xint, 2xext), SCSI, par, ser, CP8, Microsoft Inport - OSC: 16.257MHz, 48MHz, 14.318180MHz - ISA16: 1, riser card with 1xISA8 and 2xISA16
+ROM_START( micral45 )
+	ROM_REGION16_LE(0x20000, "bios", 0)
+	ROM_SYSTEM_BIOS(0, "vu12", "Version U1.2")
+	ROMX_LOAD( "bm45_u1.2_p665.bin", 0x10000, 0x8000, CRC(046ab44a) SHA1(06e44b0bd8ae77c12319e11f629338651d53141d), ROM_SKIP(1) | ROM_BIOS(0) )
+	ROMX_LOAD( "bm45_u1.2_p664.bin", 0x10001, 0x8000, CRC(5729c972) SHA1(40b2dbc53829384e54cf953ed8b39e5d424bbff2), ROM_SKIP(1) | ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS(1, "vu20", "Versio U2.0")
+	ROMX_LOAD( "even.fil", 0x10000, 0x8000, CRC(438a7b36) SHA1(b5c9a71cfd7e87cc91453a73f17e93527c5ac7ac),  ROM_SKIP(1) | ROM_BIOS(1) )
+	ROMX_LOAD( "odd.fil", 0x10001, 0x8000, CRC(9decd446) SHA1(dcbd305f065382f5327296391da388c50bb1b734),  ROM_SKIP(1) | ROM_BIOS(1) )
+ROM_END
 
 // Wang PC-250/16
 // Phoenix 80286 ROM BIOS PLUS Version 3.10 07 / ROMBIOS Version 03.13.00 (c) Copyright Wang Laboratories, Inc. 1991
@@ -4213,6 +4235,7 @@ COMP( 198?, pccm205,   ibm5170, 0,       atturbo,   0,     at_state,     init_at
 COMP( 198?, pccm216,   ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "PC-Chips", "M216", MACHINE_NOT_WORKING )
 COMP( 198?, snomi286,  ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "Snobol", "Mini 286", MACHINE_NOT_WORKING )
 COMP( 198?, u3911v3,   ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "Uniron", "U3911-V3", MACHINE_NOT_WORKING )
+COMP( 199?, micral45,  ibm5170, 0,       micral45,  0,     at_state,     init_at,        "Bull", "Micral 45", MACHINE_NOT_WORKING )
 COMP( 1986, ncrpc8,    ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "NCR",         "PC-8", MACHINE_NOT_WORKING )
 COMP( 1988, comslt286, ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "Compaq",      "SLT/286", MACHINE_NOT_WORKING )
 COMP( 1990, n8810m16v, ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "Nixdorf Computer AG", "8810 M16 VGA version", MACHINE_NOT_WORKING )
