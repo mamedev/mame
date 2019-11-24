@@ -118,12 +118,17 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(interrupt_ouptut_changed);
 	DECLARE_READ8_MEMBER(get_slave_ack);
 	DECLARE_WRITE_LINE_MEMBER(pit8254_out0_changed);
+	DECLARE_WRITE_LINE_MEMBER(pit8254_out1_changed);
 	DECLARE_WRITE_LINE_MEMBER(pit8254_out2_changed);
 
 private:
 	void internal_io_map(address_map &map);
 	void lpc_io(address_map &map);
 	void update_smi_line();
+	void speaker_set_spkrdata(uint8_t data);
+
+	DECLARE_READ8_MEMBER(portb_r);
+	DECLARE_WRITE8_MEMBER(portb_w);
 
 	devcb_write_line m_smi_callback;
 	devcb_write_line m_interrupt_output;
@@ -141,6 +146,11 @@ private:
 	uint16_t m_global_smi_control;
 	uint8_t m_smi_command_port;
 	lpcbus_device_interface *lpcdevices[16];
+	uint8_t m_speaker;
+	bool m_refresh;
+	uint8_t m_pit_out2;
+	uint8_t m_spkrdata;
+	uint8_t m_channel_check;
 };
 
 DECLARE_DEVICE_TYPE(MCPX_ISALPC, mcpx_isalpc_device)
