@@ -101,4 +101,7 @@ void bml3bus_rtc_device::device_start()
 
 	m_addr_latch = 0;
 	m_data_latch = 0;
+
+	save_item(NAME(m_addr_latch));
+	save_item(NAME(m_data_latch));
 }
