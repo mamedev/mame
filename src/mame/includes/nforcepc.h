@@ -209,17 +209,17 @@ private:
 	} mode;
 	enum LogicalDevice
 	{
-		FDC = 0,
-		Parallel,
-		Serial1,
-		Serial2,
-		Keyboard = 5,
-		ConsumerIR,
-		Gpio1,
-		Gpio2,
-		Gpio34,
-		ACPI,
-		Gpio567 = 12
+		FDC = 0,		// Floppy disk controller
+		Parallel,		// Parallel port
+		Serial1,		// Serial port 1
+		Serial2,		// Serial port 2
+		Keyboard = 5,	// Keyboard controller
+		ConsumerIR,		// Consumer IR
+		Gpio1,			// Game port, MIDI, GPIO set 1
+		Gpio2,			// GPIO set 2
+		Gpio34,			// GPIO set 3 and 4
+		ACPI,			// ACPI
+		Gpio567 = 12	// GPIO set 5, 6 and 7
 	};
 	int config_key_step;
 	int config_index;
@@ -230,6 +230,8 @@ private:
 	devcb_write_line pin_gatea20_callback;
 	required_device<kbdc8042_device> m_kbdc;
 	bool enabled_logical[13];
+	bool enabled_game_port;
+	bool enabled_midi_port;
 
 	lpcbus_host_interface *lpchost;
 	int lpcindex;

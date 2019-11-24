@@ -362,9 +362,14 @@ it8703f_device::it8703f_device(const machine_config &mconfig, const char *tag, d
 	, pin_reset_callback(*this)
 	, pin_gatea20_callback(*this)
 	, m_kbdc(*this, "pc_kbdc")
+	, enabled_game_port(false)
+	, enabled_midi_port(false)
 {
 	memset(global_configuration_registers, 0, sizeof(global_configuration_registers));
 	memset(configuration_registers, 0, sizeof(configuration_registers));
+	global_configuration_registers[0x20] = 0x87; // identifies it8703f
+	global_configuration_registers[0x21] = 1;
+	global_configuration_registers[0x24] = 4;
 	for (int n = 0; n < 13; n++)
 		enabled_logical[n] = false;
 }
@@ -498,6 +503,21 @@ void it8703f_device::write_logical_configuration_register(int index, int data)
 					unmap_keyboard_addresses();
 				enabled_logical[LogicalDevice::Keyboard] = false;
 			}
+		}
+		break;
+	case LogicalDevice::Serial1:
+		break;
+	case LogicalDevice::Serial2:
+		break;
+	case LogicalDevice::Parallel:
+		break;
+	case LogicalDevice::Gpio1:
+		if (index == 0x30)
+		{
+			if (data & 1)
+				enabled_game_port = true;
+			if (data & 2)
+				enabled_midi_port = true;
 		}
 		break;
 	}
