@@ -231,6 +231,7 @@ public:
 	{
 	}
 
+	virtual ~brazehs() override = default;
 	virtual void config(machine_config &config) override
 	{
 		T::config(config);
@@ -277,7 +278,7 @@ protected:
 
 READ_LINE_MEMBER(tnx1_state::dsw1_read)
 {
-	return ioport("DSW1")->read() >> m_dswbit;
+	return m_io_dsw1->read() >> m_dswbit;
 }
 
 

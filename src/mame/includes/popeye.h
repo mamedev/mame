@@ -29,6 +29,7 @@ public:
 		m_color_prom(*this, "proms"),
 		m_color_prom_spr(*this, "sprpal"),
 		m_io_mconf(*this, "MCONF"),
+		m_io_dsw1(*this, "DSW1"),
 		m_background_scroll{0,0,0},
 		m_fg_tilemap(nullptr),
 		m_palette_bank(0),
@@ -57,6 +58,7 @@ protected:
 	required_region_ptr<uint8_t> m_color_prom;
 	required_region_ptr<uint8_t> m_color_prom_spr;
 	required_ioport m_io_mconf;
+	required_ioport m_io_dsw1;
 
 	static const res_net_decode_info mb7051_decode_info;
 	static const res_net_decode_info mb7052_decode_info;
