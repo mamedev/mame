@@ -143,14 +143,14 @@ uint32_t bgfx_chain::applicable_passes()
 	return applicable_passes;
 }
 
-void bgfx_chain::prepend_converter(bgfx_effect *effect, chain_manager &chains)
+void bgfx_chain::insert_effect(uint32_t index, bgfx_effect *effect, std::string name, std::string source, chain_manager &chains)
 {
 	clear_state *clear = new clear_state(BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH | BGFX_CLEAR_STENCIL, 0, 1.0f, 0);
 	std::vector<bgfx_suppressor*> suppressors;
 
 	std::vector<bgfx_input_pair*> inputs;
 	std::vector<std::string> available_textures;
-	inputs.push_back(new bgfx_input_pair(0, "s_tex", "source",  available_textures, "", chains, m_screen_index));
+	inputs.push_back(new bgfx_input_pair(0, "s_tex", source,  available_textures, "", chains, m_screen_index));
 	inputs.push_back(new bgfx_input_pair(1, "s_pal", "palette", available_textures, "", chains, m_screen_index));
 
 	std::vector<bgfx_entry_uniform*> uniforms;
@@ -163,8 +163,7 @@ void bgfx_chain::prepend_converter(bgfx_effect *effect, chain_manager &chains)
 	uniforms.push_back(new bgfx_value_uniform(new bgfx_uniform("u_inv_tex_size0", bgfx::UniformType::Vec4), values, 4));
 	uniforms.push_back(new bgfx_value_uniform(new bgfx_uniform("u_inv_tex_size1", bgfx::UniformType::Vec4), values, 4));
 
-	m_entries.insert(m_entries.begin(), new bgfx_chain_entry("XXconvert", effect, clear, suppressors, inputs, uniforms, m_targets, "screen"));
-	m_has_converter = true;
+	m_entries.insert(m_entries.begin() + index, new bgfx_chain_entry(name, effect, clear, suppressors, inputs, uniforms, m_targets, "screen", false));
 
 	const uint32_t screen_width = chains.targets().width(TARGET_STYLE_GUEST, m_screen_index);
 	const uint32_t screen_height = chains.targets().height(TARGET_STYLE_GUEST, m_screen_index);

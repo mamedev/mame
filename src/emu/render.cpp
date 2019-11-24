@@ -697,7 +697,7 @@ const rgb_t *render_container::bcg_lookup_table(int texformat, u32 &out_length, 
 		case TEXFORMAT_RGB32:
 		case TEXFORMAT_ARGB32:
 		case TEXFORMAT_YUY16:
-			out_length = 256;
+			out_length = ARRAY_LENGTH(m_bcglookup256);
 			return m_bcglookup256;
 
 		default:
