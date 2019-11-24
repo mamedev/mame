@@ -2460,7 +2460,7 @@ static int compare_texture_primitive(const ogl_texture_info *texture, const rend
 		texture->texinfo.width == prim->texture.width &&
 		texture->texinfo.height == prim->texture.height &&
 		texture->texinfo.rowpixels == prim->texture.rowpixels &&
-		/* texture->texinfo.palette == prim->texture.palette && */
+		texture->texinfo.palette == prim->texture.palette &&
 		((texture->flags ^ prim->flags) & (PRIMFLAG_BLENDMODE_MASK | PRIMFLAG_TEXFORMAT_MASK)) == 0)
 		return 1;
 	else
