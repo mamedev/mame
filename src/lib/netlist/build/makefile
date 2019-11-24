@@ -32,7 +32,7 @@ space +=
 TIDY_FLAGS = $(subst $(space),,$(TIDY_FLAGSX))
 TIDY_SOURCES = $(SOURCES)
 
-#TIDY_SOURCES = $(SRC)/solver/nld_solver.cpp
+#TIDY_SOURCES = $(SRC)/devices/nld_7442.cpp $(SRC)/devices/nld_7492.cpp
 
 #TIDY_FLAGS = -checks=llvm-include-order,llvm-namespace-comment,modernize-use-override,modernize-use-using -fix
 #TIDY_FLAGS = -checks=llvm-include-order -fix
@@ -109,6 +109,7 @@ NLOBJS := \
 	$(NLOBJ)/devices/nld_4020.o \
 	$(NLOBJ)/devices/nld_4066.o \
 	$(NLOBJ)/devices/nld_4316.o \
+	$(NLOBJ)/devices/nld_7442.o \
 	$(NLOBJ)/devices/nld_7448.o \
 	$(NLOBJ)/devices/nld_7450.o \
 	$(NLOBJ)/devices/nld_7473.o \
@@ -116,6 +117,7 @@ NLOBJS := \
 	$(NLOBJ)/devices/nld_7475.o \
 	$(NLOBJ)/devices/nld_7483.o \
 	$(NLOBJ)/devices/nld_7485.o \
+	$(NLOBJ)/devices/nld_7492.o \
 	$(NLOBJ)/devices/nld_7490.o \
 	$(NLOBJ)/devices/nld_7493.o \
 	$(NLOBJ)/devices/nld_7497.o \

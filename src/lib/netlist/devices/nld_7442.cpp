@@ -89,7 +89,7 @@ namespace devices
 		const netlist_sig_t new_D = m_D();
 
 		m_last_val = m_val;
-		m_val = (new_D << 3) | (new_C << 2) | (new_B << 1) | new_A;
+		m_val = static_cast<uint8_t>((new_D << 3) | (new_C << 2) | (new_B << 1) | new_A);
 
 		if (m_last_val != m_val)
 		{
