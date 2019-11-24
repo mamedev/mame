@@ -64,6 +64,7 @@ void chain_manager::init_texture_converters()
 	m_converters.push_back(m_effects.effect("misc/texconv_rgb32"));
 	m_converters.push_back(nullptr);
 	m_converters.push_back(m_effects.effect("misc/texconv_yuy16"));
+	m_adjuster = m_effects.effect("misc/bcg_adjust");
 }
 
 void chain_manager::refresh_available_chains()
@@ -156,7 +157,7 @@ bgfx_chain* chain_manager::load_chain(std::string name, uint32_t screen_index)
 	bx::FileReader reader;
 	if (!bx::open(&reader, path.c_str()))
 	{
-		printf("Unable to open chain file %s, falling back to no post processing\n", path.c_str());
+		osd_printf_warning("Unable to open chain file %s, falling back to no post processing\n", path.c_str());
 		return nullptr;
 	}
 
@@ -175,8 +176,8 @@ bgfx_chain* chain_manager::load_chain(std::string name, uint32_t screen_index)
 	if (document.HasParseError())
 	{
 		std::string error(GetParseError_En(document.GetParseError()));
-		printf("Unable to parse chain %s. Errors returned:\n", path.c_str());
-		printf("%s\n", error.c_str());
+		osd_printf_warning("Unable to parse chain %s. Errors returned:\n", path.c_str());
+		osd_printf_warning("%s\n", error.c_str());
 		return nullptr;
 	}
 
@@ -184,7 +185,7 @@ bgfx_chain* chain_manager::load_chain(std::string name, uint32_t screen_index)
 
 	if (chain == nullptr)
 	{
-		printf("Unable to load chain %s, falling back to no post processing\n", path.c_str());
+		osd_printf_warning("Unable to load chain %s, falling back to no post processing\n", path.c_str());
 		return nullptr;
 	}
 
@@ -443,11 +444,12 @@ uint32_t chain_manager::update_screen_textures(uint32_t view, render_primitive *
 
 		const uint32_t src_format = (prim.m_flags & PRIMFLAG_TEXFORMAT_MASK) >> PRIMFLAG_TEXFORMAT_SHIFT;
 		const bool needs_conversion = m_converters[src_format] != nullptr;
+		const bool needs_adjust = prim.m_prim->texture.palette != nullptr && src_format != TEXFORMAT_PALETTE16;
 		std::string screen_index = std::to_string(screen);
 		std::string source_name = "source" + screen_index;
 		std::string screen_name = "screen" + screen_index;
 		std::string palette_name = "palette" + screen_index;
-		std::string full_name = needs_conversion ? source_name : screen_name;
+		std::string full_name = (needs_conversion || needs_adjust) ? source_name : screen_name;
 		if (texture && (texture->width() != tex_width || texture->height() != tex_height))
 		{
 			m_textures.add_provider(full_name, nullptr);
@@ -483,21 +485,19 @@ uint32_t chain_manager::update_screen_textures(uint32_t view, render_primitive *
 				m_textures.add_provider(palette_name, palette);
 			}
 
-			if (screen >= m_screen_textures.size())
+			while (screen >= m_screen_textures.size())
 			{
-				m_screen_textures.push_back(texture);
-				if (palette)
-				{
-					m_screen_palettes.push_back(palette);
-				}
+				m_screen_textures.push_back(nullptr);
 			}
-			else
+			m_screen_textures[screen] = texture;
+
+			while (screen >= m_screen_palettes.size())
 			{
-				m_screen_textures[screen] = texture;
-				if (palette)
-				{
-					m_screen_palettes[screen] = palette;
-				}
+				m_screen_palettes.push_back(nullptr);
+			}
+			if (palette)
+			{
+				m_screen_palettes[screen] = palette;
 			}
 		}
 		else
@@ -506,17 +506,40 @@ uint32_t chain_manager::update_screen_textures(uint32_t view, render_primitive *
 
 			if (prim.m_prim->texture.palette)
 			{
-				m_palette_temp.resize(palette->width() * palette->height() * 4);
+				uint16_t palette_width = (uint16_t)std::min(prim.m_palette_length, 256U);
+				uint16_t palette_height = (uint16_t)std::max((prim.m_palette_length + 255) / 256, 1U);
+				const uint32_t palette_size = palette_width * palette_height * 4;
+				m_palette_temp.resize(palette_size);
 				memcpy(&m_palette_temp[0], prim.m_prim->texture.palette, prim.m_palette_length * 4);
-				const bgfx::Memory *palmem = bgfx::copy(&m_palette_temp[0], palette->width() * palette->height() * 4);
-				palette->update(palmem);
+				const bgfx::Memory *palmem = bgfx::copy(&m_palette_temp[0], palette_size);
+
+				if (palette)
+				{
+					palette->update(palmem);
+				}
+				else
+				{
+					palette = new bgfx_texture(palette_name, bgfx::TextureFormat::BGRA8, palette_width, palette_height, palmem, BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP | BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT, palette_width * 4);
+					m_textures.add_provider(palette_name, palette);
+					while (screen >= m_screen_palettes.size())
+					{
+						m_screen_palettes.push_back(nullptr);
+					}
+					m_screen_palettes[screen] = palette;
+				}
 			}
 		}
 
 		bgfx_chain* chain = screen_chain(screen);
+		if (chain && needs_adjust && !chain->has_adjuster())
+		{
+			chain->insert_effect(chain->has_converter() ? 1 : 0, m_adjuster, "XXadjust", needs_conversion ? "screen" : "source", *this);
+			chain->set_has_adjuster(true);
+		}
 		if (chain && needs_conversion && !chain->has_converter())
 		{
-			chain->prepend_converter(m_converters[src_format], *this);
+			chain->insert_effect(0, m_converters[src_format], "XXconvert", "source", *this);
+			chain->set_has_converter(true);
 		}
 	}
 
