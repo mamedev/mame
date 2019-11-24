@@ -841,14 +841,6 @@ public:
 
 
 //**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-render_screen_list render_target::s_empty_screen_list;
-
-
-
-//**************************************************************************
 //  LAYOUT ELEMENT
 //**************************************************************************
 
@@ -3026,6 +3018,17 @@ layout_view::~layout_view()
 
 
 //-------------------------------------------------
+//  has_screen - return true if this view contains
+//  the given screen
+//-------------------------------------------------
+
+bool layout_view::has_screen(screen_device &screen) const
+{
+	return std::find_if(m_screens.begin(), m_screens.end(), [&screen](auto const &scr) { return &scr.get() == &screen; }) != m_screens.end();
+}
+
+
+//-------------------------------------------------
 //  recompute - recompute the bounds and aspect
 //  ratio of a view and all of its contained items
 //-------------------------------------------------
@@ -3035,7 +3038,7 @@ void layout_view::recompute(render_layer_config layerconfig)
 	// reset the bounds
 	m_bounds.x0 = m_bounds.y0 = m_bounds.x1 = m_bounds.y1 = 0.0f;
 	m_scrbounds.x0 = m_scrbounds.y0 = m_scrbounds.x1 = m_scrbounds.y1 = 0.0f;
-	m_screens.reset();
+	m_screens.clear();
 
 	// loop over all layers
 	bool first = true;
@@ -3059,7 +3062,7 @@ void layout_view::recompute(render_layer_config layerconfig)
 			scrfirst = false;
 
 			// accumulate the screens in use while we're scanning
-			m_screens.add(*curitem.m_screen);
+			m_screens.emplace_back(*curitem.m_screen);
 		}
 	}
 
@@ -3069,7 +3072,7 @@ void layout_view::recompute(render_layer_config layerconfig)
 
 	// if we're handling things normally, the target bounds are (0,0)-(1,1)
 	render_bounds target_bounds;
-	if (!layerconfig.zoom_to_screen() || m_screens.count() == 0)
+	if (!layerconfig.zoom_to_screen() || m_screens.empty())
 	{
 		// compute the aspect ratio of the view
 		m_aspect = (m_bounds.x1 - m_bounds.x0) / (m_bounds.y1 - m_bounds.y0);
