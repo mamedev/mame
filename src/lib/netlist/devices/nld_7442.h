@@ -48,16 +48,16 @@
 
 #include "netlist/nl_setup.h"
 
-#define TTL_7442(name, cA, cB, cC, cD)							\
-		NET_REGISTER_DEV(TTL_7442, name)						\
-		NET_CONNECT(name, GND, GND)								\
-		NET_CONNECT(name, VCC, VCC)								\
-		NET_CONNECT(name, A, cA)								\
-		NET_CONNECT(name, B, cB)								\
-		NET_CONNECT(name, C, cC)								\
+#define TTL_7442(name, cA, cB, cC, cD)                          \
+		NET_REGISTER_DEV(TTL_7442, name)                        \
+		NET_CONNECT(name, GND, GND)                             \
+		NET_CONNECT(name, VCC, VCC)                             \
+		NET_CONNECT(name, A, cA)                                \
+		NET_CONNECT(name, B, cB)                                \
+		NET_CONNECT(name, C, cC)                                \
 		NET_CONNECT(name, D, cD)
 
-#define TTL_7442_DIP(name)										\
+#define TTL_7442_DIP(name)                                      \
 		NET_REGISTER_DEV(TTL_7442_DIP, name)
 
 #endif /* NLD_7442_H_ */

@@ -19,7 +19,7 @@ public:
 	auto space_read_callback() { return m_space_read_cb.bind(); }
 
 	template <unsigned N> auto sound_end_cb() { return m_sound_end_cb[N].bind(); }
-	
+
 	void map(address_map& map);
 
 

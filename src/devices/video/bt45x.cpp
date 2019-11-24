@@ -37,7 +37,7 @@
 #include "bt45x.h"
 
 #define LOG_READS   (1U << 0)
-#define LOG_WRITES	(1U << 1)
+#define LOG_WRITES  (1U << 1)
 
 #define VERBOSE (0)
 

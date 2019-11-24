@@ -7,9 +7,9 @@
     6502 with instruction scrambling
 
     This form of scrambling is used in the VRT VT1682
-	(it's used for the MiWi2 and InterAct consoles).
-    
-	This is simpler, permanently activated and consists of swapping opcode bits
+    (it's used for the MiWi2 and InterAct consoles).
+
+    This is simpler, permanently activated and consists of swapping opcode bits
     7 and 2.
 
 ***************************************************************************/

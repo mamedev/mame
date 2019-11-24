@@ -7,8 +7,8 @@ Alfaskop 41 series
 This driver is a part of a revivel project for Alfaskop 41 series where
 no known working system exists today because of the distributed nature.
 All parts network boots over SS3 (SDLC) from a Floppy Disk unit and nothing
-works unless there is a floppy in that unit. These floppies are rare and 
-many parts have been discarded because they are useless stand alone. 
+works unless there is a floppy in that unit. These floppies are rare and
+many parts have been discarded because they are useless stand alone.
 
 The goal is to emulate missing parts so a full system can be demonstrated again.
 
@@ -122,18 +122,18 @@ void alfaskop4110_state::mem_map(address_map &map)
 	map(0x8000, 0xefff).ram();
 
 	map(0xf600, 0xf6ff).lrw8(NAME([this](offs_t offset) -> uint8_t { LOGNVRAM("nvram_r %04x: %02x\n", offset, 0); return (uint8_t) 0; }),// TODO: Move to MRO board
-				 NAME( [this](offs_t offset, uint8_t data) {	LOGNVRAM("nvram_w %04x: %02x\n", offset, data);	}));
+				 NAME( [this](offs_t offset, uint8_t data) {    LOGNVRAM("nvram_w %04x: %02x\n", offset, data); }));
 	map(0xf7d9, 0xf7d9).mirror(0x06).lrw8(NAME([this](offs_t offset) -> uint8_t    { LOGIO("CRTC reg r %04x: %02x\n", offset, 0); return m_crtc->register_r(); }),
-					      NAME([this](offs_t offset, uint8_t data) { LOGIO("CRTC reg w %04x: %02x\n", offset, data); m_crtc->register_w(data);}));
+						  NAME([this](offs_t offset, uint8_t data) { LOGIO("CRTC reg w %04x: %02x\n", offset, data); m_crtc->register_w(data);}));
 	map(0xf7d8, 0xf7d8).mirror(0x06).lw8(NAME([this](offs_t offset, uint8_t data) { LOGIO("CRTC adr w %04x: %02x\n", offset, data); m_crtc->address_w(data); }));
 	map(0xf7d0, 0xf7d3).mirror(0x04).lrw8(NAME([this](offs_t offset) -> uint8_t    { LOGIO("DIA pia_r %04x: %02x\n", offset, 0); return m_diapia->read(offset & 3); }),
-					      NAME([this](offs_t offset, uint8_t data) { LOGIO("DIA pia_w %04x: %02x\n", offset, data); m_diapia->write(offset & 3, data); }));
+						  NAME([this](offs_t offset, uint8_t data) { LOGIO("DIA pia_w %04x: %02x\n", offset, data); m_diapia->write(offset & 3, data); }));
 	map(0xf7c4, 0xf7c7).mirror(0x00).lrw8(NAME([this](offs_t offset) -> uint8_t    { LOGIO("MIC pia_r %04x: %02x\n", offset, 0); return m_micpia->read(offset & 3); }),
-					      NAME( [this](offs_t offset, uint8_t data) { LOGIO("MIC pia_w %04x: %02x\n", offset, data); m_micpia->write(offset & 3, data); }));
+						  NAME( [this](offs_t offset, uint8_t data) { LOGIO("MIC pia_w %04x: %02x\n", offset, data); m_micpia->write(offset & 3, data); }));
 	map(0xf7c0, 0xf7c1).mirror(0x02).lrw8(NAME([this](offs_t offset) -> uint8_t    { LOGIO("KBD acia_r %04x: %02x\n", offset, 0); return m_kbdacia->read(offset & 1); }),
-					      NAME( [this](offs_t offset, uint8_t data) { LOGIO("KBD acia_w %04x: %02x\n", offset, data); m_kbdacia->write(offset & 1, data); }));
+						  NAME( [this](offs_t offset, uint8_t data) { LOGIO("KBD acia_w %04x: %02x\n", offset, data); m_kbdacia->write(offset & 1, data); }));
 
-       	map(0xf7fc, 0xf7fc).mirror(0x00).lr8(NAME([this](offs_t offset) -> uint8_t { LOGIO("Address Switch 0-7\n"); return 0; }));
+		map(0xf7fc, 0xf7fc).mirror(0x00).lr8(NAME([this](offs_t offset) -> uint8_t { LOGIO("Address Switch 0-7\n"); return 0; }));
 
 	map(0xf800, 0xffff).rom().region("roms", 0);
 }
@@ -143,11 +143,11 @@ void alfaskop4120_state::mem_map(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0xefff).ram();
 	map(0xf600, 0xf6ff).lrw8(NAME([this](offs_t offset) -> uint8_t { LOGNVRAM("nvram_r %04x: %02x\n", offset, 0); return (uint8_t) 0; }), // TODO: Move to MRO board
-				 NAME([this](offs_t offset, uint8_t data) {	LOGNVRAM("nvram_w %04x: %02x\n", offset, data);	}));
+				 NAME([this](offs_t offset, uint8_t data) { LOGNVRAM("nvram_w %04x: %02x\n", offset, data); }));
 	map(0xf740, 0xf743).mirror(0x0c).lrw8(NAME([this](offs_t offset) -> uint8_t    { LOGIO("FDA pia_r %04x: %02x\n", offset, 0); return m_fdapia->read(offset & 3); }),
-					      NAME([this](offs_t offset, uint8_t data) { LOGIO("FDA pia_w %04x: %02x\n", offset, data); m_fdapia->write(offset & 3, data); }));
+						  NAME([this](offs_t offset, uint8_t data) { LOGIO("FDA pia_w %04x: %02x\n", offset, data); m_fdapia->write(offset & 3, data); }));
 	map(0xf7c4, 0xf7c7).mirror(0x00).lrw8(NAME([this](offs_t offset) -> uint8_t    { LOGIO("MIC pia_r %04x: %02x\n", offset, 0); return m_micpia->read(offset & 3); }),
-					      NAME([this](offs_t offset, uint8_t data) { LOGIO("MIC pia_w %04x: %02x\n", offset, data); m_micpia->write(offset & 3, data); }));
+						  NAME([this](offs_t offset, uint8_t data) { LOGIO("MIC pia_w %04x: %02x\n", offset, data); m_micpia->write(offset & 3, data); }));
 	map(0xf800, 0xffff).rom().region("roms", 0);
 }
 
@@ -156,9 +156,9 @@ void alfaskop4101_state::mem_map(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0xefff).ram();
 	map(0xf600, 0xf6ff).lrw8(NAME([this](offs_t offset) -> uint8_t { LOGNVRAM("nvram_r %04x: %02x\n", offset, 0); return (uint8_t) 0; }),
-				 NAME([this](offs_t offset, uint8_t data) {	LOGNVRAM("nvram_w %04x: %02x\n", offset, data);	}));
+				 NAME([this](offs_t offset, uint8_t data) { LOGNVRAM("nvram_w %04x: %02x\n", offset, data); }));
 	map(0xf7c4, 0xf7c7).mirror(0x00).lrw8(NAME([this](offs_t offset) -> uint8_t    { LOGIO("MIC pia_r %04x: %02x\n", offset, 0); return m_micpia->read(offset & 3); }),
-					      NAME([this](offs_t offset, uint8_t data) { LOGIO("MIC pia_w %04x: %02x\n", offset, data); m_micpia->write(offset & 3, data); }));
+						  NAME([this](offs_t offset, uint8_t data) { LOGIO("MIC pia_w %04x: %02x\n", offset, data); m_micpia->write(offset & 3, data); }));
 	map(0xf800, 0xffff).rom().region("roms", 0);
 }
 
@@ -196,7 +196,7 @@ void alfaskop4110_state::alfaskop4110(machine_config &config)
 	/* basic machine hardware */
 	M6800(config, m_maincpu, XTAL(19'170'000) / 18); // Verified from service manual
 	m_maincpu->set_addrmap(AS_PROGRAM, &alfaskop4110_state::mem_map);
-	
+
 	MC6845(config, m_crtc, XTAL(19'170'000) / 9);
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
@@ -246,12 +246,12 @@ void alfaskop4101_state::alfaskop4101(machine_config &config)
 	/* basic machine hardware */
 	M6800(config, m_maincpu, XTAL(19'170'000) / 18); // Verified from service manual
 	m_maincpu->set_addrmap(AS_PROGRAM, &alfaskop4101_state::mem_map);
-	
+
 	PIA6821(config, m_micpia, 0); // Main board PIA
 }
 
 /* ROM definitions */
-ROM_START( alfaskop4110 ) // Display Unit 
+ROM_START( alfaskop4110 ) // Display Unit
 	ROM_REGION( 0x800, "roms", ROMREGION_ERASEFF )
 	ROM_LOAD( "e3405870205201.bin", 0x0000, 0x0800, CRC(23f20f7f) SHA1(6ed008e309473ab966c6b0d42a4f87c76a7b1d6e))
 	ROM_REGION( 0x800, "chargen", ROMREGION_ERASEFF )

@@ -96,7 +96,7 @@
 		</part>
 	</software>
 
-    <!-- Has 3d geometry bugs on attract mode with SH2 DRC, crashes if you attempt to enter into main menu -->
+	<!-- Has 3d geometry bugs on attract mode with SH2 DRC, crashes if you attempt to enter into main menu -->
 	<software name="vrdx" supported="no">
 		<description>Virtua Racing Deluxe (Euro)</description>
 		<year>1994</year>
@@ -2472,7 +2472,7 @@
 		</part>
 	</software>
 
-    <!-- black screen after choosing a level, requires SH2 SCI support -->
+	<!-- black screen after choosing a level, requires SH2 SCI support -->
 	<software name="xmen" supported="no">
 		<description>X-Men (USA, Prototype)</description>
 		<year>1995</year>

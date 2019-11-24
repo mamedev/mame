@@ -54,7 +54,7 @@ class spectrum_mface1_device : public spectrum_mface_base_device
 {
 public:
 	spectrum_mface1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	
+
 	DECLARE_INPUT_CHANGED_MEMBER(magic_button) override;
 
 protected:
@@ -64,7 +64,7 @@ protected:
 
 	virtual uint8_t iorq_r(offs_t offset) override;
 	virtual void iorq_w(offs_t offset, uint8_t data) override;
-	
+
 private:
 	required_ioport m_joy;
 	required_ioport m_hwconfig;

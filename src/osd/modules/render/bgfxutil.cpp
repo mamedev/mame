@@ -45,28 +45,28 @@ const bgfx::Memory* bgfx_util::mame_texture_data_to_argb32(uint32_t src_format, 
 
 	for (int y = 0; y < height; y++)
 	{
-	    switch (src_format)
-	    {
-	    case PRIMFLAG_TEXFORMAT(TEXFORMAT_PALETTE16):
-	        copy_util::copyline_palette16(dst, src16, width, palette);
-	        src16 += rowpixels;
-	        break;
-	    case PRIMFLAG_TEXFORMAT(TEXFORMAT_YUY16):
-	        copy_util::copyline_yuy16_to_argb(dst, src16, width, palette, 1);
-	        src16 += rowpixels;
-	        break;
-	    case PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32):
-	        copy_util::copyline_argb32(dst, src32, width, palette);
-	        src32 += rowpixels;
-	        break;
-	    case PRIMFLAG_TEXFORMAT(TEXFORMAT_RGB32):
-	        copy_util::copyline_rgb32(dst, src32, width, palette);
-	        src32 += rowpixels;
-	        break;
-	    default:
-	        break;
-	    }
-	    dst += width;
+		switch (src_format)
+		{
+		case PRIMFLAG_TEXFORMAT(TEXFORMAT_PALETTE16):
+			copy_util::copyline_palette16(dst, src16, width, palette);
+			src16 += rowpixels;
+			break;
+		case PRIMFLAG_TEXFORMAT(TEXFORMAT_YUY16):
+			copy_util::copyline_yuy16_to_argb(dst, src16, width, palette, 1);
+			src16 += rowpixels;
+			break;
+		case PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32):
+			copy_util::copyline_argb32(dst, src32, width, palette);
+			src32 += rowpixels;
+			break;
+		case PRIMFLAG_TEXFORMAT(TEXFORMAT_RGB32):
+			copy_util::copyline_rgb32(dst, src32, width, palette);
+			src32 += rowpixels;
+			break;
+		default:
+			break;
+		}
+		dst += width;
 	}
 	return mem;
 }

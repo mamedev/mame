@@ -449,26 +449,26 @@ READ8_MEMBER(spectrum_state::spectrum_port_fe_r)
 READ8_MEMBER(spectrum_state::spectrum_port_ula_r)
 {
 	// known ports used for reading floating bus are:
-	//   0x28ff   Arkanoid, Cobra, Renegade, Short Circuit, Terra Cresta        
+	//   0x28ff   Arkanoid, Cobra, Renegade, Short Circuit, Terra Cresta
 	//   0x40ff   Sidewize
-	
+
 	// note, these games clash with Beta disk (status reg is R:xxff)
 
 	offset |= 1;
 	//logerror("fb: %04x\n", offset);
-	
+
 	// Arkanoid, Cobra, Renegade, Short Circuit, Terra Cresta
 	if (offset == 0x28ff)
 		return floating_bus_r();
-	
+
 	// Sidewize
 	if (offset == 0x40ff)
 		return floating_bus_r();
-	
+
 	// Pass through to expansion device if present
 	if (m_exp->get_card_device())
 		return m_exp->iorq_r(offset);
-	
+
 	return floating_bus_r();
 }
 
@@ -525,7 +525,7 @@ uint8_t spectrum_state::floating_bus_r()
 	*  It seems this trick was found quite late in the life of the original Sinclair models,
 	*  then found not to work properly on the later Amstrad models, so was mostly abandoned by devs.
 	*  This means most games that use it were released in a relatively small window of mid-late 1986.
-	*  
+	*
 	*  known games:
 	*    Arkanoid
 	*    Cobra
@@ -538,17 +538,17 @@ uint8_t spectrum_state::floating_bus_r()
 	*
 	*  Note, some were later re-released as "fixed" +2A compatible versions with the floating bus code removed (Arkanoid, Cobra, others?).
 	*/
-	
+
 	uint8_t data = 0xff;
 	int hpos = m_screen->hpos();
 	int vpos = m_screen->vpos();
-	
+
 	// peek into attribute ram when beam is in display area
 	// ula always returns ff when in border area (or h/vblank)
-	
+
 	if ((hpos >= 48 && hpos < 304) && (vpos >= 48 && vpos < 240))
 		data = m_video_ram[0x1800 + (((vpos-48)/8)*32) + ((hpos-48)/8)];
-	
+
 	return data;
 }
 

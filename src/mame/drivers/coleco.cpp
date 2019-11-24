@@ -61,10 +61,10 @@
 
     - Dina SG-1000 mode
 
-	- Bit90:
-		Add support for memory expansion (documented)
-		Add support for printer interface (documented)
-		Add tape Support
+    - Bit90:
+        Add support for memory expansion (documented)
+        Add support for printer interface (documented)
+        Add tape Support
 
 */
 
@@ -175,7 +175,7 @@ void bit90_state::bit90_io_map(address_map &map)
 	map(0xc0, 0xc0).mirror(0x1f).r(FUNC(bit90_state::keyboard_r));
 	map(0xc0, 0xc0).mirror(0x1f).w(FUNC(coleco_state::paddle_on_w));
 	map(0xe0, 0xe0).mirror(0x1d).r(FUNC(coleco_state::paddle_1_r));
-	map(0xe0, 0xe0).mirror(0x1b).w(FUNC(bit90_state::u32_w));  	     // bits7-4 for keyscan, (to bcd decoder) and bits1-0 tape out
+	map(0xe0, 0xe0).mirror(0x1b).w(FUNC(bit90_state::u32_w));        // bits7-4 for keyscan, (to bcd decoder) and bits1-0 tape out
 	map(0xe2, 0xe2).mirror(0x1d).r(FUNC(coleco_state::paddle_2_r));  // also, bit7 is tape read?
 	map(0xe4, 0xe4).mirror(0x1b).w("sn76489a", FUNC(sn76489a_device::write));
 

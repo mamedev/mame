@@ -73,7 +73,7 @@ public:
 		m_interlace = 1;
 		m_oam.interlace = 0;
 	}
-    void set_current_vert(uint16_t value);
+	void set_current_vert(uint16_t value);
 
 protected:
 	/* offset-per-tile modes */

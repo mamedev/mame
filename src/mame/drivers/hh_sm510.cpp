@@ -3637,7 +3637,7 @@ void gnw_mariotj_state::gnw_mariotj(machine_config &config)
 // roms
 
 ROM_START( gnw_mariotj )
-    ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "mb-108.program", 0x0000, 0x1000, CRC(f7118bb4) SHA1(c3117fd009e4686a149f85fb65786ddffc091eeb) )
 
 	ROM_REGION( 0x100, "maincpu:melody", 0 )

@@ -597,7 +597,7 @@ screen_device::screen_device(const machine_config &mconfig, const char *tag, dev
 
 screen_device::~screen_device()
 {
-    destroy_scan_bitmaps();
+	destroy_scan_bitmaps();
 }
 
 
@@ -608,21 +608,21 @@ screen_device::~screen_device()
 
 void screen_device::destroy_scan_bitmaps()
 {
-    if (m_video_attributes & VIDEO_VARIABLE_WIDTH)
-    {
-        const bool screen16 = !m_screen_update_ind16.isnull();
-        for (int j = 0; j < 2; j++)
-        {
-            for (bitmap_t* bitmap : m_scan_bitmaps[j])
-            {
-                if (screen16)
-                    delete (bitmap_ind16*)bitmap;
-                else
-                    delete (bitmap_rgb32*)bitmap;
-            }
-            m_scan_bitmaps[j].clear();
-        }
-    }
+	if (m_video_attributes & VIDEO_VARIABLE_WIDTH)
+	{
+		const bool screen16 = !m_screen_update_ind16.isnull();
+		for (int j = 0; j < 2; j++)
+		{
+			for (bitmap_t* bitmap : m_scan_bitmaps[j])
+			{
+				if (screen16)
+					delete (bitmap_ind16*)bitmap;
+				else
+					delete (bitmap_rgb32*)bitmap;
+			}
+			m_scan_bitmaps[j].clear();
+		}
+	}
 }
 
 
@@ -633,14 +633,14 @@ void screen_device::destroy_scan_bitmaps()
 
 void screen_device::allocate_scan_bitmaps()
 {
-    if (m_video_attributes & VIDEO_VARIABLE_WIDTH)
-    {
-        const bool screen16 = !m_screen_update_ind16.isnull();
-        s32 effwidth = std::max(m_max_width, m_visarea.right() + 1);
-        const s32 old_height = (s32)m_scan_widths.size();
-        s32 effheight = std::max(m_height, m_visarea.bottom() + 1);
-        if (old_height < effheight)
-        {
+	if (m_video_attributes & VIDEO_VARIABLE_WIDTH)
+	{
+		const bool screen16 = !m_screen_update_ind16.isnull();
+		s32 effwidth = std::max(m_max_width, m_visarea.right() + 1);
+		const s32 old_height = (s32)m_scan_widths.size();
+		s32 effheight = std::max(m_height, m_visarea.bottom() + 1);
+		if (old_height < effheight)
+		{
 			for (int i = old_height; i < effheight; i++)
 			{
 				for (int j = 0; j < 2; j++)
@@ -668,7 +668,7 @@ void screen_device::allocate_scan_bitmaps()
 				m_scan_widths.erase(m_scan_widths.begin() + i);
 			}
 		}
-    }
+	}
 }
 
 //-------------------------------------------------
@@ -1021,8 +1021,8 @@ void screen_device::configure(int width, int height, const rectangle &visarea, a
 	m_visarea = visarea;
 
 	// reallocate bitmap(s) if necessary
-    realloc_screen_bitmaps();
-    if (machine().input().code_pressed(KEYCODE_E)) printf("CONFIGURE\n");
+	realloc_screen_bitmaps();
+	if (machine().input().code_pressed(KEYCODE_E)) printf("CONFIGURE\n");
 
 	// compute timing parameters
 	m_frame_period = frame_period;
@@ -1094,8 +1094,8 @@ void screen_device::reset_origin(int beamy, int beamx)
 
 void screen_device::update_scan_bitmap_size(int y)
 {
-    // don't update this line if it exceeds the allocated size, which can happen on initial configuration
-    if (y >= m_scan_widths.size())
+	// don't update this line if it exceeds the allocated size, which can happen on initial configuration
+	if (y >= m_scan_widths.size())
 		return;
 
 	// determine effective size to allocate
@@ -1138,7 +1138,7 @@ void screen_device::realloc_screen_bitmaps()
 	m_texture[0]->set_bitmap(m_bitmap[0], m_visarea, m_bitmap[0].texformat());
 	m_texture[1]->set_bitmap(m_bitmap[1], m_visarea, m_bitmap[1].texformat());
 
-    allocate_scan_bitmaps();
+	allocate_scan_bitmaps();
 }
 
 

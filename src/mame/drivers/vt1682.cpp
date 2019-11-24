@@ -11,43 +11,43 @@
 */
 
 /*
-	UNIMPLEMENTED / TODO
-	
-	General VT1862:
+    UNIMPLEMENTED / TODO
 
-	Sound Quality (currently crackles)
-	Verify timer enable / disable behavior
-	Line Modes, High Colour Line Mode
-	Tile rowscroll modes
-	0x8000 bit in palette is 'cut through' mode, which isn't the same as transpen, some kind of palette manipulation
-	**DONE** It seems Pal1 and Pal2 should actually be separate render buffers for each palette, on which layers / sprites can be enabled, that are mixed later and can be output independently to LCD and TV? 
-		(how does this work with high colour line mode?)
-	CCIR effects (only apply to 'palette 2'?)
-	LCD Control registers
-	Internal to External DMA (glitchy)
-	Sprite limits
-	Other hardware limits (video DMA should be delayed until Vblank, some registers only take effect at Hblank)
-	Verify raster timing (might be off by a line)
-	Hardware glitches (scroll layers + sprites get offset under specific conditions, sprites sometimes missing in 2 rightmost column, bk sometimes missing in rightmost column during scroll)
-	Sleep functionality on sound cpu (broken on hardware?)
-	Interrupt controller / proper interrupt support (currently a bit hacky, only main timer and sub-timer a supported)
-	Proper IO support (enables / disables) UART, I2C etc.
-	'Capture' mode
-	Gain (zoom) for Tilemaps
+    General VT1862:
 
-	Refactor into a device
+    Sound Quality (currently crackles)
+    Verify timer enable / disable behavior
+    Line Modes, High Colour Line Mode
+    Tile rowscroll modes
+    0x8000 bit in palette is 'cut through' mode, which isn't the same as transpen, some kind of palette manipulation
+    **DONE** It seems Pal1 and Pal2 should actually be separate render buffers for each palette, on which layers / sprites can be enabled, that are mixed later and can be output independently to LCD and TV?
+        (how does this work with high colour line mode?)
+    CCIR effects (only apply to 'palette 2'?)
+    LCD Control registers
+    Internal to External DMA (glitchy)
+    Sprite limits
+    Other hardware limits (video DMA should be delayed until Vblank, some registers only take effect at Hblank)
+    Verify raster timing (might be off by a line)
+    Hardware glitches (scroll layers + sprites get offset under specific conditions, sprites sometimes missing in 2 rightmost column, bk sometimes missing in rightmost column during scroll)
+    Sleep functionality on sound cpu (broken on hardware?)
+    Interrupt controller / proper interrupt support (currently a bit hacky, only main timer and sub-timer a supported)
+    Proper IO support (enables / disables) UART, I2C etc.
+    'Capture' mode
+    Gain (zoom) for Tilemaps
 
-	+ more
+    Refactor into a device
 
-	Intec InterAct:
+    + more
 
-	Is there meant to be a 2nd player? (many games prompt a 2nd player to start, but inputs don't appear to be read?)
-	Verify that internal ROM is blank (it isn't used)
+    Intec InterAct:
 
-	Zone 40:
+    Is there meant to be a 2nd player? (many games prompt a 2nd player to start, but inputs don't appear to be read?)
+    Verify that internal ROM is blank (it isn't used)
 
-	Decrypt, verify it's a good dump, verify that it's 6502 code, see how close the architecture is to 1682 (many games are the same)
-	If it has an internal ROM dump it (I don't see any obvious encrypted boot vectors in current dump)
+    Zone 40:
+
+    Decrypt, verify it's a good dump, verify that it's 6502 code, see how close the architecture is to 1682 (many games are the same)
+    If it has an internal ROM dump it (I don't see any obvious encrypted boot vectors in current dump)
 
 */
 
@@ -4682,14 +4682,14 @@ void vt_vt1682_state::draw_layer(int which, int opaque, const rectangle& cliprec
 		   sprites and tilemaps on the select menu need to align too, without left edge scrolling glitches
 		   judging this from videos is tricky, because there's another bug that causes the right-most column of pixels to not render for certain scroll values
 		   and the right-most 2 columns of sprites to not render
-		   
+
 		   does this come down to pal1/pal2 output mixing rather than specific layers?
 		*/
 		//if (which == 0)
-		//	xscroll += 1;
+		//  xscroll += 1;
 
 		//if (which == 1)
-		//	xscroll += 1;
+		//  xscroll += 1;
 
 		int segment = m_segment_7_0_bk[which];
 		segment |= m_segment_11_8_bk[which] << 8;
@@ -4770,7 +4770,7 @@ void vt_vt1682_state::draw_layer(int which, int opaque, const rectangle& cliprec
 					{
 						// this mode isn't tested, not seen it used
 						//if (bk_paldepth_mode)
-						//	popmessage("bk_paldepth_mode set\n");
+						//  popmessage("bk_paldepth_mode set\n");
 						realdepth = pal & 0x03;
 
 						// depth might instead be the high 2 bits in 4bpp mode
@@ -4855,7 +4855,7 @@ void vt_vt1682_state::draw_sprites(const rectangle& cliprect)
 
 					// guess! Maze Pac needs sprites shifted left by 1, but actual conditions might be more complex
 					//if ((!sp_size & 0x01))
-					//	x -= 1;
+					//  x -= 1;
 
 					int palselect = 0;
 					if (sp_pal_sel)

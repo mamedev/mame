@@ -294,7 +294,7 @@ uint8_t bbc_ariesb32_device::ram_r(offs_t offset)
 void bbc_ariesb32_device::ram_w(offs_t offset, uint8_t data)
 {
 	//if ((offset & 0xff) == 0x00)
-	//	logerror("ram_w: %04x = %02x\n", offset, data);
+	//  logerror("ram_w: %04x = %02x\n", offset, data);
 	if (m_shadow && offset >= 0x3000)
 		m_ram[offset - 0x3000] = data;
 	else
@@ -324,7 +324,7 @@ uint8_t bbc_ariesb32_device::paged_r(offs_t offset)
 void bbc_ariesb32_device::paged_w(offs_t offset, uint8_t data)
 {
 	//if ((offset & 0xff) == 0x00)
-	//	logerror("paged_w: %04x = %02x\n", offset | 0x8000, data);
+	//  logerror("paged_w: %04x = %02x\n", offset | 0x8000, data);
 	if (m_rom[m_romsel])
 	{
 		m_rom[m_romsel]->write(offset, data);

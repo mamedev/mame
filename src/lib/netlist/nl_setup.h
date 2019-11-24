@@ -448,7 +448,7 @@ namespace netlist
 		devices::nld_netlistparams                  *m_netlist_params;
 		std::unordered_map<pstring, param_ref_t>    m_params;
 		std::unordered_map<detail::core_terminal_t *,
-			devices::nld_base_proxy *>				m_proxies;
+			devices::nld_base_proxy *>              m_proxies;
 
 		unsigned m_proxy_cnt;
 	};

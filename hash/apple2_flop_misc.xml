@@ -825,13 +825,13 @@
 		<publisher>4AM</publisher>
 		<info name="usage" value="Defective disk image format, but is worked around by MAME's detection." />
 		<info name="release" value="2019-03-16"/>
-		<!-- 
+		<!--
 		* Support booting 13-sector disks
 		* Support booting disks on Apple //c and IIgs which would otherwise
 		time out looking for a boot sector (SpiraDisc, some early EA games)
 		* Bypass a peripheral scan in some games that would hang on some
-		peripherals	and crash others and require a hardware power cycle in
-		order to reboot	properly (SpiraDisc)
+		peripherals and crash others and require a hardware power cycle in
+		order to reboot properly (SpiraDisc)
 		* Support multiple versions of "David's Midnight Magic"
 		* Remove "unsupported game" error, always continue booting
 		* Bypass prompt if launched from hard drive (press the open- or
@@ -924,7 +924,7 @@
 		<publisher>4AM</publisher>
 		<info name="release" value="2019-11-09"/>
 		<!--
-		* Support Personal Software 13-sector disks 
+		* Support Personal Software 13-sector disks
 		("MicroChess 2.0," "Checker King," "Gammon Gambler")
 		-->
 
@@ -6725,8 +6725,8 @@
 		language card (which is a 16K RAM card) and a firmware card. When it
 		finds the language card, it assumes both BASICs are present and tries to
 		use both, which fails.
-		
-		Additionally, newer Apples cannot directly book 13-sector disks, 
+
+		Additionally, newer Apples cannot directly book 13-sector disks,
 		so this patch converts the program to a 16-sector disk and patches the
 		program to ignore a blank language card while preserving the ability to
 		utilize both BASICs. -->

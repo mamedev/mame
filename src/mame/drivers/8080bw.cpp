@@ -3569,20 +3569,20 @@ void _8080bw_state::init_invmulti()
 /*                                                     */
 /*******************************************************/
 /***********************************************************************************************************************************
-	This game was never released by Model Racing to the public.
+    This game was never released by Model Racing to the public.
 
-	The assembler source files for this game were extracted from the original floppy disks used by the former Model Racing developer
-	Adolfo Melilli (adolfo@melilli.com).
-	Those disks were retrieved by Alessandro Bolgia (xadhoom76@gmail.com) and Lorenzo Fongaro (lorenzo.fongaro@virgilio.it) and
-	dumped by Piero Andreini (pieroandreini@gmail.com) using KryoFlux hardware and software.
-	Subsequently Jean Paul Piccato (j2pguard-spam@yahoo.com) mounted the images and compiled the source files, managed to set up a
-	romset and wrote a MAME driver that aims to reproduce in the most faithful way the work of Melilli at Model Racing in late '70s.
+    The assembler source files for this game were extracted from the original floppy disks used by the former Model Racing developer
+    Adolfo Melilli (adolfo@melilli.com).
+    Those disks were retrieved by Alessandro Bolgia (xadhoom76@gmail.com) and Lorenzo Fongaro (lorenzo.fongaro@virgilio.it) and
+    dumped by Piero Andreini (pieroandreini@gmail.com) using KryoFlux hardware and software.
+    Subsequently Jean Paul Piccato (j2pguard-spam@yahoo.com) mounted the images and compiled the source files, managed to set up a
+    romset and wrote a MAME driver that aims to reproduce in the most faithful way the work of Melilli at Model Racing in late '70s.
 
-	The game driver is not based on hardware inspection and is solely derived from assumptions I've made looking at the assembler
-	code and comments written into the source files of the game. Several of those hypotheses came following the directions of
-	previous yet contemporary Model Racing works (Eg: Claybuster) and were confirmed by Melilli himself.
+    The game driver is not based on hardware inspection and is solely derived from assumptions I've made looking at the assembler
+    code and comments written into the source files of the game. Several of those hypotheses came following the directions of
+    previous yet contemporary Model Racing works (Eg: Claybuster) and were confirmed by Melilli himself.
 
-	Being unreleased this game lacks an official name, thus the name used in the source files was used instead.
+    Being unreleased this game lacks an official name, thus the name used in the source files was used instead.
 
 ***********************************************************************************************************************************/
 void cane_state::cane_map(address_map &map)
@@ -3594,99 +3594,99 @@ void cane_state::cane_map(address_map &map)
 void cane_state::cane_io_map(address_map &map)
 {
 /*********************************************************************************************************************************
-	-----------
-	I/O mapping
-	-----------
-	out:
-	$00 - Unknown - Not yet emulated
-	$01 - Hardware shift register - Shift count
-	$02 - Hardware shift register - Shift data
-	$03 - Audio sub-system - D0->sx0, D1->sx1, D2->sx2, D3->sx3, D4->sx4, D5-D7 unused
-													 sx0 mute/unmute all
-													 sx1,sx2,sx3 routed to 76477 mixer select
-													 sx4 routed to 555 one-shot trigger
-	$04 - Reset watchdog timer
-	$05 - Audio TOS
+    -----------
+    I/O mapping
+    -----------
+    out:
+    $00 - Unknown - Not yet emulated
+    $01 - Hardware shift register - Shift count
+    $02 - Hardware shift register - Shift data
+    $03 - Audio sub-system - D0->sx0, D1->sx1, D2->sx2, D3->sx3, D4->sx4, D5-D7 unused
+                                                     sx0 mute/unmute all
+                                                     sx1,sx2,sx3 routed to 76477 mixer select
+                                                     sx4 routed to 555 one-shot trigger
+    $04 - Reset watchdog timer
+    $05 - Audio TOS
 
-	in:
-	$01 - CPO / coin input port
-	$03 - Hardware shift register - Shift result
+    in:
+    $01 - CPO / coin input port
+    $03 - Hardware shift register - Shift result
 
 =================================================================================================================
 ------------
 -- OUT 0 --
 Source file: CANE1.ED - Referenced only once in code, in the "rifle routine" (ROUTINE FUCILE)
 
-	> ;ROUTINE FUCILE
-	>   CALL  SPARO
-	>   OUT 0
+    > ;ROUTINE FUCILE
+    >   CALL  SPARO
+    >   OUT 0
 
 ------------
 -- OUT 1 --
 Source files: CANE2.ED, MIRINO.ED
 
-	Defined in CANE2.ED
+    Defined in CANE2.ED
 
-	> PRMTR EQU 1
+    > PRMTR EQU 1
 
-	and referenced multiple times in CANE2.ED and MIRINO.ED. Eg:
+    and referenced multiple times in CANE2.ED and MIRINO.ED. Eg:
 
-	> ;PER RISPETTARE POS ORIZZONT. UCCELLO
-	>   LXI D,TPADEL
-	>   XRA A
-	>   OUT PRMTR
+    > ;PER RISPETTARE POS ORIZZONT. UCCELLO
+    >   LXI D,TPADEL
+    >   XRA A
+    >   OUT PRMTR
 
 ------------
 -- OUT 2 --
 Source files: CANE1.ED, CANE2.ED, MIRINO.ED
 
-	Defined in CANE2.ED
+    Defined in CANE2.ED
 
-	> DATO  EQU 2
+    > DATO  EQU 2
 
-	and referenced multiple times in CANE1.ED and MIRINO.ED. Eg:
+    and referenced multiple times in CANE1.ED and MIRINO.ED. Eg:
 
-	> ZANZ: XRA A
-	>   OUT DATO
+    > ZANZ: XRA A
+    >   OUT DATO
 
 ------------
 -- OUT 3 --
 Source file: CANE2.ED
 
-	The access to port 3 is mediated by the routines SETP3 and RESP3 defined in CANE2.ED
-	SETP3 -- Port 3 = Port 3 | A
+    The access to port 3 is mediated by the routines SETP3 and RESP3 defined in CANE2.ED
+    SETP3 -- Port 3 = Port 3 | A
 
-	> SETP3:
-	> ;SETTA I BITS CONTEN IN REG A NELLA PORTA 3
+    > SETP3:
+    > ;SETTA I BITS CONTEN IN REG A NELLA PORTA 3
 
-	RESP3 -- Port 3 = Port 3 & A
+    RESP3 -- Port 3 = Port 3 & A
 
-	> RESP3:
-	> ;IL CONTRARIO DI SETP3
+    > RESP3:
+    > ;IL CONTRARIO DI SETP3
 
-	and referenced multiple times in CANE2.ED. Eg:
+    and referenced multiple times in CANE2.ED. Eg:
 
-	> ;SPENGO IL VOLO UCCELLI
-	> MVI A,0FEH
-	> CALL  SETP3
+    > ;SPENGO IL VOLO UCCELLI
+    > MVI A,0FEH
+    > CALL  SETP3
 
 ------------
 -- OUT 4 --
 Source file: CANE1.ED, CANE2.ED
 
-	Called directly in CANE1.ED
+    Called directly in CANE1.ED
 
-	> INT8:
-	>   OUT 4
-	> ;PER LAUTORESET
+    > INT8:
+    >   OUT 4
+    > ;PER LAUTORESET
 
-	Also defined in CANE2.ED
+    Also defined in CANE2.ED
 
-	> RESET EQU 4
+    > RESET EQU 4
 
-	and called multiple times in CANE1.ED and CANE2.ED. Eg:
+    and called multiple times in CANE1.ED and CANE2.ED. Eg:
 
-	> DELAY3: OUT RESET
+    > DELAY3: OUT RESET
 
 ------------
 -- OUT 5 --
@@ -3697,79 +3697,79 @@ D0-D7 is pushed into a LS273 (Octal D-type Flip-Flop) and its value is used to p
 two, cascaded, LS161 (Synchronous 4-Bit Counters).
 The counters drive a J-K Flip-Flop generating a square wave signal driven in frequency by the preloaded value.
 
-	> CANONE:
-	> ;AZZITTO IL TOS:
-	>   MVI A,255   ; A = 255       ; TIMER spento
-	>   OUT 5       ; OUT 5
+    > CANONE:
+    > ;AZZITTO IL TOS:
+    >   MVI A,255   ; A = 255       ; TIMER spento
+    >   OUT 5       ; OUT 5
 
 The musical notes are defined in a library source file TOS.ED and referenced later by the source files, eg. in CANE2.ED:
-	> CARICA: DB  RE,FA,FA,FA,FA,PAU
-	>   DB  RE,FA,FA,FA,FA,PAU
-	>   DB  RE,FA,PAU,RE,FA,PAU
-	>   DB  RE,FA,FA,FA,FA,PAU
-	>   DB  FINALE
-	> TABSTR: NOP
-	> LULUP:  DB  DO,RE,MI,FA,SOL,LA,SI,DO2
-	>   DB  FINALE
+    > CARICA: DB  RE,FA,FA,FA,FA,PAU
+    >   DB  RE,FA,FA,FA,FA,PAU
+    >   DB  RE,FA,PAU,RE,FA,PAU
+    >   DB  RE,FA,FA,FA,FA,PAU
+    >   DB  FINALE
+    > TABSTR: NOP
+    > LULUP:  DB  DO,RE,MI,FA,SOL,LA,SI,DO2
+    >   DB  FINALE
 
-	> CIPCIP: DB  220,215,210,205,200,FINALE
+    > CIPCIP: DB  220,215,210,205,200,FINALE
 
-	The notes are defined in TOS.ED:
-	> ; SI PARTE DA UNA FREQUENZA DI CLOCK DI 1 MHZ CIRCA,QUESTA FREQUENZA DIVISA)
-	> ; PER UNA SERIE DI PARAMETRI ATTRAVERSO DEI DIVISORI PROGRAMMABILI FORNISCE
-	> ; ALL'USCITA DI QUESTI I DODICI SEMITONI DELLA SCALA CROMATICA
+    The notes are defined in TOS.ED:
+    > ; SI PARTE DA UNA FREQUENZA DI CLOCK DI 1 MHZ CIRCA,QUESTA FREQUENZA DIVISA)
+    > ; PER UNA SERIE DI PARAMETRI ATTRAVERSO DEI DIVISORI PROGRAMMABILI FORNISCE
+    > ; ALL'USCITA DI QUESTI I DODICI SEMITONI DELLA SCALA CROMATICA
 
-	Name - Counter - Aprox. frequency
-	DO    16    - 1000/(255-16)  = 4.18 KHz
-	DOD   30    - 1000/(255-30)  = 4.44 KHz
-	RE    43    - 1000/(255-43)  = 4.72 KHz
-	RED   55    - 1000/(255-55)  = 5    KHz
-	MI    66    - 1000/(255-66)  = 5.29 KHz
-	FA    77    - 1000/(255-77)  = 5.62 KHz
-	FAD   87    - 1000/(255-87)  = 5.95 KHz
-	SOL   96    - 1000/(255-96)  = 6.29 KHz
-	SOLD  105   - 1000/(255-105) = 6.67 KHz
-	LA    114   - 1000/(255-114) = 7.09 KHz
-	LAD   122   - 1000/(255-122) = 7.52 KHz
-	SI    129   - 1000/(255-129) = 7.94 KHz
+    Name - Counter - Aprox. frequency
+    DO    16    - 1000/(255-16)  = 4.18 KHz
+    DOD   30    - 1000/(255-30)  = 4.44 KHz
+    RE    43    - 1000/(255-43)  = 4.72 KHz
+    RED   55    - 1000/(255-55)  = 5    KHz
+    MI    66    - 1000/(255-66)  = 5.29 KHz
+    FA    77    - 1000/(255-77)  = 5.62 KHz
+    FAD   87    - 1000/(255-87)  = 5.95 KHz
+    SOL   96    - 1000/(255-96)  = 6.29 KHz
+    SOLD  105   - 1000/(255-105) = 6.67 KHz
+    LA    114   - 1000/(255-114) = 7.09 KHz
+    LAD   122   - 1000/(255-122) = 7.52 KHz
+    SI    129   - 1000/(255-129) = 7.94 KHz
 
-	DO2   136   - 1000/(255-136) = 8.4  KHz
-	DOD2  143   - 1000/(255-143) = 8.93 KHz
-	RE2   149.5 - 1000/(255-150) = 9.52 KHz
-	RED2  155.5 - 1000/(255-156) = 10.1 KHz
-	MI2   161   - 1000/(255-161) = 10.64 KHz
-	FA2   166.5 - 1000/(255-167) = 11.36 KHz
-	FAD2  171.5 - 1000/(255-172) = 12.05 KHz
-	SOL2  176   - 1000/(255-176) = 12.66 KHz
-	SOLD2 180.5   - 1000/(255-181) = 13.51 KHz
-	LA2   185   - 1000/(255-185) = 14.29 KHz
-	LAD2  189   - 1000/(255-189) = 15.15 KHz
-	SI2   192.5 - 1000/(255-193) = 16.13 KHz
+    DO2   136   - 1000/(255-136) = 8.4  KHz
+    DOD2  143   - 1000/(255-143) = 8.93 KHz
+    RE2   149.5 - 1000/(255-150) = 9.52 KHz
+    RED2  155.5 - 1000/(255-156) = 10.1 KHz
+    MI2   161   - 1000/(255-161) = 10.64 KHz
+    FA2   166.5 - 1000/(255-167) = 11.36 KHz
+    FAD2  171.5 - 1000/(255-172) = 12.05 KHz
+    SOL2  176   - 1000/(255-176) = 12.66 KHz
+    SOLD2 180.5   - 1000/(255-181) = 13.51 KHz
+    LA2   185   - 1000/(255-185) = 14.29 KHz
+    LAD2  189   - 1000/(255-189) = 15.15 KHz
+    SI2   192.5 - 1000/(255-193) = 16.13 KHz
 
-	Pause code:
-	PAU EQU 255
+    Pause code:
+    PAU EQU 255
 
-	End of note sequence:
-	FINALE  EQU 254
+    End of note sequence:
+    FINALE  EQU 254
 
 ------------
 -- IN 1 --
 Source file: CANE2.ED
 
-	Defined in CANE2.ED
-	> PORTAM  EQU 1 ;E' LA PORTA DI INPUT DI TUTTI I PULSANTI
+    Defined in CANE2.ED
+    > PORTAM  EQU 1 ;E' LA PORTA DI INPUT DI TUTTI I PULSANTI
 
 ------------
 -- IN 3 --
 Source file: CANE1.ED, CANE2.ED
-	Defined in CANE2.ED
+    Defined in CANE2.ED
 
-	> PRONTO  EQU 3
+    > PRONTO  EQU 3
 
-	and referenced in CANE1.ED
+    and referenced in CANE1.ED
 
-	> OUT LOW DATO
-	> IN  LOW PRONTO
+    > OUT LOW DATO
+    > IN  LOW PRONTO
 
 **********************************************************************************************************************************/
 	map(0x00, 0x00).w(FUNC(cane_state::cane_unknown_port0_w));
@@ -3785,56 +3785,56 @@ Source file: CANE1.ED, CANE2.ED
 
 static INPUT_PORTS_START( cane )
 /* Source file: CANE2.ED, MIRINO.ED
-	Port definition:
-	> PORTAM  EQU 1 ;E' LA PORTA DI INPUT DI TUTTI I PULSANTI
+    Port definition:
+    > PORTAM  EQU 1 ;E' LA PORTA DI INPUT DI TUTTI I PULSANTI
 
-	Bit values:
-	CANE2.ED
-	> DITO  EQU 80H ;BIT DEL PULSANTE DI SPARO DEL FUCILE
+    Bit values:
+    CANE2.ED
+    > DITO  EQU 80H ;BIT DEL PULSANTE DI SPARO DEL FUCILE
 
-	MIRINO.ED
-	> UPPMIR  EQU 20H ;BIT PER MIRINO IN ALTO
-	> LOWMIR  EQU 40H ;BASSO
-	> RIGMIR  EQU 8H  ;DESTRA
-	> LEFMIR  EQU 10H ;SINISTRA
+    MIRINO.ED
+    > UPPMIR  EQU 20H ;BIT PER MIRINO IN ALTO
+    > LOWMIR  EQU 40H ;BASSO
+    > RIGMIR  EQU 8H  ;DESTRA
+    > LEFMIR  EQU 10H ;SINISTRA
 
-	Joystick reading routine:
-	MIRINO.ED
-	> ;ORA LEGGO LA PORTA DELLA CLOCHE
-	>   IN  LOW PORTAM
-	>   MOV B,A
-	> ;A QUESTO PUNTO AGGIORNO LE COORDINATE X E Y A SECONDA DELLO STATO DEI BIT
-	> ;DELLA CLOCHE (ATTIVI BASSI)
-	>   ANI LOWMIR
-	>   CZ  MIRLOW
-	>   MOV A,B
-	>   ANI UPPMIR
-	>   CZ  MIRUPP
-	>   MOV A,B
-	>   ANI LEFMIR
-	>   CZ  MIRLEF
-	>   MOV A,B
-	>   ANI RIGMIR
-	>   CZ  MIRRIG
+    Joystick reading routine:
+    MIRINO.ED
+    > ;ORA LEGGO LA PORTA DELLA CLOCHE
+    >   IN  LOW PORTAM
+    >   MOV B,A
+    > ;A QUESTO PUNTO AGGIORNO LE COORDINATE X E Y A SECONDA DELLO STATO DEI BIT
+    > ;DELLA CLOCHE (ATTIVI BASSI)
+    >   ANI LOWMIR
+    >   CZ  MIRLOW
+    >   MOV A,B
+    >   ANI UPPMIR
+    >   CZ  MIRUPP
+    >   MOV A,B
+    >   ANI LEFMIR
+    >   CZ  MIRLEF
+    >   MOV A,B
+    >   ANI RIGMIR
+    >   CZ  MIRRIG
 
-	Shot reading routine:
-	CANE2.ED
-	> ;QUI CI VADO SE NESSUNO PREME IL PULSANTE E STO ASPETTANDO UNO SPARO
-	> ;TEST GRILLETTO
-	>     IN  PORTAM
-	>     ANI DITO
+    Shot reading routine:
+    CANE2.ED
+    > ;QUI CI VADO SE NESSUNO PREME IL PULSANTE E STO ASPETTANDO UNO SPARO
+    > ;TEST GRILLETTO
+    >     IN  PORTAM
+    >     ANI DITO
 
-	Coin reading routine;
-	CANE1.ED
-	> ;ACCREDITA
-	> SAR9A:  IN  1
-	>   ANI 4
+    Coin reading routine;
+    CANE1.ED
+    > ;ACCREDITA
+    > SAR9A:  IN  1
+    >   ANI 4
 
-	Start game: (Verified by debugging $3C2)
-	CANE1.ED
-	> IN  1
-	> ANI 8
-	> JNZ FONTI
+    Start game: (Verified by debugging $3C2)
+    CANE1.ED
+    > IN  1
+    > ANI 8
+    > JNZ FONTI
 
 */
 
@@ -3879,21 +3879,21 @@ void cane_state::cane_unknown_port0_w(u8 data)
 /*                                                     */
 /*******************************************************/
 /***********************************************************************************************************************************
-	This game was never completed and released by Model Racing to the public.
-	It's in a nearly incomplete form (eg: doesn't have any sound or score routine in the code) and it's barely playable.
+    This game was never completed and released by Model Racing to the public.
+    It's in a nearly incomplete form (eg: doesn't have any sound or score routine in the code) and it's barely playable.
 
-	The assembler source files for this game were extracted from the original floppy disks used by the former Model Racing developer
-	Adolfo Melilli (adolfo@melilli.com).
-	Those disks were retrieved by Alessandro Bolgia (xadhoom76@gmail.com) and Lorenzo Fongaro (lorenzo.fongaro@virgilio.it) and
-	dumped by Piero Andreini (pieroandreini@gmail.com) using KryoFlux hardware and software.
-	Subsequently Jean Paul Piccato (j2pguard-spam@yahoo.com) mounted the images and compiled the source files, managed to set up a
-	ROMset and wrote a MAME driver that aims to reproduce in the most faithful way the work of Melilli at Model Racing in late '70s.
+    The assembler source files for this game were extracted from the original floppy disks used by the former Model Racing developer
+    Adolfo Melilli (adolfo@melilli.com).
+    Those disks were retrieved by Alessandro Bolgia (xadhoom76@gmail.com) and Lorenzo Fongaro (lorenzo.fongaro@virgilio.it) and
+    dumped by Piero Andreini (pieroandreini@gmail.com) using KryoFlux hardware and software.
+    Subsequently Jean Paul Piccato (j2pguard-spam@yahoo.com) mounted the images and compiled the source files, managed to set up a
+    ROMset and wrote a MAME driver that aims to reproduce in the most faithful way the work of Melilli at Model Racing in late '70s.
 
-	The game driver is not based on hardware inspection and is solely derived from assumptions I've made looking at the assembler
-	code and comments written into the source files of the game. Several of those hypotheses came following the directions of
-	previous yet contemporary Model Racing works (Eg: Claybuster) and were confirmed by Melilli himself.
+    The game driver is not based on hardware inspection and is solely derived from assumptions I've made looking at the assembler
+    code and comments written into the source files of the game. Several of those hypotheses came following the directions of
+    previous yet contemporary Model Racing works (Eg: Claybuster) and were confirmed by Melilli himself.
 
-	Being unreleased this game lacks an official name, thus the name used in the source files was used instead.
+    Being unreleased this game lacks an official name, thus the name used in the source files was used instead.
 
 ***********************************************************************************************************************************/
 

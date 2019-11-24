@@ -21,14 +21,14 @@ protected:
 
 private:
 	uint16_t get_next_lfsr_state(uint16_t lfsr);
-	
+
 	uint8_t  m_enable;
 	uint16_t m_lfsr;
 	uint16_t m_pre_vis_cycle_count;
 	uint16_t m_post_vis_cycle_count;
 	uint8_t  m_set_a;
 	uint8_t  m_set_b;
-	
+
 	uint16_t m_offset_x;
 	uint16_t m_offset_y;
 	uint16_t m_limit_x;

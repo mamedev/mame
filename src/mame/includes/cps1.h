@@ -143,7 +143,7 @@ public:
 	void sf2m3(machine_config &config);
 	void sf2cems6(machine_config &config);
 	void sf2m10(machine_config &config);
-	
+
 	void init_cps1();
 	void init_sf2ee();
 	void init_wof();
@@ -162,14 +162,14 @@ public:
 	void init_sf2ceblp();
 	void init_sf2m8();
 	void init_dinohunt();
-	
+
 protected:
 	DECLARE_MACHINE_START(common);
 	DECLARE_MACHINE_START(cps1);
 	DECLARE_MACHINE_START(qsound);
 	DECLARE_MACHINE_START(ganbare);
 	DECLARE_MACHINE_RESET(cps);
-	
+
 	DECLARE_READ16_MEMBER(cps1_dsw_r);
 	DECLARE_READ16_MEMBER(cps1_in1_r);
 	DECLARE_READ16_MEMBER(cps1_in2_r);
@@ -200,7 +200,7 @@ protected:
 	DECLARE_WRITE16_MEMBER(sf2ceblp_prot_w);
 	DECLARE_WRITE16_MEMBER(sf2m3_layer_w);
 	DECLARE_READ16_MEMBER(dinohunt_sound_r);
-	
+
 	TILEMAP_MAPPER_MEMBER(tilemap0_scan);
 	TILEMAP_MAPPER_MEMBER(tilemap1_scan);
 	TILEMAP_MAPPER_MEMBER(tilemap2_scan);
@@ -208,16 +208,16 @@ protected:
 	TILE_GET_INFO_MEMBER(get_tile1_info);
 	TILE_GET_INFO_MEMBER(get_tile2_info);
 	virtual void video_start() override;
-	
+
 	INTERRUPT_GEN_MEMBER(cps1_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(ganbare_interrupt);
-	
+
 	virtual void render_layers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cps1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_cps1);
-	
+
 	void kabuki_setup(void (*decode)(uint8_t *src, uint8_t *dst));
-	
+
 	/* maps */
 	void cpu_space_map(address_map &map);
 	void main_map(address_map &map);
@@ -229,7 +229,7 @@ protected:
 	void sf2m3_map(address_map &map);
 	void sf2cems6_map(address_map &map);
 	void sf2m10_map(address_map &map);
-	
+
 	// game-specific
 	uint16_t sf2ceblp_prot;
 
@@ -264,7 +264,7 @@ protected:
 	int m_palette_size;
 	int m_stars_rom_size;
 	uint8_t m_empty_tile[32*32];
-	
+
 	/* video/cps1.cpp */
 	inline uint16_t *cps1_base( int offset, int boundary );
 	void cps1_get_video_base();
@@ -276,7 +276,7 @@ protected:
 	void cps1_render_stars(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void cps1_render_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int primask);
 	void cps1_render_high_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer);
-	
+
 	/* memory pointers */
 	optional_shared_ptr<uint16_t> m_mainram;
 	required_shared_ptr<uint16_t> m_gfxram;

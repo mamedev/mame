@@ -1561,10 +1561,10 @@ namespace netlist
 	private:
 
 		void reset();
-		nlmempool							m_pool; // must be deleted last!
+		nlmempool                           m_pool; // must be deleted last!
 
 		pstring                             m_name;
-		unique_pool_ptr<netlist_t>			m_netlist;
+		unique_pool_ptr<netlist_t>          m_netlist;
 		plib::unique_ptr<plib::dynlib>      m_lib; // external lib needs to be loaded as long as netlist exists
 		plib::state_manager_t               m_state;
 		plib::unique_ptr<callbacks_t>       m_callbacks;
@@ -1694,7 +1694,7 @@ namespace netlist
 		template <bool KEEP_STATS>
 		void process_queue_stats(netlist_time delta) noexcept;
 
-		netlist_state_t	&				    m_state;
+		netlist_state_t &                   m_state;
 		devices::NETLIB_NAME(solver) *      m_solver;
 
 		// mostly rw

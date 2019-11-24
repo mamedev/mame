@@ -19,29 +19,29 @@
 
     Tetris
     Space Invaders
-	ABL Air-Blaster Joystick
+    ABL Air-Blaster Joystick
 
     ---
     XaviX plug and play units almost always have a XaviX logo on the external packaging
-	while the ones for this driver (and SunPlus etc.) don't seem to have any specific
-	markings.
+    while the ones for this driver (and SunPlus etc.) don't seem to have any specific
+    markings.
 
     Notes:
-    
-	Tetris - RAM 0xa0 and 0xa1 contain the ACD0 and AD1 values and player 2 controls if
-	between certain values? probably read via serial (or ADC abuse?)
 
-	Internal Test Menus:
-	
-	Tetris - hold P1 Down + P1 Anticlockwise (Button 2) on boot
+    Tetris - RAM 0xa0 and 0xa1 contain the ACD0 and AD1 values and player 2 controls if
+    between certain values? probably read via serial (or ADC abuse?)
+
+    Internal Test Menus:
+
+    Tetris - hold P1 Down + P1 Anticlockwise (Button 2) on boot
     Space Invaders - hold P1 Down + P1 Button 1 on boot
-	ABL Air-Blaster - none?
+    ABL Air-Blaster - none?
 
-	-----------------------------------------------------
+    -----------------------------------------------------
     Flaws (NOT emulation bugs, happen on hardware):
-	-----------------------------------------------------
+    -----------------------------------------------------
 
-	rad_sinv:
+    rad_sinv:
 
     In QIX the sprites lag behind the line drawing, so you see the line infront of your player until you stop moving
 
@@ -61,35 +61,35 @@
     they don't seem to be used.  It's difficult to judge from hardware videos, although it definitely isn't as
     white as the menu, so this might also be a non-bug. (Uncertain - to check)
 
-	-------------------------
+    -------------------------
 
-	airblasjs:
+    airblasjs:
 
-	This game is very buggy.
+    This game is very buggy.
 
-	The 3D stages are prone to softlocking when the refuel jet is meant to appear.
+    The 3D stages are prone to softlocking when the refuel jet is meant to appear.
 
-	2D stages will zap you of your lives and then continues one by one if you die on a boss meaning if you have
-	2 continues left you'll be offered the continue screen twice while it drains you of your lives before
-	actually presenting you with the Game Over screen.  The manual claims you can't continue on a boss however
-	this isn't true for the 3D stages, where the continue feature works as expected.  Either way, this is a very
-	crude way of implementing a 'no continue' feature on bosses if it isn't simply a bug in the game code that
-	was explained away as a feature.
+    2D stages will zap you of your lives and then continues one by one if you die on a boss meaning if you have
+    2 continues left you'll be offered the continue screen twice while it drains you of your lives before
+    actually presenting you with the Game Over screen.  The manual claims you can't continue on a boss however
+    this isn't true for the 3D stages, where the continue feature works as expected.  Either way, this is a very
+    crude way of implementing a 'no continue' feature on bosses if it isn't simply a bug in the game code that
+    was explained away as a feature.
 
-	Sprites clip on / off the top of the screen in parts - if you move your the player helipcopter to the top
-	of the screen the top 8 pixels clip off too (not currently happening in MAME, probably need to take out
-	sprite wrapping on y)
+    Sprites clip on / off the top of the screen in parts - if you move your the player helipcopter to the top
+    of the screen the top 8 pixels clip off too (not currently happening in MAME, probably need to take out
+    sprite wrapping on y)
 
-	Sprites wrap around on X too, if you move to the left edge you can see your shadow on the right etc.
+    Sprites wrap around on X too, if you move to the left edge you can see your shadow on the right etc.
 
-	Sound sometimes stops working properly / shot changes for no reason.
+    Sound sometimes stops working properly / shot changes for no reason.
 
-	There's no indication of damage most of the time on bosses, some parts won't take damage until other parts
-	have been destroyed, not always obvious.
+    There's no indication of damage most of the time on bosses, some parts won't take damage until other parts
+    have been destroyed, not always obvious.
 
-	Very heavy sprite flicker (not emulated)
+    Very heavy sprite flicker (not emulated)
 
-	Very heavy slowdown (MAME speed is approximate)
+    Very heavy slowdown (MAME speed is approximate)
 
 */
 
@@ -280,7 +280,7 @@ static INPUT_PORTS_START( airblsjs )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Pause")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )	PORT_NAME("Start")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Trigger")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Missile")
 INPUT_PORTS_END
@@ -390,7 +390,7 @@ INTERRUPT_GEN_MEMBER(elan_eu3a05_state::interrupt)
    at most to match hardware) - a divider of 8 gives something close to original hardware
    it is unclear exactly what limits the clock speed (maybe video / sound causes waitstates? - dma in progress could also slow / stop the CPU
    and is not going to be 'instant' on hardware)
-  
+
    using a low clock speed also helps with the badly programmed controls in Tetris as that likewise seems to run the game logic 'as fast as possible'
    there don't appear to be any kind of blanking bits being checked.
 */

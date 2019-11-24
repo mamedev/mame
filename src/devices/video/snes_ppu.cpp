@@ -1611,13 +1611,13 @@ uint8_t snes_ppu_device::read_object( uint16_t address )
 	{
 		uint8_t n = (address & 0x1f) << 2;
 		return (BIT(m_objects[n + 0].x, 8) << 0) |
-		       (BIT(m_objects[n + 1].x, 8) << 2) |
-		       (BIT(m_objects[n + 2].x, 8) << 4) |
-		       (BIT(m_objects[n + 3].x, 8) << 6) |
-		       (m_objects[n + 0].size << 1) |
-		       (m_objects[n + 1].size << 3) |
-		       (m_objects[n + 2].size << 5) |
-		       (m_objects[n + 3].size << 7);
+			   (BIT(m_objects[n + 1].x, 8) << 2) |
+			   (BIT(m_objects[n + 2].x, 8) << 4) |
+			   (BIT(m_objects[n + 3].x, 8) << 6) |
+			   (m_objects[n + 0].size << 1) |
+			   (m_objects[n + 1].size << 3) |
+			   (m_objects[n + 2].size << 5) |
+			   (m_objects[n + 3].size << 7);
 	}
 }
 
@@ -1746,7 +1746,7 @@ uint16_t snes_ppu_device::direct_color(uint16_t palette, uint16_t group)
 
 void snes_ppu_device::set_current_vert(uint16_t value)
 {
-    m_beam.current_vert = value;
+	m_beam.current_vert = value;
 }
 
 void snes_ppu_device::cache_background()

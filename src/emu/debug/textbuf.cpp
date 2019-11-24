@@ -69,7 +69,7 @@ struct text_buffer
 	    buffer_space - return the number of bytes
 	    available in the buffer
 	-------------------------------------------------*/
-	
+
 	s32 buffer_space() const noexcept
 	{
 		return bufsize - buffer_used();

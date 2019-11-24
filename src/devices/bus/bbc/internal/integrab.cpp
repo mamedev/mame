@@ -1,4 +1,4 @@
-﻿// license:BSD-3-Clause
+// license:BSD-3-Clause
 // copyright-holders:Nigel Barnes
 /**********************************************************************
 
@@ -169,19 +169,19 @@ uint8_t bbc_integrab_device::romsel_r(offs_t offset)
 void bbc_integrab_device::romsel_w(offs_t offset, uint8_t data)
 {
 	/*
-     ROMSEL & ROMID
-      Bits 0,3 ROMNUM Sideways ROM/RAM select bits
-      Bits 4,5        Not used
-      Bit 6    PRVEN  Private RAM enable
-      Bit 7    MEMSEL Shadow/Main RAM toggle
+	 ROMSEL & ROMID
+	  Bits 0,3 ROMNUM Sideways ROM/RAM select bits
+	  Bits 4,5        Not used
+	  Bit 6    PRVEN  Private RAM enable
+	  Bit 7    MEMSEL Shadow/Main RAM toggle
 
-     RAMSEL & RAMID
-      Bits 0,1 AUX0,1 Not used but must be preserved
-      Bits 2,3        Not used
-      Bit 4    PRVS8  Private RAM 8K area select (&9000-&AFFF)
-      Bit 5    PRVS4  Private RAM 4K area select (&8000-&8FFF)
-      Bit 6    PRVS1  Private RAM 1K area select (&8000-&83FF)
-      Bit 7    SHEN   Shadow RAM enable bit
+	 RAMSEL & RAMID
+	  Bits 0,1 AUX0,1 Not used but must be preserved
+	  Bits 2,3        Not used
+	  Bit 4    PRVS8  Private RAM 8K area select (&9000-&AFFF)
+	  Bit 5    PRVS4  Private RAM 4K area select (&8000-&8FFF)
+	  Bit 6    PRVS1  Private RAM 1K area select (&8000-&83FF)
+	  Bit 7    SHEN   Shadow RAM enable bit
 	*/
 	switch (offset & 0x0c)
 	{

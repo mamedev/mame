@@ -47,11 +47,11 @@
 
   system11 left the following comment on mametesters:
 
-  	  Worth noting that there are at least 3 different types of picture output
-  	  for this game - and it will be difficult to make it match 'everything' out there.
-		1) Normal Nintendo board - inverted video output
-		2) Normal Nintendo board with non-inverted video output - has potentiometers to adjust R/G/B
-		3) Bootleg board, non inverted non adjustable output
+      Worth noting that there are at least 3 different types of picture output
+      for this game - and it will be difficult to make it match 'everything' out there.
+        1) Normal Nintendo board - inverted video output
+        2) Normal Nintendo board with non-inverted video output - has potentiometers to adjust R/G/B
+        3) Bootleg board, non inverted non adjustable output
 
   Additional note: Output for 1) is also adjusted by potentiometers which adjust
   RGB. With today's bgfx hlsl filters it is easy to individually adjust

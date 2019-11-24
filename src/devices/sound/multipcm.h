@@ -5,7 +5,7 @@
 
 #pragma once
 
-#define MULTIPCM_LOG_SAMPLES	0
+#define MULTIPCM_LOG_SAMPLES    0
 
 #if MULTIPCM_LOG_SAMPLES
 #include <map>

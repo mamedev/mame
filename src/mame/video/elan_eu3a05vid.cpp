@@ -125,8 +125,8 @@ void elan_eu3a05vid_device::draw_sprites(screen_device &screen, bitmap_ind16 &bi
 
 	    FF = flags  ( e-dD fFsS )
 	    e = enable
-		D = ZoomX to double size (boss explosions on Air Blaster)
-		d = ZoomY to double size (boss explosions on Air Blaster)
+	    D = ZoomX to double size (boss explosions on Air Blaster)
+	    d = ZoomY to double size (boss explosions on Air Blaster)
 	    S = SizeX
 	    s = SizeY
 	    F = FlipX
@@ -148,7 +148,7 @@ void elan_eu3a05vid_device::draw_sprites(screen_device &screen, bitmap_ind16 &bi
 		   top of the screen - there are no extra y co-ordinate bits.  However there would have been easier
 		   ways to hide this tho as there are a bunch of unseen lines at the bottom of the screen anyway!
 
-		   Air Blaster Joystick seems to indicate there is no sprite wrapping - sprites abruptly enter 
+		   Air Blaster Joystick seems to indicate there is no sprite wrapping - sprites abruptly enter
 		   the screen in pieces on real hardware.
 
 		   needs further investigation.
@@ -226,7 +226,7 @@ void elan_eu3a05vid_device::draw_sprites(screen_device &screen, bitmap_ind16 &bi
 			for (int xx = 0; xx < sizex; xx++)
 			{
 				int realaddr;
-				
+
 				if (!doubleX)
 					realaddr = base + ((tex_x + xx) & 0xff);
 				else
@@ -283,7 +283,7 @@ bool elan_eu3a05vid_device::get_tile_data(int base, int drawpri, int& tile, int 
 void elan_eu3a05vid_device::draw_tilemaps(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect, int drawpri)
 {
 	/*
-		this doesn't handle 8x8 4bpp (not used by anything yet)
+	    this doesn't handle 8x8 4bpp (not used by anything yet)
 	*/
 
 	int scroll = get_scroll(1);
@@ -574,19 +574,19 @@ WRITE8_MEMBER(elan_eu3a05vid_device::elan_eu3a05_vidctrl_w)
 	    e3  4bpp 16x16         1110 0011
 	    83  8bpp 8x8           1000 0011  air blaster logo
 	    02  8bpp 8x8 (phoenix) 0000 0010  air blaster 2d normal
-		03  8bpp 8x8           0000 0011  air blaster 2d bosses
-		00                     0000 0000  air blaster 3d stages
+	    03  8bpp 8x8           0000 0011  air blaster 2d bosses
+	    00                     0000 0000  air blaster 3d stages
 
-		?tb- --wh
+	    ?tb- --wh
 
-		? = unknown
-		t = tile size (1 = 16x16, 0 = 8x8)
-		b = bpp (0 = 8bpp, 1 = 4bpp)
-		- = haven't seen used
-		h = tilemap height? (0 = double height)
-		w = tilemap width? (0 = double width)
+	    ? = unknown
+	    t = tile size (1 = 16x16, 0 = 8x8)
+	    b = bpp (0 = 8bpp, 1 = 4bpp)
+	    - = haven't seen used
+	    h = tilemap height? (0 = double height)
+	    w = tilemap width? (0 = double width)
 
-		space invaders test mode doesn't initialize this
+	    space invaders test mode doesn't initialize this
 
 	*/
 	m_vidctrl = data;

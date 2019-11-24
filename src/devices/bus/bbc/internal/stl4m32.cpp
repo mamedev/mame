@@ -281,7 +281,7 @@ uint8_t bbc_stl4m32_device::mos_r(offs_t offset)
 
 	//if (BIT(m_shadow, 7) && offset >= 0x2000)
 	//{
-	//	data = m_ram[offset];
+	//  data = m_ram[offset];
 	//}
 	//else
 	//{
@@ -298,6 +298,6 @@ void bbc_stl4m32_device::mos_w(offs_t offset, uint8_t data)
 
 	//if (BIT(m_romsel, 7) && offset >= 0x2000)
 	//{
-	//	m_ram[offset] = data;
+	//  m_ram[offset] = data;
 	//}
 }

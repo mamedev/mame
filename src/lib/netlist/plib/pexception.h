@@ -13,10 +13,10 @@
 
 #include <exception>
 
-#define passert_always(expr)							\
+#define passert_always(expr)                            \
   ((expr) ? static_cast<void>(0) : plib::passert_fail (#expr, __FILE__, __LINE__, nullptr))
 
-#define passert_always_msg(expr, msg)							\
+#define passert_always_msg(expr, msg)                           \
   ((expr) ? static_cast<void>(0) : plib::passert_fail (#expr, __FILE__, __LINE__, msg))
 
 namespace plib {

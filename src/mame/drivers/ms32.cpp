@@ -873,7 +873,7 @@ static INPUT_PORTS_START( ms32 )
 	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	// mapping to F1 key because there may be a specific service dip as well 
+	// mapping to F1 key because there may be a specific service dip as well
 	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_START2 )
@@ -1292,7 +1292,7 @@ static INPUT_PORTS_START( hayaosi2 )
 	PORT_INCLUDE( ms32 )
 
 	PORT_MODIFY("INPUTS")
-	// fast button is actually mapped as button 1 in hayaosi2 and button 5 for hayaosi3. 
+	// fast button is actually mapped as button 1 in hayaosi2 and button 5 for hayaosi3.
 	// We use latter layout for convenience
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)

@@ -8505,7 +8505,7 @@
 		<info name="release" value="2019-11-01"/>
 		<sharedfeat name="compatibility" value="A2" />
 		<!-- It requires an Apple ][ with Integer BASIC ROM and at least 32K.
-        Due to reliance on Integer ROM, it will not run on later models. -->
+		Due to reliance on Integer ROM, it will not run on later models. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234809">
@@ -8628,7 +8628,7 @@
 		<publisher>Stoneware</publisher>
 		<info name="release" value="2019-11-12"/>
 		<sharedfeat name="compatibility" value="A2" />
-		<!-- It requires an original Apple ][ with 48K and Integer BASIC 
+		<!-- It requires an original Apple ][ with 48K and Integer BASIC
 		in ROM. -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234791">
@@ -8643,7 +8643,7 @@
 		<publisher>MUSE Software</publisher>
 		<info name="release" value="2019-11-12"/>
 		<sharedfeat name="compatibility" value="A2" />
-		<!-- It requires an original Apple ][ with 32K and Integer BASIC 
+		<!-- It requires an original Apple ][ with 32K and Integer BASIC
 		in ROM. -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="234802">
