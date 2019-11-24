@@ -167,6 +167,7 @@ public:
 	void n8810m15(machine_config &config);
 	void n8810m55(machine_config &config);
 	void ews286(machine_config &config);
+	void olyport40(machine_config &config);
 
 	void init_at();
 	void init_atpci();
@@ -883,6 +884,14 @@ void at_state::n8810m55(machine_config &config)
 	ibm5170(config);
 	m_maincpu->set_clock(6'000'000);
 	subdevice<isa16_slot_device>("isa1")->set_default_option("ega");
+}
+
+// AEG Olympia Olyport 40-21
+void at_state::olyport40(machine_config &config)
+{
+	neat(config);
+	m_maincpu->set_clock(12'000'000);
+	subdevice<isa16_slot_device>("isa1")->set_default_option("cga");
 }
 
 //**************************************************************************
@@ -2123,6 +2132,17 @@ ROM_END
 //**************************************************************************
 //  80286 Notebook/Laptop/Portable
 //**************************************************************************
+
+// AEG Olympia Olyport 40-21 aka Zenith SuperSport - CPU: AMD N80L286-12/8 - Chipset: Chips P82C2185, P82C211C, P82C206 F-1, P82C212B, P82C604, WD37C65BFM, Hitachi HD6305VOP
+// OSC: 22.500, 24.000 - Video: CGA, LCD with 16 grey intensities - Connectors: CRT, Ext. Bus, RS232C, Printer, Ext.FDD - Mass storage: FDD 1.44MB, HD: Conner CP-323 (IDE with detached controller PCB)
+ROM_START( olyport40 ) // "+++ ERROR: Fatal Slushware RAM Error +++" / "--- Fatal Error: Cannot Continue! ---" - slushware is a ROM shadowing concept cropping up in Zenith brochures
+	ROM_REGION16_LE(0x20000, "bios", 0)
+	ROM_LOAD16_BYTE( "mbevn_v2.7b.bin", 0x10000, 0x8000, CRC(eaf0d73c) SHA1(d642afe8a72b95e5e9d9cdc8cf8db833df54eaf0))
+	ROM_LOAD16_BYTE( "mbodd_v2.7b.bin", 0x10001, 0x8000, CRC(a750d652) SHA1(c9a3cca535f6e7c44b83d87efcc289afda71b62f))
+
+	ROM_REGION( 0x0800, "keyboard", 0 )
+	ROM_LOAD( "nec_d80c42c.bin", 0x000, 0x0800, CRC(49ae4c38) SHA1(d5e6463d1dbcc7d68ef6b9222ff02102918f41b7))
+ROM_END
 
 // Compaq Portable II
 // Chips: Intel D8742, SN76LS612N, 2x NEC D8237AC-5, 2xIntel P8259A-2, MC146818AP, Intel P8254
@@ -4206,6 +4226,7 @@ COMP( 1985, k286i,     ibm5170, 0,       k286i,     0,     at_state,     init_at
 COMP( 1987, comportii ,ibm5170, 0,       comportii, 0,     at_state,     init_at,        "Compaq",      "Portable II", MACHINE_NOT_WORKING )
 COMP( 1987, comportiii,ibm5170, 0,       comportiii,0,     at_state,     init_at,        "Compaq",      "Portable III", MACHINE_NOT_WORKING )
 COMP( 1986, ews286,    ibm5170, 0,       ews286,    0,     at_state,     init_at,        "Ericsson",    "Ericsson WS286", MACHINE_NOT_WORKING )
+COMP( 198?, olyport40, ibm5170, 0,       olyport40, 0,     at_state,     init_at,        "AEG Olympia", "Olyport 40-21", MACHINE_NOT_WORKING )
 COMP( 1987, n8810m15,  ibm5170, 0,       n8810m15,  0,     at_state,     init_at,        "Nixdorf Computer AG", "8810 M15", MACHINE_NOT_WORKING )
 COMP( 1990, n8810m16c, ibm5170, 0,       n8810m15,  0,     at_state,     init_at,        "Nixdorf Computer AG", "8810 M16 CGA version", MACHINE_NOT_WORKING )
 COMP( 1986, n8810m55,  ibm5170, 0,       n8810m55,  0,     at_state,     init_at,        "Nixdorf Computer AG", "8810 M55", MACHINE_NOT_WORKING )
