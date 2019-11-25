@@ -200,7 +200,6 @@ namespace solver
 			resched_cnt++;
 		} while (resched && (resched_cnt < this->m_params.m_gs_loops));
 
-		this->m_stat_calculations++;
 		this->m_iterative_total += resched_cnt;
 
 		if (resched)

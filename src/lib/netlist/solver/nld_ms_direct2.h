@@ -47,7 +47,6 @@ namespace solver
 			this->m_new_V[0] = v0;
 			this->m_new_V[1] = v1;
 
-			this->m_stat_calculations++;
 			bool err(false);
 			if (newton_raphson)
 				err = this->check_err();
