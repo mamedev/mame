@@ -53,21 +53,41 @@ protected:
 
 	virtual void mem_map_4m(address_map &map);
 
+	virtual DECLARE_WRITE16_MEMBER(write_external_space);
+
 private:
 	required_region_ptr<uint16_t> m_romregion;
 
 	uint32_t m_current_bank;
 	int m_numbanks;
-	std::vector<uint16_t> m_prgram;
 
 	DECLARE_READ16_MEMBER(porta_r);
 	DECLARE_READ16_MEMBER(portb_r);
 
 	DECLARE_READ16_MEMBER(read_external_space);
-	DECLARE_WRITE16_MEMBER(write_external_space);
+};
 
-	DECLARE_WRITE16_MEMBER(change_external_bank);
+class wrlshunt_game_state : public gcm394_game_state
+{
+public:
+	wrlshunt_game_state(const machine_config& mconfig, device_type type, const char* tag) :
+		gcm394_game_state(mconfig, type, tag),
+		m_mainram(*this, "mainram")
+	{
+	}
 
+	void wrlshunt(machine_config &config);
+
+protected:
+	//virtual void machine_start() override;
+	//virtual void machine_reset() override;
+
+	void wrlshunt_map(address_map &map);
+	
+	virtual DECLARE_WRITE16_MEMBER(write_external_space) override;
+
+private:
+	required_shared_ptr<u16> m_mainram;
 };
 
 READ16_MEMBER(gcm394_game_state::read_external_space)
@@ -79,20 +99,33 @@ READ16_MEMBER(gcm394_game_state::read_external_space)
 WRITE16_MEMBER(gcm394_game_state::write_external_space)
 {
 	logerror("DMA writing to external space (RAM?) %08x %04x\n", offset, data);
+}
+
+WRITE16_MEMBER(wrlshunt_game_state::write_external_space)
+{
+//	logerror("DMA writing to external space (RAM?) %08x %04x\n", offset, data);
 
 	if (offset & 0x0800000)
 	{
-		offset += 0x10000;
-		offset &= 0x07fffff;
-		m_prgram[offset] = data;
+		offset &= 0x03fffff;
+
+		if (offset < 0x03d0000)
+		{
+			m_mainram[offset] = data;
+			//logerror("DMA writing to external space (RAM?) %08x %04x\n", offset, data);
+
+		}
+		else
+		{
+			logerror("DMA writing to external space (RAM?) (out of bounds) %08x %04x\n", offset, data);
+		}
+	}
+	else
+	{
+		logerror("DMA writing to external space (RAM?) (unknown handling) %08x %04x\n", offset, data);
 	}
 }
 
-WRITE16_MEMBER(gcm394_game_state::change_external_bank)
-{
-	logerror("change bank hack\n");
-	m_bank->set_entry(0x10);
-}
 
 
 READ16_MEMBER(gcm394_game_state::porta_r)
@@ -118,7 +151,6 @@ void gcm394_game_state::base(machine_config &config)
 	m_maincpu->portb_in().set(FUNC(gcm394_game_state::portb_r));
 	m_maincpu->space_read_callback().set(FUNC(gcm394_game_state::read_external_space));
 	m_maincpu->space_write_callback().set(FUNC(gcm394_game_state::write_external_space));
-	m_maincpu->bank_write_callback().set(FUNC(gcm394_game_state::change_external_bank));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
@@ -134,8 +166,17 @@ void gcm394_game_state::base(machine_config &config)
 
 }
 
+void wrlshunt_game_state::wrlshunt(machine_config &config)
+{
+	gcm394_game_state::base(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &wrlshunt_game_state::wrlshunt_map);
+}
+
 void gcm394_game_state::switch_bank(uint32_t bank)
 {
+	if (!m_bank)
+		return;
+
 	if (bank != m_current_bank)
 	{
 		m_current_bank = bank;
@@ -146,19 +187,22 @@ void gcm394_game_state::switch_bank(uint32_t bank)
 
 void gcm394_game_state::machine_start()
 {
-	m_prgram.resize(0x800000);
-
-	int i;
-	for (i = 0; i < (m_romregion.bytes() / 0x800000); i++)
+	if (m_bank)
 	{
-		m_bank->configure_entry(i, &m_romregion[i*0x800000]);
-	}
-	
-	m_bank->configure_entry(i, &m_prgram[0]);
-	
-	m_numbanks = i;
+		int i;
+		for (i = 0; i < (m_romregion.bytes() / 0x800000); i++)
+		{
+			m_bank->configure_entry(i, &m_romregion[i * 0x800000]);
+		}
 
-	m_bank->set_entry(0);
+		m_numbanks = i;
+
+		m_bank->set_entry(0);
+	}
+	else
+	{
+		m_numbanks = 0;
+	}
 
 	save_item(NAME(m_current_bank));
 }
@@ -170,10 +214,16 @@ void gcm394_game_state::machine_reset()
 
 void gcm394_game_state::mem_map_4m(address_map &map)
 {
-	map(0x000000, 0x01ffff).rom().region("maincpu", 0); // non-banked area on this SoC?
+	map(0x000000, 0x00ffff).rom().region("maincpu", 0); // non-banked area on this SoC?
 
 	// smartfp really expects the ROM at 0 to map here, so maybe this is how the newer SoC works
 	map(0x020000, 0x3fffff).bankr("cartbank");
+}
+
+void wrlshunt_game_state::wrlshunt_map(address_map &map)
+{
+	map(0x000000, 0x00ffff).rom().region("maincpu", 0); // non-banked area on this SoC?
+	map(0x030000, 0x3fffff).ram().share("mainram");
 }
 
 static INPUT_PORTS_START( gcm394 )
@@ -270,6 +320,10 @@ static INPUT_PORTS_START( gcm394 )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( wrlshunt )
+	PORT_START("P1")
+	PORT_START("P2")
+INPUT_PORTS_END
 
 /*
 Wireless Hunting Video Game System
@@ -377,7 +431,7 @@ GLB_GP-FS1_0405L_SPU_1.0.2.3
 SPF2ALP
 
 "GPnandnand" as a required signature appears to be referenced right here, in page 19 of a GeneralPlus document;
-http://www.lcis.com.tw/paper_store/paper_store/GPL162004A-507A_162005A-707AV10_code_reference-20147131205102.pdf
+http://www.lcis.com.tw/paper_store/paper_store/GPL162004A-507A_162005A-707AV10_code_reference-20147131205102.pdf (this link is no longer valid)
 
 */
 
@@ -387,7 +441,7 @@ ROM_START( wlsair60 )
 ROM_END
 
 
-CONS(2011, wrlshunt, 0, 0, base, gcm394, gcm394_game_state, empty_init, "Hamy / Kids Station Toys Inc", "Wireless Hunting Video Game System", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS(2011, wrlshunt, 0, 0, wrlshunt, wrlshunt, wrlshunt_game_state, empty_init, "Hamy / Kids Station Toys Inc", "Wireless Hunting Video Game System", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 CONS(2009, smartfp, 0, 0, base, gcm394, gcm394_game_state, empty_init, "Fisher-Price", "Fun 2 Learn Smart Fit Park (Spain)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 // Fun 2 Learn 3-in-1 SMART SPORTS  ?

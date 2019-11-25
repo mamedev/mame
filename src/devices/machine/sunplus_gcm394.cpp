@@ -55,14 +55,13 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::system_dma_trigger_w)
 	if (source >= 0x20000)
 		LOGMASKED(LOG_GCM394_SYSDMA, " likely transfer from ROM %08x - %08x\n", (source - 0x20000) * 2, (source - 0x20000) * 2 + (length * 2)- 1);
 
-	// wrlshunt uses the extra params, might be doing very large ROM -> RAM transfers with even more upper address bits?
+	// wrlshunt transfers ROM to RAM, all RAM write addresses have 0x800000 in the destination set
 
-	// wrlshunt first transfer has 0x4000 set on trigger, and could mean treat source address as an unmodified (no - 0x20000) byte offset instead of word offset
-	// in that case it would be pointing at the block we currently execute from ROM and copying it to RAM
-
-	// 0x0089 == no source inc, used for memory clear operations? (source usually points at stack value)
-	// 0x0009 == regular copy? (smartfp does 2 copies like this after the initial clears, source definitely points at a correctly sized data structure)
-	if ((mode == 0x0089) || (mode == 0x0009)) 
+	// mode 0x0089 == no source inc, used for memory clear operations? (source usually points at stack value)
+	// mode 0x0009 == regular copy? (smartfp does 2 copies like this after the initial clears, source definitely points at a correctly sized data structure)
+	// what does having bit 0x4000 on mode set mean? (first transfer on wrlshunt - maybe an IRQ disable?)
+	
+	if ((mode == 0x0089) || (mode == 0x0009) || (mode == 0x4009)) 
 	{
 		for (int i = 0; i < length; i++)
 		{
@@ -76,6 +75,7 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::system_dma_trigger_w)
 			}
 			else
 			{
+				// maybe the -0x20000 here should be handled in external space handlers instead
 				val = m_space_read_cb(space, source - 0x20000);
 			}
 
@@ -85,11 +85,12 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::system_dma_trigger_w)
 			}
 			else
 			{
+				// maybe the -0x20000 here should be handled in external space handlers instead
 				m_space_write_cb(space, dest - 0x20000, val);
 			}
 
 			dest += 1;
-			if (mode == 0x0009)
+			if ((mode&0x3fff) == 0x0009)
 				source += 1;
 		}
 	}
@@ -147,14 +148,6 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7820_w) { LOGMASKED(LOG_GCM39
 WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7821_w)
 {
 	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7821_w %04x\n", machine().describe_context(), data); m_7821 = data;
-	logerror("maincpu %08x\n", this->pc());
-
-	// temp hack so that wrlshunt can bank in the RAM program (until we find proper register)
-	// code still not in the right place tho, looks like code that gets copied to 40000 should be the code jumped to but the jump is to 50000, so DMA probalby needs adjusting for RAM writes
-	if (this->pc() == 0x02394)
-	{
-		m_bank_write_cb(space, data);
-	}
 }
 
 WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7822_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7822_w %04x\n", machine().describe_context(), data); m_7822 = data; }
