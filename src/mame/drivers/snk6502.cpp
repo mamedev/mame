@@ -852,7 +852,7 @@ void snk6502_state::satansat(machine_config &config)
 void snk6502_state::vanguard(machine_config &config)
 {
 	// basic machine hardware
-	M6502(config, m_maincpu, MASTER_CLOCK / 16); // adjusted using common divisor
+	M6502(config, m_maincpu, MASTER_CLOCK / 8); // runs twice as fast as CRTC
 	m_maincpu->set_addrmap(AS_PROGRAM, &snk6502_state::vanguard_map);
 	m_maincpu->set_vblank_int("screen", FUNC(snk6502_state::snk6502_interrupt));
 
