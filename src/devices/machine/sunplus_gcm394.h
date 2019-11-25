@@ -207,6 +207,8 @@ private:
 
 	DECLARE_WRITE16_MEMBER(unkarea_78a0_w);
 
+	DECLARE_READ16_MEMBER(unkarea_78a1_r);
+
 	DECLARE_WRITE16_MEMBER(unkarea_78a4_w);
 	DECLARE_WRITE16_MEMBER(unkarea_78a5_w);
 	DECLARE_WRITE16_MEMBER(unkarea_78a6_w);
@@ -215,6 +217,8 @@ private:
 
 	DECLARE_WRITE16_MEMBER(unkarea_78b0_w);
 	DECLARE_WRITE16_MEMBER(unkarea_78b1_w);
+
+	DECLARE_READ16_MEMBER(unkarea_78b2_r);
 	DECLARE_WRITE16_MEMBER(unkarea_78b2_w);
 
 	DECLARE_WRITE16_MEMBER(unkarea_78b8_w);
