@@ -2,7 +2,7 @@
 // copyright-holders:David Haywood
 /*
     SunPlus unSP based hardware, SPG-??? (6xx?) (die is GCM394)
-
+	
     Compared to vii.cpp this is clearly newer, has extra opcodes, different internal map etc. also scaling and higher resolutions based on Spongebob
 
         Smart Fit Park
@@ -82,6 +82,7 @@ WRITE16_MEMBER(gcm394_game_state::write_external_space)
 
 	if (offset & 0x0800000)
 	{
+		offset += 0x10000;
 		offset &= 0x07fffff;
 		m_prgram[offset] = data;
 	}
