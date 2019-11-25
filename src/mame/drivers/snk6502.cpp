@@ -382,29 +382,43 @@ void snk6502_state::satansat_map(address_map &map)
 	map(0xf800, 0xffff).rom();
 }
 
-void snk6502_state::vanguard_map(address_map &map)
+uint8_t vanguard_state::lowmem_r(offs_t offset)
+{
+	// RDY toggles on ϕ2 during each access to $0000-3FFF, generating one wait state
+	if (!machine().side_effects_disabled())
+		m_maincpu->adjust_icount(-1);
+
+	return m_lowmem->read8(offset);
+}
+
+void vanguard_state::vanguard_low_map(address_map &map)
 {
 	map(0x0000, 0x03ff).ram();
-	map(0x0400, 0x07ff).ram().w(FUNC(snk6502_state::videoram2_w)).share("videoram2");
-	map(0x0800, 0x0bff).ram().w(FUNC(snk6502_state::videoram_w)).share("videoram");
-	map(0x0c00, 0x0fff).ram().w(FUNC(snk6502_state::colorram_w)).share("colorram");
-	map(0x1000, 0x1fff).ram().w(FUNC(snk6502_state::charram_w)).share("charram");
+	map(0x0400, 0x07ff).ram().w(FUNC(vanguard_state::videoram2_w)).share("videoram2");
+	map(0x0800, 0x0bff).ram().w(FUNC(vanguard_state::videoram_w)).share("videoram");
+	map(0x0c00, 0x0fff).ram().w(FUNC(vanguard_state::colorram_w)).share("colorram");
+	map(0x1000, 0x1fff).ram().w(FUNC(vanguard_state::charram_w)).share("charram");
 	map(0x3000, 0x3000).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x3001, 0x3001).w("crtc", FUNC(mc6845_device::register_w));
 	map(0x3100, 0x3102).w("snk6502", FUNC(vanguard_sound_device::sound_w));
-	map(0x3103, 0x3103).w(FUNC(snk6502_state::flipscreen_w));
+	map(0x3103, 0x3103).w(FUNC(vanguard_state::flipscreen_w));
 	map(0x3104, 0x3104).portr("IN0");
 	map(0x3105, 0x3105).portr("IN1");
 	map(0x3106, 0x3106).portr("DSW");
 	map(0x3107, 0x3107).portr("IN2");
-	map(0x3200, 0x3200).w(FUNC(snk6502_state::scrollx_w));
-	map(0x3300, 0x3300).w(FUNC(snk6502_state::scrolly_w));
+	map(0x3200, 0x3200).w(FUNC(vanguard_state::scrollx_w));
+	map(0x3300, 0x3300).w(FUNC(vanguard_state::scrolly_w));
 	map(0x3400, 0x3400).w("snk6502", FUNC(vanguard_sound_device::speech_w)); // speech
+}
+
+void vanguard_state::vanguard_map(address_map &map)
+{
+	map(0x0000, 0x3fff).r(FUNC(vanguard_state::lowmem_r)).w(m_lowmem, FUNC(address_map_bank_device::write8));
 	map(0x4000, 0xbfff).rom();
 	map(0xf000, 0xffff).rom(); /* for the reset / interrupt vectors */
 }
 
-void fantasy_state::fantasy_map(address_map &map)
+void fantasy_state::fantasy_low_map(address_map &map)
 {
 	map(0x0000, 0x03ff).ram();
 	map(0x0400, 0x07ff).ram().w(FUNC(fantasy_state::videoram2_w)).share("videoram2");
@@ -422,18 +436,30 @@ void fantasy_state::fantasy_map(address_map &map)
 	map(0x2200, 0x2200).w(FUNC(fantasy_state::scrollx_w));
 	map(0x2300, 0x2300).w(FUNC(fantasy_state::scrolly_w));
 	map(0x2400, 0x2400).w("snk6502", FUNC(fantasy_sound_device::speech_w));  // speech
-	map(0x3000, 0xbfff).rom();
+	map(0x3000, 0x3fff).rom().region("maincpu", 0x3000);
+}
+
+void fantasy_state::fantasy_map(address_map &map)
+{
+	map(0x0000, 0x3fff).r(FUNC(fantasy_state::lowmem_r)).w(m_lowmem, FUNC(address_map_bank_device::write8));
+	map(0x4000, 0xbfff).rom();
 	map(0xf000, 0xffff).rom();
 }
 
-void fantasy_state::pballoon_map(address_map &map)
+void fantasy_state::pballoon_low_map(address_map &map)
 {
 	map(0x0000, 0x03ff).ram();
 	map(0x0400, 0x07ff).ram().w(FUNC(fantasy_state::videoram2_w)).share("videoram2");
 	map(0x0800, 0x0bff).ram().w(FUNC(fantasy_state::videoram_w)).share("videoram");
 	map(0x0c00, 0x0fff).ram().w(FUNC(fantasy_state::colorram_w)).share("colorram");
 	map(0x1000, 0x1fff).ram().w(FUNC(fantasy_state::charram_w)).share("charram");
-	map(0x3000, 0x9fff).rom();
+	map(0x3000, 0x3fff).rom().region("maincpu", 0x3000);
+}
+
+void fantasy_state::pballoon_map(address_map &map)
+{
+	map(0x0000, 0x3fff).r(FUNC(fantasy_state::lowmem_r)).w(m_lowmem, FUNC(address_map_bank_device::write8));
+	map(0x4000, 0x9fff).rom();
 	map(0xb000, 0xb000).w("crtc", FUNC(mc6845_device::address_w));
 	map(0xb001, 0xb001).w("crtc", FUNC(mc6845_device::register_w));
 	map(0xb100, 0xb102).w("snk6502", FUNC(fantasy_sound_device::sound_w));
@@ -849,12 +875,17 @@ void snk6502_state::satansat(machine_config &config)
 	SATANSAT_SOUND(config.replace(), "snk6502", 0);
 }
 
-void snk6502_state::vanguard(machine_config &config)
+void vanguard_state::vanguard(machine_config &config)
 {
 	// basic machine hardware
 	M6502(config, m_maincpu, MASTER_CLOCK / 8); // runs twice as fast as CRTC
-	m_maincpu->set_addrmap(AS_PROGRAM, &snk6502_state::vanguard_map);
-	m_maincpu->set_vblank_int("screen", FUNC(snk6502_state::snk6502_interrupt));
+	m_maincpu->set_addrmap(AS_PROGRAM, &vanguard_state::vanguard_map);
+	m_maincpu->set_vblank_int("screen", FUNC(vanguard_state::snk6502_interrupt));
+
+	ADDRESS_MAP_BANK(config, m_lowmem);
+	m_lowmem->set_addrmap(0, &vanguard_state::vanguard_low_map);
+	m_lowmem->set_data_width(8);
+	m_lowmem->set_addr_width(14);
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -862,11 +893,11 @@ void snk6502_state::vanguard(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(0*8, 32*8-1, 0*8, 28*8-1);
-	screen.set_screen_update(FUNC(snk6502_state::screen_update));
+	screen.set_screen_update(FUNC(vanguard_state::screen_update));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_vanguard);
-	PALETTE(config, m_palette, FUNC(snk6502_state::snk6502_palette), 64);
-	MCFG_VIDEO_START_OVERRIDE(snk6502_state,snk6502)
+	PALETTE(config, m_palette, FUNC(vanguard_state::snk6502_palette), 64);
+	MCFG_VIDEO_START_OVERRIDE(vanguard_state,snk6502)
 
 	mc6845_device &crtc(MC6845(config, "crtc", MASTER_CLOCK / 16));
 	crtc.set_screen("screen");
@@ -883,6 +914,7 @@ void fantasy_state::fantasy(machine_config &config)
 
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &fantasy_state::fantasy_map);
+	m_lowmem->set_addrmap(0, &fantasy_state::fantasy_low_map);
 
 	// sound hardware
 	FANTASY_SOUND(config.replace(), "snk6502", 0);
@@ -902,6 +934,7 @@ void fantasy_state::pballoon(machine_config &config)
 
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &fantasy_state::pballoon_map);
+	m_lowmem->set_addrmap(AS_PROGRAM, &fantasy_state::pballoon_low_map);
 
 	MCFG_VIDEO_START_OVERRIDE(snk6502_state, pballoon)
 
@@ -1524,9 +1557,9 @@ GAME( 1981, satansat,    0,        satansat, satansat, snk6502_state, empty_init
 GAME( 1981, satansata,   satansat, satansat, satansat, snk6502_state, empty_init, ROT90, "SNK", "Satan of Saturn (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, zarzon,      satansat, satansat, satansat, snk6502_state, empty_init, ROT90, "SNK (Taito America license)", "Zarzon", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, satansatind, satansat, satansat, satansat, snk6502_state, empty_init, ROT90, "bootleg (Inder S.A.)", "Satan of Saturn (Inder S.A., bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, vanguard,    0,        vanguard, vanguard, snk6502_state, empty_init, ROT90, "SNK", "Vanguard (SNK)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, vanguardc,   vanguard, vanguard, vanguard, snk6502_state, empty_init, ROT90, "SNK (Centuri license)", "Vanguard (Centuri)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, vanguardj,   vanguard, vanguard, vanguard, snk6502_state, empty_init, ROT90, "SNK", "Vanguard (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, vanguard,    0,        vanguard, vanguard, vanguard_state,empty_init, ROT90, "SNK", "Vanguard (SNK)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, vanguardc,   vanguard, vanguard, vanguard, vanguard_state,empty_init, ROT90, "SNK (Centuri license)", "Vanguard (Centuri)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, vanguardj,   vanguard, vanguard, vanguard, vanguard_state,empty_init, ROT90, "SNK", "Vanguard (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, fantasyu,    0,        fantasy,  fantasyu, fantasy_state, empty_init, ROT90, "SNK (Rock-Ola license)", "Fantasy (US)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, fantasyg,    fantasyu, fantasy,  fantasy,  fantasy_state, empty_init, ROT90, "SNK", "Fantasy (Germany, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // bootleg?
 GAME( 1981, fantasyg2,   fantasyu, fantasy,  fantasy,  fantasy_state, empty_init, ROT90, "SNK", "Fantasy (Germany, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // bootleg?

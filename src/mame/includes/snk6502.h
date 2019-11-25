@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "machine/bankdev.h"
 #include "machine/timer.h"
 #include "emupal.h"
 #include "tilemap.h"
@@ -31,7 +32,6 @@ public:
 	{ }
 
 	void satansat(machine_config &config);
-	void vanguard(machine_config &config);
 	void sasuke(machine_config &config);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(sasuke_count_r);
@@ -92,14 +92,34 @@ protected:
 
 	void sasuke_map(address_map &map);
 	void satansat_map(address_map &map);
+};
+
+class vanguard_state : public snk6502_state
+{
+public:
+	vanguard_state(const machine_config &mconfig, device_type type, const char *tag) :
+		snk6502_state(mconfig, type, tag),
+		m_lowmem(*this, "lowmem")
+	{
+	}
+
+	void vanguard(machine_config &config);
+
+protected:
+	uint8_t lowmem_r(offs_t offset);
+
+	required_device<address_map_bank_device> m_lowmem;
+
+private:
+	void vanguard_low_map(address_map &map);
 	void vanguard_map(address_map &map);
 };
 
-class fantasy_state : public snk6502_state
+class fantasy_state : public vanguard_state
 {
 public:
 	fantasy_state(const machine_config &mconfig, device_type type, const char *tag) :
-		snk6502_state(mconfig, type, tag),
+		vanguard_state(mconfig, type, tag),
 		m_sound(*this, "snk6502")
 	{
 	}
@@ -111,7 +131,9 @@ public:
 private:
 	DECLARE_WRITE8_MEMBER(fantasy_flipscreen_w);
 
+	void fantasy_low_map(address_map &map);
 	void fantasy_map(address_map &map);
+	void pballoon_low_map(address_map &map);
 	void pballoon_map(address_map &map);
 
 	required_device<fantasy_sound_device> m_sound;
