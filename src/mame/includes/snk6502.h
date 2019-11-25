@@ -99,20 +99,21 @@ class vanguard_state : public snk6502_state
 public:
 	vanguard_state(const machine_config &mconfig, device_type type, const char *tag) :
 		snk6502_state(mconfig, type, tag),
-		m_lowmem(*this, "lowmem")
+		m_highmem(*this, "highmem")
 	{
 	}
 
 	void vanguard(machine_config &config);
 
 protected:
-	uint8_t lowmem_r(offs_t offset);
+	uint8_t highmem_r(offs_t offset);
+	void highmem_w(offs_t offset, uint8_t data);
 
-	required_device<address_map_bank_device> m_lowmem;
+	required_device<address_map_bank_device> m_highmem;
 
 private:
-	void vanguard_low_map(address_map &map);
 	void vanguard_map(address_map &map);
+	void vanguard_upper_map(address_map &map);
 };
 
 class fantasy_state : public vanguard_state
@@ -131,10 +132,9 @@ public:
 private:
 	DECLARE_WRITE8_MEMBER(fantasy_flipscreen_w);
 
-	void fantasy_low_map(address_map &map);
 	void fantasy_map(address_map &map);
-	void pballoon_low_map(address_map &map);
 	void pballoon_map(address_map &map);
+	void pballoon_upper_map(address_map &map);
 
 	required_device<fantasy_sound_device> m_sound;
 };

@@ -382,16 +382,22 @@ void snk6502_state::satansat_map(address_map &map)
 	map(0xf800, 0xffff).rom();
 }
 
-uint8_t vanguard_state::lowmem_r(offs_t offset)
+uint8_t vanguard_state::highmem_r(offs_t offset)
 {
-	// RDY toggles on ϕ2 during each access to $0000-3FFF, generating one wait state
+	// RDY toggles on ϕ2 during each access to memory above $3FFF, generating one wait state
 	if (!machine().side_effects_disabled())
 		m_maincpu->adjust_icount(-1);
 
-	return m_lowmem->read8(offset);
+	return m_highmem->read8(offset + 0x4000);
 }
 
-void vanguard_state::vanguard_low_map(address_map &map)
+void vanguard_state::highmem_w(offs_t offset, uint8_t data)
+{
+	// RDY toggles on ϕ2 during each access to memory above $3FFF, but 6502 does not apply wait states to writes
+	m_highmem->write8(offset + 0x4000, data);
+}
+
+void vanguard_state::vanguard_map(address_map &map)
 {
 	map(0x0000, 0x03ff).ram();
 	map(0x0400, 0x07ff).ram().w(FUNC(vanguard_state::videoram2_w)).share("videoram2");
@@ -409,16 +415,16 @@ void vanguard_state::vanguard_low_map(address_map &map)
 	map(0x3200, 0x3200).w(FUNC(vanguard_state::scrollx_w));
 	map(0x3300, 0x3300).w(FUNC(vanguard_state::scrolly_w));
 	map(0x3400, 0x3400).w("snk6502", FUNC(vanguard_sound_device::speech_w)); // speech
+	map(0x4000, 0xffff).rw(FUNC(vanguard_state::highmem_r), FUNC(vanguard_state::highmem_w));
 }
 
-void vanguard_state::vanguard_map(address_map &map)
+void vanguard_state::vanguard_upper_map(address_map &map)
 {
-	map(0x0000, 0x3fff).r(FUNC(vanguard_state::lowmem_r)).w(m_lowmem, FUNC(address_map_bank_device::write8));
-	map(0x4000, 0xbfff).rom();
-	map(0xf000, 0xffff).rom(); /* for the reset / interrupt vectors */
+	map(0x4000, 0xbfff).rom().region("maincpu", 0x4000);
+	map(0xf000, 0xffff).rom().region("maincpu", 0xf000); /* for the reset / interrupt vectors */
 }
 
-void fantasy_state::fantasy_low_map(address_map &map)
+void fantasy_state::fantasy_map(address_map &map)
 {
 	map(0x0000, 0x03ff).ram();
 	map(0x0400, 0x07ff).ram().w(FUNC(fantasy_state::videoram2_w)).share("videoram2");
@@ -437,16 +443,10 @@ void fantasy_state::fantasy_low_map(address_map &map)
 	map(0x2300, 0x2300).w(FUNC(fantasy_state::scrolly_w));
 	map(0x2400, 0x2400).w("snk6502", FUNC(fantasy_sound_device::speech_w));  // speech
 	map(0x3000, 0x3fff).rom().region("maincpu", 0x3000);
+	map(0x4000, 0xffff).rw(FUNC(fantasy_state::highmem_r), FUNC(fantasy_state::highmem_w));
 }
 
-void fantasy_state::fantasy_map(address_map &map)
-{
-	map(0x0000, 0x3fff).r(FUNC(fantasy_state::lowmem_r)).w(m_lowmem, FUNC(address_map_bank_device::write8));
-	map(0x4000, 0xbfff).rom();
-	map(0xf000, 0xffff).rom();
-}
-
-void fantasy_state::pballoon_low_map(address_map &map)
+void fantasy_state::pballoon_map(address_map &map)
 {
 	map(0x0000, 0x03ff).ram();
 	map(0x0400, 0x07ff).ram().w(FUNC(fantasy_state::videoram2_w)).share("videoram2");
@@ -454,12 +454,12 @@ void fantasy_state::pballoon_low_map(address_map &map)
 	map(0x0c00, 0x0fff).ram().w(FUNC(fantasy_state::colorram_w)).share("colorram");
 	map(0x1000, 0x1fff).ram().w(FUNC(fantasy_state::charram_w)).share("charram");
 	map(0x3000, 0x3fff).rom().region("maincpu", 0x3000);
+	map(0x4000, 0xffff).rw(FUNC(fantasy_state::highmem_r), FUNC(fantasy_state::highmem_w));
 }
 
-void fantasy_state::pballoon_map(address_map &map)
+void fantasy_state::pballoon_upper_map(address_map &map)
 {
-	map(0x0000, 0x3fff).r(FUNC(fantasy_state::lowmem_r)).w(m_lowmem, FUNC(address_map_bank_device::write8));
-	map(0x4000, 0x9fff).rom();
+	map(0x4000, 0x9fff).rom().region("maincpu", 0x4000);
 	map(0xb000, 0xb000).w("crtc", FUNC(mc6845_device::address_w));
 	map(0xb001, 0xb001).w("crtc", FUNC(mc6845_device::register_w));
 	map(0xb100, 0xb102).w("snk6502", FUNC(fantasy_sound_device::sound_w));
@@ -470,7 +470,7 @@ void fantasy_state::pballoon_map(address_map &map)
 	map(0xb107, 0xb107).portr("IN2");
 	map(0xb200, 0xb200).w(FUNC(fantasy_state::scrollx_w));
 	map(0xb300, 0xb300).w(FUNC(fantasy_state::scrolly_w));
-	map(0xf000, 0xffff).rom();
+	map(0xf000, 0xffff).rom().region("maincpu", 0xf000);
 }
 
 
@@ -882,10 +882,10 @@ void vanguard_state::vanguard(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &vanguard_state::vanguard_map);
 	m_maincpu->set_vblank_int("screen", FUNC(vanguard_state::snk6502_interrupt));
 
-	ADDRESS_MAP_BANK(config, m_lowmem);
-	m_lowmem->set_addrmap(0, &vanguard_state::vanguard_low_map);
-	m_lowmem->set_data_width(8);
-	m_lowmem->set_addr_width(14);
+	ADDRESS_MAP_BANK(config, m_highmem);
+	m_highmem->set_addrmap(0, &vanguard_state::vanguard_upper_map);
+	m_highmem->set_data_width(8);
+	m_highmem->set_addr_width(16);
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -914,7 +914,6 @@ void fantasy_state::fantasy(machine_config &config)
 
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &fantasy_state::fantasy_map);
-	m_lowmem->set_addrmap(0, &fantasy_state::fantasy_low_map);
 
 	// sound hardware
 	FANTASY_SOUND(config.replace(), "snk6502", 0);
@@ -934,7 +933,7 @@ void fantasy_state::pballoon(machine_config &config)
 
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &fantasy_state::pballoon_map);
-	m_lowmem->set_addrmap(AS_PROGRAM, &fantasy_state::pballoon_low_map);
+	m_highmem->set_addrmap(AS_PROGRAM, &fantasy_state::pballoon_upper_map);
 
 	MCFG_VIDEO_START_OVERRIDE(snk6502_state, pballoon)
 
