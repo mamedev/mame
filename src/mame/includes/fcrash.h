@@ -21,7 +21,7 @@ public:
 		, m_msm_1(*this, "msm1")
 		, m_msm_2(*this, "msm2")
 	{ }
-	
+
 	void fcrash(machine_config &config);
 	void cawingbl(machine_config &config);
 	void kodb(machine_config &config);
@@ -30,13 +30,13 @@ public:
 	void sgyxz(machine_config &config);
 	void wofabl(machine_config &config);
 	void varthb(machine_config &config);
-	
+
 	void init_cawingbl();
 	void init_kodb();
 	void init_mtwinsb();
 	void init_sf2m1();
 	void init_wofabl();
-	
+
 protected:
 	DECLARE_MACHINE_START(fcrash);
 	DECLARE_MACHINE_RESET(fcrash);
@@ -45,7 +45,7 @@ protected:
 	DECLARE_MACHINE_START(mtwinsb);
 	DECLARE_MACHINE_START(sf2m1);
 	DECLARE_MACHINE_START(sgyxz);
-	
+
 	DECLARE_WRITE16_MEMBER(fcrash_soundlatch_w);
 	DECLARE_WRITE8_MEMBER(fcrash_snd_bankswitch_w);
 	DECLARE_WRITE_LINE_MEMBER(m5205_int1);
@@ -58,7 +58,7 @@ protected:
 	DECLARE_WRITE16_MEMBER(sf2m1_layer_w);
 	DECLARE_WRITE16_MEMBER(varthb_layer_w);
 	DECLARE_WRITE16_MEMBER(varthb_layer2_w);
-	
+
 	uint32_t screen_update_fcrash(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void fcrash_update_transmasks();
 	virtual void bootleg_render_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -72,17 +72,17 @@ protected:
 	void sgyxz_map(address_map &map);
 	void wofabl_map(address_map &map);
 	void varthb_map(address_map &map);
-	
+
 	void fcrash_sound_map(address_map &map);
 	void kodb_sound_map(address_map &map);
 	void sgyxz_sound_map(address_map &map);
-	
+
 	/* sound hw */
 	int m_sample_buffer1;
 	int m_sample_buffer2;
 	int m_sample_select1;
 	int m_sample_select2;
-	
+
 	/* video config */
 	uint8_t m_layer_enable_reg;
 	uint8_t m_layer_mask_reg[4];
@@ -94,7 +94,7 @@ protected:
 	int     m_sprite_x_offset;
 	std::unique_ptr<uint16_t[]> m_bootleg_sprite_ram;
 	std::unique_ptr<uint16_t[]> m_bootleg_work_ram;
-	
+
 	optional_device<msm5205_device> m_msm_1;
 	optional_device<msm5205_device> m_msm_2;
 };

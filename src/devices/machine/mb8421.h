@@ -6,9 +6,9 @@
 
     Fujitsu MB8421/22/31/32-90/-90L/-90LL/-12/-12L/-12LL
     CMOS 16K-bit (2KB) dual-port SRAM (pinouts : see below)
-	IDT 71321 16K-bit (2Kx8) dual port SRAM
-	IDT 7130 8K-bit (1Kx8) dual port SRAM
-	Cypress CY7C131 8K-bit (1Kx8) dual port SRAM
+    IDT 71321 16K-bit (2Kx8) dual port SRAM
+    IDT 7130 8K-bit (1Kx8) dual port SRAM
+    Cypress CY7C131 8K-bit (1Kx8) dual port SRAM
 
 ***********************************************************************
                             _____________

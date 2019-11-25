@@ -2898,7 +2898,7 @@ wd1772_device::wd1772_device(const machine_config &mconfig, const char *tag, dev
 	head_control = false;
 	motor_control = true;
 	ready_hooked = false;
-	
+
 	/* Sam Coupe/+D/Disciple expect a 0xd0 force interrupt command to cause a spin-up.
 	   eg. +D issues 2x 0xd0, then waits for index pulses to start, bails out with no disk error if that doesn't happen.
 	   Not sure if other chips should do this too? */

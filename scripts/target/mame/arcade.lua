@@ -3876,7 +3876,6 @@ files {
 	MAME_DIR .. "src/mame/video/fgoal.cpp",
 	MAME_DIR .. "src/mame/drivers/flstory.cpp",
 	MAME_DIR .. "src/mame/includes/flstory.h",
-	MAME_DIR .. "src/mame/machine/flstory.cpp",
 	MAME_DIR .. "src/mame/video/flstory.cpp",
 	MAME_DIR .. "src/mame/drivers/galastrm.cpp",
 	MAME_DIR .. "src/mame/includes/galastrm.h",

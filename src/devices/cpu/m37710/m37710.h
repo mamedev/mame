@@ -128,9 +128,20 @@ public:
 	auto an7_cb() { return m_analog_cb[7].bind(); }
 
 protected:
+	void ad_register_map(address_map &map);
+	void uart0_register_map(address_map &map);
+	void uart1_register_map(address_map &map);
+	void timer_register_map(address_map &map);
+	void timer_6channel_register_map(address_map &map);
+	void irq_register_map(address_map &map);
+
 	// internal registers
-	uint8_t port_r(offs_t offset);
-	void port_w(offs_t offset, uint8_t data);
+	template <int Base> uint8_t port_r(offs_t offset);
+	template <int Base> void port_w(offs_t offset, uint8_t data);
+	uint8_t get_port_reg(int p);
+	uint8_t get_port_dir(int p);
+	void set_port_reg(int p, uint8_t data);
+	void set_port_dir(int p, uint8_t data);
 	void da_reg_w(offs_t offset, uint8_t data);
 	void pulse_output_w(offs_t offset, uint8_t data);
 	uint8_t ad_control_r();
@@ -180,8 +191,10 @@ protected:
 	void refresh_timer_w(uint8_t data);
 	uint16_t dmac_control_r(offs_t offset, uint16_t mem_mask);
 	void dmac_control_w(offs_t offset, uint16_t data, uint16_t mem_mask);
-	uint8_t int_control_r(offs_t offset);
-	void int_control_w(offs_t offset, uint8_t data);
+	template <int Level> uint8_t int_control_r();
+	template <int Level> void int_control_w(uint8_t data);
+	uint8_t get_int_control(int level);
+	void set_int_control(int level, uint8_t data);
 
 	// construction/destruction
 	m37710_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor map_delegate);
@@ -317,7 +330,6 @@ private:
 	typedef void (m37710_cpu_device::*set_reg_func)(int regnum, uint32_t val);
 	typedef int  (m37710_cpu_device::*execute_func)(int cycles);
 
-	static const int m37710_int_reg_map[M37710_MASKABLE_INTERRUPTS];
 	static const int m37710_irq_vectors[M37710_INTERRUPT_MAX];
 	static const char *const m37710_tnames[8];
 	static const char *const m37710_intnames[M37710_INTERRUPT_MAX];

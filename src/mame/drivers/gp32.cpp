@@ -16,8 +16,8 @@
  *
  * TODO:
  * - device-ify s3c240x;
- * - console screen is horizontal, but here screen is setted up with 
- *   Height < Width and ROT270, in a double negation fashion. Simplify and 
+ * - console screen is horizontal, but here screen is setted up with
+ *   Height < Width and ROT270, in a double negation fashion. Simplify and
  *   eventually update video fns;
  * - Normalize palette to actual TFT color space;
  * - Several games have dubious sound clipping and mixing;
@@ -25,7 +25,7 @@
  * - Games from SW list doesn't reload after save, is it even supported?
  * - Add slot for USB PC-Link application, add a host machine connection
  *   somehow;
- * - Verify MP3 support, which in turn needs checking out how the filesystem 
+ * - Verify MP3 support, which in turn needs checking out how the filesystem
  *   works here (and eventually a tool for direct injecting);
  * - Verify gp32linux distro;
  *

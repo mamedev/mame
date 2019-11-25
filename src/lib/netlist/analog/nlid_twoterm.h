@@ -36,9 +36,9 @@
 
 #include "netlist/nl_base.h"
 #include "netlist/nl_setup.h"
+#include "netlist/plib/pfunction.h"
 #include "netlist/solver/nld_solver.h"
 #include "nld_generic_models.h"
-#include "netlist/plib/pfunction.h"
 
 // -----------------------------------------------------------------------------
 // Implementation

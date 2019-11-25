@@ -146,7 +146,7 @@ private:
 
 	// internal state
 	std::unique_ptr<uint8_t[]> m_data;   // enough for a whole track
-	uint32_t m_data_idx;                 // byte position in track 
+	uint32_t m_data_idx;                 // byte position in track
 	uint32_t m_start_idx;                // start of write position
 	uint32_t m_data_size;                // track length
 	uint8_t  m_data_crc;                 // checksum when writing

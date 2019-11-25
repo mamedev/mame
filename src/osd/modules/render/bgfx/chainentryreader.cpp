@@ -183,6 +183,10 @@ bgfx_chain_entry* chain_entry_reader::read_from_value(const Value& value, std::s
 		}
 	}
 
+	// Parse whether or not to apply screen tint in this pass
+	bool applytint = get_bool(value, "applytint", false);
+
+	// Parse uniforms
 	std::vector<bgfx_entry_uniform*> uniforms;
 	if (value.HasMember("uniforms"))
 	{
@@ -228,7 +232,7 @@ bgfx_chain_entry* chain_entry_reader::read_from_value(const Value& value, std::s
 	}
 
 	std::string output = value["output"].GetString();
-	return new bgfx_chain_entry(name, effect, clear, suppressors, inputs, uniforms, chains.targets(), output);
+	return new bgfx_chain_entry(name, effect, clear, suppressors, inputs, uniforms, chains.targets(), output, applytint);
 }
 
 bool chain_entry_reader::validate_parameters(const Value& value, std::string prefix)
@@ -242,5 +246,6 @@ bool chain_entry_reader::validate_parameters(const Value& value, std::string pre
 	if (!READER_CHECK(!value.HasMember("input") || value["input"].IsArray(), (prefix + "Value 'input' must be an array\n").c_str())) return false;
 	if (!READER_CHECK(!value.HasMember("uniforms") || value["uniforms"].IsArray(), (prefix + "Value 'uniforms' must be an array\n").c_str())) return false;
 	if (!READER_CHECK(!value.HasMember("disablewhen") || value["disablewhen"].IsArray(), (prefix + "Value 'disablewhen' must be an array\n").c_str())) return false;
+	if (!READER_CHECK(!value.HasMember("applytint") || value["applytint"].IsBool(), (prefix + "Value 'applytint' must be a bool\n").c_str())) return false;
 	return true;
 }

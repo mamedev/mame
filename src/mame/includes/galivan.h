@@ -53,7 +53,6 @@ private:
 	uint16_t       m_scrollx;
 	uint16_t       m_scrolly;
 	uint8_t       m_galivan_scrollx[2],m_galivan_scrolly[2];
-	uint8_t       m_write_layers;
 	uint8_t       m_layers;
 	uint8_t       m_ninjemak_dispdisable;
 
@@ -78,6 +77,7 @@ private:
 	TILE_GET_INFO_MEMBER(ninjemak_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(ninjemak_get_tx_tile_info);
 	void galivan_palette(palette_device &palette) const;
+	void ninjemak_palette(palette_device &palette) const;
 	DECLARE_MACHINE_START(galivan);
 	DECLARE_MACHINE_RESET(galivan);
 	DECLARE_VIDEO_START(galivan);

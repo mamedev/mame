@@ -461,7 +461,7 @@ void device_mixer_interface::sound_stream_update(sound_stream &stream, stream_sa
 {
 	// clear output buffers
 	for (int output = 0; output < m_outputs; output++)
-		memset(outputs[output], 0, samples * sizeof(outputs[0][0]));
+		std::fill_n(outputs[output], samples, 0);
 
 	// loop over samples
 	const u8 *outmap = &m_outputmap[0];

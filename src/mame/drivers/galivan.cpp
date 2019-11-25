@@ -375,9 +375,15 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( gfx_galivan )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,            0,   8 )
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,         8*16,  16 )
-	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 8*16+16*16, 256 )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,             0,  16 )
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,         16*16,  16 )
+	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 16*16+16*16, 256 )
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_ninjemak )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,             0,   8 )
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,          8*16,  16 )
+	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,  8*16+16*16, 256 )
 GFXDECODE_END
 
 
@@ -392,7 +398,6 @@ MACHINE_START_MEMBER(galivan_state,galivan)
 	/* register for saving */
 	save_item(NAME(m_scrollx));
 	save_item(NAME(m_scrolly));
-	save_item(NAME(m_write_layers));
 	save_item(NAME(m_layers));
 }
 
@@ -413,9 +418,7 @@ MACHINE_RESET_MEMBER(galivan_state,galivan)
 {
 	m_maincpu->reset();
 
-//  m_layers = 0x60;
 	m_layers = 0;
-	m_write_layers = 0;
 	m_galivan_scrollx[0] = m_galivan_scrollx[1] = 0;
 	m_galivan_scrolly[0] = m_galivan_scrolly[1] = 0;
 }
@@ -458,7 +461,7 @@ void galivan_state::galivan(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_galivan);
-	PALETTE(config, m_palette, FUNC(galivan_state::galivan_palette), 8*16+16*16+256*16, 256);
+	PALETTE(config, m_palette, FUNC(galivan_state::galivan_palette), 16*16+16*16+256*16, 256);
 
 	MCFG_VIDEO_START_OVERRIDE(galivan_state,galivan)
 
@@ -514,8 +517,8 @@ void galivan_state::ninjemak(machine_config &config)
 	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
 	screen.set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_galivan);
-	PALETTE(config, m_palette, FUNC(galivan_state::galivan_palette), 8*16+16*16+256*16, 256);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ninjemak);
+	PALETTE(config, m_palette, FUNC(galivan_state::ninjemak_palette), 8*16+16*16+256*16, 256);
 
 	MCFG_VIDEO_START_OVERRIDE(galivan_state,ninjemak)
 

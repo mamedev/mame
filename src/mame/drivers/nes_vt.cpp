@@ -148,7 +148,7 @@ protected:
 
 	uint8_t m_8000_scramble[8];
 	uint8_t m_410x_scramble[2];
-		
+
 	void scrambled_410x_w(uint16_t offset, uint8_t data);
 	void scrambled_8000_w(address_space& space, uint16_t offset, uint8_t data);
 
@@ -173,9 +173,9 @@ private:
 	/* Extra IO */
 	DECLARE_WRITE8_MEMBER(extra_io_control_w);
 	DECLARE_READ8_MEMBER(extrain_01_r);
-	DECLARE_READ8_MEMBER(extrain_23_r);	
+	DECLARE_READ8_MEMBER(extrain_23_r);
 	DECLARE_WRITE8_MEMBER(extraout_01_w);
-	DECLARE_WRITE8_MEMBER(extraout_23_w);	
+	DECLARE_WRITE8_MEMBER(extraout_23_w);
 
 	/* Misc */
 	DECLARE_READ8_MEMBER(rs232flags_region_r);
@@ -1397,7 +1397,7 @@ READ8_MEMBER(nes_vt_state::rs232flags_region_r)
 {
 	/*
 	0x4119 RS232 Flags + Region
-	
+
 	0x01 - RX bit 8
 	0x02 - RERFF (error status)
 	0x04 - unused
@@ -1454,7 +1454,7 @@ READ8_MEMBER(nes_vt_ablpinb_state::ablpinb_in0_r)
 	{
 		m_plunger_state_count++;
 
-		if ((m_plunger_state_count >= m_plunger->read()) || (m_plunger_state_count >= 0x80)) // if it stays low for too many frames the gfx corrupt, 
+		if ((m_plunger_state_count >= m_plunger->read()) || (m_plunger_state_count >= 0x80)) // if it stays low for too many frames the gfx corrupt,
 		{
 			m_plunger_off = 1;
 			m_plunger_state_count = 0;
@@ -1507,13 +1507,13 @@ void nes_vt_state::nes_vt_map(address_map &map)
 	// 0x410c unused
 	map(0x410d, 0x410d).w(FUNC(nes_vt_state::extra_io_control_w));
 	map(0x410e, 0x410e).r(FUNC(nes_vt_state::extrain_01_r));
-	map(0x410f, 0x410f).r(FUNC(nes_vt_state::extrain_23_r));	
+	map(0x410f, 0x410f).r(FUNC(nes_vt_state::extrain_23_r));
 	// 0x4114 RS232 timer (low)
 	// 0x4115 RS232 timer (high)
 	// 0x4116 unused
 	// 0x4117 unused
 	// 0x4118 unused
-	map(0x4119, 0x4119).r(FUNC(nes_vt_state::rs232flags_region_r));	
+	map(0x4119, 0x4119).r(FUNC(nes_vt_state::rs232flags_region_r));
 	// 0x411a RS232 TX data
 	// 0x411b RS232 RX data
 
@@ -1739,7 +1739,7 @@ void nes_vt_ablpinb_state::nes_vt_ablpinb(machine_config &config)
 		(ppu2c0x_device::VBLANK_LAST_SCANLINE_PAL - ppu2c0x_device::VBLANK_FIRST_SCANLINE_PALC + 1 + 2)));
 	m_screen->set_size(32 * 8, 312);
 	m_screen->set_visarea(0 * 8, 32 * 8 - 1, 0 * 8, 30 * 8 - 1);
-	
+
 	// override for controllers
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_ablpinb_state::nes_vt_ablpinb_map);
 }

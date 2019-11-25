@@ -233,7 +233,7 @@ public:
 		, m_in(*this, "IN")
 		, m_cpu_device(nullptr)
 		, m_last(*this, "m_last", 0)
-//		, m_supply(*this)
+//      , m_supply(*this)
 	{
 		auto *nl = dynamic_cast<netlist_mame_device::netlist_mame_t *>(&state());
 		if (nl != nullptr)

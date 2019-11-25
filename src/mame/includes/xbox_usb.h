@@ -355,7 +355,7 @@ public:
 	void usb_ohci_device_address_changed(int old_address, int new_address);
 	void set_cpu(cpu_device *cpu) { m_maincpu = cpu; }
 	void set_timer(emu_timer *timer) { ohcist.timer = timer; }
-	void set_irq_callbaclk(std::function<void(int state)> callback) { irq_callback = callback; }
+	void set_irq_callback(std::function<void(int state)> callback) { irq_callback = callback; }
 
 	void start();
 	void reset();

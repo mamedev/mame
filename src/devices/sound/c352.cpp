@@ -23,7 +23,7 @@
 //#define VERBOSE 1
 #include "logmacro.h"
 
-#define C352_LOG_PCM	(0)
+#define C352_LOG_PCM    (0)
 
 #if C352_LOG_PCM
 #include <map>

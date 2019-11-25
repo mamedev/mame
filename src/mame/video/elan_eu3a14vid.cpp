@@ -56,7 +56,7 @@ void elan_eu3a14vid_device::map(address_map &map)
 	map(0x1a, 0x1e).rw(FUNC(elan_eu3a14vid_device::rowscrollsplit_r), FUNC(elan_eu3a14vid_device::rowscrollsplit_w));
 	// 0x1f
 	// 0x20
-	map(0x21, 0x24).rw(FUNC(elan_eu3a14vid_device::scrollregs_r), FUNC(elan_eu3a14vid_device::scrollregs_w)); 	// 0x21,0x22 = scroll reg 1,  0x23,0x24 = scroll reg 2
+	map(0x21, 0x24).rw(FUNC(elan_eu3a14vid_device::scrollregs_r), FUNC(elan_eu3a14vid_device::scrollregs_w));   // 0x21,0x22 = scroll reg 1,  0x23,0x24 = scroll reg 2
 	map(0x25, 0x2c).rw(FUNC(elan_eu3a14vid_device::rowscrollregs_r), FUNC(elan_eu3a14vid_device::rowscrollregs_w)); // 0x25,0x26 = rowscroll reg 1, 0x27,0x28 = rowscroll reg 2, 0x29,0x2a = rowscroll reg 3, 0x2b,0x2c = rowscroll reg 3
 	// 0x2d
 	// 0x2e
@@ -80,7 +80,7 @@ void elan_eu3a14vid_device::map(address_map &map)
 	map(0x40, 0x45).rw(FUNC(elan_eu3a14vid_device::ramtilecfg_r), FUNC(elan_eu3a14vid_device::ramtilecfg_w));
 	// 0x46
 	// 0x47
-	map(0x48, 0x4b).ram(); 	// hnt3 (always 0 tho?)
+	map(0x48, 0x4b).ram();  // hnt3 (always 0 tho?)
 	// 0x4c
 	// 0x4d
 	// 0x4e

@@ -3,13 +3,13 @@
 /***************************************************************************
 
 Midway Quicksilver II/Graphite skeleton driver
-	
+
 Hardware configurations:
 
 Hydro Thunder:   Quicksilver II system and Diego I/O board
-Offroad Thunder: Quicksilver II system and Magicbus I/O board	
+Offroad Thunder: Quicksilver II system and Magicbus I/O board
 Arctic Thunder:  Graphite system and Substitute I/O board
-	
+
 All of the games communicate with their I/O boards serially.
 
 Quicksilver II hardware:
@@ -29,7 +29,7 @@ Chipsets (440BX AGPset):
 Note: This was once claimed to run on Windows 95 or 98 but has been proven (mostly) false. The TNT Kernel was a "DOS Extender"
 that allows core Windows NT functions to work on MS DOS. It's also possible it runs on a custom made OS as both games do not display
 anything DOS related.
-	
+
 Graphite hardware:
 - Main CPU: Intel Pentium III 733MHz
 - Motherboard: BCM GT694VP
@@ -44,13 +44,13 @@ Graphite hardware:
 Chipsets (VIA Pro133A):
 - VT82C694X Northbridge
 - VT82C686A Southbridge
-	
+
 Note: Not only a beefed up Quicksilver II but acts like a normal PC. You get the normal bios startup, a Windows 2000 startup sequence and
 then the game launcher starts. Another difference is the storage device has a copy protection scheme that "locks" the storage device to the
 motherboard's serial number. If a drive doesn't match the motherboard's serial number, the game launcher will give an error.
-	
+
 I/O boards:
-	
+
 MIDWAY GAMES INC
 5770-15983-04
 DIEGO
@@ -93,12 +93,12 @@ Notes:
     JP13-15: connectors, not used
     JP16: Power connector
     P1: DB9 RS-232 port to computer
-	Q2: ULN2064B Darlington Transistor
-	S1: Dip Switches (8).
-		 S1-3: *Off: Game Mode, On: Test Mode
+    Q2: ULN2064B Darlington Transistor
+    S1: Dip Switches (8).
+         S1-3: *Off: Game Mode, On: Test Mode
          S1-4: *Off: 25" Cabinet, On: 39" Cabinet
          S1-8: Off: Watchdog Disabled, *On: Watchdog Enabled
-	U1: Texas Instruments LS85A Logic Gate
+    U1: Texas Instruments LS85A Logic Gate
     U2-3: EL244CS Amplifier
     U4: 109B Instrumentation Amplifier
     U5: PC16550DV UART Interface IC
@@ -160,12 +160,12 @@ Notes:
     JP23: Alternate RS232 port
     JP24: connector, not used
     P1: DB9 RS-232 port to computer
-	Q4: ULN2064B Darlington Transistor
-	S1: Dip Switches (8)
+    Q4: ULN2064B Darlington Transistor
+    S1: Dip Switches (8)
          S1-7: *Off: UART, On: USB
          S1-8: Off: Watchdog Disabled, *On: Watchdog Enabled
-	S2: Dip Switches (8), all set to "off"
-	U1: LS85A Logic Gate
+    S2: Dip Switches (8), all set to "off"
+    U1: LS85A Logic Gate
     U2-3: EL244CS Amplifier
     U5: MAX707CSA Supervisory Circuit
     U6: Motorola MC74HC273A Octal D Flip-Flop (LS273 based)
@@ -226,11 +226,11 @@ Notes:
     JP23: Alternate RS232 port
     JP24: connector, not used
     P1: DB9 RS-232 port to computer
-	S1: Dip Switches (8)
-	S1: Dip Switches (8)
+    S1: Dip Switches (8)
+    S1: Dip Switches (8)
          S1-7: *Off: UART, On: USB
          S1-8: Off: Watchdog Disabled, *On: Watchdog Enabled
-	S2: Dip Switches (8)
+    S2: Dip Switches (8)
     U4-5: MC74HC273A Octal D Flip-Flop (LS273 based)
     U6: Not known yet
     U7/U11: Atmel 24C01A Serial EEPROM
@@ -238,10 +238,10 @@ Notes:
     U12-19: HC541 Octal Buffer
     U20: Philips P87C51/2 8-bit Microcontroller
     U21: DS14185WM RS-232 Interface IC
-	U22-24: ULN2064B Darlington Transistor
+    U22-24: ULN2064B Darlington Transistor
     U25: Not known yet
     Y2: FS14.74 Crystal/Oscilator
-	
+
 ***************************************************************************/
 
 

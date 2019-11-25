@@ -1956,11 +1956,11 @@ static INPUT_PORTS_START( sf2amf )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
-	
+
 /* SWB.6 enables turbo mode, SWB.4 and SWB.5 sets the speed */
 static INPUT_PORTS_START( sf2amfx )
 	PORT_INCLUDE( sf2hack )
-	
+
 	PORT_MODIFY("DSWB")
 	PORT_DIPNAME( 0x18, 0x18, "Game Speed" )   PORT_DIPLOCATION("SW(B):4,5")
 	PORT_DIPSETTING(    0x18, "Normal" )
@@ -10714,8 +10714,8 @@ ROM_END
     MSTREET-6 repair info:
     Frequent cause of dead board is u104 (gal/palce20v8) becoming corrupted somehow. Luckily a working unsecured chip was found and dumped :)
     Likely to also work on other similar boards (reference number may vary).
-	
-	B/C sets patch pals have different equations but are logically equivalent.
+
+    B/C sets patch pals have different equations but are logically equivalent.
 */
 
 #define SF2CEMS6_PLD_DEVICES \
@@ -13439,22 +13439,22 @@ WRITE16_MEMBER( cps_state::sf2m3_layer_w )
 
 
 /*
-	A note reguarding bootlegs:
-	In order to keep the cps source in some sort of order, the idea is to group similar bootleg hardware into seperate
-	derived classes and source files.
+    A note reguarding bootlegs:
+    In order to keep the cps source in some sort of order, the idea is to group similar bootleg hardware into seperate
+    derived classes and source files.
 
-	Rom swaps, hacks etc.  (on original Capcom hardware)  ->  cps1.cpp
-	Sound: Z80, 2x YM2203, 2x m5205 ("Final Crash" h/w)   ->  fcrash.cpp
-	Sound: Z80, 1x YM2151, 2x m5205                       ->  cps1bl_5205.cpp
-	Sound: PIC, 1x M6295            *1                    ->  cps1bl_pic.cpp
-	Sound: Z80, 1x YM2151, 1x M6295 *2                    ->  fcrash.cpp      (for now...)
+    Rom swaps, hacks etc.  (on original Capcom hardware)  ->  cps1.cpp
+    Sound: Z80, 2x YM2203, 2x m5205 ("Final Crash" h/w)   ->  fcrash.cpp
+    Sound: Z80, 1x YM2151, 2x m5205                       ->  cps1bl_5205.cpp
+    Sound: PIC, 1x M6295            *1                    ->  cps1bl_pic.cpp
+    Sound: Z80, 1x YM2151, 1x M6295 *2                    ->  fcrash.cpp      (for now...)
 
-	*1 these seem to be only CPS1.5/Q sound games?
-	*2 this is original configuration, but non-Capcom (usually single-board) hardware.
-	
-	
-	This file currently contains games in first and last catergories.
-	Eventually only official/genuine/non-bootleg Capcom-hardware games and those in first catergory will remain here.
+    *1 these seem to be only CPS1.5/Q sound games?
+    *2 this is original configuration, but non-Capcom (usually single-board) hardware.
+
+
+    This file currently contains games in first and last catergories.
+    Eventually only official/genuine/non-bootleg Capcom-hardware games and those in first catergory will remain here.
 */
 
 

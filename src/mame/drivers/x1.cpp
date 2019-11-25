@@ -9,15 +9,15 @@
 
     TODO:
     - clean-ups, split components into devices if necessary and maybe separate turbo/turboz features into specific file(s);
-	- refactor base video into a true scanline renderer, expect it to break 6845 drawing delegation support badly;
-	- support extended x1turboz video features (need more test cases?);
+    - refactor base video into a true scanline renderer, expect it to break 6845 drawing delegation support badly;
+    - support extended x1turboz video features (need more test cases?);
     - Rewrite keyboard input hook-up and decap/dump the keyboard MCU if possible;
     - Fix the 0xe80/0xe83 kanji ROM readback;
     - x1turbo keyboard inputs are currently broken, use x1turbo40 for now;
     - Hook-up remaining .tap image formats;
     - Implement APSS tape commands;
-    - Sort out / redump the BIOS gfx roms, and understand if TurboZ really have same BIOS as 
-	  vanilla Turbo like Jp emulators seems to suggest;
+    - Sort out / redump the BIOS gfx roms, and understand if TurboZ really have same BIOS as
+      vanilla Turbo like Jp emulators seems to suggest;
     - X1Turbo: Implement SIO.
     - Implement true 400 lines mode (i.e. Chatnoir no Mahjong v2.1, Casablanca)
     - Implement SASI HDD interface;
@@ -981,7 +981,7 @@ WRITE8_MEMBER( x1_state::x1turboz_4096_palette_w )
 				popmessage("APRD enabled, contact MAMEdev");
 				return;
 			}
-			// TODO: unlike normal operation this cannot do mid-frame scanline update 
+			// TODO: unlike normal operation this cannot do mid-frame scanline update
 			// (-> bus request signal when accessing this on non-vblank time)
 			uint32_t pal_entry = ((offset & 0xff) << 4) | ((data & 0xf0) >> 4);
 			// TODO: more complex condition

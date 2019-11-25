@@ -1779,6 +1779,37 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 	</software>
 
 
+<!-- Japan prototype -->
+	<software name="crydragn">
+		<description>Crying Dragon (Jpn, Prototype)</description>
+		<year>1991</year>
+		<publisher>Treco</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="SEGA 1988/171-5663/M5 TEST 8MB"/>
+			<feature name="c3" value="CK2605"/>
+			<feature name="c4" value="HN27C301AG"/>
+			<feature name="c5" value="HN27C301AG"/>
+			<feature name="c6" value="HN27C301AG"/>
+			<feature name="c7" value="HN27C301AG"/>
+			<feature name="c8" value="HN27C301AG"/>
+			<feature name="c9" value="HN27C301AG"/>
+			<feature name="c10" value="HN27C301AG"/>
+			<feature name="c11" value="HN27C301AG"/>
+			<feature name="c12" value="MB8464A-10LL-SK"/>
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom loadflag="load16_byte" name="hn27c301ag.c4" offset="0x00001" size="131072" crc="cfcea09b" sha1="59be32d111315bf7d1f8221724f54a840dd2814f"/>
+				<rom loadflag="load16_byte" name="hn27c301ag.c5" offset="0x00000" size="131072" crc="60829383" sha1="ade97f9046896dd59335eee272e6b3f84bb787e0"/>
+				<rom loadflag="load16_byte" name="hn27c301ag.c6" offset="0x40001" size="131072" crc="e8342dd7" sha1="dcd3f8bb8849d85d10f442ad84c34c7ebf2aa19f"/>
+				<rom loadflag="load16_byte" name="hn27c301ag.c7" offset="0x40000" size="131072" crc="1fdb0ed2" sha1="0fb8446d21de80efc8ef6cef40df96c335a55a3b"/>
+				<rom loadflag="load16_byte" name="hn27c301ag.c8" offset="0x80001" size="131072" crc="a9a4704f" sha1="1bf0176b68269c21e48b75e244ec9b755f71f12f"/>
+				<rom loadflag="load16_byte" name="hn27c301ag.c9" offset="0x80000" size="131072" crc="76c96b1a" sha1="cda1ed7da5ef9835e6d20e90b844755288d44f84"/>
+				<rom loadflag="load16_byte" name="hn27c301ag.c10" offset="0xc0001" size="131072" crc="5864d4ba" sha1="ee8ad53e424b99cff525df8278ebd854d64c5bd9"/>
+				<rom loadflag="load16_byte" name="hn27c301ag.c11" offset="0xc0000" size="131072" crc="a6a02e5f" sha1="cc586e0dee3642e9d1f9e24cb1d5c4ca5bde4bfe"/>
+			</dataarea>
+		</part>
+	</software>
+
+
 <!-- Only Euro is confirmed -->
 	<software name="cyberbal">
 		<description>Cyberball - Football in the 21st Century (World)</description>

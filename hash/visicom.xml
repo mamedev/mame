@@ -6,17 +6,17 @@ Toshiba Visicom games list
 ID      Title                                           Dumped
 _________________________________________________________________
 
-CAS-110 Arithmetic Drill (Math Fun & Fun with Numbers)  yes      算数ドリル
+CAS-110 Sansuu Drill (Math Fun & Fun with Numbers)      yes      算数ドリル
 CAS-130 Sports Fan (Baseball & Sumo Wrestling)          yes      スポーツファン
 CAS-140 Gambler I (Blackjack)                           yes      ギャンブラーI
 CAS-141 Gambler II (Slot Machine and Dice)              yes      ギャンブラーII
 CAS-160 Space Command (Space War)                       yes      スペースコマンド
-CAS-190 Inspiration (Bagua and Biorhythm)               no       霊感
+CAS-190 Reikan (Bagua and Biorhythm)                    no       霊感
 -->
 <softwarelist name="visicom" description="Toshiba Visicom cartridges">
 
-	<software name="aridrill">
-		<description>Arithmetic Drill</description><!-- Dumper called it Maths Drill -->
+	<software name="sandrill">
+		<description>Sansuu Drill</description>
 		<year>1978</year>
 		<publisher>Toshiba</publisher>
 		<info name="serial" value="CAS-110" />

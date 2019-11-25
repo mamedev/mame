@@ -423,7 +423,7 @@ uint32_t ms32_state::screen_update_ms32(screen_device &screen, bitmap_rgb32 &bit
 		rot_pri++;
 
 	//popmessage("%02x %02x %02x %d %d %d",m_priram[0x2b00 / 2],m_priram[0x2e00 / 2],m_priram[0x3a00 / 2], asc_pri, scr_pri, rot_pri);
-	
+
 	// tile-tile mixing
 	for(int prin=0;prin<4;prin++)
 	{

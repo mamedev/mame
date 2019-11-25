@@ -69,18 +69,20 @@ public:
 	u16 vregs(offs_t offset) const { return m_vregs[offset]; }
 
 	// vregs
-	bool flipx() const        { return BIT(~m_vregs[0], 15); }
-	bool rowscroll_en() const { return BIT(m_vregs[0], 14) && (m_lineram != nullptr); }
-	u16 scrollx() const       { return m_vregs[0] & 0x1ff; }
+	bool flipx() const         { return BIT(~m_vregs[0], 15); }
+	bool rowscroll_en() const  { return BIT(m_vregs[0], 14) && (m_lineram != nullptr); }
+	u16 scrollx() const        { return m_vregs[0] & 0x1ff; }
 
-	bool flipy() const        { return BIT(~m_vregs[1], 15); }
-	bool rowselect_en() const { return BIT(m_vregs[1], 14) && (m_lineram != nullptr); }
-	bool tiledim() const      { return m_tiledim; }
-	u16 scrolly() const       { return m_vregs[1] & 0x1ff; }
+	bool flipy() const         { return BIT(~m_vregs[1], 15); }
+	bool rowselect_en() const  { return BIT(m_vregs[1], 14) && (m_lineram != nullptr); }
+	bool tiledim() const       { return m_tiledim; }
+	u16 scrolly() const        { return m_vregs[1] & 0x1ff; }
 
-	bool enable() const       { return BIT(~m_vregs[2], 4); }
-	u16 external() const      { return m_vregs[2] & 0xf; }
+	bool enable() const        { return BIT(~m_vregs[2], 4); }
+	u16 external() const       { return m_vregs[2] & 0xf; }
 
+	bool tile_is_8x8() const   { return (!m_tiledim) || (m_vram_16x16 == nullptr); }
+	bool tile_is_16x16() const { return m_tiledim || (m_vram_8x8 == nullptr); }
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;

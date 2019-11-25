@@ -800,7 +800,7 @@ ROM_START( spdheat )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "a55-17.ic11",  0x00000, 0x08000, CRC(43c2318f) SHA1(472e9cc68bb8ff3c5c3d4ec475491ad1a97261e7) )
 
-    ROM_REGION( 0x10000, "subcpu", 0 ) // TODO: What are the correct labels for these?
+	ROM_REGION( 0x10000, "subcpu", 0 ) // TODO: What are the correct labels for these?
 	ROM_LOAD( "a55-15.ic5", 0x00000, 0x08000, CRC(c43b85ee) SHA1(7d7ed6b5f3e48a38b3e387f2dbc2f2bb0662db94) )
 	ROM_LOAD( "a55-16.ic6", 0x08000, 0x08000, CRC(8f45edbd) SHA1(29a696691bd199b6fff0fe0e9fd9241cec9f3fbe) )
 

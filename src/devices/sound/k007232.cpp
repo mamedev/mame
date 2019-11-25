@@ -6,20 +6,20 @@
 
 /*
   Changelog, Hiromitsu Shioya 02/05/2002
-	fixed start address decode timing. (sample loop bug.)
+    fixed start address decode timing. (sample loop bug.)
 
   Changelog, Mish, August 1999:
-	Removed interface support for different memory regions per channel.
-	Removed interface support for differing channel volume.
+    Removed interface support for different memory regions per channel.
+    Removed interface support for differing channel volume.
 
-	Added bankswitching.
-	Added support for multiple chips.
+    Added bankswitching.
+    Added support for multiple chips.
 
-	(NB: Should different memory regions per channel be needed, the bankswitching function can set this up).
+    (NB: Should different memory regions per channel be needed, the bankswitching function can set this up).
 
   Chanelog, Nicola, August 1999:
-	Added Support for the k007232_VOL() macro.
-	Added external port callback, and functions to set the volume of the channels
+    Added Support for the k007232_VOL() macro.
+    Added external port callback, and functions to set the volume of the channels
 */
 
 
@@ -27,8 +27,8 @@
 #include "k007232.h"
 #include "wavwrite.h"
 
-#define	K007232_LOG_PCM	(0)
-#define	BASE_SHIFT    	(12)
+#define K007232_LOG_PCM (0)
+#define BASE_SHIFT      (12)
 
 DEFINE_DEVICE_TYPE(K007232, k007232_device, "k007232", "K007232 PCM Controller")
 

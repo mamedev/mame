@@ -36,7 +36,7 @@
  |     IC4        IC3       Resistor DIL     IC6          ooooo      o5     o5 IC9    P2|| |- BNC(3270)
  |    74LS00     74LS00   1234567890        74LS86        ooooo   1o o4  1o o4 74LS245  ||---
  |                          SW1 DIP                               2o o3  2o o3       ____|
- +----------------------------------------------------------------------------------|o___|   
+ +----------------------------------------------------------------------------------|o___|
                                                            |||||||||||||||||||||||||     |
  Notes                                                                                   |
  ------------------------------------------------------------------------------          |
@@ -49,7 +49,7 @@
  -------------------
  This is a passive ISA8 board that should be fitted into an Ericsson PC (epc) and
  driven by suitable software. It was replaced by the ISA16 SAD8852 intelligent TWIB
- board for WS286 and higher a few years later. 
+ board for WS286 and higher a few years later.
 
  */
 
@@ -246,7 +246,7 @@ void isa8_eistwib_device::device_reset()
 	int base = m_sw1->read();
 	if (!m_installed)
 	{
-		LOG("Installing twib device at %04x\n", base); 
+		LOG("Installing twib device at %04x\n", base);
 		m_isa->install_device(
 				base, base + 0x0f,
 				read8_delegate(*this, FUNC( isa8_eistwib_device::twib_r )),

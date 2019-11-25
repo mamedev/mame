@@ -231,6 +231,7 @@ public:
 	{
 	}
 
+	virtual ~brazehs() override = default;
 	virtual void config(machine_config &config) override
 	{
 		T::config(config);
@@ -277,7 +278,7 @@ protected:
 
 READ_LINE_MEMBER(tnx1_state::dsw1_read)
 {
-	return ioport("DSW1")->read() >> m_dswbit;
+	return m_io_dsw1->read() >> m_dswbit;
 }
 
 
@@ -355,6 +356,12 @@ static INPUT_PORTS_START( skyskipr )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
+
+	PORT_START("MCONF")
+	PORT_CONFNAME( 0x03, 0x00, "Interlace mode" )
+	PORT_CONFSETTING(    0x00, "False Progressive" )
+	PORT_CONFSETTING(    0x01, "Interlaced (scanline skip)" )
+	PORT_CONFSETTING(    0x02, "Interlaced (bitmap)" )
 INPUT_PORTS_END
 
 READ_LINE_MEMBER( tnx1_state::pop_field_r )
@@ -434,6 +441,13 @@ static INPUT_PORTS_START( popeye )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )     PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
+
+	PORT_START("MCONF")
+	PORT_CONFNAME( 0x03, 0x00, "Interlace mode" )
+	PORT_CONFSETTING(    0x00, "False Progressive" )
+	PORT_CONFSETTING(    0x01, "Interlaced (scanline skip)" )
+	PORT_CONFSETTING(    0x02, "Interlaced (bitmap)" )
+
 INPUT_PORTS_END
 
 
@@ -519,13 +533,14 @@ void tnx1_state::config(machine_config &config)
 	m_maincpu->refresh_cb().set(FUNC(tnx1_state::refresh_w));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(32*16, 32*16);
-	screen.set_visarea(0*16, 32*16-1, 2*16, 30*16-1);
-	screen.set_screen_update(FUNC(tnx1_state::screen_update));
-	screen.set_palette(m_palette);
+	// FIXME: 59.94 screen refresch is the NTSC standard
+	auto &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(59.94)
+		.set_vblank_time(ATTOSECONDS_IN_USEC(0))
+		.set_size(32*16, 32*16)
+		.set_visarea(0*16, 32*16-1, 2*16, 30*16-1)
+		.set_palette(m_palette)
+		.set_screen_update(FUNC(tnx1_state::screen_update));
 	screen.screen_vblank().set(FUNC(tnx1_state::screen_vblank));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_popeye);

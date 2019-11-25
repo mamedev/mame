@@ -247,19 +247,19 @@ static INPUT_PORTS_START( cm32p )
 	PORT_START("A7")
 	PORT_BIT(0x03ff, 0x0000, IPT_DIAL) PORT_NAME("Knob") PORT_SENSITIVITY(50) PORT_KEYDELTA(8) PORT_CODE_DEC(KEYCODE_DOWN) PORT_CODE_INC(KEYCODE_UP)
 
-	PORT_START("SERVICE")	// connected to Port 0 of the P8098 CPU.
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Test Switch") PORT_TOGGLE PORT_CODE(KEYCODE_F2)	// SW A (checked during boot)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Test: Check/Tune") PORT_CODE(KEYCODE_B)	// SW B
+	PORT_START("SERVICE")   // connected to Port 0 of the P8098 CPU.
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Test Switch") PORT_TOGGLE PORT_CODE(KEYCODE_F2) // SW A (checked during boot)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Test: Check/Tune") PORT_CODE(KEYCODE_B) // SW B
 
-	PORT_START("SW")	// test switches, accessed by reading from address 0x1300
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Test: MSB Adj.") PORT_CODE(KEYCODE_1)	// SW 1
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Test: THD Check") PORT_CODE(KEYCODE_2)	// SW 2
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Test: PCM Out: String 1") PORT_CODE(KEYCODE_3)	// SW 3
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Test: PCM Out: Sax 1") PORT_CODE(KEYCODE_4)	// SW 4
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Test: PCM + Long Reverb") PORT_CODE(KEYCODE_5)	// SW 5
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Test: PCM + Short Reverb") PORT_CODE(KEYCODE_6)	// SW 6
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Test: VCA Down Check") PORT_CODE(KEYCODE_7)	// SW 7
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Test: VCA Up Check") PORT_CODE(KEYCODE_8)	// SW 8
+	PORT_START("SW")    // test switches, accessed by reading from address 0x1300
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Test: MSB Adj.") PORT_CODE(KEYCODE_1)   // SW 1
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Test: THD Check") PORT_CODE(KEYCODE_2)  // SW 2
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Test: PCM Out: String 1") PORT_CODE(KEYCODE_3)  // SW 3
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Test: PCM Out: Sax 1") PORT_CODE(KEYCODE_4) // SW 4
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Test: PCM + Long Reverb") PORT_CODE(KEYCODE_5)  // SW 5
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Test: PCM + Short Reverb") PORT_CODE(KEYCODE_6) // SW 6
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Test: VCA Down Check") PORT_CODE(KEYCODE_7) // SW 7
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Test: VCA Up Check") PORT_CODE(KEYCODE_8)   // SW 8
 INPUT_PORTS_END
 
 class cm32p_state : public driver_device
@@ -297,7 +297,7 @@ private:
 	DECLARE_READ8_MEMBER(snd_io_r);
 	DECLARE_WRITE8_MEMBER(snd_io_w);
 	DECLARE_READ8_MEMBER(test_sw_r);
-	
+
 	TIMER_DEVICE_CALLBACK_MEMBER(midi_timer_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(samples_timer_cb);
 
@@ -360,10 +360,10 @@ void cm32p_state::machine_start()
 
 	// TODO: The IC8 gate array has an "LCD INT" line that needs to be emulated. Then, the hack can be removed.
 	// Note: The hack is not necessary when *not* using test mode.
-	rom[0xBB2D] = 0x03;	// hack to make test mode not freeze when displaying the LCD text
+	rom[0xBB2D] = 0x03; // hack to make test mode not freeze when displaying the LCD text
 
 	// TODO: remove this hack
-	rom[0x7D80] = 0x00;	// hack to exit some loop waiting for interrupt #8
+	rom[0x7D80] = 0x00; // hack to exit some loop waiting for interrupt #8
 }
 
 void cm32p_state::machine_reset()
@@ -511,15 +511,15 @@ void cm32p_state::mt32_palette(palette_device &palette) const
 
 void cm32p_state::cm32p_map(address_map &map)
 {
-	map(0x1080, 0x10ff).rw(FUNC(cm32p_state::dsp_io_r), FUNC(cm32p_state::dsp_io_w));	// DSP area (writes to 1080..82/86/8C/8D)
+	map(0x1080, 0x10ff).rw(FUNC(cm32p_state::dsp_io_r), FUNC(cm32p_state::dsp_io_w));   // DSP area (writes to 1080..82/86/8C/8D)
 	map(0x1100, 0x1100).rw(FUNC(cm32p_state::lcd_ctrl_r), FUNC(cm32p_state::lcd_ctrl_w));
 	map(0x1102, 0x1102).w(FUNC(cm32p_state::lcd_data_w));
-	map(0x1300, 0x1300).r(FUNC(cm32p_state::test_sw_r));	// test switch state
-	map(0x1400, 0x14ff).rw(FUNC(cm32p_state::snd_io_r), FUNC(cm32p_state::snd_io_w));	// sound chip area
-	map(0x2000, 0x20ff).rom().region("maincpu", 0x2000);	// init vector @ 2080
-	map(0x2100, 0x3fff).ram();	// main RAM
+	map(0x1300, 0x1300).r(FUNC(cm32p_state::test_sw_r));    // test switch state
+	map(0x1400, 0x14ff).rw(FUNC(cm32p_state::snd_io_r), FUNC(cm32p_state::snd_io_w));   // sound chip area
+	map(0x2000, 0x20ff).rom().region("maincpu", 0x2000);    // init vector @ 2080
+	map(0x2100, 0x3fff).ram();  // main RAM
 	map(0x4000, 0xbfff).rom().region("maincpu", 0x4000);
-	map(0xc000, 0xffff).r(FUNC(cm32p_state::pcmrom_r));	// show descrambled PCM ROM (for debugging)
+	map(0xc000, 0xffff).r(FUNC(cm32p_state::pcmrom_r)); // show descrambled PCM ROM (for debugging)
 }
 
 void cm32p_state::cm32p(machine_config &config)
@@ -550,13 +550,13 @@ void cm32p_state::cm32p(machine_config &config)
 
 ROM_START( cm32p )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "cm-32p-ic9.bin",  0x000000, 0x10000, CRC(6f2f6dfd) SHA1(689f77c1d56f923ef1dab7d993a124c47736bc56) )
+	ROM_LOAD( "cm-32_p__1.0.0.am27c512.7d.ic9",  0x000000, 0x10000, CRC(6f2f6dfd) SHA1(689f77c1d56f923ef1dab7d993a124c47736bc56) ) // "CM-32 P // 1 0 0 <filled bubbles in red marker>" sticker on an AM27C512-150DC eprom @ IC9
 
 	ROM_REGION( 0x400000, "pcm32", 0 )
-	ROM_LOAD( "cm-32p-ic18.bin", 0x000000, 0x80000, CRC(8e53b2a3) SHA1(4872530870d5079776e80e477febe425dc0ec1df) )
+	ROM_LOAD( "roland__r15179970__mb834000a-20__3b1_aa__8917_r00.45f.ic18", 0x000000, 0x80000, CRC(8e53b2a3) SHA1(4872530870d5079776e80e477febe425dc0ec1df) ) // markings under chip footprint are "MB834000A-20P-G-3B1"
 	// 0x080000 .. 0x0FFFFF is reserved for the PCM card
-	ROM_LOAD( "cm-32p-ic19.bin", 0x100000, 0x80000, CRC(c8220761) SHA1(49e55fa672020f95fd9c858ceaae94d6db93df7d) )
-	ROM_LOAD( "cm-32p-ic20.bin", 0x200000, 0x80000, CRC(733c4054) SHA1(9b6b59ab74e5bf838702abb087c408aaa85b7b1f) )
+	ROM_LOAD( "roland__r15179971__mb834000a-20__3b2_aa__8919_r02.34f.ic19", 0x100000, 0x80000, CRC(c8220761) SHA1(49e55fa672020f95fd9c858ceaae94d6db93df7d) ) // markings under chip footprint are "MB834000A20P-G-3B2" (including the missing dash, which is a typo on the board silkscreen)
+	ROM_LOAD( "roland__r15179972__hn62304bpe98__9d1_japan.3f.ic20", 0x200000, 0x80000, CRC(733c4054) SHA1(9b6b59ab74e5bf838702abb087c408aaa85b7b1f) ) // markings under chip footprint are "HN62304BPE98"
 ROM_END
 
 CONS( 1989, cm32p, 0, 0, cm32p, cm32p, cm32p_state, empty_init, "Roland", "CM-32P", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

@@ -147,6 +147,7 @@ private:
 	std::vector<bgfx_texture*>  m_screen_textures;
 	std::vector<bgfx_texture*>  m_screen_palettes;
 	std::vector<bgfx_effect*>   m_converters;
+	bgfx_effect *               m_adjuster;
 	std::vector<screen_prim>    m_screen_prims;
 	std::vector<uint8_t>        m_palette_temp;
 

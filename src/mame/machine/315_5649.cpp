@@ -164,7 +164,7 @@ WRITE8_MEMBER( sega_315_5649_device::write )
 	case 0x03:
 	case 0x04:
 	case 0x05:
-	case 0x06:	// when in counter mode, bit 7 - 0 reset counters (not implemented)
+	case 0x06:  // when in counter mode, bit 7 - 0 reset counters (not implemented)
 		m_port_value[offset] = data;
 		m_out_port_cb[offset](data);
 		break;

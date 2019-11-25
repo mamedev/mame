@@ -29,17 +29,17 @@ Tengai              (J) 1996    SH404          SH404 has MCU, ymf278-b for sound
 
 To Do:
 
-- All games uses PORT_VBLANK and legacy screen parameters (which is already 
-  bad per-se), with also naive and unlikely measurements (i.e. exactly 59.30 
+- All games uses PORT_VBLANK and legacy screen parameters (which is already
+  bad per-se), with also naive and unlikely measurements (i.e. exactly 59.30
   or 59.90 Hz).
-  The most blunt examples of something being wrong with timings are with 
-  Gunbird and Tengai: they both have FOUR frames of input lag, the real thing 
+  The most blunt examples of something being wrong with timings are with
+  Gunbird and Tengai: they both have FOUR frames of input lag, the real thing
   doesn't sport anything like that.
   Given the above, all games are marked with MACHINE_IMPERFECT_TIMING until
-  somebody provides accurate H/Vsync signals for at least one game of this 
+  somebody provides accurate H/Vsync signals for at least one game of this
   driver.
-- tengai / tengaij: "For use in Japan" screen is supposed to output the 
-  typical blue Psikyo backdrop gradient instead of being pure black as it is 
+- tengai / tengaij: "For use in Japan" screen is supposed to output the
+  typical blue Psikyo backdrop gradient instead of being pure black as it is
   now;
 - Flip Screen support
 
@@ -1179,7 +1179,7 @@ void psikyo_state::s1945(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	// TODO: accurate measurements
-	m_screen->set_refresh_hz(59.90); 
+	m_screen->set_refresh_hz(59.90);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_size(320, 256);
 	m_screen->set_visarea(0, 320-1, 0, 256-32-1);

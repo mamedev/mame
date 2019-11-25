@@ -45,7 +45,7 @@ DEFINE_DEVICE_TYPE_NS(TI99_JOYPORT, bus::ti99::joyport, joyport_device, "ti99_jo
 namespace bus { namespace ti99 { namespace joyport {
 
 device_ti99_joyport_interface::device_ti99_joyport_interface(const machine_config &config, device_t &device)
-	:	device_interface(device, "ti99joyport"),
+	:   device_interface(device, "ti99joyport"),
 		m_joyport(nullptr)
 {
 }

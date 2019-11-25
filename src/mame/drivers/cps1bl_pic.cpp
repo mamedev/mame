@@ -2,25 +2,25 @@
 // copyright-holders:David Haywood
 
 /*
-	CPS1 single board bootlegs
-	
-	sound hardware: PIC16c57, oki M6295 (no z80)
-	
-	Games known to use this h/w:
-	Cadillacs and Dinosaurs         930201 ETC
-	The Punisher                    930422 ETC
-	Saturday Night Slam Masters     930713 ETC
-	
-	(Note, these are all CPS1.5/Q sound games)
-	
-	Generally the sound quality is very poor compared to official Capcom hardware.
-	Both music and sound effects are produced by just a single M6295.
-	Background music consists of short pre-recorded clips which loop continuously.
-	Currently all games have no sound emulation due to the PICs being secured/protected.
-	Unless any un-protected PIcs ever turn up (unlikely) then "decapping" of working chips is probably the
-	only way valid dumps will ever be made.
-	
-	*** see fcrash.cpp for game status ***
+    CPS1 single board bootlegs
+
+    sound hardware: PIC16c57, oki M6295 (no z80)
+
+    Games known to use this h/w:
+    Cadillacs and Dinosaurs         930201 ETC
+    The Punisher                    930422 ETC
+    Saturday Night Slam Masters     930713 ETC
+
+    (Note, these are all CPS1.5/Q sound games)
+
+    Generally the sound quality is very poor compared to official Capcom hardware.
+    Both music and sound effects are produced by just a single M6295.
+    Background music consists of short pre-recorded clips which loop continuously.
+    Currently all games have no sound emulation due to the PICs being secured/protected.
+    Unless any un-protected PIcs ever turn up (unlikely) then "decapping" of working chips is probably the
+    only way valid dumps will ever be made.
+
+    *** see fcrash.cpp for game status ***
 */
 
 #include "emu.h"
@@ -43,24 +43,24 @@ public:
 	cps1bl_pic_state(const machine_config &mconfig, device_type type, const char *tag)
 		: fcrash_state(mconfig, type, tag)
 	{ }
-	
+
 	void dinopic(machine_config &config);
 	void punipic(machine_config &config);
 	void slampic(machine_config &config);
 	void slampic2(machine_config &config);
-	
+
 	void init_dinopic();
 	void init_punipic();
 	void init_punipic3();
 	void init_slampic();
 	void init_slampic2();
-	
+
 private:
 	DECLARE_MACHINE_START(dinopic);
 	DECLARE_MACHINE_START(punipic);
 	DECLARE_MACHINE_START(slampic);
 	DECLARE_MACHINE_START(slampic2);
-	
+
 	DECLARE_WRITE16_MEMBER(dinopic_layer_w);
 	DECLARE_WRITE16_MEMBER(dinopic_layer2_w);
 	DECLARE_WRITE16_MEMBER(punipic_layer_w);
@@ -69,7 +69,7 @@ private:
 	DECLARE_READ16_MEMBER(slampic2_cps_a_r);
 	DECLARE_WRITE16_MEMBER(slampic2_sound_w);
 	DECLARE_WRITE16_MEMBER(slampic2_sound2_w);
-	
+
 	void dinopic_map(address_map &map);
 	void punipic_map(address_map &map);
 	void slampic_map(address_map &map);
@@ -82,7 +82,7 @@ public:
 	slampic2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: cps1bl_pic_state(mconfig, type, tag)
 	{ }
-	
+
 private:
 	void bootleg_render_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 };
@@ -193,7 +193,7 @@ WRITE16_MEMBER(cps1bl_pic_state::slampic_layer_w)
 WRITE16_MEMBER(cps1bl_pic_state::slampic_layer2_w)
 {
 	COMBINE_DATA(&m_cps_a_regs[offset]);
-	
+
 	if (offset == 0x22 / 2)
 	{
 		// doesn't seem to write anywhere outside mainram?
@@ -335,12 +335,12 @@ void cps1bl_pic_state::slampic2(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &cps1bl_pic_state::slampic2_map);
 	m_maincpu->set_vblank_int("screen", FUNC(cps1bl_pic_state::cps1_interrupt));
 	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &cps1bl_pic_state::cpu_space_map);
-	
+
 	PIC16C57(config, m_audiocpu, 4000000);  // measured
 	//m_audiocpu->set_disable();
 
 	MCFG_MACHINE_START_OVERRIDE(cps1bl_pic_state, slampic2)
-	
+
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(CPS_PIXEL_CLOCK, CPS_HTOTAL, CPS_HBEND, CPS_HBSTART, CPS_VTOTAL, CPS_VBEND, CPS_VBSTART);
 	m_screen->set_screen_update(FUNC(cps1bl_pic_state::screen_update_fcrash));
@@ -349,7 +349,7 @@ void cps1bl_pic_state::slampic2(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cps1);
 	PALETTE(config, m_palette, palette_device::BLACK).set_entries(0xc00);
-	
+
 	SPEAKER(config, "mono").front_center();
 	//GENERIC_LATCH_8(config, m_soundlatch);
 	//GENERIC_LATCH_8(config, m_soundlatch2);
@@ -437,17 +437,17 @@ void cps1bl_pic_state::slampic2_map(address_map &map)
 	//  0xfc0000, 0xfeffff  gfxram
 	//  0xff0000, 0xff3fff  spriteram
 	map(0xff4000, 0xffffff).ram().share("mainram");
-	
+
 	/*
 	                  slammast        slampic2
 	sprite table 1    900000-9007ff   ff2000-ff27ff
 	                                  ff2800-ff2fff  ?
 	sprite table 2    904000-9047ff   ff3000-ff37ff
 	                                  ff3800-ff3fff  ?
-									  
+
 	gfxram            900000-91bfff   900000-91bfff
 	                  91c000-92ffff   fdc000-feffff
-	
+
 	test menu reads 3p + 4p controls at original ports f1c000-f1c003
 	start-up check tests f00000-f40000 region
 	start-up check tests 930000-934000 region but ignores any failure found, mirrored with sprite table region?
@@ -548,17 +548,17 @@ void cps1bl_pic_state::init_slampic2()
 	m_bootleg_sprite_ram = std::make_unique<uint16_t[]>(0x2000);
 	m_maincpu->space(AS_PROGRAM).install_ram(0x930000, 0x933fff, m_bootleg_sprite_ram.get());
 	m_maincpu->space(AS_PROGRAM).install_ram(0xff0000, 0xff3fff, m_bootleg_sprite_ram.get());
-	
+
 	m_bootleg_work_ram = std::make_unique<uint16_t[]>(0x20000);
 	m_maincpu->space(AS_PROGRAM).install_ram(0xf00000, 0xf3ffff, m_bootleg_work_ram.get());
-	
+
 	init_cps1();
 }
 
 
 static INPUT_PORTS_START( slampic )
 	PORT_INCLUDE(slammast)
-	
+
 	PORT_MODIFY("IN2")  // players 3 + 4  (player 4 doesn't work in test menu but ok in game)
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
@@ -576,7 +576,7 @@ static INPUT_PORTS_START( slampic )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_COIN4 )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START4 )
-	
+
 	PORT_MODIFY("IN3")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
@@ -592,7 +592,7 @@ static INPUT_PORTS_START( slampic2 )
 	//PORT_SERVICE( 0x40, IP_ACTIVE_LOW )
 	PORT_SERVICE_NO_TOGGLE( 0x40, IP_ACTIVE_LOW )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	
+
 	PORT_START("DSWA")
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW(A):1,2,3")
 	PORT_DIPSETTING( 0x07, DEF_STR( 1C_1C ) )
@@ -612,7 +612,7 @@ static INPUT_PORTS_START( slampic2 )
 	PORT_DIPNAME( 0x80, 0x80, "Chuter" ) PORT_DIPLOCATION("SW(A):8")
 	PORT_DIPSETTING( 0x80, "Single Chuter" )
 	PORT_DIPSETTING( 0x00, "Multi Chuters" )
-	
+
 	PORT_START("DSWB")
 	PORT_DIPNAME( 0x07, 0x04, "Game Difficulty" ) PORT_DIPLOCATION("SW(B):1,2,3")
 	PORT_DIPSETTING( 0x07, "(0) Extra Easy" )
@@ -633,7 +633,7 @@ static INPUT_PORTS_START( slampic2 )
 	//PORT_DIPSETTING( 0x80, "Invalid" )              // only coin 1 works, credits both player 1 and 2
 	PORT_DIPSETTING( 0x40, "4 Players Cabinet" )
 	PORT_DIPSETTING( 0x00, "2x2 Players Cabinet" )  // only coins 1,3 work, 1 credits 1+2, 2 credits 3+4
-	
+
 	PORT_START("DSWC")
 	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW(C):1" )
 	PORT_DIPNAME( 0x02, 0x02, "Game Mode" ) PORT_DIPLOCATION("SW(C):2")
@@ -673,7 +673,7 @@ static INPUT_PORTS_START( slampic2 )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4)
-	
+
 	PORT_START("IN2")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(4)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(4)
@@ -694,12 +694,12 @@ static INPUT_PORTS_START( slampic2 )
 INPUT_PORTS_END
 
 
-#define DRAWSPRITE(CODE, COLOR, FLIPX, FLIPY, SX, SY)																								\
-{																																					\
-	if (flip_screen())																																\
-		m_gfxdecode->gfx(2)->prio_transpen(bitmap, cliprect, CODE, COLOR, !(FLIPX), !(FLIPY), 512-16-(SX), 256-16-(SY), screen.priority(), 2, 15);	\
-	else																																			\
-		m_gfxdecode->gfx(2)->prio_transpen(bitmap, cliprect, CODE, COLOR, FLIPX, FLIPY, SX, SY, screen.priority(), 2, 15);							\
+#define DRAWSPRITE(CODE, COLOR, FLIPX, FLIPY, SX, SY)                                                                                               \
+{                                                                                                                                                   \
+	if (flip_screen())                                                                                                                              \
+		m_gfxdecode->gfx(2)->prio_transpen(bitmap, cliprect, CODE, COLOR, !(FLIPX), !(FLIPY), 512-16-(SX), 256-16-(SY), screen.priority(), 2, 15);  \
+	else                                                                                                                                            \
+		m_gfxdecode->gfx(2)->prio_transpen(bitmap, cliprect, CODE, COLOR, FLIPX, FLIPY, SX, SY, screen.priority(), 2, 15);                          \
 }
 
 void slampic2_state::bootleg_render_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -709,7 +709,7 @@ void slampic2_state::bootleg_render_sprites( screen_device &screen, bitmap_ind16
 	uint16_t tileno, colour, xpos, ypos;
 	uint16_t obj_base = m_cps_a_regs[0];
 	uint16_t *sprite_ram = m_bootleg_sprite_ram.get();
-	
+
 	switch (obj_base)
 	{
 	case 0x9000:
@@ -722,14 +722,14 @@ void slampic2_state::bootleg_render_sprites( screen_device &screen, bitmap_ind16
 		logerror("Unknown sprite table location: %04x\n", obj_base);
 		sprite_ram += m_sprite_base;  // ff2000
 	}
-	
+
 	while (last_sprite_offset < m_obj_size / 2)
 	{
 		if (sprite_ram[last_sprite_offset + 3] == m_sprite_list_end_marker)
 			break;
 		last_sprite_offset += 4;
 	}
-	
+
 	for (i = last_sprite_offset; i > 0; i -= 4)
 	{
 		xpos   = sprite_ram[j];
@@ -802,7 +802,7 @@ void slampic2_state::bootleg_render_sprites( screen_device &screen, bitmap_ind16
 		}
 		else
 			DRAWSPRITE(tileno, (colour & 0x1f), (colour & 0x20), (colour & 0x40), (xpos & 0x1ff), (ypos & 0x1ff));
-		
+
 		j += 4;
 	}
 }
@@ -917,24 +917,24 @@ ROM_START( dinopic2 )
 ROM_END
 
 /*
-	Cadillacs and Dinosaurs
-	pcb marking: 3M05B
-	maincpu roms are same data as dinopic but arranged as 2x 2MB 16-bit mask roms
-	Confirmed clocks (measured):
-	 xtals: 30MHz, 24MHz
-	 68k = 12MHz (P10 model, overclocked)
-	 pic = 3.75MHz
-	 oki = 1MHz
-	
-	repair note:
-	for any gfx issues, check the 9x Harris CD74HC597E shift registers,
-	(4 were dead on the board used for this dump!)
+    Cadillacs and Dinosaurs
+    pcb marking: 3M05B
+    maincpu roms are same data as dinopic but arranged as 2x 2MB 16-bit mask roms
+    Confirmed clocks (measured):
+     xtals: 30MHz, 24MHz
+     68k = 12MHz (P10 model, overclocked)
+     pic = 3.75MHz
+     oki = 1MHz
+
+    repair note:
+    for any gfx issues, check the 9x Harris CD74HC597E shift registers,
+    (4 were dead on the board used for this dump!)
 */
 ROM_START( dinopic3 )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 ) // = dinopic but arranged differently
 	ROM_LOAD16_WORD_SWAP( "tk1-305_27c800.bin", 0x000000, 0x100000, CRC(aa468337) SHA1(496df3bd62cdea0b104f96a7988ad21c94a70c2b) )
 	ROM_LOAD16_WORD_SWAP( "tk1-204_27c800.bin", 0x100000, 0x100000, CRC(0efd1ddb) SHA1(093cf7906eda36533c7021329c629ba5a995c5ee) )
-	
+
 	ROM_REGION( 0x400000, "gfx", 0 ) // = dino but arranged differently
 	ROM_LOAD64_WORD("tb416-02_27c160.bin", 0x000000, 0x80000, CRC(bfd01d21) SHA1(945f2764b0ca7f9e1569a591363c70207e8efbd0) )
 	ROM_CONTINUE( 0x200000, 0x80000 )
@@ -944,26 +944,26 @@ ROM_START( dinopic3 )
 	ROM_CONTINUE( 0x200002, 0x80000 )
 	ROM_CONTINUE( 0x000006, 0x80000 )
 	ROM_CONTINUE( 0x200006, 0x80000 )
-	
+
 	// no markings, assume pic16c57, secured
 	//ROM_REGION( 0x2000, "audiocpu", 0 )
 	//ROM_LOAD( "pic_t1.bin", 0x0000, 0x1007, NO_DUMP )
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "ti-i_27c040.bin", 0x000000, 0x80000, CRC(7d921309) SHA1(d51e60e904d302c2516b734189e141aa171b2b82) )  // = dinopic, dinopic2
-	
+
 	/* pld devices:
-		 __________________________
-		|                  6       |      (no component reference markings on pcb)
-		|                      7   |
+	     __________________________
+	    |                  6       |      (no component reference markings on pcb)
+	    |                      7   |
 	  ==            5              |
 	  ==                           |
 	  ==                           |
 	  ==                           |
 	  ==                         4 |
-		|     1            2  3    |
-		|__________________________|
-	
+	    |     1            2  3    |
+	    |__________________________|
+
 	#1   palce20v8   next to main cpu        secured                 = dinopic2 "gal20v8a-1.bin", tested ok
 	#2   palce20v8   below gfx roms, left    secured                 = dinopic2 "gal20v8a-2.bin", tested ok
 	#3   palce20v8   below gfx roms, middle  secured                 = dinopic2 "gal20v8a-3.bin", tested ok
@@ -1161,79 +1161,79 @@ ROM_START( slampic )
 ROM_END
 
 /*
-	Saturday Night Slam Masters: single board bootleg
-	
-	CPU
-	1x  MC68000P10           main cpu
-	
-	GFX
-	1x  Custom QFP 160-pin   "PLUS-B A37558.6 9325"   CPS-B-xx clone?
-	
-	RAM
-	2x  NEC D431000ACZ-70L   main ram   1Mbit (128Kx8) SRAM 70ns
-	2x  SRM20256LM12         gfx?       256Kbit (32Kx8) SRAM 120ns SOP28   (mounted on SOP->DIP adapter pcbs)
-	6x  T6116S45L            gfx?       16Kbit (2Kx8) SRAM 45ns
-	4x  T6116S35L            gfx?       16Kbit (2Kx8) SRAM 35ns
-	
-	ROMS
-	4x   27C040-15 EPROM      main rom   4Mbit (512Kx8)
-	16x  MX27C4000PC-15 OTP   gfx        4Mbit (512Kx8)
-	1x   27C020-15 EPROM      sound      2Mbit (256Kx8)
-	2x   MX27C4000PC-15 OTP   sound      4Mbit (512Kx8)
-	1x   AM27512DC EPROM      ?          512Kbit (64kx8)  1983!
-	
-	PLD
-	1x   TPC1020AFN-084C
-	14x  PALCE16V8H-25PC/4
-	4x   PALCE20V8H-25PC/4
-	1x   PALCE22V10H-25PC/4
-	
-	SOUND
-	1x  PIC16C57-XT/P     sound cpu
-	1x  TD735             sample player  (Oki MSM6295 clone)
-	1x  NEC uPC1242H      power amp
-	1x  LM324N            op amp
-	
-	MISC
-	1x  16MHz xtal
-	1x  10MHz xtal
-	1x  PST518A             reset generator
-	3x  8 pos dipswitch
-	2x  10-pin connectors   player 3 & 4 inputs
-	No eeprom!
-	
-	INPUTS
-	CN3: Player 3
-	CN4: Player 4
-	
-	1   gnd
-	2   nc
-	3   right
-	4   left
-	5   down
-	6   up
-	7   btn 1
-	8   btn 2
-	9   coin
-	10  start
-	
-	player 3 btn 3:  jamma 25  (non-std, player 1 btn 4/neogeo btn D)
-	player 4 btn 4:  jamma ac  (non-std, player 2 btn 4/neogeo btn D)
-	
-	
-	h/w issues compared to original game (slammast)
-	-----------------------------------------------
-	these are present on the real board so are not emulation issues:
-	
-	* On the title screen, the blue crystal-like effect behind the main "slammasters" logo is missing.
-	* The bottom and side crowd animations have missing frames.
-	* The foreground ropes of the wrestling ring are glitchy and don't always line up properly with the end sections,
-		the original game draws all 3 ropes on scroll2 instead of with sprites when 4 players are on screen,
-		this bootleg draws the top red rope on scroll2 even with 2 players on screen.
-	* Player 3/4 inputs don't work in test menu (except both btn 3), seems test menu code hasn't been hacked to use the different ports.
-	* No eeprom on the board, has dipswitches instead.
-	* Crashes if "memory test" is attempted in test menu.
-	* Flip screen dipswitch does nothing (but change is shown in test menu).
+    Saturday Night Slam Masters: single board bootleg
+
+    CPU
+    1x  MC68000P10           main cpu
+
+    GFX
+    1x  Custom QFP 160-pin   "PLUS-B A37558.6 9325"   CPS-B-xx clone?
+
+    RAM
+    2x  NEC D431000ACZ-70L   main ram   1Mbit (128Kx8) SRAM 70ns
+    2x  SRM20256LM12         gfx?       256Kbit (32Kx8) SRAM 120ns SOP28   (mounted on SOP->DIP adapter pcbs)
+    6x  T6116S45L            gfx?       16Kbit (2Kx8) SRAM 45ns
+    4x  T6116S35L            gfx?       16Kbit (2Kx8) SRAM 35ns
+
+    ROMS
+    4x   27C040-15 EPROM      main rom   4Mbit (512Kx8)
+    16x  MX27C4000PC-15 OTP   gfx        4Mbit (512Kx8)
+    1x   27C020-15 EPROM      sound      2Mbit (256Kx8)
+    2x   MX27C4000PC-15 OTP   sound      4Mbit (512Kx8)
+    1x   AM27512DC EPROM      ?          512Kbit (64kx8)  1983!
+
+    PLD
+    1x   TPC1020AFN-084C
+    14x  PALCE16V8H-25PC/4
+    4x   PALCE20V8H-25PC/4
+    1x   PALCE22V10H-25PC/4
+
+    SOUND
+    1x  PIC16C57-XT/P     sound cpu
+    1x  TD735             sample player  (Oki MSM6295 clone)
+    1x  NEC uPC1242H      power amp
+    1x  LM324N            op amp
+
+    MISC
+    1x  16MHz xtal
+    1x  10MHz xtal
+    1x  PST518A             reset generator
+    3x  8 pos dipswitch
+    2x  10-pin connectors   player 3 & 4 inputs
+    No eeprom!
+
+    INPUTS
+    CN3: Player 3
+    CN4: Player 4
+
+    1   gnd
+    2   nc
+    3   right
+    4   left
+    5   down
+    6   up
+    7   btn 1
+    8   btn 2
+    9   coin
+    10  start
+
+    player 3 btn 3:  jamma 25  (non-std, player 1 btn 4/neogeo btn D)
+    player 4 btn 4:  jamma ac  (non-std, player 2 btn 4/neogeo btn D)
+
+
+    h/w issues compared to original game (slammast)
+    -----------------------------------------------
+    these are present on the real board so are not emulation issues:
+
+    * On the title screen, the blue crystal-like effect behind the main "slammasters" logo is missing.
+    * The bottom and side crowd animations have missing frames.
+    * The foreground ropes of the wrestling ring are glitchy and don't always line up properly with the end sections,
+        the original game draws all 3 ropes on scroll2 instead of with sprites when 4 players are on screen,
+        this bootleg draws the top red rope on scroll2 even with 2 players on screen.
+    * Player 3/4 inputs don't work in test menu (except both btn 3), seems test menu code hasn't been hacked to use the different ports.
+    * No eeprom on the board, has dipswitches instead.
+    * Crashes if "memory test" is attempted in test menu.
+    * Flip screen dipswitch does nothing (but change is shown in test menu).
 */
 ROM_START( slampic2 )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )
@@ -1267,7 +1267,7 @@ ROM_START( slampic2 )
 	ROM_CONTINUE(                 0x400006, 0x40000)
 	ROM_LOAD64_BYTE( "rom14.bin", 0x400003, 0x40000, CRC(f538e620) SHA1(354cd0548b067dfc8782bbe13b0a9c2083dbd290) )  // = slampic 10.bin
 	ROM_CONTINUE(                 0x400007, 0x40000)
-	
+
 	// this region contains first 0x40000 bytes of 1st 0x200000 region (rom7/8/5/6.bin)
 	//   then,              last 0x1c0000 bytes of 3rd 0x200000 region (rom15/16/13/14.bin)
 	// game doesn't seem to need it ???
@@ -1282,15 +1282,15 @@ ROM_START( slampic2 )
 
 	ROM_REGION( 0x2000, "audiocpu", 0 ) // NO DUMP  -  protected PIC
 	ROM_LOAD( "pic_u33.bin", 0x0000, 0x1007, BAD_DUMP CRC(6dba4094) SHA1(ca3362de83205fc6563d16a59b8e6e4bb7ebf4a6) )
-	
+
 	ROM_REGION( 0x140000, "oki", 0 )
 	ROM_LOAD( "v1.bin", 0x000000, 0x40000,  CRC(8962b469) SHA1(91dc12610a0b780ee2b314cd346182d97279c175) )  // 27c020 w/ sticker "7"
 	ROM_LOAD( "v2.bin", 0x040000, 0x80000,  CRC(6687df38) SHA1(d1015ae089fab5c5b4d1ab51b20f3aa6b77ed348) )  // 27c4000
 	ROM_LOAD( "v3.bin", 0x0c0000, 0x80000,  CRC(5782baee) SHA1(c01f8cd08d0c7b78c010ce3f1567383b7435de9f) )  // 27c4000
-	
+
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "24.bin", 0x00000, 0x10000, CRC(13ea1c44) SHA1(5b05fe4c3920e33d94fac5f59e09ff14b3e427fe) )  // = various sf2 bootlegs (sf2ebbl etc.) "unknown (bootleg priority?)"
-	
+
 	/* pld devices:
 	#1    P7    palce16V8        todo...
 	#2    P1    palce16V8        secured, bruteforce ok
@@ -1320,13 +1320,13 @@ ROM_END
 
 // ************************************************************************* DRIVER MACROS
 
-GAME( 1993,  dinopic,   dino,      dinopic,   dino,      cps1bl_pic_state,  init_dinopic,   ROT0,  "bootleg",  "Cadillacs and Dinosaurs (bootleg with PIC16c57, set 1)",  MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )     // 930201 ETC
-GAME( 1993,  dinopic2,  dino,      dinopic,   dino,      cps1bl_pic_state,  init_dinopic,   ROT0,  "bootleg",  "Cadillacs and Dinosaurs (bootleg with PIC16c57, set 2)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // 930201 ETC
-GAME( 1993,  dinopic3,  dino,      dinopic,   dino,      cps1bl_pic_state,  init_dinopic,   ROT0,  "bootleg",  "Cadillacs and Dinosaurs (bootleg with PIC16c57, set 3)",  MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )     // 930201 ETC
+GAME( 1993,  dinopic,   dino,      dinopic,   dino,      cps1bl_pic_state,  init_dinopic,   ROT0,  "bootleg",  "Cadillacs and Dinosaurs (bootleg with PIC16C57, set 1)",  MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )     // 930201 ETC
+GAME( 1993,  dinopic2,  dino,      dinopic,   dino,      cps1bl_pic_state,  init_dinopic,   ROT0,  "bootleg",  "Cadillacs and Dinosaurs (bootleg with PIC16C57, set 2)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )  // 930201 ETC
+GAME( 1993,  dinopic3,  dino,      dinopic,   dino,      cps1bl_pic_state,  init_dinopic,   ROT0,  "bootleg",  "Cadillacs and Dinosaurs (bootleg with PIC16C57, set 3)",  MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )     // 930201 ETC
 
-GAME( 1993,  punipic,   punisher,  punipic,   punisher,  cps1bl_pic_state,  init_punipic,   ROT0,  "bootleg",  "The Punisher (bootleg with PIC16c57, set 1)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )  // 930422 ETC
-GAME( 1993,  punipic2,  punisher,  punipic,   punisher,  cps1bl_pic_state,  init_punipic,   ROT0,  "bootleg",  "The Punisher (bootleg with PIC16c57, set 2)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )  // 930422 ETC
-GAME( 1993,  punipic3,  punisher,  punipic,   punisher,  cps1bl_pic_state,  init_punipic3,  ROT0,  "bootleg",  "The Punisher (bootleg with PIC16c57, set 3)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )  // 930422 ETC
+GAME( 1993,  punipic,   punisher,  punipic,   punisher,  cps1bl_pic_state,  init_punipic,   ROT0,  "bootleg",  "The Punisher (bootleg with PIC16C57, set 1)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )  // 930422 ETC
+GAME( 1993,  punipic2,  punisher,  punipic,   punisher,  cps1bl_pic_state,  init_punipic,   ROT0,  "bootleg",  "The Punisher (bootleg with PIC16C57, set 2)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )  // 930422 ETC
+GAME( 1993,  punipic3,  punisher,  punipic,   punisher,  cps1bl_pic_state,  init_punipic3,  ROT0,  "bootleg",  "The Punisher (bootleg with PIC16C57, set 3)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )  // 930422 ETC
 
-GAME( 1993,  slampic,   slammast,  slampic,   slampic,   cps1bl_pic_state,  init_dinopic,   ROT0,  "bootleg",  "Saturday Night Slam Masters (bootleg with PIC16c57, set 1)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )  // 930713 ETC
-GAME( 1993,  slampic2,  slammast,  slampic2,  slampic2,  slampic2_state,    init_slampic2,  ROT0,  "bootleg",  "Saturday Night Slam Masters (bootleg with PIC16c57, set 2)",  MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )  // 930713 ETC
+GAME( 1993,  slampic,   slammast,  slampic,   slampic,   cps1bl_pic_state,  init_dinopic,   ROT0,  "bootleg",  "Saturday Night Slam Masters (bootleg with PIC16C57, set 1)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )  // 930713 ETC
+GAME( 1993,  slampic2,  slammast,  slampic2,  slampic2,  slampic2_state,    init_slampic2,  ROT0,  "bootleg",  "Saturday Night Slam Masters (bootleg with PIC16C57, set 2)",  MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )  // 930713 ETC

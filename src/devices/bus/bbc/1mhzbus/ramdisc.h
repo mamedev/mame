@@ -42,10 +42,9 @@ protected:
 	virtual void jim_w(offs_t offset, uint8_t data) override;
 
 private:
-	static const size_t RAM_SIZE = 0x200000;
-
 	required_device<bbc_1mhzbus_slot_device> m_1mhzbus;
 	required_device<nvram_device> m_nvram;
+	required_ioport m_ram_size;
 	required_ioport m_power;
 
 	std::unique_ptr<uint8_t[]> m_ram;

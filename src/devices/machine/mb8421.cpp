@@ -13,7 +13,7 @@
 
     IDT71321 is function compatible, but not pin compatible with MB8421
     IDT7130 is 1KB variation of IDT71321
-	CY7C131 is similar as IDT7130
+    CY7C131 is similar as IDT7130
 
 **********************************************************************/
 

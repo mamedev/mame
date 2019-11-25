@@ -27,7 +27,7 @@
  * - Complete the Ericsson 1070 MDA ISA board and test all the graphics modes including 640x400 (aka HR)
  * - Add the Ericsson 1065 HDC and boot from a hard drive
  * - Add softlist
- * - Pass the diagnostics software system test at EPC2.IMD, it currently hangs the keyboard. 
+ * - Pass the diagnostics software system test at EPC2.IMD, it currently hangs the keyboard.
  *   A later version of the test on EPC5.IMD works though so need to verify EPC2.IMD on real hardware first.
  *
  * CREDITS  The driver code is inspired from m24.cpp, myb3k.cpp and genpc.cpp. Information about the EPC has
@@ -540,7 +540,7 @@ TIMER_CALLBACK_MEMBER(epc_state::rxtxclk_w)
 	// The EPC PCB has an option to support a custom receive clock for the INS8250 apart from the TX clock through a mux controlled
 	// by the DTR pin of the I8251. The ins8250 device doesn't support RCLK as it is considerd implicitly as the same as BAUDOUT
 	// First attempt to support this in INS8250 by lifting out the BRG from deserial was reverted due to lots of regressions.
-	// We probably need to remove diserial dependencies completely from ins8250 or implement BRG hooks in diserial.cpp.  
+	// We probably need to remove diserial dependencies completely from ins8250 or implement BRG hooks in diserial.cpp.
 	// if (!m_8251dtr_state) m_uart->rclk_w(m_8251rxtx_clk_state); // TODO: fix RCLK support in INS8250
 
 	m_8251rxtx_clk_state = !m_8251rxtx_clk_state;

@@ -95,40 +95,40 @@ void qvt70_state::mem_map(address_map &map)
 void qvt70_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-//	map(0x07, 0x07) // ? (set to 0x5d)
-//	map(0x08, 0x08) // ? (set to 0x00)
-//	map(0x09, 0x09) // ? (set to 0x00)
+//  map(0x07, 0x07) // ? (set to 0x5d)
+//  map(0x08, 0x08) // ? (set to 0x00)
+//  map(0x09, 0x09) // ? (set to 0x00)
 	map(0x0a, 0x0a).w(FUNC(qvt70_state::voffset_lsb_w));
 	map(0x0b, 0x0b).w(FUNC(qvt70_state::voffset_msb_w));
-//	map(0x0c, 0x0c) // ? (set to 0x5e then 0x67)
-//	map(0x0d, 0x0d) // ? (set to 0x0c then 0x04)
-//	map(0x0e, 0x0e) // ? (set to 0x0f then 0x07)
-//	map(0x0f, 0x0f) // ? (set to 0x06 then 0x07)
-//	map(0x10, 0x10) // columns? (set to 0x50 = 80)
-//	map(0x11, 0x11) // columns? (set to 0x84 = 132)
-//	map(0x12, 0x12) // ? (set to 0x31 = 49)
-//	map(0x13, 0x13) // rows? (set to 0x19 = 25)
-//	map(0x14, 0x14) // ? (set to 0x39 = 57)
-//	map(0x15, 0x15) // ? (set to 0x60 = 96)
-//	map(0x16, 0x16) // ? (set to 0x39 = 57)
-//	map(0x17, 0x17) // debug output? (used during memtest)
-//	map(0x18, 0x18) // ? (set to 0x20 = 32)
-//	map(0x19, 0x19) // ? (set to 0x0f = 15)
-//	map(0x1a, 0x1a) // ? (set to 0x00 then 0xff)
-//	map(0x1b, 0x1b) // ? (set to 0x20 = 32)
-//	map(0x1c, 0x1c) // ? (set to 0x50 then 0xff)
+//  map(0x0c, 0x0c) // ? (set to 0x5e then 0x67)
+//  map(0x0d, 0x0d) // ? (set to 0x0c then 0x04)
+//  map(0x0e, 0x0e) // ? (set to 0x0f then 0x07)
+//  map(0x0f, 0x0f) // ? (set to 0x06 then 0x07)
+//  map(0x10, 0x10) // columns? (set to 0x50 = 80)
+//  map(0x11, 0x11) // columns? (set to 0x84 = 132)
+//  map(0x12, 0x12) // ? (set to 0x31 = 49)
+//  map(0x13, 0x13) // rows? (set to 0x19 = 25)
+//  map(0x14, 0x14) // ? (set to 0x39 = 57)
+//  map(0x15, 0x15) // ? (set to 0x60 = 96)
+//  map(0x16, 0x16) // ? (set to 0x39 = 57)
+//  map(0x17, 0x17) // debug output? (used during memtest)
+//  map(0x18, 0x18) // ? (set to 0x20 = 32)
+//  map(0x19, 0x19) // ? (set to 0x0f = 15)
+//  map(0x1a, 0x1a) // ? (set to 0x00 then 0xff)
+//  map(0x1b, 0x1b) // ? (set to 0x20 = 32)
+//  map(0x1c, 0x1c) // ? (set to 0x50 then 0xff)
 	map(0x1d, 0x1d).rw(FUNC(qvt70_state::unk_1d_r), FUNC(qvt70_state::unk_1d_w)); // ram banking? status?
 	map(0x1e, 0x1e).rw(FUNC(qvt70_state::unk_1e_r), FUNC(qvt70_state::unk_1e_w)); // ram banking?
 	map(0x1f, 0x1f).w(FUNC(qvt70_state::unk_1f_w));
-//	map(0x20, 0x20) // ? (set to 0x00)
-//	map(0x21, 0x21) // ? (set to 0x00)
-//	map(0x22, 0x22) // ? (set to 0x00)
-//	map(0x23, 0x23) // ? (set to 0x00)
-//	map(0x24, 0x24) // ? (set to 0x00)
-//	map(0x25, 0x25) // ? (set to 0xa0)
-//	map(0x26, 0x26) // ? (set to 0xff)
-//	map(0x27, 0x27) // ? (set to 0x80)
-//	map(0x28, 0x28) // ? (set to 0x9f)
+//  map(0x20, 0x20) // ? (set to 0x00)
+//  map(0x21, 0x21) // ? (set to 0x00)
+//  map(0x22, 0x22) // ? (set to 0x00)
+//  map(0x23, 0x23) // ? (set to 0x00)
+//  map(0x24, 0x24) // ? (set to 0x00)
+//  map(0x25, 0x25) // ? (set to 0xa0)
+//  map(0x26, 0x26) // ? (set to 0xff)
+//  map(0x27, 0x27) // ? (set to 0x80)
+//  map(0x28, 0x28) // ? (set to 0x9f)
 	// 29-31
 	map(0x32, 0x32).r(FUNC(qvt70_state::unk_32_r)); // keyboard data?
 	// 33-41
@@ -249,7 +249,7 @@ uint8_t qvt70_state::unk_1d_r()
 
 	uint8_t val = 0;
 	val = ioport("1d")->read();
-//	val = machine().rand();
+//  val = machine().rand();
 	logerror("1d read: %02x\n", val);
 
 	return val;
@@ -289,7 +289,7 @@ uint8_t qvt70_state::unk_1e_r()
 {
 	uint8_t val = 0;
 	val = ioport("1e")->read();
-//	val = machine().rand();
+//  val = machine().rand();
 	logerror("1e read: %02x\n", val);
 
 	return val;
@@ -311,7 +311,7 @@ uint8_t qvt70_state::unk_32_r()
 {
 	uint8_t val = 0;
 	val = ioport("32")->read();
-//	val = machine().rand();
+//  val = machine().rand();
 	logerror("32 read: %02x\n", val);
 
 	return val;
@@ -326,12 +326,12 @@ void qvt70_state::unk_42_w(uint8_t data)
 void qvt70_state::unk_60_w(uint8_t data)
 {
 	logerror("60 = %02x\n", data);
-//	m_nmi_enable = bool(BIT(data, 7));
+//  m_nmi_enable = bool(BIT(data, 7));
 }
 
 void qvt70_state::rombank_w(uint8_t data)
 {
-//	logerror("rombank_w: %02x\n", data);
+//  logerror("rombank_w: %02x\n", data);
 
 	// 765----- unknown
 	// ---43--- bankswitching

@@ -75,7 +75,7 @@ private:
 		ATTR_FOREG = 0x07,
 		ATTR_ULINE = 0x01,
 	};
-	
+
 	required_device<mc6845_device> m_crtc;
 	MC6845_UPDATE_ROW( crtc_update_row );
 

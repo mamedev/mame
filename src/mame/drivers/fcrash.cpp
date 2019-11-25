@@ -4,22 +4,22 @@
 
 
 /*
-	A note reguarding other bootlegs:
-	In order to keep the cps source in some sort of order, the idea is to group similar bootleg hardware into seperate
-	derived classes and source files.
+    A note reguarding other bootlegs:
+    In order to keep the cps source in some sort of order, the idea is to group similar bootleg hardware into seperate
+    derived classes and source files.
 
-	Rom swaps, hacks etc.  (on original Capcom hardware)  ->  cps1.cpp
-	Sound: Z80, 2x YM2203, 2x m5205 ("Final Crash" h/w)   ->  fcrash.cpp
-	Sound: Z80, 1x YM2151, 2x m5205                       ->  cps1bl_5205.cpp
-	Sound: PIC, 1x M6295            *1                    ->  cps1bl_pic.cpp
-	Sound: Z80, 1x YM2151, 1x M6295 *2                    ->  fcrash.cpp      (for now...)
+    Rom swaps, hacks etc.  (on original Capcom hardware)  ->  cps1.cpp
+    Sound: Z80, 2x YM2203, 2x m5205 ("Final Crash" h/w)   ->  fcrash.cpp
+    Sound: Z80, 1x YM2151, 2x m5205                       ->  cps1bl_5205.cpp
+    Sound: PIC, 1x M6295            *1                    ->  cps1bl_pic.cpp
+    Sound: Z80, 1x YM2151, 1x M6295 *2                    ->  fcrash.cpp      (for now...)
 
-	*1 these seem to be only CPS1.5/Q sound games?
-	*2 this is original configuration, but non-Capcom (usually single-board) hardware.
-	
-	
-	As per the above, this file now only contains games in second and last catergories.
-	Eventually only Final Crash, other Final Fight bootlegs and Carrier Air Wing bootlegs will remain here.
+    *1 these seem to be only CPS1.5/Q sound games?
+    *2 this is original configuration, but non-Capcom (usually single-board) hardware.
+
+
+    As per the above, this file now only contains games in second and last catergories.
+    Eventually only Final Crash, other Final Fight bootlegs and Carrier Air Wing bootlegs will remain here.
 */
 
 
@@ -1531,9 +1531,9 @@ ROM_START( ffightbl )
 ROM_END
 
 /*
-	this is identical to the Final Crash bootleg but without the modified gfx.
-	it's less common than Final Crash, but is either the original bootleg, or the bootleggers wanted to restore the
-	original title.
+    this is identical to the Final Crash bootleg but without the modified gfx.
+    it's less common than Final Crash, but is either the original bootleg, or the bootleggers wanted to restore the
+    original title.
 */
 ROM_START( ffightbla )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
@@ -1577,33 +1577,33 @@ ROM_END
 // ************************************************************************* KODB
 
 /*
-	CPU
-	1x TS68000CP12 (main)
-	1x TPC1020AFN-084C
-	1x Z8400BB1-Z80CPU (sound)
-	1x YM2151 (sound)
-	1x YM3012A (sound)
-	1x OKI-M6295 (sound)
-	2x LM324N (sound)
-	1x TDA2003 (sound)
-	1x oscillator 10.0 MHz
-	1x oscillator 22.1184 MHz
-	
-	ROMs
-	1x AM27C512 (1)(sound)
-	1x AM27C020 (2)(sound)
-	2x AM27C040 (3,4)(main)
-	1x Am27C040 (bp)(gfx)
-	7x mask ROM (ai,bi,ci,di,ap,cp,dp)(gfx)
-	1x GAL20V8A (not dumped)
-	3x GAL16V8A (not dumped)
-	1x PALCE20V8H (not dumped)
-	1x GAL20V8S (not dumped)
-	
-	Note
-	1x JAMMA edge connector
-	1x trimmer (volume)
-	3x 8 switches dip
+    CPU
+    1x TS68000CP12 (main)
+    1x TPC1020AFN-084C
+    1x Z8400BB1-Z80CPU (sound)
+    1x YM2151 (sound)
+    1x YM3012A (sound)
+    1x OKI-M6295 (sound)
+    2x LM324N (sound)
+    1x TDA2003 (sound)
+    1x oscillator 10.0 MHz
+    1x oscillator 22.1184 MHz
+
+    ROMs
+    1x AM27C512 (1)(sound)
+    1x AM27C020 (2)(sound)
+    2x AM27C040 (3,4)(main)
+    1x Am27C040 (bp)(gfx)
+    7x mask ROM (ai,bi,ci,di,ap,cp,dp)(gfx)
+    1x GAL20V8A (not dumped)
+    3x GAL16V8A (not dumped)
+    1x PALCE20V8H (not dumped)
+    1x GAL20V8S (not dumped)
+
+    Note
+    1x JAMMA edge connector
+    1x trimmer (volume)
+    3x 8 switches dip
 */
 ROM_START( kodb )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
@@ -1716,9 +1716,9 @@ ROM_END
 // ************************************************************************* SGYXZ
 
 /*
-	24mhz crystal (maincpu), 28.322 crystal (video), 3.579545 crystal (sound)
-	sound cpu is (239 V 249521 VC5006 KABUKI DL-030P-110V) - recycled Kabuki Z80 from genuine Capcom HW?
-	3x8 dsws
+    24mhz crystal (maincpu), 28.322 crystal (video), 3.579545 crystal (sound)
+    sound cpu is (239 V 249521 VC5006 KABUKI DL-030P-110V) - recycled Kabuki Z80 from genuine Capcom HW?
+    3x8 dsws
 */
 ROM_START( sgyxz )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 ) /* 68000 Code */

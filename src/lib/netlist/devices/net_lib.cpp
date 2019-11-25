@@ -71,6 +71,8 @@ namespace devices
 		LIB_ENTRY(7448)
 		LIB_ENTRY(7448_dip)
 #endif
+		LIB_ENTRY(7442)
+		LIB_ENTRY(7442_dip)
 		LIB_ENTRY(7450)
 		LIB_ENTRY(7450_dip)
 		LIB_ENTRY(7473)
@@ -89,6 +91,8 @@ namespace devices
 		LIB_ENTRY(7485_dip)
 		LIB_ENTRY(7490)
 		LIB_ENTRY(7490_dip)
+		LIB_ENTRY(7492)
+		LIB_ENTRY(7492_dip)
 		LIB_ENTRY(7493)
 		LIB_ENTRY(7493_dip)
 		LIB_ENTRY(7497)
