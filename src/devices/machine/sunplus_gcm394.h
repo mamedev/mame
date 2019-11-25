@@ -29,6 +29,7 @@ public:
 		m_spg_audio(*this, "spgaudio"),
 		m_porta_in(*this),
 		m_portb_in(*this),
+		m_porta_out(*this),
 		m_space_read_cb(*this),
 		m_space_write_cb(*this),
 		m_bank_write_cb(*this)
@@ -39,6 +40,9 @@ public:
 
 	auto porta_in() { return m_porta_in.bind(); }
 	auto portb_in() { return m_portb_in.bind(); }
+
+	auto porta_out() { return m_porta_out.bind(); }
+
 
 	auto space_read_callback() { return m_space_read_cb.bind(); }
 	auto space_write_callback() { return m_space_write_cb.bind(); }
@@ -62,6 +66,8 @@ protected:
 
 	devcb_read16 m_porta_in;
 	devcb_read16 m_portb_in;
+
+	devcb_write16 m_porta_out;
 
 	uint16_t m_dma_params[7];
 

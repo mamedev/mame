@@ -87,6 +87,10 @@ protected:
 	virtual DECLARE_WRITE16_MEMBER(write_external_space) override;
 
 private:
+
+	DECLARE_READ16_MEMBER(hunt_porta_r);
+	DECLARE_WRITE16_MEMBER(hunt_porta_w);
+
 	required_shared_ptr<u16> m_mainram;
 };
 
@@ -166,10 +170,31 @@ void gcm394_game_state::base(machine_config &config)
 
 }
 
+READ16_MEMBER(wrlshunt_game_state::hunt_porta_r)
+{
+	uint16_t data = m_io_p1->read();
+	logerror("%s: Port A Read: %04x\n",  machine().describe_context(), data);
+	return data;
+}
+
+WRITE16_MEMBER(wrlshunt_game_state::hunt_porta_w)
+{
+	logerror("%s: Port A:WRITE %04x\n", machine().describe_context(), data);
+
+	// skip check (EEPROM?)
+	if (m_mainram[0x5b354 - 0x30000] == 0xafd0)
+		m_mainram[0x5b354 - 0x30000] = 0xB403;
+}
+
+
 void wrlshunt_game_state::wrlshunt(machine_config &config)
 {
 	gcm394_game_state::base(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &wrlshunt_game_state::wrlshunt_map);
+
+	m_maincpu->porta_in().set(FUNC(wrlshunt_game_state::hunt_porta_r));
+	m_maincpu->porta_out().set(FUNC(wrlshunt_game_state::hunt_porta_w));
+
 }
 
 void gcm394_game_state::switch_bank(uint32_t bank)
