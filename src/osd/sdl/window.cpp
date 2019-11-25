@@ -704,6 +704,9 @@ int sdl_window_info::complete_create()
 		    * SDL_GL_SetAttribute( SDL_GL_FRAMEBUFFER_SRGB_CAPABLE, 1 );
 		    *
 		    */
+		SDL_GL_SetAttribute( SDL_GL_FRAMEBUFFER_SRGB_CAPABLE, 1 );
+		SDL_GL_SetAttribute( SDL_GL_MULTISAMPLEBUFFERS, 1);
+		SDL_GL_SetAttribute( SDL_GL_MULTISAMPLESAMPLES, 16);
 		m_extra_flags = SDL_WINDOW_OPENGL;
 	}
 	else
