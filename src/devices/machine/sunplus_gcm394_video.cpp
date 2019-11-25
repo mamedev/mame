@@ -15,7 +15,7 @@ DEFINE_DEVICE_TYPE(GCM394_VIDEO, gcm394_video_device, "gcm394_video", "SunPlus G
 #define LOG_GCM394_TMAP           (1U << 2)
 #define LOG_GCM394_VIDEO          (1U << 1)
 
-#define VERBOSE             (LOG_GCM394_VIDEO_DMA | LOG_GCM394_VIDEO)
+#define VERBOSE             (LOG_GCM394_TMAP | LOG_GCM394_VIDEO_DMA | LOG_GCM394_VIDEO)
 
 #include "logmacro.h"
 
@@ -767,6 +767,13 @@ WRITE16_MEMBER(gcm394_base_video_device::video_703a_w) { LOGMASKED(LOG_GCM394_VI
 
 READ16_MEMBER(gcm394_base_video_device::video_7062_r) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7062_r\n", machine().describe_context()); return m_7062; }
 WRITE16_MEMBER(gcm394_base_video_device::video_7062_w) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7062_w %04x\n", machine().describe_context(), data); m_7062 = data; }
+
+READ16_MEMBER(gcm394_base_video_device::video_7063_r)
+{ 
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7063_r\n", machine().describe_context());
+	return machine().rand();
+}
+
 
 WRITE16_MEMBER(gcm394_base_video_device::video_7063_w)
 {

@@ -142,8 +142,15 @@ inline void unsp_device::execute_fxxx_011_group(uint16_t op)
 	// JMPR    1 1 1 1   1 1 1 0   1 1 - -   - - - -
 	if (((op & 0xffc0) == 0xfec0) && m_iso >= 12)
 	{
-		logerror("goto mr\n");
-		unimplemented_opcode(op);
+		uint32_t mr = m_core->m_r[REG_R3] | ((m_core->m_r[REG_R4]) << 16);
+
+		m_core->m_icount -= 5;
+		m_core->m_r[REG_PC] = mr & 0xffff;
+		m_core->m_r[REG_SR] &= 0xffc0;
+		m_core->m_r[REG_SR] |=( mr>>16) & 0x3f;
+
+		logerror("goto mr %08x\n", mr);
+		//unimplemented_opcode(op);
 		return;
 	}
 
