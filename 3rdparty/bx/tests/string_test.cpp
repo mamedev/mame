@@ -226,6 +226,18 @@ TEST_CASE("strFind", "")
 
 		REQUIRE(bx::strFind("vgd", 'a').isEmpty() );
 	}
+
+	{
+		bx::StringView test = bx::strFind("a", "a");
+		REQUIRE(test.getLength() == 1);
+		REQUIRE(*test.getPtr() == 'a');
+	}
+
+	{
+		bx::StringView test = bx::strFind("a", bx::StringView("a ", 1) );
+		REQUIRE(test.getLength() == 1);
+		REQUIRE(*test.getPtr() == 'a');
+	}
 }
 
 TEST_CASE("strSkip", "")

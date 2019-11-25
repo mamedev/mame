@@ -420,18 +420,9 @@ namespace bx
 				}
 			}
 
-			// Set pointers.
-			const char* string = ptr;
-			const char* search = _find;
-
-			// Start comparing.
-			while (fn(*string++) == fn(*search++) )
+			if (0 == strCmp<fn>(ptr, _findMax, _find, _findMax) )
 			{
-				// If end of the 'search' string is reached, all characters match.
-				if ('\0' == *search)
-				{
-					return ptr;
-				}
+				return ptr;
 			}
 		}
 
