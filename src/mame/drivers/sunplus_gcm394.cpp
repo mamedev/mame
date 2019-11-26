@@ -115,7 +115,7 @@ WRITE16_MEMBER(gcm394_game_state::write_external_space)
 WRITE16_MEMBER(wrlshunt_game_state::mapping_w)
 {
 	m_mapping = data;
-	printf("change mapping %04x\n", data);
+	logerror("change mapping %04x\n", data);
 }
 
 READ16_MEMBER(wrlshunt_game_state::read_external_space)
