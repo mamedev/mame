@@ -83,10 +83,6 @@ void skyfox_state::skyfox_palette(palette_device &palette) const
 
 	compute_res_net_all(rgb, color_prom, skyfox_decode_info, skyfox_net_info);
 	palette.set_pen_colors(0, rgb);
-
-	// Grey scale for the background??? is wrong
-	for (int i = 0; i < 256; i++)
-		palette.set_pen_color(i + 256, rgb_t(i, i, i));
 }
 
 
@@ -196,17 +192,25 @@ void skyfox_state::draw_background(bitmap_ind16 &bitmap, const rectangle &clipre
 {
 	uint8_t *rom = memregion("gfx2")->base();
 
-	/* The foreground stars (sprites) move at twice this speed when
-	   the bg scroll rate [e.g. (m_bg_ctrl >> 1) & 7] is 4 */
-	int pos = (m_bg_pos >> 4) & (512 * 2 - 1);
+	/* Flashing stops until the first star moves after turning on the power */
+	bool shining = (m_bg_ctrl & 0x8);
+	/* Maybe star pattern change. This will change at some intervals or when restart */
+	int pattern = (m_bg_ctrl & 0x6) >> 1;
 
 	for (int i = 0; i < 0x1000; i++)
 	{
-		int offs = (i * 2 + ((m_bg_ctrl >> 4) & 0x3) * 0x2000) % 0x8000;
+		/* contains the position of stars from 0xd4e0 in RAM */
+		int ramoffset = 0xe0 + (i & 0xf) * 2;
+		int pos = m_bgram[ramoffset + 1] * 2 + ((m_bgram[ramoffset] & 0x80) ? 1 : 0);
 
+		/* ROM offset of star pattern */
+		int offs = (i * 2) % 0x2000 + pattern * 0x2000;
+
+		/* Looks like good, but was written with intuition, Probably not perfect */
 		int pen = rom[offs];
-		int x = rom[offs + 1] * 2 + (i & 1) + pos + ((i & 8) ? 512 : 0);
-		int y = ((i / 8) / 2) * 8 + (i % 8);
+		int x = rom[offs + 1] * 2 + (i & 1) + pos;
+		int y = (i / 16) + pen % 4;
+		x += 96;
 
 		if (m_bg_ctrl & 1) // flipscreen
 		{
@@ -214,9 +218,28 @@ void skyfox_state::draw_background(bitmap_ind16 &bitmap, const rectangle &clipre
 			y = 256     - (y % 256);
 		}
 
-		for (int j = 0; j <= ((pen & 0x80) ? 0 : 3); j++)
-			bitmap.pix16((((j / 2) & 1) + y) % 256, ((j & 1) + x) % 512) = 256 + (pen & 0x7f);
+		if (((m_bg_ctrl >> 4) & 0x3) != pen % 4 || !shining)
+			bitmap.pix16(y % 256, x % 512) = pen;
 	}
+
+#if 0
+	/* For debug: check the background work memory */
+	char buf[128];
+	std::string str;
+	sprintf(buf, "m_bg_ctrl = %02x\n", m_bg_ctrl);
+	str += buf;
+	for (int i = 0; i < 0x10; i++)
+	{
+		int ramoffset = 0xe0 + ((i >> 2) & 0xf) * 2;
+		sprintf(buf, "%02x, %02x", m_bgram[ramoffset], m_bgram[ramoffset + 1]);
+		str += buf;
+		if (i % 4 == 3)
+			str += "\n";
+		else
+			str += " | ";
+	}
+	popmessage("%s", str.c_str());
+#endif
 }
 
 

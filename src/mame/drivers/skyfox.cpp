@@ -55,7 +55,7 @@ void skyfox_state::skyfox_map(address_map &map)
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xcfff).ram();
 	map(0xd000, 0xd3ff).ram().share("spriteram");
-	map(0xd400, 0xdfff).ram(); // ?
+	map(0xd400, 0xdfff).ram().share("bgram"); // Probably for background
 	map(0xe000, 0xe000).portr("INPUTS");
 	map(0xe001, 0xe001).portr("DSW0");
 	map(0xe002, 0xe002).portr("DSW1");
@@ -204,21 +204,13 @@ GFXDECODE_END
 
 /* Scroll the background on every vblank (guess). */
 
-INTERRUPT_GEN_MEMBER(skyfox_state::skyfox_interrupt)
-{
-	/* Scroll the bg */
-	m_bg_pos += (m_bg_ctrl >> 1) & 0x7; // maybe..
-}
-
 void skyfox_state::machine_start()
 {
-	save_item(NAME(m_bg_pos));
 	save_item(NAME(m_bg_ctrl));
 }
 
 void skyfox_state::machine_reset()
 {
-	m_bg_pos = 0;
 	m_bg_ctrl = 0;
 }
 
@@ -227,7 +219,6 @@ void skyfox_state::skyfox(machine_config &config)
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(8'000'000)/2); /* Verified at 4MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &skyfox_state::skyfox_map);
-	m_maincpu->set_vblank_int("screen", FUNC(skyfox_state::skyfox_interrupt));
 
 	Z80(config, m_audiocpu, XTAL(14'318'181)/8); /* Verified at 1.789772MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &skyfox_state::skyfox_sound_map);
@@ -242,7 +233,7 @@ void skyfox_state::skyfox(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_skyfox);
-	PALETTE(config, m_palette, FUNC(skyfox_state::skyfox_palette), 256+256); // 256 static colors (+256 for the background??)
+	PALETTE(config, m_palette, FUNC(skyfox_state::skyfox_palette), 256); // 256 static colors
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
