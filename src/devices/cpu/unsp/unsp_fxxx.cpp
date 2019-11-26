@@ -54,7 +54,7 @@ inline void unsp_device::execute_fxxx_000_group(uint16_t op)
 
 	// everything else falls through to the multiply
 
-	// signed * unsigned
+	// MUL us ( signed * unsigned )
 	// MUL      1 1 1 1*  r r r 0*  0 0 0 0   1 r r r     (** = sign bits, fixed here)
 	const uint16_t opa = (op >> 9) & 7;
 	const uint16_t opb = op & 7;

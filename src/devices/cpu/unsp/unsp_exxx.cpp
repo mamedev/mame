@@ -110,17 +110,28 @@ void unsp_12_device::execute_exxx_group(uint16_t op)
 		// MUL operations
 		// MUL      1 1 1 0*  r r r S*  0 0 0 0   1 r r r     (* = sign bit, fixed here)
 		/*
-		print_mul(stream, op); // MUL uu or MUL su (invalid?)
+		print_mul(stream, op); // MUL uu or MUL su
 		*/
 
 		if (op & 0x0100)
 		{
-			logerror("MUL su\n");
-			fatalerror("UNSP: unknown opcode MUL su (invalid?) (%04x) at %04x\n", op, UNSP_LPC);
+			// MUL su ( unsigned * signed )
+			logerror("MUL su\n"); 
+			const uint16_t opa = (op >> 9) & 7;
+			const uint16_t opb = op & 7;
+			m_core->m_icount -= 12;
+			uint32_t lres = m_core->m_r[opa] * m_core->m_r[opb];
+			if (m_core->m_r[opa] & 0x8000)
+			{
+				lres -= m_core->m_r[opb] << 16;
+			}
+			m_core->m_r[REG_R4] = lres >> 16;
+			m_core->m_r[REG_R3] = (uint16_t)lres;
 			return;
 		}
 		else
 		{
+			// MUL uu (unsigned * unsigned)
 			uint32_t lres = 0;
 			const uint16_t opa = (op >> 9) & 7;
 			const uint16_t opb = op & 7;
@@ -169,9 +180,14 @@ void unsp_12_device::execute_exxx_group(uint16_t op)
 			return;
 
 		case 0x03:
-			logerror("%s = %s lslor %s\n", regs[rd], regs[rd], regs[rs]);
-			unimplemented_opcode(op);
+		{
+			// wrlshunt uses this
+			logerror("pc:%06x: %s = %s lslor %s  (%04x %04x)\n", UNSP_LPC, regs[rd], regs[rd], regs[rs], m_core->m_r[rd], m_core->m_r[rs]);
+			uint16_t tmp = m_core->m_r[rd];
+			m_core->m_r[rd] = m_core->m_r[rd] << m_core->m_r[rs];
+			m_core->m_r[rd] |= tmp; // guess
 			return;
+		}
 
 		case 0x04:
 			// smartfp loops increasing shift by 4 up to values of 28? (but regs are 16-bit?)
