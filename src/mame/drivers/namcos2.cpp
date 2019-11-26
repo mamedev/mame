@@ -45,7 +45,6 @@ known issues:
     - no artwork
 
     Metal Hawk
-    - tilemap issues (ex : Result and stage select screen)
     - ROZ wraparound isn't implemented
 
 The Namco System II board is a 5 ( only 4 are emulated ) CPU system. The
