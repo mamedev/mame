@@ -39373,6 +39373,9 @@ vcs80                           //
 break86                         //
 papillon                        //
 
+@source:vd56sp.cpp
+vd56sp                          //
+
 @source:vdm7932x.cpp
 vdm79322                        //
 

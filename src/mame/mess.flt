@@ -910,6 +910,7 @@ vax11.cpp
 vboy.cpp
 vc4000.cpp
 vcs80.cpp
+vd56sp.cpp
 vdm7932x.cpp
 vector06.cpp
 vector4.cpp
