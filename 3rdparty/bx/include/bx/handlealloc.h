@@ -12,7 +12,7 @@
 
 namespace bx
 {
-	static const uint16_t kInvalidHandle = UINT16_MAX;
+	constexpr uint16_t kInvalidHandle = UINT16_MAX;
 
 	///
 	class HandleAlloc
