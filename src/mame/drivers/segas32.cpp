@@ -585,7 +585,25 @@ segas32_state::segas32_state(const machine_config &mconfig, device_type type, co
 	, m_multipcm_bank_hi(*this, "multipcmbankhi")
 	, m_multipcm_bank_lo(*this, "multipcmbanklo")
 	, m_is_multi32(is_multi32)
+	, m_sound_irq_input(0)
+	, m_sound_dummy_value(0)
+	, m_sound_bank(0)
+	, m_system32_tilebank_external(0)
+	, m_sprite_render_count(0)
+	, m_print_count(0)
+	, m_vblank_end_int_timer(nullptr)
+	, m_update_sprites_timer(nullptr)
 {
+	std::fill(std::begin(m_v60_irq_control), std::end(m_v60_irq_control), 0);
+	std::fill(std::begin(m_v60_irq_timer), std::end(m_v60_irq_timer), nullptr);
+	std::fill(std::begin(m_sound_irq_control), std::end(m_sound_irq_control), 0);
+	std::fill(std::begin(m_system32_displayenable), std::end(m_system32_displayenable), 0);
+	std::fill(std::begin(m_arescue_dsp_io), std::end(m_arescue_dsp_io), 0);
+	std::fill(std::begin(m_sprite_control_latched), std::end(m_sprite_control_latched), 0);
+	std::fill(std::begin(m_sprite_control), std::end(m_sprite_control), 0);
+
+	for (int i = 0; i < 2; i++)
+		std::fill(std::begin(m_mixer_control[i]), std::end(m_mixer_control[i]), 0);
 }
 
 
@@ -2729,6 +2747,7 @@ DEFINE_DEVICE_TYPE(SEGA_MULTI32_ANALOG_DEVICE, sega_multi32_analog_state, "segas
 sega_multi32_analog_state::sega_multi32_analog_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: sega_multi32_state(mconfig, SEGA_MULTI32_ANALOG_DEVICE, tag, owner, clock)
 	, m_analog_ports(*this, "ANALOG%u", 1)
+	, m_analog_bank(0)
 {
 }
 
