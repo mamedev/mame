@@ -63,6 +63,7 @@ private:
 
 	DECLARE_READ16_MEMBER(porta_r);
 	DECLARE_READ16_MEMBER(portb_r);
+	DECLARE_WRITE16_MEMBER(porta_w);
 
 	DECLARE_READ16_MEMBER(read_external_space);
 };
@@ -146,6 +147,10 @@ READ16_MEMBER(gcm394_game_state::portb_r)
 	return data;
 }
 
+WRITE16_MEMBER(gcm394_game_state::porta_w)
+{
+	logerror("%s: Port A:WRITE %04x\n", machine().describe_context(), data);
+}
 
 void gcm394_game_state::base(machine_config &config)
 {
@@ -153,6 +158,7 @@ void gcm394_game_state::base(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &gcm394_game_state::mem_map_4m);
 	m_maincpu->porta_in().set(FUNC(gcm394_game_state::porta_r));
 	m_maincpu->portb_in().set(FUNC(gcm394_game_state::portb_r));
+	m_maincpu->porta_out().set(FUNC(gcm394_game_state::porta_w));
 	m_maincpu->space_read_callback().set(FUNC(gcm394_game_state::read_external_space));
 	m_maincpu->space_write_callback().set(FUNC(gcm394_game_state::write_external_space));
 
