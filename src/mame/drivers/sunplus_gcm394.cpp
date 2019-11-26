@@ -150,7 +150,8 @@ READ16_MEMBER(gcm394_game_state::portb_r)
 WRITE16_MEMBER(gcm394_game_state::porta_w)
 {
 	logerror("%s: Port A:WRITE %04x\n", machine().describe_context(), data);
-}
+}	
+
 
 void gcm394_game_state::base(machine_config &config)
 {
@@ -161,6 +162,7 @@ void gcm394_game_state::base(machine_config &config)
 	m_maincpu->porta_out().set(FUNC(gcm394_game_state::porta_w));
 	m_maincpu->space_read_callback().set(FUNC(gcm394_game_state::read_external_space));
 	m_maincpu->space_write_callback().set(FUNC(gcm394_game_state::write_external_space));
+	m_maincpu->set_irq_acknowledge_callback(m_maincpu, FUNC(sunplus_gcm394_base_device::irq_vector_cb));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);

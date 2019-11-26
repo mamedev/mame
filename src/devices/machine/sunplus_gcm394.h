@@ -43,7 +43,6 @@ public:
 
 	auto porta_out() { return m_porta_out.bind(); }
 
-
 	auto space_read_callback() { return m_space_read_cb.bind(); }
 	auto space_write_callback() { return m_space_write_cb.bind(); }
 	auto bank_write_callback() { return m_bank_write_cb.bind(); }
@@ -52,6 +51,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(vblank) { m_spg_video->vblank(state); }
 
 	virtual void device_add_mconfig(machine_config& config) override;
+
+	IRQ_CALLBACK_MEMBER(irq_vector_cb);
 
 protected:
 

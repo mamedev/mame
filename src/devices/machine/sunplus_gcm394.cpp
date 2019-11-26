@@ -227,7 +227,7 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7935_w)
 {
 	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7935_w %04x\n", machine().describe_context(), data);
 	m_7935 &= ~data;
-	checkirq6();
+	//checkirq6();
 }
 
 READ16_MEMBER(sunplus_gcm394_base_device::unkarea_7936_r) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7936_r\n", machine().describe_context()); return 0x0000; }
@@ -524,12 +524,25 @@ void sunplus_gcm394_base_device::device_reset()
 
 }
 
+IRQ_CALLBACK_MEMBER(sunplus_gcm394_base_device::irq_vector_cb)
+{
+	//printf("irq_vector_cb %d\n", irqline);
+
+	if (irqline == UNSP_IRQ6_LINE)
+		set_state_unsynced(UNSP_IRQ6_LINE, CLEAR_LINE);
+
+	return 0;
+}
+
+
 void sunplus_gcm394_base_device::checkirq6()
 {
+/*
 	if (m_7935 & 0x0100)
 		set_state_unsynced(UNSP_IRQ6_LINE, ASSERT_LINE);
 	else
 		set_state_unsynced(UNSP_IRQ6_LINE, CLEAR_LINE);
+*/
 }
 
 void sunplus_gcm394_base_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -539,7 +552,8 @@ void sunplus_gcm394_base_device::device_timer(emu_timer &timer, device_timer_id 
 	case 0:
 	{
 		m_7935 |= 0x0100;
-		checkirq6();
+		set_state_unsynced(UNSP_IRQ6_LINE, ASSERT_LINE);
+	//	checkirq6();
 		break;
 	}
 	}
