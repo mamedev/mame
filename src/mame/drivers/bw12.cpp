@@ -73,39 +73,14 @@ void bw12_state::bankswitch()
 	membank("bank1")->set_entry(m_bank);
 }
 
-void bw12_state::floppy_motor_off()
+TIMER_DEVICE_CALLBACK_MEMBER(bw12_state::floppy_motor_off_tick)
 {
+	if (m_motor0 || m_motor1)
+		return;
 	m_floppy0->mon_w(1);
 	m_floppy1->mon_w(1);
 
 	m_motor_on = 0;
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER(bw12_state::floppy_motor_off_tick)
-{
-	floppy_motor_off();
-}
-
-void bw12_state::set_floppy_motor_off_timer()
-{
-	if (m_motor0 || m_motor1)
-	{
-		m_motor_on = 1;
-		m_floppy_timer->enable(false);
-	}
-	else
-	{
-		/* trigger floppy motor off NE556 timer */
-		/*
-
-		    R18 = RES_K(100)
-		    C11 = CAP_U(4.7)
-
-		*/
-
-		//m_floppy_timer->adjust(attotime::zero);
-		floppy_motor_off();
-	}
 }
 
 void bw12_state::write_ls259(int address, int data)
@@ -145,10 +120,16 @@ void bw12_state::write_ls259(int address, int data)
 		break;
 	}
 
-	m_motor_on = m_motor0 || m_motor1;
 
-	m_floppy0->mon_w(!m_motor_on);
-	m_floppy1->mon_w(!m_motor_on);
+	if (m_motor0 || m_motor1)
+	{
+		m_motor_on = 1;
+		m_floppy0->mon_w(0);
+		m_floppy1->mon_w(0);
+		m_floppy_timer->adjust(attotime::never);
+	}
+	else
+		m_floppy_timer->adjust(attotime::from_msec(170));
 }
 
 WRITE8_MEMBER( bw12_state::ls259_w )
