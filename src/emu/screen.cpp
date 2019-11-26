@@ -1022,7 +1022,6 @@ void screen_device::configure(int width, int height, const rectangle &visarea, a
 
 	// reallocate bitmap(s) if necessary
 	realloc_screen_bitmaps();
-	if (machine().input().code_pressed(KEYCODE_E)) printf("CONFIGURE\n");
 
 	// compute timing parameters
 	m_frame_period = frame_period;
