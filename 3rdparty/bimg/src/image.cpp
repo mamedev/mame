@@ -5605,8 +5605,8 @@ namespace bimg
 			{
 				for (uint8_t side = 0; side < numSides && _err->isOk(); ++side)
 				{
-					total += bx::write(_writer, src, size, _err);
-					src += size;
+					total += bx::write(_writer, src, mipSize, _err);
+					src += mipSize;
 				}
 			}
 
