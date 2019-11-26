@@ -221,25 +221,6 @@ void skyfox_state::draw_background(bitmap_ind16 &bitmap, const rectangle &clipre
 		if (((m_bg_ctrl >> 4) & 0x3) != pen % 4 || !shining)
 			bitmap.pix16(y % 256, x % 512) = pen;
 	}
-
-#if 0
-	/* For debug: check the background work memory */
-	char buf[128];
-	std::string str;
-	sprintf(buf, "m_bg_ctrl = %02x\n", m_bg_ctrl);
-	str += buf;
-	for (int i = 0; i < 0x10; i++)
-	{
-		int ramoffset = 0xe0 + ((i >> 2) & 0xf) * 2;
-		sprintf(buf, "%02x, %02x", m_bgram[ramoffset], m_bgram[ramoffset + 1]);
-		str += buf;
-		if (i % 4 == 3)
-			str += "\n";
-		else
-			str += " | ";
-	}
-	popmessage("%s", str.c_str());
-#endif
 }
 
 
