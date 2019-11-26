@@ -32,7 +32,7 @@ public:
 		m_porta_out(*this),
 		m_space_read_cb(*this),
 		m_space_write_cb(*this),
-		m_bank_write_cb(*this)
+		m_mapping_write_cb(*this)
 	{
 	}
 
@@ -45,7 +45,7 @@ public:
 
 	auto space_read_callback() { return m_space_read_cb.bind(); }
 	auto space_write_callback() { return m_space_write_cb.bind(); }
-	auto bank_write_callback() { return m_bank_write_cb.bind(); }
+	auto mapping_write_callback() { return m_mapping_write_cb.bind(); }
 
 
 	DECLARE_WRITE_LINE_MEMBER(vblank) { m_spg_video->vblank(state); }
@@ -141,7 +141,7 @@ protected:
 private:
 	devcb_read16 m_space_read_cb;
 	devcb_write16 m_space_write_cb;
-	devcb_write16 m_bank_write_cb;
+	devcb_write16 m_mapping_write_cb;
 
 	DECLARE_READ16_MEMBER(unk_r);
 	DECLARE_WRITE16_MEMBER(unk_w);

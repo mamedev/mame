@@ -15,7 +15,7 @@
 #define LOG_GCM394                (1U << 1)
 #define LOG_GCM394_UNMAPPED       (1U << 0)
 
-#define VERBOSE             (LOG_GCM394_UNMAPPED | LOG_GCM394_SYSDMA)
+#define VERBOSE             (LOG_GCM394 | LOG_GCM394_UNMAPPED | LOG_GCM394_SYSDMA)
 #include "logmacro.h"
 
 
@@ -143,7 +143,12 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7810_w) { LOGMASKED(LOG_GCM39
 WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7816_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7816_w %04x\n", machine().describe_context(), data); m_7816 = data; }
 WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7817_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7817_w %04x\n", machine().describe_context(), data); m_7817 = data; }
 
-WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7820_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7820_w %04x\n", machine().describe_context(), data); m_7820 = data; }
+WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7820_w)
+{
+	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7820_w (Rom Mapping control?) %04x\n", machine().describe_context(), data);
+	m_7820 = data;
+	m_mapping_write_cb(data);
+}
 
 WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7821_w)
 {
@@ -208,7 +213,7 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_78b1_w) { LOGMASKED(LOG_GCM39
 READ16_MEMBER(sunplus_gcm394_base_device::unkarea_78b2_r)
 {
 	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_78b2_r\n", machine().describe_context());
-	return machine().rand();
+	return m_78b2;
 }
 
 WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_78b2_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_78b2_w %04x\n", machine().describe_context(), data); m_78b2 = data; }
@@ -352,12 +357,12 @@ void sunplus_gcm394_base_device::internal_map(address_map &map)
 	map(0x007816, 0x007816).w(FUNC(sunplus_gcm394_base_device::unkarea_7816_w));
 	map(0x007817, 0x007817).w(FUNC(sunplus_gcm394_base_device::unkarea_7817_w));
 
-
-	map(0x007820, 0x007820).w(FUNC(sunplus_gcm394_base_device::unkarea_7820_w));
-	map(0x007821, 0x007821).w(FUNC(sunplus_gcm394_base_device::unkarea_7821_w));
-	map(0x007822, 0x007822).w(FUNC(sunplus_gcm394_base_device::unkarea_7822_w));
-	map(0x007823, 0x007823).w(FUNC(sunplus_gcm394_base_device::unkarea_7823_w));
-	map(0x007824, 0x007824).w(FUNC(sunplus_gcm394_base_device::unkarea_7824_w));
+	                                                                             // wrlshunt                                                               | smartfp
+	map(0x007820, 0x007820).w(FUNC(sunplus_gcm394_base_device::unkarea_7820_w)); // 7f8a (7f8a before DMA from ROM to RAM, 008a after DMA from ROM to RAM) | 3f04
+	map(0x007821, 0x007821).w(FUNC(sunplus_gcm394_base_device::unkarea_7821_w)); // 7f47                                                                   | 0044
+	map(0x007822, 0x007822).w(FUNC(sunplus_gcm394_base_device::unkarea_7822_w)); // 0047                                                                   | 1f44
+	map(0x007823, 0x007823).w(FUNC(sunplus_gcm394_base_device::unkarea_7823_w)); // 0047                                                                   | 0044
+	map(0x007824, 0x007824).w(FUNC(sunplus_gcm394_base_device::unkarea_7824_w)); // 0047                                                                   | 0044
 
 	map(0x00782d, 0x00782d).rw(FUNC(sunplus_gcm394_base_device::unkarea_782d_r), FUNC(sunplus_gcm394_base_device::unkarea_782d_w)); // on startup
 
@@ -441,7 +446,7 @@ void sunplus_gcm394_base_device::device_start()
 
 	m_space_read_cb.resolve_safe(0);
 	m_space_write_cb.resolve();
-	m_bank_write_cb.resolve();
+	m_mapping_write_cb.resolve();
 
 
 	m_unk_timer = timer_alloc(0);
