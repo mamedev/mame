@@ -464,7 +464,7 @@ GLB_GP-FS1_0405L_SPU_1.0.2.3
 SPF2ALP
 
 "GPnandnand" as a required signature appears to be referenced right here, in page 19 of a GeneralPlus document;
-http://www.lcis.com.tw/paper_store/paper_store/GPL162004A-507A_162005A-707AV10_code_reference-20147131205102.pdf (this link is no longer valid)
+https://web.archive.org/web/20180106005235/http://www.lcis.com.tw/paper_store/paper_store/GPL162004A-507A_162005A-707AV10_code_reference-20147131205102.pdf
 
 */
 

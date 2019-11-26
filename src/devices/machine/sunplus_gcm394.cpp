@@ -310,6 +310,7 @@ void sunplus_gcm394_base_device::internal_map(address_map &map)
 	map(0x007072, 0x007072).rw(m_spg_video, FUNC(gcm394_base_video_device::video_dma_size_r), FUNC(gcm394_base_video_device::video_dma_size_w));     //
 	map(0x00707e, 0x00707e).w(m_spg_video, FUNC(gcm394_base_video_device::video_dma_unk_w));                                                         // written around same time as DMA, seems to select alt sprite bank
 
+	map(0x00707c, 0x00707c).r(m_spg_video, FUNC(gcm394_base_video_device::video_707c_r)); // wrlshunt polls this waiting for 0x8000, is this some kind of manual port based data upload?
 	map(0x00707f, 0x00707f).rw(m_spg_video, FUNC(gcm394_base_video_device::video_707f_r), FUNC(gcm394_base_video_device::video_707f_w));
 
 	// another set of registers for something?
@@ -326,6 +327,9 @@ void sunplus_gcm394_base_device::internal_map(address_map &map)
 	// ######################################################################################################################################################################################
 	// 73xx-77xx = video ram
 	// ######################################################################################################################################################################################
+
+	map(0x007100, 0x0071ef).ram().share("unkram1"); // maybe a line table? (assuming DMA isn't writing to wrong place)
+	map(0x007200, 0x0072ef).ram().share("unkram2"); // ^^
 
 	map(0x007300, 0x0073ff).rw(m_spg_video, FUNC(gcm394_base_video_device::palette_r), FUNC(gcm394_base_video_device::palette_w));
 

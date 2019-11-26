@@ -757,6 +757,11 @@ WRITE16_MEMBER(gcm394_base_video_device::video_dma_unk_w)
 }
 
 
+READ16_MEMBER(gcm394_base_video_device::video_707c_r)
+{ 
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_707c_r\n", machine().describe_context());
+	return 0x8000;
+}
 
 
 READ16_MEMBER(gcm394_base_video_device::video_707f_r) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_707f_r\n", machine().describe_context()); return m_707f; }
