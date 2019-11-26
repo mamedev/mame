@@ -1186,10 +1186,10 @@ ROM_START( mkartagp )
 	ROM_REGION(0x19000000, "rom_board", 0)
 	ROM_LOAD16_BYTE( "ic1_k9f1208u0b",  0x00000000, 0x4200000, BAD_DUMP CRC(7edb6ff2) SHA1(c544c09fc0441f940623c7368919e46153d49c20) ) // all data from 0x3de0000 - 0x41fffff is 0xFF and should not be
 	ROM_LOAD16_BYTE( "ic2_k9f1208u0b",  0x00000001, 0x4200000, BAD_DUMP CRC(beb58594) SHA1(826ddc3db46f7644b08488618453917430bb16a1) ) // all data from 0x3de0000 - 0x41fffff is 0xFF and should not be
-	ROM_LOAD16_BYTE( "ic5_k9f1208u0b",  0x08400000, 0x4200000, BAD_DUMP CRC(fd7b9a28) SHA1(bc56c0a786e70de7365bd1b46fe82b3c43388f0c) ) // all data from 0x3de0000 - 0x41fffff is 0xFF and should not be
-	ROM_LOAD16_BYTE( "ic6_k9f1208u0b",  0x08400001, 0x4200000, BAD_DUMP CRC(26bcfe14) SHA1(893e6b38cccca62037fc01012410d535634f8bc1) ) // all data from 0x3de0000 - 0x41fffff is 0xFF and should not be
-	ROM_LOAD16_BYTE( "ic35_k9f1208u0b", 0x10800000, 0x4200000, BAD_DUMP CRC(9a67892f) SHA1(f2beb56d07a42a01a8cfffbf683d8ec58c8407cc) ) // This dump is completely blank (0xFF)
-	ROM_LOAD16_BYTE( "ic45_k9f1208u0b", 0x10800001, 0x4200000, BAD_DUMP CRC(274e7b81) SHA1(d97951c19d4ea430e09bc56777d99651a1f888d1) ) // all data from 0x3de0000 - 0x41fffff is 0xFF and should not be
+	ROM_LOAD16_BYTE( "ic35_k9f1208u0b", 0x08400000, 0x4200000, BAD_DUMP CRC(9a67892f) SHA1(f2beb56d07a42a01a8cfffbf683d8ec58c8407cc) ) // This dump is completely blank (0xFF)
+	ROM_LOAD16_BYTE( "ic45_k9f1208u0b", 0x08400001, 0x4200000, BAD_DUMP CRC(274e7b81) SHA1(d97951c19d4ea430e09bc56777d99651a1f888d1) ) // all data from 0x3de0000 - 0x41fffff is 0xFF and should not be
+	ROM_LOAD16_BYTE( "ic5_k9f1208u0b",  0x10800000, 0x4200000, BAD_DUMP CRC(fd7b9a28) SHA1(bc56c0a786e70de7365bd1b46fe82b3c43388f0c) ) // all data from 0x3de0000 - 0x41fffff is 0xFF and MAYBE should not be, since it is after the end of the data in the rom, so it may be correct
+	ROM_LOAD16_BYTE( "ic6_k9f1208u0b",  0x10800001, 0x4200000, BAD_DUMP CRC(26bcfe14) SHA1(893e6b38cccca62037fc01012410d535634f8bc1) ) // all data from 0x3de0000 - 0x41fffff is 0xFF and MAYBE should not be, since it is after the end of the data in the rom, so it may be correct
 	ROM_LOAD( "ic9_29lv400t",     0x18c00000, 0x0080000, CRC(f1ba67b2) SHA1(212fe4b28b6f9590bff200a6680bf7ee381780c7) ) // block mapping flash rom
 
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
