@@ -4691,6 +4691,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/trivrus.cpp",
 	MAME_DIR .. "src/mame/drivers/crospuzl.cpp",
 	MAME_DIR .. "src/mame/drivers/psattack.cpp",
+	MAME_DIR .. "src/mame/drivers/v0bowl.cpp",
 	MAME_DIR .. "src/mame/drivers/cubeqst.cpp",
 	MAME_DIR .. "src/mame/drivers/cybertnk.cpp",
 	MAME_DIR .. "src/mame/drivers/daryde.cpp",
