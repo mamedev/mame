@@ -40,7 +40,7 @@ private:
     // devices
     required_device<cpu_device> m_maincpu;
 	required_device<vrender0soc_device> m_vr0soc;
-	
+
 	IRQ_CALLBACK_MEMBER(icallback);
 };
 
@@ -135,7 +135,7 @@ void v0bowl_state::machine_reset()
 void v0bowl_state::v0bowl(machine_config &config)
 {
 	// TODO: clock to be tuned up
-	SE3208(config, m_maincpu, 14318180 * 3); 
+	SE3208(config, m_maincpu, 14318180 * 3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &v0bowl_state::v0bowl_map);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(v0bowl_state::icallback));
 
@@ -153,10 +153,10 @@ void v0bowl_state::v0bowl(machine_config &config)
 ROM_START( v0bowl )
 	ROM_REGION32_LE( 0x1000000, "ipl", ROMREGION_ERASEFF )
     ROM_LOAD( "bootrom.u16",  0x000000, 0x080000, CRC(f8f4cf22) SHA1(881d8eeb6f50b2e7933e7c3c93adcdd0c1e93e77) )
-	
+
 	ROM_REGION32_LE( 0x20000000, "flash", ROMREGION_ERASEFF ) // SanDisk CF
 	// zipped FAT16, filesystem was made with DOS 3.31 but the folders have Windows Thumbs.db files as well.
-    ROM_LOAD( "bowling.001",  0x000000, 0x1e8be000, BAD_DUMP CRC(aebb2b01) SHA1(cd11f74f6512350ac10f822937b8769f552aabf3) ) 
+    ROM_LOAD( "bowling.001",  0x000000, 0x1e8be000, BAD_DUMP CRC(aebb2b01) SHA1(cd11f74f6512350ac10f822937b8769f552aabf3) )
 ROM_END
 
-GAME( 200?, v0bowl,  0,   v0bowl,  v0bowl, v0bowl_state, empty_init, ROT0, "A1 Amusement One",      "Unknown VRender0+ Bowling Game", MACHINE_IS_SKELETON ) // Return Bowl?
+GAME( 200?, v0bowl,  0,   v0bowl,  v0bowl, v0bowl_state, empty_init, ROT0, "A1 Amusement One",      "unknown VRender0+ bowling game", MACHINE_IS_SKELETON ) // Return Bowl?
