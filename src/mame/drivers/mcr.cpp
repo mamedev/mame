@@ -2243,6 +2243,42 @@ ROM_START( tron4 )
 	ROM_LOAD( "0066-314bx-xxqx.g12.bin", 0x0000, 0x0001, NO_DUMP)
 ROM_END
 
+/*
+  TRON (Set 5 - 5/12)
+*/
+
+ROM_START( tron5 )
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* ROM's located on the Super CPU Board (90010) */
+	ROM_LOAD( "tron_pro-0_5-12.d2",   0x0000, 0x2000, CRC(ccc4119f) SHA1(a07677ed4dae4062849867d91be96ddf342826a3) ) /* all labels were hand written */
+	ROM_LOAD( "tron_pro-1_5-12.d3",   0x2000, 0x2000, CRC(153f148c) SHA1(3d0065a9a92d4a1ad85cc907da18c03c94328e5d) )
+	ROM_LOAD( "tron_pro-2_5-12.d4",   0x4000, 0x2000, CRC(e62bb8a1) SHA1(817987251e015c3290507ebc88ee7acc07c5accd) )
+	ROM_LOAD( "tron_pro-3_5-12.d5",   0x6000, 0x2000, CRC(dbc06c91) SHA1(4d75c84844ade35c577e91787639dfdc48f9cb28) )
+	ROM_LOAD( "tron_pro-4_5-12.d6",   0x8000, 0x2000, CRC(30adb624) SHA1(5baf0294dfb01be5bdf34cfc63d764d7f34657e1) )
+	ROM_LOAD( "tron_pro-5_5-12.d7",   0xa000, 0x2000, CRC(191c72bb) SHA1(bbf406ebfb80e46f1f20bedd0d20d0154f009317) )
+
+	ROM_REGION( 0x10000, "ssio:cpu", 0 ) /* ROM's located on the Super Sound I/O Board (90913) */
+	ROM_LOAD( "ssi_oa.a7",    0x0000, 0x1000, CRC(2cbb332b) SHA1(48d1cbb336733588af728a3d0e02c8613d2b5fb2) )
+	ROM_LOAD( "ssi_ob.a8",    0x1000, 0x1000, CRC(1355b7e6) SHA1(61ed045212da67cd449910ae601058cf209b37e5) )
+	ROM_LOAD( "ssi_oc.a9",    0x2000, 0x1000, CRC(6dd4b7c9) SHA1(1ce78c242d1a7d9a4524a663a42fc8bc2870053a) )
+
+	ROM_REGION( 0x04000, "gfx1", 0 ) /* ROM's located on the Super CPU Board (90010) */
+	ROM_LOAD( "scpu_bgg.g3",  0x0000, 0x2000, CRC(1a9ed2f5) SHA1(b0d85b47873ac8ad475da18b9540d37232cb2b7c) )
+	ROM_LOAD( "scpu_bgh.g4",  0x2000, 0x2000, CRC(3220f974) SHA1(a38ea5f1db27f05d9689db838ce7a8de98f34837) )
+
+	ROM_REGION( 0x08000, "gfx2", 0 ) /* ROM's located on the MCR/II Video Gen Board (91399) */
+	ROM_LOAD( "vga.e1",       0x0000, 0x2000, CRC(bc036d1d) SHA1(c5d54d0b80ac768ccf6fdd32cad1ef6359fa324c) )
+	ROM_LOAD( "vgb.dc1",      0x2000, 0x2000, CRC(58ee14d3) SHA1(5fb4268c9c73bdfc3b1e866618979aea3f219bbc) )
+	ROM_LOAD( "vgc.cb1",      0x4000, 0x2000, CRC(3329f9d4) SHA1(11f4d744374e475d2c5b195a9f70888414529dd3) )
+	ROM_LOAD( "vga.a1",       0x6000, 0x2000, CRC(9743f873) SHA1(71ed80ecd8caaf9fce1d7010f95c4678c9bd7102) )
+
+	ROM_REGION( 0x0005, "scpu_pals", 0) /* PAL's located on the Super CPU Board (90010) */
+	ROM_LOAD( "0066-313bx-xxqx.a12.bin", 0x0000, 0x0001, NO_DUMP)
+	ROM_LOAD( "0066-315bx-xxqx.b12.bin", 0x0000, 0x0001, NO_DUMP)
+	ROM_LOAD( "0066-322bx-xx0x.e3.bin",  0x0000, 0x0001, NO_DUMP)
+	ROM_LOAD( "0066-316bx-xxqx.g11.bin", 0x0000, 0x0001, NO_DUMP)
+	ROM_LOAD( "0066-314bx-xxqx.g12.bin", 0x0000, 0x0001, NO_DUMP)
+ROM_END
+
 ROM_START( tronger )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* ROM's located on the Super CPU Board (90010) */
 	ROM_LOAD( "pro0.d2", 0x0000, 0x2000, CRC(ba14603d) SHA1(1cc30c4ea659926314343f00ccbcfe9021f4de26) )
@@ -2987,6 +3023,7 @@ GAME(  1982, tron,      0,        mcr_90010,     tron,      mcr_state,         i
 GAME(  1982, tron2,     tron,     mcr_90010,     tron,      mcr_state,         init_mcr_90010, ROT90, "Bally Midway", "Tron (6/25)", MACHINE_SUPPORTS_SAVE )
 GAME(  1982, tron3,     tron,     mcr_90010,     tron3,     mcr_state,         init_mcr_90010, ROT90, "Bally Midway", "Tron (6/17)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME(  1982, tron4,     tron,     mcr_90010,     tron3,     mcr_state,         init_mcr_90010, ROT90, "Bally Midway", "Tron (6/15)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME(  1982, tron5,     tron,     mcr_90010,     tron3,     mcr_state,         init_mcr_90010, ROT90, "Bally Midway", "Tron (5/12)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME(  1982, tronger,   tron,     mcr_90010,     tron3,     mcr_state,         init_mcr_90010, ROT90, "Bally Midway", "Tron (Germany)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME(  1982, domino,    0,        mcr_90010,     domino,    mcr_state,         init_mcr_90010, ROT0,  "Bally Midway", "Domino Man", MACHINE_SUPPORTS_SAVE )
 GAME(  1982, wacko,     0,        mcr_90010,     wacko,     mcr_state,         init_wacko,     ROT0,  "Bally Midway", "Wacko", MACHINE_SUPPORTS_SAVE )

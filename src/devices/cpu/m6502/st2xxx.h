@@ -1,3 +1,6 @@
+// license:BSD-3-Clause
+// copyright-holders:AJR
+
 #ifndef MAME_CPU_M6502_ST2XXX_H
 #define MAME_CPU_M6502_ST2XXX_H
 

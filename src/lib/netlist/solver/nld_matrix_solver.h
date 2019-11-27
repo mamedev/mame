@@ -195,11 +195,6 @@ namespace solver
 		NETLIB_UPDATEI();
 		NETLIB_RESETI();
 
-	public:
-		int get_net_idx(const analog_net_t *net) const noexcept;
-		std::pair<int, int> get_left_right_of_diag(std::size_t irow, std::size_t idiag);
-		nl_fptype get_weight_around_diag(std::size_t row, std::size_t diag);
-
 		virtual void log_stats();
 
 		virtual std::pair<pstring, pstring> create_solver_code()
@@ -216,22 +211,58 @@ namespace solver
 			const analog_net_t::list_t &nets,
 			const solver_parameters_t *params);
 
-		void sort_terms(matrix_sort_type_e sort);
-
-		void update_dynamic();
-
 		virtual unsigned vsolve_non_dynamic(const bool newton_raphson) = 0;
 		virtual netlist_time compute_next_timestep(const nl_fptype cur_ts) = 0;
 
+		template <typename T>
+		using aligned_alloc = plib::aligned_allocator<T, PALIGN_VECTOROPT>;
+
+		plib::pmatrix2d<nl_fptype, aligned_alloc<nl_fptype>>        m_gonn;
+		plib::pmatrix2d<nl_fptype, aligned_alloc<nl_fptype>>        m_gtn;
+		plib::pmatrix2d<nl_fptype, aligned_alloc<nl_fptype>>        m_Idrn;
+		plib::pmatrix2d<nl_fptype *, aligned_alloc<nl_fptype *>>    m_connected_net_Vn;
+
+		plib::aligned_vector<terms_for_net_t> m_terms;
+
+		const solver_parameters_t &m_params;
+
+		state_var<std::size_t> m_iterative_fail;
+		state_var<std::size_t> m_iterative_total;
+
+	private:
+
+		plib::aligned_vector<terms_for_net_t> m_rails_temp;
+		std::vector<unique_pool_ptr<proxied_analog_output_t>> m_inps;
+
+		state_var<std::size_t> m_stat_calculations;
+		state_var<std::size_t> m_stat_newton_raphson;
+		state_var<std::size_t> m_stat_vsolver_calls;
+
+		state_var<netlist_time> m_last_step;
+		std::vector<core_device_t *> m_step_devices;
+		std::vector<core_device_t *> m_dynamic_devices;
+
+		logic_input_t m_fb_sync;
+		logic_output_t m_Q_sync;
+
+		std::size_t m_ops;
+
+		// base setup - called from constructor
+		void setup_base(const analog_net_t::list_t &nets);
+
+		void sort_terms(matrix_sort_type_e sort);
+
+		void update_dynamic();
+		void step(const netlist_time &delta);
+
+		int get_net_idx(const analog_net_t *net) const noexcept;
+		std::pair<int, int> get_left_right_of_diag(std::size_t irow, std::size_t idiag);
+		nl_fptype get_weight_around_diag(std::size_t row, std::size_t diag);
+
 		void add_term(std::size_t net_idx, terminal_t *term);
 
-		std::size_t max_railstart() const noexcept
-		{
-			std::size_t max_rail = 0;
-			for (std::size_t k = 0; k < m_terms.size(); k++)
-				max_rail = std::max(max_rail, m_terms[k].railstart());
-			return max_rail;
-		}
+		// calculate matrix
+		void setup_matrix();
 
 		void set_pointers()
 		{
@@ -260,6 +291,69 @@ namespace solver
 					m_connected_net_Vn[k][i] = m_terms[k].terms()[i]->connected_terminal()->net().Q_Analog_state_ptr();
 				}
 			}
+		}
+
+	};
+
+	template <typename FT, int SIZE>
+	class matrix_solver_ext_t: public matrix_solver_t
+	{
+		friend class matrix_solver_t;
+	public:
+
+		using float_type = FT;
+
+		matrix_solver_ext_t(netlist_state_t &anetlist, const pstring &name,
+			const analog_net_t::list_t &nets,
+			const solver_parameters_t *params, const std::size_t size)
+		: matrix_solver_t(anetlist, name, nets, params)
+		, m_dim(size)
+		, m_new_V(size)
+		, m_RHS(size)
+		, m_mat_ptr(size, this->max_railstart() + 1)
+		, m_last_V(size, nlconst::zero())
+		, m_DD_n_m_1(size, nlconst::zero())
+		, m_h_n_m_1(size, nlconst::zero())
+		{
+			//
+			// save states
+			//
+			state().save(*this, m_last_V.as_base(), this->name(), "m_last_V");
+			state().save(*this, m_DD_n_m_1.as_base(), this->name(), "m_DD_n_m_1");
+			state().save(*this, m_h_n_m_1.as_base(), this->name(), "m_h_n_m_1");
+		}
+
+
+	private:
+		const std::size_t m_dim;
+
+	protected:
+		static constexpr const std::size_t SIZEABS = plib::parray<FT, SIZE>::SIZEABS();
+		static constexpr const std::size_t m_pitch_ABS = (((SIZEABS + 0) + 7) / 8) * 8;
+
+		PALIGNAS_VECTOROPT()
+		plib::parray<FT, SIZE> m_new_V;
+		PALIGNAS_VECTOROPT()
+		plib::parray<FT, SIZE> m_RHS;
+
+		PALIGNAS_VECTOROPT()
+		plib::parray2D<float_type *, SIZE, 0> m_mat_ptr;
+
+		// FIXME: below should be private
+		// state - variable time_stepping
+		PALIGNAS_VECTOROPT()
+		plib::parray<nl_fptype, SIZE> m_last_V;
+		PALIGNAS_VECTOROPT()
+		plib::parray<nl_fptype, SIZE> m_DD_n_m_1;
+		PALIGNAS_VECTOROPT()
+		plib::parray<nl_fptype, SIZE> m_h_n_m_1;
+
+		std::size_t max_railstart() const noexcept
+		{
+			std::size_t max_rail = 0;
+			for (std::size_t k = 0; k < m_terms.size(); k++)
+				max_rail = std::max(max_rail, m_terms[k].railstart());
+			return max_rail;
 		}
 
 
@@ -316,100 +410,6 @@ namespace solver
 #endif
 			}
 		}
-
-		template <typename T>
-		using aligned_alloc = plib::aligned_allocator<T, PALIGN_VECTOROPT>;
-
-		plib::pmatrix2d<nl_fptype, aligned_alloc<nl_fptype>>        m_gonn;
-		plib::pmatrix2d<nl_fptype, aligned_alloc<nl_fptype>>        m_gtn;
-		plib::pmatrix2d<nl_fptype, aligned_alloc<nl_fptype>>        m_Idrn;
-		plib::pmatrix2d<nl_fptype *, aligned_alloc<nl_fptype *>>    m_connected_net_Vn;
-
-		plib::aligned_vector<terms_for_net_t> m_terms;
-		plib::aligned_vector<terms_for_net_t> m_rails_temp;
-
-		std::vector<unique_pool_ptr<proxied_analog_output_t>> m_inps;
-
-		const solver_parameters_t &m_params;
-
-		state_var<int> m_stat_calculations;
-		state_var<int> m_stat_newton_raphson;
-		state_var<int> m_stat_vsolver_calls;
-		state_var<int> m_iterative_fail;
-		state_var<int> m_iterative_total;
-
-	private:
-
-		state_var<netlist_time> m_last_step;
-		std::vector<core_device_t *> m_step_devices;
-		std::vector<core_device_t *> m_dynamic_devices;
-
-		logic_input_t m_fb_sync;
-		logic_output_t m_Q_sync;
-
-		// base setup - called from constructor
-		void setup_base(const analog_net_t::list_t &nets);
-
-		// calculate matrix
-		void setup_matrix();
-
-		void step(const netlist_time &delta);
-
-		std::size_t m_ops;
-	};
-
-	template <typename FT, int SIZE>
-	class matrix_solver_ext_t: public matrix_solver_t
-	{
-		friend class matrix_solver_t;
-	public:
-
-		using float_type = FT;
-
-		matrix_solver_ext_t(netlist_state_t &anetlist, const pstring &name,
-			const analog_net_t::list_t &nets,
-			const solver_parameters_t *params, const std::size_t size)
-		: matrix_solver_t(anetlist, name, nets, params)
-		, m_dim(size)
-		, m_new_V(size)
-		, m_RHS(size)
-		, m_mat_ptr(size, this->max_railstart() + 1)
-		, m_last_V(size, nlconst::zero())
-		, m_DD_n_m_1(size, nlconst::zero())
-		, m_h_n_m_1(size, nlconst::zero())
-		{
-			//
-			// save states
-			//
-			state().save(*this, m_last_V.as_base(), this->name(), "m_last_V");
-			state().save(*this, m_DD_n_m_1.as_base(), this->name(), "m_DD_n_m_1");
-			state().save(*this, m_h_n_m_1.as_base(), this->name(), "m_h_n_m_1");
-		}
-
-
-	private:
-		const std::size_t m_dim;
-
-	protected:
-		static constexpr const std::size_t SIZEABS = plib::parray<FT, SIZE>::SIZEABS();
-		static constexpr const std::size_t m_pitch_ABS = (((SIZEABS + 0) + 7) / 8) * 8;
-
-		PALIGNAS_VECTOROPT()
-		plib::parray<FT, SIZE> m_new_V;
-		PALIGNAS_VECTOROPT()
-		plib::parray<FT, SIZE> m_RHS;
-
-		PALIGNAS_VECTOROPT()
-		plib::parray2D<float_type *, SIZE, 0> m_mat_ptr;
-
-		// FIXME: below should be private
-		// state - variable time_stepping
-		PALIGNAS_VECTOROPT()
-		plib::parray<nl_fptype, SIZE> m_last_V;
-		PALIGNAS_VECTOROPT()
-		plib::parray<nl_fptype, SIZE> m_DD_n_m_1;
-		PALIGNAS_VECTOROPT()
-		plib::parray<nl_fptype, SIZE> m_h_n_m_1;
 
 		constexpr std::size_t size() const noexcept
 		{

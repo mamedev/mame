@@ -40,11 +40,11 @@ namespace solver
 		const solver_parameters_t *params)
 		: device_t(anetlist, name)
 		, m_params(*params)
+		, m_iterative_fail(*this, "m_iterative_fail", 0)
+		, m_iterative_total(*this, "m_iterative_total", 0)
 		, m_stat_calculations(*this, "m_stat_calculations", 0)
 		, m_stat_newton_raphson(*this, "m_stat_newton_raphson", 0)
 		, m_stat_vsolver_calls(*this, "m_stat_vsolver_calls", 0)
-		, m_iterative_fail(*this, "m_iterative_fail", 0)
-		, m_iterative_total(*this, "m_iterative_total", 0)
 		, m_last_step(*this, "m_last_step", netlist_time::zero())
 		, m_fb_sync(*this, "FB_sync")
 		, m_Q_sync(*this, "Q_sync")
@@ -419,6 +419,7 @@ namespace solver
 			{
 				update_dynamic();
 				// Gauss-Seidel will revert to Gaussian elemination if steps exceeded.
+				this->m_stat_calculations++;
 				this_resched = this->vsolve_non_dynamic(true);
 				newton_loops++;
 			} while (this_resched > 1 && newton_loops < m_params.m_nr_loops);
@@ -433,6 +434,7 @@ namespace solver
 		}
 		else
 		{
+			this->m_stat_calculations++;
 			this->vsolve_non_dynamic(false);
 		}
 

@@ -150,8 +150,7 @@ enum
 	TEXTURE_TYPE_SURFACE
 };
 
-//#undef GL_TEXTURE_2D
-//#define GL_TEXTURE_2D GL_TEXTURE_2D_MULTISAMPLE
+
 //============================================================
 //  MACROS
 //============================================================
@@ -507,7 +506,7 @@ void renderer_ogl::initialize_gl()
 
 	if (strstr(extstr, "GL_EXT_framebuffer_object"))
 	{
-		//m_usefbo = 1;
+		m_usefbo = 1;
 		if (!s_shown_video_info)
 		{
 			if(m_usefbo)
@@ -1124,21 +1123,11 @@ int renderer_ogl::draw(const int update)
 
 		GLsizei iScale = 1;
 
-#if 1
-		glEnable(GL_FRAMEBUFFER_SRGB);
-		glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-		glEnable(GL_LINE_SMOOTH);
-		glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
-		glEnable(GL_POLYGON_SMOOTH);
-		glEnable(GL_MULTISAMPLE_ARB);
-		glEnable(GL_MULTISAMPLE);
-#endif
 		/*
 		    Mac hack: macOS version 10.15 and later flipped from assuming you don't support Retina to
 		    assuming you do support Retina.  SDL 2.0.11 is scheduled to fix this, but it's not out yet.
 		    So we double-scale everything if you're on 10.15 or later and SDL is not at least version 2.0.11.
 		*/
-
 		#if defined(SDLMAME_MACOSX) || defined(OSD_MAC)
 		SDL_version sdlVers;
 		SDL_GetVersion(&sdlVers);
