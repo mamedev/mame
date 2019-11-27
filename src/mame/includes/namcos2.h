@@ -67,6 +67,12 @@ public:
 	void configure_c65_standard(machine_config &config);
 	void configure_c68_standard(machine_config &config);
 	void configure_c123tmap_standard(machine_config &config);
+	void configure_c169roz_standard(machine_config &config);
+	void configure_c355spr_standard(machine_config &config);
+	void configure_c45road_standard(machine_config &config);
+	void configure_common_standard(machine_config &config);
+	void configure_namcos2_sprite_standard(machine_config &config);
+	void configure_namcos2_roz_standard(machine_config &config);
 	void metlhawk(machine_config &config);
 	void gollygho(machine_config &config);
 	void assaultp(machine_config &config);
@@ -245,8 +251,11 @@ enum
 	void common_default_am(address_map &map);
 	void common_finallap_am(address_map &map);
 	void common_suzuka8h_am(address_map &map);
+	void common_suzuka8h_roz_am(address_map &map);
+	void common_luckywld_roz_am(address_map &map);
 	void common_metlhawk_am(address_map &map);
 	void common_sgunner_am(address_map &map);
+	void master_common_am(address_map &map);
 	void master_default_am(address_map &map);
 	void master_finallap_am(address_map &map);
 	void master_suzuka8h_am(address_map &map);
@@ -255,6 +264,7 @@ enum
 	void master_sgunner_am(address_map &map);
 
 	void namcos2_68k_default_cpu_board_am(address_map &map);
+	void slave_common_am(address_map &map);
 	void slave_default_am(address_map &map);
 	void slave_finallap_am(address_map &map);
 	void slave_suzuka8h_am(address_map &map);
