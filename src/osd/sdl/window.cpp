@@ -697,24 +697,10 @@ int sdl_window_info::complete_create()
 	if (renderer().has_flags(osd_renderer::FLAG_NEEDS_OPENGL) && !video_config.novideo)
 	{
 		SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
-
-		/* FIXME: A reminder that gamma is wrong throughout MAME. Currently, SDL2.0 doesn't seem to
-		    * support the following attribute although my hardware lists GL_ARB_framebuffer_sRGB as an extension.
-		    *
-		    * SDL_GL_SetAttribute( SDL_GL_FRAMEBUFFER_SRGB_CAPABLE, 1 );
-		    *
-		    */
 		m_extra_flags = SDL_WINDOW_OPENGL;
 	}
 	else
 		m_extra_flags = 0;
-
-#ifdef SDLMAME_MACOSX
-	/* FIMXE: On OSX, SDL_WINDOW_FULLSCREEN_DESKTOP seems to be more reliable.
-	 *        It however creates issues with white borders, i.e. the screen clear
-	 *        does not work. This happens both with opengl and accel.
-	 */
-#endif
 
 	// We need to workaround an issue in SDL 2.0.4 for OS X where setting the
 	// relative mode on the mouse in fullscreen mode makes mouse events stop
