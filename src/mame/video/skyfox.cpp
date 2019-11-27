@@ -149,8 +149,8 @@ void skyfox_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 
 		if (m_bg_ctrl & 1) // flipscreen
 		{
-			x = width  - x - (n - 1) * 8;
-			y = height - y - (n - 1) * 8;
+			x = width  - x - n * 8;
+			y = height - y - n * 8;
 			flipx = !flipx;
 			flipy = !flipy;
 		}
@@ -212,11 +212,8 @@ void skyfox_state::draw_background(bitmap_ind16 &bitmap, const rectangle &clipre
 		int y = (i >> 4);
 		x += 0x60; // Adjustment based on PCB display
 
-		if (m_bg_ctrl & 1) // flipscreen
-		{
-			x = 512 * 2 - (x % (512 * 2));
-			y = 256     - (y % 256);
-		}
+		// When flipscreen is enabled, direction of background scroll is reversed by the in-game subroutine.
+		// This PCB seems does not support background flip.
 
 		if (((m_bg_ctrl >> 4) & 3) != (pen & 3) || !shining)
 			bitmap.pix16(y % 256, x % 512) = pen;
