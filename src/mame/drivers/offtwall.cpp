@@ -445,9 +445,9 @@ ROM_END
 void offtwall_state::init_offtwall()
 {
 	/* install son-of-slapstic workarounds */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x3fde42, 0x3fde43, read16_delegate(FUNC(offtwall_state::spritecache_count_r),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x037ec2, 0x037f39, read16_delegate(FUNC(offtwall_state::bankswitch_r),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x3fdf1e, 0x3fdf1f, read16_delegate(FUNC(offtwall_state::unknown_verify_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x3fde42, 0x3fde43, read16_delegate(*this, FUNC(offtwall_state::spritecache_count_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x037ec2, 0x037f39, read16_delegate(*this, FUNC(offtwall_state::bankswitch_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x3fdf1e, 0x3fdf1f, read16_delegate(*this, FUNC(offtwall_state::unknown_verify_r)));
 	m_spritecache_count = m_mainram + (0x3fde42 - 0x3fd800)/2;
 	m_bankswitch_base = (uint16_t *)(memregion("maincpu")->base() + 0x37ec2);
 	m_unknown_verify_base = m_mainram + (0x3fdf1e - 0x3fd800)/2;
@@ -457,9 +457,9 @@ void offtwall_state::init_offtwall()
 void offtwall_state::init_offtwalc()
 {
 	/* install son-of-slapstic workarounds */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x3fde42, 0x3fde43, read16_delegate(FUNC(offtwall_state::spritecache_count_r),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x037eca, 0x037f43, read16_delegate(FUNC(offtwall_state::bankswitch_r),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x3fdf24, 0x3fdf25, read16_delegate(FUNC(offtwall_state::unknown_verify_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x3fde42, 0x3fde43, read16_delegate(*this, FUNC(offtwall_state::spritecache_count_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x037eca, 0x037f43, read16_delegate(*this, FUNC(offtwall_state::bankswitch_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x3fdf24, 0x3fdf25, read16_delegate(*this, FUNC(offtwall_state::unknown_verify_r)));
 	m_spritecache_count = m_mainram + (0x3fde42 - 0x3fd800)/2;
 	m_bankswitch_base = (uint16_t *)(memregion("maincpu")->base() + 0x37eca);
 	m_unknown_verify_base = m_mainram + (0x3fdf24 - 0x3fd800)/2;

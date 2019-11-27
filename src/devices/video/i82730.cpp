@@ -58,6 +58,7 @@ i82730_device::i82730_device(const machine_config &mconfig, const char *tag, dev
 	device_t(mconfig, I82730, tag, owner, clock),
 	device_video_interface(mconfig, *this),
 	m_sint_handler(*this),
+	m_update_row_cb(*this),
 	m_cpu(*this, finder_base::DUMMY_TAG),
 	m_program(nullptr),
 	m_row_timer(nullptr),
@@ -101,7 +102,7 @@ void i82730_device::device_start()
 	m_sint_handler.resolve_safe();
 
 	// bind delegates
-	m_update_row_cb.bind_relative_to(*owner());
+	m_update_row_cb.resolve();
 
 	// allocate row timer
 	m_row_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(i82730_device::row_update), this));

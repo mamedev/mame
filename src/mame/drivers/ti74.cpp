@@ -504,7 +504,7 @@ void ti74_state::machine_start()
 	m_lamps.resolve();
 
 	if (m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0xbfff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0xbfff, read8sm_delegate(*m_cart, FUNC(generic_slot_device::read_rom)));
 
 	membank("sysbank")->configure_entries(0, 4, memregion("system")->base(), 0x2000);
 	membank("sysbank")->set_entry(0);
@@ -544,10 +544,10 @@ void ti74_state::ti74(machine_config &config)
 
 	hd44780_device &hd44780(HD44780(config, "hd44780", 0)); // 270kHz
 	hd44780.set_lcd_size(2, 16); // 2*16 internal
-	hd44780.set_pixel_update_cb(FUNC(ti74_state::ti74_pixel_update), this);
+	hd44780.set_pixel_update_cb(FUNC(ti74_state::ti74_pixel_update));
 
 	/* cartridge */
-	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "ti74_cart", "bin,rom,256").set_device_load(FUNC(ti74_state::cart_load), this);
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "ti74_cart", "bin,rom,256").set_device_load(FUNC(ti74_state::cart_load));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("ti74_cart");
 }
@@ -578,10 +578,10 @@ void ti74_state::ti95(machine_config &config)
 
 	hd44780_device &hd44780(HD44780(config, "hd44780", 0));
 	hd44780.set_lcd_size(2, 16);
-	hd44780.set_pixel_update_cb(FUNC(ti74_state::ti95_pixel_update), this);
+	hd44780.set_pixel_update_cb(FUNC(ti74_state::ti95_pixel_update));
 
 	/* cartridge */
-	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "ti95_cart", "bin,rom,256").set_device_load(FUNC(ti74_state::cart_load), this);
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "ti95_cart", "bin,rom,256").set_device_load(FUNC(ti74_state::cart_load));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("ti95_cart");
 }

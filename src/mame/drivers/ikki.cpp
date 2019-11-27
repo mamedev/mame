@@ -265,8 +265,7 @@ void ikki_state::ikki(machine_config &config)
 	m_subcpu->set_addrmap(AS_PROGRAM, &ikki_state::ikki_cpu2);
 	m_subcpu->set_periodic_int(FUNC(ikki_state::irq0_line_hold), attotime::from_hz(2*(PIXEL_CLOCK/HTOTAL/VTOTAL)));
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
-
+	config.set_perfect_quantum(m_maincpu);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

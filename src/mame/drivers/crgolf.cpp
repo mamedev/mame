@@ -476,7 +476,7 @@ void crgolf_state::crgolf(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &crgolf_state::sound_map);
 	m_audiocpu->set_vblank_int("screen", FUNC(crgolf_state::irq0_line_hold));
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // 1H
 	mainlatch.q_out_cb<3>().set(FUNC(crgolf_state::color_select_w));
@@ -757,7 +757,7 @@ ROM_END
 
 void crgolf_state::init_crgolfhi()
 {
-	m_audiocpu->space(AS_PROGRAM).install_write_handler(0xa000, 0xa003, write8_delegate(FUNC(crgolf_state::crgolfhi_sample_w),this));
+	m_audiocpu->space(AS_PROGRAM).install_write_handler(0xa000, 0xa003, write8_delegate(*this, FUNC(crgolf_state::crgolfhi_sample_w)));
 }
 
 

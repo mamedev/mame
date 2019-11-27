@@ -26,8 +26,8 @@ class segaorun_state : public sega_16bit_common_base
 {
 public:
 	// construction/destruction
-	segaorun_state(const machine_config &mconfig, device_type type, const char *tag)
-		: sega_16bit_common_base(mconfig, type, tag),
+	segaorun_state(const machine_config &mconfig, device_type type, const char *tag) :
+		sega_16bit_common_base(mconfig, type, tag),
 		m_mapper(*this, "mapper"),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "subcpu"),
@@ -44,6 +44,8 @@ public:
 		m_digital_ports(*this, { { "SERVICE", "UNKNOWN", "COINAGE", "DSW" } }),
 		m_adc_ports(*this, "ADC.%u", 0),
 		m_workram(*this, "workram"),
+		m_custom_io_r(*this),
+		m_custom_io_w(*this),
 		m_custom_map(nullptr),
 		m_shangon_video(false),
 		m_scanline_timer(nullptr),
@@ -155,15 +157,15 @@ protected:
 	// configuration
 	read16_delegate     m_custom_io_r;
 	write16_delegate    m_custom_io_w;
-	const uint8_t *       m_custom_map;
+	const uint8_t *     m_custom_map;
 	bool                m_shangon_video;
 
 	// internal state
 	emu_timer *         m_scanline_timer;
 	emu_timer *         m_irq2_gen_timer;
-	uint8_t               m_irq2_state;
-	uint8_t               m_adc_select;
-	uint8_t               m_vblank_irq_state;
+	uint8_t             m_irq2_state;
+	uint8_t             m_adc_select;
+	uint8_t             m_vblank_irq_state;
 	int                 m_bankmotor_pos;
 	int                 m_bankmotor_delta;
 };

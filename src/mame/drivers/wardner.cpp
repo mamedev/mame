@@ -398,7 +398,7 @@ void wardner_state::wardner(machine_config &config)
 	m_dsp->set_addrmap(AS_IO, &wardner_state::dsp_io_map);
 	m_dsp->bio().set(FUNC(wardner_state::twincobr_bio_r));
 
-	config.m_minimum_quantum = attotime::from_hz(6000); /* 100 CPU slices per frame */
+	config.set_maximum_quantum(attotime::from_hz(6000)); /* 100 CPU slices per frame */
 
 	ls259_device &mainlatch(LS259(config, "mainlatch"));
 	mainlatch.q_out_cb<2>().set(FUNC(wardner_state::int_enable_w));

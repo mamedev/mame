@@ -228,7 +228,7 @@ Regular game cartridges
 |        | 80-092142-123(NL) | Spider-Man en Vrienden! - Geheime Missies (Yellow webs)                                        |
 |        | 80-092143(UK)     | Spider-Man & Friends - Secret Missions (no # on front label)                                   |
 |        | 80-092143-103(UK) | Spider-Man & Friends - Secret Missions (ALT)                                                   |
-|        | 80-092144(GE)     | Spider-Man & Freunde - Geheime Missionen                                                       |
+|   XX   | 80-092144(GE)     | Spider-Man & Freunde - Geheime Missionen                                                       |
 |   XX   | 80-092145(FR)     | Spider-Man & ses amis - Missions Secrètes (white webs)                                         |
 |        | 80-092145-105(FR) | Spider-Man & ses amis - Missions Secrètes (yellow webs)                                        |
 |        | 80-092146(PT)     | Spider-man & Amigos - Missoes Secretas                                                         |
@@ -3127,6 +3127,23 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="cart_type" value="lilac" />
 			<dataarea name="rom" size="8388608">
 				<rom name="Spider-Man and Friends - Missioni Segrete (Italy).bin" size="8388608" crc="15af0018" sha1="f29ac0ac8ba68ecc515ead523e246f416e706e0a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spidermisg" cloneof="spidermisr101" supported="yes">
+		<description>Spider-Man &amp; Freunde - Geheime Missionen (Germany)</description>
+		<year>2005</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092144(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="pcb" value="708894" />
+			<feature name="pcb_model" value="708894-E" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="92144.u1" size="8388608" crc="a627298d" sha1="05fd1619c3429283ee462edef7db552b277ed0b0" />
 			</dataarea>
 		</part>
 	</software>

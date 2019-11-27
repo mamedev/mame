@@ -149,10 +149,11 @@ void menu_dats_view::populate(float &customtop, float &custombottom)
 
 void menu_dats_view::draw(uint32_t flags)
 {
+	float const aspect = machine().render().ui_aspect(&container());
 	float const line_height = ui().get_line_height();
-	float const ud_arrow_width = line_height * machine().render().ui_aspect();
-	float const gutter_width = 0.52f * line_height * machine().render().ui_aspect();
-	float const visible_width = 1.0f - (2.0f * ui().box_lr_border());
+	float const ud_arrow_width = line_height * aspect;
+	float const gutter_width = 0.52f * line_height * aspect;
+	float const visible_width = 1.0f - (2.0f * ui().box_lr_border() * aspect);
 	float const visible_left = (1.0f - visible_width) * 0.5f;
 	float const extra_height = 2.0f * line_height;
 	float const visible_extra_menu_height = get_customtop() + get_custombottom() + extra_height;
@@ -191,7 +192,7 @@ void menu_dats_view::draw(uint32_t flags)
 	int const n_loop = (std::min)(visible_items, m_visible_lines);
 	for (int linenum = 0; linenum < n_loop; linenum++)
 	{
-		float const line_y = visible_top + (float)linenum * line_height;
+		float const line_y = visible_top + float(linenum) * line_height;
 		int const itemnum = top_line + linenum;
 		menu_item const &pitem = item(itemnum);
 		char const *const itemtext = pitem.text.c_str();
@@ -295,9 +296,10 @@ void menu_dats_view::custom_render(void *selectedref, float top, float bottom, f
 	float width;
 	std::string driver = (m_issoft == true) ? m_swinfo->longname : m_driver->type.fullname();
 
+	float const lr_border = ui().box_lr_border() * machine().render().ui_aspect(&container());
 	ui().draw_text_full(container(), driver.c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
 		mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), &width, nullptr);
-	width += 2 * ui().box_lr_border();
+	width += 2 * lr_border;
 	maxwidth = std::max(maxwidth, width);
 
 	// compute our bounds
@@ -310,8 +312,8 @@ void menu_dats_view::custom_render(void *selectedref, float top, float bottom, f
 	ui().draw_outlined_box(container(), x1, y1, x2, y2, UI_GREEN_COLOR);
 
 	// take off the borders
-	x1 += ui().box_lr_border();
-	x2 -= ui().box_lr_border();
+	x1 += lr_border;
+	x2 -= lr_border;
 	y1 += ui().box_tb_border();
 
 	ui().draw_text_full(container(), driver.c_str(), x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::NEVER,
@@ -328,8 +330,8 @@ void menu_dats_view::custom_render(void *selectedref, float top, float bottom, f
 	float space = (1.0f - maxwidth) / (m_items_list.size() * 2);
 
 	// compute our bounds
-	x1 -= ui().box_lr_border();
-	x2 += ui().box_lr_border();
+	x1 -= lr_border;
+	x2 += lr_border;
 	y1 = y2 + ui().box_tb_border();
 	y2 += ui().get_line_height() + 2.0f * ui().box_tb_border();
 
@@ -361,7 +363,7 @@ void menu_dats_view::custom_render(void *selectedref, float top, float bottom, f
 	std::string revision;
 	revision.assign(_("Revision: ")).append(m_items_list[m_actual].revision);
 	ui().draw_text_full(container(), revision.c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE, mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), &width, nullptr);
-	width += 2 * ui().box_lr_border();
+	width += 2 * lr_border;
 	maxwidth = std::max(origx2 - origx1, width);
 
 	// compute our bounds
@@ -374,8 +376,8 @@ void menu_dats_view::custom_render(void *selectedref, float top, float bottom, f
 	ui().draw_outlined_box(container(), x1, y1, x2, y2, UI_GREEN_COLOR);
 
 	// take off the borders
-	x1 += ui().box_lr_border();
-	x2 -= ui().box_lr_border();
+	x1 += lr_border;
+	x2 -= lr_border;
 	y1 += ui().box_tb_border();
 
 	// draw the text within it
@@ -393,9 +395,10 @@ void menu_dats_view::get_data()
 	std::string buffer;
 	mame_machine_manager::instance()->lua()->call_plugin("data", m_items_list[m_actual].option, buffer);
 
+	float const aspect = machine().render().ui_aspect(&container());
 	float const line_height = ui().get_line_height();
-	float const gutter_width = 0.52f * line_height * machine().render().ui_aspect();
-	float const visible_width = 1.0f - (2.0f * ui().box_lr_border());
+	float const gutter_width = 0.52f * line_height * aspect;
+	float const visible_width = 1.0f - (2.0f * ui().box_lr_border() * aspect);
 	float const effective_width = visible_width - 2.0f * gutter_width;
 
 	auto lines = ui().wrap_text(container(), buffer.c_str(), 0.0f, 0.0f, effective_width, xstart, xend);
@@ -417,7 +420,7 @@ void menu_dats_view::get_data_sw()
 	else
 		mame_machine_manager::instance()->lua()->call_plugin("data", m_items_list[m_actual].option - 1, buffer);
 
-	auto lines = ui().wrap_text(container(), buffer.c_str(), 0.0f, 0.0f, 1.0f - (4.0f * ui().box_lr_border()), xstart, xend);
+	auto lines = ui().wrap_text(container(), buffer.c_str(), 0.0f, 0.0f, 1.0f - (4.0f * ui().box_lr_border() * machine().render().ui_aspect(&container())), xstart, xend);
 	for (int x = 0; x < lines; ++x)
 	{
 		std::string tempbuf(buffer.substr(xstart[x], xend[x] - xstart[x]));

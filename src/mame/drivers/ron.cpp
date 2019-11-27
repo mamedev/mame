@@ -496,7 +496,7 @@ void ron_state::ron(machine_config &config)
 	I8035(config, m_audiocpu, SOUND_CLOCK);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &ron_state::ron_audio_map);
 	m_audiocpu->set_addrmap(AS_IO, &ron_state::ron_audio_io);
-	m_audiocpu->set_t0_clk_cb("aysnd", FUNC(device_t::set_unscaled_clock));
+	m_audiocpu->set_t0_clk_cb("aysnd", FUNC(device_t::set_unscaled_clock_int));
 	m_audiocpu->p2_in_cb().set(FUNC(ron_state::audio_cmd_r));
 	m_audiocpu->p1_out_cb().set(FUNC(ron_state::audio_p1_w));
 	m_audiocpu->p2_out_cb().set(FUNC(ron_state::audio_p2_w));

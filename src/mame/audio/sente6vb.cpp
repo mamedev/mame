@@ -113,7 +113,7 @@ void sente6vb_device::device_add_mconfig(machine_config &config)
 	uartclock.signal_handler().append(m_uart, FUNC(acia6850_device::write_txc));
 	uartclock.signal_handler().append(m_uart, FUNC(acia6850_device::write_rxc));
 
-	TIMER(config, m_counter_0_timer, 0).configure_generic(timer_device::expired_delegate(FUNC(sente6vb_device::clock_counter_0_ff), this));
+	TIMER(config, m_counter_0_timer, 0).configure_generic(FUNC(sente6vb_device::clock_counter_0_ff));
 
 	PIT8253(config, m_pit, 0);
 	m_pit->out_handler<0>().set(FUNC(sente6vb_device::counter_0_set_out));
@@ -131,12 +131,12 @@ void sente6vb_device::device_add_mconfig(machine_config &config)
 		cem_device->add_route(ALL_OUTPUTS, "mono", 0.90);
 	}
 
-	m_cem_device[0]->set_ext_input_callback(FUNC(sente6vb_device::noise_gen_0), this);
-	m_cem_device[1]->set_ext_input_callback(FUNC(sente6vb_device::noise_gen_1), this);
-	m_cem_device[2]->set_ext_input_callback(FUNC(sente6vb_device::noise_gen_2), this);
-	m_cem_device[3]->set_ext_input_callback(FUNC(sente6vb_device::noise_gen_3), this);
-	m_cem_device[4]->set_ext_input_callback(FUNC(sente6vb_device::noise_gen_4), this);
-	m_cem_device[5]->set_ext_input_callback(FUNC(sente6vb_device::noise_gen_5), this);
+	m_cem_device[0]->set_ext_input_callback(FUNC(sente6vb_device::noise_gen_0));
+	m_cem_device[1]->set_ext_input_callback(FUNC(sente6vb_device::noise_gen_1));
+	m_cem_device[2]->set_ext_input_callback(FUNC(sente6vb_device::noise_gen_2));
+	m_cem_device[3]->set_ext_input_callback(FUNC(sente6vb_device::noise_gen_3));
+	m_cem_device[4]->set_ext_input_callback(FUNC(sente6vb_device::noise_gen_4));
+	m_cem_device[5]->set_ext_input_callback(FUNC(sente6vb_device::noise_gen_5));
 }
 
 

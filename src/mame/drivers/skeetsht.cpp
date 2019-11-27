@@ -225,7 +225,7 @@ INPUT_PORTS_END
 
 void skeetsht_state::skeetsht(machine_config &config)
 {
-	MC68HC11A1(config, m_68hc11, 4000000); // ?
+	MC68HC11A1(config, m_68hc11, 8000000); // ?
 	m_68hc11->set_addrmap(AS_PROGRAM, &skeetsht_state::hc11_pgm_map);
 	m_68hc11->out_pa_callback().set(FUNC(skeetsht_state::hc11_porta_w));
 

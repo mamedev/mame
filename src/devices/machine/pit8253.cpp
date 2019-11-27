@@ -1067,9 +1067,11 @@ void pit_counter_device::set_clockin(double new_clockin)
 {
 	LOG2("set_clockin(): clockin = %f\n", new_clockin);
 
-	update();
+	if (started())
+		update();
 	m_clockin = new_clockin;
-	update();
+	if (started())
+		update();
 }
 
 

@@ -1,17 +1,13 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * pfm_log.cpp
- *
- */
 
 #include "pfmtlog.h"
 #include "palloc.h"
+#include "pstonum.h"
 #include "pstrutil.h"
 
 #include <algorithm>
 #include <array>
-#include <cmath>
 #include <iomanip>
 #include <iostream>
 
@@ -48,6 +44,7 @@ pfmt::rtype pfmt::setfmt(std::stringstream &strm, char32_t cfmt_spec)
 	pstring fmt;
 	pstring search("{");
 	search += plib::to_string(m_arg);
+
 	rtype r;
 
 	r.sl = search.size();
@@ -93,31 +90,39 @@ pfmt::rtype pfmt::setfmt(std::stringstream &strm, char32_t cfmt_spec)
 	if (r.p != pstring::npos)
 	{
 		// a.b format here ...
+		char32_t pend(0);
+		int width(0);
 		if (fmt != "" && pstring("duxofge").find(static_cast<pstring::value_type>(cfmt_spec)) != pstring::npos)
 		{
-			r.pend = static_cast<char32_t>(fmt.at(fmt.size() - 1));
-			if (pstring("duxofge").find(static_cast<pstring::value_type>(r.pend)) == pstring::npos)
-				r.pend = cfmt_spec;
+			pend = static_cast<char32_t>(fmt.at(fmt.size() - 1));
+			if (pstring("duxofge").find(static_cast<pstring::value_type>(pend)) == pstring::npos)
+				pend = cfmt_spec;
 			else
 				fmt = plib::left(fmt, fmt.size() - 1);
 		}
 		else
 			// FIXME: Error
-			r.pend = cfmt_spec;
+			pend = cfmt_spec;
 
 		auto pdot(fmt.find('.'));
 
 		if (pdot==0)
-			strm << std::setprecision(pstonum<int>(fmt.substr(1)));
+			strm << std::setprecision(pstonum_ne_def<int>(fmt.substr(1), 6));
 		else if (pdot != pstring::npos)
 		{
-			strm << std::setprecision(pstonum<int>(fmt.substr(pdot + 1)));
-			r.width = pstonum<int>(left(fmt,pdot));
+			strm << std::setprecision(pstonum_ne_def<int>(fmt.substr(pdot + 1), 6));
+			width = pstonum_ne_def<int>(left(fmt,pdot), 0);
 		}
 		else if (fmt != "")
-			r.width = pstonum<int>(fmt);
+			width = pstonum_ne_def<int>(fmt, 0);
 
-		switch (r.pend)
+		auto aw(plib::abs(width));
+
+		strm << std::setw(aw);
+		if (width < 0)
+			strm << std::left;
+
+		switch (pend)
 		{
 			case 'x':
 				strm << std::hex;

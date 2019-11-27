@@ -1,5 +1,5 @@
 // license:GPL-2.0+
-//+opyright-holders:Couriersud
+// copyright-holders:Couriersud
 /*
  * nld_9310.c
  *

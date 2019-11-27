@@ -173,8 +173,9 @@ DEFINE_DEVICE_TYPE(DMVCART_SLOT, dmvcart_slot_device, "dmvcart_slot", "Decision 
 //  device_dmvslot_interface - constructor
 //-------------------------------------------------
 
-device_dmvslot_interface::device_dmvslot_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device)
+device_dmvslot_interface::device_dmvslot_interface(const machine_config &mconfig, device_t &device) :
+	device_interface(device, "dmvbus"),
+	m_bus(dynamic_cast<dmvcart_slot_device *>(device.owner()))
 {
 }
 
@@ -197,7 +198,7 @@ device_dmvslot_interface::~device_dmvslot_interface()
 //-------------------------------------------------
 dmvcart_slot_device::dmvcart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, DMVCART_SLOT, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_dmvslot_interface>(mconfig, *this),
 	m_prog_read_cb(*this),
 	m_prog_write_cb(*this),
 	m_out_int_cb(*this),
@@ -224,7 +225,7 @@ dmvcart_slot_device::~dmvcart_slot_device()
 
 void dmvcart_slot_device::device_start()
 {
-	m_cart = dynamic_cast<device_dmvslot_interface *>(get_card_device());
+	m_cart = get_card_device();
 
 	// resolve callbacks
 	m_prog_read_cb.resolve_safe(0);

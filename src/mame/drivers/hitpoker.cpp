@@ -349,7 +349,7 @@ GFXDECODE_END
 
 void hitpoker_state::hitpoker(machine_config &config)
 {
-	MC68HC11A1(config, m_maincpu, 1000000);
+	MC68HC11A1(config, m_maincpu, 8'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &hitpoker_state::hitpoker_map);
 	m_maincpu->in_pa_callback().set(FUNC(hitpoker_state::hitpoker_pic_r));
 	m_maincpu->out_pa_callback().set(FUNC(hitpoker_state::hitpoker_pic_w));

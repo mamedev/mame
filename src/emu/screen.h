@@ -12,6 +12,7 @@
 
 #pragma once
 
+#include <type_traits>
 #include <utility>
 
 
@@ -338,36 +339,29 @@ public:
 		m_yoffset = yoffs;
 	}
 
-	// FIXME: these should be aware of current device for resolving the tag
-	template <class FunctionClass>
-	void set_screen_update(u32 (FunctionClass::*callback)(screen_device &, bitmap_ind16 &, const rectangle &), const char *name)
+	template <typename F>
+	std::enable_if_t<screen_update_ind16_delegate::supports_callback<F>::value> set_screen_update(F &&callback, const char *name)
 	{
-		set_screen_update(screen_update_ind16_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
+		m_screen_update_ind16.set(std::forward<F>(callback), name);
+		m_screen_update_rgb32 = screen_update_rgb32_delegate(*this);
 	}
-	template <class FunctionClass>
-	void set_screen_update(u32 (FunctionClass::*callback)(screen_device &, bitmap_rgb32 &, const rectangle &), const char *name)
+	template <typename F>
+	std::enable_if_t<screen_update_rgb32_delegate::supports_callback<F>::value> set_screen_update(F &&callback, const char *name)
 	{
-		set_screen_update(screen_update_rgb32_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
+		m_screen_update_ind16 = screen_update_ind16_delegate(*this);
+		m_screen_update_rgb32.set(std::forward<F>(callback), name);
 	}
-	template <class FunctionClass>
-	void set_screen_update(const char *devname, u32 (FunctionClass::*callback)(screen_device &, bitmap_ind16 &, const rectangle &), const char *name)
+	template <typename T, typename F>
+	std::enable_if_t<screen_update_ind16_delegate::supports_callback<F>::value> set_screen_update(T &&target, F &&callback, const char *name)
 	{
-		set_screen_update(screen_update_ind16_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
+		m_screen_update_ind16.set(std::forward<T>(target), std::forward<F>(callback), name);
+		m_screen_update_rgb32 = screen_update_rgb32_delegate(*this);
 	}
-	template <class FunctionClass>
-	void set_screen_update(const char *devname, u32 (FunctionClass::*callback)(screen_device &, bitmap_rgb32 &, const rectangle &), const char *name)
+	template <typename T, typename F>
+	std::enable_if_t<screen_update_rgb32_delegate::supports_callback<F>::value> set_screen_update(T &&target, F &&callback, const char *name)
 	{
-		set_screen_update(screen_update_rgb32_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
-	}
-	void set_screen_update(screen_update_ind16_delegate callback)
-	{
-		m_screen_update_ind16 = callback;
-		m_screen_update_rgb32 = screen_update_rgb32_delegate();
-	}
-	void set_screen_update(screen_update_rgb32_delegate callback)
-	{
-		m_screen_update_ind16 = screen_update_ind16_delegate();
-		m_screen_update_rgb32 = callback;
+		m_screen_update_ind16 = screen_update_ind16_delegate(*this);
+		m_screen_update_rgb32.set(std::forward<T>(target), std::forward<F>(callback), name);
 	}
 
 	auto screen_vblank() { return m_screen_vblank.bind(); }
@@ -460,6 +454,8 @@ private:
 	void update_scan_bitmap_size(int y);
 	void pre_update_scanline(int y);
 	void create_composited_bitmap();
+	void destroy_scan_bitmaps();
+	void allocate_scan_bitmaps();
 
 	// inline configuration data
 	screen_type_enum    m_type;                     // type of screen

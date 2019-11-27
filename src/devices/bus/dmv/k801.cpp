@@ -86,7 +86,7 @@ dmv_k801_device::dmv_k801_device(const machine_config &mconfig, device_type type
 	device_dmvslot_interface( mconfig, *this ),
 	m_epci(*this, "epci"),
 	m_rs232(*this, "rs232"),
-	m_dsw(*this, "DSW"), m_bus(nullptr)
+	m_dsw(*this, "DSW")
 {
 }
 
@@ -129,7 +129,6 @@ dmv_k213_device::dmv_k213_device(const machine_config &mconfig, const char *tag,
 
 void dmv_k801_device::device_start()
 {
-	m_bus = static_cast<dmvcart_slot_device*>(owner());
 }
 
 //-------------------------------------------------
@@ -204,7 +203,7 @@ ioport_constructor dmv_k213_device::device_input_ports() const
 
 WRITE_LINE_MEMBER(dmv_k801_device::epci_irq_w)
 {
-	m_bus->m_out_irq_cb(state);
+	out_irq(state);
 }
 
 void dmv_k801_device::io_read(int ifsel, offs_t offset, uint8_t &data)

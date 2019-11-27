@@ -1210,7 +1210,7 @@ void alphatp_12_state::alphatp2(machine_config &config)
 	maincpu.set_addrmap(AS_PROGRAM, &alphatp_12_state::alphatp2_mem);
 	maincpu.set_addrmap(AS_IO, &alphatp_12_state::alphatp2_io);
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum("maincpu");
 
 	I8041A(config, m_kbdmcu, 12.8544_MHz_XTAL / 2);
 	m_kbdmcu->t0_in_cb().set(FUNC(alphatp_12_state::kbd_matrix_r));
@@ -1288,9 +1288,9 @@ void alphatp_34_state::alphatp3(machine_config &config)
 	maincpu.set_addrmap(AS_PROGRAM, &alphatp_34_state::alphatp3_mem);
 	maincpu.set_addrmap(AS_IO, &alphatp_34_state::alphatp3_io);
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum("maincpu");
 
-	I8041A(config, m_kbdmcu, 12.8544_MHz_XTAL /2);
+	I8041A(config, m_kbdmcu, 12.8544_MHz_XTAL / 2);
 	m_kbdmcu->t0_in_cb().set(FUNC(alphatp_34_state::kbd_matrix_r));
 	m_kbdmcu->p1_out_cb().set(FUNC(alphatp_34_state::kbd_matrix_w));
 	m_kbdmcu->p2_in_cb().set(FUNC(alphatp_34_state::kbd_port2_r));

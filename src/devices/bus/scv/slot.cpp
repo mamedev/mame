@@ -25,10 +25,10 @@ DEFINE_DEVICE_TYPE(SCV_CART_SLOT, scv_cart_slot_device, "scv_cart_slot", "SCV Ca
 //  device_scv_cart_interface - constructor
 //-------------------------------------------------
 
-device_scv_cart_interface::device_scv_cart_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device),
-		m_rom(nullptr),
-		m_rom_size(0)
+device_scv_cart_interface::device_scv_cart_interface(const machine_config &mconfig, device_t &device) :
+	device_interface(device, "scvcart"),
+	m_rom(nullptr),
+	m_rom_size(0)
 {
 }
 
@@ -75,7 +75,7 @@ void device_scv_cart_interface::ram_alloc(uint32_t size)
 scv_cart_slot_device::scv_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SCV_CART_SLOT, tag, owner, clock),
 	device_image_interface(mconfig, *this),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_scv_cart_interface>(mconfig, *this),
 	m_type(SCV_8K), m_cart(nullptr)
 {
 }
@@ -95,7 +95,7 @@ scv_cart_slot_device::~scv_cart_slot_device()
 
 void scv_cart_slot_device::device_start()
 {
-	m_cart = dynamic_cast<device_scv_cart_interface *>(get_card_device());
+	m_cart = get_card_device();
 }
 
 

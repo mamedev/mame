@@ -30,8 +30,10 @@
 
 void hp80_io_slot_devices(device_slot_interface &device);
 
+class device_hp80_io_interface;
+
 class hp80_io_slot_device : public device_t,
-							public device_slot_interface
+							public device_single_card_slot_interface<device_hp80_io_interface>
 {
 public:
 	// construction/destruction
@@ -50,9 +52,6 @@ public:
 	// configuration helpers
 	void set_slot_no(unsigned slot_no) { m_slot_no = slot_no; }
 
-	// device-level overrides
-	virtual void device_start() override;
-
 	// Callback setups
 	auto irl_cb() { return m_irl_cb_func.bind(); }
 	auto halt_cb() { return m_halt_cb_func.bind(); }
@@ -70,16 +69,21 @@ public:
 	void inten();
 	void clear_service();
 
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+
 private:
 	devcb_write8 m_irl_cb_func;
 	devcb_write8 m_halt_cb_func;
 	unsigned m_slot_no;
 };
 
-class hp80_io_card_device : public device_t,
-							public device_slot_card_interface
+class device_hp80_io_interface : public device_interface
 {
 public:
+	virtual ~device_hp80_io_interface();
+
 	// SC getter
 	uint8_t get_sc() const;
 
@@ -89,9 +93,7 @@ public:
 	virtual void clear_service();
 
 protected:
-	// construction/destruction
-	hp80_io_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-	virtual ~hp80_io_card_device();
+	device_hp80_io_interface(const machine_config &mconfig, device_t &device);
 
 	required_ioport m_select_code_port;
 

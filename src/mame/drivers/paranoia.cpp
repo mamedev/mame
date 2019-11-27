@@ -176,7 +176,7 @@ void paranoia_state::paranoia(machine_config &config)
 	m_maincpu->add_route(0, "lspeaker", 1.00);
 	m_maincpu->add_route(1, "rspeaker", 1.00);
 
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	i8085a_cpu_device &sub(I8085A(config, "sub", 18000000/3));
 	sub.set_addrmap(AS_PROGRAM, &paranoia_state::paranoia_8085_map);

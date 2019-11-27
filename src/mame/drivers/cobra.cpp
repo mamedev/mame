@@ -3295,11 +3295,10 @@ void cobra_state::cobra(machine_config &config)
 	m_gfxcpu->set_bus_frequency(XTAL(66'666'700));   /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
 	m_gfxcpu->set_addrmap(AS_PROGRAM, &cobra_state::cobra_gfx_map);
 
-	config.m_minimum_quantum = attotime::from_hz(15005);
+	config.set_maximum_quantum(attotime::from_hz(15005));
 
 	PCI_BUS_LEGACY(config, m_legacy_pci, 0, 0);
-	m_legacy_pci->set_device_read(0, FUNC(cobra_state::mpc106_pci_r), this);
-	m_legacy_pci->set_device_write(0, FUNC(cobra_state::mpc106_pci_w), this);
+	m_legacy_pci->set_device(0, FUNC(cobra_state::mpc106_pci_r), FUNC(cobra_state::mpc106_pci_w));
 
 	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, true);
 	m_ata->irq_handler().set(FUNC(cobra_state::ide_interrupt));
@@ -3377,12 +3376,12 @@ void cobra_state::init_cobra()
 								cobra_fifo::event_delegate(&cobra_state::s2mfifo_event_callback, this))
 								);
 
-	m_maincpu->ppc_set_dcstore_callback(write32_delegate(FUNC(cobra_state::main_cpu_dc_store),this));
+	m_maincpu->ppc_set_dcstore_callback(write32_delegate(*this, FUNC(cobra_state::main_cpu_dc_store)));
 
-	m_gfxcpu->ppc_set_dcstore_callback(write32_delegate(FUNC(cobra_state::gfx_cpu_dc_store), this));
+	m_gfxcpu->ppc_set_dcstore_callback(write32_delegate(*this, FUNC(cobra_state::gfx_cpu_dc_store)));
 
-	m_subcpu->ppc4xx_set_dma_write_handler(0, write32_delegate(FUNC(cobra_state::sub_sound_dma_w), this), 44100);
-	m_subcpu->ppc4xx_spu_set_tx_handler(write8_delegate(FUNC(cobra_state::sub_jvs_w), this));
+	m_subcpu->ppc4xx_set_dma_write_handler(0, write32_delegate(*this, FUNC(cobra_state::sub_sound_dma_w)), 44100);
+	m_subcpu->ppc4xx_spu_set_tx_handler(write8_delegate(*this, FUNC(cobra_state::sub_jvs_w)));
 
 
 	m_comram[0] = std::make_unique<uint32_t[]>(0x40000/4);

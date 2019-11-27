@@ -360,7 +360,7 @@ void boogwing_state::boogwing(machine_config &config)
 	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
 	m_deco_tilegen[0]->set_pf2_col_mask(0x0f);
 	// no bank1 callback
-	m_deco_tilegen[0]->set_bank2_callback(FUNC(boogwing_state::bank_callback), this);
+	m_deco_tilegen[0]->set_bank2_callback(FUNC(boogwing_state::bank_callback));
 	m_deco_tilegen[0]->set_pf12_8x8_bank(0);
 	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
 	m_deco_tilegen[0]->set_gfxdecode_tag("gfxdecode");
@@ -374,8 +374,8 @@ void boogwing_state::boogwing(machine_config &config)
 	m_deco_tilegen[1]->set_pf2_col_bank(16);
 	m_deco_tilegen[1]->set_pf1_col_mask(0x0f);
 	m_deco_tilegen[1]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[1]->set_bank1_callback(FUNC(boogwing_state::bank_callback2), this);
-	m_deco_tilegen[1]->set_bank2_callback(FUNC(boogwing_state::bank_callback2), this);
+	m_deco_tilegen[1]->set_bank1_callback(FUNC(boogwing_state::bank_callback2));
+	m_deco_tilegen[1]->set_bank2_callback(FUNC(boogwing_state::bank_callback2));
 	m_deco_tilegen[1]->set_pf12_8x8_bank(0);
 	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
 	m_deco_tilegen[1]->set_gfxdecode_tag("gfxdecode");

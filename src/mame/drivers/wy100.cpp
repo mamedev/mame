@@ -239,7 +239,7 @@ void wy100_state::wy100(machine_config &config)
 		crtc->set_screen("screen");
 		crtc->set_character_width(10);
 	}
-	m_crtc[0]->set_display_callback(FUNC(wy100_state::draw_character), this);
+	m_crtc[0]->set_display_callback(FUNC(wy100_state::draw_character));
 	m_crtc[0]->drq_wr_callback().set_inputline(m_maincpu, MCS48_INPUT_IRQ);
 	m_crtc[0]->drq_wr_callback().append(FUNC(wy100_state::brdy_w));
 	m_crtc[0]->lc_wr_callback().set("spkrgate", FUNC(input_merger_device::in_w<1>)).bit(3);

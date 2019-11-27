@@ -571,7 +571,7 @@ void ssingles_state::ssingles(machine_config &config)
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
-	crtc.set_update_row_callback(FUNC(ssingles_state::ssingles_update_row), this);
+	crtc.set_update_row_callback(FUNC(ssingles_state::ssingles_update_row));
 	crtc.out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	/* sound hardware */
@@ -595,7 +595,7 @@ void ssingles_state::atamanot(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &ssingles_state::atamanot_io_map);
 
 	mc6845_device &crtc(*subdevice<mc6845_device>("crtc"));
-	crtc.set_update_row_callback(FUNC(ssingles_state::atamanot_update_row), this);
+	crtc.set_update_row_callback(FUNC(ssingles_state::atamanot_update_row));
 	crtc.out_vsync_callback().set(FUNC(ssingles_state::atamanot_irq));
 
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_atamanot);

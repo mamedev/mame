@@ -31,18 +31,7 @@ public:
 
 	// static configuration helpers
 	void set_lcd_size(int lines, int chars) { m_lines = lines; m_chars = chars; }
-	template <typename... T> void set_pixel_update_cb(T &&... args) { m_pixel_update_cb = pixel_update_delegate(std::forward<T>(args)...); }
-	void set_pixel_update_cb(pixel_update_delegate callback) { m_pixel_update_cb = callback; }
-	template <class FunctionClass> void set_pixel_update_cb(const char *devname,
-		void (FunctionClass::*callback)(bitmap_ind16 &, u8, u8, u8, u8, int), const char *name)
-	{
-		set_pixel_update_cb(pixel_update_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
-	}
-	template <class FunctionClass> void set_pixel_update_cb(
-		void (FunctionClass::*callback)(bitmap_ind16 &, u8, u8, u8, u8, int), const char *name)
-	{
-		set_pixel_update_cb(pixel_update_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
+	template <typename... T> void set_pixel_update_cb(T &&... args) { m_pixel_update_cb.set(std::forward<T>(args)...); }
 
 	// device interface
 	void write(offs_t offset, u8 data);

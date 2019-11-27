@@ -189,7 +189,7 @@ void sm1800_state::sm1800(machine_config &config)
 
 	I8275(config, m_crtc, 2000000);
 	m_crtc->set_character_width(8);
-	m_crtc->set_display_callback(FUNC(sm1800_state::crtc_display_pixels), this);
+	m_crtc->set_display_callback(FUNC(sm1800_state::crtc_display_pixels));
 
 	I8251(config, m_uart, 0);
 }

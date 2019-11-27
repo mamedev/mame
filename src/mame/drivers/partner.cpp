@@ -177,7 +177,7 @@ void partner_state::partner(machine_config &config)
 
 	auto &i8275(I8275(config, "i8275", 16_MHz_XTAL / 12));
 	i8275.set_character_width(6);
-	i8275.set_display_callback(FUNC(partner_state::display_pixels), this);
+	i8275.set_display_callback(FUNC(partner_state::display_pixels));
 	i8275.drq_wr_callback().set("dma8257", FUNC(i8257_device::dreq2_w));
 
 	/* video hardware */

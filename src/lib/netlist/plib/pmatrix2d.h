@@ -1,20 +1,16 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * pmatrix2d.h
- *
- * NxM regular matrix
- *
- */
 
 #ifndef PMATRIX2D_H_
 #define PMATRIX2D_H_
 
+///
+/// \file pmatrix2d.h
+///
+
 #include "palloc.h"
 
 #include <algorithm>
-#include <cmath>
-//#include <cstdlib>
 #include <type_traits>
 #include <vector>
 
@@ -82,4 +78,4 @@ namespace plib
 
 } // namespace plib
 
-#endif /* MAT_CR_H_ */
+#endif // PMATRIX2D_H_

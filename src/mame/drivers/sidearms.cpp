@@ -702,7 +702,7 @@ void sidearms_state::whizz(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &sidearms_state::whizz_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &sidearms_state::whizz_io_map);
 
-	config.m_minimum_quantum = attotime::from_hz(60000);
+	config.set_maximum_quantum(attotime::from_hz(60000));
 
 	WATCHDOG_TIMER(config, "watchdog");
 

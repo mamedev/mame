@@ -327,10 +327,10 @@ void xmen_state::xmen(machine_config &config)
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette("palette");
 	m_k052109->set_screen(nullptr);
-	m_k052109->set_tile_callback(FUNC(xmen_state::tile_callback), this);
+	m_k052109->set_tile_callback(FUNC(xmen_state::tile_callback));
 
 	K053246(config, m_k053246, 0);
-	m_k053246->set_sprite_callback(FUNC(xmen_state::sprite_callback), this);
+	m_k053246->set_sprite_callback(FUNC(xmen_state::sprite_callback));
 	m_k053246->set_config(NORMAL_PLANE_ORDER, 53, -2);
 	m_k053246->set_palette("palette");
 
@@ -390,10 +390,10 @@ void xmen_state::xmen6p(machine_config &config)
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette("palette");
 	m_k052109->set_screen(nullptr);
-	m_k052109->set_tile_callback(FUNC(xmen_state::tile_callback), this);
+	m_k052109->set_tile_callback(FUNC(xmen_state::tile_callback));
 
 	K053246(config, m_k053246, 0);
-	m_k053246->set_sprite_callback(FUNC(xmen_state::sprite_callback), this);
+	m_k053246->set_sprite_callback(FUNC(xmen_state::sprite_callback));
 	m_k053246->set_config(NORMAL_PLANE_ORDER, 53, -2);
 	m_k053246->set_screen(m_screen);
 	m_k053246->set_palette("palette");

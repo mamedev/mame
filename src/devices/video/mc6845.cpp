@@ -112,6 +112,11 @@ mc6845_device::mc6845_device(const machine_config &mconfig, device_type type, co
 		m_visarea_adjust_min_y(0),
 		m_visarea_adjust_max_y(0),
 		m_hpixels_per_column(0),
+		m_reconfigure_cb(*this),
+		m_begin_update_cb(*this),
+		m_update_row_cb(*this),
+		m_end_update_cb(*this),
+		m_on_update_addr_changed_cb(*this),
 		m_out_de_cb(*this),
 		m_out_cur_cb(*this),
 		m_out_hsync_cb(*this),
@@ -1135,18 +1140,18 @@ void mc6845_device::device_start()
 	assert(clock() > 0);
 	assert(m_hpixels_per_column > 0);
 
+	/* bind delegates */
+	m_reconfigure_cb.resolve();
+	m_begin_update_cb.resolve();
+	m_update_row_cb.resolve();
+	m_end_update_cb.resolve();
+	m_on_update_addr_changed_cb.resolve();
+
 	/* resolve callbacks */
 	m_out_de_cb.resolve_safe();
 	m_out_cur_cb.resolve_safe();
 	m_out_hsync_cb.resolve_safe();
 	m_out_vsync_cb.resolve_safe();
-
-	/* bind delegates */
-	m_reconfigure_cb.bind_relative_to(*owner());
-	m_begin_update_cb.bind_relative_to(*owner());
-	m_update_row_cb.bind_relative_to(*owner());
-	m_end_update_cb.bind_relative_to(*owner());
-	m_on_update_addr_changed_cb.bind_relative_to(*owner());
 
 	/* create the timers */
 	m_line_timer = timer_alloc(TIMER_LINE);
@@ -1331,7 +1336,7 @@ void sy6845e_device::device_start()
 
 void hd6345_device::device_start()
 {
-	mc6845_device::device_start();
+	hd6845s_device::device_start();
 
 	m_supports_disp_start_addr_r = true;
 	m_supports_vert_sync_width = true;
@@ -1390,7 +1395,7 @@ void mos8563_device::device_start()
 	m_update_ready_bit = 1;
 
 	// default update_row delegate
-	m_update_row_cb =  update_row_delegate(FUNC(mos8563_device::vdc_update_row), this);
+	m_update_row_cb.set(*this, FUNC(mos8563_device::vdc_update_row));
 
 	m_char_blink_state = false;
 	m_char_blink_count = 0;
@@ -1544,6 +1549,12 @@ mc6845_1_device::mc6845_1_device(const machine_config &mconfig, const char *tag,
 }
 
 
+hd6845s_device::hd6845s_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: mc6845_device(mconfig, type, tag, owner, clock)
+{
+}
+
+
 hd6845s_device::hd6845s_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mc6845_device(mconfig, HD6845S, tag, owner, clock)
 {
@@ -1569,7 +1580,7 @@ sy6845e_device::sy6845e_device(const machine_config &mconfig, const char *tag, d
 
 
 hd6345_device::hd6345_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mc6845_device(mconfig, HD6345, tag, owner, clock)
+	: hd6845s_device(mconfig, HD6345, tag, owner, clock)
 {
 }
 

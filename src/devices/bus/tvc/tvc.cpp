@@ -30,7 +30,7 @@ DEFINE_DEVICE_TYPE(TVCEXP_SLOT, tvcexp_slot_device, "tvcexp_slot", "TVC64 Expans
 //-------------------------------------------------
 
 device_tvcexp_interface::device_tvcexp_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device)
+	: device_interface(device, "tvc64exp")
 {
 }
 
@@ -53,7 +53,7 @@ device_tvcexp_interface::~device_tvcexp_interface()
 //-------------------------------------------------
 tvcexp_slot_device::tvcexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, TVCEXP_SLOT, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_tvcexp_interface>(mconfig, *this),
 	m_out_irq_cb(*this),
 	m_out_nmi_cb(*this),
 	m_cart(nullptr)
@@ -74,7 +74,7 @@ tvcexp_slot_device::~tvcexp_slot_device()
 
 void tvcexp_slot_device::device_start()
 {
-	m_cart = dynamic_cast<device_tvcexp_interface *>(get_card_device());
+	m_cart = get_card_device();
 
 	// resolve callbacks
 	m_out_irq_cb.resolve_safe();

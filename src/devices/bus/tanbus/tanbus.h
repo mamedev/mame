@@ -25,7 +25,7 @@ class device_tanbus_interface;
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class tanbus_slot_device : public device_t, public device_slot_interface
+class tanbus_slot_device : public device_t, public device_single_card_slot_interface<device_tanbus_interface>
 {
 public:
 	// construction/destruction
@@ -37,16 +37,15 @@ public:
 		opts(*this);
 		set_default_option(dflt);
 		set_fixed(false);
-		set_tanbus_slot(tag, num);
+		set_tanbus_slot(num);
 	}
 	tanbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// inline configuration
-	void set_tanbus_slot(const char *tag, int num) { m_bus_num = num; }
+	void set_tanbus_slot(int num) { m_bus_num = num; }
 
 protected:
 	// device-level overrides
-	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override;
 
 private:
@@ -116,7 +115,7 @@ DECLARE_DEVICE_TYPE(TANBUS, tanbus_device)
 
 // ======================> device_tanbus_interface
 
-class device_tanbus_interface : public device_slot_card_interface
+class device_tanbus_interface : public device_interface
 {
 	friend class tanbus_device;
 	template <class ElementType> friend class simple_list;
@@ -127,7 +126,7 @@ public:
 	// bus access
 	virtual uint8_t read(offs_t offset, int inhrom, int inhram, int be) { return 0xff; }
 	virtual void write(offs_t offset, uint8_t data, int inhrom, int inhram, int be) { }
-	virtual void set_inhibit_lines(offs_t offset, int &inhram, int &inhrom) { };
+	virtual void set_inhibit_lines(offs_t offset, int &inhram, int &inhrom) { }
 
 protected:
 	device_tanbus_interface(const machine_config &mconfig, device_t &device);

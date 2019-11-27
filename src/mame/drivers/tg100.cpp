@@ -91,7 +91,7 @@ void tg100_state::tg100(machine_config &config)
 
 ROM_START( tg100 )
 
-	ROM_REGION(0x20000, "prgrom", 0) // H8/520 memory bus is 8 bit actually
+	ROM_REGION16_BE(0x20000, "prgrom", 0) // H8/520 memory bus is 8 bit actually
 	ROM_LOAD16_WORD_SWAP( "xk731c0.ic4", 0x00000, 0x20000, CRC(8fb6139c) SHA1(483103a2ffc63a90a2086c597baa2b2745c3a1c2) )
 
 	ROM_REGION(0x200000, "ymw258", 0)

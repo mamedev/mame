@@ -413,7 +413,7 @@ void lastbank_state::lastbank(machine_config &config)
 	audiocpu.set_addrmap(AS_IO, &lastbank_state::lastbank_audio_io);
 	// yes, we have no interrupts
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 
 	//MCFG_MACHINE_START_OVERRIDE(lastbank_state,lastbank)
 	//MCFG_MACHINE_RESET_OVERRIDE(lastbank_state,lastbank)

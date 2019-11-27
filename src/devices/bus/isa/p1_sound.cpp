@@ -161,28 +161,28 @@ void p1_sound_device::device_start()
 	// EFC00 -- ADC output
 
 	m_isa->install_memory(0xea000, 0xea01f,
-		read8_delegate(FUNC(p1_sound_device::adc_r), this), // XXX not really
-		write8_delegate(FUNC(p1_sound_device::dac_w), this));
+			read8_delegate(*this, FUNC(p1_sound_device::adc_r)), // XXX not really
+			write8_delegate(*this, FUNC(p1_sound_device::dac_w)));
 
 	m_isa->install_memory(0xee000, 0xee000,
-		read8smo_delegate(FUNC(i8251_device::data_r), m_midi.target()),
-		write8smo_delegate(FUNC(i8251_device::data_w), m_midi.target()));
+			read8smo_delegate(*m_midi, FUNC(i8251_device::data_r)),
+			write8smo_delegate(*m_midi, FUNC(i8251_device::data_w)));
 	m_isa->install_memory(0xee002, 0xee002,
-		read8smo_delegate(FUNC(i8251_device::status_r), m_midi.target()),
-		write8smo_delegate(FUNC(i8251_device::control_w), m_midi.target()));
+			read8smo_delegate(*m_midi, FUNC(i8251_device::status_r)),
+			write8smo_delegate(*m_midi, FUNC(i8251_device::control_w)));
 
 	// sync generator
 	m_isa->install_memory(0xef000, 0xef007,
-		read8_delegate(FUNC(p1_sound_device::d14_r), this),
-		write8_delegate(FUNC(p1_sound_device::d14_w), this));
+			read8_delegate(*this, FUNC(p1_sound_device::d14_r)),
+			write8_delegate(*this, FUNC(p1_sound_device::d14_w)));
 
 	// 6 music channels
 	m_isa->install_memory(0xef400, 0xef407,
-		read8_delegate(FUNC(p1_sound_device::d16_r), this),
-		write8_delegate(FUNC(p1_sound_device::d16_w), this));
+			read8_delegate(*this, FUNC(p1_sound_device::d16_r)),
+			write8_delegate(*this, FUNC(p1_sound_device::d16_w)));
 	m_isa->install_memory(0xef800, 0xef807,
-		read8_delegate(FUNC(p1_sound_device::d17_r), this),
-		write8_delegate(FUNC(p1_sound_device::d17_w), this));
+			read8_delegate(*this, FUNC(p1_sound_device::d17_r)),
+			write8_delegate(*this, FUNC(p1_sound_device::d17_w)));
 }
 
 

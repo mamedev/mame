@@ -49,6 +49,7 @@
 	"passes": [
 		{
 			"effect": "xbr/xbr-mlv4-multipass/xbr-mlv4-pass1",
+			"applytint": true,
 			"name": "Pass 0",
 			"input": [
 				{ "sampler": "decal", "texture": "screen" }

@@ -98,7 +98,7 @@ AC RETURNS (pins 3,4) - adaptor. A total of 6W may be drawn from these lines as 
 
 class device_electron_expansion_interface;
 
-class electron_expansion_slot_device : public device_t, public device_slot_interface
+class electron_expansion_slot_device : public device_t, public device_single_card_slot_interface<device_electron_expansion_interface>
 {
 public:
 	// construction/destruction
@@ -138,7 +138,7 @@ private:
 
 // ======================> device_electron_expansion_interface
 
-class device_electron_expansion_interface : public device_slot_card_interface
+class device_electron_expansion_interface : public device_interface
 {
 public:
 	virtual uint8_t expbus_r(offs_t offset) { return 0xff; }

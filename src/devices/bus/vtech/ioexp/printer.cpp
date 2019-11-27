@@ -64,9 +64,9 @@ void vtech_printer_interface_device::device_start()
 
 void vtech_printer_interface_device::device_reset()
 {
-	io_space().install_read_handler(0x00, 0x00, read8_delegate(FUNC(vtech_printer_interface_device::busy_r), this));
-	io_space().install_write_handler(0x0d, 0x0d, write8_delegate(FUNC(vtech_printer_interface_device::strobe_w), this));
-	io_space().install_write_handler(0x0e, 0x0e, write8_delegate(FUNC(output_latch_device::bus_w), m_latch.target()));
+	io_space().install_read_handler(0x00, 0x00, read8_delegate(*this, FUNC(vtech_printer_interface_device::busy_r)));
+	io_space().install_write_handler(0x0d, 0x0d, write8_delegate(*this, FUNC(vtech_printer_interface_device::strobe_w)));
+	io_space().install_write_handler(0x0e, 0x0e, write8_delegate(*m_latch, FUNC(output_latch_device::bus_w)));
 }
 
 

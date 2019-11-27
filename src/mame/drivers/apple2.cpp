@@ -1276,7 +1276,7 @@ void apple2_state::apple2_common(machine_config &config)
 
 	TIMER(config, m_scantimer, 0);
 	m_scantimer->configure_scanline(FUNC(apple2_state::apple2_interrupt), "screen", 0, 1);
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	APPLE2_VIDEO(config, m_video, XTAL(14'318'181)).set_screen(m_screen);
 	APPLE2_COMMON(config, m_a2common, XTAL(14'318'181));
@@ -1324,8 +1324,7 @@ void apple2_state::apple2_common(machine_config &config)
 	m_ay3600->ako().set(FUNC(apple2_state::ay3600_ako_w));
 
 	/* repeat timer.  15 Hz from page 90 of "The Apple II Circuit Description */
-	timer_device &timer(TIMER(config, "repttmr", 0));
-	timer.configure_periodic(timer_device::expired_delegate(FUNC(apple2_state::ay3600_repeat), this), attotime::from_hz(15));
+	TIMER(config, "repttmr", 0).configure_periodic(FUNC(apple2_state::ay3600_repeat), attotime::from_hz(15));
 
 	/* slot devices */
 	A2BUS(config, m_a2bus, 0);

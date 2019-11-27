@@ -9,27 +9,30 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "luaengine.h"
-#include "mame.h"
-#include "chd.h"
-#include "emuopts.h"
-#include "mameopts.h"
-#include "audit.h"
-#include "info.h"
-#include "romload.h"
-#include "unzip.h"
-#include "validity.h"
-#include "sound/samples.h"
 #include "clifront.h"
-#include "xmlfile.h"
-#include "media_ident.h"
-
-#include "osdepend.h"
-#include "softlist_dev.h"
 
 #include "ui/moptions.h"
+
+#include "audit.h"
+#include "infoxml.h"
 #include "language.h"
+#include "luaengine.h"
+#include "mame.h"
+#include "media_ident.h"
 #include "pluginopts.h"
+
+#include "emuopts.h"
+#include "mameopts.h"
+#include "romload.h"
+#include "softlist_dev.h"
+#include "validity.h"
+#include "sound/samples.h"
+
+#include "chd.h"
+#include "unzip.h"
+#include "xmlfile.h"
+
+#include "osdepend.h"
 
 #include <algorithm>
 #include <new>
@@ -233,7 +236,7 @@ void cli_frontend::start_execution(mame_machine_manager *manager, const std::vec
 	{
 		// if we failed, check for no command and a system name first; in that case error on the name
 		if (m_options.command().empty() && mame_options::system(m_options) == nullptr && !m_options.attempted_system_name().empty())
-			throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "Unknown system '%s'", m_options.attempted_system_name().c_str());
+			throw emu_fatalerror(EMU_ERR_NO_SUCH_SYSTEM, "Unknown system '%s'", m_options.attempted_system_name().c_str());
 
 		// otherwise, error on the options
 		throw emu_fatalerror(EMU_ERR_INVALID_CONFIG, "%s", ex.message().c_str());
@@ -272,7 +275,7 @@ void cli_frontend::start_execution(mame_machine_manager *manager, const std::vec
 	// if we can't find it, give an appropriate error
 	const game_driver *system = mame_options::system(m_options);
 	if (system == nullptr && *(m_options.system_name()) != 0)
-		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "Unknown system '%s'", m_options.system_name());
+		throw emu_fatalerror(EMU_ERR_NO_SUCH_SYSTEM, "Unknown system '%s'", m_options.system_name());
 
 	// otherwise just run the game
 #if defined(__LIBRETRO__)
@@ -307,14 +310,14 @@ int cli_frontend::execute(std::vector<std::string> &args)
 	// handle exceptions of various types
 	catch (emu_fatalerror &fatal)
 	{
-		std::string str(fatal.string());
+		std::string str(fatal.what());
 		strtrimspace(str);
 		osd_printf_error("%s\n", str);
 		m_result = (fatal.exitcode() != 0) ? fatal.exitcode() : EMU_ERR_FATALERROR;
 
 		// if a game was specified, wasn't a wildcard, and our error indicates this was the
 		// reason for failure, offer some suggestions
-		if (m_result == EMU_ERR_NO_SUCH_GAME
+		if (m_result == EMU_ERR_NO_SUCH_SYSTEM
 			&& !m_options.attempted_system_name().empty()
 			&& !core_iswildstr(m_options.attempted_system_name().c_str())
 			&& mame_options::system(m_options) == nullptr)
@@ -456,7 +459,7 @@ void cli_frontend::listclones(const std::vector<std::string> &args)
 	{
 		// see if we match but just weren't a clone
 		if (original_count == 0)
-			throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching systems found for '%s'", gamename);
+			throw emu_fatalerror(EMU_ERR_NO_SUCH_SYSTEM, "No matching systems found for '%s'", gamename);
 		else
 			osd_printf_info("Found %lu match(es) for '%s' but none were clones\n", (unsigned long)drivlist.count(), gamename); // FIXME: this never gets hit
 		return;
@@ -489,7 +492,7 @@ void cli_frontend::listbrothers(const std::vector<std::string> &args)
 	// start with a filtered list of drivers; return an error if none found
 	driver_enumerator initial_drivlist(m_options, gamename);
 	if (initial_drivlist.count() == 0)
-		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching systems found for '%s'", gamename);
+		throw emu_fatalerror(EMU_ERR_NO_SUCH_SYSTEM, "No matching systems found for '%s'", gamename);
 
 	// for the final list, start with an empty driver list
 	driver_enumerator drivlist(m_options);
@@ -633,7 +636,7 @@ void cli_frontend::listsamples(const std::vector<std::string> &args)
 	// determine which drivers to output; return an error if none found
 	driver_enumerator drivlist(m_options, gamename);
 	if (drivlist.count() == 0)
-		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching systems found for '%s'", gamename);
+		throw emu_fatalerror(EMU_ERR_NO_SUCH_SYSTEM, "No matching systems found for '%s'", gamename);
 
 	// iterate over drivers, looking for SAMPLES devices
 	bool first = true;
@@ -673,7 +676,7 @@ void cli_frontend::listdevices(const std::vector<std::string> &args)
 	// determine which drivers to output; return an error if none found
 	driver_enumerator drivlist(m_options, gamename);
 	if (drivlist.count() == 0)
-		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching systems found for '%s'", gamename);
+		throw emu_fatalerror(EMU_ERR_NO_SUCH_SYSTEM, "No matching systems found for '%s'", gamename);
 
 	// iterate over drivers, looking for SAMPLES devices
 	bool first = true;
@@ -758,7 +761,7 @@ void cli_frontend::listslots(const std::vector<std::string> &args)
 	// determine which drivers to output; return an error if none found
 	driver_enumerator drivlist(m_options, gamename);
 	if (drivlist.count() == 0)
-		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching systems found for '%s'", gamename);
+		throw emu_fatalerror(EMU_ERR_NO_SUCH_SYSTEM, "No matching systems found for '%s'", gamename);
 
 	// print header
 	printf("%-16s %-16s %-16s %s\n", "SYSTEM", "SLOT NAME", "SLOT OPTIONS", "SLOT DEVICE NAME");
@@ -826,7 +829,7 @@ void cli_frontend::listmedia(const std::vector<std::string> &args)
 	// determine which drivers to output; return an error if none found
 	driver_enumerator drivlist(m_options, gamename);
 	if (drivlist.count() == 0)
-		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching systems found for '%s'", gamename);
+		throw emu_fatalerror(EMU_ERR_NO_SUCH_SYSTEM, "No matching systems found for '%s'", gamename);
 
 	// print header
 	printf("%-16s %-16s %-10s %s\n", "SYSTEM", "MEDIA NAME", "(brief)", "IMAGE FILE EXTENSIONS SUPPORTED");
@@ -963,7 +966,7 @@ void cli_frontend::verifyroms(const std::vector<std::string> &args)
 	for (std::string const &pat : args)
 	{
 		if (!*it)
-			throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching systems found for '%s'", pat.c_str());
+			throw emu_fatalerror(EMU_ERR_NO_SUCH_SYSTEM, "No matching systems found for '%s'", pat.c_str());
 
 		++it;
 	}
@@ -1027,7 +1030,7 @@ void cli_frontend::verifysamples(const std::vector<std::string> &args)
 
 	// return an error if none found
 	if (matched == 0)
-		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching systems found for '%s'", gamename);
+		throw emu_fatalerror(EMU_ERR_NO_SUCH_SYSTEM, "No matching systems found for '%s'", gamename);
 
 	// if we didn't get anything at all, display a generic end message
 	if (matched > 0 && correct == 0 && incorrect == 0)
@@ -1240,7 +1243,7 @@ void cli_frontend::listsoftware(const std::vector<std::string> &args)
 	// determine which drivers to output; return an error if none found
 	driver_enumerator drivlist(m_options, gamename);
 	if (drivlist.count() == 0)
-		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching systems found for '%s'", gamename);
+		throw emu_fatalerror(EMU_ERR_NO_SUCH_SYSTEM, "No matching systems found for '%s'", gamename);
 
 	while (drivlist.next())
 	{
@@ -1285,7 +1288,7 @@ void cli_frontend::verifysoftware(const std::vector<std::string> &args)
 	// determine which drivers to process; return an error if none found
 	driver_enumerator drivlist(m_options, gamename);
 	if (drivlist.count() == 0)
-		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching systems found for '%s'", gamename);
+		throw emu_fatalerror(EMU_ERR_NO_SUCH_SYSTEM, "No matching systems found for '%s'", gamename);
 
 	media_auditor auditor(drivlist);
 	util::ovectorstream summary_string;
@@ -1323,7 +1326,7 @@ void cli_frontend::verifysoftware(const std::vector<std::string> &args)
 
 	// return an error if none found
 	if (matched == 0)
-		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching systems found for '%s'", gamename);
+		throw emu_fatalerror(EMU_ERR_NO_SUCH_SYSTEM, "No matching systems found for '%s'", gamename);
 
 	// if we didn't get anything at all, display a generic end message
 	if (matched > 0 && correct == 0 && incorrect == 0)
@@ -1426,7 +1429,7 @@ void cli_frontend::verifysoftlist(const std::vector<std::string> &args)
 
 	// return an error if none found
 	if (matched == 0)
-		throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching software lists found for '%s'", gamename);
+		throw emu_fatalerror(EMU_ERR_NO_SUCH_SYSTEM, "No matching software lists found for '%s'", gamename);
 
 	// if we didn't get anything at all, display a generic end message
 	if (matched > 0 && correct == 0 && incorrect == 0)
@@ -1553,7 +1556,7 @@ template <typename T, typename U> void cli_frontend::apply_action(const std::vec
 	for (std::string const &pat : args)
 	{
 		if (!*it)
-			throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching systems found for '%s'", pat.c_str());
+			throw emu_fatalerror(EMU_ERR_NO_SUCH_SYSTEM, "No matching systems found for '%s'", pat.c_str());
 
 		++it;
 	}

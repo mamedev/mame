@@ -1790,7 +1790,7 @@ void seibuspi_state::spi(machine_config &config)
 	Z80(config, m_audiocpu, 28.636363_MHz_XTAL / 4); // Z84C0008PEC, 7.159MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &seibuspi_state::spi_soundmap);
 
-	config.m_minimum_quantum = attotime::from_hz(12000);
+	config.set_maximum_quantum(attotime::from_hz(12000));
 
 	MCFG_MACHINE_RESET_OVERRIDE(seibuspi_state, spi)
 
@@ -2009,50 +2009,50 @@ void seibuspi_state::sys386f(machine_config &config)
 
 void seibuspi_state::init_senkyu()
 {
-	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x0018cb4, 0x0018cb7, read32_delegate(FUNC(seibuspi_state::senkyu_speedup_r),this));
+	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x0018cb4, 0x0018cb7, read32_delegate(*this, FUNC(seibuspi_state::senkyu_speedup_r)));
 	init_sei252();
 }
 
 void seibuspi_state::init_senkyua()
 {
-	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x0018c9c, 0x0018c9f, read32_delegate(FUNC(seibuspi_state::senkyua_speedup_r),this));
+	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x0018c9c, 0x0018c9f, read32_delegate(*this, FUNC(seibuspi_state::senkyua_speedup_r)));
 	init_sei252();
 }
 
 void seibuspi_state::init_batlball()
 {
-	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x0018db4, 0x0018db7, read32_delegate(FUNC(seibuspi_state::batlball_speedup_r),this));
+	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x0018db4, 0x0018db7, read32_delegate(*this, FUNC(seibuspi_state::batlball_speedup_r)));
 	init_sei252();
 }
 
 void seibuspi_state::init_viprp1()
 {
-	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x001e2e0, 0x001e2e3, read32_delegate(FUNC(seibuspi_state::viprp1_speedup_r),this));
+	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x001e2e0, 0x001e2e3, read32_delegate(*this, FUNC(seibuspi_state::viprp1_speedup_r)));
 	init_sei252();
 }
 
 void seibuspi_state::init_viprp1o()
 {
-	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x001d49c, 0x001d49f, read32_delegate(FUNC(seibuspi_state::viprp1o_speedup_r),this));
+	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x001d49c, 0x001d49f, read32_delegate(*this, FUNC(seibuspi_state::viprp1o_speedup_r)));
 	init_sei252();
 }
 
 void seibuspi_state::init_ejanhs()
 {
 //  idle skip doesn't work properly?
-//  if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x002d224, 0x002d227, read32_delegate(FUNC(seibuspi_state::ejanhs_speedup_r),this));
+//  if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x002d224, 0x002d227, read32_delegate(*this, FUNC(seibuspi_state::ejanhs_speedup_r)));
 	init_sei252();
 }
 
 void seibuspi_state::init_rdft()
 {
-	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x00298d0, 0x00298d3, read32_delegate(FUNC(seibuspi_state::rdft_speedup_r),this));
+	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x00298d0, 0x00298d3, read32_delegate(*this, FUNC(seibuspi_state::rdft_speedup_r)));
 	init_sei252();
 }
 
 void seibuspi_state::init_rdft2()
 {
-	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x00282ac, 0x00282af, read32_delegate(FUNC(seibuspi_state::rf2_speedup_r),this));
+	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x00282ac, 0x00282af, read32_delegate(*this, FUNC(seibuspi_state::rf2_speedup_r)));
 
 	rdft2_text_decrypt(memregion("chars")->base());
 	rdft2_bg_decrypt(memregion("tiles")->base(), memregion("tiles")->bytes());
@@ -2062,7 +2062,7 @@ void seibuspi_state::init_rdft2()
 
 void seibuspi_state::init_rfjet()
 {
-	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x002894c, 0x002894f, read32_delegate(FUNC(seibuspi_state::rfjet_speedup_r),this));
+	if (ENABLE_SPEEDUP_HACKS) m_maincpu->space(AS_PROGRAM).install_read_handler(0x002894c, 0x002894f, read32_delegate(*this, FUNC(seibuspi_state::rfjet_speedup_r)));
 
 	rfjet_text_decrypt(memregion("chars")->base());
 	rfjet_bg_decrypt(memregion("tiles")->base(), memregion("tiles")->bytes());

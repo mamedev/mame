@@ -210,6 +210,7 @@ void gaelco2_state::maniacsq_d5002fp(machine_config &config)
 {
 	maniacsq(config);
 	GAELCO_DS5002FP(config, "gaelco_ds5002fp", XTAL(24'000'000) / 2).set_addrmap(0, &gaelco2_state::mcu_hostmem_map); // clock unknown
+	config.set_perfect_quantum("gaelco_ds5002fp:mcu");
 }
 
 

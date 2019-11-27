@@ -576,7 +576,7 @@ void bloodbro_state::weststry(machine_config &config)
 
 	m_audiocpu->set_clock(XTAL(20'000'000)/4); /* 5MHz - verified on PCB */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &bloodbro_state::weststry_sound_map);
-	m_audiocpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate());
+	m_audiocpu->remove_irq_acknowledge_callback();
 
 	m_gfxdecode->set_info(gfx_weststry);
 	m_palette->set_format(palette_device::xBGR_444, 1024);

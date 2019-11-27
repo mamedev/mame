@@ -42,11 +42,7 @@ public:
 	deco_rmc3_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// configuration
-	void set_init(deco_rmc3_palette_init_delegate init) { m_init = init; }
-	template <class FunctionClass> void set_init(const char *devname, void (FunctionClass::*callback)(deco_rmc3_device &), const char *name)
-	{
-		set_init(deco_rmc3_palette_init_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
-	}
+	template <typename... T> void set_init(T &&... args) { m_init.set(std::forward<T>(args)...); }
 //  void set_membits(int membits);
 //  void set_endianness(endianness_t endianness);
 	void set_entries(u32 entries) { m_entries = entries; }

@@ -268,10 +268,10 @@ TILE_GET_INFO_MEMBER(dreamwld_state::get_tile_info)
 
 void dreamwld_state::video_start()
 {
-	m_tilemap[0][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dreamwld_state::get_tile_info<0>),this),TILEMAP_SCAN_ROWS, 16, 16, 64,64);
-	m_tilemap[1][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dreamwld_state::get_tile_info<1>),this),TILEMAP_SCAN_ROWS, 16, 16, 64,64);
-	m_tilemap[0][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dreamwld_state::get_tile_info<0>),this),TILEMAP_SCAN_ROWS, 16, 16, 128,32);
-	m_tilemap[1][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dreamwld_state::get_tile_info<1>),this),TILEMAP_SCAN_ROWS, 16, 16, 128,32);
+	m_tilemap[0][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(dreamwld_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_tilemap[1][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(dreamwld_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_tilemap[0][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(dreamwld_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 16, 16, 128, 32);
+	m_tilemap[1][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(dreamwld_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 16, 16, 128, 32);
 	m_tilemap[1][0]->set_transparent_pen(0);
 	m_tilemap[1][1]->set_transparent_pen(0);
 
@@ -424,7 +424,7 @@ void dreamwld_state::baryon_map(address_map &map)
 	map(0x804400, 0x805fff).ram().share("vregs");
 
 	map(0xc00000, 0xc00003).portr("INPUTS");
-	map(0xc00004, 0xc00007).lr16("c00004", [this]() { return u16(m_dsw->read()); });
+	map(0xc00004, 0xc00007).lr16(NAME([this] () { return u16(m_dsw->read()); }));
 
 	map(0xc0000f, 0xc0000f).w(FUNC(dreamwld_state::okibank_w<0>)); // sfx
 	map(0xc00018, 0xc00018).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // sfx

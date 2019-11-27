@@ -1408,14 +1408,14 @@ void paradise_state::init_paradise()
 void paradise_state::init_tgtball()
 {
 	m_sprite_inc = 4;
-	m_maincpu->space(AS_IO).install_write_handler(0x2001, 0x2001, write8_delegate(FUNC(paradise_state::tgtball_flipscreen_w),this));
+	m_maincpu->space(AS_IO).install_write_handler(0x2001, 0x2001, write8_delegate(*this, FUNC(paradise_state::tgtball_flipscreen_w)));
 
 }
 
 void paradise_state::init_torus()
 {
 	m_sprite_inc = 4;
-	m_maincpu->space(AS_IO).install_write_handler(0x2070, 0x2070, write8_delegate(FUNC(paradise_state::torus_coin_counter_w),this));
+	m_maincpu->space(AS_IO).install_write_handler(0x2070, 0x2070, write8_delegate(*this, FUNC(paradise_state::torus_coin_counter_w)));
 }
 
 

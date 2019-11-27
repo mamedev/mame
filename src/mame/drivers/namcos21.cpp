@@ -878,7 +878,7 @@ void namcos21_state::winrun(machine_config &config)
 	NAMCO_C148(config, m_gpu_intc, 0, "gpu", false);
 	NAMCO_C139(config, m_sci, 0);
 
-	config.m_minimum_quantum = attotime::from_hz(6000); /* 100 CPU slices per frame */
+	config.set_maximum_quantum(attotime::from_hz(6000)); /* 100 CPU slices per frame */
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 

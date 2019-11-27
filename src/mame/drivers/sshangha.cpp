@@ -421,7 +421,7 @@ void sshangha_state::sshangha(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &sshangha_state::sound_map);
 
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	screen_device& screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
@@ -443,8 +443,8 @@ void sshangha_state::sshangha(machine_config &config)
 	m_tilegen->set_pf2_col_bank(0x20);
 	m_tilegen->set_pf1_col_mask(0x0f);
 	m_tilegen->set_pf2_col_mask(0x0f);
-	m_tilegen->set_bank1_callback(FUNC(sshangha_state::bank_callback), this);
-	m_tilegen->set_bank2_callback(FUNC(sshangha_state::bank_callback), this);
+	m_tilegen->set_bank1_callback(FUNC(sshangha_state::bank_callback));
+	m_tilegen->set_bank2_callback(FUNC(sshangha_state::bank_callback));
 	m_tilegen->set_pf12_8x8_bank(0);
 	m_tilegen->set_pf12_16x16_bank(1);
 	m_tilegen->set_gfxdecode_tag("gfxdecode");

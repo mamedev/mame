@@ -198,7 +198,7 @@ class mcpx_ohci_device : public pci_device {
 public:
 	mcpx_ohci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	void set_hack_callback(std::function<void(void)> hack) { hack_callback = hack; }
-	void plug_usb_device(int port, ohci_function *function);
+	void plug_usb_device(int port, device_usb_ohci_function_interface *function);
 
 	auto interrupt_handler() { return m_interrupt_handler.bind(); }
 
@@ -219,7 +219,7 @@ private:
 	std::function<void(void)> hack_callback;
 	void ohci_mmio(address_map &map);
 	struct dev_t {
-		ohci_function *dev;
+		device_usb_ohci_function_interface *dev;
 		int port;
 	} connecteds[4];
 	int connecteds_count;

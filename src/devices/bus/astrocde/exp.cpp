@@ -17,13 +17,13 @@
 DEFINE_DEVICE_TYPE(ASTROCADE_EXP_SLOT, astrocade_exp_device, "astrocade_exp", "Bally Astrocade expansion")
 
 
-device_astrocade_card_interface::device_astrocade_card_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device)
+device_astrocade_exp_interface::device_astrocade_exp_interface(const machine_config &mconfig, device_t &device) :
+	device_interface(device, "astrocadeexp")
 {
 }
 
 
-device_astrocade_card_interface::~device_astrocade_card_interface()
+device_astrocade_exp_interface::~device_astrocade_exp_interface()
 {
 }
 
@@ -37,7 +37,7 @@ device_astrocade_card_interface::~device_astrocade_card_interface()
 //-------------------------------------------------
 astrocade_exp_device::astrocade_exp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ASTROCADE_EXP_SLOT, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_astrocade_exp_interface>(mconfig, *this),
 	m_card_mounted(false), m_card(nullptr)
 {
 }
@@ -57,7 +57,7 @@ astrocade_exp_device::~astrocade_exp_device()
 
 void astrocade_exp_device::device_start()
 {
-	m_card = dynamic_cast<device_astrocade_card_interface *>(get_card_device());
+	m_card = get_card_device();
 	if (m_card)
 		m_card_mounted = true;
 }

@@ -79,7 +79,7 @@ void lynx_state::lynx(machine_config &config)
 	/* basic machine hardware */
 	M65SC02(config, m_maincpu, 4000000);        /* vti core, integrated in vlsi, stz, but not bbr bbs */
 	m_maincpu->set_addrmap(AS_PROGRAM, &lynx_state::lynx_mem);
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	ADDRESS_MAP_BANK(config, "bank_fc00").set_map(&lynx_state::lynx_fc00_mem).set_options(ENDIANNESS_LITTLE, 8, 9, 0x100);
 	ADDRESS_MAP_BANK(config, "bank_fd00").set_map(&lynx_state::lynx_fd00_mem).set_options(ENDIANNESS_LITTLE, 8, 9, 0x100);
@@ -98,15 +98,15 @@ void lynx_state::lynx(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	LYNX_SND(config, m_sound, 0);
-	m_sound->set_timer_delegate(FUNC(lynx_state::sound_cb), this);
+	m_sound->set_timer_delegate(FUNC(lynx_state::sound_cb));
 	m_sound->add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* devices */
-	QUICKLOAD(config, "quickload", "o").set_load_callback(FUNC(lynx_state::quickload_cb), this);
+	QUICKLOAD(config, "quickload", "o").set_load_callback(FUNC(lynx_state::quickload_cb));
 
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "lynx_cart", "lnx,lyx"));
 	cartslot.set_must_be_loaded(true);
-	cartslot.set_device_load(FUNC(lynx_state::cart_load), this);
+	cartslot.set_device_load(FUNC(lynx_state::cart_load));
 
 	/* Software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("lynx");
@@ -123,7 +123,7 @@ void lynx_state::lynx2(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 	config.device_remove("lynx");
 	LYNX2_SND(config.replace(), m_sound, 0);
-	m_sound->set_timer_delegate(FUNC(lynx_state::sound_cb), this);
+	m_sound->set_timer_delegate(FUNC(lynx_state::sound_cb));
 	m_sound->add_route(0, "lspeaker", 0.50);
 	m_sound->add_route(1, "rspeaker", 0.50);
 }

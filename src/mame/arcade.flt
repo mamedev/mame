@@ -256,6 +256,8 @@ copsnrob.cpp
 corona.cpp
 cosmic.cpp
 cps1.cpp
+cps1bl_5205.cpp
+cps1bl_pic.cpp
 cps2.cpp
 cps3.cpp
 cpzodiac.cpp
@@ -489,6 +491,7 @@ gradius3.cpp
 grchamp.cpp
 gridlee.cpp
 groundfx.cpp
+gsspade.cpp
 gstream.cpp
 gstriker.cpp
 gsword.cpp

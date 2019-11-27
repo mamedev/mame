@@ -259,6 +259,7 @@ void glass_state::glass_ds5002fp(machine_config &config)
 	glass(config);
 	gaelco_ds5002fp_device &ds5002fp(GAELCO_DS5002FP(config, "gaelco_ds5002fp", XTAL(24'000'000) / 2)); /* verified on pcb */
 	ds5002fp.set_addrmap(0, &glass_state::mcu_hostmem_map);
+	config.set_perfect_quantum("gaelco_ds5002fp:mcu");
 }
 
 ROM_START( glass ) /* Version 1.1 */

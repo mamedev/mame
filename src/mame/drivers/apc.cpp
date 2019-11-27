@@ -1014,7 +1014,7 @@ void apc_state::apc(machine_config &config)
 ***************************************************************************/
 
 ROM_START( apc )
-	ROM_REGION( 0x2000, "ipl", ROMREGION_ERASE00 )
+	ROM_REGION16_LE( 0x2000, "ipl", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "pfbu2j.bin",   0x00000, 0x001000, CRC(86970df5) SHA1(be59c5dad3bd8afc21e9f2f1404553d4371978be) )
 	ROM_LOAD16_BYTE( "pfbu2l.bin",   0x00001, 0x001000, CRC(38df2e70) SHA1(a37ccaea00c2b290610d354de08b489fa897ec48) )
 
@@ -1024,7 +1024,7 @@ ROM_START( apc )
 	ROM_REGION( 0x2000, "gfx", ROMREGION_ERASE00 )
 	ROM_LOAD("pfcu1r.bin",   0x000000, 0x002000, CRC(683efa94) SHA1(43157984a1746b2e448f3236f571011af9a3aa73) )
 
-	ROM_REGION( 0x2000, "aux_pcg", ROMREGION_ERASE00 )
+	ROM_REGION16_LE( 0x2000, "aux_pcg", ROMREGION_ERASE00 )
 ROM_END
 
 void apc_state::init_apc()

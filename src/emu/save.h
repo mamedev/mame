@@ -150,7 +150,7 @@ public:
 		if (type_checker<ItemType>::is_pointer)
 			throw emu_fatalerror("Called save_item on a pointer with no count!");
 		if (!type_checker<typename array_unwrap<ItemType>::underlying_type>::is_atom)
-			throw emu_fatalerror("Called save_item on a non-fundamental type!");
+			throw emu_fatalerror("Called save_item on a non-fundamental type, name %s!", valname);
 		save_memory(device, module, tag, index, valname, array_unwrap<ItemType>::ptr(value), array_unwrap<ItemType>::SIZE, array_unwrap<ItemType>::SAVE_COUNT);
 	}
 
@@ -159,7 +159,7 @@ public:
 	void save_pointer(device_t *device, const char *module, const char *tag, int index, ItemType *value, const char *valname, u32 count)
 	{
 		if (!type_checker<typename array_unwrap<ItemType>::underlying_type>::is_atom)
-			throw emu_fatalerror("Called save_item on a non-fundamental type!");
+			throw emu_fatalerror("Called save_item on a non-fundamental type, name %s!", valname);
 		save_memory(device, module, tag, index, valname, array_unwrap<ItemType>::ptr(value[0]), array_unwrap<ItemType>::SIZE, array_unwrap<ItemType>::SAVE_COUNT * count);
 	}
 
@@ -168,7 +168,7 @@ public:
 	void save_pointer(device_t *device, const char *module, const char *tag, int index, std::unique_ptr<ItemType[]> &value, const char *valname, u32 count)
 	{
 		if (!type_checker<typename array_unwrap<ItemType>::underlying_type>::is_atom)
-			throw emu_fatalerror("Called save_item on a non-fundamental type!");
+			throw emu_fatalerror("Called save_item on a non-fundamental type, name %s!", valname);
 		save_memory(device, module, tag, index, valname, array_unwrap<ItemType>::ptr(value[0]), array_unwrap<ItemType>::SIZE, array_unwrap<ItemType>::SAVE_COUNT * count);
 	}
 

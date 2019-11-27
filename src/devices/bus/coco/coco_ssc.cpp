@@ -211,9 +211,9 @@ coco_ssc_device::coco_ssc_device(const machine_config &mconfig, const char *tag,
 void coco_ssc_device::device_start()
 {
 	// install $FF7D-E handler
-	write8_delegate wh = write8_delegate(FUNC(coco_ssc_device::ff7d_write), this);
-	read8_delegate rh = read8_delegate(FUNC(coco_ssc_device::ff7d_read), this);
-	install_readwrite_handler(0xFF7D, 0xFF7E, rh, wh);
+	install_readwrite_handler(0xFF7D, 0xFF7E,
+			read8_delegate(*this, FUNC(coco_ssc_device::ff7d_read)),
+			write8_delegate(*this, FUNC(coco_ssc_device::ff7d_write)));
 
 	save_item(NAME(m_reset_line));
 	save_item(NAME(m_tms7000_busy));

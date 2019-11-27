@@ -28,10 +28,16 @@ DEFINE_DEVICE_TYPE(S100_SLOT, s100_slot_device, "s100_slot", "S100 slot")
 //-------------------------------------------------
 
 device_s100_card_interface::device_s100_card_interface(const machine_config &mconfig, device_t &device) :
-	device_slot_card_interface(mconfig, device),
+	device_interface(device, "s100bus"),
 	m_bus(nullptr),
 	m_next(nullptr)
 {
+}
+
+void device_s100_card_interface::interface_pre_start()
+{
+	if (!m_bus)
+		throw device_missing_dependencies();
 }
 
 
@@ -40,7 +46,7 @@ device_s100_card_interface::device_s100_card_interface(const machine_config &mco
 //-------------------------------------------------
 s100_slot_device::s100_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, S100_SLOT, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_s100_card_interface>(mconfig, *this),
 	m_bus(*this, DEVICE_SELF_OWNER)
 {
 }
@@ -52,8 +58,9 @@ s100_slot_device::s100_slot_device(const machine_config &mconfig, const char *ta
 
 void s100_slot_device::device_start()
 {
-	device_s100_card_interface *dev = dynamic_cast<device_s100_card_interface *>(get_card_device());
-	if (dev) m_bus->add_card(dev);
+	device_s100_card_interface *const dev = get_card_device();
+	if (dev)
+		m_bus->add_card(dev);
 }
 
 

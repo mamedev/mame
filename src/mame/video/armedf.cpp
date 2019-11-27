@@ -115,11 +115,11 @@ VIDEO_START_MEMBER(armedf_state,terraf)
 {
 	m_sprite_offy = (m_scroll_type & 2 ) ? 0 : 128;  /* legion, legiono, crazy climber 2 */
 
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(armedf_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 64, 32);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(armedf_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(armedf_state::get_bg_tile_info)), TILEMAP_SCAN_COLS, 16, 16, 64, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(armedf_state::get_fg_tile_info)), TILEMAP_SCAN_COLS, 16, 16, 64, 32);
 
-	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(armedf_state::get_nb1414m4_tx_tile_info),this),
-		(m_scroll_type == 2) ? tilemap_mapper_delegate(FUNC(armedf_state::armedf_scan_type3),this) : tilemap_mapper_delegate(FUNC(armedf_state::armedf_scan_type2),this), 8, 8, 64, 32);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(armedf_state::get_nb1414m4_tx_tile_info)),
+			(m_scroll_type == 2) ? tilemap_mapper_delegate(*this, FUNC(armedf_state::armedf_scan_type3)) : tilemap_mapper_delegate(*this, FUNC(armedf_state::armedf_scan_type2)), 8, 8, 64, 32);
 
 	m_bg_tilemap->set_transparent_pen(0xf);
 	m_fg_tilemap->set_transparent_pen(0xf);
@@ -138,10 +138,10 @@ VIDEO_START_MEMBER(armedf_state,armedf)
 {
 	m_sprite_offy = (m_scroll_type & 2 ) ? 0 : 128;  /* legion, legiono, crazy climber 2 */
 
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(armedf_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 64, 32);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(armedf_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(armedf_state::get_bg_tile_info)), TILEMAP_SCAN_COLS, 16, 16, 64, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(armedf_state::get_fg_tile_info)), TILEMAP_SCAN_COLS, 16, 16, 64, 32);
 
-	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(armedf_state::get_armedf_tx_tile_info),this), tilemap_mapper_delegate(FUNC(armedf_state::armedf_scan_type1),this), 8, 8, 64, 32);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(armedf_state::get_armedf_tx_tile_info)), tilemap_mapper_delegate(*this, FUNC(armedf_state::armedf_scan_type1)), 8, 8, 64, 32);
 
 	m_bg_tilemap->set_transparent_pen(0xf);
 	m_fg_tilemap->set_transparent_pen(0xf);

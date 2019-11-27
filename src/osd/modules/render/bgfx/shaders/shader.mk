@@ -43,24 +43,24 @@ SHADER_PATH=shaders/dx11/$(SHADERS_DIR)
 else
 ifeq ($(TARGET), 2)
 VS_FLAGS=--platform nacl
-FS_FLAGS=--platform nacl --define TRANSPOSED_XYZ_TO_sRGB
+FS_FLAGS=--platform nacl
 SHADER_PATH=shaders/essl/$(SHADERS_DIR)
 else
 ifeq ($(TARGET), 3)
 VS_FLAGS=--platform android
-FS_FLAGS=--platform android --define TRANSPOSED_XYZ_TO_sRGB
+FS_FLAGS=--platform android
 CS_FLAGS=--platform android
 SHADER_PATH=shaders/essl/$(SHADERS_DIR)
 else
 ifeq ($(TARGET), 4)
 VS_FLAGS=--platform linux -p 120
-FS_FLAGS=--platform linux -p 120 --define TRANSPOSED_XYZ_TO_sRGB
+FS_FLAGS=--platform linux -p 120
 CS_FLAGS=--platform linux -p 430
 SHADER_PATH=shaders/glsl/$(SHADERS_DIR)
 else
 ifeq ($(TARGET), 5)
 VS_FLAGS=--platform osx -p metal
-FS_FLAGS=--platform osx -p metal --define TRANSPOSED_XYZ_TO_sRGB
+FS_FLAGS=--platform osx -p metal
 CS_FLAGS=--platform osx -p metal
 SHADER_PATH=shaders/metal/$(SHADERS_DIR)
 else

@@ -166,10 +166,10 @@ void kickgoal_state::program_map(address_map &map)
 	map(0x880000, 0x89ffff).nopw(); // during startup
 
 	map(0x900000, 0x90ffff).nopw(); // during startup
-	map(0x900001, 0x900001).lw8("eeprom_cs_w", [this](u8 data){ m_eeprom->cs_write(BIT(data, 0)); });
-	map(0x900003, 0x900003).lw8("eeprom_clk_w", [this](u8 data){ m_eeprom->clk_write(BIT(data, 0)); });
-	map(0x900005, 0x900005).lw8("eeprom_di_w", [this](u8 data){ m_eeprom->di_write(BIT(data, 0)); });
-	map(0x900007, 0x900007).lr8("eeprom_r", [this](){ return m_eeprom->do_read(); });
+	map(0x900001, 0x900001).lw8(NAME([this] (u8 data) { m_eeprom->cs_write(BIT(data, 0)); }));
+	map(0x900003, 0x900003).lw8(NAME([this] (u8 data) { m_eeprom->clk_write(BIT(data, 0)); }));
+	map(0x900005, 0x900005).lw8(NAME([this] (u8 data) { m_eeprom->di_write(BIT(data, 0)); }));
+	map(0x900007, 0x900007).lr8(NAME([this] () { return m_eeprom->do_read(); }));
 
 	map(0xa00000, 0xa03fff).ram().w(FUNC(kickgoal_state::fgram_w)).share("fgram"); /* FG Layer */
 	map(0xa04000, 0xa07fff).ram().w(FUNC(kickgoal_state::bgram_w)).share("bgram"); /* Higher BG Layer */
@@ -399,7 +399,7 @@ void kickgoal_state::kickgoal(machine_config &config)
 	m_audiocpu->read_c().set(FUNC(kickgoal_state::soundio_port_c_r));
 	m_audiocpu->write_c().set(FUNC(kickgoal_state::soundio_port_c_w));
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 
 	EEPROM_93C46_16BIT(config, "eeprom").default_data(kickgoal_default_eeprom_type1, 128);
 
@@ -547,7 +547,7 @@ void kickgoal_state::init_kickgoal()
 
 void kickgoal_state::init_actionhw()
 {
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x800004, 0x800005, write16_delegate(FUNC(kickgoal_state::actionhw_snd_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x800004, 0x800005, write16_delegate(*this, FUNC(kickgoal_state::actionhw_snd_w)));
 }
 
 GAME( 1995, kickgoal,  0,        kickgoal, kickgoal, kickgoal_state, init_kickgoal, ROT0, "TCH", "Kick Goal (set 1)",        MACHINE_SUPPORTS_SAVE )

@@ -187,12 +187,12 @@ void statriv2_state::statriv2_palette(palette_device &palette) const
 
 void statriv2_state::video_start()
 {
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(statriv2_state::horizontal_tile_info), this), TILEMAP_SCAN_ROWS, 8, 15, 64, 16);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(statriv2_state::horizontal_tile_info)), TILEMAP_SCAN_ROWS, 8, 15, 64, 16);
 }
 
 VIDEO_START_MEMBER(statriv2_state,vertical)
 {
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(statriv2_state::vertical_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(statriv2_state::vertical_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 
@@ -1698,18 +1698,18 @@ void statriv2_state::init_laserdisc()
 {
 	address_space &iospace = m_maincpu->space(AS_IO);
 	iospace.install_readwrite_handler(0x28, 0x2b,
-		read8_delegate([this](address_space &space, offs_t offset, uint8_t mem_mask) -> uint8_t
+		read8_delegate(*this, NAME([this] (address_space &space, offs_t offset, uint8_t mem_mask) -> uint8_t
 		{
 			uint8_t result = 0x00;
 			if (offset == 1)
 				result = 0x18;
 			logerror("%s:ld read ($%02X) = %02X\n", machine().describe_context(), 0x28 + offset, result);
 			return result;
-		},"write_lambda"),
-		write8_delegate([this](address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
+		})),
+		write8_delegate(*this, NAME([this] (address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 		{
 			logerror("%s:ld write ($%02X) = %02X\n", machine().describe_context(), 0x28 + offset, data);
-		},"read_lambda")
+		}))
 	);
 }
 

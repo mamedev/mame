@@ -630,7 +630,7 @@ void comx35_state::base(machine_config &config, const XTAL clock)
 	m_kbe->d11_callback().set_ioport("D11");
 	m_kbe->da_callback().set_inputline(m_maincpu, COSMAC_INPUT_LINE_EF3);
 
-	QUICKLOAD(config, "quickload", "comx").set_load_callback(FUNC(comx35_state::quickload_cb), this);
+	QUICKLOAD(config, "quickload", "comx").set_load_callback(FUNC(comx35_state::quickload_cb));
 
 	CASSETTE(config, m_cassette).set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	//m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);

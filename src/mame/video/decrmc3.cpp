@@ -19,12 +19,12 @@
 DEFINE_DEVICE_TYPE(DECO_RMC3, deco_rmc3_device, "deco_rmc3", "DECO RM-C3 PALETTE")
 
 deco_rmc3_device::deco_rmc3_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, DECO_RMC3, tag, owner, clock),
-		device_palette_interface(mconfig, *this),
-		m_entries(0),
-		m_indirect_entries(0),
-		m_prom_region(*this, finder_base::DUMMY_TAG),
-		m_init(deco_rmc3_palette_init_delegate())
+	: device_t(mconfig, DECO_RMC3, tag, owner, clock)
+	, device_palette_interface(mconfig, *this)
+	, m_entries(0)
+	, m_indirect_entries(0)
+	, m_prom_region(*this, finder_base::DUMMY_TAG)
+	, m_init(*this)
 {
 }
 
@@ -153,7 +153,7 @@ WRITE8_MEMBER(deco_rmc3_device::write_indirect_ext)
 void deco_rmc3_device::device_start()
 {
 	// bind the init function
-	m_init.bind_relative_to(*owner());
+	m_init.resolve();
 
 	// find the memory, if present
 	const memory_share *share = memshare(tag());

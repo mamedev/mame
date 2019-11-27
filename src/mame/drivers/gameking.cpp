@@ -1,5 +1,5 @@
 // license:GPL-2.0+
-// copyright-holders:Peter Trauner
+// copyright-holders:Peter Trauner, AJR
 /* TimeTop - GameKing */
 /*
   PeT mess@utanet.at 2015
@@ -13,27 +13,20 @@
 
   todo:
   !back up gameking3 bios so emulation of gameking3 gets possible; my gameking bios backup solution should work
-  search for rockwell r65c02 variant (cb:wai instruction) and several more exceptions, and implement it
-    (with luck microcontroller peripherals match those in gameking)
-  work out bankswitching and exceptions
   (improove emulation)
   (add audio)
 
   use gameking3 cartridge to get illegal cartridge scroller
-
-  This system appears to be based on the GeneralPlus GPL133 system-on-chip or a close relative.
-  Datasheet: http://www.generalplus.com/doc/ds/GPL133AV10_spec.pdf
 */
 
 #include "emu.h"
-#include "cpu/m6502/r65c02.h"
+#include "cpu/m6502/st2204.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 
-#include <stddef.h>
 
 class gameking_state : public driver_device
 {
@@ -54,120 +47,61 @@ public:
 
 protected:
 	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 private:
 	void gameking_palette(palette_device &palette) const;
-	DECLARE_READ8_MEMBER(io_r);
-	DECLARE_WRITE8_MEMBER(io_w);
-	DECLARE_READ8_MEMBER(lcd_r);
-	DECLARE_WRITE8_MEMBER(lcd_w);
-	INTERRUPT_GEN_MEMBER(gameking_frame_int);
+	void timer_w(uint8_t data);
+	uint8_t input_r();
+	uint8_t input2_r();
 	TIMER_CALLBACK_MEMBER(gameking_timer);
 	TIMER_CALLBACK_MEMBER(gameking_timer2);
 
 	uint32_t screen_update_gameking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_gameking3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
-	struct Gkio {
-		uint8_t input, input2;
-		uint8_t timer;
-		uint8_t res3[0x2f];
-		uint8_t bank4000_address; // 32
-		uint8_t bank4000_cart; //33 bit 0 only?
-		uint8_t bank8000_cart; //34 bit 7; bits 0,1,.. a15,a16,..
-		uint8_t res2[0x4c];
-	};
 	void gameking_mem(address_map &map);
+	void gameking3_mem(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
 	required_ioport m_io_joy;
-	required_device<palette_device> m_palette;
+	optional_device<palette_device> m_palette;
 
-	memory_region *m_cart_rom;
-	memory_bank *m_bank4000;
-	memory_bank *m_bank8000;
 	emu_timer *timer1;
 	emu_timer *timer2;
+
+	uint8_t m_timer;
 };
 
 
-WRITE8_MEMBER(gameking_state::io_w)
+void gameking_state::timer_w(uint8_t data)
 {
-	if (offset != offsetof(Gkio, bank8000_cart))
-		logerror("%.6f io w %x %x\n", machine().time().as_double(), offset, data);
-
-	memory_region *maincpu_rom = memregion("maincpu");
-
-	maincpu_rom->base()[offset] = data;
-	if (offset == offsetof(Gkio, timer)) {
-		m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
-		timer1->enable(true);
-		timer1->reset(m_maincpu->cycles_to_attotime(data * 300/*?*/));
-	}
-
-	Gkio *io = reinterpret_cast<Gkio*>(maincpu_rom->base());
-	if (offset == offsetof(Gkio, bank4000_address) || offset == offsetof(Gkio, bank4000_cart)) {
-		uint8_t bank = io->bank4000_address ^ 1;
-		uint8_t *base = io->bank4000_cart & 1/*?*/ && m_cart_rom ? m_cart_rom->base() : maincpu_rom->base() + 0x10000;
-		m_bank4000->set_base(base + bank * 0x4000);
-	}
-	if (offset == offsetof(Gkio, bank8000_cart)) {
-		uint8_t *base = io->bank8000_cart & 0x80/*?*/ && m_cart_rom ? m_cart_rom->base() : maincpu_rom->base() + 0x10000;
-		uint8_t bank = io->bank8000_cart & 0x7f;
-		m_bank8000->set_base(base + bank * 0x8000);
-	}
+	m_timer = data;
+	//m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+	timer1->enable(true);
+	timer1->reset(m_maincpu->cycles_to_attotime(data * 300/*?*/));
 }
 
-READ8_MEMBER(gameking_state::io_r)
+uint8_t gameking_state::input_r()
 {
-	memory_region *maincpu_rom = memregion("maincpu");
-	uint8_t data = maincpu_rom->base()[offset];
-	switch (offset) {
-		case offsetof(Gkio, input):
-			data = m_io_joy->read() | ~3;
-			break;
-		case offsetof(Gkio, input2):
-			data = m_io_joy->read() | 3;
-			break;
-		case 0x4c: data = 6;
-			break; // bios protection endless loop
-	}
-
-	if (offset != offsetof(Gkio, bank8000_cart))
-		logerror("%.6f io r %x %x\n", machine().time().as_double(), offset, data);
-
-	return data;
+	return m_io_joy->read() | ~3;
 }
 
-WRITE8_MEMBER( gameking_state::lcd_w )
+uint8_t gameking_state::input2_r()
 {
-	memory_region *maincpu_rom = memregion("maincpu");
-	maincpu_rom->base()[offset+0x600]=data;
-}
-
-READ8_MEMBER(gameking_state::lcd_r)
-{
-	memory_region *maincpu_rom = memregion("maincpu");
-	uint8_t data = maincpu_rom->base()[offset + 0x600];
-	return data;
+	return m_io_joy->read() | 3;
 }
 
 void gameking_state::gameking_mem(address_map &map)
 {
-	map(0x0000, 0x007f).rw(FUNC(gameking_state::io_r), FUNC(gameking_state::io_w));
-	map(0x0080, 0x01ff).ram();
-	map(0x0200, 0x03ff).ram(); // lcd 2nd copy
+	map(0x000000, 0x07ffff).rom().region("maincpu", 0);
+}
 
-	map(0x0600, 0x077f).rw(FUNC(gameking_state::lcd_r), FUNC(gameking_state::lcd_w));
-	map(0x0d00, 0x0fff).ram(); // d00, e00, f00 prooved on handheld
-//  map(0x1000, 0x1fff).ram();    // sthero writes to $19xx
-
-//  map(0x3000, 0x3fff).bankr("bank3000");
-	map(0x4000, 0x7fff).bankr("bank4000");
-	map(0x8000, 0xffaf).bankr("bank8000");
-	map(0xffb0, 0xffff).bankr("bankboot"); // cpu seems to read from 8000 bank, and for exceptions ignore bank
+void gameking_state::gameking3_mem(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom().region("maincpu", 0);
+	map(0x800000, 0x807fff).ram();
 }
 
 
@@ -175,12 +109,19 @@ static INPUT_PORTS_START( gameking )
 	PORT_START("JOY")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START) PORT_NAME("Start")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SELECT) PORT_NAME("Select") //?
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("A") //?
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("A")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("B")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) //?
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) //?
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( gameking3 )
+	PORT_INCLUDE( gameking )
+	PORT_MODIFY("JOY")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START) PORT_NAME("Start")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SELECT) PORT_NAME("Select") //?
 INPUT_PORTS_END
 
 static constexpr rgb_t gameking_pens[] =
@@ -199,18 +140,92 @@ void gameking_state::gameking_palette(palette_device &palette) const
 
 uint32_t gameking_state::screen_update_gameking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	address_space *maincpu_ram = &m_maincpu->space(AS_PROGRAM);
+	offs_t lssa = m_maincpu->state_int(st2xxx_device::ST_LSSA);
+	if (lssa < 0x0080)
+		return 0;
+
 	for (int y=31, i=0;i<32;i++,y--)
 	{
 		for (int x=0, j=0;j<48/4;x+=4, j++)
 		{
-			memory_region *maincpu_rom = memregion("maincpu");
-			uint8_t data=maincpu_rom->base()[0x600+j+i*12];
+			uint8_t data=maincpu_ram->read_byte(lssa+j+i*12);
 			bitmap.pix16(y, x+3)=data&3;
 			bitmap.pix16(y, x+2)=(data>>2)&3;
 			bitmap.pix16(y, x+1)=(data>>4)&3;
 			bitmap.pix16(y, x)=(data>>6)&3;
 		}
 	}
+	return 0;
+}
+
+
+static constexpr uint8_t gameking3_intensities[] =
+{
+	0,
+	127,
+	191,
+	255
+};
+
+uint32_t gameking_state::screen_update_gameking3(screen_device& screen, bitmap_rgb32 &bitmap, const rectangle& cliprect)
+{
+	address_space* maincpu_ram = &m_maincpu->space(AS_PROGRAM);
+	offs_t lssa = m_maincpu->state_int(st2xxx_device::ST_LSSA);
+	if (lssa < 0x0080)
+		return 0;
+
+	for (int y = 0, i = 0; i < 80; y += 2, i++)
+	{
+		for (int x = 0, j = 0; j < 40; x += 4, j++)
+		{
+			uint8_t data=maincpu_ram->read_byte(lssa+j+i*40);
+
+			// apply SPRD-C color filter
+			switch (i % 3)
+			{
+			case 0:
+				bitmap.pix32(y, x + 3) = rgb_t(0, gameking3_intensities[data&3], 0);
+				bitmap.pix32(y + 1, x + 2) = rgb_t(gameking3_intensities[(data>>2)&3], 0, 0);
+				bitmap.pix32(y, x + 1) = rgb_t(0, gameking3_intensities[(data>>4)&3], 0);
+				bitmap.pix32(y + 1, x) = rgb_t(gameking3_intensities[(data>>6)&3], 0, 0);
+				break;
+
+			case 1:
+				bitmap.pix32(y, x + 3) = rgb_t(0, 0, gameking3_intensities[data&3]);
+				bitmap.pix32(y + 1, x+2) = rgb_t(0, gameking3_intensities[(data>>2)&3], 0);
+				bitmap.pix32(y, x + 1) = rgb_t(0, 0, gameking3_intensities[(data>>4)&3]);
+				bitmap.pix32(y + 1, x) = rgb_t(0, gameking3_intensities[(data>>6)&3], 0);
+				break;
+
+			case 2:
+				bitmap.pix32(y, x + 3) = rgb_t(gameking3_intensities[data&3], 0, 0);
+				bitmap.pix32(y + 1, x+2) = rgb_t(0, 0, gameking3_intensities[(data>>2)&3]);
+				bitmap.pix32(y, x + 1) = rgb_t(gameking3_intensities[(data>>4)&3], 0, 0);
+				bitmap.pix32(y + 1, x) = rgb_t(0, 0, gameking3_intensities[(data>>6)&3]);
+				break;
+			}
+		}
+	}
+
+	// interpolate values for dots in between
+	for (int y = 0; y < 160; y++)
+	{
+		for (int x = y & 1; x < 160; x += 2)
+		{
+			rgb_t l = rgb_t(x == 0 ? 0 : bitmap.pix32(y, x - 1));
+			rgb_t r = rgb_t(x == 159 ? 0 : bitmap.pix32(y, x + 1));
+			rgb_t u = rgb_t(y == 0 ? 0 : bitmap.pix32(y - 1, x));
+			rgb_t d = rgb_t(y == 159 ? 0 : bitmap.pix32(y + 1, x));
+
+			bitmap.pix32(y, x) = rgb_t(
+				((u.r() + d.r()) * 2 + l.r() + r.r()) / 3,
+				((u.g() + d.g()) * 2 + l.g() + r.g()) / 3,
+				((u.b() + d.b()) * 2 + l.b() + r.b()) / 3
+			);
+		}
+	}
+
 	return 0;
 }
 
@@ -223,7 +238,8 @@ void gameking_state::init_gameking()
 
 TIMER_CALLBACK_MEMBER(gameking_state::gameking_timer)
 {
-	m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE); // in reality int for vector at fff4
+	m_maincpu->set_state_int(st2xxx_device::ST_IREQ,
+		m_maincpu->state_int(st2xxx_device::ST_IREQ) | (0x012 & m_maincpu->state_int(st2xxx_device::ST_IENA)));
 	timer1->enable(false);
 	timer2->enable(true);
 	timer2->reset(m_maincpu->cycles_to_attotime(10/*?*/));
@@ -231,19 +247,17 @@ TIMER_CALLBACK_MEMBER(gameking_state::gameking_timer)
 
 TIMER_CALLBACK_MEMBER(gameking_state::gameking_timer2)
 {
-	memory_region *maincpu_rom = memregion("maincpu");
-	m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE); // in reality int for vector at fff4
+	//m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE); // in reality int for vector at fff4
 	timer2->enable(false);
 	timer1->enable(true);
-	Gkio *io = reinterpret_cast<Gkio*>(maincpu_rom->base());
-	timer1->reset(m_maincpu->cycles_to_attotime(io->timer * 300/*?*/));
+	timer1->reset(m_maincpu->cycles_to_attotime(m_timer * 300/*?*/));
 }
 
 DEVICE_IMAGE_LOAD_MEMBER(gameking_state::cart_load)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
-	if (size > 0x80000)
+	if (size > 0x100000)
 	{
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
 		return image_init_result::FAIL;
@@ -258,40 +272,21 @@ DEVICE_IMAGE_LOAD_MEMBER(gameking_state::cart_load)
 void gameking_state::machine_start()
 {
 	std::string region_tag;
-	m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
-
-	m_bank4000 = membank("bank4000");
-	m_bank8000 = membank("bank8000");
-
-	memory_region *maincpu_rom = memregion("maincpu");
-	memory_bank *bankboot=membank("bankboot");
-	maincpu_rom->base()[0x10000+0x7ffe]=0xcf; // routing irq to timerint until r65c02gk hooked up
-	bankboot->set_base(maincpu_rom->base()+0x10000+0x7fb0);
-}
-
-void gameking_state::machine_reset()
-{
-	memory_region *maincpu_rom = memregion("maincpu");
-	maincpu_rom->base()[0x32] = 0; // neccessary to boot correctly
-	maincpu_rom->base()[0x33] = 0;
-	m_bank4000->set_base(maincpu_rom->base() + 0x10000 + 0x4000);
-	//m_bank8000->set_base(maincpu_rom->base()+0x10000); //? no reason to enforce this yet
-}
-
-INTERRUPT_GEN_MEMBER(gameking_state::gameking_frame_int) // guess to get over bios wai
-{
-	//  static int line=0;
-	//  line++;
-	//  m_maincpu->set_input_line(M6502_IRQ_LINE, line&1? ASSERT_LINE: CLEAR_LINE); // in reality int for vector at fff4
+	memory_region *cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
+	if (cart_rom)
+		m_maincpu->space(AS_DATA).install_rom(0x400000, 0x400000 + cart_rom->bytes() - 1, cart_rom->base()); // FIXME: gamekin3 wants Flash cartridges, not plain ROM
 }
 
 
 void gameking_state::gameking(machine_config &config)
 {
 	/* basic machine hardware */
-	R65C02(config, m_maincpu, 6000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &gameking_state::gameking_mem);
-	m_maincpu->set_vblank_int("screen", FUNC(gameking_state::gameking_frame_int));
+	st2xxx_device &maincpu(ST2204(config, m_maincpu, 6000000));
+	maincpu.set_addrmap(AS_DATA, &gameking_state::gameking_mem);
+	maincpu.in_pa_callback().set(FUNC(gameking_state::input_r));
+	maincpu.in_pb_callback().set(FUNC(gameking_state::input2_r));
+	maincpu.out_pc_callback().set(FUNC(gameking_state::timer_w)); // wrong
+	maincpu.in_pl_callback().set_constant(6); // bios protection endless loop
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
@@ -304,7 +299,7 @@ void gameking_state::gameking(machine_config &config)
 	PALETTE(config, m_palette, FUNC(gameking_state::gameking_palette), ARRAY_LENGTH(gameking_pens));
 
 	/* cartridge */
-	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "gameking_cart", "bin").set_device_load(FUNC(gameking_state::cart_load), this);
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "gameking_cart", "bin").set_device_load(FUNC(gameking_state::cart_load));
 }
 
 void gameking_state::gameking1(machine_config &config)
@@ -316,25 +311,36 @@ void gameking_state::gameking1(machine_config &config)
 void gameking_state::gameking3(machine_config &config)
 {
 	gameking(config);
+	m_maincpu->set_clock(8000000);
+	m_maincpu->set_addrmap(AS_DATA, &gameking_state::gameking3_mem);
+
+	screen_device &screen(*subdevice<screen_device>("screen"));
+	screen.set_size(160, 160);
+	screen.set_visarea_full();
+	screen.set_physical_aspect(3, 2);
+	screen.set_refresh_hz(39.308176); // ?
+	screen.set_screen_update(FUNC(gameking_state::screen_update_gameking3));
+	screen.set_no_palette();
+	config.device_remove("palette");
+
 	SOFTWARE_LIST(config, "cart_list").set_original("gameking");
 	SOFTWARE_LIST(config, "cart_list_3").set_original("gameking3");
 }
 
 
 ROM_START(gameking)
-	ROM_REGION(0x10000+0x80000, "maincpu", ROMREGION_ERASE00)
-//  ROM_LOAD("gm218.bin", 0x10000, 0x80000, CRC(8f52a928) SHA1(2e791fc7b642440d36820d2c53e1bb732375eb6e) ) // a14 inversed
-	ROM_LOAD("gm218.bin", 0x10000, 0x80000, CRC(5a1ade3d) SHA1(e0d056f8ebfdf52ef6796d0375eba7fcc4a6a9d3) )
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_LOAD("gm218.bin", 0x00000, 0x80000, CRC(5a1ade3d) SHA1(e0d056f8ebfdf52ef6796d0375eba7fcc4a6a9d3) )
 ROM_END
 
 ROM_START(gamekin3)
-	ROM_REGION(0x10000+0x80000, "maincpu", ROMREGION_ERASE00)
-	ROM_LOAD("gm220.bin", 0x10000, 0x80000, CRC(1dc43bd5) SHA1(f9dcd3cb76bb7cb10565a1acb070ab375c082b4c) )
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_LOAD("gm220.bin", 0x00000, 0x80000, CRC(1dc43bd5) SHA1(f9dcd3cb76bb7cb10565a1acb070ab375c082b4c) )
 ROM_END
 
 CONS( 2003, gameking, 0, 0, gameking1, gameking, gameking_state, init_gameking, "TimeTop", "GameKing GM-218", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 // the GameKing 2 (GM-219) is probably identical HW
 
-CONS( 2003, gamekin3, 0, 0, gameking3, gameking, gameking_state, init_gameking, "TimeTop", "GameKing 3",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 2003, gamekin3, 0, 0, gameking3, gameking3, gameking_state, init_gameking, "TimeTop", "GameKing 3",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 // gameking 3: similiar cartridges, accepts gameking cartridges, gameking3 cartridges not working on gameking (illegal cartridge scroller)
 // my gameking bios backup solution might work on it

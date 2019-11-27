@@ -115,7 +115,7 @@ bool mgt_format::save(io_generic *io, floppy_image *image)
 	for(int head=0; head < 2; head++) {
 		for(int track=0; track < 80; track++) {
 			get_track_data_mfm_pc(track, head, image, 2000, 512, sector_count, sectdata);
-			io_generic_write(io, sectdata, (head*80 + track)*track_size, track_size);
+			io_generic_write(io, sectdata, (track*2+head)*track_size, track_size);
 		}
 	}
 

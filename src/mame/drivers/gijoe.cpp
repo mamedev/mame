@@ -316,12 +316,12 @@ void gijoe_state::gijoe(machine_config &config)
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 2048).enable_shadows();
 
 	K056832(config, m_k056832, 0);
-	m_k056832->set_tile_callback(FUNC(gijoe_state::tile_callback), this);
+	m_k056832->set_tile_callback(FUNC(gijoe_state::tile_callback));
 	m_k056832->set_config(K056832_BPP_4, 1, 0);
 	m_k056832->set_palette(m_palette);
 
 	K053246(config, m_k053246, 0);
-	m_k053246->set_sprite_callback(FUNC(gijoe_state::sprite_callback), this);
+	m_k053246->set_sprite_callback(FUNC(gijoe_state::sprite_callback));
 	m_k053246->set_config(NORMAL_PLANE_ORDER, -37, 20);
 	m_k053246->set_palette(m_palette);
 

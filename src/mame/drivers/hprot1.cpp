@@ -269,7 +269,7 @@ void hprot1_state::hprot1(machine_config &config)
 
 	HD44780(config, m_lcdc, 0);
 	m_lcdc->set_lcd_size(2, 16);
-	m_lcdc->set_pixel_update_cb(FUNC(hprot1_state::hprot1_pixel_update), this);
+	m_lcdc->set_pixel_update_cb(FUNC(hprot1_state::hprot1_pixel_update));
 
 	/* TODO: figure out which RTC chip is in use. */
 

@@ -49,6 +49,31 @@
           R S S D K S D S S R D                  R S S D K S D S S R C
           A A A A   E B B B B B                  A A A A   E B B B B
                     T                                      T
+                                 _____   _____
+                           D1  1|*    \_/     |48 D0
+                           D3  2|             |47 D2
+                           D5  3|             |46 D4
+                           D7  4|             |45 D6
+                        _INTR  5|             |44 R/_W
+                          CLK  6|             |43 _IACK
+                        XTAL1  7|             |42 _DTACK
+                        XTAL2  8|             |41 _CS
+                       _RESET  9|             |40 _RxRDYB
+                      _RxRDYA 10|             |39 _TxRDYB
+                      _TxRDYA 11|  DIP48      |38 GND
+                          Vcc 12|  MK68564    |37 _IEI
+                         _IEO 13|  SIO        |36 _SYNCB
+                       _SYNCA 14|             |35 _TxCB
+                        _TxCA 15|             |34 _RxCB
+                        _RxCA 16|             |29 RxDB
+                         RxDA 17|             |28 TxDB
+                         TxDA 18|             |27 _DTRB
+                        _DTRA 19|             |26 _RTSB
+                        _RTSA 20|             |25 _CTSB
+                        _CTSA 21|             |24 _DCDB
+                        _DCDA 22|             |23 A1
+                           A2 23|             |22 A3
+                           A4 24|_____________|21 A5
 
 ***************************************************************************/
 
@@ -80,6 +105,7 @@ class z80sio_channel : public device_t
 	friend class z80sio_device;
 	friend class i8274_new_device;
 	friend class upd7201_new_device;
+	friend class mk68564_device;
 
 public:
 	z80sio_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -199,8 +225,8 @@ protected:
 	void set_dtr(int state);
 	void set_rts(int state);
 
-	int get_clock_mode();
-	int get_rx_word_length();
+	int get_clock_mode() const;
+	int get_rx_word_length() const;
 	int get_tx_word_length() const;
 
 	// receiver state
@@ -258,14 +284,14 @@ protected:
 	int m_index;
 	z80sio_device *m_uart;
 
-private:
+protected:
 	// helpers
 	void out_txd_cb(int state);
 	void out_rts_cb(int state);
 	void out_dtr_cb(int state);
 	void set_ready(bool ready);
 	bool receive_allowed() const;
-	bool transmit_allowed() const;
+	virtual bool transmit_allowed() const;
 
 	void receive_enabled();
 	void enter_hunt_mode();
@@ -301,6 +327,52 @@ class i8274_channel : public z80sio_channel
 {
 public:
 	i8274_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+
+// ======================> mk68564_channel
+
+class mk68564_channel : public z80sio_channel
+{
+	friend class mk68564_device;
+
+public:
+	mk68564_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	virtual bool transmit_allowed() const override;
+
+private:
+	uint8_t cmdreg_r();
+	void cmdreg_w(uint8_t data);
+	uint8_t modectl_r();
+	void modectl_w(uint8_t data);
+	uint8_t intctl_r();
+	void intctl_w(uint8_t data);
+	uint8_t sync1_r();
+	void sync1_w(uint8_t data);
+	uint8_t sync2_r();
+	void sync2_w(uint8_t data);
+	uint8_t rcvctl_r();
+	void rcvctl_w(uint8_t data);
+	uint8_t xmtctl_r();
+	void xmtctl_w(uint8_t data);
+	uint8_t tcreg_r();
+	void tcreg_w(uint8_t data);
+	uint8_t brgctl_r();
+	void brgctl_w(uint8_t data);
+
+	void brg_update();
+	TIMER_CALLBACK_MEMBER(brg_timeout);
+
+	bool m_tx_auto_enable;
+	uint8_t m_brg_tc;
+	uint8_t m_brg_control;
+	bool m_brg_state;
+	emu_timer *m_brg_timer;
 };
 
 
@@ -443,9 +515,29 @@ public:
 	upd7201_new_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
+class mk68564_device : public i8274_new_device
+{
+public:
+	mk68564_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	void set_xtal(uint32_t clock);
+	void set_xtal(const XTAL &clock) { set_xtal(clock.value()); }
+
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
+
+protected:
+	// device_t overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+
+private:
+	void vectrg_w(uint8_t data);
+};
+
 // device type declaration
 DECLARE_DEVICE_TYPE(Z80SIO,         z80sio_device)
 DECLARE_DEVICE_TYPE(I8274_NEW,      i8274_new_device)
 DECLARE_DEVICE_TYPE(UPD7201_NEW,    upd7201_new_device)
+DECLARE_DEVICE_TYPE(MK68564,        mk68564_device)
 
 #endif // MAME_MACHINE_Z80SIO_H

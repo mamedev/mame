@@ -1,9 +1,5 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * pmain.cpp
- *
- */
 
 #include "pmain.h"
 
@@ -28,10 +24,6 @@ namespace plib {
 		return ret;
 	}
 	#endif
-
-/***************************************************************************
-    Application
-***************************************************************************/
 
 	app::app()
 	: options()

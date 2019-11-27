@@ -189,7 +189,7 @@
 
   This game has similar memory map than Golden Star. The program writes to init
   the reels RAM/palette (bp C11A), then transfer the control to PC 253h where
-  starts to write to some NVRAM chunks. Unfortunatelly at PC 2DBh there is a call
+  starts to write to some NVRAM chunks. Unfortunately at PC 2DBh there is a call
   to 0C33h, where there are only ASCII strings instead of subroutines.
   Also there are some other calls to the same range, that also lack of code.
 
@@ -206,7 +206,7 @@
   * Bingo (Wing)
 
   It has a different machine driver to support the different pos of gfx
-  layers. I strogly suspect there is a register to adjust the layer position.
+  layers. I strongly suspect there is a register to adjust the layer position.
 
 
 ***************************************************************************/
@@ -9275,6 +9275,7 @@ void wingco_state::wcat3(machine_config &config)
 	/* basic machine hardware */
 	Z80(config, m_maincpu, CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &wingco_state::wcat3_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &wingco_state::super972_decrypted_opcodes_map);
 	//m_maincpu->set_addrmap(AS_IO, &wingco_state::goldstar_readport);
 
 	I8255A(config, m_ppi[0]);
@@ -10353,6 +10354,42 @@ ROM_START( super7 )
 	ROM_LOAD( "gal20v8.bin",   0x000, 0x114, NO_DUMP )
 	ROM_LOAD( "gal20v8.bin",   0x000, 0x114, NO_DUMP )
 	ROM_LOAD( "gal20v8.bin",   0x000, 0x114, NO_DUMP )
+ROM_END
+
+ROM_START( chthree )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.u40",   0x0000, 0x8000, CRC(3d677758) SHA1(d2d13e54d3b55460a05b0ca42e12d8a6d72954ba) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_IGNORE(0x8000)
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "7.u46",  0x00000, 0x8000, CRC(65e2e9e9) SHA1(3085aec35ac6d232fcf9be847ab4fcde586dd4f5) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_IGNORE(0x8000)
+	ROM_LOAD( "8.u47",  0x08000, 0x8000, CRC(0ec483a9) SHA1(55913f830ee310c2326f50af4527aeb63649e68d) ) // 0xxxxxxxxxxxxxxx = 0xFF
+	ROM_CONTINUE(       0x08000, 0x8000)
+	ROM_LOAD( "9.u48",  0x10000, 0x8000, CRC(39f528f7) SHA1(29d31783afdb256cd9454c87170591d3f9c53665) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_IGNORE(0x8000)
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "3.u49",   0x0000, 0x2000, CRC(b541cbc0) SHA1(ab8666c06a71fa8364c71d14715ddf9e222064cd) )
+	ROM_LOAD( "4.u50",   0x2000, 0x2000, CRC(95ecd2aa) SHA1(73452c77dd83f96038d197bad5e37f0b3d9de561) )
+	ROM_LOAD( "5.u51",   0x4000, 0x2000, CRC(a99c87ba) SHA1(4d74ded22da25e093b09d0a4abfbd3e1eabd816c) )
+	ROM_LOAD( "6.u52",   0x6000, 0x2000, CRC(5b19025d) SHA1(8e861ed8249811fdf50de8ca9c44fe1176a7e340) )
+
+	ROM_REGION( 0x10000, "user1", 0 )
+	ROM_LOAD( "2.u53",  0x0000, 0x10000, CRC(4124228a) SHA1(d1a6c98cac20ae49daaaa165ac9ccfaca14323b1) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "82s129.u23", 0x0000, 0x0100, CRC(fdb15bef) SHA1(68c6539f5c9136e5f822dce86fcf3335e8c3874d) )
+	ROM_LOAD( "82s129.u35", 0x0100, 0x0100, CRC(fd90f7e6) SHA1(6bfa15ab2db8667e28277c9a5cd80ad3d5a0ea4d) )
+
+	ROM_REGION( 0x200, "proms2", 0 )
+	ROM_LOAD( "82s129.u24", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
+
+	ROM_REGION( 0x800, "plds", 0 ) // PALs dumps from a 27c020 adapter are available, need checking / conversion
+	ROM_LOAD( "16l8_u18.bin", 0x0000, 0x117, NO_DUMP )
+	ROM_LOAD( "16l8_u31.bin", 0x0200, 0x117, NO_DUMP )
+	ROM_LOAD( "16l8_u32.bin", 0x0400, 0x117, NO_DUMP )
+	ROM_LOAD( "16l8_u30.bin", 0x0600, 0x117, NO_DUMP )
 ROM_END
 
 /*
@@ -14435,7 +14472,7 @@ void cmaster_state::init_fb2010()
 	ROM[0x10dc] = 0x00;
 	ROM[0x10dd] = 0x00;
 
-	m_maincpu->space(AS_IO).install_read_handler(0x1e, 0x1e, read8_delegate(FUNC(cmaster_state::fixedval7d_r),this));
+	m_maincpu->space(AS_IO).install_read_handler(0x1e, 0x1e, read8_delegate(*this, FUNC(cmaster_state::fixedval_r<0x7d>)));
 }
 
 
@@ -16903,6 +16940,36 @@ void goldstar_state::init_ladylinre()
 	}
 }
 
+void wingco_state::init_wcat3()
+{
+	// the following is very preliminary and only good to decrypt text strings. Treat everything as incomplete and probably incorrect.
+	uint8_t *rom = memregion("maincpu")->base();
+
+	for (int i = 0x0000; i < 0x10000; i++)
+	{
+		uint8_t x = rom[i];
+
+		m_decrypted_opcodes[i] = x;
+	}
+
+	// data encryption seems to involve only bits 4, 5 and 7 and some conditional XORs
+	for (int i = 0x4000; i < 0x10000; i++)
+	{
+		uint8_t x = rom[i];
+
+		switch (i & 0x405)
+		{
+			case 0x001: x = bitswap<8>(BIT(x, 6) ? x ^ 0x10 : x, 5, 6, 7, 4, 3, 2, 1, 0); break;
+			case 0x004: x = bitswap<8>(!BIT(x, 7) ? x ^ 0x20 : x, 4, 6, 5, 7, 3, 2, 1, 0); break;
+			case 0x005: x = bitswap<8>(BIT(x, 7) ? x ^ 0x80 : x, 7, 6, 4, 5, 3, 2, 1, 0); break;
+			case 0x401: x = bitswap<8>(!BIT(x, 7) ? x ^ 0x10 : x, 5, 6, 7, 4, 3, 2, 1, 0); break;
+			case 0x404: x = bitswap<8>(x, 4, 6, 5, 7, 3, 2, 1, 0); break;
+			case 0x405: x = bitswap<8>(x, 4, 6, 5, 7, 3, 2, 1, 0); break;
+		}
+
+		rom[i] = x;
+	}
+}
 
 //  this block swapping is the same for chry10, chrygld and cb3
 //  the underlying bitswaps / xors are different however
@@ -17278,8 +17345,8 @@ void cmaster_state::init_schery97()
 
 		rom[i] = x;
 	}
-	m_maincpu->space(AS_IO).install_read_handler(0x1d, 0x1d, read8_delegate(FUNC(cmaster_state::fixedvala8_r), this));
-	m_maincpu->space(AS_IO).install_read_handler(0x2a, 0x2a, read8_delegate(FUNC(cmaster_state::fixedvalb4_r), this));
+	m_maincpu->space(AS_IO).install_read_handler(0x1d, 0x1d, read8_delegate(*this, FUNC(cmaster_state::fixedval_r<0xa8>)));
+	m_maincpu->space(AS_IO).install_read_handler(0x2a, 0x2a, read8_delegate(*this, FUNC(cmaster_state::fixedval_r<0xb4>)));
 	/* Oki 6295 at 0x20 */
 }
 
@@ -17301,7 +17368,7 @@ void cmaster_state::init_schery97a()
 	}
 
 
-	m_maincpu->space(AS_IO).install_read_handler(0x16, 0x16, read8_delegate(FUNC(cmaster_state::fixedval38_r), this));
+	m_maincpu->space(AS_IO).install_read_handler(0x16, 0x16, read8_delegate(*this, FUNC(cmaster_state::fixedval_r<0x38>)));
 	/* Oki 6295 at 0x20 */
 }
 
@@ -17321,7 +17388,7 @@ void cmaster_state::init_skill98()
 
 		rom[i] = x;
 	}
-	m_maincpu->space(AS_IO).install_read_handler(0x1e, 0x1e, read8_delegate(FUNC(cmaster_state::fixedvalea_r), this));
+	m_maincpu->space(AS_IO).install_read_handler(0x1e, 0x1e, read8_delegate(*this, FUNC(cmaster_state::fixedval_r<0xea>)));
 	/* Oki 6295 at 0x20 */
 }
 
@@ -17341,7 +17408,7 @@ void cmaster_state::init_nfb96_c1()
 		}
 		rom[i] = x;
 	}
-	m_maincpu->space(AS_IO).install_read_handler(0x31, 0x31, read8_delegate(FUNC(cmaster_state::fixedval68_r), this));
+	m_maincpu->space(AS_IO).install_read_handler(0x31, 0x31, read8_delegate(*this, FUNC(cmaster_state::fixedval_r<0x68>)));
 
 }
 
@@ -17362,7 +17429,7 @@ void cmaster_state::init_nfb96_c2()
 
 		rom[i] = x;
 	}
-	m_maincpu->space(AS_IO).install_read_handler(0x21, 0x21, read8_delegate(FUNC(cmaster_state::fixedval58_r), this));
+	m_maincpu->space(AS_IO).install_read_handler(0x21, 0x21, read8_delegate(*this, FUNC(cmaster_state::fixedval_r<0x58>)));
 }
 
 void cmaster_state::init_nfb96_d()
@@ -17382,11 +17449,11 @@ void cmaster_state::init_nfb96_d()
 		rom[i] = x;
 	}
 	// nfb96b needs both of these
-	m_maincpu->space(AS_IO).install_read_handler(0x23, 0x23, read8_delegate(FUNC(cmaster_state::fixedval80_r), this));
-	m_maincpu->space(AS_IO).install_read_handler(0x5a, 0x5a, read8_delegate(FUNC(cmaster_state::fixedvalaa_r), this));
+	m_maincpu->space(AS_IO).install_read_handler(0x23, 0x23, read8_delegate(*this, FUNC(cmaster_state::fixedval_r<0x80>)));
+	m_maincpu->space(AS_IO).install_read_handler(0x5a, 0x5a, read8_delegate(*this, FUNC(cmaster_state::fixedval_r<0xaa>)));
 
 	// csel96b
-	m_maincpu->space(AS_IO).install_read_handler(0x6e, 0x6e, read8_delegate(FUNC(cmaster_state::fixedval96_r), this));
+	m_maincpu->space(AS_IO).install_read_handler(0x6e, 0x6e, read8_delegate(*this, FUNC(cmaster_state::fixedval_r<0x96>)));
 
 }
 
@@ -17407,7 +17474,7 @@ void cmaster_state::init_nfb96_dk()
 		}
 		rom[i] = x;
 	}
-	m_maincpu->space(AS_IO).install_read_handler(0x2e, 0x2e, read8_delegate(FUNC(cmaster_state::fixedvalbe_r), this));
+	m_maincpu->space(AS_IO).install_read_handler(0x2e, 0x2e, read8_delegate(*this, FUNC(cmaster_state::fixedval_r<0xbe>)));
 
 }
 
@@ -17428,8 +17495,8 @@ void cmaster_state::init_rp35()
 		rom[i] = x;
 	}
 
-	m_maincpu->space(AS_IO).install_read_handler(0x5e, 0x5e, read8_delegate(FUNC(cmaster_state::fixedval84_r), this));
-	m_maincpu->space(AS_IO).install_read_handler(0x36, 0x36, read8_delegate(FUNC(cmaster_state::fixedval90_r), this));
+	m_maincpu->space(AS_IO).install_read_handler(0x5e, 0x5e, read8_delegate(*this, FUNC(cmaster_state::fixedval_r<0x84>)));
+	m_maincpu->space(AS_IO).install_read_handler(0x36, 0x36, read8_delegate(*this, FUNC(cmaster_state::fixedval_r<0x90>)));
 }
 
 void cmaster_state::init_rp36()
@@ -17450,7 +17517,7 @@ void cmaster_state::init_rp36()
 		rom[i] = x;
 	}
 
-	m_maincpu->space(AS_IO).install_read_handler(0x34, 0x34, read8_delegate(FUNC(cmaster_state::fixedvalb2_r), this));
+	m_maincpu->space(AS_IO).install_read_handler(0x34, 0x34, read8_delegate(*this, FUNC(cmaster_state::fixedval_r<0xb2>)));
 }
 
 void cmaster_state::init_rp36c3()
@@ -17471,7 +17538,7 @@ void cmaster_state::init_rp36c3()
 		rom[i] = x;
 	}
 
-	m_maincpu->space(AS_IO).install_read_handler(0x17, 0x17, read8_delegate(FUNC(cmaster_state::fixedval48_r), this));
+	m_maincpu->space(AS_IO).install_read_handler(0x17, 0x17, read8_delegate(*this, FUNC(cmaster_state::fixedval_r<0x48>)));
 }
 
 void cmaster_state::init_rp96sub()  // 95 33 95 33 70 6C 70 6C... XORs and bitswaps seem ok. Stuck at Program Check screen. Unlike the other sets, there aren't unmapped reads where to put the handler.
@@ -17492,7 +17559,7 @@ void cmaster_state::init_rp96sub()  // 95 33 95 33 70 6C 70 6C... XORs and bitsw
 		rom[i] = x;
 	}
 
-//  m_maincpu->space(AS_IO).install_read_handler(0x34, 0x34, read8_delegate(FUNC(cmaster_state::fixedvalb2_r),this));
+//  m_maincpu->space(AS_IO).install_read_handler(0x34, 0x34, read8_delegate(*this, FUNC(cmaster_state::fixedval_r<0xb2>)));
 }
 
 
@@ -17513,8 +17580,8 @@ void cmaster_state::init_po33()
 
 		rom[i] = x;
 	}
-	m_maincpu->space(AS_IO).install_read_handler(0x32, 0x32, read8_delegate(FUNC(cmaster_state::fixedval74_r), this));
-	m_maincpu->space(AS_IO).install_read_handler(0x12, 0x12, read8_delegate(FUNC(cmaster_state::fixedval09_r), this));
+	m_maincpu->space(AS_IO).install_read_handler(0x32, 0x32, read8_delegate(*this, FUNC(cmaster_state::fixedval_r<0x74>)));
+	m_maincpu->space(AS_IO).install_read_handler(0x12, 0x12, read8_delegate(*this, FUNC(cmaster_state::fixedval_r<0x09>)));
 	/* oki6295 at 0x20 */
 }
 
@@ -17537,8 +17604,8 @@ void cmaster_state::init_match133()
 		rom[i] = x;
 	}
 
-	m_maincpu->space(AS_IO).install_read_handler(0x16, 0x16, read8_delegate(FUNC(cmaster_state::fixedvalc7_r), this));
-	m_maincpu->space(AS_IO).install_read_handler(0x1a, 0x1a, read8_delegate(FUNC(cmaster_state::fixedvale4_r), this));
+	m_maincpu->space(AS_IO).install_read_handler(0x16, 0x16, read8_delegate(*this, FUNC(cmaster_state::fixedval_r<0xc7>)));
+	m_maincpu->space(AS_IO).install_read_handler(0x1a, 0x1a, read8_delegate(*this, FUNC(cmaster_state::fixedval_r<0xe4>)));
 }
 
 
@@ -17658,6 +17725,42 @@ void goldstar_state::init_wcherry()
 	{
 		src2[i] = bitswap<8>(src2[i], 3, 4, 2, 5, 1, 6, 0, 7);    // OK
 	}
+}
+
+void cmaster_state::init_chthree()
+{
+	// Address swapping in 0x10 bytes blocks.
+	// 01234567-89abcdef <> c9ba8dfe - 41320576
+
+	uint8_t *rom = memregion("maincpu")->base();
+
+	for (int i = 0000; i < 0x8000; i++)
+	{
+		uint8_t row = i & 0x07;
+		uint16_t addr;
+
+		switch (row)
+		{
+			case 0x00:  addr = 0x0c; break;
+			case 0x01:  addr = 0x09; break;
+			case 0x02:  addr = 0x0b; break;
+			case 0x03:  addr = 0x0a; break;
+			case 0x04:  addr = 0x08; break;
+			case 0x05:  addr = 0x0d; break;
+			case 0x06:  addr = 0x0f; break;
+			case 0x07:  addr = 0x0e; break;
+		}
+
+		addr = (i & 0xfff0) | addr;
+
+		if (!BIT(i, 3))
+			std::swap(rom[i], rom[addr]);
+	}
+
+	// Temporary hacks - PPI settings and checksum correction
+	rom[0x1ff] = 0xbd;
+	rom[0x209] = 0x9b;
+	rom[0x20d] = 0x9b;
 }
 
 /*
@@ -17864,6 +17967,7 @@ GAME(  1999, jkrmasta,  jkrmast,  pkrmast,  pkrmast,  goldstar_state, init_jkrma
 GAME(  199?, pkrmast,   jkrmast,  pkrmast,  pkrmast,  goldstar_state, init_pkrmast,   ROT0, "Fun USA",           "Poker Master (ED-1993 set 1)",                MACHINE_NOT_WORKING ) // needs inputs / dips fixed, puts FUN USA 95H N/G  V2.20 in NVRAM
 GAME(  1993, pkrmasta,  jkrmast,  pkrmast,  pkrmast,  goldstar_state, init_pkrmast,   ROT0, "Fun USA",           "Poker Master (ED-1993 set 2)",                MACHINE_NOT_WORKING ) // needs inputs / dips fixed, puts PM93 JAN 29/1996 V1.52 in NVRAM
 
+GAME(  199?, chthree,   cmaster,  cm,       cmaster,  cmaster_state,  init_chthree,   ROT0, "Promat",            "Channel Three",                               MACHINE_NOT_WORKING)  // GFX scrambled
 
 GAME(  1991, cmast91,   0,        cmast91,  cmast91,  goldstar_state, init_cmast91,   ROT0, "Dyna",              "Cherry Master '91 (ver.1.30)",                0 )
 GAME(  1992, cmast92,   0,        cmast91,  cmast91,  goldstar_state, init_cmast91,   ROT0, "Dyna",              "Cherry Master '92",                           MACHINE_NOT_WORKING ) // no gfx roms are dumped
@@ -17899,7 +18003,7 @@ GAME(  198?, ladylinrb, ladylinr, ladylinrb,ladylinr, goldstar_state, init_ladyl
 GAME(  198?, ladylinrc, ladylinr, ladylinrb,ladylinr, goldstar_state, init_ladylinrc, ROT0, "TAB Austria",       "Lady Liner (encrypted, set 2)",                            0 )
 GAME(  198?, ladylinrd, ladylinr, ladylinrb,ladylinr, goldstar_state, init_ladylinrd, ROT0, "TAB Austria",       "Lady Liner (encrypted, set 3)",                            0 )
 GAME(  198?, ladylinre, ladylinr, ladylinrb,ladylinr, goldstar_state, init_ladylinre, ROT0, "TAB Austria",       "Lady Liner (encrypted, set 4)",                            0 )
-GAME(  198?, wcat3,     0,        wcat3,    lucky8,   wingco_state,   empty_init,     ROT0, "E.A.I.",            "Wild Cat 3",                                               MACHINE_NOT_WORKING )
+GAME(  198?, wcat3,     0,        wcat3,    lucky8,   wingco_state,   init_wcat3,     ROT0, "E.A.I.",            "Wild Cat 3",                                               MACHINE_NOT_WORKING )
 
 GAME(  1985, luckylad,  0,        lucky8,   luckylad, wingco_state,   init_luckylad,  ROT0, "Wing Co., Ltd.",    "Lucky Lady (Wing, encrypted)",                             MACHINE_NOT_WORKING )  // encrypted (see notes in rom_load)...
 GAME(  1991, megaline,  0,        megaline, megaline, unkch_state,    empty_init,     ROT0, "Fun World",         "Mega Lines",                                               MACHINE_NOT_WORKING )

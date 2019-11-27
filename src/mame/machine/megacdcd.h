@@ -8,20 +8,19 @@
 #include "sound/cdda.h"
 
 
-typedef device_delegate<void (int&, uint8_t*, uint16_t&, uint16_t&)> segacd_dma_delegate;
-
-typedef device_delegate<void (void)> interrupt_delegate;
-
 class lc89510_temp_device : public device_t
 {
 public:
+	typedef device_delegate<void (int &, uint8_t *, uint16_t &, uint16_t &)> dma_delegate;
+	typedef device_delegate<void ()> interrupt_delegate;
+
 	void set_is_neoCD(bool new_is_neoCD) { is_neoCD = new_is_neoCD; }
 
-	template <typename... T> void set_type1_interrupt_callback(T &&... args) { type1_interrupt_callback = interrupt_delegate(std::forward<T>(args)...); }
-	template <typename... T> void set_type2_interrupt_callback(T &&... args) { type2_interrupt_callback = interrupt_delegate(std::forward<T>(args)...); }
-	template <typename... T> void set_type3_interrupt_callback(T &&... args) { type3_interrupt_callback = interrupt_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_type1_interrupt_callback(T &&... args) { m_type1_interrupt_callback.set(std::forward<T>(args)...); }
+	template <typename... T> void set_type2_interrupt_callback(T &&... args) { m_type2_interrupt_callback.set(std::forward<T>(args)...); }
+	template <typename... T> void set_type3_interrupt_callback(T &&... args) { m_type3_interrupt_callback.set(std::forward<T>(args)...); }
 
-	template <typename... T> void set_cdc_do_dma_callback(T &&... args) { segacd_dma_callback = segacd_dma_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_cdc_do_dma_callback(T &&... args) { m_segacd_dma_callback.set(std::forward<T>(args)...); }
 
 	template <typename T> void set_cdrom_tag(T &&tag) { m_cdrom.set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_68k_tag(T &&tag) { m_68k.set_tag(std::forward<T>(tag)); }
@@ -72,14 +71,14 @@ protected:
 	static constexpr unsigned EXTERNAL_BUFFER_SIZE = (32 * 1024 * 2) + SECTOR_SIZE;
 
 	// HACK for DMA handling
-	segacd_dma_delegate segacd_dma_callback;
-	interrupt_delegate type1_interrupt_callback;
-	interrupt_delegate type2_interrupt_callback;
-	interrupt_delegate type3_interrupt_callback;
+	dma_delegate m_segacd_dma_callback;
+	interrupt_delegate m_type1_interrupt_callback;
+	interrupt_delegate m_type2_interrupt_callback;
+	interrupt_delegate m_type3_interrupt_callback;
 
 	void Fake_CDC_Do_DMA(int &dmacount, uint8_t *CDC_BUFFER, uint16_t &dma_addrc, uint16_t &destination );
 
-	void dummy_interrupt_callback(void);
+	void dummy_interrupt_callback();
 
 
 	required_device<cdrom_image_device> m_cdrom;

@@ -263,6 +263,10 @@ private:
 	void execute_cycle1(u16 opcode);
 	void execute_tbrd(u32 ptr);
 
+	// interrupt helpers
+	bool interrupt_active() const;
+	u32 vector_interrupt() const;
+
 	enum exec_state : u8 {
 		EXEC_CYCLE1,
 		EXEC_ADCPCM, EXEC_SBCPCM,

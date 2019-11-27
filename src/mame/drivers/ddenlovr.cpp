@@ -12919,7 +12919,7 @@ ROM_END
 
 void ddenlovr_state::init_momotaro()
 {
-	m_maincpu->space(AS_IO).install_read_handler(0xe0, 0xe0, read8_delegate(FUNC(ddenlovr_state::momotaro_protection_r),this));
+	m_maincpu->space(AS_IO).install_read_handler(0xe0, 0xe0, read8_delegate(*this, FUNC(ddenlovr_state::momotaro_protection_r)));
 }
 
 /***************************************************************************

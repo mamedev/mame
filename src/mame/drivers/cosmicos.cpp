@@ -549,7 +549,7 @@ void cosmicos_state::cosmicos(machine_config &config)
 	m_cti->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* devices */
-	QUICKLOAD(config, "quickload", "bin").set_load_callback(FUNC(cosmicos_state::quickload_cb), this);
+	QUICKLOAD(config, "quickload", "bin").set_load_callback(FUNC(cosmicos_state::quickload_cb));
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);

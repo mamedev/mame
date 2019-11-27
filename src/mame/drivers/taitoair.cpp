@@ -687,7 +687,7 @@ void taitoair_state::airsys(machine_config &config)
 	m_dsp->hold_in_cb().set(FUNC(taitoair_state::dsp_HOLD_signal_r));
 	m_dsp->hold_ack_out_cb().set(FUNC(taitoair_state::dsp_HOLDA_signal_w));
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 
 	TC0220IOC(config, m_tc0220ioc, 0);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");

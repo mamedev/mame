@@ -632,20 +632,25 @@ uint32_t mplay_state::screen_update_megplay(screen_device &screen, bitmap_rgb32 
 	// if it's meant to be stretched we'll have to multiply the entire output x4 for the Genesis VDP and x5 for the SMS VDP to get a common 1280 pixel wide image
 
 	// overlay, only drawn for pixels != 0
+	const u32 width = sega315_5124_device::WIDTH - (sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH);
 	for (int y = 0; y < 224; y++)
 	{
 		uint32_t* lineptr = &bitmap.pix32(y);
-		uint32_t* srcptr =  &m_vdp1->get_bitmap().pix32(y + sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT);
+		uint32_t* srcptr =  &m_vdp1->get_bitmap().pix32(y + sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT, sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH);
+		uint8_t* y1ptr = &m_vdp1->get_y1_bitmap().pix8(y + sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT, sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH);
 
-		for (int x = 0; x < sega315_5124_device::WIDTH; x++)
+		for (int srcx = 0, xx = 0, dstx = 0; srcx < width; dstx++)
 		{
-			uint32_t src = srcptr[x] & 0xffffff;
+			uint32_t src = srcptr[srcx] & 0xffffff;
 
-			if (src)
+			if (y1ptr[srcx])
 			{
-				if (x>=16)
-					lineptr[x-16] = src;
-
+				lineptr[dstx] = src;
+			}
+			if (++xx >= 5)
+			{
+				srcx++;
+				xx = 0;
 			}
 		}
 	}
@@ -672,7 +677,7 @@ void mplay_state::megaplay(machine_config &config)
 	m_bioscpu->set_addrmap(AS_PROGRAM, &mplay_state::megaplay_bios_map);
 	m_bioscpu->set_addrmap(AS_IO, &mplay_state::megaplay_bios_io_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	cxd1095_device &io1(CXD1095(config, "io1"));
 	io1.in_porta_cb().set_ioport("DSW0");
@@ -690,15 +695,18 @@ void mplay_state::megaplay(machine_config &config)
 	io2.in_porte_cb().set(FUNC(mplay_state::bios_6404_r));
 	io2.out_porte_cb().set(FUNC(mplay_state::bios_6404_w));
 
+	m_vdp->set_lcm_scaling(true);
+
 	/* New update functions to handle the extra layer */
-	subdevice<screen_device>("megadriv")->set_raw(XTAL(10'738'635)/2, \
-			sega315_5124_device::WIDTH, sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH, sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 256, \
+	subdevice<screen_device>("megadriv")->set_raw((XTAL(10'738'635) * 5)/2,
+			sega315_5124_device::WIDTH * 5, (sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH) * 5, (sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 256) * 5,
 			sega315_5124_device::HEIGHT_NTSC, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT + 224);
 	subdevice<screen_device>("megadriv")->set_screen_update(FUNC(mplay_state::screen_update_megplay));
 
 	// Megaplay has an additional SMS VDP as an overlay
 	SEGA315_5246(config, m_vdp1, MASTER_CLOCK / 5); /* ?? */
 	m_vdp1->set_screen("megadriv");
+	m_vdp1->set_hcounter_divide(5);
 	m_vdp1->set_is_pal(false);
 	m_vdp1->n_int().set_inputline(m_bioscpu, 0);
 	m_vdp1->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
@@ -927,17 +935,17 @@ void mplay_state::init_megaplay()
 	m_ic37_ram = std::make_unique<uint8_t[]>(0x10000);
 
 	init_megadrij();
-	m_megadrive_io_read_data_port_ptr = read8_delegate(FUNC(md_base_state::megadrive_io_read_data_port_3button),this);
-	m_megadrive_io_write_data_port_ptr = write16_delegate(FUNC(md_base_state::megadrive_io_write_data_port_3button),this);
+	m_megadrive_io_read_data_port_ptr = read8_delegate(*this, FUNC(md_base_state::megadrive_io_read_data_port_3button));
+	m_megadrive_io_write_data_port_ptr = write16_delegate(*this, FUNC(md_base_state::megadrive_io_write_data_port_3button));
 
 	// for now ...
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa10000, 0xa1001f, read16_delegate(FUNC(mplay_state::mp_io_read),this), write16_delegate(FUNC(mplay_state::mp_io_write),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa10000, 0xa1001f, read16_delegate(*this, FUNC(mplay_state::mp_io_read)), write16_delegate(*this, FUNC(mplay_state::mp_io_write)));
 
 	// megaplay has ram shared with the bios cpu here
 	m_z80snd->space(AS_PROGRAM).install_ram(0x2000, 0x3fff, &m_ic36_ram[0]);
 
 	// instead of a RAM mirror the 68k sees the extra ram of the 2nd z80 too
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa02000, 0xa03fff, read16_delegate(FUNC(mplay_state::extra_ram_r),this), write16_delegate(FUNC(mplay_state::extra_ram_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa02000, 0xa03fff, read16_delegate(*this, FUNC(mplay_state::extra_ram_r)), write16_delegate(*this, FUNC(mplay_state::extra_ram_w)));
 }
 
 /*

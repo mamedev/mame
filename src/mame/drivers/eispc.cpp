@@ -26,8 +26,9 @@
  * TODO
  * - Complete the Ericsson 1070 MDA ISA board and test all the graphics modes including 640x400 (aka HR)
  * - Add the Ericsson 1065 HDC and boot from a hard drive
- * - Implement the descrete baudrate generator
- * - Implement logic around enabling/resetting NMI and ISA bus I/O CHK
+ * - Add softlist
+ * - Pass the diagnostics software system test at EPC2.IMD, it currently hangs the keyboard.
+ *   A later version of the test on EPC5.IMD works though so need to verify EPC2.IMD on real hardware first.
  *
  * CREDITS  The driver code is inspired from m24.cpp, myb3k.cpp and genpc.cpp. Information about the EPC has
  *          been contributed by many, mainly the people at Dalby Computer museum http://www.datormuseum.se/
@@ -43,10 +44,12 @@
 #include "emu.h"
 
 #include "machine/eispc_kb.h"
+#include "epc.lh"
 
 // Devices
 #include "cpu/i86/i86.h"
 #include "machine/am9517a.h"
+#include "machine/i8087.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
@@ -58,7 +61,8 @@
 //#include "bus/isa/isa.h"
 //#include "bus/isa/isa_cards.h"
 #include "bus/isa/ega.h"
-#include "bus/isa/mda.h"
+#include "bus/isa/eis_hgb107x.h"
+#include "bus/isa/eis_twib.h"
 #include "machine/pc_lpt.h"
 
 #include "machine/ram.h"
@@ -80,8 +84,10 @@
 #define LOG_LPT     (1U << 8)
 #define LOG_NMI     (1U << 9)
 #define LOG_BITS    (1U << 10)
+#define LOG_FPU     (1U << 11)
+#define LOG_COM     (1U << 12)
 
-//#define VERBOSE (LOG_BITS|LOG_KBD|LOG_IRQ)
+//#define VERBOSE (LOG_LPT)
 //#define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
@@ -95,7 +101,9 @@
 #define LOGFDC(...)  LOGMASKED(LOG_FDC,  __VA_ARGS__)
 #define LOGLPT(...)  LOGMASKED(LOG_LPT,  __VA_ARGS__)
 #define LOGNMI(...)  LOGMASKED(LOG_NMI,  __VA_ARGS__)
-#define LOGBITS(...) LOGMASKED(LOG_BITS,  __VA_ARGS__)
+#define LOGBITS(...) LOGMASKED(LOG_BITS, __VA_ARGS__)
+#define LOGFPU(...)  LOGMASKED(LOG_FPU,  __VA_ARGS__)
+#define LOGCOM(...)  LOGMASKED(LOG_COM,  __VA_ARGS__)
 
 class epc_state : public driver_device
 {
@@ -109,15 +117,17 @@ public:
 		, m_ppi8255(*this, "ppi8255")
 		, m_io_dsw(*this, "DSW")
 		, m_io_j10(*this, "J10")
+		, m_io_s21(*this, "S21")
 		, m_lpt(*this, "lpt")
 		, m_kbd8251(*this, "kbd8251")
 		, m_keyboard(*this, "keyboard")
+		, m_leds(*this, "kbled%u")
 		, m_pic8259(*this, "pic8259")
 		, m_pit8253(*this, "pit8253")
 		, m_speaker(*this, "speaker")
 		, m_fdc(*this, "fdc")
 		, m_floppy_connectors(*this, "fdc:%u", 0)
-		, m_uart(*this, "uart8250")
+		, m_uart(*this, "uart")
 	{ }
 
 	void epc(machine_config &config);
@@ -159,6 +169,7 @@ private:
 	uint8_t m_ppi_portb;
 	required_ioport m_io_dsw;
 	required_ioport m_io_j10;
+	required_ioport m_io_s21;
 
 	// Printer port
 	optional_device<pc_lpt_device> m_lpt;
@@ -168,7 +179,11 @@ private:
 	required_device<eispc_keyboard_device> m_keyboard;
 	emu_timer *m_kbdclk_timer;
 	TIMER_CALLBACK_MEMBER(rxtxclk_w);
-	int m_rxtx_clk_state;
+	bool m_8251rxtx_clk_state;
+	bool m_kbdclk_state;
+	bool m_8251dtr_state;
+	int m_kbdclk;
+	output_finder<3> m_leds;
 
 	// Interrupt Controller
 	required_device<pic8259_device> m_pic8259;
@@ -244,145 +259,164 @@ void epc_state::epc_map(address_map &map)
 
 void epc_state::epc_io(address_map &map)
 {
-	map(0x0000, 0x000f).mirror(0x10).lrw8("dma8237_rw",
+	map(0x0000, 0x000f).mirror(0x10).lrw8(
 		[this](offs_t offset) -> uint8_t
 		{
 			uint8_t data = m_dma8237a->read(offset);
 			LOGDMA("dma8237_r %04x\n", offset);
 			return data;
 		},
+		"dma8237_r",
 		[this](offs_t offset, uint8_t data)
 		{
 			LOGDMA("dma8237_w %04x: %02x\n", offset, data);
 			m_dma8237a->write(offset, data);
-		}
+		},
+		"dma8237_w"
 	);
 
-	map(0x0020, 0x0021).mirror(0x1e).lrw8("pic8259_rw",
+	map(0x0020, 0x0021).mirror(0x1e).lrw8(
 		[this](offs_t offset) -> uint8_t
 		{
 			uint8_t data = m_pic8259->read(offset);
 			LOGPIC("pic8259_r %04x: %02x\n", offset, data);
 			return data;
 		},
+		"pic8259_r",
 		[this](offs_t offset, uint8_t data)
 		{
 			LOGPIC("pic8259_w %04x: %02x\n", offset, data);
 			m_pic8259->write(offset, data);
-		}
+		},
+		"pic8259_w"
 	);
 
-	map(0x0040, 0x0043).mirror(0x1c).lrw8("pit8253_rw",
+	map(0x0040, 0x0043).mirror(0x1c).lrw8(
 		[this](offs_t offset) -> uint8_t
 		{
 			uint8_t data = m_pit8253->read(offset);
 			LOGPIT("pit8253_r %04x\n", offset);
 			return data;
 		},
+		"pit8253_r",
 		[this](offs_t offset, uint8_t data)
 		{
 			LOGPIT("pit8253_w %04x: %02x\n", offset, data);
 			m_pit8253->write(offset, data);
-		}
+		},
+		"pit8253_w"
 	);
 
-	map(0x0060, 0x0060).mirror(0x1c).lrw8("kbd_8251_data_rw",
+	map(0x0060, 0x0060).mirror(0x1c).lrw8(
 		[this]() -> uint8_t
 		{
 			uint8_t data = m_kbd8251->data_r();
 			LOGKBD("kbd8251_r %02x\n", data);
 			return data;
 		},
+		"kbd_8251_data_r",
 		[this](offs_t offset, uint8_t data)
 		{
 			LOGKBD("kbd8251_w 0x60 %02x\n", data);
 			m_kbd8251->data_w(data);
-		}
+		},
+		"kbd_8251_data_w"
 	);
 									// NOTE: PPI Port A is not mapped
-	map(0x0061, 0x0061).mirror(0x1c).lrw8("ppi8255_rw", // PPI Port B
+	map(0x0061, 0x0061).mirror(0x1c).lrw8(              // PPI Port B
 		[this](offs_t offset) -> uint8_t
 		{
 			uint8_t data = m_ppi8255->read(1);
 			LOGPPI("ppi8255_r Port B: %02x\n", data);
 			return data;
 		},
+		"ppi8255_r",
 		[this](offs_t offset, uint8_t data)
 		{
 			LOGPPI("ppi8255_w Port B: %02x\n", data);
 			m_ppi8255->write(1, data);
-		}
+		},
+		"ppi8255_w"
 	);
 
-	map(0x0062, 0x0062).mirror(0x1c).lrw8("ppi8255_rw", // PPI Port C
+	map(0x0062, 0x0062).mirror(0x1c).lrw8(              // PPI Port C
 		[this](offs_t offset) -> uint8_t
 		{
 			uint8_t data = m_ppi8255->read(2);
 			LOGPPI("ppi8255_r Port C: %02x\n", data);
 			return data;
 		},
+		"ppi8255_r",
 		[this](offs_t offset, uint8_t data)
 		{
 			LOGPPI("ppi8255_w Port C: %02x\n", data);
 			m_ppi8255->write(2, data);
-		}
+		},
+		"ppi8255_w"
 	);
 
-	map(0x0063, 0x0063).lrw8("ppi8255_rw",  // PPI Control register
+	map(0x0063, 0x0063).lrw8(               // PPI Control register
 		[this](offs_t offset) -> uint8_t
 		{
 			uint8_t data = m_ppi8255->read(3);
 			LOGPPI("ppi8255_r Control: %02x\n", data);
 			return data;
 		},
+		"ppi8255_r",
 		[this](offs_t offset, uint8_t data)
 		{
 			LOGPPI("ppi8255_w Control: %02x\n", data);
 			m_ppi8255->write(3, data);
-		}
+		},
+		"ppi8255_w"
 	);
 
-	map(0x0070, 0x0070).mirror(0x0e).lw8("i8251_data_w",
+	map(0x0070, 0x0070).mirror(0x0e).lw8(
 		[this](offs_t offset, uint8_t data)
 		{
 			LOGKBD("kbd8251_w 0x70: %02x\n", data);
 			m_kbd8251->data_w(data);
-		}
+		},
+		"i8251_data_w"
 	);
 
-	map(0x0071, 0x0071).mirror(0x0e).lrw8("kbd_8251_stat_ctrl_rw",
+	map(0x0071, 0x0071).mirror(0x0e).lrw8(
 		[this](offs_t offset) -> uint8_t
 		{
 			uint8_t stat = m_kbd8251->status_r();
 			//LOGKBD("kbd8251_status_r %02x\n", stat);
 			return stat;
 		},
+		"kbd_8251_stat_ctrl_r",
 		[this](offs_t offset, uint8_t data)
 		{
 			LOGKBD("kbd8251_control_w 0x71: %02x\n", data);
 			m_kbd8251->control_w(data);
-		}
+		},
+		"kbd_8251_stat_ctrl_w"
 	);
 
-	map(0x0080, 0x0083).mirror(0xc).lw8("dma_segement_w",
+	map(0x0080, 0x0083).mirror(0xc).lw8(
 		[this](offs_t offset, uint8_t data)
 		{
 			LOGDMA("dma_segment_w %04x: %02x\n", offset, data);
 			m_dma_segment[offset] = data & 0x0f;
-		}
+		},
+		"dma_segement_w"
 	);
 
-	map(0x00a0, 0x00a1).mirror(0xe).lw8("nmi_enable_w",
+	map(0x00a0, 0x00a1).mirror(0xe).lw8(
 		[this](offs_t offset, uint8_t data)
 		{
 			LOGNMI("nmi_enable_w %04x: %02x\n", offset, data);
 			m_nmi_enabled = BIT(data,7);
 			update_nmi();
-		}
+		},
+		"nmi_enable_w"
 	);
 
 	// FDC Output Control Register (same as PC XT DOR)
-	map(0x03f2, 0x03f3).lw8("ocr_w",        // B0-B1 Drive select 0-3
+	map(0x03f2, 0x03f3).lw8(                // B0-B1 Drive select 0-3
 		[this](offs_t offset, uint8_t data) // B2 FDC Reset line
 		{                   // B3 Enable FDC DMA/IRQ
 			LOGFDC("FDC OCR: %02x\n", data);// B4-B7 Motor on for selected drive
@@ -404,23 +438,26 @@ void epc_state::epc_io(address_map &map)
 				m_fdc->reset();
 			check_fdc_irq();
 			check_fdc_drq();
-		}
+		},
+		"ocr_w"
 	);
 
 	map(0x03f4, 0x03f5).m(m_fdc, FUNC(i8272a_device::map));
 
-	map(0x03bc, 0x03be).lrw8("lpt_rw",
+	map(0x03bc, 0x03be).lrw8(
 		[this](address_space &space, offs_t offset, uint8_t mem_mask) -> uint8_t
 		{
 			uint8_t data = m_lpt->read(space, offset);
 			LOGLPT("LPT read offset %02x: %02x\n", offset, data);
 			return data;
 		},
+		"lpt_r",
 		[this](address_space &space, offs_t offset, uint8_t data)
 		{
 			LOGLPT("LPT write offset %02x: %02x\n", offset, data);
 			m_lpt->write(space, offset, data);
-		}
+		},
+		"lpt_w"
 	);
 
 	map(0x03f8, 0x03ff).rw(m_uart, FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w));
@@ -440,7 +477,10 @@ void epc_state::machine_start()
 	save_item(NAME(m_int));
 	save_item(NAME(m_dreq0_ck));
 	save_item(NAME(m_ppi_portb));
-	save_item(NAME(m_rxtx_clk_state));
+	save_item(NAME(m_8251rxtx_clk_state));
+	save_item(NAME(m_kbdclk_state));
+	save_item(NAME(m_kbdclk));
+	save_item(NAME(m_8251dtr_state));
 	save_item(NAME(m_nmi_enabled));
 	save_item(NAME(m_8087_int));
 	save_item(NAME(m_parer_int));
@@ -452,6 +492,8 @@ void epc_state::machine_start()
 	save_item(NAME(m_drq));
 	save_item(NAME(m_fdc_irq));
 	save_item(NAME(m_fdc_drq));
+
+	m_leds.resolve();
 }
 
 void epc_state::machine_reset()
@@ -463,7 +505,10 @@ void epc_state::machine_reset()
 	m_int = 1;
 	m_dreq0_ck = true;
 	m_ppi_portb = 0;
-	m_rxtx_clk_state = 0;
+	m_8251rxtx_clk_state = 0;
+	m_kbdclk_state = 0;
+	m_kbdclk = 0;
+	m_8251dtr_state = 1;
 	m_nmi_enabled = 0;
 	m_8087_int = 0;
 	m_parer_int = 0;
@@ -482,19 +527,38 @@ void epc_state::machine_reset()
 
 void epc_state::init_epc()
 {
-	/* Keyboard UART Rxc/Txc is 19.2 kHz from x96 divider */
+	/* Keyboard UART Rxc/Txc is 19.2 kHz from x960 divider */
 	m_kbdclk_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(epc_state::rxtxclk_w), this));
-	m_kbdclk_timer->adjust(attotime::from_hz((XTAL(18'432'000) / 96) / 5));
+	m_kbdclk_timer->adjust(attotime::from_hz(XTAL(18'432'000) / 960) / 2);
 }
 
 TIMER_CALLBACK_MEMBER(epc_state::rxtxclk_w)
 {
-	m_kbd8251->write_rxc(m_rxtx_clk_state);
-	m_kbd8251->write_txc(m_rxtx_clk_state);
-	m_rxtx_clk_state ^= 0x01;
-	m_kbdclk_timer->adjust(attotime::from_hz((XTAL(18'432'000) / 96) / 5));
-}
+	m_kbd8251->write_rxc(m_8251rxtx_clk_state);
+	m_kbd8251->write_txc(m_8251rxtx_clk_state);
 
+	// The EPC PCB has an option to support a custom receive clock for the INS8250 apart from the TX clock through a mux controlled
+	// by the DTR pin of the I8251. The ins8250 device doesn't support RCLK as it is considerd implicitly as the same as BAUDOUT
+	// First attempt to support this in INS8250 by lifting out the BRG from deserial was reverted due to lots of regressions.
+	// We probably need to remove diserial dependencies completely from ins8250 or implement BRG hooks in diserial.cpp.
+	// if (!m_8251dtr_state) m_uart->rclk_w(m_8251rxtx_clk_state); // TODO: fix RCLK support in INS8250
+
+	m_8251rxtx_clk_state = !m_8251rxtx_clk_state;
+
+	// If CLK signal is jumpered in instead of reset signal for the keyboard
+	if ((m_io_s21->read() & 0x01) == 0x01)
+	{
+		if (m_kbdclk++ >= 4) // Frequncy is taken out of the same divider as the rxtx clock but 2 steps later
+		{
+			m_keyboard->rst_line_w(m_kbdclk_state);
+			m_kbdclk = 0;
+			m_kbdclk_state = !m_kbdclk_state;
+		}
+	}
+
+	/* Keyboard UART Rxc/Txc is 19.2 kHz from x960 divider ( 15 (74ls161) * 4 (74ls393.1) * 16 (74ls393) ) */
+	m_kbdclk_timer->adjust(attotime::from_hz(XTAL(18'432'000) / 960) / 2);
+}
 
 template <int Channel>
 uint8_t epc_state::epc_dma8237_io_r(offs_t offset)
@@ -664,15 +728,18 @@ WRITE8_MEMBER( epc_state::ppi_portb_w )
 
 	if (changed & 0x40)
 	{
-		if (m_ppi_portb & 0x40)
+		if ((m_io_s21->read() & 0x01) == 0x00)
 		{
-			LOGKBD("PB6 set, clearing Keyboard RESET\n");
-			m_keyboard->rst_line_w(CLEAR_LINE);
-		}
-		else
-		{
-			LOGKBD("PB6 cleared, asserting Keyboard RESET\n");
-			m_keyboard->rst_line_w(ASSERT_LINE);
+			if (m_ppi_portb & 0x40)
+			{
+				LOGKBD("PB6 set, clearing Keyboard RESET\n");
+				m_keyboard->rst_line_w(CLEAR_LINE);
+			}
+			else
+			{
+				LOGKBD("PB6 cleared, asserting Keyboard RESET\n");
+				m_keyboard->rst_line_w(ASSERT_LINE);
+			}
 		}
 	}
 
@@ -698,6 +765,7 @@ static void epc_isa8_cards(device_slot_interface &device)
 {
 	device.option_add("epc_mda", ISA8_EPC_MDA);
 	device.option_add("ega", ISA8_EGA);
+	device.option_add("epc_twib", ISA8_EIS_TWIB);
 	// device.option_add("epc_hdc1065", ISA8_EPC_HDC1065);
 	// device.option_add("epc_mb1080", ISA8_EPC_MB1080);
 }
@@ -714,10 +782,25 @@ static void epc_sd_floppies(device_slot_interface &device)
 
 void epc_state::epc(machine_config &config)
 {
+	config.set_default_layout(layout_epc);
+
+	// CPU
 	I8088(config, m_maincpu, XTAL(14'318'181) / 3.0); // TWE crystal marked X1 verified divided through a 82874
 	m_maincpu->set_addrmap(AS_PROGRAM, &epc_state::epc_map);
 	m_maincpu->set_addrmap(AS_IO, &epc_state::epc_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
+	m_maincpu->esc_opcode_handler().set("fpu8087", FUNC(i8087_device::insn_w));
+	m_maincpu->esc_data_handler().set("fpu8087", FUNC(i8087_device::addr_w));
+
+	i8087_device &i8087(I8087(config, "fpu8087", XTAL(14'318'181) / 3.0));
+	i8087.set_space_88(m_maincpu, AS_PROGRAM);
+	i8087.irq().set([this](bool state)
+	{
+		LOGFPU("8087 INT: %d\n", state);
+		m_8087_int = state;
+		update_nmi();
+	});
+	i8087.busy().set_inputline(m_maincpu, INPUT_LINE_TEST);
 
 	// DMA
 	AM9517A(config, m_dma8237a, XTAL(14'318'181) / 3.0); // TWE crystal marked X1 verified
@@ -738,11 +821,15 @@ void epc_state::epc(machine_config &config)
 	m_dma8237a->out_dack_callback<3>().set(FUNC(epc_state::epc_dack_w<3>));
 
 	// TTL-level serial keyboard callback
-	EISPC_KB(config, "keyboard").txd_cb().set([this](bool state)
+	EISPC_KB(config, m_keyboard);
+	m_keyboard->txd_cb().set([this](bool state)
 	{
 		LOGBITS("KBD->EPC: %d\n", state);
 		m_kbd8251->write_rxd(state);
 	});
+	m_keyboard->caps_cb().set(  [this](bool state){ m_leds[0] = state; });
+	m_keyboard->num_cb().set(   [this](bool state){ m_leds[1] = state; });
+	m_keyboard->scroll_cb().set([this](bool state){ m_leds[2] = state; });
 
 	// Keyboard USART
 	I8251( config, m_kbd8251, XTAL(14'318'181) / 6.0 ); // TWE crystal marked X1 verified divided through a 82874
@@ -770,7 +857,8 @@ void epc_state::epc(machine_config &config)
 	});
 	m_kbd8251->dtr_handler().set([this](bool state) // Controls RCLK for INS8250, either 19.2KHz or INS8250 BAUDOUT
 	{
-		LOGKBD("KBD DTR: %d\n", state ? 1 : 0); // TODO: Implement clock selection mux, need to check what state does what
+		LOGCOM("KBD DTR: %d\n", state ? 1 : 0);
+		m_8251dtr_state = state;
 	});
 
 	// Interrupt Controller
@@ -851,20 +939,21 @@ void epc_state::epc(machine_config &config)
 	FLOPPY_CONNECTOR(config, m_floppy_connectors[1], epc_sd_floppies, "525sd", epc_floppy_formats);
 	//SOFTWARE_LIST(config, "epc_flop_list").set_original("epc_flop");
 
-	// system board UART TODO: Implement the descrete "Baud Rate Clock" from schematics that generates clocks for the 8250
+	// system board UART
 	INS8250(config, m_uart, XTAL(18'432'000) / 10); // TEW crystal marked X2 verified. TODO: Let 8051 DTR control RCLK (see above)
-	m_uart->out_tx_callback().set("uart", FUNC(rs232_port_device::write_txd));
-	m_uart->out_dtr_callback().set("uart", FUNC(rs232_port_device::write_dtr));
-	m_uart->out_rts_callback().set("uart", FUNC(rs232_port_device::write_rts));
+	m_uart->out_tx_callback().set("com1", FUNC(rs232_port_device::write_txd));
+	m_uart->out_dtr_callback().set("com1", FUNC(rs232_port_device::write_dtr));
+	m_uart->out_rts_callback().set("com1", FUNC(rs232_port_device::write_rts));
 	m_uart->out_int_callback().set([this](int state)
 	{   // Jumper field J10 decides what IRQ to pull
-		if ((m_io_j10->read() & 0x03) == 0x02) { LOGIRQ("UART IRQ2: %d\n", state); m_pic8259->ir2_w(state); }
-		if ((m_io_j10->read() & 0x0c) == 0x08) { LOGIRQ("UART IRQ3: %d\n", state); m_pic8259->ir3_w(state); }
-		if ((m_io_j10->read() & 0x30) == 0x20) { LOGIRQ("UART IRQ4: %d\n", state); m_pic8259->ir4_w(state); } // Factory setting
-		if ((m_io_j10->read() & 0xc0) == 0x80) { LOGIRQ("UART IRQ7: %d\n", state); m_pic8259->ir7_w(state); }
+		if ((m_io_j10->read() & 0x03) == 0x02) { LOGCOM("UART IRQ2: %d\n", state); m_pic8259->ir2_w(state); }
+		if ((m_io_j10->read() & 0x0c) == 0x08) { LOGCOM("UART IRQ3: %d\n", state); m_pic8259->ir3_w(state); }
+		if ((m_io_j10->read() & 0x30) == 0x20) { LOGCOM("UART IRQ4: %d\n", state); m_pic8259->ir4_w(state); } // Factory setting
+		if ((m_io_j10->read() & 0xc0) == 0x80) { LOGCOM("UART IRQ7: %d\n", state); m_pic8259->ir7_w(state); }
 	});
+	// m_uart->out_baudout_callback().set([this](int state){ if (m_8251dtr_state) m_uart->rclk_w(state); }); // TODO: Fix INS8250 BAUDOUT pin support
 
-	rs232_port_device &rs232(RS232_PORT(config, "uart", default_rs232_devices, nullptr));
+	rs232_port_device &rs232(RS232_PORT(config, "com1", default_rs232_devices, nullptr));
 	rs232.rxd_handler().set(m_uart, FUNC(ins8250_uart_device::rx_w));
 	rs232.dcd_handler().set(m_uart, FUNC(ins8250_uart_device::dcd_w));
 	rs232.dsr_handler().set(m_uart, FUNC(ins8250_uart_device::dsr_w));
@@ -967,12 +1056,17 @@ static INPUT_PORTS_START( epc_ports )
 	PORT_DIPSETTING(0x00, "no jumper")
 	PORT_DIPSETTING(0x40, "LPT")
 	PORT_DIPSETTING(0x80, "COM")
+
+	PORT_START("S21") // Jumper 0=PB6 reset, 1=KBCLK 4.8kHz - what to send to keyboard pin 3
+	PORT_DIPNAME(0x01, 0x00, "Keyboard Clock/Reset pin")
+	PORT_DIPSETTING(0x00, "PB6")
+	PORT_DIPSETTING(0x01, "4.8kHz") // This setting is apparantly for another keyboard, currently unknown
 INPUT_PORTS_END
 
 ROM_START( epc )
 	ROM_REGION(0x10000,"bios", 0)
 	ROM_DEFAULT_BIOS("p860110")
-	ROM_SYSTEM_BIOS(0, "p840705", "P840705") // TODO: Fix "Keyboard error" for this bios
+	ROM_SYSTEM_BIOS(0, "p840705", "P840705")
 	ROMX_LOAD("ericsson_8088.bin", 0xe000, 0x2000, CRC(3953c38d) SHA1(2bfc1f1d11d0da5664c3114994fc7aa3d6dd010d), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "p860110", "P860110")
 	ROMX_LOAD("epcbios1.bin",  0xe000, 0x02000, CRC(79a83706) SHA1(33528c46a24d7f65ef5a860fbed05afcf797fc55), ROM_BIOS(1))
@@ -980,6 +1074,5 @@ ROM_START( epc )
 	ROMX_LOAD("epcbios3.bin",  0xc000, 0x02000, CRC(70483280) SHA1(b44b09da94d77b0269fc48f07d130b2d74c4bb8f), ROM_BIOS(1))
 ROM_END
 
-
-COMP( 1985, epc,     0,      0,      epc,     epc_ports, epc_state, init_epc,    "Ericsson Information System",     "Ericsson PC" ,          MACHINE_NOT_WORKING )
+COMP( 1985, epc,     0,      0,      epc,     epc_ports, epc_state, init_epc,    "Ericsson Information System",     "Ericsson PC" ,          0)
 //COMP( 1985, eppc,   ibm5150, 0,  pccga,         pccga,  pc_state, empty_init,    "Ericsson Information System",     "Ericsson Portable PC",  MACHINE_NOT_WORKING )

@@ -140,7 +140,7 @@ void smioc_device::device_add_mconfig(machine_config &config)
 {
 	/* CPU - Intel 80C188 */
 	I80188(config, m_smioccpu, XTAL(20'000'000)); // Clock division unknown
-	config.m_minimum_quantum = attotime::from_hz(1000);
+	config.set_maximum_quantum(attotime::from_hz(1000));
 	m_smioccpu->set_addrmap(AS_PROGRAM, &smioc_device::smioc_mem);
 
 	/* DMA */

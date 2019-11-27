@@ -5,6 +5,12 @@
 
 #pragma once
 
+#define MULTIPCM_LOG_SAMPLES    0
+
+#if MULTIPCM_LOG_SAMPLES
+#include <map>
+#endif
+
 class multipcm_device : public device_t,
 						public device_sound_interface,
 						public device_rom_interface
@@ -129,6 +135,11 @@ private:
 	void write_slot(slot_t &slot, int32_t reg, uint8_t data);
 
 	int16_t clamp_to_int16(int32_t value);
+
+#if MULTIPCM_LOG_SAMPLES
+	void dump_sample(slot_t &slot);
+	std::map<uint32_t, bool> m_logged_map;
+#endif
 
 	static constexpr uint32_t TL_SHIFT = 12;
 

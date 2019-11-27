@@ -3090,7 +3090,7 @@ void taitof2_state::mjnquest(machine_config &config)
 
 	TC0100SCN(config, m_tc0100scn[0], 0);
 	m_tc0100scn[0]->set_palette(m_tc0110pcr);
-	m_tc0100scn[0]->set_tile_callback(FUNC(taitof2_state::mjnquest_tmap_cb), this);
+	m_tc0100scn[0]->set_tile_callback(FUNC(taitof2_state::mjnquest_tmap_cb));
 }
 
 void taitof2_state::footchmp(machine_config &config)

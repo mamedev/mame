@@ -43,10 +43,10 @@ class debug_view_disasm_source : public debug_view_source
 {
 	friend class debug_view_disasm;
 
-	// construction/destruction
-	debug_view_disasm_source(const char *name, device_t &device);
-
 public:
+	// construction/destruction
+	debug_view_disasm_source(std::string &&name, device_t &device);
+
 	// getters
 	address_space &space() const { return m_space; }
 

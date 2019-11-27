@@ -34,7 +34,6 @@
 #include "sound/mos7360.h"
 #include "sound/t6721a.h"
 
-#define MOS7501_TAG         "u2"
 #define MOS7360_TAG         "u1"
 #define MOS6551_TAG         "u3"
 #define MOS6529_USER_TAG    "u5"
@@ -52,7 +51,7 @@ class plus4_state : public driver_device
 public:
 	plus4_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_maincpu(*this, MOS7501_TAG),
+		m_maincpu(*this, "u2"),
 		m_pla(*this, PLA_TAG),
 		m_ted(*this, MOS7360_TAG),
 		m_acia(*this, MOS6551_TAG),
@@ -845,11 +844,10 @@ void plus4_state::plus4(machine_config &config)
 	// basic machine hardware
 	M7501(config, m_maincpu, 0);
 	m_maincpu->set_addrmap(AS_PROGRAM, &plus4_state::plus4_mem);
-	m_maincpu->disable_cache(); // address decoding is 100% dynamic, no RAM/ROM banks
 	m_maincpu->read_callback().set(FUNC(plus4_state::cpu_r));
 	m_maincpu->write_callback().set(FUNC(plus4_state::cpu_w));
 	m_maincpu->set_pulls(0x00, 0xc0);
-	config.m_perfect_cpu_quantum = subtag(MOS7501_TAG);
+	config.set_perfect_quantum(m_maincpu);
 
 	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, m7501_device::IRQ_LINE);
 
@@ -928,9 +926,9 @@ void plus4_state::plus4(machine_config &config)
 	m_exp->irq_wr_callback().set("mainirq", FUNC(input_merger_device::in_w<2>));
 	m_exp->cd_rd_callback().set(FUNC(plus4_state::read));
 	m_exp->cd_wr_callback().set(FUNC(plus4_state::write));
-	m_exp->aec_wr_callback().set_inputline(MOS7501_TAG, INPUT_LINE_HALT);
+	m_exp->aec_wr_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
 
-	QUICKLOAD(config, "quickload", "p00,prg", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(plus4_state::quickload_c16), this);
+	QUICKLOAD(config, "quickload", "p00,prg", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(plus4_state::quickload_c16));
 
 	// internal ram
 	RAM(config, m_ram).set_default_size("64K");

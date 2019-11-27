@@ -690,10 +690,8 @@ void calchase_state::calchase(machine_config &config)
 	ide.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir6_w));
 
 	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
-	pcibus.set_device_read (0, FUNC(calchase_state::intel82439tx_pci_r), this);
-	pcibus.set_device_write(0, FUNC(calchase_state::intel82439tx_pci_w), this);
-	pcibus.set_device_read (7, FUNC(calchase_state::intel82371ab_pci_r), this);
-	pcibus.set_device_write(7, FUNC(calchase_state::intel82371ab_pci_w), this);
+	pcibus.set_device(0, FUNC(calchase_state::intel82439tx_pci_r), FUNC(calchase_state::intel82439tx_pci_w));
+	pcibus.set_device(7, FUNC(calchase_state::intel82371ab_pci_r), FUNC(calchase_state::intel82371ab_pci_w));
 
 	/* video hardware */
 	pcvideo_trident_vga(config);
@@ -725,10 +723,8 @@ void calchase_state::hostinv(machine_config &config)
 	ide.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir6_w));
 
 	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
-	pcibus.set_device_read (0, FUNC(calchase_state::intel82439tx_pci_r), this);
-	pcibus.set_device_write(0, FUNC(calchase_state::intel82439tx_pci_w), this);
-	pcibus.set_device_read (7, FUNC(calchase_state::intel82371ab_pci_r), this);
-	pcibus.set_device_write(7, FUNC(calchase_state::intel82371ab_pci_w), this);
+	pcibus.set_device(0, FUNC(calchase_state::intel82439tx_pci_r), FUNC(calchase_state::intel82439tx_pci_w));
+	pcibus.set_device(7, FUNC(calchase_state::intel82371ab_pci_r), FUNC(calchase_state::intel82371ab_pci_w));
 
 	/* video hardware */
 	pcvideo_trident_vga(config);
@@ -763,7 +759,7 @@ void calchase_state::init_calchase()
 
 	intel82439tx_init();
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x3f0b160, 0x3f0b163, read32_delegate(FUNC(calchase_state::calchase_idle_skip_r),this), write32_delegate(FUNC(calchase_state::calchase_idle_skip_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x3f0b160, 0x3f0b163, read32_delegate(*this, FUNC(calchase_state::calchase_idle_skip_r)), write32_delegate(*this, FUNC(calchase_state::calchase_idle_skip_w)));
 }
 
 void calchase_state::init_hostinv()

@@ -1757,7 +1757,7 @@ void namcos2_state::base_noio(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &namcos2_state::sound_default_am);
 	m_audiocpu->set_periodic_int(FUNC(namcos2_state::irq0_line_hold), attotime::from_hz(2*60));
 
-	config.m_minimum_quantum = attotime::from_hz(12000); /* CPU slices per frame */
+	config.set_maximum_quantum(attotime::from_hz(12000)); /* CPU slices per frame */
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
@@ -1822,7 +1822,7 @@ void namcos2_state::assaultp(machine_config &config)
 {
 	base2(config);
 
-	config.m_minimum_quantum = attotime::from_hz(12000*8); /* CPU slices per frame - boosted (along with MCU speed) so that the Mode Select works */
+	config.set_maximum_quantum(attotime::from_hz(12000*8)); /* CPU slices per frame - boosted (along with MCU speed) so that the Mode Select works */
 }
 
 void namcos2_state::base3(machine_config &config)
@@ -1851,7 +1851,7 @@ void namcos2_state::gollygho(machine_config &config)
 
 	configure_c65_standard(config);
 
-	config.m_minimum_quantum = attotime::from_hz(6000); /* CPU slices per frame */
+	config.set_maximum_quantum(attotime::from_hz(6000)); /* CPU slices per frame */
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
@@ -1904,7 +1904,7 @@ void namcos2_state::finallap_noio(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &namcos2_state::sound_default_am);
 	m_audiocpu->set_periodic_int(FUNC(namcos2_state::irq0_line_hold), attotime::from_hz(2*60));
 
-	config.m_minimum_quantum = attotime::from_hz(6000); /* CPU slices per frame */
+	config.set_maximum_quantum(attotime::from_hz(6000)); /* CPU slices per frame */
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
@@ -1985,7 +1985,7 @@ void namcos2_state::sgunner(machine_config &config)
 
 	configure_c65_standard(config);
 
-	config.m_minimum_quantum = attotime::from_hz(6000); /* CPU slices per frame */
+	config.set_maximum_quantum(attotime::from_hz(6000)); /* CPU slices per frame */
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
@@ -2038,7 +2038,7 @@ void namcos2_state::sgunner2(machine_config &config)
 
 	configure_c68_standard(config);
 
-	config.m_minimum_quantum = attotime::from_hz(6000); /* CPU slices per frame */
+	config.set_maximum_quantum(attotime::from_hz(6000)); /* CPU slices per frame */
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
@@ -2091,7 +2091,7 @@ void namcos2_state::suzuka8h(machine_config &config)
 
 	configure_c68_standard(config);
 
-	config.m_minimum_quantum = attotime::from_hz(6000); /* CPU slices per frame */
+	config.set_maximum_quantum(attotime::from_hz(6000)); /* CPU slices per frame */
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
@@ -2163,7 +2163,7 @@ void namcos2_state::metlhawk(machine_config &config)
 
 	configure_c65_standard(config);
 
-	config.m_minimum_quantum = attotime::from_hz(6000); /* CPU slices per frame */
+	config.set_maximum_quantum(attotime::from_hz(6000)); /* CPU slices per frame */
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 

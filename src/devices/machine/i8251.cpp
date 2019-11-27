@@ -67,7 +67,7 @@ i8251_device::i8251_device(
 	m_syndet_handler(*this),
 	m_cts(1),
 	m_dsr(1),
-	m_rxd(0),
+	m_rxd(1),
 	m_rxc(0),
 	m_txc(0)
 {

@@ -323,8 +323,8 @@ void xtide_device::device_reset()
 	int io_address      = ((ioport("IO_ADDRESS")->read() & 0x0F) * 0x20) + 0x200;
 	m_irq_number        = (ioport("IRQ")->read() & 0x07);
 
-	m_isa->install_memory(base_address, base_address + 0x1fff, read8_delegate(FUNC(eeprom_parallel_28xx_device::read), &(*m_eeprom)), write8_delegate(FUNC(eeprom_parallel_28xx_device::write), &(*m_eeprom)));
-	m_isa->install_device(io_address, io_address + 0xf, read8_delegate(FUNC(xtide_device::read), this), write8_delegate(FUNC(xtide_device::write), this));
+	m_isa->install_memory(base_address, base_address + 0x1fff, read8_delegate(*m_eeprom, FUNC(eeprom_parallel_28xx_device::read)), write8_delegate(*m_eeprom, FUNC(eeprom_parallel_28xx_device::write)));
+	m_isa->install_device(io_address, io_address + 0xf, read8_delegate(*this, FUNC(xtide_device::read)), write8_delegate(*this, FUNC(xtide_device::write)));
 
 	//logerror("xtide_device::device_reset(), bios_base=0x%5X to 0x%5X, I/O=0x%3X, IRQ=%d\n",base_address,base_address + (16*1024)  -1 ,io_address,irq);
 }

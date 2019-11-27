@@ -294,7 +294,7 @@ void micro3d_state::soundmem_io(address_map &map)
 void micro3d_state::cpu_space_map(address_map &map)
 {
 	map(0xfffff0, 0xffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));
-	map(0xfffff6, 0xfffff7).lr16("duart irq", [this]() -> u16 { return m_duart->get_irq_vector(); });
+	map(0xfffff6, 0xfffff7).lr16(NAME([this] () -> u16 { return m_duart->get_irq_vector(); }));
 }
 
 
@@ -354,7 +354,7 @@ void micro3d_state::micro3d(machine_config &config)
 	mfp.out_tco_cb().set("mfp", FUNC(mc68901_device::tbi_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-	config.m_minimum_quantum = attotime::from_hz(3000);
+	config.set_maximum_quantum(attotime::from_hz(3000));
 
 	PALETTE(config, m_palette).set_format(palette_device::BRGx_555, 4096);
 

@@ -181,6 +181,7 @@ public:
 	void init_rp96sub();
 	void init_tcl();
 	void init_super7();
+	void init_chthree();
 
 	uint32_t screen_update_amcoe1a(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -198,26 +199,7 @@ public:
 
 protected:
 	// installed by various driver init handlers to get stuff to work
-	READ8_MEMBER(fixedval09_r) { return 0x09; }
-	READ8_MEMBER(fixedval38_r) { return 0x38; }
-	READ8_MEMBER(fixedval48_r) { return 0x48; }
-	READ8_MEMBER(fixedval58_r) { return 0x58; }
-	READ8_MEMBER(fixedval68_r) { return 0x68; }
-	READ8_MEMBER(fixedval74_r) { return 0x74; }
-	READ8_MEMBER(fixedval7d_r) { return 0x7d; }
-	READ8_MEMBER(fixedval80_r) { return 0x80; }
-	READ8_MEMBER(fixedval82_r) { return 0x82; }
-	READ8_MEMBER(fixedval84_r) { return 0x84; }
-	READ8_MEMBER(fixedval90_r) { return 0x90; }
-	READ8_MEMBER(fixedval96_r) { return 0x96; }
-	READ8_MEMBER(fixedvala8_r) { return 0xa8; }
-	READ8_MEMBER(fixedvalaa_r) { return 0xaa; }
-	READ8_MEMBER(fixedvalb2_r) { return 0xb2; }
-	READ8_MEMBER(fixedvalb4_r) { return 0xb4; }
-	READ8_MEMBER(fixedvalbe_r) { return 0xbe; }
-	READ8_MEMBER(fixedvalc7_r) { return 0xc7; }
-	READ8_MEMBER(fixedvalea_r) { return 0xea; }
-	READ8_MEMBER(fixedvale4_r) { return 0xe4; }
+	template <uint8_t V> READ8_MEMBER(fixedval_r) { return V; }
 };
 
 
@@ -244,6 +226,7 @@ public:
 	void init_flam7_tw();
 	void init_luckylad();
 	void init_super972();
+	void init_wcat3();
 
 	DECLARE_VIDEO_START(bingowng);
 	DECLARE_VIDEO_START(magical);

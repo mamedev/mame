@@ -136,12 +136,12 @@ void ashnojoe_state::tilemap_regs_w(offs_t offset, u16 data, u16 mem_mask)
 
 void ashnojoe_state::video_start()
 {
-	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ashnojoe_state::get_tile_info_highest),this), TILEMAP_SCAN_ROWS,  8,  8, 64, 32);
-	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ashnojoe_state::get_tile_info_midlow),this),  TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ashnojoe_state::get_tile_info_high),this),    TILEMAP_SCAN_ROWS,  8,  8, 64, 64);
-	m_tilemap[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ashnojoe_state::get_tile_info_low),this),     TILEMAP_SCAN_ROWS,  8,  8, 64, 64);
-	m_tilemap[4] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ashnojoe_state::get_tile_info_midhigh),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_tilemap[5] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ashnojoe_state::get_tile_info_lowest),this),  TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ashnojoe_state::get_tile_info_highest)), TILEMAP_SCAN_ROWS,  8,  8, 64, 32);
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ashnojoe_state::get_tile_info_midlow)),  TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ashnojoe_state::get_tile_info_high)),    TILEMAP_SCAN_ROWS,  8,  8, 64, 64);
+	m_tilemap[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ashnojoe_state::get_tile_info_low)),     TILEMAP_SCAN_ROWS,  8,  8, 64, 64);
+	m_tilemap[4] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ashnojoe_state::get_tile_info_midhigh)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tilemap[5] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ashnojoe_state::get_tile_info_lowest)),  TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	m_tilemap[0]->set_transparent_pen(15);
 	m_tilemap[1]->set_transparent_pen(15);

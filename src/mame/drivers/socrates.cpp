@@ -1489,7 +1489,7 @@ void socrates_state::socrates(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &socrates_state::socrates_mem);
 	m_maincpu->set_addrmap(AS_IO, &socrates_state::socrates_io);
 	m_maincpu->set_vblank_int("screen", FUNC(socrates_state::assert_irq));
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	ADDRESS_MAP_BANK(config, "rombank1").set_map(&socrates_state::socrates_rombank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
 	ADDRESS_MAP_BANK(config, "rambank1").set_map(&socrates_state::socrates_rambank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
@@ -1522,7 +1522,7 @@ void socrates_state::socrates_pal(machine_config &config)
 
 	m_maincpu->set_clock(XTAL(26'601'712)/8); // XTAL verified, divider NOT verified; this is a later ASIC so the divider may be different
 
-	config.m_minimum_quantum = attotime::from_hz(50);
+	config.set_maximum_quantum(attotime::from_hz(50));
 
 	m_screen->set_refresh_hz(50);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate

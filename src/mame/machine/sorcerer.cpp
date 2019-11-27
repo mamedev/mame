@@ -463,7 +463,7 @@ void sorcerer_state::machine_start_common(u16 endmem)
 	}
 
 	if (m_cart && m_cart->exists())
-		space.install_read_handler(0xc000, 0xdfff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
+		space.install_read_handler(0xc000, 0xdfff, read8sm_delegate(*m_cart, FUNC(generic_slot_device::read_rom)));
 }
 
 void sorcerer_state::machine_start()

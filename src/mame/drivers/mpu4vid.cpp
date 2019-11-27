@@ -205,19 +205,18 @@ TODO:
 #include "crmaze4p.lh"
 
 
-struct bt471_t
-{
-	uint8_t address;
-	uint8_t addr_cnt;
-	uint8_t pixmask;
-	uint8_t command;
-	rgb_t color;
-};
-
-
 class mpu4vid_state : public mpu4_state
 {
 public:
+	struct bt471_t
+	{
+		uint8_t address;
+		uint8_t addr_cnt;
+		uint8_t pixmask;
+		uint8_t command;
+		rgb_t color;
+	};
+
 	mpu4vid_state(const machine_config &mconfig, device_type type, const char *tag)
 		: mpu4_state(mconfig, type, tag),
 		m_videocpu(*this, "video"),
@@ -281,9 +280,9 @@ private:
 	int m_gfx_index;
 	int8_t m_cur[2];
 
-	DECLARE_MACHINE_START(mpu4_vid);
-	DECLARE_MACHINE_RESET(mpu4_vid);
-	DECLARE_VIDEO_START(mpu4_vid);
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 	SCN2674_DRAW_CHARACTER_MEMBER(display_pixels);
 	DECLARE_WRITE_LINE_MEMBER(m6809_acia_irq);
 	DECLARE_WRITE_LINE_MEMBER(m68k_acia_irq);
@@ -438,7 +437,7 @@ WRITE16_MEMBER(mpu4vid_state::mpu4_vid_vidram_w )
 }
 
 
-VIDEO_START_MEMBER(mpu4vid_state,mpu4_vid)
+void mpu4vid_state::video_start()
 {
 	m_vid_vidram.allocate(0x20000/2);
 
@@ -1152,19 +1151,16 @@ WRITE_LINE_MEMBER(mpu4vid_state::mpu_video_reset)
 }
 
 /* machine start (called only once) */
-MACHINE_START_MEMBER(mpu4vid_state,mpu4_vid)
+void mpu4vid_state::machine_start()
 {
 	mpu4_config_common();
 
 	m_mod_number=4; //No AY chip
 	/* setup communications */
 	m_link7a_connected = 1;
-
-	/* Hook the reset line */
-	m_videocpu->set_reset_callback(write_line_delegate(FUNC(mpu4vid_state::mpu_video_reset),this));
 }
 
-MACHINE_RESET_MEMBER(mpu4vid_state,mpu4_vid)
+void mpu4vid_state::machine_reset()
 {
 	m_vfd->reset(); //for debug ports only
 
@@ -1302,12 +1298,9 @@ void mpu4vid_state::mpu4_vid(machine_config &config)
 
 	M68000(config, m_videocpu, VIDEO_MASTER_CLOCK);
 	m_videocpu->set_addrmap(AS_PROGRAM, &mpu4vid_state::mpu4_68k_map);
+	m_videocpu->set_reset_callback(FUNC(mpu4vid_state::mpu_video_reset));
 
-//  config.m_minimum_quantum = attotime::from_hz(960);
-
-	MCFG_MACHINE_START_OVERRIDE(mpu4vid_state,mpu4_vid)
-	MCFG_MACHINE_RESET_OVERRIDE(mpu4vid_state,mpu4_vid)
-	MCFG_VIDEO_START_OVERRIDE (mpu4vid_state,mpu4_vid)
+//  config.set_maximum_quantum(attotime::from_hz(960));
 
 	PALETTE(config, m_palette).set_entries(ef9369_device::NUMCOLORS);
 

@@ -639,7 +639,7 @@ void peribox_sg_device::device_add_mconfig(machine_config &config)
 
 peribox_slot_device::peribox_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, TI99_PERIBOX_SLOT, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_ti99_peribox_card_interface>(mconfig, *this),
 	m_card(nullptr),
 	m_slotnumber(0)
 {
@@ -699,7 +699,7 @@ void peribox_slot_device::device_start()
 
 void peribox_slot_device::device_config_complete()
 {
-	m_card = dynamic_cast<device_ti99_peribox_card_interface *>(get_card_device());
+	m_card = get_card_device();
 	peribox_device *peb = dynamic_cast<peribox_device*>(owner());
 	if (peb)
 		peb->set_slot_loaded(m_slotnumber, m_card ? this : nullptr);
@@ -736,7 +736,7 @@ WRITE_LINE_MEMBER( peribox_slot_device::set_ready )
 /***************************************************************************/
 
 device_ti99_peribox_card_interface::device_ti99_peribox_card_interface(const machine_config &mconfig, device_t &device):
-	device_slot_card_interface(mconfig, device),
+	device_interface(device, "ti99peb"),
 	m_selected(false),
 	m_cru_base(0),
 	m_select_mask(0),

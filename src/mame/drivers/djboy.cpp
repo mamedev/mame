@@ -493,7 +493,7 @@ void djboy_state::djboy(machine_config &config)
 	m_beast->port_in_cb<3>().set(FUNC(djboy_state::beast_p3_r));
 	m_beast->port_out_cb<3>().set(FUNC(djboy_state::beast_p3_w));
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	GENERIC_LATCH_8(config, m_slavelatch);
 

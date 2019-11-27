@@ -836,8 +836,8 @@ void m6805_hmos_device::internal_map(address_map &map)
 	map(0x0005, 0x0005).w(FUNC(m6805_hmos_device::port_ddr_w<1>));
 	map(0x0006, 0x0006).w(FUNC(m6805_hmos_device::port_ddr_w<2>));
 
-	map(0x0008, 0x0008).lrw8("tdr", [this]() { return m_timer.tdr_r(); }, [this](u8 data) { m_timer.tdr_w(data); });
-	map(0x0009, 0x0009).lrw8("tcr", [this]() { return m_timer.tcr_r(); }, [this](u8 data) { m_timer.tcr_w(data); });
+	map(0x0008, 0x0008).lrw8(NAME([this]() { return m_timer.tdr_r(); }), NAME([this](u8 data) { m_timer.tdr_w(data); }));
+	map(0x0009, 0x0009).lrw8(NAME([this]() { return m_timer.tcr_r(); }), NAME([this](u8 data) { m_timer.tcr_w(data); }));
 
 	// M68?05Px devices don't have Port D or the Miscellaneous register
 	if (m_port_mask[3] != 0xff)

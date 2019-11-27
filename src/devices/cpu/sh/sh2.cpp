@@ -255,6 +255,9 @@ sh2_device::sh2_device(const machine_config &mconfig, device_type type, const ch
 	, m_program_config("program", ENDIANNESS_BIG, 32, addrlines, 0, internal_map)
 	, m_decrypted_program_config("decrypted_opcodes", ENDIANNESS_BIG, 32, addrlines, 0)
 	, m_is_slave(0)
+	, m_dma_kludge_cb(*this)
+	, m_dma_fifo_data_available_cb(*this)
+	, m_ftcsr_read_cb(*this)
 	, m_drcfe(nullptr)
 	, m_debugger_temp(0)
 {
@@ -512,6 +515,8 @@ void sh2_device::device_start()
 
 	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sh2_device::sh2_timer_callback), this));
 	m_timer->adjust(attotime::never);
+	m_wdtimer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sh2_device::sh2_wdtimer_callback), this));
+	m_wdtimer->adjust(attotime::never);
 
 	m_dma_current_active_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sh2_device::sh2_dma_current_active_callback), this));
 	m_dma_current_active_timer[0]->adjust(attotime::never);
@@ -520,9 +525,9 @@ void sh2_device::device_start()
 	m_dma_current_active_timer[1]->adjust(attotime::never);
 
 	/* resolve callbacks */
-	m_dma_kludge_cb.bind_relative_to(*owner());
-	m_dma_fifo_data_available_cb.bind_relative_to(*owner());
-	m_ftcsr_read_cb.bind_relative_to(*owner());
+	m_dma_kludge_cb.resolve();
+	m_dma_fifo_data_available_cb.resolve();
+	m_ftcsr_read_cb.resolve();
 
 	m_decrypted_program = has_space(AS_OPCODES) ? &space(AS_OPCODES) : &space(AS_PROGRAM);
 	auto cache = m_decrypted_program->cache<2, 0, ENDIANNESS_BIG>();

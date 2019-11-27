@@ -18,16 +18,11 @@
 
 
 namespace ui {
+
 // itemrefs for key menu items
 #define ITEMREF_CHEATS_RESET_ALL            ((void *) 0x0001)
 #define ITEMREF_CHEATS_RELOAD_ALL           ((void *) 0x0002)
-#define ITEMREF_CHEATS_AUTOFIRE_SETTINGS    ((void *) 0x0003)
-#define ITEMREF_CHEATS_FIRST_ITEM           ((void *) 0x0004)
-
-// itemrefs for key menu items
-#define ITEMREF_AUTOFIRE_STATUS       ((void *) 0x0001)
-#define ITEMREF_AUTOFIRE_DELAY        ((void *) 0x0002)
-#define ITEMREF_AUTOFIRE_FIRST_BUTTON ((void *) 0x0003)
+#define ITEMREF_CHEATS_FIRST_ITEM           ((void *) 0x0003)
 
 
 /*-------------------------------------------------
@@ -105,12 +100,6 @@ void menu_cheat::handle()
 			machine().popmessage(_("All cheats reloaded"));
 		}
 
-		/* handle autofire menu */
-		if (menu_event->itemref == ITEMREF_CHEATS_AUTOFIRE_SETTINGS && menu_event->iptkey == IPT_UI_SELECT)
-		{
-			menu::stack_push<menu_autofire>(ui(), container());
-		}
-
 		/* if things changed, update */
 		if (changed)
 			reset(reset_options::REMEMBER_REF);
@@ -131,9 +120,6 @@ void menu_cheat::populate(float &customtop, float &custombottom)
 	/* iterate over cheats */
 	std::string text;
 	std::string subtext;
-
-	// add the autofire menu
-	item_append(_("Autofire Settings"), "", 0, (void *)ITEMREF_CHEATS_AUTOFIRE_SETTINGS);
 
 	/* add a separator */
 	item_append(menu_item_type::SEPARATOR);
@@ -163,168 +149,6 @@ void menu_cheat::populate(float &customtop, float &custombottom)
 
 menu_cheat::~menu_cheat()
 {
-}
-
-
-
-
-
-/*-------------------------------------------------
-    menu_autofire - handle the autofire settings
-    menu
--------------------------------------------------*/
-
-menu_autofire::menu_autofire(mame_ui_manager &mui, render_container &container) : menu(mui, container), last_toggle(false)
-{
-	const screen_device *screen = screen_device_iterator(mui.machine().root_device()).first();
-
-	if (screen == nullptr)
-	{
-		refresh = 60.0;
-	}
-	else
-	{
-		refresh = ATTOSECONDS_TO_HZ(screen->refresh_attoseconds());
-	}
-}
-
-menu_autofire::~menu_autofire()
-{
-}
-
-void menu_autofire::handle()
-{
-	ioport_field *field;
-	bool changed = false;
-
-	/* process the menu */
-	const event *menu_event = process(0);
-
-	/* handle events */
-	if (menu_event != nullptr && menu_event->itemref != nullptr)
-	{
-		// menu item is changed using left/right keys only
-		if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
-		{
-			if (menu_event->itemref == ITEMREF_AUTOFIRE_STATUS)
-			{
-				// toggle autofire status
-				bool autofire_toggle = machine().ioport().get_autofire_toggle();    // (menu_event->iptkey == IPT_UI_LEFT);
-				machine().ioport().set_autofire_toggle(!autofire_toggle);
-				changed = true;
-			}
-			else if (menu_event->itemref == ITEMREF_AUTOFIRE_DELAY)
-			{
-				// change autofire frequency
-				int autofire_delay = machine().ioport().get_autofire_delay();
-				if (menu_event->iptkey == IPT_UI_LEFT)
-				{
-					autofire_delay--;
-					if (autofire_delay < 1)
-						autofire_delay = 1;
-				}
-				else
-				{
-					autofire_delay++;
-					if (autofire_delay > 30)
-						autofire_delay = 30;
-				}
-				machine().ioport().set_autofire_delay(autofire_delay);
-				changed = true;
-			}
-			else
-			{
-				// enable autofire on specific button
-				field = (ioport_field *)menu_event->itemref;
-				ioport_field::user_settings settings;
-				field->get_user_settings(settings);
-				settings.autofire = (menu_event->iptkey == IPT_UI_RIGHT);
-				field->set_user_settings(settings);
-				changed = true;
-			}
-		}
-	}
-
-	// if toggle settings changed, redraw menu to reflect new options
-	if (!changed)
-	{
-		changed = (last_toggle != machine().ioport().get_autofire_toggle());
-	}
-
-	/* if something changed, rebuild the menu */
-	if (changed)
-	{
-		reset(reset_options::REMEMBER_REF);
-	}
-}
-
-
-/*-------------------------------------------------
-    menu_autofire_populate - populate the autofire
-    menu
--------------------------------------------------*/
-
-void menu_autofire::populate(float &customtop, float &custombottom)
-{
-	char temp_text[64];
-
-	/* add autofire toggle item */
-	bool autofire_toggle = machine().ioport().get_autofire_toggle();
-	item_append(_("Autofire Status"), (autofire_toggle ? _("Disabled") : _("Enabled")),
-			(autofire_toggle ? FLAG_RIGHT_ARROW : FLAG_LEFT_ARROW), (void *)ITEMREF_AUTOFIRE_STATUS);
-
-	/* iterate over the input ports and add autofire toggle items */
-	int menu_items = 0;
-	for (auto &port : machine().ioport().ports())
-	{
-		bool is_first_button = true;
-		for (ioport_field &field : port.second->fields())
-		{
-			if (field.type() >= IPT_BUTTON1 && field.type() <= IPT_BUTTON16)
-			{
-				menu_items++;
-				ioport_field::user_settings settings;
-				field.get_user_settings(settings);
-
-				if (is_first_button)
-				{
-					/* add a separator for each player */
-					item_append(menu_item_type::SEPARATOR);
-					is_first_button = false;
-				}
-
-				/* add an autofire item */
-				item_append_on_off(field.name(), settings.autofire, (autofire_toggle ? FLAG_DISABLE | FLAG_INVERT : 0), (void *)&field);
-			}
-		}
-	}
-
-	/* add text item if no buttons found */
-	if (menu_items==0)
-	{
-		item_append(menu_item_type::SEPARATOR);
-		item_append(_("No buttons found on this machine!"), "", FLAG_DISABLE, nullptr);
-	}
-
-	/* add a separator */
-	item_append(menu_item_type::SEPARATOR);
-
-	/* add autofire delay item */
-	int value = machine().ioport().get_autofire_delay();
-	snprintf(temp_text, ARRAY_LENGTH(temp_text), "%d = %.2f Hz", value, (float)refresh/value);
-	if (!autofire_toggle)
-	{
-		item_append(_("Autofire Delay"), temp_text, FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW, (void *)ITEMREF_AUTOFIRE_DELAY);
-	}
-	else
-	{
-		item_append(_("Autofire Delay"), temp_text, FLAG_DISABLE | FLAG_INVERT, nullptr);
-	}
-
-	/* add a separator */
-	item_append(menu_item_type::SEPARATOR);
-
-	last_toggle = autofire_toggle;
 }
 
 } // namespace ui

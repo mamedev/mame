@@ -36,8 +36,8 @@ diablo_image_device::diablo_image_device(const machine_config &mconfig, const ch
 		device_image_interface(mconfig, *this),
 		m_chd(nullptr),
 		m_hard_disk_handle(nullptr),
-		m_device_image_load(load_delegate()),
-		m_device_image_unload(unload_delegate()),
+		m_device_image_load(*this),
+		m_device_image_unload(*this),
 		m_interface(nullptr)
 {
 }
@@ -72,6 +72,9 @@ const util::option_guide &diablo_image_device::create_option_guide() const
 
 void diablo_image_device::device_start()
 {
+	m_device_image_load.resolve();
+	m_device_image_unload.resolve();
+
 	m_chd = nullptr;
 
 	// try to locate the CHD from a DISK_REGION

@@ -1569,26 +1569,26 @@ void mcr3_state::mcr_common_init()
 void mcr3_state::init_demoderm()
 {
 	mcr_common_init();
-	m_maincpu->space(AS_IO).install_read_handler(0x01, 0x01, read8_delegate(FUNC(mcr3_state::demoderm_ip1_r),this));
-	m_maincpu->space(AS_IO).install_read_handler(0x02, 0x02, read8_delegate(FUNC(mcr3_state::demoderm_ip2_r),this));
-	m_maincpu->space(AS_IO).install_write_handler(0x06, 0x06, write8_delegate(FUNC(mcr3_state::demoderm_op6_w),this));
+	m_maincpu->space(AS_IO).install_read_handler(0x01, 0x01, read8_delegate(*this, FUNC(mcr3_state::demoderm_ip1_r)));
+	m_maincpu->space(AS_IO).install_read_handler(0x02, 0x02, read8_delegate(*this, FUNC(mcr3_state::demoderm_ip2_r)));
+	m_maincpu->space(AS_IO).install_write_handler(0x06, 0x06, write8_delegate(*this, FUNC(mcr3_state::demoderm_op6_w)));
 }
 
 
 void mcr3_state::init_sarge()
 {
 	mcr_common_init();
-	m_maincpu->space(AS_IO).install_write_handler(0x06, 0x06, write8_delegate(FUNC(midway_turbo_cheap_squeak_device::write),m_turbo_cheap_squeak.target()));
+	m_maincpu->space(AS_IO).install_write_handler(0x06, 0x06, write8_delegate(*m_turbo_cheap_squeak, FUNC(midway_turbo_cheap_squeak_device::write)));
 }
 
 
 void mcr3_state::init_maxrpm()
 {
 	mcr_common_init();
-	m_maincpu->space(AS_IO).install_read_handler(0x01, 0x01, read8_delegate(FUNC(mcr3_state::maxrpm_ip1_r),this));
-	m_maincpu->space(AS_IO).install_read_handler(0x02, 0x02, read8_delegate(FUNC(mcr3_state::maxrpm_ip2_r),this));
-	m_maincpu->space(AS_IO).install_write_handler(0x05, 0x05, write8_delegate(FUNC(mcr3_state::maxrpm_op5_w),this));
-	m_maincpu->space(AS_IO).install_write_handler(0x06, 0x06, write8_delegate(FUNC(mcr3_state::maxrpm_op6_w),this));
+	m_maincpu->space(AS_IO).install_read_handler(0x01, 0x01, read8_delegate(*this, FUNC(mcr3_state::maxrpm_ip1_r)));
+	m_maincpu->space(AS_IO).install_read_handler(0x02, 0x02, read8_delegate(*this, FUNC(mcr3_state::maxrpm_ip2_r)));
+	m_maincpu->space(AS_IO).install_write_handler(0x05, 0x05, write8_delegate(*this, FUNC(mcr3_state::maxrpm_op5_w)));
+	m_maincpu->space(AS_IO).install_write_handler(0x06, 0x06, write8_delegate(*this, FUNC(mcr3_state::maxrpm_op6_w)));
 
 	save_item(NAME(m_maxrpm_adc_control));
 	save_item(NAME(m_maxrpm_last_shift));
@@ -1600,35 +1600,35 @@ void mcr3_state::init_maxrpm()
 void mcr3_state::init_rampage()
 {
 	mcr_common_init();
-	m_maincpu->space(AS_IO).install_read_handler(0x04, 0x04, read8_delegate(FUNC(mcr3_state::rampage_ip4_r),this));
-	m_maincpu->space(AS_IO).install_write_handler(0x06, 0x06, write8_delegate(FUNC(mcr3_state::rampage_op6_w),this));
+	m_maincpu->space(AS_IO).install_read_handler(0x04, 0x04, read8_delegate(*this, FUNC(mcr3_state::rampage_ip4_r)));
+	m_maincpu->space(AS_IO).install_write_handler(0x06, 0x06, write8_delegate(*this, FUNC(mcr3_state::rampage_op6_w)));
 }
 
 
 void mcr3_state::init_powerdrv()
 {
 	mcr_common_init();
-	m_maincpu->space(AS_IO).install_read_handler(0x02, 0x02, read8_delegate(FUNC(mcr3_state::powerdrv_ip2_r),this));
-	m_maincpu->space(AS_IO).install_write_handler(0x05, 0x05, write8_delegate(FUNC(mcr3_state::powerdrv_op5_w),this));
-	m_maincpu->space(AS_IO).install_write_handler(0x06, 0x06, write8_delegate(FUNC(mcr3_state::powerdrv_op6_w),this));
+	m_maincpu->space(AS_IO).install_read_handler(0x02, 0x02, read8_delegate(*this, FUNC(mcr3_state::powerdrv_ip2_r)));
+	m_maincpu->space(AS_IO).install_write_handler(0x05, 0x05, write8_delegate(*this, FUNC(mcr3_state::powerdrv_op5_w)));
+	m_maincpu->space(AS_IO).install_write_handler(0x06, 0x06, write8_delegate(*this, FUNC(mcr3_state::powerdrv_op6_w)));
 }
 
 
 void mcr3_state::init_stargrds()
 {
 	mcr_common_init();
-	m_maincpu->space(AS_IO).install_read_handler(0x00, 0x00, read8_delegate(FUNC(mcr3_state::stargrds_ip0_r),this));
-	m_maincpu->space(AS_IO).install_write_handler(0x05, 0x05, write8_delegate(FUNC(mcr3_state::stargrds_op5_w),this));
-	m_maincpu->space(AS_IO).install_write_handler(0x06, 0x06, write8_delegate(FUNC(mcr3_state::stargrds_op6_w),this));
+	m_maincpu->space(AS_IO).install_read_handler(0x00, 0x00, read8_delegate(*this, FUNC(mcr3_state::stargrds_ip0_r)));
+	m_maincpu->space(AS_IO).install_write_handler(0x05, 0x05, write8_delegate(*this, FUNC(mcr3_state::stargrds_op5_w)));
+	m_maincpu->space(AS_IO).install_write_handler(0x06, 0x06, write8_delegate(*this, FUNC(mcr3_state::stargrds_op6_w)));
 }
 
 
 void mcr3_state::init_spyhunt()
 {
 	mcr_common_init();
-	m_ssio->set_custom_input(1, 0x60, read8_delegate(FUNC(mcr3_state::spyhunt_ip1_r),this));
-	m_ssio->set_custom_input(2, 0xff, read8_delegate(FUNC(mcr3_state::spyhunt_ip2_r),this));
-	m_ssio->set_custom_output(4, 0xff, write8_delegate(FUNC(mcr3_state::spyhunt_op4_w),this));
+	m_ssio->set_custom_input(1, 0x60, *this, FUNC(mcr3_state::spyhunt_ip1_r));
+	m_ssio->set_custom_input(2, 0xff, *this, FUNC(mcr3_state::spyhunt_ip2_r));
+	m_ssio->set_custom_output(4, 0xff, *this, FUNC(mcr3_state::spyhunt_op4_w));
 
 	m_spyhunt_sprite_color_mask = 0x00;
 	m_spyhunt_scroll_offset = 16;
@@ -1648,9 +1648,9 @@ void mcr3_state::init_crater()
 void mcr3_state::init_turbotag()
 {
 	mcr_common_init();
-	m_ssio->set_custom_input(1, 0x60, read8_delegate(FUNC(mcr3_state::spyhunt_ip1_r),this));
-	m_ssio->set_custom_input(2, 0xff, read8_delegate(FUNC(mcr3_state::turbotag_ip2_r),this));
-	m_ssio->set_custom_output(4, 0xff, write8_delegate(FUNC(mcr3_state::spyhunt_op4_w),this));
+	m_ssio->set_custom_input(1, 0x60, *this, FUNC(mcr3_state::spyhunt_ip1_r));
+	m_ssio->set_custom_input(2, 0xff, *this, FUNC(mcr3_state::turbotag_ip2_r));
+	m_ssio->set_custom_output(4, 0xff, *this, FUNC(mcr3_state::spyhunt_op4_w));
 
 	m_spyhunt_sprite_color_mask = 0x00;
 	m_spyhunt_scroll_offset = 88;
@@ -1659,7 +1659,7 @@ void mcr3_state::init_turbotag()
 	m_cheap_squeak_deluxe->suspend_cpu();
 
 	/* kludge for bad ROM read */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0b53, 0x0b53, read8_delegate(FUNC(mcr3_state::turbotag_kludge_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0b53, 0x0b53, read8_delegate(*this, FUNC(mcr3_state::turbotag_kludge_r)));
 }
 
 

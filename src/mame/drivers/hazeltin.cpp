@@ -699,7 +699,7 @@ void hazl1500_state::hazl1500(machine_config &config)
 	I8080(config, m_maincpu, XTAL(18'000'000)/9); // 18MHz crystal on schematics, using an i8224 clock gen/driver IC
 	m_maincpu->set_addrmap(AS_PROGRAM, &hazl1500_state::hazl1500_mem);
 	m_maincpu->set_addrmap(AS_IO, &hazl1500_state::hazl1500_io);
-	config.m_perfect_cpu_quantum = subtag(CPU_TAG);
+	config.set_perfect_quantum(m_maincpu);
 
 	INPUT_MERGER_ANY_HIGH(config, "mainint").output_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
@@ -756,9 +756,9 @@ void hazl1500_state::hazl1500(machine_config &config)
 	NETLIST_LOGIC_INPUT(config, NETLIST_TAG ":cpu_db6", "cpu_db6.IN", 0);
 	NETLIST_LOGIC_INPUT(config, NETLIST_TAG ":cpu_db7", "cpu_db7.IN", 0);
 
-	NETLIST_ANALOG_OUTPUT(config, NETLIST_TAG ":video_out", 0).set_params("video_out", FUNC(hazl1500_state::video_out_cb), "");
-	NETLIST_ANALOG_OUTPUT(config, NETLIST_TAG ":vblank", 0).set_params("vblank", FUNC(hazl1500_state::vblank_cb), "");
-	NETLIST_ANALOG_OUTPUT(config, NETLIST_TAG ":tvinterq", 0).set_params("tvinterq", FUNC(hazl1500_state::tvinterq_cb), "");
+	NETLIST_ANALOG_OUTPUT(config, NETLIST_TAG ":video_out", 0).set_params("video_out", FUNC(hazl1500_state::video_out_cb));
+	NETLIST_ANALOG_OUTPUT(config, NETLIST_TAG ":vblank", 0).set_params("vblank", FUNC(hazl1500_state::vblank_cb));
+	NETLIST_ANALOG_OUTPUT(config, NETLIST_TAG ":tvinterq", 0).set_params("tvinterq", FUNC(hazl1500_state::tvinterq_cb));
 
 	/* keyboard controller */
 	AY3600(config, m_kbdc, 0);

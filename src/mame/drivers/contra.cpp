@@ -215,7 +215,7 @@ void contra_state::contra(machine_config &config)
 	MC6809E(config, m_audiocpu, XTAL(24'000'000)/8); /* 3000000? (HD68B09EP) */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &contra_state::sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);  /* enough for the sound CPU to read all commands */
+	config.set_maximum_quantum(attotime::from_hz(6000));  /* enough for the sound CPU to read all commands */
 
 
 	/* video hardware */

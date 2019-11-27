@@ -1,6 +1,6 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-#include "nlm_opamp.h"
+
 #include "netlist/devices/net_lib.h"
 
 /*

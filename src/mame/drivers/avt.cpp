@@ -537,7 +537,7 @@ TILE_GET_INFO_MEMBER(avt_state::get_bg_tile_info)
 
 void avt_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(avt_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 28, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(avt_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 28, 32);
 }
 
 

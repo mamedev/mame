@@ -596,10 +596,11 @@ public:
 	u32 unscaled_clock() const { return m_unscaled_clock; }
 	void set_unscaled_clock(u32 clock);
 	void set_unscaled_clock(const XTAL &xtal) { set_unscaled_clock(xtal.value()); }
+	void set_unscaled_clock_int(u32 clock) { set_unscaled_clock(clock); } // non-overloaded name because binding to overloads is ugly
 	double clock_scale() const { return m_clock_scale; }
 	void set_clock_scale(double clockscale);
-	attotime clocks_to_attotime(u64 clocks) const;
-	u64 attotime_to_clocks(const attotime &duration) const;
+	attotime clocks_to_attotime(u64 clocks) const noexcept;
+	u64 attotime_to_clocks(const attotime &duration) const noexcept;
 
 	// timer interfaces
 	emu_timer *timer_alloc(device_timer_id id = 0, void *ptr = nullptr);

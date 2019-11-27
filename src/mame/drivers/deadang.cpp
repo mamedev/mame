@@ -371,7 +371,7 @@ void deadang_state::deadang(machine_config &config)
 
 	SEI80BU(config, "sei80bu", 0).set_device_rom_tag("audiocpu");
 
-	config.m_minimum_quantum = attotime::from_hz(60); // the game stops working with higher interleave rates..
+	config.set_maximum_quantum(attotime::from_hz(60)); // the game stops working with higher interleave rates..
 
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -733,8 +733,8 @@ void deadang_state::init_ghunter()
 	m_adpcm1->decrypt();
 	m_adpcm2->decrypt();
 
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80000, 0x80001, read16_delegate(FUNC(deadang_state::ghunter_trackball_low_r),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xb0000, 0xb0001, read16_delegate(FUNC(deadang_state::ghunter_trackball_high_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80000, 0x80001, read16_delegate(*this, FUNC(deadang_state::ghunter_trackball_low_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xb0000, 0xb0001, read16_delegate(*this, FUNC(deadang_state::ghunter_trackball_high_r)));
 }
 
 /* Game Drivers */

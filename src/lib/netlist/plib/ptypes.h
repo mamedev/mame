@@ -1,12 +1,12 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * ptypes.h
- *
- */
 
 #ifndef PTYPES_H_
 #define PTYPES_H_
+
+///
+/// \file ptypes.h
+///
 
 #include "pconfig.h"
 
@@ -30,7 +30,7 @@ namespace plib
 	template<typename T> struct is_integral : public std::is_integral<T> { };
 	template<typename T> struct numeric_limits : public std::numeric_limits<T> { };
 
-	/* 128 bit support at least on GCC is not fully supported */
+	// 128 bit support at least on GCC is not fully supported
 #if PHAS_INT128
 	template<> struct is_integral<UINT128> { static constexpr bool value = true; };
 	template<> struct is_integral<INT128> { static constexpr bool value = true; };
@@ -57,12 +57,12 @@ namespace plib
 	struct nocopyassignmove
 	{
 		nocopyassignmove(const nocopyassignmove &) = delete;
-		nocopyassignmove(nocopyassignmove &&) = delete;
+		nocopyassignmove(nocopyassignmove &&) noexcept = delete;
 		nocopyassignmove &operator=(const nocopyassignmove &) = delete;
-		nocopyassignmove &operator=(nocopyassignmove &&) = delete;
+		nocopyassignmove &operator=(nocopyassignmove &&) noexcept = delete;
 	protected:
 		nocopyassignmove() = default;
-		~nocopyassignmove() = default;
+		~nocopyassignmove() noexcept = default;
 	};
 
 	struct nocopyassign
@@ -71,9 +71,9 @@ namespace plib
 		nocopyassign &operator=(const nocopyassign &) = delete;
 	protected:
 		nocopyassign() = default;
-		~nocopyassign() = default;
-		nocopyassign(nocopyassign &&) = default;
-		nocopyassign &operator=(nocopyassign &&) = default;
+		~nocopyassign() noexcept = default;
+		nocopyassign(nocopyassign &&) noexcept = default;
+		nocopyassign &operator=(nocopyassign &&) noexcept = default;
 	};
 
 	//============================================================
@@ -91,7 +91,6 @@ namespace plib
 		static_assert(is_integral<T>::value, "is_pow2 needs integer arguments");
 		return !(v & (v-1));
 	}
-
 
 	//============================================================
 	// abs, lcd, gcm
@@ -150,4 +149,4 @@ namespace plib
 		static constexpr const bool value = sizeof(test<T>(nullptr)) == sizeof(long);   \
 	}
 
-#endif /* PTYPES_H_ */
+#endif // PTYPES_H_

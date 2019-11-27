@@ -1,14 +1,14 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * nld_mosfet.h
- *
- */
 
 #ifndef NLD_MOSFET_H_
 #define NLD_MOSFET_H_
 
 #include "netlist/nl_setup.h"
+
+///
+/// \file nld_mosfet.h
+///
 
 // -----------------------------------------------------------------------------
 // Macros
@@ -18,4 +18,4 @@
 		NET_REGISTER_DEV(MOSFET, name)                                        \
 		NETDEV_PARAMI(name,  MODEL, model)
 
-#endif /* NLD_MOSFET_H_ */
+#endif // NLD_MOSFET_H_

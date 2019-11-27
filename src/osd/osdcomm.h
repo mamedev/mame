@@ -8,14 +8,15 @@
     fundamental integral types as well as compiler-specific tweaks.
 
 ***************************************************************************/
-
-#pragma once
-
 #ifndef MAME_OSD_OSDCOMM_H
 #define MAME_OSD_OSDCOMM_H
 
+#pragma once
+
 #include <stdio.h>
 #include <string.h>
+
+#include <array>
 #include <cstdint>
 #include <type_traits>
 
@@ -84,6 +85,7 @@ constexpr uint32_t extract_64lo(uint64_t val) { return uint32_t(val); }
 
 // Highly useful template for compile-time knowledge of an array size
 template <typename T, size_t N> constexpr size_t ARRAY_LENGTH(T (&)[N]) { return N;}
+template <typename T, size_t N> constexpr size_t ARRAY_LENGTH(std::array<T, N> const &) { return N; }
 
 // For declaring an array of the same dimensions as another array (including multi-dimensional arrays)
 template <typename T, typename U> struct equivalent_array_or_type { typedef T type; };

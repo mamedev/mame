@@ -1174,7 +1174,7 @@ void pc1512_state::pc1512(machine_config &config)
 	m_kb->clock_wr_callback().set(FUNC(pc1512_state::kbclk_w));
 	m_kb->data_wr_callback().set(FUNC(pc1512_state::kbdata_w));
 
-	pc1512_mouse_port_device &mouse(PC1512_MOUSE_PORT(config, PC1512_MOUSE_PORT_TAG, pc1512_mouse_port_devices, "mouse"));
+	pc1512_mouse_port_device &mouse(PC1512_MOUSE_PORT(config, "mous", pc1512_mouse_port_devices, "mouse"));
 	mouse.x_wr_callback().set(FUNC(pc1512_base_state::mouse_x_w));
 	mouse.y_wr_callback().set(FUNC(pc1512_base_state::mouse_y_w));
 	mouse.m1_wr_callback().set(m_kb, FUNC(pc1512_keyboard_device::m1_w));
@@ -1309,7 +1309,7 @@ void pc1640_state::pc1640(machine_config &config)
 	m_kb->clock_wr_callback().set(FUNC(pc1512_base_state::kbclk_w));
 	m_kb->data_wr_callback().set(FUNC(pc1512_base_state::kbdata_w));
 
-	pc1512_mouse_port_device &mouse(PC1512_MOUSE_PORT(config, PC1512_MOUSE_PORT_TAG, pc1512_mouse_port_devices, "mouse"));
+	pc1512_mouse_port_device &mouse(PC1512_MOUSE_PORT(config, "mous", pc1512_mouse_port_devices, "mouse"));
 	mouse.x_wr_callback().set(FUNC(pc1512_base_state::mouse_x_w));
 	mouse.y_wr_callback().set(FUNC(pc1512_base_state::mouse_y_w));
 	mouse.m1_wr_callback().set(m_kb, FUNC(pc1512_keyboard_device::m1_w));

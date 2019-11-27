@@ -444,11 +444,11 @@ TILE_GET_INFO_MEMBER(cclimber_state::toproller_get_bg_tile_info)
 
 VIDEO_START_MEMBER(cclimber_state,cclimber)
 {
-	m_pf_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cclimber_state::cclimber_get_pf_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_pf_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cclimber_state::cclimber_get_pf_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_pf_tilemap->set_transparent_pen(0);
 	m_pf_tilemap->set_scroll_cols(32);
 
-	m_bs_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cclimber_state::cclimber_get_bs_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bs_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cclimber_state::cclimber_get_bs_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bs_tilemap->set_scroll_cols(1);
 	m_bs_tilemap->set_scroll_rows(1);
 	m_bs_tilemap->set_transmask(0, 0x01, 0);    /* pen 0 is transaprent */
@@ -461,11 +461,11 @@ VIDEO_START_MEMBER(cclimber_state,cclimber)
 
 VIDEO_START_MEMBER(cclimber_state,swimmer)
 {
-	m_pf_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cclimber_state::swimmer_get_pf_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_pf_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cclimber_state::swimmer_get_pf_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_pf_tilemap->set_transparent_pen(0);
 	m_pf_tilemap->set_scroll_cols(32);
 
-	m_bs_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cclimber_state::cclimber_get_bs_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bs_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cclimber_state::cclimber_get_bs_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bs_tilemap->set_scroll_cols(1);
 	m_bs_tilemap->set_scroll_rows(1);
 	m_bs_tilemap->set_transmask(0, 0x01, 0);    /* pen 0 is transaprent */
@@ -480,13 +480,13 @@ VIDEO_START_MEMBER(cclimber_state,swimmer)
 
 VIDEO_START_MEMBER(cclimber_state,toprollr)
 {
-	m_pf_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cclimber_state::toprollr_get_pf_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_pf_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cclimber_state::toprollr_get_pf_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_pf_tilemap->set_transparent_pen(0);
 
-	m_toproller_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cclimber_state::toproller_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_toproller_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cclimber_state::toproller_get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_toproller_bg_tilemap->set_scroll_rows(1);
 
-	m_bs_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cclimber_state::toprollr_get_bs_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bs_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cclimber_state::toprollr_get_bs_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bs_tilemap->set_scroll_cols(1);
 	m_bs_tilemap->set_scroll_rows(1);
 	m_bs_tilemap->set_transmask(0, 0x01, 0);    /* pen 0 is transaprent */

@@ -25,7 +25,7 @@ DEFINE_DEVICE_TYPE(CPC_EXPANSION_SLOT, cpc_expansion_slot_device, "cpc_expansion
 
 
 device_cpc_expansion_card_interface::device_cpc_expansion_card_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig,device)
+	: device_interface(device, "cpcexp")
 	, m_rom_sel(0)
 {
 }
@@ -43,7 +43,7 @@ device_cpc_expansion_card_interface::~device_cpc_expansion_card_interface()
 
 cpc_expansion_slot_device::cpc_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, CPC_EXPANSION_SLOT, tag, owner, clock)
-	, device_slot_interface(mconfig, *this)
+	, device_single_card_slot_interface<device_cpc_expansion_card_interface>(mconfig, *this)
 	, m_cpu(*this, finder_base::DUMMY_TAG)
 	, m_out_irq_cb(*this)
 	, m_out_nmi_cb(*this)
@@ -64,7 +64,7 @@ cpc_expansion_slot_device::~cpc_expansion_slot_device()
 
 void cpc_expansion_slot_device::device_start()
 {
-	m_card = dynamic_cast<device_cpc_expansion_card_interface *>(get_card_device());
+	m_card = get_card_device();
 
 	// resolve callbacks
 	m_out_irq_cb.resolve_safe();
@@ -83,20 +83,12 @@ void cpc_expansion_slot_device::device_start()
 void cpc_expansion_slot_device::device_config_complete()
 {
 	// for passthrough connectors, use the parent slot's CPU tag
-	if ((m_cpu.finder_tag() == finder_base::DUMMY_TAG) && (dynamic_cast<device_cpc_expansion_card_interface *>(owner()) != nullptr))
+	if ((m_cpu.finder_tag() == finder_base::DUMMY_TAG) && dynamic_cast<device_cpc_expansion_card_interface *>(owner()))
 	{
-		auto parent = dynamic_cast<cpc_expansion_slot_device *>(owner()->owner());
-		if (parent != nullptr)
+		auto const parent = dynamic_cast<cpc_expansion_slot_device *>(owner()->owner());
+		if (parent)
 			m_cpu.set_tag(parent->m_cpu);
 	}
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void cpc_expansion_slot_device::device_reset()
-{
 }
 
 

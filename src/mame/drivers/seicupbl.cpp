@@ -278,10 +278,10 @@ void seicupbl_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,co
 
 void seicupbl_state::video_start()
 {
-	m_sc_layer[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(seicupbl_state::get_sc0_tileinfo),this),TILEMAP_SCAN_ROWS,16,16,32,32);
-	m_sc_layer[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(seicupbl_state::get_sc1_tileinfo),this), TILEMAP_SCAN_ROWS,16,16,32,32);
-	m_sc_layer[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(seicupbl_state::get_sc2_tileinfo),this),TILEMAP_SCAN_ROWS,16,16,32,32);
-	m_sc_layer[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(seicupbl_state::get_sc3_tileinfo),this),TILEMAP_SCAN_ROWS,  8,8,64,32);
+	m_sc_layer[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(seicupbl_state::get_sc0_tileinfo)), TILEMAP_SCAN_ROWS, 16,16, 32,32);
+	m_sc_layer[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(seicupbl_state::get_sc1_tileinfo)), TILEMAP_SCAN_ROWS, 16,16, 32,32);
+	m_sc_layer[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(seicupbl_state::get_sc2_tileinfo)), TILEMAP_SCAN_ROWS, 16,16, 32,32);
+	m_sc_layer[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(seicupbl_state::get_sc3_tileinfo)), TILEMAP_SCAN_ROWS,   8,8, 64,32);
 
 	for(int i=0;i<4;i++)
 		m_sc_layer[i]->set_transparent_pen(15);

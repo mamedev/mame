@@ -27,13 +27,13 @@ public:
 	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
 	virtual void call_unload() override;
 	virtual std::string call_display() override;
-	virtual iodevice_t image_type() const override { return IO_MAGTAPE; }
-	virtual bool is_readable() const override { return true; }
-	virtual bool is_writeable() const override { return true; }
-	virtual bool is_creatable() const override { return true; }
-	virtual bool must_be_loaded() const override { return false; }
-	virtual bool is_reset_on_load() const override { return false; }
-	virtual const char *file_extensions() const override;
+	virtual iodevice_t image_type() const noexcept override { return IO_MAGTAPE; }
+	virtual bool is_readable() const noexcept override { return true; }
+	virtual bool is_writeable() const noexcept override { return true; }
+	virtual bool is_creatable() const noexcept override { return true; }
+	virtual bool must_be_loaded() const noexcept override { return false; }
+	virtual bool is_reset_on_load() const noexcept override { return false; }
+	virtual const char *file_extensions() const noexcept override;
 
 	// **** Units ****
 	// Tape position or distance    1/(968 * 1024) in (see hti_format_t::tape_pos_t)

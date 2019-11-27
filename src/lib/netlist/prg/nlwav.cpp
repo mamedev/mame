@@ -9,16 +9,17 @@
 
 #include <cstdio>
 
-/* From: https://ffmpeg.org/pipermail/ffmpeg-devel/2007-October/038122.html
- * The most compatible way to make a wav header for unknown length is to put
- * 0xffffffff in the header. 0 as the RIFF length and 0 as the data chunk length
- * is a common agreement in serious recording applications while
- * still recording the file. So a playback application can determine that the
- * given file is still being recorded. As soon as the recording application
- * finishes the ongoing recording, it writes the correct values for RIFF lenth
- * and data chunk length to the file.
- */
-/* http://de.wikipedia.org/wiki/RIFF_WAVE */
+// From: https://ffmpeg.org/pipermail/ffmpeg-devel/2007-October/038122.html
+// The most compatible way to make a wav header for unknown length is to put
+// 0xffffffff in the header. 0 as the RIFF length and 0 as the data chunk length
+// is a common agreement in serious recording applications while
+// still recording the file. So a playback application can determine that the
+// given file is still being recorded. As soon as the recording application
+// finishes the ongoing recording, it writes the correct values for RIFF lenth
+// and data chunk length to the file.
+//
+// http://de.wikipedia.org/wiki/RIFF_WAVE
+//
 
 class wav_t
 {
@@ -27,7 +28,7 @@ public:
 	wav_t(std::ostream &strm, bool is_seekable, std::size_t sr, std::size_t channels)
 	: m_f(strm)
 	, m_stream_is_seekable(is_seekable)
-	/* force "play" to play and warn about eof instead of being silent */
+	// force "play" to play and warn about eof instead of being silent
 	, m_fmt(static_cast<std::uint16_t>(channels), static_cast<std::uint32_t>(sr))
 	, m_data(is_seekable ? 0 : 0xffffffff)
 	{
@@ -53,8 +54,8 @@ public:
 		}
 	}
 
-	std::size_t channels() { return m_fmt.channels; }
-	std::size_t sample_rate() { return m_fmt.sample_rate; }
+	std::size_t channels() const { return m_fmt.channels; }
+	std::size_t sample_rate() const { return m_fmt.sample_rate; }
 
 	template <typename T>
 	void write(const T &val)
@@ -67,7 +68,7 @@ public:
 		m_data.len += m_fmt.block_align;
 		for (std::size_t i = 0; i < channels(); i++)
 		{
-			auto ps = static_cast<int16_t>(sample[i]); /* 16 bit sample, FIXME: Endianess? */
+			auto ps = static_cast<int16_t>(sample[i]); // 16 bit sample, FIXME: Endianess?
 			write(ps);
 		}
 	}
@@ -101,7 +102,7 @@ private:
 
 	struct riff_data_t
 	{
-		riff_data_t(uint32_t alen) : len(alen) {}
+		explicit riff_data_t(uint32_t alen) : len(alen) {}
 		std::array<uint8_t, 4> signature = {{'d','a','t','a'}};
 		uint32_t    len;
 		// data follows
@@ -533,7 +534,7 @@ int nlwav_app::execute()
 	{
 		auto outstrm(std::ofstream(plib::filesystem::u8path(opt_out())));
 		if (outstrm.fail())
-			throw plib::file_open_e(opt_out());
+			plib::pthrow<plib::file_open_e>(opt_out());
 		outstrm.imbue(std::locale::classic());
 		convert(outstrm);
 	}
@@ -548,24 +549,24 @@ int nlwav_app::execute()
 
 PMAIN(nlwav_app)
 
-/*
-Der Daten-Abschnitt enth??lt die Abtastwerte:
-Offset  L??nge  Inhalt  Beschreibung
-36 (0x24)   4   'data'  Header-Signatur
-40 (0x28)   4   <length>    L??nge des Datenblocks, max. <Dateigr????e>?????????44
-
-0 (0x00)    char    4   'RIFF'
-4 (0x04)    unsigned    4   <Dateigr????e>?????????8
-8 (0x08)    char    4   'WAVE'
-
-Der fmt-Abschnitt (24 Byte) beschreibt das Format der einzelnen Abtastwerte:
-Offset  L??nge  Inhalt  Beschreibung
-12 (0x0C)   4   'fmt '  Header-Signatur (folgendes Leerzeichen beachten)
-16 (0x10)   4   <fmt length>    L??nge des restlichen fmt-Headers (16 Bytes)
-20 (0x14)   2   <format tag>    Datenformat der Abtastwerte (siehe separate Tabelle weiter unten)
-22 (0x16)   2   <channels>  Anzahl der Kan??le: 1 = mono, 2 = stereo; mittlerweile sind auch mehr als 2 Kan??le (z. B. f??r Raumklang) m??glich.[2]
-24 (0x18)   4   <sample rate>   Samples pro Sekunde je Kanal (z. B. 44100)
-28 (0x1C)   4   <bytes/second>  Abtastrate????????Frame-Gr????e
-32 (0x20)   2   <block align>   Frame-Gr????e = <Anzahl der Kan??le>????????((<Bits/Sample (eines Kanals)>???+???7)???/???8)   (Division ohne Rest)
-34 (0x22)   2   <bits/sample>   Anzahl der Datenbits pro Samplewert je Kanal (z. B. 12)
-*/
+//
+// Der Daten-Abschnitt enth??lt die Abtastwerte:
+// Offset  L??nge  Inhalt  Beschreibung
+// 36 (0x24)   4   'data'  Header-Signatur
+// 40 (0x28)   4   <length>    L??nge des Datenblocks, max. <Dateigr????e>?????????44
+//
+// 0 (0x00)    char    4   'RIFF'
+// 4 (0x04)    unsigned    4   <Dateigr????e>?????????8
+// 8 (0x08)    char    4   'WAVE'
+//
+// Der fmt-Abschnitt (24 Byte) beschreibt das Format der einzelnen Abtastwerte:
+// Offset  L??nge  Inhalt  Beschreibung
+// 12 (0x0C)   4   'fmt '  Header-Signatur (folgendes Leerzeichen beachten)
+// 16 (0x10)   4   <fmt length>    L??nge des restlichen fmt-Headers (16 Bytes)
+// 20 (0x14)   2   <format tag>    Datenformat der Abtastwerte (siehe separate Tabelle weiter unten)
+// 22 (0x16)   2   <channels>  Anzahl der Kan??le: 1 = mono, 2 = stereo; mittlerweile sind auch mehr als 2 Kan??le (z. B. f??r Raumklang) m??glich.[2]
+// 24 (0x18)   4   <sample rate>   Samples pro Sekunde je Kanal (z. B. 44100)
+// 28 (0x1C)   4   <bytes/second>  Abtastrate????????Frame-Gr????e
+// 32 (0x20)   2   <block align>   Frame-Gr????e = <Anzahl der Kan??le>????????((<Bits/Sample (eines Kanals)>???+???7)???/???8)   (Division ohne Rest)
+// 34 (0x22)   2   <bits/sample>   Anzahl der Datenbits pro Samplewert je Kanal (z. B. 12)
+//

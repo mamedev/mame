@@ -3333,16 +3333,7 @@ INSTANTIATE_TEST_SUITE_P(CompositeExtractFoldingTest, GeneralInstructionFoldingT
             "%3 = OpCompositeExtract %float %2 4\n" +
             "OpReturn\n" +
             "OpFunctionEnd",
-        3, 0),
-    // Test case 14: Fold OpCompositeExtract with no indexes.
-    InstructionFoldingCase<uint32_t>(
-        Header() + "%main = OpFunction %void None %void_func\n" +
-            "%main_lab = OpLabel\n" +
-            "%2 = OpConstantComposite %v4float %float_1 %float_1 %float_1 %float_1\n" +
-            "%3 = OpCompositeExtract %v4float %2\n" +
-            "OpReturn\n" +
-            "OpFunctionEnd",
-        3, 2)
+        3, 0)
 ));
 
 INSTANTIATE_TEST_SUITE_P(CompositeConstructFoldingTest, GeneralInstructionFoldingTest,
@@ -5770,6 +5761,132 @@ INSTANTIATE_TEST_SUITE_P(MergeAddTest, MatchingInstructionFoldingTest,
       "OpReturn\n" +
       "OpFunctionEnd\n",
     4, true)
+));
+
+INSTANTIATE_TEST_SUITE_P(MergeGenericAddSub, MatchingInstructionFoldingTest,
+::testing::Values(
+    // Test case 0: merge of add of sub
+    // (a - b) + b => a
+    InstructionFoldingCase<bool>(
+      Header() +
+      "; CHECK: [[float:%\\w+]] = OpTypeFloat 32\n" +
+      "; CHECK: %6 = OpCopyObject [[float]] %3\n" +
+      "%main = OpFunction %void None %void_func\n" +
+      "%main_lab = OpLabel\n" +
+      "%var0 = OpVariable %_ptr_float Function\n" +
+      "%var1 = OpVariable %_ptr_float Function\n" +
+      "%3 = OpLoad %float %var0\n" +
+      "%4 = OpLoad %float %var1\n" +
+      "%5 = OpFSub %float %3 %4\n" +
+      "%6 = OpFAdd %float %5 %4\n" +
+      "OpReturn\n" +
+      "OpFunctionEnd\n",
+      6, true),
+  // Test case 1: merge of add of sub
+  // b + (a - b) => a
+  InstructionFoldingCase<bool>(
+    Header() +
+    "; CHECK: [[float:%\\w+]] = OpTypeFloat 32\n" +
+    "; CHECK: %6 = OpCopyObject [[float]] %3\n" +
+    "%main = OpFunction %void None %void_func\n" +
+    "%main_lab = OpLabel\n" +
+    "%var0 = OpVariable %_ptr_float Function\n" +
+    "%var1 = OpVariable %_ptr_float Function\n" +
+    "%3 = OpLoad %float %var0\n" +
+    "%4 = OpLoad %float %var1\n" +
+    "%5 = OpFSub %float %3 %4\n" +
+    "%6 = OpFAdd %float %4 %5\n" +
+    "OpReturn\n" +
+    "OpFunctionEnd\n",
+    6, true)
+));
+
+INSTANTIATE_TEST_SUITE_P(FactorAddMul, MatchingInstructionFoldingTest,
+::testing::Values(
+    // Test case 0: factor of add of muls
+    // (a * b) + (a * c) => a * (b + c)
+    InstructionFoldingCase<bool>(
+      Header() +
+      "; CHECK: [[float:%\\w+]] = OpTypeFloat 32\n" +
+      "; CHECK: [[newadd:%\\w+]] = OpFAdd [[float]] %4 %5\n" +
+      "; CHECK: %9 = OpFMul [[float]] %6 [[newadd]]\n" +
+      "%main = OpFunction %void None %void_func\n" +
+      "%main_lab = OpLabel\n" +
+      "%var0 = OpVariable %_ptr_float Function\n" +
+      "%var1 = OpVariable %_ptr_float Function\n" +
+      "%var2 = OpVariable %_ptr_float Function\n" +
+      "%4 = OpLoad %float %var0\n" +
+      "%5 = OpLoad %float %var1\n" +
+      "%6 = OpLoad %float %var2\n" +
+      "%7 = OpFMul %float %6 %4\n" +
+      "%8 = OpFMul %float %6 %5\n" +
+      "%9 = OpFAdd %float %7 %8\n" +
+      "OpReturn\n" +
+      "OpFunctionEnd\n",
+      9, true),
+  // Test case 1: factor of add of muls
+  // (b * a) + (a * c) => a * (b + c)
+  InstructionFoldingCase<bool>(
+    Header() +
+    "; CHECK: [[float:%\\w+]] = OpTypeFloat 32\n" +
+    "; CHECK: [[newadd:%\\w+]] = OpFAdd [[float]] %4 %5\n" +
+    "; CHECK: %9 = OpFMul [[float]] %6 [[newadd]]\n" +
+    "%main = OpFunction %void None %void_func\n" +
+    "%main_lab = OpLabel\n" +
+    "%var0 = OpVariable %_ptr_float Function\n" +
+    "%var1 = OpVariable %_ptr_float Function\n" +
+    "%var2 = OpVariable %_ptr_float Function\n" +
+    "%4 = OpLoad %float %var0\n" +
+    "%5 = OpLoad %float %var1\n" +
+    "%6 = OpLoad %float %var2\n" +
+    "%7 = OpFMul %float %4 %6\n" +
+    "%8 = OpFMul %float %6 %5\n" +
+    "%9 = OpFAdd %float %7 %8\n" +
+    "OpReturn\n" +
+    "OpFunctionEnd\n",
+    9, true),
+  // Test case 2: factor of add of muls
+  // (a * b) + (c * a) => a * (b + c)
+  InstructionFoldingCase<bool>(
+    Header() +
+    "; CHECK: [[float:%\\w+]] = OpTypeFloat 32\n" +
+    "; CHECK: [[newadd:%\\w+]] = OpFAdd [[float]] %4 %5\n" +
+    "; CHECK: %9 = OpFMul [[float]] %6 [[newadd]]\n" +
+    "%main = OpFunction %void None %void_func\n" +
+    "%main_lab = OpLabel\n" +
+    "%var0 = OpVariable %_ptr_float Function\n" +
+    "%var1 = OpVariable %_ptr_float Function\n" +
+    "%var2 = OpVariable %_ptr_float Function\n" +
+    "%4 = OpLoad %float %var0\n" +
+    "%5 = OpLoad %float %var1\n" +
+    "%6 = OpLoad %float %var2\n" +
+    "%7 = OpFMul %float %6 %4\n" +
+    "%8 = OpFMul %float %5 %6\n" +
+    "%9 = OpFAdd %float %7 %8\n" +
+    "OpReturn\n" +
+    "OpFunctionEnd\n",
+    9, true),
+  // Test case 3: factor of add of muls
+  // (b * a) + (c * a) => a * (b + c)
+  InstructionFoldingCase<bool>(
+    Header() +
+    "; CHECK: [[float:%\\w+]] = OpTypeFloat 32\n" +
+    "; CHECK: [[newadd:%\\w+]] = OpFAdd [[float]] %4 %5\n" +
+    "; CHECK: %9 = OpFMul [[float]] %6 [[newadd]]\n" +
+    "%main = OpFunction %void None %void_func\n" +
+    "%main_lab = OpLabel\n" +
+    "%var0 = OpVariable %_ptr_float Function\n" +
+    "%var1 = OpVariable %_ptr_float Function\n" +
+    "%var2 = OpVariable %_ptr_float Function\n" +
+    "%4 = OpLoad %float %var0\n" +
+    "%5 = OpLoad %float %var1\n" +
+    "%6 = OpLoad %float %var2\n" +
+    "%7 = OpFMul %float %4 %6\n" +
+    "%8 = OpFMul %float %5 %6\n" +
+    "%9 = OpFAdd %float %7 %8\n" +
+    "OpReturn\n" +
+    "OpFunctionEnd\n",
+    9, true)
 ));
 
 INSTANTIATE_TEST_SUITE_P(MergeSubTest, MatchingInstructionFoldingTest,

@@ -35,6 +35,7 @@ akaiax80.cpp
 alcat7100.cpp
 alesis.cpp
 alesis_qs.cpp
+alfaskop41xx.cpp
 alphasma.cpp
 alphatpx.cpp
 alphatro.cpp
@@ -138,6 +139,7 @@ ccs2810.cpp
 ccs300.cpp
 cd2650.cpp
 cdc721.cpp
+cdsys5.cpp
 cfx9850.cpp
 cgc7900.cpp
 cgenie.cpp
@@ -187,6 +189,7 @@ daruma.cpp
 datum.cpp
 dbox.cpp
 dccons.cpp
+dcebridge.cpp
 dct11em.cpp
 debut.cpp
 decstation.cpp
@@ -241,6 +244,7 @@ esqkt.cpp
 esqmr.cpp
 et3400.cpp
 eti660.cpp
+eurit.cpp
 eurocom2.cpp
 europc.cpp
 eva.cpp
@@ -301,6 +305,7 @@ geniusiq.cpp
 geniusjr.cpp
 genpc.cpp
 gimix.cpp
+gkidabc.cpp
 gizmondo.cpp
 glcx.cpp
 gmaster.cpp
@@ -424,6 +429,7 @@ ktm3.cpp
 kyocera.cpp
 laser3k.cpp
 lb186.cpp
+lbpc.cpp
 lc80.cpp
 lcmate2.cpp
 leapfrog_leappad.cpp
@@ -530,6 +536,7 @@ msbc1.cpp
 mstation.cpp
 msx.cpp
 mt735.cpp
+mtd1256.cpp
 mtx.cpp
 multi16.cpp
 multi8.cpp
@@ -559,6 +566,7 @@ nds.cpp
 neogeocd.cpp
 nes.cpp
 nes_vt.cpp
+vt1682.cpp
 newbrain.cpp
 next.cpp
 nforcepc.cpp
@@ -696,6 +704,7 @@ rambo.cpp
 ravens.cpp
 rc702.cpp
 rc759.cpp
+rcm32p.cpp
 rd100.cpp
 rd110.cpp
 replicator.cpp
@@ -754,6 +763,7 @@ sk101bl.cpp
 slc1.cpp
 slc1a.cpp
 slicer.cpp
+slsstars.cpp
 sm1800.cpp
 sm7238.cpp
 smc777.cpp

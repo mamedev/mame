@@ -1689,10 +1689,10 @@ ROM_START( pc88va2 )
 	ROM_REGION( 0x2000, "audiocpu", 0)
 	ROM_LOAD( "soundbios.rom", 0x0000, 0x2000, NO_DUMP )
 
-	ROM_REGION( 0x80000, "kanji", ROMREGION_ERASEFF )
+	ROM_REGION16_LE( 0x80000, "kanji", ROMREGION_ERASEFF )
 	ROM_LOAD( "vafont_va2.rom", 0x00000, 0x50000, BAD_DUMP CRC(b40d34e4) SHA1(a0227d1fbc2da5db4b46d8d2c7e7a9ac2d91379f) ) // should be splitted
 
-	ROM_REGION( 0x80000, "dictionary", 0 )
+	ROM_REGION16_LE( 0x80000, "dictionary", 0 )
 	ROM_LOAD( "vadic_va2.rom", 0x00000, 0x80000, CRC(a6108f4d) SHA1(3665db538598abb45d9dfe636423e6728a812b12) )
 ROM_END
 
@@ -1713,10 +1713,10 @@ ROM_START( pc88va )
 	ROM_REGION( 0x2000, "audiocpu", 0)
 	ROM_LOAD( "soundbios.rom", 0x0000, 0x2000, NO_DUMP )
 
-	ROM_REGION( 0x80000, "kanji", ROMREGION_ERASEFF )
+	ROM_REGION16_LE( 0x80000, "kanji", ROMREGION_ERASEFF )
 	ROM_LOAD( "vafont.rom", 0x0000, 0x50000, BAD_DUMP CRC(faf7c466) SHA1(196b3d5b7407cb4f286ffe5c1e34ebb1f6905a8c)) // should be splitted
 
-	ROM_REGION( 0x80000, "dictionary", 0 )
+	ROM_REGION16_LE( 0x80000, "dictionary", 0 )
 	ROM_LOAD( "vadic.rom",  0x0000, 0x80000, CRC(f913c605) SHA1(5ba1f3578d0aaacdaf7194a80e6d520c81ae55fb))
 ROM_END
 

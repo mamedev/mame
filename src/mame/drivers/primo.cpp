@@ -269,8 +269,8 @@ void primo_state::primoa32(machine_config &config)
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* snapshot/quickload */
-	SNAPSHOT(config, "snapshot", "pss").set_load_callback(FUNC(primo_state::snapshot_cb), this);
-	QUICKLOAD(config, "quickload", "pp").set_load_callback(FUNC(primo_state::quickload_cb), this);
+	SNAPSHOT(config, "snapshot", "pss").set_load_callback(FUNC(primo_state::snapshot_cb));
+	QUICKLOAD(config, "quickload", "pp").set_load_callback(FUNC(primo_state::quickload_cb));
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(primo_ptp_format);

@@ -268,7 +268,7 @@ void mrflea_state::mrflea(machine_config &config)
 	m_subcpu->set_addrmap(AS_IO, &mrflea_state::mrflea_slave_io_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(mrflea_state::mrflea_slave_interrupt), "screen", 0, 1);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	i8255_device &mainppi(I8255(config, "mainppi", 0));
 	mainppi.in_pb_callback().set("subppi", FUNC(i8255_device::pb_r));

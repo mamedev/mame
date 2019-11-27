@@ -409,7 +409,7 @@ void device_t::calculate_derived_clock()
 //  clock ticks to an attotime
 //-------------------------------------------------
 
-attotime device_t::clocks_to_attotime(u64 numclocks) const
+attotime device_t::clocks_to_attotime(u64 numclocks) const noexcept
 {
 	if (m_clock == 0)
 		return attotime::never;
@@ -429,7 +429,7 @@ attotime device_t::clocks_to_attotime(u64 numclocks) const
 //  attotime to CPU clock ticks
 //-------------------------------------------------
 
-u64 device_t::attotime_to_clocks(const attotime &duration) const
+u64 device_t::attotime_to_clocks(const attotime &duration) const noexcept
 {
 	if (m_clock == 0)
 		return 0;
@@ -852,7 +852,7 @@ device_t *device_t::subdevice_slow(const char *tag) const
 	// we presume the result is a rooted path; also doubled colons mess up our
 	// tree walk, so catch them early
 	assert(fulltag[0] == ':');
-	assert(fulltag.find("::") == -1);
+	assert(fulltag.find("::") == std::string::npos);
 
 	// walk the device list to the final path
 	device_t *curdevice = &mconfig().root_device();
@@ -879,16 +879,15 @@ std::string device_t::subtag(std::string _tag) const
 {
 	const char *tag = _tag.c_str();
 	std::string result;
-	// if the tag begins with a colon, ignore our path and start from the root
 	if (*tag == ':')
 	{
+		// if the tag begins with a colon, ignore our path and start from the root
 		tag++;
 		result.assign(":");
 	}
-
-	// otherwise, start with our path
 	else
 	{
+		// otherwise, start with our path
 		result.assign(m_tag);
 		if (result != ":")
 			result.append(":");

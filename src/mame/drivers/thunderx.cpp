@@ -660,13 +660,13 @@ void thunderx_state::scontra(machine_config &config)
 	K052109(config, m_k052109, 0); // 051961 on Super Contra and Thunder Cross schematics
 	m_k052109->set_palette(m_palette);
 	m_k052109->set_screen("screen");
-	m_k052109->set_tile_callback(FUNC(thunderx_state::tile_callback), this);
+	m_k052109->set_tile_callback(FUNC(thunderx_state::tile_callback));
 	m_k052109->irq_handler().set_inputline(m_maincpu, KONAMI_IRQ_LINE);
 
 	K051960(config, m_k051960, 0);
 	m_k051960->set_palette(m_palette);
 	m_k051960->set_screen("screen");
-	m_k051960->set_sprite_callback(FUNC(thunderx_state::sprite_callback), this);
+	m_k051960->set_sprite_callback(FUNC(thunderx_state::sprite_callback));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -715,7 +715,7 @@ void thunderx_state::gbusters(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &thunderx_state::gbusters_map);
 	m_maincpu->line().set(FUNC(thunderx_state::banking_callback));
 
-	m_k052109->set_tile_callback(FUNC(thunderx_state::gbusters_tile_callback), this);
+	m_k052109->set_tile_callback(FUNC(thunderx_state::gbusters_tile_callback));
 }
 
 

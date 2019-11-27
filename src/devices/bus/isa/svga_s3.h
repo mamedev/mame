@@ -35,8 +35,8 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 private:
-	s3_vga_device *m_vga;
-	ibm8514a_device *m_8514;
+	required_device<s3_vga_device> m_vga;
+	required_device<ibm8514a_device> m_8514;
 };
 
 class isa16_s3virge_device :
@@ -59,7 +59,7 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 private:
-	s3virge_vga_device *m_vga;
+	required_device<s3virge_vga_device> m_vga;
 };
 
 class isa16_s3virgedx_device :
@@ -82,7 +82,7 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 private:
-	s3virgedx_vga_device *m_vga;
+	required_device<s3virgedx_vga_device> m_vga;
 };
 
 class isa16_stealth3d2kpro_device :
@@ -105,7 +105,7 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 private:
-	s3virgedx_vga_device *m_vga;
+	required_device<s3virgedx_vga_device> m_vga;
 };
 
 

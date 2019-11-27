@@ -96,7 +96,7 @@ ui_options::ui_options() : core_options()
 rgb_t ui_options::rgb_value(const char *option) const
 {
 	// find the entry
-	core_options::entry::shared_ptr entry = get_entry(option);
+	core_options::entry::shared_const_ptr entry = get_entry(option);
 
 	// look up the value, and sanity check the result
 	const char *value = entry->value();

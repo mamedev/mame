@@ -17,7 +17,7 @@
 #include "cpu/nanoprocessor/nanoprocessor.h"
 #include "bus/ieee488/ieee488.h"
 
-class hp98034_io_card_device : public hp9845_io_card_device
+class hp98034_io_card_device : public device_t, public device_hp9845_io_interface
 {
 public:
 	// construction/destruction

@@ -33,6 +33,8 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_mcu(*this, "mcu")
+		, m_dongle_r(*this)
+		, m_dongle_w(*this)
 		, m_audiocpu(*this, "audiocpu")
 		, m_watchdog(*this, "watchdog")
 		, m_cassette(*this, "cassette")
@@ -63,8 +65,8 @@ protected:
 	required_device<upi41_cpu_device> m_mcu;
 
 	/* dongles-related */
-	read8_delegate    m_dongle_r;
-	write8_delegate   m_dongle_w;
+	read8_delegate    m_dongle_r; // TODO: why isn't this a virtual method?
+	write8_delegate   m_dongle_w; // TODO: why isn't this a virtual method?
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

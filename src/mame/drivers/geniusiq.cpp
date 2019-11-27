@@ -721,8 +721,8 @@ void geniusiq_state::iq128(machine_config &config)
 
 	/* cartridge */
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "iq128_cart"));
-	cartslot.set_device_load(FUNC(geniusiq_state::cart_load), this);
-	cartslot.set_device_unload(FUNC(geniusiq_state::cart_unload), this);
+	cartslot.set_device_load(FUNC(geniusiq_state::cart_load));
+	cartslot.set_device_unload(FUNC(geniusiq_state::cart_unload));
 
 	/* Software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("iq128");

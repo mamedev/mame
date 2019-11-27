@@ -1721,7 +1721,7 @@ void pairmtch_state::pairmtch(machine_config &config)
 	m_audiocpu->read_r<2>().set(m_soundlatch[0], FUNC(generic_latch_8_device::read));
 	m_audiocpu->write_d().set(FUNC(pairmtch_state::speaker_w));
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(6, 12);
@@ -2977,7 +2977,7 @@ void eturtles_state::eturtles(machine_config &config)
 	m_audiocpu->read_l().set(FUNC(eturtles_state::cop_latch_r));
 	m_audiocpu->read_g().set(FUNC(eturtles_state::cop_ack_r));
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
@@ -3099,7 +3099,7 @@ void estargte_state::estargte(machine_config &config)
 	m_audiocpu->write_d().set(FUNC(eturtles_state::cop_irq_w));
 	m_audiocpu->read_l().set(FUNC(estargte_state::cop_data_r));
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));

@@ -436,7 +436,7 @@ void gsword_state::init_gsword()
 #endif
 #if 1
 	/* hack for sound protection or time out function */
-	m_subcpu->space(AS_PROGRAM).install_read_handler(0x4004, 0x4005, read8_delegate(FUNC(gsword_state::hack_r),this));
+	m_subcpu->space(AS_PROGRAM).install_read_handler(0x4004, 0x4005, read8_delegate(*this, FUNC(gsword_state::hack_r)));
 #endif
 }
 
@@ -451,7 +451,7 @@ void gsword_state::init_gsword2()
 #endif
 #if 1
 	/* hack for sound protection or time out function */
-	m_subcpu->space(AS_PROGRAM).install_read_handler(0x4004, 0x4005, read8_delegate(FUNC(gsword_state::hack_r),this));
+	m_subcpu->space(AS_PROGRAM).install_read_handler(0x4004, 0x4005, read8_delegate(*this, FUNC(gsword_state::hack_r)));
 #endif
 }
 
@@ -955,7 +955,7 @@ void gsword_state::gsword(machine_config &config)
 	CLOCK(config, "tclk", 12'000'000/8/128/2).signal_handler().set([this] (int state) { m_tclk_val = state != 0; });
 
 	// lazy way to ensure communication works
-	config.m_perfect_cpu_quantum = subtag("mcu1");
+	config.set_perfect_quantum("mcu1");
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -1019,7 +1019,7 @@ void josvolly_state::josvolly(machine_config &config)
 	ppi.in_pc_callback().set_ioport("IN0");   // START
 
 	// the second MCU polls the first MCU's outputs, so it needs tight sync
-	config.m_perfect_cpu_quantum = subtag("mcu2");
+	config.set_perfect_quantum("mcu2");
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

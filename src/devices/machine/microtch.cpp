@@ -25,6 +25,7 @@ microtouch_device::microtouch_device(const machine_config &mconfig, const char *
 	device_serial_interface(mconfig, *this),
 	m_rx_buffer_ptr(0), m_tx_buffer_num(0), m_tx_buffer_ptr(0), m_reset_done(0), m_format(0), m_mode(0), m_last_touch_state(0),
 	m_last_x(0), m_last_y(0),
+	m_out_touch_cb(*this),
 	m_out_stx_func(*this),
 	m_touch(*this, "TOUCH"),
 	m_touchx(*this, "TOUCH_X"),
@@ -203,6 +204,7 @@ void microtouch_device::device_start()
 	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1); //8N1?
 	set_tra_rate(clock());
 	set_rcv_rate(clock());
+	m_out_touch_cb.resolve();
 	m_out_stx_func.resolve_safe();
 	m_output_valid = false;
 

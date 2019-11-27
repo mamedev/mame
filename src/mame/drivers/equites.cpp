@@ -649,7 +649,7 @@ void equites_state::equites_common_map(address_map &map)
 	map(0x100000, 0x100001).r(FUNC(equites_state::equites_spriteram_kludge_r));
 	map(0x140000, 0x1407ff).rw(FUNC(equites_state::mcu_ram_r), FUNC(equites_state::mcu_ram_w)).umask16(0x00ff);
 	map(0x180000, 0x180001).portr("IN1").w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x180000, 0x180000).select(0x03c000).lw8("mainlatch_w", [this](offs_t offset, u8 data) { m_mainlatch->write_a3(offset >> 14); });
+	map(0x180000, 0x180000).select(0x03c000).lw8(NAME([this] (offs_t offset, u8 data) { m_mainlatch->write_a3(offset >> 14); }));
 	map(0x180001, 0x180001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x1c0000, 0x1c0001).portr("IN0").w(FUNC(equites_state::equites_scrollreg_w));
 	map(0x380000, 0x380000).w(FUNC(equites_state::equites_bgcolor_w));
@@ -678,7 +678,7 @@ void splndrbt_state::splndrbt_map(address_map &map)
 	map(0x080000, 0x080001).portr("IN0");
 	map(0x0c0000, 0x0c0001).portr("IN1");
 	map(0x0c0000, 0x0c0000).select(0x020000).w(FUNC(splndrbt_state::equites_bgcolor_w));
-	map(0x0c0001, 0x0c0001).select(0x03c000).lw8("mainlatch_w", [this](offs_t offset, u8 data) { m_mainlatch->write_a3(offset >> 14); });
+	map(0x0c0001, 0x0c0001).select(0x03c000).lw8(NAME([this] (offs_t offset, u8 data) { m_mainlatch->write_a3(offset >> 14); }));
 	map(0x100000, 0x100001).w(FUNC(splndrbt_state::splndrbt_bg_scrollx_w));
 	map(0x140001, 0x140001).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x1c0000, 0x1c0001).w(FUNC(splndrbt_state::splndrbt_bg_scrolly_w));
@@ -1042,7 +1042,7 @@ void equites_state::common_sound(machine_config &config)
 	I8085A(config, m_audiocpu, 6.144_MHz_XTAL); /* verified on pcb */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &equites_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &equites_state::sound_portmap);
-	m_audiocpu->set_clk_out("audio8155", FUNC(i8155_device::set_unscaled_clock));
+	m_audiocpu->set_clk_out(m_audio8155, FUNC(i8155_device::set_unscaled_clock_int));
 
 	I8155(config, m_audio8155, 0);
 	m_audio8155->out_pa_callback().set(FUNC(equites_state::equites_8155_porta_w));
@@ -1168,8 +1168,7 @@ void equites_state::equites(machine_config &config)
 	common_sound(config);
 
 	ALPHA_8201(config, m_alpha_8201, 4000000/8); // 8303 or 8304 (same device!)
-
-	config.m_perfect_cpu_quantum = subtag("alpha_8201:mcu");
+	config.set_perfect_quantum("alpha_8201:mcu");
 
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -1225,7 +1224,7 @@ void splndrbt_state::splndrbt(machine_config &config)
 	common_sound(config);
 
 	ALPHA_8201(config, m_alpha_8201, 4000000/8); // 8303 or 8304 (same device!)
-	config.m_perfect_cpu_quantum = subtag("alpha_8201:mcu");
+	config.set_perfect_quantum("alpha_8201:mcu");
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

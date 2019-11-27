@@ -52,7 +52,6 @@ private:
 	uint32_t screen_update_konmedal68k(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void fill_backcolor(bitmap_ind16 &bitmap, const rectangle &cliprect, int pen_idx, int mode);
 
-
 	K056832_CB_MEMBER(tile_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 
@@ -345,7 +344,7 @@ void konmedal68k_state::kzaurus(machine_config &config)
 	PALETTE(config, "palette").set_format(palette_device::xBGR_888, 8192).enable_shadows();
 
 	K056832(config, m_k056832, 0);
-	m_k056832->set_tile_callback(FUNC(konmedal68k_state::tile_callback), this);
+	m_k056832->set_tile_callback(FUNC(konmedal68k_state::tile_callback));
 	m_k056832->set_config(K056832_BPP_4dj, 1, 0);
 	m_k056832->set_palette(m_palette);
 
@@ -393,5 +392,35 @@ ROM_START( koropens )
 	ROM_LOAD( "741-a02-1f.bin", 0x080000, 0x080000, CRC(31918688) SHA1(70a1699a3914883f502e021dbb9c0847f4ebee04) )
 ROM_END
 
+ROM_START( pwrchanc )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* main program */
+	ROM_LOAD16_WORD_SWAP( "960-a05-2n.bin", 0x000000, 0x080000, CRC(a8e24c7e) SHA1(f66bbdb36379fb0f7a87bd18f7cd36cfd8d4fdfa) )
+
+	ROM_REGION( 0x200000, "k056832", 0 )   /* tilemaps */
+	ROM_LOAD( "960-a06-14n.bin", 0x000000, 0x080000, CRC(3b47ffc1) SHA1(40b1521758267a302dcf8f488296d7731a1165f5) )
+	ROM_LOAD( "960-a07-17n.bin", 0x080000, 0x080000, CRC(a6582197) SHA1(66994ee62329c61ec0c1ad39c0ed7eca16f40fdc) )
+	ROM_LOAD( "960-a08-19n.bin", 0x100000, 0x080000, CRC(17fc22fb) SHA1(b0d7670fd4176e4b6f111c83ff4d4a5db0c33e45) )
+	ROM_LOAD( "960-a09-22n.bin", 0x180000, 0x080000, CRC(76863ddd) SHA1(384a4d6b473a132bf15dc165c2582bfc2428c422) )
+
+	ROM_REGION( 0x100000, "ymz", 0 )
+	ROM_LOAD( "960-a01-2f.bin", 0x000000, 0x080000, CRC(4c9b0e07) SHA1(f1ab1a6a1440204eb844dcdae6e5f55cd75e9d9b) )
+	ROM_LOAD( "960-a02-4f.bin", 0x080000, 0x080000, CRC(48422b4b) SHA1(464a1c7e2309ec77b0c16e24ceac3c304b7133c5) )
+ROM_END
+
+ROM_START( ymcapsul )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* main program */
+	ROM_LOAD16_WORD_SWAP( "834-a05-2n.bin", 0x000000, 0x080000, CRC(34773912) SHA1(0e3832f51effa5495562796da4dea1e79dcd0ad3) )
+
+	ROM_REGION( 0x100000, "k056832", 0 )   /* tilemaps */
+	ROM_LOAD( "834-a06-14n.bin", 0x000000, 0x080000, CRC(444b0172) SHA1(b305457e11a4382855bc37e39a6d23f74a646bd4) )
+	ROM_LOAD( "834-a07-17n.bin", 0x080000, 0x080000, CRC(e5a9533e) SHA1(7ad7b1603dbb2e31acae469a97a8b2a5d80b3026) )
+
+	ROM_REGION( 0x100000, "ymz", 0 )
+	ROM_LOAD( "834-a01-2f.bin", 0x000000, 0x080000, CRC(d9be9af9) SHA1(d2877e1c62f6b5ee1a24026560bba66c97daa065) )
+	ROM_LOAD( "834-a02-4f.bin", 0x080000, 0x080000, CRC(47b6ab29) SHA1(5bff269fca6f664db8749d036f649a480af2588e) )
+ROM_END
+
 GAME( 1995, kzaurus, 0, kzaurus, kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Pittanko Zaurus", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, koropens, 0, koropens, kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Korokoro Pensuke", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, pwrchanc, 0, koropens, kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Powerful Chance", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, ymcapsul, 0, kzaurus, kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Yu-Gi-Oh Monster Capsule", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )

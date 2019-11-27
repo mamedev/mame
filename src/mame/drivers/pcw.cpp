@@ -245,7 +245,7 @@ void pcw_state::pcw_update_read_memory_block(int block, int bank)
 	if (bank == 3)
 	{
 		/* when upper 16 bytes are accessed use keyboard read handler */
-		space.install_read_handler( block * 0x04000 + 0x3ff0, block * 0x04000 + 0x3fff, read8_delegate(FUNC(pcw_state::pcw_keyboard_data_r),this));
+		space.install_read_handler( block * 0x04000 + 0x3ff0, block * 0x04000 + 0x3fff, read8_delegate(*this, FUNC(pcw_state::pcw_keyboard_data_r)));
 		LOGMEM("MEM: read block %i -> bank %i\n", block, bank);
 	}
 	else
@@ -1266,8 +1266,8 @@ void pcw_state::pcw(machine_config &config)
 	m_keyboard_mcu->t0_in_cb().set(FUNC(pcw_state::mcu_kb_t0_r));
 	m_keyboard_mcu->bus_in_cb().set(FUNC(pcw_state::mcu_kb_data_r));
 
-//  config.m_minimum_quantum = attotime::from_hz(50);
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+//  config.set_maximum_quantum(attotime::from_hz(50));
+	config.set_perfect_quantum(m_maincpu);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -1291,7 +1291,7 @@ void pcw_state::pcw(machine_config &config)
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("256K");
 
-	TIMER(config, "pcw_timer", 0).configure_periodic(timer_device::expired_delegate(FUNC(pcw_state::pcw_timer_interrupt), this), attotime::from_hz(300));
+	TIMER(config, "pcw_timer", 0).configure_periodic(FUNC(pcw_state::pcw_timer_interrupt), attotime::from_hz(300));
 }
 
 void pcw_state::pcw8256(machine_config &config)

@@ -105,7 +105,7 @@ void vtech_storio_state::vtech_storio(machine_config &config)
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "vtech_storio_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
-	m_cart->set_device_load(FUNC(vtech_storio_state::cart_load), this);
+	m_cart->set_device_load(FUNC(vtech_storio_state::cart_load));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("vtech_storio_cart");
 }

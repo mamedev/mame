@@ -551,7 +551,7 @@ void airbustr_state::airbustr(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &airbustr_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &airbustr_state::sound_io_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);  // Palette RAM is filled by sub cpu with data supplied by main cpu
+	config.set_maximum_quantum(attotime::from_hz(6000));  // Palette RAM is filled by sub cpu with data supplied by main cpu
 							// Maybe a high value is safer in order to avoid glitches
 
 	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_seconds(3));  /* a guess, and certainly wrong */
@@ -699,7 +699,7 @@ ROM_END
 
 void airbustr_state::init_airbustr()
 {
-	m_master->space(AS_PROGRAM).install_read_handler(0xe000, 0xefff, read8_delegate(FUNC(airbustr_state::devram_r),this)); // protection device lives here
+	m_master->space(AS_PROGRAM).install_read_handler(0xe000, 0xefff, read8_delegate(*this, FUNC(airbustr_state::devram_r))); // protection device lives here
 }
 
 

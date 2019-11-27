@@ -16,6 +16,7 @@
 #include "netlist/nl_factory.h"
 #include "netlist/nl_parser.h"
 #include "netlist/devices/net_lib.h"
+#include "netlist/devices/nlid_system.h"
 
 #include "netlist/plib/palloc.h"
 
@@ -69,7 +70,7 @@ public:
 	}
 
 protected:
-	void vlog(const plib::plog_level &l, const pstring &ls) const override
+	void vlog(const plib::plog_level &l, const pstring &ls) const noexcept override
 	{
 		switch (l)
 		{
@@ -89,7 +90,9 @@ protected:
 			m_parent.logerror("netlist ERROR: %s\n", ls.c_str());
 			break;
 		case plib::plog_level::FATAL:
-			throw emu_fatalerror(1, "netlist FATAL: %s\n", ls.c_str());
+			//throw emu_fatalerror(1, "netlist FATAL: %s\n", ls.c_str());
+			m_parent.logerror("netlist FATAL: %s\n", ls.c_str());
+			break;
 		}
 	}
 
@@ -107,7 +110,7 @@ public:
 	}
 
 protected:
-	void vlog(const plib::plog_level &l, const pstring &ls) const override
+	void vlog(const plib::plog_level &l, const pstring &ls) const noexcept override
 	{
 		switch (l)
 		{
@@ -125,7 +128,9 @@ protected:
 			osd_printf_error("netlist ERROR: %s\n", ls);
 			break;
 		case plib::plog_level::FATAL:
-			throw emu_fatalerror(1, "netlist FATAL: %s\n", ls.c_str());
+			osd_printf_error("netlist FATAL: %s\n", ls);
+			break;
+			//throw emu_fatalerror(1, "netlist FATAL: %s\n", ls.c_str());
 		}
 	}
 
@@ -133,18 +138,18 @@ private:
 };
 
 
-class netlist_mame_device::netlist_mame_t : public netlist::netlist_t
+class netlist_mame_device::netlist_mame_t : public netlist::netlist_state_t
 {
 public:
 
 	netlist_mame_t(netlist_mame_device &parent, const pstring &aname)
-		: netlist::netlist_t(aname, plib::make_unique<netlist_mame_device::netlist_mame_callbacks_t>(parent))
+		: netlist::netlist_state_t(aname, plib::make_unique<netlist_mame_device::netlist_mame_callbacks_t>(parent))
 		, m_parent(parent)
 	{
 	}
 
 	netlist_mame_t(netlist_mame_device &parent, const pstring &aname, plib::unique_ptr<netlist::callbacks_t> cbs)
-		: netlist::netlist_t(aname, std::move(cbs))
+		: netlist::netlist_state_t(aname, std::move(cbs))
 		, m_parent(parent)
 	{
 	}
@@ -172,7 +177,7 @@ public:
 		, m_cpu_device(nullptr)
 		, m_last(*this, "m_last", 0)
 	{
-		auto *nl = dynamic_cast<netlist_mame_device::netlist_mame_t *>(&exec());
+		auto *nl = dynamic_cast<netlist_mame_device::netlist_mame_t *>(&state());
 		if (nl != nullptr)
 			m_cpu_device = downcast<netlist_mame_cpu_device *>(&nl->parent());
 	}
@@ -184,19 +189,19 @@ public:
 
 	ATTR_COLD void register_callback(netlist_mame_analog_output_device::output_delegate &&callback)
 	{
-		m_callback = std::move(callback);
+		m_callback.reset(new netlist_mame_analog_output_device::output_delegate(std::move(callback)));
 	}
 
 	NETLIB_UPDATEI()
 	{
-		nl_double cur = m_in();
+		nl_fptype cur = m_in();
 
 		// FIXME: make this a parameter
 		// avoid calls due to noise
-		if (std::fabs(cur - m_last) > 1e-6)
+		if (plib::abs(cur - m_last) > 1e-6)
 		{
 			m_cpu_device->update_icount(exec().time());
-			m_callback(cur, m_cpu_device->local_time());
+			(*m_callback)(cur, m_cpu_device->local_time());
 			m_cpu_device->check_mame_abort_slice();
 			m_last = cur;
 		}
@@ -204,13 +209,20 @@ public:
 
 private:
 	netlist::analog_input_t m_in;
-	netlist_mame_analog_output_device::output_delegate m_callback;
+	std::unique_ptr<netlist_mame_analog_output_device::output_delegate> m_callback; // TODO: change to std::optional for C++17
 	netlist_mame_cpu_device *m_cpu_device;
-	netlist::state_var<nl_double> m_last;
+	netlist::state_var<nl_fptype> m_last;
 };
 
 // ----------------------------------------------------------------------------------------
 // logic_callback
+//
+// This device must be connected to a logic net. It has no power terminals
+// and conversion with proxies will not work.
+//
+// Background: This is inserted later into the driver and should not modify
+// the resulting analog representation of the netlist.
+//
 // ----------------------------------------------------------------------------------------
 
 class NETLIB_NAME(logic_callback) : public netlist::device_t
@@ -221,8 +233,9 @@ public:
 		, m_in(*this, "IN")
 		, m_cpu_device(nullptr)
 		, m_last(*this, "m_last", 0)
+//      , m_supply(*this)
 	{
-		auto *nl = dynamic_cast<netlist_mame_device::netlist_mame_t *>(&exec());
+		auto *nl = dynamic_cast<netlist_mame_device::netlist_mame_t *>(&state());
 		if (nl != nullptr)
 			m_cpu_device = downcast<netlist_mame_cpu_device *>(&nl->parent());
 	}
@@ -234,7 +247,7 @@ public:
 
 	ATTR_COLD void register_callback(netlist_mame_logic_output_device::output_delegate &&callback)
 	{
-		m_callback = std::move(callback);
+		m_callback.reset(new netlist_mame_logic_output_device::output_delegate(std::move(callback)));
 	}
 
 	NETLIB_UPDATEI()
@@ -246,7 +259,7 @@ public:
 		if (cur != m_last)
 		{
 			m_cpu_device->update_icount(exec().time());
-			m_callback(cur, m_cpu_device->local_time());
+			(*m_callback)(cur, m_cpu_device->local_time());
 			m_cpu_device->check_mame_abort_slice();
 			m_last = cur;
 		}
@@ -254,9 +267,10 @@ public:
 
 private:
 	netlist::logic_input_t m_in;
-	netlist_mame_logic_output_device::output_delegate m_callback;
+	std::unique_ptr<netlist_mame_logic_output_device::output_delegate> m_callback; // TODO: change to std::optional for C++17
 	netlist_mame_cpu_device *m_cpu_device;
 	netlist::state_var<netlist::netlist_sig_t> m_last;
+	//netlist::devices::NETLIB_NAME(power_pins) m_supply;
 };
 
 
@@ -376,6 +390,7 @@ plib::unique_ptr<std::istream> netlist_data_memregions_t::stream(const pstring &
 		/* validation */
 		if (rom_exists(m_dev.mconfig().root_device(), pstring(m_dev.tag()) + ":" + name))
 		{
+			// Create an empty stream.
 			auto ret(plib::make_unique<std::istringstream>(std::ios_base::binary));
 			ret->imbue(std::locale::classic());
 			return MOVE_UNIQUE_PTR(ret);
@@ -443,10 +458,10 @@ public:
 
 	NETLIB_UPDATEI()
 	{
-		nl_double val = m_in() * m_mult() + m_offset();
+		nl_fptype val = m_in() * m_mult() + m_offset();
 		sound_update(exec().time());
 		/* ignore spikes */
-		if (std::abs(val) < 32767.0)
+		if (plib::abs(val) < 32767.0)
 			m_cur = val;
 		else if (val > 0.0)
 			m_cur = 32767.0;
@@ -463,8 +478,8 @@ public:
 	}
 
 	netlist::param_int_t m_channel;
-	netlist::param_double_t m_mult;
-	netlist::param_double_t m_offset;
+	netlist::param_fp_t m_mult;
+	netlist::param_fp_t m_offset;
 	stream_sample_t *m_buffer;
 	int m_bufsize;
 
@@ -499,9 +514,9 @@ public:
 
 		for (int i = 0; i < MAX_INPUT_CHANNELS; i++)
 		{
-			m_channels[i].m_param_name = netlist::pool().make_unique<netlist::param_str_t>(*this, plib::pfmt("CHAN{1}")(i), "");
-			m_channels[i].m_param_mult = netlist::pool().make_unique<netlist::param_double_t>(*this, plib::pfmt("MULT{1}")(i), 1.0);
-			m_channels[i].m_param_offset = netlist::pool().make_unique<netlist::param_double_t>(*this, plib::pfmt("OFFSET{1}")(i), 0.0);
+			m_channels[i].m_param_name = anetlist.make_object<netlist::param_str_t>(*this, plib::pfmt("CHAN{1}")(i), "");
+			m_channels[i].m_param_mult = anetlist.make_object<netlist::param_fp_t>(*this, plib::pfmt("MULT{1}")(i), 1.0);
+			m_channels[i].m_param_offset = anetlist.make_object<netlist::param_fp_t>(*this, plib::pfmt("OFFSET{1}")(i), 0.0);
 		}
 	}
 
@@ -522,7 +537,7 @@ public:
 				if (i != m_num_channels)
 					state().log().fatal("sound input numbering has to be sequential!");
 				m_num_channels++;
-				m_channels[i].m_param = dynamic_cast<netlist::param_double_t *>(setup().find_param((*m_channels[i].m_param_name)(), true));
+				m_channels[i].m_param = dynamic_cast<netlist::param_fp_t *>(state().setup().find_param((*m_channels[i].m_param_name)(), true));
 			}
 		}
 	}
@@ -533,7 +548,7 @@ public:
 		{
 			if (m_channels[i].m_buffer == nullptr)
 				break; // stop, called outside of stream_update
-			const nl_double v = m_channels[i].m_buffer[m_pos];
+			const nl_fptype v = m_channels[i].m_buffer[m_pos];
 			m_channels[i].m_param->setTo(v * (*m_channels[i].m_param_mult)() + (*m_channels[i].m_param_offset)());
 		}
 		m_pos++;
@@ -549,10 +564,10 @@ public:
 	struct channel
 	{
 		netlist::unique_pool_ptr<netlist::param_str_t> m_param_name;
-		netlist::param_double_t *m_param;
+		netlist::param_fp_t *m_param;
 		stream_sample_t *m_buffer;
-		netlist::unique_pool_ptr<netlist::param_double_t> m_param_mult;
-		netlist::unique_pool_ptr<netlist::param_double_t> m_param_offset;
+		netlist::unique_pool_ptr<netlist::param_fp_t> m_param_mult;
+		netlist::unique_pool_ptr<netlist::param_fp_t> m_param_offset;
 	};
 	channel m_channels[MAX_INPUT_CHANNELS];
 	netlist::netlist_time m_inc;
@@ -585,7 +600,7 @@ netlist::setup_t &netlist_mame_device::setup()
 {
 	if (!m_netlist)
 		throw device_missing_dependencies();
-	return m_netlist->nlstate().setup();
+	return m_netlist->setup();
 }
 
 void netlist_mame_device::register_memregion_source(netlist::nlparse_t &setup, device_t &dev, const char *name)
@@ -672,6 +687,7 @@ netlist_mame_analog_input_device::netlist_mame_analog_input_device(const machine
 	, m_param(nullptr)
 	, m_auto_port(true)
 	, m_param_name(param_name)
+	, m_value_for_device_timer(0)
 {
 }
 
@@ -681,6 +697,7 @@ netlist_mame_analog_input_device::netlist_mame_analog_input_device(const machine
 	, m_param(nullptr)
 	, m_auto_port(true)
 	, m_param_name("")
+	, m_value_for_device_timer(0)
 {
 }
 
@@ -688,7 +705,7 @@ void netlist_mame_analog_input_device::device_start()
 {
 	LOGDEVCALLS("start\n");
 	netlist::param_t *p = this->nl_owner().setup().find_param(pstring(m_param_name));
-	m_param = dynamic_cast<netlist::param_double_t *>(p);
+	m_param = dynamic_cast<netlist::param_fp_t *>(p);
 	if (m_param == nullptr)
 	{
 		fatalerror("device %s wrong parameter type for %s\n", basetag(), m_param_name);
@@ -704,7 +721,7 @@ void netlist_mame_analog_input_device::validity_helper(validity_checker &valid,
 	netlist::netlist_state_t &nlstate) const
 {
 	netlist::param_t *p = nlstate.setup().find_param(pstring(m_param_name));
-	auto *param = dynamic_cast<netlist::param_double_t *>(p);
+	auto *param = dynamic_cast<netlist::param_fp_t *>(p);
 	if (param == nullptr)
 	{
 		osd_printf_warning("device %s wrong parameter type for %s\n", basetag(), m_param_name);
@@ -719,6 +736,7 @@ netlist_mame_analog_output_device::netlist_mame_analog_output_device(const machi
 	: device_t(mconfig, NETLIST_ANALOG_OUTPUT, tag, owner, clock)
 	, netlist_mame_sub_interface(*owner)
 	, m_in("")
+	, m_delegate(*this)
 {
 }
 
@@ -730,9 +748,9 @@ void netlist_mame_analog_output_device::custom_netlist_additions(netlist::netlis
 
 	/* ignore if no running machine -> called within device_validity_check context */
 	if (owner()->has_running_machine())
-		m_delegate.bind_relative_to(owner()->machine().root_device());
+		m_delegate.resolve();
 
-	auto dev = netlist::pool().make_unique<NETLIB_NAME(analog_callback)>(nlstate, dfqn);
+	auto dev = nlstate.make_object<NETLIB_NAME(analog_callback)>(nlstate, dfqn);
 	//static_cast<NETLIB_NAME(analog_callback) *>(dev.get())->register_callback(std::move(m_delegate));
 	dev->register_callback(std::move(m_delegate));
 	nlstate.register_device(dfqn, std::move(dev));
@@ -753,13 +771,8 @@ netlist_mame_logic_output_device::netlist_mame_logic_output_device(const machine
 	: device_t(mconfig, NETLIST_LOGIC_OUTPUT, tag, owner, clock)
 	, netlist_mame_sub_interface(*owner)
 	, m_in("")
+	, m_delegate(*this)
 {
-}
-
-void netlist_mame_logic_output_device::set_params(const char *in_name, output_delegate &&adelegate)
-{
-	m_in = in_name;
-	m_delegate = std::move(adelegate);
 }
 
 void netlist_mame_logic_output_device::custom_netlist_additions(netlist::netlist_state_t &nlstate)
@@ -770,9 +783,9 @@ void netlist_mame_logic_output_device::custom_netlist_additions(netlist::netlist
 
 	/* ignore if no running machine -> called within device_validity_check context */
 	if (owner()->has_running_machine())
-		m_delegate.bind_relative_to(owner()->machine().root_device());
+		m_delegate.resolve();
 
-	auto dev = netlist::pool().make_unique<NETLIB_NAME(logic_callback)>(nlstate, dfqn);
+	auto dev = nlstate.make_object<NETLIB_NAME(logic_callback)>(nlstate, dfqn);
 	dev->register_callback(std::move(m_delegate));
 	nlstate.register_device(dfqn, std::move(dev));
 	nlstate.setup().register_link(dname + ".IN", pin);
@@ -1025,20 +1038,20 @@ void netlist_mame_device::device_config_complete()
 
 }
 
-void netlist_mame_device::common_dev_start(netlist::netlist_t *lnetlist) const
+void netlist_mame_device::common_dev_start(netlist::netlist_state_t *lnetlist) const
 {
-	auto &lsetup = lnetlist->nlstate().setup();
+	auto &lsetup = lnetlist->setup();
 
 	// Override log statistics
 	pstring p = plib::util::environment("NL_STATS", "");
 	if (p != "")
 	{
 		bool err=false;
-		bool v = plib::pstonum_ne<bool, true>(p, err);
+		bool v = plib::pstonum_ne<bool>(p, err);
 		if (err)
 			lsetup.log().warning("NL_STATS: invalid value {1}", p);
 		else
-			lnetlist->enable_stats(v);
+			lnetlist->exec().enable_stats(v);
 	}
 
 	// register additional devices
@@ -1052,7 +1065,7 @@ void netlist_mame_device::common_dev_start(netlist::netlist_t *lnetlist) const
 		if( sdev != nullptr )
 		{
 			LOGDEVCALLS("Preparse subdevice %s/%s\n", d.name(), d.shortname());
-			sdev->pre_parse_action(lnetlist->nlstate());
+			sdev->pre_parse_action(*lnetlist);
 		}
 	}
 
@@ -1070,21 +1083,21 @@ void netlist_mame_device::common_dev_start(netlist::netlist_t *lnetlist) const
 		if( sdev != nullptr )
 		{
 			LOGDEVCALLS("Found subdevice %s/%s\n", d.name(), d.shortname());
-			sdev->custom_netlist_additions(lnetlist->nlstate());
+			sdev->custom_netlist_additions(*lnetlist);
 		}
 	}
 	lsetup.prepare_to_run();
 #endif
 }
 
-plib::unique_ptr<netlist::netlist_t> netlist_mame_device::base_validity_check(validity_checker &valid) const
+plib::unique_ptr<netlist::netlist_state_t> netlist_mame_device::base_validity_check(validity_checker &valid) const
 {
 	try
 	{
 		//netlist_mame_t lnetlist(*this, "netlist", plib::make_unique<netlist_validate_callbacks_t>());
-		auto lnetlist = plib::make_unique<netlist::netlist_t>("netlist", plib::make_unique<netlist_validate_callbacks_t>());
+		auto lnetlist = plib::make_unique<netlist::netlist_state_t>("netlist", plib::make_unique<netlist_validate_callbacks_t>());
 		// enable validation mode
-		lnetlist->nlstate().setup().set_extended_validation(false);
+		lnetlist->set_extended_validation(true);
 		common_dev_start(lnetlist.get());
 
 		for (device_t &d : subdevices())
@@ -1093,7 +1106,7 @@ plib::unique_ptr<netlist::netlist_t> netlist_mame_device::base_validity_check(va
 			if( sdev != nullptr )
 			{
 				LOGDEVCALLS("Validity check on subdevice %s/%s\n", d.name(), d.shortname());
-				sdev->validity_helper(valid, lnetlist->nlstate());
+				sdev->validity_helper(valid, *lnetlist);
 			}
 		}
 
@@ -1106,13 +1119,13 @@ plib::unique_ptr<netlist::netlist_t> netlist_mame_device::base_validity_check(va
 	}
 	catch (emu_fatalerror &err)
 	{
-		osd_printf_error("%s\n", err.string());
+		osd_printf_error("%s\n", err.what());
 	}
 	catch (std::exception &err)
 	{
 		osd_printf_error("%s\n", err.what());
 	}
-	return plib::unique_ptr<netlist::netlist_t>(nullptr);
+	return plib::unique_ptr<netlist::netlist_state_t>(nullptr);
 }
 
 void netlist_mame_device::device_validity_check(validity_checker &valid) const
@@ -1127,18 +1140,18 @@ void netlist_mame_device::device_start()
 {
 	LOGDEVCALLS("device_start entry\n");
 
-	m_netlist = netlist::pool().make_unique<netlist_mame_t>(*this, "netlist");
+	m_netlist = std::make_unique<netlist_mame_t>(*this, "netlist");
 	if (!machine().options().verbose())
 	{
-		m_netlist->nlstate().log().verbose.set_enabled(false);
-		m_netlist->nlstate().log().debug.set_enabled(false);
+		m_netlist->log().verbose.set_enabled(false);
+		m_netlist->log().debug.set_enabled(false);
 	}
 
 	common_dev_start(m_netlist.get());
 
-	m_netlist->nlstate().save(*this, m_rem, pstring(this->name()), "m_rem");
-	m_netlist->nlstate().save(*this, m_div, pstring(this->name()), "m_div");
-	m_netlist->nlstate().save(*this, m_old, pstring(this->name()), "m_old");
+	m_netlist->save(*this, m_rem, pstring(this->name()), "m_rem");
+	m_netlist->save(*this, m_div, pstring(this->name()), "m_div");
+	m_netlist->save(*this, m_old, pstring(this->name()), "m_old");
 
 	save_state();
 
@@ -1160,13 +1173,13 @@ void netlist_mame_device::device_reset()
 	LOGDEVCALLS("device_reset\n");
 	m_old = netlist::netlist_time::zero();
 	m_rem = netlist::netlist_time::zero();
-	netlist().reset();
+	netlist().exec().reset();
 }
 
 void netlist_mame_device::device_stop()
 {
 	LOGDEVCALLS("device_stop\n");
-	netlist().stop();
+	netlist().exec().stop();
 }
 
 ATTR_COLD void netlist_mame_device::device_post_load()
@@ -1174,7 +1187,7 @@ ATTR_COLD void netlist_mame_device::device_post_load()
 	LOGDEVCALLS("device_post_load\n");
 
 	netlist().run_state_manager().post_load();
-	netlist().nlstate().rebuild_lists();
+	netlist().rebuild_lists();
 }
 
 ATTR_COLD void netlist_mame_device::device_pre_save()
@@ -1197,46 +1210,46 @@ void netlist_mame_device::update_icount(netlist::netlist_time time) noexcept
 void netlist_mame_device::check_mame_abort_slice() noexcept
 {
 	if (m_icount <= 0)
-		netlist().abort_current_queue_slice();
+		netlist().exec().abort_current_queue_slice();
 }
 
 ATTR_COLD void netlist_mame_device::save_state()
 {
 	for (auto const & s : netlist().run_state_manager().save_list())
 	{
-		netlist().log().debug("saving state for {1}\n", s->m_name.c_str());
-		if (s->m_dt.is_float)
+		netlist().log().debug("saving state for {1}\n", s->name().c_str());
+		if (s->dt().is_float())
 		{
-			if (s->m_dt.size == sizeof(double))
-				save_pointer((double *) s->m_ptr, s->m_name.c_str(), s->m_count);
-			else if (s->m_dt.size == sizeof(float))
-				save_pointer((float *) s->m_ptr, s->m_name.c_str(), s->m_count);
+			if (s->dt().size() == sizeof(double))
+				save_pointer((double *) s->ptr(), s->name().c_str(), s->count());
+			else if (s->dt().size() == sizeof(float))
+				save_pointer((float *) s->ptr(), s->name().c_str(), s->count());
 			else
-				netlist().log().fatal("Unknown floating type for {1}\n", s->m_name.c_str());
+				netlist().log().fatal("Unknown floating type for {1}\n", s->name().c_str());
 		}
-		else if (s->m_dt.is_integral)
+		else if (s->dt().is_integral())
 		{
-			if (s->m_dt.size == sizeof(int64_t))
-				save_pointer((int64_t *) s->m_ptr, s->m_name.c_str(), s->m_count);
-			else if (s->m_dt.size == sizeof(int32_t))
-				save_pointer((int32_t *) s->m_ptr, s->m_name.c_str(), s->m_count);
-			else if (s->m_dt.size == sizeof(int16_t))
-				save_pointer((int16_t *) s->m_ptr, s->m_name.c_str(), s->m_count);
-			else if (s->m_dt.size == sizeof(int8_t))
-				save_pointer((int8_t *) s->m_ptr, s->m_name.c_str(), s->m_count);
+			if (s->dt().size() == sizeof(int64_t))
+				save_pointer((int64_t *) s->ptr(), s->name().c_str(), s->count());
+			else if (s->dt().size() == sizeof(int32_t))
+				save_pointer((int32_t *) s->ptr(), s->name().c_str(), s->count());
+			else if (s->dt().size() == sizeof(int16_t))
+				save_pointer((int16_t *) s->ptr(), s->name().c_str(), s->count());
+			else if (s->dt().size() == sizeof(int8_t))
+				save_pointer((int8_t *) s->ptr(), s->name().c_str(), s->count());
 #if (PHAS_INT128)
-			else if (s->m_dt.size == sizeof(INT128))
-				save_pointer((int64_t *) s->m_ptr, s->m_name.c_str(), s->m_count * 2);
+			else if (s->dt().size() == sizeof(INT128))
+				save_pointer((int64_t *) s->ptr(), s->name().c_str(), s->count() * 2);
 #endif
 			else
-				netlist().log().fatal("Unknown integral type size {1} for {2}\n", s->m_dt.size, s->m_name.c_str());
+				netlist().log().fatal("Unknown integral type size {1} for {2}\n", s->dt().size(), s->name().c_str());
 		}
-		else if (s->m_dt.is_custom)
+		else if (s->dt().is_custom())
 		{
 			/* do nothing */
 		}
 		else
-			netlist().log().fatal("found unsupported save element {1}\n", s->m_name);
+			netlist().log().fatal("found unsupported save element {1}\n", s->name());
 	}
 }
 
@@ -1266,17 +1279,16 @@ void netlist_mame_cpu_device::device_start()
 	state_add(STATE_GENPCBASE, "CURPC", m_genPC).noshow();
 
 	int index = 0;
-	for (auto &n : netlist().nlstate().nets())
+	for (auto &n : netlist().nets())
 	{
 		if (n->is_logic())
 		{
-			state_add(index, n->name().c_str(), *(downcast<netlist::logic_net_t &>(*n).Q_state_ptr()));
+			state_add(index++, n->name().c_str(), *(downcast<netlist::logic_net_t &>(*n).Q_state_ptr()));
 		}
 		else
 		{
-			state_add(index, n->name().c_str(), *(downcast<netlist::analog_net_t &>(*n).Q_Analog_state_ptr()));
+			//state_add(index++, n->name().c_str(), *(downcast<netlist::analog_net_t &>(*n).Q_Analog_state_ptr()));
 		}
-		index++;
 	}
 
 	// set our instruction counter
@@ -1289,12 +1301,12 @@ void netlist_mame_cpu_device::nl_register_devices(netlist::setup_t &lsetup) cons
 	lsetup.factory().register_device<nld_analog_callback>( "NETDEV_CALLBACK", "nld_analog_callback", "-");
 }
 
-ATTR_COLD uint64_t netlist_mame_cpu_device::execute_clocks_to_cycles(uint64_t clocks) const
+ATTR_COLD uint64_t netlist_mame_cpu_device::execute_clocks_to_cycles(uint64_t clocks) const noexcept
 {
 	return clocks;
 }
 
-ATTR_COLD uint64_t netlist_mame_cpu_device::execute_cycles_to_clocks(uint64_t cycles) const
+ATTR_COLD uint64_t netlist_mame_cpu_device::execute_cycles_to_clocks(uint64_t cycles) const noexcept
 {
 	return cycles;
 }
@@ -1309,14 +1321,14 @@ ATTR_HOT void netlist_mame_cpu_device::execute_run()
 			m_genPC++;
 			m_genPC &= 255;
 			debugger_instruction_hook(m_genPC);
-			netlist().process_queue(m_div);
-			update_icount(netlist().time());
+			netlist().exec().process_queue(m_div);
+			update_icount(netlist().exec().time());
 		}
 	}
 	else
 	{
-		netlist().process_queue(m_div * m_icount);
-		update_icount(netlist().time());
+		netlist().exec().process_queue(m_div * m_icount);
+		update_icount(netlist().exec().time());
 	}
 }
 
@@ -1338,11 +1350,11 @@ offs_t netlist_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 {
 	unsigned startpc = pc;
 	int relpc = pc - m_dev->genPC();
-	if (relpc >= 0 && relpc < m_dev->netlist().queue().size())
+	if (relpc >= 0 && relpc < m_dev->netlist().exec().queue().size())
 	{
-		int dpc = m_dev->netlist().queue().size() - relpc - 1;
-		util::stream_format(stream, "%c %s @%10.7f", (relpc == 0) ? '*' : ' ', m_dev->netlist().queue()[dpc].m_object->name().c_str(),
-				m_dev->netlist().queue()[dpc].m_exec_time.as_double());
+		int dpc = m_dev->netlist().exec().queue().size() - relpc - 1;
+		util::stream_format(stream, "%c %s @%10.7f", (relpc == 0) ? '*' : ' ', m_dev->netlist().exec().queue()[dpc].object()->name().c_str(),
+				m_dev->netlist().exec().queue()[dpc].exec_time().as_double());
 	}
 
 	pc+=1;
@@ -1368,7 +1380,7 @@ void netlist_mame_sound_device::device_validity_check(validity_checker &valid) c
 	if (lnetlist)
 	{
 		/*Ok - do some more checks */
-		std::vector<nld_sound_out *> outdevs = lnetlist->nlstate().get_device_list<nld_sound_out>();
+		std::vector<nld_sound_out *> outdevs = lnetlist->get_device_list<nld_sound_out>();
 		if (outdevs.size() == 0)
 			osd_printf_error("No output devices\n");
 		else
@@ -1380,7 +1392,7 @@ void netlist_mame_sound_device::device_validity_check(validity_checker &valid) c
 					osd_printf_error("illegal channel number %d\n", chan);
 			}
 		}
-		std::vector<nld_sound_in *> indevs = lnetlist->nlstate().get_device_list<nld_sound_in>();
+		std::vector<nld_sound_in *> indevs = lnetlist->get_device_list<nld_sound_in>();
 		if (indevs.size() > 1)
 			osd_printf_error("A maximum of one input device is allowed but found %d!\n", (int)indevs.size());
 	}
@@ -1396,7 +1408,7 @@ void netlist_mame_sound_device::device_start()
 
 	// Configure outputs
 
-	std::vector<nld_sound_out *> outdevs = netlist().nlstate().get_device_list<nld_sound_out>();
+	std::vector<nld_sound_out *> outdevs = netlist().get_device_list<nld_sound_out>();
 	if (outdevs.size() == 0)
 		fatalerror("No output devices");
 
@@ -1423,7 +1435,7 @@ void netlist_mame_sound_device::device_start()
 
 	m_in = nullptr;
 
-	std::vector<nld_sound_in *> indevs = netlist().nlstate().get_device_list<nld_sound_in>();
+	std::vector<nld_sound_in *> indevs = netlist().get_device_list<nld_sound_in>();
 	if (indevs.size() > 1)
 		fatalerror("A maximum of one input device is allowed!");
 	if (indevs.size() == 1)
@@ -1463,9 +1475,9 @@ void netlist_mame_sound_device::sound_stream_update(sound_stream &stream, stream
 		}
 	}
 
-	netlist::netlist_time cur(netlist().time());
+	netlist::netlist_time cur(netlist().exec().time());
 
-	netlist().process_queue(m_div * samples);
+	netlist().exec().process_queue(m_div * samples);
 
 	cur += (m_div * samples);
 

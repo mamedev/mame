@@ -148,7 +148,7 @@ WRITE8_MEMBER(cosmic_state::cosmicg_output_w)
 		/* The schematics show a direct link to the sound amp  */
 		/* as other cosmic series games, but it is toggled     */
 		/* once during game over. It is implemented for sake   */
-		/* of completness.                                     */
+		/* of completeness.                                    */
 		case 1: m_dac->write(BIT(data, 0)); break; /* Game Over */
 		case 2: if (data) m_samples->start(0, m_march_select); break;   /* March Sound */
 		case 3: m_march_select = (m_march_select & 0xfe) | data; break;
@@ -1369,6 +1369,28 @@ ROM_START( cosmica1 ) /* earlier 7910-A pcb, had lots of rework; roms do NOT hav
 	ROM_LOAD( "8.k3",       0x0000, 0x0400, CRC(acbd4e98) SHA1(d33fe8bdc77bb18a3ffb369ea692210d1b890771) ) /* 2708; located on sub pcb */
 ROM_END
 
+ROM_START( cosmica3 ) // main: 7910-AII sub: 7910-BII sound: 7910-S
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.e3",      0x0000, 0x0800, CRC(535ee0c5) SHA1(3ec3056b7fabe07ef49a9179114aa74be44a943e) )
+	ROM_LOAD( "2-ii-2.e4", 0x0800, 0x0800, CRC(6c9907e8) SHA1(699369b2116c24a41de48c737aa9adc67cbb25cd) ) // has an & stamped on the chip
+	ROM_LOAD( "3-ii-3.e5", 0x1000, 0x0800, CRC(c7205278) SHA1(439da2d8f591378c323b7ace273fd2da90b80076) ) // has an & stamped on the chip
+	ROM_LOAD( "4-ii-4.e6", 0x1800, 0x0800, CRC(c7765ecd) SHA1(fa793510560bc50d5ddbdec44651b76f5a22003f) ) // has an & stamped on the chip
+	ROM_LOAD( "5-ii-5.e7", 0x2000, 0x0800, CRC(5f60242f) SHA1(d5dad3b2b8508dc272567bd091bcbb53fe9b2cc6) ) // has an & stamped on the chip
+
+	ROM_REGION( 0x1000, "gfx1", 0 ) // sprites
+	ROM_LOAD( "7.n2", 0x0000, 0x0800, CRC(aa6c6079) SHA1(af4ab73e9e1c189290b26bf42adb511d5a347df9) )
+	ROM_LOAD( "6.n1", 0x0800, 0x0800, CRC(431e866c) SHA1(b007cd3cc856360a0247bd78bb49d173f5cef321) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "u7910.d9", 0x0000, 0x0020, BAD_DUMP CRC(dfb60f19) SHA1(d510327ff3492f098659c551f7245835f61a2959) ) // not dumped for this set, probably matches the other
+
+	ROM_REGION( 0x0400, "user1", 0 ) // color map
+	ROM_LOAD( "9-9.e2", 0x0000, 0x0400, CRC(ea4ee931) SHA1(d0a4afda4b493efb40286c2d67bf56a2a8b8da9d) )
+
+	ROM_REGION( 0x0400, "user2", 0 ) // starfield generator
+	ROM_LOAD( "8-8.ic10", 0x0000, 0x0400, CRC(acbd4e98) SHA1(d33fe8bdc77bb18a3ffb369ea692210d1b890771) )
+ROM_END
+
 ROM_START( cosmicg )
 	ROM_REGION( 0x10000, "maincpu", 0 )  /* 8k for code */
 	ROM_LOAD( "cosmicg1.bin", 0x0000, 0x0400, CRC(e1b9f894) SHA1(bab7fd9b3db145a889542653191905b6efc5ce75) )
@@ -1575,16 +1597,16 @@ void cosmic_state::init_cosmica()
 
 void cosmic_state::init_devzone()
 {
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x4807, 0x4807,write8_delegate(FUNC(cosmic_state::cosmic_background_enable_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x4807, 0x4807, write8_delegate(*this, FUNC(cosmic_state::cosmic_background_enable_w)));
 }
 
 
 void cosmic_state::init_nomnlnd()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x5000, 0x5001, read8_delegate(FUNC(cosmic_state::nomnlnd_port_0_1_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x5000, 0x5001, read8_delegate(*this, FUNC(cosmic_state::nomnlnd_port_0_1_r)));
 	m_maincpu->space(AS_PROGRAM).nop_write(0x4800, 0x4800);
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x4807, 0x4807, write8_delegate(FUNC(cosmic_state::cosmic_background_enable_w),this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x480a, 0x480a, write8_delegate(FUNC(cosmic_state::dac_w), this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x4807, 0x4807, write8_delegate(*this, FUNC(cosmic_state::cosmic_background_enable_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x480a, 0x480a, write8_delegate(*this, FUNC(cosmic_state::dac_w)));
 }
 
 void cosmic_state::init_panic()
@@ -1595,7 +1617,8 @@ void cosmic_state::init_panic()
 
 GAME( 1979, cosmicg,  0,       cosmicg, cosmicg,  cosmic_state, init_cosmicg, ROT270, "Universal", "Cosmic Guerilla", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL /*| MACHINE_SUPPORTS_SAVE */)
 GAME( 1979, cosmicgi, cosmicg, cosmicg, cosmicg,  cosmic_state, init_cosmicg, ROT270, "bootleg (Inder)", "Cosmic Guerilla (Spanish bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL  /*| MACHINE_SUPPORTS_SAVE */)
-GAME( 1979, cosmica,  0,       cosmica, cosmica,  cosmic_state, init_cosmica, ROT270, "Universal", "Cosmic Alien (version II)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, cosmica,  0,       cosmica, cosmica,  cosmic_state, init_cosmica, ROT270, "Universal", "Cosmic Alien (version II, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, cosmica3, cosmica, cosmica, cosmica,  cosmic_state, init_cosmica, ROT270, "Universal", "Cosmic Alien (version II, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, cosmica1, cosmica, cosmica, cosmica,  cosmic_state, init_cosmica, ROT270, "Universal", "Cosmic Alien (first version)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, cosmica2, cosmica, cosmica, cosmica,  cosmic_state, init_cosmica, ROT270, "Universal", "Cosmic Alien (early version II?)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, nomnlnd,  0,       nomnlnd, nomnlnd,  cosmic_state, init_nomnlnd, ROT270, "Universal", "No Man's Land", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

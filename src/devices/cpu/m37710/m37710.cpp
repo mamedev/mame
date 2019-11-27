@@ -81,39 +81,145 @@ DEFINE_DEVICE_TYPE(M37702M2, m37702m2_device, "m37702m2", "Mitsubishi M37702M2")
 DEFINE_DEVICE_TYPE(M37702S1, m37702s1_device, "m37702s1", "Mitsubishi M37702S1")
 DEFINE_DEVICE_TYPE(M37710S4, m37710s4_device, "m37710s4", "Mitsubishi M37710S4")
 DEFINE_DEVICE_TYPE(M37720S1, m37720s1_device, "m37720s1", "Mitsubishi M37720S1")
+DEFINE_DEVICE_TYPE(M37730S2, m37730s2_device, "m37730s2", "Mitsubishi M37730S2")
 
 
 // On-board RAM, ROM, and peripherals
+
+template <int Base>
+uint8_t m37710_cpu_device::port_r(offs_t offset)
+{
+	int p = (offset & ~1) + Base;
+
+	uint8_t result = 0;
+	if (BIT(offset, 0))
+		result = get_port_dir(p);
+	else
+		result = get_port_reg(p);
+
+	LOGMASKED(LOG_PORTS, "port_r from %02x: Port P%d %s = %x\n",
+		0x02 + (Base + offset) * 2 - (Base & 1),
+		p,
+		BIT(offset, 0) ? "dir reg" : "reg", result);
+
+	return result;
+}
+
+template <int Base>
+void m37710_cpu_device::port_w(offs_t offset, uint8_t data)
+{
+	int p = (offset & ~1) + Base;
+
+	LOGMASKED(LOG_PORTS, "port_w %x to %02x: Port P%d %s = %x\n",
+		data,
+		0x02 + (Base + offset) * 2 - (Base & 1),
+		p,
+		BIT(offset, 0) ? "dir reg" : "reg",
+		BIT(offset, 0) ? m_port_dir[p] : m_port_regs[p]);
+
+	if (BIT(offset, 0))
+		set_port_dir(p, data);
+	else
+		set_port_reg(p, data);
+}
+
+template <int Level>
+uint8_t m37710_cpu_device::int_control_r()
+{
+	return get_int_control(Level);
+}
+
+template <int Level>
+void m37710_cpu_device::int_control_w(uint8_t data)
+{
+	set_int_control(Level, data);
+}
+
+void m37710_cpu_device::ad_register_map(address_map &map)
+{
+	map(0x00001e, 0x00001e).rw(FUNC(m37710_cpu_device::ad_control_r), FUNC(m37710_cpu_device::ad_control_w));
+	map(0x00001f, 0x00001f).rw(FUNC(m37710_cpu_device::ad_sweep_r), FUNC(m37710_cpu_device::ad_sweep_w));
+	map(0x000020, 0x00002f).r(FUNC(m37710_cpu_device::ad_result_r));
+	map(0x000070, 0x000070).rw(FUNC(m37710_cpu_device::int_control_r<M37710_LINE_ADC>), FUNC(m37710_cpu_device::int_control_w<M37710_LINE_ADC>));
+}
+
+void m37710_cpu_device::uart0_register_map(address_map &map)
+{
+	map(0x000030, 0x000030).rw(FUNC(m37710_cpu_device::uart0_mode_r), FUNC(m37710_cpu_device::uart0_mode_w));
+	map(0x000031, 0x000031).w(FUNC(m37710_cpu_device::uart0_baud_w));
+	map(0x000032, 0x000033).w(FUNC(m37710_cpu_device::uart0_tbuf_w));
+	map(0x000034, 0x000034).rw(FUNC(m37710_cpu_device::uart0_ctrl_reg0_r), FUNC(m37710_cpu_device::uart0_ctrl_reg0_w));
+	map(0x000035, 0x000035).rw(FUNC(m37710_cpu_device::uart0_ctrl_reg1_r), FUNC(m37710_cpu_device::uart0_ctrl_reg1_w));
+	map(0x000036, 0x000037).r(FUNC(m37710_cpu_device::uart0_rbuf_r));
+	map(0x000071, 0x000071).rw(FUNC(m37710_cpu_device::int_control_r<M37710_LINE_UART0XMIT>), FUNC(m37710_cpu_device::int_control_w<M37710_LINE_UART0XMIT>));
+	map(0x000072, 0x000072).rw(FUNC(m37710_cpu_device::int_control_r<M37710_LINE_UART0RECV>), FUNC(m37710_cpu_device::int_control_w<M37710_LINE_UART0RECV>));
+}
+
+void m37710_cpu_device::uart1_register_map(address_map &map)
+{
+	map(0x000038, 0x000038).rw(FUNC(m37710_cpu_device::uart1_mode_r), FUNC(m37710_cpu_device::uart1_mode_w));
+	map(0x000039, 0x000039).w(FUNC(m37710_cpu_device::uart1_baud_w));
+	map(0x00003a, 0x00003b).w(FUNC(m37710_cpu_device::uart1_tbuf_w));
+	map(0x00003c, 0x00003c).rw(FUNC(m37710_cpu_device::uart1_ctrl_reg0_r), FUNC(m37710_cpu_device::uart1_ctrl_reg0_w));
+	map(0x00003d, 0x00003d).rw(FUNC(m37710_cpu_device::uart1_ctrl_reg1_r), FUNC(m37710_cpu_device::uart1_ctrl_reg1_w));
+	map(0x00003e, 0x00003f).r(FUNC(m37710_cpu_device::uart1_rbuf_r));
+	map(0x000073, 0x000073).rw(FUNC(m37710_cpu_device::int_control_r<M37710_LINE_UART1XMIT>), FUNC(m37710_cpu_device::int_control_w<M37710_LINE_UART1XMIT>));
+	map(0x000074, 0x000074).rw(FUNC(m37710_cpu_device::int_control_r<M37710_LINE_UART1RECV>), FUNC(m37710_cpu_device::int_control_w<M37710_LINE_UART1RECV>));
+}
+
+void m37710_cpu_device::timer_register_map(address_map &map)
+{
+	map(0x000040, 0x000040).rw(FUNC(m37710_cpu_device::count_start_r), FUNC(m37710_cpu_device::count_start_w));
+	map(0x000042, 0x000042).w(FUNC(m37710_cpu_device::one_shot_start_w));
+	map(0x000044, 0x000044).rw(FUNC(m37710_cpu_device::up_down_r), FUNC(m37710_cpu_device::up_down_w));
+	map(0x000046, 0x000055).rw(FUNC(m37710_cpu_device::timer_reg_r), FUNC(m37710_cpu_device::timer_reg_w));
+	map(0x000056, 0x00005d).rw(FUNC(m37710_cpu_device::timer_mode_r), FUNC(m37710_cpu_device::timer_mode_w));
+	map(0x000075, 0x000075).rw(FUNC(m37710_cpu_device::int_control_r<M37710_LINE_TIMERA0>), FUNC(m37710_cpu_device::int_control_w<M37710_LINE_TIMERA0>));
+	map(0x000076, 0x000076).rw(FUNC(m37710_cpu_device::int_control_r<M37710_LINE_TIMERA1>), FUNC(m37710_cpu_device::int_control_w<M37710_LINE_TIMERA1>));
+	map(0x000077, 0x000077).rw(FUNC(m37710_cpu_device::int_control_r<M37710_LINE_TIMERA2>), FUNC(m37710_cpu_device::int_control_w<M37710_LINE_TIMERA2>));
+	map(0x000078, 0x000078).rw(FUNC(m37710_cpu_device::int_control_r<M37710_LINE_TIMERA3>), FUNC(m37710_cpu_device::int_control_w<M37710_LINE_TIMERA3>));
+	map(0x000079, 0x000079).rw(FUNC(m37710_cpu_device::int_control_r<M37710_LINE_TIMERA4>), FUNC(m37710_cpu_device::int_control_w<M37710_LINE_TIMERA4>));
+	map(0x00007a, 0x00007a).rw(FUNC(m37710_cpu_device::int_control_r<M37710_LINE_TIMERB0>), FUNC(m37710_cpu_device::int_control_w<M37710_LINE_TIMERB0>));
+	map(0x00007b, 0x00007b).rw(FUNC(m37710_cpu_device::int_control_r<M37710_LINE_TIMERB1>), FUNC(m37710_cpu_device::int_control_w<M37710_LINE_TIMERB1>));
+	map(0x00007c, 0x00007c).rw(FUNC(m37710_cpu_device::int_control_r<M37710_LINE_TIMERB2>), FUNC(m37710_cpu_device::int_control_w<M37710_LINE_TIMERB2>));
+}
+
+void m37710_cpu_device::timer_6channel_register_map(address_map &map)
+{
+	map(0x000040, 0x000040).rw(FUNC(m37710_cpu_device::count_start_r), FUNC(m37710_cpu_device::count_start_w));
+	map(0x000042, 0x000042).w(FUNC(m37710_cpu_device::one_shot_start_w));
+	map(0x000044, 0x000044).rw(FUNC(m37710_cpu_device::up_down_r), FUNC(m37710_cpu_device::up_down_w));
+	map(0x000046, 0x000051).rw(FUNC(m37710_cpu_device::timer_reg_r), FUNC(m37710_cpu_device::timer_reg_w));
+	map(0x000056, 0x00005b).rw(FUNC(m37710_cpu_device::timer_mode_r), FUNC(m37710_cpu_device::timer_mode_w));
+	map(0x000075, 0x000075).rw(FUNC(m37710_cpu_device::int_control_r<M37710_LINE_TIMERA0>), FUNC(m37710_cpu_device::int_control_w<M37710_LINE_TIMERA0>));
+	map(0x000076, 0x000076).rw(FUNC(m37710_cpu_device::int_control_r<M37710_LINE_TIMERA1>), FUNC(m37710_cpu_device::int_control_w<M37710_LINE_TIMERA1>));
+	map(0x000077, 0x000077).rw(FUNC(m37710_cpu_device::int_control_r<M37710_LINE_TIMERA2>), FUNC(m37710_cpu_device::int_control_w<M37710_LINE_TIMERA2>));
+	map(0x000078, 0x000078).rw(FUNC(m37710_cpu_device::int_control_r<M37710_LINE_TIMERA3>), FUNC(m37710_cpu_device::int_control_w<M37710_LINE_TIMERA3>));
+	map(0x000079, 0x000079).rw(FUNC(m37710_cpu_device::int_control_r<M37710_LINE_TIMERA4>), FUNC(m37710_cpu_device::int_control_w<M37710_LINE_TIMERA4>));
+	map(0x00007a, 0x00007a).rw(FUNC(m37710_cpu_device::int_control_r<M37710_LINE_TIMERB0>), FUNC(m37710_cpu_device::int_control_w<M37710_LINE_TIMERB0>));
+}
+
+void m37710_cpu_device::irq_register_map(address_map &map)
+{
+	map(0x00007d, 0x00007d).rw(FUNC(m37710_cpu_device::int_control_r<M37710_LINE_IRQ0>), FUNC(m37710_cpu_device::int_control_w<M37710_LINE_IRQ0>));
+	map(0x00007e, 0x00007e).rw(FUNC(m37710_cpu_device::int_control_r<M37710_LINE_IRQ1>), FUNC(m37710_cpu_device::int_control_w<M37710_LINE_IRQ1>));
+	map(0x00007f, 0x00007f).rw(FUNC(m37710_cpu_device::int_control_r<M37710_LINE_IRQ2>), FUNC(m37710_cpu_device::int_control_w<M37710_LINE_IRQ2>));
+}
 
 // M37702M2: 512 bytes internal RAM, 16K internal mask ROM
 // (M37702E2: same with EPROM instead of mask ROM)
 void m37702m2_device::map(address_map &map)
 {
-	map(0x000002, 0x000015).rw(FUNC(m37702m2_device::port_r), FUNC(m37702m2_device::port_w));
-	map(0x00001e, 0x00001e).rw(FUNC(m37702m2_device::ad_control_r), FUNC(m37702m2_device::ad_control_w));
-	map(0x00001f, 0x00001f).rw(FUNC(m37702m2_device::ad_sweep_r), FUNC(m37702m2_device::ad_sweep_w));
-	map(0x000020, 0x00002f).r(FUNC(m37702m2_device::ad_result_r));
-	map(0x000030, 0x000030).rw(FUNC(m37702m2_device::uart0_mode_r), FUNC(m37702m2_device::uart0_mode_w));
-	map(0x000031, 0x000031).w(FUNC(m37702m2_device::uart0_baud_w));
-	map(0x000032, 0x000033).w(FUNC(m37702m2_device::uart0_tbuf_w));
-	map(0x000034, 0x000034).rw(FUNC(m37702m2_device::uart0_ctrl_reg0_r), FUNC(m37702m2_device::uart0_ctrl_reg0_w));
-	map(0x000035, 0x000035).rw(FUNC(m37702m2_device::uart0_ctrl_reg1_r), FUNC(m37702m2_device::uart0_ctrl_reg1_w));
-	map(0x000036, 0x000037).r(FUNC(m37702m2_device::uart0_rbuf_r));
-	map(0x000038, 0x000038).rw(FUNC(m37702m2_device::uart1_mode_r), FUNC(m37702m2_device::uart1_mode_w));
-	map(0x000039, 0x000039).w(FUNC(m37702m2_device::uart1_baud_w));
-	map(0x00003a, 0x00003b).w(FUNC(m37702m2_device::uart1_tbuf_w));
-	map(0x00003c, 0x00003c).rw(FUNC(m37702m2_device::uart1_ctrl_reg0_r), FUNC(m37702m2_device::uart1_ctrl_reg0_w));
-	map(0x00003d, 0x00003d).rw(FUNC(m37702m2_device::uart1_ctrl_reg1_r), FUNC(m37702m2_device::uart1_ctrl_reg1_w));
-	map(0x00003e, 0x00003f).r(FUNC(m37702m2_device::uart1_rbuf_r));
-	map(0x000040, 0x000040).rw(FUNC(m37702m2_device::count_start_r), FUNC(m37702m2_device::count_start_w));
-	map(0x000042, 0x000042).w(FUNC(m37702m2_device::one_shot_start_w));
-	map(0x000044, 0x000044).rw(FUNC(m37702m2_device::up_down_r), FUNC(m37702m2_device::up_down_w));
-	map(0x000046, 0x000055).rw(FUNC(m37702m2_device::timer_reg_r), FUNC(m37702m2_device::timer_reg_w));
-	map(0x000056, 0x00005d).rw(FUNC(m37702m2_device::timer_mode_r), FUNC(m37702m2_device::timer_mode_w));
+	map(0x000002, 0x000015).rw(FUNC(m37702m2_device::port_r<0>), FUNC(m37702m2_device::port_w<0>)).umask16(0x00ff);
+	map(0x000002, 0x000011).rw(FUNC(m37702m2_device::port_r<1>), FUNC(m37702m2_device::port_w<1>)).umask16(0xff00);
 	map(0x00005e, 0x00005e).rw(FUNC(m37702m2_device::proc_mode_r), FUNC(m37702m2_device::proc_mode_w));
 	map(0x000060, 0x000060).w(FUNC(m37702m2_device::watchdog_timer_w));
 	map(0x000061, 0x000061).rw(FUNC(m37702m2_device::watchdog_freq_r), FUNC(m37702m2_device::watchdog_freq_w));
-	map(0x00006c, 0x00007f).rw(FUNC(m37702m2_device::int_control_r), FUNC(m37702m2_device::int_control_w));
+	ad_register_map(map);
+	uart0_register_map(map);
+	uart1_register_map(map);
+	timer_register_map(map);
+	irq_register_map(map);
 	map(0x000080, 0x00027f).ram();
 	map(0x00c000, 0x00ffff).rom().region(M37710_INTERNAL_ROM_REGION, 0);
 }
@@ -122,31 +228,16 @@ void m37702m2_device::map(address_map &map)
 // M37702S1: 512 bytes internal RAM, no internal ROM
 void m37702s1_device::map(address_map &map)
 {
-	map(0x000002, 0x000015).rw(FUNC(m37702s1_device::port_r), FUNC(m37702s1_device::port_w));
-	map(0x00001e, 0x00001e).rw(FUNC(m37702s1_device::ad_control_r), FUNC(m37702s1_device::ad_control_w));
-	map(0x00001f, 0x00001f).rw(FUNC(m37702s1_device::ad_sweep_r), FUNC(m37702s1_device::ad_sweep_w));
-	map(0x000020, 0x00002f).r(FUNC(m37702s1_device::ad_result_r));
-	map(0x000030, 0x000030).rw(FUNC(m37702s1_device::uart0_mode_r), FUNC(m37702s1_device::uart0_mode_w));
-	map(0x000031, 0x000031).w(FUNC(m37702s1_device::uart0_baud_w));
-	map(0x000032, 0x000033).w(FUNC(m37702s1_device::uart0_tbuf_w));
-	map(0x000034, 0x000034).rw(FUNC(m37702s1_device::uart0_ctrl_reg0_r), FUNC(m37702s1_device::uart0_ctrl_reg0_w));
-	map(0x000035, 0x000035).rw(FUNC(m37702s1_device::uart0_ctrl_reg1_r), FUNC(m37702s1_device::uart0_ctrl_reg1_w));
-	map(0x000036, 0x000037).r(FUNC(m37702s1_device::uart0_rbuf_r));
-	map(0x000038, 0x000038).rw(FUNC(m37702s1_device::uart1_mode_r), FUNC(m37702s1_device::uart1_mode_w));
-	map(0x000039, 0x000039).w(FUNC(m37702s1_device::uart1_baud_w));
-	map(0x00003a, 0x00003b).w(FUNC(m37702s1_device::uart1_tbuf_w));
-	map(0x00003c, 0x00003c).rw(FUNC(m37702s1_device::uart1_ctrl_reg0_r), FUNC(m37702s1_device::uart1_ctrl_reg0_w));
-	map(0x00003d, 0x00003d).rw(FUNC(m37702s1_device::uart1_ctrl_reg1_r), FUNC(m37702s1_device::uart1_ctrl_reg1_w));
-	map(0x00003e, 0x00003f).r(FUNC(m37702s1_device::uart1_rbuf_r));
-	map(0x000040, 0x000040).rw(FUNC(m37702s1_device::count_start_r), FUNC(m37702s1_device::count_start_w));
-	map(0x000042, 0x000042).w(FUNC(m37702s1_device::one_shot_start_w));
-	map(0x000044, 0x000044).rw(FUNC(m37702s1_device::up_down_r), FUNC(m37702s1_device::up_down_w));
-	map(0x000046, 0x000055).rw(FUNC(m37702s1_device::timer_reg_r), FUNC(m37702s1_device::timer_reg_w));
-	map(0x000056, 0x00005d).rw(FUNC(m37702s1_device::timer_mode_r), FUNC(m37702s1_device::timer_mode_w));
+	map(0x000002, 0x000015).rw(FUNC(m37702s1_device::port_r<0>), FUNC(m37702s1_device::port_w<0>)).umask16(0x00ff);
+	map(0x000002, 0x000011).rw(FUNC(m37702s1_device::port_r<1>), FUNC(m37702s1_device::port_w<1>)).umask16(0xff00);
 	map(0x00005e, 0x00005e).rw(FUNC(m37702s1_device::proc_mode_r), FUNC(m37702s1_device::proc_mode_w));
 	map(0x000060, 0x000060).w(FUNC(m37702s1_device::watchdog_timer_w));
 	map(0x000061, 0x000061).rw(FUNC(m37702s1_device::watchdog_freq_r), FUNC(m37702s1_device::watchdog_freq_w));
-	map(0x00006c, 0x00007f).rw(FUNC(m37702s1_device::int_control_r), FUNC(m37702s1_device::int_control_w));
+	ad_register_map(map);
+	uart0_register_map(map);
+	uart1_register_map(map);
+	timer_register_map(map);
+	irq_register_map(map);
 	map(0x000080, 0x00027f).ram();
 }
 
@@ -154,62 +245,28 @@ void m37702s1_device::map(address_map &map)
 // M37710S4: 2048 bytes internal RAM, no internal ROM
 void m37710s4_device::map(address_map &map)
 {
-	map(0x000002, 0x000015).rw(FUNC(m37710s4_device::port_r), FUNC(m37710s4_device::port_w)); // FIXME: P4-P8 only
+	map(0x00000a, 0x000015).rw(FUNC(m37710s4_device::port_r<4>), FUNC(m37710s4_device::port_w<4>)).umask16(0x00ff);
+	map(0x00000a, 0x000011).rw(FUNC(m37710s4_device::port_r<5>), FUNC(m37710s4_device::port_w<5>)).umask16(0xff00);
 	map(0x00001a, 0x00001d).w(FUNC(m37710s4_device::da_reg_w)).umask16(0x00ff);
-	map(0x00001e, 0x00001e).rw(FUNC(m37710s4_device::ad_control_r), FUNC(m37710s4_device::ad_control_w));
-	map(0x00001f, 0x00001f).rw(FUNC(m37710s4_device::ad_sweep_r), FUNC(m37710s4_device::ad_sweep_w));
-	map(0x000020, 0x00002f).r(FUNC(m37710s4_device::ad_result_r));
-	map(0x000030, 0x000030).rw(FUNC(m37710s4_device::uart0_mode_r), FUNC(m37710s4_device::uart0_mode_w));
-	map(0x000031, 0x000031).w(FUNC(m37710s4_device::uart0_baud_w));
-	map(0x000032, 0x000033).w(FUNC(m37710s4_device::uart0_tbuf_w));
-	map(0x000034, 0x000034).rw(FUNC(m37710s4_device::uart0_ctrl_reg0_r), FUNC(m37710s4_device::uart0_ctrl_reg0_w));
-	map(0x000035, 0x000035).rw(FUNC(m37710s4_device::uart0_ctrl_reg1_r), FUNC(m37710s4_device::uart0_ctrl_reg1_w));
-	map(0x000036, 0x000037).r(FUNC(m37710s4_device::uart0_rbuf_r));
-	map(0x000038, 0x000038).rw(FUNC(m37710s4_device::uart1_mode_r), FUNC(m37710s4_device::uart1_mode_w));
-	map(0x000039, 0x000039).w(FUNC(m37710s4_device::uart1_baud_w));
-	map(0x00003a, 0x00003b).w(FUNC(m37710s4_device::uart1_tbuf_w));
-	map(0x00003c, 0x00003c).rw(FUNC(m37710s4_device::uart1_ctrl_reg0_r), FUNC(m37710s4_device::uart1_ctrl_reg0_w));
-	map(0x00003d, 0x00003d).rw(FUNC(m37710s4_device::uart1_ctrl_reg1_r), FUNC(m37710s4_device::uart1_ctrl_reg1_w));
-	map(0x00003e, 0x00003f).r(FUNC(m37710s4_device::uart1_rbuf_r));
-	map(0x000040, 0x000040).rw(FUNC(m37710s4_device::count_start_r), FUNC(m37710s4_device::count_start_w));
-	map(0x000042, 0x000042).w(FUNC(m37710s4_device::one_shot_start_w));
-	map(0x000044, 0x000044).rw(FUNC(m37710s4_device::up_down_r), FUNC(m37710s4_device::up_down_w));
-	map(0x000046, 0x000055).rw(FUNC(m37710s4_device::timer_reg_r), FUNC(m37710s4_device::timer_reg_w));
-	map(0x000056, 0x00005d).rw(FUNC(m37710s4_device::timer_mode_r), FUNC(m37710s4_device::timer_mode_w));
 	map(0x00005e, 0x00005e).rw(FUNC(m37710s4_device::proc_mode_r), FUNC(m37710s4_device::proc_mode_w));
 	map(0x000060, 0x000060).w(FUNC(m37710s4_device::watchdog_timer_w));
 	map(0x000061, 0x000061).rw(FUNC(m37710s4_device::watchdog_freq_r), FUNC(m37710s4_device::watchdog_freq_w));
 	map(0x000062, 0x000062).rw(FUNC(m37710s4_device::waveform_mode_r), FUNC(m37710s4_device::waveform_mode_w));
 	map(0x000064, 0x000065).w(FUNC(m37710s4_device::pulse_output_w));
-	map(0x00006c, 0x00007f).rw(FUNC(m37710s4_device::int_control_r), FUNC(m37710s4_device::int_control_w));
+	ad_register_map(map);
+	uart0_register_map(map);
+	uart1_register_map(map);
+	timer_register_map(map);
+	irq_register_map(map);
 	map(0x000080, 0x00087f).ram();
 }
 
 // M37720S1: 512 bytes internal RAM, no internal ROM, built-in DMA
 void m37720s1_device::map(address_map &map)
 {
-	map(0x000002, 0x000019).rw(FUNC(m37720s1_device::port_r), FUNC(m37720s1_device::port_w)); // FIXME: P4-P10 only
+	map(0x00000a, 0x000019).rw(FUNC(m37720s1_device::port_r<4>), FUNC(m37720s1_device::port_w<4>)).umask16(0x00ff);
+	map(0x00000a, 0x000015).rw(FUNC(m37720s1_device::port_r<5>), FUNC(m37720s1_device::port_w<5>)).umask16(0xff00);
 	map(0x00001a, 0x00001d).w(FUNC(m37720s1_device::pulse_output_w)).umask16(0x00ff);
-	map(0x00001e, 0x00001e).rw(FUNC(m37720s1_device::ad_control_r), FUNC(m37720s1_device::ad_control_w));
-	map(0x00001f, 0x00001f).rw(FUNC(m37720s1_device::ad_sweep_r), FUNC(m37720s1_device::ad_sweep_w));
-	map(0x000020, 0x00002f).r(FUNC(m37720s1_device::ad_result_r));
-	map(0x000030, 0x000030).rw(FUNC(m37720s1_device::uart0_mode_r), FUNC(m37720s1_device::uart0_mode_w));
-	map(0x000031, 0x000031).w(FUNC(m37720s1_device::uart0_baud_w));
-	map(0x000032, 0x000033).w(FUNC(m37720s1_device::uart0_tbuf_w));
-	map(0x000034, 0x000034).rw(FUNC(m37720s1_device::uart0_ctrl_reg0_r), FUNC(m37720s1_device::uart0_ctrl_reg0_w));
-	map(0x000035, 0x000035).rw(FUNC(m37720s1_device::uart0_ctrl_reg1_r), FUNC(m37720s1_device::uart0_ctrl_reg1_w));
-	map(0x000036, 0x000037).r(FUNC(m37720s1_device::uart0_rbuf_r));
-	map(0x000038, 0x000038).rw(FUNC(m37720s1_device::uart1_mode_r), FUNC(m37720s1_device::uart1_mode_w));
-	map(0x000039, 0x000039).w(FUNC(m37720s1_device::uart1_baud_w));
-	map(0x00003a, 0x00003b).w(FUNC(m37720s1_device::uart1_tbuf_w));
-	map(0x00003c, 0x00003c).rw(FUNC(m37720s1_device::uart1_ctrl_reg0_r), FUNC(m37720s1_device::uart1_ctrl_reg0_w));
-	map(0x00003d, 0x00003d).rw(FUNC(m37720s1_device::uart1_ctrl_reg1_r), FUNC(m37720s1_device::uart1_ctrl_reg1_w));
-	map(0x00003e, 0x00003f).r(FUNC(m37720s1_device::uart1_rbuf_r));
-	map(0x000040, 0x000040).rw(FUNC(m37720s1_device::count_start_r), FUNC(m37720s1_device::count_start_w));
-	map(0x000042, 0x000042).w(FUNC(m37720s1_device::one_shot_start_w));
-	map(0x000044, 0x000044).rw(FUNC(m37720s1_device::up_down_r), FUNC(m37720s1_device::up_down_w));
-	map(0x000046, 0x000055).rw(FUNC(m37720s1_device::timer_reg_r), FUNC(m37720s1_device::timer_reg_w));
-	map(0x000056, 0x00005d).rw(FUNC(m37720s1_device::timer_mode_r), FUNC(m37720s1_device::timer_mode_w));
 	map(0x00005e, 0x00005e).rw(FUNC(m37720s1_device::proc_mode_r), FUNC(m37720s1_device::proc_mode_w));
 	map(0x000060, 0x000060).w(FUNC(m37720s1_device::watchdog_timer_w));
 	map(0x000061, 0x000061).rw(FUNC(m37720s1_device::watchdog_freq_r), FUNC(m37720s1_device::watchdog_freq_w));
@@ -217,8 +274,32 @@ void m37720s1_device::map(address_map &map)
 	map(0x000064, 0x000064).rw(FUNC(m37720s1_device::dram_control_r), FUNC(m37720s1_device::dram_control_w));
 	map(0x000066, 0x000066).w(FUNC(m37720s1_device::refresh_timer_w));
 	map(0x000068, 0x000069).rw(FUNC(m37720s1_device::dmac_control_r), FUNC(m37720s1_device::dmac_control_w));
-	map(0x00006c, 0x00007f).rw(FUNC(m37720s1_device::int_control_r), FUNC(m37720s1_device::int_control_w));
+	map(0x00006c, 0x00006c).rw(FUNC(m37720s1_device::int_control_r<M37710_LINE_DMA0>), FUNC(m37720s1_device::int_control_w<M37710_LINE_DMA0>));
+	map(0x00006d, 0x00006d).rw(FUNC(m37720s1_device::int_control_r<M37710_LINE_DMA1>), FUNC(m37720s1_device::int_control_w<M37710_LINE_DMA1>));
+	map(0x00006e, 0x00006e).rw(FUNC(m37720s1_device::int_control_r<M37710_LINE_DMA2>), FUNC(m37720s1_device::int_control_w<M37710_LINE_DMA2>));
+	map(0x00006f, 0x00006f).rw(FUNC(m37720s1_device::int_control_r<M37710_LINE_DMA3>), FUNC(m37720s1_device::int_control_w<M37710_LINE_DMA3>));
+	ad_register_map(map);
+	uart0_register_map(map);
+	uart1_register_map(map);
+	timer_register_map(map);
+	irq_register_map(map);
 	map(0x000080, 0x00027f).ram();
+}
+
+// M37730S2: 1024 bytes internal RAM, no internal ROM
+void m37730s2_device::map(address_map &map)
+{
+	map(0x00000a, 0x000015).rw(FUNC(m37730s2_device::port_r<4>), FUNC(m37730s2_device::port_w<4>)).umask16(0x00ff);
+	map(0x00000a, 0x00000d).rw(FUNC(m37730s2_device::port_r<5>), FUNC(m37730s2_device::port_w<5>)).umask16(0xff00);
+	map(0x00005e, 0x00005e).rw(FUNC(m37730s2_device::proc_mode_r), FUNC(m37730s2_device::proc_mode_w));
+	map(0x000060, 0x000060).w(FUNC(m37730s2_device::watchdog_timer_w));
+	map(0x000061, 0x000061).rw(FUNC(m37730s2_device::watchdog_freq_r), FUNC(m37730s2_device::watchdog_freq_w));
+	map(0x000062, 0x000062).rw(FUNC(m37730s2_device::waveform_mode_r), FUNC(m37730s2_device::waveform_mode_w));
+	map(0x000064, 0x000065).w(FUNC(m37730s2_device::pulse_output_w));
+	uart0_register_map(map);
+	timer_6channel_register_map(map);
+	irq_register_map(map);
+	map(0x000080, 0x00047f).ram();
 }
 
 // many other combinations of RAM and ROM size exist
@@ -262,6 +343,11 @@ m37720s1_device::m37720s1_device(const machine_config &mconfig, const char *tag,
 {
 }
 
+m37730s2_device::m37730s2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: m37710_cpu_device(mconfig, M37730S2, tag, owner, clock, address_map_constructor(FUNC(m37730s2_device::map), this))
+{
+}
+
 std::vector<std::pair<int, const address_space_config *>> m37710_cpu_device::memory_space_config() const
 {
 	return std::vector<std::pair<int, const address_space_config *>> {
@@ -270,30 +356,6 @@ std::vector<std::pair<int, const address_space_config *>> m37710_cpu_device::mem
 }
 
 /* interrupt control mapping */
-
-const int m37710_cpu_device::m37710_int_reg_map[M37710_MASKABLE_INTERRUPTS] =
-{
-	M37710_LINE_DMA0,       // level 3  (0x6c)
-	M37710_LINE_DMA1,       // level 2  (0x6d)
-	M37710_LINE_DMA2,       // level 1  (0x6e)
-	M37710_LINE_DMA3,       // level 0  (0x6f)
-	M37710_LINE_ADC,        // level 4  (0x70)
-	M37710_LINE_UART0XMIT,  // level 7  (0x71)
-	M37710_LINE_UART0RECV,  // level 8  (0x72)
-	M37710_LINE_UART1XMIT,  // level 5  (0x73)
-	M37710_LINE_UART1RECV,  // level 6  (0x74)
-	M37710_LINE_TIMERA0,    // level 16 (0x75)
-	M37710_LINE_TIMERA1,    // level 15 (0x76)
-	M37710_LINE_TIMERA2,    // level 14 (0x77)
-	M37710_LINE_TIMERA3,    // level 13 (0x78)
-	M37710_LINE_TIMERA4,    // level 12 (0x79)
-	M37710_LINE_TIMERB0,    // level 11 (0x7a)
-	M37710_LINE_TIMERB1,    // level 10 (0x7b)
-	M37710_LINE_TIMERB2,    // level 9  (0x7c)
-	M37710_LINE_IRQ0,       // level 19 (0x7d)
-	M37710_LINE_IRQ1,       // level 18 (0x7e)
-	M37710_LINE_IRQ2,       // level 17 (0x7f)
-};
 
 const int m37710_cpu_device::m37710_irq_vectors[M37710_INTERRUPT_MAX] =
 {
@@ -474,50 +536,39 @@ void m37710_cpu_device::m37710_recalc_timer(int timer)
 	}
 }
 
-uint8_t m37710_cpu_device::port_r(offs_t offset)
+uint8_t m37710_cpu_device::get_port_reg(int p)
 {
-	int p = (offset & 0x1c) >> 1 | (offset & 0x01);
+	assert(p >= 0 && p < 11);
 
-	uint8_t result = 0;
-	if (p < 11)
-	{
-		if (BIT(offset, 1))
-			result = m_port_dir[p];
-		else
-		{
-			uint8_t d = m_port_dir[p];
-			if (d != 0xff)
-				result = (m_port_in_cb[p](0, ~d) & ~d) | (m_port_regs[p] & d);
-			else
-				result = m_port_regs[p];
-		}
-	}
-
-	LOGMASKED(LOG_PORTS, "port_r from %02x: Port P%d %s = %x\n", (int)offset + 0x02, p, BIT(offset, 1) ? "dir reg" : "reg", result);
-
-	return result;
+	uint8_t d = m_port_dir[p];
+	if (d != 0xff)
+		return (m_port_in_cb[p](0, ~d) & ~d) | (m_port_regs[p] & d);
+	else
+		return m_port_regs[p];
 }
 
-void m37710_cpu_device::port_w(offs_t offset, uint8_t data)
+uint8_t m37710_cpu_device::get_port_dir(int p)
 {
-	int p = (offset & 0x1c) >> 1 | (offset & 0x01);
+	assert(p >= 0 && p < 11);
 
-	if (p < 11)
-	{
-		LOGMASKED(LOG_PORTS, "port_w %x to %02x: Port P%d %s = %x\n", data, (int)offset + 0x02, p,
-			BIT(offset, 1) ? "dir reg" : "reg",
-			BIT(offset, 1) ? m_port_dir[p] : m_port_regs[p]);
+	return m_port_dir[p];
+}
 
-		if (BIT(offset, 1))
-			m_port_dir[p] = data;
-		else
-		{
-			uint8_t d = m_port_dir[p];
-			if (d != 0)
-				m_port_out_cb[p](0, data & d, d);
-			m_port_regs[p] = data;
-		}
-	}
+void m37710_cpu_device::set_port_reg(int p, uint8_t data)
+{
+	assert(p >= 0 && p < 11);
+
+	uint8_t d = m_port_dir[p];
+	if (d != 0)
+		m_port_out_cb[p](0, data & d, d);
+	m_port_regs[p] = data;
+}
+
+void m37710_cpu_device::set_port_dir(int p, uint8_t data)
+{
+	assert(p >= 0 && p < 11);
+
+	m_port_dir[p] = data;
 }
 
 void m37710_cpu_device::da_reg_w(offs_t offset, uint8_t data)
@@ -876,24 +927,22 @@ void m37710_cpu_device::dmac_control_w(offs_t offset, uint16_t data, uint16_t me
 	m_dmac_control = (data & mem_mask) | (m_timer_reg[offset] & ~mem_mask);
 }
 
-uint8_t m37710_cpu_device::int_control_r(offs_t offset)
+uint8_t m37710_cpu_device::get_int_control(int level)
 {
-	assert(offset < M37710_MASKABLE_INTERRUPTS);
-	int level = m37710_int_reg_map[offset];
+	assert(level < M37710_MASKABLE_INTERRUPTS);
 
-	//LOGMASKED(LOG_INT, "int_control_r from %02x: %s IRQ ctrl = %x (PC=%x)\n", (int)offset + 0x6c, m37710_intnames[level], m_int_control[level], REG_PB<<16 | REG_PC);
+	//LOGMASKED(LOG_INT, "int_control_r: %s IRQ ctrl = %x (PC=%x)\n", m37710_intnames[level], m_int_control[level], REG_PB<<16 | REG_PC);
 
 	uint8_t result = m_int_control[level];
 
 	return result;
 }
 
-void m37710_cpu_device::int_control_w(offs_t offset, uint8_t data)
+void m37710_cpu_device::set_int_control(int level, uint8_t data)
 {
-	assert(offset < M37710_MASKABLE_INTERRUPTS);
-	int level = m37710_int_reg_map[offset];
+	assert(level < M37710_MASKABLE_INTERRUPTS);
 
-	LOGMASKED(LOG_INT, "int_control_w %x to %02x: %s IRQ ctrl = %x\n", data, (int)offset + 0x6c, m37710_intnames[level], m_int_control[level]);
+	LOGMASKED(LOG_INT, "int_control_w %x: %s IRQ ctrl = %x\n", data, m37710_intnames[level], m_int_control[level]);
 
 	m_int_control[level] = data;
 

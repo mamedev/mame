@@ -600,6 +600,14 @@ ROM_START(coco)
 	ROM_LOAD("bas10.rom",   0x2000, 0x2000, CRC(00b50aaa) SHA1(1f08455cd48ce6a06132aea15c4778f264e19539))
 ROM_END
 
+ROM_START(trsvidtx)
+	ROM_REGION(0x8000,MAINCPU_TAG,0)
+	ROM_LOAD( "8041716-1.1.u13", 0x2000, 0x0800, BAD_DUMP CRC(7844793c) SHA1(4595f1ff9140974356fa60781caf201e5c464258) )
+	ROM_RELOAD(0x2800, 0x0800)
+	ROM_RELOAD(0x3000, 0x0800)
+	ROM_RELOAD(0x3800, 0x0800)
+ROM_END
+
 ROM_START(cocoe)
 	ROM_REGION(0x8000,MAINCPU_TAG,0)
 	ROM_LOAD("bas11.rom",   0x2000, 0x2000, CRC(6270955a) SHA1(cecb7c24ff1e0ab5836e4a7a8eb1b8e01f1fded3))
@@ -670,6 +678,7 @@ ROM_END
 
 //    YEAR   NAME       PARENT  COMPAT  MACHINE  INPUT    CLASS         INIT        COMPANY                         FULLNAME                               FLAGS
 COMP( 1980,  coco,      0,      0,      coco,    coco,    coco12_state, empty_init, "Tandy Radio Shack",            "Color Computer",                      0 )
+COMP( 1981,  trsvidtx,  coco,   0,      coco,    coco,    coco12_state, empty_init, "Tandy Radio Shack",            "Videotex", MACHINE_NOT_WORKING )
 COMP( 19??,  cocoh,     coco,   0,      cocoh,   coco,    coco12_state, empty_init, "Tandy Radio Shack",            "Color Computer (HD6309)",             MACHINE_UNOFFICIAL )
 COMP( 1981,  cocoe,     coco,   0,      cocoe,   coco,    coco12_state, empty_init, "Tandy Radio Shack",            "Color Computer (Extended BASIC 1.0)", 0 )
 COMP( 19??,  cocoeh,    coco,   0,      cocoeh,  coco,    coco12_state, empty_init, "Tandy Radio Shack",            "Color Computer (Extended BASIC 1.0; HD6309)", MACHINE_UNOFFICIAL )

@@ -155,10 +155,8 @@ void suna8_state::suna8_vh_start_common(bool has_text, GFXBANK_TYPE_T gfxbank_ty
 	}
 
 #if TILEMAPS
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(suna8_state::get_tile_info),this), TILEMAP_SCAN_COLS,
-
-								8, 8, 0x20*(m_has_text ? 4 : 16), 0x20);
-
+	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(suna8_state::get_tile_info)), TILEMAP_SCAN_COLS,
+			8, 8, 0x20*(m_has_text ? 4 : 16), 0x20);
 	m_bg_tilemap->set_transparent_pen(15);
 #endif
 }

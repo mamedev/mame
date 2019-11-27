@@ -128,7 +128,7 @@ void acorn_vidc10_device::device_config_complete()
 		screen().set_raw(clock() * 2 / 3, 1024,0,735, 624/2,0,292); // RiscOS 3 default screen settings
 
 	if (!screen().has_screen_update())
-		screen().set_screen_update(screen_update_rgb32_delegate(FUNC(acorn_vidc10_device::screen_update), this));
+		screen().set_screen_update(*this, FUNC(acorn_vidc10_device::screen_update));
 }
 
 //-------------------------------------------------

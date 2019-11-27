@@ -554,10 +554,10 @@ void hyprduel_state::init_hyprduel()
 	m_int_num = 0x02;
 
 	/* cpu synchronization (severe timings) */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xc0040e, 0xc00411, write16_delegate(FUNC(hyprduel_state::hyprduel_cpusync_trigger1_w),this));
-	m_subcpu->space(AS_PROGRAM).install_read_handler(0xc00408, 0xc00409, read16_delegate(FUNC(hyprduel_state::hyprduel_cpusync_trigger1_r),this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xc00408, 0xc00409, write16_delegate(FUNC(hyprduel_state::hyprduel_cpusync_trigger2_w),this));
-	m_subcpu->space(AS_PROGRAM).install_read_handler(0xfff34c, 0xfff34d, read16_delegate(FUNC(hyprduel_state::hyprduel_cpusync_trigger2_r),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xc0040e, 0xc00411, write16_delegate(*this, FUNC(hyprduel_state::hyprduel_cpusync_trigger1_w)));
+	m_subcpu->space(AS_PROGRAM).install_read_handler(0xc00408, 0xc00409, read16_delegate(*this, FUNC(hyprduel_state::hyprduel_cpusync_trigger1_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xc00408, 0xc00409, write16_delegate(*this, FUNC(hyprduel_state::hyprduel_cpusync_trigger2_w)));
+	m_subcpu->space(AS_PROGRAM).install_read_handler(0xfff34c, 0xfff34d, read16_delegate(*this, FUNC(hyprduel_state::hyprduel_cpusync_trigger2_r)));
 }
 
 void hyprduel_state::init_magerror()

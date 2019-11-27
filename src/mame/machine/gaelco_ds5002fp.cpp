@@ -44,8 +44,6 @@ void gaelco_ds5002fp_device::device_add_mconfig(machine_config &config)
 	mcu.set_addrmap(AS_PROGRAM, &gaelco_ds5002fp_device::dallas_rom);
 	mcu.set_addrmap(AS_IO, &gaelco_ds5002fp_device::dallas_ram);
 
-	config.m_perfect_cpu_quantum = subtag("mcu");
-
 	NVRAM(config, "sram", nvram_device::DEFAULT_ALL_0);
 }
 

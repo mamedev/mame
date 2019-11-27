@@ -62,7 +62,10 @@ void genpc_state::pcmda(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &genpc_state::pc8_io);
 	m_maincpu->set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
-	IBM5160_MOTHERBOARD(config, "mb", 0).set_cputag(m_maincpu);
+	ibm5160_mb_device &mb(IBM5160_MOTHERBOARD(config, "mb", 0));
+	mb.set_cputag(m_maincpu);
+	mb.int_callback().set_inputline(m_maincpu, 0);
+	mb.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, "mda", false); // FIXME: determine ISA bus clock
 	ISA8_SLOT(config, "isa2", 0, "mb:isa", pc_isa8_cards, "com", false);
@@ -213,6 +216,8 @@ ROM_START(pc)
 	ROMX_LOAD( "kt10bios.bin", 0xe000, 0x2000, CRC(94e9836e) SHA1(793a9359ffd6f0964aa25edce31a3f37aa0dadc8), ROM_BIOS(47))
 	ROM_SYSTEM_BIOS(48, "diag", "Ruud Baltissen's Diagnostics") // http://www.vcfed.org/forum/showthread.php?68214-Ruud-s-diagnostic-ROM-for-IBM-PC-XT-and-compatibles / use pcherc
 	ROMX_LOAD( "diagrom.bin", 0xe000, 0x2000, CRC(747b1853) SHA1(204a484bc83b3607d5e1404a2dbe629f5f3044b1), ROM_BIOS(48))
+	ROM_SYSTEM_BIOS(49, "081682", "08/16/1982")
+	ROMX_LOAD( "xt_rom_1_081682_clone.bin", 0xe000, 0x2000, CRC(cfce9b2c) SHA1(14145acb0aca2baf8a6f3c7613f4521fdf0cbe92), ROM_BIOS(49))
 ROM_END
 
 #define rom_pcmda    rom_pc

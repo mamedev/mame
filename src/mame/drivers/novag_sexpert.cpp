@@ -440,7 +440,7 @@ void sexpert_state::sexpert(machine_config &config)
 
 	HD44780(config, m_lcd, 0);
 	m_lcd->set_lcd_size(2, 8);
-	m_lcd->set_pixel_update_cb(FUNC(sexpert_state::lcd_pixel_update), this);
+	m_lcd->set_pixel_update_cb(FUNC(sexpert_state::lcd_pixel_update));
 
 	PWM_DISPLAY(config, m_display).set_size(8, 8);
 	config.set_default_layout(layout_novag_sexpert);

@@ -471,7 +471,7 @@ void konamigx_state::fantjour_dma_install()
 {
 	save_item(NAME(m_fantjour_dma));
 	save_item(NAME(m_prot_data));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xdb0000, 0xdb001f, write32_delegate(FUNC(konamigx_state::fantjour_dma_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xdb0000, 0xdb001f, write32_delegate(*this, FUNC(konamigx_state::fantjour_dma_w)));
 	memset(m_fantjour_dma, 0, sizeof(m_fantjour_dma));
 }
 

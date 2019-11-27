@@ -18,7 +18,7 @@
 #include "machine/z80sio.h"
 #include "bus/rs232/rs232.h"
 
-class hp98046_io_card_device : public hp9845_io_card_device
+class hp98046_io_card_device : public device_t, public device_hp9845_io_interface
 {
 public:
 	// construction/destruction

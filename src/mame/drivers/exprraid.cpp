@@ -501,7 +501,7 @@ void exprraid_state::exprraid(machine_config &config)
 	m_slave->set_addrmap(AS_PROGRAM, &exprraid_state::slave_map);
 	/* IRQs are caused by the YM3526 */
 
-	config.m_minimum_quantum = attotime::from_hz(12000);
+	config.set_maximum_quantum(attotime::from_hz(12000));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -856,13 +856,13 @@ void exprraid_state::init_exprraid()
 
 void exprraid_state::init_wexpressb2()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x3800, 0x3800, read8_delegate(FUNC(exprraid_state::vblank_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x3800, 0x3800, read8_delegate(*this, FUNC(exprraid_state::vblank_r)));
 	exprraid_gfx_expand();
 }
 
 void exprraid_state::init_wexpressb3()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xFFC0, 0xFFC0, read8_delegate(FUNC(exprraid_state::vblank_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xffc0, 0xffc0, read8_delegate(*this, FUNC(exprraid_state::vblank_r)));
 	exprraid_gfx_expand();
 }
 

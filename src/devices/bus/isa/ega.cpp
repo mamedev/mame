@@ -549,7 +549,7 @@ void isa8_ega_device::device_add_mconfig(machine_config &config)
 	CRTC_EGA(config, m_crtc_ega, 16.257_MHz_XTAL/8);
 	m_crtc_ega->set_screen(EGA_SCREEN_NAME);
 	m_crtc_ega->config_set_hpixels_per_column(8);
-	m_crtc_ega->set_row_update_callback(FUNC(isa8_ega_device::ega_update_row), this);
+	m_crtc_ega->set_row_update_callback(FUNC(isa8_ega_device::ega_update_row));
 	m_crtc_ega->res_out_de_callback().set(FUNC(isa8_ega_device::de_changed));
 	m_crtc_ega->res_out_hsync_callback().set(FUNC(isa8_ega_device::hsync_changed));
 	m_crtc_ega->res_out_vsync_callback().set(FUNC(isa8_ega_device::vsync_changed));
@@ -637,9 +637,9 @@ void isa8_ega_device::device_start()
 	m_plane[3] = m_videoram + 0x30000;
 
 	m_isa->install_rom(this, 0xc0000, 0xc3fff, "ega", "user2");
-	m_isa->install_device(0x3b0, 0x3bf, read8_delegate(FUNC(isa8_ega_device::pc_ega8_3b0_r), this), write8_delegate(FUNC(isa8_ega_device::pc_ega8_3b0_w), this));
-	m_isa->install_device(0x3c0, 0x3cf, read8_delegate(FUNC(isa8_ega_device::pc_ega8_3c0_r), this), write8_delegate(FUNC(isa8_ega_device::pc_ega8_3c0_w), this));
-	m_isa->install_device(0x3d0, 0x3df, read8_delegate(FUNC(isa8_ega_device::pc_ega8_3d0_r), this), write8_delegate(FUNC(isa8_ega_device::pc_ega8_3d0_w), this));
+	m_isa->install_device(0x3b0, 0x3bf, read8_delegate(*this, FUNC(isa8_ega_device::pc_ega8_3b0_r)), write8_delegate(*this, FUNC(isa8_ega_device::pc_ega8_3b0_w)));
+	m_isa->install_device(0x3c0, 0x3cf, read8_delegate(*this, FUNC(isa8_ega_device::pc_ega8_3c0_r)), write8_delegate(*this, FUNC(isa8_ega_device::pc_ega8_3c0_w)));
+	m_isa->install_device(0x3d0, 0x3df, read8_delegate(*this, FUNC(isa8_ega_device::pc_ega8_3d0_r)), write8_delegate(*this, FUNC(isa8_ega_device::pc_ega8_3d0_w)));
 }
 
 //-------------------------------------------------
@@ -693,7 +693,7 @@ void isa8_ega_device::install_banks()
 	case 0x00:      /* 0xA0000, 128KB */
 		if ( m_misc_output & 0x02 )
 		{
-			m_isa->install_memory(0xa0000, 0xbffff, read8_delegate(FUNC(isa8_ega_device::read), this), write8_delegate(FUNC(isa8_ega_device::write), this));
+			m_isa->install_memory(0xa0000, 0xbffff, read8_delegate(*this, FUNC(isa8_ega_device::read)), write8_delegate(*this, FUNC(isa8_ega_device::write)));
 		}
 		else
 		{
@@ -705,7 +705,7 @@ void isa8_ega_device::install_banks()
 	case 0x04:      /* 0xA0000, 64KB */
 		if ( m_misc_output & 0x02 )
 		{
-			m_isa->install_memory(0xa0000, 0xaffff, read8_delegate(FUNC(isa8_ega_device::read), this), write8_delegate(FUNC(isa8_ega_device::write), this));
+			m_isa->install_memory(0xa0000, 0xaffff, read8_delegate(*this, FUNC(isa8_ega_device::read)), write8_delegate(*this, FUNC(isa8_ega_device::write)));
 		}
 		else
 		{
@@ -718,7 +718,7 @@ void isa8_ega_device::install_banks()
 	case 0x08:      /* 0xB0000, 32KB */
 		if ( m_misc_output & 0x02 )
 		{
-			m_isa->install_memory(0xb0000, 0xb7fff, read8_delegate(FUNC(isa8_ega_device::read), this), write8_delegate(FUNC(isa8_ega_device::write), this));
+			m_isa->install_memory(0xb0000, 0xb7fff, read8_delegate(*this, FUNC(isa8_ega_device::read)), write8_delegate(*this, FUNC(isa8_ega_device::write)));
 		}
 		else
 		{
@@ -731,7 +731,7 @@ void isa8_ega_device::install_banks()
 	case 0x0c:      /* 0xB8000, 32KB */
 		if ( m_misc_output & 0x02 )
 		{
-			m_isa->install_memory(0xb8000, 0xbffff, read8_delegate(FUNC(isa8_ega_device::read), this), write8_delegate(FUNC(isa8_ega_device::write), this));
+			m_isa->install_memory(0xb8000, 0xbffff, read8_delegate(*this, FUNC(isa8_ega_device::read)), write8_delegate(*this, FUNC(isa8_ega_device::write)));
 		}
 		else
 		{

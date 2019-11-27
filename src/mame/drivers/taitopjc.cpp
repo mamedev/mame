@@ -244,8 +244,8 @@ void taitopjc_state::video_start()
 	m_screen_ram = std::make_unique<uint32_t[]>(0x40000);
 	m_pal_ram = std::make_unique<uint32_t[]>(0x8000);
 
-	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(taitopjc_state::tile_get_info),this), tilemap_mapper_delegate(FUNC(taitopjc_state::tile_scan_layer0),this), 16, 16, 32, 32);
-	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(taitopjc_state::tile_get_info),this), tilemap_mapper_delegate(FUNC(taitopjc_state::tile_scan_layer1),this), 16, 16, 32, 32);
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(taitopjc_state::tile_get_info)), tilemap_mapper_delegate(*this, FUNC(taitopjc_state::tile_scan_layer0)), 16, 16, 32, 32);
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(taitopjc_state::tile_get_info)), tilemap_mapper_delegate(*this, FUNC(taitopjc_state::tile_scan_layer1)), 16, 16, 32, 32);
 	m_tilemap[0]->set_transparent_pen(0);
 	m_tilemap[1]->set_transparent_pen(1);
 
@@ -638,7 +638,7 @@ void taitopjc_state::tlcs900h_mem(address_map &map)
 	map(0x044000, 0x045fff).ram().share("nvram");
 	map(0x060000, 0x061fff).rw(FUNC(taitopjc_state::tlcs_common_r), FUNC(taitopjc_state::tlcs_common_w));
 	map(0x06c000, 0x06c00f).w(FUNC(taitopjc_state::tlcs_unk_w));
-	map(0xfc0000, 0xffffff).rom().region("io_cpu", 0);
+	map(0xfc0000, 0xffffff).rom().region("iocpu", 0);
 }
 
 void taitopjc_state::mn10200_map(address_map &map)
@@ -686,13 +686,13 @@ WRITE16_MEMBER(taitopjc_state::dsp_romh_w)
 
 void taitopjc_state::tms_program_map(address_map &map)
 {
-	map(0x0000, 0x3fff).rom().region("user2", 0);
-	map(0x4c00, 0xefff).rom().region("user2", 0x9800);
+	map(0x0000, 0x3fff).rom().region("dspdata", 0);
+	map(0x4c00, 0xefff).rom().region("dspdata", 0x9800);
 }
 
 void taitopjc_state::tms_data_map(address_map &map)
 {
-	map(0x4000, 0x6fff).rom().region("user2", 0x8000);
+	map(0x4000, 0x6fff).rom().region("dspdata", 0x8000);
 	map(0x7000, 0xefff).ram();
 	map(0xf000, 0xffff).rw(FUNC(taitopjc_state::tms_dspshare_r), FUNC(taitopjc_state::tms_dspshare_w));
 }
@@ -797,7 +797,7 @@ void taitopjc_state::taitopjc(machine_config &config)
 	MN1020012A(config, m_soundcpu, 10000000); /* MN1020819DA sound CPU - NOTE: May have 64kB internal ROM */
 	m_soundcpu->set_addrmap(AS_PROGRAM, &taitopjc_state::mn10200_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -818,11 +818,11 @@ void taitopjc_state::taitopjc(machine_config &config)
 
 void taitopjc_state::init_optiger()
 {
-	uint8_t *rom = (uint8_t*)memregion("io_cpu")->base();
+	uint8_t *rom = (uint8_t*)memregion("iocpu")->base();
 
 	// skip sound check
-	rom[0x217] = 0x00;
-	rom[0x218] = 0x00;
+	rom[BYTE_XOR_LE(0x217)] = 0x00;
+	rom[BYTE_XOR_LE(0x218)] = 0x00;
 
 #if 0
 	uint32_t *mr = (uint32_t*)memregion("user1")->base();
@@ -839,11 +839,11 @@ ROM_START( optiger )
 	ROM_LOAD32_BYTE( "e63-31-1_p-lh.8",  0x000002, 0x080000, CRC(ad69e649) SHA1(9fc853d2cb6e7cac87dc06bad91048f191b799c5) )
 	ROM_LOAD32_BYTE( "e63-30-1_p-ll.7",  0x000003, 0x080000, CRC(a6183479) SHA1(e556c3edf100342079e680ec666f018fca7a82b0) )
 
-	ROM_REGION16_BE( 0x20000, "user2", 0 )
-	ROM_LOAD16_BYTE( "e63-04_l.29",  0x000001, 0x010000, CRC(eccae391) SHA1(e5293c16342cace54dc4b6dfb827558e18ac25a4) )
-	ROM_LOAD16_BYTE( "e63-03_h.28",  0x000000, 0x010000, CRC(58fce52f) SHA1(1e3d9ee034b25e658ca45a8b900de2aa54b00135) )
+	ROM_REGION16_LE( 0x20000, "dspdata", 0 )
+	ROM_LOAD16_BYTE( "e63-04_l.29",  0x000000, 0x010000, CRC(eccae391) SHA1(e5293c16342cace54dc4b6dfb827558e18ac25a4) )
+	ROM_LOAD16_BYTE( "e63-03_h.28",  0x000001, 0x010000, CRC(58fce52f) SHA1(1e3d9ee034b25e658ca45a8b900de2aa54b00135) )
 
-	ROM_REGION( 0x40000, "io_cpu", 0 )
+	ROM_REGION( 0x40000, "iocpu", 0 )
 	ROM_LOAD16_BYTE( "e63-28-1_0.59", 0x000000, 0x020000, CRC(ef41ffaf) SHA1(419621f354f548180d37961b861304c469e43a65) )
 	ROM_LOAD16_BYTE( "e63-27-1_1.58", 0x000001, 0x020000, CRC(facc17a7) SHA1(40d69840cfcfe5a509d69824c2994de56a3c6ece) )
 

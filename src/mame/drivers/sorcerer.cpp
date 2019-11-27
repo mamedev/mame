@@ -169,6 +169,11 @@ Exidy Sorcerer Video/Disk Unit:
 #include "softlist.h"
 #include "speaker.h"
 
+#define FLOPPY_0 "floppy0"
+#define FLOPPY_1 "floppy1"
+#define FLOPPY_2 "floppy2"
+#define FLOPPY_3 "floppy3"
+
 
 void sorcerer_state::sorcerer_mem(address_map &map)
 {
@@ -488,8 +493,8 @@ void sorcerer_state::sorcerer(machine_config &config)
 	INPUT_BUFFER(config, "cent_status_in");
 
 	/* quickload */
-	SNAPSHOT(config, "snapshot", "snp", attotime::from_seconds(2)).set_load_callback(FUNC(sorcerer_state::snapshot_cb), this);
-	QUICKLOAD(config, "quickload", "bin", attotime::from_seconds(3)).set_load_callback(FUNC(sorcerer_state::quickload_cb), this);
+	SNAPSHOT(config, "snapshot", "snp", attotime::from_seconds(2)).set_load_callback(FUNC(sorcerer_state::snapshot_cb));
+	QUICKLOAD(config, "quickload", "bin", attotime::from_seconds(3)).set_load_callback(FUNC(sorcerer_state::quickload_cb));
 
 	CASSETTE(config, m_cassette1);
 	m_cassette1->set_formats(sorcerer_cassette_formats);
@@ -528,8 +533,12 @@ void sorcerer_state::sorcererd(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(sorcerer_state, sorcererd )
 
 	MICROPOLIS(config, m_fdc, 0);
-	m_fdc->set_default_drive_tags();
-	legacy_floppy_image_device::add_4drives(config, &sorcerer_floppy_interface);
+	m_fdc->set_drive_tags(FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3);
+
+	LEGACY_FLOPPY(config, FLOPPY_0, 0, &sorcerer_floppy_interface);
+	LEGACY_FLOPPY(config, FLOPPY_1, 0, &sorcerer_floppy_interface);
+	LEGACY_FLOPPY(config, FLOPPY_2, 0, &sorcerer_floppy_interface);
+	LEGACY_FLOPPY(config, FLOPPY_3, 0, &sorcerer_floppy_interface);
 
 	FD1793(config, m_fdc2, 8_MHz_XTAL / 8);  // confirmed clock
 	m_fdc2->set_force_ready(true); // should be able to get rid of this when fdc issue is fixed

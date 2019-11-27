@@ -388,7 +388,7 @@ void taotaido_state::taotaido(machine_config &config)
 	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x800);
 
 	VSYSTEM_SPR(config, m_spr, 0);
-	m_spr->set_tile_indirect_cb(FUNC(taotaido_state::tile_callback), this);
+	m_spr->set_tile_indirect_cb(FUNC(taotaido_state::tile_callback));
 	m_spr->set_gfx_region(0);
 	m_spr->set_gfxdecode_tag(m_gfxdecode);
 

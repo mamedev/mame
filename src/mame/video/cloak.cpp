@@ -161,7 +161,7 @@ TILE_GET_INFO_MEMBER(cloak_state::get_bg_tile_info)
 
 void cloak_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cloak_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cloak_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_bitmap_videoram1 = std::make_unique<uint8_t[]>(256*256);
 	m_bitmap_videoram2 = std::make_unique<uint8_t[]>(256*256);

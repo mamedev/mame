@@ -347,7 +347,7 @@ void taxidriv_state::taxidriv(machine_config &config)
 	audiocpu.set_addrmap(AS_IO, &taxidriv_state::cpu3_port_map);
 	audiocpu.set_vblank_int("screen", FUNC(taxidriv_state::irq0_line_hold));   /* ??? */
 
-	config.m_minimum_quantum = attotime::from_hz(6000);  /* 100 CPU slices per frame - a high value to ensure proper */
+	config.set_maximum_quantum(attotime::from_hz(6000));  /* 100 CPU slices per frame - a high value to ensure proper */
 							/* synchronization of the CPUs */
 
 	i8255_device &ppi0(I8255A(config, "ppi8255_0"));

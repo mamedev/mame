@@ -191,7 +191,7 @@ TILE_GET_INFO_MEMBER(amusco_state::get_bg_tile_info)
 
 void amusco_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(amusco_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 10, 74, 24);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(amusco_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 10, 74, 24);
 	m_blink_state = false;
 
 	m_videoram = std::make_unique<uint8_t []>(videoram_size);
@@ -589,10 +589,9 @@ void amusco_state::amusco(machine_config &config)
 	m_crtc->set_screen(m_screen);
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
-	m_crtc->set_on_update_addr_change_callback(FUNC(amusco_state::crtc_addr), this);
+	m_crtc->set_on_update_addr_change_callback(FUNC(amusco_state::crtc_addr));
 	m_crtc->out_de_callback().set(m_pic, FUNC(pic8259_device::ir1_w)); // IRQ1 sets 0x918 bit 3
-	m_crtc->set_update_row_callback(FUNC(amusco_state::update_row), this);
-
+	m_crtc->set_update_row_callback(FUNC(amusco_state::update_row));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

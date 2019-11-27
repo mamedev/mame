@@ -1904,7 +1904,7 @@ void dec8_state::lastmisn(machine_config &config)
 	m_mcu->port_out_cb<2>().set(FUNC(dec8_state::shackled_mcu_to_main_w));
 	m_mcu->port_in_cb<3>().set_ioport("I8751");
 
-	config.m_minimum_quantum = attotime::from_hz(12000);
+	config.set_maximum_quantum(attotime::from_hz(12000));
 
 	INPUT_MERGER_ANY_LOW(config, "coin").output_handler().set(FUNC(dec8_state::shackled_coin_irq));
 
@@ -1963,8 +1963,8 @@ void dec8_state::shackled(machine_config &config)
 	m_mcu->port_out_cb<2>().set(FUNC(dec8_state::shackled_mcu_to_main_w));
 	m_mcu->port_in_cb<3>().set_ioport("I8751");
 
-//  config.m_minimum_quantum = attotime::from_hz(100000);
-	config.m_perfect_cpu_quantum = subtag("maincpu"); // needs heavy sync, otherwise one of the two CPUs will miss an IRQ and cause the game to hang
+//  config.set_maximum_quantum(attotime::from_hz(100000));
+	config.set_perfect_quantum(m_maincpu); // needs heavy sync, otherwise one of the two CPUs will miss an IRQ and cause the game to hang
 
 	INPUT_MERGER_ANY_LOW(config, "coin").output_handler().set(FUNC(dec8_state::shackled_coin_irq));
 
@@ -2024,7 +2024,7 @@ void dec8_state::gondo(machine_config &config)
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
 	DECO_KARNOVSPRITES(config, m_spritegen_krn, 0);
-	m_spritegen_krn->set_colpri_callback(FUNC(dec8_state::gondo_colpri_cb), this);
+	m_spritegen_krn->set_colpri_callback(FUNC(dec8_state::gondo_colpri_cb));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 //  m_screen->set_refresh_hz(58);
@@ -2156,7 +2156,7 @@ void dec8_state::ghostb(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ghostb);
 	DECO_RMC3(config, m_palette, 0, 1024); // xxxxBBBBGGGGRRRR with custom weighting
 	m_palette->set_prom_region("proms");
-	m_palette->set_init("palette", FUNC(deco_rmc3_device::palette_init_proms));
+	m_palette->set_init(m_palette, FUNC(deco_rmc3_device::palette_init_proms));
 	MCFG_VIDEO_START_OVERRIDE(dec8_state,ghostb)
 
 	/* sound hardware */
@@ -2194,7 +2194,7 @@ void dec8_state::csilver(machine_config &config)
 	M6502(config, m_audiocpu, XTAL(12'000'000)/8); /* verified on pcb */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &dec8_state::csilver_s_map); /* NMIs are caused by the main CPU */
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
 	BUFFERED_SPRITERAM8(config, m_spriteram);
@@ -2249,7 +2249,7 @@ void dec8_state::oscar(machine_config &config)
 	DECO_222(config, m_audiocpu, XTAL(12'000'000)/8); // IC labeled "C10707-1"
 	m_audiocpu->set_addrmap(AS_PROGRAM, &dec8_state::oscar_s_map); /* NMIs are caused by the main CPU */
 
-	config.m_minimum_quantum = attotime::from_hz(2400); /* 40 CPU slices per frame */
+	config.set_maximum_quantum(attotime::from_hz(2400)); /* 40 CPU slices per frame */
 
 	INPUT_MERGER_ANY_LOW(config, "coin").output_handler().set(FUNC(dec8_state::oscar_coin_irq)); // 1S1588 x3 (D1-D3) + RCDM-I5
 
@@ -2308,7 +2308,7 @@ void dec8_state::srdarwin(machine_config &config)
 	m_mcu->port_out_cb<2>().set(FUNC(dec8_state::srdarwin_mcu_to_main_w));
 	m_mcu->port_in_cb<3>().set_ioport("I8751");
 
-	config.m_perfect_cpu_quantum = subtag("maincpu"); /* needed for stability with emulated MCU or sometimes commands get missed and game crashes at bosses */
+	config.set_perfect_quantum(m_maincpu); /* needed for stability with emulated MCU or sometimes commands get missed and game crashes at bosses */
 
 	/* video hardware */
 	BUFFERED_SPRITERAM8(config, m_spriteram);
@@ -2365,7 +2365,7 @@ void dec8_state::cobracom(machine_config &config)
 	m_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO_MXC06(config, m_spritegen_mxc, 0);
-	m_spritegen_mxc->set_colpri_callback(FUNC(dec8_state::cobracom_colpri_cb), this);
+	m_spritegen_mxc->set_colpri_callback(FUNC(dec8_state::cobracom_colpri_cb));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 //  m_screen->set_refresh_hz(58);

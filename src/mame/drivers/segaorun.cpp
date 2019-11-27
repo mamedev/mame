@@ -445,32 +445,32 @@ void segaorun_state::memory_mapper(sega_315_5195_mapper_device &mapper, uint8_t 
 	switch (index)
 	{
 		case 5:
-			mapper.map_as_handler(0x90000, 0x10000, 0xf00000, read16_delegate(FUNC(segaorun_state::sega_road_control_0_r), this), write16_delegate(FUNC(segaorun_state::sega_road_control_0_w), this));
-			mapper.map_as_ram(0x80000, 0x01000, 0xf0f000, "segaic16road:roadram", write16_delegate());
-			mapper.map_as_ram(0x60000, 0x08000, 0xf18000, "cpu1ram", write16_delegate());
-			mapper.map_as_ram(0x00000, 0x60000, 0xf00000, "cpu1rom", write16_delegate(FUNC(segaorun_state::nop_w), this));
+			mapper.map_as_handler(0x90000, 0x10000, 0xf00000, read16_delegate(*this, FUNC(segaorun_state::sega_road_control_0_r)), write16_delegate(*this, FUNC(segaorun_state::sega_road_control_0_w)));
+			mapper.map_as_ram(0x80000, 0x01000, 0xf0f000, "segaic16road:roadram", write16_delegate(*this));
+			mapper.map_as_ram(0x60000, 0x08000, 0xf18000, "cpu1ram", write16_delegate(*this));
+			mapper.map_as_ram(0x00000, 0x60000, 0xf00000, "cpu1rom", write16_delegate(*this, FUNC(segaorun_state::nop_w)));
 			break;
 
 		case 4:
-			mapper.map_as_handler(0x90000, 0x10000, 0xf00000, read16_delegate(FUNC(segaorun_state::misc_io_r), this), write16_delegate(FUNC(segaorun_state::misc_io_w), this));
+			mapper.map_as_handler(0x90000, 0x10000, 0xf00000, read16_delegate(*this, FUNC(segaorun_state::misc_io_r)), write16_delegate(*this, FUNC(segaorun_state::misc_io_w)));
 			break;
 
 		case 3:
-			mapper.map_as_ram(0x00000, 0x01000, 0xfff000, "sprites", write16_delegate());
+			mapper.map_as_ram(0x00000, 0x01000, 0xfff000, "sprites", write16_delegate(*this));
 			break;
 
 		case 2:
-			mapper.map_as_ram(0x00000, 0x02000, 0xffe000, "paletteram", write16_delegate(FUNC(segaorun_state::paletteram_w), this));
+			mapper.map_as_ram(0x00000, 0x02000, 0xffe000, "paletteram", write16_delegate(*this, FUNC(segaorun_state::paletteram_w)));
 			break;
 
 		case 1:
-			mapper.map_as_ram(0x00000, 0x10000, 0xfe0000, "tileram", write16_delegate(FUNC(segaorun_state::tileram_w), this));
-			mapper.map_as_ram(0x10000, 0x01000, 0xfef000, "textram", write16_delegate(FUNC(segaorun_state::textram_w), this));
+			mapper.map_as_ram(0x00000, 0x10000, 0xfe0000, "tileram", write16_delegate(*this, FUNC(segaorun_state::tileram_w)));
+			mapper.map_as_ram(0x10000, 0x01000, 0xfef000, "textram", write16_delegate(*this, FUNC(segaorun_state::textram_w)));
 			break;
 
 		case 0:
-			mapper.map_as_ram(0x60000, 0x08000, 0xf98000, "workram", write16_delegate());
-			mapper.map_as_rom(0x00000, 0x60000, 0xf80000, "rom0base", "decrypted_rom0base", 0x00000, write16_delegate());
+			mapper.map_as_ram(0x60000, 0x08000, 0xf98000, "workram", write16_delegate(*this));
+			mapper.map_as_rom(0x00000, 0x60000, 0xf80000, "rom0base", "decrypted_rom0base", 0x00000, write16_delegate(*this));
 			break;
 	}
 }
@@ -537,7 +537,7 @@ void segaorun_state::machine_reset()
 	m_segaic16vid->tilemap_reset(*m_screen);
 
 	// hook the RESET line, which resets CPU #1
-	m_maincpu->set_reset_callback(write_line_delegate(FUNC(segaorun_state::m68k_reset_callback),this));
+	m_maincpu->set_reset_callback(*this, FUNC(segaorun_state::m68k_reset_callback));
 
 	// start timers to track interrupts
 	m_scanline_timer->adjust(m_screen->time_until_pos(223), 223);
@@ -1167,7 +1167,7 @@ void segaorun_state::outrun_base(machine_config &config)
 	m_soundcpu->set_addrmap(AS_PROGRAM, &segaorun_state::sound_map);
 	m_soundcpu->set_addrmap(AS_IO, &segaorun_state::sound_portmap);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	WATCHDOG_TIMER(config, m_watchdog);
 
@@ -1183,7 +1183,7 @@ void segaorun_state::outrun_base(machine_config &config)
 	m_adc->vin_callback().set(FUNC(segaorun_state::analog_r));
 
 	SEGA_315_5195_MEM_MAPPER(config, m_mapper, MASTER_CLOCK/4, m_maincpu);
-	m_mapper->set_mapper(FUNC(segaorun_state::memory_mapper), this);
+	m_mapper->set_mapper(FUNC(segaorun_state::memory_mapper));
 	m_mapper->pbf().set_inputline(m_soundcpu, INPUT_LINE_NMI);
 
 	// video hardware
@@ -2923,8 +2923,8 @@ void segaorun_state::init_generic()
 void segaorun_state::init_outrun()
 {
 	init_generic();
-	m_custom_io_r = read16_delegate(FUNC(segaorun_state::outrun_custom_io_r), this);
-	m_custom_io_w = write16_delegate(FUNC(segaorun_state::outrun_custom_io_w), this);
+	m_custom_io_r = read16_delegate(*this, FUNC(segaorun_state::outrun_custom_io_r));
+	m_custom_io_w = write16_delegate(*this, FUNC(segaorun_state::outrun_custom_io_w));
 }
 
 void segaorun_state::init_outrunb()
@@ -2969,8 +2969,8 @@ void segaorun_state::init_shangon()
 {
 	init_generic();
 	m_shangon_video = true;
-	m_custom_io_r = read16_delegate(FUNC(segaorun_state::shangon_custom_io_r), this);
-	m_custom_io_w = write16_delegate(FUNC(segaorun_state::shangon_custom_io_w), this);
+	m_custom_io_r = read16_delegate(*this, FUNC(segaorun_state::shangon_custom_io_r));
+	m_custom_io_w = write16_delegate(*this, FUNC(segaorun_state::shangon_custom_io_w));
 }
 
 

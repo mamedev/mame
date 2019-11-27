@@ -36,7 +36,7 @@ DEFINE_DEVICE_TYPE(PC_KBDC_SLOT, pc_kbdc_slot_device, "pc_kbdc_slot", "PC keyboa
 //-------------------------------------------------
 pc_kbdc_slot_device::pc_kbdc_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, PC_KBDC_SLOT, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_pc_kbd_interface>(mconfig, *this),
 	m_kbdc_device(nullptr)
 {
 }
@@ -48,8 +48,7 @@ pc_kbdc_slot_device::pc_kbdc_slot_device(const machine_config &mconfig, const ch
 
 void pc_kbdc_slot_device::device_start()
 {
-	device_pc_kbd_interface *pc_kbd = dynamic_cast<device_pc_kbd_interface *>(get_card_device());
-
+	device_pc_kbd_interface *const pc_kbd = get_card_device();
 	if (pc_kbd)
 		pc_kbd->set_pc_kbdc(m_kbdc_device);
 }
@@ -189,7 +188,7 @@ WRITE_LINE_MEMBER(pc_kbdc_device::data_write_from_kb)
 //-------------------------------------------------
 
 device_pc_kbd_interface::device_pc_kbd_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device)
+	: device_interface(device, "pckbd")
 	, m_pc_kbdc(nullptr)
 	, m_pc_kbdc_tag(nullptr)
 {

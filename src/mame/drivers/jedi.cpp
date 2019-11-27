@@ -326,7 +326,7 @@ void jedi_state::jedi(machine_config &config)
 	M6502(config, m_maincpu, JEDI_MAIN_CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &jedi_state::main_map);
 
-	config.m_minimum_quantum = attotime::from_hz(240);
+	config.set_maximum_quantum(attotime::from_hz(240));
 
 	X2212(config, "novram12b");
 	X2212(config, "novram12c");

@@ -140,7 +140,7 @@ INPUT_PORTS_END
 void myvision_state::machine_start()
 {
 	if (m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x5fff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x5fff, read8sm_delegate(*m_cart, FUNC(generic_slot_device::read_rom)));
 
 	save_item(NAME(m_column));
 }
@@ -239,7 +239,7 @@ void myvision_state::myvision(machine_config &config)
 
 	/* cartridge */
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "myvision_cart"));
-	cartslot.set_device_load(FUNC(myvision_state::cart_load), this);
+	cartslot.set_device_load(FUNC(myvision_state::cart_load));
 	//cartslot.set_must_be_loaded(true);
 
 	/* software lists */

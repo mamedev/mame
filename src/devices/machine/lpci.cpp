@@ -93,9 +93,13 @@ DEFINE_DEVICE_TYPE(PCI_BUS_LEGACY, pci_bus_legacy_device, "pci_bus_legacy", "PCI
 //-------------------------------------------------
 pci_bus_legacy_device::pci_bus_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, PCI_BUS_LEGACY, tag, owner, clock),
-	m_father(nullptr)
+	m_read_callback(*this),
+	m_write_callback(*this),
+	m_father(nullptr),
+	m_siblings_count(0)
 {
-	m_siblings_count = 0;
+	std::fill(std::begin(m_siblings), std::end(m_siblings), nullptr);
+	std::fill(std::begin(m_siblings_busnum), std::end(m_siblings_busnum), 0);
 }
 
 /***************************************************************************
@@ -255,12 +259,10 @@ void pci_bus_legacy_device::device_start()
 	m_devicenum = -1;
 
 	/* find all our device callbacks */
-	for (auto &cb : m_read_callback)
-		cb.bind_relative_to(*owner());
-	for (auto &cb : m_write_callback)
-		cb.bind_relative_to(*owner());
+	m_read_callback.resolve_all();
+	m_write_callback.resolve_all();
 
-	if (m_father != nullptr) {
+	if (m_father) {
 		pci_bus_legacy_device *father = machine().device<pci_bus_legacy_device>(m_father);
 		if (father)
 			father->add_sibling(this, m_busnum);

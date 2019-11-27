@@ -32,13 +32,14 @@ control registers
 #include "k007342.h"
 #include "konami_helper.h"
 
-#define VERBOSE 0
-#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
+//#define VERBOSE 1
+#include "logmacro.h"
+
 
 DEFINE_DEVICE_TYPE(K007342, k007342_device, "k007342", "K007342 Video Controller")
 
-k007342_device::k007342_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, K007342, tag, owner, clock),
+k007342_device::k007342_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, K007342, tag, owner, clock),
 	m_ram(nullptr),
 	m_scroll_ram(nullptr),
 	m_videoram_0(nullptr),
@@ -52,6 +53,7 @@ k007342_device::k007342_device(const machine_config &mconfig, const char *tag, d
 	//m_scrollx[2],
 	//m_scrolly[2],
 	m_gfxdecode(*this, finder_base::DUMMY_TAG),
+	m_callback(*this),
 	m_gfxnum(0)
 {
 }
@@ -66,10 +68,10 @@ void k007342_device::device_start()
 		throw device_missing_dependencies();
 
 	// bind the init function
-	m_callback.bind_relative_to(*owner());
+	m_callback.resolve();
 
-	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(k007342_device::get_tile_info0),this), tilemap_mapper_delegate(FUNC(k007342_device::scan),this), 8, 8, 64, 32);
-	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(k007342_device::get_tile_info1),this), tilemap_mapper_delegate(FUNC(k007342_device::scan),this), 8, 8, 64, 32);
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(k007342_device::get_tile_info0)), tilemap_mapper_delegate(*this, FUNC(k007342_device::scan)), 8, 8, 64, 32);
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(k007342_device::get_tile_info1)), tilemap_mapper_delegate(*this, FUNC(k007342_device::scan)), 8, 8, 64, 32);
 
 	m_ram = make_unique_clear<uint8_t[]>(0x2000);
 	m_scroll_ram = make_unique_clear<uint8_t[]>(0x0200);

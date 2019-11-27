@@ -57,7 +57,7 @@
 		</part>
 	</software>
 	<software name="edasm">
-		<description>Editor Assembler</description>
+		<description>Edit-80</description>
 		<year>198?</year>
 		<publisher>Dick Smith Electronics</publisher>
 		<info name="serial" value="X-3791" /><!-- 437L1 -->

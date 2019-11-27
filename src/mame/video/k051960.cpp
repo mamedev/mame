@@ -136,6 +136,7 @@ k051960_device::k051960_device(const machine_config &mconfig, const char *tag, d
 	, m_ram(nullptr)
 	, m_sprite_rom(*this, DEVICE_SELF)
 	, m_scanline_timer(nullptr)
+	, m_k051960_cb(*this)
 	, m_irq_handler(*this)
 	, m_firq_handler(*this)
 	, m_nmi_handler(*this)
@@ -180,6 +181,9 @@ void k051960_device::device_start()
 	if (!palette().device().started())
 		throw device_missing_dependencies();
 
+	// bind callbacks
+	m_k051960_cb.resolve();
+
 	// allocate scanline timer and start at first scanline
 	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(k051960_device::scanline_callback), this));
 	m_scanline_timer->adjust(screen().time_until_pos(0));
@@ -191,9 +195,6 @@ void k051960_device::device_start()
 		popmessage("driver should use VIDEO_HAS_SHADOWS");
 
 	m_ram = make_unique_clear<uint8_t[]>(0x400);
-
-	// bind callbacks
-	m_k051960_cb.bind_relative_to(*owner());
 
 	// resolve callbacks
 	m_irq_handler.resolve_safe();

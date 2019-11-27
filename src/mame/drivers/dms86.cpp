@@ -180,7 +180,7 @@ void dms86_state::dms86(machine_config &config)
 
 /* ROM definition */
 ROM_START( dms86 )
-	ROM_REGION( 0x2000, "roms", ROMREGION_ERASEFF )
+	ROM_REGION16_LE( 0x2000, "roms", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "hns-86_54-8678.bin", 0x0000, 0x1000, CRC(95f58e1c) SHA1(6fc8f087f0c887d8b429612cd035c6c1faab570c))
 	ROM_LOAD16_BYTE( "hns-86_54-8677.bin", 0x0001, 0x1000, CRC(78fad756) SHA1(ddcbff1569ec6975b8489935cdcfa80eba413502))
 ROM_END

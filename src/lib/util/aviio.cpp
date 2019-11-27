@@ -3550,7 +3550,8 @@ avi_file::error avi_file_impl::soundbuf_flush(bool only_flush_full)
 	if (processedsamples > 0)
 	{
 		/* first account for the samples we processed */
-		std::memmove(&m_soundbuf[0], &m_soundbuf[processedsamples * stream->channels()], (m_soundbuf_samples - processedsamples) * bytes_per_sample);
+		if (m_soundbuf_samples > processedsamples)
+			std::memmove(&m_soundbuf[0], &m_soundbuf[processedsamples * stream->channels()], (m_soundbuf_samples - processedsamples) * bytes_per_sample);
 		for (int channel = 0; channel < stream->channels(); channel++)
 			m_soundbuf_chansamples[channel] -= processedsamples;
 	}

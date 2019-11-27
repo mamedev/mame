@@ -150,9 +150,12 @@ public:
 		, m_acia_cas(*this, "acia_cas")
 		, m_brg(*this, "brg")
 		, m_cass(*this, "cassette")
-		, m_tx_rate(*this, "tx_baud")
-		, m_rx_rate(*this, "rx_baud")
-		, m_cas_rate(*this, "cas_rate")
+		, m_console_enable(*this, "CONSOLE_ENABLE")
+		, m_rs232_tx_baud(*this, "RS232_TX_BAUD")
+		, m_rs232_rx_baud(*this, "RS232_RX_BAUD")
+		, m_rs232_cts_route(*this, "RS232_CTS_ROUTE")
+		, m_rs232_dcd_route(*this, "RS232_DCD_ROUTE")
+		, m_cas_baud(*this, "CAS_BAUD")
 		  // MEK68R2
 		, m_mc6845(*this, "mc6845")
 		, m_palette(*this, "palette")
@@ -160,9 +163,9 @@ public:
 		, m_p_chargen(*this, "chargen")
 		, m_video_ram(*this, "videoram")
 		, m_r2_pia(*this, "r2_pia")
-		, m_r2_mode(*this, "r2_mode")
-		, m_r2_display_nationality(*this, "r2_display_nationality")
-		, m_r2_display_format(*this, "r2_display_format")
+		, m_r2_mode(*this, "R2_MODE")
+		, m_r2_display_nationality(*this, "R2_DISPLAY_NATIONALITY")
+		, m_r2_display_format(*this, "R2_DISPLAY_FORMAT")
 	{ }
 
 	void mekd3(machine_config &config);
@@ -170,6 +173,8 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(reset_key_w);
 	DECLARE_INPUT_CHANGED_MEMBER(keypad_changed);
+	DECLARE_INPUT_CHANGED_MEMBER(rs232_cts_route_change);
+	DECLARE_INPUT_CHANGED_MEMBER(rs232_dcd_route_change);
 
 private:
 	DECLARE_READ_LINE_MEMBER(keypad_cb1_r);
@@ -207,6 +212,11 @@ private:
 
 	// MEK68IO
 
+	DECLARE_WRITE_LINE_MEMBER(rs232_route_cts);
+	DECLARE_WRITE_LINE_MEMBER(rs232_route_dcd);
+	int m_cts;
+	int m_dcd;
+
 	// Clocks
 	DECLARE_WRITE_LINE_MEMBER(write_f1_clock);
 	DECLARE_WRITE_LINE_MEMBER(write_f2_clock);
@@ -228,9 +238,12 @@ private:
 	required_device<acia6850_device> m_acia_cas;
 	required_device<mc14411_device> m_brg;
 	required_device<cassette_image_device> m_cass;
-	required_ioport m_tx_rate;
-	required_ioport m_rx_rate;
-	required_ioport m_cas_rate;
+	required_ioport m_console_enable;
+	required_ioport m_rs232_tx_baud;
+	required_ioport m_rs232_rx_baud;
+	required_ioport m_rs232_cts_route;
+	required_ioport m_rs232_dcd_route;
+	required_ioport m_cas_baud;
 	uint8_t m_cass_rx_period, m_cass_txcount;
 	bool m_cass_in, m_cass_inbit, m_cass_txbit, m_cass_last_txbit;
 
@@ -366,39 +379,50 @@ static INPUT_PORTS_START(mekd3)
 
 	// MEK68IO
 
-	PORT_START("console_enable")
+	PORT_START("CONSOLE_ENABLE")
 	PORT_DIPNAME(0x01, 0x00, "RS-232 console")
 	PORT_DIPSETTING(0x01, DEF_STR(On))
 	PORT_DIPSETTING(0x00, DEF_STR(Off))
 
 	// RS232 baud rates available for use at socket 1.
-	PORT_START("tx_baud")
+	PORT_START("RS232_TX_BAUD")
 	PORT_CONFNAME(0x3f, 1, "RS232 TX Baud Rate")
-	PORT_CONFSETTING(0x01, "9600")
-	PORT_CONFSETTING(0x02, "4800")
-	PORT_CONFSETTING(0x04, "3600")
-	PORT_CONFSETTING(0x08, "2400")
-	PORT_CONFSETTING(0x10, "1200")
-	PORT_CONFSETTING(0x20, "600")
-	PORT_CONFSETTING(0x40, "300")
 	PORT_CONFSETTING(0x80, "110")
+	PORT_CONFSETTING(0x40, "300")
+	PORT_CONFSETTING(0x20, "600")
+	PORT_CONFSETTING(0x10, "1200")
+	PORT_CONFSETTING(0x08, "2400")
+	PORT_CONFSETTING(0x04, "3600")
+	PORT_CONFSETTING(0x02, "4800")
+	PORT_CONFSETTING(0x01, "9600")
 
-	PORT_START("rx_baud")
+	PORT_START("RS232_RX_BAUD")
 	PORT_CONFNAME(0x3f, 1, "RS232 RX Baud Rate")
-	PORT_CONFSETTING(0x01, "9600")
-	PORT_CONFSETTING(0x02, "4800")
-	PORT_CONFSETTING(0x04, "3600")
-	PORT_CONFSETTING(0x08, "2400")
-	PORT_CONFSETTING(0x10, "1200")
-	PORT_CONFSETTING(0x20, "600")
-	PORT_CONFSETTING(0x40, "300")
 	PORT_CONFSETTING(0x80, "110")
+	PORT_CONFSETTING(0x40, "300")
+	PORT_CONFSETTING(0x20, "600")
+	PORT_CONFSETTING(0x10, "1200")
+	PORT_CONFSETTING(0x08, "2400")
+	PORT_CONFSETTING(0x04, "3600")
+	PORT_CONFSETTING(0x02, "4800")
+	PORT_CONFSETTING(0x01, "9600")
+
+	// RS232 CTS and DCD routing at socket 3. These need to be
+	// jumpered low if not driven by the RS232 device.
+	PORT_START("RS232_CTS_ROUTE")
+	PORT_CONFNAME(0x1, 0, "RS232 CTS") PORT_CHANGED_MEMBER(DEVICE_SELF, mekd3_state, rs232_cts_route_change, 0)
+	PORT_CONFSETTING(0, "Jumper Low")
+	PORT_CONFSETTING(1, "Pass Through")
+	PORT_START("RS232_DCD_ROUTE")
+	PORT_CONFNAME(0x1, 0, "RS232 DCD") PORT_CHANGED_MEMBER(DEVICE_SELF, mekd3_state, rs232_dcd_route_change, 0)
+	PORT_CONFSETTING(0, "Jumper Low")
+	PORT_CONFSETTING(1, "Pass Through")
 
 	// A mechanical switch at the edge of the board set the cassette baud
 	// rate. The software could not control or read this rate setting and
 	// since D3BUG used a different format for 1200 baud it had to promote
 	// for the rate too.
-	PORT_START("cas_rate")
+	PORT_START("CAS_BAUD")
 	PORT_CONFNAME(0x01, 0, "Cassette Baud Rate")
 	PORT_CONFSETTING(0x1, "1200")
 	PORT_CONFSETTING(0x0, "300")
@@ -406,17 +430,17 @@ static INPUT_PORTS_START(mekd3)
 
 	// MEK68R2
 
-	PORT_START("r2_mode")
+	PORT_START("R2_MODE")
 	PORT_DIPNAME(0x1, 0, "R2 Mode")
 	PORT_DIPSETTING(0, "Normal")
 	PORT_DIPSETTING(1, "Dumb terminal")
 
-	PORT_START("r2_display_nationality")
+	PORT_START("R2_DISPLAY_NATIONALITY")
 	PORT_DIPNAME(0x1, 1, "Display nationality")
 	PORT_DIPSETTING(0, "US")
 	PORT_DIPSETTING(1, "Europe")
 
-	PORT_START("r2_display_format")
+	PORT_START("R2_DISPLAY_FORMAT")
 	PORT_DIPNAME(0x0003, 2, "Display format")
 	PORT_DIPSETTING(0, "16 lines of 32 characters")
 	PORT_DIPSETTING(1, "16 lines of 64 characters")
@@ -541,75 +565,109 @@ WRITE8_MEMBER(mekd3_state::led_digit_w)
 
 ************************************************************/
 
+WRITE_LINE_MEMBER(mekd3_state::rs232_route_cts)
+{
+	if (m_rs232_cts_route->read())
+		m_acia_io1->write_cts(state);
+
+	// Cache the state, in case the ioport setting changes.
+	m_cts = state;
+}
+
+WRITE_LINE_MEMBER(mekd3_state::rs232_route_dcd)
+{
+	if (m_rs232_dcd_route->read())
+		m_acia_io1->write_dcd(state);
+
+	// Cache the state, in case the ioport setting changes.
+	m_dcd = state;
+}
+
+INPUT_CHANGED_MEMBER(mekd3_state::rs232_cts_route_change)
+{
+	if (newval)
+		m_acia_io1->write_cts(m_cts);
+	else
+		m_acia_io1->write_cts(0);
+}
+
+INPUT_CHANGED_MEMBER(mekd3_state::rs232_dcd_route_change)
+{
+	if (newval)
+		m_acia_io1->write_dcd(m_dcd);
+	else
+		m_acia_io1->write_dcd(0);
+}
+
 WRITE_LINE_MEMBER(mekd3_state::write_f1_clock)
 {
-	if (BIT(m_tx_rate->read(), 0))
+	if (BIT(m_rs232_tx_baud->read(), 0))
 		m_acia_io1->write_txc(state);
-	if (BIT(m_rx_rate->read(), 0))
+	if (BIT(m_rs232_rx_baud->read(), 0))
 		m_acia_io1->write_rxc(state);
 }
 
 WRITE_LINE_MEMBER(mekd3_state::write_f2_clock)
 {
-	if (BIT(m_tx_rate->read(), 1))
+	if (BIT(m_rs232_tx_baud->read(), 1))
 		m_acia_io1->write_txc(state);
-	if (BIT(m_rx_rate->read(), 1))
+	if (BIT(m_rs232_rx_baud->read(), 1))
 		m_acia_io1->write_rxc(state);
 }
 
 WRITE_LINE_MEMBER(mekd3_state::write_f4_clock)
 {
-	if (BIT(m_tx_rate->read(), 2))
+	if (BIT(m_rs232_tx_baud->read(), 2))
 		m_acia_io1->write_txc(state);
-	if (BIT(m_rx_rate->read(), 2))
+	if (BIT(m_rs232_rx_baud->read(), 2))
 		m_acia_io1->write_rxc(state);
 }
 
 WRITE_LINE_MEMBER(mekd3_state::write_f5_clock)
 {
-	if (BIT(m_tx_rate->read(), 3))
+	if (BIT(m_rs232_tx_baud->read(), 3))
 		m_acia_io1->write_txc(state);
-	if (BIT(m_rx_rate->read(), 3))
+	if (BIT(m_rs232_rx_baud->read(), 3))
 		m_acia_io1->write_rxc(state);
 }
 
 WRITE_LINE_MEMBER(mekd3_state::write_f7_clock)
 {
-	if (BIT(m_tx_rate->read(), 4))
+	if (BIT(m_rs232_tx_baud->read(), 4))
 		m_acia_io1->write_txc(state);
-	if (BIT(m_rx_rate->read(), 4))
+	if (BIT(m_rs232_rx_baud->read(), 4))
 		m_acia_io1->write_rxc(state);
 
 	// 1200 baud also drives the cassette ACIA
-	if (m_cas_rate->read() == 1)
+	if (m_cas_baud->read() == 1)
 		acia_cas_clock1200_w(state);
 }
 
 WRITE_LINE_MEMBER(mekd3_state::write_f8_clock)
 {
-	if (BIT(m_tx_rate->read(), 5))
+	if (BIT(m_rs232_tx_baud->read(), 5))
 		m_acia_io1->write_txc(state);
-	if (BIT(m_rx_rate->read(), 5))
+	if (BIT(m_rs232_rx_baud->read(), 5))
 		m_acia_io1->write_rxc(state);
 }
 
 WRITE_LINE_MEMBER(mekd3_state::write_f9_clock)
 {
-	if (BIT(m_tx_rate->read(), 6))
+	if (BIT(m_rs232_tx_baud->read(), 6))
 		m_acia_io1->write_txc(state);
-	if (BIT(m_rx_rate->read(), 6))
+	if (BIT(m_rs232_rx_baud->read(), 6))
 		m_acia_io1->write_rxc(state);
 
 	// 300 baud also drives the cassette ACIA
-	if (m_cas_rate->read() == 0)
+	if (m_cas_baud->read() == 0)
 		acia_cas_clock300_w(state);
 }
 
 WRITE_LINE_MEMBER(mekd3_state::write_f13_clock)
 {
-	if (BIT(m_tx_rate->read(), 7))
+	if (BIT(m_rs232_tx_baud->read(), 7))
 		m_acia_io1->write_txc(state);
-	if (BIT(m_rx_rate->read(), 7))
+	if (BIT(m_rs232_rx_baud->read(), 7))
 		m_acia_io1->write_rxc(state);
 }
 
@@ -693,7 +751,7 @@ WRITE_LINE_MEMBER(mekd3_state::acia_cas_clock1200_w)
 
 READ8_MEMBER(mekd3_state::pia_io2a_r)
 {
-	uint32_t console_enable = ioport("console_enable")->read();
+	uint32_t console_enable = m_console_enable->read();
 
 	// bit 1 (0x02) is a jumper to set RS232 terminal mode when set.
 
@@ -842,6 +900,22 @@ void mekd3_state::machine_start()
 {
 	uint8_t* RAM = m_ram->pointer();
 	m_ram_bank->configure_entries(0, 8, RAM, 0x8000);
+
+	save_item(NAME(m_rom_page));
+	save_item(NAME(m_ram_page));
+	save_item(NAME(m_trace));
+	save_item(NAME(m_segment));
+	save_item(NAME(m_digit));
+	save_item(NAME(m_cts));
+	save_item(NAME(m_dcd));
+	save_item(NAME(m_cass_rx_period));
+	save_item(NAME(m_cass_txcount));
+	save_item(NAME(m_cass_in));
+	save_item(NAME(m_cass_inbit));
+	save_item(NAME(m_cass_txbit));
+	save_item(NAME(m_cass_last_txbit));
+	save_item(NAME(m_term_data));
+	save_item(NAME(m_r2_vsync));
 }
 
 void mekd3_state::machine_reset()
@@ -863,6 +937,19 @@ void mekd3_state::machine_reset()
 	m_cass_txcount = 0;
 	m_cass_in = 0;
 	m_cass_inbit = 0;
+
+	// Write low here if jumpered low.
+	if (!m_rs232_cts_route->read())
+		m_acia_io1->write_cts(0);
+	if (!m_rs232_dcd_route->read())
+		m_acia_io1->write_dcd(0);
+
+	// MEK68R2
+	m_r2_pia->ca1_w(ASSERT_LINE);
+	m_r2_pia->ca2_w(ASSERT_LINE);
+	m_r2_vsync = 0;
+	m_r2_pia->cb1_w(m_r2_vsync);
+	m_r2_pia->cb2_w(0);
 }
 
 /***********************************************************
@@ -887,8 +974,8 @@ void mekd3_state::mekd3(machine_config &config)
 
 	RAM(config, m_ram).set_default_size("256K").set_default_value(0);
 
-	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, M6802_IRQ_LINE);
-	INPUT_MERGER_ANY_HIGH(config, "mainnmi").output_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	INPUT_MERGER_ANY_HIGH(config, m_mainirq).output_handler().set_inputline(m_maincpu, M6802_IRQ_LINE);
+	INPUT_MERGER_ANY_HIGH(config, m_mainnmi).output_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	// LED display
 	PWM_DISPLAY(config, m_display).set_size(8, 7);
@@ -909,21 +996,21 @@ void mekd3_state::mekd3(machine_config &config)
 	m_kpd_pia->writepa_handler().set(FUNC(mekd3_state::led_segment_w));
 	m_kpd_pia->writepb_handler().set(FUNC(mekd3_state::led_digit_w));
 	m_kpd_pia->readca1_handler().set(FUNC(mekd3_state::trace_timer_r));
-	m_kpd_pia->irqa_handler().set("mainnmi", FUNC(input_merger_device::in_w<0>));
-	m_kpd_pia->irqb_handler().set("mainnmi", FUNC(input_merger_device::in_w<1>));
+	m_kpd_pia->irqa_handler().set(m_mainnmi, FUNC(input_merger_device::in_w<0>));
+	m_kpd_pia->irqb_handler().set(m_mainnmi, FUNC(input_merger_device::in_w<1>));
 
 	// CP1, CP2, /CTG, /CTC are available at SK1, and not used here.
 	MC6846(config, m_mc6846, XTAL_MEKD3 / 4);  // Same as the cpu clock
 	m_mc6846->out_port().set(FUNC(mekd3_state::page_w));
 	m_mc6846->cto().set(FUNC(mekd3_state::trace_timer_w));
-	m_mc6846->irq().set("mainirq", FUNC(input_merger_device::in_w<0>));
+	m_mc6846->irq().set(m_mainirq, FUNC(input_merger_device::in_w<0>));
 
 	// MEK68IO
 
 	// A 'user' PIA, I/O available at SK6.
 	PIA6821(config, m_pia_io1, 0);
-	m_pia_io1->irqa_handler().set("mainnmi", FUNC(input_merger_device::in_w<2>));
-	m_pia_io1->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
+	m_pia_io1->irqa_handler().set(m_mainnmi, FUNC(input_merger_device::in_w<2>));
+	m_pia_io1->irqb_handler().set(m_mainirq, FUNC(input_merger_device::in_w<1>));
 
 	// Largely a 'user' PIA, I/O available at SK5.
 	// PA0 can optionally be an audio bit input, at TP1.
@@ -931,14 +1018,15 @@ void mekd3_state::mekd3(machine_config &config)
 	// PA2 can optionally be an audio bit output, at TP2.
 	PIA6821(config, m_pia_io2, 0);
 	m_pia_io2->readpa_handler().set(FUNC(mekd3_state::pia_io2a_r));
-	m_pia_io2->irqa_handler().set("mainirq", FUNC(input_merger_device::in_w<2>));
-	m_pia_io2->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<3>));
+	m_pia_io2->irqa_handler().set(m_mainirq, FUNC(input_merger_device::in_w<2>));
+	m_pia_io2->irqb_handler().set(m_mainirq, FUNC(input_merger_device::in_w<3>));
 
 	// RS232 ACIA
 	// /RTS, /CTS and /DCD are available at SK3.
 	ACIA6850(config, m_acia_io1, 0);
 	m_acia_io1->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
-	m_acia_io1->irq_handler().set("mainirq", FUNC(input_merger_device::in_w<4>));
+	m_acia_io1->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
+	m_acia_io1->irq_handler().set(m_mainirq, FUNC(input_merger_device::in_w<4>));
 
 	MC14411(config, m_brg, XTAL(1'843'200));
 	m_brg->out_f<1>().set(FUNC(mekd3_state::write_f1_clock));
@@ -952,13 +1040,15 @@ void mekd3_state::mekd3(machine_config &config)
 
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
 	rs232.rxd_handler().set(m_acia_io1, FUNC(acia6850_device::write_rxd));
+	rs232.cts_handler().set(FUNC(mekd3_state::rs232_route_cts));
+	rs232.dcd_handler().set(FUNC(mekd3_state::rs232_route_dcd));
 	rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 
 	// /RTS is available at SK2.
 	// /CTS and /DCD are available at SK2, or can be jumpered low.
 	ACIA6850(config, m_acia_cas, 0);
 	m_acia_cas->txd_handler().set([this] (bool state) { m_cass_txbit = state; });
-	m_acia_cas->irq_handler().set("mainirq", FUNC(input_merger_device::in_w<5>));
+	m_acia_cas->irq_handler().set(m_mainirq, FUNC(input_merger_device::in_w<5>));
 
 	TIMER(config, "kansas_r").configure_periodic(FUNC(mekd3_state::kansas_r), attotime::from_hz(40000));
 
@@ -974,10 +1064,11 @@ void mekd3_state::mekd3(machine_config &config)
 	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
 
 	MC6845(config, m_mc6845, XTAL(14'318'181)/8);
-	m_mc6845->set_screen("screen");
+	m_mc6845->set_screen(m_screen);
+	//
 	m_mc6845->set_show_border_area(false);
 	m_mc6845->set_char_width(8);
-	m_mc6845->set_update_row_callback(FUNC(mekd3_state::update_row), this);
+	m_mc6845->set_update_row_callback(FUNC(mekd3_state::update_row));
 	m_mc6845->out_hsync_callback().set(FUNC(mekd3_state::r2_hsync_changed));
 	m_mc6845->out_vsync_callback().set(FUNC(mekd3_state::r2_vsync_changed));
 
@@ -990,8 +1081,8 @@ void mekd3_state::mekd3(machine_config &config)
 	m_r2_pia->readpa_handler().set(FUNC(mekd3_state::r2_pia_pa_r));
 	m_r2_pia->readpb_handler().set(FUNC(mekd3_state::r2_pia_pb_r));
 	m_r2_pia->readcb1_handler().set(FUNC(mekd3_state::r2_pia_cb1_r));
-	m_r2_pia->irqa_handler().set("mainirq", FUNC(input_merger_device::in_w<6>));
-	m_r2_pia->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<7>));
+	m_r2_pia->irqa_handler().set(m_mainirq, FUNC(input_merger_device::in_w<6>));
+	m_r2_pia->irqb_handler().set(m_mainirq, FUNC(input_merger_device::in_w<7>));
 
 	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
 	keyboard.set_keyboard_callback(FUNC(mekd3_state::kbd_put));

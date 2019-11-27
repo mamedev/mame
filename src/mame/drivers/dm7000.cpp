@@ -261,8 +261,8 @@ void dm7000_state::machine_reset()
 	dcr[DCRSTB045_FRAME_BUFR_BASE] = 0x0f000000;
 	m_scc0_lsr = UART_LSR_THRE | UART_LSR_TEMT;
 
-	m_maincpu->ppc4xx_set_dcr_read_handler(read32_delegate(FUNC(dm7000_state::dcr_r),this));
-	m_maincpu->ppc4xx_set_dcr_write_handler(write32_delegate(FUNC(dm7000_state::dcr_w),this));
+	m_maincpu->ppc4xx_set_dcr_read_handler(read32_delegate(*this, FUNC(dm7000_state::dcr_r)));
+	m_maincpu->ppc4xx_set_dcr_write_handler(write32_delegate(*this, FUNC(dm7000_state::dcr_w)));
 }
 
 void dm7000_state::video_start()

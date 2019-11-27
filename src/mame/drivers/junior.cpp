@@ -230,7 +230,7 @@ void junior_state::junior(machine_config &config)
 	/* basic machine hardware */
 	M6502(config, m_maincpu, 1_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &junior_state::junior_mem);
-	config.m_minimum_quantum = attotime::from_hz(50);
+	config.set_maximum_quantum(attotime::from_hz(50));
 
 	/* video hardware */
 	config.set_default_layout(layout_junior);

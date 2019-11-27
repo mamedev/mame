@@ -1394,7 +1394,7 @@ void hp64k_state::hp64k(machine_config &config)
 	I8275(config, m_crtc, 2729045);
 	m_crtc->set_screen("screen");
 	m_crtc->set_character_width(9);
-	m_crtc->set_display_callback(FUNC(hp64k_state::crtc_display_pixels), this);
+	m_crtc->set_display_callback(FUNC(hp64k_state::crtc_display_pixels));
 	m_crtc->drq_wr_callback().set(FUNC(hp64k_state::hp64k_crtc_drq_w));
 	m_crtc->vrtc_wr_callback().set(FUNC(hp64k_state::hp64k_crtc_vrtc_w));
 

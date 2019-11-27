@@ -3027,8 +3027,10 @@ ROM_START( arescue )
 
 	ROM_REGION( 0x20000, "mainpcb:dsp", 0 ) /* NEC uPD77P25 DSP Internal ROM */ // ONLY PRESENT ON ONE PCB STACK
 	ROM_LOAD( "d7725.01", 0x000000, 0x002800, CRC(a7ec5644) SHA1(e9b05c70b639ee289e557dfd9a6c724b36338e2b) )
-	ROM_REGION(0x2000, "mainpcb:dspprg", ROMREGION_ERASEFF)
-	ROM_REGION(0x800, "mainpcb:dspdata", ROMREGION_ERASEFF)
+	ROM_REGION32_BE(0x2000, "mainpcb:dspprg", ROMREGION_ERASEFF)
+	ROM_COPY( "mainpcb:dsp", 0x0000, 0x0000, 0x2000 )
+	ROM_REGION16_BE(0x800, "mainpcb:dspdata", ROMREGION_ERASEFF)
+	ROM_COPY( "mainpcb:dsp", 0x2000, 0x0000, 0x0800 )
 
 	ROM_REGION( 0x200000, "slavepcb:maincpu", 0 ) /* v60 code + data */
 	ROM_LOAD_x4( "epr-14542.ic13",     0x000000, 0x020000, CRC(6d39fc18) SHA1(7fbddfb2605a020331e1e81a7bc4466196df17bd) ) /* 834-8526-05 (Export) */
@@ -3103,8 +3105,10 @@ ROM_START( arescueu )
 
 	ROM_REGION( 0x20000, "mainpcb:dsp", 0 ) /* NEC uPD77P25 DSP Internal ROM */ // ONLY PRESENT ON ONE PCB STACK
 	ROM_LOAD( "d7725.01", 0x000000, 0x002800, CRC(a7ec5644) SHA1(e9b05c70b639ee289e557dfd9a6c724b36338e2b) )
-	ROM_REGION(0x2000, "mainpcb:dspprg", ROMREGION_ERASEFF)
-	ROM_REGION(0x800, "mainpcb:dspdata", ROMREGION_ERASEFF)
+	ROM_REGION32_BE(0x2000, "mainpcb:dspprg", ROMREGION_ERASEFF)
+	ROM_COPY( "mainpcb:dsp", 0x0000, 0x0000, 0x2000 )
+	ROM_REGION16_BE(0x800, "mainpcb:dspdata", ROMREGION_ERASEFF)
+	ROM_COPY( "mainpcb:dsp", 0x2000, 0x0000, 0x0800 )
 
 	ROM_REGION( 0x200000, "slavepcb:maincpu", 0 ) /* v60 code + data */
 	ROM_LOAD_x4( "epr-14540.ic13",     0x000000, 0x020000, CRC(c2b4e5d0) SHA1(69f8ddded5095df9012663d0ded61b78f1692a8d) )
@@ -3179,8 +3183,10 @@ ROM_START( arescuej )
 
 	ROM_REGION( 0x20000, "mainpcb:dsp", 0 ) /* NEC uPD77P25 DSP Internal ROM */ // ONLY PRESENT ON ONE PCB STACK
 	ROM_LOAD( "d7725.01", 0x000000, 0x002800, CRC(a7ec5644) SHA1(e9b05c70b639ee289e557dfd9a6c724b36338e2b) )
-	ROM_REGION(0x2000, "mainpcb:dspprg", ROMREGION_ERASEFF)
-	ROM_REGION(0x800, "mainpcb:dspdata", ROMREGION_ERASEFF)
+	ROM_REGION32_BE(0x2000, "mainpcb:dspprg", ROMREGION_ERASEFF)
+	ROM_COPY( "mainpcb:dsp", 0x0000, 0x0000, 0x2000 )
+	ROM_REGION16_BE(0x800, "mainpcb:dspdata", ROMREGION_ERASEFF)
+	ROM_COPY( "mainpcb:dsp", 0x2000, 0x0000, 0x0800 )
 
 	ROM_REGION( 0x200000, "slavepcb:maincpu", 0 ) /* v60 code + data */
 	ROM_LOAD_x4( "epr-14515.ic13",     0x000000, 0x020000, CRC(fb5eefbd) SHA1(f2739ad2e168843fe992d7fb546ffd859fa6c17a) )
@@ -5650,11 +5656,11 @@ void segas32_new_state::init_arescue()
 	m_slavepcb->init_arescue(0);
 
 	m_dual_pcb_comms = std::make_unique<uint16_t[]>(0x1000/2);
-	m_mainpcb->maincpu()->space(AS_PROGRAM).install_readwrite_handler(0x810000, 0x810fff, read16_delegate(FUNC(segas32_new_state::dual_pcb_comms_r),this), write16_delegate(FUNC(segas32_new_state::dual_pcb_comms_w),this));
-	m_mainpcb->maincpu()->space(AS_PROGRAM).install_read_handler(0x818000, 0x818003, read16_delegate(FUNC(segas32_new_state::dual_pcb_masterslave),this));
+	m_mainpcb->maincpu()->space(AS_PROGRAM).install_readwrite_handler(0x810000, 0x810fff, read16_delegate(*this, FUNC(segas32_new_state::dual_pcb_comms_r)), write16_delegate(*this, FUNC(segas32_new_state::dual_pcb_comms_w)));
+	m_mainpcb->maincpu()->space(AS_PROGRAM).install_read_handler(0x818000, 0x818003, read16_delegate(*this, FUNC(segas32_new_state::dual_pcb_masterslave)));
 
-	m_slavepcb->maincpu()->space(AS_PROGRAM).install_readwrite_handler(0x810000, 0x810fff, read16_delegate(FUNC(segas32_new_state::dual_pcb_comms_r),this), write16_delegate(FUNC(segas32_new_state::dual_pcb_comms_w),this));
-	m_slavepcb->maincpu()->space(AS_PROGRAM).install_read_handler(0x818000, 0x818003, read16_delegate(FUNC(segas32_new_state::dual_pcb_slave),this));
+	m_slavepcb->maincpu()->space(AS_PROGRAM).install_readwrite_handler(0x810000, 0x810fff, read16_delegate(*this, FUNC(segas32_new_state::dual_pcb_comms_r)), write16_delegate(*this, FUNC(segas32_new_state::dual_pcb_comms_w)));
+	m_slavepcb->maincpu()->space(AS_PROGRAM).install_read_handler(0x818000, 0x818003, read16_delegate(*this, FUNC(segas32_new_state::dual_pcb_slave)));
 }
 
 void segas32_new_state::init_f1en() {
@@ -5664,11 +5670,11 @@ void segas32_new_state::init_f1en() {
 	m_dual_pcb_comms = std::make_unique<uint16_t[]>(0x1000/2);
 	memset(m_dual_pcb_comms.get(), 0xff, 0x1000 / 2);
 
-	m_mainpcb->maincpu()->space(AS_PROGRAM).install_readwrite_handler(0x810000, 0x810fff, read16_delegate(FUNC(segas32_new_state::dual_pcb_comms_r),this), write16_delegate(FUNC(segas32_new_state::dual_pcb_comms_w),this));
-	m_mainpcb->maincpu()->space(AS_PROGRAM).install_read_handler(0x818000, 0x818003, read16_delegate(FUNC(segas32_new_state::dual_pcb_masterslave),this));
+	m_mainpcb->maincpu()->space(AS_PROGRAM).install_readwrite_handler(0x810000, 0x810fff, read16_delegate(*this, FUNC(segas32_new_state::dual_pcb_comms_r)), write16_delegate(*this, FUNC(segas32_new_state::dual_pcb_comms_w)));
+	m_mainpcb->maincpu()->space(AS_PROGRAM).install_read_handler(0x818000, 0x818003, read16_delegate(*this, FUNC(segas32_new_state::dual_pcb_masterslave)));
 
-	m_slavepcb->maincpu()->space(AS_PROGRAM).install_readwrite_handler(0x810000, 0x810fff, read16_delegate(FUNC(segas32_new_state::dual_pcb_comms_r),this), write16_delegate(FUNC(segas32_new_state::dual_pcb_comms_w),this));
-	m_slavepcb->maincpu()->space(AS_PROGRAM).install_read_handler(0x818000, 0x818003, read16_delegate(FUNC(segas32_new_state::dual_pcb_slave),this));
+	m_slavepcb->maincpu()->space(AS_PROGRAM).install_readwrite_handler(0x810000, 0x810fff, read16_delegate(*this, FUNC(segas32_new_state::dual_pcb_comms_r)), write16_delegate(*this, FUNC(segas32_new_state::dual_pcb_comms_w)));
+	m_slavepcb->maincpu()->space(AS_PROGRAM).install_read_handler(0x818000, 0x818003, read16_delegate(*this, FUNC(segas32_new_state::dual_pcb_slave)));
 }
 
 void segas32_new_state::init_f1lap()
@@ -5690,31 +5696,11 @@ void segas32_state::init_alien3()
 void segas32_state::init_arescue(int m_hasdsp)
 {
 	segas32_common_init();
-	if (m_hasdsp) m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa00000, 0xa00007, read16_delegate(FUNC(segas32_state::arescue_dsp_r),this), write16_delegate(FUNC(segas32_state::arescue_dsp_w),this));
+	if (m_hasdsp) m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa00000, 0xa00007, read16_delegate(*this, FUNC(segas32_state::arescue_dsp_r)), write16_delegate(*this, FUNC(segas32_state::arescue_dsp_w)));
 
 	for (auto & elem : m_arescue_dsp_io)
 		elem = 0x00;
 
-	if (m_hasdsp)
-	{
-		// massages the data from the BPMicro-compatible dump to runnable form
-		uint8_t *dspsrc = (uint8_t *)memregion("dsp")->base();
-		uint32_t *dspprg = (uint32_t *)memregion("dspprg")->base();
-		uint16_t *dspdata = (uint16_t *)memregion("dspdata")->base();
-
-		// copy DSP program
-		for (int i = 0; i < 0x2000; i+= 4)
-		{
-			*dspprg = dspsrc[0+i]<<24 | dspsrc[1+i]<<16 | dspsrc[2+i]<<8;
-			dspprg++;
-		}
-
-		// copy DSP data
-		for (int i = 0; i < 0x800; i+= 2)
-		{
-			*dspdata++ = dspsrc[0x2000+i]<<8 | dspsrc[0x2001+i];
-		}
-	}
 	m_sw1_output = &segas32_state::arescue_sw1_output;
 }
 
@@ -5731,8 +5717,8 @@ void segas32_state::init_brival()
 
 	/* install protection handlers */
 	m_system32_protram = std::make_unique<uint16_t[]>(0x1000/2);
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20ba00, 0x20ba07, read16_delegate(FUNC(segas32_state::brival_protection_r),this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa00000, 0xa00fff, write16_delegate(FUNC(segas32_state::brival_protection_w),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20ba00, 0x20ba07, read16_delegate(*this, FUNC(segas32_state::brival_protection_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa00000, 0xa00fff, write16_delegate(*this, FUNC(segas32_state::brival_protection_w)));
 }
 
 
@@ -5741,7 +5727,7 @@ void segas32_state::init_darkedge()
 	segas32_common_init();
 
 	/* install protection handlers */
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa00000, 0xa7ffff, read16_delegate(FUNC(segas32_state::darkedge_protection_r),this), write16_delegate(FUNC(segas32_state::darkedge_protection_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa00000, 0xa7ffff, read16_delegate(*this, FUNC(segas32_state::darkedge_protection_r)), write16_delegate(*this, FUNC(segas32_state::darkedge_protection_w)));
 	m_system32_prot_vblank = &segas32_state::darkedge_fd1149_vblank;
 }
 
@@ -5751,7 +5737,7 @@ void segas32_state::init_dbzvrvs()
 	segas32_common_init();
 
 	/* install protection handlers */
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa00000, 0xa7ffff, read16_delegate(FUNC(segas32_state::dbzvrvs_protection_r),this), write16_delegate(FUNC(segas32_state::dbzvrvs_protection_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa00000, 0xa7ffff, read16_delegate(*this, FUNC(segas32_state::dbzvrvs_protection_r)), write16_delegate(*this, FUNC(segas32_state::dbzvrvs_protection_w)));
 	// 0x810000 to 0x8107ff = link RAM? probably not a dual cabinet, though...
 }
 
@@ -5852,7 +5838,7 @@ void segas32_state::init_radr()
 void segas32_state::init_scross()
 {
 	segas32_common_init();
-	m_soundcpu->space(AS_PROGRAM).install_write_handler(0xb0, 0xbf, write8_delegate(FUNC(segas32_state::scross_bank_w),this));
+	m_soundcpu->space(AS_PROGRAM).install_write_handler(0xb0, 0xbf, write8_delegate(*this, FUNC(segas32_state::scross_bank_w)));
 
 	m_sw1_output = &segas32_state::scross_sw1_output;
 	m_sw2_output = &segas32_state::scross_sw2_output;
@@ -5872,7 +5858,7 @@ void segas32_state::init_sonic()
 	segas32_common_init();
 
 	/* install protection handlers */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x20E5C4, 0x20E5C5, write16_delegate(FUNC(segas32_state::sonic_level_load_protection),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x20E5C4, 0x20E5C5, write16_delegate(*this, FUNC(segas32_state::sonic_level_load_protection)));
 }
 
 
@@ -5897,7 +5883,7 @@ void segas32_state::init_svf()
 void segas32_state::init_jleague()
 {
 	segas32_common_init();
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x20F700, 0x20F705, write16_delegate(FUNC(segas32_state::jleague_protection_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x20F700, 0x20F705, write16_delegate(*this, FUNC(segas32_state::jleague_protection_w)));
 }
 
 

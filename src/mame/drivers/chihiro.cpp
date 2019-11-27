@@ -511,11 +511,11 @@ int jvs_master::received_packet(uint8_t *buffer)
 
 DECLARE_DEVICE_TYPE(OHCI_HLEAN2131QC, ohci_hlean2131qc_device)
 
-class ohci_hlean2131qc_device : public device_t, public ohci_function, public device_slot_card_interface
+class ohci_hlean2131qc_device : public device_t, public device_usb_ohci_function_interface
 {
 public:
 	ohci_hlean2131qc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	void initialize(running_machine &machine) override;
+	void initialize() override;
 	int handle_nonstandard_request(int endpoint, USBSetupPacket *setup) override;
 	int handle_bulk_pid(int endpoint, int pid, uint8_t *buffer, int size) override;
 	void set_region_base(uint8_t *data);
@@ -569,11 +569,11 @@ DEFINE_DEVICE_TYPE(OHCI_HLEAN2131QC, ohci_hlean2131qc_device, "ohci_hlean2131qc"
 
 DECLARE_DEVICE_TYPE(OHCI_HLEAN2131SC, ohci_hlean2131sc_device)
 
-class ohci_hlean2131sc_device : public device_t, public ohci_function, public device_slot_card_interface
+class ohci_hlean2131sc_device : public device_t, public device_usb_ohci_function_interface
 {
 public:
 	ohci_hlean2131sc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	void initialize(running_machine &machine) override;
+	void initialize() override;
 	int handle_nonstandard_request(int endpoint, USBSetupPacket *setup) override;
 	int handle_bulk_pid(int endpoint, int pid, uint8_t *buffer, int size) override;
 	void set_region_base(uint8_t *data);
@@ -876,8 +876,7 @@ const uint8_t ohci_hlean2131qc_device::strdesc2[] = { 0x0E,0x03,0x42,0x00,0x41,0
 
 ohci_hlean2131qc_device::ohci_hlean2131qc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, OHCI_HLEAN2131QC, tag, owner, clock)
-	, ohci_function()
-	, device_slot_card_interface(mconfig, *this)
+	, device_usb_ohci_function_interface(mconfig, *this)
 	, m_jvs_master(*this, "^^^^jvs_master")
 {
 	maximum_send = 0;
@@ -889,9 +888,9 @@ ohci_hlean2131qc_device::ohci_hlean2131qc_device(const machine_config &mconfig, 
 	jvs.buffer_out_packets = 0;
 }
 
-void ohci_hlean2131qc_device::initialize(running_machine &machine)
+void ohci_hlean2131qc_device::initialize()
 {
-	ohci_function::initialize(machine);
+	device_usb_ohci_function_interface::initialize();
 	add_device_descriptor(devdesc);
 	add_configuration_descriptor(condesc);
 	add_interface_descriptor(intdesc);
@@ -1184,7 +1183,7 @@ void ohci_hlean2131qc_device::process_jvs_packet()
 
 void ohci_hlean2131qc_device::device_start()
 {
-	initialize(machine());
+	initialize();
 	if (region_tag)
 		set_region_base(memregion(region_tag)->base() + region_offset);
 }
@@ -1205,8 +1204,7 @@ const uint8_t ohci_hlean2131sc_device::strdesc2[] = { 0x0E,0x03,0x42,0x00,0x41,0
 
 ohci_hlean2131sc_device::ohci_hlean2131sc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, OHCI_HLEAN2131SC, tag, owner, clock)
-	, ohci_function()
-	, device_slot_card_interface(mconfig, *this)
+	, device_usb_ohci_function_interface(mconfig, *this)
 {
 	region = nullptr;
 	region_tag = nullptr;
@@ -1227,9 +1225,9 @@ void ohci_hlean2131sc_device::set_region(const char *_region_tag, int _region_of
 	region_offset = _region_offset;
 }
 
-void ohci_hlean2131sc_device::initialize(running_machine &machine)
+void ohci_hlean2131sc_device::initialize()
 {
-	ohci_function::initialize(machine);
+	device_usb_ohci_function_interface::initialize();
 	add_device_descriptor(devdesc);
 	add_configuration_descriptor(condesc);
 	add_interface_descriptor(intdesc);
@@ -1516,7 +1514,7 @@ void ohci_hlean2131sc_device::process_packet()
 
 void ohci_hlean2131sc_device::device_start()
 {
-	initialize(machine());
+	initialize();
 	if (region_tag)
 		set_region_base(memregion(region_tag)->base() + region_offset);
 }
@@ -1951,7 +1949,7 @@ void chihiro_state::chihirogd(machine_config &config)
 		ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios))
 
 #define CHIHIRO_BIOS \
-	ROM_REGION( 0x80000, "bios", 0) \
+	ROM_REGION32_LE( 0x80000, "bios", 0) \
 	ROM_SYSTEM_BIOS( 0, "bios0", "Chihiro Bios" ) \
 	ROM_LOAD_BIOS( 0,  "chihiro_xbox_bios.bin", 0x000000, 0x80000, CRC(66232714) SHA1(b700b0041af8f84835e45d1d1250247bf7077188) ) \
 	ROM_REGION( 0x200000, "mediaboard", 0) \

@@ -900,7 +900,7 @@ void cv1k_state::install_speedups(uint32_t idleramoff, uint32_t idlepc, bool is_
 
 	m_maincpu->sh2drc_add_pcflush(idlepc+2);
 
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000000+m_idleramoffs, 0xc000000+m_idleramoffs+7, read64_delegate(FUNC(cv1k_state::speedup_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000000+m_idleramoffs, 0xc000000+m_idleramoffs+7, read64_delegate(*this, FUNC(cv1k_state::speedup_r)));
 
 	m_maincpu->sh2drc_add_fastram(0x00000000, 0x003fffff, true,  m_rombase);
 

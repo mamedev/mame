@@ -154,7 +154,7 @@ TILE_GET_INFO_MEMBER(m14_state::m14_get_tile_info)
 
 void m14_state::video_start()
 {
-	m_m14_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m14_state::m14_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_m14_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(m14_state::m14_get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 
 }

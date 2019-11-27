@@ -60,13 +60,13 @@ WRITE8_MEMBER(hitme_state::hitme_vidram_w)
 
 void hitme_state::video_start()
 {
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(hitme_state::get_hitme_tile_info),this), TILEMAP_SCAN_ROWS, 8, 10, 40, 19);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(hitme_state::get_hitme_tile_info)), TILEMAP_SCAN_ROWS, 8, 10, 40, 19);
 }
 
 
 VIDEO_START_MEMBER(hitme_state,barricad)
 {
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(hitme_state::get_hitme_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 24);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(hitme_state::get_hitme_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 24);
 }
 
 

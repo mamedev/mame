@@ -498,10 +498,10 @@ void taito_f3_state::video_start()
 
 	if (m_game_config->extend)
 	{
-		m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(taito_f3_state::get_tile_info<0>), this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
-		m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(taito_f3_state::get_tile_info<1>), this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
-		m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(taito_f3_state::get_tile_info<2>), this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
-		m_tilemap[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(taito_f3_state::get_tile_info<3>), this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+		m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(taito_f3_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+		m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(taito_f3_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+		m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(taito_f3_state::get_tile_info<2>)), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+		m_tilemap[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(taito_f3_state::get_tile_info<3>)), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
 
 		m_pf_data[0] = m_pf_ram + (0x0000 / 2);
 		m_pf_data[1] = m_pf_ram + (0x2000 / 2);
@@ -519,14 +519,14 @@ void taito_f3_state::video_start()
 	}
 	else
 	{
-		m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(taito_f3_state::get_tile_info<0>), this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-		m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(taito_f3_state::get_tile_info<1>), this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-		m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(taito_f3_state::get_tile_info<2>), this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-		m_tilemap[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(taito_f3_state::get_tile_info<3>), this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-		m_tilemap[4] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(taito_f3_state::get_tile_info<4>), this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-		m_tilemap[5] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(taito_f3_state::get_tile_info<5>), this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-		m_tilemap[6] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(taito_f3_state::get_tile_info<6>), this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-		m_tilemap[7] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(taito_f3_state::get_tile_info<7>), this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+		m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(taito_f3_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+		m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(taito_f3_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+		m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(taito_f3_state::get_tile_info<2>)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+		m_tilemap[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(taito_f3_state::get_tile_info<3>)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+		m_tilemap[4] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(taito_f3_state::get_tile_info<4>)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+		m_tilemap[5] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(taito_f3_state::get_tile_info<5>)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+		m_tilemap[6] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(taito_f3_state::get_tile_info<6>)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+		m_tilemap[7] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(taito_f3_state::get_tile_info<7>)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 		m_pf_data[0] = m_pf_ram + (0x0000 / 2);
 		m_pf_data[1] = m_pf_ram + (0x1000 / 2);
@@ -554,8 +554,8 @@ void taito_f3_state::video_start()
 	m_spriteram16_buffered = std::make_unique<u16[]>(0x10000 / 2);
 	m_spritelist = std::make_unique<tempsprite[]>(0x400);
 	m_sprite_end = &m_spritelist[0];
-	m_vram_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(taito_f3_state::get_tile_info_text), this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_pixel_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(taito_f3_state::get_tile_info_pixel), this), TILEMAP_SCAN_COLS, 8, 8, 64, 32);
+	m_vram_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(taito_f3_state::get_tile_info_text)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_pixel_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(taito_f3_state::get_tile_info_pixel)), TILEMAP_SCAN_COLS, 8, 8, 64, 32);
 	m_pf_line_inf = std::make_unique<f3_playfield_line_inf[]>(5);
 	m_sa_line_inf = std::make_unique<f3_spritealpha_line_inf[]>(1);
 	m_screen->register_screen_bitmap(m_pri_alp_bitmap);
@@ -566,8 +566,7 @@ void taito_f3_state::video_start()
 	m_vram_layer->set_transparent_pen(0);
 	m_pixel_layer->set_transparent_pen(0);
 
-	/* Palettes have 4 bpp indexes despite up to 6 bpp data. The unused */
-	/* top bits in the gfx data are cleared later.                      */
+	// Palettes have 4 bpp indexes despite up to 6 bpp data. The unused top bits in the gfx data are cleared later.
 	m_gfxdecode->gfx(2)->set_granularity(16);
 	m_gfxdecode->gfx(3)->set_granularity(16);
 

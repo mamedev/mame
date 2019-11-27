@@ -69,7 +69,7 @@ void fortyl_state::video_start()
 	m_tmp_bitmap1 = std::make_unique<bitmap_ind16>(256, 256);
 	m_tmp_bitmap2 = std::make_unique<bitmap_ind16>(256, 256);
 
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(fortyl_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(fortyl_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	m_xoffset = 128;    // this never changes
 

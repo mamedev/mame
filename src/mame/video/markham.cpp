@@ -54,7 +54,7 @@ TILE_GET_INFO_MEMBER(markham_state::get_bg_tile_info)
 
 void markham_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(markham_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(markham_state::get_bg_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
 
 	m_bg_tilemap->set_scroll_rows(32);
 }

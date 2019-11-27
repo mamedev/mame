@@ -275,13 +275,13 @@ TILE_GET_INFO_MEMBER(cybertnk_state::get_tile_info)
 
 void cybertnk_state::video_start()
 {
-	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cybertnk_state::get_tile_info<0>),this),TILEMAP_SCAN_ROWS,8,8,128,32);
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cybertnk_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 8,8,128,32);
 	m_tilemap[0]->set_transparent_pen(0);
 
-	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cybertnk_state::get_tile_info<1>),this),TILEMAP_SCAN_ROWS,8,8,128,32);
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cybertnk_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 8,8,128,32);
 	m_tilemap[1]->set_transparent_pen(0);
 
-	m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cybertnk_state::get_tile_info<2>),this),TILEMAP_SCAN_ROWS,8,8,128,32);
+	m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cybertnk_state::get_tile_info<2>)), TILEMAP_SCAN_ROWS, 8,8,128,32);
 	m_tilemap[2]->set_transparent_pen(0);
 }
 
@@ -833,7 +833,7 @@ void cybertnk_state::cybertnk(machine_config &config)
 	Z80(config, m_audiocpu, XTAL(3'579'545));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &cybertnk_state::sound_mem);
 
-	config.m_minimum_quantum = attotime::from_hz(60000); //arbitrary value, needed to get the communication to work
+	config.set_maximum_quantum(attotime::from_hz(60000)); //arbitrary value, needed to get the communication to work
 
 	/* video hardware */
 	config.set_default_layout(layout_dualhsxs);

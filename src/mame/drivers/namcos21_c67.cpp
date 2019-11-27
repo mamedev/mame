@@ -796,7 +796,7 @@ void namcos21_c67_state::namcos21(machine_config &config)
 	NAMCOS21_DSP_C67(config, m_namcos21_dsp_c67, 0);
 	m_namcos21_dsp_c67->set_renderer_tag("namcos21_3d");
 
-	config.m_minimum_quantum = attotime::from_hz(12000);
+	config.set_maximum_quantum(attotime::from_hz(12000));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 

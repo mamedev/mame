@@ -149,8 +149,8 @@ void powerins_state::video_start()
 	m_spritebuffer[0] = make_unique_clear<uint16_t[]>(0x1000/2);
 	m_spritebuffer[1] = make_unique_clear<uint16_t[]>(0x1000/2);
 
-	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(powerins_state::get_tile_info_0),this),tilemap_mapper_delegate(FUNC(powerins_state::get_memory_offset_0),this),16,16,256,32);
-	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(powerins_state::get_tile_info_1),this),TILEMAP_SCAN_COLS,8,8,64,32);
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(powerins_state::get_tile_info_0)), tilemap_mapper_delegate(*this, FUNC(powerins_state::get_memory_offset_0)), 16, 16, 256, 32);
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(powerins_state::get_tile_info_1)), TILEMAP_SCAN_COLS, 8, 8, 64, 32);
 
 	m_tilemap[1]->set_transparent_pen(15);
 

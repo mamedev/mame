@@ -695,14 +695,12 @@ void pbaction_state::init_pbaction2()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
-	/* first of all, do a simple bitswap */
+	// first of all, do a simple bitswap
 	for (int i = 0; i < 0xc000; i++)
-	{
 		rom[i] = bitswap<8>(rom[i], 7,6,5,4,1,2,3,0);
-	}
 
-	/* install a protection (?) workaround */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000, 0xc000, read8_delegate(FUNC(pbaction_state::pbaction2_prot_kludge_r),this) );
+	// install a protection (?) workaround
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000, 0xc000, read8_delegate(*this, FUNC(pbaction_state::pbaction2_prot_kludge_r)) );
 }
 
 

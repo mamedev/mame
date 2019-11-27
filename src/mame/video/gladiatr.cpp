@@ -44,8 +44,8 @@ TILE_GET_INFO_MEMBER(gladiatr_state_base::fg_get_tile_info)
 
 VIDEO_START_MEMBER(ppking_state,ppking)
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ppking_state::bg_get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,64);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ppking_state::fg_get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,64);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ppking_state::bg_get_tile_info)), TILEMAP_SCAN_ROWS,8,8,32,64);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ppking_state::fg_get_tile_info)), TILEMAP_SCAN_ROWS,8,8,32,64);
 
 	m_fg_tilemap->set_transparent_pen(0);
 
@@ -61,8 +61,8 @@ VIDEO_START_MEMBER(ppking_state,ppking)
 
 VIDEO_START_MEMBER(gladiatr_state,gladiatr)
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gladiatr_state::bg_get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gladiatr_state::fg_get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gladiatr_state::bg_get_tile_info)), TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gladiatr_state::fg_get_tile_info)), TILEMAP_SCAN_ROWS,8,8,64,32);
 
 	m_fg_tilemap->set_transparent_pen(0);
 

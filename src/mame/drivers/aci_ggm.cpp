@@ -450,7 +450,7 @@ void ggm_state::ggm(machine_config &config)
 
 	/* cartridge */
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "ggm", "bin");
-	m_cart->set_device_load(FUNC(ggm_state::cartridge), this);
+	m_cart->set_device_load(FUNC(ggm_state::cartridge));
 	m_cart->set_must_be_loaded(true);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("ggm");

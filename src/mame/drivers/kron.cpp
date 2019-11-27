@@ -104,20 +104,24 @@
 #include "emupal.h"
 #include "screen.h"
 
-#define VERBOSE 2
+#define LOG_IO     (1U << 1)
+#define LOG_SCAN   (1U << 2)
+#define LOG_SCREEN (1U << 3)
+#define LOG_KBD    (1U << 4)
+#define LOG_READ   (1U << 5)
+#define LOG_CS     (1U << 6)
 
-#define LOGPRINT(x) do { if (VERBOSE) logerror x; } while (0)
-#define LOG(x) {}
-#define LOGIO(x) {}
-#define LOGSCAN(x) {}
-#define LOGSCREEN(x) {}
-#define LOGKBD(x) LOGPRINT(x)
-#define RLOG(x) {}
-#define LOGCS(x) {}
+//#define VERBOSE (LOG_IO)
+//#define LOG_OUTPUT_STREAM std::cout
 
-#if VERBOSE >= 2
-#define logerror printf
-#endif
+#include "logmacro.h"
+
+#define LOGIO(...)     LOGMASKED(LOG_IO,     __VA_ARGS__)
+#define LOGSCAN(...)   LOGMASKED(LOG_SCAN,   __VA_ARGS__)
+#define LOGSCREEN(...) LOGMASKED(LOG_SCREEN, __VA_ARGS__)
+#define LOGKBD(...)    LOGMASKED(LOG_KBD,    __VA_ARGS__)
+#define LOGR(...)      LOGMASKED(LOG_READ,   __VA_ARGS__)
+#define LOGCS(...)     LOGMASKED(LOG_CS,     __VA_ARGS__)
 
 #ifdef _MSC_VER
 #define FUNCNAME __func__
@@ -131,35 +135,33 @@ public:
 	kron180_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_videoram(*this, "videoram")
+		, m_chargen(*this, "chargen")
+		, m_vram(*this, "videoram")
 		, m_keyboard(*this, "pc_keyboard")
 	{ }
 
 	void kron180(machine_config &config);
 
 private:
-	uint8_t * m_char_ptr;
-	uint8_t *m_vram;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(keyb_interrupt);
-	DECLARE_WRITE8_MEMBER(sn74259_w) { LOGIO(("%s %02x = %02x\n", FUNCNAME, offset & 0x07, offset & 0x08 ? 1 : 0)); }
-	DECLARE_WRITE8_MEMBER(ap5_w) { LOGIO(("%s %02x = %02x\n", FUNCNAME, offset, data)); }
-	DECLARE_READ8_MEMBER(ap5_r) { LOGIO(("%s() %02x = %02x\n", FUNCNAME, offset, 1)); return 1; }
-	DECLARE_WRITE8_MEMBER(wkb_w) { LOGIO(("%s %02x = %02x\n", FUNCNAME, offset, data)); }
-	DECLARE_WRITE8_MEMBER(sn74299_w) { LOGIO(("%s %02x = %02x\n", FUNCNAME, offset, data)); }
-	DECLARE_READ8_MEMBER(sn74299_r) { LOGIO(("%s() %02x = %02x\n", FUNCNAME, offset, 1)); return 1; }
-	DECLARE_WRITE8_MEMBER(txen_w) { LOGIO(("%s %02x = %02x\n", FUNCNAME, offset, data)); }
-	DECLARE_WRITE8_MEMBER(kbd_reset_w) { LOGIO(("%s %02x = %02x\n", FUNCNAME, offset, data)); }
-	DECLARE_WRITE8_MEMBER(dreq_w) { LOGIO(("%s %02x = %02x\n", FUNCNAME, offset, data)); }
+	DECLARE_WRITE8_MEMBER(sn74259_w) { LOGIO("%s %02x = %02x\n", FUNCNAME, offset & 0x07, offset & 0x08 ? 1 : 0); }
+	DECLARE_WRITE8_MEMBER(ap5_w) { LOGIO("%s %02x = %02x\n", FUNCNAME, offset, data); }
+	DECLARE_READ8_MEMBER(ap5_r) { LOGIO("%s() %02x = %02x\n", FUNCNAME, offset, 1); return 1; }
+	DECLARE_WRITE8_MEMBER(wkb_w) { LOGIO("%s %02x = %02x\n", FUNCNAME, offset, data); }
+	DECLARE_WRITE8_MEMBER(sn74299_w) { LOGIO("%s %02x = %02x\n", FUNCNAME, offset, data); }
+	DECLARE_READ8_MEMBER(sn74299_r) { LOGIO("%s() %02x = %02x\n", FUNCNAME, offset, 1); return 1; }
+	DECLARE_WRITE8_MEMBER(txen_w) { LOGIO("%s %02x = %02x\n", FUNCNAME, offset, data); }
+	DECLARE_WRITE8_MEMBER(kbd_reset_w) { LOGIO("%s %02x = %02x\n", FUNCNAME, offset, data); }
+	DECLARE_WRITE8_MEMBER(dreq_w) { LOGIO("%s %02x = %02x\n", FUNCNAME, offset, data); }
 	void kron180_iomap(address_map &map);
 	void kron180_mem(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<uint8_t> m_videoram;
+	required_region_ptr<uint8_t> m_chargen;
+	required_shared_ptr<uint8_t> m_vram;
 	required_device<pc_keyboard_device> m_keyboard;
 	uint8_t m_kbd_data;
-
-	virtual void machine_start() override;
 };
 
 void kron180_state::kron180_mem(address_map &map)
@@ -167,7 +169,7 @@ void kron180_state::kron180_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x7fff).rom().region("roms", 0x8000);
 	map(0x8000, 0x85ff).ram().mirror(0x6000);
-	map(0x8600, 0x95ff).ram().share("videoram").mirror(0x6000);
+	map(0x8600, 0x95ff).ram().share(m_vram).mirror(0x6000);
 	map(0x9600, 0x9fff).ram().mirror(0x6000);
 }
 
@@ -227,7 +229,7 @@ uint32_t kron180_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	uint8_t *chardata;
 	uint8_t charcode;
 
-	LOGSCREEN(("%s()\n", FUNCNAME));
+	LOGSCREEN("%s()\n", FUNCNAME);
 	vramad = 0;
 	for (int row = 0; row < 25 * 8; row += 8)
 	{
@@ -235,38 +237,26 @@ uint32_t kron180_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 		{
 			/* look up the character data */
 			charcode = m_vram[vramad];
-			if (VERBOSE && charcode != 0x20 && charcode != 0) LOGSCREEN(("\n %c at X=%d Y=%d: ", charcode, col, row));
-			chardata = &m_char_ptr[(charcode * 8) + 8];
+			if (VERBOSE && charcode != 0x20 && charcode != 0) LOGSCREEN("\n %c at X=%d Y=%d: ", charcode, col, row);
+			chardata = &m_chargen[(charcode * 8) + 8];
 			/* plot the character */
 			for (y = 0; y < 8; y++)
 			{
 				chardata--;
-				if (VERBOSE && charcode != 0x20 && charcode != 0) LOGSCREEN(("\n  %02x: ", *chardata));
+				if (VERBOSE && charcode != 0x20 && charcode != 0) LOGSCREEN("\n  %02x: ", *chardata);
 				for (x = 0; x < 8; x++)
 				{
-					if (VERBOSE && charcode != 0x20 && charcode != 0) LOGSCREEN((" %02x: ", *chardata));
+					if (VERBOSE && charcode != 0x20 && charcode != 0) LOGSCREEN(" %02x: ", *chardata);
 					bitmap.pix16(row + (8 - y), col + (8 - x)) = (*chardata & (1 << x)) ? 1 : 0;
 				}
 			}
 			vramad += 2;
 		}
-		if (VERBOSE && charcode != 0x20 && charcode != 0) LOGSCREEN(("\n"));
+		if (VERBOSE && charcode != 0x20 && charcode != 0) LOGSCREEN("\n");
 		vramad += 96; // Each row is aligned at a 128 byte boundary
 	}
 
 	return 0;
-}
-
-/* Start it up */
-void kron180_state::machine_start ()
-{
-	LOG(("%s()\n", FUNCNAME));
-	m_char_ptr  = memregion("chargen")->base();
-	m_vram      = (uint8_t *)m_videoram.target();
-
-	/* register for state saving */
-	save_pointer (NAME (m_char_ptr), sizeof(m_char_ptr));
-	save_pointer (NAME (m_vram), sizeof(m_vram));
 }
 
 /* Interrupt Handling */
@@ -291,7 +281,7 @@ WRITE_LINE_MEMBER(kron180_state::keyb_interrupt)
 {
 	if(state && (m_kbd_data = m_keyboard->read(machine().dummy_space(), 0)))
 	{
-		LOGKBD(("%s(%02x)\n", FUNCNAME, m_kbd_data));
+		LOGKBD("%s(%02x)\n", FUNCNAME, m_kbd_data);
 		m_maincpu->set_input_line(2, ASSERT_LINE);
 		/* TODO: store and present this to K180 in a good way. */
 	}

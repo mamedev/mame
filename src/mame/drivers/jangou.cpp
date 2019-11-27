@@ -1272,7 +1272,7 @@ READ8_MEMBER(jangou_state::jngolady_rng_r)
 
 void jangou_state::init_jngolady()
 {
-	m_nsc->space(AS_PROGRAM).install_read_handler(0x08, 0x08, read8_delegate(FUNC(jangou_state::jngolady_rng_r),this) );
+	m_nsc->space(AS_PROGRAM).install_read_handler(0x08, 0x08, read8_delegate(*this, FUNC(jangou_state::jngolady_rng_r)));
 }
 
 void jangou_state::init_luckygrl()

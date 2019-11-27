@@ -237,7 +237,7 @@ WRITE8_MEMBER(p1_state::p1_ppi2_porta_w)
 		else
 		{
 			program.install_read_bank(0xb8000, 0xbbfff, "bank11");
-			program.install_write_handler(0xb8000, 0xbbfff, WRITE8_DELEGATE(p1_state, p1_vram_w));
+			program.install_write_handler(0xb8000, 0xbbfff, write8_delegate(*this, FUNC(p1_state::p1_vram_w)));
 		}
 	}
 	// DISPLAY BANK
@@ -701,7 +701,7 @@ void p1_state::poisk1(machine_config &config)
 }
 
 ROM_START( poisk1 )
-	ROM_REGION16_LE(0x10000,"bios", 0)
+	ROM_REGION(0x10000, "bios", 0)
 
 	ROM_DEFAULT_BIOS("v91")
 	ROM_SYSTEM_BIOS(0, "v89r0", "1989r0")

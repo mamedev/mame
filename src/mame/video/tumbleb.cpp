@@ -222,9 +222,9 @@ void tumbleb_state::tumbleb_tilemap_redraw()
 
 VIDEO_START_MEMBER(tumbleb_state,pangpang)
 {
-	m_pf1_tilemap =     &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tumbleb_state::pangpang_get_fg_tile_info),this),  TILEMAP_SCAN_ROWS, 8,  8, 64, 32);
-	m_pf1_alt_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tumbleb_state::pangpang_get_bg1_tile_info),this), tilemap_mapper_delegate(FUNC(tumbleb_state::tumblep_scan),this),     16, 16, 64, 32);
-	m_pf2_tilemap =     &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tumbleb_state::pangpang_get_bg2_tile_info),this), tilemap_mapper_delegate(FUNC(tumbleb_state::tumblep_scan),this),     16, 16, 64, 32);
+	m_pf1_tilemap =     &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tumbleb_state::pangpang_get_fg_tile_info)),  TILEMAP_SCAN_ROWS, 8,  8, 64, 32);
+	m_pf1_alt_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tumbleb_state::pangpang_get_bg1_tile_info)), tilemap_mapper_delegate(*this, FUNC(tumbleb_state::tumblep_scan)),     16, 16, 64, 32);
+	m_pf2_tilemap =     &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tumbleb_state::pangpang_get_bg2_tile_info)), tilemap_mapper_delegate(*this, FUNC(tumbleb_state::tumblep_scan)),     16, 16, 64, 32);
 
 	m_pf1_tilemap->set_transparent_pen(0);
 	m_pf1_alt_tilemap->set_transparent_pen(0);
@@ -235,9 +235,9 @@ VIDEO_START_MEMBER(tumbleb_state,pangpang)
 
 VIDEO_START_MEMBER(tumbleb_state,tumblepb)
 {
-	m_pf1_tilemap =     &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tumbleb_state::get_fg_tile_info),this),  TILEMAP_SCAN_ROWS, 8,  8, 64, 32);
-	m_pf1_alt_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tumbleb_state::get_bg1_tile_info),this), tilemap_mapper_delegate(FUNC(tumbleb_state::tumblep_scan),this),     16, 16, 64, 32);
-	m_pf2_tilemap =     &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tumbleb_state::get_bg2_tile_info),this), tilemap_mapper_delegate(FUNC(tumbleb_state::tumblep_scan),this),     16, 16, 64, 32);
+	m_pf1_tilemap =     &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tumbleb_state::get_fg_tile_info)),  TILEMAP_SCAN_ROWS, 8,  8, 64, 32);
+	m_pf1_alt_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tumbleb_state::get_bg1_tile_info)), tilemap_mapper_delegate(*this, FUNC(tumbleb_state::tumblep_scan)),     16, 16, 64, 32);
+	m_pf2_tilemap =     &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tumbleb_state::get_bg2_tile_info)), tilemap_mapper_delegate(*this, FUNC(tumbleb_state::tumblep_scan)),     16, 16, 64, 32);
 
 	m_pf1_tilemap->set_transparent_pen(0);
 	m_pf1_alt_tilemap->set_transparent_pen(0);
@@ -247,9 +247,9 @@ VIDEO_START_MEMBER(tumbleb_state,tumblepb)
 
 VIDEO_START_MEMBER(tumbleb_state,sdfight)
 {
-	m_pf1_tilemap =     &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tumbleb_state::get_fg_tile_info),this),  TILEMAP_SCAN_ROWS, 8,  8, 64, 64); // 64*64 to prevent bad tilemap wrapping? - check real behavior
-	m_pf1_alt_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tumbleb_state::get_bg1_tile_info),this), tilemap_mapper_delegate(FUNC(tumbleb_state::tumblep_scan),this),     16, 16, 64, 32);
-	m_pf2_tilemap =     &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tumbleb_state::get_bg2_tile_info),this), tilemap_mapper_delegate(FUNC(tumbleb_state::tumblep_scan),this),     16, 16, 64, 32);
+	m_pf1_tilemap =     &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tumbleb_state::get_fg_tile_info)),  TILEMAP_SCAN_ROWS, 8,  8, 64, 64); // 64*64 to prevent bad tilemap wrapping? - check real behavior
+	m_pf1_alt_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tumbleb_state::get_bg1_tile_info)), tilemap_mapper_delegate(*this, FUNC(tumbleb_state::tumblep_scan)),     16, 16, 64, 32);
+	m_pf2_tilemap =     &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tumbleb_state::get_bg2_tile_info)), tilemap_mapper_delegate(*this, FUNC(tumbleb_state::tumblep_scan)),     16, 16, 64, 32);
 
 	m_pf1_tilemap->set_transparent_pen(0);
 	m_pf1_alt_tilemap->set_transparent_pen(0);
@@ -259,9 +259,9 @@ VIDEO_START_MEMBER(tumbleb_state,sdfight)
 
 VIDEO_START_MEMBER(tumbleb_state,fncywld)
 {
-	m_pf1_tilemap =     &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tumbleb_state::get_fncywld_fg_tile_info),this),  TILEMAP_SCAN_ROWS, 8,  8, 64, 32);
-	m_pf1_alt_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tumbleb_state::get_fncywld_bg1_tile_info),this), tilemap_mapper_delegate(FUNC(tumbleb_state::tumblep_scan),this),     16, 16, 64, 32);
-	m_pf2_tilemap =     &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tumbleb_state::get_fncywld_bg2_tile_info),this), tilemap_mapper_delegate(FUNC(tumbleb_state::tumblep_scan),this),     16, 16, 64, 32);
+	m_pf1_tilemap =     &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tumbleb_state::get_fncywld_fg_tile_info)),  TILEMAP_SCAN_ROWS, 8,  8, 64, 32);
+	m_pf1_alt_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tumbleb_state::get_fncywld_bg1_tile_info)), tilemap_mapper_delegate(*this, FUNC(tumbleb_state::tumblep_scan)),     16, 16, 64, 32);
+	m_pf2_tilemap =     &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tumbleb_state::get_fncywld_bg2_tile_info)), tilemap_mapper_delegate(*this, FUNC(tumbleb_state::tumblep_scan)),     16, 16, 64, 32);
 
 	m_pf1_tilemap->set_transparent_pen(15);
 	m_pf1_alt_tilemap->set_transparent_pen(15);
@@ -272,9 +272,9 @@ VIDEO_START_MEMBER(tumbleb_state,fncywld)
 
 VIDEO_START_MEMBER(tumbleb_state,suprtrio)
 {
-	m_pf1_tilemap =     &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tumbleb_state::get_fg_tile_info),this),  TILEMAP_SCAN_ROWS, 8,  8, 64, 32);
-	m_pf1_alt_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tumbleb_state::get_bg1_tile_info),this), tilemap_mapper_delegate(FUNC(tumbleb_state::tumblep_scan),this),     16, 16, 64, 32);
-	m_pf2_tilemap =     &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tumbleb_state::get_bg2_tile_info),this), tilemap_mapper_delegate(FUNC(tumbleb_state::tumblep_scan),this),     16, 16, 64, 32);
+	m_pf1_tilemap =     &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tumbleb_state::get_fg_tile_info)),  TILEMAP_SCAN_ROWS, 8,  8, 64, 32);
+	m_pf1_alt_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tumbleb_state::get_bg1_tile_info)), tilemap_mapper_delegate(*this, FUNC(tumbleb_state::tumblep_scan)),     16, 16, 64, 32);
+	m_pf2_tilemap =     &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tumbleb_state::get_bg2_tile_info)), tilemap_mapper_delegate(*this, FUNC(tumbleb_state::tumblep_scan)),     16, 16, 64, 32);
 
 	m_pf1_alt_tilemap->set_transparent_pen(0);
 

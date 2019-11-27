@@ -373,7 +373,7 @@ void savant_state::savant(machine_config &config)
 	m_psu->write_a().set(FUNC(savant_state::lcd_w));
 	m_psu->read_b().set(FUNC(savant_state::input_r));
 
-	config.m_perfect_cpu_quantum = subtag("mcu");
+	config.set_perfect_quantum(m_mcu);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->set_ui_enable(false); // no chesspieces

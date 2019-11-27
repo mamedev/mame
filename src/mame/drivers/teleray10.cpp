@@ -12,7 +12,10 @@
 #include "machine/74259.h"
 #include "machine/input_merger.h"
 #include "machine/mc2661.h"
+#include "machine/timer.h"
+#include "sound/spkrdev.h"
 #include "screen.h"
+#include "speaker.h"
 
 class teleray10_state : public driver_device
 {
@@ -20,8 +23,10 @@ public:
 	teleray10_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_mainirq(*this, "mainirq")
 		, m_outreg(*this, "outreg")
 		, m_screen(*this, "screen")
+		, m_bell(*this, "bell")
 		, m_pci(*this, "pci")
 		, m_serialio(*this, "serialio")
 		, m_peripheral(*this, "peripheral")
@@ -29,6 +34,7 @@ public:
 		, m_displayram(*this, "displayram")
 		, m_chargen(*this, "chargen")
 		, m_keys(*this, "KA%X", 0U)
+		, m_swmisc(*this, "SWMISC")
 	{
 	}
 
@@ -44,6 +50,10 @@ protected:
 private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_expired);
+	TIMER_CALLBACK_MEMBER(bell_toggle);
+	void bell_update();
+
 	DECLARE_WRITE_LINE_MEMBER(wide_mode_w);
 	DECLARE_WRITE_LINE_MEMBER(bell_off_w);
 	DECLARE_WRITE_LINE_MEMBER(reset_timer_w);
@@ -56,8 +66,10 @@ private:
 	void mem_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
+	required_device<input_merger_device> m_mainirq;
 	required_device<ls259_device> m_outreg;
 	required_device<screen_device> m_screen;
+	required_device<speaker_sound_device> m_bell;
 	required_device<mc2661_device> m_pci;
 	required_device<rs232_port_device> m_serialio;
 	required_device<rs232_port_device> m_peripheral;
@@ -65,16 +77,24 @@ private:
 	required_shared_ptr<u8> m_displayram;
 	required_region_ptr<u8> m_chargen;
 	required_ioport_array<16> m_keys;
+	required_ioport m_swmisc;
+
+	emu_timer *m_bell_timer;
 
 	u8 m_topr;
+	bool m_timer_expired;
 };
 
 
 void teleray10_state::machine_start()
 {
+	m_bell_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(teleray10_state::bell_toggle), this));
+
 	m_topr = 0;
+	m_timer_expired = false;
 
 	save_item(NAME(m_topr));
+	save_item(NAME(m_timer_expired));
 }
 
 void teleray10_state::machine_reset()
@@ -82,6 +102,48 @@ void teleray10_state::machine_reset()
 	// Pins 5 (CTS), 6 (DSR), 8 (DCD) are pulled up to +12V on peripheral connector
 	m_peripheral->write_rts(0);
 	m_peripheral->write_dtr(0);
+}
+
+
+TIMER_DEVICE_CALLBACK_MEMBER(teleray10_state::timer_expired)
+{
+	// arbitrary VBLANK condition
+	if (param >= 240 && param < 290)
+	{
+		int height = BIT(m_swmisc->read(), 2) ? 310 : 372;
+		if (height != m_screen->height())
+			m_screen->configure(1000, height, m_screen->visible_area(), attotime::from_ticks(1000 * height, 18.6_MHz_XTAL).as_attoseconds());
+	}
+
+	if (m_outreg->q7_r())
+	{
+		m_timer_expired = true;
+		m_mainirq->in_w<1>(1);
+	}
+}
+
+TIMER_CALLBACK_MEMBER(teleray10_state::bell_toggle)
+{
+	bell_update();
+}
+
+void teleray10_state::bell_update()
+{
+	int vpos = m_screen->vpos();
+	int line = vpos % 12;
+	if (line < 8)
+	{
+		m_bell->level_w(1);
+		m_bell_timer->adjust(m_screen->time_until_pos(vpos - line + 8));
+	}
+	else
+	{
+		m_bell->level_w(0);
+		if (vpos - line + 12 < m_screen->height())
+			m_bell_timer->adjust(m_screen->time_until_pos(vpos - line + 12));
+		else
+			m_bell_timer->adjust(m_screen->time_until_pos(0));
+	}
 }
 
 
@@ -122,15 +184,27 @@ WRITE_LINE_MEMBER(teleray10_state::wide_mode_w)
 
 WRITE_LINE_MEMBER(teleray10_state::bell_off_w)
 {
+	if (state)
+	{
+		m_bell->level_w(0);
+		m_bell_timer->adjust(attotime::never);
+	}
+	else
+		bell_update();
 }
 
 WRITE_LINE_MEMBER(teleray10_state::reset_timer_w)
 {
+	if (!state)
+	{
+		m_timer_expired = false;
+		m_mainirq->in_w<1>(0);
+	}
 }
 
 READ_LINE_MEMBER(teleray10_state::timer_expired_r)
 {
-	return 0;
+	return m_timer_expired;
 }
 
 void teleray10_state::scratchpad_w(offs_t offset, u8 data)
@@ -379,10 +453,10 @@ static INPUT_PORTS_START(teleray10)
 	PORT_DIPNAME(0x01, 0x01, "Display Attributes") PORT_DIPLOCATION("7A:1")
 	PORT_DIPSETTING(0x01, DEF_STR(Off))
 	PORT_DIPSETTING(0x00, DEF_STR(On))
-	PORT_DIPNAME(0x02, 0x02, "Inverse Display") // internal jumper near 4N
+	PORT_DIPNAME(0x02, 0x02, "Inverse Display") PORT_DIPLOCATION("INVRS:1") // internal jumper near 4M
 	PORT_DIPSETTING(0x02, DEF_STR(Off))
 	PORT_DIPSETTING(0x00, DEF_STR(On))
-	PORT_DIPNAME(0x04, 0x04, "Refresh Rate") // internal jumper near 2K
+	PORT_DIPNAME(0x04, 0x04, "Refresh Rate") PORT_DIPLOCATION("50Hz:1") // internal jumper near 2J
 	PORT_DIPSETTING(0x00, "50 Hz")
 	PORT_DIPSETTING(0x04, "60 Hz")
 	PORT_DIPNAME(0x08, 0x08, "Serial Loop") PORT_DIPLOCATION("7A:8")
@@ -396,7 +470,9 @@ void teleray10_state::teleray10(machine_config &config)
 	M6502(config, m_maincpu, 18.6_MHz_XTAL / 20); // 2 characters loaded during each ϕ1 cycle
 	m_maincpu->set_addrmap(AS_PROGRAM, &teleray10_state::mem_map);
 
-	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, m6502_device::IRQ_LINE);
+	TIMER(config, "timer").configure_scanline(FUNC(teleray10_state::timer_expired), "screen", 10, 12);
+
+	INPUT_MERGER_ANY_HIGH(config, m_mainirq).output_handler().set_inputline(m_maincpu, m6502_device::IRQ_LINE);
 
 	LS259(config, m_outreg); // Output Control Register @ 7D
 	m_outreg->q_out_cb<0>().set("xmitser", FUNC(input_merger_device::in_w<0>)).invert();
@@ -412,8 +488,11 @@ void teleray10_state::teleray10(machine_config &config)
 	m_screen->set_raw(18.6_MHz_XTAL, 1000, 0, 800, 310, 0, 288); // 372 total lines in 50 Hz mode
 	m_screen->set_screen_update(FUNC(teleray10_state::screen_update));
 
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_bell).add_route(ALL_OUTPUTS, "mono", 0.5);
+
 	MC2661(config, m_pci, 5.0688_MHz_XTAL); // Signetics 2651 or equivalent
-	m_pci->rxrdy_handler().set("mainirq", FUNC(input_merger_device::in_w<0>));
+	m_pci->rxrdy_handler().set(m_mainirq, FUNC(input_merger_device::in_w<0>));
 	m_pci->txd_handler().set("xmitser", FUNC(input_merger_device::in_w<1>));
 	m_pci->txd_handler().append("xmitperiph", FUNC(input_merger_device::in_w<0>));
 	m_pci->rts_handler().set(m_serialio, FUNC(rs232_port_device::write_rts));
@@ -443,4 +522,4 @@ ROM_START(teleray10)
 ROM_END
 
 
-COMP(1978, teleray10, 0, 0, teleray10, teleray10, teleray10_state, empty_init, "Research Inc.", "Teleray Model 10", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP(1978, teleray10, 0, 0, teleray10, teleray10, teleray10_state, empty_init, "Research Inc.", "Teleray Model 10", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)

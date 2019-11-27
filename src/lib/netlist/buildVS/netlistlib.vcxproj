@@ -21,28 +21,28 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{A374399B-B87F-4E0F-9525-6C099600705F}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -100,13 +100,15 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\..\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..;$(SolutionDir)..\..</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <AdditionalOptions>/bigobj</AdditionalOptions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\analog\nld_bjt.cpp" />
+    <ClCompile Include="..\analog\nld_mosfet.cpp" />
     <ClCompile Include="..\analog\nld_opamps.cpp" />
     <ClCompile Include="..\analog\nld_switches.cpp" />
     <ClCompile Include="..\analog\nlid_fourterm.cpp" />
@@ -114,6 +116,8 @@
     <ClCompile Include="..\devices\net_lib.cpp" />
     <ClCompile Include="..\devices\nld_2102A.cpp" />
     <ClCompile Include="..\devices\nld_2716.cpp" />
+    <ClCompile Include="..\devices\nld_7497.cpp" />
+    <ClCompile Include="..\devices\nld_schmitt.cpp" />
     <ClCompile Include="..\devices\nld_tms4800.cpp" />
     <ClCompile Include="..\devices\nld_4020.cpp" />
     <ClCompile Include="..\devices\nld_4066.cpp" />
@@ -169,18 +173,15 @@
     <ClCompile Include="..\nl_factory.cpp" />
     <ClCompile Include="..\nl_parser.cpp" />
     <ClCompile Include="..\nl_setup.cpp" />
-    <ClCompile Include="..\plib\palloc.cpp" />
-    <ClCompile Include="..\plib\pchrono.cpp" />
     <ClCompile Include="..\plib\pdynlib.cpp" />
     <ClCompile Include="..\plib\pexception.cpp" />
     <ClCompile Include="..\plib\pfmtlog.cpp" />
     <ClCompile Include="..\plib\pfunction.cpp" />
     <ClCompile Include="..\plib\pmain.cpp" />
     <ClCompile Include="..\plib\poptions.cpp" />
-    <ClCompile Include="..\plib\pparser.cpp" />
-    <ClCompile Include="..\plib\pstate.cpp" />
-    <ClCompile Include="..\plib\pstream.cpp" />
+    <ClCompile Include="..\plib\ppreprocessor.cpp" />
     <ClCompile Include="..\plib\pstring.cpp" />
+    <ClCompile Include="..\plib\ptokenizer.cpp" />
     <ClCompile Include="..\plib\putil.cpp" />
     <ClCompile Include="..\solver\nld_matrix_solver.cpp" />
     <ClCompile Include="..\solver\nld_solver.cpp" />
@@ -189,6 +190,8 @@
   <ItemGroup>
     <ClInclude Include="..\analog\nld_bjt.h" />
     <ClInclude Include="..\analog\nld_fourterm.h" />
+    <ClInclude Include="..\analog\nld_generic_models.h" />
+    <ClInclude Include="..\analog\nld_mosfet.h" />
     <ClInclude Include="..\analog\nld_opamps.h" />
     <ClInclude Include="..\analog\nld_switches.h" />
     <ClInclude Include="..\analog\nld_twoterm.h" />
@@ -197,6 +200,8 @@
     <ClInclude Include="..\devices\net_lib.h" />
     <ClInclude Include="..\devices\nld_2102A.h" />
     <ClInclude Include="..\devices\nld_2716.h" />
+    <ClInclude Include="..\devices\nld_7497.h" />
+    <ClInclude Include="..\devices\nld_schmitt.h" />
     <ClInclude Include="..\devices\nld_tms4800.h" />
     <ClInclude Include="..\devices\nld_4020.h" />
     <ClInclude Include="..\devices\nld_4066.h" />
@@ -253,7 +258,6 @@
     <ClInclude Include="..\macro\nlm_opamp.h" />
     <ClInclude Include="..\macro\nlm_other.h" />
     <ClInclude Include="..\macro\nlm_ttl74xx.h" />
-    <ClInclude Include="..\netlist_types.h" />
     <ClInclude Include="..\nl_base.h" />
     <ClInclude Include="..\nl_config.h" />
     <ClInclude Include="..\nl_dice_compat.h" />
@@ -262,8 +266,10 @@
     <ClInclude Include="..\nl_lists.h" />
     <ClInclude Include="..\nl_parser.h" />
     <ClInclude Include="..\nl_setup.h" />
-    <ClInclude Include="..\nl_time.h" />
+    <ClInclude Include="..\plib\gmres.h" />
+    <ClInclude Include="..\plib\mat_cr.h" />
     <ClInclude Include="..\plib\palloc.h" />
+    <ClInclude Include="..\plib\parray.h" />
     <ClInclude Include="..\plib\pchrono.h" />
     <ClInclude Include="..\plib\pconfig.h" />
     <ClInclude Include="..\plib\pdynlib.h" />
@@ -272,15 +278,24 @@
     <ClInclude Include="..\plib\pfunction.h" />
     <ClInclude Include="..\plib\plists.h" />
     <ClInclude Include="..\plib\pmain.h" />
+    <ClInclude Include="..\plib\pmath.h" />
+    <ClInclude Include="..\plib\pmatrix2d.h" />
+    <ClInclude Include="..\plib\pmempool.h" />
+    <ClInclude Include="..\plib\pomp.h" />
     <ClInclude Include="..\plib\poptions.h" />
     <ClInclude Include="..\plib\pparser.h" />
     <ClInclude Include="..\plib\ppmf.h" />
+    <ClInclude Include="..\plib\ppreprocessor.h" />
     <ClInclude Include="..\plib\pstate.h" />
+    <ClInclude Include="..\plib\pstonum.h" />
     <ClInclude Include="..\plib\pstream.h" />
     <ClInclude Include="..\plib\pstring.h" />
+    <ClInclude Include="..\plib\pstrutil.h" />
+    <ClInclude Include="..\plib\ptime.h" />
+    <ClInclude Include="..\plib\ptokenizer.h" />
     <ClInclude Include="..\plib\ptypes.h" />
     <ClInclude Include="..\plib\putil.h" />
-    <ClInclude Include="..\solver\mat_cr.h" />
+    <ClInclude Include="..\plib\vector_ops.h" />
     <ClInclude Include="..\solver\nld_matrix_solver.h" />
     <ClInclude Include="..\solver\nld_ms_direct.h" />
     <ClInclude Include="..\solver\nld_ms_direct1.h" />

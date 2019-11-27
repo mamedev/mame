@@ -799,7 +799,7 @@ void z100_state::z100(machine_config &config)
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(z100_state::update_row), this);
+	m_crtc->set_update_row_callback(FUNC(z100_state::update_row));
 	m_crtc->out_vsync_callback().set(FUNC(z100_state::vidint_w));
 
 	PIC8259(config, m_picm);
@@ -852,8 +852,8 @@ void z100_state::z100(machine_config &config)
 
 	FLOPPY_CONNECTOR(config, m_floppies[0], z100_floppies, "dd", floppy_image_device::default_floppy_formats);
 	FLOPPY_CONNECTOR(config, m_floppies[1], z100_floppies, "dd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppies[2], z100_floppies, "", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppies[3], z100_floppies, "", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppies[2], z100_floppies, nullptr, floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppies[3], z100_floppies, nullptr, floppy_image_device::default_floppy_formats);
 
 	MC2661(config, m_epci[0], 4.9152_MHz_XTAL); // First 2661-2 serial port (printer)
 	m_epci[0]->txrdy_handler().set("epci0int", FUNC(input_merger_device::in_w<0>));

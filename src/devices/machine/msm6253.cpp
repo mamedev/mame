@@ -26,12 +26,13 @@ DEFINE_DEVICE_TYPE(MSM6253, msm6253_device, "msm6253", "OKI MSM6253 A/D Converte
 msm6253_device::msm6253_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, MSM6253, tag, owner, clock)
 	, m_analog_ports(*this, {finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG})
+	, m_analog_input_cb(*this)
 	, m_shift_register(0)
 {
-	m_analog_input_cb[0] = port_read_delegate(FUNC(msm6253_device::port_read<0>), this);
-	m_analog_input_cb[1] = port_read_delegate(FUNC(msm6253_device::port_read<1>), this);
-	m_analog_input_cb[2] = port_read_delegate(FUNC(msm6253_device::port_read<2>), this);
-	m_analog_input_cb[3] = port_read_delegate(FUNC(msm6253_device::port_read<3>), this);
+	m_analog_input_cb[0].set(*this, FUNC(msm6253_device::port_read<0>));
+	m_analog_input_cb[1].set(*this, FUNC(msm6253_device::port_read<1>));
+	m_analog_input_cb[2].set(*this, FUNC(msm6253_device::port_read<2>));
+	m_analog_input_cb[3].set(*this, FUNC(msm6253_device::port_read<3>));
 }
 
 //-------------------------------------------------
@@ -40,11 +41,11 @@ msm6253_device::msm6253_device(const machine_config &mconfig, const char *tag, d
 
 void msm6253_device::device_start()
 {
+	// resolve each callback
+	m_analog_input_cb.resolve_all();
+
 	for (int port = 0; port < 4; port++)
 	{
-		// resolve each callback
-		m_analog_input_cb[port].bind_relative_to(*owner());
-
 		// ensure that any configured ports truly are analog
 		if (m_analog_ports[port].found())
 		{

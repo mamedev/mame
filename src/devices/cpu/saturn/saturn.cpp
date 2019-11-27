@@ -15,6 +15,10 @@
 #include "debugger.h"
 
 
+//#define VERBOSE 1
+#include "logmacro.h"
+
+
 #define R0 0
 #define R1 1
 #define R2 2
@@ -25,10 +29,6 @@
 #define C 7
 #define D 8
 #define I 9 // invalid
-
-
-//#define VERBOSE 1
-#include "logmacro.h"
 
 
 // Hardware status bits
@@ -52,16 +52,19 @@ saturn_device::saturn_device(const machine_config &mconfig, const char *tag, dev
 	, m_unconfig_func(*this)
 	, m_id_func(*this)
 	, m_crc_func(*this)
-	, m_rsi_func(*this), m_pc(0), m_oldpc(0), m_p(0), m_out(0), m_carry(0), m_decimal(0), m_st(0), m_hst(0), m_nmi_state(0), m_irq_state(0), m_irq_enable(0), m_in_irq(0),
-	m_pending_irq(0), m_sleeping(0), m_monitor_id(0), m_monitor_in(0), m_program(nullptr), m_cache(nullptr), m_icount(0), m_debugger_temp(0)
+	, m_rsi_func(*this)
+	, m_pc(0), m_oldpc(0), m_p(0), m_out(0), m_carry(0), m_decimal(0), m_st(0), m_hst(0)
+	, m_nmi_state(0), m_irq_state(0), m_irq_enable(0), m_in_irq(0), m_pending_irq(0)
+	, m_sleeping(0), m_monitor_id(0), m_monitor_in(0)
+	, m_program(nullptr), m_cache(nullptr)
+	, m_icount(0)
+	, m_debugger_temp(0)
 {
 }
 
 device_memory_interface::space_config_vector saturn_device::memory_space_config() const
 {
-	return space_config_vector {
-		std::make_pair(AS_PROGRAM, &m_program_config)
-	};
+	return space_config_vector{ std::make_pair(AS_PROGRAM, &m_program_config) };
 }
 
 bool saturn_device::get_nonstandard_mnemonics_mode() const
@@ -81,8 +84,8 @@ std::unique_ptr<util::disasm_interface> saturn_device::create_disassembler()
  * include the opcode macros, functions and tables
  ***************************************************************/
 
-#include "satops.hxx"
-#include "sattable.hxx"
+#include "satops.ipp"
+#include "sattable.ipp"
 
 /*****************************************************************************
  *

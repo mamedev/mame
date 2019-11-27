@@ -186,7 +186,7 @@ void ultraman_state::ultraman(machine_config &config)
 
 	INPUT_MERGER_ALL_HIGH(config, "soundnmi").output_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -206,22 +206,22 @@ void ultraman_state::ultraman(machine_config &config)
 	K051960(config, m_k051960, 0);
 	m_k051960->set_palette("palette");
 	m_k051960->set_screen("screen");
-	m_k051960->set_sprite_callback(FUNC(ultraman_state::sprite_callback), this);
+	m_k051960->set_sprite_callback(FUNC(ultraman_state::sprite_callback));
 
 	K051316(config, m_k051316[0], 0);
 	m_k051316[0]->set_palette("palette");
 	m_k051316[0]->set_offsets(8, 0);
-	m_k051316[0]->set_zoom_callback(FUNC(ultraman_state::zoom_callback_1), this);
+	m_k051316[0]->set_zoom_callback(FUNC(ultraman_state::zoom_callback_1));
 
 	K051316(config, m_k051316[1], 0);
 	m_k051316[1]->set_palette("palette");
 	m_k051316[1]->set_offsets(8, 0);
-	m_k051316[1]->set_zoom_callback(FUNC(ultraman_state::zoom_callback_2), this);
+	m_k051316[1]->set_zoom_callback(FUNC(ultraman_state::zoom_callback_2));
 
 	K051316(config, m_k051316[2], 0);
 	m_k051316[2]->set_palette("palette");
 	m_k051316[2]->set_offsets(8, 0);
-	m_k051316[2]->set_zoom_callback(FUNC(ultraman_state::zoom_callback_3), this);
+	m_k051316[2]->set_zoom_callback(FUNC(ultraman_state::zoom_callback_3));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

@@ -832,7 +832,7 @@ void wicat_state::wicat(machine_config &config)
 
 	I8275(config, m_crtc, 19.6608_MHz_XTAL/10);
 	m_crtc->set_character_width(10);
-	m_crtc->set_display_callback(FUNC(wicat_state::wicat_display_pixels), this);
+	m_crtc->set_display_callback(FUNC(wicat_state::wicat_display_pixels));
 	m_crtc->drq_wr_callback().set(m_videodma, FUNC(am9517a_device::dreq0_w));
 	m_crtc->vrtc_wr_callback().set(FUNC(wicat_state::crtc_irq_w));
 	m_crtc->set_screen("screen");

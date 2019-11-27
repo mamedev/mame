@@ -168,7 +168,7 @@ WRITE_LINE_MEMBER(ibm5160_mb_device::pc_speaker_set_spkrdata)
 
 WRITE_LINE_MEMBER(ibm5160_mb_device::pic_int_w)
 {
-	m_maincpu->set_input_line(0, state);
+	m_int_callback(state);
 }
 
 
@@ -396,13 +396,13 @@ WRITE8_MEMBER( ibm5160_mb_device::nmi_enable_w )
 {
 	m_nmi_enabled = BIT(data,7);
 	if (!m_nmi_enabled)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+		m_nmi_callback(CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER( ibm5160_mb_device::iochck_w )
 {
 	if (m_nmi_enabled && !state)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+		m_nmi_callback(ASSERT_LINE);
 }
 
 //**************************************************************************
@@ -542,6 +542,8 @@ ibm5160_mb_device::ibm5160_mb_device(
 	, m_isabus(*this, "isa")
 	, m_pc_kbdc(*this, "pc_kbdc")
 	, m_ram(*this, ":" RAM_TAG)
+	, m_int_callback(*this)
+	, m_nmi_callback(*this)
 {
 }
 
@@ -554,6 +556,20 @@ void ibm5160_mb_device::map(address_map &map)
 	map(0x0080, 0x008f).w(FUNC(ibm5160_mb_device::pc_page_w));
 	map(0x00a0, 0x00a1).w(FUNC(ibm5160_mb_device::nmi_enable_w));
 }
+
+
+//-------------------------------------------------
+//  device_resolve_objects - resolve objects that
+//  may be needed for other devices to set
+//  initial conditions at start time
+//-------------------------------------------------
+
+void ibm5160_mb_device::device_resolve_objects()
+{
+	m_int_callback.resolve_safe();
+	m_nmi_callback.resolve_safe();
+}
+
 
 //-------------------------------------------------
 //  device_start - device-specific startup

@@ -102,21 +102,21 @@ void dio16_98543_device::device_start()
 
 	dio().install_memory(
 			0x200000, 0x27ffff,
-			read16_delegate(FUNC(dio16_98543_device::vram_r), this),
-			write16_delegate(FUNC(dio16_98543_device::vram_w), this));
+			read16_delegate(*this, FUNC(dio16_98543_device::vram_r)),
+			write16_delegate(*this, FUNC(dio16_98543_device::vram_w)));
 	dio().install_memory(
 			0x560000, 0x563fff,
-			read16_delegate(FUNC(dio16_98543_device::rom_r), this),
-			write16_delegate(FUNC(dio16_98543_device::rom_w), this));
+			read16_delegate(*this, FUNC(dio16_98543_device::rom_r)),
+			write16_delegate(*this, FUNC(dio16_98543_device::rom_w)));
 	dio().install_memory(
 			0x564000, 0x565fff,
-			read16_delegate(FUNC(dio16_98543_device::ctrl_r), this),
-			write16_delegate(FUNC(dio16_98543_device::ctrl_w), this));
+			read16_delegate(*this, FUNC(dio16_98543_device::ctrl_r)),
+			write16_delegate(*this, FUNC(dio16_98543_device::ctrl_w)));
 
 	dio().install_memory(
 			0x566000, 0x567fff,
-			read16_delegate(FUNC(nereid_device::ctrl_r), static_cast<nereid_device*>(m_nereid)),
-			write16_delegate(FUNC(nereid_device::ctrl_w), static_cast<nereid_device*>(m_nereid)));
+			read16_delegate(*m_nereid, FUNC(nereid_device::ctrl_r)),
+			write16_delegate(*m_nereid, FUNC(nereid_device::ctrl_w)));
 }
 
 void dio16_98543_device::device_reset()

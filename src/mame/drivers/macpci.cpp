@@ -139,7 +139,7 @@ void macpci_state::pippin(machine_config &config)
 	m_cuda->linechange_callback().set(FUNC(macpci_state::cuda_adb_linechange_w));
 	m_cuda->via_clock_callback().set(m_via1, FUNC(via6522_device::write_cb1));
 	m_cuda->via_data_callback().set(m_via1, FUNC(via6522_device::write_cb2));
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 }
 
 /* ROM definition */

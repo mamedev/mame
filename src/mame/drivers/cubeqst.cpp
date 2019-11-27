@@ -542,7 +542,7 @@ void cubeqst_state::cubeqst(machine_config &config)
 	m_soundcpu->dac_w().set(FUNC(cubeqst_state::sound_dac_w));
 	m_soundcpu->set_sound_region("soundproms");
 
-	config.m_minimum_quantum = attotime::from_hz(48000);
+	config.set_maximum_quantum(attotime::from_hz(48000));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

@@ -10,7 +10,7 @@
 
 DECLARE_DEVICE_TYPE(ATA_FLASH_PCCARD, ata_flash_pccard_device)
 
-class ata_flash_pccard_device : public ide_hdd_device, public pccard_interface
+class ata_flash_pccard_device : public ide_hdd_device, public device_pccard_interface
 {
 public:
 	ata_flash_pccard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

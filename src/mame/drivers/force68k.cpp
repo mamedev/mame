@@ -381,9 +381,9 @@ void force68k_state::machine_start ()
 	{
 		m_usrrom = (uint16_t*)m_cart->get_rom_base();
 #if 0 // This should be the correct way but produces odd and even bytes swapped
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0xa0000, 0xbffff, read16_delegate(FUNC(generic_slot_device::read16_rom), (generic_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xa0000, 0xbffff, read16_delegate(*m_cart, FUNC(generic_slot_device::read16_rom)));
 #else // So we installs a custom very ineffecient handler for now until we understand hwp to solve the problem better
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0xa0000, 0xbffff, read16_delegate(FUNC(force68k_state::read16_rom), this));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xa0000, 0xbffff, read16_delegate(*this, FUNC(force68k_state::read16_rom)));
 #endif
 	}
 }
@@ -500,7 +500,7 @@ void force68k_state::fccpu1_eprom_sockets(machine_config &config)
 	generic_cartslot_device &exp_rom1(GENERIC_CARTSLOT(config, "exp_rom1", generic_plain_slot, "fccpu1_cart", "bin,rom"));
 	exp_rom1.set_width(GENERIC_ROM16_WIDTH);
 	exp_rom1.set_endian(ENDIANNESS_BIG);
-	exp_rom1.set_device_load(FUNC(force68k_state::exp1_load), this);
+	exp_rom1.set_device_load(FUNC(force68k_state::exp1_load));
 //  SOFTWARE_LIST(config, "cart_list").set_original("fccpu1_cart");
 }
 

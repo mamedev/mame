@@ -898,7 +898,7 @@ void polepos_state::polepos(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 16);   // 128V clocks the same as VBLANK
 
-	config.m_minimum_quantum = attotime::from_hz(6000);  /* some interleaving */
+	config.set_maximum_quantum(attotime::from_hz(6000));  /* some interleaving */
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
@@ -1007,7 +1007,7 @@ void polepos_state::topracern(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 16);   // 128V clocks the same as VBLANK
 
-	config.m_minimum_quantum = attotime::from_hz(6000);  /* some interleaving */
+	config.set_maximum_quantum(attotime::from_hz(6000));  /* some interleaving */
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
@@ -2449,7 +2449,7 @@ ROM_END
 void polepos_state::init_polepos2()
 {
 	/* note that the bootleg version doesn't need this custom IC; it has a hacked ROM in its place */
-	m_subcpu->space(AS_PROGRAM).install_read_handler(0x4000, 0x5fff, read16_delegate(FUNC(polepos_state::polepos2_ic25_r),this));
+	m_subcpu->space(AS_PROGRAM).install_read_handler(0x4000, 0x5fff, read16_delegate(*this, FUNC(polepos_state::polepos2_ic25_r)));
 }
 
 
