@@ -60,11 +60,14 @@ void load_translation(emu_options &m_options)
 	f_translation_data.reset();
 	f_translation_map.clear();
 
-	emu_file file(m_options.language_path(), OPEN_FLAG_READ);
 	std::string name = m_options.language();
+	if (name.empty())
+		return;
+
 	strreplace(name, " ", "_");
 	strreplace(name, "(", "");
 	strreplace(name, ")", "");
+	emu_file file(m_options.language_path(), OPEN_FLAG_READ);
 	if (file.open(name.c_str(), PATH_SEPARATOR "strings.mo") != osd_file::error::NONE)
 	{
 		osd_printf_error("Error opening translation file %s\n", name);
