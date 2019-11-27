@@ -2203,10 +2203,10 @@ void sega315_5313_device::render_videobuffer_to_screenbuffer(int scanline)
 	{
 		if (m_32x_scanline_helper_func(scanline, MEGADRIVE_REG01_240_LINE, hres[get_hres()] == 320))
 		{
-			for (int srcx = 0, xx = 0, dstx = 0; srcx < horz; dstx++)
+			for (int srcx = 0, xx = 0, dstx = 0; srcx < 320; dstx++)
 			{
 				m_32x_scanline_func(srcx, m_video_renderline[srcx] & 0x20000, lineptr[dstx]);
-				if (++xx >= mul)
+				if (++xx >= m_lcm_scaling ? 4 : 1)
 				{
 					srcx++;
 					xx = 0;
