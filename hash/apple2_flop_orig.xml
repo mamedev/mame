@@ -8877,4 +8877,106 @@
 		</part>
 	</software>
 
+	<software name="krift">
+		<description>Koronis Rift</description>
+		<year>1985</year>
+		<publisher>Epyx</publisher>
+		<info name="release" value="2019-11-25"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234737">
+				<rom name="koronis rift.woz" size="234737" crc="657888ad" sha1="97f86d1d2b7bc39c86f81cc6c3adf6528c19e81b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tantales">
+		<description>Tangled Tales</description>
+		<year>1989</year>
+		<publisher>Origin Systems</publisher>
+		<info name="release" value="2019-11-25"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side A - Boot"/>
+			<dataarea name="flop" size="234868">
+				<rom name="tangled tales disk 1a - boot.woz" size="234868" crc="079c0226" sha1="505a512df0a5f36115cd2eac0d092bd9a5d7518c"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side B - Adventure 3"/>
+			<dataarea name="flop" size="234868">
+				<rom name="tangled tales disk 1b - adventure 3.woz" size="234868" crc="cd208f55" sha1="8b1fc202a9878fc0c7e5f356d78b270891a416c8"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side A - Adventure 1"/>
+			<dataarea name="flop" size="234868">
+				<rom name="tangled tales disk 2a - adventure 1.woz" size="234868" crc="1fbdee91" sha1="813f0033b3242387542caab350dc687c57764333"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side B - Adventure 2"/>
+			<dataarea name="flop" size="234868">
+				<rom name="tangled tales disk 2b - adventure 2.woz" size="234868" crc="c03b8ec4" sha1="ebaf93937fd0dae6a85ea410fc9547aa82867a6c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nordbert">
+		<description>Nord and Bert Couldn't Make Head or Tail of It (Release 19 / 870722)</description>
+		<year>1987</year>
+		<publisher>Infocom</publisher>
+		<info name="release" value="2019-11-25"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234837">
+				<rom name="nord and bert couldn't make head or tail of it r19 side a.woz" size="234837" crc="c9519b7c" sha1="3488765db40e404775bb9cf3df73a8fd37165296"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="108373">
+				<rom name="nord and bert couldn't make head or tail of it r19 side b.woz" size="108373" crc="8137995a" sha1="b3934608cc519e9663d04daabc051a9fcd7c7750"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="drugalrt">
+		<description>Drug Alert!</description>
+		<year>1986</year>
+		<publisher>Methods \&amp; Solutions</publisher>
+		<info name="release" value="2019-11-26"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple ][+ or later. -->
+		<!-- The password to read the handbook in-game is SESAME.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234793">
+				<rom name="drug alert.woz" size="234793" crc="7761dd4f" sha1="c7ca43dc87efa8e10641f0e108ca57f69d031d63"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="amzthng">
+		<description>In Search of the Most Amazing Thing</description>
+		<year>1983</year>
+		<publisher>Spinnaker Software</publisher>
+		<info name="release" value="2019-11-26"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234804">
+				<rom name="in search of the most amazing thing.woz" size="234804" crc="ab9f24eb" sha1="db71277402a4457c039a67efb2d8f6891c04185c"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
