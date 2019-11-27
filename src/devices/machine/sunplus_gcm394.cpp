@@ -15,7 +15,7 @@
 #define LOG_GCM394                (1U << 1)
 #define LOG_GCM394_UNMAPPED       (1U << 0)
 
-#define VERBOSE             (LOG_GCM394_UNMAPPED | LOG_GCM394_SYSDMA)
+#define VERBOSE             (LOG_GCM394 | LOG_GCM394_UNMAPPED | LOG_GCM394_SYSDMA)
 #include "logmacro.h"
 
 
@@ -143,7 +143,12 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7810_w) { LOGMASKED(LOG_GCM39
 WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7816_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7816_w %04x\n", machine().describe_context(), data); m_7816 = data; }
 WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7817_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7817_w %04x\n", machine().describe_context(), data); m_7817 = data; }
 
-WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7820_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7820_w %04x\n", machine().describe_context(), data); m_7820 = data; }
+WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7820_w)
+{
+	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7820_w (Rom Mapping control?) %04x\n", machine().describe_context(), data);
+	m_7820 = data;
+	m_mapping_write_cb(data);
+}
 
 WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7821_w)
 {
@@ -208,7 +213,7 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_78b1_w) { LOGMASKED(LOG_GCM39
 READ16_MEMBER(sunplus_gcm394_base_device::unkarea_78b2_r)
 {
 	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_78b2_r\n", machine().describe_context());
-	return machine().rand();
+	return m_78b2;
 }
 
 WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_78b2_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_78b2_w %04x\n", machine().describe_context(), data); m_78b2 = data; }
@@ -227,7 +232,7 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7935_w)
 {
 	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7935_w %04x\n", machine().describe_context(), data);
 	m_7935 &= ~data;
-	checkirq6();
+	//checkirq6();
 }
 
 READ16_MEMBER(sunplus_gcm394_base_device::unkarea_7936_r) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7936_r\n", machine().describe_context()); return 0x0000; }
@@ -281,16 +286,16 @@ void sunplus_gcm394_base_device::internal_map(address_map &map)
 	map(0x007010, 0x007015).rw(m_spg_video, FUNC(gcm394_base_video_device::tmap0_regs_r), FUNC(gcm394_base_video_device::tmap0_regs_w));
 	map(0x007016, 0x00701b).rw(m_spg_video, FUNC(gcm394_base_video_device::tmap1_regs_r), FUNC(gcm394_base_video_device::tmap1_regs_w));
 
-	map(0x007020, 0x007020).w(m_spg_video, FUNC(gcm394_base_video_device::tmap0_unk0_w));                 // probably tilebase, written with other tmap0 regs
-	map(0x007021, 0x007021).w(m_spg_video, FUNC(gcm394_base_video_device::tmap1_unk0_w));                 // probably tilebase, written with other tmap1 regs
+	map(0x007020, 0x007020).w(m_spg_video, FUNC(gcm394_base_video_device::tmap0_tilebase_lsb_w));                 // probably tilebase, written with other tmap0 regs
+	map(0x007021, 0x007021).w(m_spg_video, FUNC(gcm394_base_video_device::tmap1_tilebase_lsb_w));                 // probably tilebase, written with other tmap1 regs
 	map(0x007022, 0x007022).w(m_spg_video, FUNC(gcm394_base_video_device::unknown_video_device2_unk0_w)); // another tilebase? maybe sprites? written as 7022, 702d and 7042 group
 	map(0x007023, 0x007023).w(m_spg_video, FUNC(gcm394_base_video_device::unknown_video_device0_unk0_w)); // written with other unknown_video_device0 regs
 	map(0x007024, 0x007024).w(m_spg_video, FUNC(gcm394_base_video_device::unknown_video_device1_unk0_w)); // written with other unknown_video_device1 regs
 
 	map(0x00702a, 0x00702a).w(m_spg_video, FUNC(gcm394_base_video_device::video_702a_w));
 
-	map(0x00702b, 0x00702b).w(m_spg_video, FUNC(gcm394_base_video_device::tmap0_unk1_w));                 // written with other tmap0 regs
-	map(0x00702c, 0x00702c).w(m_spg_video, FUNC(gcm394_base_video_device::tmap1_unk1_w));                 // written with other tmap1 regs
+	map(0x00702b, 0x00702b).w(m_spg_video, FUNC(gcm394_base_video_device::tmap0_tilebase_msb_w));                 // written with other tmap0 regs
+	map(0x00702c, 0x00702c).w(m_spg_video, FUNC(gcm394_base_video_device::tmap1_tilebase_msb_w));                 // written with other tmap1 regs
 	map(0x00702d, 0x00702d).w(m_spg_video, FUNC(gcm394_base_video_device::unknown_video_device2_unk1_w)); // maybe sprites?  written as 7022, 702d and 7042 group
 	map(0x00702e, 0x00702e).w(m_spg_video, FUNC(gcm394_base_video_device::unknown_video_device0_unk1_w)); // written with other unknown_video_device0 regs
 	map(0x00702f, 0x00702f).w(m_spg_video, FUNC(gcm394_base_video_device::unknown_video_device1_unk1_w)); // written with other unknown_video_device1 regs
@@ -310,6 +315,7 @@ void sunplus_gcm394_base_device::internal_map(address_map &map)
 	map(0x007072, 0x007072).rw(m_spg_video, FUNC(gcm394_base_video_device::video_dma_size_r), FUNC(gcm394_base_video_device::video_dma_size_w));     //
 	map(0x00707e, 0x00707e).w(m_spg_video, FUNC(gcm394_base_video_device::video_dma_unk_w));                                                         // written around same time as DMA, seems to select alt sprite bank
 
+	map(0x00707c, 0x00707c).r(m_spg_video, FUNC(gcm394_base_video_device::video_707c_r)); // wrlshunt polls this waiting for 0x8000, is this some kind of manual port based data upload?
 	map(0x00707f, 0x00707f).rw(m_spg_video, FUNC(gcm394_base_video_device::video_707f_r), FUNC(gcm394_base_video_device::video_707f_w));
 
 	// another set of registers for something?
@@ -326,6 +332,9 @@ void sunplus_gcm394_base_device::internal_map(address_map &map)
 	// ######################################################################################################################################################################################
 	// 73xx-77xx = video ram
 	// ######################################################################################################################################################################################
+
+	map(0x007100, 0x0071ef).ram().share("unkram1"); // maybe a line table? (assuming DMA isn't writing to wrong place)
+	map(0x007200, 0x0072ef).ram().share("unkram2"); // ^^
 
 	map(0x007300, 0x0073ff).rw(m_spg_video, FUNC(gcm394_base_video_device::palette_r), FUNC(gcm394_base_video_device::palette_w));
 
@@ -348,12 +357,12 @@ void sunplus_gcm394_base_device::internal_map(address_map &map)
 	map(0x007816, 0x007816).w(FUNC(sunplus_gcm394_base_device::unkarea_7816_w));
 	map(0x007817, 0x007817).w(FUNC(sunplus_gcm394_base_device::unkarea_7817_w));
 
-
-	map(0x007820, 0x007820).w(FUNC(sunplus_gcm394_base_device::unkarea_7820_w));
-	map(0x007821, 0x007821).w(FUNC(sunplus_gcm394_base_device::unkarea_7821_w));
-	map(0x007822, 0x007822).w(FUNC(sunplus_gcm394_base_device::unkarea_7822_w));
-	map(0x007823, 0x007823).w(FUNC(sunplus_gcm394_base_device::unkarea_7823_w));
-	map(0x007824, 0x007824).w(FUNC(sunplus_gcm394_base_device::unkarea_7824_w));
+	                                                                             // wrlshunt                                                               | smartfp
+	map(0x007820, 0x007820).w(FUNC(sunplus_gcm394_base_device::unkarea_7820_w)); // 7f8a (7f8a before DMA from ROM to RAM, 008a after DMA from ROM to RAM) | 3f04
+	map(0x007821, 0x007821).w(FUNC(sunplus_gcm394_base_device::unkarea_7821_w)); // 7f47                                                                   | 0044
+	map(0x007822, 0x007822).w(FUNC(sunplus_gcm394_base_device::unkarea_7822_w)); // 0047                                                                   | 1f44
+	map(0x007823, 0x007823).w(FUNC(sunplus_gcm394_base_device::unkarea_7823_w)); // 0047                                                                   | 0044
+	map(0x007824, 0x007824).w(FUNC(sunplus_gcm394_base_device::unkarea_7824_w)); // 0047                                                                   | 0044
 
 	map(0x00782d, 0x00782d).rw(FUNC(sunplus_gcm394_base_device::unkarea_782d_r), FUNC(sunplus_gcm394_base_device::unkarea_782d_w)); // on startup
 
@@ -437,7 +446,7 @@ void sunplus_gcm394_base_device::device_start()
 
 	m_space_read_cb.resolve_safe(0);
 	m_space_write_cb.resolve();
-	m_bank_write_cb.resolve();
+	m_mapping_write_cb.resolve();
 
 
 	m_unk_timer = timer_alloc(0);
@@ -524,12 +533,25 @@ void sunplus_gcm394_base_device::device_reset()
 
 }
 
+IRQ_CALLBACK_MEMBER(sunplus_gcm394_base_device::irq_vector_cb)
+{
+	//printf("irq_vector_cb %d\n", irqline);
+
+	if (irqline == UNSP_IRQ6_LINE)
+		set_state_unsynced(UNSP_IRQ6_LINE, CLEAR_LINE);
+
+	return 0;
+}
+
+
 void sunplus_gcm394_base_device::checkirq6()
 {
+/*
 	if (m_7935 & 0x0100)
 		set_state_unsynced(UNSP_IRQ6_LINE, ASSERT_LINE);
 	else
 		set_state_unsynced(UNSP_IRQ6_LINE, CLEAR_LINE);
+*/
 }
 
 void sunplus_gcm394_base_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -539,7 +561,8 @@ void sunplus_gcm394_base_device::device_timer(emu_timer &timer, device_timer_id 
 	case 0:
 	{
 		m_7935 |= 0x0100;
-		checkirq6();
+		set_state_unsynced(UNSP_IRQ6_LINE, ASSERT_LINE);
+	//	checkirq6();
 		break;
 	}
 	}

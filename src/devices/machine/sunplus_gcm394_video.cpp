@@ -285,7 +285,7 @@ void gcm394_base_video_device::draw(const rectangle &cliprect, uint32_t line, ui
 		}
 		else
 		{
-			pen = machine().rand() & 0x1f;
+			//pen = machine().rand() & 0x1f;
 			// 8bpp
 		}
 
@@ -518,10 +518,10 @@ uint32_t gcm394_base_video_device::screen_update(screen_device &screen, bitmap_r
 {
 	memset(&m_screenbuf[320 * cliprect.min_y], 0, 4 * 320 * ((cliprect.max_y - cliprect.min_y) + 1));
 
-	const uint32_t page1_addr = 0x40 * m_page1_addr;
-	const uint32_t page2_addr = 0x40 * m_page2_addr;
-	uint16_t* page1_regs = m_tmap0_regs;
-	uint16_t* page2_regs = m_tmap1_regs;
+	const uint32_t page0_addr = 0x40 * (m_page0_addr | (m_page0_addr_msb<<16));
+	const uint32_t page1_addr = 0x40 * (m_page1_addr | (m_page1_addr_msb<<16));
+	uint16_t* page0_regs = m_tmap0_regs;
+	uint16_t* page1_regs = m_tmap1_regs;
 
 	for (uint32_t scanline = (uint32_t)cliprect.min_y; scanline <= (uint32_t)cliprect.max_y; scanline++)
 	{
@@ -529,8 +529,8 @@ uint32_t gcm394_base_video_device::screen_update(screen_device &screen, bitmap_r
 		{
 			if (1)
 			{
+				draw_page(cliprect, scanline, i, page0_addr, page0_regs);
 				draw_page(cliprect, scanline, i, page1_addr, page1_regs);
-				draw_page(cliprect, scanline, i, page2_addr, page2_regs);
 			}
 			draw_sprites(cliprect, scanline, i);
 		}
@@ -595,15 +595,16 @@ WRITE16_MEMBER(gcm394_base_video_device::tmap0_regs_w)
 	write_tmap_regs(0, m_tmap0_regs, offset, data);
 }
 
-WRITE16_MEMBER(gcm394_base_video_device::tmap0_unk0_w)
+WRITE16_MEMBER(gcm394_base_video_device::tmap0_tilebase_lsb_w)
 {
-	LOGMASKED(LOG_GCM394_TMAP, "%s:gcm394_base_video_device::tmap0_unk0_w %04x\n", machine().describe_context(), data);
-	m_page1_addr = data;
+	LOGMASKED(LOG_GCM394_TMAP, "%s:gcm394_base_video_device::tmap0_tilebase_lsb_w %04x\n", machine().describe_context(), data);
+	m_page0_addr = data;
 }
 
-WRITE16_MEMBER(gcm394_base_video_device::tmap0_unk1_w)
+WRITE16_MEMBER(gcm394_base_video_device::tmap0_tilebase_msb_w)
 {
-	LOGMASKED(LOG_GCM394_TMAP, "%s:gcm394_base_video_device::tmap0_unk1_w %04x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_GCM394_TMAP, "%s:gcm394_base_video_device::tmap0_tilebase_msb_w %04x\n", machine().describe_context(), data);
+	m_page0_addr_msb = data;
 }
 
 // **************************************** TILEMAP 1 *************************************************
@@ -616,15 +617,16 @@ WRITE16_MEMBER(gcm394_base_video_device::tmap1_regs_w)
 	write_tmap_regs(1, m_tmap1_regs, offset, data);
 }
 
-WRITE16_MEMBER(gcm394_base_video_device::tmap1_unk0_w)
+WRITE16_MEMBER(gcm394_base_video_device::tmap1_tilebase_lsb_w)
 {
-	LOGMASKED(LOG_GCM394_TMAP, "%s:gcm394_base_video_device::tmap1_unk0_w %04x\n", machine().describe_context(), data);
-	m_page2_addr = data;
+	LOGMASKED(LOG_GCM394_TMAP, "%s:gcm394_base_video_device::tmap1_tilebase_lsb_w %04x\n", machine().describe_context(), data);
+	m_page1_addr = data;
 }
 
-WRITE16_MEMBER(gcm394_base_video_device::tmap1_unk1_w)
+WRITE16_MEMBER(gcm394_base_video_device::tmap1_tilebase_msb_w)
 {
-	LOGMASKED(LOG_GCM394_TMAP, "%s:gcm394_base_video_device::tmap1_unk1_w %04x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_GCM394_TMAP, "%s:gcm394_base_video_device::tmap1_tilebase_msb_w %04x\n", machine().describe_context(), data);
+	m_page1_addr_msb = data;
 }
 
 // **************************************** unknown video device 0 (another tilemap? sprite layer?) *************************************************
@@ -757,6 +759,11 @@ WRITE16_MEMBER(gcm394_base_video_device::video_dma_unk_w)
 }
 
 
+READ16_MEMBER(gcm394_base_video_device::video_707c_r)
+{ 
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_707c_r\n", machine().describe_context());
+	return 0x8000;
+}
 
 
 READ16_MEMBER(gcm394_base_video_device::video_707f_r) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_707f_r\n", machine().describe_context()); return m_707f; }
@@ -791,7 +798,12 @@ WRITE16_MEMBER(gcm394_base_video_device::video_7063_w)
 WRITE16_MEMBER(gcm394_base_video_device::video_702a_w) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_702a_w %04x\n", machine().describe_context(), data); m_702a = data; }
 
 // read in IRQ
-READ16_MEMBER(gcm394_base_video_device::video_7030_r) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7030_r\n", machine().describe_context()); return m_7030; }
+READ16_MEMBER(gcm394_base_video_device::video_7030_r)
+{
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7030_r\n", machine().describe_context());
+	return 0x0000; /* wrlshunt ends up doing an explicit jump to 0000 shortly after boot if you just return the value written here, what is it? do we want to be returning non-zero to continue, with the problem being elsewhere, or is this the problem? */ 
+}
+
 WRITE16_MEMBER(gcm394_base_video_device::video_7030_w) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7030_w %04x\n", machine().describe_context(), data); m_7030 = data; }
 WRITE16_MEMBER(gcm394_base_video_device::video_703c_w) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_703c_w %04x\n", machine().describe_context(), data); m_703c = data; }
 

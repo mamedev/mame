@@ -83,10 +83,6 @@ void skyfox_state::skyfox_palette(palette_device &palette) const
 
 	compute_res_net_all(rgb, color_prom, skyfox_decode_info, skyfox_net_info);
 	palette.set_pen_colors(0, rgb);
-
-	// Grey scale for the background??? is wrong
-	for (int i = 0; i < 256; i++)
-		palette.set_pen_color(i + 256, rgb_t(i, i, i));
 }
 
 
@@ -153,8 +149,8 @@ void skyfox_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 
 		if (m_bg_ctrl & 1) // flipscreen
 		{
-			x = width  - x - (n - 1) * 8;
-			y = height - y - (n - 1) * 8;
+			x = width  - x - n * 8;
+			y = height - y - n * 8;
 			flipx = !flipx;
 			flipy = !flipy;
 		}
@@ -196,26 +192,31 @@ void skyfox_state::draw_background(bitmap_ind16 &bitmap, const rectangle &clipre
 {
 	uint8_t *rom = memregion("gfx2")->base();
 
-	/* The foreground stars (sprites) move at twice this speed when
-	   the bg scroll rate [e.g. (m_bg_ctrl >> 1) & 7] is 4 */
-	int pos = (m_bg_pos >> 4) & (512 * 2 - 1);
+	/* Flashing stops until the first star moves after turning on the power */
+	bool shining = (m_bg_ctrl & 0x8);
+	/* Maybe star pattern change. This will change at some intervals or when restart */
+	int pattern = (m_bg_ctrl & 0x6) >> 1;
 
 	for (int i = 0; i < 0x1000; i++)
 	{
-		int offs = (i * 2 + ((m_bg_ctrl >> 4) & 0x3) * 0x2000) % 0x8000;
+		/* contains the position of stars from 0xd4e0 in RAM */
+		int ramoffset = 0xe0 + (i & 0xf) * 2;
+		int pos = m_bgram[ramoffset + 1] * 2 + ((m_bgram[ramoffset] & 0x80) ? 1 : 0);
 
+		/* ROM offset of star pattern */
+		int offs = (i * 2) % 0x2000 + pattern * 0x2000;
+
+		/* Looks like good, but was written with intuition, Probably not perfect */
 		int pen = rom[offs];
-		int x = rom[offs + 1] * 2 + (i & 1) + pos + ((i & 8) ? 512 : 0);
-		int y = ((i / 8) / 2) * 8 + (i % 8);
+		int x = rom[offs + 1] * 2 + ((i >> 4) & 1) + pos;
+		int y = (i >> 4);
+		x += 0x60; // Adjustment based on PCB display
 
-		if (m_bg_ctrl & 1) // flipscreen
-		{
-			x = 512 * 2 - (x % (512 * 2));
-			y = 256     - (y % 256);
-		}
+		// When flipscreen is enabled, direction of background scroll is reversed by the in-game subroutine.
+		// This PCB seems does not support background flip.
 
-		for (int j = 0; j <= ((pen & 0x80) ? 0 : 3); j++)
-			bitmap.pix16((((j / 2) & 1) + y) % 256, ((j & 1) + x) % 512) = 256 + (pen & 0x7f);
+		if (((m_bg_ctrl >> 4) & 3) != (pen & 3) || !shining)
+			bitmap.pix16(y % 256, x % 512) = pen;
 	}
 }
 

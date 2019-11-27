@@ -57,23 +57,23 @@ protected:
 
 	std::vector<uint8_t> m_light_states;
 
-	bool m_eps_mode;
+	bool m_eps_mode = 0;
 
 	esqpanel::external_panel_server *m_external_panel_server;
 
 private:
 	static const int XMIT_RING_SIZE = 16;
 
-	bool  m_bCalibSecondByte;
-	bool  m_bButtonLightSecondByte;
+	bool  m_bCalibSecondByte = 0;
+	bool  m_bButtonLightSecondByte = 0;
 
 	devcb_write_line m_write_tx;
 	devcb_write16 m_write_analog;
 	uint8_t m_xmitring[XMIT_RING_SIZE];
-	int m_xmit_read, m_xmit_write;
-	bool m_tx_busy;
+	int m_xmit_read, m_xmit_write = 0;
+	bool m_tx_busy = 0;
 
-	emu_timer *m_external_timer;
+	emu_timer *m_external_timer = nullptr;
 };
 
 class esqpanel1x22_device : public esqpanel_device {

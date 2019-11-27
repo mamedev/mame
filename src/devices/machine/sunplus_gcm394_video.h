@@ -29,13 +29,13 @@ public:
 
 	DECLARE_READ16_MEMBER(tmap0_regs_r);
 	DECLARE_WRITE16_MEMBER(tmap0_regs_w);
-	DECLARE_WRITE16_MEMBER(tmap0_unk0_w);
-	DECLARE_WRITE16_MEMBER(tmap0_unk1_w);
+	DECLARE_WRITE16_MEMBER(tmap0_tilebase_lsb_w);
+	DECLARE_WRITE16_MEMBER(tmap0_tilebase_msb_w);
 
 	DECLARE_READ16_MEMBER(tmap1_regs_r);
 	DECLARE_WRITE16_MEMBER(tmap1_regs_w);
-	DECLARE_WRITE16_MEMBER(tmap1_unk0_w);
-	DECLARE_WRITE16_MEMBER(tmap1_unk1_w);
+	DECLARE_WRITE16_MEMBER(tmap1_tilebase_lsb_w);
+	DECLARE_WRITE16_MEMBER(tmap1_tilebase_msb_w);
 
 	DECLARE_WRITE16_MEMBER(unknown_video_device0_regs_w);
 	DECLARE_WRITE16_MEMBER(unknown_video_device0_unk0_w);
@@ -69,6 +69,7 @@ public:
 	DECLARE_WRITE16_MEMBER(video_7030_w);
 	DECLARE_WRITE16_MEMBER(video_703c_w);
 
+	DECLARE_READ16_MEMBER(video_707c_r);
 
 	DECLARE_READ16_MEMBER(video_707f_r);
 	DECLARE_WRITE16_MEMBER(video_707f_w);
@@ -155,8 +156,11 @@ protected:
 //  required_shared_ptr<uint16_t> m_scrollram;
 	required_shared_ptr<uint16_t> m_spriteram;
 
+	uint16_t m_page0_addr;
+	uint16_t m_page0_addr_msb;
+
 	uint16_t m_page1_addr;
-	uint16_t m_page2_addr;
+	uint16_t m_page1_addr_msb;
 
 	uint16_t m_videodma_bank;
 	uint16_t m_videodma_size;
