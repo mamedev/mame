@@ -1544,7 +1544,7 @@ SH2_DMA_FIFO_DATA_AVAILABLE_CB(sega_32x_device::_32x_fifo_available_callback)
 bool sega_32x_device::render_videobuffer_to_screenbuffer_helper(int scanline, bool height_240, bool width_320)
 {
 	bool const height_240_mode = m_32x_240mode;
-	if ((!width_320) || (height_240 != height_240_mode) || (m_32x_displaymode == 0))
+	if ((!width_320) || (height_240 != height_240_mode) || (m_32x_displaymode == 0)) // TODO : needs hw tests
 		return false; // disable this layer
 
 	int x;
