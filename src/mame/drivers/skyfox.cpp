@@ -33,7 +33,7 @@ Verified Dip locations and recommended settings with manual
 
 ***************************************************************************/
 
-WRITE8_MEMBER(skyfox_state::skyfox_vregs_w)
+WRITE8_MEMBER(skyfox_state::output_w)
 {
 	switch (offset)
 	{
@@ -55,11 +55,12 @@ void skyfox_state::skyfox_map(address_map &map)
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xcfff).ram();
 	map(0xd000, 0xd3ff).ram().share("spriteram");
-	map(0xd400, 0xdfff).ram().share("bgram"); // Probably for background
+	map(0xd400, 0xd4ff).ram().share("bgram"); // For background stars
+	map(0xd500, 0xdfff).ram();
 	map(0xe000, 0xe000).portr("INPUTS");
 	map(0xe001, 0xe001).portr("DSW0");
 	map(0xe002, 0xe002).portr("DSW1");
-	map(0xe008, 0xe00f).w(FUNC(skyfox_state::skyfox_vregs_w));
+	map(0xe008, 0xe00f).w(FUNC(skyfox_state::output_w));
 	map(0xf001, 0xf001).portr("DSW2");
 }
 

@@ -208,9 +208,9 @@ void skyfox_state::draw_background(bitmap_ind16 &bitmap, const rectangle &clipre
 
 		/* Looks like good, but was written with intuition, Probably not perfect */
 		int pen = rom[offs];
-		int x = rom[offs + 1] * 2 + (i & 1) + pos;
-		int y = (i / 16) + pen % 4;
-		x += 96;
+		int x = rom[offs + 1] * 2 + ((i >> 4) & 1) + pos;
+		int y = (i >> 4);
+		x += 0x60; // Adjustment based on PCB display
 
 		if (m_bg_ctrl & 1) // flipscreen
 		{
@@ -218,7 +218,7 @@ void skyfox_state::draw_background(bitmap_ind16 &bitmap, const rectangle &clipre
 			y = 256     - (y % 256);
 		}
 
-		if (((m_bg_ctrl >> 4) & 0x3) != pen % 4 || !shining)
+		if (((m_bg_ctrl >> 4) & 3) != (pen & 3) || !shining)
 			bitmap.pix16(y % 256, x % 512) = pen;
 	}
 }
