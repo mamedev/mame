@@ -54,7 +54,7 @@ inline void unsp_device::execute_fxxx_000_group(uint16_t op)
 
 	// everything else falls through to the multiply
 
-	// signed * unsigned
+	// MUL us ( signed * unsigned )
 	// MUL      1 1 1 1*  r r r 0*  0 0 0 0   1 r r r     (** = sign bits, fixed here)
 	const uint16_t opa = (op >> 9) & 7;
 	const uint16_t opb = op & 7;
@@ -287,24 +287,30 @@ void unsp_12_device::execute_fxxx_101_group(uint16_t op)
 	case 0xf174: case 0xf374: case 0xf574: case 0xf774: case 0xf974: case 0xfb74: case 0xfd74: case 0xff74:
 	case 0xf17c: case 0xf37c: case 0xf57c: case 0xf77c: case 0xf97c: case 0xfb7c: case 0xfd7c: case 0xff7c:
 	{
-		//unimplemented_opcode(op);
-		// what is this, sign extend / sign expand / zero expand? it doesn't seem to be exponent
-		// palette uploads in smartfp depend on this, however this logic only works for the first few, so isn't correct
-		uint16_t result = m_core->m_r[REG_R4];// rand();
-		uint16_t temp = m_core->m_r[REG_R4];
+		uint16_t r4 = m_core->m_r[REG_R4];
 
-		for (int i = 0; i < 16; i++)
+		// this could be optimized, but logic is correct for use cases seen
+		if (r4 & 0x8000)
 		{
-			int bit = (temp << i) & 0x8000;
-
-			if (bit)
-				break;
-
-			result |= 1 << (15 - i);
+			// r2 undefined (code will check for this and avoid calculations
 		}
-
-		logerror("pc:%06x: r2 = exp r4 (with r2 = %04x r4 = %04x) (returning %04x)\n", UNSP_LPC, m_core->m_r[REG_R2], m_core->m_r[REG_R4], result);
-		m_core->m_r[REG_R2] = result;
+		else if (r4 & 0x4000) { m_core->m_r[REG_R2] = 0x0000; }
+		else if (r4 & 0x2000) { m_core->m_r[REG_R2] = 0x0001; }
+		else if (r4 & 0x1000) { m_core->m_r[REG_R2] = 0x0002; }
+		else if (r4 & 0x0800) { m_core->m_r[REG_R2] = 0x0003; }
+		else if (r4 & 0x0400) { m_core->m_r[REG_R2] = 0x0004; }
+		else if (r4 & 0x0200) { m_core->m_r[REG_R2] = 0x0005; }
+		else if (r4 & 0x0100) { m_core->m_r[REG_R2] = 0x0006; }
+		else if (r4 & 0x0080) { m_core->m_r[REG_R2] = 0x0007; }
+		else if (r4 & 0x0040) { m_core->m_r[REG_R2] = 0x0008; }
+		else if (r4 & 0x0020) { m_core->m_r[REG_R2] = 0x0009; }
+		else if (r4 & 0x0010) { m_core->m_r[REG_R2] = 0x000a; }
+		else if (r4 & 0x0008) { m_core->m_r[REG_R2] = 0x000b; }
+		else if (r4 & 0x0004) { m_core->m_r[REG_R2] = 0x000c; }
+		else if (r4 & 0x0002) { m_core->m_r[REG_R2] = 0x000d; }
+		else if (r4 & 0x0001) { m_core->m_r[REG_R2] = 0x000e; }
+		else { m_core->m_r[REG_R2] = 0x000f; }
+		
 		return;
 	}
 

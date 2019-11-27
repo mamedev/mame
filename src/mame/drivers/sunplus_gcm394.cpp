@@ -53,18 +53,20 @@ protected:
 
 	virtual void mem_map_4m(address_map &map);
 
-	virtual DECLARE_WRITE16_MEMBER(write_external_space);
-
-private:
 	required_region_ptr<uint16_t> m_romregion;
+private:
 
 	uint32_t m_current_bank;
 	int m_numbanks;
 
 	DECLARE_READ16_MEMBER(porta_r);
 	DECLARE_READ16_MEMBER(portb_r);
+	DECLARE_WRITE16_MEMBER(porta_w);
 
-	DECLARE_READ16_MEMBER(read_external_space);
+	virtual DECLARE_WRITE16_MEMBER(mapping_w) {}
+
+	virtual DECLARE_READ16_MEMBER(read_external_space);
+	virtual DECLARE_WRITE16_MEMBER(write_external_space);
 };
 
 class wrlshunt_game_state : public gcm394_game_state
@@ -72,6 +74,7 @@ class wrlshunt_game_state : public gcm394_game_state
 public:
 	wrlshunt_game_state(const machine_config& mconfig, device_type type, const char* tag) :
 		gcm394_game_state(mconfig, type, tag),
+		m_mapping(0),
 		m_mainram(*this, "mainram")
 	{
 	}
@@ -84,14 +87,18 @@ protected:
 
 	void wrlshunt_map(address_map &map);
 	
-	virtual DECLARE_WRITE16_MEMBER(write_external_space) override;
-
 private:
 
 	DECLARE_READ16_MEMBER(hunt_porta_r);
 	DECLARE_WRITE16_MEMBER(hunt_porta_w);
 
+	virtual DECLARE_WRITE16_MEMBER(mapping_w) override;
+	uint16_t m_mapping;
+
 	required_shared_ptr<u16> m_mainram;
+
+	virtual DECLARE_READ16_MEMBER(read_external_space) override;
+	virtual DECLARE_WRITE16_MEMBER(write_external_space) override;
 };
 
 READ16_MEMBER(gcm394_game_state::read_external_space)
@@ -104,6 +111,37 @@ WRITE16_MEMBER(gcm394_game_state::write_external_space)
 {
 	logerror("DMA writing to external space (RAM?) %08x %04x\n", offset, data);
 }
+
+WRITE16_MEMBER(wrlshunt_game_state::mapping_w)
+{
+	m_mapping = data;
+	logerror("change mapping %04x\n", data);
+}
+
+READ16_MEMBER(wrlshunt_game_state::read_external_space)
+{
+	if (m_mapping == 0x7f8a)
+	{
+	//logerror("reading offset %04x\n", offset * 2);
+		return m_romregion[offset];
+	}
+	else if (m_mapping == 0x008a)
+	{
+		address_space& mem = m_maincpu->space(AS_PROGRAM);
+		uint16_t retdata = mem.read_word(offset + 0x20000);
+		logerror("reading from RAM instead offset %08x returning %04x\n", offset * 2, retdata);
+		return retdata;
+	}
+	else
+	{
+		uint16_t retdata = 0x0000;
+		logerror("reading from unknown source instead offset %08x returning %04x\n", offset * 2, retdata);
+		return retdata;
+	}
+}
+
+
+
 
 WRITE16_MEMBER(wrlshunt_game_state::write_external_space)
 {
@@ -146,6 +184,11 @@ READ16_MEMBER(gcm394_game_state::portb_r)
 	return data;
 }
 
+WRITE16_MEMBER(gcm394_game_state::porta_w)
+{
+	logerror("%s: Port A:WRITE %04x\n", machine().describe_context(), data);
+}	
+
 
 void gcm394_game_state::base(machine_config &config)
 {
@@ -153,8 +196,11 @@ void gcm394_game_state::base(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &gcm394_game_state::mem_map_4m);
 	m_maincpu->porta_in().set(FUNC(gcm394_game_state::porta_r));
 	m_maincpu->portb_in().set(FUNC(gcm394_game_state::portb_r));
+	m_maincpu->porta_out().set(FUNC(gcm394_game_state::porta_w));
 	m_maincpu->space_read_callback().set(FUNC(gcm394_game_state::read_external_space));
 	m_maincpu->space_write_callback().set(FUNC(gcm394_game_state::write_external_space));
+	m_maincpu->set_irq_acknowledge_callback(m_maincpu, FUNC(sunplus_gcm394_base_device::irq_vector_cb));
+	m_maincpu->mapping_write_callback().set(FUNC(gcm394_game_state::mapping_w));	
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
@@ -456,7 +502,7 @@ GLB_GP-FS1_0405L_SPU_1.0.2.3
 SPF2ALP
 
 "GPnandnand" as a required signature appears to be referenced right here, in page 19 of a GeneralPlus document;
-http://www.lcis.com.tw/paper_store/paper_store/GPL162004A-507A_162005A-707AV10_code_reference-20147131205102.pdf (this link is no longer valid)
+https://web.archive.org/web/20180106005235/http://www.lcis.com.tw/paper_store/paper_store/GPL162004A-507A_162005A-707AV10_code_reference-20147131205102.pdf
 
 */
 
