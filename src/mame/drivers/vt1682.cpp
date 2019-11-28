@@ -5252,6 +5252,29 @@ static const gfx_layout helper_8bpp_16x16_layout =
 	16 * 16 * 8
 };
 
+static const gfx_layout helper_8bpp_32x32_layout =
+{
+	32,32,
+	RGN_FRAC(1,1),
+	8,
+	{ 0,1,2,3,4,5,6,7 },
+	{ STEP32(0,8) },
+	{ STEP32(0,32*8) },
+	32 * 32 * 8
+};
+
+static const gfx_layout helper_4bpp_16x16_layout =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	4,
+	{ 0,1,2,3 },
+	{ STEP16(0,4) },
+	{ STEP16(0,16*4) },
+	16 * 16 * 4
+};
+
+
 // hardware has line modes, so these views might be useful
 static const uint32_t texlayout_xoffset_8bpp[256] = { STEP256(0,8) };
 static const uint32_t texlayout_yoffset_8bpp[256] = { STEP256(0,256*8) };
@@ -5289,6 +5312,8 @@ static GFXDECODE_START( gfx_test )
 	GFXDECODE_ENTRY( "mainrom", 0, helper_8bpp_8x8_layout,  0x0, 2  )
 	GFXDECODE_ENTRY( "mainrom", 0, helper_8bpp_16x16_layout,  0x0, 2  )
 	GFXDECODE_ENTRY( "mainrom", 0, texture_helper_8bpp_layout,  0x0, 2  )
+	GFXDECODE_ENTRY( "mainrom", 0, helper_8bpp_32x32_layout,  0x0, 2  )	
+	GFXDECODE_ENTRY( "mainrom", 0, helper_4bpp_16x16_layout,  0x0, 2  )	
 GFXDECODE_END
 
 
@@ -5581,8 +5606,28 @@ void zone40_state::init_zone40()
 
 	for (int i = 0; i < size/2; i++)
 	{
-		ROM[i] = ROM[i] ^ 0xbb88;
+		ROM[i] = ROM[i] ^ 0x88bb;
+
+		ROM[i] = bitswap<16>(ROM[i], 3, 2, 11, 10, 12, 4, 13, 5,
+			                         1, 9, 0,  8,  14, 15, 6, 7);
 	}
+
+	if (0)
+	{
+		uint8_t* rom = memregion("mainrom")->base();
+
+		FILE* fp;
+		char filename[256];
+		sprintf(filename, "decrypted_%s", machine().system().name);
+		fp = fopen(filename, "w+b");
+		if (fp)
+		{
+			fwrite(rom, 0x4000000, 1, fp);
+			fclose(fp);
+		}
+	}
+
+
 }
 
 ROM_START( zone40 )
