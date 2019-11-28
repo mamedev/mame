@@ -297,11 +297,6 @@ Stephh's notes (based on the games M6502 code and some tests) :
 #define NIBBLER_HACK    0
 
 
-#ifndef M_LN2
-#define M_LN2       0.69314718055994530942
-#endif
-
-
 void snk6502_state::machine_start()
 {
 	// these could be split in different MACHINE_STARTs to save only
@@ -1565,10 +1560,10 @@ GAME( 1981, fantasyg2,   fantasyu, fantasy,  fantasy,  fantasy_state, empty_init
 GAME( 1981, fantasyj,    fantasyu, fantasy,  fantasyu, fantasy_state, empty_init, ROT90, "SNK", "Fantasy (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, pballoon,    0,        pballoon, pballoon, fantasy_state, empty_init, ROT90, "SNK", "Pioneer Balloon", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, pballoonr,   pballoon, pballoon, pballoon, fantasy_state, empty_init, ROT90, "SNK (Rock-Ola license)", "Pioneer Balloon (Rock-Ola license)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, nibbler,     0,        nibbler,  nibbler,  fantasy_state, empty_init, ROT90, "Rock-Ola", "Nibbler (rev 9)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, nibblera,    nibbler,  nibbler,  nibbler,  fantasy_state, empty_init, ROT90, "Rock-Ola", "Nibbler (rev 9, alternate set)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, nibbler,     0,        nibbler,  nibbler,  fantasy_state, empty_init, ROT90, "Rock-Ola", "Nibbler (rev 9, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, nibblera,    nibbler,  nibbler,  nibbler,  fantasy_state, empty_init, ROT90, "Rock-Ola", "Nibbler (rev 9, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, nibbler8,    nibbler,  nibbler,  nibbler8, fantasy_state, empty_init, ROT90, "Rock-Ola", "Nibbler (rev 8)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, nibblero,    nibbler,  nibbler,  nibbler8, fantasy_state, empty_init, ROT90, "Rock-Ola (Olympia license)", "Nibbler (rev 8, Olympia)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, nibbler7,    nibbler,  nibbler,  nibbler8, fantasy_state, empty_init, ROT90, "Rock-Ola", "Nibbler (rev 7)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, nibbler6,    nibbler,  nibbler,  nibbler6, fantasy_state, empty_init, ROT90, "Rock-Ola", "Nibbler (rev 6)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, nibblerp,    nibbler,  nibbler,  nibbler6, fantasy_state, empty_init, ROT90, "Rock-Ola", "Nibbler (Pioneer Balloon conversion - rev 6)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, nibblero,    nibbler,  nibbler,  nibbler8, fantasy_state, empty_init, ROT90, "Rock-Ola (Olympia license)", "Nibbler (Olympia - rev 8)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, nibblerp,    nibbler,  nibbler,  nibbler6, fantasy_state, empty_init, ROT90, "Rock-Ola", "Nibbler (rev 6, Pioneer Balloon conversion)", MACHINE_SUPPORTS_SAVE ) // music
