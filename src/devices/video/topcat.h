@@ -131,7 +131,7 @@ private:
 	uint16_t m_unknown_reg4a = 0;
 	uint16_t m_unknown_reg4c = 0;
 	emu_timer *m_cursor_timer = nullptr;
-	bool m_cursor_state = 0;
+	bool m_cursor_state = false;
 	uint16_t m_cursor_x_pos = 0;
 	uint16_t m_cursor_y_pos = 0;
 	uint16_t m_cursor_width = 0;
@@ -140,10 +140,10 @@ private:
 	int m_fb_height = 0;
 	uint8_t m_plane_mask = 0;
 
-	bool m_read_enable = 0;
-	bool m_write_enable = 0;
-	bool m_fb_enable = 0;
-	bool m_changed = 0;
+	bool m_read_enable = false;
+	bool m_write_enable = false;
+	bool m_fb_enable = false;
+	bool m_changed = false;
 
 	required_shared_ptr<uint8_t> m_vram;
 };

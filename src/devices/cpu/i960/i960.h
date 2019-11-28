@@ -108,8 +108,8 @@ private:
 	struct {
 		uint32_t t1,t2 = 0;
 		int index,size = 0;
-		bool burst_mode = 0;
-		bool iswriteop = 0;
+		bool burst_mode = false;
+		bool iswriteop = false;
 	}m_stall_state;
 	bool m_stalled;
 

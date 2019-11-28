@@ -65,10 +65,10 @@ acorn_vidc10_device::acorn_vidc10_device(const machine_config &mconfig, device_t
 	, m_pixel_clock(0)
 	, m_bpp_mode(0)
 	, m_crtc_interlace(0)
-	, m_cursor_enable(0)
+	, m_cursor_enable(false)
 	, m_sound_frequency_latch(0)
-	, m_sound_frequency_test_bit(0)
-	, m_sound_mode(0)
+	, m_sound_frequency_test_bit(false)
+	, m_sound_mode(false)
 
 {
 	std::fill(std::begin(m_crtc_regs), std::end(m_crtc_regs), 0);
