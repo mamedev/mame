@@ -927,9 +927,7 @@ void epc_state::epc(machine_config &config)
 	// 128kB Memory Expansion Board 1090 and/or the 128kB Multifunction Board MB1080-001
 	// and/or the 384kB MB1080-002. The MB1080 DRAM might need to be dynamically added as
 	// base address and also a video memory hole is configurable.
-	// Some RAM sizes are disabled because they trigger issue #5776, just until that is sorted out
-	//RAM(config, m_ram).set_default_size("128K").set_extra_options("256K, 384K, 512K, 640K");
-	RAM(config, m_ram).set_default_size("128K").set_extra_options("384K");
+	RAM(config, m_ram).set_default_size("128K").set_extra_options("256K, 384K, 512K, 640K");
 
 	// FDC
 	I8272A(config, m_fdc, XTAL(16'000'000) / 2, false); // TEW crystal marked X3 verified
