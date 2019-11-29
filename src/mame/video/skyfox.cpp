@@ -192,9 +192,10 @@ void skyfox_state::draw_background(bitmap_ind16 &bitmap, const rectangle &clipre
 {
 	uint8_t *rom = memregion("gfx2")->base();
 
-	/* Flashing stops until the first star moves after turning on the power */
-	bool shining = (m_bg_ctrl & 0x8);
-	/* Maybe star pattern change. This will change at some intervals or when restart */
+	/* Blinking stops until the first star moves after turning on the power */
+	bool blinking = (m_bg_ctrl & 0x8);
+	/* Star pattern change. This will change at when all star clusters to out of screen or when player restart.
+	   When it changes, will change color of star clusters. */
 	int pattern = (m_bg_ctrl & 0x6) >> 1;
 
 	for (int i = 0; i < 0x1000; i++)
@@ -206,16 +207,19 @@ void skyfox_state::draw_background(bitmap_ind16 &bitmap, const rectangle &clipre
 		/* ROM offset of star pattern */
 		int offs = (i * 2) % 0x2000 + pattern * 0x2000;
 
-		/* Looks like good, but was written with intuition, Probably not perfect */
+		/* Adjusted with 1 pixel accuracy compared to PCB.
+		   Confirmed that pixel and color pattern match in the "1UP START" screen. */
 		int pen = rom[offs];
-		int x = rom[offs + 1] * 2 + ((i >> 4) & 1) + pos;
-		int y = (i >> 4);
-		x += 0x60; // Adjustment based on PCB display
+		int x = rom[offs + 1] * 2 + pos + 0x5b;
+		int y = (i >> 4) + 1;
 
-		// When flipscreen is enabled, direction of background scroll is reversed by the in-game subroutine.
-		// This PCB seems does not support background flip.
+		/* When flipscreen is enabled, scroll direction is flipped by only in-game subroutine.
+		   This PCB seems does not support background flip. */
 
-		if (((m_bg_ctrl >> 4) & 3) != (pen & 3) || !shining)
+		/* This looks perfect at first glance.
+		   but when strict compared on "1UP START" screen, 
+		   it seems the blinking pattern in each star may be different. */
+		if (((m_bg_ctrl >> 4) & 3) != (pen & 3) || !blinking)
 			bitmap.pix16(y % 256, x % 512) = pen;
 	}
 }
