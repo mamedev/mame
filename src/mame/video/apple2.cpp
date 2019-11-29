@@ -843,7 +843,6 @@ void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, co
 				|   (((uint32_t) vram_row[col+1] & 0x7f) <<  7)
 				|   (((uint32_t) vram_row[col+2] & 0x7f) << 14);
 
-
 			// verified on h/w: setting dhires w/o 80col emulates a rev. 0 Apple ][ with no orange/blue
 			if (m_dhires)
 			{
@@ -873,17 +872,29 @@ void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, co
 
 				case 1:
 					w >>= 7;
+					if (vram_row[col] & 0x80)
+					{
+						p--;
+					}
 					for (b = 0; b < 7; b++)
 					{
 						v = (w & 1);
 						w >>= 1;
 						*(p++) = v ? WHITE : BLACK;
 						*(p++) = v ? WHITE : BLACK;
+					}
+					if (vram_row[col] & 0x80)
+					{
+						p++;
 					}
 					break;
 
 				case 2:
 					w >>= 7;
+					if (vram_row[col] & 0x80)
+					{
+						p--;
+					}
 					for (b = 0; b < 7; b++)
 					{
 						v = (w & 1);
@@ -891,16 +902,28 @@ void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, co
 						*(p++) = v ? GREEN : BLACK;
 						*(p++) = v ? GREEN : BLACK;
 					}
+					if (vram_row[col] & 0x80)
+					{
+						p++;
+					}
 					break;
 
 				case 3:
 					w >>= 7;
+					if (vram_row[col] & 0x80)
+					{
+						p--;
+					}
 					for (b = 0; b < 7; b++)
 					{
 						v = (w & 1);
 						w >>= 1;
 						*(p++) = v ? ORANGE : BLACK;
 						*(p++) = v ? ORANGE : BLACK;
+					}
+					if (vram_row[col] & 0x80)
+					{
+						p++;
 					}
 					break;
 			}
@@ -962,19 +985,31 @@ void a2_video_device::hgr_update_tk2000(screen_device &screen, bitmap_ind16 &bit
 					}
 					break;
 
-				case 1:
+\               case 1:
 					w >>= 7;
+					if (vram_row[col] & 0x80)
+					{
+						p--;
+					}
 					for (b = 0; b < 7; b++)
 					{
 						v = (w & 1);
 						w >>= 1;
 						*(p++) = v ? WHITE : BLACK;
 						*(p++) = v ? WHITE : BLACK;
+					}
+					if (vram_row[col] & 0x80)
+					{
+						p++;
 					}
 					break;
 
 				case 2:
 					w >>= 7;
+					if (vram_row[col] & 0x80)
+					{
+						p--;
+					}
 					for (b = 0; b < 7; b++)
 					{
 						v = (w & 1);
@@ -982,16 +1017,28 @@ void a2_video_device::hgr_update_tk2000(screen_device &screen, bitmap_ind16 &bit
 						*(p++) = v ? GREEN : BLACK;
 						*(p++) = v ? GREEN : BLACK;
 					}
+					if (vram_row[col] & 0x80)
+					{
+						p++;
+					}
 					break;
 
 				case 3:
 					w >>= 7;
+					if (vram_row[col] & 0x80)
+					{
+						p--;
+					}
 					for (b = 0; b < 7; b++)
 					{
 						v = (w & 1);
 						w >>= 1;
 						*(p++) = v ? ORANGE : BLACK;
 						*(p++) = v ? ORANGE : BLACK;
+					}
+					if (vram_row[col] & 0x80)
+					{
+						p++;
 					}
 					break;
 			}
