@@ -813,47 +813,40 @@ void namcos2_state::common_suzuka8h_am(address_map &map)
 	map(0x840000, 0x840001).nopr();
 	map(0x900000, 0x900007).rw(m_c355spr, FUNC(namco_c355spr_device::position_r), FUNC(namco_c355spr_device::position_w));
 	map(0xa00000, 0xa1ffff).rw(m_c45_road, FUNC(namco_c45_road_device::read), FUNC(namco_c45_road_device::write));
+	map(0xc00000, 0xc0ffff).noprw(); // no ROZ hardware implemented in PCB
+	map(0xd00000, 0xd0001f).noprw(); // ^^
 	map(0xf00000, 0xf00007).rw(FUNC(namcos2_state::namcos2_68k_key_r), FUNC(namcos2_state::namcos2_68k_key_w));
-}
-
-void namcos2_state::common_suzuka8h_roz_am(address_map &map)
-{
-	map(0xc00000, 0xc0ffff).ram(); // is roz hardware populated?
-	map(0xd00000, 0xd0001f).ram(); // is roz hardware populated?
 }
 
 void namcos2_state::master_suzuka8h_am(address_map &map)
 {
 	common_suzuka8h_am(map);
 	master_common_am(map);
-	common_suzuka8h_roz_am(map);
 }
 
 void namcos2_state::slave_suzuka8h_am(address_map &map)
 {
 	common_suzuka8h_am(map);
 	slave_common_am(map);
-	common_suzuka8h_roz_am(map);
 }
 
-void namcos2_state::common_luckywld_roz_am(address_map &map)
+void namcos2_state::common_luckywld_am(address_map &map)
 {
+	common_suzuka8h_am(map);
 	map(0xc00000, 0xc0ffff).rw(m_c169roz, FUNC(namco_c169roz_device::videoram_r), FUNC(namco_c169roz_device::videoram_w));
 	map(0xd00000, 0xd0001f).rw(m_c169roz, FUNC(namco_c169roz_device::control_r), FUNC(namco_c169roz_device::control_w));
 }
 
 void namcos2_state::master_luckywld_am(address_map &map)
 {
-	common_suzuka8h_am(map);
+	common_luckywld_am(map);
 	master_common_am(map);
-	common_luckywld_roz_am(map);
 }
 
 void namcos2_state::slave_luckywld_am(address_map &map)
 {
-	common_suzuka8h_am(map);
+	common_luckywld_am(map);
 	slave_common_am(map);
-	common_luckywld_roz_am(map);
 }
 
 /*************************************************************/

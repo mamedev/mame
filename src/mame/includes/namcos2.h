@@ -251,8 +251,7 @@ enum
 	void common_default_am(address_map &map);
 	void common_finallap_am(address_map &map);
 	void common_suzuka8h_am(address_map &map);
-	void common_suzuka8h_roz_am(address_map &map);
-	void common_luckywld_roz_am(address_map &map);
+	void common_luckywld_am(address_map &map);
 	void common_metlhawk_am(address_map &map);
 	void common_sgunner_am(address_map &map);
 	void master_common_am(address_map &map);
