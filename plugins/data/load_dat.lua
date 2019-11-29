@@ -151,9 +151,6 @@ function datfile.open(file, vertag, fixupcb)
 				local row = stmt:last_insert_rowid()
 				stmt:finalize()
 				for num, tag in pairs(tags) do
-					if fixupcb then
-						fixupcb(data)
-					end
 					stmt = db.prepare("INSERT INTO \"" .. file .. "_idx\" VALUES (?, ?, ?, ?)")
 					db.check("inserting into index")
 					stmt:bind_values(infotype, tag.tag, tag.set, row)
