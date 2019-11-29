@@ -2524,6 +2524,7 @@ void zone40_state::machine_reset()
 	m_w60_controller_input = -1;
 	m_w60_porta_data = 0;
 	m_z40_rombase = 0xe0;
+	m_maincpu->invalidate_cache();
 }
 
 
@@ -3693,32 +3694,12 @@ void zone40_state::init_zone40()
 
 	for (int i = 0; i < size/2; i++)
 	{
-		ROM[i] = ((ROM[i] & 0xff00) >> 8) | ((ROM[i] & 0x00ff) << 8);
+		ROM[i] = ROM[i] ^ 0xbb88;
 
-		ROM[i] = ROM[i] ^ 0x88bb;
+		ROM[i] = ((ROM[i] & 0xff00) >> 8) | ((ROM[i] & 0x00ff) << 8);
 
 		ROM[i] = bitswap<16>(ROM[i], 3, 2, 11, 10, 12, 4, 13, 5,
 			                         1, 9, 0,  8,  14, 15, 6, 7);
-	}
-
-	if (1)
-	{
-		int count = 0;
-		for (int i = 0; i < 0x4000000; i += 0x100000)
-		{
-			uint8_t* rom = memregion("maincpu")->base();
-
-			FILE* fp;
-			char filename[256];
-			sprintf(filename, "decrypted_split_%s_%02x", machine().system().name, count);
-			count++;
-			fp = fopen(filename, "w+b");
-			if (fp)
-			{
-				fwrite(&rom[i], 0x100000, 1, fp);
-				fclose(fp);
-			}
-		}
 	}
 }
 
