@@ -186,7 +186,6 @@ public:
 	void jakks(machine_config &config);
 	void jakks_i2c(machine_config &config);
 	void walle(machine_config &config);
-	void wireless60(machine_config &config);
 	void rad_skat(machine_config &config);
 	void rad_skatp(machine_config &config);
 	void rad_sktv(machine_config &config);
@@ -209,9 +208,6 @@ protected:
 	DECLARE_READ8_MEMBER(eeprom_r);
 
 	DECLARE_READ16_MEMBER(jakks_porta_r);
-	DECLARE_WRITE16_MEMBER(wireless60_porta_w);
-	DECLARE_WRITE16_MEMBER(wireless60_portb_w);
-	DECLARE_READ16_MEMBER(wireless60_porta_r);
 
 	DECLARE_READ16_MEMBER(rad_porta_r);
 	DECLARE_READ16_MEMBER(rad_portb_r);
@@ -231,15 +227,9 @@ protected:
 	virtual void mem_map_2m(address_map &map);
 	virtual void mem_map_1m(address_map &map);
 
-
-
 	uint32_t m_current_bank;
 
 	std::unique_ptr<uint8_t[]> m_serial_eeprom;
-	uint8_t m_w60_controller_input;
-	uint16_t m_w60_porta_data;
-	uint16_t m_w60_p1_ctrl_mask;
-	uint16_t m_w60_p2_ctrl_mask;
 
 	uint16_t m_walle_portc_data;
 
@@ -250,11 +240,37 @@ protected:
 	optional_device<nvram_device> m_nvram;
 };
 
-class zone40_state : public spg2xx_game_state
+class wireless60_state : public spg2xx_game_state
+{
+public:
+	wireless60_state(const machine_config& mconfig, device_type type, const char* tag) :
+		spg2xx_game_state(mconfig, type, tag)
+	{ }
+
+	void wireless60(machine_config& config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	uint8_t m_w60_controller_input;
+	uint16_t m_w60_porta_data;
+	uint16_t m_w60_p1_ctrl_mask;
+	uint16_t m_w60_p2_ctrl_mask;
+
+	DECLARE_WRITE16_MEMBER(wireless60_porta_w);
+	DECLARE_WRITE16_MEMBER(wireless60_portb_w);
+	DECLARE_READ16_MEMBER(wireless60_porta_r);
+
+private:
+};
+
+
+class zone40_state : public wireless60_state
 {
 public:
 	zone40_state(const machine_config& mconfig, device_type type, const char* tag) :
-		spg2xx_game_state(mconfig, type, tag),
+		wireless60_state(mconfig, type, tag),
 		m_romregion(*this, "maincpu")
 	{ }
 
@@ -621,7 +637,7 @@ READ8_MEMBER(spg2xx_game_state::eeprom_r)
 	return m_serial_eeprom[offset & 0x3ff];
 }
 
-WRITE16_MEMBER(spg2xx_game_state::wireless60_porta_w)
+WRITE16_MEMBER(wireless60_state::wireless60_porta_w)
 {
 	m_w60_porta_data = (data & 0x300) | m_w60_p1_ctrl_mask | m_w60_p2_ctrl_mask;
 	switch (m_w60_porta_data & 0x300)
@@ -655,7 +671,7 @@ WRITE16_MEMBER(zone40_state::zone40_porta_w)
 	}
 }
 
-READ16_MEMBER(spg2xx_game_state::wireless60_porta_r)
+READ16_MEMBER(wireless60_state::wireless60_porta_r)
 {
 	return m_w60_porta_data;
 }
@@ -667,7 +683,7 @@ READ16_MEMBER(zone40_state::zone40_porta_r)
 	return ret;
 }
 
-WRITE16_MEMBER(spg2xx_game_state::wireless60_portb_w)
+WRITE16_MEMBER(wireless60_state::wireless60_portb_w)
 {
 	switch_bank(data & 7);
 }
@@ -2491,34 +2507,45 @@ void vii_state::machine_reset()
 
 void spg2xx_game_state::machine_start()
 {
-	m_bank->configure_entries(0, (memregion("maincpu")->bytes() + 0x7fffff) / 0x800000, memregion("maincpu")->base(), 0x800000);
-	m_bank->set_entry(0);
+	if (m_bank)
+	{
+		m_bank->configure_entries(0, (memregion("maincpu")->bytes() + 0x7fffff) / 0x800000, memregion("maincpu")->base(), 0x800000);
+		m_bank->set_entry(0);
+	}
 
-	m_serial_eeprom = std::make_unique<uint8_t[]>(0x400);
-	if (m_nvram)
-		m_nvram->set_base(&m_serial_eeprom[0], 0x400);
+	if (m_serial_eeprom)
+	{
+		m_serial_eeprom = std::make_unique<uint8_t[]>(0x400);
+		if (m_nvram)
+			m_nvram->set_base(&m_serial_eeprom[0], 0x400);
+	}
 
 	save_item(NAME(m_current_bank));
-	save_item(NAME(m_w60_controller_input));
-	save_item(NAME(m_w60_porta_data));
 	save_item(NAME(m_walle_portc_data));
 }
 
 void spg2xx_game_state::machine_reset()
 {
 	m_current_bank = 0;
+}
 
-	// TODO: put these in their own class for Wireless 60 related material
-	m_w60_controller_input = -1;
-	m_w60_porta_data = 0;
+
+
+void wireless60_state::machine_start()
+{
+	spg2xx_game_state::machine_start();
+
+	save_item(NAME(m_w60_controller_input));
+	save_item(NAME(m_w60_porta_data));
+	
 	m_w60_p1_ctrl_mask = 0x0400;
 	m_w60_p2_ctrl_mask = 0x0800;
 }
 
 void zone40_state::machine_start()
 {
-	save_item(NAME(m_w60_controller_input));
-	save_item(NAME(m_w60_porta_data));
+	wireless60_state::machine_start();
+
 	save_item(NAME(m_z40_rombase));
 
 	m_z40_rombase = 0xe0;
@@ -2526,10 +2553,16 @@ void zone40_state::machine_start()
 	m_w60_p2_ctrl_mask = 0x1000;
 }
 
-void zone40_state::machine_reset()
+void wireless60_state::machine_reset()
 {
+	spg2xx_game_state::machine_reset();
 	m_w60_controller_input = -1;
 	m_w60_porta_data = 0;
+}
+
+void zone40_state::machine_reset()
+{
+	wireless60_state::machine_reset();
 	m_z40_rombase = 0xe0;
 	m_maincpu->invalidate_cache();
 	m_maincpu->reset();
@@ -2712,16 +2745,16 @@ void tvgogo_state::tvgogo(machine_config &config)
 }
 
 
-void spg2xx_game_state::wireless60(machine_config &config)
+void wireless60_state::wireless60(machine_config &config)
 {
 	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
-	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_game_state::mem_map_4m);
+	m_maincpu->set_addrmap(AS_PROGRAM, &wireless60_state::mem_map_4m);
 
 	spg2xx_base(config);
 
-	m_maincpu->porta_out().set(FUNC(spg2xx_game_state::wireless60_porta_w));
-	m_maincpu->portb_out().set(FUNC(spg2xx_game_state::wireless60_portb_w));
-	m_maincpu->porta_in().set(FUNC(spg2xx_game_state::wireless60_porta_r));
+	m_maincpu->porta_out().set(FUNC(wireless60_state::wireless60_porta_w));
+	m_maincpu->portb_out().set(FUNC(wireless60_state::wireless60_portb_w));
+	m_maincpu->porta_in().set(FUNC(wireless60_state::wireless60_porta_r));
 }
 
 void zone40_state::zone40(machine_config &config)
@@ -3720,8 +3753,8 @@ ROM_END
 // Jungle Soft TV games
 CONS( 2007, vii,      0, 0, vii,        vii,      vii_state,         empty_init,  "Jungle Soft / KenSingTon / Siatronics",       "Vii",         MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // motion controls are awkward, but playable for the most part
 CONS( 2009, zone40,   0, 0, zone40,     wirels60, zone40_state,      init_zone40, "Jungle Soft / Ultimate Products (HK) Ltd",    "Zone 40",     MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2010, zone60,   0, 0, wireless60, wirels60, spg2xx_game_state, empty_init,  "Jungle's Soft / Ultimate Products (HK) Ltd",  "Zone 60",     MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2010, wirels60, 0, 0, wireless60, wirels60, spg2xx_game_state, empty_init,  "Jungle Soft / Kids Station Toys Inc",         "Wireless 60", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2010, zone60,   0, 0, wireless60, wirels60, wireless60_state,  empty_init,  "Jungle's Soft / Ultimate Products (HK) Ltd",  "Zone 60",     MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2010, wirels60, 0, 0, wireless60, wirels60, wireless60_state,  empty_init,  "Jungle Soft / Kids Station Toys Inc",         "Wireless 60", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // JAKKS Pacific Inc TV games
 CONS( 2004, jak_batm, 0, 0, jakks, batman, spg2xx_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "The Batman (JAKKS Pacific TV Game)",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
