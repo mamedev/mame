@@ -3697,10 +3697,8 @@ void zone40_state::init_zone40()
 	{
 		ROM[i] = ROM[i] ^ 0xbb88;
 
-		ROM[i] = ((ROM[i] & 0xff00) >> 8) | ((ROM[i] & 0x00ff) << 8);
-
-		ROM[i] = bitswap<16>(ROM[i], 3, 2, 11, 10, 12, 4, 13, 5,
-			                         1, 9, 0,  8,  14, 15, 6, 7);
+		ROM[i] = bitswap<16>(ROM[i], 11, 10, 3,  2,  4,  12, 5,  13,
+			                         9,  1,  8,  0,  6,  7,  14, 15);
 	}
 }
 
