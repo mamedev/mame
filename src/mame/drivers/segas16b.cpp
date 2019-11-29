@@ -1261,6 +1261,10 @@ INTERRUPT_GEN_MEMBER( segas16b_state::i8751_main_cpu_vblank )
 
 void segas16b_state::machine_reset()
 {
+	m_atomicp_sound_count = 0;
+	m_hwc_input_value = 0;
+	m_mj_input_num = 0;
+	m_mj_last_val = 0;
 	// if we have a hard-coded mapping configuration, set it now
 	if (m_i8751_initial_config != nullptr)
 		m_mapper->configure_explicit(m_i8751_initial_config);
@@ -1514,7 +1518,8 @@ READ16_MEMBER( segas16b_state::hwchamp_custom_io_r )
 			{
 				case 0x20/2:
 					result = (m_hwc_input_value & 0x80) >> 7;
-					m_hwc_input_value <<= 1;
+					if (!machine().side_effects_disabled())
+						m_hwc_input_value <<= 1;
 					return result;
 			}
 			break;
@@ -1703,11 +1708,11 @@ void segas16b_state::system16b_bootleg_map(address_map &map)
 	map(0xffc000, 0xffffff).ram().share("workram");
 }
 
-void segas16b_state::dfjail_map(address_map &map)
+void dfjail_state::dfjail_map(address_map &map)
 {
 	system16b_bootleg_map(map);
 	map(0x000000, 0x07ffff).rom();
-	map(0x840000, 0x840fff).ram().w(FUNC(segas16b_state::philko_paletteram_w)).share("paletteram");
+	map(0x840000, 0x840fff).ram().w(FUNC(dfjail_state::philko_paletteram_w)).share("paletteram");
 
 	map(0xc40000, 0xc43fff).unmaprw();
 
@@ -1872,14 +1877,14 @@ void segas16b_state::bootleg_sound_portmap(address_map &map)
 	map(0xc0, 0xc0).mirror(0x3f).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }
 
-WRITE8_MEMBER(segas16b_state::dfjail_sound_control_w)
+WRITE8_MEMBER(dfjail_state::sound_control_w)
 {
 	int size = memregion("soundcpu")->bytes() - 0x10000;
 
 	// NMI and presumably DAC output clear
 	// TODO: identify which is which
-	m_dfjail_nmi_enable = ((data & 0xc0) == 0);
-	if (m_dfjail_nmi_enable == false)
+	m_nmi_enable = ((data & 0xc0) == 0);
+	if (m_nmi_enable == false)
 		m_dac->write(0);
 	//m_upd7759->start_w(BIT(data, 7));
 	//m_upd7759->reset_w(BIT(data, 6));
@@ -1892,36 +1897,36 @@ WRITE8_MEMBER(segas16b_state::dfjail_sound_control_w)
 	membank("soundbank")->set_base(memregion("soundcpu")->base() + 0x10000 + (bankoffs % size));
 }
 
-WRITE8_MEMBER(segas16b_state::dfjail_dac_data_w)
+WRITE8_MEMBER(dfjail_state::dac_data_w)
 {
 	// TODO: understand how this is hooked up
 	#if 0
 	switch(offset)
 	{
 		case 0:
-			m_dfjail_dac_data = (data & 0xf) << 0;
+			m_dac_data = (data & 0xf) << 0;
 			break;
 		case 1:
-			m_dfjail_dac_data |= (data & 0xf) << 4;
+			m_dac_data |= (data & 0xf) << 4;
 			break;
 		case 2:
-			m_dfjail_dac_data |= (data & 0xf) << 8;
+			m_dac_data |= (data & 0xf) << 8;
 			break;
 		case 3:
-			m_dfjail_dac_data |= (data & 0xf) << 12;
-			m_dac->write(m_dfjail_dac_data);
+			m_dac_data |= (data & 0xf) << 12;
+			m_dac->write(m_dac_data);
 			break;
 	}
 	#endif
 }
 
-void segas16b_state::dfjail_sound_iomap(address_map &map)
+void dfjail_state::dfjail_sound_iomap(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	map(0x00, 0x01).mirror(0x3e).rw(m_ym2151, FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0x40, 0x40).mirror(0x3f).w(FUNC(segas16b_state::dfjail_sound_control_w));
-	map(0x80, 0x83).w(FUNC(segas16b_state::dfjail_dac_data_w));
+	map(0x40, 0x40).mirror(0x3f).w(FUNC(dfjail_state::sound_control_w));
+	map(0x80, 0x83).w(FUNC(dfjail_state::dac_data_w));
 	map(0xc0, 0xc0).mirror(0x3f).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }
 
@@ -4163,26 +4168,40 @@ void segas16b_state::atomicp(machine_config &config) // 10MHz CPU Clock verified
 	config.device_remove("upd");
 }
 
-INTERRUPT_GEN_MEMBER(segas16b_state::dfjail_soundirq_cb)
+INTERRUPT_GEN_MEMBER(dfjail_state::soundirq_cb)
 {
-	if (m_dfjail_nmi_enable == true)
+	if (m_nmi_enable == true)
 	{
 		m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 }
 
-void segas16b_state::dfjail(machine_config &config)
+void dfjail_state::machine_start()
+{
+	segas16b_state::machine_start();
+	save_item(NAME(m_nmi_enable));
+	save_item(NAME(m_dac_data));
+}
+
+void dfjail_state::machine_reset()
+{
+	m_nmi_enable = false;
+	m_dac_data = 0;
+	segas16b_state::machine_reset();
+}
+
+void dfjail_state::dfjail(machine_config &config)
 {
 	system16b_split(config);
 	M68000(config.replace(), m_maincpu, XTAL(16'000'000)/2); // ?
-	m_maincpu->set_addrmap(AS_PROGRAM, &segas16b_state::dfjail_map);
-	m_maincpu->set_vblank_int("screen", FUNC(segas16b_state::irq4_line_hold));
+	m_maincpu->set_addrmap(AS_PROGRAM, &dfjail_state::dfjail_map);
+	m_maincpu->set_vblank_int("screen", FUNC(dfjail_state::irq4_line_hold));
 
 	Z80(config.replace(), m_soundcpu, XTAL(16'000'000)/4); // ?
-	m_soundcpu->set_addrmap(AS_PROGRAM, &segas16b_state::bootleg_sound_map);
-	m_soundcpu->set_addrmap(AS_IO, &segas16b_state::dfjail_sound_iomap);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &dfjail_state::bootleg_sound_map);
+	m_soundcpu->set_addrmap(AS_IO, &dfjail_state::dfjail_sound_iomap);
 	// connected to a 74ls74 clock source
-	m_soundcpu->set_periodic_int(FUNC(segas16b_state::dfjail_soundirq_cb), attotime::from_hz(4*60)); // TODO: timing
+	m_soundcpu->set_periodic_int(FUNC(dfjail_state::soundirq_cb), attotime::from_hz(4*60)); // TODO: timing
 
 	//config.device_remove("ym2151");
 	config.device_remove("upd");
@@ -9622,7 +9641,7 @@ GAME( 1990, atomicp,    0,        atomicp,               atomicp,  segas16b_stat
 GAME( 1990, snapper,    0,        atomicp,               snapper,  segas16b_state, init_snapper,            ROT0,   "Philko", "Snapper (Korea)", 0) // korean clone board..
 // board marked 'System 4' and has Philko custom chip - various hw changes (4bpp tiles for example)
 GAME( 1991, lockonph,   0,        lockonph,              lockonph, segas16b_state, init_lockonph,           ROT0,   "Philko", "Lock On (Philko)", MACHINE_IMPERFECT_SOUND ) // Copyright not shown in game, but has 'PHILKO' in the startup warning and tiles / PCB.  1991 is the name entry for the lowest high score.  Clipping issues on left edge in attract look like original game bugs.
-GAME( 199?, dfjail,   0,          dfjail,                dfjail,   segas16b_state, init_generic_korean,     ROT0,   "Philko", "The Destroyer From Jail (Korea)", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL ) // dips, check sound, not extensively tested
+GAME( 199?, dfjail,   0,          dfjail,                dfjail,   dfjail_state,   init_generic_korean,     ROT0,   "Philko", "The Destroyer From Jail (Korea)", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL ) // dips, check sound, not extensively tested
 
 // decrypted bootleg / 'suicide repair' sets
 
@@ -10118,6 +10137,19 @@ INPUT_PORTS_END
 
 void isgsm_state::machine_reset()
 {
+	m_cart_addrlatch = 0;
+	m_cart_addr = 0;
+	m_data_type = 0;
+	m_data_addr = 0;
+	m_data_mode = 0;
+	m_addr_latch = 0;
+	m_security_value = 0;
+	m_security_latch = 0;
+	m_rle_control_position = 0;
+	m_rle_control_byte = 0;
+	m_rle_latched = 0;
+	m_rle_byte = 0;
+
 	m_segaic16vid->tilemap_reset(*m_screen);
 
 	// configure sprite banks
@@ -10126,6 +10158,23 @@ void isgsm_state::machine_reset()
 			m_sprites->set_bank(i, i);
 
 	membank(ISGSM_MAIN_BANK)->set_base(memregion("bios")->base());
+}
+
+void isgsm_state::machine_start()
+{
+	segas16b_state::machine_start();
+	save_item(NAME(m_cart_addrlatch));
+	save_item(NAME(m_cart_addr));
+	save_item(NAME(m_data_type));
+	save_item(NAME(m_data_addr));
+	save_item(NAME(m_data_mode));
+	save_item(NAME(m_addr_latch));
+	save_item(NAME(m_security_value));
+	save_item(NAME(m_security_latch));
+	save_item(NAME(m_rle_control_position));
+	save_item(NAME(m_rle_control_byte));
+	save_item(NAME(m_rle_latched));
+	save_item(NAME(m_rle_byte));
 }
 
 

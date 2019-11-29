@@ -181,7 +181,7 @@ void konmedal68k_state::fill_backcolor(bitmap_ind16 &bitmap, const rectangle &cl
 
 uint32_t konmedal68k_state::screen_update_konmedal68k(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	static const int order[4] = { 0, 1, 3, 2 };
+	static const int order[4] = { 3, 2, 0, 1 };
 	int enables = m_k055555->K055555_read_register(K55_INPUT_ENABLES);
 
 	screen.priority().fill(0, cliprect);
@@ -420,7 +420,21 @@ ROM_START( ymcapsul )
 	ROM_LOAD( "834-a02-4f.bin", 0x080000, 0x080000, CRC(47b6ab29) SHA1(5bff269fca6f664db8749d036f649a480af2588e) )
 ROM_END
 
+ROM_START( kattobas )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* main program */
+	ROM_LOAD16_WORD_SWAP( "841-a05-2n.bin", 0x000000, 0x080000, CRC(e5d9f04c) SHA1(58829945728ed93441ba40cded3f289f3c54df1b) )
+
+	ROM_REGION( 0x100000, "k056832", 0 )   /* tilemaps */
+	ROM_LOAD( "841-a06-14n.bin", 0x000000, 0x080000, CRC(5aecf05c) SHA1(9d76730ace595ff725686d5d0d3610326cb0ec9e) )
+	ROM_LOAD( "841-a07-17n.bin", 0x080000, 0x080000, CRC(5a1fb6d1) SHA1(b8ad45b04e346aabf1c97e6146d68a0351ce83a3) )
+
+	ROM_REGION( 0x100000, "ymz", 0 )
+	ROM_LOAD( "841-a01-2f.bin", 0x000000, 0x080000, CRC(e3474fe8) SHA1(5e27c59f952088821eb34714484e288407d48d3d) )
+	ROM_LOAD( "841-a02-4f.bin", 0x080000, 0x080000, CRC(685c1c10) SHA1(9884940df8c079e8129fc8d870f90e5b7987e6f4) )
+ROM_END
+
 GAME( 1995, kzaurus, 0, kzaurus, kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Pittanko Zaurus", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, koropens, 0, koropens, kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Korokoro Pensuke", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, kattobas, 0, koropens, kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Kattobase Power Pro Kun", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1999, pwrchanc, 0, koropens, kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Powerful Chance", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1999, ymcapsul, 0, kzaurus, kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Yu-Gi-Oh Monster Capsule", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )

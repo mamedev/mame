@@ -74,7 +74,9 @@ public:
 		m_mouse_buttons(*this, "mouse_buttons"),
 		m_io_mouse_x(*this, "mouse_x"),
 		m_io_mouse_y(*this, "mouse_y"),
-		m_config(*this, "config")
+		m_config(*this, "config"),
+		m_joy1(*this, "joy_1"),
+		m_joy2(*this, "joy_2")
 	{
 		sam_bank_read_ptr[0] = nullptr;
 		sam_bank_write_ptr[0] = nullptr;
@@ -192,6 +194,8 @@ private:
 	required_ioport m_io_mouse_x;
 	required_ioport m_io_mouse_y;
 	required_ioport m_config;
+	required_ioport m_joy1;
+	required_ioport m_joy2;
 
 	void draw_mode4_line(int y, int hpos);
 	void draw_mode3_line(int y, int hpos);

@@ -293,14 +293,6 @@ Stephh's notes (based on the games M6502 code and some tests) :
 
 #define MASTER_CLOCK    XTAL(11'289'000)
 
-/* Change to 1 to allow fake debug buttons */
-#define NIBBLER_HACK    0
-
-
-#ifndef M_LN2
-#define M_LN2       0.69314718055994530942
-#endif
-
 
 void snk6502_state::machine_start()
 {
@@ -652,32 +644,14 @@ static INPUT_PORTS_START( pballoon )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( nibbler )
-	/* There are no buttons on a real "Nibbler" cabinet, but I guess that the game was tested
-	   with a "Vanguard" cabinet so they have been mapped with debug features.
-	   Rock-Ola documentation recommends a "4 Way Joystick - Heavy Duty" (RMC #G-6477-A). */
+	// Rock-Ola documentation recommends a "4 Way Joystick - Heavy Duty" (RMC #G-6477-A).
 	PORT_START("IN0")
-#if NIBBLER_HACK
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Debug 0") PORT_CODE(KEYCODE_Z) // slow down
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Debug 1") PORT_CODE(KEYCODE_X)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Debug 2") PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Debug 3") PORT_CODE(KEYCODE_V)
-#else
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-#endif
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN) PORT_4WAY
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP) PORT_4WAY
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY
 
 	PORT_START("IN1")
-#if NIBBLER_HACK
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Debug 4") PORT_CODE(KEYCODE_B) // pause
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Debug 5") PORT_CODE(KEYCODE_N) // unpause
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Debug 6") PORT_CODE(KEYCODE_M) // end game
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Debug 7") PORT_CODE(KEYCODE_K)
-#else
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-#endif
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
@@ -713,6 +687,27 @@ static INPUT_PORTS_START( nibbler )
 	PORT_DIPSETTING(    0xc0, "2 Coins/1 Credit 4/3" )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x80, "1 Coin/1 Credit 2/3" )
+
+	/* There are no buttons on a real "Nibbler" cabinet, but I guess that the game was tested
+	   with a "Vanguard" cabinet so they have been mapped with debug features. */
+	PORT_START("DEBUG")
+	PORT_CONFNAME( 0x01, 0x00, "Enable Debug Inputs" )
+	PORT_CONFSETTING(    0x00, DEF_STR( No ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( Yes ) )
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_CONDITION("DEBUG", 0x01, EQUALS, 0x01) PORT_NAME("Debug 0") PORT_CODE(KEYCODE_Z) // slow down
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_CONDITION("DEBUG", 0x01, EQUALS, 0x01) PORT_NAME("Debug 1") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_CONDITION("DEBUG", 0x01, EQUALS, 0x01) PORT_NAME("Debug 2") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_CONDITION("DEBUG", 0x01, EQUALS, 0x01) PORT_NAME("Debug 3") PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CONDITION("DEBUG", 0x01, EQUALS, 0x00)
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_CONDITION("DEBUG", 0x01, EQUALS, 0x01) PORT_NAME("Debug 4") PORT_CODE(KEYCODE_B) // pause
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_CONDITION("DEBUG", 0x01, EQUALS, 0x01) PORT_NAME("Debug 5") PORT_CODE(KEYCODE_N) // unpause
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_CONDITION("DEBUG", 0x01, EQUALS, 0x01) PORT_NAME("Debug 6") PORT_CODE(KEYCODE_M) // end game
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_CONDITION("DEBUG", 0x01, EQUALS, 0x01) PORT_NAME("Debug 7") PORT_CODE(KEYCODE_COMMA)
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_CONDITION("DEBUG", 0x01, EQUALS, 0x00)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( nibbler8 )
@@ -1565,10 +1560,10 @@ GAME( 1981, fantasyg2,   fantasyu, fantasy,  fantasy,  fantasy_state, empty_init
 GAME( 1981, fantasyj,    fantasyu, fantasy,  fantasyu, fantasy_state, empty_init, ROT90, "SNK", "Fantasy (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, pballoon,    0,        pballoon, pballoon, fantasy_state, empty_init, ROT90, "SNK", "Pioneer Balloon", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, pballoonr,   pballoon, pballoon, pballoon, fantasy_state, empty_init, ROT90, "SNK (Rock-Ola license)", "Pioneer Balloon (Rock-Ola license)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, nibbler,     0,        nibbler,  nibbler,  fantasy_state, empty_init, ROT90, "Rock-Ola", "Nibbler (rev 9)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, nibblera,    nibbler,  nibbler,  nibbler,  fantasy_state, empty_init, ROT90, "Rock-Ola", "Nibbler (rev 9, alternate set)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, nibbler,     0,        nibbler,  nibbler,  fantasy_state, empty_init, ROT90, "Rock-Ola", "Nibbler (rev 9, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, nibblera,    nibbler,  nibbler,  nibbler,  fantasy_state, empty_init, ROT90, "Rock-Ola", "Nibbler (rev 9, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, nibbler8,    nibbler,  nibbler,  nibbler8, fantasy_state, empty_init, ROT90, "Rock-Ola", "Nibbler (rev 8)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, nibblero,    nibbler,  nibbler,  nibbler8, fantasy_state, empty_init, ROT90, "Rock-Ola (Olympia license)", "Nibbler (rev 8, Olympia)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, nibbler7,    nibbler,  nibbler,  nibbler8, fantasy_state, empty_init, ROT90, "Rock-Ola", "Nibbler (rev 7)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, nibbler6,    nibbler,  nibbler,  nibbler6, fantasy_state, empty_init, ROT90, "Rock-Ola", "Nibbler (rev 6)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, nibblerp,    nibbler,  nibbler,  nibbler6, fantasy_state, empty_init, ROT90, "Rock-Ola", "Nibbler (Pioneer Balloon conversion - rev 6)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, nibblero,    nibbler,  nibbler,  nibbler8, fantasy_state, empty_init, ROT90, "Rock-Ola (Olympia license)", "Nibbler (Olympia - rev 8)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, nibblerp,    nibbler,  nibbler,  nibbler6, fantasy_state, empty_init, ROT90, "Rock-Ola", "Nibbler (rev 6, Pioneer Balloon conversion)", MACHINE_SUPPORTS_SAVE ) // music
