@@ -5239,29 +5239,6 @@ static const gfx_layout helper_8bpp_16x16_layout =
 	16 * 16 * 8
 };
 
-static const gfx_layout helper_8bpp_32x32_layout =
-{
-	32,32,
-	RGN_FRAC(1,1),
-	8,
-	{ 0,1,2,3,4,5,6,7 },
-	{ STEP32(0,8) },
-	{ STEP32(0,32*8) },
-	32 * 32 * 8
-};
-
-static const gfx_layout helper_4bpp_16x16_layout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ 0,1,2,3 },
-	{ STEP16(0,4) },
-	{ STEP16(0,16*4) },
-	16 * 16 * 4
-};
-
-
 // hardware has line modes, so these views might be useful
 static const uint32_t texlayout_xoffset_8bpp[256] = { STEP256(0,8) };
 static const uint32_t texlayout_yoffset_8bpp[256] = { STEP256(0,256*8) };
@@ -5299,8 +5276,6 @@ static GFXDECODE_START( gfx_test )
 	GFXDECODE_ENTRY( "mainrom", 0, helper_8bpp_8x8_layout,  0x0, 2  )
 	GFXDECODE_ENTRY( "mainrom", 0, helper_8bpp_16x16_layout,  0x0, 2  )
 	GFXDECODE_ENTRY( "mainrom", 0, texture_helper_8bpp_layout,  0x0, 2  )
-	GFXDECODE_ENTRY( "mainrom", 0, helper_8bpp_32x32_layout,  0x0, 2  )	
-	GFXDECODE_ENTRY( "mainrom", 0, helper_4bpp_16x16_layout,  0x0, 2  )	
 GFXDECODE_END
 
 
