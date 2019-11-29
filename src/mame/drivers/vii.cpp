@@ -238,6 +238,8 @@ protected:
 	std::unique_ptr<uint8_t[]> m_serial_eeprom;
 	uint8_t m_w60_controller_input;
 	uint16_t m_w60_porta_data;
+	uint16_t m_w60_p1_ctrl_mask;
+	uint16_t m_w60_p2_ctrl_mask;
 
 	uint16_t m_walle_portc_data;
 
@@ -621,7 +623,7 @@ READ8_MEMBER(spg2xx_game_state::eeprom_r)
 
 WRITE16_MEMBER(spg2xx_game_state::wireless60_porta_w)
 {
-	m_w60_porta_data = data & 0xf00;
+	m_w60_porta_data = (data & 0x300) | m_w60_p1_ctrl_mask | m_w60_p2_ctrl_mask;
 	switch (m_w60_porta_data & 0x300)
 	{
 	case 0x300:
@@ -636,8 +638,8 @@ WRITE16_MEMBER(spg2xx_game_state::wireless60_porta_w)
 		uint16_t temp1 = m_io_p1->read();
 		uint16_t temp2 = m_io_p2->read();
 		uint16_t temp3 = 1 << m_w60_controller_input;
-		if (temp1 & temp3) m_w60_porta_data ^= 0x400;
-		if (temp2 & temp3) m_w60_porta_data ^= 0x800;
+		if (temp1 & temp3) m_w60_porta_data ^= m_w60_p1_ctrl_mask;
+		if (temp2 & temp3) m_w60_porta_data ^= m_w60_p2_ctrl_mask;
 		break;
 	}
 }
@@ -660,9 +662,8 @@ READ16_MEMBER(spg2xx_game_state::wireless60_porta_r)
 
 READ16_MEMBER(zone40_state::zone40_porta_r)
 {
-	uint16_t ret = wireless60_porta_r(space, offset) & 0x0c00;
+	uint16_t ret = wireless60_porta_r(space, offset) & (0x0300 | m_w60_p1_ctrl_mask | m_w60_p2_ctrl_mask);
 	ret = (ret & 0xff00) | m_z40_rombase;
-	ret |= 0x1000; // Sword of Warrior in zone40 requires this bit to be set or controls don't do anything
 	return ret;
 }
 
@@ -2507,8 +2508,11 @@ void spg2xx_game_state::machine_reset()
 {
 	m_current_bank = 0;
 
+	// TODO: put these in their own class for Wireless 60 related material
 	m_w60_controller_input = -1;
 	m_w60_porta_data = 0;
+	m_w60_p1_ctrl_mask = 0x0400;
+	m_w60_p2_ctrl_mask = 0x0800;
 }
 
 void zone40_state::machine_start()
@@ -2518,6 +2522,8 @@ void zone40_state::machine_start()
 	save_item(NAME(m_z40_rombase));
 
 	m_z40_rombase = 0xe0;
+	m_w60_p1_ctrl_mask = 0x0400;
+	m_w60_p2_ctrl_mask = 0x1000;
 }
 
 void zone40_state::machine_reset()
