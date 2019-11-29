@@ -197,7 +197,6 @@ public:
 
 	void init_crc();
 	void init_zeus();
-	void init_zone40();
 	void init_taikeegr();
 
 protected:
@@ -247,6 +246,21 @@ protected:
 	optional_ioport m_io_p3;
 	optional_device<i2cmem_device> m_i2cmem;
 	optional_device<nvram_device> m_nvram;
+};
+
+class zone40_state : public spg2xx_game_state
+{
+public:
+	zone40_state(const machine_config& mconfig, device_type type, const char* tag) :
+		spg2xx_game_state(mconfig, type, tag)
+	{ }
+
+	void zone40(machine_config &config);
+
+	void init_zone40();
+
+protected:
+	virtual void machine_start() override;
 };
 
 class pvmil_state : public spg2xx_game_state
@@ -2349,13 +2363,13 @@ void icanguit_state::machine_reset()
 DEVICE_IMAGE_LOAD_MEMBER(icanguit_state::cart_load_icanguit)
 {
 	uint32_t size = m_cart->common_get_size("rom");
-
+/*
 	if (size < 0x800000)
 	{
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
 		return image_init_result::FAIL;
 	}
-
+*/
 	m_cart->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
@@ -2385,13 +2399,13 @@ void tvgogo_state::machine_reset()
 DEVICE_IMAGE_LOAD_MEMBER(tvgogo_state::cart_load_tvgogo)
 {
 	uint32_t size = m_cart->common_get_size("rom");
-
+/*
 	if (size > 0x800000)
 	{
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
 		return image_init_result::FAIL;
 	}
-
+*/
 	m_cart->rom_alloc(0x800000, GENERIC_ROM16_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
@@ -2454,6 +2468,13 @@ void spg2xx_game_state::machine_reset()
 	m_w60_porta_data = 0;
 }
 
+void zone40_state::machine_start()
+{
+	spg2xx_game_state::machine_start();
+
+	m_bank->set_entry(7);
+}
+
 void vii_state::poll_controls()
 {
 	int32_t x = m_io_motionx ? ((int32_t)m_io_motionx->read() - 0x200) : 0;
@@ -2485,13 +2506,13 @@ void vii_state::poll_controls()
 DEVICE_IMAGE_LOAD_MEMBER(vii_state::cart_load_vii)
 {
 	uint32_t size = m_cart->common_get_size("rom");
-
+/*
 	if (size < 0x800000)
 	{
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
 		return image_init_result::FAIL;
 	}
-
+	*/
 	m_cart->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
@@ -2641,6 +2662,19 @@ void spg2xx_game_state::wireless60(machine_config &config)
 	m_maincpu->portb_out().set(FUNC(spg2xx_game_state::wireless60_portb_w));
 	m_maincpu->porta_in().set(FUNC(spg2xx_game_state::wireless60_porta_r));
 }
+
+void zone40_state::zone40(machine_config &config)
+{
+	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
+	m_maincpu->set_addrmap(AS_PROGRAM, &zone40_state::mem_map_4m);
+
+	spg2xx_base(config);
+
+//	m_maincpu->porta_out().set(FUNC(spg2xx_game_state::wireless60_porta_w));
+//	m_maincpu->portb_out().set(FUNC(spg2xx_game_state::wireless60_portb_w));
+//	m_maincpu->porta_in().set(FUNC(spg2xx_game_state::wireless60_porta_r));
+}
+
 
 void spg2xx_game_state::jakks(machine_config &config)
 {
@@ -3601,13 +3635,56 @@ void spg2xx_game_state::init_taikeegr()
 	std::copy(buffer.begin(), buffer.end(), &src[0]);
 }
 
+void zone40_state::init_zone40()
+{
+	uint16_t *ROM = (uint16_t*)memregion("maincpu")->base();
+	int size = memregion("maincpu")->bytes();
+
+	for (int i = 0; i < size/2; i++)
+	{
+		ROM[i] = ((ROM[i] & 0xff00) >> 8) | ((ROM[i] & 0x00ff) << 8);
+
+
+		ROM[i] = ROM[i] ^ 0x88bb;
+
+		ROM[i] = bitswap<16>(ROM[i], 3, 2, 11, 10, 12, 4, 13, 5,
+			                         1, 9, 0,  8,  14, 15, 6, 7);
+	}
+
+	if (1)
+	{
+		int count = 0;
+		for (int i = 0; i < 0x4000000; i += 0x100000)
+		{
+			uint8_t* rom = memregion("maincpu")->base();
+
+			FILE* fp;
+			char filename[256];
+			sprintf(filename, "decrypted_split_%s_%02x", machine().system().name, count);
+			count++;
+			fp = fopen(filename, "w+b");
+			if (fp)
+			{
+				fwrite(&rom[i], 0x100000, 1, fp);
+				fclose(fp);
+			}
+		}
+	}
+}
+
+ROM_START( zone40 )
+	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "zone40.bin", 0x0000, 0x4000000, CRC(4ba1444f) SHA1(de83046ab93421486668a247972ad6d3cda19440) )
+ROM_END
+
 
 // year, name, parent, compat, machine, input, class, init, company, fullname, flags
 
 // Jungle Soft TV games
-CONS( 2007, vii,      0, 0, vii,        vii,      vii_state,         empty_init, "Jungle Soft / KenSingTon / Siatronics",    "Vii",         MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // motion controls are awkward, but playable for the most part
-CONS( 2010, zone60,   0, 0, wireless60, wirels60, spg2xx_game_state, empty_init, "Jungle's Soft / Ultimate Products (HK) Ltd", "Zone 60",     MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2010, wirels60, 0, 0, wireless60, wirels60, spg2xx_game_state, empty_init, "Jungle Soft / Kids Station Toys Inc",      "Wireless 60", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2007, vii,      0, 0, vii,        vii,      vii_state,         empty_init,  "Jungle Soft / KenSingTon / Siatronics",       "Vii",         MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // motion controls are awkward, but playable for the most part
+CONS( 2009, zone40,   0, 0, zone40,     wirels60, zone40_state,      init_zone40, "Jungle Soft / Ultimate Products (HK) Ltd",    "Zone 40",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2010, zone60,   0, 0, wireless60, wirels60, spg2xx_game_state, empty_init,  "Jungle's Soft / Ultimate Products (HK) Ltd",  "Zone 60",     MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2010, wirels60, 0, 0, wireless60, wirels60, spg2xx_game_state, empty_init,  "Jungle Soft / Kids Station Toys Inc",         "Wireless 60", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // JAKKS Pacific Inc TV games
 CONS( 2004, jak_batm, 0, 0, jakks, batman, spg2xx_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "The Batman (JAKKS Pacific TV Game)",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
@@ -3675,4 +3752,5 @@ CONS( 2007, taikeegr,    0,     0,        taikeegr,     taikeegr, spg2xx_game_st
 // "go 02d1d0" "do r1 = ff" to get past initial screen (currently bypassed by setting controller sense in RAM earlier, see hack in machine_reset)
 // a 'deluxe' version of this also exists with extra game modes
 CONS( 2004, sentx6p,    0,     0,        sentx6p,     sentx6p, sentx6p_state, empty_init, "Senario / Play Vision", "Vs Maxx Texas Hold'em TV Poker - 6 Player Edition (UK)", MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // from a UK Play Vision branded box, values in GBP
+
 
