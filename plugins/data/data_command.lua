@@ -2,7 +2,11 @@ local dat = {}
 local info, ver
 local datread = require("data/load_dat")
 do
-	local convert = require("data/button_char")
+	local buttonchar
+	local function convert(str)
+		if not buttonchar then buttonchar = require("data/button_char") end
+		return buttonchar(str)
+	end
 	datread, ver = datread.open("command.dat", "# Version:", convert)
 end
 

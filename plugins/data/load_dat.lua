@@ -1,14 +1,11 @@
 local datfile = {}
 local db = require("data/database")
 
-function datfile.open(file, vertag, fixupcb)
-	if not db then
-		return nil
-	end
+local function readret(file)
 	local function read(tag1, tag2, set)
 		local data
 		local stmt = db.prepare("SELECT f.data FROM \"" .. file .. "_idx\" AS fi, \"" .. file .. [["
-		 AS f WHERE fi.type = ? AND fi.val = ? AND fi.romset = ? AND f.rowid = fi.data]])
+		AS f WHERE fi.type = ? AND fi.val = ? AND fi.romset = ? AND f.rowid = fi.data]])
 		db.check("reading " .. tag1 .. " - " .. tag2 .. " - " .. set)
 		stmt:bind_values(tag1, tag2, set)
 		if stmt:step() == db.ROW then
@@ -17,7 +14,14 @@ function datfile.open(file, vertag, fixupcb)
 		stmt:finalize()
 		return data
 	end
+	return read
+end
 
+
+function datfile.open(file, vertag, fixupcb)
+	if not db then
+		return nil
+	end
 	local ver, dbver
 	local filepath
 	local fh
@@ -60,7 +64,7 @@ function datfile.open(file, vertag, fixupcb)
 
 	if vertag then
 		for line in fh:lines() do
-			local match = line:match(vertag .. "%s*([^%s]+)")
+			local match = line:match(vertag .. "%s*(%S+)")
 			if match then
 				ver = match
 				break
@@ -106,7 +110,7 @@ function datfile.open(file, vertag, fixupcb)
 					if not spos then
 						return nil
 					end
-					npos, epos = buffer:find("[\n\r]$[%w]*[\n\r]+", epos)
+					npos, epos = buffer:find("[\n\r]$%w*[\n\r]+", epos)
 					if not npos then
 						return nil
 					end
@@ -164,7 +168,7 @@ function datfile.open(file, vertag, fixupcb)
 	end
 	fh:close()
 
-	return read, ver
+	return readret(file), ver
 end
 
 return datfile
