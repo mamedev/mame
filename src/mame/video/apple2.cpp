@@ -985,7 +985,7 @@ void a2_video_device::hgr_update_tk2000(screen_device &screen, bitmap_ind16 &bit
 					}
 					break;
 
-\               case 1:
+               case 1:
 					w >>= 7;
 					if (vram_row[col] & 0x80)
 					{
