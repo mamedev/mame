@@ -252,18 +252,26 @@ class zone40_state : public spg2xx_game_state
 {
 public:
 	zone40_state(const machine_config& mconfig, device_type type, const char* tag) :
-		spg2xx_game_state(mconfig, type, tag)
+		spg2xx_game_state(mconfig, type, tag),
+		m_romregion(*this, "maincpu")
 	{ }
 
 	void zone40(machine_config &config);
 
 	void init_zone40();
 
+
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 private:
+	virtual void mem_map_z40(address_map &map);
+	DECLARE_READ16_MEMBER(z40_rom_r);
+	DECLARE_READ16_MEMBER(zone40_porta_r);
+	DECLARE_WRITE16_MEMBER(zone40_porta_w);
+	required_region_ptr<uint16_t> m_romregion;
+	uint8_t m_z40_rombase;
 };
 
 class pvmil_state : public spg2xx_game_state
@@ -634,9 +642,27 @@ WRITE16_MEMBER(spg2xx_game_state::wireless60_porta_w)
 	}
 }
 
+WRITE16_MEMBER(zone40_state::zone40_porta_w)
+{
+	wireless60_porta_w(space, offset, data);
+	
+	if ((data & 0x00ff) != m_z40_rombase)
+	{
+		m_z40_rombase = data & 0x00ff;
+		m_maincpu->invalidate_cache();
+	}
+}
+
 READ16_MEMBER(spg2xx_game_state::wireless60_porta_r)
 {
 	return m_w60_porta_data;
+}
+
+READ16_MEMBER(zone40_state::zone40_porta_r)
+{
+	uint16_t ret = wireless60_porta_r(space, offset);
+	ret = (ret & 0xff00) | m_z40_rombase;
+	return ret;
 }
 
 WRITE16_MEMBER(spg2xx_game_state::wireless60_portb_w)
@@ -907,6 +933,18 @@ void sentx6p_state::mem_map_2m_texas(address_map &map)
 	map(0x000000, 0x1fffff).bankr("cartbank");
 	map(0x3f0000, 0x3f7fff).ram();
 }
+
+READ16_MEMBER(zone40_state::z40_rom_r)
+{
+	// due to granularity of rom bank this manual method is safer
+	return m_romregion[(offset + (m_z40_rombase * 0x20000)) & 0x1ffffff];
+}
+
+void zone40_state::mem_map_z40(address_map &map)
+{
+	map(0x000000, 0x3fffff).r(FUNC(zone40_state::z40_rom_r));
+}
+
 
 void spg2xx_game_state::mem_map_1m(address_map &map)
 {
@@ -2474,14 +2512,18 @@ void spg2xx_game_state::machine_reset()
 
 void zone40_state::machine_start()
 {
-	spg2xx_game_state::machine_start();
-	m_bank->set_entry(7);
+	save_item(NAME(m_w60_controller_input));
+	save_item(NAME(m_w60_porta_data));
+	save_item(NAME(m_z40_rombase));
+
+	m_z40_rombase = 0xe0;
 }
 
 void zone40_state::machine_reset()
 {
-	spg2xx_game_state::machine_reset();
-	m_bank->set_entry(7);
+	m_w60_controller_input = -1;
+	m_w60_porta_data = 0;
+	m_z40_rombase = 0xe0;
 }
 
 
@@ -2676,13 +2718,12 @@ void spg2xx_game_state::wireless60(machine_config &config)
 void zone40_state::zone40(machine_config &config)
 {
 	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
-	m_maincpu->set_addrmap(AS_PROGRAM, &zone40_state::mem_map_4m);
+	m_maincpu->set_addrmap(AS_PROGRAM, &zone40_state::mem_map_z40);
 
 	spg2xx_base(config);
 
-	m_maincpu->porta_out().set(FUNC(zone40_state::wireless60_porta_w));
-	m_maincpu->portb_out().set(FUNC(zone40_state::wireless60_portb_w));
-	m_maincpu->porta_in().set(FUNC(zone40_state::wireless60_porta_r));;
+	m_maincpu->porta_out().set(FUNC(zone40_state::zone40_porta_w));
+	m_maincpu->porta_in().set(FUNC(zone40_state::zone40_porta_r));
 }
 
 
@@ -3691,7 +3732,7 @@ ROM_END
 
 // Jungle Soft TV games
 CONS( 2007, vii,      0, 0, vii,        vii,      vii_state,         empty_init,  "Jungle Soft / KenSingTon / Siatronics",       "Vii",         MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // motion controls are awkward, but playable for the most part
-CONS( 2009, zone40,   0, 0, zone40,     wirels60, zone40_state,      init_zone40, "Jungle Soft / Ultimate Products (HK) Ltd",    "Zone 40",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2009, zone40,   0, 0, zone40,     wirels60, zone40_state,      init_zone40, "Jungle Soft / Ultimate Products (HK) Ltd",    "Zone 40",     MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 CONS( 2010, zone60,   0, 0, wireless60, wirels60, spg2xx_game_state, empty_init,  "Jungle's Soft / Ultimate Products (HK) Ltd",  "Zone 60",     MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 CONS( 2010, wirels60, 0, 0, wireless60, wirels60, spg2xx_game_state, empty_init,  "Jungle Soft / Kids Station Toys Inc",         "Wireless 60", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
