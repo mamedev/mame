@@ -818,8 +818,8 @@ void namcos2_state::common_suzuka8h_am(address_map &map)
 
 void namcos2_state::common_suzuka8h_roz_am(address_map &map)
 {
-	map(0xc00000, 0xc0ffff).ram(); // is roz hardware populated?
-	map(0xd00000, 0xd0001f).ram(); // is roz hardware populated?
+	map(0xc00000, 0xc0ffff).noprw(); // no ROZ hardware implemented in PCB
+	map(0xd00000, 0xd0001f).noprw(); // ^^
 }
 
 void namcos2_state::master_suzuka8h_am(address_map &map)
