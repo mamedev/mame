@@ -75,6 +75,7 @@ DECLARE_DEVICE_TYPE(NV2A_RAM, nv2a_ram_device)
 class lpcbus_host_interface {
 public:
 	virtual void set_virtual_line(int line, int state) = 0;
+	virtual void remap() = 0;
 };
 
 class lpcbus_device_interface {
@@ -96,6 +97,7 @@ public:
 	void debug_generate_irq(int irq, int state);
 
 	virtual void set_virtual_line(int line, int state) override;
+	virtual void remap() override;
 
 	DECLARE_READ32_MEMBER(acpi_r);
 	DECLARE_WRITE32_MEMBER(acpi_w);

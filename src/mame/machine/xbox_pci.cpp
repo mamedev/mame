@@ -449,6 +449,11 @@ void mcpx_isalpc_device::set_virtual_line(int line, int state)
 	//line = line - 16;
 }
 
+void mcpx_isalpc_device::remap()
+{
+	remap_cb();
+}
+
 /*
  * SMBus
  */
@@ -489,6 +494,7 @@ void mcpx_smbus_device::device_start()
 	add_map(0x00000020, M_IO, FUNC(mcpx_smbus_device::smbus_io2));
 	bank_infos[2].adr = 0xc200;
 	status = 0x00b0;
+	intr_pin = 1;
 	memset(&smbusst, 0, sizeof(smbusst));
 	for (int b = 0; b < 2; b++)
 		for (int a = 0; a < 128; a++)
@@ -646,6 +652,7 @@ void mcpx_ohci_device::device_start()
 	add_map(0x00001000, M_MEM, FUNC(mcpx_ohci_device::ohci_mmio));
 	bank_infos[0].adr = 0xfed00000;
 	status = 0x00b0;
+	intr_pin = 1;
 	ohci_usb = new ohci_usb_controller();
 	ohci_usb->set_cpu(maincpu.target());
 	ohci_usb->set_irq_callback(
@@ -789,6 +796,7 @@ void mcpx_apu_device::device_start()
 	add_map(0x00080000, M_MEM, FUNC(mcpx_apu_device::apu_mmio));
 	bank_infos[0].adr = 0xfe800000;
 	status = 0x00b0;
+	intr_pin = 1;
 	memset(apust.memory, 0, sizeof(apust.memory));
 	memset(apust.voices_heap_blockaddr, 0, sizeof(apust.voices_heap_blockaddr));
 	memset(apust.voices_active, 0, sizeof(apust.voices_active));
@@ -992,6 +1000,7 @@ void mcpx_ac97_audio_device::device_start()
 	add_map(0x00001000, M_MEM, FUNC(mcpx_ac97_audio_device::ac97_mmio));
 	bank_infos[2].adr = 0xfec00000;
 	status = 0x00b0;
+	intr_pin = 1;
 	memset(&ac97st, 0, sizeof(ac97st));
 }
 
