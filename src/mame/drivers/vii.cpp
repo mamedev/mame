@@ -2442,13 +2442,13 @@ void tvgogo_state::machine_reset()
 DEVICE_IMAGE_LOAD_MEMBER(tvgogo_state::cart_load_tvgogo)
 {
 	uint32_t size = m_cart->common_get_size("rom");
-/*
+
 	if (size > 0x800000)
 	{
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
 		return image_init_result::FAIL;
 	}
-*/
+
 	m_cart->rom_alloc(0x800000, GENERIC_ROM16_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
