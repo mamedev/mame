@@ -660,8 +660,9 @@ READ16_MEMBER(spg2xx_game_state::wireless60_porta_r)
 
 READ16_MEMBER(zone40_state::zone40_porta_r)
 {
-	uint16_t ret = wireless60_porta_r(space, offset);
+	uint16_t ret = wireless60_porta_r(space, offset) & 0x0c00;
 	ret = (ret & 0xff00) | m_z40_rombase;
+	ret |= 0x1000; // Sword of Warrior in zone40 requires this bit to be set or controls don't do anything
 	return ret;
 }
 
