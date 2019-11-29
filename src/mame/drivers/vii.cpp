@@ -2525,6 +2525,7 @@ void zone40_state::machine_reset()
 	m_w60_porta_data = 0;
 	m_z40_rombase = 0xe0;
 	m_maincpu->invalidate_cache();
+	m_maincpu->reset();
 }
 
 
