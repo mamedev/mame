@@ -2406,13 +2406,13 @@ void icanguit_state::machine_reset()
 DEVICE_IMAGE_LOAD_MEMBER(icanguit_state::cart_load_icanguit)
 {
 	uint32_t size = m_cart->common_get_size("rom");
-/*
+
 	if (size < 0x800000)
 	{
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
 		return image_init_result::FAIL;
 	}
-*/
+
 	m_cart->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
@@ -2561,13 +2561,13 @@ void vii_state::poll_controls()
 DEVICE_IMAGE_LOAD_MEMBER(vii_state::cart_load_vii)
 {
 	uint32_t size = m_cart->common_get_size("rom");
-/*
+
 	if (size < 0x800000)
 	{
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
 		return image_init_result::FAIL;
 	}
-	*/
+	
 	m_cart->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
