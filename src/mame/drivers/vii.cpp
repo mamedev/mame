@@ -244,10 +244,13 @@ class wireless60_state : public spg2xx_game_state
 {
 public:
 	wireless60_state(const machine_config& mconfig, device_type type, const char* tag) :
-		spg2xx_game_state(mconfig, type, tag)
+		spg2xx_game_state(mconfig, type, tag),
+		m_bankmask(0x7)
 	{ }
 
 	void wireless60(machine_config& config);
+
+	void init_lx_jg7415();
 
 protected:
 	virtual void machine_start() override;
@@ -257,6 +260,7 @@ protected:
 	uint16_t m_w60_porta_data;
 	uint16_t m_w60_p1_ctrl_mask;
 	uint16_t m_w60_p2_ctrl_mask;
+	uint8_t m_bankmask;
 
 	DECLARE_WRITE16_MEMBER(wireless60_porta_w);
 	DECLARE_WRITE16_MEMBER(wireless60_portb_w);
@@ -619,11 +623,14 @@ private:
 
 void spg2xx_game_state::switch_bank(uint32_t bank)
 {
-	if (bank != m_current_bank)
+	if (m_bank)
 	{
-		m_current_bank = bank;
-		m_bank->set_entry(bank);
-		m_maincpu->invalidate_cache();
+		if (bank != m_current_bank)
+		{
+			m_current_bank = bank;
+			m_bank->set_entry(bank);
+			m_maincpu->invalidate_cache();
+		}
 	}
 }
 
@@ -685,7 +692,8 @@ READ16_MEMBER(zone40_state::zone40_porta_r)
 
 WRITE16_MEMBER(wireless60_state::wireless60_portb_w)
 {
-	switch_bank(data & 7);
+	logerror("%s: wireless60_portb_w (bankswitch) %04x\n", machine().describe_context(), data);
+	switch_bank(data & m_bankmask);
 }
 
 void vii_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -2526,7 +2534,9 @@ void spg2xx_game_state::machine_start()
 
 void spg2xx_game_state::machine_reset()
 {
-	m_current_bank = 0;
+	m_current_bank = -1;
+	switch_bank(0);
+	m_maincpu->reset();
 }
 
 
@@ -3558,6 +3568,11 @@ ROM_START( lexizeus )
 	ROM_LOAD16_WORD_SWAP( "lexibook1g900us.bin", 0x0000, 0x800000, CRC(c2370806) SHA1(cbb599c29c09b62b6a9951c724cd9fc496309cf9))
 ROM_END
 
+ROM_START( zone40 )
+	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "zone40.bin", 0x0000, 0x4000000, CRC(4ba1444f) SHA1(de83046ab93421486668a247972ad6d3cda19440) )
+ROM_END
+
 ROM_START( zone60 )
 	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "zone60.bin", 0x0000, 0x4000000, CRC(4cb637d1) SHA1(1f97cbdb4299ac0fbafc2a3aa592066cb0727066))
@@ -3567,6 +3582,17 @@ ROM_START( wirels60 )
 	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "wirels60.bin", 0x0000, 0x4000000, CRC(b4df8b28) SHA1(00e3da542e4bc14baf4724ad436f66d4c0f65c84))
 ROM_END
+
+// PCB marked 'Zone 100 110728 V2.1'
+ROM_START( lx_jg7415 )
+	ROM_REGION( 0x10000000, "maincpu", ROMREGION_ERASE00 )
+	// reads of some unused areas were not 100% consistent, but this seems intentional, the game has a ROM twice the size it needs and is wired up in such a way that those bad areas are unused by the game
+	// if adding a clone make sure to check if there are actual differences in the used areas
+	ROM_LOAD16_WORD_SWAP( "rom.bin", 0x0000, 0x10000000, CRC(59442e00) SHA1(7e91cf6b19c37f9b4fa4dc21e241c6634d6a6f95) )
+ROM_END
+
+
+
 
 ROM_START( rad_skat )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
@@ -3742,19 +3768,41 @@ void zone40_state::init_zone40()
 	}
 }
 
-ROM_START( zone40 )
-	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "zone40.bin", 0x0000, 0x4000000, CRC(4ba1444f) SHA1(de83046ab93421486668a247972ad6d3cda19440) )
-ROM_END
+void wireless60_state::init_lx_jg7415()
+{
+	uint8_t blocks[32] = {
+		// these parts of the ROM contain the code that gets selected		
+		0x00, 0x01, 0x06, 0x07, 0x08, 0x09, 0x0e, 0x0f,   0x10, 0x11, 0x16, 0x17, 0x18, 0x19, 0x1e, 0x1f,
+		// these parts of the ROM contain code / data but go unused, this seems intentional, some of these areas don't read consistently so likely this double size ROM was used knowing that some areas were bad and could be avoided
+		0x02, 0x03, 0x04, 0x05, 0x0a, 0x0b, 0x0c, 0x0d,   0x12, 0x13, 0x14, 0x15, 0x1a, 0x1b, 0x1c, 0x1d
+	};
+
+	uint8_t *src = memregion("maincpu")->base();
+	std::vector<u8> buffer(0x10000000);
+
+	for (int addr = 0; addr < 0x10000000; addr++)
+	{                    
+		int bank = (addr & 0xf800000) >> 23;
+		int newbank = blocks[bank];
+		int newaddr = (addr & 0x07fffff) | (newbank << 23);
+		buffer[addr] = src[newaddr];
+	}
+
+	std::copy(buffer.begin(), buffer.end(), &src[0]);
+
+	m_bankmask = 0xf;
+}
 
 
 // year, name, parent, compat, machine, input, class, init, company, fullname, flags
 
 // Jungle Soft TV games
-CONS( 2007, vii,      0, 0, vii,        vii,      vii_state,         empty_init,  "Jungle Soft / KenSingTon / Siatronics",       "Vii",         MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // motion controls are awkward, but playable for the most part
-CONS( 2009, zone40,   0, 0, zone40,     wirels60, zone40_state,      init_zone40, "Jungle Soft / Ultimate Products (HK) Ltd",    "Zone 40",     MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2010, zone60,   0, 0, wireless60, wirels60, wireless60_state,  empty_init,  "Jungle's Soft / Ultimate Products (HK) Ltd",  "Zone 60",     MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2010, wirels60, 0, 0, wireless60, wirels60, wireless60_state,  empty_init,  "Jungle Soft / Kids Station Toys Inc",         "Wireless 60", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2007, vii,      0, 0, vii,        vii,      vii_state,         empty_init,      "Jungle Soft / KenSingTon / Siatronics",       "Vii",         MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // motion controls are awkward, but playable for the most part
+// these don't have real motion controls
+CONS( 2009, zone40,   0, 0, zone40,     wirels60, zone40_state,      init_zone40,     "Jungle Soft / Ultimate Products (HK) Ltd",    "Zone 40",     MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2010, zone60,   0, 0, wireless60, wirels60, wireless60_state,  empty_init,      "Jungle's Soft / Ultimate Products (HK) Ltd",  "Zone 60",     MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2010, wirels60, 0, 0, wireless60, wirels60, wireless60_state,  empty_init,      "Jungle Soft / Kids Station Toys Inc",         "Wireless 60", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2011, lx_jg7415,0, 0, wireless60, wirels60, wireless60_state,  init_lx_jg7415,  "Lexibook",  "Lexibook JG7415 120-in-1",                      MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // JAKKS Pacific Inc TV games
 CONS( 2004, jak_batm, 0, 0, jakks, batman, spg2xx_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "The Batman (JAKKS Pacific TV Game)",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
