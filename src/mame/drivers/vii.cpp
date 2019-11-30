@@ -3767,7 +3767,7 @@ void zone40_state::init_zone40()
 void wireless60_state::init_lx_jg7415()
 {
 	uint8_t blocks[32] = {
-		// these parts of the ROM contain the code that gets elected		
+		// these parts of the ROM contain the code that gets selected		
 		0x00, 0x01, 0x06, 0x07, 0x08, 0x09, 0x0e, 0x0f,   0x10, 0x11, 0x16, 0x17, 0x18, 0x19, 0x1e, 0x1f,
 		// these parts of the ROM contain code / data but go unused? (is it garbage / leftover data, or intentionally avoided areas due to failing flash being wired up to avoid bad areas?)
 		0x02, 0x03, 0x04, 0x05, 0x0a, 0x0b, 0x0c, 0x0d,   0x12, 0x13, 0x14, 0x15, 0x1a, 0x1b, 0x1c, 0x1d
