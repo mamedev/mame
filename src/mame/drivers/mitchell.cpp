@@ -451,6 +451,23 @@ void mitchell_state::mstworld_io_map(address_map &map)
 	map(0x07, 0x07).w(FUNC(mitchell_state::mstworld_video_bank_w));    /* Video RAM bank register */
 }
 
+void mitchell_state::pkladiesbl_io_map(address_map &map) // TODO: check everything
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).w(FUNC(mitchell_state::pang_gfxctrl_w));   /* Palette bank, layer enable, coin counters, more */
+	map(0x00, 0x02).r(FUNC(mitchell_state::input_r));
+	map(0x01, 0x01).w(FUNC(mitchell_state::input_w));
+	map(0x02, 0x02).w(FUNC(mitchell_state::pang_bankswitch_w));    /* Code bank register */
+	map(0x03, 0x03).w("ymsnd", FUNC(ym2413_device::data_port_w));
+	map(0x04, 0x04).w("ymsnd", FUNC(ym2413_device::register_port_w));
+	map(0x05, 0x05).r(FUNC(mitchell_state::pang_port5_r));
+	map(0x06, 0x06).noprw();                     /* watchdog? IRQ ack? video buffering? */
+	map(0x07, 0x07).w(FUNC(mitchell_state::pang_video_bank_w));    /* Video RAM bank register */
+	map(0x08, 0x08).w(FUNC(mitchell_state::eeprom_cs_w));
+//  map(0x09, 0x09) MSM5205?
+	map(0x10, 0x10).w(FUNC(mitchell_state::eeprom_clock_w));
+	map(0x18, 0x18).w(FUNC(mitchell_state::eeprom_serial_w));
+}
 
 /*************************************
  *
@@ -1408,7 +1425,7 @@ void mitchell_state::pkladiesbl(machine_config &config)
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(12'000'000)/2); /* verified on pcb */
 	m_maincpu->set_addrmap(AS_PROGRAM, &mitchell_state::mitchell_map);
-	m_maincpu->set_addrmap(AS_IO, &mitchell_state::mitchell_io_map);
+	m_maincpu->set_addrmap(AS_IO, &mitchell_state::pkladiesbl_io_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &mitchell_state::decrypted_opcodes_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(mitchell_state::mitchell_irq), "screen", 0, 1);
 
@@ -1431,8 +1448,8 @@ void mitchell_state::pkladiesbl(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6295(config, m_oki, XTAL(16'000'000)/16, okim6295_device::PIN7_HIGH); /* It should be a OKIM5205 with a 384khz resonator */
-	m_oki->add_route(ALL_OUTPUTS, "mono", 0.50);
+	MSM5205(config, m_msm, 384000);
+	m_msm->add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	ym2413_device &ymsnd(YM2413(config, "ymsnd", 3750000)); /* verified on pcb, read the comments */
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
@@ -1575,8 +1592,8 @@ ROM_START( pkladiesbl )
 	// however, only parts of it are??
 	ROM_LOAD( "1.ic112", 0x50000, 0x08000, CRC(ca4cfaf9) SHA1(97ad3c526e4494f347db45c986ba23aff07e6321) )
 	ROM_CONTINUE(0x00000,0x08000)
-	ROM_LOAD( "2.ic126", 0x10000, 0x10000, CRC(5c73e9b6) SHA1(5fbfb4c79e2df8e1edd3f29ac63f9961dd3724b1) )
-	ROM_CONTINUE(0x60000,0x10000)
+	ROM_LOAD( "2.ic126", 0x60000, 0x10000, CRC(5c73e9b6) SHA1(5fbfb4c79e2df8e1edd3f29ac63f9961dd3724b1) )
+	ROM_CONTINUE(0x10000,0x10000)
 
 	ROM_REGION( 0x240000, "gfx1", ROMREGION_INVERT )
 	ROM_LOAD32_BYTE("20.ic97",  0x000000, 0x20000, CRC(ea72f6b5) SHA1(f38e4c8c9acec754f34b3ac442c96919c321a277) )
@@ -1608,8 +1625,8 @@ ROM_START( pkladiesbl2 ) // same as the above but without the z80 block, only 1.
 	ROM_REGION( 0x50000*2, "maincpu", 0 )
 	ROM_LOAD( "1.ic112", 0x50000, 0x08000, CRC(cadb9925) SHA1(d88353501a29ff855335f9c8822e095ef5196246) ) //sldh
 	ROM_CONTINUE(0x00000,0x08000)
-	ROM_LOAD( "2.ic126", 0x10000, 0x10000, CRC(5c73e9b6) SHA1(5fbfb4c79e2df8e1edd3f29ac63f9961dd3724b1) )
-	ROM_CONTINUE(0x60000,0x10000)
+	ROM_LOAD( "2.ic126", 0x60000, 0x10000, CRC(5c73e9b6) SHA1(5fbfb4c79e2df8e1edd3f29ac63f9961dd3724b1) )
+	ROM_CONTINUE(0x10000,0x10000)
 
 	ROM_REGION( 0x240000, "gfx1", ROMREGION_INVERT )
 	ROM_LOAD32_BYTE("20.ic97",  0x000000, 0x20000, CRC(ea72f6b5) SHA1(f38e4c8c9acec754f34b3ac442c96919c321a277) )
@@ -2576,7 +2593,7 @@ GAME( 1989, pkladies,    0,        marukin,    pkladies, mitchell_state, init_pk
 GAME( 1989, pkladiesl,   pkladies, marukin,    pkladies, mitchell_state, init_pkladies,   ROT0,   "Leprechaun",                "Poker Ladies (Leprechaun ver. 510)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, pkladiesla,  pkladies, marukin,    pkladies, mitchell_state, init_pkladies,   ROT0,   "Leprechaun",                "Poker Ladies (Leprechaun ver. 401)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, pkladiesbl,  pkladies, pkladiesbl, pkladies, mitchell_state, init_pkladiesbl, ROT0,   "bootleg",                   "Poker Ladies (Censored bootleg, set 1)", MACHINE_NOT_WORKING ) // by Playmark? need to figure out CPU 'decryption' / ordering
-GAME( 1989, pkladiesbl2, pkladies, pkladiesbl, pkladies, mitchell_state, init_pkladiesbl, ROT0,   "bootleg",                   "Poker Ladies (Censored bootleg, set 2)", MACHINE_NOT_WORKING ) // by Playmark? gets further than the above
+GAME( 1989, pkladiesbl2, pkladies, pkladiesbl, pkladies, mitchell_state, init_pkladiesbl, ROT0,   "bootleg",                   "Poker Ladies (Censored bootleg, set 2)", MACHINE_NOT_WORKING ) // by Playmark? needs inputs, sound, GFX fixes
 GAME( 1989, dokaben,     0,        pang,       pang,     mitchell_state, init_dokaben,    ROT0,   "Capcom",                    "Dokaben (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, pang,        0,        pang,       pang,     mitchell_state, init_pang,       ROT0,   "Mitchell",                  "Pang (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, bbros,       pang,     pang,       pang,     mitchell_state, init_pang,       ROT0,   "Mitchell (Capcom license)", "Buster Bros. (USA)", MACHINE_SUPPORTS_SAVE )
