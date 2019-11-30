@@ -2664,6 +2664,9 @@ so4saw2                         // SOYO SY-4SAW2 motherboard (486)
 nat48pv                         // NAT48PV-1.00 VL motherboard (486)
 olyport40                       // AEG Olympia Olyport 40-21
 micral45                        // Bull Micral 45 (286)
+epsax                           // Epson PC AX
+epsax2e                         // Epson PC AX2e
+epsax3                          // Epson PC AX3
 
 @source:atari_s1.cpp
 aavenger                        //

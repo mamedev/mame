@@ -2005,6 +2005,21 @@ ROM_END
 //  80286 Desktop
 //**************************************************************************
 
+// Epson PC AX / Equity III+ - 102-System Board Error (according to the technical manual this means
+// "TlMER SPEED CHECK: An error was detected in timer controller counter 0."
+ROM_START( epsax )
+	ROM_REGION16_LE(0x20000, "bios", 0)
+	ROM_LOAD16_BYTE( "evax.bin", 0x18000, 0x4000, CRC(5f9e5fc9) SHA1(5dbe414b762494fa65df6ac0391b2281f452f3e9))
+	ROM_LOAD16_BYTE( "odax.bin", 0x18001, 0x4000, CRC(e9cba352) SHA1(22be1457332a62ae789e779e9666ffd63c91d010))
+ROM_END
+
+// Epson PC AX2e
+ROM_START( epsax2e ) // see epsax
+	ROM_REGION16_LE(0x20000, "bios", 0)
+	ROM_LOAD16_BYTE( "evaxe.bin", 0x10000, 0x8000, CRC(1251f3e9) SHA1(52456943ee4d83c2a3d46e75d292f4fb57a5a2d8))
+	ROM_LOAD16_BYTE( "odaxe.bin", 0x10001, 0x8000, CRC(ce08f140) SHA1(1c6e62f2ab45e9574691224dd6a6ab2a823e85cc))
+ROM_END
+
 // Bull Micral 45 - Chipset: VLSI 8842AV / R2622 / VC2730-0001, VLSI 8832VB / L81711 / VL16C452-QC, MBL8042N, MC146818AP, ???, 900110003 V1.1 1986 MICROSOFT, FDC9268, NCR 53C80,
 // CPU: 286, FPU socket proided, 12MHz/8MHz RAM: 6xSIMM30 (1.152MB - 6MB) - ROM: 64KB, 16KB Video BIOS - On board video: Paradise PEGA2A, 256KB video RAM
 // On board: Floppy (2xint, 2xext), SCSI, par, ser, CP8, Microsoft Inport - OSC: 16.257MHz, 48MHz, 14.318180MHz - ISA16: 1, riser card with 1xISA8 and 2xISA16
@@ -2356,9 +2371,9 @@ ROM_START( at386 )
 	// BIOS-String: MR BIOS (r) V1.41 / 386DX CPU - the notes also say it comes from a DX motherboard, so sorted here
 	ROM_SYSTEM_BIOS( 15, "acer310", "Acer 310" )
 	ROMX_LOAD( "3alr001.bin", 0x10000, 0x10000, CRC(b45e5c73) SHA1(81ef79faed3914ccff23b3da5e831d7a99626538), ROM_BIOS(15))
-	// 16: five short beeps (Processor error)
+// 16: BIOS-String: 30-0200-ZZ1453-00101111-050591-SCAT3.04-0
 	ROM_SYSTEM_BIOS( 16, "kmxc02", "KMX-C-02" )
-	ROMX_LOAD( "3ctm005.bin", 0x10000, 0x10000, CRC(5f40533f) SHA1(806ad983087db686521ec2d7793671d128936e18), ROM_BIOS(16))
+	ROMX_LOAD( "3ctm005.bin", 0x10000, 0x10000, CRC(cfba6b2a) SHA1(001642016a3c02b031d739bd8b0fcff9470e86d2), ROM_BIOS(16))
 	// 17: BIOS: AMI; 11/11/92 - ISA16: 5 - CPU/FPU: Am386DX-40, IIT 3C87-40 - Chipset: FOREX FRX46C521, KS83C206Q
 	// BIOS-String: 40-0G00-009999-00101111-111192-4X521-F
 	ROM_SYSTEM_BIOS( 17, "frx521", "using the Forex FRX46C521" ) // no display
@@ -3154,6 +3169,19 @@ ROM_START( um82c481af )
 	ROM_SYSTEM_BIOS(1, "3diud", "386 UMC 3DIUD")
 	ROMX_LOAD( "386-umc-3flud.bin", 0x10000, 0x10000, CRC(2e795a01) SHA1(02e9e2871c1c1a542f44ab5eef66aee4b04225c1), ROM_BIOS(1))
 ROM_END
+
+
+//**************************************************************************
+//  80386 SX and DX Desktop
+//**************************************************************************
+
+// Epson PC AX3 - see epsax
+ROM_START( epsax3 )
+	ROM_REGION16_LE( 0x20000, "bios", 0)
+	ROM_LOAD16_BYTE( "evax3.bin", 0x10000, 0x8000, CRC(fec03cdc) SHA1(549027e6b786fa98a14912c1fb6d44c607206253))
+	ROM_LOAD16_BYTE( "odax3.bin", 0x10001, 0x8000, CRC(0162d959) SHA1(f17741282e078a66e38d82ca48455b17c54e832f))
+ROM_END
+
 
 //**************************************************************************
 //  80386 SX and DX Laptop/Notebook
@@ -4238,6 +4266,8 @@ COMP( 198?, u3911v3,   ibm5170, 0,       atturbo,   0,     at_state,     init_at
 COMP( 199?, micral45,  ibm5170, 0,       micral45,  0,     at_state,     init_at,        "Bull", "Micral 45", MACHINE_NOT_WORKING )
 COMP( 1986, ncrpc8,    ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "NCR",         "PC-8", MACHINE_NOT_WORKING )
 COMP( 1988, comslt286, ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "Compaq",      "SLT/286", MACHINE_NOT_WORKING )
+COMP( 198?, epsax,     ibm5170, 0,       ibm5162,   0,     at_state,     init_at,        "Epson",       "PC AX", MACHINE_NOT_WORKING )
+COMP( 198?, epsax2e,   ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "Epson",       "PC AX2e", MACHINE_NOT_WORKING )
 COMP( 1990, n8810m16v, ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "Nixdorf Computer AG", "8810 M16 VGA version", MACHINE_NOT_WORKING )
 COMP( 198?, o286foxii, ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "Octek",       "Fox II", MACHINE_NOT_WORKING )
 COMP( 1987, m290,      ibm5170, 0,       atturbo,   0,     at_state,     init_at,        "Olivetti",    "M290", MACHINE_NOT_WORKING )
@@ -4276,6 +4306,7 @@ COMP( 199?, elt386sx,  ibm5170, 0,       at386sx,   0,     at_state,     init_at
 COMP( 199?, pcd3nsx,   ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Siemens-Nixdorf", "PCD-3Nsx Notebook Computer", MACHINE_NOT_WORKING )
 COMP( 199?, mbc18nb,   ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Sanyo",       "MBC-18NB", MACHINE_NOT_WORKING )
 COMP( 1992, walk386sx, ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Triumph-Adler", "Walkstation 386 SX", MACHINE_NOT_WORKING ) // screen remains blank
+COMP( 198?, epsax3,    ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Epson",       "PC AX3", MACHINE_NOT_WORKING )
 COMP( 199?, frxc402,   ibm5170, 0,       at386,     0,     at_state,     init_at,        "<unknown>", "386 motherboards with a FOREX FRX46C402/FRX36C300/SIS85C206 chipset", MACHINE_NOT_WORKING )
 COMP( 199?, opti495slc,ibm5170, 0,       at386,     0,     at_state,     init_at,        "<unknown>", "386 motherboards using a OPTi 82C495SLC chipset", MACHINE_NOT_WORKING )
 COMP( 199?, opti495xlc,ibm5170, 0,       at386,     0,     at_state,     init_at,        "<unknown>", "386 motherboards using a OPTi 82C495XLC chipset", MACHINE_NOT_WORKING )
