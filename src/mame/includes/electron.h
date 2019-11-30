@@ -9,9 +9,10 @@
  * Driver by Wilbert Pol
  *
  ****************************************************************************/
-
 #ifndef MAME_INCLUDES_ELECTRON_H
 #define MAME_INCLUDES_ELECTRON_H
+
+#pragma once
 
 #include "machine/ram.h"
 #include "imagedev/cassette.h"
@@ -79,7 +80,7 @@ private:
 	DECLARE_READ8_MEMBER(electron_sheila_r);
 	DECLARE_WRITE8_MEMBER(electron_sheila_w);
 
-	DECLARE_PALETTE_INIT(electron);
+	void electron_colours(palette_device &palette) const;
 	uint32_t screen_update_electron(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(electron_tape_timer_handler);
 	TIMER_CALLBACK_MEMBER(setup_beep);

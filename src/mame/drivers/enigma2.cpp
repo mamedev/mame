@@ -61,15 +61,16 @@ TODO:
 class enigma2_state : public driver_device
 {
 public:
-	enigma2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	enigma2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_colors(*this, "colors"),
-		m_stars(*this, "stars"){ }
+		m_stars(*this, "stars")
+	{ }
 
 	void enigma2(machine_config &config);
 	void enigma2a(machine_config &config);
@@ -157,7 +158,7 @@ TIMER_CALLBACK_MEMBER(enigma2_state::interrupt_assert_callback)
 	int vpos = m_screen->vpos();
 	uint16_t counter = vpos_to_vysnc_chain_counter(vpos);
 	uint8_t vector = 0xc7 | ((counter & 0x80) >> 3) | ((~counter & 0x80) >> 4);
-	m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, vector);
+	m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, vector); // Z80
 
 	/* set up for next interrupt */
 	if (counter == INT_TRIGGER_COUNT_1)
@@ -501,14 +502,14 @@ static INPUT_PORTS_START( enigma2 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x78, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, enigma2_state,p1_controls_r, nullptr)
+	PORT_BIT( 0x78, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(enigma2_state, p1_controls_r)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x78, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, enigma2_state,p2_controls_r, nullptr)
+	PORT_BIT( 0x78, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(enigma2_state, p2_controls_r)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("DSW")
@@ -556,7 +557,7 @@ static INPUT_PORTS_START( enigma2a )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, enigma2_state,p1_controls_r, nullptr)
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(enigma2_state, p1_controls_r)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN1")
@@ -564,7 +565,7 @@ static INPUT_PORTS_START( enigma2a )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, enigma2_state,p2_controls_r, nullptr)
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(enigma2_state, p2_controls_r)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("DSW")
@@ -604,59 +605,59 @@ static INPUT_PORTS_START( enigma2a )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(enigma2_state::enigma2)
-
+void enigma2_state::enigma2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(enigma2_main_cpu_map)
+	Z80(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &enigma2_state::enigma2_main_cpu_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 2500000)
-	MCFG_DEVICE_PROGRAM_MAP(enigma2_audio_cpu_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(enigma2_state, irq0_line_hold, 8*52)
+	Z80(config, m_audiocpu, 2500000);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &enigma2_state::enigma2_audio_cpu_map);
+	m_audiocpu->set_periodic_int(FUNC(enigma2_state::irq0_line_hold), attotime::from_hz(8*52));
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(enigma2_state, screen_update_enigma2)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
+	m_screen->set_screen_update(FUNC(enigma2_state::screen_update_enigma2));
 
-	MCFG_PALETTE_ADD_3BIT_BGR("palette")
+	PALETTE(config, m_palette, palette_device::BGR_3BIT);
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, AY8910_CLOCK)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, enigma2_state, sound_latch_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, enigma2_state, protection_data_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	ay8910_device &aysnd(AY8910(config, "aysnd", AY8910_CLOCK));
+	aysnd.port_a_read_callback().set(FUNC(enigma2_state::sound_latch_r));
+	aysnd.port_b_write_callback().set(FUNC(enigma2_state::protection_data_w));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
-MACHINE_CONFIG_START(enigma2_state::enigma2a)
-
+void enigma2_state::enigma2a(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8080, CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(enigma2a_main_cpu_map)
-	MCFG_DEVICE_IO_MAP(enigma2a_main_cpu_io_map)
+	I8080(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &enigma2_state::enigma2a_main_cpu_map);
+	m_maincpu->set_addrmap(AS_IO, &enigma2_state::enigma2a_main_cpu_io_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 2500000)
-	MCFG_DEVICE_PROGRAM_MAP(enigma2_audio_cpu_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(enigma2_state, irq0_line_hold, 8*52)
+	Z80(config, m_audiocpu, 2500000);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &enigma2_state::enigma2_audio_cpu_map);
+	m_audiocpu->set_periodic_int(FUNC(enigma2_state::irq0_line_hold), attotime::from_hz(8*52));
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(enigma2_state, screen_update_enigma2a)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
+	m_screen->set_screen_update(FUNC(enigma2_state::screen_update_enigma2a));
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, AY8910_CLOCK)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, enigma2_state, sound_latch_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, enigma2_state, protection_data_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	ay8910_device &aysnd(AY8910(config, "aysnd", AY8910_CLOCK));
+	aysnd.port_a_read_callback().set(FUNC(enigma2_state::sound_latch_r));
+	aysnd.port_b_write_callback().set(FUNC(enigma2_state::protection_data_w));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 

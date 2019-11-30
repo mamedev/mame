@@ -8,8 +8,10 @@
 
 DEFINE_DEVICE_TYPE(SEGAIC16_ROAD, segaic16_road_device, "segaic16_road", "Sega 16-bit Road Generator")
 
-segaic16_road_device::segaic16_road_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+segaic16_road_device::segaic16_road_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, SEGAIC16_ROAD, tag, owner, clock)
+	, m_gfx_region(*this, DEVICE_SELF)
+	, m_roadram(*this, "roadram")
 {
 }
 
@@ -21,12 +23,6 @@ void segaic16_road_device::device_start()
 void segaic16_road_device::device_reset()
 {
 }
-
-
-
-
-
-
 
 
 /*******************************************************************************************
@@ -68,47 +64,41 @@ void segaic16_road_device::device_reset()
  *******************************************************************************************/
 
 
-
-void segaic16_road_device::segaic16_road_hangon_decode(running_machine &machine, road_info *info)
+void segaic16_road_device::segaic16_road_hangon_decode(road_info *info)
 {
-	int x, y;
-	const uint8_t *gfx = memregion("^gfx3")->base();
-	int len = memregion("^gfx3")->bytes();
+	const int len = m_gfx_region.length();
 
 	/* allocate memory for the unpacked road data */
-	info->gfx = std::make_unique<uint8_t[]>(256 * 512);
+	info->gfx = std::make_unique<u8[]>(256 * 512);
 
 	/* loop over rows */
-	for (y = 0; y < 256; y++)
+	for (int y = 0; y < 256; y++)
 	{
-		const uint8_t *src = gfx + ((y & 0xff) * 0x40) % len;
-		uint8_t *dst = info->gfx.get() + y * 512;
+		const u8 *src = m_gfx_region + ((y & 0xff) * 0x40) % len;
+		u8 *dst = info->gfx.get() + y * 512;
 
 		/* loop over columns */
-		for (x = 0; x < 512; x++)
-			dst[x] = (((src[x/8] >> (~x & 7)) & 1) << 0) | (((src[x/8 + 0x4000] >> (~x & 7)) & 1) << 1);
+		for (int x = 0; x < 512; x++)
+			dst[x] = (((src[x >> 3] >> (~x & 7)) & 1) << 0) | (((src[(x >> 3) + 0x4000] >> (~x & 7)) & 1) << 1);
 	}
 }
 
 
 static void segaic16_road_hangon_draw(segaic16_road_device::road_info *info, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority)
 {
-	uint16_t *roadram = info->roadram;
-	int x, y;
+	const u16 *roadram = info->roadram;
 
 	/* loop over scanlines */
-	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		uint16_t *dest = &bitmap.pix16(y);
-		int control = roadram[0x000 + y];
+		u16 *dest = &bitmap.pix16(y);
+		const u16 control = roadram[0x000 + y];
 		int hpos = roadram[0x100 + (control & 0xff)];
-		int color0 = roadram[0x200 + (control & 0xff)];
-		int color1 = roadram[0x300 + (control & 0xff)];
-		int ff9j1, ff9j2, ctr9m, ctr9n9p, ctr9n9p_ena, ss8j, plycont;
-		uint8_t *src;
+		const u16 color0 = roadram[0x200 + (control & 0xff)];
+		const u16 color1 = roadram[0x300 + (control & 0xff)];
 
 		/* the PLYCONT signal controls the road layering */
-		plycont = (control >> 10) & 3;
+		const u16 plycont = (control >> 10) & 3;
 
 		/* skip layers we aren't supposed to be drawing */
 		if ((plycont == 0 && priority != segaic16_road_device::ROAD_BACKGROUND) ||
@@ -116,32 +106,32 @@ static void segaic16_road_hangon_draw(segaic16_road_device::road_info *info, bit
 			continue;
 
 		/* compute the offset of the road graphics for this line */
-		src = info->gfx.get() + (0x000 + (control & 0xff)) * 512;
+		u8 *src = info->gfx.get() + (0x000 + (control & 0xff)) * 512;
 
 		/* initialize the 4-bit counter at 9M, which counts bits within each road byte */
-		ctr9m = hpos & 7;
+		int ctr9m = hpos & 7;
 
 		/* initialize the two 4-bit counters at 9P (low) and 9N (high), which count road data bytes */
-		ctr9n9p = (hpos >> 3) & 0xff;
+		int ctr9n9p = (hpos >> 3) & 0xff;
 
 		/* initialize the flip-flop at 9J (lower half), which controls the counting direction */
-		ff9j1 = (hpos >> 11) & 1;
+		int ff9j1 = (hpos >> 11) & 1;
 
 		/* initialize the flip-flop at 9J (upper half), which controls the background color */
-		ff9j2 = 1;
+		int ff9j2 = 1;
 
 		/* initialize the serial shifter at 8S, which delays several signals after we flip */
-		ss8j = 0;
+		int ss8j = 0;
 
 		/* draw this scanline from the beginning */
-		for (x = -24; x <= cliprect.max_x; x++)
+		for (int x = -24; x <= cliprect.max_x; x++)
 		{
-			int md, color, select;
+			int color;
 
 			/* ---- the following logic all happens constantly ---- */
 
 			/* the enable is controlled by the value in the counter at 9M */
-			ctr9n9p_ena = (ctr9m == 7);
+			const bool ctr9n9p_ena = (ctr9m == 7);
 
 			/* if we carried out of the 9P/9N counters, we will forcibly clear the flip-flop at 9J (lower half) */
 			if ((ctr9n9p & 0xff) == 0xff)
@@ -157,7 +147,7 @@ static void segaic16_road_hangon_draw(segaic16_road_device::road_info *info, bit
 				ff9j2 = 1;
 
 			/* ---- now process the pixel ---- */
-			md = 3;
+			int md = 3;
 
 			/* the Space Harrier/Enduro Racer hardware has a tweak that maps the control word bit 9 to the */
 			/* /CE line on the road ROM; use this to effectively disable the road data */
@@ -175,7 +165,7 @@ static void segaic16_road_hangon_draw(segaic16_road_device::road_info *info, bit
 
 			/* "select" is a made-up signal that comes from bit 3 of the serial shifter and is */
 			/* used in several places for color selection */
-			select = (ss8j >> 3) & 1;
+			int select = (ss8j >> 3) & 1;
 
 			/* check the flip-flop at 9J (upper half) to determine if we should use the background color; */
 			/* the output of this is ANDed with M0 and M1 so it only affects pixels with a value of 3; */
@@ -232,7 +222,6 @@ static void segaic16_road_hangon_draw(segaic16_road_device::road_info *info, bit
 		}
 	}
 }
-
 
 
 /*******************************************************************************************
@@ -330,25 +319,23 @@ static void segaic16_road_hangon_draw(segaic16_road_device::road_info *info, bit
  *
  *******************************************************************************************/
 
-void segaic16_road_device::segaic16_road_outrun_decode(running_machine &machine, road_info *info)
+void segaic16_road_device::segaic16_road_outrun_decode(road_info *info)
 {
-	int x, y;
-	const uint8_t *gfx = memregion("^gfx3")->base();
-	int len = memregion("^gfx3")->bytes();
+	const int len = m_gfx_region.length();
 
 	/* allocate memory for the unpacked road data */
-	info->gfx = std::make_unique<uint8_t[]>((256 * 2 + 1) * 512);
+	info->gfx = std::make_unique<u8[]>((256 * 2 + 1) * 512);
 
 	/* loop over rows */
-	for (y = 0; y < 256 * 2; y++)
+	for (int y = 0; y < 256 * 2; y++)
 	{
-		const uint8_t *src = gfx + ((y & 0xff) * 0x40 + (y >> 8) * 0x8000) % len;
-		uint8_t *dst = info->gfx.get() + y * 512;
+		const u8 *src = m_gfx_region + ((y & 0xff) * 0x40 + (y >> 8) * 0x8000) % len;
+		u8 *dst = info->gfx.get() + y * 512;
 
 		/* loop over columns */
-		for (x = 0; x < 512; x++)
+		for (int x = 0; x < 512; x++)
 		{
-			dst[x] = (((src[x/8] >> (~x & 7)) & 1) << 0) | (((src[x/8 + 0x4000] >> (~x & 7)) & 1) << 1);
+			dst[x] = (((src[x >> 3] >> (~x & 7)) & 1) << 0) | (((src[(x >> 3) + 0x4000] >> (~x & 7)) & 1) << 1);
 
 			/* pre-mark road data in the "stripe" area with a high bit */
 			if (x >= 256-8 && x < 256 && dst[x] == 3)
@@ -363,13 +350,12 @@ void segaic16_road_device::segaic16_road_outrun_decode(running_machine &machine,
 
 static void segaic16_road_outrun_draw(segaic16_road_device::road_info *info, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority)
 {
-	uint16_t *roadram = info->buffer.get();
-	int x, y;
+	const u16 *roadram = info->buffer.get();
 
 	/* loop over scanlines */
-	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		static const uint8_t priority_map[2][8] =
+		static const u8 priority_map[2][8] =
 		{
 			{ 0x80,0x81,0x81,0x87,0,0,0,0x00 },
 			{ 0x81,0x81,0x81,0x8f,0,0,0,0x80 }
@@ -378,9 +364,9 @@ static void segaic16_road_outrun_draw(segaic16_road_device::road_info *info, bit
 //          { 0x80,0x81,0x81,0x83,0,0,0,0x00 },
 //          { 0x81,0x87,0x87,0x8f,0,0,0,0x00 }
 		};
-		uint16_t *dest = &bitmap.pix16(y);
-		int data0 = roadram[0x000 + y];
-		int data1 = roadram[0x100 + y];
+		u16 *dest = &bitmap.pix16(y);
+		const u16 data0 = roadram[0x000 + y];
+		const u16 data1 = roadram[0x100 + y];
 
 		/* background case: look for solid fill scanlines */
 		if (priority == segaic16_road_device::ROAD_BACKGROUND)
@@ -419,7 +405,7 @@ static void segaic16_road_outrun_draw(segaic16_road_device::road_info *info, bit
 			if (color != -1)
 			{
 				color |= info->colorbase3;
-				for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+				for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 					dest[x] = color;
 			}
 		}
@@ -427,31 +413,28 @@ static void segaic16_road_outrun_draw(segaic16_road_device::road_info *info, bit
 		/* foreground case: render from ROM */
 		else
 		{
-			int hpos0, hpos1, color0, color1;
-			int control = info->control & 3;
-			uint16_t color_table[32];
-			uint8_t *src0, *src1;
-			uint8_t bgcolor;
+			const u8 control = info->control & 3;
+			u16 color_table[32];
 
 			/* if both roads are low priority, skip */
 			if ((data0 & 0x800) && (data1 & 0x800))
 				continue;
 
 			/* get road 0 data */
-			src0 = (data0 & 0x800) ? info->gfx.get() + 256 * 2 * 512 : (info->gfx.get() + (0x000 + ((data0 >> 1) & 0xff)) * 512);
-			hpos0 = (roadram[0x200 + ((info->control & 4) ? y : (data0 & 0x1ff))]) & 0xfff;
-			color0 = roadram[0x600 + ((info->control & 4) ? y : (data0 & 0x1ff))];
+			u8 *src0 = (data0 & 0x800) ? info->gfx.get() + 256 * 2 * 512 : (info->gfx.get() + (0x000 + ((data0 >> 1) & 0xff)) * 512);
+			int hpos0 = (roadram[0x200 + ((info->control & 4) ? y : (data0 & 0x1ff))]) & 0xfff;
+			int color0 = roadram[0x600 + ((info->control & 4) ? y : (data0 & 0x1ff))];
 
 			/* get road 1 data */
-			src1 = (data1 & 0x800) ? info->gfx.get() + 256 * 2 * 512 : (info->gfx.get() + (0x100 + ((data1 >> 1) & 0xff)) * 512);
-			hpos1 = (roadram[0x400 + ((info->control & 4) ? (0x100 + y) : (data1 & 0x1ff))]) & 0xfff;
-			color1 = roadram[0x600 + ((info->control & 4) ? (0x100 + y) : (data1 & 0x1ff))];
+			u8 *src1 = (data1 & 0x800) ? info->gfx.get() + 256 * 2 * 512 : (info->gfx.get() + (0x100 + ((data1 >> 1) & 0xff)) * 512);
+			int hpos1 = (roadram[0x400 + ((info->control & 4) ? (0x100 + y) : (data1 & 0x1ff))]) & 0xfff;
+			int color1 = roadram[0x600 + ((info->control & 4) ? (0x100 + y) : (data1 & 0x1ff))];
 
 			/* determine the 5 colors for road 0 */
 			color_table[0x00] = info->colorbase1 ^ 0x00 ^ ((color0 >> 0) & 1);
 			color_table[0x01] = info->colorbase1 ^ 0x02 ^ ((color0 >> 1) & 1);
 			color_table[0x02] = info->colorbase1 ^ 0x04 ^ ((color0 >> 2) & 1);
-			bgcolor = (color0 >> 8) & 0xf;
+			u8 bgcolor = (color0 >> 8) & 0xf;
 			color_table[0x03] = (data0 & 0x200) ? color_table[0x00] : (info->colorbase2 ^ 0x00 ^ bgcolor);
 			color_table[0x07] = info->colorbase1 ^ 0x06 ^ ((color0 >> 3) & 1);
 
@@ -470,9 +453,9 @@ static void segaic16_road_outrun_draw(segaic16_road_device::road_info *info, bit
 					if (data0 & 0x800)
 						continue;
 					hpos0 = (hpos0 - (0x5f8 + info->xoffs)) & 0xfff;
-					for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+					for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 					{
-						int pix0 = (hpos0 < 0x200) ? src0[hpos0] : 3;
+						const int pix0 = (hpos0 < 0x200) ? src0[hpos0] : 3;
 						dest[x] = color_table[0x00 + pix0];
 						hpos0 = (hpos0 + 1) & 0xfff;
 					}
@@ -481,10 +464,10 @@ static void segaic16_road_outrun_draw(segaic16_road_device::road_info *info, bit
 				case 1:
 					hpos0 = (hpos0 - (0x5f8 + info->xoffs)) & 0xfff;
 					hpos1 = (hpos1 - (0x5f8 + info->xoffs)) & 0xfff;
-					for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+					for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 					{
-						int pix0 = (hpos0 < 0x200) ? src0[hpos0] : 3;
-						int pix1 = (hpos1 < 0x200) ? src1[hpos1] : 3;
+						const int pix0 = (hpos0 < 0x200) ? src0[hpos0] : 3;
+						const int pix1 = (hpos1 < 0x200) ? src1[hpos1] : 3;
 						if ((priority_map[0][pix0] >> pix1) & 1)
 							dest[x] = color_table[0x10 + pix1];
 						else
@@ -497,10 +480,10 @@ static void segaic16_road_outrun_draw(segaic16_road_device::road_info *info, bit
 				case 2:
 					hpos0 = (hpos0 - (0x5f8 + info->xoffs)) & 0xfff;
 					hpos1 = (hpos1 - (0x5f8 + info->xoffs)) & 0xfff;
-					for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+					for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 					{
-						int pix0 = (hpos0 < 0x200) ? src0[hpos0] : 3;
-						int pix1 = (hpos1 < 0x200) ? src1[hpos1] : 3;
+						const int pix0 = (hpos0 < 0x200) ? src0[hpos0] : 3;
+						const int pix1 = (hpos1 < 0x200) ? src1[hpos1] : 3;
 						if ((priority_map[1][pix0] >> pix1) & 1)
 							dest[x] = color_table[0x10 + pix1];
 						else
@@ -514,9 +497,9 @@ static void segaic16_road_outrun_draw(segaic16_road_device::road_info *info, bit
 					if (data1 & 0x800)
 						continue;
 					hpos1 = (hpos1 - (0x5f8 + info->xoffs)) & 0xfff;
-					for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+					for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 					{
-						int pix1 = (hpos1 < 0x200) ? src1[hpos1] : 3;
+						const int pix1 = (hpos1 < 0x200) ? src1[hpos1] : 3;
 						dest[x] = color_table[0x10 + pix1];
 						hpos1 = (hpos1 + 1) & 0xfff;
 					}
@@ -534,7 +517,7 @@ static void segaic16_road_outrun_draw(segaic16_road_device::road_info *info, bit
  *
  *************************************/
 
-void segaic16_road_device::segaic16_road_init(running_machine &machine, int which, int type, int colorbase1, int colorbase2, int colorbase3, int xoffs)
+void segaic16_road_device::segaic16_road_init(int which, int type, int colorbase1, int colorbase2, int colorbase3, int xoffs)
 {
 	road_info *info = &segaic16_road[which];
 
@@ -551,7 +534,7 @@ void segaic16_road_device::segaic16_road_init(running_machine &machine, int whic
 	switch (which)
 	{
 		case 0:
-			info->roadram = segaic16_roadram_0;
+			info->roadram = m_roadram.target();
 			break;
 
 		default:
@@ -564,14 +547,14 @@ void segaic16_road_device::segaic16_road_init(running_machine &machine, int whic
 		case ROAD_HANGON:
 		case ROAD_SHARRIER:
 			info->draw = segaic16_road_hangon_draw;
-			segaic16_road_hangon_decode(machine, info);
+			segaic16_road_hangon_decode(info);
 			break;
 
 		case ROAD_OUTRUN:
 		case ROAD_XBOARD:
-			info->buffer = std::make_unique<uint16_t[]>(0x1000/2);
+			info->buffer = std::make_unique<u16[]>(0x1000/2);
 			info->draw = segaic16_road_outrun_draw;
-			segaic16_road_outrun_decode(machine, info);
+			segaic16_road_outrun_decode(info);
 			break;
 
 		default:
@@ -601,22 +584,24 @@ void segaic16_road_device::segaic16_road_draw(int which, bitmap_ind16 &bitmap, c
  *
  *************************************/
 
-READ16_MEMBER( segaic16_road_device::segaic16_road_control_0_r )
+u16 segaic16_road_device::segaic16_road_control_0_r()
 {
-	road_info *info = &segaic16_road[0];
-
-	if (info->buffer)
+	if (!machine().side_effects_disabled())
 	{
-		uint32_t *src = (uint32_t *)info->roadram;
-		uint32_t *dst = (uint32_t *)info->buffer.get();
-		int i;
+		road_info *info = &segaic16_road[0];
 
-		/* swap the halves of the road RAM */
-		for (i = 0; i < 0x1000/4; i++)
+		if (info->buffer)
 		{
-			uint32_t temp = *src;
-			*src++ = *dst;
-			*dst++ = temp;
+			u32 *src = (u32 *)info->roadram;
+			u32 *dst = (u32 *)info->buffer.get();
+
+			/* swap the halves of the road RAM */
+			for (int i = 0; i < 0x1000/4; i++)
+			{
+				const u32 temp = *src;
+				*src++ = *dst;
+				*dst++ = temp;
+			}
 		}
 	}
 
@@ -624,7 +609,7 @@ READ16_MEMBER( segaic16_road_device::segaic16_road_control_0_r )
 }
 
 
-WRITE16_MEMBER( segaic16_road_device::segaic16_road_control_0_w )
+void segaic16_road_device::segaic16_road_control_0_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	road_info *info = &segaic16_road[0];
 

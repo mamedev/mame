@@ -68,14 +68,13 @@ public:
 	void vipclub(machine_config &config);
 	void ojousan(machine_config &config);
 	void seiha(machine_config &config);
+	void bikkuri(machine_config &config);
 
 	void init_kyuhito();
 	void init_idhimitu();
 	void init_kaguya2();
 	void init_mjcamera();
 	void init_kanatuen();
-
-	DECLARE_CUSTOM_INPUT_MEMBER(nb1413m3_busyflag_r);
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -125,12 +124,12 @@ private:
 	DECLARE_WRITE8_MEMBER(barline_output_w);
 
 	DECLARE_VIDEO_START(mbmj8688_pure_12bit);
-	DECLARE_PALETTE_INIT(mbmj8688_12bit);
+	void mbmj8688_12bit(palette_device &palette) const;
 	DECLARE_VIDEO_START(mbmj8688_pure_16bit_LCD);
-	DECLARE_PALETTE_INIT(mbmj8688_16bit);
-	DECLARE_PALETTE_INIT(mbmj8688_lcd);
+	void mbmj8688_16bit(palette_device &palette) const;
+	void mbmj8688_lcd(palette_device &palette) const;
 	DECLARE_VIDEO_START(mbmj8688_8bit);
-	DECLARE_PALETTE_INIT(mbmj8688_8bit);
+	void mbmj8688_8bit(palette_device &palette) const;
 	DECLARE_VIDEO_START(mbmj8688_hybrid_16bit);
 	DECLARE_VIDEO_START(mbmj8688_hybrid_12bit);
 	DECLARE_VIDEO_START(mbmj8688_pure_16bit);
@@ -145,6 +144,8 @@ private:
 	void postload();
 
 	void barline_io_map(address_map &map);
+	void bikkuri_map(address_map &map);
+	void bikkuri_io_map(address_map &map);
 	void crystalg_io_map(address_map &map);
 	void iemoto_io_map(address_map &map);
 	void kaguya_io_map(address_map &map);

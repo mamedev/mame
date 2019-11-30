@@ -154,40 +154,47 @@ static void cpu21yb_vme_cards(device_slot_interface &device)
 }
 
 /* Machine configurations */
-MACHINE_CONFIG_START(cpu20_state::cpu20)
-	MCFG_VME_DEVICE_ADD("vme")
-	MCFG_VME_SLOT_ADD ("vme", 1, cpu20_vme_cards, "fccpu20")
-MACHINE_CONFIG_END
+void cpu20_state::cpu20(machine_config &config)
+{
+	VME(config, "vme", 0);
+	VME_SLOT(config, "slot1", cpu20_vme_cards, "fccpu20", 1, "vme");
+}
 
-MACHINE_CONFIG_START(cpu20_state::cpu21s)
-	MCFG_VME_DEVICE_ADD("vme")
-	MCFG_VME_SLOT_ADD ("vme", 1, cpu21s_vme_cards, "fccpu21s")
-MACHINE_CONFIG_END
+void cpu20_state::cpu21s(machine_config &config)
+{
+	VME(config, "vme", 0);
+	VME_SLOT(config, "slot1", cpu21s_vme_cards, "fccpu21s", 1, "vme");
+}
 
-MACHINE_CONFIG_START(cpu20_state::cpu21)
-	MCFG_VME_DEVICE_ADD("vme")
-	MCFG_VME_SLOT_ADD ("vme", 1, cpu21_vme_cards, "fccpu21")
-MACHINE_CONFIG_END
+void cpu20_state::cpu21(machine_config &config)
+{
+	VME(config, "vme", 0);
+	VME_SLOT(config, "slot1", cpu21_vme_cards, "fccpu21", 1, "vme");
+}
 
-MACHINE_CONFIG_START(cpu20_state::cpu21a)
-	MCFG_VME_DEVICE_ADD("vme")
-	MCFG_VME_SLOT_ADD ("vme", 1, cpu21a_vme_cards, "fccpu21a")
-MACHINE_CONFIG_END
+void cpu20_state::cpu21a(machine_config &config)
+{
+	VME(config, "vme", 0);
+	VME_SLOT(config, "slot1", cpu21a_vme_cards, "fccpu21a", 1, "vme");
+}
 
-MACHINE_CONFIG_START(cpu20_state::cpu21ya)
-	MCFG_VME_DEVICE_ADD("vme")
-	MCFG_VME_SLOT_ADD ("vme", 1, cpu21ya_vme_cards, "fccpu21ya")
-MACHINE_CONFIG_END
+void cpu20_state::cpu21ya(machine_config &config)
+{
+	VME(config, "vme", 0);
+	VME_SLOT(config, "slot1", cpu21ya_vme_cards, "fccpu21ya", 1, "vme");
+}
 
-MACHINE_CONFIG_START(cpu20_state::cpu21b)
-	MCFG_VME_DEVICE_ADD("vme")
-	MCFG_VME_SLOT_ADD ("vme", 1, cpu21b_vme_cards, "fccpu21b")
-MACHINE_CONFIG_END
+void cpu20_state::cpu21b(machine_config &config)
+{
+	VME(config, "vme", 0);
+	VME_SLOT(config, "slot1", cpu21b_vme_cards, "fccpu21b", 1, "vme");
+}
 
-MACHINE_CONFIG_START(cpu20_state::cpu21yb)
-	MCFG_VME_DEVICE_ADD("vme")
-	MCFG_VME_SLOT_ADD ("vme", 1, cpu21yb_vme_cards, "fccpu21yb")
-MACHINE_CONFIG_END
+void cpu20_state::cpu21yb(machine_config &config)
+{
+	VME(config, "vme", 0);
+	VME_SLOT(config, "slot1", cpu21yb_vme_cards, "fccpu21yb", 1, "vme");
+}
 
 /* ROM configurations */
 ROM_START(fccpu20sbc)   ROM_END

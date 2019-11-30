@@ -12,26 +12,29 @@
 #include "boot_kof2k3.h"
 
 
-MACHINE_CONFIG_START(neogeo_kf2k3bl_cart_device::device_add_mconfig)
-	MCFG_NEOBOOT_PROT_ADD("bootleg_prot")
-	MCFG_CMC_PROT_ADD("cmc_prot")
-	MCFG_PCM2_PROT_ADD("pcm2_prot")
-	MCFG_KOF2K3BL_PROT_ADD("kof2k3bl_prot")
-MACHINE_CONFIG_END
+void neogeo_kf2k3bl_cart_device::device_add_mconfig(machine_config &config)
+{
+	NEOBOOT_PROT(config, m_prot);
+	NG_CMC_PROT(config, m_cmc_prot);
+	NG_PCM2_PROT(config, m_pcm2_prot);
+	NG_KOF2K3BL_PROT(config, m_kof2k3bl_prot);
+}
 
-MACHINE_CONFIG_START(neogeo_kf2k3pl_cart_device::device_add_mconfig)
-	MCFG_NEOBOOT_PROT_ADD("bootleg_prot")
-	MCFG_CMC_PROT_ADD("cmc_prot")
-	MCFG_PCM2_PROT_ADD("pcm2_prot")
-	MCFG_KOF2K3BL_PROT_ADD("kof2k3bl_prot")
-MACHINE_CONFIG_END
+void neogeo_kf2k3pl_cart_device::device_add_mconfig(machine_config &config)
+{
+	NEOBOOT_PROT(config, m_prot);
+	NG_CMC_PROT(config, m_cmc_prot);
+	NG_PCM2_PROT(config, m_pcm2_prot);
+	NG_KOF2K3BL_PROT(config, m_kof2k3bl_prot);
+}
 
-MACHINE_CONFIG_START(neogeo_kf2k3upl_cart_device::device_add_mconfig)
-	MCFG_NEOBOOT_PROT_ADD("bootleg_prot")
-	MCFG_CMC_PROT_ADD("cmc_prot")
-	MCFG_PCM2_PROT_ADD("pcm2_prot")
-	MCFG_KOF2K3BL_PROT_ADD("kof2k3bl_prot")
-MACHINE_CONFIG_END
+void neogeo_kf2k3upl_cart_device::device_add_mconfig(machine_config &config)
+{
+	NEOBOOT_PROT(config, m_prot);
+	NG_CMC_PROT(config, m_cmc_prot);
+	NG_PCM2_PROT(config, m_pcm2_prot);
+	NG_KOF2K3BL_PROT(config, m_kof2k3bl_prot);
+}
 
 /*************************************************
  kf2k3bl

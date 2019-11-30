@@ -46,7 +46,7 @@ private:
 	DECLARE_READ8_MEMBER(portc_r);
 	DECLARE_WRITE8_MEMBER(portc_w);
 	DECLARE_WRITE_LINE_MEMBER(upd1771_ack_w);
-	DECLARE_PALETTE_INIT(scv);
+	void scv_palette(palette_device &palette) const;
 	uint32_t screen_update_scv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void plot_sprite_part(bitmap_ind16 &bitmap, uint8_t x, uint8_t y, uint8_t pat, uint8_t col, uint8_t screen_sprite_start_line);
@@ -85,7 +85,6 @@ void scv_state::scv_mem(address_map &map)
 	map(0x3600, 0x3600).w(m_upd1771c, FUNC(upd1771c_device::write));
 
 	map(0x8000, 0xff7f).rw(m_cart, FUNC(scv_cart_slot_device::read_cart), FUNC(scv_cart_slot_device::write_cart)); // cartridge
-	map(0xff80, 0xffff).ram();   // upd7801 internal RAM
 }
 
 
@@ -214,10 +213,10 @@ WRITE8_MEMBER( scv_state::portc_w )
 }
 
 
-PALETTE_INIT_MEMBER(scv_state, scv)
+void scv_state::scv_palette(palette_device &palette) const
 {
 	/*
-	  SCV Epoch-1A chip RGB voltage readouts from paused Bios color test:
+	  SCV Epoch-1A chip RGB voltage readouts from paused BIOS color test:
 
 	  (values in millivolts)
 
@@ -244,7 +243,7 @@ PALETTE_INIT_MEMBER(scv_state, scv)
 	  330 ish
 	  520 ish.
 
-	  Quamtizing/scaling/rounding between 0 and 255 we thus get:
+	  Quantizing/scaling/rounding between 0 and 255 we thus get:
 
 	*/
 	palette.set_pen_color( 0,   0,   0, 155);
@@ -257,12 +256,12 @@ PALETTE_INIT_MEMBER(scv_state, scv)
 	palette.set_pen_color( 7,   0, 161,   0);
 	palette.set_pen_color( 8, 255,   0,   0);
 	palette.set_pen_color( 9, 255, 161,   0);
-	palette.set_pen_color( 10, 255,   0, 255);
-	palette.set_pen_color( 11, 255, 160, 159);
-	palette.set_pen_color( 12, 255, 255,   0);
-	palette.set_pen_color( 13, 163, 160,   0);
-	palette.set_pen_color( 14, 161, 160, 157);
-	palette.set_pen_color( 15, 255, 255, 255);
+	palette.set_pen_color(10, 255,   0, 255);
+	palette.set_pen_color(11, 255, 160, 159);
+	palette.set_pen_color(12, 255, 255,   0);
+	palette.set_pen_color(13, 163, 160,   0);
+	palette.set_pen_color(14, 161, 160, 157);
+	palette.set_pen_color(15, 255, 255, 255);
 }
 
 
@@ -270,99 +269,85 @@ void scv_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 {
 	switch (id)
 	{
-		case TIMER_VB:
+	case TIMER_VB:
+		{
+			int vpos = m_screen->vpos();
+
+			switch( vpos )
 			{
-				int vpos = m_screen->vpos();
-
-				switch( vpos )
-				{
-				case 240:
-					m_maincpu->set_input_line(UPD7810_INTF2, ASSERT_LINE);
-					break;
-				case 0:
-					m_maincpu->set_input_line(UPD7810_INTF2, CLEAR_LINE);
-					break;
-				}
-
-				m_vb_timer->adjust(m_screen->time_until_pos((vpos + 1) % 262, 0));
+			case 240:
+				m_maincpu->set_input_line(UPD7810_INTF2, ASSERT_LINE);
+				break;
+			case 0:
+				m_maincpu->set_input_line(UPD7810_INTF2, CLEAR_LINE);
+				break;
 			}
-			break;
 
-		default:
-			assert_always(false, "Unknown id in scv_state::device_timer");
+			m_vb_timer->adjust(m_screen->time_until_pos((vpos + 1) % 262, 0));
+		}
+		break;
+
+	default:
+		throw emu_fatalerror("Unknown id in scv_state::device_timer");
 	}
 }
 
 
 inline void scv_state::plot_sprite_part( bitmap_ind16 &bitmap, uint8_t x, uint8_t y, uint8_t pat, uint8_t col, uint8_t screen_sprite_start_line )
 {
-	if ( x < 4 )
+	if ((x >= 4) && ((y + 2) >= screen_sprite_start_line))
 	{
-		return;
-	}
+		x -= 4;
 
-	x -= 4;
+		if (pat & 0x08)
+			bitmap.pix16(y + 2, x) = col;
 
-	if ( y + 2 >= screen_sprite_start_line )
-	{
-		if ( pat & 0x08 )
-		{
-			bitmap.pix16(y + 2, x ) = col;
-		}
-		if ( pat & 0x04 && x < 255 )
-		{
-			bitmap.pix16(y + 2, x + 1 ) = col;
-		}
-		if ( pat & 0x02 && x < 254 )
-		{
-			bitmap.pix16(y + 2, x + 2 ) = col;
-		}
-		if ( pat & 0x01 && x < 253 )
-		{
-			bitmap.pix16(y + 2, x + 3 ) = col;
-		}
+		if (pat & 0x04 && x < 255 )
+			bitmap.pix16(y + 2, x + 1) = col;
+
+		if (pat & 0x02 && x < 254)
+			bitmap.pix16(y + 2, x + 2) = col;
+
+		if (pat & 0x01 && x < 253)
+			bitmap.pix16(y + 2, x + 3) = col;
 	}
 }
 
 
 inline void scv_state::draw_sprite( bitmap_ind16 &bitmap, uint8_t x, uint8_t y, uint8_t tile_idx, uint8_t col, uint8_t left, uint8_t right, uint8_t top, uint8_t bottom, uint8_t clip_y, uint8_t screen_sprite_start_line )
 {
-	int j;
-
 	y += clip_y * 2;
-	for ( j = clip_y * 4; j < 32; j += 4 )
+	for (int j = clip_y * 4; j < 32; j += 4, y += 2)
 	{
-		uint8_t pat0 = m_videoram[ tile_idx * 32 + j + 0 ];
-		uint8_t pat1 = m_videoram[ tile_idx * 32 + j + 1 ];
-		uint8_t pat2 = m_videoram[ tile_idx * 32 + j + 2 ];
-		uint8_t pat3 = m_videoram[ tile_idx * 32 + j + 3 ];
+		uint8_t const pat0 = m_videoram[tile_idx * 32 + j + 0];
+		uint8_t const pat1 = m_videoram[tile_idx * 32 + j + 1];
+		uint8_t const pat2 = m_videoram[tile_idx * 32 + j + 2];
+		uint8_t const pat3 = m_videoram[tile_idx * 32 + j + 3];
 
-		if ( ( top && j < 16 ) || ( bottom && j >= 16 ) )
+		if ((top && (j < 16)) || (bottom && (j >= 16)))
 		{
-			if ( left )
+			if (left)
 			{
-				plot_sprite_part( bitmap, x     , y, pat0 >> 4, col, screen_sprite_start_line );
-				plot_sprite_part( bitmap, x +  4, y, pat1 >> 4, col, screen_sprite_start_line );
+				plot_sprite_part(bitmap, x     , y, pat0 >> 4, col, screen_sprite_start_line);
+				plot_sprite_part(bitmap, x +  4, y, pat1 >> 4, col, screen_sprite_start_line);
 			}
-			if ( right )
+			if (right)
 			{
-				plot_sprite_part( bitmap, x +  8, y, pat2 >> 4, col, screen_sprite_start_line );
-				plot_sprite_part( bitmap, x + 12, y, pat3 >> 4, col, screen_sprite_start_line );
+				plot_sprite_part(bitmap, x +  8, y, pat2 >> 4, col, screen_sprite_start_line);
+				plot_sprite_part(bitmap, x + 12, y, pat3 >> 4, col, screen_sprite_start_line);
 			}
 
-			if ( left )
+			if (left)
 			{
-				plot_sprite_part( bitmap, x     , y + 1, pat0 & 0x0f, col, screen_sprite_start_line );
-				plot_sprite_part( bitmap, x +  4, y + 1, pat1 & 0x0f, col, screen_sprite_start_line );
+				plot_sprite_part(bitmap, x     , y + 1, pat0 & 0x0f, col, screen_sprite_start_line);
+				plot_sprite_part(bitmap, x +  4, y + 1, pat1 & 0x0f, col, screen_sprite_start_line);
 			}
-			if ( right )
+			if (right)
 			{
-				plot_sprite_part( bitmap, x +  8, y + 1, pat2 & 0x0f, col, screen_sprite_start_line );
-				plot_sprite_part( bitmap, x + 12, y + 1, pat3 & 0x0f, col, screen_sprite_start_line );
+				plot_sprite_part(bitmap, x +  8, y + 1, pat2 & 0x0f, col, screen_sprite_start_line);
+				plot_sprite_part(bitmap, x + 12, y + 1, pat3 & 0x0f, col, screen_sprite_start_line);
 			}
 		}
-
-		y += 2;
 	}
 }
 
@@ -663,8 +648,8 @@ static void scv_cart(device_slot_interface &device)
 	device.option_add_internal("rom128k_ram", SCV_ROM128K_RAM4K);
 }
 
-MACHINE_CONFIG_START(scv_state::scv)
-
+void scv_state::scv(machine_config &config)
+{
 	upd7801_device &upd(UPD7801(config, m_maincpu, 4_MHz_XTAL));
 	upd.set_addrmap(AS_PROGRAM, &scv_state::scv_mem);
 	upd.pa_out_cb().set(FUNC(scv_state::porta_w));
@@ -678,9 +663,8 @@ MACHINE_CONFIG_START(scv_state::scv)
 	m_screen->set_screen_update(FUNC(scv_state::screen_update_scv));
 	m_screen->set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_scv)
-	MCFG_PALETTE_ADD( "palette", 16 )
-	MCFG_PALETTE_INIT_OWNER(scv_state, scv)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_scv);
+	PALETTE(config, "palette", FUNC(scv_state::scv_palette), 16);
 
 	/* Sound is generated by UPD1771C clocked at XTAL(6'000'000) */
 	SPEAKER(config, "mono").front_center();
@@ -688,11 +672,11 @@ MACHINE_CONFIG_START(scv_state::scv)
 	m_upd1771c->ack_handler().set(FUNC(scv_state::upd1771_ack_w));
 	m_upd1771c->add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	MCFG_SCV_CARTRIDGE_ADD("cartslot", scv_cart, nullptr)
+	SCV_CART_SLOT(config, m_cart, scv_cart, nullptr);
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","scv")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cart_list").set_original("scv");
+}
 
 
 void scv_state::scv_pal(machine_config &config)

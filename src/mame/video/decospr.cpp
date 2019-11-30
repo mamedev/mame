@@ -142,25 +142,25 @@ DECOSPR_COLOUR_CB_MEMBER(decospr_device::default_col_cb)
 DEFINE_DEVICE_TYPE(DECO_SPRITE, decospr_device, "decospr", "DECO 52 Sprite")
 
 decospr_device::decospr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, DECO_SPRITE, tag, owner, clock),
-		device_video_interface(mconfig, *this),
-		m_gfxregion(0),
-		m_is_bootleg(false),
-		m_bootleg_type(0),
-		m_x_offset(0),
-		m_y_offset(0),
-		m_flipallx(0),
-		m_transpen(0),
-		m_gfxdecode(*this, finder_base::DUMMY_TAG)
+	: device_t(mconfig, DECO_SPRITE, tag, owner, clock)
+	, device_video_interface(mconfig, *this)
+	, m_gfxregion(0)
+	, m_pri_cb(*this)
+	, m_col_cb(*this, DEVICE_SELF, FUNC(decospr_device::default_col_cb)) // default color callback
+	, m_is_bootleg(false)
+	, m_bootleg_type(0)
+	, m_x_offset(0)
+	, m_y_offset(0)
+	, m_flipallx(0)
+	, m_transpen(0)
+	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
 {
-	// default color callback
-	m_col_cb =  decospr_col_cb_delegate(FUNC(decospr_device::default_col_cb), this);
 }
 
 void decospr_device::device_start()
 {
-	m_pri_cb.bind_relative_to(*owner());
-	m_col_cb.bind_relative_to(*owner());
+	m_pri_cb.resolve();
+	m_col_cb.resolve();
 
 	m_alt_format = 0;
 	m_pixmask = 0xf;

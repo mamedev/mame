@@ -1,0 +1,155 @@
+<?xml version="1.0"?>
+<!-- loosely based on tranz330.lay -->
+<!-- note, the led16seg renderer is hardcoded to have OFF segments darker than ON, which is good for LEDs but not LCDs. -->
+<!-- TODO : fix that -->
+<!-- TODO : add button subtext for shifted functions -->
+<mamelayout version="2">
+	<element name="vfd0"><led16segsc><color red="0.8" green="0.8" blue="0.8" /></led16segsc></element>
+
+	<element name="front"><rect><color red="0.6" green="0.63" blue="0.65" /></rect></element>
+	<element name="vfd_back"><rect><color red="0.29" green="0.33" blue="0.32" /></rect></element>
+	<element name="button_digit_back"><rect><color red="0.75" green="0.75" blue="0.75" /></rect></element>
+
+	<element name="hl" defstate="0">
+		<text string="">
+			<bounds x="0.0" y="0.0" width="1.0" height="1.0" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+		<rect state="1">
+			<bounds x="0.0" y="0.0" width="1.0" height="1.0" />
+			<color red="0.0" green="0.0" blue="0.5" />
+		</rect>
+	</element>
+
+	<element name="button_dcv_text">
+		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
+		<text string="DCV"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="button_acv_text">
+		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
+		<text string="ACV"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="button_2w_text">
+		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
+		<text string="2W"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="button_4w_text">
+		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
+		<text string="4W"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="button_dca_text">
+		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
+		<text string="DCA"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="button_aca_text">
+		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
+		<text string="ACA"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="button_shift_text">
+		<rect><color red="0.3" green="0.35" blue="0.85" /></rect>
+		<text string=""><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="button_auto_text">
+		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
+		<text string="AUTO"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="button_up_text">
+		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
+		<text string="UP"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="button_dn_text">
+		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
+		<text string="DN"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="button_int_text">
+		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
+		<text string="INT"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="button_sgl_text">
+		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
+		<text string="SGL"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="button_srq_text">
+		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
+		<text string="SRQ"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="button_local_text">
+		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
+		<text string="LCL"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+
+
+	<view name="Internal Layout">
+		<backdrop name="case_bg"      element="front">            <bounds x=" 0" y=" 0" width="126" height="70"/></backdrop>
+		<!-- 2 rows of 7 buttons , but electrical switch matrix is different -->
+		<backdrop name="button_dcv"     element="button_digit_back"><bounds x="5" y="35" width="10" height="10"/></backdrop>
+		<backdrop name="button_acv"     element="button_digit_back"><bounds x="20" y="35" width="10" height="10"/></backdrop>
+		<backdrop name="button_2w"     element="button_digit_back"><bounds x="35" y="35" width="10" height="10"/></backdrop>
+		<backdrop name="button_4w"     element="button_digit_back"><bounds x="50" y="35" width="10" height="10"/></backdrop>
+		<backdrop name="button_dca"     element="button_digit_back"><bounds x="65" y="35" width="10" height="10"/></backdrop>
+		<backdrop name="button_aca"     element="button_digit_back"><bounds x="80" y="35" width="10" height="10"/></backdrop>
+		<backdrop name="button_shift" element="button_digit_back"><bounds x="95" y="35" width="10" height="10"/></backdrop>
+
+		<backdrop name="button_auto"     element="button_digit_back"><bounds x="5" y="50" width="10" height="10"/></backdrop>
+		<backdrop name="button_up"     element="button_digit_back"><bounds x="20" y="50" width="10" height="10"/></backdrop>
+		<backdrop name="button_dn"     element="button_digit_back"><bounds x="35" y="50" width="10" height="10"/></backdrop>
+		<backdrop name="button_int"     element="button_digit_back"><bounds x="50" y="50" width="10" height="10"/></backdrop>
+		<backdrop name="button_sgl"     element="button_digit_back"><bounds x="65" y="50" width="10" height="10"/></backdrop>
+		<backdrop name="button_srq"     element="button_digit_back"><bounds x="80" y="50" width="10" height="10"/></backdrop>
+		<backdrop name="button_local"     element="button_digit_back"><bounds x="95" y="50" width="10" height="10"/></backdrop>
+
+		<backdrop name="vfd_backdrop" element="vfd_back">         <bounds x="0" y="0" width="126" height="32"/></backdrop>
+
+		<bezel name="vfd0"  element="vfd0" state="0"><bounds x=" 9" y="9" width="9" height="14"/></bezel>
+		<bezel name="vfd1"  element="vfd0" state="0"><bounds x="18" y="9" width="9" height="14"/></bezel>
+		<bezel name="vfd2"  element="vfd0" state="0"><bounds x="27" y="9" width="9" height="14"/></bezel>
+		<bezel name="vfd3"  element="vfd0" state="0"><bounds x="36" y="9" width="9" height="14"/></bezel>
+		<bezel name="vfd4"  element="vfd0" state="0"><bounds x="45" y="9" width="9" height="14"/></bezel>
+		<bezel name="vfd5"  element="vfd0" state="0"><bounds x="54" y="9" width="9" height="14"/></bezel>
+		<bezel name="vfd6"  element="vfd0" state="0"><bounds x="63" y="9" width="9" height="14"/></bezel>
+		<bezel name="vfd7"  element="vfd0" state="0"><bounds x="72" y="9" width="9" height="14"/></bezel>
+		<bezel name="vfd8"  element="vfd0" state="0"><bounds x="81" y="9" width="9" height="14"/></bezel>
+		<bezel name="vfd9"  element="vfd0" state="0"><bounds x="90" y="9" width="9" height="14"/></bezel>
+		<bezel name="vfd10" element="vfd0" state="0"><bounds x="99" y="9" width="9" height="14"/></bezel>
+		<bezel name="vfd11" element="vfd0" state="0"><bounds x="108" y="9" width="9" height="14"/></bezel>
+
+		<bezel name="button_dcv_text1"     element="button_dcv_text">    <bounds x="5" y="37" width="10" height="8"/></bezel>
+		<bezel name="button_acv_text1"     element="button_acv_text">    <bounds x="20" y="37" width="10" height="8"/></bezel>
+		<bezel name="button_2w_text1"     element="button_2w_text">    <bounds x="35" y="37" width="10" height="8"/></bezel>
+		<bezel name="button_4w_text1"     element="button_4w_text">    <bounds x="50" y="37" width="10" height="8"/></bezel>
+		<bezel name="button_dca_text1"     element="button_dca_text">    <bounds x="65" y="37" width="10" height="8"/></bezel>
+		<bezel name="button_aca_text1"     element="button_aca_text">    <bounds x="80" y="37" width="10" height="8"/></bezel>
+		<bezel name="button_shift_text1" element="button_shift_text"><bounds x="95" y="35" width="10" height="10"/></bezel>
+
+		<bezel name="button_auto_text1"     element="button_auto_text">    <bounds x="5" y="52" width="10" height="8"/></bezel>
+		<bezel name="button_up_text1"     element="button_up_text">    <bounds x="20" y="52" width="10" height="8"/></bezel>
+		<bezel name="button_dn_text1"     element="button_dn_text">    <bounds x="35" y="52" width="10" height="8"/></bezel>
+		<bezel name="button_int_text1"     element="button_int_text">    <bounds x="50" y="52" width="10" height="8"/></bezel>
+		<bezel name="button_sgl_text1"     element="button_sgl_text">    <bounds x="65" y="52" width="10" height="8"/></bezel>
+		<bezel name="button_srq_text1"     element="button_srq_text">    <bounds x="80" y="52" width="10" height="8"/></bezel>
+		<bezel name="button_local_text1"     element="button_local_text">    <bounds x="95" y="52" width="10" height="8"/></bezel>
+
+
+<!-- to match the schematics, we consider Col.0-3 to be driven by P14-17. The value in "inputmask" is the one read as "p1 & 0x0F", i.e. P13-P10. -->
+<!--    col.0 : (nc)|shift|ACA|DCA
+        col.1 : 4W|2W|ACV|DCV
+        col.2 : int|dn|up|auto
+        col.3 : (nc)|loc|srq|sgl -->
+		<bezel element="hl" inputtag="COL.0" inputmask="0x01"><bounds x="65" y="35" width="10" height="10" /><color alpha="0.2" /></bezel>
+		<bezel element="hl" inputtag="COL.0" inputmask="0x02"><bounds x="80" y="35" width="10" height="10" /><color alpha="0.2" /></bezel>
+		<bezel element="hl" inputtag="COL.0" inputmask="0x04"><bounds x="95" y="35" width="10" height="10" /><color alpha="0.2" /></bezel>
+		<!--bezel element="hl" inputtag="COL.0" inputmask="0x08"><bounds x="" y="54" width="10" height="10" /><color alpha="0.2" /></bezel -->
+		<bezel element="hl" inputtag="COL.1" inputmask="0x01"><bounds x="5" y="35" width="10" height="10" /><color alpha="0.2" /></bezel>
+		<bezel element="hl" inputtag="COL.1" inputmask="0x02"><bounds x="20" y="35" width="10" height="10" /><color alpha="0.2" /></bezel>
+		<bezel element="hl" inputtag="COL.1" inputmask="0x04"><bounds x="35" y="35" width="10" height="10" /><color alpha="0.2" /></bezel>
+		<bezel element="hl" inputtag="COL.1" inputmask="0x08"><bounds x="50" y="35" width="10" height="10" /><color alpha="0.2" /></bezel>
+		<bezel element="hl" inputtag="COL.2" inputmask="0x01"><bounds x="5" y="50" width="10" height="10" /><color alpha="0.2" /></bezel>
+		<bezel element="hl" inputtag="COL.2" inputmask="0x02"><bounds x="20" y="50" width="10" height="10" /><color alpha="0.2" /></bezel>
+		<bezel element="hl" inputtag="COL.2" inputmask="0x04"><bounds x="35" y="50" width="10" height="10" /><color alpha="0.2" /></bezel>
+		<bezel element="hl" inputtag="COL.2" inputmask="0x08"><bounds x="50" y="50" width="10" height="10" /><color alpha="0.2" /></bezel>
+		<bezel element="hl" inputtag="COL.3" inputmask="0x01"><bounds x="65" y="50" width="10" height="10" /><color alpha="0.2" /></bezel>
+		<bezel element="hl" inputtag="COL.3" inputmask="0x02"><bounds x="80" y="50" width="10" height="10" /><color alpha="0.2" /></bezel>
+		<bezel element="hl" inputtag="COL.3" inputmask="0x04"><bounds x="95" y="50" width="10" height="10" /><color alpha="0.2" /></bezel>
+		<!--bezel element="hl" inputtag="COL.3" inputmask="0x08"><bounds x="" y="5" width="10" height="10" /><color alpha="0.2" /></bezel -->
+	</view>
+</mamelayout>

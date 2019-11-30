@@ -45,65 +45,55 @@
   The RGB outputs have a 470 ohm pull-down each.
 
 ***************************************************************************/
-PALETTE_INIT_MEMBER(galaxold_state,galaxold)
+void galaxold_state::galaxold_palette(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	int i, len;
 
-
-	/* first, the character/sprite palette */
-	len = memregion("proms")->bytes();
-	for (i = 0;i < len;i++)
+	// first, the character/sprite palette
+	int const len = memregion("proms")->bytes();
+	for (int i = 0; i < len; i++)
 	{
-		int bit0,bit1,bit2,r,g,b;
+		int bit0, bit1, bit2;
 
-		/* red component */
-		bit0 = BIT(*color_prom,0);
-		bit1 = BIT(*color_prom,1);
-		bit2 = BIT(*color_prom,2);
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		/* green component */
-		bit0 = BIT(*color_prom,3);
-		bit1 = BIT(*color_prom,4);
-		bit2 = BIT(*color_prom,5);
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		/* blue component */
-		bit0 = BIT(*color_prom,6);
-		bit1 = BIT(*color_prom,7);
-		b = 0x4f * bit0 + 0xa8 * bit1;
+		// red component
+		bit0 = BIT(*color_prom, 0);
+		bit1 = BIT(*color_prom, 1);
+		bit2 = BIT(*color_prom, 2);
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		// green component
+		bit0 = BIT(*color_prom, 3);
+		bit1 = BIT(*color_prom, 4);
+		bit2 = BIT(*color_prom, 5);
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		// blue component
+		bit0 = BIT(*color_prom, 6);
+		bit1 = BIT(*color_prom, 7);
+		int const b = 0x4f * bit0 + 0xa8 * bit1;
 
-		palette.set_pen_color(i,r,g,b);
+		palette.set_pen_color(i, r, g, b);
 		color_prom++;
 	}
 
-
 	galaxold_init_stars(STARS_COLOR_BASE);
 
-
-	/* bullets - yellow and white */
-	palette.set_pen_color(BULLETS_COLOR_BASE+0,rgb_t(0xef,0xef,0x00));
-	palette.set_pen_color(BULLETS_COLOR_BASE+1,rgb_t(0xef,0xef,0xef));
+	// bullets - yellow and white
+	palette.set_pen_color(BULLETS_COLOR_BASE + 0, rgb_t(0xef, 0xef, 0x00));
+	palette.set_pen_color(BULLETS_COLOR_BASE + 1, rgb_t(0xef, 0xef, 0xef));
 }
 
-PALETTE_INIT_MEMBER(galaxold_state,scrambold)
+void galaxold_state::scrambold_palette(palette_device &palette)
 {
-	PALETTE_INIT_NAME(galaxold)(palette);
+	galaxold_palette(palette);
 
-
-	/* blue background - 390 ohm resistor */
-	palette.set_pen_color(BACKGROUND_COLOR_BASE,rgb_t(0,0,0x56));
+	// blue background - 390 ohm resistor
+	palette.set_pen_color(BACKGROUND_COLOR_BASE, rgb_t(0, 0, 0x56));
 }
 
 
 
-PALETTE_INIT_MEMBER(galaxold_state,stratgyx)
+void galaxold_state::stratgyx_palette(palette_device &palette)
 {
-	int base = BACKGROUND_COLOR_BASE;
-	int i;
-
-
-	PALETTE_INIT_NAME(galaxold)(palette);
-
+	galaxold_palette(palette);
 
 	/*  The background color generator is connected this way:
 
@@ -111,47 +101,46 @@ PALETTE_INIT_MEMBER(galaxold_state,stratgyx)
 	    GREEN - 560 ohm resistor
 	    BLUE  - 470 ohm resistor */
 
-	for (i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 	{
-		int r = BIT(i,0) * 0x7c;
-		int g = BIT(i,1) * 0x3c;
-		int b = BIT(i,2) * 0x47;
+		int const r = BIT(i, 0) * 0x7c;
+		int const g = BIT(i, 1) * 0x3c;
+		int const b = BIT(i, 2) * 0x47;
 
-		palette.set_pen_color(base+i,r,g,b);
+		palette.set_pen_color(BACKGROUND_COLOR_BASE + i, r, g, b);
 	}
 }
 
-PALETTE_INIT_MEMBER(galaxold_state,rockclim)
+void galaxold_state::rockclim_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	int i, len;
 
-
-	/* first, the character/sprite palette */
-	len = memregion("proms")->bytes();
-	for (i = 0;i < len;i++)
+	// first, the character/sprite palette
+	int const len = memregion("proms")->bytes();
+	for (int i = 0; i < len; i++)
 	{
-		int bit0,bit1,bit2,r,g,b;
+		int bit0, bit1, bit2;
 
-		/* red component */
-		bit0 = BIT(*color_prom,0);
-		bit1 = BIT(*color_prom,1);
-		bit2 = BIT(*color_prom,2);
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		/* green component */
-		bit0 = BIT(*color_prom,3);
-		bit1 = BIT(*color_prom,4);
-		bit2 = BIT(*color_prom,5);
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		/* blue component */
-		bit0 = BIT(*color_prom,6);
-		bit1 = BIT(*color_prom,7);
-		b = 0x4f * bit0 + 0xa8 * bit1;
+		// red component
+		bit0 = BIT(*color_prom, 0);
+		bit1 = BIT(*color_prom, 1);
+		bit2 = BIT(*color_prom, 2);
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		// green component
+		bit0 = BIT(*color_prom, 3);
+		bit1 = BIT(*color_prom, 4);
+		bit2 = BIT(*color_prom, 5);
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		// blue component
+		bit0 = BIT(*color_prom, 6);
+		bit1 = BIT(*color_prom, 7);
+		int const b = 0x4f * bit0 + 0xa8 * bit1;
 
-		palette.set_pen_color(i,r,g,b);
+		palette.set_pen_color(i, r, g, b);
 		color_prom++;
 	}
 }
+
 /***************************************************************************
 
   Convert the color PROMs into a more useable format.
@@ -170,103 +159,84 @@ PALETTE_INIT_MEMBER(galaxold_state,rockclim)
   The RGB outputs have a 470 ohm pull-down each.
 
 ***************************************************************************/
-PALETTE_INIT_MEMBER(galaxold_state,darkplnt)
+void galaxold_state::darkplnt_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
 
-
-	/* first, the character/sprite palette */
-
-	for (i = 0;i < 32;i++)
+	// first, the character/sprite palette
+	for (int i = 0; i < 32; i++)
 	{
-		int bit0,bit1,bit2,r,g,b;
+		int bit0, bit1, bit2;
 
-		/* red component */
-		bit0 = BIT(*color_prom,0);
-		bit1 = BIT(*color_prom,1);
-		bit2 = BIT(*color_prom,2);
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		/* green component */
-		g = 0x00;
-		/* blue component */
-		bit0 = BIT(*color_prom,3);
-		bit1 = BIT(*color_prom,4);
-		bit2 = BIT(*color_prom,5);
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		// red component
+		bit0 = BIT(*color_prom, 0);
+		bit1 = BIT(*color_prom, 1);
+		bit2 = BIT(*color_prom, 2);
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		// green component
+		int const g = 0x00;
+		// blue component
+		bit0 = BIT(*color_prom, 3);
+		bit1 = BIT(*color_prom, 4);
+		bit2 = BIT(*color_prom, 5);
+		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette.set_pen_color(i,r,g,b);
+		palette.set_pen_color(i, r, g, b);
 		color_prom++;
 	}
 
-
-	/* bullets - red and blue */
-	palette.set_pen_color(BULLETS_COLOR_BASE+0,rgb_t(0xef,0x00,0x00));
-	palette.set_pen_color(BULLETS_COLOR_BASE+1,rgb_t(0x00,0x00,0xef));
+	// bullets - red and blue
+	palette.set_pen_color(BULLETS_COLOR_BASE + 0, rgb_t(0xef, 0x00, 0x00));
+	palette.set_pen_color(BULLETS_COLOR_BASE + 1, rgb_t(0x00, 0x00, 0xef));
 }
 
-PALETTE_INIT_MEMBER(galaxold_state,minefld)
+void galaxold_state::minefld_palette(palette_device &palette)
 {
-	int base = BACKGROUND_COLOR_BASE;
-	int i;
+	galaxold_palette(palette);
 
+	// set up background colors
 
-	PALETTE_INIT_NAME(galaxold)(palette);
+	// graduated blue
 
-
-	/* set up background colors */
-
-	/* graduated blue */
-
-	for (i = 0; i < 128; i++)
+	for (int i = 0; i < 128; i++)
 	{
-		int r = 0;
-		int g = i;
-		int b = i * 2;
-		palette.set_pen_color(base+i,r,g,b);
+		int const r = 0;
+		int const g = i;
+		int const b = i * 2;
+		palette.set_pen_color(BACKGROUND_COLOR_BASE + i, r, g, b);
 	}
 
-	/* graduated brown */
+	// graduated brown
 
-	for (i = 0; i < 128; i++)
+	for (int i = 0; i < 128; i++)
 	{
-		int r = i * 1.5;
-		int g = i * 0.75;
-		int b = i / 2;
-		palette.set_pen_color(base+128+i,r,g,b);
+		int const r = i * 1.5;
+		int const g = i * 0.75;
+		int const b = i / 2;
+		palette.set_pen_color(BACKGROUND_COLOR_BASE + 128 + i, r, g, b);
 	}
 }
 
-PALETTE_INIT_MEMBER(galaxold_state,rescue)
+void galaxold_state::rescue_palette(palette_device &palette)
 {
-	int base = BACKGROUND_COLOR_BASE;
-	int i;
+	galaxold_palette(palette);
 
+	// set up background colors
 
-	PALETTE_INIT_NAME(galaxold)(palette);
+	// graduated blue
 
-
-	/* set up background colors */
-
-	/* graduated blue */
-
-	for (i = 0; i < 128; i++)
+	for (int i = 0; i < 128; i++)
 	{
-		int r = 0;
-		int g = i;
-		int b = i * 2;
-		palette.set_pen_color(base+i,r,g,b);
+		int const r = 0;
+		int const g = i;
+		int const b = i * 2;
+		palette.set_pen_color(BACKGROUND_COLOR_BASE + i, r, g, b);
 	}
 }
 
-PALETTE_INIT_MEMBER(galaxold_state,mariner)
+void galaxold_state::mariner_palette(palette_device &palette)
 {
-	int base = BACKGROUND_COLOR_BASE;
-	int i;
-
-
-	PALETTE_INIT_NAME(galaxold)(palette);
-
+	galaxold_palette(palette);
 
 	/* set up background colors */
 
@@ -277,58 +247,51 @@ PALETTE_INIT_MEMBER(galaxold_state,mariner)
 	          -- 1   kohm resistor
 	    bit 0 -- .47 kohm resistor */
 
-	for (i = 0; i < 16; i++)
+	for (int i = 0; i < 16; i++)
 	{
-		int r,g,b;
+		int const r = 0;
+		int const g = 0;
+		int const b = 0x0e * BIT(i, 0) + 0x1f * BIT(i, 1) + 0x43 * BIT(i, 2) + 0x8f * BIT(i, 3);
 
-		r = 0;
-		g = 0;
-		b = 0x0e * BIT(i,0) + 0x1f * BIT(i,1) + 0x43 * BIT(i,2) + 0x8f * BIT(i,3);
-
-		palette.set_pen_color(base+i,r,g,b);
+		palette.set_pen_color(BACKGROUND_COLOR_BASE + i, r, g, b);
 	}
 }
 
-/* swapped r/g/b hook-up */
-PALETTE_INIT_MEMBER(galaxold_state,dambustr)
+// swapped r/g/b hook-up
+void galaxold_state::dambustr_palette(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	int base = BACKGROUND_COLOR_BASE;
-	int i, len;
 
-	/* first, the character/sprite palette */
-	len = memregion("proms")->bytes();
-
-	for (i = 0;i < len;i++)
+	// first, the character/sprite palette
+	int const len = memregion("proms")->bytes();
+	for (int i = 0; i < len; i++)
 	{
-		int bit0,bit1,bit2,r,g,b;
+		int bit0, bit1, bit2;
 
-		/* red component */
-		bit0 = BIT(*color_prom,0);
-		bit1 = BIT(*color_prom,1);
-		bit2 = BIT(*color_prom,2);
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		/* green component */
-		bit0 = BIT(*color_prom,3);
-		bit1 = BIT(*color_prom,4);
-		bit2 = BIT(*color_prom,5);
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		/* blue component */
-		bit0 = BIT(*color_prom,6);
-		bit1 = BIT(*color_prom,7);
-		g = 0x4f * bit0 + 0xa8 * bit1;
+		// red component
+		bit0 = BIT(*color_prom, 0);
+		bit1 = BIT(*color_prom, 1);
+		bit2 = BIT(*color_prom, 2);
+		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		// green component
+		bit0 = BIT(*color_prom, 3);
+		bit1 = BIT(*color_prom, 4);
+		bit2 = BIT(*color_prom, 5);
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		// blue component
+		bit0 = BIT(*color_prom, 6);
+		bit1 = BIT(*color_prom, 7);
+		int const g = 0x4f * bit0 + 0xa8 * bit1;
 
-		palette.set_pen_color(i,r,g,b);
+		palette.set_pen_color(i, r, g, b);
 		color_prom++;
 	}
 
-
 	galaxold_init_stars(STARS_COLOR_BASE);
 
-
-	/* bullets - yellow and white */
-	palette.set_pen_color(BULLETS_COLOR_BASE+0,rgb_t(0xef,0xef,0x00));
-	palette.set_pen_color(BULLETS_COLOR_BASE+1,rgb_t(0xef,0xef,0xef));
+	// bullets - yellow and white
+	palette.set_pen_color(BULLETS_COLOR_BASE + 0, rgb_t(0xef, 0xef, 0x00));
+	palette.set_pen_color(BULLETS_COLOR_BASE + 1, rgb_t(0xef, 0xef, 0xef));
 
 	/*
 	Assumption (not clear from the schematics):
@@ -338,25 +301,19 @@ PALETTE_INIT_MEMBER(galaxold_state,dambustr)
 	    GREEN - 470 ohm resistor
 	    BLUE  - 470 ohm resistor */
 
-
-	for (i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 	{
-		int r = BIT(i,0) * 0x47;
-		int g = BIT(i,1) * 0x47;
-		int b = BIT(i,2) * 0x4f;
-		palette.set_pen_color(base+i,r,g,b);
+		int const r = BIT(i, 0) * 0x47;
+		int const g = BIT(i, 1) * 0x47;
+		int const b = BIT(i, 2) * 0x4f;
+		palette.set_pen_color(BACKGROUND_COLOR_BASE + i, r, g, b);
 	}
 }
 
 
-PALETTE_INIT_MEMBER(galaxold_state,turtles)
+void galaxold_state::turtles_palette(palette_device &palette)
 {
-	int base = BACKGROUND_COLOR_BASE;
-	int i;
-
-
-	PALETTE_INIT_NAME(galaxold)(palette);
-
+	galaxold_palette(palette);
 
 	/*  The background color generator is connected this way:
 
@@ -364,13 +321,13 @@ PALETTE_INIT_MEMBER(galaxold_state,turtles)
 	    GREEN - 470 ohm resistor
 	    BLUE  - 390 ohm resistor */
 
-	for (i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 	{
-		int r = BIT(i,0) * 0x55;
-		int g = BIT(i,1) * 0x47;
-		int b = BIT(i,2) * 0x55;
+		int const r = BIT(i, 0) * 0x55;
+		int const g = BIT(i, 1) * 0x47;
+		int const b = BIT(i, 2) * 0x55;
 
-		palette.set_pen_color(base+i,r,g,b);
+		palette.set_pen_color(BACKGROUND_COLOR_BASE + i, r, g, b);
 	}
 }
 
@@ -428,7 +385,7 @@ void galaxold_state::video_start_common()
 VIDEO_START_MEMBER(galaxold_state,galaxold_plain)
 {
 	video_start_common();
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(galaxold_state::get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(galaxold_state::get_tile_info)), TILEMAP_SCAN_ROWS,8,8,32,32);
 	m_bg_tilemap->set_transparent_pen(0);
 
 	m_bg_tilemap->set_scroll_cols(32);
@@ -500,6 +457,9 @@ VIDEO_START_MEMBER(galaxold_state,stratgyx)
 	VIDEO_START_CALL_MEMBER(galaxold_plain);
 
 	m_draw_background = &galaxold_state::stratgyx_draw_background;
+
+	// level 3 tank bullets
+	m_draw_bullets = &galaxold_state::scrambold_draw_bullets;
 }
 
 VIDEO_START_MEMBER(galaxold_state,ckongs)
@@ -621,7 +581,7 @@ void galaxold_state::rockclim_modify_spritecode(uint8_t *spriteram, int *code, i
 VIDEO_START_MEMBER(galaxold_state,rockclim)
 {
 	VIDEO_START_CALL_MEMBER(galaxold);
-	m_rockclim_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(galaxold_state::rockclim_get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_rockclim_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(galaxold_state::rockclim_get_tile_info)), TILEMAP_SCAN_ROWS,8,8,64,32);
 
 	m_draw_background = &galaxold_state::rockclim_draw_background;
 	m_modify_charcode = &galaxold_state::mooncrst_modify_charcode;
@@ -648,7 +608,7 @@ TILE_GET_INFO_MEMBER(galaxold_state::drivfrcg_get_tile_info)
 VIDEO_START_MEMBER(galaxold_state,drivfrcg)
 {
 	video_start_common();
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(galaxold_state::drivfrcg_get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(galaxold_state::drivfrcg_get_tile_info)), TILEMAP_SCAN_ROWS,8,8,32,32);
 
 	m_bg_tilemap->set_transparent_pen(0);
 	m_bg_tilemap->set_scroll_cols(32);
@@ -662,7 +622,7 @@ VIDEO_START_MEMBER(galaxold_state,drivfrcg)
 VIDEO_START_MEMBER(galaxold_state,ad2083)
 {
 	video_start_common();
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(galaxold_state::drivfrcg_get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(galaxold_state::drivfrcg_get_tile_info)), TILEMAP_SCAN_ROWS,8,8,32,32);
 
 	m_bg_tilemap->set_transparent_pen(0);
 	m_bg_tilemap->set_scroll_cols(32);
@@ -698,7 +658,7 @@ TILE_GET_INFO_MEMBER(galaxold_state::racknrol_get_tile_info)
 VIDEO_START_MEMBER(galaxold_state,racknrol)
 {
 	video_start_common();
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(galaxold_state::racknrol_get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(galaxold_state::racknrol_get_tile_info)), TILEMAP_SCAN_ROWS,8,8,32,32);
 
 	m_bg_tilemap->set_transparent_pen(0);
 	m_bg_tilemap->set_scroll_cols(32);
@@ -729,7 +689,7 @@ void galaxold_state::harem_modify_spritecode(uint8_t *spriteram, int *code, int 
 VIDEO_START_MEMBER(galaxold_state,harem)
 {
 	video_start_common();
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(galaxold_state::harem_get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(galaxold_state::harem_get_tile_info)), TILEMAP_SCAN_ROWS,8,8,32,32);
 //  m_bg_tilemap->set_transparent_pen(0);   // opaque tilemap to get sky and sand colors
 
 	m_bg_tilemap->set_scroll_cols(32);
@@ -797,7 +757,7 @@ VIDEO_START_MEMBER(galaxold_state,dambustr)
 
 	/* make a copy of the tilemap to emulate background priority */
 	m_dambustr_videoram2 = std::make_unique<uint8_t[]>(0x0400);
-	m_dambustr_tilemap2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(galaxold_state::dambustr_get_tile_info2),this),TILEMAP_SCAN_ROWS,8,8,32,32);
+	m_dambustr_tilemap2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(galaxold_state::dambustr_get_tile_info2)), TILEMAP_SCAN_ROWS,8,8,32,32);
 
 	m_dambustr_tilemap2->set_transparent_pen(0);
 }

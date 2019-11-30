@@ -200,17 +200,17 @@ WRITE8_MEMBER( micronic_state::port_2c_w )
 
 WRITE8_MEMBER( micronic_state::rtc_address_w )
 {
-	m_rtc->write(space, 0, data);
+	m_rtc->write(0, data);
 }
 
 READ8_MEMBER( micronic_state::rtc_data_r )
 {
-	return m_rtc->read(space, 1);
+	return m_rtc->read(1);
 }
 
 WRITE8_MEMBER( micronic_state::rtc_data_w )
 {
-	m_rtc->write(space, 1, data);
+	m_rtc->write(1, data);
 }
 
 /***************************************************************************
@@ -309,10 +309,10 @@ void micronic_state::nvram_init(nvram_device &nvram, void *data, size_t size)
 }
 
 
-PALETTE_INIT_MEMBER(micronic_state, micronic)
+void micronic_state::micronic_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
-	palette.set_pen_color(1, rgb_t(92, 83, 88));
+	palette.set_pen_color(1, rgb_t( 92,  83,  88));
 }
 
 void micronic_state::machine_start()
@@ -349,39 +349,38 @@ WRITE_LINE_MEMBER( micronic_state::mc146818_irq )
 }
 
 
-MACHINE_CONFIG_START(micronic_state::micronic)
+void micronic_state::micronic(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, 3.579545_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(micronic_mem)
-	MCFG_DEVICE_IO_MAP(micronic_io)
+	Z80(config, m_maincpu, 3.579545_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &micronic_state::micronic_mem);
+	m_maincpu->set_addrmap(AS_IO, &micronic_state::micronic_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(SCREEN_TAG, LCD)
-	MCFG_SCREEN_REFRESH_RATE(80)
-	MCFG_SCREEN_UPDATE_DEVICE(HD61830_TAG, hd61830_device, screen_update)
-	MCFG_SCREEN_SIZE(120, 64)   //6x20, 8x8
-	MCFG_SCREEN_VISIBLE_AREA(0, 120-1, 0, 64-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(80);
+	screen.set_screen_update(HD61830_TAG, FUNC(hd61830_device::screen_update));
+	screen.set_size(120, 64);   //6x20, 8x8
+	screen.set_visarea(0, 120-1, 0, 64-1);
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(micronic_state, micronic)
+	PALETTE(config, "palette", FUNC(micronic_state::micronic_palette), 2);
 
-	MCFG_DEVICE_ADD(HD61830_TAG, HD61830, 4.9152_MHz_XTAL / 2 / 2)
+	HD61830(config, m_lcdc, 4.9152_MHz_XTAL / 2 / 2);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD( "beeper", BEEP, 0 )
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
+	BEEP(config, m_beep, 0).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* ram banks */
 	RAM(config, RAM_TAG).set_default_size("224K");
 
-	NVRAM(config, "nvram1").set_custom_handler(FUNC(micronic_state::nvram_init));  // base ram
-	NVRAM(config, "nvram2").set_custom_handler(FUNC(micronic_state::nvram_init));  // additional ram banks
+	NVRAM(config, "nvram1").set_custom_handler(FUNC(micronic_state::nvram_init));  // base RAM
+	NVRAM(config, "nvram2").set_custom_handler(FUNC(micronic_state::nvram_init));  // additional RAM banks
 
-	MCFG_DEVICE_ADD(MC146818_TAG, MC146818, 32.768_kHz_XTAL)
-	MCFG_MC146818_IRQ_HANDLER(WRITELINE(*this, micronic_state, mc146818_irq))
-MACHINE_CONFIG_END
+	MC146818(config, m_rtc, 32.768_kHz_XTAL);
+	m_rtc->irq().set(FUNC(micronic_state::mc146818_irq));
+}
 
 /* ROM definition */
 ROM_START( micronic )

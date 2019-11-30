@@ -222,7 +222,7 @@ void econet_e01_device::e01_mem(address_map &map)
 	map(0xfc04, 0xfc04).mirror(0x00c3).rw(FUNC(econet_e01_device::rtc_data_r), FUNC(econet_e01_device::rtc_data_w));
 	map(0xfc08, 0xfc08).mirror(0x00c0).r(FUNC(econet_e01_device::ram_select_r)).w(FUNC(econet_e01_device::floppy_w));
 	map(0xfc0c, 0xfc0f).mirror(0x00c0).rw(WD2793_TAG, FUNC(wd2793_device::read), FUNC(wd2793_device::write));
-	map(0xfc10, 0xfc1f).mirror(0x00c0).rw(R6522_TAG, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0xfc10, 0xfc1f).mirror(0x00c0).m(R6522_TAG, FUNC(via6522_device::map));
 	map(0xfc20, 0xfc23).mirror(0x00c0).rw(MC6854_TAG, FUNC(mc6854_device::read), FUNC(mc6854_device::write));
 	map(0xfc24, 0xfc24).mirror(0x00c3).rw(FUNC(econet_e01_device::network_irq_disable_r), FUNC(econet_e01_device::network_irq_disable_w));
 	map(0xfc28, 0xfc28).mirror(0x00c3).rw(FUNC(econet_e01_device::network_irq_enable_r), FUNC(econet_e01_device::network_irq_enable_w));
@@ -245,7 +245,7 @@ void econet_e01_device::device_add_mconfig(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &econet_e01_device::e01_mem);
 
 	MC146818(config, m_rtc, 32.768_kHz_XTAL);
-	m_rtc->irq_callback().set(FUNC(econet_e01_device::rtc_irq_w));
+	m_rtc->irq().set(FUNC(econet_e01_device::rtc_irq_w));
 
 	// devices
 	via6522_device &via(VIA6522(config, R6522_TAG, 8_MHz_XTAL / 4));
@@ -400,6 +400,7 @@ econet_e01_device::econet_e01_device(const machine_config &mconfig, device_type 
 	, m_floppy(*this, WD2793_TAG":%u", 0U)
 	, m_rom(*this, R65C102_TAG)
 	, m_centronics(*this, CENTRONICS_TAG)
+	, m_led(*this, "led_0")
 	, m_adlc_ie(0)
 	, m_hdc_ie(0)
 	, m_rtc_irq(CLEAR_LINE)
@@ -421,6 +422,8 @@ econet_e01_device::econet_e01_device(const machine_config &mconfig, device_type 
 
 void econet_e01_device::device_start()
 {
+	m_led.resolve();
+
 	// allocate timers
 	m_clk_timer = timer_alloc();
 
@@ -547,7 +550,7 @@ WRITE8_MEMBER( econet_e01_device::floppy_w )
 	// TODO floppy test
 
 	// mode LED
-	machine().output().set_value("led_0", BIT(data, 7));
+	m_led = BIT(data, 7);
 }
 
 
@@ -647,7 +650,7 @@ WRITE8_MEMBER( econet_e01_device::hdc_irq_enable_w )
 
 READ8_MEMBER( econet_e01_device::rtc_address_r )
 {
-	return m_rtc->read(space, 0);
+	return m_rtc->read(0);
 }
 
 
@@ -657,7 +660,7 @@ READ8_MEMBER( econet_e01_device::rtc_address_r )
 
 WRITE8_MEMBER( econet_e01_device::rtc_address_w )
 {
-	m_rtc->write(space, 0, data);
+	m_rtc->write(0, data);
 }
 
 
@@ -667,7 +670,7 @@ WRITE8_MEMBER( econet_e01_device::rtc_address_w )
 
 READ8_MEMBER( econet_e01_device::rtc_data_r )
 {
-	return m_rtc->read(space, 1);
+	return m_rtc->read(1);
 }
 
 
@@ -677,7 +680,7 @@ READ8_MEMBER( econet_e01_device::rtc_data_r )
 
 WRITE8_MEMBER( econet_e01_device::rtc_data_w )
 {
-	m_rtc->write(space, 1, data);
+	m_rtc->write(1, data);
 }
 
 

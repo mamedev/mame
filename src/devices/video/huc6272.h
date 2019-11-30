@@ -14,17 +14,7 @@
 #include "bus/scsi/scsi.h"
 #include "bus/scsi/scsicd.h"
 #include "video/huc6271.h"
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_HUC6272_IRQ_CHANGED_CB(cb) \
-		downcast<huc6272_device &>(*device).set_irq_changed_callback((DEVCB_##cb));
-
-#define MCFG_HUC6272_RAINBOW(tag) \
-		downcast<huc6272_device &>(*device).set_rainbow_tag((tag));
+#include "speaker.h"
 
 
 //**************************************************************************
@@ -40,7 +30,7 @@ public:
 	// construction/destruction
 	huc6272_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_irq_changed_callback(Object &&cb) { return m_irq_changed_cb.set_callback(std::forward<Object>(cb)); }
+	auto irq_changed_callback() { return m_irq_changed_cb.bind(); }
 	template <typename T> void set_rainbow_tag(T &&tag) { m_huc6271.set_tag(std::forward<T>(tag)); }
 
 	// I/O operations
@@ -50,6 +40,11 @@ public:
 	// ADPCM operations
 	DECLARE_READ8_MEMBER( adpcm_update_0 );
 	DECLARE_READ8_MEMBER( adpcm_update_1 );
+
+	// CD-DA operations
+	DECLARE_WRITE8_MEMBER( cdda_update );
+
+	static void cdrom_config(device_t *device);
 
 protected:
 	// device-level overrides
@@ -61,6 +56,8 @@ protected:
 
 private:
 	required_device<huc6271_device> m_huc6271;
+	required_device<speaker_device> m_cdda_l;
+	required_device<speaker_device> m_cdda_r;
 
 	uint8_t m_register;
 	uint32_t m_kram_addr_r, m_kram_addr_w;

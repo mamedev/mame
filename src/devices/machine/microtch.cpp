@@ -25,6 +25,7 @@ microtouch_device::microtouch_device(const machine_config &mconfig, const char *
 	device_serial_interface(mconfig, *this),
 	m_rx_buffer_ptr(0), m_tx_buffer_num(0), m_tx_buffer_ptr(0), m_reset_done(0), m_format(0), m_mode(0), m_last_touch_state(0),
 	m_last_x(0), m_last_y(0),
+	m_out_touch_cb(*this),
 	m_out_stx_func(*this),
 	m_touch(*this, "TOUCH"),
 	m_touchx(*this, "TOUCH_X"),
@@ -203,6 +204,7 @@ void microtouch_device::device_start()
 	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1); //8N1?
 	set_tra_rate(clock());
 	set_rcv_rate(clock());
+	m_out_touch_cb.resolve();
 	m_out_stx_func.resolve_safe();
 	m_output_valid = false;
 
@@ -312,7 +314,7 @@ INPUT_CHANGED_MEMBER( microtouch_device::touch )
 
 static INPUT_PORTS_START(microtouch)
 	PORT_START("TOUCH")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME( "Touch screen" ) PORT_CHANGED_MEMBER( DEVICE_SELF,microtouch_device, touch, nullptr )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME( "Touch screen" ) PORT_CHANGED_MEMBER( DEVICE_SELF,microtouch_device, touch, 0 )
 	PORT_START("TOUCH_X")
 	PORT_BIT( 0x3fff, 0x2000, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(45) PORT_KEYDELTA(15)
 	PORT_START("TOUCH_Y")

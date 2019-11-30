@@ -40,6 +40,7 @@
 
 #include "emu.h"
 #include "includes/canyon.h"
+
 #include "cpu/m6502/m6502.h"
 #include "sound/discrete.h"
 #include "screen.h"
@@ -52,12 +53,12 @@
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(canyon_state, canyon)
+void canyon_state::canyon_palette(palette_device &palette) const
 {
-	palette.set_pen_color(0, rgb_t(0x80, 0x80, 0x80)); /* GREY  */
-	palette.set_pen_color(1, rgb_t(0x00, 0x00, 0x00)); /* BLACK */
-	palette.set_pen_color(2, rgb_t(0x80, 0x80, 0x80)); /* GREY  */
-	palette.set_pen_color(3, rgb_t(0xff, 0xff, 0xff)); /* WHITE */
+	palette.set_pen_color(0, rgb_t(0x80, 0x80, 0x80)); // GREY
+	palette.set_pen_color(1, rgb_t(0x00, 0x00, 0x00)); // BLACK
+	palette.set_pen_color(2, rgb_t(0x80, 0x80, 0x80)); // GREY
+	palette.set_pen_color(3, rgb_t(0xff, 0xff, 0xff)); // WHITE
 }
 
 
@@ -238,11 +239,11 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(canyon_state::canyon)
-
+void canyon_state::canyon(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, 12.096_MHz_XTAL / 16)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	M6502(config, m_maincpu, 12.096_MHz_XTAL / 16);
+	m_maincpu->set_addrmap(AS_PROGRAM, &canyon_state::main_map);
 
 	F9334(config, m_outlatch); // C7
 	m_outlatch->q_out_cb<0>().set("discrete", FUNC(discrete_device::write_line<CANYON_WHISTLE1_EN>));
@@ -252,28 +253,26 @@ MACHINE_CONFIG_START(canyon_state::canyon)
 	m_outlatch->q_out_cb<4>().set("discrete", FUNC(discrete_device::write_line<CANYON_ATTRACT1_EN>));
 	m_outlatch->q_out_cb<5>().set("discrete", FUNC(discrete_device::write_line<CANYON_ATTRACT2_EN>));
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
+	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 8);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(12.096_MHz_XTAL / 2, 384, 0, 256, 262, 0, 240) // HSYNC = 15,750 Hz
-	MCFG_SCREEN_UPDATE_DRIVER(canyon_state, screen_update_canyon)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", m6502_device::NMI_LINE))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(12.096_MHz_XTAL / 2, 384, 0, 256, 262, 0, 240); // HSYNC = 15,750 Hz
+	screen.set_screen_update(FUNC(canyon_state::screen_update_canyon));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set_inputline(m_maincpu, m6502_device::NMI_LINE);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_canyon)
-	MCFG_PALETTE_ADD("palette", 4)
-	MCFG_PALETTE_INIT_OWNER(canyon_state, canyon)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_canyon);
+	PALETTE(config, m_palette, FUNC(canyon_state::canyon_palette), 4);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE, canyon_discrete)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	DISCRETE(config, m_discrete, canyon_discrete);
+	m_discrete->add_route(0, "lspeaker", 1.0);
+	m_discrete->add_route(1, "rspeaker", 1.0);
+}
 
 
 

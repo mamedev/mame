@@ -44,12 +44,11 @@ protected:
 	virtual void adamnet_reset_w(int state) override;
 
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<m6801_cpu_device> m_maincpu;
 
 	DECLARE_READ8_MEMBER( p2_r );
 	DECLARE_WRITE8_MEMBER( p2_w );
 
-	void adam_spi_io(address_map &map);
 	void adam_spi_mem(address_map &map);
 };
 

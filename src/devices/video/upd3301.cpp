@@ -84,6 +84,7 @@ upd3301_device::upd3301_device(const machine_config &mconfig, const char *tag, d
 	m_write_drq(*this),
 	m_write_hrtc(*this),
 	m_write_vrtc(*this),
+	m_display_cb(*this),
 	m_width(0),
 	m_status(0),
 	m_param_count(0),
@@ -115,11 +116,11 @@ void upd3301_device::device_start()
 {
 	screen().register_screen_bitmap(m_bitmap);
 	// resolve callbacks
-	m_display_cb.bind_relative_to(*owner());
 	m_write_drq.resolve_safe();
 	m_write_int.resolve_safe();
 	m_write_hrtc.resolve_safe();
 	m_write_vrtc.resolve_safe();
+	m_display_cb.resolve();
 
 	// allocate timers
 	m_hrtc_timer = timer_alloc(TIMER_HRTC);

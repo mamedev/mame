@@ -207,66 +207,64 @@ void vaportra_state::machine_reset()
 	m_priority[1] = 0;
 }
 
-MACHINE_CONFIG_START(vaportra_state::vaportra)
-
+void vaportra_state::vaportra(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, M68000,XTAL(24'000'000)/2) /* Custom chip 59 */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", vaportra_state, irq6_line_assert)
+	M68000(config, m_maincpu, XTAL(24'000'000)/2); /* Custom chip 59 */
+	m_maincpu->set_addrmap(AS_PROGRAM, &vaportra_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(vaportra_state::irq6_line_assert));
 
 	H6280(config, m_audiocpu, XTAL(24'000'000)/4); /* Custom chip 45; Audio section crystal is 32.220 MHz but CPU clock is confirmed as coming from the 24MHz crystal (6Mhz exactly on the CPU) */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &vaportra_state::sound_map);
 	m_audiocpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
+	m_audiocpu->set_timer_scale(2);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD(m_spriteram, BUFFERED_SPRITERAM16)
+	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(vaportra_state, screen_update)
-	MCFG_SCREEN_PALETTE("colors")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(58);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(529));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(vaportra_state::screen_update));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, m_palette, gfx_vaportra)
-	MCFG_PALETTE_ADD(m_palette, 1280)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_vaportra);
+	PALETTE(config, m_palette).set_entries(1280);
 
-	MCFG_DEVICE_ADD(m_deco_tilegen[0], DECO16IC, 0)
-	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
-	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
-	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF1_COL_BANK(0x00)
-	MCFG_DECO16IC_PF2_COL_BANK(0x20)
-	MCFG_DECO16IC_PF1_COL_MASK(0x0f)
-	MCFG_DECO16IC_PF2_COL_MASK(0x0f)
-	MCFG_DECO16IC_BANK1_CB(vaportra_state, bank_callback)
-	MCFG_DECO16IC_BANK2_CB(vaportra_state, bank_callback)
-	MCFG_DECO16IC_PF12_8X8_BANK(0)
-	MCFG_DECO16IC_PF12_16X16_BANK(1)
-	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	DECO16IC(config, m_deco_tilegen[0], 0);
+	m_deco_tilegen[0]->set_pf1_size(DECO_64x32);
+	m_deco_tilegen[0]->set_pf2_size(DECO_64x32);
+	m_deco_tilegen[0]->set_pf1_trans_mask(0x0f);
+	m_deco_tilegen[0]->set_pf2_trans_mask(0x0f);
+	m_deco_tilegen[0]->set_pf1_col_bank(0x00);
+	m_deco_tilegen[0]->set_pf2_col_bank(0x20);
+	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
+	m_deco_tilegen[0]->set_pf2_col_mask(0x0f);
+	m_deco_tilegen[0]->set_bank1_callback(FUNC(vaportra_state::bank_callback));
+	m_deco_tilegen[0]->set_bank2_callback(FUNC(vaportra_state::bank_callback));
+	m_deco_tilegen[0]->set_pf12_8x8_bank(0);
+	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
+	m_deco_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DEVICE_ADD(m_deco_tilegen[1], DECO16IC, 0)
-	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
-	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
-	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF1_COL_BANK(0x30)
-	MCFG_DECO16IC_PF2_COL_BANK(0x40)
-	MCFG_DECO16IC_PF1_COL_MASK(0x0f)
-	MCFG_DECO16IC_PF2_COL_MASK(0x0f)
-	MCFG_DECO16IC_BANK1_CB(vaportra_state, bank_callback)
-	MCFG_DECO16IC_BANK2_CB(vaportra_state, bank_callback)
-	MCFG_DECO16IC_PF12_8X8_BANK(2)
-	MCFG_DECO16IC_PF12_16X16_BANK(3)
-	MCFG_DECO16IC_GFXDECODE("gfxdecode")
+	DECO16IC(config, m_deco_tilegen[1], 0);
+	m_deco_tilegen[1]->set_pf1_size(DECO_64x32);
+	m_deco_tilegen[1]->set_pf2_size(DECO_64x32);
+	m_deco_tilegen[1]->set_pf1_trans_mask(0x0f);
+	m_deco_tilegen[1]->set_pf2_trans_mask(0x0f);
+	m_deco_tilegen[1]->set_pf1_col_bank(0x30);
+	m_deco_tilegen[1]->set_pf2_col_bank(0x40);
+	m_deco_tilegen[1]->set_pf1_col_mask(0x0f);
+	m_deco_tilegen[1]->set_pf2_col_mask(0x0f);
+	m_deco_tilegen[1]->set_bank1_callback(FUNC(vaportra_state::bank_callback));
+	m_deco_tilegen[1]->set_bank2_callback(FUNC(vaportra_state::bank_callback));
+	m_deco_tilegen[1]->set_pf12_8x8_bank(2);
+	m_deco_tilegen[1]->set_pf12_16x16_bank(3);
+	m_deco_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DEVICE_ADD(m_spritegen, DECO_MXC06, 0)
-	MCFG_DECO_MXC06_GFX_REGION(4)
-	MCFG_DECO_MXC06_GFXDECODE("gfxdecode")
+	DECO_MXC06(config, m_spritegen, 0);
+	m_spritegen->set_colpri_callback(FUNC(vaportra_state::vaportra_colpri_cb));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -274,20 +272,17 @@ MACHINE_CONFIG_START(vaportra_state::vaportra)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
-	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(32'220'000)/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
+	YM2203(config, "ym1", XTAL(32'220'000)/8).add_route(ALL_OUTPUTS, "mono", 0.60);
 
-	MCFG_DEVICE_ADD("ym2", YM2151, XTAL(32'220'000)/9) // uses a preset LS163 to force the odd speed
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1)) /* IRQ 2 */
-	MCFG_SOUND_ROUTE(0, "mono", 0.60)
-	MCFG_SOUND_ROUTE(1, "mono", 0.60)
+	ym2151_device &ym2(YM2151(config, "ym2", XTAL(32'220'000)/9)); // uses a preset LS163 to force the odd speed
+	ym2.irq_handler().set_inputline(m_audiocpu, 1); /* IRQ2 */
+	ym2.add_route(0, "mono", 0.60);
+	ym2.add_route(1, "mono", 0.60);
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, XTAL(32'220'000)/32, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	OKIM6295(config, "oki1", XTAL(32'220'000)/32, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.75);
 
-	MCFG_DEVICE_ADD("oki2", OKIM6295, XTAL(32'220'000)/16, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki2", XTAL(32'220'000)/16, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.60);
+}
 
 /******************************************************************************/
 

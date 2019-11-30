@@ -132,6 +132,7 @@
 #include "cpu/es5510/es5510.h"
 #include "cpu/m68000/m68000.h"
 #include "formats/esq16_dsk.h"
+#include "imagedev/floppy.h"
 #include "machine/esqlcd.h"
 #include "machine/esqpanel.h"
 #include "machine/esqvfd.h"
@@ -193,7 +194,7 @@ public:
 	void init_sq1();
 	void init_denib();
 	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
-	IRQ_CALLBACK_MEMBER(maincpu_irq_acknowledge_callback);
+
 	DECLARE_WRITE_LINE_MEMBER(esq5505_otis_irq);
 
 private:
@@ -221,13 +222,13 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(duart_tx_b);
 	DECLARE_WRITE8_MEMBER(duart_output);
 
+	void es5505_clock_changed(u32 data);
+
 	int m_system_type;
 	uint8_t m_duart_io;
 	uint8_t otis_irq_state;
 	uint8_t dmac_irq_state;
-	int dmac_irq_vector;
 	uint8_t duart_irq_state;
-	int duart_irq_vector;
 
 	void update_irq_to_maincpu();
 
@@ -238,39 +239,35 @@ private:
 	void vfx_map(address_map &map);
 	void vfxsd_map(address_map &map);
 
+	void cpu_space_map(address_map &map);
+	void eps_cpu_space_map(address_map &map);
+
 	uint16_t  *m_rom, *m_ram;
 	uint16_t m_analog_values[8];
 
 	//dmac
-	DECLARE_WRITE8_MEMBER(dma_end);
-	DECLARE_WRITE8_MEMBER(dma_error);
+	DECLARE_WRITE_LINE_MEMBER(dma_irq);
 };
 
 FLOPPY_FORMATS_MEMBER( esq5505_state::floppy_formats )
 	FLOPPY_ESQIMG_FORMAT
 FLOPPY_FORMATS_END
 
-IRQ_CALLBACK_MEMBER(esq5505_state::maincpu_irq_acknowledge_callback)
+void esq5505_state::cpu_space_map(address_map &map)
 {
-	switch(irqline)
-	{
-	case 1:
-		return M68K_INT_ACK_AUTOVECTOR;
-	case 2:
-		return dmac_irq_vector;
-	case 3:
-		return duart_irq_vector;
-	default:
-		logerror("\nUnexpected IRQ ACK Callback: IRQ %d\n", irqline);
-		return 0;
-	}
+	map(0xfffff0, 0xffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));
+	map(0xfffff7, 0xfffff7).r(m_duart, FUNC(mc68681_device::get_irq_vector));
+}
+
+void esq5505_state::eps_cpu_space_map(address_map &map)
+{
+	cpu_space_map(map);
+	map(0xfffff5, 0xfffff5).r(m_dmac, FUNC(hd63450_device::iack));
 }
 
 void esq5505_state::machine_start()
 {
 	driver_device::machine_start();
-	// tell the pump about the ESP chips
-	m_pump->set_esp(m_esp);
 
 	m_rom = (uint16_t *)(void *)memregion("osrom")->base();
 	m_ram = (uint16_t *)(void *)memshare("osram")->ptr();
@@ -319,13 +316,13 @@ void esq5505_state::update_irq_to_maincpu()
 	{
 		m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
 		m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
-		m_maincpu->set_input_line_and_vector(M68K_IRQ_3, ASSERT_LINE, duart_irq_vector);
+		m_maincpu->set_input_line(M68K_IRQ_3, ASSERT_LINE);
 	}
 	else if (dmac_irq_state)
 	{
 		m_maincpu->set_input_line(M68K_IRQ_3, CLEAR_LINE);
 		m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
-		m_maincpu->set_input_line_and_vector(M68K_IRQ_2, ASSERT_LINE, dmac_irq_vector);
+		m_maincpu->set_input_line(M68K_IRQ_2, ASSERT_LINE);
 	}
 	else if (otis_irq_state)
 	{
@@ -434,6 +431,11 @@ WRITE_LINE_MEMBER(esq5505_state::esq5505_otis_irq)
 	update_irq_to_maincpu();
 }
 
+void esq5505_state::es5505_clock_changed(u32 data)
+{
+	m_pump->set_unscaled_clock(data);
+}
+
 WRITE16_MEMBER(esq5505_state::analog_w)
 {
 	offset &= 0x7;
@@ -450,12 +452,11 @@ WRITE_LINE_MEMBER(esq5505_state::duart_irq_handler)
 //    printf("\nDUART IRQ: state %d vector %d\n", state, vector);
 	if (state == ASSERT_LINE)
 	{
-		duart_irq_vector = m_duart->get_irq_vector();
 		duart_irq_state = 1;
 	}
 	else
 	{
-				duart_irq_state = 0;
+		duart_irq_state = 0;
 	}
 	update_irq_to_maincpu();
 }
@@ -526,30 +527,12 @@ WRITE_LINE_MEMBER(esq5505_state::duart_tx_b)
 	m_panel->rx_w(state);
 }
 
-WRITE8_MEMBER(esq5505_state::dma_end)
+WRITE_LINE_MEMBER(esq5505_state::dma_irq)
 {
-	if (data != 0)
+	if (state != CLEAR_LINE)
 	{
-		//printf("DMAC IRQ, vector = %x\n", m_dmac->get_vector(offset));
+		logerror("DMAC error, vector = %x\n", m_dmac->iack());
 		dmac_irq_state = 1;
-		dmac_irq_vector = m_dmac->get_vector(offset);
-	}
-	else
-	{
-		dmac_irq_state = 0;
-	}
-
-	// printf("IRQ update from DMAC: have OTIS=%d, DMAC=%d, DUART=%d\n", otis_irq_state, dmac_irq_state, duart_irq_state);
-	update_irq_to_maincpu();
-}
-
-WRITE8_MEMBER(esq5505_state::dma_error)
-{
-	if(data != 0)
-	{
-		logerror("DMAC error, vector = %x\n", m_dmac->get_error_vector(offset));
-		dmac_irq_state = 1;
-		dmac_irq_vector = m_dmac->get_vector(offset);
 	}
 	else
 	{
@@ -562,7 +545,7 @@ WRITE8_MEMBER(esq5505_state::dma_error)
 #if KEYBOARD_HACK
 INPUT_CHANGED_MEMBER(esq5505_state::key_stroke)
 {
-	int val = (uint8_t)(uintptr_t)param;
+	int val = (uint8_t)param;
 	int cmp = 0x60;
 
 	if (m_system_type == SQ1)
@@ -605,7 +588,7 @@ INPUT_CHANGED_MEMBER(esq5505_state::key_stroke)
 		}
 		else if (oldval == 1 && newval == 0)
 		{
-	//        printf("key off %x\n", (uint8_t)(uintptr_t)param);
+	//        printf("key off %x\n", (uint8_t)param);
 			m_panel->xmit_char(val&0x7f);
 			m_panel->xmit_char(0x00);
 		}
@@ -617,7 +600,7 @@ void esq5505_state::vfx(machine_config &config)
 {
 	M68000(config, m_maincpu, 10_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &esq5505_state::vfx_map);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(esq5505_state::maincpu_irq_acknowledge_callback));
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &esq5505_state::cpu_space_map);
 
 	ES5510(config, m_esp, 10_MHz_XTAL);
 	m_esp->set_disable();
@@ -643,10 +626,12 @@ void esq5505_state::vfx(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	ESQ_5505_5510_PUMP(config, m_pump, 10_MHz_XTAL / (16 * 21));
+	m_pump->set_esp(m_esp);
 	m_pump->add_route(0, "lspeaker", 1.0);
 	m_pump->add_route(1, "rspeaker", 1.0);
 
 	auto &es5505(ES5505(config, "otis", 10_MHz_XTAL));
+	es5505.sample_rate_changed().set(FUNC(esq5505_state::es5505_clock_changed));
 	es5505.set_region0("waverom");  /* Bank 0 */
 	es5505.set_region1("waverom2"); /* Bank 1 */
 	es5505.set_channels(4);          /* channels */
@@ -666,6 +651,7 @@ void esq5505_state::eps(machine_config &config)
 {
 	vfx(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &esq5505_state::eps_map);
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &esq5505_state::eps_cpu_space_map);
 
 	m_duart->set_clock(10_MHz_XTAL / 2);
 
@@ -681,10 +667,9 @@ void esq5505_state::eps(machine_config &config)
 
 	HD63450(config, m_dmac, 10_MHz_XTAL);   // MC68450 compatible
 	m_dmac->set_cpu_tag(m_maincpu);
-	m_dmac->set_our_clocks(attotime::from_usec(32), attotime::from_nsec(450), attotime::from_usec(4), attotime::from_hz(15625/2));
+	m_dmac->set_clocks(attotime::from_usec(32), attotime::from_nsec(450), attotime::from_usec(4), attotime::from_hz(15625/2));
 	m_dmac->set_burst_clocks(attotime::from_usec(32), attotime::from_nsec(450), attotime::from_nsec(50), attotime::from_nsec(50));
-	m_dmac->dma_end().set(FUNC(esq5505_state::dma_end));
-	m_dmac->dma_error().set(FUNC(esq5505_state::dma_error));
+	m_dmac->irq_callback().set(FUNC(esq5505_state::dma_irq));
 	m_dmac->dma_read<0>().set(m_fdc, FUNC(wd1772_device::data_r));  // ch 0 = fdc, ch 1 = 340001 (ADC?)
 	m_dmac->dma_write<0>().set(m_fdc, FUNC(wd1772_device::data_w));
 }
@@ -704,9 +689,9 @@ void esq5505_state::vfxsd(machine_config &config)
 // 32-voice machines with the VFX-SD type config
 void esq5505_state::vfx32(machine_config &config)
 {
-	M68000(config, m_maincpu, 30.4761_MHz_XTAL / 2);
+	M68000(config, m_maincpu, 30.47618_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &esq5505_state::vfxsd_map);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(esq5505_state::maincpu_irq_acknowledge_callback));
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &esq5505_state::cpu_space_map);
 
 	ES5510(config, m_esp, 10_MHz_XTAL);
 	m_esp->set_disable();
@@ -731,11 +716,13 @@ void esq5505_state::vfx32(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	ESQ_5505_5510_PUMP(config, m_pump, 30.4761_MHz_XTAL / (2 * 16 * 32));
+	ESQ_5505_5510_PUMP(config, m_pump, 30.47618_MHz_XTAL / (2 * 16 * 32));
+	m_pump->set_esp(m_esp);
 	m_pump->add_route(0, "lspeaker", 1.0);
 	m_pump->add_route(1, "rspeaker", 1.0);
 
-	auto &es5505(ES5505(config, "otis", 30.4761_MHz_XTAL / 2));
+	auto &es5505(ES5505(config, "otis", 30.47618_MHz_XTAL / 2));
+	es5505.sample_rate_changed().set(FUNC(esq5505_state::es5505_clock_changed));
 	es5505.set_region0("waverom");  /* Bank 0 */
 	es5505.set_region1("waverom2"); /* Bank 1 */
 	es5505.set_channels(4);          /* channels */
@@ -861,9 +848,9 @@ INPUT_PORTS_END
 		ROMX_LOAD(name, offset, length, hash, ROM_SKIP(1) | ROM_BIOS(bios))
 
 ROM_START( vfx )
-	ROM_REGION(0x40000, "osrom", 0)
-	ROM_LOAD16_BYTE( "vfx210b-low.bin",  0x000000, 0x010000, CRC(c51b19cd) SHA1(2a125b92ffa02ae9d7fb88118d525491d785e87e) )
-	ROM_LOAD16_BYTE( "vfx210b-high.bin", 0x000001, 0x010000, CRC(59853be8) SHA1(8e07f69d53f80885d15f624e0b912aeaf3212ee4) )
+	ROM_REGION16_BE(0x40000, "osrom", 0)
+	ROM_LOAD16_BYTE( "vfx210b-low.bin",  0x000001, 0x010000, CRC(c51b19cd) SHA1(2a125b92ffa02ae9d7fb88118d525491d785e87e) )
+	ROM_LOAD16_BYTE( "vfx210b-high.bin", 0x000000, 0x010000, CRC(59853be8) SHA1(8e07f69d53f80885d15f624e0b912aeaf3212ee4) )
 
 	ROM_REGION(0x200000, "waverom", ROMREGION_ERASE00)
 	ROM_LOAD16_BYTE( "u14.bin", 0x000001, 0x080000, CRC(85592299) SHA1(1aa7cf612f91972baeba15991d9686ccde01599c) )
@@ -874,13 +861,13 @@ ROM_START( vfx )
 ROM_END
 
 ROM_START( vfxsd )
-	ROM_REGION(0x40000, "osrom", 0)
+	ROM_REGION16_BE(0x40000, "osrom", 0)
 	ROM_SYSTEM_BIOS( 0, "v200", "V200" )
-	ROMX_LOAD( "vfxsd_200_lower.bin", 0x000000, 0x010000, CRC(7bd31aea) SHA1(812bf73c4861a5d963f128def14a4a98171c93ad), ROM_SKIP(1) | ROM_BIOS(0) )
-	ROMX_LOAD( "vfxsd_200_upper.bin", 0x000001, 0x010000, CRC(9a40efa2) SHA1(e38a2a4514519c1573361cb1526139bfcf94e45a), ROM_SKIP(1) | ROM_BIOS(0) )
+	ROMX_LOAD( "vfxsd_200_lower.bin", 0x000001, 0x010000, CRC(7bd31aea) SHA1(812bf73c4861a5d963f128def14a4a98171c93ad), ROM_SKIP(1) | ROM_BIOS(0) )
+	ROMX_LOAD( "vfxsd_200_upper.bin", 0x000000, 0x010000, CRC(9a40efa2) SHA1(e38a2a4514519c1573361cb1526139bfcf94e45a), ROM_SKIP(1) | ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "v133", "V133" )
-	ROMX_LOAD( "vfxsd_133_lower.bin", 0x000000, 0x010000, CRC(65407fcf) SHA1(83952a19f6f9ae7886ac828d8bd5ea7fee8d0fe3), ROM_SKIP(1) | ROM_BIOS(1) )
-	ROMX_LOAD( "vfxsd_133_upper.bin", 0x000001, 0x010000, CRC(150fcd18) SHA1(e42cf08604b52fab248d15d761de7d835a076940), ROM_SKIP(1) | ROM_BIOS(1) )
+	ROMX_LOAD( "vfxsd_133_lower.bin", 0x000001, 0x010000, CRC(65407fcf) SHA1(83952a19f6f9ae7886ac828d8bd5ea7fee8d0fe3), ROM_SKIP(1) | ROM_BIOS(1) )
+	ROMX_LOAD( "vfxsd_133_upper.bin", 0x000000, 0x010000, CRC(150fcd18) SHA1(e42cf08604b52fab248d15d761de7d835a076940), ROM_SKIP(1) | ROM_BIOS(1) )
 
 	ROM_REGION(0x200000, "waverom", ROMREGION_ERASE00)
 	ROM_LOAD16_BYTE( "u57.bin", 0x000001, 0x080000, CRC(85592299) SHA1(1aa7cf612f91972baeba15991d9686ccde01599c) )
@@ -893,9 +880,9 @@ ROM_START( vfxsd )
 ROM_END
 
 ROM_START( sd1 )
-	ROM_REGION(0x40000, "osrom", 0)
-	ROM_LOAD16_BYTE( "sd1_21_300b_lower.bin", 0x000000, 0x020000, CRC(a1358a0c) SHA1(64ac5358aa46da37ca4195002cf358554e00878a) )
-	ROM_LOAD16_BYTE( "sd1_21_300b_upper.bin", 0x000001, 0x010000, CRC(465ba463) SHA1(899b0e83d0788c8d49c7b09ccf0b4a92b528c6e9) )
+	ROM_REGION16_BE(0x40000, "osrom", 0)
+	ROM_LOAD16_BYTE( "sd1_21_300b_lower.bin", 0x000001, 0x020000, CRC(a1358a0c) SHA1(64ac5358aa46da37ca4195002cf358554e00878a) )
+	ROM_LOAD16_BYTE( "sd1_21_300b_upper.bin", 0x000000, 0x010000, CRC(465ba463) SHA1(899b0e83d0788c8d49c7b09ccf0b4a92b528c6e9) )
 
 	ROM_REGION(0x200000, "waverom", ROMREGION_ERASE00)  // BS=0 region (12-bit)
 	ROM_LOAD16_BYTE( "u34.bin", 0x000001, 0x080000, CRC(85592299) SHA1(1aa7cf612f91972baeba15991d9686ccde01599c) )
@@ -911,13 +898,13 @@ ROM_END
 
 // note: all known 4.xx BIOSes are for the 32-voice SD-1 and play out of tune on 21-voice h/w
 ROM_START( sd132 )
-	ROM_REGION(0x40000, "osrom", 0)
+	ROM_REGION16_BE(0x40000, "osrom", 0)
 	ROM_SYSTEM_BIOS(0, "410", "SD-1 v4.10")
-	ROM_LOAD16_BYTE_BIOS(0, "sd1_410_lo.bin", 0x000000, 0x020000, CRC(faa613a6) SHA1(60066765cddfa9d3b5d09057d8f83fb120f4e65e) )
-	ROM_LOAD16_BYTE_BIOS(0, "sd1_410_hi.bin", 0x000001, 0x010000, CRC(618c0aa8) SHA1(74acf458aa1d04a0a7a0cd5855c49e6855dbd301) )
+	ROM_LOAD16_BYTE_BIOS(0, "sd1_410_lo.bin", 0x000001, 0x020000, CRC(faa613a6) SHA1(60066765cddfa9d3b5d09057d8f83fb120f4e65e) )
+	ROM_LOAD16_BYTE_BIOS(0, "sd1_410_hi.bin", 0x000000, 0x010000, CRC(618c0aa8) SHA1(74acf458aa1d04a0a7a0cd5855c49e6855dbd301) )
 	ROM_SYSTEM_BIOS(1, "402", "SD-1 v4.02")
-	ROM_LOAD16_BYTE_BIOS(1, "sd1_32_402_lo.bin", 0x000000, 0x020000, CRC(5da2572b) SHA1(cb6ddd637ed13bfeb40a99df56000479e63fc8ec) )
-	ROM_LOAD16_BYTE_BIOS(1, "sd1_32_402_hi.bin", 0x000001, 0x010000, CRC(fc45c210) SHA1(23b81ebd9176112e6eae0c7c75b39fcb1656c953) )
+	ROM_LOAD16_BYTE_BIOS(1, "sd1_32_402_lo.bin", 0x000001, 0x020000, CRC(5da2572b) SHA1(cb6ddd637ed13bfeb40a99df56000479e63fc8ec) )
+	ROM_LOAD16_BYTE_BIOS(1, "sd1_32_402_hi.bin", 0x000000, 0x010000, CRC(fc45c210) SHA1(23b81ebd9176112e6eae0c7c75b39fcb1656c953) )
 
 	ROM_REGION(0x200000, "waverom", ROMREGION_ERASE00)  // BS=0 region (12-bit)
 	ROM_LOAD16_BYTE( "u34.bin", 0x000001, 0x080000, CRC(85592299) SHA1(1aa7cf612f91972baeba15991d9686ccde01599c) )
@@ -933,9 +920,9 @@ ROM_END
 
 
 ROM_START( sq1 )
-	ROM_REGION(0x40000, "osrom", 0)
-	ROM_LOAD16_BYTE( "sq1lo.bin",    0x000000, 0x010000, CRC(b004cf05) SHA1(567b0dae2e35b06e39da108f9c041fd9bc38fa35) )
-	ROM_LOAD16_BYTE( "sq1up.bin",    0x000001, 0x010000, CRC(2e927873) SHA1(06a948cb71fa254b23f4b9236f29035d10778da1) )
+	ROM_REGION16_BE(0x40000, "osrom", 0)
+	ROM_LOAD16_BYTE( "sq1lo.bin",    0x000001, 0x010000, CRC(b004cf05) SHA1(567b0dae2e35b06e39da108f9c041fd9bc38fa35) )
+	ROM_LOAD16_BYTE( "sq1up.bin",    0x000000, 0x010000, CRC(2e927873) SHA1(06a948cb71fa254b23f4b9236f29035d10778da1) )
 
 	ROM_REGION(0x200000, "waverom", 0)
 	ROM_LOAD16_BYTE( "sq1-u25.bin",  0x000001, 0x080000, CRC(26312451) SHA1(9f947a11592fd8420fc581914bf16e7ade75390c) )
@@ -945,9 +932,9 @@ ROM_START( sq1 )
 ROM_END
 
 ROM_START( sqrack )
-	ROM_REGION(0x40000, "osrom", 0)
-	ROM_LOAD16_BYTE( "sqr-102-lower.bin", 0x000000, 0x010000, CRC(186c85ad) SHA1(801c5cf82823ce31a88688fbee4c11ea5ffdbc10) )
-	ROM_LOAD16_BYTE( "sqr-102-upper.bin", 0x000001, 0x010000, CRC(088c9d31) SHA1(30627f21d893888b6159c481bea08e3eedd21902) )
+	ROM_REGION16_BE(0x40000, "osrom", 0)
+	ROM_LOAD16_BYTE( "sqr-102-lower.bin", 0x000001, 0x010000, CRC(186c85ad) SHA1(801c5cf82823ce31a88688fbee4c11ea5ffdbc10) )
+	ROM_LOAD16_BYTE( "sqr-102-upper.bin", 0x000000, 0x010000, CRC(088c9d31) SHA1(30627f21d893888b6159c481bea08e3eedd21902) )
 
 	ROM_REGION(0x200000, "waverom", 0)
 	ROM_LOAD16_BYTE( "sq1-u25.bin",  0x000001, 0x080000, CRC(26312451) SHA1(9f947a11592fd8420fc581914bf16e7ade75390c) )
@@ -957,9 +944,9 @@ ROM_START( sqrack )
 ROM_END
 
 ROM_START( sq2 )
-	ROM_REGION(0x40000, "osrom", 0)
-	ROM_LOAD16_BYTE( "sq232_2.03_9193_lower.u27", 0x000000, 0x010000, CRC(e37fbc2c) SHA1(4a74f3540756745073c8768b384905db03da47c0) )
-	ROM_LOAD16_BYTE( "sq232_2.03_cbcd_upper.u32", 0x000001, 0x020000, CRC(5a7dc228) SHA1(d25adecc0dbba93a094c49fae105dcc7aad317f1) )
+	ROM_REGION16_BE(0x40000, "osrom", 0)
+	ROM_LOAD16_BYTE( "sq232_2.03_9193_lower.u27", 0x000001, 0x010000, CRC(e37fbc2c) SHA1(4a74f3540756745073c8768b384905db03da47c0) )
+	ROM_LOAD16_BYTE( "sq232_2.03_cbcd_upper.u32", 0x000000, 0x020000, CRC(5a7dc228) SHA1(d25adecc0dbba93a094c49fae105dcc7aad317f1) )
 
 	ROM_REGION(0x200000, "waverom", 0)
 	ROM_LOAD16_BYTE( "sq1-u25.bin",  0x000001, 0x080000, CRC(26312451) SHA1(9f947a11592fd8420fc581914bf16e7ade75390c) )
@@ -973,9 +960,9 @@ ROM_START( sq2 )
 ROM_END
 
 ROM_START( eps )
-	ROM_REGION(0x20000, "osrom", 0)
-	ROM_LOAD16_BYTE( "eps-l.bin",    0x000000, 0x008000, CRC(382beac1) SHA1(110e31edb03fcf7bbde3e17423b21929e5b32db2) )
-	ROM_LOAD16_BYTE( "eps-h.bin",    0x000001, 0x008000, CRC(d8747420) SHA1(460597751386eb5f08465699b61381c4acd78065) )
+	ROM_REGION16_BE(0x20000, "osrom", 0)
+	ROM_LOAD16_BYTE( "eps-l.bin",    0x000001, 0x008000, CRC(382beac1) SHA1(110e31edb03fcf7bbde3e17423b21929e5b32db2) )
+	ROM_LOAD16_BYTE( "eps-h.bin",    0x000000, 0x008000, CRC(d8747420) SHA1(460597751386eb5f08465699b61381c4acd78065) )
 
 	ROM_REGION(0x200000, "waverom", ROMREGION_ERASE00)  // EPS-16 has no ROM sounds
 
@@ -983,9 +970,9 @@ ROM_START( eps )
 ROM_END
 
 ROM_START( eps16p )
-	ROM_REGION(0x20000, "osrom", 0)
-	ROM_LOAD16_BYTE( "eps16plus-100f-lower.u27", 0x000000, 0x010000, CRC(78568d3f) SHA1(ac737e093f422e109e8f06d44548629a12d6418c) )
-	ROM_LOAD16_BYTE( "eps16plus-100f-upper.u28", 0x000001, 0x010000, CRC(1264465f) SHA1(71604da091bd90a32f0d93698d70b9e114ec1697) )
+	ROM_REGION16_BE(0x20000, "osrom", 0)
+	ROM_LOAD16_BYTE( "eps16plus-100f-lower.u27", 0x000001, 0x010000, CRC(78568d3f) SHA1(ac737e093f422e109e8f06d44548629a12d6418c) )
+	ROM_LOAD16_BYTE( "eps16plus-100f-upper.u28", 0x000000, 0x010000, CRC(1264465f) SHA1(71604da091bd90a32f0d93698d70b9e114ec1697) )
 
 	ROM_REGION(0x200000, "waverom", ROMREGION_ERASE00)  // EPS-16 Plus has no ROM sounds
 

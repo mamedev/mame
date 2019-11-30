@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Luca Elia
+// copyright-holders:Luca Elia, AJR
 /***************************************************************************
 
     TMP68301 basic emulation + Interrupt Handling
@@ -9,7 +9,7 @@
     all integrated in a single chip.
 
     TODO:
-    - Interrupt generation: handle pending / in-service mechanisms
+    - Interrupt generation: edge detection, input expansion (INT3-INT9)
     - Parallel port: handle timing latency
     - Serial port: not done at all
     - (and many other things)
@@ -23,10 +23,12 @@ DEFINE_DEVICE_TYPE(TMP68301, tmp68301_device, "tmp68301", "Toshiba TMP68301")
 
 void tmp68301_device::tmp68301_regs(address_map &map)
 {
-//  AM_RANGE(0x000,0x3ff) AM_RAM
+	map(0x000, 0x3ff).rw(FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));
+
 	map(0x080, 0x093).rw(FUNC(tmp68301_device::icr_r), FUNC(tmp68301_device::icr_w)).umask16(0x00ff);
 
 	map(0x094, 0x095).rw(FUNC(tmp68301_device::imr_r), FUNC(tmp68301_device::imr_w));
+	map(0x096, 0x097).rw(FUNC(tmp68301_device::ipr_r), FUNC(tmp68301_device::ipr_w));
 	map(0x098, 0x099).rw(FUNC(tmp68301_device::iisr_r), FUNC(tmp68301_device::iisr_w));
 
 	/* Parallel Port */
@@ -37,7 +39,7 @@ void tmp68301_device::tmp68301_regs(address_map &map)
 	map(0x18e, 0x18f).rw(FUNC(tmp68301_device::scr_r), FUNC(tmp68301_device::scr_w));
 }
 
-// IRQ Mask register, 0x94
+// IRQ Mask register
 READ16_MEMBER(tmp68301_device::imr_r)
 {
 	return m_imr;
@@ -46,6 +48,20 @@ READ16_MEMBER(tmp68301_device::imr_r)
 WRITE16_MEMBER(tmp68301_device::imr_w)
 {
 	COMBINE_DATA(&m_imr);
+	update_ipl();
+}
+
+// IRQ Pending Register
+READ16_MEMBER(tmp68301_device::ipr_r)
+{
+	return m_ipr;
+}
+
+WRITE16_MEMBER(tmp68301_device::ipr_w)
+{
+	// software writes only clear bits
+	m_ipr &= data | ~mem_mask;
+	update_ipl();
 }
 
 // IRQ In-Service Register
@@ -56,7 +72,8 @@ READ16_MEMBER(tmp68301_device::iisr_r)
 
 WRITE16_MEMBER(tmp68301_device::iisr_w)
 {
-	COMBINE_DATA(&m_iisr);
+	// software writes only clear bits
+	m_iisr &= data | ~mem_mask;
 }
 
 // Serial Control Register (TODO: 8-bit wide)
@@ -118,21 +135,20 @@ WRITE8_MEMBER(tmp68301_device::icr_w)
 }
 
 tmp68301_device::tmp68301_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TMP68301, tag, owner, clock),
-		device_memory_interface(mconfig, *this),
-		m_cpu(*this, finder_base::DUMMY_TAG),
+	: m68000_device(mconfig, TMP68301, tag, owner, clock),
 		m_in_parallel_cb(*this),
 		m_out_parallel_cb(*this),
+		m_ipl(0),
 		m_imr(0),
+		m_ipr(0),
 		m_iisr(0),
 		m_scr(0),
 		m_pdir(0),
-		m_pdr(0),
-	  m_space_config("regs", ENDIANNESS_LITTLE, 16, 10, 0, address_map_constructor(), address_map_constructor(FUNC(tmp68301_device::tmp68301_regs), this))
+		m_pdr(0)
 {
 	memset(m_regs, 0, sizeof(m_regs));
 	memset(m_icr, 0, sizeof(m_icr));
-	memset(m_irq_vector, 0, sizeof(m_irq_vector));
+	m_cpu_space_config.m_internal_map = address_map_constructor(FUNC(tmp68301_device::internal_vectors_r), this);
 }
 
 
@@ -142,17 +158,21 @@ tmp68301_device::tmp68301_device(const machine_config &mconfig, const char *tag,
 
 void tmp68301_device::device_start()
 {
-	int i;
-	for (i = 0; i < 3; i++)
+	m68000_device::device_start();
+
+	for (int i = 0; i < 3; i++)
 		m_tmp68301_timer[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tmp68301_device::timer_callback), this));
 
 	m_in_parallel_cb.resolve_safe(0);
 	m_out_parallel_cb.resolve_safe();
 
+	m_program->install_device(0xfffc00, 0xffffff, *this, &tmp68301_device::tmp68301_regs);
+
 	save_item(NAME(m_regs));
 	save_item(NAME(m_icr));
-	save_item(NAME(m_irq_vector));
+	save_item(NAME(m_ipl));
 	save_item(NAME(m_imr));
+	save_item(NAME(m_ipr));
 	save_item(NAME(m_iisr));
 	save_item(NAME(m_scr));
 	save_item(NAME(m_pdir));
@@ -165,71 +185,74 @@ void tmp68301_device::device_start()
 
 void tmp68301_device::device_reset()
 {
+	m68000_device::device_reset();
+
+	m_ipr = 0;
 	m_iisr = 0;
 	m_imr = 0x7f7; // mask all irqs
-}
-
-//-------------------------------------------------
-//  memory_space_config - return a description of
-//  any address spaces owned by this device
-//-------------------------------------------------
-
-device_memory_interface::space_config_vector tmp68301_device::memory_space_config() const
-{
-	return space_config_vector {
-		std::make_pair(0, &m_space_config)
-	};
+	std::fill(std::begin(m_icr), std::end(m_icr), 0x07);
+	update_ipl();
 }
 
 //**************************************************************************
 //  INLINE HELPERS
 //**************************************************************************
 
-//-------------------------------------------------
-//  read_byte - read a byte at the given address
-//-------------------------------------------------
-
-inline uint16_t tmp68301_device::read_word(offs_t address)
+void tmp68301_device::internal_vectors_r(address_map &map)
 {
-	return space(0).read_word(address << 1);
+	map(0xfffff0, 0xffffff).r(FUNC(tmp68301_device::irq_callback)).umask16(0x00ff);
 }
 
-//-------------------------------------------------
-//  write_byte - write a byte at the given address
-//-------------------------------------------------
 
-inline void tmp68301_device::write_word(offs_t address, uint16_t data)
+uint8_t tmp68301_device::irq_callback(offs_t offset)
 {
-	space(0).write_word(address << 1, data);
+	uint8_t IVNR = m_regs[0x9a/2] & 0xe0;      // Interrupt Vector Number Register (IVNR)
+
+	for (int src : { 0, 7, 3, 1, 8, 4, 5, 9, 2 })
+	{
+		// check if the IPL matches
+		if (offset == (m_icr[src] & 0x07))
+		{
+			// check if interrupt is pending and not masked out
+			u16 mask = (src > 2 ? 2 : 1) << src;
+			if ((m_ipr & mask) != 0 && (m_imr & mask) == 0)
+			{
+				if (!machine().side_effects_disabled())
+				{
+					// add cause to interrupt in-service register
+					m_iisr |= mask;
+
+					// no longer pending
+					m_ipr &= ~mask;
+					update_ipl();
+				}
+
+				// vary vector number by type
+				if (src > 6)
+					return IVNR | (src - 3);
+				else if (src > 2)
+					return IVNR | (src - 1) << 2 | serial_interrupt_cause(src - 3);
+				else /*if (BIT(m_icr[src], 5))*/ // TODO: use external vector otherwise
+					return IVNR | src;
+			}
+		}
+	}
+
+	// default vector
+	return IVNR | 0x1f;
 }
 
-IRQ_CALLBACK_MEMBER(tmp68301_device::irq_callback)
-{
-	int vector = m_irq_vector[irqline];
-//  logerror("%s: irq callback returns %04X for level %x\n",machine().describe_context(),vector,int_level);
-	return vector;
-}
-
-TIMER_CALLBACK_MEMBER( tmp68301_device::timer_callback )
+TIMER_CALLBACK_MEMBER(tmp68301_device::timer_callback)
 {
 	int i = param;
 	uint16_t TCR  =   m_regs[(0x200 + i * 0x20)/2];
-	uint16_t ICR  =   m_regs[0x8e/2+i];    // Interrupt Controller Register (ICR7..9)
-	uint16_t IVNR =   m_regs[0x9a/2];      // Interrupt Vector Number Register (IVNR)
 
 //  logerror("s: callback timer %04X, j = %d\n",machine().describe_context(),i,tcount);
 
-	if  (   (TCR & 0x0004) &&   // INT
-			!(m_imr & (0x100<<i))
-		)
+	if (TCR & 0x0004)   // INT
 	{
-		int level = ICR & 0x0007;
-
-		// Interrupt Vector Number Register (IVNR)
-		m_irq_vector[level]  =   IVNR & 0x00e0;
-		m_irq_vector[level]  +=  4+i;
-
-		m_cpu->set_input_line(level,HOLD_LINE);
+		m_ipr |= 0x100 << i;
+		update_ipl();
 	}
 
 	if (TCR & 0x0080)   // N/1
@@ -243,7 +266,7 @@ TIMER_CALLBACK_MEMBER( tmp68301_device::timer_callback )
 	}
 }
 
-void tmp68301_device::update_timer( int i )
+void tmp68301_device::update_timer(int i)
 {
 	uint16_t TCR  =   m_regs[(0x200 + i * 0x20)/2];
 	uint16_t MAX1 =   m_regs[(0x204 + i * 0x20)/2];
@@ -272,7 +295,7 @@ void tmp68301_device::update_timer( int i )
 		{
 			int scale = (TCR & 0x3c00)>>10;         // P4..1
 			if (scale > 8) scale = 8;
-			duration = attotime::from_hz(m_cpu->unscaled_clock()) * ((1 << scale) * max);
+			duration = attotime::from_hz(unscaled_clock()) * ((1 << scale) * max);
 		}
 		break;
 	}
@@ -289,88 +312,53 @@ void tmp68301_device::update_timer( int i )
 }
 
 /* Update the IRQ state based on all possible causes */
-void tmp68301_device::update_irq_state(uint16_t cause)
+void tmp68301_device::update_ipl()
 {
-	int i;
+	uint8_t new_ipl = 0;
 
-	/* Take care of external interrupts */
-
-	uint16_t IVNR =   m_regs[0x9a/2];      // Interrupt Vector Number Register (IVNR)
-	// add cause to interrupt in-service register
-	m_iisr |= cause;
-
-	for (i = 0; i < 3; i++)
+	for (int src = 0; src < 10; src++)
 	{
-		if ((m_iisr & 1 << i) && !(m_imr & (1<<i)))
-		{
-			uint8_t current_ICR = m_icr[i];    // Interrupt Controller Register (ICR0..2)
+		u16 mask = (src > 2 ? 2 : 1) << src;
+		if ((m_ipr & mask) != 0 && (m_imr & mask) == 0 && new_ipl < (m_icr[src] & 0x07))
+			new_ipl = m_icr[src] & 0x07;
+	}
 
-			// Interrupt Controller Register (ICR0..2)
-			int level = current_ICR & 0x0007;
+	if (new_ipl != m_ipl)
+	{
+		if (m_ipl != 0)
+			set_input_line(m_ipl, CLEAR_LINE);
+		if (new_ipl != 0)
+			set_input_line(new_ipl, ASSERT_LINE);
 
-			// Interrupt Vector Number Register (IVNR)
-			m_irq_vector[level]  =   IVNR & 0x00e0;
-			m_irq_vector[level]  +=  i;
-
-			m_cpu->set_input_line(level,HOLD_LINE);
-		}
+		m_ipl = new_ipl;
 	}
 }
 
-void tmp68301_device::update_irq_serial(uint16_t cause, uint8_t type)
+uint8_t tmp68301_device::serial_interrupt_cause(int channel)
 {
-	int i;
-	const uint8_t serial_irq_vector[3] = { 8, 0xc, 0x10 };
-
-	/* Take care of external interrupts */
-
-	uint16_t IVNR =   m_regs[0x9a/2];      // Interrupt Vector Number Register (IVNR)
-	// add cause to interrupt in-service register
-	m_iisr |= cause;
-
-	for (i = 4; i < 7; i++)
-	{
-		if ((m_iisr & 1 << i) && !(m_imr & (1<<i)))
-		{
-			uint8_t current_ICR = m_icr[i-1];    // Interrupt Controller Register (ICR0..2)
-
-			// Interrupt Controller Register (ICR0..2)
-			int level = current_ICR & 0x0007;
-
-			// Interrupt Vector Number Register (IVNR)
-			m_irq_vector[level]  =   IVNR & 0x00e0;
-			/*
-			 * channel number
-			 */
-			m_irq_vector[level]  +=  serial_irq_vector[i-4];
-			/*
-			 *  00 error occurred
-			 *  01 receive completed
-			 *  10 transmit ready
-			 *  11 interrupt cause cleared while interrupt pending
-			 */
-			m_irq_vector[level]  +=  type;
-
-			m_cpu->set_input_line(level,HOLD_LINE);
-		}
-	}
+	/*
+	 *  00 error occurred
+	 *  01 receive completed
+	 *  10 transmit ready
+	 *  11 interrupt cause cleared while interrupt pending
+	 */
+	(void)channel;
+	return 3;
 }
 
 
 READ16_MEMBER( tmp68301_device::regs_r )
 {
-	return read_word(offset);
+	return m_regs[offset];
 }
 
 WRITE16_MEMBER( tmp68301_device::regs_w )
 {
 	COMBINE_DATA(&m_regs[offset]);
 
-	write_word(offset,m_regs[offset]);
-
 	if (!ACCESSING_BITS_0_7)    return;
 
-//  logerror("CPU #0 PC %06X: TMP68301 Reg %04X<-%04X & %04X\n", m_cpu->pc(),offset*2,data,mem_mask^0xffff);
+//  logerror("CPU #0 PC %06X: TMP68301 Reg %04X<-%04X & %04X\n", >pc(),offset*2,data,mem_mask^0xffff);
 
 	switch( offset * 2 )
 	{
@@ -387,6 +375,6 @@ WRITE16_MEMBER( tmp68301_device::regs_w )
 	}
 }
 
-void tmp68301_device::external_interrupt_0()    { update_irq_state(EXT_IRQ0); }
-void tmp68301_device::external_interrupt_1()    { update_irq_state(EXT_IRQ1); }
-void tmp68301_device::external_interrupt_2()    { update_irq_state(EXT_IRQ2); }
+void tmp68301_device::external_interrupt_0()    { m_ipr |= EXT_IRQ0; update_ipl(); }
+void tmp68301_device::external_interrupt_1()    { m_ipr |= EXT_IRQ1; update_ipl(); }
+void tmp68301_device::external_interrupt_2()    { m_ipr |= EXT_IRQ2; update_ipl(); }

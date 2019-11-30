@@ -30,7 +30,7 @@ enum
 class tms9995_device : public cpu_device
 {
 public:
-	static constexpr int AS_SETOFFSET = 4;
+	static constexpr int AS_SETADDRESS = 4;
 
 	tms9995_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -50,10 +50,8 @@ public:
 
 	// Callbacks
 	auto extop_cb() { return m_external_operation.bind(); }
-	auto iaq_cb() { return m_iaq_line.bind(); }
 	auto clkout_cb() { return m_clock_out_line.bind(); }
 	auto holda_cb() { return m_holda_line.bind(); }
-	auto dbin_cb() { return m_dbin_line.bind(); }
 
 	// For debugger access
 	uint8_t debug_read_onchip_memory(offs_t addr) { return m_onchip_memory[addr & 0xff]; };
@@ -68,9 +66,9 @@ protected:
 	virtual void        device_start() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t      execute_min_cycles() const override;
-	virtual uint32_t      execute_max_cycles() const override;
-	virtual uint32_t      execute_input_lines() const override;
+	virtual uint32_t      execute_min_cycles() const noexcept override;
+	virtual uint32_t      execute_max_cycles() const noexcept override;
+	virtual uint32_t      execute_input_lines() const noexcept override;
 	virtual void        execute_set_input(int irqline, int state) override;
 	virtual void        execute_run() override;
 
@@ -79,8 +77,8 @@ protected:
 
 	virtual space_config_vector memory_space_config() const override;
 
-	uint64_t execute_clocks_to_cycles(uint64_t clocks) const override { return clocks / 4.0; }
-	uint64_t execute_cycles_to_clocks(uint64_t cycles) const override { return cycles * 4.0; }
+	uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return clocks / 4.0; }
+	uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return cycles * 4.0; }
 
 	// Variant of the TMS9995 without internal RAM and decrementer
 	bool    m_mp9537;
@@ -88,7 +86,7 @@ protected:
 private:
 	// State / debug management
 	uint16_t  m_state_any;
-	static const char* s_statename[];
+	static char const *const s_statename[];
 	void    state_import(const device_state_entry &entry) override;
 	void    state_export(const device_state_entry &entry) override;
 	void    state_string_export(const device_state_entry &entry, std::string &str) const override;
@@ -104,14 +102,17 @@ private:
 	// We use this additional member for the debugger only.
 	uint16_t  PC_debug;
 
+	// Indicates the instruction acquisition phase
+	bool    m_iaq;
+
 	// 256 bytes of onchip memory
 	uint8_t   m_onchip_memory[256];
 
 	const address_space_config      m_program_config;
-	const address_space_config      m_setoffset_config;
+	const address_space_config      m_setaddress_config;
 	const address_space_config      m_io_config;
 	address_space*                  m_prgspace;
-	address_space*                  m_sospace;
+	address_space*                  m_setaddr;
 	address_space*                  m_cru;
 
 	// Processor states
@@ -245,8 +246,6 @@ private:
 	uint16_t  m_cru_address;
 	uint16_t  m_cru_value;
 	bool    m_cru_first_read;
-	int     m_cru_bits_left;
-	uint32_t  m_cru_read;
 
 	// CPU-internal CRU flags
 	bool    m_flag[16];
@@ -397,20 +396,11 @@ private:
 	// chip emulations we use a dedicated callback.
 	devcb_write8   m_external_operation;
 
-	// Signal to the outside world that we are now getting an instruction (IAQ).
-	// In the real hardware this line is shared with the HOLDA line, and the
-	// /MEMEN line is used to decide which signal we have on the line. We do not
-	// emulate the /MEMEN line, so we have to use two separate lines.
-	devcb_write_line   m_iaq_line;
-
 	// Clock output.
 	devcb_write_line   m_clock_out_line;
 
 	// Asserted when the CPU is in a HOLD state
 	devcb_write_line   m_holda_line;
-
-	// DBIN line. When asserted (high), the CPU has disabled the data bus output buffers.
-	devcb_write_line   m_dbin_line;
 };
 
 

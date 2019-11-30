@@ -496,7 +496,7 @@ void bfcobra_state::RunBlit(address_space &space)
 		/* This debug is now wrong ! */
 		if (DEBUG_BLITTER)
 		{
-			osd_printf_debug("\n%s:Blitter: Running command from 0x%.5x\n\n", device->machine().describe_context().c_str(), blitter.program.addr - 12);
+			osd_printf_debug("\n%s:Blitter: Running command from 0x%.5x\n\n", device->machine().describe_context(), blitter.program.addr - 12);
 			osd_printf_debug("Command Reg         %.2x",   blitter.command);
 			osd_printf_debug("     %s %s %s %s %s %s %s\n",
 				blitter.command & CMD_RUN ? "RUN" : "     ",
@@ -1409,15 +1409,15 @@ void bfcobra_state::m6809_prog_map(address_map &map)
 	map(0x2200, 0x2200).ram();     // W 'F'
 	map(0x2600, 0x2600).rw(FUNC(bfcobra_state::meter_r), FUNC(bfcobra_state::meter_w));
 	map(0x2800, 0x2800).ram();     // W
-	map(0x2A00, 0x2A02).rw(FUNC(bfcobra_state::latch_r), FUNC(bfcobra_state::latch_w));
-	map(0x2E00, 0x2E00).r(FUNC(bfcobra_state::int_latch_r));
+	map(0x2a00, 0x2a02).rw(FUNC(bfcobra_state::latch_r), FUNC(bfcobra_state::latch_w));
+	map(0x2e00, 0x2e00).r(FUNC(bfcobra_state::int_latch_r));
 	map(0x3001, 0x3001).w("aysnd", FUNC(ay8910_device::data_w));
 	map(0x3201, 0x3201).w("aysnd", FUNC(ay8910_device::address_w));
 	map(0x3404, 0x3405).rw(m_acia6850_1, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
 	map(0x3406, 0x3407).rw(m_acia6850_2, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
-//  AM_RANGE(0x3408, 0x3408) AM_NOP
-//  AM_RANGE(0x340A, 0x340A) AM_NOP
-//  AM_RANGE(0x3600, 0x3600) AM_NOP
+//  map(0x3408, 0x3408).noprw();
+//  map(0x340a, 0x340a).noprw();
+//  map(0x3600, 0x3600).noprw();
 	map(0x3801, 0x3801).rw(FUNC(bfcobra_state::upd_r), FUNC(bfcobra_state::upd_w));
 	map(0x8000, 0xffff).rom();
 	map(0xf000, 0xf000).nopw();    /* Watchdog */
@@ -1638,39 +1638,39 @@ INTERRUPT_GEN_MEMBER(bfcobra_state::vblank_gen)
 	update_irqs();
 }
 
-MACHINE_CONFIG_START(bfcobra_state::bfcobra)
-	MCFG_DEVICE_ADD("maincpu", Z80, Z80_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(z80_prog_map)
-	MCFG_DEVICE_IO_MAP(z80_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bfcobra_state,  vblank_gen)
+void bfcobra_state::bfcobra(machine_config &config)
+{
+	Z80(config, m_maincpu, Z80_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &bfcobra_state::z80_prog_map);
+	m_maincpu->set_addrmap(AS_IO, &bfcobra_state::z80_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(bfcobra_state::vblank_gen));
 
-	MCFG_DEVICE_ADD("audiocpu", MC6809, M6809_XTAL) // MC6809P
-	MCFG_DEVICE_PROGRAM_MAP(m6809_prog_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(bfcobra_state, timer_irq, 1000)
+	MC6809(config, m_audiocpu, M6809_XTAL); // MC6809P
+	m_audiocpu->set_addrmap(AS_PROGRAM, &bfcobra_state::m6809_prog_map);
+	m_audiocpu->set_periodic_int(FUNC(bfcobra_state::timer_irq), attotime::from_hz(1000));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 
 	/* TODO */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512 - 1, 0, 256 - 1)
-	MCFG_SCREEN_UPDATE_DRIVER(bfcobra_state, screen_update_bfcobra)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(512, 256);
+	screen.set_visarea_full();
+	screen.set_screen_update(FUNC(bfcobra_state::screen_update_bfcobra));
 
-	MCFG_PALETTE_ADD("palette", 256)
+	PALETTE(config, m_palette).set_entries(256);
 
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette") // MUSIC Semiconductor TR9C1710 RAMDAC or equivalent
-	MCFG_RAMDAC_SPLIT_READ(1)
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette)); // MUSIC Semiconductor TR9C1710 RAMDAC or equivalent
+	ramdac.set_addrmap(0, &bfcobra_state::ramdac_map);
+	ramdac.set_split_read(1);
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, M6809_XTAL / 4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	AY8910(config, "aysnd", M6809_XTAL / 4).add_route(ALL_OUTPUTS, "mono", 0.20);
 
-	MCFG_DEVICE_ADD("upd", UPD7759)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	UPD7759(config, m_upd7759).add_route(ALL_OUTPUTS, "mono", 0.40);
 
 	/* ACIAs */
 	ACIA6850(config, m_acia6850_0, 0);
@@ -1684,12 +1684,11 @@ MACHINE_CONFIG_START(bfcobra_state::bfcobra)
 	m_acia6850_2->txd_handler().set(FUNC(bfcobra_state::data_acia_tx_w));
 	m_acia6850_2->irq_handler().set(FUNC(bfcobra_state::m6809_data_irq));
 
-	MCFG_DEVICE_ADD("acia_clock", CLOCK, 31250*16) // What are the correct ACIA clocks ?
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, bfcobra_state, write_acia_clock))
+	clock_device &acia_clock(CLOCK(config, "acia_clock", 31250*16)); // What are the correct ACIA clocks ?
+	acia_clock.signal_handler().set(FUNC(bfcobra_state::write_acia_clock));
 
-	MCFG_DEVICE_ADD("meters", METERS, 0)
-	MCFG_METERS_NUMBER(8)
-MACHINE_CONFIG_END
+	METERS(config, m_meters, 0).set_number(8);
+}
 
 /***************************************************************************
 

@@ -46,7 +46,7 @@ Some debug tricks (let's test this CPU as more as possible):
 
 #include "emu.h"
 #include "cpu/mc68hc11/mc68hc11.h"
-#include "machine/nvram.h"
+#include "machine/ds17x85.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
 #include "emupal.h"
@@ -59,24 +59,24 @@ class hitpoker_state : public driver_device
 public:
 	hitpoker_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_sys_regs(*this, "sys_regs"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette"),
+		m_eeprom(*this, "eeprom")
+	{
+	}
 
 	void hitpoker(machine_config &config);
 
 	void init_hitpoker();
 
 private:
-	required_shared_ptr<uint8_t> m_sys_regs;
+	uint8_t m_sys_regs;
 
 	uint8_t m_pic_data;
 	std::unique_ptr<uint8_t[]> m_videoram;
 	std::unique_ptr<uint8_t[]> m_paletteram;
 	std::unique_ptr<uint8_t[]> m_colorram;
-	uint8_t m_eeprom_data[0x1000];
-	uint16_t m_eeprom_index;
 
 	DECLARE_READ8_MEMBER(hitpoker_vram_r);
 	DECLARE_WRITE8_MEMBER(hitpoker_vram_w);
@@ -84,20 +84,14 @@ private:
 	DECLARE_WRITE8_MEMBER(hitpoker_cram_w);
 	DECLARE_READ8_MEMBER(hitpoker_paletteram_r);
 	DECLARE_WRITE8_MEMBER(hitpoker_paletteram_w);
-	DECLARE_READ8_MEMBER(rtc_r);
-	DECLARE_WRITE8_MEMBER(eeprom_offset_w);
-	DECLARE_WRITE8_MEMBER(eeprom_w);
-	DECLARE_READ8_MEMBER(eeprom_r);
 	DECLARE_READ8_MEMBER(hitpoker_pic_r);
 	DECLARE_WRITE8_MEMBER(hitpoker_pic_w);
-	DECLARE_WRITE_LINE_MEMBER(hitpoker_irq);
-	DECLARE_READ8_MEMBER(irq_clear_r);
 	virtual void video_start() override;
-	uint32_t screen_update_hitpoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
+	uint32_t screen_update_hitpoker(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	required_device<mc68hc11_cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	void hitpoker_io(address_map &map);
+	required_shared_ptr<uint8_t> m_eeprom;
 	void hitpoker_map(address_map &map);
 };
 
@@ -111,12 +105,12 @@ void hitpoker_state::video_start()
 	m_colorram = std::make_unique<uint8_t[]>(0x2000);
 }
 
-uint32_t hitpoker_state::screen_update_hitpoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t hitpoker_state::screen_update_hitpoker(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int count = 0;
 	int y,x;
 
-	bitmap.fill(0, cliprect);
+	bitmap.fill(rgb_t::black(), cliprect);
 
 	for (y=0;y<31;y++)
 	{
@@ -195,38 +189,6 @@ WRITE8_MEMBER(hitpoker_state::hitpoker_paletteram_w)
 	m_palette->set_pen_color(offset, pal5bit(r), pal6bit(g), pal5bit(b));
 }
 
-READ8_MEMBER(hitpoker_state::rtc_r)
-{
-	return 0x80; //kludge it for now
-}
-
-
-/* tests 0x180, what EEPROM is this one??? it seems to access up to 4KB */
-WRITE8_MEMBER(hitpoker_state::eeprom_offset_w)
-{
-	if (offset == 0)
-		m_eeprom_index = (m_eeprom_index & 0xf00) | (data & 0xff);
-	else
-		m_eeprom_index = (m_eeprom_index & 0x0ff) | (data << 8 & 0xf00);
-}
-
-WRITE8_MEMBER(hitpoker_state::eeprom_w)
-{
-	// is 0xbe53 the right address?
-	m_eeprom_data[m_eeprom_index] = data;
-}
-
-READ8_MEMBER(hitpoker_state::eeprom_r)
-{
-	/*** hack to make it boot ***/
-	int ret = ((m_eeprom_index & 0x1f) == 0x1f) ? 1 : 0;
-	m_eeprom_index++;
-	return ret;
-	/*** ***/
-
-	// FIXME: never executed
-	//return m_eeprom_data[m_eeprom_index & 0xfff];
-}
 
 READ8_MEMBER(hitpoker_state::hitpoker_pic_r)
 {
@@ -243,7 +205,7 @@ READ8_MEMBER(hitpoker_state::hitpoker_pic_r)
 		return (m_pic_data & 0x7f) | (m_pic_data & 0x40 ? 0x80 : 0x00);
 	}
 
-	return m_sys_regs[offset];
+	return m_sys_regs;
 }
 
 WRITE8_MEMBER(hitpoker_state::hitpoker_pic_w)
@@ -251,7 +213,7 @@ WRITE8_MEMBER(hitpoker_state::hitpoker_pic_w)
 	if(offset == 0)
 		m_pic_data = (data & 0xff);// | (data & 0x40) ? 0x80 : 0x00;
 //  logerror("%02x W\n",data);
-	m_sys_regs[offset] = data;
+	m_sys_regs = data;
 }
 
 #if 0
@@ -261,47 +223,22 @@ READ8_MEMBER(hitpoker_state::test_r)
 }
 #endif
 
-WRITE_LINE_MEMBER(hitpoker_state::hitpoker_irq)
-{
-	if (state)
-		m_maincpu->set_input_line(MC68HC11_IRQ_LINE, ASSERT_LINE);
-}
-
-READ8_MEMBER(hitpoker_state::irq_clear_r)
-{
-	if (!machine().side_effects_disabled())
-		m_maincpu->set_input_line(MC68HC11_IRQ_LINE, CLEAR_LINE);
-	return 0xff;
-}
-
 /* overlap empty rom addresses */
 void hitpoker_state::hitpoker_map(address_map &map)
 {
-	map(0x0000, 0xbdff).rom();
+	map(0x0000, 0xb5ff).rom();
 	map(0xbf00, 0xffff).rom();
 
-	map(0x0000, 0x00ff).ram(); // stack ram
-	map(0x1000, 0x103f).ram(); // internal I/O
 	map(0x8000, 0xb5ff).rw(FUNC(hitpoker_state::hitpoker_vram_r), FUNC(hitpoker_state::hitpoker_vram_w));
-	map(0xb600, 0xbdff).ram();
-	map(0xbe0a, 0xbe0a).portr("IN0");
-	map(0xbe0c, 0xbe0c).r(FUNC(hitpoker_state::irq_clear_r));
-	map(0xbe0d, 0xbe0d).r(FUNC(hitpoker_state::rtc_r));
-	map(0xbe0e, 0xbe0e).portr("IN1");
-	map(0xbe50, 0xbe51).w(FUNC(hitpoker_state::eeprom_offset_w));
-	map(0xbe53, 0xbe53).rw(FUNC(hitpoker_state::eeprom_r), FUNC(hitpoker_state::eeprom_w));
+	map(0xb600, 0xbdff).ram().share("eeprom");
+	map(0xbe00, 0xbe7f).rw("rtc", FUNC(ds17x85_device::read_direct), FUNC(ds17x85_device::write_direct));
 	map(0xbe80, 0xbe80).w("crtc", FUNC(mc6845_device::address_w));
 	map(0xbe81, 0xbe81).w("crtc", FUNC(mc6845_device::register_w));
 	map(0xbe90, 0xbe91).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
 	map(0xbea0, 0xbea0).portr("VBLANK"); //probably other bits as well
-//  AM_RANGE(0xbe00, 0xbeff) AM_READ(test_r)
+//  map(0xbe00, 0xbeff).r(FUNC(hitpoker_state::test_r));
 	map(0xc000, 0xdfff).rw(FUNC(hitpoker_state::hitpoker_cram_r), FUNC(hitpoker_state::hitpoker_cram_w));
 	map(0xe000, 0xefff).rw(FUNC(hitpoker_state::hitpoker_paletteram_r), FUNC(hitpoker_state::hitpoker_paletteram_w));
-}
-
-void hitpoker_state::hitpoker_io(address_map &map)
-{
-	map(MC68HC11_IO_PORTA, MC68HC11_IO_PORTA).rw(FUNC(hitpoker_state::hitpoker_pic_r), FUNC(hitpoker_state::hitpoker_pic_w)).share("sys_regs");
 }
 
 static INPUT_PORTS_START( hitpoker )
@@ -328,58 +265,6 @@ static INPUT_PORTS_START( hitpoker )
 	PORT_DIPSETTING(    0x40, "15KHz" )
 	PORT_DIPSETTING(    0x00, "24KHz" )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
-
-	PORT_START("IN0")
-	PORT_DIPNAME( 0x01, 0x01, "IN0" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("IN1")
-	PORT_DIPNAME( 0x01, 0x01, "IN1" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, "DSW1" )
@@ -462,45 +347,45 @@ static GFXDECODE_START( gfx_hitpoker )
 	GFXDECODE_ENTRY( "gfx1", 0, hitpoker_layout_8bpp,   0, 8  )
 GFXDECODE_END
 
-MACHINE_CONFIG_START(hitpoker_state::hitpoker)
-	MCFG_DEVICE_ADD("maincpu", MC68HC11,1000000)
-	MCFG_DEVICE_PROGRAM_MAP(hitpoker_map)
-	MCFG_DEVICE_IO_MAP(hitpoker_io)
-	MCFG_MC68HC11_CONFIG(0, 0x100, 0x01)
+void hitpoker_state::hitpoker(machine_config &config)
+{
+	MC68HC11A1(config, m_maincpu, 8'000'000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &hitpoker_state::hitpoker_map);
+	m_maincpu->in_pa_callback().set(FUNC(hitpoker_state::hitpoker_pic_r));
+	m_maincpu->out_pa_callback().set(FUNC(hitpoker_state::hitpoker_pic_w));
+	m_maincpu->in_pe_callback().set_constant(0);
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	ds17x85_device &rtc(DS17487(config, "rtc", 32768));
+	rtc.irq().set_inputline(m_maincpu, MC68HC11_IRQ_LINE);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
-	MCFG_SCREEN_SIZE(648, 480) //setted by the CRTC
-	MCFG_SCREEN_VISIBLE_AREA(0, 648-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(hitpoker_state, screen_update_hitpoker)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
+	screen.set_size(648, 480); //setted by the CRTC
+	screen.set_visarea(0, 648-1, 0, 240-1);
+	screen.set_screen_update(FUNC(hitpoker_state::screen_update_hitpoker));
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", CRTC_CLOCK/2)  /* hand tuned to get ~60 fps */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, hitpoker_state, hitpoker_irq))
+	hd6845s_device &crtc(HD6845S(config, "crtc", CRTC_CLOCK/2));  /* hand tuned to get ~60 fps */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	//crtc.out_vsync_callback().set(FUNC(hitpoker_state::hitpoker_irq));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hitpoker)
-	MCFG_PALETTE_ADD("palette", 0x800)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_hitpoker);
+	PALETTE(config, m_palette).set_entries(0x800);
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", YM2149, 1500000)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	ym2149_device &aysnd(YM2149(config, "aysnd", 1500000));
+	aysnd.port_a_read_callback().set_ioport("DSW1");
+	aysnd.port_b_read_callback().set_ioport("DSW2");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 void hitpoker_state::init_hitpoker()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
-
-	// init nvram
-	subdevice<nvram_device>("nvram")->set_base(m_eeprom_data, sizeof(m_eeprom_data));
 
 	ROM[0x1220] = 0x01; //patch eeprom write?
 	ROM[0x1221] = 0x01;
@@ -508,6 +393,12 @@ void hitpoker_state::init_hitpoker()
 
 	ROM[0x10c6] = 0x01;
 	ROM[0x10c7] = 0x01; //patch the checksum routine
+
+	// must match RTC serial number
+	m_eeprom[3] = 'M';
+	m_eeprom[2] = 'A';
+	m_eeprom[1] = 'M';
+	m_eeprom[0] = 'E';
 }
 
 ROM_START( hitpoker )

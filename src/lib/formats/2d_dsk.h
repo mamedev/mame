@@ -7,11 +7,10 @@
     Disk image format
 
 ***************************************************************************/
+#ifndef MAME_FORMATS_2D_DSK_H
+#define MAME_FORMATS_2D_DSK_H
 
 #pragma once
-
-#ifndef __2D_DSK_H__
-#define __2D_DSK_H__
 
 #include "wd177x_dsk.h"
 
@@ -30,4 +29,4 @@ private:
 
 extern const floppy_format_type FLOPPY_2D_FORMAT;
 
-#endif // __2D_DSK_H__
+#endif // MAME_FORMATS_2D_DSK_H

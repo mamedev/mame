@@ -32,7 +32,6 @@ Galaksija driver by Krzysztof Strzecha and Miodrag Milanovic
 #include "imagedev/snapquik.h"
 #include "machine/ram.h"
 #include "sound/ay8910.h"
-#include "sound/wave.h"
 #include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
@@ -176,85 +175,84 @@ static GFXDECODE_START( gfx_galaxy )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(galaxy_state::galaxy)
+void galaxy_state::galaxy(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL / 2)
-	MCFG_DEVICE_PROGRAM_MAP(galaxy_mem)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", galaxy_state,  galaxy_interrupt)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(galaxy_state,galaxy_irq_callback)
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_PALETTE("palette")
+	Z80(config, m_maincpu, XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &galaxy_state::galaxy_mem);
+	m_maincpu->set_vblank_int("screen", FUNC(galaxy_state::galaxy_interrupt));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(galaxy_state::galaxy_irq_callback));
 
 	MCFG_MACHINE_RESET_OVERRIDE(galaxy_state, galaxy )
 
 	/* video hardware */
-	MCFG_SCREEN_SIZE(384, 212)
-	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 208-1)
-	MCFG_SCREEN_UPDATE_DRIVER(galaxy_state, screen_update_galaxy)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(50);
+	m_screen->set_palette("palette");
+	m_screen->set_size(384, 212);
+	m_screen->set_visarea(0, 384-1, 0, 208-1);
+	m_screen->set_screen_update(FUNC(galaxy_state::screen_update_galaxy));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_galaxy)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
-
+	GFXDECODE(config, "gfxdecode", "palette", gfx_galaxy);
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* snapshot */
-	MCFG_SNAPSHOT_ADD("snapshot", galaxy_state, galaxy, "gal", 0)
+	SNAPSHOT(config, "snapshot", "gal").set_load_callback(FUNC(galaxy_state::snapshot_cb));
 
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(gtp_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
-	MCFG_CASSETTE_INTERFACE("galaxy_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(gtp_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cassette->set_interface("galaxy_cass");
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list","galaxy")
+	SOFTWARE_LIST(config, "cass_list").set_original("galaxy");
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("6K").set_extra_options("2K,22K,38K,54K");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(galaxy_state::galaxyp)
+void galaxy_state::galaxyp(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL / 2)
-	MCFG_DEVICE_PROGRAM_MAP(galaxyp_mem)
-	MCFG_DEVICE_IO_MAP(galaxyp_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", galaxy_state,  galaxy_interrupt)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(galaxy_state,galaxy_irq_callback)
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_PALETTE("palette")
+	Z80(config, m_maincpu, XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &galaxy_state::galaxyp_mem);
+	m_maincpu->set_addrmap(AS_IO, &galaxy_state::galaxyp_io);
+	m_maincpu->set_vblank_int("screen", FUNC(galaxy_state::galaxy_interrupt));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(galaxy_state::galaxy_irq_callback));
 
 	MCFG_MACHINE_RESET_OVERRIDE(galaxy_state, galaxyp )
 
 	/* video hardware */
-	MCFG_SCREEN_SIZE(384, 208)
-	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 208-1)
-	MCFG_SCREEN_UPDATE_DRIVER(galaxy_state, screen_update_galaxy)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(50);
+	m_screen->set_palette("palette");
+	m_screen->set_size(384, 208);
+	m_screen->set_visarea(0, 384-1, 0, 208-1);
+	m_screen->set_screen_update(FUNC(galaxy_state::screen_update_galaxy));
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 
 	/* snapshot */
-	MCFG_SNAPSHOT_ADD("snapshot", galaxy_state, galaxy, "gal", 0)
+	SNAPSHOT(config, "snapshot", "gal").set_load_callback(FUNC(galaxy_state::snapshot_cb));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("ay8910", AY8910, XTAL/4) // FIXME: really no output routes for this AY?
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	AY8910(config, "ay8910", XTAL/4); // FIXME: really no output routes for this AY?
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(gtp_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
-	MCFG_CASSETTE_INTERFACE("galaxy_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(gtp_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cassette->set_interface("galaxy_cass");
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list","galaxy")
+	SOFTWARE_LIST(config, "cass_list").set_original("galaxy");
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("38K");
-MACHINE_CONFIG_END
+}
 
 ROM_START (galaxy)
 	ROM_REGION (0x10000, "maincpu", ROMREGION_ERASEFF)

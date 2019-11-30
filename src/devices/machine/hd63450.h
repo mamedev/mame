@@ -8,64 +8,25 @@
 
 #pragma once
 
-
-
-#define MCFG_HD63450_DMA_END_CB(_devcb) \
-	downcast<hd63450_device &>(*device).set_dma_end_callback(DEVCB_##_devcb);
-
-#define MCFG_HD63450_DMA_ERROR_CB(_devcb) \
-	downcast<hd63450_device &>(*device).set_dma_error_callback(DEVCB_##_devcb);
-
-#define MCFG_HD63450_DMA_READ_0_CB(_devcb) \
-	downcast<hd63450_device &>(*device).set_dma_read_callback<0>(DEVCB_##_devcb);
-
-#define MCFG_HD63450_DMA_READ_1_CB(_devcb) \
-	downcast<hd63450_device &>(*device).set_dma_read_callback<1>(DEVCB_##_devcb);
-
-#define MCFG_HD63450_DMA_READ_2_CB(_devcb) \
-	downcast<hd63450_device &>(*device).set_dma_read_callback<2>(DEVCB_##_devcb);
-
-#define MCFG_HD63450_DMA_READ_3_CB(_devcb) \
-	downcast<hd63450_device &>(*device).set_dma_read_callback<3>(DEVCB_##_devcb);
-
-#define MCFG_HD63450_DMA_WRITE_0_CB(_devcb) \
-	downcast<hd63450_device &>(*device).set_dma_write_callback<0>(DEVCB_##_devcb);
-
-#define MCFG_HD63450_DMA_WRITE_1_CB(_devcb) \
-	downcast<hd63450_device &>(*device).set_dma_write_callback<1>(DEVCB_##_devcb);
-
-#define MCFG_HD63450_DMA_WRITE_2_CB(_devcb) \
-	downcast<hd63450_device &>(*device).set_dma_write_callback<2>(DEVCB_##_devcb);
-
-#define MCFG_HD63450_DMA_WRITE_3_CB(_devcb) \
-	downcast<hd63450_device &>(*device).set_dma_write_callback<3>(DEVCB_##_devcb);
-
-#define MCFG_HD63450_CPU(_tag) \
-	downcast<hd63450_device &>(*device).set_cpu_tag(_tag);
-
-#define MCFG_HD63450_CLOCKS(_clk1, _clk2, _clk3, _clk4) \
-	downcast<hd63450_device &>(*device).set_our_clocks(_clk1, _clk2, _clk3, _clk4);
-
-#define MCFG_HD63450_BURST_CLOCKS(_clk1, _clk2, _clk3, _clk4) \
-	downcast<hd63450_device &>(*device).set_burst_clocks(_clk1, _clk2, _clk3, _clk4);
-
 class hd63450_device : public device_t
 {
 public:
+	template <typename T>
+	hd63450_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cputag)
+		: hd63450_device(mconfig, tag, owner, clock)
+	{
+		set_cpu_tag(std::forward<T>(cputag));
+	}
+
 	hd63450_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_dma_end_callback(Object &&cb) { return m_dma_end.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_dma_error_callback(Object &&cb) { return m_dma_error.set_callback(std::forward<Object>(cb)); }
-	template <int Ch, class Object> devcb_base &set_dma_read_callback(Object &&cb) { return m_dma_read[Ch].set_callback(std::forward<Object>(cb)); }
-	template <int Ch, class Object> devcb_base &set_dma_write_callback(Object &&cb) { return m_dma_write[Ch].set_callback(std::forward<Object>(cb)); }
-
+	auto irq_callback() { return m_irq_callback.bind(); }
 	auto dma_end() { return m_dma_end.bind(); }
-	auto dma_error() { return m_dma_error.bind(); }
 	template<int Ch> auto dma_read() { return m_dma_read[Ch].bind(); }
 	template<int Ch> auto dma_write() { return m_dma_write[Ch].bind(); }
 
 	template <typename T> void set_cpu_tag(T &&cpu_tag) { m_cpu.set_tag(std::forward<T>(cpu_tag)); }
-	void set_our_clocks(const attotime &clk1, const attotime &clk2, const attotime &clk3, const attotime &clk4)
+	void set_clocks(const attotime &clk1, const attotime &clk2, const attotime &clk3, const attotime &clk4)
 	{
 		m_our_clock[0] = clk1;
 		m_our_clock[1] = clk2;
@@ -86,11 +47,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(drq1_w);
 	DECLARE_WRITE_LINE_MEMBER(drq2_w);
 	DECLARE_WRITE_LINE_MEMBER(drq3_w);
+	uint8_t iack();
 
 	void single_transfer(int x);
 	void set_timer(int channel, const attotime &tm);
-	int get_vector(int channel);
-	int get_error_vector(int channel);
 
 protected:
 	// device-level overrides
@@ -120,8 +80,8 @@ private:
 		uint8_t gcr;  // [3f]  General Control Register (R/W)
 	};
 
+	devcb_write_line m_irq_callback;
 	devcb_write8 m_dma_end;
-	devcb_write8 m_dma_error;
 	devcb_read8 m_dma_read[4];
 	devcb_write8 m_dma_write[4];
 
@@ -136,6 +96,8 @@ private:
 	required_device<cpu_device> m_cpu;
 	bool m_drq_state[4];
 
+	int8_t m_irq_channel;
+
 	// tell if a channel is in use
 	bool dma_in_progress(int channel) const { return (m_reg[channel].csr & 0x08) != 0; }
 
@@ -144,6 +106,11 @@ private:
 	void dma_transfer_halt(int channel);
 	void dma_transfer_continue(int channel);
 	void dma_transfer_start(int channel);
+	void set_error(int channel, uint8_t code);
+
+	// interrupt helpers
+	void set_irq(int channel);
+	void clear_irq(int channel);
 };
 
 DECLARE_DEVICE_TYPE(HD63450, hd63450_device)

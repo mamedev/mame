@@ -50,7 +50,7 @@ public:
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	void set_gtia_tag(const char *tag) { m_gtia.set_tag(tag); }
+	template <typename T> void set_gtia_tag(T &&tag) { m_gtia.set_tag(std::forward<T>(tag)); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -161,7 +161,7 @@ private:
 	uint8_t   m_cclock[256+32];     /* color clock buffer filled by ANTIC */
 	uint8_t   m_pmbits[256+32];     /* player missile buffer filled by GTIA */
 	std::unique_ptr<uint8_t[]>   m_prio_table[64];    /* player/missile priority tables */
-	VIDEO   *m_video[312];        /* video buffer */
+	std::unique_ptr<VIDEO[]>     m_video;             /* video buffer */
 	std::unique_ptr<uint32_t[]>  m_cclk_expand;       /* shared buffer for the following: */
 	uint32_t  *m_pf_21;             /* 1cclk 2 color txt 2,3 */
 	uint32_t  *m_pf_x10b;           /* 1cclk 4 color txt 4,5, gfx D,E */
@@ -207,26 +207,5 @@ private:
 
 // device type definition
 DECLARE_DEVICE_TYPE(ATARI_ANTIC, antic_device)
-
-
-
-#define MCFG_ANTIC_GTIA(_tag) \
-		downcast<antic_device &>(*device).set_gtia_tag(_tag);
-
-#define MCFG_SCREEN_VISIBLE_AREA_ANTIC() \
-		MCFG_SCREEN_VISIBLE_AREA(antic_device::MIN_X, antic_device::MAX_X, antic_device::MIN_Y, antic_device::MAX_Y)
-
-#define MCFG_SCREEN_REFRESH_RATE_ANTIC_50HZ() \
-		MCFG_SCREEN_REFRESH_RATE(antic_device::FRAME_RATE_50HZ)
-
-#define MCFG_SCREEN_REFRESH_RATE_ANTIC_60HZ() \
-		MCFG_SCREEN_REFRESH_RATE(antic_device::FRAME_RATE_60HZ)
-
-#define MCFG_SCREEN_SIZE_ANTIC_50HZ() \
-		MCFG_SCREEN_SIZE(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_50HZ)
-
-#define MCFG_SCREEN_SIZE_ANTIC_60HZ() \
-		MCFG_SCREEN_SIZE(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_60HZ)
-
 
 #endif // MAME_VIDEO_ANTIC_H

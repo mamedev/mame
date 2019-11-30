@@ -16,24 +16,24 @@
 
 WRITE8_MEMBER(orbit_state::note_w)
 {
-	m_discrete->write(space, ORBIT_NOTE_FREQ, (~data) & 0xff);
+	m_discrete->write(ORBIT_NOTE_FREQ, (~data) & 0xff);
 }
 
 WRITE8_MEMBER(orbit_state::note_amp_w)
 {
-	m_discrete->write(space, ORBIT_ANOTE1_AMP, data & 0x0f);
-	m_discrete->write(space, ORBIT_ANOTE2_AMP, data >> 4);
+	m_discrete->write(ORBIT_ANOTE1_AMP, data & 0x0f);
+	m_discrete->write(ORBIT_ANOTE2_AMP, data >> 4);
 }
 
 WRITE8_MEMBER(orbit_state::noise_amp_w)
 {
-	m_discrete->write(space, ORBIT_NOISE1_AMP, data & 0x0f);
-	m_discrete->write(space, ORBIT_NOISE2_AMP, data >> 4);
+	m_discrete->write(ORBIT_NOISE1_AMP, data & 0x0f);
+	m_discrete->write(ORBIT_NOISE2_AMP, data >> 4);
 }
 
 WRITE8_MEMBER(orbit_state::noise_rst_w)
 {
-	m_discrete->write(space, ORBIT_NOISE_EN, 0);
+	m_discrete->write(ORBIT_NOISE_EN, 0);
 }
 
 

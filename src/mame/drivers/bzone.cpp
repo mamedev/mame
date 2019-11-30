@@ -16,7 +16,7 @@
 
     Battlezone memory map (preliminary)
 
-    0000-04ff RAM
+    0000-03ff RAM
     0800      IN0
     0a00      IN1
     0c00      IN2
@@ -214,7 +214,6 @@
 #include "video/vector.h"
 #include "video/avgdvg.h"
 #include "sound/pokey.h"
-#include "screen.h"
 #include "speaker.h"
 
 #include "bzone.lh"
@@ -243,7 +242,7 @@ void redbaron_state::machine_start()
 
 void redbaron_state::machine_reset()
 {
-	earom_control_w(machine().dummy_space(), 0, 0);
+	earom_control_w(0);
 }
 
 
@@ -268,13 +267,13 @@ INTERRUPT_GEN_MEMBER(bzone_state::bzone_interrupt)
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(bzone_state::clock_r)
+READ_LINE_MEMBER(bzone_state::clock_r)
 {
 	return (m_maincpu->total_cycles() & 0x100) ? 1 : 0;
 }
 
 
-WRITE8_MEMBER(bzone_state::bzone_coin_counter_w)
+void bzone_state::bzone_coin_counter_w(offs_t offset, uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(offset,data);
 }
@@ -287,15 +286,15 @@ WRITE8_MEMBER(bzone_state::bzone_coin_counter_w)
  *
  *************************************/
 
-READ8_MEMBER(redbaron_state::redbaron_joy_r)
+uint8_t redbaron_state::redbaron_joy_r()
 {
 	return m_fake_ports[m_rb_input_select ? 0 : 1]->read();
 }
 
-WRITE8_MEMBER(redbaron_state::redbaron_joysound_w)
+void redbaron_state::redbaron_joysound_w(uint8_t data)
 {
 	m_rb_input_select = data & 1;
-	m_redbaronsound->sounds_w(space, offset, data);
+	m_redbaronsound->sounds_w(data);
 }
 
 
@@ -306,18 +305,18 @@ WRITE8_MEMBER(redbaron_state::redbaron_joysound_w)
  *
  *************************************/
 
-READ8_MEMBER(redbaron_state::earom_read)
+uint8_t redbaron_state::earom_read()
 {
 	return m_earom->data();
 }
 
-WRITE8_MEMBER(redbaron_state::earom_write)
+void redbaron_state::earom_write(offs_t offset, uint8_t data)
 {
 	m_earom->set_address((offset ^ 0x20) & 0x3f);
 	m_earom->set_data(data);
 }
 
-WRITE8_MEMBER(redbaron_state::earom_control_w)
+void redbaron_state::earom_control_w(uint8_t data)
 {
 	// CK = EDB0, C1 = /EDB2, C2 = EDB1, CS1 = EDB3, /CS2 = GND
 	m_earom->set_control(BIT(data, 3), 1, !BIT(data, 2), BIT(data, 1));
@@ -349,7 +348,7 @@ void bzone_state::bzone_map(address_map &map)
 	map(0x1820, 0x182f).rw("pokey", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x1840, 0x1840).w(FUNC(bzone_state::bzone_sounds_w));
 	map(0x1860, 0x187f).w(m_mathbox, FUNC(mathbox_device::go_w));
-	map(0x2000, 0x2fff).ram().share("vectorram").region("maincpu", 0x2000);
+	map(0x2000, 0x2fff).ram().share("avg:vectorram").region("maincpu", 0x2000);
 	map(0x3000, 0x7fff).rom();
 }
 
@@ -370,11 +369,11 @@ void redbaron_state::redbaron_map(address_map &map)
 	map(0x1806, 0x1806).r("mathbox", FUNC(mathbox_device::hi_r));
 	map(0x1808, 0x1808).w(FUNC(redbaron_state::redbaron_joysound_w));  /* and select joystick pot also */
 	map(0x180a, 0x180a).nopw();                /* sound reset, yet todo */
-	map(0x180c, 0x180c).w(FUNC(redbaron_state::earom_control_w));
+	map(0x180c, 0x180c).nopr().w(FUNC(redbaron_state::earom_control_w));
 	map(0x1810, 0x181f).rw("pokey", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x1820, 0x185f).rw(FUNC(redbaron_state::earom_read), FUNC(redbaron_state::earom_write));
-	map(0x1860, 0x187f).w("mathbox", FUNC(mathbox_device::go_w));
-	map(0x2000, 0x2fff).ram().share("vectorram").region("maincpu", 0x2000);
+	map(0x1860, 0x187f).nopr().w("mathbox", FUNC(mathbox_device::go_w));
+	map(0x2000, 0x2fff).ram().share("avg:vectorram").region("maincpu", 0x2000);
 	map(0x3000, 0x7fff).rom();
 }
 
@@ -395,9 +394,9 @@ void redbaron_state::redbaron_map(address_map &map)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Diagnostic Step") \
 	/* bit 6 is the VG HALT bit. We set it to "low" */\
 	/* per default (busy vector processor). */\
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER("avg", avg_bzone_device, done_r, nullptr)\
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("avg", avg_bzone_device, done_r)\
 	/* bit 7 is tied to a 3kHz clock */\
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, bzone_state,clock_r, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(bzone_state, clock_r)
 
 
 #define BZONEDSW0\
@@ -569,66 +568,61 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(bzone_state::bzone_base)
-
+void bzone_state::bzone_base(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, BZONE_MASTER_CLOCK / 8)
-	MCFG_DEVICE_PROGRAM_MAP(bzone_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(bzone_state, bzone_interrupt,  BZONE_CLOCK_3KHZ / 12)
+	M6502(config, m_maincpu, BZONE_MASTER_CLOCK / 8);
+	m_maincpu->set_addrmap(AS_PROGRAM, &bzone_state::bzone_map);
+	m_maincpu->set_periodic_int(FUNC(bzone_state::bzone_interrupt), attotime::from_hz(BZONE_CLOCK_3KHZ / 12));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_VECTOR_ADD("vector")
-	MCFG_SCREEN_ADD("screen", VECTOR)
-	MCFG_SCREEN_REFRESH_RATE(BZONE_CLOCK_3KHZ / 12 / 6)
-	MCFG_SCREEN_SIZE(400, 300)
-	MCFG_SCREEN_VISIBLE_AREA(0, 580, 0, 400)
-	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
+	VECTOR(config, "vector");
+	SCREEN(config, m_screen, SCREEN_TYPE_VECTOR);
+	m_screen->set_refresh_hz(BZONE_CLOCK_3KHZ / 12 / 6);
+	m_screen->set_size(400, 300);
+	m_screen->set_visarea(0, 580, 0, 400);
+	m_screen->set_screen_update("vector", FUNC(vector_device::screen_update));
 
-	MCFG_DEVICE_ADD("avg", AVG_BZONE, 0)
-	MCFG_AVGDVG_VECTOR("vector")
+	avg_device &avg(AVG_BZONE(config, "avg", 0));
+	avg.set_vector_tag("vector");
 
 	/* Drivers */
-	MCFG_MATHBOX_ADD("mathbox")
+	MATHBOX(config, m_mathbox, 0);
+}
 
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(bzone_state::bzone)
+void bzone_state::bzone(machine_config &config)
+{
 	bzone_base(config);
 
 	/* sound hardware */
 	bzone_audio(config);
+}
 
-MACHINE_CONFIG_END
-
-
-
-MACHINE_CONFIG_START(redbaron_state::redbaron)
+void redbaron_state::redbaron(machine_config &config)
+{
 	bzone_base(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(redbaron_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &redbaron_state::redbaron_map);
 
-	MCFG_DEVICE_ADD("earom", ER2055)
+	ER2055(config, m_earom);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(BZONE_CLOCK_3KHZ / 12 / 4)
-	MCFG_SCREEN_VISIBLE_AREA(0, 520, 0, 400)
+	m_screen->set_refresh_hz(BZONE_CLOCK_3KHZ / 12 / 4);
+	m_screen->set_visarea(0, 520, 0, 400);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("pokey", POKEY, 1500000)
-	MCFG_POKEY_ALLPOT_R_CB(READ8(*this, redbaron_state, redbaron_joy_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	pokey_device &pokey(POKEY(config, "pokey", 1500000));
+	pokey.allpot_r().set(FUNC(redbaron_state::redbaron_joy_r));
+	pokey.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("custom", REDBARON, 0)
-
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	REDBARON(config, m_redbaronsound, 0);
+	m_redbaronsound->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
 
@@ -669,10 +663,10 @@ ROM_START( bzone ) /* Analog Vec Gen A035742-02 */
 	ROM_LOAD( "036409-01.n1",  0x7800, 0x0800, CRC(1e14e919) SHA1(448fab30535e6fad7e0ab4427bc06bbbe075e797) )
 	/* Vector Generator ROMs */
 	ROM_LOAD( "036422-01.bc3", 0x3000, 0x0800, CRC(7414177b) SHA1(147d97a3b475e738ce00b1a7909bbd787ad06eda) )
-	ROM_LOAD( "036421-01.a3",  0x3800, 0x0800, CRC(8ea8f939) SHA1(b71e0ab0e220c3e64dc2b094c701fb1a960b64e4) )
+	ROM_LOAD( "036421-01.a3",  0x3800, 0x0800, CRC(8ea8f939) SHA1(b71e0ab0e220c3e64dc2b094c701fb1a960b64e4) )  // 036421-01e.a3 same contents
 
 	/* AVG PROM */
-	ROM_REGION( 0x100, "user1", 0 )
+	ROM_REGION( 0x100, "avg:prom", 0 )
 	ROM_LOAD( "036408-01.k7",   0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 
 	/* Mathbox PROMs */
@@ -699,10 +693,10 @@ ROM_START( bzonea ) /* Analog Vec Gen A035742-02 */
 	ROM_LOAD( "036409-01.n1",  0x7800, 0x0800, CRC(1e14e919) SHA1(448fab30535e6fad7e0ab4427bc06bbbe075e797) )
 	/* Vector Generator ROMs */
 	ROM_LOAD( "036422-01.bc3", 0x3000, 0x0800, CRC(7414177b) SHA1(147d97a3b475e738ce00b1a7909bbd787ad06eda) )
-	ROM_LOAD( "036421-01.a3",  0x3800, 0x0800, CRC(8ea8f939) SHA1(b71e0ab0e220c3e64dc2b094c701fb1a960b64e4) )
+	ROM_LOAD( "036421-01.a3",  0x3800, 0x0800, CRC(8ea8f939) SHA1(b71e0ab0e220c3e64dc2b094c701fb1a960b64e4) )  // 036421-01e.a3 same contents
 
 	/* AVG PROM */
-	ROM_REGION( 0x100, "user1", 0 )
+	ROM_REGION( 0x100, "avg:prom", 0 )
 	ROM_LOAD( "036408-01.k7",   0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 
 	/* Mathbox PROMs */
@@ -733,7 +727,7 @@ ROM_START( bzonec ) /* cocktail version */
 	ROM_LOAD( "bz3b3800",   0x3800, 0x0800, CRC(76cf57f6) SHA1(1b8f3fcd664ed04ce60d94fdf27e56b20d52bdbd) )
 
 	/* AVG PROM */
-	ROM_REGION( 0x100, "user1", 0 )
+	ROM_REGION( 0x100, "avg:prom", 0 )
 	ROM_LOAD( "036408-01.k7",   0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 
 	/* Mathbox PROMs */
@@ -765,7 +759,7 @@ ROM_START( bradley )
 	ROM_LOAD( "bta3.bin",   0x3800, 0x0800, CRC(d669d796) SHA1(ad606882320cd13612c7962d4718680fe5a35dd3) )
 
 	/* AVG PROM */
-	ROM_REGION( 0x100, "user1", 0 )
+	ROM_REGION( 0x100, "avg:prom", 0 )
 	ROM_LOAD( "036408-01.k7",   0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 
 	/* Mathbox PROMs */
@@ -819,7 +813,7 @@ ROM_START( redbaron ) /* Analog Vec Gen A035742-02 Rev. C+ */
 	ROM_LOAD( "037007-01.a3",  0x3800, 0x0800, CRC(60250ede) SHA1(9c48952bd69863bee0c6dce09f3613149e0151ef) )
 
 	/* AVG PROM */
-	ROM_REGION( 0x100, "user1", 0 )
+	ROM_REGION( 0x100, "avg:prom", 0 )
 	ROM_LOAD( "036408-01.k7", 0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) ) /* 74S287N or compatible bprom like the 82S129 */
 
 	/* Mathbox PROMs */
@@ -853,7 +847,7 @@ ROM_START( redbarona ) /* Analog Vec Gen A035742-02 */
 	ROM_LOAD( "037007-01e.a3",  0x3800, 0x0800, CRC(60250ede) SHA1(9c48952bd69863bee0c6dce09f3613149e0151ef) )
 
 	/* AVG PROM */
-	ROM_REGION( 0x100, "user1", 0 )
+	ROM_REGION( 0x100, "avg:prom", 0 )
 	ROM_LOAD( "036408-01.k7", 0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) ) /* 74S287N or compatible bprom like the 82S129 */
 
 	/* Mathbox PROMs */
@@ -881,13 +875,13 @@ ROM_END
  *
  *************************************/
 
-READ8_MEMBER(bzone_state::analog_data_r)
+uint8_t bzone_state::analog_data_r()
 {
 	return m_analog_data;
 }
 
 
-WRITE8_MEMBER(bzone_state::analog_select_w)
+void bzone_state::analog_select_w(offs_t offset, uint8_t data)
 {
 	static const char *const analog_port[] = { "AN0", "AN1", "AN2" };
 
@@ -902,8 +896,8 @@ void bzone_state::init_bradley()
 	space.install_ram(0x400, 0x7ff);
 	space.install_read_port(0x1808, 0x1808, "1808");
 	space.install_read_port(0x1809, 0x1809, "1809");
-	space.install_read_handler(0x180a, 0x180a, read8_delegate(FUNC(bzone_state::analog_data_r),this));
-	space.install_write_handler(0x1848, 0x1850, write8_delegate(FUNC(bzone_state::analog_select_w),this));
+	space.install_read_handler(0x180a, 0x180a, read8smo_delegate(*this, FUNC(bzone_state::analog_data_r)));
+	space.install_write_handler(0x1848, 0x1850, write8sm_delegate(*this, FUNC(bzone_state::analog_select_w)));
 }
 
 

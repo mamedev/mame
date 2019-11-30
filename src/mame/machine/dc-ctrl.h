@@ -7,25 +7,6 @@
 
 #include "mapledev.h"
 
-#define MCFG_DC_CONTROLLER_ADD(_tag, _host_tag, _host_port, d0, d1, a0, a1, a2, a3, a4, a5) \
-	MCFG_MAPLE_DEVICE_ADD(_tag, DC_CONTROLLER, 0, _host_tag, _host_port) \
-	downcast<dc_common_device &>(*device).set_port_tag(0, d0); \
-	downcast<dc_common_device &>(*device).set_port_tag(1, d1); \
-	downcast<dc_common_device &>(*device).set_port_tag(2, a0); \
-	downcast<dc_common_device &>(*device).set_port_tag(3, a1); \
-	downcast<dc_common_device &>(*device).set_port_tag(4, a2); \
-	downcast<dc_common_device &>(*device).set_port_tag(5, a3); \
-	downcast<dc_common_device &>(*device).set_port_tag(6, a4); \
-	downcast<dc_common_device &>(*device).set_port_tag(7, a5);
-
-#define MCFG_DC_CONTROLLER_SET_MODEL(name) \
-	downcast<dc_common_device &>(*device).set_model(name);
-
-#define MCFG_DC_CONTROLLER_SET_LICENSE(license) \
-	downcast<dc_common_device &>(*device).set_license(license);
-
-#define MCFG_DC_CONTROLLER_SET_VERSIONS(versions) \
-	ddowncast<dc_common_device &>(*device).set_versions(versions);
 
 class dc_common_device : public maple_device
 {
@@ -33,7 +14,15 @@ public:
 	// construction/destruction
 	dc_common_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	void set_port_tag(int port, const char *tag) { port_tag[port] = tag; }
+	template <uint8_t Which, typename T>
+	void set_port_tag(T &&port_tag) { port[Which].set_tag(std::forward<T>(port_tag)); }
+	template <uint8_t First = 0U, typename T, typename... U>
+	void set_port_tags(T &&first_tag, U &&... other_tags)
+	{
+		set_port_tag<First>(std::forward<T>(first_tag));
+		set_port_tags<First + 1>(std::forward<U>(other_tags)...);
+	}
+
 	// TODO: we probably don't need these setters
 	void set_model(const char *new_id) { model = new_id; }
 	void set_license(const char *new_license) { license = new_license; }
@@ -42,16 +31,17 @@ public:
 	void maple_w(const uint32_t *data, uint32_t in_size) override;
 
 protected:
+	template <uint8_t First> void set_port_tags() { }
+
 	// device-level overrides
 	virtual void device_start() override;
 
-	const char *port_tag[8];
 	const char *model, *license, *versions;
 	uint32_t id;
 	uint32_t electric_current;
 	uint32_t region;
 
-	ioport_port *port[8];
+	optional_ioport_array<8> port;
 
 	virtual void fixed_status(uint32_t *dest) = 0;
 	virtual void free_status(uint32_t *dest) = 0;
@@ -62,6 +52,14 @@ class dc_controller_device : public dc_common_device
 {
 public:
 	// construction/destruction
+	template <typename T>
+	dc_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&host_tag, int host_port)
+		: dc_controller_device(mconfig, tag, owner, clock)
+	{
+		host.set_tag(std::forward<T>(host_tag));
+		set_host_port(host_port);
+	}
+
 	dc_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 private:
@@ -70,22 +68,19 @@ private:
 	void read(uint32_t *dest) override;
 };
 
-#define MCFG_DC_KEYBOARD_ADD(_tag, _host_tag, _host_port, d0, d1, a0, a1, a2, a3, a4, a5) \
-	MCFG_MAPLE_DEVICE_ADD(_tag, DC_KEYBOARD, 0, _host_tag, _host_port) \
-	downcast<dc_common_device &>(*device).set_port_tag(0, d0); \
-	downcast<dc_common_device &>(*device).set_port_tag(1, d1); \
-	downcast<dc_common_device &>(*device).set_port_tag(2, a0); \
-	downcast<dc_common_device &>(*device).set_port_tag(3, a1); \
-	downcast<dc_common_device &>(*device).set_port_tag(4, a2); \
-	downcast<dc_common_device &>(*device).set_port_tag(5, a3); \
-	downcast<dc_common_device &>(*device).set_port_tag(6, a4); \
-	downcast<dc_common_device &>(*device).set_port_tag(7, a5);
-
 
 class dc_keyboard_device : public dc_common_device
 {
 public:
 	// construction/destruction
+	template <typename T>
+	dc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&host_tag, int host_port)
+		: dc_keyboard_device(mconfig, tag, owner, clock)
+	{
+		host.set_tag(std::forward<T>(host_tag));
+		set_host_port(host_port);
+	}
+
 	dc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 //protected:

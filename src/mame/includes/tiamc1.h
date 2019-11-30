@@ -8,6 +8,7 @@
 #include "machine/pit8253.h"
 #include "sound/spkrdev.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class tiamc1_state : public driver_device
 {
@@ -22,6 +23,10 @@ public:
 
 	void kot(machine_config &config);
 	void tiamc1(machine_config &config);
+
+protected:
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 private:
 	std::unique_ptr<uint8_t[]> m_videoram;
@@ -56,10 +61,8 @@ private:
 
 	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	DECLARE_VIDEO_START(kot);
-	DECLARE_PALETTE_INIT(tiamc1);
+	void tiamc1_palette(palette_device &palette);
 	uint32_t screen_update_tiamc1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_kot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);

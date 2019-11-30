@@ -32,11 +32,11 @@
 class kontest_state : public driver_device
 {
 public:
-	kontest_state(const machine_config &mconfig, device_type type, const char *tag)
-			: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_ram(*this, "ram"),
-			m_palette(*this, "palette")
+	kontest_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_ram(*this, "ram"),
+		m_palette(*this, "palette")
 	{ }
 
 	void kontest(machine_config &config);
@@ -65,7 +65,7 @@ private:
 
 	virtual void video_start() override;
 
-	DECLARE_PALETTE_INIT(kontest);
+	void kontest_palette(palette_device &palette) const;
 	INTERRUPT_GEN_MEMBER(kontest_interrupt);
 };
 
@@ -76,26 +76,25 @@ private:
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(kontest_state, kontest)
+void kontest_state::kontest_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	int bit0, bit1, bit2 , r, g, b;
-	int i;
-
-	for (i = 0; i < 0x20; ++i)
+	for (int i = 0; i < 0x20; ++i)
 	{
+		int bit0, bit1, bit2;
+
 		bit0 = 0;
-		bit1 = (color_prom[i] >> 6) & 0x01;
-		bit2 = (color_prom[i] >> 7) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		bit0 = (color_prom[i] >> 3) & 0x01;
-		bit1 = (color_prom[i] >> 4) & 0x01;
-		bit2 = (color_prom[i] >> 5) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		bit0 = (color_prom[i] >> 0) & 0x01;
-		bit1 = (color_prom[i] >> 1) & 0x01;
-		bit2 = (color_prom[i] >> 2) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit1 = BIT(color_prom[i], 6);
+		bit2 = BIT(color_prom[i], 7);
+		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = BIT(color_prom[i], 3);
+		bit1 = BIT(color_prom[i], 4);
+		bit2 = BIT(color_prom[i], 5);
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		bit2 = BIT(color_prom[i], 2);
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -180,8 +179,8 @@ void kontest_state::kontest_map(address_map &map)
 void kontest_state::kontest_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w("sn1", FUNC(sn76489a_device::command_w));
-	map(0x04, 0x04).w("sn2", FUNC(sn76489a_device::command_w));
+	map(0x00, 0x00).w("sn1", FUNC(sn76489a_device::write));
+	map(0x04, 0x04).w("sn2", FUNC(sn76489a_device::write));
 	map(0x08, 0x08).w(FUNC(kontest_state::control_w));
 	map(0x0c, 0x0c).portr("IN0");
 	map(0x0d, 0x0d).portr("IN1");
@@ -255,35 +254,32 @@ void kontest_state::machine_reset()
 	m_control = 0;
 }
 
-MACHINE_CONFIG_START(kontest_state::kontest)
-
+void kontest_state::kontest(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,MAIN_CLOCK/8)
-	MCFG_DEVICE_PROGRAM_MAP(kontest_map)
-	MCFG_DEVICE_IO_MAP(kontest_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", kontest_state,  kontest_interrupt)
+	Z80(config, m_maincpu, MAIN_CLOCK/8);
+	m_maincpu->set_addrmap(AS_PROGRAM, &kontest_state::kontest_map);
+	m_maincpu->set_addrmap(AS_IO, &kontest_state::kontest_io);
+	m_maincpu->set_vblank_int("screen", FUNC(kontest_state::kontest_interrupt));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_UPDATE_DRIVER(kontest_state, screen_update)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_screen_update(FUNC(kontest_state::screen_update));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
 
-	MCFG_PALETTE_ADD("palette", 32)
-	MCFG_PALETTE_INIT_OWNER(kontest_state, kontest)
+	PALETTE(config, m_palette, FUNC(kontest_state::kontest_palette), 32);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("sn1", SN76489A, MAIN_CLOCK/16)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	SN76489A(config, "sn1", MAIN_CLOCK/16).add_route(ALL_OUTPUTS, "rspeaker", 0.50);
 
-	MCFG_DEVICE_ADD("sn2", SN76489A, MAIN_CLOCK/16)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-MACHINE_CONFIG_END
+	SN76489A(config, "sn2", MAIN_CLOCK/16).add_route(ALL_OUTPUTS, "lspeaker", 0.50);
+}
 
 
 /***************************************************************************

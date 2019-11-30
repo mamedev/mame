@@ -154,7 +154,7 @@ void amiga_state::machine_start()
 	m_power_led.resolve();
 
 	// add callback for RESET instruction
-	m_maincpu->set_reset_callback(write_line_delegate(FUNC(amiga_state::m68k_reset), this));
+	m_maincpu->set_reset_callback(*this, FUNC(amiga_state::m68k_reset));
 
 	// set up chip RAM access
 	memory_share *share = memshare("chip_ram");
@@ -298,16 +298,11 @@ TIMER_CALLBACK_MEMBER( amiga_state::scanline_callback )
 	// render up to this scanline
 	if (!m_screen->update_partial(scanline))
 	{
+		bitmap_rgb32 dummy_bitmap;
 		if (IS_AGA())
-		{
-			bitmap_rgb32 dummy_bitmap;
 			aga_render_scanline(dummy_bitmap, scanline);
-		}
 		else
-		{
-			bitmap_ind16 dummy_bitmap;
 			render_scanline(dummy_bitmap, scanline);
-		}
 	}
 
 	// clock tod (if we actually render this scanline)
@@ -416,21 +411,6 @@ uint16_t amiga_state::joy1dat_r()
 		return m_joy1dat_port.read_safe(0xffff);
 	else
 		return (m_p2_mouse_y.read_safe(0xff) << 8) | m_p2_mouse_x.read_safe(0xff);
-}
-
-CUSTOM_INPUT_MEMBER( amiga_state::amiga_joystick_convert )
-{
-	uint8_t bits = m_joy_ports[(int)(uintptr_t)param].read_safe(0xff);
-
-	int up = (bits >> 0) & 1;
-	int down = (bits >> 1) & 1;
-	int left = (bits >> 2) & 1;
-	int right = (bits >> 3) & 1;
-
-	if (left) up ^= 1;
-	if (right) down ^= 1;
-
-	return down | (right << 1) | (up << 8) | (left << 9);
 }
 
 
@@ -1052,10 +1032,10 @@ READ16_MEMBER( amiga_state::cia_r )
 	uint16_t data = 0;
 
 	if ((offset & 0x1000/2) == 0 && ACCESSING_BITS_0_7)
-		data |= m_cia_0->read(space, offset >> 7);
+		data |= m_cia_0->read(offset >> 7);
 
 	if ((offset & 0x2000/2) == 0 && ACCESSING_BITS_8_15)
-		data |= m_cia_1->read(space, offset >> 7) << 8;
+		data |= m_cia_1->read(offset >> 7) << 8;
 
 	if (LOG_CIA)
 		logerror("%s: cia_r(%06x) = %04x & %04x\n", machine().describe_context(), offset, data, mem_mask);
@@ -1069,10 +1049,10 @@ WRITE16_MEMBER( amiga_state::cia_w )
 		logerror("%s: cia_w(%06x) = %04x & %04x\n", machine().describe_context(), offset, data, mem_mask);
 
 	if ((offset & 0x1000/2) == 0 && ACCESSING_BITS_0_7)
-		m_cia_0->write(space, offset >> 7, data & 0xff);
+		m_cia_0->write(offset >> 7, data & 0xff);
 
 	if ((offset & 0x2000/2) == 0 && ACCESSING_BITS_8_15)
-		m_cia_1->write(space, offset >> 7, data >> 8);
+		m_cia_1->write(offset >> 7, data >> 8);
 }
 
 WRITE16_MEMBER( amiga_state::gayle_cia_w )

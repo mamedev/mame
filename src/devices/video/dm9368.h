@@ -23,19 +23,6 @@
 #pragma once
 
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_DM9368_UPDATE_CALLBACK(cb) \
-		downcast<dm9368_device &>(*device).set_update_callback(DEVCB_##cb);
-
-#define MCFG_DM9368_RBO_CALLBACK(cb) \
-		downcast<dm9368_device &>(*device).set_rbo_callback(DEVCB_##cb);
-
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -45,8 +32,8 @@
 class dm9368_device : public device_t
 {
 public:
-	template <typename Obj> devcb_base &set_update_callback(Obj &&cb) { return m_update_cb.set_callback(std::forward<Obj>(cb)); }
-	template <typename Obj> devcb_base &set_rbo_callback(Obj &&cb) { return m_rbo_cb.set_callback(std::forward<Obj>(cb)); }
+	auto update_cb() { return m_update_cb.bind(); }
+	auto rbo_cb() { return m_rbo_cb.bind(); }
 
 	// construction/destruction
 	dm9368_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);

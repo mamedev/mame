@@ -17,6 +17,8 @@
 #include "machine/autoconfig.h"
 
 
+namespace bus { namespace amiga { namespace zorro {
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -30,8 +32,8 @@ public:
 	a2052_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_start() override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 	// device_zorro2_card_interface overrides
 	virtual DECLARE_WRITE_LINE_MEMBER( cfgin_w ) override;
@@ -44,7 +46,9 @@ private:
 	std::vector<uint16_t> m_ram;
 };
 
+} } } // namespace bus::amiga::zorro
+
 // device type definition
-DECLARE_DEVICE_TYPE(A2052, a2052_device)
+DECLARE_DEVICE_TYPE_NS(ZORRO_A2052, bus::amiga::zorro, a2052_device)
 
 #endif // MAME_BUS_AMIGA_ZORRO_A2052_H

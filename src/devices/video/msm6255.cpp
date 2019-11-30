@@ -63,7 +63,8 @@ void msm6255_device::map(address_map &map)
 // default address map
 void msm6255_device::msm6255(address_map &map)
 {
-	map(0x00000, 0xfffff).ram();
+	if (!has_configured_map(0))
+		map(0x00000, 0xfffff).ram();
 }
 
 
@@ -80,7 +81,7 @@ msm6255_device::msm6255_device(const machine_config &mconfig, const char *tag, d
 	device_t(mconfig, MSM6255, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
-	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 20, 0, address_map_constructor(), address_map_constructor(FUNC(msm6255_device::msm6255), this)),
+	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 20, 0, address_map_constructor(FUNC(msm6255_device::msm6255), this)),
 	m_cursor(0)
 {
 }

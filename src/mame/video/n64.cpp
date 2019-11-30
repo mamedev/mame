@@ -600,7 +600,7 @@ void n64_rdp::set_blender_input(int32_t cycle, int32_t which, color_t** input_rg
 	}
 }
 
-const uint8_t n64_rdp::s_bayer_matrix[16] =
+uint8_t const n64_rdp::s_bayer_matrix[16] =
 { /* Bayer matrix */
 		0,  4,  1, 5,
 		6,  2,  7, 3,
@@ -608,7 +608,7 @@ const uint8_t n64_rdp::s_bayer_matrix[16] =
 		7,  3,  6, 2
 };
 
-const uint8_t n64_rdp::s_magic_matrix[16] =
+uint8_t const n64_rdp::s_magic_matrix[16] =
 { /* Magic square matrix */
 		0,  6,  1, 7,
 		4,  2,  5, 3,
@@ -616,7 +616,7 @@ const uint8_t n64_rdp::s_magic_matrix[16] =
 		7,  1,  6, 0
 };
 
-const z_decompress_entry_t n64_rdp::m_z_dec_table[8] =
+z_decompress_entry_t const n64_rdp::m_z_dec_table[8] =
 {
 	{ 6, 0x00000 },
 	{ 5, 0x20000 },
@@ -1109,10 +1109,10 @@ uint64_t n64_rdp::read_data(uint32_t address)
 	}
 }
 
-const char* n64_rdp::s_image_format[] = { "RGBA", "YUV", "CI", "IA", "I", "???", "???", "???" };
-const char* n64_rdp::s_image_size[] = { "4-bit", "8-bit", "16-bit", "32-bit" };
+char const *const  n64_rdp::s_image_format[] = { "RGBA", "YUV", "CI", "IA", "I", "???", "???", "???" };
+char const *const  n64_rdp::s_image_size[] = { "4-bit", "8-bit", "16-bit", "32-bit" };
 
-const int32_t n64_rdp::s_rdp_command_length[64] =
+int32_t const n64_rdp::s_rdp_command_length[64] =
 {
 	8,          // 0x00, No Op
 	8,          // 0x01, ???

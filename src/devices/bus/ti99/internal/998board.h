@@ -101,7 +101,6 @@ public:
 	line_state ready();
 	void treset();
 
-	DECLARE_READ8_MEMBER( read );
 	DECLARE_SETADDRESS_DBIN_MEMBER( set_address );
 
 	DECLARE_READ_LINE_MEMBER( sprd_out );
@@ -248,7 +247,7 @@ public:
 	void device_start() override;
 	void device_reset() override;
 
-	DECLARE_WRITE8_MEMBER( cruwrite );
+	void cruwrite(offs_t offset, uint8_t data);
 	DECLARE_SETADDRESS_DBIN_MEMBER( set_address );
 
 	// Debugger support
@@ -261,7 +260,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( pmemen_in );
 	DECLARE_WRITE_LINE_MEMBER( skdrcs_in );
 
-	DECLARE_READ8_MEMBER( rom1cs_out );
 	DECLARE_READ_LINE_MEMBER( gromclk_out );
 
 	DECLARE_READ_LINE_MEMBER( alccs_out );
@@ -335,9 +333,9 @@ public:
 	void device_start() override;
 	void device_reset() override;
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( set_address );
+	uint8_t read();
+	void write(uint8_t data);
+	uint8_t set_address(offs_t offset);
 
 	// Debugger support
 	int get_physical_address_debug(offs_t offset);
@@ -453,8 +451,8 @@ class oso_device : public bus::hexbus::hexbus_chained_device
 {
 public:
 	oso_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 	void device_start() override;
 	void hexbus_value_changed(uint8_t data) override;
 
@@ -541,17 +539,17 @@ public:
 	mainboard8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// Memory space
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( setoffset );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
+	void setaddress(offs_t offset, uint8_t busctrl);
 
 	// Memory space for debugger access
-	DECLARE_READ8_MEMBER( debugger_read );
-	DECLARE_WRITE8_MEMBER( debugger_write );
+	uint8_t debugger_read(offs_t offset);
+	void debugger_write(offs_t offset, uint8_t data);
 
 	// I/O space
 	DECLARE_READ8Z_MEMBER( crureadz );
-	DECLARE_WRITE8_MEMBER( cruwrite );
+	void cruwrite(offs_t offset, uint8_t data);
 
 	// Control lines
 	DECLARE_WRITE_LINE_MEMBER( clock_in );
@@ -597,9 +595,6 @@ private:
 
 	// Mapped physical address.
 	int     m_physical_address;
-
-	// Hold the address space value so that we can use it in other methods.
-	address_space*  m_space;
 
 	// Indicates that a byte is waiting on the data bus (see m_latched_data)
 	bool    m_pending_write;

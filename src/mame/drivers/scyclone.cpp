@@ -67,7 +67,7 @@ public:
 
 	void scyclone(machine_config &config);
 
-	CUSTOM_INPUT_MEMBER(collision_r);
+	DECLARE_READ_LINE_MEMBER(collision_r);
 
 private:
 	DECLARE_WRITE8_MEMBER(vidctrl_w);
@@ -339,8 +339,8 @@ void scyclone_state::scyclone_sub_map(address_map &map)
 	map(0x3000, 0x3000).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w("dac", FUNC(dac_byte_interface::data_w)); // music
 	map(0x3001, 0x3001).w(FUNC(scyclone_state::snd_3001_w)); // written at the same time, with the same data as 0x3005
 	map(0x3002, 0x3002).w("dac2", FUNC(dac_byte_interface::data_w)); // speech
-//  AM_RANGE(0x3003, 0x3003) AM_WRITE(snd_3003_w) // writes 02 or 00
-//  AM_RANGE(0x3004, 0x3004) AM_WRITE(snd_3004_w) // always writes 00?
+//  map(0x3003, 0x3003).w(FUNC(scyclone_state::snd_3003_w)); // writes 02 or 00
+//  map(0x3004, 0x3004).w(FUNC(scyclone_state::snd_3004_w)); // always writes 00?
 	map(0x3005, 0x3005).w(FUNC(scyclone_state::snd_3005_w)); // written at the same time, with the same data as 0x3001
 }
 
@@ -353,7 +353,7 @@ void scyclone_state::scyclone_sub_iomap(address_map &map)
 // appears to be when a white bitmap pixel (col 0x7) collides with a large sprite?
 // if you simply set it to 1 and shoot in the left corner, the game gets stuck
 // but if you have it set to 0 there are no collisions with large objects
-CUSTOM_INPUT_MEMBER(scyclone_state::collision_r)
+READ_LINE_MEMBER(scyclone_state::collision_r)
 {
 	return m_hascollided;
 }
@@ -371,7 +371,7 @@ static INPUT_PORTS_START( scyclone )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, scyclone_state, collision_r, nullptr) // hw collision?
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(scyclone_state, collision_r) // hw collision?
 	// maybe these 4 are the 4xdsw bank?
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -534,24 +534,24 @@ WRITE8_MEMBER(scyclone_state::snd_3001_w)
 	// need to clear the latch somewhere, the command value is written back here and at 3005
 	// after acknowledging a command
 	// might actually reset the DACs as there are (at least) 2 of them?
-	m_soundlatch->clear_w(space, 0, data);
+	m_soundlatch->clear_w();
 }
 
 /*
 WRITE8_MEMBER(scyclone_state::snd_3003_w)
 {
-//  m_soundlatch->clear_w(space, 0, data);
+//  m_soundlatch->clear_w();
 }
 
 WRITE8_MEMBER(scyclone_state::snd_3004_w)
 {
-//  m_soundlatch->clear_w(space, 0, data);
+//  m_soundlatch->clear_w();
 }
 */
 
 WRITE8_MEMBER(scyclone_state::snd_3005_w)
 {
-//  m_soundlatch->clear_w(space, 0, data);
+//  m_soundlatch->clear_w();
 }
 
 
@@ -603,72 +603,67 @@ void scyclone_state::machine_reset()
 INTERRUPT_GEN_MEMBER(scyclone_state::irq)
 {
 	// CPU runs in IM0
-	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7);   /* RST 10h */
+	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7);   /* Z80 - RST 10h */
 }
 
 
-MACHINE_CONFIG_START(scyclone_state::scyclone)
-
+void scyclone_state::scyclone(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 5000000/2) // MOSTEK Z80-CPU   ? MHz  (there's also a 9.987MHz XTAL)  intermissions seem driven directly by CPU speed for reference
-	MCFG_DEVICE_PROGRAM_MAP(scyclone_map)
-	MCFG_DEVICE_IO_MAP(scyclone_iomap)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", scyclone_state, irq)
+	Z80(config, m_maincpu, 5000000/2); // MOSTEK Z80-CPU   ? MHz  (there's also a 9.987MHz XTAL)  intermissions seem driven directly by CPU speed for reference
+	m_maincpu->set_addrmap(AS_PROGRAM, &scyclone_state::scyclone_map);
+	m_maincpu->set_addrmap(AS_IO, &scyclone_state::scyclone_iomap);
+	m_maincpu->set_vblank_int("screen", FUNC(scyclone_state::irq));
 
 	// sound ?
-	MCFG_DEVICE_ADD("subcpu", Z80, 5000000/2) // LH0080 Z80-CPU SHARP  ? MHz   (5Mhz XTAL on this sub-pcb)
-	MCFG_DEVICE_PROGRAM_MAP(scyclone_sub_map)
-	MCFG_DEVICE_IO_MAP(scyclone_sub_iomap)
+	z80_device &subcpu(Z80(config, "subcpu", 5000000/2)); // LH0080 Z80-CPU SHARP  ? MHz   (5Mhz XTAL on this sub-pcb)
+	subcpu.set_addrmap(AS_PROGRAM, &scyclone_state::scyclone_sub_map);
+	subcpu.set_addrmap(AS_IO, &scyclone_state::scyclone_sub_iomap);
 	// no idea, but it does wait on an irq in places, irq0 increases a register checked in the wait loop so without it sound dies after a while
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(scyclone_state, irq0_line_hold, 400*60)
+	subcpu.set_periodic_int(FUNC(scyclone_state::irq0_line_hold), attotime::from_hz(400*60));
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	/* add shifter */
-	MCFG_MB14241_ADD("mb14241")
+	MB14241(config, "mb14241");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-32-1)
-	MCFG_SCREEN_UPDATE_DRIVER(scyclone_state, screen_update_scyclone)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE) // due to hw collisions
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 256-1, 0, 256-32-1);
+	screen.set_screen_update(FUNC(scyclone_state::screen_update_scyclone));
+	screen.set_video_attributes(VIDEO_ALWAYS_UPDATE); // due to hw collisions
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_scyclone)
-	MCFG_PALETTE_ADD("palette", 8 + 4*4)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_scyclone);
+	PALETTE(config, m_palette).set_entries(8 + 4*4);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_DEVICE_ADD("snsnd0", SN76477)
-	MCFG_SN76477_ENABLE(1)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2)
+	sn76477_device &snsnd0(SN76477(config, "snsnd0"));
+	snsnd0.set_enable(1);
+	snsnd0.add_route(ALL_OUTPUTS, "speaker", 0.2);
 
-	MCFG_DEVICE_ADD("snsnd1", SN76477)
-	MCFG_SN76477_ENABLE(1)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2)
+	sn76477_device &snsnd1(SN76477(config, "snsnd1"));
+	snsnd1.set_enable(1);
+	snsnd1.add_route(ALL_OUTPUTS, "speaker", 0.2);
 
 	// this is just taken from route16.cpp
 
-	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
 
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0)
-	MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
-	MCFG_DEVICE_ADD("dac2", DAC_8BIT_R2R, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
+	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
 
-	MCFG_DEVICE_ADD("vref2", VOLTAGE_REGULATOR, 0)
-	MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac2", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
-
-MACHINE_CONFIG_END
+	voltage_regulator_device &vref2(VOLTAGE_REGULATOR(config, "vref2", 0));
+	vref2.add_route(0, "dac2", 1.0, DAC_VREF_POS_INPUT);
+	vref2.add_route(0, "dac2", -1.0, DAC_VREF_NEG_INPUT);
+}
 
 ROM_START( scyclone )
 	ROM_REGION( 0x3000, "maincpu", 0 )

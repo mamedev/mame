@@ -56,7 +56,8 @@ constexpr unsigned P1_NDAC_BIT = 1;
 constexpr unsigned P1_NRFD_BIT = 0;
 
 hp82937_io_card_device::hp82937_io_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: hp80_io_card_device(mconfig , HP82937_IO_CARD , tag , owner , clock),
+	: device_t(mconfig , HP82937_IO_CARD , tag , owner , clock),
+	  device_hp80_io_interface(mconfig, *this),
 	  m_cpu(*this , "cpu"),
 	  m_translator(*this , "xlator"),
 	  m_sw1(*this , "sw1"),
@@ -70,7 +71,7 @@ hp82937_io_card_device::~hp82937_io_card_device()
 
 void hp82937_io_card_device::install_read_write_handlers(address_space& space , uint16_t base_addr)
 {
-	space.install_readwrite_handler(base_addr , base_addr + 1 , READ8_DEVICE_DELEGATE(m_translator , hp_1mb5_device , cpu_r) , WRITE8_DEVICE_DELEGATE(m_translator , hp_1mb5_device , cpu_w));
+	space.install_readwrite_handler(base_addr, base_addr + 1, read8_delegate(*m_translator, FUNC(hp_1mb5_device::cpu_r)), write8_delegate(*m_translator, FUNC(hp_1mb5_device::cpu_w)));
 }
 
 void hp82937_io_card_device::inten()
@@ -186,7 +187,7 @@ WRITE_LINE_MEMBER(hp82937_io_card_device::ieee488_ctrl_w)
 }
 
 static INPUT_PORTS_START(hp82937_port)
-	MCFG_HP80_IO_SC(7)
+	PORT_HP80_IO_SC(7)
 	PORT_START("sw1")
 	PORT_DIPNAME(0x1f , 0x15 , "HPIB address")
 	PORT_DIPLOCATION("S1:7,6,5,4,3")
@@ -243,8 +244,6 @@ void hp82937_io_card_device::device_start()
 
 void hp82937_io_card_device::device_reset()
 {
-	hp80_io_card_device::device_reset();
-
 	m_latch = 0;
 	m_updating = false;
 	update_signals();
@@ -253,7 +252,7 @@ void hp82937_io_card_device::device_reset()
 
 void hp82937_io_card_device::update_data_out()
 {
-	m_ieee488->write_dio(m_dio_out ? m_cpu->p2_r(machine().dummy_space() , 0) : 0xff);
+	m_ieee488->write_dio(m_dio_out ? m_cpu->p2_r() : 0xff);
 }
 
 void hp82937_io_card_device::update_signals()
@@ -264,7 +263,7 @@ void hp82937_io_card_device::update_signals()
 	}
 	m_updating = true;
 	bool ctrl_active = BIT(m_latch , LATCH_CA_BIT);
-	uint8_t p1 = m_cpu->p1_r(machine().dummy_space() , 0);
+	uint8_t p1 = m_cpu->p1_r();
 	m_iatn = BIT(p1 , P1_ATN_BIT);
 	if (ctrl_active) {
 		m_ieee488->host_atn_w(m_iatn);

@@ -26,13 +26,13 @@
     GLOBAL VARIABLES & CONSTANTS
 ***************************************************************************/
 
-/* base colors */
-static const int hp48_bg_color[3] = { 136, 147, 109 };  /* yellow */
-static const int hp48_fg_color[3] = {   0,   0,  64 };  /* dark blue */
+// base colors
+static constexpr int hp48_bg_color[3] = { 136, 147, 109 };  // yellow
+static constexpr int hp48_fg_color[3] = {   0,   0,  64 };  // dark blue
 
-/* color mixing */
-#define mix(c1,c2,x) (c1)*(1-(x))+(c2)*(x)
-#define mix2(i,x) mix(hp48_bg_color[i],hp48_fg_color[i],x)
+// color mixing
+constexpr float mix(int c1, int c2, float x) { return (c1 * (1 - x)) + (c2 * x); }
+inline float mix2(int i, float x) { return mix(hp48_bg_color[i], hp48_fg_color[i], x); }
 
 
 
@@ -41,13 +41,12 @@ static const int hp48_fg_color[3] = {   0,   0,  64 };  /* dark blue */
     FUNCTIONS
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(hp48_state, hp48)
+void hp48_state::hp48_palette(palette_device &palette) const
 {
-	int i;
-	for ( i = 0; i < 255; i++ )
+	for (int i = 0; i < 256; i++)
 	{
-		float c = i/255.;
-		m_palette->set_pen_color( i, rgb_t( 0, mix2(0,c), mix2(1,c), mix2(2,c) ) );
+		float const c = i / 255.;
+		m_palette->set_pen_color(i, rgb_t(mix2(0, c), mix2(1, c), mix2(2, c)));
 	}
 }
 

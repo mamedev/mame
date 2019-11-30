@@ -6,26 +6,6 @@
 #pragma once
 
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_MACKBD_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, MACKBD, 0)
-
-#define MCFG_MACKBD_REPLACE(_tag) \
-	MCFG_DEVICE_REPLACE(_tag, MACKBD, 0)
-
-#define MCFG_MACKBD_REMOVE(_tag) \
-	MCFG_DEVICE_REMOVE(_tag)
-
-#define MCFG_MACKBD_CLKOUT_HANDLER(_devcb) \
-	devcb = downcast<mackbd_device &>(*device).set_clkout_handler(DEVCB_##_devcb);
-
-#define MCFG_MACKBD_DATAOUT_HANDLER(_devcb) \
-	downcast<mackbd_device &>(*device).set_dataout_handler(DEVCB_##_devcb);
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -36,8 +16,6 @@ class mackbd_device :  public device_t
 {
 public:
 	// config helper
-	template <class Object> devcb_base &set_clkout_handler(Object &&cb) { return m_clkout_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_dataout_handler(Object &&cb) { return m_dataout_handler.set_callback(std::forward<Object>(cb)); }
 	auto clkout_handler() { return m_clkout_handler.bind(); }
 	auto dataout_handler() { return m_dataout_handler.bind(); }
 

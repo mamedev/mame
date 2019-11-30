@@ -4,15 +4,8 @@
 
     Act Fancer (Japan)              FD (c) 1989 Data East Corporation
     Act Fancer (World)              FE (c) 1989 Data East Corporation
-    Trio The Punch (World)          FC (c) 1989 Data East Corporation
+    Trio The Punch (World)          FG (c) 1989 Data East Corporation
     Trio The Punch (Japan)          FF (c) 1989 Data East Corporation
-
-    The 'World' set has rom code FE, the 'Japan' set has rom code FD.
-
-    Most Data East games give the Japanese version the earlier code, though
-    there is no real difference between the sets.
-
-    I believe the USA version of Act Fancer is called 'Out Fencer'
 
     Emulation by Bryan McPhail, mish@tendril.co.uk
 
@@ -222,53 +215,38 @@ INPUT_PORTS_END
 
 /******************************************************************************/
 
-static const gfx_layout chars =
+static const gfx_layout layout_8x8x4 =
 {
 	8,8,    /* 8*8 chars */
-	4096,
+	RGN_FRAC(1,4),
 	4,      /* 4 bits per pixel  */
-	{ 0x08000*8, 0x18000*8, 0x00000*8, 0x10000*8 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	{ RGN_FRAC(1,4), RGN_FRAC(3,4), RGN_FRAC(0,4), RGN_FRAC(2,4) },
+	{ STEP8(0,1) },
+	{ STEP8(0,8) },
 	8*8 /* every char takes 8 consecutive bytes */
 };
 
-static const gfx_layout tiles =
+static const gfx_layout layout_16x16x4 =
 {
 	16,16,  /* 16*16 sprites */
-	2048,
+	RGN_FRAC(1,4),
 	4,
-	{ 0, 0x10000*8, 0x20000*8,0x30000*8 },  /* plane offset */
-	{ 16*8+0, 16*8+1, 16*8+2, 16*8+3, 16*8+4, 16*8+5, 16*8+6, 16*8+7,
-			0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-			8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	32*8    /* every sprite takes 32 consecutive bytes */
-};
-
-static const gfx_layout sprites =
-{
-	16,16,  /* 16*16 sprites */
-	2048+1024,
-	4,
-	{ 0, 0x18000*8, 0x30000*8, 0x48000*8 }, /* plane offset */
-	{ 16*8+0, 16*8+1, 16*8+2, 16*8+3, 16*8+4, 16*8+5, 16*8+6, 16*8+7,
-			0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-			8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	{ 0, RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) },  /* plane offset */
+	{ STEP8(16*8,1), STEP8(0,1) },
+	{ STEP16(0,8) },
 	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
 static GFXDECODE_START( gfx_actfan )
-	GFXDECODE_ENTRY( "chars",   0, chars,       0, 16 )
-	GFXDECODE_ENTRY( "sprites", 0, sprites,   512, 16 )
-	GFXDECODE_ENTRY( "tiles",   0, tiles,     256, 16 )
+	GFXDECODE_ENTRY( "chars",   0, layout_8x8x4,     0, 16 )
+	GFXDECODE_ENTRY( "sprites", 0, layout_16x16x4, 512, 16 )
+	GFXDECODE_ENTRY( "tiles",   0, layout_16x16x4, 256, 16 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_triothep )
-	GFXDECODE_ENTRY( "chars",   0, chars,       0, 16 )
-	GFXDECODE_ENTRY( "sprites", 0, sprites,   256, 16 )
-	GFXDECODE_ENTRY( "tiles",   0, tiles,     512, 16 )
+	GFXDECODE_ENTRY( "chars",   0, layout_8x8x4,     0, 16 )
+	GFXDECODE_ENTRY( "sprites", 0, layout_16x16x4, 256, 16 )
+	GFXDECODE_ENTRY( "tiles",   0, layout_16x16x4, 512, 16 )
 GFXDECODE_END
 
 /******************************************************************************/
@@ -285,64 +263,61 @@ MACHINE_RESET_MEMBER(actfancr_state,triothep)
 
 /******************************************************************************/
 
-MACHINE_CONFIG_START(actfancr_state::actfancr)
-
+void actfancr_state::actfancr(machine_config &config)
+{
 	/* basic machine hardware */
 	H6280(config, m_maincpu, 21477200/3); /* Should be accurate */
 	m_maincpu->set_addrmap(AS_PROGRAM, &actfancr_state::actfan_map);
 	m_maincpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
-	MCFG_DEVICE_ADD("audiocpu",M6502, 1500000) /* Should be accurate */
-	MCFG_DEVICE_PROGRAM_MAP(dec0_s_map)
+	M6502(config, m_audiocpu, 1500000); /* Should be accurate */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &actfancr_state::dec0_s_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(actfancr_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(HOLDLINE("maincpu", 0)) /* VBL */
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(529));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(actfancr_state::screen_update));
+	screen.screen_vblank().set_inputline(m_maincpu, 0, HOLD_LINE); /* VBL */
+	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_actfan)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_actfan);
+	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 768);
 
-	MCFG_PALETTE_ADD("palette", 768)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	DECO_BAC06(config, m_tilegen[0], 0);
+	m_tilegen[0]->set_gfx_region_wide(2, 2, 2);
+	m_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
-	MCFG_DECO_BAC06_GFX_REGION_WIDE(2, 2, 2)
-	MCFG_DECO_BAC06_GFXDECODE("gfxdecode")
-	MCFG_DEVICE_ADD("tilegen2", DECO_BAC06, 0)
-	MCFG_DECO_BAC06_GFX_REGION_WIDE(0, 0, 0)
-	MCFG_DECO_BAC06_GFXDECODE("gfxdecode")
+	DECO_BAC06(config, m_tilegen[1], 0);
+	m_tilegen[1]->set_gfx_region_wide(0, 0, 0);
+	m_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DEVICE_ADD("spritegen", DECO_MXC06, 0)
-	MCFG_DECO_MXC06_GFX_REGION(1)
-	MCFG_DECO_MXC06_GFXDECODE("gfxdecode")
+	DECO_MXC06(config, m_spritegen, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ym1", YM2203, 1500000)
-	MCFG_SOUND_ROUTE(0, "mono", 0.90)
-	MCFG_SOUND_ROUTE(1, "mono", 0.90)
-	MCFG_SOUND_ROUTE(2, "mono", 0.90)
-	MCFG_SOUND_ROUTE(3, "mono", 0.50)
+	ym2203_device &ym1(YM2203(config, "ym1", 1500000));
+	ym1.add_route(0, "mono", 0.90);
+	ym1.add_route(1, "mono", 0.90);
+	ym1.add_route(2, "mono", 0.90);
+	ym1.add_route(3, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("ym2", YM3812, 3000000)
-	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
+	ym3812_device &ym2(YM3812(config, "ym2", 3000000));
+	ym2.irq_handler().set_inputline("audiocpu", M6502_IRQ_LINE);
+	ym2.add_route(ALL_OUTPUTS, "mono", 0.90);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1024188, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.85)
-MACHINE_CONFIG_END
+	okim6295_device &oki(OKIM6295(config, "oki", 1024188, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
+	oki.add_route(ALL_OUTPUTS, "mono", 0.85);
+}
 
-MACHINE_CONFIG_START(actfancr_state::triothep)
-
+void actfancr_state::triothep(machine_config &config)
+{
 	/* basic machine hardware */
 	H6280(config, m_maincpu, XTAL(21'477'272)/3); /* XIN=21.4772Mhz, verified on pcb */
 	m_maincpu->set_addrmap(AS_PROGRAM, &actfancr_state::triothep_map);
@@ -350,57 +325,54 @@ MACHINE_CONFIG_START(actfancr_state::triothep)
 	m_maincpu->port_out_cb().set(FUNC(actfancr_state::triothep_control_select_w));
 	m_maincpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
-	MCFG_DEVICE_ADD("audiocpu",M6502, XTAL(12'000'000)/8) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(dec0_s_map)
+	M6502(config, m_audiocpu, XTAL(12'000'000)/8); /* verified on pcb */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &actfancr_state::dec0_s_map);
 
 	MCFG_MACHINE_START_OVERRIDE(actfancr_state,triothep)
 	MCFG_MACHINE_RESET_OVERRIDE(actfancr_state,triothep)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(actfancr_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(HOLDLINE("maincpu", 0)) /* VBL */
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(529));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(actfancr_state::screen_update));
+	screen.screen_vblank().set_inputline(m_maincpu, 0, HOLD_LINE); /* VBL */
+	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_triothep)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_triothep);
+	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 768);
 
-	MCFG_PALETTE_ADD("palette", 768)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	DECO_BAC06(config, m_tilegen[0], 0);
+	m_tilegen[0]->set_gfx_region_wide(2, 2, 0);
+	m_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
-	MCFG_DECO_BAC06_GFX_REGION_WIDE(2, 2, 0)
-	MCFG_DECO_BAC06_GFXDECODE("gfxdecode")
-	MCFG_DEVICE_ADD("tilegen2", DECO_BAC06, 0)
-	MCFG_DECO_BAC06_GFX_REGION_WIDE(0, 0, 0)
-	MCFG_DECO_BAC06_GFXDECODE("gfxdecode")
+	DECO_BAC06(config, m_tilegen[1], 0);
+	m_tilegen[1]->set_gfx_region_wide(0, 0, 0);
+	m_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_DEVICE_ADD("spritegen", DECO_MXC06, 0)
-	MCFG_DECO_MXC06_GFX_REGION(1)
-	MCFG_DECO_MXC06_GFXDECODE("gfxdecode")
+	DECO_MXC06(config, m_spritegen, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(12'000'000)/8) /* verified on pcb */
-	MCFG_SOUND_ROUTE(0, "mono", 0.90)
-	MCFG_SOUND_ROUTE(1, "mono", 0.90)
-	MCFG_SOUND_ROUTE(2, "mono", 0.90)
-	MCFG_SOUND_ROUTE(3, "mono", 0.50)
+	ym2203_device &ym1(YM2203(config, "ym1", XTAL(12'000'000)/8)); /* verified on pcb */
+	ym1.add_route(0, "mono", 0.90);
+	ym1.add_route(1, "mono", 0.90);
+	ym1.add_route(2, "mono", 0.90);
+	ym1.add_route(3, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("ym2", YM3812, XTAL(12'000'000)/4) /* verified on pcb */
-	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
+	ym3812_device &ym2(YM3812(config, "ym2", XTAL(12'000'000)/4)); /* verified on pcb */
+	ym2.irq_handler().set_inputline("audiocpu", M6502_IRQ_LINE);
+	ym2.add_route(ALL_OUTPUTS, "mono", 0.90);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(1'056'000), okim6295_device::PIN7_HIGH) /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.85)
-MACHINE_CONFIG_END
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL(1'056'000), okim6295_device::PIN7_HIGH)); /* verified on pcb */
+	oki.add_route(ALL_OUTPUTS, "mono", 0.85);
+}
 
 /******************************************************************************/
 
@@ -441,7 +413,7 @@ ROM_START( actfancr2 )
 	ROM_REGION( 0x30000, "maincpu", 0 ) /* Need to allow full RAM allocation for now */
 	ROM_LOAD( "fe08-2.bin", 0x00000, 0x10000, CRC(0d36fbfa) SHA1(cef5cfd053beac5ca2ac52421024c316bdbfba42) )
 	ROM_LOAD( "fe09-2.bin", 0x10000, 0x10000, CRC(27ce2bb1) SHA1(52a423dfc2bba7b3330d1a10f4149ae6eeb9198c) )
-	ROM_LOAD( "10",   0x20000, 0x10000, CRC(cabad137) SHA1(41ca833649671a29e9395968cde2be8137a9ff0a) )
+	ROM_LOAD( "10",         0x20000, 0x10000, CRC(cabad137) SHA1(41ca833649671a29e9395968cde2be8137a9ff0a) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 6502 Sound CPU */
 	ROM_LOAD( "17-1", 0x08000, 0x8000, CRC(289ad106) SHA1(cf1b32ac41d3d92860fab04d82a08efe57b6ecf3) )
@@ -507,7 +479,7 @@ ROM_START( actfancrj )
 	ROM_REGION( 0x30000, "maincpu", 0 ) /* Need to allow full RAM allocation for now */
 	ROM_LOAD( "fd08-1.bin", 0x00000, 0x10000, CRC(69004b60) SHA1(7c6b876ca04377d2aa2d3c3f19d8e6cc7345363d) )
 	ROM_LOAD( "fd09-1.bin", 0x10000, 0x10000, CRC(a455ae3e) SHA1(960798271c8370c1c4ffce2a453f59d7a301c9f9) )
-	ROM_LOAD( "10",   0x20000, 0x10000, CRC(cabad137) SHA1(41ca833649671a29e9395968cde2be8137a9ff0a) )
+	ROM_LOAD( "10",         0x20000, 0x10000, CRC(cabad137) SHA1(41ca833649671a29e9395968cde2be8137a9ff0a) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 6502 Sound CPU */
 	ROM_LOAD( "17-1", 0x08000, 0x8000, CRC(289ad106) SHA1(cf1b32ac41d3d92860fab04d82a08efe57b6ecf3) )

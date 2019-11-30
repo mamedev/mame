@@ -40,7 +40,7 @@
 
 
 #include "nld_74ls629.h"
-#include "../analog/nlid_twoterm.h"
+#include "netlist/analog/nlid_twoterm.h"
 
 namespace netlist
 {
@@ -85,7 +85,7 @@ namespace netlist
 		, m_ENQ(*this, "ENQ")
 		, m_RNG(*this, "RNG")
 		, m_FC(*this, "FC")
-		, m_CAP(*this, "CAP", 1e-6)
+		, m_CAP(*this, "CAP", nlconst::magic(1e-6))
 		{
 			register_subalias("GND",    m_R_FC.m_N);
 
@@ -98,13 +98,16 @@ namespace netlist
 
 		NETLIB_RESETI()
 		{
-			m_R_FC.set_R(90000.0);
-			m_R_RNG.set_R(90000.0);
-			m_clock.do_reset();
+			m_R_FC.set_R( nlconst::magic(90000.0));
+			m_R_RNG.set_R(nlconst::magic(90000.0));
+			m_clock.reset();
 		}
 		NETLIB_UPDATEI();
 
-		NETLIB_UPDATE_PARAMI() { update_dev(); }
+		NETLIB_UPDATE_PARAMI()
+		{
+			/* update param may be called from anywhere, update_dev(time) is not a good idea */
+		}
 
 	public:
 		NETLIB_SUB(SN74LS629clk) m_clock;
@@ -115,43 +118,43 @@ namespace netlist
 		analog_input_t m_RNG;
 		analog_input_t m_FC;
 
-		param_double_t m_CAP;
+		param_fp_t m_CAP;
 	};
 
 	NETLIB_OBJECT(SN74LS629_dip)
 	{
 		NETLIB_CONSTRUCTOR(SN74LS629_dip)
-		, m_1(*this, "1")
-		, m_2(*this, "2")
+		, m_A(*this, "A")
+		, m_B(*this, "B")
 		{
-			register_subalias("1",  m_2.m_FC);
-			register_subalias("2",  m_1.m_FC);
-			register_subalias("3",  m_1.m_RNG);
+			register_subalias("1",  m_B.m_FC);
+			register_subalias("2",  m_A.m_FC);
+			register_subalias("3",  m_A.m_RNG);
 
-			register_subalias("6",  m_1.m_ENQ);
-			register_subalias("7",  m_1.m_clock.m_Y);
+			register_subalias("6",  m_A.m_ENQ);
+			register_subalias("7",  m_A.m_clock.m_Y);
 
-			register_subalias("8",  m_1.m_R_FC.m_N);
-			register_subalias("9",  m_1.m_R_FC.m_N);
-			connect(m_1.m_R_FC.m_N, m_2.m_R_FC.m_N);
+			register_subalias("8",  m_A.m_R_FC.m_N);
+			register_subalias("9",  m_A.m_R_FC.m_N);
+			connect(m_A.m_R_FC.m_N, m_B.m_R_FC.m_N);
 
-			register_subalias("10",  m_2.m_clock.m_Y);
+			register_subalias("10",  m_B.m_clock.m_Y);
 
-			register_subalias("11",  m_2.m_ENQ);
-			register_subalias("14",  m_2.m_RNG);
+			register_subalias("11",  m_B.m_ENQ);
+			register_subalias("14",  m_B.m_RNG);
 		}
 
 		NETLIB_UPDATEI() { }
 
 		NETLIB_RESETI()
 		{
-			m_1.do_reset();
-			m_2.do_reset();
+			m_A.reset();
+			m_B.reset();
 		}
 
 	private:
-		NETLIB_SUB(SN74LS629) m_1;
-		NETLIB_SUB(SN74LS629) m_2;
+		NETLIB_SUB(SN74LS629) m_A;
+		NETLIB_SUB(SN74LS629) m_B;
 	};
 
 
@@ -172,31 +175,29 @@ namespace netlist
 	{
 		{
 			// recompute
-			nl_double  freq;
-			nl_double  v_freq_2, v_freq_3, v_freq_4;
-			nl_double  v_freq = m_FC();
-			nl_double  v_rng = m_RNG();
+			nl_fptype  v_freq = m_FC();
+			nl_fptype  v_rng = m_RNG();
 
 			/* coefficients */
-			const nl_double k1 = 1.9904769024796283E+03;
-			const nl_double k2 = 1.2070059213983407E+03;
-			const nl_double k3 = 1.3266985579561108E+03;
-			const nl_double k4 = -1.5500979825922698E+02;
-			const nl_double k5 = 2.8184536266938172E+00;
-			const nl_double k6 = -2.3503421582744556E+02;
-			const nl_double k7 = -3.3836786704527788E+02;
-			const nl_double k8 = -1.3569136703258670E+02;
-			const nl_double k9 = 2.9914575453819188E+00;
-			const nl_double k10 = 1.6855569086173170E+00;
+			const nl_fptype k1 =  nlconst::magic( 1.9904769024796283E+03);
+			const nl_fptype k2 =  nlconst::magic( 1.2070059213983407E+03);
+			const nl_fptype k3 =  nlconst::magic( 1.3266985579561108E+03);
+			const nl_fptype k4 =  nlconst::magic(-1.5500979825922698E+02);
+			const nl_fptype k5 =  nlconst::magic( 2.8184536266938172E+00);
+			const nl_fptype k6 =  nlconst::magic(-2.3503421582744556E+02);
+			const nl_fptype k7 =  nlconst::magic(-3.3836786704527788E+02);
+			const nl_fptype k8 =  nlconst::magic(-1.3569136703258670E+02);
+			const nl_fptype k9 =  nlconst::magic( 2.9914575453819188E+00);
+			const nl_fptype k10 = nlconst::magic( 1.6855569086173170E+00);
 
 			/* scale due to input resistance */
 
 			/* Polyfunctional3D_model created by zunzun.com using sum of squared absolute error */
 
-			v_freq_2 = v_freq * v_freq;
-			v_freq_3 = v_freq_2 * v_freq;
-			v_freq_4 = v_freq_3 * v_freq;
-			freq = k1;
+			nl_fptype v_freq_2 = v_freq * v_freq;
+			nl_fptype v_freq_3 = v_freq_2 * v_freq;
+			nl_fptype v_freq_4 = v_freq_3 * v_freq;
+			nl_fptype freq = k1;
 			freq += k2 * v_freq;
 			freq += k3 * v_freq_2;
 			freq += k4 * v_freq_3;
@@ -207,11 +208,11 @@ namespace netlist
 			freq += k9 * v_rng * v_freq_3;
 			freq += k10 * v_rng * v_freq_4;
 
-			freq *= NL_FCONST(0.1e-6) / m_CAP();
+			freq *= nlconst::magic(0.1e-6) / m_CAP();
 
 			// FIXME: we need a possibility to remove entries from queue ...
 			//        or an exact model ...
-			m_clock.m_inc = netlist_time::from_double(0.5 / freq);
+			m_clock.m_inc = netlist_time::from_fp(nlconst::half() / freq);
 			//m_clock.update();
 
 			//NL_VERBOSE_OUT(("{1} {2} {3} {4}\n", name(), v_freq, v_rng, freq));
@@ -231,8 +232,8 @@ namespace netlist
 		}
 	}
 
-	NETLIB_DEVICE_IMPL(SN74LS629)
-	NETLIB_DEVICE_IMPL(SN74LS629_dip)
+	NETLIB_DEVICE_IMPL(SN74LS629,     "SN74LS629",     "CAP")
+	NETLIB_DEVICE_IMPL(SN74LS629_dip, "SN74LS629_DIP", "1.CAP1,2.CAP2")
 
 	} //namespace devices
 } // namespace netlist

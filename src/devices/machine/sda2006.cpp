@@ -5,15 +5,15 @@
 #include "machine/sda2006.h"
 
 //-------------------------------------------------
-// 
+//
 // Siemens SDA2006 512-bit (32x16) NV EEPROM
-// 
+//
 // TODO:
 //  - 8/12 bit controll word selection (currently emulates only 8 bt one)
 //  - INV pin
 //  - better( and correct) state flow
 //  - read mode, with reversed data stream
-// 
+//
 //-------------------------------------------------
 
 enum {
@@ -23,8 +23,8 @@ enum {
 	CMD_UNKNOWN
 };
 
-#define EEPROM_CAPACITY 	0x40
-#define EEPROM_ADDRESS_MASK	0x1f
+#define EEPROM_CAPACITY     0x40
+#define EEPROM_ADDRESS_MASK 0x1f
 
 // device type definition
 DEFINE_DEVICE_TYPE(SDA2006, sda2006_device, "sda2006", "SDA2006 EEPROM")
@@ -173,7 +173,7 @@ WRITE_LINE_MEMBER( sda2006_device::write_clock )
 				m_write_stream_length = 0;
 				while(counter>0){
 					reversed_stream<<=1;
-				
+
 					if (m_write_stream & mask) {
 						reversed_stream |= 1;
 					}
@@ -182,7 +182,7 @@ WRITE_LINE_MEMBER( sda2006_device::write_clock )
 				}
 
 				uint32_t command = bitswap<8>(m_write_stream, 7,6,5,4,3,0,1,2);
- 
+
 				switch (command&3){
 					case CMD_WRITE:  m_eeprom_data[(reversed_stream>>16) & EEPROM_ADDRESS_MASK] = reversed_stream & 0xffff; break;
 					case CMD_READ:
@@ -191,7 +191,7 @@ WRITE_LINE_MEMBER( sda2006_device::write_clock )
 						m_eeprom_state = EEPROM_READ;
 						break;
 					case CMD_READ_REVERSED:
-					case CMD_UNKNOWN: break; 
+					case CMD_UNKNOWN: break;
 				}
 			} else {
 

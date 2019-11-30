@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco
+// thanks-to:rfka01
 #ifndef MAME_BUS_DMV_K801_H
 #define MAME_BUS_DMV_K801_H
 
@@ -36,16 +37,15 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	// dmvcart_interface overrides
-	virtual void io_read(address_space &space, int ifsel, offs_t offset, uint8_t &data) override;
-	virtual void io_write(address_space &space, int ifsel, offs_t offset, uint8_t data) override;
+	virtual void io_read(int ifsel, offs_t offset, uint8_t &data) override;
+	virtual void io_write(int ifsel, offs_t offset, uint8_t data) override;
 
 	required_device<mc2661_device> m_epci;
+	required_device<rs232_port_device> m_rs232;
 	required_ioport m_dsw;
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(epci_irq_w);
-
-	dmvcart_slot_device * m_bus;
 };
 
 
@@ -66,8 +66,8 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	// dmvcart_interface overrides
-	virtual void io_read(address_space &space, int ifsel, offs_t offset, uint8_t &data) override;
-	virtual void io_write(address_space &space, int ifsel, offs_t offset, uint8_t data) override;
+	virtual void io_read(int ifsel, offs_t offset, uint8_t &data) override;
+	virtual void io_write(int ifsel, offs_t offset, uint8_t data) override;
 };
 
 // ======================> dmv_k212_device

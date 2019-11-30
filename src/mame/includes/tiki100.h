@@ -12,6 +12,7 @@
 #include "machine/z80daisy.h"
 #include "formats/tiki100_dsk.h"
 #include "imagedev/cassette.h"
+#include "imagedev/floppy.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
 #include "machine/z80ctc.h"
@@ -56,7 +57,7 @@ public:
 		m_floppy1(*this, FD1797_TAG":1"),
 		m_cassette(*this, CASSETTE_TAG),
 		m_centronics(*this, CENTRONICS_TAG),
-		m_exp(*this, TIKI100_BUS_TAG),
+		m_exp(*this, "tiki100bus"),
 		m_rom(*this, Z80_TAG),
 		m_prom(*this, "u4"),
 		m_video_ram(*this, "video_ram"),
@@ -107,7 +108,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
 	required_device<fd1797_device> m_fdc;
 	required_device<z80pio_device> m_pio;

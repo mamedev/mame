@@ -18,45 +18,43 @@
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(equites_state,equites)
+void equites_state::equites_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
 
-	for (i = 0; i < 256; i++)
+	for (int i = 0; i < 256; i++)
 		palette.set_indirect_color(i, rgb_t(pal4bit(color_prom[i]), pal4bit(color_prom[i + 0x100]), pal4bit(color_prom[i + 0x200])));
 
 	// point to the CLUT
 	color_prom += 0x380;
 
-	for (i = 0; i < 256; i++)
+	for (int i = 0; i < 256; i++)
 		palette.set_pen_indirect(i, i);
 
-	for (i = 0; i < 0x80; i++)
+	for (int i = 0; i < 0x80; i++)
 		palette.set_pen_indirect(i + 0x100, color_prom[i]);
 }
 
-PALETTE_INIT_MEMBER(splndrbt_state,splndrbt)
+void splndrbt_state::splndrbt_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
 
-	for (i = 0; i < 0x100; i++)
+	for (int i = 0; i < 0x100; i++)
 		palette.set_indirect_color(i, rgb_t(pal4bit(color_prom[i]), pal4bit(color_prom[i + 0x100]), pal4bit(color_prom[i + 0x200])));
 
-	for (i = 0; i < 0x100; i++)
+	for (int i = 0; i < 0x100; i++)
 		palette.set_pen_indirect(i, i);
 
 	// point to the bg CLUT
 	color_prom += 0x300;
 
-	for (i = 0; i < 0x80; i++)
+	for (int i = 0; i < 0x80; i++)
 		palette.set_pen_indirect(i + 0x100, color_prom[i] + 0x10);
 
 	// point to the sprite CLUT
 	color_prom += 0x100;
 
-	for (i = 0; i < 0x100; i++)
+	for (int i = 0; i < 0x100; i++)
 		palette.set_pen_indirect(i + 0x180, color_prom[i]);
 }
 
@@ -122,10 +120,10 @@ VIDEO_START_MEMBER(equites_state,equites)
 	m_fg_videoram = std::make_unique<uint8_t[]>(0x800);
 	save_pointer(NAME(m_fg_videoram), 0x800);
 
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(equites_state::equites_fg_info),this), TILEMAP_SCAN_COLS,  8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(equites_state::equites_fg_info)), TILEMAP_SCAN_COLS,  8, 8, 32, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(equites_state::equites_bg_info),this), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(equites_state::equites_bg_info)), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
 	m_bg_tilemap->set_transparent_pen(0);
 	m_bg_tilemap->set_scrolldx(0, -10);
 }
@@ -137,11 +135,11 @@ VIDEO_START_MEMBER(splndrbt_state,splndrbt)
 	m_fg_videoram = std::make_unique<uint8_t[]>(0x800);
 	save_pointer(NAME(m_fg_videoram), 0x800);
 
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(splndrbt_state::splndrbt_fg_info),this), TILEMAP_SCAN_COLS,  8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(splndrbt_state::splndrbt_fg_info)), TILEMAP_SCAN_COLS,  8, 8, 32, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 	m_fg_tilemap->set_scrolldx(8, -8);
 
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(splndrbt_state::splndrbt_bg_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(splndrbt_state::splndrbt_bg_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 	m_bg_tilemap->configure_groups(*m_gfxdecode->gfx(1), 0x10);
 }
 

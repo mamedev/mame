@@ -121,7 +121,7 @@ uint8_t YM_DELTAT::ADPCM_Read()
 
 		if (now_addr != (end << 1))
 		{
-			v = memory[now_addr>>1];
+			v = read_byte(device, now_addr>>1);
 
 			/*logerror("YM Delta-T memory read  $%08x, v=$%02x\n", now_addr >> 1, v);*/
 
@@ -200,6 +200,7 @@ value:   START, REC, MEMDAT, REPEAT, SPOFF, x,x,RESET   meaning:
 		if (emulation_mode == EMULATION_MODE_YM2610)
 		{
 			v |= 0x20;      /*  YM2610 always uses external memory and doesn't even have memory flag bit. */
+			v &= ~0x40;     /*  YM2610 has no rec bit */
 		}
 
 		portstate = v & (0x80|0x40|0x20|0x10|0x01); /* start, rec, memory mode, repeat flag copy, reset(bit0) */
@@ -223,28 +224,6 @@ value:   START, REC, MEMDAT, REPEAT, SPOFF, x,x,RESET   meaning:
 		{
 			now_addr = start << 1;
 			memread = 2;    /* two dummy reads needed before accesing external memory via register $08*/
-
-			/* if yes, then let's check if ADPCM memory is mapped and big enough */
-			if (!memory)
-			{
-				device->logerror("YM Delta-T ADPCM rom not mapped\n");
-				portstate = 0x00;
-				PCM_BSY = 0;
-			}
-			else
-			{
-				if (end >= memory_size)    /* Check End in Range */
-				{
-					device->logerror("YM Delta-T ADPCM end out of range: $%08x\n", end);
-					end = memory_size - 1;
-				}
-				if (start >= memory_size)  /* Check Start in Range */
-				{
-					device->logerror("YM Delta-T ADPCM start out of range: $%08x\n", start);
-					portstate = 0x00;
-					PCM_BSY = 0;
-				}
-			}
 		}
 		else    /* we access CPU memory (ADPCM data register $08) so we only reset now_addr here */
 		{
@@ -340,7 +319,7 @@ value:   START, REC, MEMDAT, REPEAT, SPOFF, x,x,RESET   meaning:
 
 			if (now_addr != (end << 1))
 			{
-				memory[now_addr >> 1] = v;
+				write_byte(device, now_addr >> 1, v);
 				now_addr += 2; /* two nybbles at a time */
 
 				/* reset BRDY bit in status register, which means we are processing the write */
@@ -450,8 +429,7 @@ void YM_DELTAT::postload(uint8_t *regs)
 	reg[0] = regs[0];
 
 	/* current rom data */
-	if (memory)
-		now_data = *(memory + (now_addr >> 1));
+	now_data = read_byte(device, now_addr >> 1);
 
 }
 void YM_DELTAT::savestate(device_t *device)
@@ -515,7 +493,7 @@ static inline void YM_DELTAT_synthesis_from_external_memory(YM_DELTAT *DELTAT)
 			if( DELTAT->now_addr&1 ) data = DELTAT->now_data & 0x0f;
 			else
 			{
-				DELTAT->now_data = *(DELTAT->memory + (DELTAT->now_addr>>1));
+				DELTAT->now_data = DELTAT->read_byte(DELTAT->device, DELTAT->now_addr>>1);
 				data = DELTAT->now_data >> 4;
 			}
 

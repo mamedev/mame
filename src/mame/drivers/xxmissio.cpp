@@ -24,10 +24,10 @@ WRITE8_MEMBER(xxmissio_state::bank_sel_w)
 	membank("bank1")->set_entry(data & 7);
 }
 
-CUSTOM_INPUT_MEMBER(xxmissio_state::status_r)
+template <int Mask>
+READ_LINE_MEMBER(xxmissio_state::status_r)
 {
-	int bit_mask = (uintptr_t)param;
-	return (m_status & bit_mask) ? 1 : 0;
+	return (m_status & Mask) ? 1 : 0;
 }
 
 WRITE8_MEMBER(xxmissio_state::status_m_w)
@@ -40,7 +40,7 @@ WRITE8_MEMBER(xxmissio_state::status_m_w)
 
 		case 0x40:
 			m_status &= ~0x08;
-			m_subcpu->set_input_line_and_vector(0, HOLD_LINE, 0x10);
+			m_subcpu->set_input_line_and_vector(0, HOLD_LINE, 0x10); // Z80
 			break;
 
 		case 0x80:
@@ -63,7 +63,7 @@ WRITE8_MEMBER(xxmissio_state::status_s_w)
 
 		case 0x80:
 			m_status &= ~0x04;
-			m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x10);
+			m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x10); // Z80
 			break;
 	}
 }
@@ -208,14 +208,14 @@ static INPUT_PORTS_START( xxmissio )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" ) /* Shown as "Unused" in the manual */
 
 	PORT_START("STATUS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, xxmissio_state, status_r, (void *)0x01)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(xxmissio_state, status_r<0x01>)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, xxmissio_state, status_r, (void *)0x04)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, xxmissio_state, status_r, (void *)0x08)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, xxmissio_state, status_r, (void *)0x10)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, xxmissio_state, status_r, (void *)0x20)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, xxmissio_state, status_r, (void *)0x40)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, xxmissio_state, status_r, (void *)0x80)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(xxmissio_state, status_r<0x04>)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(xxmissio_state, status_r<0x08>)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(xxmissio_state, status_r<0x10>)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(xxmissio_state, status_r<0x20>)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(xxmissio_state, status_r<0x40>)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(xxmissio_state, status_r<0x80>)
 INPUT_PORTS_END
 
 /****************************************************************************/
@@ -265,51 +265,50 @@ GFXDECODE_END
 
 /****************************************************************************/
 
-MACHINE_CONFIG_START(xxmissio_state::xxmissio)
-
+void xxmissio_state::xxmissio(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,12000000/4) /* 3.0MHz */
-	MCFG_DEVICE_PROGRAM_MAP(map1)
+	Z80(config, m_maincpu, 12000000/4); /* 3.0MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &xxmissio_state::map1);
 
-	MCFG_DEVICE_ADD("sub", Z80,12000000/4) /* 3.0MHz */
-	MCFG_DEVICE_PROGRAM_MAP(map2)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(xxmissio_state, interrupt_s, 2*60)
+	Z80(config, m_subcpu, 12000000/4); /* 3.0MHz */
+	m_subcpu->set_addrmap(AS_PROGRAM, &xxmissio_state::map2);
+	m_subcpu->set_periodic_int(FUNC(xxmissio_state::interrupt_s), attotime::from_hz(2*60));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 4*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(xxmissio_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, xxmissio_state, interrupt_m))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 64*8-1, 4*8, 28*8-1);
+	screen.set_screen_update(FUNC(xxmissio_state::screen_update));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(xxmissio_state::interrupt_m));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_xxmissio)
-	MCFG_PALETTE_ADD("palette", 768)
-	MCFG_PALETTE_FORMAT_CLASS(1, xxmissio_state, BBGGRRII)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_xxmissio);
+	PALETTE(config, m_palette).set_format(1, &xxmissio_state::BBGGRRII, 768);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ym1", YM2203, 12000000/8)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
-	MCFG_SOUND_ROUTE(0, "mono", 0.15)
-	MCFG_SOUND_ROUTE(1, "mono", 0.15)
-	MCFG_SOUND_ROUTE(2, "mono", 0.15)
-	MCFG_SOUND_ROUTE(3, "mono", 0.40)
+	ym2203_device &ym1(YM2203(config, "ym1", 12000000/8));
+	ym1.port_a_read_callback().set_ioport("DSW1");
+	ym1.port_b_read_callback().set_ioport("DSW2");
+	ym1.add_route(0, "mono", 0.15);
+	ym1.add_route(1, "mono", 0.15);
+	ym1.add_route(2, "mono", 0.15);
+	ym1.add_route(3, "mono", 0.40);
 
-	MCFG_DEVICE_ADD("ym2", YM2203, 12000000/8)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, xxmissio_state, scroll_x_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, xxmissio_state, scroll_y_w))
-	MCFG_SOUND_ROUTE(0, "mono", 0.15)
-	MCFG_SOUND_ROUTE(1, "mono", 0.15)
-	MCFG_SOUND_ROUTE(2, "mono", 0.15)
-	MCFG_SOUND_ROUTE(3, "mono", 0.40)
-MACHINE_CONFIG_END
+	ym2203_device &ym2(YM2203(config, "ym2", 12000000/8));
+	ym2.port_a_write_callback().set(FUNC(xxmissio_state::scroll_x_w));
+	ym2.port_b_write_callback().set(FUNC(xxmissio_state::scroll_y_w));
+	ym2.add_route(0, "mono", 0.15);
+	ym2.add_route(1, "mono", 0.15);
+	ym2.add_route(2, "mono", 0.15);
+	ym2.add_route(3, "mono", 0.40);
+}
 
 /****************************************************************************/
 

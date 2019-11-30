@@ -32,8 +32,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_gvram(*this, "gvram"),
 		m_vram(*this, "vram"),
-		m_maincpu(*this, "maincpu")
-		, m_crtc(*this, "crtc"),
+		m_maincpu(*this, "maincpu"),
+		m_crtc(*this, "crtc"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")
 	{ }
@@ -170,13 +170,13 @@ WRITE8_MEMBER(fp6000_state::fp6000_pcg_w)
 WRITE8_MEMBER(fp6000_state::fp6000_6845_address_w)
 {
 	m_crtc_index = data;
-	m_crtc->address_w(space, offset, data);
+	m_crtc->address_w(data);
 }
 
 WRITE8_MEMBER(fp6000_state::fp6000_6845_data_w)
 {
 	m_crtc_vreg[m_crtc_index] = data;
-	m_crtc->register_w(space, offset, data);
+	m_crtc->register_w(data);
 }
 
 void fp6000_state::fp6000_map(address_map &map)
@@ -297,34 +297,35 @@ void fp6000_state::machine_reset()
 {
 }
 
-MACHINE_CONFIG_START(fp6000_state::fp6000)
+void fp6000_state::fp6000(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8086, 16000000/2)
-	MCFG_DEVICE_PROGRAM_MAP(fp6000_map)
-	MCFG_DEVICE_IO_MAP(fp6000_io)
+	I8086(config, m_maincpu, 16000000/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &fp6000_state::fp6000_map);
+	m_maincpu->set_addrmap(AS_IO, &fp6000_state::fp6000_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_DRIVER(fp6000_state, screen_update_fp6000)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(640, 480);
+	screen.set_visarea_full();
+	screen.set_screen_update(FUNC(fp6000_state::screen_update_fp6000));
+	screen.set_palette(m_palette);
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", 16000000/5)    /* unknown clock, hand tuned to get ~60 fps */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
+	MC6845(config, m_crtc, 16000000/5);    /* unknown variant, unknown clock, hand tuned to get ~60 fps */
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
 
-	MCFG_PALETTE_ADD("palette", 8)
-//  MCFG_PALETTE_INIT(black_and_white)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fp6000)
+	PALETTE(config, m_palette).set_entries(8);
 
-MACHINE_CONFIG_END
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fp6000);
+}
 
 /* ROM definition */
 ROM_START( fp6000 )
-	ROM_REGION( 0x10000, "ipl", ROMREGION_ERASEFF )
+	ROM_REGION16_LE( 0x10000, "ipl", ROMREGION_ERASEFF )
 	ROM_LOAD( "ipl.rom", 0x0000, 0x10000, CRC(c72fe40a) SHA1(0e4c60dc27f6c7f461c4bc382b81602b3327a7a4))
 
 	ROM_REGION( 0x1000, "mcu", ROMREGION_ERASEFF )

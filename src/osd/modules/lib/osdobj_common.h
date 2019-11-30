@@ -37,6 +37,7 @@
 #define OSDCOMMAND_LIST_NETWORK_ADAPTERS "listnetwork"
 
 #define OSDOPTION_DEBUGGER              "debugger"
+#define OSDOPTION_DEBUGGER_PORT         "debugger_port"
 #define OSDOPTION_DEBUGGER_FONT         "debugger_font"
 #define OSDOPTION_DEBUGGER_FONT_SIZE    "debugger_font_size"
 #define OSDOPTION_WATCHDOG              "watchdog"
@@ -88,6 +89,7 @@
 #define OSDOPTION_BGFX_DEBUG            "bgfx_debug"
 #define OSDOPTION_BGFX_SCREEN_CHAINS    "bgfx_screen_chains"
 #define OSDOPTION_BGFX_SHADOW_MASK      "bgfx_shadow_mask"
+#define OSDOPTION_BGFX_LUT              "bgfx_lut"
 #define OSDOPTION_BGFX_AVI_NAME         "bgfx_avi_name"
 
 //============================================================
@@ -105,6 +107,7 @@ public:
 
 	// debugging options
 	const char *debugger() const { return value(OSDOPTION_DEBUGGER); }
+	int debugger_port() const { return int_value(OSDOPTION_DEBUGGER_PORT); }
 	const char *debugger_font() const { return value(OSDOPTION_DEBUGGER_FONT); }
 	float debugger_font_size() const { return float_value(OSDOPTION_DEBUGGER_FONT_SIZE); }
 	int watchdog() const { return int_value(OSDOPTION_WATCHDOG); }
@@ -162,6 +165,7 @@ public:
 	bool bgfx_debug() const { return bool_value(OSDOPTION_BGFX_DEBUG); }
 	const char *bgfx_screen_chains() const { return value(OSDOPTION_BGFX_SCREEN_CHAINS); }
 	const char *bgfx_shadow_mask() const { return value(OSDOPTION_BGFX_SHADOW_MASK); }
+	const char *bgfx_lut() const { return value(OSDOPTION_BGFX_LUT); }
 	const char *bgfx_avi_name() const { return value(OSDOPTION_BGFX_AVI_NAME); }
 
 	// PortAudio options
@@ -200,7 +204,7 @@ public:
 	virtual bool no_sound() override;
 
 	// input overridables
-	virtual void customize_input_type_list(simple_list<input_type_entry> &typelist) override;
+	virtual void customize_input_type_list(std::vector<input_type_entry> &typelist) override;
 
 	// video overridables
 	virtual void add_audio_to_recording(const int16_t *buffer, int samples_this_frame) override;
@@ -241,13 +245,14 @@ public:
 	virtual osd_options &options() { return m_options; }
 
 	// osd_output interface ...
-	virtual void output_callback(osd_output_channel channel, const char *msg, va_list args)  override;
+	virtual void output_callback(osd_output_channel channel, const util::format_argument_pack<std::ostream> &args)  override;
 	bool verbose() const { return m_print_verbose; }
-	void set_verbose(bool print_verbose) { m_print_verbose = print_verbose; }
+	virtual void set_verbose(bool print_verbose) override { m_print_verbose = print_verbose; }
 
 	void notify(const char *outname, int32_t value) const { m_output->notify(outname, value); }
 
 	static std::list<std::shared_ptr<osd_window>> s_window_list;
+
 protected:
 	virtual bool input_init();
 	virtual void input_pause();
@@ -274,7 +279,7 @@ private:
 			opt_val = "";
 		else if (!m_mod_man.type_has_name(opt_name.c_str(), opt_val.c_str()))
 		{
-			osd_printf_warning("Value %s not supported for option %s - falling back to auto\n", opt_val.c_str(), opt_name.c_str());
+			osd_printf_warning("Value %s not supported for option %s - falling back to auto\n", opt_val, opt_name);
 			opt_val = "";
 		}
 		return m_mod_man.select_module(opt_name.c_str(), opt_val.c_str());

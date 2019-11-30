@@ -6,6 +6,24 @@
 
 ***********************************************************************
                _____________
+    /INTA   1 |             | 28  Vcc
+       NC   2 |             | 27  /WE
+       NC   3 |             | 26  /INTB
+       NC   4 |             | 25  NC
+       A5   5 |             | 24  NC
+       A4   6 |             | 23  SQW
+       A3   7 |             | 22  /OE
+       A2   8 |             | 21  NC
+       A1   9 |             | 20  /CE
+       A0  10 |             | 19  DQ7
+      DQ0  11 |             | 18  DQ6
+      DQ1  12 |             | 17  DQ5
+      DQ2  13 |             | 16  DQ4
+      GND  14 |_____________| 15  DQ3
+
+               DS1286 (64 x 8)
+
+               _____________
     /INTA   1 |             | 32  Vcc
     /INTB   2 |             | 31  SQW
    NC/A14   3 |             | 30  Vcc
@@ -56,8 +74,11 @@
 
 #pragma once
 
+#include "dirtc.h"
+
 class ds1386_device : public device_t,
-					  public device_nvram_interface
+					  public device_nvram_interface,
+					  public device_rtc_interface
 {
 public:
 	auto inta() { return m_inta_cb.bind(); }
@@ -104,13 +125,17 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override;
 	virtual void nvram_read(emu_file &file) override;
 	virtual void nvram_write(emu_file &file) override;
+
+	// device_rtc_interface overrides
+	virtual bool rtc_feature_y2k() const override { return false; }
+	virtual bool rtc_feature_leap_year() const override { return true; }
+	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override;
 
 	static constexpr device_timer_id CLOCK_TIMER = 0;
 	static constexpr device_timer_id SQUAREWAVE_TIMER = 1;
@@ -168,6 +193,12 @@ protected:
 	const size_t m_ram_size;
 };
 
+class ds1286_device : public ds1386_device
+{
+public:
+	ds1286_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
 class ds1386_8k_device : public ds1386_device
 {
 public:
@@ -180,6 +211,7 @@ public:
 	ds1386_32k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
+DECLARE_DEVICE_TYPE(DS1286,     ds1286_device)
 DECLARE_DEVICE_TYPE(DS1386_8K,  ds1386_8k_device)
 DECLARE_DEVICE_TYPE(DS1386_32K, ds1386_32k_device)
 

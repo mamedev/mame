@@ -29,7 +29,7 @@
 		<info name="developer" value="Splice" />
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="castelo.bin" size="8192" crc="07a3d3db" sha1="0406ad601be68014820c77eda4491bfb4ea5c402" offset="0x0000" />
+				<rom name="castelo.bin" size="8192" crc="07a3d3db" sha1="0406ad601be68014820c77eda4491bfb4ea5c402"/>
 			</dataarea>
 		</part>
 	</software>
@@ -42,7 +42,7 @@
 		<info name="serial" value="9800" />
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="qbert.bin" size="8192" crc="532f61ba" sha1="6243fc5593f40d7285ea6b69c541307d3fc583ac" offset="0x0000" />
+				<rom name="qbert.bin" size="8192" crc="532f61ba" sha1="6243fc5593f40d7285ea6b69c541307d3fc583ac"/>
 			</dataarea>
 		</part>
 	</software>
@@ -56,7 +56,7 @@
 		<info name="serial" value="9800" />
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="qberta.bin" size="8192" crc="13f06adc" sha1="d2322e9aba23bdd3732ff5e631f92667f0c04ae9" offset="0x0000" />
+				<rom name="qberta.bin" size="8192" crc="13f06adc" sha1="d2322e9aba23bdd3732ff5e631f92667f0c04ae9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -69,7 +69,7 @@
 		<info name="serial" value="9850" />
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="scobra.bin" size="8192" crc="6cb5cb8f" sha1="c0ff64668723f5f353ce98d3ee6089ebe0201369" offset="0x0000" />
+				<rom name="scobra.bin" size="8192" crc="6cb5cb8f" sha1="c0ff64668723f5f353ce98d3ee6089ebe0201369"/>
 			</dataarea>
 		</part>
 	</software>
@@ -83,7 +83,7 @@
 		<info name="serial" value="9850" />
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="scobraa.bin" size="8192" crc="f84622d2" sha1="3bf730acbfb0404d2e2411169c8fc6a81b907053" offset="0x0000" />
+				<rom name="scobraa.bin" size="8192" crc="f84622d2" sha1="3bf730acbfb0404d2e2411169c8fc6a81b907053"/>
 			</dataarea>
 		</part>
 	</software>
@@ -96,7 +96,7 @@
 		<info name="serial" value="G2500" />
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="ssketch.bin" size="8192" crc="8627300a" sha1="3acbae2580c38bfea9ce7ec06274edd39607016d" offset="0x0000" />
+				<rom name="ssketch.bin" size="8192" crc="8627300a" sha1="3acbae2580c38bfea9ce7ec06274edd39607016d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2598,7 +2598,7 @@
 		<publisher>Coleco / CBS</publisher>
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="bbears.bin" size="8192" crc="18864abc" sha1="cb68d5a70ca0567060eddfd0b7783cbeeffb399e" offset="0x0000" />
+				<rom name="bbears.bin" size="8192" crc="18864abc" sha1="cb68d5a70ca0567060eddfd0b7783cbeeffb399e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2759,7 +2759,7 @@
 		<publisher>Parker Brothers</publisher>
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="orbit.bin" size="8192" crc="2cc6f4aa" sha1="bcb3d6845b09adc1adf842cba1ca12f57aa47d79" offset="0x0000" />
+				<rom name="orbit.bin" size="8192" crc="2cc6f4aa" sha1="bcb3d6845b09adc1adf842cba1ca12f57aa47d79"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2894,7 +2894,7 @@
 		<info name="developer" value="Konami" />
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="video.bin" size="8192" crc="a9177b20" sha1="08172d85140c004241ab585fc41cdc7841f8290b" offset="0x0000" />
+				<rom name="video.bin" size="8192" crc="a9177b20" sha1="08172d85140c004241ab585fc41cdc7841f8290b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2905,7 +2905,7 @@
 		<publisher>Konami</publisher>
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="hustler-7-27-84-8c61.bin" size="8192" crc="841d168f" sha1="5f481ff47762a812c73bb120e60f31ee99fd6b5f" offset="0x0000" />
+				<rom name="hustler-7-27-84-8c61.bin" size="8192" crc="841d168f" sha1="5f481ff47762a812c73bb120e60f31ee99fd6b5f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2965,7 +2965,7 @@
 		<publisher>Coleco / CBS</publisher>
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="colecovision final test (1982) (coleco).rom" size="8192" crc="3ae4b58c" sha1="cef53b9eae8dfbd877e18277980975f862f95f9d" offset="0x0000" />
+				<rom name="colecovision final test (1982) (coleco).rom" size="8192" crc="3ae4b58c" sha1="cef53b9eae8dfbd877e18277980975f862f95f9d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2977,7 +2977,7 @@
 		<publisher>Coleco / CBS</publisher>
 		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="super action controller tester (1982) (nuvatec).rom" size="8192" crc="d206fe58" sha1="b96fe60d2a1ee107a3b5a9cc91d5c811e93768af" offset="0x0000" />
+				<rom name="super action controller tester (1982) (nuvatec).rom" size="8192" crc="d206fe58" sha1="b96fe60d2a1ee107a3b5a9cc91d5c811e93768af"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3301,7 +3301,7 @@
 		<part name="cart" interface="coleco_cart">
 			<feature name="slot" value="xin1" />
 			<dataarea name="rom" size="1048576">
-				<rom name="31in1-eprom-15012013-rev2.rom" size="1048576" crc="3f4ebe58" sha1="bf7fc70b25b9654c86f644474ef9e6906df82a46" offset="0" />
+				<rom name="31in1-eprom-15012013-rev2.rom" size="1048576" crc="3f4ebe58" sha1="bf7fc70b25b9654c86f644474ef9e6906df82a46" />
 			</dataarea>
 		</part>
 	</software>
@@ -3313,8 +3313,8 @@
 		<part name="cart" interface="coleco_cart">
 			<feature name="slot" value="xin1" />
 			<dataarea name="rom" size="2097152">
-				<rom name="eprom-flash-63in1-part1.rom" size="1048576" crc="3b21137f" sha1="a22b1a4ea96507c87269db50c0d21052e987e83f" offset="0" />
-				<rom name="eprom-flash-63in1-part2.rom" size="1048576" crc="f4d18722" sha1="e5a6d0071a0b1d813f03713133b48ba3a073c2cd" offset="1048576" />
+				<rom name="eprom-flash-63in1-part1.rom" size="1048576" crc="3b21137f" sha1="a22b1a4ea96507c87269db50c0d21052e987e83f" offset="0x000000" />
+				<rom name="eprom-flash-63in1-part2.rom" size="1048576" crc="f4d18722" sha1="e5a6d0071a0b1d813f03713133b48ba3a073c2cd" offset="0x100000" />
 			</dataarea>
 		</part>
 	</software>

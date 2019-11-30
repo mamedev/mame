@@ -26,8 +26,9 @@ private:
 static INPUT_PORTS_START( lilith )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(lilith_state::lilith)
-MACHINE_CONFIG_END
+void lilith_state::lilith(machine_config &config)
+{
+}
 
 ROM_START( lilith )
 	ROM_REGION( 0x10000, "maincpu", 0 )

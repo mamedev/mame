@@ -104,25 +104,25 @@ void pgm3_state::machine_reset()
 {
 }
 
-MACHINE_CONFIG_START(pgm3_state::pgm3)
-
+void pgm3_state::pgm3(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", ARM9, 800000000) // wrong, see notes at top of driver
-	MCFG_DEVICE_PROGRAM_MAP(pgm3_map)
-	MCFG_DEVICE_DISABLE()
+	ARM9(config, m_maincpu, 800000000); // wrong, see notes at top of driver
+	m_maincpu->set_addrmap(AS_PROGRAM, &pgm3_state::pgm3_map);
+	m_maincpu->set_disable();
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(1280, 720)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1280-1, 0, 720-1)
-	MCFG_SCREEN_UPDATE_DRIVER(pgm3_state, screen_update_pgm3)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, pgm3_state, screen_vblank_pgm3))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(1280, 720);
+	screen.set_visarea(0, 1280-1, 0, 720-1);
+	screen.set_screen_update(FUNC(pgm3_state::screen_update_pgm3));
+	screen.screen_vblank().set(FUNC(pgm3_state::screen_vblank_pgm3));
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 0x1000)
-MACHINE_CONFIG_END
+	PALETTE(config, "palette").set_entries(0x1000);
+}
 
 ROM_START( kov3hd )
 	ROM_REGION( 0x04000, "maincpu", ROMREGION_ERASE00 )

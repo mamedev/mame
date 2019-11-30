@@ -5,10 +5,10 @@
 #include "cpu/i86/i186.h"
 #include "machine/wd_fdc.h"
 #include "machine/mc68681.h"
+#include "bus/nscsi/hd.h"
 #include "bus/rs232/rs232.h"
-#include "machine/nscsi_hd.h"
 #include "machine/ncr5380n.h"
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
 #include "formats/pc_dsk.h"
 #include "formats/naslite_dsk.h"
 
@@ -26,10 +26,8 @@ public:
 	void lb186(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(sio_out_w);
-	DECLARE_WRITE8_MEMBER(drive_sel_w);
-	DECLARE_READ8_MEMBER(scsi_dack_r);
-	DECLARE_WRITE8_MEMBER(scsi_dack_w);
+	void sio_out_w(uint8_t data);
+	void drive_sel_w(uint8_t data);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	static void ncr5380(device_t *device);
 	void lb186_io(address_map &map);
@@ -40,24 +38,13 @@ private:
 	required_device<ncr5380n_device> m_scsi;
 };
 
-WRITE8_MEMBER(lb186_state::scsi_dack_w)
+void lb186_state::sio_out_w(uint8_t data)
 {
-	m_scsi->dma_w(data);
-}
-
-READ8_MEMBER(lb186_state::scsi_dack_r)
-{
-	return m_scsi->dma_r();
-}
-
-WRITE8_MEMBER(lb186_state::sio_out_w)
-{
-	if(!BIT(data, 5))
-		m_fdc->soft_reset();
+	m_fdc->mr_w(BIT(data, 5));
 	m_maincpu->tmrin1_w(BIT(data, 3) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE8_MEMBER(lb186_state::drive_sel_w)
+void lb186_state::drive_sel_w(uint8_t data)
 {
 	m_fdc->dden_w(BIT(data, 5));
 
@@ -103,7 +90,7 @@ void lb186_state::lb186_io(address_map &map)
 	map(0x1000, 0x101f).rw("duart", FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask16(0x00ff);
 	map(0x1080, 0x108f).rw(m_scsi, FUNC(ncr5380n_device::read), FUNC(ncr5380n_device::write)).umask16(0x00ff);
 	map(0x1100, 0x1107).rw(m_fdc, FUNC(wd1772_device::read), FUNC(wd1772_device::write)).umask16(0x00ff);
-	map(0x1180, 0x1180).rw(FUNC(lb186_state::scsi_dack_r), FUNC(lb186_state::scsi_dack_w));
+	map(0x1180, 0x1180).rw(m_scsi, FUNC(ncr5380n_device::dma_r), FUNC(ncr5380n_device::dma_w));
 	map(0x1200, 0x1200).w(FUNC(lb186_state::drive_sel_w));
 }
 
@@ -116,9 +103,8 @@ void lb186_state::ncr5380(device_t *device)
 {
 	devcb_base *devcb;
 	(void)devcb;
-	MCFG_DEVICE_CLOCK(10000000)
-	MCFG_NCR5380N_IRQ_HANDLER(WRITELINE(":maincpu", i80186_cpu_device, int1_w))
-	MCFG_NCR5380N_DRQ_HANDLER(WRITELINE(":maincpu", i80186_cpu_device, drq0_w))
+	downcast<ncr5380n_device &>(*device).irq_handler().set(":maincpu", FUNC(i80186_cpu_device::int1_w));
+	downcast<ncr5380n_device &>(*device).drq_handler().set(":maincpu", FUNC(i80186_cpu_device::drq0_w));
 }
 
 static void scsi_devices(device_slot_interface &device)
@@ -132,46 +118,50 @@ FLOPPY_FORMATS_MEMBER( lb186_state::floppy_formats )
 	FLOPPY_NASLITE_FORMAT
 FLOPPY_FORMATS_END
 
-MACHINE_CONFIG_START(lb186_state::lb186)
-	MCFG_DEVICE_ADD("maincpu", I80186, 16_MHz_XTAL / 2)
-	MCFG_DEVICE_PROGRAM_MAP(lb186_map)
-	MCFG_DEVICE_IO_MAP(lb186_io)
+void lb186_state::lb186(machine_config &config)
+{
+	I80186(config, m_maincpu, 16_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &lb186_state::lb186_map);
+	m_maincpu->set_addrmap(AS_IO, &lb186_state::lb186_io);
 
-	MCFG_DEVICE_ADD("duart", SCN2681, 3.6864_MHz_XTAL)
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE("maincpu", i80186_cpu_device, int0_w))
-	MCFG_MC68681_A_TX_CALLBACK(WRITELINE("rs232_1", rs232_port_device, write_txd))
-	MCFG_MC68681_B_TX_CALLBACK(WRITELINE("rs232_2", rs232_port_device, write_txd))
-	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(*this, lb186_state, sio_out_w))
+	scn2681_device &duart(SCN2681(config, "duart", 3.6864_MHz_XTAL));
+	duart.irq_cb().set(m_maincpu, FUNC(i80186_cpu_device::int0_w));
+	duart.a_tx_cb().set("rs232_1", FUNC(rs232_port_device::write_txd));
+	duart.b_tx_cb().set("rs232_2", FUNC(rs232_port_device::write_txd));
+	duart.outport_cb().set(FUNC(lb186_state::sio_out_w));
 
-	MCFG_DEVICE_ADD("rs232_1", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("duart", scn2681_device, rx_a_w))
-	MCFG_DEVICE_ADD("rs232_2", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("duart", scn2681_device, rx_b_w))
+	rs232_port_device &rs232_1(RS232_PORT(config, "rs232_1", default_rs232_devices, "terminal"));
+	rs232_1.rxd_handler().set("duart", FUNC(scn2681_device::rx_a_w));
+	rs232_port_device &rs232_2(RS232_PORT(config, "rs232_2", default_rs232_devices, nullptr));
+	rs232_2.rxd_handler().set("duart", FUNC(scn2681_device::rx_b_w));
 
-	MCFG_DEVICE_ADD("fdc", WD1772, 16_MHz_XTAL / 2)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE("maincpu", i80186_cpu_device, int2_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE("maincpu", i80186_cpu_device, drq0_w))
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", lb186_floppies, "525dd", lb186_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", lb186_floppies, nullptr, lb186_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:2", lb186_floppies, nullptr, lb186_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:3", lb186_floppies, nullptr, lb186_state::floppy_formats)
+	WD1772(config, m_fdc, 16_MHz_XTAL / 2);
+	m_fdc->intrq_wr_callback().set(m_maincpu, FUNC(i80186_cpu_device::int2_w));
+	m_fdc->drq_wr_callback().set(m_maincpu, FUNC(i80186_cpu_device::drq0_w));
+	FLOPPY_CONNECTOR(config, "fdc:0", lb186_floppies, "525dd", lb186_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", lb186_floppies, nullptr, lb186_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:2", lb186_floppies, nullptr, lb186_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:3", lb186_floppies, nullptr, lb186_state::floppy_formats);
 
-	MCFG_NSCSI_BUS_ADD("scsibus")
-	MCFG_NSCSI_ADD("scsibus:0", scsi_devices, "harddisk", false)
-	MCFG_NSCSI_ADD("scsibus:1", scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:2", scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:3", scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:4", scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:5", scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:6", scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:7", scsi_devices, "ncr5380", true)
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("ncr5380", lb186_state::ncr5380)
-MACHINE_CONFIG_END
+	NSCSI_BUS(config, "scsibus");
+	NSCSI_CONNECTOR(config, "scsibus:0", scsi_devices, "harddisk");
+	NSCSI_CONNECTOR(config, "scsibus:1", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:2", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:3", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:4", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:5", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:6", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:7", scsi_devices, "ncr5380", true).set_option_machine_config("ncr5380", lb186_state::ncr5380);
+}
 
 ROM_START( lb186 )
-	ROM_REGION(0x4000, "bios", 0)
-	ROM_LOAD16_BYTE("a75515_v3.35.rom", 0x0000, 0x2000, CRC(245824fb) SHA1(b39ed91d421513f5912fdbc290aaa3f1b7d4f1e0))
-	ROM_LOAD16_BYTE("a75516_v3.35.rom", 0x0001, 0x2000, CRC(9d9a5e22) SHA1(070be31c622f50508e8cbdb797c79978b6a4b8f6))
+	ROM_REGION16_LE(0x4000, "bios", 0)
+	ROM_SYSTEM_BIOS(0, "v335", "BIOS Version 3.35") // 28 January 1987
+	ROMX_LOAD("a75515_v3.35.rom", 0x0000, 0x2000, CRC(245824fb) SHA1(b39ed91d421513f5912fdbc290aaa3f1b7d4f1e0), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("a75516_v3.35.rom", 0x0001, 0x2000, CRC(9d9a5e22) SHA1(070be31c622f50508e8cbdb797c79978b6a4b8f6), ROM_SKIP(1) | ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "ramdisk", "RAM Disk BIOS Version 1.00")
+	ROMX_LOAD("a75523.rom", 0x0000, 0x2000, CRC(2d22e826) SHA1(e366e489f580b440131ad5212722391b60af90cd), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("a75524.rom", 0x0001, 0x2000, CRC(9c9b249c) SHA1(e988e92d9fa6fe66f89ef748021e9a0501d2807e), ROM_SKIP(1) | ROM_BIOS(1))
 ROM_END
 
 COMP( 1985, lb186, 0, 0, lb186, 0, lb186_state, empty_init, "Ampro Computers", "Little Board/186", MACHINE_NO_SOUND_HW )

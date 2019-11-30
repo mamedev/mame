@@ -1,0 +1,1228 @@
+Operation Wolf C-Chip Protection simulation
+===========================================
+
+The below simulation was replaced by emulating the actual cchip using an
+extracted eprom image. The information previously contained in the MAME driver
+is contained below for documentation purposes.
+
+Start of original notes and simulation below.
+
+
+***************************************************************************
+File: mame/machine/opwolf.cpp
+***************************************************************************
+
+
+  Operation Wolf C-Chip Protection
+  ================================
+
+  The C-Chip (Taito TC0030CMD) is an unidentified mask programmed
+  microcontroller of some sort with 64 pins used for copy protection.
+  It probably has about 2k of ROM and 8k of RAM.  The simulation in this file
+  is verified from the unprotected prototype game and the observed behaviour
+  of the real pcb running.  It should give 100% accurate gameplay.  The bootleg
+  Operation Wolf uses a Z80 and custom program to replace the c-chip.  However
+  it's clear that bootlegger done the minimum to make the game work, with both
+  major and minor differences to the original game, which are outlined below.
+
+  Operation Wolf has interesting software architecture.  Unlike most games of this
+  era which have a simple main loop and linear code flow, Operation Wolf
+  implements a co-operative threading model where routines run in 68K user mode
+  until giving up their timeslice and a supervisor mode scheduler picks the next
+  thread to run.  There are 32 thread slots, and each enemy in game run as its
+  own thread/object as well as a thread for coins, scrolling the level, level
+  specific gameplay and so on.  The code is very robust when creating threads,
+  for example if there are no free slots, the creating thread just spins until
+  a slot frees up.  The rest of the game just keeps on playing in the background.
+  Another interesting detail is that a thread can give up it's timeslice for more
+  than 1 frame - this makes it really easy to implement timed events.  The 'WARNING'
+  text at the end of level 2 is handled by a thread that prints to screen, then just
+  waits a second before spawning the boss enemy thread.
+
+  Each level in the game implements its own logic thread and often sub-threads -
+  this is the major difference between the protected game and the bootleg - the bootleg
+  mostly implements the parts that are generic between all levels rather than all of
+  the details.  The biggest single area the bootleg did not implement revolves
+  around location 0x5f in the shared c-chip RAM.  The original code sets up a thread
+  that just waits for this value to become non-zero.  It then jumps to a set of
+  functions defined in a look-up table (that can then spawn further threads).  There
+  are 10 non-null functions tied to this routine.
+
+  1:  Enemy spawn for level 7 (first 'Located' cut-scene)
+  2:  Enemy spawn for level 8 (second 'Located' cut-scene) - zoom in helicopters
+  3:  Enemy spawn for level 9 (third 'Located' cut-scene)
+  4:  Boss & hostage sequence for level 2
+  5:  Enemy spawn when less than 45 enemies in level 2 (paratrooper drop-down)
+  6:  Enemy spawn when less than 25 enemies in level 2
+  7:  Enemy spawn when 0 men left in levels 2,4,5,6
+  8:  Enemy spawn when 0 men left in level 3
+  9:  Enemy spawn when 0 men left in level 1
+  10:  Special explosion animation when level 4 (Powder Dump) is completed
+
+  The bootleg also misses some other details, for example in level 5 the c-chip
+  sets a flag when all men are destroyed (not vehicles) and this triggers the 68K
+  to scroll the screen vertically to focus on the remaining helicopter enemies.
+
+  The 'Enemy has located you' cut-scenes appear 'randomly' between levels in the
+  original game, but are deliberately disabled in the bootleg.  The exact formula
+  for determining if the cut-scene appears is '(frameCount & levelNumber)==0'.
+  See code at 0x2D68 for this logic.
+
+
+  Interesting memory locations shared by cchip/68k:
+
+  0a/xx - copy of 3a0000
+  28/14 - dip switch A (written by 68k at start)
+  2a/15 - dip switch B (written by 68k at start)
+  2c/ ???      (mapped to $982,A5) [word] in prototype)
+  2e/          (mapped to $984,A5) [word] in prototype)
+  58/2c         m_cchip_ram[0x2c] = 0x31;
+  ee/77         m_cchip_ram[0x77] = 0x05;
+  4a/25         m_cchip_ram[0x25] = 0x0f;
+  4c/26         m_cchip_ram[0x26] = 0x0b;
+  36/1b - Current level number (1-6)
+  38/1c - Number of men remaining in level
+  3c/1e - Number of helicopters remaining in level
+  3e/1f - Number of tanks remaining in level
+  40/20 - Number of boats remaining in level
+  42/21 - Hostages in plane (last level)
+  44/22 - Hostages remaining (last level)/Hostages saved (2nd last level)
+  4e/27 - Set to 1 when final boss is destroyed
+  64/32 - Set to 1 by cchip when level complete (no more enemies remaining)
+  68/34 - Game state (0=attract mode, 1=intro, 2=in-game, 3=end-screen)
+  69/xx - variable mapped from ($980,A5) [byte] in prototype
+  6B/xx - variable mapped from ($981,A5) [byte] in prototype
+  A6/xx - variable mapped from ($d6e,A5) [word] in prototype
+  A8/54 - ?
+  xx/51/52 - Used by cchip to signal change in credit level to 68k
+  xx/53 - Credit count
+  EA/75 - Set to 1 to trigger end of game boss
+  EC/76 - used near above
+  xx/7a - Used to trigger level data select command
+
+  Notes on bootleg c-chip compared to original:
+    Bootleg cchip forces english language mode
+    Bootleg forces round 4 in attract mode
+    Bootleg doesn't support service switch
+    If you die after round 6 then the bootleg fails to reset the difficulty
+      for the next game.
+    The bootleg does not contain data for the 3 mini-levels ('Enemy has located you'),
+      instead it prevents them running by writing 0 to location 70 in the shared memory.
+    The bootleg does not play the special powder magazine (level 4) animation.
+    The bootleg does not vertically scroll the screen when all men killed in level 5
+    The bootleg does not update the enemy spawn tables at various points.
+
+  Notes by bmcphail@vcmame.net
+
+
+
+
+/* Select how coinage data is initialised in opwolf_cchip_data_w : 0 = user-defined in function - 1 = automatic */
+#define OPWOLF_READ_COINAGE_FROM_ROM    1
+
+/* List of possible regions */
+enum {
+	OPWOLF_REGION_BAD=0,
+	OPWOLF_REGION_JAPAN,
+	OPWOLF_REGION_US,
+	OPWOLF_REGION_WORLD,
+	OPWOLF_REGION_OTHER
+};
+
+static const uint16_t level_data_00[] = {
+	0x0480, 0x1008, 0x0300,   0x5701, 0x0001, 0x0010,
+	0x0480, 0x1008, 0x0300,   0x5701, 0x0001, 0x002b,
+	0x0780, 0x0009, 0x0300,   0x4a01, 0x0004, 0x0020,
+	0x0780, 0x1208, 0x0300,   0x5d01, 0x0004, 0x0030,
+	0x0780, 0x0209, 0x0300,   0x4c01, 0x0004, 0x0038,
+	0x0780, 0x0309, 0x0300,   0x4d01, 0x0004, 0x0048,
+	0x0980, 0x1108, 0x0300,   0x5a01, 0xc005, 0x0018,
+	0x0980, 0x0109, 0x0300,   0x4b01, 0xc005, 0x0028,
+	0x0b80, 0x020a, 0x0000,   0x6401, 0x8006, 0x0004,
+	0x0c80, 0x010b, 0x0000,   0xf201, 0x8006, 0x8002,
+	0x0b80, 0x020a, 0x0000,   0x6401, 0x8006, 0x0017,
+	0x0c80, 0x010b, 0x0000,   0xf201, 0x8006, 0x8015,
+	0x0b80, 0x020a, 0x0000,   0x6401, 0x0007, 0x0034,
+	0x0c80, 0x010b, 0x0000,   0xf201, 0x0007, 0x8032,
+	0x0b80, 0x020a, 0x0000,   0x6401, 0x8006, 0x803e,
+	0x0c80, 0x010b, 0x0000,   0xf201, 0x8006, 0x803d,
+	0x0b80, 0x100a, 0x0000,   0x6001, 0x0007, 0x0008,
+	0x0b80, 0x100a, 0x0000,   0x6001, 0x0007, 0x000b,
+	0x0b80, 0x100a, 0x0000,   0x6001, 0x0007, 0x001b,
+	0x0b80, 0x100a, 0x0000,   0x6001, 0x0007, 0x001e,
+	0x0b80, 0x100a, 0x0000,   0x6001, 0x8007, 0x0038,
+	0x0b80, 0x100a, 0x0000,   0x6001, 0x8007, 0x003b,
+	0x0b80, 0x100a, 0x0000,   0x6001, 0x0007, 0x8042,
+	0x0b80, 0x100a, 0x0000,   0x6001, 0x0007, 0x8045,
+	0x0c80, 0x000b, 0x0000,   0xf101, 0x800b, 0x8007,
+	0x0c80, 0x000b, 0x0000,   0xf101, 0x800b, 0x801a,
+	0x0c80, 0x000b, 0x0000,   0xf101, 0x000c, 0x8037,
+	0x0c80, 0x000b, 0x0000,   0xf101, 0x800b, 0x0042,
+	0x0c80, 0xd04b, 0x0000,   0xf301, 0x8006, 0x8009,
+	0x0c80, 0xd04b, 0x0000,   0xf301, 0x8006, 0x801c,
+	0x0c80, 0xd04b, 0x0000,   0xf301, 0x8006, 0x0044,
+	0x0c80, 0x030b, 0x0000,   0xf401, 0x0008, 0x0028,
+	0x0c80, 0x030b, 0x0000,   0xf401, 0x0008, 0x804b,
+	0x0c00, 0x040b, 0x0000,   0xf501, 0x0008, 0x8026,
+	0xffff
+};
+
+static const uint16_t level_data_01[] = {
+	0x0780, 0x0209, 0x0300,   0x4c01, 0x0004, 0x0010,
+	0x0780, 0x0209, 0x0300,   0x4c01, 0x4004, 0x0020,
+	0x0780, 0x0309, 0x0300,   0x4d01, 0xe003, 0x0030,
+	0x0780, 0x0309, 0x0300,   0x4d01, 0x8003, 0x0040,
+	0x0780, 0x0209, 0x0300,   0x4c01, 0x8004, 0x0018,
+	0x0780, 0x0309, 0x0300,   0x4d01, 0xc003, 0x0028,
+	0x0b80, 0x000b, 0x0000,   0x0b02, 0x8009, 0x0029,
+	0x0b80, 0x0409, 0x0000,   0x0f02, 0x8008, 0x8028,
+	0x0b80, 0x040a, 0x0000,   0x3502, 0x000a, 0x8028,
+	0x0b80, 0x050a, 0x0000,   0x1002, 0x8006, 0x8028,
+	0x0b80, 0x120a, 0x0000,   0x3602, 0x0008, 0x004d,
+	0x0b80, 0x120a, 0x0000,   0x3602, 0x0008, 0x004f,
+	0x0b80, 0x120a, 0x0000,   0x3602, 0x0008, 0x0001,
+	0x0b80, 0x120a, 0x0000,   0x3602, 0x0008, 0x0003,
+	0x0b80, 0x130a, 0x0000,   0x3a02, 0x0007, 0x0023,
+	0x0b80, 0x130a, 0x0000,   0x3a02, 0x0007, 0x8025,
+	0x0b80, 0x130a, 0x0000,   0x3a02, 0x8009, 0x0023,
+	0x0b80, 0x130a, 0x0000,   0x3a02, 0x8009, 0x8025,
+	0x0b80, 0x140a, 0x0000,   0x3e02, 0x0007, 0x000d,
+	0x0b80, 0x140a, 0x0000,   0x3e02, 0x0007, 0x800f,
+	0x0b80, 0x000b, 0x0000,   0x0102, 0x0007, 0x804e,
+	0x0b80, 0xd24b, 0x0000,   0x0302, 0x0007, 0x000e,
+	0x0b80, 0x000b, 0x0000,   0x0402, 0x8006, 0x0020,
+	0x0b80, 0xd34b, 0x0000,   0x0502, 0x8006, 0x0024,
+	0x0b80, 0x000b, 0x0000,   0x0602, 0x8009, 0x0001,
+	0x0b80, 0xd44b, 0x0000,   0x0702, 0x800b, 0x800b,
+	0x0b80, 0xd54b, 0x0000,   0x0802, 0x800b, 0x000e,
+	0x0b80, 0x000b, 0x0000,   0x0902, 0x800b, 0x0010,
+	0x0b80, 0x000b, 0x0000,   0x0a02, 0x0009, 0x0024,
+	0x0b80, 0xd64b, 0x0000,   0x0c02, 0x000c, 0x8021,
+	0x0b80, 0x000b, 0x0000,   0x0d02, 0x000c, 0x0025,
+	0x0b80, 0x000b, 0x0000,   0x0e02, 0x8009, 0x004e,
+	0x0b80, 0x000b, 0x0300,   0x4e01, 0x8006, 0x8012,
+	0x0b80, 0x000b, 0x0300,   0x4e01, 0x0007, 0x8007,
+	0xffff
+};
+
+static const uint16_t level_data_02[] = {
+	0x0480, 0x000b, 0x0300,   0x4501, 0x0001, 0x0018,
+	0x0480, 0x000b, 0x0300,   0x4501, 0x2001, 0x0030,
+	0x0780, 0x1208, 0x0300,   0x5d01, 0x0004, 0x0010,
+	0x0780, 0x1208, 0x0300,   0x5d01, 0x2004, 0x001c,
+	0x0780, 0x1208, 0x0300,   0x5d01, 0xe003, 0x0026,
+	0x0780, 0x1208, 0x0300,   0x5d01, 0x8003, 0x0034,
+	0x0780, 0x1208, 0x0300,   0x5d01, 0x3004, 0x0040,
+	0x0780, 0x010c, 0x0300,   0x4601, 0x4004, 0x0022,
+	0x0780, 0x010c, 0x0300,   0x4601, 0x6004, 0x0042,
+	0x0780, 0x000c, 0x0500,   0x7b01, 0x800b, 0x0008,
+	0x0780, 0x010c, 0x0300,   0x4601, 0x2004, 0x0008,
+	0x0000, 0x0000, 0x0000,   0xf001, 0x0000, 0x0000,
+	0x0000, 0x0000, 0x0000,   0xf001, 0x0000, 0x0000,
+	0x0000, 0x0000, 0x0000,   0xf001, 0x0000, 0x0000,
+	0x0b80, 0x000b, 0x0000,   0x1902, 0x000b, 0x0004,
+	0x0b80, 0x000b, 0x0000,   0x1a02, 0x0009, 0x8003,
+	0x0b80, 0x000b, 0x0000,   0x1902, 0x000b, 0x000c,
+	0x0b80, 0x000b, 0x0000,   0x1a02, 0x0009, 0x800b,
+	0x0b80, 0x000b, 0x0000,   0x1902, 0x000b, 0x001c,
+	0x0b80, 0x000b, 0x0000,   0x1a02, 0x0009, 0x801b,
+	0x0b80, 0x000b, 0x0000,   0x1902, 0x000b, 0x002c,
+	0x0b80, 0x000b, 0x0000,   0x1a02, 0x0009, 0x802b,
+	0x0b80, 0x000b, 0x0000,   0x1902, 0x000b, 0x0044,
+	0x0b80, 0x000b, 0x0000,   0x1a02, 0x0009, 0x8043,
+	0x0b80, 0x000b, 0x0000,   0x1902, 0x000b, 0x004c,
+	0x0b80, 0x000b, 0x0000,   0x1a02, 0x0009, 0x804b,
+	0x0b80, 0x020c, 0x0300,   0x4801, 0xa009, 0x0010,
+	0x0b80, 0x020c, 0x0300,   0x4801, 0xa009, 0x0028,
+	0x0b80, 0x020c, 0x0300,   0x4801, 0xa009, 0x0036,
+	0x0000, 0x0000, 0x0000,   0xf001, 0x0000, 0x0000,
+	0x0000, 0x0000, 0x0000,   0xf001, 0x0000, 0x0000,
+	0x0000, 0x0000, 0x0000,   0xf001, 0x0000, 0x0000,
+	0x0000, 0x0000, 0x0000,   0xf001, 0x0000, 0x0000,
+	0x0000, 0x0000, 0x0000,   0xf001, 0x0000, 0x0000,
+	0xffff
+};
+
+static const uint16_t level_data_03[] = {
+	0x0480, 0x000b, 0x0300,   0x4501, 0x0001, 0x0018,
+	0x0480, 0x000b, 0x0300,   0x4501, 0x2001, 0x002b,
+	0x0780, 0x010c, 0x0300,   0x4601, 0x0004, 0x000d,
+	0x0780, 0x000c, 0x0500,   0x7b01, 0x800b, 0x0020,
+	0x0780, 0x010c, 0x0300,   0x4601, 0x2004, 0x0020,
+	0x0780, 0x010c, 0x0300,   0x4601, 0x8003, 0x0033,
+	0x0780, 0x010c, 0x0300,   0x4601, 0x0004, 0x003c,
+	0x0780, 0x010c, 0x0300,   0x4601, 0xd003, 0x0045,
+	0x0780, 0x000c, 0x0500,   0x7b01, 0x900b, 0x0041,
+	0x0780, 0x010c, 0x0300,   0x4601, 0x3004, 0x0041,
+	0x0b80, 0x020c, 0x0300,   0x4801, 0x0007, 0x0000,
+	0x0b80, 0x410a, 0x0000,   0x2b02, 0xe006, 0x4049,
+	0x0b80, 0x020c, 0x0300,   0x4801, 0x8007, 0x000b,
+	0x0b80, 0x000b, 0x0000,   0x2702, 0x800a, 0x8005,
+	0x0b80, 0x000b, 0x0000,   0x1e02, 0x0008, 0x800e,
+	0x0b80, 0x000b, 0x0000,   0x1f02, 0x8007, 0x0011,
+	0x0b80, 0x000b, 0x0000,   0x2802, 0x000b, 0x0012,
+	0x0b80, 0x000b, 0x0000,   0x2002, 0x0007, 0x8015,
+	0x0b80, 0x000b, 0x0000,   0x2102, 0x0007, 0x801b,
+	0x0b80, 0x000b, 0x0000,   0x2902, 0x800a, 0x001a,
+	0x0b80, 0x000b, 0x0000,   0x2202, 0x8007, 0x001e,
+	0x0b80, 0x000b, 0x0000,   0x1e02, 0x0008, 0x0025,
+	0x0b80, 0x000b, 0x0000,   0x2302, 0x8007, 0x802c,
+	0x0b80, 0x000b, 0x0000,   0x2802, 0x000b, 0x8028,
+	0x0b80, 0x020c, 0x0300,   0x4801, 0x0007, 0x0030,
+	0x0b80, 0x400a, 0x0000,   0x2e02, 0x4007, 0x002d,
+	0x0b80, 0x000b, 0x0000,   0x2702, 0x800a, 0x8035,
+	0x0b80, 0x020c, 0x0300,   0x4801, 0x8007, 0x0022,
+	0x0b80, 0x000b, 0x0000,   0x2402, 0x8007, 0x0047,
+	0x0b80, 0x000b, 0x0000,   0x2a02, 0x800a, 0x004b,
+	0x0b80, 0x000b, 0x0000,   0x2502, 0x0007, 0x804b,
+	0x0b80, 0x000b, 0x0000,   0x2602, 0x0007, 0x004e,
+	0x0b80, 0x020c, 0x0300,   0x4801, 0x0007, 0x8043,
+	0x0b80, 0x020c, 0x0300,   0x4801, 0x8007, 0x803d,
+	0xffff
+};
+
+static const uint16_t level_data_04[] = {
+	0x0780, 0x0209, 0x0300,   0x4c01, 0x0004, 0x0010,
+	0x0780, 0x0209, 0x0300,   0x4c01, 0x4004, 0x0020,
+	0x0780, 0x0309, 0x0300,   0x4d01, 0xe003, 0x0030,
+	0x0780, 0x0309, 0x0300,   0x4d01, 0x8003, 0x0040,
+	0x0780, 0x0209, 0x0300,   0x4c01, 0x8004, 0x0018,
+	0x0780, 0x0309, 0x0300,   0x4d01, 0xc003, 0x0028,
+	0x0780, 0x000b, 0x0300,   0x5601, 0x8004, 0x0008,
+	0x0780, 0x000b, 0x0300,   0x5601, 0x8004, 0x0038,
+	0x0780, 0x000b, 0x0300,   0x5501, 0x8004, 0x0048,
+	0x0980, 0x0509, 0x0f00,   0x0f01, 0x4005, 0x4007,
+	0x0980, 0x0509, 0x0f00,   0x0f01, 0x4005, 0x4037,
+	0x0b80, 0x030a, 0x0000,   0x1302, 0x8006, 0x0040,
+	0x0b80, 0x110a, 0x0000,   0x1502, 0x8008, 0x8048,
+	0x0b80, 0x110a, 0x0000,   0x1502, 0x8008, 0x8049,
+	0x0b80, 0x000b, 0x0000,   0xf601, 0x0007, 0x8003,
+	0x0b80, 0x000b, 0x0000,   0xf701, 0x0007, 0x0005,
+	0x0b80, 0x000b, 0x0000,   0xf901, 0x0007, 0x8008,
+	0x0b80, 0x000b, 0x0000,   0xf901, 0x0007, 0x0010,
+	0x0b80, 0x000b, 0x0000,   0xfa01, 0x0007, 0x8013,
+	0x0b80, 0x000b, 0x0000,   0xf801, 0x800b, 0x800b,
+	0x0b80, 0x000b, 0x0000,   0x0002, 0x800b, 0x801a,
+	0x0b80, 0x000b, 0x0000,   0xf901, 0x0007, 0x8017,
+	0x0b80, 0x000b, 0x0000,   0xfa01, 0x0007, 0x001b,
+	0x0b80, 0x000b, 0x0000,   0xf801, 0x800b, 0x0013,
+	0x0b80, 0x000b, 0x0000,   0x4202, 0x800b, 0x0016,
+	0x0b80, 0x000b, 0x0000,   0xfb01, 0x8007, 0x8020,
+	0x0b80, 0x000b, 0x0000,   0xf601, 0x0007, 0x8023,
+	0x0b80, 0x000b, 0x0000,   0x4202, 0x800b, 0x800e,
+	0x0b80, 0x000b, 0x0000,   0x4302, 0x800b, 0x801d,
+	0x0b80, 0x000b, 0x0000,   0xf701, 0x0007, 0x0025,
+	0x0b80, 0x000b, 0x0000,   0xfd01, 0x8006, 0x003f,
+	0x0b80, 0x000b, 0x0000,   0xfe01, 0x0007, 0x0046,
+	0x0b80, 0x000b, 0x0000,   0xff01, 0x8007, 0x8049,
+	0x0b80, 0x000b, 0x0000,   0xfc01, 0x8009, 0x0042,
+	0xffff
+};
+
+static const uint16_t level_data_05[] = {
+	0x0480, 0x1008, 0x0300,   0x5701, 0x0001, 0x0010,
+	0x0480, 0x1008, 0x0300,   0x5701, 0x0001, 0x002b,
+	0x0780, 0x0009, 0x0300,   0x4a01, 0x0004, 0x0020,
+	0x0780, 0x1208, 0x0300,   0x5d01, 0x0004, 0x0030,
+	0x0780, 0x0209, 0x0300,   0x4c01, 0x0004, 0x0038,
+	0x0780, 0x0309, 0x0300,   0x4d01, 0x0004, 0x0048,
+	0x0980, 0x1108, 0x0300,   0x5a01, 0xc005, 0x0018,
+	0x0980, 0x0109, 0x0300,   0x4b01, 0xc005, 0x0028,
+	0x0b80, 0x020a, 0x0000,   0x6401, 0x8006, 0x0004,
+	0x0c80, 0x010b, 0x0000,   0xf201, 0x8006, 0x8002,
+	0x0b80, 0x020a, 0x0000,   0x6401, 0x8006, 0x0017,
+	0x0c80, 0x010b, 0x0000,   0xf201, 0x8006, 0x8015,
+	0x0b80, 0x020a, 0x0000,   0x6401, 0x0007, 0x0034,
+	0x0c80, 0x010b, 0x0000,   0xf201, 0x0007, 0x8032,
+	0x0b80, 0x020a, 0x0000,   0x6401, 0x8006, 0x803e,
+	0x0c80, 0x010b, 0x0000,   0xf201, 0x8006, 0x803d,
+	0x0b80, 0x100a, 0x0000,   0x6001, 0x0007, 0x0008,
+	0x0b80, 0x100a, 0x0000,   0x6001, 0x0007, 0x000b,
+	0x0b80, 0x100a, 0x0000,   0x6001, 0x0007, 0x001b,
+	0x0b80, 0x100a, 0x0000,   0x6001, 0x0007, 0x001e,
+	0x0b80, 0x100a, 0x0000,   0x6001, 0x8007, 0x0038,
+	0x0b80, 0x100a, 0x0000,   0x6001, 0x8007, 0x003b,
+	0x0b80, 0x100a, 0x0000,   0x6001, 0x0007, 0x8042,
+	0x0b80, 0x100a, 0x0000,   0x6001, 0x0007, 0x8045,
+	0x0c80, 0x000b, 0x0000,   0xf101, 0x800b, 0x8007,
+	0x0c80, 0x000b, 0x0000,   0xf101, 0x800b, 0x801a,
+	0x0c80, 0x000b, 0x0000,   0xf101, 0x000c, 0x8037,
+	0x0c80, 0x000b, 0x0000,   0xf101, 0x800b, 0x0042,
+	0x0c80, 0xd04b, 0x0000,   0xf301, 0x8006, 0x8009,
+	0x0c80, 0xd04b, 0x0000,   0xf301, 0x8006, 0x801c,
+	0x0c80, 0xd04b, 0x0000,   0xf301, 0x8006, 0x0044,
+	0x0c80, 0x030b, 0x0000,   0xf401, 0x0008, 0x0028,
+	0x0c80, 0x030b, 0x0000,   0xf401, 0x0008, 0x804b,
+	0x0c00, 0x040b, 0x0000,   0xf501, 0x0008, 0x8026,
+	0xffff
+};
+
+static const uint16_t level_data_06[] = {
+	0x0000, 0x1008, 0x0300,   0x5701, 0x0001, 0x0010,
+	0x0000, 0x1008, 0x0300,   0x5701, 0x0001, 0x002b,
+	0x0000, 0x0000, 0x0000,   0x0000, 0x0000, 0x0000,
+	0x0700, 0x0009, 0x0300,   0x4a01, 0x0004, 0x0020,
+	0x0700, 0x1208, 0x0300,   0x5d01, 0x0004, 0x0030,
+	0x0700, 0x0209, 0x0300,   0x4c01, 0x0004, 0x0038,
+	0x0700, 0x0309, 0x0300,   0x4d01, 0x0004, 0x0048,
+	0x0900, 0x1108, 0x0300,   0x5a01, 0xc005, 0x0018,
+	0x0900, 0x0109, 0x0300,   0x4b01, 0xc005, 0x0028,
+	0x0000, 0x000b, 0x0000,   0x0000, 0x0018, 0x0000,
+	0x0000, 0x000b, 0x0000,   0x0000, 0x0018, 0x0000,
+	0x0000, 0x000b, 0x0000,   0x0000, 0x0018, 0x0000,
+	0x0000, 0x000b, 0x0000,   0x0000, 0x0018, 0x0000,
+	0x0000, 0x000b, 0x0000,   0x0000, 0x0018, 0x0000,
+	0x0000, 0x000b, 0x0000,   0x0000, 0x0018, 0x0000,
+	0x0000, 0x000b, 0x0000,   0x0000, 0x0018, 0x0000,
+	0x0000, 0x000b, 0x0000,   0x0000, 0x0018, 0x0000,
+	0x0000, 0x000b, 0x0000,   0x0000, 0x0018, 0x0000,
+	0x0980, 0xdb4c, 0x0000,   0x3202, 0x0006, 0x0004,
+	0x0000, 0x000b, 0x0000,   0x0000, 0x0018, 0x0000,
+	0x0000, 0x000b, 0x0000,   0x0000, 0x0018, 0x0000,
+	0x0000, 0x000b, 0x0000,   0x0000, 0x0018, 0x0000,
+	0x0000, 0x000b, 0x0000,   0x0000, 0x0018, 0x0000,
+	0x0000, 0x000b, 0x0000,   0x0000, 0x0018, 0x0000,
+	0x0000, 0x000b, 0x0000,   0x0000, 0x0018, 0x0000,
+	0x0000, 0x000b, 0x0000,   0x0000, 0x0018, 0x0000,
+	0x0000, 0x000b, 0x0000,   0x0000, 0x0018, 0x0000,
+	0x0000, 0x000b, 0x0000,   0x0000, 0x0018, 0x0000,
+	0x0000, 0x000b, 0x0000,   0x0000, 0x0018, 0x0000,
+	0x0000, 0x000b, 0x0000,   0x0000, 0x0018, 0x0000,
+	0x0000, 0x000b, 0x0000,   0x0000, 0x0018, 0x0000,
+	0x0000, 0x000b, 0x0000,   0x0000, 0x0018, 0x0000,
+	0x0000, 0x000b, 0x0000,   0x0000, 0x0018, 0x0000,
+	0x0000, 0x000b, 0x0000,   0x0000, 0x0018, 0x0000,
+	0xffff
+};
+
+static const uint16_t level_data_07[] = {
+	0x0480, 0x000b, 0x0300,   0x4501, 0x0001, 0x0001,
+	0x0000, 0x0000, 0x0000,   0xf001, 0x0000, 0x0000,
+	0x0780, 0x0109, 0x0300,   0x4a01, 0x0004, 0x0004,
+	0x0780, 0x0009, 0x0300,   0x4a01, 0x0004, 0x000d,
+	0x0780, 0x000c, 0x0500,   0x7b01, 0x000c, 0x0005,
+	0x0780, 0x000c, 0x0540,   0x7b01, 0x000c, 0x0005,
+	0x0780, 0x010c, 0x0300,   0x4601, 0x0005, 0x0005,
+	0x0780, 0x000c, 0x0500,   0x7b01, 0x800b, 0xc00d,
+	0x0780, 0x000c, 0x0540,   0x7b01, 0x800b, 0xc00d,
+	0x0780, 0x010c, 0x0300,   0x4601, 0x8004, 0xc00d,
+	0x0900, 0x0109, 0x0340,   0x4b01, 0x2006, 0x400c,
+	0x0780, 0x020c, 0x0300,   0x4801, 0x8007, 0x0008,
+	0x0780, 0x020c, 0x0300,   0x4801, 0x4007, 0xc00b,
+	0x0980, 0x0109, 0x0300,   0x4b01, 0xc006, 0x8007,
+	0x0980, 0x0109, 0x0300,   0x4b01, 0x8007, 0x8008,
+	0x0980, 0x0109, 0x0300,   0x4b01, 0xc006, 0x800c,
+	0x0000, 0x0000, 0x0000,   0xf001, 0x0000, 0x0000,
+	0x0000, 0x0000, 0x0000,   0xf001, 0x0000, 0x0000,
+	0x0000, 0x0000, 0x0000,   0xf001, 0x0000, 0x0000,
+	0x0000, 0x0000, 0x0000,   0xf001, 0x0000, 0x0000,
+	0x0000, 0x0000, 0x0000,   0xf001, 0x0000, 0x0000,
+	0x0000, 0x0000, 0x0000,   0xf001, 0x0000, 0x0000,
+	0x0000, 0x0000, 0x0000,   0xf001, 0x0000, 0x0000,
+	0x0000, 0x0000, 0x0000,   0xf001, 0x0000, 0x0000,
+	0x0000, 0x0000, 0x0000,   0xf001, 0x0000, 0x0000,
+	0x0000, 0x0000, 0x0000,   0xf001, 0x0000, 0x0000,
+	0x0000, 0x0000, 0x0000,   0xf001, 0x0000, 0x0000,
+	0x0000, 0x0000, 0x0000,   0xf001, 0x0000, 0x0000,
+	0x0000, 0x0000, 0x0000,   0xf001, 0x0000, 0x0000,
+	0x0000, 0x0000, 0x0000,   0xf001, 0x0000, 0x0000,
+	0x0000, 0x0000, 0x0000,   0xf001, 0x0000, 0x0000,
+	0x0000, 0x0000, 0x0000,   0xf001, 0x0000, 0x0000,
+	0xffff
+};
+
+static const uint16_t level_data_08[] = {
+	0xffff
+};
+
+static const uint16_t level_data_09[] = {
+	0x0000, 0x0000, 0x0000,   0xf001, 0x0000, 0x0000,
+	0x0000, 0x0000, 0x0000,   0xf001, 0x0000, 0x0000,
+	0x0780, 0x0109, 0x0300,   0x4a01, 0x8003, 0x8003,
+	0x0780, 0x0009, 0x0300,   0x4a01, 0x0004, 0x800e,
+	0x0780, 0x000c, 0x0500,   0x7b01, 0x000c, 0x0005,
+	0x0780, 0x000c, 0x0540,   0x7b01, 0x000c, 0x0005,
+	0x0780, 0x010c, 0x0300,   0x4601, 0x0005, 0x0005,
+	0x0780, 0x000c, 0x0500,   0x7b01, 0x800b, 0xc00d,
+	0x0780, 0x000c, 0x0540,   0x7b01, 0x800b, 0xc00d,
+	0x0780, 0x010c, 0x0300,   0x4601, 0x8004, 0xc00d,
+	0x0900, 0x0109, 0x0340,   0x4b01, 0x2006, 0x400c,
+	0x0780, 0x020c, 0x0300,   0x4801, 0x8007, 0x0008,
+	0x0780, 0x020c, 0x0300,   0x4801, 0x4007, 0xc00b,
+	0x0980, 0x0109, 0x0300,   0x4b01, 0xc006, 0x8007,
+	0x0980, 0x0109, 0x0300,   0x4b01, 0x8007, 0x8008,
+	0x0980, 0x0109, 0x0300,   0x4b01, 0xc006, 0x800c,
+	0x0000, 0x0000, 0x0000,   0xf001, 0x0000, 0x0000,
+	0x0000, 0x0000, 0x0000,   0xf001, 0x0000, 0x0000,
+	0x0000, 0x0000, 0x0000,   0xf001, 0x0000, 0x0000,
+	0x0000, 0x0000, 0x0000,   0xf001, 0x0000, 0x0000,
+	0x0000, 0x0000, 0x0000,   0xf001, 0x0000, 0x0000,
+	0x0000, 0x0000, 0x0000,   0xf001, 0x0000, 0x0000,
+	0x0000, 0x0000, 0x0000,   0xf001, 0x0000, 0x0000,
+	0x0000, 0x0000, 0x0000,   0xf001, 0x0000, 0x0000,
+	0x0000, 0x0000, 0x0000,   0xf001, 0x0000, 0x0000,
+	0x0000, 0x0000, 0x0000,   0xf001, 0x0000, 0x0000,
+	0x0000, 0x0000, 0x0000,   0xf001, 0x0000, 0x0000,
+	0x0000, 0x0000, 0x0000,   0xf001, 0x0000, 0x0000,
+	0x0000, 0x0000, 0x0000,   0xf001, 0x0000, 0x0000,
+	0x0000, 0x0000, 0x0000,   0xf001, 0x0000, 0x0000,
+	0x0000, 0x0000, 0x0000,   0xf001, 0x0000, 0x0000,
+	0x0000, 0x0000, 0x0000,   0xf001, 0x0000, 0x0000,
+	0xffff
+};
+
+static const uint16_t *const level_data_lookup[] =
+{
+	level_data_00,
+	level_data_01,
+	level_data_02,
+	level_data_03,
+	level_data_04,
+	level_data_05,
+	level_data_06,
+	level_data_07,
+	level_data_08,
+	level_data_09
+};
+
+void opwolf_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_OPWOLF:
+		opwolf_timer_callback(ptr, param);
+		break;
+	case TIMER_CCHIP:
+		cchip_timer(ptr, param);
+		break;
+	default:
+		throw emu_fatalerror("Unknown id in opwolf_state::device_timer");
+	}
+}
+
+TIMER_CALLBACK_MEMBER(opwolf_state::opwolf_timer_callback)
+{
+	// Level data command
+	if (m_current_cmd == 0xf5)
+	{
+		int const level = m_cchip_ram[0x1b] % 10;
+		uint16_t const *const level_data = level_data_lookup[level];
+
+		// The c-chip data is stored as a series of 3 word sets, delimited by 0xffff
+		memset(m_cchip_ram + 0x200, 0, 0x200);
+		for (unsigned i = 0; (i < 0x200) && (level_data[i] != 0xffff); i += 3)
+		{
+			m_cchip_ram[0x200 + i*2 + 0] = level_data[i]>>8;
+			m_cchip_ram[0x200 + i*2 + 1] = level_data[i]&0xff;
+			m_cchip_ram[0x200 + i*2 + 2] = level_data[i+1]>>8;
+			m_cchip_ram[0x200 + i*2 + 3] = level_data[i+1]&0xff;
+			m_cchip_ram[0x200 + i*2 + 4] = level_data[i+2]>>8;
+			m_cchip_ram[0x200 + i*2 + 5] = level_data[i+2]&0xff;
+		}
+
+		// The bootleg cchip writes 0 to these locations - we can probably assume the real one
+		// does similar as this is just zeroing out work variables used in the level.
+		m_cchip_ram[0x0] = 0;
+		m_cchip_ram[0x76] = 0;
+		m_cchip_ram[0x75] = 0;
+		m_cchip_ram[0x74] = 0;
+		m_cchip_ram[0x72] = 0;
+		m_cchip_ram[0x71] = 0;
+		// m_cchip_ram[0x70] = 0; // The bootleg writes this to disable mini-levels.  The real c-chip does not do this.
+		m_cchip_ram[0x66] = 0;
+		m_cchip_ram[0x2b] = 0;
+		m_cchip_ram[0x30] = 0;
+		m_cchip_ram[0x31] = 0;
+		m_cchip_ram[0x32] = 0;
+		m_cchip_ram[0x27] = 0;
+		m_c588 = 0;
+		m_c589 = 0;
+		m_c58a = 0;
+		m_triggeredLevel1b = 0;
+		m_triggeredLevel13b = 0;
+		m_triggeredLevel2 = 0;
+		m_triggeredLevel2b = 0;
+		m_triggeredLevel2c = 0;
+		m_triggeredLevel3b = 0;
+		m_triggeredLevel4 = 0;
+		m_triggeredLevel5 = 0;
+		m_triggeredLevel7 = 0;
+		m_triggeredLevel8 = 0;
+		m_triggeredLevel9 = 0;
+
+		m_cchip_ram[0x1a] = 0;
+		m_cchip_ram[0x7a] = 1; // Signal command complete
+
+		//logerror("Signal level command complete\n");
+	}
+
+	m_current_cmd = 0;
+}
+
+void opwolf_state::updateDifficulty( int mode )
+{
+	// The game is made up of 6 rounds, when you complete the
+	// sixth you return to the start but with harder difficulty.
+	if (mode == 0)
+	{
+		switch (m_cchip_ram[0x15]&3) // Dipswitch B
+		{
+		case 3:
+			m_cchip_ram[0x2c] = 0x31;
+			m_cchip_ram[0x77] = 0x05;
+			m_cchip_ram[0x25] = 0x0f;
+			m_cchip_ram[0x26] = 0x0b;
+			break;
+		case 0:
+			m_cchip_ram[0x2c] = 0x20;
+			m_cchip_ram[0x77] = 0x06;
+			m_cchip_ram[0x25] = 0x07;
+			m_cchip_ram[0x26] = 0x03;
+			break;
+		case 1:
+			m_cchip_ram[0x2c] = 0x31;
+			m_cchip_ram[0x77] = 0x05;
+			m_cchip_ram[0x25] = 0x0f;
+			m_cchip_ram[0x26] = 0x0b;
+			break;
+		case 2:
+			m_cchip_ram[0x2c] = 0x3c;
+			m_cchip_ram[0x77] = 0x04;
+			m_cchip_ram[0x25] = 0x13;
+			m_cchip_ram[0x26] = 0x0f;
+			break;
+		}
+	}
+	else
+	{
+		switch (m_cchip_ram[0x15]&3) // Dipswitch B
+		{
+		case 3:
+			m_cchip_ram[0x2c] = 0x46;
+			m_cchip_ram[0x77] = 0x05;
+			m_cchip_ram[0x25] = 0x11;
+			m_cchip_ram[0x26] = 0x0e;
+			break;
+		case 0:
+			m_cchip_ram[0x2c] = 0x30;
+			m_cchip_ram[0x77] = 0x06;
+			m_cchip_ram[0x25] = 0x0b;
+			m_cchip_ram[0x26] = 0x03;
+			break;
+		case 1:
+			m_cchip_ram[0x2c] = 0x3a;
+			m_cchip_ram[0x77] = 0x05;
+			m_cchip_ram[0x25] = 0x0f;
+			m_cchip_ram[0x26] = 0x09;
+			break;
+		case 2:
+			m_cchip_ram[0x2c] = 0x4c;
+			m_cchip_ram[0x77] = 0x04;
+			m_cchip_ram[0x25] = 0x19;
+			m_cchip_ram[0x26] = 0x11;
+			break;
+		};
+	}
+}
+
+/*************************************
+ *
+ * Writes to C-Chip - Important Bits
+ *
+ *************************************/
+
+WRITE16_MEMBER(opwolf_state::opwolf_cchip_status_w)
+{
+	// This is written once after the C-Chip init is complete (and passes)
+	// We use it to setup some initial state (it's not clear if the real
+	// c-chip sets this here, or if it's as a side-effect of the other
+	// init sequence data).
+
+	m_cchip_ram[0x3d] = 1;
+	m_cchip_ram[0x7a] = 1;
+	updateDifficulty(0);
+}
+
+WRITE16_MEMBER(opwolf_state::opwolf_cchip_bank_w)
+{
+	m_current_bank = data & 7;
+}
+
+WRITE16_MEMBER(opwolf_state::opwolf_cchip_data_w)
+{
+	//int logValue=1;
+	//if (offset==0x1c && offset==0x1d && offset==0x1e && offset==0x1f && offset==0x20) // Enemies, tanks, choppers, boats
+	//  logValue=0;
+	//if (offset==0x50 && offset==0x51 && offset==0x52 && offset==0x53) // Coins
+	//  logValue=0;
+	//if (logValue)
+	//  logerror("%s:  opwolf 68K writes c-chip %02x at %04x/%04x (bank %04x)\n", machine().describe_context(), data & 0xff, offset*2, offset, m_current_bank);
+
+	m_cchip_ram[(m_current_bank * 0x400) + offset] = data & 0xff;
+
+	if (m_current_bank == 0)
+	{
+		// Dip switch A is written here by the 68k - precalculate the coinage values
+		// Shouldn't we directly read the values from the ROM area ?
+		if (offset == 0x14)
+		{
+#if OPWOLF_READ_COINAGE_FROM_ROM
+			uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
+			uint32_t coin_table[2] = {0, 0};
+			uint8_t coin_offset[2];
+			int slot;
+
+			if ((m_opwolf_region == OPWOLF_REGION_JAPAN) || (m_opwolf_region == OPWOLF_REGION_US))
+			{
+				coin_table[0] = 0x03ffce;
+				coin_table[1] = 0x03ffce;
+			}
+			if ((m_opwolf_region == OPWOLF_REGION_WORLD) || (m_opwolf_region == OPWOLF_REGION_OTHER))
+			{
+				coin_table[0] = 0x03ffde;
+				coin_table[1] = 0x03ffee;
+			}
+			coin_offset[0] = 12 - (4 * ((data & 0x30) >> 4));
+			coin_offset[1] = 12 - (4 * ((data & 0xc0) >> 6));
+
+			for (slot = 0; slot < 2; slot++)
+			{
+				if (coin_table[slot])
+				{
+					m_cchip_coins_for_credit[slot] = rom[(coin_table[slot] + coin_offset[slot] + 0) / 2] & 0xff;
+					m_cchip_credits_for_coin[slot] = rom[(coin_table[slot] + coin_offset[slot] + 2) / 2] & 0xff;
+				}
+			}
+#else
+			if ((m_opwolf_region == OPWOLF_REGION_JAPAN) || (m_opwolf_region == OPWOLF_REGION_US))
+			{
+				switch (data&0x30)  /* table at 0x03ffce.w - 4 * 2 words (coins for credits first) - inverted order */
+				{
+					case 0x00: m_cchip_coins_for_credit[0] = 2; cchip_credits_for_coin[0] = 3; break;
+					case 0x10: m_cchip_coins_for_credit[0] = 2; cchip_credits_for_coin[0] = 1; break;
+					case 0x20: m_cchip_coins_for_credit[0] = 1; cchip_credits_for_coin[0] = 2; break;
+					case 0x30: m_cchip_coins_for_credit[0] = 1; cchip_credits_for_coin[0] = 1; break;
+				}
+				switch (data&0xc0)  /* table at 0x03ffce.w - 4 * 2 words (coins for credits first) - inverted order */
+				{
+					case 0x00: m_cchip_coins_for_credit[1] = 2; cchip_credits_for_coin[1] = 3; break;
+					case 0x40: m_cchip_coins_for_credit[1] = 2; cchip_credits_for_coin[1] = 1; break;
+					case 0x80: m_cchip_coins_for_credit[1] = 1; cchip_credits_for_coin[1] = 2; break;
+					case 0xc0: m_cchip_coins_for_credit[1] = 1; cchip_credits_for_coin[1] = 1; break;
+				}
+			}
+
+			if ((opwolf_region == OPWOLF_REGION_WORLD) || (opwolf_region == OPWOLF_REGION_OTHER))
+			{
+				switch (data&0x30)  /* table at 0x03ffde.w - 4 * 2 words (coins for credits first) - inverted order */
+				{
+					case 0x00: m_cchip_coins_for_credit[0] = 4; cchip_credits_for_coin[0] = 1; break;
+					case 0x10: m_cchip_coins_for_credit[0] = 3; cchip_credits_for_coin[0] = 1; break;
+					case 0x20: m_cchip_coins_for_credit[0] = 2; cchip_credits_for_coin[0] = 1; break;
+					case 0x30: m_cchip_coins_for_credit[0] = 1; cchip_credits_for_coin[0] = 1; break;
+				}
+				switch (data & 0xc0)    /* table at 0x03ffee.w - 4 * 2 words (coins for credits first) - inverted order */
+				{
+					case 0x00: m_cchip_coins_for_credit[1] = 1; cchip_credits_for_coin[1] = 6; break;
+					case 0x40: m_cchip_coins_for_credit[1] = 1; cchip_credits_for_coin[1] = 4; break;
+					case 0x80: m_cchip_coins_for_credit[1] = 1; cchip_credits_for_coin[1] = 3; break;
+					case 0xc0: m_cchip_coins_for_credit[1] = 1; cchip_credits_for_coin[1] = 2; break;
+				}
+			}
+#endif
+		}
+
+		// Dip switch B
+		if (offset == 0x15)
+		{
+			updateDifficulty(0);
+		}
+	}
+}
+
+/*************************************
+ *
+ * Reads from C-Chip
+ *
+ *************************************/
+
+READ16_MEMBER(opwolf_state::opwolf_cchip_status_r)
+{
+	/*
+	    Bit 0x4 = Error signal
+	    Bit 0x1 = Ready signal
+	*/
+	return 0x1; /* Return 0x5 for C-Chip error */
+}
+
+READ16_MEMBER(opwolf_state::opwolf_cchip_data_r)
+{
+//  if (offset!=0x7f && && m_maincpu->pc()!=0xc18 && m_maincpu->pc()!=0xc2e && m_maincpu->pc()!=0xc9e && offset!=0x50 && offset!=0x51 && offset!=0x52 && offset!=0x53 && offset!=0x5 && offset!=0x13 && offset!=0x79 && offset!=0x12 && offset!=0x34)
+//      logerror("%08x:  opwolf c read %04x (bank %04x)\n", m_maincpu->pc(), offset, m_current_bank);
+
+	//int logValue=1;
+	//if (offset==0x1c || offset==0x1d || offset==0x1e || offset==0x1f || offset==0x20) // Enemies, tanks, choppers, boats
+	//  logValue=0;
+	//if (offset==0x50 || offset==0x51 || offset==0x52 || offset==0x53) // Coins
+	//  logValue=0;
+	//if (m_maincpu->pc()==0xc18 && m_maincpu->pc()!=0xc2e && m_maincpu->pc()!=0xc9e)
+	//  logValue=0;
+	//if (logValue)
+	//  logerror("%08x:  opwolf 68K reads c-chip at %04x/%04x (bank %04x)\n", m_maincpu->pc(), offset*2, offset, m_current_bank);
+
+	return m_cchip_ram[(m_current_bank * 0x400) + offset];
+}
+
+/*************************************
+ *
+ * C-Chip Tick
+ *
+ *************************************/
+
+TIMER_CALLBACK_MEMBER(opwolf_state::cchip_timer)
+{
+	// Update input ports, these are used by both the 68k directly and by the c-chip
+	m_cchip_ram[0x4] = ioport("IN0")->read();
+	m_cchip_ram[0x5] = ioport("IN1")->read();
+
+	// Dev Cheat -  kill all enemeies
+	//if ((ioport("IN1")->read()&0x10)!=0x10)
+	//{
+	//  m_cchip_ram[0x1c] = m_cchip_ram[0x1d] = m_cchip_ram[0x1e] = m_cchip_ram[0x1f] = m_cchip_ram[0x20] = 0;
+	//}
+
+	// Coin slots
+	if (m_cchip_ram[0x4] != m_cchip_last_04)
+	{
+		int slot = -1;
+
+		if (m_cchip_ram[0x4] & 1) slot = 0;
+		if (m_cchip_ram[0x4] & 2) slot = 1;
+
+		if (slot != -1)
+		{
+			m_cchip_coins[slot]++;
+			if (m_cchip_coins[slot] >= m_cchip_coins_for_credit[slot])
+			{
+				m_cchip_ram[0x53] += m_cchip_credits_for_coin[slot];
+				m_cchip_ram[0x51] = 0x55;
+				m_cchip_ram[0x52] = 0x55;
+				m_cchip_coins[slot] -= m_cchip_coins_for_credit[slot];
+			}
+			machine().bookkeeping().coin_counter_w(slot, 1);
+		}
+
+		if (m_cchip_ram[0x53] > 9)
+			m_cchip_ram[0x53] = 9;
+	}
+	m_cchip_last_04 = m_cchip_ram[0x4];
+
+	// Service switch
+	if (m_cchip_ram[0x5] != m_cchip_last_05)
+	{
+		if ((m_cchip_ram[0x5] & 4)==0)
+		{
+			m_cchip_ram[0x53]++;
+			m_cchip_ram[0x51] = 0x55;
+			m_cchip_ram[0x52] = 0x55;
+		}
+	}
+	m_cchip_last_05=m_cchip_ram[0x5];
+
+	// Cchip handles coin lockout (68k flags error if more than 9 coins)
+	machine().bookkeeping().coin_lockout_w(1, m_cchip_ram[0x53] == 9);
+	machine().bookkeeping().coin_lockout_w(0, m_cchip_ram[0x53] == 9);
+	machine().bookkeeping().coin_counter_w(0, 0);
+	machine().bookkeeping().coin_counter_w(1, 0);
+
+	// These variables are cleared every frame during attract mode and the intro.
+	if (m_cchip_ram[0x34] < 2)
+	{
+		updateDifficulty(0);
+		m_cchip_ram[0x76] = 0;
+		m_cchip_ram[0x75] = 0;
+		m_cchip_ram[0x74] = 0;
+		m_cchip_ram[0x72] = 0;
+		m_cchip_ram[0x71] = 0;
+		m_cchip_ram[0x70] = 0;
+		m_cchip_ram[0x66] = 0;
+		m_cchip_ram[0x2b] = 0;
+		m_cchip_ram[0x30] = 0;
+		m_cchip_ram[0x31] = 0;
+		m_cchip_ram[0x32] = 0;
+		m_cchip_ram[0x27] = 0;
+		m_c588 = 0;
+		m_c589 = 0;
+		m_c58a = 0;
+	}
+
+	// The unprotected Operation Wolf (prototype) shows the game sets up a special thread function specific to each level of the game.
+	// This includes the end of level check as different levels have different rules.  In the protected version this logic is moved
+	// to the c-chip, so we simulate it here.
+	if (m_cchip_ram[0x1c] == 0 && m_cchip_ram[0x1d] == 0 && m_cchip_ram[0x1e] == 0 && m_cchip_ram[0x1f] == 0 && m_cchip_ram[0x20] == 0)
+	{
+		// Special handling for end of level 6
+		if (m_cchip_ram[0x1b] == 0x6)
+		{
+			// Don't signal end of level until final boss is destroyed
+			if (m_cchip_ram[0x27] == 0x1)
+				m_cchip_ram[0x32] = 1;
+		}
+		// Level 2 - Boss check - cross-referenced from logic at 0x91CE in OpWolfP
+		// When all enemies are destroyed c-chip signals function 4 in the level function table, which
+		// starts the 'WARNING' sequences for the boss.
+		else if (m_cchip_ram[0x1b] == 0x2)
+		{
+			if (m_triggeredLevel2==0 && m_cchip_ram[0x5f]==0) // Don't write unless 68K is ready (0 at 0x5f)
+			{
+				m_cchip_ram[0x5f] = 4; // 0xBE at 68K side
+				m_triggeredLevel2=1;
+			}
+
+			// When the level 2 boss has been defeated the 68K will write 0xff to $ff0ba.l - this should signal
+			// the c-chip to start the end of level routine.  See code at 0xC370 in OpWolf and 0x933e in OpWolfP
+			if (m_triggeredLevel2 && m_cchip_ram[0x5d]!=0)
+			{
+				// Signal end of level
+				m_cchip_ram[0x32] = 1;
+				m_cchip_ram[0x5d] = 0; // acknowledge 68K command
+			}
+		}
+		else if (m_cchip_ram[0x1b] == 0x4)
+		{
+			m_cchip_ram[0x32] = 1;
+
+			// When level 4 (powder magazine) is complete the c-chip triggers an explosion animation.
+			if (m_triggeredLevel4==0 && m_cchip_ram[0x5f]==0) // Don't write unless 68K is ready (0 at 0x5f))
+			{
+				m_cchip_ram[0x5f]=10;
+				m_triggeredLevel4=1;
+			}
+		}
+		else
+		{
+			// Signal end of level
+			m_cchip_ram[0x32] = 1;
+		}
+	}
+
+	// When all men are destroyed (not necessarily vehicles) the enemy look up table changes
+	// Reference functions around 0x96A4 in the unprotected prototype.
+	// Level 1 has a specific table.
+	// Level 3 has an additional flag set
+	if (m_cchip_ram[0x1c] == 0 && m_cchip_ram[0x1d] == 0)
+	{
+		// Compare code at 0x96DC in prototype with 0xC3A2 in protected version
+		if (m_cchip_ram[0x1b] == 0x1 && m_triggeredLevel1b==0 && m_cchip_ram[0x5f]==0) // Don't write unless 68K is ready (0 at 0x5f))
+		{
+			m_cchip_ram[0x5f]=7;
+			m_triggeredLevel1b=1;
+		}
+
+		// Compare code at 0x96BC in prototype with 0xC3B2 in protected version
+		if (m_cchip_ram[0x1b] == 0x3 && m_triggeredLevel3b==0 && m_cchip_ram[0x5f]==0) // Don't write unless 68K is ready (0 at 0x5f))
+		{
+			m_cchip_ram[0x5f]=8;
+			m_triggeredLevel3b=1;
+		}
+
+		// Compare code at 0x96BC in prototype with 0xC3C8 in protected version
+		if ((m_cchip_ram[0x1b] != 0x1 && m_cchip_ram[0x1b] != 0x3) && m_triggeredLevel13b==0 && m_cchip_ram[0x5f]==0) // Don't write unless 68K is ready (0 at 0x5f))
+		{
+			m_cchip_ram[0x5f]=9;
+			m_triggeredLevel13b=1;
+		}
+	}
+
+	//-------------------------------------------------------------------------------------------------
+	// Level 2.  On level 2 specifically when there are less than 45 men left the enemy lookup table is
+	// switched.  This drops down a wave of paratroopers.  When there are less than 25 men left the lookup
+	// table is switched again.
+	// See code at 0xC37A and 0xc390 in protected version against 0x9648 in prototype.
+	if (m_cchip_ram[0x1b] == 0x2)
+	{
+		// (Note:  it's correct that 25 decimal is represented as 0x25 in hex here).
+		int numMen=(m_cchip_ram[0x1d]<<8) + m_cchip_ram[0x1c];
+		if (numMen<0x25 && m_triggeredLevel2b==1 && m_triggeredLevel2c==0 && m_cchip_ram[0x5f]==0) // Don't write unless 68K is ready (0 at 0x5f))
+		{
+			m_cchip_ram[0x5f]=6;
+			m_triggeredLevel2c=1;
+		}
+
+		// (Note:  it's correct that 45 decimal is represented as 0x45 in hex here).
+		if (numMen<0x45 && m_triggeredLevel2b==0 && m_cchip_ram[0x5f]==0) // Don't write unless 68K is ready (0 at 0x5f))
+		{
+			m_cchip_ram[0x5f]=5;
+			m_triggeredLevel2b=1;
+		}
+	}
+
+	//-------------------------------------------------------------------------------------------------
+	// Level 5
+	if (m_cchip_ram[0x1b] == 0x5)
+	{
+		// When all men are destroyed (not necessarily vehicles), the c-chip writes 1 to location
+		// 0x2f to spawn a thread that scrolls the screen upwards to focus on the helicopter
+		// enemies.  The 68K acknowledges this by writing 2 to 0x2f.
+		// See code at 0x4ED6 in prototype and 0x687e in original.
+		if (m_cchip_ram[0x1c] == 0 && m_cchip_ram[0x1d] == 0 && m_triggeredLevel5==0)
+		{
+			m_cchip_ram[0x2f] = 1;
+			m_triggeredLevel5 = 1;
+		}
+	}
+
+	//-------------------------------------------------------------------------------------------------
+	// Level 6
+	if (m_cchip_ram[0x1b] == 0x6)
+	{
+		// Check for triggering final helicopter (end boss)
+		if (m_c58a == 0)
+		{
+			if ((m_cchip_ram[0x72] & 0x7f) >= 8 && m_cchip_ram[0x74] == 0 && m_cchip_ram[0x1c] == 0 && m_cchip_ram[0x1d] == 0 && m_cchip_ram[0x1f] == 0)
+			{
+				m_cchip_ram[0x30] = 1;
+				m_cchip_ram[0x74] = 1;
+				m_c58a = 1;
+			}
+		}
+
+		if (m_cchip_ram[0x1a] == 0x90)
+			m_cchip_ram[0x74] = 0;
+
+		if (m_c58a != 0)
+		{
+			if (m_c589 == 0 && m_cchip_ram[0x27] == 0 && m_cchip_ram[0x75] == 0 && m_cchip_ram[0x1c] == 0 && m_cchip_ram[0x1d] == 0 && m_cchip_ram[0x1e] == 0 && m_cchip_ram[0x1f] == 0)
+			{
+				m_cchip_ram[0x31] = 1;
+				m_cchip_ram[0x75] = 1;
+				m_c589 = 1;
+			}
+		}
+
+		if (m_cchip_ram[0x2b] == 0x1)
+		{
+			m_cchip_ram[0x2b] = 0;
+
+			if (m_cchip_ram[0x30] == 0x1)
+			{
+				if (m_cchip_ram[0x1a] != 0x90)
+					m_cchip_ram[0x1a]--;
+			}
+
+			if (m_cchip_ram[0x72] == 0x9)
+			{
+				if (m_cchip_ram[0x76] != 0x4)
+				{
+					m_cchip_ram[0x76] = 3;
+				}
+			}
+			else
+			{
+				// This timer is derived from the bootleg rather than the real board, I'm not 100% sure about it
+				m_c588 |= 0x80;
+
+				m_cchip_ram[0x72] = m_c588;
+				m_c588++;
+
+				m_cchip_ram[0x1a]--;
+				m_cchip_ram[0x1a]--;
+				m_cchip_ram[0x1a]--;
+			}
+		}
+
+		// Update difficulty settings
+		if (m_cchip_ram[0x76] == 0)
+		{
+			m_cchip_ram[0x76] = 1;
+			updateDifficulty(1);
+		}
+	}
+
+	//-------------------------------------------------------------------------------------------------
+	// Start of level 7 - should trigger '1' in level thread table (compare 0xC164 in protected to 0x9468 in unprotected)
+	if (m_cchip_ram[0x1b] == 0x7 && m_triggeredLevel7==0 && m_cchip_ram[0x5f]==0) // Don't write unless 68K is ready (0 at 0x5f))
+	{
+		m_triggeredLevel7 = 1;
+		m_cchip_ram[0x5f] = 1;
+	}
+
+	//-------------------------------------------------------------------------------------------------
+	// Start of level 8 - should trigger '2' in level thread table (compare 0xC18E in protected to 0x9358 in unprotected)
+	// This controls the 'zoom in helicopters' enemy
+	if (m_cchip_ram[0x1b] == 0x8 && m_triggeredLevel8==0 && m_cchip_ram[0x5f]==0) // Don't write unless 68K is ready (0 at 0x5f))
+	{
+		m_triggeredLevel8 = 1;
+		m_cchip_ram[0x5f] = 2;
+	}
+
+	//-------------------------------------------------------------------------------------------------
+	// Start of level 9 - should trigger '3' in level thread table (compare 0xC1B0 in protected to 0x9500 in unprotected)
+	// This controls the 'zoom in helicopters' enemy
+	if (m_cchip_ram[0x1b] == 0x9 && m_triggeredLevel9==0 && m_cchip_ram[0x5f]==0) // Don't write unless 68K is ready (0 at 0x5f))
+	{
+		m_triggeredLevel9 = 1;
+		m_cchip_ram[0x5f] = 3;
+	}
+
+	if (m_cchip_ram[0xe] == 1)
+	{
+		m_cchip_ram[0xe] = 0xfd;
+		m_cchip_ram[0x61] = 0x04;
+	}
+
+	// Access level data command (address 0xf5 goes from 1 -> 0)
+	if (m_cchip_ram[0x7a] == 0 && m_cchip_last_7a != 0 && m_current_cmd != 0xf5)
+	{
+		// Simulate time for command to execute (exact timing unknown, this is close)
+		m_current_cmd = 0xf5;
+		m_opwolf_timer->adjust(m_maincpu->cycles_to_attotime(80000));
+	}
+	m_cchip_last_7a = m_cchip_ram[0x7a];
+
+	// This seems to some kind of periodic counter - results are expected
+	// by the 68k when the counter reaches 0xa
+	if (m_cchip_ram[0x7f] == 0xa)
+	{
+		m_cchip_ram[0xfe] = 0xf7;
+		m_cchip_ram[0xff] = 0x6e;
+	}
+
+	// These are set every frame
+	m_cchip_ram[0x64] = 0;
+	m_cchip_ram[0x66] = 0;
+}
+
+/*************************************
+ *
+ * C-Chip State Saving
+ *
+ *************************************/
+
+void opwolf_state::opwolf_cchip_init(  )
+{
+	m_cchip_ram.allocate(0x400 * 8);
+
+	save_item(NAME(m_current_bank));
+	save_item(NAME(m_current_cmd));
+	save_item(NAME(m_cchip_last_7a));
+	save_item(NAME(m_cchip_last_04));
+	save_item(NAME(m_cchip_last_05));
+	save_item(NAME(m_c588));
+	save_item(NAME(m_c589));
+	save_item(NAME(m_c58a));
+	save_item(NAME(m_cchip_coins));
+	save_item(NAME(m_cchip_coins_for_credit));
+	save_item(NAME(m_cchip_credits_for_coin));
+	save_item(NAME(m_triggeredLevel1b));
+	save_item(NAME(m_triggeredLevel2));
+	save_item(NAME(m_triggeredLevel2b));
+	save_item(NAME(m_triggeredLevel2c));
+	save_item(NAME(m_triggeredLevel3b));
+	save_item(NAME(m_triggeredLevel13b));
+	save_item(NAME(m_triggeredLevel4));
+	save_item(NAME(m_triggeredLevel5));
+	save_item(NAME(m_triggeredLevel7));
+	save_item(NAME(m_triggeredLevel8));
+	save_item(NAME(m_triggeredLevel9));
+
+	m_triggeredLevel1b = 0;
+	m_triggeredLevel2 = 0;
+	m_triggeredLevel2b = 0;
+	m_triggeredLevel2c = 0;
+	m_triggeredLevel3b = 0;
+	m_triggeredLevel13b = 0;
+	m_triggeredLevel4 = 0;
+	m_triggeredLevel5 = 0;
+	m_triggeredLevel7 = 0;
+	m_triggeredLevel8 = 0;
+	m_triggeredLevel9 = 0;
+	m_current_bank = 0;
+	m_current_cmd = 0;
+	m_cchip_last_7a = 0;
+	m_cchip_last_04 = 0xfc;
+	m_cchip_last_05 = 0xff;
+	m_c588 = 0;
+	m_c589 = 0;
+	m_c58a = 0;
+	m_cchip_coins[0] = 0;
+	m_cchip_coins[1] = 0;
+	m_cchip_coins_for_credit[0] = 1;
+	m_cchip_credits_for_coin[0] = 1;
+	m_cchip_coins_for_credit[1] = 1;
+	m_cchip_credits_for_coin[1] = 1;
+
+	m_cchip_timer = timer_alloc(TIMER_CCHIP);
+	m_cchip_timer->adjust(attotime::from_hz(60), 0, attotime::from_hz(60));
+}
+
+
+***************************************************************************
+File: mame/drivers/opwolf.cpp
+***************************************************************************
+
+
+//  map(0x0f0000, 0x0f07ff).mirror(0xf000).r(FUNC(opwolf_state::opwolf_cchip_data_r));
+//  map(0x0f0802, 0x0f0803).mirror(0xf000).r(FUNC(opwolf_state::opwolf_cchip_status_r));
+//  map(0x0ff000, 0x0ff7ff).w(FUNC(opwolf_state::opwolf_cchip_data_w));
+//  map(0x0ff802, 0x0ff803).w(FUNC(opwolf_state::opwolf_cchip_status_w));
+//  map(0x0ffc00, 0x0ffc01).w(FUNC(opwolf_state::opwolf_cchip_bank_w));
+
+//  m_opwolf_timer = timer_alloc(TIMER_OPWOLF);
+
+//  opwolf_cchip_init(); // start old simulation, including periodic timer
+
+
+***************************************************************************
+File: mame/includes/opwolf.h
+***************************************************************************
+
+
+enum
+{
+	TIMER_OPWOLF,
+	TIMER_CCHIP
+};
+
+DECLARE_WRITE16_MEMBER(opwolf_cchip_status_w);
+DECLARE_WRITE16_MEMBER(opwolf_cchip_bank_w);
+DECLARE_WRITE16_MEMBER(opwolf_cchip_data_w);
+DECLARE_READ16_MEMBER(opwolf_cchip_status_r);
+DECLARE_READ16_MEMBER(opwolf_cchip_data_r);
+
+virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+TIMER_CALLBACK_MEMBER(opwolf_timer_callback);
+TIMER_CALLBACK_MEMBER(cchip_timer);
+void updateDifficulty(int mode);
+void opwolf_cchip_init();
+
+emu_timer   *m_opwolf_timer;
+
+/* c-chip */
+emu_timer   *m_cchip_timer;
+
+int          m_opwolf_region;
+
+uint8_t        m_current_bank;
+uint8_t        m_current_cmd;
+uint8_t        m_cchip_last_7a;
+uint8_t        m_cchip_last_04;
+uint8_t        m_cchip_last_05;
+uint8_t        m_cchip_coins_for_credit[2];
+uint8_t        m_cchip_credits_for_coin[2];
+uint8_t        m_cchip_coins[2];
+uint8_t        m_c588;
+uint8_t        m_c589;
+uint8_t        m_c58a; // These variables derived from the bootleg
+uint8_t        m_triggeredLevel1b; // These variables derived from comparison to unprotection version
+uint8_t        m_triggeredLevel2;
+uint8_t        m_triggeredLevel2b;
+uint8_t        m_triggeredLevel2c;
+uint8_t        m_triggeredLevel3b;
+uint8_t        m_triggeredLevel13b;
+uint8_t        m_triggeredLevel4;
+uint8_t        m_triggeredLevel5;
+uint8_t        m_triggeredLevel7;
+uint8_t        m_triggeredLevel8;
+uint8_t        m_triggeredLevel9;

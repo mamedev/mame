@@ -35,6 +35,7 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "imagedev/floppy.h"
 #include "machine/keyboard.h"
 #include "machine/upd765.h"
 #include "sound/spkrdev.h"
@@ -148,18 +149,19 @@ WRITE16_MEMBER( dim68k_state::dim68k_video_control_w )
    D1 0 = Standard Chars & LoRes; 1 = Alternate Chars & HiRes [not emulated yet]
    D0 0 = Non-Mixed (all text or all Graphics); 1 = Mixed (Colour Graphics and Monochrome Text) [not emulated yet]
  */
-	m_crtc->set_hpixels_per_column((data & 0x40) ? 7 : 8);
+	unsigned dots = (data & 0x40) ? 7 : 8;
+	m_crtc->set_hpixels_per_column(dots);
 	m_video_control = data;
 
 	switch (data & 0x18)
 	{
-		case 0x00: m_crtc->set_clock(XTAL(14'000'000));
+		case 0x00: m_crtc->set_unscaled_clock(XTAL(14'000'000) / dots);
 					break;
-		case 0x08: m_crtc->set_clock(XTAL(3'579'545));
+		case 0x08: m_crtc->set_unscaled_clock(XTAL(3'579'545) / dots);
 					break;
-		case 0x10: m_crtc->set_clock(XTAL(14'000'000) / 2);
+		case 0x10: m_crtc->set_unscaled_clock(XTAL(14'000'000) / dots / 2);
 					break;
-		case 0x18: m_crtc->set_clock(XTAL(3'579'545) / 2);
+		case 0x18: m_crtc->set_unscaled_clock(XTAL(3'579'545) / dots / 2);
 					break;
 	}
 }
@@ -211,7 +213,7 @@ void dim68k_state::dim68k_mem(address_map &map)
 	map(0x00ffcc00, 0x00ffcc1f).rw(FUNC(dim68k_state::dim68k_game_switches_r), FUNC(dim68k_state::dim68k_reset_timers_w));
 	map(0x00ffd000, 0x00ffd003).m("fdc", FUNC(upd765a_device::map)).umask16(0x00ff); // NEC uPD765A
 	map(0x00ffd004, 0x00ffd005).rw(FUNC(dim68k_state::dim68k_fdc_r), FUNC(dim68k_state::dim68k_fdc_w));
-	//AM_RANGE(0x00ffd400, 0x00ffd403) emulation trap control
+	//map(0x00ffd400, 0x00ffd403) emulation trap control
 	map(0x00ffd800, 0x00ffd801).w(FUNC(dim68k_state::dim68k_printer_strobe_w));
 	map(0x00ffdc00, 0x00ffdc01).w(FUNC(dim68k_state::dim68k_banksw_w));
 }
@@ -226,8 +228,6 @@ void dim68k_state::machine_reset()
 	u8* ROM = memregion("bootrom")->base();
 
 	memcpy((u8*)m_ram.target(), ROM, 0x2000);
-
-	m_maincpu->reset();
 }
 
 // Text-only; graphics isn't emulated yet. Need to find out if hardware cursor is used.
@@ -310,42 +310,43 @@ void dim68k_state::kbd_put(u8 data)
 	m_term_data = data;
 }
 
-MACHINE_CONFIG_START(dim68k_state::dim68k)
+void dim68k_state::dim68k(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(10'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(dim68k_mem)
+	M68000(config, m_maincpu, XTAL(10'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &dim68k_state::dim68k_mem);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 250-1)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dim68k)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 640-1, 0, 250-1);
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_dim68k);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Devices */
-	MCFG_UPD765A_ADD("fdc", true, true) // these options unknown
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", dim68k_floppies, "525hd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", dim68k_floppies, "525hd", floppy_image_device::default_floppy_formats)
+	UPD765A(config, "fdc", 8'000'000, true, true); // these options unknown
+	FLOPPY_CONNECTOR(config, "fdc:0", dim68k_floppies, "525hd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", dim68k_floppies, "525hd", floppy_image_device::default_floppy_formats);
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 1790000)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(dim68k_state, crtc_update_row)
+	MC6845(config, m_crtc, 1790000);
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(dim68k_state::crtc_update_row));
 
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(dim68k_state, kbd_put))
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(dim68k_state::kbd_put));
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "dim68k")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "flop_list").set_original("dim68k");
+}
 
 /*
 68000

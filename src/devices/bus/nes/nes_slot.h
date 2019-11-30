@@ -159,26 +159,26 @@ enum
 
 // ======================> device_nes_cart_interface
 
-class device_nes_cart_interface : public device_slot_card_interface
+class device_nes_cart_interface : public device_interface
 {
 public:
 	// construction/destruction
 	virtual ~device_nes_cart_interface();
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_l);
-	virtual DECLARE_READ8_MEMBER(read_m);
-	virtual DECLARE_READ8_MEMBER(read_h) { return 0xff; }
-	virtual DECLARE_READ8_MEMBER(read_ex) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(write_l);
-	virtual DECLARE_WRITE8_MEMBER(write_m);
-	virtual DECLARE_WRITE8_MEMBER(write_h);
-	virtual DECLARE_WRITE8_MEMBER(write_ex) { }
+	virtual uint8_t read_l(offs_t offset);
+	virtual uint8_t read_m(offs_t offset);
+	virtual uint8_t read_h(offs_t offset) { return 0xff; }
+	virtual uint8_t read_ex(offs_t offset) { return 0xff; }
+	virtual void write_l(offs_t offset, uint8_t data);
+	virtual void write_m(offs_t offset, uint8_t data);
+	virtual void write_h(offs_t offset, uint8_t data);
+	virtual void write_ex(offs_t offset, uint8_t data) { }
 
-	virtual DECLARE_READ8_MEMBER(chr_r);
-	virtual DECLARE_WRITE8_MEMBER(chr_w);
-	virtual DECLARE_READ8_MEMBER(nt_r);
-	virtual DECLARE_WRITE8_MEMBER(nt_w);
+	virtual uint8_t chr_r(offs_t offset);
+	virtual void chr_w(offs_t offset, uint8_t data);
+	virtual uint8_t nt_r(offs_t offset);
+	virtual void nt_w(offs_t offset, uint8_t data);
 
 	// hack until disk system is made modern!
 	virtual void disk_flip_side() { }
@@ -200,8 +200,10 @@ public:
 
 	void set_ce(int mask, int state) {  m_ce_mask = mask; m_ce_state = state; }
 	void set_vrc_lines(int PRG_A, int PRG_B, int CHR) { m_vrc_ls_prg_a = PRG_A; m_vrc_ls_prg_b = PRG_B; m_vrc_ls_chr = CHR; }
+	void set_n163_vol(int vol) { m_n163_vol = vol; }
 	void set_x1_005_alt(bool val) { m_x1_005_alt_mirroring = val; }
 	void set_bus_conflict(bool val) { m_bus_conflict = val; }
+	uint8_t get_open_bus() { return m_open_bus; }
 	void set_open_bus(uint8_t val) { m_open_bus = val; }
 
 	uint8_t *get_prg_base() { return m_prg; }
@@ -237,6 +239,7 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(set_irq_line);
 	void hold_irq_line();
 	void reset_cpu();
+	void poke(offs_t offset, uint8_t data);
 
 	// internal state
 	uint8_t *m_prg;
@@ -265,13 +268,16 @@ protected:
 	int m_vrc_ls_prg_a;
 	int m_vrc_ls_prg_b;
 	int m_vrc_ls_chr;
+	int m_n163_vol;
 
 	int m_mirroring;
 	bool m_pcb_ctrl_mirror, m_four_screen_vram, m_has_trainer;
 	bool m_x1_005_alt_mirroring;    // temp hack for two kind of mirroring in Taito X1-005 boards (to be replaced with pin checking)
 	bool m_bus_conflict;
+private:
 	uint8_t m_open_bus;
 
+public:
 	// PRG
 	inline int prg_8k_bank_num(int bank);
 	inline void update_prg_banks(int prg_bank_start, int prg_bank_end);
@@ -342,7 +348,7 @@ protected:
 
 class nes_cart_slot_device : public device_t,
 								public device_image_interface,
-								public device_slot_interface
+								public device_single_card_slot_interface<device_nes_cart_interface>
 {
 public:
 	// construction/destruction
@@ -358,44 +364,32 @@ public:
 	nes_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~nes_cart_slot_device();
 
-	// device-level overrides
-	virtual void device_start() override;
-
 	// image-level overrides
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
-	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
-	void call_load_ines();
-	void call_load_unif();
-	void call_load_pcb();
-
-	virtual iodevice_t image_type() const override { return IO_CARTSLOT; }
-	virtual bool is_readable()  const override { return 1; }
-	virtual bool is_writeable() const override { return 0; }
-	virtual bool is_creatable() const override { return 0; }
-	virtual bool must_be_loaded() const override { return m_must_be_loaded; }
-	virtual bool is_reset_on_load() const override { return 1; }
-	virtual const char *image_interface() const override { return "nes_cart"; }
-	virtual const char *file_extensions() const override { return "nes,unf,unif"; }
-	virtual u32 unhashed_header_length() const override { return 16; }
+	virtual iodevice_t image_type() const noexcept override { return IO_CARTSLOT; }
+	virtual bool is_readable()  const noexcept override { return true; }
+	virtual bool is_writeable() const noexcept override { return false; }
+	virtual bool is_creatable() const noexcept override { return false; }
+	virtual bool must_be_loaded() const noexcept override { return m_must_be_loaded; }
+	virtual bool is_reset_on_load() const noexcept override { return true; }
+	virtual const char *image_interface() const noexcept override { return "nes_cart"; }
+	virtual const char *file_extensions() const noexcept override { return "nes,unf,unif"; }
+	virtual u32 unhashed_header_length() const noexcept override { return 16; }
 
 	// slot interface overrides
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
-	const char * get_default_card_ines(get_default_card_software_hook &hook, const uint8_t *ROM, uint32_t len) const;
-	static const char * get_default_card_unif(const uint8_t *ROM, uint32_t len);
-	static const char * nes_get_slot(int pcb_id);
-	int nes_get_pcb_id(const char *slot);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_l);
-	virtual DECLARE_READ8_MEMBER(read_m);
-	virtual DECLARE_READ8_MEMBER(read_h);
-	virtual DECLARE_READ8_MEMBER(read_ex);
-	virtual DECLARE_WRITE8_MEMBER(write_l);
-	virtual DECLARE_WRITE8_MEMBER(write_m);
-	virtual DECLARE_WRITE8_MEMBER(write_h);
-	virtual DECLARE_WRITE8_MEMBER(write_ex);
+	virtual uint8_t read_l(offs_t offset);
+	virtual uint8_t read_m(offs_t offset);
+	virtual uint8_t read_h(offs_t offset);
+	virtual uint8_t read_ex(offs_t offset);
+	virtual void write_l(offs_t offset, uint8_t data);
+	virtual void write_m(offs_t offset, uint8_t data);
+	virtual void write_h(offs_t offset, uint8_t data);
+	virtual void write_ex(offs_t offset, uint8_t data);
 
 	// hack until disk system is made modern!
 	virtual void disk_flip_side() { if (m_cart) m_cart->disk_flip_side(); }
@@ -416,6 +410,22 @@ public:
 	device_nes_cart_interface*      m_cart;
 	int m_pcb_id;
 	bool                            m_must_be_loaded;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+
+	// device_image_interface implementation
+	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
+
+	const char * get_default_card_ines(get_default_card_software_hook &hook, const uint8_t *ROM, uint32_t len) const;
+	static const char * get_default_card_unif(const uint8_t *ROM, uint32_t len);
+	static const char * nes_get_slot(int pcb_id);
+	int nes_get_pcb_id(const char *slot);
+
+	void call_load_ines();
+	void call_load_unif();
+	void call_load_pcb();
 };
 
 // device type definition
@@ -428,10 +438,5 @@ DECLARE_DEVICE_TYPE(NES_CART_SLOT, nes_cart_slot_device)
 
 #define NESSLOT_PRGROM_REGION_TAG ":cart:prg_rom"
 #define NESSLOT_CHRROM_REGION_TAG ":cart:chr_rom"
-
-
-#define MCFG_NES_CARTRIDGE_NOT_MANDATORY                                     \
-	static_cast<nes_cart_slot_device *>(device)->set_must_be_loaded(false);
-
 
 #endif // MAME_BUS_NES_NES_SLOT_H

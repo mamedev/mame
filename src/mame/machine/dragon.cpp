@@ -82,7 +82,7 @@ READ8_MEMBER( dragon64_state::ff00_read )
 			break;
 
 		case 4: case 5: case 6: case 7:
-			result = m_acia->read(space, offset, mem_mask);
+			result = m_acia->read(offset);
 			break;
 	}
 	return result;
@@ -103,7 +103,7 @@ WRITE8_MEMBER( dragon64_state::ff00_write )
 			break;
 
 		case 4: case 5: case 6: case 7:
-			m_acia->write(space, offset, data, mem_mask);
+			m_acia->write(offset, data);
 			break;
 	}
 }
@@ -235,10 +235,10 @@ void d64plus_state::device_start()
 {
 	dragon_state::device_start();
 
-	address_space& space = m_maincpu->space(AS_PROGRAM);
-	space.install_readwrite_handler(0xffe0, 0xffe0, READ8_DEVICE_DELEGATE(m_crtc, mc6845_device, status_r), WRITE8_DEVICE_DELEGATE(m_crtc, mc6845_device, address_w));
-	space.install_readwrite_handler(0xffe1, 0xffe1, READ8_DEVICE_DELEGATE(m_crtc, mc6845_device, register_r), WRITE8_DEVICE_DELEGATE(m_crtc, mc6845_device, register_w));
-	space.install_readwrite_handler(0xffe2, 0xffe2, READ8_DELEGATE(d64plus_state, d64plus_6845_disp_r), WRITE8_DELEGATE(d64plus_state, d64plus_bank_w));
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	space.install_readwrite_handler(0xffe0, 0xffe0, read8smo_delegate(*m_crtc, FUNC(mc6845_device::status_r)), write8smo_delegate(*m_crtc, FUNC(mc6845_device::address_w)));
+	space.install_readwrite_handler(0xffe1, 0xffe1, read8smo_delegate(*m_crtc, FUNC(mc6845_device::register_r)), write8smo_delegate(*m_crtc, FUNC(mc6845_device::register_w)));
+	space.install_readwrite_handler(0xffe2, 0xffe2, read8_delegate(*this, FUNC(d64plus_state::d64plus_6845_disp_r)), write8_delegate(*this, FUNC(d64plus_state::d64plus_bank_w)));
 
 	// allocate memory
 	m_plus_ram.allocate(0x10000);

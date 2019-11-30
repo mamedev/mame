@@ -277,7 +277,7 @@ static INPUT_PORTS_START( common )
 	PORT_BIT( 0x00000008, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, eolith_state, eolith_speedup_getvblank, nullptr)
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(eolith_state, speedup_vblank_r)
 	PORT_BIT( 0x00003f80, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x00008000, IP_ACTIVE_LOW )
@@ -515,7 +515,7 @@ static INPUT_PORTS_START( stealsee )
 	PORT_INCLUDE(common)
 
 	PORT_MODIFY("IN0")
-	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, eolith_state, stealsee_speedup_getvblank, nullptr)
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(eolith_state, stealsee_speedup_vblank_r)
 INPUT_PORTS_END
 
 
@@ -537,17 +537,18 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(eolith_state::eolith45)
-	MCFG_DEVICE_ADD("maincpu", E132N, 45000000)         /* 45 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(eolith_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", eolith_state, eolith_speedup, "screen", 0, 1)
+void eolith_state::eolith45(machine_config &config)
+{
+	E132N(config, m_maincpu, 45000000);         /* 45 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &eolith_state::eolith_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(eolith_state::eolith_speedup), "screen", 0, 1);
 
 	/* Sound CPU */
-	MCFG_DEVICE_ADD("soundcpu", I8032, XTAL(12'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(sound_prg_map)
-	MCFG_DEVICE_IO_MAP(sound_io_map)
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, eolith_state, sound_p1_w))
-	MCFG_MCS51_SERIAL_TX_CB(WRITE8(*this, eolith_state, soundcpu_to_qs1000)) // Sound CPU -> QS1000 CPU serial link
+	I8032(config, m_soundcpu, XTAL(12'000'000));
+	m_soundcpu->set_addrmap(AS_PROGRAM, &eolith_state::sound_prg_map);
+	m_soundcpu->set_addrmap(AS_IO, &eolith_state::sound_io_map);
+	m_soundcpu->port_out_cb<1>().set(FUNC(eolith_state::sound_p1_w));
+	m_soundcpu->serial_tx_cb().set(FUNC(eolith_state::soundcpu_to_qs1000)); // Sound CPU -> QS1000 CPU serial link
 
 	MCFG_MACHINE_RESET_OVERRIDE(eolith_state,eolith)
 
@@ -556,19 +557,19 @@ MACHINE_CONFIG_START(eolith_state::eolith45)
 		.write_time(attotime::from_usec(250));
 
 //  for testing sound sync
-//  MCFG_QUANTUM_PERFECT_CPU("maincpu")
-//  MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+//  config.m_perfect_cpu_quantum = subtag("maincpu");
+//  config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(512, 262)
-	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(eolith_state, screen_update_eolith)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	m_screen->set_size(512, 262);
+	m_screen->set_visarea(0, 319, 0, 239);
+	m_screen->set_screen_update(FUNC(eolith_state::screen_update_eolith));
+	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
+	PALETTE(config, m_palette, palette_device::RGB_555);
 
 	MCFG_VIDEO_START_OVERRIDE(eolith_state,eolith)
 
@@ -576,34 +577,33 @@ MACHINE_CONFIG_START(eolith_state::eolith45)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", MCS51_INT0_LINE))
+	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_soundcpu, MCS51_INT0_LINE);
 
-	MCFG_DEVICE_ADD("qs1000", QS1000, XTAL(24'000'000))
-	MCFG_QS1000_EXTERNAL_ROM(true)
-	MCFG_QS1000_IN_P1_CB(READ8(*this, eolith_state, qs1000_p1_r))
-	MCFG_QS1000_OUT_P1_CB(WRITE8(*this, eolith_state, qs1000_p1_w))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	qs1000_device &qs1000(QS1000(config, "qs1000", XTAL(24'000'000)));
+	qs1000.set_external_rom(true);
+	qs1000.p1_in().set(FUNC(eolith_state::qs1000_p1_r));
+	qs1000.p1_out().set(FUNC(eolith_state::qs1000_p1_w));
+	qs1000.add_route(0, "lspeaker", 1.0);
+	qs1000.add_route(1, "rspeaker", 1.0);
+}
 
-MACHINE_CONFIG_START(eolith_state::eolith50)
+void eolith_state::eolith50(machine_config &config)
+{
 	eolith45(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(50000000)         /* 50 MHz */
-MACHINE_CONFIG_END
+	m_maincpu->set_clock(50000000);         /* 50 MHz */
+}
 
-MACHINE_CONFIG_START(eolith_state::ironfort)
+void eolith_state::ironfort(machine_config &config)
+{
 	eolith45(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(44900000) /* Normally 45MHz??? but PCB actually had a 44.9MHz OSC, so it's value is used */
-MACHINE_CONFIG_END
+	m_maincpu->set_clock(44900000); /* Normally 45MHz??? but PCB actually had a 44.9MHz OSC, so it's value is used */
+}
 
-MACHINE_CONFIG_START(eolith_state::hidctch3)
+void eolith_state::hidctch3(machine_config &config)
+{
 	eolith50(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(hidctch3_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &eolith_state::hidctch3_map);
+}
 
 
 /*************************************
@@ -1726,7 +1726,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(eolith_state::eolith_speedup)
 	}
 }
 
-CUSTOM_INPUT_MEMBER(eolith_state::eolith_speedup_getvblank)
+READ_LINE_MEMBER(eolith_state::speedup_vblank_r)
 {
 //  printf("%s:eolith speedup_read data %02x\n",machine().describe_context().c_str(), m_speedup_vblank);
 
@@ -1735,7 +1735,7 @@ CUSTOM_INPUT_MEMBER(eolith_state::eolith_speedup_getvblank)
 }
 
 // StealSee doesn't use interrupts, just the vblank
-CUSTOM_INPUT_MEMBER(eolith_state::stealsee_speedup_getvblank)
+READ_LINE_MEMBER(eolith_state::stealsee_speedup_vblank_r)
 {
 	int pc = m_maincpu->pc();
 
@@ -1753,24 +1753,24 @@ CUSTOM_INPUT_MEMBER(eolith_state::stealsee_speedup_getvblank)
  *
  *************************************/
 
-GAME( 1998, linkypip,  0,        eolith45, linkypip,  eolith_state, init_eolith,   ROT0, "Eolith", "Linky Pipe", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, ironfort,  0,        ironfort, ironfort,  eolith_state, init_eolith,   ROT0, "Eolith", "Iron Fortress", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, ironfortc, ironfort, ironfort, ironfortc, eolith_state, init_eolith,   ROT0, "Eolith (Excellent Competence Ltd. license)", "Gongtit Jiucoi Iron Fortress (Hong Kong)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Licensed/Distributed to Hong Kong company Excellent Competence Ltd.
-GAME( 1998, hidnctch,  0,        eolith45, hidnctch,  eolith_state, init_eolith,   ROT0, "Eolith", "Hidden Catch (World) / Tul Lin Gu Lim Chat Ki '98 (Korea) (pcb ver 3.03)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // or Teurrin Geurim Chajgi '98
-GAME( 1998, hidnctcha, hidnctch, eolith45, hidnctch,  eolith_state, init_eolith,   ROT0, "Eolith", "Hidden Catch (World) / Tul Lin Gu Lim Chat Ki '98 (Korea) (pcb ver 3.02)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // or Teurrin Geurim Chajgi '98
-GAME( 1998, raccoon,   0,        eolith45, raccoon,   eolith_state, init_eolith,   ROT0, "Eolith", "Raccoon World", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, puzzlekg,  0,        eolith45, puzzlekg,  eolith_state, init_eolith,   ROT0, "Eolith", "Puzzle King (Dance & Puzzle)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1999, candy,     0,        eolith50, candy,     eolith_state, init_eolith,   ROT0, "Eolith", "Candy Candy",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1999, hidctch2,  0,        eolith50, hidctch2,  eolith_state, init_hidctch2, ROT0, "Eolith", "Hidden Catch 2 (pcb ver 3.03) (Kor/Eng) (AT89c52 protected)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1999, hidctch2a, hidctch2, eolith50, hidctch2,  eolith_state, init_eolith,   ROT0, "Eolith", "Hidden Catch 2 (pcb ver 1.00) (Kor/Eng/Jpn/Chi)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1999, hidnc2k,   0,        eolith50, hidctch2,  eolith_state, init_hidnc2k,  ROT0, "Eolith", "Hidden Catch 2000 (AT89c52 protected)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1999, landbrk,   0,        eolith45, landbrk,   eolith_state, init_landbrk,  ROT0, "Eolith", "Land Breaker (World) / Miss Tang Ja Ru Gi (Korea) (pcb ver 3.02)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // or Miss Ttang Jjareugi
-GAME( 1999, landbrka,  landbrk,  eolith45, landbrk,   eolith_state, init_landbrka, ROT0, "Eolith", "Land Breaker (World) / Miss Tang Ja Ru Gi (Korea) (pcb ver 3.03) (AT89c52 protected)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // or Miss Ttang Jjareugi
-GAME( 1999, landbrkb,  landbrk,  eolith45, landbrk,   eolith_state, init_landbrkb, ROT0, "Eolith", "Land Breaker (World) / Miss Tang Ja Ru Gi (Korea) (pcb ver 1.0) (AT89c52 protected)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // or Miss Ttang Jjareugi
-GAME( 1999, nhidctch,  0,        eolith45, hidctch2,  eolith_state, init_eolith,   ROT0, "Eolith", "New Hidden Catch (World) / New Tul Lin Gu Lim Chat Ki '98 (Korea) (pcb ver 3.02)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // or New Teurrin Geurim Chajgi '98
-GAME( 1999, penfan,    0,        eolith45, penfan,    eolith_state, init_eolith,   ROT0, "Eolith", "Penfan Girls - Step1. Mild Mind (set 1)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // alt title of Ribbon
-GAME( 1999, penfana,   penfan,   eolith45, penfan,    eolith_state, init_eolith,   ROT0, "Eolith", "Penfan Girls - Step1. Mild Mind (set 2)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2000, stealsee,  0,        eolith45, stealsee,  eolith_state, init_eolith,   ROT0, "Moov Generation / Eolith", "Steal See",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2000, hidctch3,  0,        hidctch3, hidctch3,  eolith_state, init_eolith,   ROT0, "Eolith", "Hidden Catch 3 (ver 1.00 / pcb ver 3.05)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2001, fort2b,    0,        eolith50, common,    eolith_state, init_eolith,   ROT0, "Eolith", "Fortress 2 Blue Arcade (World) (ver 1.01 / pcb ver 3.05)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Language selection is greyed out in Service Mode
-GAME( 2001, fort2ba,   fort2b,   eolith50, common,    eolith_state, init_eolith,   ROT0, "Eolith", "Fortress 2 Blue Arcade (Korea) (ver 1.00 / pcb ver 3.05)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // ^^
+GAME( 1998, linkypip,  0,        eolith45, linkypip,  eolith_state, init_eolith,   ROT0, "Eolith", "Linky Pipe", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, ironfort,  0,        ironfort, ironfort,  eolith_state, init_eolith,   ROT0, "Eolith", "Iron Fortress", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, ironfortc, ironfort, ironfort, ironfortc, eolith_state, init_eolith,   ROT0, "Eolith (Excellent Competence Ltd. license)", "Gongtit Jiucoi Iron Fortress (Hong Kong)", MACHINE_SUPPORTS_SAVE ) // Licensed/Distributed to Hong Kong company Excellent Competence Ltd.
+GAME( 1998, hidnctch,  0,        eolith45, hidnctch,  eolith_state, init_eolith,   ROT0, "Eolith", "Hidden Catch (World) / Tul Lin Gu Lim Chat Ki '98 (Korea) (pcb ver 3.03)",  MACHINE_SUPPORTS_SAVE ) // or Teurrin Geurim Chajgi '98
+GAME( 1998, hidnctcha, hidnctch, eolith45, hidnctch,  eolith_state, init_eolith,   ROT0, "Eolith", "Hidden Catch (World) / Tul Lin Gu Lim Chat Ki '98 (Korea) (pcb ver 3.02)",  MACHINE_SUPPORTS_SAVE ) // or Teurrin Geurim Chajgi '98
+GAME( 1998, raccoon,   0,        eolith45, raccoon,   eolith_state, init_eolith,   ROT0, "Eolith", "Raccoon World", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, puzzlekg,  0,        eolith45, puzzlekg,  eolith_state, init_eolith,   ROT0, "Eolith", "Puzzle King (Dance & Puzzle)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1999, candy,     0,        eolith50, candy,     eolith_state, init_eolith,   ROT0, "Eolith", "Candy Candy",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1999, hidctch2,  0,        eolith50, hidctch2,  eolith_state, init_hidctch2, ROT0, "Eolith", "Hidden Catch 2 (pcb ver 3.03) (Kor/Eng) (AT89c52 protected)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, hidctch2a, hidctch2, eolith50, hidctch2,  eolith_state, init_eolith,   ROT0, "Eolith", "Hidden Catch 2 (pcb ver 1.00) (Kor/Eng/Jpn/Chi)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, hidnc2k,   0,        eolith50, hidctch2,  eolith_state, init_hidnc2k,  ROT0, "Eolith", "Hidden Catch 2000 (AT89c52 protected)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, landbrk,   0,        eolith45, landbrk,   eolith_state, init_landbrk,  ROT0, "Eolith", "Land Breaker (World) / Miss Tang Ja Ru Gi (Korea) (pcb ver 3.02)",  MACHINE_SUPPORTS_SAVE ) // or Miss Ttang Jjareugi
+GAME( 1999, landbrka,  landbrk,  eolith45, landbrk,   eolith_state, init_landbrka, ROT0, "Eolith", "Land Breaker (World) / Miss Tang Ja Ru Gi (Korea) (pcb ver 3.03) (AT89c52 protected)",  MACHINE_SUPPORTS_SAVE ) // or Miss Ttang Jjareugi
+GAME( 1999, landbrkb,  landbrk,  eolith45, landbrk,   eolith_state, init_landbrkb, ROT0, "Eolith", "Land Breaker (World) / Miss Tang Ja Ru Gi (Korea) (pcb ver 1.0) (AT89c52 protected)",  MACHINE_SUPPORTS_SAVE ) // or Miss Ttang Jjareugi
+GAME( 1999, nhidctch,  0,        eolith45, hidctch2,  eolith_state, init_eolith,   ROT0, "Eolith", "New Hidden Catch (World) / New Tul Lin Gu Lim Chat Ki '98 (Korea) (pcb ver 3.02)", MACHINE_SUPPORTS_SAVE ) // or New Teurrin Geurim Chajgi '98
+GAME( 1999, penfan,    0,        eolith45, penfan,    eolith_state, init_eolith,   ROT0, "Eolith", "Penfan Girls - Step1. Mild Mind (set 1)",  MACHINE_SUPPORTS_SAVE ) // alt title of Ribbon
+GAME( 1999, penfana,   penfan,   eolith45, penfan,    eolith_state, init_eolith,   ROT0, "Eolith", "Penfan Girls - Step1. Mild Mind (set 2)",  MACHINE_SUPPORTS_SAVE )
+GAME( 2000, stealsee,  0,        eolith45, stealsee,  eolith_state, init_eolith,   ROT0, "Moov Generation / Eolith", "Steal See",  MACHINE_SUPPORTS_SAVE )
+GAME( 2000, hidctch3,  0,        hidctch3, hidctch3,  eolith_state, init_eolith,   ROT0, "Eolith", "Hidden Catch 3 (ver 1.00 / pcb ver 3.05)", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, fort2b,    0,        eolith50, common,    eolith_state, init_eolith,   ROT0, "Eolith", "Fortress 2 Blue Arcade (World) (ver 1.01 / pcb ver 3.05)",  MACHINE_SUPPORTS_SAVE ) // Language selection is greyed out in Service Mode
+GAME( 2001, fort2ba,   fort2b,   eolith50, common,    eolith_state, init_eolith,   ROT0, "Eolith", "Fortress 2 Blue Arcade (Korea) (ver 1.00 / pcb ver 3.05)",  MACHINE_SUPPORTS_SAVE ) // ^^

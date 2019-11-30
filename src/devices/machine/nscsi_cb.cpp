@@ -7,6 +7,7 @@ DEFINE_DEVICE_TYPE(NSCSI_CB, nscsi_callback_device, "nscsi_cb", "SCSI callback (
 
 nscsi_callback_device::nscsi_callback_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nscsi_device(mconfig, NSCSI_CB, tag, owner, clock),
+		nscsi_slot_card_interface(mconfig, *this, DEVICE_SELF),
 		m_write_rst(*this),
 		m_write_atn(*this),
 		m_write_ack(*this),

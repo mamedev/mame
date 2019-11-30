@@ -37,11 +37,11 @@ WRITE8_MEMBER(bogeyman_state::ay8910_control_w)
 
 	// bit 5 goes to 8910 #0 BDIR pin
 	if ((m_last_write & 0x20) == 0x20 && (data & 0x20) == 0x00)
-		m_ay1->data_address_w(space, m_last_write >> 4, m_psg_latch);
+		m_ay1->data_address_w(m_last_write >> 4, m_psg_latch);
 
 	// bit 7 goes to 8910 #1 BDIR pin
 	if ((m_last_write & 0x80) == 0x80 && (data & 0x80) == 0x00)
-		m_ay2->data_address_w(space, m_last_write >> 6, m_psg_latch);
+		m_ay2->data_address_w(m_last_write >> 6, m_psg_latch);
 
 	m_last_write = data;
 }
@@ -229,41 +229,38 @@ WRITE8_MEMBER(bogeyman_state::colbank_w)
 	}
 }
 
-MACHINE_CONFIG_START(bogeyman_state::bogeyman)
-
+void bogeyman_state::bogeyman(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", M6502, 1500000) /* Verified */
-	MCFG_DEVICE_PROGRAM_MAP(bogeyman_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(bogeyman_state, irq0_line_hold,  16*60) // Controls sound
+	M6502(config, m_maincpu, 1500000); /* Verified */
+	m_maincpu->set_addrmap(AS_PROGRAM, &bogeyman_state::bogeyman_map);
+	m_maincpu->set_periodic_int(FUNC(bogeyman_state::irq0_line_hold), attotime::from_hz(16*60)); // Controls sound
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-//  MCFG_SCREEN_REFRESH_RATE(60)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-//  MCFG_SCREEN_SIZE(32*8, 32*8)
-//  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+//  screen.set_refresh_hz(60);
+//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+//  screen.set_size(32*8, 32*8);
+//  screen.set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
 	// DECO video CRTC, unverified
-	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000)/2,384,0,256,272,8,248)
-	MCFG_SCREEN_UPDATE_DRIVER(bogeyman_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen.set_raw(XTAL(12'000'000)/2,384,0,256,272,8,248);
+	screen.set_screen_update(FUNC(bogeyman_state::screen_update));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bogeyman)
-	MCFG_PALETTE_ADD("palette", 16+256)
-	MCFG_PALETTE_FORMAT(BBGGGRRR_inverted)
-	MCFG_PALETTE_INIT_OWNER(bogeyman_state, bogeyman)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bogeyman);
+	PALETTE(config, m_palette, FUNC(bogeyman_state::bogeyman_palette)).set_format(palette_device::BGR_233_inverted, 16 + 256);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	// verified to be YM2149s from PCB pic
-	MCFG_DEVICE_ADD("ay1", YM2149, 1500000)  /* Verified */
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, bogeyman_state, colbank_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	YM2149(config, m_ay1, 1500000);  /* Verified */
+	m_ay1->port_a_write_callback().set(FUNC(bogeyman_state::colbank_w));
+	m_ay1->add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	MCFG_DEVICE_ADD("ay2", YM2149, 1500000)  /* Verified */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_CONFIG_END
+	YM2149(config, m_ay2, 1500000).add_route(ALL_OUTPUTS, "mono", 0.30);  /* Verified */
+}
 
 /* ROMs */
 

@@ -14,6 +14,7 @@
 #include "machine/buffer.h"
 #include "bus/centronics/ctronics.h"
 #include "imagedev/cassette.h"
+#include "imagedev/floppy.h"
 #include "sound/beep.h"
 #include "sound/2203intf.h"
 #include "machine/wd_fdc.h"
@@ -112,8 +113,8 @@ struct fm7_alu_t
 class fm7_state : public driver_device
 {
 public:
-	fm7_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	fm7_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_shared_ram(*this, "shared_ram"),
 		m_boot_ram(*this, "boot_ram"),
 		m_maincpu(*this, "maincpu"),

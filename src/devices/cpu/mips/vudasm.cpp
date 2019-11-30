@@ -9,22 +9,22 @@
 #include "emu.h"
 #include "vudasm.h"
 
-/*static*/ const char* sonyvu_disassembler::DEST_STR[] =
+/*static*/ char const *const sonyvu_disassembler::DEST_STR[] =
 {
 	"    ", "w   ", "z   ", "zw  ", "y   ", "yw  ", "yz  ", "yzw ",
 	"x   ", "xw  ", "xz  ", "xzw ", "xy  ", "xyw ", "xyz ", "xyzw"
 };
 
-/*static*/ const char* sonyvu_disassembler::DEST_COMMA_STR[] =
+/*static*/ char const *const sonyvu_disassembler::DEST_COMMA_STR[] =
 {
 	",",  "w,",  "z,",  "zw,",  "y,",  "yw,",  "yz,",  "yzw,",
 	"x,", "xw,", "xz,", "xzw,", "xy,", "xyw,", "xyz,", "xyzw,"
 };
 
-/*static*/ const char* sonyvu_disassembler::BC_STR[] = { "x", "y", "z", "w" };
-/*static*/ const char* sonyvu_disassembler::BC_COMMA_STR[] = { "x,", "y,", "z,", "w," };
+/*static*/ char const *const sonyvu_disassembler::BC_STR[] = { "x", "y", "z", "w" };
+/*static*/ char const *const sonyvu_disassembler::BC_COMMA_STR[] = { "x,", "y,", "z,", "w," };
 
-/*static*/ const char* sonyvu_disassembler::VFREG[] =
+/*static*/ char const *const sonyvu_disassembler::VFREG[] =
 {
 	"$vf00", "$vf01", "$vf02", "$vf03", "$vf04", "$vf05", "$vf06", "$vf07",
 	"$vf08", "$vf09", "$vf10", "$vf11", "$vf12", "$vf13", "$vf14", "$vf15",
@@ -32,7 +32,7 @@
 	"$vf24", "$vf25", "$vf26", "$vf27", "$vf28", "$vf29", "$vf30", "$vf31"
 };
 
-/*static*/ const char* sonyvu_disassembler::VIREG[] =
+/*static*/ char const *const sonyvu_disassembler::VIREG[] =
 {
 	"$vi00",  "$vi01", "$vi02", "$vi03",  "$vi04", "$vi05",    "$vi06", "$vi07",
 	"$vi08",  "$vi09", "$vi10", "$vi11",  "$vi12", "$vi13",    "$vi14", "$vi15",

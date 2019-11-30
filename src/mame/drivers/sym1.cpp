@@ -314,11 +314,11 @@ void sym1_state::sym1_map(address_map &map)
 	map(0x0800, 0x0bff).bankrw("bank3").share("ram_2k");
 	map(0x0c00, 0x0fff).bankrw("bank4").share("ram_3k");
 	map(0x8000, 0x8fff).rom().share("monitor"); // U20 Monitor ROM
-	map(0xa000, 0xa00f).rw("via1", FUNC(via6522_device::read), FUNC(via6522_device::write));  // U25 VIA #1
+	map(0xa000, 0xa00f).m("via1", FUNC(via6522_device::map));  // U25 VIA #1
 	map(0xa400, 0xa41f).m("riot", FUNC(mos6532_new_device::io_map));  // U27 RIOT
 	map(0xa600, 0xa67f).bankrw("bank5").share("riot_ram");   // U27 RIOT RAM
-	map(0xa800, 0xa80f).rw("via2", FUNC(via6522_device::read), FUNC(via6522_device::write));  // U28 VIA #2
-	map(0xac00, 0xac0f).rw("via3", FUNC(via6522_device::read), FUNC(via6522_device::write));  // U29 VIA #3
+	map(0xa800, 0xa80f).m("via2", FUNC(via6522_device::map));  // U28 VIA #2
+	map(0xac00, 0xac0f).m("via3", FUNC(via6522_device::map));  // U29 VIA #3
 	map(0xb000, 0xefff).rom();
 }
 

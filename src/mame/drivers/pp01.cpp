@@ -1,12 +1,23 @@
 // license:BSD-3-Clause
 // copyright-holders:Miodrag Milanovic
-/***************************************************************************
+/*****************************************************************************************
 
-        PP-01 driver by Miodrag Milanovic
+PP-01 driver by Miodrag Milanovic.
+Also for PP-02/03/04/05/06, if the roms ever appear.
 
-        08/09/2008 Preliminary driver.
+2008-09-08 Preliminary driver.
 
-****************************************************************************/
+MONIT to enter the Monitor
+M - ?
+N - ?
+P - to return
+S - ?
+Z - ?
+
+ToDo:
+- Interrupt controller
+
+*****************************************************************************************/
 
 #include "emu.h"
 #include "includes/pp01.h"
@@ -16,7 +27,7 @@
 
 
 /* Address maps */
-void pp01_state::pp01_mem(address_map &map)
+void pp01_state::mem_map(address_map &map)
 {
 	map(0x0000, 0x0fff).bankrw("bank1");
 	map(0x1000, 0x1fff).bankrw("bank2");
@@ -36,15 +47,16 @@ void pp01_state::pp01_mem(address_map &map)
 	map(0xf000, 0xffff).bankrw("bank16");
 }
 
-void pp01_state::pp01_io(address_map &map)
+void pp01_state::io_map(address_map &map)
 {
-	map(0xc0, 0xc3).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write)); // system
-	//AM_RANGE(0xc4, 0xc7) AM_DEVREADWRITE("ppi8255", i8255_device, read, write) // user
-	map(0xc8, 0xc8).mirror(2).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xc9, 0xc9).mirror(2).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0xcc, 0xcf).w(FUNC(pp01_state::pp01_video_write_mode_w));
+	map(0xc0, 0xc3).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write)); // system
+	map(0xc4, 0xc7).rw("ppi2", FUNC(i8255_device::read), FUNC(i8255_device::write)); // user
+	map(0xc8, 0xc9).mirror(2).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0xcc, 0xcf).w(FUNC(pp01_state::video_write_mode_w));
 	map(0xd0, 0xd3).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
-	map(0xe0, 0xef).mirror(0x10).rw(FUNC(pp01_state::pp01_mem_block_r), FUNC(pp01_state::pp01_mem_block_w));
+	//map(0xd4, 0xd7). MH3214 interrupt controller
+	//map(0xd8, 0xdb). MH102 multiply 2 8-bit signed or unsigned numbers, get back 16-bit result.
+	map(0xe0, 0xef).mirror(0x10).rw(FUNC(pp01_state::mem_block_r), FUNC(pp01_state::mem_block_w));
 }
 
 /* Input ports */
@@ -200,52 +212,56 @@ static INPUT_PORTS_START( pp01 )
 INPUT_PORTS_END
 
 /* Machine driver */
-MACHINE_CONFIG_START(pp01_state::pp01)
+void pp01_state::pp01(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8080, 2000000)
-	MCFG_DEVICE_PROGRAM_MAP(pp01_mem)
-	MCFG_DEVICE_IO_MAP(pp01_io)
+	I8080(config, m_maincpu, 2000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pp01_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &pp01_state::io_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(pp01_state, screen_update_pp01)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 256-1, 0, 256-1);
+	screen.set_screen_update(FUNC(pp01_state::screen_update_pp01));
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_INIT_OWNER(pp01_state, pp01)
+	PALETTE(config, "palette", FUNC(pp01_state::pp01_palette), 8);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
-	//WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("uart", I8251, 0)
-	// when rts and dtr are both high, the uart is being used for cassette operations
+	I8251(config, m_uart, 2000000);
+	m_uart->txd_handler().set([this] (bool state) { m_txd = state; });
+	m_uart->txempty_handler().set([this] (bool state) { m_txe = state; });
+	m_uart->rts_handler().set([this] (bool state) { m_rts = state; });
 
-	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(0)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, pp01_state,pp01_pit_out0))
-	MCFG_PIT8253_CLK1(2000000)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, pp01_state,pp01_pit_out1))
-	MCFG_PIT8253_CLK2(2000000)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE("pit8253", pit8253_device, write_clk0))
+	PIT8253(config, m_pit, 0);
+	m_pit->set_clk<2>(2000000);
+	m_pit->out_handler<2>().set(FUNC(pp01_state::z2_w));
 
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, pp01_state, pp01_8255_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pp01_state, pp01_8255_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, pp01_state, pp01_8255_portb_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, pp01_state, pp01_8255_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, pp01_state, pp01_8255_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pp01_state, pp01_8255_portc_w))
+	I8255A(config, m_ppi1);
+	m_ppi1->in_pa_callback().set(FUNC(pp01_state::ppi1_porta_r));
+	m_ppi1->out_pa_callback().set(FUNC(pp01_state::ppi1_porta_w));
+	m_ppi1->in_pb_callback().set(FUNC(pp01_state::ppi1_portb_r));
+	m_ppi1->out_pb_callback().set(FUNC(pp01_state::ppi1_portb_w));
+	m_ppi1->in_pc_callback().set(FUNC(pp01_state::ppi1_portc_r));
+	m_ppi1->out_pc_callback().set(FUNC(pp01_state::ppi1_portc_w));
+
+	I8255A(config, m_ppi2);
 
 	/* internal ram */
-	RAM(config, RAM_TAG).set_default_size("64K").set_default_value(0);
-MACHINE_CONFIG_END
+	RAM(config, RAM_TAG).set_default_size("64K").set_default_value(0x00);
+
+	CASSETTE(config, m_cass);
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.15);
+	TIMER(config, "kansas_r").configure_periodic(FUNC(pp01_state::kansas_r), attotime::from_hz(19200));
+}
 
 /* ROM definition */
 

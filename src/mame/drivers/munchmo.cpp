@@ -75,13 +75,13 @@ WRITE8_MEMBER(munchmo_state::sound_nmi_ack_w)
 
 READ8_MEMBER(munchmo_state::ay1reset_r)
 {
-	m_ay8910[0]->reset_w(space, 0, 0);
+	m_ay8910[0]->reset_w();
 	return 0;
 }
 
 READ8_MEMBER(munchmo_state::ay2reset_r)
 {
-	m_ay8910[1]->reset_w(space, 0, 0);
+	m_ay8910[1]->reset_w();
 	return 0;
 }
 
@@ -102,10 +102,7 @@ void munchmo_state::mnchmobl_map(address_map &map)
 	map(0xbaba, 0xbaba).nopw(); /* ? */
 	map(0xbc00, 0xbc7f).ram().share(m_status_vram);
 	map(0xbe00, 0xbe00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0xbe01, 0xbe01).select(0x0070).lw8("mainlatch_w",
-										   [this](address_space &space, offs_t offset, u8 data, u8 mem_mask){
-											   m_mainlatch->write_d0(space, offset >> 4, data, mem_mask);
-										   });
+	map(0xbe01, 0xbe01).select(0x0070).lw8(NAME([this] (offs_t offset, u8 data){ m_mainlatch->write_d0(offset >> 4, data); }));
 	map(0xbe02, 0xbe02).portr("DSW1");
 	map(0xbe03, 0xbe03).portr("DSW2");
 	map(0xbf00, 0xbf00).w(FUNC(munchmo_state::nmi_ack_w)); // CNI 1-8C
@@ -315,16 +312,16 @@ void munchmo_state::machine_start()
 	save_item(NAME(m_nmi_enable));
 }
 
-MACHINE_CONFIG_START(munchmo_state::mnchmobl)
-
+void munchmo_state::mnchmobl(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, Z80, XTAL(15'000'000)/4) // from pin 13 of XTAL-driven 163
-	MCFG_DEVICE_PROGRAM_MAP(mnchmobl_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(munchmo_state, generic_irq_ack) // IORQ clears flip-flop at 1-2C
+	Z80(config, m_maincpu, XTAL(15'000'000)/4); // from pin 13 of XTAL-driven 163
+	m_maincpu->set_addrmap(AS_PROGRAM, &munchmo_state::mnchmobl_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(munchmo_state::generic_irq_ack)); // IORQ clears flip-flop at 1-2C
 
-	MCFG_DEVICE_ADD(m_audiocpu, Z80, XTAL(15'000'000)/8) // from pin 12 of XTAL-driven 163
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(munchmo_state, generic_irq_ack) // IORQ clears flip-flop at 1-7H
+	Z80(config, m_audiocpu, XTAL(15'000'000)/8); // from pin 12 of XTAL-driven 163
+	m_audiocpu->set_addrmap(AS_PROGRAM, &munchmo_state::sound_map);
+	m_audiocpu->set_irq_acknowledge_callback(FUNC(munchmo_state::generic_irq_ack)); // IORQ clears flip-flop at 1-7H
 
 	LS259(config, m_mainlatch, 0); // 12E
 	m_mainlatch->q_out_cb<0>().set(FUNC(munchmo_state::palette_bank_0_w)); // BCL0 2-11E
@@ -336,18 +333,17 @@ MACHINE_CONFIG_START(munchmo_state::mnchmobl)
 	m_mainlatch->q_out_cb<6>().set(FUNC(munchmo_state::nmi_enable_w)); // ENI 1-10C
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(256+32+32, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 255+32+32,0, 255-16)
-	MCFG_SCREEN_UPDATE_DRIVER(munchmo_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, munchmo_state, vblank_irq))
-	MCFG_SCREEN_PALETTE(m_palette)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(57);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(256+32+32, 256);
+	screen.set_visarea(0, 255+32+32,0, 255-16);
+	screen.set_screen_update(FUNC(munchmo_state::screen_update));
+	screen.screen_vblank().set(FUNC(munchmo_state::vblank_irq));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_mnchmobl)
-	MCFG_PALETTE_ADD(m_palette, 256)
-	MCFG_PALETTE_INIT_OWNER(munchmo_state, munchmo)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mnchmobl);
+	PALETTE(config, m_palette, FUNC(munchmo_state::munchmo_palette), 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -355,14 +351,14 @@ MACHINE_CONFIG_START(munchmo_state::mnchmobl)
 	GENERIC_LATCH_8(config, m_soundlatch).data_pending_callback().set_inputline(m_audiocpu, 0, ASSERT_LINE);
 
 	/* AY clock speeds confirmed to match known recording */
-	MCFG_DEVICE_ADD(m_ay8910[0], AY8910, XTAL(15'000'000)/8)
-	//MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	AY8910(config, m_ay8910[0], XTAL(15'000'000)/8);
+	//m_ay8910[0]->set_flags(AY8910_SINGLE_OUTPUT);
+	m_ay8910[0]->add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_DEVICE_ADD(m_ay8910[1], AY8910, XTAL(15'000'000)/8)
-	//MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	AY8910(config, m_ay8910[1], XTAL(15'000'000)/8);
+	//m_ay8910[1]->set_flags(AY8910_SINGLE_OUTPUT);
+	m_ay8910[1]->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
 /*************************************

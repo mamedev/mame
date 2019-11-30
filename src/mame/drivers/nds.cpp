@@ -970,18 +970,19 @@ TIMER_CALLBACK_MEMBER(nds_state::timer_expire)
 	}
 }
 
-MACHINE_CONFIG_START(nds_state::nds)
-	MCFG_DEVICE_ADD("arm7", ARM7, MASTER_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(nds_arm7_map)
+void nds_state::nds(machine_config &config)
+{
+	ARM7(config, m_arm7, MASTER_CLOCK);
+	m_arm7->set_addrmap(AS_PROGRAM, &nds_state::nds_arm7_map);
 
-	MCFG_DEVICE_ADD("arm9", ARM946ES, MASTER_CLOCK*2)
-	MCFG_ARM_HIGH_VECTORS()
-	MCFG_DEVICE_PROGRAM_MAP(nds_arm9_map)
+	ARM946ES(config, m_arm9, MASTER_CLOCK*2);
+	m_arm9->set_high_vectors();
+	m_arm9->set_addrmap(AS_PROGRAM, &nds_state::nds_arm9_map);
 
 	// WRAM
 	ADDRESS_MAP_BANK(config, "nds7wram").set_map(&nds_state::nds7_wram_map).set_options(ENDIANNESS_LITTLE, 32, 32, 0x8000);
 	ADDRESS_MAP_BANK(config, "nds9wram").set_map(&nds_state::nds9_wram_map).set_options(ENDIANNESS_LITTLE, 32, 32, 0x8000);
-MACHINE_CONFIG_END
+}
 
 /* Help identifying the region and revisions of the set would be greatly appreciated! */
 ROM_START( nds )

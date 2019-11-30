@@ -12,28 +12,27 @@
 #include "emu.h"
 #include "includes/markham.h"
 
-PALETTE_INIT_MEMBER(markham_state, markham)
+void markham_state::markham_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
 
-	/* create a lookup table for the palette */
-	for (i = 0; i < 0x100; i++)
+	// create a lookup table for the palette
+	for (int i = 0; i < 0x100; i++)
 	{
-		int r = pal4bit(color_prom[i + 0x000]);
-		int g = pal4bit(color_prom[i + 0x100]);
-		int b = pal4bit(color_prom[i + 0x200]);
+		int const r = pal4bit(color_prom[i | 0x000]);
+		int const g = pal4bit(color_prom[i | 0x100]);
+		int const b = pal4bit(color_prom[i | 0x200]);
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
-	/* color_prom now points to the beginning of the lookup table */
+	// color_prom now points to the beginning of the lookup table
 	color_prom += 0x300;
 
-	/* sprites lookup table */
-	for (i = 0; i < 0x400; i++)
+	// sprites lookup table
+	for (int i = 0; i < 0x400; i++)
 	{
-		uint8_t ctabentry = color_prom[i];
+		uint8_t const ctabentry = color_prom[i];
 		palette.set_pen_indirect(i, ctabentry);
 	}
 }
@@ -55,7 +54,7 @@ TILE_GET_INFO_MEMBER(markham_state::get_bg_tile_info)
 
 void markham_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(markham_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(markham_state::get_bg_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
 
 	m_bg_tilemap->set_scroll_rows(32);
 }
@@ -65,7 +64,7 @@ VIDEO_START_MEMBER(markham_state, strnskil)
 	video_start();
 
 	m_bg_tilemap->set_scroll_rows(32);
-	m_irq_scanline_start = 96;
+	m_irq_scanline_start = 109;
 	m_irq_scanline_end = 240;
 
 	save_item(NAME(m_irq_source));
@@ -142,16 +141,18 @@ uint32_t markham_state::screen_update_strnskil(screen_device &screen, bitmap_ind
 
 	for (row = 0; row < 32; row++)
 	{
-		if (m_scroll_ctrl != 0x07)
+		switch (scroll_data[m_scroll_ctrl * 32 + row])
 		{
-			switch (scroll_data[m_scroll_ctrl * 32 + row])
-			{
-				case 2:
-					m_bg_tilemap->set_scrollx(row, -~m_xscroll[1]);
-				case 4:
-					m_bg_tilemap->set_scrollx(row, -~m_xscroll[0]);
+			case 2:
+				m_bg_tilemap->set_scrollx(row, -~m_xscroll[1]);
 				break;
-			}
+			case 4:
+				m_bg_tilemap->set_scrollx(row, -~m_xscroll[0]);
+				break;
+			default:
+				// case 6 and 0
+				m_bg_tilemap->set_scrollx(row, 0);
+				break;
 		}
 	}
 

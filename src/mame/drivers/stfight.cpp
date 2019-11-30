@@ -253,13 +253,19 @@ TODO:
 - Each version of empcity/stfight has a different protection code stored in the
   MCU (at $1D2) so each 68705 will need to be dumped.
   We currently use hacked versions of the empcityu MCU for each different set.
+  Currently, the following protection codes are known:
+  06 USA
+  08 Japan
+  09 Benelux
+  0d Italy
+  0f Germany
+  The France version doesn't care for the protection code.
 
 *****************************************************************************/
 
 #include "emu.h"
 #include "includes/stfight.h"
 
-#include "cpu/m6805/m68705.h"
 #include "cpu/z80/z80.h"
 
 #include "sound/2203intf.h"
@@ -309,7 +315,7 @@ void stfight_state::cshooter_cpu1_map(address_map &map)
 	map(0xc801, 0xc801).w(FUNC(stfight_state::stfight_bank_w));
 	map(0xd000, 0xd7ff).ram().w("airraid_vid", FUNC(airraid_video_device::txram_w)).share("txram");
 	map(0xd800, 0xd80f).ram().w("airraid_vid", FUNC(airraid_video_device::vregs_w)).share("vregs"); // wrong?
-	map(0xe000, 0xfdff).ram();
+	map(0xf000, 0xfdff).ram();
 	map(0xfe00, 0xffff).ram().share("sprite_ram");
 }
 
@@ -453,69 +459,67 @@ INPUT_PORTS_END
 
 
 
-MACHINE_CONFIG_START(stfight_state::stfight_base)
-
+void stfight_state::stfight_base(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000) / 4)
-	MCFG_DEVICE_PROGRAM_MAP(cpu1_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("stfight_vid:screen", stfight_state,  stfight_vb_interrupt)
+	Z80(config, m_maincpu, 12_MHz_XTAL / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &stfight_state::cpu1_map);
+	m_maincpu->set_vblank_int("stfight_vid:screen", FUNC(stfight_state::stfight_vb_interrupt));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(12'000'000) / 4)
-	MCFG_DEVICE_PROGRAM_MAP(cpu2_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(stfight_state, irq0_line_hold, 120)
+	Z80(config, m_audiocpu, 12_MHz_XTAL / 4);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &stfight_state::cpu2_map);
+	m_audiocpu->set_periodic_int(FUNC(stfight_state::irq0_line_hold), attotime::from_hz(120));
 
-	MCFG_DEVICE_ADD("mcu", M68705P5, XTAL(12'000'000) / 4)
-	MCFG_M68705_PORTB_R_CB(READ8(*this, stfight_state, stfight_68705_port_b_r));
-	MCFG_M68705_PORTA_W_CB(WRITE8(*this, stfight_state, stfight_68705_port_a_w));
-	MCFG_M68705_PORTB_W_CB(WRITE8(*this, stfight_state, stfight_68705_port_b_w));
-	MCFG_M68705_PORTC_W_CB(WRITE8(*this, stfight_state, stfight_68705_port_c_w));
+	M68705P5(config, m_mcu, 12_MHz_XTAL / 4);
+	m_mcu->portb_r().set(FUNC(stfight_state::stfight_68705_port_b_r));
+	m_mcu->porta_w().set(FUNC(stfight_state::stfight_68705_port_a_w));
+	m_mcu->portb_w().set(FUNC(stfight_state::stfight_68705_port_b_w));
+	m_mcu->portc_w().set(FUNC(stfight_state::stfight_68705_port_c_w));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+	config.set_maximum_quantum(attotime::from_hz(600));
 
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
+	PALETTE(config, "palette").set_format(palette_device::xBRG_444, 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
 	// YM2203_PITCH_HACK - These should be clocked at 1.5Mhz (see TODO list)
-	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(12'000'000) / 8 * 3)
-	MCFG_SOUND_ROUTE(0, "mono", 0.15)
-	MCFG_SOUND_ROUTE(1, "mono", 0.15)
-	MCFG_SOUND_ROUTE(2, "mono", 0.15)
-	MCFG_SOUND_ROUTE(3, "mono", 0.10)
+	ym2203_device &ym1(YM2203(config, "ym1", 12_MHz_XTAL / 8 * 3));
+	ym1.add_route(0, "mono", 0.15);
+	ym1.add_route(1, "mono", 0.15);
+	ym1.add_route(2, "mono", 0.15);
+	ym1.add_route(3, "mono", 0.10);
 
-	MCFG_DEVICE_ADD("ym2", YM2203, XTAL(12'000'000) / 8 * 3)
-	MCFG_SOUND_ROUTE(0, "mono", 0.15)
-	MCFG_SOUND_ROUTE(1, "mono", 0.15)
-	MCFG_SOUND_ROUTE(2, "mono", 0.15)
-	MCFG_SOUND_ROUTE(3, "mono", 0.10)
+	ym2203_device &ym2(YM2203(config, "ym2", 12_MHz_XTAL / 8 * 3));
+	ym2.add_route(0, "mono", 0.15);
+	ym2.add_route(1, "mono", 0.15);
+	ym2.add_route(2, "mono", 0.15);
+	ym2.add_route(3, "mono", 0.10);
 
-	MCFG_DEVICE_ADD("msm", MSM5205, XTAL(384'000))
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, stfight_state, stfight_adpcm_int)) // Interrupt function
-	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)  // 8KHz, 4-bit
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	MSM5205(config, m_msm, 384_kHz_XTAL);
+	m_msm->vck_callback().set(FUNC(stfight_state::stfight_adpcm_int)); // Interrupt function
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B);  // 8KHz, 4-bit
+	m_msm->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
-MACHINE_CONFIG_START(stfight_state::stfight)
+void stfight_state::stfight(machine_config &config)
+{
 	stfight_base(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(stfight_cpu1_map)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("stfight_vid:screen", stfight_state,  stfight_vb_interrupt)
+	m_maincpu->set_addrmap(AS_PROGRAM, &stfight_state::stfight_cpu1_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &stfight_state::decrypted_opcodes_map);
+	m_maincpu->set_vblank_int("stfight_vid:screen", FUNC(stfight_state::stfight_vb_interrupt));
 
-	MCFG_DEVICE_ADD("stfight_vid", STFIGHT_VIDEO, 0)
-MACHINE_CONFIG_END
+	STFIGHT_VIDEO(config, "stfight_vid", 0);
+}
 
-
-MACHINE_CONFIG_START(stfight_state::cshooter)
+void stfight_state::cshooter(machine_config &config)
+{
 	stfight_base(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(cshooter_cpu1_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("airraid_vid:screen", stfight_state,  stfight_vb_interrupt)
+	m_maincpu->set_addrmap(AS_PROGRAM, &stfight_state::cshooter_cpu1_map);
+	m_maincpu->set_vblank_int("airraid_vid:screen", FUNC(stfight_state::stfight_vb_interrupt));
 
-	MCFG_AIRRAID_VIDEO_ADD("airraid_vid")
-MACHINE_CONFIG_END
+	AIRRAID_VIDEO(config, "airraid_vid", 0);
+}
 
 
 /***************************************************************************
@@ -873,7 +877,7 @@ ROM_START( empcityi ) // very similar to above set
 	ROM_LOAD( "19.7w",   0x08000, 0x8000, CRC(5170a057) SHA1(9222f9febc222fa0c2eead258ad77c857f6d40c8) )
 
 	ROM_REGION( 0x10000, "stfight_vid:fg_map", 0 )    /* foreground map data */
-	ROM_LOAD( "9.7c",   0x00000, 0x8000, CRC(8ceaf4fe) SHA1(5698f2ff44c109825b8d9d0b6dd2426624df668b) )
+	ROM_LOAD( "9.7c",    0x00000, 0x8000, CRC(8ceaf4fe) SHA1(5698f2ff44c109825b8d9d0b6dd2426624df668b) )
 	ROM_LOAD( "10.8c",   0x08000, 0x8000, CRC(5a1a227a) SHA1(24928ab218824ae1f5380398ceb90dcad525cc08) )
 
 	ROM_REGION( 0x10000, "stfight_vid:bg_map", 0 )    /* background map data */
@@ -900,6 +904,69 @@ ROM_START( empcityi ) // very similar to above set
 
 	ROM_REGION( 0x08000, "adpcm", 0 )   /* ADPCM voice data */
 	ROM_LOAD( "5j",   0x00000, 0x8000, CRC(1b8d0c07) SHA1(c163ccd2b7ed6c84facc075eb1564ca399f3ba17) )
+ROM_END
+
+// This set doesn't seem to check for the protection code in the MCU
+ROM_START( empcityfr )
+	ROM_REGION( 2*0x18000, "maincpu", 0 )   /* 96k for code + 96k for decrypted opcodes */
+	ROM_LOAD( "pr.4t",     0x00000, 0x8000, CRC(aa1f84ac) SHA1(b484b85270091511860f5b4041099c5335ff1204) )
+	ROM_LOAD( "pr.2t",     0x10000, 0x8000, CRC(af381247) SHA1(93812d6b6a2dead07670b789597d23f29b8f0c5d) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for the second CPU */
+	ROM_LOAD( "092-5c",   0x0000,  0x8000, CRC(6a8cb7a6) SHA1(dc123cc48d3623752b78e7c23dd8d2f5adf84f92) )
+
+	ROM_REGION( 0x0800, "mcu", 0 )
+	ROM_LOAD( "empcityu_68705.3j",  0x0000,  0x0800, BAD_DUMP CRC(182f7616) SHA1(38b4f23a559ae13f8ca1b974407a2a40fc52879f) )
+
+	ROM_REGION( 0x02000, "stfight_vid:tx_gfx", 0 )    /* character data */
+	ROM_LOAD( "17.2n",   0x0000, 0x2000, CRC(1b3706b5) SHA1(61f069329a7a836523ffc8cce915b0d0129fd896) )
+
+	ROM_REGION( 0x20000, "stfight_vid:fg_gfx", 0 ) /* foreground tile pixel data */
+	ROM_LOAD( "115.4c",   0x10000, 0x8000, CRC(2c6caa5f) SHA1(f6893cb87004979ead331897c684f995f850447e) )
+	ROM_LOAD( "116.5c",   0x18000, 0x8000, CRC(e11ded31) SHA1(e3e634ad324d51e52d79dd79e5e6e5697cb8d21f) )
+	ROM_LOAD( "113.2c",   0x00000, 0x8000, CRC(0c099a31) SHA1(dabaf8edc59e4954941cd8176031a358f45a1956) )
+	ROM_LOAD( "114.3c",   0x08000, 0x8000, CRC(3cc77c31) SHA1(13d2324df5a322d499c9959a6bb3a844edaefb45) )
+
+	ROM_REGION( 0x20000, "stfight_vid:bg_gfx", 0 )    /* background tile pixel data */
+	ROM_LOAD( "109.4j",   0x10000, 0x8000, CRC(0ae48dd3) SHA1(ca3d9aeb9f4343c379cef9282e408fbf8aa67d99) )
+	ROM_LOAD( "110.5j",   0x18000, 0x8000, CRC(debf5d76) SHA1(eb18c35166eb5f93be98b3c30c7d909c0a68eada) )
+	ROM_LOAD( "097.2j",   0x00000, 0x8000, CRC(8261ecfe) SHA1(5817f4a0458a949298414fe09c86bbcf50be52f3) )
+	ROM_LOAD( "108.3j",   0x08000, 0x8000, CRC(71137301) SHA1(087a9f401939bc30f1dafa9916e8d8c564595a57) )
+
+	ROM_REGION( 0x20000, "stfight_vid:spr_gfx", 0 )    /* sprite data */
+	ROM_LOAD( "095.8w",   0x10000, 0x8000, CRC(8299f247) SHA1(71891f7b1fbfaed14c3854b7f6e10a3ddb4bd479) )
+	ROM_LOAD( "096.9w",   0x18000, 0x8000, CRC(b57dc037) SHA1(69ac79a95ba9ace7c9ca7af480a4a10176be5ace) )
+	ROM_LOAD( "093.6w",   0x00000, 0x8000, CRC(68acd627) SHA1(f98ff9ccb0913711079a2988e8dd08695fb5e107) )
+	ROM_LOAD( "094.7w",   0x08000, 0x8000, CRC(5170a057) SHA1(9222f9febc222fa0c2eead258ad77c857f6d40c8) )
+
+	ROM_REGION( 0x10000, "stfight_vid:fg_map", 0 )    /* foreground map data */
+	ROM_LOAD( "117.7c",   0x00000, 0x8000, CRC(8ceaf4fe) SHA1(5698f2ff44c109825b8d9d0b6dd2426624df668b) )
+	ROM_LOAD( "118.8c",   0x08000, 0x8000, CRC(5a1a227a) SHA1(24928ab218824ae1f5380398ceb90dcad525cc08) )
+
+	ROM_REGION( 0x10000, "stfight_vid:bg_map", 0 )    /* background map data */
+	ROM_LOAD( "111.7j",   0x00000, 0x8000, CRC(27a310bc) SHA1(dd30d72bc33b0bf7ddaf3ab730e028f51b20152a) )
+	ROM_LOAD( "112.8j",   0x08000, 0x8000, CRC(3d19ce18) SHA1(38f691a23c96ef672637965c1a13f6d1595f9d51) )
+
+	ROM_REGION( 0x0100, "stfight_vid:tx_clut", 0 )
+	ROM_LOAD( "82s129.006", 0x0000, 0x0100, CRC(f9424b5b) SHA1(e3bc23213406d35d54f1221f17f25d433df273a2) )  /* text lookup table */
+
+	ROM_REGION( 0x0100, "stfight_vid:fg_clut", 0 )
+	ROM_LOAD_NIB_HIGH( "82s129.002", 0x0000, 0x0100, CRC(c883d49b) SHA1(e84900ccf6f27e5043e43c0d85ea1e4eee7e52d3) )  /* fg lookup table */
+	ROM_LOAD_NIB_LOW(  "82s129.003", 0x0000, 0x0100, CRC(af81882a) SHA1(b1008c991bd8d1157b3479e465ab286c70418b58) )
+
+	ROM_REGION( 0x0100, "stfight_vid:bg_clut", 0 )
+	ROM_LOAD_NIB_HIGH( "82s129.004", 0x0000, 0x0100, CRC(1831ce7c) SHA1(57afbee9225f0efd63895a5f522e96dc87ca2616) )  /* bg lookup table */
+	ROM_LOAD_NIB_LOW(  "82s129.005", 0x0000, 0x0100, CRC(96cb6293) SHA1(1dcdeaa995e6ffa3753b742842c5ffe0f68ef8cd) )
+
+	ROM_REGION( 0x0100, "stfight_vid:spr_clut", 0 )
+	ROM_LOAD_NIB_HIGH( "82s129.052", 0x0000, 0x0100, CRC(3d915ffc) SHA1(921be6d5e5fc0fdee9c9f545c1c4a0c334e9844c) )  /* sprite lookup table */
+	ROM_LOAD_NIB_LOW(  "82s129.066", 0x0000, 0x0100, CRC(51e8832f) SHA1(ed8c00559e7a02bb8c11861d747c8c64c01b7437) )
+
+	ROM_REGION( 0x0800, "proms", 0 )
+	ROM_LOAD( "82s129.015", 0x0700, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )  /* timing? (not used) */
+
+	ROM_REGION( 0x08000, "adpcm", 0 )   /* ADPCM voice data */
+	ROM_LOAD( "091.5j",   0x00000, 0x8000, CRC(1b8d0c07) SHA1(c163ccd2b7ed6c84facc075eb1564ca399f3ba17) )
 ROM_END
 
 ROM_START( stfightgb )
@@ -1069,6 +1136,7 @@ GAME( 1986, empcity,   0,       stfight,  stfight,  stfight_state, init_empcity,
 GAME( 1986, empcityu,  empcity, stfight,  stfight,  stfight_state, init_stfight,  ROT0,   "Seibu Kaihatsu (Taito / Romstar license)", "Empire City: 1931 (US)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // different title logo
 GAME( 1986, empcityj,  empcity, stfight,  stfight,  stfight_state, init_stfight,  ROT0,   "Seibu Kaihatsu (Taito license)",           "Empire City: 1931 (Japan)",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, empcityi,  empcity, stfight,  stfight,  stfight_state, init_stfight,  ROT0,   "Seibu Kaihatsu (Eurobed license)",         "Empire City: 1931 (Italy)",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, empcityfr, empcity, stfight,  stfight,  stfight_state, init_stfight,  ROT0,   "Seibu Kaihatsu (Norad license)",           "Empire City: 1931 (France)",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, stfight,   empcity, stfight,  stfight,  stfight_state, init_stfight,  ROT0,   "Seibu Kaihatsu (Tuning license)",          "Street Fight (Germany)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, stfighta,  empcity, stfight,  stfight,  stfight_state, init_stfight,  ROT0,   "Seibu Kaihatsu",                           "Street Fight (bootleg?)",          MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, stfightgb, empcity, stfight,  stfight,  stfight_state, init_stfight,  ROT0,   "Seibu Kaihatsu (Tuning license)",          "Street Fight (Germany - Benelux)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

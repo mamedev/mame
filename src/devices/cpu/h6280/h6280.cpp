@@ -171,11 +171,12 @@ DEFINE_DEVICE_TYPE(H6280, h6280_device, "h6280", "Hudson Soft HuC6280")
 h6280_device::h6280_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, H6280, tag, owner, clock)
 	, device_mixer_interface(mconfig, *this, 2)
-	, m_program_config("program", ENDIANNESS_LITTLE, 8, 21, 0, address_map_constructor(FUNC(h6280_device::internal_map), this))
+	, m_program_config("program", ENDIANNESS_LITTLE, 8, 21, 0, 16, 0, address_map_constructor(FUNC(h6280_device::internal_map), this))
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 2)
 	, m_port_in_cb(*this)
 	, m_port_out_cb(*this)
 	, m_psg(*this, "psg")
+	, m_timer_scale(1)
 {
 	// build the opcode table
 	for (int op = 0; op < 256; op++)
@@ -238,7 +239,7 @@ void h6280_device::device_add_mconfig(machine_config &config)
 
 void h6280_device::device_start()
 {
-	m_port_in_cb.resolve_safe(0xff);
+	m_port_in_cb.resolve();
 	m_port_out_cb.resolve_safe();
 
 	// register our state for the debugger
@@ -257,14 +258,8 @@ void h6280_device::device_start()
 	state_add(H6280_IRQ1_STATE, "IRQ1",        m_irq_state[0]).mask(0xf);
 	state_add(H6280_IRQ2_STATE, "IRQ2",        m_irq_state[1]).mask(0xf);
 	state_add(H6280_IRQT_STATE, "IRQT",        m_irq_state[2]).mask(0xf);
-	state_add(H6280_M1,         "M1",           m_mmr[0]).mask(0xff);
-	state_add(H6280_M2,         "M2",           m_mmr[1]).mask(0xff);
-	state_add(H6280_M3,         "M3",           m_mmr[2]).mask(0xff);
-	state_add(H6280_M4,         "M4",           m_mmr[3]).mask(0xff);
-	state_add(H6280_M5,         "M5",           m_mmr[4]).mask(0xff);
-	state_add(H6280_M6,         "M6",           m_mmr[5]).mask(0xff);
-	state_add(H6280_M7,         "M7",           m_mmr[6]).mask(0xff);
-	state_add(H6280_M8,         "M8",           m_mmr[7]).mask(0xff);
+	for (int i = 0; i < 8; i++)
+		state_add(H6280_MPR0 + i, util::string_format("MPR%d", i).c_str(), m_mmr[i]).mask(0xff);
 
 	save_item(NAME(m_ppc.w.l));
 	save_item(NAME(m_pc.w.l));
@@ -344,7 +339,7 @@ void h6280_device::device_reset()
 
 	/* timer off by default */
 	m_timer_status = 0;
-	m_timer_load = 128 * 1024;
+	m_timer_load = 128 * 1024 * m_timer_scale;
 
 	m_irq_pending = 0;
 }
@@ -2261,7 +2256,7 @@ std::unique_ptr<util::disasm_interface> h6280_device::create_disassembler()
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-uint32_t h6280_device::execute_min_cycles() const
+uint32_t h6280_device::execute_min_cycles() const noexcept
 {
 	return 2;
 }
@@ -2272,7 +2267,7 @@ uint32_t h6280_device::execute_min_cycles() const
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-uint32_t h6280_device::execute_max_cycles() const
+uint32_t h6280_device::execute_max_cycles() const noexcept
 {
 	return 17 + 6*65536;
 }
@@ -2283,7 +2278,7 @@ uint32_t h6280_device::execute_max_cycles() const
 //  input/interrupt lines
 //-------------------------------------------------
 
-uint32_t h6280_device::execute_input_lines() const
+uint32_t h6280_device::execute_input_lines() const noexcept
 {
 	return 4;
 }
@@ -2294,7 +2289,7 @@ uint32_t h6280_device::execute_input_lines() const
 //  the input line has an asynchronous edge trigger
 //-------------------------------------------------
 
-bool h6280_device::execute_input_edge_triggered(int inputnum) const
+bool h6280_device::execute_input_edge_triggered(int inputnum) const noexcept
 {
 	return inputnum == H6280_NMI_STATE;
 }
@@ -2571,7 +2566,8 @@ WRITE8_MEMBER( h6280_device::timer_w )
 	switch (offset & 1)
 	{
 		case 0: /* Counter preload */
-			m_timer_load = m_timer_value = ((data & 127) + 1) * 1024;
+			// matches HW behaviour, value is latched only with 0->1 counter enable transition
+			m_timer_load = ((data & 127) + 1) * 1024 * m_timer_scale;
 			return;
 
 		case 1: /* Counter enable */
@@ -2589,16 +2585,15 @@ READ8_MEMBER( h6280_device::port_r )
 {
 	if (!m_port_in_cb.isnull())
 		return m_port_in_cb();
-
-	return m_io_buffer;
+	else
+		return m_io_buffer;
 }
 
 WRITE8_MEMBER( h6280_device::port_w )
 {
 	m_io_buffer = data;
 
-	if (!m_port_out_cb.isnull())
-		m_port_out_cb(data);
+	m_port_out_cb(data);
 }
 
 READ8_MEMBER( h6280_device::io_buffer_r )

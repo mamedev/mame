@@ -9,7 +9,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cpm8610.d80" size="533248" crc="83e8d3c0" sha1="0fd8946985da419abdaccefdbe6dd91a8edcb3d5" offset="0" />
+				<rom name="cpm8610.d80" size="533248" crc="83e8d3c0" sha1="0fd8946985da419abdaccefdbe6dd91a8edcb3d5" />
 			</dataarea>
 		</part>
 	</software>
@@ -21,7 +21,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cpm8611.d80" size="533248" crc="1d479584" sha1="e9ed5aae765cb8e5e7f35397095f57d8c55e3b33" offset="0" />
+				<rom name="cpm8611.d80" size="533248" crc="1d479584" sha1="e9ed5aae765cb8e5e7f35397095f57d8c55e3b33" />
 			</dataarea>
 		</part>
 	</software>
@@ -33,7 +33,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="msdos disk.d80" size="533248" crc="0cb75b48" sha1="5c2bcb6b84ede6ad991cca19a98a3a2998c79531" offset="0" />
+				<rom name="msdos disk.d80" size="533248" crc="0cb75b48" sha1="5c2bcb6b84ede6ad991cca19a98a3a2998c79531" />
 			</dataarea>
 		</part>
 	</software>
@@ -45,31 +45,31 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cpm-86 disk1.d80" size="533248" crc="573ea04c" sha1="03a452c6b4bd5fdcf0ae1a51e281309e5d5a3e3a" offset="0" />
+				<rom name="cpm-86 disk1.d80" size="533248" crc="573ea04c" sha1="03a452c6b4bd5fdcf0ae1a51e281309e5d5a3e3a" />
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cpm-86 disk2.d80" size="533248" crc="a2c258ab" sha1="748589a748e9e596885a73c14f2b1cee0afc1eab" offset="0" />
+				<rom name="cpm-86 disk2.d80" size="533248" crc="a2c258ab" sha1="748589a748e9e596885a73c14f2b1cee0afc1eab" />
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cpm-8619911214.d80" size="533248" crc="38f55ca4" sha1="01155a7fe7b70c955785cf4f3f0134edcbaa021c" offset="0" />
+				<rom name="cpm-8619911214.d80" size="533248" crc="38f55ca4" sha1="01155a7fe7b70c955785cf4f3f0134edcbaa021c" />
 			</dataarea>
 		</part>
 
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cpm86bios86-d0.d80" size="533248" crc="908e2c31" sha1="e45899e9fd906e6e448b59ae3361d810b45e758d" offset="0" />
+				<rom name="cpm86bios86-d0.d80" size="533248" crc="908e2c31" sha1="e45899e9fd906e6e448b59ae3361d810b45e758d" />
 			</dataarea>
 		</part>
 
 		<part name="flop5" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cpm86bios86-f10-ws-d0.d80" size="533248" crc="b88c352b" sha1="20fde2e8fa3e252900f6d4374b78a894d7bfcb0c" offset="0" />
+				<rom name="cpm86bios86-f10-ws-d0.d80" size="533248" crc="b88c352b" sha1="20fde2e8fa3e252900f6d4374b78a894d7bfcb0c" />
 			</dataarea>
 		</part>
 	</software>
@@ -81,7 +81,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cpm-86dbaseii.d80" size="533248" crc="f52f4c27" sha1="ee7cc2d05e0dcfd23b9ba8513aba09af84fb14e0" offset="0" />
+				<rom name="cpm-86dbaseii.d80" size="533248" crc="f52f4c27" sha1="ee7cc2d05e0dcfd23b9ba8513aba09af84fb14e0" />
 			</dataarea>
 		</part>
 	</software>
@@ -93,7 +93,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cpm-86_cbasic.d80" size="533248" crc="4d0097b9" sha1="98154042a9b56e0c1db38b76d133d4984909577e" offset="0" />
+				<rom name="cpm-86_cbasic.d80" size="533248" crc="4d0097b9" sha1="98154042a9b56e0c1db38b76d133d4984909577e" />
 			</dataarea>
 		</part>
 	</software>
@@ -105,13 +105,13 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cpm-cobol-disk.d80" size="533248" crc="16269b4b" sha1="9562b1b7ec9be9e4bbe8aa7b26c068379dde5101" offset="0" />
+				<rom name="cpm-cobol-disk.d80" size="533248" crc="16269b4b" sha1="9562b1b7ec9be9e4bbe8aa7b26c068379dde5101" />
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cpm-cobol-disk1.d80" size="533248" crc="441948c8" sha1="0816bd03a4246570381077bceccefb11347be028" offset="0" />
+				<rom name="cpm-cobol-disk1.d80" size="533248" crc="441948c8" sha1="0816bd03a4246570381077bceccefb11347be028" />
 			</dataarea>
 		</part>
 	</software>
@@ -123,25 +123,25 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cpm86_pli_disk1.d80" size="533248" crc="c358ad18" sha1="c85964461e234f6ddcee6972a34b832624ab4e63" offset="0" />
+				<rom name="cpm86_pli_disk1.d80" size="533248" crc="c358ad18" sha1="c85964461e234f6ddcee6972a34b832624ab4e63" />
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cpm86_pli_disk2.d80" size="533248" crc="47d3c489" sha1="dc8bb9390bcb8ee9352aa2f1c7dfb452f9ef621e" offset="0" />
+				<rom name="cpm86_pli_disk2.d80" size="533248" crc="47d3c489" sha1="dc8bb9390bcb8ee9352aa2f1c7dfb452f9ef621e" />
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cpm86_pli_disk3.d80" size="533248" crc="8187b78c" sha1="23ace2f0b93989ac0afa91153272753e4defc44f" offset="0" />
+				<rom name="cpm86_pli_disk3.d80" size="533248" crc="8187b78c" sha1="23ace2f0b93989ac0afa91153272753e4defc44f" />
 			</dataarea>
 		</part>
 
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cpm86_pli_disk2copy.d80" size="533248" crc="4fcbbbe6" sha1="9b93ce20fc13b3774880a9c95c4d79d347907bc2" offset="0" />
+				<rom name="cpm86_pli_disk2copy.d80" size="533248" crc="4fcbbbe6" sha1="9b93ce20fc13b3774880a9c95c4d79d347907bc2" />
 			</dataarea>
 		</part>
 	</software>

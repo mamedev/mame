@@ -9,7 +9,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="qlabacus.img" size="737280" crc="a46480b3" sha1="33ce866cfaee8a8554d93269ddf4878f5722fec7" offset="0" />
+				<rom name="qlabacus.img" size="737280" crc="a46480b3" sha1="33ce866cfaee8a8554d93269ddf4878f5722fec7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -21,7 +21,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="qlarchive.img" size="737280" crc="38e13094" sha1="859b83941663965b3e6a4acd55a2d25723e438e2" offset="0" />
+				<rom name="qlarchive.img" size="737280" crc="38e13094" sha1="859b83941663965b3e6a4acd55a2d25723e438e2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -33,7 +33,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="qleasel.img" size="737280" crc="6e8674e0" sha1="1a24d700349766c02a5b42eb9d1c9496120f7f22" offset="0" />
+				<rom name="qleasel.img" size="737280" crc="6e8674e0" sha1="1a24d700349766c02a5b42eb9d1c9496120f7f22"/>
 			</dataarea>
 		</part>
 	</software>
@@ -45,7 +45,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="qlquill.img" size="737280" crc="ac41ceca" sha1="4f855a10ce9c5bdd3b36cd9b9b02540c123b0932" offset="0" />
+				<rom name="qlquill.img" size="737280" crc="ac41ceca" sha1="4f855a10ce9c5bdd3b36cd9b9b02540c123b0932"/>
 			</dataarea>
 		</part>
 	</software>
@@ -58,14 +58,14 @@
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Runcopy"/>
 			<dataarea name="flop" size="737280">
-				<rom name="runcopy.img" size="737280" crc="53fcaa62" sha1="0584a0fd321bd2db5230cb84382c6c5aab4213d7" offset="0" />
+				<rom name="runcopy.img" size="737280" crc="53fcaa62" sha1="0584a0fd321bd2db5230cb84382c6c5aab4213d7"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Master"/>
 			<dataarea name="flop" size="737280">
-				<rom name="master.img" size="737280" crc="d04455e5" sha1="f5df5468c85b470ebe81a536fc6d4d69130698a3" offset="0" />
+				<rom name="master.img" size="737280" crc="d04455e5" sha1="f5df5468c85b470ebe81a536fc6d4d69130698a3"/>
 			</dataarea>
 		</part>
 	</software>

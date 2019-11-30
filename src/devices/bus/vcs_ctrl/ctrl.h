@@ -15,22 +15,6 @@
 #pragma once
 
 
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_VCS_CONTROL_PORT_ADD(_tag, _slot_intf, _def_slot) \
-	MCFG_DEVICE_ADD(_tag, VCS_CONTROL_PORT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
-
-
-#define MCFG_VCS_CONTROL_PORT_TRIGGER_CALLBACK(_write) \
-	downcast<vcs_control_port_device &>(*device).set_trigger_wr_callback(DEVCB_##_write);
-
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -40,22 +24,22 @@ class vcs_control_port_device;
 
 // ======================> device_vcs_control_port_interface
 
-class device_vcs_control_port_interface : public device_slot_card_interface
+class device_vcs_control_port_interface : public device_interface
 {
 public:
-	// construction/destruction
-	device_vcs_control_port_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_vcs_control_port_interface() { }
 
-	virtual uint8_t vcs_joy_r() { return 0xff; };
-	virtual uint8_t vcs_pot_x_r() { return 0xff; };
-	virtual uint8_t vcs_pot_y_r() { return 0xff; };
-	virtual void vcs_joy_w(uint8_t data) { };
+	virtual uint8_t vcs_joy_r() { return 0xff; }
+	virtual uint8_t vcs_pot_x_r() { return 0xff; }
+	virtual uint8_t vcs_pot_y_r() { return 0xff; }
+	virtual void vcs_joy_w(uint8_t data) { }
 
 	virtual bool has_pot_x() { return false; }
 	virtual bool has_pot_y() { return false; }
 
 protected:
+	device_vcs_control_port_interface(const machine_config &mconfig, device_t &device);
+
 	vcs_control_port_device *m_port;
 };
 
@@ -67,10 +51,18 @@ class vcs_control_port_device : public device_t,
 {
 public:
 	// construction/destruction
-	vcs_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T>
+	vcs_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, char const* dflt)
+		: vcs_control_port_device(mconfig, tag, owner)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
+	vcs_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// static configuration helpers
-	template <class Object> devcb_base &set_trigger_wr_callback(Object &&cb) { return m_write_trigger.set_callback(std::forward<Object>(cb)); }
 	auto trigger_wr_callback() { return m_write_trigger.bind(); }
 
 	// computer interface

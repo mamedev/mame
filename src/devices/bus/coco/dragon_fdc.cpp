@@ -69,12 +69,13 @@
 #include "dragon_fdc.h"
 
 #include "coco_fdc.h"
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
 #include "formats/dmk_dsk.h"
 #include "formats/jvc_dsk.h"
 #include "formats/vdk_dsk.h"
 #include "formats/sdf_dsk.h"
+#include "formats/os9_dsk.h"
 
 
 /***************************************************************************
@@ -98,6 +99,7 @@ namespace
 		dragon_fdc_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 		// device-level overrides
+		virtual DECLARE_READ8_MEMBER(cts_read) override;
 		virtual DECLARE_READ8_MEMBER(scs_read) override;
 		virtual DECLARE_WRITE8_MEMBER(scs_write) override;
 		virtual void device_add_mconfig(machine_config &config) override;
@@ -119,6 +121,7 @@ namespace
 		premier_fdc_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 		// device-level overrides
+		virtual DECLARE_READ8_MEMBER(cts_read) override;
 		virtual DECLARE_READ8_MEMBER(scs_read) override;
 		virtual DECLARE_WRITE8_MEMBER(scs_write) override;
 		virtual void device_add_mconfig(machine_config &config) override;
@@ -152,8 +155,8 @@ void dragon_fdc_device_base::device_add_mconfig(machine_config &config)
 
 	FLOPPY_CONNECTOR(config, m_floppies[0], dragon_fdc_drives, "qd", dragon_fdc_device_base::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_floppies[1], dragon_fdc_drives, "qd", dragon_fdc_device_base::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppies[2], dragon_fdc_drives, "", dragon_fdc_device_base::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppies[3], dragon_fdc_drives, "", dragon_fdc_device_base::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppies[2], dragon_fdc_drives, nullptr, dragon_fdc_device_base::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppies[3], dragon_fdc_drives, nullptr, dragon_fdc_device_base::floppy_formats).enable_sound(true);
 }
 
 
@@ -163,8 +166,8 @@ void premier_fdc_device_base::device_add_mconfig(machine_config &config)
 
 	FLOPPY_CONNECTOR(config, m_floppies[0], dragon_fdc_drives, "qd", dragon_fdc_device_base::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_floppies[1], dragon_fdc_drives, "qd", dragon_fdc_device_base::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppies[2], dragon_fdc_drives, "", dragon_fdc_device_base::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppies[3], dragon_fdc_drives, "", dragon_fdc_device_base::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppies[2], dragon_fdc_drives, nullptr, dragon_fdc_device_base::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppies[3], dragon_fdc_drives, nullptr, dragon_fdc_device_base::floppy_formats).enable_sound(true);
 }
 
 
@@ -287,6 +290,22 @@ void premier_fdc_device_base::dskreg_w(uint8_t data)
 
 
 //-------------------------------------------------
+//  cts_read
+//-------------------------------------------------
+
+READ8_MEMBER(dragon_fdc_device_base::cts_read)
+{
+	return memregion("eprom")->base()[offset];
+}
+
+
+READ8_MEMBER(premier_fdc_device_base::cts_read)
+{
+	return memregion("eprom")->base()[offset];
+}
+
+
+//-------------------------------------------------
 //  scs_read
 //-------------------------------------------------
 
@@ -367,7 +386,7 @@ WRITE8_MEMBER(premier_fdc_device_base::scs_write)
 
 ROM_START(dragon_fdc)
 	ROM_REGION(0x4000, "eprom", ROMREGION_ERASE00)
-	ROM_LOAD_OPTIONAL("ddos10.rom", 0x0000, 0x2000, CRC(b44536f6) SHA1(a8918c71d319237c1e3155bb38620acb114a80bc))
+	ROM_LOAD("ddos10.rom", 0x0000, 0x2000, CRC(b44536f6) SHA1(a8918c71d319237c1e3155bb38620acb114a80bc))
 ROM_END
 
 namespace
@@ -399,7 +418,7 @@ DEFINE_DEVICE_TYPE_PRIVATE(DRAGON_FDC, device_cococart_interface, dragon_fdc_dev
 
 ROM_START(premier_fdc)
 	ROM_REGION(0x4000, "eprom", ROMREGION_ERASE00)
-	ROM_LOAD_OPTIONAL("deltados.rom", 0x0000, 0x2000, CRC(149eb4dd) SHA1(eb686ce6afe63e4d4011b333a882ca812c69307f))
+	ROM_LOAD("deltados.rom", 0x0000, 0x2000, CRC(149eb4dd) SHA1(eb686ce6afe63e4d4011b333a882ca812c69307f))
 ROM_END
 
 namespace
@@ -431,7 +450,7 @@ DEFINE_DEVICE_TYPE_PRIVATE(PREMIER_FDC, device_cococart_interface, premier_fdc_d
 
 ROM_START(sdtandy_fdc)
 	ROM_REGION(0x4000, "eprom", ROMREGION_ERASE00)
-	ROM_LOAD_OPTIONAL("sdtandy.rom", 0x0000, 0x2000, CRC(5d7779b7) SHA1(ca03942118f2deab2f6c8a89b8a4f41f2d0b94f1))
+	ROM_LOAD("sdtandy.rom", 0x0000, 0x2000, CRC(5d7779b7) SHA1(ca03942118f2deab2f6c8a89b8a4f41f2d0b94f1))
 ROM_END
 
 namespace

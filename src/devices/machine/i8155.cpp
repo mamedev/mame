@@ -406,7 +406,7 @@ void i8155_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 //  io_r - register read
 //-------------------------------------------------
 
-READ8_MEMBER( i8155_device::io_r )
+uint8_t i8155_device::io_r(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -443,6 +443,80 @@ READ8_MEMBER( i8155_device::io_r )
 	return data;
 }
 
+//-------------------------------------------------
+//  write_command - set port modes and start/stop
+//  timer
+//-------------------------------------------------
+
+void i8155_device::write_command(uint8_t data)
+{
+	uint8_t old_command = std::exchange(m_command, data);
+
+	LOGMASKED(LOG_PORT, "Port A Mode: %s\n", (data & COMMAND_PA) ? "output" : "input");
+	LOGMASKED(LOG_PORT, "Port B Mode: %s\n", (data & COMMAND_PB) ? "output" : "input");
+
+	LOGMASKED(LOG_PORT, "Port A Interrupt: %s\n", (data & COMMAND_IEA) ? "enabled" : "disabled");
+	LOGMASKED(LOG_PORT, "Port B Interrupt: %s\n", (data & COMMAND_IEB) ? "enabled" : "disabled");
+
+	if ((data & COMMAND_PA) && (~old_command & COMMAND_PA))
+		m_out_pa_cb((offs_t)0, m_output[PORT_A]);
+	if ((data & COMMAND_PB) && (~old_command & COMMAND_PB))
+		m_out_pb_cb((offs_t)0, m_output[PORT_B]);
+
+	switch (data & COMMAND_PC_MASK)
+	{
+	case COMMAND_PC_ALT_1:
+		LOGMASKED(LOG_PORT, "Port C Mode: Alt 1 (PC0-PC5 input)\n");
+		break;
+
+	case COMMAND_PC_ALT_2:
+		LOGMASKED(LOG_PORT, "Port C Mode: Alt 2 (PC0-PC5 output)\n");
+		if ((old_command & COMMAND_PC_MASK) != COMMAND_PC_ALT_2)
+			m_out_pc_cb((offs_t)0, m_output[PORT_C]);
+		break;
+
+	case COMMAND_PC_ALT_3:
+		LOGMASKED(LOG_PORT, "Port C Mode: Alt 3 (PC0-PC2 A handshake, PC3-PC5 output)\n");
+		break;
+
+	case COMMAND_PC_ALT_4:
+		LOGMASKED(LOG_PORT, "Port C Mode: Alt 4 (PC0-PC2 A handshake, PC3-PC5 B handshake)\n");
+		break;
+	}
+
+	switch (data & COMMAND_TM_MASK)
+	{
+	case COMMAND_TM_NOP:
+		// do not affect counter operation
+		break;
+
+	case COMMAND_TM_STOP:
+		// NOP if timer has not started, stop counting if the timer is running
+		LOGMASKED(LOG_PORT, "Timer Command: Stop\n");
+		timer_stop_count();
+		break;
+
+	case COMMAND_TM_STOP_AFTER_TC:
+		// stop immediately after present TC is reached (NOP if timer has not started)
+		LOGMASKED(LOG_PORT, "Timer Command: Stop after TC\n");
+		break;
+
+	case COMMAND_TM_START:
+		LOGMASKED(LOG_PORT, "Timer Command: Start\n");
+
+		if (m_timer->enabled())
+		{
+			// if timer is running, start the new mode and CNT length immediately after present TC is reached
+		}
+		else
+		{
+			// load mode and CNT length and start immediately after loading (if timer is not running)
+			timer_reload_count();
+		}
+		break;
+	}
+}
+
 
 //-------------------------------------------------
 //  register_w - register write
@@ -453,64 +527,7 @@ void i8155_device::register_w(int offset, uint8_t data)
 	switch (offset & 0x07)
 	{
 	case REGISTER_COMMAND:
-		m_command = data;
-
-		LOGMASKED(LOG_PORT, "Port A Mode: %s\n", (data & COMMAND_PA) ? "output" : "input");
-		LOGMASKED(LOG_PORT, "Port B Mode: %s\n", (data & COMMAND_PB) ? "output" : "input");
-
-		LOGMASKED(LOG_PORT, "Port A Interrupt: %s\n", (data & COMMAND_IEA) ? "enabled" : "disabled");
-		LOGMASKED(LOG_PORT, "Port B Interrupt: %s\n", (data & COMMAND_IEB) ? "enabled" : "disabled");
-
-		switch (data & COMMAND_PC_MASK)
-		{
-		case COMMAND_PC_ALT_1:
-			LOGMASKED(LOG_PORT, "Port C Mode: Alt 1\n");
-			break;
-
-		case COMMAND_PC_ALT_2:
-			LOGMASKED(LOG_PORT, "Port C Mode: Alt 2\n");
-			break;
-
-		case COMMAND_PC_ALT_3:
-			LOGMASKED(LOG_PORT, "Port C Mode: Alt 3\n");
-			break;
-
-		case COMMAND_PC_ALT_4:
-			LOGMASKED(LOG_PORT, "Port C Mode: Alt 4\n");
-			break;
-		}
-
-		switch (data & COMMAND_TM_MASK)
-		{
-		case COMMAND_TM_NOP:
-			// do not affect counter operation
-			break;
-
-		case COMMAND_TM_STOP:
-			// NOP if timer has not started, stop counting if the timer is running
-			LOGMASKED(LOG_PORT, "Timer Command: Stop\n");
-			timer_stop_count();
-			break;
-
-		case COMMAND_TM_STOP_AFTER_TC:
-			// stop immediately after present TC is reached (NOP if timer has not started)
-			LOGMASKED(LOG_PORT, "Timer Command: Stop after TC\n");
-			break;
-
-		case COMMAND_TM_START:
-			LOGMASKED(LOG_PORT, "Timer Command: Start\n");
-
-			if (m_timer->enabled())
-			{
-				// if timer is running, start the new mode and CNT length immediately after present TC is reached
-			}
-			else
-			{
-				// load mode and CNT length and start immediately after loading (if timer is not running)
-				timer_reload_count();
-			}
-			break;
-		}
+		write_command(data);
 		break;
 
 	case REGISTER_PORT_A:
@@ -539,7 +556,7 @@ void i8155_device::register_w(int offset, uint8_t data)
 //  io_w - register write
 //-------------------------------------------------
 
-WRITE8_MEMBER( i8155_device::io_w )
+void i8155_device::io_w(offs_t offset, uint8_t data)
 {
 	register_w(offset, data);
 }
@@ -549,7 +566,7 @@ WRITE8_MEMBER( i8155_device::io_w )
 //  memory_r - internal RAM read
 //-------------------------------------------------
 
-READ8_MEMBER( i8155_device::memory_r )
+uint8_t i8155_device::memory_r(offs_t offset)
 {
 	return m_ram[offset & 0xff];
 }
@@ -559,7 +576,7 @@ READ8_MEMBER( i8155_device::memory_r )
 //  memory_w - internal RAM write
 //-------------------------------------------------
 
-WRITE8_MEMBER( i8155_device::memory_w )
+void i8155_device::memory_w(offs_t offset, uint8_t data)
 {
 	m_ram[offset & 0xff] = data;
 }
@@ -569,7 +586,7 @@ WRITE8_MEMBER( i8155_device::memory_w )
 //  ale_w - address latch write
 //-------------------------------------------------
 
-WRITE8_MEMBER( i8155_device::ale_w )
+void i8155_device::ale_w(offs_t offset, uint8_t data)
 {
 	// I/O / memory select
 	m_io_m = BIT(offset, 0);
@@ -580,21 +597,21 @@ WRITE8_MEMBER( i8155_device::ale_w )
 
 
 //-------------------------------------------------
-//  read - memory or I/O read
+//  data_r - memory or I/O read
 //-------------------------------------------------
 
-READ8_MEMBER( i8155_device::read )
+uint8_t i8155_device::data_r()
 {
 	uint8_t data = 0;
 
 	switch (m_io_m)
 	{
 	case MEMORY:
-		data = memory_r(space, m_ad);
+		data = memory_r(m_ad);
 		break;
 
 	case IO:
-		data = io_r(space, m_ad);
+		data = io_r(m_ad);
 		break;
 	}
 
@@ -603,19 +620,19 @@ READ8_MEMBER( i8155_device::read )
 
 
 //-------------------------------------------------
-//  write - memory or I/O write
+//  data_w - memory or I/O write
 //-------------------------------------------------
 
-WRITE8_MEMBER( i8155_device::write )
+void i8155_device::data_w(uint8_t data)
 {
 	switch (m_io_m)
 	{
 	case MEMORY:
-		memory_w(space, m_ad, data);
+		memory_w(m_ad, data);
 		break;
 
 	case IO:
-		io_w(space, m_ad, data);
+		io_w(m_ad, data);
 		break;
 	}
 }

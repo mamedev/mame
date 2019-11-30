@@ -362,6 +362,27 @@ bool dsk_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 		skip = 2;
 	}
 	int tracks  = header[0x30];
+
+	int img_tracks, img_heads;
+	image->get_maximal_geometry(img_tracks, img_heads);
+	if (tracks > img_tracks)
+	{
+		if (tracks - img_tracks > DUMP_THRESHOLD)
+		{
+			osd_printf_error("dsk: Floppy disk has too many tracks for this drive (floppy tracks=%d, drive tracks=%d).\n", tracks, img_tracks);
+			return false;
+		}
+		else
+		{
+			// Some dumps has a few excess tracks to be safe,
+			// lets be nice and just skip those tracks
+			osd_printf_warning("dsk: Floppy disk has a slight excess of tracks for this drive that will be discarded (floppy tracks=%d, drive tracks=%d).\n", tracks, img_tracks);
+			tracks = img_tracks;
+		}
+	}
+	if (heads > img_heads)
+		return false;
+
 	uint64_t track_offsets[84*2];
 	int cnt =0;
 	if (!extendformat) {
@@ -403,10 +424,27 @@ bool dsk_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 			if (tr.number_of_sector == 0)
 				continue;
 
+			int protection = 0;
+			int first_sector_code = -1;
+			for(int j=0;j<tr.number_of_sector;j++) {
+				sector_header sector;
+				io_generic_read(io, &sector,track_offsets[(track<<1)+side]+sizeof(tr)+(sizeof(sector)*j),sizeof(sector));
+
+				if (j == 0)
+					first_sector_code = sector.sector_size_code;
+
+				if ((j > 0) && (sector.sector_size_code == 2) && (first_sector_code == 6))
+					protection = 1;  //  first: 6144 rest: 512
+
+				if ((j > 0) && (sector.sector_size_code == j) && (first_sector_code == 0))
+					protection = 2;  // first: 128 rest: N*128
+			}
+
 			desc_pc_sector sects[256];
 			uint8_t sect_data[65536];
 			int sdatapos = 0;
 			int pos = track_offsets[(track<<1)+side] + 0x100;
+
 			for(int j=0;j<tr.number_of_sector;j++) {
 				sector_header sector;
 				io_generic_read(io, &sector,track_offsets[(track<<1)+side]+sizeof(tr)+(sizeof(sector)*j),sizeof(sector));
@@ -416,16 +454,21 @@ bool dsk_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 				sects[j].sector      = sector.sector_id;
 				sects[j].size        = sector.sector_size_code;
 				if(extendformat)
-					sects[j].actual_size = sector.data_length;
+				{
+					if (protection == 1)
+						sects[j].actual_size = 512;
+					else if (protection == 2)
+						sects[j].actual_size = 128;
+					else
+						sects[j].actual_size = sector.data_length;
+				}
 				else
 					sects[j].actual_size = 128 << tr.sector_size_code;
 
-				if (sector.fdc_status_reg1 == 0xb2 || (sector.fdc_status_reg2 & 0x40))
-					sects[j].deleted = 1;
-				if (sector.fdc_status_reg1 == 0xb5 || (sector.fdc_status_reg2 & 0x20))
-					sects[j].bad_crc = 1;
+				sects[j].deleted = (sector.fdc_status_reg2 & 0x40);
+				sects[j].bad_crc = ((sector.fdc_status_reg1 & 0x20) || (sector.fdc_status_reg2 & 0x20));
 
-				if(!sects[j].deleted) {
+				if(!(sector.fdc_status_reg1 & 0x04)) {
 					sects[j].data = sect_data + sdatapos;
 					io_generic_read(io, sects[j].data, pos, sects[j].actual_size);
 					sdatapos += sects[j].actual_size;
@@ -438,7 +481,8 @@ bool dsk_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 				else
 					pos += 128 << tr.sector_size_code;
 			}
-			build_pc_track_mfm(track, side, image, 100000, tr.number_of_sector, sects, tr.gap3_length);
+			// larger cell count (was 100000) to allow for slightly out of spec images (theatre europe on einstein)
+			build_pc_track_mfm(track, side, image, 105000, tr.number_of_sector, sects, tr.gap3_length);
 			counter++;
 		}
 	}

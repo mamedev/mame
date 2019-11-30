@@ -49,9 +49,10 @@ void mn10200_device::mn1020012a_internal_map(address_map &map)
 mn10200_device::mn10200_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor program)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, 24, 0, program), m_program(nullptr)
-	, m_read_port0(*this), m_read_port1(*this), m_read_port2(*this), m_read_port3(*this), m_read_port4(*this)
-	, m_write_port0(*this), m_write_port1(*this), m_write_port2(*this), m_write_port3(*this), m_write_port4(*this), m_cycles(0), m_pc(0), m_psw(0), m_mdr(0), m_nmicr(0), m_iagr(0),
-	m_extmdl(0), m_extmdh(0), m_possible_irq(false), m_pplul(0), m_ppluh(0), m_p3md(0), m_p4(0)
+	, m_read_port{{*this}, {*this}, {*this}, {*this}, {*this}}
+	, m_write_port{{*this}, {*this}, {*this}, {*this}, {*this}}
+	, m_cycles(0), m_pc(0), m_psw(0), m_mdr(0), m_nmicr(0), m_iagr(0)
+	, m_extmdl(0), m_extmdh(0), m_possible_irq(false), m_pplul(0), m_ppluh(0), m_p3md(0), m_p4(0)
 { }
 
 // device definitions
@@ -123,17 +124,11 @@ void mn10200_device::device_start()
 	m_program = &space(AS_PROGRAM);
 
 	// resolve callbacks
-	m_read_port0.resolve_safe(0xff);
-	m_read_port1.resolve_safe(0xff);
-	m_read_port2.resolve_safe(0xff);
-	m_read_port3.resolve_safe(0xff);
-	m_read_port4.resolve_safe(0xff);
-
-	m_write_port0.resolve_safe();
-	m_write_port1.resolve_safe();
-	m_write_port2.resolve_safe();
-	m_write_port3.resolve_safe();
-	m_write_port4.resolve_safe();
+	for (int i = 0; i < 5; i++)
+	{
+		m_read_port[i].resolve_safe(0xff);
+		m_write_port[i].resolve_safe();
+	}
 
 	// init and register for savestates
 	save_item(NAME(m_pc));
@@ -2075,19 +2070,19 @@ WRITE8_MEMBER(mn10200_device::io_control_w)
 		// outputs
 		case 0x3c0:
 			m_port[0].out = data;
-			m_write_port0(MN10200_PORT0, m_port[0].out | (m_port[0].dir ^ 0xff), 0xff);
+			m_write_port[0](MN10200_PORT0, m_port[0].out | (m_port[0].dir ^ 0xff), 0xff);
 			break;
 		case 0x264:
 			m_port[1].out = data;
-			m_write_port1(MN10200_PORT1, m_port[1].out | (m_port[1].dir ^ 0xff), 0xff);
+			m_write_port[1](MN10200_PORT1, m_port[1].out | (m_port[1].dir ^ 0xff), 0xff);
 			break;
 		case 0x3c2:
 			m_port[2].out = data & 0x0f;
-			m_write_port2(MN10200_PORT2, m_port[2].out | (m_port[2].dir ^ 0x0f), 0xff);
+			m_write_port[2](MN10200_PORT2, m_port[2].out | (m_port[2].dir ^ 0x0f), 0xff);
 			break;
 		case 0x3c3:
 			m_port[3].out = data & 0x1f;
-			m_write_port3(MN10200_PORT3, m_port[3].out | (m_port[3].dir ^ 0x1f), 0xff);
+			m_write_port[3](MN10200_PORT3, m_port[3].out | (m_port[3].dir ^ 0x1f), 0xff);
 			break;
 
 		// directions (0=input, 1=output)
@@ -2218,13 +2213,13 @@ READ8_MEMBER(mn10200_device::io_control_r)
 
 		// inputs
 		case 0x3d0:
-			return m_read_port0(MN10200_PORT0, 0xff) | m_port[0].dir;
+			return m_read_port[0](MN10200_PORT0, 0xff) | m_port[0].dir;
 		case 0x3d1:
-			return m_read_port1(MN10200_PORT1, 0xff) | m_port[1].dir;
+			return m_read_port[1](MN10200_PORT1, 0xff) | m_port[1].dir;
 		case 0x3d2:
-			return (m_read_port2(MN10200_PORT2, 0xff) & 0x0f) | m_port[2].dir;
+			return (m_read_port[2](MN10200_PORT2, 0xff) & 0x0f) | m_port[2].dir;
 		case 0x3d3:
-			return (m_read_port3(MN10200_PORT3, 0xff) & 0x1f) | m_port[3].dir;
+			return (m_read_port[3](MN10200_PORT3, 0xff) & 0x1f) | m_port[3].dir;
 
 		// directions (0=input, 1=output)
 		case 0x3e0:

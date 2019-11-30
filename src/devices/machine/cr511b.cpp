@@ -23,13 +23,13 @@ DEFINE_DEVICE_TYPE(CR511B, cr511b_device, "cr511b", "CR-511-B CD-ROM drive")
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(cr511b_device::device_add_mconfig)
-	MCFG_CDROM_ADD("cdrom")
-	MCFG_CDROM_INTERFACE("cdrom")
-	MCFG_DEVICE_ADD("cdda", CDDA)
-	MCFG_SOUND_ROUTE(0, ":lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, ":rspeaker", 1.0)
-MACHINE_CONFIG_END
+void cr511b_device::device_add_mconfig(machine_config &config)
+{
+	CDROM(config, m_cdrom).set_interface("cdrom");
+	CDDA(config, m_cdda);
+	m_cdda->add_route(0, ":lspeaker", 1.0);
+	m_cdda->add_route(1, ":rspeaker", 1.0);
+}
 
 
 //**************************************************************************

@@ -277,11 +277,11 @@ WRITE_LINE_MEMBER(hle_device_base::input_txd)
 	device_buffered_serial_interface::rx_w(state);
 }
 
-MACHINE_CONFIG_START(hle_device_base::device_add_mconfig)
+void hle_device_base::device_add_mconfig(machine_config &config)
+{
 	SPEAKER(config, "bell").front_center();
-	MCFG_DEVICE_ADD("beeper", BEEP, ATTOSECONDS_TO_HZ(480 * ATTOSECONDS_PER_MICROSECOND))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bell", 1.0)
-MACHINE_CONFIG_END
+	BEEP(config, m_beeper, ATTOSECONDS_TO_HZ(480 * ATTOSECONDS_PER_MICROSECOND)).add_route(ALL_OUTPUTS, "bell", 1.0);
+}
 
 void hle_device_base::device_start()
 {

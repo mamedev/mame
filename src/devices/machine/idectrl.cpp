@@ -222,6 +222,7 @@ DEFINE_DEVICE_TYPE(BUS_MASTER_IDE_CONTROLLER, bus_master_ide_controller_device, 
 
 bus_master_ide_controller_device::bus_master_ide_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	ide_controller_32_device(mconfig, BUS_MASTER_IDE_CONTROLLER, tag, owner, clock),
+	m_dma_space(*this, finder_base::DUMMY_TAG, -1, 32),
 	m_dma_address(0),
 	m_dma_bytes_left(0),
 	m_dma_descriptor(0),
@@ -239,17 +240,7 @@ void bus_master_ide_controller_device::device_start()
 	ide_controller_32_device::device_start();
 
 	/* find the bus master space */
-	if (m_bmcpu != nullptr)
-	{
-		device_t *bmtarget = machine().device(m_bmcpu);
-		if (bmtarget == nullptr)
-			throw emu_fatalerror("IDE controller '%s' bus master target '%s' doesn't exist!", tag(), m_bmcpu);
-		device_memory_interface *memory;
-		if (!bmtarget->interface(memory))
-			throw emu_fatalerror("IDE controller '%s' bus master target '%s' has no memory!", tag(), m_bmcpu);
-		m_dma_space = &memory->space(m_bmspace);
-		m_dma_address_xor = (m_dma_space->endianness() == ENDIANNESS_LITTLE) ? 0 : 3;
-	}
+	m_dma_address_xor = (m_dma_space->endianness() == ENDIANNESS_LITTLE) ? 0 : 3;
 
 	save_item(NAME(m_dma_address));
 	save_item(NAME(m_dma_bytes_left));
@@ -293,20 +284,25 @@ void bus_master_ide_controller_device::set_dmarq(int state)
 
 READ32_MEMBER( bus_master_ide_controller_device::bmdma_r )
 {
-	LOG("%s:ide_bus_master32_r(%d, %08x)\n", machine().describe_context(), offset, mem_mask);
-
+	uint32_t result = 0;
 	switch( offset )
 	{
 	case 0:
 		/* command register/status register */
-		return m_bus_master_command | (m_bus_master_status << 16);
-
+		result = m_bus_master_command | (m_bus_master_status << 16);
+		break;
 	case 1:
 		/* descriptor table register */
-		return m_bus_master_descriptor;
+		result = m_bus_master_descriptor;
+		break;
+	default:
+		result = 0xffffffff;
+		break;
 	}
 
-	return 0xffffffff;
+	LOG("%s:ide_bus_master32_r(%d, %08x, %08x)\n", machine().describe_context(), offset, mem_mask, result);
+
+	return result;
 }
 
 
@@ -405,8 +401,7 @@ void bus_master_ide_controller_device::execute_dma()
 			m_dma_bytes_left &= 0xfffe;
 			if (m_dma_bytes_left == 0)
 				m_dma_bytes_left = 0x10000;
-
-//          LOG("New DMA descriptor: address = %08X  bytes = %04X  last = %d\n", m_dma_address, m_dma_bytes_left, m_dma_last_buffer);
+			LOG("New DMA descriptor: address = %08X  bytes = %04X  last = %d time: %s\n", m_dma_address, m_dma_bytes_left, m_dma_last_buffer, machine().time().as_string());
 		}
 
 		if (m_bus_master_command & 8)
@@ -433,7 +428,7 @@ void bus_master_ide_controller_device::execute_dma()
 		if (m_dma_bytes_left == 0 && m_dma_last_buffer)
 		{
 			m_bus_master_status &= ~IDE_BUSMASTER_STATUS_ACTIVE;
-
+			LOG("DMA Complete time: %s\n", machine().time().as_string());
 			if (m_dmarq)
 			{
 				LOG("DMA Out of buffer space!\n");

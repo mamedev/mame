@@ -180,10 +180,10 @@ Notes:
 #include "emu.h"
 #include "audio/dcs.h"
 
+#include "bus/ata/ataintf.h"
+#include "bus/ata/idehd.h"
 #include "cpu/adsp2100/adsp2100.h"
 #include "cpu/mips/mips3.h"
-#include "machine/ataintf.h"
-#include "machine/idehd.h"
 #include "emupal.h"
 #include "screen.h"
 
@@ -199,7 +199,8 @@ public:
 		m_rombase(*this, "rombase"),
 		m_maincpu(*this, "maincpu"),
 		m_ata(*this, "ata"),
-		m_dcs(*this, "dcs")
+		m_dcs(*this, "dcs"),
+		m_palette(*this, "palette")
 	{
 	}
 
@@ -221,6 +222,7 @@ private:
 	required_device<mips3_device> m_maincpu;
 	required_device<ata_interface_device> m_ata;
 	required_device<dcs_audio_2k_device> m_dcs;
+	required_device<palette_device> m_palette;
 
 	uint32_t *m_video_base;
 	const uint8_t *m_control_map;
@@ -231,7 +233,7 @@ private:
 		TIMER_IRQ0_STOP
 	};
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(irq0_start);
 	DECLARE_READ32_MEMBER(control_r);
 	DECLARE_WRITE32_MEMBER(control_w);
@@ -313,13 +315,15 @@ void kinst_state::machine_reset()
  *
  *************************************/
 
-uint32_t kinst_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t kinst_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	const pen_t *pen = m_palette->pens();
+
 	/* loop over rows and copy to the destination */
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		uint32_t *src = &m_video_base[640/4 * y];
-		uint16_t *dest = &bitmap.pix16(y, cliprect.min_x);
+		uint32_t *dest = &bitmap.pix32(y, cliprect.min_x);
 
 		/* loop over columns */
 		for (int x = cliprect.min_x; x < cliprect.max_x; x += 2)
@@ -327,8 +331,8 @@ uint32_t kinst_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 			uint32_t data = *src++;
 
 			/* store two pixels */
-			*dest++ = (data >>  0) & 0x7fff;
-			*dest++ = (data >> 16) & 0x7fff;
+			*dest++ = pen[(data >>  0) & 0x7fff];
+			*dest++ = pen[(data >> 16) & 0x7fff];
 		}
 	}
 	return 0;
@@ -350,7 +354,7 @@ void kinst_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 		break;
 	default:
-		assert_always(false, "Unknown id in kinst_state::device_timer");
+		throw emu_fatalerror("Unknown id in kinst_state::device_timer");
 	}
 }
 
@@ -718,33 +722,32 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(kinst_state::kinst)
-
+void kinst_state::kinst(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, R4600LE, MASTER_CLOCK*2)
-	MCFG_MIPS3_ICACHE_SIZE(16384)
-	MCFG_MIPS3_DCACHE_SIZE(16384)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", kinst_state,  irq0_start)
+	R4600LE(config, m_maincpu, MASTER_CLOCK*2);
+	m_maincpu->set_icache_size(16384);
+	m_maincpu->set_dcache_size(16384);
+	m_maincpu->set_addrmap(AS_PROGRAM, &kinst_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(kinst_state::irq0_start));
 
 	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, true);
 	m_ata->irq_handler().set_inputline("maincpu", 1);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(320, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(kinst_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(320, 240);
+	screen.set_visarea(0, 319, 0, 239);
+	screen.set_screen_update(FUNC(kinst_state::screen_update));
 
-	MCFG_PALETTE_ADD_BBBBBGGGGGRRRRR("palette")
+	PALETTE(config, m_palette, palette_device::BGR_555);
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD(m_dcs, DCS_AUDIO_2K, 0)
-MACHINE_CONFIG_END
+	DCS_AUDIO_2K(config, m_dcs, 0);
+}
 
 
 

@@ -13,6 +13,7 @@
 #include "machine/watchdog.h"
 #include "sound/discrete.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 /* Discrete Sound Input Nodes */
 
@@ -49,7 +50,7 @@ private:
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
-	DECLARE_PALETTE_INIT(poolshrk);
+	void poolshrk_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	virtual void video_start() override;

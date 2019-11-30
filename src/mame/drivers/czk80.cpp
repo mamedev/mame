@@ -40,6 +40,7 @@ I/O ports: These ranges are what is guessed
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/upd765.h"
 #include "machine/z80daisy.h"
 #include "machine/z80pio.h"
@@ -61,8 +62,10 @@ public:
 	void czk80(machine_config &config);
 	void init_czk80();
 
+protected:
+	virtual void machine_reset() override;
+
 private:
-	DECLARE_MACHINE_RESET(czk80);
 	TIMER_CALLBACK_MEMBER(czk80_reset);
 	DECLARE_READ8_MEMBER(port80_r);
 	DECLARE_READ8_MEMBER(port81_r);
@@ -74,7 +77,7 @@ private:
 	void czk80_io(address_map &map);
 	void czk80_mem(address_map &map);
 	uint8_t m_term_data;
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 	required_device<upd765a_device> m_fdc;
 };
@@ -152,7 +155,7 @@ TIMER_CALLBACK_MEMBER( czk80_state::czk80_reset)
 	membank("bankr0")->set_entry(1);
 }
 
-MACHINE_RESET_MEMBER( czk80_state, czk80 )
+void czk80_state::machine_reset()
 {
 	machine().scheduler().timer_set(attotime::from_usec(3), timer_expired_delegate(FUNC(czk80_state::czk80_reset),this));
 	membank("bankr0")->set_entry(0); // point at rom
@@ -184,34 +187,34 @@ void czk80_state::kbd_put(u8 data)
 	m_term_data = data;
 }
 
-MACHINE_CONFIG_START(czk80_state::czk80)
+void czk80_state::czk80(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(16'000'000) / 4)
-	MCFG_DEVICE_PROGRAM_MAP(czk80_mem)
-	MCFG_DEVICE_IO_MAP(czk80_io)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain)
-	MCFG_MACHINE_RESET_OVERRIDE(czk80_state, czk80)
+	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &czk80_state::czk80_mem);
+	m_maincpu->set_addrmap(AS_IO, &czk80_state::czk80_io);
+	m_maincpu->set_daisy_config(daisy_chain);
 
-	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(czk80_state, kbd_put))
-	MCFG_UPD765A_ADD("fdc", true, true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", czk80_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	GENERIC_TERMINAL(config, m_terminal, 0);
+	m_terminal->set_keyboard_callback(FUNC(czk80_state::kbd_put));
+	UPD765A(config, m_fdc, 8_MHz_XTAL, true, true);
+	FLOPPY_CONNECTOR(config, "fdc:0", czk80_floppies, "525dd", floppy_image_device::default_floppy_formats);
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(16'000'000) / 4)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, czk80_state, ctc_z0_w))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, czk80_state, ctc_z1_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(*this, czk80_state, ctc_z2_w))
+	z80ctc_device& ctc(Z80CTC(config, "ctc", 16_MHz_XTAL / 4));
+	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	ctc.zc_callback<0>().set(FUNC(czk80_state::ctc_z0_w));
+	ctc.zc_callback<1>().set(FUNC(czk80_state::ctc_z1_w));
+	ctc.zc_callback<2>().set(FUNC(czk80_state::ctc_z2_w));
 
-	MCFG_DEVICE_ADD("dart", Z80DART, XTAL(16'000'000) / 4)
-	//MCFG_Z80DART_OUT_TXDA_CB(WRITELINE("rs232", rs232_port_device, write_txd))
-	//MCFG_Z80DART_OUT_DTRA_CB(WRITELINE("rs232", rs232_port_device, write_dtr))
-	//MCFG_Z80DART_OUT_RTSA_CB(WRITELINE("rs232", rs232_port_device, write_rts))
-	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	z80dart_device& dart(Z80DART(config, "dart", 16_MHz_XTAL / 4));
+	//dart.out_txda_callback().set("rs232", FUNC(rs232_port_device::write_txd));
+	//dart.out_dtra_callback().set("rs232", FUNC(rs232_port_device::write_dtr));
+	//dart.out_rtsa_callback().set("rs232", FUNC(rs232_port_device::write_rts));
+	dart.out_int_callback().set_inputline("maincpu", INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL(16'000'000)/4)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-MACHINE_CONFIG_END
+	z80pio_device& pio(Z80PIO(config, "pio", 16_MHz_XTAL / 4));
+	pio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+}
 
 
 /* ROM definition */

@@ -7,9 +7,10 @@
     kc85 format
 
 *********************************************************************/
+#ifndef MAME_FORMATS_KC85_DSK_H
+#define MAME_FORMATS_KC85_DSK_H
 
-#ifndef KC85_DSK_H_
-#define KC85_DSK_H_
+#pragma once
 
 #include "upd765_dsk.h"
 
@@ -27,4 +28,4 @@ private:
 
 extern const floppy_format_type FLOPPY_KC85_FORMAT;
 
-#endif
+#endif // MAME_FORMATS_KC85_DSK_H

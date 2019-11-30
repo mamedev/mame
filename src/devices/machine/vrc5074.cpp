@@ -100,7 +100,7 @@
 #define NINT_PCIS           (14)
 #define NINT_PCIE           (15)
 
-#define TIMER_PERIOD        attotime::from_hz(SYSTEM_CLOCK)
+#define TIMER_PERIOD        attotime::from_hz(clock())
 
 #define PCI_BUS_CLOCK        33000000
 // Number of dma words to transfer at a time, real hardware bursts 8
@@ -143,18 +143,19 @@ void vrc5074_device::target1_map(address_map &map)
 	map(0x00000000, 0xFFFFFFFF).rw(FUNC(vrc5074_device::target1_r), FUNC(vrc5074_device::target1_w));
 }
 
-MACHINE_CONFIG_START(vrc5074_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("uart", NS16550, SYSTEM_CLOCK / 12)
-	MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, vrc5074_device, uart_irq_callback))
-	MCFG_INS8250_OUT_TX_CB(WRITELINE("ttys00", rs232_port_device, write_txd))
-	MCFG_INS8250_OUT_DTR_CB(WRITELINE("ttys00", rs232_port_device, write_dtr))
-	MCFG_INS8250_OUT_RTS_CB(WRITELINE("ttys00", rs232_port_device, write_rts))
+void vrc5074_device::device_add_mconfig(machine_config &config)
+{
+	NS16550(config, m_uart, DERIVED_CLOCK(1, 12));
+	m_uart->out_int_callback().set(FUNC(vrc5074_device::uart_irq_callback));
+	m_uart->out_tx_callback().set("ttys00", FUNC(rs232_port_device::write_txd));
+	m_uart->out_dtr_callback().set("ttys00", FUNC(rs232_port_device::write_dtr));
+	m_uart->out_rts_callback().set("ttys00", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("ttys00", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("uart", ns16550_device, rx_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("uart", ns16550_device, dcd_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("uart", ns16550_device, cts_w))
-MACHINE_CONFIG_END
+	rs232_port_device &ttys00(RS232_PORT(config, "ttys00", default_rs232_devices, nullptr));
+	ttys00.rxd_handler().set(m_uart, FUNC(ns16550_device::rx_w));
+	ttys00.dcd_handler().set(m_uart, FUNC(ns16550_device::dcd_w));
+	ttys00.cts_handler().set(m_uart, FUNC(ns16550_device::cts_w));
+}
 
 vrc5074_device::vrc5074_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	pci_host_device(mconfig, VRC5074, tag, owner, clock),
@@ -332,12 +333,12 @@ void vrc5074_device::map_cpu_space()
 			winStart = regConfig & 0xffe00000;
 			if (winSize > 0) {
 				if (index == 0) {
-					m_cpu_space->install_read_handler(winStart, winStart + winSize - 1, read32_delegate(FUNC(vrc5074_device::pci0_r), this));
-					m_cpu_space->install_write_handler(winStart, winStart + winSize - 1, write32_delegate(FUNC(vrc5074_device::pci0_w), this));
+					m_cpu_space->install_read_handler(winStart, winStart + winSize - 1, read32_delegate(*this, FUNC(vrc5074_device::pci0_r)));
+					m_cpu_space->install_write_handler(winStart, winStart + winSize - 1, write32_delegate(*this, FUNC(vrc5074_device::pci0_w)));
 				}
 				else {
-					m_cpu_space->install_read_handler(winStart, winStart + winSize - 1, read32_delegate(FUNC(vrc5074_device::pci1_r), this));
-					m_cpu_space->install_write_handler(winStart, winStart + winSize - 1, write32_delegate(FUNC(vrc5074_device::pci1_w), this));
+					m_cpu_space->install_read_handler(winStart, winStart + winSize - 1, read32_delegate(*this, FUNC(vrc5074_device::pci1_r)));
+					m_cpu_space->install_write_handler(winStart, winStart + winSize - 1, write32_delegate(*this, FUNC(vrc5074_device::pci1_w)));
 				}
 			}
 			if (LOG_NILE | LOG_MAP)
@@ -361,8 +362,8 @@ void vrc5074_device::map_extra(uint64_t memory_window_start, uint64_t memory_win
 		winStart = 0x0;
 
 		winEnd = winStart + winSize -1;
-		memory_space->install_read_handler(winStart, winEnd, read32_delegate(FUNC(vrc5074_device::target1_r), this));
-		memory_space->install_write_handler(winStart, winEnd, write32_delegate(FUNC(vrc5074_device::target1_w), this));
+		memory_space->install_read_handler(winStart, winEnd, read32_delegate(*this, FUNC(vrc5074_device::target1_r)));
+		memory_space->install_write_handler(winStart, winEnd, write32_delegate(*this, FUNC(vrc5074_device::target1_w)));
 		if (LOG_NILE | LOG_MAP)
 			logerror("%s: map_extra Target Window 1 start=%08X end=%08X size=%08X\n", tag(), winStart, winEnd, winSize);
 	}
@@ -371,8 +372,8 @@ void vrc5074_device::map_extra(uint64_t memory_window_start, uint64_t memory_win
 	//  winStart = m_cpu_regs[NREG_PCITW2]&0xffe00000;
 	//  winEnd = winStart | (~(0xf0000000 | (((m_cpu_regs[NREG_PCITW2]>>13)&0x7f)<<21)));
 	//  winSize = winEnd - winStart + 1;
-	//  memory_space->install_read_handler(winStart, winEnd, read32_delegate(FUNC(vrc5074_device::target2_r), this));
-	//  memory_space->install_write_handler(winStart, winEnd, write32_delegate(FUNC(vrc5074_device::target2_w), this));
+	//  memory_space->install_read_handler(winStart, winEnd, read32_delegate(*this, FUNC(vrc5074_device::target2_r)));
+	//  memory_space->install_write_handler(winStart, winEnd, write32_delegate(*this, FUNC(vrc5074_device::target2_w)));
 	//  if (LOG_NILE)
 	//      logerror("%s: map_extra Target Window 2 start=%08X end=%08X size=%08X laddr=%08X\n", tag(), winStart, winEnd, winSize,  m_target2_laddr);
 	//}
@@ -833,7 +834,7 @@ READ32_MEMBER(vrc5074_device::cpu_reg_r)
 		if (m_cpu_regs[offset - 1] & 1)
 		{
 			// Should check for cascaded timer
-			result = m_cpu_regs[offset] = m_timer[which]->remaining().as_double() * SYSTEM_CLOCK;
+			result = m_cpu_regs[offset] = m_timer[which]->remaining().as_double() * clock();
 		}
 
 		if (LOG_TIMERS) logerror("%s NILE READ: timer %d counter(%03X) = %08X\n", machine().describe_context(), which, offset * 4, result);
@@ -954,24 +955,24 @@ WRITE32_MEMBER(vrc5074_device::cpu_reg_w)
 		which = (offset - NREG_T0CTRL) / 4;
 		if (LOG_NILE | LOG_TIMERS) logerror("%s NILE WRITE: timer %d control(%03X) = %08X & %08X\n", machine().describe_context(), which, offset * 4, data, mem_mask);
 		logit = 0;
-		m_timer_period[which] = (uint64_t(m_cpu_regs[NREG_T0CTRL + which * 4]) + 1) * attotime::from_hz(SYSTEM_CLOCK).as_double();
+		m_timer_period[which] = (uint64_t(m_cpu_regs[NREG_T0CTRL + which * 4]) + 1) * attotime::from_hz(clock()).as_double();
 		if (m_cpu_regs[offset] & 2) {
 			// Cascade timer
 			uint32_t scaleSrc = (m_cpu_regs[offset] >> 2) & 0x3;
-			m_timer_period[which] += (uint64_t(m_cpu_regs[NREG_T0CTRL + scaleSrc * 4]) + 1) * attotime::from_hz(SYSTEM_CLOCK).as_double();
+			m_timer_period[which] += (uint64_t(m_cpu_regs[NREG_T0CTRL + scaleSrc * 4]) + 1) * attotime::from_hz(clock()).as_double();
 			logerror("Timer scale: timer %d is scaled by %08X\n", which, m_cpu_regs[NREG_T0CTRL + which * 4]);
 		}
 		/* timer just enabled? */
 		if (!(olddata & 1) && (m_cpu_regs[offset] & 1))
 		{
-			m_timer[which]->adjust(attotime::from_hz(SYSTEM_CLOCK) * m_cpu_regs[NREG_T0CNTR + which * 4], which);
-			if (LOG_TIMERS) logerror("Starting timer %d at a rate of %f Hz\n", which, ATTOSECONDS_TO_HZ(attotime::from_double(m_timer_period[which]).as_attoseconds()));
+			m_timer[which]->adjust(attotime::from_hz(clock()) * m_cpu_regs[NREG_T0CNTR + which * 4], which);
+			if (LOG_TIMERS) logerror("Starting timer %d at a rate of %f Hz\n", which, attotime::from_double(m_timer_period[which]).as_hz());
 		}
 
 		/* timer disabled? */
 		else if ((olddata & 1) && !(m_cpu_regs[offset] & 1))
 		{
-			m_cpu_regs[offset + 1] = m_timer[which]->remaining().as_double() * SYSTEM_CLOCK;
+			m_cpu_regs[offset + 1] = m_timer[which]->remaining().as_double() * clock();
 			m_timer[which]->adjust(attotime::never, which);
 		}
 		break;
@@ -986,7 +987,7 @@ WRITE32_MEMBER(vrc5074_device::cpu_reg_w)
 
 		if (m_cpu_regs[offset - 1] & 1)
 		{
-			m_timer[which]->adjust(attotime::from_hz(SYSTEM_CLOCK) * m_cpu_regs[offset], which);
+			m_timer[which]->adjust(attotime::from_hz(clock()) * m_cpu_regs[offset], which);
 		}
 		break;
 	}
@@ -1007,7 +1008,7 @@ WRITE_LINE_MEMBER(vrc5074_device::uart_irq_callback)
 
 READ32_MEMBER(vrc5074_device::serial_r)
 {
-	uint32_t result = m_uart->ins8250_r(space, offset>>1);
+	uint32_t result = m_uart->ins8250_r(offset>>1);
 
 	if (0 && LOG_NILE)
 		logerror("%s serial_r offset %03X = %08X (%08x)\n", machine().describe_context(), offset>>1, result, offset*4);
@@ -1016,7 +1017,7 @@ READ32_MEMBER(vrc5074_device::serial_r)
 
 WRITE32_MEMBER(vrc5074_device::serial_w)
 {
-	m_uart->ins8250_w(space, offset>>1, data);
+	m_uart->ins8250_w(offset>>1, data);
 	if (PRINTF_SERIAL && offset == NREG_UARTTHR) {
 		static std::string debugStr;
 		printf("%c", data);

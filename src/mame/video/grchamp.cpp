@@ -13,40 +13,39 @@
 
 #define RGB_MAX     191
 
-PALETTE_INIT_MEMBER(grchamp_state, grchamp)
+void grchamp_state::grchamp_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	static const int resistances[3] = { 100, 270, 470 };
+	uint8_t const *const color_prom = memregion("proms")->base();
+	static constexpr int resistances[3] = { 100, 270, 470 };
+
+	// compute the color output resistor weights
 	double rweights[3], gweights[3], bweights[2];
-	int i;
-
-	/* compute the color output resistor weights */
 	compute_resistor_weights(0, RGB_MAX, -1.0,
-			3,  &resistances[0], rweights, 0, 100,
-			3,  &resistances[0], gweights, 0, 100,
-			2,  &resistances[0], bweights, 0, 100);
+				3,  &resistances[0], rweights, 0, 100,
+				3,  &resistances[0], gweights, 0, 100,
+				2,  &resistances[0], bweights, 0, 100);
 
-	/* initialize the palette with these colors */
-	for (i = 0; i < 0x20; i++)
+	// initialize the palette with these colors
+	for (int i = 0; i < 0x20; i++)
 	{
-		int bit0, bit1, bit2, r, g, b;
+		int bit0, bit1, bit2;
 
-		/* red component */
-		bit0 = (color_prom[i] >> 0) & 1;
-		bit1 = (color_prom[i] >> 1) & 1;
-		bit2 = (color_prom[i] >> 2) & 1;
-		r = combine_3_weights(rweights, bit0, bit1, bit2);
+		// red component
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		bit2 = BIT(color_prom[i], 2);
+		int const r = combine_weights(rweights, bit0, bit1, bit2);
 
-		/* green component */
-		bit0 = (color_prom[i] >> 3) & 1;
-		bit1 = (color_prom[i] >> 4) & 1;
-		bit2 = (color_prom[i] >> 5) & 1;
-		g = combine_3_weights(gweights, bit0, bit1, bit2);
+		// green component
+		bit0 = BIT(color_prom[i], 3);
+		bit1 = BIT(color_prom[i], 4);
+		bit2 = BIT(color_prom[i], 5);
+		int const g = combine_weights(gweights, bit0, bit1, bit2);
 
-		/* blue component */
-		bit0 = (color_prom[i] >> 6) & 1;
-		bit1 = (color_prom[i] >> 7) & 1;
-		b = combine_2_weights(bweights, bit0, bit1);
+		// blue component
+		bit0 = BIT(color_prom[i], 6);
+		bit1 = BIT(color_prom[i], 7);
+		int const b = combine_weights(bweights, bit0, bit1);
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -102,10 +101,10 @@ void grchamp_state::video_start()
 	m_work_bitmap.allocate(32,32);
 
 	/* allocate tilemaps for each of the three sections */
-	m_left_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(grchamp_state::get_left_tile_info),this), tilemap_mapper_delegate(FUNC(grchamp_state::get_memory_offset),this),  8,8, 64,32);
-	m_text_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(grchamp_state::get_text_tile_info),this), TILEMAP_SCAN_ROWS,  8,8, 32,32);
-	m_right_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(grchamp_state::get_right_tile_info),this), tilemap_mapper_delegate(FUNC(grchamp_state::get_memory_offset),this),  8,8, 64,32);
-	m_center_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(grchamp_state::get_center_tile_info),this), tilemap_mapper_delegate(FUNC(grchamp_state::get_memory_offset),this),  8,8, 64,32);
+	m_left_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(grchamp_state::get_left_tile_info)), tilemap_mapper_delegate(*this, FUNC(grchamp_state::get_memory_offset)), 8,8, 64,32);
+	m_text_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(grchamp_state::get_text_tile_info)), TILEMAP_SCAN_ROWS,  8,8, 32,32);
+	m_right_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(grchamp_state::get_right_tile_info)), tilemap_mapper_delegate(*this, FUNC(grchamp_state::get_memory_offset)), 8,8, 64,32);
+	m_center_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(grchamp_state::get_center_tile_info)), tilemap_mapper_delegate(*this, FUNC(grchamp_state::get_memory_offset)), 8,8, 64,32);
 }
 
 #if 0

@@ -548,8 +548,8 @@ void bt459_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 			{
 				u8 data = *pixel_data++;
 
-				bitmap.pix(y, x + 1) = get_rgb(data & 0x7, pixel_mask); data >>= 4;
-				bitmap.pix(y, x + 0) = get_rgb(data & 0x7, pixel_mask);
+				bitmap.pix(y, x + 1) = get_rgb(data & 0xf, pixel_mask); data >>= 4;
+				bitmap.pix(y, x + 0) = get_rgb(data & 0xf, pixel_mask);
 			}
 		break;
 

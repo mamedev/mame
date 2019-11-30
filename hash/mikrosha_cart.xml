@@ -8,7 +8,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="mikrosha_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="micron.rom" size="16384" crc="42ac7739" sha1="ca7ac6e0f38d54274db14d1dd4141722908b2d8b" offset="0" />
+				<rom name="micron.rom" size="16384" crc="42ac7739" sha1="ca7ac6e0f38d54274db14d1dd4141722908b2d8b"/>
 			</dataarea>
 		</part>
 	</software>

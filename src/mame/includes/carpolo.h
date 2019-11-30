@@ -43,7 +43,6 @@ public:
 		, m_palette(*this, "palette")
 		, m_alpharam(*this, "alpharam")
 		, m_spriteram(*this, "spriteram")
-		, m_proms(*this, "proms")
 		, m_user1(*this, "user1")
 		, m_dial(*this, "DIAL%u", 0U)
 		, m_in(*this, "IN%u", 0U)
@@ -57,12 +56,6 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-
-	enum
-	{
-		TID_TIMER,
-	};
 
 private:
 	uint8_t m_ball_screen_collision_cause;
@@ -95,13 +88,10 @@ private:
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint8_t> m_alpharam;
 	required_shared_ptr<uint8_t> m_spriteram;
-	required_memory_region m_proms;
 	required_memory_region m_user1;
 	required_ioport_array<4> m_dial;
 	required_ioport_array<3> m_in;
 	required_ioport m_pedals;
-
-	emu_timer *m_timer;
 
 	std::unique_ptr<bitmap_ind16> m_sprite_sprite_collision_bitmap1;
 	std::unique_ptr<bitmap_ind16> m_sprite_sprite_collision_bitmap2;
@@ -123,7 +113,7 @@ private:
 	DECLARE_WRITE8_MEMBER(car_ball_interrupt_clear_w);
 	DECLARE_WRITE8_MEMBER(car_border_interrupt_clear_w);
 	DECLARE_WRITE8_MEMBER(timer_interrupt_clear_w);
-	DECLARE_PALETTE_INIT(carpolo);
+	void carpolo_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	DECLARE_WRITE_LINE_MEMBER(coin1_interrupt_clear_w);

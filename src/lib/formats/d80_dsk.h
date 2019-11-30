@@ -7,13 +7,15 @@
     Commodore 8050 sector disk image format
 
 *********************************************************************/
+#ifndef MAME_FORMATS_D80_DSK_H
+#define MAME_FORMATS_D80_DSK_H
 
-#ifndef D80_DSK_H_
-#define D80_DSK_H_
+#pragma once
 
 #include "d64_dsk.h"
 
-class d80_format : public d64_format {
+class d80_format : public d64_format
+{
 public:
 	d80_format();
 	d80_format(const format *formats);
@@ -41,6 +43,4 @@ protected:
 
 extern const floppy_format_type FLOPPY_D80_FORMAT;
 
-
-
-#endif
+#endif // MAME_FORMATS_D80_DSK_H

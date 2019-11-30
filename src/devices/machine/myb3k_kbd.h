@@ -14,20 +14,12 @@
     is responsible for storing the byte into the serial/parallell converter
     (that can be read through IN from port 0x04) and then trigger an interrupt.
 
-    MCFG_DEVICE_ADD("myb3k_keyboard", MYB3K_KEYBOARD, 0)
-    MCFG_MYB3K_KEYBOARD_CB(PUT(myb3k_state, kbd_set_data_and_interrupt))
-
 **********************************************************************/
 
 #ifndef MAME_MACHINE_MYB3K_KBD_H
 #define MAME_MACHINE_MYB3K_KBD_H
 
 #pragma once
-
-#define MYB3K_KBD_CB_PUT(cls, fnc)          myb3k_keyboard_device::output_delegate((&cls::fnc), (#cls "::" #fnc), DEVICE_SELF, ((cls *)nullptr))
-#define MYB3K_KBD_CB_DEVPUT(tag, cls, fnc)  myb3k_keyboard_device::output_delegate((&cls::fnc), (#cls "::" #fnc), (tag), ((cls *)nullptr))
-
-#define MCFG_MYB3K_KEYBOARD_CB(cb)          downcast<myb3k_keyboard_device &>(*device).set_keyboard_callback((MYB3K_KBD_CB_##cb));
 
 DECLARE_DEVICE_TYPE(MYB3K_KEYBOARD, myb3k_keyboard_device)
 DECLARE_DEVICE_TYPE(JB3000_KEYBOARD, jb3000_keyboard_device)
@@ -51,7 +43,11 @@ public:
 		TIMER_ID_SECOND_BYTE
 	};
 
-	template <class Object> void set_keyboard_callback(Object &&cb) { m_keyboard_cb = std::forward<Object>(cb); }
+	template <typename... T>
+	void set_keyboard_callback(T &&... args)
+	{
+		m_keyboard_cb.set(std::forward<T>(args)...);
+	}
 
 protected:
 	myb3k_keyboard_device(

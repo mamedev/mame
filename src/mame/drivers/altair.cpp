@@ -44,7 +44,7 @@ public:
 	void altair(machine_config &config);
 
 private:
-	DECLARE_QUICKLOAD_LOAD_MEMBER(altair);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
 	virtual void machine_reset() override;
 	void io_map(address_map &map);
@@ -68,7 +68,7 @@ void altair_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	// TODO: Remove AM_MIRROR() and use SIO address S0-S7
+	// TODO: Remove mirror() and use SIO address S0-S7
 	map(0x00, 0x01).mirror(0x10).rw("acia", FUNC(acia6850_device::read), FUNC(acia6850_device::write));
 }
 
@@ -77,7 +77,7 @@ static INPUT_PORTS_START( altair )
 INPUT_PORTS_END
 
 
-QUICKLOAD_LOAD_MEMBER( altair_state,altair)
+QUICKLOAD_LOAD_MEMBER(altair_state::quickload_cb)
 {
 	int quick_length;
 	int read_;
@@ -97,29 +97,30 @@ void altair_state::machine_reset()
 	m_maincpu->set_state_int(i8080_cpu_device::I8085_PC, 0xFD00);
 }
 
-MACHINE_CONFIG_START(altair_state::altair)
+void altair_state::altair(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8080, 2_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_IO_MAP(io_map)
+	I8080(config, m_maincpu, 2_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &altair_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &altair_state::io_map);
 
 	/* video hardware */
 	acia6850_device &acia(ACIA6850(config, "acia", 0));
 	acia.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	acia.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("acia", acia6850_device, write_rxd))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("acia", acia6850_device, write_dcd))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("acia", acia6850_device, write_cts))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set("acia", FUNC(acia6850_device::write_rxd));
+	rs232.dcd_handler().set("acia", FUNC(acia6850_device::write_dcd));
+	rs232.cts_handler().set("acia", FUNC(acia6850_device::write_cts));
 
 	clock_device &uart_clock(CLOCK(config, "uart_clock", 153600)); // TODO: this is set using jumpers S3/S2/S1/S0
 	uart_clock.signal_handler().set("acia", FUNC(acia6850_device::write_txc));
 	uart_clock.signal_handler().append("acia", FUNC(acia6850_device::write_rxc));
 
 	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", altair_state, altair, "bin", 0)
-MACHINE_CONFIG_END
+	QUICKLOAD(config, "quickload", "bin").set_load_callback(FUNC(altair_state::quickload_cb));
+}
 
 /* ROM definition */
 ROM_START( al8800bt )

@@ -25,6 +25,7 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/eeprompar.h"
 #include "machine/watchdog.h"
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -81,7 +82,7 @@ void blstroid_state::main_map(address_map &map)
 	map(0x801804, 0x801805).mirror(0x0383f8).portr("DIAL1");
 	map(0x801c00, 0x801c01).mirror(0x0383fc).portr("IN0");
 	map(0x801c02, 0x801c03).mirror(0x0383fc).portr("IN1");
-	map(0x802000, 0x8023ff).mirror(0x038c00).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x802000, 0x8023ff).mirror(0x038c00).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x803000, 0x8033ff).mirror(0x038c00).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 	map(0x804000, 0x804fff).mirror(0x038000).ram().w(m_playfield_tilemap, FUNC(tilemap_device::write16)).share("playfield");
 	map(0x805000, 0x805fff).mirror(0x038000).ram().share("mob");
@@ -174,34 +175,34 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(blstroid_state::blstroid)
-
+void blstroid_state::blstroid(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	M68000(config, m_maincpu, ATARI_CLOCK_14MHz/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &blstroid_state::main_map);
 
 	EEPROM_2804(config, "eeprom").lock_after_write(true);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_blstroid)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_blstroid);
 
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 512);
 
-	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 2, blstroid_state, get_playfield_tile_info, 16,8, SCAN_ROWS, 64,64)
-	MCFG_ATARI_MOTION_OBJECTS_ADD("mob", "screen", blstroid_state::s_mob_config)
-	MCFG_ATARI_MOTION_OBJECTS_GFXDECODE("gfxdecode")
+	TILEMAP(config, m_playfield_tilemap, m_gfxdecode, 2, 16,8, TILEMAP_SCAN_ROWS, 64,64).set_info_callback(FUNC(blstroid_state::get_playfield_tile_info));
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, blstroid_state::s_mob_config);
+	m_mob->set_gfxdecode(m_gfxdecode);
+
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses an SOS-2 chip to generate video signals */
-	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz, 456*2, 0, 320*2, 262, 0, 240)
-	MCFG_SCREEN_UPDATE_DRIVER(blstroid_state, screen_update_blstroid)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, blstroid_state, video_int_write_line))
+	m_screen->set_raw(ATARI_CLOCK_14MHz, 456*2, 0, 320*2, 262, 0, 240);
+	m_screen->set_screen_update(FUNC(blstroid_state::screen_update_blstroid));
+	m_screen->set_palette("palette");
+	m_screen->screen_vblank().set(FUNC(blstroid_state::video_int_write_line));
 
 	MCFG_VIDEO_START_OVERRIDE(blstroid_state,blstroid)
 
@@ -209,13 +210,14 @@ MACHINE_CONFIG_START(blstroid_state::blstroid)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_ATARI_JSA_I_ADD("jsa", INPUTLINE("maincpu", M68K_IRQ_4))
-	MCFG_ATARI_JSA_TEST_PORT("IN0", 7)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-	MCFG_DEVICE_REMOVE("jsa:pokey")
-	MCFG_DEVICE_REMOVE("jsa:tms")
-MACHINE_CONFIG_END
+	ATARI_JSA_I(config, m_jsa, 0);
+	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_4);
+	m_jsa->test_read_cb().set_ioport("IN0").bit(7);
+	m_jsa->add_route(0, "lspeaker", 1.0);
+	m_jsa->add_route(1, "rspeaker", 1.0);
+	config.device_remove("jsa:pokey");
+	config.device_remove("jsa:tms");
+}
 
 
 

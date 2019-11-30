@@ -8,8 +8,7 @@
     Driver by Pierpaolo Prazzoli
 
     TODO:
-      - is the background color pen correct for both games? (Dacholer probably
-        just use a different color prom data)
+      - is the background color pen correct for all games?
 
     Mods by Tomasz Slanina (2008.06.12):
       - fixed sound cpu interrupts (mode 2 (two vectors)+ nmi)
@@ -41,6 +40,7 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 class dacholer_state : public driver_device
 {
@@ -62,7 +62,7 @@ public:
 	void itaten(machine_config &config);
 	void dacholer(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(snd_ack_r);
+	DECLARE_READ_LINE_MEMBER(snd_ack_r);
 
 private:
 	DECLARE_WRITE8_MEMBER(bg_scroll_x_w);
@@ -78,7 +78,7 @@ private:
 	DECLARE_WRITE8_MEMBER(music_irq_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	DECLARE_PALETTE_INIT(dacholer);
+	void dacholer_palette(palette_device &palette) const;
 	uint32_t screen_update_dacholer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(sound_irq);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
@@ -138,8 +138,8 @@ TILE_GET_INFO_MEMBER(dacholer_state::get_fg_tile_info)
 
 void dacholer_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dacholer_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dacholer_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(dacholer_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(dacholer_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);
 }
@@ -302,7 +302,7 @@ WRITE8_MEMBER(dacholer_state::snd_ack_w)
 	m_snd_ack = data;
 }
 
-CUSTOM_INPUT_MEMBER(dacholer_state::snd_ack_r)
+READ_LINE_MEMBER(dacholer_state::snd_ack_r)
 {
 	return m_snd_ack;       //guess ...
 }
@@ -382,7 +382,7 @@ static INPUT_PORTS_START( dacholer )
 	PORT_DIPSETTING(    0x04, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, dacholer_state,snd_ack_r, nullptr)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(dacholer_state, snd_ack_r)
 
 	PORT_START("DSWB")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )            /* table at 0x0a9c */
@@ -586,7 +586,7 @@ INTERRUPT_GEN_MEMBER(dacholer_state::sound_irq)
 {
 	if (m_music_interrupt_enable == 1)
 	{
-		device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x30);
+		device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x30); // Z80
 	}
 }
 
@@ -599,7 +599,7 @@ WRITE_LINE_MEMBER(dacholer_state::adpcm_int)
 		m_msm_toggle ^= 1;
 		if (m_msm_toggle == 0)
 		{
-			m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0x38);
+			m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0x38); // Z80
 		}
 	}
 }
@@ -627,139 +627,132 @@ void dacholer_state::machine_reset()
 	m_snd_ack = 0;
 }
 
-/* guess: use the same resistor values as Crazy Climber (needs checking on the real HW) */
-PALETTE_INIT_MEMBER(dacholer_state, dacholer)
+// guess: use the same resistor values as Crazy Climber (needs checking on the real hardware)
+void dacholer_state::dacholer_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	static const int resistances_rg[3] = { 1000, 470, 220 };
-	static const int resistances_b [2] = { 470, 220 };
-	double weights_rg[3], weights_b[2];
-	int i;
+	static constexpr int resistances_rg[3] = { 1000, 470, 220 };
+	static constexpr int resistances_b [2] = { 470, 220 };
 
-	/* compute the color output resistor weights */
+	// compute the color output resistor weights
+	double weights_rg[3], weights_b[2];
 	compute_resistor_weights(0, 255, -1.0,
 			3, resistances_rg, weights_rg, 0, 0,
 			2, resistances_b,  weights_b,  0, 0,
 			0, nullptr, nullptr, 0, 0);
 
-	for (i = 0;i < palette.entries(); i++)
+	for (int i = 0; i < palette.entries(); i++)
 	{
 		int bit0, bit1, bit2;
-		int r, g, b;
 
-		/* red component */
-		bit0 = (color_prom[i] >> 0) & 0x01;
-		bit1 = (color_prom[i] >> 1) & 0x01;
-		bit2 = (color_prom[i] >> 2) & 0x01;
-		r = combine_3_weights(weights_rg, bit0, bit1, bit2);
+		// red component
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		bit2 = BIT(color_prom[i], 2);
+		int const r = combine_weights(weights_rg, bit0, bit1, bit2);
 
-		/* green component */
-		bit0 = (color_prom[i] >> 3) & 0x01;
-		bit1 = (color_prom[i] >> 4) & 0x01;
-		bit2 = (color_prom[i] >> 5) & 0x01;
-		g = combine_3_weights(weights_rg, bit0, bit1, bit2);
+		// green component
+		bit0 = BIT(color_prom[i], 3);
+		bit1 = BIT(color_prom[i], 4);
+		bit2 = BIT(color_prom[i], 5);
+		int const g = combine_weights(weights_rg, bit0, bit1, bit2);
 
-		/* blue component */
-		bit0 = (color_prom[i] >> 6) & 0x01;
-		bit1 = (color_prom[i] >> 7) & 0x01;
-		b = combine_2_weights(weights_b, bit0, bit1);
+		// blue component
+		bit0 = BIT(color_prom[i], 6);
+		bit1 = BIT(color_prom[i], 7);
+		int const b = combine_weights(weights_b, bit0, bit1);
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
 /* note: clocks are taken from itaten sound reference recording */
-MACHINE_CONFIG_START(dacholer_state::dacholer)
-
+void dacholer_state::dacholer(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(16'000'000)/4)  /* ? */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_IO_MAP(main_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dacholer_state,  irq0_line_assert)
+	Z80(config, m_maincpu, XTAL(16'000'000)/4);  /* Dacholer PCB has a 15.46848 MHz OSC here */
+	m_maincpu->set_addrmap(AS_PROGRAM, &dacholer_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &dacholer_state::main_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(dacholer_state::irq0_line_assert));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(19'968'000)/8) /* ? */
-	MCFG_DEVICE_PROGRAM_MAP(snd_map)
-	MCFG_DEVICE_IO_MAP(snd_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dacholer_state, sound_irq)
-
+	Z80(config, m_audiocpu, XTAL(19'968'000)/8); /* ? */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &dacholer_state::snd_map);
+	m_audiocpu->set_addrmap(AS_IO, &dacholer_state::snd_io_map);
+	m_audiocpu->set_vblank_int("screen", FUNC(dacholer_state::sound_irq));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-1-16)
-	MCFG_SCREEN_UPDATE_DRIVER(dacholer_state, screen_update_dacholer)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 256-1, 16, 256-1-16);
+	screen.set_screen_update(FUNC(dacholer_state::screen_update_dacholer));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 32)
-	MCFG_PALETTE_INIT_OWNER(dacholer_state, dacholer)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dacholer)
-
+	PALETTE(config, m_palette, FUNC(dacholer_state::dacholer_palette), 32);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dacholer);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(19'968'000)/16)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	AY8910(config, "ay1", XTAL(19'968'000)/16).add_route(ALL_OUTPUTS, "mono", 0.15);
+	AY8910(config, "ay2", XTAL(19'968'000)/16).add_route(ALL_OUTPUTS, "mono", 0.15);
+	AY8910(config, "ay3", XTAL(19'968'000)/16).add_route(ALL_OUTPUTS, "mono", 0.15);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(19'968'000)/16)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	MSM5205(config, m_msm, XTAL(384'000));
+	m_msm->vck_legacy_callback().set(FUNC(dacholer_state::adpcm_int));  /* interrupt function */
+	m_msm->set_prescaler_selector(msm5205_device::S96_4B);  /* 1 / 96 = 3906.25Hz playback  - guess */
+	m_msm->add_route(ALL_OUTPUTS, "mono", 0.30);
+}
 
-	MCFG_DEVICE_ADD("ay3", AY8910, XTAL(19'968'000)/16)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
-
-	MCFG_DEVICE_ADD("msm", MSM5205, XTAL(384'000))
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, dacholer_state, adpcm_int))          /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)  /* 1 / 96 = 3906.25Hz playback  - guess */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(dacholer_state::itaten)
+void dacholer_state::itaten(machine_config &config)
+{
 	dacholer(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(itaten_main_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &dacholer_state::itaten_main_map);
 
-	MCFG_DEVICE_MODIFY("audiocpu")
-	MCFG_DEVICE_PROGRAM_MAP(itaten_snd_map)
-	MCFG_DEVICE_IO_MAP(itaten_snd_io_map)
-	MCFG_DEVICE_VBLANK_INT_REMOVE()
+	m_audiocpu->set_addrmap(AS_PROGRAM, &dacholer_state::itaten_snd_map);
+	m_audiocpu->set_addrmap(AS_IO, &dacholer_state::itaten_snd_io_map);
+	m_audiocpu->remove_vblank_int();
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_itaten)
+	m_gfxdecode->set_info(gfx_itaten);
 
-	MCFG_DEVICE_REMOVE("msm")
-MACHINE_CONFIG_END
+	config.device_remove("msm");
+}
 
-ROM_START( dacholer )
+ROM_START( dacholer ) /* AM-1-A & AM-1-B two board stack */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "dacholer8.rom",  0x0000, 0x2000, CRC(8b73a441) SHA1(6de9e4845b9063af8df42aa82ad536737190582c) )
-	ROM_LOAD( "dacholer9.rom",  0x2000, 0x2000, CRC(9499289f) SHA1(bcfe554eb1f8e686d193050c18278b6bf93f179f) )
-	ROM_LOAD( "dacholer10.rom", 0x4000, 0x2000, CRC(39d37281) SHA1(daaf84079dd18dd854946e066e2dcde994bcbba4) )
-	ROM_LOAD( "dacholer11.rom", 0x6000, 0x2000, CRC(bb781ea4) SHA1(170966c4bcd0246968850d908a69f81ea1e136d5) )
+	ROM_LOAD( "dp_1.5k", 0x0000, 0x2000, CRC(8b73a441) SHA1(6de9e4845b9063af8df42aa82ad536737190582c) ) /* these 4 ROMs located on the AM-1-A top board */
+	ROM_LOAD( "dp_2.5l", 0x2000, 0x2000, CRC(9499289f) SHA1(bcfe554eb1f8e686d193050c18278b6bf93f179f) )
+	ROM_LOAD( "dp_3.5m", 0x4000, 0x2000, CRC(39d37281) SHA1(daaf84079dd18dd854946e066e2dcde994bcbba4) )
+	ROM_LOAD( "dp_4.5n", 0x6000, 0x2000, CRC(bb781ea4) SHA1(170966c4bcd0246968850d908a69f81ea1e136d5) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "dacholer12.rom", 0x0000, 0x2000, CRC(cc3a4b68) SHA1(29344dc10c5d236f9a452196b3809565b4101327) )
-	ROM_LOAD( "dacholer13.rom", 0x2000, 0x2000, CRC(aa18e126) SHA1(e6af334188d0edbc37a7fb4a00a325b2039172b7) )
-	ROM_LOAD( "dacholer14.rom", 0x4000, 0x2000, CRC(3b0131c7) SHA1(338ca2c2c7480e1cd0bb15ee6b90d683ce06f0fd) )
+	ROM_LOAD( "ds_1.6g", 0x0000, 0x2000, CRC(cc3a4b68) SHA1(29344dc10c5d236f9a452196b3809565b4101327) ) /* these 4 ROMs located on the AM-1-A top board */
+	ROM_LOAD( "ds_2.6h", 0x2000, 0x2000, CRC(aa18e126) SHA1(e6af334188d0edbc37a7fb4a00a325b2039172b7) )
+	ROM_LOAD( "ds_3.6j", 0x4000, 0x2000, CRC(3b0131c7) SHA1(338ca2c2c7480e1cd0bb15ee6b90d683ce06f0fd) )
+	/* 6K not populated */
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
-	ROM_LOAD( "dacholer7.rom", 0x0000, 0x2000, CRC(fd649d36) SHA1(77d78eef44f348b635dbc0711e662a5236c00d51) )
+	ROM_LOAD( "dc_7.12j", 0x0000, 0x2000, CRC(fd649d36) SHA1(77d78eef44f348b635dbc0711e662a5236c00d51) ) /* this ROM located on the AM-1-B bottom board */
 
 	ROM_REGION( 0x6000, "gfx2", 0 )
-	ROM_LOAD( "dacholer1.rom", 0x0000, 0x2000, CRC(9cca0fd2) SHA1(3ca1b4cca9611232df1195ae6ac172a79c8368c3) )
-	ROM_LOAD( "dacholer2.rom", 0x2000, 0x2000, CRC(c1322b27) SHA1(8022f59b8ae10a7a911563b01bffc2d5646108a5) )
-	ROM_LOAD( "dacholer3.rom", 0x4000, 0x2000, CRC(9e1e7198) SHA1(7a75da1ae09f6cf095976b48f462ede42625b244) )
+	ROM_LOAD( "dc_3.13a", 0x0000, 0x2000, CRC(9cca0fd2) SHA1(3ca1b4cca9611232df1195ae6ac172a79c8368c3) ) /* these 3 ROMs located on the AM-1-B bottom board */
+	ROM_LOAD( "dc_2.12a", 0x2000, 0x2000, CRC(c1322b27) SHA1(8022f59b8ae10a7a911563b01bffc2d5646108a5) )
+	ROM_LOAD( "dc_1.11a", 0x4000, 0x2000, CRC(9e1e7198) SHA1(7a75da1ae09f6cf095976b48f462ede42625b244) )
+	/* 10A not populated */
 
 	ROM_REGION( 0x6000, "gfx3", 0 )
-	ROM_LOAD( "dacholer5.rom", 0x0000, 0x2000, CRC(dd4818f0) SHA1(718236932248512f8779f640e0367b5d92e6497e) )
-	ROM_LOAD( "dacholer4.rom", 0x2000, 0x2000, CRC(7f338ae0) SHA1(9206ed044feb44c55990803cdf608dd899e976ff) )
-	ROM_LOAD( "dacholer6.rom", 0x4000, 0x2000, CRC(0a6d4ec4) SHA1(419ea1f6ead3afb2de98432d9f8ead7447842a1e) )
+	ROM_LOAD( "dc_5.2d", 0x0000, 0x2000, CRC(dd4818f0) SHA1(718236932248512f8779f640e0367b5d92e6497e) ) /* these 3 ROMs located on the AM-1-B bottom board */
+	ROM_LOAD( "dc_4.1d", 0x2000, 0x2000, CRC(7f338ae0) SHA1(9206ed044feb44c55990803cdf608dd899e976ff) )
+	ROM_LOAD( "dc_6.3d", 0x4000, 0x2000, CRC(0a6d4ec4) SHA1(419ea1f6ead3afb2de98432d9f8ead7447842a1e) )
+	/* 4D not populated */
 
-	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "k.13d", 0x0000, 0x0020, BAD_DUMP CRC(82f87a36) SHA1(5dc2059eb5b6cd541b014347c36198b8838d98fa) ) //taken from Kick Boy
+	ROM_REGION( 0x0060, "proms", 0 )
+	ROM_LOAD( "dc.13d",  0x0000, 0x0020, CRC(d273abe5) SHA1(219bcba7f3e961f6b2cfbf48ac6ae6b6d80b974c) ) /* this MB7051 (or compatible 82S123) BPROM located on bottom board */
+	ROM_LOAD( "af-2.1h", 0x0020, 0x0020, CRC(e1cac297) SHA1(f15326d04d006d9d029a6565aebf9daf3657bc2a) ) /* this PBROM located on the AM-1-B bottom board */
+	ROM_LOAD( "af-1.3n", 0x0040, 0x0020, CRC(5638e485) SHA1(5d892111936a8eb7646c03a17300069be9a2b442) ) /* this PBROM located on the AM-1-A top board */
 ROM_END
 
 ROM_START( kickboy )
@@ -778,16 +771,18 @@ ROM_START( kickboy )
 	ROM_LOAD( "k_7.12j", 0x0000, 0x2000, CRC(22be46e8) SHA1(d92b3913d8eba881c69acd1d85ca73ee58489fae) )
 
 	ROM_REGION( 0x4000, "gfx2", 0 )
-	ROM_LOAD( "k_3.13a",  0x0000, 0x2000, CRC(7eac2a64) SHA1(b4a44770bbded59cd572ac5d0ae178affc8cdab8) )
-	ROM_LOAD( "k_2.12a",  0x2000, 0x2000, CRC(b8829572) SHA1(01009ec63449c809608923fd9dcecd82b29c5d6d) )
+	ROM_LOAD( "k_3.13a", 0x0000, 0x2000, CRC(7eac2a64) SHA1(b4a44770bbded59cd572ac5d0ae178affc8cdab8) )
+	ROM_LOAD( "k_2.12a", 0x2000, 0x2000, CRC(b8829572) SHA1(01009ec63449c809608923fd9dcecd82b29c5d6d) )
 
 	ROM_REGION( 0x6000, "gfx3", 0 )
 	ROM_LOAD( "k_5.2d", 0x0000, 0x2000, CRC(4b769a1c) SHA1(fde17dcd4b7cda9cc54572e81bc2f0e48c19277d) )
 	ROM_LOAD( "k_4.1d", 0x2000, 0x2000, CRC(45199750) SHA1(a04b4d6d0defa613d269625b089d28dc68d5b73a) )
 	ROM_LOAD( "k_6.3d", 0x4000, 0x2000, CRC(d1795506) SHA1(e0f7a64e301cf43c4739031461dba16aa44100a1) )
 
-	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "k.13d", 0x0000, 0x0020, CRC(82f87a36) SHA1(5dc2059eb5b6cd541b014347c36198b8838d98fa) )
+	ROM_REGION( 0x0060, "proms", 0 )
+	ROM_LOAD( "k.13d",   0x0000, 0x0020, CRC(82f87a36) SHA1(5dc2059eb5b6cd541b014347c36198b8838d98fa) )
+	ROM_LOAD( "af-2.1h", 0x0020, 0x0020, CRC(e1cac297) SHA1(f15326d04d006d9d029a6565aebf9daf3657bc2a) )
+	ROM_LOAD( "af-1.3n", 0x0040, 0x0020, CRC(5638e485) SHA1(5d892111936a8eb7646c03a17300069be9a2b442) )
 ROM_END
 
 /*
@@ -816,7 +811,7 @@ ITA-EXP
 
 --------------------------------
 IT A-2
-OSC  :19.968 ?
+OSC  :19.968MHz
 --------------------------------
 8.10A        [c32b0859] 2764
 9.11A        [919cac5e]  |
@@ -870,6 +865,6 @@ ROM_START( itaten )
 ROM_END
 
 
-GAME( 1983, dacholer, 0, dacholer, dacholer, dacholer_state, empty_init, ROT0, "Nichibutsu",         "Dacholer",               MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, dacholer, 0, dacholer, dacholer, dacholer_state, empty_init, ROT0, "Nichibutsu",         "Dacholer",               MACHINE_SUPPORTS_SAVE )
 GAME( 1983, kickboy,  0, dacholer, kickboy,  dacholer_state, empty_init, ROT0, "Nichibutsu",         "Kick Boy",               MACHINE_SUPPORTS_SAVE )
 GAME( 1984, itaten,   0, itaten,   itaten,   dacholer_state, empty_init, ROT0, "Nichibutsu / Alice", "Itazura Tenshi (Japan)", MACHINE_SUPPORTS_SAVE )

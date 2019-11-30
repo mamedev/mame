@@ -90,9 +90,9 @@ void tc0180vcu_device::device_resolve_objects()
 
 void tc0180vcu_device::device_start()
 {
-	m_tilemap[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(tc0180vcu_device::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
-	m_tilemap[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(tc0180vcu_device::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
-	m_tilemap[2] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(tc0180vcu_device::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(tc0180vcu_device::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_tilemap[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(tc0180vcu_device::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_tilemap[2] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(tc0180vcu_device::get_tx_tile_info)), TILEMAP_SCAN_ROWS,  8,  8, 64, 32);
 
 	m_tilemap[1]->set_transparent_pen(0);
 	m_tilemap[2]->set_transparent_pen(0);
@@ -152,6 +152,8 @@ void tc0180vcu_device::vblank_callback(screen_device &screen, bool state)
 
 	if (state)
 	{
+		vblank_update();
+
 		m_inth_callback(ASSERT_LINE);
 		m_intl_timer->adjust(screen.time_until_pos(screen.vpos() + 8));
 	}
@@ -618,19 +620,13 @@ g_profiler.start(PROFILER_USER1);
 g_profiler.stop();
 }
 
-WRITE_LINE_MEMBER(tc0180vcu_device::screen_vblank)
+void tc0180vcu_device::vblank_update()
 {
-	// rising edge
-	if (state)
-	{
-		if (~m_video_control & 0x01)
-			m_framebuffer[m_framebuffer_page]->fill(0, screen().visible_area());
+	if (~m_video_control & 0x01)
+		m_framebuffer[m_framebuffer_page]->fill(0, screen().visible_area());
 
-		if (~m_video_control & 0x80)
-		{
-			m_framebuffer_page ^= 1;
-		}
+	if (~m_video_control & 0x80)
+		m_framebuffer_page ^= 1;
 
-		draw_sprites(*m_framebuffer[m_framebuffer_page], screen().visible_area());
-	}
+	draw_sprites(*m_framebuffer[m_framebuffer_page], screen().visible_area());
 }

@@ -17,7 +17,7 @@
 #pragma once
 
 #include "peribox.h"
-#include "machine/ataintf.h"
+#include "bus/ata/ataintf.h"
 #include "machine/ram.h"
 #include "machine/rtc65271.h"
 
@@ -28,10 +28,10 @@ class nouspikel_ide_interface_device : public device_t, public device_ti99_perib
 public:
 	nouspikel_ide_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	DECLARE_READ8Z_MEMBER(readz) override;
-	DECLARE_WRITE8_MEMBER(write) override;
+	void write(offs_t offset, uint8_t data) override;
 
 	DECLARE_READ8Z_MEMBER(crureadz) override;
-	DECLARE_WRITE8_MEMBER(cruwrite) override;
+	void cruwrite(offs_t offset, uint8_t data) override;
 
 	void    do_inta(int state);
 	bool    m_ata_irq;

@@ -19,6 +19,7 @@
 
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 #include "blockade.lh"
 
@@ -30,8 +31,8 @@
 class blockade_state : public driver_device
 {
 public:
-	blockade_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	blockade_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_videoram(*this, "videoram"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -44,7 +45,7 @@ public:
 	{ }
 
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-	DECLARE_CUSTOM_INPUT_MEMBER(coin_r);
+	DECLARE_READ_LINE_MEMBER(coin_r);
 	DECLARE_WRITE8_MEMBER(coin_latch_w);
 
 	DECLARE_WRITE8_MEMBER(videoram_w);
@@ -68,7 +69,7 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
-	required_device<discrete_device> m_discrete;
+	required_device<discrete_sound_device> m_discrete;
 	required_device<samples_device> m_samples;
 
 	emu_timer *m_vblank_timer;
@@ -106,7 +107,7 @@ void blockade_state::main_io_map(address_map &map)
 
 static INPUT_PORTS_START( blockade )
 	PORT_START("coin")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_COIN1) PORT_IMPULSE(24) PORT_CHANGED_MEMBER(DEVICE_SELF, blockade_state, coin_inserted, nullptr)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_COIN1) PORT_IMPULSE(24) PORT_CHANGED_MEMBER(DEVICE_SELF, blockade_state, coin_inserted, 0)
 
 	// These are not dip switches, they are mapped to connectors on the board.  Different games
 	// had different harnesses which plugged in here, and some pins were unused.
@@ -122,7 +123,7 @@ static INPUT_PORTS_START( blockade )
 	PORT_CONFSETTING(   0x50, "4" )
 	PORT_CONFSETTING(   0x30, "5" )
 	PORT_CONFSETTING(   0x70, "6" )
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, blockade_state, coin_r, nullptr)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_MEMBER(blockade_state, coin_r)
 
 	PORT_START("IN1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_4WAY PORT_PLAYER(2)
@@ -153,7 +154,7 @@ static INPUT_PORTS_START( comotion )
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_START1)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, blockade_state, coin_r, nullptr)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_MEMBER(blockade_state, coin_r)
 
 	PORT_MODIFY("IN1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_4WAY PORT_PLAYER(1)
@@ -192,7 +193,7 @@ static INPUT_PORTS_START( blasto )
 	PORT_CONFSETTING(   0x00, "70 Secs") // though service manual says 60
 	PORT_CONFSETTING(   0x08, "90 Secs")
 	PORT_BIT(0x70, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, blockade_state, coin_r, nullptr)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_MEMBER(blockade_state, coin_r)
 
 	PORT_MODIFY("IN1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(2)
@@ -227,7 +228,7 @@ static INPUT_PORTS_START( hustle )
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_START1)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_START2)
 	PORT_BIT(0x60, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, blockade_state, coin_r, nullptr)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_MEMBER(blockade_state, coin_r)
 
 	PORT_MODIFY("IN1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_4WAY PORT_PLAYER(2)
@@ -264,7 +265,7 @@ static INPUT_PORTS_START( mineswpr )
 	PORT_CONFSETTING(   0x50, "4")
 	PORT_CONFSETTING(   0x30, "5")
 	PORT_CONFSETTING(   0x70, "6")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, blockade_state, coin_r, nullptr)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_MEMBER(blockade_state, coin_r)
 
 	PORT_MODIFY("IN1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_4WAY PORT_PLAYER(1)
@@ -295,7 +296,7 @@ static INPUT_PORTS_START( mineswpr4 )
 	PORT_CONFSETTING(   0x50, "4")
 	PORT_CONFSETTING(   0x30, "5")
 	PORT_CONFSETTING(   0x70, "6")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, blockade_state, coin_r, nullptr)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_MEMBER(blockade_state, coin_r)
 
 	PORT_MODIFY("IN1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_4WAY PORT_PLAYER(1)
@@ -331,7 +332,7 @@ INPUT_CHANGED_MEMBER( blockade_state::coin_inserted )
 		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 }
 
-CUSTOM_INPUT_MEMBER( blockade_state::coin_r )
+READ_LINE_MEMBER( blockade_state::coin_r )
 {
 	return m_coin_latch;
 }
@@ -413,7 +414,7 @@ DISCRETE_SOUND_END
 
 WRITE8_MEMBER( blockade_state::sound_freq_w )
 {
-	m_discrete->write(space, BLOCKADE_NOTE_DATA, data);
+	m_discrete->write(BLOCKADE_NOTE_DATA, data);
 	return;
 }
 
@@ -442,7 +443,7 @@ const char *const blockade_sample_names[] =
 
 void blockade_state::machine_start()
 {
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(blockade_state::tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(blockade_state::tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_vblank_timer = timer_alloc(0);
 
@@ -468,32 +469,33 @@ void blockade_state::device_timer(emu_timer &timer, device_timer_id id, int para
 //  MACHINE DEFINTIONS
 //**************************************************************************
 
-MACHINE_CONFIG_START(blockade_state::blockade)
-	MCFG_DEVICE_ADD("maincpu", I8080A, XTAL(20'790'000) / 10)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_IO_MAP(main_io_map)
+void blockade_state::blockade(machine_config &config)
+{
+	I8080A(config, m_maincpu, XTAL(20'790'000) / 10);
+	m_maincpu->set_addrmap(AS_PROGRAM, &blockade_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &blockade_state::main_io_map);
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(20'790'000) / 4, 330, 0, 256, 262, 0, 224)
-	MCFG_SCREEN_UPDATE_DRIVER(blockade_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(XTAL(20'790'000) / 4, 330, 0, 256, 262, 0, 224);
+	m_screen->set_screen_update(FUNC(blockade_state::screen_update));
+	m_screen->set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_blockade)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_blockade);
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(1)
-	MCFG_SAMPLES_NAMES(blockade_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(1);
+	m_samples->set_samples_names(blockade_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE, blockade_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	DISCRETE(config, m_discrete, blockade_discrete);
+	m_discrete->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 //**************************************************************************

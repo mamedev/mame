@@ -6,7 +6,10 @@
 
     TODO:
     - Use NSCSI instead of legacy one!
-	- ADPCM Transfer is correct?
+    - ADPCM Transfer is correct?
+
+    ADPCM related patents:
+    - https://patents.google.com/patent/US5692099
 
 ***************************************************************************/
 
@@ -25,13 +28,17 @@ DEFINE_DEVICE_TYPE(HUC6272, huc6272_device, "huc6272", "Hudson HuC6272 \"King\""
 
 void huc6272_device::microprg_map(address_map &map)
 {
-	map(0x00, 0x0f).ram().share("microprg_ram");
+	if (!has_configured_map(0))
+		map(0x00, 0x0f).ram().share("microprg_ram");
 }
 
 void huc6272_device::kram_map(address_map &map)
 {
-	map(0x000000, 0x0fffff).ram().share("kram_page0");
-	map(0x100000, 0x1fffff).ram().share("kram_page1");
+	if (!has_configured_map(1))
+	{
+		map(0x000000, 0x0fffff).ram().share("kram_page0");
+		map(0x100000, 0x1fffff).ram().share("kram_page1");
+	}
 }
 
 
@@ -47,8 +54,10 @@ huc6272_device::huc6272_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, HUC6272, tag, owner, clock),
 		device_memory_interface(mconfig, *this),
 		m_huc6271(*this, finder_base::DUMMY_TAG),
-		m_program_space_config("microprg", ENDIANNESS_LITTLE, 16, 4, 0, address_map_constructor(), address_map_constructor(FUNC(huc6272_device::microprg_map), this)),
-		m_data_space_config("kram", ENDIANNESS_LITTLE, 32, 21, 0, address_map_constructor(), address_map_constructor(FUNC(huc6272_device::kram_map), this)),
+		m_cdda_l(*this, "cdda_l"),
+		m_cdda_r(*this, "cdda_r"),
+		m_program_space_config("microprg", ENDIANNESS_LITTLE, 16, 4, 0, address_map_constructor(FUNC(huc6272_device::microprg_map), this)),
+		m_data_space_config("kram", ENDIANNESS_LITTLE, 32, 21, 0, address_map_constructor(FUNC(huc6272_device::kram_map), this)),
 		m_microprg_ram(*this, "microprg_ram"),
 		m_kram_page0(*this, "kram_page0"),
 		m_kram_page1(*this, "kram_page1"),
@@ -547,6 +556,14 @@ READ8_MEMBER(huc6272_device::adpcm_update_1)
 	return adpcm_update(1);
 }
 
+WRITE8_MEMBER(huc6272_device::cdda_update)
+{
+	if (offset)
+		m_cdda_r->set_output_gain(ALL_OUTPUTS, float(data) / 63.0);
+	else
+		m_cdda_l->set_output_gain(ALL_OUTPUTS, float(data) / 63.0);
+}
+
 void huc6272_device::interrupt_update()
 {
 	if (m_adpcm.interrupt)
@@ -555,12 +572,22 @@ void huc6272_device::interrupt_update()
 		m_irq_changed_cb(CLEAR_LINE);
 }
 
+void huc6272_device::cdrom_config(device_t *device)
+{
+	cdda_device *cdda = device->subdevice<cdda_device>("cdda");
+	cdda->add_route(0, "^^cdda_l", 1.0);
+	cdda->add_route(1, "^^cdda_r", 1.0);
+}
+
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
 void huc6272_device::device_add_mconfig(machine_config &config)
 {
+	SPEAKER(config, m_cdda_l).front_left();
+	SPEAKER(config, m_cdda_r).front_right();
+
 	scsi_port_device &scsibus(SCSI_PORT(config, "scsi"));
 	scsibus.set_data_input_buffer("scsi_data_in");
 	scsibus.rst_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::write_bit7));
@@ -578,4 +605,5 @@ void huc6272_device::device_add_mconfig(machine_config &config)
 	INPUT_BUFFER(config, "scsi_data_in");
 
 	scsibus.set_slot_device(1, "cdrom", SCSICD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_1));
+	scsibus.slot(1).set_option_machine_config("cdrom", cdrom_config);
 }

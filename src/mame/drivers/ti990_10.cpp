@@ -136,7 +136,7 @@ void ti990_10_state::ti990_set_int_line(int line, int state)
 	{
 		for (level = 0; ! (m_intlines & (1 << level)); level++)
 			;
-		m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, level);  /* interrupt it, baby */
+		m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, level);  /* TI990_10 - interrupt it, baby */
 	}
 	else
 		m_maincpu->set_input_line(0, CLEAR_LINE);
@@ -300,11 +300,11 @@ void ti990_10_state::ti990_10_io(address_map &map)
 {
 	map(0x10, 0x11).r(m_terminal, FUNC(vdt911_device::cru_r));
 	map(0x80, 0x8f).w(m_terminal, FUNC(vdt911_device::cru_w));
-	map(0x1fa, 0x1fb).noprw(); // AM_READ(ti990_10_mapper_cru_r)
-	map(0x1fc, 0x1fd).noprw(); // AM_READ(ti990_10_eir_cru_r)
+	map(0x1fa, 0x1fb).noprw(); // .r(FUNC(ti990_10_state::ti990_10_mapper_cru_r));
+	map(0x1fc, 0x1fd).noprw(); // .r(FUNC(ti990_10_state::ti990_10_eir_cru_r));
 	map(0x1fe, 0x1ff).r(FUNC(ti990_10_state::ti990_panel_read));
-	map(0xfd0, 0xfdf).noprw(); // AM_WRITE(ti990_10_mapper_cru_w)
-	map(0xfe0, 0xfef).noprw(); // AM_WRITE(ti990_10_eir_cru_w)
+	map(0xfd0, 0xfdf).noprw(); // .w(FUNC(ti990_10_state::ti990_10_mapper_cru_w));
+	map(0xfe0, 0xfef).noprw(); // .w(FUNC(ti990_10_state::ti990_10_eir_cru_w));
 	map(0xff0, 0xfff).w(FUNC(ti990_10_state::ti990_panel_write));
 
 }
@@ -317,7 +317,8 @@ WRITE_LINE_MEMBER(ti990_10_state::tape_interrupt)
 	// set_int9(state);
 }
 
-MACHINE_CONFIG_START(ti990_10_state::ti990_10)
+void ti990_10_state::ti990_10(machine_config &config)
+{
 	/* basic machine hardware */
 	/* TI990/10 CPU @ 4.0(???) MHz */
 	TI990_10(config, m_maincpu, 4000000);
@@ -330,11 +331,15 @@ MACHINE_CONFIG_START(ti990_10_state::ti990_10)
 	m_terminal->lineint_cb().set(FUNC(ti990_10_state::line_interrupt));
 
 	// Hard disk
-	TI990_HDC(config, "hdc", 0).int_cb().set(FUNC(ti990_10_state::ti990_set_int13));
+	ti990_hdc_device &hdc(TI990_HDC(config, "hdc", 0));
+	hdc.set_memory_space(m_maincpu, AS_PROGRAM);
+	hdc.int_cb().set(FUNC(ti990_10_state::ti990_set_int13));
 
 	// Tape controller
-	TI990_TAPE_CTRL(config, "tpc", 0).int_cb().set(FUNC(ti990_10_state::tape_interrupt));
-MACHINE_CONFIG_END
+	tap_990_device &tpc(TI990_TAPE_CTRL(config, "tpc", 0));
+	tpc.set_memory_space(m_maincpu, AS_PROGRAM);
+	tpc.int_cb().set(FUNC(ti990_10_state::tape_interrupt));
+}
 
 
 /*

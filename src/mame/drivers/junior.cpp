@@ -124,7 +124,7 @@ PORT_START("LINE0")         /* IN0 keys row 0 */
 	PORT_START("LINE3")         /* IN3 STEP and RESET keys, MODE switch */
 	PORT_BIT( 0x80, 0x00, IPT_UNUSED )
 	PORT_BIT( 0x40, 0x40, IPT_KEYBOARD ) PORT_NAME("sw1: ST") PORT_CODE(KEYCODE_F7)
-	PORT_BIT( 0x20, 0x20, IPT_KEYBOARD ) PORT_NAME("sw2: RST") PORT_CODE(KEYCODE_F3) PORT_CHANGED_MEMBER(DEVICE_SELF, junior_state, junior_reset, nullptr)
+	PORT_BIT( 0x20, 0x20, IPT_KEYBOARD ) PORT_NAME("sw2: RST") PORT_CODE(KEYCODE_F3) PORT_CHANGED_MEMBER(DEVICE_SELF, junior_state, junior_reset, 0)
 	PORT_DIPNAME(0x10, 0x10, "sw3: SS (NumLock)") PORT_CODE(KEYCODE_NUMLOCK) PORT_TOGGLE
 	PORT_DIPSETTING( 0x00, "single step")
 	PORT_DIPSETTING( 0x10, "run")
@@ -225,25 +225,26 @@ void junior_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(junior_state::junior)
+void junior_state::junior(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",M6502, 1_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(junior_mem)
-	MCFG_QUANTUM_TIME(attotime::from_hz(50))
+	M6502(config, m_maincpu, 1_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &junior_state::junior_mem);
+	config.set_maximum_quantum(attotime::from_hz(50));
 
 	/* video hardware */
 	config.set_default_layout(layout_junior);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("riot", MOS6532_NEW, 1_MHz_XTAL)
-	MCFG_MOS6530n_IN_PA_CB(READ8(*this, junior_state, junior_riot_a_r))
-	MCFG_MOS6530n_OUT_PA_CB(WRITE8(*this, junior_state, junior_riot_a_w))
-	MCFG_MOS6530n_IN_PB_CB(READ8(*this, junior_state, junior_riot_b_r))
-	MCFG_MOS6530n_OUT_PB_CB(WRITE8(*this, junior_state, junior_riot_b_w))
-	MCFG_MOS6530n_IRQ_CB(INPUTLINE("maincpu", M6502_IRQ_LINE))
+	MOS6532_NEW(config, m_riot, 1_MHz_XTAL);
+	m_riot->pa_rd_callback().set(FUNC(junior_state::junior_riot_a_r));
+	m_riot->pa_wr_callback().set(FUNC(junior_state::junior_riot_a_w));
+	m_riot->pb_rd_callback().set(FUNC(junior_state::junior_riot_b_r));
+	m_riot->pb_wr_callback().set(FUNC(junior_state::junior_riot_b_w));
+	m_riot->irq_wr_callback().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("led_timer", junior_state, junior_update_leds, attotime::from_hz(50))
-MACHINE_CONFIG_END
+	TIMER(config, "led_timer").configure_periodic(FUNC(junior_state::junior_update_leds), attotime::from_hz(50));
+}
 
 
 /* ROM definition */

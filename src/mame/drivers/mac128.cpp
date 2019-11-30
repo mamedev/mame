@@ -102,6 +102,8 @@ c0   8 data bits, Rx disabled
 #include "softlist.h"
 #include "speaker.h"
 
+#include "bus/macpds/hyperdrive.h"
+
 #define MAC_SCREEN_NAME "screen"
 #define MAC_539X_1_TAG "539x_1"
 #define MAC_539X_2_TAG "539x_2"
@@ -109,8 +111,8 @@ c0   8 data bits, Rx disabled
 #define DAC_TAG "macdac"
 #define SCC_TAG "scc"
 
-#define C7M (7833600)
-#define C3_7M (3916800)
+#define C7M (15.6672_MHz_XTAL / 2)
+#define C3_7M (15.6672_MHz_XTAL / 4).value()
 
 // uncomment to run i8021 keyboard in original Mac/512(e)/Plus
 //#define MAC_USE_EMULATED_KBD (1)
@@ -220,6 +222,7 @@ private:
 	int m_last_was_x;
 	int m_screen_buffer;
 	emu_timer *m_scan_timer;
+	emu_timer *m_hblank_timer;
 
 	// interrupts
 	int m_scc_interrupt, m_via_interrupt, m_scsi_interrupt, m_last_taken_interrupt;
@@ -246,8 +249,8 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(set_scc_interrupt);
 
 	TIMER_CALLBACK_MEMBER(mac_scanline);
+	TIMER_CALLBACK_MEMBER(mac_hblank);
 	DECLARE_VIDEO_START(mac);
-	void palette_init(palette_device &palette);
 	uint32_t screen_update_mac(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 #ifndef MAC_USE_EMULATED_KBD
 	TIMER_CALLBACK_MEMBER(kbd_clock);
@@ -292,8 +295,8 @@ void mac128_state::machine_start()
 	m_ram_mask = m_ram_size - 1;
 	m_rom_ptr = (u16*)memregion("bootrom")->base();
 
-	if (!m_scan_timer)
-		m_scan_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mac128_state::mac_scanline), this));
+	m_scan_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mac128_state::mac_scanline), this));
+	m_hblank_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mac128_state::mac_hblank), this));
 }
 
 void mac128_state::machine_reset()
@@ -301,7 +304,6 @@ void mac128_state::machine_reset()
 	m_via_cycles = -10;
 	m_last_taken_interrupt = -1;
 	m_overlay = 1;
-	m_maincpu->reset();
 	m_screen_buffer = 1;
 #ifndef MAC_USE_EMULATED_KBD
 	m_keyboard_reply = 0;
@@ -321,6 +323,8 @@ void mac128_state::machine_reset()
 
 	const int next_vpos = m_screen->vpos() + 1;
 	m_scan_timer->adjust(m_screen->time_until_pos(next_vpos), next_vpos);
+	if (m_screen->vblank())
+		m_via->write_pb6(0);
 }
 
 READ16_MEMBER(mac128_state::ram_r)
@@ -452,6 +456,13 @@ TIMER_CALLBACK_MEMBER(mac128_state::mac_scanline)
 		vblank_irq();
 	}
 
+	/* video beam in display (! VBLANK && ! HBLANK basically) */
+	if (scanline < MAC_V_VIS)
+	{
+		m_via->write_pb6(1);
+		m_hblank_timer->adjust(m_screen->time_until_pos(scanline, MAC_H_VIS));
+	}
+
 	if (!(scanline % 10))
 	{
 		mouse_callback();
@@ -468,6 +479,11 @@ TIMER_CALLBACK_MEMBER(mac128_state::mac_scanline)
 
 	m_dac->write(mac_snd_buf_ptr[scanline] >> 8);
 	m_scan_timer->adjust(m_screen->time_until_pos(scanline+1), (scanline+1) % m_screen->height());
+}
+
+TIMER_CALLBACK_MEMBER(mac128_state::mac_hblank)
+{
+	m_via->write_pb6(0);
 }
 
 WRITE_LINE_MEMBER(mac128_state::mac_scsi_irq)
@@ -507,6 +523,7 @@ void mac128_state::scc_mouse_irq(int x, int y)
 	static int lasty = 0;
 	static int lastx = 0;
 
+	// DCD lines are active low in hardware but active high to software
 	if (x && y)
 	{
 		if (m_last_was_x)
@@ -515,12 +532,12 @@ void mac128_state::scc_mouse_irq(int x, int y)
 			{
 				if(lastx)
 				{
-					m_scc->dcda_w(CLEAR_LINE);
+					m_scc->dcda_w(1);
 					m_mouse_bit_x = 0;
 				}
 				else
 				{
-					m_scc->dcda_w(ASSERT_LINE);
+					m_scc->dcda_w(0);
 					m_mouse_bit_x = 1;
 				}
 			}
@@ -528,12 +545,12 @@ void mac128_state::scc_mouse_irq(int x, int y)
 			{
 				if(lastx)
 				{
-					m_scc->dcda_w(CLEAR_LINE);
+					m_scc->dcda_w(1);
 					m_mouse_bit_x = 1;
 				}
 				else
 				{
-					m_scc->dcda_w(ASSERT_LINE);
+					m_scc->dcda_w(0);
 					m_mouse_bit_x = 0;
 				}
 			}
@@ -545,12 +562,12 @@ void mac128_state::scc_mouse_irq(int x, int y)
 			{
 				if(lasty)
 				{
-					m_scc->dcdb_w(CLEAR_LINE);
+					m_scc->dcdb_w(1);
 					m_mouse_bit_y = 0;
 				}
 				else
 				{
-					m_scc->dcdb_w(ASSERT_LINE);
+					m_scc->dcdb_w(0);
 					m_mouse_bit_y = 1;
 				}
 			}
@@ -558,12 +575,12 @@ void mac128_state::scc_mouse_irq(int x, int y)
 			{
 				if(lasty)
 				{
-					m_scc->dcdb_w(CLEAR_LINE);
+					m_scc->dcdb_w(1);
 					m_mouse_bit_y = 1;
 				}
 				else
 				{
-					m_scc->dcdb_w(ASSERT_LINE);
+					m_scc->dcdb_w(0);
 					m_mouse_bit_y = 0;
 				}
 			}
@@ -580,12 +597,12 @@ void mac128_state::scc_mouse_irq(int x, int y)
 			{
 				if(lastx)
 				{
-					m_scc->dcda_w(CLEAR_LINE);
+					m_scc->dcda_w(1);
 					m_mouse_bit_x = 0;
 				}
 				else
 				{
-					m_scc->dcda_w(ASSERT_LINE);
+					m_scc->dcda_w(0);
 					m_mouse_bit_x = 1;
 				}
 			}
@@ -593,12 +610,12 @@ void mac128_state::scc_mouse_irq(int x, int y)
 			{
 				if(lastx)
 				{
-					m_scc->dcda_w(CLEAR_LINE);
+					m_scc->dcda_w(1);
 					m_mouse_bit_x = 1;
 				}
 				else
 				{
-					m_scc->dcda_w(ASSERT_LINE);
+					m_scc->dcda_w(0);
 					m_mouse_bit_x = 0;
 				}
 			}
@@ -610,12 +627,12 @@ void mac128_state::scc_mouse_irq(int x, int y)
 			{
 				if(lasty)
 				{
-					m_scc->dcdb_w(CLEAR_LINE);
+					m_scc->dcdb_w(1);
 					m_mouse_bit_y = 0;
 				}
 				else
 				{
-					m_scc->dcdb_w(ASSERT_LINE);
+					m_scc->dcdb_w(0);
 					m_mouse_bit_y = 1;
 				}
 			}
@@ -623,12 +640,12 @@ void mac128_state::scc_mouse_irq(int x, int y)
 			{
 				if(lasty)
 				{
-					m_scc->dcdb_w(CLEAR_LINE);
+					m_scc->dcdb_w(1);
 					m_mouse_bit_y = 1;
 				}
 				else
 				{
-					m_scc->dcdb_w(ASSERT_LINE);
+					m_scc->dcdb_w(0);
 					m_mouse_bit_y = 0;
 				}
 			}
@@ -698,10 +715,7 @@ WRITE16_MEMBER ( mac128_state::mac_via_w )
 	if (LOG_VIA)
 		logerror("mac_via_w: offset=0x%02x data=0x%08x\n", offset, data);
 
-	if (ACCESSING_BITS_0_7)
-		m_via->write(offset, data & 0xff);
-	if (ACCESSING_BITS_8_15)
-		m_via->write(offset, (data >> 8) & 0xff);
+	m_via->write(offset, (data >> 8) & 0xff);
 
 	m_maincpu->adjust_icount(m_via_cycles);
 }
@@ -734,10 +748,7 @@ READ8_MEMBER(mac128_state::mac_via_in_a)
 
 READ8_MEMBER(mac128_state::mac_via_in_b)
 {
-	int val = 0;
-	/* video beam in display (! VBLANK && ! HBLANK basically) */
-	if (m_screen->vpos() >= MAC_V_VIS)
-		val |= 0x40;
+	int val = 0x40;
 
 	if (m_mouse_bit_y)  /* Mouse Y2 */
 		val |= 0x20;
@@ -1231,12 +1242,6 @@ void mac128_state::mac128_state_load()
 {
 }
 
-void mac128_state::palette_init(palette_device &palette)
-{
-	palette.set_pen_color(0, 0xff, 0xff, 0xff);
-	palette.set_pen_color(1, 0x00, 0x00, 0x00);
-}
-
 VIDEO_START_MEMBER(mac128_state,mac)
 {
 }
@@ -1290,8 +1295,8 @@ void mac128_state::mac512ke_map(address_map &map)
 	map(0x000000, 0x3fffff).rw(FUNC(mac128_state::ram_r), FUNC(mac128_state::ram_w));
 	map(0x400000, 0x4fffff).rom().region("bootrom", 0).mirror(0x100000);
 	map(0x600000, 0x6fffff).rw(FUNC(mac128_state::ram_600000_r), FUNC(mac128_state::ram_600000_w));
-	map(0x800000, 0x9fffff).r(m_scc, FUNC(z80scc_device::cd_ab_r)).umask16(0xff00);
-	map(0xa00000, 0xbfffff).w(m_scc, FUNC(z80scc_device::cd_ab_w)).umask16(0x00ff);
+	map(0x800000, 0x9fffff).r(m_scc, FUNC(z80scc_device::dc_ab_r)).umask16(0xff00);
+	map(0xa00000, 0xbfffff).w(m_scc, FUNC(z80scc_device::dc_ab_w)).umask16(0x00ff);
 	map(0xc00000, 0xdfffff).rw(FUNC(mac128_state::mac_iwm_r), FUNC(mac128_state::mac_iwm_w));
 	map(0xe80000, 0xefffff).rw(FUNC(mac128_state::mac_via_r), FUNC(mac128_state::mac_via_w));
 	map(0xfffff0, 0xffffff).rw(FUNC(mac128_state::mac_autovector_r), FUNC(mac128_state::mac_autovector_w));
@@ -1302,8 +1307,8 @@ void mac128_state::macplus_map(address_map &map)
 	map(0x000000, 0x3fffff).rw(FUNC(mac128_state::ram_r), FUNC(mac128_state::ram_w));
 	map(0x400000, 0x4fffff).rom().region("bootrom", 0);
 	map(0x580000, 0x5fffff).rw(FUNC(mac128_state::macplus_scsi_r), FUNC(mac128_state::macplus_scsi_w));
-	map(0x800000, 0x9fffff).r(m_scc, FUNC(z80scc_device::cd_ab_r)).umask16(0xff00);
-	map(0xa00000, 0xbfffff).w(m_scc, FUNC(z80scc_device::cd_ab_w)).umask16(0x00ff);
+	map(0x800000, 0x9fffff).r(m_scc, FUNC(z80scc_device::dc_ab_r)).umask16(0xff00);
+	map(0xa00000, 0xbfffff).w(m_scc, FUNC(z80scc_device::dc_ab_w)).umask16(0x00ff);
 	map(0xc00000, 0xdfffff).rw(FUNC(mac128_state::mac_iwm_r), FUNC(mac128_state::mac_iwm_w));
 	map(0xe80000, 0xefffff).rw(FUNC(mac128_state::mac_via_r), FUNC(mac128_state::mac_via_w));
 	map(0xfffff0, 0xffffff).rw(FUNC(mac128_state::mac_autovector_r), FUNC(mac128_state::mac_autovector_w));
@@ -1334,21 +1339,25 @@ static const floppy_interface mac_floppy_interface =
 	"floppy_3_5"
 };
 
+static void mac_pds_cards(device_slot_interface &device)
+{
+	device.option_add("hyperdrive", PDS_HYPERDRIVE);  // GCC HyperDrive ST-506 interface
+}
+
 void mac128_state::mac512ke(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, C7M);        /* 7.8336 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &mac128_state::mac512ke_map);
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(C7M*2, MAC_H_TOTAL, 0, MAC_H_VIS, MAC_V_TOTAL, 0, MAC_V_VIS);
+	m_screen->set_raw(15.6672_MHz_XTAL, MAC_H_TOTAL, 0, MAC_H_VIS, MAC_V_TOTAL, 0, MAC_V_VIS);
 	m_screen->set_screen_update(FUNC(mac128_state::screen_update_mac));
 	m_screen->set_palette("palette");
 
-	palette_device &palette(PALETTE(config, "palette", 2));
-	palette.set_init(DEVICE_SELF, FUNC(mac128_state::palette_init));
+	PALETTE(config, "palette", palette_device::MONOCHROME_INVERTED);
 
 	MCFG_VIDEO_START_OVERRIDE(mac128_state,mac)
 
@@ -1356,7 +1365,6 @@ void mac128_state::mac512ke(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 	DAC_8BIT_PWM(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // 2 x ls161
 	voltage_regulator_device &vreg(VOLTAGE_REGULATOR(config, "vref"));
-	vreg.set_output(5.0);
 	vreg.add_route(0, DAC_TAG, 1.0, DAC_VREF_POS_INPUT);
 	vreg.add_route(0, DAC_TAG, -1.0, DAC_VREF_NEG_INPUT);
 
@@ -1388,6 +1396,9 @@ void mac128_state::mac512ke(machine_config &config)
 	/* internal ram */
 	RAM(config, m_ram);
 	m_ram->set_default_size("512K");
+
+	MACPDS(config, "macpds", "maincpu");
+	MACPDS_SLOT(config, "pds", "macpds", mac_pds_cards, nullptr);
 
 	// software list
 	SOFTWARE_LIST(config, "flop35_list").set_type("mac_flop", SOFTWARE_LIST_ORIGINAL_SYSTEM);
@@ -1497,7 +1508,7 @@ static INPUT_PORTS_START( macplus )
 	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_UNUSED)    /* keyboard Enter : */
 	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_UNUSED)    /* escape: */
 	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_UNUSED)    /* ??? */
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Command") PORT_CODE(KEYCODE_LCONTROL)
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Command") PORT_CODE(KEYCODE_RALT)
 	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Caps Lock") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
 	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Option") PORT_CODE(KEYCODE_LALT) PORT_CHAR(UCHAR_SHIFT_2)
@@ -1719,7 +1730,7 @@ ROM_END
 //COMP( 1983, mactw,    0,       0,      mac128k,  macplus, mac128_state, init_mac128k512k, "Apple Computer",    "Macintosh (4.3T Prototype)",  MACHINE_NOT_WORKING )
 COMP( 1984, mac128k,  0,       0,      mac128k,  macplus, mac128_state, init_mac128k512k, "Apple Computer",    "Macintosh 128k",  MACHINE_NOT_WORKING )
 COMP( 1984, mac512k,  mac128k, 0,      mac512ke, macplus, mac128_state, init_mac128k512k, "Apple Computer",    "Macintosh 512k",  MACHINE_NOT_WORKING )
-COMP( 1986, mac512ke, macplus, 0,      mac512ke, macplus, mac128_state, init_mac512ke,    "Apple Computer",    "Macintosh 512ke", 0 )
+COMP( 1986, mac512ke, macplus, 0,      mac512ke, macplus, mac128_state, init_mac512ke,    "Apple Computer",    "Macintosh 512ke", MACHINE_NOT_WORKING )
 COMP( 1985, unitron,  macplus, 0,      mac512ke, macplus, mac128_state, init_mac512ke,    "bootleg (Unitron)", "Mac 512",  MACHINE_NOT_WORKING )
-COMP( 1986, macplus,  0,       0,      macplus,  macplus, mac128_state, init_macplus,     "Apple Computer",    "Macintosh Plus",  0 )
-COMP( 1985, utrn1024, macplus, 0,      macplus,  macplus, mac128_state, init_macplus,     "bootleg (Unitron)", "Unitron 1024",  0 )
+COMP( 1986, macplus,  0,       0,      macplus,  macplus, mac128_state, init_macplus,     "Apple Computer",    "Macintosh Plus",  MACHINE_NOT_WORKING )
+COMP( 1985, utrn1024, macplus, 0,      macplus,  macplus, mac128_state, init_macplus,     "bootleg (Unitron)", "Unitron 1024",  MACHINE_NOT_WORKING )

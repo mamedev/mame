@@ -34,7 +34,6 @@
 #include "sound/mos7360.h"
 #include "sound/t6721a.h"
 
-#define MOS7501_TAG         "u2"
 #define MOS7360_TAG         "u1"
 #define MOS6551_TAG         "u3"
 #define MOS6529_USER_TAG    "u5"
@@ -52,7 +51,7 @@ class plus4_state : public driver_device
 public:
 	plus4_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_maincpu(*this, MOS7501_TAG),
+		m_maincpu(*this, "u2"),
 		m_pla(*this, PLA_TAG),
 		m_ted(*this, MOS7360_TAG),
 		m_acia(*this, MOS6551_TAG),
@@ -122,7 +121,7 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER( write_kb6 ) { if (state) m_kb |= 64; else m_kb &= ~64; }
 	DECLARE_WRITE_LINE_MEMBER( write_kb7 ) { if (state) m_kb |= 128; else m_kb &= ~128; }
 
-	DECLARE_QUICKLOAD_LOAD_MEMBER( cbm_c16 );
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_c16);
 
 	enum
 	{
@@ -190,7 +189,7 @@ private:
 
 
 
-QUICKLOAD_LOAD_MEMBER( plus4_state, cbm_c16 )
+QUICKLOAD_LOAD_MEMBER(plus4_state::quickload_c16)
 {
 	return general_cbm_loadsnap(image, file_type, quickload_size, m_maincpu->space(AS_PROGRAM), 0, cbm_quick_sethiaddress);
 }
@@ -295,7 +294,7 @@ uint8_t plus4_state::read_memory(address_space &space, offs_t offset, int ba, in
 	}
 	else if (!_6551 && m_acia)
 	{
-		data = m_acia->read(space, offset & 0x03);
+		data = m_acia->read(offset & 0x03);
 	}
 	else if (!keyport)
 	{
@@ -371,7 +370,7 @@ uint8_t plus4_state::read_memory(address_space &space, offs_t offset, int ba, in
 		data = m_ram->pointer()[offset & m_ram->mask()];
 	}
 
-	return m_exp->cd_r(space, offset, data, ba, cs0, c1l, c1h, cs1, c2l, c2h);
+	return m_exp->cd_r(offset, data, ba, cs0, c1l, c1h, cs1, c2l, c2h);
 }
 
 
@@ -416,7 +415,7 @@ WRITE8_MEMBER( plus4_state::write )
 	}
 	else if (!_6551 && m_acia)
 	{
-		m_acia->write(space, offset & 0x03, data);
+		m_acia->write(offset & 0x03, data);
 	}
 	else if (!addr_clk)
 	{
@@ -431,7 +430,7 @@ WRITE8_MEMBER( plus4_state::write )
 		m_ram->pointer()[offset & m_ram->mask()] = data;
 	}
 
-	m_exp->cd_w(space, offset, data, ba, cs0, c1l, c1h, cs1, c2l, c2h);
+	m_exp->cd_w(offset, data, ba, cs0, c1l, c1h, cs1, c2l, c2h);
 }
 
 
@@ -837,27 +836,28 @@ void plus4_state::machine_reset()
 //**************************************************************************
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( plus4 )
+//  machine_config( plus4 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(plus4_state::plus4)
+void plus4_state::plus4(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD(MOS7501_TAG, M7501, 0)
-	MCFG_DEVICE_PROGRAM_MAP(plus4_mem)
-	MCFG_M6502_DISABLE_CACHE() // address decoding is 100% dynamic, no RAM/ROM banks
-	MCFG_M7501_PORT_CALLBACKS(READ8(*this, plus4_state, cpu_r), WRITE8(*this, plus4_state, cpu_w))
-	MCFG_M7501_PORT_PULLS(0x00, 0xc0)
-	MCFG_QUANTUM_PERFECT_CPU(MOS7501_TAG)
+	M7501(config, m_maincpu, 0);
+	m_maincpu->set_addrmap(AS_PROGRAM, &plus4_state::plus4_mem);
+	m_maincpu->read_callback().set(FUNC(plus4_state::cpu_r));
+	m_maincpu->write_callback().set(FUNC(plus4_state::cpu_w));
+	m_maincpu->set_pulls(0x00, 0xc0);
+	config.set_perfect_quantum(m_maincpu);
 
 	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, m7501_device::IRQ_LINE);
 
 	// video and sound hardware
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(mos7360_device::PAL_VRETRACERATE)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(336, 216)
-	MCFG_SCREEN_VISIBLE_AREA(0, 336 - 1, 0, 216 - 1)
-	MCFG_SCREEN_UPDATE_DEVICE(MOS7360_TAG, mos7360_device, screen_update)
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(mos7360_device::PAL_VRETRACERATE);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_size(336, 216);
+	screen.set_visarea(0, 336 - 1, 0, 216 - 1);
+	screen.set_screen_update(MOS7360_TAG, FUNC(mos7360_device::screen_update));
 
 	SPEAKER(config, "mono").front_center();
 
@@ -869,7 +869,7 @@ MACHINE_CONFIG_START(plus4_state::plus4)
 	m_ted->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	// devices
-	MCFG_PLS100_ADD(PLA_TAG)
+	PLS100(config, m_pla);
 
 	PET_USER_PORT(config, m_user, plus4_user_port_cards, nullptr);
 	m_user->p4_handler().set(m_spi_user, FUNC(mos6529_device::write_p2)); // cassette sense
@@ -893,130 +893,127 @@ MACHINE_CONFIG_START(plus4_state::plus4)
 	m_acia->txd_handler().set(m_user, FUNC(pet_user_port_device::write_m));
 	m_acia->irq_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
 
-	MCFG_DEVICE_ADD(m_spi_user, MOS6529, 0)
-	MCFG_MOS6529_P0_HANDLER(WRITELINE(m_user, pet_user_port_device, write_b))
-	MCFG_MOS6529_P1_HANDLER(WRITELINE(m_user, pet_user_port_device, write_k))
-	MCFG_MOS6529_P2_HANDLER(WRITELINE(m_user, pet_user_port_device, write_4))
-	MCFG_MOS6529_P3_HANDLER(WRITELINE(m_user, pet_user_port_device, write_5))
-	MCFG_MOS6529_P4_HANDLER(WRITELINE(m_user, pet_user_port_device, write_6))
-	MCFG_MOS6529_P5_HANDLER(WRITELINE(m_user, pet_user_port_device, write_7))
-	MCFG_MOS6529_P6_HANDLER(WRITELINE(m_user, pet_user_port_device, write_j))
-	MCFG_MOS6529_P7_HANDLER(WRITELINE(m_user, pet_user_port_device, write_f))
+	MOS6529(config, m_spi_user, 0);
+	m_spi_user->p_handler<0>().set(m_user, FUNC(pet_user_port_device::write_b));
+	m_spi_user->p_handler<1>().set(m_user, FUNC(pet_user_port_device::write_k));
+	m_spi_user->p_handler<2>().set(m_user, FUNC(pet_user_port_device::write_4));
+	m_spi_user->p_handler<3>().set(m_user, FUNC(pet_user_port_device::write_5));
+	m_spi_user->p_handler<4>().set(m_user, FUNC(pet_user_port_device::write_6));
+	m_spi_user->p_handler<5>().set(m_user, FUNC(pet_user_port_device::write_7));
+	m_spi_user->p_handler<6>().set(m_user, FUNC(pet_user_port_device::write_j));
+	m_spi_user->p_handler<7>().set(m_user, FUNC(pet_user_port_device::write_f));
 
-	MCFG_DEVICE_ADD(MOS6529_KB_TAG, MOS6529, 0)
-	MCFG_MOS6529_P0_HANDLER(WRITELINE(*this, plus4_state, write_kb0))
-	MCFG_MOS6529_P1_HANDLER(WRITELINE(*this, plus4_state, write_kb1))
-	MCFG_MOS6529_P2_HANDLER(WRITELINE(*this, plus4_state, write_kb2))
-	MCFG_MOS6529_P3_HANDLER(WRITELINE(*this, plus4_state, write_kb3))
-	MCFG_MOS6529_P4_HANDLER(WRITELINE(*this, plus4_state, write_kb4))
-	MCFG_MOS6529_P5_HANDLER(WRITELINE(*this, plus4_state, write_kb5))
-	MCFG_MOS6529_P6_HANDLER(WRITELINE(*this, plus4_state, write_kb6))
-	MCFG_MOS6529_P7_HANDLER(WRITELINE(*this, plus4_state, write_kb7))
+	MOS6529(config, m_spi_kb, 0);
+	m_spi_kb->p_handler<0>().set(FUNC(plus4_state::write_kb0));
+	m_spi_kb->p_handler<1>().set(FUNC(plus4_state::write_kb1));
+	m_spi_kb->p_handler<2>().set(FUNC(plus4_state::write_kb2));
+	m_spi_kb->p_handler<3>().set(FUNC(plus4_state::write_kb3));
+	m_spi_kb->p_handler<4>().set(FUNC(plus4_state::write_kb4));
+	m_spi_kb->p_handler<5>().set(FUNC(plus4_state::write_kb5));
+	m_spi_kb->p_handler<6>().set(FUNC(plus4_state::write_kb6));
+	m_spi_kb->p_handler<7>().set(FUNC(plus4_state::write_kb7));
 
-	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, plus4_datassette_devices, "c1531", NOOP)
+	PET_DATASSETTE_PORT(config, m_cassette, plus4_datassette_devices, "c1531");
+	m_cassette->read_handler().set_nop();
 
-	MCFG_CBM_IEC_ADD("c1541")
-	MCFG_CBM_IEC_BUS_ATN_CALLBACK(WRITELINE(m_user, pet_user_port_device, write_9))
+	cbm_iec_slot_device::add(config, m_iec, "c1541");
+	m_iec->atn_callback().set(m_user, FUNC(pet_user_port_device::write_9));
 
-	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, nullptr)
-	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, "joy")
-	MCFG_PLUS4_EXPANSION_SLOT_ADD(PLUS4_EXPANSION_SLOT_TAG, XTAL(14'318'181)/16, plus4_expansion_cards, nullptr)
-	MCFG_PLUS4_EXPANSION_SLOT_IRQ_CALLBACK(WRITELINE("mainirq", input_merger_device, in_w<2>))
-	MCFG_PLUS4_EXPANSION_SLOT_CD_INPUT_CALLBACK(READ8(*this, plus4_state, read))
-	MCFG_PLUS4_EXPANSION_SLOT_CD_OUTPUT_CALLBACK(WRITE8(*this, plus4_state, write))
-	MCFG_PLUS4_EXPANSION_SLOT_AEC_CALLBACK(INPUTLINE(MOS7501_TAG, INPUT_LINE_HALT))
+	VCS_CONTROL_PORT(config, m_joy1, vcs_control_port_devices, nullptr);
+	VCS_CONTROL_PORT(config, m_joy2, vcs_control_port_devices, "joy");
 
-	MCFG_QUICKLOAD_ADD("quickload", plus4_state, cbm_c16, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
+	PLUS4_EXPANSION_SLOT(config, m_exp, XTAL(14'318'181)/16, plus4_expansion_cards, nullptr);
+	m_exp->irq_wr_callback().set("mainirq", FUNC(input_merger_device::in_w<2>));
+	m_exp->cd_rd_callback().set(FUNC(plus4_state::read));
+	m_exp->cd_wr_callback().set(FUNC(plus4_state::write));
+	m_exp->aec_wr_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
+
+	QUICKLOAD(config, "quickload", "p00,prg", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(plus4_state::quickload_c16));
 
 	// internal ram
 	RAM(config, m_ram).set_default_size("64K");
-MACHINE_CONFIG_END
+}
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( plus4p )
+//  machine_config( plus4p )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(c16_state::plus4p)
+void c16_state::plus4p(machine_config &config)
+{
 	plus4(config);
-	MCFG_DEVICE_MODIFY(MOS7501_TAG)
-	MCFG_DEVICE_CLOCK(XTAL(17'734'470)/20)
-
-	MCFG_DEVICE_MODIFY(MOS7360_TAG)
-	MCFG_DEVICE_CLOCK(XTAL(17'734'470)/5)
+	m_maincpu->set_clock(XTAL(17'734'470)/20);
+	m_ted->set_clock(XTAL(17'734'470)/5);
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "plus4_cart")
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "plus4_cass")
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "plus4_flop")
-	MCFG_SOFTWARE_LIST_FILTER("cart_list", "PAL")
-	MCFG_SOFTWARE_LIST_FILTER("cass_list", "PAL")
-	MCFG_SOFTWARE_LIST_FILTER("flop_list", "PAL")
-MACHINE_CONFIG_END
-
+	SOFTWARE_LIST(config, "cart_list").set_original("plus4_cart");
+	SOFTWARE_LIST(config, "cass_list").set_original("plus4_cass");
+	SOFTWARE_LIST(config, "flop_list").set_original("plus4_flop");
+	subdevice<software_list_device>("cart_list")->set_filter("PAL");
+	subdevice<software_list_device>("cass_list")->set_filter("PAL");
+	subdevice<software_list_device>("flop_list")->set_filter("PAL");
+}
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( plus4n )
+//  machine_config( plus4n )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(c16_state::plus4n)
+void c16_state::plus4n(machine_config &config)
+{
 	plus4(config);
-	MCFG_DEVICE_MODIFY(MOS7501_TAG)
-	MCFG_DEVICE_CLOCK(XTAL(14'318'181)/16)
-
-	MCFG_DEVICE_MODIFY(MOS7360_TAG)
-	MCFG_DEVICE_CLOCK(XTAL(14'318'181)/4)
+	m_maincpu->set_clock(XTAL(14'318'181)/16);
+	m_ted->set_clock(XTAL(14'318'181)/4);
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "plus4_cart")
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "plus4_cass")
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "plus4_flop")
-	MCFG_SOFTWARE_LIST_FILTER("cart_list", "NTSC")
-	MCFG_SOFTWARE_LIST_FILTER("cass_list", "NTSC")
-	MCFG_SOFTWARE_LIST_FILTER("flop_list", "NTSC")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cart_list").set_original("plus4_cart");
+	SOFTWARE_LIST(config, "cass_list").set_original("plus4_cass");
+	SOFTWARE_LIST(config, "flop_list").set_original("plus4_flop");
+	subdevice<software_list_device>("cart_list")->set_filter("NTSC");
+	subdevice<software_list_device>("cass_list")->set_filter("NTSC");
+	subdevice<software_list_device>("flop_list")->set_filter("NTSC");
+}
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( c16n )
+//  machine_config( c16n )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(c16_state::c16n)
+void c16_state::c16n(machine_config &config)
+{
 	plus4n(config);
-	MCFG_DEVICE_MODIFY(MOS7501_TAG)
-	MCFG_M7501_PORT_CALLBACKS(READ8(*this, c16_state, cpu_r), WRITE8(*this, plus4_state, cpu_w))
-	MCFG_M7501_PORT_PULLS(0x00, 0xc0)
+	m_maincpu->read_callback().set(FUNC(c16_state::cpu_r));
+	m_maincpu->write_callback().set(FUNC(plus4_state::cpu_w));
+	m_maincpu->set_pulls(0x00, 0xc0);
 
-	MCFG_DEVICE_REMOVE(MOS6551_TAG)
-	MCFG_DEVICE_REMOVE(MOS6529_USER_TAG)
-	MCFG_DEVICE_REMOVE(PET_USER_PORT_TAG)
+	config.device_remove(MOS6551_TAG);
+	config.device_remove(MOS6529_USER_TAG);
+	config.device_remove(PET_USER_PORT_TAG);
 
-	MCFG_DEVICE_MODIFY(CBM_IEC_TAG)
-	MCFG_CBM_IEC_BUS_ATN_CALLBACK(NOOP)
+	m_iec->atn_callback().set_nop();
 
 	m_ram->set_default_size("16K").set_extra_options("64K");
-MACHINE_CONFIG_END
+}
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( c16p )
+//  machine_config( c16p )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(c16_state::c16p)
+void c16_state::c16p(machine_config &config)
+{
 	plus4p(config);
-	MCFG_DEVICE_MODIFY(MOS7501_TAG)
-	MCFG_M7501_PORT_CALLBACKS(READ8(*this, c16_state, cpu_r), WRITE8(*this, plus4_state, cpu_w))
-	MCFG_M7501_PORT_PULLS(0x00, 0xc0)
+	m_maincpu->read_callback().set(FUNC(c16_state::cpu_r));
+	m_maincpu->write_callback().set(FUNC(plus4_state::cpu_w));
+	m_maincpu->set_pulls(0x00, 0xc0);
 
-	MCFG_DEVICE_REMOVE(MOS6551_TAG)
-	MCFG_DEVICE_REMOVE(MOS6529_USER_TAG)
-	MCFG_DEVICE_REMOVE(PET_USER_PORT_TAG)
+	config.device_remove(MOS6551_TAG);
+	config.device_remove(MOS6529_USER_TAG);
+	config.device_remove(PET_USER_PORT_TAG);
 
-	MCFG_DEVICE_MODIFY(CBM_IEC_TAG)
-	MCFG_CBM_IEC_BUS_ATN_CALLBACK(NOOP)
+	m_iec->atn_callback().set_nop();
 
 	m_ram->set_default_size("16K").set_extra_options("64K");
-MACHINE_CONFIG_END
+}
 
 
 void c16_state::c232(machine_config &config)
@@ -1027,16 +1024,16 @@ void c16_state::c232(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( v364 )
+//  machine_config( v364 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(c16_state::v364)
+void c16_state::v364(machine_config &config)
+{
 	plus4n(config);
-	MCFG_DEVICE_ADD(T6721A_TAG, T6721A, XTAL(640'000))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	T6721A(config, T6721A_TAG, XTAL(640'000)).add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_MOS8706_ADD(MOS8706_TAG, XTAL(14'318'181)/16)
-MACHINE_CONFIG_END
+	MOS8706(config, m_vslsi, XTAL(14'318'181)/16);
+}
 
 
 

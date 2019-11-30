@@ -101,6 +101,7 @@ ToDo:
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
+#include "imagedev/floppy.h"
 #include "machine/mos6551.h"
 #include "machine/upd765.h"
 #include "machine/terminal.h"
@@ -144,7 +145,7 @@ READ8_MEMBER( d6809_state::term_r )
 WRITE8_MEMBER( d6809_state::term_w )
 {
 	if ((data > 0) && (data < 0x80))
-		m_terminal->write(space, 0, data);
+		m_terminal->write(data);
 }
 
 void d6809_state::mem_map(address_map &map)
@@ -157,7 +158,7 @@ void d6809_state::mem_map(address_map &map)
 	//map(0x00f0, 0x00f0).r(m_fdc, FUNC(upd765a_device::msr_r));
 	map(0x00ff, 0x00ff).rw(FUNC(d6809_state::term_r), FUNC(d6809_state::term_w));
 	map(0x0200, 0x0201).mirror(0xfe).m(m_fdc, FUNC(upd765a_device::map));
-	map(0x0300, 0x0300).mirror(0xff).lw8("tc", [this](u8 data){ m_fdc->tc_w(1); m_fdc->tc_w(0); } );
+	map(0x0300, 0x0300).mirror(0xff).lw8(NAME([this] (u8 data){ m_fdc->tc_w(1); m_fdc->tc_w(0); }));
 	map(0x1000, 0xdfff).ram();
 	map(0xe000, 0xffff).rom().region("roms", 0);
 }
@@ -188,24 +189,24 @@ static void floppies(device_slot_interface &device)
 }
 
 
-MACHINE_CONFIG_START(d6809_state::d6809)
+void d6809_state::d6809(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809E, XTAL(14'745'600) / 8) // MC68B09EP
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	MC6809E(config, m_maincpu, XTAL(14'745'600) / 8); // MC68B09EP
+	m_maincpu->set_addrmap(AS_PROGRAM, &d6809_state::mem_map);
 
-	MCFG_DEVICE_ADD("acia1", MOS6551, XTAL(14'745'600) / 8) // uses Q clock
-	MCFG_DEVICE_ADD("acia2", MOS6551, XTAL(14'745'600) / 8) // uses Q clock
+	MOS6551(config, "acia1", XTAL(14'745'600) / 8); // uses Q clock
+	MOS6551(config, "acia2", XTAL(14'745'600) / 8); // uses Q clock
 
 	/* video hardware */
-	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(d6809_state, kbd_put))
+	GENERIC_TERMINAL(config, m_terminal, 0);
+	m_terminal->set_keyboard_callback(FUNC(d6809_state::kbd_put));
 
 	// Floppy
-	UPD765A(config, m_fdc, true, true);
+	UPD765A(config, m_fdc, 8'000'000, true, true);
 	//m_fdc->drq_wr_callback().set(m_fdc, FUNC(upd765a_device::dack_w));   // pin not emulated
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", floppies, "525qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-MACHINE_CONFIG_END
+	FLOPPY_CONNECTOR(config, "fdc:0", floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
+}
 
 /* ROM definition */
 ROM_START( d6809 )

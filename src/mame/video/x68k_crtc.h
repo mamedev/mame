@@ -7,7 +7,7 @@
 class x68k_crtc_device : public device_t, public device_video_interface
 {
 public:
-	// device configuration
+	// device callback configuration
 	auto vdisp_cb() { return m_vdisp_callback.bind(); }
 	auto rint_cb() { return m_rint_callback.bind(); }
 	auto hsync_cb() { return m_hsync_callback.bind(); }
@@ -15,7 +15,15 @@ public:
 	auto tvram_write_cb() { return m_tvram_write_callback.bind(); }
 	auto gvram_read_cb() { return m_gvram_read_callback.bind(); }
 	auto gvram_write_cb() { return m_gvram_write_callback.bind(); }
-	// TODO: XTAL clocks
+
+	// clock configuration
+	void set_clock_69m(uint32_t clock) { m_clock_69m = clock; }
+	void set_clock_69m(const XTAL &xtal) { set_clock_69m(xtal.value()); }
+	void set_clock_50m(uint32_t clock) { m_clock_50m = clock; }
+	void set_clock_50m(const XTAL &xtal) { set_clock_50m(xtal.value()); }
+	u32 clock_39m() const { return clock(); }
+	u32 clock_69m() const { return m_clock_69m; }
+	u32 clock_50m() const { return m_clock_50m; }
 
 	DECLARE_WRITE16_MEMBER(crtc_w);
 	DECLARE_READ16_MEMBER(crtc_r);
@@ -69,6 +77,10 @@ private:
 	devcb_read16 m_gvram_read_callback;
 	devcb_write16 m_tvram_write_callback;
 	devcb_write16 m_gvram_write_callback;
+
+	// software-selectable oscillators
+	u32 m_clock_69m;
+	u32 m_clock_50m;
 
 	// internal state
 	u16 m_reg[24];  // registers

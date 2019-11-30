@@ -155,7 +155,7 @@ void imm4_22_device::map_ram_io()
 		{
 			memory_space().install_ram(start << 8, (start << 8) | 0x00ffU, m_memory);
 			status_space().install_ram(start << 6, (start << 6) | 0x003fU, m_status);
-			ram_ports_space().install_write_handler(start << 2, (start << 2) | 0x03U, write8_delegate(FUNC(imm4_22_device::ram_out), this));
+			ram_ports_space().install_write_handler(start << 2, (start << 2) | 0x03U, write8_delegate(*this, FUNC(imm4_22_device::ram_out)));
 		}
 
 		offs_t const rom_ports_start(offs_t(m_rom_page) << 6);
@@ -163,7 +163,7 @@ void imm4_22_device::map_ram_io()
 		offs_t const rom_ports_mirror(m_rom_mirror ? 0x1f00U : 0x0700U);
 		rom_ports_space().install_readwrite_handler(
 				rom_ports_start, rom_ports_end, 0U, rom_ports_mirror, 0U,
-				read8_delegate(FUNC(imm4_22_device::rom_in), this), write8_delegate(FUNC(imm4_22_device::rom_out), this));
+				read8_delegate(*this, FUNC(imm4_22_device::rom_in)), write8_delegate(*this, FUNC(imm4_22_device::rom_out)));
 
 		if (is_loaded())
 			map_prom();

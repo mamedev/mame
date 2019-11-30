@@ -9,9 +9,9 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "video/resnet.h"
 #include "includes/phoenix.h"
 
+#include "video/resnet.h"
 
 
 /***************************************************************************
@@ -77,53 +77,50 @@ static const res_net_info survival_net_info =
 	}
 };
 
-PALETTE_INIT_MEMBER(phoenix_state,phoenix)
+void phoenix_state::phoenix_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
-	std::vector<rgb_t> rgb;
+	uint8_t const *const color_prom = memregion("proms")->base();
 
+	std::vector<rgb_t> rgb;
 	compute_res_net_all(rgb, color_prom, phoenix_decode_info, phoenix_net_info);
-	/* native order */
-	for (i=0;i<256;i++)
+
+	// native order
+	for (int i = 0; i < 256; i++)
 	{
-		int col;
-		col = ((i << 3 ) & 0x18) | ((i>>2) & 0x07) | (i & 0x60);
-		palette.set_pen_color(i,rgb[col]);
+		int const col = bitswap<7>(i, 6, 5, 1, 0, 4, 3, 2);
+		palette.set_pen_color(i, rgb[col]);
 	}
 	palette.palette()->normalize_range(0, 255);
 }
 
-PALETTE_INIT_MEMBER(phoenix_state,survival)
+void phoenix_state::survival_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
-	std::vector<rgb_t> rgb;
+	uint8_t const *const color_prom = memregion("proms")->base();
 
+	std::vector<rgb_t> rgb;
 	compute_res_net_all(rgb, color_prom, phoenix_decode_info, survival_net_info);
-	/* native order */
-	for (i=0;i<256;i++)
+
+	// native order
+	for (int i = 0; i < 256; i++)
 	{
-		int col;
-		col = ((i << 3 ) & 0x18) | ((i>>2) & 0x07) | (i & 0x60);
-		palette.set_pen_color(i,rgb[col]);
+		int const col = bitswap<7>(i, 6, 5, 1, 0, 4, 3, 2);
+		palette.set_pen_color(i, rgb[col]);
 	}
 	palette.palette()->normalize_range(0, 255);
 }
 
-PALETTE_INIT_MEMBER(phoenix_state,pleiads)
+void phoenix_state::pleiads_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
-	std::vector<rgb_t> rgb;
+	uint8_t const *const color_prom = memregion("proms")->base();
 
+	std::vector<rgb_t> rgb;
 	compute_res_net_all(rgb, color_prom, phoenix_decode_info, pleiades_net_info);
-	/* native order */
-	for (i=0;i<256;i++)
+
+	// native order
+	for (int i = 0; i < 256; i++)
 	{
-		int col;
-		col = ((i << 3 ) & 0x18) | ((i>>2) & 0x07) | (i & 0xE0);
-		palette.set_pen_color(i,rgb[col]);
+		int const col = bitswap<8>(i, 7, 6, 5, 1, 0, 4, 3, 2);
+		palette.set_pen_color(i, rgb[col]);
 	}
 	palette.palette()->normalize_range(0, 255);
 }
@@ -181,8 +178,8 @@ VIDEO_START_MEMBER(phoenix_state,phoenix)
 	m_palette_bank = 0;
 	m_cocktail_mode = 0;
 
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(phoenix_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(phoenix_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(phoenix_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(phoenix_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);
 
@@ -305,7 +302,7 @@ CUSTOM_INPUT_MEMBER(phoenix_state::player_input_r)
 		return (ioport("CTRL")->read() & 0x0f) >> 0;
 }
 
-CUSTOM_INPUT_MEMBER(phoenix_state::pleiads_protection_r)
+READ_LINE_MEMBER(phoenix_state::pleiads_protection_r)
 {
 	/* handle Pleiads protection */
 	switch (m_pleiads_protection_question)

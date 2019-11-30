@@ -22,32 +22,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_AKIKO_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, AKIKO, 0)
-
-#define MCFG_AKIKO_MEM_READ_CB(_devcb) \
-	downcast<akiko_device &>(*device).set_mem_r_callback(DEVCB_##_devcb);
-
-#define MCFG_AKIKO_MEM_WRITE_CB(_devcb) \
-	downcast<akiko_device &>(*device).set_mem_w_callback(DEVCB_##_devcb);
-
-#define MCFG_AKIKO_INT_CB(_devcb) \
-	downcast<akiko_device &>(*device).set_int_w_callback(DEVCB_##_devcb);
-
-#define MCFG_AKIKO_SCL_HANDLER(_devcb) \
-	downcast<akiko_device &>(*device).set_scl_handler(DEVCB_##_devcb);
-
-#define MCFG_AKIKO_SDA_READ_HANDLER(_devcb) \
-	downcast<akiko_device &>(*device).set_sda_read_handler(DEVCB_##_devcb);
-
-#define MCFG_AKIKO_SDA_WRITE_HANDLER(_devcb) \
-	downcast<akiko_device &>(*device).set_sda_write_handler(DEVCB_##_devcb);
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 

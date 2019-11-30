@@ -92,7 +92,8 @@ osd_file::error win_open_ptty(std::string const &path, std::uint32_t openflags, 
 
 	if (INVALID_HANDLE_VALUE == pipe)
 	{
-		pipe = CreateNamedPipe(t_name.c_str(), PIPE_ACCESS_DUPLEX, PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_NOWAIT, 1, 32, 32, 0, nullptr);
+		if (openflags & OPEN_FLAG_CREATE)
+			pipe = CreateNamedPipe(t_name.c_str(), PIPE_ACCESS_DUPLEX, PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_NOWAIT, 1, 32, 32, 0, nullptr);
 		if (INVALID_HANDLE_VALUE == pipe)
 			return osd_file::error::ACCESS_DENIED;
 	}

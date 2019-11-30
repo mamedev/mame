@@ -867,7 +867,7 @@ done:
 	revised_path.clear();
 	if (filerr == osd_file::error::NONE)
 	{
-		/* cannonicalize mainpath */
+		/* canonicalize mainpath */
 		std::string alloc_fullpath;
 		filerr = osd_get_full_path(alloc_fullpath, mainpath);
 		if (filerr == osd_file::error::NONE)

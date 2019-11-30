@@ -8,12 +8,10 @@
  *
  */
 
-#pragma once
-
 #ifndef NLD_LEGACY_H_
 #define NLD_LEGACY_H_
 
-#include "../nl_setup.h"
+#include "netlist/nl_setup.h"
 
 // ----------------------------------------------------------------------------------------
 // Macros

@@ -132,7 +132,7 @@ private:
 
 	enum
 	{
-		LATENCY_MIN = 1,
+		LATENCY_MIN = 0,
 		LATENCY_MAX = 5,
 	};
 
@@ -261,8 +261,16 @@ int sound_pa::init(osd_options const &options)
 	// clamp to a probable figure
 	callback_interval = std::min<double>(callback_interval, 20.0);
 
-	// set the best guess callback interval to allowed count, each audio_latency step > 1 adds 20 ms
-	m_skip_threshold = ((std::max<double>(callback_interval, 10.0) + (m_audio_latency - 1) * 20.0) / 1000.0) * m_sample_rate * 2 + 0.5f;
+	if (m_audio_latency == 0)
+	{
+		// very-low-latency mode (set audio_latency to 0); pa_latency controls allowable audio jitter
+		m_skip_threshold = (options.pa_latency() ? options.pa_latency() : device_info->defaultLowOutputLatency) * m_sample_rate * 2 + 0.5f;
+	}
+	else
+	{
+		// set the best guess callback interval to allowed count, each audio_latency step > 1 adds 20 ms
+		m_skip_threshold = ((std::max<double>(callback_interval, 10.0) + (m_audio_latency - 1) * 20.0) / 1000.0) * m_sample_rate * 2 + 0.5f;
+	}
 
 	osd_printf_verbose("PortAudio: Using device \"%s\" on API \"%s\"\n", device_info->name, api_info->name);
 	osd_printf_verbose("PortAudio: Sample rate is %0.0f Hz, device output latency is %0.2f ms\n",
@@ -343,12 +351,23 @@ int sound_pa::callback(s16* output_buffer, size_t number_of_samples)
 		// if we have been above the set threshold for ~1 second, skip forward
 		if (m_osd_ticks - m_skip_threshold_ticks > m_osd_tps)
 		{
-			int adjust = m_buffer_min_ct - m_skip_threshold / 2;
-
-			// if adjustment is less than two milliseconds, don't bother
-			if (adjust / 2 > sample_rate() / 500) {
-				m_ab->increment_playpos(adjust);
+			if (m_audio_latency == 0)
+			{
+				// in very-low-latency mode, always skip forward the whole way
+				// to prevent input from appearing delayed (due to sound cues getting delayed)
+				m_ab->increment_playpos(m_buffer_min_ct);
+				//osd_printf_verbose("PortAudio: skip ahead %d samples\n", m_buffer_min_ct);
 				m_has_overflowed = true;
+			}
+			else
+			{
+				int adjust = m_buffer_min_ct - m_skip_threshold / 2;
+
+				// if adjustment is less than two milliseconds, don't bother
+				if (adjust / 2 > sample_rate() / 500) {
+					m_ab->increment_playpos(adjust);
+					m_has_overflowed = true;
+				}
 			}
 
 			m_skip_threshold_ticks = m_osd_ticks;

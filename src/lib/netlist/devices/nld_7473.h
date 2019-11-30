@@ -60,16 +60,18 @@
 #ifndef NLD_7473_H_
 #define NLD_7473_H_
 
-#include "../nl_setup.h"
+#include "netlist/nl_setup.h"
 
-#define TTL_7473(name, cCLK, cJ, cK, cCLRQ) \
-		NET_REGISTER_DEV(TTL_7473, name)        \
-		NET_CONNECT(name, CLK, cCLK)            \
-		NET_CONNECT(name, J, cJ)                \
-		NET_CONNECT(name, K, cK)                \
+#define TTL_7473(name, cCLK, cJ, cK, cCLRQ)                                    \
+		NET_REGISTER_DEV(TTL_7473, name)                                       \
+		NET_CONNECT(name, GND, GND)                                            \
+		NET_CONNECT(name, VCC, VCC)                                            \
+		NET_CONNECT(name, CLK, cCLK)                                           \
+		NET_CONNECT(name, J, cJ)                                               \
+		NET_CONNECT(name, K, cK)                                               \
 		NET_CONNECT(name, CLRQ, cCLRQ)
 
-#define TTL_7473A(name, cCLK, cJ, cK, cCLRQ)        \
+#define TTL_7473A(name, cCLK, cJ, cK, cCLRQ)                                   \
 		TTL_7473(name, cCLK, cJ, cK, cCLRQ)
 
 #define TTL_7473_DIP(name)                      \

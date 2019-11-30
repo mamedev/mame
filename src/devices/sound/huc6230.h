@@ -14,6 +14,7 @@ public:
 	huc6230_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template <unsigned N> auto adpcm_update_cb() { return m_adpcm_update_cb[N].bind(); }
+	auto cdda_cb() { return m_cdda_cb.bind(); }
 
 	// write only
 	DECLARE_WRITE8_MEMBER( write );
@@ -36,19 +37,24 @@ private:
 		uint8_t         m_playing;
 		int32_t         m_prev_sample;
 		int32_t         m_curr_sample;
+		int32_t         m_output;
 		uint32_t        m_pos;
 		uint8_t         m_input;
 	};
 
 	// internal state
 	sound_stream *m_stream;
+	emu_timer *m_adpcm_timer;
 	required_device<c6280_device> m_psg;
 	adpcm_channel m_adpcm_channel[2];
 	uint32_t m_adpcm_freq;
 	uint32_t m_cdda_lvol;
 	uint32_t m_cdda_rvol;
 
+	TIMER_CALLBACK_MEMBER(adpcm_timer);
+
 	devcb_read8 m_adpcm_update_cb[2];
+	devcb_write8 m_cdda_cb;
 };
 
 DECLARE_DEVICE_TYPE(HuC6230, huc6230_device)

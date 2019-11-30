@@ -413,6 +413,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
+#include "machine/ds1994.h"
 #include "sound/3812intf.h"
 #include "video/mc6845.h"
 //#include "sound/dac.h"
@@ -432,13 +433,14 @@
 class amaticmg_state : public driver_device
 {
 public:
-	amaticmg_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	amaticmg_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_attr(*this, "attr"),
 		m_vram(*this, "vram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
+		m_tch(*this, "touch_m"),
 		m_lamps(*this, "lamp%u", 0U)
 	{
 	}
@@ -446,29 +448,42 @@ public:
 	void amaticmg2(machine_config &config);
 	void amaticmg(machine_config &config);
 	void amaticmg4(machine_config &config);
+
 	void init_ama8000_3_o();
 	void init_ama8000_2_i();
 	void init_ama8000_2_v();
 	void init_ama8000_1_x();
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
 	required_shared_ptr<uint8_t> m_attr;
 	required_shared_ptr<uint8_t> m_vram;
 
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	optional_device<ds1994_device> m_tch;
+	output_finder<7> m_lamps;
+
+	uint8_t m_nmi_mask;
+
+	DECLARE_READ8_MEMBER(epm_code_r);
+	DECLARE_READ8_MEMBER(touchm_r);
+	DECLARE_WRITE8_MEMBER(touchm_w);
 	DECLARE_WRITE8_MEMBER(rombank_w);
 	DECLARE_WRITE8_MEMBER(nmi_mask_w);
 	DECLARE_WRITE8_MEMBER(unk80_w);
 
-	uint8_t m_nmi_mask;
 	DECLARE_WRITE8_MEMBER(out_a_w);
 	DECLARE_WRITE8_MEMBER(out_c_w);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(amaticmg);
-	DECLARE_PALETTE_INIT(amaticmg2);
-	uint32_t screen_update_amaticmg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_amaticmg2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void amaticmg_palette(palette_device &palette) const;
+	void amaticmg2_palette(palette_device &palette) const;
+	uint32_t screen_update_amaticmg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_amaticmg2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(amaticmg2_irq);
 	void encf(uint8_t ciphertext, int address, uint8_t &plaintext, int &newaddress);
 	void decrypt(int key1, int key2);
@@ -477,11 +492,6 @@ private:
 	void amaticmg4_portmap(address_map &map);
 	void amaticmg_map(address_map &map);
 	void amaticmg_portmap(address_map &map);
-
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-	output_finder<7> m_lamps;
 };
 
 
@@ -493,7 +503,7 @@ void amaticmg_state::video_start()
 {
 }
 
-uint32_t amaticmg_state::screen_update_amaticmg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t amaticmg_state::screen_update_amaticmg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 	int y, x;
@@ -518,7 +528,7 @@ uint32_t amaticmg_state::screen_update_amaticmg(screen_device &screen, bitmap_in
 	return 0;
 }
 
-uint32_t amaticmg_state::screen_update_amaticmg2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t amaticmg_state::screen_update_amaticmg2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 	int y, x;
@@ -542,53 +552,66 @@ uint32_t amaticmg_state::screen_update_amaticmg2(screen_device &screen, bitmap_i
 	return 0;
 }
 
-PALETTE_INIT_MEMBER(amaticmg_state, amaticmg)
+void amaticmg_state::amaticmg_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int bit0, bit1, bit2 , r, g, b;
-	int i;
+	uint8_t const *const color_prom = memregion("proms")->base();
 
-	for (i = 0; i < 0x200; ++i)
+	for (int i = 0; i < 0x200; ++i)
 	{
+		int bit0, bit1, bit2;
+
 		bit0 = 0;
-		bit1 = (color_prom[0] >> 6) & 0x01;
-		bit2 = (color_prom[0] >> 7) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		bit0 = (color_prom[0] >> 0) & 0x01;
-		bit1 = (color_prom[0] >> 1) & 0x01;
-		bit2 = (color_prom[0] >> 2) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		bit0 = (color_prom[0] >> 3) & 0x01;
-		bit1 = (color_prom[0] >> 4) & 0x01;
-		bit2 = (color_prom[0] >> 5) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit1 = BIT(color_prom[i], 6);
+		bit2 = BIT(color_prom[i], 7);
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		bit2 = BIT(color_prom[i], 2);
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		bit0 = BIT(color_prom[i], 3);
+		bit1 = BIT(color_prom[i], 4);
+		bit2 = BIT(color_prom[i], 5);
+		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
-		color_prom++;
 	}
 }
 
 
-PALETTE_INIT_MEMBER(amaticmg_state,amaticmg2)
+void amaticmg_state::amaticmg2_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	int r, g, b;
-	int i;
 
-	for (i = 0; i < memregion("proms")->bytes(); i+=2)
+	for (int i = 0, n = memregion("proms")->bytes(); i < n; i += 2)
 	{
-		b = ((color_prom[1] & 0xf8) >> 3);
-		g = ((color_prom[0] & 0xc0) >> 6) | ((color_prom[1] & 0x7) << 2);
-		r = ((color_prom[0] & 0x3e) >> 1);
+		int const b = ((color_prom[1] & 0xf8) >> 3);
+		int const g = ((color_prom[0] & 0xc0) >> 6) | ((color_prom[1] & 0x7) << 2);
+		int const r = ((color_prom[0] & 0x3e) >> 1);
 
 		palette.set_pen_color(i >> 1, pal5bit(r), pal5bit(g), pal5bit(b));
-		color_prom+=2;
+		color_prom += 2;
 	}
 }
 
 /************************************
 *       Read/Write Handlers         *
 ************************************/
+READ8_MEMBER( amaticmg_state::epm_code_r )
+{
+	return 0x65;
+}
+
+READ8_MEMBER( amaticmg_state::touchm_r )
+{
+	return m_tch->read() & 1;
+}
+
+WRITE8_MEMBER( amaticmg_state::touchm_w )
+{
+	m_tch->write(data & 1);
+}
 
 WRITE8_MEMBER( amaticmg_state::rombank_w )
 {
@@ -657,7 +680,7 @@ WRITE8_MEMBER( amaticmg_state::unk80_w )
 void amaticmg_state::amaticmg_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x9fff).ram(); // AM_SHARE("nvram")
+	map(0x8000, 0x9fff).ram(); // .share("nvram");
 	map(0xa000, 0xafff).ram().share("vram");
 	map(0xb000, 0xbfff).ram().share("attr");
 	map(0xc000, 0xffff).bankr("bank1");
@@ -673,20 +696,22 @@ void amaticmg_state::amaticmg_portmap(address_map &map)
 	map(0x61, 0x61).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x80, 0x80).w(FUNC(amaticmg_state::unk80_w));
 	map(0xc0, 0xc0).w(FUNC(amaticmg_state::rombank_w));
-//  AM_RANGE(0x00, 0x00) AM_DEVWRITE("dac1", dac_byte_interface, data_w)
-//  AM_RANGE(0x00, 0x00) AM_DEVWRITE("dac2", dac_byte_interface, data_w)
+//  map(0x00, 0x00).w("dac1", FUNC(dac_byte_interface::data_w));
+//  map(0x00, 0x00).w("dac2", FUNC(dac_byte_interface::data_w));
 }
 
 void amaticmg_state::amaticmg2_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-//  ADDRESS_MAP_UNMAP_HIGH
+//  map.unmap_value_high();
 	map(0x00, 0x03).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x20, 0x23).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x40, 0x41).w("ymsnd", FUNC(ym3812_device::write));
-	map(0x60, 0x60).w("crtc", FUNC(mc6845_device::address_w));                  // 0e for mg_iii_vger_3.64_v_8309
+	map(0x60, 0x60).w("crtc", FUNC(mc6845_device::address_w));                                    // 0e for mg_iii_vger_3.64_v_8309
 	map(0x61, 0x61).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w)); // 0f for mg_iii_vger_3.64_v_8309
 	map(0xc0, 0xc0).w(FUNC(amaticmg_state::rombank_w));
+	map(0xe0, 0xe0).rw(FUNC(amaticmg_state::touchm_r),FUNC(amaticmg_state::touchm_w));            // Touch Memory DS1994f
+	map(0xe4, 0xe4).r(FUNC(amaticmg_state::epm_code_r));                                          // Input(0x00E4)  must give back 0x65  in case of  EPM Code 8201
 	map(0xe6, 0xe6).w(FUNC(amaticmg_state::nmi_mask_w));
 	map(0xe8, 0xeb).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));
 }
@@ -694,14 +719,14 @@ void amaticmg_state::amaticmg2_portmap(address_map &map)
 void amaticmg_state::amaticmg4_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-//  ADDRESS_MAP_UNMAP_HIGH
+//  map.unmap_value_high();
 	map(0x00, 0x03).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x04, 0x07).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x08, 0x0b).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x50, 0x51).w("ymsnd", FUNC(ym3812_device::write));
 	map(0x0e, 0x0e).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x0f, 0x0f).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-//  AM_RANGE(0xc0, 0xc0) AM_WRITE(rombank_w)
+//  map(0xc0, 0xc0).w(FUNC(amaticmg_state::rombank_w));
 	map(0xe6, 0xe6).w(FUNC(amaticmg_state::nmi_mask_w));
 }
 
@@ -843,50 +868,48 @@ void amaticmg_state::machine_reset()
 *          Machine Drivers          *
 ************************************/
 
-MACHINE_CONFIG_START(amaticmg_state::amaticmg)
+void amaticmg_state::amaticmg(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)     /* WRONG! */
-	MCFG_DEVICE_PROGRAM_MAP(amaticmg_map)
-	MCFG_DEVICE_IO_MAP(amaticmg_portmap)
+	Z80(config, m_maincpu, CPU_CLOCK);     /* WRONG! */
+	m_maincpu->set_addrmap(AS_PROGRAM, &amaticmg_state::amaticmg_map);
+	m_maincpu->set_addrmap(AS_IO, &amaticmg_state::amaticmg_portmap);
 
-//	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* 3x 8255 */
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+	i8255_device &ppi0(I8255A(config, "ppi8255_0"));
+	ppi0.in_pa_callback().set_ioport("IN0");
+	ppi0.in_pb_callback().set_ioport("IN1");
+	ppi0.in_pc_callback().set_ioport("IN2");
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, amaticmg_state, out_a_w))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("SW1"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, amaticmg_state, out_c_w))
+	i8255_device &ppi1(I8255A(config, "ppi8255_1"));
+	ppi1.out_pa_callback().set(FUNC(amaticmg_state::out_a_w));
+	ppi1.in_pb_callback().set_ioport("SW1");
+	ppi1.out_pc_callback().set(FUNC(amaticmg_state::out_c_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(amaticmg_state, screen_update_amaticmg)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(512, 256);
+	screen.set_visarea_full();
+	screen.set_screen_update(FUNC(amaticmg_state::screen_update_amaticmg));
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(4)
-	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI)) // no NMI mask?
+	mc6845_device &crtc(MC6845(config, "crtc", CRTC_CLOCK));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(4);
+	crtc.out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI); // no NMI mask?
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_amaticmg)
-
-	MCFG_PALETTE_ADD("palette", 0x200)
-	MCFG_PALETTE_INIT_OWNER(amaticmg_state, amaticmg)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_amaticmg);
+	PALETTE(config, m_palette, FUNC(amaticmg_state::amaticmg_palette), 0x200);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, SND_CLOCK) /* Y3014B DAC */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
-MACHINE_CONFIG_END
+	YM3812(config, "ymsnd", SND_CLOCK).add_route(ALL_OUTPUTS, "speaker", 0.5); /* Y3014B DAC */
+}
 
 
 WRITE_LINE_MEMBER(amaticmg_state::amaticmg2_irq)
@@ -896,46 +919,41 @@ WRITE_LINE_MEMBER(amaticmg_state::amaticmg2_irq)
 }
 
 
-MACHINE_CONFIG_START(amaticmg_state::amaticmg2)
+void amaticmg_state::amaticmg2(machine_config &config)
+{
 	amaticmg(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(amaticmg2_portmap)
+	m_maincpu->set_addrmap(AS_IO, &amaticmg_state::amaticmg2_portmap);
 
-	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0) // MG4: 0x89 -> A:out; B:out; C(h):in; C(l):in.
+	I8255A(config, "ppi8255_2"); // MG4: 0x89 -> A:out; B:out; C(h):in; C(l):in.
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(amaticmg_state, screen_update_amaticmg2)
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(amaticmg_state::screen_update_amaticmg2));
 
-	MCFG_DEVICE_MODIFY("crtc")
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, amaticmg_state, amaticmg2_irq))
+	subdevice<mc6845_device>("crtc")->out_vsync_callback().set(FUNC(amaticmg_state::amaticmg2_irq));
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_amaticmg2)
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(0x10000)
-	MCFG_PALETTE_INIT_OWNER(amaticmg_state,amaticmg2)
-MACHINE_CONFIG_END
+	m_gfxdecode->set_info(gfx_amaticmg2);
+	m_palette->set_init(FUNC(amaticmg_state::amaticmg2_palette));
+	m_palette->set_entries(0x10000);
 
+	DS1994(config, "touch_m");
+}
 
-MACHINE_CONFIG_START(amaticmg_state::amaticmg4)
+void amaticmg_state::amaticmg4(machine_config &config)
+{
 	amaticmg(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(amaticmg4_portmap)
+	m_maincpu->set_addrmap(AS_IO, &amaticmg_state::amaticmg4_portmap);
 
-	MCFG_DEVICE_ADD("ppi8255_2", I8255A, 0) // MG4: 0x89 -> A:out; B:out; C(h):in; C(l):in.
+	I8255A(config, "ppi8255_2"); // MG4: 0x89 -> A:out; B:out; C(h):in; C(l):in.
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(amaticmg_state, screen_update_amaticmg2)
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(amaticmg_state::screen_update_amaticmg2));
 
-	MCFG_DEVICE_MODIFY("crtc")
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, amaticmg_state, amaticmg2_irq))
+	subdevice<mc6845_device>("crtc")->out_vsync_callback().set(FUNC(amaticmg_state::amaticmg2_irq));
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_amaticmg2)
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(0x10000)
-	MCFG_PALETTE_INIT_OWNER(amaticmg_state,amaticmg2)
-MACHINE_CONFIG_END
+	m_gfxdecode->set_info(gfx_amaticmg2);
+	m_palette->set_init(FUNC(amaticmg_state::amaticmg2_palette));
+	m_palette->set_entries(0x10000);
+}
 
 
 /************************************
@@ -972,9 +990,12 @@ ROM_START( am_mg24 )
 	ROM_LOAD( "multi_2.4_zg2.i18.bin", 0x080000, 0x80000, CRC(b504e1b8) SHA1(ffa17a2c212eb2fffb89b131868e69430cb41203) )
 	ROM_LOAD( "multi_2.4_zg3.i33.bin", 0x000000, 0x80000, CRC(9b66bb4d) SHA1(64035d2028a9b68164c87475a1ec9754453ad572) )
 
-	ROM_REGION( 0x20000/*0x0400*/, "proms", 0 )
-	ROM_LOAD( "n82s147a_1.bin", 0x0000, 0x0200, NO_DUMP )
-	ROM_LOAD( "n82s147a_2.bin", 0x0200, 0x0200, NO_DUMP )
+	ROM_REGION( 0x4000, "proms", 0 )
+	ROM_LOAD( "m2061295.bin", 0x0000, 0x1c00, CRC(05f4a6af) SHA1(b14e9c80d3313fa5bf076d129a509a711d80f982) )
+	ROM_LOAD( "m2080196.bin", 0x2000, 0x1c00, CRC(8cf6c3a6) SHA1(6454077c2ab94093e878cbc1c0102bbb6c4bc367) )
+
+	ROM_REGION( 0x0248, "touch_m", 0 )
+	ROM_LOAD( "ds1994.bin", 0x0000, 0x0248, CRC(7f581301) SHA1(33b2652f053a5e09442ccaa078b5d245255bb415) )
 ROM_END
 
 /*

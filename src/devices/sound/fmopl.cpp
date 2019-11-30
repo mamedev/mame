@@ -70,8 +70,8 @@ Revision History:
 */
 
 #include "emu.h"
-#include "ymdeltat.h"
 #include "fmopl.h"
+#include "ymdeltat.h"
 
 
 
@@ -2477,11 +2477,11 @@ void y8950_set_update_handler(void *chip,OPL_UPDATEHANDLER UpdateHandler,device_
 	reinterpret_cast<FM_OPL *>(chip)->SetUpdateHandler(UpdateHandler, device);
 }
 
-void y8950_set_delta_t_memory(void *chip, void * deltat_mem_ptr, int deltat_mem_size )
+void y8950_set_delta_t_memory(void *chip, FM_READBYTE read_byte, FM_WRITEBYTE write_byte)
 {
 	FM_OPL      *OPL = (FM_OPL *)chip;
-	OPL->deltat->memory = (uint8_t *)(deltat_mem_ptr);
-	OPL->deltat->memory_size = deltat_mem_size;
+	OPL->deltat->read_byte = read_byte;
+	OPL->deltat->write_byte = write_byte;
 }
 
 /*

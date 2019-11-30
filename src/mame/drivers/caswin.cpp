@@ -74,6 +74,7 @@ TODO:
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class caswin_state : public driver_device
@@ -99,7 +100,7 @@ protected:
 	DECLARE_WRITE8_MEMBER(vvillage_output_w);
 	DECLARE_WRITE8_MEMBER(vvillage_lamps_w);
 	TILE_GET_INFO_MEMBER(get_sc0_tile_info);
-	DECLARE_PALETTE_INIT(caswin);
+	void caswin_palette(palette_device &palette) const;
 	uint32_t screen_update_vvillage(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	virtual void video_start() override;
@@ -131,7 +132,7 @@ TILE_GET_INFO_MEMBER(caswin_state::get_sc0_tile_info)
 void caswin_state::video_start()
 {
 	m_lamps.resolve();
-	m_sc0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(caswin_state::get_sc0_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
+	m_sc0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(caswin_state::get_sc0_tile_info)), TILEMAP_SCAN_ROWS, 8,8,32,32);
 }
 
 uint32_t caswin_state::screen_update_vvillage(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -307,26 +308,25 @@ static GFXDECODE_START( gfx_vvillage )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
-PALETTE_INIT_MEMBER(caswin_state, caswin)
+void caswin_state::caswin_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	int bit0, bit1, bit2 , r, g, b;
-	int i;
-
-	for (i = 0; i < 0x40; ++i)
+	for (int i = 0; i < 0x40; ++i)
 	{
+		int bit0, bit1, bit2;
+
 		bit0 = 0;
 		bit1 = (color_prom[0] >> 0) & 0x01;
 		bit2 = (color_prom[0] >> 1) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 		bit0 = (color_prom[0] >> 2) & 0x01;
 		bit1 = (color_prom[0] >> 3) & 0x01;
 		bit2 = (color_prom[0] >> 4) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 		bit0 = (color_prom[0] >> 5) & 0x01;
 		bit1 = (color_prom[0] >> 6) & 0x01;
 		bit2 = (color_prom[0] >> 7) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 		color_prom++;
@@ -334,35 +334,35 @@ PALETTE_INIT_MEMBER(caswin_state, caswin)
 }
 
 
-MACHINE_CONFIG_START(caswin_state::vvillage)
+void caswin_state::vvillage(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)         /* ? MHz */
-	MCFG_DEVICE_PROGRAM_MAP(vvillage_mem)
-	MCFG_DEVICE_IO_MAP(vvillage_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", caswin_state, irq0_line_hold)
+	Z80(config, m_maincpu, 4000000);         /* ? MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &caswin_state::vvillage_mem);
+	m_maincpu->set_addrmap(AS_IO, &caswin_state::vvillage_io);
+	m_maincpu->set_vblank_int("screen", FUNC(caswin_state::irq0_line_hold));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(caswin_state, screen_update_vvillage)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 256-1, 16, 256-16-1);
+	screen.set_screen_update(FUNC(caswin_state::screen_update_vvillage));
+	screen.set_palette("palette");
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_vvillage)
-	MCFG_PALETTE_ADD("palette", 0x40)
-	MCFG_PALETTE_INIT_OWNER(caswin_state, caswin)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_vvillage);
+	PALETTE(config, "palette", FUNC(caswin_state::caswin_palette), 0x40);
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 4000000 / 4)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-MACHINE_CONFIG_END
+	ay8910_device &aysnd(AY8910(config, "aysnd", 4000000 / 4));
+	aysnd.port_a_read_callback().set_ioport("DSW1");
+	aysnd.port_b_read_callback().set_ioport("DSW2");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.40);
+}
 
 ROM_START( caswin )
 	ROM_REGION( 0x8000, "maincpu", 0 )
@@ -429,7 +429,25 @@ ROM_START( rcasinoo )
 	ROM_LOAD( "prom1.e8",  0x0020, 0x0020, CRC(2b5c7826) SHA1(c0de392aebd6982e5846c12aeb2e871358be60d7) ) /* MB7051 */
 ROM_END
 
+ROM_START( rcasino2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "0.b18",  0x0000, 0x2000, CRC(ce04c911) SHA1(776af4b07ee57503cf48f5f0651f1e506ae4ec08) )
+	ROM_LOAD( "1.b16",  0x2000, 0x2000, CRC(922b7745) SHA1(4fcf3fc02cac021820ddec89c1f57e7249ff819a) )
+	ROM_LOAD( "2.b15",  0x4000, 0x1000, CRC(b4c99c55) SHA1(e90967d53c4a33cfaace603e3a9eb7e43e747101) )
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_LOAD( "5.b8",  0x0000, 0x2000, CRC(b2dd4e1e) SHA1(323dcfb26653c17951db65ce2ced3325d35489e4) )
+	ROM_LOAD( "6.b6",  0x2000, 0x1000, CRC(8e0d3b9c) SHA1(c5211d834b0db488839a5c53d00435a0b59cd4ca) )
+	ROM_LOAD( "4.b9",  0x3000, 0x2000, CRC(81d20577) SHA1(50a1e0231400c106539ffa78deb3e0e6c8afc3f5) )
+	ROM_LOAD( "3.b11", 0x5000, 0x1000, CRC(7ca0e78c) SHA1(163cfd1f76ecbd14219146963d1abc4c09c0ac8c) )
+
+	ROM_REGION( 0x40, "proms", 0 )
+	ROM_LOAD( "mb7051.e9", 0x0000, 0x0020, CRC(93312432) SHA1(3c7abc165e6bc7e0c56ca97d89b0b5e06323b82e) )
+	ROM_LOAD( "mb7051.e8", 0x0020, 0x0020, CRC(2b5c7826) SHA1(c0de392aebd6982e5846c12aeb2e871358be60d7) )
+ROM_END
+
 GAME( 1984, rcasino,  0,       vvillage, vvillage, caswin_state, empty_init, ROT270, "Dyna Electronics", "Royal Casino (D-2608208A1-2)",                MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1984, rcasino1, rcasino, vvillage, vvillage, caswin_state, empty_init, ROT270, "Dyna Electronics", "Royal Casino (D-2608208A1-1, Larger Board)",  MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1984, rcasinoo, rcasino, vvillage, vvillage, caswin_state, empty_init, ROT270, "Dyna Electronics", "Royal Casino (D-2608208A1-1, Smaller Board)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1984, rcasinoo, rcasino, vvillage, vvillage, caswin_state, empty_init, ROT270, "Dyna Electronics", "Royal Casino (D-2608208A1-1, Smaller Board, set 1)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1984, rcasino2, rcasino, vvillage, vvillage, caswin_state, empty_init, ROT270, "Dyna Electronics", "Royal Casino (D-2608208A1-1, Smaller Board, set 2)",  MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1985, caswin,   rcasino, vvillage, vvillage, caswin_state, empty_init, ROT270, "Aristocrat",       "Casino Winner",                               MACHINE_IMPERFECT_GRAPHICS )

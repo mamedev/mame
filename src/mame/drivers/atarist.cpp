@@ -69,7 +69,7 @@ void st_state::device_timer(emu_timer &timer, device_timer_id id, int param, voi
 		blitter_tick();
 		break;
 	default:
-		assert_always(false, "Unknown id in st_state::device_timer");
+		throw emu_fatalerror("Unknown id in st_state::device_timer");
 	}
 }
 
@@ -1213,17 +1213,14 @@ void st_state::ikbd_map(address_map &map)
 
 
 //-------------------------------------------------
-//  ADDRESS_MAP( ikbd_io_map )
+//  ADDRESS_MAP( cpu_space_map )
 //-------------------------------------------------
 
-void st_state::ikbd_io_map(address_map &map)
+void st_state::cpu_space_map(address_map &map)
 {
-	map(M6801_PORT1, M6801_PORT1).r(FUNC(st_state::ikbd_port1_r));
-	map(M6801_PORT2, M6801_PORT2).rw(FUNC(st_state::ikbd_port2_r), FUNC(st_state::ikbd_port2_w));
-	map(M6801_PORT3, M6801_PORT3).w(FUNC(st_state::ikbd_port3_w));
-	map(M6801_PORT4, M6801_PORT4).rw(FUNC(st_state::ikbd_port4_r), FUNC(st_state::ikbd_port4_w));
+	map(0xfffff0, 0xffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));
+	map(0xfffffd, 0xfffffd).r(m_mfp, FUNC(mc68901_device::get_vector));
 }
-
 
 //-------------------------------------------------
 //  ADDRESS_MAP( st_map )
@@ -1236,7 +1233,7 @@ void st_state::st_map(address_map &map)
 	map(0x000008, 0x1fffff).ram();
 	map(0x200000, 0x3fffff).ram();
 	map(0x400000, 0xf9ffff).rw(FUNC(st_state::berr_r), FUNC(st_state::berr_w));
-	//AM_RANGE(0xfa0000, 0xfbffff)      // mapped by the cartslot
+	//map(0xfa0000, 0xfbffff)      // mapped by the cartslot
 	map(0xfc0000, 0xfeffff).rom().region(M68000_TAG, 0).w(FUNC(st_state::berr_w));
 	map(0xff8001, 0xff8001).rw(FUNC(st_state::mmu_r), FUNC(st_state::mmu_w));
 	map(0xff8200, 0xff8203).rw(FUNC(st_state::shifter_base_r), FUNC(st_state::shifter_base_w)).umask16(0x00ff);
@@ -1338,7 +1335,7 @@ void ste_state::ste_map(address_map &map)
 void megaste_state::megaste_map(address_map &map)
 {
 	st_map(map);
-	map(0xff8c80, 0xff8c87).rw(Z8530_TAG, FUNC(scc8530_t::reg_r), FUNC(scc8530_t::reg_w)).umask16(0x00ff);
+	map(0xff8c80, 0xff8c87).rw(Z8530_TAG, FUNC(scc8530_legacy_device::reg_r), FUNC(scc8530_legacy_device::reg_w)).umask16(0x00ff);
 	map(0xfffc20, 0xfffc3f).rw(RP5C15_TAG, FUNC(rp5c15_device::read), FUNC(rp5c15_device::write)).umask16(0x00ff);
 }
 
@@ -1351,47 +1348,47 @@ void stbook_state::stbook_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).ram();
 	map(0x200000, 0x3fffff).ram();
-//  AM_RANGE(0xd40000, 0xd7ffff) AM_ROM
+//  map(0xd40000, 0xd7ffff).rom();
 	map(0xe00000, 0xe3ffff).rom().region(M68000_TAG, 0);
-//  AM_RANGE(0xe80000, 0xebffff) AM_ROM
-//  AM_RANGE(0xfa0000, 0xfbffff) AM_ROM // cartridge
+//  map(0xe80000, 0xebffff).rom();
+//  map(0xfa0000, 0xfbffff).rom(); // cartridge
 	map(0xfc0000, 0xfeffff).rom().region(M68000_TAG, 0);
-/*  AM_RANGE(0xf00000, 0xf1ffff) AM_READWRITE(stbook_ide_r, stbook_ide_w)
-    AM_RANGE(0xff8000, 0xff8001) AM_READWRITE(stbook_mmu_r, stbook_mmu_w)
-    AM_RANGE(0xff8200, 0xff8203) AM_READWRITE(stbook_shifter_base_r, stbook_shifter_base_w)
-    AM_RANGE(0xff8204, 0xff8209) AM_READWRITE(stbook_shifter_counter_r, stbook_shifter_counter_w)
-    AM_RANGE(0xff820a, 0xff820b) AM_READWRITE8(stbook_shifter_sync_r, stbook_shifter_sync_w, 0xff00)
-    AM_RANGE(0xff820c, 0xff820d) AM_READWRITE(stbook_shifter_base_low_r, stbook_shifter_base_low_w)
-    AM_RANGE(0xff820e, 0xff820f) AM_READWRITE(stbook_shifter_lineofs_r, stbook_shifter_lineofs_w)
-    AM_RANGE(0xff8240, 0xff8241) AM_READWRITE(stbook_shifter_palette_r, stbook_shifter_palette_w)
-    AM_RANGE(0xff8260, 0xff8261) AM_READWRITE8(stbook_shifter_mode_r, stbook_shifter_mode_w, 0xff00)
-    AM_RANGE(0xff8264, 0xff8265) AM_READWRITE(stbook_shifter_pixelofs_r, stbook_shifter_pixelofs_w)
-    AM_RANGE(0xff827e, 0xff827f) AM_WRITE(lcd_control_w)*/
+/*  map(0xf00000, 0xf1ffff).rw(FUNC(stbook_state::stbook_ide_r), FUNC(stbook_state::stbook_ide_w));
+    map(0xff8000, 0xff8001).rw(FUNC(stbook_state::stbook_mmu_r), FUNC(stbook_state::stbook_mmu_w));
+    map(0xff8200, 0xff8203).rw(FUNC(stbook_state::stbook_shifter_base_r), FUNC(stbook_state::stbook_shifter_base_w));
+    map(0xff8204, 0xff8209).rw(FUNC(stbook_state::stbook_shifter_counter_r), FUNC(stbook_state::stbook_shifter_counter_w));
+    map(0xff820a, 0xff820a).rw(FUNC(stbook_state::stbook_shifter_sync_r), FUNC(stbook_state::stbook_shifter_sync_w));
+    map(0xff820c, 0xff820d).rw(FUNC(stbook_state::stbook_shifter_base_low_r), FUNC(stbook_state::stbook_shifter_base_low_w));
+    map(0xff820e, 0xff820f).rw(FUNC(stbook_state::stbook_shifter_lineofs_r), FUNC(stbook_state::stbook_shifter_lineofs_w));
+    map(0xff8240, 0xff8241).rw(FUNC(stbook_state::stbook_shifter_palette_r), FUNC(stbook_state::stbook_shifter_palette_w));
+    map(0xff8260, 0xff8260).rw(FUNC(stbook_state::stbook_shifter_mode_r), FUNC(stbook_state::stbook_shifter_mode_w));
+    map(0xff8264, 0xff8265).rw(FUNC(stbook_state::stbook_shifter_pixelofs_r), FUNC(stbook_state::stbook_shifter_pixelofs_w));
+    map(0xff827e, 0xff827f).w(FUNC(stbook_state::lcd_control_w));*/
 	map(0xff8800, 0xff8800).rw(YM3439_TAG, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
 	map(0xff8802, 0xff8802).w(YM3439_TAG, FUNC(ay8910_device::data_w));
-/*  AM_RANGE(0xff8900, 0xff8901) AM_READWRITE8(sound_dma_control_r, sound_dma_control_w, 0x00ff)
-    AM_RANGE(0xff8902, 0xff8907) AM_READWRITE8(sound_dma_base_r, sound_dma_base_w, 0x00ff)
-    AM_RANGE(0xff8908, 0xff890d) AM_READ8(sound_dma_counter_r, 0x00ff)
-    AM_RANGE(0xff890e, 0xff8913) AM_READWRITE8(sound_dma_end_r, sound_dma_end_w, 0x00ff)
-    AM_RANGE(0xff8920, 0xff8921) AM_READWRITE8(sound_mode_r, sound_mode_w, 0x00ff)
-    AM_RANGE(0xff8922, 0xff8923) AM_READWRITE(microwire_data_r, microwire_data_w)
-    AM_RANGE(0xff8924, 0xff8925) AM_READWRITE(microwire_mask_r, microwire_mask_w)
-    AM_RANGE(0xff8a00, 0xff8a1f) AM_READWRITE(blitter_halftone_r, blitter_halftone_w)
-    AM_RANGE(0xff8a20, 0xff8a21) AM_READWRITE(blitter_src_inc_x_r, blitter_src_inc_x_w)
-    AM_RANGE(0xff8a22, 0xff8a23) AM_READWRITE(blitter_src_inc_y_r, blitter_src_inc_y_w)
-    AM_RANGE(0xff8a24, 0xff8a27) AM_READWRITE(blitter_src_r, blitter_src_w)
-    AM_RANGE(0xff8a28, 0xff8a2d) AM_READWRITE(blitter_end_mask_r, blitter_end_mask_w)
-    AM_RANGE(0xff8a2e, 0xff8a2f) AM_READWRITE(blitter_dst_inc_x_r, blitter_dst_inc_x_w)
-    AM_RANGE(0xff8a30, 0xff8a31) AM_READWRITE(blitter_dst_inc_y_r, blitter_dst_inc_y_w)
-    AM_RANGE(0xff8a32, 0xff8a35) AM_READWRITE(blitter_dst_r, blitter_dst_w)
-    AM_RANGE(0xff8a36, 0xff8a37) AM_READWRITE(blitter_count_x_r, blitter_count_x_w)
-    AM_RANGE(0xff8a38, 0xff8a39) AM_READWRITE(blitter_count_y_r, blitter_count_y_w)
-    AM_RANGE(0xff8a3a, 0xff8a3b) AM_READWRITE(blitter_op_r, blitter_op_w)
-    AM_RANGE(0xff8a3c, 0xff8a3d) AM_READWRITE(blitter_ctrl_r, blitter_ctrl_w)
-    AM_RANGE(0xff9200, 0xff9201) AM_READ(config_r)
-    AM_RANGE(0xff9202, 0xff9203) AM_READWRITE(lcd_contrast_r, lcd_contrast_w)
-    AM_RANGE(0xff9210, 0xff9211) AM_READWRITE(power_r, power_w)
-    AM_RANGE(0xff9214, 0xff9215) AM_READWRITE(reference_r, reference_w)*/
+/*  map(0xff8901, 0xff8901).rw(FUNC(stbook_state::sound_dma_control_r), FUNC(stbook_state::sound_dma_control_w));
+    map(0xff8902, 0xff8907).rw(FUNC(stbook_state::sound_dma_base_r), FUNC(stbook_state::sound_dma_base_w)).umask16(0x00ff);
+    map(0xff8908, 0xff890d).r(FUNC(stbook_state::sound_dma_counter_r)).umask16(0x00ff);
+    map(0xff890e, 0xff8913).rw(FUNC(stbook_state::sound_dma_end_r), FUNC(stbook_state::sound_dma_end_w)).umask16(0x00ff);
+    map(0xff8921, 0xff8921).rw(FUNC(stbook_state::sound_mode_r), FUNC(stbook_state::sound_mode_w));
+    map(0xff8922, 0xff8923).rw(FUNC(stbook_state::microwire_data_r), FUNC(stbook_state::microwire_data_w));
+    map(0xff8924, 0xff8925).rw(FUNC(stbook_state::microwire_mask_r), FUNC(stbook_state::microwire_mask_w));
+    map(0xff8a00, 0xff8a1f).rw(FUNC(stbook_state::blitter_halftone_r), FUNC(stbook_state::blitter_halftone_w));
+    map(0xff8a20, 0xff8a21).rw(FUNC(stbook_state::blitter_src_inc_x_r), FUNC(stbook_state::blitter_src_inc_x_w));
+    map(0xff8a22, 0xff8a23).rw(FUNC(stbook_state::blitter_src_inc_y_r), FUNC(stbook_state::blitter_src_inc_y_w));
+    map(0xff8a24, 0xff8a27).rw(FUNC(stbook_state::blitter_src_r), FUNC(stbook_state::blitter_src_w));
+    map(0xff8a28, 0xff8a2d).rw(FUNC(stbook_state::blitter_end_mask_r), FUNC(stbook_state::blitter_end_mask_w));
+    map(0xff8a2e, 0xff8a2f).rw(FUNC(stbook_state::blitter_dst_inc_x_r), FUNC(stbook_state::blitter_dst_inc_x_w));
+    map(0xff8a30, 0xff8a31).rw(FUNC(stbook_state::blitter_dst_inc_y_r), FUNC(stbook_state::blitter_dst_inc_y_w));
+    map(0xff8a32, 0xff8a35).rw(FUNC(stbook_state::blitter_dst_r), FUNC(stbook_state::blitter_dst_w));
+    map(0xff8a36, 0xff8a37).rw(FUNC(stbook_state::blitter_count_x_r), FUNC(stbook_state::blitter_count_x_w));
+    map(0xff8a38, 0xff8a39).rw(FUNC(stbook_state::blitter_count_y_r), FUNC(stbook_state::blitter_count_y_w));
+    map(0xff8a3a, 0xff8a3b).rw(FUNC(stbook_state::blitter_op_r), FUNC(stbook_state::blitter_op_w));
+    map(0xff8a3c, 0xff8a3d).rw(FUNC(stbook_state::blitter_ctrl_r), FUNC(stbook_state::blitter_ctrl_w));
+    map(0xff9200, 0xff9201).r(FUNC(stbook_state::config_r));
+    map(0xff9202, 0xff9203).rw(FUNC(stbook_state::lcd_contrast_r), FUNC(stbook_state::lcd_contrast_w));
+    map(0xff9210, 0xff9211).rw(FUNC(stbook_state::power_r), FUNC(stbook_state::power_w));
+    map(0xff9214, 0xff9215).rw(FUNC(stbook_state::reference_r), FUNC(stbook_state::reference_w));*/
 }
 #endif
 
@@ -1800,21 +1797,6 @@ WRITE_LINE_MEMBER( st_state::fdc_drq_w )
 //**************************************************************************
 
 //-------------------------------------------------
-//  IRQ_CALLBACK_MEMBER( atarist_int_ack )
-//-------------------------------------------------
-
-IRQ_CALLBACK_MEMBER(st_state::atarist_int_ack)
-{
-	if (irqline == M68K_IRQ_6)
-	{
-		return m_mfp->get_vector();
-	}
-
-	return M68K_INT_ACK_AUTOVECTOR;
-}
-
-
-//-------------------------------------------------
 //  configure_memory -
 //-------------------------------------------------
 
@@ -1880,7 +1862,7 @@ void st_state::machine_start()
 	configure_memory();
 
 	if (m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0xfa0000, 0xfbffff, read16_delegate(FUNC(generic_slot_device::read16_rom),(generic_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xfa0000, 0xfbffff, read16s_delegate(*m_cart, FUNC(generic_slot_device::read16_rom)));
 
 	// allocate timers
 	if (m_mousex.found())
@@ -1935,7 +1917,7 @@ void ste_state::machine_start()
 	configure_memory();
 
 	if (m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0xfa0000, 0xfbffff, read16_delegate(FUNC(generic_slot_device::read16_rom),(generic_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xfa0000, 0xfbffff, read16s_delegate(*m_cart, FUNC(generic_slot_device::read16_rom)));
 
 	/* allocate timers */
 	m_dmasound_timer = timer_alloc(TIMER_DMASOUND_TICK);
@@ -1982,7 +1964,7 @@ void stbook_state::machine_start()
 	}
 
 	if (m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0xfa0000, 0xfbffff, read16_delegate(FUNC(generic_slot_device::read16_rom),(generic_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xfa0000, 0xfbffff, read16s_delegate(*m_cart, FUNC(generic_slot_device::read16_rom)));
 
 	/* register for state saving */
 	ste_state::state_save();
@@ -2007,62 +1989,47 @@ static void atari_floppies(device_slot_interface &device)
 //  MACHINE CONFIGURATION
 //**************************************************************************
 
-//-------------------------------------------------
-//  MACHINE_CONFIG( st )
-//-------------------------------------------------
-
-MACHINE_CONFIG_START(st_state::st)
+void st_state::common(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD(M68000_TAG, M68000, Y2/4)
-	MCFG_DEVICE_PROGRAM_MAP(st_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(st_state,atarist_int_ack)
+	M68000(config, m_maincpu, Y2/4);
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &st_state::cpu_space_map);
 
-	MCFG_DEVICE_ADD(HD6301V1_TAG, HD6301, Y2/8)
-	MCFG_DEVICE_PROGRAM_MAP(ikbd_map)
-	MCFG_DEVICE_IO_MAP(ikbd_io_map)
+	keyboard(config);
 
-	// video hardware
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_UPDATE_DRIVER(st_state, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(Y2/2, ATARIST_HTOT_PAL*2, ATARIST_HBEND_PAL*2, ATARIST_HBSTART_PAL*2, ATARIST_VTOT_PAL, ATARIST_VBEND_PAL, ATARIST_VBSTART_PAL)
-
-	MCFG_PALETTE_ADD("palette", 16)
-
-	// sound hardware
-	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD(YM2149_TAG, YM2149, Y2/16)
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
-	MCFG_AY8910_RES_LOADS(RES_K(1), 0, 0)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, st_state, psg_pa_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	// sound
+	YM2149(config, m_ymsnd, Y2/16);
+	m_ymsnd->set_flags(AY8910_SINGLE_OUTPUT);
+	m_ymsnd->set_resistors_load(RES_K(1), 0, 0);
+	m_ymsnd->port_a_write_callback().set(FUNC(st_state::psg_pa_w));
+	m_ymsnd->port_b_write_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
 
 	// devices
-
 	WD1772(config, m_fdc, Y2/4);
 	m_fdc->intrq_wr_callback().set(m_mfp, FUNC(mc68901_device::i5_w)).invert();
 	m_fdc->drq_wr_callback().set(FUNC(st_state::fdc_drq_w));
-	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":0", atari_floppies, "35dd", st_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":1", atari_floppies, nullptr,      st_state::floppy_formats)
+	FLOPPY_CONNECTOR(config, WD1772_TAG ":0", atari_floppies, "35dd",  st_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, WD1772_TAG ":1", atari_floppies, nullptr, st_state::floppy_formats);
 
-	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(MC68901_TAG, mc68901_device, i0_w))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(m_mfp, FUNC(mc68901_device::i0_w));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
 
 	MC68901(config, m_mfp, Y2/8);
 	m_mfp->set_timer_clock(Y1);
 	m_mfp->set_rx_clock(0);
 	m_mfp->set_tx_clock(0);
-	m_mfp->out_irq_cb().set_inputline(M68000_TAG, M68K_IRQ_6);
+	m_mfp->out_irq_cb().set_inputline(m_maincpu, M68K_IRQ_6);
 	m_mfp->out_tdo_cb().set(FUNC(st_state::mfp_tdo_w));
-	m_mfp->out_so_cb().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
+	m_mfp->out_so_cb().set(m_rs232, FUNC(rs232_port_device::write_txd));
 
-	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(MC68901_TAG, mc68901_device, write_rx))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(MC68901_TAG, mc68901_device, i1_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(MC68901_TAG, mc68901_device, i2_w))
-	MCFG_RS232_RI_HANDLER(WRITELINE(MC68901_TAG, mc68901_device, i6_w))
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
+	m_rs232->rxd_handler().set(m_mfp, FUNC(mc68901_device::write_rx));
+	m_rs232->dcd_handler().set(m_mfp, FUNC(mc68901_device::i1_w));
+	m_rs232->cts_handler().set(m_mfp, FUNC(mc68901_device::i2_w));
+	m_rs232->ri_handler().set(m_mfp, FUNC(mc68901_device::i6_w));
 
 	ACIA6850(config, m_acia0, 0);
 	m_acia0->txd_handler().set(FUNC(st_state::ikbd_tx_w));
@@ -2073,275 +2040,187 @@ MACHINE_CONFIG_START(st_state::st)
 	m_acia1->irq_handler().set("aciairq", FUNC(input_merger_device::in_w<1>));
 
 	input_merger_device &aciairq(INPUT_MERGER_ANY_HIGH(config, "aciairq"));
-	aciairq.output_handler().set(MC68901_TAG, FUNC(mc68901_device::i4_w)).invert();
+	aciairq.output_handler().set(m_mfp, FUNC(mc68901_device::i4_w)).invert();
 
-	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_MIDI_RX_HANDLER(WRITELINE(MC6850_1_TAG, acia6850_device, write_rxd))
+	MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set(m_acia1, FUNC(acia6850_device::write_rxd));
+	MIDI_PORT(config, "mdout", midiout_slot, "midiout");
 
-	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
-
-	MCFG_DEVICE_ADD("acia_clock", CLOCK, Y2/64) // 500kHz
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, st_state, write_acia_clock))
+	CLOCK(config, "acia_clock", Y2/64).signal_handler().set(FUNC(st_state::write_acia_clock)); // 500kHz
 
 	// cartridge
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_linear_slot, "st_cart")
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_WIDTH(GENERIC_ROM16_WIDTH)
-	MCFG_GENERIC_ENDIAN(ENDIANNESS_BIG)
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "st_cart")
-
-	// internal ram
-	RAM(config, m_ram)
-		.set_default_size("1M") // 1040ST
-		.set_extra_options("512K,256K"); // 520ST, 260ST
+	GENERIC_CARTSLOT(config, m_cart, generic_linear_slot, "st_cart", "bin,rom");
+	m_cart->set_width(GENERIC_ROM16_WIDTH);
+	m_cart->set_endian(ENDIANNESS_BIG);
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "st_flop")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "flop_list").set_original("st_flop");
+}
 
+void st_state::keyboard(machine_config &config)
+{
+	hd6301_cpu_device &ikbd(HD6301(config, HD6301V1_TAG, Y2/8));
+	ikbd.set_addrmap(AS_PROGRAM, &st_state::ikbd_map);
+	ikbd.in_p1_cb().set(FUNC(st_state::ikbd_port1_r));
+	ikbd.in_p2_cb().set(FUNC(st_state::ikbd_port2_r));
+	ikbd.out_p2_cb().set(FUNC(st_state::ikbd_port2_w));
+	ikbd.out_p3_cb().set(FUNC(st_state::ikbd_port3_w));
+	ikbd.in_p4_cb().set(FUNC(st_state::ikbd_port4_r));
+	ikbd.out_p4_cb().set(FUNC(st_state::ikbd_port4_w));
+}
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( megast )
+//  machine_config( st )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(megast_state::megast)
+void st_state::st(machine_config &config)
+{
+	common(config);
+
 	// basic machine hardware
-	MCFG_DEVICE_ADD(M68000_TAG, M68000, Y2/4)
-	MCFG_DEVICE_PROGRAM_MAP(megast_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(st_state,atarist_int_ack)
-
-	MCFG_DEVICE_ADD(HD6301V1_TAG, HD6301, Y2/8)
-	MCFG_DEVICE_PROGRAM_MAP(ikbd_map)
-	MCFG_DEVICE_IO_MAP(ikbd_io_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &st_state::st_map);
 
 	// video hardware
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_UPDATE_DRIVER(megast_state, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(Y2/4, ATARIST_HTOT_PAL, ATARIST_HBEND_PAL, ATARIST_HBSTART_PAL, ATARIST_VTOT_PAL, ATARIST_VBEND_PAL, ATARIST_VBSTART_PAL)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_screen_update(FUNC(st_state::screen_update));
+	m_screen->set_raw(Y2/2, ATARIST_HTOT_PAL*2, ATARIST_HBEND_PAL*2, ATARIST_HBSTART_PAL*2, ATARIST_VTOT_PAL, ATARIST_VBEND_PAL, ATARIST_VBSTART_PAL);
 
-	MCFG_PALETTE_ADD("palette", 16)
+	PALETTE(config, m_palette).set_entries(16);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD(YM2149_TAG, YM2149, Y2/16)
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
-	MCFG_AY8910_RES_LOADS(RES_K(1), 0, 0)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, st_state, psg_pa_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-
-	// devices
-	MCFG_DEVICE_ADD(RP5C15_TAG, RP5C15, XTAL(32'768))
-
-	WD1772(config, m_fdc, Y2/4);
-	m_fdc->intrq_wr_callback().set(m_mfp, FUNC(mc68901_device::i5_w)).invert();
-	m_fdc->drq_wr_callback().set(FUNC(st_state::fdc_drq_w));
-	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":0", atari_floppies, "35dd", st_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":1", atari_floppies, nullptr,      st_state::floppy_formats)
-
-	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(MC68901_TAG, mc68901_device, i0_w))
-
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
-
-	MC68901(config, m_mfp, Y2/8);
-	m_mfp->set_timer_clock(Y1);
-	m_mfp->set_rx_clock(0);
-	m_mfp->set_tx_clock(0);
-	m_mfp->out_irq_cb().set_inputline(M68000_TAG, M68K_IRQ_6);
-	m_mfp->out_tdo_cb().set(FUNC(st_state::mfp_tdo_w));
-	m_mfp->out_so_cb().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
-
-	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(MC68901_TAG, mc68901_device, write_rx))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(MC68901_TAG, mc68901_device, i1_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(MC68901_TAG, mc68901_device, i2_w))
-	MCFG_RS232_RI_HANDLER(WRITELINE(MC68901_TAG, mc68901_device, i6_w))
-
-	ACIA6850(config, m_acia0, 0);
-	m_acia0->txd_handler().set(FUNC(st_state::ikbd_tx_w));
-	m_acia0->irq_handler().set("aciairq", FUNC(input_merger_device::in_w<0>));
-
-	ACIA6850(config, m_acia1, 0);
-	m_acia1->txd_handler().set("mdout", FUNC(midi_port_device::write_txd));
-	m_acia1->irq_handler().set("aciairq", FUNC(input_merger_device::in_w<1>));
-
-	input_merger_device &aciairq(INPUT_MERGER_ANY_HIGH(config, "aciairq"));
-	aciairq.output_handler().set(MC68901_TAG, FUNC(mc68901_device::i4_w)).invert();
-
-	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_MIDI_RX_HANDLER(WRITELINE(MC6850_1_TAG, acia6850_device, write_rxd))
-
-	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
-
-	MCFG_DEVICE_ADD("acia_clock", CLOCK, Y2/64) // 500kHz
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, st_state, write_acia_clock))
+	m_ymsnd->add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	// cartridge
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_linear_slot, "st_cart")
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_WIDTH(GENERIC_ROM16_WIDTH)
-	MCFG_GENERIC_ENDIAN(ENDIANNESS_BIG)
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "st_cart")
+	SOFTWARE_LIST(config, "cart_list").set_original("st_cart");
 
 	// internal ram
-	RAM(config, m_ram)
-		.set_default_size("4M") // Mega ST 4
-		.set_extra_options("2M,1M"); // Mega ST 2, Mega ST 1
-
-	// software lists
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "st_flop")
-MACHINE_CONFIG_END
+	RAM(config, m_ram);
+	m_ram->set_default_size("1M"); // 1040ST
+	m_ram->set_extra_options("512K,256K"); // 520ST, 260ST
+}
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( ste )
+//  machine_config( megast )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(ste_state::ste)
+void megast_state::megast(machine_config &config)
+{
+	common(config);
+
 	// basic machine hardware
-	MCFG_DEVICE_ADD(M68000_TAG, M68000, Y2/4)
-	MCFG_DEVICE_PROGRAM_MAP(ste_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(st_state,atarist_int_ack)
-
-	MCFG_DEVICE_ADD(HD6301V1_TAG, HD6301, Y2/8)
-	MCFG_DEVICE_PROGRAM_MAP(ikbd_map)
-	MCFG_DEVICE_IO_MAP(ikbd_io_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &megast_state::megast_map);
 
 	// video hardware
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_UPDATE_DRIVER(ste_state, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(Y2/4, ATARIST_HTOT_PAL, ATARIST_HBEND_PAL, ATARIST_HBSTART_PAL, ATARIST_VTOT_PAL, ATARIST_VBEND_PAL, ATARIST_VBSTART_PAL)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_screen_update(FUNC(megast_state::screen_update));
+	m_screen->set_raw(Y2/4, ATARIST_HTOT_PAL, ATARIST_HBEND_PAL, ATARIST_HBSTART_PAL, ATARIST_VTOT_PAL, ATARIST_VBEND_PAL, ATARIST_VBSTART_PAL);
 
-	MCFG_PALETTE_ADD("palette", 512)
+	PALETTE(config, m_palette).set_entries(16);
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	m_ymsnd->add_route(ALL_OUTPUTS, "mono", 1.00);
+
+	// devices
+	RP5C15(config, RP5C15_TAG, XTAL(32'768));
+
+	// cartridge
+	SOFTWARE_LIST(config, "cart_list").set_original("st_cart");
+
+	// internal ram
+	RAM(config, m_ram);
+	m_ram->set_default_size("4M"); // Mega ST 4
+	m_ram->set_extra_options("2M,1M"); // Mega ST 2, Mega ST 1
+}
+
+
+//-------------------------------------------------
+//  machine_config( ste )
+//-------------------------------------------------
+
+void ste_state::ste(machine_config &config)
+{
+	common(config);
+
+	// basic machine hardware
+	m_maincpu->set_addrmap(AS_PROGRAM, &ste_state::ste_map);
+
+	// video hardware
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_screen_update(FUNC(ste_state::screen_update));
+	m_screen->set_raw(Y2/4, ATARIST_HTOT_PAL, ATARIST_HBEND_PAL, ATARIST_HBSTART_PAL, ATARIST_VTOT_PAL, ATARIST_VBEND_PAL, ATARIST_VBSTART_PAL);
+
+	PALETTE(config, m_palette).set_entries(512);
 
 	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-
-	MCFG_DEVICE_ADD(YM2149_TAG, YM2149, Y2/16)
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
-	MCFG_AY8910_RES_LOADS(RES_K(1), 0, 0)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, st_state, psg_pa_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.50)
+	m_ymsnd->add_route(0, "lspeaker", 0.50);
+	m_ymsnd->add_route(0, "rspeaker", 0.50);
 /*
-    MCFG_DEVICE_ADD("custom", CUSTOM, 0) // DAC
-    MCFG_SOUND_ROUTE(0, "rspeaker", 0.50)
-    MCFG_SOUND_ROUTE(1, "lspeaker", 0.50)
+    custom_device &custom_dac(CUSTOM(config, "custom", 0)); // DAC
+    custom_dac.add_route(0, "rspeaker", 0.50);
+    custom_dac.add_route(1, "lspeaker", 0.50);
 */
-	MCFG_LMC1992_ADD(LMC1992_TAG /* ,atariste_lmc1992_intf */)
-
-	// devices
-
-	WD1772(config, m_fdc, Y2/4);
-	m_fdc->intrq_wr_callback().set(m_mfp, FUNC(mc68901_device::i5_w)).invert();
-	m_fdc->drq_wr_callback().set(FUNC(st_state::fdc_drq_w));
-	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":0", atari_floppies, "35dd", st_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":1", atari_floppies, nullptr,      st_state::floppy_formats)
-
-	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(MC68901_TAG, mc68901_device, i0_w))
-
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
-
-	MC68901(config, m_mfp, Y2/8);
-	m_mfp->set_timer_clock(Y1);
-	m_mfp->set_rx_clock(0);
-	m_mfp->set_tx_clock(0);
-	m_mfp->out_irq_cb().set_inputline(M68000_TAG, M68K_IRQ_6);
-	m_mfp->out_tdo_cb().set(FUNC(st_state::mfp_tdo_w));
-	m_mfp->out_so_cb().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
-
-	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(MC68901_TAG, mc68901_device, write_rx))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(MC68901_TAG, mc68901_device, i1_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(MC68901_TAG, mc68901_device, i2_w))
-	MCFG_RS232_RI_HANDLER(WRITELINE(MC68901_TAG, mc68901_device, i6_w))
-
-	ACIA6850(config, m_acia0, 0);
-	m_acia0->txd_handler().set(FUNC(st_state::ikbd_tx_w));
-	m_acia0->irq_handler().set("aciairq", FUNC(input_merger_device::in_w<0>));
-
-	ACIA6850(config, m_acia1, 0);
-	m_acia1->txd_handler().set("mdout", FUNC(midi_port_device::write_txd));
-	m_acia1->irq_handler().set("aciairq", FUNC(input_merger_device::in_w<1>));
-
-	input_merger_device &aciairq(INPUT_MERGER_ANY_HIGH(config, "aciairq"));
-	aciairq.output_handler().set(MC68901_TAG, FUNC(mc68901_device::i4_w)).invert();
-
-	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_MIDI_RX_HANDLER(WRITELINE(MC6850_1_TAG, acia6850_device, write_rxd))
-
-	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
-
-	MCFG_DEVICE_ADD("acia_clock", CLOCK, Y2/64) // 500kHz
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, st_state, write_acia_clock))
+	LMC1992(config, LMC1992_TAG);
 
 	// cartridge
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_linear_slot, "st_cart")
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_WIDTH(GENERIC_ROM16_WIDTH)
-	MCFG_GENERIC_ENDIAN(ENDIANNESS_BIG)
-//  MCFG_SOFTWARE_LIST_ADD("cart_list", "ste_cart")
+//  SOFTWARE_LIST(config, "cart_list").set_original("ste_cart");
 
 	// internal ram
-	RAM(config, m_ram)
-		.set_default_size("1M") // 1040STe
-		.set_extra_options("512K"); // 520STe
-
-	// software lists
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "st_flop")
-MACHINE_CONFIG_END
+	RAM(config, m_ram);
+	m_ram->set_default_size("1M"); // 1040STe
+	m_ram->set_extra_options("512K"); // 520STe
+}
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( megaste )
+//  machine_config( megaste )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(megaste_state::megaste)
+void megaste_state::megaste(machine_config &config)
+{
 	ste(config);
-	MCFG_DEVICE_MODIFY(M68000_TAG)
-	MCFG_DEVICE_PROGRAM_MAP(megaste_map)
-	MCFG_DEVICE_ADD(RP5C15_TAG, RP5C15, XTAL(32'768))
-	MCFG_DEVICE_ADD(Z8530_TAG, SCC8530, Y2/4)
+	m_maincpu->set_addrmap(AS_PROGRAM, &megaste_state::megaste_map);
+	RP5C15(config, RP5C15_TAG, XTAL(32'768));
+	SCC8530(config, Z8530_TAG, Y2/4);
 
 	/* internal ram */
-	m_ram->set_default_size("4M") // Mega STe 4
-		.set_extra_options("2M,1M"); // Mega STe 2, Mega STe 1
-MACHINE_CONFIG_END
+	m_ram->set_default_size("4M"); // Mega STe 4
+	m_ram->set_extra_options("2M,1M"); // Mega STe 2, Mega STe 1
+}
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( stbook )
+//  machine_config( stbook )
 //-------------------------------------------------
 #if 0
-static MACHINE_CONFIG_START(stbook_state::stbook)
+void stbook_state::stbook(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD(M68000_TAG, M68000, U517/2)
-	MCFG_DEVICE_PROGRAM_MAP(stbook_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(st_state,atarist_int_ack)
+	M68000(config, m_maincpu, U517/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &stbook_state::stbook_map);
 
-	//MCFG_DEVICE_ADD(COP888_TAG, COP888, Y700)
+	//COP888(config, COP888_TAG, Y700);
 
 	// video hardware
-	MCFG_SCREEN_ADD(SCREEN_TAG, LCD)
-	MCFG_SCREEN_UPDATE_DRIVER(stbook_state, screen_update)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(640, 400)
-	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 399)
+	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	m_screen->set_screen_update(FUNC(stbook_state::screen_update));
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(640, 400);
+	m_screen->set_visarea(0, 639, 0, 399);
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD(YM3439_TAG, YM3439, U517/8)
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
-	MCFG_AY8910_RES_LOADS(RES_K(1), 0, 0)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, stbook_state, psg_pa_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	ym3439_device &ym3439(YM3439(config, YM3439_TAG, U517/8));
+	ym3439.set_flags(AY8910_SINGLE_OUTPUT);
+	ym3439.set_resistors_load(RES_K(1), 0, 0);
+	ym3439.port_a_write_callback().set(FUNC(stbook_state::psg_pa_w));
+	ym3439.port_b_write_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	ym3439.add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	MC68901(config, m_mfp, U517/8);
 	m_mfp->set_timer_clock(Y1);
@@ -2354,21 +2233,21 @@ static MACHINE_CONFIG_START(stbook_state::stbook)
 	WD1772(config, m_fdc, U517/2);
 	m_fdc->intrq_wr_callback().set(m_mfp, FUNC(mc68901_device::i5_w)).invert();
 	m_fdc->drq_wr_callback().set(FUNC(st_state::fdc_drq_w));
-	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":0", atari_floppies, "35dd", 0, st_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG ":1", atari_floppies, 0,      0, st_state::floppy_formats)
+	FLOPPY_CONNECTOR(config, WD1772_TAG ":0", atari_floppies, "35dd", 0, st_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, WD1772_TAG ":1", atari_floppies, 0,      0, st_state::floppy_formats);
 
-	MCFG_DEVICE_ADD("centronics", CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(MC68901_TAG, mc68901_device, i0_w))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(m_mfp, FUNC(mc68901_device::i0_w));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out");
+	m_centronics->set_output_latch(cent_data_out);
 
-	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_SERIAL_OUT_RX_HANDLER(WRITELINE(MC68901_TAG, mc68901_device, write_rx))
-	MCFG_RS232_OUT_DCD_HANDLER(WRITELINE(MC68901_TAG, mc68901_device, i1_w))
-	MCFG_RS232_OUT_CTS_HANDLER(WRITELINE(MC68901_TAG, mc68901_device, i2_w))
-	MCFG_RS232_OUT_RI_HANDLER(WRITELINE(MC68901_TAG, mc68901_device, i6_w))
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
+	m_rs232->rxd_handler().set(m_mfp, FUNC(mc68901_device::write_rx));
+	m_rs232->dcd_handler().set(m_mfp, FUNC(mc68901_device::i1_w));
+	m_rs232->cts_handler().set(m_mfp, FUNC(mc68901_device::i2_w));
+	m_rs232->ri_handler().set(m_mfp, FUNC(mc68901_device::i6_w));
 
-	// device hardware
 	ACIA6850(config, m_acia0, 0);
 	m_acia0->txd_handler().set(FUNC(st_state::ikbd_tx_w));
 	m_acia0->irq_handler().set("aciairq", FUNC(input_merger_device::in_w<0>));
@@ -2378,30 +2257,26 @@ static MACHINE_CONFIG_START(stbook_state::stbook)
 	m_acia1->irq_handler().set("aciairq", FUNC(input_merger_device::in_w<1>));
 
 	input_merger_device &aciairq(INPUT_MERGER_ANY_HIGH(config, "aciairq"));
-	aciairq.output_handler().set(MC68901_TAG, FUNC(mc68901_device::i4_w)).invert();
+	aciairq.output_handler().set(m_mfp, FUNC(mc68901_device::i4_w)).invert();
 
-	MCFG_SERIAL_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_MIDI_RX_HANDLER(WRITELINE(MC6850_1_TAG, acia6850_device, write_rxd))
+	MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set(m_acia1, FUNC(acia6850_device::write_rxd));
+	MIDI_PORT(config, "mdout", midiout_slot, "midiout");
 
-	MCFG_SERIAL_PORT_ADD("mdout", midiout_slot, "midiout")
-
-	MCFG_DEVICE_ADD("acia_clock", CLOCK, U517/2/16) // 500kHz
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, st_state, write_acia_clock))
+	CLOCK(config, "acia_clock", Y2/64).signal_handler().set(FUNC(st_state::write_acia_clock)); // 500kHz
 
 	// cartridge
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_linear_slot, "st_cart")
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_WIDTH(GENERIC_ROM16_WIDTH)
-	MCFG_GENERIC_ENDIAN(ENDIANNESS_BIG)
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "st_cart")
+	GENERIC_CARTSLOT(config, m_cart, generic_linear_slot, "st_cart", "bin,rom");
+	m_cart->set_width(GENERIC_ROM16_WIDTH);
+	m_cart->set_endian(ENDIANNESS_BIG);
+	SOFTWARE_LIST(config, "cart_list").set_original("st_cart");
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("4M").set_extra_options("1M");
-MACHINE_CONFIG_END
+}
 #endif
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( tt030 )
+//  machine_config( tt030 )
 //-------------------------------------------------
 
 void ste_state::tt030(machine_config &config)
@@ -2411,7 +2286,7 @@ void ste_state::tt030(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( falcon )
+//  machine_config( falcon )
 //-------------------------------------------------
 
 void ste_state::falcon(machine_config &config)
@@ -2421,7 +2296,7 @@ void ste_state::falcon(machine_config &config)
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( falcon40 )
+//  machine_config( falcon40 )
 //-------------------------------------------------
 
 void ste_state::falcon40(machine_config &config)

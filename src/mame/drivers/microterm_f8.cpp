@@ -256,6 +256,15 @@ bool microterm_f8_state::poll_keyboard()
 
 READ8_MEMBER(microterm_f8_state::key_r)
 {
+	// Cursor is supposed to stop blinking temporarily when keys are depressed
+	// This implementation suspends cursor blinking when keys are actually read
+	// It also suspends blinking text, which perhaps is supposed to happen
+	if (!machine().side_effects_disabled())
+	{
+		m_blinkcount->reset_w(1);
+		m_blinkcount->reset_w(0);
+	}
+
 	return m_keylatch;
 }
 
@@ -276,11 +285,6 @@ READ8_MEMBER(microterm_f8_state::port00_r)
 WRITE8_MEMBER(microterm_f8_state::port00_w)
 {
 	m_port00 = data;
-
-	// Cursor is supposed to stop blinking temporarily when keys are depressed
-	// This implementation suspends cursor blinking when keys are acknowledged and the cursor is repositioned
-	// It also suspends blinking text, which perhaps is supposed to happen
-	m_blinkcount->reset_w(BIT(data, 0));
 }
 
 READ8_MEMBER(microterm_f8_state::port01_r)
@@ -531,7 +535,7 @@ void microterm_f8_state::act5a(machine_config &config)
 	AY51013(config, m_uart);
 	m_uart->read_si_callback().set(m_io, FUNC(rs232_port_device::rxd_r));
 	m_uart->write_so_callback().set("txd", FUNC(input_merger_device::in_w<0>));
-	m_uart->write_dav_callback().set("smi", FUNC(f3853_device::ext_int_w)).invert();
+	m_uart->write_dav_callback().set("smi", FUNC(f3853_device::ext_int_w));
 	m_uart->set_auto_rdav(true);
 
 	RS232_PORT(config, m_io, default_rs232_devices, nullptr);

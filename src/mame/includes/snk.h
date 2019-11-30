@@ -7,10 +7,15 @@
     various SNK triple Z80 games
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_SNK_H
+#define MAME_INCLUDES_SNK_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class snk_state : public driver_device
 {
@@ -58,13 +63,12 @@ public:
 	void sgladiat(machine_config &config);
 	void madcrush(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(marvins_sound_busy);
-	DECLARE_CUSTOM_INPUT_MEMBER(snk_sound_busy);
-	DECLARE_CUSTOM_INPUT_MEMBER(gwar_rotary);
-	DECLARE_CUSTOM_INPUT_MEMBER(gwarb_rotary);
+	DECLARE_READ_LINE_MEMBER(sound_busy_r);
+	template <int Which> DECLARE_CUSTOM_INPUT_MEMBER(gwar_rotary);
+	template <int Which> DECLARE_CUSTOM_INPUT_MEMBER(gwarb_rotary);
 	DECLARE_CUSTOM_INPUT_MEMBER(countryc_trackball_x);
 	DECLARE_CUSTOM_INPUT_MEMBER(countryc_trackball_y);
-	DECLARE_CUSTOM_INPUT_MEMBER(snk_bonus_r);
+	template <int Mask> DECLARE_CUSTOM_INPUT_MEMBER(snk_bonus_r);
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -209,7 +213,7 @@ private:
 	TILE_GET_INFO_MEMBER(ikari_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(gwar_get_bg_tile_info);
 	DECLARE_VIDEO_START(marvins);
-	DECLARE_PALETTE_INIT(tnk3);
+	void tnk3_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(jcross);
 	DECLARE_VIDEO_START(tnk3);
 	DECLARE_VIDEO_START(ikari);
@@ -281,3 +285,5 @@ private:
 	void tnk3_cpuA_map(address_map &map);
 	void tnk3_cpuB_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_SNK_H

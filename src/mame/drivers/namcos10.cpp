@@ -42,12 +42,12 @@ Seishun Quiz Colorful High School (CHS1 Ver.A)     (C) Namco, 2002
 Sekai Kaseki Hakken (Japan, SKH1 Ver.A)            (C) Namco, 2004
 Shamisen Brothers                                  (C) Kato/Konami, 2003
 Star Trigon (STT1 Ver.A)                           (C) Namco, 2002
-*Taiko No Tatsujin                                 (C) Namco, 2001
-Taiko No Tatsujin 2 (TK21 Ver.C)                   (C) Namco, 2001
-Taiko No Tatsujin 3 (TK31 Ver.A)                   (C) Namco, 2002
-Taiko No Tatsujin 4 (TK41 Ver.A)                   (C) Namco, 2003
-Taiko No Tatsujin 5 (TK51 Ver.A)                   (C) Namco, 2003
-Taiko No Tatsujin 6 (TK61 Ver.A)                   (C) Namco, 2004
+*Taiko no Tatsujin                                 (C) Namco, 2001
+Taiko no Tatsujin 2 (TK21 Ver.C)                   (C) Namco, 2001
+Taiko no Tatsujin 3 (TK31 Ver.A)                   (C) Namco, 2002
+Taiko no Tatsujin 4 (TK41 Ver.A)                   (C) Namco, 2003
+Taiko no Tatsujin 5 (TK51 Ver.A)                   (C) Namco, 2003
+Taiko no Tatsujin 6 (TK61 Ver.A)                   (C) Namco, 2004
 Tsukkomi Yousei Gips Nice Tsukkomi (NTK1 Ver.A)    (C) Namco/Metro, 2002
 Uchuu Daisakusen Chocovader Contactee (CVC1 Ver.A) (C) Namco, 2002
 
@@ -177,7 +177,7 @@ ROM Daughterboard PCBs
 This PCB holds all the ROMs.
 There are three known types of ROM daughterboards used on S10 games (so far).
 All of the PCBs are the same size (approx 5" x 5") containing one custom connector surface-mounted to the underside of
-the PCB, some MASKROMs/FlashROMs, a CPLD (which seems to be the customary 'KEYCUS' chip. On the 2nd type a RAM
+the PCB, some mask ROMs/flash ROMs, a CPLD (which seems to be the customary 'KEYCUS' chip. On the 2nd type a RAM
 chip is also present. The 3rd type has additional hardware to decode MP3 audio and a ROMless Microcontroller.
 
 ********
@@ -209,7 +209,7 @@ System10 MEM(M) PCB 8906961000 (8906970700)
 Notes:
       CY37128VP160: CY37128VP160 Cypress Complex Programmable Logic Device (TQFP160)
       1A - 5A     : Intel Flash DA28F640J5 64MBit Flash EEPROM (SSOP56)
-      1D - 7E     : Samsung Electronics K3N9V1000A-YC 128MBit MASK ROM (TSOP48) (see note 3)
+      1D - 7E     : Samsung Electronics K3N9V1000A-YC 128MBit mask ROM (TSOP48) (see note 3)
       J1          : 6 pin header for programming the CPLD via JTAG
 
 This PCB is used on:
@@ -273,11 +273,11 @@ Panicuru Panekuru                     PPA1  Ver.A   KC017A   8E, 8D, 7E         
 Point Blank 3                         GNN2  Ver.A   KC002A   8E, 8D               N/A           see note 3
 Sekai Kaseki Hakken                   SKH1  Ver.A   KC035A   8E, 8D               N/A           also has a Namco S10 MGEX10 (8681960201) PCB, unverified title
 Star Trigon                           STT1  Ver.A   KC019A   8E, 8D               N/A
-Taiko No Tatsujin 2                   TK21  Ver.C   KC010A   8E, 8D, 7E           TK21-A        KEYCUS is marked KC007A, KC010A is a sticker
-Taiko No Tatsujin 3                   TK31  Ver.A   KC016A   8E, 8D, 7E           not dumped    For all TK* games see note 2
-Taiko No Tatsujin 4                   TK41  Ver.A   KC024A   8E, 8D, 7E           TK-4
-Taiko No Tatsujin 5                   TK51  Ver.A   KC031A   8E, 8D, 7E           not dumped
-Taiko No Tatsujin 6                   TK61  Ver.A   KC036A   8E, 8D, 7E           TK-6
+Taiko no Tatsujin 2                   TK21  Ver.C   KC010A   8E, 8D, 7E           TK21-A        KEYCUS is marked KC007A, KC010A is a sticker
+Taiko no Tatsujin 3                   TK31  Ver.A   KC016A   8E, 8D, 7E           not dumped    For all TK* games see note 2
+Taiko no Tatsujin 4                   TK41  Ver.A   KC024A   8E, 8D, 7E           TK-4
+Taiko no Tatsujin 5                   TK51  Ver.A   KC031A   8E, 8D, 7E           not dumped
+Taiko no Tatsujin 6                   TK61  Ver.A   KC036A   8E, 8D, 7E           TK-6
 Utyuu Daisakusen Chocovader Contactee CVC1  Ver.A   KC022A   8E, 8D, 7E, 7D, 6E   N/A
 
       Notes:
@@ -398,6 +398,7 @@ earlier TK games, so it appears to be optional or is only used by the later TK51
 #include "cpu/psx/psx.h"
 #include "machine/ram.h"
 #include "video/psx.h"
+#include "screen.h"
 #include "speaker.h"
 
 
@@ -408,13 +409,14 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") { }
 
+	void namcos10_base(machine_config &config);
+	void namcos10_memm(machine_config &config);
+	void namcos10_memn(machine_config &config);
 	void ns10_konotako(machine_config &config);
 	void ns10_mrdrilr2(machine_config &config);
 	void ns10_knpuzzle(machine_config &config);
 	void ns10_chocovdr(machine_config &config);
 	void ns10_startrgn(machine_config &config);
-	void namcos10_memm(machine_config &config);
-	void namcos10_memn(machine_config &config);
 	void ns10_gjspace(machine_config &config);
 	void ns10_nflclsfb(machine_config &config);
 	void ns10_gamshara(machine_config &config);
@@ -490,7 +492,7 @@ private:
 
 	DECLARE_MACHINE_RESET(namcos10);
 	void memn_driver_init(  );
-	required_device<cpu_device> m_maincpu;
+	required_device<psxcpu_device> m_maincpu;
 };
 
 
@@ -548,7 +550,7 @@ READ16_MEMBER(namcos10_state::range_r)
 
 READ16_MEMBER(namcos10_state::control_r)
 {
-	logerror("control_r %d (%x)\n", offset, m_maincpu->pc());
+	logerror("%s: control_r %d (%x)\n", machine().describe_context(), offset);
 	if(offset == 2)
 		return 1^0xffff;
 	return 0;
@@ -556,12 +558,12 @@ READ16_MEMBER(namcos10_state::control_r)
 
 WRITE16_MEMBER(namcos10_state::control_w)
 {
-	logerror("control_w %d, %04x (%x)\n", offset, data, m_maincpu->pc());
+	logerror("%s: control_w %d, %04x (%x)\n", machine().describe_context(), offset, data);
 }
 
 WRITE16_MEMBER(namcos10_state::sprot_w)
 {
-	logerror("sprot_w %04x (%x)\n", data, m_maincpu->pc());
+	logerror("%s: sprot_w %04x (%x)\n", machine().describe_context(), data);
 	sprot_bit = 7;
 	sprot_byte = 0;
 }
@@ -703,26 +705,26 @@ READ16_MEMBER(namcos10_state::nand_status_r )
 
 WRITE8_MEMBER(namcos10_state::nand_address1_w )
 {
-	logerror("nand_a1_w %08x (%08x)\n", data, m_maincpu->pc());
+	logerror("%s: nand_a1_w %08x (%08x)\n", machine().describe_context(), data);
 	//  nand_address = ( nand_address & 0x00ffffff ) | ( data << 24 );
 }
 
 WRITE8_MEMBER( namcos10_state::nand_address2_w )
 {
-	logerror("nand_a2_w %08x (%08x)\n", data, m_maincpu->pc());
+	logerror("%s: nand_a2_w %08x (%08x)\n", machine().describe_context(), data);
 	nand_address = ( nand_address & 0xffffff00 ) | ( data << 0 );
 }
 
 WRITE8_MEMBER( namcos10_state::nand_address3_w )
 {
-	logerror("nand_a3_w %08x (%08x)\n", data, m_maincpu->pc());
+	logerror("%s: nand_a3_w %08x (%08x)\n", machine().describe_context(), data);
 	nand_address = ( nand_address & 0xffff00ff ) | ( data <<  8 );
 }
 
 WRITE8_MEMBER( namcos10_state::nand_address4_w )
 {
 	nand_address = ( nand_address & 0xff00ffff ) | ( data << 16 );
-	logerror("nand_a4_w %08x (%08x) -> %08x\n", data, m_maincpu->pc(), nand_address*2);
+	logerror("%s: nand_a4_w %08x (%08x) -> %08x\n", machine().describe_context(), data, nand_address*2);
 }
 
 uint16_t namcos10_state::nand_read( uint32_t address )
@@ -920,101 +922,96 @@ MACHINE_RESET_MEMBER(namcos10_state,namcos10)
 	i2c_bit = 0;
 }
 
-MACHINE_CONFIG_START(namcos10_state::namcos10_memm)
+void namcos10_state::namcos10_base(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD( "maincpu", CXD8606BQ, XTAL(101'491'200) )
-	MCFG_DEVICE_PROGRAM_MAP( namcos10_memm_map )
-
-	// The bios first configures the rom window as 80000-big, then
+	CXD8606BQ(config, m_maincpu, XTAL(101'491'200));
+	m_maincpu->set_disable_rom_berr(true);
+	m_maincpu->subdevice<ram_device>("ram")->set_default_size("16M");
+	// The bios first configures the ROM window as 80000-big, then
 	// switches to 400000.  If berr is active, the first configuration
 	// wipes all handlers after 1fc80000, which kills the system
 	// afterwards
 
-	MCFG_PSX_DISABLE_ROM_BERR
-
-	subdevice<ram_device>("maincpu:ram")->set_default_size("16M");
-
-	MCFG_MACHINE_RESET_OVERRIDE(namcos10_state, namcos10 )
+	MCFG_MACHINE_RESET_OVERRIDE(namcos10_state, namcos10)
 
 	/* video hardware */
-	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561CQ, 0x200000, XTAL(53'693'175) )
+	CXD8561CQ(config, "gpu", XTAL(53'693'175), 0x200000, subdevice<psxcpu_device>("maincpu")).set_screen("screen");
+
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(namcos10_state::namcos10_memn)
-	/* basic machine hardware */
-	MCFG_DEVICE_ADD( "maincpu", CXD8606BQ, XTAL(101'491'200) )
-	MCFG_DEVICE_PROGRAM_MAP( namcos10_memn_map )
+void namcos10_state::namcos10_memm(machine_config &config)
+{
+	namcos10_base(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcos10_state::namcos10_memm_map);
+}
 
-	// The bios first configures the rom window as 80000-big, then
-	// switches to 400000.  If berr is active, the first configuration
-	// wipes all handlers after 1fc80000, which kills the system
-	// afterwards
+void namcos10_state::namcos10_memn(machine_config &config)
+{
+	namcos10_base(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &namcos10_state::namcos10_memn_map);
+}
 
-	MCFG_PSX_DISABLE_ROM_BERR
-
-	subdevice<ram_device>("maincpu:ram")->set_default_size("16M");
-
-	MCFG_MACHINE_RESET_OVERRIDE(namcos10_state, namcos10 )
-
-	/* video hardware */
-	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561CQ, 0x200000, XTAL(53'693'175) )
-
-	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(namcos10_state::ns10_mrdrilr2)
+void namcos10_state::ns10_mrdrilr2(machine_config &config)
+{
 	namcos10_memm(config);
 	/* decrypter device (CPLD in hardware?) */
-	MCFG_DEVICE_ADD("decrypter", MRDRILR2_DECRYPTER, 0)
-MACHINE_CONFIG_END
+	MRDRILR2_DECRYPTER(config, "decrypter", 0);
+}
 
-MACHINE_CONFIG_START(namcos10_state::ns10_chocovdr)
+void namcos10_state::ns10_chocovdr(machine_config &config)
+{
 	namcos10_memn(config);
 	/* decrypter device (CPLD in hardware?) */
-	MCFG_DEVICE_ADD("decrypter", CHOCOVDR_DECRYPTER, 0)
-MACHINE_CONFIG_END
+	CHOCOVDR_DECRYPTER(config, "decrypter", 0);
+}
 
-MACHINE_CONFIG_START(namcos10_state::ns10_gamshara)
+void namcos10_state::ns10_gamshara(machine_config &config)
+{
 	namcos10_memn(config);
 	/* decrypter device (CPLD in hardware?) */
-	MCFG_DEVICE_ADD("decrypter", GAMSHARA_DECRYPTER, 0)
-MACHINE_CONFIG_END
+	GAMSHARA_DECRYPTER(config, "decrypter", 0);
+}
 
-MACHINE_CONFIG_START(namcos10_state::ns10_gjspace)
+void namcos10_state::ns10_gjspace(machine_config &config)
+{
 	namcos10_memn(config);
 	/* decrypter device (CPLD in hardware?) */
-	MCFG_DEVICE_ADD("decrypter", GJSPACE_DECRYPTER, 0)
-MACHINE_CONFIG_END
+	GJSPACE_DECRYPTER(config, "decrypter", 0);
+}
 
-MACHINE_CONFIG_START(namcos10_state::ns10_knpuzzle)
+void namcos10_state::ns10_knpuzzle(machine_config &config)
+{
 	namcos10_memn(config);
 	/* decrypter device (CPLD in hardware?) */
-	MCFG_DEVICE_ADD("decrypter", KNPUZZLE_DECRYPTER, 0)
-MACHINE_CONFIG_END
+	KNPUZZLE_DECRYPTER(config, "decrypter", 0);
+}
 
-MACHINE_CONFIG_START(namcos10_state::ns10_konotako)
+void namcos10_state::ns10_konotako(machine_config &config)
+{
 	namcos10_memn(config);
 	/* decrypter device (CPLD in hardware?) */
-	MCFG_DEVICE_ADD("decrypter", KONOTAKO_DECRYPTER, 0)
-MACHINE_CONFIG_END
+	KONOTAKO_DECRYPTER(config, "decrypter", 0);
+}
 
-MACHINE_CONFIG_START(namcos10_state::ns10_nflclsfb)
+void namcos10_state::ns10_nflclsfb(machine_config &config)
+{
 	namcos10_memn(config);
 	/* decrypter device (CPLD in hardware?) */
-	MCFG_DEVICE_ADD("decrypter", NFLCLSFB_DECRYPTER, 0)
-MACHINE_CONFIG_END
+	NFLCLSFB_DECRYPTER(config, "decrypter", 0);
+}
 
-MACHINE_CONFIG_START(namcos10_state::ns10_startrgn)
+void namcos10_state::ns10_startrgn(machine_config &config)
+{
 	namcos10_memn(config);
 	/* decrypter device (CPLD in hardware?) */
-	MCFG_DEVICE_ADD("decrypter", STARTRGN_DECRYPTER, 0)
-MACHINE_CONFIG_END
+	STARTRGN_DECRYPTER(config, "decrypter", 0);
+}
 
 static INPUT_PORTS_START( namcos10 )
 	/* IN 0 */
@@ -1243,10 +1240,22 @@ ROM_START( sekaikh )
 	ROM_LOAD( "m48z35y.ic11", 0x0000, 0x8000, CRC(e0e52ffc) SHA1(557490e2f286773a945851f44ed0214de731cd75) )
 ROM_END
 
+ROM_START( taiko6 )
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 ) /* bios */
+	ROM_FILL( 0x0000000, 0x400000, 0x55 )
+
+	ROM_REGION16_LE( 0x3180000, "user2", 0 ) /* main prg */
+	ROM_LOAD( "k9f2808u0c.8e",         0x0000000, 0x1080000, CRC(a87352c9) SHA1(1816fabecfaa140da2cd46334701c3e2fb93258e) )
+	ROM_LOAD( "k9f2808u0c.8d",         0x1080000, 0x1080000, CRC(e89aa7a3) SHA1(c34d693f4715ce930dbd105eda1ffc8379991c22) )
+	ROM_LOAD( "k9f2808u0c.7e",         0x2100000, 0x1080000, CRC(098920ef) SHA1(06a689d8abb8454ed62dda92d93a8f5d756a6166) )
+
+	DISK_REGION("cd")
+	DISK_IMAGE_READONLY( "tk-6", 0, SHA1(ca8b8dfccc2022094c428b5e0b6391a77ec351f4) )
+ROM_END
 
 GAME( 2000, mrdrilr2,  0,        ns10_mrdrilr2, namcos10, namcos10_state, init_mrdrilr2, ROT0, "Namco", "Mr. Driller 2 (Japan, DR21 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // PORT_4WAY joysticks
-GAME( 2000, mrdrlr2a,  mrdrilr2, ns10_mrdrilr2, namcos10, namcos10_state, init_mrdrilr2, ROT0, "Namco", "Mr. Driller 2 (Asia, DR22 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // PORT_4WAY joysticks
-GAME( 2000, ptblank3,  0,        namcos10_memn, namcos10, namcos10_state, init_gunbalna, ROT0, "Namco", "Point Blank 3 (Asia, GNN2 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2000, mrdrlr2a,  mrdrilr2, ns10_mrdrilr2, namcos10, namcos10_state, init_mrdrilr2, ROT0, "Namco", "Mr. Driller 2 (World, DR22 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // PORT_4WAY joysticks
+GAME( 2000, ptblank3,  0,        namcos10_memn, namcos10, namcos10_state, init_gunbalna, ROT0, "Namco", "Point Blank 3 (World, GNN2 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2000, gunbalina, ptblank3, namcos10_memn, namcos10, namcos10_state, init_gunbalna, ROT0, "Namco", "Gunbalina (Japan, GNN1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2001, gjspace,   0,        ns10_gjspace , namcos10, namcos10_state, init_gjspace,  ROT0, "Namco / Metro", "Gekitoride-Jong Space (10011 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2001, g13jnc,    0,        namcos10_memn, namcos10, namcos10_state, empty_init,    ROT0, "Eighting / Raizing / Namco", "Golgo 13: Juusei no Chinkonka (Japan, GLT1 VER.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
@@ -1261,3 +1270,4 @@ GAME( 2002, gamsharaj, gamshara, ns10_gamshara, namcos10, namcos10_state, init_g
 GAME( 2003, nflclsfb,  0,        ns10_nflclsfb, namcos10, namcos10_state, init_nflclsfb, ROT0, "Namco", "NFL Classic Football (US, NCF3 Ver.A.)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2003, konotako,  0,        ns10_konotako, namcos10, namcos10_state, init_konotako, ROT0, "Mitchell", "Kono Tako (10021 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 GAME( 2004, sekaikh,   0,        namcos10_memn, namcos10, namcos10_state, empty_init,    ROT0, "Namco", "Sekai Kaseki Hakken (Japan, SKH1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME( 2004, taiko6,    0,        namcos10_memn, namcos10, namcos10_state, empty_init,    ROT0, "Namco", "Taiko no Tatsujin 6 (Japan, TK61 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

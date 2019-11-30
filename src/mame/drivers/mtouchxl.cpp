@@ -30,6 +30,8 @@
 //#define REAL_PCI_CHIPSET
 
 #include "emu.h"
+#include "bus/ata/atapicdr.h"
+#include "bus/ata/idehd.h"
 #include "bus/isa/isa_cards.h"
 #include "cpu/i386/i386.h"
 #include "machine/at.h"
@@ -38,7 +40,6 @@
 #include "machine/nvram.h"
 #include "machine/ins8250.h"
 #include "machine/microtch.h"
-#include "machine/atapicdr.h"
 #include "machine/bankdev.h"
 #include "machine/intelfsh.h"
 #include "machine/ds128x.h"
@@ -64,6 +65,7 @@ public:
 		{ }
 
 	void at486(machine_config &config);
+	void at486hd(machine_config &config);
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -80,6 +82,7 @@ private:
 	DECLARE_WRITE8_MEMBER(key_w);
 	DECLARE_READ8_MEMBER(coin_r);
 	static void cdrom(device_t *device);
+	static void hdd(device_t *device);
 	void at32_io(address_map &map);
 	void at32_map(address_map &map);
 	void dbank_map(address_map &map);
@@ -195,6 +198,7 @@ void mtxl_state::machine_reset()
 static void mt6k_ata_devices(device_slot_interface &device)
 {
 	device.option_add("cdrom", ATAPI_FIXED_CDROM);
+	device.option_add("hdd", IDE_HARDDISK);
 }
 
 void mtxl_state::cdrom(device_t *device)
@@ -206,50 +210,63 @@ void mtxl_state::cdrom(device_t *device)
 	ide0->set_fixed(true);
 
 	auto ide1 = dynamic_cast<device_slot_interface *>(device->subdevice("ide:1"));
-	ide1->set_default_option("");
+	ide1->set_default_option("hdd");
+	ide1->set_fixed(true);
+}
+
+void mtxl_state::hdd(device_t *device)
+{
+	auto ide0 = dynamic_cast<device_slot_interface *>(device->subdevice("ide:0"));
+	ide0->option_reset();
+	mt6k_ata_devices(*ide0);
+	ide0->set_default_option("hdd");
+	ide0->set_fixed(true);
+
+	auto ide1 = dynamic_cast<device_slot_interface *>(device->subdevice("ide:1"));
+	ide1->set_default_option("cdrom");
 	ide1->set_fixed(true);
 }
 #endif
 
-MACHINE_CONFIG_START(mtxl_state::at486)
-	MCFG_DEVICE_ADD(m_maincpu, I486DX4, 33000000)
-	MCFG_DEVICE_PROGRAM_MAP(at32_map)
-	MCFG_DEVICE_IO_MAP(at32_io)
+void mtxl_state::at486(machine_config &config)
+{
+	I486DX4(config, m_maincpu, 33000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mtxl_state::at32_map);
+	m_maincpu->set_addrmap(AS_IO, &mtxl_state::at32_io);
 #ifndef REAL_PCI_CHIPSET
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259_master", pic8259_device, inta_cb)
+	m_maincpu->set_irq_acknowledge_callback("mb:pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	MCFG_DEVICE_ADD("mb", AT_MB, 0)
+	AT_MB(config, "mb", 0);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// on board devices
-	MCFG_DEVICE_ADD("board1", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "ide", true) // FIXME: determine ISA bus clock
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("ide", cdrom)
-	MCFG_DEVICE_ADD("isa1", ISA16_SLOT, 0, "mb:isabus", pc_isa16_cards, "svga_dm", true) // original is a gd-5440
+	ISA16_SLOT(config, "board1", 0, "mb:isabus", pc_isa16_cards, "ide", true).set_option_machine_config("ide", cdrom); // FIXME: determine ISA bus clock
+	ISA16_SLOT(config, "isa1", 0, "mb:isabus", pc_isa16_cards, "svga_dm", true); // original is a gd-5440
 
-	MCFG_DEVICE_ADD("ns16550", NS16550, XTAL(1'843'200))
-	MCFG_INS8250_OUT_TX_CB(WRITELINE("microtouch", microtouch_device, rx))
-	MCFG_INS8250_OUT_INT_CB(WRITELINE("mb:pic8259_master", pic8259_device, ir4_w))
-	MCFG_MICROTOUCH_ADD("microtouch", 9600, WRITELINE("ns16550", ins8250_uart_device, rx_w))
+	ns16550_device &uart(NS16550(config, "ns16550", XTAL(1'843'200)));
+	uart.out_tx_callback().set("microtouch", FUNC(microtouch_device::rx));
+	uart.out_int_callback().set("mb:pic8259_master", FUNC(pic8259_device::ir4_w));
 
-	MCFG_DEVICE_ADD("cs4231", AD1848, 0)
-	MCFG_AD1848_IRQ_CALLBACK(WRITELINE("mb:pic8259_master", pic8259_device, ir5_w))
-	MCFG_AD1848_DRQ_CALLBACK(WRITELINE("mb:dma8237_1", am9517a_device, dreq1_w))
+	MICROTOUCH(config, "microtouch", 9600).stx().set(uart, FUNC(ins8250_uart_device::rx_w));
+
+	ad1848_device &cs4231(AD1848(config, "cs4231", 0));
+	cs4231.irq().set("mb:pic8259_master", FUNC(pic8259_device::ir5_w));
+	cs4231.drq().set("mb:dma8237_1", FUNC(am9517a_device::dreq1_w));
 
 	subdevice<am9517a_device>("mb:dma8237_1")->out_iow_callback<1>().set("cs4231", FUNC(ad1848_device::dack_w));
 
 	// remove the keyboard controller and use the HLE one which allow keys to be unmapped
-	MCFG_DEVICE_REMOVE("mb:keybc");
-	MCFG_DEVICE_REMOVE("mb:pc_kbdc");
+	config.device_remove("mb:keybc");
+	config.device_remove("mb:pc_kbdc");
 	kbdc8042_device &kbdc(KBDC8042(config, "kbdc"));
-	kbdc.set_keyboard_type(kbdc8042_device::KBDC8042_AT386);
+	kbdc.set_keyboard_type(kbdc8042_device::KBDC8042_STANDARD);
 	kbdc.system_reset_callback().set_inputline(m_maincpu, INPUT_LINE_RESET);
 	kbdc.gate_a20_callback().set_inputline(m_maincpu, INPUT_LINE_A20);
 	kbdc.input_buffer_full_callback().set("mb:pic8259_master", FUNC(pic8259_device::ir1_w));
 
-	MCFG_DEVICE_REMOVE("mb:rtc")
-	MCFG_DS12885_ADD("mb:rtc")
-	MCFG_MC146818_IRQ_HANDLER(WRITELINE("mb:pic8259_slave", pic8259_device, ir0_w))
-	MCFG_MC146818_CENTURY_INDEX(0x32)
+	ds12885_device &rtc(DS12885(config.replace(), "mb:rtc"));
+	rtc.irq().set("mb:pic8259_slave", FUNC(pic8259_device::ir0_w));
+	rtc.set_century_index(0x32);
 #endif
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("32M"); // Early XL games had 8 MB RAM, 6000 and later require 32MB
@@ -258,25 +275,86 @@ MACHINE_CONFIG_START(mtxl_state::at486)
 	ADDRESS_MAP_BANK(config, "dbank").set_map(&mtxl_state::dbank_map).set_options(ENDIANNESS_LITTLE, 32, 32, 0x10000);
 
 	/* Flash ROM */
-	MCFG_AMD_29F040_ADD("flash")
+	AMD_29F040(config, "flash");
 
 	/* Security key */
-	MCFG_DS1205_ADD("multikey")
+	DS1205(config, "multikey");
 
 #ifdef REAL_PCI_CHIPSET
 	/* PCI root */
-	MCFG_PCI_ROOT_ADD(":pci")
-	MCFG_SIS85C496_ADD(":pci:05.0", ":maincpu", 32*1024*1024)
+	PCI_ROOT(config, ":pci");
+	// FIXME: This MCFG fragment does not compile. -R
+	//MCFG_SIS85C496_ADD(":pci:05.0", ":maincpu", 32*1024*1024)
 #endif
-MACHINE_CONFIG_END
+}
+
+void mtxl_state::at486hd(machine_config &config)
+{
+	I486DX4(config, m_maincpu, 33000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mtxl_state::at32_map);
+	m_maincpu->set_addrmap(AS_IO, &mtxl_state::at32_io);
+#ifndef REAL_PCI_CHIPSET
+	m_maincpu->set_irq_acknowledge_callback("mb:pic8259_master", FUNC(pic8259_device::inta_cb));
+
+	AT_MB(config, "mb", 0);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
+	// on board devices
+	ISA16_SLOT(config, "board1", 0, "mb:isabus", pc_isa16_cards, "ide", true).set_option_machine_config("ide", hdd); // FIXME: determine ISA bus clock
+	ISA16_SLOT(config, "isa1", 0, "mb:isabus", pc_isa16_cards, "svga_dm", true); // original is a gd-5440
+
+	ns16550_device &uart(NS16550(config, "ns16550", XTAL(1'843'200)));
+	uart.out_tx_callback().set("microtouch", FUNC(microtouch_device::rx));
+	uart.out_int_callback().set("mb:pic8259_master", FUNC(pic8259_device::ir4_w));
+
+	MICROTOUCH(config, "microtouch", 9600).stx().set(uart, FUNC(ins8250_uart_device::rx_w));
+
+	ad1848_device &cs4231(AD1848(config, "cs4231", 0));
+	cs4231.irq().set("mb:pic8259_master", FUNC(pic8259_device::ir5_w));
+	cs4231.drq().set("mb:dma8237_1", FUNC(am9517a_device::dreq1_w));
+
+	subdevice<am9517a_device>("mb:dma8237_1")->out_iow_callback<1>().set("cs4231", FUNC(ad1848_device::dack_w));
+
+	// remove the keyboard controller and use the HLE one which allow keys to be unmapped
+	config.device_remove("mb:keybc");
+	config.device_remove("mb:pc_kbdc");
+	kbdc8042_device &kbdc(KBDC8042(config, "kbdc"));
+	kbdc.set_keyboard_type(kbdc8042_device::KBDC8042_STANDARD);
+	kbdc.system_reset_callback().set_inputline(m_maincpu, INPUT_LINE_RESET);
+	kbdc.gate_a20_callback().set_inputline(m_maincpu, INPUT_LINE_A20);
+	kbdc.input_buffer_full_callback().set("mb:pic8259_master", FUNC(pic8259_device::ir1_w));
+
+	ds12885_device &rtc(DS12885(config.replace(), "mb:rtc"));
+	rtc.irq().set("mb:pic8259_slave", FUNC(pic8259_device::ir0_w));
+	rtc.set_century_index(0x32);
+#endif
+	/* internal ram */
+	RAM(config, RAM_TAG).set_default_size("32M"); // Early XL games had 8 MB RAM, 6000 and later require 32MB
+
+	/* bankdev for dxxxx */
+	ADDRESS_MAP_BANK(config, "dbank").set_map(&mtxl_state::dbank_map).set_options(ENDIANNESS_LITTLE, 32, 32, 0x10000);
+
+	/* Flash ROM */
+	AMD_29F040(config, "flash");
+
+	/* Security key */
+	DS1205(config, "multikey");
+
+#ifdef REAL_PCI_CHIPSET
+	/* PCI root */
+	PCI_ROOT(config, ":pci");
+	// FIXME: This MCFG fragment does not compile. -R
+	//MCFG_SIS85C496_ADD(":pci:05.0", ":maincpu", 32*1024*1024)
+#endif
+}
 
 #ifdef REAL_PCI_CHIPSET
 #define MOTHERBOARD_ROMS \
-	ROM_REGION(0x20000, ":pci:05.0", 0) \
+	ROM_REGION32_LE(0x20000, ":pci:05.0", 0) \
 	ROM_LOAD( "094572516 bios - 486.bin", 0x000000, 0x020000, CRC(1c0b3ba0) SHA1(ff86dd6e476405e716ac7a4de4a216d2d2b49f15))
 #else
 #define MOTHERBOARD_ROMS \
-	ROM_REGION(0x20000, "bios", 0) \
+	ROM_REGION32_LE(0x20000, "bios", 0) \
 	ROM_LOAD("prom.mb", 0x10000, 0x10000, BAD_DUMP CRC(e44bfd3c) SHA1(c07ec94e11efa30e001f39560010112f73cc0016) ) \
 	ROM_REGION(0x80, "mb:rtc", 0) \
 	ROM_LOAD("mb_rtc", 0, 0x80, BAD_DUMP CRC(b724e5d3) SHA1(45a19ec4201d2933d033689b7a01a0260962fb0b))
@@ -285,7 +363,7 @@ MACHINE_CONFIG_END
 ROM_START( mtouchxl )
 	MOTHERBOARD_ROMS
 
-	ROM_REGION(0x100000, "ioboard", 0)
+	ROM_REGION32_LE(0x100000, "ioboard", 0)
 	ROM_LOAD( "sa3014-03_u12-r3", 0x000000, 0x100000, CRC(5a14b68a) SHA1(351a3ae14c335ac0b52e6f4976f9819c11a668f9) )
 
 	ROM_REGION(192, "multikey", ROMREGION_ERASE00)
@@ -298,7 +376,7 @@ ROM_END
 ROM_START( mtchxl5k )
 	MOTHERBOARD_ROMS
 
-	ROM_REGION(0x100000, "ioboard", 0)
+	ROM_REGION32_LE(0x100000, "ioboard", 0)
 	ROM_LOAD( "sa3014-03_u12-r3", 0x000000, 0x100000, CRC(5a14b68a) SHA1(351a3ae14c335ac0b52e6f4976f9819c11a668f9) )
 
 	ROM_REGION(192, "multikey", ROMREGION_ERASE00)
@@ -311,7 +389,7 @@ ROM_END
 ROM_START( mtchxl5ko )
 	MOTHERBOARD_ROMS
 
-	ROM_REGION(0x100000, "ioboard", 0)
+	ROM_REGION32_LE(0x100000, "ioboard", 0)
 	ROM_LOAD( "sa3014-03_u12-r3", 0x000000, 0x100000, CRC(5a14b68a) SHA1(351a3ae14c335ac0b52e6f4976f9819c11a668f9) )
 
 	ROM_REGION(192, "multikey", ROMREGION_ERASE00)
@@ -324,7 +402,7 @@ ROM_END
 ROM_START( mtchxl5ko2 )
 	MOTHERBOARD_ROMS
 
-	ROM_REGION(0x100000, "ioboard", 0)
+	ROM_REGION32_LE(0x100000, "ioboard", 0)
 	ROM_LOAD( "sa3014-03_u12-r3", 0x000000, 0x100000, CRC(5a14b68a) SHA1(351a3ae14c335ac0b52e6f4976f9819c11a668f9) )
 
 	ROM_REGION(192, "multikey", ROMREGION_ERASE00)
@@ -337,7 +415,7 @@ ROM_END
 ROM_START( mtchxl6k )
 	MOTHERBOARD_ROMS
 
-	ROM_REGION(0x100000, "ioboard", 0)
+	ROM_REGION32_LE(0x100000, "ioboard", 0)
 	ROM_LOAD( "sa3014-04_u12-r00.u12", 0x000000, 0x100000, CRC(2a6fbca4) SHA1(186eb052cb9b77ffe6ee4cb50c1b580532fd8f47) )
 
 	ROM_REGION(192, "multikey", 0)
@@ -350,7 +428,7 @@ ROM_END
 ROM_START( mtchxl6ko4 )
 	MOTHERBOARD_ROMS
 
-	ROM_REGION(0x100000, "ioboard", 0)
+	ROM_REGION32_LE(0x100000, "ioboard", 0)
 	ROM_LOAD( "sa3014-04_u12-r00.u12", 0x000000, 0x100000, CRC(2a6fbca4) SHA1(186eb052cb9b77ffe6ee4cb50c1b580532fd8f47) )
 
 	ROM_REGION(192, "multikey", 0)
@@ -363,7 +441,7 @@ ROM_END
 ROM_START( mtchxl6ko )
 	MOTHERBOARD_ROMS
 
-	ROM_REGION(0x100000, "ioboard", 0)
+	ROM_REGION32_LE(0x100000, "ioboard", 0)
 	ROM_LOAD( "sa3014-04_u12-r00.u12", 0x000000, 0x100000, CRC(2a6fbca4) SHA1(186eb052cb9b77ffe6ee4cb50c1b580532fd8f47) )
 
 	ROM_REGION(192, "multikey", 0)
@@ -376,7 +454,7 @@ ROM_END
 ROM_START( mtchxlgld )
 	MOTHERBOARD_ROMS
 
-	ROM_REGION(0x100000, "ioboard", 0)
+	ROM_REGION32_LE(0x100000, "ioboard", 0)
 	ROM_LOAD( "sa3014-04_u12-r00.u12", 0x000000, 0x100000, CRC(2a6fbca4) SHA1(186eb052cb9b77ffe6ee4cb50c1b580532fd8f47) )
 
 	ROM_REGION(0x8000, "nvram", 0)
@@ -392,7 +470,7 @@ ROM_END
 ROM_START( mtchxlgldo )
 	MOTHERBOARD_ROMS
 
-	ROM_REGION(0x100000, "ioboard", 0)
+	ROM_REGION32_LE(0x100000, "ioboard", 0)
 	ROM_LOAD( "sa3014-04_u12-r00.u12", 0x000000, 0x100000, CRC(2a6fbca4) SHA1(186eb052cb9b77ffe6ee4cb50c1b580532fd8f47) )
 
 	ROM_REGION(0x8000, "nvram", 0)
@@ -403,6 +481,19 @@ ROM_START( mtchxlgldo )
 
 	DISK_REGION("board1:ide:ide:0:cdrom")
 	DISK_IMAGE_READONLY("r00", 0, SHA1(635e267f1abea060ce813eb7e78b88d57ea3f951))
+ROM_END
+
+ROM_START( mtchxlti )
+	MOTHERBOARD_ROMS
+
+	ROM_REGION32_LE(0x100000, "ioboard", ROMREGION_ERASE00)
+
+	ROM_REGION(0x8000, "nvram", ROMREGION_ERASE00)
+
+	ROM_REGION(192, "multikey", ROMREGION_ERASE00)
+
+	DISK_REGION("board1:ide:ide:0:hdd")
+	DISK_IMAGE_READONLY("r00", 0, SHA1(8e9a2f9e670f02139cee11b7e8f758639d8b2838))
 ROM_END
 
 /***************************************************************************
@@ -422,3 +513,5 @@ COMP( 1999, mtchxl6ko4, mtchxl6k,  0,      at486,   mtouchxl, mtxl_state, empty_
 COMP( 1999, mtchxl6ko,  mtchxl6k,  0,      at486,   mtouchxl, mtxl_state, empty_init, "Merit Industries", "MegaTouch XL 6000 (Version r02)",       0 )
 COMP( 2000, mtchxlgld,  0,         0,      at486,   mtouchxl, mtxl_state, empty_init, "Merit Industries", "MegaTouch XL Gold (Version r01)",       MACHINE_NOT_WORKING )
 COMP( 2000, mtchxlgldo, mtchxlgld, 0,      at486,   mtouchxl, mtxl_state, empty_init, "Merit Industries", "MegaTouch XL Gold (Version r00)",       MACHINE_NOT_WORKING )
+// this is a cracked operator bootleg, but the original files exist on the disk and could be replaced to create an imperfect non-cracked dump
+COMP( 2002, mtchxlti,   0,         0,      at486hd, mtouchxl, mtxl_state, empty_init, "bootleg", "MegaTouch XL Titanium (Version r0?, cracked)",   MACHINE_NOT_WORKING )

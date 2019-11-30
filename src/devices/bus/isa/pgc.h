@@ -41,8 +41,6 @@ protected:
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(scanline_callback);
-
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
@@ -68,7 +66,6 @@ private:
 	std::unique_ptr<uint8_t[]> m_eram;
 	uint8_t m_stateparam[16];
 	uint8_t m_lut[256 * 3];
-	std::unique_ptr<bitmap_ind16> m_bitmap;
 	int m_accel;
 };
 

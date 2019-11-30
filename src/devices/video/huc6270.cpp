@@ -406,7 +406,7 @@ inline void huc6270_device::next_horz_state()
 }
 
 
-READ16_MEMBER( huc6270_device::next_pixel )
+u16 huc6270_device::next_pixel()
 {
 	uint16_t data = HUC6270_SPRITE;
 
@@ -475,7 +475,7 @@ READ16_MEMBER( huc6270_device::next_pixel )
 }
 
 
-//inline READ16_MEMBER( huc6270_device::time_until_next_event )
+//inline u16 huc6270_device::time_until_next_event()
 //{
 //  return m_horz_to_go * 8 + m_horz_steps;
 //}
@@ -596,7 +596,7 @@ inline void huc6270_device::handle_dma()
 	}
 }
 
-READ8_MEMBER( huc6270_device::read )
+u8 huc6270_device::read(offs_t offset)
 {
 	uint8_t data = 0x00;
 
@@ -633,7 +633,7 @@ READ8_MEMBER( huc6270_device::read )
 }
 
 
-WRITE8_MEMBER( huc6270_device::write )
+void huc6270_device::write(offs_t offset, u8 data)
 {
 	LOG("%s: huc6270 write %02x <- %02x ", machine().describe_context(), offset, data);
 

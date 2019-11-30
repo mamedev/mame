@@ -35,13 +35,13 @@ WRITE8_MEMBER(dogfgt_state::soundlatch_w)
 
 WRITE8_MEMBER(dogfgt_state::soundcontrol_w)
 {
-	/* bit 5 goes to 8910 #0 BDIR pin  */
+	/* bit 5 goes to YM2149 #0 BDIR pin  */
 	if ((m_last_snd_ctrl & 0x20) == 0x20 && (data & 0x20) == 0x00)
-		m_ay[0]->data_address_w(space, m_last_snd_ctrl >> 4, m_soundlatch);
+		m_ay[0]->data_address_w(m_last_snd_ctrl >> 4, m_soundlatch);
 
-	/* bit 7 goes to 8910 #1 BDIR pin  */
+	/* bit 7 goes to YM2149 #1 BDIR pin  */
 	if ((m_last_snd_ctrl & 0x80) == 0x80 && (data & 0x80) == 0x00)
-		m_ay[1]->data_address_w(space, m_last_snd_ctrl >> 6, m_soundlatch);
+		m_ay[1]->data_address_w(m_last_snd_ctrl >> 6, m_soundlatch);
 
 	m_last_snd_ctrl = data;
 }
@@ -227,41 +227,36 @@ void dogfgt_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(dogfgt_state::dogfgt)
-
+void dogfgt_state::dogfgt(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, M6502, 1500000) /* 1.5 MHz ???? */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(dogfgt_state, irq0_line_hold, 16*60)   /* ? controls music tempo */
+	M6502(config, m_maincpu, 1500000); /* 1.5 MHz ???? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &dogfgt_state::main_map);
+	m_maincpu->set_periodic_int(FUNC(dogfgt_state::irq0_line_hold), attotime::from_hz(16*60));   /* ? controls music tempo */
 
-	MCFG_DEVICE_ADD(m_subcpu, M6502, 1500000) /* 1.5 MHz ???? */
-	MCFG_DEVICE_PROGRAM_MAP(sub_map)
+	M6502(config, m_subcpu, 1500000); /* 1.5 MHz ???? */
+	m_subcpu->set_addrmap(AS_PROGRAM, &dogfgt_state::sub_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(m_screen, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(dogfgt_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
+	m_screen->set_screen_update(FUNC(dogfgt_state::screen_update));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_dogfgt)
-	MCFG_PALETTE_ADD(m_palette, 16+64)
-	MCFG_PALETTE_FORMAT(BBGGGRRR)
-	MCFG_PALETTE_INIT_OWNER(dogfgt_state, dogfgt)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dogfgt);
+	PALETTE(config, m_palette, FUNC(dogfgt_state::dogfgt_palette)).set_format(palette_device::BGR_233, 16 + 64);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD(m_ay[0], AY8910, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-
-	MCFG_DEVICE_ADD(m_ay[1], AY8910, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_CONFIG_END
+	YM2149(config, m_ay[0], 1500000).add_route(ALL_OUTPUTS, "mono", 0.30);
+	YM2149(config, m_ay[1], 1500000).add_route(ALL_OUTPUTS, "mono", 0.30);
+}
 
 
 

@@ -138,12 +138,13 @@ Keyboard Mania 2nd Mix - dongle, program CD, audio CD
 
 #include "emu.h"
 
+#include "bus/ata/ataintf.h"
+#include "bus/ata/atapicdr.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/powerpc/ppc.h"
-#include "machine/ataintf.h"
-#include "machine/atapicdr.h"
 #include "machine/ins8250.h"
 #include "machine/intelfsh.h"
+#include "machine/mb8421.h"
 #include "machine/midikbd.h"
 #include "machine/rtc65271.h"
 #include "machine/timer.h"
@@ -172,13 +173,13 @@ struct IBUTTON
 };
 
 
-#define PRINT_SPU_MEM 0
+//#define PRINT_SPU_MEM 0
 
 class firebeat_state : public driver_device
 {
 public:
-	firebeat_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	firebeat_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_work_ram(*this, "work_ram"),
@@ -187,6 +188,7 @@ public:
 		m_kbd(*this, "kbd%u", 0),
 		m_ata(*this, "ata"),
 		m_gcu(*this, "gcu%u", 0),
+		m_dpram(*this, "spuram"),
 		m_spuata(*this, "spu_ata")
 	{ }
 
@@ -207,6 +209,7 @@ private:
 	optional_device_array<midi_keyboard_device, 2> m_kbd;
 	required_device<ata_interface_device> m_ata;
 	optional_device_array<k057714_device, 2> m_gcu;
+	optional_device<cy7c131_device> m_dpram;
 	optional_device<ata_interface_device> m_spuata;
 
 	uint8_t m_extend_board_irq_enable;
@@ -216,7 +219,6 @@ private:
 	int m_cab_data_ptr;
 	const int * m_cur_cab_data;
 //  int m_keyboard_state[2];
-	uint8_t m_spu_shared_ram[0x400];
 	IBUTTON m_ibutton;
 	int m_ibutton_state;
 	int m_ibutton_read_subkey_ptr;
@@ -250,14 +252,10 @@ private:
 	DECLARE_WRITE32_MEMBER(lamp_output2_ppp_w);
 	DECLARE_WRITE32_MEMBER(lamp_output3_w);
 	DECLARE_WRITE32_MEMBER(lamp_output3_ppp_w);
-	DECLARE_READ32_MEMBER(ppc_spu_share_r);
-	DECLARE_WRITE32_MEMBER(ppc_spu_share_w);
 	DECLARE_READ16_MEMBER(spu_unk_r);
 	DECLARE_WRITE16_MEMBER(spu_irq_ack_w);
 	DECLARE_WRITE16_MEMBER(spu_220000_w);
 	DECLARE_WRITE16_MEMBER(spu_sdram_bank_w);
-	DECLARE_READ16_MEMBER(m68k_spu_share_r);
-	DECLARE_WRITE16_MEMBER(m68k_spu_share_w);
 	DECLARE_WRITE_LINE_MEMBER(spu_ata_interrupt);
 //  TIMER_CALLBACK_MEMBER(keyboard_timer_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(spu_timer_callback);
@@ -274,6 +272,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(gcu1_interrupt);
 	static void cdrom_config(device_t *device);
 	void firebeat_map(address_map &map);
+	void firebeat_spu_map(address_map &map);
 	void firebeat2_map(address_map &map);
 	void spu_map(address_map &map);
 	void ymz280b_map(address_map &map);
@@ -489,12 +488,12 @@ READ32_MEMBER(firebeat_state::keyboard_wheel_r )
 
 READ8_MEMBER(firebeat_state::midi_uart_r )
 {
-	return m_duart_midi->read(space, offset >> 6);
+	return m_duart_midi->read(offset >> 6);
 }
 
 WRITE8_MEMBER(firebeat_state::midi_uart_w )
 {
-	m_duart_midi->write(space, offset >> 6, data);
+	m_duart_midi->write(offset >> 6, data);
 }
 
 WRITE_LINE_MEMBER(firebeat_state::midi_uart_ch0_irq_callback)
@@ -765,76 +764,6 @@ WRITE32_MEMBER(firebeat_state::lamp_output3_ppp_w )
 /*****************************************************************************/
 
 
-READ32_MEMBER(firebeat_state::ppc_spu_share_r)
-{
-	uint32_t r = 0;
-
-#if PRINT_SPU_MEM
-	printf("ppc_spu_share_r: %08X, %08X at %08X\n", offset, mem_mask, m_maincpu->pc());
-#endif
-
-	if (ACCESSING_BITS_24_31)
-	{
-		r |= m_spu_shared_ram[(offset * 4) + 0] << 24;
-	}
-	if (ACCESSING_BITS_16_23)
-	{
-		r |= m_spu_shared_ram[(offset * 4) + 1] << 16;
-	}
-	if (ACCESSING_BITS_8_15)
-	{
-		r |= m_spu_shared_ram[(offset * 4) + 2] <<  8;
-	}
-	if (ACCESSING_BITS_0_7)
-	{
-		r |= m_spu_shared_ram[(offset * 4) + 3] <<  0;
-
-		if (offset == 0xff)     // address 0x3ff clears PPC interrupt
-		{
-			m_maincpu->set_input_line(INPUT_LINE_IRQ3, CLEAR_LINE);
-		}
-	}
-
-	return r;
-}
-
-WRITE32_MEMBER(firebeat_state::ppc_spu_share_w)
-{
-#if PRINT_SPU_MEM
-	printf("ppc_spu_share_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, m_maincpu->pc());
-#endif
-
-	if (ACCESSING_BITS_24_31)
-	{
-		m_spu_shared_ram[(offset * 4) + 0] = (data >> 24) & 0xff;
-	}
-	if (ACCESSING_BITS_16_23)
-	{
-		m_spu_shared_ram[(offset * 4) + 1] = (data >> 16) & 0xff;
-	}
-	if (ACCESSING_BITS_8_15)
-	{
-		m_spu_shared_ram[(offset * 4) + 2] = (data >>  8) & 0xff;
-
-		if (offset == 0xff)     // address 0x3fe triggers M68K interrupt
-		{
-			m_audiocpu->set_input_line(INPUT_LINE_IRQ4, ASSERT_LINE);
-
-			printf("SPU command %02X%02X\n", m_spu_shared_ram[0], m_spu_shared_ram[1]);
-
-			uint16_t cmd = ((uint16_t)(m_spu_shared_ram[0]) << 8) | m_spu_shared_ram[1];
-			if (cmd == 0x1110)
-			{
-				printf("   [%02X %02X %02X %02X %02X]\n", m_spu_shared_ram[0x10], m_spu_shared_ram[0x11], m_spu_shared_ram[0x12], m_spu_shared_ram[0x13], m_spu_shared_ram[0x14]);
-			}
-		}
-	}
-	if (ACCESSING_BITS_0_7)
-	{
-		m_spu_shared_ram[(offset * 4) + 3] = (data >>  0) & 0xff;
-	}
-}
-
 /*  SPU board M68K IRQs
 
     IRQ1: ?
@@ -846,41 +775,6 @@ WRITE32_MEMBER(firebeat_state::ppc_spu_share_w)
 
     IRQ6: ATA
 */
-
-READ16_MEMBER(firebeat_state::m68k_spu_share_r)
-{
-#if PRINT_SPU_MEM
-	printf("m68k_spu_share_r: %08X, %08X\n", offset, mem_mask);
-#endif
-	uint16_t r = 0;
-
-	if (ACCESSING_BITS_0_7)
-	{
-		r |= m_spu_shared_ram[offset];
-
-		if (offset == 0x3fe)            // address 0x3fe clears M68K interrupt
-		{
-			m_audiocpu->set_input_line(INPUT_LINE_IRQ4, CLEAR_LINE);
-		}
-	}
-	return r;
-}
-
-WRITE16_MEMBER(firebeat_state::m68k_spu_share_w)
-{
-#if PRINT_SPU_MEM
-	printf("m68k_spu_share_w: %04X, %08X, %08X\n", data, offset, mem_mask);
-#endif
-	if (ACCESSING_BITS_0_7)
-	{
-		m_spu_shared_ram[offset] = data & 0xff;
-
-		if (offset == 0x3ff)            // address 0x3ff triggers PPC interrupt
-		{
-			m_maincpu->set_input_line(INPUT_LINE_IRQ3, ASSERT_LINE);
-		}
-	}
-}
 
 READ16_MEMBER(firebeat_state::spu_unk_r)
 {
@@ -943,7 +837,7 @@ void firebeat_state::firebeat_map(address_map &map)
 	map(0x70006000, 0x70006003).w(FUNC(firebeat_state::extend_board_irq_w));
 	map(0x70008000, 0x7000800f).r(FUNC(firebeat_state::keyboard_wheel_r));
 	map(0x7000a000, 0x7000a003).r(FUNC(firebeat_state::extend_board_irq_r));
-	map(0x74000000, 0x740003ff).rw(FUNC(firebeat_state::ppc_spu_share_r), FUNC(firebeat_state::ppc_spu_share_w)); // SPU shared RAM
+	map(0x74000000, 0x740003ff).noprw(); // SPU shared RAM
 	map(0x7d000200, 0x7d00021f).r(FUNC(firebeat_state::cabinet_r));
 	map(0x7d000340, 0x7d000347).r(FUNC(firebeat_state::sensor_r));
 	map(0x7d000400, 0x7d000401).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write));
@@ -954,16 +848,22 @@ void firebeat_state::firebeat_map(address_map &map)
 	map(0x7dc00000, 0x7dc0000f).rw(m_duart_com, FUNC(pc16552_device::read), FUNC(pc16552_device::write));
 	map(0x7e000000, 0x7e00003f).rw("rtc", FUNC(rtc65271_device::rtc_r), FUNC(rtc65271_device::rtc_w));
 	map(0x7e000100, 0x7e00013f).rw("rtc", FUNC(rtc65271_device::xram_r), FUNC(rtc65271_device::xram_w));
-	map(0x7e800000, 0x7e8000ff).rw("gcu0", FUNC(k057714_device::read), FUNC(k057714_device::write));
+	map(0x7e800000, 0x7e8000ff).rw(m_gcu[0], FUNC(k057714_device::read), FUNC(k057714_device::write));
 	map(0x7fe00000, 0x7fe0000f).rw(FUNC(firebeat_state::ata_command_r), FUNC(firebeat_state::ata_command_w));
 	map(0x7fe80000, 0x7fe8000f).rw(FUNC(firebeat_state::ata_control_r), FUNC(firebeat_state::ata_control_w));
 	map(0x7ff80000, 0x7fffffff).rom().region("user1", 0);       /* System BIOS */
 }
 
+void firebeat_state::firebeat_spu_map(address_map &map)
+{
+	firebeat_map(map);
+	map(0x74000000, 0x740003ff).rw(m_dpram, FUNC(cy7c131_device::right_r), FUNC(cy7c131_device::right_w)); // SPU shared RAM
+}
+
 void firebeat_state::firebeat2_map(address_map &map)
 {
 	firebeat_map(map);
-	map(0x7e800100, 0x7e8001ff).rw("gcu1", FUNC(k057714_device::read), FUNC(k057714_device::write));
+	map(0x7e800100, 0x7e8001ff).rw(m_gcu[1], FUNC(k057714_device::read), FUNC(k057714_device::write));
 }
 
 void firebeat_state::spu_map(address_map &map)
@@ -974,7 +874,7 @@ void firebeat_state::spu_map(address_map &map)
 	map(0x220000, 0x220001).w(FUNC(firebeat_state::spu_220000_w));
 	map(0x230000, 0x230001).w(FUNC(firebeat_state::spu_irq_ack_w));
 	map(0x260000, 0x260001).w(FUNC(firebeat_state::spu_sdram_bank_w));
-	map(0x280000, 0x2807ff).rw(FUNC(firebeat_state::m68k_spu_share_r), FUNC(firebeat_state::m68k_spu_share_w));
+	map(0x280000, 0x2807ff).rw(m_dpram, FUNC(cy7c131_device::left_r), FUNC(cy7c131_device::left_w)).umask16(0x00ff);
 	map(0x300000, 0x30000f).rw(m_spuata, FUNC(ata_interface_device::cs0_r), FUNC(ata_interface_device::cs0_w));
 	map(0x340000, 0x34000f).rw(m_spuata, FUNC(ata_interface_device::cs1_r), FUNC(ata_interface_device::cs1_w));
 	map(0x400000, 0x400fff).rw("rf5c400", FUNC(rf5c400_device::rf5c400_r), FUNC(rf5c400_device::rf5c400_w));
@@ -1165,9 +1065,9 @@ WRITE_LINE_MEMBER( firebeat_state::ata_interrupt )
 
 void firebeat_state::cdrom_config(device_t *device)
 {
+	device->subdevice<cdda_device>("cdda")->add_route(0, "^^lspeaker", 1.0);
+	device->subdevice<cdda_device>("cdda")->add_route(1, "^^rspeaker", 1.0);
 	device = device->subdevice("cdda");
-	MCFG_SOUND_ROUTE(0, "^^lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "^^rspeaker", 1.0)
 }
 
 static void firebeat_ata_devices(device_slot_interface &device)
@@ -1175,41 +1075,39 @@ static void firebeat_ata_devices(device_slot_interface &device)
 	device.option_add("cdrom", ATAPI_FIXED_CDROM);
 }
 
-MACHINE_CONFIG_START(firebeat_state::firebeat)
-
+void firebeat_state::firebeat(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", PPC403GCX, XTAL(64'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(firebeat_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", firebeat_state,  firebeat_interrupt)
+	PPC403GCX(config, m_maincpu, XTAL(64'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &firebeat_state::firebeat_map);
+	m_maincpu->set_vblank_int("screen", FUNC(firebeat_state::firebeat_interrupt));
 
 	MCFG_MACHINE_START_OVERRIDE(firebeat_state,firebeat)
 	MCFG_MACHINE_RESET_OVERRIDE(firebeat_state,firebeat)
 
-	MCFG_DEVICE_ADD("rtc", RTC65271, 0)
+	RTC65271(config, "rtc", 0);
 
-	MCFG_FUJITSU_29F016A_ADD("flash_main")
-	MCFG_FUJITSU_29F016A_ADD("flash_snd1")
-	MCFG_FUJITSU_29F016A_ADD("flash_snd2")
+	FUJITSU_29F016A(config, "flash_main");
+	FUJITSU_29F016A(config, "flash_snd1");
+	FUJITSU_29F016A(config, "flash_snd2");
 
 	ATA_INTERFACE(config, m_ata).options(firebeat_ata_devices, "cdrom", "cdrom", true);
 	m_ata->irq_handler().set(FUNC(firebeat_state::ata_interrupt));
-
-	MCFG_DEVICE_MODIFY("ata:1")
-	MCFG_SLOT_OPTION_MACHINE_CONFIG( "cdrom", cdrom_config )
+	m_ata->slot(1).set_option_machine_config("cdrom", cdrom_config);
 
 	/* video hardware */
-	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
+	PALETTE(config, "palette", palette_device::RGB_555);
 
-	MCFG_DEVICE_ADD("gcu0", K057714, 0)
-	MCFG_K057714_IRQ_CALLBACK(WRITELINE(*this, firebeat_state, gcu0_interrupt))
+	K057714(config, m_gcu[0], 0);
+	m_gcu[0]->irq_callback().set(FUNC(firebeat_state::gcu0_interrupt));
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
-	MCFG_SCREEN_UPDATE_DRIVER(firebeat_state, screen_update_firebeat_0)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 639, 0, 479);
+	screen.set_screen_update(FUNC(firebeat_state::screen_update_firebeat_0));
+	screen.set_palette("palette");
 
 	MCFG_VIDEO_START_OVERRIDE(firebeat_state,firebeat)
 
@@ -1217,68 +1115,66 @@ MACHINE_CONFIG_START(firebeat_state::firebeat)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymz", YMZ280B, 16934400)
-	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(*this, firebeat_state, sound_irq_callback))
-	MCFG_DEVICE_ADDRESS_MAP(0, ymz280b_map)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	ymz280b_device &ymz(YMZ280B(config, "ymz", 16934400));
+	ymz.irq_handler().set(FUNC(firebeat_state::sound_irq_callback));
+	ymz.set_addrmap(0, &firebeat_state::ymz280b_map);
+	ymz.add_route(0, "lspeaker", 1.0);
+	ymz.add_route(1, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("duart_com", PC16552D, 0)  // pgmd to 9600baud
-	MCFG_DEVICE_ADD("duart_com:chan0", NS16550, XTAL(19'660'800))
-	MCFG_DEVICE_ADD("duart_com:chan1", NS16550, XTAL(19'660'800))
-	MCFG_DEVICE_ADD("duart_midi", PC16552D, 0)  // in all memory maps, pgmd to 31250baud
-	MCFG_DEVICE_ADD("duart_midi:chan0", NS16550, XTAL(24'000'000))
-	MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, firebeat_state, midi_uart_ch0_irq_callback))
-	MCFG_DEVICE_ADD("duart_midi:chan1", NS16550, XTAL(24'000'000))
-	MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, firebeat_state, midi_uart_ch1_irq_callback))
-MACHINE_CONFIG_END
+	PC16552D(config, "duart_com", 0);  // pgmd to 9600baud
+	NS16550(config, "duart_com:chan0", XTAL(19'660'800));
+	NS16550(config, "duart_com:chan1", XTAL(19'660'800));
+	PC16552D(config, "duart_midi", 0);  // in all memory maps, pgmd to 31250baud
+	ns16550_device &midi_chan0(NS16550(config, "duart_midi:chan0", XTAL(24'000'000)));
+	midi_chan0.out_int_callback().set(FUNC(firebeat_state::midi_uart_ch0_irq_callback));
+	ns16550_device &midi_chan1(NS16550(config, "duart_midi:chan1", XTAL(24'000'000)));
+	midi_chan1.out_int_callback().set(FUNC(firebeat_state::midi_uart_ch1_irq_callback));
+}
 
-MACHINE_CONFIG_START(firebeat_state::firebeat2)
-
+void firebeat_state::firebeat2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", PPC403GCX, XTAL(64'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(firebeat2_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", firebeat_state,  firebeat_interrupt)
+	PPC403GCX(config, m_maincpu, XTAL(64'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &firebeat_state::firebeat2_map);
+	m_maincpu->set_vblank_int("lscreen", FUNC(firebeat_state::firebeat_interrupt));
 
 	MCFG_MACHINE_START_OVERRIDE(firebeat_state,firebeat)
 	MCFG_MACHINE_RESET_OVERRIDE(firebeat_state,firebeat)
 
-	MCFG_DEVICE_ADD("rtc", RTC65271, 0)
+	RTC65271(config, "rtc", 0);
 
-	MCFG_FUJITSU_29F016A_ADD("flash_main")
-	MCFG_FUJITSU_29F016A_ADD("flash_snd1")
-	MCFG_FUJITSU_29F016A_ADD("flash_snd2")
+	FUJITSU_29F016A(config, "flash_main");
+	FUJITSU_29F016A(config, "flash_snd1");
+	FUJITSU_29F016A(config, "flash_snd2");
 
 	ATA_INTERFACE(config, m_ata).options(firebeat_ata_devices, "cdrom", "cdrom", true);
 	m_ata->irq_handler().set(FUNC(firebeat_state::ata_interrupt));
-
-	MCFG_DEVICE_MODIFY("ata:1")
-	MCFG_SLOT_OPTION_MACHINE_CONFIG( "cdrom", cdrom_config )
+	m_ata->slot(1).set_option_machine_config("cdrom", cdrom_config);
 
 	/* video hardware */
-	MCFG_PALETTE_ADD_RRRRRGGGGGBBBBB("palette")
+	PALETTE(config, "palette", palette_device::RGB_555);
 
-	MCFG_DEVICE_ADD("gcu0", K057714, 0)
-	MCFG_K057714_IRQ_CALLBACK(WRITELINE(*this, firebeat_state, gcu0_interrupt))
+	K057714(config, m_gcu[0], 0);
+	m_gcu[0]->irq_callback().set(FUNC(firebeat_state::gcu0_interrupt));
 
-	MCFG_DEVICE_ADD("gcu1", K057714, 0)
-	MCFG_K057714_IRQ_CALLBACK(WRITELINE(*this, firebeat_state, gcu1_interrupt))
+	K057714(config, m_gcu[1], 0);
+	m_gcu[1]->irq_callback().set(FUNC(firebeat_state::gcu1_interrupt));
 
-	MCFG_SCREEN_ADD("lscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
-	MCFG_SCREEN_UPDATE_DRIVER(firebeat_state, screen_update_firebeat_0)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
+	lscreen.set_refresh_hz(60);
+	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	lscreen.set_size(640, 480);
+	lscreen.set_visarea(0, 639, 0, 479);
+	lscreen.set_screen_update(FUNC(firebeat_state::screen_update_firebeat_0));
+	lscreen.set_palette("palette");
 
-	MCFG_SCREEN_ADD("rscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
-	MCFG_SCREEN_UPDATE_DRIVER(firebeat_state, screen_update_firebeat_1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
+	rscreen.set_refresh_hz(60);
+	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	rscreen.set_size(640, 480);
+	rscreen.set_visarea(0, 639, 0, 479);
+	rscreen.set_screen_update(FUNC(firebeat_state::screen_update_firebeat_1));
+	rscreen.set_palette("palette");
 
 	MCFG_VIDEO_START_OVERRIDE(firebeat_state,firebeat)
 
@@ -1286,40 +1182,48 @@ MACHINE_CONFIG_START(firebeat_state::firebeat2)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymz", YMZ280B, 16934400)
-	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(*this, firebeat_state, sound_irq_callback))
-	MCFG_DEVICE_ADDRESS_MAP(0, ymz280b_map)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	ymz280b_device &ymz(YMZ280B(config, "ymz", 16934400));
+	ymz.irq_handler().set(FUNC(firebeat_state::sound_irq_callback));
+	ymz.set_addrmap(0, &firebeat_state::ymz280b_map);
+	ymz.add_route(0, "lspeaker", 1.0);
+	ymz.add_route(1, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("duart_com", PC16552D, 0)
-	MCFG_DEVICE_ADD("duart_com:chan0", NS16550, XTAL(19'660'800))
-	MCFG_DEVICE_ADD("duart_com:chan1", NS16550, XTAL(19'660'800))
-	MCFG_DEVICE_ADD("duart_midi", PC16552D, 0)
-	MCFG_DEVICE_ADD("duart_midi:chan0", NS16550, XTAL(24'000'000))
-	MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, firebeat_state, midi_uart_ch0_irq_callback))
-	MCFG_DEVICE_ADD("duart_midi:chan1", NS16550, XTAL(24'000'000))
-	MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, firebeat_state, midi_uart_ch1_irq_callback))
-	MCFG_MIDI_KBD_ADD("kbd0", WRITELINE("duart_midi:chan0", ins8250_uart_device, rx_w), 31250)
-	MCFG_MIDI_KBD_ADD("kbd1", WRITELINE("duart_midi:chan1", ins8250_uart_device, rx_w), 31250)
-MACHINE_CONFIG_END
+	PC16552D(config, "duart_com", 0);
+	NS16550(config, "duart_com:chan0", XTAL(19'660'800));
+	NS16550(config, "duart_com:chan1", XTAL(19'660'800));
+	PC16552D(config, "duart_midi", 0);
+	ns16550_device &midi_chan0(NS16550(config, "duart_midi:chan0", XTAL(24'000'000)));
+	midi_chan0.out_int_callback().set(FUNC(firebeat_state::midi_uart_ch0_irq_callback));
+	ns16550_device &midi_chan1(NS16550(config, "duart_midi:chan1", XTAL(24'000'000)));
+	midi_chan1.out_int_callback().set(FUNC(firebeat_state::midi_uart_ch1_irq_callback));
 
-MACHINE_CONFIG_START(firebeat_state::firebeat_spu)
+	MIDI_KBD(config, m_kbd[0], 31250).tx_callback().set(midi_chan0, FUNC(ins8250_uart_device::rx_w));
+	MIDI_KBD(config, m_kbd[1], 31250).tx_callback().set(midi_chan1, FUNC(ins8250_uart_device::rx_w));
+}
+
+void firebeat_state::firebeat_spu(machine_config &config)
+{
 	firebeat(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("audiocpu", M68000, 16000000)
-	MCFG_DEVICE_PROGRAM_MAP(spu_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &firebeat_state::firebeat_spu_map);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("sputimer", firebeat_state, spu_timer_callback, attotime::from_hz(1000));
+	M68000(config, m_audiocpu, 16000000);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &firebeat_state::spu_map);
 
-	MCFG_DEVICE_ADD("rf5c400", RF5C400, XTAL(16'934'400))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	CY7C131(config, m_dpram);
+	m_dpram->intl_callback().set_inputline(m_audiocpu, INPUT_LINE_IRQ4); // address 0x3fe triggers M68K interrupt
+	m_dpram->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ3); // address 0x3ff triggers PPC interrupt
+
+	TIMER(config, "sputimer").configure_periodic(FUNC(firebeat_state::spu_timer_callback), attotime::from_hz(1000));
+
+	rf5c400_device &rf5c400(RF5C400(config, "rf5c400", XTAL(16'934'400)));
+	rf5c400.add_route(0, "lspeaker", 1.0);
+	rf5c400.add_route(1, "rspeaker", 1.0);
 
 	ATA_INTERFACE(config, m_spuata).options(firebeat_ata_devices, "cdrom", nullptr, true);
 	m_spuata->irq_handler().set(FUNC(firebeat_state::spu_ata_interrupt));
-MACHINE_CONFIG_END
+}
 
 /*****************************************************************************/
 /* Security dongle is a Dallas DS1411 RS232 Adapter with a DS1991 Multikey iButton */
@@ -1470,9 +1374,9 @@ WRITE8_MEMBER(firebeat_state::security_w)
 
 void firebeat_state::init_lights(write32_delegate out1, write32_delegate out2, write32_delegate out3)
 {
-	if(out1.isnull()) out1 = write32_delegate(FUNC(firebeat_state::lamp_output_w),this);
-	if(out2.isnull()) out2 = write32_delegate(FUNC(firebeat_state::lamp_output2_w),this);
-	if(out3.isnull()) out3 = write32_delegate(FUNC(firebeat_state::lamp_output3_w),this);
+	if(out1.isnull()) out1 = write32_delegate(*this, FUNC(firebeat_state::lamp_output_w));
+	if(out2.isnull()) out2 = write32_delegate(*this, FUNC(firebeat_state::lamp_output2_w));
+	if(out3.isnull()) out3 = write32_delegate(*this, FUNC(firebeat_state::lamp_output3_w));
 
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x7d000804, 0x7d000807, out1);
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x7d000320, 0x7d000323, out2);
@@ -1491,23 +1395,23 @@ void firebeat_state::init_firebeat()
 
 	m_cur_cab_data = cab_data;
 
-	m_maincpu->ppc4xx_spu_set_tx_handler(write8_delegate(FUNC(firebeat_state::security_w), this));
+	m_maincpu->ppc4xx_spu_set_tx_handler(write8_delegate(*this, FUNC(firebeat_state::security_w)));
 
 	set_ibutton(rom);
 
-	init_lights(write32_delegate(), write32_delegate(), write32_delegate());
+	init_lights(write32_delegate(*this), write32_delegate(*this), write32_delegate(*this));
 }
 
 void firebeat_state::init_ppp()
 {
 	init_firebeat();
-	init_lights(write32_delegate(FUNC(firebeat_state::lamp_output_ppp_w),this), write32_delegate(FUNC(firebeat_state::lamp_output2_ppp_w),this), write32_delegate(FUNC(firebeat_state::lamp_output3_ppp_w),this));
+	init_lights(write32_delegate(*this, FUNC(firebeat_state::lamp_output_ppp_w)), write32_delegate(*this, FUNC(firebeat_state::lamp_output2_ppp_w)), write32_delegate(*this, FUNC(firebeat_state::lamp_output3_ppp_w)));
 }
 
 void firebeat_state::init_ppd()
 {
 	init_firebeat();
-	init_lights(write32_delegate(FUNC(firebeat_state::lamp_output_ppp_w),this), write32_delegate(FUNC(firebeat_state::lamp_output2_ppp_w),this), write32_delegate(FUNC(firebeat_state::lamp_output3_ppp_w),this));
+	init_lights(write32_delegate(*this, FUNC(firebeat_state::lamp_output_ppp_w)), write32_delegate(*this, FUNC(firebeat_state::lamp_output2_ppp_w)), write32_delegate(*this, FUNC(firebeat_state::lamp_output3_ppp_w)));
 
 	m_cur_cab_data = ppd_cab_data;
 }
@@ -1522,7 +1426,7 @@ void firebeat_state::init_keyboard()
 void firebeat_state::init_kbm()
 {
 	init_firebeat();
-	init_lights(write32_delegate(FUNC(firebeat_state::lamp_output_kbm_w),this), write32_delegate(), write32_delegate());
+	init_lights(write32_delegate(*this, FUNC(firebeat_state::lamp_output_kbm_w)), write32_delegate(*this), write32_delegate(*this));
 
 	init_keyboard();
 

@@ -253,8 +253,12 @@ void namcoio_device::handle_coins( int swap )
 
 	IORAM_WRITE(0 ^ swap, m_credits / 10);   // BCD credits
 	IORAM_WRITE(1 ^ swap, m_credits % 10);   // BCD credits
-	IORAM_WRITE(2 ^ swap, credit_add);  // credit increment (coin inputs)
-	IORAM_WRITE(3 ^ swap, credit_sub);  // credit decrement (start buttons)
+	// these two are cleared by the host CPU in handshake fashion
+	// tower of druaga cares and won't give coin sound on 0->1 credit counter transition otherwise.
+	if (credit_add)
+		IORAM_WRITE(2 ^ swap, credit_add);  // credit increment (coin inputs)
+	if (credit_sub)
+		IORAM_WRITE(3 ^ swap, credit_sub);  // credit decrement (start buttons)
 	IORAM_WRITE(4, ~m_in_cb[1](0 & 0x0f));  // pins 22-25
 	button = ((val & 0x05) << 1) | (val & toggled & 0x05);
 	IORAM_WRITE(5, button); // pins 30 & 32 normal and impulse
@@ -514,4 +518,35 @@ WRITE_LINE_MEMBER( namcoio_device::set_reset_line )
 READ_LINE_MEMBER( namcoio_device::read_reset_line )
 {
 	return m_reset;
+}
+
+
+ROM_START(namco_56xx)
+	ROM_REGION(0x400, "mcu", 0)
+	ROM_LOAD("56xx.bin", 0x0000, 0x0400, NO_DUMP)
+ROM_END
+
+ROM_START(namco_58xx)
+	ROM_REGION(0x400, "mcu", 0)
+	ROM_LOAD("58xx.bin", 0x0000, 0x0400, NO_DUMP)
+ROM_END
+
+ROM_START(namco_59xx)
+	ROM_REGION(0x400, "mcu", 0)
+	ROM_LOAD("59xx.bin", 0x0000, 0x0400, NO_DUMP)
+ROM_END
+
+const tiny_rom_entry *namco56xx_device::device_rom_region() const
+{
+	return ROM_NAME(namco_56xx);
+}
+
+const tiny_rom_entry *namco58xx_device::device_rom_region() const
+{
+	return ROM_NAME(namco_58xx);
+}
+
+const tiny_rom_entry *namco59xx_device::device_rom_region() const
+{
+	return ROM_NAME(namco_59xx);
 }

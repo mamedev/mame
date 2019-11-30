@@ -6,16 +6,21 @@
     Macross Plus
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_MACROSSP_H
+#define MAME_INCLUDES_MACROSSP_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class macrossp_state : public driver_device
 {
 public:
-	macrossp_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	macrossp_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
 		m_scra_videoram(*this, "scra_videoram"),
 		m_scra_linezoom(*this, "scra_linezoom"),
@@ -110,3 +115,5 @@ private:
 	void macrossp_map(address_map &map);
 	void macrossp_sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_MACROSSP_H

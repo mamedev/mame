@@ -16,12 +16,6 @@
 #include "machine/bankdev.h"
 #include "machine/timer.h"
 
-#define MCFG_DCS2_AUDIO_DRAM_IN_MB(_dram_in_mb) \
-	downcast<dcs_audio_device &>(*device).set_dram_in_mb(_dram_in_mb);
-
-#define MCFG_DCS2_AUDIO_POLLING_OFFSET(_polling_offset) \
-	downcast<dcs_audio_device &>(*device).set_polling_offset(_polling_offset);
-
 
 class dcs_audio_device : public device_t
 {
@@ -198,6 +192,7 @@ protected:
 	uint16_t *    m_bootrom;
 	uint32_t      m_bootrom_words;
 	uint16_t *    m_sounddata;
+	std::unique_ptr<uint16_t[]> m_sounddata_ptr;
 	uint32_t      m_sounddata_words;
 	uint32_t      m_sounddata_banks;
 	uint16_t      m_sounddata_bank;
@@ -235,7 +230,7 @@ protected:
 	uint32_t      m_timer_period;
 	uint32_t      m_timers_fired;
 
-	uint16_t *m_sram;
+	std::unique_ptr<uint16_t[]> m_sram;
 	uint16_t m_polling_value;
 	uint32_t m_polling32_value;
 	uint32_t *m_internal_program_ram;

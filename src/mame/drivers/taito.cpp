@@ -313,8 +313,7 @@ WRITE8_MEMBER( taito_state::io_w )
 
 WRITE_LINE_MEMBER( taito_state::pia_cb2_w )
 {
-	address_space& space = m_maincpu->space(AS_PROGRAM);
-	m_votrax->write(space, 0, m_votrax_cmd);
+	m_votrax->write(m_votrax_cmd);
 }
 
 READ8_MEMBER( taito_state::pia_pb_r )
@@ -350,13 +349,14 @@ TIMER_DEVICE_CALLBACK_MEMBER( taito_state::timer_a )
 	m_digits[++digit] = patterns[m_p_ram[m_out_offs++]&15];
 }
 
-MACHINE_CONFIG_START(taito_state::taito)
+void taito_state::taito(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, I8080, 19000000/9)
-	MCFG_DEVICE_PROGRAM_MAP(taito_map)
+	I8080(config, m_maincpu, 19000000/9);
+	m_maincpu->set_addrmap(AS_PROGRAM, &taito_state::taito_map);
 
-	MCFG_DEVICE_ADD(m_cpu2, M6802, 1000000) // cpu & clock are a guess
-	MCFG_DEVICE_PROGRAM_MAP(taito_sub_map)
+	M6802(config, m_cpu2, 1000000); // cpu & clock are a guess
+	m_cpu2->set_addrmap(AS_PROGRAM, &taito_state::taito_sub_map);
 
 	/* Video */
 	config.set_default_layout(layout_taito);
@@ -365,9 +365,10 @@ MACHINE_CONFIG_START(taito_state::taito)
 	genpin_audio(config);
 
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.475) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.475); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	PIA6821(config, m_pia);
 	//m_pia->readpa_handler().set(FUNC(taito_state::pia_pa_r));
@@ -379,8 +380,8 @@ MACHINE_CONFIG_START(taito_state::taito)
 	m_pia->irqa_handler().set_inputline(m_cpu2, INPUT_LINE_NMI);
 	m_pia->irqb_handler().set_inputline(m_cpu2, M6802_IRQ_LINE);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_a", taito_state, timer_a, attotime::from_hz(200))
-MACHINE_CONFIG_END
+	TIMER(config, "timer_a").configure_periodic(FUNC(taito_state::timer_a), attotime::from_hz(200));
+}
 
 void taito_state::shock(machine_config &config)
 {
@@ -721,6 +722,19 @@ ROM_START(obaoba1)
 	ROM_LOAD("ob_s1a.bin", 0x1800, 0x0800, CRC(fa106de6) SHA1(be4dee9c2f10cf64a3b71cf65386e02323f040c7))
 ROM_END
 
+ROM_START(obaobao)
+	ROM_REGION(0x2000, "roms", 0)
+	ROM_LOAD( "oba01.bin", 0x0000, 0x0400, CRC(fd5d5b73) SHA1(06996254637a71a0543b66e87516372ccea1cfd6))
+	ROM_LOAD( "oba02.bin", 0x0400, 0x0400, CRC(068b84c7) SHA1(622bd3b24df175cd783cdf46e5b7e910159d2bea))
+	ROM_LOAD( "oba03.bin", 0x0800, 0x0400, CRC(a7f0e116) SHA1(bdb5d6120f7802ce4e1dad434158010b3150233a))
+	ROM_LOAD( "oba04.bin", 0x0c00, 0x0400, CRC(efede794) SHA1(7efb5e13f8dd631a65bc47e2d765308fe7d1a82b))
+	ROM_LOAD( "oba05.bin", 0x1800, 0x0400, CRC(838f7323) SHA1(84636a237014231c056e7eb80bd3f4013f4c6579))
+
+	ROM_REGION(0x2000, "cpu2", 0)
+	ROM_LOAD("ob_s2.bin", 0x1000, 0x0800, CRC(f7dbb715) SHA1(70d1331612fe497f48520726c5f39accdcbdb205))
+	ROM_LOAD("ob_s1.bin", 0x1800, 0x0800, CRC(812a362b) SHA1(22b5f5f2d467ca1b0ab55db2e01ef6579f8ee390))
+ROM_END
+
 /*--------------------------------
 / Polar Explorer
 /-------------------------------*/
@@ -1002,6 +1016,7 @@ GAME(198?,  taitest,    0,          taito,  taito, taito_state, init_taito,  ROT
 GAME(1979,  shock,      0,          shock,  taito, taito_state, init_taito,  ROT0,   "Taito do Brasil",  "Shock",                         MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 GAME(1980,  obaoba,     0,          taito,  taito, taito_state, init_taito,  ROT0,   "Taito do Brasil",  "Oba-Oba (set 1)",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 GAME(1980,  obaoba1,    obaoba,     taito,  taito, taito_state, init_taito,  ROT0,   "Taito do Brasil",  "Oba-Oba (set 2)",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME(1980,  obaobao,    obaoba,     shock,  taito, taito_state, init_taito,  ROT0,   "Taito do Brasil",  "Oba-Oba (old hardware)",        MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 GAME(1980,  drakor,     0,          taito,  taito, taito_state, init_taito,  ROT0,   "Taito do Brasil",  "Drakor",                        MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 GAME(1980,  meteort,    0,          taito,  taito, taito_state, init_taito,  ROT0,   "Taito do Brasil",  "Meteor (Taito)",                MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 GAME(1981,  sureshop,   0,          taito,  taito, taito_state, init_taito,  ROT0,   "Taito do Brasil",  "Sure Shot (Pinball)",           MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

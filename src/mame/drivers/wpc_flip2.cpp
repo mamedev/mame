@@ -187,24 +187,27 @@ void wpc_flip2_state::init_wpc_flip2()
 	wpc_flip1_state::init_wpc_flip1();
 }
 
-MACHINE_CONFIG_START(wpc_flip2_state::wpc_flip2)
+void wpc_flip2_state::wpc_flip2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6809, 2000000)
-	MCFG_DEVICE_PROGRAM_MAP(wpc_flip2_map)
+	M6809(config, m_maincpu, 2000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &wpc_flip2_state::wpc_flip2_map);
 
-	MCFG_WMS_WPC_ADD("wpc")
-	MCFG_WPC_IRQ_ACKNOWLEDGE(WRITELINE(*this, wpc_flip2_state,wpc_irq_w))
-	MCFG_WPC_FIRQ_ACKNOWLEDGE(WRITELINE(*this, wpc_flip2_state,wpc_firq_w))
-	MCFG_WPC_ROMBANK(WRITE8(*this, wpc_flip2_state,wpc_rombank_w))
-	MCFG_WPC_SOUND_CTRL(READ8(*this, wpc_flip2_state,wpc_sound_ctrl_r),WRITE8(*this, wpc_flip2_state,wpc_sound_ctrl_w))
-	MCFG_WPC_SOUND_DATA(READ8(*this, wpc_flip2_state,wpc_sound_data_r),WRITE8(*this, wpc_flip2_state,wpc_sound_data_w))
-	MCFG_WPC_DMDBANK(WRITE8(*this, wpc_flip2_state,wpc_dmdbank_w))
+	WPCASIC(config, m_wpc, 0);
+	m_wpc->irq_callback().set(FUNC(wpc_flip2_state::wpc_irq_w));
+	m_wpc->firq_callback().set(FUNC(wpc_flip2_state::wpc_firq_w));
+	m_wpc->bank_write().set(FUNC(wpc_flip2_state::wpc_rombank_w));
+	m_wpc->sound_ctrl_read().set(FUNC(wpc_flip2_state::wpc_sound_ctrl_r));
+	m_wpc->sound_ctrl_write().set(FUNC(wpc_flip2_state::wpc_sound_ctrl_w));
+	m_wpc->sound_data_read().set(FUNC(wpc_flip2_state::wpc_sound_data_r));
+	m_wpc->sound_data_write().set(FUNC(wpc_flip2_state::wpc_sound_data_w));
+	m_wpc->dmdbank_write().set(FUNC(wpc_flip2_state::wpc_dmdbank_w));
 
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("wpcsnd", WPCSND)
-	MCFG_WPC_ROM_REGION("sound1")
-	MCFG_WPC_SOUND_REPLY_CALLBACK(WRITELINE(*this, wpc_flip2_state,wpcsnd_reply_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+	WPCSND(config, m_wpcsnd);
+	m_wpcsnd->set_romregion("sound1");
+	m_wpcsnd->reply_callback().set(FUNC(wpc_flip2_state::wpcsnd_reply_w));
+	m_wpcsnd->add_route(ALL_OUTPUTS, "speaker", 1.0);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_native_aspect();
@@ -212,7 +215,7 @@ MACHINE_CONFIG_START(wpc_flip2_state::wpc_flip2)
 	screen.set_visarea(0, 128-1, 0, 32-1);
 	screen.set_refresh_hz(60);
 	screen.set_screen_update(FUNC(wpc_flip2_state::screen_update));
-MACHINE_CONFIG_END
+}
 
 /*-----------------
 /  Black Rose #20013
@@ -423,6 +426,14 @@ ROM_START(ft_p4)
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
 	ROM_REGION(0x80000, "code", 0)
 	ROM_LOAD("ft_p4.u6", 0x00000, 0x80000, CRC(386cbe45) SHA1(5cb4a32591121c4ed3da292fb50cec0d8d5dd44f))
+	ROM_REGION(0x180000, "sound1", 0)
+	ROM_LOAD("ft_u18.l1", 0x100000, 0x80000, CRC(48d2760a) SHA1(701b0bbb68f99332493ee1276e5a1cef5c85d499))
+ROM_END
+
+ROM_START(ft_p2)
+	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x80000, "code", 0)
+	ROM_LOAD("ft_p2.u6", 0x00000, 0x80000, CRC(e776ebb8) SHA1(9701291b991f62b705f6866f299429e668be0e33))
 	ROM_REGION(0x180000, "sound1", 0)
 	ROM_LOAD("ft_u18.l1", 0x100000, 0x80000, CRC(48d2760a) SHA1(701b0bbb68f99332493ee1276e5a1cef5c85d499))
 ROM_END
@@ -866,6 +877,7 @@ GAME(1992,  ft_l5,      0,          wpc_flip2,  wpc_flip2, wpc_flip2_state, init
 GAME(1992,  ft_l3,      ft_l5,      wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Williams",  "Fish Tales (L-3)",                                         MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1992,  ft_l4,      ft_l5,      wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Williams",  "Fish Tales (L-4)",                                         MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1992,  ft_p4,      ft_l5,      wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Williams",  "Fish Tales (P-4)",                                         MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1992,  ft_p2,      ft_l5,      wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Williams",  "Fish Tales (P-2)",                                         MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1994,  tafg_lx3,   0,          wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Bally",     "The Addams Family Special Collectors Edition Gold (LX-3)", MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1994,  tafg_h3,    tafg_lx3,   wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Bally",     "The Addams Family Special Collectors Edition (H-3)",       MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1994,  tafg_la2,   tafg_lx3,   wpc_flip2,  wpc_flip2, wpc_flip2_state, init_wpc_flip2,  ROT0,   "Bally",     "The Addams Family Special Collectors Edition (LA-2)",      MACHINE_IS_SKELETON_MECHANICAL)

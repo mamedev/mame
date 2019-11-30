@@ -22,6 +22,7 @@
 #include "machine/z80dart.h"
 #include "sound/spkrdev.h"
 #include "sound/beep.h"
+#include "imagedev/floppy.h"
 #include "imagedev/snapquik.h"
 #include "emupal.h"
 
@@ -72,7 +73,7 @@ public:
 	void mk83(machine_config &config);
 	void xerox820(machine_config &config);
 
-	DECLARE_QUICKLOAD_LOAD_MEMBER(xerox820);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
 	DECLARE_READ8_MEMBER( fdc_r );
 	DECLARE_WRITE8_MEMBER( fdc_w );
@@ -97,7 +98,7 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<z80pio_device> m_kbpio;
 	required_device<z80ctc_device> m_ctc;
 	required_device<z80sio0_device> m_sio;

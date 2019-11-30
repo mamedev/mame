@@ -7,13 +7,15 @@
     ITT3030 disk image format
 
 *********************************************************************/
+#ifndef MAME_FORMATS_ITT3030_DSK_H
+#define MAME_FORMATS_ITT3030_DSK_H
 
-#ifndef ITT3030_DSK_H_
-#define ITT3030_DSK_H_
+#pragma once
 
 #include "wd177x_dsk.h"
 
-class itt3030_format : public wd177x_format {
+class itt3030_format : public wd177x_format
+{
 public:
 	itt3030_format();
 
@@ -28,4 +30,4 @@ private:
 
 extern const floppy_format_type FLOPPY_ITT3030_FORMAT;
 
-#endif
+#endif // MAME_FORMATS_ITT3030_DSK_H

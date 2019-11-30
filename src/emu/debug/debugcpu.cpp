@@ -1297,8 +1297,10 @@ device_debug::device_debug(device_t &device)
 	, m_total_cycles(0)
 	, m_last_total_cycles(0)
 	, m_pc_history_index(0)
-	, m_bplist(nullptr)
-	, m_rplist(nullptr)
+	, m_bplist()
+	, m_rplist()
+	, m_triggered_breakpoint(nullptr)
+	, m_triggered_watchpoint(nullptr)
 	, m_trace(nullptr)
 	, m_hotspot_threshhold(0)
 	, m_track_pc_set()
@@ -1513,7 +1515,7 @@ void device_debug::interrupt_hook(int irqline)
 
 void device_debug::exception_hook(int exception)
 {
-	// see if this matches a pending interrupt request
+	// see if this matches an exception breakpoint
 	if ((m_flags & DEBUG_FLAG_STOP_EXCEPTION) != 0 && (m_stopexception == -1 || m_stopexception == exception))
 	{
 		m_device.machine().debugger().cpu().set_execution_stopped();
@@ -1522,6 +1524,37 @@ void device_debug::exception_hook(int exception)
 	}
 }
 
+
+//-------------------------------------------------
+//  privilege_hook - called when privilege level is
+//  changed
+//-------------------------------------------------
+
+void device_debug::privilege_hook()
+{
+	bool matched = 1;
+
+	if ((m_flags & DEBUG_FLAG_STOP_PRIVILEGE) != 0)
+	{
+		if (m_privilege_condition && !m_privilege_condition->is_empty())
+		{
+			try
+			{
+				matched = m_privilege_condition->execute();
+			}
+			catch (...)
+			{
+			}
+		}
+
+		if (matched)
+		{
+			m_device.machine().debugger().cpu().set_execution_stopped();
+			m_device.machine().debugger().console().printf("Stopped due to privilege change\n", m_device.tag());
+			compute_debug_flags();
+		}
+	}
+}
 
 //-------------------------------------------------
 //  instruction_hook - called by the CPU cores
@@ -1861,6 +1894,21 @@ void device_debug::go_milliseconds(u64 milliseconds)
 
 
 //-------------------------------------------------
+//  go_privilege - execute until execution
+//  level changes
+//-------------------------------------------------
+
+void device_debug::go_privilege(const char *condition)
+{
+	assert(m_exec != nullptr);
+	m_device.machine().rewind_invalidate();
+	m_privilege_condition = std::make_unique<parsed_expression>(&m_symtable, condition);
+	m_flags |= DEBUG_FLAG_STOP_PRIVILEGE;
+	m_device.machine().debugger().cpu().set_execution_running();
+}
+
+
+//-------------------------------------------------
 //  halt_on_next_instruction_impl - halt in the
 //  debugger on the next instruction, internal
 //  implementation which is necessary solely due
@@ -1874,23 +1922,33 @@ void device_debug::halt_on_next_instruction_impl(util::format_argument_pack<std:
 }
 
 //-------------------------------------------------
+//  breakpoint_find - return a breakpoint at the
+//  given address, or nullptr if none exists there
+//-------------------------------------------------
+
+const device_debug::breakpoint *device_debug::breakpoint_find(offs_t address) const
+{
+	for (const breakpoint &bp : m_bplist)
+		if (bp.address() == address)
+			return &bp;
+
+	return nullptr;
+}
+
+//-------------------------------------------------
 //  breakpoint_set - set a new breakpoint,
 //  returning its index
 //-------------------------------------------------
 
 int device_debug::breakpoint_set(offs_t address, const char *condition, const char *action)
 {
-	// allocate a new one
+	// allocate a new one and hook it into our list
 	u32 id = m_device.machine().debugger().cpu().get_breakpoint_index();
-	breakpoint *bp = auto_alloc(m_device.machine(), breakpoint(this, m_symtable, id, address, condition, action));
-
-	// hook it into our list
-	bp->m_next = m_bplist;
-	m_bplist = bp;
+	m_bplist.emplace_front(this, m_symtable, id, address, condition, action);
 
 	// update the flags and return the index
 	breakpoint_update_flags();
-	return bp->m_index;
+	return m_bplist.front().m_index;
 }
 
 
@@ -1902,12 +1960,10 @@ int device_debug::breakpoint_set(offs_t address, const char *condition, const ch
 bool device_debug::breakpoint_clear(int index)
 {
 	// scan the list to see if we own this breakpoint
-	for (breakpoint **bp = &m_bplist; *bp != nullptr; bp = &(*bp)->m_next)
-		if ((*bp)->m_index == index)
+	for (auto bbp = m_bplist.before_begin(); std::next(bbp) != m_bplist.end(); ++bbp)
+		if (std::next(bbp)->m_index == index)
 		{
-			breakpoint *deleteme = *bp;
-			*bp = deleteme->m_next;
-			auto_free(m_device.machine(), deleteme);
+			m_bplist.erase_after(bbp);
 			breakpoint_update_flags();
 			return true;
 		}
@@ -1923,9 +1979,9 @@ bool device_debug::breakpoint_clear(int index)
 
 void device_debug::breakpoint_clear_all()
 {
-	// clear the head until we run out
-	while (m_bplist != nullptr)
-		breakpoint_clear(m_bplist->index());
+	// clear the list
+	m_bplist.clear();
+	breakpoint_update_flags();
 }
 
 
@@ -1937,10 +1993,10 @@ void device_debug::breakpoint_clear_all()
 bool device_debug::breakpoint_enable(int index, bool enable)
 {
 	// scan the list to see if we own this breakpoint
-	for (breakpoint *bp = m_bplist; bp != nullptr; bp = bp->next())
-		if (bp->m_index == index)
+	for (breakpoint &bp : m_bplist)
+		if (bp.m_index == index)
 		{
-			bp->m_enabled = enable;
+			bp.m_enabled = enable;
 			breakpoint_update_flags();
 			return true;
 		}
@@ -1958,8 +2014,8 @@ bool device_debug::breakpoint_enable(int index, bool enable)
 void device_debug::breakpoint_enable_all(bool enable)
 {
 	// apply the enable to all breakpoints we own
-	for (breakpoint *bp = m_bplist; bp != nullptr; bp = bp->next())
-		breakpoint_enable(bp->index(), enable);
+	for (breakpoint &bp : m_bplist)
+		breakpoint_enable(bp.index(), enable);
 }
 
 
@@ -2059,15 +2115,11 @@ int device_debug::registerpoint_set(const char *condition, const char *action)
 {
 	// allocate a new one
 	u32 id = m_device.machine().debugger().cpu().get_registerpoint_index();
-	registerpoint *rp = auto_alloc(m_device.machine(), registerpoint(m_symtable, id, condition, action));
-
-	// hook it into our list
-	rp->m_next = m_rplist;
-	m_rplist = rp;
+	m_rplist.emplace_front(m_symtable, id, condition, action);
 
 	// update the flags and return the index
 	breakpoint_update_flags();
-	return rp->m_index;
+	return m_rplist.front().m_index;
 }
 
 
@@ -2079,12 +2131,10 @@ int device_debug::registerpoint_set(const char *condition, const char *action)
 bool device_debug::registerpoint_clear(int index)
 {
 	// scan the list to see if we own this registerpoint
-	for (registerpoint **rp = &m_rplist; *rp != nullptr; rp = &(*rp)->m_next)
-		if ((*rp)->m_index == index)
+	for (auto brp = m_rplist.before_begin(); std::next(brp) != m_rplist.end(); ++brp)
+		if (std::next(brp)->m_index == index)
 		{
-			registerpoint *deleteme = *rp;
-			*rp = deleteme->m_next;
-			auto_free(m_device.machine(), deleteme);
+			m_rplist.erase_after(brp);
 			breakpoint_update_flags();
 			return true;
 		}
@@ -2100,9 +2150,9 @@ bool device_debug::registerpoint_clear(int index)
 
 void device_debug::registerpoint_clear_all()
 {
-	// clear the head until we run out
-	while (m_rplist != nullptr)
-		registerpoint_clear(m_rplist->index());
+	// clear the list
+	m_rplist.clear();
+	breakpoint_update_flags();
 }
 
 
@@ -2114,10 +2164,10 @@ void device_debug::registerpoint_clear_all()
 bool device_debug::registerpoint_enable(int index, bool enable)
 {
 	// scan the list to see if we own this conditionpoint
-	for (registerpoint *rp = m_rplist; rp != nullptr; rp = rp->next())
-		if (rp->m_index == index)
+	for (registerpoint &rp : m_rplist)
+		if (rp.m_index == index)
 		{
-			rp->m_enabled = enable;
+			rp.m_enabled = enable;
 			breakpoint_update_flags();
 			return true;
 		}
@@ -2135,8 +2185,8 @@ bool device_debug::registerpoint_enable(int index, bool enable)
 void device_debug::registerpoint_enable_all(bool enable)
 {
 	// apply the enable to all registerpoints we own
-	for (registerpoint *rp = m_rplist; rp != nullptr; rp = rp->next())
-		registerpoint_enable(rp->index(), enable);
+	for (registerpoint &rp : m_rplist)
+		registerpoint_enable(rp.index(), enable);
 }
 
 
@@ -2458,8 +2508,8 @@ void device_debug::breakpoint_update_flags()
 {
 	// see if there are any enabled breakpoints
 	m_flags &= ~DEBUG_FLAG_LIVE_BP;
-	for (breakpoint *bp = m_bplist; bp != nullptr; bp = bp->m_next)
-		if (bp->m_enabled)
+	for (breakpoint &bp : m_bplist)
+		if (bp.m_enabled)
 		{
 			m_flags |= DEBUG_FLAG_LIVE_BP;
 			break;
@@ -2468,9 +2518,9 @@ void device_debug::breakpoint_update_flags()
 	if ( ! ( m_flags & DEBUG_FLAG_LIVE_BP ) )
 	{
 		// see if there are any enabled registerpoints
-		for (registerpoint *rp = m_rplist; rp != nullptr; rp = rp->m_next)
+		for (registerpoint &rp : m_rplist)
 		{
-			if (rp->m_enabled)
+			if (rp.m_enabled)
 			{
 				m_flags |= DEBUG_FLAG_LIVE_BP;
 			}
@@ -2493,40 +2543,43 @@ void device_debug::breakpoint_check(offs_t pc)
 	debugger_cpu& debugcpu = m_device.machine().debugger().cpu();
 
 	// see if we match
-	for (breakpoint *bp = m_bplist; bp != nullptr; bp = bp->m_next)
-		if (bp->hit(pc))
+	for (breakpoint &bp : m_bplist)
+		if (bp.hit(pc))
 		{
 			// halt in the debugger by default
 			debugcpu.set_execution_stopped();
 
 			// if we hit, evaluate the action
-			if (!bp->m_action.empty())
-				m_device.machine().debugger().console().execute_command(bp->m_action, false);
+			if (!bp.m_action.empty())
+				m_device.machine().debugger().console().execute_command(bp.m_action, false);
 
 			// print a notification, unless the action made us go again
 			if (debugcpu.is_stopped())
-				m_device.machine().debugger().console().printf("Stopped at breakpoint %X\n", bp->m_index);
+			{
+				m_device.machine().debugger().console().printf("Stopped at breakpoint %X\n", bp.m_index);
+				m_triggered_breakpoint = &bp;
+			}
 			break;
 		}
 
 	// see if we have any matching registerpoints
-	for (registerpoint *rp = m_rplist; rp != nullptr; rp = rp->m_next)
+	for (registerpoint &rp : m_rplist)
 	{
-		if (rp->hit())
+		if (rp.hit())
 		{
 			// halt in the debugger by default
 			debugcpu.set_execution_stopped();
 
 			// if we hit, evaluate the action
-			if (!rp->m_action.empty())
+			if (!rp.m_action.empty())
 			{
-				m_device.machine().debugger().console().execute_command(rp->m_action, false);
+				m_device.machine().debugger().console().execute_command(rp.m_action, false);
 			}
 
 			// print a notification, unless the action made us go again
 			if (debugcpu.is_stopped())
 			{
-				m_device.machine().debugger().console().printf("Stopped at registerpoint %X\n", rp->m_index);
+				m_device.machine().debugger().console().printf("Stopped at registerpoint %X\n", rp.m_index);
 			}
 			break;
 		}
@@ -2672,7 +2725,6 @@ device_debug::breakpoint::breakpoint(device_debug* debugInterface,
 										const char *condition,
 										const char *action)
 	: m_debugInterface(debugInterface),
-		m_next(nullptr),
 		m_index(index),
 		m_enabled(true),
 		m_address(address),
@@ -2741,13 +2793,14 @@ device_debug::watchpoint::watchpoint(device_debug* debugInterface,
 	  m_address(address & space.addrmask()),
 	  m_length(length),
 	  m_condition(&symbols, (condition != nullptr) ? condition : "1"),
-	  m_action((action != nullptr) ? action : "")
+	  m_action((action != nullptr) ? action : ""),
+	  m_installing(false)
 {
 	std::fill(std::begin(m_start_address), std::end(m_start_address), 0);
 	std::fill(std::begin(m_end_address), std::end(m_end_address), 0);
 	std::fill(std::begin(m_masks), std::end(m_masks), 0);
 
-	offs_t ashift = m_space.addr_shift();
+	int ashift = m_space.addr_shift();
 	endianness_t endian = m_space.endianness();
 	offs_t subamask = m_space.alignment() - 1;
 	offs_t unit_size = ashift <= 0 ? 8 << -ashift : 8 >> ashift;
@@ -2799,10 +2852,13 @@ device_debug::watchpoint::watchpoint(device_debug* debugInterface,
 		}
 		else
 		{
-			m_start_address[idx] = rstart;
-			m_end_address[idx] = rend - subamask - 1;
-			m_masks[idx] = mmask;
-			idx++;
+			if (rstart < rend - subamask)
+			{
+				m_start_address[idx] = rstart;
+				m_end_address[idx] = rend - subamask - 1;
+				m_masks[idx] = mmask;
+				idx++;
+			}
 			m_start_address[idx] = rend - subamask;
 			m_end_address[idx] = rend;
 			m_masks[idx] = emask;
@@ -2813,10 +2869,6 @@ device_debug::watchpoint::watchpoint(device_debug* debugInterface,
 	m_notifier = m_space.add_change_notifier([this](read_or_write mode) {
 												 if (m_enabled)
 												 {
-													 if (u32(mode) & u32(m_type) & u32(read_or_write::READ))
-														 m_phr->remove();
-													 if (u32(mode) & u32(m_type) & u32(read_or_write::WRITE))
-														 m_phw->remove();
 													 install(mode);
 												 }
 											 });
@@ -2824,11 +2876,11 @@ device_debug::watchpoint::watchpoint(device_debug* debugInterface,
 
 device_debug::watchpoint::~watchpoint()
 {
+	m_space.remove_change_notifier(m_notifier);
 	if (m_phr)
 		m_phr->remove();
 	if (m_phw)
 		m_phw->remove();
-	m_space.remove_change_notifier(m_notifier);
 }
 
 void device_debug::watchpoint::setEnabled(bool value)
@@ -2840,16 +2892,25 @@ void device_debug::watchpoint::setEnabled(bool value)
 			install(read_or_write::READWRITE);
 		else
 		{
+			m_installing = true;
 			if(m_phr)
 				m_phr->remove();
 			if(m_phw)
 				m_phw->remove();
+			m_installing = false;
 		}
 	}
 }
 
 void device_debug::watchpoint::install(read_or_write mode)
 {
+	if (m_installing)
+		return;
+	m_installing = true;
+	if ((u32(mode) & u32(read_or_write::READ)) && m_phr)
+		m_phr->remove();
+	if ((u32(mode) & u32(read_or_write::WRITE)) && m_phw)
+		m_phw->remove();
 	std::string name = util::string_format("wp@%x", m_address);
 	switch (m_space.data_width())
 	{
@@ -2926,6 +2987,7 @@ void device_debug::watchpoint::install(read_or_write mode)
 			}
 		break;
 	}
+	m_installing = false;
 }
 
 void device_debug::watchpoint::triggered(read_or_write type, offs_t address, u64 data, u64 mem_mask)
@@ -2939,7 +3001,7 @@ void device_debug::watchpoint::triggered(read_or_write type, offs_t address, u64
 
 	// adjust address, size & value_to_write based on mem_mask.
 	offs_t size = 0;
-	offs_t ashift = m_space.addr_shift();
+	int ashift = m_space.addr_shift();
 	offs_t unit_size = ashift <= 0 ? 8 << -ashift : 8 >> ashift;
 	u64 unit_mask = make_bitmask<u64>(unit_size);
 
@@ -3015,6 +3077,7 @@ void device_debug::watchpoint::triggered(read_or_write type, offs_t address, u64
 							   pc);
 		debug.console().printf("%s\n", buffer);
 		m_debugInterface->compute_debug_flags();
+		m_debugInterface->set_triggered_watchpoint(this);
 	}
 
 	debug.cpu().set_within_instruction(false);
@@ -3029,8 +3092,7 @@ void device_debug::watchpoint::triggered(read_or_write type, offs_t address, u64
 //-------------------------------------------------
 
 device_debug::registerpoint::registerpoint(symbol_table &symbols, int index, const char *condition, const char *action)
-	: m_next(nullptr),
-		m_index(index),
+	: m_index(index),
 		m_enabled(true),
 		m_condition(&symbols, (condition != nullptr) ? condition : "1"),
 		m_action((action != nullptr) ? action : "")

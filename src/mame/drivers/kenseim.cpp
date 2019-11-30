@@ -138,7 +138,7 @@ GND | 20
 
 */
 
-// note: I've kept this code out of cps1.c as there is likely to be a substantial amount of game specific code here ones all the extra hardware is emulated
+// note: I've kept this code out of cps1.cpp as there is likely to be a substantial amount of game specific code here ones all the extra hardware is emulated
 
 #include "emu.h"
 #include "cpu/z80/tmpz84c011.h"
@@ -172,11 +172,11 @@ public:
 
 	void init_kenseim();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(kenseim_cmd_1234_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(kenseim_cmd_5678_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(kenseim_cmd_9_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(kenseim_cmd_req_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(kenseim_cmd_LVm_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(cmd_1234_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(cmd_5678_r);
+	DECLARE_READ_LINE_MEMBER(cmd_9_r);
+	DECLARE_READ_LINE_MEMBER(cmd_req_r);
+	DECLARE_READ_LINE_MEMBER(cmd_LVm_r);
 
 private:
 	void mole_up(int side, int mole)
@@ -373,27 +373,27 @@ WRITE8_MEMBER(kenseim_state::cpu_portc_w)
 
 /* 68k side COMMS reads */
 
-CUSTOM_INPUT_MEMBER(kenseim_state::kenseim_cmd_1234_r)
+CUSTOM_INPUT_MEMBER(kenseim_state::cmd_1234_r)
 {
 	return (m_to_68k_cmd_low & 0x0f) >> 0;
 }
 
-CUSTOM_INPUT_MEMBER(kenseim_state::kenseim_cmd_5678_r)
+CUSTOM_INPUT_MEMBER(kenseim_state::cmd_5678_r)
 {
 	return (m_to_68k_cmd_low & 0xf0) >> 4;
 }
 
-CUSTOM_INPUT_MEMBER(kenseim_state::kenseim_cmd_9_r)
+READ_LINE_MEMBER(kenseim_state::cmd_9_r)
 {
 	return m_to_68k_cmd_d9;
 }
 
-CUSTOM_INPUT_MEMBER(kenseim_state::kenseim_cmd_req_r)
+READ_LINE_MEMBER(kenseim_state::cmd_req_r)
 {
 	return m_to_68k_cmd_req;
 }
 
-CUSTOM_INPUT_MEMBER(kenseim_state::kenseim_cmd_LVm_r)
+READ_LINE_MEMBER(kenseim_state::cmd_LVm_r)
 {
 	return m_to_68k_cmd_LVm;;
 }
@@ -477,44 +477,45 @@ static const z80_daisy_config daisy_chain_gamecpu[] =
 	{ nullptr }
 };
 
-MACHINE_CONFIG_START(kenseim_state::kenseim)
+void kenseim_state::kenseim(machine_config &config)
+{
 	cps1_12MHz(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("gamecpu", TMPZ84C011, XTAL(16'000'000)/2) // tmpz84c011-8
-	MCFG_Z80_DAISY_CHAIN(daisy_chain_gamecpu)
-	MCFG_DEVICE_PROGRAM_MAP(kenseim_map)
-	MCFG_DEVICE_IO_MAP(kenseim_io_map)
-	MCFG_TMPZ84C011_PORTC_WRITE_CB(WRITE8(*this, kenseim_state, cpu_portc_w))
-	MCFG_TMPZ84C011_PORTD_WRITE_CB(WRITE8(*this, kenseim_state, cpu_portd_w))
-	MCFG_TMPZ84C011_PORTE_WRITE_CB(WRITE8(*this, kenseim_state, cpu_porte_w))
-	MCFG_TMPZ84C011_PORTA_READ_CB(IOPORT("DSW1"))
-	MCFG_TMPZ84C011_PORTB_READ_CB(IOPORT("DSW2"))
-	MCFG_TMPZ84C011_PORTC_READ_CB(IOPORT("CAB-IN"))
-	MCFG_TMPZ84C011_PORTD_READ_CB(READ8(*this, kenseim_state, cpu_portd_r))
+	tmpz84c011_device& gamecpu(TMPZ84C011(config, "gamecpu", XTAL(16'000'000)/2)); // tmpz84c011-8
+	gamecpu.set_daisy_config(daisy_chain_gamecpu);
+	gamecpu.set_addrmap(AS_PROGRAM, &kenseim_state::kenseim_map);
+	gamecpu.set_addrmap(AS_IO, &kenseim_state::kenseim_io_map);
+	gamecpu.out_pc_callback().set(FUNC(kenseim_state::cpu_portc_w));
+	gamecpu.out_pd_callback().set(FUNC(kenseim_state::cpu_portd_w));
+	gamecpu.out_pe_callback().set(FUNC(kenseim_state::cpu_porte_w));
+	gamecpu.in_pa_callback().set_ioport("DSW1");
+	gamecpu.in_pb_callback().set_ioport("DSW2");
+	gamecpu.in_pc_callback().set_ioport("CAB-IN");
+	gamecpu.in_pd_callback().set(FUNC(kenseim_state::cpu_portd_r));
 
-	MCFG_MB89363B_ADD("mb89363b")
+	mb89363b_device &ppi_x2(MB89363B(config, "mb89363b"));
 	// a,b,c always $80: all ports set as output
 	// d,e,f always $92: port D and E as input, port F as output
-	MCFG_MB89363B_OUT_PORTA_CB(WRITE8(*this, kenseim_state, mb8936_porta_w))
-	MCFG_MB89363B_OUT_PORTB_CB(WRITE8(*this, kenseim_state, mb8936_portb_w))
-	MCFG_MB89363B_OUT_PORTC_CB(WRITE8(*this, kenseim_state, mb8936_portc_w))
-	MCFG_MB89363B_IN_PORTD_CB(IOPORT("MOLEA"))
-	MCFG_MB89363B_IN_PORTE_CB(IOPORT("MOLEB"))
-	MCFG_MB89363B_OUT_PORTF_CB(WRITE8(*this, kenseim_state, mb8936_portf_w))
+	ppi_x2.out_pa().set(FUNC(kenseim_state::mb8936_porta_w));
+	ppi_x2.out_pb().set(FUNC(kenseim_state::mb8936_portb_w));
+	ppi_x2.out_pc().set(FUNC(kenseim_state::mb8936_portc_w));
+	ppi_x2.in_pd().set_ioport("MOLEA");
+	ppi_x2.in_pe().set_ioport("MOLEB");
+	ppi_x2.out_pf().set(FUNC(kenseim_state::mb8936_portf_w));
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
-MACHINE_CONFIG_END
+	config.set_perfect_quantum(m_maincpu);
+}
 
 static INPUT_PORTS_START( kenseim )
 	// the regular CPS1 input ports are used for comms with the extra board
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED /*IPT_COIN1*/ ) // n/c
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED /*IPT_COIN2*/ ) // n/c
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, kenseim_state, kenseim_cmd_9_r, nullptr) //   PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 ) // D9
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(kenseim_state, cmd_9_r) //   PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 ) // D9
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN ) // n/c?
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, kenseim_state, kenseim_cmd_req_r, nullptr) // PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 ) // REQ
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, kenseim_state, kenseim_cmd_LVm_r, nullptr) // PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 ) // LVm
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(kenseim_state, cmd_req_r) // PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 ) // REQ
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(kenseim_state, cmd_LVm_r) // PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 ) // LVm
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) // PORT_SERVICE( 0x40, IP_ACTIVE_LOW ) n/c
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // n/c?
 
@@ -523,7 +524,7 @@ static INPUT_PORTS_START( kenseim )
 //  PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1) // D6
 //  PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1) // D7
 //  PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1) // D8
-	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, kenseim_state, kenseim_cmd_5678_r, nullptr)
+	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(kenseim_state, cmd_5678_r)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNUSED/*IPT_BUTTON1*/ ) /*PORT_PLAYER(1)*/ // n/c
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED/*IPT_BUTTON2*/ ) /*PORT_PLAYER(1)*/ // n/c
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED/*IPT_BUTTON3*/ ) /*PORT_PLAYER(1)*/ // n/c
@@ -533,7 +534,7 @@ static INPUT_PORTS_START( kenseim )
 //  PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2) // D2
 //  PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2) // D3
 //  PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2) // D4
-	PORT_BIT( 0x0f00, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, kenseim_state, kenseim_cmd_1234_r, nullptr)
+	PORT_BIT( 0x0f00, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(kenseim_state, cmd_1234_r)
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNUSED /*IPT_BUTTON1*/ ) /*PORT_PLAYER(2)*/ // n/c
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNUSED /*IPT_BUTTON2*/ ) /*PORT_PLAYER(2)*/ // n/c
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED /*IPT_BUTTON3*/ ) /*PORT_PLAYER(2)*/ // n/c
@@ -694,7 +695,7 @@ ROM_END
 
 void kenseim_state::init_kenseim()
 {
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x800030, 0x800037, write16_delegate(FUNC(kenseim_state::cps1_kensei_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x800030, 0x800037, write16_delegate(*this, FUNC(kenseim_state::cps1_kensei_w)));
 
 	init_cps1();
 

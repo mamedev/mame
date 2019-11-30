@@ -272,15 +272,15 @@ READ8Z_MEMBER(peribox_device::readz)
 {
 	for (int i=2; i <= 8; i++)
 	{
-		if (m_slot[i]!=nullptr) m_slot[i]->readz(space, offset | m_address_prefix, value, mem_mask);
+		if (m_slot[i]!=nullptr) m_slot[i]->readz(offset | m_address_prefix, value);
 	}
 }
 
-WRITE8_MEMBER(peribox_device::write)
+void peribox_device::write(offs_t offset, uint8_t data)
 {
 	for (int i=2; i <= 8; i++)
 	{
-		if (m_slot[i]!=nullptr) m_slot[i]->write(space, offset | m_address_prefix, data, mem_mask);
+		if (m_slot[i]!=nullptr) m_slot[i]->write(offset | m_address_prefix, data);
 	}
 }
 
@@ -291,7 +291,7 @@ SETADDRESS_DBIN_MEMBER(peribox_device::setaddress_dbin)
 
 	for (int i=2; i <= 8; i++)
 	{
-		if (m_slot[i]!=nullptr) m_slot[i]->setaddress_dbin(space, offset | m_address_prefix, state);
+		if (m_slot[i]!=nullptr) m_slot[i]->setaddress_dbin(offset | m_address_prefix, state);
 	}
 }
 
@@ -299,15 +299,15 @@ READ8Z_MEMBER(peribox_device::crureadz)
 {
 	for (int i=2; i <= 8; i++)
 	{
-		if (m_slot[i]!=nullptr) m_slot[i]->crureadz(space, offset, value);
+		if (m_slot[i]!=nullptr) m_slot[i]->crureadz(offset, value);
 	}
 }
 
-WRITE8_MEMBER(peribox_device::cruwrite)
+void peribox_device::cruwrite(offs_t offset, uint8_t data)
 {
 	for (int i=2; i <= 8; i++)
 	{
-		if (m_slot[i]!=nullptr) m_slot[i]->cruwrite(space, offset, data);
+		if (m_slot[i]!=nullptr) m_slot[i]->cruwrite(offset, data);
 	}
 }
 
@@ -639,7 +639,7 @@ void peribox_sg_device::device_add_mconfig(machine_config &config)
 
 peribox_slot_device::peribox_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, TI99_PERIBOX_SLOT, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_ti99_peribox_card_interface>(mconfig, *this),
 	m_card(nullptr),
 	m_slotnumber(0)
 {
@@ -647,27 +647,27 @@ peribox_slot_device::peribox_slot_device(const machine_config &mconfig, const ch
 
 READ8Z_MEMBER(peribox_slot_device::readz)
 {
-	m_card->readz(space, offset, value, mem_mask);
+	m_card->readz(offset, value);
 }
 
-WRITE8_MEMBER(peribox_slot_device::write)
+void peribox_slot_device::write(offs_t offset, uint8_t data)
 {
-	m_card->write(space, offset, data, mem_mask);
+	m_card->write(offset, data);
 }
 
 SETADDRESS_DBIN_MEMBER(peribox_slot_device::setaddress_dbin)
 {
-	m_card->setaddress_dbin(space, offset, state);
+	m_card->setaddress_dbin(offset, state);
 }
 
 READ8Z_MEMBER(peribox_slot_device::crureadz)
 {
-	m_card->crureadz(space, offset, value);
+	m_card->crureadz(offset, value);
 }
 
-WRITE8_MEMBER(peribox_slot_device::cruwrite)
+void peribox_slot_device::cruwrite(offs_t offset, uint8_t data)
 {
-	m_card->cruwrite(space, offset, data);
+	m_card->cruwrite(offset, data);
 }
 
 WRITE_LINE_MEMBER( peribox_slot_device::senila )
@@ -699,7 +699,7 @@ void peribox_slot_device::device_start()
 
 void peribox_slot_device::device_config_complete()
 {
-	m_card = dynamic_cast<device_ti99_peribox_card_interface *>(get_card_device());
+	m_card = get_card_device();
 	peribox_device *peb = dynamic_cast<peribox_device*>(owner());
 	if (peb)
 		peb->set_slot_loaded(m_slotnumber, m_card ? this : nullptr);
@@ -736,7 +736,7 @@ WRITE_LINE_MEMBER( peribox_slot_device::set_ready )
 /***************************************************************************/
 
 device_ti99_peribox_card_interface::device_ti99_peribox_card_interface(const machine_config &mconfig, device_t &device):
-	device_slot_card_interface(mconfig, device),
+	device_interface(device, "ti99peb"),
 	m_selected(false),
 	m_cru_base(0),
 	m_select_mask(0),

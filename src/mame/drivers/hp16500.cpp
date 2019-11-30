@@ -49,6 +49,7 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/ds1386.h"
 #include "machine/mc2661.h"
 #include "bus/hp_hil/hp_hil.h"
 #include "bus/hp_hil/hil_devices.h"
@@ -65,7 +66,7 @@ public:
 		m_mlc(*this, "mlc")
 	{ }
 
-	void hp16500(machine_config &config);
+	void hp16500b(machine_config &config);
 	void hp16500a(machine_config &config);
 	void hp1651(machine_config &config);
 	void hp1650(machine_config &config);
@@ -218,7 +219,7 @@ WRITE16_MEMBER(hp16500_state::maskval_w)
 
 WRITE_LINE_MEMBER(hp16500_state::irq_2)
 {
-	m_maincpu->set_input_line_and_vector(M68K_IRQ_2, state, M68K_INT_ACK_AUTOVECTOR);
+	m_maincpu->set_input_line(M68K_IRQ_2, state);
 }
 
 void hp16500_state::hp1650_map(address_map &map)
@@ -314,7 +315,8 @@ void hp16500_state::hp16500_map(address_map &map)
 	map(0x00203000, 0x00203003).w(FUNC(hp16500_state::vbl_ack_w));
 	map(0x00209800, 0x00209803).r(FUNC(hp16500_state::vbl_state_r));
 
-	map(0x0020b800, 0x0020b8ff).ram(); // system ram test is really strange.
+	map(0x0020b800, 0x0020b83f).rw("rtc", FUNC(ds1286_device::data_r), FUNC(ds1286_device::data_w));
+	map(0x0020b840, 0x0020b843).noprw(); // system ram test is really strange.
 
 	map(0x0020f800, 0x0020f80f).rw(m_mlc, FUNC(hp_hil_mlc_device::read), FUNC(hp_hil_mlc_device::write));
 	map(0x00600000, 0x0061ffff).w(FUNC(hp16500_state::vram_w));
@@ -413,70 +415,77 @@ uint32_t hp16500_state::screen_update_hp16500(screen_device &screen, bitmap_rgb3
 	return 0;
 }
 
-MACHINE_CONFIG_START(hp16500_state::hp1650)
+void hp16500_state::hp1650(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 10000000)
-	MCFG_DEVICE_PROGRAM_MAP(hp1650_map)
+	M68000(config, m_maincpu, 10000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &hp16500_state::hp1650_map);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(25000000, 0x330, 0, 0x250, 0x198, 0, 0x180 )
-	MCFG_SCREEN_UPDATE_DEVICE( "crtc", mc6845_device, screen_update )
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(25000000, 0x330, 0, 0x250, 0x198, 0, 0x180);
+	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 25000000/9)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(hp16500_state, crtc_update_row_1650)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, hp16500_state, vsync_changed))
+	mc6845_device &crtc(MC6845(config, "crtc", 25000000/9));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.set_update_row_callback(FUNC(hp16500_state::crtc_update_row_1650));
+	crtc.out_vsync_callback().set(FUNC(hp16500_state::vsync_changed));
 
-	MCFG_DEVICE_ADD("epci", MC2661, 5000000)
+	MC2661(config, "epci", 5000000);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(hp16500_state::hp1651)
+void hp16500_state::hp1651(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 10000000)
-	MCFG_DEVICE_PROGRAM_MAP(hp1651_map)
+	M68000(config, m_maincpu, 10000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &hp16500_state::hp1651_map);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(25000000, 0x330, 0, 0x250, 0x198, 0, 0x180 )
-	MCFG_SCREEN_UPDATE_DEVICE( "crtc", mc6845_device, screen_update )
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(25000000, 0x330, 0, 0x250, 0x198, 0, 0x180);
+	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 25000000/9)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(hp16500_state, crtc_update_row_1650)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, hp16500_state, vsync_changed))
+	mc6845_device &crtc(MC6845(config, "crtc", 25000000/9));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.set_update_row_callback(FUNC(hp16500_state::crtc_update_row_1650));
+	crtc.out_vsync_callback().set(FUNC(hp16500_state::vsync_changed));
 
-	MCFG_DEVICE_ADD("epci", MC2661, 5000000)
+	MC2661(config, "epci", 5000000);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(hp16500_state::hp16500a)
+void hp16500_state::hp16500a(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 10000000)
-	MCFG_DEVICE_PROGRAM_MAP(hp16500a_map)
+	M68000(config, m_maincpu, 10000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &hp16500_state::hp16500a_map);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(25000000, 0x320, 0, 0x240, 0x19c, 0, 0x170 )
-	MCFG_SCREEN_UPDATE_DEVICE( "crtc", mc6845_device, screen_update )
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(25000000, 0x320, 0, 0x240, 0x19c, 0, 0x170);
+	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 25000000/9)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(hp16500_state, crtc_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, hp16500_state, vsync_changed))
+	mc6845_device &crtc(MC6845(config, "crtc", 25000000/9));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.set_update_row_callback(FUNC(hp16500_state::crtc_update_row));
+	crtc.out_vsync_callback().set(FUNC(hp16500_state::vsync_changed));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(hp16500_state::hp16500)
+void hp16500_state::hp16500b(machine_config &config)
+{
 	/* basic machine hardware */
-	M68EC030(config, m_maincpu, 25'000'000);
+	M68EC030(config, m_maincpu, 50_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &hp16500_state::hp16500_map);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -493,12 +502,14 @@ MACHINE_CONFIG_START(hp16500_state::hp16500)
 
 	// TODO: for now hook up the ipc hil keyboard - this might be replaced
 	// later with a 16500b specific keyboard implementation
-	MCFG_HP_HIL_SLOT_ADD("mlc", "hil1", hp_hil_devices, "hp_ipc_kbd")
-	MCFG_HP_HIL_SLOT_ADD("mlc", "hil2", hp_hil_devices, "hp_ipc_kbd")
+	HP_HIL_SLOT(config, "hil1", "mlc", hp_hil_devices, "hp_ipc_kbd");
+
+	DS1286(config, "rtc", 32768);
+	//WD37C65C(config, "fdc", 16_MHz_XTAL);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-MACHINE_CONFIG_END
+}
 
 static INPUT_PORTS_START( hp16500 )
 INPUT_PORTS_END
@@ -532,4 +543,4 @@ ROM_END
 COMP( 1989, hp1650b,  0, 0, hp1650,   hp16500, hp16500_state, empty_init, "Hewlett Packard", "HP 1650b",  MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 COMP( 1989, hp1651b,  0, 0, hp1651,   hp16500, hp16500_state, empty_init, "Hewlett Packard", "HP 1651b",  MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 COMP( 1991, hp165ka0, 0, 0, hp16500a, hp16500, hp16500_state, empty_init, "Hewlett Packard", "HP 16500a", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
-COMP( 1991, hp16500b, 0, 0, hp16500,  hp16500, hp16500_state, empty_init, "Hewlett Packard", "HP 16500b", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+COMP( 1991, hp16500b, 0, 0, hp16500b, hp16500, hp16500_state, empty_init, "Hewlett Packard", "HP 16500b", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)

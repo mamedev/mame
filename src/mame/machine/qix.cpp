@@ -19,21 +19,27 @@
  *
  *************************************/
 
-void qix_state::machine_reset()
+void qixmcu_state::machine_start()
 {
+	qix_state::machine_start();
+
 	/* reset the coin counter register */
 	m_coinctrl = 0x00;
-}
 
-
-MACHINE_START_MEMBER(qix_state,qixmcu)
-{
 	/* set up save states */
-	save_item(NAME(m_68705_portA_out));
+	save_item(NAME(m_68705_porta_out));
 	save_item(NAME(m_coinctrl));
 }
 
+void zookeep_state::machine_start()
+{
+	qixmcu_state::machine_start();
 
+	/* configure the banking */
+	m_vidbank->configure_entry(0, memregion("videocpu")->base() + 0xa000);
+	m_vidbank->configure_entry(1, memregion("videocpu")->base() + 0x10000);
+	m_vidbank->set_entry(0);
+}
 
 /*************************************
  *
@@ -54,9 +60,9 @@ WRITE_LINE_MEMBER(qix_state::qix_vsync_changed)
  *
  *************************************/
 
-WRITE8_MEMBER(qix_state::zookeep_bankswitch_w)
+WRITE8_MEMBER(zookeep_state::bankswitch_w)
 {
-	membank("bank1")->set_entry((data >> 2) & 1);
+	m_vidbank->set_entry(BIT(data, 2));
 	/* not necessary, but technically correct */
 	qix_palettebank_w(space, offset, data);
 }
@@ -83,15 +89,17 @@ WRITE8_MEMBER(qix_state::qix_data_firq_ack_w)
 
 READ8_MEMBER(qix_state::qix_data_firq_r)
 {
-	m_maincpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
-	return 0xff;
+	if (!machine().side_effects_disabled())
+		m_maincpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
+	return space.unmap();
 }
 
 
 READ8_MEMBER(qix_state::qix_data_firq_ack_r)
 {
-	m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
-	return 0xff;
+	if (!machine().side_effects_disabled())
+		m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
+	return space.unmap();
 }
 
 
@@ -116,15 +124,17 @@ WRITE8_MEMBER(qix_state::qix_video_firq_ack_w)
 
 READ8_MEMBER(qix_state::qix_video_firq_r)
 {
-	m_videocpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
-	return 0xff;
+	if (!machine().side_effects_disabled())
+		m_videocpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
+	return space.unmap();
 }
 
 
 READ8_MEMBER(qix_state::qix_video_firq_ack_r)
 {
-	m_videocpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
-	return 0xff;
+	if (!machine().side_effects_disabled())
+		m_videocpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
+	return space.unmap();
 }
 
 
@@ -135,23 +145,23 @@ READ8_MEMBER(qix_state::qix_video_firq_ack_r)
  *
  *************************************/
 
-READ8_MEMBER(qix_state::qixmcu_coin_r)
+READ8_MEMBER(qixmcu_state::coin_r)
 {
-	logerror("6809:qixmcu_coin_r = %02X\n", m_68705_portA_out);
-	return m_68705_portA_out;
+	logerror("qixmcu_state, coin_r = %02X\n", m_68705_porta_out);
+	return m_68705_porta_out;
 }
 
 
-WRITE8_MEMBER(qix_state::qixmcu_coin_w)
+WRITE8_MEMBER(qixmcu_state::coin_w)
 {
-	logerror("6809:qixmcu_coin_w = %02X\n", data);
+	logerror("qixmcu_state, coin_w = %02X\n", data);
 	/* this is a callback called by pia6821_device::write(), so I don't need to synchronize */
 	/* the CPUs - they have already been synchronized by qix_pia_w() */
 	m_mcu->pa_w(space, 0, data, mem_mask);
 }
 
 
-WRITE8_MEMBER(qix_state::qixmcu_coinctrl_w)
+WRITE8_MEMBER(qixmcu_state::coinctrl_w)
 {
 	if (BIT(data, 2))
 	{
@@ -168,7 +178,7 @@ WRITE8_MEMBER(qix_state::qixmcu_coinctrl_w)
 	/* this is a callback called by pia6821_device::write(), so I don't need to synchronize */
 	/* the CPUs - they have already been synchronized by qix_pia_w() */
 	m_coinctrl = data;
-	logerror("6809:qixmcu_coinctrl_w = %02X\n", data);
+	logerror("qixmcu_state, coinctrl_w = %02X\n", data);
 }
 
 
@@ -179,13 +189,13 @@ WRITE8_MEMBER(qix_state::qixmcu_coinctrl_w)
  *
  *************************************/
 
-READ8_MEMBER(qix_state::qix_68705_portB_r)
+READ8_MEMBER(qixmcu_state::mcu_portb_r)
 {
 	return (ioport("COIN")->read() & 0x0f) | ((ioport("COIN")->read() & 0x80) >> 3);
 }
 
 
-READ8_MEMBER(qix_state::qix_68705_portC_r)
+READ8_MEMBER(qixmcu_state::mcu_portc_r)
 {
 	return (m_coinctrl & 0x08) | ((ioport("COIN")->read() & 0x70) >> 4);
 }
@@ -198,14 +208,14 @@ READ8_MEMBER(qix_state::qix_68705_portC_r)
  *
  *************************************/
 
-WRITE8_MEMBER(qix_state::qix_68705_portA_w)
+WRITE8_MEMBER(qixmcu_state::mcu_porta_w)
 {
 	logerror("68705:portA_w = %02X\n", data);
-	m_68705_portA_out = data;
+	m_68705_porta_out = data;
 }
 
 
-WRITE8_MEMBER(qix_state::qix_68705_portB_w)
+WRITE8_MEMBER(qixmcu_state::mcu_portb_w)
 {
 	machine().bookkeeping().coin_lockout_w(0, (~data >> 6) & 1);
 	machine().bookkeeping().coin_counter_w(0, (data >> 7) & 1);
@@ -221,7 +231,7 @@ WRITE8_MEMBER(qix_state::qix_68705_portB_w)
 
 TIMER_CALLBACK_MEMBER(qix_state::pia_w_callback)
 {
-	m_pia0->write(generic_space(), param >> 8, param & 0xff);
+	m_pia0->write(param >> 8, param & 0xff);
 }
 
 

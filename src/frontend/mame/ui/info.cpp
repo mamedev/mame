@@ -28,20 +28,27 @@ constexpr machine_flags::type MACHINE_WARNINGS  = machine_flags::NO_COCKTAIL | m
 constexpr machine_flags::type MACHINE_BTANB     = machine_flags::NO_SOUND_HW | machine_flags::IS_INCOMPLETE;
 
 constexpr std::pair<device_t::feature_type, char const *> FEATURE_NAMES[] = {
-		{ device_t::feature::PROTECTION,    __("protection")    },
-		{ device_t::feature::PALETTE,       __("color palette") },
-		{ device_t::feature::GRAPHICS,      __("graphics")      },
-		{ device_t::feature::SOUND,         __("sound")         },
-		{ device_t::feature::CONTROLS,      __("controls")      },
-		{ device_t::feature::KEYBOARD,      __("keyboard")      },
-		{ device_t::feature::MOUSE,         __("mouse")         },
-		{ device_t::feature::MICROPHONE,    __("microphone")    },
-		{ device_t::feature::CAMERA,        __("camera")        },
-		{ device_t::feature::DISK,          __("disk")          },
-		{ device_t::feature::PRINTER,       __("printer")       },
-		{ device_t::feature::LAN,           __("LAN")           },
-		{ device_t::feature::WAN,           __("WAN")           },
-		{ device_t::feature::TIMING,        __("timing")        } };
+		{ device_t::feature::PROTECTION,    __("protection")            },
+		{ device_t::feature::TIMING,        __("timing")                },
+		{ device_t::feature::GRAPHICS,      __("graphics")              },
+		{ device_t::feature::PALETTE,       __("color palette")         },
+		{ device_t::feature::SOUND,         __("sound")                 },
+		{ device_t::feature::CAPTURE,       __("capture hardware")      },
+		{ device_t::feature::CAMERA,        __("camera")                },
+		{ device_t::feature::MICROPHONE,    __("microphone")            },
+		{ device_t::feature::CONTROLS,      __("controls")              },
+		{ device_t::feature::KEYBOARD,      __("keyboard")              },
+		{ device_t::feature::MOUSE,         __("mouse")                 },
+		{ device_t::feature::MEDIA,         __("media")                 },
+		{ device_t::feature::DISK,          __("disk")                  },
+		{ device_t::feature::PRINTER,       __("printer")               },
+		{ device_t::feature::TAPE,          __("magnetic tape")         },
+		{ device_t::feature::PUNCH,         __("punch tape")            },
+		{ device_t::feature::DRUM,          __("magnetic drum")         },
+		{ device_t::feature::ROM,           __("solid state storage")   },
+		{ device_t::feature::COMMS,         __("communications")        },
+		{ device_t::feature::LAN,           __("LAN")                   },
+		{ device_t::feature::WAN,           __("WAN")                   } };
 
 } // anonymous namespace
 
@@ -51,18 +58,19 @@ constexpr std::pair<device_t::feature_type, char const *> FEATURE_NAMES[] = {
 //  machine_static_info - constructors
 //-------------------------------------------------
 
-machine_static_info::machine_static_info(machine_config const &config)
-	: machine_static_info(config, nullptr)
+machine_static_info::machine_static_info(const ui_options &options, machine_config const &config)
+	: machine_static_info(options, config, nullptr)
 {
 }
 
-machine_static_info::machine_static_info(machine_config const &config, ioport_list const &ports)
-	: machine_static_info(config, &ports)
+machine_static_info::machine_static_info(const ui_options &options, machine_config const &config, ioport_list const &ports)
+	: machine_static_info(options, config, &ports)
 {
 }
 
-machine_static_info::machine_static_info(machine_config const &config, ioport_list const *ports)
-	: m_flags(config.gamedrv().flags)
+machine_static_info::machine_static_info(const ui_options &options, machine_config const &config, ioport_list const *ports)
+	: m_options(options)
+	, m_flags(config.gamedrv().flags)
 	, m_unemulated_features(config.gamedrv().type.unemulated_features())
 	, m_imperfect_features(config.gamedrv().type.imperfect_features())
 	, m_has_bioses(false)
@@ -147,7 +155,7 @@ rgb_t machine_static_info::warnings_color() const
 	else if ((machine_flags() & MACHINE_WARNINGS) || unemulated_features() || imperfect_features())
 		return UI_YELLOW_COLOR;
 	else
-		return UI_BACKGROUND_COLOR;
+		return m_options.background_color();
 }
 
 
@@ -157,7 +165,7 @@ rgb_t machine_static_info::warnings_color() const
 //-------------------------------------------------
 
 machine_info::machine_info(running_machine &machine)
-	: machine_static_info(machine.config(), machine.ioport().ports())
+	: machine_static_info(dynamic_cast<mame_ui_manager *>(&machine.ui())->options(), machine.config(), machine.ioport().ports())
 	, m_machine(machine)
 {
 }
@@ -241,7 +249,7 @@ std::string machine_info::warnings_string() const
 	if (machine_flags() & ::machine_flags::NOT_WORKING)
 		buf << _("\nTHIS MACHINE DOESN'T WORK. The emulation for this machine is not yet complete. There is nothing you can do to fix this problem except wait for the developers to improve the emulation.\n");
 	if (machine_flags() & ::machine_flags::MECHANICAL)
-		buf << _("\nElements of this machine cannot be emulated as they requires physical interaction or consist of mechanical devices. It is not possible to fully experience this machine.\n");
+		buf << _("\nElements of this machine cannot be emulated as they require physical interaction or consist of mechanical devices. It is not possible to fully experience this machine.\n");
 
 	if ((machine_flags() & MACHINE_ERRORS) || ((m_machine.system().type.unemulated_features() | m_machine.system().type.imperfect_features()) & device_t::feature::PROTECTION))
 	{
@@ -386,7 +394,7 @@ std::string machine_info::game_info_string() const
 				detail = string_format("%d " UTF8_MULTIPLY " %d (%s) %f" UTF8_NBSP "Hz",
 						visarea.width(), visarea.height(),
 						(screen.orientation() & ORIENTATION_SWAP_XY) ? "V" : "H",
-						ATTOSECONDS_TO_HZ(screen.frame_period().attoseconds()));
+						screen.frame_period().as_hz());
 			}
 
 			util::stream_format(buf,
@@ -395,35 +403,6 @@ std::string machine_info::game_info_string() const
 		}
 	}
 
-	return buf.str();
-}
-
-
-//-------------------------------------------------
-//  mandatory_images - search for devices which
-//  need an image to be loaded
-//-------------------------------------------------
-
-std::string machine_info::mandatory_images() const
-{
-	std::ostringstream buf;
-	bool is_first = true;
-
-	// make sure that any required image has a mounted file
-	for (device_image_interface &image : image_interface_iterator(m_machine.root_device()))
-	{
-		if (image.must_be_loaded())
-		{
-			if (m_machine.options().image_option(image.instance_name()).value().empty())
-			{
-				if (is_first)
-					is_first = false;
-				else
-					buf << ", ";
-				buf << "\"" << image.instance_name() << "\"";
-			}
-		}
-	}
 	return buf.str();
 }
 

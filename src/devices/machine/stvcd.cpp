@@ -2,7 +2,7 @@
 // copyright-holders:Angelo Salese, R. Belmont
 /***************************************************************************
 
-  machine/stvcd.c - Sega Saturn and ST-V CD-ROM handling
+  machine/stvcd.cpp - Sega Saturn and ST-V CD-ROM handling
 
   Another tilt at the windmill in 2011 by R. Belmont.
 
@@ -70,6 +70,7 @@ DEFINE_DEVICE_TYPE(STVCD, stvcd_device, "stvcd", "Sega Saturn/ST-V CD Block HLE"
 
 stvcd_device::stvcd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, STVCD, tag, owner, clock)
+	, device_mixer_interface(mconfig, *this, 2)
 	, m_cdrom_image(*this, "cdrom")
 	, m_sector_timer(*this, "sector_timer")
 	, m_sh1_timer(*this, "sh1_cmd")
@@ -77,26 +78,20 @@ stvcd_device::stvcd_device(const machine_config &mconfig, const char *tag, devic
 {
 }
 
-MACHINE_CONFIG_START(stvcd_device::device_add_mconfig)
-	MCFG_CDROM_ADD("cdrom")
-	MCFG_CDROM_INTERFACE("sat_cdrom")
+void stvcd_device::device_add_mconfig(machine_config &config)
+{
+	CDROM(config, "cdrom").set_interface("sat_cdrom");
 
-	MCFG_TIMER_DRIVER_ADD("sector_timer", stvcd_device, stv_sector_cb)
-	MCFG_TIMER_DRIVER_ADD("sh1_cmd", stvcd_device, stv_sh1_sim)
+	TIMER(config, m_sector_timer).configure_generic(FUNC(stvcd_device::stv_sector_cb));
+	TIMER(config, m_sh1_timer).configure_generic(FUNC(stvcd_device::stv_sh1_sim));
 
-	MCFG_DEVICE_ADD("cdda", CDDA)
-	// FIXME: these outputs should not be hardcoded
-	MCFG_SOUND_ROUTE(0, ":lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, ":rspeaker", 1.0)
-MACHINE_CONFIG_END
+	CDDA(config, m_cdda);
+	m_cdda->add_route(0, *this, 1.0, AUTO_ALLOC_INPUT, 0);
+	m_cdda->add_route(1, *this, 1.0, AUTO_ALLOC_INPUT, 1);
+}
 
 void stvcd_device::device_start()
 {
-}
-
-READ16_MEMBER(stvcd_device::channel_volume_r)
-{
-	return m_cdda->get_channel_volume(offset);
 }
 
 int stvcd_device::get_timing_command(void)

@@ -62,7 +62,7 @@
 #include "screen.h"
 #include "speaker.h"
 
-#define CHAR_WIDTH 14
+#define TV912_CH_WIDTH 14
 #define CHARSET_TEST 0
 
 class tv912_state : public driver_device
@@ -272,7 +272,7 @@ u32 tv912_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, cons
 		return 0;
 	}
 
-	u8 *dispram = static_cast<u8 *>(m_dispram_bank->base());
+	const u8 *dispram = static_cast<u8 *>(m_dispram_bank->base());
 	ioport_value videoctrl = m_video_control->read();
 
 	rectangle curs;
@@ -306,7 +306,7 @@ u32 tv912_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, cons
 					dots ^= 0xff;
 			}
 
-			for (int d = 0; d < CHAR_WIDTH / 2; d++)
+			for (int d = 0; d < TV912_CH_WIDTH / 2; d++)
 			{
 				if (x >= cliprect.left() && x <= cliprect.right())
 					bitmap.pix(y, x) = BIT(dots, 7) ? rgb_t::white() : rgb_t::black();
@@ -424,14 +424,14 @@ static INPUT_PORTS_START( switches )
 	// S2:10 was previously used to short out 270 ohm resistor in video section
 
 	PORT_START("UARTCTRL")
-	PORT_DIPNAME(0x11, 0x11, "Parity Select") PORT_DIPLOCATION("S2:9,5") PORT_CHANGED_MEMBER(DEVICE_SELF, tv912_state, uart_settings_changed, nullptr)
+	PORT_DIPNAME(0x11, 0x11, "Parity Select") PORT_DIPLOCATION("S2:9,5") PORT_CHANGED_MEMBER(DEVICE_SELF, tv912_state, uart_settings_changed, 0)
 	PORT_DIPSETTING(0x11, "None")
 	PORT_DIPSETTING(0x01, "Even")
 	PORT_DIPSETTING(0x00, "Odd")
-	PORT_DIPNAME(0x08, 0x00, "Stop Bits") PORT_DIPLOCATION("S2:6") PORT_CHANGED_MEMBER(DEVICE_SELF, tv912_state, uart_settings_changed, nullptr)
+	PORT_DIPNAME(0x08, 0x00, "Stop Bits") PORT_DIPLOCATION("S2:6") PORT_CHANGED_MEMBER(DEVICE_SELF, tv912_state, uart_settings_changed, 0)
 	PORT_DIPSETTING(0x00, "1")
 	PORT_DIPSETTING(0x08, "2")
-	PORT_DIPNAME(0x06, 0x06, "Data Bits") PORT_DIPLOCATION("S2:8,7") PORT_CHANGED_MEMBER(DEVICE_SELF, tv912_state, uart_settings_changed, nullptr)
+	PORT_DIPNAME(0x06, 0x06, "Data Bits") PORT_DIPLOCATION("S2:8,7") PORT_CHANGED_MEMBER(DEVICE_SELF, tv912_state, uart_settings_changed, 0)
 	PORT_DIPSETTING(0x00, "5")
 	PORT_DIPSETTING(0x04, "6")
 	PORT_DIPSETTING(0x02, "7")
@@ -891,12 +891,12 @@ void tv912_state::tv912(machine_config &config)
 	m_bankdev->set_stride(0x100);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(23.814_MHz_XTAL, 105 * CHAR_WIDTH, 0, 80 * CHAR_WIDTH, 270, 0, 240);
+	screen.set_raw(23.814_MHz_XTAL, 105 * TV912_CH_WIDTH, 0, 80 * TV912_CH_WIDTH, 270, 0, 240);
 	screen.set_screen_update(FUNC(tv912_state::screen_update));
 
-	TMS9927(config, m_crtc, 23.814_MHz_XTAL / CHAR_WIDTH);
-	m_crtc->set_char_width(CHAR_WIDTH);
-	m_crtc->vsyn_wr_callback().set_inputline(m_maincpu, MCS48_INPUT_IRQ);
+	TMS9927(config, m_crtc, 23.814_MHz_XTAL / TV912_CH_WIDTH);
+	m_crtc->set_char_width(TV912_CH_WIDTH);
+	m_crtc->vsyn_callback().set_inputline(m_maincpu, MCS48_INPUT_IRQ);
 	m_crtc->set_screen("screen");
 
 	AY51013(config, m_uart);

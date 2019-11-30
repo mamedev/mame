@@ -32,8 +32,10 @@ public:
 
 	// Timers and counters
 	uint8_t m_pit_counter;
+	bool m_pit_irq;
 
 	void reset();
+	void module_reset();
 
 	enum {
 		REG_MCR          = 0x00,

@@ -353,10 +353,8 @@ WRITE16_MEMBER( atarisy1_state::atarisy1_spriteram_w )
 
 TIMER_DEVICE_CALLBACK_MEMBER(atarisy1_state::atarisy1_int3off_callback)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-
 	/* clear the state */
-	scanline_int_ack_w(space, 0, 0);
+	scanline_int_ack_w();
 }
 
 
@@ -365,7 +363,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(atarisy1_state::atarisy1_int3_callback)
 	int scanline = param;
 
 	/* update the state */
-	scanline_int_gen(*m_maincpu);
+	scanline_int_write_line(1);
 
 	/* set a timer to turn it off */
 	m_int3off_timer->adjust(m_screen->scan_period());

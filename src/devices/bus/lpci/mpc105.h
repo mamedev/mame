@@ -17,11 +17,6 @@
 
 #define MPC105_MEMORYBANK_COUNT     8
 
-#define MCFG_MPC105_CPU( _tag ) \
-	downcast<mpc105_device &>(*device).set_cpu(_tag);
-
-#define MCFG_MPC105_BANK_BASE_DEFAULT( bank_base_default ) \
-	downcast<mpc105_device &>(*device).set_bank_base_default(bank_base_default);
 
 // ======================> mpc105_device
 
@@ -32,7 +27,7 @@ public:
 	// construction/destruction
 	mpc105_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void set_cpu(const char *tag) { m_cpu_tag = tag; }
+	template <typename T> void set_cpu(T &&tag) { m_maincpu.set_tag(std::forward<T>(tag)); }
 	void set_bank_base_default(int bank_base_default) { m_bank_base_default = bank_base_default; }
 
 	virtual uint32_t pci_read(pci_bus_device *pcibus, int function, int offset, uint32_t mem_mask) override;
@@ -46,13 +41,12 @@ protected:
 	void update_memory();
 
 private:
-	const char *m_cpu_tag;
 	int m_bank_base_default;
 	int m_bank_base;
 	uint8_t m_bank_enable;
 	uint32_t m_bank_registers[8];
 
-	cpu_device*   m_maincpu;
+	required_device<cpu_device> m_maincpu;
 };
 
 

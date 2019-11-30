@@ -79,8 +79,8 @@ Dumped by Uki
 class galpani3_state : public driver_device
 {
 public:
-	galpani3_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	galpani3_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_grap2(*this,"grap2_%u", 0),
 		m_palette(*this, "palette"),
@@ -450,46 +450,43 @@ void galpani3_state::galpani3_map(address_map &map)
 }
 
 
-MACHINE_CONFIG_START(galpani3_state::galpani3)
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(28'636'363)/2) // Confirmed from PCB
-	MCFG_DEVICE_PROGRAM_MAP(galpani3_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", galpani3_state, galpani3_vblank, "screen", 0, 1)
+void galpani3_state::galpani3(machine_config &config)
+{
+	M68000(config, m_maincpu, XTAL(28'636'363)/2); // Confirmed from PCB
+	m_maincpu->set_addrmap(AS_PROGRAM, &galpani3_state::galpani3_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(galpani3_state::galpani3_vblank), "screen", 0, 1);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 64*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
-	//MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 64*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(galpani3_state, screen_update_galpani3)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 64*8);
+	screen.set_visarea(0*8, 40*8-1, 0*8, 30*8-1);
+	//screen.set_visarea(0*8, 64*8-1, 0*8, 64*8-1);
+	screen.set_screen_update(FUNC(galpani3_state::screen_update_galpani3));
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
-	MCFG_DEVICE_ADD("toybox", KANEKO_TOYBOX, "eeprom", "DSW1", "mcuram", "mcudata")
+	KANEKO_TOYBOX(config, "toybox", "eeprom", "DSW1", "mcuram", "mcudata");
 
-	MCFG_PALETTE_ADD("palette", 0x4000)
-	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
+	PALETTE(config, m_palette).set_format(palette_device::xGRB_555, 0x4000);
 
-	MCFG_DEVICE_ADD("spritegen", SKNS_SPRITE, 0)
+	SKNS_SPRITE(config, m_spritegen, 0);
 
-	MCFG_DEVICE_ADD("grap2_0", KANEKO_GRAP2, 0)
-	MCFG_DEVICE_ROM("rlebg")
+	KANEKO_GRAP2(config, m_grap2[0], 0).set_device_rom_tag("rlebg");
 
-	MCFG_DEVICE_ADD("grap2_1", KANEKO_GRAP2, 0)
-	MCFG_DEVICE_ROM("rlebg")
+	KANEKO_GRAP2(config, m_grap2[1], 0).set_device_rom_tag("rlebg");
 
-	MCFG_DEVICE_ADD("grap2_2", KANEKO_GRAP2, 0)
-	MCFG_DEVICE_ROM("rlebg")
+	KANEKO_GRAP2(config, m_grap2[2], 0).set_device_rom_tag("rlebg");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymz", YMZ280B, XTAL(33'333'000) / 2)  // Confirmed from PCB
-	MCFG_SOUND_ROUTE(0, "mono", 1.0)
-	MCFG_SOUND_ROUTE(1, "mono", 1.0)
-MACHINE_CONFIG_END
+	ymz280b_device &ymz(YMZ280B(config, "ymz", XTAL(33'333'000) / 2));  // Confirmed from PCB
+	ymz.add_route(0, "mono", 1.0);
+	ymz.add_route(1, "mono", 1.0);
+}
 
 
 ROM_START( galpani3 ) /* All game text in English */

@@ -23,6 +23,7 @@
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
+#include "imagedev/floppy.h"
 #include "machine/mm58167.h"
 #include "machine/6840ptm.h"
 #include "machine/6821pia.h"
@@ -151,9 +152,9 @@ void gimix_state::gimix_banked_mem(address_map &map)
 	map(0x00000, 0x0dfff).bankrw("lower_ram");
 	map(0x0e000, 0x0e001).rw(m_acia1, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
 	map(0x0e004, 0x0e005).rw(m_acia2, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
-	//AM_RANGE(0x0e018, 0x0e01b) AM_READWRITE(fdc_r, fdc_w)  // FD1797 FDC (PIO)
+	//map(0x0e018, 0x0e01b).rw(FUNC(gimix_state::fdc_r), FUNC(gimix_state::fdc_w));  // FD1797 FDC (PIO)
 	map(0x0e100, 0x0e1ff).ram();
-	//AM_RANGE(0x0e200, 0x0e20f) // 9511A / 9512 Arithmetic Processor
+	//map(0x0e200, 0x0e20f) // 9511A / 9512 Arithmetic Processor
 	map(0x0e210, 0x0e21f).rw("timer", FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
 	map(0x0e220, 0x0e23f).rw("rtc", FUNC(mm58167_device::read), FUNC(mm58167_device::write));
 	map(0x0e240, 0x0e3af).ram();
@@ -163,7 +164,7 @@ void gimix_state::gimix_banked_mem(address_map &map)
 	map(0x0e800, 0x0efff).ram();
 	map(0x0f000, 0x0f7ff).bankr("rombank2");
 	map(0x0f800, 0x0ffff).bankr("rombank1");
-	//AM_RANGE(0x10000, 0x1ffff) AM_RAM
+	//map(0x10000, 0x1ffff).ram();
 }
 
 void gimix_state::gimix_mem(address_map &map)
@@ -177,7 +178,7 @@ void gimix_state::gimix_mem(address_map &map)
 
 static INPUT_PORTS_START( gimix )
 	PORT_START("dma_s2")
-	PORT_DIPNAME(0x00000100,0x00000000,"5.25\" / 8\" floppy drive 0") PORT_DIPLOCATION("S2:9") PORT_CHANGED_MEMBER(DEVICE_SELF,gimix_state,drive_size_cb,nullptr)
+	PORT_DIPNAME(0x00000100,0x00000000,"5.25\" / 8\" floppy drive 0") PORT_DIPLOCATION("S2:9") PORT_CHANGED_MEMBER(DEVICE_SELF,gimix_state,drive_size_cb,0)
 	PORT_DIPSETTING(0x00000000,"5.25\"")
 	PORT_DIPSETTING(0x00000100,"8\"")
 
@@ -480,26 +481,27 @@ static void gimix_floppies(device_slot_interface &device)
 	device.option_add("8dd", FLOPPY_8_DSDD);
 }
 
-MACHINE_CONFIG_START(gimix_state::gimix)
+void gimix_state::gimix(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", MC6809, 8_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(gimix_mem)
+	MC6809(config, m_maincpu, 8_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &gimix_state::gimix_mem);
 
 	/* rtc */
-	MCFG_DEVICE_ADD("rtc", MM58167, 32.768_kHz_XTAL)
-	MCFG_MM58167_IRQ_CALLBACK(WRITELINE(*this, gimix_state,irq_w))
+	mm58167_device &rtc(MM58167(config, "rtc", 32.768_kHz_XTAL));
+	rtc.irq().set(FUNC(gimix_state::irq_w));
 
 	/* timer */
 	ptm6840_device &ptm(PTM6840(config, "timer", 2'000'000));  // clock is a guess
 	ptm.irq_callback().set(FUNC(gimix_state::irq_w));  // PCB pictures show both the RTC and timer set to generate IRQs (are jumper configurable)
 
 	/* floppy disks */
-	MCFG_DEVICE_ADD("fdc", FD1797, 8_MHz_XTAL / 4)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, gimix_state,fdc_irq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, gimix_state,fdc_drq_w))
-	MCFG_WD_FDC_FORCE_READY
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", gimix_floppies, "525hd", gimix_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", gimix_floppies, "525hd", gimix_state::floppy_formats)
+	FD1797(config, m_fdc, 8_MHz_XTAL / 4);
+	m_fdc->intrq_wr_callback().set(FUNC(gimix_state::fdc_irq_w));
+	m_fdc->drq_wr_callback().set(FUNC(gimix_state::fdc_drq_w));
+	m_fdc->set_force_ready(true);
+	FLOPPY_CONNECTOR(config, "fdc:0", gimix_floppies, "525hd", gimix_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", gimix_floppies, "525hd", gimix_state::floppy_formats);
 
 	/* parallel ports */
 	pia6821_device &pia1(PIA6821(config, "pia1", 2'000'000));
@@ -527,21 +529,21 @@ MACHINE_CONFIG_START(gimix_state::gimix)
 	m_acia4->txd_handler().set("serial4", FUNC(rs232_port_device::write_txd));
 	m_acia4->rts_handler().set("serial4", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("serial1",RS232_PORT, default_rs232_devices,nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("acia1",acia6850_device,write_rxd))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("acia1",acia6850_device,write_cts))
+	rs232_port_device &serial1(RS232_PORT(config, "serial1", default_rs232_devices, nullptr));
+	serial1.rxd_handler().set(m_acia1, FUNC(acia6850_device::write_rxd));
+	serial1.cts_handler().set(m_acia1, FUNC(acia6850_device::write_cts));
 
-	MCFG_DEVICE_ADD("serial2",RS232_PORT, default_rs232_devices,"terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("acia2",acia6850_device,write_rxd))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("acia2",acia6850_device,write_cts))
+	rs232_port_device &serial2(RS232_PORT(config, "serial2", default_rs232_devices, "terminal"));
+	serial2.rxd_handler().set(m_acia2, FUNC(acia6850_device::write_rxd));
+	serial2.cts_handler().set(m_acia2, FUNC(acia6850_device::write_cts));
 
-	MCFG_DEVICE_ADD("serial3",RS232_PORT, default_rs232_devices,nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("acia3",acia6850_device,write_rxd))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("acia3",acia6850_device,write_cts))
+	rs232_port_device &serial3(RS232_PORT(config, "serial3", default_rs232_devices, nullptr));
+	serial3.rxd_handler().set(m_acia3, FUNC(acia6850_device::write_rxd));
+	serial3.cts_handler().set(m_acia3, FUNC(acia6850_device::write_cts));
 
-	MCFG_DEVICE_ADD("serial4",RS232_PORT, default_rs232_devices,nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("acia4",acia6850_device,write_rxd))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("acia4",acia6850_device,write_cts))
+	rs232_port_device &serial4(RS232_PORT(config, "serial4", default_rs232_devices, nullptr));
+	serial4.rxd_handler().set(m_acia4, FUNC(acia6850_device::write_rxd));
+	serial4.cts_handler().set(m_acia4, FUNC(acia6850_device::write_cts));
 
 	clock_device &acia_clock(CLOCK(config, "acia_clock", 153600));
 	acia_clock.signal_handler().set(m_acia1, FUNC(acia6850_device::write_txc));
@@ -558,12 +560,12 @@ MACHINE_CONFIG_START(gimix_state::gimix)
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("128K").set_extra_options("56K,256K,512K");
 
-	MCFG_SOFTWARE_LIST_ADD("flop_list","gimix")
+	SOFTWARE_LIST(config, "flop_list").set_original("gimix");
 
 	// uncomment this timer to use a hack that generates a regular IRQ, this will get OS-9 to boot
 	// for some unknown reason, OS-9 does not touch the 6840, and only clears/disables IRQs on the RTC
-	//MCFG_TIMER_DRIVER_ADD_PERIODIC("test_timer",gimix_state,test_timer_w,attotime::from_msec(100))
-MACHINE_CONFIG_END
+	//TIMER(config, "test_timer").configure_periodic(FUNC(gimix_state::test_timer_w), attotime::from_msec(100));
+}
 
 ROM_START( gimix )
 	ROM_REGION( 0x10000, "roms", 0)

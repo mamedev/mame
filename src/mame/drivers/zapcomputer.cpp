@@ -155,15 +155,16 @@ void zapcomp_state::machine_start()
 	m_digits.resolve();
 }
 
-MACHINE_CONFIG_START(zapcomp_state::zapcomp)
+void zapcomp_state::zapcomp(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(2'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(zapcomp_mem)
-	MCFG_DEVICE_IO_MAP(zapcomp_io)
+	Z80(config, m_maincpu, XTAL(2'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &zapcomp_state::zapcomp_mem);
+	m_maincpu->set_addrmap(AS_IO, &zapcomp_state::zapcomp_io);
 
 	/* video hardware */
 	config.set_default_layout(layout_zapcomputer);
-MACHINE_CONFIG_END
+}
 
 ROM_START( zapcomp )
 	ROM_REGION( 0x10000, "roms", 0 )

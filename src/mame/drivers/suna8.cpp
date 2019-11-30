@@ -19,7 +19,7 @@ Year + Game         Game     PCB         Epoxy CPU  Samples  Notes
 88  Rough Ranger    K030087  ?           S562008    Yes      Not Encrypted
 89  Spark Man       KRB-16   60136-081   T568009    Yes      Encryption + Protection
 90  Star Fighter    KRB-17   60484-0082  T568009    Yes      Encryption + Protection
-91  Hard Head 2     ?        ?           T568009    -        Encryption + Protection
+91  Hard Head 2     KRB-18   70523-0083  T568009    -        Encryption + Protection
 92  Brick Zone      KRB-19   70523-0084  Yes        -        Encryption + Protection
 --------------------------------------------------------------------------------------
 
@@ -240,7 +240,7 @@ rom13:  0?, 1y, 2n, 3n      ?,?,?,? (palettes)
         8?, 9n?,an, bn      y,y,?,? (player anims)
         cn, dy, en, fn      y,y,n,n
 */
-		static const uint8_t swaptable[0x50] =
+		static constexpr uint8_t swaptable[0x50] =
 		{
 			1,1,1,1,0,0,1,1,    0,0,0,0,0,0,0,0,    // 8000-ffff not used
 			1,1,0,0,0,0,0,0,0,0,0,0,1,1,0,0,
@@ -259,12 +259,12 @@ rom13:  0?, 1y, 2n, 3n      ?,?,?,? (palettes)
 	/* Opcodes */
 	for (int i = 0; i < 0x8000; i++)
 	{
-		static const uint8_t swaptable[32] =
+		static constexpr uint8_t swaptable[32] =
 		{
 			1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,
 			1,1,0,1,1,1,1,1,1,1,1,1,0,1,0,0
 		};
-		static const uint8_t xortable[32] =
+		static constexpr uint8_t xortable[32] =
 		{
 			0x04,0x04,0x00,0x04,0x00,0x04,0x00,0x00,0x04,0x45,0x00,0x04,0x00,0x04,0x00,0x00,
 			0x04,0x45,0x00,0x04,0x00,0x04,0x00,0x00,0x04,0x04,0x00,0x04,0x00,0x04,0x00,0x00
@@ -283,7 +283,7 @@ rom13:  0?, 1y, 2n, 3n      ?,?,?,? (palettes)
 	/* Data */
 	for (int i = 0; i < 0x8000; i++)
 	{
-		static const uint8_t swaptable[8] = { 1,1,0,1,0,1,1,0 };
+		static constexpr uint8_t swaptable[8] = { 1,1,0,1,0,1,1,0 };
 
 		if (swaptable[(i & 0x7000) >> 12])
 			RAM[i] = bitswap<8>(RAM[i], 5,6,7,4,3,2,1,0) ^ 0x41;
@@ -318,7 +318,7 @@ void suna8_state::init_starfigh()
 	memcpy(decrypt, RAM, size);
 	for (int i = 0; i < 0x50000; i++)
 	{
-		static const uint8_t swaptable[0x50] =
+		static constexpr uint8_t swaptable[0x50] =
 		{
 			1,1,1,1,    1,1,0,0,    0,0,0,0,    0,0,0,0,    // 8000-ffff not used
 			0,0,0,0,    0,0,0,0,    0,0,0,0,    0,0,0,0,
@@ -337,12 +337,12 @@ void suna8_state::init_starfigh()
 	/* Opcodes */
 	for (int i = 0; i < 0x8000; i++)
 	{
-		static const uint8_t swaptable[32] =
+		static constexpr uint8_t swaptable[32] =
 		{
 			0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,
 			0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 		};
-		static const uint8_t xortable[32] =
+		static constexpr uint8_t xortable[32] =
 		{
 			0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x01,0x01,0x41,0x01,0x00,0x00,0x00,0x00,
 			0x01,0x01,0x41,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00
@@ -361,7 +361,7 @@ void suna8_state::init_starfigh()
 	/* Data */
 	for (int i = 0; i < 0x8000; i++)
 	{
-		static const uint8_t swaptable[8] = { 1,1,0,1,0,1,1,0 };
+		static constexpr uint8_t swaptable[8] = { 1,1,0,1,0,1,1,0 };
 
 		if (swaptable[(i & 0x7000) >> 12])
 			RAM[i] = bitswap<8>(RAM[i], 5,6,7,4,3,2,1,0) ^ 0x45;
@@ -401,7 +401,7 @@ void suna8_state::init_sparkman()
 	memcpy(decrypt, RAM, size);
 	for (int i = 0; i < 0x50000; i++)
 	{
-		static const uint8_t swaptable[0x50] =
+		static constexpr uint8_t swaptable[0x50] =
 		{
 			1,1,1,1,    0,0,1,1,    0,0,0,0,    0,0,0,0,    // 8000-ffff not used
 			0,0,0,0,    0,0,0,0,    0,0,0,0,    0,0,0,0,
@@ -420,12 +420,12 @@ void suna8_state::init_sparkman()
 	/* Opcodes */
 	for (int i = 0; i < 0x8000; i++)
 	{
-		static const uint8_t swaptable[32] =
+		static constexpr uint8_t swaptable[32] =
 		{
 			0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,
 			0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0
 		};
-		static const uint8_t xortable[32] =
+		static constexpr uint8_t xortable[32] =
 		{
 			0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
 			0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x40,0x00,0x00,0x00,0x00,0x00
@@ -444,7 +444,7 @@ void suna8_state::init_sparkman()
 	/* Data */
 	for (int i = 0; i < 0x8000; i++)
 	{
-		static const uint8_t swaptable[8] = { 1,1,1,0,1,1,0,1 };
+		static constexpr uint8_t swaptable[8] = { 1,1,1,0,1,1,0,1 };
 
 		if (swaptable[(i & 0x7000) >> 12])
 			RAM[i] = bitswap<8>(RAM[i], 5,6,7,4,3,2,1,0) ^ 0x44;
@@ -608,7 +608,7 @@ WRITE8_MEMBER(suna8_state::rranger_bankswitch_w)
 */
 READ8_MEMBER(suna8_state::rranger_soundstatus_r)
 {
-	m_soundlatch2->read(space, offset);
+	m_soundlatch2->read();
 	return 0x02;
 }
 
@@ -738,7 +738,7 @@ void suna8_state::brickzn11_map(address_map &map)
 	map(0xc060, 0xc060).w(FUNC(suna8_state::brickzn_rombank_w));   // ROM Bank
 	map(0xc080, 0xc080).w(FUNC(suna8_state::brickzn_leds_w));   // Leds
 	map(0xc0a0, 0xc0a0).w(FUNC(suna8_state::brickzn_palbank_w));   // Palette RAM Bank
-//  AM_RANGE(0xc0c0, 0xc0c0) AM_WRITE(brickzn_prot2_w       )   // Protection 2
+//  map(0xc0c0, 0xc0c0).w(FUNC(suna8_state::brickzn_prot2_w));   // Protection 2
 
 	map(0xc100, 0xc100).portr("P1");                 // P1 (Buttons)
 	map(0xc101, 0xc101).portr("P2");                 // P2 (Buttons)
@@ -784,7 +784,7 @@ WRITE8_MEMBER(suna8_state::brickzn_multi_w)
 		*/
 		uint8_t remap = (m_remap_sound ? bitswap<8>(data, 7,6,3,4,5,2,1,0) : data);
 
-		m_soundlatch->write(space, 0, remap);
+		m_soundlatch->write(remap);
 
 		logerror("CPU #0 - PC %04X: soundlatch = %02X (->%02X)\n",m_maincpu->pc(),data,remap);
 	}
@@ -1016,6 +1016,19 @@ void suna8_state::hardhea2_map(address_map &map)
 }
 
 
+void suna8_state::hardhea2b_map(address_map &map)
+{
+	hardhea2_map(map);
+
+	map(0x0000, 0x7fff).rom().region("maincpu", 0x8000); // data is in the second half of the ROM
+}
+
+void suna8_state::hardhea2b_decrypted_opcodes_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().region("maincpu", 0x0000); // opcodes are in the first half of the ROM
+}
+
+
 /***************************************************************************
                                 Star Fighter
 ***************************************************************************/
@@ -1038,7 +1051,7 @@ WRITE8_MEMBER(suna8_state::starfigh_rombank_latch_w)
 WRITE8_MEMBER(suna8_state::starfigh_sound_latch_w)
 {
 	if ( !(m_rombank_latch & 0x20) )
-		m_soundlatch->write(space, 0, data);
+		m_soundlatch->write(data);
 }
 
 /*
@@ -1876,55 +1889,53 @@ GFXDECODE_END
 /* 1 x 24 MHz crystal */
 
 
-MACHINE_CONFIG_START(suna8_state::hardhead)
-
+void suna8_state::hardhead(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)    /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(hardhead_map)
-	MCFG_DEVICE_IO_MAP(hardhead_io_map)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", suna8_state,  irq0_line_hold)      /* No NMI */
+	Z80(config, m_maincpu, SUNA8_MASTER_CLOCK / 4);    /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &suna8_state::hardhead_map);
+	m_maincpu->set_addrmap(AS_IO, &suna8_state::hardhead_io_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &suna8_state::decrypted_opcodes_map);
+	m_maincpu->set_vblank_int("screen", FUNC(suna8_state::irq0_line_hold));      /* No NMI */
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, SUNA8_MASTER_CLOCK / 8)   /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(hardhead_sound_map)
-	MCFG_DEVICE_IO_MAP(hardhead_sound_io_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(suna8_state, irq0_line_hold, 4*60)     /* No NMI */
+	Z80(config, m_audiocpu, SUNA8_MASTER_CLOCK / 8);   /* verified on pcb */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &suna8_state::hardhead_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &suna8_state::hardhead_sound_io_map);
+	m_audiocpu->set_periodic_int(FUNC(suna8_state::irq0_line_hold), attotime::from_hz(4*60));     /* No NMI */
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59.10)  /* verified on pcb */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(suna8_state, screen_update_suna8)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(59.10);  /* verified on pcb */
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(256, 256);
+	m_screen->set_visarea(0, 256-1, 0+16, 256-16-1);
+	m_screen->set_screen_update(FUNC(suna8_state::screen_update_suna8));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_suna8)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
-	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_suna8);
+	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 256);
+	m_palette->set_endianness(ENDIANNESS_BIG);
 
 	MCFG_VIDEO_START_OVERRIDE(suna8_state,suna8_text)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, m_soundlatch2);
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, SUNA8_MASTER_CLOCK / 8)     /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+	YM3812(config, "ymsnd", SUNA8_MASTER_CLOCK / 8).add_route(ALL_OUTPUTS, "speaker", 1.0); /* clock verified on pcb */
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, SUNA8_MASTER_CLOCK / 16)    /* verified on pcb */
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, suna8_state, suna8_play_samples_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, suna8_state, suna8_samples_number_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
+	ay8910_device &aysnd(AY8910(config, "aysnd", SUNA8_MASTER_CLOCK / 16));    /* clock verified on pcb */
+	aysnd.port_a_write_callback().set(FUNC(suna8_state::suna8_play_samples_w));
+	aysnd.port_b_write_callback().set(FUNC(suna8_state::suna8_samples_number_w));
+	aysnd.add_route(ALL_OUTPUTS, "speaker", 0.3);
 
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(1)
-	MCFG_SAMPLES_START_CB(suna8_state, sh_start)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(1);
+	m_samples->set_samples_start_callback(FUNC(suna8_state::sh_start));
+	m_samples->add_route(ALL_OUTPUTS, "speaker", 0.5);
+}
 
 
 /***************************************************************************
@@ -1934,56 +1945,53 @@ MACHINE_CONFIG_END
 /* 1 x 24 MHz crystal */
 
 /* 2203 + 8910 */
-MACHINE_CONFIG_START(suna8_state::rranger)
-
+void suna8_state::rranger(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)                    /* ? */
-	MCFG_DEVICE_PROGRAM_MAP(rranger_map)
-	MCFG_DEVICE_IO_MAP(rranger_io_map)
-//  MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", suna8_state,  irq0_line_hold)  /* IRQ & NMI ! */
+	Z80(config, m_maincpu, SUNA8_MASTER_CLOCK / 4); /* ? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &suna8_state::rranger_map);
+	m_maincpu->set_addrmap(AS_IO, &suna8_state::rranger_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(suna8_state::irq0_line_hold));  /* IRQ & NMI ! */
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, SUNA8_MASTER_CLOCK / 8)   /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(rranger_sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(suna8_state, irq0_line_hold, 4*60) /* NMI = retn */
+	Z80(config, m_audiocpu, SUNA8_MASTER_CLOCK / 8); /* clock verified on pcb */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &suna8_state::rranger_sound_map);
+	m_audiocpu->set_periodic_int(FUNC(suna8_state::irq0_line_hold), attotime::from_hz(4*60)); /* NMI = retn */
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59.1)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(suna8_state, screen_update_suna8)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(59.1);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(256, 256);
+	m_screen->set_visarea(0, 256-1, 0+16, 256-16-1);
+	m_screen->set_screen_update(FUNC(suna8_state::screen_update_suna8));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_suna8)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
-	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_suna8);
+	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 256);
+	m_palette->set_endianness(ENDIANNESS_BIG);
 
 	MCFG_VIDEO_START_OVERRIDE(suna8_state,suna8_text)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, m_soundlatch2);
 
-	MCFG_DEVICE_ADD("ym1", YM2203, SUNA8_MASTER_CLOCK / 16)  /* verified on pcb */
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, suna8_state, rranger_play_samples_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, suna8_state, suna8_samples_number_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.9)
+	ym2203_device &ym1(YM2203(config, "ym1", SUNA8_MASTER_CLOCK / 16));    /* verified on pcb */
+	ym1.port_a_write_callback().set(FUNC(suna8_state::rranger_play_samples_w));
+	ym1.port_b_write_callback().set(FUNC(suna8_state::suna8_samples_number_w));
+	ym1.add_route(ALL_OUTPUTS, "speaker", 0.9);
 
-	MCFG_DEVICE_ADD("ym2", YM2203, SUNA8_MASTER_CLOCK / 16)  /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.9)
+	YM2203(config, "ym2", SUNA8_MASTER_CLOCK / 16).add_route(ALL_OUTPUTS, "speaker", 0.9);  /* verified on pcb */
 
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(1)
-	MCFG_SAMPLES_START_CB(suna8_state, sh_start)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(1);
+	m_samples->set_samples_start_callback(FUNC(suna8_state::sh_start));
+	m_samples->add_route(ALL_OUTPUTS, "speaker", 0.5);
+}
 
 
 /***************************************************************************
@@ -2002,69 +2010,71 @@ MACHINE_RESET_MEMBER(suna8_state,brickzn)
 		m_bank1d->set_entry(0);
 }
 
-MACHINE_CONFIG_START(suna8_state::brickzn11)
-
+void suna8_state::brickzn11(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)        /* SUNA PROTECTION BLOCK */
-	MCFG_DEVICE_PROGRAM_MAP(brickzn11_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", suna8_state,  irq0_line_hold)  // nmi breaks ramtest but is needed!
+	Z80(config, m_maincpu, SUNA8_MASTER_CLOCK / 4); /* SUNA PROTECTION BLOCK */
+	m_maincpu->set_addrmap(AS_PROGRAM, &suna8_state::brickzn11_map);
+	m_maincpu->set_vblank_int("screen", FUNC(suna8_state::irq0_line_hold));  // nmi breaks ramtest but is needed!
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, SUNA8_MASTER_CLOCK / 4)   /* Z0840006PSC - 6MHz (measured) */
-	MCFG_DEVICE_PROGRAM_MAP(brickzn_sound_map)
+	Z80(config, m_audiocpu, SUNA8_MASTER_CLOCK / 4); /* Z0840006PSC - 6MHz (measured) */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &suna8_state::brickzn_sound_map);
 
-	MCFG_DEVICE_ADD("pcm", Z80, SUNA8_MASTER_CLOCK / 4)    /* Z0840006PSC - 6MHz (measured) */
-	MCFG_DEVICE_PROGRAM_MAP(brickzn_pcm_map)
-	MCFG_DEVICE_IO_MAP(brickzn_pcm_io_map)
+	z80_device &pcm(Z80(config, "pcm", SUNA8_MASTER_CLOCK / 4));    /* Z0840006PSC - 6MHz (measured) */
+	pcm.set_addrmap(AS_PROGRAM, &suna8_state::brickzn_pcm_map);
+	pcm.set_addrmap(AS_IO, &suna8_state::brickzn_pcm_io_map);
 
 	MCFG_MACHINE_RESET_OVERRIDE(suna8_state, brickzn )
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)   // we're using PORT_VBLANK
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(suna8_state, screen_update_suna8)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */   // we're using PORT_VBLANK
+	m_screen->set_size(256, 256);
+	m_screen->set_visarea(0, 256-1, 0+16, 256-16-1);
+	m_screen->set_screen_update(FUNC(suna8_state::screen_update_suna8));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_suna8)
-	MCFG_PALETTE_ADD("palette", 256 * 2)    // 2 x Palette RAM
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
-	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_suna8);
+	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 256 * 2); // 2 x palette RAM
+	m_palette->set_endianness(ENDIANNESS_BIG);
 
 	MCFG_VIDEO_START_OVERRIDE(suna8_state,suna8_brickzn)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, m_soundlatch2);
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, SUNA8_MASTER_CLOCK / 8)     // 3MHz (measured)
-	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", SUNA8_MASTER_CLOCK / 8));     // 3MHz (measured)
+	ymsnd.irq_handler().set_inputline("audiocpu", 0);
+	ymsnd.add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, SUNA8_MASTER_CLOCK / 16)    // 1.5MHz (measured)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.33)
+	AY8910(config, "aysnd", SUNA8_MASTER_CLOCK / 16).add_route(ALL_OUTPUTS, "speaker", 0.33);    // 1.5MHz (measured)
 
-	MCFG_DEVICE_ADD("ldac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.17) // unknown DAC
-	MCFG_DEVICE_ADD("rdac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.17) // unknown DAC
-	MCFG_DEVICE_ADD("ldac2", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.17) // unknown DAC
-	MCFG_DEVICE_ADD("rdac2", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.17) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "ldac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac2", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "rdac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac2", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	DAC_4BIT_R2R(config, "ldac", 0).add_route(ALL_OUTPUTS, "speaker", 0.17);  // unknown DAC
+	DAC_4BIT_R2R(config, "rdac", 0).add_route(ALL_OUTPUTS, "speaker", 0.17);  // unknown DAC
+	DAC_4BIT_R2R(config, "ldac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.17); // unknown DAC
+	DAC_4BIT_R2R(config, "rdac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.17); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "ldac2", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "ldac2", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "rdac2", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "rdac2", -1.0, DAC_VREF_NEG_INPUT);
+}
 
-MACHINE_CONFIG_START(suna8_state::brickzn)
+void suna8_state::brickzn(machine_config &config)
+{
 	brickzn11(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(brickzn_map)
-	MCFG_DEVICE_IO_MAP(brickzn_io_map)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &suna8_state::brickzn_map);
+	m_maincpu->set_addrmap(AS_IO, &suna8_state::brickzn_io_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &suna8_state::decrypted_opcodes_map);
+}
 
 
 /***************************************************************************
@@ -2089,138 +2099,132 @@ MACHINE_RESET_MEMBER(suna8_state,hardhea2)
 	hardhea2_rambank_0_w(space,0,0);
 }
 
-MACHINE_CONFIG_START(suna8_state::hardhea2)
+void suna8_state::hardhea2(machine_config &config)
+{
 	brickzn(config);
-	MCFG_DEVICE_REMOVE("maincpu")
-
-	MCFG_DEVICE_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)        /* SUNA T568009 */
-	MCFG_DEVICE_PROGRAM_MAP(hardhea2_map)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", suna8_state, hardhea2_interrupt, "screen", 0, 1)
+	Z80(config.replace(), m_maincpu, SUNA8_MASTER_CLOCK / 4); /* SUNA T568009 */
+	m_maincpu->set_addrmap(AS_PROGRAM, &suna8_state::hardhea2_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &suna8_state::decrypted_opcodes_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(suna8_state::hardhea2_interrupt), "screen", 0, 1);
 
 	MCFG_MACHINE_RESET_OVERRIDE(suna8_state,hardhea2)
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(256)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
-	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
-MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(suna8_state::hardhea2b)
+	m_palette->set_format(palette_device::RGBx_444, 256);
+	m_palette->set_endianness(ENDIANNESS_BIG);
+}
+
+void suna8_state::hardhea2b(machine_config &config)
+{
 	hardhea2(config);
-	MCFG_DEVICE_REMOVE("maincpu")
-
-	MCFG_DEVICE_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)        //bootleg clock not verified (?)
-	MCFG_DEVICE_PROGRAM_MAP(hardhea2_map)
-MACHINE_CONFIG_END
+	Z80(config.replace(), m_maincpu, SUNA8_MASTER_CLOCK / 4); //bootleg clock not verified (?)
+	m_maincpu->set_addrmap(AS_PROGRAM, &suna8_state::hardhea2b_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &suna8_state::hardhea2b_decrypted_opcodes_map);
+}
 
 
 /***************************************************************************
                                 Star Fighter
 ***************************************************************************/
 
-MACHINE_CONFIG_START(suna8_state::starfigh)
-
+void suna8_state::starfigh(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)                    /* ? */
-	MCFG_DEVICE_PROGRAM_MAP(starfigh_map)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", suna8_state, hardhea2_interrupt, "screen", 0, 1)
+	Z80(config, m_maincpu, SUNA8_MASTER_CLOCK / 4); /* ? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &suna8_state::starfigh_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &suna8_state::decrypted_opcodes_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(suna8_state::hardhea2_interrupt), "screen", 0, 1);
 
 	/* The sound section is identical to that of hardhead */
-	MCFG_DEVICE_ADD("audiocpu", Z80, SUNA8_MASTER_CLOCK / 4)                   /* ? */
-	MCFG_DEVICE_PROGRAM_MAP(hardhead_sound_map)
-	MCFG_DEVICE_IO_MAP(hardhead_sound_io_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(suna8_state, irq0_line_hold, 4*60) /* No NMI */
+	Z80(config, m_audiocpu, SUNA8_MASTER_CLOCK / 4); /* ? */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &suna8_state::hardhead_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &suna8_state::hardhead_sound_io_map);
+	m_audiocpu->set_periodic_int(FUNC(suna8_state::irq0_line_hold), attotime::from_hz(4*60)); /* No NMI */
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(suna8_state, screen_update_suna8)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(256, 256);
+	m_screen->set_visarea(0, 256-1, 0+16, 256-16-1);
+	m_screen->set_screen_update(FUNC(suna8_state::screen_update_suna8));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_suna8)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
-	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_suna8);
+	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 256);
+	m_palette->set_endianness(ENDIANNESS_BIG);
 
 	MCFG_VIDEO_START_OVERRIDE(suna8_state,suna8_starfigh)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, m_soundlatch2);
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, SUNA8_MASTER_CLOCK / 8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+	YM3812(config, "ymsnd", SUNA8_MASTER_CLOCK / 8).add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, SUNA8_MASTER_CLOCK / 16)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, suna8_state, suna8_play_samples_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, suna8_state, suna8_samples_number_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	ay8910_device &aysnd(AY8910(config, "aysnd", SUNA8_MASTER_CLOCK / 16));
+	aysnd.port_a_write_callback().set(FUNC(suna8_state::suna8_play_samples_w));
+	aysnd.port_b_write_callback().set(FUNC(suna8_state::suna8_samples_number_w));
+	aysnd.add_route(ALL_OUTPUTS, "speaker", 0.5);
 
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(1)
-	MCFG_SAMPLES_START_CB(suna8_state, sh_start)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(1);
+	m_samples->set_samples_start_callback(FUNC(suna8_state::sh_start));
+	m_samples->add_route(ALL_OUTPUTS, "speaker", 0.5);
+}
 
 
 /***************************************************************************
                                 Spark Man
 ***************************************************************************/
 
-MACHINE_CONFIG_START(suna8_state::sparkman)
-
+void suna8_state::sparkman(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)                    /* ? */
-	MCFG_DEVICE_PROGRAM_MAP(sparkman_map)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", suna8_state, hardhea2_interrupt, "screen", 0, 1)
+	Z80(config, m_maincpu, SUNA8_MASTER_CLOCK / 4); /* ? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &suna8_state::sparkman_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &suna8_state::decrypted_opcodes_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(suna8_state::hardhea2_interrupt), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, SUNA8_MASTER_CLOCK / 4)               /* ? */
-	MCFG_DEVICE_PROGRAM_MAP(hardhead_sound_map)
-	MCFG_DEVICE_IO_MAP(hardhead_sound_io_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(suna8_state, irq0_line_hold, 4*60) /* No NMI */
+	Z80(config, m_audiocpu, SUNA8_MASTER_CLOCK / 4); /* ? */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &suna8_state::hardhead_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &suna8_state::hardhead_sound_io_map);
+	m_audiocpu->set_periodic_int(FUNC(suna8_state::irq0_line_hold), attotime::from_hz(4*60)); /* No NMI */
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(suna8_state, screen_update_suna8)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(256, 256);
+	m_screen->set_visarea(0, 256-1, 0+16, 256-16-1);
+	m_screen->set_screen_update(FUNC(suna8_state::screen_update_suna8));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_suna8_x2)    // 2 sprite "chips"
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
-	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_suna8_x2);    // 2 sprite "chips"
+	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 512);
+	m_palette->set_endianness(ENDIANNESS_BIG);
 
 	MCFG_VIDEO_START_OVERRIDE(suna8_state,suna8_sparkman)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, m_soundlatch2);
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, SUNA8_MASTER_CLOCK / 8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+	YM3812(config, "ymsnd", SUNA8_MASTER_CLOCK / 8).add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, SUNA8_MASTER_CLOCK / 16)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, suna8_state, suna8_play_samples_w))  // two sample roms
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, suna8_state, suna8_samples_number_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
+	ay8910_device &aysnd(AY8910(config, "aysnd", SUNA8_MASTER_CLOCK / 16));
+	aysnd.port_a_write_callback().set(FUNC(suna8_state::suna8_play_samples_w));  // two sample roms
+	aysnd.port_b_write_callback().set(FUNC(suna8_state::suna8_samples_number_w));
+	aysnd.add_route(ALL_OUTPUTS, "speaker", 0.3);
 
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(1)
-	MCFG_SAMPLES_START_CB(suna8_state, sh_start)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(1);
+	m_samples->set_samples_start_callback(FUNC(suna8_state::sh_start));
+	m_samples->add_route(ALL_OUTPUTS, "speaker", 0.5);
+}
 
 
 /***************************************************************************
@@ -2390,6 +2394,40 @@ ROM_START( hardheadb2 )
 
 	ROM_REGION( 0x8000, "samples", 0 )  /* Samples */
 	ROM_LOAD( "1_14.11m", 0x00000, 0x8000, CRC(41314ac1) SHA1(1ac9213b0ac4ce9fe6256e93875672e128a5d069) ) // = p14
+ROM_END
+
+ROM_START( hardheadb3 ) // almost identical to pop_hh, only unique ROM is p8
+	ROM_REGION( 0x48000+0x8000, "maincpu", 0 ) /* Main Z80 Code */
+	ROM_LOAD( "1_27512.l6",  0x48000, 0x8000, CRC(bb4aa9ac) SHA1(da6310a1034cf610139d74fc30dd13e5fbd1d8dd) )
+	ROM_CONTINUE(            0x00000, 0x8000 )
+	ROM_LOAD( "2_27256.k6",  0x10000, 0x8000, CRC(8fcc1248) SHA1(5da0b7dc63f7bc00e81e9e5bac02ee6b0076ffaa) )
+	ROM_LOAD( "p3",          0x18000, 0x8000, CRC(3d24755e) SHA1(519a179594956f7c3ddfaca362c42b453c928e25) )
+	ROM_LOAD( "p4",          0x20000, 0x8000, CRC(0241ac79) SHA1(b3c3b98fb29836cbc9fd35ac49e02bfefd3b0c79) )
+	ROM_LOAD( "p7",          0x28000, 0x8000, CRC(beba8313) SHA1(20aa4e07ec560a89d07ec73cc93311ceaed899a3) )
+	ROM_LOAD( "p8",          0x30000, 0x8000, CRC(11729c89) SHA1(a8f548891f7d3d620b7eaa71a827cbc19c632ac3) )
+	ROM_LOAD( "p9",          0x38000, 0x8000, CRC(2ad430c4) SHA1(286a5b1042e077c3ae741d01311d4c91f8f87054) )
+	ROM_LOAD( "10_27256.i8", 0x40000, 0x8000, CRC(84fc6574) SHA1(ab33e6c656f25e65bb08d0a2689693df83cab43d) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )        /* Sound Z80 Code */
+	ROM_LOAD( "p13", 0x0000, 0x8000, CRC(493c0b41) SHA1(994a334253e905c39ec912765e8b0f4b1be900bc) )
+
+	ROM_REGION( 0x40000, "gfx1", ROMREGION_INVERT ) /* Sprites */
+	ROM_LOAD( "p5",  0x00000, 0x8000, CRC(e9aa6fba) SHA1(f286727541f08b136a7d45e13975652bdc8fd663) )
+	ROM_RELOAD(      0x08000, 0x8000             )
+	ROM_LOAD( "p6",  0x10000, 0x8000, CRC(15d5f5dd) SHA1(4441344701fcdb2be55bdd76a8a5fd59f5de813c) )
+	ROM_RELOAD(      0x18000, 0x8000             )
+	ROM_LOAD( "11_27256.d8", 0x20000, 0x8000, CRC(3751b99d) SHA1(dc4082e481a79f0389e59b4b38698df8f7b94053) )
+	ROM_RELOAD(      0x28000, 0x8000             )
+	ROM_LOAD( "p12", 0x30000, 0x8000, CRC(9582e6db) SHA1(a2b34d740e07bd35a3184365e7f3ab7476075d70) )
+	ROM_RELOAD(      0x38000, 0x8000             )
+
+	ROM_REGION( 0x8000, "samples", 0 )  /* Samples */
+	ROM_LOAD( "p14", 0x0000, 0x8000, CRC(41314ac1) SHA1(1ac9213b0ac4ce9fe6256e93875672e128a5d069) )
+
+	ROM_REGION( 0x600, "plds", 0 )
+	ROM_LOAD( "cpu-1-pal16l8a.bin", 0x000, 0x104, NO_DUMP )
+	ROM_LOAD( "cpu-2-pal16r4a.bin", 0x200, 0x104, NO_DUMP )
+	ROM_LOAD( "cpu-3-pal16r4a.bin", 0x400, 0x104, NO_DUMP )
 ROM_END
 
 ROM_START( pop_hh )
@@ -2836,7 +2874,7 @@ ROM_START( hardhea2 )
 	ROM_LOAD( "hrd-hd13", 0x40000, 0x10000, CRC(3225e7d7) SHA1(2da9d1ce182dab8d9e09772e6899676b84c7458c) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )        /* Music Z80 Code */
-	ROM_LOAD( "hrd-hd14", 0x00000, 0x08000, CRC(79a3be51) SHA1(30bc67cd3a936615c6931f8e15953425dff59611) )
+	ROM_LOAD( "hrd-hd14", 0x00000, 0x08000, CRC(79a3be51) SHA1(30bc67cd3a936615c6931f8e15953425dff59611) )  // NO PROGRAM + MUSIC PROGRAM V 2.4
 
 	ROM_REGION( 0x10000, "pcm", 0 )     /* PCM Z80 Code */
 	ROM_LOAD( "hrd-hd15", 0x00000, 0x10000, CRC(bcbd88c3) SHA1(79782d598d9d764de70c54fc07ff9bf0f7d13d62) )
@@ -2850,6 +2888,31 @@ ROM_START( hardhea2 )
 	ROM_LOAD( "hrd-hd6",  0x50000, 0x10000, CRC(bf90d3ca) SHA1(2d0533d93fc5155fe879c1890bc7bc4581308e16) )
 	ROM_LOAD( "hrd-hd7",  0x60000, 0x10000, CRC(992ce8cb) SHA1(21c0dd227138ec64003c7cb090855ec27d41719e) )
 	ROM_LOAD( "hrd-hd8",  0x70000, 0x10000, CRC(359597a4) SHA1(ae024dd61c5d12813a661abe8ea63ae6112ddc9c) )
+ROM_END
+
+ROM_START( hardhea2a )
+	ROM_REGION( 0x50000, "maincpu", 0 )     /* Main Z80 Code */
+	ROM_LOAD( "p9.f6",  0x00000, 0x08000, CRC(69c4c307) SHA1(0dfde1dcda51b5b1740aff9e96cb877a428a3e04) )  // V 2.0 1991,2,12
+	ROM_LOAD( "10.h6",  0x10000, 0x10000, CRC(77ec5b0a) SHA1(2d3e24c208904a7884e585e08e5818fd9f8b5391) )
+	ROM_LOAD( "11.i6",  0x20000, 0x10000, CRC(12af8f8e) SHA1(1b33a060b70900042fdae00f7dec325228d566f5) )
+	ROM_LOAD( "12.f7",  0x30000, 0x10000, CRC(35d13212) SHA1(2fd03077b89ec9e55d2758b7f9cada970f0bdd91) )
+	ROM_LOAD( "13.h7",  0x40000, 0x10000, CRC(3225e7d7) SHA1(2da9d1ce182dab8d9e09772e6899676b84c7458c) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )        /* Music Z80 Code */
+	ROM_LOAD( "14.c9",  0x00000, 0x08000, CRC(92e1ae81) SHA1(002125d152e84baf347245952b3f4d8637753b13) )  // 1991,2,10 ALL O.K V3.0 HARD HEAD2 MUSIC + MUSIC PROGRAM V 2,0 1990.12.14 SUNA ELECTRONICS KHT
+
+	ROM_REGION( 0x10000, "pcm", 0 )     /* PCM Z80 Code */
+	ROM_LOAD( "15.m10", 0x00000, 0x10000, CRC(bcbd88c3) SHA1(79782d598d9d764de70c54fc07ff9bf0f7d13d62) )
+
+	ROM_REGION( 0x80000, "gfx1", ROMREGION_INVERT ) /* Sprites */
+	ROM_LOAD( "p1.n1",  0x00000, 0x10000, CRC(7e7b7a58) SHA1(1a74260dda64aafcb046c8add92a54655bbc74e4) )
+	ROM_LOAD( "p2.o1",  0x10000, 0x10000, CRC(303ec802) SHA1(533c29d9bb54415410c5d3c5af234b8b040190de) )
+	ROM_LOAD( "p3.q1",  0x20000, 0x10000, CRC(3353b2c7) SHA1(a3ec0fc2a97e7e0bc72fafd5897cb1dd4cd32197) )
+	ROM_LOAD( "p4.n3",  0x30000, 0x10000, CRC(dbc1f9c1) SHA1(720c729d7825635584632d033b4b46eea2fb1291) )
+	ROM_LOAD( "p5.n4",  0x40000, 0x10000, CRC(f738c0af) SHA1(7dda657acd1d6fb7064e8dbd5ce386e9eae3d36a) )
+	ROM_LOAD( "p6.04",  0x50000, 0x10000, CRC(bf90d3ca) SHA1(2d0533d93fc5155fe879c1890bc7bc4581308e16) )
+	ROM_LOAD( "p7.q4",  0x60000, 0x10000, CRC(992ce8cb) SHA1(21c0dd227138ec64003c7cb090855ec27d41719e) )
+	ROM_LOAD( "p8.n6",  0x70000, 0x10000, CRC(359597a4) SHA1(ae024dd61c5d12813a661abe8ea63ae6112ddc9c) )
 ROM_END
 
 ROM_START( hardhea2b )
@@ -3069,15 +3132,17 @@ GAME( 1988, srangerb,  sranger,  rranger,  rranger,  suna8_state, init_suna8,   
 GAME( 1988, hardhead,  0,        hardhead, hardhead, suna8_state, init_hardhead,  ROT0,  "SunA",                       "Hard Head",                   0 )
 GAME( 1988, hardheadb, hardhead, hardhead, hardhead, suna8_state, init_hardhedb,  ROT0,  "bootleg",                    "Hard Head (bootleg, set 1)",  0 )
 GAME( 1988, hardheadb2,hardhead, hardhead, hardhead, suna8_state, init_hardhedb,  ROT0,  "bootleg",                    "Hard Head (bootleg, set 2)",  MACHINE_NOT_WORKING )
-GAME( 1988, pop_hh,    hardhead, hardhead, hardhead, suna8_state, init_hardhedb,  ROT0,  "bootleg",                    "Popper (Hard Head bootleg)",  0 )
+GAME( 1989, hardheadb3,hardhead, hardhead, hardhead, suna8_state, init_hardhedb,  ROT0,  "bootleg",                    "Hard Head (bootleg, set 3)",  0 )
+GAME( 1989, pop_hh,    hardhead, hardhead, hardhead, suna8_state, init_hardhedb,  ROT0,  "bootleg",                    "Popper (Hard Head bootleg)",  0 )
 
 GAME( 1989, sparkman,  0,        sparkman, sparkman, suna8_state, init_sparkman,  ROT0,  "SunA",                       "Spark Man (v2.0, set 1)",     0 )
 GAME( 1989, sparkmana, sparkman, sparkman, sparkman, suna8_state, init_sparkman,  ROT0,  "SunA",                       "Spark Man (v2.0, set 2)",     0 )
 
 GAME( 1990, starfigh,  0,        starfigh, starfigh, suna8_state, init_starfigh,  ROT90, "SunA",                       "Star Fighter (v1)",           MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1991, hardhea2,  0,        hardhea2, hardhea2, suna8_state, init_hardhea2,  ROT0,  "SunA",                       "Hard Head 2 (v2.0)",          0 )
-GAME( 1991, hardhea2b, hardhea2, hardhea2b,hardhea2, suna8_state, init_hardhea2b, ROT0,  "bootleg",                    "Hard Head 2 (v2.0, bootleg)", MACHINE_NOT_WORKING )
+GAME( 1991, hardhea2,  0,        hardhea2, hardhea2, suna8_state, init_hardhea2,  ROT0,  "SunA",                       "Hard Head 2 (v2.0, Music Program v2.4)",  0 )
+GAME( 1991, hardhea2a, hardhea2, hardhea2, hardhea2, suna8_state, init_hardhea2,  ROT0,  "SunA",                       "Hard Head 2 (v2.0, Music Program v2.0)",  0 )
+GAME( 1991, hardhea2b, hardhea2, hardhea2b,hardhea2, suna8_state, init_hardhea2b, ROT0,  "bootleg",                    "Hard Head 2 (v2.0, bootleg)",             MACHINE_NOT_WORKING )
 
 GAME( 1992, brickzn,   0,        brickzn,  brickznv6,suna8_state, init_brickzn,   ROT90, "SunA",                       "Brick Zone (v6.0, Joystick)", 0 )
 GAME( 1992, brickznv5, brickzn,  brickzn,  brickzn,  suna8_state, init_brickznv5, ROT90, "SunA",                       "Brick Zone (v5.0, Joystick)", 0 )

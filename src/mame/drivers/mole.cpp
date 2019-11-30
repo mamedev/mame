@@ -55,13 +55,14 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class mole_state : public driver_device
 {
 public:
-	mole_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	mole_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode")
 	{ }
@@ -109,7 +110,7 @@ TILE_GET_INFO_MEMBER(mole_state::get_bg_tile_info)
 void mole_state::video_start()
 {
 	memset(m_tileram, 0, sizeof(m_tileram));
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mole_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 40, 25);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(mole_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 40, 25);
 
 	save_item(NAME(m_tileram));
 }
@@ -323,31 +324,30 @@ void mole_state::machine_reset()
 	m_tile_bank = 0;
 }
 
-MACHINE_CONFIG_START(mole_state::mole)
-
+void mole_state::mole(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, 4000000) // ???
-	MCFG_DEVICE_PROGRAM_MAP(mole_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", mole_state, irq0_line_assert)
+	M6502(config, m_maincpu, 4000000); // ???
+	m_maincpu->set_addrmap(AS_PROGRAM, &mole_state::mole_map);
+	m_maincpu->set_vblank_int("screen", FUNC(mole_state::irq0_line_assert));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(40*8, 25*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 25*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(mole_state, screen_update_mole)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_size(40*8, 25*8);
+	screen.set_visarea(0*8, 40*8-1, 0*8, 25*8-1);
+	screen.set_screen_update(FUNC(mole_state::screen_update_mole));
+	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mole)
-	MCFG_PALETTE_ADD_3BIT_RBG("palette")
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_mole);
+	PALETTE(config, "palette", palette_device::RBG_3BIT);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 2000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	AY8910(config, "aysnd", 2000000).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 /*************************************

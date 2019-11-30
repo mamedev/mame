@@ -10,9 +10,9 @@
  Clean Sweep (1974/06)      YES       501082A/B/C/D  501083A/B/C/D
  Deluxe Baseball (1975/06)  YES       550188
  Hockey (1973/11)           YES       500699         500629
- Horoscope (1976)           UNKNOWN
+ Horoscope (1976/11)        UNKNOWN
  Knock Out (1974/09)        YES       550300
- Lie Detector (1976)        UNKNOWN   Unreleased     Unreleased
+ Lie Detector (1976/11)     UNKNOWN   Unreleased     Unreleased
  Sea Battle (1976/04)       UNKNOWN
  Soccer (1973/11)           YES       500880         500889
  Trivia (1975/11)           YES       550436
@@ -110,20 +110,20 @@ void ramtek_state::video_start()
 {
 }
 
-MACHINE_CONFIG_START(ramtek_state::ramtek)
-
+void ramtek_state::ramtek(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)
-	MCFG_NETLIST_SETUP(ramtek)
+	NETLIST_CPU(config, m_maincpu, NETLIST_CLOCK).set_source(netlist_ramtek);
 
 	/* video hardware */
-	MCFG_FIXFREQ_ADD("fixfreq", "screen")
-	MCFG_FIXFREQ_MONITOR_CLOCK(MASTER_CLOCK)
-	MCFG_FIXFREQ_HORZ_PARAMS(H_TOTAL-67,H_TOTAL-40,H_TOTAL-8,H_TOTAL)
-	MCFG_FIXFREQ_VERT_PARAMS(V_TOTAL-22,V_TOTAL-19,V_TOTAL-12,V_TOTAL)
-	MCFG_FIXFREQ_FIELDCOUNT(1)
-	MCFG_FIXFREQ_SYNC_THRESHOLD(0.30)
-MACHINE_CONFIG_END
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	FIXFREQ(config, m_video).set_screen("screen");
+	m_video->set_monitor_clock(MASTER_CLOCK);
+	m_video->set_horz_params(H_TOTAL-67,H_TOTAL-40,H_TOTAL-8,H_TOTAL);
+	m_video->set_vert_params(V_TOTAL-22,V_TOTAL-19,V_TOTAL-12,V_TOTAL);
+	m_video->set_fieldcount(1);
+	m_video->set_threshold(0.30);
+}
 
 
 /***************************************************************************

@@ -7,6 +7,7 @@
 ****************************************************************************/
 
 #include "emu.h"
+//#include "bus/rs232/rs232.h"
 #include "cpu/mcs51/mcs51.h"
 #include "cpu/mcs48/mcs48.h"
 #include "machine/x2212.h"
@@ -29,10 +30,14 @@ public:
 
 	void z29(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+
 private:
-	u8 dummy_psen_r();
-	DECLARE_WRITE8_MEMBER(crtc_w);
-	DECLARE_WRITE8_MEMBER(latch_12k_w);
+	void p3_w(u8 data);
+	DECLARE_READ8_MEMBER(bs_24k_r);
+	void crtc_w(offs_t offset, u8 data);
+	void latch_12k_w(u8 data);
 
 	void prg_map(address_map &map);
 	void ext_map(address_map &map);
@@ -44,20 +49,49 @@ private:
 	required_shared_ptr<u8> m_charmem;
 	required_shared_ptr<u8> m_attrmem;
 	required_region_ptr<u8> m_chargen;
+
+	bool m_dmatype;
 };
 
-u8 z29_state::dummy_psen_r()
+void z29_state::machine_start()
 {
-	return 0x24;
+	save_item(NAME(m_dmatype));
 }
 
-WRITE8_MEMBER(z29_state::crtc_w)
+void z29_state::p3_w(u8 data)
 {
-	m_crtc[0]->write(space, offset, data);
-	m_crtc[1]->write(space, offset, data);
+	m_dmatype = BIT(data, 4);
 }
 
-WRITE8_MEMBER(z29_state::latch_12k_w)
+READ8_MEMBER(z29_state::bs_24k_r)
+{
+	if (!machine().side_effects_disabled())
+	{
+		if (m_dmatype)
+		{
+			u8 chardata = m_charmem[offset];
+			u8 attrdata = m_attrmem[offset] & 0xf;
+
+			m_crtc[0]->dack_w(chardata & 0x7f);
+			m_crtc[1]->dack_w((chardata & 0x60) | (BIT(chardata, 7) ? 0x10 : 0) | attrdata);
+		}
+		else
+		{
+			m_charmem[offset] = 0x20;
+			m_attrmem[offset] = 0;
+		}
+	}
+
+	return m_dmatype ? 0x24 : 0x20;
+}
+
+void z29_state::crtc_w(offs_t offset, u8 data)
+{
+	m_crtc[0]->write(offset, data);
+	m_crtc[1]->write(offset, data);
+}
+
+void z29_state::latch_12k_w(u8 data)
 {
 	m_nvram->store(!BIT(data, 0));
 	m_nvram->recall(!BIT(data, 3));
@@ -66,7 +100,7 @@ WRITE8_MEMBER(z29_state::latch_12k_w)
 void z29_state::prg_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom().region("maincpu", 0);
-	map(0x2000, 0xffff).r(FUNC(z29_state::dummy_psen_r));
+	map(0x6000, 0x67ff).mirror(0x800).r(FUNC(z29_state::bs_24k_r));
 }
 
 void z29_state::ext_map(address_map &map)
@@ -85,10 +119,11 @@ INPUT_PORTS_END
 
 void z29_state::z29(machine_config &config)
 {
-	I8031(config, m_maincpu, 14.784_MHz_XTAL / 2);
+	I8031(config, m_maincpu, 14.784_MHz_XTAL / 2); // Intel P8031AH
 	m_maincpu->set_addrmap(AS_PROGRAM, &z29_state::prg_map);
 	m_maincpu->set_addrmap(AS_IO, &z29_state::ext_map);
 	m_maincpu->port_in_cb<1>().set_constant(0xfd); // hack around keyboard not working
+	m_maincpu->port_out_cb<3>().set(FUNC(z29_state::p3_w));
 
 	X2210(config, m_nvram);
 
@@ -106,9 +141,9 @@ void z29_state::z29(machine_config &config)
 }
 
 
-ROM_START(z29)
+ROM_START(z29) // All EPROMs on 85-2835-1 terminal board are HN482732AG-30
 	ROM_REGION(0x2000, "maincpu", 0)
-	ROM_LOAD("u440.bin", 0x0000, 0x1000, CRC(169b9517) SHA1(c18b6a193655a64808e9ae8765d3e54d13e6669e))
+	ROM_LOAD("u440.bin", 0x0000, 0x1000, CRC(169b9517) SHA1(c18b6a193655a64808e9ae8765d3e54d13e6669e)) // occupies pins 9-32 of 40-pin expansion socket
 	ROM_LOAD("u407.bin", 0x1000, 0x1000, CRC(b5aae8e6) SHA1(692e521a85d7e07647c66a660faa2041d1bfd785))
 
 	ROM_REGION(0x1000, "chargen", 0)

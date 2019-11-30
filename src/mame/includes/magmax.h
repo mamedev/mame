@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Takahiro Nogi
+#ifndef MAME_INCLUDES_MAGMAX_H
+#define MAME_INCLUDES_MAGMAX_H
+
+#pragma once
+
 #include "screen.h"
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
@@ -8,8 +13,8 @@
 class magmax_state : public driver_device
 {
 public:
-	magmax_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	magmax_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
 		m_vreg(*this, "vreg"),
@@ -22,7 +27,8 @@ public:
 		m_soundlatch(*this, "soundlatch"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
 	void magmax(machine_config &config);
 
@@ -61,7 +67,7 @@ private:
 	DECLARE_WRITE8_MEMBER(ay8910_portB_0_w);
 	DECLARE_WRITE8_MEMBER(ay8910_portA_0_w);
 
-	DECLARE_PALETTE_INIT(magmax);
+	void magmax_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(scanline_callback);
 
@@ -69,3 +75,5 @@ private:
 	void sound_io_map(address_map &map);
 	void sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_MAGMAX_H

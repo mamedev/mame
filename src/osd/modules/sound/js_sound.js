@@ -2,7 +2,7 @@
 // copyright-holders:Grant Galitz, Katelyn Gadd
 /***************************************************************************
 
-	JSMAME web audio backend v0.3
+	JSMAME web audio backend v0.4
 
 	Original by katelyn gadd - kg at luminance dot org ; @antumbral on twitter
 	Substantial changes by taisel
@@ -64,20 +64,26 @@ function init_event() {
 	eventNode.onaudioprocess = tick;
 	//Connect stream to volume control node:
 	eventNode.connect(gain_node);
-	//WORKAROUND FOR FIREFOX BUG:
-	initializeWatchDogForFirefoxBug();
+	//Workarounds for browser issues:
+	initializeWatchDog();
 };
 
-function initializeWatchDogForFirefoxBug() {
-	//TODO: decide if we want to user agent sniff firefox here,
-	//since Google Chrome doesn't need this:
+function initializeWatchDog() {
 	watchDogDateLast = (new Date()).getTime();
 	if (watchDogTimerEvent === null) {
 		watchDogTimerEvent = setInterval(function () {
 			var timeDiff = (new Date()).getTime() - watchDogDateLast;
 			if (timeDiff > 500) {
+				//WORKAROUND FOR FIREFOX BUG:
+				//TODO: decide if we want to user agent sniff Firefox here,
+				//since Google Chrome doesn't need this:
 				disconnect_old_event();
 				init_event();
+
+				//Work around autoplay restrictions in Chrome 71+ https://developers.google.com/web/updates/2017/09/autoplay-policy-changes#webaudio
+				if (context) {
+					context.resume();
+				}
 			}
 		}, 500);
 	}

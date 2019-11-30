@@ -1,16 +1,21 @@
 // license:LGPL-2.1+
 // copyright-holders:David Haywood, Angelo Salese, ElSemi, Andrew Gardner
+#ifndef MAME_INCLUDES_HNG64_H
+#define MAME_INCLUDES_HNG64_H
+
+#pragma once
 
 #include "machine/msm6242.h"
 #include "machine/timer.h"
 #include "cpu/mips/mips3.h"
-#include "cpu/nec/v53.h"
+#include "cpu/nec/v5x.h"
 #include "sound/l7a1045_l6028_dsp_a.h"
 #include "video/poly.h"
 #include "cpu/tlcs870/tlcs870.h"
 #include "machine/mb8421.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 enum hng64trans_t
 {
@@ -154,8 +159,8 @@ private:
 class hng64_state : public driver_device
 {
 public:
-	hng64_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	hng64_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_maincpu(*this, "maincpu"),
@@ -185,7 +190,7 @@ public:
 		m_an_in(*this, "AN%u", 0U),
 		m_samsho64_3d_hack(0),
 		m_roadedge_3d_hack(0)
-	{}
+	{ }
 
 	void hng64(machine_config &config);
 	void hng64_default(machine_config &config);
@@ -342,7 +347,7 @@ private:
 
 	DECLARE_READ8_MEMBER(hng64_fbcontrol_r);
 	DECLARE_WRITE8_MEMBER(hng64_fbcontrol_w);
-	
+
 	DECLARE_WRITE16_MEMBER(hng64_fbunkpair_w);
 	DECLARE_WRITE16_MEMBER(hng64_fbscroll_w);
 
@@ -533,3 +538,5 @@ private:
 	void hng_sound_io(address_map &map);
 	void hng_sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_HNG64_H

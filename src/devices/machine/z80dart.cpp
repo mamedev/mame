@@ -59,10 +59,11 @@ DEFINE_DEVICE_TYPE(UPD7201,         upd7201_device,  "upd7201",         "NEC uPD
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(z80dart_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(CHANA_TAG, Z80DART_CHANNEL, 0)
-	MCFG_DEVICE_ADD(CHANB_TAG, Z80DART_CHANNEL, 0)
-MACHINE_CONFIG_END
+void z80dart_device::device_add_mconfig(machine_config &config)
+{
+	Z80DART_CHANNEL(config, m_chanA, 0);
+	Z80DART_CHANNEL(config, m_chanB, 0);
+}
 
 
 //**************************************************************************
@@ -391,7 +392,7 @@ int z80dart_device::m1_r()
 //  cd_ba_r -
 //-------------------------------------------------
 
-READ8_MEMBER( z80dart_device::cd_ba_r )
+uint8_t z80dart_device::cd_ba_r(offs_t offset)
 {
 	int ba = BIT(offset, 0);
 	int cd = BIT(offset, 1);
@@ -405,7 +406,7 @@ READ8_MEMBER( z80dart_device::cd_ba_r )
 //  cd_ba_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( z80dart_device::cd_ba_w )
+void z80dart_device::cd_ba_w(offs_t offset, uint8_t data)
 {
 	int ba = BIT(offset, 0);
 	int cd = BIT(offset, 1);
@@ -422,7 +423,7 @@ WRITE8_MEMBER( z80dart_device::cd_ba_w )
 //  ba_cd_r -
 //-------------------------------------------------
 
-READ8_MEMBER( z80dart_device::ba_cd_r )
+uint8_t z80dart_device::ba_cd_r(offs_t offset)
 {
 	int ba = BIT(offset, 1);
 	int cd = BIT(offset, 0);
@@ -436,7 +437,7 @@ READ8_MEMBER( z80dart_device::ba_cd_r )
 //  ba_cd_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( z80dart_device::ba_cd_w )
+void z80dart_device::ba_cd_w(offs_t offset, uint8_t data)
 {
 	int ba = BIT(offset, 1);
 	int cd = BIT(offset, 0);
@@ -466,7 +467,7 @@ z80dart_channel::z80dart_channel(const machine_config &mconfig, const char *tag,
 	, m_rx_first(0)
 	, m_rx_break(0)
 	, m_rx_rr0_latch(0)
-	, m_rxd(0)
+	, m_rxd(1)
 	, m_ri(0)
 	, m_cts(0)
 	, m_dcd(0)
@@ -801,7 +802,7 @@ void z80dart_channel::control_write(uint8_t data)
 
 			if (!m_dcd) m_rr[0] |= RR0_DCD;
 			if (m_ri) m_rr[0] |= RR0_RI;
-			if (m_cts) m_rr[0] |= RR0_CTS;
+			if (!m_cts) m_rr[0] |= RR0_CTS;
 
 			m_rx_rr0_latch = 0;
 
@@ -919,7 +920,8 @@ void z80dart_channel::control_write(uint8_t data)
 		LOG("Z80DART \"%s\" Channel %c : Request to Send %u\n", owner()->tag(), 'A' + m_index, (data & WR5_RTS) ? 1 : 0);
 		LOG("Z80DART \"%s\" Channel %c : Data Terminal Ready %u\n", owner()->tag(), 'A' + m_index, (data & WR5_DTR) ? 1 : 0);
 
-		if (data != prev)
+		// don't update if parameters haven't changed; in fact, don't update at all since these ones are currently unused
+		if (0 && (data & WR5_TX_WORD_LENGTH_MASK) != (prev & WR5_TX_WORD_LENGTH_MASK))
 			update_serial();
 
 		if (data & WR5_RTS)
@@ -931,6 +933,8 @@ void z80dart_channel::control_write(uint8_t data)
 		else
 		{
 			// when the RTS bit is reset, the _RTS output goes high after the transmitter empties
+			if (m_rr[1] & RR1_ALL_SENT)
+				set_rts(1);
 			m_rts = 0;
 		}
 
@@ -1268,7 +1272,7 @@ void z80dart_channel::update_serial()
 	{
 		set_tra_rate(m_txc / clocks);
 	}
-	receive_register_reset(); // if stop bits is changed from 0, receive register has to be reset
+	receive_register_reset(); // if stop bits is changed from 0, receive register has to be reset (FIXME: doing this without checking is stupid)
 }
 
 

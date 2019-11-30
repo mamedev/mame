@@ -52,7 +52,7 @@ documentation still exists.
 
 #include "formats/vdk_dsk.h"
 #include "formats/dmk_dsk.h"
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
 
 
 /*
@@ -68,27 +68,27 @@ These are yet to be implemented.
 
 */
 
-static const unsigned char dgnbeta_palette[] =
+static constexpr rgb_t dgnbeta_pens[] =
 {
-	/*normal brightness */
-	0x00,0x00,0x00,     /* black */
-	0x80,0x00,0x00,     /* red */
-	0x00,0x80,0x00,     /* green */
-	0x80,0x80,0x00,     /* yellow */
-	0x00,0x00,0x80,     /* blue */
-	0x80,0x00,0x80,     /* magenta */
-	0x00,0x80,0x80,     /* cyan */
-	0x80,0x80,0x80,     /* white */
+	//normal brightness
+	{ 0x00, 0x00, 0x00 },   // black
+	{ 0x80, 0x00, 0x00 },   // red
+	{ 0x00, 0x80, 0x00 },   // green
+	{ 0x80, 0x80, 0x00 },   // yellow
+	{ 0x00, 0x00, 0x80 },   // blue
+	{ 0x80, 0x00, 0x80 },   // magenta
+	{ 0x00, 0x80, 0x80 },   // cyan
+	{ 0x80, 0x80, 0x80 },   // white
 
-	/*enhanced brightness*/
-	0x00,0x00,0x00,     /* black */
-	0xFF,0x00,0x00,     /* red */
-	0x00,0xFF,0x00,     /* green */
-	0xFF,0xFF,0x00,     /* yellow */
-	0x00,0x00,0xFF,     /* blue */
-	0xFF,0x00,0xFF,     /* magenta */
-	0x00,0xFF,0xFF,     /* cyan */
-	0xFF,0xFF,0xFF      /* white */
+	//enhanced brightness
+	{ 0x00, 0x00, 0x00 },   // black
+	{ 0xff, 0x00, 0x00 },   // red
+	{ 0x00, 0xff, 0x00 },   // green
+	{ 0xff, 0xff, 0x00 },   // yellow
+	{ 0x00, 0x00, 0xff },   // blue
+	{ 0xff, 0x00, 0xff },   // magenta
+	{ 0x00, 0xff, 0xff },   // cyan
+	{ 0xff, 0xff, 0xff }    // white
 };
 
 /*
@@ -284,11 +284,9 @@ static INPUT_PORTS_START( dgnbeta )
 INPUT_PORTS_END
 
 
-PALETTE_INIT_MEMBER(dgn_beta_state, dgn)
+void dgn_beta_state::dgn_beta_palette(palette_device &palette) const
 {
-	for ( int i = 0; i < sizeof(dgnbeta_palette) / 3; i++ ) {
-		palette.set_pen_color(i, dgnbeta_palette[i*3], dgnbeta_palette[i*3+1], dgnbeta_palette[i*3+2]);
-	}
+	palette.set_pen_colors(0, dgnbeta_pens);
 }
 
 /* F4 Character Displayer */
@@ -319,28 +317,28 @@ static void dgnbeta_floppies(device_slot_interface &device)
 	device.option_add("dd", FLOPPY_35_DD);
 }
 
-MACHINE_CONFIG_START(dgn_beta_state::dgnbeta)
+void dgn_beta_state::dgnbeta(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(MAINCPU_TAG, MC6809E, DGNBETA_CPU_SPEED_HZ)        /* 2 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(dgnbeta_map)
-	MCFG_DEVICE_DISASSEMBLE_OVERRIDE(dgn_beta_state, dgnbeta_dasm_override)
+	MC6809E(config, m_maincpu, DGNBETA_CPU_SPEED_HZ);        /* 2 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &dgn_beta_state::dgnbeta_map);
+	m_maincpu->set_dasm_override(FUNC(dgn_beta_state::dgnbeta_dasm_override));
 
 	/* both cpus in the beta share the same address/data buses */
-	MCFG_DEVICE_ADD(DMACPU_TAG, MC6809E, DGNBETA_CPU_SPEED_HZ)        /* 2 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(dgnbeta_map)
+	MC6809E(config, m_dmacpu, DGNBETA_CPU_SPEED_HZ);        /* 2 MHz */
+	m_dmacpu->set_addrmap(AS_PROGRAM, &dgn_beta_state::dgnbeta_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(DGNBETA_FRAMES_PER_SECOND)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(100))
-	MCFG_SCREEN_SIZE(700,550)
-	MCFG_SCREEN_VISIBLE_AREA(0, 699, 0, 549)
-	MCFG_SCREEN_UPDATE_DEVICE( "crtc", hd6845_device, screen_update )
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(DGNBETA_FRAMES_PER_SECOND);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(100));
+	screen.set_size(700,550);
+	screen.set_visarea(0, 699, 0, 549);
+	screen.set_screen_update("crtc", FUNC(hd6845s_device::screen_update));
+	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dgnbeta)
-	MCFG_PALETTE_ADD("palette", ARRAY_LENGTH(dgnbeta_palette) / 3)
-	MCFG_PALETTE_INIT_OWNER(dgn_beta_state, dgn)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_dgnbeta);
+	PALETTE(config, m_palette, FUNC(dgn_beta_state::dgn_beta_palette), ARRAY_LENGTH(dgnbeta_pens));
 
 	/* PIA 0 at $FC20-$FC23 I46 */
 	PIA6821(config, m_pia_0, 0);
@@ -372,24 +370,21 @@ MACHINE_CONFIG_START(dgn_beta_state::dgnbeta)
 	m_pia_2->irqa_handler().set(FUNC(dgn_beta_state::d_pia2_irq_a));
 	m_pia_2->irqb_handler().set(FUNC(dgn_beta_state::d_pia2_irq_b));
 
-	MCFG_DEVICE_ADD(FDC_TAG, WD2797, 1_MHz_XTAL)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, dgn_beta_state, dgnbeta_fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, dgn_beta_state, dgnbeta_fdc_drq_w))
+	WD2797(config, m_fdc, 1_MHz_XTAL);
+	m_fdc->intrq_wr_callback().set(FUNC(dgn_beta_state::dgnbeta_fdc_intrq_w));
+	m_fdc->drq_wr_callback().set(FUNC(dgn_beta_state::dgnbeta_fdc_drq_w));
 
-	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG ":0", dgnbeta_floppies, "dd", dgn_beta_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG ":1", dgnbeta_floppies, "dd", dgn_beta_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG ":2", dgnbeta_floppies, nullptr, dgn_beta_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD(FDC_TAG ":3", dgnbeta_floppies, nullptr, dgn_beta_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, FDC_TAG ":0", dgnbeta_floppies, "dd", dgn_beta_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, FDC_TAG ":1", dgnbeta_floppies, "dd", dgn_beta_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, FDC_TAG ":2", dgnbeta_floppies, nullptr, dgn_beta_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, FDC_TAG ":3", dgnbeta_floppies, nullptr, dgn_beta_state::floppy_formats).enable_sound(true);
 
-	MCFG_MC6845_ADD("crtc", HD6845, "screen", 12.288_MHz_XTAL / 16)    //XTAL is guessed
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(16) /*?*/
-	MCFG_MC6845_UPDATE_ROW_CB(dgn_beta_state, crtc_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, dgn_beta_state, dgnbeta_vsync_changed))
+	HD6845S(config, m_mc6845, 12.288_MHz_XTAL / 16);    //XTAL is guessed
+	m_mc6845->set_screen("screen");
+	m_mc6845->set_show_border_area(false);
+	m_mc6845->set_char_width(16); /*?*/
+	m_mc6845->set_update_row_callback(FUNC(dgn_beta_state::crtc_update_row));
+	m_mc6845->out_vsync_callback().set(FUNC(dgn_beta_state::dgnbeta_vsync_changed));
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("256K").set_extra_options("128K,384K,512K,640K,768K");
@@ -400,8 +395,8 @@ MACHINE_CONFIG_START(dgn_beta_state::dgnbeta)
 	/* in blocks of 128K up to this maximum.                                                    */
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "dgnbeta_flop")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "flop_list").set_original("dgnbeta_flop");
+}
 
 ROM_START(dgnbeta)
 	ROM_REGION(0x4000,MAINCPU_TAG,0)

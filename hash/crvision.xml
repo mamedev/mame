@@ -39,7 +39,7 @@ time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom4k" />
 			<dataarea name="rom" size="4096">
-				<rom name="airsea.bin" size="4096" crc="81a9257d" sha1="1fbc52f335c0d8bb96578a6ba764f5631c41fd36" offset="000000" />
+				<rom name="airsea.bin" size="4096" crc="81a9257d" sha1="1fbc52f335c0d8bb96578a6ba764f5631c41fd36"/>
 			</dataarea>
 		</part>
 	</software>
@@ -52,7 +52,7 @@ time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="astropin.bin" size="8192" crc="d03c0603" sha1="e7cb096d4d16fd8193f7e39c2f73bdf0930c9654" offset="000000" />
+				<rom name="astropin.bin" size="8192" crc="d03c0603" sha1="e7cb096d4d16fd8193f7e39c2f73bdf0930c9654"/>
 			</dataarea>
 		</part>
 	</software>
@@ -82,7 +82,7 @@ time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="astropinb.bin" size="8192" crc="cf7bdfc2" sha1="38bcc856d604567dc6453205a8f858bdf2000330" offset="000000" />
+				<rom name="astropinb.bin" size="8192" crc="cf7bdfc2" sha1="38bcc856d604567dc6453205a8f858bdf2000330"/>
 			</dataarea>
 		</part>
 	</software>
@@ -95,7 +95,7 @@ time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="autochas.bin" size="8192" crc="bd091ee0" sha1="369dc9aa55dd2c09376be840f8ebeca450db8b9c" offset="000000" />
+				<rom name="autochas.bin" size="8192" crc="bd091ee0" sha1="369dc9aa55dd2c09376be840f8ebeca450db8b9c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -197,7 +197,7 @@ time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom4k" />
 			<dataarea name="rom" size="4096">
-				<rom name="crazych.bin" size="4096" crc="b1b5bfe5" sha1="c0eed370267644d142a42de6201f7ac6d275104d" offset="000000" />
+				<rom name="crazych.bin" size="4096" crc="b1b5bfe5" sha1="c0eed370267644d142a42de6201f7ac6d275104d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -210,7 +210,7 @@ time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom4k" />
 			<dataarea name="rom" size="4096">
-				<rom name="crazypuc.bin" size="4096" crc="c673be37" sha1="0762ba98e9a08b7e6063e2a54734becd83df6eb3" offset="000000" />
+				<rom name="crazypuc.bin" size="4096" crc="c673be37" sha1="0762ba98e9a08b7e6063e2a54734becd83df6eb3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -237,7 +237,7 @@ time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="deeps8k.bin" size="8192" crc="2e0ddd86" sha1="d25f82aab473d4c7850ab626ae92d1eac69dbb32" offset="000000" />
+				<rom name="deeps8k.bin" size="8192" crc="2e0ddd86" sha1="d25f82aab473d4c7850ab626ae92d1eac69dbb32"/>
 			</dataarea>
 		</part>
 	</software>
@@ -278,7 +278,7 @@ time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="mousepuz.bin" size="8192" crc="e954c46b" sha1="c3aa8077756a6101009645711687edd59bf90a98" offset="000000" />
+				<rom name="mousepuz.bin" size="8192" crc="e954c46b" sha1="c3aa8077756a6101009645711687edd59bf90a98"/>
 			</dataarea>
 		</part>
 	</software>
@@ -333,7 +333,7 @@ time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="planet8k.bin" size="8192" crc="4457c7b3" sha1="0be7935db55ecf3e70b96e071ecbc489bd22dc73" offset="000000" />
+				<rom name="planet8k.bin" size="8192" crc="4457c7b3" sha1="0be7935db55ecf3e70b96e071ecbc489bd22dc73"/>
 			</dataarea>
 		</part>
 	</software>
@@ -345,7 +345,7 @@ time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="planetd2.bin" size="8192" crc="4b463c18" sha1="1fd80a3921f2487d9eee2b6d8bb3955d22857d0e" offset="000000" />
+				<rom name="planetd2.bin" size="8192" crc="4b463c18" sha1="1fd80a3921f2487d9eee2b6d8bb3955d22857d0e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -358,7 +358,7 @@ time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="policej.bin" size="8192" crc="db3d50b2" sha1="0fe6d15c973c73b53c33945e213bc2671ff5d7df" offset="000000" />
+				<rom name="policej.bin" size="8192" crc="db3d50b2" sha1="0fe6d15c973c73b53c33945e213bc2671ff5d7df"/>
 			</dataarea>
 		</part>
 	</software>
@@ -414,7 +414,7 @@ time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom4k" />
 			<dataarea name="rom" size="4096">
-				<rom name="sonicinv.bin" size="4096" crc="767a1f38" sha1="d77f49bfa951ce0ba505ad4f05f3d0adb697811f" offset="000000" />
+				<rom name="sonicinv.bin" size="4096" crc="767a1f38" sha1="d77f49bfa951ce0ba505ad4f05f3d0adb697811f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -426,7 +426,7 @@ time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="stoneage.bin" size="8192" crc="74365e94" sha1="dafe57b0ea5da7431bd5b0393bae7cf256c9a562" offset="000000" />
+				<rom name="stoneage.bin" size="8192" crc="74365e94" sha1="dafe57b0ea5da7431bd5b0393bae7cf256c9a562"/>
 			</dataarea>
 		</part>
 	</software>
@@ -453,7 +453,7 @@ time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="tankat8k.bin" size="8192" crc="2621ffca" sha1="f3c69a848f1246faf6f9558c0badddd3db626e5f" offset="000000" />
+				<rom name="tankat8k.bin" size="8192" crc="2621ffca" sha1="f3c69a848f1246faf6f9558c0badddd3db626e5f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -481,7 +481,7 @@ time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="tens8k.bin" size="8192" crc="8bed8745" sha1="690a4dcb412e517b172ec5b44c86863ef63b1246" offset="000000" />
+				<rom name="tens8k.bin" size="8192" crc="8bed8745" sha1="690a4dcb412e517b172ec5b44c86863ef63b1246"/>
 			</dataarea>
 		</part>
 	</software>
@@ -508,7 +508,7 @@ time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="tenscs8k.bin" size="8192" crc="098d1cbb" sha1="7ea0c5aa6072e2c9eab711f278fd939986a92602" offset="000000" />
+				<rom name="tenscs8k.bin" size="8192" crc="098d1cbb" sha1="7ea0c5aa6072e2c9eab711f278fd939986a92602"/>
 			</dataarea>
 		</part>
 	</software>
@@ -550,7 +550,7 @@ time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="tensds8k.bin" size="8192" crc="c914c092" sha1="7b64efddb590332c192f6c4a6accce85a6d402c3" offset="000000" />
+				<rom name="tensds8k.bin" size="8192" crc="c914c092" sha1="7b64efddb590332c192f6c4a6accce85a6d402c3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -565,7 +565,7 @@ time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
 		<part name="cart" interface="crvision_cart">
 			<feature name="slot" value="crv_rom4k" />
 			<dataarea name="rom" size="4096">
-				<rom name="hapmon.bin" size="4096" crc="15d07b96" sha1="89359dca952bc90644dfd7f546c184a8165faa14" offset="000000" />
+				<rom name="hapmon.bin" size="4096" crc="15d07b96" sha1="89359dca952bc90644dfd7f546c184a8165faa14"/>
 			</dataarea>
 		</part>
 	</software>
@@ -578,7 +578,7 @@ time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
         <part name="cart" interface="crvision_cart">
             <feature name="slot" value="crv_rom18k">
             <dataarea name="rom" size="18432">
-                <rom name="chopper rescue (alt).rom" size="18432" crc="48e7e8b8" sha1="037088f15830fdd43081edddc5d683318d67ee01" offset="000000" />
+                <rom name="chopper rescue (alt).rom" size="18432" crc="48e7e8b8" sha1="037088f15830fdd43081edddc5d683318d67ee01"/>
             </dataarea>
         </part>
     </software>
@@ -590,7 +590,7 @@ time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
         <part name="cart" interface="crvision_cart">
             <feature name="slot" value="crv_rom18k">
             <dataarea name="rom" size="18432">
-                <rom name="chopper rescue.rom" size="18432" crc="14179570" sha1="fde339c8dbd44b3332e888cd24d3d492cf066b94" offset="000000" />
+                <rom name="chopper rescue.rom" size="18432" crc="14179570" sha1="fde339c8dbd44b3332e888cd24d3d492cf066b94"/>
             </dataarea>
         </part>
     </software>

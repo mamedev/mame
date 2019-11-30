@@ -1,11 +1,16 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
+#ifndef MAME_INCLUDES_SUNA8_H
+#define MAME_INCLUDES_SUNA8_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
 #include "sound/samples.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 #define TILEMAPS 0
 
@@ -150,6 +155,8 @@ private:
 	void brickzn_sound_map(address_map &map);
 	void decrypted_opcodes_map(address_map &map);
 	void hardhea2_map(address_map &map);
+	void hardhea2b_map(address_map &map);
+	void hardhea2b_decrypted_opcodes_map(address_map &map);
 	void hardhead_io_map(address_map &map);
 	void hardhead_map(address_map &map);
 	void hardhead_sound_io_map(address_map &map);
@@ -213,3 +220,5 @@ private:
 #endif
 	output_finder<2> m_leds;
 };
+
+#endif // MAME_INCLUDES_SUNA8_H

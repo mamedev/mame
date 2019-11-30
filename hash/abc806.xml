@@ -9,7 +9,7 @@
 
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="199707">
-				<rom name="graf806.td0" size="199707" crc="96e86f58" sha1="187bb2528b7cbccc9dcf96c2824b4f9cff394064" offset="0" />
+				<rom name="graf806.td0" size="199707" crc="96e86f58" sha1="187bb2528b7cbccc9dcf96c2824b4f9cff394064" />
 			</dataarea>
 		</part>
 	</software>
@@ -21,7 +21,7 @@
 
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="297216">
-				<rom name="cpm30.td0" size="297216" crc="ccf77a0c" sha1="2563cc8c93c101f616f39620b3d7759a5062f97b" offset="0" status="baddump" />
+				<rom name="cpm30.td0" size="297216" crc="ccf77a0c" sha1="2563cc8c93c101f616f39620b3d7759a5062f97b" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -33,7 +33,7 @@
 
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="502129">
-				<rom name="cpmplus3.td0" size="502129" crc="8274028c" sha1="004366ef05c8bd617433ff63df72086096ded1ce" offset="0" />
+				<rom name="cpmplus3.td0" size="502129" crc="8274028c" sha1="004366ef05c8bd617433ff63df72086096ded1ce" />
 			</dataarea>
 		</part>
 	</software>
@@ -47,7 +47,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
-				<rom name="colorful_animals.dsk" size="163840" crc="ba6ba9a1" sha1="36f9a0b814b222eb5664a87f3b52c0268dfd18c1" offset="0" />
+				<rom name="colorful_animals.dsk" size="163840" crc="ba6ba9a1" sha1="36f9a0b814b222eb5664a87f3b52c0268dfd18c1" />
 			</dataarea>
 		</part>
 	</software>

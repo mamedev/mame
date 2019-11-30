@@ -12,28 +12,12 @@
 #pragma once
 
 
-#include "sound/beep.h"
+#include "machine/sensorboard.h"
 #include "video/hd44780.h"
+#include "sound/dac.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_MEPHISTO_SENSORS_BOARD_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, MEPHISTO_SENSORS_BOARD, 0) \
-
-#define MCFG_MEPHISTO_BUTTONS_BOARD_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, MEPHISTO_BUTTONS_BOARD, 0) \
-
-#define MCFG_MEPHISTO_BOARD_DISABLE_LEDS(_val) \
-	downcast<mephisto_board_device &>(*device).set_disable_leds(_val);
-
-#define MCFG_MEPHISTO_DISPLAY_MODUL_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, MEPHISTO_DISPLAY_MODUL, 0)
 
 
 //**************************************************************************
@@ -50,6 +34,7 @@ public:
 
 	// configuration helpers
 	void set_disable_leds(int _disable_leds) { m_disable_leds = _disable_leds; }
+	void set_delay(attotime _sensordelay)    { m_sensordelay = _sensordelay; }
 
 	DECLARE_READ8_MEMBER(input_r);
 	DECLARE_WRITE8_MEMBER(led_w);
@@ -64,8 +49,9 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-private:
-	required_ioport_array<8> m_sensors;
+protected:
+	required_device<sensorboard_device> m_board;
+	attotime                 m_sensordelay;
 	output_finder<64>        m_led;
 	emu_timer *              m_leds_update_timer;
 	emu_timer *              m_leds_refresh_timer;
@@ -81,12 +67,12 @@ class mephisto_sensors_board_device : public mephisto_board_device
 {
 public:
 	// construction/destruction
-	mephisto_sensors_board_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mephisto_sensors_board_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
 
 	// optional information overrides
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 
@@ -96,12 +82,12 @@ class mephisto_buttons_board_device : public mephisto_board_device
 {
 public:
 	// construction/destruction
-	mephisto_buttons_board_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mephisto_buttons_board_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
 
 	// optional information overrides
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 };
 
 
@@ -111,12 +97,10 @@ class mephisto_display_modul_device : public device_t
 {
 public:
 	// construction/destruction
-	mephisto_display_modul_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mephisto_display_modul_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	DECLARE_WRITE8_MEMBER(latch_w);
 	DECLARE_WRITE8_MEMBER(io_w);
-
-	DECLARE_PALETTE_INIT(lcd_palette);
 
 protected:
 	// device-level overrides
@@ -124,9 +108,11 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
+	void lcd_palette(palette_device &palette) const;
+
 private:
 	optional_device<hd44780_device> m_lcdc;
-	required_device<beep_device> m_beeper;
+	required_device<dac_byte_interface> m_dac;
 	uint8_t m_latch;
 	uint8_t m_ctrl;
 };

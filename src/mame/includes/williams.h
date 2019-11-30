@@ -5,7 +5,10 @@
     Driver for early Williams games
 
 **************************************************************************/
+#ifndef MAME_INCLUDES_WILLIAMS_H
+#define MAME_INCLUDES_WILLIAMS_H
 
+#pragma once
 
 #include "audio/williams.h"
 #include "cpu/m6800/m6800.h"
@@ -19,6 +22,7 @@
 #include "sound/hc55516.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class williams_state : public driver_device
 {
@@ -40,7 +44,8 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_paletteram(*this, "paletteram"),
-		m_pia(*this, "pia_%u", 0U) { }
+		m_pia(*this, "pia_%u", 0U)
+	{ }
 
 	void playball(machine_config &config);
 	void defender(machine_config &config);
@@ -64,10 +69,10 @@ public:
 	void init_robotron();
 	void init_bubbles();
 
-	DECLARE_READ8_MEMBER(williams_49way_port_0_r);
-	DECLARE_WRITE8_MEMBER(williams_snd_cmd_w);
-	DECLARE_WRITE8_MEMBER(defender_video_control_w);
-	DECLARE_READ8_MEMBER(williams_video_counter_r);
+	u8 williams_49way_port_0_r();
+	void williams_snd_cmd_w(u8 data);
+	void defender_video_control_w(u8 data);
+	u8 williams_video_counter_r();
 	DECLARE_WRITE8_MEMBER(williams_watchdog_reset_w);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(williams_va11_callback);
@@ -75,7 +80,7 @@ public:
 
 	uint32_t screen_update_williams(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_VIDEO_START(williams);
-	DECLARE_PALETTE_INIT(williams);
+	void williams_palette(palette_device &palette) const;
 
 protected:
 	enum
@@ -105,12 +110,12 @@ protected:
 	uint8_t m_blitter_remap_index;
 	const uint8_t *m_blitter_remap;
 	std::unique_ptr<uint8_t[]> m_blitter_remap_lookup;
-	DECLARE_WRITE8_MEMBER(williams_vram_select_w);
-	DECLARE_WRITE8_MEMBER(williams_cmos_w);
-	DECLARE_WRITE8_MEMBER(bubbles_cmos_w);
-	DECLARE_WRITE8_MEMBER(defender_bank_select_w);
-	DECLARE_READ8_MEMBER(mayday_protection_r);
-	DECLARE_WRITE8_MEMBER(sinistar_vram_select_w);
+	void williams_vram_select_w(u8 data);
+	void williams_cmos_w(offs_t offset, u8 data);
+	void bubbles_cmos_w(offs_t offset, u8 data);
+	void defender_bank_select_w(u8 data);
+	u8 mayday_protection_r(offs_t offset);
+	void sinistar_vram_select_w(u8 data);
 	DECLARE_WRITE8_MEMBER(williams_blitter_w);
 
 	DECLARE_MACHINE_START(defender);
@@ -120,7 +125,7 @@ protected:
 
 	TIMER_CALLBACK_MEMBER(williams_deferred_snd_cmd_w);
 
-	DECLARE_WRITE8_MEMBER(playball_snd_cmd_w);
+	void playball_snd_cmd_w(u8 data);
 
 	DECLARE_WRITE_LINE_MEMBER(lottofun_coin_lock_w);
 
@@ -155,7 +160,8 @@ class spdball_state : public williams_state
 {
 public:
 	spdball_state(const machine_config &mconfig, device_type type, const char *tag) :
-		williams_state(mconfig, type, tag) { }
+		williams_state(mconfig, type, tag)
+	{ }
 
 	void spdball(machine_config &config);
 
@@ -173,7 +179,8 @@ public:
 		m_soundcpu_b(*this, "soundcpu_b"),
 		m_blaster_palette_0(*this, "blaster_pal0"),
 		m_blaster_scanline_control(*this, "blaster_scan"),
-		m_blaster_bankb(*this, "blaster_bankb") { }
+		m_blaster_bankb(*this, "blaster_bankb")
+	{ }
 
 	void blastkit(machine_config &config);
 	void blaster(machine_config &config);
@@ -191,12 +198,12 @@ private:
 	uint8_t m_vram_bank;
 	uint8_t m_rom_bank;
 
-	DECLARE_WRITE8_MEMBER(blaster_vram_select_w);
-	DECLARE_WRITE8_MEMBER(blaster_bank_select_w);
-	DECLARE_WRITE8_MEMBER(blaster_remap_select_w);
-	DECLARE_WRITE8_MEMBER(blaster_video_control_w);
+	void blaster_vram_select_w(u8 data);
+	void blaster_bank_select_w(u8 data);
+	void blaster_remap_select_w(u8 data);
+	void blaster_video_control_w(u8 data);
 	TIMER_CALLBACK_MEMBER(blaster_deferred_snd_cmd_w);
-	DECLARE_WRITE8_MEMBER(blaster_snd_cmd_w);
+	void blaster_snd_cmd_w(u8 data);
 
 	DECLARE_MACHINE_START(blaster);
 	DECLARE_VIDEO_START(blaster);
@@ -212,11 +219,12 @@ private:
 class williams2_state : public williams_state
 {
 public:
-	williams2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: williams_state(mconfig, type, tag),
+	williams2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		williams_state(mconfig, type, tag),
 		m_bank8000(*this, "bank8000"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_williams2_tileram(*this, "williams2_tile") { }
+		m_williams2_tileram(*this, "williams2_tile")
+	{ }
 
 	void williams2(machine_config &config);
 	void mysticm(machine_config &config);
@@ -237,20 +245,20 @@ protected:
 	uint8_t m_williams2_tilemap_config;
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	DECLARE_WRITE8_MEMBER(williams2_bank_select_w);
+	void williams2_bank_select_w(u8 data);
 	DECLARE_WRITE8_MEMBER(williams2_watchdog_reset_w);
-	DECLARE_WRITE8_MEMBER(williams2_7segment_w);
-	DECLARE_WRITE8_MEMBER(williams2_paletteram_w);
-	DECLARE_WRITE8_MEMBER(williams2_fg_select_w);
-	DECLARE_WRITE8_MEMBER(williams2_bg_select_w);
-	DECLARE_WRITE8_MEMBER(williams2_tileram_w);
-	DECLARE_WRITE8_MEMBER(williams2_xscroll_low_w);
-	DECLARE_WRITE8_MEMBER(williams2_xscroll_high_w);
-	DECLARE_WRITE8_MEMBER(williams2_blit_window_enable_w);
+	void williams2_7segment_w(u8 data);
+	void williams2_paletteram_w(offs_t offset, u8 data);
+	void williams2_fg_select_w(u8 data);
+	void williams2_bg_select_w(u8 data);
+	void williams2_tileram_w(offs_t offset, u8 data);
+	void williams2_xscroll_low_w(u8 data);
+	void williams2_xscroll_high_w(u8 data);
+	void williams2_blit_window_enable_w(u8 data);
 	TIMER_DEVICE_CALLBACK_MEMBER(williams2_va11_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(williams2_endscreen_callback);
 	TIMER_CALLBACK_MEMBER(williams2_deferred_snd_cmd_w);
-	DECLARE_WRITE8_MEMBER(williams2_snd_cmd_w);
+	void williams2_snd_cmd_w(u8 data);
 
 	DECLARE_MACHINE_START(williams2);
 	DECLARE_MACHINE_RESET(williams2);
@@ -274,15 +282,16 @@ public:
 		m_grenade_lamp(*this, "Grenade_lamp"),
 		m_gun_lamp(*this, "Gun_lamp"),
 		m_p1_gun_recoil(*this, "Player1_Gun_Recoil"),
-		m_feather_blower(*this, "Feather_Blower") { }
+		m_feather_blower(*this, "Feather_Blower")
+	{ }
 
 	void tshoot(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(gun_r);
+	template <int P> DECLARE_CUSTOM_INPUT_MEMBER(gun_r);
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(maxvol_w);
-	DECLARE_WRITE8_MEMBER(lamp_w);
+	void lamp_w(u8 data);
 
 	DECLARE_MACHINE_START(tshoot);
 
@@ -296,9 +305,10 @@ private:
 class joust2_state : public williams2_state
 {
 public:
-	joust2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: williams2_state(mconfig, type, tag),
-		m_cvsd_sound(*this, "cvsd") { }
+	joust2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		williams2_state(mconfig, type, tag),
+		m_cvsd_sound(*this, "cvsd")
+	{ }
 
 	void joust2(machine_config &config);
 
@@ -324,3 +334,5 @@ private:
 #define WILLIAMS_TILEMAP_MYSTICM    0       /* IC79 is a 74LS85 comparator */
 #define WILLIAMS_TILEMAP_TSHOOT     1       /* IC79 is a 74LS157 selector jumpered to be enabled */
 #define WILLIAMS_TILEMAP_JOUST2     2       /* IC79 is a 74LS157 selector jumpered to be disabled */
+
+#endif // MAME_INCLUDES_WILLIAMS_H

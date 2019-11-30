@@ -97,14 +97,14 @@ void batman_state::main_map(address_map &map)
 	map(0x2a0000, 0x2a0001).mirror(0x11fffe).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0x2e0000, 0x2e0fff).mirror(0x100000).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x2effc0, 0x2effff).mirror(0x100000).rw(m_vad, FUNC(atari_vad_device::control_read), FUNC(atari_vad_device::control_write));
-	map(0x2f0000, 0x2fffff).mirror(0x100000).ram();
-	map(0x2f0000, 0x2f1fff).mirror(0x100000).w(m_vad, FUNC(atari_vad_device::playfield2_latched_msb_w)).share("vad:playfield2");
-	map(0x2f2000, 0x2f3fff).mirror(0x100000).w(m_vad, FUNC(atari_vad_device::playfield_latched_lsb_w)).share("vad:playfield");
-	map(0x2f4000, 0x2f5fff).mirror(0x100000).w(m_vad, FUNC(atari_vad_device::playfield_upper_w)).share("vad:playfield_ext");
+	map(0x2f0000, 0x2f1fff).mirror(0x100000).ram().w(m_vad, FUNC(atari_vad_device::playfield2_latched_msb_w)).share("vad:playfield2");
+	map(0x2f2000, 0x2f3fff).mirror(0x100000).ram().w(m_vad, FUNC(atari_vad_device::playfield_latched_lsb_w)).share("vad:playfield");
+	map(0x2f4000, 0x2f5fff).mirror(0x100000).ram().w(m_vad, FUNC(atari_vad_device::playfield_upper_w)).share("vad:playfield_ext");
 	map(0x2f6000, 0x2f7fff).mirror(0x100000).ram().share("vad:mob");
-	map(0x2f8000, 0x2f8eff).mirror(0x100000).w(m_vad, FUNC(atari_vad_device::alpha_w)).share("vad:alpha");
-	map(0x2f8f00, 0x2f8f7f).mirror(0x100000).share("vad:eof");
+	map(0x2f8000, 0x2f8eff).mirror(0x100000).ram().w(m_vad, FUNC(atari_vad_device::alpha_w)).share("vad:alpha");
+	map(0x2f8f00, 0x2f8f7f).mirror(0x100000).ram().share("vad:eof");
 	map(0x2f8f80, 0x2f8fff).mirror(0x100000).ram().share("vad:mob:slip");
+	map(0x2f9000, 0x2fffff).mirror(0x100000).ram();
 }
 
 
@@ -183,42 +183,43 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(batman_state::batman)
-
+void batman_state::batman(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, ATARI_CLOCK_14MHz)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	M68000(config, m_maincpu, ATARI_CLOCK_14MHz);
+	m_maincpu->set_addrmap(AS_PROGRAM, &batman_state::main_map);
 
 	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_batman)
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_batman);
+	PALETTE(config, "palette").set_format(palette_device::IRGB_1555, 2048);
 
-	MCFG_ATARI_VAD_ADD("vad", "screen", INPUTLINE("maincpu", M68K_IRQ_4))
-	MCFG_ATARI_VAD_PLAYFIELD(batman_state, "gfxdecode", get_playfield_tile_info)
-	MCFG_ATARI_VAD_PLAYFIELD2(batman_state, "gfxdecode", get_playfield2_tile_info)
-	MCFG_ATARI_VAD_ALPHA(batman_state, "gfxdecode", get_alpha_tile_info)
-	MCFG_ATARI_VAD_MOB(batman_state::s_mob_config, "gfxdecode")
+	ATARI_VAD(config, m_vad, 0, m_screen);
+	m_vad->scanline_int_cb().set_inputline(m_maincpu, M68K_IRQ_4);
+	TILEMAP(config, "vad:playfield", "gfxdecode", 2, 8, 8, TILEMAP_SCAN_COLS, 64, 64).set_info_callback(DEVICE_SELF_OWNER, FUNC(batman_state::get_playfield_tile_info));
+	TILEMAP(config, "vad:playfield2", "gfxdecode", 2, 8, 8, TILEMAP_SCAN_COLS, 64, 64, 0).set_info_callback(DEVICE_SELF_OWNER, FUNC(batman_state::get_playfield2_tile_info));
+	TILEMAP(config, "vad:alpha", "gfxdecode", 2, 8, 8, TILEMAP_SCAN_ROWS, 64, 32, 0).set_info_callback(DEVICE_SELF_OWNER, FUNC(batman_state::get_alpha_tile_info));
+	ATARI_MOTION_OBJECTS(config, "vad:mob", 0, m_screen, batman_state::s_mob_config).set_gfxdecode("gfxdecode");
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses a VAD chip to generate video signals */
-	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
-	MCFG_SCREEN_UPDATE_DRIVER(batman_state, screen_update_batman)
-	MCFG_SCREEN_PALETTE("palette")
+	m_screen->set_raw(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240);
+	m_screen->set_screen_update(FUNC(batman_state::screen_update_batman));
+	m_screen->set_palette("palette");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_ATARI_JSA_III_ADD("jsa", INPUTLINE("maincpu", M68K_IRQ_6))
-	MCFG_ATARI_JSA_TEST_PORT("260010", 6)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	ATARI_JSA_III(config, m_jsa, 0);
+	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_6);
+	m_jsa->test_read_cb().set_ioport("260010").bit(6);
+	m_jsa->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 

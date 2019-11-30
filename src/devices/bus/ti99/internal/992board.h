@@ -33,10 +33,6 @@ public:
 	static constexpr unsigned TOTAL_HORZ                 = 342;
 	static constexpr unsigned TOTAL_VERT_NTSC            = 262;
 
-	template <class Object> devcb_base &set_readmem_callback(Object &&cb) { return m_mem_read_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_hold_callback(Object &&cb) { return m_hold_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_int_callback(Object &&cb) { return m_int_cb.set_callback(std::forward<Object>(cb)); }
-
 	// Delay(2) + ColorBurst(14) + Delay(8) + LeftBorder(13)
 	static constexpr unsigned HORZ_DISPLAY_START         = 2 + 14 + 8 + 13;
 	// RightBorder(15) + Delay(8) + HorizSync(26)
@@ -107,8 +103,8 @@ class io992_device : public bus::hexbus::hexbus_chained_device
 public:
 	io992_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER( cruread );
-	DECLARE_WRITE8_MEMBER( cruwrite );
+	uint8_t cruread(offs_t offset);
+	void cruwrite(offs_t offset, uint8_t data);
 	void device_start() override;
 	ioport_constructor device_input_ports() const override;
 	auto rombank_cb() { return m_set_rom_bank.bind(); }

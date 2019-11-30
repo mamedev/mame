@@ -293,7 +293,7 @@ private:
 	bool m_hack_self_test_is_second_read; // temp variable for hack below
 
 	required_device<m68000_base_device> m_maincpu;
-	required_device<cpu_device> m_dsp;
+	required_device<tms32010_device> m_dsp;
 	required_device<scn2681_device> m_duart;
 	required_device<x2212_device> m_nvram;
 	required_device<dac_word_interface> m_dac;
@@ -335,9 +335,7 @@ private:
 /* 2681 DUART */
 WRITE_LINE_MEMBER(dectalk_state::duart_irq_handler)
 {
-	m_maincpu->set_input_line_and_vector(M68K_IRQ_6, state, M68K_INT_ACK_AUTOVECTOR);
-	//drvstate->m_maincpu->set_input_line_and_vector(M68K_IRQ_6, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
-	//drvstate->m_maincpu->set_input_line_and_vector(M68K_IRQ_6, HOLD_LINE, vector);
+	m_maincpu->set_input_line(M68K_IRQ_6, state);
 }
 
 READ8_MEMBER(dectalk_state::duart_input)
@@ -402,10 +400,10 @@ void dectalk_state::dsp_semaphore_w(bool state)
 #ifdef VERBOSE
 		logerror("speech int fired!\n");
 #endif
-		m_maincpu->set_input_line_and_vector(M68K_IRQ_5, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		m_maincpu->set_input_line(M68K_IRQ_5, ASSERT_LINE);
 	}
 	else
-	m_maincpu->set_input_line_and_vector(M68K_IRQ_5, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
+		m_maincpu->set_input_line(M68K_IRQ_5, CLEAR_LINE);
 }
 
 // read the output fifo and set the interrupt line active on the dsp
@@ -486,7 +484,7 @@ void dectalk_state::machine_start()
 void dectalk_state::machine_reset()
 {
 	/* hook the RESET line, which resets a slew of other components */
-	m_maincpu->set_reset_callback(write_line_delegate(FUNC(dectalk_state::dectalk_reset),this));
+	m_maincpu->set_reset_callback(*this, FUNC(dectalk_state::dectalk_reset));
 }
 
 /* Begin 68k i/o handlers */
@@ -602,7 +600,7 @@ WRITE16_MEMBER(dectalk_state::m68k_spcflags_w)// 68k write to the speech flags (
 #ifdef SPC_LOG_68K
 			logerror("    speech int fired!\n");
 #endif
-			m_maincpu->set_input_line_and_vector(M68K_IRQ_5, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR); // set int because semaphore was set
+			m_maincpu->set_input_line(M68K_IRQ_5, ASSERT_LINE); // set int because semaphore was set
 		}
 	}
 	else // data&0x40 == 0
@@ -610,7 +608,7 @@ WRITE16_MEMBER(dectalk_state::m68k_spcflags_w)// 68k write to the speech flags (
 #ifdef SPC_LOG_68K
 		logerror(" | 0x40 = 0: speech int disabled\n");
 #endif
-		m_maincpu->set_input_line_and_vector(M68K_IRQ_5, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR); // clear int because int is now disabled
+		m_maincpu->set_input_line(M68K_IRQ_5, CLEAR_LINE); // clear int because int is now disabled
 	}
 }
 
@@ -642,7 +640,7 @@ WRITE16_MEMBER(dectalk_state::m68k_tlcflags_w)// dtmf flags write
 #ifdef TLC_LOG
 			logerror("    TLC int fired!\n");
 #endif
-			m_maincpu->set_input_line_and_vector(M68K_IRQ_4, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR); // set int because tone detect was set
+			m_maincpu->set_input_line(M68K_IRQ_4, ASSERT_LINE); // set int because tone detect was set
 		}
 	}
 	else // data&0x40 == 0
@@ -651,7 +649,7 @@ WRITE16_MEMBER(dectalk_state::m68k_tlcflags_w)// dtmf flags write
 		logerror(" | 0x40 = 0: tone detect int disabled\n");
 #endif
 	if ((!(data&0x4000)) || (!m_tlc_ringdetect)) // check to be sure we don't disable int if both ints fired at once
-		m_maincpu->set_input_line_and_vector(M68K_IRQ_4, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR); // clear int because int is now disabled
+		m_maincpu->set_input_line(M68K_IRQ_4, CLEAR_LINE); // clear int because int is now disabled
 	}
 	if (data&0x100) // bit 8: answer phone relay enable
 	{
@@ -675,7 +673,7 @@ WRITE16_MEMBER(dectalk_state::m68k_tlcflags_w)// dtmf flags write
 #ifdef TLC_LOG
 			logerror("    TLC int fired!\n");
 #endif
-			m_maincpu->set_input_line_and_vector(M68K_IRQ_4, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR); // set int because tone detect was set
+			m_maincpu->set_input_line(M68K_IRQ_4, ASSERT_LINE); // set int because tone detect was set
 		}
 	}
 	else // data&0x4000 == 0
@@ -684,7 +682,7 @@ WRITE16_MEMBER(dectalk_state::m68k_tlcflags_w)// dtmf flags write
 		logerror(" | 0x4000 = 0: ring detect int disabled\n");
 #endif
 	if ((!(data&0x40)) || (!m_tlc_tonedetect)) // check to be sure we don't disable int if both ints fired at once
-		m_maincpu->set_input_line_and_vector(M68K_IRQ_4, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR); // clear int because int is now disabled
+		m_maincpu->set_input_line(M68K_IRQ_4, CLEAR_LINE); // clear int because int is now disabled
 	}
 }
 
@@ -818,7 +816,7 @@ void dectalk_state::tms32010_io(address_map &map)
 {
 	map(0, 0).w(FUNC(dectalk_state::spc_latch_outfifo_error_stats)); // *set* the outfifo_status_r semaphore, and also latch the error bit at D0.
 	map(1, 1).rw(FUNC(dectalk_state::spc_infifo_data_r), FUNC(dectalk_state::spc_outfifo_data_w)); //read from input fifo, write to sound fifo
-	//AM_RANGE(8, 8) //the newer firmware seems to want something mapped here?
+	//map(8, 8) //the newer firmware seems to want something mapped here?
 }
 
 /******************************************************************************
@@ -856,7 +854,7 @@ void dectalk_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		outfifo_read_cb(ptr, param);
 		break;
 	default:
-		assert_always(false, "Unknown id in dectalk_state::device_timer");
+		throw emu_fatalerror("Unknown id in dectalk_state::device_timer");
 	}
 }
 
@@ -876,25 +874,28 @@ TIMER_CALLBACK_MEMBER(dectalk_state::outfifo_read_cb)
 	    m_duart->duart_rx_break(1, 0);*/
 }
 
-MACHINE_CONFIG_START(dectalk_state::dectalk)
+void dectalk_state::dectalk(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(20'000'000)/2) /* E74 20MHz OSC (/2) */
-	MCFG_DEVICE_PROGRAM_MAP(m68k_mem)
-	MCFG_DEVICE_ADD("duart", SCN2681, XTAL(3'686'400)) // MC2681 DUART ; Y3 3.6864MHz xtal */
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, dectalk_state, duart_irq_handler))
-	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(*this, dectalk_state, duart_txa))
-	MCFG_MC68681_B_TX_CALLBACK(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_MC68681_INPORT_CALLBACK(READ8(*this, dectalk_state, duart_input))
-	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(*this, dectalk_state, duart_output))
+	M68000(config, m_maincpu, XTAL(20'000'000)/2); /* E74 20MHz OSC (/2) */
+	m_maincpu->set_addrmap(AS_PROGRAM, &dectalk_state::m68k_mem);
 
-	MCFG_DEVICE_ADD("dsp", TMS32010, XTAL(20'000'000)) /* Y1 20MHz xtal */
-	MCFG_DEVICE_PROGRAM_MAP(tms32010_mem)
-	MCFG_DEVICE_IO_MAP(tms32010_io)
-	MCFG_TMS32010_BIO_IN_CB(READLINE(*this, dectalk_state, spc_semaphore_r)) //read infifo-has-data-in-it fifo readable status
+	SCN2681(config, m_duart, XTAL(3'686'400)); // MC2681 DUART ; Y3 3.6864MHz xtal */
+	m_duart->irq_cb().set(FUNC(dectalk_state::duart_irq_handler));
+	m_duart->a_tx_cb().set(FUNC(dectalk_state::duart_txa));
+	m_duart->b_tx_cb().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_duart->inport_cb().set(FUNC(dectalk_state::duart_input));
+	m_duart->outport_cb().set(FUNC(dectalk_state::duart_output));
+
+	TMS32010(config, m_dsp, XTAL(20'000'000)); /* Y1 20MHz xtal */
+	m_dsp->set_addrmap(AS_PROGRAM, &dectalk_state::tms32010_mem);
+	m_dsp->set_addrmap(AS_IO, &dectalk_state::tms32010_io);
+	m_dsp->bio().set(FUNC(dectalk_state::spc_semaphore_r)); //read infifo-has-data-in-it fifo readable status
+
 #ifdef USE_LOOSE_TIMING
-	MCFG_QUANTUM_TIME(attotime::from_hz(100))
+	config.set_maximum_quantum(attotime::from_hz(100));
 #else
-	MCFG_QUANTUM_PERFECT_CPU("dsp")
+	config.m_perfect_cpu_quantum = subtag("dsp");
 #endif
 
 	X2212(config, "x2212");
@@ -903,15 +904,16 @@ MACHINE_CONFIG_START(dectalk_state::dectalk)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", AD7541, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.9) // ad7541.e107 (E88 10KHz OSC, handled by timer)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	AD7541(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.9); // ad7541.e107 (E88 10KHz OSC, handled by timer)
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	/* Y2 is a 3.579545 MHz xtal for the dtmf decoder chip */
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("duart", scn2681_device, rx_b_w))
-MACHINE_CONFIG_END
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set(m_duart, FUNC(scn2681_device::rx_b_w));
+}
 
 
 

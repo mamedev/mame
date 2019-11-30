@@ -30,7 +30,7 @@ namespace {
 	};
 }
 
-uint32_t segas24_state::screen_update_system24(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t segas24_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if(m_vmixer->get_reg(13) & 1) {
 		bitmap.fill(m_palette->black_pen());

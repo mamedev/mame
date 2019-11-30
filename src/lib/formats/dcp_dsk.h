@@ -7,9 +7,10 @@
     PC98 DCP & DCU disk images
 
 *********************************************************************/
+#ifndef MAME_FORMATS_DCP_DSK_H
+#define MAME_FORMATS_DCP_DSK_H
 
-#ifndef DCP_DSK_H
-#define DCP_DSK_H
+#pragma once
 
 #include "flopimg.h"
 
@@ -30,4 +31,4 @@ public:
 
 extern const floppy_format_type FLOPPY_DCP_FORMAT;
 
-#endif /* PC98DCP_DSK_H */
+#endif // MAME_FORMATS_DCP_DSK_H

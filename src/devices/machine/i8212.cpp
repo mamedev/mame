@@ -120,7 +120,7 @@ void i8212_device::device_reset()
 //  read - data latch read
 //-------------------------------------------------
 
-READ8_MEMBER(i8212_device::read)
+uint8_t i8212_device::read()
 {
 	if (!machine().side_effects_disabled())
 	{
@@ -150,7 +150,7 @@ IRQ_CALLBACK_MEMBER(i8212_device::inta_cb)
 //  write - data latch write
 //-------------------------------------------------
 
-WRITE8_MEMBER(i8212_device::write)
+void i8212_device::write(uint8_t data)
 {
 	// clear interrupt line
 	m_write_int(CLEAR_LINE);
@@ -171,7 +171,7 @@ WRITE8_MEMBER(i8212_device::write)
 //  strobe - data input strobe
 //-------------------------------------------------
 
-WRITE8_MEMBER(i8212_device::strobe)
+void i8212_device::strobe(uint8_t data)
 {
 	if (get_mode() == mode::INPUT)
 	{

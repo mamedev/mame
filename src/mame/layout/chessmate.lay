@@ -1,0 +1,364 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+
+<!-- NOTE: no chesspieces simulation here, Commodore Chessmate didn't have a built-in chessboard -->
+
+<!-- define elements -->
+
+	<element name="white"><rect><color red="0.88" green="0.88" blue="0.9" /></rect></element>
+	<element name="disk_white"><disk><color red="0.88" green="0.88" blue="0.9" /></disk></element>
+	<element name="black"><rect><color red="0.05" green="0.05" blue="0.05" /></rect></element>
+	<element name="red"><rect><color red="1.0" green="0.1" blue="0.15" /></rect></element>
+	<element name="dred"><rect><color red="0.3" green="0.1" blue="0.0" /></rect></element>
+	<element name="yellow"><rect><color red="0.75" green="0.55" blue="0.2" /></rect></element>
+	<element name="disk_yellow"><disk><color red="0.75" green="0.55" blue="0.2" /></disk></element>
+
+	<element name="digit" defstate="0">
+		<led7seg><color red="1.0" green="0.1" blue="0.15" /></led7seg>
+	</element>
+
+	<element name="led" defstate="0">
+		<disk state="1"><color red="1.0" green="0.1" blue="0.15" /></disk>
+		<disk state="0"><color red="0.15" green="0.02" blue="0.03" /></disk>
+	</element>
+	<element name="ledi" defstate="1">
+		<disk state="1"><color red="0.15" green="0.02" blue="0.03" /></disk>
+		<disk state="0"><color red="1.0" green="0.1" blue="0.15" /></disk>
+	</element>
+
+	<element name="but">
+		<rect>
+			<bounds x="0.0" y="0.0" width="1.0" height="1.0" />
+			<color red="0.05" green="0.05" blue="0.05" />
+		</rect>
+		<rect>
+			<bounds x="0.1" y="0.1" width="0.8" height="0.8" />
+			<color red="0.3" green="0.1" blue="0.0" />
+		</rect>
+	</element>
+
+	<element name="hl" defstate="0">
+		<text string=" ">
+			<bounds x="0.0" y="0.0" width="1.0" height="1.0" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+		<disk state="1">
+			<bounds x="0.12" y="0.12" width="0.76" height="0.76" />
+			<color red="1.0" green="1.0" blue="1.0" />
+		</disk>
+	</element>
+
+	<element name="text_l1">
+		<rect><color red="0.3" green="0.1" blue="0.0" /></rect>
+		<text string="A"><color red="0.88" green="0.88" blue="0.9" /></text>
+	</element>
+	<element name="text_l2">
+		<rect><color red="0.3" green="0.1" blue="0.0" /></rect>
+		<text string="B"><color red="0.88" green="0.88" blue="0.9" /></text>
+	</element>
+	<element name="text_l3">
+		<rect><color red="0.3" green="0.1" blue="0.0" /></rect>
+		<text string="C"><color red="0.88" green="0.88" blue="0.9" /></text>
+	</element>
+	<element name="text_l4">
+		<rect><color red="0.3" green="0.1" blue="0.0" /></rect>
+		<text string="D"><color red="0.88" green="0.88" blue="0.9" /></text>
+	</element>
+	<element name="text_l5">
+		<rect><color red="0.3" green="0.1" blue="0.0" /></rect>
+		<text string="E"><color red="0.88" green="0.88" blue="0.9" /></text>
+	</element>
+	<element name="text_l6">
+		<rect><color red="0.3" green="0.1" blue="0.0" /></rect>
+		<text string="F"><color red="0.88" green="0.88" blue="0.9" /></text>
+	</element>
+	<element name="text_l7">
+		<rect><color red="0.3" green="0.1" blue="0.0" /></rect>
+		<text string="G"><color red="0.88" green="0.88" blue="0.9" /></text>
+	</element>
+	<element name="text_l8">
+		<rect><color red="0.3" green="0.1" blue="0.0" /></rect>
+		<text string="H"><color red="0.88" green="0.88" blue="0.9" /></text>
+	</element>
+
+	<element name="text_n1">
+		<rect><color red="0.3" green="0.1" blue="0.0" /></rect>
+		<text string="1"><color red="0.88" green="0.88" blue="0.9" /></text>
+	</element>
+	<element name="text_n2">
+		<rect><color red="0.3" green="0.1" blue="0.0" /></rect>
+		<text string="2"><color red="0.88" green="0.88" blue="0.9" /></text>
+	</element>
+	<element name="text_n3">
+		<rect><color red="0.3" green="0.1" blue="0.0" /></rect>
+		<text string="3"><color red="0.88" green="0.88" blue="0.9" /></text>
+	</element>
+	<element name="text_n4">
+		<rect><color red="0.3" green="0.1" blue="0.0" /></rect>
+		<text string="4"><color red="0.88" green="0.88" blue="0.9" /></text>
+	</element>
+	<element name="text_n5">
+		<rect><color red="0.3" green="0.1" blue="0.0" /></rect>
+		<text string="5"><color red="0.88" green="0.88" blue="0.9" /></text>
+	</element>
+	<element name="text_n6">
+		<rect><color red="0.3" green="0.1" blue="0.0" /></rect>
+		<text string="6"><color red="0.88" green="0.88" blue="0.9" /></text>
+	</element>
+	<element name="text_n7">
+		<rect><color red="0.3" green="0.1" blue="0.0" /></rect>
+		<text string="7"><color red="0.88" green="0.88" blue="0.9" /></text>
+	</element>
+	<element name="text_n8">
+		<rect><color red="0.3" green="0.1" blue="0.0" /></rect>
+		<text string="8"><color red="0.88" green="0.88" blue="0.9" /></text>
+	</element>
+
+	<element name="text_ll">
+		<rect><color red="0.88" green="0.88" blue="0.9" /></rect>
+		<text string="WHITE"><color red="0.05" green="0.05" blue="0.05" /></text>
+	</element>
+	<element name="text_lr">
+		<rect><color red="0.88" green="0.88" blue="0.9" /></rect>
+		<text string="BLACK"><color red="0.05" green="0.05" blue="0.05" /></text>
+	</element>
+
+	<element name="text_from">
+		<rect><color red="0.88" green="0.88" blue="0.9" /></rect>
+		<text string="FROM"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="text_to">
+		<rect><color red="0.88" green="0.88" blue="0.9" /></rect>
+		<text string="TO"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="text_time">
+		<rect><color red="0.88" green="0.88" blue="0.9" /></rect>
+		<text string="TIME" align="1"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="text_twhite">
+		<rect><color red="0.88" green="0.88" blue="0.9" /></rect>
+		<text string="WHITE" align="1"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="text_tblack">
+		<rect><color red="0.88" green="0.88" blue="0.9" /></rect>
+		<text string="BLACK" align="1"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="text_white">
+		<rect><color red="0.88" green="0.88" blue="0.9" /></rect>
+		<text string="WHITE"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="text_black">
+		<rect><color red="0.88" green="0.88" blue="0.9" /></rect>
+		<text string="BLACK"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+
+	<element name="text_u1">
+		<rect><color red="0.88" green="0.88" blue="0.9" /></rect>
+		<text string="CHECK"><color red="0.05" green="0.05" blue="0.05" /></text>
+	</element>
+	<element name="text_u2a">
+		<rect><color red="0.88" green="0.88" blue="0.9" /></rect>
+		<text string="CHESSmate"><color red="0.05" green="0.05" blue="0.05" /></text>
+	</element>
+	<element name="text_u2b">
+		<rect><color red="0.88" green="0.88" blue="0.9" /></rect>
+		<text string="LOSES"><color red="0.05" green="0.05" blue="0.05" /></text>
+	</element>
+	<element name="text_u3">
+		<rect><color red="0.88" green="0.88" blue="0.9" /></rect>
+		<text string="CHESSmate" align="1"><color red="0.05" green="0.05" blue="0.05" /></text>
+	</element>
+	<element name="text_u4">
+		<rect><color red="0.88" green="0.88" blue="0.9" /></rect>
+		<text string="PLAYING"><color red="0.05" green="0.05" blue="0.05" /></text>
+	</element>
+	<element name="text_u5">
+		<rect><color red="0.88" green="0.88" blue="0.9" /></rect>
+		<text string="IS"><color red="0.05" green="0.05" blue="0.05" /></text>
+	</element>
+
+	<element name="text_m1">
+		<rect><color red="0.88" green="0.88" blue="0.9" /></rect>
+		<text string="NEW GAME"><color red="0.05" green="0.05" blue="0.05" /></text>
+	</element>
+	<element name="text_m2">
+		<rect><color red="0.88" green="0.88" blue="0.9" /></rect>
+		<text string="CLEAR"><color red="0.05" green="0.05" blue="0.05" /></text>
+	</element>
+	<element name="text_m3">
+		<rect><color red="0.88" green="0.88" blue="0.9" /></rect>
+		<text string="ENTER"><color red="0.05" green="0.05" blue="0.05" /></text>
+	</element>
+	<element name="text_up">
+		<rect><color red="0.3" green="0.1" blue="0.0" /></rect>
+		<text string="&#x2191;"><color red="0.88" green="0.88" blue="0.9" /></text>
+	</element>
+
+	<element name="text_l2a">
+		<rect><color red="0.88" green="0.88" blue="0.9" /></rect>
+		<text string="BOARD"><color red="0.05" green="0.05" blue="0.05" /></text>
+	</element>
+	<element name="text_l3a">
+		<rect><color red="0.88" green="0.88" blue="0.9" /></rect>
+		<text string="CHESS"><color red="0.05" green="0.05" blue="0.05" /></text>
+	</element>
+	<element name="text_l4a">
+		<rect><color red="0.88" green="0.88" blue="0.9" /></rect>
+		<text string="DISPLAY"><color red="0.05" green="0.05" blue="0.05" /></text>
+	</element>
+	<element name="text_l5a">
+		<rect><color red="0.88" green="0.88" blue="0.9" /></rect>
+		<text string="STOP"><color red="0.05" green="0.05" blue="0.05" /></text>
+	</element>
+	<element name="text_l6a">
+		<rect><color red="0.88" green="0.88" blue="0.9" /></rect>
+		<text string="SKILL"><color red="0.05" green="0.05" blue="0.05" /></text>
+	</element>
+	<element name="text_l7a">
+		<rect><color red="0.88" green="0.88" blue="0.9" /></rect>
+		<text string="GAME"><color red="0.05" green="0.05" blue="0.05" /></text>
+	</element>
+
+	<element name="text_l2b">
+		<rect><color red="0.88" green="0.88" blue="0.9" /></rect>
+		<text string="VERIFY"><color red="0.05" green="0.05" blue="0.05" /></text>
+	</element>
+	<element name="text_l3b">
+		<rect><color red="0.88" green="0.88" blue="0.9" /></rect>
+		<text string="CLOCK"><color red="0.05" green="0.05" blue="0.05" /></text>
+	</element>
+	<element name="text_l4b">
+		<rect><color red="0.88" green="0.88" blue="0.9" /></rect>
+		<text string="TIME"><color red="0.05" green="0.05" blue="0.05" /></text>
+	</element>
+	<element name="text_l5b">
+		<rect><color red="0.88" green="0.88" blue="0.9" /></rect>
+		<text string="CLOCK"><color red="0.05" green="0.05" blue="0.05" /></text>
+	</element>
+	<element name="text_l6b">
+		<rect><color red="0.88" green="0.88" blue="0.9" /></rect>
+		<text string="LEVEL"><color red="0.05" green="0.05" blue="0.05" /></text>
+	</element>
+	<element name="text_l7b">
+		<rect><color red="0.88" green="0.88" blue="0.9" /></rect>
+		<text string="MOVES"><color red="0.05" green="0.05" blue="0.05" /></text>
+	</element>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="-2" right="48" top="15" bottom="52.5" />
+
+		<bezel element="white"><bounds x="-2" y="15" width="50" height="37.5" /></bezel>
+
+		<bezel element="text_from"><bounds x="8.5" y="15.9" width="10.5" height="1.5" /></bezel>
+		<bezel element="text_to"><bounds x="27" y="15.9" width="10.5" height="1.5" /></bezel>
+
+		<bezel element="text_time"><bounds x="4.2" y="18.8" width="8" height="1.5" /></bezel>
+		<bezel element="text_twhite"><bounds x="4.2" y="20.2" width="8" height="1.5" /></bezel>
+		<bezel element="text_time"><bounds x="38" y="18.8" width="8" height="1.5" /></bezel>
+		<bezel element="text_tblack"><bounds x="38" y="20.2" width="8" height="1.5" /></bezel>
+
+		<bezel element="black"><bounds x="8.5" y="17.5" width="4" height="5.5" /></bezel>
+		<bezel element="black"><bounds x="15" y="17.5" width="4" height="5.5" /></bezel>
+		<bezel element="black"><bounds x="27" y="17.5" width="4" height="5.5" /></bezel>
+		<bezel element="black"><bounds x="33.5" y="17.5" width="4" height="5.5" /></bezel>
+
+		<bezel name="digit0" element="digit"><bounds x="9.3" y="18.4" width="2.4" height="3.7" /></bezel>
+		<bezel name="digit1" element="digit"><bounds x="15.8" y="18.4" width="2.4" height="3.7" /></bezel>
+		<bezel name="digit2" element="digit"><bounds x="27.8" y="18.4" width="2.4" height="3.7" /></bezel>
+		<bezel name="digit3" element="digit"><bounds x="34.3" y="18.4" width="2.4" height="3.7" /></bezel>
+
+		<bezel element="red"><bounds x="8.9" y="17.9" width="3.2" height="4.7" /><color alpha="0.38" /></bezel>
+		<bezel element="red"><bounds x="15.4" y="17.9" width="3.2" height="4.7" /><color alpha="0.38" /></bezel>
+		<bezel element="red"><bounds x="27.4" y="17.9" width="3.2" height="4.7" /><color alpha="0.38" /></bezel>
+		<bezel element="red"><bounds x="33.9" y="17.9" width="3.2" height="4.7" /><color alpha="0.38" /></bezel>
+
+		<bezel element="text_white"><bounds x="26" y="24.4" width="6" height="1.5" /></bezel>
+		<bezel element="text_black"><bounds x="38" y="24.4" width="6" height="1.5" /></bezel>
+
+		<bezel element="but"><bounds x="3" y="26" width="4" height="4" /></bezel>
+		<bezel element="but"><bounds x="15" y="26" width="4" height="4" /></bezel>
+		<bezel element="black"><bounds x="27" y="26" width="4" height="4" /></bezel>
+		<bezel element="yellow"><bounds x="27.4" y="26.4" width="3.2" height="3.2" /></bezel>
+		<bezel element="but"><bounds x="39" y="26" width="4" height="4" /></bezel>
+
+		<bezel element="yellow"><bounds x="4.45" y="26.41" width="1.1" height="3.18" /></bezel>
+		<bezel element="disk_yellow"><bounds x="3.9" y="26.9" width="2.2" height="2.2" /></bezel>
+		<bezel element="dred"><bounds x="4.25" y="29.2" width="1.5" height="0.25" /></bezel>
+		<bezel element="yellow"><bounds x="16.05" y="27.05" width="1.9" height="1.9" /></bezel>
+		<bezel element="disk_yellow"><bounds x="15.9" y="26.9" width="2.2" height="2.2" /></bezel>
+
+		<bezel name="4.0" element="led"><bounds x="4.25" y="27.25" width="1.5" height="1.5" /></bezel>
+		<bezel name="4.2" element="led"><bounds x="16.25" y="27.25" width="1.5" height="1.5" /></bezel>
+		<bezel name="4.1" element="led"><bounds x="28.25" y="27.25" width="1.5" height="1.5" /></bezel>
+		<bezel name="4.1" element="ledi"><bounds x="40.25" y="27.25" width="1.5" height="1.5" /></bezel>
+
+		<bezel element="text_u1"><bounds x="1" y="30.1" width="8" height="1.2" /></bezel>
+		<bezel element="text_u2a"><bounds x="13" y="30.1" width="8" height="1.2" /></bezel>
+		<bezel element="text_u2b"><bounds x="13" y="31.2" width="8" height="1.2" /></bezel>
+		<bezel element="text_u3"><bounds x="27" y="30.1" width="8" height="1.2" /></bezel>
+		<bezel element="text_u4"><bounds x="37" y="30.1" width="8" height="1.2" /></bezel>
+		<bezel element="text_u5"><bounds x="33" y="30.1" width="4" height="1.2" /></bezel>
+
+		<bezel element="but"><bounds x="3" y="33" width="4" height="4" /></bezel>
+		<bezel element="but"><bounds x="27" y="33" width="4" height="4" /></bezel>
+		<bezel element="but"><bounds x="39" y="33" width="4" height="4" /></bezel>
+
+		<bezel element="text_m1"><bounds x="1" y="37.1" width="8" height="1.2" /></bezel>
+		<bezel element="text_m2"><bounds x="26" y="37.1" width="6" height="1.2" /></bezel>
+		<bezel element="text_m3"><bounds x="38" y="37.1" width="6" height="1.2" /></bezel>
+
+		<bezel element="disk_white"><bounds x="4.25" y="34.25" width="1.5" height="1.5" /></bezel>
+		<bezel element="white"><bounds x="28.25" y="34.25" width="1.5" height="1.5" /></bezel>
+		<bezel element="text_up"><bounds x="39.5" y="33.5" width="3" height="2.4" /></bezel>
+
+		<bezel element="hl" inputtag="RESET" inputmask="0x01"><bounds x="3" y="33" width="4" height="4" /><color alpha="0.15" /></bezel>
+		<bezel element="hl" inputtag="IN.1" inputmask="0x10"><bounds x="27" y="33" width="4" height="4" /><color alpha="0.15" /></bezel>
+		<bezel element="hl" inputtag="IN.1" inputmask="0x08"><bounds x="39" y="33" width="4" height="4" /><color alpha="0.15" /></bezel>
+
+		<repeat count="8">
+			<param name="x1" start="0" increment="6" />
+			<param name="x2" start="0.5" increment="6" />
+			<param name="i" start="1" increment="1" />
+			<bezel element="but"><bounds x="~x1~" y="40" width="4" height="4" /></bezel>
+			<bezel element="text_l~i~"><bounds x="~x2~" y="40.6" width="3" height="2.8" /></bezel>
+		</repeat>
+		<repeat count="8">
+			<param name="x1" start="0" increment="6" />
+			<param name="x2" start="0.5" increment="6" />
+			<param name="i" start="1" increment="1" />
+			<bezel element="but"><bounds x="~x1~" y="47" width="4" height="4" /></bezel>
+			<bezel element="text_n~i~"><bounds x="~x2~" y="47.6" width="3" height="2.8" /></bezel>
+		</repeat>
+
+		<repeat count="6">
+			<param name="x" start="5" increment="6" />
+			<param name="i" start="2" increment="1" />
+			<bezel element="text_l~i~a"><bounds x="~x~" y="44.1" width="6" height="1.2" /></bezel>
+			<bezel element="text_l~i~b"><bounds x="~x~" y="45.2" width="6" height="1.2" /></bezel>
+		</repeat>
+		<bezel element="text_ll"><bounds x="-1" y="44.65" width="6" height="1.2" /></bezel>
+		<bezel element="text_lr"><bounds x="41" y="44.65" width="6" height="1.2" /></bezel>
+
+		<bezel element="hl" inputtag="IN.0" inputmask="0x20"><bounds x="0"  y="40" width="4" height="4" /><color alpha="0.15" /></bezel>
+		<bezel element="hl" inputtag="IN.0" inputmask="0x10"><bounds x="6"  y="40" width="4" height="4" /><color alpha="0.15" /></bezel>
+		<bezel element="hl" inputtag="IN.0" inputmask="0x08"><bounds x="12" y="40" width="4" height="4" /><color alpha="0.15" /></bezel>
+		<bezel element="hl" inputtag="IN.0" inputmask="0x04"><bounds x="18" y="40" width="4" height="4" /><color alpha="0.15" /></bezel>
+		<bezel element="hl" inputtag="IN.0" inputmask="0x02"><bounds x="24" y="40" width="4" height="4" /><color alpha="0.15" /></bezel>
+		<bezel element="hl" inputtag="IN.0" inputmask="0x01"><bounds x="30" y="40" width="4" height="4" /><color alpha="0.15" /></bezel>
+		<bezel element="hl" inputtag="IN.1" inputmask="0x40"><bounds x="36" y="40" width="4" height="4" /><color alpha="0.15" /></bezel>
+		<bezel element="hl" inputtag="IN.1" inputmask="0x20"><bounds x="42" y="40" width="4" height="4" /><color alpha="0.15" /></bezel>
+
+		<bezel element="hl" inputtag="IN.2" inputmask="0x20"><bounds x="0"  y="47" width="4" height="4" /><color alpha="0.15" /></bezel>
+		<bezel element="hl" inputtag="IN.2" inputmask="0x10"><bounds x="6"  y="47" width="4" height="4" /><color alpha="0.15" /></bezel>
+		<bezel element="hl" inputtag="IN.2" inputmask="0x08"><bounds x="12" y="47" width="4" height="4" /><color alpha="0.15" /></bezel>
+		<bezel element="hl" inputtag="IN.2" inputmask="0x04"><bounds x="18" y="47" width="4" height="4" /><color alpha="0.15" /></bezel>
+		<bezel element="hl" inputtag="IN.2" inputmask="0x02"><bounds x="24" y="47" width="4" height="4" /><color alpha="0.15" /></bezel>
+		<bezel element="hl" inputtag="IN.2" inputmask="0x01"><bounds x="30" y="47" width="4" height="4" /><color alpha="0.15" /></bezel>
+		<bezel element="hl" inputtag="IN.3" inputmask="0x40"><bounds x="36" y="47" width="4" height="4" /><color alpha="0.15" /></bezel>
+		<bezel element="hl" inputtag="IN.3" inputmask="0x20"><bounds x="42" y="47" width="4" height="4" /><color alpha="0.15" /></bezel>
+
+	</view>
+</mamelayout>

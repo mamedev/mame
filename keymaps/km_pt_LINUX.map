@@ -1,3 +1,8 @@
+#
+# FIXME: This file produces errors and needs to be fixed.
+#
+
+[SDL2]
 # MAME/MESS keymap for Portuguese QWERTY 105-keys keyboard (Linux)
 # SDL can tell the difference between the two COMPOSE keys but assigns them the same label
 # thus both CLOSEBRACE and BACKSLASH appear like "´ ~" in the user interface.
@@ -5,26 +10,26 @@
 #
 # Row 1
 #
-ITEM_ID_TILDE      SDLK_BACKSLASH 0x31 0x5c \
-ITEM_ID_MINUS      SDLK_QUOTE     0x14 0x27 '
-ITEM_ID_EQUALS     SDLK_WORLD_11  0x15 0xab «
+ITEM_ID_TILDE      SDL_SCANCODE_BACKSLASH \
+ITEM_ID_MINUS      SDL_SCANCODE_QUOTE     '
+ITEM_ID_EQUALS     SDL_SCANCODE_WORLD_11  «
 #
 # Row 2
 #
-ITEM_ID_OPENBRACE  SDLK_PLUS      0x22 0x2b +
-ITEM_ID_CLOSEBRACE SDLK_COMPOSE   0x23 0x00 ´
+ITEM_ID_OPENBRACE  SDL_SCANCODE_PLUS      +
+ITEM_ID_CLOSEBRACE SDL_SCANCODE_COMPOSE   ´
 #
 # Row 3
 #
-ITEM_ID_COLON      SDLK_WORLD_71  0x2f 0xe7 Ç
-ITEM_ID_QUOTE      SDLK_WORLD_26  0x30 0xba º
-ITEM_ID_BACKSLASH  SDLK_COMPOSE   0x33 0x00 ~
+ITEM_ID_COLON      SDL_SCANCODE_WORLD_71  Ç
+ITEM_ID_QUOTE      SDL_SCANCODE_WORLD_26  º
+ITEM_ID_BACKSLASH  SDL_SCANCODE_COMPOSE   ~
 #
 # Row 4
 #
-ITEM_ID_BACKSLASH2 SDLK_LESS      0x5e 0x3c <
-ITEM_ID_SLASH      SDLK_MINUS     0x3d 0x2d -
+ITEM_ID_BACKSLASH2 SDL_SCANCODE_LESS      <
+ITEM_ID_SLASH      SDL_SCANCODE_MINUS     -
 #
 # Row 5
 #
-ITEM_ID_RALT       SDLK_MODE      0x71 0x00 ALTGR
+ITEM_ID_RALT       SDL_SCANCODE_MODE      ALTGR

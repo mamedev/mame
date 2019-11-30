@@ -6,10 +6,10 @@
 #pragma once
 
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/z80daisy.h"
 #include "machine/com8116.h"
 #include "machine/ram.h"
-#include "machine/clock.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80ctc.h"
 #include "machine/z80dart.h"
@@ -69,7 +69,7 @@ private:
 
 	void bankswitch();
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
 	required_device<z80dart_device> m_dart;
 	required_device<z80dma_device> m_dma;

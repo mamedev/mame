@@ -106,8 +106,7 @@ void macpci_state::pippin(machine_config &config)
 	screen.set_screen_update(FUNC(macpci_state::screen_update_pippin));
 	screen.set_palette("palette");
 
-	palette_device &palette(PALETTE(config, "palette", 2));
-	palette.set_init("palette", FUNC(palette_device::palette_init_monochrome));
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -140,7 +139,7 @@ void macpci_state::pippin(machine_config &config)
 	m_cuda->linechange_callback().set(FUNC(macpci_state::cuda_adb_linechange_w));
 	m_cuda->via_clock_callback().set(m_via1, FUNC(via6522_device::write_cb1));
 	m_cuda->via_data_callback().set(m_via1, FUNC(via6522_device::write_cb2));
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 }
 
 /* ROM definition */

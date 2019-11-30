@@ -191,7 +191,7 @@ READ8Z_MEMBER(snug_high_speed_gpl_device::crureadz)
 /*
     Write hsgpl CRU interface
 */
-WRITE8_MEMBER(snug_high_speed_gpl_device::cruwrite)
+void snug_high_speed_gpl_device::cruwrite(offs_t offset, uint8_t data)
 {
 	// SuperCart handling - see gromport.c
 	if (m_supercart_enabled && ((offset & 0xfff0)==SUPERCART_BASE))
@@ -272,46 +272,46 @@ READ8Z_MEMBER(snug_high_speed_gpl_device::readz)
 {
 	if ((offset & 0x7e000)==0x74000)
 	{
-		dsrspace_readz(space, offset & 0xffff, value, mem_mask);
+		dsrspace_readz(offset & 0xffff, value);
 	}
 
 	if ((offset & 0x7e000)==0x76000)
 	{
-		cartspace_readz(space, offset & 0xffff, value, mem_mask);
+		cartspace_readz(offset & 0xffff, value);
 	}
 
 	// 1001 1wbb bbbb bba0
 	if ((offset & 0x7fc01)==0x79800)
 	{
-		grom_readz(space, offset & 0xffff, value, mem_mask);
+		grom_readz(offset & 0xffff, value);
 	}
 }
 
 /*
     Memory write
 */
-WRITE8_MEMBER(snug_high_speed_gpl_device::write)
+void snug_high_speed_gpl_device::write(offs_t offset, uint8_t data)
 {
 	if ((offset & 0x7e000)==0x76000)
 	{
-		cartspace_write(space, offset & 0xffff, data, mem_mask);
+		cartspace_write(offset & 0xffff, data);
 	}
 
 	// 1001 1wbb bbbb bba0
 	if ((offset & 0x7fc01)==0x79c00)
 	{
-		grom_write(space, offset & 0xffff, data, mem_mask);
+		grom_write(offset & 0xffff, data);
 	}
 }
 
 /*
     Specific read access: dsrspace
 */
-void snug_high_speed_gpl_device::dsrspace_readz(address_space& space, offs_t offset, uint8_t* value, uint8_t mem_mask)
+void snug_high_speed_gpl_device::dsrspace_readz(offs_t offset, uint8_t* value)
 {
 	if (m_dsr_enabled)
 	{
-		*value = m_dsr_eeprom->read(space, (offset & 0x1fff) | (m_dsr_page<<13), mem_mask);
+		*value = m_dsr_eeprom->read((offset & 0x1fff) | (m_dsr_page<<13));
 		LOGMASKED(LOG_READ, "read dsr %04x[%02x] -> %02x\n", offset, m_dsr_page, *value);
 	}
 }
@@ -319,7 +319,7 @@ void snug_high_speed_gpl_device::dsrspace_readz(address_space& space, offs_t off
 /*
     Specific read access: cartspace
 */
-void snug_high_speed_gpl_device::cartspace_readz(address_space& space, offs_t offset, uint8_t* value, uint8_t mem_mask)
+void snug_high_speed_gpl_device::cartspace_readz(offs_t offset, uint8_t* value)
 {
 	if (!m_card_enabled || m_flash_mode)
 	{
@@ -329,7 +329,7 @@ void snug_high_speed_gpl_device::cartspace_readz(address_space& space, offs_t of
 
 	if (m_module_bank < 16)
 	{
-		*value = m_rom6_eeprom->read(space, (offset & 0x1fff) | (m_current_bank<<13) | (m_current_grom_port<<15), mem_mask);
+		*value = m_rom6_eeprom->read((offset & 0x1fff) | (m_current_bank<<13) | (m_current_grom_port<<15));
 		LOGMASKED(LOG_READ, "cartridge space read %04x -> %02x\n", offset, *value);
 	}
 	else
@@ -351,7 +351,7 @@ void snug_high_speed_gpl_device::cartspace_readz(address_space& space, offs_t of
     it here - which is indeed closer to reality, since the real HSGPL also
     emulates GROM instead of using proper ones.
 */
-void snug_high_speed_gpl_device::grom_readz(address_space& space, offs_t offset, uint8_t* value, uint8_t mem_mask)
+void snug_high_speed_gpl_device::grom_readz(offs_t offset, uint8_t* value)
 {
 	if (machine().side_effects_disabled()) return;
 
@@ -397,7 +397,7 @@ void snug_high_speed_gpl_device::grom_readz(address_space& space, offs_t offset,
 				{
 					if (!m_flash_mode)
 					{
-						*value = m_grom_a_eeprom->read(space, m_grom_address | (port<<16), mem_mask);
+						*value = m_grom_a_eeprom->read(m_grom_address | (port<<16));
 						m_module_bank = port;
 						if (bNew) LOGMASKED(LOG_PORT, "GROM read access at %04x - switch to bank %d\n", offset & 0xffff, m_module_bank);
 					}
@@ -406,7 +406,7 @@ void snug_high_speed_gpl_device::grom_readz(address_space& space, offs_t offset,
 				{
 					if (port < 16)
 					{
-						*value = m_grom_b_eeprom->read(space, m_grom_address | ((port-8)<<16), mem_mask);
+						*value = m_grom_b_eeprom->read(m_grom_address | ((port-8)<<16));
 						m_module_bank = port;
 						if (bNew) LOGMASKED(LOG_PORT, "GROM read access at %04x - switch to bank %d\n", offset & 0xffff, m_module_bank);
 					}
@@ -416,7 +416,7 @@ void snug_high_speed_gpl_device::grom_readz(address_space& space, offs_t offset,
 						{
 							// 9840-985c
 							// DSR banks 0-63 (8 KiB per bank, 8 banks per port)
-							*value = m_dsr_eeprom->read(space, m_grom_address | ((port-16)<<16), mem_mask);
+							*value = m_dsr_eeprom->read(m_grom_address | ((port-16)<<16));
 							// Don't change the module port
 							if (bNew) LOGMASKED(LOG_DSR, "read access to DSR bank %d-%d (%04x)\n", (port-16)<<3, ((port-16)<<3)+7, offset);
 						}
@@ -427,7 +427,7 @@ void snug_high_speed_gpl_device::grom_readz(address_space& space, offs_t offset,
 								// 9860-987c (ports 24-31)
 								// Each ROM6 is available as 4 (sub)banks (switchable via 6000, 6002, 6004, 6006)
 								// Accordingly, each port has two complete sets
-								*value = m_rom6_eeprom->read(space, m_grom_address | ((port-24)<<16), mem_mask);
+								*value = m_rom6_eeprom->read(m_grom_address | ((port-24)<<16));
 								if (bNew) LOGMASKED(LOG_PORT, "ROM6 read access for module bank %d-%d (%04x)\n", (port-24)<<1, ((port-24)<<1)+1, offset & 0xffff);
 							}
 							else
@@ -469,7 +469,7 @@ void snug_high_speed_gpl_device::grom_readz(address_space& space, offs_t offset,
 /*
     Specific write access: cartspace
 */
-void snug_high_speed_gpl_device::cartspace_write(address_space& space, offs_t offset, uint8_t data, uint8_t mem_mask)
+void snug_high_speed_gpl_device::cartspace_write(offs_t offset, uint8_t data)
 {
 	if (!m_card_enabled || m_flash_mode)
 	{
@@ -537,7 +537,7 @@ void snug_high_speed_gpl_device::cartspace_write(address_space& space, offs_t of
 /*
     Specific write access: grom_write
 */
-void snug_high_speed_gpl_device::grom_write(address_space& space, offs_t offset, uint8_t data, uint8_t mem_mask)
+void snug_high_speed_gpl_device::grom_write(offs_t offset, uint8_t data)
 {
 	if (machine().side_effects_disabled()) return;
 
@@ -583,7 +583,7 @@ void snug_high_speed_gpl_device::grom_write(address_space& space, offs_t offset,
 				{
 					if (port < 8)
 					{
-						m_grom_a_eeprom->write(space, m_grom_address | (port<<16), data, mem_mask);
+						m_grom_a_eeprom->write(m_grom_address | (port<<16), data);
 						m_module_bank = port;
 						if (bNew) LOGMASKED(LOG_PORT, "GROM write access at %04x - switch to bank %d\n", offset & 0xffff, port);
 					}
@@ -591,7 +591,7 @@ void snug_high_speed_gpl_device::grom_write(address_space& space, offs_t offset,
 					{
 						if (port < 16)
 						{
-							m_grom_b_eeprom->write(space, m_grom_address | ((port-8)<<16), data, mem_mask);
+							m_grom_b_eeprom->write(m_grom_address | ((port-8)<<16), data);
 							m_module_bank = port;
 							if (bNew) LOGMASKED(LOG_PORT, "GROM write access at %04x - switch to bank %d\n", offset & 0xffff, port);
 						}
@@ -599,14 +599,14 @@ void snug_high_speed_gpl_device::grom_write(address_space& space, offs_t offset,
 						{
 							if (port < 24)
 							{
-								m_dsr_eeprom->write(space, m_grom_address | ((port-16)<<16), data, mem_mask);
+								m_dsr_eeprom->write(m_grom_address | ((port-16)<<16), data);
 								if (bNew) LOGMASKED(LOG_DSR, "write access to DSR bank %d-%d (%04x)\n", (port-16)<<3, ((port-16)<<3)+7, offset);
 							}
 							else
 							{
 								if (port < 32)
 								{
-									m_rom6_eeprom->write(space, m_grom_address | ((port-24)<<16), data, mem_mask);
+									m_rom6_eeprom->write(m_grom_address | ((port-24)<<16), data);
 									if (bNew) LOGMASKED(LOG_PORT, "ROM6 write access for module bank %d-%d (%04x)\n", (port-24)<<1, ((port-24)<<1)+1,offset & 0xffff);
 								}
 								else

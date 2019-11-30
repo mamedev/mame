@@ -13,6 +13,7 @@
 #include "machine/gen_latch.h"
 #include "machine/input_merger.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class kingofb_state : public driver_device
 {
@@ -58,28 +59,28 @@ private:
 	/* devices */
 	required_device<cpu_device> m_video_cpu;
 	required_device<cpu_device> m_sprite_cpu;
-	DECLARE_WRITE8_MEMBER(video_interrupt_w);
-	DECLARE_WRITE8_MEMBER(sprite_interrupt_w);
-	DECLARE_WRITE8_MEMBER(scroll_interrupt_w);
-	DECLARE_WRITE8_MEMBER(sound_command_w);
-	DECLARE_WRITE8_MEMBER(kingofb_videoram_w);
-	DECLARE_WRITE8_MEMBER(kingofb_colorram_w);
-	DECLARE_WRITE8_MEMBER(kingofb_videoram2_w);
-	DECLARE_WRITE8_MEMBER(kingofb_colorram2_w);
-	DECLARE_WRITE8_MEMBER(kingofb_f800_w);
+	void video_interrupt_w(uint8_t data);
+	void sprite_interrupt_w(uint8_t data);
+	void scroll_interrupt_w(uint8_t data);
+	void sound_command_w(uint8_t data);
+	void kingofb_videoram_w(offs_t offset, uint8_t data);
+	void kingofb_colorram_w(offs_t offset, uint8_t data);
+	void kingofb_videoram2_w(offs_t offset, uint8_t data);
+	void kingofb_colorram2_w(offs_t offset, uint8_t data);
+	void kingofb_f800_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(ringking_get_bg_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_VIDEO_START(kingofb);
-	DECLARE_PALETTE_INIT(kingofb);
+	void kingofb_palette(palette_device &palette);
 	DECLARE_VIDEO_START(ringking);
-	DECLARE_PALETTE_INIT(ringking);
+	void ringking_palette(palette_device &palette);
 	uint32_t screen_update_kingofb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_ringking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(kingofb_interrupt);
-	void palette_init_common( palette_device &palette, const uint8_t *color_prom, void (kingofb_state::*get_rgb_data)(const uint8_t *, int, int *, int *, int *) );
+	void palette_init_common(palette_device &palette, const uint8_t *color_prom, void (kingofb_state::*get_rgb_data)(const uint8_t *, int, int *, int *, int *));
 	void kingofb_get_rgb_data( const uint8_t *color_prom, int i, int *r_data, int *g_data, int *b_data );
 	void ringking_get_rgb_data( const uint8_t *color_prom, int i, int *r_data, int *g_data, int *b_data );
 	void kingofb_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);

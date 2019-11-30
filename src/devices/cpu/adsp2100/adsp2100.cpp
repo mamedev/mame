@@ -1104,7 +1104,7 @@ void adsp21xx_device::create_tables()
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-uint32_t adsp21xx_device::execute_min_cycles() const
+uint32_t adsp21xx_device::execute_min_cycles() const noexcept
 {
 	return 1;
 }
@@ -1115,7 +1115,7 @@ uint32_t adsp21xx_device::execute_min_cycles() const
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-uint32_t adsp21xx_device::execute_max_cycles() const
+uint32_t adsp21xx_device::execute_max_cycles() const noexcept
 {
 	return 1;
 }
@@ -1126,17 +1126,17 @@ uint32_t adsp21xx_device::execute_max_cycles() const
 //  input/interrupt lines
 //-------------------------------------------------
 
-uint32_t adsp2100_device::execute_input_lines() const
+uint32_t adsp2100_device::execute_input_lines() const noexcept
 {
 	return 4;
 }
 
-uint32_t adsp2101_device::execute_input_lines() const
+uint32_t adsp2101_device::execute_input_lines() const noexcept
 {
 	return 5;
 }
 
-uint32_t adsp2181_device::execute_input_lines() const
+uint32_t adsp2181_device::execute_input_lines() const noexcept
 {
 	return 9;
 }

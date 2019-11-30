@@ -38,7 +38,6 @@
 
 #include "emu.h"
 #include "handset.h"
-#include "machine/tms9901.h"
 
 #define LOG_WARN        (1U<<1)   // Warnings
 #define LOG_CONFIG      (1U<<2)   // Configuration

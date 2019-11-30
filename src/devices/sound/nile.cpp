@@ -69,6 +69,11 @@ nile_device::nile_device(const machine_config &mconfig, const char *tag, device_
 void nile_device::device_start()
 {
 	m_stream = stream_alloc(0, 2, 44100);
+	save_item(NAME(m_sound_regs));
+	save_item(NAME(m_vpos));
+	save_item(NAME(m_frac));
+	save_item(NAME(m_lponce));
+	save_item(NAME(m_ctrl));
 }
 
 

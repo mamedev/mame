@@ -5,9 +5,11 @@
 
 #pragma once
 
+#include "cpu/m6502/n2a03.h"
 #include "machine/rp5h01.h"
 #include "video/ppu2c0x.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class playch10_state : public driver_device
 {
@@ -50,7 +52,7 @@ public:
 	void init_pckboard();
 	void init_pc_hrz();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(pc10_int_detect_r);
+	DECLARE_READ_LINE_MEMBER(int_detect_r);
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(up8w_w);
@@ -102,7 +104,7 @@ private:
 		uint8_t* chr;     // direct access to the memory
 	};
 
-	DECLARE_PALETTE_INIT(playch10);
+	void playch10_palette(palette_device &palette) const;
 	DECLARE_MACHINE_START(playch10_hboard);
 	DECLARE_VIDEO_START(playch10_hboard);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
@@ -119,7 +121,7 @@ private:
 	uint32_t screen_update_playch10_single(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_cartcpu;
+	required_device<n2a03_device> m_cartcpu;
 	required_device<ppu2c0x_device> m_ppu;
 	optional_device<rp5h01_device> m_rp5h01;
 

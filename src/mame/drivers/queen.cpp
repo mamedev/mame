@@ -176,7 +176,7 @@ uint8_t queen_state::piix4_config_r(int function, int reg)
 
 void queen_state::piix4_config_w(int function, int reg, uint8_t data)
 {
-//  osd_printf_debug("%s:PIIX4: write %d, %02X, %02X\n", machine().describe_context().c_str(), function, reg, data);
+//  osd_printf_debug("%s:PIIX4: write %d, %02X, %02X\n", machine().describe_context(), function, reg, data);
 	m_piix4_config_reg[function][reg] = data;
 }
 
@@ -280,19 +280,18 @@ void queen_state::machine_reset()
 	membank("bios_ext")->set_base(memregion("bios")->base() + 0x20000);
 }
 
-
-
-MACHINE_CONFIG_START(queen_state::queen)
-	MCFG_DEVICE_ADD("maincpu", PENTIUM3, 533000000/16) // Celeron or Pentium 3, 533 Mhz
-	MCFG_DEVICE_PROGRAM_MAP(queen_map)
-	MCFG_DEVICE_IO_MAP(queen_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
+void queen_state::queen(machine_config &config)
+{
+	PENTIUM3(config, m_maincpu, 533000000/16); // Celeron or Pentium 3, 533 Mhz
+	m_maincpu->set_addrmap(AS_PROGRAM, &queen_state::queen_map);
+	m_maincpu->set_addrmap(AS_IO, &queen_state::queen_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
 
 	pcat_common(config);
 
-	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
-	MCFG_PCI_BUS_LEGACY_DEVICE(0, DEVICE_SELF, queen_state, intel82439tx_pci_r, intel82439tx_pci_w)
-	MCFG_PCI_BUS_LEGACY_DEVICE(7, DEVICE_SELF, queen_state, intel82371ab_pci_r, intel82371ab_pci_w)
+	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
+	pcibus.set_device(0, FUNC(queen_state::intel82439tx_pci_r), FUNC(queen_state::intel82439tx_pci_w));
+	pcibus.set_device(7, FUNC(queen_state::intel82371ab_pci_r), FUNC(queen_state::intel82371ab_pci_w));
 
 	ide_controller_device &ide(IDE_CONTROLLER(config, "ide").options(ata_devices, "hdd", nullptr, true));
 	ide.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir6_w));
@@ -302,13 +301,11 @@ MACHINE_CONFIG_START(queen_state::queen)
 
 	/* video hardware */
 	pcvideo_vga(config);
-MACHINE_CONFIG_END
-
-
+}
 
 
 ROM_START( queen )
-	ROM_REGION( 0x40000, "bios", 0 )
+	ROM_REGION32_LE( 0x40000, "bios", 0 )
 	ROM_LOAD( "bios-original.bin", 0x00000, 0x40000, CRC(feb542d4) SHA1(3cc5d8aeb0e3b7d9ed33248a4f3dc507d29debd9) )
 
 	ROM_REGION( 0x8000, "video_bios", ROMREGION_ERASEFF ) // TODO: no VGA card is hooked up, to be removed

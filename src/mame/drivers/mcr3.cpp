@@ -104,7 +104,6 @@
 
 
 #include "emu.h"
-#include "includes/mcr.h"
 #include "includes/mcr3.h"
 
 #include "machine/nvram.h"
@@ -260,11 +259,11 @@ WRITE8_MEMBER(mcr3_state::maxrpm_op6_w)
 
 	/* when the read is toggled is when the ADC value is latched */
 	if (!(data & 0x80))
-		m_latched_input = m_maxrpm_adc->read(space, 0);
+		m_latched_input = m_maxrpm_adc->read();
 
 	/* when both the write and the enable are low, it's a write to the ADC0844 */
 	if (!(data & 0x40) && !(data & 0x20))
-		m_maxrpm_adc->write(space, 0, bitswap<4>(m_maxrpm_adc_control, 2, 3, 1, 0));
+		m_maxrpm_adc->write(bitswap<4>(m_maxrpm_adc_control, 2, 3, 1, 0));
 
 	/* low 5 bits control the turbo CS */
 	m_turbo_cheap_squeak->write(space, offset, data);
@@ -390,7 +389,7 @@ WRITE8_MEMBER(mcr3_state::stargrds_op6_w)
 
 READ8_MEMBER(mcr3_state::spyhunt_ip1_r)
 {
-	return ioport("ssio:IP1")->read() | (m_cheap_squeak_deluxe->stat_r(space, 0) << 5);
+	return ioport("ssio:IP1")->read() | (m_cheap_squeak_deluxe->stat_r() << 5);
 }
 
 
@@ -430,7 +429,7 @@ WRITE8_MEMBER(mcr3_state::spyhunt_op4_w)
 	m_last_op4 = data;
 
 	/* low 5 bits go to control the Cheap Squeak Deluxe */
-	m_cheap_squeak_deluxe->sr_w(space, offset, data & 0x0f);
+	m_cheap_squeak_deluxe->sr_w(data & 0x0f);
 	m_cheap_squeak_deluxe->sirq_w(BIT(data, 4));
 }
 
@@ -526,7 +525,7 @@ void mcr3_state::spyhunt_portmap(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	m_ssio->ssio_input_ports(map, "ssio");
+	midway_ssio_device::ssio_input_ports(map, "ssio");
 	map(0x84, 0x86).w(FUNC(mcr3_state::spyhunt_scroll_value_w));
 	map(0xe0, 0xe0).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0xe8, 0xe8).nopw();
@@ -1078,21 +1077,21 @@ GFXDECODE_END
  *************************************/
 
 /* Core MCR monoboard system with no sound */
-MACHINE_CONFIG_START(mcr3_state::mcrmono)
-
+void mcr3_state::mcrmono(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(mcrmono_map)
-	MCFG_DEVICE_IO_MAP(mcrmono_portmap)
-	MCFG_Z80_DAISY_CHAIN(mcr_daisy_chain)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mcr3_state, mcr_interrupt, "screen", 0, 1)
+	Z80(config, m_maincpu, MASTER_CLOCK/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mcr3_state::mcrmono_map);
+	m_maincpu->set_addrmap(AS_IO, &mcr3_state::mcrmono_portmap);
+	m_maincpu->set_daisy_config(mcr_daisy_chain);
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, MASTER_CLOCK/4 /* same as "maincpu" */)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE("ctc", z80ctc_device, trg1))
+	TIMER(config, "scantimer").configure_scanline(FUNC(mcr3_state::mcr_interrupt), "screen", 0, 1);
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 16)
+	Z80CTC(config, m_ctc, MASTER_CLOCK/4 /* same as "maincpu" */);
+	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ctc->zc_callback<0>().set(m_ctc, FUNC(z80ctc_device::trg1));
+
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 16);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -1101,38 +1100,39 @@ MACHINE_CONFIG_START(mcr3_state::mcrmono)
 	SPEAKER(config, "rspeaker").front_right();
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(30)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*16, 30*16)
-	MCFG_SCREEN_VISIBLE_AREA(0*16, 32*16-1, 0*16, 30*16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(mcr3_state, screen_update_mcr3)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	m_screen->set_refresh_hz(30);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	m_screen->set_size(32*16, 30*16);
+	m_screen->set_visarea(0*16, 32*16-1, 0*16, 30*16-1);
+	m_screen->set_screen_update(FUNC(mcr3_state::screen_update_mcr3));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mcr3)
-	MCFG_PALETTE_ADD("palette", 64)
-MACHINE_CONFIG_END
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mcr3);
+	PALETTE(config, m_palette).set_entries(64);
+}
 
 
 /*************************************/
 
 
 /* Sarge/Demolition Derby Mono/Max RPM = MCR monoboard with Turbo Cheap Squeak */
-MACHINE_CONFIG_START(mcr3_state::mono_tcs)
+void mcr3_state::mono_tcs(machine_config &config)
+{
 	mcrmono(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("tcs", MIDWAY_TURBO_CHEAP_SQUEAK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	MIDWAY_TURBO_CHEAP_SQUEAK(config, m_turbo_cheap_squeak);
+	m_turbo_cheap_squeak->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_turbo_cheap_squeak->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+}
 
 void mcr3_state::maxrpm(machine_config &config)
 {
 	mono_tcs(config);
 
-	ADC0844(config, m_maxrpm_adc, 0);
+	ADC0844(config, m_maxrpm_adc);
 	m_maxrpm_adc->ch1_callback().set_ioport("MONO.IP1");
 	m_maxrpm_adc->ch2_callback().set_ioport("MONO.IP1.ALT1");
 	m_maxrpm_adc->ch3_callback().set_ioport("MONO.IP1.ALT2");
@@ -1141,54 +1141,53 @@ void mcr3_state::maxrpm(machine_config &config)
 
 
 /* Rampage/Power Drive/Star Guards = MCR monoboard with Sounds Good */
-MACHINE_CONFIG_START(mcr3_state::mono_sg)
+void mcr3_state::mono_sg(machine_config &config)
+{
 	mcrmono(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("sg", MIDWAY_SOUNDS_GOOD)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	MIDWAY_SOUNDS_GOOD(config, m_sounds_good);
+	m_sounds_good->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_sounds_good->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+}
 
 
 /*************************************/
 
 
 /* Core scrolling system with SSIO sound */
-MACHINE_CONFIG_START(mcr3_state::mcrscroll)
+void mcr3_state::mcrscroll(machine_config &config)
+{
 	mcrmono(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("ssio", MIDWAY_SSIO)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MIDWAY_SSIO(config, m_ssio);
+	m_ssio->add_route(0, "lspeaker", 1.0);
+	m_ssio->add_route(1, "rspeaker", 1.0);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(spyhunt_map)
-	MCFG_DEVICE_IO_MAP(spyhunt_portmap)
+	m_maincpu->set_addrmap(AS_PROGRAM, &mcr3_state::spyhunt_map);
+	m_maincpu->set_addrmap(AS_IO, &mcr3_state::spyhunt_portmap);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_SIZE(30*16, 30*16)
-	MCFG_SCREEN_VISIBLE_AREA(0, 30*16-1, 0, 30*16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(mcr3_state, screen_update_spyhunt)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_spyhunt)
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(64+4)
+	m_screen->set_size(30*16, 30*16);
+	m_screen->set_visarea(0, 30*16-1, 0, 30*16-1);
+	m_screen->set_screen_update(FUNC(mcr3_state::screen_update_spyhunt));
+	m_gfxdecode->set_info(gfx_spyhunt);
+	subdevice<palette_device>("palette")->set_entries(64 + 4).set_init(FUNC(mcr3_state::spyhunt_palette));
 
-	MCFG_PALETTE_INIT_OWNER(mcr3_state,spyhunt)
 	MCFG_VIDEO_START_OVERRIDE(mcr3_state,spyhunt)
-MACHINE_CONFIG_END
+}
 
 
 /* Spy Hunter = scrolling system with an SSIO and a cheap squeak deluxe */
-MACHINE_CONFIG_START(mcr3_state::mcrsc_csd)
+void mcr3_state::mcrsc_csd(machine_config &config)
+{
 	mcrscroll(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("csd", MIDWAY_CHEAP_SQUEAK_DELUXE)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MIDWAY_CHEAP_SQUEAK_DELUXE(config, m_cheap_squeak_deluxe);
+	m_cheap_squeak_deluxe->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_cheap_squeak_deluxe->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
 	CD4099(config, m_lamplatch); // U1 on Lamp Driver Board
 	m_lamplatch->q_out_cb<0>().set_output("lamp0");
@@ -1199,12 +1198,7 @@ MACHINE_CONFIG_START(mcr3_state::mcrsc_csd)
 	m_lamplatch->q_out_cb<5>().set_output("lamp5");
 	m_lamplatch->q_out_cb<6>().set_output("lamp6");
 	m_lamplatch->q_out_cb<7>().set_output("lamp7");
-MACHINE_CONFIG_END
-
-
-
-
-
+}
 
 
 /*************************************
@@ -1575,26 +1569,26 @@ void mcr3_state::mcr_common_init()
 void mcr3_state::init_demoderm()
 {
 	mcr_common_init();
-	m_maincpu->space(AS_IO).install_read_handler(0x01, 0x01, read8_delegate(FUNC(mcr3_state::demoderm_ip1_r),this));
-	m_maincpu->space(AS_IO).install_read_handler(0x02, 0x02, read8_delegate(FUNC(mcr3_state::demoderm_ip2_r),this));
-	m_maincpu->space(AS_IO).install_write_handler(0x06, 0x06, write8_delegate(FUNC(mcr3_state::demoderm_op6_w),this));
+	m_maincpu->space(AS_IO).install_read_handler(0x01, 0x01, read8_delegate(*this, FUNC(mcr3_state::demoderm_ip1_r)));
+	m_maincpu->space(AS_IO).install_read_handler(0x02, 0x02, read8_delegate(*this, FUNC(mcr3_state::demoderm_ip2_r)));
+	m_maincpu->space(AS_IO).install_write_handler(0x06, 0x06, write8_delegate(*this, FUNC(mcr3_state::demoderm_op6_w)));
 }
 
 
 void mcr3_state::init_sarge()
 {
 	mcr_common_init();
-	m_maincpu->space(AS_IO).install_write_handler(0x06, 0x06, write8_delegate(FUNC(midway_turbo_cheap_squeak_device::write),m_turbo_cheap_squeak.target()));
+	m_maincpu->space(AS_IO).install_write_handler(0x06, 0x06, write8_delegate(*m_turbo_cheap_squeak, FUNC(midway_turbo_cheap_squeak_device::write)));
 }
 
 
 void mcr3_state::init_maxrpm()
 {
 	mcr_common_init();
-	m_maincpu->space(AS_IO).install_read_handler(0x01, 0x01, read8_delegate(FUNC(mcr3_state::maxrpm_ip1_r),this));
-	m_maincpu->space(AS_IO).install_read_handler(0x02, 0x02, read8_delegate(FUNC(mcr3_state::maxrpm_ip2_r),this));
-	m_maincpu->space(AS_IO).install_write_handler(0x05, 0x05, write8_delegate(FUNC(mcr3_state::maxrpm_op5_w),this));
-	m_maincpu->space(AS_IO).install_write_handler(0x06, 0x06, write8_delegate(FUNC(mcr3_state::maxrpm_op6_w),this));
+	m_maincpu->space(AS_IO).install_read_handler(0x01, 0x01, read8_delegate(*this, FUNC(mcr3_state::maxrpm_ip1_r)));
+	m_maincpu->space(AS_IO).install_read_handler(0x02, 0x02, read8_delegate(*this, FUNC(mcr3_state::maxrpm_ip2_r)));
+	m_maincpu->space(AS_IO).install_write_handler(0x05, 0x05, write8_delegate(*this, FUNC(mcr3_state::maxrpm_op5_w)));
+	m_maincpu->space(AS_IO).install_write_handler(0x06, 0x06, write8_delegate(*this, FUNC(mcr3_state::maxrpm_op6_w)));
 
 	save_item(NAME(m_maxrpm_adc_control));
 	save_item(NAME(m_maxrpm_last_shift));
@@ -1606,35 +1600,35 @@ void mcr3_state::init_maxrpm()
 void mcr3_state::init_rampage()
 {
 	mcr_common_init();
-	m_maincpu->space(AS_IO).install_read_handler(0x04, 0x04, read8_delegate(FUNC(mcr3_state::rampage_ip4_r),this));
-	m_maincpu->space(AS_IO).install_write_handler(0x06, 0x06, write8_delegate(FUNC(mcr3_state::rampage_op6_w),this));
+	m_maincpu->space(AS_IO).install_read_handler(0x04, 0x04, read8_delegate(*this, FUNC(mcr3_state::rampage_ip4_r)));
+	m_maincpu->space(AS_IO).install_write_handler(0x06, 0x06, write8_delegate(*this, FUNC(mcr3_state::rampage_op6_w)));
 }
 
 
 void mcr3_state::init_powerdrv()
 {
 	mcr_common_init();
-	m_maincpu->space(AS_IO).install_read_handler(0x02, 0x02, read8_delegate(FUNC(mcr3_state::powerdrv_ip2_r),this));
-	m_maincpu->space(AS_IO).install_write_handler(0x05, 0x05, write8_delegate(FUNC(mcr3_state::powerdrv_op5_w),this));
-	m_maincpu->space(AS_IO).install_write_handler(0x06, 0x06, write8_delegate(FUNC(mcr3_state::powerdrv_op6_w),this));
+	m_maincpu->space(AS_IO).install_read_handler(0x02, 0x02, read8_delegate(*this, FUNC(mcr3_state::powerdrv_ip2_r)));
+	m_maincpu->space(AS_IO).install_write_handler(0x05, 0x05, write8_delegate(*this, FUNC(mcr3_state::powerdrv_op5_w)));
+	m_maincpu->space(AS_IO).install_write_handler(0x06, 0x06, write8_delegate(*this, FUNC(mcr3_state::powerdrv_op6_w)));
 }
 
 
 void mcr3_state::init_stargrds()
 {
 	mcr_common_init();
-	m_maincpu->space(AS_IO).install_read_handler(0x00, 0x00, read8_delegate(FUNC(mcr3_state::stargrds_ip0_r),this));
-	m_maincpu->space(AS_IO).install_write_handler(0x05, 0x05, write8_delegate(FUNC(mcr3_state::stargrds_op5_w),this));
-	m_maincpu->space(AS_IO).install_write_handler(0x06, 0x06, write8_delegate(FUNC(mcr3_state::stargrds_op6_w),this));
+	m_maincpu->space(AS_IO).install_read_handler(0x00, 0x00, read8_delegate(*this, FUNC(mcr3_state::stargrds_ip0_r)));
+	m_maincpu->space(AS_IO).install_write_handler(0x05, 0x05, write8_delegate(*this, FUNC(mcr3_state::stargrds_op5_w)));
+	m_maincpu->space(AS_IO).install_write_handler(0x06, 0x06, write8_delegate(*this, FUNC(mcr3_state::stargrds_op6_w)));
 }
 
 
 void mcr3_state::init_spyhunt()
 {
 	mcr_common_init();
-	m_ssio->set_custom_input(1, 0x60, read8_delegate(FUNC(mcr3_state::spyhunt_ip1_r),this));
-	m_ssio->set_custom_input(2, 0xff, read8_delegate(FUNC(mcr3_state::spyhunt_ip2_r),this));
-	m_ssio->set_custom_output(4, 0xff, write8_delegate(FUNC(mcr3_state::spyhunt_op4_w),this));
+	m_ssio->set_custom_input(1, 0x60, *this, FUNC(mcr3_state::spyhunt_ip1_r));
+	m_ssio->set_custom_input(2, 0xff, *this, FUNC(mcr3_state::spyhunt_ip2_r));
+	m_ssio->set_custom_output(4, 0xff, *this, FUNC(mcr3_state::spyhunt_op4_w));
 
 	m_spyhunt_sprite_color_mask = 0x00;
 	m_spyhunt_scroll_offset = 16;
@@ -1654,9 +1648,9 @@ void mcr3_state::init_crater()
 void mcr3_state::init_turbotag()
 {
 	mcr_common_init();
-	m_ssio->set_custom_input(1, 0x60, read8_delegate(FUNC(mcr3_state::spyhunt_ip1_r),this));
-	m_ssio->set_custom_input(2, 0xff, read8_delegate(FUNC(mcr3_state::turbotag_ip2_r),this));
-	m_ssio->set_custom_output(4, 0xff, write8_delegate(FUNC(mcr3_state::spyhunt_op4_w),this));
+	m_ssio->set_custom_input(1, 0x60, *this, FUNC(mcr3_state::spyhunt_ip1_r));
+	m_ssio->set_custom_input(2, 0xff, *this, FUNC(mcr3_state::turbotag_ip2_r));
+	m_ssio->set_custom_output(4, 0xff, *this, FUNC(mcr3_state::spyhunt_op4_w));
 
 	m_spyhunt_sprite_color_mask = 0x00;
 	m_spyhunt_scroll_offset = 88;
@@ -1665,7 +1659,7 @@ void mcr3_state::init_turbotag()
 	m_cheap_squeak_deluxe->suspend_cpu();
 
 	/* kludge for bad ROM read */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0b53, 0x0b53, read8_delegate(FUNC(mcr3_state::turbotag_kludge_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0b53, 0x0b53, read8_delegate(*this, FUNC(mcr3_state::turbotag_kludge_r)));
 }
 
 

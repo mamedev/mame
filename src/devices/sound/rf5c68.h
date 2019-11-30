@@ -11,13 +11,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_RF5C68_SAMPLE_END_CB(_class, _method) \
-	downcast<rf5c68_device &>(*device).set_end_callback(rf5c68_device::sample_end_cb_delegate(&_class::_method, #_class "::" #_method, this));
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -35,13 +28,13 @@ public:
 
 	rf5c68_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <typename Object> void set_end_callback(Object &&cb) { m_sample_end_cb = std::forward<Object>(cb); }
+	template <typename... T> void set_end_callback(T &&... args) { m_sample_end_cb.set(std::forward<T>(args)...); }
 
-	DECLARE_READ8_MEMBER( rf5c68_r );
-	DECLARE_WRITE8_MEMBER( rf5c68_w );
+	u8 rf5c68_r(offs_t offset);
+	void rf5c68_w(offs_t offset, u8 data);
 
-	DECLARE_READ8_MEMBER( rf5c68_mem_r );
-	DECLARE_WRITE8_MEMBER( rf5c68_mem_w );
+	u8 rf5c68_mem_r(offs_t offset);
+	void rf5c68_mem_w(offs_t offset, u8 data);
 
 protected:
 	rf5c68_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);

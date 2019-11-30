@@ -15,17 +15,15 @@ The data bus is 16 bits wide.
 #include "emu.h"
 #include "tc0110pcr.h"
 
-#define TC0110PCR_RAM_SIZE 0x2000
-
 
 DEFINE_DEVICE_TYPE(TC0110PCR, tc0110pcr_device, "tc0110pcr", "Taito TC0110PCR")
 
-tc0110pcr_device::tc0110pcr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tc0110pcr_device::tc0110pcr_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, TC0110PCR, tag, owner, clock)
+	, device_palette_interface(mconfig, *this)
 	, m_ram(nullptr)
 	, m_type(0)
 	, m_addr(0)
-	, m_palette(*this, finder_base::DUMMY_TAG)
 {
 }
 
@@ -40,8 +38,6 @@ void tc0110pcr_device::device_start()
 	save_pointer(NAME(m_ram), TC0110PCR_RAM_SIZE);
 	save_item(NAME(m_type));
 	save_item(NAME(m_addr));
-	machine().save().register_postload(save_prepost_delegate(FUNC(tc0110pcr_device::restore_colors), this));
-
 }
 
 //-------------------------------------------------
@@ -53,18 +49,26 @@ void tc0110pcr_device::device_reset()
 	m_type = 0;    /* default, xBBBBBGGGGGRRRRR */
 }
 
+//-------------------------------------------------
+//  device_post_load - device-specific postload
+//-------------------------------------------------
+
+void tc0110pcr_device::device_post_load()
+{
+	restore_colors();
+}
+
 /*****************************************************************************
     DEVICE HANDLERS
 *****************************************************************************/
 
 void tc0110pcr_device::restore_colors()
 {
-	int i, color, r = 0, g = 0, b = 0;
-
-	for (i = 0; i < (256 * 16); i++)
+	for (int i = 0; i < (256 * 16); i++)
 	{
-		color = m_ram[i];
+		const u16 color = m_ram[i];
 
+		u8 r = 0, g = 0, b = 0;
 		switch (m_type)
 		{
 			case 0x00:
@@ -92,12 +96,12 @@ void tc0110pcr_device::restore_colors()
 			}
 		}
 
-		m_palette->set_pen_color(i, rgb_t(r, g, b));
+		set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
 
-READ16_MEMBER(tc0110pcr_device::word_r )
+u16 tc0110pcr_device::word_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -110,7 +114,7 @@ READ16_MEMBER(tc0110pcr_device::word_r )
 	}
 }
 
-WRITE16_MEMBER(tc0110pcr_device::word_w )
+void tc0110pcr_device::word_w(offs_t offset, u16 data)
 {
 	switch (offset)
 	{
@@ -123,7 +127,7 @@ WRITE16_MEMBER(tc0110pcr_device::word_w )
 
 		case 1:
 			m_ram[m_addr] = data & 0xffff;
-			m_palette->set_pen_color(m_addr, pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
+			set_pen_color(m_addr, pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
 			break;
 
 		default:
@@ -132,7 +136,7 @@ WRITE16_MEMBER(tc0110pcr_device::word_w )
 	}
 }
 
-WRITE16_MEMBER(tc0110pcr_device::step1_word_w )
+void tc0110pcr_device::step1_word_w(offs_t offset, u16 data)
 {
 	switch (offset)
 	{
@@ -144,7 +148,7 @@ WRITE16_MEMBER(tc0110pcr_device::step1_word_w )
 
 		case 1:
 			m_ram[m_addr] = data & 0xffff;
-			m_palette->set_pen_color(m_addr, pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
+			set_pen_color(m_addr, pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
 			break;
 
 		default:
@@ -153,7 +157,7 @@ WRITE16_MEMBER(tc0110pcr_device::step1_word_w )
 	}
 }
 
-WRITE16_MEMBER(tc0110pcr_device::step1_rbswap_word_w )
+void tc0110pcr_device::step1_rbswap_word_w(offs_t offset, u16 data)
 {
 	m_type = 1;    /* xRRRRRGGGGGBBBBB */
 
@@ -167,7 +171,7 @@ WRITE16_MEMBER(tc0110pcr_device::step1_rbswap_word_w )
 
 		case 1:
 			m_ram[m_addr] = data & 0xffff;
-			m_palette->set_pen_color(m_addr, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
+			set_pen_color(m_addr, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 			break;
 
 		default:
@@ -176,7 +180,7 @@ WRITE16_MEMBER(tc0110pcr_device::step1_rbswap_word_w )
 	}
 }
 
-WRITE16_MEMBER(tc0110pcr_device::step1_4bpg_word_w )
+void tc0110pcr_device::step1_4bpg_word_w(offs_t offset, u16 data)
 {
 	m_type = 2;    /* xxxxBBBBGGGGRRRR */
 
@@ -190,7 +194,7 @@ WRITE16_MEMBER(tc0110pcr_device::step1_4bpg_word_w )
 
 		case 1:
 			m_ram[m_addr] = data & 0xffff;
-			m_palette->set_pen_color(m_addr, pal4bit(data >> 0), pal4bit(data >> 4), pal4bit(data >> 8));
+			set_pen_color(m_addr, pal4bit(data >> 0), pal4bit(data >> 4), pal4bit(data >> 8));
 			break;
 
 		default:

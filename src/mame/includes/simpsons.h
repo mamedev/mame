@@ -1,23 +1,30 @@
 // license:BSD-3-Clause
 // copyright-holders:Ernesto Corvi
+#ifndef MAME_INCLUDES_SIMPSONS_H
+#define MAME_INCLUDES_SIMPSONS_H
+
+#pragma once
+
+#include "cpu/m6809/konami.h" // for the callback and the firq irq definition
 #include "machine/bankdev.h"
-#include "video/k053246_k053247_k055673.h"
 #include "video/k052109.h"
 #include "video/k053251.h"
+#include "video/k053246_k053247_k055673.h"
 #include "video/konami_helper.h"
 
 class simpsons_state : public driver_device
 {
 public:
-	simpsons_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	simpsons_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_bank0000(*this, "bank0000"),
 		m_bank2000(*this, "bank2000"),
 		m_k052109(*this, "k052109"),
 		m_k053246(*this, "k053246"),
-		m_k053251(*this, "k053251") { }
+		m_k053251(*this, "k053251")
+	{ }
 
 	void simpsons(machine_config &config);
 
@@ -41,7 +48,7 @@ private:
 	//int        m_nmi_enabled;
 
 	/* devices */
-	required_device<cpu_device> m_maincpu;
+	required_device<konami_cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<address_map_bank_device> m_bank0000;
 	required_device<address_map_bank_device> m_bank2000;
@@ -74,3 +81,5 @@ private:
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
+
+#endif // MAME_INCLUDES_SIMPSONS_H

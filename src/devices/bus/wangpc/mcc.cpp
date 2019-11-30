@@ -52,13 +52,14 @@ DEFINE_DEVICE_TYPE(WANGPC_MCC, wangpc_mcc_device, "wangpc_mcc", "Wang PC-PM043 M
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( wangpc_mcc )
+//  machine_config( wangpc_mcc )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(wangpc_mcc_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(Z80SIO2_TAG, Z80SIO2, 4000000)
-	MCFG_DEVICE_ADD(Z80DART_TAG, Z80DART, 4000000)
-MACHINE_CONFIG_END
+void wangpc_mcc_device::device_add_mconfig(machine_config &config)
+{
+	Z80SIO2(config, m_sio, 4000000);
+	Z80DART(config, m_dart, 4000000);
+}
 
 
 
@@ -128,7 +129,7 @@ void wangpc_mcc_device::device_reset()
 //  wangpcbus_iorc_r - I/O read
 //-------------------------------------------------
 
-uint16_t wangpc_mcc_device::wangpcbus_iorc_r(address_space &space, offs_t offset, uint16_t mem_mask)
+uint16_t wangpc_mcc_device::wangpcbus_iorc_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = 0xffff;
 
@@ -142,7 +143,7 @@ uint16_t wangpc_mcc_device::wangpcbus_iorc_r(address_space &space, offs_t offset
 		case 0x06/2:
 			if (ACCESSING_BITS_0_7)
 			{
-				data = 0xff00 | m_sio->cd_ba_r(space, offset >> 1);
+				data = 0xff00 | m_sio->cd_ba_r(offset >> 1);
 			}
 			break;
 
@@ -152,7 +153,7 @@ uint16_t wangpc_mcc_device::wangpcbus_iorc_r(address_space &space, offs_t offset
 		case 0x0e/2:
 			if (ACCESSING_BITS_0_7)
 			{
-				data = 0xff00 | m_dart->cd_ba_r(space, offset >> 1);
+				data = 0xff00 | m_dart->cd_ba_r(offset >> 1);
 			}
 			break;
 
@@ -197,7 +198,7 @@ uint16_t wangpc_mcc_device::wangpcbus_iorc_r(address_space &space, offs_t offset
 //  wangpcbus_aiowc_w - I/O write
 //-------------------------------------------------
 
-void wangpc_mcc_device::wangpcbus_aiowc_w(address_space &space, offs_t offset, uint16_t mem_mask, uint16_t data)
+void wangpc_mcc_device::wangpcbus_aiowc_w(offs_t offset, uint16_t mem_mask, uint16_t data)
 {
 	if (sad(offset) && ACCESSING_BITS_0_7)
 	{
@@ -207,14 +208,14 @@ void wangpc_mcc_device::wangpcbus_aiowc_w(address_space &space, offs_t offset, u
 		case 0x02/2:
 		case 0x04/2:
 		case 0x06/2:
-			m_sio->cd_ba_w(space, offset >> 1, data & 0xff);
+			m_sio->cd_ba_w(offset >> 1, data & 0xff);
 			break;
 
 		case 0x08/2:
 		case 0x0a/2:
 		case 0x0c/2:
 		case 0x0e/2:
-			m_dart->cd_ba_w(space, offset >> 1, data & 0xff);
+			m_dart->cd_ba_w(offset >> 1, data & 0xff);
 			break;
 
 		case 0x12/2:

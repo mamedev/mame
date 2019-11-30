@@ -346,7 +346,7 @@
 		<part name="cart" interface="megatech_cart">
 			<feature name="pcb_type" value="genesis" />
 			<dataarea name="rom" size="0x400000">
-				<rom name="mp12645f.ic1"     size="0x080000" crc="c07ef8d2" sha1="9d111fdc7bb92d52bfa048cd134aa488b4f475ef" offset="0x000000"/>
+				<rom name="mpr-12645f.ic1"     size="0x080000" crc="c07ef8d2" sha1="9d111fdc7bb92d52bfa048cd134aa488b4f475ef" offset="0x000000"/>
 				<rom name="epr-12368-31.ic2" size="0x008000" crc="30af7e4a" sha1="baf91d527393dc90aba9371abcb1e690bcc83c7e" offset="0x300000" loadflag="load16_byte"/>
 			</dataarea>
 		</part>
@@ -515,7 +515,7 @@
 		<part name="cart" interface="megatech_cart">
 			<feature name="pcb_type" value="genesis" />
 			<dataarea name="rom" size="0x400000">
-				<rom name="mp13905a.ic1"     size="0x100000" crc="68a88d60" sha1="2f56e8a2b0999de4fa0d14a1527f4e1df0f9c7a2" offset="0x000000"/>
+				<rom name="mpr-13905a.ic1"   size="0x080000" crc="6d617940" sha1="11d5ff1c2db79632f6dea2edf97f56af2149cea4" offset="0x000000"/>
 				<rom name="epr-12368-49.ic2" size="0x008000" crc="c5101da2" sha1="636f30043e2e9291e193ef9a2ead2e97a0bf7380" offset="0x300000" loadflag="load16_byte"/>
 			</dataarea>
 		</part>
@@ -670,7 +670,7 @@
 		<part name="cart" interface="megatech_cart">
 			<feature name="pcb_type" value="genesis" />
 			<dataarea name="rom" size="0x400000">
-				<rom name="epr-14674.ic1"    size="0x080000" crc="453712a2" sha1="5d2c8430a9a14aac7f19c22617539b0503ab92cd" offset="0x000000"/>
+				<rom name="mpr-14674.ic1"    size="0x080000" crc="453712a2" sha1="5d2c8430a9a14aac7f19c22617539b0503ab92cd" offset="0x000000"/>
 				<rom name="epr-12368-61.ic2" size="0x008000" crc="4aa0b2a2" sha1="bce03f88d6cfd02683d51c28058f6229fda13b49" offset="0x300000" loadflag="load16_byte"/>
 			</dataarea>
 		</part>

@@ -95,10 +95,10 @@ void alto2_cpu_device::iomem_map(address_map &map)
 	map(0177205, 0177233).rw(FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // UNUSED RANGE
 	map(0177234, 0177237).rw(FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // { Experimental cursor control }
 	map(0177240, 0177257).rw(FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // { Alto-II debugger }
-//  AM_RANGE(0177244,                    0177247)                           AM_READWRITE( noop_r, noop_w )          // { Graphics keyboard }
+//  map(0177244, 0177247).rw(FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // { Graphics keyboard }
 	map(0177260, 0177377).rw(FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // UNUSED RANGE
 	// page 0377
-//  AM_RANGE(0177400,                    0177405)                           AM_READWRITE( noop_r, noop_w )          // { Maxc2 maintenance interface }
+//  map(0177400, 0177405).rw(FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // { Maxc2 maintenance interface }
 	map(0177400, 0177400).rw(FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // { Alto DLS input }
 	map(0177401, 0177417).rw(FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // UNUSED RANGE
 	map(0177420, 0177420).rw(FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // { "" }
@@ -127,9 +127,11 @@ void alto2_cpu_device::iomem_map(address_map &map)
 
 alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
 	cpu_device(mconfig, ALTO2, tag, owner, clock),
-	m_ucode_config("ucode", ENDIANNESS_BIG, 32, 12, -2 ),
-	m_const_config("const", ENDIANNESS_BIG, 16,  8, -1 ),
-	m_iomem_config("iomem", ENDIANNESS_BIG, 16, 17, -1 ),
+	m_kb_read_callback(*this),
+	m_utilout_callback(*this),
+	m_ucode_config("ucode", ENDIANNESS_BIG, 32, 12, -2, address_map_constructor(FUNC(alto2_cpu_device::ucode_map), this)),
+	m_const_config("const", ENDIANNESS_BIG, 16,  8, -1, address_map_constructor(FUNC(alto2_cpu_device::const_map), this)),
+	m_iomem_config("iomem", ENDIANNESS_BIG, 16, 17, -1, address_map_constructor(FUNC(alto2_cpu_device::iomem_map), this)),
 	m_cram_config(2),
 	m_ucode_rom_pages(1),
 	m_ucode_ram_pages(2),
@@ -179,6 +181,7 @@ alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* ta
 	m_ether_id(0),
 	m_hw(),
 	m_mouse(),
+	m_drive(*this, { finder_base::DUMMY_TAG, finder_base::DUMMY_TAG }),
 	m_dsk(),
 	m_dsp(),
 	m_disp_a38(nullptr),
@@ -201,12 +204,10 @@ alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* ta
 	memset(m_s_reg_bank, 0x00, sizeof(m_s_reg_bank));
 	memset(m_bank_reg, 0x00, sizeof(m_bank_reg));
 	memset(m_ram_related, 0x00, sizeof(m_ram_related));
-	memset(m_drive, 0x00, sizeof(m_drive));
 	memset(m_sysclka0, 0x00, sizeof(m_sysclka0));
 	memset(m_sysclka1, 0x00, sizeof(m_sysclka1));
 	memset(m_sysclkb0, 0x00, sizeof(m_sysclkb0));
 	memset(m_sysclkb1, 0x00, sizeof(m_sysclkb1));
-	m_speaker = 0;
 }
 
 alto2_cpu_device::~alto2_cpu_device()
@@ -228,26 +229,6 @@ alto2_cpu_device::~alto2_cpu_device()
 	exit_disp();
 	exit_disk();
 	exit_memory();
-}
-
-//-------------------------------------------------
-// driver interface to set diablo_hd_device
-//-------------------------------------------------
-
-void alto2_cpu_device::set_diablo(int unit, diablo_hd_device* ptr)
-{
-	logerror("%s: unit=%d diablo_hd_device=%p\n", __FUNCTION__, unit, (void *) ptr);
-	m_drive[unit] = ptr;
-}
-
-//-------------------------------------------------
-// driver interface to set speaker_sound_device
-//-------------------------------------------------
-
-void alto2_cpu_device::set_speaker(speaker_sound_device* speaker)
-{
-	logerror("%s: speaker_sound_device=%p\n", __FUNCTION__, speaker);
-	m_speaker = speaker;
 }
 
 //-------------------------------------------------
@@ -813,6 +794,9 @@ device_memory_interface::space_config_vector alto2_cpu_device::memory_space_conf
 
 void alto2_cpu_device::device_start()
 {
+	m_kb_read_callback.resolve_safe(0177777);
+	m_utilout_callback.resolve_safe();
+
 	// get a pointer to the IO address space
 	m_iomem = &space(2);
 
@@ -1109,14 +1093,6 @@ void alto2_cpu_device::execute_set_input(int inputnum, int state)
 {
 }
 
-void alto2_cpu_device::fatal(int exitcode, const char *format, ...)
-{
-	va_list ap;
-	va_start(ap, format);
-	emu_fatalerror error(exitcode, format, ap);
-	va_end(ap);
-}
-
 /** @brief task names */
 const char* alto2_cpu_device::task_name(int task)
 {
@@ -1284,42 +1260,42 @@ void alto2_cpu_device::watch_write(uint32_t addr, uint32_t data)
 /** @brief fatal exit on unitialized dynamic phase BUS source */
 void alto2_cpu_device::bs_early_bad()
 {
-	fatal(9,"fatal: bad early bus source pointer for task %s, mpc:%05o bs:%s\n",
-		task_name(m_task), m_mpc, bs_name(bs()));
+	throw emu_fatalerror(9,"fatal: bad early bus source pointer for task %s, mpc:%05o bs:%s\n",
+			task_name(m_task), m_mpc, bs_name(bs()));
 }
 
 /** @brief fatal exit on unitialized latching phase BUS source */
 void alto2_cpu_device::bs_late_bad()
 {
-	fatal(9,"fatal: bad late bus source pointer for task %s, mpc:%05o bs: %s\n",
-		task_name(m_task), m_mpc, bs_name(bs()));
+	throw emu_fatalerror(9,"fatal: bad late bus source pointer for task %s, mpc:%05o bs: %s\n",
+			task_name(m_task), m_mpc, bs_name(bs()));
 }
 
 /** @brief fatal exit on unitialized dynamic phase F1 function */
 void alto2_cpu_device::f1_early_bad()
 {
-	fatal(9,"fatal: bad early f1 function pointer for task %s, mpc:%05o f1: %s\n",
-		task_name(m_task), m_mpc, f1_name(f1()));
+	throw emu_fatalerror(9,"fatal: bad early f1 function pointer for task %s, mpc:%05o f1: %s\n",
+			task_name(m_task), m_mpc, f1_name(f1()));
 }
 
 /** @brief fatal exit on unitialized latching phase F1 function */
 void alto2_cpu_device::f1_late_bad()
 {
-	fatal(9,"fatal: bad late f1 function pointer for task %s, mpc:%05o f1: %s\n",
-		task_name(m_task), m_mpc, f1_name(f1()));
+	throw emu_fatalerror(9,"fatal: bad late f1 function pointer for task %s, mpc:%05o f1: %s\n",
+			task_name(m_task), m_mpc, f1_name(f1()));
 }
 
 /** @brief fatal exit on unitialized dynamic phase F2 function */
 void alto2_cpu_device::f2_early_bad()
 {
-	fatal(9,"fatal: bad early f2 function pointer for task %s, mpc:%05o f2: %s\n",
-		task_name(m_task), m_mpc, f2_name(f2()));
+	throw emu_fatalerror(9,"fatal: bad early f2 function pointer for task %s, mpc:%05o f2: %s\n",
+			task_name(m_task), m_mpc, f2_name(f2()));
 }
 
 /** @brief fatal exit on unitialized latching phase F2 function */
 void alto2_cpu_device::f2_late_bad()
 {
-	fatal(9,"fatal: bad late f2 function pointer for task %s, mpc:%05o f2: %s\n",
+	throw emu_fatalerror(9,"fatal: bad late f2 function pointer for task %s, mpc:%05o f2: %s\n",
 			task_name(m_task), m_mpc, f2_name(f2()));
 }
 
@@ -1784,7 +1760,7 @@ void alto2_cpu_device::f1_early_task()
 			return;
 		}
 	}
-	fatal(3, "no tasks requesting service\n");
+	throw emu_fatalerror(3, "no tasks requesting service\n");
 #endif  /* !USE_PRIO_F9318 */
 }
 

@@ -37,14 +37,14 @@ public:
 
 	void rgum(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(rgum_heartbeat_r);
+	DECLARE_READ_LINE_MEMBER(heartbeat_r);
 
 private:
 	required_shared_ptr<uint8_t> m_vram;
 	required_shared_ptr<uint8_t> m_cram;
 	uint8_t m_hbeat;
 	virtual void video_start() override;
-	uint32_t screen_update_royalgum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_royalgum(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -56,7 +56,7 @@ void rgum_state::video_start()
 {
 }
 
-uint32_t rgum_state::screen_update_royalgum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t rgum_state::screen_update_royalgum(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int x,y,count;
 	gfx_element *gfx = m_gfxdecode->gfx(0);
@@ -100,7 +100,7 @@ void rgum_state::rgum_map(address_map &map)
 }
 
 
-CUSTOM_INPUT_MEMBER(rgum_state::rgum_heartbeat_r)
+READ_LINE_MEMBER(rgum_state::heartbeat_r)
 {
 	m_hbeat ^= 1;
 
@@ -125,7 +125,7 @@ static INPUT_PORTS_START( rgum )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, rgum_state,rgum_heartbeat_r, nullptr)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(rgum_state, heartbeat_r)
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -245,38 +245,38 @@ static GFXDECODE_START( gfx_rgum )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(rgum_state::rgum)
+void rgum_state::rgum(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M65C02,24000000/16)      /* ? MHz */
-	MCFG_DEVICE_PROGRAM_MAP(rgum_map)
+	M65C02(config, m_maincpu, 24000000/16);      /* ? MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &rgum_state::rgum_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(rgum_state, screen_update_royalgum)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 256-1, 0, 256-1);
+	screen.set_screen_update(FUNC(rgum_state::screen_update_royalgum));
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 24000000/16)   /* unknown clock & type, hand tuned to get ~50 fps (?) */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	mc6845_device &crtc(MC6845(config, "crtc", 24000000/16));   /* unknown clock & type, hand tuned to get ~50 fps (?) */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
+	i8255_device &ppi(I8255A(config, "ppi8255"));
+	ppi.in_pa_callback().set_ioport("IN0");
+	ppi.in_pb_callback().set_ioport("IN1");
+	ppi.in_pc_callback().set_ioport("IN2");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rgum)
-	MCFG_PALETTE_ADD("palette", 0x100)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rgum);
+	PALETTE(config, m_palette).set_entries(0x100);
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 24000000/16) /* guessed to use the same xtal as the crtc */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	AY8910(config, "aysnd", 24000000/16).add_route(ALL_OUTPUTS, "mono", 0.50); /* guessed to use the same xtal as the crtc */
+}
 
 
 

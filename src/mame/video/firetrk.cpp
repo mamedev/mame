@@ -12,11 +12,9 @@ Atari Fire Truck + Super Bug + Monte Carlo video emulation
 static const rectangle playfield_window(0x02a, 0x115, 0x000, 0x0ff);
 
 
-PALETTE_INIT_MEMBER(firetrk_state, firetrk)
+void firetrk_state::firetrk_palette(palette_device &palette)
 {
-	int i;
-
-	static const uint8_t colortable_source[] =
+	static constexpr uint8_t colortable_source[] =
 	{
 		0, 0, 1, 0,
 		2, 0, 3, 0,
@@ -26,7 +24,7 @@ PALETTE_INIT_MEMBER(firetrk_state, firetrk)
 		2, 0, 0, 3,
 		3, 0, 0, 3
 	};
-	static const rgb_t palette_source[] =
+	static constexpr rgb_t palette_source[] =
 	{
 		rgb_t::black(),
 		rgb_t(0x5b, 0x5b, 0x5b),
@@ -36,7 +34,7 @@ PALETTE_INIT_MEMBER(firetrk_state, firetrk)
 
 	m_color1_mask = m_color2_mask = 0;
 
-	for (i = 0; i < ARRAY_LENGTH(colortable_source); i++)
+	for (int i = 0; i < ARRAY_LENGTH(colortable_source); i++)
 	{
 		uint8_t color = colortable_source[i];
 
@@ -56,12 +54,11 @@ void firetrk_state::prom_to_palette(int number, uint8_t val)
 }
 
 
-PALETTE_INIT_MEMBER(firetrk_state,montecar)
+void firetrk_state::montecar_palette(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
 
-	static const uint8_t colortable_source[] =
+	static constexpr uint8_t colortable_source[] =
 	{
 		0x00, 0x00, 0x00, 0x01,
 		0x00, 0x02, 0x00, 0x03,
@@ -96,7 +93,7 @@ PALETTE_INIT_MEMBER(firetrk_state,montecar)
 
 	m_color1_mask = m_color2_mask = 0;
 
-	for (i = 0; i < ARRAY_LENGTH(colortable_source); i++)
+	for (int i = 0; i < ARRAY_LENGTH(colortable_source); i++)
 	{
 		uint8_t color = colortable_source[i];
 
@@ -214,8 +211,8 @@ void firetrk_state::video_start()
 	m_screen->register_screen_bitmap(m_helper1);
 	m_screen->register_screen_bitmap(m_helper2);
 
-	m_tilemap1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(firetrk_state::firetrk_get_tile_info1),this), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
-	m_tilemap2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(firetrk_state::firetrk_get_tile_info2),this), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
+	m_tilemap1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(firetrk_state::firetrk_get_tile_info1)), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
+	m_tilemap2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(firetrk_state::firetrk_get_tile_info2)), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
 }
 
 
@@ -224,8 +221,8 @@ VIDEO_START_MEMBER(firetrk_state,superbug)
 	m_screen->register_screen_bitmap(m_helper1);
 	m_screen->register_screen_bitmap(m_helper2);
 
-	m_tilemap1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(firetrk_state::superbug_get_tile_info1),this), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
-	m_tilemap2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(firetrk_state::superbug_get_tile_info2),this), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
+	m_tilemap1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(firetrk_state::superbug_get_tile_info1)), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
+	m_tilemap2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(firetrk_state::superbug_get_tile_info2)), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
 }
 
 
@@ -234,8 +231,8 @@ VIDEO_START_MEMBER(firetrk_state,montecar)
 	m_screen->register_screen_bitmap(m_helper1);
 	m_screen->register_screen_bitmap(m_helper2);
 
-	m_tilemap1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(firetrk_state::montecar_get_tile_info1),this), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
-	m_tilemap2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(firetrk_state::montecar_get_tile_info2),this), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
+	m_tilemap1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(firetrk_state::montecar_get_tile_info1)), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
+	m_tilemap2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(firetrk_state::montecar_get_tile_info2)), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
 }
 
 

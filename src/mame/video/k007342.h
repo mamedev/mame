@@ -5,18 +5,20 @@
 
 #pragma once
 
+#include "tilemap.h"
 
-typedef device_delegate<void (int layer, int bank, int *code, int *color, int *flags)> k007342_delegate;
 
 class k007342_device : public device_t
 {
 public:
+	using tile_delegate = device_delegate<void (int layer, int bank, int *code, int *color, int *flags)>;
+
 	k007342_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	//  configuration
-	void set_gfxdecode_tag(const char *tag) { m_gfxdecode.set_tag(tag); }
+	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
 	void set_gfxnum(int gfxnum) { m_gfxnum = gfxnum; }
-	void set_callback(k007342_delegate callback) { m_callback = callback; }
+	template <typename... T> void set_tile_callback(T &&... args) { m_callback.set(std::forward<T>(args)...); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -47,7 +49,7 @@ private:
 	uint16_t   m_scrollx[2];
 	uint8_t    m_scrolly[2];
 	required_device<gfxdecode_device> m_gfxdecode;
-	k007342_delegate m_callback;
+	tile_delegate m_callback;
 	int m_gfxnum;
 
 	TILEMAP_MAPPER_MEMBER(scan);
@@ -57,20 +59,6 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(K007342, k007342_device)
-
-#define MCFG_K007342_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, K007342, 0)
-#define MCFG_K007342_GFXDECODE(_gfxtag) \
-	downcast<k007342_device &>(*device).set_gfxdecode_tag(_gfxtag);
-
-#define MCFG_K007342_GFXNUM(_gfxnum) \
-	downcast<k007342_device &>(*device).set_gfxnum(_gfxnum);
-
-#define MCFG_K007342_CALLBACK_OWNER(_class, _method) \
-	downcast<k007342_device &>(*device).set_callback(k007342_delegate(&_class::_method, #_class "::" #_method, this));
-
-#define MCFG_K007342_CALLBACK_DEVICE(_tag, _class, _method) \
-	downcast<k007342_device &>(*device).set_callback(k007342_delegate(&_class::_method, #_class "::" #_method, _tag));
 
 // function definition for a callback
 #define K007342_CALLBACK_MEMBER(_name)     void _name(int layer, int bank, int *code, int *color, int *flags)

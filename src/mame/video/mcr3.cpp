@@ -66,18 +66,16 @@ TILE_GET_INFO_MEMBER(mcr3_state::spyhunt_get_alpha_tile_info)
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(mcr3_state,spyhunt)
+void mcr3_state::spyhunt_palette(palette_device &palette) const
 {
 	for (int i = 0; i < palette.entries(); i++)
-	{
-		palette.set_pen_color(i,rgb_t::black());
-	}
+		palette.set_pen_color(i, rgb_t::black());
 
-	/* alpha colors are hard-coded */
-	palette.set_pen_color(4*16+0,rgb_t(0x00,0x00,0x00));
-	palette.set_pen_color(4*16+1,rgb_t(0x00,0xff,0x00));
-	palette.set_pen_color(4*16+2,rgb_t(0x00,0x00,0xff));
-	palette.set_pen_color(4*16+3,rgb_t(0xff,0xff,0xff));
+	// alpha colors are hard-coded
+	palette.set_pen_color(4 * 16 + 0, rgb_t(0x00, 0x00, 0x00));
+	palette.set_pen_color(4 * 16 + 1, rgb_t(0x00, 0xff, 0x00));
+	palette.set_pen_color(4 * 16 + 2, rgb_t(0x00, 0x00, 0xff));
+	palette.set_pen_color(4 * 16 + 3, rgb_t(0xff, 0xff, 0xff));
 }
 
 
@@ -91,17 +89,17 @@ PALETTE_INIT_MEMBER(mcr3_state,spyhunt)
 void mcr3_state::video_start()
 {
 	// initialize the background tilemap
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mcr3_state::mcrmono_get_bg_tile_info),this), TILEMAP_SCAN_ROWS,  16,16, 32,30);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(mcr3_state::mcrmono_get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16,16, 32,30);
 }
 
 
 VIDEO_START_MEMBER(mcr3_state,spyhunt)
 {
 	// initialize the background tilemap
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mcr3_state::spyhunt_get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(mcr3_state::spyhunt_bg_scan),this),  64,32, 64,32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(mcr3_state::spyhunt_get_bg_tile_info)), tilemap_mapper_delegate(*this, FUNC(mcr3_state::spyhunt_bg_scan)), 64,32, 64,32);
 
 	// initialize the text tilemap
-	m_alpha_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mcr3_state::spyhunt_get_alpha_tile_info),this), TILEMAP_SCAN_COLS,  16,16, 32,32);
+	m_alpha_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(mcr3_state::spyhunt_get_alpha_tile_info)), TILEMAP_SCAN_COLS, 16,16, 32,32);
 	m_alpha_tilemap->set_transparent_pen(0);
 	m_alpha_tilemap->set_scrollx(0, 16);
 

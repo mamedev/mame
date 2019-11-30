@@ -122,6 +122,7 @@ public:
 			device_t *owner,
 			uint32_t clock);
 
+protected:
 	virtual ioport_constructor device_input_ports() const override;
 
 private:
@@ -138,6 +139,7 @@ public:
 			device_t *owner,
 			uint32_t clock);
 
+protected:
 	virtual ioport_constructor device_input_ports() const override;
 };
 
@@ -151,6 +153,7 @@ public:
 			device_t *owner,
 			uint32_t clock);
 
+protected:
 	virtual ioport_constructor device_input_ports() const override;
 };
 
@@ -164,6 +167,7 @@ public:
 			device_t *owner,
 			uint32_t clock);
 
+protected:
 	virtual ioport_constructor device_input_ports() const override;
 };
 
@@ -177,6 +181,7 @@ public:
 			device_t *owner,
 			uint32_t clock);
 
+protected:
 	virtual ioport_constructor device_input_ports() const override;
 };
 
@@ -190,6 +195,7 @@ public:
 			device_t *owner,
 			uint32_t clock);
 
+protected:
 	virtual ioport_constructor device_input_ports() const override;
 };
 

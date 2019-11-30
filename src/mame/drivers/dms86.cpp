@@ -138,7 +138,8 @@ void dms86_state::kbd_put(u8 data)
 	m_term_data = data;
 }
 
-MACHINE_CONFIG_START(dms86_state::dms86)
+void dms86_state::dms86(machine_config &config)
+{
 	/* basic machine hardware */
 	I8086(config, m_maincpu, XTAL(14'745'600) / 3); // according to the manual... hmm
 	m_maincpu->set_addrmap(AS_PROGRAM, &dms86_state::mem_map);
@@ -173,13 +174,13 @@ MACHINE_CONFIG_START(dms86_state::dms86)
 	rs232.dcd_handler().set(m_sio[0], FUNC(z80sio_device::dcdb_w)); // HiNet / Monitor switch
 	rs232.cts_handler().set(m_sio[0], FUNC(z80sio_device::ctsb_w)).invert();
 
-	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(dms86_state, kbd_put))
-MACHINE_CONFIG_END
+	GENERIC_TERMINAL(config, m_terminal, 0);
+	m_terminal->set_keyboard_callback(FUNC(dms86_state::kbd_put));
+}
 
 /* ROM definition */
 ROM_START( dms86 )
-	ROM_REGION( 0x2000, "roms", ROMREGION_ERASEFF )
+	ROM_REGION16_LE( 0x2000, "roms", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "hns-86_54-8678.bin", 0x0000, 0x1000, CRC(95f58e1c) SHA1(6fc8f087f0c887d8b429612cd035c6c1faab570c))
 	ROM_LOAD16_BYTE( "hns-86_54-8677.bin", 0x0001, 0x1000, CRC(78fad756) SHA1(ddcbff1569ec6975b8489935cdcfa80eba413502))
 ROM_END

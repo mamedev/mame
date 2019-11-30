@@ -48,14 +48,14 @@ public:
 	// data write handlers
 	void write_bit(offs_t offset, bool d);
 	void write_abcd(u8 a, bool d);
-	DECLARE_WRITE8_MEMBER(write_d0);
-	DECLARE_WRITE8_MEMBER(write_d1);
-	DECLARE_WRITE8_MEMBER(write_d7);
-	DECLARE_WRITE8_MEMBER(write_a0);
-	DECLARE_WRITE8_MEMBER(write_a3);
-	DECLARE_WRITE8_MEMBER(write_nibble_d0);
-	DECLARE_WRITE8_MEMBER(write_nibble_d3);
-	DECLARE_WRITE8_MEMBER(clear);
+	void write_d0(offs_t offset, u8 data);
+	void write_d1(offs_t offset, u8 data);
+	void write_d7(offs_t offset, u8 data);
+	void write_a0(offs_t offset, u8 data = 0);
+	void write_a3(offs_t offset, u8 data = 0);
+	void write_nibble_d0(u8 data);
+	void write_nibble_d3(u8 data);
+	void clear(u8 data = 0);
 
 	// read handlers (inlined for the sake of optimization)
 	DECLARE_READ_LINE_MEMBER(q0_r) { return BIT(m_q, 0); }

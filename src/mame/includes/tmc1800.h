@@ -35,7 +35,7 @@ public:
 		, m_beeper(*this, "beeper")
 	{ }
 
-	DECLARE_QUICKLOAD_LOAD_MEMBER( tmc1800 );
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
 protected:
 	required_device<cosmac_device> m_maincpu;

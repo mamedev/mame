@@ -35,6 +35,8 @@ PCB Contents:
 1x UMC 8928LP-UM8272A floppy disk controller (lower board)
 1x UMC 8935CS-UM82C11 Printer Adapter Interface (lower board)
 1x UMC 8936CS-UM8250B Programmable asynchronous communications element (lower board)
+1x UMC 8937NS-UM82C8167 Real Time Clock (lower board)
+1x Yamaha V6363 CMDC QFP (lower board)
 There isn't any keyboard found connected to the pcb.
 ********************************************************************************************
 Filetto SW notes:
@@ -171,7 +173,7 @@ void isa8_cga_tetriskr_device::device_start()
 {
 	m_bg_bank = 0;
 	isa8_cga_superimpose_device::device_start();
-	m_isa->install_device(0x3c0, 0x3c0, read8_delegate( FUNC(isa8_cga_tetriskr_device::bg_bank_r), this ), write8_delegate( FUNC(isa8_cga_tetriskr_device::bg_bank_w), this ) );
+	m_isa->install_device(0x3c0, 0x3c0, read8_delegate(*this, FUNC(isa8_cga_tetriskr_device::bg_bank_r)), write8_delegate(*this, FUNC(isa8_cga_tetriskr_device::bg_bank_w)));
 }
 
 WRITE8_MEMBER(isa8_cga_tetriskr_device::bg_bank_w)
@@ -397,7 +399,7 @@ void pcxt_state::tetriskr_io(address_map &map)
 	map(0x0000, 0x00ff).m(m_mb, FUNC(pc_noppi_mb_device::map));
 	map(0x03c8, 0x03c8).portr("IN0");
 	map(0x03c9, 0x03c9).portr("IN1");
-//  AM_RANGE(0x03ce, 0x03ce) AM_READ_PORT("IN1") //read then discarded?
+//  map(0x03ce, 0x03ce).portr("IN1"); //read then discarded?
 }
 
 void pcxt_state::bank_map(address_map &map)
@@ -494,33 +496,41 @@ static void filetto_isa8_cards(device_slot_interface &device)
 }
 
 
-MACHINE_CONFIG_START(pcxt_state::filetto)
-	MCFG_DEVICE_ADD("maincpu", I8088, XTAL(14'318'181)/3)
-	MCFG_DEVICE_PROGRAM_MAP(filetto_map)
-	MCFG_DEVICE_IO_MAP(filetto_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
-	MCFG_PCNOPPI_MOTHERBOARD_ADD("mb","maincpu")
-	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", filetto_isa8_cards, "filetto", true) // FIXME: determine ISA bus clock
+void pcxt_state::filetto(machine_config &config)
+{
+	I8088(config, m_maincpu, XTAL(14'318'181)/3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pcxt_state::filetto_map);
+	m_maincpu->set_addrmap(AS_IO, &pcxt_state::filetto_io);
+	m_maincpu->set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
-	MCFG_DEVICE_ADD("voice", HC55516, 8000000/4)//8923S-UM5100 is a HC55536 with ROM hook-up
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mb:mono", 0.60)
+	PCNOPPI_MOTHERBOARD(config, m_mb, 0).set_cputag(m_maincpu);
+	m_mb->int_callback().set_inputline(m_maincpu, 0);
+	m_mb->nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+
+	ISA8_SLOT(config, "isa1", 0, "mb:isa", filetto_isa8_cards, "filetto", true); // FIXME: determine ISA bus clock
+
+	HC55516(config, "voice", 8000000/4).add_route(ALL_OUTPUTS, "mb:mono", 0.60); //8923S-UM5100 is a HC55536 with ROM hook-up
 
 	RAM(config, RAM_TAG).set_default_size("640K");
 
 	ADDRESS_MAP_BANK(config, "bank").set_map(&pcxt_state::bank_map).set_options(ENDIANNESS_LITTLE, 8, 18, 0x10000);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(pcxt_state::tetriskr)
-	MCFG_DEVICE_ADD("maincpu", I8088, XTAL(14'318'181)/3)
-	MCFG_DEVICE_PROGRAM_MAP(tetriskr_map)
-	MCFG_DEVICE_IO_MAP(tetriskr_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
-	MCFG_PCNOPPI_MOTHERBOARD_ADD("mb","maincpu")
+void pcxt_state::tetriskr(machine_config &config)
+{
+	I8088(config, m_maincpu, XTAL(14'318'181)/3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pcxt_state::tetriskr_map);
+	m_maincpu->set_addrmap(AS_IO, &pcxt_state::tetriskr_io);
+	m_maincpu->set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
-	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", filetto_isa8_cards, "tetriskr", true) // FIXME: determine ISA bus clock
+	PCNOPPI_MOTHERBOARD(config, m_mb, 0).set_cputag(m_maincpu);
+	m_mb->int_callback().set_inputline(m_maincpu, 0);
+	m_mb->nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+
+	ISA8_SLOT(config, "isa1", 0, "mb:isa", filetto_isa8_cards, "tetriskr", true); // FIXME: determine ISA bus clock
 
 	RAM(config, RAM_TAG).set_default_size("640K");
-MACHINE_CONFIG_END
+}
 
 ROM_START( filetto )
 	ROM_REGION( 0x10000, "bios", 0 )

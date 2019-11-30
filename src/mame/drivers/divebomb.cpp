@@ -114,12 +114,12 @@ void divebomb_state::divebomb_fgcpu_map(address_map &map)
 void divebomb_state::divebomb_fgcpu_iomap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w("sn0", FUNC(sn76489_device::command_w));
-	map(0x01, 0x01).w("sn1", FUNC(sn76489_device::command_w));
-	map(0x02, 0x02).w("sn2", FUNC(sn76489_device::command_w));
-	map(0x03, 0x03).w("sn3", FUNC(sn76489_device::command_w));
-	map(0x04, 0x04).w("sn4", FUNC(sn76489_device::command_w));
-	map(0x05, 0x05).w("sn5", FUNC(sn76489_device::command_w));
+	map(0x00, 0x00).w("sn0", FUNC(sn76489_device::write));
+	map(0x01, 0x01).w("sn1", FUNC(sn76489_device::write));
+	map(0x02, 0x02).w("sn2", FUNC(sn76489_device::write));
+	map(0x03, 0x03).w("sn3", FUNC(sn76489_device::write));
+	map(0x04, 0x04).w("sn4", FUNC(sn76489_device::write));
+	map(0x05, 0x05).w("sn5", FUNC(sn76489_device::write));
 	map(0x10, 0x10).r(m_roz2fg_latch, FUNC(generic_latch_8_device::read)).w("fg2roz", FUNC(generic_latch_8_device::write));
 	map(0x20, 0x20).r(m_spr2fg_latch, FUNC(generic_latch_8_device::read)).w("fg2spr", FUNC(generic_latch_8_device::write));
 	map(0x30, 0x30).portr("IN0");
@@ -386,50 +386,47 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(divebomb_state::divebomb)
+void divebomb_state::divebomb(machine_config &config)
+{
+	Z80(config, m_fgcpu, XTAL1/4); // ?
+	m_fgcpu->set_addrmap(AS_PROGRAM, &divebomb_state::divebomb_fgcpu_map);
+	m_fgcpu->set_addrmap(AS_IO, &divebomb_state::divebomb_fgcpu_iomap);
 
-	MCFG_DEVICE_ADD("fgcpu", Z80,XTAL1/4) // ?
-	MCFG_DEVICE_PROGRAM_MAP(divebomb_fgcpu_map)
-	MCFG_DEVICE_IO_MAP(divebomb_fgcpu_iomap)
+	Z80(config, m_spritecpu, XTAL1/4); // ?
+	m_spritecpu->set_addrmap(AS_PROGRAM, &divebomb_state::divebomb_spritecpu_map);
+	m_spritecpu->set_addrmap(AS_IO, &divebomb_state::divebomb_spritecpu_iomap);
 
-	MCFG_DEVICE_ADD("spritecpu", Z80,XTAL1/4) // ?
-	MCFG_DEVICE_PROGRAM_MAP(divebomb_spritecpu_map)
-	MCFG_DEVICE_IO_MAP(divebomb_spritecpu_iomap)
+	Z80(config, m_rozcpu, XTAL1/4); // ?
+	m_rozcpu->set_addrmap(AS_PROGRAM, &divebomb_state::divebomb_rozcpu_map);
+	m_rozcpu->set_addrmap(AS_IO, &divebomb_state::divebomb_rozcpu_iomap);
 
-	MCFG_DEVICE_ADD("rozcpu", Z80,XTAL1/4) // ?
-	MCFG_DEVICE_PROGRAM_MAP(divebomb_rozcpu_map)
-	MCFG_DEVICE_IO_MAP(divebomb_rozcpu_iomap)
+	config.set_perfect_quantum(m_fgcpu);
 
-	MCFG_QUANTUM_PERFECT_CPU("fgcpu")
+	INPUT_MERGER_ANY_HIGH(config, m_fgcpu_irq).output_handler().set_inputline(m_fgcpu, INPUT_LINE_IRQ0);
 
-	MCFG_INPUT_MERGER_ANY_HIGH("fgcpu_irq")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("fgcpu", INPUT_LINE_IRQ0))
+	GENERIC_LATCH_8(config, "fg2spr").data_pending_callback().set_inputline(m_spritecpu, INPUT_LINE_IRQ0);
 
-	MCFG_GENERIC_LATCH_8_ADD("fg2spr")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("spritecpu", INPUT_LINE_IRQ0))
+	GENERIC_LATCH_8(config, "fg2roz").data_pending_callback().set_inputline(m_rozcpu, INPUT_LINE_IRQ0);
 
-	MCFG_GENERIC_LATCH_8_ADD("fg2roz")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("rozcpu", INPUT_LINE_IRQ0))
+	GENERIC_LATCH_8(config, m_spr2fg_latch);
+	m_spr2fg_latch->data_pending_callback().set(m_fgcpu_irq, FUNC(input_merger_any_high_device::in_w<0>));
 
-	MCFG_GENERIC_LATCH_8_ADD("spr2fg")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("fgcpu_irq", input_merger_any_high_device, in_w<0>))
+	GENERIC_LATCH_8(config, m_roz2fg_latch);
+	m_roz2fg_latch->data_pending_callback().set(m_fgcpu_irq, FUNC(input_merger_any_high_device::in_w<1>));
 
-	MCFG_GENERIC_LATCH_8_ADD("roz2fg")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("fgcpu_irq", input_merger_any_high_device, in_w<1>))
+	K051316(config, m_k051316[0], 0);
+	m_k051316[0]->set_palette(m_palette);
+	m_k051316[0]->set_bpp(8);
+	m_k051316[0]->set_wrap(0);
+	m_k051316[0]->set_offsets(-88, -16);
+	m_k051316[0]->set_zoom_callback(FUNC(divebomb_state::zoom_callback_1));
 
-	MCFG_DEVICE_ADD("k051316_1", K051316, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051316_BPP(8)
-	MCFG_K051316_WRAP(0)
-	MCFG_K051316_OFFSETS(-88, -16)
-	MCFG_K051316_CB(divebomb_state, zoom_callback_1)
-
-	MCFG_DEVICE_ADD("k051316_2", K051316, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051316_BPP(8)
-	MCFG_K051316_WRAP(0)
-	MCFG_K051316_OFFSETS(-88, -16)
-	MCFG_K051316_CB(divebomb_state, zoom_callback_2)
+	K051316(config, m_k051316[1], 0);
+	m_k051316[1]->set_palette(m_palette);
+	m_k051316[1]->set_bpp(8);
+	m_k051316[1]->set_wrap(0);
+	m_k051316[1]->set_offsets(-88, -16);
+	m_k051316[1]->set_zoom_callback(FUNC(divebomb_state::zoom_callback_2));
 
 	MCFG_MACHINE_START_OVERRIDE(divebomb_state, divebomb)
 	MCFG_MACHINE_RESET_OVERRIDE(divebomb_state, divebomb)
@@ -443,33 +440,25 @@ MACHINE_CONFIG_START(divebomb_state::divebomb)
 	screen.set_size(256, 256);
 	screen.set_visarea(0, 256-1, 0, 256-1-32);
 	screen.set_screen_update(FUNC(divebomb_state::screen_update_divebomb));
-	screen.set_palette("palette");
+	screen.set_palette(m_palette);
 	screen.screen_vblank().set_inputline(m_fgcpu, INPUT_LINE_NMI);
 	screen.screen_vblank().append_inputline(m_spritecpu, INPUT_LINE_NMI);
 	screen.screen_vblank().append_inputline(m_rozcpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_divebomb)
-	MCFG_PALETTE_ADD("palette", 0x400+0x400+0x400+0x100)
-
-	MCFG_PALETTE_INIT_OWNER(divebomb_state, divebomb)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_divebomb);
+	PALETTE(config, m_palette, FUNC(divebomb_state::divebomb_palette), 0x400+0x400+0x400+0x100);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
 	// All frequencies unverified
-	MCFG_DEVICE_ADD("sn0", SN76489, XTAL1/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
-	MCFG_DEVICE_ADD("sn1", SN76489, XTAL1/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
-	MCFG_DEVICE_ADD("sn2", SN76489, XTAL1/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
-	MCFG_DEVICE_ADD("sn3", SN76489, XTAL1/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
-	MCFG_DEVICE_ADD("sn4", SN76489, XTAL1/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
-	MCFG_DEVICE_ADD("sn5", SN76489, XTAL1/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
-MACHINE_CONFIG_END
+	SN76489(config, "sn0", XTAL1/8).add_route(ALL_OUTPUTS, "mono", 0.15);
+	SN76489(config, "sn1", XTAL1/8).add_route(ALL_OUTPUTS, "mono", 0.15);
+	SN76489(config, "sn2", XTAL1/8).add_route(ALL_OUTPUTS, "mono", 0.15);
+	SN76489(config, "sn3", XTAL1/8).add_route(ALL_OUTPUTS, "mono", 0.15);
+	SN76489(config, "sn4", XTAL1/8).add_route(ALL_OUTPUTS, "mono", 0.15);
+	SN76489(config, "sn5", XTAL1/8).add_route(ALL_OUTPUTS, "mono", 0.15);
+}
 
 
 

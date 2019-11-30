@@ -6,7 +6,7 @@
  */
 
 #include "nld_legacy.h"
-#include "../nl_base.h"
+#include "netlist/nl_base.h"
 
 namespace netlist
 {
@@ -25,7 +25,7 @@ namespace netlist
 		NETLIB_RESETI();
 		NETLIB_UPDATEI();
 
-	protected:
+	private:
 		logic_input_t m_S;
 		logic_input_t m_R;
 
@@ -49,7 +49,7 @@ namespace netlist
 		NETLIB_RESETI();
 		NETLIB_UPDATEI();
 
-	protected:
+	private:
 		logic_input_t m_I;
 		logic_output_t m_Q;
 
@@ -100,8 +100,8 @@ namespace netlist
 		m_last = nval;
 	}
 
-	NETLIB_DEVICE_IMPL(nicRSFF)
-	NETLIB_DEVICE_IMPL(nicDelay)
+	NETLIB_DEVICE_IMPL(nicRSFF,  "NETDEV_RSFF",  "")
+	NETLIB_DEVICE_IMPL(nicDelay, "NETDEV_DELAY", "")
 
 	} //namespace devices
 } // namespace netlist

@@ -13,6 +13,7 @@
 #include "sound/discrete.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 /* Discrete Sound Input Nodes */
 #define VIDEOPIN_OCTAVE_DATA    NODE_01
@@ -34,7 +35,7 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_video_ram(*this, "video_ram"),
-		m_led(*this, "led0")
+		m_leds(*this, "LED%02u", 1U)
 	{ }
 
 	void videopin(machine_config &config);
@@ -45,13 +46,13 @@ private:
 		TIMER_INTERRUPT
 	};
 
-	DECLARE_READ8_MEMBER(misc_r);
-	DECLARE_WRITE8_MEMBER(led_w);
-	DECLARE_WRITE8_MEMBER(ball_w);
-	DECLARE_WRITE8_MEMBER(video_ram_w);
-	DECLARE_WRITE8_MEMBER(out1_w);
-	DECLARE_WRITE8_MEMBER(out2_w);
-	DECLARE_WRITE8_MEMBER(note_dvsr_w);
+	uint8_t misc_r();
+	void led_w(uint8_t data);
+	void ball_w(uint8_t data);
+	void video_ram_w(offs_t offset, uint8_t data);
+	void out1_w(uint8_t data);
+	void out2_w(uint8_t data);
+	void note_dvsr_w(uint8_t data);
 
 	TILEMAP_MAPPER_MEMBER(get_memory_offset);
 	TILE_GET_INFO_MEMBER(get_tile_info);
@@ -75,7 +76,7 @@ private:
 	required_device<palette_device> m_palette;
 
 	required_shared_ptr<uint8_t> m_video_ram;
-	output_finder<> m_led;
+	output_finder<32> m_leds;
 
 	attotime m_time_pushed;
 	attotime m_time_released;

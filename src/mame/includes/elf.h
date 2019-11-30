@@ -57,7 +57,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( da_w );
 	template <unsigned N> DECLARE_WRITE8_MEMBER( digit_w ) { m_7segs[N] = data; }
 
-	DECLARE_QUICKLOAD_LOAD_MEMBER( elf );
+	DECLARE_QUICKLOAD_LOAD_MEMBER( quickload_cb );
 	void elf2_io(address_map &map);
 	void elf2_mem(address_map &map);
 

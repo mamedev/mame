@@ -50,21 +50,22 @@ const tiny_rom_entry *cst_q_plus4_device::device_rom_region() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(cst_q_plus4_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(MC6821_TAG, PIA6821, 0)
+void cst_q_plus4_device::device_add_mconfig(machine_config &config)
+{
+	PIA6821(config, MC6821_TAG, 0);
 
-	MCFG_DEVICE_ADD("exp1", QL_EXPANSION_SLOT, DERIVED_CLOCK(1, 1), ql_expansion_cards, nullptr)
-	MCFG_QL_EXPANSION_SLOT_EXTINTL_CALLBACK(WRITELINE(*this, cst_q_plus4_device, exp1_extintl_w))
+	QL_EXPANSION_SLOT(config, m_exp1, DERIVED_CLOCK(1, 1), ql_expansion_cards, nullptr);
+	m_exp1->extintl_wr_callback().set(FUNC(cst_q_plus4_device::exp1_extintl_w));
 
-	MCFG_DEVICE_ADD("exp2", QL_EXPANSION_SLOT, DERIVED_CLOCK(1, 1), ql_expansion_cards, nullptr)
-	MCFG_QL_EXPANSION_SLOT_EXTINTL_CALLBACK(WRITELINE(*this, cst_q_plus4_device, exp2_extintl_w))
+	QL_EXPANSION_SLOT(config, m_exp2, DERIVED_CLOCK(1, 1), ql_expansion_cards, nullptr);
+	m_exp2->extintl_wr_callback().set(FUNC(cst_q_plus4_device::exp2_extintl_w));
 
-	MCFG_DEVICE_ADD("exp3", QL_EXPANSION_SLOT, DERIVED_CLOCK(1, 1), ql_expansion_cards, nullptr)
-	MCFG_QL_EXPANSION_SLOT_EXTINTL_CALLBACK(WRITELINE(*this, cst_q_plus4_device, exp3_extintl_w))
+	QL_EXPANSION_SLOT(config, m_exp3, DERIVED_CLOCK(1, 1), ql_expansion_cards, nullptr);
+	m_exp3->extintl_wr_callback().set(FUNC(cst_q_plus4_device::exp3_extintl_w));
 
-	MCFG_DEVICE_ADD("exp4", QL_EXPANSION_SLOT, DERIVED_CLOCK(1, 1), ql_expansion_cards, nullptr)
-	MCFG_QL_EXPANSION_SLOT_EXTINTL_CALLBACK(WRITELINE(*this, cst_q_plus4_device, exp4_extintl_w))
-MACHINE_CONFIG_END
+	QL_EXPANSION_SLOT(config, m_exp4, DERIVED_CLOCK(1, 1), ql_expansion_cards, nullptr);
+	m_exp4->extintl_wr_callback().set(FUNC(cst_q_plus4_device::exp4_extintl_w));
+}
 
 
 
@@ -105,17 +106,17 @@ void cst_q_plus4_device::device_start()
 //  read -
 //-------------------------------------------------
 
-uint8_t cst_q_plus4_device::read(address_space &space, offs_t offset, uint8_t data)
+uint8_t cst_q_plus4_device::read(offs_t offset, uint8_t data)
 {
 	if (offset >= 0xc000 && offset < 0xc200)
 	{
 		data = m_rom->base()[offset & 0x1fff];
 	}
 
-	data = m_exp1->read(space, offset, data);
-	data = m_exp2->read(space, offset, data);
-	data = m_exp3->read(space, offset, data);
-	data = m_exp4->read(space, offset, data);
+	data = m_exp1->read(offset, data);
+	data = m_exp2->read(offset, data);
+	data = m_exp3->read(offset, data);
+	data = m_exp4->read(offset, data);
 
 	return data;
 }
@@ -125,10 +126,10 @@ uint8_t cst_q_plus4_device::read(address_space &space, offs_t offset, uint8_t da
 //  write -
 //-------------------------------------------------
 
-void cst_q_plus4_device::write(address_space &space, offs_t offset, uint8_t data)
+void cst_q_plus4_device::write(offs_t offset, uint8_t data)
 {
-	m_exp1->write(space, offset, data);
-	m_exp2->write(space, offset, data);
-	m_exp3->write(space, offset, data);
-	m_exp4->write(space, offset, data);
+	m_exp1->write(offset, data);
+	m_exp2->write(offset, data);
+	m_exp3->write(offset, data);
+	m_exp4->write(offset, data);
 }

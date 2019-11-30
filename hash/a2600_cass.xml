@@ -27,7 +27,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<sharedfeat name="requirement" value="scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="communist mutants from space (1982) (arcadia corporation).a26" size="8448" crc="d64ec816" sha1="9a113bacc576d1d1f80a26622359c49df97b16bc" offset="0" />
+				<rom name="communist mutants from space (1982) (arcadia corporation).a26" size="8448" crc="d64ec816" sha1="9a113bacc576d1d1f80a26622359c49df97b16bc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -41,7 +41,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<sharedfeat name="requirement" value="scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="communist mutants from space (preview) (1982) (arcadia corporation).a26" size="8448" crc="ca6bb788" sha1="ad18885ed38516c3e136293ae565c113f299d223" offset="0" />
+				<rom name="communist mutants from space (preview) (1982) (arcadia corporation).a26" size="8448" crc="ca6bb788" sha1="ad18885ed38516c3e136293ae565c113f299d223"/>
 			</dataarea>
 		</part>
 	</software>
@@ -55,7 +55,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<sharedfeat name="requirement" value="scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="communist mutants from space (1982) (starpath corporation) (pal).a26" size="8448" crc="e8c4dc94" sha1="9ab6e90c2a41684f46592b8e2b71fd19e540b055" offset="0" />
+				<rom name="communist mutants from space (1982) (starpath corporation) (pal).a26" size="8448" crc="e8c4dc94" sha1="9ab6e90c2a41684f46592b8e2b71fd19e540b055"/>
 			</dataarea>
 		</part>
 	</software>
@@ -69,7 +69,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<sharedfeat name="requirement" value="scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="communist mutants from space (preview) (1982) (starpath corporation) (pal).a26" size="8448" crc="d1a5b3bb" sha1="b0483e5de99833d630433281953a670dd72a0df4" offset="0" />
+				<rom name="communist mutants from space (preview) (1982) (starpath corporation) (pal).a26" size="8448" crc="d1a5b3bb" sha1="b0483e5de99833d630433281953a670dd72a0df4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -83,17 +83,17 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<sharedfeat name="requirement" value="scharger"/>
 		<part name="cass1" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="dragonstomper (1 of 3) (1982) (starpath corporation).a26" size="8448" crc="ff942c31" sha1="9283e892dca1ad463443d347c99826bd623e0fdc" offset="0" />
+				<rom name="dragonstomper (1 of 3) (1982) (starpath corporation).a26" size="8448" crc="ff942c31" sha1="9283e892dca1ad463443d347c99826bd623e0fdc"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="dragonstomper (2 of 3) (1982) (starpath corporation).a26" size="8448" crc="d9734371" sha1="1f00e06ae2f42e59637d73b37b9ccc3b130ede13" offset="0" />
+				<rom name="dragonstomper (2 of 3) (1982) (starpath corporation).a26" size="8448" crc="d9734371" sha1="1f00e06ae2f42e59637d73b37b9ccc3b130ede13"/>
 			</dataarea>
 		</part>
 		<part name="cass3" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="dragonstomper (3 of 3) (1982) (starpath corporation).a26" size="8448" crc="fcd8c4ed" sha1="b463d3da55cfa27c4f75550afcd07bcf28683d26" offset="0" />
+				<rom name="dragonstomper (3 of 3) (1982) (starpath corporation).a26" size="8448" crc="fcd8c4ed" sha1="b463d3da55cfa27c4f75550afcd07bcf28683d26"/>
 			</dataarea>
 		</part>
 	</software>
@@ -107,7 +107,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<sharedfeat name="requirement" value="scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="dragonstomper (preview) (1982) (starpath corporation).a26" size="8448" crc="c483f940" sha1="aa63009fb7dc4ece8cda3078d37f4e93b326c4df" offset="0" />
+				<rom name="dragonstomper (preview) (1982) (starpath corporation).a26" size="8448" crc="c483f940" sha1="aa63009fb7dc4ece8cda3078d37f4e93b326c4df"/>
 			</dataarea>
 		</part>
 	</software>
@@ -121,17 +121,17 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<sharedfeat name="requirement" value="scharger"/>
 		<part name="cass1" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="dragonstomper (1 of 3) (1982) (starpath corporation) (pal).a26" size="8448" crc="87e14ffb" sha1="0f4bed960092061a5e3a8a118118793b16b902b4" offset="0" />
+				<rom name="dragonstomper (1 of 3) (1982) (starpath corporation) (pal).a26" size="8448" crc="87e14ffb" sha1="0f4bed960092061a5e3a8a118118793b16b902b4"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="dragonstomper (2 of 3) (1982) (starpath corporation) (pal).a26" size="8448" crc="41301d7d" sha1="6080703b9f16357e581be69a6154ac7186a91fac" offset="0" />
+				<rom name="dragonstomper (2 of 3) (1982) (starpath corporation) (pal).a26" size="8448" crc="41301d7d" sha1="6080703b9f16357e581be69a6154ac7186a91fac"/>
 			</dataarea>
 		</part>
 		<part name="cass3" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="dragonstomper (3 of 3) (1982) (starpath corporation) (pal).a26" size="8448" crc="a69d86eb" sha1="0450f52c501c1018c7f2b8d6f18767daf17bdadc" offset="0" />
+				<rom name="dragonstomper (3 of 3) (1982) (starpath corporation) (pal).a26" size="8448" crc="a69d86eb" sha1="0450f52c501c1018c7f2b8d6f18767daf17bdadc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -145,7 +145,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<sharedfeat name="requirement" value="scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="dragonstomper (preview) (1982) (starpath corporation) (pal).a26" size="8448" crc="d610fd7e" sha1="7a893558f01e21b4708622cbc4b4db30c849acc6" offset="0" />
+				<rom name="dragonstomper (preview) (1982) (starpath corporation) (pal).a26" size="8448" crc="d610fd7e" sha1="7a893558f01e21b4708622cbc4b4db30c849acc6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -159,22 +159,22 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<sharedfeat name="requirement" value="scharger"/>
 		<part name="cass1" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="escape from the mindmaster (1 of 4) (1982) (starpath corporation).a26" size="8448" crc="20817f5d" sha1="aa7179ed05d6afb6ec8bcd06c589d4b137ec1bd6" offset="0" />
+				<rom name="escape from the mindmaster (1 of 4) (1982) (starpath corporation).a26" size="8448" crc="20817f5d" sha1="aa7179ed05d6afb6ec8bcd06c589d4b137ec1bd6"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="escape from the mindmaster (2 of 4) (1982) (starpath corporation).a26" size="8448" crc="f08aa960" sha1="7cc06554cea3030fc88b537c70f2adb33e4a3f59" offset="0" />
+				<rom name="escape from the mindmaster (2 of 4) (1982) (starpath corporation).a26" size="8448" crc="f08aa960" sha1="7cc06554cea3030fc88b537c70f2adb33e4a3f59"/>
 			</dataarea>
 		</part>
 		<part name="cass3" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="escape from the mindmaster (3 of 4) (1982) (starpath corporation).a26" size="8448" crc="b9e64de8" sha1="b7e626c13bc53665a37e465d6beeb5a15e6e526c" offset="0" />
+				<rom name="escape from the mindmaster (3 of 4) (1982) (starpath corporation).a26" size="8448" crc="b9e64de8" sha1="b7e626c13bc53665a37e465d6beeb5a15e6e526c"/>
 			</dataarea>
 		</part>
 		<part name="cass4" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="escape from the mindmaster (4 of 4) (1982) (starpath corporation).a26" size="8448" crc="abd4967d" sha1="3db8d34567d9c27c41ce560b9eacc6148cd85163" offset="0" />
+				<rom name="escape from the mindmaster (4 of 4) (1982) (starpath corporation).a26" size="8448" crc="abd4967d" sha1="3db8d34567d9c27c41ce560b9eacc6148cd85163"/>
 			</dataarea>
 		</part>
 	</software>
@@ -188,7 +188,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<sharedfeat name="requirement" value="scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="escape from the mindmaster (preview) (1982) (starpath corporation).a26" size="8448" crc="5a1deb25" sha1="7a32131911eb04957facc87b4333308b44e02c02" offset="0" />
+				<rom name="escape from the mindmaster (preview) (1982) (starpath corporation).a26" size="8448" crc="5a1deb25" sha1="7a32131911eb04957facc87b4333308b44e02c02"/>
 			</dataarea>
 		</part>
 	</software>
@@ -202,22 +202,22 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<sharedfeat name="requirement" value="scharger"/>
 		<part name="cass1" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="escape from the mindmaster (1 of 4) (1982) (starpath corporation) (pal).a26" size="8448" crc="191c532a" sha1="e870fbbc07213b1cc552872f3115f33c1f5b351c" offset="0" />
+				<rom name="escape from the mindmaster (1 of 4) (1982) (starpath corporation) (pal).a26" size="8448" crc="191c532a" sha1="e870fbbc07213b1cc552872f3115f33c1f5b351c"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="escape from the mindmaster (2 of 4) (1982) (starpath corporation) (pal).a26" size="8448" crc="9a84b9e2" sha1="a72859502b9437e1e8ccf984f2e61aabc908ed28" offset="0" />
+				<rom name="escape from the mindmaster (2 of 4) (1982) (starpath corporation) (pal).a26" size="8448" crc="9a84b9e2" sha1="a72859502b9437e1e8ccf984f2e61aabc908ed28"/>
 			</dataarea>
 		</part>
 		<part name="cass3" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="escape from the mindmaster (3 of 4) (1982) (starpath corporation) (pal).a26" size="8448" crc="5b363d93" sha1="b4415af06ec8abf01c3127f17864b3d4c1e827db" offset="0" />
+				<rom name="escape from the mindmaster (3 of 4) (1982) (starpath corporation) (pal).a26" size="8448" crc="5b363d93" sha1="b4415af06ec8abf01c3127f17864b3d4c1e827db"/>
 			</dataarea>
 		</part>
 		<part name="cass4" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="escape from the mindmaster (4 of 4) (1982) (starpath corporation) (pal).a26" size="8448" crc="7fbcc11f" sha1="49bb0dfaadda7201787ca110b51ef3320963ca9f" offset="0" />
+				<rom name="escape from the mindmaster (4 of 4) (1982) (starpath corporation) (pal).a26" size="8448" crc="7fbcc11f" sha1="49bb0dfaadda7201787ca110b51ef3320963ca9f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -231,7 +231,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<sharedfeat name="requirement" value="scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="escape from the mindmaster (preview) (1982) (starpath corporation) (pal).a26" size="8448" crc="cd4bc0e0" sha1="65c7016bc60b7035645cdf1cb50bb396fce60aa0" offset="0" />
+				<rom name="escape from the mindmaster (preview) (1982) (starpath corporation) (pal).a26" size="8448" crc="cd4bc0e0" sha1="65c7016bc60b7035645cdf1cb50bb396fce60aa0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -244,7 +244,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<sharedfeat name="requirement" value="scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="excalibur (1982) (arcadia corporation) (prototype).a26" size="8448" crc="73007594" sha1="eaea4c24280cf11e11d62bbbe5c0c74448f497e8" offset="0" />
+				<rom name="excalibur (1982) (arcadia corporation) (prototype).a26" size="8448" crc="73007594" sha1="eaea4c24280cf11e11d62bbbe5c0c74448f497e8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -257,7 +257,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<sharedfeat name="requirement" value="scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="excalibur (1982) (arcadia corporation) (prototype) [a].a26" size="8448" crc="24885ec2" sha1="c6a8bb97d1891a45d9d5b6b799a3602ed7c83ef1" offset="0" />
+				<rom name="excalibur (1982) (arcadia corporation) (prototype) [a].a26" size="8448" crc="24885ec2" sha1="c6a8bb97d1891a45d9d5b6b799a3602ed7c83ef1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -270,7 +270,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<sharedfeat name="requirement" value="scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="excalibur version 36 (1982) (arcadia corporation) (prototype).a26" size="8448" crc="2a51cc8d" sha1="9b89ba2b1481468994c6c93600053500912213f3" offset="0" />
+				<rom name="excalibur version 36 (1982) (arcadia corporation) (prototype).a26" size="8448" crc="2a51cc8d" sha1="9b89ba2b1481468994c6c93600053500912213f3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -283,7 +283,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<sharedfeat name="requirement" value="scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="excalibur version 39 (1982) (arcadia corporation) (prototype).a26" size="8448" crc="ba92957e" sha1="9d515c70bb2498b44fd46f129f10be03b73c937c" offset="0" />
+				<rom name="excalibur version 39 (1982) (arcadia corporation) (prototype).a26" size="8448" crc="ba92957e" sha1="9d515c70bb2498b44fd46f129f10be03b73c937c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -297,7 +297,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<sharedfeat name="requirement" value="scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="fireball (1982) (arcadia corporation).a26" size="8448" crc="b32ae162" sha1="9fa9ed2622d29636f175b8745892dde48a871fd1" offset="0" />
+				<rom name="fireball (1982) (arcadia corporation).a26" size="8448" crc="b32ae162" sha1="9fa9ed2622d29636f175b8745892dde48a871fd1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -311,7 +311,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<sharedfeat name="requirement" value="scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="fireball (preview) (1982) (arcadia corporation).a26" size="8448" crc="962c498f" sha1="20322ad5eb2ad1c11b454d99126ce3b185351e99" offset="0" />
+				<rom name="fireball (preview) (1982) (arcadia corporation).a26" size="8448" crc="962c498f" sha1="20322ad5eb2ad1c11b454d99126ce3b185351e99"/>
 			</dataarea>
 		</part>
 	</software>
@@ -325,7 +325,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<sharedfeat name="requirement" value="scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="fireball (1982) (starpath corporation) (pal).a26" size="8448" crc="1a382f65" sha1="f936c2ebc26c025e4904ae8d01be5f3e66249adb" offset="0" />
+				<rom name="fireball (1982) (starpath corporation) (pal).a26" size="8448" crc="1a382f65" sha1="f936c2ebc26c025e4904ae8d01be5f3e66249adb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -339,7 +339,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<sharedfeat name="requirement" value="scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="fireball (preview) (1982) (starpath corporation) (pal).a26" size="8448" crc="138ccbd1" sha1="f7133999d072ac0560c5a9a4ec46fdd94b52dde6" offset="0" />
+				<rom name="fireball (preview) (1982) (starpath corporation) (pal).a26" size="8448" crc="138ccbd1" sha1="f7133999d072ac0560c5a9a4ec46fdd94b52dde6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -352,7 +352,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<sharedfeat name="requirement" value="scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="fireball (1982) (arcadia corporation) (prototype).a26" size="8448" crc="10e4971e" sha1="fd9ba06548a16067f1a3ab1ef48e3f32d6199191" offset="0" />
+				<rom name="fireball (1982) (arcadia corporation) (prototype).a26" size="8448" crc="10e4971e" sha1="fd9ba06548a16067f1a3ab1ef48e3f32d6199191"/>
 			</dataarea>
 		</part>
 	</software>
@@ -366,7 +366,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<sharedfeat name="requirement" value="scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="killer satellites (1983) (starpath corporation).a26" size="8448" crc="bdd932dc" sha1="64125e796f96aa472bb2191367c6501c657712d9" offset="0" />
+				<rom name="killer satellites (1983) (starpath corporation).a26" size="8448" crc="bdd932dc" sha1="64125e796f96aa472bb2191367c6501c657712d9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -380,7 +380,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<sharedfeat name="requirement" value="scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="killer satellites (1983) (starpath corporation) (pal).a26" size="8448" crc="0b60d857" sha1="7ab5597ca336d3eebd21a7ad82989af366f2dcd3" offset="0" />
+				<rom name="killer satellites (1983) (starpath corporation) (pal).a26" size="8448" crc="0b60d857" sha1="7ab5597ca336d3eebd21a7ad82989af366f2dcd3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -394,7 +394,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<sharedfeat name="requirement" value="scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="killer satellites (1983) (starpath corporation) (prototype).a26" size="8448" crc="c989064c" sha1="dd0a82dac03298a8ce945c4b612cf8944927f5e8" offset="0" />
+				<rom name="killer satellites (1983) (starpath corporation) (prototype).a26" size="8448" crc="c989064c" sha1="dd0a82dac03298a8ce945c4b612cf8944927f5e8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -407,7 +407,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<sharedfeat name="requirement" value="scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="labyrinth (escape from the mindmaster beta) (1982) (arcadia corporation).a26" size="8448" crc="30ebc4a2" sha1="3ce35421bfa26c69eaced246909956a7e484f1fd" offset="0" />
+				<rom name="labyrinth (escape from the mindmaster beta) (1982) (arcadia corporation).a26" size="8448" crc="30ebc4a2" sha1="3ce35421bfa26c69eaced246909956a7e484f1fd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -420,7 +420,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<sharedfeat name="requirement" value="scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="labyrinth (escape from the mindmaster beta) (1982) (arcadia corporation) [a].a26" size="8448" crc="9dc34fb0" sha1="1df4b18ce0187eea5b4d3dd7d150f552d97a08fa" offset="0" />
+				<rom name="labyrinth (escape from the mindmaster beta) (1982) (arcadia corporation) [a].a26" size="8448" crc="9dc34fb0" sha1="1df4b18ce0187eea5b4d3dd7d150f552d97a08fa"/>
 			</dataarea>
 		</part>
 	</software>
@@ -433,7 +433,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<sharedfeat name="requirement" value="scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="meteoroids (suicide mission beta) (1982) (arcadia corporation).a26" size="8448" crc="40d6bbb2" sha1="11c3bd2b9327987e83b34e65e1bbee5fd62e6f60" offset="0" />
+				<rom name="meteoroids (suicide mission beta) (1982) (arcadia corporation).a26" size="8448" crc="40d6bbb2" sha1="11c3bd2b9327987e83b34e65e1bbee5fd62e6f60"/>
 			</dataarea>
 		</part>
 	</software>
@@ -447,7 +447,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<sharedfeat name="requirement" value="scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="official frogger, the (1983) (starpath corporation).a26" size="8448" crc="1228e48c" sha1="f84c15579d22f2536e94f1679642b9dc73b6f2fe" offset="0" />
+				<rom name="official frogger, the (1983) (starpath corporation).a26" size="8448" crc="1228e48c" sha1="f84c15579d22f2536e94f1679642b9dc73b6f2fe"/>
 			</dataarea>
 		</part>
 	</software>
@@ -461,7 +461,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<sharedfeat name="requirement" value="scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="official frogger, the (preview) (1983) (starpath corporation).a26" size="8448" crc="5f0181f9" sha1="2edb64be1bb6f4215f520ec2f487b19f29724b8d" offset="0" />
+				<rom name="official frogger, the (preview) (1983) (starpath corporation).a26" size="8448" crc="5f0181f9" sha1="2edb64be1bb6f4215f520ec2f487b19f29724b8d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -475,7 +475,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<sharedfeat name="requirement" value="scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="official frogger, the (1983) (starpath corporation) (pal).a26" size="8448" crc="e374b94b" sha1="2295b1eb5d30698e0a3a49e959f2a65ae60b4154" offset="0" />
+				<rom name="official frogger, the (1983) (starpath corporation) (pal).a26" size="8448" crc="e374b94b" sha1="2295b1eb5d30698e0a3a49e959f2a65ae60b4154"/>
 			</dataarea>
 		</part>
 	</software>
@@ -489,17 +489,17 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<sharedfeat name="requirement" value="scharger"/>
 		<part name="cass1" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="party mix (1 of 3) (1983) (starpath corporation).a26" size="8448" crc="4724f396" sha1="1b1bcc35bd1120ded54318e63bce05d9c8603a82" offset="0" />
+				<rom name="party mix (1 of 3) (1983) (starpath corporation).a26" size="8448" crc="4724f396" sha1="1b1bcc35bd1120ded54318e63bce05d9c8603a82"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="party mix (2 of 3) (1983) (starpath corporation).a26" size="8448" crc="bf14c002" sha1="13e8f09014dd4bebdb782833028504ff8577b035" offset="0" />
+				<rom name="party mix (2 of 3) (1983) (starpath corporation).a26" size="8448" crc="bf14c002" sha1="13e8f09014dd4bebdb782833028504ff8577b035"/>
 			</dataarea>
 		</part>
 		<part name="cass3" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="party mix (3 of 3) (1983) (starpath corporation).a26" size="8448" crc="c1aa60ce" sha1="261c9d149e7908558fb1a5a5898f568ac823dbb1" offset="0" />
+				<rom name="party mix (3 of 3) (1983) (starpath corporation).a26" size="8448" crc="c1aa60ce" sha1="261c9d149e7908558fb1a5a5898f568ac823dbb1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -513,7 +513,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<sharedfeat name="requirement" value="scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="party mix (preview) (1983) (starpath corporation).a26" size="8448" crc="fb3fe9b1" sha1="035bad1d6142dbe932eb2f2a4e34bbb64692fa9f" offset="0" />
+				<rom name="party mix (preview) (1983) (starpath corporation).a26" size="8448" crc="fb3fe9b1" sha1="035bad1d6142dbe932eb2f2a4e34bbb64692fa9f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -527,17 +527,17 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<sharedfeat name="requirement" value="scharger"/>
 		<part name="cass1" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="party mix (1 of 3) (1983) (starpath corporation) (pal).a26" size="8448" crc="d20d4821" sha1="b92aaae1f94f9c2d9957dfaf1941b7f12c5c7679" offset="0" />
+				<rom name="party mix (1 of 3) (1983) (starpath corporation) (pal).a26" size="8448" crc="d20d4821" sha1="b92aaae1f94f9c2d9957dfaf1941b7f12c5c7679"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="party mix (2 of 3) (1983) (starpath corporation) (pal).a26" size="8448" crc="e50a3d5c" sha1="d668e291131fc01b1286f7cbf5f0de10d15de7f1" offset="0" />
+				<rom name="party mix (2 of 3) (1983) (starpath corporation) (pal).a26" size="8448" crc="e50a3d5c" sha1="d668e291131fc01b1286f7cbf5f0de10d15de7f1"/>
 			</dataarea>
 		</part>
 		<part name="cass3" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="party mix (3 of 3) (1983) (starpath corporation) (pal).a26" size="8448" crc="d619142f" sha1="00c90aea85bd8272cb34ce23fd0e5f0d36a1ea48" offset="0" />
+				<rom name="party mix (3 of 3) (1983) (starpath corporation) (pal).a26" size="8448" crc="d619142f" sha1="00c90aea85bd8272cb34ce23fd0e5f0d36a1ea48"/>
 			</dataarea>
 		</part>
 	</software>
@@ -551,7 +551,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<sharedfeat name="requirement" value="scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="party mix (preview) (1983) (starpath corporation) (pal).a26" size="8448" crc="57536159" sha1="55e51e131235123d2ab9f8a0209bcb16a7734622" offset="0" />
+				<rom name="party mix (preview) (1983) (starpath corporation) (pal).a26" size="8448" crc="57536159" sha1="55e51e131235123d2ab9f8a0209bcb16a7734622"/>
 			</dataarea>
 		</part>
 	</software>
@@ -565,7 +565,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<sharedfeat name="requirement" value="scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="phaser patrol (1982) (arcadia corporation).a26" size="8448" crc="eaf31bd7" sha1="21c255e489d126475c3744cdd0d6e8a8e618e3eb" offset="0" />
+				<rom name="phaser patrol (1982) (arcadia corporation).a26" size="8448" crc="eaf31bd7" sha1="21c255e489d126475c3744cdd0d6e8a8e618e3eb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -579,7 +579,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<sharedfeat name="requirement" value="scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="phaser patrol (1982) (starpath corporation) (pal).a26" size="8448" crc="15550fed" sha1="9734cde5019fad40aef45fe5271f245995027009" offset="0" />
+				<rom name="phaser patrol (1982) (starpath corporation) (pal).a26" size="8448" crc="15550fed" sha1="9734cde5019fad40aef45fe5271f245995027009"/>
 			</dataarea>
 		</part>
 	</software>
@@ -593,7 +593,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<sharedfeat name="requirement" value="scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="phaser patrol (1982) (arcadia corporation) (prototype).a26" size="8448" crc="4fd200db" sha1="1ff4e3101275555ff014d981ff7f9006c93942ee" offset="0" />
+				<rom name="phaser patrol (1982) (arcadia corporation) (prototype).a26" size="8448" crc="4fd200db" sha1="1ff4e3101275555ff014d981ff7f9006c93942ee"/>
 			</dataarea>
 		</part>
 	</software>
@@ -607,7 +607,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<sharedfeat name="requirement" value="scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="phaser patrol (1982) (arcadia corporation) (prototype) [a].a26" size="8448" crc="61a05bf2" sha1="abfd85e6973ab55d12f039cb0a4f4df8a62c0330" offset="0" />
+				<rom name="phaser patrol (1982) (arcadia corporation) (prototype) [a].a26" size="8448" crc="61a05bf2" sha1="abfd85e6973ab55d12f039cb0a4f4df8a62c0330"/>
 			</dataarea>
 		</part>
 	</software>
@@ -621,7 +621,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<sharedfeat name="requirement" value="scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="rabbit transit (1983) (starpath corporation).a26" size="8448" crc="517e5561" sha1="81654cbd6a7262ce0f1abc385ed9adc323a9b6a6" offset="0" />
+				<rom name="rabbit transit (1983) (starpath corporation).a26" size="8448" crc="517e5561" sha1="81654cbd6a7262ce0f1abc385ed9adc323a9b6a6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -635,7 +635,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<sharedfeat name="requirement" value="scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="rabbit transit (preview) (1983) (starpath corporation).a26" size="8448" crc="ba955bb1" sha1="2271944cd9284b499a590cf9fca938560a741990" offset="0" />
+				<rom name="rabbit transit (preview) (1983) (starpath corporation).a26" size="8448" crc="ba955bb1" sha1="2271944cd9284b499a590cf9fca938560a741990"/>
 			</dataarea>
 		</part>
 	</software>
@@ -649,7 +649,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<sharedfeat name="requirement" value="scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="rabbit transit (1983) (starpath corporation) (pal).a26" size="8448" crc="ea7f9afd" sha1="a55851ead48c5033a45fb3f1672341146e5b47d9" offset="0" />
+				<rom name="rabbit transit (1983) (starpath corporation) (pal).a26" size="8448" crc="ea7f9afd" sha1="a55851ead48c5033a45fb3f1672341146e5b47d9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -663,7 +663,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<sharedfeat name="requirement" value="scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="suicide mission (1982) (arcadia corporation).a26" size="8448" crc="b92c49e3" sha1="d3919b4dbeedfabfba30126d351eab509b0c1536" offset="0" />
+				<rom name="suicide mission (1982) (arcadia corporation).a26" size="8448" crc="b92c49e3" sha1="d3919b4dbeedfabfba30126d351eab509b0c1536"/>
 			</dataarea>
 		</part>
 	</software>
@@ -677,7 +677,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<sharedfeat name="requirement" value="scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="suicide mission (preview) (1982) (arcadia corporation).a26" size="8448" crc="4705b9c4" sha1="35061334cd1d26345e2459dfd663d240759eb5f4" offset="0" />
+				<rom name="suicide mission (preview) (1982) (arcadia corporation).a26" size="8448" crc="4705b9c4" sha1="35061334cd1d26345e2459dfd663d240759eb5f4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -691,7 +691,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<sharedfeat name="requirement" value="scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="suicide mission (1982) (starpath corporation) (pal).a26" size="8448" crc="3b2a9c8a" sha1="3b6d664440442f5f1d0220ef01d967a6004bbbdd" offset="0" />
+				<rom name="suicide mission (1982) (starpath corporation) (pal).a26" size="8448" crc="3b2a9c8a" sha1="3b6d664440442f5f1d0220ef01d967a6004bbbdd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -705,7 +705,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<sharedfeat name="requirement" value="scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="suicide mission (preview) (1982) (starpath corporation) (pal).a26" size="8448" crc="67e4a405" sha1="c15c986f92bd068ec844c9cc3da73ff410ec002a" offset="0" />
+				<rom name="suicide mission (preview) (1982) (starpath corporation) (pal).a26" size="8448" crc="67e4a405" sha1="c15c986f92bd068ec844c9cc3da73ff410ec002a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -718,7 +718,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<sharedfeat name="requirement" value="scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="suicide mission (1982) (arcadia corporation) (prototype).a26" size="8448" crc="54efd148" sha1="c3a79f8dbd4af3628ff91fa0f99f995a8756f4fa" offset="0" />
+				<rom name="suicide mission (1982) (arcadia corporation) (prototype).a26" size="8448" crc="54efd148" sha1="c3a79f8dbd4af3628ff91fa0f99f995a8756f4fa"/>
 			</dataarea>
 		</part>
 	</software>
@@ -732,17 +732,17 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<sharedfeat name="requirement" value="scharger"/>
 		<part name="cass1" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="survival island (1 of 3) (1983) (starpath corporation).a26" size="8448" crc="ea4f2765" sha1="cba1c7d15cc3c7b6164652866f958297de9d7eef" offset="0" />
+				<rom name="survival island (1 of 3) (1983) (starpath corporation).a26" size="8448" crc="ea4f2765" sha1="cba1c7d15cc3c7b6164652866f958297de9d7eef"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="survival island (2 of 3) (1983) (starpath corporation).a26" size="8448" crc="ae02fdb4" sha1="bac319deee30cc6fb4f8e12605df2b69a9a249aa" offset="0" />
+				<rom name="survival island (2 of 3) (1983) (starpath corporation).a26" size="8448" crc="ae02fdb4" sha1="bac319deee30cc6fb4f8e12605df2b69a9a249aa"/>
 			</dataarea>
 		</part>
 		<part name="cass3" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="survival island (3 of 3) (1983) (starpath corporation).a26" size="8448" crc="d23dcfec" sha1="34de46efc38be5c870faf11bc878e74519f7aac4" offset="0" />
+				<rom name="survival island (3 of 3) (1983) (starpath corporation).a26" size="8448" crc="d23dcfec" sha1="34de46efc38be5c870faf11bc878e74519f7aac4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -756,17 +756,17 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<sharedfeat name="requirement" value="scharger"/>
 		<part name="cass1" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="survival island (1 of 3) (1983) (starpath corporation) (pal).a26" size="8448" crc="2ee59279" sha1="b1344b694ed1408ef50a6c9b1fe162c5b850cd1e" offset="0" />
+				<rom name="survival island (1 of 3) (1983) (starpath corporation) (pal).a26" size="8448" crc="2ee59279" sha1="b1344b694ed1408ef50a6c9b1fe162c5b850cd1e"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="survival island (2 of 3) (1983) (starpath corporation) (pal).a26" size="8448" crc="c7dd5f7f" sha1="9fecc4ea4fbcba8c0ecaabfe6dc77ea97826cc32" offset="0" />
+				<rom name="survival island (2 of 3) (1983) (starpath corporation) (pal).a26" size="8448" crc="c7dd5f7f" sha1="9fecc4ea4fbcba8c0ecaabfe6dc77ea97826cc32"/>
 			</dataarea>
 		</part>
 		<part name="cass3" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="survival island (3 of 3) (1983) (starpath corporation) (pal).a26" size="8448" crc="d1f68f7a" sha1="e32c7604f84a3a22f455c6900fce28b33ddcf8cc" offset="0" />
+				<rom name="survival island (3 of 3) (1983) (starpath corporation) (pal).a26" size="8448" crc="d1f68f7a" sha1="e32c7604f84a3a22f455c6900fce28b33ddcf8cc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -779,17 +779,17 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<sharedfeat name="requirement" value="scharger"/>
 		<part name="cass1" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="sweat! - the decathlon game (1 of 3) (1983) (starpath corporation) (prototype).a26" size="8448" crc="32297adf" sha1="709a413f7d83176c5e6a6a753308752aecd16923" offset="0" />
+				<rom name="sweat! - the decathlon game (1 of 3) (1983) (starpath corporation) (prototype).a26" size="8448" crc="32297adf" sha1="709a413f7d83176c5e6a6a753308752aecd16923"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="sweat! - the decathlon game (2 of 3) (1983) (starpath corporation) (prototype).a26" size="8448" crc="bc58243a" sha1="e84a3f964098c435d361aba9a2948f7ddc58dc60" offset="0" />
+				<rom name="sweat! - the decathlon game (2 of 3) (1983) (starpath corporation) (prototype).a26" size="8448" crc="bc58243a" sha1="e84a3f964098c435d361aba9a2948f7ddc58dc60"/>
 			</dataarea>
 		</part>
 		<part name="cass3" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="sweat! - the decathlon game (3 of 3) (1983) (starpath corporation) (prototype).a26" size="8448" crc="ba1f666b" sha1="bea35df3bbcdc7b0a52e5b09716ab6f49719d9b1" offset="0" />
+				<rom name="sweat! - the decathlon game (3 of 3) (1983) (starpath corporation) (prototype).a26" size="8448" crc="ba1f666b" sha1="bea35df3bbcdc7b0a52e5b09716ab6f49719d9b1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -803,7 +803,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<sharedfeat name="requirement" value="scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="sword of saros (1983) (starpath corporation).a26" size="8448" crc="d96a3632" sha1="45ab6ae206f86524e31815a736a90287cca94b70" offset="0" />
+				<rom name="sword of saros (1983) (starpath corporation).a26" size="8448" crc="d96a3632" sha1="45ab6ae206f86524e31815a736a90287cca94b70"/>
 			</dataarea>
 		</part>
 	</software>
@@ -817,7 +817,7 @@ MultiLoad (TM) games, i.e. the few games which had separate chunks of data on th
 		<sharedfeat name="requirement" value="scharger"/>
 		<part name="cass" interface="a2600_cass">
 			<dataarea name="cass" size="8448">
-				<rom name="sword of saros (1983) (starpath corporation) (pal).a26" size="8448" crc="670ff870" sha1="f81877de942e4c424db201e80cee3af38e3c105d" offset="0" />
+				<rom name="sword of saros (1983) (starpath corporation) (pal).a26" size="8448" crc="670ff870" sha1="f81877de942e4c424db201e80cee3af38e3c105d"/>
 			</dataarea>
 		</part>
 	</software>

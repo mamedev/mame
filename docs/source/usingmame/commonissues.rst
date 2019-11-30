@@ -24,7 +24,8 @@ Common Issues and Questions (FAQ)
 18. :ref:`Ultracade`
 19. :ref:`Blackscreen-DirectX`
 20. :ref:`ControllerIssues`
-
+21. :ref:`ExternalOPL`
+22. :ref:`Autofire`
 
 
 .. _rapid-coins:
@@ -39,12 +40,14 @@ In either case, the game would display an error for the operator to look into th
 
 .. _broken-package:
 
-Why is my non-official MAME package (e.g. EmuCR build) broken?
---------------------------------------------------------------
+Why is my non-official MAME package (e.g. EmuCR build) broken? Why is my official update broken?
+------------------------------------------------------------------------------------------------
 
 In many cases, updates to various subsystems such as HLSL, BGFX, or Lua plugins come as updates to the external shader files as well as to the core MAME code. Unfortunately, builds that come from third parties may come as just a main MAME executable or with outdated external files, which can break the coupling between these external files and MAME core code. Despite repeated attempts at contacting some of these third parties to warn them, they persist in distributing broken MAME updates.
 
 As we have no control over how third parties distribute these, all we really can do is disclaim the use of sites like EmuCR and say that we cannot provide support for packages we didn't build. Compile your own MAME or use one of the official packages provided by us.
+
+You may also run into this problem if you have not replaced the contents of the HLSL and BGFX folders with the latest files when updating your MAME install with a new official build.
 
 
 .. _faster-if-X:
@@ -233,3 +236,43 @@ By default, MAME on Microsoft Windows tries to do raw reads of the joystick(s), 
 One thing you can try is setting the keyboardprovider, mouseprovider, or joystickprovider setting (depending on which kind of device your input device acts as) from rawinput to one of the other options such as dinput or win32. See :ref:`osd-commandline-options` for details on supported providers.
 
 
+.. _ExternalOPL:
+
+What happened to the MAME support for external OPL2-carrying soundcards?
+------------------------------------------------------------------------
+
+MAME added support in version 0.23 for the use of a soundcard's onboard OPL2 (Yamaha YM3812 chip) instead of emulating the OPL2. This feature was never supported on the official Windows version of MAME and was dropped entirely as of MAME 0.60, because the OPL2 emulation in MAME had become advanced enough to be a better solution in almost all cases as of that time; now it's superior to using a sound card's YM3812 in all cases, especially as modern cards lack a YM3812.
+
+Unofficial builds of MAME may have supported it for varying amounts of time as well.
+
+
+.. _Autofire:
+
+What happened to the MAME support for autofire?
+-----------------------------------------------
+
+A Lua plugin with providing enhanced autofire support was added in MAME 0.210; the old built-in autofire functionality was removed in MAME 0.216. This new plugin has more functionality than the previous built-in autofire in older MAME revisions; for instance, you can specify an alternate button for the autofire.
+
+You can enable and configure the new autofire system with the following steps:
+
+* Start MAME with no system selected.
+* Choose *Plugins* at the bottom (just above Exit)
+* Turn Autofire on.
+
+The setting will be automatically saved for future use.
+
+Once you're inside a system of your choice, bring up the MAME menu (typically the **tab** key) and go into *plugin options*. From there, depending on whether you have an existing autofire button set up or not, it will either show the existing entry/entries or it will ask you to select the input for the autofire.
+
+Typically you'll be choosing *P1 Button 1* for systems like Galaga, Alcon, or the like. The *Hotkey* is the button you press for the autofire effect. This can be any keyboard key or joystick button that you wish. As of 0.216, mouse buttons are not yet supported.
+
+*On frames* and *Off frames* are how long to leave the button pressed and unpressed in number of frames. Some systems do not read the inputs fast enough for 1 and 1 to be usable. You may need to try 2 and 2 (e.g. Alcon) or other combinations. Try fine-tuning these to your taste.
+
+The autofire configuration for that system will be saved in a ``systemname.cfg`` (e.g. ``alcon.cfg``) file inside the Autofire folder for future use. Each system will have its own configuration.
+
+Note that if you set the autofire button to an input button that's also defined in MAME's inputs for the running system, you may get unexpected results-- Using Gradius as an example:
+
+ If you set button 1 on your controller to fire, then set autofire to button 1 as well, holding the button down to shoot will not trigger the autofire because the button never gets released from you holding the non-autofire button 1. This will also happen if you set a different button as autofire (say, button 3 in this case), and hold button 1 down while holding button 3 down.
+
+ If you set button 3 on your controller to autofire and set button 3 to be powerup as well, you will trigger the powerup action every time you grab a powerup because the powerup button is also being held down along with the autofire button.
+
+ It is suggested you choose a button for autofire that is not in use for anything else in the current system.

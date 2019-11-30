@@ -48,9 +48,10 @@ DEFINE_DEVICE_TYPE(ISA8_MPU401, isa8_mpu401_device, "isa_mpu401", "Roland MPU-40
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(isa8_mpu401_device::device_add_mconfig)
-	MCFG_MPU401_ADD(MPU_CORE_TAG, WRITELINE(*this, isa8_mpu401_device, mpu_irq_out))
-MACHINE_CONFIG_END
+void isa8_mpu401_device::device_add_mconfig(machine_config &config)
+{
+	MPU401(config, m_mpu401).irq_cb().set(FUNC(isa8_mpu401_device::mpu_irq_out));
+}
 
 
 //**************************************************************************
@@ -76,7 +77,7 @@ void isa8_mpu401_device::device_start()
 {
 	set_isa_device();
 
-	m_isa->install_device(0x330, 0x0331, READ8_DEVICE_DELEGATE(m_mpu401, mpu401_device, mpu_r), WRITE8_DEVICE_DELEGATE(m_mpu401, mpu401_device, mpu_w));
+	m_isa->install_device(0x330, 0x0331, read8_delegate(*m_mpu401, FUNC(mpu401_device::mpu_r)), write8_delegate(*m_mpu401, FUNC(mpu401_device::mpu_w)));
 }
 
 //-------------------------------------------------

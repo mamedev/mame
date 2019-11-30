@@ -42,17 +42,19 @@ dy_6.bin (near Z80)
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class dynadice_state : public driver_device
 {
 public:
-	dynadice_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	dynadice_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_ay8910(*this, "ay8910") { }
+		m_ay8910(*this, "ay8910")
+	{ }
 
 	void dynadice(machine_config &config);
 
@@ -118,10 +120,10 @@ WRITE8_MEMBER(dynadice_state::sound_control_w)
 
 */
 	if ((data & 7) == 7)
-		m_ay8910->address_w(space, 0, m_ay_data);
+		m_ay8910->address_w(m_ay_data);
 
 	if ((data & 7) == 6)
-		m_ay8910->data_w(space, 0, m_ay_data);
+		m_ay8910->data_w(m_ay_data);
 }
 
 
@@ -235,8 +237,8 @@ TILE_GET_INFO_MEMBER(dynadice_state::get_tile_info)
 void dynadice_state::video_start()
 {
 	/* pacman - style videoram layout */
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dynadice_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_top_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dynadice_state::get_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 2, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(dynadice_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_top_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(dynadice_state::get_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 2, 32);
 	m_bg_tilemap->set_scrollx(0, -16);
 }
 
@@ -259,39 +261,38 @@ void dynadice_state::machine_reset()
 	m_ay_data = 0;
 }
 
-MACHINE_CONFIG_START(dynadice_state::dynadice)
-
+void dynadice_state::dynadice(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, I8080, 18.432_MHz_XTAL / 8)
-	MCFG_DEVICE_PROGRAM_MAP(dynadice_map)
-	MCFG_DEVICE_IO_MAP(dynadice_io_map)
+	I8080(config, m_maincpu, 18.432_MHz_XTAL / 8);
+	m_maincpu->set_addrmap(AS_PROGRAM, &dynadice_state::dynadice_map);
+	m_maincpu->set_addrmap(AS_IO, &dynadice_state::dynadice_io_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 18.432_MHz_XTAL / 6)
-	MCFG_DEVICE_PROGRAM_MAP(dynadice_sound_map)
-	MCFG_DEVICE_IO_MAP(dynadice_sound_io_map)
+	z80_device &audiocpu(Z80(config, "audiocpu", 18.432_MHz_XTAL / 6));
+	audiocpu.set_addrmap(AS_PROGRAM, &dynadice_state::dynadice_sound_map);
+	audiocpu.set_addrmap(AS_IO, &dynadice_state::dynadice_sound_io_map);
 
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256+16, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 34*8-1, 3*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(dynadice_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(256+16, 256);
+	screen.set_visarea(0*8, 34*8-1, 3*8, 28*8-1);
+	screen.set_screen_update(FUNC(dynadice_state::screen_update));
+	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_dynadice)
-	MCFG_PALETTE_ADD_3BIT_BRG("palette")
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_dynadice);
+	PALETTE(config, "palette", palette_device::BRG_3BIT);
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD(m_ay8910, AY8910, 2000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	AY8910(config, m_ay8910, 2000000).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 ROM_START( dynadice )
 	ROM_REGION( 0x10000, "maincpu", 0 )

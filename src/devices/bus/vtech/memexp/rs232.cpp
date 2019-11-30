@@ -34,10 +34,11 @@ const tiny_rom_entry *vtech_rs232_interface_device::device_rom_region() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(vtech_rs232_interface_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(*this, vtech_rs232_interface_device, rs232_rx_w))
-MACHINE_CONFIG_END
+void vtech_rs232_interface_device::device_add_mconfig(machine_config &config)
+{
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
+	m_rs232->rxd_handler().set(FUNC(vtech_rs232_interface_device::rs232_rx_w));
+}
 
 
 //**************************************************************************
@@ -74,8 +75,8 @@ void vtech_rs232_interface_device::device_reset()
 	program_space().install_rom(0x4000, 0x47ff, 0x800, memregion("software")->base());
 
 	// data
-	program_space().install_read_handler(0x5000, 0x57ff, read8_delegate(FUNC(vtech_rs232_interface_device::receive_data_r), this));
-	program_space().install_write_handler(0x5800, 0x5fff, write8_delegate(FUNC(vtech_rs232_interface_device::transmit_data_w), this));
+	program_space().install_read_handler(0x5000, 0x57ff, read8_delegate(*this, FUNC(vtech_rs232_interface_device::receive_data_r)));
+	program_space().install_write_handler(0x5800, 0x5fff, write8_delegate(*this, FUNC(vtech_rs232_interface_device::transmit_data_w)));
 }
 
 

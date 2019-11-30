@@ -9,7 +9,7 @@
 
 		<part name="cart" interface="cbm2_cart">
 			<dataarea name="bank1" size="0x2000">
-				<rom name="profitext.bin" size="0x2000" crc="ac622a2b" sha1="a02fcd187b7493a08379bbaef3d4296a083d30c8" offset="0" />
+				<rom name="profitext.bin" size="0x2000" crc="ac622a2b" sha1="a02fcd187b7493a08379bbaef3d4296a083d30c8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -21,11 +21,11 @@
 
 		<part name="cart" interface="cbm2_cart">
 			<dataarea name="bank1" size="0x2000">
-				<rom name="cbm610-cart1-red-left.bin" size="0x2000" crc="be426f3d" sha1="da6f1099fd09165f8ee454e2e517cfc523deb8b7" offset="0" />
+				<rom name="cbm610-cart1-red-left.bin" size="0x2000" crc="be426f3d" sha1="da6f1099fd09165f8ee454e2e517cfc523deb8b7"/>
 			</dataarea>
 
 			<dataarea name="bank2" size="0x2000">
-				<rom name="cbm610-cart1-blue-right.bin" size="0x2000" crc="61a5008b" sha1="02db07ca68631aefb69e5db41fada27486263c69" offset="0" />
+				<rom name="cbm610-cart1-blue-right.bin" size="0x2000" crc="61a5008b" sha1="02db07ca68631aefb69e5db41fada27486263c69"/>
 			</dataarea>
 		</part>
 	</software>
@@ -37,11 +37,11 @@
 
 		<part name="cart" interface="cbm2_cart">
 			<dataarea name="bank1" size="0x2000">
-				<rom name="cbm610-cart2-white-left.bin" size="0x2000" crc="aeb6881c" sha1="4bdabbd7d6d642f916b5a91155396c98fce591a3" offset="0" />
+				<rom name="cbm610-cart2-white-left.bin" size="0x2000" crc="aeb6881c" sha1="4bdabbd7d6d642f916b5a91155396c98fce591a3"/>
 			</dataarea>
 
 			<dataarea name="bank2" size="0x2000">
-				<rom name="cbm610-cart2-green-right.bin" size="0x2000" crc="61a5008b" sha1="02db07ca68631aefb69e5db41fada27486263c69" offset="0" />
+				<rom name="cbm610-cart2-green-right.bin" size="0x2000" crc="61a5008b" sha1="02db07ca68631aefb69e5db41fada27486263c69"/>
 			</dataarea>
 		</part>
 	</software>
@@ -53,7 +53,7 @@
 
 		<part name="cart" interface="cbm2_cart">
 			<dataarea name="bank2" size="0x2000">
-				<rom name="moni610.bin" size="0x2000" crc="43b08d1f" sha1="9c0c24907e85674348dd58e81e6da64e157e9d0f" offset="0" />
+				<rom name="moni610.bin" size="0x2000" crc="43b08d1f" sha1="9c0c24907e85674348dd58e81e6da64e157e9d0f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -66,7 +66,7 @@
 
 		<part name="cart" interface="cbm2_cart">
 			<dataarea name="bank2" size="0x2000">
-				<rom name="vt52emu.bin" size="0x2000" crc="b3b6173a" sha1="dd4a412a1a6ce4272b02d731364dd6dc96a4570b" offset="0" />
+				<rom name="vt52emu.bin" size="0x2000" crc="b3b6173a" sha1="dd4a412a1a6ce4272b02d731364dd6dc96a4570b"/>
 			</dataarea>
 		</part>
 	</software>

@@ -272,7 +272,7 @@ READ16_MEMBER(polepos_state::polepos2_ic25_r)
 }
 
 
-READ8_MEMBER(polepos_state::adc_r)
+uint8_t polepos_state::analog_r()
 {
 	return ioport(m_adc_input ? "ACCEL" : "BRAKE")->read();
 }
@@ -284,7 +284,8 @@ READ8_MEMBER(polepos_state::ready_r)
 	if (m_screen->vpos() >= 128)
 		ret ^= 0x02;
 
-	ret ^= 0x08; /* ADC End Flag */
+	if (!m_adc->intr_r())
+		ret ^= 0x08; /* ADC End Flag */
 
 	return ret;
 }
@@ -311,10 +312,10 @@ template<bool sub1> WRITE16_MEMBER(polepos_state::z8002_nvi_enable_w)
 
 	m_sub_irq_mask = data;
 	if (!data)
-		(sub1 ? m_subcpu : m_subcpu2)->set_input_line(0, CLEAR_LINE);
+		(sub1 ? m_subcpu : m_subcpu2)->set_input_line(z8002_device::NVI_LINE, CLEAR_LINE);
 }
 
-CUSTOM_INPUT_MEMBER(polepos_state::auto_start_r)
+READ_LINE_MEMBER(polepos_state::auto_start_r)
 {
 	return m_auto_start_mask;
 }
@@ -388,8 +389,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(polepos_state::scanline)
 
 	if (scanline == 240 && m_sub_irq_mask)  // VBLANK
 	{
-		m_subcpu->set_input_line(0, ASSERT_LINE);
-		m_subcpu2->set_input_line(0, ASSERT_LINE);
+		m_subcpu->set_input_line(z8002_device::NVI_LINE, ASSERT_LINE);
+		m_subcpu2->set_input_line(z8002_device::NVI_LINE, ASSERT_LINE);
 	}
 }
 
@@ -403,13 +404,11 @@ void polepos_state::machine_start()
 	save_item(NAME(m_last_unsigned));
 	save_item(NAME(m_adc_input));
 	save_item(NAME(m_auto_start_mask));
+	save_item(NAME(m_sub_irq_mask));
 }
 
 void polepos_state::machine_reset()
 {
-	/* set the interrupt vectors (this shouldn't be needed) */
-	m_subcpu->set_input_line_vector(0, Z8000_NVI);
-	m_subcpu2->set_input_line_vector(0, Z8000_NVI);
 }
 
 
@@ -442,7 +441,7 @@ void polepos_state::z80_map(address_map &map)
 void polepos_state::z80_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).r(FUNC(polepos_state::adc_r)).nopw();
+	map(0x00, 0x00).rw(m_adc, FUNC(adc0804_device::read), FUNC(adc0804_device::write));
 }
 
 
@@ -479,7 +478,7 @@ static INPUT_PORTS_START( polepos )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Gear Change") PORT_CODE(KEYCODE_SPACE) POLEPOS_TOGGLE /* Gear */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, polepos_state,auto_start_r, nullptr)  // start 1, program controlled
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(polepos_state, auto_start_r)  // start 1, program controlled
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -849,18 +848,18 @@ GFXDECODE_END
  * Machine driver
  *********************************************************************/
 
-MACHINE_CONFIG_START(polepos_state::polepos)
-
+void polepos_state::polepos(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, Z80, MASTER_CLOCK/8)    /* 3.072 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(z80_map)
-	MCFG_DEVICE_IO_MAP(z80_io)
+	Z80(config, m_maincpu, MASTER_CLOCK/8);   /* 3.072 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &polepos_state::z80_map);
+	m_maincpu->set_addrmap(AS_IO, &polepos_state::z80_io);
 
-	MCFG_DEVICE_ADD(m_subcpu, Z8002, MASTER_CLOCK/8)  /* 3.072 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(z8002_map_1)
+	Z8002(config, m_subcpu, MASTER_CLOCK/8);  /* 3.072 MHz */
+	m_subcpu->set_addrmap(AS_PROGRAM, &polepos_state::z8002_map_1);
 
-	MCFG_DEVICE_ADD(m_subcpu2, Z8002, MASTER_CLOCK/8) /* 3.072 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(z8002_map_2)
+	Z8002(config, m_subcpu2, MASTER_CLOCK/8); /* 3.072 MHz */
+	m_subcpu2->set_addrmap(AS_PROGRAM, &polepos_state::z8002_map_2);
 
 	namco_51xx_device &n51xx(NAMCO_51XX(config, "51xx", MASTER_CLOCK/8/2));      /* 1.536 MHz */
 	n51xx.set_screen_tag(m_screen);
@@ -871,11 +870,11 @@ MACHINE_CONFIG_START(polepos_state::polepos)
 	n51xx.output_callback<0>().set(FUNC(polepos_state::out_0));
 	n51xx.output_callback<1>().set(FUNC(polepos_state::out_1));
 
-	MCFG_NAMCO_52XX_ADD("52xx", MASTER_CLOCK/8/2)      /* 1.536 MHz */
-	MCFG_NAMCO_52XX_DISCRETE("discrete")
-	MCFG_NAMCO_52XX_BASENODE(NODE_04)
-	MCFG_NAMCO_52XX_ROMREAD_CB(READ8(*this, polepos_state,namco_52xx_rom_r))
-	MCFG_NAMCO_52XX_SI_CB(READ8(*this, polepos_state,namco_52xx_si_r))
+	namco_52xx_device &n52xx(NAMCO_52XX(config, "52xx", MASTER_CLOCK/8/2));      /* 1.536 MHz */
+	n52xx.set_discrete("discrete");
+	n52xx.set_basenote(NODE_04);
+	n52xx.romread_callback().set(FUNC(polepos_state::namco_52xx_rom_r));
+	n52xx.si_callback().set(FUNC(polepos_state::namco_52xx_si_r));
 
 	namco_53xx_device &n53xx(NAMCO_53XX(config, "53xx", MASTER_CLOCK/8/2));      /* 1.536 MHz */
 	n53xx.k_port_callback().set(FUNC(polepos_state::namco_53xx_k_r));
@@ -884,27 +883,26 @@ MACHINE_CONFIG_START(polepos_state::polepos)
 	n53xx.input_callback<2>().set_ioport("DSWA").mask(0x0f);
 	n53xx.input_callback<3>().set_ioport("DSWA").rshift(4);
 
-	MCFG_NAMCO_54XX_ADD("54xx", MASTER_CLOCK/8/2)  /* 1.536 MHz */
-	MCFG_NAMCO_54XX_DISCRETE("discrete")
-	MCFG_NAMCO_54XX_BASENODE(NODE_01)
+	namco_54xx_device &n54xx(NAMCO_54XX(config, "54xx", MASTER_CLOCK/8/2));      /* 1.536 MHz */
+	n54xx.set_discrete("discrete");
+	n54xx.set_basenote(NODE_01);
 
-	MCFG_NAMCO_06XX_ADD("06xx", MASTER_CLOCK/8/64)
-	MCFG_NAMCO_06XX_MAINCPU("maincpu")
-	MCFG_NAMCO_06XX_READ_0_CB(READ8("51xx", namco_51xx_device, read))
-	MCFG_NAMCO_06XX_WRITE_0_CB(WRITE8("51xx", namco_51xx_device, write))
-	MCFG_NAMCO_06XX_READ_1_CB(READ8("53xx", namco_53xx_device, read))
-	MCFG_NAMCO_06XX_READ_REQUEST_1_CB(WRITELINE("53xx", namco_53xx_device, read_request))
-	MCFG_NAMCO_06XX_WRITE_2_CB(WRITE8("52xx", namco_52xx_device, write))
-	MCFG_NAMCO_06XX_WRITE_3_CB(WRITE8("54xx", namco_54xx_device, write))
+	namco_06xx_device &n06xx(NAMCO_06XX(config, "06xx", MASTER_CLOCK/8/64));
+	n06xx.set_maincpu(m_maincpu);
+	n06xx.read_callback<0>().set("51xx", FUNC(namco_51xx_device::read));
+	n06xx.write_callback<0>().set("51xx", FUNC(namco_51xx_device::write));
+	n06xx.read_callback<1>().set("53xx", FUNC(namco_53xx_device::read));
+	n06xx.read_request_callback<1>().set("53xx", FUNC(namco_53xx_device::read_request));
+	n06xx.write_callback<2>().set("52xx", FUNC(namco_52xx_device::write));
+	n06xx.write_callback<3>().set("54xx", FUNC(namco_54xx_device::write));
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 16)   // 128V clocks the same as VBLANK
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 16);   // 128V clocks the same as VBLANK
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* some interleaving */
+	config.set_maximum_quantum(attotime::from_hz(6000));  /* some interleaving */
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", polepos_state, scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(polepos_state::scanline), "screen", 0, 1);
 
 	LS259(config, m_latch); // at 8E on polepos
 	m_latch->q_out_cb<0>().set_inputline(m_maincpu, 0, CLEAR_LINE).invert();
@@ -917,45 +915,45 @@ MACHINE_CONFIG_START(polepos_state::polepos)
 	m_latch->q_out_cb<6>().set(FUNC(polepos_state::sb0_w));
 	m_latch->q_out_cb<7>().set(FUNC(polepos_state::chacl_w));
 
+	ADC0804(config, m_adc, MASTER_CLOCK/8/8);
+	m_adc->vin_callback().set(FUNC(polepos_state::analog_r));
+
 	/* video hardware */
-	MCFG_SCREEN_ADD(m_screen, RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/4, 384, 0, 256, 264, 16, 224+16)
-	MCFG_SCREEN_UPDATE_DRIVER(polepos_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(MASTER_CLOCK/4, 384, 0, 256, 264, 16, 224+16);
+	m_screen->set_screen_update(FUNC(polepos_state::screen_update));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_polepos)
-	MCFG_PALETTE_ADD(m_palette, 0x0f00)
-	MCFG_PALETTE_INDIRECT_ENTRIES(128)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_polepos);
+	PALETTE(config, m_palette, FUNC(polepos_state::polepos_palette), 0x0f00, 128);
+
 	config.set_default_layout(layout_polepos);
-
-	MCFG_PALETTE_INIT_OWNER(polepos_state,polepos)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD(m_namco_sound, NAMCO, MASTER_CLOCK/512)
-	MCFG_NAMCO_AUDIO_VOICES(8)
-	MCFG_NAMCO_AUDIO_STEREO(1)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
+	NAMCO(config, m_namco_sound, MASTER_CLOCK/512);
+	m_namco_sound->set_voices(8);
+	m_namco_sound->set_stereo(true);
+	m_namco_sound->add_route(0, "lspeaker", 0.80);
+	m_namco_sound->add_route(1, "rspeaker", 0.80);
 
 	/* discrete circuit on the 54XX outputs */
-	MCFG_DEVICE_ADD("discrete", DISCRETE, polepos_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
+	discrete_sound_device &discrete(DISCRETE(config, "discrete", polepos_discrete));
+	discrete.add_route(ALL_OUTPUTS, "lspeaker", 0.90);
+	discrete.add_route(ALL_OUTPUTS, "rspeaker", 0.90);
 
 	/* engine sound */
-	MCFG_DEVICE_ADD("polepos", POLEPOS_SOUND, MASTER_CLOCK/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90 * 0.77)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90 * 0.77)
-MACHINE_CONFIG_END
-
+	polepos_sound_device &polepos(POLEPOS_SOUND(config, "polepos", MASTER_CLOCK/8));
+	polepos.add_route(ALL_OUTPUTS, "lspeaker", 0.90 * 0.77);
+	polepos.add_route(ALL_OUTPUTS, "rspeaker", 0.90 * 0.77);
+}
 
 WRITE8_MEMBER(polepos_state::bootleg_soundlatch_w)
 {
 	if (m_soundlatch.found()) // topracern also uses this; no idea what it should do there
-		m_soundlatch->write(space, 0, data | 0xfc);
+		m_soundlatch->write(data | 0xfc);
 }
 
 void polepos_state::topracern_io(address_map &map)
@@ -983,18 +981,18 @@ void polepos_state::sound_z80_bootleg_iomap(address_map &map)
 	map(0x00, 0x00).rw("tms", FUNC(tms5220_device::status_r), FUNC(tms5220_device::data_w));
 }
 
-MACHINE_CONFIG_START(polepos_state::topracern)
-
+void polepos_state::topracern(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, Z80, MASTER_CLOCK/8)    /* 3.072 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(z80_map)
-	MCFG_DEVICE_IO_MAP(topracern_io)
+	Z80(config, m_maincpu, MASTER_CLOCK/8);   /* 3.072 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &polepos_state::z80_map);
+	m_maincpu->set_addrmap(AS_IO, &polepos_state::topracern_io);
 
-	MCFG_DEVICE_ADD(m_subcpu, Z8002, MASTER_CLOCK/8)  /* 3.072 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(z8002_map_1)
+	Z8002(config, m_subcpu, MASTER_CLOCK/8);  /* 3.072 MHz */
+	m_subcpu->set_addrmap(AS_PROGRAM, &polepos_state::z8002_map_1);
 
-	MCFG_DEVICE_ADD(m_subcpu2, Z8002, MASTER_CLOCK/8) /* 3.072 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(z8002_map_2)
+	Z8002(config, m_subcpu2, MASTER_CLOCK/8); /* 3.072 MHz */
+	m_subcpu2->set_addrmap(AS_PROGRAM, &polepos_state::z8002_map_2);
 
 	// TODO, remove these devices too, this bootleg doesn't have them, but the emulation doesn't boot without them.
 	// doesn't exist on the bootleg, but required for now or the game only boots in test mode!  they probably simulate some of the logic
@@ -1002,19 +1000,18 @@ MACHINE_CONFIG_START(polepos_state::topracern)
 	n51xx.set_screen_tag(m_screen);
 	n51xx.input_callback<1>().set_ioport("IN0").rshift(4);
 
-	MCFG_NAMCO_06XX_ADD("06xx", MASTER_CLOCK/8/64)
-	MCFG_NAMCO_06XX_MAINCPU("maincpu")
-	MCFG_NAMCO_06XX_READ_0_CB(READ8("51xx", namco_51xx_device, read))
-	MCFG_NAMCO_06XX_WRITE_0_CB(WRITE8("51xx", namco_51xx_device, write))
+	namco_06xx_device &n06xx(NAMCO_06XX(config, "06xx", MASTER_CLOCK/8/64));
+	n06xx.set_maincpu(m_maincpu);
+	n06xx.read_callback<0>().set("51xx", FUNC(namco_51xx_device::read));
+	n06xx.write_callback<0>().set("51xx", FUNC(namco_51xx_device::write));
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 16)   // 128V clocks the same as VBLANK
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 16);   // 128V clocks the same as VBLANK
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* some interleaving */
+	config.set_maximum_quantum(attotime::from_hz(6000));  /* some interleaving */
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", polepos_state, scanline, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline(FUNC(polepos_state::scanline), "screen", 0, 1);
 
 	LS259(config, m_latch);
 	m_latch->q_out_cb<0>().set_inputline(m_maincpu, 0, CLEAR_LINE).invert();
@@ -1027,40 +1024,43 @@ MACHINE_CONFIG_START(polepos_state::topracern)
 	m_latch->q_out_cb<6>().set(FUNC(polepos_state::sb0_w));
 	m_latch->q_out_cb<7>().set(FUNC(polepos_state::chacl_w));
 
+	ADC0804(config, m_adc, MASTER_CLOCK/8/8);
+	m_adc->vin_callback().set(FUNC(polepos_state::analog_r));
+
 	/* video hardware */
-	MCFG_SCREEN_ADD(m_screen, RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/4, 384, 0, 256, 264, 16, 224+16)
-	MCFG_SCREEN_UPDATE_DRIVER(polepos_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(MASTER_CLOCK/4, 384, 0, 256, 264, 16, 224+16);
+	m_screen->set_screen_update(FUNC(polepos_state::screen_update));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_polepos)
-	MCFG_PALETTE_ADD(m_palette, 0x0f00)
-	MCFG_PALETTE_INDIRECT_ENTRIES(128)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_polepos);
+	PALETTE(config, m_palette, FUNC(polepos_state::polepos_palette), 0x0f00, 128);
+
 	config.set_default_layout(layout_topracer);
-
-	MCFG_PALETTE_INIT_OWNER(polepos_state,polepos)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD(m_namco_sound, NAMCO, MASTER_CLOCK/512)
-	MCFG_NAMCO_AUDIO_VOICES(8)
-	MCFG_NAMCO_AUDIO_STEREO(1)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
+	NAMCO(config, m_namco_sound, MASTER_CLOCK/512);
+	m_namco_sound->set_voices(8);
+	m_namco_sound->set_stereo(true);
+	m_namco_sound->add_route(0, "lspeaker", 0.80);
+	m_namco_sound->add_route(1, "rspeaker", 0.80);
 
 	/* engine sound */
-	MCFG_DEVICE_ADD("polepos", POLEPOS_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90 * 0.77)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90 * 0.77)
+	polepos_sound_device &polepos(POLEPOS_SOUND(config, "polepos", 0));
+	polepos.add_route(ALL_OUTPUTS, "lspeaker", 0.90 * 0.77);
+	polepos.add_route(ALL_OUTPUTS, "rspeaker", 0.90 * 0.77);
 
-	MCFG_DEVICE_ADD("dac", DAC_4BIT_R2R, 0) // unknown resistor configuration
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.12)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.12)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	dac_4bit_r2r_device &dac(DAC_4BIT_R2R(config, "dac", 0)); // unknown resistor configuration
+	dac.add_route(ALL_OUTPUTS, "lspeaker", 0.12);
+	dac.add_route(ALL_OUTPUTS, "rspeaker", 0.12);
+
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
 void polepos_state::polepos2bi(machine_config &config)
 {
@@ -2179,9 +2179,9 @@ ROM_START( polepos2bi )
 	ROM_LOAD( "20.bin",       0x0000, 0x2000, CRC(1771fe1b) SHA1(da74ca85dfd4f5ad5a9dbfe6f7668d93105e3575) )
 
 	ROM_REGION( 0x2000, "pals", 0 )
-	ROM_LOAD( "pal12l6-a.bin.bad.dump",     0x0000, 0x34, BAD_DUMP CRC(56c2e02f) SHA1(33545f83d63b476d9164472b439aa7002506b33d) )
-	ROM_LOAD( "pal12l6-b.bin.bad.dump",     0x0000, 0x34, BAD_DUMP CRC(56c2e02f) SHA1(33545f83d63b476d9164472b439aa7002506b33d) )
-	ROM_LOAD( "pal16l8.bin.bad.dump",       0x0000,0x104, BAD_DUMP CRC(e9cd78fb) SHA1(557d3e7ef3b25c1338b24722cac91bca788c02b8) )
+	ROM_LOAD( "pal12l6-a.bin", 0x0000, 0x34, NO_DUMP )
+	ROM_LOAD( "pal12l6-b.bin", 0x0000, 0x34, NO_DUMP )
+	ROM_LOAD( "pal16l8.bin",   0x0000,0x104, NO_DUMP )
 ROM_END
 
 
@@ -2449,7 +2449,7 @@ ROM_END
 void polepos_state::init_polepos2()
 {
 	/* note that the bootleg version doesn't need this custom IC; it has a hacked ROM in its place */
-	m_subcpu->space(AS_PROGRAM).install_read_handler(0x4000, 0x5fff, read16_delegate(FUNC(polepos_state::polepos2_ic25_r),this));
+	m_subcpu->space(AS_PROGRAM).install_read_handler(0x4000, 0x5fff, read16_delegate(*this, FUNC(polepos_state::polepos2_ic25_r)));
 }
 
 
@@ -2458,18 +2458,18 @@ void polepos_state::init_polepos2()
  *********************************************************************/
 
 /*    YEAR  NAME        PARENT    MACHINE     INPUT      STATE          INIT           ROT   COMPANY                    FULLNAME                                                FLAGS */
-GAME( 1982, polepos,    0,        polepos,    poleposa,  polepos_state, empty_init,    ROT0, "Namco",                   "Pole Position (World)",                                0 )
-GAME( 1982, poleposj,   polepos,  polepos,    polepos,   polepos_state, empty_init,    ROT0, "Namco",                   "Pole Position (Japan)",                                0 )
-GAME( 1982, poleposa1,  polepos,  polepos,    poleposa,  polepos_state, empty_init,    ROT0, "Namco (Atari license)",   "Pole Position (Atari version 1)",                      0 )
-GAME( 1982, poleposa2,  polepos,  polepos,    poleposa,  polepos_state, empty_init,    ROT0, "Namco (Atari license)",   "Pole Position (Atari version 2)",                      0 )
-GAME( 1984, topracer,   polepos,  polepos,    polepos,   polepos_state, empty_init,    ROT0, "bootleg",                 "Top Racer (with MB8841 + MB8842, 1984)",               0 ) // the NAMCO customs have been cloned on these bootlegs
-GAME( 1983, topracera,  polepos,  polepos,    polepos,   polepos_state, empty_init,    ROT0, "bootleg",                 "Top Racer (with MB8841 + MB8842, 1983)",               0 ) // the only difference between them is the year displayed on the title screen
-GAME( 1983, ppspeed,    polepos,  polepos,    polepos,   polepos_state, empty_init,    ROT0, "bootleg",                 "Speed Up (Spanish bootleg of Pole Position)",          0 ) // very close to topracer / topracera
-GAME( 1982, topracern,  polepos,  topracern,  topracern, polepos_state, empty_init,    ROT0, "bootleg",                 "Top Racer (no MB8841 + MB8842)",                       MACHINE_IMPERFECT_SOUND ) // explosion sound generator missing
+GAME( 1982, polepos,    0,        polepos,    poleposa,  polepos_state, empty_init,    ROT0, "Namco",                   "Pole Position (World)",                                MACHINE_SUPPORTS_SAVE )
+GAME( 1982, poleposj,   polepos,  polepos,    polepos,   polepos_state, empty_init,    ROT0, "Namco",                   "Pole Position (Japan)",                                MACHINE_SUPPORTS_SAVE )
+GAME( 1982, poleposa1,  polepos,  polepos,    poleposa,  polepos_state, empty_init,    ROT0, "Namco (Atari license)",   "Pole Position (Atari version 1)",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1982, poleposa2,  polepos,  polepos,    poleposa,  polepos_state, empty_init,    ROT0, "Namco (Atari license)",   "Pole Position (Atari version 2)",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1984, topracer,   polepos,  polepos,    polepos,   polepos_state, empty_init,    ROT0, "bootleg",                 "Top Racer (with MB8841 + MB8842, 1984)",               MACHINE_SUPPORTS_SAVE ) // the NAMCO customs have been cloned on these bootlegs
+GAME( 1983, topracera,  polepos,  polepos,    polepos,   polepos_state, empty_init,    ROT0, "bootleg",                 "Top Racer (with MB8841 + MB8842, 1983)",               MACHINE_SUPPORTS_SAVE ) // the only difference between them is the year displayed on the title screen
+GAME( 1983, ppspeed,    polepos,  polepos,    polepos,   polepos_state, empty_init,    ROT0, "bootleg",                 "Speed Up (Spanish bootleg of Pole Position)",          MACHINE_SUPPORTS_SAVE ) // very close to topracer / topracera
+GAME( 1982, topracern,  polepos,  topracern,  topracern, polepos_state, empty_init,    ROT0, "bootleg",                 "Top Racer (no MB8841 + MB8842)",                       MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // explosion sound generator missing
 
-GAME( 1983, polepos2,   0,        polepos,    polepos2j, polepos_state, init_polepos2, ROT0, "Namco",                   "Pole Position II (Japan)",                             0 )
-GAME( 1983, polepos2a,  polepos2, polepos,    polepos2,  polepos_state, init_polepos2, ROT0, "Namco (Atari license)",   "Pole Position II (Atari)",                             0 )
-GAME( 1983, polepos2b,  polepos2, polepos,    polepos2,  polepos_state, empty_init,    ROT0, "bootleg",                 "Pole Position II (bootleg)",                           0 )
-GAME( 1984, polepos2bi, polepos2, polepos2bi, polepos2bi,polepos_state, empty_init,    ROT0, "bootleg",                 "Gran Premio F1 (Italian bootleg of Pole Position II)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND )
-GAME( 1984, polepos2bs, polepos2, polepos2bi, polepos2bi,polepos_state, empty_init,    ROT0, "bootleg (BCN Internacional S.A.)", "Gran Premio F1 (Spanish bootleg of Pole Position II)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND )
-GAME( 1984, grally,     polepos2, polepos2bi, polepos2bi,polepos_state, empty_init,    ROT0, "bootleg (Niemer)",        "Gran Rally (Spanish bootleg of Pole Position II)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND )
+GAME( 1983, polepos2,   0,        polepos,    polepos2j, polepos_state, init_polepos2, ROT0, "Namco",                   "Pole Position II (Japan)",                             MACHINE_SUPPORTS_SAVE )
+GAME( 1983, polepos2a,  polepos2, polepos,    polepos2,  polepos_state, init_polepos2, ROT0, "Namco (Atari license)",   "Pole Position II (Atari)",                             MACHINE_SUPPORTS_SAVE )
+GAME( 1983, polepos2b,  polepos2, polepos,    polepos2,  polepos_state, empty_init,    ROT0, "bootleg",                 "Pole Position II (bootleg)",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1984, polepos2bi, polepos2, polepos2bi, polepos2bi,polepos_state, empty_init,    ROT0, "bootleg",                 "Gran Premio F1 (Italian bootleg of Pole Position II)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND )
+GAME( 1984, polepos2bs, polepos2, polepos2bi, polepos2bi,polepos_state, empty_init,    ROT0, "bootleg (BCN Internacional S.A.)", "Gran Premio F1 (Spanish bootleg of Pole Position II)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND )
+GAME( 1984, grally,     polepos2, polepos2bi, polepos2bi,polepos_state, empty_init,    ROT0, "bootleg (Niemer)",        "Gran Rally (Spanish bootleg of Pole Position II)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND )

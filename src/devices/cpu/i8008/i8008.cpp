@@ -37,7 +37,7 @@ DEFINE_DEVICE_TYPE(I8008, i8008_device, "i8008", "Intel 8008")
 i8008_device::i8008_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, I8008, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 14)
-	, m_io_config("io", ENDIANNESS_LITTLE, 8, 8)
+	, m_io_config("io", ENDIANNESS_LITTLE, 8, 5)
 	, m_program(nullptr)
 	, m_cache(nullptr)
 {
@@ -222,7 +222,7 @@ std::unique_ptr<util::disasm_interface> i8008_device::create_disassembler()
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-uint32_t i8008_device::execute_min_cycles() const
+uint32_t i8008_device::execute_min_cycles() const noexcept
 {
 	return 8;
 }
@@ -232,7 +232,7 @@ uint32_t i8008_device::execute_min_cycles() const
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-uint32_t i8008_device::execute_max_cycles() const
+uint32_t i8008_device::execute_max_cycles() const noexcept
 {
 	return 16;
 }

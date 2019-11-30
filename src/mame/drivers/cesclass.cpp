@@ -48,7 +48,7 @@ public:
 
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_PALETTE_INIT(cesclassic);
+	void cesclassic_palette(palette_device &palette) const;
 	void cesclassic(machine_config &config);
 	void cesclassic_map(address_map &map);
 protected:
@@ -136,13 +136,13 @@ void cesclassic_state::cesclassic_map(address_map &map)
 	map(0x480000, 0x481fff).ram().share("nvram"); //8k according to schematics (games doesn't use that much tho)
 	map(0x600000, 0x600001).portr("SYSTEM");
 	map(0x610000, 0x610001).w(FUNC(cesclassic_state::outputs_w));
-//  AM_RANGE(0x640000, 0x640001) AM_WRITENOP
+//  map(0x640000, 0x640001).nopw();
 	map(0x640040, 0x640041).w(FUNC(cesclassic_state::lamps_w));
 	map(0x670000, 0x670001).portr("DSW");
 	map(0x70ff00, 0x70ff01).nopw(); // writes 0xffff at irq 3 end of service, watchdog?
 	map(0x900001, 0x900001).r(m_oki, FUNC(okim6295_device::read)); // unsure about this ...
 	map(0x900101, 0x900101).w(m_oki, FUNC(okim6295_device::write));
-//  AM_RANGE(0x904000, 0x904001) AM_WRITENOP //some kind of serial
+//  map(0x904000, 0x904001).nopw(); //some kind of serial
 }
 
 static INPUT_PORTS_START( cesclassic )
@@ -242,38 +242,34 @@ static INPUT_PORTS_START( cesclassic )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("l_lcd")
 INPUT_PORTS_END
 
-PALETTE_INIT_MEMBER(cesclassic_state, cesclassic)
+void cesclassic_state::cesclassic_palette(palette_device &palette) const
 {
-	int i;
-
-	for (i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)
 		palette.set_pen_color(i, pal2bit(i), 0, 0);
 }
 
-MACHINE_CONFIG_START(cesclassic_state::cesclassic)
-
-	MCFG_DEVICE_ADD("maincpu", M68000, 24000000/2 )
-	MCFG_DEVICE_PROGRAM_MAP(cesclassic_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("l_lcd", cesclassic_state,  irq2_line_assert)  // TODO: unknown sources
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(cesclassic_state, irq3_line_assert, 60*8)
+void cesclassic_state::cesclassic(machine_config &config)
+{
+	M68000(config, m_maincpu, 24000000/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cesclassic_state::cesclassic_map);
+	m_maincpu->set_vblank_int("l_lcd", FUNC(cesclassic_state::irq2_line_assert));  // TODO: unknown sources
+	m_maincpu->set_periodic_int(FUNC(cesclassic_state::irq3_line_assert), attotime::from_hz(60*8));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("l_lcd", LCD)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_UPDATE_DRIVER(cesclassic_state, screen_update)
-	MCFG_SCREEN_SIZE(8*16*2, 8*8+3*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 8*16*2-1, 0*8, 8*8-1)
+	screen_device &screen(SCREEN(config, "l_lcd", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_screen_update(FUNC(cesclassic_state::screen_update));
+	screen.set_size(8*16*2, 8*8+3*8);
+	screen.set_visarea(0*8, 8*16*2-1, 0*8, 8*8-1);
 
-	MCFG_PALETTE_ADD("palette", 4)
-	MCFG_PALETTE_INIT_OWNER(cesclassic_state, cesclassic)
+	PALETTE(config, m_palette, FUNC(cesclassic_state::cesclassic_palette), 4);
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("oki", OKIM6295, 24000000/16, okim6295_device::PIN7_LOW)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, 24000000/16, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.5);
+}
 
 
 ROM_START(hrclass)

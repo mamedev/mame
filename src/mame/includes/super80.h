@@ -7,20 +7,20 @@
 
 #include "bus/centronics/ctronics.h"
 #include "cpu/z80/z80.h"
-#include "machine/z80daisy.h"
 #include "imagedev/cassette.h"
+#include "imagedev/floppy.h"
 #include "imagedev/snapquik.h"
 #include "machine/buffer.h"
 #include "machine/timer.h"
 #include "machine/wd_fdc.h"
+#include "machine/z80daisy.h"
 #include "machine/z80dma.h"
 #include "machine/z80pio.h"
 #include "sound/samples.h"
 #include "sound/spkrdev.h"
-#include "sound/wave.h"
 #include "video/mc6845.h"
 #include "emupal.h"
-
+#include "screen.h"
 
 /* Bits in m_portf0 variable:
     d5 cassette LED
@@ -34,6 +34,8 @@ public:
 	super80_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_palette(*this, "palette")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_screen(*this, "screen")
 		, m_maincpu(*this, "maincpu")
 		, m_p_ram(*this, "maincpu")
 		, m_p_chargen(*this, "chargen")
@@ -41,7 +43,6 @@ public:
 		, m_p_videoram(*this, "videoram")
 		, m_pio(*this, "z80pio")
 		, m_cassette(*this, "cassette")
-		, m_wave(*this, "wave")
 		, m_samples(*this, "samples")
 		, m_speaker(*this, "speaker")
 		, m_centronics(*this, "centronics")
@@ -93,8 +94,8 @@ private:
 	DECLARE_MACHINE_RESET(super80);
 	DECLARE_MACHINE_RESET(super80r);
 	DECLARE_VIDEO_START(super80);
-	DECLARE_PALETTE_INIT(super80m);
-	DECLARE_QUICKLOAD_LOAD_MEMBER(super80);
+	void super80m_palette(palette_device &palette) const;
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	uint32_t screen_update_super80(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_super80v(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -105,7 +106,7 @@ private:
 	TIMER_CALLBACK_MEMBER(super80_reset);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_h);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_k);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_p);
+	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 
 	void super80_io(address_map &map);
 	void super80_map(address_map &map);
@@ -131,14 +132,15 @@ private:
 	void mc6845_cursor_configure();
 	void super80_cassette_motor(bool data);
 	required_device<palette_device> m_palette;
-	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<z80_device> m_maincpu;
 	required_region_ptr<u8> m_p_ram;
 	optional_region_ptr<u8> m_p_chargen;
 	optional_region_ptr<u8> m_p_colorram;
 	optional_region_ptr<u8> m_p_videoram;
 	required_device<z80pio_device> m_pio;
 	required_device<cassette_image_device> m_cassette;
-	required_device<wave_device> m_wave;
 	required_device<samples_device> m_samples;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<centronics_device> m_centronics;

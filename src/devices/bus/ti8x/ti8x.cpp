@@ -37,7 +37,7 @@ ti8x_link_port_device::ti8x_link_port_device(
 		device_t *owner,
 		uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, device_slot_interface(mconfig, *this)
+	, device_single_card_slot_interface<device_ti8x_link_port_interface>(mconfig, *this)
 	, m_tip_handler(*this)
 	, m_ring_handler(*this)
 	, m_dev(nullptr)
@@ -88,7 +88,7 @@ void ti8x_link_port_device::device_start()
 
 void ti8x_link_port_device::device_config_complete()
 {
-	m_dev = dynamic_cast<device_ti8x_link_port_interface *>(get_card_device());
+	m_dev = get_card_device();
 }
 
 
@@ -96,7 +96,7 @@ void ti8x_link_port_device::device_config_complete()
 device_ti8x_link_port_interface::device_ti8x_link_port_interface(
 		machine_config const &mconfig,
 		device_t &device)
-	: device_slot_card_interface(mconfig, device)
+	: device_interface(device, "ti8xlink")
 	, m_port(dynamic_cast<ti8x_link_port_device *>(device.owner()))
 {
 }

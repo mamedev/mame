@@ -89,9 +89,12 @@ DEFINE_DEVICE_TYPE(PPU_2C05_04, ppu2c05_04_device, "ppu2c05_04", "2C05_04 PPU")
 // default address map
 void ppu2c0x_device::ppu2c0x(address_map &map)
 {
-	map(0x0000, 0x3eff).ram();
-	map(0x3f00, 0x3fff).rw(FUNC(ppu2c0x_device::palette_read), FUNC(ppu2c0x_device::palette_write));
-//  AM_RANGE(0x0000, 0x3fff) AM_RAM
+	if (!has_configured_map(0))
+	{
+		map(0x0000, 0x3eff).ram();
+		map(0x3f00, 0x3fff).rw(FUNC(ppu2c0x_device::palette_read), FUNC(ppu2c0x_device::palette_write));
+//  map(0x0000, 0x3fff).ram();
+	}
 }
 
 //-------------------------------------------------
@@ -114,10 +117,10 @@ device_memory_interface::space_config_vector ppu2c0x_device::memory_space_config
 void ppu2c0x_device::device_config_complete()
 {
 	/* reset the callbacks */
-	m_latch = latch_delegate();
-	m_scanline_callback_proc = scanline_delegate();
-	m_hblank_callback_proc = hblank_delegate();
-	m_vidaccess_callback_proc = vidaccess_delegate();
+	m_scanline_callback_proc.set(nullptr);
+	m_hblank_callback_proc.set(nullptr);
+	m_vidaccess_callback_proc.set(nullptr);
+	m_latch.set(nullptr);
 }
 
 ppu2c0x_device::ppu2c0x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
@@ -125,9 +128,12 @@ ppu2c0x_device::ppu2c0x_device(const machine_config &mconfig, device_type type, 
 	, device_memory_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)
 	, device_palette_interface(mconfig, *this)
-	, m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, address_map_constructor(), address_map_constructor(FUNC(ppu2c0x_device::ppu2c0x), this))
+	, m_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, address_map_constructor(FUNC(ppu2c0x_device::ppu2c0x), this))
 	, m_cpu(*this, finder_base::DUMMY_TAG)
 	, m_scanline(0)  // reset the scanline count
+	, m_scanline_callback_proc(*this)
+	, m_hblank_callback_proc(*this)
+	, m_vidaccess_callback_proc(*this)
 	, m_int_callback(*this)
 	, m_refresh_data(0)
 	, m_refresh_latch(0)
@@ -143,6 +149,7 @@ ppu2c0x_device::ppu2c0x_device(const machine_config &mconfig, device_type type, 
 	, m_scan_scale(1) // set the scan scale (this is for dual monitor vertical setups)
 	, m_tilecount(0)
 	, m_draw_phase(0)
+	, m_latch(*this)
 	, m_use_sprite_write_limitation(true)
 {
 	for (auto & elem : m_regs)
@@ -229,7 +236,7 @@ void ppu2c0x_device::device_start()
 
 	/* initialize the scanline handling portion */
 	m_scanline_timer->adjust(screen().time_until_pos(1));
-	m_hblank_timer->adjust(m_cpu->cycles_to_attotime(86.67)); // ??? FIXME - hardcoding NTSC, need better calculation
+	m_hblank_timer->adjust(m_cpu->cycles_to_attotime(260) / 3); // ??? FIXME - hardcoding NTSC, need better calculation
 	m_nmi_timer->adjust(attotime::never);
 
 	/* allocate a screen bitmap, videomem and spriteram, a dirtychar array and the monochromatic colortable */
@@ -558,7 +565,7 @@ void ppu2c0x_device::device_timer(emu_timer &timer, device_timer_id id, int para
 				next_scanline = 0;
 
 			// Call us back when the hblank starts for this scanline
-			m_hblank_timer->adjust(m_cpu->cycles_to_attotime(86.67)); // ??? FIXME - hardcoding NTSC, need better calculation
+			m_hblank_timer->adjust(m_cpu->cycles_to_attotime(260) / 3); // ??? FIXME - hardcoding NTSC, need better calculation
 
 			// trigger again at the start of the next scanline
 			m_scanline_timer->adjust(screen().time_until_pos(next_scanline * m_scan_scale));
@@ -673,6 +680,9 @@ void ppu2c0x_device::draw_background(uint8_t *line_priority)
 
 		index1 = tile_index + x;
 
+		// page2 is the output of the nametable read (this section is the FIRST read per tile!)
+		page2 = readbyte(index1);
+
 		// this is attribute table stuff! (actually read 2 in PPUspeak)!
 		/* Figure out which byte in the color table to use */
 		pos = ((index1 & 0x380) >> 4) | ((index1 & 0x1f) >> 2);
@@ -682,10 +692,6 @@ void ppu2c0x_device::draw_background(uint8_t *line_priority)
 
 		/* figure out which bits in the color table to use */
 		color_bits = ((index1 & 0x40) >> 4) + (index1 & 0x02);
-
-		// page2 is the output of the nametable read (this section is the FIRST read per tile!)
-		address = index1 & 0x3ff;
-		page2 = readbyte(index1);
 
 		// 27/12/2002
 		if (!m_latch.isnull())
@@ -977,10 +983,13 @@ void ppu2c0x_device::update_scanline()
 		/* Render this scanline if appropriate */
 		if (m_regs[PPU_CONTROL1] & (PPU_CONTROL1_BACKGROUND | PPU_CONTROL1_SPRITES))
 		{
-			/* If background or sprites are enabled, copy the ppu address latch */
-			/* Copy only the scroll x-coarse and the x-overflow bit */
-			m_refresh_data &= ~0x041f;
-			m_refresh_data |= (m_refresh_latch & 0x041f);
+			if (m_scanline_timer->remaining() == attotime::zero)
+			{
+				/* If background or sprites are enabled, copy the ppu address latch */
+				/* Copy only the scroll x-coarse and the x-overflow bit */
+				m_refresh_data &= ~0x041f;
+				m_refresh_data |= (m_refresh_latch & 0x041f);
+			}
 
 //          logerror("updating refresh_data: %04x (scanline: %d)\n", m_refresh_data, m_scanline);
 			render_scanline();
@@ -1012,23 +1021,26 @@ void ppu2c0x_device::update_scanline()
 				bitmap.pix32(m_scanline, i) = back_pen;
 		}
 
-		/* increment the fine y-scroll */
-		m_refresh_data += 0x1000;
-
-		/* if it's rolled, increment the coarse y-scroll */
-		if (m_refresh_data & 0x8000)
+		if (m_scanline_timer->remaining() == attotime::zero)
 		{
-			uint16_t tmp;
-			tmp = (m_refresh_data & 0x03e0) + 0x20;
-			m_refresh_data &= 0x7c1f;
+			/* increment the fine y-scroll */
+			m_refresh_data += 0x1000;
 
-			/* handle bizarro scrolling rollover at the 30th (not 32nd) vertical tile */
-			if (tmp == 0x03c0)
-				m_refresh_data ^= 0x0800;
-			else
-				m_refresh_data |= (tmp & 0x03e0);
+			/* if it's rolled, increment the coarse y-scroll */
+			if (m_refresh_data & 0x8000)
+			{
+				uint16_t tmp;
+				tmp = (m_refresh_data & 0x03e0) + 0x20;
+				m_refresh_data &= 0x7c1f;
 
-//          logerror("updating refresh_data: %04x\n", m_refresh_data);
+				/* handle bizarro scrolling rollover at the 30th (not 32nd) vertical tile */
+				if (tmp == 0x03c0)
+					m_refresh_data ^= 0x0800;
+				else
+					m_refresh_data |= (tmp & 0x03e0);
+
+				//logerror("updating refresh_data: %04x\n", m_refresh_data);
+			}
 		}
 	}
 
@@ -1329,30 +1341,18 @@ void ppu2c0x_device::spriteram_dma( address_space &space, const uint8_t page )
  *
  *************************************/
 
-void ppu2c0x_device::render(bitmap_rgb32 &bitmap, int flipx, int flipy, int sx, int sy)
+void ppu2c0x_device::render(bitmap_rgb32 &bitmap, int flipx, int flipy, int sx, int sy, const rectangle &cliprect)
 {
-	copybitmap(bitmap, *m_bitmap, flipx, flipy, sx, sy, bitmap.cliprect());
+	if (m_scanline_timer->remaining() != attotime::zero)
+	{
+		// Partial line update, need to render first (especially for light gun emulation).
+		update_scanline();
+	}
+	copybitmap(bitmap, *m_bitmap, flipx, flipy, sx, sy, cliprect);
 }
 
 uint32_t ppu2c0x_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	render(bitmap, 0, 0, 0, 0);
+	render(bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
-}
-
-/*************************************
- *
- *  Utility functions
- *
- *************************************/
-
-rgb_t ppu2c0x_device::get_pixel(int x, int y)
-{
-	if (x >= VISIBLE_SCREEN_WIDTH)
-		x = VISIBLE_SCREEN_WIDTH - 1;
-
-	if (y >= VISIBLE_SCREEN_HEIGHT)
-		y = VISIBLE_SCREEN_HEIGHT - 1;
-
-	return rgb_t(m_bitmap->pix32(y, x));
 }

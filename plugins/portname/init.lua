@@ -2,6 +2,7 @@
 -- copyright-holders:Carl
 -- data files are json files named <romname>.json
 -- {
+--   "import":"<import filename>"
 --   "ports":{
 --     "<ioport name>":{
 --       "labels":{
@@ -39,31 +40,63 @@ function portname.startplugin()
 		return filename
 	end
 
-	emu.register_start(function()
-		local file = emu.file(ctrlrpath .. "/portname", "r")
-		local ret = file:open(get_filename())
-		if ret then
-			ret = file:open(get_filename(true))
-			if ret then
-				ret = file:open(manager:machine():system().parent .. ".json")
-				if ret then
-					return
-				end
+	local function parse_names(ctable, depth)
+		if depth >= 5 then
+			emu.print_error("portname: max import depth exceeded\n")
+			return
+		end
+		if ctable.import then
+			local file = emu.file(ctrlrpath .. "/portname", "r")
+			local ret = file:open(ctable.import)
+			if not ret then
+				parse_names(json.parse(file:read(file:size())), depth + 1)
 			end
 		end
-		local ctable = json.parse(file:read(file:size()))
+		if not ctable.ports then
+			return
+		end
 		for pname, port in pairs(ctable.ports) do
 			local ioport = manager:machine():ioport().ports[pname]
 			if ioport then
 				for mask, label in pairs(port.labels) do
 					for num3, field in pairs(ioport.fields) do
-						if tonumber(mask) == field.mask and label.player == field.player then
+						local nummask = tonumber(mask, 16)
+						if nummask == field.mask and label.player == field.player then
 							field.live.name = label.name
 						end
 					end
 				end
 			end
 		end
+	end
+
+	emu.register_start(function()
+		local file = emu.file(ctrlrpath .. "/portname", "r")
+		local ret = file:open(get_filename())
+		if ret then
+			if emu.softname() ~= "" then
+				local parent
+				for tag, image in pairs(manager:machine().images) do
+					parent = image.software_parent
+					if parent ~= "" then
+						break
+					end
+				end
+				if parent ~= "" then
+					ret = file:open(emu.romname() .. "_" .. parent:match("([^:]*)$")  .. ".json")
+				end
+			end
+			if ret then
+				ret = file:open(get_filename(true))
+				if ret then
+					ret = file:open(manager:machine():system().parent .. ".json")
+					if ret then
+						return
+					end
+				end
+			end
+		end
+		parse_names(json.parse(file:read(file:size())), 0)
 	end)
 
 	local function menu_populate()
@@ -77,18 +110,18 @@ function portname.startplugin()
 				local labels = {}
 				local sort = {}
 				for fname, field in pairs(port.fields) do
-					local mask = tostring(field.mask)
+					local mask = string.format("%x", field.mask)
 					if not labels[mask] then
 						sort[#sort + 1] = mask
 						labels[mask] = { name = fname, player = field.player }
 						setmetatable(labels[mask], { __tojson = function(v,s)
 							local label = { name = v.name, player = v.player }
 							setmetatable(label, { __jsonorder = { "player", "name" }})
-							return json.stringify({ name = v.name, player = v.player }) end })
+							return json.stringify(label) end })
 					end
 				end
 				if #sort > 0 then
-					table.sort(sort, function(i, j) return tonumber(i) < tonumber(j) end)
+					table.sort(sort, function(i, j) return tonumber(i, 16) < tonumber(j, 16) end)
 					setmetatable(labels, { __jsonorder = sort })
 					ports[pname] = { labels = labels }
 				end

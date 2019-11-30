@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz
-#pragma once
+#ifndef RENDER_BGFX_UTIL
+#define RENDER_BGFX_UTIL
 
-#ifndef __RENDER_BGFX_UTIL__
-#define __RENDER_BGFX_UTIL__
+#pragma once
 
 #include <bgfx/bgfx.h>
 
@@ -11,8 +11,9 @@
 class bgfx_util
 {
 public:
-	static const bgfx::Memory* mame_texture_data_to_bgfx_texture_data(uint32_t format, int width, int height, int rowpixels, const rgb_t *palette, void *base);
+	static const bgfx::Memory* mame_texture_data_to_bgfx_texture_data(bgfx::TextureFormat::Enum &dst_format, uint32_t format, int width, int height, int rowpixels, const rgb_t *palette, void *base, uint16_t *out_pitch = nullptr);
+	static const bgfx::Memory* mame_texture_data_to_argb32(uint32_t src_format, int width, int height, int rowpixels, const rgb_t *palette, void *base);
 	static uint64_t get_blend_state(uint32_t blend);
 };
 
-#endif // __RENDER_BGFX_UTIL__
+#endif // RENDER_BGFX_UTIL

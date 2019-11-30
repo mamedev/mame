@@ -15,7 +15,7 @@ ToDo:
 - Other things
 
 Issues:
-- Floppy disc error. It reads 0x780 bytes from the wrong sector then gives diskette error (use bios 1)
+- Floppy disc error. It reads 0x780 bytes from the wrong sector then gives diskette error (use bios 0)
 
 
 ****************************************************************************************************************/
@@ -24,6 +24,7 @@ Issues:
 
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/z80daisy.h"
 #include "machine/7474.h"
 #include "machine/am9517a.h"
@@ -63,8 +64,10 @@ public:
 
 	void init_rc702();
 
-private:
+protected:
 	virtual void machine_reset() override;
+
+private:
 	DECLARE_READ8_MEMBER(memory_read_byte);
 	DECLARE_WRITE8_MEMBER(memory_write_byte);
 	DECLARE_WRITE8_MEMBER(port14_w);
@@ -77,6 +80,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(qbar_w);
 	DECLARE_WRITE_LINE_MEMBER(dack1_w);
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
+	void rc702_palette(palette_device &palette) const;
 	void kbd_put(u8 data);
 
 	void rc702_io(address_map &map);
@@ -89,7 +93,7 @@ private:
 	bool m_eop;
 	bool m_dack1;
 	required_device<palette_device> m_palette;
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_region_ptr<u8> m_p_chargen;
 	required_device<z80ctc_device> m_ctc1;
 	required_device<z80pio_device> m_pio;
@@ -117,7 +121,7 @@ void rc702_state::rc702_io(address_map &map)
 	map(0x0c, 0x0f).rw(m_ctc1, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x10, 0x13).rw(m_pio, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 	map(0x14, 0x17).portr("DSW").w(FUNC(rc702_state::port14_w)); // motors
-	map(0x18, 0x1b).lw8("banking",[this](u8 data){membank("bankr0")->set_entry(1);}); // replace roms with ram
+	map(0x18, 0x1b).lw8(NAME([this] (u8 data) { membank("bankr0")->set_entry(1); })); // replace roms with ram
 	map(0x1c, 0x1f).w(FUNC(rc702_state::port1c_w)); // sound
 	map(0xf0, 0xff).rw(m_dma, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
 }
@@ -241,10 +245,11 @@ WRITE8_MEMBER( rc702_state::port1c_w )
 }
 
 // monitor is orange even when powered off
-static const rgb_t our_palette[3] = {
-	rgb_t(0xc0, 0x60, 0x00), // off
-	rgb_t(0xff, 0xb4, 0x00), // on
-};
+void rc702_state::rc702_palette(palette_device &palette) const
+{
+	palette.set_pen_color(0, rgb_t(0xc0, 0x60, 0x00));
+	palette.set_pen_color(1, rgb_t(0xff, 0xb4, 0x00));
+}
 
 void rc702_state::init_rc702()
 {
@@ -253,7 +258,6 @@ void rc702_state::init_rc702()
 	membank("bankr0")->configure_entry(1, &main[0x0000]);
 	membank("bankr0")->configure_entry(0, &main[0x10000]);
 	membank("bankw0")->configure_entry(0, &main[0x0000]);
-	m_palette->set_pen_colors(0, our_palette, ARRAY_LENGTH(our_palette));
 }
 
 I8275_DRAW_CHARACTER_MEMBER( rc702_state::display_pixels )
@@ -317,7 +321,7 @@ static const z80_daisy_config daisy_chain_intf[] =
 
 void rc702_state::kbd_put(u8 data)
 {
-	m_pio->pa_w(machine().dummy_space(), 0, data);
+	m_pio->port_a_write(data);
 	m_pio->strobe_a(0);
 	m_pio->strobe_a(1);
 }
@@ -327,12 +331,13 @@ static void floppies(device_slot_interface &device)
 	device.option_add("525qd", FLOPPY_525_QD);
 }
 
-MACHINE_CONFIG_START(rc702_state::rc702)
+void rc702_state::rc702(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(8'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(rc702_mem)
-	MCFG_DEVICE_IO_MAP(rc702_io)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain_intf)
+	Z80(config, m_maincpu, XTAL(8'000'000) / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &rc702_state::rc702_mem);
+	m_maincpu->set_addrmap(AS_IO, &rc702_state::rc702_io);
+	m_maincpu->set_daisy_config(daisy_chain_intf);
 
 	CLOCK(config, "ctc_clock", 614000).signal_handler().set(FUNC(rc702_state::clock_w));
 
@@ -342,8 +347,8 @@ MACHINE_CONFIG_START(rc702_state::rc702)
 	m_ctc1->zc_callback<1>().set("sio1", FUNC(z80dart_device::rxtxcb_w));
 	m_ctc1->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD("sio1", Z80DART, XTAL(8'000'000) / 2)
-	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	z80dart_device& dart(Z80DART(config, "sio1", XTAL(8'000'000) / 2));
+	dart.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	Z80PIO(config, m_pio, 8_MHz_XTAL / 2);
 	m_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -354,46 +359,45 @@ MACHINE_CONFIG_START(rc702_state::rc702)
 	m_dma->out_eop_callback().set(FUNC(rc702_state::eop_w)).invert();   // real line is active low, mame has it backwards
 	m_dma->in_memr_callback().set(FUNC(rc702_state::memory_read_byte));
 	m_dma->out_memw_callback().set(FUNC(rc702_state::memory_write_byte));
-	m_dma->in_ior_callback<1>().set(m_fdc, FUNC(upd765a_device::mdma_r));
-	m_dma->out_iow_callback<1>().set(m_fdc, FUNC(upd765a_device::mdma_w));
+	m_dma->in_ior_callback<1>().set(m_fdc, FUNC(upd765a_device::dma_r));
+	m_dma->out_iow_callback<1>().set(m_fdc, FUNC(upd765a_device::dma_w));
 	m_dma->out_iow_callback<2>().set("crtc", FUNC(i8275_device::dack_w));
 	m_dma->out_iow_callback<3>().set("crtc", FUNC(i8275_device::dack_w));
 	m_dma->out_dack_callback<1>().set(FUNC(rc702_state::dack1_w));
 
-	UPD765A(config, m_fdc, true, true);
+	UPD765A(config, m_fdc, 8_MHz_XTAL, true, true);
 	m_fdc->intrq_wr_callback().set(m_ctc1, FUNC(z80ctc_device::trg3));
 	m_fdc->drq_wr_callback().set(m_dma, FUNC(am9517a_device::dreq1_w));
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", floppies, "525qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FLOPPY_CONNECTOR(config, "fdc:0", floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
 
 	/* Keyboard */
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(rc702_state, kbd_put))
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(rc702_state::kbd_put));
 
 	TTL7474(config, m_7474, 0);
 	m_7474->output_cb().set(FUNC(rc702_state::q_w));
 	m_7474->comp_output_cb().set(FUNC(rc702_state::qbar_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(272*2, 200+4*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 272*2-1, 0, 200-1)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", i8275_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_size(272*2, 200+4*8);
+	screen.set_visarea(0, 272*2-1, 0, 200-1);
+	screen.set_screen_update("crtc", FUNC(i8275_device::screen_update));
 
 	i8275_device &crtc(I8275(config, "crtc", 11640000/7));
 	crtc.set_character_width(7);
-	crtc.set_display_callback(FUNC(rc702_state::display_pixels), this);
+	crtc.set_display_callback(FUNC(rc702_state::display_pixels));
 	crtc.irq_wr_callback().set(m_7474, FUNC(ttl7474_device::clear_w)).invert();
 	crtc.irq_wr_callback().append(m_ctc1, FUNC(z80ctc_device::trg2));
 	crtc.drq_wr_callback().set(FUNC(rc702_state::crtc_drq_w));
-	MCFG_PALETTE_ADD("palette", 2)
+
+	PALETTE(config, m_palette, FUNC(rc702_state::rc702_palette), 2);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("beeper", BEEP, 1000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	BEEP(config, m_beep, 1000).add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
 /* ROM definition */

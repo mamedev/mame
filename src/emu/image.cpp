@@ -73,11 +73,11 @@ image_manager::image_manager(running_machine &machine)
 				if (machine.options().write_config())
 					write_config(machine.options(), nullptr, &machine.system());
 
-				fatalerror_exitcode(machine, EMU_ERR_DEVICE, "Device %s load (-%s %s) failed: %s",
-					image.device().name(),
-					image.instance_name().c_str(),
-					startup_image_name.c_str(),
-					image_err.c_str());
+				throw emu_fatalerror(EMU_ERR_DEVICE, "Device %s load (-%s %s) failed: %s",
+						image.device().name(),
+						image.instance_name(),
+						startup_image_name,
+						image_err);
 			}
 		}
 	}
@@ -196,7 +196,8 @@ void image_manager::options_extract()
 		//      Note that as a part of #2, we cannot extract the option when the image in question is a part of an
 		//      active reset_on_load; hence the check for is_reset_and_loading() (see issue #2414)
 		if (!image.is_reset_on_load()
-			|| (!image.exists() && !image.is_reset_and_loading() && !machine().options().image_option(image.instance_name()).value().empty()))
+			|| (!image.exists() && !image.is_reset_and_loading()
+				&& machine().options().has_image_option(image.instance_name()) && !machine().options().image_option(image.instance_name()).value().empty()))
 		{
 			// we have to assemble the image option differently for software lists and for normal images
 			std::string image_opt;
@@ -211,7 +212,7 @@ void image_manager::options_extract()
 			}
 
 			// and set the option (provided that it hasn't been removed out from under us)
-			if (machine().options().exists(image.instance_name()))
+			if (machine().options().exists(image.instance_name()) && machine().options().has_image_option(image.instance_name()))
 				machine().options().image_option(image.instance_name()).specify(std::move(image_opt));
 		}
 	}
@@ -243,9 +244,9 @@ void image_manager::postdevice_init()
 			/* unload all images */
 			unload_all();
 
-			fatalerror_exitcode(machine(), EMU_ERR_DEVICE, "Device %s load failed: %s",
-				image.device().name(),
-				image_err.c_str());
+			throw emu_fatalerror(EMU_ERR_DEVICE, "Device %s load failed: %s",
+					image.device().name(),
+					image_err);
 		}
 	}
 	/* add a callback for when we shut down */

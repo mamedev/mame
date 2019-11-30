@@ -9,19 +9,19 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="142061">
-				<rom name="cpmplus1.imd" size="142061" crc="581a4e02" sha1="00928887a48bd14910eb432df55f24554e2f72c9" offset="0" />
+				<rom name="cpmplus1.imd" size="142061" crc="581a4e02" sha1="00928887a48bd14910eb432df55f24554e2f72c9"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="191176">
-				<rom name="cpmplus2.imd" size="191176" crc="ddd36ec1" sha1="741653c8eaeb706a5d2229b98d79d5da53240b8c" offset="0" />
+				<rom name="cpmplus2.imd" size="191176" crc="ddd36ec1" sha1="741653c8eaeb706a5d2229b98d79d5da53240b8c"/>
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="198338">
-				<rom name="cpmplus3.imd" size="198338" crc="352b00ce" sha1="d632c50ef0b2c5eeea23d3d77f6fb73131b0b0e5" offset="0" />
+				<rom name="cpmplus3.imd" size="198338" crc="352b00ce" sha1="d632c50ef0b2c5eeea23d3d77f6fb73131b0b0e5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -33,19 +33,19 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="66602">
-				<rom name="ose-cpma.td0" size="66602" crc="534dbaa1" sha1="42ab459f311430bc53e9dc86faa013e016530641" offset="0" />
+				<rom name="ose-cpma.td0" size="66602" crc="534dbaa1" sha1="42ab459f311430bc53e9dc86faa013e016530641"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="95534">
-				<rom name="ose-cpmb.td0" size="95534" crc="50fc6882" sha1="5f9724c24c147c3a3f7b029ebf6b84c312347ca2" offset="0" />
+				<rom name="ose-cpmb.td0" size="95534" crc="50fc6882" sha1="5f9724c24c147c3a3f7b029ebf6b84c312347ca2"/>
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="111014">
-				<rom name="ose-cpmc.td0" size="111014" crc="f083408a" sha1="724bdd22e0a74e811950cf4d230cc2cb563d1dee" offset="0" />
+				<rom name="ose-cpmc.td0" size="111014" crc="f083408a" sha1="724bdd22e0a74e811950cf4d230cc2cb563d1dee"/>
 			</dataarea>
 		</part>
 	</software>
@@ -57,7 +57,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="107630">
-				<rom name="ose-psys.td0" size="107630" crc="1037a24b" sha1="3d33597d05b1b7b2eb543d6ed0f3b7637222e18a" offset="0" />
+				<rom name="ose-psys.td0" size="107630" crc="1037a24b" sha1="3d33597d05b1b7b2eb543d6ed0f3b7637222e18a"/>
 			</dataarea>
 		</part>
 	</software>

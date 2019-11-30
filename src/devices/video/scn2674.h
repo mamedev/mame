@@ -6,26 +6,7 @@
 #pragma once
 
 
-#define MCFG_SCN2672_INTR_CALLBACK(_intr) \
-	downcast<scn2672_device &>(*device).set_intr_callback(DEVCB_##_intr);
-
-#define MCFG_SCN2672_CHARACTER_WIDTH(_value) \
-	downcast<scn2672_device &>(*device).set_character_width(_value);
-
-#define MCFG_SCN2672_DRAW_CHARACTER_CALLBACK_OWNER(_class, _method) \
-	downcast<scn2672_device &>(*device).set_display_callback(scn2672_device::draw_character_delegate(&_class::_method, #_class "::" #_method, this));
-
 #define SCN2672_DRAW_CHARACTER_MEMBER(_name) void _name(bitmap_rgb32 &bitmap, int x, int y, uint8_t linecount, uint8_t charcode, uint8_t attrcode, uint16_t address, bool cursor, bool dw, bool lg, bool ul, bool blink)
-
-
-#define MCFG_SCN2674_INTR_CALLBACK(_intr) \
-	downcast<scn2674_device &>(*device).set_intr_callback(DEVCB_##_intr);
-
-#define MCFG_SCN2674_CHARACTER_WIDTH(_value) \
-	downcast<scn2674_device &>(*device).set_character_width(_value);
-
-#define MCFG_SCN2674_DRAW_CHARACTER_CALLBACK_OWNER(_class, _method) \
-	downcast<scn2674_device &>(*device).set_display_callback(scn2674_device::draw_character_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define SCN2674_DRAW_CHARACTER_MEMBER(_name) void _name(bitmap_rgb32 &bitmap, int x, int y, uint8_t linecount, uint8_t charcode, uint8_t attrcode, uint16_t address, bool cursor, bool dw, bool lg, bool ul, bool blink)
 
@@ -35,36 +16,48 @@ class scn2674_device : public device_t,
 						public device_memory_interface
 {
 public:
-	scn2674_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
 	typedef device_delegate<void (bitmap_rgb32 &bitmap, int x, int y, uint8_t linecount, uint8_t charcode, uint8_t attrcode, uint16_t address, bool cursor, bool dw, bool lg, bool ul, bool blink)> draw_character_delegate;
 
 	// static configuration
-	template <class Object> devcb_base &set_intr_callback(Object &&cb) { return m_intr_cb.set_callback(std::forward<Object>(cb)); }
+	auto intr_callback() { return m_intr_cb.bind(); }
+	auto breq_callback() { return m_breq_cb.bind(); }
+	auto mbc_callback() { return m_mbc_cb.bind(); }
+	auto mbc_char_callback() { return m_mbc_char_cb.bind(); }
+	auto mbc_attr_callback() { return m_mbc_attr_cb.bind(); }
 	void set_character_width(int value) { m_hpixels_per_column = value; }
-	template <typename Object> void set_display_callback(Object &&cb) { m_display_cb = std::forward<Object>(cb); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( buffer_r ) { return m_char_buffer; }
-	DECLARE_WRITE8_MEMBER( buffer_w ) { m_char_buffer = data; }
-	DECLARE_READ8_MEMBER( attr_buffer_r ) { return m_attr_buffer; }
-	DECLARE_WRITE8_MEMBER( attr_buffer_w ) { m_attr_buffer = data; }
+	template <typename... T> void set_display_callback(T &&... args) { m_display_cb.set(std::forward<T>(args)...); }
+
+	scn2674_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
+	uint8_t buffer_r() { return m_char_buffer; }
+	void buffer_w(offs_t offset, uint8_t data) { m_char_buffer = data; }
+	uint8_t attr_buffer_r() { return m_attr_buffer; }
+	void attr_buffer_w(offs_t offset, uint8_t data) { m_attr_buffer = data; }
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
-	scn2674_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	scn2674_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool extend_addressing);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	virtual space_config_vector memory_space_config() const override;
+
+	TIMER_CALLBACK_MEMBER(scanline_timer);
+	TIMER_CALLBACK_MEMBER(breq_timer);
+	TIMER_CALLBACK_MEMBER(vblank_timer);
 
 //protected:
 	bitmap_rgb32 m_bitmap;
 	devcb_write_line m_intr_cb;
+	devcb_write_line m_breq_cb;
+	devcb_write_line m_mbc_cb;
+	devcb_read8 m_mbc_char_cb;
+	devcb_read8 m_mbc_attr_cb;
 
 	uint8_t m_IR_pointer;
 	uint16_t m_screen1_address;
@@ -75,6 +68,7 @@ protected:
 	uint8_t m_irq_mask;
 	bool m_gfx_enabled;
 	bool m_display_enabled;
+	bool m_dadd_enabled;
 	bool m_display_enabled_field;
 	bool m_display_enabled_scanline;
 	bool m_cursor_enabled;
@@ -132,14 +126,12 @@ protected:
 
 	draw_character_delegate m_display_cb;
 	emu_timer *m_scanline_timer;
+	emu_timer *m_breq_timer;
+	emu_timer *m_vblank_timer;
 	address_space *m_char_space;
 	address_space *m_attr_space;
 	const address_space_config m_char_space_config;
 	const address_space_config m_attr_space_config;
-	enum
-	{
-		TIMER_SCANLINE
-	};
 };
 
 class scn2672_device : public scn2674_device

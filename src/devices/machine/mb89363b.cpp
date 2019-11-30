@@ -120,37 +120,38 @@ WRITE8_MEMBER(mb89363b_device::i8255_b_port_c_w) { m_out_b_pc_cb(space, offset, 
 READ8_MEMBER( mb89363b_device::read )
 {
 	if (offset & 4)
-		return m_i8255_b->read(space, offset & 3);
+		return m_i8255_b->read(offset & 3);
 	else
-		return m_i8255_a->read(space, offset & 3);
+		return m_i8255_a->read(offset & 3);
 }
 
 WRITE8_MEMBER( mb89363b_device::write )
 {
 	if (offset & 4)
-		m_i8255_b->write(space, offset & 3, data);
+		m_i8255_b->write(offset & 3, data);
 	else
-		m_i8255_a->write(space, offset & 3, data);
+		m_i8255_a->write(offset & 3, data);
 }
 
 
-MACHINE_CONFIG_START(mb89363b_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("i8255_a", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, mb89363b_device, i8255_a_port_a_r))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, mb89363b_device, i8255_a_port_b_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, mb89363b_device, i8255_a_port_c_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, mb89363b_device, i8255_a_port_a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, mb89363b_device, i8255_a_port_b_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, mb89363b_device, i8255_a_port_c_w))
+void mb89363b_device::device_add_mconfig(machine_config &config)
+{
+	I8255(config, m_i8255_a);
+	m_i8255_a->in_pa_callback().set(FUNC(mb89363b_device::i8255_a_port_a_r));
+	m_i8255_a->in_pb_callback().set(FUNC(mb89363b_device::i8255_a_port_b_r));
+	m_i8255_a->in_pc_callback().set(FUNC(mb89363b_device::i8255_a_port_c_r));
+	m_i8255_a->out_pa_callback().set(FUNC(mb89363b_device::i8255_a_port_a_w));
+	m_i8255_a->out_pb_callback().set(FUNC(mb89363b_device::i8255_a_port_b_w));
+	m_i8255_a->out_pc_callback().set(FUNC(mb89363b_device::i8255_a_port_c_w));
 
-	MCFG_DEVICE_ADD("i8255_b", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, mb89363b_device, i8255_b_port_a_r))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, mb89363b_device, i8255_b_port_b_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, mb89363b_device, i8255_b_port_c_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, mb89363b_device, i8255_b_port_a_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, mb89363b_device, i8255_b_port_b_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, mb89363b_device, i8255_b_port_c_w))
-MACHINE_CONFIG_END
+	I8255(config, m_i8255_b);
+	m_i8255_b->in_pa_callback().set(FUNC(mb89363b_device::i8255_b_port_a_r));
+	m_i8255_b->in_pb_callback().set(FUNC(mb89363b_device::i8255_b_port_b_r));
+	m_i8255_b->in_pc_callback().set(FUNC(mb89363b_device::i8255_b_port_c_r));
+	m_i8255_b->out_pa_callback().set(FUNC(mb89363b_device::i8255_b_port_a_w));
+	m_i8255_b->out_pb_callback().set(FUNC(mb89363b_device::i8255_b_port_b_w));
+	m_i8255_b->out_pc_callback().set(FUNC(mb89363b_device::i8255_b_port_c_w));
+}
 
 
 void mb89363b_device::device_start()

@@ -56,8 +56,8 @@ protected:
 	virtual void device_start() override;
 
 	// device_neogeo_ctrl_edge_interface overrides
-	virtual DECLARE_READ8_MEMBER( in0_r ) override;
-	virtual DECLARE_READ8_MEMBER( in1_r ) override;
+	virtual uint8_t in0_r() override;
+	virtual uint8_t in1_r() override;
 	virtual uint8_t read_start_sel() override;
 
 private:

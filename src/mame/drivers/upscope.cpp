@@ -37,11 +37,11 @@
 class upscope_state : public amiga_state
 {
 public:
-	upscope_state(const machine_config &mconfig, device_type type, const char *tag)
-		: amiga_state(mconfig, type, tag),
-	m_prev_cia1_porta(0xff),
-	m_parallel_data(0xff),
-	m_ppi(*this, "ppi")
+	upscope_state(const machine_config &mconfig, device_type type, const char *tag) :
+		amiga_state(mconfig, type, tag),
+		m_prev_cia1_porta(0xff),
+		m_parallel_data(0xff),
+		m_ppi(*this, "ppi")
 	{ }
 
 	void upscope(machine_config &config);
@@ -146,7 +146,7 @@ WRITE8_MEMBER( upscope_state::upscope_cia_1_porta_w )
 		/* if SEL == 1 && BUSY == 1, we write data to internal registers */
 		else if ((data & 5) == 5)
 		{
-			m_ppi->write(space, m_nvram_address_latch & 0x03, m_parallel_data);
+			m_ppi->write(m_nvram_address_latch & 0x03, m_parallel_data);
 		}
 
 		/* if SEL == 0 && BUSY == 1, we write data to NVRAM */
@@ -170,7 +170,7 @@ WRITE8_MEMBER( upscope_state::upscope_cia_1_porta_w )
 		if (data & 4)
 		{
 			if (LOG_IO) logerror("Internal register (%d) read\n", m_nvram_address_latch);
-			m_nvram_data_latch = m_ppi->read(space, m_nvram_address_latch & 0x03);
+			m_nvram_data_latch = m_ppi->read(m_nvram_address_latch & 0x03);
 		}
 
 		/* if SEL == 0, we read NVRAM */
@@ -265,11 +265,11 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(upscope_state::upscope)
-
+void upscope_state::upscope(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, amiga_state::CLK_7M_NTSC)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	M68000(config, m_maincpu, amiga_state::CLK_7M_NTSC);
+	m_maincpu->set_addrmap(AS_PROGRAM, &upscope_state::main_map);
 
 	ADDRESS_MAP_BANK(config, "overlay").set_map(&amiga_state::overlay_512kb_map).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
 
@@ -278,8 +278,7 @@ MACHINE_CONFIG_START(upscope_state::upscope)
 	/* video hardware */
 	ntsc_video(config);
 
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_INIT_OWNER(upscope_state,amiga)
+	PALETTE(config, m_palette, FUNC(upscope_state::amiga_palette), 4096);
 
 	MCFG_VIDEO_START_OVERRIDE(upscope_state,amiga)
 
@@ -296,15 +295,16 @@ MACHINE_CONFIG_START(upscope_state::upscope)
 	paula.int_cb().set(FUNC(amiga_state::paula_int_w));
 
 	/* cia */
-	MCFG_DEVICE_ADD("cia_0", MOS8520, amiga_state::CLK_E_NTSC)
-	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(*this, amiga_state, cia_0_irq))
-	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(*this, amiga_state, cia_0_port_a_write))
-	MCFG_MOS6526_PB_INPUT_CALLBACK(READ8(*this, upscope_state, upscope_cia_0_portb_r))
-	MCFG_MOS6526_PB_OUTPUT_CALLBACK(WRITE8(*this, upscope_state, upscope_cia_0_portb_w))
-	MCFG_DEVICE_ADD("cia_1", MOS8520, amiga_state::CLK_E_NTSC)
-	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(*this, amiga_state, cia_1_irq))
-	MCFG_MOS6526_PA_INPUT_CALLBACK(READ8(*this, upscope_state, upscope_cia_1_porta_r))
-	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(*this, upscope_state, upscope_cia_1_porta_w))
+	MOS8520(config, m_cia_0, amiga_state::CLK_E_NTSC);
+	m_cia_0->irq_wr_callback().set(FUNC(amiga_state::cia_0_irq));
+	m_cia_0->pa_wr_callback().set(FUNC(amiga_state::cia_0_port_a_write));
+	m_cia_0->pb_rd_callback().set(FUNC(upscope_state::upscope_cia_0_portb_r));
+	m_cia_0->pb_wr_callback().set(FUNC(upscope_state::upscope_cia_0_portb_w));
+
+	MOS8520(config, m_cia_1, amiga_state::CLK_E_NTSC);
+	m_cia_1->irq_wr_callback().set(FUNC(amiga_state::cia_1_irq));
+	m_cia_1->pa_rd_callback().set(FUNC(upscope_state::upscope_cia_1_porta_r));
+	m_cia_1->pa_wr_callback().set(FUNC(upscope_state::upscope_cia_1_porta_w));
 
 	/* fdc */
 	AMIGA_FDC(config, m_fdc, amiga_state::CLK_7M_NTSC);
@@ -315,11 +315,11 @@ MACHINE_CONFIG_START(upscope_state::upscope)
 	m_fdc->dsksyn_callback().set(FUNC(amiga_state::fdc_dsksyn_w));
 
 	// i/o extension
-	MCFG_DEVICE_ADD("ppi", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IO0"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, upscope_state, lamps_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, upscope_state, coin_counter_w))
-MACHINE_CONFIG_END
+	I8255(config, m_ppi);
+	m_ppi->in_pa_callback().set_ioport("IO0");
+	m_ppi->out_pb_callback().set(FUNC(upscope_state::lamps_w));
+	m_ppi->out_pc_callback().set(FUNC(upscope_state::coin_counter_w));
+}
 
 
 

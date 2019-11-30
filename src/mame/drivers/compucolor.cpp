@@ -395,26 +395,27 @@ void compucolor2_state::machine_reset()
 	m_rs232->write_dtr(1);
 }
 
-MACHINE_CONFIG_START(compucolor2_state::compucolor2)
+void compucolor2_state::compucolor2(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD(I8080_TAG, I8080, XTAL(17'971'200)/9)
-	MCFG_DEVICE_PROGRAM_MAP(compucolor2_mem)
-	MCFG_DEVICE_IO_MAP(compucolor2_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(compucolor2_state,int_ack)
+	I8080(config, m_maincpu, XTAL(17'971'200)/9);
+	m_maincpu->set_addrmap(AS_PROGRAM, &compucolor2_state::compucolor2_mem);
+	m_maincpu->set_addrmap(AS_IO, &compucolor2_state::compucolor2_io);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(compucolor2_state::int_ack));
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(17'971'200)/2, 93*6, 0, 64*6, 268, 0, 256)
-	MCFG_SCREEN_UPDATE_DRIVER(compucolor2_state, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(17'971'200)/2, 93*6, 0, 64*6, 268, 0, 256);
+	screen.set_screen_update(FUNC(compucolor2_state::screen_update));
 
-	MCFG_PALETTE_ADD_3BIT_RGB("palette")
+	PALETTE(config, m_palette, palette_device::RGB_3BIT);
 
-	MCFG_DEVICE_ADD(CRT5027_TAG, CRT5027, XTAL(17'971'200)/2/6)
-	MCFG_TMS9927_CHAR_WIDTH(6)
-	MCFG_TMS9927_VSYN_CALLBACK(WRITELINE("blink", ripple_counter_device, clock_w))
-	MCFG_VIDEO_SET_SCREEN("screen")
+	CRT5027(config, m_vtac, XTAL(17'971'200)/2/6);
+	m_vtac->set_char_width(6);
+	m_vtac->vsyn_callback().set("blink", FUNC(ripple_counter_device::clock_w));
+	m_vtac->set_screen("screen");
 
-	ripple_counter_device &blink(RIPPLE_COUNTER(config, "blink", 0)); // 74LS393 at UG10
+	ripple_counter_device &blink(RIPPLE_COUNTER(config, "blink")); // 74LS393 at UG10
 	blink.set_stages(8);
 	blink.count_out_cb().set(m_mioc, FUNC(tms5501_device::sens_w)).bit(4);
 
@@ -425,21 +426,21 @@ MACHINE_CONFIG_START(compucolor2_state::compucolor2)
 	m_mioc->xi_callback().set(FUNC(compucolor2_state::xi_r));
 	m_mioc->xo_callback().set(FUNC(compucolor2_state::xo_w));
 
-	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(TMS5501_TAG, tms5501_device, rcv_w))
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
+	m_rs232->rxd_handler().set(m_mioc, FUNC(tms5501_device::rcv_w));
 
-	MCFG_COMPUCOLOR_FLOPPY_PORT_ADD("cd0", compucolor_floppy_port_devices, "floppy")
-	MCFG_RS232_RXD_HANDLER(WRITELINE(TMS5501_TAG, tms5501_device, rcv_w))
+	COMPUCOLOR_FLOPPY_PORT(config, m_floppy0, compucolor_floppy_port_devices, "floppy");
+	m_floppy0->rxd_handler().set(m_mioc, FUNC(tms5501_device::rcv_w));
 
-	MCFG_COMPUCOLOR_FLOPPY_PORT_ADD("cd1", compucolor_floppy_port_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(TMS5501_TAG, tms5501_device, rcv_w))
+	COMPUCOLOR_FLOPPY_PORT(config, m_floppy1, compucolor_floppy_port_devices, nullptr);
+	m_floppy1->rxd_handler().set(m_mioc, FUNC(tms5501_device::rcv_w));
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("32K").set_extra_options("8K,16K");
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "compclr2_flop")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "flop_list").set_original("compclr2_flop");
+}
 
 ROM_START( compclr2 )
 	ROM_REGION( 0x4000, I8080_TAG, 0 )

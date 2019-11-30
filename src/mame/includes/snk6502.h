@@ -10,8 +10,10 @@
 
 #pragma once
 
+#include "machine/bankdev.h"
 #include "machine/timer.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class fantasy_sound_device;
 
@@ -30,7 +32,6 @@ public:
 	{ }
 
 	void satansat(machine_config &config);
-	void vanguard(machine_config &config);
 	void sasuke(machine_config &config);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(sasuke_count_r);
@@ -76,11 +77,11 @@ protected:
 	virtual void machine_start() override;
 	DECLARE_MACHINE_RESET(sasuke);
 	DECLARE_VIDEO_START(satansat);
-	DECLARE_PALETTE_INIT(satansat);
+	void satansat_palette(palette_device &palette);
 	DECLARE_VIDEO_START(snk6502);
-	DECLARE_PALETTE_INIT(snk6502);
+	void snk6502_palette(palette_device &palette);
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(satansat_interrupt);
 	INTERRUPT_GEN_MEMBER(snk6502_interrupt);
@@ -91,14 +92,35 @@ protected:
 
 	void sasuke_map(address_map &map);
 	void satansat_map(address_map &map);
-	void vanguard_map(address_map &map);
 };
 
-class fantasy_state : public snk6502_state
+class vanguard_state : public snk6502_state
+{
+public:
+	vanguard_state(const machine_config &mconfig, device_type type, const char *tag) :
+		snk6502_state(mconfig, type, tag),
+		m_highmem(*this, "highmem")
+	{
+	}
+
+	void vanguard(machine_config &config);
+
+protected:
+	uint8_t highmem_r(offs_t offset);
+	void highmem_w(offs_t offset, uint8_t data);
+
+	required_device<address_map_bank_device> m_highmem;
+
+private:
+	void vanguard_map(address_map &map);
+	void vanguard_upper_map(address_map &map);
+};
+
+class fantasy_state : public vanguard_state
 {
 public:
 	fantasy_state(const machine_config &mconfig, device_type type, const char *tag) :
-		snk6502_state(mconfig, type, tag),
+		vanguard_state(mconfig, type, tag),
 		m_sound(*this, "snk6502")
 	{
 	}
@@ -112,6 +134,7 @@ private:
 
 	void fantasy_map(address_map &map);
 	void pballoon_map(address_map &map);
+	void pballoon_upper_map(address_map &map);
 
 	required_device<fantasy_sound_device> m_sound;
 };

@@ -19,7 +19,7 @@ class snk6502_sound_device : public device_t, public device_sound_interface
 public:
 	snk6502_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(music0_playing);
+	DECLARE_READ_LINE_MEMBER(music0_playing);
 
 	void set_music_freq(int freq);
 	void set_music_clock(double clock_time);
@@ -27,6 +27,7 @@ public:
 	void mute_channel(int channel);
 	void unmute_channel(int channel);
 	void set_sound0_stop_on_rollover(int value) { m_sound0_stop_on_rollover = value; }
+	void reset_offset(int channel) { m_tone_channels[channel].offset = 0; }
 
 	void speech_w(uint8_t data, const uint16_t *table, int start);
 
@@ -115,7 +116,7 @@ protected:
 	required_device<snk6502_sound_device> m_custom;
 
 private:
-	required_device<discrete_device> m_discrete;
+	required_device<discrete_sound_device> m_discrete;
 
 	uint8_t m_last_port1;
 };

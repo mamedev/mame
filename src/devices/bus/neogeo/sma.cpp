@@ -55,10 +55,11 @@ void neogeo_sma_cart_device::device_reset()
  mapper specific handlers
  -------------------------------------------------*/
 
-MACHINE_CONFIG_START(neogeo_sma_cart_device::device_add_mconfig)
-	MCFG_SMA_PROT_ADD("sma_prot")
-	MCFG_CMC_PROT_ADD("cmc_prot")
-MACHINE_CONFIG_END
+void neogeo_sma_cart_device::device_add_mconfig(machine_config &config)
+{
+	NG_SMA_PROT(config, m_sma_prot);
+	NG_CMC_PROT(config, m_cmc_prot);
+}
 
 
 /*************************************************

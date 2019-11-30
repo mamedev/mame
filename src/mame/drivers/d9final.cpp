@@ -32,18 +32,20 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class d9final_state : public driver_device
 {
 public:
-	d9final_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	d9final_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_lo_vram(*this, "lo_vram"),
 		m_hi_vram(*this, "hi_vram"),
-		m_cram(*this, "cram") { }
+		m_cram(*this, "cram")
+	{ }
 
 	void d9final(machine_config &config);
 
@@ -88,7 +90,7 @@ TILE_GET_INFO_MEMBER(d9final_state::get_sc0_tile_info)
 
 void d9final_state::video_start()
 {
-	m_sc0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(d9final_state::get_sc0_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_sc0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(d9final_state::get_sc0_tile_info)), TILEMAP_SCAN_ROWS, 8,8,64,32);
 }
 
 uint32_t d9final_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -139,14 +141,14 @@ void d9final_state::d9final_map(address_map &map)
 	map(0xd000, 0xd7ff).ram().w(FUNC(d9final_state::sc0_lovram)).share("lo_vram");
 	map(0xd800, 0xdfff).ram().w(FUNC(d9final_state::sc0_hivram)).share("hi_vram");
 	map(0xe000, 0xe7ff).ram().w(FUNC(d9final_state::sc0_cram)).share("cram");
-	map(0xf000, 0xf007).r(FUNC(d9final_state::prot_latch_r)); //AM_DEVREADWRITE("essnd", es8712_device, read, write)
+	map(0xf000, 0xf007).r(FUNC(d9final_state::prot_latch_r)); //.rw("essnd", FUNC(es8712_device::read), FUNC(es8712_device::write));
 	map(0xf800, 0xf80f).rw("rtc", FUNC(rtc62421_device::read), FUNC(rtc62421_device::write));
 }
 
 void d9final_state::d9final_io(address_map &map)
 {
 	map.global_mask(0xff);
-//  AM_RANGE(0x00, 0x00) AM_WRITENOP //bit 0: irq enable? screen enable?
+//  map(0x00, 0x00).nopw(); //bit 0: irq enable? screen enable?
 	map(0x00, 0x00).portr("DSWA");
 	map(0x20, 0x20).portr("DSWB");
 	map(0x40, 0x40).portr("DSWC");
@@ -301,38 +303,36 @@ void d9final_state::machine_start()
 	membank("bank1")->set_entry(0);
 }
 
-MACHINE_CONFIG_START(d9final_state::d9final)
+void d9final_state::d9final(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 24000000/4)/* ? MHz */
-	MCFG_DEVICE_PROGRAM_MAP(d9final_map)
-	MCFG_DEVICE_IO_MAP(d9final_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", d9final_state,  irq0_line_hold)
+	Z80(config, m_maincpu, 24000000/4); /* ? MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &d9final_state::d9final_map);
+	m_maincpu->set_addrmap(AS_IO, &d9final_state::d9final_io);
+	m_maincpu->set_vblank_int("screen", FUNC(d9final_state::irq0_line_hold));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // Sharp LH5116D-10 + battery
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 16, 256-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(d9final_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(512, 256);
+	screen.set_visarea(0, 512-1, 16, 256-16-1);
+	screen.set_screen_update(FUNC(d9final_state::screen_update));
+	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_d9final)
-	MCFG_PALETTE_ADD_INIT_BLACK("palette", 0x400)
-	MCFG_PALETTE_FORMAT(xxxxBBBBRRRRGGGG)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_d9final);
+	PALETTE(config, "palette", palette_device::BLACK).set_format(palette_device::xBRG_444, 0x400);
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(3'579'545))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	YM2413(config, "ymsnd", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	//MCFG_DEVICE_ADD("essnd", ES8712, 24000000/3) // clock unknown
-	//MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	//ES8712(config, "essnd", 24000000/3).add_route(ALL_OUTPUTS, "mono", 1.0); // clock unknown
 
-	MCFG_DEVICE_ADD("rtc", RTC62421, XTAL(32'768)) // internal oscillator
-MACHINE_CONFIG_END
+	RTC62421(config, "rtc", XTAL(32'768)); // internal oscillator
+}
 
 
 ROM_START( d9final )

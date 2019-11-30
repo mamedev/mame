@@ -42,6 +42,7 @@ WRITE8_MEMBER( liberatr_state::bitmap_w )
 
 	m_bitmapram[offset] = data;
 
+	offset += 3;
 	x = (offset & 0x3f) << 2;
 	y = offset >> 6;
 

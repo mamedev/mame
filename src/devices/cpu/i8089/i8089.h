@@ -19,20 +19,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_I8089_DATA_WIDTH(_data_width) \
-	downcast<i8089_device &>(*device).set_data_width(_data_width);
-
-#define MCFG_I8089_SINTR1(_sintr1) \
-	downcast<i8089_device *>(device)->set_sintr1_callback(DEVCB_##_sintr1);
-
-#define MCFG_I8089_SINTR2(_sintr2) \
-	downcast<i8089_device *>(device)->set_sintr2_callback(DEVCB_##_sintr2);
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -50,8 +36,8 @@ public:
 	i8089_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// callbacks
-	template <class Object> devcb_base &set_sintr1_callback(Object &&sintr1) { return m_write_sintr1.set_callback(std::forward<Object>(sintr1)); }
-	template <class Object> devcb_base &set_sintr2_callback(Object &&sintr2) { return m_write_sintr2.set_callback(std::forward<Object>(sintr2)); }
+	auto sintr1() { return m_write_sintr1.bind(); }
+	auto sintr2() { return m_write_sintr2.bind(); }
 
 	// configuration helpers
 	void set_data_width(uint8_t data_width) { m_data_width = data_width; }

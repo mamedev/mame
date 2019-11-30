@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco
+// thanks-to:rfka01
 #ifndef MAME_BUS_DMV_K230_H
 #define MAME_BUS_DMV_K230_H
 
@@ -48,21 +49,18 @@ protected:
 
 	void k230_io(address_map &map);
 	void k230_mem(address_map &map);
-	void k234_mem(address_map &map);
-	void k235_io(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
 	optional_memory_region      m_rom;
-	dmvcart_slot_device *       m_bus;
-	address_space *             m_io;
 	int                         m_switch16;
 	int                         m_hold;
 
-private:
 	DECLARE_READ8_MEMBER(io_r);
 	DECLARE_READ8_MEMBER(program_r);
 	DECLARE_WRITE8_MEMBER(io_w);
 	DECLARE_WRITE8_MEMBER(program_w);
+
+private:
 	DECLARE_READ8_MEMBER(rom_r);
 };
 
@@ -108,6 +106,8 @@ private:
 
 	DECLARE_READ8_MEMBER(snr_r);
 	DECLARE_WRITE8_MEMBER(snr_w);
+
+	void k234_mem(address_map &map);
 };
 
 
@@ -140,6 +140,8 @@ protected:
 private:
 	required_device<pic8259_device> m_pic;
 	required_ioport m_dsw;
+
+	void k235_io(address_map &map);
 };
 
 // device type definition

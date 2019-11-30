@@ -229,6 +229,7 @@ i8255_device::i8255_device(const machine_config &mconfig, device_type type, cons
 	, m_out_pc_cb(*this)
 	, m_tri_pa_cb(*this)
 	, m_tri_pb_cb(*this)
+	, m_tri_pc_cb(*this)
 	, m_control(0)
 	, m_intr{ 0, 0 }
 {
@@ -250,6 +251,7 @@ void i8255_device::device_resolve_objects()
 	m_out_pc_cb.resolve_safe();
 	m_tri_pa_cb.resolve_safe(0xff);
 	m_tri_pb_cb.resolve_safe(0xff);
+	m_tri_pc_cb.resolve_safe(0xff);
 }
 
 //-------------------------------------------------
@@ -522,8 +524,8 @@ void i8255_device::output_pc()
 		}
 		else
 		{
-			// TTL inputs float high
-			data |= 0xf0;
+			// TTL inputs floating
+			data |= m_tri_pc_cb(0) & 0xf0;
 		}
 		break;
 
@@ -560,8 +562,8 @@ void i8255_device::output_pc()
 		}
 		else
 		{
-			// TTL inputs float high
-			data |= b_mask;
+			// TTL inputs floating
+			data |= m_tri_pc_cb(0) & b_mask;
 		}
 		break;
 
@@ -714,7 +716,7 @@ void i8255_device::set_pc_bit(int bit, int state)
 }
 
 
-READ8_MEMBER( i8255_device::read )
+uint8_t i8255_device::read(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -754,7 +756,7 @@ READ8_MEMBER( i8255_device::read )
 }
 
 
-WRITE8_MEMBER( i8255_device::write )
+void i8255_device::write(offs_t offset, uint8_t data)
 {
 	switch (offset & 0x03)
 	{
@@ -807,17 +809,11 @@ WRITE8_MEMBER( i8255_device::write )
 }
 
 
-READ8_MEMBER( i8255_device::pa_r )
-{
-	return read_pa();
-}
-
-
 //-------------------------------------------------
-//  read_pa - port A read
+//  pa_r - port A read
 //-------------------------------------------------
 
-uint8_t i8255_device::read_pa()
+uint8_t i8255_device::pa_r()
 {
 	uint8_t data = 0xff;
 
@@ -832,12 +828,12 @@ uint8_t i8255_device::read_pa()
 //  acka_r - port A read with PC6 strobe
 //-------------------------------------------------
 
-READ8_MEMBER( i8255_device::acka_r )
+uint8_t i8255_device::acka_r()
 {
 	if (!machine().side_effects_disabled())
 		pc6_w(0);
 
-	uint8_t data = read_pa();
+	uint8_t data = pa_r();
 
 	if (!machine().side_effects_disabled())
 		pc6_w(1);
@@ -846,17 +842,11 @@ READ8_MEMBER( i8255_device::acka_r )
 }
 
 
-READ8_MEMBER( i8255_device::pb_r )
-{
-	return read_pb();
-}
-
-
 //-------------------------------------------------
-//  read_pb - port B read
+//  pb_r - port B read
 //-------------------------------------------------
 
-uint8_t i8255_device::read_pb()
+uint8_t i8255_device::pb_r()
 {
 	uint8_t data = 0xff;
 
@@ -873,12 +863,12 @@ uint8_t i8255_device::read_pb()
 //  ackb_r - port B read with PC2 strobe
 //-------------------------------------------------
 
-READ8_MEMBER( i8255_device::ackb_r )
+uint8_t i8255_device::ackb_r()
 {
 	if (!machine().side_effects_disabled())
 		pc2_w(0);
 
-	uint8_t data = read_pb();
+	uint8_t data = pb_r();
 
 	if (!machine().side_effects_disabled())
 		pc2_w(1);

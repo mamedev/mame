@@ -4,34 +4,24 @@
 
 #include "includes/labyrunr.h"
 
-PALETTE_INIT_MEMBER(labyrunr_state, labyrunr)
+void labyrunr_state::labyrunr_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	int pal;
 
-	for (pal = 0; pal < 8; pal++)
+	for (int pal = 0; pal < 8; pal++)
 	{
-		/* chars, no lookup table */
 		if (pal & 1)
 		{
-			int i;
-
-			for (i = 0; i < 0x100; i++)
+			// chars, no lookup table
+			for (int i = 0; i < 0x100; i++)
 				palette.set_pen_indirect((pal << 8) | i, (pal << 4) | (i & 0x0f));
 		}
-		/* sprites */
 		else
 		{
-			int i;
-
-			for (i = 0; i < 0x100; i++)
+			// sprites
+			for (int i = 0; i < 0x100; i++)
 			{
-				uint8_t ctabentry;
-
-				if (color_prom[i] == 0)
-					ctabentry = 0;
-				else
-					ctabentry = (pal << 4) | (color_prom[i] & 0x0f);
+				uint8_t const ctabentry = !color_prom[i] ? 0 : ((pal << 4) | (color_prom[i] & 0x0f));
 
 				palette.set_pen_indirect((pal << 8) | i, ctabentry);
 			}
@@ -113,8 +103,8 @@ TILE_GET_INFO_MEMBER(labyrunr_state::get_tile_info1)
 
 void labyrunr_state::video_start()
 {
-	m_layer0 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(labyrunr_state::get_tile_info0),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_layer1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(labyrunr_state::get_tile_info1),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_layer0 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(labyrunr_state::get_tile_info0)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_layer1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(labyrunr_state::get_tile_info1)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_layer0->set_transparent_pen(0);
 	m_layer1->set_transparent_pen(0);

@@ -5,9 +5,10 @@
  * includes/kramermc.h
  *
  ****************************************************************************/
-
 #ifndef MAME_INCLUDES_KRAMERMC_H
 #define MAME_INCLUDES_KRAMERMC_H
+
+#pragma once
 
 #include "machine/z80pio.h"
 #include "emupal.h"
@@ -15,11 +16,12 @@
 class kramermc_state : public driver_device
 {
 public:
-	kramermc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	kramermc_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette")
+	{ }
 
 	void kramermc(machine_config &config);
 

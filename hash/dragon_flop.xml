@@ -23,7 +23,7 @@
 		<publisher>Dragonfire Services</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Airball Construction Kit (198x)(Dragonfire Services)[!].vdk" size="184332" crc="eaa987ed" sha1="608a40526d105748eeb0496da889f39be8bebaf0" offset="0" />
+				<rom name="Airball Construction Kit (198x)(Dragonfire Services)[!].vdk" size="184332" crc="eaa987ed" sha1="608a40526d105748eeb0496da889f39be8bebaf0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -34,7 +34,7 @@
 		<publisher>N.D.U.G.</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Animated Tunes (1989)(N.D.U.G.)[!].vdk" size="184332" crc="993a8408" sha1="128ccb4fa2a11f13242a7b87fa52273c4a1b0da4" offset="0" />
+				<rom name="Animated Tunes (1989)(N.D.U.G.)[!].vdk" size="184332" crc="993a8408" sha1="128ccb4fa2a11f13242a7b87fa52273c4a1b0da4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -45,7 +45,7 @@
 		<publisher>Kouga Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Balldozer (198x)(Kouga Software)[!].vdk" size="184332" crc="6e994c55" sha1="ee024be01d41a469f4f5ec62bd328dd3256fa1d7" offset="0" />
+				<rom name="Balldozer (198x)(Kouga Software)[!].vdk" size="184332" crc="6e994c55" sha1="ee024be01d41a469f4f5ec62bd328dd3256fa1d7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -56,7 +56,7 @@
 		<publisher>Harris Micro Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184340">
-				<rom name="BASIC42 (198x)(Harris Micros)[!].vdk" size="184340" crc="0e75a42d" sha1="a1d230058a12e7c269e600a73b2df7122ca34404" offset="0" />
+				<rom name="BASIC42 (198x)(Harris Micros)[!].vdk" size="184340" crc="0e75a42d" sha1="a1d230058a12e7c269e600a73b2df7122ca34404"/>
 			</dataarea>
 		</part>
 	</software>
@@ -67,7 +67,7 @@
 		<publisher>N.D.U.G.</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="BT Codes Search (1993)(NDUG)[!].vdk" size="184332" crc="f38e553f" sha1="9a89abe10c393262d4d1174195c216dca03ac00a" offset="0" />
+				<rom name="BT Codes Search (1993)(NDUG)[!].vdk" size="184332" crc="f38e553f" sha1="9a89abe10c393262d4d1174195c216dca03ac00a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -78,7 +78,7 @@
 		<publisher>Pulser Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="CAD6809 (1988)(Pulser Software)[!].vdk" size="184332" crc="48a5f502" sha1="309badfcccc3e5b9c5db08d0ad1aea493d2afc09" offset="0" />
+				<rom name="CAD6809 (1988)(Pulser Software)[!].vdk" size="184332" crc="48a5f502" sha1="309badfcccc3e5b9c5db08d0ad1aea493d2afc09"/>
 			</dataarea>
 		</part>
 	</software>
@@ -89,7 +89,7 @@
 		<publisher>Compusense</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184340">
-				<rom name="Chatview (198x)(Compusense)[!].vdk" size="184340" crc="da853ae0" sha1="43d28348bc377afca82398bcca7d6629ba0f2341" offset="0" />
+				<rom name="Chatview (198x)(Compusense)[!].vdk" size="184340" crc="da853ae0" sha1="43d28348bc377afca82398bcca7d6629ba0f2341"/>
 			</dataarea>
 		</part>
 	</software>
@@ -100,7 +100,7 @@
 		<publisher>MicroVison</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184350">
-				<rom name="Composer Companion (198x)(Microvison)[!].vdk" size="184350" crc="fc146f50" sha1="5cde0848a0b5352a9f290e81e2ca17b25d5ea247" offset="0" />
+				<rom name="Composer Companion (198x)(Microvison)[!].vdk" size="184350" crc="fc146f50" sha1="5cde0848a0b5352a9f290e81e2ca17b25d5ea247"/>
 			</dataarea>
 		</part>
 	</software>
@@ -111,7 +111,7 @@
 		<publisher>Dragonfire Services</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Composer Companion (Dragonfire Services)(1986)[!].vdk" size="184332" crc="eb4437d8" sha1="4b0cea63a5093809f58c2fcf3da18c3b309af3a0" offset="0" />
+				<rom name="Composer Companion (Dragonfire Services)(1986)[!].vdk" size="184332" crc="eb4437d8" sha1="4b0cea63a5093809f58c2fcf3da18c3b309af3a0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -122,7 +122,7 @@
 		<publisher>PSE Computers</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Composer X (PSE Computers)(1988)[!].vdk" size="184332" crc="27929f51" sha1="36b503235e25ed93d2b646c0695d568457b7c2b5" offset="0" />
+				<rom name="Composer X (PSE Computers)(1988)[!].vdk" size="184332" crc="27929f51" sha1="36b503235e25ed93d2b646c0695d568457b7c2b5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -133,7 +133,7 @@
 		<publisher>Pulser Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Composer X (1988)(Pulser Software)[!].vdk" size="184332" crc="9d09688f" sha1="6be7ddfe478a4eb665090b697a021a471de0442e" offset="0" />
+				<rom name="Composer X (1988)(Pulser Software)[!].vdk" size="184332" crc="9d09688f" sha1="6be7ddfe478a4eb665090b697a021a471de0442e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -144,7 +144,7 @@
 		<publisher>PSE Computers</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Copycat (PSE Computers)(1988)[!].vdk" size="184332" crc="d8c47c7a" sha1="4fb7b38a59614f8213622f74672ad768abfca898" offset="0" />
+				<rom name="Copycat (PSE Computers)(1988)[!].vdk" size="184332" crc="d8c47c7a" sha1="4fb7b38a59614f8213622f74672ad768abfca898"/>
 			</dataarea>
 		</part>
 	</software>
@@ -155,7 +155,7 @@
 		<publisher>Pulser Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Copycat (1988)(Pulser Software)[!].vdk" size="184332" crc="98da7277" sha1="a210b5ff2874919ae6343bbb7e7ad71a9fc7e934" offset="0" />
+				<rom name="Copycat (1988)(Pulser Software)[!].vdk" size="184332" crc="98da7277" sha1="a210b5ff2874919ae6343bbb7e7ad71a9fc7e934"/>
 			</dataarea>
 		</part>
 	</software>
@@ -166,7 +166,7 @@
 		<publisher>Microdeal</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184363">
-				<rom name="Crazy Painter (198x)(Microdeal)[!].vdk" size="184363" crc="05720988" sha1="cd4575859483481e3e99a00cac042aa6f226ac91" offset="0" />
+				<rom name="Crazy Painter (198x)(Microdeal)[!].vdk" size="184363" crc="05720988" sha1="cd4575859483481e3e99a00cac042aa6f226ac91"/>
 			</dataarea>
 		</part>
 	</software>
@@ -177,7 +177,7 @@
 		<publisher>Microdeal</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184353">
-				<rom name="Cuthbert Goes Walkabout (198x)(Microdeal)[!].vdk" size="184353" crc="f4ee7818" sha1="881bd44c357642b1c41d72426d23a1e07994eb63" offset="0" />
+				<rom name="Cuthbert Goes Walkabout (198x)(Microdeal)[!].vdk" size="184353" crc="f4ee7818" sha1="881bd44c357642b1c41d72426d23a1e07994eb63"/>
 			</dataarea>
 		</part>
 	</software>
@@ -188,7 +188,7 @@
 		<publisher>Microdeal</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184347">
-				<rom name="Cuthbert In Space (198x)(Microdeal)[!].vdk" size="184347" crc="5431de05" sha1="73db7344eb63c248c0be23341dc396297128c93d" offset="0" />
+				<rom name="Cuthbert In Space (198x)(Microdeal)[!].vdk" size="184347" crc="5431de05" sha1="73db7344eb63c248c0be23341dc396297128c93d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -199,7 +199,7 @@
 		<publisher>Pulser Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="DAMS (1985)(Pulser Software)[!].vdk" size="184332" crc="d056269e" sha1="45ef7c1ebf107c76e48b65bf1473164bcf5b416f" offset="0" />
+				<rom name="DAMS (1985)(Pulser Software)[!].vdk" size="184332" crc="d056269e" sha1="45ef7c1ebf107c76e48b65bf1473164bcf5b416f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -210,7 +210,7 @@
 		<publisher>Compusense</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Dasm-Demon (1984)(Compusense Ltd)[!].vdk" size="184332" crc="797be112" sha1="95ea970fcc7815ef03835fae29f81492433e3ce5" offset="0" />
+				<rom name="Dasm-Demon (1984)(Compusense Ltd)[!].vdk" size="184332" crc="797be112" sha1="95ea970fcc7815ef03835fae29f81492433e3ce5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -221,7 +221,7 @@
 		<publisher>Dragsoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184351">
-				<rom name="Data load and print (198x)(Dragsoft)[!].vdk" size="184351" crc="cf9d5467" sha1="b8a6d6f1004d0c3aba60798b3f1b1d151e97b4df" offset="0" />
+				<rom name="Data load and print (198x)(Dragsoft)[!].vdk" size="184351" crc="cf9d5467" sha1="b8a6d6f1004d0c3aba60798b3f1b1d151e97b4df"/>
 			</dataarea>
 		</part>
 	</software>
@@ -232,7 +232,7 @@
 		<publisher>Pulser Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Data-Designer (1989)(Pulser Software)[!].vdk" size="184332" crc="69a8476f" sha1="423627522ff7be21a80dc808eec7d020d380cb03" offset="0" />
+				<rom name="Data-Designer (1989)(Pulser Software)[!].vdk" size="184332" crc="69a8476f" sha1="423627522ff7be21a80dc808eec7d020d380cb03"/>
 			</dataarea>
 		</part>
 	</software>
@@ -244,7 +244,7 @@
 		<info name="usage" value="LOAD&quot;DRS.BIN&quot; then EXEC&amp;H6800" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="cass" size="184332">
-				<rom name="DRS (1983)(Salamander Software)[!].vdk" size="184332" crc="9885c686" sha1="5d684c5d7359ee279ff9ceba2cfa9ca2f7732982" offset="0" />
+				<rom name="DRS (1983)(Salamander Software)[!].vdk" size="184332" crc="9885c686" sha1="5d684c5d7359ee279ff9ceba2cfa9ca2f7732982"/>
 			</dataarea>
 		</part>
 	</software>
@@ -255,7 +255,7 @@
 		<publisher>MST Consultants</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184344">
-				<rom name="Database (198x)(MST)[!].vdk" size="184344" crc="d6217da9" sha1="0bfcb661821a58655ef0967ed2ad1b0e9defe26d" offset="0" />
+				<rom name="Database (198x)(MST)[!].vdk" size="184344" crc="d6217da9" sha1="0bfcb661821a58655ef0967ed2ad1b0e9defe26d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -266,7 +266,7 @@
 		<publisher>D.P.S</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="DCHROME &amp; SCANNER (1989)(D.P.S)[!].vdk" size="184332" crc="5af1a82e" sha1="cde765aabe45edc7b39af64876ff93c9a1035ed7" offset="0" />
+				<rom name="DCHROME &amp; SCANNER (1989)(D.P.S)[!].vdk" size="184332" crc="5af1a82e" sha1="cde765aabe45edc7b39af64876ff93c9a1035ed7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -277,7 +277,7 @@
 		<publisher>Pamcomms</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184355">
-				<rom name="Delux.D for Trojan Light Pen (198x)(Pamcomms)[!].vdk" size="184355" crc="75d52a05" sha1="33e21f95dc8311538367b633893d2d874b2b720d" offset="0" />
+				<rom name="Delux.D for Trojan Light Pen (198x)(Pamcomms)[!].vdk" size="184355" crc="75d52a05" sha1="33e21f95dc8311538367b633893d2d874b2b720d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -288,7 +288,7 @@
 		<publisher>N.D.U.G.</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Desktop (1989)(NDUG)[!].vdk" size="184332" crc="f13cd025" sha1="2e7dac40d4a58ad39f92c8321db5ef92e260d513" offset="0" />
+				<rom name="Desktop (1989)(NDUG)[!].vdk" size="184332" crc="f13cd025" sha1="2e7dac40d4a58ad39f92c8321db5ef92e260d513"/>
 			</dataarea>
 		</part>
 	</software>
@@ -299,7 +299,7 @@
 		<publisher>Knight Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Desktop Publisher v2 (KCS)(1990)[!].vdk" size="184332" crc="79d004c7" sha1="1a2742303df5018ce77dccd1d2dfce2eec9233a1" offset="0" />
+				<rom name="Desktop Publisher v2 (KCS)(1990)[!].vdk" size="184332" crc="79d004c7" sha1="1a2742303df5018ce77dccd1d2dfce2eec9233a1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -310,7 +310,7 @@
 		<publisher>Knight Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Desk Top Publisher (1990)(Knight Software)[!].vdk" size="184332" crc="0e4096c7" sha1="7dfa596162b94c7cee5ad2e5295e123f85ead2a9" offset="0" />
+				<rom name="Desk Top Publisher (1990)(Knight Software)[!].vdk" size="184332" crc="0e4096c7" sha1="7dfa596162b94c7cee5ad2e5295e123f85ead2a9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -321,7 +321,7 @@
 		<publisher>Pulser Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Discup (198x)(Pulser Software)[!].vdk" size="184332" crc="e30f35fd" sha1="e2611e5112a1881d10dd482f5f645bad16e1a67b" offset="0" />
+				<rom name="Discup (198x)(Pulser Software)[!].vdk" size="184332" crc="e30f35fd" sha1="e2611e5112a1881d10dd482f5f645bad16e1a67b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -332,7 +332,7 @@
 		<publisher>PSE Computers</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Discup (PSE Computers)(1985)[!].vdk" size="184332" crc="0179dc3b" sha1="f18483f1684065538f27e34430e839926cc19d13" offset="0" />
+				<rom name="Discup (PSE Computers)(1985)[!].vdk" size="184332" crc="0179dc3b" sha1="f18483f1684065538f27e34430e839926cc19d13"/>
 			</dataarea>
 		</part>
 	</software>
@@ -343,7 +343,7 @@
 		<publisher>Domino Computing</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184342">
-				<rom name="Disk Doctor (198x)(Domino Computing)[!].vdk" size="184342" crc="fe9b1959" sha1="f3eaabe27b763d23fcd8bad21cfc15c1f500790b" offset="0" />
+				<rom name="Disk Doctor (198x)(Domino Computing)[!].vdk" size="184342" crc="fe9b1959" sha1="f3eaabe27b763d23fcd8bad21cfc15c1f500790b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -354,7 +354,7 @@
 		<publisher>Pamcomms</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Disk-Kit (1986)(Pamcomms Limited)[!].vdk" size="184332" crc="95971314" sha1="9dbb08817c1ae111fb0e365144545957376a406f" offset="0" />
+				<rom name="Disk-Kit (1986)(Pamcomms Limited)[!].vdk" size="184332" crc="95971314" sha1="9dbb08817c1ae111fb0e365144545957376a406f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -365,7 +365,7 @@
 		<publisher>Pulser Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Diskbase (1987)(Pulser Software)[!].vdk" size="184332" crc="6e572fc3" sha1="958c32770b1ffd2e8b4b1be37943a4e5d2973940" offset="0" />
+				<rom name="Diskbase (1987)(Pulser Software)[!].vdk" size="184332" crc="6e572fc3" sha1="958c32770b1ffd2e8b4b1be37943a4e5d2973940"/>
 			</dataarea>
 		</part>
 	</software>
@@ -376,12 +376,12 @@
 		<publisher>N.D.U.G.</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Dragon Detour (NDUG)(1993)[!].vdk" size="184332" crc="d3840620" sha1="7b515b35ee0752d639183cd12b1cd731baef2e38" offset="0" />
+				<rom name="Dragon Detour (NDUG)(1993)[!].vdk" size="184332" crc="d3840620" sha1="7b515b35ee0752d639183cd12b1cd731baef2e38"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Dragon Detour Sector Save Disk (NDUG)(1993)[!].VDK" size="184332" crc="8d1e813a" sha1="30375665647b129b16f9756ac25a3f6a59753e60" offset="0" />
+				<rom name="Dragon Detour Sector Save Disk (NDUG)(1993)[!].VDK" size="184332" crc="8d1e813a" sha1="30375665647b129b16f9756ac25a3f6a59753e60"/>
 			</dataarea>
 		</part>
 	</software>
@@ -393,13 +393,13 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Boot"/>
 			<dataarea name="flop" size="184332">
-				<rom name="Dragon Graphics Studio Plus (1989)(Knight Software)[!].vdk" size="184332" crc="8592e188" sha1="55e23f3545f36a34d09a6b42251a48613ddb3740" offset="0" />
+				<rom name="Dragon Graphics Studio Plus (1989)(Knight Software)[!].vdk" size="184332" crc="8592e188" sha1="55e23f3545f36a34d09a6b42251a48613ddb3740"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Clip Art"/>
 			<dataarea name="flop" size="184332">
-				<rom name="Dragon Graphics Studio Plus Clip Art (1991)(Knight Software)[!].vdk" size="184332" crc="2096e871" sha1="4571c2ed73c6c3dc104fb8f16be3c3c2dc3e0838" offset="0" />
+				<rom name="Dragon Graphics Studio Plus Clip Art (1991)(Knight Software)[!].vdk" size="184332" crc="2096e871" sha1="4571c2ed73c6c3dc104fb8f16be3c3c2dc3e0838"/>
 			</dataarea>
 		</part>
 	</software>
@@ -410,7 +410,7 @@
 		<publisher>N.D.U.G.</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Draw Ezee Plus (198x)(N.D.U.G)[!].vdk" size="184332" crc="b44c04bb" sha1="5b451684ee245fba381244e54e32221a11945b9f" offset="0" />
+				<rom name="Draw Ezee Plus (198x)(N.D.U.G)[!].vdk" size="184332" crc="b44c04bb" sha1="5b451684ee245fba381244e54e32221a11945b9f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -421,7 +421,7 @@
 		<publisher>Dragon Data</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184363">
-				<rom name="Dream (198x)(Dragon Data Ltd)[!].vdk" size="184363" crc="e2812ed0" sha1="b3ae1ce54d25f6bcb27078a29026a9f5105d089f" offset="0" />
+				<rom name="Dream (198x)(Dragon Data Ltd)[!].vdk" size="184363" crc="e2812ed0" sha1="b3ae1ce54d25f6bcb27078a29026a9f5105d089f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -432,7 +432,19 @@
 		<publisher>Microdeal</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184343">
-				<rom name="Dungeon Raid (198x)(Microdeal)[!].vdk" size="184343" crc="4daf6072" sha1="46049f7da426549a9c707c993554d51c258c5b65" offset="0" />
+				<rom name="Dungeon Raid (198x)(Microdeal)[!].vdk" size="184343" crc="4daf6072" sha1="46049f7da426549a9c707c993554d51c258c5b65"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dunjunz">
+		<description>Dunjunz</description>
+		<year>2018</year>
+		<publisher>Teipen Mwnci</publisher>
+		<info name="author" value="Ciaran Anscomb"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="184320">
+				<rom name="Dunjunz (2018)(Teipen Mwnci).dsk" size="184320" crc="92e54430" sha1="efed7bcee9ef5d29d3ab813d3d06bbdf7339bb4c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -443,40 +455,29 @@
 		<publisher>Quickbeam</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184363">
-				<rom name="DupliDisk 2 (198x)(QuickBeam Software)[!].vdk" size="184363" crc="70dbcd67" sha1="3f6d4281cf7c7728e15d6bbf3b105630e5e08cb2" offset="0" />
+				<rom name="DupliDisk 2 (198x)(QuickBeam Software)[!].vdk" size="184363" crc="70dbcd67" sha1="3f6d4281cf7c7728e15d6bbf3b105630e5e08cb2"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="dynafast124" cloneof="dynafast">
+	<software name="dynafast124" cloneof="dynafast140">
 		<description>DynaFast v1.2.4</description>
 		<year>1984</year>
 		<publisher>Compusense</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184338">
-				<rom name="Dynafast v1.2.4 (198x)(Compusense)[!].vdk" size="184338" crc="cd6b9fd9" sha1="3b6920c08d145dcf98ecfb9110474f3b48a36538" offset="0" />
+				<rom name="Dynafast v1.2.4 (198x)(Compusense)[!].vdk" size="184338" crc="cd6b9fd9" sha1="3b6920c08d145dcf98ecfb9110474f3b48a36538"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="dynafast140" cloneof="dynafast">
+	<software name="dynafast140">
 		<description>DynaFast v1.4.0</description>
 		<year>1984</year>
 		<publisher>Compusense</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Dynafast v1.4.0 (198x)(Compusense)[!].vdk" size="184332" crc="ef834916" sha1="dacf6282c51a9a1468232ab11f7b95b491961ee1" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="dynafast">
-		<description>DynaFast v1.5.0</description>
-		<year>1984</year>
-		<publisher>Compusense</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="102412">
-				<rom name="Dynafast v1.5 (1984)(Compusense Ltd)[!].vdk" size="102412" crc="6f57191a" sha1="4b86a6a7128efe98eb3b99fa66adb7b2d44b2358" offset="0" />
+				<rom name="Dynafast v1.4.0 (198x)(Compusense)[!].vdk" size="184332" crc="ef834916" sha1="dacf6282c51a9a1468232ab11f7b95b491961ee1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -487,7 +488,7 @@
 		<publisher>Compusense</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184341">
-				<rom name="Dynamiser v1.4.2 (198x)(Compusense)[!].vdk" size="184341" crc="4815a3e7" sha1="ff03ad5e7915fdb8096b16856e2fcddbcaa2794f" offset="0" />
+				<rom name="Dynamiser v1.4.2 (198x)(Compusense)[!].vdk" size="184341" crc="4815a3e7" sha1="ff03ad5e7915fdb8096b16856e2fcddbcaa2794f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -498,7 +499,7 @@
 		<publisher>Compusense</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184340">
-				<rom name="Dynaxref v1.0.3 (198x)(Compusense)[!].vdk" size="184340" crc="b8921045" sha1="bec8864ae9b60470468cccf8d6683e0dc8ea3568" offset="0" />
+				<rom name="Dynaxref v1.0.3 (198x)(Compusense)[!].vdk" size="184340" crc="b8921045" sha1="bec8864ae9b60470468cccf8d6683e0dc8ea3568"/>
 			</dataarea>
 		</part>
 	</software>
@@ -509,7 +510,7 @@
 		<publisher>Orange Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184353">
-				<rom name="Easel Plus (198x)(Orange Software)[!].vdk" size="184353" crc="3c7d7bae" sha1="fb40323943222742d84cef382e5dfcbf8b062e10" offset="0" />
+				<rom name="Easel Plus (198x)(Orange Software)[!].vdk" size="184353" crc="3c7d7bae" sha1="fb40323943222742d84cef382e5dfcbf8b062e10"/>
 			</dataarea>
 		</part>
 	</software>
@@ -520,7 +521,7 @@
 		<publisher>Compusense</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Edit Plus v2.2.2 (198x)(Compusense)[!].vdk" size="184332" crc="247d95d4" sha1="3b6b0401ce8cbd33c4fd4415eb05313ca2c350ed" offset="0" />
+				<rom name="Edit Plus v2.2.2 (198x)(Compusense)[!].vdk" size="184332" crc="247d95d4" sha1="3b6b0401ce8cbd33c4fd4415eb05313ca2c350ed"/>
 			</dataarea>
 		</part>
 	</software>
@@ -531,7 +532,7 @@
 		<publisher>Compusense</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Edit+ v2.2.2 Dragon32-64-128 (1985)(Compusense Ltd)[!].vdk" size="184332" crc="5de99a48" sha1="f32bbc0d3db6c776c47564742d248728a1af3437" offset="0" />
+				<rom name="Edit+ v2.2.2 Dragon32-64-128 (1985)(Compusense Ltd)[!].vdk" size="184332" crc="5de99a48" sha1="f32bbc0d3db6c776c47564742d248728a1af3437"/>
 			</dataarea>
 		</part>
 	</software>
@@ -542,7 +543,7 @@
 		<publisher>MicroVision</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184338">
-				<rom name="El Pea (198x)(Microvision)[!].vdk" size="184338" crc="4ce6e398" sha1="80bc959f8cb4366e16339100804ac907ffdc7a73" offset="0" />
+				<rom name="El Pea (198x)(Microvision)[!].vdk" size="184338" crc="4ce6e398" sha1="80bc959f8cb4366e16339100804ac907ffdc7a73"/>
 			</dataarea>
 		</part>
 	</software>
@@ -553,7 +554,7 @@
 		<publisher>Pulser Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="EL-PEA 2 (1988)(Pulser Software)[!].vdk" size="184332" crc="c8448770" sha1="2a12415a9504a5defa84c91445f21c24c97d4c6a" offset="0" />
+				<rom name="EL-PEA 2 (1988)(Pulser Software)[!].vdk" size="184332" crc="c8448770" sha1="2a12415a9504a5defa84c91445f21c24c97d4c6a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -564,7 +565,7 @@
 		<publisher>Pulser Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="EL-PEA 3 (1988)(Pulser Software)[!].vdk" size="184332" crc="2f59b66f" sha1="da2a1346135d8d52d6ca79fa34ae453baa74bb91" offset="0" />
+				<rom name="EL-PEA 3 (1988)(Pulser Software)[!].vdk" size="184332" crc="2f59b66f" sha1="da2a1346135d8d52d6ca79fa34ae453baa74bb91"/>
 			</dataarea>
 		</part>
 	</software>
@@ -575,7 +576,7 @@
 		<publisher>N.D.U.G.</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Ezee Adventure Writer (198x)(N.D.U.G)[!].vdk" size="184332" crc="ef9237d8" sha1="f9ab75405a912fbe92758a983a529a4290541fad" offset="0" />
+				<rom name="Ezee Adventure Writer (198x)(N.D.U.G)[!].vdk" size="184332" crc="ef9237d8" sha1="f9ab75405a912fbe92758a983a529a4290541fad"/>
 			</dataarea>
 		</part>
 	</software>
@@ -586,7 +587,7 @@
 		<publisher>G.E.Hovland</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="FEDIT (Hovland, G.E.)(1991)[!].vdk" size="184332" crc="8feb35be" sha1="ce96413229e9a93825460b952c980f00a8f97d48" offset="0" />
+				<rom name="FEDIT (Hovland, G.E.)(1991)[!].vdk" size="184332" crc="8feb35be" sha1="ce96413229e9a93825460b952c980f00a8f97d48"/>
 			</dataarea>
 		</part>
 	</software>
@@ -597,7 +598,7 @@
 		<publisher>Microdeal</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184340">
-				<rom name="Filmastr (198x)(Microdeal)[!].vdk" size="184340" crc="d8d5abe9" sha1="9f28ea6358f2e27261238c1b3c76dd73eda3e4cd" offset="0" />
+				<rom name="Filmastr (198x)(Microdeal)[!].vdk" size="184340" crc="d8d5abe9" sha1="9f28ea6358f2e27261238c1b3c76dd73eda3e4cd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -608,7 +609,7 @@
 		<publisher>Orange Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184341">
-				<rom name="Fire Force (198x)(Orange Software)[!].vdk" size="184341" crc="c0fa218f" sha1="6c6d4ba5499ff108e7ff7e5a1e817c48496fbd6d" offset="0" />
+				<rom name="Fire Force (198x)(Orange Software)[!].vdk" size="184341" crc="c0fa218f" sha1="6c6d4ba5499ff108e7ff7e5a1e817c48496fbd6d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -619,7 +620,7 @@
 		<publisher>Bosco</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184576">
-				<rom name="Flagon Bird 1.1 (2014)(Bosco)[!].vdk" size="184576" crc="a9171559" sha1="58378688cfffb542dfd1a0033546e17053b70c8e" offset="0" />
+				<rom name="Flagon Bird 1.1 (2014)(Bosco)[!].vdk" size="184576" crc="a9171559" sha1="58378688cfffb542dfd1a0033546e17053b70c8e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -630,7 +631,7 @@
 		<publisher>Pamcomms</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Formula One (1987)(Pamcomms Limited)[!].vdk" size="184332" crc="33af33e0" sha1="80935bad5b5d7ecca0d195d6a052a7c7b6988ade" offset="0" />
+				<rom name="Formula One (1987)(Pamcomms Limited)[!].vdk" size="184332" crc="33af33e0" sha1="80935bad5b5d7ecca0d195d6a052a7c7b6988ade"/>
 			</dataarea>
 		</part>
 	</software>
@@ -639,9 +640,10 @@
 		<description>Forth Compiler (DeltaDOS)</description>
 		<year>1985</year>
 		<publisher>N.D.U.G.</publisher>
+		<sharedfeat name="ext_default" value="premier_fdc"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102412">
-				<rom name="Forth Compiler (1985)(NDUG)[!][DELTA].vdk" size="102412" crc="44d0a07c" sha1="bfbcbec8ebe763eb382f105416dbf4d2a1e104f9" offset="0" />
+				<rom name="Forth Compiler (1985)(NDUG)[!][DELTA].vdk" size="102412" crc="44d0a07c" sha1="bfbcbec8ebe763eb382f105416dbf4d2a1e104f9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -652,7 +654,7 @@
 		<publisher>N.D.U.G.</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Forth OS Plus (198x)(N.D.U.G)[!].vdk" size="184332" crc="622d867b" sha1="7bb081a35e7385d9f3c143f27de8b8b7181bc768" offset="0" />
+				<rom name="Forth OS Plus (198x)(N.D.U.G)[!].vdk" size="184332" crc="622d867b" sha1="7bb081a35e7385d9f3c143f27de8b8b7181bc768"/>
 			</dataarea>
 		</part>
 	</software>
@@ -663,7 +665,7 @@
 		<publisher>Pamcomms</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Golden Oldies (198x)(Pamcomms Ltd)[!].vdk" size="184332" crc="81e69933" sha1="fd31bf634149134b3d0b510c6b7ad8c1cd1c352d" offset="0" />
+				<rom name="Golden Oldies (198x)(Pamcomms Ltd)[!].vdk" size="184332" crc="81e69933" sha1="fd31bf634149134b3d0b510c6b7ad8c1cd1c352d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -674,7 +676,7 @@
 		<publisher>Microdeal</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Grabber (198x)(Microdeal)[!].vdk" size="184332" crc="705ac4f7" sha1="5e8a6a70c0580276b928d7832c42de788f30f8a9" offset="0" />
+				<rom name="Grabber (198x)(Microdeal)[!].vdk" size="184332" crc="705ac4f7" sha1="5e8a6a70c0580276b928d7832c42de788f30f8a9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -685,7 +687,7 @@
 		<publisher>Pulser Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="High Text Plus (1988)(Pulser Software)[!].vdk" size="184332" crc="55dd4471" sha1="927f6d4dac958b7ca7210d76198388827504d64b" offset="0" />
+				<rom name="High Text Plus (1988)(Pulser Software)[!].vdk" size="184332" crc="55dd4471" sha1="927f6d4dac958b7ca7210d76198388827504d64b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -696,7 +698,7 @@
 		<publisher>N.D.U.G.</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184340">
-				<rom name="Hitchhikers Guide To The Galaxy (198x)(N.D.U.G)[!].vdk" size="184340" crc="ea239013" sha1="c98d1b42c23259dabc4c94e9ecb90b0abe88be8f" offset="0" />
+				<rom name="Hitchhikers Guide To The Galaxy (198x)(N.D.U.G)[!].vdk" size="184340" crc="ea239013" sha1="c98d1b42c23259dabc4c94e9ecb90b0abe88be8f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -707,7 +709,7 @@
 		<publisher>MST Consultants</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184355">
-				<rom name="Home Accounts (198x)(MST)[!].vdk" size="184355" crc="c1b3b525" sha1="0bc3a9a030a469e9ebbef27e5ccd83e34550e8c4" offset="0" />
+				<rom name="Home Accounts (198x)(MST)[!].vdk" size="184355" crc="c1b3b525" sha1="0bc3a9a030a469e9ebbef27e5ccd83e34550e8c4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -718,7 +720,7 @@
 		<publisher>Pulser Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184343">
-				<rom name="Impossiball (198x)(Pulser Software)[!].vdk" size="184343" crc="79e97b4c" sha1="90c989f5a1fc68b60397d3a3e5dce42b8225d67b" offset="0" />
+				<rom name="Impossiball (198x)(Pulser Software)[!].vdk" size="184343" crc="79e97b4c" sha1="90c989f5a1fc68b60397d3a3e5dce42b8225d67b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -729,7 +731,7 @@
 		<publisher>Orange Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184347">
-				<rom name="Indoor Football (198x)(Orange Software)[!].vdk" size="184347" crc="74dc9618" sha1="2d800264ee6411b469b63da54c36fc715fe87ff4" offset="0" />
+				<rom name="Indoor Football (198x)(Orange Software)[!].vdk" size="184347" crc="74dc9618" sha1="2d800264ee6411b469b63da54c36fc715fe87ff4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -740,7 +742,7 @@
 		<publisher>Dragonfire Services</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Intelligent Database (1990)(Dragonfire Services)[!].vdk" size="184332" crc="0db0d7b6" sha1="e99c20ab09a167244fe1024a6be454d544b02556" offset="0" />
+				<rom name="Intelligent Database (1990)(Dragonfire Services)[!].vdk" size="184332" crc="0db0d7b6" sha1="e99c20ab09a167244fe1024a6be454d544b02556"/>
 			</dataarea>
 		</part>
 	</software>
@@ -751,7 +753,7 @@
 		<publisher>Dragonfire Services</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Intelligent Disk Copier (1988)(Dragonfire Services)[!].vdk" size="184332" crc="81d39808" sha1="86c7f7e6122cc6ced07cc67360cc6467d4034cc8" offset="0" />
+				<rom name="Intelligent Disk Copier (1988)(Dragonfire Services)[!].vdk" size="184332" crc="81d39808" sha1="86c7f7e6122cc6ced07cc67360cc6467d4034cc8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -762,7 +764,7 @@
 		<publisher>MST Consultants</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184360">
-				<rom name="Invoices Statements (198x)(MST)[!].vdk" size="184360" crc="c0c69b95" sha1="1c246febbf16a1cabc3493e561cfed63c8261a22" offset="0" />
+				<rom name="Invoices Statements (198x)(MST)[!].vdk" size="184360" crc="c0c69b95" sha1="1c246febbf16a1cabc3493e561cfed63c8261a22"/>
 			</dataarea>
 		</part>
 	</software>
@@ -773,7 +775,7 @@
 		<publisher>Dragonfire Services</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Jet Set Willy Screen Designer (1988)(Dragonfire Services)[!].vdk" size="184332" crc="723acf0e" sha1="bbc277999ad1882b1db1c95f8d8e3647f6c41ecd" offset="0" />
+				<rom name="Jet Set Willy Screen Designer (1988)(Dragonfire Services)[!].vdk" size="184332" crc="723acf0e" sha1="bbc277999ad1882b1db1c95f8d8e3647f6c41ecd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -784,7 +786,7 @@
 		<publisher>Dragonfire Services</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Jumble Disk (1992)(Dragonfire Services)[!].vdk" size="184332" crc="8ec315cc" sha1="1fa96ad734605f159d8b208b6629c30bfe6bc3f2" offset="0" />
+				<rom name="Jumble Disk (1992)(Dragonfire Services)[!].vdk" size="184332" crc="8ec315cc" sha1="1fa96ad734605f159d8b208b6629c30bfe6bc3f2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -795,7 +797,7 @@
 		<publisher>&lt;homebrew&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="K3 Fractals v1.0 Disk (2013)(Robcfg)[!].vdk" size="184332" crc="fa46be09" sha1="9abc59d39221b6452b0d1ab97c450ac7aeafa1ae" offset="0" />
+				<rom name="K3 Fractals v1.0 Disk (2013)(Robcfg)[!].vdk" size="184332" crc="fa46be09" sha1="9abc59d39221b6452b0d1ab97c450ac7aeafa1ae"/>
 			</dataarea>
 		</part>
 	</software>
@@ -806,7 +808,7 @@
 		<publisher>Preston Computer Games</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Kung-fu The Master (198x)(R&amp;J Preston)[!].vdk" size="184332" crc="98a7b149" sha1="ae0e613e567250e757e0de9fcc78d0a3b0be0e45" offset="0" />
+				<rom name="Kung-fu The Master (198x)(R&amp;J Preston)[!].vdk" size="184332" crc="98a7b149" sha1="ae0e613e567250e757e0de9fcc78d0a3b0be0e45"/>
 			</dataarea>
 		</part>
 	</software>
@@ -817,7 +819,7 @@
 		<publisher>Orange Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184347">
-				<rom name="Lucifer's Kingdom (198x)(Orange Software)[!].vdk" size="184347" crc="27a91582" sha1="7dd85432619f3eb19e622c01fe31e00033d45dce" offset="0" />
+				<rom name="Lucifer's Kingdom (198x)(Orange Software)[!].vdk" size="184347" crc="27a91582" sha1="7dd85432619f3eb19e622c01fe31e00033d45dce"/>
 			</dataarea>
 		</part>
 	</software>
@@ -828,7 +830,7 @@
 		<publisher>Pulser Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Lucifer's Kingdom (198x)(Pulser Software)[!].vdk" size="184332" crc="eb661609" sha1="1ed16b7ce91b3f13c701e270e66c4bb4b1ae66e0" offset="0" />
+				<rom name="Lucifer's Kingdom (198x)(Pulser Software)[!].vdk" size="184332" crc="eb661609" sha1="1ed16b7ce91b3f13c701e270e66c4bb4b1ae66e0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -839,7 +841,7 @@
 		<publisher>T&amp;D Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Machine Language Tutorial (1983)(T&amp;D Software)[!].vdk" size="184332" crc="9a2cbf2d" sha1="820a7bdd41c9b5af373397c148bac2361d344444" offset="0" />
+				<rom name="Machine Language Tutorial (1983)(T&amp;D Software)[!].vdk" size="184332" crc="9a2cbf2d" sha1="820a7bdd41c9b5af373397c148bac2361d344444"/>
 			</dataarea>
 		</part>
 	</software>
@@ -851,13 +853,13 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="184332">
-				<rom name="Machine Language Tutorial (198x)(N.D.U.G)[!].vdk" size="184332" crc="62c5ce00" sha1="06bdb316134f3fb7b6de58a393f8dc0bd3950834" offset="0" />
+				<rom name="Machine Language Tutorial (198x)(N.D.U.G)[!].vdk" size="184332" crc="62c5ce00" sha1="06bdb316134f3fb7b6de58a393f8dc0bd3950834"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="184332">
-				<rom name="Machine Language Tutorial 2 (198x)(N.D.U.G)[!].vdk" size="184332" crc="f29fad5c" sha1="abee87d00af9eb974b1b1ee256f1b313a30ac2c9" offset="0" />
+				<rom name="Machine Language Tutorial 2 (198x)(N.D.U.G)[!].vdk" size="184332" crc="f29fad5c" sha1="abee87d00af9eb974b1b1ee256f1b313a30ac2c9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -868,7 +870,7 @@
 		<publisher>Pulser Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Magbase (198x)(Pulser Software)[!].vdk" size="184332" crc="9ef6569b" sha1="e2e088b0243dd37b70f9ddc1094a62716b5a0879" offset="0" />
+				<rom name="Magbase (198x)(Pulser Software)[!].vdk" size="184332" crc="9ef6569b" sha1="e2e088b0243dd37b70f9ddc1094a62716b5a0879"/>
 			</dataarea>
 		</part>
 	</software>
@@ -879,7 +881,7 @@
 		<publisher>Pulser Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Magbase (198x)(Pulser Software)[a][!].vdk" size="184332" crc="a4ebb913" sha1="7bafbf93b1bcba5cb43917196b513b8b5d6f7ad2" offset="0" />
+				<rom name="Magbase (198x)(Pulser Software)[a][!].vdk" size="184332" crc="a4ebb913" sha1="7bafbf93b1bcba5cb43917196b513b8b5d6f7ad2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -891,13 +893,13 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="184332">
-				<rom name="Magbase Dragon User Side A (1986)(Pulser Software)[!].vdk" size="184332" crc="2c8e1ffa" sha1="d92e66347cb3f03dbb14b649115ba9331a7ef008" offset="0" />
+				<rom name="Magbase Dragon User Side A (1986)(Pulser Software)[!].vdk" size="184332" crc="2c8e1ffa" sha1="d92e66347cb3f03dbb14b649115ba9331a7ef008"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="184332">
-				<rom name="Magbase Dragon User Side B (1986)(Pulser Software)[!].vdk" size="184332" crc="3817247d" sha1="fdd3569840821a695ea5c9d68e2c14aaa91d8f3a" offset="0" />
+				<rom name="Magbase Dragon User Side B (1986)(Pulser Software)[!].vdk" size="184332" crc="3817247d" sha1="fdd3569840821a695ea5c9d68e2c14aaa91d8f3a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -909,13 +911,13 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="184332">
-				<rom name="Magbase Dragon User Side A (1986)(Pulser Software)[a][!].vdk" size="184332" crc="74523053" sha1="d24e87418915de9404cab7750788150fe4e34408" offset="0" />
+				<rom name="Magbase Dragon User Side A (1986)(Pulser Software)[a][!].vdk" size="184332" crc="74523053" sha1="d24e87418915de9404cab7750788150fe4e34408"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="184332">
-				<rom name="Magbase Dragon User Side B (1986)(Pulser Software)[a][!].vdk" size="184332" crc="e0048925" sha1="45301f4c9eab7af7a56e282e2682cb861749e5ff" offset="0" />
+				<rom name="Magbase Dragon User Side B (1986)(Pulser Software)[a][!].vdk" size="184332" crc="e0048925" sha1="45301f4c9eab7af7a56e282e2682cb861749e5ff"/>
 			</dataarea>
 		</part>
 	</software>
@@ -927,13 +929,13 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="184332">
-				<rom name="Magbase Dragon User Update Side A (1986)(Pulser Software)[!].vdk" size="184332" crc="3b399d8f" sha1="5238c1ad67fc98b6cb8e0e99c553417d3f970839" offset="0" />
+				<rom name="Magbase Dragon User Update Side A (1986)(Pulser Software)[!].vdk" size="184332" crc="3b399d8f" sha1="5238c1ad67fc98b6cb8e0e99c553417d3f970839"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="184332">
-				<rom name="Magbase Dragon User Update Side B (1986)(Pulser Software)[!].vdk" size="184332" crc="198456ee" sha1="69298323cdd2b8f3a4a44f9856c6ac7d63abc027" offset="0" />
+				<rom name="Magbase Dragon User Update Side B (1986)(Pulser Software)[!].vdk" size="184332" crc="198456ee" sha1="69298323cdd2b8f3a4a44f9856c6ac7d63abc027"/>
 			</dataarea>
 		</part>
 	</software>
@@ -945,13 +947,13 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="184332">
-				<rom name="Magic v1.0 Disk 1 (1986)(Max Hantsch)[!].vdk" size="184332" crc="15305057" sha1="5eb1c616a91e510ed1867a6962360b4718826db6" offset="0" />
+				<rom name="Magic v1.0 Disk 1 (1986)(Max Hantsch)[!].vdk" size="184332" crc="15305057" sha1="5eb1c616a91e510ed1867a6962360b4718826db6"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="184332">
-				<rom name="Magic v1.0 Disk 2 (1986)(Max Hantsch)[!].vdk" size="184332" crc="ccf1310a" sha1="ef5ad1e4f3ff1a5b86f051fb19712e0b44c69310" offset="0" />
+				<rom name="Magic v1.0 Disk 2 (1986)(Max Hantsch)[!].vdk" size="184332" crc="ccf1310a" sha1="ef5ad1e4f3ff1a5b86f051fb19712e0b44c69310"/>
 			</dataarea>
 		</part>
 	</software>
@@ -962,7 +964,7 @@
 		<publisher>MST Consultants</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184355">
-				<rom name="Mailer Address Book (198x)(MST)[!].vdk" size="184355" crc="7ed8e517" sha1="75a227ebddb7273b3564f2cf994db4572344e0cc" offset="0" />
+				<rom name="Mailer Address Book (198x)(MST)[!].vdk" size="184355" crc="7ed8e517" sha1="75a227ebddb7273b3564f2cf994db4572344e0cc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -973,7 +975,7 @@
 		<publisher>PSE Computers</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Mandragore (PSE Computers)(198x)[!].vdk" size="184332" crc="a908bde5" sha1="a515c8acaa5ece7c68232bf61ef0555138524864" offset="0" />
+				<rom name="Mandragore (PSE Computers)(198x)[!].vdk" size="184332" crc="a908bde5" sha1="a515c8acaa5ece7c68232bf61ef0555138524864"/>
 			</dataarea>
 		</part>
 	</software>
@@ -984,7 +986,7 @@
 		<publisher>Microdeal</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="MrDig (198x)(Microdeal)[!].vdk" size="184332" crc="a9ef7988" sha1="da3f068aa2018b986dcfb92ae45ef1703bf395e4" offset="0" />
+				<rom name="MrDig (198x)(Microdeal)[!].vdk" size="184332" crc="a9ef7988" sha1="da3f068aa2018b986dcfb92ae45ef1703bf395e4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -995,7 +997,7 @@
 		<publisher>Microdeal</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Mudpies (and Demon Seed) (198x)(Microdeal)[].vdk" size="184332" crc="5660b6af" sha1="c8d46c3a2970fd37e022c78e270c3f96afdc0a49" offset="0" />
+				<rom name="Mudpies (and Demon Seed) (198x)(Microdeal)[].vdk" size="184332" crc="5660b6af" sha1="c8d46c3a2970fd37e022c78e270c3f96afdc0a49"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1006,7 +1008,7 @@
 		<publisher>Ian Elkiington</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Multi-Disk (1985)(Elkiington, Ian)[!].vdk" size="184332" crc="83fe596b" sha1="9791e6decc38b1309708153cdce009b843ca111b" offset="0" />
+				<rom name="Multi-Disk (1985)(Elkiington, Ian)[!].vdk" size="184332" crc="83fe596b" sha1="9791e6decc38b1309708153cdce009b843ca111b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1017,7 +1019,7 @@
 		<publisher>Phill Harvey-Smith</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368652">
-				<rom name="NitrOS9-6809-Level1-v030204-DS40 (2010)(Phill Harvey-Smith)[!].vdk" size="368652" crc="4f24c964" sha1="703b9a1a7213f951f5726a2fd2c6518bb7d6240b" offset="0" />
+				<rom name="NitrOS9-6809-Level1-v030204-DS40 (2010)(Phill Harvey-Smith)[!].vdk" size="368652" crc="4f24c964" sha1="703b9a1a7213f951f5726a2fd2c6518bb7d6240b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1028,7 +1030,7 @@
 		<publisher>Phill Harvey-Smith</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368652">
-				<rom name="NitrOS9-6809-Level1-v030204-DS40-51 Column (2010)(Phill Harvey-Smith)[!].vdk" size="368652" crc="1bb2ca15" sha1="51e35756d5c0803a2775af5fe8dd10d7658b5c2c" offset="0" />
+				<rom name="NitrOS9-6809-Level1-v030204-DS40-51 Column (2010)(Phill Harvey-Smith)[!].vdk" size="368652" crc="1bb2ca15" sha1="51e35756d5c0803a2775af5fe8dd10d7658b5c2c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1039,7 +1041,7 @@
 		<publisher>PSE Computers</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Orange Base (PSE Computers)(198x)[!].vdk" size="184332" crc="54daa678" sha1="7bd538d19a85416fb3844a81f74ced7dbb27e6f1" offset="0" />
+				<rom name="Orange Base (PSE Computers)(198x)[!].vdk" size="184332" crc="54daa678" sha1="7bd538d19a85416fb3844a81f74ced7dbb27e6f1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1050,7 +1052,7 @@
 		<publisher>Orange Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184342">
-				<rom name="Orange Base v8.8 (1989)(Orange Software)[!].vdk" size="184342" crc="fb0d3b94" sha1="3ca3578b3d178323c609b7971f24560c96ad0c25" offset="0" />
+				<rom name="Orange Base v8.8 (1989)(Orange Software)[!].vdk" size="184342" crc="fb0d3b94" sha1="3ca3578b3d178323c609b7971f24560c96ad0c25"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1061,7 +1063,7 @@
 		<publisher>Pulser Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Orange Base v8.9 (1988)(Pulser Software)[!].vdk" size="184332" crc="54daa678" sha1="7bd538d19a85416fb3844a81f74ced7dbb27e6f1" offset="0" />
+				<rom name="Orange Base v8.9 (1988)(Pulser Software)[!].vdk" size="184332" crc="54daa678" sha1="7bd538d19a85416fb3844a81f74ced7dbb27e6f1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1072,7 +1074,7 @@
 		<publisher>Orange Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184342">
-				<rom name="Orange Boot (198x)(Orange Software)[!].vdk" size="184342" crc="fd80d6fa" sha1="b74af0876e528282bc0b3e8537d88d562ed9b6f1" offset="0" />
+				<rom name="Orange Boot (198x)(Orange Software)[!].vdk" size="184342" crc="fd80d6fa" sha1="b74af0876e528282bc0b3e8537d88d562ed9b6f1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1083,7 +1085,7 @@
 		<publisher>Pulser Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Orange Boot (198x)(Pulser Software)[!].vdk" size="184332" crc="3d718780" sha1="bfdab64cb14c580d5a0d0410e239e8784a9dfbb6" offset="0" />
+				<rom name="Orange Boot (198x)(Pulser Software)[!].vdk" size="184332" crc="3d718780" sha1="bfdab64cb14c580d5a0d0410e239e8784a9dfbb6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1094,7 +1096,7 @@
 		<publisher>Orange Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184337">
-				<rom name="Orange Utilities 1 (198x)(Orange Software)[!].vdk" size="184337" crc="816594dc" sha1="d7c29f9766aac44dd0f532aa336e9317dec5fe6e" offset="0" />
+				<rom name="Orange Utilities 1 (198x)(Orange Software)[!].vdk" size="184337" crc="816594dc" sha1="d7c29f9766aac44dd0f532aa336e9317dec5fe6e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1105,7 +1107,7 @@
 		<publisher>Microdeal</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184338">
-				<rom name="Pengon (198x)(Microdeal)[!].vdk" size="184338" crc="b94b6864" sha1="33835f83554f1314f7b583b54e1a2274a25607b0" offset="0" />
+				<rom name="Pengon (198x)(Microdeal)[!].vdk" size="184338" crc="b94b6864" sha1="33835f83554f1314f7b583b54e1a2274a25607b0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1116,7 +1118,7 @@
 		<publisher>Dragonfire Services</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Pop Up Print Master (1989)(Dragonfire Services)[!].vdk" size="184332" crc="ed55b272" sha1="b58bd4d14f09246473b1b61d11dae7a1ac95ba73" offset="0" />
+				<rom name="Pop Up Print Master (1989)(Dragonfire Services)[!].vdk" size="184332" crc="ed55b272" sha1="b58bd4d14f09246473b1b61d11dae7a1ac95ba73"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1127,7 +1129,7 @@
 		<publisher>PSE Computers</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="PyrAdventure (PSE Computers)(198x)[!].vdk" size="184332" crc="f8a63c2d" sha1="8d1a2a8732f59ee7bdc77d51ca6b097b2dade3b9" offset="0" />
+				<rom name="PyrAdventure (PSE Computers)(198x)[!].vdk" size="184332" crc="f8a63c2d" sha1="8d1a2a8732f59ee7bdc77d51ca6b097b2dade3b9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1138,7 +1140,7 @@
 		<publisher>Microdeal</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Rainbow Writer v1.3 (198x)(Microdeal)[!].vdk" size="184332" crc="07c72b66" sha1="d0b9664b4081380c4ce1c0700ddc7eb328537d41" offset="0" />
+				<rom name="Rainbow Writer v1.3 (198x)(Microdeal)[!].vdk" size="184332" crc="07c72b66" sha1="d0b9664b4081380c4ce1c0700ddc7eb328537d41"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1149,7 +1151,7 @@
 		<publisher>Microdeal</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184346">
-				<rom name="Rainbow Writer (198x)(Microdeal)[!].vdk" size="184346" crc="2f501850" sha1="3e9e80a7fa03628d0b8dca382937ee2216ff6330" offset="0" />
+				<rom name="Rainbow Writer (198x)(Microdeal)[!].vdk" size="184346" crc="2f501850" sha1="3e9e80a7fa03628d0b8dca382937ee2216ff6330"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1161,13 +1163,13 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="184332">
-				<rom name="Rally Adventure Side A (1987)(Pulser Software)[!].vdk" size="184332" crc="5abb03ac" sha1="8bdfe1183a69969c7babc702f5f6dde0848cac24" offset="0" />
+				<rom name="Rally Adventure Side A (1987)(Pulser Software)[!].vdk" size="184332" crc="5abb03ac" sha1="8bdfe1183a69969c7babc702f5f6dde0848cac24"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="184332">
-				<rom name="Rally Adventure Side B (1987)(Pulser Software)[!].vdk" size="184332" crc="97b7ad15" sha1="be48ac9d177801d975d5c4099ab3f8ce9c06acf8" offset="0" />
+				<rom name="Rally Adventure Side B (1987)(Pulser Software)[!].vdk" size="184332" crc="97b7ad15" sha1="be48ac9d177801d975d5c4099ab3f8ce9c06acf8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1178,7 +1180,7 @@
 		<publisher>Starship Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="RolaBall2 (Starship Software)(1988)[!].vdk" size="184332" crc="06d03a07" sha1="c039dd325429273c5c3fad8922b116beb49c40a0" offset="0" />
+				<rom name="RolaBall2 (Starship Software)(1988)[!].vdk" size="184332" crc="06d03a07" sha1="c039dd325429273c5c3fad8922b116beb49c40a0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1189,7 +1191,7 @@
 		<publisher>N.D.U.G.</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="151564">
-				<rom name="ROTABB (198x)(N.D.U.G)[!].vdk" size="151564" crc="9beb879c" sha1="d118dbdf967a83d7c0bcb6eb6253dfbeac1b5d36" offset="0" />
+				<rom name="ROTABB (198x)(N.D.U.G)[!].vdk" size="151564" crc="9beb879c" sha1="d118dbdf967a83d7c0bcb6eb6253dfbeac1b5d36"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1200,7 +1202,7 @@
 		<publisher>Pulser Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="ROTABB (198x)(Pulser Software)[!].vdk" size="184332" crc="e4182927" sha1="01b85e332d1a3662b6e693c20f54129f28e9c178" offset="0" />
+				<rom name="ROTABB (198x)(Pulser Software)[!].vdk" size="184332" crc="e4182927" sha1="01b85e332d1a3662b6e693c20f54129f28e9c178"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1211,7 +1213,7 @@
 		<publisher>Pulser Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Shaolin Master Plus (Pulser Software)(198x)[!].vdk" size="184332" crc="f7c3e35f" sha1="d11965e564128389b58c0bcceea37cd9fff27cb2" offset="0" />
+				<rom name="Shaolin Master Plus (Pulser Software)(198x)[!].vdk" size="184332" crc="f7c3e35f" sha1="d11965e564128389b58c0bcceea37cd9fff27cb2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1222,7 +1224,7 @@
 		<publisher>Pamcomms</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184336">
-				<rom name="Source Maker (198x)(Pamcomms)[!].vdk" size="184336" crc="4d32c6cd" sha1="4b5166641caf9301f46fcafaf5ea16dd6cb7ee85" offset="0" />
+				<rom name="Source Maker (198x)(Pamcomms)[!].vdk" size="184336" crc="4d32c6cd" sha1="4b5166641caf9301f46fcafaf5ea16dd6cb7ee85"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1233,7 +1235,7 @@
 		<publisher>Microdeal</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184343">
-				<rom name="Speed Racer (198x)(Microdeal)[!].vdk" size="184343" crc="ec98a1f4" sha1="5c5164ace7034fbc4dff5c65fac3b5bb61a0b633" offset="0" />
+				<rom name="Speed Racer (198x)(Microdeal)[!].vdk" size="184343" crc="ec98a1f4" sha1="5c5164ace7034fbc4dff5c65fac3b5bb61a0b633"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1244,7 +1246,7 @@
 		<publisher>PSE Computers</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Sprite Designer (PSE Computers)(198x)[!].vdk" size="184332" crc="0f0a42dd" sha1="9d24133827af9df417e824b734b22a2ab3d11fe6" offset="0" />
+				<rom name="Sprite Designer (PSE Computers)(198x)[!].vdk" size="184332" crc="0f0a42dd" sha1="9d24133827af9df417e824b734b22a2ab3d11fe6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1255,7 +1257,7 @@
 		<publisher>Pulser Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Sprite Designer (1987)(Pulser Software)[!].vdk" size="184332" crc="d7a10b41" sha1="80be48c4963f4e9a1101cf0cffe03d66665cefa8" offset="0" />
+				<rom name="Sprite Designer (1987)(Pulser Software)[!].vdk" size="184332" crc="d7a10b41" sha1="80be48c4963f4e9a1101cf0cffe03d66665cefa8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1266,7 +1268,7 @@
 		<publisher>Orange Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Sprite Designer (198x)(Orange Software)[!].vdk" size="184332" crc="38e42e8a" sha1="6ff13f40617429a517d33c1170e349ae32ff33ce" offset="0" />
+				<rom name="Sprite Designer (198x)(Orange Software)[!].vdk" size="184332" crc="38e42e8a" sha1="6ff13f40617429a517d33c1170e349ae32ff33ce"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1277,7 +1279,7 @@
 		<publisher>Knight Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Sprite Magic v2.3 (198x)(Knight Software)[!].vdk" size="184332" crc="65e660dc" sha1="3eece9dd984fddeac7bfcdf86c78306df218a4c8" offset="0" />
+				<rom name="Sprite Magic v2.3 (198x)(Knight Software)[!].vdk" size="184332" crc="65e660dc" sha1="3eece9dd984fddeac7bfcdf86c78306df218a4c8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1288,7 +1290,7 @@
 		<publisher>MST Consultants</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184353">
-				<rom name="Stock Control (198x)(MST)[!].vdk" size="184353" crc="7843701a" sha1="ce84544d9411ff44659a5ef395de723a8f69a8ec" offset="0" />
+				<rom name="Stock Control (198x)(MST)[!].vdk" size="184353" crc="7843701a" sha1="ce84544d9411ff44659a5ef395de723a8f69a8ec"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1299,7 +1301,7 @@
 		<publisher>Orange Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Supa Nova (1988)(Orange Software)[!].vdk" size="184332" crc="c73a1f62" sha1="e5f44cf994838e40d85e51c354a39908b3712bc1" offset="0" />
+				<rom name="Supa Nova (1988)(Orange Software)[!].vdk" size="184332" crc="c73a1f62" sha1="e5f44cf994838e40d85e51c354a39908b3712bc1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1310,7 +1312,7 @@
 		<publisher>PSE Computers</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Super Writer 2 (PSE Computers)(198x)[!].vdk" size="184332" crc="4bddf1fc" sha1="5ff2a34b355021a5d8e22fb95b897c0f5754ff54" offset="0" />
+				<rom name="Super Writer 2 (PSE Computers)(198x)[!].vdk" size="184332" crc="4bddf1fc" sha1="5ff2a34b355021a5d8e22fb95b897c0f5754ff54"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1319,9 +1321,10 @@
 		<description>Telewriter Premier DOS</description>
 		<year>1985</year>
 		<publisher>Microdeal</publisher>
+		<sharedfeat name="ext_default" value="premier_fdc"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="256016">
-				<rom name="Telewriter (1985)(Microdeal)(DeltaDOS)[!].dmk" size="256016" crc="c9b2ed45" sha1="8e7cfda7289318972c8ec9595c1c125d312ddf42" offset="0" />
+				<rom name="Telewriter (1985)(Microdeal)(DeltaDOS)[!].dmk" size="256016" crc="c9b2ed45" sha1="8e7cfda7289318972c8ec9595c1c125d312ddf42"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1332,7 +1335,7 @@
 		<publisher>Microdeal</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Telewriter (198x)(Microdeal)[!].vdk" size="184332" crc="ab3b0d05" sha1="1dc3f71cc58821c7fbbf6a63970e7f5bd914fb7a" offset="0" />
+				<rom name="Telewriter (198x)(Microdeal)[!].vdk" size="184332" crc="ab3b0d05" sha1="1dc3f71cc58821c7fbbf6a63970e7f5bd914fb7a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1343,7 +1346,7 @@
 		<publisher>Microdeal</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="TeleWriter v1 (1985)(Microdeal)[!].vdk" size="184332" crc="f19a85af" sha1="2d569dd97375dc9d7264f4d92f4e6842f3a27d72" offset="0" />
+				<rom name="TeleWriter v1 (1985)(Microdeal)[!].vdk" size="184332" crc="f19a85af" sha1="2d569dd97375dc9d7264f4d92f4e6842f3a27d72"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1354,7 +1357,7 @@
 		<publisher>Microdeal</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="TeleWriter v2 (1985)(Microdeal)[!].vdk" size="184332" crc="ed81999f" sha1="4a6090eafdc809d28f35a2ea6bdf0eecdcb2d218" offset="0" />
+				<rom name="TeleWriter v2 (1985)(Microdeal)[!].vdk" size="184332" crc="ed81999f" sha1="4a6090eafdc809d28f35a2ea6bdf0eecdcb2d218"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1365,7 +1368,7 @@
 		<publisher>Microdeal</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="TeleWriter v4 (1985](Microdeal)[DDOS4].vdk" size="184332" crc="d39ae1e3" sha1="b655e6741446a3ea7eccd9f26870372e6dc91775" offset="0" />
+				<rom name="TeleWriter v4 (1985](Microdeal)[DDOS4].vdk" size="184332" crc="d39ae1e3" sha1="b655e6741446a3ea7eccd9f26870372e6dc91775"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1376,7 +1379,7 @@
 		<publisher>P.S.E. Computers</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Tetris (1991)(PSE Computers)[!].vdk" size="184332" crc="15173f43" sha1="24823884e88b7cede8820319184ccd4bd74eeb56" offset="0" />
+				<rom name="Tetris (1991)(PSE Computers)[!].vdk" size="184332" crc="15173f43" sha1="24823884e88b7cede8820319184ccd4bd74eeb56"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1387,7 +1390,7 @@
 		<publisher>Pulser Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Text Screen Designer (198x)(Pulser Software)[!].vdk" size="184332" crc="f2465fbd" sha1="061699100bd3a0ed87fbd2e6de661730c3ebfe12" offset="0" />
+				<rom name="Text Screen Designer (198x)(Pulser Software)[!].vdk" size="184332" crc="f2465fbd" sha1="061699100bd3a0ed87fbd2e6de661730c3ebfe12"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1398,7 +1401,7 @@
 		<publisher>N.D.U.G.</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="The Fun Disc! (1988)(NDUG)[!].vdk" size="184332" crc="147e1655" sha1="5ef6768fae60137226abb4cb837abe312c1659aa" offset="0" />
+				<rom name="The Fun Disc! (1988)(NDUG)[!].vdk" size="184332" crc="147e1655" sha1="5ef6768fae60137226abb4cb837abe312c1659aa"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1409,7 +1412,7 @@
 		<publisher>Pere Serrat</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368896">
-				<rom name="The Hobbit (2016)(Pere Serrat)(v16g3).vdk" size="368896" crc="d581c398" sha1="bdca936e45f48680abc59df4beea03b88e02b625" offset="0" />
+				<rom name="The Hobbit (2016)(Pere Serrat)(v16g3).vdk" size="368896" crc="d581c398" sha1="bdca936e45f48680abc59df4beea03b88e02b625"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1420,7 +1423,7 @@
 		<publisher>Wintersoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184340">
-				<rom name="The Ring Of Darkness (19xx)(Wintersoft).vdk" size="184340" crc="9612727b" sha1="8c8e3bd7d2e69454e2640eb283c17198ba53d2a8" offset="0" />
+				<rom name="The Ring Of Darkness (19xx)(Wintersoft).vdk" size="184340" crc="9612727b" sha1="8c8e3bd7d2e69454e2640eb283c17198ba53d2a8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1431,7 +1434,7 @@
 		<publisher>PSE Computers</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Utility Pack (PSE Computers)(198x)[!].vdk" size="184332" crc="c3227362" sha1="efc2533f908fb3819c60a46e42db516ccfd8aa82" offset="0" />
+				<rom name="Utility Pack (PSE Computers)(198x)[!].vdk" size="184332" crc="c3227362" sha1="efc2533f908fb3819c60a46e42db516ccfd8aa82"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1442,7 +1445,7 @@
 		<publisher>Pulser Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Utility Pack (1990)(Pulser Software)[!].vdk" size="184332" crc="c3227362" sha1="efc2533f908fb3819c60a46e42db516ccfd8aa82" offset="0" />
+				<rom name="Utility Pack (1990)(Pulser Software)[!].vdk" size="184332" crc="c3227362" sha1="efc2533f908fb3819c60a46e42db516ccfd8aa82"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1453,7 +1456,7 @@
 		<publisher>Dragonfire Services</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Utopia (1988)(Dragonfire Services)[!].vdk" size="184332" crc="1548a9ff" sha1="3660430790843951210a90f09c6f2f5248dd83f5" offset="0" />
+				<rom name="Utopia (1988)(Dragonfire Services)[!].vdk" size="184332" crc="1548a9ff" sha1="3660430790843951210a90f09c6f2f5248dd83f5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1464,7 +1467,7 @@
 		<publisher>Pulser Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Visitext Deluxe (19xx)(PulserSoftware)[!].vdk" size="184332" crc="5d93bc52" sha1="1267257bc8bbbb5ac98a8655113900b989d0a2e8" offset="0" />
+				<rom name="Visitext Deluxe (19xx)(PulserSoftware)[!].vdk" size="184332" crc="5d93bc52" sha1="1267257bc8bbbb5ac98a8655113900b989d0a2e8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1475,7 +1478,7 @@
 		<publisher>Orange Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Visitext Extra (198x)(Orange Software)[!].vdk" size="184332" crc="96336afb" sha1="e2a2eb422071eba1b1afe685ef1f88f6feeb3f1f" offset="0" />
+				<rom name="Visitext Extra (198x)(Orange Software)[!].vdk" size="184332" crc="96336afb" sha1="e2a2eb422071eba1b1afe685ef1f88f6feeb3f1f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1486,7 +1489,7 @@
 		<publisher>Dragonfire Services</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="WIMP (1988)(Dragonfire Services)[!].vdk" size="184332" crc="51c33f6b" sha1="fde76405fa0e0852fd7b1310d2ae931338422025" offset="0" />
+				<rom name="WIMP (1988)(Dragonfire Services)[!].vdk" size="184332" crc="51c33f6b" sha1="fde76405fa0e0852fd7b1310d2ae931338422025"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1497,7 +1500,7 @@
 		<publisher>Dragonfire Services</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="183820">
-				<rom name="WIMP (1989)(Dragonfire Services)[!].vdk" size="183820" crc="33de1007" sha1="0eaff58e5f8fd295275a8ed725d0c99fab57073b" offset="0" />
+				<rom name="WIMP (1989)(Dragonfire Services)[!].vdk" size="183820" crc="33de1007" sha1="0eaff58e5f8fd295275a8ed725d0c99fab57073b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1508,7 +1511,7 @@
 		<publisher>Dragonfire Services</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Wordgrid-Poster (1990)(Dragonfire Services)[!].vdk" size="184332" crc="97838680" sha1="254fa103adee26889afdf2a7b0fc75a20d29acc8" offset="0" />
+				<rom name="Wordgrid-Poster (1990)(Dragonfire Services)[!].vdk" size="184332" crc="97838680" sha1="254fa103adee26889afdf2a7b0fc75a20d29acc8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1519,7 +1522,7 @@
 		<publisher>Dragon Power Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184345">
-				<rom name="Wriggle (198x)(Dragon Power Software)[!].vdk" size="184345" crc="d7450c8b" sha1="9d128764f1ce7b5b87e4ffeb1c97983e7661359d" offset="0" />
+				<rom name="Wriggle (198x)(Dragon Power Software)[!].vdk" size="184345" crc="d7450c8b" sha1="9d128764f1ce7b5b87e4ffeb1c97983e7661359d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1530,12 +1533,12 @@
 		<publisher>Softsystems</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Zapper (1985)(Softsystems)[!].vdk" size="184332" crc="30d87ab5" sha1="fc3a93d4d519d8a948b9963d9aad78c56c2e823e" offset="0" />
+				<rom name="Zapper (1985)(Softsystems)[!].vdk" size="184332" crc="30d87ab5" sha1="fc3a93d4d519d8a948b9963d9aad78c56c2e823e"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Zapper Build Disk (1985)(Softsystems)[!].vdk" size="184332" crc="e41c9588" sha1="0358ac3b4d8be786c68f285379e8605403dd295e" offset="0" />
+				<rom name="Zapper Build Disk (1985)(Softsystems)[!].vdk" size="184332" crc="e41c9588" sha1="0358ac3b4d8be786c68f285379e8605403dd295e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1548,12 +1551,12 @@
 		<publisher>N.D.U.G.</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184343">
-				<rom name="up2d01a.vdk" size="184343" crc="0a484ea0" sha1="1ce64cf2a0f4acbb725d7572dfc1f175416751d6" offset="0" />
+				<rom name="up2d01a.vdk" size="184343" crc="0a484ea0" sha1="1ce64cf2a0f4acbb725d7572dfc1f175416751d6"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="184343">
-				<rom name="up2d01b.vdk" size="184343" crc="a6c6f67d" sha1="d53b1a083431118c671c92d13aac03aeddfc37ed" offset="0" />
+				<rom name="up2d01b.vdk" size="184343" crc="a6c6f67d" sha1="d53b1a083431118c671c92d13aac03aeddfc37ed"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1564,7 +1567,7 @@
 		<publisher>N.D.U.G.</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184342">
-				<rom name="up2d02.vdk" size="184342" crc="b39803b1" sha1="b37f0804cdca9d6e2d828416ea40b7fe11b121f6" offset="0" />
+				<rom name="up2d02.vdk" size="184342" crc="b39803b1" sha1="b37f0804cdca9d6e2d828416ea40b7fe11b121f6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1575,7 +1578,7 @@
 		<publisher>N.D.U.G.</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184342">
-				<rom name="up2d03.vdk" size="184342" crc="ec29a4e4" sha1="32bae6dbe72c332a4dc622bdd8f2edf44fe1fe4a" offset="0" />
+				<rom name="up2d03.vdk" size="184342" crc="ec29a4e4" sha1="32bae6dbe72c332a4dc622bdd8f2edf44fe1fe4a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1586,7 +1589,7 @@
 		<publisher>N.D.U.G.</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184342">
-				<rom name="up2d04.vdk" size="184342" crc="35348ce2" sha1="c583902472efcec438006fe324a60a49d1c9f5e7" offset="0" />
+				<rom name="up2d04.vdk" size="184342" crc="35348ce2" sha1="c583902472efcec438006fe324a60a49d1c9f5e7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1597,7 +1600,7 @@
 		<publisher>N.D.U.G.</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184342">
-				<rom name="up2d05.vdk" size="184342" crc="083466dc" sha1="1163fbc49e840e85dd092f3c8bcefe0c25a538c3" offset="0" />
+				<rom name="up2d05.vdk" size="184342" crc="083466dc" sha1="1163fbc49e840e85dd092f3c8bcefe0c25a538c3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1608,7 +1611,7 @@
 		<publisher>N.D.U.G.</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184342">
-				<rom name="up2d06.vdk" size="184342" crc="bb71f594" sha1="4927fb15d6acd2f75bc0d88c527a2c826975be68" offset="0" />
+				<rom name="up2d06.vdk" size="184342" crc="bb71f594" sha1="4927fb15d6acd2f75bc0d88c527a2c826975be68"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1619,12 +1622,12 @@
 		<publisher>N.D.U.G.</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184343">
-				<rom name="up2d07a.vdk" size="184343" crc="b4591da2" sha1="8b145a9b746ee4302b68972eb09507713fc30399" offset="0" />
+				<rom name="up2d07a.vdk" size="184343" crc="b4591da2" sha1="8b145a9b746ee4302b68972eb09507713fc30399"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="184343">
-				<rom name="up2d07b.vdk" size="184343" crc="ab9c6c85" sha1="840f39629a23cd957b2cca5961bcf6649516c56f" offset="0" />
+				<rom name="up2d07b.vdk" size="184343" crc="ab9c6c85" sha1="840f39629a23cd957b2cca5961bcf6649516c56f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1635,7 +1638,7 @@
 		<publisher>N.D.U.G.</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184342">
-				<rom name="up2d08.vdk" size="184342" crc="5d5d84bf" sha1="a74510e8d422c7705566c6b9d7c0500e8c4b1830" offset="0" />
+				<rom name="up2d08.vdk" size="184342" crc="5d5d84bf" sha1="a74510e8d422c7705566c6b9d7c0500e8c4b1830"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1646,7 +1649,7 @@
 		<publisher>N.D.U.G.</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184342">
-				<rom name="up2d09.vdk" size="184342" crc="e3a9d26d" sha1="a47fc83d591cb1e3d32f9f2b1d9821d5bc14cbe1" offset="0" />
+				<rom name="up2d09.vdk" size="184342" crc="e3a9d26d" sha1="a47fc83d591cb1e3d32f9f2b1d9821d5bc14cbe1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1657,7 +1660,7 @@
 		<publisher>N.D.U.G.</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184342">
-				<rom name="up2d10.vdk" size="184342" crc="71a52b0c" sha1="248f8277c9eb15c629da4674f63ed69e63338d1a" offset="0" />
+				<rom name="up2d10.vdk" size="184342" crc="71a52b0c" sha1="248f8277c9eb15c629da4674f63ed69e63338d1a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1668,7 +1671,7 @@
 		<publisher>N.D.U.G.</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184342">
-				<rom name="up2d11.vdk" size="184342" crc="8705ff64" sha1="3d7b8541b592c3b1f46c15265a4576410dd7c0f4" offset="0" />
+				<rom name="up2d11.vdk" size="184342" crc="8705ff64" sha1="3d7b8541b592c3b1f46c15265a4576410dd7c0f4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1679,7 +1682,7 @@
 		<publisher>N.D.U.G.</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184342">
-				<rom name="up2d12.vdk" size="184342" crc="3ebb2b9e" sha1="e793349332fdd05a1dfa723e997dafc1bcb7100a" offset="0" />
+				<rom name="up2d12.vdk" size="184342" crc="3ebb2b9e" sha1="e793349332fdd05a1dfa723e997dafc1bcb7100a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1690,7 +1693,7 @@
 		<publisher>N.D.U.G.</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184342">
-				<rom name="up2d13.vdk" size="184342" crc="c1e818ed" sha1="44c22a73b218c1931d9f65fe2441df5cfd9288bb" offset="0" />
+				<rom name="up2d13.vdk" size="184342" crc="c1e818ed" sha1="44c22a73b218c1931d9f65fe2441df5cfd9288bb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1701,7 +1704,7 @@
 		<publisher>N.D.U.G.</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184342">
-				<rom name="up2d14.vdk" size="184342" crc="194fed76" sha1="4c3094786266226c91748ad9a8835641868d2c79" offset="0" />
+				<rom name="up2d14.vdk" size="184342" crc="194fed76" sha1="4c3094786266226c91748ad9a8835641868d2c79"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1712,7 +1715,7 @@
 		<publisher>N.D.U.G.</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184342">
-				<rom name="up2d15.vdk" size="184342" crc="a0be9b67" sha1="a0be131aeb2973b7de76ed68e60a45cb89c194cb" offset="0" />
+				<rom name="up2d15.vdk" size="184342" crc="a0be9b67" sha1="a0be131aeb2973b7de76ed68e60a45cb89c194cb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1723,7 +1726,7 @@
 		<publisher>N.D.U.G.</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184342">
-				<rom name="up2d16.vdk" size="184342" crc="b2d0e88d" sha1="e1cd7a4ee137df6906ff2ac6136fe3cc8440bbbf" offset="0" />
+				<rom name="up2d16.vdk" size="184342" crc="b2d0e88d" sha1="e1cd7a4ee137df6906ff2ac6136fe3cc8440bbbf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1734,7 +1737,7 @@
 		<publisher>N.D.U.G.</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184342">
-				<rom name="up2d17.vdk" size="184342" crc="6e95ef5a" sha1="f00b1ac032b89d0b08cd1967c6159ad4b8ee1a09" offset="0" />
+				<rom name="up2d17.vdk" size="184342" crc="6e95ef5a" sha1="f00b1ac032b89d0b08cd1967c6159ad4b8ee1a09"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1745,7 +1748,7 @@
 		<publisher>N.D.U.G.</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184338">
-				<rom name="up2d18.vdk" size="184338" crc="37da6c4d" sha1="60c54d0453f3cc7838ac8f906ed179e34ffb3f01" offset="0" />
+				<rom name="up2d18.vdk" size="184338" crc="37da6c4d" sha1="60c54d0453f3cc7838ac8f906ed179e34ffb3f01"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1756,7 +1759,7 @@
 		<publisher>N.D.U.G.</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184342">
-				<rom name="up2d19.vdk" size="184342" crc="b989742c" sha1="55fc900f12cf27c089f66bbcc1a98c60a376871d" offset="0" />
+				<rom name="up2d19.vdk" size="184342" crc="b989742c" sha1="55fc900f12cf27c089f66bbcc1a98c60a376871d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1767,7 +1770,7 @@
 		<publisher>N.D.U.G.</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184338">
-				<rom name="up2d20.vdk" size="184338" crc="0ea6eb51" sha1="2cc18a6b8d4d5f944fcb45e6e1261a3f088d2e67" offset="0" />
+				<rom name="up2d20.vdk" size="184338" crc="0ea6eb51" sha1="2cc18a6b8d4d5f944fcb45e6e1261a3f088d2e67"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1778,7 +1781,7 @@
 		<publisher>N.D.U.G.</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184338">
-				<rom name="up2d21.vdk" size="184338" crc="611915ea" sha1="a9c6d6aebc3846bf4f4878cc796938203a0042e3" offset="0" />
+				<rom name="up2d21.vdk" size="184338" crc="611915ea" sha1="a9c6d6aebc3846bf4f4878cc796938203a0042e3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1789,7 +1792,7 @@
 		<publisher>N.D.U.G.</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184338">
-				<rom name="up2d22.vdk" size="184338" crc="62800a1a" sha1="1294990dbb25c1d837045d04403c80bf477a8ce2" offset="0" />
+				<rom name="up2d22.vdk" size="184338" crc="62800a1a" sha1="1294990dbb25c1d837045d04403c80bf477a8ce2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1800,7 +1803,7 @@
 		<publisher>N.D.U.G.</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184338">
-				<rom name="up2d23.vdk" size="184338" crc="6c3fd1bf" sha1="edfe7fab646b64054bd6804ddab75fe182f2df60" offset="0" />
+				<rom name="up2d23.vdk" size="184338" crc="6c3fd1bf" sha1="edfe7fab646b64054bd6804ddab75fe182f2df60"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1811,7 +1814,7 @@
 		<publisher>N.D.U.G.</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184338">
-				<rom name="up2d24.vdk" size="184338" crc="60708858" sha1="338c919d525b56876c7793ff27c66a2d36f574e0" offset="0" />
+				<rom name="up2d24.vdk" size="184338" crc="60708858" sha1="338c919d525b56876c7793ff27c66a2d36f574e0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1822,7 +1825,7 @@
 		<publisher>N.D.U.G.</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184338">
-				<rom name="up2d25.vdk" size="184338" crc="1949f77e" sha1="65612128daf6be10c57b054c039ccf24c49997cf" offset="0" />
+				<rom name="up2d25.vdk" size="184338" crc="1949f77e" sha1="65612128daf6be10c57b054c039ccf24c49997cf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1833,7 +1836,7 @@
 		<publisher>N.D.U.G.</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184338">
-				<rom name="up2d26.vdk" size="184338" crc="4ce08c17" sha1="97b2a214f526b7de8f073214581ac6387e2d9685" offset="0" />
+				<rom name="up2d26.vdk" size="184338" crc="4ce08c17" sha1="97b2a214f526b7de8f073214581ac6387e2d9685"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1844,7 +1847,7 @@
 		<publisher>N.D.U.G.</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184338">
-				<rom name="up2d27.vdk" size="184338" crc="d57be816" sha1="b18657485cbf48ba8781130b57599b8cf163b831" offset="0" />
+				<rom name="up2d27.vdk" size="184338" crc="d57be816" sha1="b18657485cbf48ba8781130b57599b8cf163b831"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1855,7 +1858,7 @@
 		<publisher>N.D.U.G.</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184338">
-				<rom name="up2d28.vdk" size="184338" crc="f7cd8297" sha1="d494501a3a6acd7a63356bfd6878894ce6a3928f" offset="0" />
+				<rom name="up2d28.vdk" size="184338" crc="f7cd8297" sha1="d494501a3a6acd7a63356bfd6878894ce6a3928f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1866,7 +1869,7 @@
 		<publisher>N.D.U.G.</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184338">
-				<rom name="up2d29.vdk" size="184338" crc="61f8ecc2" sha1="8c2d4f3f8ce2f4c780d4b0ad23f0fcb3518264d1" offset="0" />
+				<rom name="up2d29.vdk" size="184338" crc="61f8ecc2" sha1="8c2d4f3f8ce2f4c780d4b0ad23f0fcb3518264d1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1877,7 +1880,7 @@
 		<publisher>N.D.U.G.</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184338">
-				<rom name="up2d30.vdk" size="184338" crc="772a1d12" sha1="972a11676787deeb6ab81323fd5d745388814d27" offset="0" />
+				<rom name="up2d30.vdk" size="184338" crc="772a1d12" sha1="972a11676787deeb6ab81323fd5d745388814d27"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1888,7 +1891,7 @@
 		<publisher>N.D.U.G.</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184338">
-				<rom name="up2d31.vdk" size="184338" crc="fdb3cd81" sha1="5e61b789bcb5ac97eb0d0275b67bd120b86ac9b3" offset="0" />
+				<rom name="up2d31.vdk" size="184338" crc="fdb3cd81" sha1="5e61b789bcb5ac97eb0d0275b67bd120b86ac9b3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1899,7 +1902,7 @@
 		<publisher>N.D.U.G.</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184338">
-				<rom name="up2d32.vdk" size="184338" crc="54b68a51" sha1="b6bb007040718943b2e63f29f6aea69e1d174a65" offset="0" />
+				<rom name="up2d32.vdk" size="184338" crc="54b68a51" sha1="b6bb007040718943b2e63f29f6aea69e1d174a65"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1910,7 +1913,7 @@
 		<publisher>N.D.U.G.</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184338">
-				<rom name="up2d33.vdk" size="184338" crc="e26de760" sha1="30ffe1331052e57f95839d2b0d45d7094c96f384" offset="0" />
+				<rom name="up2d33.vdk" size="184338" crc="e26de760" sha1="30ffe1331052e57f95839d2b0d45d7094c96f384"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1921,7 +1924,7 @@
 		<publisher>N.D.U.G.</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184338">
-				<rom name="up2d34.vdk" size="184338" crc="c000a3a4" sha1="ecfcaa5c9317b3627b3fc5043377689db70eefc2" offset="0" />
+				<rom name="up2d34.vdk" size="184338" crc="c000a3a4" sha1="ecfcaa5c9317b3627b3fc5043377689db70eefc2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1932,7 +1935,7 @@
 		<publisher>N.D.U.G.</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184338">
-				<rom name="up2d35.vdk" size="184338" crc="c19fabaa" sha1="ffd4a9995ec7b4373057ca0fdfac97747cd39ed7" offset="0" />
+				<rom name="up2d35.vdk" size="184338" crc="c19fabaa" sha1="ffd4a9995ec7b4373057ca0fdfac97747cd39ed7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1943,7 +1946,7 @@
 		<publisher>N.D.U.G.</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184338">
-				<rom name="up2d36.vdk" size="184338" crc="7b049878" sha1="f37f6422c95b8718309dc609ee428f76efe522d0" offset="0" />
+				<rom name="up2d36.vdk" size="184338" crc="7b049878" sha1="f37f6422c95b8718309dc609ee428f76efe522d0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1954,7 +1957,7 @@
 		<publisher>N.D.U.G.</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184338">
-				<rom name="up2d37.vdk" size="184338" crc="50d5619a" sha1="b279bb326ae61d65770d615e474e1095c1a4465f" offset="0" />
+				<rom name="up2d37.vdk" size="184338" crc="50d5619a" sha1="b279bb326ae61d65770d615e474e1095c1a4465f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1965,7 +1968,7 @@
 		<publisher>N.D.U.G.</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184338">
-				<rom name="up2d38.vdk" size="184338" crc="bfef3762" sha1="a39ce15d7f78e3480364436fdb50d8fcd17604cf" offset="0" />
+				<rom name="up2d38.vdk" size="184338" crc="bfef3762" sha1="a39ce15d7f78e3480364436fdb50d8fcd17604cf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1976,7 +1979,7 @@
 		<publisher>N.D.U.G.</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184340">
-				<rom name="up2d39.vdk" size="184340" crc="0556a9cd" sha1="6656db6a78db036e484e831bbb63c3f8bb05ae18" offset="0" />
+				<rom name="up2d39.vdk" size="184340" crc="0556a9cd" sha1="6656db6a78db036e484e831bbb63c3f8bb05ae18"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1987,7 +1990,7 @@
 		<publisher>N.D.U.G.</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184338">
-				<rom name="up2d40d64.vdk" size="184338" crc="ec180c9e" sha1="466617024304db7db8bee63e34aea4847c19ba6b" offset="0" />
+				<rom name="up2d40d64.vdk" size="184338" crc="ec180c9e" sha1="466617024304db7db8bee63e34aea4847c19ba6b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1998,7 +2001,7 @@
 		<publisher>N.D.U.G.</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184342">
-				<rom name="up2d41d64.vdk" size="184342" crc="abbb87f0" sha1="6ecc955abe307c3dbaa4ce99c40a5219875445b7" offset="0" />
+				<rom name="up2d41d64.vdk" size="184342" crc="abbb87f0" sha1="6ecc955abe307c3dbaa4ce99c40a5219875445b7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2009,7 +2012,7 @@
 		<publisher>N.D.U.G.</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184340">
-				<rom name="up2d42d64.vdk" size="184340" crc="e295d6a1" sha1="e2b409b65a61860291a4d1640621ad1cc895c076" offset="0" />
+				<rom name="up2d42d64.vdk" size="184340" crc="e295d6a1" sha1="e2b409b65a61860291a4d1640621ad1cc895c076"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2020,7 +2023,7 @@
 		<publisher>N.D.U.G.</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184340">
-				<rom name="up2d43d64.vdk" size="184340" crc="0c14e065" sha1="8f965c3faf9be97f8a601622c6bc6707641fb433" offset="0" />
+				<rom name="up2d43d64.vdk" size="184340" crc="0c14e065" sha1="8f965c3faf9be97f8a601622c6bc6707641fb433"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2031,7 +2034,7 @@
 		<publisher>N.D.U.G.</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184340">
-				<rom name="up2d44d64.vdk" size="184340" crc="46b9cc69" sha1="966eac537d9f933da6ac2ff3f048ea8358bf256d" offset="0" />
+				<rom name="up2d44d64.vdk" size="184340" crc="46b9cc69" sha1="966eac537d9f933da6ac2ff3f048ea8358bf256d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2043,13 +2046,13 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Dragon 32"/>
 			<dataarea name="flop" size="184340">
-				<rom name="up2d45d32.vdk" size="184340" crc="e3248b79" sha1="89584ed140deb361cf9b8b3d4d7968a21f13901f" offset="0" />
+				<rom name="up2d45d32.vdk" size="184340" crc="e3248b79" sha1="89584ed140deb361cf9b8b3d4d7968a21f13901f"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Dragon 64"/>
 			<dataarea name="flop" size="184338">
-				<rom name="up2d45d64.vdk" size="184338" crc="3feb1580" sha1="1b944979c27583fd24979b22047e54713ab26eb9" offset="0" />
+				<rom name="up2d45d64.vdk" size="184338" crc="3feb1580" sha1="1b944979c27583fd24979b22047e54713ab26eb9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2061,13 +2064,13 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Dragon 32"/>
 			<dataarea name="flop" size="184340">
-				<rom name="up2d46d32.vdk" size="184340" crc="1c7a18bd" sha1="625060113ffd9662cbbdeb0573a483ce829e6781" offset="0" />
+				<rom name="up2d46d32.vdk" size="184340" crc="1c7a18bd" sha1="625060113ffd9662cbbdeb0573a483ce829e6781"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Dragon 64"/>
 			<dataarea name="flop" size="184340">
-				<rom name="up2d46d64.vdk" size="184340" crc="fc42aab7" sha1="d2236c8900ed8a97b5e4a63bdfdf41731f672a68" offset="0" />
+				<rom name="up2d46d64.vdk" size="184340" crc="fc42aab7" sha1="d2236c8900ed8a97b5e4a63bdfdf41731f672a68"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2078,7 +2081,7 @@
 		<publisher>N.D.U.G.</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184338">
-				<rom name="up2d47.vdk" size="184338" crc="35f1147e" sha1="a4b7df10fb8f95629f771db810176ec6579cd798" offset="0" />
+				<rom name="up2d47.vdk" size="184338" crc="35f1147e" sha1="a4b7df10fb8f95629f771db810176ec6579cd798"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2090,13 +2093,13 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Dragon 32"/>
 			<dataarea name="flop" size="184340">
-				<rom name="up2d48d32.vdk" size="184340" crc="4e77e2d1" sha1="d7343891c25897e009ef20f7fd86db6ffec2f291" offset="0" />
+				<rom name="up2d48d32.vdk" size="184340" crc="4e77e2d1" sha1="d7343891c25897e009ef20f7fd86db6ffec2f291"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Dragon 64"/>
 			<dataarea name="flop" size="184340">
-				<rom name="up2d48d64.vdk" size="184340" crc="b4e59fa4" sha1="5d5d440ea63c6b5c7270160d786dcfb811f16ec4" offset="0" />
+				<rom name="up2d48d64.vdk" size="184340" crc="b4e59fa4" sha1="5d5d440ea63c6b5c7270160d786dcfb811f16ec4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2108,7 +2111,7 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Dragon 64"/>
 			<dataarea name="flop" size="184340">
-				<rom name="up2d49d64.vdk" size="184340" crc="a0d40001" sha1="f329807136a76a237bba11b8aecb84c120a21062" offset="0" />
+				<rom name="up2d49d64.vdk" size="184340" crc="a0d40001" sha1="f329807136a76a237bba11b8aecb84c120a21062"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2120,13 +2123,13 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Dragon 32"/>
 			<dataarea name="flop" size="184340">
-				<rom name="up2d50d32.vdk" size="184340" crc="6676829d" sha1="0eb362b16ea968b28c4e56c2eb91b17cd6df1262" offset="0" />
+				<rom name="up2d50d32.vdk" size="184340" crc="6676829d" sha1="0eb362b16ea968b28c4e56c2eb91b17cd6df1262"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Dragon 64"/>
 			<dataarea name="flop" size="184340">
-				<rom name="up2d50d64.vdk" size="184340" crc="ab334ad3" sha1="8a2df81767e1f04ce310ac27546d72b5e424464c" offset="0" />
+				<rom name="up2d50d64.vdk" size="184340" crc="ab334ad3" sha1="8a2df81767e1f04ce310ac27546d72b5e424464c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2138,13 +2141,13 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Dragon 32"/>
 			<dataarea name="flop" size="184340">
-				<rom name="up2d51d32.vdk" size="184340" crc="a5014bdf" sha1="10afc282789d45b406591ea14304985adeac364f" offset="0" />
+				<rom name="up2d51d32.vdk" size="184340" crc="a5014bdf" sha1="10afc282789d45b406591ea14304985adeac364f"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Dragon 64"/>
 			<dataarea name="flop" size="184344">
-				<rom name="up2d51d64.vdk" size="184344" crc="189f6367" sha1="729ed09efe5e3117aff765c5105fb8b69ed37a97" offset="0" />
+				<rom name="up2d51d64.vdk" size="184344" crc="189f6367" sha1="729ed09efe5e3117aff765c5105fb8b69ed37a97"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2156,13 +2159,13 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Dragon 32"/>
 			<dataarea name="flop" size="184340">
-				<rom name="up2d52d32.vdk" size="184340" crc="cd488bb2" sha1="c88a0ff8c5483fd0c6e7c6bac4fa5a51616a366c" offset="0" />
+				<rom name="up2d52d32.vdk" size="184340" crc="cd488bb2" sha1="c88a0ff8c5483fd0c6e7c6bac4fa5a51616a366c"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Dragon 64"/>
 			<dataarea name="flop" size="184344">
-				<rom name="up2d52d64.vdk" size="184344" crc="973c237e" sha1="6703d237f7d236dce4b67d63b8b44a54e2ce3157" offset="0" />
+				<rom name="up2d52d64.vdk" size="184344" crc="973c237e" sha1="6703d237f7d236dce4b67d63b8b44a54e2ce3157"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2174,13 +2177,13 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Dragon 32"/>
 			<dataarea name="flop" size="184338">
-				<rom name="up2d53d32.vdk" size="184338" crc="27aaa2f5" sha1="5c4e7134f6bbcbc07662f28697c0be21c6f290f6" offset="0" />
+				<rom name="up2d53d32.vdk" size="184338" crc="27aaa2f5" sha1="5c4e7134f6bbcbc07662f28697c0be21c6f290f6"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Dragon 64"/>
 			<dataarea name="flop" size="184340">
-				<rom name="up2d53d64.vdk" size="184340" crc="49e9676c" sha1="bec4a4e61a126c69df4a7acaee9a1a955e4dc4e8" offset="0" />
+				<rom name="up2d53d64.vdk" size="184340" crc="49e9676c" sha1="bec4a4e61a126c69df4a7acaee9a1a955e4dc4e8"/>
 			</dataarea>
 		</part>
 	</software>

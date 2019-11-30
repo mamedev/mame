@@ -96,12 +96,13 @@ static void comx_fd_floppies(device_slot_interface &device)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(comx_fd_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(WD1770_TAG, WD1770, 8_MHz_XTAL)
+void comx_fd_device::device_add_mconfig(machine_config &config)
+{
+	WD1770(config, m_fdc, 8_MHz_XTAL);
 
-	MCFG_FLOPPY_DRIVE_ADD(WD1770_TAG":0", comx_fd_floppies, "525sd35t", comx_fd_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(WD1770_TAG":1", comx_fd_floppies, nullptr, comx_fd_device::floppy_formats)
-MACHINE_CONFIG_END
+	FLOPPY_CONNECTOR(config, m_floppy0, comx_fd_floppies, "525sd35t", comx_fd_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy1, comx_fd_floppies, nullptr, comx_fd_device::floppy_formats);
+}
 
 
 
@@ -187,7 +188,7 @@ void comx_fd_device::comx_q_w(int state)
 //  comx_mrd_r - memory read
 //-------------------------------------------------
 
-uint8_t comx_fd_device::comx_mrd_r(address_space &space, offs_t offset, int *extrom)
+uint8_t comx_fd_device::comx_mrd_r(offs_t offset, int *extrom)
 {
 	uint8_t data = 0xff;
 
@@ -209,7 +210,7 @@ uint8_t comx_fd_device::comx_mrd_r(address_space &space, offs_t offset, int *ext
 //  comx_io_r - I/O read
 //-------------------------------------------------
 
-uint8_t comx_fd_device::comx_io_r(address_space &space, offs_t offset)
+uint8_t comx_fd_device::comx_io_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -234,7 +235,7 @@ uint8_t comx_fd_device::comx_io_r(address_space &space, offs_t offset)
 //  comx_io_w - I/O write
 //-------------------------------------------------
 
-void comx_fd_device::comx_io_w(address_space &space, offs_t offset, uint8_t data)
+void comx_fd_device::comx_io_w(offs_t offset, uint8_t data)
 {
 	if (offset == 2)
 	{

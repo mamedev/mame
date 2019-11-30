@@ -11,40 +11,7 @@
 #ifndef MAME_MACHINE_I8291A_H
 #define MAME_MACHINE_I8291A_H
 
-
 #pragma once
-
-
-#define MCFG_I8291A_INT_WRITE_CB(_write)                               \
-	downcast<i8291a_device &>(*device).set_int_write_cb(DEVCB_##_write);
-
-#define MCFG_I8291A_DREQ_WRITE_CB(_write)                               \
-	downcast<i8291a_device &>(*device).set_dreq_write_cb(DEVCB_##_write);
-
-#define MCFG_I8291A_TRIG_WRITE_CB(_write)                               \
-	downcast<i8291a_device &>(*device).set_trig_write_cb(DEVCB_##_write);
-
-#define MCFG_I8291A_DIO_READ_CB(_read)             \
-	downcast<i8291a_device &>(*device).set_dio_read_cb(DEVCB_##_read);
-
-#define MCFG_I8291A_DIO_WRITE_CB(_write)                   \
-	downcast<i8291a_device &>(*device).set_dio_write_cb(DEVCB_##_write);
-
-#define MCFG_I8291A_EOI_WRITE_CB(_write)                               \
-	downcast<i8291a_device &>(*device).set_eoi_write_cb(DEVCB_##_write);
-
-#define MCFG_I8291A_DAV_WRITE_CB(_write)                               \
-	downcast<i8291a_device &>(*device).set_dav_write_cb(DEVCB_##_write);
-
-#define MCFG_I8291A_NRFD_WRITE_CB(_write)                              \
-	downcast<i8291a_device &>(*device).set_nrfd_write_cb(DEVCB_##_write);
-
-#define MCFG_I8291A_NDAC_WRITE_CB(_write)                              \
-	downcast<i8291a_device &>(*device).set_ndac_write_cb(DEVCB_##_write);
-
-#define MCFG_I8291A_SRQ_WRITE_CB(_write)                               \
-	downcast<i8291a_device &>(*device).set_srq_write_cb(DEVCB_##_write);
-
 
 class i8291a_device : public device_t
 {
@@ -52,35 +19,16 @@ public:
 	// construction/destruction
 	i8291a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base& set_int_write_cb(Object &&cb)
-	{ return m_int_write_func.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> devcb_base& set_dreq_write_cb(Object &&cb)
-	{ return m_dreq_write_func.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> devcb_base& set_trig_write_cb(Object &&cb)
-	{ return m_trig_write_func.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> devcb_base& set_eoi_write_cb(Object &&cb)
-	{ return m_eoi_write_func.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> devcb_base& set_dav_write_cb(Object &&cb)
-	{ return m_dav_write_func.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> devcb_base& set_nrfd_write_cb(Object &&cb)
-	{ return m_nrfd_write_func.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> devcb_base& set_ndac_write_cb(Object &&cb)
-	{ return m_ndac_write_func.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> devcb_base& set_srq_write_cb(Object &&cb)
-	{ return m_srq_write_func.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> devcb_base& set_dio_write_cb(Object &&cb)
-	{ return m_dio_write_func.set_callback(std::forward<Object>(cb)); }
-
-	template <class Object> devcb_base& set_dio_read_cb(Object &&cb)
-	{ return m_dio_read_func.set_callback(std::forward<Object>(cb)); }
+	auto int_write() { return m_int_write_func.bind(); }
+	auto dreq_write() { return m_dreq_write_func.bind(); }
+	auto trig_write() { return m_trig_write_func.bind(); }
+	auto eoi_write() { return m_eoi_write_func.bind(); }
+	auto dav_write() { return m_dav_write_func.bind(); }
+	auto nrfd_write() { return m_nrfd_write_func.bind(); }
+	auto ndac_write() { return m_ndac_write_func.bind(); }
+	auto srq_write() { return m_srq_write_func.bind(); }
+	auto dio_write() { return m_dio_write_func.bind(); }
+	auto dio_read() { return m_dio_read_func.bind(); }
 
 	// Signal inputs
 	DECLARE_WRITE_LINE_MEMBER(reset_w);

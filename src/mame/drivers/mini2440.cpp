@@ -212,7 +212,7 @@ void mini2440_state::machine_reset()
 
 void mini2440_state::mini2440_map(address_map &map)
 {
-//  AM_RANGE(0x00000000, 0x001fffff) AM_ROM
+//  map(0x00000000, 0x001fffff).rom();
 	map(0x30000000, 0x37ffffff).ram();
 }
 
@@ -225,49 +225,49 @@ void mini2440_state::init_mini2440()
 	// do nothing
 }
 
-MACHINE_CONFIG_START(mini2440_state::mini2440)
-	MCFG_DEVICE_ADD("maincpu", ARM920T, 400000000)
-	MCFG_DEVICE_PROGRAM_MAP(mini2440_map)
+void mini2440_state::mini2440(machine_config &config)
+{
+	ARM920T(config, m_maincpu, 400000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mini2440_state::mini2440_map);
 
-	MCFG_PALETTE_ADD("palette", 32768)
+	PALETTE(config, "palette").set_entries(32768);
 
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(1024, 768)
-	MCFG_SCREEN_VISIBLE_AREA(0, 239, 0, 319)
-
-	MCFG_SCREEN_UPDATE_DEVICE("s3c2440", s3c2440_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(1024, 768);
+	screen.set_visarea(0, 239, 0, 319);
+	screen.set_screen_update("s3c2440", FUNC(s3c2440_device::screen_update));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("ldac", UDA1341TS, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0) // uda1341ts.u12
-	MCFG_DEVICE_ADD("rdac", UDA1341TS, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0) // uda1341ts.u12
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
+	UDA1341TS(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 1.0); // uda1341ts.u12
+	UDA1341TS(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 1.0); // uda1341ts.u12
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
 
-	MCFG_DEVICE_ADD("s3c2440", S3C2440, 12000000)
-	MCFG_S3C2440_PALETTE("palette")
-	MCFG_S3C2440_SCREEN("screen")
-	MCFG_S3C2440_CORE_PIN_R_CB(READ32(*this, mini2440_state, s3c2440_core_pin_r))
-	MCFG_S3C2440_GPIO_PORT_R_CB(READ32(*this, mini2440_state, s3c2440_gpio_port_r))
-	MCFG_S3C2440_GPIO_PORT_W_CB(WRITE32(*this, mini2440_state, s3c2440_gpio_port_w))
-	MCFG_S3C2440_ADC_DATA_R_CB(READ32(*this, mini2440_state, s3c2440_adc_data_r))
-	MCFG_S3C2440_I2S_DATA_W_CB(WRITE16(*this, mini2440_state, s3c2440_i2s_data_w))
-	MCFG_S3C2440_NAND_COMMAND_W_CB(WRITE8(*this, mini2440_state, s3c2440_nand_command_w))
-	MCFG_S3C2440_NAND_ADDRESS_W_CB(WRITE8(*this, mini2440_state, s3c2440_nand_address_w))
-	MCFG_S3C2440_NAND_DATA_R_CB(READ8(*this, mini2440_state, s3c2440_nand_data_r))
-	MCFG_S3C2440_NAND_DATA_W_CB(WRITE8(*this, mini2440_state, s3c2440_nand_data_w))
+	S3C2440(config, m_s3c2440, 12000000);
+	m_s3c2440->set_palette_tag("palette");
+	m_s3c2440->set_screen_tag("screen");
+	m_s3c2440->core_pin_r_callback().set(FUNC(mini2440_state::s3c2440_core_pin_r));
+	m_s3c2440->gpio_port_r_callback().set(FUNC(mini2440_state::s3c2440_gpio_port_r));
+	m_s3c2440->gpio_port_w_callback().set(FUNC(mini2440_state::s3c2440_gpio_port_w));
+	m_s3c2440->adc_data_r_callback().set(FUNC(mini2440_state::s3c2440_adc_data_r));
+	m_s3c2440->i2s_data_w_callback().set(FUNC(mini2440_state::s3c2440_i2s_data_w));
+	m_s3c2440->nand_command_w_callback().set(FUNC(mini2440_state::s3c2440_nand_command_w));
+	m_s3c2440->nand_address_w_callback().set(FUNC(mini2440_state::s3c2440_nand_address_w));
+	m_s3c2440->nand_data_r_callback().set(FUNC(mini2440_state::s3c2440_nand_data_r));
+	m_s3c2440->nand_data_w_callback().set(FUNC(mini2440_state::s3c2440_nand_data_w));
 
-	MCFG_DEVICE_ADD("nand", NAND, 0)
-	MCFG_NAND_TYPE(K9F1G08U0B)
-	MCFG_NAND_RNB_CALLBACK(WRITELINE("s3c2440", s3c2440_device, frnb_w))
-MACHINE_CONFIG_END
+	NAND(config, m_nand, 0);
+	m_nand->set_nand_type(nand_device::chip::K9F1G08U0B);
+	m_nand->rnb_wr_callback().set(m_s3c2440, FUNC(s3c2440_device::frnb_w));
+}
 
 static INPUT_PORTS_START( mini2440 )
 	PORT_START( "PENB" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Pen Button") PORT_CHANGED_MEMBER(DEVICE_SELF, mini2440_state, mini2440_input_changed, nullptr) PORT_PLAYER(1)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Pen Button") PORT_CHANGED_MEMBER(DEVICE_SELF, mini2440_state, mini2440_input_changed, 0) PORT_PLAYER(1)
 	PORT_START( "PENX" )
 	PORT_BIT( 0x3ff, 0x200, IPT_LIGHTGUN_X ) PORT_NAME("Pen X") PORT_MINMAX(80, 950) PORT_SENSITIVITY(50) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_KEYDELTA(30) PORT_PLAYER(1)
 	PORT_START( "PENY" )

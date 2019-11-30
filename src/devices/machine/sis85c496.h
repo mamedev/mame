@@ -11,7 +11,7 @@
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 
-#include "machine/ataintf.h"
+#include "bus/ata/ataintf.h"
 #include "machine/at_keybc.h"
 
 #include "sound/spkrdev.h"
@@ -25,10 +25,10 @@
 #include "cpu/i386/i386.h"
 #include "machine/at.h"
 
-#define MCFG_SIS85C496_ADD(_tag, _cpu_tag, _ram_size)    \
-	MCFG_PCI_HOST_ADD(_tag, SIS85C496, 0x10390496, 0x03, 0x00000000) \
-	downcast<sis85c496_host_device *>(device)->set_cpu_tag(_cpu_tag); \
-	downcast<sis85c496_host_device *>(device)->set_ram_size(_ram_size);
+#define SIS85C496_HOST(_config, _tag, _cpu_tag, _ram_size)  \
+	pci_host_device &pcihost(PCI_HOST(_config, _tag, SIS85C496, 0x10390496, 0x03, 0x00000000)); \
+	pcihost.set_cpu_tag(_cpu_tag); \
+	pcihost.set_ram_size(_ram_size);
 
 class sis85c496_host_device : public pci_host_device {
 public:

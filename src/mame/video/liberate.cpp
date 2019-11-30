@@ -126,7 +126,7 @@ WRITE8_MEMBER(liberate_state::deco16_io_w)
 			m_maincpu->set_input_line(DECO16_IRQ_LINE, CLEAR_LINE);
 			break;
 		case 9: /* Sound */
-			m_soundlatch->write(space, 0, data);
+			m_soundlatch->write(data);
 			m_audiocpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
 			break;
 	}
@@ -154,7 +154,7 @@ WRITE8_MEMBER(liberate_state::prosoccr_io_w)
 			m_maincpu->set_input_line(DECO16_IRQ_LINE, CLEAR_LINE);
 			break;
 		case 9: /* Sound */
-			m_soundlatch->write(space, 0, data);
+			m_soundlatch->write(data);
 			m_audiocpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
 			break;
 	}
@@ -173,7 +173,7 @@ WRITE8_MEMBER(liberate_state::prosport_io_w)
 			m_back_tilemap->mark_all_dirty();
 			break;
 		case 2: /* Sound */
-			m_soundlatch->write(space, 0, data);
+			m_soundlatch->write(data);
 			m_audiocpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
 			break;
 		case 4: /* Irq ack */
@@ -204,8 +204,8 @@ WRITE8_MEMBER(liberate_state::prosport_bg_vram_w)
 
 VIDEO_START_MEMBER(liberate_state,prosoccr)
 {
-	m_back_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(liberate_state::get_back_tile_info),this), tilemap_mapper_delegate(FUNC(liberate_state::back_scan),this), 16, 16, 32, 32);
-	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(liberate_state::get_fix_tile_info),this), tilemap_mapper_delegate(FUNC(liberate_state::fix_scan),this), 8, 8, 32, 32);
+	m_back_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(liberate_state::get_back_tile_info)), tilemap_mapper_delegate(*this, FUNC(liberate_state::back_scan)), 16, 16, 32, 32);
+	m_fix_tilemap  = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(liberate_state::get_fix_tile_info)),  tilemap_mapper_delegate(*this, FUNC(liberate_state::fix_scan)),   8,  8, 32, 32);
 
 	m_fix_tilemap->set_transparent_pen(0);
 
@@ -218,8 +218,8 @@ VIDEO_START_MEMBER(liberate_state,prosoccr)
 
 VIDEO_START_MEMBER(liberate_state,boomrang)
 {
-	m_back_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(liberate_state::get_back_tile_info),this), tilemap_mapper_delegate(FUNC(liberate_state::back_scan),this), 16, 16, 32, 32);
-	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(liberate_state::get_fix_tile_info),this), tilemap_mapper_delegate(FUNC(liberate_state::fix_scan),this), 8, 8, 32, 32);
+	m_back_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(liberate_state::get_back_tile_info)), tilemap_mapper_delegate(*this, FUNC(liberate_state::back_scan)), 16, 16, 32, 32);
+	m_fix_tilemap  = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(liberate_state::get_fix_tile_info)),  tilemap_mapper_delegate(*this, FUNC(liberate_state::fix_scan)),   8,  8, 32, 32);
 
 	m_back_tilemap->set_transmask(0, 0x0001, 0x007e); /* Bottom 1 pen/Top 7 pens */
 	m_fix_tilemap->set_transparent_pen(0);
@@ -227,51 +227,51 @@ VIDEO_START_MEMBER(liberate_state,boomrang)
 
 VIDEO_START_MEMBER(liberate_state,liberate)
 {
-	m_back_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(liberate_state::get_back_tile_info),this), tilemap_mapper_delegate(FUNC(liberate_state::back_scan),this), 16, 16, 32, 32);
-	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(liberate_state::get_fix_tile_info),this), tilemap_mapper_delegate(FUNC(liberate_state::fix_scan),this), 8, 8, 32, 32);
+	m_back_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(liberate_state::get_back_tile_info)), tilemap_mapper_delegate(*this, FUNC(liberate_state::back_scan)), 16, 16, 32, 32);
+	m_fix_tilemap  = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(liberate_state::get_fix_tile_info)),  tilemap_mapper_delegate(*this, FUNC(liberate_state::fix_scan)),   8,  8, 32, 32);
 
 	m_fix_tilemap->set_transparent_pen(0);
 }
 
 VIDEO_START_MEMBER(liberate_state,prosport)
 {
-	m_back_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(liberate_state::prosport_get_back_tile_info),this), tilemap_mapper_delegate(FUNC(liberate_state::back_scan),this), 16, 16, 32, 32);
-	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(liberate_state::get_fix_tile_info),this), tilemap_mapper_delegate(FUNC(liberate_state::fix_scan),this), 8, 8, 32, 32);
+	m_back_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(liberate_state::prosport_get_back_tile_info)), tilemap_mapper_delegate(*this, FUNC(liberate_state::back_scan)), 16, 16, 32, 32);
+	m_fix_tilemap  = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(liberate_state::get_fix_tile_info)),           tilemap_mapper_delegate(*this, FUNC(liberate_state::fix_scan)),   8,  8, 32, 32);
 
 	m_fix_tilemap->set_transparent_pen(0);
 }
 
 /***************************************************************************/
 
-PALETTE_INIT_MEMBER(liberate_state,liberate)
+void liberate_state::liberate_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	int i, bit0, bit1, bit2, g, r, b;
-
-	for (i = 0;i < 32;i++)
+	for (int i = 0; i < 32; i++)
 	{
-		/* red component */
+		int bit0, bit1, bit2;
+
+		// red component
 		bit0 = (*color_prom >> 0) & 0x01;
 		bit1 = (*color_prom >> 1) & 0x01;
 		bit2 = (*color_prom >> 2) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		/* green component */
+		// green component
 		bit0 = (*color_prom >> 3) & 0x01;
 		bit1 = (*color_prom >> 4) & 0x01;
 		bit2 = (*color_prom >> 5) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		/* blue component */
+		// blue component
 		bit0 = 0;
 		bit1 = (*color_prom >> 6) & 0x01;
 		bit2 = (*color_prom >> 7) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		color_prom++;
-		palette.set_pen_color(i,rgb_t(r,g,b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
-	palette.set_pen_color(32,rgb_t(0,0,0)); /* Allocate black for when no background is displayed */
+	palette.set_pen_color(32, rgb_t::black()); // Allocate black for when no background is displayed
 }
 
 /***************************************************************************/

@@ -16,8 +16,6 @@ public:
 	void hyhoo(machine_config &config);
 	void hyhoo2(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(nb1413m3_busyflag_r);
-
 private:
 	enum
 	{

@@ -255,8 +255,8 @@ void m62_state::ldrun3_map(address_map &map)
 	map(0xcc00, 0xcc00).r(FUNC(m62_state::ldrun3_prot_7_r));
 	map(0xcfff, 0xcfff).r(FUNC(m62_state::ldrun3_prot_7_r));
 	map(0xc000, 0xc0ff).writeonly().share("spriteram");
-	map(0xd000, 0xefff).ram();
 	map(0xd000, 0xdfff).ram().w(FUNC(m62_state::m62_tileram_w)).share("m62_tileram");
+	map(0xe000, 0xefff).ram();
 }
 
 void m62_state::ldrun3_io_map(address_map &map)
@@ -965,238 +965,220 @@ void m62_state::machine_reset()
 	m_bankcontrol[1] = 0;
 }
 
-MACHINE_CONFIG_START(m62_state::ldrun)
+void m62_state::ldrun(machine_config &config)
+{
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 24000000/6)
-	MCFG_DEVICE_PROGRAM_MAP(ldrun_map)
-	MCFG_DEVICE_IO_MAP(kungfum_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", m62_state,  irq0_line_hold)
+	Z80(config, m_maincpu, 24000000/6);
+	m_maincpu->set_addrmap(AS_PROGRAM, &m62_state::ldrun_map);
+	m_maincpu->set_addrmap(AS_IO, &m62_state::kungfum_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(m62_state::irq0_line_hold));
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(55)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1790) /* frames per second and vblank duration from the Lode Runner manual */)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA((64*8-384)/2, 64*8-(64*8-384)/2-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(m62_state, screen_update_ldrun)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(55);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(1790) /* frames per second and vblank duration from the Lode Runner manual */);
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea((64*8-384)/2, 64*8-(64*8-384)/2-1, 0*8, 32*8-1);
+	screen.set_screen_update(FUNC(m62_state::screen_update_ldrun));
 
-	MCFG_DEVICE_ADD("spr_decode", GFXDECODE, "spr_palette", gfx_m62_sprites)
-	MCFG_DEVICE_ADD("chr_decode", GFXDECODE, "chr_palette", gfx_m62_tiles)
+	GFXDECODE(config, m_spr_decode, m_spr_palette, gfx_m62_sprites);
+	GFXDECODE(config, m_chr_decode, m_chr_palette, gfx_m62_tiles);
 
-	MCFG_PALETTE_ADD("chr_palette", 256)
-	MCFG_PALETTE_INIT_OWNER(m62_state,m62_chr)
-
-	MCFG_PALETTE_ADD("spr_palette", 256)
-	MCFG_PALETTE_INIT_OWNER(m62_state,m62_spr)
+	PALETTE(config, m_chr_palette, FUNC(m62_state::m62_chr), 256);
+	PALETTE(config, m_spr_palette, FUNC(m62_state::m62_spr), 256);
 
 	/* sound hardware */
 	//m62_audio(config);
-	MCFG_DEVICE_ADD("irem_audio", IREM_M62_AUDIO, 0)
+	IREM_M62_AUDIO(config, m_audio, 0);
 
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(m62_state::kungfum)
+void m62_state::kungfum(machine_config &config)
+{
 	ldrun(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(18432000/6)
-	MCFG_DEVICE_PROGRAM_MAP(kungfum_map)
-	MCFG_DEVICE_IO_MAP(kungfum_io_map)
+	m_maincpu->set_clock(18432000/6);
+	m_maincpu->set_addrmap(AS_PROGRAM, &m62_state::kungfum_map);
+	m_maincpu->set_addrmap(AS_IO, &m62_state::kungfum_io_map);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(m62_state, screen_update_kungfum)
+	subdevice<screen_device>("screen")->set_visarea((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1);
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(m62_state::screen_update_kungfum));
 
 	MCFG_VIDEO_START_OVERRIDE(m62_state,kungfum)
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(m62_state::battroad)
+void m62_state::battroad(machine_config &config)
+{
 	ldrun(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(18432000/6)
-	MCFG_DEVICE_PROGRAM_MAP(battroad_map)
-	MCFG_DEVICE_IO_MAP(battroad_io_map)
+	m_maincpu->set_clock(18432000/6);
+	m_maincpu->set_addrmap(AS_PROGRAM, &m62_state::battroad_map);
+	m_maincpu->set_addrmap(AS_IO, &m62_state::battroad_io_map);
 
 	MCFG_MACHINE_START_OVERRIDE(m62_state,battroad)
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(m62_state, screen_update_battroad)
+	subdevice<screen_device>("screen")->set_visarea((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1);
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(m62_state::screen_update_battroad));
 
-	MCFG_DEVICE_ADD("fg_decode", GFXDECODE, "fg_palette", gfx_m62_fg_battroad)
+	GFXDECODE(config, m_fg_decode, m_fg_palette, gfx_m62_fg_battroad);
 
-	MCFG_PALETTE_ADD("fg_palette", 32)
-	MCFG_PALETTE_INIT_OWNER(m62_state,m62_battroad_fg)
+	PALETTE(config, m_fg_palette, FUNC(m62_state::m62_battroad_fg), 32);
 
 	MCFG_VIDEO_START_OVERRIDE(m62_state,battroad)
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(m62_state::ldrun2)
+void m62_state::ldrun2(machine_config &config)
+{
 	ldrun(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(ldrun2_map)
-	MCFG_DEVICE_IO_MAP(ldrun2_io_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &m62_state::ldrun2_map);
+	m_maincpu->set_addrmap(AS_IO, &m62_state::ldrun2_io_map);
 
 	MCFG_VIDEO_START_OVERRIDE(m62_state,ldrun2)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(m62_state, screen_update_ldrun)
-MACHINE_CONFIG_END
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(m62_state::screen_update_ldrun));
+}
 
 
-MACHINE_CONFIG_START(m62_state::ldrun3)
+void m62_state::ldrun3(machine_config &config)
+{
 	ldrun(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(ldrun3_map)
-	MCFG_DEVICE_IO_MAP(ldrun3_io_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &m62_state::ldrun3_map);
+	m_maincpu->set_addrmap(AS_IO, &m62_state::ldrun3_io_map);
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(m62_state,ldrun2)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(m62_state, screen_update_ldrun3)
-MACHINE_CONFIG_END
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(m62_state::screen_update_ldrun3));
+}
 
 
-MACHINE_CONFIG_START(m62_state::ldrun4)
+void m62_state::ldrun4(machine_config &config)
+{
 	ldrun(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(ldrun4_map)
-	MCFG_DEVICE_IO_MAP(ldrun4_io_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &m62_state::ldrun4_map);
+	m_maincpu->set_addrmap(AS_IO, &m62_state::ldrun4_io_map);
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(m62_state,ldrun4)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(m62_state, screen_update_ldrun4)
-MACHINE_CONFIG_END
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(m62_state::screen_update_ldrun4));
+}
 
 
-MACHINE_CONFIG_START(m62_state::lotlot)
+void m62_state::lotlot(machine_config &config)
+{
 	ldrun(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(lotlot_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &m62_state::lotlot_map);
 
 	/* video hardware */
+	GFXDECODE(config, m_fg_decode, m_fg_palette, gfx_m62_fg_lotlot);
+	m_chr_decode->set_info(gfx_m62_tiles_lotlot);
 
-	MCFG_DEVICE_ADD("fg_decode", GFXDECODE, "fg_palette", gfx_m62_fg_lotlot)
-	MCFG_GFXDECODE_MODIFY("chr_decode", gfx_m62_tiles_lotlot)
-
-	MCFG_PALETTE_ADD("fg_palette", 256)
-	MCFG_PALETTE_INIT_OWNER(m62_state,m62_lotlot_fg)
+	PALETTE(config, m_fg_palette, FUNC(m62_state::m62_lotlot_fg), 256);
 
 
 	MCFG_VIDEO_START_OVERRIDE(m62_state,lotlot)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(m62_state, screen_update_lotlot)
-MACHINE_CONFIG_END
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(m62_state::screen_update_lotlot));
+}
 
 
-MACHINE_CONFIG_START(m62_state::kidniki)
+void m62_state::kidniki(machine_config &config)
+{
 	ldrun(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(kidniki_map)
-	MCFG_DEVICE_IO_MAP(kidniki_io_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &m62_state::kidniki_map);
+	m_maincpu->set_addrmap(AS_IO, &m62_state::kidniki_io_map);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("fg_decode", GFXDECODE, "chr_palette", gfx_m62_fg_kidniki)
+	GFXDECODE(config, m_fg_decode, m_chr_palette, gfx_m62_fg_kidniki);
 
 	MCFG_VIDEO_START_OVERRIDE(m62_state,kidniki)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(m62_state, screen_update_kidniki)
-MACHINE_CONFIG_END
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(m62_state::screen_update_kidniki));
+}
 
 
-MACHINE_CONFIG_START(m62_state::spelunkr)
+void m62_state::spelunkr(machine_config &config)
+{
 	ldrun(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(spelunkr_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &m62_state::spelunkr_map);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("fg_decode", GFXDECODE, "chr_palette", gfx_m62_fg_spelunkr)
+	GFXDECODE(config, m_fg_decode, m_chr_palette, gfx_m62_fg_spelunkr);
 
 	MCFG_VIDEO_START_OVERRIDE(m62_state,spelunkr)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(m62_state, screen_update_spelunkr)
-MACHINE_CONFIG_END
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(m62_state::screen_update_spelunkr));
+}
 
 
-MACHINE_CONFIG_START(m62_state::spelunk2)
+void m62_state::spelunk2(machine_config &config)
+{
 	ldrun(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(spelunk2_map)
-
+	m_maincpu->set_addrmap(AS_PROGRAM, &m62_state::spelunk2_map);
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("chr_decode", gfx_m62_tiles_spelunk2)
-	MCFG_DEVICE_ADD("fg_decode", GFXDECODE, "chr_palette", gfx_m62_fg_spelunk2)
+	m_chr_decode->set_info(gfx_m62_tiles_spelunk2);
+	GFXDECODE(config, m_fg_decode, m_chr_palette, gfx_m62_fg_spelunk2);
 
-	MCFG_PALETTE_MODIFY("chr_palette")
-	MCFG_PALETTE_ENTRIES(512)
-	MCFG_PALETTE_INIT_OWNER(m62_state,spelunk2)
+	m_chr_palette->set_entries(512);
+	m_chr_palette->set_init(FUNC(m62_state::spelunk2_palette));
 
 	MCFG_VIDEO_START_OVERRIDE(m62_state,spelunk2)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(m62_state, screen_update_spelunk2)
-MACHINE_CONFIG_END
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(m62_state::screen_update_spelunk2));
+}
 
 
-MACHINE_CONFIG_START(m62_state::youjyudn)
+void m62_state::youjyudn(machine_config &config)
+{
 	ldrun(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(18432000/6)
-	MCFG_DEVICE_PROGRAM_MAP(youjyudn_map)
-	MCFG_DEVICE_IO_MAP(youjyudn_io_map)
+	m_maincpu->set_clock(18432000/6);
+	m_maincpu->set_addrmap(AS_PROGRAM, &m62_state::youjyudn_map);
+	m_maincpu->set_addrmap(AS_IO, &m62_state::youjyudn_io_map);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(m62_state, screen_update_youjyudn)
+	subdevice<screen_device>("screen")->set_visarea((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1);
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(m62_state::screen_update_youjyudn));
 
-	MCFG_GFXDECODE_MODIFY("chr_decode", gfx_m62_tiles_youjyudn)
-	MCFG_DEVICE_ADD("fg_decode", GFXDECODE, "chr_palette", gfx_m62_fg_youjyudn)
+	m_chr_decode->set_info(gfx_m62_tiles_youjyudn);
+	GFXDECODE(config, m_fg_decode, m_chr_palette, gfx_m62_fg_youjyudn);
 
 	MCFG_VIDEO_START_OVERRIDE(m62_state,youjyudn)
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(m62_state::horizon)
+void m62_state::horizon(machine_config &config)
+{
 	ldrun(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(horizon_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &m62_state::horizon_map);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(m62_state, screen_update_horizon)
+	subdevice<screen_device>("screen")->set_visarea((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1);
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(m62_state::screen_update_horizon));
 
 	MCFG_VIDEO_START_OVERRIDE(m62_state,horizon)
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************
@@ -1914,6 +1896,61 @@ ROM_START( kidnikiu )
 	ROM_LOAD( "dr33.6f",      0x000, 0x100, CRC(34d88d3c) SHA1(727f4c5cfff33538886fa0a29fd119aa085d7008) )    /* video timing - common to the other games */
 ROM_END
 
+// 3 PCB stack (3047A, 3047B, 3047C), stickered Yanza.
+// Very similar to yanchamr, just with mostly bigger ROMs. Main difference is in "gfx3", where the bootleggers redrew the title. PROMs weren't dumped for this set.
+ROM_START( kidnikib )
+	ROM_REGION( 0x30000, "maincpu", 0 ) /* main CPU, only 10.bin has small differences */
+	ROM_LOAD( "3.bin",  0x00000, 0x08000, CRC(461e1625) SHA1(6c568c589af345314dc327c7b189a00758bf4465) )
+	ROM_LOAD( "10.bin", 0x10000, 0x08000, CRC(2975bd31) SHA1(7c7e32beba6e461cdd7231e5390b7586669ac0de) )  /* banked at 8000-9fff */
+	ROM_LOAD( "11.bin", 0x18000, 0x08000, CRC(a929110b) SHA1(87334f946e14c79426bc7a14e8da984bb8ef9cfc) )
+
+	ROM_REGION( 0x10000, "irem_audio:iremsound", 0 )   /* sound CPU, identical */
+	ROM_LOAD( "2.bin", 0x4000, 0x04000, CRC(cb365f3b) SHA1(fefad25459eb00d228ee29931c5714ae895b76c7) )
+	ROM_LOAD( "1.bin", 0x8000, 0x08000, CRC(606a0fc3) SHA1(1843ae4faba66a955909442a02729854328b6011) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 ) // identical
+	ROM_LOAD( "6.bin", 0x00000, 0x8000, CRC(cb9761fc) SHA1(3eaf289ebd4ee1b1659dda0804fc0597ccc76218) )   /* tiles */
+	ROM_LOAD( "5.bin", 0x08000, 0x8000, CRC(59732741) SHA1(e77fbe3b0cd57a6a3fea7da46d8f23a4bcc7b583) )
+	ROM_LOAD( "4.bin", 0x10000, 0x8000, CRC(0370fd82) SHA1(0ddad9638b778f5651fccbec9b2c711c8ad07098) )
+
+	ROM_REGION( 0x30000, "gfx2", 0 ) // identical
+	ROM_LOAD( "15.bin", 0x00000, 0x4000, CRC(454017f3) SHA1(35ebcf0337720bffbc855b733b9a6643d37d59c4) )   /* sprites */
+	ROM_CONTINUE(       0x0c000, 0x4000 )
+	ROM_LOAD( "14.bin", 0x08000, 0x4000, CRC(a9a9ab62) SHA1(8eb905c1555f7e3c45dca26a03c560d2d59f9370) )
+	ROM_CONTINUE(       0x04000, 0x4000 )
+	ROM_LOAD( "17.bin", 0x10000, 0x4000, CRC(5cd4a019) SHA1(5c658e85fe3ed6c85dfaee9c78ac86bc09dab3c5) )
+	ROM_CONTINUE(       0x1c000, 0x4000 )
+	ROM_LOAD( "16.bin", 0x18000, 0x4000, CRC(90fab5e7) SHA1(66e60801c46424fe2b01bc18ce72280ca532ca51) )
+	ROM_CONTINUE(       0x14000, 0x4000 )
+	ROM_LOAD( "13.bin", 0x20000, 0x4000, CRC(44a978f2) SHA1(cf6644a6ff9ff39ecd2a126fcdbed96222c44756) )
+	ROM_CONTINUE(       0x2c000, 0x4000 )
+	ROM_LOAD( "12.bin", 0x28000, 0x4000, CRC(5eb4b1b1) SHA1(04daa4ccfe2fb707424dd557fb698bdc4950648d) )
+	ROM_CONTINUE(       0x24000, 0x4000 )
+
+	ROM_REGION( 0x0c000, "gfx3", 0 ) // all different, hacked up title screen
+	ROM_LOAD( "7.bin", 0x00000, 0x4000, CRC(abad77b7) SHA1(9c0110738670a8a3e3bba4251a661c1f78b576a4) )   /* chars */
+	ROM_LOAD( "8.bin", 0x04000, 0x4000, CRC(62e59144) SHA1(ab4c085cd4e4d4c741f32aecf6072ebf57cc37ad) ) // 11001xxxxxxxxx = 0x00, redumped multiple times
+	ROM_LOAD( "9.bin", 0x08000, 0x4000, CRC(81fded13) SHA1(394e52de4ad35c4c1a91d4f4e25f323f06d531aa) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "dr28.8f",      0x000, 0x200, CRC(6cef0fbd) SHA1(0c5c63a203e7bd852a3574c18f212487caf529ca) )    /* unknown */
+
+	ROM_REGION( 0x20, "spr_height_prom", 0 )
+	ROM_LOAD( "dr32.5p",      0x00, 0x20, CRC(11cd1f2e) SHA1(45ceb84ff373127ff370610c1ce8d83fc6045bcb) )    /* sprite height, one entry per 32 */
+
+	ROM_REGION( 0x300, "spr_color_proms", 0 )
+	ROM_LOAD( "dr30.1m",      0x0000, 0x0100, CRC(28c73263) SHA1(ffeb8d1310759bf20b1624ab92fc91078726679c) )    /* sprite palette red component */
+	ROM_LOAD( "dr31.1n",      0x0100, 0x0100, CRC(3529210e) SHA1(3042ec941bdcb873077e77cffe36d4a28298bbbb) )    /* sprite palette green component */
+	ROM_LOAD( "dr29.1l",      0x0200, 0x0100, CRC(1173a754) SHA1(dbb7d02b72ae1842e0d17aee324a5b85ff2a2178) )    /* sprite palette blue component */
+
+	ROM_REGION( 0x300, "chr_color_proms", 0 )
+	ROM_LOAD( "dr25.3f",      0x0000, 0x0100, CRC(8e91430b) SHA1(a7a1567a0fd31cd65260f3ddb5280368704378bd) )    /* character palette red component */
+	ROM_LOAD( "dr26.3h",      0x0100, 0x0100, CRC(b563b93f) SHA1(86aefdaa63b35fe82f9f70eff3e4c14629f7a184) )    /* character palette green component */
+	ROM_LOAD( "dr27.3j",      0x0200, 0x0100, CRC(70d668ef) SHA1(2cc647f2708932105bb9a5130aacc5a8a160e418) )    /* character palette blue component */
+
+	ROM_REGION( 0x100, "timing", 0 )
+	ROM_LOAD( "dr33.6f",      0x000, 0x100, CRC(34d88d3c) SHA1(727f4c5cfff33538886fa0a29fd119aa085d7008) )    /* video timing - common to the other games */
+ROM_END
 
 ROM_START( yanchamr )
 	ROM_REGION( 0x30000, "maincpu", 0 ) /* main CPU */
@@ -2379,36 +2416,37 @@ void m62_state::init_youjyudn()
 	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 
-GAME( 1984, kungfum,  0,        kungfum,  kungfum,  m62_state, empty_init,    ROT0,   "Irem", "Kung-Fu Master (World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1984, kungfumd, kungfum,  kungfum,  kungfum,  m62_state, empty_init,    ROT0,   "Irem (Data East USA license)", "Kung-Fu Master (US)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1984, spartanx, kungfum,  kungfum,  kungfum,  m62_state, empty_init,    ROT0,   "Irem", "Spartan X (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1984, kungfub,  kungfum,  kungfum,  kungfum,  m62_state, empty_init,    ROT0,   "bootleg", "Kung-Fu Master (bootleg set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1984, kungfub2, kungfum,  kungfum,  kungfum,  m62_state, empty_init,    ROT0,   "bootleg", "Kung-Fu Master (bootleg set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1984, kungfum,   0,        kungfum,  kungfum,  m62_state, empty_init,    ROT0,   "Irem", "Kung-Fu Master (World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1984, kungfumd,  kungfum,  kungfum,  kungfum,  m62_state, empty_init,    ROT0,   "Irem (Data East USA license)", "Kung-Fu Master (US)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1984, spartanx,  kungfum,  kungfum,  kungfum,  m62_state, empty_init,    ROT0,   "Irem", "Spartan X (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1984, kungfub,   kungfum,  kungfum,  kungfum,  m62_state, empty_init,    ROT0,   "bootleg", "Kung-Fu Master (bootleg set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1984, kungfub2,  kungfum,  kungfum,  kungfum,  m62_state, empty_init,    ROT0,   "bootleg", "Kung-Fu Master (bootleg set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1984, battroad, 0,        battroad, battroad, m62_state, init_battroad, ROT90,  "Irem", "The Battle-Road", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1984, battroad,  0,        battroad, battroad, m62_state, init_battroad, ROT90,  "Irem", "The Battle-Road", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1984, ldrun,    0,        ldrun,    ldrun,    m62_state, empty_init,    ROT0,   "Irem (licensed from Broderbund)", "Lode Runner (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1984, ldruna,   ldrun,    ldrun,    ldrun,    m62_state, empty_init,    ROT0,   "Irem (licensed from Broderbund, Digital Controls Inc. license)", "Lode Runner (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1984, ldrun,     0,        ldrun,    ldrun,    m62_state, empty_init,    ROT0,   "Irem (licensed from Broderbund)", "Lode Runner (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1984, ldruna,    ldrun,    ldrun,    ldrun,    m62_state, empty_init,    ROT0,   "Irem (licensed from Broderbund, Digital Controls Inc. license)", "Lode Runner (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1984, ldrun2,   0,        ldrun2,   ldrun2,   m62_state, init_ldrun2,   ROT0,   "Irem (licensed from Broderbund)", "Lode Runner II - The Bungeling Strikes Back", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) /* Japanese version is called Bangeringu Teikoku No Gyakushuu */
+GAME( 1984, ldrun2,    0,        ldrun2,   ldrun2,   m62_state, init_ldrun2,   ROT0,   "Irem (licensed from Broderbund)", "Lode Runner II - The Bungeling Strikes Back", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) /* Japanese version is called Bangeringu Teikoku no Gyakushuu */
 
-GAME( 1985, ldrun3,   0,        ldrun3,   ldrun3,   m62_state, empty_init,    ROT0,   "Irem (licensed from Broderbund)", "Lode Runner III - The Golden Labyrinth", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1985, ldrun3j,  ldrun3,   ldrun3,   ldrun3,   m62_state, empty_init,    ROT0,   "Irem (licensed from Broderbund)", "Lode Runner III - Majin No Fukkatsu (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1985, ldrun3,    0,        ldrun3,   ldrun3,   m62_state, empty_init,    ROT0,   "Irem (licensed from Broderbund)", "Lode Runner III - The Golden Labyrinth", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1985, ldrun3j,   ldrun3,   ldrun3,   ldrun3,   m62_state, empty_init,    ROT0,   "Irem (licensed from Broderbund)", "Lode Runner III - Majin no Fukkatsu (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1986, ldrun4,   0,        ldrun4,   ldrun4,   m62_state, init_ldrun4,   ROT0,   "Irem (licensed from Broderbund)", "Lode Runner IV - Teikoku Karano Dasshutsu (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1986, ldrun4,    0,        ldrun4,   ldrun4,   m62_state, init_ldrun4,   ROT0,   "Irem (licensed from Broderbund)", "Lode Runner IV - Teikoku Karano Dasshutsu (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1985, lotlot,   0,        lotlot,   lotlot,   m62_state, empty_init,    ROT0,   "Irem (licensed from Tokuma Shoten)", "Lot Lot", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1985, lotlot,    0,        lotlot,   lotlot,   m62_state, empty_init,    ROT0,   "Irem (licensed from Tokuma Shoten)", "Lot Lot", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1986, kidniki,  0,        kidniki,  kidniki,  m62_state, init_kidniki,  ROT0,   "Irem", "Kid Niki - Radical Ninja (World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1986, kidnikiu, kidniki,  kidniki,  kidniki,  m62_state, init_kidniki,  ROT0,   "Irem (Data East USA license)", "Kid Niki - Radical Ninja (US)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1986, yanchamr, kidniki,  kidniki,  kidniki,  m62_state, init_kidniki,  ROT0,   "Irem", "Kaiketsu Yanchamaru (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1987, lithero,  kidniki,  kidniki,  kidniki,  m62_state, init_kidniki,  ROT0,   "bootleg", "Little Hero", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1986, kidniki,   0,        kidniki,  kidniki,  m62_state, init_kidniki,  ROT0,   "Irem", "Kid Niki - Radical Ninja (World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1986, kidnikiu,  kidniki,  kidniki,  kidniki,  m62_state, init_kidniki,  ROT0,   "Irem (Data East USA license)", "Kid Niki - Radical Ninja (US)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1986, kidnikib,  kidniki,  kidniki,  kidniki,  m62_state, init_kidniki,  ROT0,   "bootleg", "Kid Niki (bootleg)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1986, yanchamr,  kidniki,  kidniki,  kidniki,  m62_state, init_kidniki,  ROT0,   "Irem", "Kaiketsu Yanchamaru (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1987, lithero,   kidniki,  kidniki,  kidniki,  m62_state, init_kidniki,  ROT0,   "bootleg", "Little Hero", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1985, spelunkr, 0,        spelunkr, spelunkr, m62_state, init_spelunkr, ROT0,   "Irem (licensed from Broderbund)", "Spelunker", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1985, spelunkrj,spelunkr, spelunkr, spelunkr, m62_state, init_spelunkr, ROT0,   "Irem (licensed from Broderbund)", "Spelunker (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1985, spelunkr,  0,        spelunkr, spelunkr, m62_state, init_spelunkr, ROT0,   "Irem (licensed from Broderbund)", "Spelunker", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1985, spelunkrj, spelunkr, spelunkr, spelunkr, m62_state, init_spelunkr, ROT0,   "Irem (licensed from Broderbund)", "Spelunker (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1986, spelunk2, 0,        spelunk2, spelunk2, m62_state, init_spelunk2, ROT0,   "Irem (licensed from Broderbund)", "Spelunker II - 23 no Kagi (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1986, spelunk2,  0,        spelunk2, spelunk2, m62_state, init_spelunk2, ROT0,   "Irem (licensed from Broderbund)", "Spelunker II - 23 no Kagi (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1986, youjyudn, 0,        youjyudn, youjyudn, m62_state, init_youjyudn, ROT270, "Irem", "Youjyuden (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1986, youjyudn,  0,        youjyudn, youjyudn, m62_state, init_youjyudn, ROT270, "Irem", "Youjyuden (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1985, horizon,  0,        horizon,  horizon,  m62_state, empty_init,    ROT0,   "Irem", "Horizon (Irem)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1985, horizon,   0,        horizon,  horizon,  m62_state, empty_init,    ROT0,   "Irem", "Horizon (Irem)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )

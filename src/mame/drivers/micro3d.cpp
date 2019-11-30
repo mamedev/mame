@@ -117,7 +117,7 @@ static INPUT_PORTS_START( botss )
 	PORT_INCLUDE( micro3d )
 
 	PORT_MODIFY("INPUTS_A_B")
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, micro3d_state, botss_hwchk_r, nullptr)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(micro3d_state, botss_hwchk_r)
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON3 )  PORT_NAME("Shield")
 	PORT_SERVICE( 0x0400, IP_ACTIVE_LOW )
@@ -240,7 +240,6 @@ void micro3d_state::vgbmem(address_map &map)
 	map(0x02e00000, 0x02e0003f).w(FUNC(micro3d_state::vgb_uart_w)).umask16(0x00ff);
 	map(0x03800000, 0x03dfffff).rom().region("tms_gfx", 0);
 	map(0x03e00000, 0x03ffffff).rom().region("tms34010", 0);
-	map(0xc0000000, 0xc00001ff).rw(m_vgb, FUNC(tms34010_device::io_register_r), FUNC(tms34010_device::io_register_w));
 	map(0xffe00000, 0xffffffff).rom().region("tms34010", 0);
 }
 
@@ -269,7 +268,7 @@ void micro3d_state::drmath_data(address_map &map)
 	map(0x01400000, 0x01400003).rw(FUNC(micro3d_state::micro3d_pipe_r), FUNC(micro3d_state::micro3d_fifo_w));
 	map(0x01600000, 0x01600003).w(FUNC(micro3d_state::drmath_intr2_ack));
 	map(0x01800000, 0x01800003).w(FUNC(micro3d_state::micro3d_alt_fifo_w));
-	map(0x03fffff0, 0x03fffff7).rw("scc", FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask32(0x000000ff);
+	map(0x03fffff0, 0x03ffffff).rw("scc", FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask32(0x000000ff);
 }
 
 /*************************************
@@ -292,6 +291,12 @@ void micro3d_state::soundmem_io(address_map &map)
 	map(0xff01, 0xff01).w(FUNC(micro3d_state::micro3d_snd_dac_b));
 }
 
+void micro3d_state::cpu_space_map(address_map &map)
+{
+	map(0xfffff0, 0xffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));
+	map(0xfffff6, 0xfffff7).lr16(NAME([this] () -> u16 { return m_duart->get_irq_vector(); }));
+}
+
 
 /*************************************
  *
@@ -299,48 +304,45 @@ void micro3d_state::soundmem_io(address_map &map)
  *
  *************************************/
 
-MACHINE_CONFIG_START(micro3d_state::micro3d)
+void micro3d_state::micro3d(machine_config &config)
+{
+	M68000(config, m_maincpu, 32_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &micro3d_state::hostmem);
+	m_maincpu->set_vblank_int("screen", FUNC(micro3d_state::micro3d_vblank));
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &micro3d_state::cpu_space_map);
 
-	MCFG_DEVICE_ADD("maincpu", M68000, 32_MHz_XTAL / 2)
-	MCFG_DEVICE_PROGRAM_MAP(hostmem)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", micro3d_state,  micro3d_vblank)
+	TMS34010(config, m_vgb, 40_MHz_XTAL);
+	m_vgb->set_addrmap(AS_PROGRAM, &micro3d_state::vgbmem);
+	m_vgb->set_halt_on_reset(false);
+	m_vgb->set_pixel_clock(40_MHz_XTAL / 8);
+	m_vgb->set_pixels_per_clock(4);
+	m_vgb->set_scanline_ind16_callback(FUNC(micro3d_state::scanline_update));
+	m_vgb->output_int().set(FUNC(micro3d_state::tms_interrupt));
+	m_vgb->set_screen("screen");
 
-	MCFG_DEVICE_ADD("vgb", TMS34010, 40_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(vgbmem)
-	MCFG_VIDEO_SET_SCREEN("screen")
-	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
-	MCFG_TMS340X0_PIXEL_CLOCK(40_MHz_XTAL / 8) /* pixel clock */
-	MCFG_TMS340X0_PIXELS_PER_CLOCK(4) /* pixels per clock */
-	MCFG_TMS340X0_SCANLINE_IND16_CB(micro3d_state, scanline_update)        /* scanline updater (indexed16) */
-	MCFG_TMS340X0_OUTPUT_INT_CB(WRITELINE(*this, micro3d_state, tms_interrupt))
+	AM29000(config, m_drmath, 32_MHz_XTAL / 2);
+	m_drmath->set_addrmap(AS_PROGRAM, &micro3d_state::drmath_prg);
+	m_drmath->set_addrmap(AS_DATA, &micro3d_state::drmath_data);
 
-	MCFG_DEVICE_ADD("drmath", AM29000, 32_MHz_XTAL / 2)
-	MCFG_DEVICE_PROGRAM_MAP(drmath_prg)
-	MCFG_DEVICE_DATA_MAP(drmath_data)
+	scc8530_device &scc(SCC8530N(config, "scc", 32_MHz_XTAL / 2 / 2));
+	scc.out_txdb_callback().set("monitor_drmath", FUNC(rs232_port_device::write_txd));
 
-	MCFG_DEVICE_ADD("scc", SCC8530N, 32_MHz_XTAL / 2 / 2)
-	MCFG_Z80SCC_OUT_TXDB_CB(WRITELINE("monitor_drmath", rs232_port_device, write_txd))
+	I8051(config, m_audiocpu, 11.0592_MHz_XTAL);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &micro3d_state::soundmem_prg);
+	m_audiocpu->set_addrmap(AS_IO, &micro3d_state::soundmem_io);
+	m_audiocpu->port_in_cb<1>().set(FUNC(micro3d_state::micro3d_sound_p1_r));
+	m_audiocpu->port_out_cb<1>().set(FUNC(micro3d_state::micro3d_sound_p1_w));
+	m_audiocpu->port_in_cb<3>().set(FUNC(micro3d_state::micro3d_sound_p3_r));
+	m_audiocpu->port_out_cb<3>().set(FUNC(micro3d_state::micro3d_sound_p3_w));
+	m_audiocpu->serial_tx_cb().set(FUNC(micro3d_state::data_from_i8031));
+	m_audiocpu->serial_rx_cb().set(FUNC(micro3d_state::data_to_i8031));
 
-	rs232_port_device &monitor_drmath(RS232_PORT(config, "monitor_drmath", default_rs232_devices, nullptr));
-	monitor_drmath.rxd_handler().set("scc", FUNC(z80scc_device::rxb_w));
-	monitor_drmath.dcd_handler().set("scc", FUNC(z80scc_device::dcdb_w)).exor(1);
-
-	MCFG_DEVICE_ADD("audiocpu", I8051, 11.0592_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(soundmem_prg)
-	MCFG_DEVICE_IO_MAP(soundmem_io)
-	MCFG_MCS51_PORT_P1_IN_CB(READ8(*this, micro3d_state, micro3d_sound_p1_r))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, micro3d_state, micro3d_sound_p1_w))
-	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, micro3d_state, micro3d_sound_p3_r))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, micro3d_state, micro3d_sound_p3_w))
-	MCFG_MCS51_SERIAL_TX_CB(WRITE8(*this, micro3d_state, data_from_i8031))
-	MCFG_MCS51_SERIAL_RX_CB(READ8(*this, micro3d_state, data_to_i8031))
-
-	MCFG_DEVICE_ADD("duart", MC68681, 3.6864_MHz_XTAL)
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, micro3d_state, duart_irq_handler))
-	MCFG_MC68681_A_TX_CALLBACK(WRITELINE("monitor_host", rs232_port_device, write_txd))
-	MCFG_MC68681_B_TX_CALLBACK(WRITELINE(*this, micro3d_state, duart_txb))
-	MCFG_MC68681_INPORT_CALLBACK(READ8(*this, micro3d_state, duart_input_r))
-	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(*this, micro3d_state, duart_output_w))
+	MC68681(config, m_duart, 3.6864_MHz_XTAL);
+	m_duart->irq_cb().set(FUNC(micro3d_state::duart_irq_handler));
+	m_duart->a_tx_cb().set("monitor_host", FUNC(rs232_port_device::write_txd));
+	m_duart->b_tx_cb().set(FUNC(micro3d_state::duart_txb));
+	m_duart->inport_cb().set(FUNC(micro3d_state::duart_input_r));
+	m_duart->outport_cb().set(FUNC(micro3d_state::duart_output_w));
 
 	mc68901_device &mfp(MC68901(config, "mfp", 4000000));
 	mfp.set_timer_clock(4000000);
@@ -352,27 +354,30 @@ MACHINE_CONFIG_START(micro3d_state::micro3d)
 	mfp.out_tco_cb().set("mfp", FUNC(mc68901_device::tbi_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-	MCFG_QUANTUM_TIME(attotime::from_hz(3000))
+	config.set_maximum_quantum(attotime::from_hz(3000));
 
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(BBBBBRRRRRGGGGGx)
+	PALETTE(config, m_palette).set_format(palette_device::BRGx_555, 4096);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(40_MHz_XTAL/8*4, 192*4, 0, 144*4, 434, 0, 400)
-	MCFG_SCREEN_UPDATE_DEVICE("vgb", tms34010_device, tms340x0_ind16)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(40_MHz_XTAL/8*4, 192*4, 0, 144*4, 434, 0, 400);
+	screen.set_screen_update("vgb", FUNC(tms34010_device::tms340x0_ind16));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("uart", MC2661, 40_MHz_XTAL / 8) // actually SCN2651
-	MCFG_MC2661_TXD_HANDLER(WRITELINE("monitor_vgb", rs232_port_device, write_txd))
+	MC2661(config, m_vgb_uart, 40_MHz_XTAL / 8); // actually SCN2651
+	m_vgb_uart->txd_handler().set("monitor_vgb", FUNC(rs232_port_device::write_txd));
 
-	MCFG_DEVICE_ADD("monitor_vgb", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("uart", mc2661_device, rx_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("uart", mc2661_device, dsr_w))
+	rs232_port_device &monitor_host(RS232_PORT(config, "monitor_host", default_rs232_devices, nullptr)); // J2 (4-pin molex)
+	monitor_host.rxd_handler().set("duart", FUNC(mc68681_device::rx_a_w));
 
-	MCFG_DEVICE_ADD("monitor_host", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("duart", mc68681_device, rx_a_w))
+	rs232_port_device &monitor_drmath(RS232_PORT(config, "monitor_drmath", default_rs232_devices, nullptr)); // J4 (4-pin molex)
+	monitor_drmath.rxd_handler().set("scc", FUNC(z80scc_device::rxb_w));
+	monitor_drmath.dcd_handler().set("scc", FUNC(z80scc_device::dcdb_w));
 
-	ADC0844(config, m_adc, 0);
+	rs232_port_device &monitor_vgb(RS232_PORT(config, "monitor_vgb", default_rs232_devices, nullptr)); // J3 (4-pin molex)
+	monitor_vgb.rxd_handler().set(m_vgb_uart, FUNC(mc2661_device::rx_w));
+	monitor_vgb.dsr_handler().set(m_vgb_uart, FUNC(mc2661_device::dsr_w));
+
+	ADC0844(config, m_adc);
 	m_adc->intr_callback().set("mfp", FUNC(mc68901_device::i3_w));
 	m_adc->ch1_callback().set_ioport("THROTTLE");
 	m_adc->ch2_callback().set(FUNC(micro3d_state::adc_volume_r));
@@ -395,7 +400,7 @@ MACHINE_CONFIG_START(micro3d_state::micro3d)
 	MICRO3D_SOUND(config, m_noise_2);
 	m_noise_2->add_route(0, "lspeaker", 1.0);
 	m_noise_2->add_route(1, "rspeaker", 1.0);
-MACHINE_CONFIG_END
+}
 
 void micro3d_state::botss11(machine_config &config)
 {
@@ -467,10 +472,10 @@ ROM_END
 ROM_START( f15se21 )
 	/* Host PCB (MPG DW-00011C-0011-01) */
 	ROM_REGION( 0x180000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "500.hst", 0x000001, 0x20000, CRC(6c26806d) SHA1(7cfd2b3b92b0fc6627c92a2013a317ca5abc66a0) )
-	ROM_LOAD16_BYTE( "501.hst", 0x000000, 0x20000, CRC(81f02bf7) SHA1(09976746fe4d9c88bd8840f6e7addb09226aa54b) )
-	ROM_LOAD16_BYTE( "502.hst", 0x040001, 0x20000, CRC(1eb945e5) SHA1(aba3ff038f2ca0f1200be5710073825ce80e3656) )
-	ROM_LOAD16_BYTE( "503.hst", 0x040000, 0x20000, CRC(21fcb974) SHA1(56f78ce652e2bf432fbba8cda8c800f02dad84bb) )
+	ROM_LOAD16_BYTE( "110-00001-500.u67", 0x000001, 0x20000, CRC(6c26806d) SHA1(7cfd2b3b92b0fc6627c92a2013a317ca5abc66a0) )
+	ROM_LOAD16_BYTE( "110-00001-501.u91", 0x000000, 0x20000, CRC(81f02bf7) SHA1(09976746fe4d9c88bd8840f6e7addb09226aa54b) )
+	ROM_LOAD16_BYTE( "110-00001-502.u68", 0x040001, 0x20000, CRC(1eb945e5) SHA1(aba3ff038f2ca0f1200be5710073825ce80e3656) )
+	ROM_LOAD16_BYTE( "110-00001-503.u92", 0x040000, 0x20000, CRC(21fcb974) SHA1(56f78ce652e2bf432fbba8cda8c800f02dad84bb) )
 
 	ROM_LOAD16_BYTE( "004.hst", 0x080001, 0x20000, CRC(81671ce1) SHA1(51ff641ccbc9dea640a62944910abe73d796b062) )
 	ROM_LOAD16_BYTE( "005.hst", 0x080000, 0x20000, CRC(bdaa7db5) SHA1(52cd832cdd44e609e8cd269469b806e2cd27d63d) )

@@ -49,7 +49,7 @@ void adam_ram_expansion_device::device_start()
 //  adam_bd_r - buffered data read
 //-------------------------------------------------
 
-uint8_t adam_ram_expansion_device::adam_bd_r(address_space &space, offs_t offset, uint8_t data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2)
+uint8_t adam_ram_expansion_device::adam_bd_r(offs_t offset, uint8_t data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2)
 {
 	if (!cas2)
 	{
@@ -64,7 +64,7 @@ uint8_t adam_ram_expansion_device::adam_bd_r(address_space &space, offs_t offset
 //  adam_bd_w - buffered data write
 //-------------------------------------------------
 
-void adam_ram_expansion_device::adam_bd_w(address_space &space, offs_t offset, uint8_t data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2)
+void adam_ram_expansion_device::adam_bd_w(offs_t offset, uint8_t data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2)
 {
 	if (!cas2)
 	{

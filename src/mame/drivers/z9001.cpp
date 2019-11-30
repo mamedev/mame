@@ -1,14 +1,19 @@
 // license:BSD-3-Clause
 // copyright-holders:Miodrag Milanovic , Robbbert
-/***************************************************************************
+/*************************************************************************************
 
-        Robotron Z9001 (KC85/1)
+Robotron Z9001 (KC85/1)
 
-        12/05/2009 Skeleton driver.
-        13/07/2011 Notes added. You can enter text via terminal input.
-                   Colour and flashing added.
+2009-05-12 Skeleton driver.
+2011-07-13 Notes added. You can enter text via terminal input.
+           Colour and flashing added.
+2019-06-13 Basic enabled
 
-The only kind of acceptable input is a filename that is in 8.3 format and
+All input should be in UPPER case.
+
+For KC87_10/11/20/21, type BASIC to start Basic.
+
+The only other kind of acceptable input is a filename that is in 8.3 format and
 begins with a letter. It will say 'start tape'. You can press ^C here to
 escape, or any key to continue.
 
@@ -21,11 +26,14 @@ Some other control keys:
 
 
 ToDo:
-- cassette in
-- proper keyboard
+- cassette in - interrupt-driven via PIO1
+    via astb should cause interrupt but nothing happens.
+- proper keyboard - interrupt-driven via PIO2
+    pressing any key should program ctc/2 to a debounce delay and this then causes
+    another interrupt which reads keyboard and places ascii character at 0x0025.
 - get rid of temporary code
 
-****************************************************************************/
+**************************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -35,7 +43,6 @@ ToDo:
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "sound/beep.h"
-#include "sound/wave.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -74,7 +81,7 @@ private:
 	bool m_cassbit;
 	virtual void machine_reset() override;
 	//virtual void machine_start();
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<beep_device> m_beeper;
 	required_device<cassette_image_device> m_cass;
 	required_shared_ptr<uint8_t> m_p_colorram;
@@ -87,6 +94,7 @@ void z9001_state::z9001_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0xe7ff).ram();
 	map(0xe800, 0xebff).ram().share("colorram");
+	map(0xc000, 0xe7ff).rom();
 	map(0xec00, 0xefff).ram().share("videoram");
 	map(0xf000, 0xffff).rom();
 }
@@ -95,9 +103,9 @@ void z9001_state::z9001_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x80, 0x83).mirror(4).rw("z80ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
-	map(0x88, 0x8B).mirror(4).rw("z80pio1", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
-	map(0x90, 0x93).mirror(4).rw("z80pio2", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+	map(0x80, 0x83).mirror(4).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x88, 0x8B).mirror(4).rw("pio1", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
+	map(0x90, 0x93).mirror(4).rw("pio2", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 }
 
 /* Input ports */
@@ -106,9 +114,9 @@ INPUT_PORTS_END
 
 static const z80_daisy_config z9001_daisy_chain[] =
 {
-	{ "z80pio2" },
-	{ "z80pio1" },
-	{ "z80ctc" },
+	{ "pio2" },
+	{ "pio1" },
+	{ "ctc" },
 	{ nullptr }
 };
 
@@ -206,49 +214,50 @@ static GFXDECODE_START( gfx_z9001 )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(z9001_state::z9001)
+void z9001_state::z9001(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(9'830'400) / 4)
-	MCFG_DEVICE_PROGRAM_MAP(z9001_mem)
-	MCFG_DEVICE_IO_MAP(z9001_io)
-	MCFG_Z80_DAISY_CHAIN(z9001_daisy_chain)
+	Z80(config, m_maincpu, XTAL(9'830'400) / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &z9001_state::z9001_mem);
+	m_maincpu->set_addrmap(AS_IO, &z9001_state::z9001_io);
+	m_maincpu->set_daisy_config(z9001_daisy_chain);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(40*8, 24*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 24*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(z9001_state, screen_update_z9001)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(40*8, 24*8);
+	screen.set_visarea(0, 40*8-1, 0, 24*8-1);
+	screen.set_screen_update(FUNC(z9001_state::screen_update_z9001));
+	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_z9001)
-	MCFG_PALETTE_ADD("palette", 16)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_z9001);
+	PALETTE(config, "palette").set_entries(16);
 
 	/* Sound */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 	BEEP(config, "beeper", 800).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(z9001_state, kbd_put))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("z9001_timer", z9001_state, timer_callback, attotime::from_msec(10))
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(z9001_state::kbd_put));
+	TIMER(config, "z9001_timer").configure_periodic(FUNC(z9001_state::timer_callback), attotime::from_msec(10));
 
-	MCFG_DEVICE_ADD("z80pio1", Z80PIO, XTAL(9'830'400) / 4)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, z9001_state, port88_w))
+	z80pio_device& pio1(Z80PIO(config, "pio1", XTAL(9'830'400) / 4));
+	pio1.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	pio1.out_pa_callback().set(FUNC(z9001_state::port88_w));
 
-	MCFG_DEVICE_ADD("z80pio2", Z80PIO, XTAL(9'830'400) / 4)   // keyboard PIO
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	z80pio_device& pio2(Z80PIO(config, "pio2", XTAL(9'830'400) / 4)); // keyboard PIO
+	pio2.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL(9'830'400) / 4)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, z9001_state, cass_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE("z80ctc", z80ctc_device, trg3))
+	z80ctc_device& ctc(Z80CTC(config, "ctc", XTAL(9'830'400) / 4));
+	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	ctc.zc_callback<0>().set(FUNC(z9001_state::cass_w));
+	ctc.zc_callback<2>().set("ctc", FUNC(z80ctc_device::trg3));
 
-	MCFG_CASSETTE_ADD( "cassette" )
-MACHINE_CONFIG_END
+	CASSETTE(config, m_cass);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
+}
 
 /* ROM definition */
 ROM_START( z9001 )

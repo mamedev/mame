@@ -16,8 +16,9 @@
 
 #include "emu.h"
 #include "includes/elf.h"
-#include "elf2.lh"
 #include "screen.h"
+#include "speaker.h"
+#include "elf2.lh"
 
 #define RUN \
 	BIT(m_special->read(), 0)
@@ -212,7 +213,7 @@ void elf2_state::machine_start()
 
 	/* setup memory banking */
 	program.install_read_bank(0x0000, 0x00ff, "bank1");
-	program.install_write_handler(0x0000, 0x00ff, write8_delegate(FUNC(elf2_state::memory_w), this));
+	program.install_write_handler(0x0000, 0x00ff, write8_delegate(*this, FUNC(elf2_state::memory_w)));
 	membank("bank1")->configure_entry(0, m_ram->pointer());
 	membank("bank1")->set_entry(0);
 
@@ -222,7 +223,7 @@ void elf2_state::machine_start()
 
 /* Machine Driver */
 
-QUICKLOAD_LOAD_MEMBER( elf2_state, elf )
+QUICKLOAD_LOAD_MEMBER(elf2_state::quickload_cb)
 {
 	int size = image.length();
 
@@ -236,7 +237,8 @@ QUICKLOAD_LOAD_MEMBER( elf2_state, elf )
 	return image_init_result::PASS;
 }
 
-MACHINE_CONFIG_START(elf2_state::elf2)
+void elf2_state::elf2(machine_config &config)
+{
 	/* basic machine hardware */
 	CDP1802(config, m_maincpu, XTAL(3'579'545)/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &elf2_state::elf2_mem);
@@ -259,28 +261,29 @@ MACHINE_CONFIG_START(elf2_state::elf2)
 	SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER);
 
 	/* devices */
-	MCFG_DEVICE_ADD(MM74C923_TAG, MM74C923, 0)
-	MCFG_MM74C922_OSC(CAP_U(0.15))
-	MCFG_MM74C922_DEBOUNCE(CAP_U(1))
-	MCFG_MM74C922_DA_CALLBACK(WRITELINE(*this, elf2_state, da_w))
-	MCFG_MM74C922_X1_CALLBACK(IOPORT("X1"))
-	MCFG_MM74C922_X2_CALLBACK(IOPORT("X2"))
-	MCFG_MM74C922_X3_CALLBACK(IOPORT("X3"))
-	MCFG_MM74C922_X4_CALLBACK(IOPORT("X4"))
+	MM74C923(config, m_kb, 0);
+	m_kb->set_cap_osc(CAP_U(0.15));
+	m_kb->set_cap_debounce(CAP_U(1));
+	m_kb->da_wr_callback().set(FUNC(elf2_state::da_w));
+	m_kb->x1_rd_callback().set_ioport("X1");
+	m_kb->x2_rd_callback().set_ioport("X2");
+	m_kb->x3_rd_callback().set_ioport("X3");
+	m_kb->x4_rd_callback().set_ioport("X4");
 
-	MCFG_DEVICE_ADD(DM9368_H_TAG, DM9368, 0)
-	MCFG_DM9368_UPDATE_CALLBACK(WRITE8(*this, elf2_state, digit_w<0>))
-	MCFG_DEVICE_ADD(DM9368_L_TAG, DM9368, 0)
-	MCFG_DM9368_UPDATE_CALLBACK(WRITE8(*this, elf2_state, digit_w<1>))
+	DM9368(config, m_led_h, 0).update_cb().set(FUNC(elf2_state::digit_w<0>));
+	DM9368(config, m_led_l, 0).update_cb().set(FUNC(elf2_state::digit_w<1>));
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_QUICKLOAD_ADD("quickload", elf2_state, elf, "bin", 0)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+
+	QUICKLOAD(config, "quickload", "bin").set_load_callback(FUNC(elf2_state::quickload_cb));
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("256");
-MACHINE_CONFIG_END
+}
 
 /* ROMs */
 

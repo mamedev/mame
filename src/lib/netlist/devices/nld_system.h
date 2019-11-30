@@ -9,7 +9,7 @@
 #ifndef NLD_SYSTEM_H_
 #define NLD_SYSTEM_H_
 
-#include "../nl_setup.h"
+#include "netlist/nl_setup.h"
 
 // -----------------------------------------------------------------------------
 // Macros
@@ -29,12 +29,15 @@
 		PARAM(name.IN, v)
 
 #define MAINCLOCK(name, freq)                                                   \
-		NET_REGISTER_DEV(MAINCLOCK, name)                                       \
-		PARAM(name.FREQ, freq)
+		NET_REGISTER_DEVEXT(MAINCLOCK, name, freq)
 
 #define CLOCK(name, freq)                                                       \
 		NET_REGISTER_DEV(CLOCK, name)                                           \
 		PARAM(name.FREQ, freq)
+
+#define VARCLOCK(name, func)                                                    \
+		NET_REGISTER_DEV(VARCLOCK, name)                                        \
+		PARAM(name.FUNC, func)
 
 #define EXTCLOCK(name, freq, pattern)                                           \
 		NET_REGISTER_DEV(EXTCLOCK, name)                                        \
@@ -44,8 +47,8 @@
 #define GNDA()                                                                  \
 		NET_REGISTER_DEV(GNDA, GND)
 
-#define DUMMY_INPUT(name)                                                       \
-		NET_REGISTER_DEV(DUMMY_INPUT, name)
+#define NC_PIN(name)                                                            \
+		NET_REGISTER_DEV(NC_PIN, name)
 
 //FIXME: Usage discouraged, use OPTIMIZE_FRONTIER instead
 #define FRONTIER_DEV(name, cIN, cG, cOUT)                                       \

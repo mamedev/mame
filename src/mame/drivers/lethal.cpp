@@ -376,7 +376,7 @@ void lethal_state::bank4000_map(address_map &map)
 	map(0x3800, 0x3fff).rw(m_k056832, FUNC(k056832_device::ram_attr_hi_r), FUNC(k056832_device::ram_attr_hi_w));
 
 	// VRD = 1, CBNK = 0 or 1
-	map(0xa000, 0xbfff).mirror(0x4000).unmaprw(); // AM_DEVREAD("k056832", k056832_device, rom_byte_r)
+	map(0xa000, 0xbfff).mirror(0x4000).unmaprw(); // .r(m_k056832, FUNC(k056832_device::rom_byte_r));
 
 	// CBNK = 1; partially overlaid when VRD = 1
 	map(0x4000, 0x7fff).mirror(0x8000).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
@@ -489,67 +489,65 @@ void lethal_state::machine_reset()
 	m_bank4000->set_bank(0);
 }
 
-MACHINE_CONFIG_START(lethal_state::lethalen)
-
+void lethal_state::lethalen(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", HD6309, MAIN_CLOCK/2)    /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(le_main)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", lethal_state,  lethalen_interrupt)
+	HD6309(config, m_maincpu, MAIN_CLOCK/2);    /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &lethal_state::le_main);
+	m_maincpu->set_vblank_int("screen", FUNC(lethal_state::lethalen_interrupt));
 
-	MCFG_DEVICE_ADD("soundcpu", Z80, MAIN_CLOCK/4)  /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(le_sound)
+	Z80(config, m_soundcpu, MAIN_CLOCK/4);  /* verified on pcb */
+	m_soundcpu->set_addrmap(AS_PROGRAM, &lethal_state::le_sound);
 
-	ADDRESS_MAP_BANK(config, "bank4000").set_map(&lethal_state::bank4000_map).set_options(ENDIANNESS_BIG, 8, 16, 0x4000);
+	ADDRESS_MAP_BANK(config, m_bank4000).set_map(&lethal_state::bank4000_map).set_options(ENDIANNESS_BIG, 8, 16, 0x4000);
 
 	EEPROM_ER5911_8BIT(config, "eeprom");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59.62)  /* verified on pcb */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(216, 504-1, 16, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(lethal_state, screen_update_lethalen)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(59.62);  /* verified on pcb */
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(216, 504-1, 16, 240-1);
+	screen.set_screen_update(FUNC(lethal_state::screen_update_lethalen));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 8192)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 8192);
+	m_palette->enable_shadows();
 
-	MCFG_DEVICE_ADD("k056832", K056832, 0)
-	MCFG_K056832_CB(lethal_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_8LE, 1, 0)
-	MCFG_K056832_PALETTE("palette")
+	K056832(config, m_k056832, 0);
+	m_k056832->set_tile_callback(FUNC(lethal_state::tile_callback));
+	m_k056832->set_config(K056832_BPP_8LE, 1, 0);
+	m_k056832->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("k053244", K053244, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K05324X_BPP(6)
-	MCFG_K05324X_OFFSETS(95, 0)
-	MCFG_K05324X_CB(lethal_state, sprite_callback)
+	K053244(config, m_k053244, 0);
+	m_k053244->set_palette(m_palette);
+	m_k053244->set_bpp(6);
+	m_k053244->set_offsets(95, 0);
+	m_k053244->set_sprite_callback(FUNC(lethal_state::sprite_callback));
 
-	MCFG_K054000_ADD("k054000")
+	K054000(config, "k054000", 0);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_K054321_ADD("k054321", "lspeaker", "rspeaker")
+	K054321(config, m_k054321, "lspeaker", "rspeaker");
 
-	MCFG_DEVICE_ADD("k054539", K054539, XTAL(18'432'000))
-	MCFG_K054539_TIMER_HANDLER(INPUTLINE("soundcpu", INPUT_LINE_NMI))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	k054539_device &k054539(K054539(config, "k054539", XTAL(18'432'000)));
+	k054539.timer_handler().set_inputline("soundcpu", INPUT_LINE_NMI);
+	k054539.add_route(0, "rspeaker", 1.0);
+	k054539.add_route(1, "lspeaker", 1.0);
+}
 
-MACHINE_CONFIG_START(lethal_state::lethalej)
+void lethal_state::lethalej(machine_config &config)
+{
 	lethalen(config);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(224, 512-1, 16, 240-1)
+	subdevice<screen_device>("screen")->set_visarea(224, 512-1, 16, 240-1);
 
-	MCFG_DEVICE_MODIFY("k053244")
-	MCFG_K05324X_OFFSETS(-105, 0)
-MACHINE_CONFIG_END
+	m_k053244->set_offsets(-105, 0);
+}
 
 ROM_START( lethalen )   // US version UAE
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* main program */
@@ -558,7 +556,7 @@ ROM_START( lethalen )   // US version UAE
 	ROM_REGION( 0x10000, "soundcpu", 0 )    /* Z80 sound program */
 	ROM_LOAD( "191a02.f4", 0x00000, 0x10000, CRC(72b843cc) SHA1(b44b2f039358c26fa792d740639b66a5c8bf78e7) )
 
-	ROM_REGION( 0x400000, "gfx1", 0 )   /* tilemaps */
+	ROM_REGION( 0x400000, "k056832", 0 )   /* tilemaps */
 	ROM_LOAD32_WORD( "191a08", 0x000002, 0x100000, CRC(555bd4db) SHA1(d2e55796b4ab2306ae549fa9e7288e41eaa8f3de) )
 	ROM_LOAD32_WORD( "191a10", 0x000000, 0x100000, CRC(2fa9bf51) SHA1(1e4ec56b41dfd8744347a7b5799e3ebce0939adc) )
 	ROM_LOAD32_WORD( "191a07", 0x200002, 0x100000, CRC(1dad184c) SHA1(b2c4a8e48084005056aef2c8eaccb3d2eca71b73) )
@@ -583,7 +581,7 @@ ROM_START( lethalenub ) // US version UAB
 	ROM_REGION( 0x10000, "soundcpu", 0 )    /* Z80 sound program */
 	ROM_LOAD( "191a02.f4", 0x00000, 0x10000, CRC(72b843cc) SHA1(b44b2f039358c26fa792d740639b66a5c8bf78e7) )
 
-	ROM_REGION( 0x400000, "gfx1", 0 )   /* tilemaps */
+	ROM_REGION( 0x400000, "k056832", 0 )   /* tilemaps */
 	ROM_LOAD32_WORD( "191a08", 0x000002, 0x100000, CRC(555bd4db) SHA1(d2e55796b4ab2306ae549fa9e7288e41eaa8f3de) )
 	ROM_LOAD32_WORD( "191a10", 0x000000, 0x100000, CRC(2fa9bf51) SHA1(1e4ec56b41dfd8744347a7b5799e3ebce0939adc) )
 	ROM_LOAD32_WORD( "191a07", 0x200002, 0x100000, CRC(1dad184c) SHA1(b2c4a8e48084005056aef2c8eaccb3d2eca71b73) )
@@ -608,7 +606,7 @@ ROM_START( lethalenua ) // US version UAA
 	ROM_REGION( 0x10000, "soundcpu", 0 )    /* Z80 sound program */
 	ROM_LOAD( "191a02.f4", 0x00000, 0x10000, CRC(72b843cc) SHA1(b44b2f039358c26fa792d740639b66a5c8bf78e7) )
 
-	ROM_REGION( 0x400000, "gfx1", 0 )   /* tilemaps */
+	ROM_REGION( 0x400000, "k056832", 0 )   /* tilemaps */
 	ROM_LOAD32_WORD( "191a08", 0x000002, 0x100000, CRC(555bd4db) SHA1(d2e55796b4ab2306ae549fa9e7288e41eaa8f3de) )
 	ROM_LOAD32_WORD( "191a10", 0x000000, 0x100000, CRC(2fa9bf51) SHA1(1e4ec56b41dfd8744347a7b5799e3ebce0939adc) )
 	ROM_LOAD32_WORD( "191a07", 0x200002, 0x100000, CRC(1dad184c) SHA1(b2c4a8e48084005056aef2c8eaccb3d2eca71b73) )
@@ -633,7 +631,7 @@ ROM_START( lethalenux ) // US version ?, proto / hack?, very different to other 
 	ROM_REGION( 0x10000, "soundcpu", 0 )    /* Z80 sound program */
 	ROM_LOAD( "191a02.f4", 0x00000, 0x10000, CRC(72b843cc) SHA1(b44b2f039358c26fa792d740639b66a5c8bf78e7) )
 
-	ROM_REGION( 0x400000, "gfx1", 0 )   /* tilemaps */
+	ROM_REGION( 0x400000, "k056832", 0 )   /* tilemaps */
 	ROM_LOAD32_WORD( "191a08", 0x000002, 0x100000, CRC(555bd4db) SHA1(d2e55796b4ab2306ae549fa9e7288e41eaa8f3de) )
 	ROM_LOAD32_WORD( "191a10", 0x000000, 0x100000, CRC(2fa9bf51) SHA1(1e4ec56b41dfd8744347a7b5799e3ebce0939adc) )
 	ROM_LOAD32_WORD( "191a07", 0x200002, 0x100000, CRC(1dad184c) SHA1(b2c4a8e48084005056aef2c8eaccb3d2eca71b73) )
@@ -658,7 +656,7 @@ ROM_START( lethaleneab )    // Euro ver. EAB
 	ROM_REGION( 0x10000, "soundcpu", 0 )    /* Z80 sound program */
 	ROM_LOAD( "191a02.f4", 0x00000, 0x10000, CRC(72b843cc) SHA1(b44b2f039358c26fa792d740639b66a5c8bf78e7) )
 
-	ROM_REGION( 0x400000, "gfx1", 0 )   /* tilemaps */
+	ROM_REGION( 0x400000, "k056832", 0 )   /* tilemaps */
 	ROM_LOAD32_WORD( "191a08", 0x000002, 0x100000, CRC(555bd4db) SHA1(d2e55796b4ab2306ae549fa9e7288e41eaa8f3de) )
 	ROM_LOAD32_WORD( "191a10", 0x000000, 0x100000, CRC(2fa9bf51) SHA1(1e4ec56b41dfd8744347a7b5799e3ebce0939adc) )
 	ROM_LOAD32_WORD( "191a07", 0x200002, 0x100000, CRC(1dad184c) SHA1(b2c4a8e48084005056aef2c8eaccb3d2eca71b73) )
@@ -676,6 +674,31 @@ ROM_START( lethaleneab )    // Euro ver. EAB
 	ROM_LOAD( "lethaleneab.nv", 0x0000, 0x0080, CRC(4e9bb34d) SHA1(9502583bc9f5f6fc5bba333869398b24bf154b73) )
 ROM_END
 
+ROM_START( lethalenead )    // Euro ver. EAD
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* main program */
+	ROM_LOAD( "191ead01.u4",    0x00000,  0x40000, CRC(ce2e13ce) SHA1(52df8fbcca0de02bdb83fc804ee27a90135993e7) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )    /* Z80 sound program */
+	ROM_LOAD( "191a02.f4", 0x00000, 0x10000, CRC(72b843cc) SHA1(b44b2f039358c26fa792d740639b66a5c8bf78e7) )
+
+	ROM_REGION( 0x400000, "k056832", 0 )   /* tilemaps */
+	ROM_LOAD32_WORD( "191a08", 0x000002, 0x100000, CRC(555bd4db) SHA1(d2e55796b4ab2306ae549fa9e7288e41eaa8f3de) )
+	ROM_LOAD32_WORD( "191a10", 0x000000, 0x100000, CRC(2fa9bf51) SHA1(1e4ec56b41dfd8744347a7b5799e3ebce0939adc) )
+	ROM_LOAD32_WORD( "191a07", 0x200002, 0x100000, CRC(1dad184c) SHA1(b2c4a8e48084005056aef2c8eaccb3d2eca71b73) )
+	ROM_LOAD32_WORD( "191a09", 0x200000, 0x100000, CRC(e2028531) SHA1(63ccce7855d829763e9e248a6c3eb6ea89ab17ee) )
+
+	ROM_REGION( 0x400000, "k053244", ROMREGION_ERASE00 )   /* sprites */
+	ROM_LOAD32_WORD( "191a05", 0x000000, 0x100000, CRC(f2e3b58b) SHA1(0bbc2fe87a4fd00b5073a884bcfebcf9c2c402ad) )
+	ROM_LOAD32_WORD( "191a04", 0x000002, 0x100000, CRC(5c3eeb2b) SHA1(33ea8b3968b78806334b5a0aab3a2c24e45c604e) )
+	ROM_LOAD32_WORD( "191a06", 0x200000, 0x100000, CRC(ee11fc08) SHA1(ec6dd684e8261b181d65b8bf1b9e97da5c4468f7) )
+
+	ROM_REGION( 0x200000, "k054539", 0 )    /* K054539 samples */
+	ROM_LOAD( "191a03", 0x000000, 0x200000, CRC(9b13fbe8) SHA1(19b02dbd9d6da54045b0ba4dfe7b282c72745c9c))
+
+	ROM_REGION( 0x80, "eeprom", 0 )
+	ROM_LOAD( "lethalenead.nv", 0x0000, 0x0080, CRC(e1dc2bc0) SHA1(adfb8dfaec0b0faf6784eab97a5b31c0c7813756) )
+ROM_END
+
 ROM_START( lethaleneae )    // Euro ver. EAE
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* main program */
 	ROM_LOAD( "191eae01.u4",    0x00000,  0x40000, CRC(c6a3c6ac) SHA1(96a209a3a5b4af40af36bd7090c59a74f8c8df59) )
@@ -683,7 +706,7 @@ ROM_START( lethaleneae )    // Euro ver. EAE
 	ROM_REGION( 0x10000, "soundcpu", 0 )    /* Z80 sound program */
 	ROM_LOAD( "191a02.f4", 0x00000, 0x10000, CRC(72b843cc) SHA1(b44b2f039358c26fa792d740639b66a5c8bf78e7) )
 
-	ROM_REGION( 0x400000, "gfx1", 0 )   /* tilemaps */
+	ROM_REGION( 0x400000, "k056832", 0 )   /* tilemaps */
 	ROM_LOAD32_WORD( "191a08", 0x000002, 0x100000, CRC(555bd4db) SHA1(d2e55796b4ab2306ae549fa9e7288e41eaa8f3de) )
 	ROM_LOAD32_WORD( "191a10", 0x000000, 0x100000, CRC(2fa9bf51) SHA1(1e4ec56b41dfd8744347a7b5799e3ebce0939adc) )
 	ROM_LOAD32_WORD( "191a07", 0x200002, 0x100000, CRC(1dad184c) SHA1(b2c4a8e48084005056aef2c8eaccb3d2eca71b73) )
@@ -708,7 +731,7 @@ ROM_START( lethalenj )  // Japan version JAD
 	ROM_REGION( 0x10000, "soundcpu", 0 )    /* Z80 sound program */
 	ROM_LOAD( "191a02.f4", 0x00000, 0x10000, CRC(72b843cc) SHA1(b44b2f039358c26fa792d740639b66a5c8bf78e7) )
 
-	ROM_REGION( 0x400000, "gfx1", 0 )   /* tilemaps */
+	ROM_REGION( 0x400000, "k056832", 0 )   /* tilemaps */
 	ROM_LOAD32_WORD( "191a08", 0x000002, 0x100000, CRC(555bd4db) SHA1(d2e55796b4ab2306ae549fa9e7288e41eaa8f3de) )
 	ROM_LOAD32_WORD( "191a10", 0x000000, 0x100000, CRC(2fa9bf51) SHA1(1e4ec56b41dfd8744347a7b5799e3ebce0939adc) )
 	ROM_LOAD32_WORD( "191a07", 0x200002, 0x100000, CRC(1dad184c) SHA1(b2c4a8e48084005056aef2c8eaccb3d2eca71b73) )
@@ -733,7 +756,7 @@ ROM_START( lethaleneaa )    // Euro ver. EAA
 	ROM_REGION( 0x10000, "soundcpu", 0 )    /* Z80 sound program */
 	ROM_LOAD( "191a02.f4", 0x00000, 0x10000, CRC(72b843cc) SHA1(b44b2f039358c26fa792d740639b66a5c8bf78e7) )
 
-	ROM_REGION( 0x400000, "gfx1", 0 )   /* tilemaps */
+	ROM_REGION( 0x400000, "k056832", 0 )   /* tilemaps */
 	ROM_LOAD32_WORD( "191a08", 0x000002, 0x100000, CRC(555bd4db) SHA1(d2e55796b4ab2306ae549fa9e7288e41eaa8f3de) )
 	ROM_LOAD32_WORD( "191a10", 0x000000, 0x100000, CRC(2fa9bf51) SHA1(1e4ec56b41dfd8744347a7b5799e3ebce0939adc) )
 	ROM_LOAD32_WORD( "191a07", 0x200002, 0x100000, CRC(1dad184c) SHA1(b2c4a8e48084005056aef2c8eaccb3d2eca71b73) )
@@ -759,6 +782,7 @@ GAME( 1992, lethalenua, lethalen, lethalen, lethalen,  lethal_state, empty_init,
 GAME( 1992, lethalenux, lethalen, lethalen, lethalen,  lethal_state, empty_init, ORIENTATION_FLIP_Y, "Konami", "Lethal Enforcers (ver unknown, US, 08/06/92 15:11, hacked/proto?)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // writes UA to eeprom but earlier than suspected UAA set, might be a proto, might be hacked, fails rom test, definitely a good dump, another identical set was found in Italy
 
 GAME( 1992, lethaleneae,lethalen, lethalen, lethalene, lethal_state, empty_init, ORIENTATION_FLIP_Y, "Konami", "Lethal Enforcers (ver EAE, 11/19/92 16:24)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // writes EE to eeprom
+GAME( 1992, lethalenead,lethalen, lethalen, lethalene, lethal_state, empty_init, ORIENTATION_FLIP_Y, "Konami", "Lethal Enforcers (ver EAD, 11/11/92 10:52)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // writes ED to eeprom
 GAME( 1992, lethaleneab,lethalen, lethalen, lethalene, lethal_state, empty_init, ORIENTATION_FLIP_Y, "Konami", "Lethal Enforcers (ver EAB, 10/14/92 19:53)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // writes EC to eeprom, so might actually be EC
 GAME( 1992, lethaleneaa,lethalen, lethalen, lethalene, lethal_state, empty_init, ORIENTATION_FLIP_Y, "Konami", "Lethal Enforcers (ver EAA, 09/09/92 09:44)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // writes EA to eeprom
 

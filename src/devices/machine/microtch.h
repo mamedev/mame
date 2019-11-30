@@ -12,19 +12,23 @@ class microtouch_device :
 		public device_serial_interface
 {
 public:
-	microtouch_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	template <class Object> devcb_base &set_stx_callback(Object &&cb) { return m_out_stx_func.set_callback(std::forward<Object>(cb)); }
+	typedef device_delegate<int (int *, int *)> touch_cb;
 
-	virtual ioport_constructor device_input_ports() const override;
+	microtouch_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	auto stx() { return m_out_stx_func.bind(); }
+
 	DECLARE_WRITE_LINE_MEMBER(rx) { device_serial_interface::rx_w(state); }
 	DECLARE_INPUT_CHANGED_MEMBER(touch);
 
-	typedef delegate<int (int *, int *)> touch_cb;
-	template <typename Object> void set_touch_callback(Object &&cb) { m_out_touch_cb = std::forward<Object>(cb); }
+	template <typename... T> void set_touch_callback(T &&... args) { m_out_touch_cb.set(std::forward<T>(args)...); }
 
 protected:
+	// device_t implementation
+	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	// device_serial_interface implementation
 	virtual void tra_callback() override;
 	virtual void tra_complete() override;
 	virtual void rcv_complete() override;
@@ -71,12 +75,5 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(MICROTOUCH, microtouch_device)
-
-#define MCFG_MICROTOUCH_ADD(_tag, _clock, _devcb) \
-	MCFG_DEVICE_ADD(_tag, MICROTOUCH, _clock) \
-	downcast<microtouch_device &>(*device).set_stx_callback(DEVCB_##_devcb);
-
-#define MCFG_MICROTOUCH_TOUCH_CB(_class, _touch_cb) \
-	downcast<microtouch_device &>(*device).set_touch_callback(microtouch_device::touch_cb(&_class::_touch_cb, this));
 
 #endif // MAME_MACHINE_MICROTCH_H

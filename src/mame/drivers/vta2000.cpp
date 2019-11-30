@@ -47,7 +47,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(speaker_w);
 
 	uint32_t screen_update_vta2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_PALETTE_INIT(vta2000);
 
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
@@ -181,19 +180,13 @@ static GFXDECODE_START( gfx_vta2000 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, vta2000_charlayout, 0, 1 )
 GFXDECODE_END
 
-PALETTE_INIT_MEMBER(vta2000_state, vta2000)
+void vta2000_state::vta2000(machine_config &config)
 {
-	palette.set_pen_color(0, rgb_t::black());
-	palette.set_pen_color(1, 0x00, 0xc0, 0x00); // green
-	palette.set_pen_color(2, 0x00, 0xff, 0x00); // highlight
-}
-
-MACHINE_CONFIG_START(vta2000_state::vta2000)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, I8080, XTAL(4'000'000) / 4)
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_IO_MAP(io_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic", pic8259_device, inta_cb)
+	I8080(config, m_maincpu, XTAL(4'000'000) / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &vta2000_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &vta2000_state::io_map);
+	m_maincpu->set_irq_acknowledge_callback("pic", FUNC(pic8259_device::inta_cb));
 
 	PIT8253(config, m_mainpit, 0);
 	m_mainpit->set_clk<0>(500'000);
@@ -213,22 +206,20 @@ MACHINE_CONFIG_START(vta2000_state::vta2000)
 	brgpit.out_handler<1>().set("usart", FUNC(i8251_device::write_txc)); // or vice versa?
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(80*8, 25*12)
-	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 25*12-1)
-	MCFG_SCREEN_UPDATE_DRIVER(vta2000_state, screen_update_vta2000)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(80*8, 25*12);
+	screen.set_visarea(0, 80*8-1, 0, 25*12-1);
+	screen.set_screen_update(FUNC(vta2000_state::screen_update_vta2000));
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 3)
-	MCFG_PALETTE_INIT_OWNER(vta2000_state, vta2000)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_vta2000)
+	PALETTE(config, "palette", palette_device::MONOCHROME_HIGHLIGHT);
+	GFXDECODE(config, "gfxdecode", "palette", gfx_vta2000);
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.5);
+}
 
 
 /* ROM definition */
@@ -244,5 +235,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY      FULLNAME    FLAGS */
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY      FULLNAME    FLAGS
 COMP( 19??, vta2000, 0,      0,      vta2000, vta2000, vta2000_state, empty_init, "<unknown>", "VTA2000-15m", MACHINE_NOT_WORKING )

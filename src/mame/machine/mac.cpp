@@ -344,7 +344,7 @@ void mac_state::v8_resize()
 		mac_install_memory(0x00000000, memory_size-1, memory_size, memory_data, is_rom, "bank1");
 
 		// install catcher in place of ROM that will detect the first access to ROM in its real location
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0xa00000, 0xafffff, read32_delegate(FUNC(mac_state::rom_switch_r), this), 0xffffffff);
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xa00000, 0xafffff, read32_delegate(*this, FUNC(mac_state::rom_switch_r)), 0xffffffff);
 	}
 	else
 	{
@@ -464,7 +464,7 @@ void mac_state::set_memory_overlay(int overlay)
 
 			if (is_rom)
 			{
-				m_maincpu->space(AS_PROGRAM).install_read_handler(0x40000000, 0x4fffffff, read32_delegate(FUNC(mac_state::rom_switch_r), this), 0xffffffff);
+				m_maincpu->space(AS_PROGRAM).install_read_handler(0x40000000, 0x4fffffff, read32_delegate(*this, FUNC(mac_state::rom_switch_r)), 0xffffffff);
 			}
 			else
 			{
@@ -1523,6 +1523,12 @@ void mac_state::update_volume(void)
 WRITE8_MEMBER(mac_state::mac_via_out_b_bbadb)
 {
 //  printf("%s VIA1 OUT B: %02x\n", machine().describe_context().c_str(), data);
+
+	if (AUDIO_IS_CLASSIC)
+	{
+		m_snd_enable = (data & 0x80) == 0;
+		update_volume();
+	}
 
 	// SE and Classic have SCSI enable/disable here
 	if ((m_model == MODEL_MAC_SE) || (m_model == MODEL_MAC_CLASSIC))

@@ -10,7 +10,9 @@
 #include "includes/abc80x.h"
 #include "screen.h"
 
-#define LOG 0
+//#define VERBOSE 1
+#include "logmacro.h"
+
 
 #define HORIZONTAL_PORCH_HACK   109
 #define VERTICAL_PORCH_HACK     27
@@ -38,7 +40,7 @@ WRITE8_MEMBER( abc806_state::hrs_w )
 
 	*/
 
-	if (LOG) logerror("%s HRS %02x\n", machine().describe_context(), data);
+	LOG("%s HRS %02x\n", machine().describe_context(), data);
 
 	m_hrs = data;
 }
@@ -124,7 +126,7 @@ READ8_MEMBER( abc806_state::cli_r )
 	uint16_t hru2_addr = (m_hru2_a8 << 8) | (offset >> 8);
 	uint8_t data = m_hru2_prom->base()[hru2_addr] & 0x0f;
 
-	if (LOG) logerror("HRU II %03x : %01x\n", hru2_addr, data);
+	LOG("HRU II %03x : %01x\n", hru2_addr, data);
 
 	data |= m_rtc->dio_r() << 7;
 
@@ -169,7 +171,7 @@ WRITE8_MEMBER( abc806_state::sto_w )
 	{
 	case 0:
 		// external memory enable
-		if (LOG) logerror("%s EME %u\n", machine().describe_context(), level);
+		LOG("%s EME %u\n", machine().describe_context(), level);
 		m_eme = level;
 		break;
 	case 1:
@@ -460,7 +462,7 @@ uint32_t abc806_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 //  PALETTE_INIT( abc806 )
 //-------------------------------------------------
 
-PALETTE_INIT_MEMBER( abc806_state, abc806 )
+void abc806_state::abc806_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t::black());
 	palette.set_pen_color(1, rgb_t(0xff, 0x00, 0x00)); // red
@@ -474,21 +476,22 @@ PALETTE_INIT_MEMBER( abc806_state, abc806 )
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( abc806_video )
+//  machine_config( abc806_video )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(abc806_state::abc806_video)
-	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, ABC800_CCLK)
-	MCFG_MC6845_SHOW_BORDER_AREA(true)
-	MCFG_MC6845_CHAR_WIDTH(ABC800_CHAR_WIDTH)
-	MCFG_MC6845_UPDATE_ROW_CB(abc806_state, abc806_update_row)
-	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(*this, abc806_state, hs_w))
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, abc806_state, vs_w))
+void abc806_state::abc806_video(machine_config &config)
+{
+	MC6845(config, m_crtc, ABC800_CCLK);
+	m_crtc->set_screen(SCREEN_TAG);
+	m_crtc->set_show_border_area(true);
+	m_crtc->set_char_width(ABC800_CHAR_WIDTH);
+	m_crtc->set_update_row_callback(FUNC(abc806_state::abc806_update_row));
+	m_crtc->out_hsync_callback().set(FUNC(abc806_state::hs_w));
+	m_crtc->out_vsync_callback().set(FUNC(abc806_state::vs_w));
 
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_UPDATE_DRIVER(abc806_state, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000), 0x300, 0, 0x1e0, 0x13a, 0, 0xfa)
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen.set_screen_update(FUNC(abc806_state::screen_update));
+	screen.set_raw(XTAL(12'000'000), 0x300, 0, 0x1e0, 0x13a, 0, 0xfa);
 
-	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_INIT_OWNER(abc806_state, abc806)
-MACHINE_CONFIG_END
+	PALETTE(config, m_palette, FUNC(abc806_state::abc806_palette), 8);
+}

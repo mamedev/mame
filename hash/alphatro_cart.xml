@@ -14,13 +14,13 @@
 		</part>
 	</software>
 	<software name="microtxt">
-	<description>MicroText</description>
-	<year>1983</year>
-	<publisher>VictorSoft</publisher>
-	<part name="cart" interface="alphatro_cart">
-		<dataarea name="rom" size="16384">
-			<rom name="microtext.bin" size="8192" crc="7a7eba6b" sha1="e75465ee6b397f806674fa645264fb2633ba7470" offset="8192" />
-		</dataarea>
-	</part>
-</software>
+		<description>MicroText</description>
+		<year>1983</year>
+		<publisher>VictorSoft</publisher>
+		<part name="cart" interface="alphatro_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="microtext.bin" size="8192" crc="7a7eba6b" sha1="e75465ee6b397f806674fa645264fb2633ba7470" offset="8192" />
+			</dataarea>
+		</part>
+	</software>
 </softwarelist>

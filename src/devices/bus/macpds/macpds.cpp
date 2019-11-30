@@ -136,7 +136,7 @@ void macpds_device::set_irq_line(int line, int state)
 //-------------------------------------------------
 
 device_macpds_card_interface::device_macpds_card_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device),
+	: device_interface(device, "macpds"),
 		m_macpds(nullptr),
 		m_macpds_tag(nullptr), m_macpds_slottag(nullptr), m_next(nullptr)
 {
@@ -162,9 +162,7 @@ void device_macpds_card_interface::install_bank(offs_t start, offs_t end, const 
 	char bank[256];
 
 	// append an underscore and the slot name to the bank so it's guaranteed unique
-	strcpy(bank, tag);
-	strcat(bank, "_");
-	strcat(bank, m_macpds_slottag);
+	snprintf(bank, sizeof(bank), "%s_%s", tag, m_macpds_slottag);
 
 	m_macpds->install_bank(start, end, bank, data);
 }

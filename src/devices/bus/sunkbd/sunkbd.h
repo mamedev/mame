@@ -11,7 +11,7 @@
 class device_sun_keyboard_port_interface;
 
 
-class sun_keyboard_port_device : public device_t, public device_slot_interface
+class sun_keyboard_port_device : public device_t, public device_single_card_slot_interface<device_sun_keyboard_port_interface>
 {
 	friend class device_sun_keyboard_port_interface;
 
@@ -28,7 +28,7 @@ public:
 	sun_keyboard_port_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~sun_keyboard_port_device();
 
-	// static configuration helpers
+	// configuration helpers
 	auto rxd_handler() { return m_rxd_handler.bind(); }
 
 	DECLARE_WRITE_LINE_MEMBER( write_txd );
@@ -38,9 +38,9 @@ public:
 protected:
 	sun_keyboard_port_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, uint32_t clock);
 
+	virtual void device_config_complete() override;
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
-	virtual void device_config_complete() override;
 
 	int m_rxd;
 
@@ -51,19 +51,19 @@ private:
 };
 
 
-class device_sun_keyboard_port_interface : public device_slot_card_interface
+class device_sun_keyboard_port_interface : public device_interface
 {
 	friend class sun_keyboard_port_device;
 
 public:
 	virtual ~device_sun_keyboard_port_interface() override;
 
+protected:
+	device_sun_keyboard_port_interface(machine_config const &mconfig, device_t &device);
+
 	virtual DECLARE_WRITE_LINE_MEMBER( input_txd ) { }
 
 	DECLARE_WRITE_LINE_MEMBER( output_rxd ) { m_port->m_rxd = state; m_port->m_rxd_handler(state); }
-
-protected:
-	device_sun_keyboard_port_interface(machine_config const &mconfig, device_t &device);
 
 	sun_keyboard_port_device *m_port;
 

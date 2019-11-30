@@ -47,11 +47,8 @@ void gameplan_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	case TIMER_VIA_IRQ_DELAYED:
 		via_irq_delayed(ptr, param);
 		break;
-	case TIMER_VIA_0_CAL:
-		via_0_ca1_timer_callback(ptr, param);
-		break;
 	default:
-		assert_always(false, "Unknown id in gameplan_state::device_timer");
+		throw emu_fatalerror("Unknown id in gameplan_state::device_timer");
 	}
 }
 
@@ -247,64 +244,19 @@ WRITE_LINE_MEMBER(gameplan_state::via_irq)
 }
 
 
-TIMER_CALLBACK_MEMBER(gameplan_state::via_0_ca1_timer_callback)
-{
-	/* !VBLANK is connected to CA1 */
-	m_via_0->write_ca1(param);
-
-	if (param)
-		m_via_0_ca1_timer->adjust(m_screen->time_until_pos(VBSTART));
-	else
-		m_via_0_ca1_timer->adjust(m_screen->time_until_pos(VBEND), 1);
-}
-
-
 /*************************************
  *
  *  Start
  *
  *************************************/
 
-VIDEO_START_MEMBER(gameplan_state,common)
+void gameplan_state::video_start()
 {
 	m_videoram_size = (HBSTART - HBEND) * (VBSTART - VBEND);
 	m_videoram = std::make_unique<uint8_t[]>(m_videoram_size);
 
-	m_via_0_ca1_timer = timer_alloc(TIMER_VIA_0_CAL);
-
 	/* register for save states */
 	save_pointer(NAME(m_videoram), m_videoram_size);
-}
-
-
-VIDEO_START_MEMBER(gameplan_state,gameplan)
-{
-	VIDEO_START_CALL_MEMBER(common);
-}
-
-
-VIDEO_START_MEMBER(gameplan_state,leprechn)
-{
-	VIDEO_START_CALL_MEMBER(common);
-}
-
-
-VIDEO_START_MEMBER(gameplan_state,trvquest)
-{
-	VIDEO_START_CALL_MEMBER(common);
-}
-
-
-
-/*************************************
- *
- *  Reset
- *
- *************************************/
-
-VIDEO_RESET_MEMBER(gameplan_state,gameplan)
-{
-	m_via_0_ca1_timer->adjust(m_screen->time_until_pos(VBSTART));
 }
 
 
@@ -317,23 +269,20 @@ VIDEO_RESET_MEMBER(gameplan_state,gameplan)
 
 void gameplan_state::gameplan_video(machine_config &config)
 {
-	MCFG_VIDEO_START_OVERRIDE(gameplan_state,gameplan)
-	MCFG_VIDEO_RESET_OVERRIDE(gameplan_state,gameplan)
-
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(GAMEPLAN_PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	m_screen->set_screen_update(FUNC(gameplan_state::screen_update_gameplan));
+	m_screen->screen_vblank().set(m_via_0, FUNC(via6522_device::write_ca1)).invert(); // !VBLANK is connected to CA1
 }
 
 void gameplan_state::leprechn_video(machine_config &config)
 {
-	MCFG_VIDEO_START_OVERRIDE(gameplan_state,leprechn)
 	m_screen->set_screen_update(FUNC(gameplan_state::screen_update_leprechn));
 }
 
 void gameplan_state::trvquest_video(machine_config &config)
 {
 	gameplan_video(config);
-	MCFG_VIDEO_START_OVERRIDE(gameplan_state,trvquest)
 	m_screen->set_screen_update(FUNC(gameplan_state::screen_update_gameplan));
+	m_screen->screen_vblank().set(m_via_2, FUNC(via6522_device::write_ca1));
 }

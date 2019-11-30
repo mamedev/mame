@@ -539,10 +539,10 @@ bool hp1ll3_device::bitblt(uint16_t src_base_addr, unsigned src_width, unsigned 
 				 dst_rect.origin.x, dst_rect.origin.y, dst_rect.size.x, dst_rect.size.y,
 				 rop));
 	int src_x = src_p.x;
-	int dst_x = dst_rect.origin.x;
+	int dst_x = static_cast<int16_t>(dst_rect.origin.x);
 	int dst_width = dst_rect.size.x;
 	int src_y = src_p.y;
-	int dst_y = dst_rect.origin.y;
+	int dst_y = static_cast<int16_t>(dst_rect.origin.y);
 	int dst_height = dst_rect.size.y;
 	// Clip x-coordinates
 	clip_coord(src_width, src_x, clip_rect.origin.x, clip_rect.size.x, dst_x, dst_width);
@@ -823,22 +823,10 @@ uint32_t hp1ll3_device::screen_update(screen_device &screen, bitmap_ind16 &bitma
 		{
 			uint16_t const gfx = m_videoram[x];
 
-			*p++ = BIT(gfx, 15);
-			*p++ = BIT(gfx, 14);
-			*p++ = BIT(gfx, 13);
-			*p++ = BIT(gfx, 12);
-			*p++ = BIT(gfx, 11);
-			*p++ = BIT(gfx, 10);
-			*p++ = BIT(gfx, 9);
-			*p++ = BIT(gfx, 8);
-			*p++ = BIT(gfx, 7);
-			*p++ = BIT(gfx, 6);
-			*p++ = BIT(gfx, 5);
-			*p++ = BIT(gfx, 4);
-			*p++ = BIT(gfx, 3);
-			*p++ = BIT(gfx, 2);
-			*p++ = BIT(gfx, 1);
-			*p++ = BIT(gfx, 0);
+			for (int i = 15; i >= 0; i--)
+			{
+				*p++ = BIT(gfx, i);
+			}
 		}
 	}
 

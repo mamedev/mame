@@ -5,24 +5,30 @@
     Atari Tetris hardware
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_ATETRIS_H
+#define MAME_INCLUDES_ATETRIS_H
+
+#pragma once
 
 #include "includes/slapstic.h"
 #include "cpu/mcs48/mcs48.h"
 #include "machine/gen_latch.h"
 #include "sound/sn76496.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class atetris_state : public driver_device
 {
 public:
-	atetris_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	atetris_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_slapstic(*this, "slapstic"),
 		m_videoram(*this, "videoram")
-		{ }
+	{
+	}
 
 	void atetris_base(machine_config &config);
 	void atetris(machine_config &config);
@@ -64,8 +70,8 @@ protected:
 class atetris_mcu_state : public atetris_state
 {
 public:
-	atetris_mcu_state(const machine_config &mconfig, device_type type, const char *tag)
-		: atetris_state(mconfig, type, tag),
+	atetris_mcu_state(const machine_config &mconfig, device_type type, const char *tag) :
+		atetris_state(mconfig, type, tag),
 		m_mcu(*this, "mcu"),
 		m_soundlatch(*this, "soundlatch%u", 1U),
 		m_sn(*this, "sn%u", 1U)
@@ -85,3 +91,5 @@ private:
 	required_device_array<generic_latch_8_device, 2> m_soundlatch;
 	required_device_array<sn76496_base_device, 4> m_sn;
 };
+
+#endif // MAME_INCLUDES_ATETRIS_H

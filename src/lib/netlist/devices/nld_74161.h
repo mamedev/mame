@@ -25,21 +25,23 @@
 #ifndef NLD_74161_H_
 #define NLD_74161_H_
 
-#include "../nl_setup.h"
+#include "netlist/nl_setup.h"
 
-#define TTL_74161(name, cA, cB, cC, cD, cCLRQ, cLOADQ, cCLK, cENABLEP, cENABLET)    \
-		NET_REGISTER_DEV(TTL_74161, name)   \
-		NET_CONNECT(name, A,       cA)      \
-		NET_CONNECT(name, B,       cB)      \
-		NET_CONNECT(name, C,       cC)      \
-		NET_CONNECT(name, D,       cD)      \
-		NET_CONNECT(name, CLRQ,   cCLRQ)    \
-		NET_CONNECT(name, LOADQ,   cLOADQ)  \
-		NET_CONNECT(name, CLK,     cCLK)    \
-		NET_CONNECT(name, ENABLEP, cENABLEP) \
+#define TTL_74161(name, cA, cB, cC, cD, cCLRQ, cLOADQ, cCLK, cENABLEP, cENABLET) \
+		NET_REGISTER_DEV(TTL_74161, name)                                      \
+		NET_CONNECT(name, GND, GND)                                            \
+		NET_CONNECT(name, VCC, VCC)                                            \
+		NET_CONNECT(name, A,       cA)                                         \
+		NET_CONNECT(name, B,       cB)                                         \
+		NET_CONNECT(name, C,       cC)                                         \
+		NET_CONNECT(name, D,       cD)                                         \
+		NET_CONNECT(name, CLRQ,   cCLRQ)                                       \
+		NET_CONNECT(name, LOADQ,   cLOADQ)                                     \
+		NET_CONNECT(name, CLK,     cCLK)                                       \
+		NET_CONNECT(name, ENABLEP, cENABLEP)                                   \
 		NET_CONNECT(name, ENABLET, cENABLET)
 
-#define TTL_74161_DIP(name)                                                     \
+#define TTL_74161_DIP(name)                                                    \
 		NET_REGISTER_DEV(TTL_74161_DIP, name)
 
 #endif /* NLD_74161_H_ */

@@ -14,6 +14,7 @@
 #include "ieee488.h"
 #include "cpu/m6502/m6502.h"
 #include "formats/c8280_dsk.h"
+#include "imagedev/floppy.h"
 #include "machine/mos6530n.h"
 #include "machine/wd_fdc.h"
 

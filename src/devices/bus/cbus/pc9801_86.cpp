@@ -14,7 +14,6 @@
     - Test all pcm modes
     - Make volume work
     - Recording
-    - actual stereo sound routing (currently routes to ALL_OUTPUTS)
     - SpeakBoard: no idea about software that uses this, also board shows a single YM2608B?
       "-86 only supports ADPCM instead of PCM, while SpeakBoard has OPNA + 256 Kbit RAM"
       Sounds like a sound core flaw since OPNA requires a rom region in any case;
@@ -48,29 +47,35 @@ WRITE_LINE_MEMBER(pc9801_86_device::sound_irq)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(pc9801_86_device::pc9801_86_config)
+void pc9801_86_device::pc9801_86_config(machine_config &config)
+{
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("opna", YM2608, 7.987_MHz_XTAL)
-	MCFG_YM2608_IRQ_HANDLER(WRITELINE(*this, pc9801_86_device, sound_irq))
-	MCFG_AY8910_OUTPUT_TYPE(0)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, pc9801_86_device, opn_porta_r))
-	//MCFG_AY8910_PORT_B_READ_CB(READ8(*this, pc9801_state, opn_portb_r))
-	//MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, pc9801_state, opn_porta_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, pc9801_86_device, opn_portb_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
+	YM2608(config, m_opna, 7.987_MHz_XTAL);
+	m_opna->irq_handler().set(FUNC(pc9801_86_device::sound_irq));
+	m_opna->set_flags(AY8910_SINGLE_OUTPUT);
+	m_opna->port_a_read_callback().set(FUNC(pc9801_86_device::opn_porta_r));
+	//m_opna->port_b_read_callback().set(FUNC(pc8801_state::opn_portb_r));
+	//m_opna->port_a_write_callback().set(FUNC(pc8801_state::opn_porta_w));
+	m_opna->port_b_write_callback().set(FUNC(pc9801_86_device::opn_portb_w));
+	m_opna->add_route(0, "lspeaker", 1.00);
+	m_opna->add_route(0, "rspeaker", 1.00);
+	m_opna->add_route(1, "lspeaker", 1.00);
+	m_opna->add_route(2, "rspeaker", 1.00);
 
-	MCFG_DEVICE_ADD("ldac", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0) // burr brown pcm61p
-	MCFG_DEVICE_ADD("rdac", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0) // burr brown pcm61p
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 1.0); // burr brown pcm61p
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 1.0); // burr brown pcm61p
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
-MACHINE_CONFIG_START(pc9801_86_device::device_add_mconfig)
+void pc9801_86_device::device_add_mconfig(machine_config &config)
+{
 	pc9801_86_config(config);
-MACHINE_CONFIG_END
+}
 
 // to load a different bios for slots:
 // -cbusX pc9801_86,bios=N
@@ -155,10 +160,10 @@ void pc9801_86_device::device_validity_check(validity_checker &valid) const
 void pc9801_86_device::device_start()
 {
 	m_bus->program_space().install_rom(0xcc000,0xcffff,memregion(this->subtag("sound_bios").c_str())->base());
-	m_bus->install_io(0xa460, 0xa463, read8_delegate(FUNC(pc9801_86_device::id_r), this), write8_delegate(FUNC(pc9801_86_device::mask_w), this));
-	m_bus->install_io(0xa464, 0xa46f, read8_delegate(FUNC(pc9801_86_device::pcm_r), this), write8_delegate(FUNC(pc9801_86_device::pcm_w), this));
-	m_bus->install_io(0xa66c, 0xa66f, read8_delegate([this](address_space &s, offs_t o, u8 mm){ return o == 2 ? m_pcm_mute : 0xff; }, "pc9801_86_mute_r"),
-								   write8_delegate([this](address_space &s, offs_t o, u8 d, u8 mm){ if(o == 2) m_pcm_mute = d; }, "pc9801_86_mute_w"));
+	m_bus->install_io(0xa460, 0xa463, read8_delegate(*this, FUNC(pc9801_86_device::id_r)), write8_delegate(*this, FUNC(pc9801_86_device::mask_w)));
+	m_bus->install_io(0xa464, 0xa46f, read8_delegate(*this, FUNC(pc9801_86_device::pcm_r)), write8_delegate(*this, FUNC(pc9801_86_device::pcm_w)));
+	m_bus->install_io(0xa66c, 0xa66f, read8_delegate(*this, [this](address_space &s, offs_t o, u8 mm){ return o == 2 ? m_pcm_mute : 0xff; }, "pc9801_86_mute_r"),
+								   write8_delegate(*this, [this](address_space &s, offs_t o, u8 d, u8 mm){ if(o == 2) m_pcm_mute = d; }, "pc9801_86_mute_w"));
 
 	m_dac_timer = timer_alloc();
 	save_item(NAME(m_count));
@@ -175,7 +180,7 @@ void pc9801_86_device::device_reset()
 {
 	uint16_t port_base = (ioport("OPNA_DSW")->read() & 1) << 8;
 	m_bus->io_space().unmap_readwrite(0x0088, 0x008f, 0x100);
-	m_bus->install_io(port_base + 0x0088, port_base + 0x008f, read8_delegate(FUNC(pc9801_86_device::opna_r), this), write8_delegate(FUNC(pc9801_86_device::opna_w), this) );
+	m_bus->install_io(port_base + 0x0088, port_base + 0x008f, read8_delegate(*this, FUNC(pc9801_86_device::opna_r)), write8_delegate(*this, FUNC(pc9801_86_device::opna_w)));
 
 	m_mask = 0;
 	m_head = m_tail = m_count = 0;
@@ -196,7 +201,7 @@ void pc9801_86_device::device_reset()
 READ8_MEMBER(pc9801_86_device::opna_r)
 {
 	if((offset & 1) == 0)
-		return m_opna->read(space, offset >> 1);
+		return m_opna->read(offset >> 1);
 	else // odd
 	{
 		logerror("PC9801-86: Read to undefined port [%02x]\n",offset+0x188);
@@ -207,7 +212,7 @@ READ8_MEMBER(pc9801_86_device::opna_r)
 WRITE8_MEMBER(pc9801_86_device::opna_w)
 {
 	if((offset & 1) == 0)
-		m_opna->write(space, offset >> 1,data);
+		m_opna->write(offset >> 1,data);
 	else // odd
 		logerror("PC9801-86: Write to undefined port [%02x] %02x\n",offset+0x188,data);
 }
@@ -385,25 +390,29 @@ pc9801_speakboard_device::pc9801_speakboard_device(const machine_config &mconfig
 {
 }
 
-MACHINE_CONFIG_START(pc9801_speakboard_device::device_add_mconfig)
+void pc9801_speakboard_device::device_add_mconfig(machine_config &config)
+{
 	pc9801_86_config(config);
 
-	MCFG_DEVICE_MODIFY("opna")
-	MCFG_SOUND_ROUTES_RESET()
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	m_opna->reset_routes();
+	m_opna->add_route(0, "lspeaker", 0.50);
+	m_opna->add_route(0, "rspeaker", 0.50);
+	m_opna->add_route(1, "lspeaker", 0.50);
+	m_opna->add_route(2, "rspeaker", 0.50);
 
-	MCFG_DEVICE_ADD("opna_slave", YM2608, 7.987_MHz_XTAL)
-	MCFG_AY8910_OUTPUT_TYPE(0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
-MACHINE_CONFIG_END
+	YM2608(config, m_opna_slave, 7.987_MHz_XTAL);
+	m_opna_slave->set_flags(AY8910_SINGLE_OUTPUT);
+	m_opna_slave->add_route(0, "lspeaker", 0.50);
+	m_opna_slave->add_route(0, "rspeaker", 0.50);
+	m_opna_slave->add_route(1, "lspeaker", 0.50);
+	m_opna_slave->add_route(2, "rspeaker", 0.50);
+}
 
 void pc9801_speakboard_device::device_start()
 {
 	pc9801_86_device::device_start();
 
-	m_bus->install_io(0x0588, 0x058f, read8_delegate(FUNC(pc9801_speakboard_device::opna_slave_r), this), write8_delegate(FUNC(pc9801_speakboard_device::opna_slave_w), this) );
+	m_bus->install_io(0x0588, 0x058f, read8_delegate(*this, FUNC(pc9801_speakboard_device::opna_slave_r)), write8_delegate(*this, FUNC(pc9801_speakboard_device::opna_slave_w)));
 }
 
 void pc9801_speakboard_device::device_reset()
@@ -414,7 +423,7 @@ void pc9801_speakboard_device::device_reset()
 READ8_MEMBER(pc9801_speakboard_device::opna_slave_r)
 {
 	if((offset & 1) == 0)
-		return m_opna_slave->read(space, offset >> 1);
+		return m_opna_slave->read(offset >> 1);
 	else // odd
 	{
 		logerror("PC9801-SPB: Read to undefined port [%02x]\n",offset+0x588);
@@ -425,7 +434,7 @@ READ8_MEMBER(pc9801_speakboard_device::opna_slave_r)
 WRITE8_MEMBER(pc9801_speakboard_device::opna_slave_w)
 {
 	if((offset & 1) == 0)
-		m_opna_slave->write(space, offset >> 1,data);
+		m_opna_slave->write(offset >> 1,data);
 	else // odd
 		logerror("PC9801-SPB: Write to undefined port [%02x] %02x\n",offset+0x588,data);
 }

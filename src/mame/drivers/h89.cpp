@@ -31,8 +31,8 @@ class h89_state : public driver_device
 {
 public:
 	h89_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
 	{
 	}
 
@@ -69,25 +69,25 @@ void h89_state::h89_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-//  AM_RANGE(0x78, 0x7b)    expansion 1    // Options - Cassette I/O (only uses 0x78 - 0x79) Requires MTR-88 ROM
+//  map(0x78, 0x7b)    expansion 1    // Options - Cassette I/O (only uses 0x78 - 0x79) Requires MTR-88 ROM
 										   //         - H37 5-1/4" Soft-sectored Controller MTR-90 ROM
 										   //         - H47 Dual 8" Drives - Requires MTR-89 or MTR-90 ROM
 										   //         - H67 8" Hard disk + 8" Floppy Drives - MTR-90 ROM
-//  AM_RANGE(0x7c, 0x7f)    expansion 2    // Options - 5-1/4" Hard-sectored Controller (works with ALL ROMs)
+//  map(0x7c, 0x7f)    expansion 2    // Options - 5-1/4" Hard-sectored Controller (works with ALL ROMs)
 										   //         - H47 Dual 8" Drives - Requires MTR-89 or MTR-90 ROM
 										   //         - H67 8" Hard disk + 8" Floppy Drives - MTR-90 ROM
 
-//  AM_RANGE(0xd0, 0xd7)    8250 UART DCE
-//  AM_RANGE(0xd8, 0xdf)    8250 UART DTE - MODEM
-//  AM_RANGE(0xe0, 0xe7)    8250 UART DCE - LP
+//  map(0xd0, 0xd7)    8250 UART DCE
+//  map(0xd8, 0xdf)    8250 UART DTE - MODEM
+//  map(0xe0, 0xe7)    8250 UART DCE - LP
 	map(0xe8, 0xef).rw("ins8250", FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w)); // 8250 UART console - this
 																								 // connects internally to a Terminal board
 																								 // that is also used in the H19. Ideally,
 																								 // the H19 code could be connected and ran
 																								 // as a separate thread.
-//  AM_RANGE(0xf0, 0xf1)        // ports defined on the H8 - on the H89, access to these addresses causes a NMI
+//  map(0xf0, 0xf1)        // ports defined on the H8 - on the H89, access to these addresses causes a NMI
 	map(0xf2, 0xf2).w(FUNC(h89_state::port_f2_w)).portr("SW501");
-//  AM_RANGE(0xf3, 0xf3)        // ports defined on the H8 - on the H89, access to these addresses causes a NMI
+//  map(0xf3, 0xf3)        // ports defined on the H8 - on the H89, access to these addresses causes a NMI
 }
 
 /* Input ports */
@@ -164,7 +164,7 @@ void h89_state::machine_reset()
 TIMER_DEVICE_CALLBACK_MEMBER(h89_state::h89_irq_timer)
 {
 	if (m_port_f2 & 0x02)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf); // Z80
 }
 
 WRITE8_MEMBER( h89_state::port_f2_w )
@@ -185,21 +185,22 @@ static DEVICE_INPUT_DEFAULTS_START( terminal )
 DEVICE_INPUT_DEFAULTS_END
 
 
-MACHINE_CONFIG_START(h89_state::h89)
+void h89_state::h89(machine_config & config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(12'288'000) / 6)
-	MCFG_DEVICE_PROGRAM_MAP(h89_mem)
-	MCFG_DEVICE_IO_MAP(h89_io)
+	Z80(config, m_maincpu, XTAL(12'288'000) / 6);
+	m_maincpu->set_addrmap(AS_PROGRAM, &h89_state::h89_mem);
+	m_maincpu->set_addrmap(AS_IO, &h89_state::h89_io);
 
-	MCFG_DEVICE_ADD( "ins8250", INS8250, XTAL(1'843'200) )
-	MCFG_INS8250_OUT_TX_CB(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
+	ins8250_device &uart(INS8250(config, "ins8250", XTAL(1'843'200)));
+	uart.out_tx_callback().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
 
-	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("ins8250", ins8250_uart_device, rx_w))
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", terminal)
+	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set("ins8250", FUNC(ins8250_uart_device::rx_w));
+	rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer", h89_state, h89_irq_timer, attotime::from_hz(100))
-MACHINE_CONFIG_END
+	TIMER(config, "irq_timer", 0).configure_periodic(FUNC(h89_state::h89_irq_timer), attotime::from_hz(100));
+}
 
 /* ROM definition */
 ROM_START( h89 )

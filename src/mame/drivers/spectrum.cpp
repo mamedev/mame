@@ -279,7 +279,6 @@ SamRam
 #include "includes/spectrum.h"
 
 #include "cpu/z80/z80.h"
-#include "sound/wave.h"
 #include "machine/spec_snqk.h"
 
 #include "screen.h"
@@ -292,19 +291,44 @@ SamRam
 /****************************************************************************************************/
 /* Spectrum 48k functions */
 
+READ8_MEMBER(spectrum_state::pre_opcode_fetch_r)
+{
+	/* this allows expansion devices to act upon opcode fetches from MEM addresses
+	   for example, interface1 detection fetches requires fetches at 0008 / 0708 to
+	   enable paged ROM and then fetches at 0700 to disable it
+	*/
+	m_exp->pre_opcode_fetch(offset);
+	uint8_t retval = m_specmem->space(AS_PROGRAM).read_byte(offset);
+	m_exp->post_opcode_fetch(offset);
+	return retval;
+}
+
+READ8_MEMBER(spectrum_state::spectrum_data_r)
+{
+	m_exp->pre_data_fetch(offset);
+	uint8_t retval = m_specmem->space(AS_PROGRAM).read_byte(offset);
+	m_exp->post_data_fetch(offset);
+	return retval;
+}
+
+WRITE8_MEMBER(spectrum_state::spectrum_data_w)
+{
+	m_specmem->space(AS_PROGRAM).write_byte(offset,data);
+}
+
 WRITE8_MEMBER(spectrum_state::spectrum_rom_w)
 {
 	if (m_exp->romcs())
-		m_exp->mreq_w(space, offset, data);
+		m_exp->mreq_w(offset, data);
 }
 
 READ8_MEMBER(spectrum_state::spectrum_rom_r)
 {
 	uint8_t data;
 
-	data = m_exp->mreq_r(space, offset);
-
-	if (!m_exp->romcs())
+	if (m_exp->romcs())
+		data = m_exp->mreq_r(offset);
+	else
 		data = memregion("maincpu")->base()[offset];
 
 	return data;
@@ -360,6 +384,10 @@ READ8_MEMBER(spectrum_state::spectrum_port_fe_r)
 	int joy1 = m_io_joy1.read_safe(0x1f) & 0x1f;
 	int joy2 = m_io_joy2.read_safe(0x1f) & 0x1f;
 
+	/* expansion port */
+	if (m_exp)
+		data = m_exp->iorq_r(offset);
+
 	/* Caps - V */
 	if ((lines & 1) == 0)
 	{
@@ -410,19 +438,41 @@ READ8_MEMBER(spectrum_state::spectrum_port_fe_r)
 		data &= ~0x40;
 	}
 
-	/* expansion port */
-	if (m_exp)
-		data &= m_exp->port_fe_r(space, offset);
-
 	/* Issue 2 Spectrums default to having bits 5, 6 & 7 set.
 	Issue 3 Spectrums default to having bits 5 & 7 set and bit 6 reset. */
-	if (m_io_config->read() & 0x80)
+	if ((m_io_config->read() & 0x80) == 0)
 		data ^= (0x40);
 
 	return data;
 }
 
 READ8_MEMBER(spectrum_state::spectrum_port_ula_r)
+{
+	// known ports used for reading floating bus are:
+	//   0x28ff   Arkanoid, Cobra, Renegade, Short Circuit, Terra Cresta
+	//   0x40ff   Sidewize
+
+	// note, these games clash with Beta disk (status reg is R:xxff)
+
+	offset |= 1;
+	//logerror("fb: %04x\n", offset);
+
+	// Arkanoid, Cobra, Renegade, Short Circuit, Terra Cresta
+	if (offset == 0x28ff)
+		return floating_bus_r();
+
+	// Sidewize
+	if (offset == 0x40ff)
+		return floating_bus_r();
+
+	// Pass through to expansion device if present
+	if (m_exp->get_card_device())
+		return m_exp->iorq_r(offset);
+
+	return floating_bus_r();
+}
+
+READ8_MEMBER(spectrum_state::spectrum_clone_port_ula_r)
 {
 	int vpos = m_screen->vpos();
 
@@ -431,21 +481,77 @@ READ8_MEMBER(spectrum_state::spectrum_port_ula_r)
 
 /* Memory Maps */
 
-void spectrum_state::spectrum_mem(address_map &map)
+void spectrum_state::spectrum_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rw(FUNC(spectrum_state::spectrum_rom_r), FUNC(spectrum_state::spectrum_rom_w));
 	map(0x4000, 0x5aff).ram().share("video_ram");
-//  AM_RANGE(0x5b00, 0x7fff) AM_RAM
-//  AM_RANGE(0x8000, 0xffff) AM_RAM
+	// installed later depending on ramsize
+	//map(0x5b00, 0x7fff).ram();
+	//map(0x8000, 0xffff).ram();
+}
+
+void spectrum_state::spectrum_opcodes(address_map &map)
+{
+	map(0x0000, 0xffff).rw(FUNC(spectrum_state::spectrum_data_r), FUNC(spectrum_state::spectrum_data_w));
+}
+
+void spectrum_state::spectrum_data(address_map &map)
+{
+	map(0x0000, 0xffff).r(FUNC(spectrum_state::pre_opcode_fetch_r));
 }
 
 /* ports are not decoded full.
 The function decodes the ports appropriately */
 void spectrum_state::spectrum_io(address_map &map)
 {
+	map(0x0000, 0xffff).w(m_exp, FUNC(spectrum_expansion_slot_device::iorq_w));
 	map(0x00, 0x00).rw(FUNC(spectrum_state::spectrum_port_fe_r), FUNC(spectrum_state::spectrum_port_fe_w)).select(0xfffe);
-	map(0x01, 0x01).r(FUNC(spectrum_state::spectrum_port_ula_r)).mirror(0xfffe);
+	map(0x01, 0x01).r(FUNC(spectrum_state::spectrum_port_ula_r)).select(0xfffe);
 }
+
+void spectrum_state::spectrum_clone_io(address_map &map)
+{
+	map(0x0000, 0xffff).rw(m_exp, FUNC(spectrum_expansion_slot_device::iorq_r), FUNC(spectrum_expansion_slot_device::iorq_w));
+	map(0x00, 0x00).rw(FUNC(spectrum_state::spectrum_port_fe_r), FUNC(spectrum_state::spectrum_port_fe_w)).select(0xfffe);
+	map(0x01, 0x01).r(FUNC(spectrum_state::spectrum_clone_port_ula_r)); // .mirror(0xfffe);
+}
+
+uint8_t spectrum_state::floating_bus_r()
+{
+	/*
+	*  "floating bus"
+	*  (cpu can peek at the video bus via odd i/o read, some games use it for timing instead of vblank)
+	*
+	*  It seems this trick was found quite late in the life of the original Sinclair models,
+	*  then found not to work properly on the later Amstrad models, so was mostly abandoned by devs.
+	*  This means most games that use it were released in a relatively small window of mid-late 1986.
+	*
+	*  known games:
+	*    Arkanoid
+	*    Cobra
+	*    Sidewize
+	*    Short Circuit
+	*    Renegade
+	*    Terra Cresta
+	*
+	*    ...others?
+	*
+	*  Note, some were later re-released as "fixed" +2A compatible versions with the floating bus code removed (Arkanoid, Cobra, others?).
+	*/
+
+	uint8_t data = 0xff;
+	int hpos = m_screen->hpos();
+	int vpos = m_screen->vpos();
+
+	// peek into attribute ram when beam is in display area
+	// ula always returns ff when in border area (or h/vblank)
+
+	if ((hpos >= 48 && hpos < 304) && (vpos >= 48 && vpos < 240))
+		data = m_video_ram[0x1800 + (((vpos-48)/8)*32) + ((hpos-48)/8)];
+
+	return data;
+}
+
 
 /* Input ports */
 
@@ -608,14 +714,12 @@ INPUT_PORTS_END
 
 void spectrum_state::init_spectrum()
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-
 	switch (m_ram->size())
 	{
 		case 48*1024:
-		space.install_ram(0x8000, 0xffff, nullptr); // Fall through
+			m_specmem->space(AS_PROGRAM).install_ram(0x8000, 0xffff, nullptr); // Fall through
 		case 16*1024:
-		space.install_ram(0x5b00, 0x7fff, nullptr);
+			m_specmem->space(AS_PROGRAM).install_ram(0x5b00, 0x7fff, nullptr);
 	}
 }
 
@@ -655,7 +759,7 @@ void spectrum_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		spectrum_UpdateScreenBitmap();
 		break;
 	default:
-		assert_always(false, "Unknown id in spectrum_state::device_timer");
+		throw emu_fatalerror("Unknown id in spectrum_state::device_timer");
 	}
 }
 
@@ -665,50 +769,54 @@ INTERRUPT_GEN_MEMBER(spectrum_state::spec_interrupt)
 	m_irq_off_timer->adjust(m_maincpu->clocks_to_attotime(32));
 }
 
-MACHINE_CONFIG_START(spectrum_state::spectrum_common)
-
+void spectrum_state::spectrum_common(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, X1 / 4)        /* This is verified only for the ZX Spectrum. Other clones are reported to have different clocks */
-	MCFG_DEVICE_PROGRAM_MAP(spectrum_mem)
-	MCFG_DEVICE_IO_MAP(spectrum_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", spectrum_state, spec_interrupt)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	Z80(config, m_maincpu, X1 / 4);        /* This is verified only for the ZX Spectrum. Other clones are reported to have different clocks */
+	m_maincpu->set_addrmap(AS_PROGRAM, &spectrum_state::spectrum_opcodes);
+	m_maincpu->set_addrmap(AS_OPCODES, &spectrum_state::spectrum_data);
+	m_maincpu->set_addrmap(AS_IO, &spectrum_state::spectrum_io);
+	m_maincpu->set_vblank_int("screen", FUNC(spectrum_state::spec_interrupt));
+
+	ADDRESS_MAP_BANK(config, m_specmem).set_map(&spectrum_state::spectrum_map).set_options(ENDIANNESS_LITTLE, 8, 16, 0x10000);
+
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	MCFG_MACHINE_RESET_OVERRIDE(spectrum_state, spectrum )
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(X1 / 2, 448, 0, 352, 312, 0, 296);
+	m_screen->set_screen_update(FUNC(spectrum_state::screen_update_spectrum));
+	m_screen->screen_vblank().set(FUNC(spectrum_state::screen_vblank_spectrum));
+	m_screen->set_palette("palette");
 
-	MCFG_SCREEN_RAW_PARAMS(X1 / 2, 448, 0, 352,  312, 0, 296)
+	PALETTE(config, "palette", FUNC(spectrum_state::spectrum_palette), 16);
+	GFXDECODE(config, "gfxdecode", "palette", gfx_spectrum);
 
-	MCFG_SCREEN_UPDATE_DRIVER(spectrum_state, screen_update_spectrum)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, spectrum_state, screen_vblank_spectrum))
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_INIT_OWNER(spectrum_state, spectrum )
-
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_spectrum)
-	MCFG_VIDEO_START_OVERRIDE(spectrum_state, spectrum )
+	MCFG_VIDEO_START_OVERRIDE(spectrum_state, spectrum)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* expansion port */
-	MCFG_SPECTRUM_EXPANSION_SLOT_ADD("exp", spectrum_expansion_devices, "kempjoy")
+	SPECTRUM_EXPANSION_SLOT(config, m_exp, spectrum_expansion_devices, "kempjoy");
+	m_exp->irq_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_exp->nmi_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	/* devices */
-	MCFG_SNAPSHOT_ADD("snapshot", spectrum_state, spectrum, "ach,frz,plusd,prg,sem,sit,sna,snp,snx,sp,z80,zx", 0)
-	MCFG_QUICKLOAD_ADD("quickload", spectrum_state, spectrum, "raw,scr", 2) // The delay prevents the screen from being cleared by the RAM test at boot
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(tzx_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
-	MCFG_CASSETTE_INTERFACE("spectrum_cass")
+	SNAPSHOT(config, "snapshot", "ach,frz,plusd,prg,sem,sit,sna,snp,snx,sp,z80,zx").set_load_callback(FUNC(spectrum_state::snapshot_cb));
+	QUICKLOAD(config, "quickload", "raw,scr", attotime::from_seconds(2)).set_load_callback(FUNC(spectrum_state::quickload_cb)); // The delay prevents the screen from being cleared by the RAM test at boot
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "spectrum_cass")
-MACHINE_CONFIG_END
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(tzx_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cassette->set_interface("spectrum_cass");
+
+	SOFTWARE_LIST(config, "cass_list").set_original("spectrum_cass");
+}
 
 void spectrum_state::spectrum(machine_config &config)
 {
@@ -720,6 +828,12 @@ void spectrum_state::spectrum(machine_config &config)
 	// It's likely, but still to be checked, that many clones were produced only
 	// in the 48k configuration, while others have extra memory (80k, 128K, 1024K)
 	// available via bankswitching.
+}
+
+void spectrum_state::spectrum_clone(machine_config &config)
+{
+	spectrum(config);
+	m_maincpu->set_addrmap(AS_IO, &spectrum_state::spectrum_clone_io);
 }
 
 /***************************************************************************
@@ -959,38 +1073,41 @@ ROM_START(zvezda)
 	ROM_LOAD( "2764-far-cpu_blue.bin", 0x2000, 0x2000, CRC(ebab64bc) SHA1(8c98a8b6e927b02cf602c20a1b50838e60f7785b))
 ROM_END
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT      CLASS           INIT           COMPANY                  FULLNAME                 FLAGS
-COMP( 1982, spectrum, 0,        0,      spectrum, spectrum,  spectrum_state, init_spectrum, "Sinclair Research Ltd", "ZX Spectrum" ,          0 )
-COMP( 1987, spec80k,  spectrum, 0,      spectrum, spectrum,  spectrum_state, init_spectrum, "<unknown>",             "ZX Spectrum 80K",       MACHINE_UNOFFICIAL )
-COMP( 1995, specide,  spectrum, 0,      spectrum, spectrum,  spectrum_state, init_spectrum, "<unknown>",             "ZX Spectrum IDE",       MACHINE_UNOFFICIAL )
-COMP( 1986, inves,    spectrum, 0,      spectrum, spec_plus, spectrum_state, init_spectrum, "Investronica",          "Inves Spectrum 48K+",   0 )
-COMP( 1985, tk90x,    spectrum, 0,      spectrum, spectrum,  spectrum_state, init_spectrum, "Micro Digital",         "TK 90X Color Computer", 0 )
-COMP( 1986, tk95,     spectrum, 0,      spectrum, spec_plus, spectrum_state, init_spectrum, "Micro Digital",         "TK 95 Color Computer",  0 )
-COMP( 1985, hc85,     spectrum, 0,      spectrum, spectrum,  spectrum_state, init_spectrum, "ICE-Felix",             "HC-85",                 0 )
-COMP( 1988, hc88,     spectrum, 0,      spectrum, spectrum,  spectrum_state, init_spectrum, "ICE-Felix",             "HC-88",                 MACHINE_NOT_WORKING )
-COMP( 1990, hc90,     spectrum, 0,      spectrum, spectrum,  spectrum_state, init_spectrum, "ICE-Felix",             "HC-90",                 0 )
-COMP( 1991, hc91,     spectrum, 0,      spectrum, spec_plus, spectrum_state, init_spectrum, "ICE-Felix",             "HC-91",                 0 )
-COMP( 1988, cobrasp,  spectrum, 0,      spectrum, spectrum,  spectrum_state, init_spectrum, "ITCI",                  "Cobra (ITCI)",          MACHINE_NOT_WORKING )
-COMP( 1988, cobra80,  spectrum, 0,      spectrum, spectrum,  spectrum_state, init_spectrum, "ITCI",                  "Cobra 80K (ITCI)",      MACHINE_NOT_WORKING )
-COMP( 1987, cip01,    spectrum, 0,      spectrum, spectrum,  spectrum_state, init_spectrum, "Electronica",           "CIP-01",                0 )  // keyboard should be spectrum, but image was not clear
-COMP( 1988, cip03,    spectrum, 0,      spectrum, spectrum,  spectrum_state, init_spectrum, "Electronica",           "CIP-03",                0 )  // keyboard should be spectrum, but image was not clear
-COMP( 1990, jet,      spectrum, 0,      spectrum, spectrum,  spectrum_state, init_spectrum, "Electromagnetica",      "JET",                   0 )  // keyboard should be spectrum, but image was not clear
-COMP( 1987, dgama87,  spectrum, 0,      spectrum, spectrum,  spectrum_state, init_spectrum, "Didaktik Skalica",      "Didaktik Gama 87",      0 )
-COMP( 1988, dgama88,  spectrum, 0,      spectrum, spectrum,  spectrum_state, init_spectrum, "Didaktik Skalica",      "Didaktik Gama 88",      0 )
-COMP( 1989, dgama89,  spectrum, 0,      spectrum, spectrum,  spectrum_state, init_spectrum, "Didaktik Skalica",      "Didaktik Gama 89",      0 )
-COMP( 1990, didakt90, spectrum, 0,      spectrum, spectrum,  spectrum_state, init_spectrum, "Didaktik Skalica",      "Didaktik 90",           0 )
-COMP( 1991, didakm91, spectrum, 0,      spectrum, spec_plus, spectrum_state, init_spectrum, "Didaktik Skalica",      "Didaktik M 91",         0 )
-COMP( 1992, didakm92, spectrum, 0,      spectrum, spec_plus, spectrum_state, init_spectrum, "Didaktik Skalica",      "Didaktik M 92",         0 )
-COMP( 1992, didaktk,  spectrum, 0,      spectrum, spec_plus, spectrum_state, init_spectrum, "Didaktik Skalica",      "Didaktik Kompakt",      0 )
-COMP( 1993, didakm93, spectrum, 0,      spectrum, spec_plus, spectrum_state, init_spectrum, "Didaktik Skalica",      "Didaktik M 93",         0 )
-COMP( 1988, mistrum,  spectrum, 0,      spectrum, spectrum,  spectrum_state, init_spectrum, "Amaterske RADIO",       "Mistrum",               0 )  // keyboard could be spectrum in some models (since it was a build-yourself design)
-COMP( 198?, bk08,     spectrum, 0,      spectrum, spectrum,  spectrum_state, init_spectrum, "Orel",                  "BK-08",                 0 )
-COMP( 1990, blitzs,   spectrum, 0,      spectrum, spectrum,  spectrum_state, init_spectrum, "<unknown>",             "Blic",                  0 )  // no keyboard images found
-COMP( 1990, byte,     spectrum, 0,      spectrum, spectrum,  spectrum_state, init_spectrum, "<unknown>",             "Byte",                  0 )  // no keyboard images found
-COMP( 199?, orizon,   spectrum, 0,      spectrum, spectrum,  spectrum_state, init_spectrum, "<unknown>",             "Orizon-Micro",          0 )  // no keyboard images found
-COMP( 1993, quorum48, spectrum, 0,      spectrum, spectrum,  spectrum_state, init_spectrum, "<unknown>",             "Kvorum 48K",            MACHINE_NOT_WORKING )
-COMP( 1993, magic6,   spectrum, 0,      spectrum, spectrum,  spectrum_state, init_spectrum, "<unknown>",             "Magic 6",               MACHINE_NOT_WORKING )   // keyboard should be spectrum, but image was not clear
-COMP( 1990, compani1, spectrum, 0,      spectrum, spectrum,  spectrum_state, init_spectrum, "<unknown>",             "Kompanion 1",           0 )  // no keyboard images found
-COMP( 1990, spektrbk, spectrum, 0,      spectrum, spectrum,  spectrum_state, init_spectrum, "<unknown>",             "Spektr BK-001",         0 )
-COMP( 1989, sintez2,  spectrum, 0,      spectrum, spectrum,  spectrum_state, init_spectrum, "Signal",                "Sintez 2",              0 )
-COMP( 1990, zvezda,   spectrum, 0,      spectrum, spectrum,  spectrum_state, init_spectrum, "<unknown>",             "Zvezda",                0 )
+
+/*  Any clone known to have the same "floating bus" behaviour as official Sinclair models should be changed to use the "spectrum" machine  */
+
+//    YEAR  NAME      PARENT    COMPAT  MACHINE          INPUT      CLASS           INIT           COMPANY                  FULLNAME                 FLAGS
+COMP( 1982, spectrum, 0,        0,      spectrum,       spectrum,  spectrum_state, init_spectrum, "Sinclair Research Ltd", "ZX Spectrum" ,          0 )
+COMP( 1987, spec80k,  spectrum, 0,      spectrum_clone, spectrum,  spectrum_state, init_spectrum, "<unknown>",             "ZX Spectrum 80K",       MACHINE_UNOFFICIAL )
+COMP( 1995, specide,  spectrum, 0,      spectrum_clone, spectrum,  spectrum_state, init_spectrum, "<unknown>",             "ZX Spectrum IDE",       MACHINE_UNOFFICIAL )
+COMP( 1986, inves,    spectrum, 0,      spectrum_clone, spec_plus, spectrum_state, init_spectrum, "Investronica",          "Inves Spectrum 48K+",   0 )
+COMP( 1985, tk90x,    spectrum, 0,      spectrum_clone, spectrum,  spectrum_state, init_spectrum, "Micro Digital",         "TK 90X Color Computer", 0 )
+COMP( 1986, tk95,     spectrum, 0,      spectrum_clone, spec_plus, spectrum_state, init_spectrum, "Micro Digital",         "TK 95 Color Computer",  0 )
+COMP( 1985, hc85,     spectrum, 0,      spectrum_clone, spectrum,  spectrum_state, init_spectrum, "ICE-Felix",             "HC-85",                 0 )
+COMP( 1988, hc88,     spectrum, 0,      spectrum_clone, spectrum,  spectrum_state, init_spectrum, "ICE-Felix",             "HC-88",                 MACHINE_NOT_WORKING )
+COMP( 1990, hc90,     spectrum, 0,      spectrum_clone, spectrum,  spectrum_state, init_spectrum, "ICE-Felix",             "HC-90",                 0 )
+COMP( 1991, hc91,     spectrum, 0,      spectrum_clone, spec_plus, spectrum_state, init_spectrum, "ICE-Felix",             "HC-91",                 0 )
+COMP( 1988, cobrasp,  spectrum, 0,      spectrum_clone, spectrum,  spectrum_state, init_spectrum, "ITCI",                  "Cobra (ITCI)",          MACHINE_NOT_WORKING )
+COMP( 1988, cobra80,  spectrum, 0,      spectrum_clone, spectrum,  spectrum_state, init_spectrum, "ITCI",                  "Cobra 80K (ITCI)",      MACHINE_NOT_WORKING )
+COMP( 1987, cip01,    spectrum, 0,      spectrum_clone, spectrum,  spectrum_state, init_spectrum, "Electronica",           "CIP-01",                0 )  // keyboard should be spectrum, but image was not clear
+COMP( 1988, cip03,    spectrum, 0,      spectrum_clone, spectrum,  spectrum_state, init_spectrum, "Electronica",           "CIP-03",                0 )  // keyboard should be spectrum, but image was not clear
+COMP( 1990, jet,      spectrum, 0,      spectrum_clone, spectrum,  spectrum_state, init_spectrum, "Electromagnetica",      "JET",                   0 )  // keyboard should be spectrum, but image was not clear
+COMP( 1987, dgama87,  spectrum, 0,      spectrum_clone, spectrum,  spectrum_state, init_spectrum, "Didaktik Skalica",      "Didaktik Gama 87",      0 )
+COMP( 1988, dgama88,  spectrum, 0,      spectrum_clone, spectrum,  spectrum_state, init_spectrum, "Didaktik Skalica",      "Didaktik Gama 88",      0 )
+COMP( 1989, dgama89,  spectrum, 0,      spectrum_clone, spectrum,  spectrum_state, init_spectrum, "Didaktik Skalica",      "Didaktik Gama 89",      0 )
+COMP( 1990, didakt90, spectrum, 0,      spectrum_clone, spectrum,  spectrum_state, init_spectrum, "Didaktik Skalica",      "Didaktik 90",           0 )
+COMP( 1991, didakm91, spectrum, 0,      spectrum_clone, spec_plus, spectrum_state, init_spectrum, "Didaktik Skalica",      "Didaktik M 91",         0 )
+COMP( 1992, didakm92, spectrum, 0,      spectrum_clone, spec_plus, spectrum_state, init_spectrum, "Didaktik Skalica",      "Didaktik M 92",         0 )
+COMP( 1992, didaktk,  spectrum, 0,      spectrum_clone, spec_plus, spectrum_state, init_spectrum, "Didaktik Skalica",      "Didaktik Kompakt",      0 )
+COMP( 1993, didakm93, spectrum, 0,      spectrum_clone, spec_plus, spectrum_state, init_spectrum, "Didaktik Skalica",      "Didaktik M 93",         0 )
+COMP( 1988, mistrum,  spectrum, 0,      spectrum_clone, spectrum,  spectrum_state, init_spectrum, "Amaterske RADIO",       "Mistrum",               0 )  // keyboard could be spectrum in some models (since it was a build-yourself design)
+COMP( 198?, bk08,     spectrum, 0,      spectrum_clone, spectrum,  spectrum_state, init_spectrum, "Orel",                  "BK-08",                 0 )
+COMP( 1990, blitzs,   spectrum, 0,      spectrum_clone, spectrum,  spectrum_state, init_spectrum, "<unknown>",             "Blic",                  0 )  // no keyboard images found
+COMP( 1990, byte,     spectrum, 0,      spectrum_clone, spectrum,  spectrum_state, init_spectrum, "<unknown>",             "Byte",                  0 )  // no keyboard images found
+COMP( 199?, orizon,   spectrum, 0,      spectrum_clone, spectrum,  spectrum_state, init_spectrum, "<unknown>",             "Orizon-Micro",          0 )  // no keyboard images found
+COMP( 1993, quorum48, spectrum, 0,      spectrum_clone, spectrum,  spectrum_state, init_spectrum, "<unknown>",             "Kvorum 48K",            MACHINE_NOT_WORKING )
+COMP( 1993, magic6,   spectrum, 0,      spectrum_clone, spectrum,  spectrum_state, init_spectrum, "<unknown>",             "Magic 6",               MACHINE_NOT_WORKING )   // keyboard should be spectrum, but image was not clear
+COMP( 1990, compani1, spectrum, 0,      spectrum_clone, spectrum,  spectrum_state, init_spectrum, "<unknown>",             "Kompanion 1",           0 )  // no keyboard images found
+COMP( 1990, spektrbk, spectrum, 0,      spectrum_clone, spectrum,  spectrum_state, init_spectrum, "<unknown>",             "Spektr BK-001",         0 )
+COMP( 1989, sintez2,  spectrum, 0,      spectrum_clone, spectrum,  spectrum_state, init_spectrum, "Signal",                "Sintez 2",              0 )
+COMP( 1990, zvezda,   spectrum, 0,      spectrum_clone, spectrum,  spectrum_state, init_spectrum, "<unknown>",             "Zvezda",                0 )

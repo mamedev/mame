@@ -521,7 +521,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 			<feature name="u1" value="NUS-NASE-0" />
 			<feature name="u2" value="[empty]" />
 			<feature name="u3" value="CIC-NUS-6102A" />
-			<feature name="cart_model" value=" NUS-006(USA)" />
+			<feature name="cart_model" value="NUS-006(USA)" />
 			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
 			<dataarea name="rom" size="16777216">
 				<rom name="nus-nase-0.u1" size="16777216" crc="3e8be0e0" sha1="353ad679666287988a0e645851ee01eff2048449" offset="000000" />
@@ -2185,6 +2185,14 @@ patched out (+ a fix for internal checksum)
 		</part>
 	</software>
 
+	<!-- Notes:
+	    This game is compatible with the Nintendo VRSユニット [NUS-020(JPN)], a voice recognition unit that connects
+	    to controller 2 port and has the following hardware inside:
+	        pcb: NUS-VRU-01
+	        u1: Nintendo VRD-NUS 215 9915J3001
+	        u2: NEC D9930G 9912LP009 (linear CODEC LSI)
+	        u3: Nintendo VCI-NUS 9910XX003 011
+	-->
 	<software name="dendeg64">
 		<description>Densha de Go! 64 (Jpn)</description>
 		<year>1999</year>
@@ -3877,6 +3885,14 @@ This cart features a RTC, currently unemulated
 		</part>
 	</software>
 
+	<!-- Notes:
+	    This game requires the Nintendo VRU [NUS-020(USA)], a voice recognition unit that connects
+	    to controller 2 port and has the following hardware inside (parts from the Japanese version [NUS-020(JPN)]):
+	        pcb: NUS-VRU-01
+	        u1: Nintendo VRD-NUS 215 9915J3001
+	        u2: NEC D9930G 9912LP009 (linear CODEC LSI)
+	        u3: Nintendo VCI-NUS 9910XX003 011
+	-->
 	<software name="heypika">
 		<description>Hey You, Pikachu! (USA)</description>
 		<year>2000</year>
@@ -7597,6 +7613,14 @@ patched out (+ a fix for internal checksum)
 		</part>
 	</software>
 
+	<!-- Notes:
+	    This game requires the Nintendo VRSユニット [NUS-020(JPN)], a voice recognition unit that connects
+	    to controller 2 port and has the following hardware inside:
+	        pcb: NUS-VRU-01
+	        u1: Nintendo VRD-NUS 215 9915J3001
+	        u2: NEC D9930G 9912LP009 (linear CODEC LSI)
+	        u3: Nintendo VCI-NUS 9910XX003 011
+	-->
 	<software name="pikachu" cloneof="heypika">
 		<description>Pikachuu Genki de Chuu (Jpn)</description>
 		<year>1998</year>

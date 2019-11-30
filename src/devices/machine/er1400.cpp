@@ -42,6 +42,7 @@ DEFINE_DEVICE_TYPE(ER1400, er1400_device, "er1400", "ER1400 Serial EAROM (100x14
 er1400_device::er1400_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, ER1400, tag, owner, clock)
 	, device_nvram_interface(mconfig, *this)
+	, m_default_data(*this, DEVICE_SELF, 100)
 	, m_clock_input(0)
 	, m_code_input(0)
 	, m_data_input(0)
@@ -85,8 +86,16 @@ void er1400_device::device_start()
 
 void er1400_device::nvram_default()
 {
-	// all locations erased
-	std::fill(&m_data_array[0], &m_data_array[100], 0x3fff);
+	if (m_default_data.found())
+	{
+		// obtain default data from memory region
+		std::copy_n(&m_default_data[0], 100, &m_data_array[0]);
+	}
+	else
+	{
+		// all locations erased
+		std::fill_n(&m_data_array[0], 100, 0);
+	}
 }
 
 
@@ -176,11 +185,11 @@ void er1400_device::write_data()
 				if (BIT(m_address_register, units))
 				{
 					offs_t offset = 10 * (tens - 10) + units;
-					if ((m_data_array[offset] & ~m_data_register) != 0)
+					if ((~m_data_array[offset] & m_data_register) != 0)
 					{
 						LOG("Writing data at %d (%04X changed to %04X)\n", offset,
 							m_data_array[offset], m_data_array[offset] & m_data_register);
-						m_data_array[offset] &= m_data_register;
+						m_data_array[offset] |= m_data_register;
 					}
 					selected++;
 				}
@@ -210,10 +219,10 @@ void er1400_device::erase_data()
 				if (BIT(m_address_register, units))
 				{
 					offs_t offset = 10 * (tens - 10) + units;
-					if (m_data_array[offset] != 0x3fff)
+					if (m_data_array[offset] != 0)
 					{
 						LOG("Erasing data at %d\n", offset);
-						m_data_array[offset] = 0x3fff;
+						m_data_array[offset] = 0;
 					}
 					selected++;
 				}
@@ -291,7 +300,13 @@ void er1400_device::device_timer(emu_timer &timer, device_timer_id id, int param
 	switch (id)
 	{
 	case PROPAGATION_TIMER:
-		m_data_output = (m_code_input == 5) ? BIT(m_data_register, 13) : false;
+		if (m_code_input == 5)
+		{
+			m_data_output = BIT(m_data_register, 13);
+			LOG("Data output %d bit\n", m_data_output);
+		}
+		else
+			m_data_output = false;
 		break;
 	}
 }
@@ -345,6 +360,7 @@ WRITE_LINE_MEMBER(er1400_device::clock_w)
 			break;
 
 		case 3: // accept address
+			LOG("Accepting address %d bit\n", m_data_input);
 			m_address_register = (m_address_register << 1) | m_data_input;
 			m_address_register &= 0xfffff;
 			break;
@@ -367,6 +383,7 @@ WRITE_LINE_MEMBER(er1400_device::clock_w)
 			break;
 
 		case 7: // accept data
+			LOG("Accepting data %d bit\n", m_data_input);
 			m_data_register = (m_data_register & 0x1fff) << 1;
 			m_data_register |= m_data_input;
 			break;

@@ -232,7 +232,7 @@ private:
 	virtual void machine_reset() override;
 
 	uint32_t screen_update_leapster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(leapster_cart);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	DECLARE_READ32_MEMBER(leapster_random_r)
 	{
@@ -266,7 +266,7 @@ uint32_t leapster_state::screen_update_leapster(screen_device &screen, bitmap_rg
 	return 0;
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( leapster_state, leapster_cart )
+DEVICE_IMAGE_LOAD_MEMBER( leapster_state::cart_load )
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
@@ -300,7 +300,7 @@ void leapster_state::leapster_map(address_map &map)
 	map(0x0180D800, 0x0180D803).r(FUNC(leapster_state::leapster_random_r));
 	map(0x03000000, 0x030007ff).ram(); // puts stack here, writes a pointer @ 0x03000000 on startup
 	map(0x3c000000, 0x3c1fffff).ram(); // really ram, or has our code execution gone wrong?
-//  AM_RANGE(0x80000000, 0x807fffff) AM_ROMBANK("cartrom") // game ROM pointers are all to the 80xxxxxx region, so I assume it maps here - installed if a cart is present
+//  map(0x80000000, 0x807fffff).bankr("cartrom"); // game ROM pointers are all to the 80xxxxxx region, so I assume it maps here - installed if a cart is present
 }
 
 void leapster_state::leapster_aux(address_map &map)
@@ -308,28 +308,27 @@ void leapster_state::leapster_aux(address_map &map)
 	map(0x00000004b, 0x00000004b).w(FUNC(leapster_state::leapster_aux004b_w)); // this address isn't used by ARC internal stuff afaik, so probably leapster specific
 }
 
-MACHINE_CONFIG_START(leapster_state::leapster)
+void leapster_state::leapster(machine_config &config)
+{
 	/* basic machine hardware */
 	// CPU is ArcTangent-A5 '5.1' (ARCompact core)
-	MCFG_DEVICE_ADD("maincpu", ARCA5, 96000000/10)
-	MCFG_DEVICE_PROGRAM_MAP(leapster_map)
-	MCFG_DEVICE_IO_MAP(leapster_aux)
+	ARCA5(config, m_maincpu, 96000000/10);
+	m_maincpu->set_addrmap(AS_PROGRAM, &leapster_state::leapster_map);
+	m_maincpu->set_addrmap(AS_IO, &leapster_state::leapster_aux);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(160, 160)
-	MCFG_SCREEN_VISIBLE_AREA(0, 160-1, 0, 160-1)
-	MCFG_SCREEN_UPDATE_DRIVER(leapster_state, screen_update_leapster)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(60);
+	screen.set_size(160, 160);
+	screen.set_visarea(0, 160-1, 0, 160-1);
+	screen.set_screen_update(FUNC(leapster_state::screen_update_leapster));
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "leapster_cart")
-	MCFG_GENERIC_EXTENSIONS("bin")
-	MCFG_GENERIC_LOAD(leapster_state, leapster_cart)
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "leapster_cart", "bin").set_device_load(FUNC(leapster_state::cart_load));
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "leapster")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cart_list").set_original("leapster");
+}
 
 #define ROM_LOAD_BIOS(bios,name,offset,length,hash) \
 		ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios))
@@ -342,12 +341,14 @@ MACHINE_CONFIG_END
 
 ROM_START(leapster)
 	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASE00)
-	ROM_SYSTEM_BIOS( 0,  "uni15",   "Universal 1.5" )    /* 152-10346 Leapster BaseROM Universal v1.5      - Sep 04 2003 10:46:47 */
+	ROM_SYSTEM_BIOS( 0, "uni15", "Universal 1.5" ) // 152-10346 Leapster BaseROM Universal v1.5 - Sep 04 2003 10:46:47
 	ROM_LOAD_BIOS( 0, "155-10072-a.bin"   , 0x00000, 0x200000, CRC(af05e5a0) SHA1(d4468d060543ba7e44785041093bc98bcd9afa07) )
-	ROM_SYSTEM_BIOS( 1,  "uk21",    "UK 2.1" )           /* 152-11452 Leapster BaseROM UK v2.1             - Aug 30 2005 16:01:46 */
+	ROM_SYSTEM_BIOS( 1, "uk21",  "UK 2.1" )        // 152-11452 Leapster BaseROM UK v2.1        - Aug 30 2005 16:01:46
 	ROM_LOAD_BIOS( 1, "leapster2_1004.bin", 0x00000, 0x800000, CRC(b466e14d) SHA1(910c234f03e76b7de55b8aa0a0c62fd1daae4910) )
-	ROM_SYSTEM_BIOS( 2,  "ger21",   "German 2.1" )       /* 152-11435 Leapster BaseROM German v2.1         - Oct 21 2005 18:53:59 */
+	ROM_SYSTEM_BIOS( 2, "ger21", "German 2.1" )    // 152-11435 Leapster BaseROM German v2.1    - Oct 21 2005 18:53:59
 	ROM_LOAD_BIOS( 2, "leapster2_1006.bin", 0x00000, 0x800000, CRC(a69ed8ca) SHA1(e6aacba0c39b1465f344c2b07ff1cbd8a395adac) )
+	ROM_SYSTEM_BIOS( 3, "sp10",  "Spanish 1.0" )   // 152-11546 Leapster Baserom SP v1.0        - Apr 03 2006 06:26:00
+	ROM_LOAD_BIOS( 3, "leapster2_1008.bin", 0x00000, 0x800000, CRC(b43345e7) SHA1(31c27e79568115bf36e5ef668f528e3005054152) )
 ROM_END
 
 ROM_START(leapstertv)

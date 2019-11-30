@@ -68,9 +68,6 @@ private:
 DECLARE_DEVICE_TYPE(RP5H01, rp5h01_device)
 
 
-#define MCFG_RP5H01_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, RP5H01, 0)
-
 /*
  * Device uses memory region
  * with the same tag as the one

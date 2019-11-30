@@ -28,6 +28,7 @@ ToDo: (both)
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/keyboard.h"
 #include "machine/6850acia.h"
 #include "bus/rs232/rs232.h"
@@ -115,21 +116,21 @@ void jupiter2_state::jupiter2_mem(address_map &map)
 	map(0x0000, 0x7fff).ram();
 	map(0xc000, 0xcfff).ram();  // Video RAM
 	map(0xf000, 0xff00).rom().region(MCM6571AP_TAG, 0);
-//  AM_RANGE(0xff58, 0xff5c) Cartridge Disk Controller PIA
-//  AM_RANGE(0xff60, 0xff76) DMA Controller
-//  AM_RANGE(0xff80, 0xff83) Floppy PIA
+//  map(0xff58, 0xff5c) Cartridge Disk Controller PIA
+//  map(0xff60, 0xff76) DMA Controller
+//  map(0xff80, 0xff83) Floppy PIA
 	map(0xff84, 0xff87).rw(INS1771N1_TAG, FUNC(wd_fdc_device_base::read), FUNC(wd_fdc_device_base::write));
-//  AM_RANGE(0xff90, 0xff93) Hytype Parallel Printer PIA
-//  AM_RANGE(0xffa0, 0xffa7) Persci Floppy Disk Controller
-//  AM_RANGE(0xffb0, 0xffb3) Video PIA
+//  map(0xff90, 0xff93) Hytype Parallel Printer PIA
+//  map(0xffa0, 0xffa7) Persci Floppy Disk Controller
+//  map(0xffb0, 0xffb3) Video PIA
 	map(0xffc0, 0xffc1).rw(m_acia0, FUNC(acia6850_device::read), FUNC(acia6850_device::write)); // Serial Port 0 ACIA
 	map(0xffc4, 0xffc5).rw(m_acia1, FUNC(acia6850_device::read), FUNC(acia6850_device::write)); // Serial Port 1 ACIA
-//  AM_RANGE(0xffc8, 0xffc9) Serial Port 2 ACIA
-//  AM_RANGE(0xffcc, 0xffcd) Serial Port 3 ACIA
-//  AM_RANGE(0xffd0, 0xffd1) Serial Port 4 ACIA / Cassette
-//  AM_RANGE(0xffd4, 0xffd5) Serial Port 5 ACIA / EPROM Programmer (2704/2708)
-//  AM_RANGE(0xffd8, 0xffd9) Serial Port 6 ACIA / Hardware Breakpoint Registers
-//  AM_RANGE(0xffdc, 0xffdd) Serial Port 7 ACIA
+//  map(0xffc8, 0xffc9) Serial Port 2 ACIA
+//  map(0xffcc, 0xffcd) Serial Port 3 ACIA
+//  map(0xffd0, 0xffd1) Serial Port 4 ACIA / Cassette
+//  map(0xffd4, 0xffd5) Serial Port 5 ACIA / EPROM Programmer (2704/2708)
+//  map(0xffd8, 0xffd9) Serial Port 6 ACIA / Hardware Breakpoint Registers
+//  map(0xffdc, 0xffdd) Serial Port 7 ACIA
 	map(0xfff8, 0xffff).rom().region(MCM6571AP_TAG, 0x0ff8); // vectors
 }
 
@@ -279,72 +280,74 @@ void jupiter3_state::machine_reset()
 //**************************************************************************
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( jupiter )
+//  machine_config( jupiter )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(jupiter2_state::jupiter2)
+void jupiter2_state::jupiter2(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD(MCM6571AP_TAG, M6800, 2000000)
-	MCFG_DEVICE_PROGRAM_MAP(jupiter2_mem)
+	M6800(config, m_maincpu, 2000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &jupiter2_state::jupiter2_mem);
 
 	// devices
-	MCFG_DEVICE_ADD(INS1771N1_TAG, FD1771, 1000000)
-	MCFG_FLOPPY_DRIVE_ADD(INS1771N1_TAG":0", jupiter_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(INS1771N1_TAG":1", jupiter_floppies, nullptr, floppy_image_device::default_floppy_formats)
+	FD1771(config, INS1771N1_TAG, 1000000);
+	FLOPPY_CONNECTOR(config, INS1771N1_TAG":0", jupiter_floppies, "525ssdd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, INS1771N1_TAG":1", jupiter_floppies, nullptr, floppy_image_device::default_floppy_formats);
 
 	ACIA6850(config, m_acia0, XTAL(2'000'000)); // unknown frequency
 	m_acia0->txd_handler().set("serial0", FUNC(rs232_port_device::write_txd));
 	m_acia0->rts_handler().set("serial0", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("serial0", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("acia0", acia6850_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("acia0", acia6850_device, write_cts))
+	rs232_port_device &serial0(RS232_PORT(config, "serial0", default_rs232_devices, "terminal"));
+	serial0.rxd_handler().set(m_acia0, FUNC(acia6850_device::write_rxd));
+	serial0.cts_handler().set(m_acia0, FUNC(acia6850_device::write_cts));
 
 	ACIA6850(config, m_acia1, XTAL(2'000'000)); // unknown frequency
 	m_acia1->txd_handler().set("serial1", FUNC(rs232_port_device::write_txd));
 	m_acia1->rts_handler().set("serial1", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("serial1", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("acia1", acia6850_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("acia1", acia6850_device, write_cts))
+	rs232_port_device &serial1(RS232_PORT(config, "serial1", default_rs232_devices, "terminal"));
+	serial1.rxd_handler().set(m_acia1, FUNC(acia6850_device::write_rxd));
+	serial1.cts_handler().set(m_acia1, FUNC(acia6850_device::write_cts));
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("64K");
-MACHINE_CONFIG_END
+}
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( jupiter3 )
+//  machine_config( jupiter3 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(jupiter3_state::jupiter3)
+void jupiter3_state::jupiter3(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, 4000000)
-	MCFG_DEVICE_PROGRAM_MAP(jupiter3_mem)
-	MCFG_DEVICE_IO_MAP(jupiter3_io)
+	Z80(config, m_maincpu, 4000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &jupiter3_state::jupiter3_mem);
+	m_maincpu->set_addrmap(AS_IO, &jupiter3_state::jupiter3_io);
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(jupiter3_state, screen_update)
-	MCFG_SCREEN_SIZE(512, 320)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 320-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update(FUNC(jupiter3_state::screen_update));
+	screen.set_size(512, 320);
+	screen.set_visarea(0, 512-1, 0, 320-1);
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	// devices
-	MCFG_DEVICE_ADD(INS1771N1_TAG, FD1771, 1000000)
-	MCFG_FLOPPY_DRIVE_ADD(INS1771N1_TAG":0", jupiter_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(INS1771N1_TAG":1", jupiter_floppies, nullptr, floppy_image_device::default_floppy_formats)
+	FD1771(config, INS1771N1_TAG, 1000000);
+	FLOPPY_CONNECTOR(config, INS1771N1_TAG":0", jupiter_floppies, "525ssdd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, INS1771N1_TAG":1", jupiter_floppies, nullptr, floppy_image_device::default_floppy_formats);
 
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(jupiter3_state, kbd_put))
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(jupiter3_state::kbd_put));
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("64K");
-MACHINE_CONFIG_END
+}
 
 
 

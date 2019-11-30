@@ -2,15 +2,16 @@
 // copyright-holders:hap
 /*
 
-  Hughes HLCD 0515 family LCD Driver
+Hughes HLCD 0515 family LCD Driver
 
-  0515: 25 columns(also size of buffer/ram)
-  0569: 24 columns, no DATA OUT pin, display blank has no effect
-  0530: specifications unknown, pinout seems similar to 0569
+0515: 25 columns(also size of buffer/ram)
+0569: 24 columns, display blank has no effect(instead it's external with VDRIVE?)
+0530: specifications unknown, pinout seems similar to 0569
+0601: specifications unknown, pinout seems similar to 0569
 
-  TODO:
-  - read mode is untested
-  - MAME bitmap update callback when needed
+TODO:
+- Does DATA OUT pin function the same on each chip? The 0515 datasheet says that
+  the 25th column is output first, but on 0569(no datasheet available) it's reversed.
 
 */
 
@@ -21,32 +22,33 @@
 DEFINE_DEVICE_TYPE(HLCD0515, hlcd0515_device, "hlcd0515", "Hughes HLCD 0515 LCD Driver")
 DEFINE_DEVICE_TYPE(HLCD0569, hlcd0569_device, "hlcd0569", "Hughes HLCD 0569 LCD Driver")
 DEFINE_DEVICE_TYPE(HLCD0530, hlcd0530_device, "hlcd0530", "Hughes HLCD 0530 LCD Driver")
+DEFINE_DEVICE_TYPE(HLCD0601, hlcd0601_device, "hlcd0601", "Hughes HLCD 0601 LCD Driver")
 
 //-------------------------------------------------
 //  constructor
 //-------------------------------------------------
 
-hlcd0515_device::hlcd0515_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 colmax)
-	: device_t(mconfig, type, tag, owner, clock)
-	, m_colmax(colmax)
-	, m_write_cols(*this), m_write_data(*this)
-{
-}
+hlcd0515_device::hlcd0515_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 colmax) :
+	device_t(mconfig, type, tag, owner, clock),
+	m_colmax(colmax),
+	m_write_cols(*this), m_write_data(*this)
+{ }
 
-hlcd0515_device::hlcd0515_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: hlcd0515_device(mconfig, HLCD0515, tag, owner, clock, 25)
-{
-}
+hlcd0515_device::hlcd0515_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	hlcd0515_device(mconfig, HLCD0515, tag, owner, clock, 25)
+{ }
 
-hlcd0569_device::hlcd0569_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: hlcd0515_device(mconfig, HLCD0569, tag, owner, clock, 24)
-{
-}
+hlcd0569_device::hlcd0569_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	hlcd0515_device(mconfig, HLCD0569, tag, owner, clock, 24)
+{ }
 
-hlcd0530_device::hlcd0530_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: hlcd0515_device(mconfig, HLCD0530, tag, owner, clock, 24)
-{
-}
+hlcd0530_device::hlcd0530_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	hlcd0515_device(mconfig, HLCD0530, tag, owner, clock, 24)
+{ }
+
+hlcd0601_device::hlcd0601_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	hlcd0515_device(mconfig, HLCD0601, tag, owner, clock, 24)
+{ }
 
 
 
@@ -66,8 +68,9 @@ void hlcd0515_device::device_start()
 
 	// zerofill
 	m_cs = 0;
-	m_pclock = 0;
+	m_clk = 0;
 	m_data = 0;
+	m_dataout = 0;
 	m_count = 0;
 	m_control = 0;
 	m_blank = false;
@@ -79,8 +82,9 @@ void hlcd0515_device::device_start()
 
 	// register for savestates
 	save_item(NAME(m_cs));
-	save_item(NAME(m_pclock));
+	save_item(NAME(m_clk));
 	save_item(NAME(m_data));
+	save_item(NAME(m_dataout));
 	save_item(NAME(m_count));
 	save_item(NAME(m_control));
 	save_item(NAME(m_blank));
@@ -126,7 +130,13 @@ void hlcd0515_device::set_control()
 	}
 
 	// clock 4: read/write mode
-	m_buffer = (m_control & 1) ? m_ram[m_rowsel] : 0;
+	if (m_control & 1)
+	{
+		m_buffer = m_ram[m_rowsel];
+		clock_data();
+	}
+	else
+		m_buffer = 0;
 }
 
 void hlcd0569_device::set_control()
@@ -140,10 +150,10 @@ void hlcd0515_device::clock_data(int col)
 {
 	if (m_control & 1)
 	{
-		if (col < m_colmax)
-			m_buffer <<= 1;
+		m_dataout = m_buffer & 1;
+		m_write_data(m_dataout);
 
-		m_write_data(m_buffer >> m_colmax & 1);
+		m_buffer >>= 1;
 	}
 	else
 	{
@@ -157,12 +167,12 @@ void hlcd0515_device::clock_data(int col)
 }
 
 
-WRITE_LINE_MEMBER(hlcd0515_device::write_clock)
+WRITE_LINE_MEMBER(hlcd0515_device::clock_w)
 {
 	state = (state) ? 1 : 0;
 
 	// clock/shift data on falling edge
-	if (!m_cs && !state && m_pclock)
+	if (!m_cs && !state && m_clk)
 	{
 		if (m_count < 5)
 		{
@@ -179,11 +189,11 @@ WRITE_LINE_MEMBER(hlcd0515_device::write_clock)
 			m_count++;
 	}
 
-	m_pclock = state;
+	m_clk = state;
 }
 
 
-WRITE_LINE_MEMBER(hlcd0515_device::write_cs)
+WRITE_LINE_MEMBER(hlcd0515_device::cs_w)
 {
 	state = (state) ? 1 : 0;
 

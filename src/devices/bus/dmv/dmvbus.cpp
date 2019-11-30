@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco
+// thanks-to:rfka01
 /*********************************************************************
 
     NCR Decision mate slot bus and module emulation
@@ -172,8 +173,9 @@ DEFINE_DEVICE_TYPE(DMVCART_SLOT, dmvcart_slot_device, "dmvcart_slot", "Decision 
 //  device_dmvslot_interface - constructor
 //-------------------------------------------------
 
-device_dmvslot_interface::device_dmvslot_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device)
+device_dmvslot_interface::device_dmvslot_interface(const machine_config &mconfig, device_t &device) :
+	device_interface(device, "dmvbus"),
+	m_bus(dynamic_cast<dmvcart_slot_device *>(device.owner()))
 {
 }
 
@@ -196,12 +198,15 @@ device_dmvslot_interface::~device_dmvslot_interface()
 //-------------------------------------------------
 dmvcart_slot_device::dmvcart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, DMVCART_SLOT, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_dmvslot_interface>(mconfig, *this),
 	m_prog_read_cb(*this),
 	m_prog_write_cb(*this),
 	m_out_int_cb(*this),
 	m_out_irq_cb(*this),
-	m_out_thold_cb(*this), m_cart(nullptr)
+	m_out_thold_cb(*this),
+	m_memspace(*this, finder_base::DUMMY_TAG, -1),
+	m_iospace(*this, finder_base::DUMMY_TAG, -1),
+	m_cart(nullptr)
 {
 }
 
@@ -220,7 +225,7 @@ dmvcart_slot_device::~dmvcart_slot_device()
 
 void dmvcart_slot_device::device_start()
 {
-	m_cart = dynamic_cast<device_dmvslot_interface *>(get_card_device());
+	m_cart = get_card_device();
 
 	// resolve callbacks
 	m_prog_read_cb.resolve_safe(0);
@@ -276,10 +281,10 @@ void dmvcart_slot_device::ram_write(uint8_t cas, offs_t offset, uint8_t data)
     IO read
 -------------------------------------------------*/
 
-void dmvcart_slot_device::io_read(address_space &space, int ifsel, offs_t offset, uint8_t &data)
+void dmvcart_slot_device::io_read(int ifsel, offs_t offset, uint8_t &data)
 {
 	if (m_cart)
-		m_cart->io_read(space, ifsel, offset, data);
+		m_cart->io_read(ifsel, offset, data);
 }
 
 
@@ -287,10 +292,10 @@ void dmvcart_slot_device::io_read(address_space &space, int ifsel, offs_t offset
    IO write
 -------------------------------------------------*/
 
-void dmvcart_slot_device::io_write(address_space &space, int ifsel, offs_t offset, uint8_t data)
+void dmvcart_slot_device::io_write(int ifsel, offs_t offset, uint8_t data)
 {
 	if (m_cart)
-		m_cart->io_write(space, ifsel, offset, data);
+		m_cart->io_write(ifsel, offset, data);
 }
 
 /*-------------------------------------------------

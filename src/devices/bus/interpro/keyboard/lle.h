@@ -30,7 +30,7 @@ protected:
 	virtual void io_map(address_map &map);
 	virtual void ext_map(address_map &map);
 
-	DECLARE_WRITE_LINE_MEMBER(input_txd) override { m_txd = (state == ASSERT_LINE) ? 0 : 1; }
+	DECLARE_WRITE_LINE_MEMBER(input_txd) override { m_txd = state; }
 
 	DECLARE_READ_LINE_MEMBER(t0_r);
 	DECLARE_READ_LINE_MEMBER(t1_r);
@@ -40,7 +40,7 @@ protected:
 	DECLARE_WRITE8_MEMBER(bus_w);
 
 private:
-	required_device<cpu_device> m_mcu;
+	required_device<i8049_device> m_mcu;
 	required_device<address_map_bank_device> m_ext;
 	required_ioport_array<15> m_upper;
 	required_ioport_array<11> m_lower;

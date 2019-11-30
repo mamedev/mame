@@ -3,64 +3,33 @@
 
 	<element name="overlay">
 		<rect>
-			<bounds left="0" top="0" right="4" bottom="3" />
 			<color red="0.25" green="0.5" blue="1" />
 		</rect>
 	</element>
 
-<!-- define periscope lamps -->
-
-	<element name="lamp_1" defstate="0">
+	<element name="explamp" defstate="0">
 		<disk state="1">
-			<color red="1.0" green="0.25" blue="0.10" />
+			<color red="0.9" green="0.6" blue="0.2" />
 		</disk>
-		<disk state="0">
-			<color red="0.25" green="0.05" blue="0.0" />
-		</disk>
-		<text string="1">
-			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.2" width="1" height="0.6" />
-		</text>
 	</element>
 
-	<element name="lamp_2" defstate="0">
-		<disk state="1">
-			<color red="1.0" green="0.25" blue="0.10" />
-		</disk>
-		<disk state="0">
-			<color red="0.25" green="0.05" blue="0.0" />
-		</disk>
-		<text string="2">
-			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.2" width="1" height="0.6" />
-		</text>
-	</element>
+	<!-- define periscope lamps -->
 
-	<element name="lamp_3" defstate="0">
-		<disk state="1">
-			<color red="1.0" green="0.25" blue="0.10" />
-		</disk>
-		<disk state="0">
-			<color red="0.25" green="0.05" blue="0.0" />
-		</disk>
-		<text string="3">
-			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.2" width="1" height="0.6" />
-		</text>
-	</element>
-
-	<element name="lamp_4" defstate="0">
-		<disk state="1">
-			<color red="1.0" green="0.25" blue="0.10" />
-		</disk>
-		<disk state="0">
-			<color red="0.25" green="0.05" blue="0.0" />
-		</disk>
-		<text string="4">
-			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.2" width="1" height="0.6" />
-		</text>
-	</element>
+	<repeat count="4">
+		<param name="lampno" start="1" increment="1" />
+		<element name="lamp_~lampno~" defstate="0">
+			<disk state="1">
+				<color red="1.0" green="0.25" blue="0.10" />
+			</disk>
+			<disk state="0">
+				<color red="0.25" green="0.05" blue="0.0" />
+			</disk>
+			<text string="~lampno~">
+				<color red="0.0" green="0.0" blue="0.0" />
+				<bounds x="0" y="0.2" width="1" height="0.6" />
+			</text>
+		</element>
+	</repeat>
 
 	<element name="lamp_ready" defstate="0">
 		<disk state="1">
@@ -131,36 +100,84 @@
 	</element>
 
 
-<!-- NOTE: does not include explosion lamps yet -->
-
-	<view name="Lamps + Color Overlay">
+	<view name="Lamps and Color Overlay">
 		<bounds left="0" top="-90" right="400" bottom="300" />
+
 		<screen index="0">
 			<bounds left="0" top="0" right="400" bottom="300" />
 		</screen>
-		<overlay name="overlay" element="overlay">
+		<element ref="overlay" blend="multiply">
 			<bounds left="0" top="0" right="400" bottom="300" />
-		</overlay>
+		</element>
 
-		<bezel name="TORP_LAMP_1" element="lamp_1">
+		<element name="EXP_LAMP_0" ref="explamp" blend="add">
+			<bounds x="20.1" y="66.8" width="35" height="17.7" />
+		</element>
+		<element name="EXP_LAMP_1" ref="explamp" blend="add">
+			<bounds x="66.5" y="66.8" width="35" height="17.7" />
+		</element>
+		<element name="EXP_LAMP_2" ref="explamp" blend="add">
+			<bounds x="112.9" y="66.8" width="35" height="17.7" />
+		</element>
+		<element name="EXP_LAMP_3" ref="explamp" blend="add">
+			<bounds x="159.3" y="66.8" width="35" height="17.7" />
+		</element>
+		<element name="EXP_LAMP_4" ref="explamp" blend="add">
+			<bounds x="205.7" y="66.8" width="35" height="17.7" />
+		</element>
+		<element name="EXP_LAMP_5" ref="explamp" blend="add">
+			<bounds x="252.1" y="66.8" width="35" height="17.7" />
+		</element>
+		<element name="EXP_LAMP_6" ref="explamp" blend="add">
+			<bounds x="298.5" y="66.8" width="35" height="17.7" />
+		</element>
+		<element name="EXP_LAMP_7" ref="explamp" blend="add">
+			<bounds x="344.9" y="66.8" width="35" height="17.7" />
+		</element>
+		<element name="EXP_LAMP_8" ref="explamp" blend="add">
+			<bounds x="20.1" y="28.3" width="35" height="17.7" />
+		</element>
+		<element name="EXP_LAMP_9" ref="explamp" blend="add">
+			<bounds x="66.5" y="28.3" width="35" height="17.7" />
+		</element>
+		<element name="EXP_LAMP_A" ref="explamp" blend="add">
+			<bounds x="112.9" y="28.3" width="35" height="17.7" />
+		</element>
+		<element name="EXP_LAMP_B" ref="explamp" blend="add">
+			<bounds x="159.3" y="28.3" width="35" height="17.7" />
+		</element>
+		<element name="EXP_LAMP_C" ref="explamp" blend="add">
+			<bounds x="205.7" y="28.3" width="35" height="17.7" />
+		</element>
+		<element name="EXP_LAMP_D" ref="explamp" blend="add">
+			<bounds x="252.1" y="28.3" width="35" height="17.7" />
+		</element>
+		<element name="EXP_LAMP_E" ref="explamp" blend="add">
+			<bounds x="298.5" y="28.3" width="35" height="17.7" />
+		</element>
+		<element name="EXP_LAMP_F" ref="explamp" blend="add">
+			<bounds x="344.9" y="28.3" width="35" height="17.7" />
+		</element>
+
+		<element name="TORP_LAMP_4" ref="lamp_1">
 			<bounds x="117.5" y="-80" width="30" height="30" />
-		</bezel>
-		<bezel name="TORP_LAMP_2" element="lamp_2">
+		</element>
+		<element name="TORP_LAMP_3" ref="lamp_2">
 			<bounds x="162.5" y="-80" width="30" height="30" />
-		</bezel>
-		<bezel name="TORP_LAMP_3" element="lamp_3">
+		</element>
+		<element name="TORP_LAMP_2" ref="lamp_3">
 			<bounds x="207.5" y="-80" width="30" height="30" />
-		</bezel>
-		<bezel name="TORP_LAMP_4" element="lamp_4">
+		</element>
+		<element name="TORP_LAMP_1" ref="lamp_4">
 			<bounds x="252.5" y="-80" width="30" height="30" />
-		</bezel>
+		</element>
 
-		<bezel name="READY_LAMP" element="lamp_ready">
+		<element name="READY_LAMP" ref="lamp_ready">
 			<bounds x="117.5" y="-40" width="75" height="30" />
-		</bezel>
-		<bezel name="RELOAD_LAMP" element="lamp_reload">
+		</element>
+		<element name="RELOAD_LAMP" ref="lamp_reload">
 			<bounds x="207.5" y="-40" width="75" height="30" />
-		</bezel>
+		</element>
 
 	</view>
 
@@ -168,9 +185,9 @@
 		<screen index="0">
 			<bounds left="0" top="0" right="400" bottom="300" />
 		</screen>
-		<overlay name="overlay" element="overlay">
+		<element ref="overlay" blend="multiply">
 			<bounds left="0" top="0" right="400" bottom="300" />
-		</overlay>
+		</element>
 	</view>
 
 </mamelayout>

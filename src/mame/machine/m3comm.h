@@ -8,8 +8,6 @@
 #include "machine/ram.h"
 #include "cpu/m68000/m68000.h"
 
-#define MCFG_M3COMM_ADD(_tag ) \
-	MCFG_DEVICE_ADD(_tag, M3COMM, 0)
 
 //**************************************************************************
 //  TYPE DEFINITIONS

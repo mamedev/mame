@@ -359,9 +359,6 @@ const tiny_rom_entry *tms3203x_device::device_rom_region() const
 
 inline uint32_t tms3203x_device::ROPCODE(offs_t pc)
 {
-	if (m_mcbl_mode && pc < 0x1000)
-		return m_bootrom[pc];
-
 	return m_cache->read_dword(pc);
 }
 
@@ -372,9 +369,6 @@ inline uint32_t tms3203x_device::ROPCODE(offs_t pc)
 
 inline uint32_t tms3203x_device::RMEM(offs_t addr)
 {
-	if (m_mcbl_mode && addr < 0x1000)
-		return m_bootrom[addr];
-
 	return m_program->read_dword(addr);
 }
 
@@ -406,7 +400,8 @@ void tms3203x_device::device_start()
 	m_holda_cb.resolve_safe();
 
 	// set up the internal boot loader ROM
-	m_bootrom = reinterpret_cast<uint32_t*>(memregion(shortname())->base());
+	if (m_mcbl_mode)
+		m_program->install_rom(0x000000, 0x000fff, memregion(shortname())->base());
 
 	// save state
 	save_item(NAME(m_pc));
@@ -707,7 +702,7 @@ void tms3203x_device::check_irqs()
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-uint32_t tms3203x_device::execute_min_cycles() const
+uint32_t tms3203x_device::execute_min_cycles() const noexcept
 {
 	return 1;
 }
@@ -718,7 +713,7 @@ uint32_t tms3203x_device::execute_min_cycles() const
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-uint32_t tms3203x_device::execute_max_cycles() const
+uint32_t tms3203x_device::execute_max_cycles() const noexcept
 {
 	return 4;
 }
@@ -729,7 +724,7 @@ uint32_t tms3203x_device::execute_max_cycles() const
 //  input/interrupt lines
 //-------------------------------------------------
 
-uint32_t tms3203x_device::execute_input_lines() const
+uint32_t tms3203x_device::execute_input_lines() const noexcept
 {
 	return 14;
 }
@@ -744,7 +739,15 @@ void tms3203x_device::execute_set_input(int inputnum, int state)
 	if (inputnum == TMS3203X_MCBL)
 	{
 		// switch between microcomputer/boot loader and microprocessor modes
+		bool old_mode = m_mcbl_mode;
 		m_mcbl_mode = (state == ASSERT_LINE);
+		if (m_mcbl_mode != old_mode)
+		{
+			if (m_mcbl_mode)
+				m_program->install_rom(0x000000, 0x000fff, memregion(shortname())->base());
+			else
+				m_program->unmap_read(0x000000, 0x000fff);
+		}
 		return;
 	}
 

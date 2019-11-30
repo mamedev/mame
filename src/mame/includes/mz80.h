@@ -5,9 +5,10 @@
  * includes/mz80.h
  *
  ****************************************************************************/
-
 #ifndef MAME_INCLUDES_MZ80_H
 #define MAME_INCLUDES_MZ80_H
+
+#pragma once
 
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
@@ -15,7 +16,6 @@
 #include "machine/timer.h"
 #include "imagedev/cassette.h"
 #include "sound/spkrdev.h"
-#include "sound/wave.h"
 
 class mz80_state : public driver_device
 {
@@ -30,7 +30,7 @@ public:
 		, m_p_ram(*this, "p_ram")
 		, m_p_videoram(*this, "videoram")
 		, m_p_chargen(*this, "chargen")
-		{ }
+	{ }
 
 	void mz80kj(machine_config &config);
 	void mz80k(machine_config &config);

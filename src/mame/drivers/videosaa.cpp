@@ -30,8 +30,8 @@ class videosaa_state : public driver_device
 {
 public:
 	videosaa_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
 	{ }
 
 	void videosaa(machine_config &config);
@@ -96,12 +96,11 @@ void videosaa_state::videosaa(machine_config &config)
 	screen.set_visarea(0, 640-1, 0, 480-1);
 	screen.set_screen_update(FUNC(videosaa_state::screen_update));
 
-	H46505(config, "crtc", 10_MHz_XTAL); // unknown divider
+	HD6845S(config, "crtc", 10_MHz_XTAL); // unknown divider
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx);
 
-	palette_device& palette(PALETTE(config, "palette", 8));
-	palette.set_init("palette", FUNC(palette_device::palette_init_3bit_rgb));
+	PALETTE(config, "palette", palette_device::RGB_3BIT);
 
 	/* sound hardware */
 	UPD7759(config, "upd");

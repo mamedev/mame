@@ -415,6 +415,10 @@ int renderer_sdl1::draw(int update)
 	{
 		switch (rmask)
 		{
+			case 0xff000000:
+				software_renderer<uint32_t, 0,0,0, 24,16,8>::draw_primitives(*win->m_primlist, surfptr, mamewidth, mameheight, pitch / 4);
+				break;
+
 			case 0x0000ff00:
 				software_renderer<uint32_t, 0,0,0, 8,16,24>::draw_primitives(*win->m_primlist, surfptr, mamewidth, mameheight, pitch / 4);
 				break;

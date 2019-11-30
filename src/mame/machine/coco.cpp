@@ -88,7 +88,6 @@ coco_state::coco_state(const machine_config &mconfig, device_type type, const ch
 	m_pia_1(*this, PIA1_TAG),
 	m_dac(*this, "dac"),
 	m_sbs(*this, "sbs"),
-	m_wave(*this, "wave"),
 	m_screen(*this, SCREEN_TAG),
 	m_cococart(*this, CARTRIDGE_TAG),
 	m_ram(*this, RAM_TAG),
@@ -305,7 +304,7 @@ uint8_t coco_state::floating_space_read(offs_t offset)
 	//
 	// Most of the time, the read below will result in floating_bus_read() being
 	// invoked
-	return m_floating->read8(m_floating->space(0), offset);
+	return m_floating->read8(offset);
 }
 
 
@@ -315,7 +314,7 @@ uint8_t coco_state::floating_space_read(offs_t offset)
 
 void coco_state::floating_space_write(offs_t offset, uint8_t data)
 {
-	m_floating->write8(m_floating->space(0), offset, data);
+	m_floating->write8(offset, data);
 }
 
 
@@ -336,7 +335,7 @@ void coco_state::floating_space_write(offs_t offset, uint8_t data)
 
 READ8_MEMBER( coco_state::ff00_read )
 {
-	return pia_0().read(space, offset, mem_mask);
+	return pia_0().read(offset);
 }
 
 
@@ -347,7 +346,7 @@ READ8_MEMBER( coco_state::ff00_read )
 
 WRITE8_MEMBER( coco_state::ff00_write )
 {
-	pia_0().write(space, offset, data, mem_mask);
+	pia_0().write(offset, data);
 }
 
 
@@ -446,7 +445,7 @@ WRITE_LINE_MEMBER( coco_state::pia0_irq_b )
 
 READ8_MEMBER( coco_state::ff20_read )
 {
-	return pia_1().read(space, offset, mem_mask);
+	return pia_1().read(offset);
 }
 
 
@@ -458,7 +457,7 @@ READ8_MEMBER( coco_state::ff20_read )
 WRITE8_MEMBER( coco_state::ff20_write )
 {
 	/* write to the PIA */
-	pia_1().write(space, offset, data, mem_mask);
+	pia_1().write(offset, data);
 
 	/* we have to do this to do something that approximates the cartridge Q line behavior */
 	m_cococart->twiddle_q_lines();
@@ -874,10 +873,8 @@ void coco_state::poll_joystick(bool *joyin, uint8_t *buttons)
 void coco_state::poll_keyboard(void)
 {
 	uint8_t pia0_pb = pia_0().b_output();
-	uint8_t pia0_pb_z = pia_0().port_b_z_mask();
 
 	uint8_t pia0_pa = 0x7F;
-	uint8_t pia0_pa_z = 0x7F;
 
 	/* poll the keyboard, and update PA6-PA0 accordingly*/
 	for (unsigned i = 0; i < m_keyboard.size(); i++)
@@ -886,10 +883,6 @@ void coco_state::poll_keyboard(void)
 		if ((value | pia0_pb) != 0xFF)
 		{
 			pia0_pa &= ~(0x01 << i);
-		}
-		if ((value | pia0_pb_z) != 0xFF)
-		{
-			pia0_pa_z &= ~(0x01 << i);
 		}
 	}
 
@@ -906,10 +899,9 @@ void coco_state::poll_keyboard(void)
 
 	/* mask out the buttons */
 	pia0_pa &= ~buttons;
-	pia0_pa_z &= ~buttons;
 
 	/* and write the result to PIA0 */
-	update_keyboard_input(pia0_pa, pia0_pa_z);
+	update_keyboard_input(pia0_pa);
 }
 
 
@@ -919,9 +911,9 @@ void coco_state::poll_keyboard(void)
 //  on the CoCo 3 controls a GIME input
 //-------------------------------------------------
 
-void coco_state::update_keyboard_input(uint8_t value, uint8_t z)
+void coco_state::update_keyboard_input(uint8_t value)
 {
-	pia_0().set_a_input(value, z);
+	pia_0().set_a_input(value);
 }
 
 

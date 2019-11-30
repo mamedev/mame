@@ -18,7 +18,6 @@
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
 #include "sound/spkrdev.h"
-#include "sound/wave.h"
 #include "emupal.h"
 
 class b2m_state : public driver_device
@@ -43,7 +42,7 @@ public:
 	DECLARE_READ8_MEMBER(b2m_localmachine_r);
 	void init_b2m();
 
-	DECLARE_PALETTE_INIT(b2m);
+	void b2m_palette(palette_device &palette) const;
 	uint32_t screen_update_b2m(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(b2m_vblank_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(bm2_pit_out1);

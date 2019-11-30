@@ -181,6 +181,15 @@ public:
 
 	void map(address_map &map);
 
+	DECLARE_READ8_MEMBER(address_lo_r);
+	DECLARE_WRITE8_MEMBER(address_lo_w);
+	DECLARE_READ8_MEMBER(address_hi_r);
+	DECLARE_WRITE8_MEMBER(address_hi_w);
+	DECLARE_READ8_MEMBER(register_r);
+	DECLARE_WRITE8_MEMBER(register_w);
+	DECLARE_READ8_MEMBER(palette_r);
+	DECLARE_WRITE8_MEMBER(palette_w);
+
 	void screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u8 *pixel_data);
 	void set_contrast(const u8 data) { m_contrast = data; }
 
@@ -203,15 +212,6 @@ private:
 
 		return rgb;
 	}
-
-	DECLARE_READ8_MEMBER(address_lo_r);
-	DECLARE_WRITE8_MEMBER(address_lo_w);
-	DECLARE_READ8_MEMBER(address_hi_r);
-	DECLARE_WRITE8_MEMBER(address_hi_w);
-	DECLARE_READ8_MEMBER(register_r);
-	DECLARE_WRITE8_MEMBER(register_w);
-	DECLARE_READ8_MEMBER(palette_r);
-	DECLARE_WRITE8_MEMBER(palette_w);
 
 	// device state in memory map order
 	u16 m_address;

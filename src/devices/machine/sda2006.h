@@ -4,7 +4,7 @@
 #define MAME_MACHINE_SDA2006_H
 
 #pragma once
-	
+
 
 
 // sda2006_device

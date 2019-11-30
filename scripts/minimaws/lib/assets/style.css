@@ -7,5 +7,7 @@ td { padding-left: 0.25em; padding-right: 0.25em }
 
 table[class=sysinfo] th { text-align: right }
 
+div[class=dropzone] { padding: 0 1em; border-width: 2px; border-radius: 1em; border-style: dashed }
+
 dl[id=list-slot-options] dt { font-weight: bold; margin-top: 1em }
 dl[id=list-slot-options] dd table { margin-top: 0.5em; margin-bottom: 1em }

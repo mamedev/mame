@@ -68,36 +68,6 @@ enum
 	attotime::from_hz(_clock/(3*5))
 
 
-#define MCFG_MCS48_PORT_P1_IN_CB(_devcb) \
-	downcast<mcs48_cpu_device &>(*device).set_port_in_cb(0, DEVCB_##_devcb);
-#define MCFG_MCS48_PORT_P1_OUT_CB(_devcb) \
-	downcast<mcs48_cpu_device &>(*device).set_port_out_cb(0, DEVCB_##_devcb);
-
-#define MCFG_MCS48_PORT_P2_IN_CB(_devcb) \
-	downcast<mcs48_cpu_device &>(*device).set_port_in_cb(1, DEVCB_##_devcb);
-#define MCFG_MCS48_PORT_P2_OUT_CB(_devcb) \
-	downcast<mcs48_cpu_device &>(*device).set_port_out_cb(1, DEVCB_##_devcb);
-
-#define MCFG_MCS48_PORT_T0_IN_CB(_devcb) \
-	downcast<mcs48_cpu_device &>(*device).set_test_in_cb(0, DEVCB_##_devcb);
-#define MCFG_MCS48_PORT_T0_CLK_DEVICE(_tag) \
-	downcast<mcs48_cpu_device &>(*device).set_t0_clk_cb(clock_update_delegate(FUNC(device_t::set_unscaled_clock), _tag, (device_t *)nullptr));
-#define MCFG_MCS48_PORT_T0_CLK_CUSTOM(_class, _func) \
-	downcast<mcs48_cpu_device &>(*device).set_t0_clk_cb(clock_update_delegate(&_class::_func, #_class "::" _func, owner));
-
-#define MCFG_MCS48_PORT_T1_IN_CB(_devcb) \
-	downcast<mcs48_cpu_device &>(*device).set_test_in_cb(1, DEVCB_##_devcb);
-
-#define MCFG_MCS48_PORT_BUS_IN_CB(_devcb) \
-	downcast<mcs48_cpu_device &>(*device).set_bus_in_cb(DEVCB_##_devcb);
-#define MCFG_MCS48_PORT_BUS_OUT_CB(_devcb) \
-	downcast<mcs48_cpu_device &>(*device).set_bus_out_cb(DEVCB_##_devcb);
-
-// PROG line to 8243 expander
-#define MCFG_MCS48_PORT_PROG_OUT_CB(_devcb) \
-	downcast<mcs48_cpu_device &>(*device).set_prog_out_cb(DEVCB_##_devcb);
-
-
 /***************************************************************************
     TYPES
 ***************************************************************************/
@@ -116,11 +86,14 @@ DECLARE_DEVICE_TYPE(I8040, i8040_device)    /* external ROM,        256 bytes in
 DECLARE_DEVICE_TYPE(I8050, i8050_device)    /* 4k internal ROM,     256 bytes internal RAM */
 
 /* Official Intel UPI-41 parts */
-DECLARE_DEVICE_TYPE(I8041, i8041_device)    /* 1k internal ROM,     128 bytes internal RAM */
-DECLARE_DEVICE_TYPE(I8741, i8741_device)    /* 1k internal EEPROM,  128 bytes internal RAM */
-DECLARE_DEVICE_TYPE(I8042, i8042_device)    /* 2k internal ROM,     256 bytes internal RAM */
-DECLARE_DEVICE_TYPE(I8242, i8242_device)    /* 2k internal ROM,     256 bytes internal RAM */
-DECLARE_DEVICE_TYPE(I8742, i8742_device)    /* 2k internal EEPROM,  256 bytes internal RAM */
+DECLARE_DEVICE_TYPE(I8041A,  i8041a_device)   /* 1k internal ROM,      64 bytes internal RAM */
+DECLARE_DEVICE_TYPE(I8741A,  i8741a_device)   /* 1k internal EEPROM,   64 bytes internal RAM */
+DECLARE_DEVICE_TYPE(I8041AH, i8041ah_device)  /* 1k internal ROM,     128 bytes internal RAM */
+DECLARE_DEVICE_TYPE(I8741AH, i8741ah_device)  /* 1k internal EEPROM,  128 bytes internal RAM */
+DECLARE_DEVICE_TYPE(I8042,   i8042_device)    /* 2k internal ROM,     128 bytes internal RAM */
+DECLARE_DEVICE_TYPE(I8742,   i8742_device)    /* 2k internal EEPROM,  128 bytes internal RAM */
+DECLARE_DEVICE_TYPE(I8042AH, i8042ah_device)  /* 2k internal ROM,     256 bytes internal RAM */
+DECLARE_DEVICE_TYPE(I8742AH, i8742ah_device)  /* 2k internal EEPROM,  256 bytes internal RAM */
 
 /* Clones */
 DECLARE_DEVICE_TYPE(MB8884, mb8884_device)  /* 8035 clone */
@@ -142,13 +115,6 @@ public:
 	};
 
 	// configuration
-	template <class Object> devcb_base &set_port_in_cb(int n, Object &&cb) { return m_port_in_cb[n].set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_port_out_cb(int n, Object &&cb) { return m_port_out_cb[n].set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_bus_in_cb(Object &&cb) { return m_bus_in_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_bus_out_cb(Object &&cb) { return m_bus_out_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_test_in_cb(int n, Object &&cb) { return m_test_in_cb[n].set_callback(std::forward<Object>(cb)); }
-	template <typename Object> void set_t0_clk_cb(Object &&cb) { m_t0_clk_func = std::forward<Object>(cb); }
-	template <class Object> devcb_base &set_prog_out_cb(Object &&cb) { return m_prog_out_cb.set_callback(std::forward<Object>(cb)); }
 	auto p1_in_cb() { return m_port_in_cb[0].bind(); }
 	auto p2_in_cb() { return m_port_in_cb[1].bind(); }
 	auto p1_out_cb() { return m_port_out_cb[0].bind(); }
@@ -157,10 +123,12 @@ public:
 	auto bus_out_cb() { return m_bus_out_cb.bind(); }
 	auto t0_in_cb() { return m_test_in_cb[0].bind(); }
 	auto t1_in_cb() { return m_test_in_cb[1].bind(); }
+
+	// PROG line to 8243 expander
 	auto prog_out_cb() { return m_prog_out_cb.bind(); }
 
-	DECLARE_READ8_MEMBER(p1_r);
-	DECLARE_READ8_MEMBER(p2_r);
+	uint8_t p1_r() { return m_p1; }
+	uint8_t p2_r() { return m_p2; }
 
 	void data_6bit(address_map &map);
 	void data_7bit(address_map &map);
@@ -168,6 +136,9 @@ public:
 	void program_10bit(address_map &map);
 	void program_11bit(address_map &map);
 	void program_12bit(address_map &map);
+
+	template <typename... T> void set_t0_clk_cb(T &&... args) { m_t0_clk_func.set(std::forward<T>(args)...); }
+
 protected:
 	typedef int (mcs48_cpu_device::*mcs48_ophandler)();
 
@@ -180,11 +151,11 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override { return (clocks + 15 - 1) / 15; }
-	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override { return (cycles * 15); }
-	virtual uint32_t execute_min_cycles() const override { return 1; }
-	virtual uint32_t execute_max_cycles() const override { return 3; }
-	virtual uint32_t execute_input_lines() const override { return 2; }
+	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 15 - 1) / 15; }
+	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * 15); }
+	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 3; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 2; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -229,7 +200,8 @@ protected:
 	uint8_t       m_dbbi;               /* 8-bit input data buffer (UPI-41 only) */
 	uint8_t       m_dbbo;               /* 8-bit output data buffer (UPI-41 only) */
 
-	bool          m_irq_state;          /* true if an IRQ is pending */
+	bool          m_irq_state;          /* true if the IRQ line is active */
+	bool          m_irq_polled;         /* true if last instruction was JNI (and not taken) */
 	bool          m_irq_in_progress;    /* true if an IRQ is in progress */
 	bool          m_timer_overflow;     /* true on a timer overflow; cleared by taking interrupt */
 	bool          m_timer_flag;         /* true on a timer overflow; cleared on JTF */
@@ -248,6 +220,8 @@ protected:
 	memory_access_cache<0, 0, ENDIANNESS_LITTLE> *m_cache;
 	address_space *m_data;
 	address_space *m_io;
+
+	required_shared_ptr<uint8_t> m_dataptr;
 
 	uint8_t       m_feature_mask;       /* processor feature flags */
 	uint16_t      m_int_rom_size;       /* internal rom size */
@@ -543,8 +517,8 @@ public:
 
 protected:
 	// device_execute_interface overrides
-	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override { return (clocks + 30 - 1) / 30; }
-	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override { return (cycles * 30); }
+	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 30 - 1) / 30; }
+	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * 30); }
 };
 
 class i8022_device : public mcs48_cpu_device
@@ -555,8 +529,8 @@ public:
 
 protected:
 	// device_execute_interface overrides
-	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override { return (clocks + 30 - 1) / 30; }
-	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override { return (cycles * 30); }
+	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 30 - 1) / 30; }
+	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * 30); }
 };
 
 class i8035_device : public mcs48_cpu_device
@@ -658,18 +632,32 @@ protected:
 	TIMER_CALLBACK_MEMBER( master_callback );
 };
 
-class i8041_device : public upi41_cpu_device
+class i8041a_device : public upi41_cpu_device
 {
 public:
 	// construction/destruction
-	i8041_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i8041a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
-class i8741_device : public upi41_cpu_device
+class i8741a_device : public upi41_cpu_device
 {
 public:
 	// construction/destruction
-	i8741_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i8741a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+class i8041ah_device : public upi41_cpu_device
+{
+public:
+	// construction/destruction
+	i8041ah_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+class i8741ah_device : public upi41_cpu_device
+{
+public:
+	// construction/destruction
+	i8741ah_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class i8042_device : public upi41_cpu_device
@@ -679,18 +667,25 @@ public:
 	i8042_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
-class i8242_device : public upi41_cpu_device
-{
-public:
-	// construction/destruction
-	i8242_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-};
-
 class i8742_device : public upi41_cpu_device
 {
 public:
 	// construction/destruction
 	i8742_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+class i8042ah_device : public upi41_cpu_device
+{
+public:
+	// construction/destruction
+	i8042ah_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+class i8742ah_device : public upi41_cpu_device
+{
+public:
+	// construction/destruction
+	i8742ah_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 

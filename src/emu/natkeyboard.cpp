@@ -486,6 +486,13 @@ void natural_keyboard::post_utf8(const char *text, size_t length, const attotime
 }
 
 
+void natural_keyboard::post_utf8(const std::string &text, const attotime &rate)
+{
+	if (!text.empty())
+		post_utf8(text.c_str(), text.size(), rate);
+}
+
+
 //-------------------------------------------------
 //  post_coded - post a coded string
 //-------------------------------------------------
@@ -564,6 +571,27 @@ void natural_keyboard::post_coded(const char *text, size_t length, const attotim
 }
 
 
+void natural_keyboard::post_coded(const std::string &text, const attotime &rate)
+{
+	if (!text.empty())
+		post_coded(text.c_str(), text.size(), rate);
+}
+
+
+//-------------------------------------------------
+//  paste - does a paste from the keyboard
+//-------------------------------------------------
+
+void natural_keyboard::paste()
+{
+	// retrieve the clipboard text
+	std::string text = osd_get_clipboard_text();
+
+	// post the text
+	post_utf8(text);
+}
+
+
 //-------------------------------------------------
 //  build_codes - given an input port table, create
 //  an input code table useful for mapping unicode
@@ -574,7 +602,7 @@ void natural_keyboard::build_codes(ioport_manager &manager)
 {
 	// find all shift keys
 	unsigned mask = 0;
-	ioport_field *shift[SHIFT_COUNT];
+	std::array<ioport_field *, SHIFT_COUNT> shift;
 	std::fill(std::begin(shift), std::end(shift), nullptr);
 	for (auto const &port : manager.ports())
 	{
@@ -628,7 +656,6 @@ void natural_keyboard::build_codes(ioport_manager &manager)
 											newcode.field[fieldnum++] = shift[i];
 									}
 
-									assert(fieldnum < ARRAY_LENGTH(newcode.field));
 									newcode.field[fieldnum] = &field;
 									if (m_keycode_map.end() == found)
 										m_keycode_map.emplace(code, newcode);
@@ -767,8 +794,6 @@ void natural_keyboard::timer(void *ptr, int param)
 		{
 			do
 			{
-				assert(m_fieldnum < ARRAY_LENGTH(code->field));
-
 				ioport_field *const field = code->field[m_fieldnum];
 				if (field)
 				{
@@ -779,8 +804,8 @@ void natural_keyboard::timer(void *ptr, int param)
 						field->set_value(!field->digital_value());
 				}
 			}
-			while (code->field[m_fieldnum] && (++m_fieldnum < ARRAY_LENGTH(code->field)) && m_status_keydown);
-			advance = (m_fieldnum >= ARRAY_LENGTH(code->field)) || !code->field[m_fieldnum];
+			while (code->field[m_fieldnum] && (++m_fieldnum < code->field.size()) && m_status_keydown);
+			advance = (m_fieldnum >= code->field.size()) || !code->field[m_fieldnum];
 		}
 		else
 		{
@@ -874,7 +899,7 @@ void natural_keyboard::dump(std::ostream &str) const
 		util::stream_format(str, "%-*s", left_column_width, description);
 
 		// identify the keys used
-		for (std::size_t field = 0; (ARRAY_LENGTH(code.second.field) > field) && code.second.field[field]; ++field)
+		for (std::size_t field = 0; (code.second.field.size() > field) && code.second.field[field]; ++field)
 			util::stream_format(str, "%s'%s'", first ? "" : ", ", code.second.field[field]->name());
 
 		// carriage return

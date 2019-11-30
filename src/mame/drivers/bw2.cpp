@@ -108,7 +108,7 @@ READ8_MEMBER( bw2_state::read )
 		data = m_ram->pointer()[offset];
 	}
 
-	return m_exp->cd_r(space, offset, data, ram2, ram3, ram4, ram5, ram6);
+	return m_exp->cd_r(offset, data, ram2, ram3, ram4, ram5, ram6);
 }
 
 
@@ -159,7 +159,7 @@ WRITE8_MEMBER( bw2_state::write )
 		m_ram->pointer()[offset] = data;
 	}
 
-	m_exp->cd_w(space, offset, data, ram2, ram3, ram4, ram5, ram6);
+	m_exp->cd_w(offset, data, ram2, ram3, ram4, ram5, ram6);
 }
 
 
@@ -191,8 +191,7 @@ void bw2_state::bw2_io(address_map &map)
 	map(0x10, 0x13).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x20, 0x21).m(m_lcdc, FUNC(msm6255_device::map));
 	map(0x30, 0x3f).rw(m_exp, FUNC(bw2_expansion_slot_device::slot_r), FUNC(bw2_expansion_slot_device::slot_w));
-	map(0x40, 0x40).rw(m_uart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x41, 0x41).rw(m_uart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x40, 0x41).rw(m_uart, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x50, 0x50).w("cent_data_out", FUNC(output_latch_device::bus_w));
 	map(0x60, 0x63).rw(m_fdc, FUNC(wd2797_device::read), FUNC(wd2797_device::write));
 	map(0x70, 0x7f).rw(m_exp, FUNC(bw2_expansion_slot_device::modsel_r), FUNC(bw2_expansion_slot_device::modsel_w));
@@ -512,7 +511,7 @@ static void bw2_floppies(device_slot_interface &device)
 //**************************************************************************
 
 
-PALETTE_INIT_MEMBER(bw2_state, bw2)
+void bw2_state::bw2_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, 0xa5, 0xad, 0xa5);
 	palette.set_pen_color(1, 0x31, 0x39, 0x10);
@@ -540,24 +539,25 @@ void bw2_state::machine_start()
 //**************************************************************************
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( bw2 )
+//  machine_config( bw2 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(bw2_state::bw2)
+void bw2_state::bw2(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, 16_MHz_XTAL / 4)
-	MCFG_DEVICE_PROGRAM_MAP(bw2_mem)
-	MCFG_DEVICE_IO_MAP(bw2_io)
+	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &bw2_state::bw2_mem);
+	m_maincpu->set_addrmap(AS_IO, &bw2_state::bw2_io);
 
 	// video hardware
-	MCFG_SCREEN_ADD(SCREEN_TAG, LCD)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_UPDATE_DEVICE( MSM6255_TAG, msm6255_device, screen_update )
-	MCFG_SCREEN_SIZE(640, 200)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(bw2_state, bw2)
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(60);
+	screen.set_screen_update(MSM6255_TAG, FUNC(msm6255_device::screen_update));
+	screen.set_size(640, 200);
+	screen.set_visarea(0, 640-1, 0, 200-1);
+	screen.set_palette("palette");
+
+	PALETTE(config, "palette", FUNC(bw2_state::bw2_palette), 2);
 
 	// devices
 	PIT8253(config, m_pit, 0);
@@ -569,44 +569,45 @@ MACHINE_CONFIG_START(bw2_state::bw2)
 	m_pit->set_clk<2>(0); // Floppy /MTRON
 	m_pit->out_handler<2>().set(FUNC(bw2_state::mtron_w));
 
-	MCFG_DEVICE_ADD(I8255A_TAG, I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, bw2_state, ppi_pa_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, bw2_state, ppi_pb_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, bw2_state, ppi_pc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, bw2_state, ppi_pc_w))
+	i8255_device &ppi(I8255A(config, I8255A_TAG));
+	ppi.out_pa_callback().set(FUNC(bw2_state::ppi_pa_w));
+	ppi.in_pb_callback().set(FUNC(bw2_state::ppi_pb_r));
+	ppi.in_pc_callback().set(FUNC(bw2_state::ppi_pc_r));
+	ppi.out_pc_callback().set(FUNC(bw2_state::ppi_pc_w));
 
-	MCFG_DEVICE_ADD(MSM6255_TAG, MSM6255, 16_MHz_XTAL)
-	MCFG_DEVICE_ADDRESS_MAP(0, lcdc_map)
-	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
+	MSM6255(config, m_lcdc, 16_MHz_XTAL);
+	m_lcdc->set_addrmap(0, &bw2_state::lcdc_map);
+	m_lcdc->set_screen(SCREEN_TAG);
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, bw2_state, write_centronics_busy))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(bw2_state::write_centronics_busy));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
+	output_latch_device &latch(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(latch);
 
-	MCFG_DEVICE_ADD(m_uart, I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_rts))
+	I8251(config, m_uart, 0);
+	m_uart->txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
+	m_uart->dtr_handler().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
+	m_uart->rts_handler().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_uart, i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(m_uart, i8251_device, write_dsr))
+	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(m_uart, FUNC(i8251_device::write_rxd));
+	rs232.dsr_handler().set(m_uart, FUNC(i8251_device::write_dsr));
 
-	MCFG_DEVICE_ADD(WD2797_TAG, WD2797, 16_MHz_XTAL / 16)
-	MCFG_WD_FDC_INTRQ_CALLBACK(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, bw2_state, fdc_drq_w))
+	WD2797(config, m_fdc, 16_MHz_XTAL / 16);
+	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_fdc->drq_wr_callback().set(FUNC(bw2_state::fdc_drq_w));
 
-	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG":0", bw2_floppies, "35dd", bw2_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG":1", bw2_floppies, nullptr,   bw2_state::floppy_formats)
-	MCFG_BW2_EXPANSION_SLOT_ADD(BW2_EXPANSION_SLOT_TAG, 16_MHz_XTAL, bw2_expansion_cards, nullptr)
+	FLOPPY_CONNECTOR(config, WD2797_TAG":0", bw2_floppies, "35dd", bw2_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, WD2797_TAG":1", bw2_floppies, nullptr, bw2_state::floppy_formats);
+	BW2_EXPANSION_SLOT(config, m_exp, 16_MHz_XTAL, bw2_expansion_cards, nullptr);
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("flop_list","bw2")
+	SOFTWARE_LIST(config, "flop_list").set_original("bw2");
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("64K").set_extra_options("96K,128K,160K,192K,224K");
-MACHINE_CONFIG_END
+}
 
 
 

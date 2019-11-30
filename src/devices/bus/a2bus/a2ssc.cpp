@@ -189,7 +189,7 @@ uint8_t a2bus_ssc_device::read_c0nx(uint8_t offset)
 		case 9:
 		case 0xa:
 		case 0xb:
-			return m_acia->read(machine().dummy_space(), offset-8);
+			return m_acia->read(offset-8);
 
 	}
 
@@ -208,7 +208,7 @@ void a2bus_ssc_device::write_c0nx(uint8_t offset, uint8_t data)
 		case 9:
 		case 0xa:
 		case 0xb:
-			m_acia->write(machine().dummy_space(), offset-8, data);
+			m_acia->write(offset-8, data);
 			break;
 	}
 }

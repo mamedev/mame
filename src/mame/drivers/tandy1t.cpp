@@ -138,6 +138,7 @@ private:
 	uint8_t m_tandy_data[8];
 
 	uint8_t m_tandy_bios_bank;    /* I/O port FFEAh */
+	uint8_t m_tandy_ppi_porta, m_tandy_ppi_ack;
 	uint8_t m_tandy_ppi_portb, m_tandy_ppi_portc;
 	uint8_t m_vram_bank;
 	static void cfg_fdc_35(device_t *device);
@@ -315,7 +316,10 @@ WRITE8_MEMBER( tandy1000_state::tandy1000_pio_w )
 		// sx enables keyboard from bit 3, others bit 6, hopefully theres no conflict
 		m_keyboard->enable(data&0x48);
 		if ( data & 0x80 )
+		{
 			m_mb->m_pic8259->ir1_w(0);
+			m_tandy_ppi_ack = 1;
+		}
 		break;
 	case 2:
 		m_tandy_ppi_portc = data;
@@ -333,7 +337,12 @@ READ8_MEMBER(tandy1000_state::tandy1000_pio_r)
 	switch (offset)
 	{
 	case 0:
-		data = m_keyboard->read(space, 0);
+		if (m_tandy_ppi_ack)
+		{
+			m_tandy_ppi_porta = m_keyboard->read(space, 0);
+			m_tandy_ppi_ack = 0;
+		}
+		data = m_tandy_ppi_porta;
 		break;
 	case 1:
 		data=m_tandy_ppi_portb;
@@ -419,10 +428,10 @@ void tandy1000_state::machine_start()
 	m_maincpu->space(AS_PROGRAM).install_ram(0, m_ram->size() - (128*1024) - 1, &m_ram->pointer()[128*1024]);
 	if(m_maincpu->space(AS_PROGRAM).data_width() == 8)
 		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(m_ram->size() - (128*1024), 640*1024 - 1,
-			read8_delegate(FUNC(tandy1000_state::vram_r), this), write8_delegate(FUNC(tandy1000_state::vram_w), this));
+				read8_delegate(*this, FUNC(tandy1000_state::vram_r)), write8_delegate(*this, FUNC(tandy1000_state::vram_w)));
 	else
 		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(m_ram->size() - (128*1024), 640*1024 - 1,
-			read8_delegate(FUNC(tandy1000_state::vram_r), this), write8_delegate(FUNC(tandy1000_state::vram_w), this), 0xffff);
+				read8_delegate(*this, FUNC(tandy1000_state::vram_r)), write8_delegate(*this, FUNC(tandy1000_state::vram_w)), 0xffff);
 	subdevice<nvram_device>("nvram")->set_base(m_eeprom_ee, sizeof(m_eeprom_ee));
 }
 
@@ -564,7 +573,7 @@ void tandy1000_state::tandy1000_io(address_map &map)
 	map(0x0000, 0x00ff).m(m_mb, FUNC(t1000_mb_device::map));
 	map(0x0060, 0x0063).rw(FUNC(tandy1000_state::tandy1000_pio_r), FUNC(tandy1000_state::tandy1000_pio_w));
 	map(0x00a0, 0x00a0).w(FUNC(tandy1000_state::nmi_vram_bank_w));
-	map(0x00c0, 0x00c0).w("sn76496", FUNC(ncr7496_device::command_w));
+	map(0x00c0, 0x00c0).w("sn76496", FUNC(ncr8496_device::write));
 	map(0x0200, 0x0207).rw("pc_joy", FUNC(pc_joy_device::joy_port_r), FUNC(pc_joy_device::joy_port_w));
 	map(0x0378, 0x037f).rw(FUNC(tandy1000_state::pc_t1t_p37x_r), FUNC(tandy1000_state::pc_t1t_p37x_w));
 	map(0x03d0, 0x03df).r(m_video, FUNC(pcvideo_t1000_device::read)).w(m_video, FUNC(pcvideo_t1000_device::write));
@@ -591,7 +600,7 @@ void tandy1000_state::tandy1000_16_io(address_map &map)
 	map(0x0060, 0x0063).rw(FUNC(tandy1000_state::tandy1000_pio_r), FUNC(tandy1000_state::tandy1000_pio_w));
 	map(0x0065, 0x0065).w(FUNC(tandy1000_state::devctrl_w));
 	map(0x00a0, 0x00a0).r(FUNC(tandy1000_state::unk_r));
-	map(0x00c0, 0x00c1).w("sn76496", FUNC(ncr7496_device::command_w));
+	map(0x00c0, 0x00c1).w("sn76496", FUNC(ncr8496_device::write));
 	map(0x0200, 0x0207).rw("pc_joy", FUNC(pc_joy_device::joy_port_r), FUNC(pc_joy_device::joy_port_w));
 	map(0x0378, 0x037f).rw(FUNC(tandy1000_state::pc_t1t_p37x_r), FUNC(tandy1000_state::pc_t1t_p37x_w));
 	map(0x03d0, 0x03df).r(m_video, FUNC(pcvideo_t1000_device::read)).w(m_video, FUNC(pcvideo_t1000_device::write));
@@ -636,91 +645,99 @@ void tandy1000_state::cfg_fdc_35(device_t *device)
 {
 	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_default_option("35dd");
 	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_fixed(true);
-	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:1")).set_default_option("");
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:1")).set_default_option(nullptr);
 }
 
 void tandy1000_state::cfg_fdc_525(device_t *device)
 {
 	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_fixed(true);
-	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:1")).set_default_option("");
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:1")).set_default_option(nullptr);
 }
 
 static GFXDECODE_START( gfx_t1000 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, t1000_charlayout, 3, 1 )
 GFXDECODE_END
 
-MACHINE_CONFIG_START(tandy1000_state::tandy1000_common)
-	MCFG_DEVICE_ADD("mb", T1000_MOTHERBOARD, 0)
-	downcast<t1000_mb_device &>(*device).set_cputag("maincpu");
+void tandy1000_state::tandy1000_common(machine_config &config)
+{
+	T1000_MOTHERBOARD(config, m_mb, 0);
+	m_mb->set_cputag("maincpu");
+	m_mb->int_callback().set_inputline("maincpu", 0);
+	m_mb->nmi_callback().set_inputline("maincpu", INPUT_LINE_NMI);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("pcvideo_t1000", PCVIDEO_T1000, 0)
-	MCFG_VIDEO_SET_SCREEN("pcvideo_t1000:screen")
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "pcvideo_t1000:palette", gfx_t1000)
+	PCVIDEO_T1000(config, m_video, 0);
+	m_video->set_screen("pcvideo_t1000:screen");
+	GFXDECODE(config, "gfxdecode", "pcvideo_t1000:palette", gfx_t1000);
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("sn76496", NCR7496, XTAL(14'318'181)/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mb:mono", 0.80)
+	NCR8496(config, "sn76496", XTAL(14'318'181)/4).add_route(ALL_OUTPUTS, "mb:mono", 0.80);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("isa_fdc", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "fdc_xt", true) // FIXME: determine ISA bus clock
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc_xt", cfg_fdc_35)
+	isa8_slot_device &isa_fdc(ISA8_SLOT(config, "isa_fdc", 0, "mb:isa", pc_isa8_cards, "fdc_xt", true)); // FIXME: determine ISA bus clock
+	isa_fdc.set_option_machine_config("fdc_xt", cfg_fdc_35);
 
-	MCFG_DEVICE_ADD("isa_lpt", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "lpt", true)
-	MCFG_DEVICE_ADD("isa_com", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "com", true)
+	ISA8_SLOT(config, "isa_lpt", 0, "mb:isa", pc_isa8_cards, "lpt", true);
+	ISA8_SLOT(config, "isa_com", 0, "mb:isa", pc_isa8_cards, "com", true);
 
-	MCFG_PC_JOY_ADD("pc_joy")
+	PC_JOY(config, "pc_joy");
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("640K");
 
-	MCFG_SOFTWARE_LIST_ADD("disk_list","t1000")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("pc_list","ibm5150")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "disk_list").set_original("t1000");
+	SOFTWARE_LIST(config, "pc_list").set_compatible("ibm5150");
+}
 
-MACHINE_CONFIG_START(tandy1000_state::tandy1000_90key)
-	MCFG_PC_KEYB_ADD("pc_keyboard", WRITELINE("mb:pic8259", pic8259_device, ir1_w))
-MACHINE_CONFIG_END
+void tandy1000_state::tandy1000_90key(machine_config &config)
+{
+	PC_KEYB(config, m_keyboard);
+	m_keyboard->keypress().set("mb:pic8259", FUNC(pic8259_device::ir1_w));
+}
 
-MACHINE_CONFIG_START(tandy1000_state::tandy1000_101key)
-	MCFG_AT_KEYB_ADD("pc_keyboard", 1, WRITELINE("mb:pic8259", pic8259_device, ir1_w))
-MACHINE_CONFIG_END
+void tandy1000_state::tandy1000_101key(machine_config &config)
+{
+	AT_KEYB(config, m_keyboard, pc_keyboard_device::KEYBOARD_TYPE::AT, 1);
+	m_keyboard->keypress().set("mb:pic8259", FUNC(pic8259_device::ir1_w));
+}
 
-MACHINE_CONFIG_START(tandy1000_state::t1000hx)
-	MCFG_DEVICE_ADD("maincpu", I8088, 8000000)
-	MCFG_DEVICE_PROGRAM_MAP(tandy1000_map)
-	MCFG_DEVICE_IO_MAP(tandy1000_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
+void tandy1000_state::t1000hx(machine_config &config)
+{
+	I8088(config, m_maincpu, 8000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tandy1000_state::tandy1000_map);
+	m_maincpu->set_addrmap(AS_IO, &tandy1000_state::tandy1000_io);
+	m_maincpu->set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
 	tandy1000_common(config);
 
 	tandy1000_90key(config);
 
 	// plus cards are isa with a nonstandard conntector
-	MCFG_DEVICE_ADD("plus1", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false) // FIXME: determine ISA bus clock
+	ISA8_SLOT(config, "plus1", 0, "mb:isa", pc_isa8_cards, nullptr, false); // FIXME: determine ISA bus clock
 
 	m_ram->set_extra_options("256K, 384K");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(tandy1000_state::t1000sx)
+void tandy1000_state::t1000sx(machine_config &config)
+{
 	t1000hx(config);
-	MCFG_DEVICE_MODIFY("isa_fdc")
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc_xt", cfg_fdc_525)
+	subdevice<isa8_slot_device>("isa_fdc")->set_option_machine_config("fdc_xt", cfg_fdc_525);
 
-	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false) // FIXME: determine ISA bus clock
-	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
-	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
-	MCFG_DEVICE_ADD("isa4", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
+	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, nullptr, false); // FIXME: determine ISA bus clock
+	ISA8_SLOT(config, "isa2", 0, "mb:isa", pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa3", 0, "mb:isa", pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa4", 0, "mb:isa", pc_isa8_cards, nullptr, false);
 
 	m_ram->set_extra_options("384K");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(tandy1000_state::t1000rl)
-	MCFG_DEVICE_ADD("maincpu", I8086, XTAL(28'636'363) / 3)
-	MCFG_DEVICE_PROGRAM_MAP(tandy1000_bank_map)
-	MCFG_DEVICE_IO_MAP(tandy1000_bank_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
+void tandy1000_state::t1000rl(machine_config &config)
+{
+	I8086(config, m_maincpu, XTAL(28'636'363) / 3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tandy1000_state::tandy1000_bank_map);
+	m_maincpu->set_addrmap(AS_IO, &tandy1000_state::tandy1000_bank_io);
+	m_maincpu->set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
 	tandy1000_common(config);
 
@@ -731,48 +748,49 @@ MACHINE_CONFIG_START(tandy1000_state::t1000rl)
 	MCFG_MACHINE_RESET_OVERRIDE(tandy1000_state,tandy1000rl)
 
 	m_ram->set_extra_options("384K");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(tandy1000_state::t1000sl2)
+void tandy1000_state::t1000sl2(machine_config &config)
+{
 	t1000rl(config);
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_CLOCK( XTAL(24'000'000) / 3 )
+	m_maincpu->set_clock(XTAL(24'000'000) / 3);
 
-	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false) // FIXME: determine ISA bus clock
-	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
-	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
-	MCFG_DEVICE_ADD("isa4", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
-MACHINE_CONFIG_END
+	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, nullptr, false); // FIXME: determine ISA bus clock
+	ISA8_SLOT(config, "isa2", 0, "mb:isa", pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa3", 0, "mb:isa", pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa4", 0, "mb:isa", pc_isa8_cards, nullptr, false);
+}
 
-MACHINE_CONFIG_START(tandy1000_state::t1000tl)
-	MCFG_DEVICE_ADD("maincpu", I80286, XTAL(28'636'363) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(tandy1000_286_map)
-	MCFG_DEVICE_IO_MAP(tandy1000_16_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
+void tandy1000_state::t1000tl(machine_config &config)
+{
+	I80286(config, m_maincpu, XTAL(28'636'363) / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tandy1000_state::tandy1000_286_map);
+	m_maincpu->set_addrmap(AS_IO, &tandy1000_state::tandy1000_16_io);
+	m_maincpu->set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
 	tandy1000_common(config);
 
 	tandy1000_101key(config);
 
-	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false) // FIXME: determine ISA bus clock
-	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
-	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
-	MCFG_DEVICE_ADD("isa4", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
-	MCFG_DEVICE_ADD("isa5", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
-MACHINE_CONFIG_END
+	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, nullptr, false); // FIXME: determine ISA bus clock
+	ISA8_SLOT(config, "isa2", 0, "mb:isa", pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa3", 0, "mb:isa", pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa4", 0, "mb:isa", pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa5", 0, "mb:isa", pc_isa8_cards, nullptr, false);
+}
 
-MACHINE_CONFIG_START(tandy1000_state::t1000tx)
+void tandy1000_state::t1000tx(machine_config &config)
+{
 	t1000tl(config);
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_DEVICE_IO_MAP(tandy1000tx_io)
+	m_maincpu->set_addrmap(AS_IO, &tandy1000_state::tandy1000tx_io);
 
-	MCFG_DEVICE_REMOVE("pc_keyboard")
+	config.device_remove("pc_keyboard");
 	tandy1000_90key(config);
-MACHINE_CONFIG_END
+}
 
 #ifdef UNUSED_DEFINITION
 ROM_START( t1000 )
-	// Schematics displays 2 32KB ROMs at U9 and U10
+	// Schematic shows 2 32KB ROMs at U9 and U10 for Tandy 1000; 1000A is a different mainboard.
 	ROM_REGION(0x20000,"bios", 0)
 	ROM_SYSTEM_BIOS( 0, "v010000", "v010000" )
 	ROMX_LOAD("v010000.f0", 0x10000, 0x10000, NO_DUMP, ROM_BIOS(0))
@@ -882,7 +900,7 @@ ROM_END
 
 
 ROM_START( t1000tx )
-	ROM_REGION(0x20000,"bios", 0)
+	ROM_REGION16_LE(0x20000, "bios", 0)
 	// There should be 2 32KBx8 ROMs, one for odd at u38, one for even at u39
 	// The machine already boots up with just this one rom
 	ROM_LOAD("t1000tx.bin", 0x18000, 0x8000, BAD_DUMP CRC(9b34765c) SHA1(0b07e87f6843393f7d4ca4634b832b0c0bec304e))
@@ -896,7 +914,7 @@ ROM_END
 
 ROM_START( t1000rl )
 	// bankable ROM regions
-	ROM_REGION(0x80000, "rom", 0)
+	ROM_REGION16_LE(0x80000, "rom", 0)
 	/* v2.0.0.1 */
 	/* Rom is labeled "(C) TANDY CORP. 1990 // 8079073 // LH534G70 JAPAN // 9034 D" */
 	ROM_LOAD("8079073.u23", 0x00000, 0x80000, CRC(6fab50f7) SHA1(2ccc02bee4c250dc1b7c17faef2590bc158860b0) )
@@ -909,7 +927,7 @@ ROM_END
 
 ROM_START( t1000sl2 )
 	// bankable ROM regions
-	ROM_REGION(0x80000, "rom", 0)
+	ROM_REGION16_LE(0x80000, "rom", 0)
 	// v01.04.04 BIOS
 	// Fix up memory region (highest address bit flipped??)
 	ROM_LOAD16_BYTE("8079047.hu1", 0x40000, 0x20000, CRC(c773ec0e) SHA1(7deb71f14c2c418400b639d60066ab61b7e9df32))
@@ -926,7 +944,7 @@ ROM_END
 
 
 ROM_START( t1000tl2 )
-	ROM_REGION(0x20000, "bios", 0)
+	ROM_REGION16_LE(0x20000, "bios", 0)
 	ROM_LOAD( "t10000tl2.bin", 0x10000, 0x10000, CRC(e288f12c) SHA1(9d54ccf773cd7202c9906323f1b5a68b1b3a3a67))
 
 	ROM_REGION(0x08000,"gfx1", 0)

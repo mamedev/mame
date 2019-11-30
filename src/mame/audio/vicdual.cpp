@@ -111,15 +111,16 @@ static const char *const frogs_sample_names[] =
 };
 
 
-MACHINE_CONFIG_START(vicdual_state::frogs_audio)
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(5)
-	MCFG_SAMPLES_NAMES(frogs_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
+void vicdual_state::frogs_audio(machine_config &config)
+{
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(5);
+	m_samples->set_samples_names(frogs_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.35);
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE, frogs_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	DISCRETE(config, m_discrete, frogs_discrete);
+	m_discrete->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 TIMER_CALLBACK_MEMBER( vicdual_state::frogs_croak_callback )
@@ -143,12 +144,12 @@ WRITE8_MEMBER( vicdual_state::frogs_audio_w )
 	int new_croak = data & 0x08;
 	int new_buzzz = data & 0x10;
 
-//  m_discrete->write(space, FROGS_HOP_EN, data & 0x01);
-//  m_discrete->write(space, FROGS_JUMP_EN, data & 0x02);
-	m_discrete->write(space, FROGS_TONGUE_EN, data & 0x04);
-//  m_discrete->write(space, FROGS_CAPTURE_EN, data & 0x08);
-//  m_discrete->write(space, FROGS_FLY_EN, data & 0x10);
-//  m_discrete->write(space, FROGS_SPLASH_EN, data & 0x80);
+//  m_discrete->write(FROGS_HOP_EN, data & 0x01);
+//  m_discrete->write(FROGS_JUMP_EN, data & 0x02);
+	m_discrete->write(FROGS_TONGUE_EN, data & 0x04);
+//  m_discrete->write(FROGS_CAPTURE_EN, data & 0x08);
+//  m_discrete->write(FROGS_FLY_EN, data & 0x10);
+//  m_discrete->write(FROGS_SPLASH_EN, data & 0x80);
 
 	if (data & 0x01)
 		m_samples->start(3, 3);   // Hop
@@ -444,23 +445,23 @@ static DISCRETE_SOUND_START(headon_discrete)
 
 DISCRETE_SOUND_END
 
-MACHINE_CONFIG_START(vicdual_state::headon_audio)
-
-	MCFG_DEVICE_ADD("discrete", DISCRETE, headon_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+void vicdual_state::headon_audio(machine_config &config)
+{
+	DISCRETE(config, m_discrete, headon_discrete);
+	m_discrete->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 WRITE8_MEMBER( vicdual_state::headon_audio_w )
 {
 	if (m_discrete == nullptr)
 		return;
-	m_discrete->write(space, HEADON_HISPEED_PC_EN, data & 0x01);
-	m_discrete->write(space, HEADON_SCREECH1_EN, data & 0x02);
-	m_discrete->write(space, HEADON_CRASH_EN, data & 0x04);
-	m_discrete->write(space, HEADON_HISPEED_CC_EN, data & 0x08);
-	m_discrete->write(space, HEADON_SCREECH2_EN, data & 0x10);
-	m_discrete->write(space, HEADON_BONUS_EN, data & 0x20);
-	m_discrete->write(space, HEADON_CAR_ON_EN, data & 0x40);
+	m_discrete->write(HEADON_HISPEED_PC_EN, data & 0x01);
+	m_discrete->write(HEADON_SCREECH1_EN, data & 0x02);
+	m_discrete->write(HEADON_CRASH_EN, data & 0x04);
+	m_discrete->write(HEADON_HISPEED_CC_EN, data & 0x08);
+	m_discrete->write(HEADON_SCREECH2_EN, data & 0x10);
+	m_discrete->write(HEADON_BONUS_EN, data & 0x20);
+	m_discrete->write(HEADON_CAR_ON_EN, data & 0x40);
 
 }
 
@@ -468,13 +469,13 @@ WRITE8_MEMBER( vicdual_state::invho2_audio_w )
 {
 	if (m_discrete == nullptr)
 		return;
-	m_discrete->write(space, HEADON_HISPEED_PC_EN, data & 0x10);
-	m_discrete->write(space, HEADON_SCREECH1_EN, data & 0x08);
-	m_discrete->write(space, HEADON_CRASH_EN, data & 0x80);
-	m_discrete->write(space, HEADON_HISPEED_CC_EN, data & 0x40);
-	m_discrete->write(space, HEADON_SCREECH2_EN, data & 0x04);
-	m_discrete->write(space, HEADON_BONUS_EN, data & 0x02);
-	m_discrete->write(space, HEADON_CAR_ON_EN, data & 0x20);
+	m_discrete->write(HEADON_HISPEED_PC_EN, data & 0x10);
+	m_discrete->write(HEADON_SCREECH1_EN, data & 0x08);
+	m_discrete->write(HEADON_CRASH_EN, data & 0x80);
+	m_discrete->write(HEADON_HISPEED_CC_EN, data & 0x40);
+	m_discrete->write(HEADON_SCREECH2_EN, data & 0x04);
+	m_discrete->write(HEADON_BONUS_EN, data & 0x02);
+	m_discrete->write(HEADON_CAR_ON_EN, data & 0x20);
 
 }
 
@@ -590,12 +591,13 @@ static const char *const brdrline_sample_names[] =
 };
 
 
-MACHINE_CONFIG_START(vicdual_state::brdrline_audio)
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(7)
-	MCFG_SAMPLES_NAMES(brdrline_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
-MACHINE_CONFIG_END
+void vicdual_state::brdrline_audio(machine_config &config)
+{
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(7);
+	m_samples->set_samples_names(brdrline_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.35);
+}
 
 WRITE8_MEMBER( vicdual_state::brdrline_audio_w )
 {

@@ -59,7 +59,6 @@ class sangho_state : public driver_device
 public:
 	sangho_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_v9958(*this, "v9958")
 		, m_maincpu(*this, "maincpu")
 		, m_region_user1(*this, "user1")
 		, m_banks(*this, "bank%u", 1U)
@@ -71,7 +70,6 @@ protected:
 	void sangho_map(address_map &map);
 
 	std::unique_ptr<uint8_t[]> m_ram;
-	required_device<v9958_device> m_v9958;
 	required_device<cpu_device> m_maincpu;
 	required_memory_region m_region_user1;
 	required_memory_bank_array<8> m_banks;
@@ -223,7 +221,7 @@ void pzlestar_state::pzlestar_map_banks()
 		break;
 	}
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xffff, 0xffff, read8_delegate(FUNC(pzlestar_state::sec_slot_r),this), write8_delegate(FUNC(pzlestar_state::sec_slot_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xffff, 0xffff, read8_delegate(*this, FUNC(pzlestar_state::sec_slot_r)), write8_delegate(*this, FUNC(pzlestar_state::sec_slot_w)));
 }
 
 WRITE8_MEMBER(pzlestar_state::pzlestar_bank_w)
@@ -315,7 +313,7 @@ void pzlestar_state::pzlestar_io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x7c, 0x7d).w("ymsnd", FUNC(ym2413_device::write));
 	map(0x91, 0x91).w(FUNC(pzlestar_state::pzlestar_bank_w));
-	map(0x98, 0x9b).rw(m_v9958, FUNC(v9958_device::read), FUNC(v9958_device::write));
+	map(0x98, 0x9b).rw("v9958", FUNC(v9958_device::read), FUNC(v9958_device::write));
 	map(0xa0, 0xa0).portr("P1");
 	map(0xa1, 0xa1).portr("P2");
 	map(0xa8, 0xa8).rw(FUNC(pzlestar_state::pzlestar_mem_bank_r), FUNC(pzlestar_state::pzlestar_mem_bank_w));
@@ -330,7 +328,7 @@ void sexyboom_state::sexyboom_io_map(address_map &map)
 	map(0x7c, 0x7d).w("ymsnd", FUNC(ym2413_device::write));
 	map(0xa0, 0xa0).portr("P1");
 	map(0xa1, 0xa1).portr("P2");
-	map(0xf0, 0xf3).rw(m_v9958, FUNC(v9958_device::read), FUNC(v9958_device::write));
+	map(0xf0, 0xf3).rw("v9958", FUNC(v9958_device::read), FUNC(v9958_device::write));
 	map(0xf7, 0xf7).portr("DSW");
 	map(0xf8, 0xff).w(FUNC(sexyboom_state::sexyboom_bank_w));
 }
@@ -479,38 +477,40 @@ void sexyboom_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(pzlestar_state::pzlestar)
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(21'477'272)/6) // ?
-	MCFG_DEVICE_PROGRAM_MAP(sangho_map)
-	MCFG_DEVICE_IO_MAP(pzlestar_io_map)
+void pzlestar_state::pzlestar(machine_config &config)
+{
+	Z80(config, m_maincpu, XTAL(21'477'272)/6); // ?
+	m_maincpu->set_addrmap(AS_PROGRAM, &pzlestar_state::sangho_map);
+	m_maincpu->set_addrmap(AS_IO, &pzlestar_state::pzlestar_io_map);
 
-	MCFG_V9958_ADD("v9958", "screen", 0x20000, XTAL(21'477'272)) // typical 9958 clock, not verified
-	MCFG_V99X8_INTERRUPT_CALLBACK(INPUTLINE("maincpu", 0))
-	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9958", XTAL(21'477'272))
-
-	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("ymsnd", YM2413,  XTAL(21'477'272)/6)
-
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(sexyboom_state::sexyboom)
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(21'477'272)/6)
-	MCFG_DEVICE_PROGRAM_MAP(sangho_map)
-	MCFG_DEVICE_IO_MAP(sexyboom_io_map)
-
-	MCFG_V9958_ADD("v9958", "screen", 0x20000, XTAL(21'477'272))
-	MCFG_V99X8_INTERRUPT_CALLBACK(INPUTLINE("maincpu", 0))
-	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9958", XTAL(21'477'272))
-
-	MCFG_PALETTE_ADD("palette", 19780)
+	v9958_device &v9958(V9958(config, "v9958", XTAL(21'477'272))); // typical 9958 clock, not verified
+	v9958.set_screen_ntsc("screen");
+	v9958.set_vram_size(0x20000);
+	v9958.int_cb().set_inputline("maincpu", 0);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(21'477'272)/6)
+	YM2413(config, "ymsnd", XTAL(21'477'272)/6).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+
+void sexyboom_state::sexyboom(machine_config &config)
+{
+	Z80(config, m_maincpu, XTAL(21'477'272)/6);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sexyboom_state::sangho_map);
+	m_maincpu->set_addrmap(AS_IO, &sexyboom_state::sexyboom_io_map);
+
+	v9958_device &v9958(V9958(config, "v9958", XTAL(21'477'272)));
+	v9958.set_screen_ntsc("screen");
+	v9958.set_vram_size(0x20000);
+	v9958.int_cb().set_inputline("maincpu", 0);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+
+	PALETTE(config, "palette").set_entries(19780);
+
+	SPEAKER(config, "mono").front_center();
+	YM2413(config, "ymsnd", XTAL(21'477'272)/6).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 ROM_START( pzlestar )
 	ROM_REGION( 0x20000*16, "user1", 0 ) // 15 sockets, 13 used
@@ -527,8 +527,27 @@ ROM_START( pzlestar )
 	ROM_LOAD( "rom11.bin", 0x140000, 0x20000, CRC(d36c1f92) SHA1(42b412c1ab99cb14f2e15bd80fede34c0df414b9) )
 	ROM_LOAD( "rom12.bin", 0x160000, 0x20000, CRC(baa82727) SHA1(ed3dd1befa615003204f903472ef1af1eb702c38) )
 	ROM_LOAD( "rom13.bin", 0x180000, 0x20000, CRC(8b4b6a2c) SHA1(4b9c188260617ccce94cbf6cccb45aab455af09b) )
-	/* 14 empty */
-	/* 15 empty */
+	/* ROM14 empty */
+	/* ROM15 empty */
+ROM_END
+
+ROM_START( sprpuzzle )
+	ROM_REGION( 0x20000*16, "user1", 0 ) // 15 sockets, 12 used
+	ROM_LOAD( "01.rom1",  0x000000, 0x20000, CRC(c494d996) SHA1(755a8e49845f3168130a83a4c7363d3ee9da359b) )
+	ROM_LOAD( "02.rom2",  0x020000, 0x20000, CRC(7ee2974e) SHA1(36a91b690f1228cbf66b5b3733823056632e9ef3) )
+	ROM_LOAD( "03.rom3",  0x040000, 0x20000, CRC(340edac9) SHA1(47ffc4553cb34ff932d3d54d5cefe82571c6ddbf) ) // ROMs 02 through 12 match sexyboom below
+	ROM_LOAD( "04.rom4",  0x060000, 0x20000, CRC(25f76d7f) SHA1(caff03ba4ca9ad44e488618141c4e1f43a0cdc48) )
+	ROM_LOAD( "05.rom5",  0x080000, 0x20000, CRC(3a3dda85) SHA1(b174cf87be5dd7a7430ff29c70c8093c577f4033) )
+	ROM_LOAD( "06.rom6",  0x0a0000, 0x20000, CRC(d0428a82) SHA1(4409c2ebd2f70828286769c9367cbccac483cdaf) )
+	ROM_LOAD( "07.rom7",  0x0c0000, 0x20000, CRC(2d2e4df2) SHA1(8ec36c8c021c2b9d9be7b61e09e31a7a18a06dad) )
+	ROM_LOAD( "08.rom8",  0x0e0000, 0x20000, CRC(283ba870) SHA1(98f35d95caf58595f002d57a4bafc39b6d67ed1a) )
+	ROM_LOAD( "09.rom9",  0x100000, 0x20000, CRC(a78310f4) SHA1(7a14cabd371d6ba4e335f0e00135de3dd8a4e642) )
+	ROM_LOAD( "10.rom10", 0x120000, 0x20000, CRC(b20fabd2) SHA1(a6a3bac1ac19e1ecd2fd0aeb17fbf16ffa07df13) )
+	ROM_LOAD( "11.rom11", 0x140000, 0x20000, CRC(e4aa16bc) SHA1(c5889b813ceb7a1c0deb8a9d4d006932b266a482) )
+	ROM_LOAD( "12.rom12", 0x160000, 0x20000, CRC(cd8b6b5d) SHA1(ffddc7781e13146e198ad12a9c89504f270857d8) )
+	/* ROM13 empty */
+	/* ROM14 empty */
+	/* ROM15 empty */
 ROM_END
 
 ROM_START( sexyboom )
@@ -545,9 +564,9 @@ ROM_START( sexyboom )
 	ROM_LOAD( "rom10.bin", 0x120000, 0x20000, CRC(b20fabd2) SHA1(a6a3bac1ac19e1ecd2fd0aeb17fbf16ffa07df13) )
 	ROM_LOAD( "rom11.bin", 0x140000, 0x20000, CRC(e4aa16bc) SHA1(c5889b813ceb7a1c0deb8a9d4d006932b266a482) )
 	ROM_LOAD( "rom12.bin", 0x160000, 0x20000, CRC(cd8b6b5d) SHA1(ffddc7781e13146e198ad12a9c89504f270857d8) )
-	/* 13 empty */
-	/* 14 empty */
-	/* 15 empty */
+	/* ROM13 empty */
+	/* ROM14 empty */
+	/* ROM15 empty */
 ROM_END
 
 void pzlestar_state::init_pzlestar()
@@ -559,5 +578,6 @@ void pzlestar_state::init_pzlestar()
 	ROM[0x12ca8] = 0x00;
 }
 
-GAME( 1991, pzlestar,  0,    pzlestar, pzlestar, pzlestar_state, init_pzlestar, ROT270, "Sang Ho Soft", "Puzzle Star (Sang Ho Soft)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND )
-GAME( 1992, sexyboom,  0,    sexyboom, sexyboom, sexyboom_state, empty_init,    ROT270, "Sang Ho Soft", "Sexy Boom", 0 )
+GAME( 1991, pzlestar,  0,        pzlestar, pzlestar, pzlestar_state, init_pzlestar, ROT270, "Sang Ho Soft", "Puzzle Star (Sang Ho Soft)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND )
+GAME( 1992, sexyboom,  0,        sexyboom, sexyboom, sexyboom_state, empty_init,    ROT270, "Sang Ho Soft", "Sexy Boom", 0 )
+GAME( 1991, sprpuzzle, sexyboom, sexyboom, sexyboom, sexyboom_state, empty_init,    ROT270, "Sang Ho Soft", "Super Puzzle (Sang Ho Soft)", 0 )

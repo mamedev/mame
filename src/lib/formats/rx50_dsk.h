@@ -11,9 +11,10 @@
 based on lib/formats/esq16_dsk.h
 
 *********************************************************************/
+#ifndef MAME_FORMATS_RX50_DSK_H
+#define MAME_FORMATS_RX50_DSK_H
 
-#ifndef RX50_DSK_H_
-#define RX50_DSK_H_
+#pragma once
 
 #include "flopimg.h"
 
@@ -39,4 +40,4 @@ private:
 
 extern const floppy_format_type FLOPPY_RX50IMG_FORMAT;
 
-#endif /* RX50_DSK_H_ */
+#endif // MAME_FORMATS_RX50_DSK_H

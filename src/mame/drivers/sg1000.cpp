@@ -136,9 +136,8 @@ void sg1000_state::sg1000_map(address_map &map)
 void sg1000_state::sg1000_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x40, 0x40).mirror(0x3f).w(SN76489AN_TAG, FUNC(sn76489a_device::command_w));
-	map(0x80, 0x80).mirror(0x3e).rw(TMS9918A_TAG, FUNC(tms9918a_device::vram_r), FUNC(tms9918a_device::vram_w));
-	map(0x81, 0x81).mirror(0x3e).rw(TMS9918A_TAG, FUNC(tms9918a_device::register_r), FUNC(tms9918a_device::register_w));
+	map(0x40, 0x40).mirror(0x3f).w(SN76489AN_TAG, FUNC(sn76489a_device::write));
+	map(0x80, 0x81).mirror(0x3e).rw(TMS9918A_TAG, FUNC(tms9918a_device::read), FUNC(tms9918a_device::write));
 	map(0xdc, 0xdf).rw(FUNC(sg1000_state::peripheral_r), FUNC(sg1000_state::peripheral_w));
 }
 
@@ -159,9 +158,8 @@ void sg1000_state::omv_map(address_map &map)
 void sg1000_state::omv_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x40, 0x40).mirror(0x3f).w(SN76489AN_TAG, FUNC(sn76489a_device::command_w));
-	map(0x80, 0x80).mirror(0x3e).rw(TMS9918A_TAG, FUNC(tms9918a_device::vram_r), FUNC(tms9918a_device::vram_w));
-	map(0x81, 0x81).mirror(0x3e).rw(TMS9918A_TAG, FUNC(tms9918a_device::register_r), FUNC(tms9918a_device::register_w));
+	map(0x40, 0x40).mirror(0x3f).w(SN76489AN_TAG, FUNC(sn76489a_device::write));
+	map(0x80, 0x81).mirror(0x3e).rw(TMS9918A_TAG, FUNC(tms9918a_device::read), FUNC(tms9918a_device::write));
 	map(0xc0, 0xc0).mirror(0x38).portr("C0");
 	map(0xc1, 0xc1).mirror(0x38).portr("C1");
 	map(0xc2, 0xc2).mirror(0x38).portr("C2");
@@ -187,9 +185,9 @@ void sg1000_state::sc3000_map(address_map &map)
 void sg1000_state::sc3000_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x7f, 0x7f).w(SN76489AN_TAG, FUNC(sn76489a_device::command_w));
-	map(0xbe, 0xbe).rw(TMS9918A_TAG, FUNC(tms9918a_device::vram_r), FUNC(tms9918a_device::vram_w));
-	map(0xbf, 0xbf).rw(TMS9918A_TAG, FUNC(tms9918a_device::register_r), FUNC(tms9918a_device::register_w));
+	map(0x00, 0xff).rw(CARTSLOT_TAG, FUNC(sega8_cart_slot_device::read_io), FUNC(sega8_cart_slot_device::write_io));
+	map(0x7f, 0x7f).w(SN76489AN_TAG, FUNC(sn76489a_device::write));
+	map(0xbe, 0xbf).rw(TMS9918A_TAG, FUNC(tms9918a_device::read), FUNC(tms9918a_device::write));
 	map(0xdc, 0xdf).rw(FUNC(sg1000_state::peripheral_r), FUNC(sg1000_state::peripheral_w));
 }
 
@@ -198,9 +196,8 @@ void sg1000_state::sc3000_io_map(address_map &map)
 {
     map.global_mask(0xff);
     map(0x00, 0x00).mirror(0xdf).rw(UPD9255_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
-    map(0x00, 0x00).mirror(0x7f).w(SN76489AN_TAG, FUNC(sn76489a_device::command_w));
-    map(0x00, 0x00).mirror(0xae).rw(TMS9918A_TAG, FUNC(tms9918a_device::vram_r), FUNC(tms9918a_device::vram_w));
-    map(0x01, 0x01).mirror(0xae).rw(TMS9918A_TAG, FUNC(tms9918a_device::register_r), FUNC(tms9918a_device::register_w));
+    map(0x00, 0x00).mirror(0x7f).w(SN76489AN_TAG, FUNC(sn76489a_device::write));
+    map(0x00, 0x01).mirror(0xae).rw(TMS9918A_TAG, FUNC(tms9918a_device::read), FUNC(tms9918a_device::write));
     map(0x60, 0x60).mirror(0x9f).r(FUNC(sg1000_state::sc3000_r_r));
 }
 */
@@ -222,14 +219,12 @@ void sf7000_state::sf7000_map(address_map &map)
 void sf7000_state::sf7000_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x7f, 0x7f).w(SN76489AN_TAG, FUNC(sn76489a_device::command_w));
-	map(0xbe, 0xbe).rw(TMS9918A_TAG, FUNC(tms9918a_device::vram_r), FUNC(tms9918a_device::vram_w));
-	map(0xbf, 0xbf).rw(TMS9918A_TAG, FUNC(tms9918a_device::register_r), FUNC(tms9918a_device::register_w));
+	map(0x7f, 0x7f).w(SN76489AN_TAG, FUNC(sn76489a_device::write));
+	map(0xbe, 0xbf).rw(TMS9918A_TAG, FUNC(tms9918a_device::read), FUNC(tms9918a_device::write));
 	map(0xdc, 0xdf).rw(FUNC(sf7000_state::peripheral_r), FUNC(sf7000_state::peripheral_w));
 	map(0xe0, 0xe1).m(m_fdc, FUNC(upd765a_device::map));
 	map(0xe4, 0xe7).rw(UPD9255_1_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xe8, 0xe8).rw(UPD8251_TAG, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xe9, 0xe9).rw(UPD8251_TAG, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0xe8, 0xe9).rw(UPD8251_TAG, FUNC(i8251_device::read), FUNC(i8251_device::write));
 }
 
 /***************************************************************************
@@ -468,8 +463,8 @@ void sg1000_state::machine_start()
 {
 	if (m_cart->get_type() == SEGA8_DAHJEE_TYPEA || m_cart->get_type() == SEGA8_DAHJEE_TYPEB)
 	{
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000, 0xffff, read8_delegate(FUNC(sega8_cart_slot_device::read_ram),(sega8_cart_slot_device*)m_cart));
-		m_maincpu->space(AS_PROGRAM).install_write_handler(0xc000, 0xffff, write8_delegate(FUNC(sega8_cart_slot_device::write_ram),(sega8_cart_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000, 0xffff, read8_delegate(*m_cart, FUNC(sega8_cart_slot_device::read_ram)));
+		m_maincpu->space(AS_PROGRAM).install_write_handler(0xc000, 0xffff, write8_delegate(*m_cart, FUNC(sega8_cart_slot_device::write_ram)));
 	}
 
 	if (m_cart)
@@ -486,10 +481,11 @@ void sc3000_state::machine_start()
 	timer_set(attotime::zero, TIMER_LIGHTGUN_TICK);
 
 	if (m_cart && m_cart->exists() && (m_cart->get_type() == SEGA8_BASIC_L3 || m_cart->get_type() == SEGA8_MUSIC_EDITOR
-								|| m_cart->get_type() == SEGA8_DAHJEE_TYPEA || m_cart->get_type() == SEGA8_DAHJEE_TYPEB))
+								|| m_cart->get_type() == SEGA8_DAHJEE_TYPEA || m_cart->get_type() == SEGA8_DAHJEE_TYPEB
+								|| m_cart->get_type() == SEGA8_MULTICART || m_cart->get_type() == SEGA8_MEGACART))
 	{
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000, 0xffff, read8_delegate(FUNC(sega8_cart_slot_device::read_ram),(sega8_cart_slot_device*)m_cart));
-		m_maincpu->space(AS_PROGRAM).install_write_handler(0xc000, 0xffff, write8_delegate(FUNC(sega8_cart_slot_device::write_ram),(sega8_cart_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000, 0xffff, read8_delegate(*m_cart, FUNC(sega8_cart_slot_device::read_ram)));
+		m_maincpu->space(AS_PROGRAM).install_write_handler(0xc000, 0xffff, write8_delegate(*m_cart, FUNC(sega8_cart_slot_device::write_ram)));
 	}
 
 	if (m_cart)
@@ -524,14 +520,15 @@ void sf7000_state::machine_reset()
 ***************************************************************************/
 
 /*-------------------------------------------------
-    MACHINE_CONFIG_START( sg1000 )
+    machine_config( sg1000 )
 -------------------------------------------------*/
 
-MACHINE_CONFIG_START(sg1000_state::sg1000)
+void sg1000_state::sg1000(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(10'738'635)/3)
-	MCFG_DEVICE_PROGRAM_MAP(sg1000_map)
-	MCFG_DEVICE_IO_MAP(sg1000_io_map)
+	Z80(config, m_maincpu, XTAL(10'738'635)/3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sg1000_state::sg1000_map);
+	m_maincpu->set_addrmap(AS_IO, &sg1000_state::sg1000_io_map);
 
 	/* video hardware */
 	tms9918a_device &vdp(TMS9918A(config, TMS9918A_TAG, XTAL(10'738'635)));
@@ -543,47 +540,48 @@ MACHINE_CONFIG_START(sg1000_state::sg1000)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD(SN76489AN_TAG, SN76489A, XTAL(10'738'635)/3)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	SN76489A(config, SN76489AN_TAG, XTAL(10'738'635)/3).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* expansion slot */
-	MCFG_SG1000_EXPANSION_ADD(EXPSLOT_TAG, sg1000_expansion_devices, nullptr, false)
+	SG1000_EXPANSION_SLOT(config, m_sgexpslot, sg1000_expansion_devices, nullptr, false);
 
 	/* cartridge */
-	MCFG_SG1000_CARTRIDGE_ADD(CARTSLOT_TAG, sg1000_cart, nullptr)
+	SG1000_CART_SLOT(config, CARTSLOT_TAG, sg1000_cart, nullptr);
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","sg1000")
+	SOFTWARE_LIST(config, "cart_list").set_original("sg1000");
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("1K");
-MACHINE_CONFIG_END
+}
 
 /*-------------------------------------------------
-    MACHINE_CONFIG_START( omv )
+    machine_config( omv )
 -------------------------------------------------*/
 
-MACHINE_CONFIG_START(sg1000_state::omv)
+void sg1000_state::omv(machine_config &config)
+{
 	sg1000(config);
-	MCFG_DEVICE_MODIFY(Z80_TAG)
-	MCFG_DEVICE_PROGRAM_MAP(omv_map)
-	MCFG_DEVICE_IO_MAP(omv_io_map)
 
-	MCFG_DEVICE_REMOVE(CARTSLOT_TAG)
-	MCFG_OMV_CARTRIDGE_ADD(CARTSLOT_TAG, sg1000_cart, nullptr)
+	m_maincpu->set_addrmap(AS_PROGRAM, &sg1000_state::omv_map);
+	m_maincpu->set_addrmap(AS_IO, &sg1000_state::omv_io_map);
+
+	config.device_remove(CARTSLOT_TAG);
+	OMV_CART_SLOT(config, CARTSLOT_TAG, sg1000_cart, nullptr);
 
 	m_ram->set_default_size("2K");
-MACHINE_CONFIG_END
+}
 
 /*-------------------------------------------------
-    MACHINE_CONFIG_START( sc3000 )
+    machine_config( sc3000 )
 -------------------------------------------------*/
 
-MACHINE_CONFIG_START(sc3000_state::sc3000)
+void sc3000_state::sc3000(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(10'738'635)/3) // LH0080A
-	MCFG_DEVICE_PROGRAM_MAP(sc3000_map)
-	MCFG_DEVICE_IO_MAP(sc3000_io_map)
+	Z80(config, m_maincpu, XTAL(10'738'635)/3); // LH0080A
+	m_maincpu->set_addrmap(AS_PROGRAM, &sc3000_state::sc3000_map);
+	m_maincpu->set_addrmap(AS_IO, &sc3000_state::sc3000_io_map);
 
 	/* video hardware */
 	tms9918a_device &vdp(TMS9918A(config, TMS9918A_TAG, XTAL(10'738'635)));
@@ -595,32 +593,32 @@ MACHINE_CONFIG_START(sc3000_state::sc3000)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD(SN76489AN_TAG, SN76489A, XTAL(10'738'635)/3)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	SN76489A(config, SN76489AN_TAG, XTAL(10'738'635)/3).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* sc3000 has all sk1100 features built-in, so add it as a fixed slot */
-	MCFG_SG1000_EXPANSION_ADD(EXPSLOT_TAG, sg1000_expansion_devices, "sk1100", true)
+	SG1000_EXPANSION_SLOT(config, m_sgexpslot, sg1000_expansion_devices, "sk1100", true);
 
 	/* cartridge */
-	MCFG_SC3000_CARTRIDGE_ADD(CARTSLOT_TAG, sg1000_cart, nullptr)
+	SC3000_CART_SLOT(config, CARTSLOT_TAG, sg1000_cart, nullptr);
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","sg1000")
+	SOFTWARE_LIST(config, "cart_list").set_original("sg1000");
 	/* the sk1100 device will add sc3000 cart and cass lists */
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("2K");
-MACHINE_CONFIG_END
+}
 
 /*-------------------------------------------------
-    MACHINE_CONFIG_START( sf7000 )
+    machine_config( sf7000 )
 -------------------------------------------------*/
 
-MACHINE_CONFIG_START(sf7000_state::sf7000)
+void sf7000_state::sf7000(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(10'738'635)/3)
-	MCFG_DEVICE_PROGRAM_MAP(sf7000_map)
-	MCFG_DEVICE_IO_MAP(sf7000_io_map)
+	Z80(config, m_maincpu, XTAL(10'738'635)/3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sf7000_state::sf7000_map);
+	m_maincpu->set_addrmap(AS_IO, &sf7000_state::sf7000_io_map);
 
 	/* video hardware */
 	tms9918a_device &vdp(TMS9918A(config, TMS9918A_TAG, XTAL(10'738'635)));
@@ -632,40 +630,40 @@ MACHINE_CONFIG_START(sf7000_state::sf7000)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD(SN76489AN_TAG, SN76489A, XTAL(10'738'635)/3)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	SN76489A(config, SN76489AN_TAG, XTAL(10'738'635)/3).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* devices */
-	MCFG_DEVICE_ADD(UPD9255_1_TAG, I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, sf7000_state, ppi_pa_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, sf7000_state, ppi_pc_w))
+	i8255_device &ppi(I8255(config, UPD9255_1_TAG));
+	ppi.in_pa_callback().set(FUNC(sf7000_state::ppi_pa_r));
+	ppi.out_pb_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	ppi.out_pc_callback().set(FUNC(sf7000_state::ppi_pc_w));
 
-	MCFG_DEVICE_ADD(UPD8251_TAG, I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_rts))
+	i8251_device &upd8251(I8251(config, UPD8251_TAG, 0));
+	upd8251.txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
+	upd8251.dtr_handler().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
+	upd8251.rts_handler().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(UPD8251_TAG, i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(UPD8251_TAG, i8251_device, write_dsr))
+	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(UPD8251_TAG, FUNC(i8251_device::write_rxd));
+	rs232.dsr_handler().set(UPD8251_TAG, FUNC(i8251_device::write_dsr));
 
-	MCFG_UPD765A_ADD(UPD765_TAG, false, false)
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", sf7000_floppies, "3ssdd", sf7000_state::floppy_formats)
+	UPD765A(config, m_fdc, 8'000'000, false, false);
+	FLOPPY_CONNECTOR(config, UPD765_TAG ":0", sf7000_floppies, "3ssdd", sf7000_state::floppy_formats);
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
 
 	/* sf7000 (sc3000) has all sk1100 features built-in, so add it as a fixed slot */
-	MCFG_SG1000_EXPANSION_ADD(EXPSLOT_TAG, sg1000_expansion_devices, "sk1100", true)
+	SG1000_EXPANSION_SLOT(config, m_sgexpslot, sg1000_expansion_devices, "sk1100", true);
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("flop_list","sf7000")
+	SOFTWARE_LIST(config, "flop_list").set_original("sf7000");
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("64K");
-MACHINE_CONFIG_END
+}
 
 /***************************************************************************
     ROMS

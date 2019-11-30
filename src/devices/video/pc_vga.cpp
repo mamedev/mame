@@ -90,7 +90,7 @@ enum
 
 #define IBM8514_LINE_LENGTH (m_vga->offset())
 
-#define CHAR_WIDTH ((vga.sequencer.data[1]&1)?8:9)
+#define VGA_CH_WIDTH ((vga.sequencer.data[1]&1)?8:9)
 
 #define TEXT_COLUMNS (vga.crtc.horz_disp_end+1)
 #define TEXT_START_ADDRESS (vga.crtc.start_addr<<3)
@@ -134,6 +134,7 @@ vga_device::vga_device(const machine_config &mconfig, device_type type, const ch
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, device_palette_interface(mconfig, *this)
+	, vga(*this)
 {
 }
 
@@ -252,7 +253,7 @@ void vga_device::device_start()
 
 
 	// copy over interfaces
-	vga.read_dipswitch = read8_delegate(); //read_dipswitch;
+	vga.read_dipswitch.set(nullptr); //read_dipswitch;
 	vga.svga_intf.seq_regcount = 0x05;
 	vga.svga_intf.crtc_regcount = 0x19;
 	vga.svga_intf.vram_size = 0x100000;
@@ -452,7 +453,7 @@ void vga_device::vga_vh_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	uint8_t bits;
 	uint32_t font_base;
 	uint32_t *bitmapline;
-	int width=CHAR_WIDTH, height = (vga.crtc.maximum_scan_line) * (vga.crtc.scan_doubling + 1);
+	int width=VGA_CH_WIDTH, height = (vga.crtc.maximum_scan_line) * (vga.crtc.scan_doubling + 1);
 	int pos, line, column, mask, w, h, addr;
 	uint8_t blink_en,fore_col,back_col;
 	pen_t pen;
@@ -1392,7 +1393,7 @@ void vga_device::recompute_params_clock(int divisor, int xtal)
 {
 	int vblank_period,hblank_period;
 	attoseconds_t refresh;
-	uint8_t hclock_m = (!GRAPHIC_MODE) ? CHAR_WIDTH : 8;
+	uint8_t hclock_m = (!GRAPHIC_MODE) ? VGA_CH_WIDTH : 8;
 	int pixel_clock;
 
 	/* safety check */
@@ -2220,14 +2221,16 @@ WRITE8_MEMBER(vga_device::mem_linear_w)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(ati_vga_device::device_add_mconfig)
-	MCFG_MACH8_ADD_OWNER("8514a")
+void ati_vga_device::device_add_mconfig(machine_config &config)
+{
+	MACH8(config, "8514a", 0).set_vga_owner();
 	EEPROM_93C46_16BIT(config, "ati_eeprom");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(s3_vga_device::device_add_mconfig)
-	MCFG_8514A_ADD_OWNER("8514a")
-MACHINE_CONFIG_END
+void s3_vga_device::device_add_mconfig(machine_config &config)
+{
+	IBM8514A(config, "8514a", 0).set_vga_owner();
+}
 
 /******************************************
 
@@ -2719,6 +2722,9 @@ uint8_t s3_vga_device::s3_crtc_reg_read(uint8_t index)
 				res = (vga.crtc.start_addr_latch & 0x0c0000) >> 18;
 				res |= ((svga.bank_w & 0x30) >> 2);
 				res |= ((vga.crtc.offset & 0x0300) >> 4);
+				break;
+			case 0x53:
+				res = s3.cr53;
 				break;
 			case 0x55:
 				res = s3.extended_dac_ctrl;

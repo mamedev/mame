@@ -92,7 +92,7 @@ void hng64_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, cons
 		zoomx = (source[1]&0x0000ffff)>>0;
 
 		int filtervalue = 0x000;
-		
+
 		// This flips between ingame and other screens for roadedge, where the sprites which are filtered definitely needs to change and the game explicitly swaps the values in the sprite list at the same time.
 		// m_spriteregs[2] could also play a part as it also flips between 0x00000000 and 0x000fffff at the same time
 		// Samsho games also set the upper 3 bits which could be related, samsho games still have some unwanted sprites (but also use the other 'sprite clear' mechanism)

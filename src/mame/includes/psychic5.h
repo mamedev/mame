@@ -5,6 +5,7 @@
 #include "machine/timer.h"
 #include "video/jalblend.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class psychic5_state : public driver_device
 {
@@ -86,7 +87,7 @@ private:
 	virtual void video_start() override;
 	DECLARE_VIDEO_START(psychic5);
 	DECLARE_VIDEO_START(bombsa);
-	DECLARE_VIDEO_RESET(psychic5);
+	virtual void video_reset() override;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 

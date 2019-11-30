@@ -219,7 +219,7 @@ READ8Z_MEMBER(horizon_ramdisk_device::readz)
 	}
 }
 
-WRITE8_MEMBER(horizon_ramdisk_device::write)
+void horizon_ramdisk_device::write(offs_t offset, uint8_t data)
 {
 	// 32K expansion
 	// According to the manual, "this memory is not affected by the HIDE switch"
@@ -303,7 +303,7 @@ void horizon_ramdisk_device::setbit(int& page, int pattern, bool set)
 	}
 }
 
-WRITE8_MEMBER(horizon_ramdisk_device::cruwrite)
+void horizon_ramdisk_device::cruwrite(offs_t offset, uint8_t data)
 {
 	int size = ioport("HORIZONSIZE")->read();
 	int split_bit = size + 10;
@@ -456,7 +456,7 @@ INPUT_PORTS_START( horizon )
 		PORT_DIPSETTING(    0x02, "Geneve mode" )
 
 	PORT_START( "HORIZONACT" )
-	PORT_DIPNAME( 0x01, 0x00, "Horizon hideswitch" ) PORT_CHANGED_MEMBER(DEVICE_SELF, horizon_ramdisk_device, hs_changed, nullptr)
+	PORT_DIPNAME( 0x01, 0x00, "Horizon hideswitch" ) PORT_CHANGED_MEMBER(DEVICE_SELF, horizon_ramdisk_device, hs_changed, 0)
 		PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 		PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 

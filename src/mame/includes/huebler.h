@@ -26,8 +26,9 @@ class amu880_state : public driver_device
 public:
 	amu880_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, Z80_TAG)
 		, m_cassette(*this, "cassette")
-		, m_z80sio(*this, Z80SIO_TAG)
+		, m_sio(*this, Z80SIO_TAG)
 		, m_palette(*this, "palette")
 		, m_kb_rom(*this, "keyboard")
 		, m_char_rom(*this, "chargen")
@@ -41,9 +42,14 @@ public:
 
 	void amu880(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override { m_maincpu->set_pc(0xf000); }
+
 private:
+	required_device<z80_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
-	required_device<z80dart_device> m_z80sio;
+	required_device<z80dart_device> m_sio;
 	required_device<palette_device> m_palette;
 	required_memory_region m_kb_rom;
 	required_memory_region m_char_rom;
@@ -51,12 +57,9 @@ private:
 	required_ioport_array<16> m_key_row;
 	required_ioport m_special;
 
-	virtual void machine_start() override;
-
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER( keyboard_r );
-	TIMER_DEVICE_CALLBACK_MEMBER( tape_tick );
 
 	void scan_keyboard();
 
@@ -74,6 +77,10 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(cassette_w);
 	void amu880_io(address_map &map);
 	void amu880_mem(address_map &map);
+
+	// cassette variables
+	u8 m_cnt;
+	bool m_cassbit;
 };
 
 #endif

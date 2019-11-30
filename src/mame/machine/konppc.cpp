@@ -114,7 +114,7 @@ READ32_MEMBER( konppc_device::cgboard_dsp_comm_r_ppc )
 {
 	if (cgboard_id < MAX_CG_BOARDS)
 	{
-//      osd_printf_debug("%s dsp_cmd_r: (board %d) %08X, %08X\n", machine().describe_context().c_str(), cgboard_id, offset, mem_mask);
+//      osd_printf_debug("%s dsp_cmd_r: (board %d) %08X, %08X\n", machine().describe_context(), cgboard_id, offset, mem_mask);
 		return dsp_comm_sharc[cgboard_id][offset] | (dsp_state[cgboard_id] << 16);
 	}
 	else
@@ -125,7 +125,7 @@ READ32_MEMBER( konppc_device::cgboard_dsp_comm_r_ppc )
 
 WRITE32_MEMBER( konppc_device::cgboard_dsp_comm_w_ppc )
 {
-//  osd_printf_debug("%s dsp_cmd_w: (board %d) %08X, %08X, %08X\n", machine().describe_context().c_str(), cgboard_id, data, offset, mem_mask);
+//  osd_printf_debug("%s dsp_cmd_w: (board %d) %08X, %08X, %08X\n", machine().describe_context(), cgboard_id, data, offset, mem_mask);
 
 	if (cgboard_id < MAX_CG_BOARDS)
 	{
@@ -384,12 +384,12 @@ READ32_MEMBER( konppc_device::K033906_0_r )
 	if (nwk_device_sel[0] & 0x01)
 		return nwk_fifo_r(space, 0);
 	else
-		return m_k033906[0]->read(space, offset, mem_mask);
+		return m_k033906[0]->read(offset);
 }
 
 WRITE32_MEMBER( konppc_device::K033906_0_w )
 {
-	m_k033906[0]->write(space, offset, data, mem_mask);
+	m_k033906[0]->write(offset, data);
 }
 
 READ32_MEMBER( konppc_device::K033906_1_r )
@@ -397,12 +397,12 @@ READ32_MEMBER( konppc_device::K033906_1_r )
 	if (nwk_device_sel[1] & 0x01)
 		return nwk_fifo_r(space, 1);
 	else
-		return m_k033906[1]->read(space, offset, mem_mask);
+		return m_k033906[1]->read(offset);
 }
 
 WRITE32_MEMBER( konppc_device::K033906_1_w)
 {
-	m_k033906[1]->write(space, offset, data, mem_mask);
+	m_k033906[1]->write(offset, data);
 }
 
 /*****************************************************************************/
@@ -420,7 +420,7 @@ WRITE32_MEMBER( konppc_device::nwk_fifo_0_w)
 	}
 	else
 	{
-		m_voodoo[0]->voodoo_w(space, offset ^ 0x80000, data, mem_mask);
+		m_voodoo[0]->voodoo_w(offset ^ 0x80000, data, mem_mask);
 	}
 }
 
@@ -437,7 +437,7 @@ WRITE32_MEMBER( konppc_device::nwk_fifo_1_w)
 	}
 	else
 	{
-		m_voodoo[1]->voodoo_w(space, offset ^ 0x80000, data, mem_mask);
+		m_voodoo[1]->voodoo_w(offset ^ 0x80000, data, mem_mask);
 	}
 }
 
@@ -449,7 +449,7 @@ READ32_MEMBER( konppc_device::nwk_voodoo_0_r)
 	}
 	else
 	{
-		return m_voodoo[0]->voodoo_r(space, offset, mem_mask);
+		return m_voodoo[0]->voodoo_r(offset);
 	}
 }
 
@@ -461,7 +461,7 @@ READ32_MEMBER( konppc_device::nwk_voodoo_1_r)
 	}
 	else
 	{
-		return m_voodoo[1]->voodoo_r(space, offset, mem_mask);
+		return m_voodoo[1]->voodoo_r(offset);
 	}
 }
 
@@ -478,7 +478,7 @@ WRITE32_MEMBER( konppc_device::nwk_voodoo_0_w)
 	}
 	else
 	{
-		m_voodoo[0]->voodoo_w(space, offset, data, mem_mask);
+		m_voodoo[0]->voodoo_w(offset, data, mem_mask);
 	}
 }
 
@@ -495,7 +495,7 @@ WRITE32_MEMBER( konppc_device::nwk_voodoo_1_w)
 	}
 	else
 	{
-		m_voodoo[1]->voodoo_w(space, offset, data, mem_mask);
+		m_voodoo[1]->voodoo_w(offset, data, mem_mask);
 	}
 }
 

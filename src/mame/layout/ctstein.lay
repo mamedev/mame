@@ -3,6 +3,7 @@
 
 <!-- define elements -->
 
+	<element name="static_black"><rect><color red="0" green="0" blue="0" /></rect></element>
 	<element name="static_white"><rect><color red="0.75" green="0.73" blue="0.7" /></rect></element>
 	<element name="static_white2"><rect><color red="0.6" green="0.59" blue="0.57" /></rect></element>
 
@@ -21,6 +22,43 @@
 	<element name="text_game">
 		<rect><color red="0.6" green="0.59" blue="0.57" /></rect>
 		<text string="GAME"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="text_dif">
+		<rect><color red="0.6" green="0.59" blue="0.57" /></rect>
+		<text string="DIFFICULTY"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="text_1">
+		<rect><color red="0.6" green="0.59" blue="0.57" /></rect>
+		<text string="1"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="text_2">
+		<rect><color red="0.6" green="0.59" blue="0.57" /></rect>
+		<text string="2"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="text_3">
+		<rect><color red="0.6" green="0.59" blue="0.57" /></rect>
+		<text string="3"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="text_4">
+		<rect><color red="0.6" green="0.59" blue="0.57" /></rect>
+		<text string="4"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+
+	<element name="switch1" defstate="0">
+		<text string=" "><color red="0" green="0" blue="0" /></text>
+		<disk state="0x0e"><color red="0.4" green="0.4" blue="0.4" /></disk>
+	</element>
+	<element name="switch2" defstate="0">
+		<text string=" "><color red="0" green="0" blue="0" /></text>
+		<disk state="0x0d"><color red="0.4" green="0.4" blue="0.4" /></disk>
+	</element>
+	<element name="switch3" defstate="0">
+		<text string=" "><color red="0" green="0" blue="0" /></text>
+		<disk state="0x0b"><color red="0.4" green="0.4" blue="0.4" /></disk>
+	</element>
+	<element name="switch4" defstate="0">
+		<text string=" "><color red="0" green="0" blue="0" /></text>
+		<disk state="0x07"><color red="0.4" green="0.4" blue="0.4" /></disk>
 	</element>
 
 	<element name="lamp_r" defstate="0">
@@ -94,6 +132,17 @@
 		<bezel element="text_start"><bounds x="21.2" y="18.5" width="3" height="0.75" /></bezel>
 		<bezel element="text_game"><bounds x="25.8" y="18.5" width="3" height="0.75" /></bezel>
 		<bezel element="button_r" inputtag="IN.1" inputmask="0x01"><bounds x="24" y="18" width="2" height="2" /></bezel>
+
+		<bezel element="text_dif"><bounds x="21.2" y="6.6" width="7.6" height="0.75" /></bezel>
+		<bezel element="static_black"><bounds x="23.5" y="7.5" width="3.0" height="0.7" /></bezel>
+		<bezel element="switch1" inputtag="IN.0" inputmask="0x0f" inputraw="1"><bounds x="23.4" y="7.4" width="0.9" height="0.9" /></bezel>
+		<bezel element="switch2" inputtag="IN.0" inputmask="0x0f" inputraw="1"><bounds x="24.166" y="7.4" width="0.9" height="0.9" /></bezel>
+		<bezel element="switch3" inputtag="IN.0" inputmask="0x0f" inputraw="1"><bounds x="24.933" y="7.4" width="0.9" height="0.9" /></bezel>
+		<bezel element="switch4" inputtag="IN.0" inputmask="0x0f" inputraw="1"><bounds x="25.7" y="7.4" width="0.9" height="0.9" /></bezel>
+		<bezel element="text_1"><bounds x="23.4" y="8.3" width="0.9" height="0.75" /></bezel>
+		<bezel element="text_2"><bounds x="24.166" y="8.3" width="0.9" height="0.75" /></bezel>
+		<bezel element="text_3"><bounds x="24.933" y="8.3" width="0.9" height="0.75" /></bezel>
+		<bezel element="text_4"><bounds x="25.7" y="8.3" width="0.9" height="0.75" /></bezel>
 
 	</view>
 </mamelayout>

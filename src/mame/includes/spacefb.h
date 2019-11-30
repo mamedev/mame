@@ -5,6 +5,13 @@
     Space Firebird hardware
 
 ****************************************************************************/
+
+#ifndef MAME_INCLUDES_SPACEFB
+#define MAME_INCLUDES_SPACEFB
+
+#pragma once
+
+#include "cpu/mcs48/mcs48.h"
 #include "sound/samples.h"
 #include "screen.h"
 /*
@@ -48,7 +55,7 @@ private:
 	};
 
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
+	required_device<i8035_device> m_audiocpu;
 	required_device<samples_device> m_samples;
 	required_device<screen_device> m_screen;
 
@@ -92,3 +99,5 @@ private:
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
+
+#endif // MAME_INCLUDES_SPACEFB

@@ -12,16 +12,16 @@ class address_map_bank_device :
 {
 public:
 	// construction/destruction
-	address_map_bank_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	address_map_bank_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// configuration helpers
 	template <typename... T> address_map_bank_device& set_map(T &&... args) { set_addrmap(0, std::forward<T>(args)...); return *this; }
 	address_map_bank_device& set_endianness(endianness_t endianness) { m_endianness = endianness; return *this; }
-	address_map_bank_device& set_data_width(uint8_t data_width) { m_data_width = data_width; return *this; }
-	address_map_bank_device& set_addr_width(uint8_t addr_width) { m_addr_width = addr_width; return *this; }
-	address_map_bank_device& set_stride(uint32_t stride) { m_stride = stride; return *this; }
-	address_map_bank_device& set_shift(uint32_t shift) { m_shift = shift; return *this; }
-	address_map_bank_device& set_options(endianness_t endianness, uint8_t data_width, uint8_t addr_width, uint32_t stride = 1)
+	address_map_bank_device& set_data_width(u8 data_width) { m_data_width = data_width; return *this; }
+	address_map_bank_device& set_addr_width(u8 addr_width) { m_addr_width = addr_width; return *this; }
+	address_map_bank_device& set_stride(u32 stride) { m_stride = stride; return *this; }
+	address_map_bank_device& set_shift(u32 shift) { m_shift = shift; return *this; }
+	address_map_bank_device& set_options(endianness_t endianness, u8 data_width, u8 addr_width, u32 stride = 1)
 	{
 		set_endianness(endianness);
 		set_data_width(data_width);
@@ -32,25 +32,25 @@ public:
 
 	template <typename... T> address_map_bank_device& map(T &&... args) { set_addrmap(0, std::forward<T>(args)...); return *this; }
 	address_map_bank_device& endianness(endianness_t endianness) { m_endianness = endianness; return *this; }
-	address_map_bank_device& data_width(uint8_t data_width) { m_data_width = data_width; return *this; }
-	address_map_bank_device& addr_width(uint8_t addr_width) { m_addr_width = addr_width; return *this; }
-	address_map_bank_device& stride(uint32_t stride) { m_stride = stride; return *this; }
-	address_map_bank_device& shift(uint32_t shift) { m_shift = shift; return *this; }
+	address_map_bank_device& data_width(u8 data_width) { m_data_width = data_width; return *this; }
+	address_map_bank_device& addr_width(u8 addr_width) { m_addr_width = addr_width; return *this; }
+	address_map_bank_device& stride(u32 stride) { m_stride = stride; return *this; }
+	address_map_bank_device& shift(u32 shift) { m_shift = shift; return *this; }
 
 	void amap8(address_map &map);
 	void amap16(address_map &map);
 	void amap32(address_map &map);
 	void amap64(address_map &map);
 
-	DECLARE_WRITE8_MEMBER(write8);
-	DECLARE_WRITE16_MEMBER(write16);
-	DECLARE_WRITE32_MEMBER(write32);
-	DECLARE_WRITE64_MEMBER(write64);
+	void write8(offs_t offset, u8 data);
+	void write16(offs_t offset, u16 data, u16 mem_mask = 0xffff);
+	void write32(offs_t offset, u32 data, u32 mem_mask = 0xffffffff);
+	void write64(offs_t offset, u64 data, u64 mem_mask = ~u64(0));
 
-	DECLARE_READ8_MEMBER(read8);
-	DECLARE_READ16_MEMBER(read16);
-	DECLARE_READ32_MEMBER(read32);
-	DECLARE_READ64_MEMBER(read64);
+	u8 read8(offs_t offset);
+	u16 read16(offs_t offset, u16 mem_mask = 0xffff);
+	u32 read32(offs_t offset, u32 mem_mask = 0xffffffff);
+	u64 read64(offs_t offset, u64 mem_mask = ~u64(0));
 
 	void set_bank(offs_t offset);
 
@@ -64,9 +64,9 @@ protected:
 private:
 	// internal state
 	endianness_t m_endianness;
-	uint8_t m_data_width;
-	uint8_t m_addr_width;
-	uint32_t m_stride;
+	u8 m_data_width;
+	u8 m_addr_width;
+	u32 m_stride;
 	address_space_config m_program_config;
 	address_space *m_program;
 	offs_t m_offset;

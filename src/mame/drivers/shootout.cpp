@@ -60,17 +60,17 @@ WRITE8_MEMBER(shootout_state::bankswitch_w)
 
 READ8_MEMBER(shootout_state::sound_cpu_command_r)
 {
-	m_audiocpu->set_input_line (INPUT_LINE_NMI, CLEAR_LINE);
-	return (m_soundlatch->read (space, 0));
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	return m_soundlatch->read();
 }
 
 WRITE8_MEMBER(shootout_state::sound_cpu_command_w)
 {
-	m_soundlatch->write( space, offset, data );
+	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 
 	// Allow the other CPU to reply. This fixes the missing music on the title screen (parent set).
-	m_maincpu->spin_until_time (attotime :: from_usec (200));
+	m_maincpu->spin_until_time(attotime::from_usec(200));
 }
 
 WRITE8_MEMBER(shootout_state::flipscreen_w)
@@ -276,77 +276,71 @@ void shootout_state::machine_reset ()
 	m_ccnt_old_val = 0x40;
 }
 
-MACHINE_CONFIG_START(shootout_state::shootout)
-
+void shootout_state::shootout(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", DECO_222, XTAL(12'000'000) / 6) // 2 MHz?
-	MCFG_DEVICE_PROGRAM_MAP(shootout_map)
+	DECO_222(config, m_maincpu, XTAL(12'000'000) / 6); // 2 MHz?
+	m_maincpu->set_addrmap(AS_PROGRAM, &shootout_state::shootout_map);
 
-	MCFG_DEVICE_ADD("audiocpu", M6502, XTAL(12'000'000) / 8) // 1.5 MHz
-	MCFG_DEVICE_PROGRAM_MAP(shootout_sound_map)
+	M6502(config, m_audiocpu, XTAL(12'000'000) / 8); // 1.5 MHz
+	m_audiocpu->set_addrmap(AS_PROGRAM, &shootout_state::shootout_sound_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	// Guessed parameters based on the 12 MHz XTAL, but they seem reasonable (TODO: Real PCB measurements)
+	screen.set_raw(XTAL(12'000'000) / 2, 384, 0, 256, 262, 8, 248);
+	screen.set_screen_update(FUNC(shootout_state::screen_update_shootout));
+	screen.set_palette(m_palette);
 
-	// Guessed parameters based on the 12 MHz XTAL, but they seem resonable (TODO: Real PCB measurements)
-	MCFG_SCREEN_RAW_PARAMS (XTAL(12'000'000) / 2, 384, 0, 256, 262, 8, 248)
-
-	MCFG_SCREEN_UPDATE_DRIVER(shootout_state, screen_update_shootout)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_shootout)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(shootout_state, shootout)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_shootout);
+	PALETTE(config, m_palette, FUNC(shootout_state::shootout_palette), 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(12'000'000) / 8) // 1.5 MHz
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-MACHINE_CONFIG_END
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(12'000'000) / 8)); // 1.5 MHz
+	ymsnd.irq_handler().set_inputline(m_audiocpu, M6502_IRQ_LINE);
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.00);
+}
 
 
-MACHINE_CONFIG_START(shootout_state::shootouj)
-
+void shootout_state::shootouj(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(12'000'000) / 6) // 2 MHz? (Assuming the same XTAL as DE-0219 pcb)
-	MCFG_DEVICE_PROGRAM_MAP(shootouj_map)
+	M6502(config, m_maincpu, XTAL(12'000'000) / 6); // 2 MHz? (Assuming the same XTAL as DE-0219 pcb)
+	m_maincpu->set_addrmap(AS_PROGRAM, &shootout_state::shootouj_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	// Guessed parameters based on the 12 MHz XTAL, but they seem reasonable (TODO: Real PCB measurements)
+	screen.set_raw (XTAL(12'000'000) / 2, 384, 0, 256, 262, 8, 248);
+	screen.set_screen_update(FUNC(shootout_state::screen_update_shootouj));
+	screen.set_palette(m_palette);
 
-	// Guessed parameters based on the 12 MHz XTAL, but they seem resonable (TODO: Real PCB measurements)
-	MCFG_SCREEN_RAW_PARAMS (XTAL(12'000'000) / 2, 384, 0, 256, 262, 8, 248)
-
-	MCFG_SCREEN_UPDATE_DRIVER(shootout_state, screen_update_shootouj)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_shootout)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(shootout_state, shootout)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_shootout);
+	PALETTE(config, m_palette, FUNC(shootout_state::shootout_palette), 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(12'000'000) / 8) // 1.5 MHz (Assuming the same XTAL as DE-0219 pcb)
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("maincpu", M6502_IRQ_LINE))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, shootout_state, bankswitch_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, shootout_state, flipscreen_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-MACHINE_CONFIG_END
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(12'000'000) / 8)); // 1.5 MHz (Assuming the same XTAL as DE-0219 pcb)
+	ymsnd.irq_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
+	ymsnd.port_a_write_callback().set(FUNC(shootout_state::bankswitch_w));
+	ymsnd.port_b_write_callback().set(FUNC(shootout_state::flipscreen_w));
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.00);
+}
 
-MACHINE_CONFIG_START(shootout_state::shootouk)
+void shootout_state::shootouk(machine_config &config)
+{
 	shootouj(config);
 	/* the Korean 'bootleg' has the usual DECO222 style encryption */
-	MCFG_DEVICE_REMOVE("maincpu")
-	MCFG_DEVICE_ADD("maincpu", DECO_222, XTAL(12'000'000) / 6) // 2 MHz? (Assuming the same XTAL as DE-0219 pcb)
-	MCFG_DEVICE_PROGRAM_MAP(shootouj_map)
-MACHINE_CONFIG_END
+	DECO_222(config.replace(), m_maincpu, XTAL(12'000'000) / 6); // 2 MHz? (Assuming the same XTAL as DE-0219 pcb)
+	m_maincpu->set_addrmap(AS_PROGRAM, &shootout_state::shootouj_map);
+}
 
 
 

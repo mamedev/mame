@@ -250,6 +250,7 @@ private:
 	void sound_data(address_map &map);
 	void sound_io(address_map &map);
 	void sound_prg(address_map &map);
+	void cpu_space_map(address_map &map);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -666,7 +667,6 @@ void maygayv1_state::sound_prg(address_map &map)
 
 void maygayv1_state::sound_data(address_map &map)
 {
-	map(0x0000, 0x1ff).ram(); // nothing?
 }
 
 void maygayv1_state::sound_io(address_map &map)
@@ -824,10 +824,15 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
+void maygayv1_state::cpu_space_map(address_map &map)
+{
+	map(0xfffff0, 0xffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));
+	map(0xfffffa, 0xfffffb).lr16(NAME([this] () -> u16 { return m_duart68681->get_irq_vector(); }));
+}
+
 WRITE_LINE_MEMBER(maygayv1_state::duart_irq_handler)
 {
-	m_maincpu->set_input_line_and_vector(5, state, m_duart68681->get_irq_vector());
-//  m_maincpu->set_input_line(5, state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(5, state);
 }
 
 
@@ -878,16 +883,18 @@ void maygayv1_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(maygayv1_state::maygayv1)
-	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CLOCK / 2)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+void maygayv1_state::maygayv1(machine_config &config)
+{
+	M68000(config, m_maincpu, MASTER_CLOCK / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &maygayv1_state::main_map);
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &maygayv1_state::cpu_space_map);
 
-	MCFG_DEVICE_ADD("soundcpu", I8052, SOUND_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(sound_prg)
-	MCFG_DEVICE_DATA_MAP(sound_data)
-	MCFG_DEVICE_IO_MAP(sound_io)
-	MCFG_MCS51_SERIAL_TX_CB(WRITE8(*this, maygayv1_state, data_from_i8031))
-	MCFG_MCS51_SERIAL_RX_CB(READ8(*this, maygayv1_state, data_to_i8031))
+	I8052(config, m_soundcpu, SOUND_CLOCK);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &maygayv1_state::sound_prg);
+	m_soundcpu->set_addrmap(AS_DATA, &maygayv1_state::sound_data);
+	m_soundcpu->set_addrmap(AS_IO, &maygayv1_state::sound_io);
+	m_soundcpu->serial_tx_cb().set(FUNC(maygayv1_state::data_from_i8031));
+	m_soundcpu->serial_rx_cb().set(FUNC(maygayv1_state::data_to_i8031));
 
 	/* U25 ST 2 9148 EF68B21P */
 	pia6821_device &pia(PIA6821(config, "pia", 0));
@@ -899,34 +906,32 @@ MACHINE_CONFIG_START(maygayv1_state::maygayv1)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* TODO: Use real video timings */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(640, 300)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 300 - 1)
-	MCFG_SCREEN_UPDATE_DRIVER(maygayv1_state, screen_update_maygayv1)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, maygayv1_state, screen_vblank_maygayv1))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_size(640, 300);
+	screen.set_visarea(0, 640 - 1, 0, 300 - 1);
+	screen.set_screen_update(FUNC(maygayv1_state::screen_update_maygayv1));
+	screen.screen_vblank().set(FUNC(maygayv1_state::screen_vblank_maygayv1));
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 16)
+	PALETTE(config, "palette").set_entries(16);
 
-	MCFG_DEVICE_ADD("duart68681", MC68681, DUART_CLOCK)
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, maygayv1_state, duart_irq_handler))
-	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(*this, maygayv1_state, duart_txa))
+	MC68681(config, m_duart68681, DUART_CLOCK);
+	m_duart68681->irq_cb().set(FUNC(maygayv1_state::duart_irq_handler));
+	m_duart68681->a_tx_cb().set(FUNC(maygayv1_state::duart_txa));;
 
-	MCFG_DEVICE_ADD("i8279", I8279, MASTER_CLOCK/4)    // unknown clock
-	MCFG_I8279_OUT_SL_CB(WRITE8(*this, maygayv1_state, strobe_w))      // scan SL lines
-	MCFG_I8279_OUT_DISP_CB(WRITE8(*this, maygayv1_state, lamp_data_w)) // display A&B
-	MCFG_I8279_IN_RL_CB(READ8(*this, maygayv1_state, kbd_r))                   // kbd RL lines
+	i8279_device &kbdc(I8279(config, "i8279", MASTER_CLOCK/4));         // unknown clock
+	kbdc.out_sl_callback().set(FUNC(maygayv1_state::strobe_w));         // scan SL lines
+	kbdc.out_disp_callback().set(FUNC(maygayv1_state::lamp_data_w));    // display A&B
+	kbdc.in_rl_callback().set(FUNC(maygayv1_state::kbd_r));             // kbd RL lines
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd",YM2413, MASTER_CLOCK / 4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
+	YM2413(config, "ymsnd", MASTER_CLOCK / 4).add_route(ALL_OUTPUTS, "mono", 0.8);
 
-	MCFG_DEVICE_ADD("upd",UPD7759)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	UPD7759(config, m_upd7759).add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
 /*************************************

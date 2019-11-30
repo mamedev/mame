@@ -59,11 +59,11 @@ WRITE8_MEMBER(madalien_state::madalien_output_w)
 
 WRITE8_MEMBER(madalien_state::madalien_portA_w)
 {
-	m_discrete->write(space, MADALIEN_8910_PORTA, data);
+	m_discrete->write(MADALIEN_8910_PORTA, data);
 }
 WRITE8_MEMBER(madalien_state::madalien_portB_w)
 {
-	m_discrete->write(space, MADALIEN_8910_PORTB, data);
+	m_discrete->write(MADALIEN_8910_PORTB, data);
 }
 
 
@@ -150,14 +150,14 @@ static INPUT_PORTS_START( madalien )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(madalien_state::madalien)
-
+void madalien_state::madalien(machine_config &config)
+{
 	/* main CPU */
-	MCFG_DEVICE_ADD("maincpu", M6502, MADALIEN_MAIN_CLOCK / 8) /* 1324kHz */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	M6502(config, m_maincpu, MADALIEN_MAIN_CLOCK / 8); /* 1324kHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &madalien_state::main_map);
 
-	MCFG_DEVICE_ADD("audiocpu", M6502, SOUND_CLOCK / 8)        /* 512kHz */
-	MCFG_DEVICE_PROGRAM_MAP(audio_map)
+	M6502(config, m_audiocpu, SOUND_CLOCK / 8);        /* 512kHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &madalien_state::audio_map);
 
 	/* video hardware */
 	madalien_video(config);
@@ -165,21 +165,20 @@ MACHINE_CONFIG_START(madalien_state::madalien)
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0)) // 7400 at 3A used as R/S latch
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0); // 7400 at 3A used as R/S latch
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch2);
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, SOUND_CLOCK / 4)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, madalien_state, madalien_portA_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, madalien_state, madalien_portB_w))
-	MCFG_SOUND_ROUTE(0, "discrete", 1.0, 0)
-	MCFG_SOUND_ROUTE(1, "discrete", 1.0, 1)
-	MCFG_SOUND_ROUTE(2, "discrete", 1.0, 2)
+	ay8910_device &aysnd(AY8910(config, "aysnd", SOUND_CLOCK / 4));
+	aysnd.port_a_write_callback().set(FUNC(madalien_state::madalien_portA_w));
+	aysnd.port_b_write_callback().set(FUNC(madalien_state::madalien_portB_w));
+	aysnd.add_route(0, "discrete", 1.0, 0);
+	aysnd.add_route(1, "discrete", 1.0, 1);
+	aysnd.add_route(2, "discrete", 1.0, 2);
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE, madalien_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	DISCRETE(config, m_discrete, madalien_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 ROM_START( madalien )

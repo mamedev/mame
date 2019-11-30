@@ -120,7 +120,7 @@ Canon Cat versions:
 There is really only one version of the cat which saw wide release, the US version.
 * It is possible a very small number of UK/European units were released as a test.
   If so, these will have slightly different keyboard key caps and different
-  system and spellcheck roms.
+  system and spellcheck ROMs.
 
 As for prototypes/dev cat machines, a few minor variants exist:
 * Prototype cat motherboards used 16k*4bit drams instead of 64k*4bit as the
@@ -174,11 +174,11 @@ ToDo:
   original compile, and Dwight's recompile from the released source code),
   2.42 (NEED DUMP)
   It is possible a few prototype UK 1.74 or 2.40 units were produced; the code
-  roms of these will differ (they contain different spellcheck "core" code) as
-  well as the spellcheck roms, the keyboard id and the keycaps.
-- Known Spellcheck roms: NH7-0684 (US, dumped); NH7-0724 (UK, NEED DUMP);
+  ROMs of these will differ (they contain different spellcheck "core" code) as
+  well as the spellcheck ROMs, the keyboard id and the keycaps.
+- Known Spellcheck ROMs: NH7-0684 (US, dumped); NH7-0724 (UK, NEED DUMP);
   NH7-0813/0814 (Quebec/France, NEED DUMP); NH7-1019/1020/1021 (Germany, NEED DUMP)
-  It is possible the non-US roms were never officially released.
+  It is possible the non-US ROMs were never officially released.
   Wordlist sources: American Heritage (US and UK), Librarie Larousse (FR),
   Langenscheidt (DE)
 - (would-be-really-nice-but-totally-unnecessary feature): due to open bus, the
@@ -186,7 +186,7 @@ ToDo:
   respectively on a real machine (and hence appear inverted/'fail'-state).
   This requires sub-cycle accurate 68k open bus emulation to pull off, as well
   as emulating the fact that UDS/LDS are ?not connected? (unclear because this
-  happens inside an asic) for the SVROMS (or the svram or the code roms, for
+  happens inside an asic) for the SVROMS (or the svram or the code ROMs, for
   that matter!)
 - Hook Battery Low input to a dipswitch.
 - Hook pfail to a dipswitch.
@@ -355,10 +355,11 @@ public:
 
 	//TIMER_CALLBACK_MEMBER(keyboard_callback);
 	TIMER_CALLBACK_MEMBER(counter_6ms_callback);
-	IRQ_CALLBACK_MEMBER(cat_int_ack);
 
 	void cat(machine_config &config);
 	void cat_mem(address_map &map);
+	void cpu_space_map(address_map &map);
+
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -721,7 +722,7 @@ a23 a22 a21 a20 a19 a18 a17 a16 a15 a14 a13 a12 a11 a10 a9  a8  a7  a6  a5  a4  
 0   0   0   x   x   1   1   0   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   0       O   OPEN BUS (reads as 0x2e) [may be controlled via GA2 /RAMCS?]
 0   0   0   x   x   1   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   1       O   OPEN BUS (reads as 0x80) [may be controlled via GA2 /RAMCS?]
 0   0   1   x   x   0   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   0       R   SVROM 2 ic7 (not present on cat as sold, open bus reads as 0x2e) [controlled via GA2 /SVCS0]
-0   0   1   x   x   0   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   1       R   SVROM 0 ic6 (MASK ROM tc531000) [controlled via GA2 /SVCS0]
+0   0   1   x   x   0   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   1       R   SVROM 0 ic6 (mask ROM tc531000) [controlled via GA2 /SVCS0]
 0   0   1   x   x   1   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   0       O   OPEN BUS (reads as 0x2e) [controlled via GA2 /SVCS1] *SEE BELOW*
 0   0   1   x   x   1   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   1       R   SVROM 1 ic8 (not present on cat as sold, open bus reads as 0x80) [controlled via GA2 /SVCS1] *SEE BELOW*
                                                                                                     *NOTE: on Dwight E's user-made developer unit, two 128K SRAMS are mapped in place of the
@@ -751,7 +752,7 @@ a23 a22 a21 a20 a19 a18 a17 a16 a15 a14 a13 a12 a11 a10 a9  a8  a7  a6  a5  a4  
 1   0   0   x   x   1   1   0   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   *       R?W {'tcb'} test control bits (reads as 0x0000)
 1   0   0   x   x   1   1   1   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   *       ?   Unknown (reads as 0x2e80)
 
-1   0   1   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x       O   OPEN BUS (reads as 0x2e80) [68k DTACK is asserted by gate array 1 when accessing this area, for testing?] On real IAI shadow rom board, at least 0x40000 of ram lives here.
+1   0   1   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x       O   OPEN BUS (reads as 0x2e80) [68k DTACK is asserted by gate array 1 when accessing this area, for testing?] On real IAI shadow ROM board, at least 0x40000 of ram lives here.
 1   1   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x       O   OPEN BUS (reads as 0x2e80) [68k VPA is asserted by gate array 1 when accessing this area, for testing?]
 */
 
@@ -773,14 +774,14 @@ void cat_state::cat_mem(address_map &map)
 	map(0x80000c, 0x80000d).r(FUNC(cat_state::cat_0080_r)).mirror(0x18FFE0); // Open bus?
 	map(0x80000e, 0x80000f).rw(FUNC(cat_state::cat_battery_r), FUNC(cat_state::cat_printer_control_w)).mirror(0x18FFE0); // Centronics Printer Control, keyboard led and country code enable
 	map(0x800010, 0x80001f).r(FUNC(cat_state::cat_0080_r)).mirror(0x18FFE0); // Open bus?
-	map(0x810000, 0x81001f).rw("duartn68681", FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff).mirror(0x18FFE0);
+	map(0x810000, 0x81001f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff).mirror(0x18FFE0);
 	map(0x820000, 0x82003f).rw(FUNC(cat_state::cat_modem_r), FUNC(cat_state::cat_modem_w)).mirror(0x18FFC0); // AMI S35213 Modem Chip, all access is on bit 7
 	map(0x830000, 0x830001).r(FUNC(cat_state::cat_6ms_counter_r)).mirror(0x18FFFE); // 16bit 6ms counter clocked by output of another 16bit counter clocked at 10mhz
 	map(0x840000, 0x840001).rw(FUNC(cat_state::cat_2e80_r), FUNC(cat_state::cat_opr_w)).mirror(0x18FFFE); // GA2 Output port register (video enable, invert, watchdog reset, phone relays)
 	map(0x850000, 0x850001).r(FUNC(cat_state::cat_wdt_r)).mirror(0x18FFFE); // watchdog and power fail state read
 	map(0x860000, 0x860001).rw(FUNC(cat_state::cat_0000_r), FUNC(cat_state::cat_tcb_w)).mirror(0x18FFFE); // Test mode
 	map(0x870000, 0x870001).r(FUNC(cat_state::cat_2e80_r)).mirror(0x18FFFE); // Open bus?
-	map(0xA00000, 0xA00001).r(FUNC(cat_state::cat_2e80_r)).mirror(0x1FFFFE); // Open bus/dtack? The 0xA00000-0xA3ffff area is ram used for shadow rom storage on cat developer machines, which is either banked over top of, or jumped to instead of the normal rom
+	map(0xA00000, 0xA00001).r(FUNC(cat_state::cat_2e80_r)).mirror(0x1FFFFE); // Open bus/dtack? The 0xA00000-0xA3ffff area is ram used for shadow ROM storage on cat developer machines, which is either banked over top of, or jumped to instead of the normal ROM
 	map(0xC00000, 0xC00001).r(FUNC(cat_state::cat_2e80_r)).mirror(0x3FFFFE); // Open bus/vme?
 }
 
@@ -901,7 +902,7 @@ void cat_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 		counter_6ms_callback(ptr, param);
 		break;
 	default:
-		assert_always(false, "Unknown id in cat_state::device_timer");
+		throw emu_fatalerror("Unknown id in cat_state::device_timer");
 	}
 }
 
@@ -915,10 +916,10 @@ TIMER_CALLBACK_MEMBER(cat_state::counter_6ms_callback)
 	m_6ms_counter++;
 }
 
-IRQ_CALLBACK_MEMBER(cat_state::cat_int_ack)
+void cat_state::cpu_space_map(address_map &map)
 {
-	m_maincpu->set_input_line(M68K_IRQ_1,CLEAR_LINE);
-	return M68K_INT_ACK_AUTOVECTOR;
+	map(0xfffff0, 0xffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));
+	map(0xfffff3, 0xfffff3).lr8(NAME([this]() { m_maincpu->set_input_line(1, CLEAR_LINE); return m68000_device::autovector(1); }));
 }
 
 MACHINE_START_MEMBER(cat_state,cat)
@@ -983,12 +984,10 @@ uint32_t cat_state::screen_update_cat(screen_device &screen, bitmap_rgb32 &bitma
  */
 WRITE_LINE_MEMBER(cat_state::cat_duart_irq_handler)
 {
-	int irqvector = m_duart->get_irq_vector();
-
 #ifdef DEBUG_DUART_IRQ_HANDLER
 	fprintf(stderr, "Duart IRQ handler called: state: %02X, vector: %06X\n", state, irqvector);
 #endif
-	m_maincpu->set_input_line_and_vector(M68K_IRQ_1, state, irqvector);
+	m_maincpu->set_input_line(M68K_IRQ_1, state);
 }
 
 WRITE_LINE_MEMBER(cat_state::cat_duart_txa) // semit sends stuff here; connects to the serial port on the back
@@ -1054,42 +1053,44 @@ WRITE_LINE_MEMBER(cat_state::prn_ack_ff) // switch the flipflop state on the ris
 #endif
 }
 
-MACHINE_CONFIG_START(cat_state::cat)
-
+void cat_state::cat(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",M68000, XTAL(19'968'000)/4)
-	MCFG_DEVICE_PROGRAM_MAP(cat_mem)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(cat_state,cat_int_ack)
+	M68000(config, m_maincpu, XTAL(19'968'000)/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cat_state::cat_mem);
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &cat_state::cpu_space_map);
 
 	MCFG_MACHINE_START_OVERRIDE(cat_state,cat)
 	MCFG_MACHINE_RESET_OVERRIDE(cat_state,cat)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(672, 344)
-	MCFG_SCREEN_VISIBLE_AREA(0, 672-1, 0, 344-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cat_state, screen_update_cat)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(672, 344);
+	screen.set_visarea_full();
+	screen.set_screen_update(FUNC(cat_state::screen_update_cat));
 
 	MCFG_VIDEO_START_OVERRIDE(cat_state,cat)
 
-	MCFG_DEVICE_ADD( "duartn68681", MC68681, (XTAL(19'968'000)*2)/11 ) // duart is normally clocked by 3.6864mhz xtal, but cat seemingly uses a divider from the main xtal instead which probably yields 3.63054545Mhz. There is a trace to cut and a mounting area to allow using an actual 3.6864mhz xtal if you so desire
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, cat_state, cat_duart_irq_handler))
-	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(*this, cat_state, cat_duart_txa))
-	MCFG_MC68681_B_TX_CALLBACK(WRITELINE(*this, cat_state, cat_duart_txb))
-	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(*this, cat_state, cat_duart_output))
+	MC68681(config, m_duart, (XTAL(19'968'000)*2)/11); // duart is normally clocked by 3.6864mhz xtal, but cat seemingly uses a divider from the main xtal instead which probably yields 3.63054545Mhz. There is a trace to cut and a mounting area to allow using an actual 3.6864mhz xtal if you so desire
+	m_duart->irq_cb().set(FUNC(cat_state::cat_duart_irq_handler));
+	m_duart->a_tx_cb().set(FUNC(cat_state::cat_duart_txa));
+	m_duart->b_tx_cb().set(FUNC(cat_state::cat_duart_txb));
+	m_duart->outport_cb().set(FUNC(cat_state::cat_duart_output));;
 
 	CENTRONICS(config, m_ctx, centronics_devices, "printer");
 	m_ctx->ack_handler().set(FUNC(cat_state::prn_ack_ff));
-	m_ctx->busy_handler().set("duartn68681", FUNC(mc68681_device::ip4_w)).invert();
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("ctx_data_out", "ctx")
+	m_ctx->busy_handler().set(m_duart, FUNC(mc68681_device::ip4_w)).invert();
+
+	OUTPUT_LATCH(config, m_ctx_data_out);
+	m_ctx->set_output_latch(*m_ctx_data_out);
 
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-MACHINE_CONFIG_END
+}
 
 ROM_START( cat )
 	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASEFF )
@@ -1122,8 +1123,8 @@ ROM_START( cat )
 	ROMX_LOAD( "r240h1.ic5", 0x20000, 0x10000, CRC(898dd9f6) SHA1(93e791dd4ed7e4afa47a04df6fdde359e41c2075), ROM_SKIP(1) | ROM_BIOS(1))
 	/* This v1.74 code comes from (probably) the 'main us release' of first-run
 	 * Canon cats, and was dumped from machine serial number R12014979
-	 * Canon cat v1.74 roms are labeled as r74; they only added the major number
-	 * to the rom label after v2.0?
+	 * Canon cat v1.74 ROMs are labeled as r74; they only added the major number
+	 * to the ROM label after v2.0?
 	 */
 	ROM_SYSTEM_BIOS( 2, "r174", "Canon Cat V1.74 US Firmware")
 	ROMX_LOAD( "r74__0l__c18c.blue.ic2", 0x00001, 0x10000, CRC(b19aa0c8) SHA1(85b3e549cfb91bd3dd32335e02eaaf9350e80900), ROM_SKIP(1) | ROM_BIOS(2))
@@ -1135,12 +1136,12 @@ ROM_START( cat )
 
 	ROM_REGION( 0x80000, "svrom", ROMREGION_ERASE00 )
 	// SPELLING VERIFICATION ROM (SVROM)
-	/* Romspace here is a little strange: there are 3 rom sockets on the board:
+	/* Romspace here is a little strange: there are 3 ROM sockets on the board:
 	 * svrom-0 maps to 200000-21ffff every ODD byte (d8-d0)
 	 * svrom-1 maps to 200000-21ffff every EVEN byte (d15-d7)
-	 *  (since no rom is in the socket; it reads as open bus, sometimes 0x2E)
+	 *  (since no ROM is in the socket; it reads as open bus, sometimes 0x2E)
 	 * svrom-2 maps to 240000-25ffff every ODD byte (d8-d0)
-	 *  (since no rom is in the socket; it reads as open bus, sometimes 0x80)
+	 *  (since no ROM is in the socket; it reads as open bus, sometimes 0x80)
 	 * there is no svrom-3 socket; 240000-25ffff EVEN always reads as 0x2E
 	 * since ROM_FILL16BE(0x0, 0x80000, 0x2e80) doesn't exist, the
 	 * even bytes and latter chunk of the svrom space need to be filled in
@@ -1148,13 +1149,13 @@ ROM_START( cat )
 	 * 'open bus' once the mame/mess core supports that.
 	 * NOTE: there are at least 6 more SVROMS which existed (possibly in
 	 * limited form), and are not dumped:
-	 * UK (1 rom, NH7-0724)
-	 * French/Quebec (2 roms, NH7-0813/0814)
-	 * German (3 roms, NH7-1019/1020/1021)
-	 * Each of these will also have its own code romset as well.
+	 * UK (1 ROM, NH7-0724)
+	 * French/Quebec (2 ROMs, NH7-0813/0814)
+	 * German (3 ROMs, NH7-1019/1020/1021)
+	 * Each of these will also have its own code ROMset as well.
 	 */
 	// NH7-0684 (US, dumped):
-	ROMX_LOAD( "uv1__nh7-0684__hn62301apc11__7h1.ic6", 0x00000, 0x20000, CRC(229ca210) SHA1(564b57647a34acdd82159993a3990a412233da14), ROM_SKIP(1)) // this is a 28pin tc531000 mask rom, 128KB long; "US" SVROM
+	ROMX_LOAD( "uv1__nh7-0684__hn62301apc11__7h1.ic6", 0x00000, 0x20000, CRC(229ca210) SHA1(564b57647a34acdd82159993a3990a412233da14), ROM_SKIP(1)) // this is a 28pin tc531000 mask ROM, 128KB long; "US" SVROM
 
 	/* There is an unpopulated PAL16L8 at IC9 whose original purpose (based
 	 * on the schematics) was probably to cause a 68k bus error when
@@ -1163,11 +1164,11 @@ ROM_START( cat )
 	 * Its connections are (where Ix = inp on pin x, Ox = out on pin x):
 	 * I1 = A23, I2 = A22, I3 = A2, I4 = R/W, I5 = A5, I6 = FC2, I7 = gnd,
 	 * I8 = A1, I9 = gnd, I11 = gnd, O16 = /BERR,
-	 * I14 = REMAP (connects to emulator 'shadow rom' board or to gnd when unused)
+	 * I14 = REMAP (connects to emulator 'shadow ROM' board or to gnd when unused)
 	 * Based on the inputs and outputs of this pal, almost if not the entire
 	 * open bus and mirrored areas of the cat address space could be made
 	 * to cause bus errors. REMAP was probably used to 'open up' the A00000-A7ffff
-	 * shadow rom/ram area and make it writeable without erroring.
+	 * shadow ROM/RAM area and make it writeable without erroring.
 	 */
 ROM_END
 

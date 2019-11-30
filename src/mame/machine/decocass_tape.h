@@ -73,7 +73,4 @@ private:
 
 DECLARE_DEVICE_TYPE(DECOCASS_TAPE, decocass_tape_device)
 
-#define MCFG_DECOCASS_TAPE_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, DECOCASS_TAPE, 0)
-
 #endif // MAME_MACHINE_DECOCASS_TAPE_H

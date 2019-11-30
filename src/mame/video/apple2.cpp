@@ -9,6 +9,7 @@
 #include "emu.h"
 #include "machine/ram.h"
 #include "video/apple2.h"
+#include "screen.h"
 
 /***************************************************************************/
 
@@ -38,6 +39,8 @@ DEFINE_DEVICE_TYPE(APPLE2_VIDEO, a2_video_device, "a2video", "Apple II video")
 
 a2_video_device::a2_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, APPLE2_VIDEO, tag, owner, clock)
+	, device_palette_interface(mconfig, *this)
+	, device_video_interface(mconfig, *this)
 {
 }
 
@@ -96,6 +99,9 @@ void a2_video_device::device_start()
 		m_dhires_artifact_map[i] = dhires_artifact_color_table[i];
 	}
 
+	// initialise for device_palette_interface
+	init_palette();
+
 	save_item(NAME(m_page2));
 	save_item(NAME(m_flash));
 	save_item(NAME(m_mix));
@@ -130,6 +136,50 @@ void a2_video_device::device_reset()
 	m_80store = false;
 	m_monohgr = false;
 	m_newvideo = 0x01;
+}
+
+WRITE_LINE_MEMBER(a2_video_device::txt_w)
+{
+	if (m_graphics == state) // avoid flickering from II+ refresh polling
+	{
+		// select graphics or text mode
+		screen().update_now();
+		m_graphics = !state;
+	}
+}
+
+WRITE_LINE_MEMBER(a2_video_device::mix_w)
+{
+	// select mixed mode or nomix
+	screen().update_now();
+	m_mix = state;
+}
+
+WRITE_LINE_MEMBER(a2_video_device::scr_w)
+{
+	// select primary or secondary page
+	if (!m_80col)
+		screen().update_now();
+	m_page2 = state;
+}
+
+WRITE_LINE_MEMBER(a2_video_device::res_w)
+{
+	// select lo-res or hi-res
+	screen().update_now();
+	m_hires = state;
+}
+
+WRITE_LINE_MEMBER(a2_video_device::dhires_w)
+{
+	// select double hi-res
+	screen().update_now();
+	m_dhires = !state;
+}
+
+WRITE_LINE_MEMBER(a2_video_device::an2_w)
+{
+	m_an2 = state;
 }
 
 void a2_video_device::plot_text_character(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, uint32_t code,
@@ -793,7 +843,6 @@ void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, co
 				|   (((uint32_t) vram_row[col+1] & 0x7f) <<  7)
 				|   (((uint32_t) vram_row[col+2] & 0x7f) << 14);
 
-
 			// verified on h/w: setting dhires w/o 80col emulates a rev. 0 Apple ][ with no orange/blue
 			if (m_dhires)
 			{
@@ -823,17 +872,29 @@ void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, co
 
 				case 1:
 					w >>= 7;
+					if (vram_row[col] & 0x80)
+					{
+						p--;
+					}
 					for (b = 0; b < 7; b++)
 					{
 						v = (w & 1);
 						w >>= 1;
 						*(p++) = v ? WHITE : BLACK;
 						*(p++) = v ? WHITE : BLACK;
+					}
+					if (vram_row[col] & 0x80)
+					{
+						p++;
 					}
 					break;
 
 				case 2:
 					w >>= 7;
+					if (vram_row[col] & 0x80)
+					{
+						p--;
+					}
 					for (b = 0; b < 7; b++)
 					{
 						v = (w & 1);
@@ -841,16 +902,28 @@ void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, co
 						*(p++) = v ? GREEN : BLACK;
 						*(p++) = v ? GREEN : BLACK;
 					}
+					if (vram_row[col] & 0x80)
+					{
+						p++;
+					}
 					break;
 
 				case 3:
 					w >>= 7;
+					if (vram_row[col] & 0x80)
+					{
+						p--;
+					}
 					for (b = 0; b < 7; b++)
 					{
 						v = (w & 1);
 						w >>= 1;
 						*(p++) = v ? ORANGE : BLACK;
 						*(p++) = v ? ORANGE : BLACK;
+					}
+					if (vram_row[col] & 0x80)
+					{
+						p++;
 					}
 					break;
 			}
@@ -912,19 +985,31 @@ void a2_video_device::hgr_update_tk2000(screen_device &screen, bitmap_ind16 &bit
 					}
 					break;
 
-				case 1:
+               case 1:
 					w >>= 7;
+					if (vram_row[col] & 0x80)
+					{
+						p--;
+					}
 					for (b = 0; b < 7; b++)
 					{
 						v = (w & 1);
 						w >>= 1;
 						*(p++) = v ? WHITE : BLACK;
 						*(p++) = v ? WHITE : BLACK;
+					}
+					if (vram_row[col] & 0x80)
+					{
+						p++;
 					}
 					break;
 
 				case 2:
 					w >>= 7;
+					if (vram_row[col] & 0x80)
+					{
+						p--;
+					}
 					for (b = 0; b < 7; b++)
 					{
 						v = (w & 1);
@@ -932,16 +1017,28 @@ void a2_video_device::hgr_update_tk2000(screen_device &screen, bitmap_ind16 &bit
 						*(p++) = v ? GREEN : BLACK;
 						*(p++) = v ? GREEN : BLACK;
 					}
+					if (vram_row[col] & 0x80)
+					{
+						p++;
+					}
 					break;
 
 				case 3:
 					w >>= 7;
+					if (vram_row[col] & 0x80)
+					{
+						p--;
+					}
 					for (b = 0; b < 7; b++)
 					{
 						v = (w & 1);
 						w >>= 1;
 						*(p++) = v ? ORANGE : BLACK;
 						*(p++) = v ? ORANGE : BLACK;
+					}
+					if (vram_row[col] & 0x80)
+					{
+						p++;
 					}
 					break;
 			}
@@ -1068,10 +1165,15 @@ static const rgb_t apple2_palette[] =
 	rgb_t(0xFF, 0xFF, 0xFF)  /* White */
 };
 
-/* Initialize the palette */
-PALETTE_INIT_MEMBER(a2_video_device, apple2)
+void a2_video_device::init_palette()
 {
-	palette.set_pen_colors(0, apple2_palette, ARRAY_LENGTH(apple2_palette));
+	for (int i = 0; i < ARRAY_LENGTH(apple2_palette); i++)
+		set_pen_color(i, apple2_palette[i]);
+}
+
+uint32_t a2_video_device::palette_entries() const
+{
+	return ARRAY_LENGTH(apple2_palette);
 }
 
 uint32_t a2_video_device::screen_update_GS(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

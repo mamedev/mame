@@ -20,8 +20,8 @@ DECLARE_DEVICE_TYPE(AT29C040A, at29c040a_device)
 class at29x_device : public device_t, public device_nvram_interface
 {
 public:
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 protected:
 	at29x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int memory_size, int device_id, int sector_size);

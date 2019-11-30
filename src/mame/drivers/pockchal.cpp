@@ -43,20 +43,23 @@ public:
 
 	void pockchalv1(machine_config &config);
 
-private:
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
+
+private:
 	uint32_t screen_update_pockchalv1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
+	void pockchalv1_map(address_map &map);
+
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
 	uint32_t  m_rom_size;
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pockchalv1_cart);
-	void pockchalv1_map(address_map &map);
 };
 
 
-DEVICE_IMAGE_LOAD_MEMBER( pockchalv1_state, pockchalv1_cart )
+DEVICE_IMAGE_LOAD_MEMBER( pockchalv1_state::cart_load )
 {
 	m_rom_size = m_cart->common_get_size("rom");
 	m_cart->rom_alloc(m_rom_size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
@@ -89,7 +92,7 @@ void pockchalv1_state::machine_start()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	if (m_cart->exists())
-		space.install_read_handler(0x0000, 0x7fff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
+		space.install_read_handler(0x0000, 0x7fff, read8sm_delegate(*m_cart, FUNC(generic_slot_device::read_rom)));
 }
 
 void pockchalv1_state::machine_reset()
@@ -97,35 +100,31 @@ void pockchalv1_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(pockchalv1_state::pockchalv1)
-
+void pockchalv1_state::pockchalv1(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMP90845,8000000)         /* ? MHz */
-	MCFG_DEVICE_PROGRAM_MAP(pockchalv1_map)
-//  MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pockchalv1_state,  irq0_line_hold)
+	TMP90845(config, m_maincpu, 8000000);         /* ? MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &pockchalv1_state::pockchalv1_map);
+//  m_maincpu->->set_vblank_int("screen", FUNC(pockchalv1_state::irq0_line_hold));
 
 	// wrong, it's a b&w / greyscale thing
-	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
-	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
+	PALETTE(config, "palette").set_format(palette_device::xRGB_444, 0x100).set_endianness(ENDIANNESS_BIG);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(pockchalv1_state, screen_update_pockchalv1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 256-1, 16, 256-16-1);
+	screen.set_screen_update(FUNC(pockchalv1_state::screen_update_pockchalv1));
+	screen.set_palette("palette");
 
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "pockchalw_cart")
-	MCFG_GENERIC_EXTENSIONS("bin")
-	MCFG_GENERIC_LOAD(pockchalv1_state, pockchalv1_cart)
-	MCFG_GENERIC_MANDATORY
+	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "pockchalw_cart", "bin"));
+	cartslot.set_device_load(FUNC(pockchalv1_state::cart_load));
+	cartslot.set_must_be_loaded(true);
 
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("pc1_list","pockchalw")
-
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "pc1_list").set_compatible("pockchalw");
+}
 
 
 

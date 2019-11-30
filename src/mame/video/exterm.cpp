@@ -16,9 +16,9 @@
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(exterm_state, exterm)
+void exterm_state::exterm_palette(palette_device &palette) const
 {
-	/* initialize 555 RGB lookup */
+	// initialize 555 RGB lookup
 	for (int i = 0; i < 32768; i++)
 		palette.set_pen_color(i + 0x800, pal5bit(i >> 10), pal5bit(i >> 5), pal5bit(i >> 0));
 }

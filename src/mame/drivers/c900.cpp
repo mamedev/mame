@@ -32,10 +32,13 @@ To Do:
 
 #include "emu.h"
 #include "cpu/z8000/z8000.h"
+#include "cpu/m6502/m6510.h"
 #include "machine/z80scc.h"
 #include "bus/rs232/rs232.h"
 #include "machine/z8536.h"
+#include "sound/spkrdev.h"
 #include "emupal.h"
+#include "speaker.h"
 
 
 class c900_state : public driver_device
@@ -44,16 +47,30 @@ public:
 	c900_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_fdcpu(*this, "fdcpu")
+		, m_spkrdev(*this, "speaker")
 	{ }
 
 	void c900(machine_config &config);
 
 private:
+	void sound_pb_w(u8 data);
+
 	void data_map(address_map &map);
 	void io_map(address_map &map);
+	void special_io_map(address_map &map);
 	void mem_map(address_map &map);
+	void fdc_map(address_map &map);
+
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_fdcpu;
+	required_device<speaker_sound_device> m_spkrdev;
 };
+
+void c900_state::sound_pb_w(u8 data)
+{
+	m_spkrdev->level_w(BIT(data, 0));
+}
 
 void c900_state::mem_map(address_map &map)
 {
@@ -64,12 +81,24 @@ void c900_state::data_map(address_map &map)
 {
 	map(0x00000, 0x07fff).rom().region("roms", 0);
 	map(0x08000, 0x6ffff).ram();
+	map(0xf0000, 0xf1fff).ram();
 }
 
 void c900_state::io_map(address_map &map)
 {
 	map(0x0000, 0x007f).rw("cio", FUNC(z8036_device::read), FUNC(z8036_device::write)).umask16(0x00ff);
 	map(0x0100, 0x013f).rw("scc", FUNC(scc8030_device::zbus_r), FUNC(scc8030_device::zbus_w)).umask16(0x00ff);
+}
+
+void c900_state::special_io_map(address_map &map)
+{
+	// TODO: Z8010 MMU
+}
+
+void c900_state::fdc_map(address_map &map)
+{
+	map(0x0000, 0x01ff).noprw(); // internal
+	map(0xe000, 0xffff).rom().region("fdc", 0);
 }
 
 static INPUT_PORTS_START( c900 )
@@ -93,34 +122,43 @@ static GFXDECODE_START( gfx_c900 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, c900_charlayout, 0, 1 )
 GFXDECODE_END
 
-MACHINE_CONFIG_START(c900_state::c900)
+void c900_state::c900(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z8001, XTAL(12'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_DATA_MAP(data_map)
-	MCFG_DEVICE_IO_MAP(io_map)
+	Z8001(config, m_maincpu, 12_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &c900_state::mem_map);
+	m_maincpu->set_addrmap(AS_DATA, &c900_state::data_map);
+	m_maincpu->set_addrmap(AS_IO, &c900_state::io_map);
+	m_maincpu->set_addrmap(z8001_device::AS_SIO, &c900_state::special_io_map);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_c900)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	M6508(config, m_fdcpu, 12_MHz_XTAL / 8); // PH1/PH2 = 1.5 MHz
+	m_fdcpu->set_addrmap(AS_PROGRAM, &c900_state::fdc_map);
 
-	Z8036(config, "cio", 6'000'000);
+	GFXDECODE(config, "gfxdecode", "palette", gfx_c900);
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	MCFG_DEVICE_ADD("scc", SCC8030, 6'000'000) // 5'850'000 is the ideal figure
+	z8036_device &cio(Z8036(config, "cio", 12_MHz_XTAL / 16)); // SNDCLK = 750kHz
+	cio.pb_wr_cb().set(FUNC(c900_state::sound_pb_w));
+
+	scc8030_device &scc(SCC8030(config, "scc", 12_MHz_XTAL / 2)); // 5'850'000 is the ideal figure
 	/* Port B */
-	MCFG_Z80SCC_OUT_TXDB_CB(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_Z80SCC_OUT_DTRB_CB(WRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_Z80SCC_OUT_RTSB_CB(WRITELINE("rs232", rs232_port_device, write_rts))
-	//MCFG_Z80SCC_OUT_INT_CB(WRITELINE(*this, c900_state, scc_int))
+	scc.out_txdb_callback().set("rs232", FUNC(rs232_port_device::write_txd));
+	scc.out_dtrb_callback().set("rs232", FUNC(rs232_port_device::write_dtr));
+	scc.out_rtsb_callback().set("rs232", FUNC(rs232_port_device::write_rts));
+	//scc.out_int_callback().set("rs232", FUNC(c900_state::scc_int));
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER (WRITELINE ("scc", scc8030_device, rxb_w))
-	MCFG_RS232_CTS_HANDLER (WRITELINE ("scc", scc8030_device, ctsb_w))
-MACHINE_CONFIG_END
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set("scc", FUNC(scc8030_device::rxb_w));
+	rs232.cts_handler().set("scc", FUNC(scc8030_device::ctsb_w));
+
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_spkrdev).add_route(ALL_OUTPUTS, "mono", 0.05);
+}
 
 ROM_START( c900 )
-	ROM_REGION16_LE( 0x8000, "roms", 0 )
-	ROM_LOAD16_BYTE( "c 900 boot-h v 1.0.bin.u17", 0x0001, 0x4000, CRC(c3aa7fc1) SHA1(ff12dd100fa7b1e7e931e9a8ef4c4f5cc056e099) )
-	ROM_LOAD16_BYTE( "c 900 boot-l v 1.0.bin.u18", 0x0000, 0x4000, CRC(0aa39272) SHA1(b2c5da4586d38fc66bb33aafeae4dbda36080f1e) )
+	ROM_REGION16_BE( 0x8000, "roms", 0 )
+	ROM_LOAD16_BYTE( "c 900 boot-h v 1.0.bin.u17", 0x0000, 0x4000, CRC(c3aa7fc1) SHA1(ff12dd100fa7b1e7e931e9a8ef4c4f5cc056e099) )
+	ROM_LOAD16_BYTE( "c 900 boot-l v 1.0.bin.u18", 0x0001, 0x4000, CRC(0aa39272) SHA1(b2c5da4586d38fc66bb33aafeae4dbda36080f1e) )
 
 	ROM_REGION( 0x2000, "fdc", 0 )
 	ROM_LOAD( "s41_6-20-85.bin", 0x0000, 0x2000, CRC(ec245721) SHA1(4cc19014b4887833a56b1236dc5fe39cc5d7b5c3) )

@@ -50,6 +50,7 @@ Notes:
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 #define MASTER_CLOCK    XTAL(16'000'000)
 
@@ -64,25 +65,28 @@ public:
 		m_bgram(*this, "bgram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_screen(*this, "screen")
 	{ }
 
 	void flagrall(machine_config &config);
 	void k3(machine_config &config);
 
 private:
-	DECLARE_WRITE16_MEMBER(bgram_w);
-	DECLARE_WRITE16_MEMBER(scrollx_w);
-	DECLARE_WRITE16_MEMBER(scrolly_w);
-	DECLARE_WRITE16_MEMBER(k3_soundbanks_w);
-	DECLARE_WRITE16_MEMBER(flagrall_soundbanks_w);
+	void bgram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void scrollx_w(u16 data);
+	void scrolly_w(u16 data);
+	void k3_soundbanks_w(u16 data);
+	void flagrall_soundbanks_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
-	virtual void machine_start() override;
 	virtual void video_start() override;
 
+	void k3_drawgfx(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,
+							u32 code,u32 color,bool flipx,bool flipy,int offsx,int offsy,
+							u8 transparent_color, bool flicker);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void k3_map(address_map &map);
 	void flagrall_map(address_map &map);
@@ -91,18 +95,19 @@ private:
 	/* devices */
 	optional_device_array<okim6295_device, 2> m_oki;
 	/* memory pointers */
-	required_shared_ptr_array<uint16_t, 2> m_spriteram;
-	required_shared_ptr<uint16_t> m_bgram;
+	required_shared_ptr_array<u16, 2> m_spriteram;
+	required_shared_ptr<u16> m_bgram;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
 };
 
 
-WRITE16_MEMBER(k3_state::bgram_w)
+void k3_state::bgram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_bgram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -116,34 +121,106 @@ TILE_GET_INFO_MEMBER(k3_state::get_tile_info)
 
 void k3_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(k3_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(k3_state::get_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+}
+
+void k3_state::k3_drawgfx(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,
+							u32 code,u32 color,bool flipx,bool flipy,int offsx,int offsy,
+							u8 transparent_color, bool flicker)
+{
+	/* Start drawing */
+	const u16 pal = gfx->colorbase() + gfx->granularity() * (color % gfx->colors());
+	const u8 *source_base = gfx->get_data(code % gfx->elements());
+
+	int xinc = flipx ? -1 : 1;
+	int yinc = flipy ? -1 : 1;
+
+	int x_index_base = flipx ? gfx->width() - 1 : 0;
+	int y_index = flipy ? gfx->height() - 1 : 0;
+
+	// start coordinates
+	int sx = offsx;
+	int sy = offsy;
+
+	// end coordinates
+	int ex = sx + gfx->width();
+	int ey = sy + gfx->height();
+
+	if (sx < clip.min_x)
+	{ // clip left
+		int pixels = clip.min_x - sx;
+		sx += pixels;
+		x_index_base += xinc * pixels;
+	}
+	if (sy < clip.min_y)
+	{ // clip top
+		int pixels = clip.min_y - sy;
+		sy += pixels;
+		y_index += yinc * pixels;
+	}
+	// NS 980211 - fixed incorrect clipping
+	if (ex > clip.max_x + 1)
+	{ // clip right
+		ex = clip.max_x + 1;
+	}
+	if (ey > clip.max_y + 1)
+	{ // clip bottom
+		ey = clip.max_y + 1;
+	}
+
+	if (ex > sx)
+	{ // skip if inner loop doesn't draw anything
+		for (int y = sy; y < ey; y++)
+		{
+			const u8 *source = source_base + y_index * gfx->rowbytes();
+			u16 *dest = &dest_bmp.pix16(y);
+			int x_index = x_index_base;
+			for (int x = sx; x < ex; x++)
+			{
+				u8 c = source[x_index];
+				if (c != transparent_color)
+				{
+					if (flicker) // verified from PCB (reference : https://www.youtube.com/watch?v=ooXyyvpW1O0)
+					{
+						dest[x] = pal | 0xff;
+					}
+					else
+					{
+						dest[x] = pal | c;
+					}
+				}
+				x_index += xinc;
+			}
+			y_index += yinc;
+		}
+	}
 }
 
 void k3_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(0);
-	uint16_t *source = m_spriteram[0];
-	uint16_t *source2 = m_spriteram[1];
-	uint16_t *finish = source + 0x1000 / 2; // TODO : Not of all spriteram are used
+	u16 *source = m_spriteram[0];
+	u16 *source2 = m_spriteram[1];
+	u16 *finish = source + 0x1000 / 2; // TODO : Not of all spriteram are used
 
 	while (source < finish)
 	{
 		int xpos = (source[0] & 0xff00) >> 8 | (source2[0] & 0x0001) << 8;
 		int ypos = (source[0] & 0x00ff) >> 0;
-		int tileno = (source2[0] & 0x7ffe) >> 1;
-		int color = BIT(source2[0], 15) ? 0 : 1;
+		u32 tileno = (source2[0] & 0x7ffe) >> 1;
+		bool flicker = BIT(source2[0], 15);
 
-		gfx->transpen(bitmap,cliprect, tileno, color, 0, 0, xpos, ypos, 0);
-		gfx->transpen(bitmap,cliprect, tileno, color, 0, 0, xpos, ypos - 0x100, 0); // wrap
-		gfx->transpen(bitmap,cliprect, tileno, color, 0, 0, xpos - 0x200, ypos, 0); // wrap
-		gfx->transpen(bitmap,cliprect, tileno, color, 0, 0, xpos - 0x200, ypos - 0x100, 0); // wrap
+		k3_drawgfx(bitmap, cliprect, gfx, tileno, 1, false, false, xpos, ypos, 0, flicker);
+		k3_drawgfx(bitmap, cliprect, gfx, tileno, 1, false, false, xpos, ypos - 0x100, 0, flicker); // wrap
+		k3_drawgfx(bitmap, cliprect, gfx, tileno, 1, false, false, xpos - 0x200, ypos, 0, flicker); // wrap
+		k3_drawgfx(bitmap, cliprect, gfx, tileno, 1, false, false, xpos - 0x200, ypos - 0x100, 0, flicker); // wrap
 
 		source++;
 		source2++;
 	}
 }
 
-uint32_t k3_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 k3_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);
@@ -151,23 +228,23 @@ uint32_t k3_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 }
 
 
-WRITE16_MEMBER(k3_state::scrollx_w)
+void k3_state::scrollx_w(u16 data)
 {
 	m_bg_tilemap->set_scrollx(0, data);
 }
 
-WRITE16_MEMBER(k3_state::scrolly_w)
+void k3_state::scrolly_w(u16 data)
 {
 	m_bg_tilemap->set_scrolly(0, data);
 }
 
-WRITE16_MEMBER(k3_state::k3_soundbanks_w)
+void k3_state::k3_soundbanks_w(u16 data)
 {
-	m_oki[1]->set_rom_bank((data & 4) >> 2);
-	m_oki[0]->set_rom_bank((data & 2) >> 1);
+	m_oki[1]->set_rom_bank(BIT(data, 2));
+	m_oki[0]->set_rom_bank(BIT(data, 1));
 }
 
-WRITE16_MEMBER(k3_state::flagrall_soundbanks_w)
+void k3_state::flagrall_soundbanks_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	data &= mem_mask;
 
@@ -186,7 +263,6 @@ WRITE16_MEMBER(k3_state::flagrall_soundbanks_w)
 		popmessage("unk control %04x", data & 0xfcc9);
 
 	m_oki[0]->set_rom_bank((data & 0x6) >> 1);
-
 }
 
 
@@ -199,9 +275,9 @@ void k3_state::k3_base_map(address_map &map)
 	map(0x000000, 0x0fffff).rom(); // ROM
 	map(0x100000, 0x10ffff).ram(); // Main Ram
 	map(0x200000, 0x2003ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x240000, 0x240fff).ram().share("spritera1");
-	map(0x280000, 0x280fff).ram().share("spritera2");
-	map(0x2c0000, 0x2c07ff).ram().w(FUNC(k3_state::bgram_w)).share("bgram");
+	map(0x240000, 0x240fff).ram().share(m_spriteram[0]);
+	map(0x280000, 0x280fff).ram().share(m_spriteram[1]);
+	map(0x2c0000, 0x2c07ff).ram().w(FUNC(k3_state::bgram_w)).share(m_bgram);
 	map(0x2c0800, 0x2c0fff).ram(); // or does k3 have a bigger tilemap? (flagrall is definitely 32x32 tiles)
 	map(0x340000, 0x340001).w(FUNC(k3_state::scrollx_w));
 	map(0x380000, 0x380001).w(FUNC(k3_state::scrolly_w));
@@ -374,48 +450,42 @@ static GFXDECODE_START( gfx_1945kiii )
 GFXDECODE_END
 
 
-void k3_state::machine_start()
+void k3_state::flagrall(machine_config &config)
 {
-}
+	M68000(config, m_maincpu, MASTER_CLOCK); // ?
+	m_maincpu->set_addrmap(AS_PROGRAM, &k3_state::flagrall_map);
+	m_maincpu->set_vblank_int("screen", FUNC(k3_state::irq4_line_hold));
 
-MACHINE_CONFIG_START(k3_state::flagrall)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_1945kiii);
 
-	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CLOCK ) // ?
-	MCFG_DEVICE_PROGRAM_MAP(flagrall_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", k3_state,  irq4_line_hold)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(64*8, 32*8);
+	m_screen->set_visarea(0*8, 40*8-1, 0*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(k3_state::screen_update));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_1945kiii)
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(k3_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_PALETTE_ADD("palette", 0x200)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x200);
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, MASTER_CLOCK/16, okim6295_device::PIN7_HIGH)  /* dividers? */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki[0], MASTER_CLOCK/16, okim6295_device::PIN7_HIGH);  /* dividers? */
+	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
-MACHINE_CONFIG_START(k3_state::k3)
+void k3_state::k3(machine_config &config)
+{
 	flagrall(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(k3_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &k3_state::k3_map);
 
-	MCFG_DEVICE_ADD("oki2", OKIM6295, MASTER_CLOCK/16, okim6295_device::PIN7_HIGH)  /* dividers? */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	OKIM6295(config, m_oki[1], MASTER_CLOCK/16, okim6295_device::PIN7_HIGH);  /* dividers? */
+	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
-MACHINE_CONFIG_END
+	m_screen->set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
+}
 
 
 

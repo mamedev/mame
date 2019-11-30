@@ -3,18 +3,14 @@
 #ifndef MAME_MACHINE_MAPLEDEV_H
 #define MAME_MACHINE_MAPLEDEV_H
 
-#define MCFG_MAPLE_DEVICE_ADD(_tag, _type, _clock, _host_tag, _host_port) \
-	MCFG_DEVICE_ADD(_tag, _type, _clock) \
-	downcast<maple_device &>(*device).set_host(_host_tag, _host_port);
+
+#include "maple-dc.h"
 
 class maple_device : public device_t
 {
 public:
-	void set_host(const char *_host_tag, int _host_port)
-	{
-		host_tag = _host_tag;
-		host_port = _host_port;
-	}
+	void set_host_port(int _host_port) { host_port = _host_port; }
+
 	virtual void maple_w(const uint32_t *data, uint32_t in_size) = 0;
 	void maple_r(uint32_t *data, uint32_t &out_size, bool &partial);
 	virtual void maple_reset();
@@ -43,8 +39,7 @@ protected:
 	void reply_start(uint8_t code, uint8_t source, uint8_t size);
 
 	// Configuration
-	class maple_dc_device *host;
-	const char *host_tag;
+	required_device<maple_dc_device> host;
 	int host_port;
 
 private:

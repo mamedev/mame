@@ -185,8 +185,7 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
-
-#include "netlist/devices/net_lib.h"
+#include "audio/nl_cocoloco.h"
 
 
 #define MASTER_CLOCK    XTAL(20'000'000)     // confirmed
@@ -197,11 +196,20 @@
 class cocoloco_state : public driver_device
 {
 public:
-	cocoloco_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	cocoloco_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+
+	void cocoloco(machine_config &config);
+
+protected:
+	virtual void video_start() override;
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 
@@ -214,13 +222,9 @@ public:
 	DECLARE_WRITE8_MEMBER(vram_clear_w);
 	DECLARE_WRITE8_MEMBER(coincounter_w);
 
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(cocoloco);
+	void cocoloco_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void cocoloco(machine_config &config);
 	void cocoloco_map(address_map &map);
 };
 
@@ -228,62 +232,19 @@ public:
 *          Sound Hardware          *
 ***********************************/
 
-static NETLIST_START(nl_cocoloco)
-
-	/* Standard stuff */
-
-	SOLVER(Solver, 48000)
-	PARAM(Solver.ACCURACY, 1e-5)
-	ANALOG_INPUT(V5, 5)
-
-	/* AY 8910 internal resistors */
-
-	RES(R_AY1_1, 1000);
-	RES(R_AY1_2, 1000);
-	RES(R_AY1_3, 1000);
-
-	RES(R1, 4700)
-	RES(R2, 4700)
-	RES(R3, 4700)
-	RES(RAMP, 150000)
-	//RES(RAMP, 150)
-	POT(P1, 5000)
-	PARAM(P1.DIAL, 0.5) // 50%
-
-	CAP(C1, 10e-6)
-
-	NET_C(V5, R_AY1_1.1, R_AY1_2.1, R_AY1_3.1)
-
-	NET_C(R_AY1_1.2, R1.1)
-	NET_C(R_AY1_2.2, R2.1)
-	NET_C(R_AY1_3.2, R3.1)
-
-	NET_C(R1.2, R2.2, R3.2, P1.1)
-
-	NET_C(P1.3, RAMP.2, GND)
-	NET_C(P1.2, C1.1)
-	NET_C(C1.2, RAMP.1)
-#if 0
-	CAP(C2, 0.1e-6)
-	NET_C(C2.2, GND)
-	NET_C(C2.1, RAMP.1)
-#endif
-NETLIST_END()
 
 
 /***********************************
 *          Video Hardware          *
 ***********************************/
 
-PALETTE_INIT_MEMBER(cocoloco_state, cocoloco)
+void cocoloco_state::cocoloco_palette(palette_device &palette) const
 {
-	for(int i = 0; i < 0x10; i += 2)
+	for (int i = 0; i < 0x10; i += 2)
 	{
-		int r,g,b;
-
-		r = pal2bit(i & 3);
-		g = pal2bit((i >> 1) & 3);
-		b = pal2bit((i >> 2) & 3);
+		int const r = pal2bit(i & 3);
+		int const g = pal2bit((i >> 1) & 3);
+		int const b = pal2bit((i >> 2) & 3);
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -310,17 +271,15 @@ void cocoloco_state::video_start()
 
 uint32_t cocoloco_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int x, y, count, xi;
-
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
-	count = 0;
+	int count = 0;
 
-	for(x = 0; x < 256; x += 8)
+	for (int x = 0; x < 256; x += 8)
 	{
-		for(y = 0; y < 256; y++)
+		for (int y = 0; y < 256; y++)
 		{
-			for (xi = 0; xi < 8; xi++)
+			for (int xi = 0; xi < 8; xi++)
 			{
 				int color;
 				color  =  (m_videoram[count|0x0000] >> (xi)) & 1;
@@ -328,7 +287,7 @@ uint32_t cocoloco_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 				color |= ((m_videoram[count|0x4000] >> (xi)) & 1) << 2;
 				color |= ((m_videoram[count|0x6000] >> (xi)) & 1) << 3;
 
-				if(cliprect.contains(x + xi, 256 - y))
+				if (cliprect.contains(x + xi, 256 - y))
 					bitmap.pix16(256 - y, x + xi) = m_palette->pen(color & 0x0f);
 			}
 
@@ -510,45 +469,42 @@ INPUT_PORTS_END
 *         Machine Drivers          *
 ***********************************/
 
-MACHINE_CONFIG_START(cocoloco_state::cocoloco)
-
+void cocoloco_state::cocoloco(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(cocoloco_map)
+	M6502(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cocoloco_state::cocoloco_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(CPU_CLOCK * 4, 384, 0, 256, 262, 0, 256)  // TODO: not accurate, ~50 Hz
-	MCFG_SCREEN_UPDATE_DRIVER(cocoloco_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(CPU_CLOCK * 4, 384, 0, 256, 262, 0, 256);  // TODO: not accurate, ~50 Hz
+	screen.set_screen_update(FUNC(cocoloco_state::screen_update));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 0x10)
-	MCFG_PALETTE_INIT_OWNER(cocoloco_state, cocoloco)
+	PALETTE(config, m_palette, FUNC(cocoloco_state::cocoloco_palette), 0x10);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("ay8910", AY8910, SND_CLOCK)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_RESISTOR_OUTPUT)
-	MCFG_SOUND_ROUTE(0, "snd_nl", 1.0, 0)
-	MCFG_SOUND_ROUTE(1, "snd_nl", 1.0, 1)
-	MCFG_SOUND_ROUTE(2, "snd_nl", 1.0, 2)
+	ay8910_device &ay8910(AY8910(config, "ay8910", SND_CLOCK));
+	ay8910.port_a_read_callback().set_ioport("DSW1");
+	ay8910.port_b_read_callback().set_ioport("DSW2");
+	ay8910.set_flags(AY8910_RESISTOR_OUTPUT);
+	ay8910.add_route(0, "snd_nl", 1.0, 0);
+	ay8910.add_route(1, "snd_nl", 1.0, 1);
+	ay8910.add_route(2, "snd_nl", 1.0, 2);
 
 	/* NETLIST configuration using internal AY8910 resistor values */
 
-	MCFG_DEVICE_ADD("snd_nl", NETLIST_SOUND, 48000)
-	MCFG_NETLIST_SETUP(nl_cocoloco)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	NETLIST_SOUND(config, "snd_nl", 48000)
+		.set_source(NETLIST_NAME(cocoloco))
+		.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_NETLIST_STREAM_INPUT("snd_nl", 0, "R_AY1_1.R")
-	MCFG_NETLIST_STREAM_INPUT("snd_nl", 1, "R_AY1_2.R")
-	MCFG_NETLIST_STREAM_INPUT("snd_nl", 2, "R_AY1_3.R")
+	NETLIST_STREAM_INPUT(config, "snd_nl:cin0", 0, "R_AY1_1.R");
+	NETLIST_STREAM_INPUT(config, "snd_nl:cin1", 1, "R_AY1_2.R");
+	NETLIST_STREAM_INPUT(config, "snd_nl:cin2", 2, "R_AY1_3.R");
 
-	MCFG_NETLIST_STREAM_OUTPUT("snd_nl", 0, "RAMP.1")
-	MCFG_NETLIST_ANALOG_MULT_OFFSET(30000.0 * 1.5, 0)
-
-MACHINE_CONFIG_END
+	NETLIST_STREAM_OUTPUT(config, "snd_nl:cout0", 0, "RAMP.1").set_mult_offset(30000.0 * 1.5, 0);
+}
 
 
 /***********************************

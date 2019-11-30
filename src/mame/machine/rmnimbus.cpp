@@ -66,7 +66,7 @@ chdman createhd -o ST125N.chd -chs 41921,1,1 -ss 512
 #include "debugger.h"
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
 
 
 
@@ -206,14 +206,7 @@ void rmnimbus_state::machine_reset()
 	mouse_js_reset();
 
 	/* USER VIA 6522 port B is connected to the BBC user port */
-	m_via->write_pb0(1);
-	m_via->write_pb1(1);
-	m_via->write_pb2(1);
-	m_via->write_pb3(1);
-	m_via->write_pb4(1);
-	m_via->write_pb5(1);
-	m_via->write_pb6(1);
-	m_via->write_pb7(1);
+	m_via->write_pb(0xff);
 }
 
 void rmnimbus_state::machine_start()

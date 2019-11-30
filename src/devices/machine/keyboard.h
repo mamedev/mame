@@ -7,18 +7,6 @@
 
 
 /***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-#define KEYBOARDCB_PUT(cls, fnc)          generic_keyboard_device::output_delegate((&cls::fnc), (#cls "::" #fnc), DEVICE_SELF, ((cls *)nullptr))
-#define KEYBOARDCB_DEVPUT(tag, cls, fnc)  generic_keyboard_device::output_delegate((&cls::fnc), (#cls "::" #fnc), (tag), ((cls *)nullptr))
-
-#define MCFG_GENERIC_KEYBOARD_CB(cb) \
-	downcast<generic_keyboard_device &>(*device).set_keyboard_callback((KEYBOARDCB_##cb));
-
-
-
-/***************************************************************************
     DEVICE TYPE GLOBALS
 ***************************************************************************/
 
@@ -91,7 +79,11 @@ public:
 			device_t *owner,
 			u32 clock);
 
-	template <class Object> void set_keyboard_callback(Object &&cb) { m_keyboard_cb = std::forward<Object>(cb); }
+	template <typename... T>
+	void set_keyboard_callback(T &&... args)
+	{
+		m_keyboard_cb.set(std::forward<T>(args)...);
+	}
 
 	virtual ioport_constructor device_input_ports() const override;
 

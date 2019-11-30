@@ -5,6 +5,10 @@
     Double Dragon & Double Dragon II (but also China Gate)
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_DDRAGON_H
+#define MAME_INCLUDES_DDRAGON_H
+
+#pragma once
 
 #include "cpu/m6805/m68705.h"
 #include "machine/bankdev.h"
@@ -13,6 +17,7 @@
 #include "sound/msm5205.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 
 class ddragon_state : public driver_device
@@ -50,7 +55,7 @@ public:
 	void init_ddragon();
 	void init_ddragon6809();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(subcpu_bus_free);
+	DECLARE_READ_LINE_MEMBER(subcpu_bus_free_r);
 
 protected:
 	required_device<cpu_device> m_maincpu;
@@ -119,7 +124,7 @@ private:
 
 	optional_region_ptr_array<uint8_t, 2> m_adpcm_rom;
 
-	void ddragon_interrupt_ack(address_space &space, offs_t offset, uint8_t data);
+	void ddragon_interrupt_ack(offs_t offset, uint8_t data);
 	void dd_adpcm_int(int chip);
 
 	/* video/ddragon.c */
@@ -152,7 +157,6 @@ private:
 	void dd2_sub_map(address_map &map);
 	void ddragon_map(address_map &map);
 	void ddragonba_sub_map(address_map &map);
-	void ddragonba_sub_portmap(address_map &map);
 	void sound_map(address_map &map);
 	void sub_map(address_map &map);
 };
@@ -178,7 +182,6 @@ private:
 	DECLARE_WRITE8_MEMBER(darktowr_mcu_bank_w);
 	DECLARE_WRITE8_MEMBER(darktowr_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(mcu_port_a_w);
-
 
 	void darktowr_map(address_map &map);
 	void darktowr_banked_map(address_map &map);
@@ -207,3 +210,5 @@ private:
 
 	void toffy_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_DDRAGON_H

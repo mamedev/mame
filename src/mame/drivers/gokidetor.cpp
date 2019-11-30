@@ -99,7 +99,7 @@ void gokidetor_state::main_map(address_map &map)
 	// d101 = ?output
 	// d1c0 = ?output
 	map(0xd800, 0xd80f).rw("te7750", FUNC(te7750_device::read), FUNC(te7750_device::write));
-	//AM_RANGE(0xda00, 0xda01) AM_DEVWRITE("pwm", m66240_device, write)
+	//map(0xda00, 0xda01).w("pwm", FUNC(m66240_device::write));
 	// de00 ?input
 	// df00 ?input
 	map(0xe000, 0xe003).nopr(); // ?input
@@ -121,45 +121,45 @@ void gokidetor_state::sound_map(address_map &map)
 }
 
 
-MACHINE_CONFIG_START(gokidetor_state::gokidetor)
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(16'000'000) / 4) // divider not verified
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+void gokidetor_state::gokidetor(machine_config &config)
+{
+	Z80(config, m_maincpu, XTAL(16'000'000) / 4); // divider not verified
+	m_maincpu->set_addrmap(AS_PROGRAM, &gokidetor_state::main_map);
 	// IRQ from ???
 	// NMI related to E002 input and TE7750 port 7
 
-	MCFG_DEVICE_ADD("te7750", TE7750, 0)
-	MCFG_TE7750_IOS_CB(CONSTANT(3))
-	MCFG_TE7750_IN_PORT1_CB(IOPORT("IN1"))
-	MCFG_TE7750_IN_PORT2_CB(IOPORT("IN2"))
-	MCFG_TE7750_IN_PORT3_CB(IOPORT("IN3"))
-	MCFG_TE7750_OUT_PORT4_CB(WRITE8(*this, gokidetor_state, out4_w))
-	MCFG_TE7750_OUT_PORT5_CB(WRITE8(*this, gokidetor_state, out5_w))
-	MCFG_TE7750_OUT_PORT6_CB(WRITE8(*this, gokidetor_state, out6_w))
-	MCFG_TE7750_OUT_PORT7_CB(WRITE8(*this, gokidetor_state, out7_w))
-	MCFG_TE7750_IN_PORT8_CB(IOPORT("IN8"))
-	MCFG_TE7750_OUT_PORT8_CB(WRITE8(*this, gokidetor_state, out8_w))
-	MCFG_TE7750_OUT_PORT9_CB(WRITE8(*this, gokidetor_state, out9_w))
+	te7750_device &te7750(TE7750(config, "te7750"));
+	te7750.ios_cb().set_constant(3);
+	te7750.in_port1_cb().set_ioport("IN1");
+	te7750.in_port2_cb().set_ioport("IN2");
+	te7750.in_port3_cb().set_ioport("IN3");
+	te7750.out_port4_cb().set(FUNC(gokidetor_state::out4_w));
+	te7750.out_port5_cb().set(FUNC(gokidetor_state::out5_w));
+	te7750.out_port6_cb().set(FUNC(gokidetor_state::out6_w));
+	te7750.out_port7_cb().set(FUNC(gokidetor_state::out7_w));
+	te7750.in_port8_cb().set_ioport("IN8");
+	te7750.out_port8_cb().set(FUNC(gokidetor_state::out8_w));
+	te7750.out_port9_cb().set(FUNC(gokidetor_state::out9_w));
 
-	MCFG_DEVICE_ADD("soundcpu", Z80, 4000000)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	z80_device &soundcpu(Z80(config, "soundcpu", 4000000));
+	soundcpu.set_addrmap(AS_PROGRAM, &gokidetor_state::sound_map);
 
-	MCFG_DEVICE_ADD("ciu", PC060HA, 0)
-	MCFG_PC060HA_MASTER_CPU("maincpu")
-	MCFG_PC060HA_SLAVE_CPU("soundcpu")
+	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
+	ciu.set_master_tag(m_maincpu);
+	ciu.set_slave_tag("soundcpu");
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, 3000000)
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, gokidetor_state, ym_porta_w))
-	MCFG_SOUND_ROUTE(0, "mono", 0.25)
-	MCFG_SOUND_ROUTE(1, "mono", 0.25)
-	MCFG_SOUND_ROUTE(2, "mono", 0.25)
-	MCFG_SOUND_ROUTE(3, "mono", 0.80)
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", 3000000));
+	ymsnd.irq_handler().set_inputline("soundcpu", 0);
+	ymsnd.port_a_write_callback().set(FUNC(gokidetor_state::ym_porta_w));
+	ymsnd.add_route(0, "mono", 0.25);
+	ymsnd.add_route(1, "mono", 0.25);
+	ymsnd.add_route(2, "mono", 0.25);
+	ymsnd.add_route(3, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.50); // clock frequency & pin 7 not verified
+}
 
 INPUT_PORTS_START( gokidetor )
 	PORT_START("IN1")

@@ -87,20 +87,22 @@ Notes:
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class calorie_state : public driver_device
 {
 public:
-	calorie_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	calorie_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_fg_ram(*this, "fg_ram"),
 		m_sprites(*this, "sprites"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
-		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
+		m_decrypted_opcodes(*this, "decrypted_opcodes")
+	{ }
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_fg_ram;
@@ -164,8 +166,8 @@ TILE_GET_INFO_MEMBER(calorie_state::get_fg_tile_info)
 
 void calorie_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(calorie_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(calorie_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(calorie_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(calorie_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);
 }
@@ -249,8 +251,8 @@ WRITE8_MEMBER(calorie_state::calorie_flipscreen_w)
 
 READ8_MEMBER(calorie_state::calorie_soundlatch_r)
 {
-	uint8_t latch = m_soundlatch->read(space, 0);
-	m_soundlatch->clear_w(space, 0, 0);
+	uint8_t latch = m_soundlatch->read();
+	m_soundlatch->clear_w();
 	return latch;
 }
 
@@ -464,56 +466,53 @@ void calorie_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(calorie_state::calorie)
-
+void calorie_state::calorie(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,4000000)         /* 4 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(calorie_map)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", calorie_state,  irq0_line_hold)
+	Z80(config, m_maincpu, 4000000);         /* 4 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &calorie_state::calorie_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &calorie_state::decrypted_opcodes_map);
+	m_maincpu->set_vblank_int("screen", FUNC(calorie_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80,3000000)        /* 3 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(calorie_sound_map)
-	MCFG_DEVICE_IO_MAP(calorie_sound_io_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(calorie_state, irq0_line_hold,  64)
+	z80_device &audiocpu(Z80(config, "audiocpu", 3000000));        /* 3 MHz */
+	audiocpu.set_addrmap(AS_PROGRAM, &calorie_state::calorie_sound_map);
+	audiocpu.set_addrmap(AS_IO, &calorie_state::calorie_sound_io_map);
+	audiocpu.set_periodic_int(FUNC(calorie_state::irq0_line_hold), attotime::from_hz(64));
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(calorie_state, screen_update_calorie)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 256-1, 16, 256-16-1);
+	screen.set_screen_update(FUNC(calorie_state::screen_update_calorie));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_calorie)
-	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_calorie);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 0x100);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ay1", YM2149, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
+	YM2149(config, "ay1", 1500000).add_route(ALL_OUTPUTS, "mono", 0.8);
 
-	MCFG_DEVICE_ADD("ay2", YM2149, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
+	YM2149(config, "ay2", 1500000).add_route(ALL_OUTPUTS, "mono", 0.8);
 
-	MCFG_DEVICE_ADD("ay3", YM2149, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
-MACHINE_CONFIG_END
+	YM2149(config, "ay3", 1500000).add_route(ALL_OUTPUTS, "mono", 0.8);
+}
 
-MACHINE_CONFIG_START(calorie_state::caloriee)
+void calorie_state::caloriee(machine_config &config)
+{
 	calorie(config);
-	MCFG_DEVICE_REPLACE("maincpu", SEGA_317_0004,4000000)         /* 4 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(calorie_map)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", calorie_state,  irq0_line_hold)
-	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":decrypted_opcodes")
-MACHINE_CONFIG_END
+	sega_317_0004_device &maincpu(SEGA_317_0004(config.replace(), m_maincpu, 4000000));         /* 4 MHz */
+	maincpu.set_addrmap(AS_PROGRAM, &calorie_state::calorie_map);
+	maincpu.set_addrmap(AS_OPCODES, &calorie_state::decrypted_opcodes_map);
+	maincpu.set_vblank_int("screen", FUNC(calorie_state::irq0_line_hold));
+	maincpu.set_decrypted_tag(m_decrypted_opcodes);
+}
 
 /*************************************
  *

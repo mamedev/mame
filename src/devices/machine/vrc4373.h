@@ -10,16 +10,6 @@
 #include "pci.h"
 #include "cpu/mips/mips3.h"
 
-#define MCFG_VRC4373_SET_RAM(_size) \
-	downcast<vrc4373_device &>(*device).set_ram_size(_size);
-
-#define MCFG_VRC4373_SET_SIMM0(_size) \
-	downcast<vrc4373_device &>(*device).set_simm0_size(_size);
-
-#define MCFG_VRC4373_IRQ_CB(_devcb) \
-	ide_pci_device::set_irq_cb(*device, DEVCB_##_devcb);
-
-
 class vrc4373_device : public pci_host_device {
 public:
 	template <typename T>
@@ -36,7 +26,7 @@ public:
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 	virtual void device_post_load() override;
 
-	template <class Object> devcb_base &set_irq_cb(Object &&cb) { return m_irq_cb.set_callback(std::forward<Object>(cb)); }
+	auto irq_cb() { return m_irq_cb.bind(); }
 	template <typename T> void set_cpu_tag(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
 	void set_ram_size(int size) { m_ram_size = size; };
 	void set_simm0_size(int size) { m_simm0_size = size; };

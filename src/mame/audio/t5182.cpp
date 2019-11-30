@@ -225,11 +225,11 @@ void t5182_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 {
 	switch (id)
 	{
-		case SETIRQ_CB:
-			setirq_callback(ptr, param);
-			break;
-		default:
-			assert_always(false, "Unknown id in t5182_device::device_timer");
+	case SETIRQ_CB:
+		setirq_callback(ptr, param);
+		break;
+	default:
+		throw emu_fatalerror("Unknown id in t5182_device::device_timer");
 	}
 }
 
@@ -371,9 +371,9 @@ void t5182_device::t5182_io(address_map &map)
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(t5182_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("t5182_z80", Z80, T5182_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(t5182_map)
-	MCFG_DEVICE_IO_MAP(t5182_io)
-
-MACHINE_CONFIG_END
+void t5182_device::device_add_mconfig(machine_config &config)
+{
+	Z80(config, m_ourcpu, T5182_CLOCK);
+	m_ourcpu->set_addrmap(AS_PROGRAM, &t5182_device::t5182_map);
+	m_ourcpu->set_addrmap(AS_IO, &t5182_device::t5182_io);
+}

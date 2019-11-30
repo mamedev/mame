@@ -229,50 +229,50 @@ GFXDECODE_END
 
 
 /* All clocks are unconfirmed */
-MACHINE_CONFIG_START(exzisus_state::exzisus)
-
+void exzisus_state::exzisus(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("cpua", Z80, 6000000)
-	MCFG_DEVICE_PROGRAM_MAP(cpua_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", exzisus_state,  irq0_line_hold)
+	z80_device &cpua(Z80(config, "cpua", 6000000));
+	cpua.set_addrmap(AS_PROGRAM, &exzisus_state::cpua_map);
+	cpua.set_vblank_int("screen", FUNC(exzisus_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("cpub", Z80, 6000000)
-	MCFG_DEVICE_PROGRAM_MAP(cpub_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", exzisus_state,  irq0_line_hold)
+	z80_device &cpub(Z80(config, "cpub", 6000000));
+	cpub.set_addrmap(AS_PROGRAM, &exzisus_state::cpub_map);
+	cpub.set_vblank_int("screen", FUNC(exzisus_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("cpuc", Z80, 6000000)
-	MCFG_DEVICE_PROGRAM_MAP(cpuc_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", exzisus_state,  irq0_line_hold)
+	Z80(config, m_cpuc, 6000000);
+	m_cpuc->set_addrmap(AS_PROGRAM, &exzisus_state::cpuc_map);
+	m_cpuc->set_vblank_int("screen", FUNC(exzisus_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	z80_device &audiocpu(Z80(config, "audiocpu", 4000000));
+	audiocpu.set_addrmap(AS_PROGRAM, &exzisus_state::sound_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
+	config.set_maximum_quantum(attotime::from_hz(600));   /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(exzisus_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(exzisus_state::screen_update));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_exzisus)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 1024)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_exzisus);
+	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 1024);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 4000000)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.50)
-	MCFG_SOUND_ROUTE(1, "mono", 0.50)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 4000000));
+	ymsnd.irq_handler().set_inputline("audiocpu", 0);
+	ymsnd.add_route(0, "mono", 0.50);
+	ymsnd.add_route(1, "mono", 0.50);
 
-	MCFG_DEVICE_ADD("ciu", PC060HA, 0)
-	MCFG_PC060HA_MASTER_CPU("cpub")
-	MCFG_PC060HA_SLAVE_CPU("audiocpu")
-MACHINE_CONFIG_END
+	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
+	ciu.set_master_tag("cpub");
+	ciu.set_slave_tag("audiocpu");
+}
 
 
 /***************************************************************************

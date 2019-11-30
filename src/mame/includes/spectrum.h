@@ -12,14 +12,11 @@
 #pragma once
 
 #include "machine/spec_snqk.h"
-
+#include "machine/bankdev.h"
 #include "bus/spectrum/exp.h"
-#include "bus/generic/carts.h"
-#include "bus/generic/slot.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
 #include "machine/ram.h"
-#include "machine/upd765.h"
 #include "sound/spkrdev.h"
 #include "emupal.h"
 #include "screen.h"
@@ -62,22 +59,21 @@ struct EVENT_LIST_ITEM
 };
 
 
+
+
 class spectrum_state : public driver_device
 {
 public:
-	spectrum_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	spectrum_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_video_ram(*this, "video_ram"),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
 		m_cassette(*this, "cassette"),
 		m_ram(*this, RAM_TAG),
+		m_specmem(*this, "specmem"),
 		m_speaker(*this, "speaker"),
 		m_exp(*this, "exp"),
-		m_dock(*this, "dockslot"),
-		m_upd765(*this, "upd765"),
-		m_upd765_0(*this, "upd765:0"),
-		m_upd765_1(*this, "upd765:1"),
 		m_io_line0(*this, "LINE0"),
 		m_io_line1(*this, "LINE1"),
 		m_io_line2(*this, "LINE2"),
@@ -94,21 +90,18 @@ public:
 		m_io_plus3(*this, "PLUS3"),
 		m_io_plus4(*this, "PLUS4"),
 		m_io_joy1(*this, "JOY1"),
-		m_io_joy2(*this, "JOY2") { }
+		m_io_joy2(*this, "JOY2")
+	{ }
 
 	void spectrum_common(machine_config &config);
 	void spectrum(machine_config &config);
-	void ts2068(machine_config &config);
-	void uk2086(machine_config &config);
-	void tc2048(machine_config &config);
-	void spectrum_plus3(machine_config &config);
+	void spectrum_clone(machine_config &config);
 	void spectrum_128(machine_config &config);
 
 	void init_spectrum();
-	void init_plus2();
-	void init_plus3();
 
 protected:
+
 	enum
 	{
 		TIMER_IRQ_ON,
@@ -121,8 +114,6 @@ protected:
 	int m_port_1ffd_data;   /* scorpion and plus3 */
 	int m_port_ff_data; /* Display enhancement control */
 	int m_port_f4_data; /* Horizontal Select Register */
-
-	int m_floppy;
 
 	/* video support */
 	int m_frame_invert_count;
@@ -149,87 +140,61 @@ protected:
 
 	uint8_t *m_ram_0000;
 	uint8_t m_ram_disabled_by_beta;
+	DECLARE_READ8_MEMBER(pre_opcode_fetch_r);
 	DECLARE_WRITE8_MEMBER(spectrum_rom_w);
 	DECLARE_READ8_MEMBER(spectrum_rom_r);
+	DECLARE_READ8_MEMBER(spectrum_data_r);
+	DECLARE_WRITE8_MEMBER(spectrum_data_w);
+
 	DECLARE_WRITE8_MEMBER(spectrum_port_fe_w);
 	DECLARE_READ8_MEMBER(spectrum_port_fe_r);
 	DECLARE_READ8_MEMBER(spectrum_port_ula_r);
+	DECLARE_READ8_MEMBER(spectrum_clone_port_ula_r);
 
+	DECLARE_READ8_MEMBER(spectrum_128_pre_opcode_fetch_r);
 	DECLARE_WRITE8_MEMBER(spectrum_128_bank1_w);
 	DECLARE_READ8_MEMBER(spectrum_128_bank1_r);
 	DECLARE_WRITE8_MEMBER(spectrum_128_port_7ffd_w);
 	DECLARE_READ8_MEMBER(spectrum_128_ula_r);
 
-	DECLARE_WRITE8_MEMBER(spectrum_plus3_bank1_w);
-	DECLARE_READ8_MEMBER(spectrum_plus3_bank1_r);
-	DECLARE_WRITE8_MEMBER(spectrum_plus3_port_3ffd_w);
-	DECLARE_READ8_MEMBER(spectrum_plus3_port_3ffd_r);
-	DECLARE_READ8_MEMBER(spectrum_plus3_port_2ffd_r);
-	DECLARE_WRITE8_MEMBER(spectrum_plus3_port_7ffd_w);
-	DECLARE_WRITE8_MEMBER(spectrum_plus3_port_1ffd_w);
-
-	DECLARE_READ8_MEMBER(ts2068_port_f4_r);
-	DECLARE_WRITE8_MEMBER(ts2068_port_f4_w);
-	DECLARE_READ8_MEMBER(ts2068_port_ff_r);
-	DECLARE_WRITE8_MEMBER(ts2068_port_ff_w);
-	DECLARE_WRITE8_MEMBER(tc2048_port_ff_w);
-
 	DECLARE_MACHINE_RESET(spectrum);
 	DECLARE_VIDEO_START(spectrum);
-	DECLARE_PALETTE_INIT(spectrum);
-	DECLARE_MACHINE_RESET(tc2048);
+	void spectrum_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(spectrum_128);
 	DECLARE_MACHINE_RESET(spectrum_128);
-	DECLARE_MACHINE_RESET(spectrum_plus3);
-	DECLARE_MACHINE_RESET(ts2068);
-	DECLARE_VIDEO_START(ts2068);
 	uint32_t screen_update_spectrum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_tc2048(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_ts2068(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_spectrum);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_timex);
 	INTERRUPT_GEN_MEMBER(spec_interrupt);
-
-	// for timex cart only
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(timex_cart);
-	int m_dock_cart_type, m_ram_chunks;
-	memory_region *m_dock_crt;
 
 	unsigned int m_previous_border_x, m_previous_border_y;
 	bitmap_ind16 m_border_bitmap;
 	unsigned int m_previous_screen_x, m_previous_screen_y;
 	bitmap_ind16 m_screen_bitmap;
 
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
 	void spectrum_128_update_memory();
-	void spectrum_plus3_update_memory();
-	void ts2068_update_memory();
+	virtual void plus3_update_memory() { }
+	virtual void ts2068_update_memory() { }
 
-	DECLARE_SNAPSHOT_LOAD_MEMBER(spectrum);
-	DECLARE_QUICKLOAD_LOAD_MEMBER(spectrum);
+	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 
 	void spectrum_128_io(address_map &map);
 	void spectrum_128_mem(address_map &map);
+	void spectrum_128_fetch(address_map &map);
 	void spectrum_io(address_map &map);
-	void spectrum_mem(address_map &map);
-	void spectrum_plus3_io(address_map &map);
-	void spectrum_plus3_mem(address_map &map);
-	void tc2048_io(address_map &map);
-	void tc2048_mem(address_map &map);
-	void ts2068_io(address_map &map);
-	void ts2068_mem(address_map &map);
+	void spectrum_clone_io(address_map &map);
+	void spectrum_opcodes(address_map &map);
+	void spectrum_map(address_map &map);
+	void spectrum_data(address_map &map);
 
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
+	optional_device<address_map_bank_device> m_specmem;
 	required_device<speaker_sound_device> m_speaker;
 	optional_device<spectrum_expansion_slot_device> m_exp;
-	optional_device<generic_slot_device> m_dock;
-	optional_device<upd765a_device> m_upd765;
-	optional_device<floppy_connector> m_upd765_0;
-	optional_device<floppy_connector> m_upd765_1;
 
 	// Regular spectrum ports; marked as optional because of other subclasses
 	optional_ioport m_io_line0;
@@ -258,9 +223,6 @@ protected:
 	void spectrum_UpdateScreenBitmap(bool eof = false);
 	inline unsigned char get_display_color(unsigned char color, int invert);
 	inline void spectrum_plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint32_t color);
-	void ts2068_hires_scanline(bitmap_ind16 &bitmap, int y, int borderlines);
-	void ts2068_64col_scanline(bitmap_ind16 &bitmap, int y, int borderlines, unsigned short inkcolor);
-	void ts2068_lores_scanline(bitmap_ind16 &bitmap, int y, int borderlines, int screen);
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// snapshot helpers
@@ -286,6 +248,8 @@ protected:
 	void log_quickload(const char *type, uint32_t start, uint32_t length, uint32_t exec, const char *exec_format);
 	void setup_scr(uint8_t *quickdata, uint32_t quicksize);
 	void setup_raw(uint8_t *quickdata, uint32_t quicksize);
+
+	uint8_t floating_bus_r();
 };
 
 

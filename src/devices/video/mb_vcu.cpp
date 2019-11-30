@@ -38,16 +38,20 @@ DEFINE_DEVICE_TYPE(MB_VCU, mb_vcu_device, "mb_vcu", "Mazer Blazer custom VCU")
 
 void mb_vcu_device::mb_vcu_vram(address_map &map)
 {
-	map(0x00000, 0x7ffff).ram(); // enough for a 256x256x4 x 2 pages of framebuffer with 4 layers (TODO: doubled for simplicity)
+	if (!has_configured_map(0))
+		map(0x00000, 0x7ffff).ram(); // enough for a 256x256x4 x 2 pages of framebuffer with 4 layers (TODO: doubled for simplicity)
 }
 
 
 void mb_vcu_device::mb_vcu_pal_ram(address_map &map)
 {
-	map(0x0000, 0x00ff).ram();
-	map(0x0200, 0x02ff).ram();
-	map(0x0400, 0x04ff).ram();
-	map(0x0600, 0x06ff).rw(FUNC(mb_vcu_device::mb_vcu_paletteram_r), FUNC(mb_vcu_device::mb_vcu_paletteram_w));
+	if (!has_configured_map(1))
+	{
+		map(0x0000, 0x00ff).ram();
+		map(0x0200, 0x02ff).ram();
+		map(0x0400, 0x04ff).ram();
+		map(0x0600, 0x06ff).rw(FUNC(mb_vcu_device::mb_vcu_paletteram_r), FUNC(mb_vcu_device::mb_vcu_paletteram_w));
+	}
 }
 
 READ8_MEMBER( mb_vcu_device::mb_vcu_paletteram_r )
@@ -64,19 +68,19 @@ WRITE8_MEMBER( mb_vcu_device::mb_vcu_paletteram_w )
 	/* red component */
 	bit1 = (m_palram[offset] >> 7) & 0x01;
 	bit0 = (m_palram[offset] >> 6) & 0x01;
-	r = combine_2_weights(m_weights_r, bit0, bit1);
+	r = combine_weights(m_weights_r, bit0, bit1);
 
 	/* green component */
 	bit2 = (m_palram[offset] >> 5) & 0x01;
 	bit1 = (m_palram[offset] >> 4) & 0x01;
 	bit0 = (m_palram[offset] >> 3) & 0x01;
-	g = combine_3_weights(m_weights_g, bit0, bit1, bit2);
+	g = combine_weights(m_weights_g, bit0, bit1, bit2);
 
 	/* blue component */
 	bit2 = (m_palram[offset] >> 2) & 0x01;
 	bit1 = (m_palram[offset] >> 1) & 0x01;
 	bit0 = (m_palram[offset] >> 0) & 0x01;
-	b = combine_3_weights(m_weights_b, bit0, bit1, bit2);
+	b = combine_weights(m_weights_b, bit0, bit1, bit2);
 
 	m_palette->set_pen_color(offset, rgb_t(r, g, b));
 }
@@ -147,8 +151,8 @@ mb_vcu_device::mb_vcu_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, MB_VCU, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)
-	, m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 19, 0, address_map_constructor(), address_map_constructor(FUNC(mb_vcu_device::mb_vcu_vram), this))
-	, m_paletteram_space_config("palram", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(), address_map_constructor(FUNC(mb_vcu_device::mb_vcu_pal_ram), this))
+	, m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 19, 0, address_map_constructor(FUNC(mb_vcu_device::mb_vcu_vram), this))
+	, m_paletteram_space_config("palram", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(mb_vcu_device::mb_vcu_pal_ram), this))
 	, m_cpu(*this, finder_base::DUMMY_TAG)
 	, m_palette(*this, finder_base::DUMMY_TAG)
 {
@@ -474,19 +478,19 @@ WRITE8_MEMBER( mb_vcu_device::background_color_w )
 	/* red component */
 	bit1 = (m_bk_color >> 7) & 0x01;
 	bit0 = (m_bk_color >> 6) & 0x01;
-	r = combine_2_weights(m_weights_r, bit0, bit1);
+	r = combine_weights(m_weights_r, bit0, bit1);
 
 	/* green component */
 	bit2 = (m_bk_color >> 5) & 0x01;
 	bit1 = (m_bk_color >> 4) & 0x01;
 	bit0 = (m_bk_color >> 3) & 0x01;
-	g = combine_3_weights(m_weights_g, bit0, bit1, bit2);
+	g = combine_weights(m_weights_g, bit0, bit1, bit2);
 
 	/* blue component */
 	bit2 = (m_bk_color >> 2) & 0x01;
 	bit1 = (m_bk_color >> 1) & 0x01;
 	bit0 = (m_bk_color >> 0) & 0x01;
-	b = combine_3_weights(m_weights_b, bit0, bit1, bit2);
+	b = combine_weights(m_weights_b, bit0, bit1, bit2);
 
 	m_palette->set_pen_color(0x100, rgb_t(r, g, b));
 }

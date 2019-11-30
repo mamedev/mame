@@ -62,7 +62,7 @@ void tg100_state::tg100_map(address_map &map)
 
 void tg100_state::tg100_io_map(address_map &map)
 {
-//  ADDRESS_MAP_GLOBAL_MASK(0xff)
+//  map.global_mask(0xff);
 }
 
 static INPUT_PORTS_START( tg100 )
@@ -73,25 +73,25 @@ void tg100_state::ymw258_map(address_map &map)
 	map(0x000000, 0x1fffff).rom();
 }
 
-MACHINE_CONFIG_START(tg100_state::tg100)
+void tg100_state::tg100(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",  H83002, XTAL(20'000'000)) /* TODO: correct CPU type (H8/520) */
-	MCFG_DEVICE_PROGRAM_MAP( tg100_map )
-	MCFG_DEVICE_IO_MAP( tg100_io_map )
+	H83002(config, m_maincpu, XTAL(20'000'000)); /* TODO: correct CPU type (H8/520) */
+	m_maincpu->set_addrmap(AS_PROGRAM, &tg100_state::tg100_map);
+	m_maincpu->set_addrmap(AS_IO, &tg100_state::tg100_io_map);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymw258", MULTIPCM, 9400000)
-	MCFG_DEVICE_ADDRESS_MAP(0, ymw258_map)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-
-MACHINE_CONFIG_END
+	MULTIPCM(config, m_ymw258, 9400000);
+	m_ymw258->set_addrmap(0, &tg100_state::ymw258_map);
+	m_ymw258->add_route(0, "lspeaker", 1.0);
+	m_ymw258->add_route(1, "rspeaker", 1.0);
+}
 
 ROM_START( tg100 )
 
-	ROM_REGION(0x20000, "prgrom", 0) // H8/520 memory bus is 8 bit actually
+	ROM_REGION16_BE(0x20000, "prgrom", 0) // H8/520 memory bus is 8 bit actually
 	ROM_LOAD16_WORD_SWAP( "xk731c0.ic4", 0x00000, 0x20000, CRC(8fb6139c) SHA1(483103a2ffc63a90a2086c597baa2b2745c3a1c2) )
 
 	ROM_REGION(0x200000, "ymw258", 0)

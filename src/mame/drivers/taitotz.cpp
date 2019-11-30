@@ -172,10 +172,10 @@ Notes:
 */
 
 #include "emu.h"
+#include "bus/ata/ataintf.h"
+#include "bus/ata/idehd.h"
 #include "cpu/powerpc/ppc.h"
 #include "cpu/tlcs900/tlcs900.h"
-#include "machine/ataintf.h"
-#include "machine/idehd.h"
 #include "machine/nvram.h"
 #include "video/poly.h"
 
@@ -566,7 +566,7 @@ public:
 
 private:
 	required_device<ppc_device> m_maincpu;
-	required_device<cpu_device> m_iocpu;
+	required_device<tmp95c063_device> m_iocpu;
 	required_shared_ptr<uint64_t> m_work_ram;
 	required_shared_ptr<uint16_t> m_mbox_ram;
 	required_device<ata_interface_device> m_ata;
@@ -2570,53 +2570,52 @@ WRITE_LINE_MEMBER(taitotz_state::ide_interrupt)
 	m_iocpu->set_input_line(TLCS900_INT2, state);
 }
 
-MACHINE_CONFIG_START(taitotz_state::taitotz)
+void taitotz_state::taitotz(machine_config &config)
+{
 	/* IBM EMPPC603eBG-100 */
-	MCFG_DEVICE_ADD("maincpu", PPC603E, 100000000)
-	MCFG_PPC_BUS_FREQUENCY(XTAL(66'666'700))    /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
-	MCFG_DEVICE_PROGRAM_MAP(ppc603e_mem)
+	PPC603E(config, m_maincpu, 100000000);
+	m_maincpu->set_bus_frequency(XTAL(66'666'700)); /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &taitotz_state::ppc603e_mem);
 
 	/* TMP95C063F I/O CPU */
-	MCFG_DEVICE_ADD("iocpu", TMP95C063, 25000000)
-	MCFG_TMP95C063_PORT9_READ(IOPORT("INPUTS1"))
-	MCFG_TMP95C063_PORTB_READ(IOPORT("INPUTS2"))
-	MCFG_TMP95C063_PORTD_READ(IOPORT("INPUTS3"))
-	MCFG_TMP95C063_PORTE_READ(IOPORT("INPUTS4"))
-	MCFG_TMP95C063_AN0_READ(IOPORT("ANALOG1"))
-	MCFG_TMP95C063_AN1_READ(IOPORT("ANALOG2"))
-	MCFG_TMP95C063_AN2_READ(IOPORT("ANALOG3"))
-	MCFG_TMP95C063_AN3_READ(IOPORT("ANALOG4"))
-	MCFG_TMP95C063_AN4_READ(IOPORT("ANALOG5"))
-	MCFG_TMP95C063_AN5_READ(IOPORT("ANALOG6"))
-	MCFG_TMP95C063_AN6_READ(IOPORT("ANALOG7"))
-	MCFG_TMP95C063_AN7_READ(IOPORT("ANALOG8"))
-
-	MCFG_DEVICE_PROGRAM_MAP(tlcs900h_mem)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", taitotz_state,  taitotz_vbi)
+	TMP95C063(config, m_iocpu, 25000000);
+	m_iocpu->port9_read().set_ioport("INPUTS1");
+	m_iocpu->portb_read().set_ioport("INPUTS2");
+	m_iocpu->portd_read().set_ioport("INPUTS3");
+	m_iocpu->porte_read().set_ioport("INPUTS4");
+	m_iocpu->an_read<0>().set_ioport("ANALOG1");
+	m_iocpu->an_read<1>().set_ioport("ANALOG2");
+	m_iocpu->an_read<2>().set_ioport("ANALOG3");
+	m_iocpu->an_read<3>().set_ioport("ANALOG4");
+	m_iocpu->an_read<4>().set_ioport("ANALOG5");
+	m_iocpu->an_read<5>().set_ioport("ANALOG6");
+	m_iocpu->an_read<6>().set_ioport("ANALOG7");
+	m_iocpu->an_read<7>().set_ioport("ANALOG8");
+	m_iocpu->set_addrmap(AS_PROGRAM, &taitotz_state::tlcs900h_mem);
+	m_iocpu->set_vblank_int("screen", FUNC(taitotz_state::taitotz_vbi));
 
 	/* MN1020819DA sound CPU */
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(120))
+	config.set_maximum_quantum(attotime::from_hz(120));
 
 	ata_interface_device &ata(ATA_INTERFACE(config, "ata").options(ata_devices, "hdd", nullptr, true));
 	ata.irq_handler().set(FUNC(taitotz_state::ide_interrupt));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 384)
-	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
-	MCFG_SCREEN_UPDATE_DRIVER(taitotz_state, screen_update_taitotz)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(512, 384);
+	m_screen->set_visarea(0, 511, 0, 383);
+	m_screen->set_screen_update(FUNC(taitotz_state::screen_update_taitotz));
+}
 
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(taitotz_state::landhigh)
+void taitotz_state::landhigh(machine_config &config)
+{
 	taitotz(config);
-	MCFG_DEVICE_MODIFY("iocpu")
-	MCFG_DEVICE_PROGRAM_MAP(landhigh_tlcs900h_mem)
-MACHINE_CONFIG_END
+	m_iocpu->set_addrmap(AS_PROGRAM, &taitotz_state::landhigh_tlcs900h_mem);
+}
 
 
 // Init for BIOS v1.52
@@ -2760,7 +2759,7 @@ ROM_START( taitotz )
 	ROM_REGION64_BE( 0x100000, "user1", 0 )
 	TAITOTZ_BIOS_V152
 
-	ROM_REGION( 0x40000, "io_cpu", ROMREGION_ERASE00 )
+	ROM_REGION16_LE( 0x40000, "io_cpu", ROMREGION_ERASE00 )
 	ROM_REGION( 0x10000, "sound_cpu", ROMREGION_ERASE00 ) /* Internal ROM :( */
 	ROM_REGION( 0x500, "plds", ROMREGION_ERASE00 )
 	DISK_REGION( "ata:0:hdd:image" )
@@ -2788,7 +2787,7 @@ ROM_START( landhigh )
 	ROM_REGION64_BE( 0x100000, "user1", 0 )
 	TAITOTZ_BIOS_V152
 
-	ROM_REGION( 0x40000, "io_cpu", 0 )
+	ROM_REGION16_LE( 0x40000, "io_cpu", 0 )
 	ROM_LOAD16_BYTE( "e82-03.ic14", 0x000000, 0x020000, CRC(0de65b4d) SHA1(932316f7435259b723a29843d58b2e3dca92e7b7) )
 	ROM_LOAD16_BYTE( "e82-04.ic15", 0x000001, 0x020000, CRC(b3cb0f3d) SHA1(80414f50a1593c6b849d9f37e94a32168699a5c1) )
 
@@ -2808,7 +2807,7 @@ ROM_START( landhigha )
 	ROM_REGION64_BE( 0x100000, "user1", 0 )
 	TAITOTZ_BIOS_V152
 
-	ROM_REGION( 0x40000, "io_cpu", 0 )
+	ROM_REGION16_LE( 0x40000, "io_cpu", 0 )
 	ROM_LOAD16_BYTE( "e82-03.ic14", 0x000000, 0x020000, CRC(0de65b4d) SHA1(932316f7435259b723a29843d58b2e3dca92e7b7) )
 	ROM_LOAD16_BYTE( "e82-04.ic15", 0x000001, 0x020000, CRC(b3cb0f3d) SHA1(80414f50a1593c6b849d9f37e94a32168699a5c1) )
 
@@ -2828,7 +2827,7 @@ ROM_START( batlgear )
 	ROM_REGION64_BE( 0x100000, "user1", 0 )
 	TAITOTZ_BIOS_V111A
 
-	ROM_REGION( 0x40000, "io_cpu", 0 )
+	ROM_REGION16_LE( 0x40000, "io_cpu", 0 )
 	ROM_LOAD16_BYTE( "e68-07.ic14",  0x000000, 0x020000, CRC(554c6fd7) SHA1(9f203dead81c7ccf73d7fd462cab147cd17f890f) )
 	ROM_LOAD16_BYTE( "e68-08.ic15",  0x000001, 0x020000, CRC(f1932380) SHA1(64d12e858af15a9ba8254917da13863ac7c9c050) )
 
@@ -2843,7 +2842,7 @@ ROM_START( batlgr2 )
 	ROM_REGION64_BE( 0x100000, "user1", 0 )
 	TAITOTZ_BIOS_V152
 
-	ROM_REGION( 0x40000, "io_cpu", 0 )
+	ROM_REGION16_LE( 0x40000, "io_cpu", 0 )
 	ROM_LOAD16_BYTE( "e87-03.ic14",  0x000000, 0x020000, CRC(49ae7cd0) SHA1(15f07a6bb2044a85a2139481f1dc95a44520c929) )
 	ROM_LOAD16_BYTE( "e87-04.ic15",  0x000001, 0x020000, CRC(59f8f75f) SHA1(f5595751b10c0033f460114c43f5e2c192fe61f1) )
 
@@ -2858,7 +2857,7 @@ ROM_START( batlgr2a )
 	ROM_REGION64_BE( 0x100000, "user1", 0 )
 	TAITOTZ_BIOS_V152
 
-	ROM_REGION( 0x40000, "io_cpu", 0 )
+	ROM_REGION16_LE( 0x40000, "io_cpu", 0 )
 	ROM_LOAD16_BYTE( "e87-03.ic14",  0x000000, 0x020000, CRC(49ae7cd0) SHA1(15f07a6bb2044a85a2139481f1dc95a44520c929) )
 	ROM_LOAD16_BYTE( "e87-04.ic15",  0x000001, 0x020000, CRC(59f8f75f) SHA1(f5595751b10c0033f460114c43f5e2c192fe61f1) )
 
@@ -2873,14 +2872,14 @@ ROM_START( pwrshovl )
 	ROM_REGION64_BE( 0x100000, "user1", 0 )
 	TAITOTZ_BIOS_V111A
 
-	ROM_REGION( 0x40000, "io_cpu", 0 )
+	ROM_REGION16_LE( 0x40000, "io_cpu", 0 )
 	ROM_LOAD16_BYTE( "e74-04++.ic14", 0x000000, 0x020000, CRC(ef21a261) SHA1(7398826dbf48014b9c7e9454f978f3e419ebc64b) ) // actually labeled E74-04**
 	ROM_LOAD16_BYTE( "e74-05++.ic15", 0x000001, 0x020000, CRC(2466217d) SHA1(dc814da3a1679cff001f179d3c1641af985a6490) ) // actually labeled E74-05**
 
 	ROM_REGION( 0x10000, "sound_cpu", 0 ) /* Internal ROM :( */
 	ROM_LOAD( "e68-01.ic7", 0x000000, 0x010000, NO_DUMP )
 
-	ROM_REGION( 0x20000, "io_cpu2", 0 ) // another TMP95C063F, not hooked up yet
+	ROM_REGION16_LE( 0x20000, "io_cpu2", 0 ) // another TMP95C063F, not hooked up yet
 	ROM_LOAD( "e74-06.ic2", 0x000000, 0x020000, CRC(cd4a99d3) SHA1(ea280e05a68308c1c5f1fc0ee8a25b33923df635) ) // located on the I/O PCB
 
 	ROM_REGION( 0x20000, "oki1", 0 )
@@ -2897,14 +2896,14 @@ ROM_START( pwrshovla )
 	ROM_REGION64_BE( 0x100000, "user1", 0 )
 	TAITOTZ_BIOS_V111A
 
-	ROM_REGION( 0x40000, "io_cpu", 0 )
+	ROM_REGION16_LE( 0x40000, "io_cpu", 0 )
 	ROM_LOAD16_BYTE( "e74-04++.ic14", 0x000000, 0x020000, CRC(ef21a261) SHA1(7398826dbf48014b9c7e9454f978f3e419ebc64b) ) // actually labeled E74-04**
 	ROM_LOAD16_BYTE( "e74-05++.ic15", 0x000001, 0x020000, CRC(2466217d) SHA1(dc814da3a1679cff001f179d3c1641af985a6490) ) // actually labeled E74-05**
 
 	ROM_REGION( 0x10000, "sound_cpu", 0 ) /* Internal ROM :( */
 	ROM_LOAD( "e68-01.ic7", 0x000000, 0x010000, NO_DUMP )
 
-	ROM_REGION( 0x20000, "io_cpu2", 0 ) // another TMP95C063F, not hooked up yet
+	ROM_REGION16_LE( 0x20000, "io_cpu2", 0 ) // another TMP95C063F, not hooked up yet
 	ROM_LOAD( "e74-06.ic2", 0x000000, 0x020000, CRC(cd4a99d3) SHA1(ea280e05a68308c1c5f1fc0ee8a25b33923df635) ) // located on the I/O PCB
 
 	ROM_REGION( 0x20000, "oki1", 0 )
@@ -2921,7 +2920,7 @@ ROM_START( raizpin )
 	ROM_REGION64_BE( 0x100000, "user1", 0 )
 	TAITOTZ_BIOS_V152
 
-	ROM_REGION( 0x40000, "io_cpu", 0 )
+	ROM_REGION16_LE( 0x40000, "io_cpu", 0 )
 	ROM_LOAD16_BYTE( "f14-01.ic14",  0x000000, 0x020000, CRC(f86a184d) SHA1(46abd11430c08d4f384fb79a5a3a39e54f83b8d8) )
 	ROM_LOAD16_BYTE( "f14-02.ic15",  0x000001, 0x020000, CRC(bd2d0dee) SHA1(652f810702598184551de9fd69436862d48c1608) )
 
@@ -2936,7 +2935,7 @@ ROM_START( raizpinj )
 	ROM_REGION64_BE( 0x100000, "user1", 0 )
 	TAITOTZ_BIOS_V152
 
-	ROM_REGION( 0x40000, "io_cpu", 0 )
+	ROM_REGION16_LE( 0x40000, "io_cpu", 0 )
 	ROM_LOAD16_BYTE( "f14-01.ic14",  0x000000, 0x020000, CRC(f86a184d) SHA1(46abd11430c08d4f384fb79a5a3a39e54f83b8d8) )
 	ROM_LOAD16_BYTE( "f14-02.ic15",  0x000001, 0x020000, CRC(bd2d0dee) SHA1(652f810702598184551de9fd69436862d48c1608) )
 
@@ -2951,7 +2950,7 @@ ROM_START( styphp )
 	ROM_REGION64_BE( 0x100000, "user1", 0 )
 	TAITOTZ_BIOS_V152
 
-	ROM_REGION( 0x40000, "io_cpu", 0 )
+	ROM_REGION16_LE( 0x40000, "io_cpu", 0 )
 	ROM_LOAD16_BYTE( "e98-01.ic14", 0x000000, 0x020000, CRC(479b37ad) SHA1(a0e59d990665244a7919a104dc4b6869ccf90be1) )
 	ROM_LOAD16_BYTE( "e98-02.ic15", 0x000001, 0x020000, CRC(d8da590f) SHA1(b33a67d81e388d7863adaf03041911c7f84d193b) )
 
@@ -2962,14 +2961,14 @@ ROM_START( styphp )
 	DISK_IMAGE( "styphp", 0, SHA1(c232d3460e37523346132544b8e23a5f9b447150) )
 ROM_END
 
-GAME( 1999, taitotz,   0,        taitotz,  taitotz,  taitotz_state, empty_init,    ROT0, "Taito", "Type Zero BIOS", MACHINE_NO_SOUND|MACHINE_NOT_WORKING|MACHINE_IS_BIOS_ROOT)
-GAME( 1998, batlgear,  taitotz,  taitotz,  batlgr2,  taitotz_state, init_batlgear, ROT0, "Taito", "Battle Gear (Ver 2.40 A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1999, taitotz,   0,        taitotz,  taitotz,  taitotz_state, empty_init,    ROT0, "Taito", "Type Zero BIOS", MACHINE_NO_SOUND|MACHINE_NOT_WORKING|MACHINE_IS_BIOS_ROOT )
+GAME( 1998, batlgear,  taitotz,  taitotz,  batlgr2,  taitotz_state, init_batlgear, ROT0, "Taito", "Battle Gear (Ver 2.40 A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_NODEVICE_LAN )
 GAME( 1999, landhigh,  taitotz,  landhigh, landhigh, taitotz_state, init_landhigh, ROT0, "Taito", "Landing High Japan (Ver 2.01 OK)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 1999, landhigha, landhigh, landhigh, landhigh, taitotz_state, init_landhigha,ROT0, "Taito", "Landing High Japan (Ver 2.02 O)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 1999, pwrshovl,  taitotz,  taitotz,  pwrshovl, taitotz_state, init_pwrshovl, ROT0, "Taito", "Power Shovel ni Norou!! - Power Shovel Simulator (v2.07J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 1999/8/5 19:13:35
 GAME( 1999, pwrshovla, pwrshovl, taitotz,  pwrshovl, taitotz_state, init_pwrshovl, ROT0, "Taito", "Power Shovel ni Norou!! - Power Shovel Simulator (v2.07J, alt)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // seem to be some differences in drive content, but identifies as the same revision, is it just user data changes??
-GAME( 2000, batlgr2,   taitotz,  taitotz,  batlgr2,  taitotz_state, init_batlgr2,  ROT0, "Taito", "Battle Gear 2 (v2.04J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2000, batlgr2a,  batlgr2,  taitotz,  batlgr2,  taitotz_state, init_batlgr2a, ROT0, "Taito", "Battle Gear 2 (v2.01J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2000, batlgr2,   taitotz,  taitotz,  batlgr2,  taitotz_state, init_batlgr2,  ROT0, "Taito", "Battle Gear 2 (v2.04J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_NODEVICE_LAN )
+GAME( 2000, batlgr2a,  batlgr2,  taitotz,  batlgr2,  taitotz_state, init_batlgr2a, ROT0, "Taito", "Battle Gear 2 (v2.01J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_NODEVICE_LAN )
 GAME( 2000, styphp,    taitotz,  taitotz,  styphp,   taitotz_state, init_styphp,   ROT0, "Taito", "Stunt Typhoon Plus (Ver 2.04 J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2002, raizpin,   taitotz,  taitotz,  taitotz,  taitotz_state, init_raizpin,  ROT0, "Taito", "Raizin Ping Pong (V2.01O)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2002, raizpinj,  raizpin,  taitotz,  taitotz,  taitotz_state, init_raizpinj, ROT0, "Taito", "Raizin Ping Pong (V2.01J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

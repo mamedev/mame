@@ -195,7 +195,7 @@ void at29x_device::sync_flags()
 /*
     read a byte from FEEPROM
 */
-READ8_MEMBER( at29x_device::read )
+uint8_t at29x_device::read(offs_t offset)
 {
 	int reply;
 
@@ -271,7 +271,7 @@ READ8_MEMBER( at29x_device::read )
 /*
     Write a byte to FEEPROM
 */
-WRITE8_MEMBER( at29x_device::write )
+void at29x_device::write(offs_t offset, uint8_t data)
 {
 	offset &= m_address_mask;
 	LOGMASKED(LOG_WRITE, "%05x <- %02x\n", offset, data);

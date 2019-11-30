@@ -300,49 +300,46 @@ void bladestl_state::machine_reset()
 	for (i = 0; i < 4 ; i++)
 		m_last_track[i] = 0;
 
-	m_soundlatch->acknowledge_w(machine().dummy_space(), 0, 0);
+	m_soundlatch->acknowledge_w();
 }
 
-MACHINE_CONFIG_START(bladestl_state::bladestl)
-
+void bladestl_state::bladestl(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, HD6309E, XTAL(24'000'000) / 8) // divider not verified (from 007342 custom)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", bladestl_state, bladestl_scanline, "screen", 0, 1)
+	HD6309E(config, m_maincpu, XTAL(24'000'000) / 8); // divider not verified (from 007342 custom)
+	m_maincpu->set_addrmap(AS_PROGRAM, &bladestl_state::main_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(bladestl_state::bladestl_scanline), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD(m_audiocpu, MC6809E, XTAL(24'000'000) / 16)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	MC6809E(config, m_audiocpu, XTAL(24'000'000) / 16);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &bladestl_state::sound_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+	config.set_maximum_quantum(attotime::from_hz(600));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(bladestl_state, screen_update_bladestl)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(bladestl_state::screen_update_bladestl));
+	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_bladestl)
-	MCFG_PALETTE_ADD("palette", 32 + 16*16)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32+16)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_PALETTE_INIT_OWNER(bladestl_state, bladestl)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_bladestl);
+	PALETTE(config, "palette", FUNC(bladestl_state::bladestl_palette)).set_format(palette_device::xBGR_555, 32 + 16*16, 32+16);
 
-	MCFG_K007342_ADD(m_k007342)
-	MCFG_K007342_GFXNUM(0)
-	MCFG_K007342_CALLBACK_OWNER(bladestl_state, bladestl_tile_callback)
-	MCFG_K007342_GFXDECODE("gfxdecode")
+	K007342(config, m_k007342, 0);
+	m_k007342->set_gfxnum(0);
+	m_k007342->set_tile_callback(FUNC(bladestl_state::bladestl_tile_callback));
+	m_k007342->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_K007420_ADD(m_k007420)
-	MCFG_K007420_BANK_LIMIT(0x3ff)
-	MCFG_K007420_CALLBACK_OWNER(bladestl_state, bladestl_sprite_callback)
-	MCFG_K007420_PALETTE("palette")
+	K007420(config, m_k007420, 0);
+	m_k007420->set_bank_limit(0x3ff);
+	m_k007420->set_sprite_callback(FUNC(bladestl_state::bladestl_sprite_callback));
+	m_k007420->set_palette_tag("palette");
 
-	MCFG_K051733_ADD("k051733")
+	K051733(config, "k051733", 0);
 
 	/* sound hardware */
 	/* the initialization order is important, the port callbacks being
@@ -353,24 +350,20 @@ MACHINE_CONFIG_START(bladestl_state::bladestl)
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, M6809_IRQ_LINE);
 	m_soundlatch->set_separate_acknowledge(true);
 
-	MCFG_DEVICE_ADD(m_upd7759, UPD7759)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
+	UPD7759(config, m_upd7759).add_route(ALL_OUTPUTS, "mono", 0.60);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, XTAL(24'000'000) / 8)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(m_upd7759, upd775x_device, port_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, bladestl_state, bladestl_port_B_w))
-	MCFG_SOUND_ROUTE(0, "filter1", 0.45)
-	MCFG_SOUND_ROUTE(1, "filter2", 0.45)
-	MCFG_SOUND_ROUTE(2, "filter3", 0.45)
-	MCFG_SOUND_ROUTE(3, "mono", 0.45)
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(24'000'000) / 8));
+	ymsnd.port_a_write_callback().set(m_upd7759, FUNC(upd775x_device::port_w));
+	ymsnd.port_b_write_callback().set(FUNC(bladestl_state::bladestl_port_B_w));
+	ymsnd.add_route(0, "filter1", 0.45);
+	ymsnd.add_route(1, "filter2", 0.45);
+	ymsnd.add_route(2, "filter3", 0.45);
+	ymsnd.add_route(3, "mono", 0.45);
 
-	MCFG_DEVICE_ADD(m_filter1, FILTER_RC)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADD(m_filter2, FILTER_RC)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADD(m_filter3, FILTER_RC)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	FILTER_RC(config, m_filter1).add_route(ALL_OUTPUTS, "mono", 1.0);
+	FILTER_RC(config, m_filter2).add_route(ALL_OUTPUTS, "mono", 1.0);
+	FILTER_RC(config, m_filter3).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 /*************************************

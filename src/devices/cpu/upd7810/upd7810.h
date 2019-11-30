@@ -131,10 +131,10 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override { return 1; }
-	virtual uint32_t execute_max_cycles() const override { return 40; }
-	virtual uint32_t execute_input_lines() const override { return 2; }
-	virtual bool execute_input_edge_triggered(int inputnum) const override { return true; }
+	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 40; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 2; }
+	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return true; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -258,6 +258,7 @@ protected:
 	uint8_t   m_mc;     /* port C input or output mask */
 	uint8_t   m_mm;     /* memory mapping */
 	uint8_t   m_mf;     /* port F input or output mask */
+	uint8_t   m_mt;     /* port T input threshold level */
 	uint8_t   m_tmm;    /* timer 0 and timer 1 operating parameters */
 	uint8_t   m_etmm;   /* 16-bit multifunction timer/event counter */
 	uint8_t   m_eom;    /* 16-bit timer/event counter output control */
@@ -483,6 +484,7 @@ protected:
 	void MOV_TXB_A();
 	void MOV_TM0_A();
 	void MOV_TM1_A();
+	void MOV_MT_A();
 	void MOV_ZCM_A();
 	void ANA_V_A();
 	void ANA_A_A();
@@ -1391,8 +1393,8 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override { return (clocks + 4 - 1) / 4; }
-	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override { return (cycles * 4); }
+	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 4 - 1) / 4; }
+	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * 4); }
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 	virtual void handle_timers(int cycles) override;
 	virtual void configure_ops() override;

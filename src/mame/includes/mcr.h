@@ -5,6 +5,10 @@
     Midway MCR system
 
 **************************************************************************/
+#ifndef MAME_INCLUDES_MCR_H
+#define MAME_INCLUDES_MCR_H
+
+#pragma once
 
 #include "cpu/z80/z80.h"
 #include "machine/z80daisy.h"
@@ -13,10 +17,12 @@
 #include "machine/z80pio.h"
 #include "machine/z80dart.h"
 #include "machine/watchdog.h"
+#include "audio/bally.h"
 #include "audio/midway.h"
 #include "audio/csd.h"
 #include "sound/samples.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 /* constants */
 #define MAIN_OSC_MCR_I      XTAL(19'968'000)
@@ -122,7 +128,7 @@ protected:
 	optional_device<midway_cheap_squeak_deluxe_device> m_cheap_squeak_deluxe;
 	optional_device<midway_sounds_good_device> m_sounds_good;
 	optional_device<midway_turbo_cheap_squeak_device> m_turbo_cheap_squeak;
-	optional_device<midway_squawk_n_talk_device> m_squawk_n_talk;
+	optional_device<bally_squawk_n_talk_device> m_squawk_n_talk;
 	optional_device<samples_device> m_samples;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -174,13 +180,14 @@ private:
 class mcr_nflfoot_state : public mcr_state
 {
 public:
-	mcr_nflfoot_state(const machine_config &mconfig, device_type type, const char *tag)
-		: mcr_state(mconfig, type, tag),
+	mcr_nflfoot_state(const machine_config &mconfig, device_type type, const char *tag) :
+		mcr_state(mconfig, type, tag),
 		m_ipu(*this, "ipu"),
 		m_ipu_sio(*this, "ipu_sio"),
 		m_ipu_ctc(*this, "ipu_ctc"),
 		m_ipu_pio0(*this, "ipu_pio0"),
-		m_ipu_pio1(*this, "ipu_pio1") {}
+		m_ipu_pio1(*this, "ipu_pio1")
+	{ }
 
 	DECLARE_WRITE_LINE_MEMBER(sio_txda_w);
 	DECLARE_WRITE_LINE_MEMBER(sio_txdb_w);
@@ -206,7 +213,7 @@ private:
 	int m_ipu_sio_txdb;
 	emu_timer *m_ipu_watchdog_timer;
 
-	required_device<cpu_device> m_ipu;
+	required_device<z80_device> m_ipu;
 	required_device<z80dart_device> m_ipu_sio;
 	required_device<z80ctc_device> m_ipu_ctc;
 	required_device<z80pio_device> m_ipu_pio0;
@@ -221,3 +228,4 @@ extern const z80_daisy_config mcr_ipu_daisy_chain[];
 extern const gfx_layout mcr_bg_layout;
 extern const gfx_layout mcr_sprite_layout;
 
+#endif // MAME_INCLUDES_MCR_H

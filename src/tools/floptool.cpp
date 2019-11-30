@@ -51,6 +51,14 @@
 
 #include "formats/hpi_dsk.h"
 
+#include "formats/dvk_mx_dsk.h"
+#include "formats/aim_dsk.h"
+#include "formats/m20_dsk.h"
+
+#include "formats/flex_dsk.h"
+#include "formats/uniflex_dsk.h"
+
+
 static floppy_format_type floppy_formats[] = {
 	FLOPPY_MFI_FORMAT,
 	FLOPPY_DFI_FORMAT,
@@ -89,7 +97,14 @@ static floppy_format_type floppy_formats[] = {
 
 	FLOPPY_APPLIX_FORMAT,
 
-	FLOPPY_HPI_FORMAT
+	FLOPPY_HPI_FORMAT,
+
+	FLOPPY_DVK_MX_FORMAT,
+	FLOPPY_AIM_FORMAT,
+	FLOPPY_M20_FORMAT,
+
+	FLOPPY_FLEX_FORMAT,
+	FLOPPY_UNIFLEX_FORMAT
 };
 
 void CLIB_DECL ATTR_PRINTF(1,2) logerror(const char *format, ...)

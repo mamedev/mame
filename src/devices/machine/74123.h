@@ -68,6 +68,12 @@ class ttl74123_device :  public device_t
 public:
 	// construction/destruction
 	ttl74123_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ttl74123_device(const machine_config &mconfig, const char *tag, device_t *owner, double res, double cap)
+		: ttl74123_device(mconfig, tag, owner, 0U)
+	{
+		set_resistor_value(res);
+		set_capacitor_value(cap);
+	}
 
 	void set_connection_type(int type) { m_connection_type = type; }
 	void set_resistor_value(double value) { m_res = value; }
@@ -82,6 +88,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(b_w);
 	DECLARE_WRITE_LINE_MEMBER(clear_w);
 	DECLARE_WRITE_LINE_MEMBER(reset_w);
+
+	DECLARE_READ_LINE_MEMBER(q_r) { return timer_running(); }
 
 protected:
 	// device-level overrides

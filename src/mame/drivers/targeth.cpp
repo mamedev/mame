@@ -6,7 +6,7 @@ Target Hits (c) 1994 Gaelco (Designed & Developed by Zigurat. Produced by Gaelco
 
 Driver by Manuel Abadia <emumanu+mame@gmail.com>
 
-** NOTES: Merge with wrally.ccp???  Address map nearly identical & PCB
+** NOTES: Merge with wrally.cpp???  Address map nearly identical & PCB
           is reworked to add connections for light guns and different RAM
 
           is the visible area correct? if it's larger than the startup
@@ -74,19 +74,19 @@ DS5002FP Box contains:
 #include "speaker.h"
 
 
-static const gfx_layout tilelayout16_0x080000 =
+static const gfx_layout tilelayout =
 {
 	16,16,                                                          /* 16x16 tiles */
 	RGN_FRAC(1,4),                                                  /* number of tiles */
 	4,                                                              /* bitplanes */
 	{ RGN_FRAC(3,4), RGN_FRAC(2,4), RGN_FRAC(1,4), RGN_FRAC(0,4) }, /* plane offsets */
-	{ 0,1,2,3,4,5,6,7, 16*8+0,16*8+1,16*8+2,16*8+3,16*8+4,16*8+5,16*8+6,16*8+7 },
-	{ 0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8, 8*8,9*8,10*8,11*8,12*8,13*8,14*8,15*8 },
+	{ STEP8(0,1), STEP8(16*8,1) },
+	{ STEP16(0,8) },
 	32*8
 };
 
-static GFXDECODE_START( gfx_0x080000 )
-	GFXDECODE_ENTRY( "gfx1", 0x000000, tilelayout16_0x080000, 0, 64 )
+static GFXDECODE_START( gfx_targeth )
+	GFXDECODE_ENTRY( "gfx1", 0x000000, tilelayout, 0, 64 )
 GFXDECODE_END
 
 TIMER_CALLBACK_MEMBER(targeth_state::gun1_irq)
@@ -103,11 +103,9 @@ TIMER_CALLBACK_MEMBER(targeth_state::gun2_irq)
 	m_gun_irq_timer[1]->adjust( m_screen->time_until_pos(160, 0 ) );
 }
 
-WRITE16_MEMBER(targeth_state::OKIM6295_bankswitch_w)
+WRITE8_MEMBER(targeth_state::oki_bankswitch_w)
 {
-	if (ACCESSING_BITS_0_7){
-		membank("okibank")->set_entry(data & 0x0f);
-	}
+	m_okibank->set_entry(data & 0x0f);
 }
 
 WRITE16_MEMBER(targeth_state::output_latch_w)
@@ -127,13 +125,13 @@ WRITE_LINE_MEMBER(targeth_state::coin2_counter_w)
 
 WRITE8_MEMBER(targeth_state::shareram_w)
 {
-	// why isn't there an AM_SOMETHING macro for this?
+	// why isn't there address map functionality for this?
 	reinterpret_cast<u8 *>(m_shareram.target())[BYTE_XOR_BE(offset)] = data;
 }
 
 READ8_MEMBER(targeth_state::shareram_r)
 {
-	// why isn't there an AM_SOMETHING macro for this?
+	// why isn't there address map functionality for this?
 	return reinterpret_cast<u8 const *>(m_shareram.target())[BYTE_XOR_BE(offset)];
 }
 
@@ -147,7 +145,6 @@ void targeth_state::main_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
 	map(0x100000, 0x103fff).ram().w(FUNC(targeth_state::vram_w)).share("videoram");  /* Video RAM */
-	map(0x108000, 0x108007).writeonly().share("vregs"); /* Video Registers */
 	map(0x108000, 0x108001).portr("GUNX1");
 	map(0x108002, 0x108003).portr("GUNY1");
 	map(0x108004, 0x108005).portr("GUNX2");
@@ -161,7 +158,7 @@ void targeth_state::main_map(address_map &map)
 	map(0x700006, 0x700007).portr("SYSTEM");             /* Coins, Start & Fire buttons */
 	map(0x700008, 0x700009).portr("SERVICE");            /* Service & Guns Reload? */
 	map(0x70000a, 0x70000b).select(0x000070).w(FUNC(targeth_state::output_latch_w));
-	map(0x70000c, 0x70000d).w(FUNC(targeth_state::OKIM6295_bankswitch_w));    /* OKI6295 bankswitch */
+	map(0x70000d, 0x70000d).w(FUNC(targeth_state::oki_bankswitch_w));    /* OKI6295 bankswitch */
 	map(0x70000f, 0x70000f).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));  /* OKI6295 status register */
 	map(0x700010, 0x700011).nopw();                        /* ??? Guns reload related? */
 	map(0xfe0000, 0xfe7fff).ram();                                          /* Work RAM */
@@ -177,7 +174,7 @@ void targeth_state::oki_map(address_map &map)
 
 void targeth_state::machine_start()
 {
-	membank("okibank")->configure_entries(0, 16, memregion("oki")->base(), 0x10000);
+	m_okibank->configure_entries(0, 16, memregion("oki")->base(), 0x10000);
 
 	m_gun_irq_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(targeth_state::gun1_irq), this));
 	m_gun_irq_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(targeth_state::gun2_irq), this));
@@ -196,11 +193,11 @@ static INPUT_PORTS_START( targeth )
 	PORT_BIT( 0xfe00, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("GUNX2")
-	PORT_BIT( 0x01ff, 400 + 4, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.20, -0.133, 0) PORT_MINMAX( 0, 400 + 4) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_PLAYER(2) PORT_REVERSE
+	PORT_BIT( 0x01ff, 200, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.20, -0.133, 0) PORT_MINMAX( 0, 400 + 4) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_PLAYER(2)
 	PORT_BIT( 0xfe00, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("GUNY2")
-	PORT_BIT( 0x01ff, 255, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.12, -0.055, 0) PORT_MINMAX(4,255) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_PLAYER(2) PORT_REVERSE
+	PORT_BIT( 0x01ff, 128, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.12, -0.055, 0) PORT_MINMAX(4,255) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_PLAYER(2)
 	PORT_BIT( 0xfe00, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("DSW1")
@@ -271,40 +268,40 @@ static INPUT_PORTS_START( targeth )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(targeth_state::targeth)
-
+void targeth_state::targeth(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000)/2)          /* 12 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", targeth_state, irq2_line_hold)
+	M68000(config, m_maincpu, XTAL(24'000'000)/2);          /* 12 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &targeth_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(targeth_state::irq2_line_hold));
 
-	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL(24'000'000) / 2)
-	MCFG_DEVICE_ADDRESS_MAP(0, mcu_hostmem_map)
+	gaelco_ds5002fp_device &ds5002fp(GAELCO_DS5002FP(config, "gaelco_ds5002fp", XTAL(24'000'000) / 2));
+	ds5002fp.set_addrmap(0, &targeth_state::mcu_hostmem_map);
+	config.set_perfect_quantum("gaelco_ds5002fp:mcu");
 
 	LS259(config, m_outlatch);
 	m_outlatch->q_out_cb<2>().set(FUNC(targeth_state::coin1_counter_w));
 	m_outlatch->q_out_cb<3>().set(FUNC(targeth_state::coin2_counter_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*16, 16*16)
-	MCFG_SCREEN_VISIBLE_AREA(3*8, 23*16-8-1, 16, 16*16-8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(targeth_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	m_screen->set_size(64*16, 16*16);
+	m_screen->set_visarea(3*8, 23*16-8-1, 16, 16*16-8-1);
+	m_screen->set_screen_update(FUNC(targeth_state::screen_update));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_0x080000)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_targeth);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(1'000'000), okim6295_device::PIN7_HIGH) // 1MHz resonator - pin 7 not verified
-	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL(1'000'000), okim6295_device::PIN7_HIGH)); // 1MHz resonator - pin 7 not verified
+	oki.set_addrmap(0, &targeth_state::oki_map);
+	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 ROM_START( targeth )
 	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */

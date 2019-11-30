@@ -15,6 +15,7 @@ ToDo:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/am9519.h"
 #include "machine/upd765.h"
 #include "machine/mc2661.h"
@@ -37,6 +38,9 @@ public:
 
 	void init_dps1();
 
+protected:
+	virtual void machine_reset() override;
+
 private:
 	DECLARE_WRITE8_MEMBER(portb2_w);
 	DECLARE_WRITE8_MEMBER(portb4_w);
@@ -48,7 +52,6 @@ private:
 	DECLARE_READ8_MEMBER(portff_r);
 	DECLARE_WRITE8_MEMBER(portff_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
-	DECLARE_MACHINE_RESET(dps1);
 
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
@@ -81,14 +84,14 @@ void dps1_state::io_map(address_map &map)
 	map(0xbe, 0xbf).w(FUNC(dps1_state::portbe_w)); // disable eprom
 	map(0xff, 0xff).rw(FUNC(dps1_state::portff_r), FUNC(dps1_state::portff_w));
 	// other allocated ports, optional
-	// AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("uart2", mc2661_device, read, write) // S2651
-	// AM_RANGE(0x08, 0x0b) parallel ports
-	// AM_RANGE(0x10, 0x11) // interrupt response
+	// map(0x04, 0x07).rw("uart2", FUNC(mc2661_device::read), FUNC(mc2661_device::write)); // S2651
+	// map(0x08, 0x0b) parallel ports
+	// map(0x10, 0x11) // interrupt response
 	map(0x14, 0x14).rw("am9519a", FUNC(am9519_device::data_r), FUNC(am9519_device::data_w));
 	map(0x15, 0x15).rw("am9519a", FUNC(am9519_device::stat_r), FUNC(am9519_device::cmd_w));
 	map(0x16, 0x16).rw("am9519b", FUNC(am9519_device::data_r), FUNC(am9519_device::data_w));
 	map(0x17, 0x17).rw("am9519b", FUNC(am9519_device::stat_r), FUNC(am9519_device::cmd_w));
-	// AM_RANGE(0x18, 0x1f) control lines 0 to 7
+	// map(0x18, 0x1f) control lines 0 to 7
 	map(0xe0, 0xe3).noprw(); //unknown device
 }
 
@@ -155,18 +158,18 @@ WRITE_LINE_MEMBER( dps1_state::fdc_drq_w )
 		address_space& mem = m_maincpu->space(AS_PROGRAM);
 		if (m_dma_dir)
 		{ // disk to mem
-			mem.write_byte(m_dma_adr, m_fdc->mdma_r(mem, 0));
+			mem.write_byte(m_dma_adr, m_fdc->dma_r());
 		}
 		else
 		{ // mem to disk
-			m_fdc->mdma_w(mem, 0, mem.read_byte(m_dma_adr));
+			m_fdc->dma_w(mem.read_byte(m_dma_adr));
 		}
 		m_dma_adr++;
 	}
 	// else take /dack high (unsupported)
 }
 
-MACHINE_RESET_MEMBER( dps1_state, dps1 )
+void dps1_state::machine_reset()
 {
 	membank("bankr0")->set_entry(1); // point at rom
 	membank("bankw0")->set_entry(0); // always write to ram
@@ -195,40 +198,37 @@ static void floppies(device_slot_interface &device)
 	device.option_add("floppy0", FLOPPY_8_DSDD);
 }
 
-MACHINE_CONFIG_START(dps1_state::dps1)
+void dps1_state::dps1(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_IO_MAP(io_map)
-	MCFG_MACHINE_RESET_OVERRIDE(dps1_state, dps1)
+	Z80(config, m_maincpu, 4_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &dps1_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &dps1_state::io_map);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("uart", MC2661, XTAL(5'068'800))
-	MCFG_MC2661_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_MC2661_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
-	MCFG_MC2661_DTR_HANDLER(WRITELINE("rs232", rs232_port_device, write_dtr))
+	mc2661_device &uart(MC2661(config, "uart", 5.0688_MHz_XTAL)); // Signetics 2651N
+	uart.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	uart.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
+	uart.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("uart",mc2661_device,rx_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("uart",mc2661_device,dsr_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("uart",mc2661_device,cts_w))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set(uart, FUNC(mc2661_device::rx_w));
+	rs232.dsr_handler().set(uart, FUNC(mc2661_device::dsr_w));
+	rs232.cts_handler().set(uart, FUNC(mc2661_device::cts_w));
 
-	MCFG_DEVICE_ADD("am9519a", AM9519, 0)
-
-	MCFG_DEVICE_ADD("am9519b", AM9519, 0)
+	AM9519(config, "am9519a", 0);
+	AM9519(config, "am9519b", 0);
 
 	// floppy
-	MCFG_UPD765A_ADD("fdc", false, true)
-	//MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, dps1_state, fdc_int_w)) // doesn't appear to be used
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(*this, dps1_state, fdc_drq_w))
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", floppies, "floppy0", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	//MCFG_FLOPPY_DRIVE_ADD("fdc:1", floppies, "floppy1", floppy_image_device::default_floppy_formats)
-	//MCFG_FLOPPY_DRIVE_SOUND(true)
+	UPD765A(config, m_fdc, 16_MHz_XTAL / 2, false, true);
+	//m_fdc->intrq_wr_callback().set(FUNC(dps1_state::fdc_int_w)); // doesn't appear to be used
+	m_fdc->drq_wr_callback().set(FUNC(dps1_state::fdc_drq_w));
+	FLOPPY_CONNECTOR(config, "fdc:0", floppies, "floppy0", floppy_image_device::default_floppy_formats).enable_sound(true);
+	//FLOPPY_CONNECTOR(config, "fdc:1", floppies, "floppy1", floppy_image_device::default_floppy_formats).enable_sound(true);
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "dps1")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "flop_list").set_original("dps1");
+}
 
 ROM_START( dps1 )
 	ROM_REGION( 0x800, "maincpu", 0 )

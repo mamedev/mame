@@ -1,9 +1,5 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * pmain.cpp
- *
- */
 
 #include "pmain.h"
 
@@ -23,32 +19,21 @@ namespace plib {
 		char *buf = new char[dst_char_count + 1];
 		WideCharToMultiByte(CP_UTF8, 0, w, wlen, buf, dst_char_count, nullptr, nullptr);
 		buf[dst_char_count] = 0;
-		auto ret = pstring(buf, pstring::UTF8);
+		auto ret = pstring(buf);
 		delete [] buf;
 		return ret;
 	}
 	#endif
 
-/***************************************************************************
-    Application
-***************************************************************************/
-
 	app::app()
 	: options()
-	, pout_strm()
-	, perr_strm()
-	, pout(pout_strm)
-	, perr(perr_strm)
+	, pout(&std::cout)
+	, perr(&std::cerr)
 	{
 
 	}
 
-	app::~app()
-	{
-
-	}
-
-	int app::main_utfX(int argc, char *argv[])
+	int app::main_utfX(int argc, char **argv)
 	{
 		auto r = this->parse(argc, argv);
 		int ret = 0;

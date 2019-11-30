@@ -10,7 +10,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="4106">
-				<rom name="bomber.gam" size="4106" crc="991dca1d" sha1="bb40f0ef81e83740e75b137b22eedd0e6054909d" offset="0" />
+				<rom name="bomber.gam" size="4106" crc="991dca1d" sha1="bb40f0ef81e83740e75b137b22eedd0e6054909d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -21,7 +21,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="2170">
-				<rom name="cherv.rkr" size="2170" crc="e33cfaf0" sha1="d559388c30da391fcb4729017da326659494a405" offset="0" />
+				<rom name="cherv.rkr" size="2170" crc="e33cfaf0" sha1="d559388c30da391fcb4729017da326659494a405"/>
 			</dataarea>
 		</part>
 	</software>
@@ -32,7 +32,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="28939">
-				<rom name="chess.gam" size="28939" crc="d9d8dc47" sha1="71733932ceb7a7659cd288dd0e79338c6ad241eb" offset="0" />
+				<rom name="chess.gam" size="28939" crc="d9d8dc47" sha1="71733932ceb7a7659cd288dd0e79338c6ad241eb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -43,7 +43,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="26377">
-				<rom name="chess2.rkr" size="26377" crc="f5acd428" sha1="bacae294474212c308005d114efe018490736e9a" offset="0" />
+				<rom name="chess2.rkr" size="26377" crc="f5acd428" sha1="bacae294474212c308005d114efe018490736e9a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -54,7 +54,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="7657">
-				<rom name="circus.rkr" size="7657" crc="71a4ec9a" sha1="9b9b8a2bf787d489d98d670a74d74920920a7e78" offset="0" />
+				<rom name="circus.rkr" size="7657" crc="71a4ec9a" sha1="9b9b8a2bf787d489d98d670a74d74920920a7e78"/>
 			</dataarea>
 		</part>
 	</software>
@@ -65,7 +65,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="5914">
-				<rom name="diverse.gam" size="5914" crc="0b3e04a0" sha1="6c944fe89d7f3442b5d1b0ff112f8c5b078feb36" offset="0" />
+				<rom name="diverse.gam" size="5914" crc="0b3e04a0" sha1="6c944fe89d7f3442b5d1b0ff112f8c5b078feb36"/>
 			</dataarea>
 		</part>
 	</software>
@@ -76,7 +76,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="1546">
-				<rom name="e_stakan.rkr" size="1546" crc="ba2382a7" sha1="8c30f40d9808019b2b4c44f3cf6e1b072ecd7689" offset="0" />
+				<rom name="e_stakan.rkr" size="1546" crc="ba2382a7" sha1="8c30f40d9808019b2b4c44f3cf6e1b072ecd7689"/>
 			</dataarea>
 		</part>
 	</software>
@@ -87,7 +87,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="11290">
-				<rom name="gfire.gam" size="11290" crc="05f71aa3" sha1="eb9a3445e647cec98c4bd6b13b02ee0fa649cf54" offset="0" />
+				<rom name="gfire.gam" size="11290" crc="05f71aa3" sha1="eb9a3445e647cec98c4bd6b13b02ee0fa649cf54"/>
 			</dataarea>
 		</part>
 	</software>
@@ -98,7 +98,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="1544">
-				<rom name="glass1.gam" size="1544" crc="59ac91fd" sha1="cf6571c2959de26a0535e19ca92dbabfe9b31982" offset="0" />
+				<rom name="glass1.gam" size="1544" crc="59ac91fd" sha1="cf6571c2959de26a0535e19ca92dbabfe9b31982"/>
 			</dataarea>
 		</part>
 	</software>
@@ -109,7 +109,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="2313">
-				<rom name="glass2.gam" size="2313" crc="7cbc470e" sha1="243ee409333c3da68e9a3fb8f7b80482f3fe538e" offset="0" />
+				<rom name="glass2.gam" size="2313" crc="7cbc470e" sha1="243ee409333c3da68e9a3fb8f7b80482f3fe538e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -120,7 +120,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="10250">
-				<rom name="kalah.rkr" size="10250" crc="7f1c82c5" sha1="9018a51deba7e2bc2deb8b191cb67103a8392b43" offset="0" />
+				<rom name="kalah.rkr" size="10250" crc="7f1c82c5" sha1="9018a51deba7e2bc2deb8b191cb67103a8392b43"/>
 			</dataarea>
 		</part>
 	</software>
@@ -131,7 +131,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="13145">
-				<rom name="klad.rkr" size="13145" crc="e8c83232" sha1="52650060a5b7e69661d518180110c4835b8d5cc6" offset="0" />
+				<rom name="klad.rkr" size="13145" crc="e8c83232" sha1="52650060a5b7e69661d518180110c4835b8d5cc6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -142,7 +142,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="5131">
-				<rom name="krestno.gam" size="5131" crc="1cf3470e" sha1="f4d1e456ae31334b269ddf16ab1682aa83b87120" offset="0" />
+				<rom name="krestno.gam" size="5131" crc="1cf3470e" sha1="f4d1e456ae31334b269ddf16ab1682aa83b87120"/>
 			</dataarea>
 		</part>
 	</software>
@@ -153,7 +153,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="5187">
-				<rom name="krestno.rkr" size="5187" crc="cf99a8de" sha1="0dbb5e031ed7bd49dcafee43b1d56ab017ff6735" offset="0" />
+				<rom name="krestno.rkr" size="5187" crc="cf99a8de" sha1="0dbb5e031ed7bd49dcafee43b1d56ab017ff6735"/>
 			</dataarea>
 		</part>
 	</software>
@@ -164,7 +164,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="6922">
-				<rom name="krok.gam" size="6922" crc="81237cfe" sha1="3cffe752f34d32d2529a691ddac2b3182af86431" offset="0" />
+				<rom name="krok.gam" size="6922" crc="81237cfe" sha1="3cffe752f34d32d2529a691ddac2b3182af86431"/>
 			</dataarea>
 		</part>
 	</software>
@@ -175,7 +175,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="7967">
-				<rom name="labyrint.gam" size="7967" crc="1f5a0274" sha1="355573557f28bfd1f9b3354f08185882418d3482" offset="0" />
+				<rom name="labyrint.gam" size="7967" crc="1f5a0274" sha1="355573557f28bfd1f9b3354f08185882418d3482"/>
 			</dataarea>
 		</part>
 	</software>
@@ -186,7 +186,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="1643">
-				<rom name="lest.rkr" size="1643" crc="6e54b2d3" sha1="5fb86edef9f3d010666a18b033ad66ba2dc5b532" offset="0" />
+				<rom name="lest.rkr" size="1643" crc="6e54b2d3" sha1="5fb86edef9f3d010666a18b033ad66ba2dc5b532"/>
 			</dataarea>
 		</part>
 	</software>
@@ -197,7 +197,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="7977">
-				<rom name="lestn1.rkr" size="7977" crc="69800ec6" sha1="abb01543c809227512237f9ec3ba964329bbb704" offset="0" />
+				<rom name="lestn1.rkr" size="7977" crc="69800ec6" sha1="abb01543c809227512237f9ec3ba964329bbb704"/>
 			</dataarea>
 		</part>
 	</software>
@@ -208,7 +208,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="3946">
-				<rom name="life.rkr" size="3946" crc="108b30a7" sha1="2ce0d8e01ac6dc7d7c406473d7cb1aefd7256ac4" offset="0" />
+				<rom name="life.rkr" size="3946" crc="108b30a7" sha1="2ce0d8e01ac6dc7d7c406473d7cb1aefd7256ac4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -219,7 +219,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="12554">
-				<rom name="lorunner.gam" size="12554" crc="1071c1dc" sha1="e11e5274562d7991f56a9b6c1cfede6e22e7293a" offset="0" />
+				<rom name="lorunner.gam" size="12554" crc="1071c1dc" sha1="e11e5274562d7991f56a9b6c1cfede6e22e7293a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -230,7 +230,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="7946">
-				<rom name="maze.gam" size="7946" crc="c2c2dcc7" sha1="f89fb113a467e096dc94971300eb890844039bf2" offset="0" />
+				<rom name="maze.gam" size="7946" crc="c2c2dcc7" sha1="f89fb113a467e096dc94971300eb890844039bf2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -241,7 +241,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="6058">
-				<rom name="otello.rkr" size="6058" crc="0ad1b91c" sha1="0a3b6787ad815466695ad4ccd8693d01dc41d021" offset="0" />
+				<rom name="otello.rkr" size="6058" crc="0ad1b91c" sha1="0a3b6787ad815466695ad4ccd8693d01dc41d021"/>
 			</dataarea>
 		</part>
 	</software>
@@ -252,7 +252,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="4543">
-				<rom name="pacman.gam" size="4543" crc="08c904b1" sha1="50571449ca09a7e74f195a9275912951bc23fdb9" offset="0" />
+				<rom name="pacman.gam" size="4543" crc="08c904b1" sha1="50571449ca09a7e74f195a9275912951bc23fdb9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -263,7 +263,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="9830">
-				<rom name="pacman.rkr" size="9830" crc="37f17241" sha1="52e1a1cfb8ae54fab6846bce8dae40aa9a8b7ed4" offset="0" />
+				<rom name="pacman.rkr" size="9830" crc="37f17241" sha1="52e1a1cfb8ae54fab6846bce8dae40aa9a8b7ed4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -274,7 +274,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="9819">
-				<rom name="pacman1.gam" size="9819" crc="e27c809e" sha1="509af0df7d36a77b97117ce7057090792aa1d615" offset="0" />
+				<rom name="pacman1.gam" size="9819" crc="e27c809e" sha1="509af0df7d36a77b97117ce7057090792aa1d615"/>
 			</dataarea>
 		</part>
 	</software>
@@ -285,7 +285,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="16075">
-				<rom name="paket.rkr" size="16075" crc="feeca21a" sha1="a3391172d6a75bebe33916745fa9be7a1212e0ea" offset="0" />
+				<rom name="paket.rkr" size="16075" crc="feeca21a" sha1="a3391172d6a75bebe33916745fa9be7a1212e0ea"/>
 			</dataarea>
 		</part>
 	</software>
@@ -296,7 +296,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="16623">
-				<rom name="paket2.rkr" size="16623" crc="ec0e0bc2" sha1="2e08472805a2d32b5ea816e5c3a4fdfb55f01d20" offset="0" />
+				<rom name="paket2.rkr" size="16623" crc="ec0e0bc2" sha1="2e08472805a2d32b5ea816e5c3a4fdfb55f01d20"/>
 			</dataarea>
 		</part>
 	</software>
@@ -307,7 +307,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="2945">
-				<rom name="pingpong.rkr" size="2945" crc="73ce53f7" sha1="33014aff55e581a7958472543c8157614a20e799" offset="0" />
+				<rom name="pingpong.rkr" size="2945" crc="73ce53f7" sha1="33014aff55e581a7958472543c8157614a20e799"/>
 			</dataarea>
 		</part>
 	</software>
@@ -318,7 +318,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="520">
-				<rom name="piton.gam" size="520" crc="23e0e074" sha1="84b2d62d7d92e1d74b5f788067ce28e1251f889d" offset="0" />
+				<rom name="piton.gam" size="520" crc="23e0e074" sha1="84b2d62d7d92e1d74b5f788067ce28e1251f889d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -329,7 +329,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="402">
-				<rom name="piton.rkr" size="402" crc="09300d62" sha1="c18f2be41090dd9f6c5ccbadf14f9bad0f00f845" offset="0" />
+				<rom name="piton.rkr" size="402" crc="09300d62" sha1="c18f2be41090dd9f6c5ccbadf14f9bad0f00f845"/>
 			</dataarea>
 		</part>
 	</software>
@@ -340,7 +340,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="1198">
-				<rom name="pusher.gam" size="1198" crc="d3e5a00a" sha1="1da0bcfafa3279239e4ca6bfd043d65d2b58fba8" offset="0" />
+				<rom name="pusher.gam" size="1198" crc="d3e5a00a" sha1="1da0bcfafa3279239e4ca6bfd043d65d2b58fba8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -351,7 +351,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="1291">
-				<rom name="pvo.rkr" size="1291" crc="79adf1bc" sha1="11ba30b8adcc45bdf7e6160abac8a8613e424e53" offset="0" />
+				<rom name="pvo.rkr" size="1291" crc="79adf1bc" sha1="11ba30b8adcc45bdf7e6160abac8a8613e424e53"/>
 			</dataarea>
 		</part>
 	</software>
@@ -362,7 +362,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="1967">
-				<rom name="rendzu.rkr" size="1967" crc="60c4bf8c" sha1="22e1cb1a181f16b2c41b3d1960a09c171310cbfd" offset="0" />
+				<rom name="rendzu.rkr" size="1967" crc="60c4bf8c" sha1="22e1cb1a181f16b2c41b3d1960a09c171310cbfd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -373,7 +373,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="22537">
-				<rom name="reversi2.rkr" size="22537" crc="2d38626d" sha1="b5fc3f079677b2d78cb52857143f1bc3b05d8dab" offset="0" />
+				<rom name="reversi2.rkr" size="22537" crc="2d38626d" sha1="b5fc3f079677b2d78cb52857143f1bc3b05d8dab"/>
 			</dataarea>
 		</part>
 	</software>
@@ -384,7 +384,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="12248">
-				<rom name="rikoshet.rkr" size="12248" crc="6b191477" sha1="fa8e105b61b96b644b93e2d1e1e64e47e0812f55" offset="0" />
+				<rom name="rikoshet.rkr" size="12248" crc="6b191477" sha1="fa8e105b61b96b644b93e2d1e1e64e47e0812f55"/>
 			</dataarea>
 		</part>
 	</software>
@@ -395,7 +395,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="6291">
-				<rom name="sdemise.gam" size="6291" crc="a8c98031" sha1="596eafdf689f4651548ba533e4e0090c441c5d86" offset="0" />
+				<rom name="sdemise.gam" size="6291" crc="a8c98031" sha1="596eafdf689f4651548ba533e4e0090c441c5d86"/>
 			</dataarea>
 		</part>
 	</software>
@@ -406,7 +406,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="1288">
-				<rom name="skachki.gam" size="1288" crc="d4755d7a" sha1="e63a03f4339adda877e6a355365794075bf232d5" offset="0" />
+				<rom name="skachki.gam" size="1288" crc="d4755d7a" sha1="e63a03f4339adda877e6a355365794075bf232d5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -417,7 +417,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="716">
-				<rom name="skvotch.rkr" size="716" crc="e8e94783" sha1="d89b3ffa432ad95bd70f357cbe518d1ec736245d" offset="0" />
+				<rom name="skvotch.rkr" size="716" crc="e8e94783" sha1="d89b3ffa432ad95bd70f357cbe518d1ec736245d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -428,7 +428,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="3848">
-				<rom name="slams.rkr" size="3848" crc="63eafac1" sha1="88e3c6e38c6ca125e09b95e83d7d7cb70b0eb31b" offset="0" />
+				<rom name="slams.rkr" size="3848" crc="63eafac1" sha1="88e3c6e38c6ca125e09b95e83d7d7cb70b0eb31b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -439,7 +439,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="4106">
-				<rom name="sos1.gam" size="4106" crc="98d8c877" sha1="b84053ff283bae81d50c2bea2376f789ee94edc4" offset="0" />
+				<rom name="sos1.gam" size="4106" crc="98d8c877" sha1="b84053ff283bae81d50c2bea2376f789ee94edc4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -450,7 +450,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="3307">
-				<rom name="sos2.gam" size="3307" crc="643a7c55" sha1="714224515d3d2748daeb31639d33b8ed9d390cc5" offset="0" />
+				<rom name="sos2.gam" size="3307" crc="643a7c55" sha1="714224515d3d2748daeb31639d33b8ed9d390cc5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -461,7 +461,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="2057">
-				<rom name="sp_games.rkr" size="2057" crc="e4bf6756" sha1="8aae550fc276db3aea9da4674376df0a9f0415c3" offset="0" />
+				<rom name="sp_games.rkr" size="2057" crc="e4bf6756" sha1="8aae550fc276db3aea9da4674376df0a9f0415c3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -472,7 +472,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="16154">
-				<rom name="spiton.gam" size="16154" crc="b0a0bd72" sha1="d0540ac86cc0a7a4c43e51a6b82301475cb2f2c2" offset="0" />
+				<rom name="spiton.gam" size="16154" crc="b0a0bd72" sha1="d0540ac86cc0a7a4c43e51a6b82301475cb2f2c2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -483,7 +483,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="4139">
-				<rom name="stranger.gam" size="4139" crc="cd41f336" sha1="a3b8df56c9cea07f74c60c9c159a0142ae34d242" offset="0" />
+				<rom name="stranger.gam" size="4139" crc="cd41f336" sha1="a3b8df56c9cea07f74c60c9c159a0142ae34d242"/>
 			</dataarea>
 		</part>
 	</software>
@@ -494,7 +494,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="13465">
-				<rom name="svvi.rkr" size="13465" crc="cbc99380" sha1="4a9a2895086cea5c62d7e986e9bdbeaaa5d48b5e" offset="0" />
+				<rom name="svvi.rkr" size="13465" crc="cbc99380" sha1="4a9a2895086cea5c62d7e986e9bdbeaaa5d48b5e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -505,7 +505,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="4106">
-				<rom name="tapper.gam" size="4106" crc="5e0a8bc7" sha1="c69536e0bb64c1dcda3109b95d200113e78df40c" offset="0" />
+				<rom name="tapper.gam" size="4106" crc="5e0a8bc7" sha1="c69536e0bb64c1dcda3109b95d200113e78df40c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -516,7 +516,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="4949">
-				<rom name="tennis.gam" size="4949" crc="ba7e5610" sha1="89811822bc096ddfd3a6d99fa8b94e91218e0cfc" offset="0" />
+				<rom name="tennis.gam" size="4949" crc="ba7e5610" sha1="89811822bc096ddfd3a6d99fa8b94e91218e0cfc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -527,7 +527,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="2371">
-				<rom name="tennis.rkr" size="2371" crc="647f32bd" sha1="25099fa0b19ab19729f48ac7ce52c93cb032c511" offset="0" />
+				<rom name="tennis.rkr" size="2371" crc="647f32bd" sha1="25099fa0b19ab19729f48ac7ce52c93cb032c511"/>
 			</dataarea>
 		</part>
 	</software>
@@ -538,7 +538,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="3212">
-				<rom name="tetr2.rkr" size="3212" crc="4ccb842a" sha1="0ca6342a6f3ab85873a956bea574d7cb77aa366c" offset="0" />
+				<rom name="tetr2.rkr" size="3212" crc="4ccb842a" sha1="0ca6342a6f3ab85873a956bea574d7cb77aa366c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -549,7 +549,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="1288">
-				<rom name="tetris1.rkr" size="1288" crc="e2f86ef9" sha1="215a4d2a2ccb228fbe913ad3c2ac1151b5f7a2c5" offset="0" />
+				<rom name="tetris1.rkr" size="1288" crc="e2f86ef9" sha1="215a4d2a2ccb228fbe913ad3c2ac1151b5f7a2c5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -560,7 +560,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="1644">
-				<rom name="tetris4.rkr" size="1644" crc="e9b5eebc" sha1="c22a380eb0f21b65e1e29b23675358abc9babd6d" offset="0" />
+				<rom name="tetris4.rkr" size="1644" crc="e9b5eebc" sha1="c22a380eb0f21b65e1e29b23675358abc9babd6d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -571,7 +571,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="1185">
-				<rom name="tochki.rkr" size="1185" crc="b9cac08c" sha1="bee4a703a02d1aa6fb1dc0a8ffe3cb42b33fab1f" offset="0" />
+				<rom name="tochki.rkr" size="1185" crc="b9cac08c" sha1="bee4a703a02d1aa6fb1dc0a8ffe3cb42b33fab1f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -582,7 +582,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="2058">
-				<rom name="udaw.gam" size="2058" crc="0c8234d8" sha1="aefd38aa65de69c4e226a12b4f792935cad2bd9d" offset="0" />
+				<rom name="udaw.gam" size="2058" crc="0c8234d8" sha1="aefd38aa65de69c4e226a12b4f792935cad2bd9d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -593,7 +593,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="1851">
-				<rom name="utka.gam" size="1851" crc="9160fc93" sha1="c115c4cf321c58e1dd0bdd07545660a0dff405ed" offset="0" />
+				<rom name="utka.gam" size="1851" crc="9160fc93" sha1="c115c4cf321c58e1dd0bdd07545660a0dff405ed"/>
 			</dataarea>
 		</part>
 	</software>
@@ -604,7 +604,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="4089">
-				<rom name="volcano.rkr" size="4089" crc="a8388172" sha1="a61ba1d6d6ede430d2df9d4946cd7d4b425eae65" offset="0" />
+				<rom name="volcano.rkr" size="4089" crc="a8388172" sha1="a61ba1d6d6ede430d2df9d4946cd7d4b425eae65"/>
 			</dataarea>
 		</part>
 	</software>
@@ -615,7 +615,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="2057">
-				<rom name="xonix-s.rkr" size="2057" crc="5d04bf82" sha1="29d6938d1372d7acf73beb23447689c29da640db" offset="0" />
+				<rom name="xonix-s.rkr" size="2057" crc="5d04bf82" sha1="29d6938d1372d7acf73beb23447689c29da640db"/>
 			</dataarea>
 		</part>
 	</software>
@@ -626,7 +626,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="1995">
-				<rom name="xonix.rkr" size="1995" crc="8da8f0d0" sha1="25800773dbb69b05b9b9623f9ffdaf2e8ffe91ff" offset="0" />
+				<rom name="xonix.rkr" size="1995" crc="8da8f0d0" sha1="25800773dbb69b05b9b9623f9ffdaf2e8ffe91ff"/>
 			</dataarea>
 		</part>
 	</software>
@@ -637,7 +637,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="2828">
-				<rom name="xonix1.rkr" size="2828" crc="b1ff81f8" sha1="d1a3bb86172ca42ee3f6d5c1e810aee66090c66b" offset="0" />
+				<rom name="xonix1.rkr" size="2828" crc="b1ff81f8" sha1="d1a3bb86172ca42ee3f6d5c1e810aee66090c66b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -648,7 +648,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="3832">
-				<rom name="xonixzm.gam" size="3832" crc="3281ecf7" sha1="31f8291efbc8c1f56c15e5637c7df7a8704748cf" offset="0" />
+				<rom name="xonixzm.gam" size="3832" crc="3281ecf7" sha1="31f8291efbc8c1f56c15e5637c7df7a8704748cf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -659,7 +659,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="2154">
-				<rom name="z-statio.rkr" size="2154" crc="b7bffe75" sha1="6fb1f86ab61d55144abde74c640050423c5cdc44" offset="0" />
+				<rom name="z-statio.rkr" size="2154" crc="b7bffe75" sha1="6fb1f86ab61d55144abde74c640050423c5cdc44"/>
 			</dataarea>
 		</part>
 	</software>
@@ -670,7 +670,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="1035">
-				<rom name="zagib.rkr" size="1035" crc="3948c41b" sha1="95f722845532c639612bd2f56b72111a8424b946" offset="0" />
+				<rom name="zagib.rkr" size="1035" crc="3948c41b" sha1="95f722845532c639612bd2f56b72111a8424b946"/>
 			</dataarea>
 		</part>
 	</software>
@@ -681,7 +681,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="4250">
-				<rom name="zmei.rkr" size="4250" crc="1c4ffc22" sha1="8931c410da5748dc784ea5deefcad2a00d4aa289" offset="0" />
+				<rom name="zmei.rkr" size="4250" crc="1c4ffc22" sha1="8931c410da5748dc784ea5deefcad2a00d4aa289"/>
 			</dataarea>
 		</part>
 	</software>
@@ -695,7 +695,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="4105">
-				<rom name="asm_ed.rkr" size="4105" crc="abead7b5" sha1="41e92546ed9b644db8ffc41889c929bfdaf86fd0" offset="0" />
+				<rom name="asm_ed.rkr" size="4105" crc="abead7b5" sha1="41e92546ed9b644db8ffc41889c929bfdaf86fd0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -706,7 +706,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="4185">
-				<rom name="assm_mic.rkr" size="4185" crc="dcafcdb7" sha1="465cd658b982cd8a9537a282f38d3af75cd67a4f" offset="0" />
+				<rom name="assm_mic.rkr" size="4185" crc="dcafcdb7" sha1="465cd658b982cd8a9537a282f38d3af75cd67a4f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -717,7 +717,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="6665">
-				<rom name="basic80.rkr" size="6665" crc="e124c576" sha1="60299c22f07b046d787b6e5961eb9fa8a74921b7" offset="0" />
+				<rom name="basic80.rkr" size="6665" crc="e124c576" sha1="60299c22f07b046d787b6e5961eb9fa8a74921b7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -728,7 +728,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="8201">
-				<rom name="basic_ok.rkr" size="8201" crc="2d0d7e1a" sha1="96a88510e8c316ea697c866b760aa3644ef93b6a" offset="0" />
+				<rom name="basic_ok.rkr" size="8201" crc="2d0d7e1a" sha1="96a88510e8c316ea697c866b760aa3644ef93b6a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -739,7 +739,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="7433">
-				<rom name="basic_pr.rkr" size="7433" crc="84efbd0d" sha1="34bd7d5fe98a4e3165a1155b604d1d43cbc3c5f6" offset="0" />
+				<rom name="basic_pr.rkr" size="7433" crc="84efbd0d" sha1="34bd7d5fe98a4e3165a1155b604d1d43cbc3c5f6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -750,7 +750,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="6847">
-				<rom name="basic_rk.rkr" size="6847" crc="22563777" sha1="d2919a1c057a72e1044c0d93a35e272dbad8a9fa" offset="0" />
+				<rom name="basic_rk.rkr" size="6847" crc="22563777" sha1="d2919a1c057a72e1044c0d93a35e272dbad8a9fa"/>
 			</dataarea>
 		</part>
 	</software>
@@ -761,7 +761,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="10741">
-				<rom name="basicmus.rkr" size="10741" crc="ef11aef8" sha1="a5a303b22a718443916e3416611fb36a9ea24efe" offset="0" />
+				<rom name="basicmus.rkr" size="10741" crc="ef11aef8" sha1="a5a303b22a718443916e3416611fb36a9ea24efe"/>
 			</dataarea>
 		</part>
 	</software>
@@ -772,7 +772,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="8201">
-				<rom name="basicpc.rkr" size="8201" crc="b8e4ee51" sha1="dfac012a23ce9215ac362f570481c815be22e7f7" offset="0" />
+				<rom name="basicpc.rkr" size="8201" crc="b8e4ee51" sha1="dfac012a23ce9215ac362f570481c815be22e7f7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -783,7 +783,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="7433">
-				<rom name="basicser.rkr" size="7433" crc="4aa0ccdf" sha1="7f81a30a10f65e1a2d3a6a0da7787b9f54626845" offset="0" />
+				<rom name="basicser.rkr" size="7433" crc="4aa0ccdf" sha1="7f81a30a10f65e1a2d3a6a0da7787b9f54626845"/>
 			</dataarea>
 		</part>
 	</software>
@@ -794,7 +794,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="6601">
-				<rom name="basmic.rkr" size="6601" crc="54e5e1a9" sha1="506bf89161b2d9e725c84a84359b4fccb86a0ee8" offset="0" />
+				<rom name="basmic.rkr" size="6601" crc="54e5e1a9" sha1="506bf89161b2d9e725c84a84359b4fccb86a0ee8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -805,7 +805,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="8202">
-				<rom name="basmikr.rkr" size="8202" crc="3354c039" sha1="2c6e309b24e65768e86a79c4bf8156301d243b1a" offset="0" />
+				<rom name="basmikr.rkr" size="8202" crc="3354c039" sha1="2c6e309b24e65768e86a79c4bf8156301d243b1a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -816,7 +816,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="8201">
-				<rom name="bs_m_old.rkr" size="8201" crc="43dc43e3" sha1="285823b645e96f35d1f1e28278caa0758ef05d13" offset="0" />
+				<rom name="bs_m_old.rkr" size="8201" crc="43dc43e3" sha1="285823b645e96f35d1f1e28278caa0758ef05d13"/>
 			</dataarea>
 		</part>
 	</software>
@@ -827,7 +827,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="6729">
-				<rom name="bs_psf.rkr" size="6729" crc="4de53d56" sha1="bc044c150de1efd6547598036eb42ee2d972ad6e" offset="0" />
+				<rom name="bs_psf.rkr" size="6729" crc="4de53d56" sha1="bc044c150de1efd6547598036eb42ee2d972ad6e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -838,7 +838,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="6905">
-				<rom name="bs_svvi.rkr" size="6905" crc="c79c78e3" sha1="306b49bc4436ca99a708b025028c8322acb0fc18" offset="0" />
+				<rom name="bs_svvi.rkr" size="6905" crc="c79c78e3" sha1="306b49bc4436ca99a708b025028c8322acb0fc18"/>
 			</dataarea>
 		</part>
 	</software>
@@ -849,7 +849,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="18440">
-				<rom name="c.rkr" size="18440" crc="093669cc" sha1="73e52b59a12ec3804cdddf95a88de854512a26ea" offset="0" />
+				<rom name="c.rkr" size="18440" crc="093669cc" sha1="73e52b59a12ec3804cdddf95a88de854512a26ea"/>
 			</dataarea>
 		</part>
 	</software>
@@ -860,7 +860,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="123">
-				<rom name="constmag.rkr" size="123" crc="c5715cb0" sha1="454a76a8d068bcdf7a4ca87a4a7a006335e0bdd5" offset="0" />
+				<rom name="constmag.rkr" size="123" crc="c5715cb0" sha1="454a76a8d068bcdf7a4ca87a4a7a006335e0bdd5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -871,7 +871,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="687">
-				<rom name="cpm.rkr" size="687" crc="fea8d517" sha1="b5c11397f5bf5b816bffe0c8e058d16833cf8f92" offset="0" />
+				<rom name="cpm.rkr" size="687" crc="fea8d517" sha1="b5c11397f5bf5b816bffe0c8e058d16833cf8f92"/>
 			</dataarea>
 		</part>
 	</software>
@@ -882,7 +882,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="4873">
-				<rom name="debug.rkr" size="4873" crc="b32098cb" sha1="854df8c9555bf2d8723bdc95d549a54351cdeb06" offset="0" />
+				<rom name="debug.rkr" size="4873" crc="b32098cb" sha1="854df8c9555bf2d8723bdc95d549a54351cdeb06"/>
 			</dataarea>
 		</part>
 	</software>
@@ -893,7 +893,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="5929">
-				<rom name="dssm-cpm.rkr" size="5929" crc="8bc936e1" sha1="09d74f88397d02b76efc3d994b82402e9c7db4e9" offset="0" />
+				<rom name="dssm-cpm.rkr" size="5929" crc="8bc936e1" sha1="09d74f88397d02b76efc3d994b82402e9c7db4e9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -904,7 +904,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="647">
-				<rom name="dumped.rkr" size="647" crc="26e67adc" sha1="0e5e44b6b328b385e4771110018df66058b593ca" offset="0" />
+				<rom name="dumped.rkr" size="647" crc="26e67adc" sha1="0e5e44b6b328b385e4771110018df66058b593ca"/>
 			</dataarea>
 		</part>
 	</software>
@@ -915,7 +915,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="4105">
-				<rom name="ed-dssm.rkr" size="4105" crc="bf14a0ba" sha1="9fea35a84e2b848292646704a187a15fe182faca" offset="0" />
+				<rom name="ed-dssm.rkr" size="4105" crc="bf14a0ba" sha1="9fea35a84e2b848292646704a187a15fe182faca"/>
 			</dataarea>
 		</part>
 	</software>
@@ -926,7 +926,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="4103">
-				<rom name="ed-dssm2.rkr" size="4103" crc="39ffe51a" sha1="d306c365cd9c7f82506405a393d6352f9076ae65" offset="0" />
+				<rom name="ed-dssm2.rkr" size="4103" crc="39ffe51a" sha1="d306c365cd9c7f82506405a393d6352f9076ae65"/>
 			</dataarea>
 		</part>
 	</software>
@@ -937,7 +937,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="3743">
-				<rom name="ed-sort.rkr" size="3743" crc="a236a186" sha1="dc6f190efea9dc03039ba4d3354d9462868175fd" offset="0" />
+				<rom name="ed-sort.rkr" size="3743" crc="a236a186" sha1="dc6f190efea9dc03039ba4d3354d9462868175fd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -948,7 +948,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="4103">
-				<rom name="edmasm.rkr" size="4103" crc="2011b21b" sha1="0522a399f69cbea6ea22bce81810a1550b3dcbee" offset="0" />
+				<rom name="edmasm.rkr" size="4103" crc="2011b21b" sha1="0522a399f69cbea6ea22bce81810a1550b3dcbee"/>
 			</dataarea>
 		</part>
 	</software>
@@ -959,7 +959,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="17869">
-				<rom name="forth.rkr" size="17869" crc="9fbda3c8" sha1="04ffec500aaeb6903f71b70152e6bc42ce93ba78" offset="0" />
+				<rom name="forth.rkr" size="17869" crc="9fbda3c8" sha1="04ffec500aaeb6903f71b70152e6bc42ce93ba78"/>
 			</dataarea>
 		</part>
 	</software>
@@ -970,7 +970,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="4105">
-				<rom name="fulledit.rkr" size="4105" crc="ec1a78ad" sha1="5dd4ef42e110a885377cf9cab6249cc8ec3d5124" offset="0" />
+				<rom name="fulledit.rkr" size="4105" crc="ec1a78ad" sha1="5dd4ef42e110a885377cf9cab6249cc8ec3d5124"/>
 			</dataarea>
 		</part>
 	</software>
@@ -981,7 +981,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="3753">
-				<rom name="hexedit1.rkr" size="3753" crc="19d41bc5" sha1="7878dad260a48e57a135801b39ea7e7165cc3a83" offset="0" />
+				<rom name="hexedit1.rkr" size="3753" crc="19d41bc5" sha1="7878dad260a48e57a135801b39ea7e7165cc3a83"/>
 			</dataarea>
 		</part>
 	</software>
@@ -992,7 +992,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="3753">
-				<rom name="hexedit2.rkr" size="3753" crc="d1264cd2" sha1="27a510e5207e34f4e48d98e73c5ead2a0c556c04" offset="0" />
+				<rom name="hexedit2.rkr" size="3753" crc="d1264cd2" sha1="27a510e5207e34f4e48d98e73c5ead2a0c556c04"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1003,7 +1003,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="729">
-				<rom name="linkrk.rkr" size="729" crc="42787e3d" sha1="85ed14dccebd3d8cc17ab21bf70a8cdebc3fca96" offset="0" />
+				<rom name="linkrk.rkr" size="729" crc="42787e3d" sha1="85ed14dccebd3d8cc17ab21bf70a8cdebc3fca96"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1014,7 +1014,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="744">
-				<rom name="morse16.rkr" size="744" crc="9204fe6c" sha1="22f601ab0f4a1756f4ec2e496e439d9a25c3109e" offset="0" />
+				<rom name="morse16.rkr" size="744" crc="9204fe6c" sha1="22f601ab0f4a1756f4ec2e496e439d9a25c3109e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1025,7 +1025,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="4681">
-				<rom name="music.rkr" size="4681" crc="3032480a" sha1="cfdb679d979fac555c017d55e70998479514bcab" offset="0" />
+				<rom name="music.rkr" size="4681" crc="3032480a" sha1="cfdb679d979fac555c017d55e70998479514bcab"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1036,7 +1036,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="4601">
-				<rom name="muz_syst.rkr" size="4601" crc="7a518126" sha1="b23e2dcafd01495a079e7dabc85f9805c0ee0aa7" offset="0" />
+				<rom name="muz_syst.rkr" size="4601" crc="7a518126" sha1="b23e2dcafd01495a079e7dabc85f9805c0ee0aa7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1047,7 +1047,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="2670">
-				<rom name="muzukred.rkr" size="2670" crc="bfaa11f1" sha1="31a20e0a70b9ff24bbd570310bf90d747b89483c" offset="0" />
+				<rom name="muzukred.rkr" size="2670" crc="bfaa11f1" sha1="31a20e0a70b9ff24bbd570310bf90d747b89483c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1058,7 +1058,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="16392">
-				<rom name="pascal.rkr" size="16392" crc="c7be8b88" sha1="9af3eeb483a25151b983f3d423689b05fc65197a" offset="0" />
+				<rom name="pascal.rkr" size="16392" crc="c7be8b88" sha1="9af3eeb483a25151b983f3d423689b05fc65197a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1069,7 +1069,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="2057">
-				<rom name="progr1.rkr" size="2057" crc="5f1c61fe" sha1="e6b39866f84e918110b38db555e22a13c8c6e78f" offset="0" />
+				<rom name="progr1.rkr" size="2057" crc="5f1c61fe" sha1="e6b39866f84e918110b38db555e22a13c8c6e78f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1080,7 +1080,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="1125">
-				<rom name="progr2.rkr" size="1125" crc="8e9aad2b" sha1="ff110fe1b0ceab768562998d4c3f976c4f9ccc8f" offset="0" />
+				<rom name="progr2.rkr" size="1125" crc="8e9aad2b" sha1="ff110fe1b0ceab768562998d4c3f976c4f9ccc8f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1091,7 +1091,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="1545">
-				<rom name="progr3.rkr" size="1545" crc="d91b6b89" sha1="9f841e5c01d731c2be88fc169e9948aed7095233" offset="0" />
+				<rom name="progr3.rkr" size="1545" crc="d91b6b89" sha1="9f841e5c01d731c2be88fc169e9948aed7095233"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1102,7 +1102,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="4024">
-				<rom name="redasm.rkr" size="4024" crc="c0aec5ab" sha1="01cc7172c2f073d6719325d33c92e7f28e3314f8" offset="0" />
+				<rom name="redasm.rkr" size="4024" crc="c0aec5ab" sha1="01cc7172c2f073d6719325d33c92e7f28e3314f8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1113,7 +1113,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="304">
-				<rom name="sp_comp.rkr" size="304" crc="ee0d06be" sha1="cf13f4af38cf54de2c23f8543e61915e65998fae" offset="0" />
+				<rom name="sp_comp.rkr" size="304" crc="ee0d06be" sha1="cf13f4af38cf54de2c23f8543e61915e65998fae"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1124,7 +1124,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="radio86_cass">
 			<dataarea name="cass" size="5640">
-				<rom name="wel.rkr" size="5640" crc="19456dd8" sha1="874c778d46ab2b338924662e9864c05b996641d4" offset="0" />
+				<rom name="wel.rkr" size="5640" crc="19456dd8" sha1="874c778d46ab2b338924662e9864c05b996641d4"/>
 			</dataarea>
 		</part>
 	</software>

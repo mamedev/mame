@@ -6,6 +6,10 @@
     HAR MadMax hardware
 
 **************************************************************************/
+#ifndef MAME_INCLUDES_DCHEESE_H
+#define MAME_INCLUDES_DCHEESE_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "sound/bsmt2000.h"
@@ -19,41 +23,52 @@ public:
 		driver_device(mconfig, type, tag),
 		m_palrom(*this, "palrom"),
 		m_gfxrom(*this, "gfx"),
+		m_eepromout_io(*this, "EEPROMOUT"),
+		m_2a0002_io(*this, "2a0002"),
+		m_2a000e_io(*this, "2a000e"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_screen(*this, "screen"),
 		m_bsmt(*this, "bsmt"),
-		m_soundlatch(*this, "soundlatch") { }
+		m_soundlatch(*this, "soundlatch")
+	{ }
 
 	void fredmem(machine_config &config);
 	void dcheese(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(sound_latch_state_r);
-
-private:
+protected:
 	enum
 	{
 		TIMER_BLITTER_SCANLINE,
 		TIMER_SIGNAL_IRQ
 	};
 
-	required_region_ptr<uint16_t> m_palrom;
-	required_region_ptr<uint8_t> m_gfxrom;
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+private:
+	required_region_ptr<u16> m_palrom;
+	required_region_ptr<u8> m_gfxrom;
+	required_ioport m_eepromout_io;
+	required_ioport m_2a0002_io;
+	required_ioport m_2a000e_io;
 
 	/* video-related */
-	uint16_t   m_blitter_color[2];
-	uint16_t   m_blitter_xparam[16];
-	uint16_t   m_blitter_yparam[16];
-	uint16_t   m_blitter_vidparam[32];
+	u16   m_blitter_color[2];
+	u16   m_blitter_xparam[16];
+	u16   m_blitter_yparam[16];
+	u16   m_blitter_vidparam[32];
 
 	std::unique_ptr<bitmap_ind16> m_dstbitmap;
 	emu_timer *m_blitter_timer;
 	emu_timer *m_signal_irq_timer;
 
 	/* misc */
-	uint8_t    m_irq_state[5];
-	uint8_t    m_sound_control;
-	uint8_t    m_sound_msb_latch;
+	u8    m_irq_state[5];
+	u8    m_sound_control;
+	u8    m_sound_msb_latch;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -72,22 +87,19 @@ private:
 	DECLARE_WRITE16_MEMBER(blitter_vidparam_w);
 	DECLARE_WRITE16_MEMBER(blitter_unknown_w);
 	DECLARE_READ16_MEMBER(blitter_vidparam_r);
-	virtual void machine_start() override;
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(dcheese);
-	uint32_t screen_update_dcheese(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(dcheese_vblank);
-	void dcheese_signal_irq(int which);
+	void dcheese_palette(palette_device &palette) const;
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(vblank);
+	void signal_irq(u8 which);
 	void update_irq_state();
-	IRQ_CALLBACK_MEMBER(irq_callback);
+	uint8_t iack_r(offs_t offset);
 	void update_scanline_irq();
-	void do_clear(  );
-	void do_blit(  );
+	void do_clear();
+	void do_blit();
 
 	void main_cpu_map(address_map &map);
+	void main_fc7_map(address_map &map);
 	void sound_cpu_map(address_map &map);
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
-/*----------- defined in drivers/dcheese.c -----------*/
+#endif // MAME_INCLUDES_DCHEESE_H

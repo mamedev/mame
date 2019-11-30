@@ -28,27 +28,6 @@
 
 #pragma once
 
-
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_CRT9212_WEN2_VCC() \
-	downcast<crt9212_device &>(*device).set_wen2(1);
-
-#define MCFG_CRT9212_DOUT_CALLBACK(_write) \
-	downcast<crt9212_device &>(*device).set_dout_wr_callback(DEVCB_##_write);
-
-#define MCFG_CRT9212_ROF_CALLBACK(_write) \
-	downcast<crt9212_device &>(*device).set_rof_wr_callback(DEVCB_##_write);
-
-#define MCFG_CRT9212_WOF_CALLBACK(_write) \
-	downcast<crt9212_device &>(*device).set_wof_wr_callback(DEVCB_##_write);
-
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -62,10 +41,9 @@ public:
 	crt9212_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void set_wen2(int state) { m_wen2 = state; }
-
-	template <class Object> devcb_base &set_dout_wr_callback(Object &&cb) { return m_write_dout.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_rof_wr_callback(Object &&cb) { return m_write_rof.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_wof_wr_callback(Object &&cb) { return m_write_wof.set_callback(std::forward<Object>(cb)); }
+	auto dout() { return m_write_dout.bind(); }
+	auto rof() { return m_write_rof.bind(); }
+	auto wof() { return m_write_wof.bind(); }
 
 	DECLARE_WRITE8_MEMBER( write ) { m_data = data; }
 	DECLARE_WRITE_LINE_MEMBER( clrcnt_w );

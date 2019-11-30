@@ -36,11 +36,11 @@ public:
 
 	// Next eight methods are called from the console
 	DECLARE_READ8Z_MEMBER(readz) override;
-	DECLARE_WRITE8_MEMBER(write) override;
+	void write(offs_t offset, uint8_t data) override;
 	DECLARE_SETADDRESS_DBIN_MEMBER(setaddress_dbin) override;
 
 	DECLARE_READ8Z_MEMBER(crureadz) override;
-	DECLARE_WRITE8_MEMBER(cruwrite) override;
+	void cruwrite(offs_t offset, uint8_t data) override;
 
 	DECLARE_WRITE_LINE_MEMBER(senila);
 	DECLARE_WRITE_LINE_MEMBER(senilb);
@@ -170,15 +170,15 @@ protected:
     The parent class for all expansion cards.
 ******************************************************************************/
 
-class device_ti99_peribox_card_interface : public device_slot_card_interface
+class device_ti99_peribox_card_interface : public device_interface
 {
 	friend class peribox_slot_device;
 
 public:
 	virtual DECLARE_READ8Z_MEMBER(readz) = 0;
-	virtual DECLARE_WRITE8_MEMBER(write) = 0;
+	virtual void write(offs_t offset, uint8_t data) = 0;
 	virtual DECLARE_READ8Z_MEMBER(crureadz) = 0;
-	virtual DECLARE_WRITE8_MEMBER(cruwrite) = 0;
+	virtual void cruwrite(offs_t offset, uint8_t data) = 0;
 	virtual DECLARE_SETADDRESS_DBIN_MEMBER(setaddress_dbin) { };
 
 	virtual DECLARE_WRITE_LINE_MEMBER(clock_in) { }
@@ -186,7 +186,6 @@ public:
 	void    set_senilb(int state) { m_senilb = state; }
 
 protected:
-	using device_slot_card_interface::device_slot_card_interface;
 	device_ti99_peribox_card_interface(const machine_config &mconfig, device_t &device);
 	virtual void interface_config_complete() override;
 
@@ -212,7 +211,7 @@ protected:
     A single slot in the box.
 ******************************************************************************/
 
-class peribox_slot_device : public device_t, public device_slot_interface
+class peribox_slot_device : public device_t, public device_single_card_slot_interface<device_ti99_peribox_card_interface>
 {
 	friend class peribox_device;
 public:
@@ -231,7 +230,7 @@ public:
 
 	// Called from the box (direction to card)
 	DECLARE_READ8Z_MEMBER(readz);
-	DECLARE_WRITE8_MEMBER(write);
+	void write(offs_t offset, uint8_t data);
 	DECLARE_SETADDRESS_DBIN_MEMBER(setaddress_dbin);
 
 	DECLARE_WRITE_LINE_MEMBER(senila);
@@ -245,7 +244,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( set_ready );
 
 	DECLARE_READ8Z_MEMBER(crureadz);
-	DECLARE_WRITE8_MEMBER(cruwrite);
+	void cruwrite(offs_t offset, uint8_t data);
 
 	// called from the box itself
 	void set_genmod(bool set);

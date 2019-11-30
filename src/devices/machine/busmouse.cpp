@@ -126,12 +126,13 @@ bus_mouse_device::bus_mouse_device(const machine_config &mconfig, const char *ta
 }
 
 
-MACHINE_CONFIG_START(bus_mouse_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("ppi", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, bus_mouse_device, ppi_a_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, bus_mouse_device, ppi_c_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, bus_mouse_device, ppi_c_r))
-MACHINE_CONFIG_END
+void bus_mouse_device::device_add_mconfig(machine_config &config)
+{
+	i8255_device &ppi(I8255(config, "ppi"));
+	ppi.in_pa_callback().set(FUNC(bus_mouse_device::ppi_a_r));
+	ppi.out_pc_callback().set(FUNC(bus_mouse_device::ppi_c_w));
+	ppi.in_pc_callback().set(FUNC(bus_mouse_device::ppi_c_r));
+}
 
 
 //-------------------------------------------------

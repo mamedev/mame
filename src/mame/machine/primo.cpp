@@ -296,7 +296,7 @@ void primo_state::primo_setup_pss (uint8_t* snapshot_data, uint32_t snapshot_siz
 		m_maincpu->space(AS_PROGRAM).write_byte(i + 0x4000, snapshot_data[i + 38]);
 }
 
-SNAPSHOT_LOAD_MEMBER( primo_state, primo )
+SNAPSHOT_LOAD_MEMBER(primo_state::snapshot_cb)
 {
 	std::vector<uint8_t> snapshot_data(snapshot_size);
 
@@ -338,7 +338,7 @@ void primo_state::primo_setup_pp(uint8_t* quickload_data, uint32_t quickload_siz
 	logerror ("Quickload .pp l: %04x r: %04x s: %04x\n", load_addr, start_addr, quickload_size-4);
 }
 
-QUICKLOAD_LOAD_MEMBER( primo_state, primo )
+QUICKLOAD_LOAD_MEMBER(primo_state::quickload_cb)
 {
 	std::vector<uint8_t> quickload_data(quickload_size);
 

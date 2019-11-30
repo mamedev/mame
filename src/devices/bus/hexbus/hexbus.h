@@ -39,15 +39,14 @@ class hexbus_chained_device;
     Interface for a device that connects to the Hexbus
 ********************************************************************/
 
-class device_hexbus_interface : public device_slot_card_interface
+class device_hexbus_interface : public device_interface
 {
 public:
-	virtual uint8_t bus_read(int dir) =0;
-	virtual void bus_write(int dir, uint8_t data) =0;
+	virtual uint8_t bus_read(int dir) = 0;
+	virtual void bus_write(int dir, uint8_t data) = 0;
 
 protected:
-	device_hexbus_interface(const machine_config &mconfig, device_t &device) :
-		device_slot_card_interface(mconfig, device) { }
+	device_hexbus_interface(const machine_config &mconfig, device_t &device);
 };
 
 /********************************************************************
@@ -58,12 +57,12 @@ class hexbus_chained_device : public device_t, public device_hexbus_interface
 {
 	friend class hexbus_device;
 
-public:
-	hexbus_chained_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-	virtual void device_start() override;
-
 protected:
+	hexbus_chained_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	void set_outbound_hexbus(hexbus_device *outbound) { m_hexbus_outbound = outbound; }
+
+	virtual void device_start() override;
 
 	// Link to the inbound Hexbus (if not null, see Oso chip)
 	hexbus_device *m_hexbus_inbound;
@@ -90,7 +89,7 @@ protected:
 	uint8_t hexbus_read();
 
 	// Callback for changes on the hexbus
-	virtual void hexbus_value_changed(uint8_t data) { };
+	virtual void hexbus_value_changed(uint8_t data) { }
 
 	// Levels of the lines at this device. 0 means pull down, 1 means release.
 	uint8_t m_myvalue;
@@ -105,7 +104,7 @@ protected:
     Connector to the Hexbus, offers a slot for Hexbus-chained devices
 ********************************************************************/
 
-class hexbus_device : public device_t, public device_slot_interface
+class hexbus_device : public device_t, public device_single_card_slot_interface<device_hexbus_interface>
 {
 public:
 	template <typename U>

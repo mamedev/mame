@@ -45,8 +45,9 @@ public:
 		, m_centronics(*this, "centronics")
 		, m_cent_status_in(*this, "cent_status_in")
 		, m_statuslatch(*this, "statuslatch")
-		, m_bios(*this, "user1")
+		, m_bios(*this, "bios")
 		, m_biosram(*this, "biosram")
+		, m_sbx(*this, "sbx%u", 1U)
 	{ }
 
 	void isbc2861(machine_config &config);
@@ -96,6 +97,7 @@ private:
 	optional_device<ls259_device> m_statuslatch;
 	optional_memory_region m_bios;
 	optional_shared_ptr<u16> m_biosram;
+	optional_device_array<isbx_slot_device, 2> m_sbx;
 
 	bool m_upperen;
 	offs_t m_megabyte_page;
@@ -121,7 +123,7 @@ void isbc_state::rpc86_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00000, 0xcffff).ram();
-	map(0xf8000, 0xfffff).rom().region("user1", 0);
+	map(0xf8000, 0xfffff).rom().region("bios", 0);
 }
 
 void isbc_state::rpc86_io(address_map &map)
@@ -135,10 +137,8 @@ void isbc_state::rpc86_io(address_map &map)
 	map(0x00c4, 0x00c7).rw(m_pic_0, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
 	map(0x00c8, 0x00cf).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 	map(0x00d0, 0x00d7).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
-	map(0x00d8, 0x00d8).rw(m_uart8251, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x00da, 0x00da).rw(m_uart8251, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x00dc, 0x00dc).rw(m_uart8251, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x00de, 0x00de).rw(m_uart8251, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x00d8, 0x00db).rw(m_uart8251, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
+	map(0x00dc, 0x00df).rw(m_uart8251, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 }
 
 void isbc_state::isbc8605_io(address_map &map)
@@ -159,7 +159,7 @@ void isbc_state::isbc86_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00000, 0xfbfff).ram();
-	map(0xfc000, 0xfffff).rom().region("user1", 0);
+	map(0xfc000, 0xfffff).rom().region("bios", 0);
 }
 
 void isbc_state::isbc_io(address_map &map)
@@ -169,10 +169,8 @@ void isbc_state::isbc_io(address_map &map)
 	map(0x00c4, 0x00c7).rw(m_pic_0, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
 	map(0x00c8, 0x00cf).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 	map(0x00d0, 0x00d7).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
-	map(0x00d8, 0x00d8).rw(m_uart8251, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x00da, 0x00da).rw(m_uart8251, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x00dc, 0x00dc).rw(m_uart8251, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x00de, 0x00de).rw(m_uart8251, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x00d8, 0x00db).rw(m_uart8251, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
+	map(0x00dc, 0x00df).rw(m_uart8251, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 }
 
 void isbc_state::isbc286_io(address_map &map)
@@ -199,8 +197,8 @@ void isbc_state::isbc286_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00000, 0xdffff).ram();
-	map(0xe0000, 0xfffff).rom().region("user1", 0);
-	map(0xfe0000, 0xffffff).rom().region("user1", 0);
+	map(0xe0000, 0xfffff).rom().region("bios", 0);
+	map(0xfe0000, 0xffffff).rom().region("bios", 0);
 }
 
 void isbc_state::isbc2861_mem(address_map &map)
@@ -208,8 +206,8 @@ void isbc_state::isbc2861_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x00000, 0xdffff).ram();
 	map(0xe0000, 0xfffff).rw(FUNC(isbc_state::bioslo_r), FUNC(isbc_state::bioslo_w)).share("biosram");
-//  AM_RANGE(0x100000, 0x1fffff) AM_RAM // FIXME: XENIX doesn't like this, IRMX is okay with it
-	map(0xff0000, 0xffffff).rom().region("user1", 0);
+//  map(0x100000, 0x1fffff).ram(); // FIXME: XENIX doesn't like this, IRMX is okay with it
+	map(0xff0000, 0xffffff).rom().region("bios", 0);
 }
 
 /* Input ports */
@@ -325,79 +323,81 @@ WRITE_LINE_MEMBER(isbc_state::bus_intr_out2_w)
 	// Multibus interrupt request (active high)
 }
 
-MACHINE_CONFIG_START(isbc_state::isbc86)
+void isbc_state::isbc86(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, I8086, XTAL(5'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(isbc86_mem)
-	MCFG_DEVICE_IO_MAP(isbc_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic_0", pic8259_device, inta_cb)
+	I8086(config, m_maincpu, XTAL(5'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &isbc_state::isbc86_mem);
+	m_maincpu->set_addrmap(AS_IO, &isbc_state::isbc_io);
+	m_maincpu->set_irq_acknowledge_callback("pic_0", FUNC(pic8259_device::inta_cb));
 
 	PIC8259(config, m_pic_0, 0);
 	m_pic_0->out_int_callback().set_inputline(m_maincpu, 0);
 
-	MCFG_DEVICE_ADD("pit", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL(22'118'400)/18)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("pic_0", pic8259_device, ir0_w))
-	MCFG_PIT8253_CLK1(XTAL(22'118'400)/18)
-	MCFG_PIT8253_CLK2(XTAL(22'118'400)/18)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, isbc_state, isbc86_tmr2_w))
+	pit8253_device &pit(PIT8253(config, "pit", 0));
+	pit.set_clk<0>(XTAL(22'118'400)/18);
+	pit.out_handler<0>().set(m_pic_0, FUNC(pic8259_device::ir0_w));
+	pit.set_clk<1>(XTAL(22'118'400)/18);
+	pit.set_clk<2>(XTAL(22'118'400)/18);
+	pit.out_handler<2>().set(FUNC(isbc_state::isbc86_tmr2_w));
 
-	MCFG_DEVICE_ADD("ppi", I8255A, 0)
+	I8255A(config, "ppi");
 
-	MCFG_DEVICE_ADD("uart8251", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(WRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE("pic_0", pic8259_device, ir6_w))
+	I8251(config, m_uart8251, 0);
+	m_uart8251->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_uart8251->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
+	m_uart8251->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
+	m_uart8251->rxrdy_handler().set("pic_0", FUNC(pic8259_device::ir6_w));
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("uart8251", i8251_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("uart8251", i8251_device, write_cts))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("uart8251", i8251_device, write_dsr))
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", isbc86_terminal)
-MACHINE_CONFIG_END
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set(m_uart8251, FUNC(i8251_device::write_rxd));
+	rs232.cts_handler().set(m_uart8251, FUNC(i8251_device::write_cts));
+	rs232.dsr_handler().set(m_uart8251, FUNC(i8251_device::write_dsr));
+	rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(isbc86_terminal));
+}
 
-MACHINE_CONFIG_START(isbc_state::rpc86)
+void isbc_state::rpc86(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, I8086, XTAL(5'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(rpc86_mem)
-	MCFG_DEVICE_IO_MAP(rpc86_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic_0", pic8259_device, inta_cb)
+	I8086(config, m_maincpu, XTAL(5'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &isbc_state::rpc86_mem);
+	m_maincpu->set_addrmap(AS_IO, &isbc_state::rpc86_io);
+	m_maincpu->set_irq_acknowledge_callback("pic_0", FUNC(pic8259_device::inta_cb));
 
 	PIC8259(config, m_pic_0, 0);
 	m_pic_0->out_int_callback().set_inputline(m_maincpu, 0);
 
-	MCFG_DEVICE_ADD("pit", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL(22'118'400)/18)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("pic_0", pic8259_device, ir2_w))
-	MCFG_PIT8253_CLK1(XTAL(22'118'400)/144)
-	MCFG_PIT8253_CLK2(XTAL(22'118'400)/18)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, isbc_state, isbc86_tmr2_w))
+	pit8253_device &pit(PIT8253(config, "pit", 0));
+	pit.set_clk<0>(XTAL(22'118'400)/18);
+	pit.out_handler<0>().set(m_pic_0, FUNC(pic8259_device::ir2_w));
+	pit.set_clk<1>(XTAL(22'118'400)/144);
+	pit.set_clk<2>(XTAL(22'118'400)/18);
+	pit.out_handler<2>().set(FUNC(isbc_state::isbc86_tmr2_w));
 
-	MCFG_DEVICE_ADD("ppi", I8255A, 0)
+	I8255A(config, "ppi");
 
-	MCFG_DEVICE_ADD("uart8251", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(WRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE("pic_0", pic8259_device, ir6_w))
-	MCFG_I8251_TXRDY_HANDLER(WRITELINE("pic_0", pic8259_device, ir7_w))
+	I8251(config, m_uart8251, 0);
+	m_uart8251->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_uart8251->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
+	m_uart8251->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
+	m_uart8251->rxrdy_handler().set("pic_0", FUNC(pic8259_device::ir6_w));
+	m_uart8251->txrdy_handler().set("pic_0", FUNC(pic8259_device::ir7_w));
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("uart8251", i8251_device, write_rxd))
-	//MCFG_RS232_CTS_HANDLER(WRITELINE("uart8251", i8251_device, write_cts))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("uart8251", i8251_device, write_dsr))
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", isbc286_terminal)
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set(m_uart8251, FUNC(i8251_device::write_rxd));
+	//rs232.cts_handler().set(m_uart8251, FUNC(i8251_device::write_cts));
+	rs232.dsr_handler().set(m_uart8251, FUNC(i8251_device::write_dsr));
+	rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(isbc286_terminal));
 
-	MCFG_ISBX_SLOT_ADD("sbx1", 0, isbx_cards, nullptr)
-	//MCFG_ISBX_SLOT_MINTR0_CALLBACK(WRITELINE("pic_0", pic8259_device, ir3_w))
-	//MCFG_ISBX_SLOT_MINTR1_CALLBACK(WRITELINE("pic_0", pic8259_device, ir4_w))
-	MCFG_ISBX_SLOT_ADD("sbx2", 0, isbx_cards, nullptr)
-	//MCFG_ISBX_SLOT_MINTR0_CALLBACK(WRITELINE("pic_0", pic8259_device, ir5_w))
-	//MCFG_ISBX_SLOT_MINTR1_CALLBACK(WRITELINE("pic_0", pic8259_device, ir6_w))
-MACHINE_CONFIG_END
+	ISBX_SLOT(config, m_sbx[0], 0, isbx_cards, nullptr);
+	//m_sbx[0]->mintr0().set("pic_0", FUNC(pic8259_device::ir3_w));
+	//m_sbx[0]->mintr1().set("pic_0", FUNC(pic8259_device::ir4_w));
+	ISBX_SLOT(config, m_sbx[1], 0, isbx_cards, nullptr);
+	//m_sbx[1]->mintr0().set("pic_0", FUNC(pic8259_device::ir5_w));
+	//m_sbx[1]->mintr1().set("pic_0", FUNC(pic8259_device::ir6_w));
+}
 
 void isbc_state::isbc8605(machine_config &config)
 {
@@ -428,12 +428,13 @@ void isbc_state::isbc8630(machine_config &config)
 	m_statuslatch->q_out_cb<7>().set([this] (int state) { m_megabyte_enable = !state; });
 }
 
-MACHINE_CONFIG_START(isbc_state::isbc286)
+void isbc_state::isbc286(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, I80286, XTAL(16'000'000)/2)
-	MCFG_DEVICE_PROGRAM_MAP(isbc286_mem)
-	MCFG_DEVICE_IO_MAP(isbc286_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic_0", pic8259_device, inta_cb)
+	I80286(config, m_maincpu, XTAL(16'000'000)/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &isbc_state::isbc286_mem);
+	m_maincpu->set_addrmap(AS_IO, &isbc_state::isbc286_io);
+	m_maincpu->set_irq_acknowledge_callback("pic_0", FUNC(pic8259_device::inta_cb));
 
 	PIC8259(config, m_pic_0, 0);
 	m_pic_0->out_int_callback().set_inputline(m_maincpu, 0);
@@ -444,38 +445,39 @@ MACHINE_CONFIG_START(isbc_state::isbc286)
 	m_pic_1->out_int_callback().set(m_pic_0, FUNC(pic8259_device::ir7_w));
 	m_pic_1->in_sp_callback().set_constant(0);
 
-	MCFG_DEVICE_ADD("pit", PIT8254, 0)
-	MCFG_PIT8253_CLK0(XTAL(22'118'400)/18)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("pic_0", pic8259_device, ir0_w))
-	MCFG_PIT8253_CLK1(XTAL(22'118'400)/18)
-//  MCFG_PIT8253_OUT1_HANDLER(WRITELINE("uart8274", z80dart_device, rxtxcb_w))
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(m_uart8274, i8274_new_device, rxtxcb_w))
-	MCFG_PIT8253_CLK2(XTAL(22'118'400)/18)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, isbc_state, isbc286_tmr2_w))
+	pit8254_device &pit(PIT8254(config, "pit", 0));
+	pit.set_clk<0>(XTAL(22'118'400)/18);
+	pit.out_handler<0>().set(m_pic_0, FUNC(pic8259_device::ir0_w));
+	pit.set_clk<1>(XTAL(22'118'400)/18);
+//  pit.out_handler<1>().set(m_uart8274, FUNC(z80dart_device::rxtxcb_w));
+	pit.out_handler<1>().set(m_uart8274, FUNC(i8274_new_device::rxtxcb_w));
+	pit.set_clk<2>(XTAL(22'118'400)/18);
+	pit.out_handler<2>().set(FUNC(isbc_state::isbc286_tmr2_w));
 
-	MCFG_DEVICE_ADD("ppi", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
-	MCFG_I8255_IN_PORTB_CB(READ8("cent_status_in", input_buffer_device, bus_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, isbc_state, ppi_c_w))
+	i8255_device &ppi(I8255A(config, "ppi"));
+	ppi.out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	ppi.in_pb_callback().set(m_cent_status_in, FUNC(input_buffer_device::bus_r));
+	ppi.out_pc_callback().set(FUNC(isbc_state::ppi_c_w));
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, isbc_state, write_centronics_ack))
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit7))
-	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit6))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->ack_handler().set(FUNC(isbc_state::write_centronics_ack));
+	m_centronics->busy_handler().set(m_cent_status_in, FUNC(input_buffer_device::write_bit7));
+	m_centronics->fault_handler().set(m_cent_status_in, FUNC(input_buffer_device::write_bit6));
 
-	MCFG_DEVICE_ADD("cent_status_in", INPUT_BUFFER, 0)
+	INPUT_BUFFER(config, m_cent_status_in, 0);
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
 
 #if 0
-	MCFG_DEVICE_ADD("uart8274", I8274, XTAL(16'000'000)/4)
-	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE("rs232a", rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRA_CB(WRITELINE("rs232a", rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSA_CB(WRITELINE("rs232a", rs232_port_device, write_rts))
-	MCFG_Z80DART_OUT_TXDB_CB(WRITELINE("rs232b", rs232_port_device, write_txd))
-	MCFG_Z80DART_OUT_DTRB_CB(WRITELINE("rs232b", rs232_port_device, write_dtr))
-	MCFG_Z80DART_OUT_RTSB_CB(WRITELINE("rs232b", rs232_port_device, write_rts))
-	MCFG_Z80DART_OUT_INT_CB(WRITELINE(*this, isbc_state, isbc_uart8274_irq))
+	I8274(config, m_uart8274, XTAL(16'000'000)/4);
+	m_uart8274->out_txda_callback().set("rs232a", FUNC(rs232_port_device::write_txd));
+	m_uart8274->out_dtra_callback().set("rs232a", FUNC(rs232_port_device::write_dtr));
+	m_uart8274->out_rtsa_callback().set("rs232a", FUNC(rs232_port_device::write_rts));
+	m_uart8274->out_txdb_callback().set("rs232b", FUNC(rs232_port_device::write_txd));
+	m_uart8274->out_dtrb_callback().set("rs232b", FUNC(rs232_port_device::write_dtr));
+	m_uart8274->out_rtsb_callback().set("rs232b", FUNC(rs232_port_device::write_rts));
+	m_uart8274->out_int_callback().set(FUNC(isbc_state::isbc_uart8274_irq));
 #else
 	I8274_NEW(config, m_uart8274, XTAL(16'000'000)/4);
 	m_uart8274->out_txda_callback().set("rs232a", FUNC(rs232_port_device::write_txd));
@@ -484,42 +486,42 @@ MACHINE_CONFIG_START(isbc_state::isbc286)
 	m_uart8274->out_txdb_callback().set("rs232b", FUNC(rs232_port_device::write_txd));
 	m_uart8274->out_dtrb_callback().set("rs232b", FUNC(rs232_port_device::write_dtr));
 	m_uart8274->out_rtsb_callback().set("rs232b", FUNC(rs232_port_device::write_rts));
-//  MCFG_Z80SIO_OUT_INT_CB(WRITELINE(*this, isbc_state, isbc_uart8274_irq))
-	m_uart8274->out_int_callback().set("pic_0", FUNC(pic8259_device::ir6_w));
+//  m_uart8274->out_int_callback().set(FUNC(isbc_state::isbc_uart8274_irq));
+	m_uart8274->out_int_callback().set(m_pic_0, FUNC(pic8259_device::ir6_w));
 #endif
 
-	MCFG_DEVICE_ADD("rs232a", RS232_PORT, default_rs232_devices, nullptr)
+	rs232_port_device &rs232a(RS232_PORT(config, "rs232a", default_rs232_devices, nullptr));
 #if 0
-	MCFG_RS232_RXD_HANDLER(WRITELINE("uart8274", z80dart_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("uart8274", z80dart_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("uart8274", z80dart_device, ctsa_w))
+	rs232a.rxd_handler().set(m_uart8274, FUNC(z80dart_device::rxa_w));
+	rs232a.dcd_handler().set(m_uart8274, FUNC(z80dart_device::dcda_w));
+	rs232a.cts_handler().set(m_uart8274, FUNC(z80dart_device::ctsa_w));
 #else
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_uart8274, i8274_new_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(m_uart8274, i8274_new_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_uart8274, i8274_new_device, ctsa_w))
+	rs232a.rxd_handler().set(m_uart8274, FUNC(i8274_new_device::rxa_w));
+	rs232a.dcd_handler().set(m_uart8274, FUNC(i8274_new_device::dcda_w));
+	rs232a.cts_handler().set(m_uart8274, FUNC(i8274_new_device::ctsa_w));
 #endif
 
-	MCFG_DEVICE_ADD("rs232b", RS232_PORT, default_rs232_devices, "terminal")
+	rs232_port_device &rs232b(RS232_PORT(config, "rs232b", default_rs232_devices, "terminal"));
 #if 0
-	MCFG_RS232_RXD_HANDLER(WRITELINE("uart8274", z80dart_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("uart8274", z80dart_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("uart8274", z80dart_device, ctsb_w))
+	rs232b.rxd_handler().set(m_uart8274, FUNC(z80dart_device::rxb_w));
+	rs232b.dcd_handler().set(m_uart8274, FUNC(z80dart_device::dcdb_w));
+	rs232b.cts_handler().set(m_uart8274, FUNC(z80dart_device::ctsb_w));
 #else
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_uart8274, i8274_new_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(m_uart8274, i8274_new_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_uart8274, i8274_new_device, ctsb_w))
+	rs232b.rxd_handler().set(m_uart8274, FUNC(i8274_new_device::rxb_w));
+	rs232b.dcd_handler().set(m_uart8274, FUNC(i8274_new_device::dcdb_w));
+	rs232b.cts_handler().set(m_uart8274, FUNC(i8274_new_device::ctsb_w));
 #endif
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("terminal", isbc286_terminal)
+	rs232b.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(isbc286_terminal));
 
-	MCFG_ISBX_SLOT_ADD("sbx1", 0, isbx_cards, nullptr)
-	MCFG_ISBX_SLOT_MINTR0_CALLBACK(WRITELINE("pic_1", pic8259_device, ir3_w))
-	MCFG_ISBX_SLOT_MINTR1_CALLBACK(WRITELINE("pic_1", pic8259_device, ir4_w))
-	MCFG_ISBX_SLOT_ADD("sbx2", 0, isbx_cards, nullptr)
-	MCFG_ISBX_SLOT_MINTR0_CALLBACK(WRITELINE("pic_1", pic8259_device, ir5_w))
-	MCFG_ISBX_SLOT_MINTR1_CALLBACK(WRITELINE("pic_1", pic8259_device, ir6_w))
+	ISBX_SLOT(config, m_sbx[0], 0, isbx_cards, nullptr);
+	m_sbx[0]->mintr0().set("pic_1", FUNC(pic8259_device::ir3_w));
+	m_sbx[0]->mintr1().set("pic_1", FUNC(pic8259_device::ir4_w));
+	ISBX_SLOT(config, m_sbx[1], 0, isbx_cards, nullptr);
+	m_sbx[1]->mintr0().set("pic_1", FUNC(pic8259_device::ir5_w));
+	m_sbx[1]->mintr1().set("pic_1", FUNC(pic8259_device::ir6_w));
 
 	ISBC_215G(config, "isbc_215g", 0, 0x100, m_maincpu).irq_callback().set(m_pic_0, FUNC(pic8259_device::ir5_w));
-MACHINE_CONFIG_END
+}
 
 void isbc_state::isbc2861(machine_config &config)
 {
@@ -529,7 +531,7 @@ void isbc_state::isbc2861(machine_config &config)
 
 /* ROM definition */
 ROM_START( isbc86 )
-	ROM_REGION( 0x4000, "user1", ROMREGION_ERASEFF )
+	ROM_REGION16_LE( 0x4000, "bios", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "8612_2u.bin", 0x0001, 0x1000, CRC(84fa14cf) SHA1(783e1459ab121201fd49368d4bf769c1bab6447a))
 	ROM_LOAD16_BYTE( "8612_2l.bin", 0x0000, 0x1000, CRC(922bda5f) SHA1(15743e69f3aba56425fa004d19b82ec20532fd72))
 	ROM_LOAD16_BYTE( "8612_3u.bin", 0x2001, 0x1000, CRC(68d47c3e) SHA1(16c17f26b33daffa84d065ff7aefb581544176bd))
@@ -537,12 +539,12 @@ ROM_START( isbc86 )
 ROM_END
 
 ROM_START( isbc8605 )
-	ROM_REGION( 0x8000, "user1", ROMREGION_ERASEFF )
+	ROM_REGION16_LE( 0x8000, "bios", ROMREGION_ERASEFF )
 	ROM_LOAD( "i8605mon.bin", 0x4000, 0x4000, CRC(e16acb6e) SHA1(eb9a3fd21f7609d44f8052b6a0603ecbb52dc3f3))
 ROM_END
 
 ROM_START( isbc8630 )
-	ROM_REGION( 0x8000, "user1", ROMREGION_ERASEFF )
+	ROM_REGION16_LE( 0x8000, "bios", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "14378", "14378" )
 	ROMX_LOAD( "143780-001_isdm_for_isbc_86-30_socket_u57_i2732a.bin", 0x4000, 0x1000, CRC(db0ef880) SHA1(8ef296066d16881217618e54b410d12157f318ea), ROM_SKIP(1) | ROM_BIOS(0))
 	ROMX_LOAD( "143782-001_isdm_for_isbc_86-30_socket_u39_i2732a.bin", 0x4001, 0x1000, CRC(ea1ebe78) SHA1(f03b63659e8f5e96f481dbc6c2ddef1d22850ebb), ROM_SKIP(1) | ROM_BIOS(0))
@@ -556,7 +558,7 @@ ROM_START( isbc8630 )
 ROM_END
 
 ROM_START( isbc286 )
-	ROM_REGION( 0x20000, "user1", ROMREGION_ERASEFF )
+	ROM_REGION16_LE( 0x20000, "bios", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "u79.bin", 0x00001, 0x10000, CRC(144182ea) SHA1(4620ca205a6ac98fe2636183eaead7c4bfaf7a72))
 	ROM_LOAD16_BYTE( "u36.bin", 0x00000, 0x10000, CRC(22db075f) SHA1(fd29ea77f5fc0697c8f8b66aca549aad5b9db3ea))
 ROM_END
@@ -634,7 +636,7 @@ ROM_END
  * :uart8274 B Reg 05 <- ea - Tx Enabled, Tx 8 bits, Send Break 0, RTS=0, DTR=0
 */
 ROM_START( isbc2861 )
-	ROM_REGION( 0x10000, "user1", ROMREGION_ERASEFF )
+	ROM_REGION16_LE( 0x10000, "bios", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "v11", "iSDM Monitor V1.1" )
 	ROMX_LOAD( "174894-001.bin", 0x0000, 0x4000, CRC(79e4f7af) SHA1(911a4595d35e6e82b1149e75bb027927cd1c1658), ROM_SKIP(1) | ROM_BIOS(0))
 	ROMX_LOAD( "174894-002.bin", 0x0001, 0x4000, CRC(66747d21) SHA1(4094b1f10a8bc7db8d6dd48d7128e14e875776c7), ROM_SKIP(1) | ROM_BIOS(0))
@@ -648,13 +650,13 @@ ROM_START( isbc2861 )
 ROM_END
 
 ROM_START( isbc28612 )
-	ROM_REGION( 0x10000, "user1", ROMREGION_ERASEFF )
+	ROM_REGION16_LE( 0x10000, "bios", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "176346-001.bin", 0x0000, 0x8000, CRC(f86c8be5) SHA1(e2bb16b0aeb718219e65d61edabd7838ef34c560))
 	ROM_LOAD16_BYTE( "176346-002.bin", 0x0001, 0x8000, CRC(b964c6c3) SHA1(c3de8541182e32b3568fde77da8c435eab397498))
 ROM_END
 
 ROM_START( rpc86 )
-	ROM_REGION( 0x8000, "user1", ROMREGION_ERASEFF )
+	ROM_REGION16_LE( 0x8000, "bios", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "145068-001.bin", 0x4001, 0x1000, CRC(0fa9db83) SHA1(4a44f8683c263c9ef6850cbe05aaa73f4d4d4e06))
 	ROM_LOAD16_BYTE( "145069-001.bin", 0x6001, 0x1000, CRC(1692a076) SHA1(0ce3a4a867cb92340871bb8f9c3e91ce2984c77c))
 	ROM_LOAD16_BYTE( "145070-001.bin", 0x4000, 0x1000, CRC(8c8303ef) SHA1(60f94daa76ab9dea6e309ac580152eb212b847a0))

@@ -57,7 +57,6 @@ public:
 
 		// getters
 		const device_debug *debugInterface() const { return m_debugInterface; }
-		breakpoint *next() const { return m_next; }
 		int index() const { return m_index; }
 		bool enabled() const { return m_enabled; }
 		offs_t address() const { return m_address; }
@@ -71,7 +70,6 @@ public:
 		// internals
 		bool hit(offs_t pc);
 		const device_debug * m_debugInterface;           // the interface we were created from
-		breakpoint *         m_next;                     // next in the list
 		int                  m_index;                    // user reported index
 		bool                 m_enabled;                  // enabled?
 		offs_t               m_address;                  // execution address
@@ -132,6 +130,7 @@ public:
 		offs_t               m_start_address[3];         // the start addresses of the checks to install
 		offs_t               m_end_address[3];           // the end addresses
 		u64                  m_masks[3];                 // the access masks
+		bool                 m_installing;               // prevent recursive multiple installs
 		void install(read_or_write mode);
 		void triggered(read_or_write type, offs_t address, u64 data, u64 mem_mask);
 	};
@@ -146,7 +145,6 @@ public:
 		registerpoint(symbol_table &symbols, int index, const char *condition, const char *action = nullptr);
 
 		// getters
-		registerpoint *next() const { return m_next; }
 		int index() const { return m_index; }
 		bool enabled() const { return m_enabled; }
 		const char *condition() const { return m_condition.original_string(); }
@@ -156,7 +154,6 @@ public:
 		// internals
 		bool hit();
 
-		registerpoint *     m_next;                     // next in the list
 		int                 m_index;                    // user reported index
 		bool                m_enabled;                  // enabled?
 		parsed_expression   m_condition;                // condition
@@ -181,6 +178,7 @@ public:
 	void stop_hook();
 	void interrupt_hook(int irqline);
 	void exception_hook(int exception);
+	void privilege_hook();
 	void instruction_hook(offs_t curpc);
 
 	// hooks into our operations
@@ -205,6 +203,7 @@ public:
 	void go_interrupt(int irqline = -1);
 	void go_exception(int exception);
 	void go_milliseconds(u64 milliseconds);
+	void go_privilege(const char *condition);
 	void go_next_device();
 
 	template <typename Format, typename... Params>
@@ -214,12 +213,14 @@ public:
 	}
 
 	// breakpoints
-	breakpoint *breakpoint_first() const { return m_bplist; }
+	const std::forward_list<breakpoint> &breakpoint_list() const { return m_bplist; }
+	const breakpoint *breakpoint_find(offs_t address) const;
 	int breakpoint_set(offs_t address, const char *condition = nullptr, const char *action = nullptr);
 	bool breakpoint_clear(int index);
 	void breakpoint_clear_all();
 	bool breakpoint_enable(int index, bool enable = true);
 	void breakpoint_enable_all(bool enable = true);
+	breakpoint *triggered_breakpoint(void) { breakpoint *ret = m_triggered_breakpoint; m_triggered_breakpoint = nullptr; return ret; }
 
 	// watchpoints
 	int watchpoint_space_count() const { return m_wplist.size(); }
@@ -229,9 +230,11 @@ public:
 	void watchpoint_clear_all();
 	bool watchpoint_enable(int index, bool enable = true);
 	void watchpoint_enable_all(bool enable = true);
+	void set_triggered_watchpoint(watchpoint *wp) { m_triggered_watchpoint = wp; }
+	watchpoint *triggered_watchpoint(void) { watchpoint *ret = m_triggered_watchpoint; m_triggered_watchpoint = nullptr; return ret; }
 
 	// registerpoints
-	registerpoint *registerpoint_first() const { return m_rplist; }
+	const std::forward_list<registerpoint> &registerpoint_list() const { return m_rplist; }
 	int registerpoint_set(const char *condition, const char *action = nullptr);
 	bool registerpoint_clear(int index);
 	void registerpoint_clear_all();
@@ -324,6 +327,7 @@ private:
 	attotime                m_stoptime;                 // stop time for DEBUG_FLAG_STOP_TIME
 	int                     m_stopirq;                  // stop IRQ number for DEBUG_FLAG_STOP_INTERRUPT
 	int                     m_stopexception;            // stop exception number for DEBUG_FLAG_STOP_EXCEPTION
+	std::unique_ptr<parsed_expression> m_privilege_condition;      // expression to evaluate on privilege change
 	attotime                m_endexectime;              // ending time of the current execution
 	u64                     m_total_cycles;             // current total cycles
 	u64                     m_last_total_cycles;        // last total cycles
@@ -333,9 +337,12 @@ private:
 	u32                     m_pc_history_index;         // current history index
 
 	// breakpoints and watchpoints
-	breakpoint *            m_bplist;                   // list of breakpoints
+	std::forward_list<breakpoint> m_bplist;             // list of breakpoints
 	std::vector<std::vector<std::unique_ptr<watchpoint>>> m_wplist;  // watchpoint lists for each address space
-	registerpoint *         m_rplist;                   // list of registerpoints
+	std::forward_list<registerpoint> m_rplist;          // list of registerpoints
+
+	breakpoint *            m_triggered_breakpoint;     // latest breakpoint that was triggered
+	watchpoint *            m_triggered_watchpoint;     // latest watchpoint that was triggered
 
 	// tracing
 	class tracer
@@ -459,11 +466,13 @@ private:
 	static constexpr u32 DEBUG_FLAG_STOP_TIME       = 0x00002000;       // there is a pending stop at cpu->stoptime
 	static constexpr u32 DEBUG_FLAG_SUSPENDED       = 0x00004000;       // CPU currently suspended
 	static constexpr u32 DEBUG_FLAG_LIVE_BP         = 0x00010000;       // there are live breakpoints for this CPU
+	static constexpr u32 DEBUG_FLAG_STOP_PRIVILEGE  = 0x00020000;       // run until execution level changes
 
 	static constexpr u32 DEBUG_FLAG_STEPPING_ANY    = DEBUG_FLAG_STEPPING | DEBUG_FLAG_STEPPING_OVER | DEBUG_FLAG_STEPPING_OUT;
 	static constexpr u32 DEBUG_FLAG_TRACING_ANY     = DEBUG_FLAG_TRACING | DEBUG_FLAG_TRACING_OVER;
 	static constexpr u32 DEBUG_FLAG_TRANSIENT       = DEBUG_FLAG_STEPPING_ANY | DEBUG_FLAG_STOP_PC |
-			DEBUG_FLAG_STOP_INTERRUPT | DEBUG_FLAG_STOP_EXCEPTION | DEBUG_FLAG_STOP_VBLANK | DEBUG_FLAG_STOP_TIME;
+			DEBUG_FLAG_STOP_INTERRUPT | DEBUG_FLAG_STOP_EXCEPTION | DEBUG_FLAG_STOP_VBLANK |
+			DEBUG_FLAG_STOP_TIME | DEBUG_FLAG_STOP_PRIVILEGE;
 };
 
 //**************************************************************************

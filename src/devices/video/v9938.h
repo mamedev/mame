@@ -15,45 +15,6 @@
 
 
 //**************************************************************************
-//  DEVICE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_V9938_ADD(_tag, _screen, _vramsize, _clock) \
-	MCFG_DEVICE_ADD(_tag, V9938, _clock) \
-	MCFG_VIDEO_SET_SCREEN(_screen) \
-	downcast<v99x8_device &>(*device).set_vram_size(_vramsize);
-#define MCFG_V9958_ADD(_tag, _screen, _vramsize, _clock) \
-	MCFG_DEVICE_ADD(_tag, V9958, _clock) \
-	MCFG_VIDEO_SET_SCREEN(_screen) \
-	downcast<v99x8_device &>(*device).set_vram_size(_vramsize);
-
-#define MCFG_V99X8_SCREEN_ADD_NTSC(_screen_tag, _v9938_tag, _clock) \
-	MCFG_SCREEN_ADD(_screen_tag, RASTER) \
-	MCFG_SCREEN_RAW_PARAMS(_clock, \
-		v99x8_device::HTOTAL, \
-		0, \
-		v99x8_device::HVISIBLE - 1, \
-		v99x8_device::VTOTAL_NTSC * 2, \
-		v99x8_device::VERTICAL_ADJUST * 2, \
-		v99x8_device::VVISIBLE_NTSC * 2 - 1 - v99x8_device::VERTICAL_ADJUST * 2) \
-	MCFG_SCREEN_UPDATE_DEVICE(_v9938_tag, v9938_device, screen_update)
-
-#define MCFG_V99X8_SCREEN_ADD_PAL(_screen_tag, _v9938_tag, _clock) \
-	MCFG_SCREEN_ADD(_screen_tag, RASTER) \
-	MCFG_SCREEN_RAW_PARAMS(_clock, \
-		v99x8_device::HTOTAL, \
-		0, \
-		v99x8_device::HVISIBLE - 1, \
-		v99x8_device::VTOTAL_PAL * 2, \
-		v99x8_device::VERTICAL_ADJUST * 2, \
-		v99x8_device::VVISIBLE_PAL * 2 - 1 - v99x8_device::VERTICAL_ADJUST * 2) \
-	MCFG_SCREEN_UPDATE_DEVICE(_v9938_tag, v9938_device, screen_update)
-
-#define MCFG_V99X8_INTERRUPT_CALLBACK(_irq) \
-	downcast<v99x8_device *>(device)->set_interrupt_callback(DEVCB_##_irq);
-
-
-//**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
@@ -75,16 +36,27 @@ class v99x8_device :    public device_t,
 						public device_video_interface
 {
 public:
-	template <class Object> devcb_base &set_interrupt_callback(Object &&irq) { return m_int_callback.set_callback(std::forward<Object>(irq)); }
+	auto int_cb() { return m_int_callback.bind(); }
+	template <class T> void set_screen_ntsc(T &&screen)
+	{
+		set_screen(std::forward<T>(screen));
+		m_pal_config = false;
+	}
+	template <class T> void set_screen_pal(T &&screen)
+	{
+		set_screen(std::forward<T>(screen));
+		m_pal_config = true;
+	}
+
 	bitmap_rgb32 &get_bitmap() { return m_bitmap; }
-	void update_mouse_state(int mx_delta, int my_delta, int button_state);
+	void colorbus_x_input(int mx_delta);
+	void colorbus_y_input(int my_delta);
+	void colorbus_button_input(bool button1, bool button2);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-
-	auto int_cb() { return m_int_callback.bind(); }
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 	uint8_t vram_r();
 	uint8_t status_r();
@@ -122,7 +94,10 @@ protected:
 
 	const int m_model;
 
+	bool m_pal_config;
+
 	// device overrides
+	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -237,7 +212,7 @@ private:
 	// blinking
 	int m_blink, m_blink_count;
 	// mouse
-	uint8_t m_mx_delta, m_my_delta;
+	int16_t m_mx_delta, m_my_delta;
 	// mouse & lightpen
 	uint8_t m_button_state;
 	// render bitmap

@@ -61,6 +61,7 @@ Notes:
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 #define DUNHUANG_DEBUG  0
@@ -176,8 +177,8 @@ TILE_GET_INFO_MEMBER(dunhuang_state::get_tile_info2)
 
 void dunhuang_state::video_start()
 {
-	m_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dunhuang_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8,8, 0x40,0x20);
-	m_tmap2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dunhuang_state::get_tile_info2),this), TILEMAP_SCAN_ROWS, 8,32, 0x40,0x8);
+	m_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(dunhuang_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 0x40,0x20);
+	m_tmap2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(dunhuang_state::get_tile_info2)), TILEMAP_SCAN_ROWS, 8,32, 0x40,0x8);
 
 	m_tmap->set_transparent_pen(0);
 	m_tmap2->set_transparent_pen(0);
@@ -498,7 +499,7 @@ void dunhuang_state::dunhuang_io_map(address_map &map)
 
 	map(0x000f, 0x000f).w(FUNC(dunhuang_state::block_addr_lo_w));
 	map(0x0010, 0x0010).w(FUNC(dunhuang_state::block_addr_hi_w));
-//  AM_RANGE( 0x0011, 0x0011 ) ?
+//  map(0x0011, 0x0011) ?
 	map(0x0012, 0x0012).w(FUNC(dunhuang_state::block_c_w));
 	map(0x0015, 0x0015).w(FUNC(dunhuang_state::block_x_w));
 	map(0x0016, 0x0016).w(FUNC(dunhuang_state::block_y_w));
@@ -804,45 +805,43 @@ void dunhuang_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(dunhuang_state::dunhuang)
-
+void dunhuang_state::dunhuang(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,12000000/2)
-	MCFG_DEVICE_PROGRAM_MAP(dunhuang_map)
-	MCFG_DEVICE_IO_MAP(dunhuang_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dunhuang_state, irq0_line_hold)
+	Z80(config, m_maincpu, 12000000/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &dunhuang_state::dunhuang_map);
+	m_maincpu->set_addrmap(AS_IO, &dunhuang_state::dunhuang_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(dunhuang_state::irq0_line_hold));
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(5))
+	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_seconds(5));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0+8, 512-8-1, 0+16, 256-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(dunhuang_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(512, 256);
+	m_screen->set_visarea(0+8, 512-8-1, 0+16, 256-16-1);
+	m_screen->set_screen_update(FUNC(dunhuang_state::screen_update));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dunhuang)
-	MCFG_PALETTE_ADD("palette", 0x100)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dunhuang);
+	PALETTE(config, m_palette).set_entries(0x100);
 
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette") // HMC HM86171 VGA 256 colour RAMDAC
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette)); // HMC HM86171 VGA 256 colour RAMDAC
+	ramdac.set_addrmap(0, &dunhuang_state::ramdac_map);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2413, 3579545)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	YM2413(config, "ymsnd", 3579545).add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("ay8910", AY8910, 12000000/8)
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, dunhuang_state, dsw_r))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, dunhuang_state, input_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	ay8910_device &ay8910(AY8910(config, "ay8910", 12000000/8));
+	ay8910.port_b_read_callback().set(FUNC(dunhuang_state::dsw_r));
+	ay8910.port_a_write_callback().set(FUNC(dunhuang_state::input_w));
+	ay8910.add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 12000000/8, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki", 12000000/8, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.80);
+}
 
 
 /***************************************************************************

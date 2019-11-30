@@ -3,7 +3,7 @@
 
 /******************************************************************************
 
-  Nightmare / Clean Octopus.
+  Night Mare / Clean Octopus.
 
   E.F.O. S.A. Video IV System.
   Barcelona, Spain.
@@ -16,8 +16,9 @@
   The game was designed by EFO/Playmatic in 1982, then dissappeared and remained
   lost till now.
 
-  The name of the game for the local market was "Nightmare", but for the interna-
-  tional market they changed the name to "Clean Octopus".
+  The name of the game for the local market was "Night Mare" (misspelled in
+  some cases as "Nigth Mare"), but for the international market they changed the
+  name to "Clean Octopus".
 
 
 --------------------------------------------------------------------------------
@@ -50,7 +51,7 @@
   2x CDP1852 (I/O).
 
   1x Xtal @ 2.9500 MHz.
-  
+
   Sound ROM is missing.
   Overall the board is pretty much dead, no interruptions observed, no video sync output.
 
@@ -113,7 +114,7 @@
 
   PINOUTS
   -------
-  
+
   Main Board:
 
 
@@ -134,7 +135,7 @@
   J3:  Pin marked 4 ---> IC8 CDP1852CE, pin 16.      J4:  Pin marked GND -> GND.
   J3:  Pin marked 5 ---> IC8 CDP1852CE, pin 18.
   J3:  Pin marked 6 ---> IC8 CDP1852CE, pin 20.
-  J3:  Pin marked 7 ---> IC8 CDP1852CE, pin 22.      J5:  Pin marked GND --> GND. 
+  J3:  Pin marked 7 ---> IC8 CDP1852CE, pin 22.      J5:  Pin marked GND --> GND.
   J3:  Pin marked D ---> IC7 CDP1802ACE, pin 21.     J5:  Pins marked 1-8 -> CPU data bus.
   J3:  Pin marked GND -> GND    .                    J5:  Pin marked 9 ----> Mainboard IC5 CD4001, pin 11.
   J3:  Pin marked T ---> IC7 CDP1802ACE, pin 22.
@@ -168,7 +169,7 @@
   Since STWL is connected to GND, the control word is set to 8-bit lenght.
 
 
-  
+
   Sound Board:
   (also used on some Pinball machines)
 
@@ -270,7 +271,7 @@ void nightmare_state::device_timer(emu_timer &timer, device_timer_id id, int par
 		m_reset = 1;
 		break;
 	default:
-		assert_always(false, "Unknown id in nightmare_state::device_timer");
+		throw emu_fatalerror("Unknown id in nightmare_state::device_timer");
 	}
 }
 
@@ -346,13 +347,11 @@ void nightmare_state::nightmare_map(address_map &map)
 
 void nightmare_state::nightmare_io_map(address_map &map)
 {
-	map(0x0001, 0x0001).r("ic8", FUNC(cdp1852_device::read)).w(FUNC(nightmare_state::unkout_w));
-	map(0x0002, 0x0002).r("ic9", FUNC(cdp1852_device::read)).w("ic10", FUNC(cdp1852_device::write));
+	map(1, 1).r("ic8", FUNC(cdp1852_device::read)).w(FUNC(nightmare_state::unkout_w));
+	map(2, 2).r("ic9", FUNC(cdp1852_device::read)).w("ic10", FUNC(cdp1852_device::write));
 
-	map(0x0004, 0x0004).rw(m_vdc, FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));
-	map(0x0005, 0x0005).rw(m_vdc, FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));
-	map(0x0006, 0x0006).rw(m_vdc2, FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));
-	map(0x0007, 0x0007).rw(m_vdc2, FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));
+	map(4, 5).rw(m_vdc, FUNC(tms9928a_device::read), FUNC(tms9928a_device::write));
+	map(6, 7).rw(m_vdc2, FUNC(tms9928a_device::read), FUNC(tms9928a_device::write));
 }
 
 void nightmare_state::nightmare_sound_map(address_map &map)
@@ -408,8 +407,8 @@ static INPUT_PORTS_START( nightmare )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) 
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) 
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
 
@@ -436,10 +435,10 @@ void nightmare_state::nightmare(machine_config &config)
 	CDP1802(config, m_soundcpu, SOUND_CLOCK);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &nightmare_state::nightmare_sound_map);
 	m_soundcpu->set_addrmap(AS_IO, &nightmare_state::nightmare_sound_io_map);
-	m_soundcpu->set_disable(); 
+	m_soundcpu->set_disable();
 
 	/* i/o hardware */
-	cdp1852_device &ic8(CDP1852(config, "ic8")); 
+	cdp1852_device &ic8(CDP1852(config, "ic8"));
 	ic8.mode_cb().set_constant(0);
 	ic8.di_cb().set_ioport("IN0");
 
@@ -447,23 +446,23 @@ void nightmare_state::nightmare(machine_config &config)
 	ic9.mode_cb().set_constant(0);
 	ic9.di_cb().set_ioport("IN1");
 
-	cdp1852_device &ic10(CDP1852(config, "ic10")); 
+	cdp1852_device &ic10(CDP1852(config, "ic10"));
 	ic10.mode_cb().set_constant(1);
 	ic10.do_cb().set(FUNC(nightmare_state::ic10_w));
 
 	SDA2006(config, m_eeprom);
 
 	/* video hardware */
-	TMS9928A( config, m_vdc, MASTER_CLOCK );
+	EFO90501( config, m_vdc, MASTER_CLOCK );
+	m_vdc->set_screen("screen");
 	m_vdc->set_vram_size(0x4000);
 
-	TMS9928A( config, m_vdc2, MASTER_CLOCK );
+	EFO90501( config, m_vdc2, MASTER_CLOCK );
+	m_vdc2->set_screen("screen");
 	m_vdc2->set_vram_size(0x4000);
 	m_vdc2->int_callback().set_inputline(m_maincpu, COSMAC_INPUT_LINE_INT);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(MASTER_CLOCK/2, tms9928a_device::TOTAL_HORZ, tms9928a_device::HORZ_DISPLAY_START-12, tms9928a_device::HORZ_DISPLAY_START + 256 + 12, \
-		tms9928a_device::TOTAL_VERT_NTSC, tms9928a_device::VERT_DISPLAY_START_NTSC - 12, tms9928a_device::VERT_DISPLAY_START_NTSC + 192 + 12);
 	screen.set_screen_update(FUNC(nightmare_state::screen_update_nightmare));
 }
 
@@ -474,11 +473,11 @@ ROM_START( nightmare )
 	ROM_LOAD( "nm1-ib1.bin", 0x2000, 0x2000, CRC(c10695f7) SHA1(929467fe7529782e8181d3caae3a67bb0a8d8753) )
 	ROM_LOAD( "nm1-ic1.bin", 0x4000, 0x2000, CRC(a3117246) SHA1(ca9601401f7ab34200c969e41ffae50bee0aca4d) )
 
-	ROM_REGION( 0x10000, "cdp1802_sound", 0 ) 
+	ROM_REGION( 0x10000, "cdp1802_sound", 0 )
 	ROM_LOAD( "sound.bin",    0x0000, 0x4000, NO_DUMP )
 
-	ROM_REGION( 0x40, "eeprom", 0 ) 
+	ROM_REGION( 0x40, "eeprom", 0 )
 	ROM_LOAD( "eeprom", 0x00, 0x40, CRC(7824e1f8) SHA1(2ccac62b4e8abcb2b3d66fa4025947fea184664e) )
 ROM_END
 
-GAME( 1982, nightmare, 0,        nightmare, nightmare,   nightmare_state,   empty_init, ROT90, "E.F.O.", "Nightmare (Spain)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1982, nightmare, 0,        nightmare, nightmare,   nightmare_state,   empty_init, ROT90, "E.F.O.", "Night Mare (Spain)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )

@@ -111,13 +111,13 @@ TODO:
   zombraid not aligned when flipped vertically or horizontally
 
 - bad sound in sokonuke?
-- in msgunda1, colors for the score display screw up after the second animation
+- in msgundam1, colors for the score display screw up after the second animation
   in attract mode. The end of the animation also has garbled sprites.
   Note that the animation is not present in msgundam.
 - Some games: battery backed portion of RAM (e.g. downtown, kiwame, zombraid)
 - the zombraid crosshair hack can go if the nvram regions are figured out.
 - Some games: programmable timer that generates IRQ. See e.g. gundhara:
-  lev 4 is triggerd by writes at d00000-6 and drives the sound.
+  lev 4 is triggered by writes at d00000-6 and drives the sound.
   See also msgundam.
 
 - tndrcade: lots of flickering sprites
@@ -488,7 +488,7 @@ Lithium battery x1
                             Daioh
 
 DAIOH
-Alumer 1993, Sammy license
+Allumer 1993, Sammy license
 P0-092A
 
 
@@ -670,9 +670,9 @@ CONN1 = 8 pin header for gun connection
 
 68HC000N -16N
 
-2)   Alumer  X1-012
-2)   Alumer  X1-011
-2)   Alumer  X1-014
+2)   Allumer  X1-012
+2)   Allumer  X1-011
+2)   Allumer  X1-014
 
 X1-010
 X1-007
@@ -819,7 +819,7 @@ RST1  : Reset
 
 CN1   : 7-Pin header to drive lights underneath buttons to show what cards are available to play
 CN2   : 8-Pin header to drive lights underneath buttons to show what cards are available to play
-CN3   : 5-Pin header connected to aucilliary PCB to drive lights about the cabinet
+CN3   : 5-Pin header connected to auxiliary PCB to drive lights about the cabinet
 
 PAL   :FU-011 @ U50
        FU-012 @ U51
@@ -1322,18 +1322,59 @@ Notes:
 /***************************************************************************
 
 Crazy Fight
+Subsino 1996
+Readme by Guru
+This game runs on Allumer-based hardware.
+It is a whack-a-mole type game using 6 buttons.
 
-x1-11
-x1-11
-x1-12
-x1-12
-x1-001a
-x1-002a
-x1-007
-Lattlice PLSI 1032 FPGA
-oki 6295
-ym3812
-68000
+PCB Layout
+----------
+
+186P010
+|--------------------------------------------------------------------|
+|    VOLUME               68000              ROM_U68                 |
+|TDA1519  LM358 LM324                                                |
+|              YM3014     ROM_U3             ROM_U67                 |
+|           YM3812                                                   |
+|4.43361875MHz            62256             X1-011  X1-012           |
+|                                 PLSI1032                           |
+|        M6295            ROM_U4                                     |
+|                                            ROM_U66                 |
+|                         62256                                      |
+|   ROM_U85                                  ROM_U65                 |
+|J                                16MHz                              |
+|A                                          X1-011  X1-012           |
+|M                                                                   |
+|M  X1-007        PAL                                                |
+|A                                           6164       X1-001A      |
+|    6164                                                            |
+|                                                                    |
+|    6164                                    6164       X1-002A      |
+|                DSW2(8)  DSW1(8)                                    |
+| TD62003                            PAL   ROM_U228     ROM_U226     |
+|    J2    DIP42                     PAL         ROM_U227    ROM_U225|
+|--------------------------------------------------------------------|
+Notes:
+      68000 clock  - 16.00MHz (DIP64)
+      YM3812 clock - 4.000MHz [16/4] (DIP24)
+      M6295 clock  - 1.108404688 [4.43361875/4]. Pin 7 HIGH (QFP44)
+      PLSI1032     - Lattice pLSI1032-80LJ Programmable Logic Device (PLCC84)
+      6164         - 8kx8 SRAM (SDIP28)
+      62256        - 32kx8 SRAM (SDIP28)
+      TD62003      - Toshiba TD62003 7-Channel Darlington Sink Driver (DIP16)
+      DIP42        - Unknown DIP42 IC. Note several pins have no connection.
+                     Pins 6-26 tied to inputs on JAMMA connector.
+                     Some other pins tied to logic.
+                     No pins have a clock so this chip is not a MCU.
+      J2           - 4 pin connector. Pin 2 tied to DIP42 IC pin 27
+                     and pin 3 tied to TD62003 pin 16
+      Custom Chips - X1-007
+                     X1-001A
+                     X1-002A
+                     X1-011 (2)
+                     X1-012 (2)
+      HSync        - 15.1433kHz
+      VSync        - 59.1851Hz
 
 ***************************************************************************/
 
@@ -1378,7 +1419,6 @@ Note: on screen copyright is (c)1998 Coinmaster.
 #include "machine/msm6242.h"
 #include "machine/nvram.h"
 #include "machine/pit8253.h"
-#include "machine/tmp68301.h"
 #include "machine/watchdog.h"
 #include "sound/2203intf.h"
 #include "sound/2612intf.h"
@@ -1396,7 +1436,9 @@ Note: on screen copyright is (c)1998 Coinmaster.
 
 #include <algorithm>
 
-#if __uPD71054_TIMER
+#define USE_uPD71054_TIMER 1
+
+#if USE_uPD71054_TIMER
 // this mess should be replaced with pit8254, see madshark
 
 #define USED_TIMER_NUM  1
@@ -1409,18 +1451,20 @@ Note: on screen copyright is (c)1998 Coinmaster.
 void seta_state::uPD71054_update_timer(device_t *cpu, int no)
 {
 	uPD71054_state *uPD71054 = &m_uPD71054;
-	uint16_t max = uPD71054->max[no]&0xffff;
+	u16 max = uPD71054->max[no] & 0xffff;
 
-	if( max != 0 ) {
+	if (max != 0)
+	{
 		attotime period = attotime::from_hz(m_maincpu->unscaled_clock()) * (16 * max);
 		uPD71054->timer[no]->adjust( period, no );
-	} else {
+	}
+	else
+	{
 		uPD71054->timer[no]->adjust( attotime::never, no);
 		logerror( "%s: uPD71054 error, timer %d duration is 0\n",
 				machine().describe_context(), no );
 	}
 }
-
 
 
 /*------------------------------
@@ -1433,31 +1477,27 @@ TIMER_CALLBACK_MEMBER(seta_state::uPD71054_timer_callback)
 }
 
 
-
 /*------------------------------
     initialize
 ------------------------------*/
-void seta_state::uPD71054_timer_init(  )
+void seta_state::uPD71054_timer_init()
 {
 	uPD71054_state *uPD71054 = &m_uPD71054;
-	int no;
 
 	uPD71054->write_select = 0;
 
-	for( no = 0; no < USED_TIMER_NUM; no++ ) {
+	for (int no = 0; no < USED_TIMER_NUM; no++)
 		uPD71054->max[no] = 0xffff;
-	}
-	for( no = 0; no < USED_TIMER_NUM; no++ ) {
-		uPD71054->timer[no] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(seta_state::uPD71054_timer_callback),this));
-	}
-}
 
+	for (int no = 0; no < USED_TIMER_NUM; no++)
+		uPD71054->timer[no] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(seta_state::uPD71054_timer_callback),this));
+}
 
 
 /*------------------------------
     timer write handler
 ------------------------------*/
-WRITE16_MEMBER(seta_state::timer_regs_w)
+void seta_state::timer_regs_w(offs_t offset, u16 data)
 {
 	uPD71054_state *uPD71054 = &m_uPD71054;
 
@@ -1465,34 +1505,39 @@ WRITE16_MEMBER(seta_state::timer_regs_w)
 
 	uPD71054->reg[offset] = data;
 
-	switch( offset ) {
-		case 0x0000:
-		case 0x0001:
-		case 0x0002:
-		if( uPD71054->write_select == 0 ) {
-			uPD71054->max[offset] = (uPD71054->max[offset]&0xff00)+data;
-			if( ((uPD71054->reg[3]>>4)&3) == 3 ) {
+	switch (offset)
+	{
+	case 0x0000:
+	case 0x0001:
+	case 0x0002:
+		if (uPD71054->write_select == 0)
+		{
+			uPD71054->max[offset] = (uPD71054->max[offset] & 0xff00) + data;
+			if (((uPD71054->reg[3] >> 4) & 3) == 3)
+			{
 				uPD71054->write_select = 1;
 			}
-		} else {
-			uPD71054->max[offset] = (uPD71054->max[offset]&0x00ff)+(data<<8);
 		}
-		if( uPD71054->max[offset] != 0 ) {
-			uPD71054_update_timer( m_maincpu.target(), offset );
+		else
+		{
+			uPD71054->max[offset] = (uPD71054->max[offset] & 0x00ff) + (data << 8);
+		}
+		if (uPD71054->max[offset] != 0)
+		{
+			uPD71054_update_timer(m_maincpu.target(), offset);
 		}
 		break;
-		case 0x0003:
-		switch( (data>>4)&3 ) {
-			case 2: uPD71054->write_select = 1; break;
-			case 1:
-			case 3: uPD71054->write_select = 0; break;
+	case 0x0003:
+		switch ((data >> 4) & 3)
+		{
+		case 2: uPD71054->write_select = 1; break;
+		case 1:
+		case 3: uPD71054->write_select = 0; break;
 		}
 		break;
 	}
 }
-#endif  // __uPD71054_TIMER
-
-
+#endif  // USE_uPD71054_TIMER
 
 
 /***************************************************************************
@@ -1529,7 +1574,6 @@ WRITE_LINE_MEMBER(seta_state::pit_out0)
 }
 
 
-
 /*
 
  Shared RAM:
@@ -1539,20 +1583,15 @@ WRITE_LINE_MEMBER(seta_state::pit_out0)
 
 */
 
-READ16_MEMBER(seta_state::sharedram_68000_r)
+u8 seta_state::sharedram_68000_r(offs_t offset)
 {
-	return ((uint16_t)m_sharedram[offset]) & 0xff;
+	return m_sharedram[offset];
 }
 
-WRITE16_MEMBER(seta_state::sharedram_68000_w)
+void seta_state::sharedram_68000_w(offs_t offset, u8 data)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		m_sharedram[offset] = data & 0xff;
-	}
+	m_sharedram[offset] = data & 0xff;
 }
-
-
 
 
 /*
@@ -1561,28 +1600,25 @@ WRITE16_MEMBER(seta_state::sharedram_68000_w)
 
 */
 
-WRITE16_MEMBER(seta_state::sub_ctrl_w)
+void seta_state::sub_ctrl_w(offs_t offset, u8 data)
 {
-	switch(offset)
+	switch (offset)
 	{
 		case 0/2:   // bit 0: reset sub cpu?
-			if (ACCESSING_BITS_0_7)
-			{
-				if ( !(m_sub_ctrl_data & 1) && (data & 1) )
-					m_subcpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
-				m_sub_ctrl_data = data;
-			}
+			if (!(m_sub_ctrl_data & 1) && (data & 1))
+				m_subcpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
+			m_sub_ctrl_data = data;
 			break;
 
 		case 2/2:   // ?
 			break;
 
 		case 4/2:   // not sure
-			if (ACCESSING_BITS_0_7) if(m_soundlatch[0] != nullptr) m_soundlatch[0]->write(space, 0, data & 0xff);
+			if (m_soundlatch[0] != nullptr) m_soundlatch[0]->write(data);
 			break;
 
 		case 6/2:   // not sure
-			if (ACCESSING_BITS_0_7) if(m_soundlatch[1] != nullptr) m_soundlatch[1]->write(space, 0, data & 0xff);
+			if (m_soundlatch[1] != nullptr) m_soundlatch[1]->write(data);
 			break;
 	}
 
@@ -1590,9 +1626,9 @@ WRITE16_MEMBER(seta_state::sub_ctrl_w)
 
 
 /* DSW reading for 16 bit CPUs */
-READ16_MEMBER(seta_state::seta_dsw_r)
+u16 seta_state::seta_dsw_r(offs_t offset)
 {
-	uint16_t dsw = m_dsw->read();
+	const u16 dsw = m_dsw->read();
 	if (offset == 0)    return (dsw >> 8) & 0xff;
 	else                return (dsw >> 0) & 0xff;
 }
@@ -1600,12 +1636,12 @@ READ16_MEMBER(seta_state::seta_dsw_r)
 
 /* DSW reading for 8 bit CPUs */
 
-READ8_MEMBER(seta_state::dsw1_r)
+u8 seta_state::dsw1_r()
 {
 	return (m_dsw->read() >> 8) & 0xff;
 }
 
-READ8_MEMBER(seta_state::dsw2_r)
+u8 seta_state::dsw2_r()
 {
 	return (m_dsw->read() >> 0) & 0xff;
 }
@@ -1632,7 +1668,7 @@ WRITE_LINE_MEMBER(seta_state::screen_vblank_seta_buffer_sprites)
 
 */
 template<int Layer>
-WRITE16_MEMBER(seta_state::vram_w)
+void seta_state::vram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_vram[Layer][offset]);
 	if (m_rambank[Layer] == ((offset >> 12) & 1))
@@ -1654,35 +1690,38 @@ WRITE16_MEMBER(seta_state::vram_w)
 ***************************************************************************/
 
 
-READ16_MEMBER(seta_state::ipl0_ack_r)
+u16 seta_state::ipl0_ack_r()
+{
+	if (!machine().side_effects_disabled())
+		m_maincpu->set_input_line(1, CLEAR_LINE);
+	return 0;
+}
+
+void seta_state::ipl0_ack_w(u16 data)
 {
 	m_maincpu->set_input_line(1, CLEAR_LINE);
+}
+
+u16 seta_state::ipl1_ack_r()
+{
+	if (!machine().side_effects_disabled())
+		m_maincpu->set_input_line(2, CLEAR_LINE);
 	return 0;
 }
 
-WRITE16_MEMBER(seta_state::ipl0_ack_w)
-{
-	m_maincpu->set_input_line(1, CLEAR_LINE);
-}
-
-READ16_MEMBER(seta_state::ipl1_ack_r)
-{
-	m_maincpu->set_input_line(2, CLEAR_LINE);
-	return 0;
-}
-
-WRITE16_MEMBER(seta_state::ipl1_ack_w)
+void seta_state::ipl1_ack_w(u16 data)
 {
 	m_maincpu->set_input_line(2, CLEAR_LINE);
 }
 
-READ16_MEMBER(seta_state::ipl2_ack_r)
+u16 seta_state::ipl2_ack_r()
 {
-	m_maincpu->set_input_line(4, CLEAR_LINE);
+	if (!machine().side_effects_disabled())
+		m_maincpu->set_input_line(4, CLEAR_LINE);
 	return 0;
 }
 
-WRITE16_MEMBER(seta_state::ipl2_ack_w)
+void seta_state::ipl2_ack_w(u16 data)
 {
 	m_maincpu->set_input_line(4, CLEAR_LINE);
 }
@@ -1711,8 +1750,8 @@ void seta_state::tndrcade_map(address_map &map)
 	map(0x600000, 0x6005ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r16), FUNC(seta001_device::spriteylow_w16));     // Sprites Y
 	map(0x600600, 0x600607).ram().rw(m_seta001, FUNC(seta001_device::spritectrl_r16), FUNC(seta001_device::spritectrl_w16));
 
-	map(0x800000, 0x800007).w(FUNC(seta_state::sub_ctrl_w));               // Sub CPU Control?
-	map(0xa00000, 0xa00fff).rw(FUNC(seta_state::sharedram_68000_r), FUNC(seta_state::sharedram_68000_w));  // Shared RAM
+	map(0x800000, 0x800007).w(FUNC(seta_state::sub_ctrl_w)).umask16(0x00ff);               // Sub CPU Control?
+	map(0xa00000, 0xa00fff).rw(FUNC(seta_state::sharedram_68000_r), FUNC(seta_state::sharedram_68000_w)).umask16(0x00ff);  // Shared RAM
 	map(0xc00000, 0xc03fff).ram().rw(m_seta001, FUNC(seta001_device::spritecode_r16), FUNC(seta001_device::spritecode_w16));     // Sprites Code + X + Attr
 	map(0xe00000, 0xe03fff).ram().share("share1");                  // RAM (Mirrored?)
 	map(0xffc000, 0xffffff).ram().share("share1");                  // RAM (Mirrored?)
@@ -1724,7 +1763,7 @@ void seta_state::tndrcade_map(address_map &map)
         (with slight variations, and Meta Fox protection hooked in)
 ***************************************************************************/
 
-WRITE8_MEMBER(seta_state::twineagl_ctrl_w)
+void seta_state::twineagl_ctrl_w(u8 data)
 {
 	if ((data & 0x30) == 0)
 	{
@@ -1739,14 +1778,14 @@ void seta_state::downtown_map(address_map &map)
 	map(0x100000, 0x103fff).rw(m_x1, FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
 	map(0x200000, 0x200001).noprw();                             // watchdog? (twineagl)
 	map(0x300000, 0x300001).w(FUNC(seta_state::ipl1_ack_w));
-	map(0x400000, 0x400007).w(FUNC(seta_state::twineagl_tilebank_w));      // special tile banking to animate water in twineagl
+	map(0x400000, 0x400007).w(FUNC(seta_state::twineagl_tilebank_w)).umask16(0x00ff);      // special tile banking to animate water in twineagl
 	map(0x500001, 0x500001).w(FUNC(seta_state::twineagl_ctrl_w));
 	map(0x600000, 0x600003).r(FUNC(seta_state::seta_dsw_r));                // DSW
 	map(0x700000, 0x7003ff).ram().share("paletteram1");  // Palette
 	map(0x800000, 0x800005).writeonly().share("vctrl_0");// VRAM Ctrl
 	map(0x900000, 0x903fff).ram().w(FUNC(seta_state::vram_w<0>)).share("vram_0"); // VRAM
-	map(0xa00000, 0xa00007).w(FUNC(seta_state::sub_ctrl_w));               // Sub CPU Control?
-	map(0xb00000, 0xb00fff).rw(FUNC(seta_state::sharedram_68000_r), FUNC(seta_state::sharedram_68000_w));  // Shared RAM
+	map(0xa00000, 0xa00007).w(FUNC(seta_state::sub_ctrl_w)).umask16(0x00ff);               // Sub CPU Control?
+	map(0xb00000, 0xb00fff).rw(FUNC(seta_state::sharedram_68000_r), FUNC(seta_state::sharedram_68000_w)).umask16(0x00ff);  // Shared RAM
 	map(0xc00000, 0xc00001).nopw();                        // ? $4000
 	map(0xd00000, 0xd005ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r16), FUNC(seta001_device::spriteylow_w16));     // Sprites Y
 	map(0xd00600, 0xd00607).ram().rw(m_seta001, FUNC(seta001_device::spritectrl_r16), FUNC(seta001_device::spritectrl_w16));
@@ -1776,14 +1815,14 @@ void seta_state::calibr50_map(address_map &map)
 	map(0xa00000, 0xa00001).portr("P1");                 // X1-004
 	map(0xa00002, 0xa00003).portr("P2");                 // X1-004
 	map(0xa00008, 0xa00009).portr("COINS");              // X1-004
-	map(0xa00010, 0xa00017).r(m_upd4701, FUNC(upd4701_device::read_xy)).umask16(0x00ff);
-	map(0xa00019, 0xa00019).r(m_upd4701, FUNC(upd4701_device::reset_xy_r));
+	map(0xa00010, 0xa00017).r("upd4701", FUNC(upd4701_device::read_xy)).umask16(0x00ff);
+	map(0xa00019, 0xa00019).r("upd4701", FUNC(upd4701_device::reset_xy_r));
 
 	map(0xd00000, 0xd005ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r16), FUNC(seta001_device::spriteylow_w16));     // Sprites Y
 	map(0xd00600, 0xd00607).ram().rw(m_seta001, FUNC(seta001_device::spritectrl_r16), FUNC(seta001_device::spritectrl_w16));
 	map(0xe00000, 0xe03fff).ram().rw(m_seta001, FUNC(seta001_device::spritecode_r16), FUNC(seta001_device::spritecode_w16));     // Sprites Code + X + Attr
-	map(0xb00001, 0xb00001).r("soundlatch2", FUNC(generic_latch_8_device::read)); // From Sub CPU
-	map(0xb00001, 0xb00001).w("soundlatch1", FUNC(generic_latch_8_device::write)); // To Sub CPU
+	map(0xb00001, 0xb00001).r(m_soundlatch[1], FUNC(generic_latch_8_device::read)); // From Sub CPU
+	map(0xb00001, 0xb00001).w(m_soundlatch[0], FUNC(generic_latch_8_device::write)); // To Sub CPU
 	map(0xc00000, 0xc00001).ram();                             // ? $4000
 
 	map(0xff0000, 0xffffff).ram();                             // RAM
@@ -1794,7 +1833,7 @@ void seta_state::calibr50_map(address_map &map)
                                 U.S. Classic
 ***************************************************************************/
 
-READ16_MEMBER(seta_state::usclssic_dsw_r)
+u16 usclssic_state::dsw_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -1806,23 +1845,23 @@ READ16_MEMBER(seta_state::usclssic_dsw_r)
 	return 0;
 }
 
-CUSTOM_INPUT_MEMBER(seta_state::usclssic_trackball_x_r)
+CUSTOM_INPUT_MEMBER(usclssic_state::trackball_x_r)
 {
-	return m_track_x[m_usclssic_port_select ? 1 : 0]->read();
+	return m_track_x[m_port_select ? 1 : 0]->read();
 }
 
-CUSTOM_INPUT_MEMBER(seta_state::usclssic_trackball_y_r)
+CUSTOM_INPUT_MEMBER(usclssic_state::trackball_y_r)
 {
-	return m_track_y[m_usclssic_port_select ? 1 : 0]->read();
+	return m_track_y[m_port_select ? 1 : 0]->read();
 }
 
 
-WRITE8_MEMBER(seta_state::usclssic_lockout_w)
+void usclssic_state::lockout_w(u8 data)
 {
 	int tiles_offset = BIT(data, 4) ? 0x4000: 0;
 
-	m_usclssic_port_select = BIT(data, 6);
-	m_buttonmux->select_w(m_usclssic_port_select);
+	m_port_select = BIT(data, 6);
+	m_buttonmux->select_w(m_port_select);
 
 	m_upd4701->resetx_w(BIT(data, 7));
 	m_upd4701->resety_w(BIT(data, 7));
@@ -1835,7 +1874,7 @@ WRITE8_MEMBER(seta_state::usclssic_lockout_w)
 }
 
 
-void seta_state::usclssic_map(address_map &map)
+void usclssic_state::usclssic_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();                                 // ROM
 	map(0xff0000, 0xffffff).ram();                                 // RAM
@@ -1845,15 +1884,15 @@ void seta_state::usclssic_map(address_map &map)
 	map(0xa00000, 0xa00005).ram().share("vctrl_0");         // VRAM Ctrl
 	map(0xb00000, 0xb003ff).ram().share("paletteram1");  // Palette
 	map(0xb40000, 0xb40007).r(m_upd4701, FUNC(upd4701_device::read_xy)).umask16(0x00ff);
-	map(0xb40001, 0xb40001).w(FUNC(seta_state::usclssic_lockout_w));  // Coin Lockout + Tiles Banking
-	map(0xb4000a, 0xb4000b).w(FUNC(seta_state::ipl1_ack_w));
+	map(0xb40001, 0xb40001).w(FUNC(usclssic_state::lockout_w));  // Coin Lockout + Tiles Banking
+	map(0xb4000a, 0xb4000b).w(FUNC(usclssic_state::ipl1_ack_w));
 	map(0xb40010, 0xb40011).portr("COINS");                  // Coins
-	map(0xb40011, 0xb40011).w("soundlatch1", FUNC(generic_latch_8_device::write)); // To Sub CPU
-	map(0xb40018, 0xb4001f).r(FUNC(seta_state::usclssic_dsw_r));                // 2 DSWs
+	map(0xb40011, 0xb40011).w(m_soundlatch[0], FUNC(generic_latch_8_device::write)); // To Sub CPU
+	map(0xb40018, 0xb4001f).r(FUNC(usclssic_state::dsw_r));                // 2 DSWs
 	map(0xb40018, 0xb40019).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
-	map(0xb80000, 0xb80001).r(FUNC(seta_state::ipl2_ack_r));
+	map(0xb80000, 0xb80001).r(FUNC(usclssic_state::ipl2_ack_r));
 	map(0xc00000, 0xc03fff).ram().rw(m_seta001, FUNC(seta001_device::spritecode_r16), FUNC(seta001_device::spritecode_w16));         // Sprites Code + X + Attr
-	map(0xd00000, 0xd03fff).ram().w(FUNC(seta_state::vram_w<0>)).share("vram_0"); // VRAM
+	map(0xd00000, 0xd03fff).ram().w(FUNC(usclssic_state::vram_w<0>)).share("vram_0"); // VRAM
 	map(0xd04000, 0xd04fff).ram();                                 //
 	map(0xe00000, 0xe00fff).ram();                                 // NVRAM? (odd bytes)
 }
@@ -1902,7 +1941,7 @@ void seta_state::blandia_map(address_map &map)
 	map(0x600000, 0x600003).r(FUNC(seta_state::seta_dsw_r));                // DSW
 	map(0x700000, 0x7003ff).ram();                             // (rezon,jjsquawk)
 	map(0x700400, 0x700fff).ram().share("paletteram1");  // Palette
-	map(0x703c00, 0x7047ff).ram().share("paletteram2"); // 2nd Palette for the palette offset effect
+	map(0x703c00, 0x7047ff).ram().share("paletteram2"); // 2nd Palette for the paletteoffseteffect
 	map(0x800000, 0x8005ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r16), FUNC(seta001_device::spriteylow_w16));     // Sprites Y
 	map(0x800600, 0x800607).ram().rw(m_seta001, FUNC(seta001_device::spritectrl_r16), FUNC(seta001_device::spritectrl_w16));
 	map(0x880000, 0x880001).ram();                             // ? 0xc000
@@ -1946,7 +1985,7 @@ void seta_state::blandiap_map(address_map &map)
 	map(0x600000, 0x600003).r(FUNC(seta_state::seta_dsw_r));                // DSW
 	map(0x700000, 0x7003ff).ram();                             // (rezon,jjsquawk)
 	map(0x700400, 0x700fff).ram().share("paletteram1");  // Palette
-	map(0x703c00, 0x7047ff).ram().share("paletteram2"); // 2nd Palette for the palette offset effect
+	map(0x703c00, 0x7047ff).ram().share("paletteram2"); // 2nd Palette for the paletteoffseteffect
 	map(0x800000, 0x803fff).ram().w(FUNC(seta_state::vram_w<0>)).share("vram_0"); // VRAM 0&1
 	map(0x804000, 0x80ffff).ram();                             // (jjsquawk)
 	map(0x880000, 0x883fff).ram().w(FUNC(seta_state::vram_w<1>)).share("vram_1"); // VRAM 2&3
@@ -1969,7 +2008,7 @@ void seta_state::blandiap_map(address_map &map)
                     and Zombie Raid (with slight variations)
 ***************************************************************************/
 
-double seta_state::zombraid_adc_cb(uint8_t input)
+double zombraid_state::adc_cb(u8 input)
 {
 	if (input == ADC083X_AGND)
 		return 0.0;
@@ -1979,13 +2018,13 @@ double seta_state::zombraid_adc_cb(uint8_t input)
 		return m_gun_inputs[input - ADC083X_CH0]->read() / 255.0;
 }
 
-READ16_MEMBER(seta_state::zombraid_gun_r)// Serial interface
+u16 zombraid_state::gun_r()// Serial interface
 {
 	return m_adc->do_read();
 }
 
 // Bit 0 is clock, 1 is data, 2 is reset
-WRITE16_MEMBER(seta_state::zombraid_gun_w)
+void zombraid_state::gun_w(u16 data)
 {
 	m_adc->cs_write(BIT(data, 2));
 	m_adc->di_write(BIT(data, 1));
@@ -1997,7 +2036,7 @@ WRITE16_MEMBER(seta_state::zombraid_gun_w)
 	m_gun_recoil[1] = BIT(data, 3);
 }
 
-READ16_MEMBER(seta_state::extra_r)
+u16 seta_state::extra_r()
 {
 	return m_extra_port.read_safe(0xff);
 }
@@ -2007,7 +2046,7 @@ void seta_state::wrofaero_map(address_map &map)
 	map(0x000000, 0x1fffff).rom();                             // ROM (up to 2MB)
 	map(0x200000, 0x20ffff).ram();                             // RAM
 	map(0x210000, 0x21ffff).ram();                             // RAM (gundhara)
-	map(0x300000, 0x30ffff).ram();                             // RAM (wrofaero only?)
+	map(0x300000, 0x30ffff).ram().share("nvram");              // actually 8K x8 SRAM in zombraid
 	map(0x400000, 0x400001).portr("P1");                 // P1
 	map(0x400002, 0x400003).portr("P2");                 // P2
 	map(0x400004, 0x400005).portr("COINS");              // Coins
@@ -2032,7 +2071,7 @@ void seta_state::wrofaero_map(address_map &map)
 	map(0xa80000, 0xa80001).ram();                             // ? 0x4000
 	map(0xb00000, 0xb03fff).ram().rw(m_seta001, FUNC(seta001_device::spritecode_r16), FUNC(seta001_device::spritecode_w16));     // Sprites Code + X + Attr
 	map(0xc00000, 0xc03fff).rw(m_x1, FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
-#if __uPD71054_TIMER
+#if USE_uPD71054_TIMER
 	map(0xd00000, 0xd00007).w(FUNC(seta_state::timer_regs_w));             // ?
 #else
 	map(0xd00000, 0xd00007).nopw();                        // ?
@@ -2041,57 +2080,53 @@ void seta_state::wrofaero_map(address_map &map)
 	map(0xf00000, 0xf00001).nopw();                        // ? Sound  IRQ Ack
 }
 
-void seta_state::zombraid_map(address_map &map)
+void zombraid_state::zombraid_map(address_map &map)
 {
 	wrofaero_map(map);
-	map(0x300000, 0x30ffff).ram().share("nvram");           // actually 8K x8 SRAM
-	map(0xf00000, 0xf00001).w(FUNC(seta_state::zombraid_gun_w));
-	map(0xf00002, 0xf00003).r(FUNC(seta_state::zombraid_gun_r));
+	map(0xf00000, 0xf00001).w(FUNC(zombraid_state::gun_w));
+	map(0xf00002, 0xf00003).r(FUNC(zombraid_state::gun_r));
 }
 
-void seta_state::zombraid_x1_map(address_map &map)
+void zombraid_state::zombraid_x1_map(address_map &map)
 {
 	map(0x00000, 0x7ffff).rom();
 	map(0x80000, 0xfffff).bankr("x1_bank");
 }
 
-READ16_MEMBER(seta_state::zingzipbl_unknown_r)
+u16 seta_state::zingzipbl_unknown_r()
 {
 	return 0x0000;
 }
 
 void seta_state::zingzipbl_map(address_map &map)
 {
-	map(0x000000, 0x1fffff).rom();                             // ROM (up to 2MB)
-	map(0x200000, 0x20ffff).ram().share("workram");     // RAM (pointer for zombraid crosshair hack)
-	map(0x210000, 0x21ffff).ram();                             // RAM (gundhara)
-	map(0x300000, 0x30ffff).ram();                             // RAM (wrofaero only?)
-//  AM_RANGE(0x400000, 0x400001) AM_READ_PORT("P1")                 // P1
-//  AM_RANGE(0x400002, 0x400003) AM_READ_PORT("P2")                 // P2
+	map(0x000000, 0x07ffff).rom();                             // ROM (up to 2MB)
+	map(0x200000, 0x20ffff).ram().share("workram");       // RAM (pointer for zombraid crosshair hack)
+//  map(0x400000, 0x400001).port_r("P1");                 // P1
+//  map(0x400002, 0x400003).port_r("P2");                 // P2
 	map(0x400002, 0x400003).r(FUNC(seta_state::zingzipbl_unknown_r));       // P2
-//  AM_RANGE(0x400004, 0x400005) AM_READ_PORT("COINS")              // Coins
+//  map(0x400004, 0x400005).port_r("COINS");              // Coins
 	map(0x500001, 0x500001).w(FUNC(seta_state::seta_coin_lockout_w));       // Coin Lockout
 	map(0x500003, 0x500003).w(FUNC(seta_state::seta_vregs_w));              // Video Registers
 	map(0x500004, 0x500005).nopw();
-	//AM_RANGE(0x600000, 0x600003) AM_READ(seta_dsw_r)              // DSW
-	map(0x700000, 0x7003ff).ram();                             // (rezon,jjsquawk)
+	//map(0x600000, 0x600003).r(FUNC(seta_state::seta_dsw_r));              // DSW
 	map(0x700400, 0x700fff).ram().share("paletteram1");  // Palette
-	map(0x701000, 0x70ffff).ram();                             //
 	map(0x800000, 0x803fff).ram().w(FUNC(seta_state::vram_w<0>)).share("vram_0"); // VRAM 0&1
-	map(0x804000, 0x80ffff).ram();                             // (jjsquawk)
 	map(0x880000, 0x883fff).ram().w(FUNC(seta_state::vram_w<1>)).share("vram_1"); // VRAM 2&3
-	map(0x884000, 0x88ffff).ram();                             // (jjsquawk)
 	map(0x900000, 0x900005).ram().share("vctrl_0");     // VRAM 0&1 Ctrl
 
+	//map(0x902006, 0x902007).w // writes 0 here on start up
 	map(0x902010, 0x902013).r(FUNC(seta_state::zingzipbl_unknown_r));
 
 	map(0x980000, 0x980005).ram().share("vctrl_1");     // VRAM 2&3 Ctrl
 	map(0xa00000, 0xa005ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r16), FUNC(seta001_device::spriteylow_w16));     // Sprites Y
 	map(0xa00600, 0xa00607).ram().rw(m_seta001, FUNC(seta001_device::spritectrl_r16), FUNC(seta001_device::spritectrl_w16));
+	map(0xa00608, 0xa00fff).ram(); // zeroed on start up
+	map(0xa00600, 0xa00607).ram().rw(m_seta001, FUNC(seta001_device::spritectrl_r16), FUNC(seta001_device::spritectrl_w16));
 	map(0xa80000, 0xa80001).ram();                             // ? 0x4000
 	map(0xb00000, 0xb03fff).ram().rw(m_seta001, FUNC(seta001_device::spritecode_r16), FUNC(seta001_device::spritecode_w16));     // Sprites Code + X + Attr
-	map(0xc00000, 0xc03fff).ram(); // soundram on original
-#if __uPD71054_TIMER
+	map(0xc00000, 0xc000ff).ram(); // zeroed on startup
+#if USE_uPD71054_TIMER
 	map(0xd00000, 0xd00007).w(FUNC(seta_state::timer_regs_w));             // ?
 #else
 	map(0xd00000, 0xd00007).nopw();                        // ?
@@ -2123,10 +2158,10 @@ void seta_state::jjsquawb_map(address_map &map)
 	map(0x909000, 0x909005).ram().share("vctrl_1");     // VRAM 2&3 Ctrl
 	map(0xa0a000, 0xa0a5ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r16), FUNC(seta001_device::spriteylow_w16));     // RZ: Sprites Y
 	map(0xa0a600, 0xa0a607).ram().rw(m_seta001, FUNC(seta001_device::spritectrl_r16), FUNC(seta001_device::spritectrl_w16));
-//  AM_RANGE(0xa80000, 0xa80001) AM_RAM                              // ? 0x4000
+//  map(0xa80000, 0xa80001).ram()                              // ? 0x4000
 	map(0xb0c000, 0xb0ffff).ram().rw(m_seta001, FUNC(seta001_device::spritecode_r16), FUNC(seta001_device::spritecode_w16));     // RZ: Sprites Code + X + Attr
 	map(0xc00000, 0xc03fff).rw(m_x1, FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
-#if __uPD71054_TIMER
+#if USE_uPD71054_TIMER
 	map(0xd00000, 0xd00007).w(FUNC(seta_state::timer_regs_w));             // ?
 #else
 	map(0xd00000, 0xd00007).nopw();                        // ?
@@ -2150,7 +2185,7 @@ void seta_state::orbs_map(address_map &map)
 	map(0x500000, 0x500001).portr("P1");                 // P1
 	map(0x500002, 0x500003).portr("P2");                 // P2
 	map(0x500004, 0x500005).portr("COINS");              // Coins
-	//AM_RANGE(0x600000, 0x60000f) AM_READ(krzybowl_input_r     )   // P1
+	//map(0x600000, 0x60000f).r(FUNC(seta_state::krzybowl_input_r);   // P1
 	map(0x8000f0, 0x8000f1).ram();                             // NVRAM
 	map(0x800100, 0x8001ff).ram();                             // NVRAM
 	map(0xa00000, 0xa03fff).rw(m_x1, FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
@@ -2165,7 +2200,7 @@ void seta_state::orbs_map(address_map &map)
                   Kero Kero Keroppi no Issyoni Asobou
 ***************************************************************************/
 
-static const uint16_t keroppi_protection_word[] = {
+static const u16 keroppi_protection_word[] = {
 	0x0000,
 	0x0000, 0x0000, 0x0000,
 	0x2000, 0x2000, 0x2000,
@@ -2175,32 +2210,36 @@ static const uint16_t keroppi_protection_word[] = {
 };
 
 
-READ16_MEMBER(seta_state::keroppi_protection_r)
+u16 seta_state::keroppi_protection_r()
 {
-	uint16_t result = keroppi_protection_word[m_keroppi_protection_count];
+	const u16 result = keroppi_protection_word[m_keroppi_protection_count];
 
-	m_keroppi_protection_count++;
-	if (m_keroppi_protection_count > 15)
-		m_keroppi_protection_count = 15;
-
+	if (!machine().side_effects_disabled())
+	{
+		m_keroppi_protection_count++;
+		if (m_keroppi_protection_count > 15)
+			m_keroppi_protection_count = 15;
+	}
 	return result;
 }
 
-READ16_MEMBER(seta_state::keroppi_protection_init_r)
+u16 seta_state::keroppi_protection_init_r()
 {
-	m_keroppi_protection_count = 0;
+	if (!machine().side_effects_disabled())
+		m_keroppi_protection_count = 0;
 
 	return 0x00;
 }
 
-READ16_MEMBER(seta_state::keroppi_coin_r)
+u16 seta_state::keroppi_coin_r()
 {
-	uint16_t result = m_coins->read();
+	u16 result = m_coins->read();
 
 	if (m_keroppi_prize_hop == 2)
 	{
 		result &= ~0x0002;      /* prize hopper */
-		m_keroppi_prize_hop = 0;
+		if (!machine().side_effects_disabled())
+			m_keroppi_prize_hop = 0;
 	}
 
 	return result;
@@ -2211,7 +2250,7 @@ TIMER_CALLBACK_MEMBER(seta_state::keroppi_prize_hop_callback)
 	m_keroppi_prize_hop = 2;
 }
 
-WRITE16_MEMBER(seta_state::keroppi_prize_w)
+void seta_state::keroppi_prize_w(u16 data)
 {
 	if ((data & 0x0010) && !m_keroppi_prize_hop)
 	{
@@ -2427,7 +2466,7 @@ INPUT_CHANGED_MEMBER( setaroul_state::coin_drop_start )
 
 CUSTOM_INPUT_MEMBER( setaroul_state::coin_sensors_r )
 {
-	uint8_t data = 0x03;
+	u8 data = 0x03;
 
 	// simulates the passage of coins through multiple sensors
 	if (m_coin_start_cycles)
@@ -2452,28 +2491,28 @@ CUSTOM_INPUT_MEMBER( setaroul_state::coin_sensors_r )
 
 WRITE16_MEMBER(setaroul_state::spritecode_w)
 {
-	if ((offset&1)==1) m_seta001->spritecodelow_w8(space, offset>>1, (data & 0xff00) >> 8);
-	if ((offset&1)==0) m_seta001->spritecodehigh_w8(space, offset>>1, (data & 0xff00) >> 8);
+	if ((offset & 1) == 1) m_seta001->spritecodelow_w8(space, offset >> 1, (data & 0xff00) >> 8);
+	if ((offset & 1) == 0) m_seta001->spritecodehigh_w8(space, offset >> 1, (data & 0xff00) >> 8);
 }
 
 READ16_MEMBER(setaroul_state::spritecode_r)
 {
-	uint16_t ret;
-	if ((offset&1)==1)
-		ret = m_seta001->spritecodelow_r8(space, offset>>1);
+	u16 ret;
+	if ((offset & 1) == 1)
+		ret = m_seta001->spritecodelow_r8(space, offset >> 1);
 	else
-		ret = m_seta001->spritecodehigh_r8(space, offset>>1);
+		ret = m_seta001->spritecodehigh_r8(space, offset >> 1);
 	return ret << 8;
 }
 
 WRITE16_MEMBER(setaroul_state::spriteylow_w)
 {
-	if ((offset&1)==0) m_seta001->spriteylow_w8(space, offset>>1, (data & 0xff00) >> 8);
+	if ((offset & 1) == 0) m_seta001->spriteylow_w8(space, offset >> 1, (data & 0xff00) >> 8);
 }
 
 WRITE16_MEMBER(setaroul_state::spritectrl_w)
 {
-	if ((offset&1)==0) m_seta001->spritectrl_w8(space, offset>>1, (data & 0xff00) >> 8);
+	if ((offset & 1) == 0) m_seta001->spritectrl_w8(space, offset >> 1, (data & 0xff00) >> 8);
 }
 
 // RTC (To do: write a D4911C device)
@@ -2481,9 +2520,9 @@ READ16_MEMBER(setaroul_state::rtc_r)
 {
 	if (offset >= 7)
 		++offset;
-	if (offset/2 >= 7)
+	if (offset / 2 >= 7)
 		return 0;
-	return (m_rtc->read(space, offset/2, mem_mask) >> ((offset & 1) * 4)) & 0xf;
+	return (m_rtc->read(space, offset / 2, mem_mask) >> ((offset & 1) * 4)) & 0xf;
 }
 
 WRITE16_MEMBER(setaroul_state::rtc_w)
@@ -2491,13 +2530,13 @@ WRITE16_MEMBER(setaroul_state::rtc_w)
 }
 
 // Inputs
-READ16_MEMBER(setaroul_state::inputs_r)
+u16 setaroul_state::inputs_r()
 {
 	if (m_mux < 0x1a)
 		return m_bet[m_mux]->read();
 	return 0xff;
 }
-WRITE16_MEMBER(setaroul_state::mux_w)
+void setaroul_state::mux_w(u16 data)
 {
 	m_mux = data;
 }
@@ -2510,7 +2549,7 @@ void setaroul_state::show_outputs()
 #endif
 }
 
-WRITE8_MEMBER(setaroul_state::pay_w)
+void setaroul_state::pay_w(u8 data)
 {
 	m_pay = data;
 
@@ -2527,7 +2566,7 @@ WRITE8_MEMBER(setaroul_state::pay_w)
 	show_outputs();
 }
 
-WRITE8_MEMBER(setaroul_state::led_w)
+void setaroul_state::led_w(u8 data)
 {
 	m_led = data;
 
@@ -2578,7 +2617,7 @@ void setaroul_state::setaroul_map(address_map &map)
 	map(0xf40000, 0xf40bff).w(FUNC(setaroul_state::spriteylow_w));
 	map(0xf40c00, 0xf40c11).w(FUNC(setaroul_state::spritectrl_w));
 
-//  AM_RANGE(0xf80000, 0xf80001) AM_WRITE // $40 at boot
+//  map(0xf80000, 0xf80001).w(FUNC(setaroul_state::xxx)); // $40 at boot
 }
 
 /***************************************************************************
@@ -2681,9 +2720,9 @@ void seta_state::madshark_map(address_map &map)
 }
 
 
-WRITE16_MEMBER(seta_state::magspeed_lights_w)
+void seta_state::magspeed_lights_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	COMBINE_DATA( &m_magspeed_lights[offset] );
+	COMBINE_DATA(&m_magspeed_lights[offset]);
 
 	for (int i = 0; i < 16; i++)
 		m_leds[offset * 16 + i] = BIT(m_magspeed_lights[offset], i);
@@ -2788,6 +2827,32 @@ void seta_state::msgundam_map(address_map &map)
 	map(0xd00000, 0xd00007).rw("pit", FUNC(pit8254_device::read), FUNC(pit8254_device::write)).umask16(0x00ff);
 }
 
+void seta_state::msgundamb_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();                             // ROM
+	map(0x100000, 0x1fffff).rom();                             // ROM
+	map(0x200000, 0x20ffff).ram();          // RAM
+	map(0x400000, 0x400001).portr("P1");                 // P1
+	map(0x400002, 0x400003).portr("P2");                 // P2
+	map(0x400004, 0x400005).portr("COINS");              // Coins
+	map(0x400000, 0x400001).w(FUNC(seta_state::ipl1_ack_w));               // Lev 2 IRQ Ack
+	map(0x400004, 0x400005).w(FUNC(seta_state::ipl2_ack_w));               // Lev 4 IRQ Ack
+	map(0x500001, 0x500001).w(FUNC(seta_state::seta_coin_counter_w));
+	map(0x500003, 0x500003).w(FUNC(seta_state::seta_vregs_w));              // Video Registers
+	map(0x500004, 0x500005).nopw();
+	map(0x600000, 0x600003).r(FUNC(seta_state::seta_dsw_r));                // DSW
+	map(0x700400, 0x700fff).ram().share("paletteram1");  // Palette
+	map(0x800000, 0x803fff).ram().w(FUNC(seta_state::vram_w<0>)).share("vram_0"); // VRAM 0&1
+	map(0x880000, 0x883fff).ram().w(FUNC(seta_state::vram_w<1>)).share("vram_1"); // VRAM 2&3
+	map(0x900000, 0x900005).ram().share("vctrl_0");     // VRAM 0&1 Ctrl
+	map(0x980000, 0x980005).ram().share("vctrl_1");     // VRAM 2&3 Ctrl
+	map(0xa00000, 0xa005ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r16), FUNC(seta001_device::spriteylow_w16));     // Sprites Y
+	map(0xa00600, 0xa00607).ram().rw(m_seta001, FUNC(seta001_device::spritectrl_r16), FUNC(seta001_device::spritectrl_w16));
+	map(0xa80000, 0xa80001).ram();                             // ? 0x4000
+	map(0xb00000, 0xb03fff).ram().rw(m_seta001, FUNC(seta001_device::spritecode_r16), FUNC(seta001_device::spritecode_w16));     // Sprites Code + X + Attr
+	map(0xc00000, 0xc03fff).rw(m_x1, FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
+	map(0xd00000, 0xd00007).rw("pit", FUNC(pit8254_device::read), FUNC(pit8254_device::write)).umask16(0x00ff);
+}
 
 /***************************************************************************
                                 Oishii Puzzle
@@ -2857,34 +2922,34 @@ void seta_state::triplfun_map(address_map &map)
                             Pro Mahjong Kiwame
 ***************************************************************************/
 
-WRITE16_MEMBER(seta_state::kiwame_row_select_w)
+void kiwame_state::row_select_w(u16 data)
 {
 	m_kiwame_row_select = data & 0x001f;
 }
 
-READ16_MEMBER(seta_state::kiwame_input_r)
+u16 kiwame_state::input_r(offs_t offset)
 {
-	int row_select = m_kiwame_row_select;
+	const int row_select = m_kiwame_row_select;
 	int i;
 
-	for(i = 0; i < 5; i++)
+	for (i = 0; i < 5; i++)
 		if (row_select & (1<<i))    break;
 
-	switch( offset )
+	switch (offset)
 	{
 		case 0x00/2:    return m_key[i]->read();
-		case 0x02/2:    return 0xffff;
+		case 0x02/2:    return m_key[i + 5]->read();
 		case 0x04/2:    return m_coins->read();
 //      case 0x06/2:
 		case 0x08/2:    return 0xffff;
 
 		default:
-			logerror("PC %06X - Read input %02X !\n", m_maincpu->pc(), offset*2);
+			logerror("PC %06X - Read input %02X !\n", m_maincpu->pc(), offset * 2);
 			return 0x0000;
 	}
 }
 
-void seta_state::kiwame_map(address_map &map)
+void kiwame_state::kiwame_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();                             // ROM
 	map(0x200000, 0x20ffff).ram().share("nvram");                            // RAM
@@ -2894,9 +2959,8 @@ void seta_state::kiwame_map(address_map &map)
 	map(0xa00600, 0xa00607).ram().rw(m_seta001, FUNC(seta001_device::spritectrl_r16), FUNC(seta001_device::spritectrl_w16));
 	map(0xb00000, 0xb003ff).ram().share("paletteram1");  // Palette
 	map(0xc00000, 0xc03fff).rw(m_x1, FUNC(x1_010_device::word_r), FUNC(x1_010_device::word_w));   // Sound
-	map(0xd00000, 0xd00009).r(FUNC(seta_state::kiwame_input_r));            // mahjong panel
-	map(0xe00000, 0xe00003).r(FUNC(seta_state::seta_dsw_r));                // DSW
-	map(0xfffc00, 0xffffff).rw("tmp68301", FUNC(tmp68301_device::regs_r), FUNC(tmp68301_device::regs_w));
+	map(0xd00000, 0xd00009).r(FUNC(kiwame_state::input_r));                 // mahjong panel
+	map(0xe00000, 0xe00003).r(FUNC(kiwame_state::seta_dsw_r));              // DSW
 }
 
 
@@ -2904,14 +2968,14 @@ void seta_state::kiwame_map(address_map &map)
                         Thunder & Lightning / Wit's
 ***************************************************************************/
 
-READ16_MEMBER(seta_state::thunderl_protection_r)
+u16 seta_state::thunderl_protection_r()
 {
 //  logerror("PC %06X - Protection Read\n", m_maincpu->pc());
 	return 0x00dd;
 }
-WRITE16_MEMBER(seta_state::thunderl_protection_w)
+void seta_state::thunderl_protection_w(u16 data)
 {
-//  logerror("PC %06X - Protection Written: %04X <- %04X\n", m_maincpu->pc(), offset*2, data);
+//  logerror("PC %06X - Protection Written: %04X <- %04X\n", m_maincpu->pc(), offset * 2, data);
 }
 
 /* Similar to downtown etc. */
@@ -2955,9 +3019,9 @@ void seta_state::thunderlbl_map(address_map &map)
 	map(0xb00000, 0xb00001).portr("P1");                 // P1
 	map(0xb00002, 0xb00003).portr("P2");                 // P2
 	map(0xb00004, 0xb00005).portr("COINS");              // Coins
-//  map(0xb0000c, 0xb0000d).r(FUNC(seta_state::thunderl_protection_r));   // Protection (not in wits)
+	map(0xb0000c, 0xb0000d).w(m_seta001, FUNC(seta001_device::spritectrl_w8)).umask16(0xff00); // the bootleg is modified to write the first byte of spritectrl here, rather than the usual address
 	map(0xb00008, 0xb00009).portr("P3"); // P3 (wits)
-	map(0xb00008, 0xb00008).w("soundlatch1", FUNC(generic_latch_8_device::write));
+	map(0xb00008, 0xb00008).w(m_soundlatch[0], FUNC(generic_latch_8_device::write));
 	map(0xb0000a, 0xb0000b).portr("P4");                 // P4 (wits)
 	map(0xc00000, 0xc00001).ram();                             // ? 0x4000
 	map(0xd00000, 0xd005ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r16), FUNC(seta001_device::spriteylow_w16));     // Sprites Y
@@ -2986,7 +3050,7 @@ void seta_state::wiggie_map(address_map &map)
 	map(0xb00004, 0xb00005).portr("COINS");              // Coins
 	map(0xb0000c, 0xb0000d).r(FUNC(seta_state::thunderl_protection_r));     // Protection (not in wits)
 	map(0xb00008, 0xb00009).portr("P3");                 // P3 (wits)
-	map(0xb00008, 0xb00008).w("soundlatch1", FUNC(generic_latch_8_device::write));
+	map(0xb00008, 0xb00008).w(m_soundlatch[0], FUNC(generic_latch_8_device::write));
 	map(0xb0000a, 0xb0000b).portr("P4");                 // P4 (wits)
 	map(0xc00000, 0xc00001).ram();                             // ? 0x4000
 	map(0xd00000, 0xd005ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r16), FUNC(seta001_device::spriteylow_w16));     // Sprites Y
@@ -3000,7 +3064,7 @@ void seta_state::wiggie_sound_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
 	map(0x9800, 0x9800).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0xa000, 0xa000).r("soundlatch1", FUNC(generic_latch_8_device::read));
+	map(0xa000, 0xa000).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));
 }
 
 
@@ -3033,14 +3097,6 @@ void seta_state::umanclub_map(address_map &map)
                             Ultra Toukond Densetsu
 ***************************************************************************/
 
-WRITE8_MEMBER(seta_state::utoukond_sound_control_w)
-{
-	if (!BIT(data, 6))
-		m_soundlatch[0]->acknowledge_w(space, 0, 0);
-
-	// other bits used for banking? (low nibble seems to always be 2)
-}
-
 void seta_state::utoukond_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();                             // ROM
@@ -3059,7 +3115,7 @@ void seta_state::utoukond_map(address_map &map)
 	map(0xa00000, 0xa005ff).ram().rw(m_seta001, FUNC(seta001_device::spriteylow_r16), FUNC(seta001_device::spriteylow_w16));     // Sprites Y
 	map(0xa00600, 0xa00607).ram().rw(m_seta001, FUNC(seta001_device::spritectrl_r16), FUNC(seta001_device::spritectrl_w16));
 	map(0xb00000, 0xb03fff).ram().rw(m_seta001, FUNC(seta001_device::spritecode_r16), FUNC(seta001_device::spritecode_w16));     // Sprites Code + X + Attr
-	map(0xc00001, 0xc00001).w("soundlatch1", FUNC(generic_latch_8_device::write));
+	map(0xc00001, 0xc00001).w(m_soundlatch[0], FUNC(generic_latch_8_device::write));
 	map(0xe00000, 0xe00001).nopw();                        // ? ack
 }
 
@@ -3067,17 +3123,16 @@ void seta_state::utoukond_map(address_map &map)
                                 Pairs Love
 ***************************************************************************/
 
-READ16_MEMBER(seta_state::pairlove_prot_r)
+u16 seta_state::pairlove_prot_r(offs_t offset)
 {
-	int retdata;
-
-	retdata = m_pairslove_protram[offset];
+	const u16 retdata = m_pairslove_protram[offset];
 	//osd_printf_debug("pairs love protection? read %06x %04x %04x\n",m_maincpu->pc(), offset,retdata);
-	m_pairslove_protram[offset] = m_pairslove_protram_old[offset];
+	if (!machine().side_effects_disabled())
+		m_pairslove_protram[offset] = m_pairslove_protram_old[offset];
 	return retdata;
 }
 
-WRITE16_MEMBER(seta_state::pairlove_prot_w)
+void seta_state::pairlove_prot_w(offs_t offset, u16 data)
 {
 	//osd_printf_debug("pairs love protection? write %06x %04x %04x\n",m_maincpu->pc(), offset,data);
 	m_pairslove_protram_old[offset] = m_pairslove_protram[offset];
@@ -3143,9 +3198,9 @@ READ16_MEMBER(jockeyc_state::rtc_r)
 {
 	if (offset >= 7)
 		++offset;
-	if (offset/2 >= 7)
+	if (offset / 2 >= 7)
 		return 0;
-	return (m_rtc->read(space, offset/2, mem_mask) >> ((offset & 1) * 4)) & 0xf;
+	return (m_rtc->read(space, offset / 2, mem_mask) >> ((offset & 1) * 4)) & 0xf;
 }
 
 WRITE16_MEMBER(jockeyc_state::rtc_w)
@@ -3160,9 +3215,9 @@ void jockeyc_state::show_outputs()
 #endif
 }
 
-READ16_MEMBER(jockeyc_state::mux_r)
+u16 jockeyc_state::mux_r()
 {
-	switch ( m_mux & 0xf8 )
+	switch (m_mux & 0xf8)
 	{
 		case 0x08:  return (m_key2[0]->read() << 8) | m_key1[0]->read();
 		case 0x10:  return (m_key2[1]->read() << 8) | m_key1[1]->read();
@@ -3174,9 +3229,9 @@ READ16_MEMBER(jockeyc_state::mux_r)
 	return 0xffff;
 }
 
-WRITE16_MEMBER(jockeyc_state::jockeyc_mux_w)
+void jockeyc_state::jockeyc_mux_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	COMBINE_DATA( &m_mux );
+	COMBINE_DATA(&m_mux);
 
 	// 0x8000 lamp 5  (p1 cancel)
 	// 0x4000 lamp 4  (p2 payout)
@@ -3199,9 +3254,9 @@ WRITE16_MEMBER(jockeyc_state::jockeyc_mux_w)
 	show_outputs();
 }
 
-WRITE16_MEMBER(jockeyc_state::jockeyc_out_w)
+void jockeyc_state::jockeyc_out_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	COMBINE_DATA( &m_out );
+	COMBINE_DATA(&m_out);
 
 	// 0x8000 lamp 8  (p2 start)
 	// 0x4000 lamp 7  (p1 start)
@@ -3240,25 +3295,25 @@ void jockeyc_state::update_hoppers()
 	if (m_cabinet->read() & 1)
 	{
 		// double hoppers
-		m_hopper1->motor_w( (m_mux & 0x0201) && !(m_out & 0x0004) );
-		m_hopper2->motor_w( (m_mux & 0x0102) && !(m_out & 0x0008) );
+		m_hopper1->motor_w((m_mux & 0x0201) && !(m_out & 0x0004));
+		m_hopper2->motor_w((m_mux & 0x0102) && !(m_out & 0x0008));
 	}
 	else
 	{
 		// single hopper (jockeyc: in test mode, use key 5/6 to select pay1/pay2)
-		m_hopper1->motor_w( (m_mux & 0x0201) && (!(m_out & 0x0004) || !(m_out & 0x0008)) );
+		m_hopper1->motor_w((m_mux & 0x0201) && (!(m_out & 0x0004) || !(m_out & 0x0008)));
 	}
 }
 
-READ16_MEMBER(jockeyc_state::dsw_r)
+u16 jockeyc_state::dsw_r(offs_t offset)
 {
-	int shift = offset * 4;
+	const int shift = offset * 4;
 	return  ((((m_dsw1->read()   >> shift)     & 0xf)) << 0) |
 			((((m_dsw2_3->read() >> shift)     & 0xf)) << 4) |
 			((((m_dsw2_3->read() >> (shift+8)) & 0xf)) << 8) ;
 }
 
-READ16_MEMBER(jockeyc_state::comm_r)
+u16 jockeyc_state::comm_r()
 {
 	return 0xffff;//machine().rand();
 }
@@ -3272,7 +3327,7 @@ READ16_MEMBER(jockeyc_state::comm_r)
 */
 #define JOCKEYC_HIDDEN_EDITOR 0
 
-READ16_MEMBER(jockeyc_state::trackball_r)
+u16 jockeyc_state::trackball_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -3333,9 +3388,9 @@ void jockeyc_state::jockeyc_map(address_map &map)
 
 // Same as Jockey Club but with additional protection
 
-WRITE16_MEMBER(jockeyc_state::inttoote_mux_w)
+void jockeyc_state::inttoote_mux_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	COMBINE_DATA( &m_mux );
+	COMBINE_DATA(&m_mux);
 
 	// 0x8000 lamp?
 	// 0x1000 lamp (help button)
@@ -3348,9 +3403,9 @@ WRITE16_MEMBER(jockeyc_state::inttoote_mux_w)
 	show_outputs();
 }
 
-WRITE16_MEMBER(jockeyc_state::inttoote_out_w)
+void jockeyc_state::inttoote_out_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	COMBINE_DATA( &m_out );
+	COMBINE_DATA(&m_out);
 
 	// 0x2000 meter (key in)
 	// 0x1000 meter (coin out)
@@ -3367,7 +3422,7 @@ WRITE16_MEMBER(jockeyc_state::inttoote_out_w)
 	show_outputs();
 }
 
-READ16_MEMBER(jockeyc_state::inttoote_700000_r)
+u16 jockeyc_state::inttoote_700000_r(offs_t offset)
 {
 	return m_inttoote_700000[offset] & 0x3f;
 }
@@ -3433,14 +3488,14 @@ void seta_state::sub_bankswitch_lockout_w(u8 data)
                                 Thundercade
 ***************************************************************************/
 
-READ8_MEMBER(seta_state::ff_r){return 0xff;}
+u8 seta_state::ff_r(){return 0xff;}
 
 void seta_state::tndrcade_sub_map(address_map &map)
 {
 	map(0x0000, 0x01ff).ram();                             // RAM
 	map(0x0800, 0x0800).r(FUNC(seta_state::ff_r));                      // ? (bits 0/1/2/3: 1 -> do test 0-ff/100-1e0/5001-57ff/banked rom)
-	//AM_RANGE(0x0800, 0x0800) AM_DEVREAD("soundlatch1", generic_latch_8_device, read)             //
-	//AM_RANGE(0x0801, 0x0801) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)            //
+	//map(0x0800, 0x0800).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));             //
+	//map(0x0801, 0x0801).r(m_soundlatch[1], FUNC(generic_latch_8_device::read));            //
 	map(0x1000, 0x1000).portr("P1");                 // P1
 	map(0x1000, 0x1000).w(FUNC(seta_state::sub_bankswitch_lockout_w)); // ROM Bank + Coin Lockout
 	map(0x1001, 0x1001).portr("P2");                 // P2
@@ -3461,8 +3516,8 @@ void seta_state::tndrcade_sub_map(address_map &map)
 void seta_state::twineagl_sub_map(address_map &map)
 {
 	map(0x0000, 0x01ff).ram();                         // RAM
-	map(0x0800, 0x0800).r("soundlatch1", FUNC(generic_latch_8_device::read));         //
-	map(0x0801, 0x0801).r("soundlatch2", FUNC(generic_latch_8_device::read));            //
+	map(0x0800, 0x0800).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));         //
+	map(0x0801, 0x0801).r(m_soundlatch[1], FUNC(generic_latch_8_device::read));            //
 	map(0x1000, 0x1000).portr("P1");             // P1
 	map(0x1000, 0x1000).w(FUNC(seta_state::sub_bankswitch_lockout_w)); // ROM Bank + Coin Lockout
 	map(0x1001, 0x1001).portr("P2");             // P2
@@ -3478,7 +3533,7 @@ void seta_state::twineagl_sub_map(address_map &map)
                                 DownTown
 ***************************************************************************/
 
-READ8_MEMBER(seta_state::downtown_ip_r)
+u8 seta_state::downtown_ip_r(offs_t offset)
 {
 	int dir1 = m_rot[0]->read();  // analog port
 	int dir2 = m_rot[1]->read();  // analog port
@@ -3504,8 +3559,8 @@ READ8_MEMBER(seta_state::downtown_ip_r)
 void seta_state::downtown_sub_map(address_map &map)
 {
 	map(0x0000, 0x01ff).ram();                         // RAM
-	map(0x0800, 0x0800).r("soundlatch1", FUNC(generic_latch_8_device::read));         //
-	map(0x0801, 0x0801).r("soundlatch2", FUNC(generic_latch_8_device::read));            //
+	map(0x0800, 0x0800).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));         //
+	map(0x0801, 0x0801).r(m_soundlatch[1], FUNC(generic_latch_8_device::read));            //
 	map(0x1000, 0x1007).r(FUNC(seta_state::downtown_ip_r));         // Input Ports
 	map(0x1000, 0x1000).w(FUNC(seta_state::sub_bankswitch_lockout_w)); // ROM Bank + Coin Lockout
 	map(0x5000, 0x57ff).ram().share("sharedram");       // Shared RAM
@@ -3521,18 +3576,17 @@ void seta_state::downtown_sub_map(address_map &map)
 
 MACHINE_RESET_MEMBER(seta_state,calibr50)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	calibr50_sub_bankswitch_w(space, 0, 0);
+	calibr50_sub_bankswitch_w(0);
 }
 
-WRITE8_MEMBER(seta_state::calibr50_sub_bankswitch_w)
+void seta_state::calibr50_sub_bankswitch_w(u8 data)
 {
 	// Bits 7-4: BK3-BK0
 	sub_bankswitch_w(data);
 
 	// Bit 3: NMICLR
 	if (!BIT(data, 3))
-		m_soundlatch[0]->acknowledge_w(space, 0, 0);
+		m_soundlatch[0]->acknowledge_w();
 
 	// Bit 2: IRQCLR
 	if (!BIT(data, 2))
@@ -3542,18 +3596,18 @@ WRITE8_MEMBER(seta_state::calibr50_sub_bankswitch_w)
 	m_x1->set_output_gain(ALL_OUTPUTS, BIT(data, 0) ? 0.0f : 1.0f);
 }
 
-WRITE8_MEMBER(seta_state::calibr50_soundlatch2_w)
+void seta_state::calibr50_soundlatch2_w(u8 data)
 {
-	m_soundlatch[1]->write(space,0,data);
+	m_soundlatch[1]->write(data);
 	m_subcpu->spin_until_time(attotime::from_usec(50));  // Allow the other cpu to reply
 }
 
 void seta_state::calibr50_sub_map(address_map &map)
 {
-	map(0x0000, 0x1fff).lrw8("x1_soundram_rw",
-								 [this](offs_t offset) { return m_x1->read(offset ^ 0x1000); },
-								 [this](offs_t offset, u8 data) { m_x1->write(offset ^ 0x1000, data); }); // Sound
-	map(0x4000, 0x4000).r("soundlatch1", FUNC(generic_latch_8_device::read));             // From Main CPU
+	map(0x0000, 0x1fff).lrw8(
+								 NAME([this](offs_t offset) { return m_x1->read(offset ^ 0x1000); }),
+								 NAME([this](offs_t offset, u8 data) { m_x1->write(offset ^ 0x1000, data); })); // Sound
+	map(0x4000, 0x4000).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));             // From Main CPU
 	map(0x4000, 0x4000).w(FUNC(seta_state::calibr50_sub_bankswitch_w));        // Bankswitching
 	map(0x8000, 0xbfff).bankr("subbank");                        // Banked ROM
 	map(0xc000, 0xffff).rom();                             // ROM
@@ -3568,12 +3622,12 @@ void seta_state::calibr50_sub_map(address_map &map)
 void seta_state::metafox_sub_map(address_map &map)
 {
 	map(0x0000, 0x01ff).ram();                         // RAM
-	map(0x0800, 0x0800).r("soundlatch1", FUNC(generic_latch_8_device::read));         //
-	map(0x0801, 0x0801).r("soundlatch2", FUNC(generic_latch_8_device::read));            //
+	map(0x0800, 0x0800).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));         //
+	map(0x0801, 0x0801).r(m_soundlatch[1], FUNC(generic_latch_8_device::read));            //
 	map(0x1000, 0x1000).portr("COINS");          // Coins
 	map(0x1000, 0x1000).w(FUNC(seta_state::sub_bankswitch_lockout_w)); // ROM Bank + Coin Lockout
 	map(0x1002, 0x1002).portr("P1");             // P1
-	//AM_RANGE(0x1004, 0x1004) AM_READNOP                     // ?
+	//map(0x1004, 0x1004).nopr();                // ?
 	map(0x1006, 0x1006).portr("P2");             // P2
 	map(0x5000, 0x57ff).ram().share("sharedram");       // Shared RAM
 	map(0x7000, 0x7fff).rom();                         // ROM
@@ -3585,6 +3639,14 @@ void seta_state::metafox_sub_map(address_map &map)
 /***************************************************************************
                             Ultra Toukon Densetsu
 ***************************************************************************/
+
+void seta_state::utoukond_sound_control_w(u8 data)
+{
+	if (!BIT(data, 6))
+		m_soundlatch[0]->acknowledge_w();
+
+	// other bits used for banking? (low nibble seems to always be 2)
+}
 
 void seta_state::utoukond_sound_map(address_map &map)
 {
@@ -3598,7 +3660,7 @@ void seta_state::utoukond_sound_io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x03).rw("ymsnd", FUNC(ym3438_device::read), FUNC(ym3438_device::write));
 	map(0x80, 0x80).w(FUNC(seta_state::utoukond_sound_control_w));
-	map(0xc0, 0xc0).r("soundlatch1", FUNC(generic_latch_8_device::read));
+	map(0xc0, 0xc0).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));
 }
 
 
@@ -3756,26 +3818,57 @@ INPUT_PORTS_END
 /***************************************************************************
                                 Athena no Hatena?
 ***************************************************************************/
+/*
+        Athena no Hatena is a quiz game that uses only four buttons for inputs.
+        However, the hidden "Test Program" menu makes use of the standard
+        stick/3-button input layout. With the default input mapping, the menus
+        are unusable as the three SHOT buttons are unmapped. So we have two
+        input configurations to allow the debug menu to be usable.
+
+        More information about the Test Program menu:
+        http://sudden-desu.net/entry/athena-no-hatena-debug-menu-and-functions
+*/
 
 static INPUT_PORTS_START( atehate )
+	PORT_START("INPUT_TYPE")
+	PORT_CONFNAME(0x01,0x00,"Input Type")
+	PORT_CONFSETTING(0x00, "Default Control Panel")
+	PORT_CONFSETTING(0x01, "Joystick/3 Button Control Panel (for Debug)")
+
 	PORT_START("P1")    // Player 1
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(1) PORT_CONDITION("INPUT_TYPE", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_CONDITION("INPUT_TYPE", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_PLAYER(1) PORT_CONDITION("INPUT_TYPE", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(1) PORT_CONDITION("INPUT_TYPE", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1        ) PORT_PLAYER(1) PORT_CONDITION("INPUT_TYPE", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2        ) PORT_PLAYER(1) PORT_CONDITION("INPUT_TYPE", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3        ) PORT_PLAYER(1) PORT_CONDITION("INPUT_TYPE", 0x01, EQUALS, 0x01)
+
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_CONDITION("INPUT_TYPE", 0x01, EQUALS, 0x00)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_CONDITION("INPUT_TYPE", 0x01, EQUALS, 0x00)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_CONDITION("INPUT_TYPE", 0x01, EQUALS, 0x00)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_CONDITION("INPUT_TYPE", 0x01, EQUALS, 0x00)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )                PORT_CONDITION("INPUT_TYPE", 0x01, EQUALS, 0x00)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )                PORT_CONDITION("INPUT_TYPE", 0x01, EQUALS, 0x00)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )                PORT_CONDITION("INPUT_TYPE", 0x01, EQUALS, 0x00)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1  )
 
 	PORT_START("P2")    // Player 2
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(2) PORT_CONDITION("INPUT_TYPE", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_CONDITION("INPUT_TYPE", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_PLAYER(2) PORT_CONDITION("INPUT_TYPE", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(2) PORT_CONDITION("INPUT_TYPE", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1        ) PORT_PLAYER(2) PORT_CONDITION("INPUT_TYPE", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2        ) PORT_PLAYER(2) PORT_CONDITION("INPUT_TYPE", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3        ) PORT_PLAYER(2) PORT_CONDITION("INPUT_TYPE", 0x01, EQUALS, 0x01)
+
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_CONDITION("INPUT_TYPE", 0x01, EQUALS, 0x00)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_CONDITION("INPUT_TYPE", 0x01, EQUALS, 0x00)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_CONDITION("INPUT_TYPE", 0x01, EQUALS, 0x00)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_CONDITION("INPUT_TYPE", 0x01, EQUALS, 0x00)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )                PORT_CONDITION("INPUT_TYPE", 0x01, EQUALS, 0x00)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )                PORT_CONDITION("INPUT_TYPE", 0x01, EQUALS, 0x00)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )                PORT_CONDITION("INPUT_TYPE", 0x01, EQUALS, 0x00)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START2  )
 
 	PORT_START("COINS") // Coins
@@ -3890,10 +3983,10 @@ static INPUT_PORTS_START( blandia )
 
 
 	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:1,2")
-	PORT_DIPSETTING(      0x0200, "1" )
-	PORT_DIPSETTING(      0x0300, "2" )
-	PORT_DIPSETTING(      0x0100, "3" )
-	PORT_DIPSETTING(      0x0000, "4" )
+	PORT_DIPSETTING(      0x0200, "1, 1 Round" ) // Test mode shows 1 in both blandia and blandiap
+	PORT_DIPSETTING(      0x0300, "1, 2 Rounds" ) // Test mode shows 0 in blandia, 2 in blandiap (neither match actual behaviour)
+	PORT_DIPSETTING(      0x0100, "2" ) // Test mode shows 2 in blandia, 3 in blandiap (blandiap test mode is wrong)
+	PORT_DIPSETTING(      0x0000, "3" ) // Test mode shows 3 in blandia, 4 in blandiap (blandiap test mode is wrong)
 	PORT_DIPNAME( 0x0c00, 0x0c00, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(      0x0800, DEF_STR( Easy )    )
 	PORT_DIPSETTING(      0x0c00, DEF_STR( Normal )  )
@@ -4374,10 +4467,10 @@ static INPUT_PORTS_START( setaroul )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Attendant Pay") // att.pay (clears error)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN3    ) PORT_NAME("Note")          // note    (same as 100 coins)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2    ) PORT_NAME("Coupon")        // cupon   (same as  10 coins)
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, setaroul_state, coin_sensors_r, nullptr)
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(setaroul_state, coin_sensors_r)
 
 	PORT_START("COIN1") // start the coin drop sequence (see coin_sensors_r)
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, setaroul_state, coin_drop_start, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, setaroul_state, coin_drop_start, 0)
 
 	PORT_START("DOOR") // d4000b.b
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -4714,7 +4807,7 @@ static INPUT_PORTS_START( gundhara )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(5)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(5)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_SERVICE_NO_TOGGLE( 0x0008, IP_ACTIVE_LOW)
+	PORT_SERVICE_NO_TOGGLE( 0x0008, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN  )
@@ -4753,10 +4846,10 @@ static INPUT_PORTS_START( gundhara )
 	PORT_DIPSETTING(      0x0100, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
 	PORT_DIPNAME( 0x0c00, 0x0c00, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:3,4")
-	PORT_DIPSETTING(      0x0800, "1" )
-	PORT_DIPSETTING(      0x0c00, "2" )
-	PORT_DIPSETTING(      0x0400, "3" )
-	PORT_DIPSETTING(      0x0000, "4" )
+	PORT_DIPSETTING(      0x0800, "2" )
+	PORT_DIPSETTING(      0x0c00, "3" )
+	PORT_DIPSETTING(      0x0400, "4" )
+	PORT_DIPSETTING(      0x0000, "5" )
 	PORT_DIPNAME( 0x3000, 0x3000, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW1:5,6")
 	PORT_DIPSETTING(      0x3000, "200K" )
 	PORT_DIPSETTING(      0x2000, "200K, Every 200K" )
@@ -4869,10 +4962,10 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( jjsquawk )
 	PORT_START("P1") //Player 1 - $400000.w
-	JOY_TYPE1_2BUTTONS(1)
+	JOY_TYPE1_3BUTTONS(1)
 
 	PORT_START("P2") //Player 2 - $400002.w
-	JOY_TYPE1_2BUTTONS(2)
+	JOY_TYPE1_3BUTTONS(2)
 
 	PORT_START("COINS") //Coins - $400004.w
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(5)
@@ -5404,11 +5497,11 @@ static INPUT_PORTS_START( msgundam )
 	PORT_SERVICE_DIPLOC(  0x8000, IP_ACTIVE_LOW, "SW1:8" )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( msgunda1 )
+static INPUT_PORTS_START( msgundam1 )
 	PORT_INCLUDE(msgundam)
 
 	PORT_MODIFY("COINS") // IN2 - Coins - $400004.w
-	/* this set seems to be a japan set, english mode doesn't work correctly */
+	/* this set seems to be a Japan set, English mode doesn't work correctly */
 	PORT_DIPNAME( 0x0080, 0x0000, DEF_STR( Language ) )
 //  PORT_DIPSETTING(      0x0080, DEF_STR( English ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Japanese ) )
@@ -5585,6 +5678,46 @@ bit 0       a   b   c   d   lc
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_H )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_L )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
+	PORT_BIT( 0xfff0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("KEY5")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE ) PORT_PLAYER(2)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) PORT_PLAYER(2)
+	PORT_BIT( 0xfff0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("KEY6")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_B ) PORT_PLAYER(2)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_F ) PORT_PLAYER(2)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_J ) PORT_PLAYER(2)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_N ) PORT_PLAYER(2)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_REACH ) PORT_PLAYER(2)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_MAHJONG_BET ) PORT_PLAYER(2)
+	PORT_BIT( 0xffc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("KEY7")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_A ) PORT_PLAYER(2)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_E ) PORT_PLAYER(2)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_I ) PORT_PLAYER(2)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_M ) PORT_PLAYER(2)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_KAN ) PORT_PLAYER(2)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START2  )
+	PORT_BIT( 0xffc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("KEY8")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_C ) PORT_PLAYER(2)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_G ) PORT_PLAYER(2)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_K ) PORT_PLAYER(2)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_CHI ) PORT_PLAYER(2)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_RON ) PORT_PLAYER(2)
+	PORT_BIT( 0xffe0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("KEY9")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_D ) PORT_PLAYER(2)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_H ) PORT_PLAYER(2)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_L ) PORT_PLAYER(2)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_PON ) PORT_PLAYER(2)
 	PORT_BIT( 0xfff0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
@@ -5999,9 +6132,9 @@ static INPUT_PORTS_START( thunderl )
 	PORT_DIPSETTING(      0x00e0, "Seta (Visco License)" )
 	PORT_DIPSETTING(      0x00a0, "Visco" )
 	PORT_DIPSETTING(      0x0060, DEF_STR( None ) )
-//  PORT_DIPSETTING(      0x0040, DEF_STR( None ) )
-//  PORT_DIPSETTING(      0x0020, DEF_STR( None ) )
-//  PORT_DIPSETTING(      0x0000, DEF_STR( None ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( None ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( None ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( None ) )
 
 	PORT_START("DSW") //2 DSWs - $600003 & 1.b
 	PORT_DIPNAME( 0x000f, 0x000f, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW2:1,2,3,4")
@@ -6069,16 +6202,21 @@ static INPUT_PORTS_START( thunderl )
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-
 static INPUT_PORTS_START( thunderlbl )
-	PORT_INCLUDE(thunderl)
 
-	PORT_MODIFY("DSW")
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:2")
-	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_INCLUDE( thunderl )
+
+	PORT_MODIFY("COINS")
+	PORT_DIPNAME( 0x00e0, 0x00e0, "Copyright" )
+	PORT_DIPSETTING(      0x0080, DEF_STR( None ) )
+	PORT_DIPSETTING(      0x00c0, "Hyogo (Hyogo License)" )
+	PORT_DIPSETTING(      0x00e0, "(Hyogo License)" )
+	PORT_DIPSETTING(      0x00a0, "Hyogo" )
+	PORT_DIPSETTING(      0x0060, DEF_STR( None ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( None ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( None ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( None ) )
 INPUT_PORTS_END
-
 
 /***************************************************************************
                                 Thundercade (US)
@@ -6425,10 +6563,10 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( usclssic )
 	PORT_START("TRACKX")
-	PORT_BIT( 0xfff, 0x000, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, seta_state, usclssic_trackball_x_r, nullptr)
+	PORT_BIT( 0xfff, 0x000, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(usclssic_state, trackball_x_r)
 
 	PORT_START("TRACKY")
-	PORT_BIT( 0xfff, 0x000, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, seta_state, usclssic_trackball_y_r, nullptr)
+	PORT_BIT( 0xfff, 0x000, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(usclssic_state, trackball_y_r)
 
 	PORT_START("TRACK1_X")     /* muxed port 0 */
 	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(70) PORT_KEYDELTA(30) PORT_RESET
@@ -7468,117 +7606,58 @@ or 6 planes deep and are stored in a wealth of formats.
 						/* First the 4 bit tiles */
 
 
-/* The bitplanes are packed togheter */
-static const gfx_layout layout_packed =
+/* The tilemap bitplanes are packed togheter */
+static const gfx_layout layout_tilemap =
 {
 	16,16,
 	RGN_FRAC(1,1),
 	4,
-	{2*4,3*4,0*4,1*4},
-	{256+128,256+129,256+130,256+131, 256+0,256+1,256+2,256+3,
-		128,129,130,131, 0,1,2,3},
-	{0*16,1*16,2*16,3*16,4*16,5*16,6*16,7*16,
-		32*16,33*16,34*16,35*16,36*16,37*16,38*16,39*16},
+	{ STEP4(0,4) },
+	{ STEP4(4*4*8*3,1), STEP4(4*4*8*2,1), STEP4(4*4*8,1), STEP4(0,1) },
+	{ STEP8(0,4*4), STEP8(4*4*8*4,4*4) },
 	16*16*4
 };
 
 
-/* The bitplanes are separated */
-static const gfx_layout layout_planes =
-{
-	16,16,
-	RGN_FRAC(1,4),
-	4,
-	{ RGN_FRAC(0,4),RGN_FRAC(1,4),RGN_FRAC(2,4),RGN_FRAC(3,4) },
-	{ STEP8(0,1), STEP8(8*8,1) },
-	{ STEP8(0,8), STEP8(8*8*2,8) },
-	16*16
-};
-
-
-/* The bitplanes are separated (but there are 2 per rom) */
-static const gfx_layout layout_planes_2roms =
+/* The sprite bitplanes are separated (but there are 2 per rom) */
+static const gfx_layout layout_sprites =
 {
 	16,16,
 	RGN_FRAC(1,2),
 	4,
-	{RGN_FRAC(1,2)+8, RGN_FRAC(1,2)+0, 8, 0},
-	{0,1,2,3,4,5,6,7, 128,129,130,131,132,133,134,135},
-	{0*16,1*16,2*16,3*16,4*16,5*16,6*16,7*16,
-		16*16,17*16,18*16,19*16,20*16,21*16,22*16,23*16 },
+	{ RGN_FRAC(1,2) + 8, RGN_FRAC(1,2) + 0, 8, 0 },
+	{ STEP8(0,1), STEP8(8*2*8,1) },
+	{ STEP8(0,8*2), STEP8(8*2*8*2,8*2) },
 	16*16*2
 };
 
 
-
-
-/* The bitplanes are separated (but there are 2 per rom).
-   Each 8x8 tile is additionally split in 2 vertical halves four bits wide,
-   stored one after the other */
-static const gfx_layout layout_planes_2roms_split =
+static const gfx_layout layout_tilemap_8bpp =
 {
 	16,16,
-	RGN_FRAC(1,2),
-	4,
-	{0,4, RGN_FRAC(1,2)+0,RGN_FRAC(1,2)+4},
-	{128+64,128+65,128+66,128+67, 128+0,128+1,128+2,128+3,
-		8*8+0,8*8+1,8*8+2,8*8+3, 0,1,2,3},
-	{0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8,
-		32*8,33*8,34*8,35*8,36*8,37*8,38*8,39*8},
-	16*16*2
-};
-
-static const gfx_layout layout_8bpp =
-{
-	16,16,
-	RGN_FRAC(1,4),
+	RGN_FRAC(1,1),
 	8,
-	{ RGN_FRAC(0,4)+0,RGN_FRAC(0,4)+4, RGN_FRAC(1,4)+0,RGN_FRAC(1,4)+4,RGN_FRAC(2,4)+0,RGN_FRAC(2,4)+4, RGN_FRAC(3,4)+0,RGN_FRAC(3,4)+4},
-	{128+64,128+65,128+66,128+67, 128+0,128+1,128+2,128+3,
-		8*8+0,8*8+1,8*8+2,8*8+3, 0,1,2,3},
-	{0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8,
-		32*8,33*8,34*8,35*8,36*8,37*8,38*8,39*8},
-	16*16*2
+	{ STEP8(0,4) },
+	{ STEP4(8*4*8*3,1), STEP4(8*4*8*2,1), STEP4(8*4*8,1), STEP4(0,1) },
+	{ STEP8(0,8*4), STEP8(8*4*8*4,8*4) },
+	16*16*8
 };
-
 
 
 						/* Then the 6 bit tiles */
 
 
-/* The bitplanes are packed together: 3 roms with 2 bits in each */
-static const gfx_layout layout_packed_6bits_3roms =
+/* The tilemap bitplanes are packed together */
+static const gfx_layout layout_tilemap_6bpp =
 {
 	16,16,
-	RGN_FRAC(1,3),
+	RGN_FRAC(1,1),
 	6,
-	{RGN_FRAC(0,3)+0,RGN_FRAC(0,3)+4,  RGN_FRAC(1,3)+0,RGN_FRAC(1,3)+4,  RGN_FRAC(2,3)+0,RGN_FRAC(2,3)+4},
-	{128+64,128+65,128+66,128+67, 128+0,128+1,128+2,128+3,
-		64,65,66,67, 0,1,2,3},
-	{0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8,
-		32*8,33*8,34*8,35*8,36*8,37*8,38*8,39*8},
-	16*16*2
+	{ STEP4(0,4), STEP2(4*4,4) },
+	{ STEP4(6*4*8*3,1), STEP4(6*4*8*2,1), STEP4(6*4*8,1), STEP4(0,1) },
+	{ STEP8(0,6*4), STEP8(6*4*8*4,6*4) },
+	16*16*6
 };
-
-
-/* The bitplanes are packed togheter: 4 bits in one rom, 2 bits in another.
-   Since there isn't simmetry between the two roms, we load the latter with
-   ROM_LOAD16_BYTE. This way we can think of it as a 4 planes rom, with the
-   upper 2 planes unused.    */
-
-static const gfx_layout layout_packed_6bits_2roms =
-{
-	16,16,
-	RGN_FRAC(1,2),
-	6,
-	{RGN_FRAC(1,2)+0*4, RGN_FRAC(1,2)+1*4, 2*4,3*4,0*4,1*4},
-	{256+128,256+129,256+130,256+131, 256+0,256+1,256+2,256+3,
-		128,129,130,131, 0,1,2,3},
-	{0*16,1*16,2*16,3*16,4*16,5*16,6*16,7*16,
-		32*16,33*16,34*16,35*16,36*16,37*16,38*16,39*16},
-	16*16*4
-};
-
 
 
 /***************************************************************************
@@ -7586,11 +7665,11 @@ static const gfx_layout layout_packed_6bits_2roms =
 ***************************************************************************/
 
 static GFXDECODE_START( gfx_blandia )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_planes_2roms,       0,             32 ) // [0] Sprites
-	GFXDECODE_ENTRY( "gfx2", 0, layout_packed_6bits_3roms, 16*32+64*32*1, 32 ) // [1] Layer 1
-	GFXDECODE_ENTRY( "gfx3", 0, layout_packed_6bits_3roms, 16*32+64*32*0, 32 ) // [2] Layer 2
-	GFXDECODE_ENTRY( "gfx2", 0, layout_packed_6bits_3roms, 16*32+64*32*3, 32 ) // [3] Layer 1
-	GFXDECODE_ENTRY( "gfx3", 0, layout_packed_6bits_3roms, 16*32+64*32*2, 32 ) // [4] Layer 2
+	GFXDECODE_ENTRY( "gfx1", 0, layout_sprites,                  0, 32 ) // [0] Sprites
+	GFXDECODE_ENTRY( "gfx2", 0, layout_tilemap_6bpp, 16*32+64*32*1, 32 ) // [1] Layer 1
+	GFXDECODE_ENTRY( "gfx3", 0, layout_tilemap_6bpp, 16*32+64*32*0, 32 ) // [2] Layer 2
+	GFXDECODE_ENTRY( "gfx2", 0, layout_tilemap_6bpp, 16*32+64*32*3, 32 ) // [3] Layer 1
+	GFXDECODE_ENTRY( "gfx3", 0, layout_tilemap_6bpp, 16*32+64*32*2, 32 ) // [4] Layer 2
 GFXDECODE_END
 
 /***************************************************************************
@@ -7598,8 +7677,8 @@ GFXDECODE_END
 ***************************************************************************/
 
 static GFXDECODE_START( gfx_downtown )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_planes_2roms,       512*0, 32 ) // [0] Sprites
-	GFXDECODE_ENTRY( "gfx2", 0, layout_planes_2roms_split, 512*0, 32 ) // [1] Layer 1
+	GFXDECODE_ENTRY( "gfx1", 0, layout_sprites, 0, 32 ) // [0] Sprites
+	GFXDECODE_ENTRY( "gfx2", 0, layout_tilemap, 0, 32 ) // [1] Layer 1
 GFXDECODE_END
 
 /***************************************************************************
@@ -7607,8 +7686,8 @@ GFXDECODE_END
 ***************************************************************************/
 
 static GFXDECODE_START( gfx_setaroul )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_planes_2roms,       0x100, 16 ) // [0] Sprites
-	GFXDECODE_ENTRY( "gfx2", 0, layout_8bpp,               512*0, 32 ) // [1] Layer 1
+	GFXDECODE_ENTRY( "gfx1", 0, layout_sprites,  0x100, 16 ) // [0] Sprites
+	GFXDECODE_ENTRY( "gfx2", 0, layout_tilemap_8bpp, 0, 32 ) // [1] Layer 1
 GFXDECODE_END
 
 /***************************************************************************
@@ -7616,11 +7695,37 @@ GFXDECODE_END
 ***************************************************************************/
 
 static GFXDECODE_START( gfx_jjsquawk )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_planes_2roms,       0,             32 ) // [0] Sprites
-	GFXDECODE_ENTRY( "gfx2", 0, layout_packed_6bits_2roms, 16*32+64*32*0, 32 ) // [1] Layer 1
-	GFXDECODE_ENTRY( "gfx3", 0, layout_packed_6bits_2roms, 16*32+64*32*1, 32 ) // [2] Layer 2
-	GFXDECODE_ENTRY( "gfx2", 0, layout_packed_6bits_2roms, 16*32+64*32*2, 32 ) // [3] Layer 1
-	GFXDECODE_ENTRY( "gfx3", 0, layout_packed_6bits_2roms, 16*32+64*32*3, 32 ) // [4] Layer 2
+	GFXDECODE_ENTRY( "gfx1", 0, layout_sprites,                  0, 32 ) // [0] Sprites
+	GFXDECODE_ENTRY( "gfx2", 0, layout_tilemap_6bpp, 16*32+64*32*0, 32 ) // [1] Layer 1
+	GFXDECODE_ENTRY( "gfx3", 0, layout_tilemap_6bpp, 16*32+64*32*1, 32 ) // [2] Layer 2
+	GFXDECODE_ENTRY( "gfx2", 0, layout_tilemap_6bpp, 16*32+64*32*2, 32 ) // [3] Layer 1
+	GFXDECODE_ENTRY( "gfx3", 0, layout_tilemap_6bpp, 16*32+64*32*3, 32 ) // [4] Layer 2
+GFXDECODE_END
+
+/* The bitplanes are packed togheter: 4 bits in one rom, 2 bits in another.
+   Since there isn't simmetry between the two roms, we load the latter with
+   ROM_LOAD16_BYTE. This way we can think of it as a 4 planes rom, with the
+   upper 2 planes unused.    */
+
+static const gfx_layout layout_tilemap_6bpp_jjsquawkb =
+{
+	16,16,
+	RGN_FRAC(1,2),
+	6,
+	{RGN_FRAC(1,2) + 0*4, RGN_FRAC(1,2) + 1*4, 2*4,3*4,0*4,1*4},
+	{256+128,256+129,256+130,256+131, 256+0,256+1,256+2,256+3,
+		128,129,130,131, 0,1,2,3},
+	{0*16,1*16,2*16,3*16,4*16,5*16,6*16,7*16,
+		32*16,33*16,34*16,35*16,36*16,37*16,38*16,39*16},
+	16*16*4
+};
+
+static GFXDECODE_START( gfx_jjsquawkb )
+	GFXDECODE_ENTRY( "gfx1", 0, layout_sprites,                            0, 32 ) // [0] Sprites
+	GFXDECODE_ENTRY( "gfx2", 0, layout_tilemap_6bpp_jjsquawkb, 16*32+64*32*0, 32 ) // [1] Layer 1
+	GFXDECODE_ENTRY( "gfx3", 0, layout_tilemap_6bpp_jjsquawkb, 16*32+64*32*1, 32 ) // [2] Layer 2
+	GFXDECODE_ENTRY( "gfx2", 0, layout_tilemap_6bpp_jjsquawkb, 16*32+64*32*2, 32 ) // [3] Layer 1
+	GFXDECODE_ENTRY( "gfx3", 0, layout_tilemap_6bpp_jjsquawkb, 16*32+64*32*3, 32 ) // [4] Layer 2
 GFXDECODE_END
 
 /***************************************************************************
@@ -7628,28 +7733,9 @@ GFXDECODE_END
 ***************************************************************************/
 
 static GFXDECODE_START( gfx_msgundam )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_planes_2roms, 512*0, 32 ) // [0] Sprites
-	GFXDECODE_ENTRY( "gfx2", 0, layout_packed,       512*2, 32 ) // [1] Layer 1
-	GFXDECODE_ENTRY( "gfx3", 0, layout_packed,       512*1, 32 ) // [2] Layer 2
-GFXDECODE_END
-
-/***************************************************************************
-                       Daioh (prototype)
-***************************************************************************/
-
-static GFXDECODE_START( gfx_daiohp )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_planes,             512*0, 32 ) // [0] Sprites
-	GFXDECODE_ENTRY( "gfx2", 0, layout_planes_2roms_split, 512*2, 32 ) // [1] Layer 1
-	GFXDECODE_ENTRY( "gfx3", 0, layout_planes_2roms_split, 512*1, 32 ) // [2] Layer 2
-GFXDECODE_END
-
-/***************************************************************************
-                                Quiz Kokology 2
-***************************************************************************/
-
-static GFXDECODE_START( gfx_qzkklgy2 )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_planes_2roms,    512*0, 32 ) // [0] Sprites
-	GFXDECODE_ENTRY( "gfx2", 0, layout_packed,          512*0, 32 ) // [1] Layer 1
+	GFXDECODE_ENTRY( "gfx1", 0, layout_sprites,     0, 32 ) // [0] Sprites
+	GFXDECODE_ENTRY( "gfx2", 0, layout_tilemap, 0x400, 32 ) // [1] Layer 1
+	GFXDECODE_ENTRY( "gfx3", 0, layout_tilemap, 0x200, 32 ) // [2] Layer 2
 GFXDECODE_END
 
 /***************************************************************************
@@ -7657,21 +7743,13 @@ GFXDECODE_END
 ***************************************************************************/
 
 static GFXDECODE_START( gfx_tndrcade )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_planes_2roms, 512*0, 32 ) // [0] Sprites
+	GFXDECODE_ENTRY( "gfx1", 0, layout_sprites, 0, 32 ) // [0] Sprites
 GFXDECODE_END
 
 // TODO: pairlove sets up two identical palette banks at 0-1ff and 0x200-0x3ff in-game, 0x200-0x3ff only in service mode.
-//       Maybe there's a color offset register to somewhere?
+//       Maybe there's a coloroffsetregister to somewhere?
 static GFXDECODE_START( gfx_pairlove )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_planes_2roms, 512*1, 32 ) // [0] Sprites
-GFXDECODE_END
-
-/***************************************************************************
-                                Orbs
-***************************************************************************/
-
-static GFXDECODE_START( gfx_orbs )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_planes, 512*0, 32 ) // [0] Sprites
+	GFXDECODE_ENTRY( "gfx1", 0, layout_sprites, 0x200, 32 ) // [0] Sprites
 GFXDECODE_END
 
 
@@ -7699,7 +7777,7 @@ static const gfx_layout wiggie_layout =
 
 
 static GFXDECODE_START( gfx_wiggie )
-	GFXDECODE_ENTRY( "gfx1", 0, wiggie_layout,   0x0, 32  ) /* bg tiles */
+	GFXDECODE_ENTRY( "gfx1", 0, wiggie_layout, 0x0, 32 ) /* bg tiles */
 GFXDECODE_END
 
 static const gfx_layout superbar_layout =
@@ -7719,7 +7797,7 @@ static const gfx_layout superbar_layout =
 
 
 static GFXDECODE_START( gfx_superbar )
-	GFXDECODE_ENTRY( "gfx1", 0, superbar_layout,   0x0, 32  ) /* bg tiles */
+	GFXDECODE_ENTRY( "gfx1", 0, superbar_layout, 0x0, 32 ) /* bg tiles */
 GFXDECODE_END
 
 /***************************************************************************
@@ -7727,9 +7805,9 @@ GFXDECODE_END
 ***************************************************************************/
 
 static GFXDECODE_START( gfx_usclssic )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_planes_2roms,       0,           32 ) // [0] Sprites
-	GFXDECODE_ENTRY( "gfx2", 0, layout_packed_6bits_3roms, 512+64*32*0, 32 ) // [1] Layer 1
-	GFXDECODE_ENTRY( "gfx2", 0, layout_packed_6bits_3roms, 512+64*32*1, 32 ) // [2] Layer 1
+	GFXDECODE_ENTRY( "gfx1", 0, layout_sprites,                0, 32 ) // [0] Sprites
+	GFXDECODE_ENTRY( "gfx2", 0, layout_tilemap_6bpp, 512+64*32*0, 32 ) // [1] Layer 1
+	GFXDECODE_ENTRY( "gfx2", 0, layout_tilemap_6bpp, 512+64*32*1, 32 ) // [2] Layer 1
 GFXDECODE_END
 
 
@@ -7738,10 +7816,10 @@ GFXDECODE_END
 ***************************************************************************/
 
 static GFXDECODE_START( gfx_zingzip )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_planes_2roms,       16*32*0,         32 ) // [0] Sprites
-	GFXDECODE_ENTRY( "gfx2", 0, layout_packed_6bits_2roms, 16*32*2,         32 ) // [1] Layer 1
-	GFXDECODE_ENTRY( "gfx3", 0, layout_packed,             16*32*1,         32 ) // [2] Layer 2
-	GFXDECODE_ENTRY( "gfx2", 0, layout_packed_6bits_2roms, 16*32*2+64*32*1, 32 ) // [3] Layer 1
+	GFXDECODE_ENTRY( "gfx1", 0, layout_sprites,              16*32*0, 32 ) // [0] Sprites
+	GFXDECODE_ENTRY( "gfx2", 0, layout_tilemap_6bpp,         16*32*2, 32 ) // [1] Layer 1
+	GFXDECODE_ENTRY( "gfx3", 0, layout_tilemap,              16*32*1, 32 ) // [2] Layer 2
+	GFXDECODE_ENTRY( "gfx2", 0, layout_tilemap_6bpp, 16*32*2+64*32*1, 32 ) // [3] Layer 1
 GFXDECODE_END
 
 static const gfx_layout layout_zzbl =
@@ -7749,58 +7827,31 @@ static const gfx_layout layout_zzbl =
 	16,16,
 	RGN_FRAC(1,2),
 	4,
-	{RGN_FRAC(1,2)+8, RGN_FRAC(1,2)+0, 8, 0},
-	{0,1,2,3,4,5,6,7, 256,257,258,259,260,261,262,263},
-	{0*16,1*16,2*16,3*16,4*16,5*16,6*16,7*16,
-		8*16,9*16,10*16,11*16,12*16,13*16,14*16,15*16 },
+	{ RGN_FRAC(1,2) + 8, RGN_FRAC(1,2) + 0, 8, 0 },
+	{ STEP8(0,1), STEP8(8*2*16,1) },
+	{ STEP16(0,8*2) },
 	16*16*2
 };
 
 static const gfx_layout layout_zzbl_6bpp =
 {
 	16,16,
-	RGN_FRAC(1,4),
+	RGN_FRAC(1,3),
 	6,
-	{ RGN_FRAC(3,4)+0, RGN_FRAC(2,4)+0, RGN_FRAC(1,4)+8, RGN_FRAC(1,4)+0, 8, 0},
-	{256,257,258,259,260,261,262,263,0,1,2,3,4,5,6,7},
-	{
-		0*16,1*16,2*16,3*16,4*16,5*16,6*16,7*16,
-		8*16,9*16,10*16,11*16,12*16,13*16,14*16,15*16
-
-	},
+	{ RGN_FRAC(2,3) + 8, RGN_FRAC(2,3) + 0, RGN_FRAC(1,3) + 8, RGN_FRAC(1,3) + 0, 8, 0 },
+	{ STEP8(8*2*16,1), STEP8(0,1) },
+	{ STEP16(0,8*2) },
 	16*16*2
 };
 
 
-
 static GFXDECODE_START( gfx_zingzipbl )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_zzbl,       16*32*0,         32 ) // [0] Sprites
-	GFXDECODE_ENTRY( "gfx2", 0, layout_zzbl_6bpp, 16*32*2,      32 ) // [1] Layer 1
-	GFXDECODE_ENTRY( "gfx3", 0, layout_zzbl, 16*32*1,       32 ) // [2] Layer 2
+	GFXDECODE_ENTRY( "gfx1", 0, layout_zzbl,              16*32*0, 32 ) // [0] Sprites
+	GFXDECODE_ENTRY( "gfx2", 0, layout_zzbl_6bpp,         16*32*2, 32 ) // [1] Layer 1
+	GFXDECODE_ENTRY( "gfx3", 0, layout_zzbl,              16*32*1, 32 ) // [2] Layer 2
 	GFXDECODE_ENTRY( "gfx2", 0, layout_zzbl_6bpp, 16*32*2+64*32*1, 32 ) // [3] Layer 1
 GFXDECODE_END
 
-
-/***************************************************************************
-                                Crazy Fight
-***************************************************************************/
-
-static GFXDECODE_START( gfx_crazyfgt )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_planes,             0,             32 ) // [0] Sprites
-	GFXDECODE_ENTRY( "gfx2", 0, layout_packed_6bits_3roms, 16*32+64*32*1, 32 ) // [1] Layer 1
-	GFXDECODE_ENTRY( "gfx3", 0, layout_packed_6bits_3roms, 16*32+64*32*0, 32 ) // [2] Layer 2
-	GFXDECODE_ENTRY( "gfx2", 0, layout_packed_6bits_3roms, 16*32+64*32*3, 32 ) // [1] Layer 1
-	GFXDECODE_ENTRY( "gfx3", 0, layout_packed_6bits_3roms, 16*32+64*32*2, 32 ) // [2] Layer 2
-GFXDECODE_END
-
-/***************************************************************************
-                                 Jockey Club
-***************************************************************************/
-
-static GFXDECODE_START( gfx_jockeyc )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_planes,             0,       32 ) // [0] Sprites
-	GFXDECODE_ENTRY( "gfx2", 0, layout_planes_2roms_split, 16*32*0, 32 ) // [1] Layer 1
-GFXDECODE_END
 
 /***************************************************************************
 
@@ -7812,10 +7863,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(seta_state::seta_interrupt_1_and_2)
 {
 	int scanline = param;
 
-	if(scanline == 240)
+	if (scanline == 240)
 		m_maincpu->set_input_line(1, HOLD_LINE);
 
-	if(scanline == 112)
+	if (scanline == 112)
 		m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
@@ -7823,10 +7874,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(seta_state::seta_interrupt_2_and_4)
 {
 	int scanline = param;
 
-	if(scanline == 240)
+	if (scanline == 240)
 		m_maincpu->set_input_line(2, HOLD_LINE);
 
-	if(scanline == 112)
+	if (scanline == 112)
 		m_maincpu->set_input_line(4, HOLD_LINE);
 }
 
@@ -7835,10 +7886,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(seta_state::seta_sub_interrupt)
 {
 	int scanline = param;
 
-	if(scanline == 240)
+	if (scanline == 240)
 		m_subcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 
-	if(scanline == 112)
+	if (scanline == 112)
 		m_subcpu->set_input_line(0, HOLD_LINE);
 }
 
@@ -7851,56 +7902,53 @@ TIMER_DEVICE_CALLBACK_MEMBER(seta_state::tndrcade_sub_interrupt)
 {
 	int scanline = param;
 
-	if(scanline == 240)
+	if (scanline == 240)
 		m_subcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 
-	if((scanline % 16) == 0)
+	if ((scanline % 16) == 0)
 		m_subcpu->set_input_line(0, HOLD_LINE);
 }
 
-MACHINE_CONFIG_START(seta_state::tndrcade)
-
+void seta_state::tndrcade(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000/2) /* 8 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(tndrcade_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
+	M68000(config, m_maincpu, 16000000/2); /* 8 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::tndrcade_map);
+	m_maincpu->set_vblank_int("screen", FUNC(seta_state::irq2_line_assert));
 
-	MCFG_DEVICE_ADD("sub", M65C02, 16000000/8) /* 2 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(tndrcade_sub_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, tndrcade_sub_interrupt, "screen", 0, 1)
+	M65C02(config, m_subcpu, 16000000/8); /* 2 MHz */
+	m_subcpu->set_addrmap(AS_PROGRAM, &seta_state::tndrcade_sub_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(seta_state::tndrcade_sub_interrupt), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_no_layers)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta_no_layers));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tndrcade)
-	MCFG_PALETTE_ADD("palette", 512)    /* sprites only */
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tndrcade);
+	PALETTE(config, m_palette).set_entries(512);    // sprites only
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ym1", YM2203, 16000000/4)   /* 4 MHz */
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, seta_state, dsw1_r))     /* input A: DSW 1 */
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, seta_state, dsw2_r))     /* input B: DSW 2 */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.35)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.35)
+	ym2203_device &ym1(YM2203(config, "ym1", 16000000/4));   /* 4 MHz */
+	ym1.port_a_read_callback().set(FUNC(seta_state::dsw1_r));     /* input A: DSW 1 */
+	ym1.port_b_read_callback().set(FUNC(seta_state::dsw2_r));     /* input B: DSW 2 */
+	ym1.add_route(ALL_OUTPUTS, "mono", 0.35);
 
-	MCFG_DEVICE_ADD("ym2", YM3812, 16000000/4)   /* 4 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	ym3812_device &ym2(YM3812(config, "ym2", 16000000/4));   /* 4 MHz */
+	ym2.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 /***************************************************************************
@@ -7913,44 +7961,44 @@ MACHINE_CONFIG_END
 
 /* twineagl lev 3 = lev 2 + lev 1 ! */
 
-MACHINE_CONFIG_START(seta_state::twineagl)
-
+void seta_state::twineagl(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000/2) /* 8 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(downtown_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state, irq3_line_assert)
+	M68000(config, m_maincpu, 16000000/2); /* 8 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::downtown_map);
+	m_maincpu->set_vblank_int("screen", FUNC(seta_state::irq3_line_assert));
 
-	MCFG_DEVICE_ADD("sub", M65C02, 16000000/8) /* 2 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(twineagl_sub_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("s_scantimer", seta_state, seta_sub_interrupt, "screen", 0, 1)
+	M65C02(config, m_subcpu, 16000000/8); /* 2 MHz */
+	m_subcpu->set_addrmap(AS_PROGRAM, &seta_state::twineagl_sub_map);
+	TIMER(config, "s_scantimer").configure_scanline(FUNC(seta_state::seta_sub_interrupt), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57.42) // Possibly lower than 60Hz, Correct?
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(57.42); // Possibly lower than 60Hz, Correct?
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_downtown)
-	MCFG_PALETTE_ADD("palette", 512)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_downtown);
+	PALETTE(config, m_palette).set_entries(512);
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,twineagl_1_layer)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch[0]);
+	GENERIC_LATCH_8(config, m_soundlatch[1]);
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	X1_010(config, m_x1, 16000000);   /* 16 MHz */
+	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 /***************************************************************************
@@ -7959,44 +8007,44 @@ MACHINE_CONFIG_END
 
 /* downtown lev 3 = lev 2 + lev 1 ! */
 
-MACHINE_CONFIG_START(seta_state::downtown)
-
+void seta_state::downtown(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)/2) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(downtown_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state,  irq2_line_assert)
+	M68000(config, m_maincpu, XTAL(16'000'000)/2); /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::downtown_map);
+	m_maincpu->set_vblank_int("screen", FUNC(seta_state::irq2_line_assert));
 
-	MCFG_DEVICE_ADD("sub", M65C02, XTAL(16'000'000)/8) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(downtown_sub_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("s_scantimer", seta_state, seta_sub_interrupt, "screen", 0, 1)
+	M65C02(config, m_subcpu, XTAL(16'000'000)/8); /* verified on pcb */
+	m_subcpu->set_addrmap(AS_PROGRAM, &seta_state::downtown_sub_map);
+	TIMER(config, "s_scantimer").configure_scanline(FUNC(seta_state::seta_sub_interrupt), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57.42) /* verified on pcb */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(57.42); /* verified on pcb */
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_downtown)
-	MCFG_PALETTE_ADD("palette", 512)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_downtown);
+	PALETTE(config, m_palette).set_entries(512);
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_1_layer)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch[0]);
+	GENERIC_LATCH_8(config, m_soundlatch[1]);
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	X1_010(config, m_x1, 16000000);   /* 16 MHz */
+	m_x1->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
 /***************************************************************************
@@ -8013,76 +8061,72 @@ TIMER_DEVICE_CALLBACK_MEMBER(seta_state::calibr50_interrupt)
 {
 	int scanline = param;
 
-	if((scanline % 64) == 0)
+	if ((scanline % 64) == 0)
 		m_maincpu->set_input_line(4, ASSERT_LINE);
 
-	if(scanline == 248)
+	if (scanline == 248)
 		m_maincpu->set_input_line(2, ASSERT_LINE);
 }
 
 
-MACHINE_START_MEMBER(seta_state, usclssic)
+void usclssic_state::machine_start()
 {
-	m_buttonmux->write_ab(0xff);
+	m_buttonmux->ab_w(0xff);
 }
 
 
-MACHINE_CONFIG_START(seta_state::usclssic)
-
+void usclssic_state::usclssic(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000/2) /* 8 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(usclssic_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, calibr50_interrupt, "screen", 0, 1)
+	M68000(config, m_maincpu, 16000000/2); /* 8 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &usclssic_state::usclssic_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(usclssic_state::calibr50_interrupt), "screen", 0, 1);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
-	MCFG_DEVICE_ADD("sub", M65C02, 16000000/8) /* 2 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(calibr50_sub_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state,  irq0_line_assert)
+	M65C02(config, m_subcpu, 16000000/8); /* 2 MHz */
+	m_subcpu->set_addrmap(AS_PROGRAM, &usclssic_state::calibr50_sub_map);
+	m_subcpu->set_vblank_int("screen", FUNC(usclssic_state::irq0_line_assert));
 
-	MCFG_DEVICE_ADD("upd4701", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("TRACKX")
-	MCFG_UPD4701_PORTY("TRACKY")
+	UPD4701A(config, m_upd4701);
+	m_upd4701->set_portx_tag("TRACKX");
+	m_upd4701->set_porty_tag("TRACKY");
 
 	HC157(config, m_buttonmux, 0);
 	m_buttonmux->out_callback().set(m_upd4701, FUNC(upd4701_device::middle_w)).bit(0);
 	m_buttonmux->out_callback().append(m_upd4701, FUNC(upd4701_device::right_w)).bit(1);
 	m_buttonmux->out_callback().append(m_upd4701, FUNC(upd4701_device::left_w)).bit(2);
 
-	MCFG_MACHINE_START_OVERRIDE(seta_state,usclssic)
-	MCFG_MACHINE_RESET_OVERRIDE(seta_state,calibr50)
+	MCFG_MACHINE_RESET_OVERRIDE(usclssic_state,calibr50)
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(usclssic_state::setac_gfxbank_callback));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_usclssic)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(usclssic_state::screen_update_usclssic));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_usclssic)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_usclssic);
+	PALETTE(config, m_palette, FUNC(usclssic_state::usclssic_palette), 16*32 + 64*32*2, 0x400); // sprites, layer - layer is 6 planes deep
 
-	MCFG_PALETTE_ADD("palette", 16*32 + 64*32*2)        /* sprites, layer */
-	MCFG_PALETTE_INDIRECT_ENTRIES(0x400)
-	MCFG_PALETTE_INIT_OWNER(seta_state,usclssic) /* layer is 6 planes deep */
-
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_1_layer)
+	MCFG_VIDEO_START_OVERRIDE(usclssic_state,seta_1_layer)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("sub", INPUT_LINE_NMI))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_soundlatch[0]);
+	m_soundlatch[0]->data_pending_callback().set_inputline(m_subcpu, INPUT_LINE_NMI);
+	m_soundlatch[0]->set_separate_acknowledge(true);
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	X1_010(config, m_x1, 16000000);   /* 16 MHz */
+	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 /***************************************************************************
@@ -8094,57 +8138,57 @@ MACHINE_CONFIG_END
     Test mode shows a 16ms and 4ms counters. I wonder if every game has
     5 ints per frame */
 
-MACHINE_CONFIG_START(seta_state::calibr50)
-
+void seta_state::calibr50(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)/2) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(calibr50_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, calibr50_interrupt, "screen", 0, 1)
+	M68000(config, m_maincpu, XTAL(16'000'000)/2); /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::calibr50_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(seta_state::calibr50_interrupt), "screen", 0, 1);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("sub", M65C02, XTAL(16'000'000)/8) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(calibr50_sub_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(seta_state, irq0_line_assert, 4*60)  // IRQ: 4/frame
+	M65C02(config, m_subcpu, XTAL(16'000'000)/8); /* verified on pcb */
+	m_subcpu->set_addrmap(AS_PROGRAM, &seta_state::calibr50_sub_map);
+	m_subcpu->set_periodic_int(FUNC(seta_state::irq0_line_assert), attotime::from_hz(4*60));  // IRQ: 4/frame
 
-	MCFG_DEVICE_ADD("upd4701", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("ROT1")
-	MCFG_UPD4701_PORTY("ROT2")
+	upd4701_device &upd4701(UPD4701A(config, "upd4701"));
+	upd4701.set_portx_tag("ROT1");
+	upd4701.set_porty_tag("ROT2");
 
 	MCFG_MACHINE_RESET_OVERRIDE(seta_state,calibr50)
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57.42)  /* verified on pcb */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(57.42); /* verified on pcb */
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_downtown)
-	MCFG_PALETTE_ADD("palette", 512)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_downtown);
+	PALETTE(config, m_palette).set_entries(512);
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_1_layer)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("sub", INPUT_LINE_NMI))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_soundlatch[0]);
+	m_soundlatch[0]->data_pending_callback().set_inputline(m_subcpu, INPUT_LINE_NMI);
+	m_soundlatch[0]->set_separate_acknowledge(true);
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch[1]);
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	X1_010(config, m_x1, 16000000);   /* 16 MHz */
+	m_x1->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
 /***************************************************************************
@@ -8153,81 +8197,81 @@ MACHINE_CONFIG_END
 
 /* metafox lev 3 = lev 2 + lev 1 ! */
 
-MACHINE_CONFIG_START(seta_state::metafox)
-
+void seta_state::metafox(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000/2) /* 8 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(downtown_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state, irq3_line_assert)
+	M68000(config, m_maincpu, 16000000/2); /* 8 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::downtown_map);
+	m_maincpu->set_vblank_int("screen", FUNC(seta_state::irq3_line_assert));
 
-	MCFG_DEVICE_ADD("sub", M65C02, 16000000/8) /* 2 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(metafox_sub_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("s_scantimer", seta_state, seta_sub_interrupt, "screen", 0, 1)
+	M65C02(config, m_subcpu, 16000000/8); /* 2 MHz */
+	m_subcpu->set_addrmap(AS_PROGRAM, &seta_state::metafox_sub_map);
+	TIMER(config, "s_scantimer").configure_scanline(FUNC(seta_state::seta_sub_interrupt), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_downtown)
-	MCFG_PALETTE_ADD("palette", 512)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_downtown);
+	PALETTE(config, m_palette).set_entries(512);
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_1_layer)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch[0]);
+	GENERIC_LATCH_8(config, m_soundlatch[1]);
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	X1_010(config, m_x1, 16000000);   /* 16 MHz */
+	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 /***************************************************************************
                                 Athena no Hatena?
 ***************************************************************************/
 
-MACHINE_CONFIG_START(seta_state::atehate)
-
+void seta_state::atehate(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(atehate_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
+	M68000(config, m_maincpu, 16000000);   /* 16 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::atehate_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(seta_state::seta_interrupt_1_and_2), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_no_layers)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta_no_layers));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tndrcade)
-	MCFG_PALETTE_ADD("palette", 512)    /* sprites only */
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tndrcade);
+	PALETTE(config, m_palette).set_entries(512);    // sprites only
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	X1_010(config, m_x1, 16000000);   /* 16 MHz */
+	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 /***************************************************************************
@@ -8240,118 +8284,112 @@ MACHINE_CONFIG_END
     samples are bankswitched
 */
 
-MACHINE_CONFIG_START(seta_state::blandia)
-
+void seta_state::blandia(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(blandia_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_2_and_4, "screen", 0, 1)
+	M68000(config, m_maincpu, 16000000);   /* 16 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::blandia_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(seta_state::seta_interrupt_2_and_4), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, seta_state, screen_vblank_seta_buffer_sprites))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
+	screen.screen_vblank().set(FUNC(seta_state::screen_vblank_seta_buffer_sprites));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_blandia)
-
-	MCFG_PALETTE_ADD("palette", (16*32+64*32*4)*2)  /* sprites, layer1, layer2, palette effect */
-	MCFG_PALETTE_INDIRECT_ENTRIES(0x600*2)
-	MCFG_PALETTE_INIT_OWNER(seta_state,blandia)              /* layers 1&2 are 6 planes deep */
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_blandia);
+	PALETTE(config, m_palette, FUNC(seta_state::blandia_palette), (16*32 + 64*32*4)*2, 0x600*2);  // sprites, layer1, layer2, palette effect - layers 1&2 are 6 planes deep
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADDRESS_MAP(0, blandia_x1_map)
-MACHINE_CONFIG_END
+	X1_010(config, m_x1, 16000000);   /* 16 MHz */
+	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_x1->set_addrmap(0, &seta_state::blandia_x1_map);
+}
 
-MACHINE_CONFIG_START(seta_state::blandiap)
-
+void seta_state::blandiap(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(blandiap_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_2_and_4, "screen", 0, 1)
+	M68000(config, m_maincpu, 16000000);   /* 16 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::blandiap_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(seta_state::seta_interrupt_2_and_4), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, seta_state, screen_vblank_seta_buffer_sprites))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
+	screen.screen_vblank().set(FUNC(seta_state::screen_vblank_seta_buffer_sprites));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_blandia)
-
-	MCFG_PALETTE_ADD("palette", (16*32+64*32*4)*2)  /* sprites, layer1, layer2, palette effect */
-	MCFG_PALETTE_INDIRECT_ENTRIES(0x600*2)
-	MCFG_PALETTE_INIT_OWNER(seta_state,blandia)              /* layers 1&2 are 6 planes deep */
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_blandia);
+	PALETTE(config, m_palette, FUNC(seta_state::blandia_palette), (16*32 + 64*32*4)*2, 0x600*2);  // sprites, layer1, layer2, palette effect - layers 1&2 are 6 planes deep
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADDRESS_MAP(0, blandia_x1_map)
-MACHINE_CONFIG_END
+	X1_010(config, m_x1, 16000000);   /* 16 MHz */
+	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_x1->set_addrmap(0, &seta_state::blandia_x1_map);
+}
 
 
 /***************************************************************************
                                 Block Carnival
 ***************************************************************************/
 
-MACHINE_CONFIG_START(seta_state::blockcar)
-
+void seta_state::blockcar(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000/2) /* 8 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(blockcar_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state,  irq3_line_hold)
+	M68000(config, m_maincpu, 16000000/2); /* 8 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::blockcar_map);
+	m_maincpu->set_vblank_int("screen", FUNC(seta_state::irq3_line_hold));
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_no_layers)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta_no_layers));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tndrcade)
-	MCFG_PALETTE_ADD("palette", 512)    /* sprites only */
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tndrcade);
+	PALETTE(config, m_palette).set_entries(512);    // sprites only
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	X1_010(config, m_x1, 16000000);   /* 16 MHz */
+	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 void seta_state::blockcarb_sound_map(address_map &map)
@@ -8359,35 +8397,35 @@ void seta_state::blockcarb_sound_map(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x7fff).rom();
 	map(0xd000, 0xdfff).ram();
-	//AM_RANGE(0xf001, 0xf001) ??
+	//map(0xf001, 0xf001) ??
 }
 
 void seta_state::blockcarb_sound_portmap(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-//  AM_RANGE(0x00, 0x01) AM_MIRROR(0x3e) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-//  AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x3f) AM_DEVREAD("soundlatch1", generic_latch_8_device, read)
+//  map(0x00, 0x01).mirror(0x3e).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+//  map(0xc0, 0xc0).mirror(0x3f).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));
 }
 
-MACHINE_CONFIG_START(seta_state::blockcarb)
+void seta_state::blockcarb(machine_config &config)
+{
 	blockcar(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(blockcarb_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state,  irq3_line_hold)
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::blockcarb_map);
+	m_maincpu->set_vblank_int("screen", FUNC(seta_state::irq3_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000) // unk freq
-	MCFG_DEVICE_PROGRAM_MAP(blockcarb_sound_map)
-	MCFG_DEVICE_IO_MAP(blockcarb_sound_portmap)
+	Z80(config, m_audiocpu, 4000000); // unk freq
+	m_audiocpu->set_addrmap(AS_PROGRAM, &seta_state::blockcarb_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &seta_state::blockcarb_sound_portmap);
 
 	/* the sound hardware / program is ripped from Tetris (S16B) */
-	MCFG_DEVICE_REMOVE("x1snd")
+	config.device_remove("x1snd");
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki", 1000000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
+		.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 
@@ -8395,74 +8433,50 @@ MACHINE_CONFIG_END
                                 Daioh
 ***************************************************************************/
 
-MACHINE_CONFIG_START(seta_state::daioh)
-
+void seta_state::daioh(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000))   /* 16 MHz, MC68000-16, Verified from PCB */
-	MCFG_DEVICE_PROGRAM_MAP(daioh_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
+	M68000(config, m_maincpu, XTAL(16'000'000));   /* 16 MHz, MC68000-16, Verified from PCB */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::daioh_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(seta_state::seta_interrupt_1_and_2), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57.42)   /* verified on PCB */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(57.42);   /* verified on PCB */
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_msgundam)
-	MCFG_PALETTE_ADD("palette", 512 * 3)    /* sprites, layer1, layer2 */
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_msgundam);
+	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, XTAL(16'000'000))   /* 16 MHz, Verified from PCB audio */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	X1_010(config, m_x1, XTAL(16'000'000));   /* 16 MHz, Verified from PCB audio */
+	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 /***************************************************************************
                        Daioh (prototype)
 ***************************************************************************/
 
-MACHINE_CONFIG_START(seta_state::daiohp)
-
+void seta_state::daiohp(machine_config &config)
+{
+	daioh(config);
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000))   /* 16 MHz, MC68000-16, Verified from PCB */
-	MCFG_DEVICE_PROGRAM_MAP(daiohp_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::daiohp_map);
+}
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
-
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57.42)   /* verified on PCB */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_daiohp)
-	MCFG_PALETTE_ADD("palette", 512 * 3)    /* sprites, layer1, layer2 */
-
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-
-	MCFG_DEVICE_ADD("x1snd", X1_010, XTAL(16'000'000))   /* 16 MHz, Verified from PCB audio */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
 
 /***************************************************************************
                 Dragon Unit, Quiz Kokology, Strike Gunner
@@ -8474,76 +8488,48 @@ MACHINE_CONFIG_END
     lev 2 drives the game
 */
 
-MACHINE_CONFIG_START(seta_state::drgnunit)
-
+void seta_state::drgnunit(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000/2) /* 8 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(drgnunit_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
+	M68000(config, m_maincpu, 16000000/2); /* 8 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::drgnunit_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(seta_state::seta_interrupt_1_and_2), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, seta_state, screen_vblank_seta_buffer_sprites))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
+	screen.screen_vblank().set(FUNC(seta_state::screen_vblank_seta_buffer_sprites));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_downtown)
-	MCFG_PALETTE_ADD("palette", 512)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_downtown);
+	PALETTE(config, m_palette).set_entries(512);
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_1_layer)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	X1_010(config, m_x1, 16000000);   /* 16 MHz */
+	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-/*  Same as qzkklogy, but with a 16MHz CPU and different
-    layout for the layer's tiles    */
+/*  Same as qzkklogy, but with a 16MHz CPU    */
 
-MACHINE_CONFIG_START(seta_state::qzkklgy2)
-
+void seta_state::qzkklgy2(machine_config &config)
+{
+	drgnunit(config);
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(drgnunit_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
+	m_maincpu->set_clock(16000000);   /* 16 MHz */
+}
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
-
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, seta_state, screen_vblank_seta_buffer_sprites))
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_qzkklgy2)
-	MCFG_PALETTE_ADD("palette", 512)
-
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_1_layer)
-
-	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-
-	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
 
 /***************************************************************************
                                 The Roulette
@@ -8562,42 +8548,41 @@ TIMER_DEVICE_CALLBACK_MEMBER(setaroul_state::interrupt)
 	// lev 6: RS232
 }
 
-MACHINE_CONFIG_START(setaroul_state::setaroul)
-
+void setaroul_state::setaroul(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)/2) /* 8 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(setaroul_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", setaroul_state, interrupt, "screen", 0, 1)
-	MCFG_WATCHDOG_ADD("watchdog")
+	M68000(config, m_maincpu, XTAL(16'000'000)/2); /* 8 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &setaroul_state::setaroul_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(setaroul_state::interrupt), "screen", 0, 1);
+
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_MACHINE_START_OVERRIDE(setaroul_state, setaroul)
 	MCFG_MACHINE_RESET_OVERRIDE(setaroul_state, setaroul)
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_RANDOM);
 
 	/* devices */
-	MCFG_DEVICE_ADD("rtc", UPD4992, XTAL(32'768)) // ! Actually D4911C !
-	MCFG_DEVICE_ADD ("acia0", ACIA6850, 0)
-	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(150), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )
+	UPD4992(config, m_rtc); // ! Actually D4911C !
+	ACIA6850(config, "acia0", 0);
+	TICKET_DISPENSER(config, "hopper", attotime::from_msec(150), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(setaroul_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, setaroul_state, screen_vblank))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(setaroul_state::screen_update));
+	screen.screen_vblank().set(FUNC(setaroul_state::screen_vblank));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_setaroul)
-
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_INIT_OWNER(setaroul_state,setaroul)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_setaroul);
+	PALETTE(config, m_palette, FUNC(setaroul_state::setaroul_palette), 512);
 
 	MCFG_VIDEO_START_OVERRIDE(setaroul_state,setaroul_1_layer)
 
@@ -8605,51 +8590,52 @@ MACHINE_CONFIG_START(setaroul_state::setaroul)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, XTAL(16'000'000))   /* 16 MHz */
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	X1_010(config, m_x1, XTAL(16'000'000));   /* 16 MHz */
+	m_x1->add_route(0, "lspeaker", 1.0);
+	m_x1->add_route(1, "rspeaker", 1.0);
 
 	// layout
 	config.set_default_layout(layout_setaroul);
-MACHINE_CONFIG_END
+}
+
 
 /***************************************************************************
                                 Eight Force
 ***************************************************************************/
 
-MACHINE_CONFIG_START(seta_state::eightfrc)
-
+void seta_state::eightfrc(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(wrofaero_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
-	MCFG_WATCHDOG_ADD("watchdog")
+	M68000(config, m_maincpu, 16000000);   /* 16 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::wrofaero_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(seta_state::seta_interrupt_1_and_2), "screen", 0, 1);
+	WATCHDOG_TIMER(config, "watchdog");
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_msgundam)
-	MCFG_PALETTE_ADD("palette", 512 * 3)    /* sprites, layer1, layer2 */
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_msgundam);
+	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADDRESS_MAP(0, blandia_x1_map)
-MACHINE_CONFIG_END
+	X1_010(config, m_x1, 16000000);   /* 16 MHz */
+	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_x1->set_addrmap(0, &seta_state::blandia_x1_map);
+}
 
 
 /***************************************************************************
@@ -8661,32 +8647,29 @@ MACHINE_CONFIG_END
     lev 1 == lev 3 (writes to $500000, bit 4 -> 1 then 0)
     lev 2 drives the game
 */
-MACHINE_CONFIG_START(seta_state::extdwnhl)
-
+void seta_state::extdwnhl(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(extdwnhl_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
-	MCFG_WATCHDOG_ADD("watchdog")
+	M68000(config, m_maincpu, 16000000);   /* 16 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::extdwnhl_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(seta_state::seta_interrupt_1_and_2), "screen", 0, 1);
+	WATCHDOG_TIMER(config, "watchdog");
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_zingzip)
-
-	MCFG_PALETTE_ADD("palette", 16*32+16*32+64*32*2)    /* sprites, layer2, layer1 */
-	MCFG_PALETTE_INDIRECT_ENTRIES(0x600)
-	MCFG_PALETTE_INIT_OWNER(seta_state,zingzip)          /* layer 1 gfx is 6 planes deep */
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_zingzip);
+	PALETTE(config, m_palette, FUNC(seta_state::zingzip_palette), 16*32 + 16*32 + 64*32*2, 0x600);    // sprites, layer2, layer1 - layer 1 gfx is 6 planes deep
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
@@ -8694,23 +8677,23 @@ MACHINE_CONFIG_START(seta_state::extdwnhl)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	X1_010(config, m_x1, 16000000);   /* 16 MHz */
+	m_x1->add_route(0, "lspeaker", 1.0);
+	m_x1->add_route(1, "rspeaker", 1.0);
+}
 
 
 /***************************************************************************
                                 Gundhara
 ***************************************************************************/
-#if __uPD71054_TIMER
+#if USE_uPD71054_TIMER
 INTERRUPT_GEN_MEMBER(seta_state::wrofaero_interrupt)
 {
 	device.execute().set_input_line(2, HOLD_LINE );
 }
 
 MACHINE_START_MEMBER(seta_state,wrofaero){ uPD71054_timer_init(); }
-#endif  // __uPD71054_TIMER
+#endif  // USE_uPD71054_TIMER
 
 
 
@@ -8720,74 +8703,75 @@ MACHINE_START_MEMBER(seta_state,wrofaero){ uPD71054_timer_init(); }
     lev 2: VBlank
     lev 4: Sound (generated by a timer mapped at $d00000-6 ?)
 */
-MACHINE_CONFIG_START(seta_state::gundhara)
-
+void seta_state::gundhara(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(wrofaero_map)
-#if __uPD71054_TIMER
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
+	M68000(config, m_maincpu, 16000000);   /* 16 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::wrofaero_map);
+#if USE_uPD71054_TIMER
+	TIMER(config, "scantimer").configure_scanline(FUNC(seta_state::seta_interrupt_1_and_2), "screen", 0, 1);
 #else
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_2_and_4, "screen", 0, 1)
-#endif  // __uPD71054_TIMER
+	TIMER(config, "scantimer").configure_scanline(FUNC(seta_state::seta_interrupt_2_and_4), "screen", 0, 1);
+#endif  // USE_uPD71054_TIMER
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
-#if __uPD71054_TIMER
+#if USE_uPD71054_TIMER
 	MCFG_MACHINE_START_OVERRIDE(seta_state, wrofaero )
-#endif  // __uPD71054_TIMER
+#endif  // USE_uPD71054_TIMER
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jjsquawk)
-
-	MCFG_PALETTE_ADD("palette", 16*32+64*32*4)  /* sprites, layer2, layer1 */
-	MCFG_PALETTE_INDIRECT_ENTRIES(0x600)
-	MCFG_PALETTE_INIT_OWNER(seta_state,gundhara)             /* layers are 6 planes deep (seta_state,but have only 4 palettes) */
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_jjsquawk);
+	PALETTE(config, m_palette, FUNC(seta_state::gundhara_palette), 16*32 + 64*32*4, 0x600);  // sprites, layer2, layer1 - layers are 6 planes deep (seta_state,but have only 4 palettes)
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	X1_010(config, m_x1, 16000000);   /* 16 MHz */
+	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
+
 
 /***************************************************************************
                                 Zombie Raid
 ***************************************************************************/
 
-MACHINE_START_MEMBER(seta_state,zombraid) { m_gun_recoil.resolve(); }
+MACHINE_START_MEMBER(zombraid_state,zombraid)
+{
+	uPD71054_timer_init();
+	m_gun_recoil.resolve();
+}
 
-MACHINE_CONFIG_START(seta_state::zombraid)
+void zombraid_state::zombraid(machine_config &config)
+{
 	gundhara(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(zombraid_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &zombraid_state::zombraid_map);
 
-	MCFG_MACHINE_START_OVERRIDE(seta_state, zombraid)
+	MCFG_MACHINE_START_OVERRIDE(zombraid_state, zombraid)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	adc0834_device &adc(ADC0834(config, "adc", 0));
-	adc.set_input_callback(FUNC(seta_state::zombraid_adc_cb));
+	adc0834_device &adc(ADC0834(config, "adc"));
+	adc.set_input_callback(FUNC(zombraid_state::adc_cb));
 
-	MCFG_DEVICE_MODIFY("x1snd")
-	MCFG_DEVICE_ADDRESS_MAP(0, zombraid_x1_map)
-MACHINE_CONFIG_END
+	m_x1->set_addrmap(0, &zombraid_state::zombraid_x1_map);
+}
 
 /***************************************************************************
                                 J.J.Squawkers
@@ -8797,118 +8781,115 @@ MACHINE_CONFIG_END
     lev 1 == lev 3 (writes to $500000, bit 4 -> 1 then 0)
     lev 2 drives the game
 */
-MACHINE_CONFIG_START(seta_state::jjsquawk)
-
+void seta_state::jjsquawk(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(wrofaero_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
-	MCFG_WATCHDOG_ADD("watchdog")
+	M68000(config, m_maincpu, 16000000);   /* 16 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::wrofaero_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(seta_state::seta_interrupt_1_and_2), "screen", 0, 1);
+	WATCHDOG_TIMER(config, "watchdog");
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jjsquawk)
-
-	MCFG_PALETTE_ADD("palette", 16*32+64*32*4)  /* sprites, layer2, layer1 */
-	MCFG_PALETTE_INDIRECT_ENTRIES(0x600)
-	MCFG_PALETTE_INIT_OWNER(seta_state,jjsquawk)             /* layers are 6 planes deep */
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_jjsquawk);
+	PALETTE(config, m_palette, FUNC(seta_state::jjsquawk_palette), 16*32 + 64*32*4, 0x600);  // sprites, layer2, layer1 - layers are 6 planes deep
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	X1_010(config, m_x1, 16000000);   /* 16 MHz */
+	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-MACHINE_CONFIG_START(seta_state::jjsquawb)
-
+void seta_state::jjsquawb(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(jjsquawb_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
+	M68000(config, m_maincpu, 16000000);   /* 16 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::jjsquawb_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(seta_state::seta_interrupt_1_and_2), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jjsquawk)
-
-	MCFG_PALETTE_ADD("palette", 16*32+64*32*4)  /* sprites, layer2, layer1 */
-	MCFG_PALETTE_INDIRECT_ENTRIES(0x600)
-	MCFG_PALETTE_INIT_OWNER(seta_state,jjsquawk)             /* layers are 6 planes deep */
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_jjsquawkb);
+	PALETTE(config, m_palette, FUNC(seta_state::jjsquawk_palette), 16*32 + 64*32*4, 0x600);  // sprites, layer2, layer1 - layers are 6 planes deep
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	X1_010(config, m_x1, 16000000);   /* 16 MHz */
+	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
+
 
 /***************************************************************************
                 (Kamen) Masked Riders Club Battle Race
 ***************************************************************************/
 
 /*  kamenrid: lev 2 by vblank, lev 4 by timer */
-MACHINE_CONFIG_START(seta_state::kamenrid)
-
+void seta_state::kamenrid(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(kamenrid_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
-	MCFG_WATCHDOG_ADD("watchdog")
+	M68000(config, m_maincpu, 16000000);   /* 16 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::kamenrid_map);
+	m_maincpu->set_vblank_int("screen", FUNC(seta_state::irq2_line_assert));
 
-	MCFG_DEVICE_ADD("pit", PIT8254, 0) // uPD71054C
-	MCFG_PIT8253_CLK0(16000000/2/8)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, seta_state, pit_out0))
+	WATCHDOG_TIMER(config, "watchdog");
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	pit8254_device &pit(PIT8254(config, "pit", 0)); // uPD71054C
+	pit.set_clk<0>(16000000/2/8);
+	pit.out_handler<0>().set(FUNC(seta_state::pit_out0));
+
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_msgundam)
-	MCFG_PALETTE_ADD("palette", 512 * 3)    /* sprites, layer2, layer1 */
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_msgundam);
+	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	X1_010(config, m_x1, 16000000);   /* 16 MHz */
+	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
+
 
 /***************************************************************************
                                 Orbs
@@ -8916,28 +8897,28 @@ MACHINE_CONFIG_END
 
 /* The CPU clock has been verified/measured, PCB only has one OSC and it's 14.318180 MHz */
 
-MACHINE_CONFIG_START(seta_state::orbs)
-
+void seta_state::orbs(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 14318180/2) /* 7.143 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(orbs_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
+	M68000(config, m_maincpu, 14318180/2); /* 7.143 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::orbs_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(seta_state::seta_interrupt_1_and_2), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(1*8, 39*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_no_layers)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(1*8, 39*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta_no_layers));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_orbs)
-	MCFG_PALETTE_ADD("palette", 512)    /* sprites only */
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tndrcade);
+	PALETTE(config, m_palette).set_entries(512);    // sprites only
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
 
@@ -8945,42 +8926,40 @@ MACHINE_CONFIG_START(seta_state::orbs)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 14318180)   /* 14.318180 MHz */
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
-
-
+	X1_010(config, m_x1, 14318180);   /* 14.318180 MHz */
+	m_x1->add_route(0, "lspeaker", 1.0);
+	m_x1->add_route(1, "rspeaker", 1.0);
+}
 
 
 /***************************************************************************
                   Kero Kero Keroppi no Issyoni Asobou
 ***************************************************************************/
 
-MACHINE_CONFIG_START(seta_state::keroppij)
-
+void seta_state::keroppij(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 14318180/2) /* 7.143 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(keroppi_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
+	M68000(config, m_maincpu, 14318180/2); /* 7.143 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::keroppi_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(seta_state::seta_interrupt_1_and_2), "screen", 0, 1);
 
 	MCFG_MACHINE_START_OVERRIDE(seta_state,keroppi)
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_no_layers)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta_no_layers));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_orbs)
-	MCFG_PALETTE_ADD("palette", 512)    /* sprites only */
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tndrcade);
+	PALETTE(config, m_palette).set_entries(512);    // sprites only
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
 
@@ -8988,59 +8967,61 @@ MACHINE_CONFIG_START(seta_state::keroppij)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 14318180)   /* 14.318180 MHz */
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	X1_010(config, m_x1, 14318180);   /* 14.318180 MHz */
+	m_x1->add_route(0, "lspeaker", 1.0);
+	m_x1->add_route(1, "rspeaker", 1.0);
+}
 
-MACHINE_CONFIG_START(seta_state::keroppi)
+void seta_state::keroppi(machine_config &config)
+{
 	keroppij(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_tndrcade)
-MACHINE_CONFIG_END
+	m_gfxdecode->set_info(gfx_tndrcade);
+}
+
 
 /***************************************************************************
                                 Krazy Bowl
 ***************************************************************************/
 
-MACHINE_CONFIG_START(seta_state::krzybowl)
-
+void seta_state::krzybowl(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(krzybowl_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
+	M68000(config, m_maincpu, 16000000);   /* 16 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::krzybowl_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(seta_state::seta_interrupt_1_and_2), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("upd1", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("TRACK1_X")
-	MCFG_UPD4701_PORTY("TRACK1_Y")
+	upd4701_device &upd1(UPD4701A(config, "upd1"));
+	upd1.set_portx_tag("TRACK1_X");
+	upd1.set_porty_tag("TRACK1_Y");
 
-	MCFG_DEVICE_ADD("upd2", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("TRACK2_X")
-	MCFG_UPD4701_PORTY("TRACK2_Y")
+	upd4701_device &upd2(UPD4701A(config, "upd2"));
+	upd2.set_portx_tag("TRACK2_X");
+	upd2.set_porty_tag("TRACK2_Y");
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(1*8, 39*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_no_layers)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(1*8, 39*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta_no_layers));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tndrcade)
-	MCFG_PALETTE_ADD("palette", 512)    /* sprites only */
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tndrcade);
+	PALETTE(config, m_palette).set_entries(512);    // sprites only
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	X1_010(config, m_x1, 16000000);   /* 16 MHz */
+	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 /***************************************************************************
@@ -9048,46 +9029,44 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 /*  madshark: lev 2 by vblank, lev 4 by timer */
-MACHINE_CONFIG_START(seta_state::madshark)
-
+void seta_state::madshark(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(madshark_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
+	M68000(config, m_maincpu, 16000000);   /* 16 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::madshark_map);
+	m_maincpu->set_vblank_int("screen", FUNC(seta_state::irq2_line_assert));
 
-	MCFG_DEVICE_ADD("pit", PIT8254, 0) // uPD71054C
-	MCFG_PIT8253_CLK0(16000000/2/8)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, seta_state, pit_out0))
+	pit8254_device &pit(PIT8254(config, "pit", 0)); // uPD71054C
+	pit.set_clk<0>(16000000/2/8);
+	pit.out_handler<0>().set(FUNC(seta_state::pit_out0));
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jjsquawk)
-
-	MCFG_PALETTE_ADD("palette", 16*32+64*32*4)  /* sprites, layer2, layer1 */
-	MCFG_PALETTE_INDIRECT_ENTRIES(0x600)
-	MCFG_PALETTE_INIT_OWNER(seta_state,jjsquawk)             /* layers are 6 planes deep */
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_jjsquawk);
+	PALETTE(config, m_palette, FUNC(seta_state::jjsquawk_palette), 16*32 + 64*32*4, 0x600);  // sprites, layer2, layer1 - layers are 6 planes deep
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	X1_010(config, m_x1, 16000000);   /* 16 MHz */
+	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
+
 
 /***************************************************************************
                                 Magical Speed
@@ -9096,45 +9075,45 @@ MACHINE_CONFIG_END
 MACHINE_START_MEMBER(seta_state,magspeed){ m_leds.resolve(); }
 
 /*  magspeed: lev 2 by vblank, lev 4 by timer */
-MACHINE_CONFIG_START(seta_state::magspeed)
-
+void seta_state::magspeed(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(magspeed_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
+	M68000(config, m_maincpu, 16000000);   /* 16 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::magspeed_map);
+	m_maincpu->set_vblank_int("screen", FUNC(seta_state::irq2_line_assert));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	MCFG_MACHINE_START_OVERRIDE(seta_state, magspeed)
 
-	MCFG_DEVICE_ADD("pit", PIT8254, 0) // uPD71054C
-	MCFG_PIT8253_CLK0(16000000/2/8)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, seta_state, pit_out0))
+	pit8254_device &pit(PIT8254(config, "pit", 0)); // uPD71054C
+	pit.set_clk<0>(16000000/2/8);
+	pit.out_handler<0>().set(FUNC(seta_state::pit_out0));
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_msgundam)
-	MCFG_PALETTE_ADD("palette", 512 * 3)    /* sprites, layer2, layer1 */
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_msgundam);
+	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	X1_010(config, m_x1, 16000000);   /* 16 MHz */
+	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 /***************************************************************************
@@ -9143,82 +9122,88 @@ MACHINE_CONFIG_END
 
 /* msgundam lev 2 == lev 6 ! */
 
-MACHINE_CONFIG_START(seta_state::msgundam)
-
+void seta_state::msgundam(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(msgundam_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
+	M68000(config, m_maincpu, 16000000);   /* 16 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::msgundam_map);
+	m_maincpu->set_vblank_int("screen", FUNC(seta_state::irq2_line_assert));
 
-	MCFG_DEVICE_ADD("pit", PIT8254, 0) // uPD71054C
-	MCFG_PIT8253_CLK0(16000000/2/8)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, seta_state, pit_out0))
+	pit8254_device &pit(PIT8254(config, "pit", 0)); // uPD71054C
+	pit.set_clk<0>(16000000/2/8);
+	pit.out_handler<0>().set(FUNC(seta_state::pit_out0));
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(56.66) /* between 56 and 57 to match a real PCB's game speed */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, seta_state, screen_vblank_seta_buffer_sprites))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(56.66); /* between 56 and 57 to match a real PCB's game speed */
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
+	screen.screen_vblank().set(FUNC(seta_state::screen_vblank_seta_buffer_sprites));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_msgundam)
-	MCFG_PALETTE_ADD("palette", 512 * 3)    /* sprites, layer2, layer1 */
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_msgundam);
+	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	X1_010(config, m_x1, 16000000);   /* 16 MHz */
+	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
+void seta_state::msgundamb(machine_config &config)
+{
+	msgundam(config);
 
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::msgundamb_map);
+}
 
 /***************************************************************************
                             Oishii Puzzle
 ***************************************************************************/
 
-MACHINE_CONFIG_START(seta_state::oisipuzl)
-
+void seta_state::oisipuzl(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(oisipuzl_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
+	M68000(config, m_maincpu, 16000000);   /* 16 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::oisipuzl_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(seta_state::seta_interrupt_1_and_2), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_msgundam)
-	MCFG_PALETTE_ADD("palette", 512 * 3)    /* sprites, layer2, layer1 */
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_msgundam);
+	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,oisipuzl_2_layers) // flip is inverted for the tilemaps
+	MCFG_VIDEO_START_OVERRIDE(seta_state, oisipuzl_2_layers) // flip is inverted for the tilemaps
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	X1_010(config, m_x1, 16000000);   /* 16 MHz */
+	m_x1->add_route(0, "lspeaker", 1.0);
+	m_x1->add_route(1, "rspeaker", 1.0);
+}
+
 
 /***************************************************************************
                             Triple Fun
@@ -9226,84 +9211,87 @@ MACHINE_CONFIG_END
 
 /* same as oisipuzl but with different interrupts and sound */
 
-MACHINE_CONFIG_START(seta_state::triplfun)
-
+void seta_state::triplfun(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(triplfun_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state,  irq3_line_hold)
+	M68000(config, m_maincpu, 16000000);   /* 16 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::triplfun_map);
+	m_maincpu->set_vblank_int("screen", FUNC(seta_state::irq3_line_hold));
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_msgundam)
-	MCFG_PALETTE_ADD("palette", 512 * 3)    /* sprites, layer2, layer1 */
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_msgundam);
+	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,oisipuzl_2_layers) // flip is inverted for the tilemaps
+	MCFG_VIDEO_START_OVERRIDE(seta_state, oisipuzl_2_layers) // flip is inverted for the tilemaps
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 792000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	okim6295_device &oki(OKIM6295(config, "oki", 792000, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
+	oki.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	oki.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+}
+
 
 /***************************************************************************
                             Pro Mahjong Kiwame
 ***************************************************************************/
 
-MACHINE_CONFIG_START(seta_state::kiwame)
+WRITE_LINE_MEMBER(kiwame_state::kiwame_vblank)
+{
+	if (state)
+		m_maincpu->external_interrupt_0();
+}
 
+void kiwame_state::kiwame(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(kiwame_map)
-	/* lev 1-7 are the same. WARNING: the interrupt table is written to. */
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state,  irq1_line_hold)
-	MCFG_DEVICE_ADD("tmp68301", TMP68301, 0)
-	MCFG_TMP68301_CPU("maincpu")
-	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(*this, seta_state, kiwame_row_select_w))
+	TMP68301(config, m_maincpu, 16000000);   /* 16 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &kiwame_state::kiwame_map);
+	m_maincpu->out_parallel_callback().set(FUNC(kiwame_state::row_select_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(kiwame_state::setac_gfxbank_callback));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 56*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_no_layers)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 56*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(kiwame_state::screen_update_seta_no_layers));
+	screen.screen_vblank().set(FUNC(kiwame_state::kiwame_vblank));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tndrcade)
-	MCFG_PALETTE_ADD("palette", 512)    /* sprites only */
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tndrcade);
+	PALETTE(config, m_palette).set_entries(512);    // sprites only
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
+	MCFG_VIDEO_START_OVERRIDE(kiwame_state,seta_no_layers)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
-
+	X1_010(config, m_x1, 16000000);   /* 16 MHz */
+	m_x1->add_route(0, "lspeaker", 1.0);
+	m_x1->add_route(1, "rspeaker", 1.0);
+}
 
 
 /***************************************************************************
@@ -9312,39 +9300,39 @@ MACHINE_CONFIG_END
 
 /* pretty much like wrofaero, but ints are 1&2, not 2&4 */
 
-MACHINE_CONFIG_START(seta_state::rezon)
-
+void seta_state::rezon(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(wrofaero_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
-	MCFG_WATCHDOG_ADD("watchdog")
+	M68000(config, m_maincpu, 16000000);   /* 16 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::wrofaero_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(seta_state::seta_interrupt_1_and_2), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	WATCHDOG_TIMER(config, "watchdog");
+
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_msgundam)
-	MCFG_PALETTE_ADD("palette", 512 * 3)    /* sprites, layer1, layer2 */
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_msgundam);
+	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
-
+	X1_010(config, m_x1, 16000000);   /* 16 MHz */
+	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 /***************************************************************************
@@ -9353,37 +9341,37 @@ MACHINE_CONFIG_END
 
 /*  thunderl lev 2 = lev 3 - other levels lead to an error */
 
-MACHINE_CONFIG_START(seta_state::thunderl)
-
+void seta_state::thunderl(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000/2) /* 8 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(thunderl_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
+	M68000(config, m_maincpu, 16000000/2); /* 8 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::thunderl_map);
+	m_maincpu->set_vblank_int("screen", FUNC(seta_state::irq2_line_assert));
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_no_layers)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta_no_layers));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tndrcade)
-	MCFG_PALETTE_ADD("palette", 512)    /* sprites only */
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tndrcade);
+	PALETTE(config, m_palette).set_entries(512);    // sprites only
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	X1_010(config, m_x1, 16000000);   /* 16 MHz */
+	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 void seta_state::thunderlbl_sound_map(address_map &map)
@@ -9399,177 +9387,174 @@ void seta_state::thunderlbl_sound_portmap(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	map(0x00, 0x01).mirror(0x3e).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0xc0, 0xc0).mirror(0x3f).r("soundlatch1", FUNC(generic_latch_8_device::read));
+	map(0xc0, 0xc0).mirror(0x3f).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));
 }
 
-
-MACHINE_CONFIG_START(seta_state::thunderlbl)
+void seta_state::thunderlbl(machine_config &config)
+{
 	thunderl(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(thunderlbl_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::thunderlbl_map);
+	m_maincpu->set_vblank_int("screen", FUNC(seta_state::irq2_line_assert));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 10000000/2)
-	MCFG_DEVICE_PROGRAM_MAP(thunderlbl_sound_map)
-	MCFG_DEVICE_IO_MAP(thunderlbl_sound_portmap)
+	Z80(config, m_audiocpu, 16_MHz_XTAL / 4); // XTAL verified, divider unknown, but Z8400A PS, so likely
+	m_audiocpu->set_addrmap(AS_PROGRAM, &seta_state::thunderlbl_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &seta_state::thunderlbl_sound_portmap);
 
 	/* the sound hardware / program is ripped from Tetris (S16B) */
-	MCFG_DEVICE_REMOVE("x1snd")
+	config.device_remove("x1snd");
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 10000000/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	YM2151(config, "ymsnd", 16_MHz_XTAL / 4).add_route(ALL_OUTPUTS, "mono", 1.0); // XTAL verified, divider unknown
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
-MACHINE_CONFIG_END
+	GENERIC_LATCH_8(config, m_soundlatch[0]);
+	m_soundlatch[0]->data_pending_callback().set_inputline(m_audiocpu, 0);
+}
 
 
-MACHINE_CONFIG_START(seta_state::wiggie)
-
+void seta_state::wiggie(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000/2) /* 8 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(wiggie_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
+	M68000(config, m_maincpu, 16000000/2); /* 8 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::wiggie_map);
+	m_maincpu->set_vblank_int("screen", FUNC(seta_state::irq2_line_assert));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 16000000/4)   /* 4 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(wiggie_sound_map)
+	Z80(config, m_audiocpu, 16000000/4);   /* 4 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &seta_state::wiggie_sound_map);
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_no_layers)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta_no_layers));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wiggie)
-	MCFG_PALETTE_ADD("palette", 512)    /* sprites only */
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_wiggie);
+	PALETTE(config, m_palette).set_entries(512);    // sprites only
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	OKIM6295(config, "oki", 1000000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
-MACHINE_CONFIG_END
+	GENERIC_LATCH_8(config, m_soundlatch[0]);
+	m_soundlatch[0]->data_pending_callback().set_inputline(m_audiocpu, 0);
+}
 
-MACHINE_CONFIG_START(seta_state::superbar)
+void seta_state::superbar(machine_config &config)
+{
 	wiggie(config);
+	m_gfxdecode->set_info(gfx_superbar);
+}
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_superbar)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(seta_state::wits)
-
+void seta_state::wits(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000/2) /* 8 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(thunderl_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state, irq2_line_assert)
+	M68000(config, m_maincpu, 16000000/2); /* 8 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::thunderl_map);
+	m_maincpu->set_vblank_int("screen", FUNC(seta_state::irq2_line_assert));
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_no_layers)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta_no_layers));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tndrcade)
-	MCFG_PALETTE_ADD("palette", 512)    /* sprites only */
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tndrcade);
+	PALETTE(config, m_palette).set_entries(512);    // sprites only
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	X1_010(config, m_x1, 16000000);   /* 16 MHz */
+	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 /***************************************************************************
                     Ultraman Club / SD Gundam Neo Battling
 ***************************************************************************/
 
-MACHINE_CONFIG_START(seta_state::umanclub)
-
+void seta_state::umanclub(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(umanclub_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state,  irq3_line_hold)
+	M68000(config, m_maincpu, 16000000);   /* 16 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::umanclub_map);
+	m_maincpu->set_vblank_int("screen", FUNC(seta_state::irq3_line_hold));
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_no_layers)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta_no_layers));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tndrcade)
-	MCFG_PALETTE_ADD("palette", 512)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tndrcade);
+	PALETTE(config, m_palette).set_entries(512);
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	X1_010(config, m_x1, 16000000);   /* 16 MHz */
+	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 /***************************************************************************
                             Ultra Toukond Densetsu
 ***************************************************************************/
 
-MACHINE_CONFIG_START(seta_state::utoukond)
-
+void seta_state::utoukond(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(utoukond_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
+	M68000(config, m_maincpu, 16000000);   /* 16 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::utoukond_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(seta_state::seta_interrupt_1_and_2), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 16000000/4)   /* 4 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(utoukond_sound_map)
-	MCFG_DEVICE_IO_MAP(utoukond_sound_io_map)
+	Z80(config, m_audiocpu, 16000000/4);   /* 4 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &seta_state::utoukond_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &seta_state::utoukond_sound_io_map);
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_msgundam)
-	MCFG_PALETTE_ADD("palette", 512 * 3)    /* sprites, layer2, layer1 */
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_msgundam);
+	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
@@ -9577,68 +9562,66 @@ MACHINE_CONFIG_START(seta_state::utoukond)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch1")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	GENERIC_LATCH_8(config, m_soundlatch[0]);
+	m_soundlatch[0]->data_pending_callback().set_inputline(m_audiocpu, 0);
+	m_soundlatch[0]->set_separate_acknowledge(true);
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	X1_010(config, m_x1, 16000000);
+	m_x1->add_route(0, "lspeaker", 1.0);
+	m_x1->add_route(1, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("ymsnd", YM3438, 16000000/4) /* 4 MHz */
-	MCFG_YM2612_IRQ_HANDLER(WRITELINE(*this, seta_state, utoukond_ym3438_interrupt))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.30)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.30)
-MACHINE_CONFIG_END
+	ym3438_device &ymsnd(YM3438(config, "ymsnd", 16000000/4)); /* 4 MHz */
+	ymsnd.irq_handler().set(FUNC(seta_state::utoukond_ym3438_interrupt));
+	ymsnd.add_route(0, "lspeaker", 0.30);
+	ymsnd.add_route(1, "rspeaker", 0.30);
+}
 
 
 /***************************************************************************
                                 War of Aero
 ***************************************************************************/
 
-MACHINE_CONFIG_START(seta_state::wrofaero)
-
+void seta_state::wrofaero(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(wrofaero_map)
-#if __uPD71054_TIMER
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state,  wrofaero_interrupt)
+	M68000(config, m_maincpu, 16000000);   /* 16 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::wrofaero_map);
+#if USE_uPD71054_TIMER
+	m_maincpu->set_vblank_int("screen", FUNC(seta_state::wrofaero_interrupt));
 #else
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_2_and_4, "screen", 0, 1)
-#endif  // __uPD71054_TIMER
+	TIMER(config, "scantimer").configure_scanline(FUNC(seta_state::seta_interrupt_2_and_4), "screen", 0, 1);
+#endif  // USE_uPD71054_TIMER
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
-#if __uPD71054_TIMER
+#if USE_uPD71054_TIMER
 	MCFG_MACHINE_START_OVERRIDE(seta_state, wrofaero )
-#endif  // __uPD71054_TIMER
+#endif  // USE_uPD71054_TIMER
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_msgundam)
-	MCFG_PALETTE_ADD("palette", 512 * 3)    /* sprites, layer1, layer2 */
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_msgundam);
+	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
-
-
+	X1_010(config, m_x1, 16000000);   /* 16 MHz */
+	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 /***************************************************************************
@@ -9650,95 +9633,91 @@ MACHINE_CONFIG_END
    at int 1 is necessary: it plays the background music.
 */
 
-MACHINE_CONFIG_START(seta_state::zingzip)
-
+void seta_state::zingzip(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(wrofaero_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", seta_state,  irq3_line_hold)
+	M68000(config, m_maincpu, 16000000);   /* 16 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::wrofaero_map);
+	m_maincpu->set_vblank_int("screen", FUNC(seta_state::irq3_line_hold));
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57.42) // taken from other games but seems to better match PCB videos
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(57.42); // taken from other games but seems to better match PCB videos
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_zingzip)
-
-	MCFG_PALETTE_ADD("palette", 16*32+16*32+64*32*2)    /* sprites, layer2, layer1 */
-	MCFG_PALETTE_INDIRECT_ENTRIES(0x600)
-	MCFG_PALETTE_INIT_OWNER(seta_state,zingzip)              /* layer 1 gfx is 6 planes deep */
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_zingzip);
+	PALETTE(config, m_palette, FUNC(seta_state::zingzip_palette), 16*32 + 16*32 + 64*32*2, 0x600);    // sprites, layer2, layer1 - layer 1 gfx is 6 planes deep
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	X1_010(config, m_x1, 16000000);   /* 16 MHz */
+	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
-MACHINE_CONFIG_START(seta_state::zingzipbl)
+void seta_state::zingzipbl(machine_config &config)
+{
 	zingzip(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_zingzipbl)
+	m_gfxdecode->set_info(gfx_zingzipbl);
 
-	MCFG_DEVICE_REMOVE("maincpu")
+	M68000(config.replace(), m_maincpu, 16000000);   /* 16 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::zingzipbl_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(seta_state::seta_interrupt_1_and_2), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(zingzipbl_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
+	config.device_remove("x1snd");
 
-	MCFG_DEVICE_REMOVE("x1snd")
+	OKIM6295(config, "oki", 1000000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
 
 /***************************************************************************
                                 Pairs Love
 ***************************************************************************/
 
-MACHINE_CONFIG_START(seta_state::pairlove)
-
+void seta_state::pairlove(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000/2) /* 8 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(pairlove_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
+	M68000(config, m_maincpu, 16000000/2); /* 8 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::pairlove_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(seta_state::seta_interrupt_1_and_2), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_no_layers)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta_no_layers));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pairlove)
-	MCFG_PALETTE_ADD("palette", 2048)   /* sprites only */
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pairlove);
+	PALETTE(config, m_palette).set_entries(2048);   // sprites only
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)   /* 16 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	X1_010(config, m_x1, 16000000);   /* 16 MHz */
+	m_x1->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 /***************************************************************************
@@ -9749,50 +9728,48 @@ TIMER_DEVICE_CALLBACK_MEMBER(seta_state::crazyfgt_interrupt)
 {
 	int scanline = param;
 
-	if((scanline % 48) == 0)
+	if ((scanline % 48) == 0)
 		m_maincpu->set_input_line(2, HOLD_LINE); // should this be triggered by the 3812?
 
-	if(scanline == 240)
+	if (scanline == 240)
 		m_maincpu->set_input_line(1, HOLD_LINE);
 }
 
-MACHINE_CONFIG_START(seta_state::crazyfgt)
-
+void seta_state::crazyfgt(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(crazyfgt_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, crazyfgt_interrupt, "screen", 0, 1)
+	M68000(config, m_maincpu, 16_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &seta_state::crazyfgt_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(seta_state::crazyfgt_interrupt), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(59.1851);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_crazyfgt)
-
-	MCFG_PALETTE_ADD("palette", 16*32+64*32*4)  /* sprites, layer1, layer2 */
-	MCFG_PALETTE_INDIRECT_ENTRIES(0x600)
-	MCFG_PALETTE_INIT_OWNER(seta_state,gundhara)             /* layers are 6 planes deep (seta_state,but have only 4 palettes) */
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_blandia);
+	PALETTE(config, m_palette, FUNC(seta_state::gundhara_palette), 16*32 + 64*32*4, 0x600);  // sprites, layer2, layer1 - layers are 6 planes deep (seta_state,but have only 4 palettes)
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_2_layers)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM3812, 16000000/4) /* 4 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", 16_MHz_XTAL / 4));
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)   // clock?
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	okim6295_device &oki(OKIM6295(config, "oki", 4.433619_MHz_XTAL / 4, okim6295_device::PIN7_HIGH));
+	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
+
 
 /***************************************************************************
                                  Jockey Club
@@ -9804,16 +9781,16 @@ TIMER_DEVICE_CALLBACK_MEMBER(jockeyc_state::interrupt)
 	int scanline = param;
 
 	/* ACIA irq */
-	if(scanline == 15)
+	if (scanline == 15)
 		m_maincpu->set_input_line(4, HOLD_LINE);
 
-	if(scanline == 38)
+	if (scanline == 38)
 		m_maincpu->set_input_line(1, HOLD_LINE);
 
-	if(scanline == 61)
+	if (scanline == 61)
 		m_maincpu->set_input_line(2, HOLD_LINE);
 
-	if(scanline >= 85 && (scanline % 23) == 0)
+	if (scanline >= 85 && (scanline % 23) == 0)
 		m_maincpu->set_input_line(6, HOLD_LINE);
 }
 
@@ -9825,41 +9802,39 @@ MACHINE_START_MEMBER(jockeyc_state, jockeyc)
 }
 
 
-MACHINE_CONFIG_START(jockeyc_state::jockeyc)
-
+void jockeyc_state::jockeyc(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)/2) // TMP68000N-8
-	MCFG_DEVICE_PROGRAM_MAP(jockeyc_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", jockeyc_state, interrupt, "screen", 0, 1)
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(2.0)) // jockeyc: watchdog test error if over 2.5s
+	M68000(config, m_maincpu, XTAL(16'000'000)/2); // TMP68000N-8
+	m_maincpu->set_addrmap(AS_PROGRAM, &jockeyc_state::jockeyc_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(jockeyc_state::interrupt), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
+	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_seconds(2.0)); // jockeyc: watchdog test error if over 2.5s
+
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag(m_gfxdecode);
+	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_RANDOM);
 
 	MCFG_MACHINE_START_OVERRIDE(jockeyc_state, jockeyc)
 	/* devices */
-	MCFG_DEVICE_ADD("rtc", UPD4992, XTAL(32'768)) // ! Actually D4911C !
-	MCFG_DEVICE_ADD ("acia0", ACIA6850, 0)
-	MCFG_TICKET_DISPENSER_ADD("hopper1", attotime::from_msec(150), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )
-	MCFG_TICKET_DISPENSER_ADD("hopper2", attotime::from_msec(150), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )
+	UPD4992(config, m_rtc); // ! Actually D4911C !
+	ACIA6850(config, "acia0", 0);
+	TICKET_DISPENSER(config, "hopper1", attotime::from_msec(150), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
+	TICKET_DISPENSER(config, "hopper2", attotime::from_msec(150), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_layers)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(seta_state::screen_update_seta_layers));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jockeyc)
-
-	MCFG_PALETTE_ADD("palette", 512 * 1)
-	MCFG_PALETTE_INIT_OWNER(seta_state,palette_init_RRRRRGGGGGBBBBB_proms)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_downtown);
+	PALETTE(config, m_palette, FUNC(seta_state::palette_init_RRRRRGGGGGBBBBB_proms), 512 * 1);
 
 	MCFG_VIDEO_START_OVERRIDE(jockeyc_state,jockeyc_1_layer)
 
@@ -9867,13 +9842,13 @@ MACHINE_CONFIG_START(jockeyc_state::jockeyc)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("x1snd", X1_010, 16000000)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	X1_010(config, m_x1, 16000000);
+	m_x1->add_route(0, "lspeaker", 1.0);
+	m_x1->add_route(1, "rspeaker", 1.0);
 
 	// layout
 	config.set_default_layout(layout_jockeyc);
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************
@@ -9886,23 +9861,25 @@ MACHINE_START_MEMBER(jockeyc_state, inttoote)
 	m_out_itstart.resolve();
 }
 
-MACHINE_CONFIG_START(jockeyc_state::inttoote)
+void jockeyc_state::inttoote(machine_config &config)
+{
 	jockeyc(config);
-	MCFG_DEVICE_REMOVE("maincpu")
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(16'000'000)) // TMP68HC000N-16
-	MCFG_DEVICE_PROGRAM_MAP(inttoote_map)
+
+	M68000(config.replace(), m_maincpu, XTAL(16'000'000)); // TMP68HC000N-16
+	m_maincpu->set_addrmap(AS_PROGRAM, &jockeyc_state::inttoote_map);
 
 	MCFG_MACHINE_START_OVERRIDE(jockeyc_state, inttoote)
-	// I/O board (not hooked up yet)
-	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
 
-	MCFG_DEVICE_ADD ("acia1", ACIA6850, 0)
-	MCFG_DEVICE_ADD ("acia2", ACIA6850, 0)
+	// I/O board (not hooked up yet)
+	PIA6821(config, "pia0", 0);
+	PIA6821(config, "pia1", 0);
+
+	ACIA6850(config, "acia1", 0);
+	ACIA6850(config, "acia2", 0);
 
 	// layout
 	config.set_default_layout(layout_inttoote);
-MACHINE_CONFIG_END
+}
 
 
 
@@ -9911,6 +9888,11 @@ MACHINE_CONFIG_END
                                 ROMs Loading
 
 ***************************************************************************/
+
+// used for 6bpp gfxs
+#define ROM_LOAD24_BYTE(name, offset,length,hash)        ROMX_LOAD(name, offset, length, hash, ROM_SKIP(2))
+#define ROM_LOAD24_WORD(name, offset,length,hash)        ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_SKIP(1))
+#define ROM_LOAD24_WORD_SWAP(name, offset,length,hash)   ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_SKIP(1))
 
 ROM_START( tndrcade )
 	ROM_REGION( 0x080000, "maincpu", 0 )        /* 68000 Code */
@@ -9974,10 +9956,10 @@ ROM_START( twineagl )
 	ROM_LOAD16_BYTE( "ua2-5",  0x080001, 0x040000, CRC(6e450d28) SHA1(d0050afcc3f425ac70768271c9d2d55ab7fba622) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 )   /* Layer 1 */
-	ROM_LOAD( "ua2-8",  0x000000, 0x080000, CRC(7d3a8d73) SHA1(d6a0bea124d7d228818f8ea8c804ad2ba8cead4b) )
-	ROM_LOAD( "ua2-10", 0x080000, 0x080000, CRC(5bbe1f56) SHA1(309bc43884816dafeb0f47e71ff5272d4d7cac54) )
-	ROM_LOAD( "ua2-7",  0x100000, 0x080000, CRC(fce56907) SHA1(5d0d2d6dfdbadb21f1d61d84b8992ec0e527e18d) )
-	ROM_LOAD( "ua2-9",  0x180000, 0x080000, CRC(a451eae9) SHA1(c236c92d9ecf56f8d8f4a5ee493e3791be0d3db4) )
+	ROM_LOAD16_BYTE( "ua2-7",  0x000001, 0x080000, CRC(fce56907) SHA1(5d0d2d6dfdbadb21f1d61d84b8992ec0e527e18d) )
+	ROM_LOAD16_BYTE( "ua2-8",  0x000000, 0x080000, CRC(7d3a8d73) SHA1(d6a0bea124d7d228818f8ea8c804ad2ba8cead4b) )
+	ROM_LOAD16_BYTE( "ua2-9",  0x100001, 0x080000, CRC(a451eae9) SHA1(c236c92d9ecf56f8d8f4a5ee493e3791be0d3db4) )
+	ROM_LOAD16_BYTE( "ua2-10", 0x100000, 0x080000, CRC(5bbe1f56) SHA1(309bc43884816dafeb0f47e71ff5272d4d7cac54) )
 
 	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "ua2-11", 0x000000, 0x080000, CRC(624e6057) SHA1(0e8e4d4b6bc5febf5ca83eea92e3ed06f16e7df0) )
@@ -10002,8 +9984,8 @@ ROM_START( downtown )
 	ROM_LOAD16_BYTE( "ud2-001-008-t04.6n", 0x100001, 0x080000, CRC(99b9d757) SHA1(c3a763993305110ec2a0b231d75fbef4c385d21b) ) /* 32 pin MASK rom */
 
 	ROM_REGION( 0x100000, "gfx2", 0 )   /* Layer 1 */
-	ROM_LOAD( "ud2-001-009-t05.8n", 0x000000, 0x080000, CRC(aee6c581) SHA1(5b2150a308ca12eea8148d0bbff663b3baf0c831) ) /* 32 pin MASK rom */
-	ROM_LOAD( "ud2-001-010-t06.9n", 0x080000, 0x080000, CRC(3d399d54) SHA1(7d9036e73fbf0e9c3b976336e3e4786b17b2f4fc) ) /* 32 pin MASK rom */
+	ROM_LOAD16_BYTE( "ud2-001-009-t05.8n", 0x000000, 0x080000, CRC(aee6c581) SHA1(5b2150a308ca12eea8148d0bbff663b3baf0c831) ) /* 32 pin MASK rom */
+	ROM_LOAD16_BYTE( "ud2-001-010-t06.9n", 0x000001, 0x080000, CRC(3d399d54) SHA1(7d9036e73fbf0e9c3b976336e3e4786b17b2f4fc) ) /* 32 pin MASK rom */
 
 	ROM_REGION( 0x080000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "ud2-001-011-t07.14n", 0x000000, 0x080000, CRC(9c9ff69f) SHA1(3840b654f4f709bc4c03dfe4ee79369d5c70dd62) ) /* 32 pin MASK rom */
@@ -10027,8 +10009,8 @@ ROM_START( downtown2 )
 	ROM_LOAD16_BYTE( "ud2-001-008-t04.6n", 0x100001, 0x080000, CRC(99b9d757) SHA1(c3a763993305110ec2a0b231d75fbef4c385d21b) ) /* 32 pin MASK rom */
 
 	ROM_REGION( 0x100000, "gfx2", 0 )   /* Layer 1 */
-	ROM_LOAD( "ud2-001-009-t05.8n", 0x000000, 0x080000, CRC(aee6c581) SHA1(5b2150a308ca12eea8148d0bbff663b3baf0c831) ) /* 32 pin MASK rom */
-	ROM_LOAD( "ud2-001-010-t06.9n", 0x080000, 0x080000, CRC(3d399d54) SHA1(7d9036e73fbf0e9c3b976336e3e4786b17b2f4fc) ) /* 32 pin MASK rom */
+	ROM_LOAD16_BYTE( "ud2-001-009-t05.8n", 0x000000, 0x080000, CRC(aee6c581) SHA1(5b2150a308ca12eea8148d0bbff663b3baf0c831) ) /* 32 pin MASK rom */
+	ROM_LOAD16_BYTE( "ud2-001-010-t06.9n", 0x000001, 0x080000, CRC(3d399d54) SHA1(7d9036e73fbf0e9c3b976336e3e4786b17b2f4fc) ) /* 32 pin MASK rom */
 
 	ROM_REGION( 0x080000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "ud2-001-011-t07.14n", 0x000000, 0x080000, CRC(9c9ff69f) SHA1(3840b654f4f709bc4c03dfe4ee79369d5c70dd62) ) /* 32 pin MASK rom */
@@ -10052,8 +10034,8 @@ ROM_START( downtownj )
 	ROM_LOAD16_BYTE( "ud2-001-008-t04.6n", 0x100001, 0x080000, CRC(99b9d757) SHA1(c3a763993305110ec2a0b231d75fbef4c385d21b) ) /* 32 pin MASK rom */
 
 	ROM_REGION( 0x100000, "gfx2", 0 )   /* Layer 1 */
-	ROM_LOAD( "ud2-001-009-t05.8n", 0x000000, 0x080000, CRC(aee6c581) SHA1(5b2150a308ca12eea8148d0bbff663b3baf0c831) ) /* 32 pin MASK rom */
-	ROM_LOAD( "ud2-001-010-t06.9n", 0x080000, 0x080000, CRC(3d399d54) SHA1(7d9036e73fbf0e9c3b976336e3e4786b17b2f4fc) ) /* 32 pin MASK rom */
+	ROM_LOAD16_BYTE( "ud2-001-009-t05.8n", 0x000000, 0x080000, CRC(aee6c581) SHA1(5b2150a308ca12eea8148d0bbff663b3baf0c831) ) /* 32 pin MASK rom */
+	ROM_LOAD16_BYTE( "ud2-001-010-t06.9n", 0x000001, 0x080000, CRC(3d399d54) SHA1(7d9036e73fbf0e9c3b976336e3e4786b17b2f4fc) ) /* 32 pin MASK rom */
 
 	ROM_REGION( 0x080000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "ud2-001-011-t07.14n", 0x000000, 0x080000, CRC(9c9ff69f) SHA1(3840b654f4f709bc4c03dfe4ee79369d5c70dd62) ) /* 32 pin MASK rom */
@@ -10077,8 +10059,8 @@ ROM_START( downtownp )
 	ROM_LOAD16_BYTE( "ud2-001-008-t04.6n", 0x100001, 0x080000, CRC(99b9d757) SHA1(c3a763993305110ec2a0b231d75fbef4c385d21b) ) /* 32 pin MASK rom */
 
 	ROM_REGION( 0x100000, "gfx2", 0 )   /* Layer 1 */
-	ROM_LOAD( "ud2-001-009-t05.8n", 0x000000, 0x080000, CRC(aee6c581) SHA1(5b2150a308ca12eea8148d0bbff663b3baf0c831) ) /* 32 pin MASK rom */
-	ROM_LOAD( "ud2-001-010-t06.9n", 0x080000, 0x080000, CRC(3d399d54) SHA1(7d9036e73fbf0e9c3b976336e3e4786b17b2f4fc) ) /* 32 pin MASK rom */
+	ROM_LOAD16_BYTE( "ud2-001-009-t05.8n", 0x000000, 0x080000, CRC(aee6c581) SHA1(5b2150a308ca12eea8148d0bbff663b3baf0c831) ) /* 32 pin MASK rom */
+	ROM_LOAD16_BYTE( "ud2-001-010-t06.9n", 0x000001, 0x080000, CRC(3d399d54) SHA1(7d9036e73fbf0e9c3b976336e3e4786b17b2f4fc) ) /* 32 pin MASK rom */
 
 	ROM_REGION( 0x080000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "ud2-001-011-t07.14n", 0x000000, 0x080000, CRC(9c9ff69f) SHA1(3840b654f4f709bc4c03dfe4ee79369d5c70dd62) ) /* 32 pin MASK rom */
@@ -10102,20 +10084,20 @@ ROM_START( usclssic )
 	ROM_LOAD16_BYTE( "ue001006.116", 0x100001, 0x080000, CRC(a6ab6ef4) SHA1(9f54f116d1d8e54d64ba541195baa66c5ca960bd) )
 
 	ROM_REGION( 0x600000, "gfx2", 0 )   /* Layer 1 */
-	ROM_LOAD( "ue001010.120", 0x000000, 0x080000, CRC(dd683031) SHA1(06ed38a243666c1acaf8eb3fdba51d18fc2a70bc) )    // planes 01
-	ROM_LOAD( "ue001011.121", 0x080000, 0x080000, CRC(0e27bc49) SHA1(f9ec4f4c15c86f608607a5ec916f5182a8e265fa) )
-	ROM_LOAD( "ue001012.122", 0x100000, 0x080000, CRC(961dfcdc) SHA1(9de95692860abd4206db22ad7ade9f02f0c03506) )
-	ROM_LOAD( "ue001013.123", 0x180000, 0x080000, CRC(03e9eb79) SHA1(e7cabfd73b73c7df8d79c113db5eca110bf2f05e) )
+	ROM_LOAD24_BYTE( "ue001010.120", 0x000000, 0x080000, CRC(dd683031) SHA1(06ed38a243666c1acaf8eb3fdba51d18fc2a70bc) )    // planes 01
+	ROM_LOAD24_BYTE( "ue001011.121", 0x180000, 0x080000, CRC(0e27bc49) SHA1(f9ec4f4c15c86f608607a5ec916f5182a8e265fa) )
+	ROM_LOAD24_BYTE( "ue001012.122", 0x300000, 0x080000, CRC(961dfcdc) SHA1(9de95692860abd4206db22ad7ade9f02f0c03506) )
+	ROM_LOAD24_BYTE( "ue001013.123", 0x480000, 0x080000, CRC(03e9eb79) SHA1(e7cabfd73b73c7df8d79c113db5eca110bf2f05e) )
 
-	ROM_LOAD( "ue001014.124", 0x200000, 0x080000, CRC(9576ace7) SHA1(a5350934533241daf63c561a88d952bb6976b81b) )    // planes 23
-	ROM_LOAD( "ue001015.125", 0x280000, 0x080000, CRC(631d6eb1) SHA1(df342c20e2b3c29eab3c72440c11be60d14d3557) )
-	ROM_LOAD( "ue001016.126", 0x300000, 0x080000, CRC(f44a8686) SHA1(649f6f95cc67fa2f4551af19a2b607c811318820) )
-	ROM_LOAD( "ue001017.127", 0x380000, 0x080000, CRC(7f568258) SHA1(ac36e87386f9d5c68c66a9469e1b30ee66c4cb7f) )
+	ROM_LOAD24_BYTE( "ue001014.124", 0x000001, 0x080000, CRC(9576ace7) SHA1(a5350934533241daf63c561a88d952bb6976b81b) )    // planes 23
+	ROM_LOAD24_BYTE( "ue001015.125", 0x180001, 0x080000, CRC(631d6eb1) SHA1(df342c20e2b3c29eab3c72440c11be60d14d3557) )
+	ROM_LOAD24_BYTE( "ue001016.126", 0x300001, 0x080000, CRC(f44a8686) SHA1(649f6f95cc67fa2f4551af19a2b607c811318820) )
+	ROM_LOAD24_BYTE( "ue001017.127", 0x480001, 0x080000, CRC(7f568258) SHA1(ac36e87386f9d5c68c66a9469e1b30ee66c4cb7f) )
 
-	ROM_LOAD( "ue001018.128", 0x400000, 0x080000, CRC(4bd98f23) SHA1(be6483253a5ea1efe7c7f6b4432fe819b906894c) )    // planes 45
-	ROM_LOAD( "ue001019.129", 0x480000, 0x080000, CRC(6d9f5a33) SHA1(8d300adf2b3299df78e274c4c7f2ee2d8e1e2575) )
-	ROM_LOAD( "ue001020.130", 0x500000, 0x080000, CRC(bc07403f) SHA1(f994b6d1dee23f5dabdb328f955f4380a8ca9d52) )
-	ROM_LOAD( "ue001021.131", 0x580000, 0x080000, CRC(98c03efd) SHA1(761c51d5573e6f35c48b8b9ee5d88cbde02e92a7) )
+	ROM_LOAD24_BYTE( "ue001018.128", 0x000002, 0x080000, CRC(4bd98f23) SHA1(be6483253a5ea1efe7c7f6b4432fe819b906894c) )    // planes 45
+	ROM_LOAD24_BYTE( "ue001019.129", 0x180002, 0x080000, CRC(6d9f5a33) SHA1(8d300adf2b3299df78e274c4c7f2ee2d8e1e2575) )
+	ROM_LOAD24_BYTE( "ue001020.130", 0x300002, 0x080000, CRC(bc07403f) SHA1(f994b6d1dee23f5dabdb328f955f4380a8ca9d52) )
+	ROM_LOAD24_BYTE( "ue001021.131", 0x480002, 0x080000, CRC(98c03efd) SHA1(761c51d5573e6f35c48b8b9ee5d88cbde02e92a7) )
 
 	ROM_REGION( 0x400, "proms", 0 ) /* Extra Colours */
 	ROM_LOAD16_BYTE( "ue1-022.prm", 0x000, 0x200, CRC(1a23129e) SHA1(110eb54ab83ecb8375164a5c96f522b2737c379c) )
@@ -10143,8 +10125,8 @@ ROM_START( calibr50 )
 	ROM_LOAD16_BYTE( "uh001009.ux0", 0x100001, 0x080000, CRC(f85da2c5) SHA1(d090e49b3a897729c7fb05f9386939448fe1d3d9) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )   /* Layer 1 */
-	ROM_LOAD( "uh001010.u3x", 0x000000, 0x080000, CRC(f986577a) SHA1(8f6c2fca271fed21a1c04e93c3f50dc41348ae30) )
-	ROM_LOAD( "uh001011.u50", 0x080000, 0x080000, CRC(08620052) SHA1(e2ab49dbabc139e6b276401340085ccab1ae3892) )
+	ROM_LOAD16_BYTE( "uh001010.u3x", 0x000000, 0x080000, CRC(f986577a) SHA1(8f6c2fca271fed21a1c04e93c3f50dc41348ae30) )
+	ROM_LOAD16_BYTE( "uh001011.u50", 0x000001, 0x080000, CRC(08620052) SHA1(e2ab49dbabc139e6b276401340085ccab1ae3892) )
 
 	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "uh001013.u60", 0x000000, 0x080000, CRC(09ec0df6) SHA1(57c68d05074ea4a1e133be2ce6e25c594f04a712) )
@@ -10169,10 +10151,10 @@ ROM_START( arbalest )
 	ROM_LOAD16_BYTE( "uk001.09", 0x080001, 0x040000, CRC(b4748ae0) SHA1(a71e671754ed5bba737f0b5f7be510a23d5e925c) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 )   /* Layer 1 */
-	ROM_LOAD( "uk-001-010-t26", 0x000000, 0x080000, CRC(c1e2f823) SHA1(892473351e7b590c59c578047a67fc235bd31e02) ) /* Mask ROM on P1-036A sub PCB */
-	ROM_LOAD( "uk-001-011-t27", 0x080000, 0x080000, CRC(09dfe56a) SHA1(077627627d3cb8f79ffdd83e46157bd3c473c4a1) ) /* Mask ROM on P1-036A sub PCB */
-	ROM_LOAD( "uk-001-012-t28", 0x100000, 0x080000, CRC(818a4085) SHA1(fd8b5658fc7f5fa6d3daebb4be17aeabd60c9028) ) /* Mask ROM on P1-036A sub PCB */
-	ROM_LOAD( "uk-001-013-t29", 0x180000, 0x080000, CRC(771fa164) SHA1(a91214318808f991846a828f0e309c0ff430245e) ) /* Mask ROM on P1-036A sub PCB */
+	ROM_LOAD16_BYTE( "uk-001-010-t26", 0x000000, 0x080000, CRC(c1e2f823) SHA1(892473351e7b590c59c578047a67fc235bd31e02) ) /* Mask ROM on P1-036A sub PCB */
+	ROM_LOAD16_BYTE( "uk-001-011-t27", 0x100000, 0x080000, CRC(09dfe56a) SHA1(077627627d3cb8f79ffdd83e46157bd3c473c4a1) ) /* Mask ROM on P1-036A sub PCB */
+	ROM_LOAD16_BYTE( "uk-001-012-t28", 0x000001, 0x080000, CRC(818a4085) SHA1(fd8b5658fc7f5fa6d3daebb4be17aeabd60c9028) ) /* Mask ROM on P1-036A sub PCB */
+	ROM_LOAD16_BYTE( "uk-001-013-t29", 0x100001, 0x080000, CRC(771fa164) SHA1(a91214318808f991846a828f0e309c0ff430245e) ) /* Mask ROM on P1-036A sub PCB */
 
 	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "uk-001-015-t31", 0x000000, 0x080000, CRC(ce9df5dd) SHA1(91d879b774b5b367adb5bd511fda827bc0bae0a9) ) /* Mask ROM on P1-036A sub PCB */
@@ -10200,10 +10182,10 @@ ROM_START( metafox )
 	ROM_LOAD16_BYTE( "p1009166", 0x080001, 0x040000, CRC(8344afd2) SHA1(7348b423405ad00b9240d152b119cf5341754815) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 )   /* Layer 1 */
-	ROM_LOAD( "up001010", 0x000000, 0x080000, CRC(bfbab472) SHA1(d3e7b20d14de48134c4fbe3da31feb928c1c655b) )
-	ROM_LOAD( "up001011", 0x080000, 0x080000, CRC(26cea381) SHA1(b4bfd2a13ef6051376fe3ed57e2331a072970f86) )
-	ROM_LOAD( "up001012", 0x100000, 0x080000, CRC(fed2c5f9) SHA1(81f0f19a500b665c937f5431000ebde7abd97c30) )
-	ROM_LOAD( "up001013", 0x180000, 0x080000, CRC(adabf9ea) SHA1(db28e4e565e567a97a6b05a4803a55a403e24a0e) )
+	ROM_LOAD16_BYTE( "up001010", 0x000000, 0x080000, CRC(bfbab472) SHA1(d3e7b20d14de48134c4fbe3da31feb928c1c655b) )
+	ROM_LOAD16_BYTE( "up001011", 0x100000, 0x080000, CRC(26cea381) SHA1(b4bfd2a13ef6051376fe3ed57e2331a072970f86) )
+	ROM_LOAD16_BYTE( "up001012", 0x000001, 0x080000, CRC(fed2c5f9) SHA1(81f0f19a500b665c937f5431000ebde7abd97c30) )
+	ROM_LOAD16_BYTE( "up001013", 0x100001, 0x080000, CRC(adabf9ea) SHA1(db28e4e565e567a97a6b05a4803a55a403e24a0e) )
 
 	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "up001015", 0x000000, 0x080000, CRC(2e20e39f) SHA1(6f8bd4a76ed5c2150015698e7a98044d060157be) )
@@ -10226,14 +10208,14 @@ ROM_START( drgnunit )
 	ROM_LOAD16_BYTE( "obj-7.bin", 0x0c0001, 0x020000, CRC(cbaa7f6a) SHA1(060f0651b8ca07d239ef1b7c63943cdd433e1ae9) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )   /* Layer 1 */
-	ROM_LOAD( "scr-1o.bin",  0x000000, 0x020000, CRC(671525db) SHA1(e230e99754c9f40af7da2054bd5ea09823e0b1b7) )
-	ROM_LOAD( "scr-2o.bin",  0x020000, 0x020000, CRC(2a3f2ed8) SHA1(9d188100437a10eb3d3097f28e28e3cb2dc1b21d) )
-	ROM_LOAD( "scr-3o.bin",  0x040000, 0x020000, CRC(4d33a92d) SHA1(8b09768abb460446405224565eb6652d2dc1c571) )
-	ROM_LOAD( "scr-4o.bin",  0x060000, 0x020000, CRC(79a0aa61) SHA1(9905d90afb759b1d983856d7bef17c139d4f0e4f) )
-	ROM_LOAD( "scr-1e.bin",  0x080000, 0x020000, CRC(dc9cd8c9) SHA1(04450a5cfde5d6b69fdd745cd930309863e1aadd) )
-	ROM_LOAD( "scr-2e.bin",  0x0a0000, 0x020000, CRC(b6126b41) SHA1(13275f05868d93af95ebb162d229b69ddd660438) )
-	ROM_LOAD( "scr-3e.bin",  0x0c0000, 0x020000, CRC(1592b8c2) SHA1(d337de280c5ea3704dec9baa04c45e1c837924a9) )
-	ROM_LOAD( "scr-4e.bin",  0x0e0000, 0x020000, CRC(8201681c) SHA1(7784a68828d728107b0228bb3568129c543cbf40) )
+	ROM_LOAD16_BYTE( "scr-1o.bin",  0x000000, 0x020000, CRC(671525db) SHA1(e230e99754c9f40af7da2054bd5ea09823e0b1b7) )
+	ROM_LOAD16_BYTE( "scr-2o.bin",  0x040000, 0x020000, CRC(2a3f2ed8) SHA1(9d188100437a10eb3d3097f28e28e3cb2dc1b21d) )
+	ROM_LOAD16_BYTE( "scr-3o.bin",  0x080000, 0x020000, CRC(4d33a92d) SHA1(8b09768abb460446405224565eb6652d2dc1c571) )
+	ROM_LOAD16_BYTE( "scr-4o.bin",  0x0c0000, 0x020000, CRC(79a0aa61) SHA1(9905d90afb759b1d983856d7bef17c139d4f0e4f) )
+	ROM_LOAD16_BYTE( "scr-1e.bin",  0x000001, 0x020000, CRC(dc9cd8c9) SHA1(04450a5cfde5d6b69fdd745cd930309863e1aadd) )
+	ROM_LOAD16_BYTE( "scr-2e.bin",  0x040001, 0x020000, CRC(b6126b41) SHA1(13275f05868d93af95ebb162d229b69ddd660438) )
+	ROM_LOAD16_BYTE( "scr-3e.bin",  0x080001, 0x020000, CRC(1592b8c2) SHA1(d337de280c5ea3704dec9baa04c45e1c837924a9) )
+	ROM_LOAD16_BYTE( "scr-4e.bin",  0x0c0001, 0x020000, CRC(8201681c) SHA1(7784a68828d728107b0228bb3568129c543cbf40) )
 
 	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "snd-1.bin", 0x000000, 0x020000, CRC(8f47bd0d) SHA1(c55e22ac4294931cfb72ac88a2128891d9f8ee93) )
@@ -10289,9 +10271,33 @@ ROM_START( thunderlbl )
 
 	ROM_REGION( 0x080000, "gfx1", 0 )   /* Sprites */
 	ROM_LOAD16_BYTE( "25.a10", 0x000000, 0x020000, CRC(599a632a) SHA1(29da423dfe1f971cbb205767cf902d199d968d85) )
-	ROM_LOAD16_BYTE( "24.a8", 0x000001, 0x020000, CRC(3aeef91c) SHA1(a5dc8c22a7bcc1199bdd09c7d0f1f8a378e757c5) )
-	ROM_LOAD16_BYTE( "23.a5", 0x040000, 0x020000, CRC(b97a7b56) SHA1(c08d3586d489947af21f3493356e3a88d79746e8) )
-	ROM_LOAD16_BYTE( "22.a3", 0x040001, 0x020000, CRC(79c707be) SHA1(f67fa40c8f6ab0fbce44997fdfbf699fea1f0df6) )
+	ROM_LOAD16_BYTE( "24.a8",  0x000001, 0x020000, CRC(3aeef91c) SHA1(a5dc8c22a7bcc1199bdd09c7d0f1f8a378e757c5) )
+	ROM_LOAD16_BYTE( "23.a5",  0x040000, 0x020000, CRC(b97a7b56) SHA1(c08d3586d489947af21f3493356e3a88d79746e8) )
+	ROM_LOAD16_BYTE( "22.a3",  0x040001, 0x020000, CRC(79c707be) SHA1(f67fa40c8f6ab0fbce44997fdfbf699fea1f0df6) )
+ROM_END
+
+ROM_START( thunderlbl2 ) // 2 PCB stack, label JK274
+	ROM_REGION( 0x010000, "maincpu", 0 )        /* 68000 Code, both 27c256, on main PCB */
+	ROM_LOAD16_BYTE( "g11", 0x000000, 0x008000, CRC(e4842fbd) SHA1(6fc4cded6a7f2e7f331c22323c5b793a7bafdd06) )
+	ROM_LOAD16_BYTE( "f11", 0x000001, 0x008000, CRC(b883ab13) SHA1(b835506b97359e3cd9e528d78c6195721be9e878) )
+
+	// they ripped the sound CPU program from Tetris!
+	ROM_REGION( 0x40000, "audiocpu", 0 ) /* sound cpu code, on main PCB */
+	ROM_LOAD( "d", 0x00000, 0x08000, CRC(bd9ba01b) SHA1(fafa7dc36cc057a50ae4cdf7a35f3594292336f4) ) // 27c256
+
+	ROM_REGION( 0x080000, "gfx1", 0 )   /* Sprites, all 27c010a, on sub PCB */
+	ROM_LOAD16_BYTE( "a10", 0x000000, 0x020000, CRC(599a632a) SHA1(29da423dfe1f971cbb205767cf902d199d968d85) )
+	ROM_LOAD16_BYTE( "a8",  0x000001, 0x020000, CRC(3aeef91c) SHA1(a5dc8c22a7bcc1199bdd09c7d0f1f8a378e757c5) )
+	ROM_LOAD16_BYTE( "a5",  0x040000, 0x020000, CRC(b97a7b56) SHA1(c08d3586d489947af21f3493356e3a88d79746e8) )
+	ROM_LOAD16_BYTE( "a3",  0x040001, 0x020000, CRC(79c707be) SHA1(f67fa40c8f6ab0fbce44997fdfbf699fea1f0df6) )
+
+	ROM_REGION( 0xc00, "plds", 0 ) // all on sub PCB
+	ROM_LOAD( "pal16l8acn.e13", 0x000, 0x104, NO_DUMP )
+	ROM_LOAD( "pal16l8acn.e14", 0x200, 0x104, NO_DUMP )
+	ROM_LOAD( "pal16l8acn.e15", 0x400, 0x104, NO_DUMP )
+	ROM_LOAD( "pal16l8acn.f13", 0x600, 0x104, NO_DUMP )
+	ROM_LOAD( "pal16l8acn.h9",  0x800, 0x104, NO_DUMP )
+	ROM_LOAD( "pal16l8acn.i3",  0xa00, 0x104, NO_DUMP )
 ROM_END
 
 /*
@@ -10385,10 +10391,10 @@ ROM_START( rezon )
 	ROM_LOAD( "us001005.u63",  0x080000, 0x080000, CRC(e6251ebc) SHA1(f02a4c8373e33fc57e18e39f1b5ecff3f6d9ca9e) )
 
 	ROM_REGION( 0x080000, "gfx2", 0 )   /* Layer 1 */
-	ROM_LOAD( "us001007.u66",  0x000000, 0x080000, CRC(3760b935) SHA1(f5fe69f7e93c90a5b6c1dff236402b962821e33f) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD16_WORD_SWAP( "us001007.u66",  0x000000, 0x080000, CRC(3760b935) SHA1(f5fe69f7e93c90a5b6c1dff236402b962821e33f) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
 
 	ROM_REGION( 0x080000, "gfx3", 0 )   /* Layer 2 */
-	ROM_LOAD( "us001008.u68",  0x000000, 0x080000, CRC(0ab73910) SHA1(78e2c0570c5c6f5e1cdb2fbeae73376923127024) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD16_WORD_SWAP( "us001008.u68",  0x000000, 0x080000, CRC(0ab73910) SHA1(78e2c0570c5c6f5e1cdb2fbeae73376923127024) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
 
 	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD16_WORD_SWAP( "us001009.u70",  0x000000, 0x100000, CRC(0d7d2e2b) SHA1(cfba19314ecb0a49ed9ff8df32cd6a3fe37ff526) )
@@ -10410,10 +10416,10 @@ ROM_START( rezont )
 	ROM_LOAD( "us001005.u63",  0x080000, 0x080000, CRC(e6251ebc) SHA1(f02a4c8373e33fc57e18e39f1b5ecff3f6d9ca9e) )
 
 	ROM_REGION( 0x080000, "gfx2", 0 )   /* Layer 1 */
-	ROM_LOAD( "us001007.u66",  0x000000, 0x080000, CRC(3760b935) SHA1(f5fe69f7e93c90a5b6c1dff236402b962821e33f) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD16_WORD_SWAP( "us001007.u66",  0x000000, 0x080000, CRC(3760b935) SHA1(f5fe69f7e93c90a5b6c1dff236402b962821e33f) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
 
 	ROM_REGION( 0x080000, "gfx3", 0 )   /* Layer 2 */
-	ROM_LOAD( "us001008.u68",  0x000000, 0x080000, CRC(0ab73910) SHA1(78e2c0570c5c6f5e1cdb2fbeae73376923127024) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD16_WORD_SWAP( "us001008.u68",  0x000000, 0x080000, CRC(0ab73910) SHA1(78e2c0570c5c6f5e1cdb2fbeae73376923127024) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
 
 	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD16_WORD_SWAP( "us001009.u70",  0x000000, 0x100000, CRC(0d7d2e2b) SHA1(cfba19314ecb0a49ed9ff8df32cd6a3fe37ff526) )
@@ -10431,8 +10437,8 @@ ROM_START( stg )
 	ROM_LOAD( "att01005.u26", 0x080000, 0x080000, CRC(a347ff00) SHA1(8455c5e7dfa25646b1782ab3bcf62fca91ca03ad) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )   /* Layer 1 */
-	ROM_LOAD( "att01008.u39", 0x000000, 0x080000, CRC(20c47457) SHA1(53ddf8c076aa35fb87edc739bc9e9612a5a1526b) ) // FIRST AND SECOND HALF IDENTICAL
-	ROM_LOAD( "att01007.u42", 0x080000, 0x080000, CRC(ac975544) SHA1(5cdd2c7aada7179d4bdaf8578134c0ef672a2704) ) // FIRST AND SECOND HALF IDENTICAL
+	ROM_LOAD16_BYTE( "att01008.u39", 0x000000, 0x080000, CRC(20c47457) SHA1(53ddf8c076aa35fb87edc739bc9e9612a5a1526b) ) // FIRST AND SECOND HALF IDENTICAL
+	ROM_LOAD16_BYTE( "att01007.u42", 0x000001, 0x080000, CRC(ac975544) SHA1(5cdd2c7aada7179d4bdaf8578134c0ef672a2704) ) // FIRST AND SECOND HALF IDENTICAL
 
 	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "att01009.u47", 0x000000, 0x080000, CRC(4276b58d) SHA1(a2e77dc3295791520c6cb25dea4e910b5a7bc137) )
@@ -10451,13 +10457,13 @@ ROM_START( blandia )
 	ROM_LOAD( "ux001006.u63",  0x200000, 0x100000, CRC(abc01cf7) SHA1(c3f26e75eeb68073d2825be8df82cc6afcfbfb26) )
 	ROM_LOAD( "ux001008.u64",  0x000000, 0x100000, CRC(413647b6) SHA1(594e010ca6f49ec82cc6d44fe23ac3427c4c3dbd) )
 
-	ROM_REGION( 0x0c0000, "gfx2", 0 )   /* Layer 1 */
-	ROM_LOAD( "ux001009.u65", 0x000000, 0x080000, CRC(bc6f6aea) SHA1(673efa0c70587b5650ccf0a3c4bc316f53d52ba6) )
-	ROM_LOAD( "ux001010.u66", 0x040000, 0x080000, CRC(bd7f7614) SHA1(dc865ff0f327f460956915b2018aaac815e8fce5) )
+	ROM_REGION( 0x180000, "gfx2", 0 )   /* Layer 1 */
+	ROM_LOAD24_BYTE     ( "ux001009.u65", 0x000000, 0x080000, CRC(bc6f6aea) SHA1(673efa0c70587b5650ccf0a3c4bc316f53d52ba6) )
+	ROM_LOAD24_WORD_SWAP( "ux001010.u66", 0x000001, 0x080000, CRC(bd7f7614) SHA1(dc865ff0f327f460956915b2018aaac815e8fce5) )
 
-	ROM_REGION( 0x0c0000, "gfx3", 0 )   /* Layer 2 */
-	ROM_LOAD( "ux001011.u67",  0x000000, 0x080000, CRC(5efe0397) SHA1(a294a2dae9a10e93912543a8614a7f960a011f27) )
-	ROM_LOAD( "ux001012.u068", 0x040000, 0x080000, CRC(f29959f6) SHA1(edccea3d0bf972a07edd6339e18792d089033bff) )
+	ROM_REGION( 0x180000, "gfx3", 0 )   /* Layer 2 */
+	ROM_LOAD24_BYTE     ( "ux001011.u67",  0x000000, 0x080000, CRC(5efe0397) SHA1(a294a2dae9a10e93912543a8614a7f960a011f27) )
+	ROM_LOAD24_WORD_SWAP( "ux001012.u068", 0x000001, 0x080000, CRC(f29959f6) SHA1(edccea3d0bf972a07edd6339e18792d089033bff) )
 
 	/* The c0000-fffff region is bankswitched */
 	ROM_REGION( 0x200000, "x1snd", 0 )  /* Samples */
@@ -10483,20 +10489,20 @@ ROM_START( blandiap )
 	ROM_LOAD16_BYTE( "o-6.bin",  0x300001, 0x080000, CRC(92882943) SHA1(460f3ae37d6f88d3a6068e2fb8d0d330be7c786f) )
 
 	ROM_REGION( 0x0c0000, "gfx2", 0 )   /* Layer 1 */
-	ROM_LOAD( "v1-2.bin",  0x000000, 0x020000, CRC(d524735e) SHA1(4d17e7896b6c6451effe8a19bf7a4919db0cc06d) )
-	ROM_LOAD( "v1-5.bin",  0x020000, 0x020000, CRC(eb440cdb) SHA1(180ed9d616c66b7fae1a3d1156028c8476e45bde) )
-	ROM_LOAD( "v1-1.bin",  0x040000, 0x020000, CRC(09bdf75f) SHA1(33bda046092d5bc3d8e8ffec25c745a2fda16a5c) )
-	ROM_LOAD( "v1-4.bin",  0x060000, 0x020000, CRC(803911e5) SHA1(a93cac42eda69698b393a1a49e3615ee60868838) )
-	ROM_LOAD( "v1-0.bin",  0x080000, 0x020000, CRC(73617548) SHA1(9c04d0179cb93e9fb78cc8af1006ef3edfcde707) )
-	ROM_LOAD( "v1-3.bin",  0x0a0000, 0x020000, CRC(7f18e4fb) SHA1(0e51e3f88b90c07a1352bcd42e6438c947d4856e) )
+	ROM_LOAD24_BYTE( "v1-2.bin",  0x000000, 0x020000, CRC(d524735e) SHA1(4d17e7896b6c6451effe8a19bf7a4919db0cc06d) )
+	ROM_LOAD24_BYTE( "v1-1.bin",  0x000001, 0x020000, CRC(09bdf75f) SHA1(33bda046092d5bc3d8e8ffec25c745a2fda16a5c) )
+	ROM_LOAD24_BYTE( "v1-0.bin",  0x000002, 0x020000, CRC(73617548) SHA1(9c04d0179cb93e9fb78cc8af1006ef3edfcde707) )
+	ROM_LOAD24_BYTE( "v1-5.bin",  0x060000, 0x020000, CRC(eb440cdb) SHA1(180ed9d616c66b7fae1a3d1156028c8476e45bde) )
+	ROM_LOAD24_BYTE( "v1-4.bin",  0x060001, 0x020000, CRC(803911e5) SHA1(a93cac42eda69698b393a1a49e3615ee60868838) )
+	ROM_LOAD24_BYTE( "v1-3.bin",  0x060002, 0x020000, CRC(7f18e4fb) SHA1(0e51e3f88b90c07a1352bcd42e6438c947d4856e) )
 
 	ROM_REGION( 0x0c0000, "gfx3", 0 )   /* Layer 2 */
-	ROM_LOAD( "v2-2.bin",  0x000000, 0x020000, CRC(c4f15638) SHA1(6be0f3e90ab23189caadfd99b3e4ded74749ebbc) )   // identical to v2-1
-	ROM_LOAD( "v2-5.bin",  0x020000, 0x020000, CRC(c2e57622) SHA1(994a4774d68f2d562d985951b06216d59f38afe9) )
-	ROM_LOAD( "v2-1.bin",  0x040000, 0x020000, CRC(c4f15638) SHA1(6be0f3e90ab23189caadfd99b3e4ded74749ebbc) )
-	ROM_LOAD( "v2-4.bin",  0x060000, 0x020000, CRC(16ec2130) SHA1(187f548563577ca36cced9ae184d27e6fcdd7e6a) )
-	ROM_LOAD( "v2-0.bin",  0x080000, 0x020000, CRC(5b05eba9) SHA1(665001cdb3c9977f8f4c7ce551549f7fc640c6a9) )
-	ROM_LOAD( "v2-3.bin",  0x0a0000, 0x020000, CRC(80ad0c3b) SHA1(00fcbcf7805784d7298b92136e7f256d65029c44) )
+	ROM_LOAD24_BYTE( "v2-2.bin",  0x000000, 0x020000, CRC(c4f15638) SHA1(6be0f3e90ab23189caadfd99b3e4ded74749ebbc) )   // identical to v2-1
+	ROM_LOAD24_BYTE( "v2-1.bin",  0x000001, 0x020000, CRC(c4f15638) SHA1(6be0f3e90ab23189caadfd99b3e4ded74749ebbc) )
+	ROM_LOAD24_BYTE( "v2-0.bin",  0x000002, 0x020000, CRC(5b05eba9) SHA1(665001cdb3c9977f8f4c7ce551549f7fc640c6a9) )
+	ROM_LOAD24_BYTE( "v2-5.bin",  0x060000, 0x020000, CRC(c2e57622) SHA1(994a4774d68f2d562d985951b06216d59f38afe9) )
+	ROM_LOAD24_BYTE( "v2-4.bin",  0x060001, 0x020000, CRC(16ec2130) SHA1(187f548563577ca36cced9ae184d27e6fcdd7e6a) )
+	ROM_LOAD24_BYTE( "v2-3.bin",  0x060002, 0x020000, CRC(80ad0c3b) SHA1(00fcbcf7805784d7298b92136e7f256d65029c44) )
 
 	/* The c0000-fffff region is bankswitched */
 	ROM_REGION( 0x200000, "x1snd", 0 )  /* Samples */
@@ -10562,8 +10568,8 @@ ROM_START( qzkklogy )
 	ROM_LOAD( "t2709u26.u26", 0x080000, 0x080000, CRC(416ac849) SHA1(3bd5dd13a8f2693e8f160a4ecfff3b7610644f5f) ) // FIRST AND SECOND HALF IDENTICAL
 
 	ROM_REGION( 0x100000, "gfx2", 0 )   /* Layer 1 */
-	ROM_LOAD( "t2709u42.u39", 0x000000, 0x080000, CRC(194d5704) SHA1(ab2833f7427d0608850c158b813bc49935ac7d6d) )
-	ROM_LOAD( "t2709u39.u42", 0x080000, 0x080000, CRC(6f95a76d) SHA1(925f5880fb5153c1215d1f5ee1eff5b53a84abea) )
+	ROM_LOAD16_BYTE( "t2709u42.u39", 0x000000, 0x080000, CRC(194d5704) SHA1(ab2833f7427d0608850c158b813bc49935ac7d6d) )
+	ROM_LOAD16_BYTE( "t2709u39.u42", 0x000001, 0x080000, CRC(6f95a76d) SHA1(925f5880fb5153c1215d1f5ee1eff5b53a84abea) )
 
 	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "t2709u47.u47", 0x000000, 0x080000, CRC(0ebdad40) SHA1(6558eeaac76d98d91b0be6faa78f531f1e3b9f84) )
@@ -10593,18 +10599,18 @@ ROM_START( zingzip )
 	ROM_LOAD( "uy001005.63",  0x080000, 0x080000, CRC(4aac128e) SHA1(3ac64c84a40f86e29e33a218babcd21cae6dbfdb) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 )   /* Layer 1 */
-	ROM_LOAD       ( "uy001008.66", 0x000000, 0x100000, CRC(1dff7c4b) SHA1(94f581f4aae1ef417dce6e62a611a523205e8c27) ) // FIRST AND SECOND HALF IDENTICAL
-	ROM_LOAD16_BYTE( "uy001007.65", 0x100000, 0x080000, CRC(ec5b3ab9) SHA1(e82fb050ae4e2486e43418fcb5fa726d92c5cd21) )
+	ROM_LOAD24_WORD_SWAP( "uy001008.66", 0x000001, 0x100000, CRC(1dff7c4b) SHA1(94f581f4aae1ef417dce6e62a611a523205e8c27) ) // FIRST AND SECOND HALF IDENTICAL
+	ROM_LOAD24_BYTE     ( "uy001007.65", 0x000000, 0x080000, CRC(ec5b3ab9) SHA1(e82fb050ae4e2486e43418fcb5fa726d92c5cd21) )
 
 	ROM_REGION( 0x200000, "gfx3", 0 )   /* Layer 2 */
-	ROM_LOAD( "uy001010.68",  0x000000, 0x100000, CRC(bdbcdf03) SHA1(857f541697f76086ac6c761a3505678a3d3499df) ) // FIRST AND SECOND HALF IDENTICAL
+	ROM_LOAD16_WORD_SWAP( "uy001010.68", 0x000000, 0x100000, CRC(bdbcdf03) SHA1(857f541697f76086ac6c761a3505678a3d3499df) ) // FIRST AND SECOND HALF IDENTICAL
 
 	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "uy001011.70",  0x000000, 0x100000, CRC(bd845f55) SHA1(345b79cfcd8c924d6ba365814286e518438f10bc) ) // uy001017 + uy001018
 ROM_END
 
 ROM_START( zingzipbl )
-	ROM_REGION( 0x200000, "maincpu", 0 )        /* 68000 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 )        /* 68000 Code */
 	ROM_LOAD16_BYTE( "prg9.bin",   0x000000, 0x040000, CRC(bf47a8cf) SHA1(87ef35c2dc4d25bbd90cd7528616d06362b20fc8) )
 	ROM_LOAD16_BYTE( "prg10.bin",  0x000001, 0x040000, CRC(561501ba) SHA1(f9d488b6d6b313e543738905f11ebbc5f644eb09) )
 
@@ -10620,12 +10626,12 @@ ROM_START( zingzipbl )
 	ROM_LOAD16_BYTE( "13",  0x100000, 0x080000,  CRC(cabc66d9) SHA1(cf1777eb95822cd705edf9b7e4b2d4d6e75f33cf) )
 	ROM_LOAD16_BYTE( "14",  0x100001, 0x080000,  CRC(fefad62f) SHA1(13aaf6cc6af4b42a1184f3fc6c07d9d966153dc1) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 )   /* Layer 1 */
+	ROM_REGION( 0x180000, "gfx2", 0 )   /* Layer 1 */
 	ROM_COPY( "gfxtemp", 0x000000, 0x000000, 0x80000 )
 	ROM_COPY( "gfxtemp", 0x100000, 0x080000, 0x80000 )
 	// 2bpp of extra planes for this layer
 	ROM_LOAD16_BYTE( "15",  0x100000, 0x040000, CRC(af7a786f) SHA1(de67960f529ebfff0f1d55c79912685f9eca9623) )
-	ROM_LOAD16_BYTE( "16",  0x180000, 0x040000, CRC(06dee8f3) SHA1(8c5f489e53bc10e2bad9f98445328e2ec0eac7d2) )
+	ROM_LOAD16_BYTE( "16",  0x100001, 0x040000, CRC(06dee8f3) SHA1(8c5f489e53bc10e2bad9f98445328e2ec0eac7d2) )
 
 	ROM_REGION( 0x100000, "gfx3", 0 )   /* Layer 2 */
 	ROM_COPY( "gfxtemp", 0x080000, 0x000000, 0x80000 )
@@ -10670,10 +10676,10 @@ ROM_START( daioh )
 	ROM_LOAD( "fg-001-003", 0x100000, 0x100000, CRC(1c9d51e2) SHA1(1d6236ab28d11676386834fd6e405fd40198e924) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 ) /* Layer 1 */
-	ROM_LOAD( "fg-001-005",  0x000000, 0x200000, CRC(c25159b9) SHA1(4c9da3233223508389c3c0f277a00aedfc860da4) )
+	ROM_LOAD16_WORD_SWAP( "fg-001-005",  0x000000, 0x200000, CRC(c25159b9) SHA1(4c9da3233223508389c3c0f277a00aedfc860da4) )
 
 	ROM_REGION( 0x200000, "gfx3", 0 ) /* Layer 2 */
-	ROM_LOAD( "fg-001-006",  0x000000, 0x200000, CRC(2052c39a) SHA1(83a444a76e68aa711b0e25a5aa963ca876a6357e) )
+	ROM_LOAD16_WORD_SWAP( "fg-001-006",  0x000000, 0x200000, CRC(2052c39a) SHA1(83a444a76e68aa711b0e25a5aa963ca876a6357e) )
 
 	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "fg-001-007",  0x000000, 0x100000, CRC(4a2fe9e0) SHA1(e55b6f301f842ff5d3c7a0041856695ac1d8a78f) )
@@ -10689,10 +10695,10 @@ ROM_START( daioha )
 	ROM_LOAD( "fg-001-003", 0x100000, 0x100000, CRC(1c9d51e2) SHA1(1d6236ab28d11676386834fd6e405fd40198e924) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 ) /* Layer 1 */
-	ROM_LOAD( "fg-001-005",  0x000000, 0x200000, CRC(c25159b9) SHA1(4c9da3233223508389c3c0f277a00aedfc860da4) )
+	ROM_LOAD16_WORD_SWAP( "fg-001-005",  0x000000, 0x200000, CRC(c25159b9) SHA1(4c9da3233223508389c3c0f277a00aedfc860da4) )
 
 	ROM_REGION( 0x200000, "gfx3", 0 ) /* Layer 2 */
-	ROM_LOAD( "fg-001-006",  0x000000, 0x200000, CRC(2052c39a) SHA1(83a444a76e68aa711b0e25a5aa963ca876a6357e) )
+	ROM_LOAD16_WORD_SWAP( "fg-001-006",  0x000000, 0x200000, CRC(2052c39a) SHA1(83a444a76e68aa711b0e25a5aa963ca876a6357e) )
 
 	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "fg-001-007",  0x000000, 0x100000, CRC(4a2fe9e0) SHA1(e55b6f301f842ff5d3c7a0041856695ac1d8a78f) )
@@ -10706,26 +10712,26 @@ ROM_START( daiohp ) /* Found on the same P0-072-2 PCB as the Blandia prototype *
 	ROM_LOAD16_BYTE( "data_odd.u102",  0x100001, 0x040000, CRC(b75b9a5c) SHA1(4c187105fe5253cc86862df1f3970fa45d4f7317) )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )   /* Sprites */
-	ROM_LOAD( "obj_2.u146",  0x000000, 0x040000, CRC(77560a03) SHA1(f766b56a88d49e4b41c9ed3c68e5478991033b5b) )
-	ROM_LOAD( "obj_6.u147",  0x040000, 0x040000, CRC(081f5fb1) SHA1(2fc6816704f7c42627ec47edd0e2ea88e7088101) )
-	ROM_LOAD( "obj_3.u144",  0x080000, 0x040000, CRC(d33ca640) SHA1(3d278cb46f2eabd03851ee470adfae5313988a27) )
-	ROM_LOAD( "obj_7.u145",  0x0C0000, 0x040000, CRC(e878ac92) SHA1(fc67cbefb050bfbc96f3350bb3d76bf0206e6553) )
-	ROM_LOAD( "obj_0.u142",  0x100000, 0x040000, CRC(78f45582) SHA1(021e635ba365558d9bf37a3b33b4c42b63119f0c) )
-	ROM_LOAD( "obj_4.u143",  0x140000, 0x040000, CRC(d387de72) SHA1(22f40a2daa98e52d6990aa52f9fde2cd66ad40d8) )
-	ROM_LOAD( "obj_1.u140",  0x180000, 0x040000, CRC(8ff6c5a9) SHA1(a2d188d44c8671282bf53f7927e099a212c0ed51) )
-	ROM_LOAD( "obj_5.u141",  0x1C0000, 0x040000, CRC(6a671757) SHA1(aa6c2f916f1ca70514f1bb5754545171d8991456) )
+	ROM_LOAD16_BYTE( "obj_1.u140",  0x000000, 0x040000, CRC(8ff6c5a9) SHA1(a2d188d44c8671282bf53f7927e099a212c0ed51) )
+	ROM_LOAD16_BYTE( "obj_0.u142",  0x000001, 0x040000, CRC(78f45582) SHA1(021e635ba365558d9bf37a3b33b4c42b63119f0c) )
+	ROM_LOAD16_BYTE( "obj_5.u141",  0x080000, 0x040000, CRC(6a671757) SHA1(aa6c2f916f1ca70514f1bb5754545171d8991456) )
+	ROM_LOAD16_BYTE( "obj_4.u143",  0x080001, 0x040000, CRC(d387de72) SHA1(22f40a2daa98e52d6990aa52f9fde2cd66ad40d8) )
+	ROM_LOAD16_BYTE( "obj_3.u144",  0x100000, 0x040000, CRC(d33ca640) SHA1(3d278cb46f2eabd03851ee470adfae5313988a27) )
+	ROM_LOAD16_BYTE( "obj_2.u146",  0x100001, 0x040000, CRC(77560a03) SHA1(f766b56a88d49e4b41c9ed3c68e5478991033b5b) )
+	ROM_LOAD16_BYTE( "obj_7.u145",  0x180000, 0x040000, CRC(e878ac92) SHA1(fc67cbefb050bfbc96f3350bb3d76bf0206e6553) )
+	ROM_LOAD16_BYTE( "obj_6.u147",  0x180001, 0x040000, CRC(081f5fb1) SHA1(2fc6816704f7c42627ec47edd0e2ea88e7088101) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 )   /* Layer 1 */
-	ROM_LOAD( "bg1_1.u150",  0x000000, 0x080000, CRC(d5793a2f) SHA1(0623d51d405fde69622f1e15512fd8fc41209a59) )
-	ROM_LOAD( "bg1_3.u151",  0x080000, 0x080000, CRC(6456fae1) SHA1(ce839e68342b62be61e29255ebdd8ddbd2b67a71) )
-	ROM_LOAD( "bg1_0.u148",  0x100000, 0x080000, CRC(bec48d7a) SHA1(9fdcc8f461e48cb4244827bead980ad48acdfbd8) )
-	ROM_LOAD( "bg1_2.u149",  0x180000, 0x080000, CRC(5e674c30) SHA1(8f2e264df7d0b4f2a5a54d86dd0b3106d0ff7c15) )
+	ROM_LOAD16_BYTE( "bg1_0.u148",  0x000001, 0x080000, CRC(bec48d7a) SHA1(9fdcc8f461e48cb4244827bead980ad48acdfbd8) )
+	ROM_LOAD16_BYTE( "bg1_1.u150",  0x000000, 0x080000, CRC(d5793a2f) SHA1(0623d51d405fde69622f1e15512fd8fc41209a59) )
+	ROM_LOAD16_BYTE( "bg1_2.u149",  0x100001, 0x080000, CRC(5e674c30) SHA1(8f2e264df7d0b4f2a5a54d86dd0b3106d0ff7c15) )
+	ROM_LOAD16_BYTE( "bg1_3.u151",  0x100000, 0x080000, CRC(6456fae1) SHA1(ce839e68342b62be61e29255ebdd8ddbd2b67a71) )
 
 	ROM_REGION( 0x200000, "gfx3", 0 )   /* Layer 2 */
-	ROM_LOAD( "bg2_1.u166",  0x000000, 0x080000, CRC(9274123b) SHA1(b58e107a5bd222e454fd435d515e57cab52e6593) )
-	ROM_LOAD( "bg2_3.u167",  0x080000, 0x080000, CRC(d3d68aa1) SHA1(14b0e4fd9bbdc2b6a99147dd6f6143d609d9110b) )
-	ROM_LOAD( "bg2_0.u164",  0x100000, 0x080000, CRC(7e46a10e) SHA1(a8576f7a140b065b88a0dab648f7b31c75fec006) )
-	ROM_LOAD( "bg2_2.u165",  0x180000, 0x080000, CRC(3119189b) SHA1(3a45ec8db30659d7fd47090cb137df05bbdc1c86) )
+	ROM_LOAD16_BYTE( "bg2_0.u164",  0x000001, 0x080000, CRC(7e46a10e) SHA1(a8576f7a140b065b88a0dab648f7b31c75fec006) )
+	ROM_LOAD16_BYTE( "bg2_1.u166",  0x000000, 0x080000, CRC(9274123b) SHA1(b58e107a5bd222e454fd435d515e57cab52e6593) )
+	ROM_LOAD16_BYTE( "bg2_2.u165",  0x100001, 0x080000, CRC(3119189b) SHA1(3a45ec8db30659d7fd47090cb137df05bbdc1c86) )
+	ROM_LOAD16_BYTE( "bg2_3.u167",  0x100000, 0x080000, CRC(d3d68aa1) SHA1(14b0e4fd9bbdc2b6a99147dd6f6143d609d9110b) )
 
 	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "snd0.u156",  0x000000, 0x020000, CRC(4d253547) SHA1(87cda11dc86bc121cb8fb0e574006c3627158f51) )
@@ -10760,16 +10766,16 @@ ROM_START( daiohc ) /* Found on a 93111A PCB - same PCB as War of Areo & J. J. S
 	ROM_LOAD( "12.u12", 0x180000, 0x080000, CRC(f35e3341) SHA1(9260460e1823d157201de02557c7136ef898cfb3) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 ) /* Layer 1 */
-	ROM_LOAD( "5.u5", 0x000000, 0x080000, CRC(aaa5e41e) SHA1(fe362ec083cb13732ea07003a4a1a9c63d382f4b) ) /* connects to U66 through a riser card */
-	ROM_LOAD( "6.u6", 0x080000, 0x080000, CRC(9ad8b4b4) SHA1(b6e4cff160ae0efe6f3fd0df9a8a618957c3ce61) )
-	ROM_LOAD( "7.u7", 0x100000, 0x080000, CRC(babf194a) SHA1(ef838aab2d651c10553fb87552c67f289a8ac83d) )
-	ROM_LOAD( "8.u8", 0x180000, 0x080000, CRC(2db65290) SHA1(4f4d65e984fad7bb1d886de67bc50645798282bb) )
+	ROM_LOAD16_WORD_SWAP( "5.u5", 0x000000, 0x080000, CRC(aaa5e41e) SHA1(fe362ec083cb13732ea07003a4a1a9c63d382f4b) ) /* connects to U66 through a riser card */
+	ROM_LOAD16_WORD_SWAP( "6.u6", 0x080000, 0x080000, CRC(9ad8b4b4) SHA1(b6e4cff160ae0efe6f3fd0df9a8a618957c3ce61) )
+	ROM_LOAD16_WORD_SWAP( "7.u7", 0x100000, 0x080000, CRC(babf194a) SHA1(ef838aab2d651c10553fb87552c67f289a8ac83d) )
+	ROM_LOAD16_WORD_SWAP( "8.u8", 0x180000, 0x080000, CRC(2db65290) SHA1(4f4d65e984fad7bb1d886de67bc50645798282bb) )
 
 	ROM_REGION( 0x200000, "gfx3", 0 ) /* Layer 2 */
-	ROM_LOAD( "1.u1", 0x000000, 0x080000, CRC(30f81f99) SHA1(9c164c798c7e869e92505d9d85f06f4a1c9a9528) ) /* connects to U68 through a riser card */
-	ROM_LOAD( "2.u2", 0x080000, 0x080000, CRC(3b3e0f4e) SHA1(740afe4eefea480f941dd80a03392592d8d4b084) )
-	ROM_LOAD( "3.u3", 0x100000, 0x080000, CRC(c5eef1c1) SHA1(d4b3188b39bad5c7a2c7b7dbc91a79c7ee80a3a1) )
-	ROM_LOAD( "4.u4", 0x180000, 0x080000, CRC(851115b6) SHA1(b8e1e22231d131085c90afcf30ff35a2866edff5) )
+	ROM_LOAD16_WORD_SWAP( "1.u1", 0x000000, 0x080000, CRC(30f81f99) SHA1(9c164c798c7e869e92505d9d85f06f4a1c9a9528) ) /* connects to U68 through a riser card */
+	ROM_LOAD16_WORD_SWAP( "2.u2", 0x080000, 0x080000, CRC(3b3e0f4e) SHA1(740afe4eefea480f941dd80a03392592d8d4b084) )
+	ROM_LOAD16_WORD_SWAP( "3.u3", 0x100000, 0x080000, CRC(c5eef1c1) SHA1(d4b3188b39bad5c7a2c7b7dbc91a79c7ee80a3a1) )
+	ROM_LOAD16_WORD_SWAP( "4.u4", 0x180000, 0x080000, CRC(851115b6) SHA1(b8e1e22231d131085c90afcf30ff35a2866edff5) )
 
 	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "data.u69", 0x000000, 0x080000, CRC(21e4f093) SHA1(f0420d158dc5d182e41b6fb2ea3af6baf88bacb8) )
@@ -10789,10 +10795,10 @@ ROM_START( msgundam )
 	ROM_LOAD( "fa001007.u22",  0x200000, 0x200000, CRC(793198a6) SHA1(45f53870e74b14126680d18dd58dbbe01a6ef509) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )   /* Layer 1 */
-	ROM_LOAD( "fa001006.u23",  0x000000, 0x100000, CRC(3b60365c) SHA1(bdf5a0b1b45eb75dbbb6725d1e5303716321aeb9) )
+	ROM_LOAD16_WORD_SWAP( "fa001006.u23",  0x000000, 0x100000, CRC(3b60365c) SHA1(bdf5a0b1b45eb75dbbb6725d1e5303716321aeb9) )
 
 	ROM_REGION( 0x080000, "gfx3", 0 )   /* Layer 2 */
-	ROM_LOAD( "fa001005.u24",  0x000000, 0x080000, CRC(8cd7ff86) SHA1(ce7eb90776e21239f8f52e822c636143506c6f9b) )
+	ROM_LOAD16_WORD_SWAP( "fa001005.u24",  0x000000, 0x080000, CRC(8cd7ff86) SHA1(ce7eb90776e21239f8f52e822c636143506c6f9b) )
 
 	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "fa001004.u26",  0x000000, 0x100000, CRC(b965f07c) SHA1(ff7827cc80655465ffbb732d55ba81f21f51a5ca) )
@@ -10808,13 +10814,39 @@ ROM_START( msgundam1 )
 	ROM_LOAD( "fa001007.u22",  0x200000, 0x200000, CRC(793198a6) SHA1(45f53870e74b14126680d18dd58dbbe01a6ef509) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )   /* Layer 1 */
-	ROM_LOAD( "fa001006.u23",  0x000000, 0x100000, CRC(3b60365c) SHA1(bdf5a0b1b45eb75dbbb6725d1e5303716321aeb9) )
+	ROM_LOAD16_WORD_SWAP( "fa001006.u23",  0x000000, 0x100000, CRC(3b60365c) SHA1(bdf5a0b1b45eb75dbbb6725d1e5303716321aeb9) )
 
 	ROM_REGION( 0x080000, "gfx3", 0 )   /* Layer 2 */
-	ROM_LOAD( "fa001005.u24",  0x000000, 0x080000, CRC(8cd7ff86) SHA1(ce7eb90776e21239f8f52e822c636143506c6f9b) )
+	ROM_LOAD16_WORD_SWAP( "fa001005.u24",  0x000000, 0x080000, CRC(8cd7ff86) SHA1(ce7eb90776e21239f8f52e822c636143506c6f9b) )
 
 	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "fa001004.u26",  0x000000, 0x100000, CRC(b965f07c) SHA1(ff7827cc80655465ffbb732d55ba81f21f51a5ca) )
+ROM_END
+
+ROM_START( msgundamb ) // 2 PCB stack, one has a 'Tecnoval - tecnologia valenciana del recreativo' sticker
+	ROM_REGION( 0x300000, "maincpu", 0 )        /* 68000 Code, on lower board */
+	ROM_LOAD16_BYTE( "d-4.bin", 0x000000, 0x040000, CRC(ca5bfa89) SHA1(108435cb65919b4b90be102e7ac2799501149fc8) ) // 27c020
+	ROM_LOAD16_BYTE( "d-2.bin", 0x000001, 0x040000, CRC(b4b86d1b) SHA1(d9b625cfdabcabed9308fccc29c66adfe566a996) ) // 27c020
+	ROM_LOAD16_BYTE( "27c8001-7.bin",   0x100000, 0x100000, CRC(803f279c) SHA1(1095ac434ce553ed56d106556e7d23ccac1f0cd4) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_LOAD16_BYTE( "27c8001-8.bin",   0x100001, 0x100000, CRC(a310fa93) SHA1(2ee1616699c95ed2b8c46d43de4cffece1b033ea) ) // 1ST AND 2ND HALF IDENTICAL
+
+	ROM_REGION( 0x400000, "gfx1", 0 )   /* Sprites, on top board, almost identical to the original but split */
+	ROM_LOAD16_BYTE( "27c8001-3.bin", 0x000000, 0x100000, CRC(9f36d867) SHA1(01a15dcdcb1077d7c8678762f58ad705dc29e8c9) )
+	ROM_LOAD16_BYTE( "27c8001-2.bin", 0x000001, 0x100000, CRC(70d333d9) SHA1(9ef3b0e0567ceed082921a5c384cfcfeb154f048) )
+	ROM_LOAD16_BYTE( "27c8001-1.bin", 0x200000, 0x100000, CRC(2792692c) SHA1(ed99c589ed15f8c1a4e2ab435a379b35105ba503) )
+	ROM_LOAD16_BYTE( "4.bin", 0x200001, 0x080000, CRC(eb551f1a) SHA1(e9d2fc31c3076164c5ee9722ea1b1e60b4f6d663) ) // mx27c4000
+	ROM_LOAD16_BYTE( "5.bin", 0x300001, 0x080000, CRC(e9aa57e8) SHA1(699c0132f4be81570f748e5ca2f88fc4fc6802bb) ) // mx27c4000
+
+	ROM_REGION( 0x200000, "gfx2", 0 )   /* Layer 1, on lower board */
+	ROM_LOAD16_BYTE( "27c8001-5.bin", 0x000000, 0x100000, CRC(c83ae34a) SHA1(d7bf49843c443c5b7cb9187404a3518eaed577a6) ) // 1ST AND 2ND HALF IDENTICAL, fa001006.u23 [odd]  IDENTICAL
+	ROM_LOAD16_BYTE( "27c8001-6.bin", 0x000001, 0x100000, CRC(8fbb5478) SHA1(247fd080f0ee18282c4d8b918171cfeab4b40d23) ) // 1ST AND 2ND HALF IDENTICAL, fa001006.u23 [even] IDENTICAL
+
+	ROM_REGION( 0x080000, "gfx3", 0 )   /* Layer 2, on lower board, identical to the original but split */
+	ROM_LOAD16_BYTE( "d-8.bin", 0x000001, 0x040000, CRC(a03c8345) SHA1(d3c3f0045ebb3d82d82432c212db4a801cb53b60) ) // 27c020
+	ROM_LOAD16_BYTE( "d-9.bin", 0x000000, 0x040000, CRC(cfd47024) SHA1(ab4fbaf258d2694407dd6c896f45d69821ccc408) ) // 27c020
+
+	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples, on lower board */
+	ROM_LOAD( "27c8001-4.bin", 0x000000, 0x100000, CRC(b965f07c) SHA1(ff7827cc80655465ffbb732d55ba81f21f51a5ca) )  // identical to the original
 ROM_END
 
 ROM_START( oisipuzl )
@@ -10830,11 +10862,11 @@ ROM_START( oisipuzl )
 	ROM_LOAD( "ss1u305.v10", 0x180000, 0x080000, CRC(2a33e08b) SHA1(780cfe44a4d57b254bd0cfae8727dc77358027a8) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )   /* Layer 1 */
-	ROM_LOAD( "ss1u23.v10",  0x000000, 0x080000, CRC(9fa60901) SHA1(3d42e4174ad566b6eeb488c7a4c51db9c1fef7af) )
-	ROM_LOAD( "ss1u24.v10",  0x080000, 0x080000, CRC(c10eb4b3) SHA1(70a82a750b1d9c849cd92d4f73769bbf5962c771) )
+	ROM_LOAD16_WORD_SWAP( "ss1u23.v10",  0x000000, 0x080000, CRC(9fa60901) SHA1(3d42e4174ad566b6eeb488c7a4c51db9c1fef7af) )
+	ROM_LOAD16_WORD_SWAP( "ss1u24.v10",  0x080000, 0x080000, CRC(c10eb4b3) SHA1(70a82a750b1d9c849cd92d4f73769bbf5962c771) )
 
 	ROM_REGION( 0x080000, "gfx3", 0 )   /* Layer 2 */
-	ROM_LOAD( "ss1u25.v10",  0x000000, 0x080000, CRC(56840728) SHA1(db61539fd84f0de35ee2077238ba3646c4960cc6) )
+	ROM_LOAD16_WORD_SWAP( "ss1u25.v10",  0x000000, 0x080000, CRC(56840728) SHA1(db61539fd84f0de35ee2077238ba3646c4960cc6) )
 
 	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "ss1u26.v10", 0x000000, 0x080000, CRC(d452336b) SHA1(d3bf3cb383c40911758a60546f121c48087868e3) )
@@ -10855,12 +10887,12 @@ ROM_START( triplfun ) /* the program fails its self-check but thats probably bec
 	ROM_LOAD16_BYTE( "11.bin", 0x100000, 0x80000, CRC(276ef724) SHA1(e0c642dfd19542234abb0de68a66f8c36d9cb827) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )
-	ROM_LOAD16_BYTE( "02.bin", 0x000000, 0x80000, CRC(4c0d1068) SHA1(cb77309474938765fd0582ab132f19fb5e21fca3) )
-	ROM_LOAD16_BYTE( "03.bin", 0x000001, 0x80000, CRC(dba94e18) SHA1(3f54d874287e4ab96b2791503235488164d90cb1) )
+	ROM_LOAD16_BYTE( "02.bin", 0x000001, 0x80000, CRC(4c0d1068) SHA1(cb77309474938765fd0582ab132f19fb5e21fca3) )
+	ROM_LOAD16_BYTE( "03.bin", 0x000000, 0x80000, CRC(dba94e18) SHA1(3f54d874287e4ab96b2791503235488164d90cb1) )
 
 	ROM_REGION( 0x80000, "gfx3", 0 )
-	ROM_LOAD16_BYTE( "06.bin", 0x000000, 0x40000, CRC(8944bb72) SHA1(37cd0e2c8e99fb23ea70dc183a8aa0670c5f6b65) )
-	ROM_LOAD16_BYTE( "07.bin", 0x000001, 0x40000, CRC(934a5d91) SHA1(aa19d2699b5ebdd99d59004005b0ce0c5140d192) )
+	ROM_LOAD16_BYTE( "06.bin", 0x000001, 0x40000, CRC(8944bb72) SHA1(37cd0e2c8e99fb23ea70dc183a8aa0670c5f6b65) )
+	ROM_LOAD16_BYTE( "07.bin", 0x000000, 0x40000, CRC(934a5d91) SHA1(aa19d2699b5ebdd99d59004005b0ce0c5140d192) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "01.bin", 0x000000, 0x40000, CRC(c186a930) SHA1(e17e1a620e380f0737b80c7f160ad643979b2799) )
@@ -10875,7 +10907,7 @@ ROM_START( qzkklgy2 )
 	ROM_LOAD( "fn001004.100", 0x000000, 0x100000, CRC(5ba139a2) SHA1(24fe19a7e5d2cd53bf3b1c71bf05020067f5e956) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 )   /* Layer 1 */
-	ROM_LOAD( "fn001005.104", 0x000000, 0x200000, CRC(95726a63) SHA1(e53ffc2815c4858bbfb5ff452c581bccb41854c9) )
+	ROM_LOAD16_WORD_SWAP( "fn001005.104", 0x000000, 0x200000, CRC(95726a63) SHA1(e53ffc2815c4858bbfb5ff452c581bccb41854c9) )
 
 	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "fn001006.105", 0x000000, 0x100000, CRC(83f201e6) SHA1(536e74788ad0e07451300a1ad3b127bc9d2d9063) )
@@ -10891,10 +10923,10 @@ ROM_START( wrofaero )
 	ROM_LOAD( "u63.bin",  0x080000, 0x080000, CRC(2a602a1b) SHA1(b04fa743200d62bc25a6aa34efae53209f185f79) )
 
 	ROM_REGION( 0x080000, "gfx2", 0 )   /* Layer 1 */
-	ROM_LOAD( "u66.bin",  0x000000, 0x080000, CRC(c9fc6a0c) SHA1(85ac0726221e3fedd80bd9b426d61471eb20ce46) )
+	ROM_LOAD16_WORD_SWAP( "u66.bin",  0x000000, 0x080000, CRC(c9fc6a0c) SHA1(85ac0726221e3fedd80bd9b426d61471eb20ce46) )
 
 	ROM_REGION( 0x080000, "gfx3", 0 )   /* Layer 2 */
-	ROM_LOAD( "u68.bin",  0x000000, 0x080000, CRC(25c0c483) SHA1(2e705e7f0c66c3bc73e78ffb526606ab8be61d99) )
+	ROM_LOAD16_WORD_SWAP( "u68.bin",  0x000000, 0x080000, CRC(25c0c483) SHA1(2e705e7f0c66c3bc73e78ffb526606ab8be61d99) )
 
 	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "u69.bin",  0x000000, 0x080000, CRC(957ecd41) SHA1(3b37ba44b8b8f0f0de41c8c26c3dfdb391ba572c) )
@@ -10914,15 +10946,15 @@ ROM_START( jjsquawk ) /* PCB stickered  J.J. SQUAWKERS 9401- 1022 */
 	ROM_LOAD( "fe2001007", 0x100000, 0x080000, CRC(62c45658) SHA1(82b1ea138e8f4b4ade7e44b31843aa2023c9dd71) )
 	ROM_LOAD( "fe2001008", 0x180000, 0x080000, CRC(2690c57b) SHA1(b880ded7715dffe12c4fea7ad7cb9c5133b73250) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 )   /* Layer 1 */
-	ROM_LOAD       ( "fe2001011", 0x000000, 0x080000, CRC(98b9f4b4) SHA1(de96708aebb428ddc413c3649caaec80c0c155bd) ) /* This rom located on a plug-in PCB */
-	ROM_LOAD       ( "fe2001012", 0x080000, 0x080000, CRC(d4aa916c) SHA1(d619d20c33f16ab06b529fc1717ad9b703acbabf) ) /* This rom located on a plug-in PCB */
-	ROM_LOAD16_BYTE( "fe2001003", 0x100000, 0x080000, CRC(a5a35caf) SHA1(da4bdb7f0b319f8ff972a552d0134a73e5ac1b87) )
+	ROM_REGION( 0x180000, "gfx2", 0 )   /* Layer 1 */
+	ROM_LOAD24_WORD_SWAP( "fe2001011", 0x000001, 0x080000, CRC(98b9f4b4) SHA1(de96708aebb428ddc413c3649caaec80c0c155bd) ) /* This rom located on a plug-in PCB */
+	ROM_LOAD24_WORD_SWAP( "fe2001012", 0x0c0001, 0x080000, CRC(d4aa916c) SHA1(d619d20c33f16ab06b529fc1717ad9b703acbabf) ) /* This rom located on a plug-in PCB */
+	ROM_LOAD24_BYTE     ( "fe2001003", 0x000000, 0x080000, CRC(a5a35caf) SHA1(da4bdb7f0b319f8ff972a552d0134a73e5ac1b87) )
 
-	ROM_REGION( 0x200000, "gfx3", 0 )   /* Layer 2 */
-	ROM_LOAD       ( "fe2001014", 0x000000, 0x080000, CRC(274bbb48) SHA1(b8db632a9bbb7232d0b1debd67b3b453fd4989e6) ) /* This rom located on a plug-in PCB */
-	ROM_LOAD       ( "fe2001013", 0x080000, 0x080000, CRC(51e29871) SHA1(9d33283bd9a3f57602a55cfc9fafa49edd0be8c5) ) /* This rom located on a plug-in PCB */
-	ROM_LOAD16_BYTE( "fe2001004", 0x100000, 0x080000, CRC(a235488e) SHA1(a45d02a4451defbef7fbdab15671955fab8ed76b) )
+	ROM_REGION( 0x180000, "gfx3", 0 )   /* Layer 2 */
+	ROM_LOAD24_WORD_SWAP( "fe2001014", 0x000001, 0x080000, CRC(274bbb48) SHA1(b8db632a9bbb7232d0b1debd67b3b453fd4989e6) ) /* This rom located on a plug-in PCB */
+	ROM_LOAD24_WORD_SWAP( "fe2001013", 0x0c0001, 0x080000, CRC(51e29871) SHA1(9d33283bd9a3f57602a55cfc9fafa49edd0be8c5) ) /* This rom located on a plug-in PCB */
+	ROM_LOAD24_BYTE     ( "fe2001004", 0x000000, 0x080000, CRC(a235488e) SHA1(a45d02a4451defbef7fbdab15671955fab8ed76b) )
 
 	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "fe2001005.u69", 0x000000, 0x080000, CRC(d99f2879) SHA1(66e83a6bc9093d19c72bd8ef1ec0523cfe218250) )
@@ -10942,15 +10974,15 @@ ROM_START( jjsquawko ) /* Official 93111A PCB missing version sticker */
 	ROM_LOAD( "fe2001007", 0x100000, 0x080000, CRC(62c45658) SHA1(82b1ea138e8f4b4ade7e44b31843aa2023c9dd71) )
 	ROM_LOAD( "fe2001008", 0x180000, 0x080000, CRC(2690c57b) SHA1(b880ded7715dffe12c4fea7ad7cb9c5133b73250) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 )   /* Layer 1 */
-	ROM_LOAD       ( "fe2001011", 0x000000, 0x080000, CRC(98b9f4b4) SHA1(de96708aebb428ddc413c3649caaec80c0c155bd) ) /* This rom located on a plug-in PCB */
-	ROM_LOAD       ( "fe2001012", 0x080000, 0x080000, CRC(d4aa916c) SHA1(d619d20c33f16ab06b529fc1717ad9b703acbabf) ) /* This rom located on a plug-in PCB */
-	ROM_LOAD16_BYTE( "fe2001003", 0x100000, 0x080000, CRC(a5a35caf) SHA1(da4bdb7f0b319f8ff972a552d0134a73e5ac1b87) )
+	ROM_REGION( 0x180000, "gfx2", 0 )   /* Layer 1 */
+	ROM_LOAD24_WORD_SWAP( "fe2001011", 0x000001, 0x080000, CRC(98b9f4b4) SHA1(de96708aebb428ddc413c3649caaec80c0c155bd) ) /* This rom located on a plug-in PCB */
+	ROM_LOAD24_WORD_SWAP( "fe2001012", 0x0c0001, 0x080000, CRC(d4aa916c) SHA1(d619d20c33f16ab06b529fc1717ad9b703acbabf) ) /* This rom located on a plug-in PCB */
+	ROM_LOAD24_BYTE     ( "fe2001003", 0x000000, 0x080000, CRC(a5a35caf) SHA1(da4bdb7f0b319f8ff972a552d0134a73e5ac1b87) )
 
-	ROM_REGION( 0x200000, "gfx3", 0 )   /* Layer 2 */
-	ROM_LOAD       ( "fe2001014", 0x000000, 0x080000, CRC(274bbb48) SHA1(b8db632a9bbb7232d0b1debd67b3b453fd4989e6) ) /* This rom located on a plug-in PCB */
-	ROM_LOAD       ( "fe2001013", 0x080000, 0x080000, CRC(51e29871) SHA1(9d33283bd9a3f57602a55cfc9fafa49edd0be8c5) ) /* This rom located on a plug-in PCB */
-	ROM_LOAD16_BYTE( "fe2001004", 0x100000, 0x080000, CRC(a235488e) SHA1(a45d02a4451defbef7fbdab15671955fab8ed76b) )
+	ROM_REGION( 0x180000, "gfx3", 0 )   /* Layer 2 */
+	ROM_LOAD24_WORD_SWAP( "fe2001014", 0x000001, 0x080000, CRC(274bbb48) SHA1(b8db632a9bbb7232d0b1debd67b3b453fd4989e6) ) /* This rom located on a plug-in PCB */
+	ROM_LOAD24_WORD_SWAP( "fe2001013", 0x0c0001, 0x080000, CRC(51e29871) SHA1(9d33283bd9a3f57602a55cfc9fafa49edd0be8c5) ) /* This rom located on a plug-in PCB */
+	ROM_LOAD24_BYTE     ( "fe2001004", 0x000000, 0x080000, CRC(a235488e) SHA1(a45d02a4451defbef7fbdab15671955fab8ed76b) )
 
 	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "fe2001005.u69", 0x000000, 0x080000, CRC(d99f2879) SHA1(66e83a6bc9093d19c72bd8ef1ec0523cfe218250) )
@@ -10994,12 +11026,12 @@ ROM_START( jjsquawkb2 ) /* PCB was P0-078A, which was a Blandia board converted 
 	ROM_LOAD( "u63.2l",  0x100000, 0x100000, CRC(7a385ef0) SHA1(d38e2242532074b58707783608a6ddce42c55a77) ) /* fe2001007 + fe2001008 from jjsquawk */
 
 	ROM_REGION( 0x200000, "gfx2", 0 )   /* Layer 1 */
-	ROM_LOAD       ( "u66.5l", 0x000000, 0x100000, CRC(bbaf40c5) SHA1(aecd48176adbe79e76c8febca1d9bb95ff0d6912) ) /* fe2001011 + fe2001012 from jjsquawk */
-	ROM_LOAD16_BYTE( "u65.4l", 0x100000, 0x080000, CRC(a5a35caf) SHA1(da4bdb7f0b319f8ff972a552d0134a73e5ac1b87) ) /* fe2001003             from jjsquawk */
+	ROM_LOAD24_WORD_SWAP( "u66.5l", 0x000001, 0x100000, CRC(bbaf40c5) SHA1(aecd48176adbe79e76c8febca1d9bb95ff0d6912) ) /* fe2001011 + fe2001012 from jjsquawk */
+	ROM_LOAD24_BYTE     ( "u65.4l", 0x000000, 0x080000, CRC(a5a35caf) SHA1(da4bdb7f0b319f8ff972a552d0134a73e5ac1b87) ) /* fe2001003             from jjsquawk */
 
 	ROM_REGION( 0x200000, "gfx3", 0 )   /* Layer 2 */
-	ROM_LOAD       ( "u68.7l", 0x000000, 0x100000, CRC(ae9ae01f) SHA1(1a828d5b8848c5b5d8e5f279f1fde26b972a6332) ) /* fe2001014 + fe2001013 from jjsquawk */
-	ROM_LOAD16_BYTE( "u67.6l", 0x100000, 0x080000, CRC(a235488e) SHA1(a45d02a4451defbef7fbdab15671955fab8ed76b) ) /* fe2001004             from jjsquawk */
+	ROM_LOAD24_WORD_SWAP( "u68.7l", 0x000001, 0x100000, CRC(ae9ae01f) SHA1(1a828d5b8848c5b5d8e5f279f1fde26b972a6332) ) /* fe2001014 + fe2001013 from jjsquawk */
+	ROM_LOAD24_BYTE     ( "u67.6l", 0x000000, 0x080000, CRC(a235488e) SHA1(a45d02a4451defbef7fbdab15671955fab8ed76b) ) /* fe2001004             from jjsquawk */
 
 	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "u70.10l", 0x000000, 0x100000, CRC(181a55b8) SHA1(6fa404f85bad93cc15e80feb61d19bed84602b82) ) /* fe2001005.u69 + fe2001006.u70 from jjsquawk */
@@ -11040,7 +11072,7 @@ ROM_START( kamenrid )
 	ROM_LOAD( "fj001006.22", 0x100000, 0x100000, CRC(cf28eb78) SHA1(b1b34e0e50b5d54ff3cff908c579031a326890a2) )
 
 	ROM_REGION( 0x80000, "user1", 0 )   /* Layers 1+2 */
-	ROM_LOAD( "fj001007.152", 0x000000, 0x080000, CRC(d9ffe80b) SHA1(c1f919b53cd1b9874a5e5dc5640891e1b227cfc6) )
+	ROM_LOAD16_WORD_SWAP( "fj001007.152", 0x000000, 0x080000, CRC(d9ffe80b) SHA1(c1f919b53cd1b9874a5e5dc5640891e1b227cfc6) )
 
 	ROM_REGION( 0x40000, "gfx2", 0 )    /* Layer 1 */
 	ROM_COPY( "user1", 0x000000, 0x000000, 0x040000 )
@@ -11062,10 +11094,10 @@ ROM_START( eightfrc )
 	ROM_LOAD( "u63.bin",  0x080000, 0x080000, CRC(4c3f8366) SHA1(b25a27a67ae828d8fcf2c8d9d373ebdaacce9c4e) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )   /* Layer 1 */
-	ROM_LOAD( "u66.bin",  0x000000, 0x100000, CRC(6fad2b7f) SHA1(469d185dc942bd4b54babf1d528e0e420f31d88b) )
+	ROM_LOAD16_WORD_SWAP( "u66.bin",  0x000000, 0x100000, CRC(6fad2b7f) SHA1(469d185dc942bd4b54babf1d528e0e420f31d88b) )
 
 	ROM_REGION( 0x100000, "gfx3", 0 )   /* Layer 2 */
-	ROM_LOAD( "u68.bin",  0x000000, 0x100000, CRC(c17aad22) SHA1(eabbae2142cad3eef6a94d542ea03221c8228e94) )
+	ROM_LOAD16_WORD_SWAP( "u68.bin",  0x000000, 0x100000, CRC(c17aad22) SHA1(eabbae2142cad3eef6a94d542ea03221c8228e94) )
 
 	ROM_REGION( 0x200000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "u70.bin",  0x000000, 0x100000, CRC(dfdb67a3) SHA1(0fed6fb498dcfc1276facd0ecd2dfde45ff671f2) )
@@ -11111,10 +11143,10 @@ ROM_START( orbs )   /* All eproms are socketed and labelled (handwritten) "ORBS 
 	ROM_LOAD16_BYTE( "orbs.u9",   0x000001, 0x080000, CRC(f269d16f) SHA1(34f38789cb3256e334b0ac8acd9f339d14481578) )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )   /* Sprites */
-	ROM_LOAD( "orbs.u14",  0x000000, 0x080000, CRC(1cc76541) SHA1(d8a233212bfb9a9c686a40e470524f95b34417fa) )
-	ROM_LOAD( "orbs.u13",  0x080000, 0x080000, CRC(784bdc1a) SHA1(de2c5b38561b8ba6bd800126d010b734c2751575) )
-	ROM_LOAD( "orbs.u12",  0x100000, 0x080000, CRC(b8c352c2) SHA1(7d6fd1425d9d5cf6a14a1ddceba0ad10e472dfa5) )
-	ROM_LOAD( "orbs.u11",  0x180000, 0x080000, CRC(58cb38ba) SHA1(1c6c5f7ccb9c81b71bc1cbad080799b97962f262) )
+	ROM_LOAD16_BYTE( "orbs.u11",  0x000000, 0x080000, CRC(58cb38ba) SHA1(1c6c5f7ccb9c81b71bc1cbad080799b97962f262) )
+	ROM_LOAD16_BYTE( "orbs.u12",  0x000001, 0x080000, CRC(b8c352c2) SHA1(7d6fd1425d9d5cf6a14a1ddceba0ad10e472dfa5) )
+	ROM_LOAD16_BYTE( "orbs.u13",  0x100000, 0x080000, CRC(784bdc1a) SHA1(de2c5b38561b8ba6bd800126d010b734c2751575) )
+	ROM_LOAD16_BYTE( "orbs.u14",  0x100001, 0x080000, CRC(1cc76541) SHA1(d8a233212bfb9a9c686a40e470524f95b34417fa) )
 
 	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "orbs.u15",  0x000000, 0x080000, CRC(bc0e9fe3) SHA1(758a44d07d59af8bbc87602df25dfcdc6cb8d9b3) )
@@ -11141,10 +11173,10 @@ ROM_START( keroppij )
 	ROM_LOAD16_BYTE( "ft-001-002.u9",   0x000001, 0x080000, CRC(f531d4ef) SHA1(75a99695679de083765700c250bd1fdfd8be9981) )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )   /* Sprites */
-	ROM_LOAD( "ft-001-003.u14",  0x000000, 0x080000, CRC(62fb22fb) SHA1(a67cb46152b73a47c2287c4058d0a22fb7064e7e) )
-	ROM_LOAD( "ft-001-004.u13",  0x080000, 0x080000, CRC(69908c98) SHA1(1af069e9330a33cd2f0e1365e05c72eb23c3244e) )
-	ROM_LOAD( "ft-001-005.u12",  0x100000, 0x080000, CRC(de6432a8) SHA1(afee9b29e0b3db4815fc29456044532aee03597e) )
-	ROM_LOAD( "ft-001-006.u11",  0x180000, 0x080000, CRC(9c500eae) SHA1(3448adef04c9ad2e0b39a283e4eb9c9bac7d4967) )
+	ROM_LOAD16_BYTE( "ft-001-006.u11",  0x000000, 0x080000, CRC(9c500eae) SHA1(3448adef04c9ad2e0b39a283e4eb9c9bac7d4967) )
+	ROM_LOAD16_BYTE( "ft-001-005.u12",  0x000001, 0x080000, CRC(de6432a8) SHA1(afee9b29e0b3db4815fc29456044532aee03597e) )
+	ROM_LOAD16_BYTE( "ft-001-004.u13",  0x100000, 0x080000, CRC(69908c98) SHA1(1af069e9330a33cd2f0e1365e05c72eb23c3244e) )
+	ROM_LOAD16_BYTE( "ft-001-003.u14",  0x100001, 0x080000, CRC(62fb22fb) SHA1(a67cb46152b73a47c2287c4058d0a22fb7064e7e) )
 
 	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "ft-001-007.u15",  0x000000, 0x080000, CRC(c98dacf0) SHA1(b508433e2383af1e8bd5fda253c9925c48443490) )
@@ -11160,11 +11192,11 @@ ROM_START( extdwnhl )
 	ROM_LOAD( "fw001003.202", 0x000000, 0x200000, CRC(ac9b31d5) SHA1(d362217ea0c474994e3c79ddcf87ee6688428ea5) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 )   /* Layer 1 */
-	ROM_LOAD       ( "fw001004.206", 0x000000, 0x200000, CRC(0dcb1d72) SHA1(ffc84f46f06f46750bddd1a303ed83a28fa9572f) )
-	ROM_LOAD16_BYTE( "fw001005.205", 0x200000, 0x100000, CRC(5c33b2f1) SHA1(9ea848aeaccbba0b71e60b39cf844665bd97928f) )
+	ROM_LOAD24_WORD_SWAP( "fw001004.206", 0x000001, 0x200000, CRC(0dcb1d72) SHA1(ffc84f46f06f46750bddd1a303ed83a28fa9572f) )
+	ROM_LOAD24_BYTE     ( "fw001005.205", 0x000000, 0x100000, CRC(5c33b2f1) SHA1(9ea848aeaccbba0b71e60b39cf844665bd97928f) )
 
 	ROM_REGION( 0x200000, "gfx3", 0 )   /* Layer 2 */
-	ROM_LOAD( "fw001006.152",  0x000000, 0x200000, CRC(d00e8ddd) SHA1(e13692034afec1a0e86d19abfb9efa518b374147) )   // FIRST AND SECOND HALF IDENTICAL
+	ROM_LOAD16_WORD_SWAP( "fw001006.152",  0x000000, 0x200000, CRC(d00e8ddd) SHA1(e13692034afec1a0e86d19abfb9efa518b374147) )   // FIRST AND SECOND HALF IDENTICAL
 
 	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "fw001007.026",  0x080000, 0x080000, CRC(16d84d7a) SHA1(fdc13776ba1ec9c48a33a9f2dfe8a0e55c54d89e) )   // swapped halves
@@ -11184,13 +11216,13 @@ ROM_START( gundhara )
 	ROM_LOAD( "bpgh-007.u63", 0x400000, 0x200000, CRC(aa49ce7b) SHA1(fe0064d533bd895657b88a0ef96e835443a4077f) )
 	ROM_LOAD( "bpgh-005.200", 0x600000, 0x200000, CRC(74138266) SHA1(c859acff358a61a32e5810ff369b9d5528137337) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 )   /* Layer 1 */
-	ROM_LOAD       ( "bpgh-010.u66", 0x000000, 0x100000, CRC(b742f0b8) SHA1(9246846c9ee839d5d84f5e02cf4605afcfd6bf7a) )
-	ROM_LOAD16_BYTE( "bpgh-009.u65", 0x100000, 0x080000, CRC(b768e666) SHA1(473fa52c16c0a9f321e6429947a3e0fc1ef22f7e) )
+	ROM_REGION( 0x180000, "gfx2", 0 )   /* Layer 1 */
+	ROM_LOAD24_BYTE     ( "bpgh-009.u65", 0x000000, 0x080000, CRC(b768e666) SHA1(473fa52c16c0a9f321e6429947a3e0fc1ef22f7e) )
+	ROM_LOAD24_WORD_SWAP( "bpgh-010.u66", 0x000001, 0x100000, CRC(b742f0b8) SHA1(9246846c9ee839d5d84f5e02cf4605afcfd6bf7a) )
 
-	ROM_REGION( 0x400000, "gfx3", 0 )   /* Layer 2 */
-	ROM_LOAD       ( "bpgh-012.u68", 0x000000, 0x200000, CRC(edfda595) SHA1(5942181430d59c0c303cd1cbe753910c26c109a2) )
-	ROM_LOAD16_BYTE( "bpgh-011.u67", 0x200000, 0x100000, CRC(49aff270) SHA1(de25209e520cd8747042078440ee20866097d0cb) )
+	ROM_REGION( 0x300000, "gfx3", 0 )   /* Layer 2 */
+	ROM_LOAD24_BYTE     ( "bpgh-011.u67", 0x000000, 0x100000, CRC(49aff270) SHA1(de25209e520cd8747042078440ee20866097d0cb) )
+	ROM_LOAD24_WORD_SWAP( "bpgh-012.u68", 0x000001, 0x200000, CRC(edfda595) SHA1(5942181430d59c0c303cd1cbe753910c26c109a2) )
 
 	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "bpgh-013.u70",  0x080000, 0x080000, CRC(0fa5d503) SHA1(fd7a80cd25c23e737cc2c3d11de2291e22313b58) )   // swapped halves
@@ -11225,18 +11257,18 @@ ROM_START( gundharac )
 	ROM_LOAD16_BYTE( "10.u145-b", 0x700000, 0x080000, CRC(7c5d12b9) SHA1(6ee45c4da6994540852153752e2818a8ea8ecf1a) )
 	ROM_LOAD16_BYTE( "14.u147-b", 0x700001, 0x080000, CRC(5a8af50f) SHA1(3b7937ba720fcbbc5e29c1b95a97c29e8ff5490a) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 )   /* Layer 1 */
-	ROM_LOAD16_BYTE( "5.u148", 0x000000, 0x080000, CRC(0c740f9b) SHA1(f6d135c3318ff0d50d40921aa108b1b332c1a086) )
-	ROM_LOAD16_BYTE( "6.u150", 0x000001, 0x080000, CRC(ba60eb98) SHA1(7204269816332bbb3401d9f20a513372ffe78500) )
-	ROM_LOAD16_BYTE( "7.u154", 0x100000, 0x080000, CRC(b768e666) SHA1(473fa52c16c0a9f321e6429947a3e0fc1ef22f7e) )
+	ROM_REGION( 0x180000, "gfx2", 0 )   /* Layer 1 */
+	ROM_LOAD24_BYTE( "5.u148", 0x000002, 0x080000, CRC(0c740f9b) SHA1(f6d135c3318ff0d50d40921aa108b1b332c1a086) )
+	ROM_LOAD24_BYTE( "6.u150", 0x000001, 0x080000, CRC(ba60eb98) SHA1(7204269816332bbb3401d9f20a513372ffe78500) )
+	ROM_LOAD24_BYTE( "7.u154", 0x000000, 0x080000, CRC(b768e666) SHA1(473fa52c16c0a9f321e6429947a3e0fc1ef22f7e) )
 
-	ROM_REGION( 0x400000, "gfx3", 0 )   /* Layer 2 */
-	ROM_LOAD16_BYTE( "26.u164", 0x000000, 0x080000, CRC(be3ccaba) SHA1(98f8b83cbed00932866375d21f86ee5c9bddb2a6) )
-	ROM_LOAD16_BYTE( "28.u166", 0x000001, 0x080000, CRC(8a650a4e) SHA1(1f6eda27b39ad052e3d9a8a72cb0a072e7be4487) )
-	ROM_LOAD16_BYTE( "27.u165", 0x100000, 0x080000, CRC(47994ff0) SHA1(25211a9af01f77788578bb524619d95b5b86e241) )
-	ROM_LOAD16_BYTE( "29.u167", 0x100001, 0x080000, CRC(453c3d3f) SHA1(151528b6b1e7f8c059d67dbaca61e7c382e9ce04) )
-	ROM_LOAD16_BYTE( "16.u152", 0x200000, 0x080000, CRC(5ccc500b) SHA1(d3a2a5658cac8d788e0a1189c184309b8394b10a) )
-	ROM_LOAD16_BYTE( "17.u153", 0x300000, 0x080000, CRC(5586d086) SHA1(e43d5e8834701f40389400f68a99353e67598f6d) )
+	ROM_REGION( 0x300000, "gfx3", 0 )   /* Layer 2 */
+	ROM_LOAD24_BYTE( "26.u164", 0x000002, 0x080000, CRC(be3ccaba) SHA1(98f8b83cbed00932866375d21f86ee5c9bddb2a6) )
+	ROM_LOAD24_BYTE( "28.u166", 0x000001, 0x080000, CRC(8a650a4e) SHA1(1f6eda27b39ad052e3d9a8a72cb0a072e7be4487) )
+	ROM_LOAD24_BYTE( "16.u152", 0x000000, 0x080000, CRC(5ccc500b) SHA1(d3a2a5658cac8d788e0a1189c184309b8394b10a) )
+	ROM_LOAD24_BYTE( "27.u165", 0x180002, 0x080000, CRC(47994ff0) SHA1(25211a9af01f77788578bb524619d95b5b86e241) )
+	ROM_LOAD24_BYTE( "29.u167", 0x180001, 0x080000, CRC(453c3d3f) SHA1(151528b6b1e7f8c059d67dbaca61e7c382e9ce04) )
+	ROM_LOAD24_BYTE( "17.u153", 0x180000, 0x080000, CRC(5586d086) SHA1(e43d5e8834701f40389400f68a99353e67598f6d) )
 
 	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "30.u69", 0x000000, 0x080000, CRC(3111a98a) SHA1(75e17a0113060a10551b2b8c17b19890eb7aa0a6) )
@@ -11251,9 +11283,9 @@ ROM_START( sokonuke )
 	ROM_REGION( 0x200000, "gfx1", 0 )   /* Sprites */
 	ROM_LOAD( "001-003.bin", 0x000000, 0x200000, CRC(ab9ba897) SHA1(650c1eadf82f6e2b4c598495c867118277565411) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 )   /* Layer 1 */
-	ROM_LOAD       ( "001-004.bin", 0x000000, 0x100000, CRC(34ca3540) SHA1(a9b6b395037870033a2a422453e304fd4666b99e) )
-	ROM_LOAD16_BYTE( "001-005.bin", 0x100000, 0x080000, CRC(2b95d68d) SHA1(2fb480c31a6a7e180a68bd774b5f86348bea0761) )
+	ROM_REGION( 0x180000, "gfx2", 0 )   /* Layer 1 */
+	ROM_LOAD24_WORD_SWAP( "001-004.bin", 0x000001, 0x100000, CRC(34ca3540) SHA1(a9b6b395037870033a2a422453e304fd4666b99e) )
+	ROM_LOAD24_BYTE     ( "001-005.bin", 0x000000, 0x080000, CRC(2b95d68d) SHA1(2fb480c31a6a7e180a68bd774b5f86348bea0761) )
 
 	ROM_REGION( 0x100, "gfx3", ROMREGION_ERASE )    /* Layer 2 */
 	/* Unused */
@@ -11273,13 +11305,13 @@ ROM_START( zombraid )
 	ROM_REGION( 0x200000, "gfx1", 0 )   /* Sprites */
 	ROM_LOAD( "fy001006.200", 0x000000, 0x200000, CRC(e9ae99f7) SHA1(7ffd62e5db4a48d362c90e8fca991c5b63f22bd8) )
 
-	ROM_REGION( 0x400000, "gfx2", 0 )   /* Layer 1 */
-	ROM_LOAD       ( "fy001008.66", 0x000000, 0x200000, CRC(73d7b0e1) SHA1(aa332b563005edb1a6e20fbceaba68b56761a634) )
-	ROM_LOAD16_BYTE( "fy001007.65", 0x200000, 0x100000, CRC(b2fc2c81) SHA1(2c529beccea353c3e90563215ddf3d8931e0fb83) )
+	ROM_REGION( 0x300000, "gfx2", 0 )   /* Layer 1 */
+	ROM_LOAD24_WORD_SWAP( "fy001008.66", 0x000001, 0x200000, CRC(73d7b0e1) SHA1(aa332b563005edb1a6e20fbceaba68b56761a634) )
+	ROM_LOAD24_BYTE     ( "fy001007.65", 0x000000, 0x100000, CRC(b2fc2c81) SHA1(2c529beccea353c3e90563215ddf3d8931e0fb83) )
 
-	ROM_REGION( 0x400000, "gfx3", 0 )   /* Layer 2 */
-	ROM_LOAD       ( "fy001010.68", 0x000000, 0x200000, CRC(8b40ed7a) SHA1(05fcd7947a8419cab5ed2305fba9a671911e4850) )
-	ROM_LOAD16_BYTE( "fy001009.67", 0x200000, 0x100000, CRC(6bcca641) SHA1(49c9106e6f23e25e5b5917af11fc48d34457c61a) )
+	ROM_REGION( 0x300000, "gfx3", 0 )   /* Layer 2 */
+	ROM_LOAD24_WORD_SWAP( "fy001010.68", 0x000001, 0x200000, CRC(8b40ed7a) SHA1(05fcd7947a8419cab5ed2305fba9a671911e4850) )
+	ROM_LOAD24_BYTE     ( "fy001009.67", 0x000000, 0x100000, CRC(6bcca641) SHA1(49c9106e6f23e25e5b5917af11fc48d34457c61a) )
 
 	ROM_REGION( 0x400000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "fy001012.b",  0x000000, 0x200000, CRC(fd30e102) SHA1(ae02f94f69aa301b0c37921ca1117e3ad20467b5) )
@@ -11322,21 +11354,21 @@ ROM_START( zombraidp ) /* Prototype or test board version.  Data matches release
 	ROM_LOAD16_BYTE( "u147_master_obj_06_c3d8.u147", 0x180001, 0x040000, CRC(a32c3da8) SHA1(fd63c0fb13fb546732351dc2ee5fa33c1c275274) )
 	ROM_LOAD16_BYTE( "u145_master_obj_07_8ad4.u145", 0x180000, 0x040000, CRC(8071f0b6) SHA1(e596897e52beaf686e95ad643a36beefe311d85c) )
 
-	ROM_REGION( 0x400000, "gfx2", ROMREGION_ERASE00 )   /* Layer 1 */
-	ROM_LOAD16_BYTE( "u148_master_scn_1-0_3ef8.u148", 0x000000, 0x080000, CRC(7d722f2a) SHA1(6bcd18fe65a4a94a718f75c3813cea014c80b35a) ) /* These 6 roms dated 7/17/95 */
-	ROM_LOAD16_BYTE( "u150_master_scn_1-1_89a6.u150", 0x000001, 0x080000, CRC(3c62a8af) SHA1(38d9a32817a928586fe027b4c974f7dde585e5b7) )
-	ROM_LOAD16_BYTE( "u149_master_scn_1-3_71bb.u149", 0x100000, 0x080000, CRC(70d6af7f) SHA1(1c922882a90efe83eacf6e25c4fb0c0a9e29a22c) )
-	ROM_LOAD16_BYTE( "u151_master_scn_1-4_872e.u151", 0x100001, 0x080000, CRC(83ef4d5f) SHA1(b7e804c3a702caaee320daf8604d0af6f5874946) )
-	ROM_LOAD16_BYTE( "u154_master_scn_1-2_0f4b.u154", 0x200000, 0x080000, CRC(0a1d647c) SHA1(66dede165438001a34317d5ab29a9553d25530a2) )
-	ROM_LOAD16_BYTE( "u155_master_scn_1-5_daef.u155", 0x300000, 0x080000, CRC(2508f67f) SHA1(43a9d56c49187891007457dd23d3ac696f8ce0fa) )
+	ROM_REGION( 0x300000, "gfx2", ROMREGION_ERASE00 )   /* Layer 1 */
+	ROM_LOAD24_BYTE( "u148_master_scn_1-0_3ef8.u148", 0x000000, 0x080000, CRC(7d722f2a) SHA1(6bcd18fe65a4a94a718f75c3813cea014c80b35a) ) /* These 6 roms dated 7/17/95 */
+	ROM_LOAD24_BYTE( "u150_master_scn_1-1_89a6.u150", 0x000001, 0x080000, CRC(3c62a8af) SHA1(38d9a32817a928586fe027b4c974f7dde585e5b7) )
+	ROM_LOAD24_BYTE( "u154_master_scn_1-2_0f4b.u154", 0x000000, 0x080000, CRC(0a1d647c) SHA1(66dede165438001a34317d5ab29a9553d25530a2) )
+	ROM_LOAD24_BYTE( "u149_master_scn_1-3_71bb.u149", 0x180000, 0x080000, CRC(70d6af7f) SHA1(1c922882a90efe83eacf6e25c4fb0c0a9e29a22c) )
+	ROM_LOAD24_BYTE( "u151_master_scn_1-4_872e.u151", 0x180001, 0x080000, CRC(83ef4d5f) SHA1(b7e804c3a702caaee320daf8604d0af6f5874946) )
+	ROM_LOAD24_BYTE( "u155_master_scn_1-5_daef.u155", 0x180000, 0x080000, CRC(2508f67f) SHA1(43a9d56c49187891007457dd23d3ac696f8ce0fa) )
 
-	ROM_REGION( 0x400000, "gfx3", ROMREGION_ERASE00 )   /* Layer 2 */
-	ROM_LOAD16_BYTE( "u164_master_scn_2-0_e79c.u164", 0x000000, 0x080000, CRC(f8c89062) SHA1(08fd32b30923025b3769e56a8601b2ea1f85ebd1) ) /* These 6 roms dated 7/17/95 */
-	ROM_LOAD16_BYTE( "u166_master_scn_2-1_0b75.u166", 0x000001, 0x080000, CRC(4d7a72d5) SHA1(83b7ca4ea4c83fdab5be3c17d816dfd4033fb89c) )
-	ROM_LOAD16_BYTE( "u165_master_scn_2-3_be68.u165", 0x100000, 0x080000, CRC(8aaaef08) SHA1(12b9c8c170a4acf200e3fba45407a3e38f787926) )
-	ROM_LOAD16_BYTE( "u167_master_scn_2-4_c515.u167", 0x100001, 0x080000, CRC(d22ff5c1) SHA1(c488a69c9a241e1ca2119264bf879140d16fe69f) )
-	ROM_LOAD16_BYTE( "u152_master_scn_2-2_c00e.u152", 0x200000, 0x080000, CRC(0870ad58) SHA1(20e076fa665c24db0e316598a0a5d7fae9fc2f2a) )
-	ROM_LOAD16_BYTE( "u153_master_scn_2-5_e1da.u153", 0x300000, 0x080000, CRC(814ac66a) SHA1(1fd13a0bf73b9bdede82a865789413308d989c3a) )
+	ROM_REGION( 0x300000, "gfx3", ROMREGION_ERASE00 )   /* Layer 2 */
+	ROM_LOAD24_BYTE( "u164_master_scn_2-0_e79c.u164", 0x000002, 0x080000, CRC(f8c89062) SHA1(08fd32b30923025b3769e56a8601b2ea1f85ebd1) ) /* These 6 roms dated 7/17/95 */
+	ROM_LOAD24_BYTE( "u166_master_scn_2-1_0b75.u166", 0x000001, 0x080000, CRC(4d7a72d5) SHA1(83b7ca4ea4c83fdab5be3c17d816dfd4033fb89c) )
+	ROM_LOAD24_BYTE( "u152_master_scn_2-2_c00e.u152", 0x000000, 0x080000, CRC(0870ad58) SHA1(20e076fa665c24db0e316598a0a5d7fae9fc2f2a) )
+	ROM_LOAD24_BYTE( "u165_master_scn_2-3_be68.u165", 0x180002, 0x080000, CRC(8aaaef08) SHA1(12b9c8c170a4acf200e3fba45407a3e38f787926) )
+	ROM_LOAD24_BYTE( "u167_master_scn_2-4_c515.u167", 0x180001, 0x080000, CRC(d22ff5c1) SHA1(c488a69c9a241e1ca2119264bf879140d16fe69f) )
+	ROM_LOAD24_BYTE( "u153_master_scn_2-5_e1da.u153", 0x180000, 0x080000, CRC(814ac66a) SHA1(1fd13a0bf73b9bdede82a865789413308d989c3a) )
 
 	ROM_REGION( 0x400000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "u156_master_snd_0_f630.u156", 0x000000, 0x080000, CRC(bfc467bd) SHA1(a234cb8e0259a21b7bad40a72d99bf379a4b4046) ) /* These 8 roms dated 7/17/95 */
@@ -11369,21 +11401,21 @@ ROM_START( zombraidpj ) /* Prototype or test board version.  Data matches releas
 	ROM_LOAD16_BYTE( "u147_master_obj_06_c3d8.u147", 0x180001, 0x040000, CRC(a32c3da8) SHA1(fd63c0fb13fb546732351dc2ee5fa33c1c275274) )
 	ROM_LOAD16_BYTE( "u145_master_obj_07_8ad4.u145", 0x180000, 0x040000, CRC(8071f0b6) SHA1(e596897e52beaf686e95ad643a36beefe311d85c) )
 
-	ROM_REGION( 0x400000, "gfx2", ROMREGION_ERASE00 )   /* Layer 1 */
-	ROM_LOAD16_BYTE( "u148_master_scn_1-0_3ef8.u148", 0x000000, 0x080000, CRC(7d722f2a) SHA1(6bcd18fe65a4a94a718f75c3813cea014c80b35a) ) /* These 6 roms dated 7/17/95 */
-	ROM_LOAD16_BYTE( "u150_master_scn_1-1_89a6.u150", 0x000001, 0x080000, CRC(3c62a8af) SHA1(38d9a32817a928586fe027b4c974f7dde585e5b7) )
-	ROM_LOAD16_BYTE( "u149_master_scn_1-3_71bb.u149", 0x100000, 0x080000, CRC(70d6af7f) SHA1(1c922882a90efe83eacf6e25c4fb0c0a9e29a22c) )
-	ROM_LOAD16_BYTE( "u151_master_scn_1-4_872e.u151", 0x100001, 0x080000, CRC(83ef4d5f) SHA1(b7e804c3a702caaee320daf8604d0af6f5874946) )
-	ROM_LOAD16_BYTE( "u154_master_scn_1-2_0f4b.u154", 0x200000, 0x080000, CRC(0a1d647c) SHA1(66dede165438001a34317d5ab29a9553d25530a2) )
-	ROM_LOAD16_BYTE( "u155_master_scn_1-5_daef.u155", 0x300000, 0x080000, CRC(2508f67f) SHA1(43a9d56c49187891007457dd23d3ac696f8ce0fa) )
+	ROM_REGION( 0x300000, "gfx2", ROMREGION_ERASE00 )   /* Layer 1 */
+	ROM_LOAD24_BYTE( "u148_master_scn_1-0_3ef8.u148", 0x000002, 0x080000, CRC(7d722f2a) SHA1(6bcd18fe65a4a94a718f75c3813cea014c80b35a) ) /* These 6 roms dated 7/17/95 */
+	ROM_LOAD24_BYTE( "u150_master_scn_1-1_89a6.u150", 0x000001, 0x080000, CRC(3c62a8af) SHA1(38d9a32817a928586fe027b4c974f7dde585e5b7) )
+	ROM_LOAD24_BYTE( "u154_master_scn_1-2_0f4b.u154", 0x000000, 0x080000, CRC(0a1d647c) SHA1(66dede165438001a34317d5ab29a9553d25530a2) )
+	ROM_LOAD24_BYTE( "u149_master_scn_1-3_71bb.u149", 0x180002, 0x080000, CRC(70d6af7f) SHA1(1c922882a90efe83eacf6e25c4fb0c0a9e29a22c) )
+	ROM_LOAD24_BYTE( "u151_master_scn_1-4_872e.u151", 0x180001, 0x080000, CRC(83ef4d5f) SHA1(b7e804c3a702caaee320daf8604d0af6f5874946) )
+	ROM_LOAD24_BYTE( "u155_master_scn_1-5_daef.u155", 0x180000, 0x080000, CRC(2508f67f) SHA1(43a9d56c49187891007457dd23d3ac696f8ce0fa) )
 
-	ROM_REGION( 0x400000, "gfx3", ROMREGION_ERASE00 )   /* Layer 2 */
-	ROM_LOAD16_BYTE( "u164_master_scn_2-0_e79c.u164", 0x000000, 0x080000, CRC(f8c89062) SHA1(08fd32b30923025b3769e56a8601b2ea1f85ebd1) ) /* These 6 roms dated 7/17/95 */
-	ROM_LOAD16_BYTE( "u166_master_scn_2-1_0b75.u166", 0x000001, 0x080000, CRC(4d7a72d5) SHA1(83b7ca4ea4c83fdab5be3c17d816dfd4033fb89c) )
-	ROM_LOAD16_BYTE( "u165_master_scn_2-3_be68.u165", 0x100000, 0x080000, CRC(8aaaef08) SHA1(12b9c8c170a4acf200e3fba45407a3e38f787926) )
-	ROM_LOAD16_BYTE( "u167_master_scn_2-4_c515.u167", 0x100001, 0x080000, CRC(d22ff5c1) SHA1(c488a69c9a241e1ca2119264bf879140d16fe69f) )
-	ROM_LOAD16_BYTE( "u152_master_scn_2-2_c00e.u152", 0x200000, 0x080000, CRC(0870ad58) SHA1(20e076fa665c24db0e316598a0a5d7fae9fc2f2a) )
-	ROM_LOAD16_BYTE( "u153_master_scn_2-5_e1da.u153", 0x300000, 0x080000, CRC(814ac66a) SHA1(1fd13a0bf73b9bdede82a865789413308d989c3a) )
+	ROM_REGION( 0x300000, "gfx3", ROMREGION_ERASE00 )   /* Layer 2 */
+	ROM_LOAD24_BYTE( "u164_master_scn_2-0_e79c.u164", 0x000002, 0x080000, CRC(f8c89062) SHA1(08fd32b30923025b3769e56a8601b2ea1f85ebd1) ) /* These 6 roms dated 7/17/95 */
+	ROM_LOAD24_BYTE( "u166_master_scn_2-1_0b75.u166", 0x000001, 0x080000, CRC(4d7a72d5) SHA1(83b7ca4ea4c83fdab5be3c17d816dfd4033fb89c) )
+	ROM_LOAD24_BYTE( "u152_master_scn_2-2_c00e.u152", 0x000000, 0x080000, CRC(0870ad58) SHA1(20e076fa665c24db0e316598a0a5d7fae9fc2f2a) )
+	ROM_LOAD24_BYTE( "u165_master_scn_2-3_be68.u165", 0x180002, 0x080000, CRC(8aaaef08) SHA1(12b9c8c170a4acf200e3fba45407a3e38f787926) )
+	ROM_LOAD24_BYTE( "u167_master_scn_2-4_c515.u167", 0x180001, 0x080000, CRC(d22ff5c1) SHA1(c488a69c9a241e1ca2119264bf879140d16fe69f) )
+	ROM_LOAD24_BYTE( "u153_master_scn_2-5_e1da.u153", 0x180000, 0x080000, CRC(814ac66a) SHA1(1fd13a0bf73b9bdede82a865789413308d989c3a) )
 
 	ROM_REGION( 0x400000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "u156_master_snd_0_f630.u156", 0x000000, 0x080000, CRC(bfc467bd) SHA1(a234cb8e0259a21b7bad40a72d99bf379a4b4046) ) /* These 8 roms dated 7/17/95 */
@@ -11408,17 +11440,15 @@ ROM_START( madshark )
 	ROM_LOAD( "fq001004.202", 0x100000, 0x100000, CRC(e56a1b5e) SHA1(f0dd34122fd7db15cc56714b72b60d07ccb59222) )
 	ROM_CONTINUE(             0x000000, 0x100000 )
 
-	ROM_REGION( 0x400000, "user1", 0 )  /* Layers 1+2 */
-	ROM_LOAD       ( "fq001006.152", 0x000000, 0x200000, CRC(3bc5e8e4) SHA1(74cdf1bb2e58bef29c6f4371ff40f64472bff3ce) )
-	ROM_LOAD16_BYTE( "fq001005.205", 0x200000, 0x100000, CRC(5f6c6d4a) SHA1(eed5661738282a14ce89917335fd1b695eb7351e) )
+	ROM_REGION( 0x300000, "user1", 0 )  /* Layers 1+2 */
+	ROM_LOAD24_WORD_SWAP( "fq001006.152", 0x000001, 0x200000, CRC(3bc5e8e4) SHA1(74cdf1bb2e58bef29c6f4371ff40f64472bff3ce) )
+	ROM_LOAD24_BYTE     ( "fq001005.205", 0x000000, 0x100000, CRC(5f6c6d4a) SHA1(eed5661738282a14ce89917335fd1b695eb7351e) )
 
-	ROM_REGION( 0x200000, "gfx2", 0 )   /* Layer 1 */
-	ROM_COPY( "user1", 0x000000, 0x000000, 0x100000 )
-	ROM_COPY( "user1", 0x200000, 0x100000, 0x100000 )
+	ROM_REGION( 0x180000, "gfx2", 0 )   /* Layer 1 */
+	ROM_COPY( "user1", 0x000000, 0x000000, 0x180000 )
 
-	ROM_REGION( 0x200000, "gfx3", 0 )   /* Layer 2 */
-	ROM_COPY( "user1", 0x100000, 0x000000, 0x100000 )
-	ROM_COPY( "user1", 0x300000, 0x100000, 0x100000 )
+	ROM_REGION( 0x180000, "gfx3", 0 )   /* Layer 2 */
+	ROM_COPY( "user1", 0x180000, 0x000000, 0x180000 )
 
 	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "fq001007.26", 0x000000, 0x100000, CRC(e4b33c13) SHA1(c4f9532de7a09c80f5a74c3a386e99a0f546846f) )
@@ -11434,7 +11464,7 @@ ROM_START( magspeed )
 	ROM_LOAD( "fu001005.22", 0x100000, 0x100000, CRC(fd4b1ff6) SHA1(188b74cdf120e9d6e0fe15b60997383929dfa5cd) )
 
 	ROM_REGION( 0x100000, "user1", 0 )  /* Layers 1+2 */
-	ROM_LOAD( "fu001006.152", 0x000000, 0x100000, CRC(70855139) SHA1(24d635aceb823b0569169c8ecced13ac82c17d6a) )
+	ROM_LOAD16_WORD_SWAP( "fu001006.152", 0x000000, 0x100000, CRC(70855139) SHA1(24d635aceb823b0569169c8ecced13ac82c17d6a) )
 
 	ROM_REGION( 0x80000, "gfx2", 0 )    /* Layer 1 */
 	ROM_COPY( "user1", 0x000000, 0x00000, 0x80000 )
@@ -11461,11 +11491,11 @@ ROM_START( utoukond )
 	ROM_LOAD( "93uta01.200", 0x300000, 0x100000, CRC(364de841) SHA1(a025bd57f60eac05c0d7b4fb69b4b4979f357e6b) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )   /* Layer 1 */
-	ROM_LOAD( "93uta05.66",  0x000000, 0x100000, CRC(5e640bfb) SHA1(37f30ae6ab9d7860da6ca6a343fa9adf4b3d355c) )
+	ROM_LOAD16_WORD_SWAP( "93uta05.66",  0x000000, 0x100000, CRC(5e640bfb) SHA1(37f30ae6ab9d7860da6ca6a343fa9adf4b3d355c) )
 
 	ROM_REGION( 0x200000, "gfx3", 0 )   /* Layer 2 */
-	ROM_LOAD( "93uta07.68",  0x000000, 0x100000, CRC(67bdd036) SHA1(527b6a67e7a62263bee738dc82d6ff289ab54853) )
-	ROM_LOAD( "93uta06.67",  0x100000, 0x100000, CRC(294c26e4) SHA1(459ec7f8c8db4f1e3906d5db240298405bda991c) )
+	ROM_LOAD16_WORD_SWAP( "93uta07.68",  0x000000, 0x100000, CRC(67bdd036) SHA1(527b6a67e7a62263bee738dc82d6ff289ab54853) )
+	ROM_LOAD16_WORD_SWAP( "93uta06.67",  0x100000, 0x100000, CRC(294c26e4) SHA1(459ec7f8c8db4f1e3906d5db240298405bda991c) )
 
 	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "93uta08.69", 0x000000, 0x100000, CRC(3d50bbcd) SHA1(e9b78d08466e1f9b42f11999bb53b6deceb81a12) )
@@ -11495,7 +11525,7 @@ ROM_START( pairlove )
 
 	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "ut2-001-003.12a",  0x000000, 0x080000, CRC(900219a9) SHA1(3260a900df25beba597bf947a9fbb6f7392827d7) )
-	ROM_RELOAD(                   0x080000, 0x080000  )
+	ROM_RELOAD(                   0x080000, 0x080000 )
 ROM_END
 
 ROM_START( crazyfgt )
@@ -11504,18 +11534,18 @@ ROM_START( crazyfgt )
 	ROM_LOAD16_BYTE( "rom.u4", 0x00001, 0x40000, CRC(505e9d47) SHA1(3797d396a24e46b891de4c40aafe960d1cf5f161) )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )   /* Sprites */
-	ROM_LOAD( "rom.u228",  0x000000, 0x80000, CRC(7181618e) SHA1(57c5aced95b0a11a43dc9bd532290f067113e65a) )
-	ROM_LOAD( "rom.u227",  0x080000, 0x80000, CRC(7905b5f2) SHA1(633f86bf2be620afbe8012ade5d1e59c359a25d4) )
-	ROM_LOAD( "rom.u226",  0x100000, 0x80000, CRC(ef210e34) SHA1(99241ffcbc8af889c8ab6f0bc67eedef27d455f0) )
-	ROM_LOAD( "rom.u225",  0x180000, 0x80000, CRC(451b4419) SHA1(ab32b3c452b566ddfc64c0a80a257c3baadd8f41) )
+	ROM_LOAD16_BYTE( "rom.u225",  0x000000, 0x80000, CRC(451b4419) SHA1(ab32b3c452b566ddfc64c0a80a257c3baadd8f41) )
+	ROM_LOAD16_BYTE( "rom.u226",  0x000001, 0x80000, CRC(ef210e34) SHA1(99241ffcbc8af889c8ab6f0bc67eedef27d455f0) )
+	ROM_LOAD16_BYTE( "rom.u227",  0x100000, 0x80000, CRC(7905b5f2) SHA1(633f86bf2be620afbe8012ade5d1e59c359a25d4) )
+	ROM_LOAD16_BYTE( "rom.u228",  0x100001, 0x80000, CRC(7181618e) SHA1(57c5aced95b0a11a43dc9bd532290f067113e65a) )
 
 	ROM_REGION( 0xc0000, "gfx2", 0 )    /* Layer 1 */
-	ROM_LOAD( "rom.u67",  0x000000, 0x40000, CRC(ec8c6831) SHA1(e0ef1c2e539c1780fc5816ec950d33cb2a69d55e) )
-	ROM_LOAD( "rom.u68",  0x040000, 0x80000, CRC(2124312e) SHA1(1c6053c87a975bfdf910e75bd3e38d0898806ea0) )
+	ROM_LOAD24_BYTE     ( "rom.u67",  0x000000, 0x40000, CRC(ec8c6831) SHA1(e0ef1c2e539c1780fc5816ec950d33cb2a69d55e) )
+	ROM_LOAD24_WORD_SWAP( "rom.u68",  0x000001, 0x80000, CRC(2124312e) SHA1(1c6053c87a975bfdf910e75bd3e38d0898806ea0) )
 
 	ROM_REGION( 0xc0000, "gfx3", 0 )    /* Layer 2 */
-	ROM_LOAD( "rom.u65",  0x000000, 0x40000, CRC(58448231) SHA1(711f24831777719f6a7b143f4f1bfd14f5a9ed4c) )
-	ROM_LOAD( "rom.u66",  0x040000, 0x80000, CRC(c6f7735b) SHA1(0e77045f82d0bf659be5dbfe21cfc8f223faeee9) )
+	ROM_LOAD24_BYTE     ( "rom.u65",  0x000000, 0x40000, CRC(58448231) SHA1(711f24831777719f6a7b143f4f1bfd14f5a9ed4c) )
+	ROM_LOAD24_WORD_SWAP( "rom.u66",  0x000001, 0x80000, CRC(c6f7735b) SHA1(0e77045f82d0bf659be5dbfe21cfc8f223faeee9) )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* OKI samples */
 	ROM_LOAD( "rom.u85",  0x00000, 0x40000, CRC(7b95d0bb) SHA1(f16dfd639eed6856e3ab93704caef592a07ba367) )
@@ -11530,14 +11560,14 @@ ROM_START( jockeyc )
 	ROM_FILL(                               0x180000, 0x80000, 0xff )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )   /* Sprites */
-	ROM_LOAD( "ya-001-004-t74.u10", 0x000000, 0x80000, CRC(eb74d2e0) SHA1(221ff6cc03ce57a7fcbe418f1c12a293990f8a7d) )
-	ROM_LOAD( "ya-001-005-t75.u17", 0x080000, 0x80000, CRC(4a6c804b) SHA1(b596b9b0b3b453c26f9c7f976ff4d56eac4fac04) )
-	ROM_LOAD( "ya-001-006-t76.u22", 0x100000, 0x80000, CRC(bfae01a5) SHA1(3be83972c3987e9bf722cd6db7770f074587301c) )
-	ROM_LOAD( "ya-001-007-t77.u27", 0x180000, 0x80000, CRC(2dc7a294) SHA1(97f2aa9939a45aaa94d4aeb2fcd5b7f30204b942) )
+	ROM_LOAD16_BYTE( "ya-001-007-t77.u27", 0x000000, 0x80000, CRC(2dc7a294) SHA1(97f2aa9939a45aaa94d4aeb2fcd5b7f30204b942) )
+	ROM_LOAD16_BYTE( "ya-001-006-t76.u22", 0x000001, 0x80000, CRC(bfae01a5) SHA1(3be83972c3987e9bf722cd6db7770f074587301c) )
+	ROM_LOAD16_BYTE( "ya-001-005-t75.u17", 0x100000, 0x80000, CRC(4a6c804b) SHA1(b596b9b0b3b453c26f9c7f976ff4d56eac4fac04) )
+	ROM_LOAD16_BYTE( "ya-001-004-t74.u10", 0x100001, 0x80000, CRC(eb74d2e0) SHA1(221ff6cc03ce57a7fcbe418f1c12a293990f8a7d) )
 
 	ROM_REGION( 0x80000, "gfx2", 0 )    /* Layer 1 */
-	ROM_LOAD( "ya-001-008-t59.u35", 0x000000, 0x40000, CRC(4b890f83) SHA1(fde6544898a0691b550f3045803f2e81cfeb5fe9) )
-	ROM_LOAD( "ya-001-009-t60.u41", 0x040000, 0x40000, CRC(caa5e3c1) SHA1(63cccc5479040a02872febc8d7f2d46096e138d1) )
+	ROM_LOAD16_BYTE( "ya-001-008-t59.u35", 0x000000, 0x40000, CRC(4b890f83) SHA1(fde6544898a0691b550f3045803f2e81cfeb5fe9) )
+	ROM_LOAD16_BYTE( "ya-001-009-t60.u41", 0x000001, 0x40000, CRC(caa5e3c1) SHA1(63cccc5479040a02872febc8d7f2d46096e138d1) )
 
 	ROM_REGION( 0x400, "proms", 0 ) /* Colours */
 	ROM_LOAD16_BYTE( "ya1-010.prom", 0x000, 0x200, CRC(778094b3) SHA1(270329a0d544dc7a8240d6dab08ccd54ea87ab70) )
@@ -11589,14 +11619,14 @@ ROM_START( inttoote2 )
 	ROM_FILL(                                     0x180000, 0x80000, 0xff )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )   /* Sprites */
-	ROM_LOAD( "ya-001-004-t74.u10", 0x000000, 0x80000, CRC(eb74d2e0) SHA1(221ff6cc03ce57a7fcbe418f1c12a293990f8a7d) )
-	ROM_LOAD( "ya-001-005-t75.u17", 0x080000, 0x80000, CRC(4a6c804b) SHA1(b596b9b0b3b453c26f9c7f976ff4d56eac4fac04) )
-	ROM_LOAD( "ya-001-006-t76.u22", 0x100000, 0x80000, CRC(bfae01a5) SHA1(3be83972c3987e9bf722cd6db7770f074587301c) )
-	ROM_LOAD( "ya-001-007-t77.u27", 0x180000, 0x80000, CRC(2dc7a294) SHA1(97f2aa9939a45aaa94d4aeb2fcd5b7f30204b942) )
+	ROM_LOAD16_BYTE( "ya-001-007-t77.u27", 0x000000, 0x80000, CRC(2dc7a294) SHA1(97f2aa9939a45aaa94d4aeb2fcd5b7f30204b942) )
+	ROM_LOAD16_BYTE( "ya-001-006-t76.u22", 0x000001, 0x80000, CRC(bfae01a5) SHA1(3be83972c3987e9bf722cd6db7770f074587301c) )
+	ROM_LOAD16_BYTE( "ya-001-005-t75.u17", 0x100000, 0x80000, CRC(4a6c804b) SHA1(b596b9b0b3b453c26f9c7f976ff4d56eac4fac04) )
+	ROM_LOAD16_BYTE( "ya-001-004-t74.u10", 0x100001, 0x80000, CRC(eb74d2e0) SHA1(221ff6cc03ce57a7fcbe418f1c12a293990f8a7d) )
 
 	ROM_REGION( 0x80000, "gfx2", 0 )    /* Layer 1 */
-	ROM_LOAD( "ya-001-008-t59.u35", 0x000000, 0x40000, CRC(4b890f83) SHA1(fde6544898a0691b550f3045803f2e81cfeb5fe9) )
-	ROM_LOAD( "ya-001-009-t60.u41", 0x040000, 0x40000, CRC(caa5e3c1) SHA1(63cccc5479040a02872febc8d7f2d46096e138d1) )
+	ROM_LOAD16_BYTE( "ya-001-008-t59.u35", 0x000000, 0x40000, CRC(4b890f83) SHA1(fde6544898a0691b550f3045803f2e81cfeb5fe9) )
+	ROM_LOAD16_BYTE( "ya-001-009-t60.u41", 0x000001, 0x40000, CRC(caa5e3c1) SHA1(63cccc5479040a02872febc8d7f2d46096e138d1) )
 
 	ROM_REGION( 0x400, "proms", 0 ) /* Colours */
 	ROM_LOAD16_BYTE( "ya-010.prom", 0x000, 0x200, CRC(778094b3) SHA1(270329a0d544dc7a8240d6dab08ccd54ea87ab70) )
@@ -11616,20 +11646,20 @@ ROM_START( inttoote )
 	ROM_FILL(                                     0x180000, 0x80000, 0xff )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )   /* Sprites */
-	ROM_LOAD( "ya_011_004.u10",             0x000000, 0x80000, CRC(eb74d2e0) SHA1(221ff6cc03ce57a7fcbe418f1c12a293990f8a7d) )
-	ROM_LOAD( "p523.v01_horse_fore_1.u135", 0x070000, 0x10000, CRC(3a75df30) SHA1(f3b3a7428e3e125921686bc9aacde6b28b1947b5) )
-	ROM_LOAD( "ya_011_005.u17",             0x080000, 0x80000, CRC(4a6c804b) SHA1(b596b9b0b3b453c26f9c7f976ff4d56eac4fac04) )
-	ROM_LOAD( "p523.v01_horse_fore_2.u134", 0x0f0000, 0x10000, CRC(26fb0339) SHA1(a134ecef00f690c82c8bddf26498b357ccf8d5c3) )
-	ROM_LOAD( "ya_011_006.u22",             0x100000, 0x80000, CRC(bfae01a5) SHA1(3be83972c3987e9bf722cd6db7770f074587301c) )
-	ROM_LOAD( "p523.v01_horse_fore_3.u133", 0x170000, 0x10000, CRC(c38596af) SHA1(d27141e28d8f8352f065c55121412e604c199a9a) )
-	ROM_LOAD( "ya_011_007.u27",             0x180000, 0x80000, CRC(2dc7a294) SHA1(97f2aa9939a45aaa94d4aeb2fcd5b7f30204b942) )
-	ROM_LOAD( "p523.v01_horse_fore_4.u132", 0x1f0000, 0x10000, CRC(64ef345e) SHA1(ef5d9f293ded44a2be91278549f5db8673fc7571) )
+	ROM_LOAD16_BYTE( "ya_011_007.u27",             0x000000, 0x80000, CRC(2dc7a294) SHA1(97f2aa9939a45aaa94d4aeb2fcd5b7f30204b942) )
+	ROM_LOAD16_BYTE( "ya_011_006.u22",             0x000001, 0x80000, CRC(bfae01a5) SHA1(3be83972c3987e9bf722cd6db7770f074587301c) )
+	ROM_LOAD16_BYTE( "p523.v01_horse_fore_3.u133", 0x0e0001, 0x10000, CRC(c38596af) SHA1(d27141e28d8f8352f065c55121412e604c199a9a) )
+	ROM_LOAD16_BYTE( "p523.v01_horse_fore_4.u132", 0x0e0000, 0x10000, CRC(64ef345e) SHA1(ef5d9f293ded44a2be91278549f5db8673fc7571) )
+	ROM_LOAD16_BYTE( "ya_011_005.u17",             0x100000, 0x80000, CRC(4a6c804b) SHA1(b596b9b0b3b453c26f9c7f976ff4d56eac4fac04) )
+	ROM_LOAD16_BYTE( "ya_011_004.u10",             0x100001, 0x80000, CRC(eb74d2e0) SHA1(221ff6cc03ce57a7fcbe418f1c12a293990f8a7d) )
+	ROM_LOAD16_BYTE( "p523.v01_horse_fore_2.u134", 0x1e0000, 0x10000, CRC(26fb0339) SHA1(a134ecef00f690c82c8bddf26498b357ccf8d5c3) )
+	ROM_LOAD16_BYTE( "p523.v01_horse_fore_1.u135", 0x1e0001, 0x10000, CRC(3a75df30) SHA1(f3b3a7428e3e125921686bc9aacde6b28b1947b5) )
 
 	ROM_REGION( 0xc0000, "gfx2", 0 )    /* Layer 1 */
-	ROM_LOAD( "ya_011_008.u35",             0x000000, 0x40000, CRC(4b890f83) SHA1(fde6544898a0691b550f3045803f2e81cfeb5fe9) )
-	ROM_LOAD( "p523.v01_horse_back_1.u137", 0x040000, 0x20000, CRC(39b221ea) SHA1(3b3367430733ed36d6a981cd2ec6df731d07c089) )
-	ROM_LOAD( "ya_011_009.u41",             0x060000, 0x40000, CRC(caa5e3c1) SHA1(63cccc5479040a02872febc8d7f2d46096e138d1) )
-	ROM_LOAD( "p523.v01_horse_back_2.u136", 0x0a0000, 0x20000, CRC(9c5e32a0) SHA1(964734a626b5c7b9d7130addc642895df520dcb7) )
+	ROM_LOAD16_BYTE( "ya_011_008.u35",             0x000000, 0x40000, CRC(4b890f83) SHA1(fde6544898a0691b550f3045803f2e81cfeb5fe9) )
+	ROM_LOAD16_BYTE( "ya_011_009.u41",             0x000001, 0x40000, CRC(caa5e3c1) SHA1(63cccc5479040a02872febc8d7f2d46096e138d1) )
+	ROM_LOAD16_BYTE( "p523.v01_horse_back_1.u137", 0x080000, 0x20000, CRC(39b221ea) SHA1(3b3367430733ed36d6a981cd2ec6df731d07c089) )
+	ROM_LOAD16_BYTE( "p523.v01_horse_back_2.u136", 0x080001, 0x20000, CRC(9c5e32a0) SHA1(964734a626b5c7b9d7130addc642895df520dcb7) )
 
 	ROM_REGION( 0x400, "proms", 0 ) /* Colours */
 	ROM_LOAD16_BYTE( "ya-010.prom", 0x000, 0x200, CRC(778094b3) SHA1(270329a0d544dc7a8240d6dab08ccd54ea87ab70) )
@@ -11800,14 +11830,14 @@ ROM_START( setaroul )
 	ROM_LOAD16_BYTE( "uf0-008.u6", 0x000000, 0x008000, CRC(e198e602) SHA1(f53fa36d1ea51239e71fe1ea7432bb4b7b8b3466) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 )   /* Layer 1 - 8bpp */
-	ROM_LOAD( "uf0-010.u15", 0x000000, 0x080000, CRC(0af13a56) SHA1(c294b7947d004c0e0b280ca44636e4059e05a57e) )
-	ROM_LOAD( "uf0-009.u13", 0x080000, 0x080000, CRC(20f2d7f5) SHA1(343a8fac76d6ee7f845f9988c491698ebd0150d4) )
-	ROM_LOAD( "uf0-012.u29", 0x100000, 0x080000, CRC(cba2a6b7) SHA1(8627eda24c6980a0e786fd9dc06176893a33c58f) )
-	ROM_LOAD( "uf0-011.u22", 0x180000, 0x080000, CRC(af60adf9) SHA1(6505cbce6e066d75b779fdbe2c034ba4daabbefe) )
-	ROM_LOAD( "uf0-014.u38", 0x200000, 0x080000, CRC(da2bd4e4) SHA1(244af8705f2fa4ab3f3a002af16a0e4d60e03de8) )
-	ROM_LOAD( "uf0-013.u37", 0x280000, 0x080000, CRC(645ec3c3) SHA1(e9b8056c68bf33b0b7130a5ce2bafd11dfd6c29b) )
-	ROM_LOAD( "uf0-015.u40", 0x300000, 0x080000, CRC(11dc19fa) SHA1(e7084f61d075a61249d924a523c32e7993d9ae46) )
-	ROM_LOAD( "uf0-016.u48", 0x380000, 0x080000, CRC(10f99fa8) SHA1(7ef9a3f71dd071483cf3513ef57e2fcfe8702994) )
+	ROM_LOAD32_BYTE( "uf0-010.u15", 0x000000, 0x080000, CRC(0af13a56) SHA1(c294b7947d004c0e0b280ca44636e4059e05a57e) )
+	ROM_LOAD32_BYTE( "uf0-012.u29", 0x000001, 0x080000, CRC(cba2a6b7) SHA1(8627eda24c6980a0e786fd9dc06176893a33c58f) )
+	ROM_LOAD32_BYTE( "uf0-014.u38", 0x000002, 0x080000, CRC(da2bd4e4) SHA1(244af8705f2fa4ab3f3a002af16a0e4d60e03de8) )
+	ROM_LOAD32_BYTE( "uf0-015.u40", 0x000003, 0x080000, CRC(11dc19fa) SHA1(e7084f61d075a61249d924a523c32e7993d9ae46) )
+	ROM_LOAD32_BYTE( "uf0-009.u13", 0x200000, 0x080000, CRC(20f2d7f5) SHA1(343a8fac76d6ee7f845f9988c491698ebd0150d4) )
+	ROM_LOAD32_BYTE( "uf0-011.u22", 0x200001, 0x080000, CRC(af60adf9) SHA1(6505cbce6e066d75b779fdbe2c034ba4daabbefe) )
+	ROM_LOAD32_BYTE( "uf0-013.u37", 0x200002, 0x080000, CRC(645ec3c3) SHA1(e9b8056c68bf33b0b7130a5ce2bafd11dfd6c29b) )
+	ROM_LOAD32_BYTE( "uf0-016.u48", 0x200003, 0x080000, CRC(10f99fa8) SHA1(7ef9a3f71dd071483cf3513ef57e2fcfe8702994) )
 
 	ROM_REGION( 0x100000, "x1snd", ROMREGION_ERASE00 )  /* Samples */
 	ROM_LOAD( "uf1-004.u52",     0x040000, 0x020000, CRC(6638054d) SHA1(f5c4a4c822ee56cfcbb4e8401253ae0a2c2c1df7) )
@@ -11849,8 +11879,8 @@ READ16_MEMBER(seta_state::twineagl_debug_r)
 
 void seta_state::init_bank6502()
 {
-	uint8_t *rom = memregion("sub")->base();
-	uint32_t max = (memregion("sub")->bytes() - 0xc000) / 0x4000;
+	u8 *rom = memregion("sub")->base();
+	const u32 max = (memregion("sub")->bytes() - 0xc000) / 0x4000;
 
 	if (max > 1) // if 6502 ROM is bankswitched(size is larger than 0x4000)
 	{
@@ -11867,12 +11897,12 @@ void seta_state::init_bank6502()
 READ16_MEMBER(seta_state::twineagl_200100_r)
 {
 	// protection check at boot
-	logerror("%04x: twineagl_200100_r %d\n",m_maincpu->pc(),offset);
+	logerror("%04x: twineagl_200100_r %d\n",m_maincpu->pc(), offset);
 	return m_twineagl_xram[offset];
 }
 WRITE16_MEMBER(seta_state::twineagl_200100_w)
 {
-	logerror("%04x: twineagl_200100_w %d = %02x\n",m_maincpu->pc(),offset,data);
+	logerror("%04x: twineagl_200100_w %d = %02x\n",m_maincpu->pc(), offset,data);
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -11884,24 +11914,24 @@ void seta_state::init_twineagl()
 {
 	init_bank6502();
 	/* debug? */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x800000, 0x8000ff, read16_delegate(FUNC(seta_state::twineagl_debug_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x800000, 0x8000ff, read16_delegate(*this, FUNC(seta_state::twineagl_debug_r)));
 
 	/* This allows 2 simultaneous players and the use of the "Copyright" Dip Switch. */
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x200100, 0x20010f, read16_delegate(FUNC(seta_state::twineagl_200100_r),this), write16_delegate(FUNC(seta_state::twineagl_200100_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x200100, 0x20010f, read16_delegate(*this, FUNC(seta_state::twineagl_200100_r)), write16_delegate(*this, FUNC(seta_state::twineagl_200100_w)));
 }
 
 
 /* Protection? NVRAM is handled writing commands here */
 READ16_MEMBER(seta_state::downtown_protection_r)
 {
-	int job = m_downtown_protection[0xf8/2] & 0xff;
+	const int job = m_downtown_protection[0xf8/2] & 0xff;
 
 	switch (job)
 	{
 		case 0xa3:
 		{
-			static const uint8_t word[] = "WALTZ0";
-			if (offset >= 0x100/2 && offset <= 0x10a/2) return word[offset-0x100/2];
+			static const u8 word[] = "WALTZ0";
+			if (offset >= 0x100/2 && offset <= 0x10a/2) return word[offset - 0x100/2];
 			else                                        return 0;
 		}
 		default:
@@ -11918,10 +11948,10 @@ void seta_state::init_downtown()
 {
 	init_bank6502();
 
-	m_downtown_protection = make_unique_clear<uint16_t[]>(0x200/2);
+	m_downtown_protection = make_unique_clear<u16[]>(0x200/2);
 	save_pointer(NAME(m_downtown_protection),0x200/2);
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x200000, 0x2001ff, read16_delegate(FUNC(seta_state::downtown_protection_r),this), write16_delegate(FUNC(seta_state::downtown_protection_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x200000, 0x2001ff, read16_delegate(*this, FUNC(seta_state::downtown_protection_r)), write16_delegate(*this, FUNC(seta_state::downtown_protection_w)));
 }
 
 
@@ -11942,7 +11972,7 @@ READ16_MEMBER(seta_state::arbalest_debug_r)
 void seta_state::init_arbalest()
 {
 	init_bank6502();
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80000, 0x8000f, read16_delegate(FUNC(seta_state::arbalest_debug_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80000, 0x8000f, read16_delegate(*this, FUNC(seta_state::arbalest_debug_r)));
 }
 
 
@@ -11971,7 +12001,7 @@ READ16_MEMBER(seta_state::metafox_protection_r)
 void seta_state::init_metafox()
 {
 	init_bank6502();
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x21c000, 0x21ffff,read16_delegate(FUNC(seta_state::metafox_protection_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x21c000, 0x21ffff,read16_delegate(*this, FUNC(seta_state::metafox_protection_r)));
 }
 
 
@@ -11980,53 +12010,10 @@ void seta_state::init_bankx1()
 	m_x1_bank->configure_entries(0, 8, memregion("x1snd")->base(), 0x40000);
 }
 
-void seta_state::rearrange_gfx()
-{
-	/* rearrange the gfx data so it can be decoded in the same way as the other set */
-	int rom_size = 0x80000;
-	std::vector<uint8_t> buf(rom_size);
-
-	uint8_t *rom = memregion("gfx2")->base() + 0x40000;
-
-	int rpos;
-	for (rpos = 0; rpos < rom_size/2; rpos++) {
-		buf[rpos+0x40000] = rom[rpos*2];
-		buf[rpos] = rom[rpos*2+1];
-	}
-
-	std::copy( buf.begin(), buf.end(), &rom[0] );
-
-	rom = memregion("gfx3")->base() + 0x40000;
-
-	for (rpos = 0; rpos < rom_size/2; rpos++) {
-		buf[rpos+0x40000] = rom[rpos*2];
-		buf[rpos] = rom[rpos*2+1];
-	}
-
-	std::copy( buf.begin(), buf.end(), &rom[0] );
-}
-
-void seta_state::init_blandia()
-{
-	rearrange_gfx();
-	init_bankx1();
-}
-
 void seta_state::init_eightfrc()
 {
 	m_maincpu->space(AS_PROGRAM).nop_read(0x500004, 0x500005);   // watchdog??
 	init_bankx1();
-}
-
-void seta_state::init_kiwame()
-{
-	uint16_t *RAM = (uint16_t *) memregion("maincpu")->base();
-
-	/* WARNING: This game writes to the interrupt vector
-	   table. Lev 1 routine address is stored at $100 */
-
-	RAM[0x64/2] = 0x0000;
-	RAM[0x66/2] = 0x0dca;
 }
 
 void seta_state::init_rezon()
@@ -12036,13 +12023,13 @@ void seta_state::init_rezon()
 
 void seta_state::init_pairlove()
 {
-	m_pairslove_protram = make_unique_clear<uint16_t[]>(0x200/2);
-	m_pairslove_protram_old = make_unique_clear<uint16_t[]>(0x200/2);
+	m_pairslove_protram = make_unique_clear<u16[]>(0x200/2);
+	m_pairslove_protram_old = make_unique_clear<u16[]>(0x200/2);
 	save_pointer(NAME(m_pairslove_protram), 0x200/2);
 	save_pointer(NAME(m_pairslove_protram_old), 0x200/2);
 }
 
-void seta_state::init_zombraid()
+void zombraid_state::init_zombraid()
 {
 	/* bank 1 is never explicitly selected, 0 is used in its place */
 	m_x1_bank->configure_entry(0, memregion("x1snd")->base() + 0x80000);
@@ -12051,13 +12038,13 @@ void seta_state::init_zombraid()
 
 void seta_state::init_wiggie()
 {
-	uint8_t temp[16];
-	uint8_t *src = memregion("maincpu")->base();
+	u8 temp[16];
+	u8 *src = memregion("maincpu")->base();
 	int len = memregion("maincpu")->bytes();
-	for (int i = 0;i < len;i += 16)
+	for (int i = 0; i < len; i += 16)
 	{
 		std::copy(&src[i], &src[i+16], std::begin(temp));
-		for (int j = 0;j < 16;j++)
+		for (int j = 0; j < 16; j++)
 		{
 			static const int convtable[16] =
 			{
@@ -12070,26 +12057,23 @@ void seta_state::init_wiggie()
 			src[i+j] = temp[convtable[j]];
 		}
 
-
 	}
 }
 
 void seta_state::init_crazyfgt()
 {
-	uint16_t *RAM = (uint16_t *) memregion("maincpu")->base();
+	u16 *RAM = (u16 *) memregion("maincpu")->base();
 
 	// protection check at boot
 	RAM[0x1078/2] = 0x4e71;
 
 	// fixed priorities?
-
-	rearrange_gfx();
 }
 
 void jockeyc_state::init_inttoote()
 {
 	// code patches due to unemulated protection (to be removed...)
-	uint16_t *ROM = (uint16_t *)memregion( "maincpu" )->base();
+	u16 *ROM = (u16 *)memregion( "maincpu" )->base();
 
 	ROM[0x4de0/2] = 0x4e71; // hardware test errors
 	ROM[0x4de2/2] = 0x4e71;
@@ -12115,7 +12099,7 @@ GAME( 1989, downtown2, downtown, downtown,  downtown,  seta_state,     init_down
 GAME( 1989, downtownj, downtown, downtown,  downtown,  seta_state,     init_downtown,  ROT270, "Seta",                      "DownTown / Mokugeki (joystick hack)" , 0) // Country/License: DSW
 GAME( 1989, downtownp, downtown, downtown,  downtown,  seta_state,     init_downtown,  ROT270, "Seta",                      "DownTown / Mokugeki (prototype)" , 0) // Country/License: DSW
 
-GAME( 1989, usclssic,  0,        usclssic,  usclssic,  seta_state,     init_bank6502,  ROT270, "Seta",                      "U.S. Classic" , 0) // Country/License: DSW
+GAME( 1989, usclssic,  0,        usclssic,  usclssic,  usclssic_state, init_bank6502,  ROT270, "Seta",                      "U.S. Classic" , 0) // Country/License: DSW
 
 GAME( 1989, calibr50,  0,        calibr50,  calibr50,  seta_state,     init_bank6502,  ROT270, "Athena / Seta",             "Caliber 50 (Ver. 1.01)" , 0) // Country/License: DSW
 
@@ -12125,21 +12109,22 @@ GAME( 1989, metafox,   0,        metafox,   metafox,   seta_state,     init_meta
 
 /* 68000 */
 
-GAME( 1989?,setaroul,  0,        setaroul,  setaroul,  setaroul_state, empty_init,     ROT270, "Visco",                     "The Roulette (Visco)", 0 )
+GAME( 1989?,setaroul,  0,        setaroul,  setaroul,  setaroul_state, empty_init,     ROT270, "Visco",                     "The Roulette (Visco)", MACHINE_CLICKABLE_ARTWORK )
 
 GAME( 1989, drgnunit,  0,        drgnunit,  drgnunit,  seta_state,     empty_init,     ROT0,   "Seta",                      "Dragon Unit / Castle of Dragon", 0 )
 
 GAME( 1989, wits,      0,        wits,      wits,      seta_state,     empty_init,     ROT0,   "Athena (Visco license)",    "Wit's (Japan)" , 0) // Country/License: DSW
 
-GAME( 1990, thunderl,  0,        thunderl,  thunderl,  seta_state,     empty_init,     ROT270, "Seta",                      "Thunder & Lightning" , 0) // Country/License: DSW
-GAME( 1990, thunderlbl,thunderl, thunderlbl,thunderlbl,seta_state,     empty_init,     ROT90,  "bootleg",                   "Thunder & Lightning (bootleg with Tetris sound)", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL ) // Country/License: DSW
+GAME( 1990, thunderl,   0,       thunderl,  thunderl,  seta_state,     empty_init,     ROT270, "Seta",                      "Thunder & Lightning" , 0) // Country/License: DSW
+GAME( 1991, thunderlbl, thunderl,thunderlbl,thunderlbl,seta_state,     empty_init,     ROT270, "bootleg (Hyogo)",           "Thunder & Lightning (bootleg with Tetris sound, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL ) // Country/License: DSW
+GAME( 1990, thunderlbl2,thunderl,thunderlbl,thunderl,  seta_state,     empty_init,     ROT270, "bootleg",                   "Thunder & Lightning (bootleg with Tetris sound, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL ) // Country/License: DSW
 
 GAME( 1994, wiggie,    0,        wiggie,    thunderl,  seta_state,     init_wiggie,    ROT270, "Promat",                    "Wiggie Waggie", MACHINE_IMPERFECT_GRAPHICS ) // hack of Thunder & Lightning
 GAME( 1994, superbar,  wiggie,   superbar,  thunderl,  seta_state,     init_wiggie,    ROT270, "Promat",                    "Super Bar", MACHINE_IMPERFECT_GRAPHICS ) // hack of Thunder & Lightning
 
-GAME( 1990, jockeyc,   0,        jockeyc,   jockeyc,   jockeyc_state,  empty_init,     ROT0,   "Seta (Visco license)",      "Jockey Club (v1.18)", 0 )
-GAME( 1993, inttoote2, jockeyc,  jockeyc,   jockeyc,   jockeyc_state,  empty_init,     ROT0,   "bootleg (Coinmaster)",      "International Toote II (v1.24, P387.V01)", 0 )
-GAME( 1998, inttoote,  jockeyc,  inttoote,  inttoote,  jockeyc_state,  init_inttoote,  ROT0,   "bootleg (Coinmaster)",      "International Toote (Germany, P523.V01)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1990, jockeyc,   0,        jockeyc,   jockeyc,   jockeyc_state,  empty_init,     ROT0,   "Seta (Visco license)",      "Jockey Club (v1.18)", MACHINE_CLICKABLE_ARTWORK )
+GAME( 1993, inttoote2, jockeyc,  jockeyc,   jockeyc,   jockeyc_state,  empty_init,     ROT0,   "bootleg (Coinmaster)",      "International Toote II (v1.24, P387.V01)", MACHINE_CLICKABLE_ARTWORK )
+GAME( 1998, inttoote,  jockeyc,  inttoote,  inttoote,  jockeyc_state,  init_inttoote,  ROT0,   "bootleg (Coinmaster)",      "International Toote (Germany, P523.V01)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_CLICKABLE_ARTWORK )
 
 GAME( 1991, rezon,     0,        rezon,     rezon,     seta_state,     init_rezon,     ROT0,   "Allumer",                   "Rezon", 0 )
 GAME( 1992, rezont,    rezon,    rezon,     rezont,    seta_state,     init_rezon,     ROT0,   "Allumer (Taito license)",   "Rezon (Taito)", 0 )
@@ -12148,7 +12133,7 @@ GAME( 1991, stg,       0,        drgnunit,  stg,       seta_state,     empty_ini
 
 GAME( 1991, pairlove,  0,        pairlove,  pairlove,  seta_state,     init_pairlove,  ROT270, "Athena",                    "Pairs Love", 0 )
 
-GAME( 1992, blandia,   0,        blandia,   blandia,   seta_state,     init_blandia,   ROT0,   "Allumer",                   "Blandia", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, blandia,   0,        blandia,   blandia,   seta_state,     init_bankx1,    ROT0,   "Allumer",                   "Blandia", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1992, blandiap,  blandia,  blandiap,  blandia,   seta_state,     init_bankx1,    ROT0,   "Allumer",                   "Blandia (prototype)", MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 1992, blockcar,  0,        blockcar,  blockcar,  seta_state,     empty_init,     ROT90,  "Visco",                     "Block Carnival / Thunder & Lightning 2" , 0) // Title: DSW
@@ -12172,16 +12157,18 @@ GAME( 1993, daiohc,    daioh,    wrofaero,  daioh,     seta_state,     empty_ini
 
 GAME( 1993, jjsquawk,  0,        jjsquawk,  jjsquawk,  seta_state,     empty_init,     ROT0,   "Athena / Able",             "J. J. Squawkers", MACHINE_IMPERFECT_SOUND )
 GAME( 1993, jjsquawko, jjsquawk, jjsquawk,  jjsquawk,  seta_state,     empty_init,     ROT0,   "Athena / Able",             "J. J. Squawkers (older)", MACHINE_IMPERFECT_SOUND )
-GAME( 1993, jjsquawkb, jjsquawk, jjsquawb,  jjsquawk,  seta_state,     empty_init,     ROT0,   "bootleg",                   "J. J. Squawkers (bootleg)", MACHINE_IMPERFECT_SOUND )
-GAME( 1993, jjsquawkb2,jjsquawk, jjsquawk,  jjsquawk,  seta_state,     empty_init,     ROT0,   "bootleg",                   "J. J. Squawkers (bootleg, Blandia Conversion)", MACHINE_IMPERFECT_SOUND )
-GAME( 2003, simpsonjr, jjsquawk, jjsquawb,  jjsquawk,  seta_state,     empty_init,     ROT0,   "bootleg",                   "Simpson Junior (bootleg of J. J. Squawkers)", MACHINE_IMPERFECT_SOUND )
+GAME( 1999, jjsquawkb, jjsquawk, jjsquawb,  jjsquawk,  seta_state,     empty_init,     ROT0,   "bootleg",                   "J. J. Squawkers (bootleg)", MACHINE_IMPERFECT_SOUND )
+GAME( 1999, jjsquawkb2,jjsquawk, jjsquawk,  jjsquawk,  seta_state,     empty_init,     ROT0,   "bootleg",                   "J. J. Squawkers (bootleg, Blandia Conversion)", MACHINE_IMPERFECT_SOUND )
+GAME( 2003, simpsonjr, jjsquawk, jjsquawb,  jjsquawk,  seta_state,     empty_init,     ROT0,   "bootleg (Daigom Games)",    "Simpson Junior (bootleg of J. J. Squawkers)", MACHINE_IMPERFECT_SOUND )
 
 GAME( 1993, kamenrid,  0,        kamenrid,  kamenrid,  seta_state,     empty_init,     ROT0,   "Banpresto / Toei",          "Masked Riders Club Battle Race", 0 )
 
 GAME( 1993, madshark,  0,        madshark,  madshark,  seta_state,     empty_init,     ROT270, "Allumer",                   "Mad Shark", 0 )
 
-GAME( 1993, msgundam,  0,        msgundam,  msgundam,  seta_state,     empty_init,     ROT0,   "Banpresto",                 "Mobile Suit Gundam", 0 )
-GAME( 1993, msgundam1, msgundam, msgundam,  msgunda1,  seta_state,     empty_init,     ROT0,   "Banpresto",                 "Mobile Suit Gundam (Japan)", 0 )
+// end credits shows Allumer as developer.
+GAME( 1993, msgundam,  0,        msgundam,  msgundam,  seta_state,     empty_init,     ROT0,   "Banpresto / Allumer",       "Mobile Suit Gundam", 0 )
+GAME( 1993, msgundam1, msgundam, msgundam,  msgundam1, seta_state,     empty_init,     ROT0,   "Banpresto / Allumer",       "Mobile Suit Gundam (Japan)", 0 )
+GAME( 1993, msgundamb, msgundam, msgundamb, msgundam,  seta_state,     empty_init,     ROT0,   "bootleg",                   "Mobile Suit Gundam (bootleg)", 0 )
 
 GAME( 1993, oisipuzl,  0,        oisipuzl,  oisipuzl,  seta_state,     empty_init,     ROT0,   "Sunsoft / Atlus",           "Oishii Puzzle Ha Irimasenka", 0 )
 GAME( 1993, triplfun,  oisipuzl, triplfun,  oisipuzl,  seta_state,     empty_init,     ROT0,   "bootleg",                   "Triple Fun", 0 )
@@ -12194,7 +12181,7 @@ GAME( 1993, wrofaero,  0,        wrofaero,  wrofaero,  seta_state,     empty_ini
 
 GAME( 1994, eightfrc,  0,        eightfrc,  eightfrc,  seta_state,     init_eightfrc,  ROT90,  "Tecmo",                     "Eight Forces", 0 )
 
-GAME( 1994, kiwame,    0,        kiwame,    kiwame,    seta_state,     init_kiwame,    ROT0,   "Athena",                    "Pro Mahjong Kiwame", 0 )
+GAME( 1994, kiwame,    0,        kiwame,    kiwame,    kiwame_state,   empty_init,     ROT0,   "Athena",                    "Pro Mahjong Kiwame", 0 )
 
 GAME( 1994, krzybowl,  0,        krzybowl,  krzybowl,  seta_state,     empty_init,     ROT270, "American Sammy",            "Krazy Bowl", 0 )
 
@@ -12212,8 +12199,8 @@ GAME( 1995, gundharac, gundhara, gundhara,  gundhara,  seta_state,     empty_ini
 
 GAME( 1995, sokonuke,  0,        extdwnhl,  sokonuke,  seta_state,     empty_init,     ROT0,   "Sammy Industries",          "Sokonuke Taisen Game (Japan)", MACHINE_IMPERFECT_SOUND )
 
-GAME( 1995, zombraid,  0,        zombraid,  zombraid,  seta_state,     init_zombraid,  ROT0,   "American Sammy",            "Zombie Raid (9/28/95, US)", MACHINE_NO_COCKTAIL )
-GAME( 1995, zombraidp, zombraid, zombraid,  zombraid,  seta_state,     init_zombraid,  ROT0,   "American Sammy",            "Zombie Raid (9/28/95, US, prototype PCB)", MACHINE_NO_COCKTAIL ) // actual code is same as the released version
-GAME( 1995, zombraidpj,zombraid, zombraid,  zombraid,  seta_state,     init_zombraid,  ROT0,   "Sammy Industries Co.,Ltd.", "Zombie Raid (9/28/95, Japan, prototype PCB)", MACHINE_NO_COCKTAIL ) // just 3 bytes different from above
+GAME( 1995, zombraid,  0,        zombraid,  zombraid,  zombraid_state, init_zombraid,  ROT0,   "American Sammy",            "Zombie Raid (9/28/95, US)", MACHINE_NO_COCKTAIL )
+GAME( 1995, zombraidp, zombraid, zombraid,  zombraid,  zombraid_state, init_zombraid,  ROT0,   "American Sammy",            "Zombie Raid (9/28/95, US, prototype PCB)", MACHINE_NO_COCKTAIL ) // actual code is same as the released version
+GAME( 1995, zombraidpj,zombraid, zombraid,  zombraid,  zombraid_state, init_zombraid,  ROT0,   "Sammy Industries Co.,Ltd.", "Zombie Raid (9/28/95, Japan, prototype PCB)", MACHINE_NO_COCKTAIL ) // just 3 bytes different from above
 
 GAME( 1996, crazyfgt,  0,        crazyfgt,  crazyfgt,  seta_state,     init_crazyfgt,  ROT0,   "Subsino",                   "Crazy Fight", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

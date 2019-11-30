@@ -216,7 +216,7 @@ static const uint8_t tx0_colors[] =
 	0x80,0x80,0x80  /* light gray */
 };
 
-static const uint8_t tx0_palette[] =
+static const uint8_t tx0_pens[] =
 {
 	pen_panel_bg, pen_panel_caption,    /* captions */
 	pen_typewriter_bg, pen_black,       /* black typing in typewriter */
@@ -230,7 +230,7 @@ static GFXDECODE_START( gfx_tx0 )
 GFXDECODE_END
 
 /* Initialise the palette */
-PALETTE_INIT_MEMBER(tx0_state, tx0)
+void tx0_state::tx0_palette(palette_device &palette) const
 {
 	/* rgb components for the two color emissions */
 	const double r1 = .1, g1 = .1, b1 = .924, r2 = .7, g2 = .7, b2 = .076;
@@ -298,7 +298,7 @@ PALETTE_INIT_MEMBER(tx0_state, tx0)
 
 	/* set up palette for text */
 	for( i = 0; i < 6; i++ )
-		palette.set_pen_indirect(total_colors_needed + i, tx0_palette[i]);
+		palette.set_pen_indirect(total_colors_needed + i, tx0_pens[i]);
 }
 
 
@@ -362,14 +362,14 @@ public:
 	tx0_readtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// image-level overrides
-	virtual iodevice_t image_type() const override { return IO_PUNCHTAPE; }
+	virtual iodevice_t image_type() const noexcept override { return IO_PUNCHTAPE; }
 
-	virtual bool is_readable()  const override { return 1; }
-	virtual bool is_writeable() const override { return 0; }
-	virtual bool is_creatable() const override { return 0; }
-	virtual bool must_be_loaded() const override { return 0; }
-	virtual bool is_reset_on_load() const override { return 0; }
-	virtual const char *file_extensions() const override { return "tap,rim"; }
+	virtual bool is_readable()  const noexcept override { return true; }
+	virtual bool is_writeable() const noexcept override { return false; }
+	virtual bool is_creatable() const noexcept override { return false; }
+	virtual bool must_be_loaded() const noexcept override { return false; }
+	virtual bool is_reset_on_load() const noexcept override { return false; }
+	virtual const char *file_extensions() const noexcept override { return "tap,rim"; }
 
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
@@ -399,14 +399,14 @@ public:
 	tx0_punchtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// image-level overrides
-	virtual iodevice_t image_type() const override { return IO_PUNCHTAPE; }
+	virtual iodevice_t image_type() const noexcept override { return IO_PUNCHTAPE; }
 
-	virtual bool is_readable()  const override { return 0; }
-	virtual bool is_writeable() const override { return 1; }
-	virtual bool is_creatable() const override { return 1; }
-	virtual bool must_be_loaded() const override { return 0; }
-	virtual bool is_reset_on_load() const override { return 0; }
-	virtual const char *file_extensions() const override { return "tap,rim"; }
+	virtual bool is_readable()  const noexcept override { return false; }
+	virtual bool is_writeable() const noexcept override { return true; }
+	virtual bool is_creatable() const noexcept override { return true; }
+	virtual bool must_be_loaded() const noexcept override { return false; }
+	virtual bool is_reset_on_load() const noexcept override { return false; }
+	virtual const char *file_extensions() const noexcept override { return "tap,rim"; }
 
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
@@ -437,14 +437,14 @@ public:
 	tx0_printer_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// image-level overrides
-	virtual iodevice_t image_type() const override { return IO_PRINTER; }
+	virtual iodevice_t image_type() const noexcept override { return IO_PRINTER; }
 
-	virtual bool is_readable()  const override { return 0; }
-	virtual bool is_writeable() const override { return 1; }
-	virtual bool is_creatable() const override { return 1; }
-	virtual bool must_be_loaded() const override { return 0; }
-	virtual bool is_reset_on_load() const override { return 0; }
-	virtual const char *file_extensions() const override { return "typ"; }
+	virtual bool is_readable()  const noexcept override { return false; }
+	virtual bool is_writeable() const noexcept override { return true; }
+	virtual bool is_creatable() const noexcept override { return true; }
+	virtual bool must_be_loaded() const noexcept override { return false; }
+	virtual bool is_reset_on_load() const noexcept override { return false; }
+	virtual const char *file_extensions() const noexcept override { return "typ"; }
 
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
@@ -474,14 +474,14 @@ public:
 	tx0_magtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// image-level overrides
-	virtual iodevice_t image_type() const override { return IO_MAGTAPE; }
+	virtual iodevice_t image_type() const noexcept override { return IO_MAGTAPE; }
 
-	virtual bool is_readable()  const override { return 1; }
-	virtual bool is_writeable() const override { return 1; }
-	virtual bool is_creatable() const override { return 1; }
-	virtual bool must_be_loaded() const override { return 0; }
-	virtual bool is_reset_on_load() const override { return 0; }
-	virtual const char *file_extensions() const override { return "tap"; }
+	virtual bool is_readable()  const noexcept override { return true; }
+	virtual bool is_writeable() const noexcept override { return true; }
+	virtual bool is_creatable() const noexcept override { return true; }
+	virtual bool must_be_loaded() const noexcept override { return false; }
+	virtual bool is_reset_on_load() const noexcept override { return false; }
+	virtual const char *file_extensions() const noexcept override { return "tap"; }
 
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
@@ -1537,62 +1537,58 @@ INTERRUPT_GEN_MEMBER(tx0_state::tx0_interrupt)
 	}
 }
 
-MACHINE_CONFIG_START(tx0_state::tx0_64kw)
+void tx0_state::tx0_64kw(machine_config &config)
+{
 	/* basic machine hardware */
 	/* TX0 CPU @ approx. 167 kHz (no master clock, but the memory cycle time is approximately 6usec) */
-	MCFG_DEVICE_ADD("maincpu", TX0_64KW, 166667)
-	MCFG_TX0_CONFIG(
-		WRITELINE( *this, tx0_state, tx0_io_cpy ),
-		WRITELINE( *this, tx0_state, tx0_io_r1l ),
-		WRITELINE( *this, tx0_state, tx0_io_dis ),
-		WRITELINE( *this, tx0_state, tx0_io_r3l ),
-		WRITELINE( *this, tx0_state, tx0_io_prt ),
-		NOOP,
-		WRITELINE( *this, tx0_state, tx0_io_p6h ),
-		WRITELINE( *this, tx0_state, tx0_io_p7h ),
-		WRITELINE( *this, tx0_state, tx0_sel ),
-		WRITELINE( *this, tx0_state, tx0_io_reset_callback )
-	)
-	MCFG_DEVICE_PROGRAM_MAP(tx0_64kw_map)
+	TX0_64KW(config, m_maincpu, 166667);
+	m_maincpu->cpy().set(FUNC(tx0_state::tx0_io_cpy));
+	m_maincpu->r1l().set(FUNC(tx0_state::tx0_io_r1l));
+	m_maincpu->dis().set(FUNC(tx0_state::tx0_io_dis));
+	m_maincpu->r3l().set(FUNC(tx0_state::tx0_io_r3l));
+	m_maincpu->prt().set(FUNC(tx0_state::tx0_io_prt));
+	m_maincpu->rsv().set_nop();
+	m_maincpu->p6h().set(FUNC(tx0_state::tx0_io_p6h));
+	m_maincpu->p7h().set(FUNC(tx0_state::tx0_io_p7h));
+	m_maincpu->sel().set(FUNC(tx0_state::tx0_sel));
+	m_maincpu->res().set(FUNC(tx0_state::tx0_io_reset_callback));
+	m_maincpu->set_addrmap(AS_PROGRAM, &tx0_state::tx0_64kw_map);
 	/* dummy interrupt: handles input */
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", tx0_state,  tx0_interrupt)
+	m_maincpu->set_vblank_int("screen", FUNC(tx0_state::tx0_interrupt));
 
 	/* video hardware (includes the control panel and typewriter output) */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(refresh_rate)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(virtual_width, virtual_height)
-	MCFG_SCREEN_VISIBLE_AREA(0, virtual_width-1, 0, virtual_height-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tx0_state, screen_update_tx0)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tx0_state, screen_vblank_tx0))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(refresh_rate);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(virtual_width, virtual_height);
+	screen.set_visarea(0, virtual_width-1, 0, virtual_height-1);
+	screen.set_screen_update(FUNC(tx0_state::screen_update_tx0));
+	screen.screen_vblank().set(FUNC(tx0_state::screen_vblank_tx0));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("crt", CRT, 0)
-	MCFG_CRT_NUM_LEVELS(pen_crt_num_levels)
-	MCFG_CRT_OFFSETS(crt_window_offset_x, crt_window_offset_y)
-	MCFG_CRT_SIZE(crt_window_width, crt_window_height)
+	CRT(config, m_crt, 0);
+	m_crt->set_num_levels(pen_crt_num_levels);
+	m_crt->set_offsets(crt_window_offset_x, crt_window_offset_y);
+	m_crt->set_size(crt_window_width, crt_window_height);
 
-	MCFG_DEVICE_ADD("readt", TX0_READTAPE, 0)
-	MCFG_DEVICE_ADD("punch", TX0_PUNCHTAPE, 0)
-	MCFG_DEVICE_ADD("typewriter", TX0_PRINTER, 0)
-	MCFG_DEVICE_ADD("magtape", TX0_MAGTAPE, 0)
+	TX0_READTAPE(config, "readt", 0);
+	TX0_PUNCHTAPE(config, "punch", 0);
+	TX0_PRINTER(config, "typewriter", 0);
+	TX0_MAGTAPE(config, "magtape", 0);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tx0)
-	MCFG_PALETTE_ADD("palette", total_colors_needed + sizeof(tx0_palette))
-	MCFG_PALETTE_INDIRECT_ENTRIES(total_colors_needed)
-	MCFG_PALETTE_INIT_OWNER(tx0_state, tx0)
-MACHINE_CONFIG_END
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tx0);
+	PALETTE(config, m_palette, FUNC(tx0_state::tx0_palette), total_colors_needed + sizeof(tx0_pens), total_colors_needed);
+}
 
-MACHINE_CONFIG_START(tx0_state::tx0_8kw)
+void tx0_state::tx0_8kw(machine_config &config)
+{
 	tx0_64kw(config);
 
 	/* basic machine hardware */
 	/* TX0 CPU @ approx. 167 kHz (no master clock, but the memory cycle time is
 	approximately 6usec) */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(tx0_8kw_map)
-	/*MCFG_CPU_PORTS(readport, writeport)*/
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &tx0_state::tx0_8kw_map);
+}
 
 ROM_START(tx0_64kw)
 	/*CPU memory space*/

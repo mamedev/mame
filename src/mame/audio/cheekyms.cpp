@@ -37,26 +37,26 @@ WRITE_LINE_MEMBER(cheekyms_audio_device::pest_dies_w)   { m_pest_dies->write_lin
 WRITE_LINE_MEMBER(cheekyms_audio_device::coin_extra_w)  { m_coin_extra->write_line(state); }
 
 
-MACHINE_CONFIG_START(cheekyms_audio_device::device_add_mconfig)
+void cheekyms_audio_device::device_add_mconfig(machine_config &config)
+{
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("sound_nl", NETLIST_SOUND, 48000)
-	MCFG_NETLIST_SETUP(cheekyms)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	NETLIST_SOUND(config, "sound_nl", 48000)
+		.set_source(NETLIST_NAME(cheekyms))
+		.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_NETLIST_LOGIC_INPUT("sound_nl", "mute",       "I_MUTE.IN",       0)
-	MCFG_NETLIST_LOGIC_INPUT("sound_nl", "cheese",     "I_CHEESE.IN",     0)
-	MCFG_NETLIST_LOGIC_INPUT("sound_nl", "music",      "I_MUSIC.IN",      0)
-	MCFG_NETLIST_LOGIC_INPUT("sound_nl", "mouse",      "I_MOUSE.IN",      0)
-	MCFG_NETLIST_LOGIC_INPUT("sound_nl", "hammer",     "I_HAMMER.IN",     0)
-	MCFG_NETLIST_LOGIC_INPUT("sound_nl", "pest",       "I_PEST.IN",       0)
-	MCFG_NETLIST_LOGIC_INPUT("sound_nl", "mouse_dies", "I_MOUSE_DIES.IN", 0)
-	MCFG_NETLIST_LOGIC_INPUT("sound_nl", "pest_dies",  "I_PEST_DIES.IN",  0)
-	MCFG_NETLIST_LOGIC_INPUT("sound_nl", "coin_extra", "I_COIN_EXTRA.IN", 0)
+	NETLIST_LOGIC_INPUT(config, "sound_nl:mute",       "I_MUTE.IN",       0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:cheese",     "I_CHEESE.IN",     0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:music",      "I_MUSIC.IN",      0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:mouse",      "I_MOUSE.IN",      0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:hammer",     "I_HAMMER.IN",     0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:pest",       "I_PEST.IN",       0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:mouse_dies", "I_MOUSE_DIES.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:pest_dies",  "I_PEST_DIES.IN",  0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:coin_extra", "I_COIN_EXTRA.IN", 0);
 
-	MCFG_NETLIST_STREAM_OUTPUT("sound_nl", 0, "VR1.2")
-	MCFG_NETLIST_ANALOG_MULT_OFFSET(30000.0 * 10.0, 0.0) // FIXME: no clue what numbers to use here
-MACHINE_CONFIG_END
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "VR1.2").set_mult_offset(30000.0 * 10.0, 0.0);
+}
 
 
 void cheekyms_audio_device::device_start()

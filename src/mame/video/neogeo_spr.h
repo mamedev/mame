@@ -21,7 +21,7 @@
 #define NEOGEO_VSSTART                          (0x100)
 
 // todo, sort out what needs to be public and make the rest private/protected
-class neosprite_base_device : public device_t
+class neosprite_base_device : public device_t, public device_video_interface
 {
 public:
 	virtual void optimize_sprite_data();
@@ -48,7 +48,6 @@ public:
 	void start_sprite_line_timer();
 	virtual void set_sprite_region(uint8_t* region_sprites, uint32_t region_sprites_size);
 	void set_fixed_regions(uint8_t* fix_cart, uint32_t fix_cart_size, memory_region* fix_bios);
-	void set_screen(screen_device* screen);
 	void set_pens(const pen_t* pens);
 
 	std::unique_ptr<uint16_t[]>     m_videoram;
@@ -57,8 +56,6 @@ public:
 	uint16_t     m_vram_offset;
 	uint16_t     m_vram_read_buffer;
 	uint16_t     m_vram_modulo;
-
-	const uint8_t *m_region_zoomy;
 
 	uint32_t     m_sprite_gfx_address_mask;
 
@@ -76,7 +73,6 @@ public:
 	TIMER_CALLBACK_MEMBER(auto_animation_timer_callback);
 	TIMER_CALLBACK_MEMBER(sprite_line_timer_callback);
 
-
 	int m_bppshift; // 4 for 4bpp gfx (NeoGeo) 8 for 8bpp gfx (Midas)
 
 protected:
@@ -93,8 +89,9 @@ protected:
 	uint8_t* m_region_sprites; uint32_t m_region_sprites_size;
 	uint8_t* m_region_fixed; uint32_t m_region_fixed_size;
 	memory_region* m_region_fixedbios;
-	screen_device* m_screen;
 	const pen_t   *m_pens;
+
+	required_region_ptr<uint8_t> m_region_zoomy;
 };
 
 

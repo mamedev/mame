@@ -2,8 +2,8 @@
 // copyright-holders:Ernesto Corvi
 /***************************************************************************
 
-King of Boxer - (c) 1985 Wood Place Inc.
-Ring King     - (c) 1985 Data East USA Inc. / Wood Place Inc.
+King of Boxer - (c) 1985 Woodplace Inc.
+Ring King     - (c) 1985 Data East USA Inc. / Woodplace Inc.
 
 Driver by:
 Ernesto Corvi
@@ -29,26 +29,26 @@ Main CPU:
 #include "speaker.h"
 
 
-WRITE8_MEMBER(kingofb_state::video_interrupt_w)
+void kingofb_state::video_interrupt_w(uint8_t data)
 {
-	m_video_cpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+	m_video_cpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
-WRITE8_MEMBER(kingofb_state::sprite_interrupt_w)
+void kingofb_state::sprite_interrupt_w(uint8_t data)
 {
-	m_sprite_cpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+	m_sprite_cpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
-WRITE8_MEMBER(kingofb_state::scroll_interrupt_w)
+void kingofb_state::scroll_interrupt_w(uint8_t data)
 {
-	sprite_interrupt_w(space, offset, data);
+	sprite_interrupt_w(data);
 	*m_scroll_y = data;
 }
 
-WRITE8_MEMBER(kingofb_state::sound_command_w)
+void kingofb_state::sound_command_w(uint8_t data)
 {
-	m_soundlatch->write(space, 0, data);
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+	m_soundlatch->write(data);
+	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
 
@@ -459,11 +459,11 @@ void kingofb_state::machine_start()
 
 void kingofb_state::machine_reset()
 {
-	kingofb_f800_w(machine().dummy_space(), 0, 0); // LS174 reset
+	kingofb_f800_w(0); // LS174 reset
 }
 
-MACHINE_CONFIG_START(kingofb_state::kingofb)
-
+void kingofb_state::kingofb(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 4000000);        // 4.0 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &kingofb_state::kingobox_map);
@@ -485,43 +485,42 @@ MACHINE_CONFIG_START(kingofb_state::kingofb)
 
 	CLOCK(config, "soundnmi", 6000).signal_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) // We really need heavy synching among the processors
+	config.set_maximum_quantum(attotime::from_hz(6000)); // We really need heavy synching among the processors
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(kingofb_state, screen_update_kingofb)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("nmigate", input_merger_device, in_w<0>))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(kingofb_state::screen_update_kingofb));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(m_nmigate, FUNC(input_merger_device::in_w<0>));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_kingobox)
-	MCFG_PALETTE_ADD("palette", 256+8*2)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256+8)
-	MCFG_PALETTE_INIT_OWNER(kingofb_state,kingofb)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_kingobox);
+	PALETTE(config, m_palette, FUNC(kingofb_state::kingofb_palette), 256+8*2, 256+8);
 	MCFG_VIDEO_START_OVERRIDE(kingofb_state,kingofb)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 1500000)
-	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	ay8910_device &aysnd(AY8910(config, "aysnd", 1500000));
+	aysnd.port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
+	aysnd.add_route(ALL_OUTPUTS, "speaker", 0.25);
 
-	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.125) // 100K (R30-44 even)/200K (R31-45 odd) ladder network
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.125); // 100K (R30-44 even)/200K (R31-45 odd) ladder network
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
 
 /* Ring King */
-MACHINE_CONFIG_START(kingofb_state::ringking)
-
+void kingofb_state::ringking(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 4000000);        // 4.0 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &kingofb_state::ringking_map);
@@ -543,38 +542,37 @@ MACHINE_CONFIG_START(kingofb_state::ringking)
 
 	CLOCK(config, "soundnmi", 6000).signal_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) // We really need heavy synching among the processors
+	config.set_maximum_quantum(attotime::from_hz(6000)); // We really need heavy synching among the processors
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(kingofb_state, screen_update_ringking)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("nmigate", input_merger_device, in_w<0>))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(kingofb_state::screen_update_ringking));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(m_nmigate, FUNC(input_merger_device::in_w<0>));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rk)
-	MCFG_PALETTE_ADD("palette", 256+8*2)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256+8)
-	MCFG_PALETTE_INIT_OWNER(kingofb_state,ringking)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rk);
+	PALETTE(config, m_palette, FUNC(kingofb_state::ringking_palette), 256+8*2, 256+8);
 	MCFG_VIDEO_START_OVERRIDE(kingofb_state,ringking)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 1500000)
-	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	ay8910_device &aysnd(AY8910(config, "aysnd", 1500000));
+	aysnd.port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
+	aysnd.add_route(ALL_OUTPUTS, "speaker", 0.25);
 
-	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.125) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.125); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
 
 /***************************************************************************
@@ -867,9 +865,9 @@ void kingofb_state::init_ringkingw()
 }
 
 
-GAME( 1985, kingofb,   0,       kingofb,  kingofb,  kingofb_state, empty_init,     ROT90, "Wood Place Inc.", "King of Boxer (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, kingofbj,  kingofb, kingofb,  kingofb,  kingofb_state, empty_init,     ROT90, "Wood Place Inc.", "King of Boxer (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, ringkingw, kingofb, kingofb,  kingofb,  kingofb_state, init_ringkingw, ROT90, "Wood Place Inc.", "Ring King (US, Wood Place Inc.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, ringking,  kingofb, ringking, ringking, kingofb_state, empty_init,     ROT90, "Wood Place Inc. (Data East USA license)", "Ring King (US set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, ringking2, kingofb, ringking, ringking, kingofb_state, empty_init,     ROT90, "Wood Place Inc. (Data East USA license)", "Ring King (US set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, ringking3, kingofb, kingofb,  kingofb,  kingofb_state, init_ringking3, ROT90, "Wood Place Inc. (Data East USA license)", "Ring King (US set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, kingofb,   0,       kingofb,  kingofb,  kingofb_state, empty_init,     ROT90, "Woodplace Inc.", "King of Boxer (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, kingofbj,  kingofb, kingofb,  kingofb,  kingofb_state, empty_init,     ROT90, "Woodplace Inc.", "King of Boxer (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, ringkingw, kingofb, kingofb,  kingofb,  kingofb_state, init_ringkingw, ROT90, "Woodplace Inc.", "Ring King (US, Woodplace Inc.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, ringking,  kingofb, ringking, ringking, kingofb_state, empty_init,     ROT90, "Woodplace Inc. (Data East USA license)", "Ring King (US set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, ringking2, kingofb, ringking, ringking, kingofb_state, empty_init,     ROT90, "Woodplace Inc. (Data East USA license)", "Ring King (US set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, ringking3, kingofb, kingofb,  kingofb,  kingofb_state, init_ringking3, ROT90, "Woodplace Inc. (Data East USA license)", "Ring King (US set 3)", MACHINE_SUPPORTS_SAVE )

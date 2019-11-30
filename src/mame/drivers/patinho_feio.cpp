@@ -85,7 +85,7 @@ void patinho_feio_state::update_panel(uint8_t ACC, uint8_t opcode, uint8_t mem_d
 
 WRITE8_MEMBER(patinho_feio_state::decwriter_data_w)
 {
-	m_decwriter->write(space, 0, data);
+	m_decwriter->write(data);
 
 	m_maincpu->set_iodev_status(0xA, IODEV_BUSY);
 
@@ -113,7 +113,7 @@ void patinho_feio_state::decwriter_kbd_input(u8 data)
 
 WRITE8_MEMBER(patinho_feio_state::teletype_data_w)
 {
-	m_tty->write(space, 0, data);
+	m_tty->write(data);
 
 	m_maincpu->set_iodev_status(0xB, IODEV_READY);
 	m_teletype_timer->adjust(attotime::from_hz(10)); //10 characters per second
@@ -134,8 +134,8 @@ void patinho_feio_state::teletype_kbd_input(u8 data)
 	//I figured out that the data is provided inverted (2's complement)
 	//based on a comment in the source code listing of the HEXAM program.
 	//It is not clear though, if all I/O devices complement the data when
-	//communicating with the computer, or if this behavious is a particular
-	//caracteristics of the teletype.
+	//communicating with the computer, or if this behaviour is a particular
+	//characteristic of the teletype.
 
 	m_maincpu->transfer_byte_from_external_device(0xB, ~data);
 }
@@ -173,7 +173,7 @@ void patinho_feio_state::load_raw_data(const char* name, unsigned int start_addr
 	memcpy(&RAM[start_address], data, data_length);
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( patinho_feio_state, patinho_tape )
+DEVICE_IMAGE_LOAD_MEMBER( patinho_feio_state::tape_load )
 {
 	if (image.loaded_through_softlist())
 	{
@@ -241,55 +241,54 @@ static INPUT_PORTS_START( patinho_feio )
 	PORT_BIT(0x800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("MEMORIA (Liberada/Protegida)") PORT_CODE(KEYCODE_M) PORT_TOGGLE
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(patinho_feio_state::patinho_feio)
+void patinho_feio_state::patinho_feio(machine_config &config)
+{
 	/* basic machine hardware */
 	/* CPU @ approx. 500 kHz (memory cycle time is 2usec) */
-	MCFG_DEVICE_ADD("maincpu", PATO_FEIO_CPU, 500000)
-	MCFG_PATINHO_RC_READ_CB(IOPORT("RC"))
-	MCFG_PATINHO_BUTTONS_READ_CB(IOPORT("BUTTONS"))
+	PATO_FEIO_CPU(config, m_maincpu, 500000);
+	m_maincpu->rc_read().set_ioport("RC");
+	m_maincpu->buttons_read().set_ioport("BUTTONS");
 
 	/* Printer */
-//  MCFG_PATINHO_IODEV_WRITE_CB(0x5, WRITE8(*this, patinho_feio_state, printer_data_w))
+//  m_maincpu->iodev_write<5>().set(FUNC(patinho_feio_state::printer_data_w));
 
 	/* Papertape Puncher */
-//  MCFG_PATINHO_IODEV_WRITE_CB(0x8, WRITE8(*this, patinho_feio_state, papertape_punch_data_w))
+//  m_maincpu->iodev_write<8>().set(FUNC(patinho_feio_state::papertape_punch_data_w));
 
 	/* Card Reader */
-//  MCFG_PATINHO_IODEV_READ_CB(0x9, READ8(*this, patinho_feio_state, cardreader_data_r))
+//  m_maincpu->iodev_read<9>().set(FUNC(patinho_feio_state::cardreader_data_r));
 
 	/* DECWRITER
 	   (max. speed: ?) */
-	MCFG_PATINHO_IODEV_WRITE_CB(0xA, WRITE8(*this, patinho_feio_state, decwriter_data_w))
+	m_maincpu->iodev_write<10>().set(FUNC(patinho_feio_state::decwriter_data_w));
 
 	/* Teleprinter
 	   TeleType ASR33
-	   (max. speed: 10 characteres per second)
+	   (max. speed: 10 characters per second)
 	   with paper tape reading (and optionally punching) capabilities */
-	MCFG_PATINHO_IODEV_WRITE_CB(0xB, WRITE8(*this, patinho_feio_state, teletype_data_w))
+	m_maincpu->iodev_write<11>().set(FUNC(patinho_feio_state::teletype_data_w));
 
 	/* Papertape Reader
 	   Hewlett-Packard HP-2737-A
-	   Optical Papertape Reader (max. speed: 300 characteres per second) */
-//  MCFG_PATINHO_IODEV_READ_CB(0xE, READ8(*this, patinho_feio_state, papertapereader_data_r))
+	   Optical Papertape Reader (max. speed: 300 characters per second) */
+//  m_maincpu->iodev_read<14>().set(FUNC(patinho_feio_state::papertapereader_data_r));
 
 	/* DECWRITER */
-	MCFG_DEVICE_ADD("decwriter", TELEPRINTER, 0)
-	MCFG_GENERIC_TELEPRINTER_KEYBOARD_CB(PUT(patinho_feio_state, decwriter_kbd_input))
+	TELEPRINTER(config, m_decwriter, 0);
+	m_decwriter->set_keyboard_callback(FUNC(patinho_feio_state::decwriter_kbd_input));
 
 	/* Teletype */
-	MCFG_DEVICE_ADD("teletype", TELEPRINTER, 1)
-	MCFG_GENERIC_TELEPRINTER_KEYBOARD_CB(PUT(patinho_feio_state, teletype_kbd_input))
+	TELEPRINTER(config, m_tty, 1);
+	m_tty->set_keyboard_callback(FUNC(patinho_feio_state::teletype_kbd_input));
 
 	/* punched tape */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "patinho_tape")
-	MCFG_GENERIC_EXTENSIONS("bin")
-	MCFG_GENERIC_LOAD(patinho_feio_state, patinho_tape)
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "patinho_tape", "bin").set_device_load(FUNC(patinho_feio_state::tape_load));
 
 	config.set_default_layout(layout_patinho);
 
 	// software lists
-//  MCFG_SOFTWARE_LIST_ADD("tape_list", "patinho")
-MACHINE_CONFIG_END
+//  SOFTWARE_LIST(config, "tape_list").set_original("patinho");
+}
 
 ROM_START( patinho )
 	ROM_REGION( 0x0d5, "hexam", 0 )

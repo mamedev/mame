@@ -7,6 +7,7 @@
 #include "cpu/sh/sh2.h"
 
 #include "emupal.h"
+#include "tilemap.h"
 
 
 struct hit_t
@@ -44,7 +45,9 @@ public:
 		m_palette_ram(*this, "palette_ram"),
 		m_v3t_ram(*this, "v3t_ram"),
 		m_main_ram(*this, "main_ram"),
-		m_cache_ram(*this, "cache_ram") { }
+		m_cache_ram(*this, "cache_ram"),
+		m_paddle(*this, "Paddle %c", 'A')
+	{ }
 
 	void sknsk(machine_config &config);
 	void sknsu(machine_config &config);
@@ -73,7 +76,7 @@ public:
 	void init_galpani4();
 	void init_ryouran();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(paddle_r);
+	template <int P> DECLARE_CUSTOM_INPUT_MEMBER(paddle_r);
 
 private:
 	required_device<sh2_device> m_maincpu;
@@ -92,6 +95,8 @@ private:
 	required_shared_ptr<uint32_t> m_v3t_ram;
 	required_shared_ptr<uint32_t> m_main_ram;
 	required_shared_ptr<uint32_t> m_cache_ram;
+
+	optional_ioport_array<4> m_paddle;
 
 	hit_t m_hit;
 	bitmap_ind16 m_sprite_bitmap;

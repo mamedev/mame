@@ -24,6 +24,7 @@
 # BENCHMARKS = 1
 # OSD = sdl
 
+# NO_OPENGL = 0
 # USE_DISPATCH_GL = 0
 # MODERN_WIN_API = 0
 # DIRECTINPUT = 7
@@ -35,7 +36,8 @@
 # DONT_USE_NETWORK = 1
 # USE_QTDEBUG = 1
 # NO_X11 = 1
-# NO_USE_XINPUT = 0
+# NO_USE_XINPUT = 1
+# NO_USE_XINPUT_WII_LIGHTGUN_HACK = 1
 # FORCE_DRC_C_BACKEND = 1
 
 # DEBUG = 1
@@ -52,6 +54,10 @@
 # MAP = 1
 # PROFILE = 1
 # ARCHOPTS =
+# ARCHOPTS_C =
+# ARCHOPTS_CXX =
+# ARCHOPTS_OBJC =
+# ARCHOPTS_OBJCXX =
 # OPT_FLAGS =
 # LDOPTS =
 
@@ -287,6 +293,21 @@ else
 UNAME    := $(shell uname -mps)
 TARGETOS := $(OS)
 
+#-------------------------------------------------
+# determine the whether -m32, -m64 or nothing
+# should be passed to gcc when building genie
+#-------------------------------------------------
+
+ifeq ($(ARCHITECTURE),_x86)
+MPARAM := -m32
+else
+ifeq ($(ARCHITECTURE),_x64)
+MPARAM := -m64
+else
+MPARAM :=
+endif
+endif
+
 ARCHITECTURE := _x86
 
 ifeq ($(firstword $(filter x86_64,$(UNAME))),x86_64)
@@ -501,7 +522,9 @@ endif
 # reverse logic for this one
 
 ifdef USE_BUNDLED_LIB_SDL2
+ifneq '$(USE_BUNDLED_LIB_SDL2)' '0'
 PARAMS += --with-bundled-sdl2
+endif
 endif
 
 #-------------------------------------------------
@@ -627,6 +650,22 @@ ifdef ARCHOPTS
 PARAMS += --ARCHOPTS='$(ARCHOPTS)'
 endif
 
+ifdef ARCHOPTS_C
+PARAMS += --ARCHOPTS_C='$(ARCHOPTS_C)'
+endif
+
+ifdef ARCHOPTS_CXX
+PARAMS += --ARCHOPTS_CXX='$(ARCHOPTS_CXX)'
+endif
+
+ifdef ARCHOPTS_OBJC
+PARAMS += --ARCHOPTS_OBJC='$(ARCHOPTS_OBJC)'
+endif
+
+ifdef ARCHOPTS_OBJCXX
+PARAMS += --ARCHOPTS_OBJCXX='$(ARCHOPTS_OBJCXX)'
+endif
+
 ifdef OPT_FLAGS
 PARAMS += --OPT_FLAGS='$(OPT_FLAGS)'
 endif
@@ -675,6 +714,10 @@ ifdef DONT_USE_NETWORK
 PARAMS += --DONT_USE_NETWORK='$(DONT_USE_NETWORK)'
 endif
 
+ifdef NO_OPENGL
+PARAMS += --NO_OPENGL='$(NO_OPENGL)'
+endif
+
 ifdef USE_DISPATCH_GL
 PARAMS += --USE_DISPATCH_GL='$(USE_DISPATCH_GL)'
 endif
@@ -721,6 +764,10 @@ endif
 
 ifdef NO_USE_XINPUT
 PARAMS += --NO_USE_XINPUT='$(NO_USE_XINPUT)'
+endif
+
+ifdef NO_USE_XINPUT_WII_LIGHTGUN_HACK
+PARAMS += --NO_USE_XINPUT_WII_LIGHTGUN_HACK='$(NO_USE_XINPUT_WII_LIGHTGUN_HACK)'
 endif
 
 ifdef SDL_LIBVER
@@ -887,7 +934,7 @@ endif
 
 ifeq (posix,$(SHELLTYPE))
   MKDIR = $(SILENT) mkdir -p "$(1)"
-  COPY  = $(SILENT) cp -fR "$(1)" "$(2)"
+  COPY  = $(SILENT) cp -fR "$(1)"/* "$(2)"
 else
   MKDIR = $(SILENT) mkdir "$(subst /,\\,$(1))" 2> nul || exit 0
   COPY  = $(SILENT) copy /Y "$(subst /,\\,$(1))" "$(subst /,\\,$(2))" > nul || exit 0
@@ -951,10 +998,12 @@ FASTBUILD_PARAMS += $(FASTBUILD_TARGET)-x32
 endif
 endif
 else
+ifdef OVERRIDE_CC
+GCC_VERSION      := $(shell $(TOOLCHAIN)$(subst @,,$(OVERRIDE_CC)) -dumpversion 2> /dev/null)
+else
 GCC_VERSION      := $(shell $(TOOLCHAIN)$(subst @,,$(CC)) -dumpversion 2> /dev/null)
-ifneq ($(OS),solaris)
-CLANG_VERSION    := $(shell $(TOOLCHAIN)$(subst @,,$(CC))  --version  2> /dev/null | head -n 1 | grep -e 'version [0-9]\+\.[0-9]\+\(\.[0-9]\+\)\?' -o | grep -e '[0-9]\+\.[0-9]\+\(\.[0-9]\+\)\?' -o | tail -n 1)
 endif
+CLANG_VERSION    := $(shell $(TOOLCHAIN)$(subst @,,$(CC))  --version  2> /dev/null | head -n 1 | grep -e 'version [0-9]\+\.[0-9]\+\(\.[0-9]\+\)\?' -o | grep -e '[0-9]\+\.[0-9]\+\(\.[0-9]\+\)\?' -o | tail -n 1)
 PYTHON_AVAILABLE := $(shell $(PYTHON) --version > /dev/null 2>&1 && echo python)
 GIT_AVAILABLE := $(shell git --version > /dev/null 2>&1 && echo git)
 endif
@@ -1135,7 +1184,7 @@ endif
 
 .PHONY: vs2017_uwp
 vs2017_uwp: generate
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=winstore82 --osd=uwp --NO_USE_MIDI=1 --NO_OPENGL=1 --USE_QTDEBUG=0 --NO_USE_PORTAUDIO=1 --MODERN_WIN_API=1 vs2015
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=winstore82 --osd=uwp --NO_USE_MIDI=1 --NO_OPENGL=1 --USE_QTDEBUG=0 --NO_USE_PORTAUDIO=1 --MODERN_WIN_API=1 vs2017
 ifdef MSBUILD
 	$(SILENT) msbuild.exe $(PROJECTDIR_WIN)/vs2017-winstore82/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
 endif
@@ -1145,6 +1194,56 @@ vs2017_fastbuild: generate
 	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) vs2017-fastbuild
 ifdef FASTBUILD
 	$(SILENT) fbuild.exe -config $(PROJECTDIR_WIN)/vs2017-fastbuild/ftbuild.bff $(FASTBUILD_PARAMS)
+endif
+
+#-------------------------------------------------
+# Visual Studio 2019
+#-------------------------------------------------
+
+.PHONY: vs2019
+vs2019: generate
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) vs2019
+ifdef MSBUILD
+	$(SILENT) msbuild.exe $(PROJECTDIR_WIN)/vs2019/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
+endif
+
+.PHONY: vs2019_clang
+vs2019_clang: generate
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=clangcl --NO_USE_PORTAUDIO=1 vs2019
+ifdef MSBUILD
+	$(SILENT) msbuild.exe $(PROJECTDIR_WIN)/vs2019-clang/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
+endif
+
+.PHONY: vs2019_intel
+vs2019_intel: generate
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=intel-15 vs2019
+ifdef MSBUILD
+	$(SILENT) msbuild.exe $(PROJECTDIR_WIN)/vs2019-intel/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
+endif
+
+.PHONY: vs2019_uwp
+vs2019_uwp: generate
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=winstore82 --osd=uwp --NO_USE_MIDI=1 --NO_OPENGL=1 --USE_QTDEBUG=0 --NO_USE_PORTAUDIO=1 --MODERN_WIN_API=1 vs2019
+ifdef MSBUILD
+	$(SILENT) msbuild.exe $(PROJECTDIR_WIN)/vs2019-winstore82/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
+endif
+
+.PHONY: vs2019_fastbuild
+vs2019_fastbuild: generate
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) vs2019-fastbuild
+ifdef FASTBUILD
+	$(SILENT) fbuild.exe -config $(PROJECTDIR_WIN)/vs2019-fastbuild/ftbuild.bff $(FASTBUILD_PARAMS)
+endif
+
+#-------------------------------------------------
+# Visual Studio LLVM
+#-------------------------------------------------
+
+.PHONY: vsllvm
+vsllvm: generate
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) vsllvm
+ifdef MSBUILD
+	$(SILENT) msbuild.exe $(PROJECTDIR_WIN)/vsllvm/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
 endif
 
 #-------------------------------------------------
@@ -1189,36 +1288,6 @@ endif
 android-arm64: android-ndk generate $(PROJECTDIR_SDL)/$(MAKETYPE)-android-arm64/Makefile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_SDL)/$(MAKETYPE)-android-arm64 config=$(CONFIG) precompile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_SDL)/$(MAKETYPE)-android-arm64 config=$(CONFIG)
-
-#-------------------------------------------------
-# android-mips
-#-------------------------------------------------
-
-$(PROJECTDIR_SDL)/$(MAKETYPE)-android-mips/Makefile: makefile $(SCRIPTS) $(GENIE)
-ifndef ANDROID_NDK_MIPS
-	$(error ANDROID_NDK_MIPS is not set)
-endif
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-mips --gcc_version=3.8.0 --osd=sdl --targetos=android --PLATFORM=mips --NO_USE_MIDI=1 --NO_OPENGL=1 --USE_QTDEBUG=0 --NO_X11=1 --DONT_USE_NETWORK=1 --NOASM=1 $(MAKETYPE)
-
-.PHONY: android-mips
-android-mips: android-ndk generate $(PROJECTDIR_SDL)/$(MAKETYPE)-android-mips/Makefile
-	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_SDL)/$(MAKETYPE)-android-mips config=$(CONFIG) precompile
-	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_SDL)/$(MAKETYPE)-android-mips config=$(CONFIG)
-
-#-------------------------------------------------
-# android-mips64
-#-------------------------------------------------
-
-$(PROJECTDIR_SDL)/$(MAKETYPE)-android-mips64/Makefile: makefile $(SCRIPTS) $(GENIE)
-ifndef ANDROID_NDK_MIPS64
-	$(error ANDROID_NDK_MIPS64 is not set)
-endif
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-mips64 --gcc_version=3.8.0 --osd=sdl --targetos=android --PLATFORM=mips64 --NO_USE_MIDI=1 --NO_OPENGL=1 --USE_QTDEBUG=0 --NO_X11=1 --DONT_USE_NETWORK=1 --NOASM=1 $(MAKETYPE)
-
-.PHONY: android-mips64
-android-mips64: android-ndk generate $(PROJECTDIR_SDL)/$(MAKETYPE)-android-mips64/Makefile
-	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_SDL)/$(MAKETYPE)-android-mips64 config=$(CONFIG) precompile
-	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_SDL)/$(MAKETYPE)-android-mips64 config=$(CONFIG)
 
 #-------------------------------------------------
 # android-x86
@@ -1355,11 +1424,10 @@ xcode4-ios: generate
 #-------------------------------------------------
 # gmake-solaris
 #-------------------------------------------------
-
-
+ifndef CLANG_VERSION
 $(PROJECTDIR)/$(MAKETYPE)-solaris/Makefile: makefile $(SCRIPTS) $(GENIE)
 	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --gcc=solaris --gcc_version=$(GCC_VERSION) $(MAKETYPE)
-
+endif
 .PHONY: solaris_x64
 solaris_x64: generate $(PROJECTDIR)/$(MAKETYPE)-solaris/Makefile
 	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-solaris config=$(CONFIG)64 precompile
@@ -1370,6 +1438,26 @@ solaris: solaris_x86
 
 .PHONY: solaris_x86
 solaris_x86: generate $(PROJECTDIR)/$(MAKETYPE)-solaris/Makefile
+	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-solaris config=$(CONFIG)32 precompile
+	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-solaris config=$(CONFIG)32
+
+#-------------------------------------------------
+# gmake-solaris-clang
+#-------------------------------------------------
+ifdef CLANG_VERSION
+$(PROJECTDIR)/$(MAKETYPE)-solaris/Makefile: makefile $(SCRIPTS) $(GENIE)
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --gcc=solaris --gcc_version=$(CLANG_VERSION) $(MAKETYPE)
+endif
+.PHONY: solaris_x64_clang
+solaris_x64_clang: generate $(PROJECTDIR)/$(MAKETYPE)-solaris/Makefile
+	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-solaris config=$(CONFIG)64 precompile
+	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-solaris config=$(CONFIG)64
+
+.PHONY: solaris_clang
+solaris_clang: solaris_x86_clang
+
+.PHONY: solaris_x86_clang
+solaris_x86_clang: generate $(PROJECTDIR)/$(MAKETYPE)-solaris/Makefile
 	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-solaris config=$(CONFIG)32 precompile
 	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-solaris config=$(CONFIG)32
 
@@ -1395,6 +1483,23 @@ freebsd_x86: generate $(PROJECTDIR)/$(MAKETYPE)-freebsd/Makefile
 	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-freebsd config=$(CONFIG)32
 
 #-------------------------------------------------
+# gmake-freebsd-clang
+#-------------------------------------------------
+
+$(PROJECTDIR)/$(MAKETYPE)-freebsd-clang/Makefile: makefile $(SCRIPTS) $(GENIE)
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --gcc=freebsd-clang --gcc_version=$(CLANG_VERSION) $(MAKETYPE)
+
+.PHONY: freebsd_x64_clang
+freebsd_x64_clang: generate $(PROJECTDIR)/$(MAKETYPE)-freebsd-clang/Makefile
+	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-freebsd-clang config=$(CONFIG)64 precompile
+	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-freebsd-clang config=$(CONFIG)64
+
+.PHONY: freebsd_x86_clang
+freebsd_x86_clang: generate $(PROJECTDIR)/$(MAKETYPE)-freebsd-clang/Makefile
+	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-freebsd-clang config=$(CONFIG)32 precompile
+	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-freebsd-clang config=$(CONFIG)32
+
+#-------------------------------------------------
 # gmake-netbsd
 #-------------------------------------------------
 
@@ -1413,6 +1518,23 @@ netbsd: netbsd_x86
 netbsd_x86: generate $(PROJECTDIR)/$(MAKETYPE)-netbsd/Makefile
 	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-netbsd config=$(CONFIG)32 precompile
 	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-netbsd config=$(CONFIG)32
+
+#-------------------------------------------------
+# gmake-netbsd-clang
+#-------------------------------------------------
+
+$(PROJECTDIR)/$(MAKETYPE)-netbsd-clang/Makefile: makefile $(SCRIPTS) $(GENIE)
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --gcc=netbsd-clang --gcc_version=$(CLANG_VERSION) $(MAKETYPE)
+
+.PHONY: netbsd_x64_clang
+netbsd_x64_clang: generate $(PROJECTDIR)/$(MAKETYPE)-netbsd-clang/Makefile
+	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-netbsd-clang config=$(CONFIG)64 precompile
+	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-netbsd-clang config=$(CONFIG)64
+
+.PHONY: netbsd_x86_clang
+netbsd_x86_clang: generate $(PROJECTDIR)/$(MAKETYPE)-netbsd-clang/Makefile
+	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-netbsd-clang config=$(CONFIG)32 precompile
+	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-netbsd-clang config=$(CONFIG)32
 
 #-------------------------------------------------
 # gmake-openbsd
@@ -1527,21 +1649,20 @@ endif
 GENIE_SRC=$(wildcard 3rdparty/genie/src/host/*.c)
 
 $(GENIE): $(GENIE_SRC)
-	$(SILENT) $(MAKE) $(MAKEPARAMS) -C 3rdparty/genie/build/gmake.$(GENIEOS) -f genie.make
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C 3rdparty/genie/build/gmake.$(GENIEOS) -f genie.make MPARAM=$(MPARAM)
 
 3rdparty/genie/src/hosts/%.c:
 
 .PHONY: genieclean
 genieclean:
-	$(SILENT) $(MAKE) $(MAKEPARAMS) -C 3rdparty/genie/build/gmake.$(GENIEOS) -f genie.make clean
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C 3rdparty/genie/build/gmake.$(GENIEOS) -f genie.make MPARAM=$(MPARAM) clean
 
 clean: genieclean
 	@echo Cleaning...
 	-@rm -rf $(BUILDDIR)
-	$(SILENT) $(MAKE) -C $(SRC)/devices/cpu/m68000 clean
 	-@rm -rf 3rdparty/bgfx/.build
 
-GEN_FOLDERS := $(GENDIR)/$(TARGET)/layout/ $(GENDIR)/$(TARGET)/$(SUBTARGET_FULL)/ $(GENDIR)/mame/drivers/
+GEN_FOLDERS := $(GENDIR)/$(TARGET)/layout/ $(GENDIR)/$(TARGET)/$(SUBTARGET_FULL)/ $(GENDIR)/mame/drivers/ $(GENDIR)/mame/machine/
 
 rwildcard=$(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2) $(filter $(subst *,%,$2),$d))
 LAYOUTS=$(wildcard $(SRC)/$(TARGET)/layout/*.lay)
@@ -1565,8 +1686,7 @@ generate: \
 		$(GENDIR)/version.cpp \
 		$(patsubst %.po,%.mo,$(call rwildcard, language/, *.po)) \
 		$(patsubst $(SRC)/%.lay,$(GENDIR)/%.lh,$(LAYOUTS)) \
-		$(GENDIR)/mame/drivers/ymmu100.hxx \
-		$(SRC)/devices/cpu/m68000/m68kops.cpp \
+		$(GENDIR)/mame/machine/mulcd.hxx \
 		$(GENDIR)/includes/SDL2
 
 $(GENDIR)/includes/SDL2:
@@ -1583,15 +1703,15 @@ $(GENDIR)/git_desc: stale | $(GEN_FOLDERS)
 endif
 
 ifeq (posix,$(SHELLTYPE))
-$(GENDIR)/version.cpp: $(GENDIR)/git_desc | $(GEN_FOLDERS)
-	@echo '#define BARE_BUILD_VERSION "0.200"' > $@
+$(GENDIR)/version.cpp: makefile $(GENDIR)/git_desc | $(GEN_FOLDERS)
+	@echo '#define BARE_BUILD_VERSION "0.216"' > $@
 	@echo 'extern const char bare_build_version[];' >> $@
 	@echo 'extern const char build_version[];' >> $@
 	@echo 'const char bare_build_version[] = BARE_BUILD_VERSION;' >> $@
 	@echo 'const char build_version[] = BARE_BUILD_VERSION " ($(NEW_GIT_VERSION))";' >> $@
 else
-$(GENDIR)/version.cpp: $(GENDIR)/git_desc
-	@echo #define BARE_BUILD_VERSION "0.200" > $@
+$(GENDIR)/version.cpp: makefile $(GENDIR)/git_desc | $(GEN_FOLDERS)
+	@echo #define BARE_BUILD_VERSION "0.216" > $@
 	@echo extern const char bare_build_version[]; >> $@
 	@echo extern const char build_version[]; >> $@
 	@echo const char bare_build_version[] = BARE_BUILD_VERSION; >> $@
@@ -1603,16 +1723,9 @@ $(GENDIR)/%.lh: $(SRC)/%.lay scripts/build/complay.py | $(GEN_FOLDERS)
 	@echo Compressing $<...
 	$(SILENT)$(PYTHON) scripts/build/complay.py $< $@ layout_$(basename $(notdir $<))
 
-$(GENDIR)/mame/drivers/ymmu100.hxx: $(SRC)/mame/drivers/ymmu100.ppm scripts/build/file2str.py
+$(GENDIR)/mame/machine/mulcd.hxx: $(SRC)/mame/machine/mulcd.ppm scripts/build/file2str.py
 	@echo Converting $<...
-	$(SILENT)$(PYTHON) scripts/build/file2str.py $< $@ ymmu100_bkg uint8_t
-
-$(SRC)/devices/cpu/m68000/m68kops.cpp: $(SRC)/devices/cpu/m68000/m68k_in.cpp $(SRC)/devices/cpu/m68000/m68kmake.cpp
-ifeq ($(TARGETOS),asmjs)
-	$(SILENT) $(MAKE) -C $(SRC)/devices/cpu/m68000
-else
-	$(SILENT) $(MAKE) -C $(SRC)/devices/cpu/m68000 CC="$(CC)" CXX="$(CXX)"
-endif
+	$(SILENT)$(PYTHON) scripts/build/file2str.py $< $@ mulcd_bkg uint8_t
 
 %.mo: %.po
 	@echo Converting translation $<...
@@ -1637,24 +1750,39 @@ tests: $(REGTESTS)
 
 .PHONY: cleansrc
 
+# FIXME: make this work with SEPARATE_BIN
 cleansrc:
 	@echo Cleaning up tabs/spaces/end of lines....
 ifeq ($(OS),windows)
 	$(shell for /r src %%i in (*.c) do srcclean %%i >&2 )
+	$(shell for /r src %%i in (*.cpp) do srcclean %%i >&2 )
 	$(shell for /r src %%i in (*.h) do srcclean %%i >&2 )
-	$(shell for /r src %%i in (*.mak) do srcclean %%i >&2 )
-	$(shell for /r src %%i in (*.lst) do srcclean %%i >&2 )
-	$(shell for /r src %%i in (*.lay) do srcclean %%i >&2 )
+	$(shell for /r src %%i in (*.hpp) do srcclean %%i >&2 )
 	$(shell for /r src %%i in (*.hxx) do srcclean %%i >&2 )
+	$(shell for /r src %%i in (*.ipp) do srcclean %%i >&2 )
+	$(shell for /r src %%i in (*.lay) do srcclean %%i >&2 )
+	$(shell for /r src %%i in (*.lst) do srcclean %%i >&2 )
+	$(shell for /r src %%i in (*.mak) do srcclean %%i >&2 )
+	$(shell for /r src %%i in (*.mm) do srcclean %%i >&2 )
+	$(shell for /r hash %%i in (*.hsi) do srcclean %%i >&2 )
 	$(shell for /r hash %%i in (*.xml) do srcclean %%i >&2 )
+	$(shell for /r plugins %%i in (*.lua) do srcclean %%i >&2 )
+	$(shell for /r scripts %%i in (*.lua) do srcclean %%i >&2 )
 else
-	$(shell find src/ -name *.c -exec ./srcclean {} >&2 ;)
-	$(shell find src/ -name *.h -exec ./srcclean {}  >&2 ;)
-	$(shell find src/ -name *.mak -exec ./srcclean {} >&2 ;)
-	$(shell find src/ -name *.lst -exec ./srcclean {} >&2 ;)
-	$(shell find src/ -name *.lay -exec ./srcclean {} >&2 ;)
-	$(shell find src/ -name *.hxx -exec ./srcclean {} >&2 ;)
-	$(shell find hash/ -name *.xml -exec ./srcclean {} >&2 ;)
+	$(SILENT) find src -name \*.c -exec ./srcclean {} \; >&2
+	$(SILENT) find src -name \*.cpp -exec ./srcclean {} \; >&2
+	$(SILENT) find src -name \*.h -exec ./srcclean {} \; >&2
+	$(SILENT) find src -name \*.hpp -exec ./srcclean {} \; >&2
+	$(SILENT) find src -name \*.hxx -exec ./srcclean {} \; >&2
+	$(SILENT) find src -name \*.ipp -exec ./srcclean {} \; >&2
+	$(SILENT) find src -name \*.lay -exec ./srcclean {} \; >&2
+	$(SILENT) find src -name \*.lst -exec ./srcclean {} \; >&2
+	$(SILENT) find src -name \*.mak -exec ./srcclean {} \; >&2
+	$(SILENT) find src -name \*.mm -exec ./srcclean {} \; >&2
+	$(SILENT) find hash -name \*.hsi -exec ./srcclean {} \; >&2
+	$(SILENT) find hash -name \*.xml -exec ./srcclean {} \; >&2
+	$(SILENT) find plugins -name \*.lua -exec ./srcclean {} \; >&2
+	$(SILENT) find scripts -name \*.lua -exec ./srcclean {} \; >&2
 endif
 
 #-------------------------------------------------
@@ -1680,7 +1808,6 @@ CPPCHECK_PARAMS += -Isrc/lib/util
 CPPCHECK_PARAMS += -Isrc/mame
 CPPCHECK_PARAMS += -Isrc/osd/modules/render
 CPPCHECK_PARAMS += -Isrc/osd/windows
-CPPCHECK_PARAMS += -Isrc/emu/cpu/m68000
 CPPCHECK_PARAMS += -I3rdparty
 ifndef USE_SYSTEM_LIB_LUA
 CPPCHECK_PARAMS += -I3rdparty/lua/src
@@ -1730,7 +1857,7 @@ cppcheck:
 .PHONY: shaders bgfx-tools
 
 bgfx-tools:
-	$(SILENT) $(MAKE) -C 3rdparty/bgfx -f makefile shaderc CC="$(CC)" CXX="$(CXX)" MINGW="$(MINGW)"
+	$(SILENT) $(MAKE) -C 3rdparty/bgfx -f makefile shaderc CC="$(CC)" CXX="$(CXX)" MINGW="$(MINGW)" SILENT="$(SILENT)"
 
 shaders: bgfx-tools
 	-$(call MKDIR,build/shaders/dx11)
@@ -1740,7 +1867,7 @@ shaders: bgfx-tools
 	-$(call MKDIR,build/shaders/essl)
 	-$(call MKDIR,build/shaders/glsl)
 	-$(call MKDIR,build/shaders/spirv)
-	$(SILENT) $(MAKE) -C $(SRC)/osd/modules/render/bgfx/shaders rebuild CHAIN="$(CHAIN)"
+	$(SILENT) $(MAKE) -C $(SRC)/osd/modules/render/bgfx/shaders rebuild CHAIN="$(CHAIN)" SILENT="$(SILENT)"
 
 #-------------------------------------------------
 # Translation

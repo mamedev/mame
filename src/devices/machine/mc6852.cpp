@@ -147,7 +147,7 @@ void mc6852_device::rcv_complete()
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( mc6852_device::read )
+uint8_t mc6852_device::read(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -156,7 +156,8 @@ READ8_MEMBER( mc6852_device::read )
 		if (m_rx_fifo.size() > 0)
 		{
 			data = m_rx_fifo.front();
-			m_rx_fifo.pop();
+			if (!machine().side_effects_disabled())
+				m_rx_fifo.pop();
 		}
 	}
 	else
@@ -172,7 +173,7 @@ READ8_MEMBER( mc6852_device::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( mc6852_device::write )
+void mc6852_device::write(offs_t offset, uint8_t data)
 {
 	if (BIT(offset, 0))
 	{

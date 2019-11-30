@@ -14,6 +14,7 @@
 #include "machine/interpro_sga.h"
 #include "machine/interpro_arbga.h"
 
+#include "imagedev/floppy.h"
 #include "machine/ram.h"
 #include "machine/28fxxx.h"
 #include "machine/mc146818.h"
@@ -23,8 +24,8 @@
 
 #include "machine/ncr5390.h"
 #include "machine/nscsi_bus.h"
-#include "machine/nscsi_cd.h"
-#include "machine/nscsi_hd.h"
+#include "bus/nscsi/cd.h"
+#include "bus/nscsi/hd.h"
 
 #include "bus/rs232/rs232.h"
 
@@ -79,6 +80,7 @@ public:
 		, m_scsibus(*this, INTERPRO_SCSI_TAG)
 		, m_eth(*this, INTERPRO_ETH_TAG)
 		, m_ioga(*this, INTERPRO_IOGA_TAG)
+		, m_eprom(*this, INTERPRO_EPROM_TAG)
 		, m_softlist(*this, "softlist")
 		, m_diag_led(*this, "digit0")
 	{
@@ -96,6 +98,7 @@ public:
 	required_device<nscsi_bus_device> m_scsibus;
 	required_device<i82586_base_device> m_eth;
 	required_device<interpro_ioga_device> m_ioga;
+	required_region_ptr<u16> m_eprom;
 
 	required_device<software_list_device> m_softlist;
 

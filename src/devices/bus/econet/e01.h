@@ -15,6 +15,7 @@
 #include "bus/centronics/ctronics.h"
 #include "bus/scsi/scsi.h"
 #include "cpu/m6502/m65c02.h"
+#include "imagedev/floppy.h"
 #include "machine/6522via.h"
 #include "machine/buffer.h"
 #include "machine/output_latch.h"
@@ -95,6 +96,8 @@ private:
 	required_device_array<floppy_connector, 2> m_floppy;
 	required_memory_region m_rom;
 	required_device<centronics_device> m_centronics;
+
+	output_finder<> m_led;
 
 	inline void update_interrupts();
 	inline void network_irq_enable(int enabled);

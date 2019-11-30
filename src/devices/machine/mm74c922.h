@@ -36,38 +36,6 @@
 #pragma once
 
 
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_MM74C922_OSC(_value) \
-	downcast<mm74c922_device &>(*device).set_cap_osc(_value);
-
-#define MCFG_MM74C922_DEBOUNCE(_value) \
-	downcast<mm74c922_device &>(*device).set_cap_debounce(_value);
-
-#define MCFG_MM74C922_DA_CALLBACK(_write) \
-	downcast<mm74c922_device &>(*device).set_da_wr_callback(DEVCB_##_write);
-
-#define MCFG_MM74C922_X1_CALLBACK(_read) \
-	downcast<mm74c922_device &>(*device).set_x1_rd_callback(DEVCB_##_read);
-
-#define MCFG_MM74C922_X2_CALLBACK(_read) \
-	downcast<mm74c922_device &>(*device).set_x2_rd_callback(DEVCB_##_read);
-
-#define MCFG_MM74C922_X3_CALLBACK(_read) \
-	downcast<mm74c922_device &>(*device).set_x3_rd_callback(DEVCB_##_read);
-
-#define MCFG_MM74C922_X4_CALLBACK(_read) \
-	downcast<mm74c922_device &>(*device).set_x4_rd_callback(DEVCB_##_read);
-
-#define MCFG_MM74C922_X5_CALLBACK(_read) \
-	downcast<mm74c922_device &>(*device).set_x5_rd_callback(DEVCB_##_read);
-
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -83,16 +51,19 @@ public:
 	void set_cap_osc(double value) { m_cap_osc = value; }
 	void set_cap_debounce(double value) { m_cap_debounce = value; }
 
-	template <class Object> devcb_base &set_da_wr_callback(Object &&cb) { return m_write_da.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_x1_rd_callback(Object &&cb) { return m_read_x1.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_x2_rd_callback(Object &&cb) { return m_read_x2.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_x3_rd_callback(Object &&cb) { return m_read_x3.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_x4_rd_callback(Object &&cb) { return m_read_x4.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_x5_rd_callback(Object &&cb) { return m_read_x5.set_callback(std::forward<Object>(cb)); }
+	auto da_wr_callback() { return m_write_da.bind(); }
+	auto x1_rd_callback() { return m_read_x[0].bind(); }
+	auto x2_rd_callback() { return m_read_x[1].bind(); }
+	auto x3_rd_callback() { return m_read_x[2].bind(); }
+	auto x4_rd_callback() { return m_read_x[3].bind(); }
 
 	uint8_t read();
 
+	DECLARE_READ_LINE_MEMBER(da_r) { return m_da; }
+
 protected:
+	mm74c922_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int max_y);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -103,33 +74,38 @@ private:
 	void detect_keypress();
 
 	devcb_write_line   m_write_da;
-	devcb_read8        m_read_x1;
-	devcb_read8        m_read_x2;
-	devcb_read8        m_read_x3;
-	devcb_read8        m_read_x4;
-	devcb_read8        m_read_x5;
+	devcb_read8        m_read_x[4];
 
 	double              m_cap_osc;
 	double              m_cap_debounce;
 
-	int m_max_y;
+	const int m_max_y;
 
-	int m_inhibit;              // scan counter clock inhibit
+	bool m_inhibit;             // scan counter clock inhibit
 	int m_x;                    // currently scanned column
 	int m_y;                    // latched row
 
-	uint8_t m_data;               // data latch
+	uint8_t m_data;             // data latch
 
-	int m_da;                   // data available flag
-	int m_next_da;              // next value of data available flag
+	bool m_da;                  // data available flag
+	bool m_next_da;             // next value of data available flag
 
 	// timers
 	emu_timer *m_scan_timer;    // keyboard scan timer
 };
 
+// ======================> mm74c923_device
+
+class mm74c923_device :  public mm74c922_device
+{
+public:
+	// construction/destruction
+	mm74c923_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
 
 // device type definition
 DECLARE_DEVICE_TYPE(MM74C922, mm74c922_device)
-DECLARE_DEVICE_TYPE(MM74C923, mm74c922_device)
+DECLARE_DEVICE_TYPE(MM74C923, mm74c923_device)
 
 #endif // MAME_MACHINE_MM74C922_H

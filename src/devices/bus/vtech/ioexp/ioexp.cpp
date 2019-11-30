@@ -29,9 +29,8 @@ DEFINE_DEVICE_TYPE(VTECH_IOEXP_SLOT, vtech_ioexp_slot_device, "vtech_ioexp_slot"
 
 vtech_ioexp_slot_device::vtech_ioexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, VTECH_IOEXP_SLOT, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
-	m_io(nullptr),
-	m_cart(nullptr)
+	device_single_card_slot_interface<device_vtech_ioexp_interface>(mconfig, *this),
+	m_io(*this, finder_base::DUMMY_TAG, -1)
 {
 }
 
@@ -51,23 +50,6 @@ void vtech_ioexp_slot_device::device_start()
 {
 }
 
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void vtech_ioexp_slot_device::device_reset()
-{
-}
-
-//-------------------------------------------------
-//  set_io_space - set address space we are attached to
-//-------------------------------------------------
-
-void vtech_ioexp_slot_device::set_io_space(address_space *io)
-{
-	m_io = io;
-}
-
 
 //**************************************************************************
 //  CARTRIDGE INTERFACE
@@ -78,7 +60,7 @@ void vtech_ioexp_slot_device::set_io_space(address_space *io)
 //-------------------------------------------------
 
 device_vtech_ioexp_interface::device_vtech_ioexp_interface(const machine_config &mconfig, device_t &device) :
-	device_slot_card_interface(mconfig, device)
+	device_interface(device, "vtechioexp")
 {
 	m_slot = dynamic_cast<vtech_ioexp_slot_device *>(device.owner());
 }

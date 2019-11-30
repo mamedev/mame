@@ -235,8 +235,8 @@ void hk68v10_state::hk68v10_mem(address_map &map)
 	map(0xfea002, 0xfea002).rw(m_sccterm, FUNC(scc8530_device::cb_r), FUNC(scc8530_device::cb_w)); /* Dual serial port Z80-SCC */
 	map(0xfea004, 0xfea004).rw(m_sccterm, FUNC(scc8530_device::da_r), FUNC(scc8530_device::da_w)); /* Dual serial port Z80-SCC */
 	map(0xfea006, 0xfea006).rw(m_sccterm, FUNC(scc8530_device::db_r), FUNC(scc8530_device::db_w)); /* Dual serial port Z80-SCC */
-	//AM_RANGE(0x100000, 0xfeffff)  AM_READWRITE(vme_a24_r, vme_a24_w) /* VMEbus Rev B addresses (24 bits) - not verified */
-	//AM_RANGE(0xff0000, 0xffffff)  AM_READWRITE(vme_a16_r, vme_a16_w) /* VMEbus Rev B addresses (16 bits) - not verified */
+	//map(0x100000, 0xfeffff).rw(FUNC(hk68v10_state::vme_a24_r), FUNC(hk68v10_state::vme_a24_w)); /* VMEbus Rev B addresses (24 bits) - not verified */
+	//map(0xff0000, 0xffffff).rw(FUNC(hk68v10_state::vme_a16_r), FUNC(hk68v10_state::vme_a16_w)); /* VMEbus Rev B addresses (16 bits) - not verified */
 }
 
 /* Input ports */
@@ -337,26 +337,27 @@ static void hk68_vme_cards(device_slot_interface &device)
 /*
  * Machine configuration
  */
-MACHINE_CONFIG_START(hk68v10_state::hk68v10)
+void hk68v10_state::hk68v10(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68010, 10_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP (hk68v10_mem)
+	M68010(config, m_maincpu, 10_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &hk68v10_state::hk68v10_mem);
 
 	Z8536(config, "cio", SCC_CLOCK);
 
 	/* Terminal Port config */
-	MCFG_DEVICE_ADD("scc", SCC8530N, SCC_CLOCK)
-	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE("rs232trm", rs232_port_device, write_txd))
-	MCFG_Z80SCC_OUT_DTRA_CB(WRITELINE("rs232trm", rs232_port_device, write_dtr))
-	MCFG_Z80SCC_OUT_RTSA_CB(WRITELINE("rs232trm", rs232_port_device, write_rts))
+	SCC8530N(config, m_sccterm, SCC_CLOCK);
+	m_sccterm->out_txda_callback().set("rs232trm", FUNC(rs232_port_device::write_txd));
+	m_sccterm->out_dtra_callback().set("rs232trm", FUNC(rs232_port_device::write_dtr));
+	m_sccterm->out_rtsa_callback().set("rs232trm", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("rs232trm", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("scc", scc8530_device, rxa_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("scc", scc8530_device, ctsa_w))
+	rs232_port_device &rs232trm(RS232_PORT(config, "rs232trm", default_rs232_devices, "terminal"));
+	rs232trm.rxd_handler().set(m_sccterm, FUNC(scc8530_device::rxa_w));
+	rs232trm.cts_handler().set(m_sccterm, FUNC(scc8530_device::ctsa_w));
 
-	MCFG_VME_DEVICE_ADD("vme")
-	MCFG_VME_SLOT_ADD("vme", 1, hk68_vme_cards, nullptr)
-MACHINE_CONFIG_END
+	VME(config, "vme", 0);
+	VME_SLOT(config, "slot1", hk68_vme_cards, nullptr, 1, "vme");
+}
 
 /* ROM definitions */
 ROM_START (hk68v10)

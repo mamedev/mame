@@ -439,7 +439,7 @@ void vastar_common_state::common(machine_config &config)
 	m_subcpu->set_addrmap(AS_IO, &vastar_common_state::cpu2_port_map);
 	m_subcpu->set_periodic_int(FUNC(vastar_common_state::irq0_line_hold), attotime::from_hz(242)); /* 4 * vsync_freq(60.58) measured, it is not known yet how long it is asserted so we'll use HOLD_LINE for now */
 
-	config.m_minimum_quantum = attotime::from_hz(600);   /* 10 CPU slices per frame - seems enough to ensure proper synchronization of the CPUs */
+	config.set_maximum_quantum(attotime::from_hz(600));   /* 10 CPU slices per frame - seems enough to ensure proper synchronization of the CPUs */
 
 	ls259_device &mainlatch(LS259(config, "mainlatch"));
 	mainlatch.q_out_cb<0>().set(FUNC(vastar_common_state::nmi_mask_w));
@@ -473,12 +473,10 @@ void vastar_state::vastar(machine_config &config)
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(vastar_state::screen_update));
-	screen.set_palette("palette");
+	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_vastar);
-	PALETTE(config, m_palette, 256);
-	m_palette->set_prom_region("proms");
-	m_palette->set_init("palette", FUNC(palette_device::palette_init_RRRRGGGGBBBB_proms));
+	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
 }
 
 void dogfightp_state::dogfightp(machine_config &config)
@@ -486,13 +484,15 @@ void dogfightp_state::dogfightp(machine_config &config)
 	common(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &dogfightp_state::dogfightp_main_map);
-	m_maincpu->set_vblank_int("videopcb:screen", FUNC(vastar_common_state::vblank_irq));
+	m_maincpu->set_vblank_int("screen", FUNC(vastar_common_state::vblank_irq));
 
 	ls259_device &mainlatch(*subdevice<ls259_device>("mainlatch"));
 	mainlatch.q_out_cb<1>().set("videopcb", FUNC(orca_ovg_40c_device::flipscreen_w));
 
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+
 	orca_ovg_40c_device& videopcb(ORCA_OVG_40C(config, "videopcb", 0));
-	videopcb.set_palette("videopcb:palette");
+	videopcb.set_screen("screen");
 	videopcb.set_percuss_hardware(true);
 }
 
@@ -674,9 +674,9 @@ ROM_START( dogfightp ) // all 2732
 	ROM_LOAD( "9.7m",      0x0800, 0x1000, CRC(ffe05fee) SHA1(70b9d0808defd936e2c3567f8e6996a19753de81) )
 	ROM_LOAD( "10.7p",     0x1800, 0x1000, CRC(2cb51793) SHA1(d90177ef28730774202a04a0846281537a1883df) )
 
-	ROM_REGION( 0x0040, "videopcb:proms", 0 ) // not dumped for this set, on ORCA OVG-40c sub board
-	ROM_LOAD( "mmi6331.2a", 0x0000, 0x0020, CRC(69a35aa5) SHA1(fe494ed1ff642f95834dfca92e9c4494e04f7b81) )
-	ROM_LOAD( "mmi6331.2b", 0x0020, 0x0020, CRC(596ae457) SHA1(1c1a3130d88c5fd5c66ce9f91d97a09c0a0b535f) )
+	ROM_REGION( 0x0040, "videopcb:proms", 0 ) // on ORCA OVG-40c sub board
+	ROM_LOAD( "blue.2a.82s123", 0x0000, 0x0020, CRC(aa839a24) SHA1(9b8217e1c257d24e873888fd083c099fc93c7878) ) //doesn't match parent
+	ROM_LOAD( "pink.2b.82s123", 0x0020, 0x0020, CRC(596ae457) SHA1(1c1a3130d88c5fd5c66ce9f91d97a09c0a0b535f) )
 ROM_END
 
 ROM_START( pprobe )

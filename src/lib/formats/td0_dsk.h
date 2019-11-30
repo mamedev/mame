@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Miodrag Milanovic
-#ifndef TD0_DSK_H_
-#define TD0_DSK_H_
+#ifndef MAME_FORMATS_TD0_DSK_H
+#define MAME_FORMATS_TD0_DSK_H
+
+#pragma once
 
 #include "flopimg.h"
 
@@ -23,4 +25,4 @@ public:
 
 extern const floppy_format_type FLOPPY_TD0_FORMAT;
 
-#endif /* TD0_DSK_H_ */
+#endif // MAME_FORMATS_TD0_DSK_H

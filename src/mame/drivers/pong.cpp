@@ -4,6 +4,7 @@
 
 Pong (c) 1972 Atari
 Pong Doubles (c) 1973 Atari
+Rebound (c) 1974 Atari
 Breakout (c) 1976 Atari
 
 driver by Couriersud
@@ -27,6 +28,7 @@ driver by Couriersud
  TM-0??                   Dr. Pong/Puppy Pong/Snoopy Pong (1974)                          A001433?                           NO
  422,TM-029               Superpong (1974)                                                A000423                            NO
  TM-014,029               Pong Doubles/Coupe Davis (1973)                                 A000785                            NO
+ TM-001,023,029,032       Rebound/Spike/Volleyball (1974)                                 A000517,A000846,SPIKE-(A or B)     NO
  TM-058                   Breakout/Breakout Cocktail/Consolette (1976)                    A004533                            NO
 
 Notes:
@@ -41,6 +43,7 @@ TODO: Dr. Pong, Pong In-A-Barrel, Puppy Pong, Snoopy Pong, and Cocktail Pong are
       be verified.
 TODO: Superpong is believed to use the Pong (Rev E) PCB with some minor modifications, this
       needs to be verified.
+TODO: Volleyball...
 
 ***************************************************************************/
 
@@ -56,12 +59,14 @@ TODO: Superpong is believed to use the Pong (Rev E) PCB with some minor modifica
 #include "netlist/devices/net_lib.h"
 
 #include "machine/nl_breakout.h"
-#include "machine/nl_pong.h"
-#include "machine/nl_pongd.h"
+#include "machine/nl_rebound.h"
+#include "machine/nl_pongf.h"
+#include "machine/nl_pongdoubles.h"
 
 #include "screen.h"
 #include "speaker.h"
 
+#include "rebound.lh"
 #include "breakout.lh"
 
 #include <cmath>
@@ -87,11 +92,22 @@ TODO: Superpong is believed to use the Pong (Rev E) PCB with some minor modifica
 
  * Net at 256H alternating at 4V
  *
+ * Pong videos:
  *
- * http://www.youtube.com/watch?v=pDrRnJOCKZc
+ * https://www.youtube.com/watch?v=pDrRnJOCKZc (no longer available)
+ *
+ * https://www.youtube.com/watch?v=fiShX2pTz9A
+ * https://www.youtube.com/watch?v=YmzH4E3x1_g
+ *
+ * Breakout videos:
+ *
+ * https://www.youtube.com/watch?v=NOGO49j5gCE
+ *
  */
 
-#define MASTER_CLOCK    7159000
+static const int NS_PER_CLOCK_PONG  = static_cast<int>((double) NETLIST_INTERNAL_RES / (double) 7159000 + 0.5);
+static const int MASTER_CLOCK_PONG  = static_cast<int>((double) NETLIST_INTERNAL_RES / (double) NS_PER_CLOCK_PONG + 0.5);
+
 #define V_TOTAL_PONG    (0x105+1)       // 262
 #define H_TOTAL_PONG    (0x1C6+1)       // 454
 
@@ -110,17 +126,12 @@ TODO: Superpong is believed to use the Pong (Rev E) PCB with some minor modifica
  *
  */
 
-#define MASTER_CLOCK_BREAKOUT    (14318000 / 2)
+//#define MASTER_CLOCK_BREAKOUT    (14318000)
+static const int NS_PER_CLOCK_BREAKOUT           = static_cast<int>((double) NETLIST_INTERNAL_RES / (double) 14318000 + 0.5);
+static const int MASTER_CLOCK_BREAKOUT  = static_cast<int>((double) NETLIST_INTERNAL_RES / (double) NS_PER_CLOCK_BREAKOUT + 0.5);
 
-#define V_TOTAL_BREAKOUT         (0xFC)       // 252
-#define H_TOTAL_BREAKOUT         (448)    // 448
-
-#if 0
-#define HBSTART                 (H_TOTAL_PONG)
-#define HBEND                   (80)
-#define VBSTART                 (V_TOTAL_PONG)
-#define VBEND                   (16)
-#endif
+static const int V_TOTAL_BREAKOUT       = (0xFC);       // 252
+static const int H_TOTAL_BREAKOUT       = (448*2);      // 448
 
 enum input_changed_enum
 {
@@ -148,9 +159,14 @@ public:
 	required_device<fixedfreq_device> m_video;
 	required_device<dac_word_interface> m_dac; /* just to have a sound device */
 
-	NETDEV_ANALOG_CALLBACK_MEMBER(sound_cb)
+	NETDEV_ANALOG_CALLBACK_MEMBER(sound_cb_analog)
 	{
 		m_dac->write(std::round(16384 * data));
+	}
+
+	NETDEV_LOGIC_CALLBACK_MEMBER(sound_cb_logic)
+	{
+		m_dac->write(16384 * data);
 	}
 
 protected:
@@ -184,6 +200,15 @@ public:
 	void pongd(machine_config &config);
 	void pong(machine_config &config);
 	void pongf(machine_config &config);
+
+	NETLIST_START(pong)
+
+		MEMREGION_SOURCE("maincpu")
+		PARAM(NETLIST.USE_DEACTIVATE, 1)
+		INCLUDE(pong_schematics)
+
+	NETLIST_END()
+
 protected:
 
 	// driver_device overrides
@@ -260,17 +285,49 @@ private:
 
 };
 
-static NETLIST_START(pong)
+class rebound_state : public ttl_mono_state
+{
+public:
+	rebound_state(const machine_config &mconfig, device_type type, const char *tag)
+		: ttl_mono_state(mconfig, type, tag)
+		, m_sw1a(*this, "maincpu:dsw1a")
+		, m_sw1b(*this, "maincpu:dsw1b")
+	{
+	}
 
-	MEMREGION_SOURCE("maincpu")
-	PARAM(NETLIST.USE_DEACTIVATE, 1)
-	INCLUDE(pong_schematics)
+	// sub devices
+	required_device<netlist_mame_logic_input_device> m_sw1a;
+	required_device<netlist_mame_logic_input_device> m_sw1b;
 
-NETLIST_END()
+	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
+
+	NETDEV_ANALOG_CALLBACK_MEMBER(led_credit_cb)
+	{
+		output().set_value("credit_led", (data < 3.5) ? 1 : 0);
+	}
+
+	NETDEV_ANALOG_CALLBACK_MEMBER(coin_counter_cb)
+	{
+		machine().bookkeeping().coin_counter_w(0, (data < 1.0));
+	}
+
+	void rebound(machine_config &config);
+
+protected:
+
+	// driver_device overrides
+	virtual void machine_start() override { };
+	virtual void machine_reset() override { };
+	virtual void video_start() override  { };
+
+private:
+
+};
+
 
 INPUT_CHANGED_MEMBER(pong_state::input_changed)
 {
-	int numpad = uintptr_t(param);
+	int numpad = param;
 
 	switch (numpad)
 	{
@@ -280,6 +337,20 @@ INPUT_CHANGED_MEMBER(pong_state::input_changed)
 		break;
 	}
 }
+
+INPUT_CHANGED_MEMBER(rebound_state::input_changed)
+{
+	int numpad = param;
+
+	switch (numpad)
+	{
+	case IC_SWITCH:
+		m_sw1a->write(newval ? 1 : 0);
+		m_sw1b->write(newval ? 1 : 0);
+		break;
+	}
+}
+
 
 static INPUT_PORTS_START( pong )
 	PORT_START( "PADDLE0" ) /* fake input port for player 1 paddle */
@@ -375,138 +446,212 @@ static INPUT_PORTS_START( breakout )
 
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(pong_state::pong)
+static INPUT_PORTS_START( rebound )
+// FIXME later
+	PORT_START( "PADDLE0" ) /* fake input port for player 1 paddle */
+	PORT_BIT( 0xff, 0x00, IPT_PADDLE ) PORT_SENSITIVITY(1) PORT_KEYDELTA(100) PORT_CENTERDELTA(0)   NETLIST_ANALOG_PORT_CHANGED("maincpu", "pot1")
 
+	PORT_START( "PADDLE1" ) /* fake input port for player 2 paddle */
+	PORT_BIT( 0xff, 0x00, IPT_PADDLE ) PORT_SENSITIVITY(1) PORT_KEYDELTA(100) PORT_CENTERDELTA(0) PORT_PLAYER(2) NETLIST_ANALOG_PORT_CHANGED("maincpu", "pot2")
+
+	PORT_START("IN0") /* fake as well */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )     NETLIST_LOGIC_PORT_CHANGED("maincpu", "coinsw")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 )     NETLIST_LOGIC_PORT_CHANGED("maincpu", "startsw")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE )  PORT_NAME("Antenna") NETLIST_LOGIC_PORT_CHANGED("maincpu", "antenna")
+
+	PORT_START("DIPS")
+	PORT_DIPNAME( 0x03, 0x00, "Game Won" )          PORT_DIPLOCATION("SW1A:1,SW1A:2") PORT_CHANGED_MEMBER(DEVICE_SELF, rebound_state, input_changed, IC_SWITCH)
+	PORT_DIPSETTING(    0x00, "11" )
+	PORT_DIPSETTING(    0x03, "15" )
+
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1A:3") NETLIST_LOGIC_PORT_CHANGED("maincpu", "dsw2")
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
+INPUT_PORTS_END
+
+
+void pong_state::pong(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)
-	MCFG_NETLIST_SETUP(pong)
+	NETLIST_CPU(config, "maincpu", NETLIST_CLOCK).set_source(this, &pong_state::NETLIST_NAME(pong));
 
-	MCFG_NETLIST_ANALOG_INPUT("maincpu", "vr0", "ic_b9_R.R")
-	MCFG_NETLIST_ANALOG_MULT_OFFSET(1.0 / 100.0 * RES_K(50), RES_K(56) )
-	MCFG_NETLIST_ANALOG_INPUT("maincpu", "vr1", "ic_a9_R.R")
-	MCFG_NETLIST_ANALOG_MULT_OFFSET(1.0 / 100.0 * RES_K(50), RES_K(56) )
-	MCFG_NETLIST_ANALOG_INPUT("maincpu", "pot0", "ic_b9_POT.DIAL")
-	MCFG_NETLIST_ANALOG_INPUT("maincpu", "pot1", "ic_a9_POT.DIAL")
-	MCFG_NETLIST_LOGIC_INPUT("maincpu", "sw1a", "sw1a.POS", 0)
-	MCFG_NETLIST_LOGIC_INPUT("maincpu", "sw1b", "sw1b.POS", 0)
-	MCFG_NETLIST_LOGIC_INPUT("maincpu", "coinsw", "coinsw.POS", 0)
-	MCFG_NETLIST_LOGIC_INPUT("maincpu", "antenna", "antenna.IN", 0)
+	NETLIST_ANALOG_INPUT(config, "maincpu:vr0", "ic_b9_R.R").set_mult_offset(1.0 / 100.0 * RES_K(50), RES_K(56) );
+	NETLIST_ANALOG_INPUT(config, "maincpu:vr1", "ic_a9_R.R").set_mult_offset(1.0 / 100.0 * RES_K(50), RES_K(56) );
+	NETLIST_ANALOG_INPUT(config, "maincpu:pot0", "ic_b9_POT.DIAL");
+	NETLIST_ANALOG_INPUT(config, "maincpu:pot1", "ic_a9_POT.DIAL");
+	NETLIST_LOGIC_INPUT(config, "maincpu:sw1a", "sw1a.POS", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:sw1b", "sw1b.POS", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:coinsw", "coinsw.POS", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:antenna", "antenna.IN", 0);
 
-	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "snd0", "sound", pong_state, sound_cb, "")
-	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "vid0", "videomix", fixedfreq_device, update_vid, "fixfreq")
+	NETLIST_LOGIC_OUTPUT(config, "maincpu:snd0", 0).set_params("sound", FUNC(pong_state::sound_cb_logic));
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:vid0", 0).set_params("videomix", "fixfreq", FUNC(fixedfreq_device::update_composite_monochrome));
 
 	/* video hardware */
-	MCFG_FIXFREQ_ADD("fixfreq", "screen")
-	MCFG_FIXFREQ_MONITOR_CLOCK(MASTER_CLOCK)
-	MCFG_FIXFREQ_HORZ_PARAMS(H_TOTAL_PONG-67,H_TOTAL_PONG-40,H_TOTAL_PONG-8,H_TOTAL_PONG)
-	MCFG_FIXFREQ_VERT_PARAMS(V_TOTAL_PONG-22,V_TOTAL_PONG-19,V_TOTAL_PONG-12,V_TOTAL_PONG)
-	MCFG_FIXFREQ_FIELDCOUNT(1)
-	MCFG_FIXFREQ_SYNC_THRESHOLD(0.11)
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	//SCREEN(config, "screen", SCREEN_TYPE_VECTOR);
+	FIXFREQ(config, m_video).set_screen("screen");
+	m_video->set_monitor_clock(MASTER_CLOCK_PONG);
+	m_video->set_horz_params(H_TOTAL_PONG-67,H_TOTAL_PONG-40,H_TOTAL_PONG-8,H_TOTAL_PONG);
+	m_video->set_vert_params(V_TOTAL_PONG-22,V_TOTAL_PONG-19,V_TOTAL_PONG-12,V_TOTAL_PONG);
+	m_video->set_fieldcount(1);
+	m_video->set_threshold(0.11);
+	m_video->set_horz_scale(4);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
-MACHINE_CONFIG_START(breakout_state::breakout)
-
+void breakout_state::breakout(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)
-	MCFG_NETLIST_SETUP(breakout)
+	NETLIST_CPU(config, "maincpu", NETLIST_CLOCK).set_source(NETLIST_NAME(breakout));
 
-	MCFG_NETLIST_ANALOG_INPUT("maincpu", "pot1", "POTP1.DIAL")
-	MCFG_NETLIST_ANALOG_INPUT("maincpu", "pot2", "POTP2.DIAL")
-	MCFG_NETLIST_LOGIC_INPUT("maincpu", "coinsw1", "COIN1.POS", 0)
-	MCFG_NETLIST_LOGIC_INPUT("maincpu", "coinsw2", "COIN2.POS", 0)
-	MCFG_NETLIST_LOGIC_INPUT("maincpu", "startsw1", "START1.POS", 0)
-	MCFG_NETLIST_LOGIC_INPUT("maincpu", "startsw2", "START2.POS", 0)
-	MCFG_NETLIST_LOGIC_INPUT("maincpu", "servesw", "SERVE.POS", 0)
-	MCFG_NETLIST_LOGIC_INPUT("maincpu", "sw4", "S4.POS", 0)
-	MCFG_NETLIST_LOGIC_INPUT("maincpu", "sw3", "S3.POS", 0)
-	MCFG_NETLIST_LOGIC_INPUT("maincpu", "sw2", "S2.POS", 0)
+	NETLIST_ANALOG_INPUT(config, "maincpu:pot1", "POTP1.DIAL");
+	NETLIST_ANALOG_INPUT(config, "maincpu:pot2", "POTP2.DIAL");
+	NETLIST_LOGIC_INPUT(config, "maincpu:coinsw1", "COIN1.POS", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:coinsw2", "COIN2.POS", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:startsw1", "START1.POS", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:startsw2", "START2.POS", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:servesw", "SERVE.POS", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:sw4", "S4.POS", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:sw3", "S3.POS", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:sw2", "S2.POS", 0);
 
-	MCFG_NETLIST_LOGIC_INPUT("maincpu", "sw1_1", "S1_1.POS", 0)
-	MCFG_NETLIST_LOGIC_INPUT("maincpu", "sw1_2", "S1_2.POS", 0)
-	MCFG_NETLIST_LOGIC_INPUT("maincpu", "sw1_3", "S1_3.POS", 0)
-	MCFG_NETLIST_LOGIC_INPUT("maincpu", "sw1_4", "S1_4.POS", 0)
+	NETLIST_LOGIC_INPUT(config, "maincpu:sw1_1", "S1_1.POS", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:sw1_2", "S1_2.POS", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:sw1_3", "S1_3.POS", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:sw1_4", "S1_4.POS", 0);
 
-	MCFG_NETLIST_LOGIC_INPUT("maincpu", "antenna", "antenna.IN", 0)
+	NETLIST_LOGIC_INPUT(config, "maincpu:antenna", "antenna.IN", 0);
 
-	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "snd0", "sound", breakout_state, sound_cb, "")
-	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "vid0", "videomix", fixedfreq_device, update_vid, "fixfreq")
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:snd0", 0).set_params("sound", FUNC(breakout_state::sound_cb_analog));
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:vid0", 0).set_params("videomix", "fixfreq", FUNC(fixedfreq_device::update_composite_monochrome));
 
 	// Leds and lamps
 
-	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "led_serve", "CON_P", breakout_state, serve_cb, "")
-	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "lamp_credit1", "CON_CREDIT1", breakout_state, credit1_cb, "")
-	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "lamp_credit2", "CON_CREDIT2", breakout_state, credit2_cb, "")
-	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "coin_counter", "CON_T", breakout_state, coin_counter_cb, "")
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:led_serve", 0).set_params("CON_P", FUNC(breakout_state::serve_cb));
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:lamp_credit1", 0).set_params("CON_CREDIT1", FUNC(breakout_state::credit1_cb));
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:lamp_credit2", 0).set_params("CON_CREDIT2", FUNC(breakout_state::credit2_cb));
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:coin_counter", 0).set_params("CON_T", FUNC(breakout_state::coin_counter_cb));
 
 	/* video hardware */
-	MCFG_FIXFREQ_ADD("fixfreq", "screen")
+	FIXFREQ(config, m_video).set_screen("screen");
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	//SCREEN(config, "screen", SCREEN_TYPE_VECTOR);
 	/* The Pixel width is a 2,1,2,1,2,1,1,1 repeating pattern
 	 * Thus we must use double resolution horizontally
 	 */
-	MCFG_FIXFREQ_MONITOR_CLOCK(MASTER_CLOCK_BREAKOUT*2)
-	MCFG_FIXFREQ_HORZ_PARAMS((H_TOTAL_BREAKOUT-104)*2,(H_TOTAL_BREAKOUT-72)*2,(H_TOTAL_BREAKOUT-8)*2,  (H_TOTAL_BREAKOUT)*2)
-	MCFG_FIXFREQ_VERT_PARAMS(V_TOTAL_BREAKOUT-22,V_TOTAL_BREAKOUT-23,V_TOTAL_BREAKOUT-4, V_TOTAL_BREAKOUT)
-	MCFG_FIXFREQ_FIELDCOUNT(1)
-	MCFG_FIXFREQ_SYNC_THRESHOLD(1.0)
-	MCFG_FIXFREQ_GAIN(1.5)
+	m_video->set_monitor_clock(MASTER_CLOCK_BREAKOUT);
+	m_video->set_horz_params((H_TOTAL_BREAKOUT-208),(H_TOTAL_BREAKOUT-144),(H_TOTAL_BREAKOUT-16),  (H_TOTAL_BREAKOUT));
+	m_video->set_vert_params(V_TOTAL_BREAKOUT-22,V_TOTAL_BREAKOUT-23,V_TOTAL_BREAKOUT-4, V_TOTAL_BREAKOUT);
+	m_video->set_fieldcount(1);
+	m_video->set_threshold(1.0);
+	m_video->set_gain(1.5);
+	m_video->set_horz_scale(2);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
-MACHINE_CONFIG_START(pong_state::pongf)
+void pong_state::pongf(machine_config &config)
+{
 	pong(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_NETLIST_SETUP(pong_fast)
 
-MACHINE_CONFIG_END
+	subdevice<netlist_mame_device>("maincpu")->set_setup_func(NETLIST_NAME(pongf));
+}
 
-MACHINE_CONFIG_START(pong_state::pongd)
-
+void pong_state::pongd(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)
-	MCFG_NETLIST_SETUP(pongdoubles)
+	NETLIST_CPU(config, "maincpu", NETLIST_CLOCK).set_source(NETLIST_NAME(pongdoubles));
 
-	MCFG_NETLIST_ANALOG_INPUT("maincpu", "pot0", "A10_POT.DIAL")
-	MCFG_NETLIST_ANALOG_INPUT("maincpu", "pot1", "B10_POT.DIAL")
-	MCFG_NETLIST_ANALOG_INPUT("maincpu", "pot2", "B9B_POT.DIAL")
-	MCFG_NETLIST_ANALOG_INPUT("maincpu", "pot3", "B9A_POT.DIAL")
-	MCFG_NETLIST_LOGIC_INPUT("maincpu", "sw1a", "DIPSW1.POS", 0)
-	MCFG_NETLIST_LOGIC_INPUT("maincpu", "sw1b", "DIPSW2.POS", 0)
-	MCFG_NETLIST_LOGIC_INPUT("maincpu", "coinsw", "COIN_SW.POS", 0)
-	MCFG_NETLIST_LOGIC_INPUT("maincpu", "startsw", "START_SW.POS", 0)
+	NETLIST_ANALOG_INPUT(config, "maincpu:pot0", "A10_POT.DIAL");
+	NETLIST_ANALOG_INPUT(config, "maincpu:pot1", "B10_POT.DIAL");
+	NETLIST_ANALOG_INPUT(config, "maincpu:pot2", "B9B_POT.DIAL");
+	NETLIST_ANALOG_INPUT(config, "maincpu:pot3", "B9A_POT.DIAL");
+	NETLIST_LOGIC_INPUT(config, "maincpu:sw1a", "DIPSW1.POS", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:sw1b", "DIPSW2.POS", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:coinsw", "COIN_SW.POS", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:startsw", "START_SW.POS", 0);
+
 #if 0
-	MCFG_NETLIST_LOGIC_INPUT("maincpu", "antenna", "antenna.IN", 0, 0x01)
+	NETLIST_LOGIC_INPUT(config, "maincpu:antenna", "antenna.IN", 0, 0x01)
 #endif
 
-	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "snd0", "AUDIO", pong_state, sound_cb, "")
-	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "vid0", "videomix", fixedfreq_device, update_vid, "fixfreq")
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:snd0", 0).set_params("AUDIO", FUNC(pong_state::sound_cb_analog));
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:vid0", 0).set_params("videomix", "fixfreq", FUNC(fixedfreq_device::update_composite_monochrome));
 
 	/* video hardware */
-	MCFG_FIXFREQ_ADD("fixfreq", "screen")
-	MCFG_FIXFREQ_MONITOR_CLOCK(MASTER_CLOCK)
-	MCFG_FIXFREQ_HORZ_PARAMS(H_TOTAL_PONG-67,H_TOTAL_PONG-52,H_TOTAL_PONG-8,H_TOTAL_PONG)
-	MCFG_FIXFREQ_VERT_PARAMS(V_TOTAL_PONG-22,V_TOTAL_PONG-19,V_TOTAL_PONG-12,V_TOTAL_PONG)
-	MCFG_FIXFREQ_FIELDCOUNT(1)
-	MCFG_FIXFREQ_SYNC_THRESHOLD(0.11)
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	FIXFREQ(config, m_video).set_screen("screen");
+	m_video->set_monitor_clock(MASTER_CLOCK_PONG);
+	m_video->set_horz_params(H_TOTAL_PONG-67,H_TOTAL_PONG-52,H_TOTAL_PONG-8,H_TOTAL_PONG);
+	m_video->set_vert_params(V_TOTAL_PONG-22,V_TOTAL_PONG-19,V_TOTAL_PONG-12,V_TOTAL_PONG);
+	m_video->set_fieldcount(1);
+	m_video->set_threshold(0.11);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
+
+void rebound_state::rebound(machine_config &config)
+{
+	/* basic machine hardware */
+	NETLIST_CPU(config, "maincpu", NETLIST_CLOCK).set_source(NETLIST_NAME(rebound));
+
+	// FIXME: Later
+	NETLIST_ANALOG_INPUT(config, "maincpu:pot1", "POTP1.DIAL");
+	NETLIST_ANALOG_INPUT(config, "maincpu:pot2", "POTP2.DIAL");
+	NETLIST_LOGIC_INPUT(config, "maincpu:antenna", "antenna.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:coinsw", "COIN1_SW.POS", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:startsw", "START_SW.POS", 0);
+
+	NETLIST_LOGIC_INPUT(config, "maincpu:dsw1a", "DSW1a.POS", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:dsw1b", "DSW1b.POS", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:dsw2", "DSW2.POS", 0);
+
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:snd0", 0).set_params("sound", FUNC(rebound_state::sound_cb_analog));
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:vid0", 0).set_params("videomix", "fixfreq", FUNC(fixedfreq_device::update_composite_monochrome));
+
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:led_credit", 0).set_params("CON11", FUNC(rebound_state::led_credit_cb));
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:coin_counter", 0).set_params("CON10", FUNC(rebound_state::coin_counter_cb));
+
+	/* video hardware */
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	FIXFREQ(config, m_video).set_screen("screen");
+	m_video->set_monitor_clock(MASTER_CLOCK_PONG);
+	//m_video->set_horz_params(H_TOTAL_PONG-67,H_TOTAL_PONG-40,H_TOTAL_PONG-8,H_TOTAL_PONG);
+	m_video->set_horz_params(H_TOTAL_PONG-51,H_TOTAL_PONG-40,H_TOTAL_PONG-8,H_TOTAL_PONG);
+	m_video->set_vert_params(V_TOTAL_PONG-22,V_TOTAL_PONG-19,V_TOTAL_PONG-12,V_TOTAL_PONG);
+	m_video->set_fieldcount(1);
+	m_video->set_threshold(1.0);
+	m_video->set_gain(0.6);
+	m_video->set_horz_scale(2);
+
+	/* sound hardware */
+	SPEAKER(config, "speaker").front_center();
+	//FIXME: this is not related to reality at all.
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
+
 
 /***************************************************************************
 
@@ -516,7 +661,7 @@ MACHINE_CONFIG_END
 
 ROM_START( pong ) /* dummy to satisfy game entry*/
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* enough for netlist */
-	ROM_LOAD( "pong.netlist", 0x000000, 0x00457f, CRC(72d5e4fe) SHA1(7bb15828223c34915c5e2869dd7917532a4bb7b4) )
+	ROM_LOAD( "pong.netlist", 0x000000, 0x00473b, CRC(eadaf087) SHA1(4cb9a79f5cb53502105974be61b99ff16ee930e9) )
 ROM_END
 
 ROM_START( breakout )
@@ -530,6 +675,11 @@ ROM_END
 ROM_START( pongd ) /* dummy to satisfy game entry*/
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
+
+ROM_START( rebound ) /* dummy to satisfy game entry*/
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+ROM_END
+
 
 /*   // 100% TTL - NO ROMS
 
@@ -573,15 +723,18 @@ ROM_END
 GAME(  1972, pong,      0, pong,     pong,      pong_state,     empty_init, ROT0,  "Atari", "Pong (Rev E) external [TTL]", MACHINE_SUPPORTS_SAVE)
 GAME(  1972, pongf,     0, pongf,    pong,      pong_state,     empty_init, ROT0,  "Atari", "Pong (Rev E) [TTL]", MACHINE_SUPPORTS_SAVE)
 GAME(  1973, pongd,     0, pongd,    pongd,     pong_state,     empty_init, ROT0,  "Atari", "Pong Doubles [TTL]", MACHINE_SUPPORTS_SAVE)
+GAMEL( 1974, rebound,   0, rebound,  rebound,   rebound_state,  empty_init, ROT0,  "Atari", "Rebound (Rev B) [TTL]", MACHINE_SUPPORTS_SAVE, layout_rebound)
 GAMEL( 1976, breakout,  0, breakout, breakout,  breakout_state, empty_init, ROT90, "Atari", "Breakout [TTL]", MACHINE_SUPPORTS_SAVE, layout_breakout)
 
 // 100% TTL
-//GAME( 1973, coupedav,   pongd,    pongd,    pongd,     driver_device, empty_init, ROT0,  "Atari France", "Coupe Davis [TTL]", MACHINE_SUPPORTS_SAVE)
-//GAME( 1973, pongbarl,   pong,     pong,     pong,      driver_device, empty_init, ROT0,  "Atari", "Pong In-A-Barrel [TTL]", MACHINE_SUPPORTS_SAVE)
-//GAME( 1974, cktpong,    pong,     pong,     pong,      driver_device, empty_init, ROT0,  "Atari / National Entertainment Co.", "Cocktail Pong [TTL]", MACHINE_SUPPORTS_SAVE)
-//GAME( 1974, drpong,     pong,     pong,     pong,      driver_device, empty_init, ROT0,  "Atari", "Dr. Pong [TTL]", MACHINE_SUPPORTS_SAVE)
-//GAME( 1974, pupppong,   pong,     pong,     pong,      driver_device, empty_init, ROT0,  "Atari", "Puppy Pong [TTL]", MACHINE_SUPPORTS_SAVE)
-//GAME( 1974, snoopong,   pong,     pong,     pong,      driver_device, empty_init, ROT0,  "Atari", "Snoopy Pong [TTL]", MACHINE_SUPPORTS_SAVE)
-//GAME( 1974, suprpong,   0,        suprpong, pong,      driver_device, empty_init, ROT0,  "Atari", "Superpong [TTL]", MACHINE_SUPPORTS_SAVE)
-//GAMEL( 1976, breakckt,  breakout, breakout, breakout,  driver_device, empty_init, ROT90, "Atari", "Breakout Cocktail [TTL]", MACHINE_SUPPORTS_SAVE, layout_breakckt)
-//GAMEL( 1976, consolet,  breakout, breakout, breakout,  driver_device, empty_init, ROT90, "Atari Europe", "Consolette [TTL]", MACHINE_SUPPORTS_SAVE, layout_consolet)
+//GAMEL(1974, spike,      rebound,  rebound,  rebound,  rebound_state,  empty_init, ROT0,  "Atari/Kee", "Spike [TTL]", MACHINE_IS_SKELETON)
+//GAMEL(1974, volleyball, rebound,  rebound,  rebound,  rebound_state,  empty_init, ROT0,  "Atari", "Volleyball [TTL]", MACHINE_IS_SKELETON)
+//GAME( 1973, coupedav,   pongd,    pongd,    pongd,    pong_state,     empty_init, ROT0,  "Atari France", "Coupe Davis [TTL]", MACHINE_SUPPORTS_SAVE)
+//GAME( 1973, pongbarl,   pong,     pong,     pong,     pong_state,     empty_init, ROT0,  "Atari", "Pong In-A-Barrel [TTL]", MACHINE_SUPPORTS_SAVE)
+//GAME( 1974, cktpong,    pong,     pong,     pong,     pong_state,     empty_init, ROT0,  "Atari / National Entertainment Co.", "Cocktail Pong [TTL]", MACHINE_SUPPORTS_SAVE)
+//GAME( 1974, drpong,     pong,     pong,     pong,     pong_state,     empty_init, ROT0,  "Atari", "Dr. Pong [TTL]", MACHINE_SUPPORTS_SAVE)
+//GAME( 1974, pupppong,   pong,     pong,     pong,     pong_state,     empty_init, ROT0,  "Atari", "Puppy Pong [TTL]", MACHINE_SUPPORTS_SAVE)
+//GAME( 1974, snoopong,   pong,     pong,     pong,     pong_state,     empty_init, ROT0,  "Atari", "Snoopy Pong [TTL]", MACHINE_SUPPORTS_SAVE)
+//GAME( 1974, suprpong,   0,        suprpong, pong,     pong_state,     empty_init, ROT0,  "Atari", "Superpong [TTL]", MACHINE_SUPPORTS_SAVE)
+//GAMEL( 1976, breakckt,  breakout, breakout, breakout, breakout_state, empty_init, ROT90, "Atari", "Breakout Cocktail [TTL]", MACHINE_SUPPORTS_SAVE, layout_breakckt)
+//GAMEL( 1976, consolet,  breakout, breakout, breakout, breakout_state, empty_init, ROT90, "Atari Europe", "Consolette [TTL]", MACHINE_SUPPORTS_SAVE, layout_consolet)

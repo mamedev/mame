@@ -103,55 +103,6 @@
 
 
 //**************************************************************************
-//  CONSTANTS
-//**************************************************************************
-
-#define ABCBUS_TAG          "bus"
-
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_ABCBUS_SLOT_ADD(_tag, _slot_intf, _def_slot) \
-	MCFG_DEVICE_ADD(_tag, ABCBUS_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
-
-
-#define MCFG_ABCBUS_SLOT_IRQ_CALLBACK(_irq) \
-	downcast<abcbus_slot_device *>(device)->set_irq_callback(DEVCB_##_irq);
-
-#define MCFG_ABCBUS_SLOT_NMI_CALLBACK(_nmi) \
-	downcast<abcbus_slot_device *>(device)->set_nmi_callback(DEVCB_##_nmi);
-
-#define MCFG_ABCBUS_SLOT_RDY_CALLBACK(_rdy) \
-	downcast<abcbus_slot_device *>(device)->set_rdy_callback(DEVCB_##_rdy);
-
-#define MCFG_ABCBUS_SLOT_RESIN_CALLBACK(_resin) \
-	downcast<abcbus_slot_device *>(device)->set_resin_callback(DEVCB_##_resin);
-
-#define MCFG_ABCBUS_SLOT_PREN_CALLBACK(_pren) \
-	downcast<abcbus_slot_device *>(device)->set_pren_callback(DEVCB_##_pren);
-
-#define MCFG_ABCBUS_SLOT_TRRQ_CALLBACK(_trrq) \
-	downcast<abcbus_slot_device *>(device)->set_trrq_callback(DEVCB_##_trrq);
-
-#define MCFG_ABCBUS_SLOT_XINT2_CALLBACK(_xint2) \
-	downcast<abcbus_slot_device *>(device)->set_xint2_callback(DEVCB_##_xint2);
-
-#define MCFG_ABCBUS_SLOT_XINT3_CALLBACK(_xint3) \
-	downcast<abcbus_slot_device *>(device)->set_xint3_callback(DEVCB_##_xint3);
-
-#define MCFG_ABCBUS_SLOT_XINT4_CALLBACK(_xint4) \
-	downcast<abcbus_slot_device *>(device)->set_xint4_callback(DEVCB_##_xint4);
-
-#define MCFG_ABCBUS_SLOT_XINT5_CALLBACK(_xint5) \
-	downcast<abcbus_slot_device *>(device)->set_xint5_callback(DEVCB_##_xint5);
-
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -159,35 +110,35 @@
 
 class abcbus_slot_device;
 
-class device_abcbus_card_interface : public device_slot_card_interface
+class device_abcbus_card_interface : public device_interface
 {
 public:
 	// required operation overrides
 	virtual void abcbus_cs(uint8_t data) = 0;
 
 	// optional operation overrides
-	virtual uint8_t abcbus_inp() { return 0xff; };
-	virtual void abcbus_out(uint8_t data) { };
-	virtual uint8_t abcbus_stat() { return 0xff; };
-	virtual void abcbus_c1(uint8_t data) { };
-	virtual void abcbus_c2(uint8_t data) { };
-	virtual void abcbus_c3(uint8_t data) { };
-	virtual void abcbus_c4(uint8_t data) { };
+	virtual uint8_t abcbus_inp() { return 0xff; }
+	virtual void abcbus_out(uint8_t data) { }
+	virtual uint8_t abcbus_stat() { return 0xff; }
+	virtual void abcbus_c1(uint8_t data) { }
+	virtual void abcbus_c2(uint8_t data) { }
+	virtual void abcbus_c3(uint8_t data) { }
+	virtual void abcbus_c4(uint8_t data) { }
 
 	// optional operation overrides for ABC 80
-	virtual uint8_t abcbus_xmemfl(offs_t offset) { return 0xff; };
-	virtual void abcbus_xmemw(offs_t offset, uint8_t data) { };
+	virtual uint8_t abcbus_xmemfl(offs_t offset) { return 0xff; }
+	virtual void abcbus_xmemw(offs_t offset, uint8_t data) { }
 
 	// optional operation overrides for ABC 1600
 	virtual int abcbus_csb() { return 1; }
-	virtual uint8_t abcbus_ops() { return 0xff; };
-	virtual void abcbus_tren(int state) { };
-	virtual void abcbus_prac(int state) { };
-	virtual uint8_t abcbus_exp() { return 0xff; };
-	virtual int abcbus_xcsb2() { return 1; };
-	virtual int abcbus_xcsb3() { return 1; };
-	virtual int abcbus_xcsb4() { return 1; };
-	virtual int abcbus_xcsb5() { return 1; };
+	virtual uint8_t abcbus_ops() { return 0xff; }
+	virtual void abcbus_tren(int state) { }
+	virtual void abcbus_prac(int state) { }
+	virtual uint8_t abcbus_exp() { return 0xff; }
+	virtual int abcbus_xcsb2() { return 1; }
+	virtual int abcbus_xcsb3() { return 1; }
+	virtual int abcbus_xcsb4() { return 1; }
+	virtual int abcbus_xcsb5() { return 1; }
 
 protected:
 	// construction/destruction
@@ -202,22 +153,31 @@ protected:
 // ======================> abcbus_slot_device
 
 class abcbus_slot_device : public device_t,
-							public device_slot_interface
+							public device_single_card_slot_interface<device_abcbus_card_interface>
 {
 public:
 	// construction/destruction
 	abcbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T>
+	abcbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&opts, const char *dflt)
+		: abcbus_slot_device(mconfig, tag, owner, clock)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
 
-	template <class Object> devcb_base &set_irq_callback(Object &&cb) { return m_write_irq.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_nmi_callback(Object &&cb) { return m_write_nmi.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_rdy_callback(Object &&cb) { return m_write_rdy.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_resin_callback(Object &&cb) { return m_write_resin.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_pren_callback(Object &&cb) { return m_write_pren.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_trrq_callback(Object &&cb) { return m_write_trrq.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_xint2_callback(Object &&cb) { return m_write_xint2.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_xint3_callback(Object &&cb) { return m_write_xint3.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_xint4_callback(Object &&cb) { return m_write_xint4.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_xint5_callback(Object &&cb) { return m_write_xint5.set_callback(std::forward<Object>(cb)); }
+	auto irq_callback() { return m_write_irq.bind(); }
+	auto nmi_callback() { return m_write_nmi.bind(); }
+	auto rdy_callback() { return m_write_rdy.bind(); }
+	auto resin_callback() { return m_write_resin.bind(); }
+	auto pren_callback() { return m_write_pren.bind(); }
+	auto trrq_callback() { return m_write_trrq.bind(); }
+	auto xint2_callback() { return m_write_xint2.bind(); }
+	auto xint3_callback() { return m_write_xint3.bind(); }
+	auto xint4_callback() { return m_write_xint4.bind(); }
+	auto xint5_callback() { return m_write_xint5.bind(); }
 
 	// computer interface
 	void write_cs(uint8_t data) { if (m_card) m_card->abcbus_cs(data); }
@@ -277,7 +237,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override { if (m_card) get_card_device()->reset(); }
 
 	devcb_write_line   m_write_irq;
 	devcb_write_line   m_write_nmi;

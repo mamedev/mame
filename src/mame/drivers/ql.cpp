@@ -80,7 +80,7 @@
 #include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs48/mcs48.h"
-#include "machine/microdrv.h"
+#include "imagedev/microdrv.h"
 #include "machine/qimi.h"
 #include "machine/ram.h"
 #include "machine/zx8302.h"
@@ -145,7 +145,7 @@ public:
 
 private:
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_ipc;
+	required_device<i8749_device> m_ipc;
 	required_device<zx8301_device> m_zx8301;
 	required_device<zx8302_device> m_zx8302;
 	required_device<speaker_sound_device> m_speaker;
@@ -254,15 +254,15 @@ READ8_MEMBER( ql_state::read )
 	}
 	if (m_qimi_enabled)
 	{
-		data = m_qimi->read(space, offset, data);
+		data = m_qimi->read(offset, data);
 	}
 
 	m_cart->romoeh_w(cart_romoeh);
-	data = m_cart->read(space, offset & 0x7fff, data);
+	data = m_cart->read(offset & 0x7fff, data);
 	m_cart->romoeh_w(0);
 
 	m_exp->romoeh_w(exp_romoeh);
-	data = m_exp->read(space, offset, data);
+	data = m_exp->read(offset, data);
 	m_exp->romoeh_w(0);
 
 	return data;
@@ -309,14 +309,14 @@ WRITE8_MEMBER( ql_state::write )
 	}
 	if (m_qimi_enabled)
 	{
-		m_qimi->write(space, offset, data);
+		m_qimi->write(offset, data);
 	}
 
 	m_cart->romoeh_w(0);
-	m_cart->write(space, offset & 0x7fff, data);
+	m_cart->write(offset & 0x7fff, data);
 
 	m_exp->romoeh_w(0);
-	m_exp->write(space, offset, data);
+	m_exp->write(offset, data);
 }
 
 
@@ -895,103 +895,103 @@ void ql_state::machine_reset()
 //**************************************************************************
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( ql )
+//  machine_config( ql )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(ql_state::ql)
+void ql_state::ql(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD(M68008_TAG, M68008, X1/2)
-	MCFG_DEVICE_PROGRAM_MAP(ql_mem)
+	M68008(config, m_maincpu, X1/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ql_state::ql_mem);
 
-	MCFG_DEVICE_ADD(I8749_TAG, I8749, X4)
-	MCFG_DEVICE_IO_MAP(ipc_io)
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, ql_state, ipc_port1_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, ql_state, ipc_port2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, ql_state, ipc_port2_w))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, ql_state, ipc_t1_r))
-	MCFG_MCS48_PORT_BUS_IN_CB(READ8(*this, ql_state, ipc_bus_r))
+	I8749(config, m_ipc, X4);
+	m_ipc->set_addrmap(AS_IO, &ql_state::ipc_io);
+	m_ipc->p1_out_cb().set(FUNC(ql_state::ipc_port1_w));
+	m_ipc->p2_in_cb().set(FUNC(ql_state::ipc_port2_r));
+	m_ipc->p2_out_cb().set(FUNC(ql_state::ipc_port2_w));
+	m_ipc->t1_in_cb().set(FUNC(ql_state::ipc_t1_r));
+	m_ipc->bus_in_cb().set(FUNC(ql_state::ipc_bus_r));
 
 	// video hardware
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50.08)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
-	MCFG_SCREEN_UPDATE_DEVICE(ZX8301_TAG, zx8301_device, screen_update)
-	MCFG_SCREEN_SIZE(960, 312)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50.08);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
+	screen.set_screen_update(ZX8301_TAG, FUNC(zx8301_device::screen_update));
+	screen.set_size(960, 312);
+	screen.set_visarea(0, 512-1, 0, 256-1);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	// devices
-	MCFG_DEVICE_ADD(ZX8301_TAG, ZX8301, X1, M68008_TAG)
-	MCFG_ZX8301_VSYNC_CALLBACK(WRITELINE(ZX8302_TAG, zx8302_device, vsync_w))
+	ZX8301(config, m_zx8301, X1, m_maincpu);
+	m_zx8301->vsync_wr_callback().set(m_zx8302, FUNC(zx8302_device::vsync_w));
+	m_zx8301->set_screen(SCREEN_TAG);
 
-	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
-
-	MCFG_DEVICE_ADD(ZX8302_TAG, ZX8302, X1)
-	MCFG_ZX8302_RTC_CLOCK(X2)
-	MCFG_ZX8302_OUT_IPL1L_CB(INPUTLINE(M68008_TAG, M68K_IRQ_2))
-	MCFG_ZX8302_OUT_BAUDX4_CB(WRITELINE(*this, ql_state, ql_baudx4_w))
-	MCFG_ZX8302_OUT_COMDATA_CB(WRITELINE(*this, ql_state, ql_comdata_w))
+	ZX8302(config, m_zx8302, X1);
+	m_zx8302->set_rtc_clock(X2);
+	m_zx8302->out_ipl1l_callback().set_inputline(m_maincpu, M68K_IRQ_2);
+	m_zx8302->out_baudx4_callback().set(FUNC(ql_state::ql_baudx4_w));
+	m_zx8302->out_comdata_callback().set(FUNC(ql_state::ql_comdata_w));
 	// TXD1
-	MCFG_ZX8302_OUT_TXD2_CB(WRITELINE(RS232_B_TAG, rs232_port_device, write_txd))
+	m_zx8302->out_txd2_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_txd));
 	// NETOUT
-	MCFG_ZX8302_OUT_MDSELCK_CB(WRITELINE(*this, ql_state, zx8302_mdselck_w))
-	MCFG_ZX8302_OUT_MDSELD_CB(WRITELINE(MDV_1, microdrive_image_device, comms_in_w))
-	MCFG_ZX8302_OUT_MDRDW_CB(WRITELINE(*this, ql_state, zx8302_mdrdw_w))
-	MCFG_ZX8302_OUT_ERASE_CB(WRITELINE(*this, ql_state, zx8302_erase_w))
-	MCFG_ZX8302_OUT_RAW1_CB(WRITELINE(*this, ql_state, zx8302_raw1_w))
-	MCFG_ZX8302_IN_RAW1_CB(READLINE(*this, ql_state, zx8302_raw1_r))
-	MCFG_ZX8302_OUT_RAW2_CB(WRITELINE(*this, ql_state, zx8302_raw2_w))
-	MCFG_ZX8302_IN_RAW2_CB(READLINE(*this, ql_state, zx8302_raw2_r))
+	m_zx8302->out_mdselck_callback().set(FUNC(ql_state::zx8302_mdselck_w));
+	m_zx8302->out_mdseld_callback().set(m_mdv1, FUNC(microdrive_image_device::comms_in_w));
+	m_zx8302->out_mdrdw_callback().set(FUNC(ql_state::zx8302_mdrdw_w));
+	m_zx8302->out_erase_callback().set(FUNC(ql_state::zx8302_erase_w));
+	m_zx8302->out_raw1_callback().set(FUNC(ql_state::zx8302_raw1_w));
+	m_zx8302->in_raw1_callback().set(FUNC(ql_state::zx8302_raw1_r));
+	m_zx8302->out_raw2_callback().set(FUNC(ql_state::zx8302_raw2_w));
+	m_zx8302->in_raw2_callback().set(FUNC(ql_state::zx8302_raw2_r));
 
-	MCFG_MICRODRIVE_ADD(MDV_1)
-	MCFG_MICRODRIVE_COMMS_OUT_CALLBACK(WRITELINE(MDV_2, microdrive_image_device, comms_in_w))
-	MCFG_MICRODRIVE_ADD(MDV_2)
+	MICRODRIVE(config, m_mdv1);
+	m_mdv1->comms_out_wr_callback().set(m_mdv2, FUNC(microdrive_image_device::comms_in_w));
+	MICRODRIVE(config, m_mdv2);
 
-	MCFG_DEVICE_ADD(RS232_A_TAG, RS232_PORT, default_rs232_devices, nullptr) // wired as DCE
-	MCFG_DEVICE_ADD(RS232_B_TAG, RS232_PORT, default_rs232_devices, nullptr) // wired as DTE
-	MCFG_RS232_CTS_HANDLER(WRITELINE(ZX8302_TAG, zx8302_device, write_cts2))
+	RS232_PORT(config, m_ser1, default_rs232_devices, nullptr); // wired as DCE
+	RS232_PORT(config, m_ser2, default_rs232_devices, nullptr); // wired as DTE
+	m_ser2->cts_handler().set(m_zx8302, FUNC(zx8302_device::write_cts2));
 
-	MCFG_DEVICE_ADD("exp", QL_EXPANSION_SLOT, 0, ql_expansion_cards, nullptr) // FIXME: what's the clock on the slot?
-	//MCFG_QL_EXPANSION_SLOT_IPL0L_CALLBACK()
-	//MCFG_QL_EXPANSION_SLOT_IPL1L_CALLBACK()
-	//MCFG_QL_EXPANSION_SLOT_BERRL_CALLBACK()
-	MCFG_QL_EXPANSION_SLOT_EXTINTL_CALLBACK(WRITELINE(*this, ql_state, exp_extintl_w))
+	QL_EXPANSION_SLOT(config, m_exp, 0, ql_expansion_cards, nullptr); // FIXME: what's the clock on the slot?
+	//m_exp->ipl0l_wr_callback().set();
+	//m_exp->ipl1l_wr_callback().set();(
+	//m_exp->berrl_wr_callback().set();
+	m_exp->extintl_wr_callback().set(FUNC(ql_state::exp_extintl_w));
 
-	MCFG_DEVICE_ADD("rom", QL_ROM_CARTRIDGE_SLOT, ql_rom_cartridge_cards, nullptr)
+	QL_ROM_CARTRIDGE_SLOT(config, m_cart, ql_rom_cartridge_cards, nullptr);
 
-	MCFG_DEVICE_ADD(QIMI_TAG, QIMI, 0)
-	MCFG_QIMI_EXTINT_CALLBACK(WRITELINE(*this, ql_state, qimi_extintl_w))
+	QIMI(config, m_qimi, 0);
+	m_qimi->extint_wr_callback().set(FUNC(ql_state::qimi_extintl_w));
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "ql_cart")
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "ql_cass")
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "ql_flop")
+	SOFTWARE_LIST(config, "cart_list").set_original("ql_cart");
+	SOFTWARE_LIST(config, "cass_list").set_original("ql_cass");
+	SOFTWARE_LIST(config, "flop_list").set_original("ql_flop");
 
 	// internal ram
 	RAM(config, m_ram).set_default_size("128K");
-MACHINE_CONFIG_END
+}
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( ql_ntsc )
+//  machine_config( ql_ntsc )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(ql_state::ql_ntsc)
+void ql_state::ql_ntsc(machine_config &config)
+{
 	ql(config);
 	// video hardware
-	MCFG_SCREEN_MODIFY(SCREEN_TAG)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(960, 262)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-MACHINE_CONFIG_END
+	screen_device &screen(*subdevice<screen_device>(SCREEN_TAG));
+	screen.set_refresh_hz(60);
+	screen.set_size(960, 262);
+	screen.set_visarea(0, 512-1, 0, 256-1);
+	}
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( opd )
+//  machine_config( opd )
 //-------------------------------------------------
 
 void ql_state::opd(machine_config &config)
@@ -1004,14 +1004,14 @@ void ql_state::opd(machine_config &config)
 
 /*
 //-------------------------------------------------
-//  MACHINE_CONFIG( megaopd )
+//  machine_config( megaopd )
 //-------------------------------------------------
 
 void ql_state::megaopd(machine_config &config)
 {
-	ql(config);
+    ql(config);
     // internal ram
-	m_ram->set_default_size("256K");
+    m_ram->set_default_size("256K");
 }
 */
 

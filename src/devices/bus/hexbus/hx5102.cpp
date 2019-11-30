@@ -121,8 +121,7 @@ void hx5102_device::memmap(address_map &map)
 */
 void hx5102_device::crumap(address_map &map)
 {
-	map(0x17e0>>4, 0x17fe>>4).r(FUNC(hx5102_device::cruread));
-	map(0x17e0>>1, 0x17fe>>1).w(FUNC(hx5102_device::cruwrite));
+	map(0x17e0, 0x17ff).rw(FUNC(hx5102_device::cruread), FUNC(hx5102_device::cruwrite));
 }
 
 hx5102_device::hx5102_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock):
@@ -151,7 +150,7 @@ hx5102_device::hx5102_device(const machine_config &mconfig, const char *tag, dev
 
 WRITE8_MEMBER( hx5102_device::external_operation )
 {
-	static const char* extop[8] = { "inv1", "inv2", "IDLE", "RSET", "inv3", "CKON", "CKOF", "LREX" };
+	static char const *const extop[8] = { "inv1", "inv2", "IDLE", "RSET", "inv3", "CKON", "CKOF", "LREX" };
 	if (offset != IDLE_OP) LOGMASKED(LOG_WARN, "External operation %s not implemented on HX5102 board\n", extop[offset]);
 }
 
@@ -374,12 +373,12 @@ READ8_MEMBER(hx5102_device::fdc_read)
 	{
 	case 0:
 		// Main status register
-		val = m_floppy_ctrl->read_msr();
+		val = m_floppy_ctrl->msr_r();
 		LOGMASKED(LOG_STATUS, "i8272A.msr -> %02x\n", val);
 		break;
 	case 4:
 		// FIFO read
-		val = m_floppy_ctrl->read_fifo();
+		val = m_floppy_ctrl->fifo_r();
 		LOGMASKED(LOG_FIFO, "i8272A.fifo -> %02x\n", val);
 		break;
 	}
@@ -398,7 +397,7 @@ WRITE8_MEMBER(hx5102_device::fdc_write)
 	case 0x08:
 		// Command register (FIFO write)
 		LOGMASKED(LOG_STATUS, "i8272A.fifo <- %02x\n", data);
-		m_floppy_ctrl->write_fifo(data);
+		m_floppy_ctrl->fifo_w(data);
 		break;
 	case 0x0c:
 		// DMA lock
@@ -475,7 +474,7 @@ READ8_MEMBER(hx5102_device::cruread)
 
 	crubits |= ((ioport("HXDIP")->read())<<4);
 
-	return crubits;
+	return BIT(crubits, offset);
 }
 
 /*
@@ -688,8 +687,7 @@ void hx5102_device::device_add_mconfig(machine_config& config)
 	// Not connected: Select lines (DS0, DS1), Head load (HDL), VCO
 	// Tied to 1: READY
 	// Tied to 0: TC
-	I8272A(config, m_floppy_ctrl, 0);
-	m_floppy_ctrl->set_ready_line_connected(false);
+	I8272A(config, m_floppy_ctrl, 8'000'000, false);
 	m_floppy_ctrl->intrq_wr_callback().set(FUNC(hx5102_device::fdc_irq_w));
 	m_floppy_ctrl->drq_wr_callback().set(FUNC(hx5102_device::fdc_drq_w));
 

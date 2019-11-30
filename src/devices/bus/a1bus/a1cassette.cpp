@@ -36,11 +36,12 @@ ROM_END
 
 /* sound output */
 
-MACHINE_CONFIG_START(a1bus_cassette_device::device_add_mconfig)
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)
-	MCFG_CASSETTE_INTERFACE("apple1_cass")
-MACHINE_CONFIG_END
+void a1bus_cassette_device::device_add_mconfig(machine_config &config)
+{
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED);
+	m_cassette->set_interface("apple1_cass");
+}
 
 const tiny_rom_entry *a1bus_cassette_device::device_rom_region() const
 {
@@ -71,7 +72,7 @@ a1bus_cassette_device::a1bus_cassette_device(const machine_config &mconfig, devi
 
 void a1bus_cassette_device::device_start()
 {
-	install_device(0xc000, 0xc0ff, read8_delegate(FUNC(a1bus_cassette_device::cassette_r), this), write8_delegate(FUNC(a1bus_cassette_device::cassette_w), this));
+	install_device(0xc000, 0xc0ff, read8_delegate(*this, FUNC(a1bus_cassette_device::cassette_r)), write8_delegate(*this, FUNC(a1bus_cassette_device::cassette_w)));
 	install_bank(0xc100, 0xc1ff, "bank_a1cas", &m_rom[0]);
 
 	save_item(NAME(m_cassette_output_flipflop));

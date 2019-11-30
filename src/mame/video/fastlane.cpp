@@ -4,18 +4,14 @@
 #include "includes/fastlane.h"
 
 
-PALETTE_INIT_MEMBER(fastlane_state, fastlane)
+void fastlane_state::fastlane_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int pal;
-
-	for (pal = 0; pal < 0x10; pal++)
+	uint8_t const *const color_prom = memregion("proms")->base();
+	for (int pal = 0; pal < 0x10; pal++)
 	{
-		int i;
-
-		for (i = 0; i < 0x400; i++)
+		for (int i = 0; i < 0x400; i++)
 		{
-			uint8_t ctabentry = (i & 0x3f0) | color_prom[(pal << 4) | (i & 0x0f)];
+			uint8_t const ctabentry = (i & 0x3f0) | color_prom[(pal << 4) | (i & 0x0f)];
 			palette.set_pen_indirect((pal << 10) | i, ctabentry);
 		}
 	}
@@ -91,8 +87,8 @@ TILE_GET_INFO_MEMBER(fastlane_state::get_tile_info1)
 
 void fastlane_state::video_start()
 {
-	m_layer0 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(fastlane_state::get_tile_info0),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_layer1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(fastlane_state::get_tile_info1),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_layer0 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(fastlane_state::get_tile_info0)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_layer1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(fastlane_state::get_tile_info1)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_layer0->set_scroll_rows(32);
 

@@ -60,10 +60,6 @@ enum
 };
 
 
-#define MCFG_LH5801_IN(_devcb) \
-	downcast<lh5801_cpu_device &>(*device).set_in_func(DEVCB_##_devcb);
-
-
 class lh5801_cpu_device :  public cpu_device
 {
 public:
@@ -71,7 +67,7 @@ public:
 	lh5801_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
-	template <class Object> devcb_base &set_in_func(Object &&cb) { return m_in_func.set_callback(std::forward<Object>(cb)); }
+	auto in_func() { return m_in_func.bind(); }
 
 protected:
 	// device-level overrides
@@ -79,10 +75,10 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override { return 2; }
-	virtual uint32_t execute_max_cycles() const override { return 19; }
-	virtual uint32_t execute_input_lines() const override { return 2; }
-	virtual bool execute_input_edge_triggered(int inputnum) const override { return inputnum == LH5801_LINE_MI || inputnum == INPUT_LINE_NMI; }
+	virtual uint32_t execute_min_cycles() const noexcept override { return 2; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 19; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 2; }
+	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum == LH5801_LINE_MI || inputnum == INPUT_LINE_NMI; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 

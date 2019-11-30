@@ -27,7 +27,8 @@ decltype(HD61830) HD61830B = HD61830;
 // default address map
 void hd61830_device::hd61830(address_map &map)
 {
-	map(0x0000, 0xffff).ram();
+	if (!has_configured_map(0))
+		map(0x0000, 0xffff).ram();
 }
 
 
@@ -84,7 +85,7 @@ hd61830_device::hd61830_device(const machine_config &mconfig, const char *tag, d
 	m_cac(0),
 	m_blink(0),
 	m_cursor(0),
-	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(), address_map_constructor(FUNC(hd61830_device::hd61830), this)),
+	m_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(hd61830_device::hd61830), this)),
 	m_char_rom(*this, "hd61830")
 {
 }
@@ -247,6 +248,7 @@ WRITE8_MEMBER( hd61830_device::data_w )
 
 	case INSTRUCTION_NUMBER_OF_CHARACTERS:
 		m_hn = (data & 0x7f) + 1;
+		m_hn = (m_hn % 2 == 0) ? m_hn : (m_hn + 1);
 
 		LOG("HD61830 Number of Characters: %u\n", m_hn);
 		break;
@@ -258,7 +260,7 @@ WRITE8_MEMBER( hd61830_device::data_w )
 		break;
 
 	case INSTRUCTION_CURSOR_POSITION:
-		m_cp = (data & 0x7f) + 1;
+		m_cp = (data & 0x0f) + 1;
 
 		LOG("HD61830 Cursor Position: %u\n", m_cp);
 		break;

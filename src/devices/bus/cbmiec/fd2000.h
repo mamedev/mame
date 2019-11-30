@@ -14,16 +14,9 @@
 #include "cbmiec.h"
 #include "cpu/m6502/m65c02.h"
 #include "formats/d81_dsk.h"
+#include "imagedev/floppy.h"
 #include "machine/6522via.h"
 #include "machine/upd765.h"
-
-
-
-//**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
-
-#define FD2000_TAG          "fd2000"
 
 
 

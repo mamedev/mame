@@ -15,28 +15,25 @@
 
 #include "machine/nscsi_bus.h"
 
-#define MCFG_NCR5380N_IRQ_HANDLER(_devcb) \
-	downcast<ncr5380n_device &>(*device).set_irq_handler(DEVCB_##_devcb);
 
-#define MCFG_NCR5380N_DRQ_HANDLER(_devcb) \
-	downcast<ncr5380n_device &>(*device).set_drq_handler(DEVCB_##_devcb);
-
-class ncr5380n_device : public nscsi_device
+class ncr5380n_device : public nscsi_device, public nscsi_slot_card_interface
 {
 public:
 	ncr5380n_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
-	template <class Object> devcb_base &set_irq_handler(Object &&cb) { return m_irq_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_drq_handler(Object &&cb) { return m_drq_handler.set_callback(std::forward<Object>(cb)); }
+	auto irq_handler() { return m_irq_handler.bind(); }
+	auto drq_handler() { return m_drq_handler.bind(); }
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 	uint8_t dma_r();
 	void dma_w(uint8_t val);
 
 protected:
+	ncr5380n_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -170,6 +167,8 @@ private:
 
 	enum { DMA_NONE, DMA_IN, DMA_OUT };
 
+	uint32_t m_fake_clock;
+
 	emu_timer *tm;
 
 	uint8_t status, istatus, m_mode, m_outdata, m_busstatus, m_dmalatch;
@@ -203,27 +202,34 @@ private:
 
 	void map(address_map &map);
 
-	DECLARE_READ8_MEMBER(scsidata_r);
-	DECLARE_WRITE8_MEMBER(outdata_w);
-	DECLARE_READ8_MEMBER(icmd_r);
-	DECLARE_WRITE8_MEMBER(icmd_w);
-	DECLARE_READ8_MEMBER(mode_r);
-	DECLARE_WRITE8_MEMBER(mode_w);
-	DECLARE_READ8_MEMBER(command_r);
-	DECLARE_WRITE8_MEMBER(command_w);
-	DECLARE_READ8_MEMBER(status_r);
-	DECLARE_WRITE8_MEMBER(selenable_w);
-	DECLARE_READ8_MEMBER(busandstatus_r);
-	DECLARE_WRITE8_MEMBER(startdmasend_w);
-	DECLARE_READ8_MEMBER(indata_r);
-	DECLARE_WRITE8_MEMBER(startdmatargetrx_w);
-	DECLARE_READ8_MEMBER(resetparityirq_r);
-	DECLARE_WRITE8_MEMBER(startdmainitrx_w);
+	uint8_t scsidata_r();
+	void outdata_w(uint8_t data);
+	uint8_t icmd_r();
+	void icmd_w(uint8_t data);
+	uint8_t mode_r();
+	void mode_w(uint8_t data);
+	uint8_t command_r();
+	void command_w(uint8_t data);
+	uint8_t status_r();
+	void selenable_w(uint8_t data);
+	uint8_t busandstatus_r();
+	void startdmasend_w(uint8_t data);
+	uint8_t indata_r();
+	void startdmatargetrx_w(uint8_t data);
+	uint8_t resetparityirq_r();
+	void startdmainitrx_w(uint8_t data);
 
 	devcb_write_line m_irq_handler;
 	devcb_write_line m_drq_handler;
 };
 
+class ncr53c80_device : public ncr5380n_device
+{
+public:
+	ncr53c80_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
 DECLARE_DEVICE_TYPE(NCR5380N, ncr5380n_device)
+DECLARE_DEVICE_TYPE(NCR53C80, ncr53c80_device)
 
 #endif // MAME_MACHINE_NCR5380N_H

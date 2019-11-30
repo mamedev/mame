@@ -146,6 +146,8 @@ TODO:
   The cpu board also has support for IRQ3 and IRQ4, coming from the external
   connectors, but I don't think they are used by any game.
 
+- excessive transmask difference between m72 games, this must be user selectable somehow;
+
 IRQ controller
 --------------
 The IRQ controller is a UPD71059C
@@ -188,7 +190,6 @@ other supported games as well.
 #include "includes/m72.h"
 #include "includes/iremipt.h"
 
-#include "cpu/mcs51/mcs51.h"
 #include "cpu/nec/nec.h"
 #include "cpu/nec/v25.h"
 #include "cpu/z80/z80.h"
@@ -230,6 +231,10 @@ void m72_state::machine_reset()
 
 	m_scanline_timer->adjust(m_screen->time_until_pos(0));
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(m72_state::synch_callback),this));
+
+	// Hold sound CPU in reset if main CPU has to upload the program into RAM
+	if (m_soundram.found())
+		m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 MACHINE_RESET_MEMBER(m72_state,kengo)
@@ -306,92 +311,64 @@ The protection device does
 
 TIMER_CALLBACK_MEMBER(m72_state::delayed_ram16_w)
 {
-	uint16_t val = param & 0xffff;
-	uint16_t offset = (param >> 16) & 0x07ff;
-	uint16_t mem_mask = (BIT(param, 28) ? 0xff00 : 0x0000) | (BIT(param, 27) ? 0x00ff : 0x0000);
+	const u16 val = param & 0xffff;
+	const u16 offset = (param >> 16) & 0x07ff;
+	const u16 mem_mask = (BIT(param, 28) ? 0xff00 : 0x0000) | (BIT(param, 27) ? 0x00ff : 0x0000);
 
 	logerror("MB8421/MB8431 left_w(0x%03x, 0x%04x, 0x%04x)\n", offset, val, mem_mask);
-	m_dpram->left_w(machine().dummy_space(), offset, val, mem_mask);
+	m_dpram->left_w(offset, val, mem_mask);
 }
 
 TIMER_CALLBACK_MEMBER(m72_state::delayed_ram8_w)
 {
-	uint8_t val = param & 0xff;
-	uint16_t offset = (param >> 9) & 0x07ff;
+	const u8 val = param & 0xff;
+	const u16 offset = (param >> 9) & 0x07ff;
 
 	if (BIT(param, 8))
-		m_dpram->right_w(machine().dummy_space(), offset, val << 8, 0xff00);
+		m_dpram->right_w(offset, val << 8, 0xff00);
 	else
-		m_dpram->right_w(machine().dummy_space(), offset, val, 0x00ff);
+		m_dpram->right_w(offset, val, 0x00ff);
 }
 
 
-WRITE16_MEMBER(m72_state::main_mcu_w)
+void m72_state::main_mcu_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(m72_state::delayed_ram16_w), this), offset << 16 | data | (mem_mask & 0x0180) << 20);
 }
 
-WRITE8_MEMBER(m72_state::mcu_data_w)
+void m72_state::mcu_data_w(offs_t offset, u8 data)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(m72_state::delayed_ram8_w), this), offset << 8 | uint32_t(data));
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(m72_state::delayed_ram8_w), this), offset << 8 | u32(data));
 }
 
-READ8_MEMBER(m72_state::mcu_data_r)
+u8 m72_state::mcu_data_r(offs_t offset)
 {
-	return (m_dpram->right_r(space, offset >> 1) >> (BIT(offset, 0) ? 8 : 0)) & 0xff;
+	return (m_dpram->right_r(offset >> 1) >> (BIT(offset, 0) ? 8 : 0)) & 0xff;
 }
 
-INTERRUPT_GEN_MEMBER(m72_state::mcu_int)
+u8 m72_state::mcu_sample_r()
 {
-	//m_mcu_snd_cmd_latch |= 0x11; /* 0x10 is special as well - FIXME */
-	//m_mcu_snd_cmd_latch = 0x11;// | (machine().rand() & 1); /* 0x10 is special as well - FIXME */
-	device.execute().set_input_line(1, ASSERT_LINE);
-}
-
-READ8_MEMBER(m72_state::mcu_sample_r)
-{
-	uint8_t sample;
-	sample = memregion("samples")->base()[m_mcu_sample_addr++];
+	const u8 sample = m_samples_region[m_mcu_sample_addr];
+	if (!machine().side_effects_disabled())
+		m_mcu_sample_addr++;
 	return sample;
 }
 
-WRITE8_MEMBER(m72_state::mcu_port1_w)
-{
-	m_mcu_sample_latch = data;
-	m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
-}
-
-WRITE8_MEMBER(m72_state::mcu_port3_w)
-{
-	logerror("port3: %02x\n", data);
-}
-
-WRITE8_MEMBER(m72_state::mcu_low_w)
+void m72_state::mcu_low_w(u8 data)
 {
 	m_mcu_sample_addr = (m_mcu_sample_addr & 0xffe000) | (data<<5);
-	logerror("low: %02x %02x %08x\n", offset, data, m_mcu_sample_addr);
+	logerror("low: %02x %08x\n", data, m_mcu_sample_addr);
 }
 
-WRITE8_MEMBER(m72_state::mcu_high_w)
+void m72_state::mcu_high_w(u8 data)
 {
 	m_mcu_sample_addr = (m_mcu_sample_addr & 0x1fff) | (data<<(8+5));
-	logerror("high: %02x %02x %08x\n", offset, data, m_mcu_sample_addr);
-}
-
-READ8_MEMBER(m72_state::snd_cpu_sample_r)
-{
-	return m_mcu_sample_latch;
+	logerror("high: %02x %08x\n", data, m_mcu_sample_addr);
 }
 
 void m72_state::init_m72_8751()
 {
-	save_item(NAME(m_mcu_sample_latch));
 	save_item(NAME(m_mcu_sample_addr));
-
-	/* sound cpu */
-	address_space &sndio = m_soundcpu->space(AS_IO);
-	sndio.install_write_handler(0x82, 0x82, write8_delegate(FUNC(dac_byte_interface::data_w),(dac_byte_interface *)m_dac));
-	sndio.install_read_handler (0x84, 0x84, read8_delegate(FUNC(m72_state::snd_cpu_sample_r),this));
 
 	/* lohtb2 */
 #if 0
@@ -401,7 +378,7 @@ void m72_state::init_m72_8751()
 	 * prefetching on the V30.
 	 */
 	{
-		uint8_t *rom=memregion("mcu")->base();
+		u8 *rom=memregion("mcu")->base();
 
 		rom[0x12d+5] += 1; printf(" 5: %d\n", rom[0x12d+5]);
 		rom[0x12d+8] += 5;  printf(" 8: %d\n", rom[0x12d+8]);
@@ -441,17 +418,16 @@ the NMI handler in the other games.
 #if 0
 int m72_state::find_sample(int num)
 {
-	uint8_t *rom = memregion("samples")->base();
-	int len = memregion("samples")->bytes();
+	int len = m_samples_region.length();
 	int addr = 0;
 
 	while (num--)
 	{
 		/* find end of sample */
-		while (addr < len &&  rom[addr]) addr++;
+		while (addr < len &&  m_samples_region[addr]) addr++;
 
 		/* skip 0 filler between samples */
-		while (addr < len && !rom[addr]) addr++;
+		while (addr < len && !m_samples_region[addr]) addr++;
 	}
 
 	return addr;
@@ -460,10 +436,9 @@ int m72_state::find_sample(int num)
 
 INTERRUPT_GEN_MEMBER(m72_state::fake_nmi)
 {
-	address_space &space = generic_space();
-	int sample = m_audio->sample_r(space,0);
+	int sample = m_audio->sample_r();
 	if (sample)
-		m_audio->sample_w(space,0,sample);
+		m_audio->sample_w(sample);
 }
 
 
@@ -497,14 +472,6 @@ WRITE16_MEMBER(m72_state::dbreedm72_sample_trigger_w)
 {
 	static const int a[9] = { 0x00000, 0x00020, 0x02c40, 0x08160, 0x0c8c0, 0x0ffe0, 0x13000, 0x15820, 0x15f40 };
 	if (ACCESSING_BITS_0_7 && (data & 0xff) < 9) m_audio->set_sample_start(a[data & 0xff]);
-}
-
-WRITE16_MEMBER(m72_state::airduelm72_sample_trigger_w)
-{
-	static const int a[16] = {
-		0x00000, 0x00020, 0x03ec0, 0x05640, 0x06dc0, 0x083a0, 0x0c000, 0x0eb60,
-		0x112e0, 0x13dc0, 0x16520, 0x16d60, 0x18ae0, 0x1a5a0, 0x1bf00, 0x1c340 };
-	if (ACCESSING_BITS_0_7 && (data & 0xff) < 16) m_audio->set_sample_start(a[data & 0xff]);
 }
 
 WRITE16_MEMBER(m72_state::dkgenm72_sample_trigger_w)
@@ -564,7 +531,7 @@ running, but they have not been derived from the real 8751 code.
 #define CRC_LEN 18
 
 /* Battle Chopper / Mr. Heli */
-static const uint8_t bchopper_code[CODE_LEN] =
+static const u8 bchopper_code[CODE_LEN] =
 {
 	0x68,0x00,0xa0,             // push 0a000h
 	0x1f,                       // pop ds
@@ -584,11 +551,11 @@ static const uint8_t bchopper_code[CODE_LEN] =
 	0x1f,                       // pop ds
 	0xea,0x68,0x01,0x40,0x00    // jmp  0040:$0168
 };
-static const uint8_t bchopper_crc[CRC_LEN] =  {   0x1a,0x12,0x5c,0x08, 0x84,0xb6,0x73,0xd1,
+static const u8 bchopper_crc[CRC_LEN] =  {   0x1a,0x12,0x5c,0x08, 0x84,0xb6,0x73,0xd1,
 												0x54,0x91,0x94,0xeb, 0x00,0x00 };
 
 /* Ninja Spirit */
-static const uint8_t nspirit_code[CODE_LEN] =
+static const u8 nspirit_code[CODE_LEN] =
 {
 	0x68,0x00,0xa0,             // push 0a000h
 	0x1f,                       // pop ds
@@ -607,10 +574,10 @@ static const uint8_t nspirit_code[CODE_LEN] =
 	0x1f,                       // pop ds
 	0xea,0x00,0x00,0x40,0x00    // jmp  0040:$0000
 };
-static const uint8_t nspirit_crc[CRC_LEN] =   {   0xfe,0x94,0x6e,0x4e, 0xc8,0x33,0xa7,0x2d,
+static const u8 nspirit_crc[CRC_LEN] =   {   0xfe,0x94,0x6e,0x4e, 0xc8,0x33,0xa7,0x2d,
 												0xf2,0xa3,0xf9,0xe1, 0xa9,0x6c,0x02,0x95, 0x00,0x00 };
 /* Image Fight */
-static const uint8_t imgfight_code[CODE_LEN] =
+static const u8 imgfight_code[CODE_LEN] =
 {
 	0x68,0x00,0xa0,             // push 0a000h
 	0x1f,                       // pop ds
@@ -635,66 +602,29 @@ static const uint8_t imgfight_code[CODE_LEN] =
 };
 
 // these are for the japan set where we have the mcu anyway...
-static const uint8_t imgfightj_crc[CRC_LEN] =  {  0x7e,0xcc,0xec,0x03, 0x04,0x33,0xb6,0xc5,
+static const u8 imgfightj_crc[CRC_LEN] =  {  0x7e,0xcc,0xec,0x03, 0x04,0x33,0xb6,0xc5,
 												0xbf,0x37,0x92,0x94, 0x00,0x00 };
 
-/* Legend of Hero Tonma */
-static const uint8_t loht_code[CODE_LEN] =
-{
-	0x68,0x00,0xa0,             // push 0a000h
-	0x1f,                       // pop ds
-	0xc6,0x06,0x3c,0x38,0x47,   // mov [383ch], byte 047h
-	0xc6,0x06,0x3d,0x38,0x47,   // mov [383dh], byte 047h
-	0xc6,0x06,0x42,0x38,0x44,   // mov [3842h], byte 044h
-	0xc6,0x06,0x43,0x38,0x44,   // mov [3843h], byte 044h
-	0x68,0x00,0xb0,             // push 0b000h
-	0x1f,                       // pop ds
-	0xc6,0x06,0x00,0x09,0x49^0xff,  // mov [0900h], byte 049h
-	0xc6,0x06,0x00,0x0a,0x49^0xff,  // mov [0a00h], byte 049h
-	0xc6,0x06,0x00,0x0b,0x49^0xff,  // mov [0b00h], byte 049h
-
-
-	0xea,0x5d,0x01,0x40,0x00    // jmp  0040:$015d
-
-};
-static const uint8_t loht_crc[CRC_LEN] =    { 0x39,0x00,0x82,0xae, 0x2c,0x9d,0x4b,0x73,
-												0xfb,0xac,0xd4,0x6d, 0x6d,0x5b,0x77,0xc0, 0x00,0x00 };
-
-
-
 /* Dragon Breed */
-static const uint8_t dbreedm72_code[CODE_LEN] =
+static const u8 dbreedm72_code[CODE_LEN] =
 {
 	0xea,0x6c,0x00,0x00,0x00    // jmp  0000:$006c
 };
-static const uint8_t dbreedm72_crc[CRC_LEN] =   { 0xa4,0x96,0x5f,0xc0, 0xab,0x49,0x9f,0x19,
+static const u8 dbreedm72_crc[CRC_LEN] =   { 0xa4,0x96,0x5f,0xc0, 0xab,0x49,0x9f,0x19,
 												0x84,0xe6,0xd6,0xca, 0x00,0x00 };
 
-/* Air Duel */
-static const uint8_t airduelm72_code[CODE_LEN] =
-{
-	0x68,0x00,0xd0,             // push 0d000h
-	0x1f,                       // pop ds
-	// the game checks for
-	// "This game can only be played in Japan..." message in the video text buffer
-	// the message is nowhere to be found in the ROMs, so has to be displayed by the mcu
-	0xc6,0x06,0xc0,0x1c,0x57,   // mov [1cc0h], byte 057h
-	0xea,0x69,0x0b,0x00,0x00    // jmp  0000:$0b69
-};
-static const uint8_t airduelm72_crc[CRC_LEN] =     { 0x72,0x9c,0xca,0x85, 0xc9,0x12,0xcc,0xea,
-												0x00,0x00 };
 
 /* Daiku no Gensan */
-static const uint8_t dkgenm72_code[CODE_LEN] =
+static const u8 dkgenm72_code[CODE_LEN] =
 {
 	0xea,0x3d,0x00,0x00,0x10    // jmp  1000:$003d
 };
-static const uint8_t dkgenm72_crc[CRC_LEN] =  {   0xc8,0xb4,0xdc,0xf8, 0xd3,0xba,0x48,0xed,
+static const u8 dkgenm72_crc[CRC_LEN] =  {   0xc8,0xb4,0xdc,0xf8, 0xd3,0xba,0x48,0xed,
 												0x79,0x08,0x1c,0xb3, 0x00,0x00 };
 
 
 
-void m72_state::copy_le(uint16_t *dest, const uint8_t *src, uint8_t bytes)
+void m72_state::copy_le(u16 *dest, const u8 *src, u8 bytes)
 {
 	int i;
 
@@ -719,14 +649,14 @@ WRITE16_MEMBER(m72_state::protection_w)
 		copy_le(&m_protection_ram[0x0fe0],m_protection_crc,CRC_LEN);
 }
 
-void m72_state::install_protection_handler(const uint8_t *code,const uint8_t *crc)
+void m72_state::install_protection_handler(const u8 *code,const u8 *crc)
 {
-	m_protection_ram = std::make_unique<uint16_t[]>(0x1000/2);
+	m_protection_ram = std::make_unique<u16[]>(0x1000/2);
 	m_protection_code = code;
 	m_protection_crc =  crc;
 	m_maincpu->space(AS_PROGRAM).install_read_bank(0xb0000, 0xb0fff, "bank1");
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xb0ffa, 0xb0ffb, read16_delegate(FUNC(m72_state::protection_r),this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xb0000, 0xb0fff, write16_delegate(FUNC(m72_state::protection_w),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xb0ffa, 0xb0ffb, read16_delegate(*this, FUNC(m72_state::protection_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xb0000, 0xb0fff, write16_delegate(*this, FUNC(m72_state::protection_w)));
 	membank("bank1")->configure_entry(0, m_protection_ram.get());
 
 	save_pointer(NAME(m_protection_ram), 0x1000/2);
@@ -735,79 +665,97 @@ void m72_state::install_protection_handler(const uint8_t *code,const uint8_t *cr
 void m72_state::init_bchopper()
 {
 	install_protection_handler(bchopper_code,bchopper_crc);
-	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::bchopper_sample_trigger_w),this));
+	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(*this, FUNC(m72_state::bchopper_sample_trigger_w)));
 }
-
 
 void m72_state::init_nspirit()
 {
 	install_protection_handler(nspirit_code,nspirit_crc);
-	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::nspirit_sample_trigger_w),this));
+	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(*this, FUNC(m72_state::nspirit_sample_trigger_w)));
 }
 
 void m72_state::init_imgfight()
 {
 	install_protection_handler(imgfight_code,imgfightj_crc);
-	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::imgfight_sample_trigger_w),this));
+	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(*this, FUNC(m72_state::imgfight_sample_trigger_w)));
 }
-
-void m72_state::init_loht()
-{
-	install_protection_handler(loht_code,loht_crc);
-
-	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::loht_sample_trigger_w),this));
-
-	/* since we skip the startup tests, clear video RAM to prevent garbage on title screen */
-	memset(m_videoram2,0,0x4000);
-}
-
 
 void m72_state::init_dbreedm72()
 {
 	install_protection_handler(dbreedm72_code,dbreedm72_crc);
-	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::dbreedm72_sample_trigger_w),this));
-}
-
-void m72_state::init_airduelm72()
-{
-	install_protection_handler(airduelm72_code,airduelm72_crc);
-	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::airduelm72_sample_trigger_w),this));
+	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(*this, FUNC(m72_state::dbreedm72_sample_trigger_w)));
 }
 
 void m72_state::init_dkgenm72()
 {
 	install_protection_handler(dkgenm72_code,dkgenm72_crc);
-	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::dkgenm72_sample_trigger_w),this));
+	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(*this, FUNC(m72_state::dkgenm72_sample_trigger_w)));
 }
 
 void m72_state::init_gallop()
 {
-	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::gallop_sample_trigger_w),this));
+	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(*this, FUNC(m72_state::gallop_sample_trigger_w)));
 }
 
 
-
-
-
-
-READ16_MEMBER(m72_state::soundram_r)
+template<unsigned N>
+u16 m72_state::palette_r(offs_t offset)
 {
-	return m_soundram[offset * 2 + 0] | (m_soundram[offset * 2 + 1] << 8);
+	/* A9 isn't connected, so 0x200-0x3ff mirrors 0x000-0x1ff etc. */
+	offset &= ~0x100;
+
+	return m_paletteram[N][offset] | 0xffe0;    /* only D0-D4 are connected */
 }
 
-WRITE16_MEMBER(m72_state::soundram_w)
+inline void m72_state::changecolor(offs_t color, u8 r, u8 g, u8 b)
 {
-	if (ACCESSING_BITS_0_7)
-		m_soundram[offset * 2 + 0] = data;
-	if (ACCESSING_BITS_8_15)
-		m_soundram[offset * 2 + 1] = data >> 8;
+	m_palette->set_pen_color(color,pal5bit(r),pal5bit(g),pal5bit(b));
+}
+
+template<unsigned N>
+void m72_state::palette_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	/* A9 isn't connected, so 0x200-0x3ff mirrors 0x000-0x1ff etc. */
+	offset &= ~0x100;
+
+	COMBINE_DATA(&m_paletteram[N][offset]);
+	offset &= 0x0ff;
+	changecolor(offset + (N << 8),
+			m_paletteram[N][offset + 0x000],
+			m_paletteram[N][offset + 0x200],
+			m_paletteram[N][offset + 0x400]);
+}
+
+template<unsigned N>
+void m72_state::scrollx_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	m_screen->update_partial(m_screen->vpos());
+	COMBINE_DATA(&m_scrollx[N]);
+}
+
+template<unsigned N>
+void m72_state::scrolly_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	m_screen->update_partial(m_screen->vpos());
+	COMBINE_DATA(&m_scrolly[N]);
+}
+
+
+u8 m72_state::soundram_r(offs_t offset)
+{
+	return m_soundram[offset];
+}
+
+void m72_state::soundram_w(offs_t offset, u8 data)
+{
+	m_soundram[offset] = data;
 }
 
 void m72_state::m72_cpu1_common_map(address_map &map)
 {
 	map(0xc0000, 0xc03ff).ram().share("spriteram");
-	map(0xc8000, 0xc8bff).rw(FUNC(m72_state::palette1_r), FUNC(m72_state::palette1_w)).share("paletteram");
-	map(0xcc000, 0xccbff).rw(FUNC(m72_state::palette2_r), FUNC(m72_state::palette2_w)).share("paletteram2");
+	map(0xc8000, 0xc8bff).rw(FUNC(m72_state::palette_r<0>), FUNC(m72_state::palette_w<0>)).share("paletteram1");
+	map(0xcc000, 0xccbff).rw(FUNC(m72_state::palette_r<1>), FUNC(m72_state::palette_w<1>)).share("paletteram2");
 	map(0xd0000, 0xd3fff).ram().w(FUNC(m72_state::videoram1_w)).share("videoram1");
 	map(0xd8000, 0xdbfff).ram().w(FUNC(m72_state::videoram2_w)).share("videoram2");
 	map(0xe0000, 0xeffff).rw(FUNC(m72_state::soundram_r), FUNC(m72_state::soundram_w));
@@ -842,11 +790,19 @@ void m72_state::xmultiplm72_map(address_map &map)
 	map(0xb0000, 0xb0fff).r(m_dpram, FUNC(mb8421_mb8431_16_device::left_r)).w(FUNC(m72_state::main_mcu_w));
 }
 
+void m72_state::dbreedwm72_map(address_map &map)
+{
+	m72_cpu1_common_map(map);
+	map(0x00000, 0x7ffff).rom();
+	map(0x90000, 0x93fff).ram();    /* work RAM */
+}
+
 void m72_state::dbreedm72_map(address_map &map)
 {
 	m72_cpu1_common_map(map);
 	map(0x00000, 0x7ffff).rom();
 	map(0x90000, 0x93fff).ram();    /* work RAM */
+	map(0xb0000, 0xb0fff).r(m_dpram, FUNC(mb8421_mb8431_16_device::left_r)).w(FUNC(m72_state::main_mcu_w));
 }
 
 void m72_state::m81_cpu1_common_map(address_map &map)
@@ -854,8 +810,8 @@ void m72_state::m81_cpu1_common_map(address_map &map)
 	map(0x00000, 0x7ffff).rom();
 	map(0xb0ffe, 0xb0fff).writeonly(); /* leftover from protection?? */
 	map(0xc0000, 0xc03ff).ram().share("spriteram");
-	map(0xc8000, 0xc8bff).rw(FUNC(m72_state::palette1_r), FUNC(m72_state::palette1_w)).share("paletteram");
-	map(0xcc000, 0xccbff).rw(FUNC(m72_state::palette2_r), FUNC(m72_state::palette2_w)).share("paletteram2");
+	map(0xc8000, 0xc8bff).rw(FUNC(m72_state::palette_r<0>), FUNC(m72_state::palette_w<0>)).share("paletteram1");
+	map(0xcc000, 0xccbff).rw(FUNC(m72_state::palette_r<1>), FUNC(m72_state::palette_w<1>)).share("paletteram2");
 	map(0xd0000, 0xd3fff).ram().w(FUNC(m72_state::videoram1_w)).share("videoram1");
 	map(0xd8000, 0xdbfff).ram().w(FUNC(m72_state::videoram2_w)).share("videoram2");
 	map(0xffff0, 0xfffff).rom();
@@ -884,7 +840,7 @@ void m72_state::m84_cpu1_common_map(address_map &map)
 	map(0x00000, 0x7ffff).rom();
 	map(0xb0000, 0xb0001).w(FUNC(m72_state::irq_line_w));
 	map(0xb4000, 0xb4001).nopw();  /* ??? */
-	map(0xbc000, 0xbc001).w(FUNC(m72_state::dmaon_w));
+	map(0xbc000, 0xbc000).w(FUNC(m72_state::dmaon_w));
 	map(0xb0ffe, 0xb0fff).writeonly(); /* leftover from protection?? */
 	map(0xc0000, 0xc03ff).ram().share("spriteram");
 	map(0xe0000, 0xe3fff).ram();   /* work RAM */
@@ -896,8 +852,8 @@ void m72_state::rtype2_map(address_map &map)
 	m84_cpu1_common_map(map);
 	map(0xd0000, 0xd3fff).ram().w(FUNC(m72_state::videoram1_w)).share("videoram1");
 	map(0xd4000, 0xd7fff).ram().w(FUNC(m72_state::videoram2_w)).share("videoram2");
-	map(0xc8000, 0xc8bff).rw(FUNC(m72_state::palette1_r), FUNC(m72_state::palette1_w)).share("paletteram");
-	map(0xd8000, 0xd8bff).rw(FUNC(m72_state::palette2_r), FUNC(m72_state::palette2_w)).share("paletteram2");
+	map(0xc8000, 0xc8bff).rw(FUNC(m72_state::palette_r<0>), FUNC(m72_state::palette_w<0>)).share("paletteram1");
+	map(0xd8000, 0xd8bff).rw(FUNC(m72_state::palette_r<1>), FUNC(m72_state::palette_w<1>)).share("paletteram2");
 }
 
 void m72_state::hharryu_map(address_map &map)
@@ -905,8 +861,8 @@ void m72_state::hharryu_map(address_map &map)
 	m84_cpu1_common_map(map);
 	map(0xd0000, 0xd3fff).ram().w(FUNC(m72_state::videoram1_w)).share("videoram1");
 	map(0xd4000, 0xd7fff).ram().w(FUNC(m72_state::videoram2_w)).share("videoram2");
-	map(0xa0000, 0xa0bff).rw(FUNC(m72_state::palette1_r), FUNC(m72_state::palette1_w)).share("paletteram");
-	map(0xa8000, 0xa8bff).rw(FUNC(m72_state::palette2_r), FUNC(m72_state::palette2_w)).share("paletteram2");
+	map(0xa0000, 0xa0bff).rw(FUNC(m72_state::palette_r<0>), FUNC(m72_state::palette_w<0>)).share("paletteram1");
+	map(0xa8000, 0xa8bff).rw(FUNC(m72_state::palette_r<1>), FUNC(m72_state::palette_w<1>)).share("paletteram2");
 }
 
 void m72_state::kengo_map(address_map &map)
@@ -914,8 +870,8 @@ void m72_state::kengo_map(address_map &map)
 	m84_cpu1_common_map(map);
 	map(0x80000, 0x83fff).ram().w(FUNC(m72_state::videoram1_w)).share("videoram1");
 	map(0x84000, 0x87fff).ram().w(FUNC(m72_state::videoram2_w)).share("videoram2");
-	map(0xa0000, 0xa0bff).rw(FUNC(m72_state::palette1_r), FUNC(m72_state::palette1_w)).share("paletteram");
-	map(0xa8000, 0xa8bff).rw(FUNC(m72_state::palette2_r), FUNC(m72_state::palette2_w)).share("paletteram2");
+	map(0xa0000, 0xa0bff).rw(FUNC(m72_state::palette_r<0>), FUNC(m72_state::palette_w<0>)).share("paletteram1");
+	map(0xa8000, 0xa8bff).rw(FUNC(m72_state::palette_r<1>), FUNC(m72_state::palette_w<1>)).share("paletteram2");
 }
 
 
@@ -923,21 +879,31 @@ void m72_state::m82_map(address_map &map)
 {
 	map(0x00000, 0x7ffff).rom();
 	map(0xa0000, 0xa03ff).ram().share("majtitle_rowscr");
-	map(0xa4000, 0xa4bff).rw(FUNC(m72_state::palette2_r), FUNC(m72_state::palette2_w)).share("paletteram2");
+	map(0xa4000, 0xa4bff).rw(FUNC(m72_state::palette_r<1>), FUNC(m72_state::palette_w<1>)).share("paletteram2");
 	map(0xac000, 0xaffff).ram().w(FUNC(m72_state::videoram1_w)).share("videoram1");
 	map(0xb0000, 0xbffff).ram().w(FUNC(m72_state::videoram2_w)).share("videoram2");  /* larger than the other games */
 	map(0xc0000, 0xc03ff).ram().share("spriteram");
 	map(0xc8000, 0xc83ff).ram().share("spriteram2");
-	map(0xcc000, 0xccbff).rw(FUNC(m72_state::palette1_r), FUNC(m72_state::palette1_w)).share("paletteram");
+	map(0xcc000, 0xccbff).rw(FUNC(m72_state::palette_r<0>), FUNC(m72_state::palette_w<0>)).share("paletteram1");
 	map(0xd0000, 0xd3fff).ram();   /* work RAM */
 	map(0xe0000, 0xe0001).w(FUNC(m72_state::irq_line_w));
 	map(0xe4000, 0xe4001).writeonly(); /* playfield enable? 1 during screen transitions, 0 otherwise */
-	map(0xec000, 0xec001).w(FUNC(m72_state::dmaon_w));
+	map(0xec000, 0xec000).w(FUNC(m72_state::dmaon_w));
 	map(0xffff0, 0xfffff).rom();
 }
 
-
-
+void m72_state::lohtb_map(address_map &map) // all to be checked
+{
+	map(0x00000, 0x7ffff).rom();
+	map(0x80000, 0x803ff).ram().share("spriteram");
+	map(0xa0000, 0xa3fff).ram();    /* work RAM */
+	map(0xaa800, 0xaafff).ram();
+	map(0xc8000, 0xc8bff).rw(FUNC(m72_state::palette_r<0>), FUNC(m72_state::palette_w<0>)).share("paletteram1");
+	map(0xcc000, 0xccbff).rw(FUNC(m72_state::palette_r<1>), FUNC(m72_state::palette_w<1>)).share("paletteram2");
+	map(0xd0000, 0xd3fff).ram().w(FUNC(m72_state::videoram1_w)).share("videoram1");
+	map(0xd8000, 0xdbfff).ram().w(FUNC(m72_state::videoram2_w)).share("videoram2");
+	map(0xffff0, 0xfffff).rom();
+}
 
 void m72_state::m72_portmap(address_map &map)
 {
@@ -946,17 +912,23 @@ void m72_state::m72_portmap(address_map &map)
 	map(0x04, 0x05).portr("DSW");
 	map(0x00, 0x00).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x02, 0x02).w(FUNC(m72_state::port02_w)); /* coin counters, reset sound cpu, other stuff? */
-	map(0x04, 0x05).w(FUNC(m72_state::dmaon_w));
+	map(0x04, 0x04).w(FUNC(m72_state::dmaon_w));
 	map(0x06, 0x07).w(FUNC(m72_state::irq_line_w));
 	map(0x40, 0x43).rw(m_upd71059c, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
-	map(0x80, 0x81).w(FUNC(m72_state::scrolly1_w));
-	map(0x82, 0x83).w(FUNC(m72_state::scrollx1_w));
-	map(0x84, 0x85).w(FUNC(m72_state::scrolly2_w));
-	map(0x86, 0x87).w(FUNC(m72_state::scrollx2_w));
+	map(0x80, 0x81).w(FUNC(m72_state::scrolly_w<0>));
+	map(0x82, 0x83).w(FUNC(m72_state::scrollx_w<0>));
+	map(0x84, 0x85).w(FUNC(m72_state::scrolly_w<1>));
+	map(0x86, 0x87).w(FUNC(m72_state::scrollx_w<1>));
 /*  { 0xc0, 0xc0      trigger sample, filled by init_ function */
 }
 
 void m72_state::m72_protected_portmap(address_map &map)
+{
+	m72_portmap(map);
+	map(0xc0, 0xc0).w("soundlatch2", FUNC(generic_latch_8_device::write));
+}
+
+void m72_state::m72_airduel_portmap(address_map &map)
 {
 	m72_portmap(map);
 	map(0xc0, 0xc0).w("mculatch", FUNC(generic_latch_8_device::write));
@@ -970,10 +942,10 @@ void m72_state::m84_portmap(address_map &map)
 	map(0x00, 0x00).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x02, 0x02).w(FUNC(m72_state::rtype2_port02_w));
 	map(0x40, 0x43).rw(m_upd71059c, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
-	map(0x80, 0x81).w(FUNC(m72_state::scrolly1_w));
-	map(0x82, 0x83).w(FUNC(m72_state::scrollx1_w));
-	map(0x84, 0x85).w(FUNC(m72_state::scrolly2_w));
-	map(0x86, 0x87).w(FUNC(m72_state::scrollx2_w));
+	map(0x80, 0x81).w(FUNC(m72_state::scrolly_w<0>));
+	map(0x82, 0x83).w(FUNC(m72_state::scrollx_w<0>));
+	map(0x84, 0x85).w(FUNC(m72_state::scrolly_w<1>));
+	map(0x86, 0x87).w(FUNC(m72_state::scrollx_w<1>));
 }
 
 void m72_state::m84_v33_portmap(address_map &map)
@@ -983,11 +955,11 @@ void m72_state::m84_v33_portmap(address_map &map)
 	map(0x04, 0x05).portr("DSW");
 	map(0x00, 0x00).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x02, 0x02).w(FUNC(m72_state::rtype2_port02_w));
-	map(0x80, 0x81).w(FUNC(m72_state::scrolly1_w));
-	map(0x82, 0x83).w(FUNC(m72_state::scrollx1_w));
-	map(0x84, 0x85).w(FUNC(m72_state::scrolly2_w));
-	map(0x86, 0x87).w(FUNC(m72_state::scrollx2_w));
-//  AM_RANGE(0x8c, 0x8f) AM_WRITENOP    /* ??? */
+	map(0x80, 0x81).w(FUNC(m72_state::scrolly_w<0>));
+	map(0x82, 0x83).w(FUNC(m72_state::scrollx_w<0>));
+	map(0x84, 0x85).w(FUNC(m72_state::scrolly_w<1>));
+	map(0x86, 0x87).w(FUNC(m72_state::scrollx_w<1>));
+//  map(0x8c, 0x8f).nopw();    /* ??? */
 }
 
 
@@ -1000,10 +972,10 @@ void m72_state::poundfor_portmap(address_map &map)
 	map(0x00, 0x00).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x02, 0x02).w(FUNC(m72_state::poundfor_port02_w));
 	map(0x40, 0x43).rw(m_upd71059c, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
-	map(0x80, 0x81).w(FUNC(m72_state::scrolly1_w));
-	map(0x82, 0x83).w(FUNC(m72_state::scrollx1_w));
-	map(0x84, 0x85).w(FUNC(m72_state::scrolly2_w));
-	map(0x86, 0x87).w(FUNC(m72_state::scrollx2_w));
+	map(0x80, 0x81).w(FUNC(m72_state::scrolly_w<0>));
+	map(0x82, 0x83).w(FUNC(m72_state::scrollx_w<0>));
+	map(0x84, 0x85).w(FUNC(m72_state::scrolly_w<1>));
+	map(0x86, 0x87).w(FUNC(m72_state::scrollx_w<1>));
 }
 
 void m72_state::m82_portmap(address_map &map)
@@ -1014,10 +986,10 @@ void m72_state::m82_portmap(address_map &map)
 	map(0x00, 0x00).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x02, 0x02).w(FUNC(m72_state::rtype2_port02_w));
 	map(0x40, 0x43).rw(m_upd71059c, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
-	map(0x80, 0x81).w(FUNC(m72_state::scrolly1_w));
-	map(0x82, 0x83).w(FUNC(m72_state::scrollx1_w));
-	map(0x84, 0x85).w(FUNC(m72_state::scrolly2_w));
-	map(0x86, 0x87).w(FUNC(m72_state::scrollx2_w));
+	map(0x80, 0x81).w(FUNC(m72_state::scrolly_w<0>));
+	map(0x82, 0x83).w(FUNC(m72_state::scrollx_w<0>));
+	map(0x84, 0x85).w(FUNC(m72_state::scrolly_w<1>));
+	map(0x86, 0x87).w(FUNC(m72_state::scrollx_w<1>));
 
 	// these ports control the tilemap sizes, rowscroll etc. that m82 has, exact bit usage not known (maybe one for each layer?)
 	map(0x8c, 0x8d).w(FUNC(m72_state::m82_tm_ctrl_w));
@@ -1031,16 +1003,29 @@ void m72_state::m81_portmap(address_map &map)
 	map(0x04, 0x05).portr("DSW");
 	map(0x00, 0x00).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x02, 0x02).w(FUNC(m72_state::rtype2_port02_w));  /* coin counters, reset sound cpu, other stuff? */
-	map(0x04, 0x05).w(FUNC(m72_state::dmaon_w));
+	map(0x04, 0x04).w(FUNC(m72_state::dmaon_w));
 	map(0x06, 0x07).w(FUNC(m72_state::irq_line_w));
 	map(0x40, 0x43).rw(m_upd71059c, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
-	map(0x80, 0x81).w(FUNC(m72_state::scrolly1_w));
-	map(0x82, 0x83).w(FUNC(m72_state::scrollx1_w));
-	map(0x84, 0x85).w(FUNC(m72_state::scrolly2_w));
-	map(0x86, 0x87).w(FUNC(m72_state::scrollx2_w));
+	map(0x80, 0x81).w(FUNC(m72_state::scrolly_w<0>));
+	map(0x82, 0x83).w(FUNC(m72_state::scrollx_w<0>));
+	map(0x84, 0x85).w(FUNC(m72_state::scrolly_w<1>));
+	map(0x86, 0x87).w(FUNC(m72_state::scrollx_w<1>));
 }
 
-
+void m72_state::lohtb_portmap(address_map &map)
+{
+	map(0x20, 0x21).portr("IN0");
+	map(0x22, 0x23).portr("IN1");
+	map(0x24, 0x25).portr("DSW");
+	//map(0x00, 0x00).w("soundlatch", FUNC(generic_latch_8_device::write));
+	//map(0x02, 0x02).w(FUNC(m72_state::port02_w)); /* coin counters, reset sound cpu, other stuff? */
+	//map(0x04, 0x04).w(FUNC(m72_state::dmaon_w));
+	//map(0x06, 0x07).w(FUNC(m72_state::irq_line_w));
+	//map(0x80, 0x81).w(FUNC(m72_state::scrolly_w<0>));
+	//map(0x82, 0x83).w(FUNC(m72_state::scrollx_w<0>));
+	//map(0x84, 0x85).w(FUNC(m72_state::scrolly_w<1>));
+	//map(0x86, 0x87).w(FUNC(m72_state::scrollx_w<1>));
+}
 
 void m72_state::sound_ram_map(address_map &map)
 {
@@ -1063,12 +1048,18 @@ void m72_state::rtype_sound_portmap(address_map &map)
 
 void m72_state::sound_portmap(address_map &map)
 {
+	rtype_sound_portmap(map);
 	map.global_mask(0xff);
-	map(0x00, 0x01).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0x02, 0x02).r("soundlatch", FUNC(generic_latch_8_device::read));
-	map(0x06, 0x06).w("soundlatch", FUNC(generic_latch_8_device::acknowledge_w));
 	map(0x82, 0x82).w(m_audio, FUNC(m72_audio_device::sample_w));
 	map(0x84, 0x84).r(m_audio, FUNC(m72_audio_device::sample_r));
+}
+
+void m72_state::sound_protected_portmap(address_map &map)
+{
+	rtype_sound_portmap(map);
+	map.global_mask(0xff);
+	map(0x82, 0x82).w("mculatch", FUNC(generic_latch_8_device::write));
+	map(0x84, 0x84).r("soundlatch2", FUNC(generic_latch_8_device::read));
 }
 
 void m72_state::rtype2_sound_portmap(address_map &map)
@@ -1080,7 +1071,7 @@ void m72_state::rtype2_sound_portmap(address_map &map)
 	map(0x82, 0x82).w(m_audio, FUNC(m72_audio_device::sample_w));
 	map(0x83, 0x83).w("soundlatch", FUNC(generic_latch_8_device::acknowledge_w));
 	map(0x84, 0x84).r(m_audio, FUNC(m72_audio_device::sample_r));
-//  AM_RANGE(0x87, 0x87) AM_WRITENOP    /* ??? */
+//  map(0x87, 0x87).nopw();    /* ??? */
 }
 
 void m72_state::poundfor_sound_portmap(address_map &map)
@@ -1089,6 +1080,11 @@ void m72_state::poundfor_sound_portmap(address_map &map)
 	map(0x10, 0x13).w(m_audio, FUNC(m72_audio_device::poundfor_sample_addr_w));
 	map(0x40, 0x41).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x42, 0x42).rw("soundlatch", FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::acknowledge_w));
+}
+
+void m72_state::i80c31_mem_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom().region("mcu", 0);
 }
 
 void m72_state::mcu_io_map(address_map &map)
@@ -1812,121 +1808,151 @@ static GFXDECODE_START( gfx_majtitle )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(m72_state::m72_audio_chips)
+void m72_state::m72_audio_chips(machine_config &config)
+{
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundirq", rst_neg_buffer_device, rst18_w))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	generic_latch_8_device &soundlatch(GENERIC_LATCH_8(config, "soundlatch"));
+	soundlatch.data_pending_callback().set("soundirq", FUNC(rst_neg_buffer_device::rst18_w));
+	soundlatch.set_separate_acknowledge(true);
 
 	RST_NEG_BUFFER(config, "soundirq", 0).int_callback().set_inputline(m_soundcpu, 0);
 
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("soundirq", rst_neg_buffer_device, inta_cb)
+	m_soundcpu->set_irq_acknowledge_callback("soundirq", FUNC(rst_neg_buffer_device::inta_cb));
 
-	MCFG_DEVICE_ADD("m72", IREM_M72_AUDIO)
+	IREM_M72_AUDIO(config, m_audio);
+	m_audio->set_device_rom_tag("samples");
+	m_audio->set_dac_tag("dac");
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, SOUND_CLOCK)
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE("soundirq", rst_neg_buffer_device, rst28_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", SOUND_CLOCK));
+	ymsnd.irq_handler().set("soundirq", FUNC(rst_neg_buffer_device::rst28_w));
+	ymsnd.add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.3); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
-MACHINE_CONFIG_START(m72_state::m72_base)
-
+void m72_state::m72_base(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",V30,MASTER_CLOCK/2/2)    /* 16 MHz external freq (8MHz internal) */
-	MCFG_DEVICE_PROGRAM_MAP(m72_map)
-	MCFG_DEVICE_IO_MAP(m72_portmap)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("upd71059c", pic8259_device, inta_cb)
-	MCFG_DEVICE_ADD("soundcpu",Z80, SOUND_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(sound_ram_map)
-	MCFG_DEVICE_IO_MAP(sound_portmap)
+	V30(config, m_maincpu, MASTER_CLOCK/2/2);    /* 16 MHz external freq (8MHz internal) */
+	m_maincpu->set_addrmap(AS_PROGRAM, &m72_state::m72_map);
+	m_maincpu->set_addrmap(AS_IO, &m72_state::m72_portmap);
+	m_maincpu->set_irq_acknowledge_callback("upd71059c", FUNC(pic8259_device::inta_cb));
 
-	MCFG_DEVICE_ADD("upd71059c", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	Z80(config, m_soundcpu, SOUND_CLOCK);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &m72_state::sound_ram_map);
+	m_soundcpu->set_addrmap(AS_IO, &m72_state::sound_portmap);
+
+	PIC8259(config, m_upd71059c, 0);
+	m_upd71059c->out_int_callback().set_inputline(m_maincpu, 0);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_m72)
-	MCFG_PALETTE_ADD("palette", 512)
+	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/4, 512, 64, 448, 284, 0, 256)
-	MCFG_SCREEN_UPDATE_DRIVER(m72_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_m72);
+	PALETTE(config, m_palette).set_entries(512);
+
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(MASTER_CLOCK/4, 512, 64, 448, 284, 0, 256);
+	m_screen->set_screen_update(FUNC(m72_state::screen_update));
+	m_screen->set_palette(m_palette);
 
 	MCFG_VIDEO_START_OVERRIDE(m72_state,m72)
 
 	m72_audio_chips(config);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(m72_state::m72)
+void m72_state::m72(machine_config &config)
+{
 	m72_base(config);
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(m72_state, fake_nmi, 128*55)   /* clocked by V1? (Vigilante) */
-							/* IRQs are generated by main Z80 and YM2151 */
-MACHINE_CONFIG_END
+	/* Sample rate verified (Gallop : https://youtu.be/aozd0dbPzOw) */
+	m_soundcpu->set_periodic_int(FUNC(m72_state::fake_nmi), attotime::from_hz(MASTER_CLOCK/8/512));
+	/* IRQs are generated by main Z80 and YM2151 */
+}
 
-MACHINE_CONFIG_START(m72_state::m72_8751)
+void m72_state::m72_8751(machine_config &config)
+{
 	m72_base(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(m72_protected_map)
-	MCFG_DEVICE_IO_MAP(m72_protected_portmap)
+	m_maincpu->set_addrmap(AS_PROGRAM, &m72_state::m72_protected_map);
+	m_maincpu->set_addrmap(AS_IO, &m72_state::m72_protected_portmap);
+
+	m_soundcpu->set_addrmap(AS_IO, &m72_state::sound_protected_portmap);
 
 	MB8421_MB8431_16BIT(config, m_dpram);
-	//m_dpram->intl_callback().set("upd71059c", FUNC(pic8259_device::ir3_w)); // not actually used?
+	//m_dpram->intl_callback().set(m_upd71059c, FUNC(pic8259_device::ir3_w)); // not actually used?
 	m_dpram->intr_callback().set_inputline("mcu", MCS51_INT0_LINE);
 
-	MCFG_GENERIC_LATCH_8_ADD("mculatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("mcu", MCS51_INT1_LINE))
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	generic_latch_8_device &mculatch(GENERIC_LATCH_8(config, "mculatch"));
+	mculatch.data_pending_callback().set_inputline(m_mcu, MCS51_INT1_LINE);
+	mculatch.set_separate_acknowledge(true);
 
-	MCFG_DEVICE_ADD("mcu", I8751, XTAL(8'000'000)) /* Uses its own XTAL */
-	MCFG_DEVICE_IO_MAP(mcu_io_map)
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, m72_state, mcu_port1_w))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, m72_state, mcu_port3_w))
-	//MCFG_DEVICE_VBLANK_INT_DRIVER("screen", m72_state,  mcu_int)
-MACHINE_CONFIG_END
+	GENERIC_LATCH_8(config, "soundlatch2").data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);
 
+	i8751_device &mcu(I8751(config, m_mcu, XTAL(8'000'000))); /* Uses its own XTAL */
+	mcu.set_addrmap(AS_IO, &m72_state::mcu_io_map);
+	mcu.port_out_cb<1>().set(m_dac, FUNC(dac_byte_interface::write));
+}
 
-MACHINE_CONFIG_START(m72_state::rtype)
-	m72_base(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(rtype_map)
-
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_DEVICE_IO_MAP(rtype_sound_portmap)
-
-	MCFG_DEVICE_REMOVE("m72")
-	MCFG_DEVICE_REMOVE("dac")
-	MCFG_DEVICE_REMOVE("vref")
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(m72_state::m72_xmultipl)
+void m72_state::m72_airduel(machine_config &config)
+{
 	m72_8751(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(xmultiplm72_map)
+	m_maincpu->set_addrmap(AS_IO, &m72_state::m72_airduel_portmap);
+}
 
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(m72_state, nmi_line_pulse, 128*55) /* clocked by V1? (Vigilante) */
-								/* IRQs are generated by main Z80 and YM2151 */
+void m72_state::imgfightb(machine_config &config)
+{
+	m72_8751(config);
+	i80c31_device &mcu(I80C31(config.replace(), m_mcu, XTAL(7'200'000)));
+	mcu.set_addrmap(AS_PROGRAM, &m72_state::i80c31_mem_map);
+	mcu.set_addrmap(AS_IO, &m72_state::mcu_io_map);
 
-MACHINE_CONFIG_END
+	// TODO: uses 6116 type RAM instead of MB8421 and MB8431
+}
 
-
-MACHINE_CONFIG_START(m72_state::m72_dbreed)
+void m72_state::rtype(machine_config &config)
+{
 	m72_base(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(dbreedm72_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &m72_state::rtype_map);
+	m_soundcpu->set_addrmap(AS_IO, &m72_state::rtype_sound_portmap);
 
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(m72_state, nmi_line_pulse, 128*55) /* clocked by V1? (Vigilante) */
-								/* IRQs are generated by main Z80 and YM2151 */
-MACHINE_CONFIG_END
+	config.device_remove("m72");
+	config.device_remove("dac");
+	config.device_remove("vref");
+}
+
+void m72_state::m72_xmultipl(machine_config &config)
+{
+	m72_8751(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &m72_state::xmultiplm72_map);
+
+	/* Sample rate verified (Gallop : https://youtu.be/aozd0dbPzOw) */
+	m_soundcpu->set_periodic_int(FUNC(m72_state::nmi_line_pulse), attotime::from_hz(MASTER_CLOCK/8/512));
+	/* IRQs are generated by main Z80 and YM2151 */
+}
+
+void m72_state::m72_dbreedw(machine_config &config)
+{
+	m72_base(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &m72_state::dbreedwm72_map);
+
+	/* Sample rate verified (Gallop : https://youtu.be/aozd0dbPzOw) */
+	m_soundcpu->set_periodic_int(FUNC(m72_state::nmi_line_pulse), attotime::from_hz(MASTER_CLOCK/8/512));
+	/* IRQs are generated by main Z80 and YM2151 */
+}
+
+void m72_state::m72_dbreed(machine_config &config)
+{
+	m72_8751(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &m72_state::dbreedm72_map);
+
+	/* Sample rate verified (Gallop : https://youtu.be/aozd0dbPzOw) */
+	m_soundcpu->set_periodic_int(FUNC(m72_state::nmi_line_pulse), attotime::from_hz(MASTER_CLOCK/8/512));
+	/* IRQs are generated by main Z80 and YM2151 */
+}
 
 
 
@@ -1934,123 +1960,142 @@ MACHINE_CONFIG_END
 /****************************************** M81 ***********************************************/
 
 // M81 is closest to M72
-MACHINE_CONFIG_START(m72_state::m81_hharry)
+void m72_state::m81_hharry(machine_config &config)
+{
 	m72_base(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(hharry_map)
-	MCFG_DEVICE_IO_MAP(m81_portmap)
+	m_maincpu->set_addrmap(AS_PROGRAM, &m72_state::hharry_map);
+	m_maincpu->set_addrmap(AS_IO, &m72_state::m81_portmap);
 
-	MCFG_DEVICE_MODIFY("soundcpu")
-	MCFG_DEVICE_PROGRAM_MAP(sound_rom_map)
-	MCFG_DEVICE_IO_MAP(rtype2_sound_portmap)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(m72_state, nmi_line_pulse, 128*55)
+	m_soundcpu->set_addrmap(AS_PROGRAM, &m72_state::sound_rom_map);
+	m_soundcpu->set_addrmap(AS_IO, &m72_state::rtype2_sound_portmap);
+	m_soundcpu->set_periodic_int(FUNC(m72_state::nmi_line_pulse), attotime::from_hz(MASTER_CLOCK/8/512));
 
 	MCFG_VIDEO_START_OVERRIDE(m72_state,hharry)
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(m72_state, screen_update_m81)
-MACHINE_CONFIG_END
+	m_screen->set_screen_update(FUNC(m72_state::screen_update_m81));
+}
 
-MACHINE_CONFIG_START(m72_state::m81_xmultipl)
+void m72_state::m81_xmultipl(machine_config &config)
+{
 	m81_hharry(config);
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(xmultipl_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &m72_state::xmultipl_map);
 
 	MCFG_VIDEO_START_OVERRIDE(m72_state,xmultipl) // different offsets
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(m72_state::m81_dbreed)
+void m72_state::m81_dbreed(machine_config &config)
+{
 	m81_xmultipl(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(dbreed_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &m72_state::dbreed_map);
+}
 
 /****************************************** M84 ***********************************************/
 
 // M84
-MACHINE_CONFIG_START(m72_state::rtype2)
-
+void m72_state::rtype2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", V30,MASTER_CLOCK/2/2)   /* 16 MHz external freq (8MHz internal) */
-	MCFG_DEVICE_PROGRAM_MAP(rtype2_map)
-	MCFG_DEVICE_IO_MAP(m84_portmap)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("upd71059c", pic8259_device, inta_cb)
+	V30(config, m_maincpu, MASTER_CLOCK/2/2);   /* 16 MHz external freq (8MHz internal) */
+	m_maincpu->set_addrmap(AS_PROGRAM, &m72_state::rtype2_map);
+	m_maincpu->set_addrmap(AS_IO, &m72_state::m84_portmap);
+	m_maincpu->set_irq_acknowledge_callback("upd71059c", FUNC(pic8259_device::inta_cb));
 
-	MCFG_DEVICE_ADD("soundcpu", Z80, SOUND_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(sound_rom_map)
-	MCFG_DEVICE_IO_MAP(rtype2_sound_portmap)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(m72_state, nmi_line_pulse, 128*55) /* clocked by V1? (Vigilante) */
+	Z80(config, m_soundcpu, SOUND_CLOCK);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &m72_state::sound_rom_map);
+	m_soundcpu->set_addrmap(AS_IO, &m72_state::rtype2_sound_portmap);
+	m_soundcpu->set_periodic_int(FUNC(m72_state::nmi_line_pulse), attotime::from_hz(MASTER_CLOCK/8/512)); /* verified (https://youtu.be/lUszf9Ong7U) */
 								/* IRQs are generated by main Z80 and YM2151 */
 
-	MCFG_DEVICE_ADD("upd71059c", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	PIC8259(config, m_upd71059c, 0);
+	m_upd71059c->out_int_callback().set_inputline(m_maincpu, 0);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rtype2)
-	MCFG_PALETTE_ADD("palette", 512)
+	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/4, 512, 64, 448, 284, 0, 256)
-	MCFG_SCREEN_UPDATE_DRIVER(m72_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rtype2);
+	PALETTE(config, m_palette).set_entries(512);
+
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(MASTER_CLOCK/4, 512, 64, 448, 284, 0, 256);
+	m_screen->set_screen_update(FUNC(m72_state::screen_update));
+	m_screen->set_palette(m_palette);
 
 	MCFG_VIDEO_START_OVERRIDE(m72_state,rtype2)
 
 	m72_audio_chips(config);
-MACHINE_CONFIG_END
+}
 
 // not m72, different video system (less tiles regions?) (M84? M82?)
-MACHINE_CONFIG_START(m72_state::hharryu)
+void m72_state::hharryu(machine_config &config)
+{
 	rtype2(config);
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(hharryu_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &m72_state::hharryu_map);
 
 	MCFG_VIDEO_START_OVERRIDE(m72_state,hharryu)
-MACHINE_CONFIG_END
+}
 
 
 // M84
 
-MACHINE_CONFIG_START(m72_state::cosmccop)
-
+void m72_state::cosmccop(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", V35,MASTER_CLOCK/2)
-	MCFG_DEVICE_PROGRAM_MAP(kengo_map)
-	MCFG_DEVICE_IO_MAP(m84_v33_portmap)
+	V35(config, m_maincpu, MASTER_CLOCK/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &m72_state::kengo_map);
+	m_maincpu->set_addrmap(AS_IO, &m72_state::m84_v33_portmap);
 
-	MCFG_DEVICE_ADD("soundcpu", Z80, SOUND_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(sound_rom_map)
-	MCFG_DEVICE_IO_MAP(rtype2_sound_portmap)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(m72_state, nmi_line_pulse, 128*55) /* clocked by V1? (Vigilante) */
+	Z80(config, m_soundcpu, SOUND_CLOCK);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &m72_state::sound_rom_map);
+	m_soundcpu->set_addrmap(AS_IO, &m72_state::rtype2_sound_portmap);
+	m_soundcpu->set_periodic_int(FUNC(m72_state::nmi_line_pulse), attotime::from_hz(MASTER_CLOCK/8/512)); /* verified (https://youtu.be/Sol2Yq2S5hQ) */
 								/* IRQs are generated by main Z80 and YM2151 */
 
 	MCFG_MACHINE_START_OVERRIDE(m72_state,kengo)
 	MCFG_MACHINE_RESET_OVERRIDE(m72_state,kengo)
 
-	// upd71059c isn't needed beacuse the V35 has its own IRQ controller
+	// upd71059c isn't needed because the V35 has its own IRQ controller
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rtype2)
-	MCFG_PALETTE_ADD("palette", 512)
+	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/4, 512, 64, 448, 284, 0, 256)
-	MCFG_SCREEN_UPDATE_DRIVER(m72_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rtype2);
+	PALETTE(config, m_palette).set_entries(512);
+
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(MASTER_CLOCK/4, 512, 64, 448, 284, 0, 256);
+	m_screen->set_screen_update(FUNC(m72_state::screen_update));
+	m_screen->set_palette(m_palette);
 
 	MCFG_VIDEO_START_OVERRIDE(m72_state,hharryu)
 
 	m72_audio_chips(config);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(m72_state::kengo)
+void m72_state::kengo(machine_config &config)
+{
 	cosmccop(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_V25_CONFIG(gunforce_decryption_table)
-MACHINE_CONFIG_END
+	subdevice<v35_device>("maincpu")->set_decryption_table(gunforce_decryption_table);
+}
 
+void m72_state::imgfightj(machine_config &config)
+{
+	m72_8751(config);
+	MCFG_VIDEO_START_OVERRIDE(m72_state,imgfightj)
+}
+
+void m72_state::nspiritj(machine_config &config)
+{
+	m72_8751(config);
+	MCFG_VIDEO_START_OVERRIDE(m72_state,nspiritj)
+}
+
+void m72_state::mrheli(machine_config &config)
+{
+	m72_8751(config);
+	MCFG_VIDEO_START_OVERRIDE(m72_state,mrheli)
+}
 
 /****************************************** M82 ***********************************************/
 
@@ -2060,79 +2105,115 @@ M82-A-A as the top board
 M82-B-A and as the bottom board
 
 */
-MACHINE_CONFIG_START(m72_state::m82)
-
+void m72_state::m82(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", V30,MASTER_CLOCK/2/2)   /* 16 MHz external freq (8MHz internal) */
-	MCFG_DEVICE_PROGRAM_MAP(m82_map)
-	MCFG_DEVICE_IO_MAP(m82_portmap)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("upd71059c", pic8259_device, inta_cb)
-	MCFG_DEVICE_ADD("soundcpu", Z80, SOUND_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(sound_rom_map)
-	MCFG_DEVICE_IO_MAP(rtype2_sound_portmap)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(m72_state, nmi_line_pulse, 128*55) /* clocked by V1? (Vigilante) */
+	V30(config, m_maincpu, MASTER_CLOCK/2/2);   /* 16 MHz external freq (8MHz internal) */
+	m_maincpu->set_addrmap(AS_PROGRAM, &m72_state::m82_map);
+	m_maincpu->set_addrmap(AS_IO, &m72_state::m82_portmap);
+	m_maincpu->set_irq_acknowledge_callback("upd71059c", FUNC(pic8259_device::inta_cb));
+
+	Z80(config, m_soundcpu, SOUND_CLOCK);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &m72_state::sound_rom_map);
+	m_soundcpu->set_addrmap(AS_IO, &m72_state::rtype2_sound_portmap);
+	m_soundcpu->set_periodic_int(FUNC(m72_state::nmi_line_pulse), attotime::from_hz(MASTER_CLOCK/8/512)); /* verified (https://youtu.be/lLQDPe-8Ha0) */
 								/* IRQs are generated by main Z80 and YM2151 */
 
-	MCFG_DEVICE_ADD("upd71059c", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	PIC8259(config, m_upd71059c, 0);
+	m_upd71059c->out_int_callback().set_inputline(m_maincpu, 0);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_majtitle)
-	MCFG_PALETTE_ADD("palette", 512)
+	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/4, 512, 64, 448, 284, 0, 256)
-	MCFG_SCREEN_UPDATE_DRIVER(m72_state, screen_update_m82)
-	MCFG_SCREEN_PALETTE("palette")
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_majtitle);
+	PALETTE(config, m_palette).set_entries(512);
+
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(MASTER_CLOCK/4, 512, 64, 448, 284, 0, 256);
+	m_screen->set_screen_update(FUNC(m72_state::screen_update_m82));
+	m_screen->set_palette(m_palette);
 
 	MCFG_VIDEO_START_OVERRIDE(m72_state,m82)
 
 	m72_audio_chips(config);
-MACHINE_CONFIG_END
+}
 
 
 /* Pound for Pound uses
   M85-A-B / M85-B
 */
 
-MACHINE_CONFIG_START(m72_state::poundfor)
-
+void m72_state::poundfor(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", V30,MASTER_CLOCK/2/2)   /* 16 MHz external freq (8MHz internal) */
-	MCFG_DEVICE_PROGRAM_MAP(rtype2_map)
-	MCFG_DEVICE_IO_MAP(poundfor_portmap)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("upd71059c", pic8259_device, inta_cb)
-	MCFG_DEVICE_ADD("soundcpu", Z80, SOUND_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(sound_rom_map)
-	MCFG_DEVICE_IO_MAP(poundfor_sound_portmap)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(m72_state, fake_nmi, 128*55)   /* clocked by V1? (Vigilante) */
+	V30(config, m_maincpu, MASTER_CLOCK/2/2);   /* 16 MHz external freq (8MHz internal) */
+	m_maincpu->set_addrmap(AS_PROGRAM, &m72_state::rtype2_map);
+	m_maincpu->set_addrmap(AS_IO, &m72_state::poundfor_portmap);
+	m_maincpu->set_irq_acknowledge_callback("upd71059c", FUNC(pic8259_device::inta_cb));
+
+	Z80(config, m_soundcpu, SOUND_CLOCK);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &m72_state::sound_rom_map);
+	m_soundcpu->set_addrmap(AS_IO, &m72_state::poundfor_sound_portmap);
+	m_soundcpu->set_periodic_int(FUNC(m72_state::fake_nmi), attotime::from_hz(MASTER_CLOCK/8/512));   /* clocked by V1? (Vigilante) */
 								/* IRQs are generated by main Z80 and YM2151 */
 
-	MCFG_DEVICE_ADD("upd71059c", PIC8259, 0)
-	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	PIC8259(config, m_upd71059c, 0);
+	m_upd71059c->out_int_callback().set_inputline(m_maincpu, 0);
 
-	MCFG_DEVICE_ADD("upd4701l", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("TRACK0_X")
-	MCFG_UPD4701_PORTY("TRACK0_Y")
+	UPD4701A(config, m_upd4701[0]);
+	m_upd4701[0]->set_portx_tag("TRACK0_X");
+	m_upd4701[0]->set_porty_tag("TRACK0_Y");
 
-	MCFG_DEVICE_ADD("upd4701h", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("TRACK1_X")
-	MCFG_UPD4701_PORTY("TRACK1_Y")
+	UPD4701A(config, m_upd4701[1]);
+	m_upd4701[1]->set_portx_tag("TRACK1_X");
+	m_upd4701[1]->set_porty_tag("TRACK1_Y");
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rtype2)
-	MCFG_PALETTE_ADD("palette", 512)
+	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/4, 512, 64, 448, 284, 0, 256)
-	MCFG_SCREEN_UPDATE_DRIVER(m72_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rtype2);
+	PALETTE(config, m_palette).set_entries(512);
+
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(MASTER_CLOCK/4, 512, 64, 448, 284, 0, 256);
+	m_screen->set_screen_update(FUNC(m72_state::screen_update));
+	m_screen->set_palette(m_palette);
 
 	MCFG_VIDEO_START_OVERRIDE(m72_state,poundfor)
 
 	m72_audio_chips(config);
-MACHINE_CONFIG_END
+}
 
+void m72_state::lohtb(machine_config &config) // almost all to be verified
+{
+	/* basic machine hardware */
+	V30(config, m_maincpu, MASTER_CLOCK/2/2);    /* 16 MHz external freq (8MHz internal) */
+	m_maincpu->set_addrmap(AS_PROGRAM, &m72_state::lohtb_map);
+	m_maincpu->set_addrmap(AS_IO, &m72_state::lohtb_portmap);
+
+	Z80(config, m_soundcpu, SOUND_CLOCK);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &m72_state::sound_rom_map);
+	m_soundcpu->set_addrmap(AS_IO, &m72_state::sound_portmap);
+
+	MCFG_MACHINE_START_OVERRIDE(m72_state,kengo)
+	MCFG_MACHINE_RESET_OVERRIDE(m72_state,kengo)
+
+	/* video hardware */
+	BUFFERED_SPRITERAM16(config, m_spriteram);
+
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_m72);
+	PALETTE(config, m_palette).set_entries(512);
+
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(MASTER_CLOCK/4, 512, 64, 448, 284, 0, 256);
+	m_screen->set_screen_update(FUNC(m72_state::screen_update));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set_inputline(m_maincpu, 0);
+
+	MCFG_VIDEO_START_OVERRIDE(m72_state,m72)
+
+	m72_audio_chips(config);
+}
 
 /***************************************************************************
 
@@ -2331,80 +2412,81 @@ ROM_START( rtypeb )
 	ROM_LOAD( "rt_b-b3.3f", 0x18000, 0x08000, CRC(ad89b072) SHA1(e2683d0e7415f3abd147e518bf6c87e44744cd4f) )
 ROM_END
 
+
 ROM_START( bchopper )
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "c-h0-b.rom",   0x00001, 0x10000, CRC(f2feab16) SHA1(03ee874658e0f59957f8425e1ebf9c938737cc19) )
-	ROM_LOAD16_BYTE( "c-l0-b.rom",   0x00000, 0x10000, CRC(9f887096) SHA1(4f41ef29580fc026ea91d110ec6b2e6af83dbd9a) )
-	ROM_LOAD16_BYTE( "c-h1-b.rom",   0x20001, 0x10000, CRC(a995d64f) SHA1(43eb2eb11e6875298a6ef2b18f0f5e587f1bba16) )
-	ROM_LOAD16_BYTE( "c-l1-b.rom",   0x20000, 0x10000, CRC(41dda999) SHA1(4d07a399aaf16bc37b5488e3e4bb60e78811a099) )
-	ROM_LOAD16_BYTE( "c-h3-b.rom",   0x60001, 0x10000, CRC(ab9451ca) SHA1(ec0e0ad592d8b21bb4e6927a452e3b7964cda015) )
-	ROM_RELOAD(                      0xe0001, 0x10000 )
-	ROM_LOAD16_BYTE( "c-l3-b.rom",   0x60000, 0x10000, CRC(11562221) SHA1(a2f136a487fb6f30350e8d1e26c0729eb0686c7d) )
-	ROM_RELOAD(                      0xe0000, 0x10000 )
+	ROM_LOAD16_BYTE( "mh_c-h0-b.ic40", 0x00001, 0x10000, CRC(f2feab16) SHA1(03ee874658e0f59957f8425e1ebf9c938737cc19) )
+	ROM_LOAD16_BYTE( "mh_c-l0-b.ic37", 0x00000, 0x10000, CRC(9f887096) SHA1(4f41ef29580fc026ea91d110ec6b2e6af83dbd9a) )
+	ROM_LOAD16_BYTE( "mh_c-h1-b.ic41", 0x20001, 0x10000, CRC(a995d64f) SHA1(43eb2eb11e6875298a6ef2b18f0f5e587f1bba16) )
+	ROM_LOAD16_BYTE( "mh_c-l1-b.ic36", 0x20000, 0x10000, CRC(41dda999) SHA1(4d07a399aaf16bc37b5488e3e4bb60e78811a099) )
+	ROM_LOAD16_BYTE( "mh_c-h3-b.ic43", 0x60001, 0x10000, CRC(ab9451ca) SHA1(ec0e0ad592d8b21bb4e6927a452e3b7964cda015) )
+	ROM_RELOAD(                        0xe0001, 0x10000 )
+	ROM_LOAD16_BYTE( "mh_c-l3-b.ic34", 0x60000, 0x10000, CRC(11562221) SHA1(a2f136a487fb6f30350e8d1e26c0729eb0686c7d) )
+	ROM_RELOAD(                        0xe0000, 0x10000 )
 
-	ROM_REGION( 0x10000, "mcu", 0 )
-	ROM_LOAD( "bchopper_i8751.mcu",  0x00000, 0x10000, NO_DUMP ) // read protected
+	ROM_REGION( 0x10000, "mcu", 0 )  /* i8751 microcontroller */
+	ROM_LOAD( "mh_c-pr-b.ic1",  0x00000, 0x10000, NO_DUMP ) /* i8751 MCU labeled  MH C-PR-B  - read protected */
 
 	ROM_REGION( 0x080000, "sprites", 0 )
-	ROM_LOAD( "c-00-a.rom",   0x00000, 0x10000, CRC(f6e6e660) SHA1(e066e5ed37719cf2b6fd36e0117f11325bb06f9c) )  /* sprites */
-	ROM_LOAD( "c-01-b.rom",   0x10000, 0x10000, CRC(708cdd37) SHA1(24f3fcd381422f0d75410c2af7a56744e3b4a699) )
-	ROM_LOAD( "c-10-a.rom",   0x20000, 0x10000, CRC(292c8520) SHA1(c552090d295ee1c1ca611b0cddee356e509e2045) )
-	ROM_LOAD( "c-11-b.rom",   0x30000, 0x10000, CRC(20904cf3) SHA1(71fe505f2da53c2eb445b7b758d257d6af42e6f1) )
-	ROM_LOAD( "c-20-a.rom",   0x40000, 0x10000, CRC(1ab50c23) SHA1(43e2f11e5bbf157c47764e04e372f40ed68bab59) )
-	ROM_LOAD( "c-21-b.rom",   0x50000, 0x10000, CRC(c823d34c) SHA1(47383214b6a60e0b1b70208b00c291f8ffed36bc) )
-	ROM_LOAD( "c-30-a.rom",   0x60000, 0x10000, CRC(11f6c56b) SHA1(39a2a674698b044c84fea65ae41a9e003a50b639) )
-	ROM_LOAD( "c-31-b.rom",   0x70000, 0x10000, CRC(23134ec5) SHA1(43453f8a13b51310e04729dc828d391ca9c04da2) )
+	ROM_LOAD( "mh_c-00-a.ic53", 0x00000, 0x10000, CRC(f6e6e660) SHA1(e066e5ed37719cf2b6fd36e0117f11325bb06f9c) )  /* sprites */
+	ROM_LOAD( "mh_c-01-b.ic52", 0x10000, 0x10000, CRC(708cdd37) SHA1(24f3fcd381422f0d75410c2af7a56744e3b4a699) )
+	ROM_LOAD( "mh_c-10-a.ic51", 0x20000, 0x10000, CRC(292c8520) SHA1(c552090d295ee1c1ca611b0cddee356e509e2045) )
+	ROM_LOAD( "mh_c-11-b.ic50", 0x30000, 0x10000, CRC(20904cf3) SHA1(71fe505f2da53c2eb445b7b758d257d6af42e6f1) )
+	ROM_LOAD( "mh_c-20-a.ic49", 0x40000, 0x10000, CRC(1ab50c23) SHA1(43e2f11e5bbf157c47764e04e372f40ed68bab59) )
+	ROM_LOAD( "mh_c-21-b.ic48", 0x50000, 0x10000, CRC(c823d34c) SHA1(47383214b6a60e0b1b70208b00c291f8ffed36bc) )
+	ROM_LOAD( "mh_c-30-a.ic47", 0x60000, 0x10000, CRC(11f6c56b) SHA1(39a2a674698b044c84fea65ae41a9e003a50b639) )
+	ROM_LOAD( "mh_c-31-b.ic46", 0x70000, 0x10000, CRC(23134ec5) SHA1(43453f8a13b51310e04729dc828d391ca9c04da2) )
 
 	ROM_REGION( 0x040000, "gfx2", 0 )
-	ROM_LOAD( "b-a0-b.rom",   0x00000, 0x10000, CRC(e46ed7bf) SHA1(75abb5f40629f7c40a610a44e068b6c4e3a5126e) )  /* tiles #1 */
-	ROM_LOAD( "b-a1-b.rom",   0x10000, 0x10000, CRC(590605ff) SHA1(fbb5c0cebd28b08d4ce39db4055d6343620e0f1c) )
-	ROM_LOAD( "b-a2-b.rom",   0x20000, 0x10000, CRC(f8158226) SHA1(bb3a8686cd89bb8265b6b9e03682cc0bf6533793) )
-	ROM_LOAD( "b-a3-b.rom",   0x30000, 0x10000, CRC(0f07b9b7) SHA1(63dbec17097f07eb39299372b736fbbc1b11b65e) )
+	ROM_LOAD( "mh_b-a0-b.ic21", 0x00000, 0x10000, CRC(e46ed7bf) SHA1(75abb5f40629f7c40a610a44e068b6c4e3a5126e) )  /* tiles #1 */
+	ROM_LOAD( "mh_b-a1-b.ic22", 0x10000, 0x10000, CRC(590605ff) SHA1(fbb5c0cebd28b08d4ce39db4055d6343620e0f1c) )
+	ROM_LOAD( "mh_b-a2-b.ic20", 0x20000, 0x10000, CRC(f8158226) SHA1(bb3a8686cd89bb8265b6b9e03682cc0bf6533793) )
+	ROM_LOAD( "mh_b-a3-b.ic23", 0x30000, 0x10000, CRC(0f07b9b7) SHA1(63dbec17097f07eb39299372b736fbbc1b11b65e) )
 
 	ROM_REGION( 0x040000, "gfx3", 0 )
-	ROM_LOAD( "b-b0-.rom",    0x00000, 0x10000, CRC(b5b95776) SHA1(4685b56071b916ce712c45f24da8068dd7e40ed1) )  /* tiles #2 */
-	ROM_LOAD( "b-b1-.rom",    0x10000, 0x10000, CRC(74ca16ee) SHA1(7984bc9a0b46e1b4a8ecac7528d57606305aad73) )
-	ROM_LOAD( "b-b2-.rom",    0x20000, 0x10000, CRC(b82cca04) SHA1(c12b95be311205181b01d15021bcf9f01ed3e0a3) )
-	ROM_LOAD( "b-b3-.rom",    0x30000, 0x10000, CRC(a7afc920) SHA1(92c75463ada39184e731b82ef2883ae6f1f67482) )
+	ROM_LOAD( "mh_b-b0-.ic26", 0x00000, 0x10000, CRC(b5b95776) SHA1(4685b56071b916ce712c45f24da8068dd7e40ed1) )  /* tiles #2 */
+	ROM_LOAD( "mh_b-b1-.ic27", 0x10000, 0x10000, CRC(74ca16ee) SHA1(7984bc9a0b46e1b4a8ecac7528d57606305aad73) )
+	ROM_LOAD( "mh_b-b2-.ic25", 0x20000, 0x10000, CRC(b82cca04) SHA1(c12b95be311205181b01d15021bcf9f01ed3e0a3) )
+	ROM_LOAD( "mh_b-b3-.ic24", 0x30000, 0x10000, CRC(a7afc920) SHA1(92c75463ada39184e731b82ef2883ae6f1f67482) )
 
 	ROM_REGION( 0x10000, "samples", 0 ) /* samples */
-	ROM_LOAD( "c-v0-b.rom",   0x00000, 0x10000, CRC(d0c27e58) SHA1(fec76217cc0c04c723989c3ec127a2bd33d64c60) )
+	ROM_LOAD( "mh_c-v0-b.ic44", 0x00000, 0x10000, CRC(d0c27e58) SHA1(fec76217cc0c04c723989c3ec127a2bd33d64c60) )
 ROM_END
 
 ROM_START( mrheli )
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "mh-c-h0.bin",  0x00001, 0x10000, CRC(e2ca5646) SHA1(9f4fe2f0a45233325bd9336cabb925a1f625453b) )
-	ROM_LOAD16_BYTE( "mh-c-l0.bin",  0x00000, 0x10000, CRC(643e23cd) SHA1(66998a6dfc7ef538540986b61d2414a5ef250d0d) )
-	ROM_LOAD16_BYTE( "mh-c-h1.bin",  0x20001, 0x10000, CRC(8974e84d) SHA1(39e05c80e805dde45f2fc5fc429b75f9b599089c) )
-	ROM_LOAD16_BYTE( "mh-c-l1.bin",  0x20000, 0x10000, CRC(5f8bda69) SHA1(48629d617bd48c9de9c6a567fb203258a56fdbbd) )
-	ROM_LOAD16_BYTE( "mh-c-h3.bin",  0x60001, 0x10000, CRC(143f596e) SHA1(f9d444eebcd53dac925d14b7a2858803b7fd9ce2) )
-	ROM_RELOAD(                      0xe0001, 0x10000 )
-	ROM_LOAD16_BYTE( "mh-c-l3.bin",  0x60000, 0x10000, CRC(c0982536) SHA1(45399f8d0577c6e2a277a69303954ce5d2de7c07) )
-	ROM_RELOAD(                      0xe0000, 0x10000 )
+	ROM_LOAD16_BYTE( "mh_c-h0-.ic40", 0x00001, 0x10000, CRC(e2ca5646) SHA1(9f4fe2f0a45233325bd9336cabb925a1f625453b) )
+	ROM_LOAD16_BYTE( "mh_c-l0-.ic37", 0x00000, 0x10000, CRC(643e23cd) SHA1(66998a6dfc7ef538540986b61d2414a5ef250d0d) )
+	ROM_LOAD16_BYTE( "mh_c-h1-.ic41", 0x20001, 0x10000, CRC(8974e84d) SHA1(39e05c80e805dde45f2fc5fc429b75f9b599089c) )
+	ROM_LOAD16_BYTE( "mh_c-l1-.ic36", 0x20000, 0x10000, CRC(5f8bda69) SHA1(48629d617bd48c9de9c6a567fb203258a56fdbbd) )
+	ROM_LOAD16_BYTE( "mh_c-h3-.ic43", 0x60001, 0x10000, CRC(143f596e) SHA1(f9d444eebcd53dac925d14b7a2858803b7fd9ce2) )
+	ROM_RELOAD(                       0xe0001, 0x10000 )
+	ROM_LOAD16_BYTE( "mh_c-l3-.ic34", 0x60000, 0x10000, CRC(c0982536) SHA1(45399f8d0577c6e2a277a69303954ce5d2de7c07) )
+	ROM_RELOAD(                       0xe0000, 0x10000 )
 
-	ROM_REGION( 0x10000, "mcu", 0 )
-	ROM_LOAD( "mh-c-pr.bin",  0x00000, 0x1000, CRC(897dc4ee) SHA1(05a24bf76e8fa9ca96ba9376cbf44d299df04138) )
+	ROM_REGION( 0x10000, "mcu", 0 )  /* i8751 microcontroller */
+	ROM_LOAD( "mh_c-pr-.ic1",  0x00000, 0x1000, CRC(897dc4ee) SHA1(05a24bf76e8fa9ca96ba9376cbf44d299df04138) ) /* i8751 MCU labeled  MH C-PR- */
 
 	ROM_REGION( 0x080000, "sprites", 0 )
-	ROM_LOAD( "mh-c-00.bin",  0x00000, 0x20000, CRC(dec4e121) SHA1(92169b523f1600e994e016dc1959a52958e1d89d) )  /* sprites */
-	ROM_LOAD( "mh-c-10.bin",  0x20000, 0x20000, CRC(7aaa151e) SHA1(efd980bb2eed7084354b7a4aa2f733cd2f876741) )
-	ROM_LOAD( "mh-c-20.bin",  0x40000, 0x20000, CRC(eae0de74) SHA1(3a2469c0eeb18131f989807afb50228f57ccea30) )
-	ROM_LOAD( "mh-c-30.bin",  0x60000, 0x20000, CRC(01d5052f) SHA1(5d5e70913bb7af48193c70209595f27a64fa6cac) )
+	ROM_LOAD( "mh_c-00.ic53", 0x00000, 0x20000, CRC(dec4e121) SHA1(92169b523f1600e994e016dc1959a52958e1d89d) )  /* sprites */
+	ROM_LOAD( "mh_c-10.ic51", 0x20000, 0x20000, CRC(7aaa151e) SHA1(efd980bb2eed7084354b7a4aa2f733cd2f876741) )
+	ROM_LOAD( "mh_c-20.ic49", 0x40000, 0x20000, CRC(eae0de74) SHA1(3a2469c0eeb18131f989807afb50228f57ccea30) )
+	ROM_LOAD( "mh_c-30.ic47", 0x60000, 0x20000, CRC(01d5052f) SHA1(5d5e70913bb7af48193c70209595f27a64fa6cac) )
 
 	ROM_REGION( 0x040000, "gfx2", 0 )
-	ROM_LOAD( "mh-b-a0.bin",  0x00000, 0x10000, CRC(6a0db256) SHA1(fa3a2dc03da5bbe06a9c9b3d4ed4fddb47c469ac) )  /* tiles #1 */
-	ROM_LOAD( "mh-b-a1.bin",  0x10000, 0x10000, CRC(14ec9795) SHA1(4842e076115efe9daf00dab8f61516d28c19baae) )
-	ROM_LOAD( "mh-b-a2.bin",  0x20000, 0x10000, CRC(dfcb510e) SHA1(2387cde4ec0bae176486e1f7541103fd557fe255) )
-	ROM_LOAD( "mh-b-a3.bin",  0x30000, 0x10000, CRC(957e329b) SHA1(9d48a0b84915e1cef0b0311a3581991dc83ee199) )
+	ROM_LOAD( "mh_b-a0.ic21", 0x00000, 0x10000, CRC(6a0db256) SHA1(fa3a2dc03da5bbe06a9c9b3d4ed4fddb47c469ac) )  /* tiles #1 */
+	ROM_LOAD( "mh_b-a1.ic22", 0x10000, 0x10000, CRC(14ec9795) SHA1(4842e076115efe9daf00dab8f61516d28c19baae) )
+	ROM_LOAD( "mh_b-a2.ic20", 0x20000, 0x10000, CRC(dfcb510e) SHA1(2387cde4ec0bae176486e1f7541103fd557fe255) )
+	ROM_LOAD( "mh_b-a3.ic23", 0x30000, 0x10000, CRC(957e329b) SHA1(9d48a0b84915e1cef0b0311a3581991dc83ee199) )
 
 	ROM_REGION( 0x040000, "gfx3", 0 )
-	ROM_LOAD( "b-b0-.rom",    0x00000, 0x10000, CRC(b5b95776) SHA1(4685b56071b916ce712c45f24da8068dd7e40ed1) )  /* tiles #2 */
-	ROM_LOAD( "b-b1-.rom",    0x10000, 0x10000, CRC(74ca16ee) SHA1(7984bc9a0b46e1b4a8ecac7528d57606305aad73) )
-	ROM_LOAD( "b-b2-.rom",    0x20000, 0x10000, CRC(b82cca04) SHA1(c12b95be311205181b01d15021bcf9f01ed3e0a3) )
-	ROM_LOAD( "b-b3-.rom",    0x30000, 0x10000, CRC(a7afc920) SHA1(92c75463ada39184e731b82ef2883ae6f1f67482) )
+	ROM_LOAD( "mh_b-b0-.ic26", 0x00000, 0x10000, CRC(b5b95776) SHA1(4685b56071b916ce712c45f24da8068dd7e40ed1) )  /* tiles #2 */
+	ROM_LOAD( "mh_b-b1-.ic27", 0x10000, 0x10000, CRC(74ca16ee) SHA1(7984bc9a0b46e1b4a8ecac7528d57606305aad73) )
+	ROM_LOAD( "mh_b-b2-.ic25", 0x20000, 0x10000, CRC(b82cca04) SHA1(c12b95be311205181b01d15021bcf9f01ed3e0a3) )
+	ROM_LOAD( "mh_b-b3-.ic24", 0x30000, 0x10000, CRC(a7afc920) SHA1(92c75463ada39184e731b82ef2883ae6f1f67482) )
 
 	ROM_REGION( 0x10000, "samples", 0 ) /* samples */
-	ROM_LOAD( "c-v0-b.rom",   0x00000, 0x10000, CRC(d0c27e58) SHA1(fec76217cc0c04c723989c3ec127a2bd33d64c60) )
+	ROM_LOAD( "mh_c-v0-b.ic44", 0x00000, 0x10000, CRC(d0c27e58) SHA1(fec76217cc0c04c723989c3ec127a2bd33d64c60) )
 ROM_END
 
 /*
@@ -2534,19 +2616,19 @@ Notes:
 
 ROM_START( nspirit )
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "nin_c-h0.6h", 0x00001, 0x10000, CRC(035692fa) SHA1(d5ab54488344bf405063737ed55d68ff1e64b55f) )
-	ROM_LOAD16_BYTE( "nin_c-l0.6d", 0x00000, 0x10000, CRC(9a405898) SHA1(b28d71c1a6410720a37e6b6518b3cc66d4c32972) )
-	ROM_LOAD16_BYTE( "nin_c-h1.6j", 0x20001, 0x10000, CRC(cbc10586) SHA1(9b1935ea9ebb21fe42ee3a57d6c10f1e8516f23c) )
-	ROM_LOAD16_BYTE( "nin_c-l1.6c", 0x20000, 0x10000, CRC(b75c9a4d) SHA1(03c28896cbe0c9f778c259d59d2e69796902daa8) )
-	ROM_LOAD16_BYTE( "nin_c-h2.6l", 0x40001, 0x10000, CRC(8ad818fa) SHA1(dd25e79b656b7fc6c31d1f8971fd0916295ccdb0) )
-	ROM_LOAD16_BYTE( "nin_c-l2.6b", 0x40000, 0x10000, CRC(c52ca78c) SHA1(2b40cce5a1f5c588b49634e7fd4bc28c9160fe43) )
-	ROM_LOAD16_BYTE( "nin_c-h3.6m", 0x60001, 0x10000, CRC(501104ef) SHA1(e44e060c072affd359e52bf6606b1dd565368d44) )
-	ROM_RELOAD(                     0xe0001, 0x10000 )
-	ROM_LOAD16_BYTE( "nin_c-l3.6a", 0x60000, 0x10000, CRC(fd7408b8) SHA1(3cbe72835a561c50265a047f0f5cd62db48378fd) )
-	ROM_RELOAD(                     0xe0000, 0x10000 )
+	ROM_LOAD16_BYTE( "nin_c-h0-b.6h", 0x00001, 0x10000, CRC(035692fa) SHA1(d5ab54488344bf405063737ed55d68ff1e64b55f) )
+	ROM_LOAD16_BYTE( "nin_c-l0-b.6d", 0x00000, 0x10000, CRC(9a405898) SHA1(b28d71c1a6410720a37e6b6518b3cc66d4c32972) )
+	ROM_LOAD16_BYTE( "nin_c-h1.6j",   0x20001, 0x10000, CRC(cbc10586) SHA1(9b1935ea9ebb21fe42ee3a57d6c10f1e8516f23c) )
+	ROM_LOAD16_BYTE( "nin_c-l1.6c",   0x20000, 0x10000, CRC(b75c9a4d) SHA1(03c28896cbe0c9f778c259d59d2e69796902daa8) )
+	ROM_LOAD16_BYTE( "nin_c-h2.6l",   0x40001, 0x10000, CRC(8ad818fa) SHA1(dd25e79b656b7fc6c31d1f8971fd0916295ccdb0) )
+	ROM_LOAD16_BYTE( "nin_c-l2.6b",   0x40000, 0x10000, CRC(c52ca78c) SHA1(2b40cce5a1f5c588b49634e7fd4bc28c9160fe43) )
+	ROM_LOAD16_BYTE( "nin_c-h3-b.6m", 0x60001, 0x10000, CRC(501104ef) SHA1(e44e060c072affd359e52bf6606b1dd565368d44) )
+	ROM_RELOAD(                       0xe0001, 0x10000 )
+	ROM_LOAD16_BYTE( "nin_c-l3-b.6a", 0x60000, 0x10000, CRC(fd7408b8) SHA1(3cbe72835a561c50265a047f0f5cd62db48378fd) )
+	ROM_RELOAD(                       0xe0000, 0x10000 )
 
-	ROM_REGION( 0x10000, "mcu", 0 )
-	ROM_LOAD( "nin_c-pr.1c", 0x00000, 0x01000, NO_DUMP ) // sldh - read protected
+	ROM_REGION( 0x10000, "mcu", 0 )  /* i8751 microcontroller */
+	ROM_LOAD( "nin_c-pr-b.ic1", 0x00000, 0x01000, NO_DUMP ) /* i8751 MCU labeled  NIN C-PR-B  - read protected */
 
 	ROM_REGION( 0x080000, "sprites", 0 )
 	ROM_LOAD( "nin-r00.7m",  0x00000, 0x20000, CRC(5f61d30b) SHA1(7754697e43f6117fa604f50885b76014b1dc5760) )  /* sprites */
@@ -2579,24 +2661,23 @@ ROM_START( nspirit )
 	/* Located on M72-A-C CPU/Sound board */
 	ROM_LOAD( "m72_a-3d.3d", 0x0100, 0x0100, CRC(de85dac3) SHA1(af83b0325f28fbb1bcc424c1b58ff0f4b49f6b67) ) /* TBP16L8 */
 	ROM_LOAD( "m72_a-4d.4d", 0x0200, 0x0100, CRC(59676de1) SHA1(fcf35f5463c14a4b06d58684c47ea9de5216d1da) ) /* TBP16L8 */
-
 ROM_END
 
 ROM_START( nspiritj )
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "c-h0",        0x00001, 0x10000, CRC(8603fab2) SHA1(2c5bc97b6c9648156969b4a9f139081dca19fa24) )
-	ROM_LOAD16_BYTE( "c-l0",        0x00000, 0x10000, CRC(e520fa35) SHA1(05f7e5a1a5ada95809ffd941080fb2c2b54363b7) )
+	ROM_LOAD16_BYTE( "nin_c-h0.6h", 0x00001, 0x10000, CRC(8603fab2) SHA1(2c5bc97b6c9648156969b4a9f139081dca19fa24) )
+	ROM_LOAD16_BYTE( "nin_c-l0.6d", 0x00000, 0x10000, CRC(e520fa35) SHA1(05f7e5a1a5ada95809ffd941080fb2c2b54363b7) )
 	ROM_LOAD16_BYTE( "nin_c-h1.6j", 0x20001, 0x10000, CRC(cbc10586) SHA1(9b1935ea9ebb21fe42ee3a57d6c10f1e8516f23c) )
 	ROM_LOAD16_BYTE( "nin_c-l1.6c", 0x20000, 0x10000, CRC(b75c9a4d) SHA1(03c28896cbe0c9f778c259d59d2e69796902daa8) )
 	ROM_LOAD16_BYTE( "nin_c-h2.6l", 0x40001, 0x10000, CRC(8ad818fa) SHA1(dd25e79b656b7fc6c31d1f8971fd0916295ccdb0) )
 	ROM_LOAD16_BYTE( "nin_c-l2.6b", 0x40000, 0x10000, CRC(c52ca78c) SHA1(2b40cce5a1f5c588b49634e7fd4bc28c9160fe43) )
-	ROM_LOAD16_BYTE( "c-h3",        0x60001, 0x10000, CRC(95b63a61) SHA1(bd5ec35fffe6d4898e6712eb6add7c51077b58d2) )
+	ROM_LOAD16_BYTE( "nin_c-h3.6m", 0x60001, 0x10000, CRC(95b63a61) SHA1(bd5ec35fffe6d4898e6712eb6add7c51077b58d2) )
 	ROM_RELOAD(                     0xe0001, 0x10000 )
-	ROM_LOAD16_BYTE( "c-l3",        0x60000, 0x10000, CRC(e754a87a) SHA1(9951d972ed13a0415c827beff122bc7ddb078447) )
+	ROM_LOAD16_BYTE( "nin_c-l3.6a", 0x60000, 0x10000, CRC(e754a87a) SHA1(9951d972ed13a0415c827beff122bc7ddb078447) )
 	ROM_RELOAD(                     0xe0000, 0x10000 )
 
-	ROM_REGION( 0x10000, "mcu", 0 )
-	ROM_LOAD( "nin_c-pr.1c", 0x00000, 0x01000, CRC(802d440a) SHA1(45b844b831aa6d5d002e3960e17fb5a058b02a29) )  /* checksum correct for Japan version only (see test mode) */
+	ROM_REGION( 0x10000, "mcu", 0 )  /* i8751 microcontroller */
+	ROM_LOAD( "nin_c-pr-.ic1", 0x00000, 0x01000, CRC(802d440a) SHA1(45b844b831aa6d5d002e3960e17fb5a058b02a29) ) /* i8751 MCU labeled  NIN C-PR- */
 
 	ROM_REGION( 0x080000, "sprites", 0 )
 	ROM_LOAD( "nin-r00.7m",  0x00000, 0x20000, CRC(5f61d30b) SHA1(7754697e43f6117fa604f50885b76014b1dc5760) )  /* sprites */
@@ -2620,108 +2701,152 @@ ROM_START( nspiritj )
 	ROM_LOAD( "nin-v0.7a",   0x00000, 0x10000, CRC(a32e8caf) SHA1(63d56ad3a63fb089056e4a170159120287594ea8) )
 ROM_END
 
+
 ROM_START( imgfight )
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "if-c-h0-a.bin", 0x00001, 0x10000, CRC(f5c94464) SHA1(5964a00d21ebb358eecc0f10f6221fb684f284df) )
-	ROM_LOAD16_BYTE( "if-c-l0-a.bin", 0x00000, 0x10000, CRC(87c534fe) SHA1(10c231a2b3046a711a1fdcc6c1631a7378295f2f) )
-	ROM_LOAD16_BYTE( "if-c-h3.bin",   0x40001, 0x20000, CRC(ea030541) SHA1(ee4c12773ecced2d755443ce0ca78fb2b2c04805) )
-	ROM_RELOAD(                       0xc0001, 0x20000 )
-	ROM_LOAD16_BYTE( "if-c-l3.bin",   0x40000, 0x20000, CRC(c66ae348) SHA1(eca5096ebd5bffc6e68f3fc9969cda9679bd921f) )
-	ROM_RELOAD(                       0xc0000, 0x20000 )
+	ROM_LOAD16_BYTE( "if-c-h0-a.ic40", 0x00001, 0x10000, CRC(f5c94464) SHA1(5964a00d21ebb358eecc0f10f6221fb684f284df) )
+	ROM_LOAD16_BYTE( "if-c-l0-a.ic37", 0x00000, 0x10000, CRC(87c534fe) SHA1(10c231a2b3046a711a1fdcc6c1631a7378295f2f) )
+	ROM_LOAD16_BYTE( "if-c-h3.ic43",   0x40001, 0x20000, CRC(ea030541) SHA1(ee4c12773ecced2d755443ce0ca78fb2b2c04805) )
+	ROM_RELOAD(                        0xc0001, 0x20000 )
+	ROM_LOAD16_BYTE( "if-c-l3.ic34",   0x40000, 0x20000, CRC(c66ae348) SHA1(eca5096ebd5bffc6e68f3fc9969cda9679bd921f) )
+	ROM_RELOAD(                        0xc0000, 0x20000 )
 
-	ROM_REGION( 0x10000, "mcu", 0 )
-	ROM_LOAD( "imgfight_i8751h.bin",  0x00000, 0x01000, NO_DUMP )
+	ROM_REGION( 0x10000, "mcu", 0 )  /* i8751 microcontroller */
+	ROM_LOAD( "if_c-pr-a.ic1",  0x00000, 0x01000, NO_DUMP )
 
 	ROM_REGION( 0x080000, "sprites", 0 )
-	ROM_LOAD( "if-c-00.bin",  0x00000, 0x20000, CRC(745e6638) SHA1(43fb1f9da4190fea67eee3aee8caf4219becc21b) )  /* sprites */
-	ROM_LOAD( "if-c-10.bin",  0x20000, 0x20000, CRC(b7108449) SHA1(1f41ebe7164fab86958caaf6749b99425e682657) )
-	ROM_LOAD( "if-c-20.bin",  0x40000, 0x20000, CRC(aef33cba) SHA1(2d8a8458207d0c790c81b1285366463c8540d190) )
-	ROM_LOAD( "if-c-30.bin",  0x60000, 0x20000, CRC(1f98e695) SHA1(5fddcfb17523f8e96f4b85f0cb15d837b81f2bd4) )
+	ROM_LOAD( "if-c-00.ic53", 0x00000, 0x20000, CRC(745e6638) SHA1(43fb1f9da4190fea67eee3aee8caf4219becc21b) )  /* sprites */
+	ROM_LOAD( "if-c-10.ic51", 0x20000, 0x20000, CRC(b7108449) SHA1(1f41ebe7164fab86958caaf6749b99425e682657) )
+	ROM_LOAD( "if-c-20.ic49", 0x40000, 0x20000, CRC(aef33cba) SHA1(2d8a8458207d0c790c81b1285366463c8540d190) )
+	ROM_LOAD( "if-c-30.ic47", 0x60000, 0x20000, CRC(1f98e695) SHA1(5fddcfb17523f8e96f4b85f0cb15d837b81f2bd4) )
 
 	ROM_REGION( 0x040000, "gfx2", 0 )
-	ROM_LOAD( "if-a-a0.bin",  0x00000, 0x10000, CRC(34ee2d77) SHA1(38826e0318aa8da893fa4c93f217288c015df606) )  /* tiles #1 */
-	ROM_LOAD( "if-a-a1.bin",  0x10000, 0x10000, CRC(6bd2845b) SHA1(149cf14f919590da88b9a8e254690da010709862) )
-	ROM_LOAD( "if-a-a2.bin",  0x20000, 0x10000, CRC(090d50e5) SHA1(4f2a7c76320b3f8dafae90a246187e034fe7562b) )
-	ROM_LOAD( "if-a-a3.bin",  0x30000, 0x10000, CRC(3a8e3083) SHA1(8a75d556790b6bea41ead1a5f95589dd293bdf4e) )
+	ROM_LOAD( "if-a-a0.ic21", 0x00000, 0x10000, CRC(34ee2d77) SHA1(38826e0318aa8da893fa4c93f217288c015df606) )  /* tiles #1 */
+	ROM_LOAD( "if-a-a1.ic22", 0x10000, 0x10000, CRC(6bd2845b) SHA1(149cf14f919590da88b9a8e254690da010709862) )
+	ROM_LOAD( "if-a-a2.ic20", 0x20000, 0x10000, CRC(090d50e5) SHA1(4f2a7c76320b3f8dafae90a246187e034fe7562b) )
+	ROM_LOAD( "if-a-a3.ic23", 0x30000, 0x10000, CRC(3a8e3083) SHA1(8a75d556790b6bea41ead1a5f95589dd293bdf4e) )
 
 	ROM_REGION( 0x040000, "gfx3", 0 )
-	ROM_LOAD( "if-a-b0.bin",  0x00000, 0x10000, CRC(b425c829) SHA1(0ccd487dba00bb7cb0ff5d1c67f8fee3e68df5d8) )  /* tiles #2 */
-	ROM_LOAD( "if-a-b1.bin",  0x10000, 0x10000, CRC(e9bfe23e) SHA1(f97a68dbdce7e06d07faab19acf7625cdc8eeaa8) )
-	ROM_LOAD( "if-a-b2.bin",  0x20000, 0x10000, CRC(256e50f2) SHA1(9e9fda4f1f1449548942c0da4478f61fe0d263d1) )
-	ROM_LOAD( "if-a-b3.bin",  0x30000, 0x10000, CRC(4c682785) SHA1(f61f1227e0ad629fdfca106306b17a9f6a9959e3) )
+	ROM_LOAD( "if-a-b0.ic26", 0x00000, 0x10000, CRC(b425c829) SHA1(0ccd487dba00bb7cb0ff5d1c67f8fee3e68df5d8) )  /* tiles #2 */
+	ROM_LOAD( "if-a-b1.ic27", 0x10000, 0x10000, CRC(e9bfe23e) SHA1(f97a68dbdce7e06d07faab19acf7625cdc8eeaa8) )
+	ROM_LOAD( "if-a-b2.ic25", 0x20000, 0x10000, CRC(256e50f2) SHA1(9e9fda4f1f1449548942c0da4478f61fe0d263d1) )
+	ROM_LOAD( "if-a-b3.ic24", 0x30000, 0x10000, CRC(4c682785) SHA1(f61f1227e0ad629fdfca106306b17a9f6a9959e3) )
 
 	ROM_REGION( 0x20000, "samples", 0 ) /* samples */
-	ROM_LOAD( "if-c-v0.bin",  0x00000, 0x10000, CRC(cb64a194) SHA1(940fad6b9147bccc8290e112f5973f8ea062b52f) )
-	ROM_LOAD( "if-c-v1.bin",  0x10000, 0x10000, CRC(45b68bf5) SHA1(2fb28793019ca85b3b6d7c4c31eedff1d71f2d83) )
+	ROM_LOAD( "if-c-v0.ic44", 0x00000, 0x10000, CRC(cb64a194) SHA1(940fad6b9147bccc8290e112f5973f8ea062b52f) )
+	ROM_LOAD( "if-c-v1.ic45", 0x10000, 0x10000, CRC(45b68bf5) SHA1(2fb28793019ca85b3b6d7c4c31eedff1d71f2d83) )
 ROM_END
 
 ROM_START( imgfightj )
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "if-c-h0.bin",  0x00001, 0x10000, CRC(592d2d80) SHA1(d54916a9bfe4b65a972b62202af706135e73518d) )
-	ROM_LOAD16_BYTE( "if-c-l0.bin",  0x00000, 0x10000, CRC(61f89056) SHA1(3e0724dbc2b00a30193ea6cfac8b4331055d4fd4) )
-	ROM_LOAD16_BYTE( "if-c-h3.bin",  0x40001, 0x20000, CRC(ea030541) SHA1(ee4c12773ecced2d755443ce0ca78fb2b2c04805) )
+	ROM_LOAD16_BYTE( "if-c-h0.ic40", 0x00001, 0x10000, CRC(592d2d80) SHA1(d54916a9bfe4b65a972b62202af706135e73518d) )
+	ROM_LOAD16_BYTE( "if-c-l0.ic37", 0x00000, 0x10000, CRC(61f89056) SHA1(3e0724dbc2b00a30193ea6cfac8b4331055d4fd4) )
+	ROM_LOAD16_BYTE( "if-c-h3.ic43", 0x40001, 0x20000, CRC(ea030541) SHA1(ee4c12773ecced2d755443ce0ca78fb2b2c04805) )
 	ROM_RELOAD(                      0xc0001, 0x20000 )
-	ROM_LOAD16_BYTE( "if-c-l3.bin",  0x40000, 0x20000, CRC(c66ae348) SHA1(eca5096ebd5bffc6e68f3fc9969cda9679bd921f) )
+	ROM_LOAD16_BYTE( "if-c-l3.ic34", 0x40000, 0x20000, CRC(c66ae348) SHA1(eca5096ebd5bffc6e68f3fc9969cda9679bd921f) )
 	ROM_RELOAD(                      0xc0000, 0x20000 )
 
-	ROM_REGION( 0x10000, "mcu", 0 )
-	ROM_LOAD( "imgfightj_i8751h.bin",  0x00000, 0x01000, CRC(ef0d5098) SHA1(068b73937588e16a318a094dfe2fb1293b1a1711) )
+	ROM_REGION( 0x10000, "mcu", 0 )    /* i8751 microcontroller */
+	ROM_LOAD( "if_c-pr-.ic1", 0x00000, 0x01000, CRC(ef0d5098) SHA1(068b73937588e16a318a094dfe2fb1293b1a1711) ) /* i8751 MCU labeled  IF C-PR- */
 
 	ROM_REGION( 0x080000, "sprites", 0 )
-	ROM_LOAD( "if-c-00.bin",  0x00000, 0x20000, CRC(745e6638) SHA1(43fb1f9da4190fea67eee3aee8caf4219becc21b) )  /* sprites */
-	ROM_LOAD( "if-c-10.bin",  0x20000, 0x20000, CRC(b7108449) SHA1(1f41ebe7164fab86958caaf6749b99425e682657) )
-	ROM_LOAD( "if-c-20.bin",  0x40000, 0x20000, CRC(aef33cba) SHA1(2d8a8458207d0c790c81b1285366463c8540d190) )
-	ROM_LOAD( "if-c-30.bin",  0x60000, 0x20000, CRC(1f98e695) SHA1(5fddcfb17523f8e96f4b85f0cb15d837b81f2bd4) )
+	ROM_LOAD( "if-c-00.ic53", 0x00000, 0x20000, CRC(745e6638) SHA1(43fb1f9da4190fea67eee3aee8caf4219becc21b) )  /* sprites */
+	ROM_LOAD( "if-c-10.ic51", 0x20000, 0x20000, CRC(b7108449) SHA1(1f41ebe7164fab86958caaf6749b99425e682657) )
+	ROM_LOAD( "if-c-20.ic49", 0x40000, 0x20000, CRC(aef33cba) SHA1(2d8a8458207d0c790c81b1285366463c8540d190) )
+	ROM_LOAD( "if-c-30.ic47", 0x60000, 0x20000, CRC(1f98e695) SHA1(5fddcfb17523f8e96f4b85f0cb15d837b81f2bd4) )
 
 	ROM_REGION( 0x040000, "gfx2", 0 )
-	ROM_LOAD( "if-a-a0.bin",  0x00000, 0x10000, CRC(34ee2d77) SHA1(38826e0318aa8da893fa4c93f217288c015df606) )  /* tiles #1 */
-	ROM_LOAD( "if-a-a1.bin",  0x10000, 0x10000, CRC(6bd2845b) SHA1(149cf14f919590da88b9a8e254690da010709862) )
-	ROM_LOAD( "if-a-a2.bin",  0x20000, 0x10000, CRC(090d50e5) SHA1(4f2a7c76320b3f8dafae90a246187e034fe7562b) )
-	ROM_LOAD( "if-a-a3.bin",  0x30000, 0x10000, CRC(3a8e3083) SHA1(8a75d556790b6bea41ead1a5f95589dd293bdf4e) )
+	ROM_LOAD( "if-a-a0.ic21", 0x00000, 0x10000, CRC(34ee2d77) SHA1(38826e0318aa8da893fa4c93f217288c015df606) )  /* tiles #1 */
+	ROM_LOAD( "if-a-a1.ic22", 0x10000, 0x10000, CRC(6bd2845b) SHA1(149cf14f919590da88b9a8e254690da010709862) )
+	ROM_LOAD( "if-a-a2.ic20", 0x20000, 0x10000, CRC(090d50e5) SHA1(4f2a7c76320b3f8dafae90a246187e034fe7562b) )
+	ROM_LOAD( "if-a-a3.ic23", 0x30000, 0x10000, CRC(3a8e3083) SHA1(8a75d556790b6bea41ead1a5f95589dd293bdf4e) )
 
 	ROM_REGION( 0x040000, "gfx3", 0 )
-	ROM_LOAD( "if-a-b0.bin",  0x00000, 0x10000, CRC(b425c829) SHA1(0ccd487dba00bb7cb0ff5d1c67f8fee3e68df5d8) )  /* tiles #2 */
-	ROM_LOAD( "if-a-b1.bin",  0x10000, 0x10000, CRC(e9bfe23e) SHA1(f97a68dbdce7e06d07faab19acf7625cdc8eeaa8) )
-	ROM_LOAD( "if-a-b2.bin",  0x20000, 0x10000, CRC(256e50f2) SHA1(9e9fda4f1f1449548942c0da4478f61fe0d263d1) )
-	ROM_LOAD( "if-a-b3.bin",  0x30000, 0x10000, CRC(4c682785) SHA1(f61f1227e0ad629fdfca106306b17a9f6a9959e3) )
+	ROM_LOAD( "if-a-b0.ic26", 0x00000, 0x10000, CRC(b425c829) SHA1(0ccd487dba00bb7cb0ff5d1c67f8fee3e68df5d8) )  /* tiles #2 */
+	ROM_LOAD( "if-a-b1.ic27", 0x10000, 0x10000, CRC(e9bfe23e) SHA1(f97a68dbdce7e06d07faab19acf7625cdc8eeaa8) )
+	ROM_LOAD( "if-a-b2.ic25", 0x20000, 0x10000, CRC(256e50f2) SHA1(9e9fda4f1f1449548942c0da4478f61fe0d263d1) )
+	ROM_LOAD( "if-a-b3.ic24", 0x30000, 0x10000, CRC(4c682785) SHA1(f61f1227e0ad629fdfca106306b17a9f6a9959e3) )
 
 	ROM_REGION( 0x20000, "samples", 0 ) /* samples */
-	ROM_LOAD( "if-c-v0.bin",  0x00000, 0x10000, CRC(cb64a194) SHA1(940fad6b9147bccc8290e112f5973f8ea062b52f) )
-	ROM_LOAD( "if-c-v1.bin",  0x10000, 0x10000, CRC(45b68bf5) SHA1(2fb28793019ca85b3b6d7c4c31eedff1d71f2d83) )
+	ROM_LOAD( "if-c-v0.ic44", 0x00000, 0x10000, CRC(cb64a194) SHA1(940fad6b9147bccc8290e112f5973f8ea062b52f) )
+	ROM_LOAD( "if-c-v1.ic45", 0x10000, 0x10000, CRC(45b68bf5) SHA1(2fb28793019ca85b3b6d7c4c31eedff1d71f2d83) )
+ROM_END
+
+ROM_START( imgfightb ) // mostly identical to imgfightj content-wise, it's a 4 PCB stack bootleg with flying wires
+	ROM_REGION( 0x100000, "maincpu", 0 ) // identical, but ic111.9e
+	ROM_LOAD16_BYTE( "ic108.9b", 0x00001, 0x10000, CRC(592d2d80) SHA1(d54916a9bfe4b65a972b62202af706135e73518d) )
+	ROM_LOAD16_BYTE( "ic89.7b",  0x00000, 0x10000, CRC(61f89056) SHA1(3e0724dbc2b00a30193ea6cfac8b4331055d4fd4) )
+	ROM_LOAD16_BYTE( "ic111.9e", 0x40001, 0x10000, CRC(da50622e) SHA1(32c75b6270d401a6825632c66f3026cae7b5b81f) ) // slight difference: 99.998474%: 0x1116 from 0x09 to 0x0d
+	ROM_RELOAD(                  0xc0001, 0x10000 )
+	ROM_LOAD16_BYTE( "ic110.9d", 0x60001, 0x10000, CRC(0e0aefcd) SHA1(f5056a2d0612d912aff1e0eccb1182de7ae16990) )
+	ROM_RELOAD(                  0xe0001, 0x10000 )
+	ROM_LOAD16_BYTE( "ic92.7e",  0x40000, 0x10000, CRC(38fce272) SHA1(4fe4d0838d21f3022b440a32ec69b25e936e62dd) )
+	ROM_RELOAD(                  0xc0000, 0x10000 )
+	ROM_LOAD16_BYTE( "ic91.7d",  0x60000, 0x10000, CRC(d69c0722) SHA1(ef18e7b7057f19caaa61d0b8c07d2d0c6e0a555e) )
+	ROM_RELOAD(                  0xe0000, 0x10000 )
+
+	ROM_REGION( 0x10000, "mcu", 0 )
+	ROM_LOAD( "25.ic27.2l",  0x00000, 0x2000, CRC(d83359a2) SHA1(2d486bf4a873abfe591e0d9383f9e230f47bc42a) ) // i80c31 instead of i8751, contents identical to imgfightj MCU, with second half padded with 0xff
+
+	ROM_REGION( 0x080000, "sprites", 0 ) // half size ROMs, but identical content
+	ROM_LOAD( "ic96.7k",  0x00000, 0x10000, CRC(d4febb03) SHA1(6fe53b198bdcef1708ff134c64af9c064e274e1b) )  /* sprites */
+	ROM_LOAD( "ic97.7l",  0x10000, 0x10000, CRC(973d7bbc) SHA1(409242ddc7eb90564a15b222641e53d11ab1e04a) )
+	ROM_LOAD( "ic115.9k", 0x20000, 0x10000, CRC(2328880b) SHA1(a35c77a7d04614dbfbca4c79bb3e729115129ee4) )
+	ROM_LOAD( "ic116.9l", 0x30000, 0x10000, CRC(6da001ea) SHA1(473ed89b77809b3b76bfa9f5ca4008c9534cdbb4) )
+	ROM_LOAD( "ic94.7h",  0x40000, 0x10000, CRC(92bc7fda) SHA1(521d4a29e06eb8790fdeeba968f99a389f50a24e) )
+	ROM_LOAD( "ic95.7j",  0x50000, 0x10000, CRC(e63a5918) SHA1(fd3374866f922cef72c0678aa751ad1e6f95a12a) )
+	ROM_LOAD( "ic113.9h", 0x60000, 0x10000, CRC(27caec8e) SHA1(cc1943ba9548715425e799f418750cd70c3f88da) )
+	ROM_LOAD( "ic114.9j", 0x70000, 0x10000, CRC(1933eb65) SHA1(4c24cfd059c11875f53b57cc020fbdbac903bd4a) )
+
+	ROM_REGION( 0x040000, "gfx2", 0 ) // identical
+	ROM_LOAD( "ic30.3d",  0x00000, 0x10000, CRC(34ee2d77) SHA1(38826e0318aa8da893fa4c93f217288c015df606) )  /* tiles #1 */
+	ROM_LOAD( "ic31.3e",  0x10000, 0x10000, CRC(6bd2845b) SHA1(149cf14f919590da88b9a8e254690da010709862) )
+	ROM_LOAD( "ic29.3c",  0x20000, 0x10000, CRC(090d50e5) SHA1(4f2a7c76320b3f8dafae90a246187e034fe7562b) )
+	ROM_LOAD( "ic32.3f",  0x30000, 0x10000, CRC(3a8e3083) SHA1(8a75d556790b6bea41ead1a5f95589dd293bdf4e) )
+
+	ROM_REGION( 0x040000, "gfx3", 0 ) // identical
+	ROM_LOAD( "ic35.3k",  0x00000, 0x10000, CRC(b425c829) SHA1(0ccd487dba00bb7cb0ff5d1c67f8fee3e68df5d8) )  /* tiles #2 */
+	ROM_LOAD( "ic36.3l",  0x10000, 0x10000, CRC(e9bfe23e) SHA1(f97a68dbdce7e06d07faab19acf7625cdc8eeaa8) )
+	ROM_LOAD( "ic34.3j",  0x20000, 0x10000, CRC(256e50f2) SHA1(9e9fda4f1f1449548942c0da4478f61fe0d263d1) )
+	ROM_LOAD( "ic33.3h",  0x30000, 0x10000, CRC(4c682785) SHA1(f61f1227e0ad629fdfca106306b17a9f6a9959e3) )
+
+	ROM_REGION( 0x20000, "samples", 0 ) /* samples, identical */
+	ROM_LOAD( "ic28.lower.2n",  0x00000, 0x10000, CRC(cb64a194) SHA1(940fad6b9147bccc8290e112f5973f8ea062b52f) )
+	ROM_LOAD( "ic28.upper.2n",  0x10000, 0x10000, CRC(45b68bf5) SHA1(2fb28793019ca85b3b6d7c4c31eedff1d71f2d83) )
 ROM_END
 
 ROM_START( loht )
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "tom_c-h0.rom", 0x00001, 0x20000, CRC(a63204b6) SHA1(d217bc70650a1a1bbe0cf536ec3bb678f670718d) )
-	ROM_LOAD16_BYTE( "tom_c-l0.rom", 0x00000, 0x20000, CRC(e788002f) SHA1(35f509976b342fd47e645453381faa3d86645876) )
-	ROM_LOAD16_BYTE( "tom_c-h3-",    0x40001, 0x20000, CRC(714778b5) SHA1(e2eaa35d6b5fa5df5163fe0d7b45fa66667f9947) )
-	ROM_RELOAD(                      0xc0001, 0x20000 )
-	ROM_LOAD16_BYTE( "tom_c-l3-",    0x40000, 0x20000, CRC(2f049b03) SHA1(21047cb10912b1fc23795673af3ea7de249328b7) )
-	ROM_RELOAD(                      0xc0000, 0x20000 )
+	ROM_LOAD16_BYTE( "tom_c-h0-b.ic40", 0x00001, 0x20000, CRC(a63204b6) SHA1(d217bc70650a1a1bbe0cf536ec3bb678f670718d) ) /* need to verify actual label */
+	ROM_LOAD16_BYTE( "tom_c-l0-b.ic37", 0x00000, 0x20000, CRC(e788002f) SHA1(35f509976b342fd47e645453381faa3d86645876) ) /* need to verify actual label */
+	ROM_LOAD16_BYTE( "tom_c-h3-.ic43",  0x40001, 0x20000, CRC(714778b5) SHA1(e2eaa35d6b5fa5df5163fe0d7b45fa66667f9947) )
+	ROM_RELOAD(                         0xc0001, 0x20000 )
+	ROM_LOAD16_BYTE( "tom_c-l3-.ic34",  0x40000, 0x20000, CRC(2f049b03) SHA1(21047cb10912b1fc23795673af3ea7de249328b7) )
+	ROM_RELOAD(                         0xc0000, 0x20000 )
 
-	ROM_REGION( 0x10000, "mcu", 0 )
-	ROM_LOAD( "loht_i8751.mcu",  0x00000, 0x10000, NO_DUMP ) // read protected
+	ROM_REGION( 0x10000, "mcu", 0 )  /* i8751 microcontroller */
+	ROM_LOAD( "tom_c-pr-b.ic1", 0x00000, 0x01000, BAD_DUMP CRC(9c9545f1) SHA1(ca800ce7467efb877d0fff4c47d72478a991e2a9) ) // from bootleg, but works - need to verify dump - Should be TOM C-PR-B ??
 
 	ROM_REGION( 0x080000, "sprites", 0 )
-	ROM_LOAD( "tom_m53.rom",  0x00000, 0x20000, CRC(0b83265f) SHA1(b31918d6442b79c9fe4f20410189788b050a994e) )  /* sprites */
-	ROM_LOAD( "tom_m51.rom",  0x20000, 0x20000, CRC(8ec5f6f3) SHA1(210f2753f5eeb06396758d21ab1778d459add247) )
-	ROM_LOAD( "tom_m49.rom",  0x40000, 0x20000, CRC(a41d3bfd) SHA1(536fb7c0321dbbc1a8b73e9647fba9c53a253fcc) )
-	ROM_LOAD( "tom_m47.rom",  0x60000, 0x20000, CRC(9d81a25b) SHA1(a354537c2fbba85f06485aa8487d7583a7133357) )
+	ROM_LOAD( "tom_m53.ic53", 0x00000, 0x20000, CRC(0b83265f) SHA1(b31918d6442b79c9fe4f20410189788b050a994e) )  /* sprites */
+	ROM_LOAD( "tom_m51.ic51", 0x20000, 0x20000, CRC(8ec5f6f3) SHA1(210f2753f5eeb06396758d21ab1778d459add247) )
+	ROM_LOAD( "tom_m49.ic49", 0x40000, 0x20000, CRC(a41d3bfd) SHA1(536fb7c0321dbbc1a8b73e9647fba9c53a253fcc) )
+	ROM_LOAD( "tom_m47.ic47", 0x60000, 0x20000, CRC(9d81a25b) SHA1(a354537c2fbba85f06485aa8487d7583a7133357) )
 
 	ROM_REGION( 0x040000, "gfx2", 0 )
-	ROM_LOAD( "tom_m21.rom",  0x00000, 0x10000, CRC(3ca3e771) SHA1(be052e01c5429ee89057c9d408794f2c7744047c) )  /* tiles #1 */
-	ROM_LOAD( "tom_m22.rom",  0x10000, 0x10000, CRC(7a05ee2f) SHA1(7d1ca5db9a5a85610129e3bc6c640ade036fe7f9) )
-	ROM_LOAD( "tom_m20.rom",  0x20000, 0x10000, CRC(79aa2335) SHA1(6b70c79d800a7b755aa7c9a368c4ea74029aaa1e) )
-	ROM_LOAD( "tom_m23.rom",  0x30000, 0x10000, CRC(789e8b24) SHA1(e957cd25c3c155ca295ab1aea03d610f91562cfb) )
+	ROM_LOAD( "tom_m21.ic21", 0x00000, 0x10000, CRC(3ca3e771) SHA1(be052e01c5429ee89057c9d408794f2c7744047c) )  /* tiles #1 */
+	ROM_LOAD( "tom_m22.ic22", 0x10000, 0x10000, CRC(7a05ee2f) SHA1(7d1ca5db9a5a85610129e3bc6c640ade036fe7f9) )
+	ROM_LOAD( "tom_m20.ic20", 0x20000, 0x10000, CRC(79aa2335) SHA1(6b70c79d800a7b755aa7c9a368c4ea74029aaa1e) )
+	ROM_LOAD( "tom_m23.ic23", 0x30000, 0x10000, CRC(789e8b24) SHA1(e957cd25c3c155ca295ab1aea03d610f91562cfb) )
 
 	ROM_REGION( 0x040000, "gfx3", 0 )
-	ROM_LOAD( "tom_m26.rom",  0x00000, 0x10000, CRC(44626bf6) SHA1(571ef74d42d30a272ff0fb33f830652b4a4bad29) )  /* tiles #2 */
-	ROM_LOAD( "tom_m27.rom",  0x10000, 0x10000, CRC(464952cf) SHA1(6b99360b6ba1ed5a72c257f51291f9f7a1ddf363) )
-	ROM_LOAD( "tom_m25.rom",  0x20000, 0x10000, CRC(3db9b2c7) SHA1(02a318ffc459c494b7f40827eff5f89b41ac0426) )
-	ROM_LOAD( "tom_m24.rom",  0x30000, 0x10000, CRC(f01fe899) SHA1(c5ab967b7af55a757638bcdc9975f4b15064022d) )
+	ROM_LOAD( "tom_m26.ic26", 0x00000, 0x10000, CRC(44626bf6) SHA1(571ef74d42d30a272ff0fb33f830652b4a4bad29) )  /* tiles #2 */
+	ROM_LOAD( "tom_m27.ic27", 0x10000, 0x10000, CRC(464952cf) SHA1(6b99360b6ba1ed5a72c257f51291f9f7a1ddf363) )
+	ROM_LOAD( "tom_m25.ic25", 0x20000, 0x10000, CRC(3db9b2c7) SHA1(02a318ffc459c494b7f40827eff5f89b41ac0426) )
+	ROM_LOAD( "tom_m24.ic24", 0x30000, 0x10000, CRC(f01fe899) SHA1(c5ab967b7af55a757638bcdc9975f4b15064022d) )
 
 	ROM_REGION( 0x10000, "samples", 0 ) /* samples */
-	ROM_LOAD( "tom_m44.rom",  0x00000, 0x10000, CRC(3ed51d1f) SHA1(84f3aa17d640df91387e5f1f5b5971cf8dcd4e17) )
+	ROM_LOAD( "tom_m44.ic44", 0x00000, 0x10000, CRC(3ed51d1f) SHA1(84f3aa17d640df91387e5f1f5b5971cf8dcd4e17) )
 ROM_END
 
 /*
@@ -2793,8 +2918,8 @@ ROM_START( lohtj )
 	ROM_LOAD16_BYTE( "tom_c-l3-", 0x40000, 0x20000, CRC(2f049b03) SHA1(21047cb10912b1fc23795673af3ea7de249328b7) )
 	ROM_RELOAD(                   0xc0000, 0x20000 )
 
-	ROM_REGION( 0x10000, "mcu", 0 )
-	ROM_LOAD( "tom_c-pr.bin",  0x00000, 0x01000, CRC(9fa9b496) SHA1(b529bcd7bf123894e11f2a8df8826932122e375a) )
+	ROM_REGION( 0x10000, "mcu", 0 )  /* i8751 microcontroller */
+	ROM_LOAD( "tom_c-pr-.ic1",  0x00000, 0x01000, CRC(9fa9b496) SHA1(b529bcd7bf123894e11f2a8df8826932122e375a) )
 
 	ROM_REGION( 0x080000, "sprites", 0 )
 	ROM_LOAD( "r200",     0x00000, 0x20000, CRC(0b83265f) SHA1(b31918d6442b79c9fe4f20410189788b050a994e) )  /* sprites */
@@ -2819,11 +2944,11 @@ ROM_START( lohtj )
 ROM_END
 
 /*
-CPU cpu: nec v30
-cpu: z80 (sharp LH0080B z80b-cpu)
-cpu: 2x YM2203C
+nec v30
+z80 (sharp LH0080B z80b-cpu)
+2x YM2203C
 
-quarzi: 16mhz vicino al v30 e 28mhz vicino allo z80 e ym2203c
+Crystals: 16MHz near the v30 and 28MHz near the z80 and ym2203c
 */
 
 ROM_START( lohtb )
@@ -2844,7 +2969,7 @@ ROM_START( lohtb )
 	ROM_LOAD( "lohtb16.13",  0x40000, 0x10000, CRC(25b85cfc) SHA1(c7a9962165379193dc6553ed1f977795a79e0f78) )
 	ROM_LOAD( "lohtb17.14",  0x60000, 0x10000, CRC(763fa4ec) SHA1(2d72b1b41f24ae299fde23869942c0b6bbb82363) )
 	ROM_LOAD( "lohtb18.15",  0x10000, 0x10000, CRC(d7ecf849) SHA1(ab86a88eae21e054d4e8a740a60c7c6c198232d4) )
-	ROM_LOAD( "lohtb19.16",  0x30000, 0x10000, CRC(35d1a808) SHA1(9378ff000104ecfb842b3b884197be82c43a01b4))
+	ROM_LOAD( "lohtb19.16",  0x30000, 0x10000, CRC(35d1a808) SHA1(9378ff000104ecfb842b3b884197be82c43a01b4) )
 	ROM_LOAD( "lohtb20.17",  0x50000, 0x10000, CRC(464d8579) SHA1(b5981f4865ee5439f0e330091927e6d97d29933f) )
 	ROM_LOAD( "lohtb21.18",  0x70000, 0x10000, CRC(a73568c7) SHA1(8fe1867256708cc1ed76d1bed5566b1852b47c40) )
 
@@ -2861,6 +2986,9 @@ ROM_START( lohtb )
 	ROM_LOAD( "lohtb06.03",  0x30000, 0x10000, CRC(f923183c) SHA1(a6b578191864aefa81e0cad3ba12a2ca491c91cf) )
 
 	ROM_REGION( 0x10000, "samples", ROMREGION_ERASEFF ) /* -- no sample roms on bootleg, included with z80 code */
+
+	ROM_REGION( 0x0117, "plds", 0 )
+	ROM_LOAD( "gal16v8-25qp.ic3", 0x0000, 0x0117, CRC(6acdfafb) SHA1(2ffd6f5a846e49fd2a8c7c7dfc9cf015406a44df) )
 ROM_END
 
 ROM_START( lohtb2 )
@@ -2879,8 +3007,8 @@ ROM_START( lohtb2 )
 	ROM_LOAD16_BYTE( "loht-a12.bin", 0x60000, 0x10000, CRC(cfb0390d) SHA1(4acc61a51a7ae681bd8d835e2644b44c4d6d7bcb) )
 	ROM_RELOAD(                      0xe0000, 0x10000 )
 
-	ROM_REGION( 0x10000, "mcu", 0 )
-	ROM_LOAD( "loht-a26.bin",  0x00000, 0x02000, CRC(ac901e17) SHA1(70a73288d594c78ad2aca78ce55a699cb040bede) ) // unprotected??
+	ROM_REGION( 0x10000, "mcu", 0 ) /* MCU running in external mode on daughtercard. Same data as lohtj just padded with 0xff */
+	ROM_LOAD( "loht-a26.bin",  0x00000, 0x02000, CRC(ac901e17) SHA1(70a73288d594c78ad2aca78ce55a699cb040bede) )
 
 	ROM_REGION( 0x080000, "sprites", 0 )
 	ROM_LOAD( "loht-a16.bin",  0x00000, 0x10000, CRC(df5ac5ee) SHA1(5b45417ada402047d97dfb6cee6545686ad26e37) )
@@ -2909,28 +3037,354 @@ ROM_START( lohtb2 )
 	ROM_LOAD( "loht-a1.bin",   0x00000, 0x10000, CRC(3ed51d1f) SHA1(84f3aa17d640df91387e5f1f5b5971cf8dcd4e17) )
 ROM_END
 
+ROM_START( lohtb3 ) // extremely similar to the original. Copyright changed to 1997 and 'IRGM BORP.'
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "9.9", 0x00001, 0x20000, CRC(f1e4ebb7) SHA1(976ec822f57f36bc097deb5d3d86e7c2c1b247ed) )
+	ROM_LOAD16_BYTE( "1.1", 0x00000, 0x20000, CRC(b9384e93) SHA1(5b882ecd68fdf7a6307af0e1aca2ab1782911227) )
+
+	ROM_LOAD16_BYTE( "i-10.10",  0x40001, 0x10000, CRC(79e007ec) SHA1(b2e4cc4a47f5f127ba9a1a00eaaf067464314ea0) )
+	ROM_RELOAD(                  0xc0001, 0x10000 )
+	ROM_LOAD16_BYTE( "i-11.11",  0x60001, 0x10000, CRC(254ea4d5) SHA1(07277bbe2ea6678f0de1f28e40be794880b3faff) )
+	ROM_RELOAD(                  0xe0001, 0x10000 )
+	ROM_LOAD16_BYTE( "i-2.2",    0x40000, 0x10000, CRC(b951346e) SHA1(82fa3c4a09a86b74b98c31aaea5c0629ddff83a0) )
+	ROM_RELOAD(                  0xc0000, 0x10000 )
+	ROM_LOAD16_BYTE( "i-3.3",    0x60000, 0x10000, CRC(cfb0390d) SHA1(4acc61a51a7ae681bd8d835e2644b44c4d6d7bcb) )
+	ROM_RELOAD(                  0xe0000, 0x10000 )
+
+	ROM_REGION( 0x10000, "mcu", 0 )  /* i8751 microcontroller */
+	ROM_LOAD( "c8751h.bin",  0x00000, 0x01000, CRC(9c9545f1) SHA1(ca800ce7467efb877d0fff4c47d72478a991e2a9) ) // unprotected?? - works for original loht (World) set
+
+	ROM_REGION( 0x080000, "sprites", 0 )
+	ROM_LOAD( "i-8.8",   0x00000, 0x10000, CRC(df5ac5ee) SHA1(5b45417ada402047d97dfb6cee6545686ad26e37) )
+	ROM_LOAD( "i-7.7",   0x10000, 0x10000, CRC(d7ecf849) SHA1(ab86a88eae21e054d4e8a740a60c7c6c198232d4) )
+	ROM_LOAD( "i-15.15", 0x20000, 0x10000, CRC(45220b01) SHA1(83715cf155f91c82067d69f14b3b01ed77777b7d) )
+	ROM_LOAD( "i-14.14", 0x30000, 0x10000, CRC(35d1a808) SHA1(9378ff000104ecfb842b3b884197be82c43a01b4) )
+	ROM_LOAD( "i-6.6",   0x40000, 0x10000, CRC(25b85cfc) SHA1(c7a9962165379193dc6553ed1f977795a79e0f78) )
+	ROM_LOAD( "i-5.5",   0x50000, 0x10000, CRC(464d8579) SHA1(b5981f4865ee5439f0e330091927e6d97d29933f) )
+	ROM_LOAD( "i-13.13", 0x60000, 0x10000, CRC(763fa4ec) SHA1(2d72b1b41f24ae299fde23869942c0b6bbb82363) )
+	ROM_LOAD( "i-12.12", 0x70000, 0x10000, CRC(a73568c7) SHA1(8fe1867256708cc1ed76d1bed5566b1852b47c40) )
+
+	ROM_REGION( 0x040000, "gfx2", 0 )
+	ROM_LOAD( "i-20.20",  0x00000, 0x10000, CRC(3ca3e771) SHA1(be052e01c5429ee89057c9d408794f2c7744047c) ) /* tiles #1 */
+	ROM_LOAD( "r-21.21",  0x10000, 0x10000, CRC(7a05ee2f) SHA1(7d1ca5db9a5a85610129e3bc6c640ade036fe7f9) )
+	ROM_LOAD( "i-19.19",  0x20000, 0x10000, CRC(79aa2335) SHA1(6b70c79d800a7b755aa7c9a368c4ea74029aaa1e) )
+	ROM_LOAD( "i-22.22",  0x30000, 0x10000, CRC(789e8b24) SHA1(e957cd25c3c155ca295ab1aea03d610f91562cfb) )
+
+	ROM_REGION( 0x040000, "gfx3", 0 )
+	ROM_LOAD( "r-25.25",  0x00000, 0x10000, CRC(44626bf6) SHA1(571ef74d42d30a272ff0fb33f830652b4a4bad29) ) /* tiles #2 */
+	ROM_LOAD( "r-26.26",  0x10000, 0x10000, CRC(464952cf) SHA1(6b99360b6ba1ed5a72c257f51291f9f7a1ddf363) )
+	ROM_LOAD( "r-24.24",  0x20000, 0x10000, CRC(3db9b2c7) SHA1(02a318ffc459c494b7f40827eff5f89b41ac0426) )
+	ROM_LOAD( "i-23.23",  0x30000, 0x10000, CRC(2e2a085d) SHA1(ed2eed6c30d44b176bd99eb386482b2a19e3b9cb) )
+
+	ROM_REGION( 0x10000, "samples", 0 ) /* samples */
+	ROM_LOAD( "i-4.4",   0x00000, 0x10000, CRC(3ed51d1f) SHA1(84f3aa17d640df91387e5f1f5b5971cf8dcd4e17) )
+ROM_END
+
+/*  Legend of Hero Tonma for Ervisa Modular System
+
+ ROM Board (51)
+ ___________________________________________________________
+ |                      ________________  ________________  |
+ |                      |               | |               | |
+ |                      | LG 506        | | LG 508        | |
+ |                      |_______________| |_______________| |
+ |           ::::::::   ________________  ________________  |
+ |                      |               | |               | |
+ | __                   | LG 505        | | LG 507        | |
+ | | |                  |_______________| |_______________| |
+ | | |     __________   ________________  ________________  |
+ | | |     |_GAL16V8|   |               | |               | |
+ | | |                  | EMPTY         | | EMPTY         | |
+ | | |                  |_______________| |_______________| |
+ | | |     __________   ________________  ________________  |
+ | | |     |_GAL16V8|   |               | |               | |
+ | | |                  | EMPTY         | | EMPTY         | |
+ | | |                  |_______________| |_______________| |
+ | | |      _________   ________________  ________________  |
+ | | |      |74LS138N   |               | |               | |
+ | | |                  | EMPTY         | | EMPTY         | |
+ | | |                  |_______________| |_______________| |
+ | | |________________  ________________                    |
+ | |_||               | |               |                   |
+ |    | LG 502        | | LG 504        |                   |
+ |    |_______________| |_______________|                   |
+ |    ________________  ________________                    |
+ |    |               | |               |                   |
+ |    | LG 501        | | LG 503        |                   |
+ |    |_______________| |_______________|                   |
+ |    ________________  ________________                    |
+ |    |               | |               |     MODULAR       |
+ |    | EMPTY         | | EMPTY         |    SYSTEM 2       |
+ |    |_______________| |_______________|                   |
+ |    ________________  ________________                    |
+ |    |               | |               |                   |
+ |    | EMPTY         | | EMPTY         |                   |
+ |    |_______________| |_______________|                   |
+ |    ________________  ________________                    |
+ |    |               | |               |                   |
+ |    | EMPTY         | | EMPTY         |                   |
+ |    |_______________| |_______________|                   |
+ |    ________________  ________________                    |
+ |    |               | |               |                   |
+ |    | EMPTY         | | EMPTY         |                   |
+ |    |_______________| |_______________|                   |
+ |__________________________________________________________|
+
+ ROM Board (8)
+ __________________________________________________________________________________
+ |           :::::::: <- Jumpers                                                   |
+ |          ________________  ________________  ________________  ________________ |
+ | _______  |               | |               | |               | |               ||
+ | 74LS175N | EMPTY         | | EMPTY         | | EMPTY         | | EMPTY         ||
+ |          |_______________| |_______________| |_______________| |_______________||
+ | _______  ________________  ________________  ________________  ________________ |
+ | 74LS175N |               | |               | |               | |               ||
+ |          | EMPTY         | | EMPTY         | | EMPTY         | | EMPTY         ||
+ | _______  |_______________| |_______________| |_______________| |_______________||
+ | 74LS175N ________________  ________________  ________________  ________________ |
+ |          |               | |               | |               | |               ||
+ | _______  | EMPTY         | | EMPTY         | | EMPTY         | | EMPTY         ||
+ | 74LS175N |_______________| |_______________| |_______________| |_______________||
+ |          ________________  ________________  ________________  ________________ |
+ | _______  |               | |               | |               | |               ||
+ | 74LS175N | EMPTY         | | EMPTY         | | EMPTY         | | EMPTY         ||
+ |          |_______________| |_______________| |_______________| |_______________||
+ |          ________________  ________________  ________________  ________________ |
+ | _______  |               | |               | |               | |               ||
+ | 74LS175N | EMPTY         | | EMPTY         | | EMPTY         | | EMPTY         ||
+ |          |_______________| |_______________| |_______________| |_______________||
+ |          ________________  ________________  ________________  ________________ |
+ | _______  |               | |               | |               | |               ||
+ | 74LS175N | LG 802        | | LG 804        | | LG 806        | | LG 808        ||
+ |          |_______________| |_______________| |_______________| |_______________||
+ | _______  ________________  ________________  ________________  ________________ |
+ | 74LS175N |               | |               | |               | |               ||
+ |          | LG 801        | | LG 803        | | LG 805        | | LG 807        ||
+ |          |_______________| |_______________| |_______________| |_______________||
+ |  _____________________________      _______  _________________________________  |
+ |__|                            |____74LS138N_|                                |__|
+    |____________________________|             |________________________________|
+
+ CPU Board (6)                                       Board 21/1
+ _____________________________________________       ______________________________________________
+ |             _______________              __|_     |                                             |
+ |             |              |             |   |    |                                             |
+ |             | KM62245AP-10 |             |   |    |  ________   _______  ________               |
+ |             |______________|   _______   |   |    |  |_EMPTY_| |_EMPTY_| |_EMPTY_|              |
+ |  _______   ________________    74LS138N  |   |    |                                             |
+ | 74LS367AN  |               |             |   |    |                                             |
+ |            | LG 606        |             |   |    |                                             |
+ |            |_______________|             |   |    |  ________   _______  ________               |
+ |            ________________    _______   |   |    |  |74S74N_| |74LS393N |74LS393N              |
+ |  _______   |               |   74LS245N  |   |    |                                             |
+ | 74LS367AN  | LG 605        |             |   |    |                                             |
+ |            |_______________|             |   |    |                                             |
+ |            ________________              |   |    |                                             |
+ |  _______   |               |   _______   |   |    |  74LS7273N |82S129_| |82S129_|              |
+ | 74LS138N   | LG 604        |   74LS374P  |   |    |               209       204                 |
+ |            |_______________|             |   |    |                                             |
+ |             _______________              |   |    |                                             |
+ |             |              |   _______   |___|    |  ________   _______  ________               |
+ |  _______    | KM62245AP-10 |   74LS245N    |      |  74LS74AN    XTAL    74LS367AN              |
+ |  GAL16V8    |______________|               |      |            28.00000 MHz                     |
+ |    686     ________________                |      |                                             |
+ |  _______   |               |   _______     |      |  ________   _______  ________               |
+ | 74LS174AN  | LG 603        |   74LS374P    |      |  74LS732B1 74LS368AN AM2148-55DC          __|_
+ |            |_______________|               |      |                                           |   |
+ |  _______   ________________                |      |                                           |   |
+ |  GAL16V8   |               |               |      |  ________   _______  ________             |   |
+ |   8638     | LG 602        |   _______     |      |  74LS157N  74S112AN  AM2148-55DC          |   |
+ |  _______   |_______________|   74LS138N    |      |                                           |   |
+ |  GAL16V8   ________________                |      |                                           |   |
+ |   8600     |               |               |      |  ________   _______  ________             |   |
+ |  _______   | LG 601        |               |      |  74LS148N  74LS368AN AM2148-55DC          |   |
+ |  74LS373N  |_______________|   _______     |      |                                           |   |
+ |___________________________     74LS32N     |      |                                           |   |
+ ||_________________ _______ |                |      |  ________   _______  ________   ________  |   |
+ |||                |74LS737N|    _______     |      |  74LS298P  74LS298P  74LS298P   74LS174N  |   |
+ ||| NEC V30        |_______ |    74LS20N     |      |                                           |   |
+ |||________________|74LS737N|                |      |                                           |   |
+ ||__________________________|                |      |  ________   _______  ________   ________  |   |
+ |  _______  ______  _______      _______     |      |  74LS245N  74LS245N  |74LS08P   74LS174N  |   |
+ |  |74S74N   XTAL  74LS368AN     74LS132N    |      |                                           |___|
+ |__________20.000MHz_________________________|      |_____________________________________________|
+
+ Board 5                                             Sound Board (1/3)
+ _____________________________________________       ______________________________________________
+ |                                            |      |                                             |
+ | __________  ________ ________ ________     |      |  ________  ________  ________               |
+ | |TO SUB 51| 74LS299N 74LS169N UM2149-1     |      |  74LS107AN |74LS3Z_| |_EMPTY_|              |
+ | |_________| ________ ________ ________     |      |                                             |
+ |             74LS169J 74LS169N UM2149-1     |      |  ________  __________________               |
+ |                                            |      | 74LS368AB1 |                 |              |
+ | __________  ________ ________ ________     |      |            | EMPTY           |              |
+ | |TO SUB 51| 74LS158N 74LS169N |82S129N <- 502     |  ________  |_________________|              |
+ | |_________| ________ ________ ________     |      |  74LS74AN  __________________               |
+ |             74LS299N 74LS169N 74LS244N     |      |            |  Z8400BB1       |              |
+ |                                            |      |  ________  |  Z80 B CPU      |  ________    |
+ | __________  ________ ________ ________     |      | 74HCT157E  |_________________|  |CA324E_|   |
+ | |TO SUB 51| 74LS299N 74LS169N 74LS244N     |      |            ________________                 |
+ | |_________| ________ ________ ________     |      |  ________  |               |             __ |
+ |             |74LS20N UM2149-1 74LS298P     |    105->N82S123N  | LG 1          |             |D||
+ |                                            |      |  ________  |_______________|             |I||
+ | __________  ________ ________ ________     |      | 74HCT157E  ________________              |P||     SOUND SUB
+ | |TO SUB 51| 74LS299N UM2149-1 74LS298P     |      | __________ |               | _____ _____ |S|| _________________
+ | |_________|                                |      | |         || SRM2064C-15   |Y3014B Y3014B|-|| | ______          |
+ |   ________  ________ ________ ________  __ |      | | SOUND   ||_______________|             |D|| | LM358N     ___  |
+ |   74LS273P  |74LS00N 74LS86B1 74LS244N  | ||      | |  SUB    |                              |I|| | .......... |  | |
+ |                                         | ||      | |         |                              |P|| |            |OKI |
+_|_  ________  ________ ________ ________  |T||    __|_|_________|__________________            |S|| | .......... |M5205
+|  | 74LS08B1  74LS158N 74LS74AN |74LS20N  |O||    |   |          | YAMAHA          |           |_|| | ________   |__| |
+|  |                                       | ||    |   |          | YM2203C         |              | | 74LS377B1       |
+|  | ________  ________ ________ ________  |S||    |   |          |_________________|              | |_________________|
+IC64->PAL16R6A 74LS393N 74LS368AN 74LS377N |U||    |   |                                           |
+|  |                                       |B||    |   | _______  ________                         |
+|  | ________  ________ ________ ________  | ||    |   | |EMPTY_| 74LS74AN                         |
+|  | 74LS138N  74LS283N AM2148-55DC EMPTY  |5||    |   |                                           |
+|  |                                       |1||    |   |                                           |
+|  | ________  ________ ________ ________  | ||    |   |          __________________    _____      |
+|  | 74LS175P  74LS283N AM2148-55DC 74LS273P ||    |   | _______  | YAMAHA          |  TDA2003     |
+|  |                                       | ||    |   | |EMPTY|  | YM2203C         |              |
+|  | ________  ________ ________ ________  |_||    |   |          |_________________|              |
+|  | 74LS298P  74LS157N 74LS157N 74LS273P     |    |   |                                           |
+|  |                                          |    |   |                                           |
+|  | ________  ________ ________ ________     |    |   |                                           |
+|  | 74LS158N  74LS169N 74LS169N 74LS245P     |    |   |                                           |
+|__|                                          |    |___|        __________________________         |
+ |____________________________________________|      |__________| |_|_|_|_|_|_|_|_|_|_|_| |________|
+                                                                          PRE-JAMMA
+ Board (6)
+ __________________________________________________________
+ | _________  _________ __________  _________  _________ __|_
+ | 74LS163AP| 74LS163AP||_GAL20V8_| |74S174N_| |74S189N_||   |
+ |                         7636                          |   |
+ | _________  _________  _________  _________  _________ |   |
+ | |74LS157N| |74LS288N| |74LS273P| 74LS290B1| |74S189N_||   |
+ |                                                       |   |
+ | _________  _________  _________  _________  _________ |   |
+ | |74LS393N| 74LS283N_|74HCTLS373N 74LS298B1| |74S189N_||   |
+ |                                                       |   |
+ | _________  __________  _____________  _________       |   |
+ | |74LS157N| |_GAL16V8_| |KM62256AP-10| |74S174N_|      |   |
+ |              7536      |____________| _________       |   |
+ | _________  __________  _____________  |74S174N_|      |   |
+ | |74LS283N| |74LS245P_| |KM62256AP-10| __________      |   |
+ |                        |____________| |74LS245P_|     |   |
+ | _________  __________    __________   _________       |   |
+ | |74LS20B1| |74LS374N_|   |74LS273P_|  |74LS74AP|      |   |
+ |                                                       |   |
+ | _________  __________    __________   _________       |___|
+ | |74LS04N_| |_GAL16V8_|   |74LS374N_|  |74LS157N|        |
+ |               7336                                      |
+ | _________  __________    __________   _________         |
+ | |74LS00N_| |_GAL16V8_|   |74LS273P_|  74LS367AN       __|_
+ |               7236                                    |   |
+ | _________  __________    __________   _________       |   |
+ | |74LS08B1| |74LS273P_|   |74LS374N_|  |GAL16V8_|      |   |
+ |                                          7436         |   |
+ | _________  __________    __________   _________       |   |
+ | |74LS74AP| |74LS273P_|   74LS367AB1|  74HCTLS373N     |   |
+ |                                                       |   |
+ | _________  __________    __________   _________       |   |
+ | |74LS32P_| |74LS374N_|   74LS367AB1| GAL20V8-25LP     |   |
+ |                                          7136         |   |
+ | _________  _________  _________  _________  _________ |   |
+ | 74LS139AN  |_74S74N_| |74LS157N| |74LS20B1| 74HCTLS373N   |
+ | _________  _________  _________  _________  _________ |   |
+ | |74LS32N_| |74LS157N|74HCTLS597N 74HCTLS597N 74HCTLS597N  |
+ | _________  _________  _________  _________  _________ |   |
+ | |74LS748P| |74LS86N_|74HCTLS597N 74HCTLS597N 74HCTLS597N  |
+ | _________  _________  _________  _________  _________ |   |
+ | |74LS748P| |74LS86N_|74HCTLS597N 74HCTLS597N 74HCTLS597N  |
+ |            _________  _________  _________  _________ |   |
+ |            |74LS377N|74HCTLS597N 74HCTLS597N 74HCTLS597N  |
+ |            _________  _________  _________  _________ |___|
+ |            |74LS273P| |74LS169N| |74LS169N| |74LS169N|  |
+ |_________________________________________________________|
+
+*/
+ROM_START( loht_ms ) // really similar to lohtb, even if it runs on 'Modular Hardware'
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "6_lg_604.ic17", 0x00001, 0x10000, CRC(7e84b6ce) SHA1(a9a54f045917a191b6d6bbe061fc7a3344efb3bb) )
+	ROM_LOAD16_BYTE( "6_lg_604.ic20", 0x10001, 0x10000, CRC(abdcd211) SHA1(6ad79c4ef14d908032e4dbded7696a66fe5d31da) )
+	ROM_LOAD16_BYTE( "6_lg_601.ic8",  0x00000, 0x10000, CRC(7e080cb8) SHA1(598bcd8ecebe1922735b61cc1305e8839d9d054e) )
+	ROM_LOAD16_BYTE( "6_lg_602.ic11", 0x10000, 0x10000, CRC(150d1178) SHA1(71df3c9a49eb74cf40790e9b4cf7c6260fbd07d6) )
+	ROM_LOAD16_BYTE( "6_lg_606.ic26", 0x40001, 0x20000, CRC(714778b5) SHA1(e2eaa35d6b5fa5df5163fe0d7b45fa66667f9947) )
+	ROM_RELOAD(                       0xc0001, 0x20000 )
+	ROM_LOAD16_BYTE( "6_lg_603.ic25", 0x40000, 0x20000, CRC(2f049b03) SHA1(21047cb10912b1fc23795673af3ea7de249328b7) )
+	ROM_RELOAD(                       0xc0000, 0x20000 )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* Sound CPU program (Z80) + Samples*/
+	ROM_LOAD( "1_lg_1.ic12",  0x00000, 0x10000, CRC(7aa26b54) SHA1(01df7ea6443bbc775d5592edc32816853c857189) )
+
+	ROM_REGION( 0x080000, "sprites", 0 ) /* Sprites */
+	ROM_LOAD( "5_lg_501.ic5",   0x00000, 0x10000, CRC(df5ac5ee) SHA1(5b45417ada402047d97dfb6cee6545686ad26e37) )
+	ROM_LOAD( "5_lg_503.ic14",  0x20000, 0x10000, CRC(45220b01) SHA1(83715cf155f91c82067d69f14b3b01ed77777b7d) )
+	ROM_LOAD( "5_lg_505.ic20",  0x40000, 0x10000, CRC(25b85cfc) SHA1(c7a9962165379193dc6553ed1f977795a79e0f78) )
+	ROM_LOAD( "5_lg_507.ic26",  0x60000, 0x10000, CRC(763fa4ec) SHA1(2d72b1b41f24ae299fde23869942c0b6bbb82363) )
+	ROM_LOAD( "5_lg_502.ic6",   0x10000, 0x10000, CRC(d7ecf849) SHA1(ab86a88eae21e054d4e8a740a60c7c6c198232d4) )
+	ROM_LOAD( "5_lg_504.ic15",  0x30000, 0x10000, CRC(35d1a808) SHA1(9378ff000104ecfb842b3b884197be82c43a01b4) )
+	ROM_LOAD( "5_lg_506.ic21",  0x50000, 0x10000, CRC(464d8579) SHA1(b5981f4865ee5439f0e330091927e6d97d29933f) )
+	ROM_LOAD( "5_lg_508.ic27",  0x70000, 0x10000, CRC(a73568c7) SHA1(8fe1867256708cc1ed76d1bed5566b1852b47c40) )
+
+	ROM_REGION( 0x040000, "gfx2", ROMREGION_INVERT ) /* tiles #1 */
+	ROM_LOAD( "8_lg_801.ic15",  0x00000, 0x10000, CRC(359f17d4) SHA1(2875ba48395e7faa1a58404475be936dcca45ed1) )
+	ROM_LOAD( "8_lg_803.ic22",  0x10000, 0x10000, CRC(73391e8a) SHA1(53ca89b8a10895f817ecdb9fa5eef462edb94ae6) )
+	ROM_LOAD( "8_lg_805.ic30",  0x20000, 0x10000, CRC(7096d390) SHA1(f4a16bf8aef7a1a65619ab022cbdb67d2f191888) )
+	ROM_LOAD( "8_lg_807.ic37",  0x30000, 0x10000, CRC(1c113901) SHA1(3d4ce2ac6cdad0e1b0a21ffb062f9c92700adcf4) )
+
+	ROM_REGION( 0x040000, "gfx3", ROMREGION_INVERT ) /* tiles #2 */
+	ROM_LOAD( "8_lg_802.ic14",  0x00000, 0x10000, CRC(4d5e9b53) SHA1(3e3977bab7a66ed0171afcd555d181960e338749) )
+	ROM_LOAD( "8_lg_804.ic21",  0x10000, 0x10000, CRC(4f75a26a) SHA1(79c09a1ad3a6f9cfbd07cb527bbd89d2478ce582) )
+	ROM_LOAD( "8_lg_806.ic29",  0x20000, 0x10000, CRC(34854262) SHA1(37436c12579fb41d22a1596b495f065959c14a26) )
+	ROM_LOAD( "8_lg_808.ic36",  0x30000, 0x10000, CRC(f923183c) SHA1(a6b578191864aefa81e0cad3ba12a2ca491c91cf) )
+
+	ROM_REGION( 0x10000, "samples", ROMREGION_ERASEFF ) /* -- no sample roms on bootleg, included with z80 code */
+
+	ROM_REGION( 0x320, "prom", ROMREGION_ERASEFF )
+	ROM_LOAD( "51_502_82s129n.ic10",      0x000, 0x100, CRC(15085e44) SHA1(646e7100fcb112594023cf02be036bd3d42cc13c) )
+	ROM_LOAD( "21_204_82s129an.ic4",      0x100, 0x100, CRC(74470450) SHA1(40b0e0991090733f8190ad7efcb500bd109c2a7e) )
+	ROM_LOAD( "21_209_82s129an.ic12",     0x200, 0x100, CRC(7922a7ab) SHA1(e7ec2b1fc61bd7d2cf921bfc50d975f91b938e8a) )
+	ROM_LOAD( "1_105_82s123n.ic20",       0x300, 0x020, CRC(14d72781) SHA1(372dc021d8aaf4aa6fd46e69a3d8f1c68113426f) )
+
+	ROM_REGION( 0x104, "plds", ROMREGION_ERASEFF )
+	ROM_LOAD( "51_p0503_pal16r6.ic46",       0x000, 0x104, CRC(07eb86d2) SHA1(482eb325df5bc60353bac85412cf45429cd03c6d) )
+	// these were read protected
+	ROM_LOAD( "5_5136_gal16v8-25lp.ic9",   0x0, 0x1, NO_DUMP )
+	ROM_LOAD( "5_5236_gal16v8-25lp.ic8",   0x0, 0x1, NO_DUMP )
+	ROM_LOAD( "6_686_gal16v8.ic13",        0x0, 0x1, NO_DUMP )
+	ROM_LOAD( "6_8638_gal16v8.ic7",        0x0, 0x1, NO_DUMP )
+	ROM_LOAD( "6_subcpu_8600_gal16v8.ic3", 0x0, 0x1, NO_DUMP )
+	ROM_LOAD( "7_7136_gal20v8-25lp.ic7",   0x0, 0x1, NO_DUMP )
+	ROM_LOAD( "7_7236_gal20v8-25lp.ic54",  0x0, 0x1, NO_DUMP )
+	ROM_LOAD( "7_7336_gal16v8.ic55",       0x0, 0x1, NO_DUMP )
+	ROM_LOAD( "7_7436_gal16v8.ic9",        0x0, 0x1, NO_DUMP )
+	ROM_LOAD( "7_7536_gal16v8.ic59",       0x0, 0x1, NO_DUMP )
+	ROM_LOAD( "7_7636_gal20v8-25lp.ic44",  0x0, 0x1, NO_DUMP )
+ROM_END
+
 
 ROM_START( xmultiplm72 )
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "ch3.h3",       0x00001, 0x20000, CRC(20685021) SHA1(92f4216320bf525045223b9454fb5bb224c536d8) )
-	ROM_LOAD16_BYTE( "cl3.l3",       0x00000, 0x20000, CRC(93fdd200) SHA1(dd4244ba0ce6c621136b0648374179da44363c01) )
-	ROM_LOAD16_BYTE( "ch0.h0",       0x40001, 0x10000, CRC(9438dd8a) SHA1(dc85789c47d31a96300b4236dc43f065e1b01e4a) )
-	ROM_RELOAD(                      0xe0001, 0x10000 )
-	ROM_LOAD16_BYTE( "cl0.l0",       0x40000, 0x10000, CRC(06a9e213) SHA1(9831c110814642703d6e71d49848d854095b7d3a) )
-	ROM_RELOAD(                      0xe0000, 0x10000 )
+	ROM_LOAD16_BYTE( "xm_c-h3-.ic43", 0x00001, 0x20000, CRC(20685021) SHA1(92f4216320bf525045223b9454fb5bb224c536d8) )
+	ROM_LOAD16_BYTE( "xm_c-l3-.ic34", 0x00000, 0x20000, CRC(93fdd200) SHA1(dd4244ba0ce6c621136b0648374179da44363c01) )
+	ROM_LOAD16_BYTE( "xm_c-h0-.ic40", 0x40001, 0x10000, CRC(9438dd8a) SHA1(dc85789c47d31a96300b4236dc43f065e1b01e4a) )
+	ROM_RELOAD(                       0xe0001, 0x10000 )
+	ROM_LOAD16_BYTE( "xm_c-l0-.ic37", 0x40000, 0x10000, CRC(06a9e213) SHA1(9831c110814642703d6e71d49848d854095b7d3a) )
+	ROM_RELOAD(                       0xe0000, 0x10000 )
 
-	ROM_REGION( 0x10000, "mcu", 0 )
-	ROM_LOAD( "xmultipl_i8751h.bin",  0x00000, 0x01000, CRC(c8ceb3cd) SHA1(e5d20a3a9d7f0919604543c97643a03434d80130) )
+	ROM_REGION( 0x10000, "mcu", 0 )  /* i8751 microcontroller */
+	ROM_LOAD( "xm_c-pr-.ic1", 0x00000, 0x01000, CRC(c8ceb3cd) SHA1(e5d20a3a9d7f0919604543c97643a03434d80130) ) /* i8751 MCU labeled  XM C-PR- */
 
 	ROM_REGION( 0x100000, "sprites", 0 )
-	ROM_LOAD( "t44.00",       0x00000, 0x20000, CRC(db45186e) SHA1(8c8edeb4b7e6b0516f2597823dc27eba9c5d9528) )  /* sprites */
-	ROM_LOAD( "t45.01",       0x20000, 0x20000, CRC(4d0764d4) SHA1(4942333336a110b033f16ac1afa06ffef7b2dad6) )
-	ROM_LOAD( "t46.10",       0x40000, 0x20000, CRC(f0c465a4) SHA1(69c107c860d4e8736431fd86b6821b70a8367eb3) )
-	ROM_LOAD( "t47.11",       0x60000, 0x20000, CRC(1263b24b) SHA1(0445a5381df3a868bed6967c8e5de7169e4be6a3) )
-	ROM_LOAD( "t48.20",       0x80000, 0x20000, CRC(4129944f) SHA1(988b072032d1667c3ac0731fada32fb6978505dc) )
-	ROM_LOAD( "t49.21",       0xa0000, 0x20000, CRC(2346e6f9) SHA1(b3de017dd0353e04d279f57e151c47f5fcc70e9c) )
-	ROM_LOAD( "t50.30",       0xc0000, 0x20000, CRC(e322543e) SHA1(b4c3a7f202d81485d5f0a7b7668ee89fc1edb215) )
-	ROM_LOAD( "t51.31",       0xe0000, 0x20000, CRC(229bf7b1) SHA1(ae42c7efbb6278dd3fa56842361138391f2d49ca) )
+	ROM_LOAD( "t44.00.ic53", 0x00000, 0x20000, CRC(db45186e) SHA1(8c8edeb4b7e6b0516f2597823dc27eba9c5d9528) )  /* sprites */
+	ROM_LOAD( "t45.01.ic52", 0x20000, 0x20000, CRC(4d0764d4) SHA1(4942333336a110b033f16ac1afa06ffef7b2dad6) )
+	ROM_LOAD( "t46.10.ic51", 0x40000, 0x20000, CRC(f0c465a4) SHA1(69c107c860d4e8736431fd86b6821b70a8367eb3) )
+	ROM_LOAD( "t47.11.ic50", 0x60000, 0x20000, CRC(1263b24b) SHA1(0445a5381df3a868bed6967c8e5de7169e4be6a3) )
+	ROM_LOAD( "t48.20.ic48", 0x80000, 0x20000, CRC(4129944f) SHA1(988b072032d1667c3ac0731fada32fb6978505dc) )
+	ROM_LOAD( "t49.21.ic48", 0xa0000, 0x20000, CRC(2346e6f9) SHA1(b3de017dd0353e04d279f57e151c47f5fcc70e9c) )
+	ROM_LOAD( "t50.30.ic47", 0xc0000, 0x20000, CRC(e322543e) SHA1(b4c3a7f202d81485d5f0a7b7668ee89fc1edb215) )
+	ROM_LOAD( "t51.31.ic46", 0xe0000, 0x20000, CRC(229bf7b1) SHA1(ae42c7efbb6278dd3fa56842361138391f2d49ca) )
 
 	ROM_REGION( 0x080000, "gfx2", 0 )
 	ROM_LOAD( "t53.a0",       0x00000, 0x20000, CRC(1a082494) SHA1(63a3a84a262833d2cafab41e35df8f10a5e317b1) )  /* tiles #1 */
@@ -2945,24 +3399,21 @@ ROM_START( xmultiplm72 )
 	ROM_LOAD( "t60.b3",       0x60000, 0x20000, CRC(14c69f99) SHA1(4bea72f8bd421ef3ca559363f7473ce2e7038699) )
 
 	ROM_REGION( 0x20000, "samples", 0 ) /* samples */
-	ROM_LOAD( "t52.v0",       0x00000, 0x20000, CRC(2db1bd80) SHA1(657006d0642ec7fb949bb52821d78fe51a599415) )
+	ROM_LOAD( "t52.v0.ic44",       0x00000, 0x20000, CRC(2db1bd80) SHA1(657006d0642ec7fb949bb52821d78fe51a599415) )
 ROM_END
-
-
-
 
 
 ROM_START( dbreedm72 )
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "db_c-h3.rom",  0x00001, 0x20000, CRC(4bf3063c) SHA1(3f970c9ece2ac700738e217e0b31b3aba2848ab2) )
-	ROM_LOAD16_BYTE( "db_c-l3.rom",  0x00000, 0x20000, CRC(e4b89b79) SHA1(c312925940633e60fb5d0f05044c6e73e4f7fd54) )
-	ROM_LOAD16_BYTE( "db_c-h0.rom",  0x60001, 0x10000, CRC(5aa79fb2) SHA1(b7b862699ddccf90cf18d3822703078668aa1dc7) )
-	ROM_RELOAD(                      0xe0001, 0x10000 )
-	ROM_LOAD16_BYTE( "db_c-l0.rom",  0x60000, 0x10000, CRC(ed0f5e06) SHA1(9030840b15e83c18d59c884ed08c93c05fa70c5b) )
-	ROM_RELOAD(                      0xe0000, 0x10000 )
+	ROM_LOAD16_BYTE( "db_c-h3-b.ic43", 0x00001, 0x20000, CRC(4bf3063c) SHA1(3f970c9ece2ac700738e217e0b31b3aba2848ab2) ) /* need to verify label, with MCU DB C-PR- below shows ROM NG  1  2 */
+	ROM_LOAD16_BYTE( "db_c-l3-b.ic34", 0x00000, 0x20000, CRC(e4b89b79) SHA1(c312925940633e60fb5d0f05044c6e73e4f7fd54) ) /* need to verify label */
+	ROM_LOAD16_BYTE( "db_c-h0.ic40",   0x60001, 0x10000, CRC(5aa79fb2) SHA1(b7b862699ddccf90cf18d3822703078668aa1dc7) )
+	ROM_RELOAD(                        0xe0001, 0x10000 )
+	ROM_LOAD16_BYTE( "db_c-l0.ic37",   0x60000, 0x10000, CRC(ed0f5e06) SHA1(9030840b15e83c18d59c884ed08c93c05fa70c5b) )
+	ROM_RELOAD(                        0xe0000, 0x10000 )
 
-	ROM_REGION( 0x10000, "mcu", 0 )
-	ROM_LOAD( "dbreedm72_i8751.mcu", 0x00000, 0x10000, NO_DUMP ) // read protected
+	ROM_REGION( 0x10000, "mcu", 0 )  /* i8751 microcontroller */
+	ROM_LOAD( "db_c-pr-b.ic1",  0x00000, 0x01000, NO_DUMP ) // Requires different currently undumped MCU code - i8751 MCU labeled  DB C-PR-B??
 
 	ROM_REGION( 0x080000, "sprites", 0 )
 	ROM_LOAD( "db_k800m.00", 0x00000, 0x20000, CRC(c027a8cf) SHA1(534dc416b8f5587168c7f644d3f9438c8a190491) )   /* sprites */
@@ -2983,8 +3434,43 @@ ROM_START( dbreedm72 )
 	ROM_LOAD( "db_k807m.b3", 0x60000, 0x20000, CRC(8eb0c978) SHA1(7fc55bbe4d0923db88492bb7160a89de34e11cd6) )
 
 	ROM_REGION( 0x20000, "samples", 0 ) /* samples */
-	ROM_LOAD( "db_c-v0.rom",  0x00000, 0x20000, CRC(312f7282) SHA1(742d56980b4618180e9a0e02051c5aec4d5cdae4) )
+	ROM_LOAD( "db_c-v0.ic44",  0x00000, 0x20000, CRC(312f7282) SHA1(742d56980b4618180e9a0e02051c5aec4d5cdae4) )
 ROM_END
+
+ROM_START( dbreedm72j )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "db_c-h3.ic43",  0x00001, 0x20000, CRC(43425d67) SHA1(a87339bf299f7e84b9a181f3827278f64a6a29ea) )
+	ROM_LOAD16_BYTE( "db_c-l3.ic34",  0x00000, 0x20000, CRC(9c1abc85) SHA1(6c73fbec12a7795e327381d886a87bca09a7dff0) )
+	ROM_LOAD16_BYTE( "db_c-h0.ic40",  0x60001, 0x10000, CRC(5aa79fb2) SHA1(b7b862699ddccf90cf18d3822703078668aa1dc7) )
+	ROM_RELOAD(                       0xe0001, 0x10000 )
+	ROM_LOAD16_BYTE( "db_c-l0.ic37",  0x60000, 0x10000, CRC(ed0f5e06) SHA1(9030840b15e83c18d59c884ed08c93c05fa70c5b) )
+	ROM_RELOAD(                       0xe0000, 0x10000 )
+
+	ROM_REGION( 0x10000, "mcu", 0 )  /* i8751 microcontroller */
+	ROM_LOAD( "db_c-pr-.mcu",  0x00000, 0x01000, CRC(8bf2910c) SHA1(65842c928626077f613e0ab56074e83301a64a2e) ) /* i8751 MCU labeled  DB C-PR- */
+
+	ROM_REGION( 0x080000, "sprites", 0 )
+	ROM_LOAD( "db_k800m.00", 0x00000, 0x20000, CRC(c027a8cf) SHA1(534dc416b8f5587168c7f644d3f9438c8a190491) )   /* sprites */
+	ROM_LOAD( "db_k801m.10", 0x20000, 0x20000, CRC(093faf33) SHA1(2704f644cdce87daf975984f143b1d55ba731c3f) )
+	ROM_LOAD( "db_k802m.20", 0x40000, 0x20000, CRC(055b4c59) SHA1(71315dd7476612f138cb64b905648791d44eb7da) )
+	ROM_LOAD( "db_k803m.30", 0x60000, 0x20000, CRC(8ed63922) SHA1(51daa8a23e637f6b4394598ff4a1d26f65b59c8b) )
+
+	ROM_REGION( 0x080000, "gfx2", 0 ) // same roms are duplicated at a0-a3 and b0-b3, confirmed
+	ROM_LOAD( "db_k804m.a0", 0x00000, 0x20000, CRC(4c83e92e) SHA1(6dade027435c48ab48bd4516d16a9961d4dd6fad) )   /* tiles #1 */
+	ROM_LOAD( "db_k805m.a1", 0x20000, 0x20000, CRC(835ef268) SHA1(89d0bb15201440dffad3ef745970f95505d7ab03) )
+	ROM_LOAD( "db_k806m.a2", 0x40000, 0x20000, CRC(5117f114) SHA1(a401a3e638209b32d4101a5c2e2a8b4612eaa21b) )
+	ROM_LOAD( "db_k807m.a3", 0x60000, 0x20000, CRC(8eb0c978) SHA1(7fc55bbe4d0923db88492bb7160a89de34e11cd6) )
+
+	ROM_REGION( 0x080000, "gfx3", 0 )
+	ROM_LOAD( "db_k804m.b0", 0x00000, 0x20000, CRC(4c83e92e) SHA1(6dade027435c48ab48bd4516d16a9961d4dd6fad) )   /* tiles #2 */
+	ROM_LOAD( "db_k805m.b1", 0x20000, 0x20000, CRC(835ef268) SHA1(89d0bb15201440dffad3ef745970f95505d7ab03) )
+	ROM_LOAD( "db_k806m.b2", 0x40000, 0x20000, CRC(5117f114) SHA1(a401a3e638209b32d4101a5c2e2a8b4612eaa21b) )
+	ROM_LOAD( "db_k807m.b3", 0x60000, 0x20000, CRC(8eb0c978) SHA1(7fc55bbe4d0923db88492bb7160a89de34e11cd6) )
+
+	ROM_REGION( 0x20000, "samples", 0 ) /* samples */
+	ROM_LOAD( "db_c-v0.ic44",  0x00000, 0x20000, CRC(312f7282) SHA1(742d56980b4618180e9a0e02051c5aec4d5cdae4) )
+ROM_END
+
 
 ROM_START( dkgensanm72 )
 	ROM_REGION( 0x100000, "maincpu", 0 )
@@ -2995,7 +3481,7 @@ ROM_START( dkgensanm72 )
 	ROM_LOAD16_BYTE( "ge72-l3.bin",  0x60000, 0x10000, CRC(23d303a5) SHA1(b62010f34d71afb590deae458493454f9af38f7c) )
 	ROM_RELOAD(                      0xe0000, 0x10000 )
 
-	ROM_REGION( 0x10000, "mcu", 0 )
+	ROM_REGION( 0x10000, "mcu", 0 )  /* i8751 microcontroller */
 	ROM_LOAD( "dkgenm72_i8751.mcu",  0x00000, 0x10000, NO_DUMP ) // read protected
 
 	ROM_REGION( 0x080000, "sprites", 0 )
@@ -3023,79 +3509,80 @@ ROM_END
 
 ROM_START( airduelm72 )
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "ad-c-h0.bin",  0x00001, 0x20000, CRC(12140276) SHA1(f218c5f2e6795b6295dea064817d7d6b1a7762b6) )
-	ROM_LOAD16_BYTE( "ad-c-l0.bin",  0x00000, 0x20000, CRC(4ac0b91d) SHA1(97e2f633181cd5c25927fd0e2988af2acdb3f388) )
-	ROM_LOAD16_BYTE( "ad-c-h3.bin",  0x40001, 0x20000, CRC(9f7cfca3) SHA1(becf827aa7749c54f1c435ea224e1fd9c8b3f5f9) )
+	ROM_LOAD16_BYTE( "ad-c-h0.ic40", 0x00001, 0x20000, CRC(12140276) SHA1(f218c5f2e6795b6295dea064817d7d6b1a7762b6) )
+	ROM_LOAD16_BYTE( "ad-c-l0.ic37", 0x00000, 0x20000, CRC(4ac0b91d) SHA1(97e2f633181cd5c25927fd0e2988af2acdb3f388) )
+	ROM_LOAD16_BYTE( "ad-c-h3.ic43", 0x40001, 0x20000, CRC(9f7cfca3) SHA1(becf827aa7749c54f1c435ea224e1fd9c8b3f5f9) )
 	ROM_RELOAD(                      0xc0001, 0x20000 )
-	ROM_LOAD16_BYTE( "ad-c-l3.bin",  0x40000, 0x20000, CRC(9dd343f7) SHA1(9f499936b6d3807aa5b5c18e9811c73c9a2c99f9) )
+	ROM_LOAD16_BYTE( "ad-c-l3.ic34", 0x40000, 0x20000, CRC(9dd343f7) SHA1(9f499936b6d3807aa5b5c18e9811c73c9a2c99f9) )
 	ROM_RELOAD(                      0xc0000, 0x20000 )
 
-	ROM_REGION( 0x10000, "mcu", 0 )
-	ROM_LOAD( "airduel_i8751.mcu",  0x00000, 0x10000, NO_DUMP ) // read protected
+	ROM_REGION( 0x1000, "mcu", 0 )  /* i8751 microcontroller */
+	ROM_LOAD( "ad_c-pr-.ic1", 0x00000, 0x01000, CRC(45584e52) SHA1(647826f1bec9b39ae971ecb58d921d363ee4cf45) ) /* i8751 MCU labeled  AD C-PR- */
 
 	ROM_REGION( 0x080000, "sprites", 0 )
-	ROM_LOAD( "ad-00.bin",    0x00000, 0x20000, CRC(2f0d599b) SHA1(a966f806b5e25bb98cc63c46c49e0e676a62afcf) )  /* sprites */
-	ROM_LOAD( "ad-10.bin",    0x20000, 0x20000, CRC(9865856b) SHA1(b18a06899ae29d45e2351594df544220f3f4485a) )
-	ROM_LOAD( "ad-20.bin",    0x40000, 0x20000, CRC(d392aef2) SHA1(0f639a07066cadddc3884eb490885a8745571567) )
-	ROM_LOAD( "ad-30.bin",    0x60000, 0x20000, CRC(923240c3) SHA1(f587a83329087a715a3e42110f74f104e8c8ef1f) )
+	ROM_LOAD( "ad-00.ic53", 0x00000, 0x20000, CRC(2f0d599b) SHA1(a966f806b5e25bb98cc63c46c49e0e676a62afcf) )
+	ROM_LOAD( "ad-10.ic51", 0x20000, 0x20000, CRC(9865856b) SHA1(b18a06899ae29d45e2351594df544220f3f4485a) )
+	ROM_LOAD( "ad-20.ic49", 0x40000, 0x20000, CRC(d392aef2) SHA1(0f639a07066cadddc3884eb490885a8745571567) )
+	ROM_LOAD( "ad-30.ic47", 0x60000, 0x20000, CRC(923240c3) SHA1(f587a83329087a715a3e42110f74f104e8c8ef1f) )
 
 	ROM_REGION( 0x080000, "gfx2", 0 )
-	ROM_LOAD( "ad-a0.bin",    0x00000, 0x20000, CRC(ce134b47) SHA1(841358cc222c81b8a91edc262f355310d50b4dbb) )  /* tiles #1 */
-	ROM_LOAD( "ad-a1.bin",    0x20000, 0x20000, CRC(097fd853) SHA1(8e08f4f4a747c899bb8e21b347635e26af9edc2d) )
-	ROM_LOAD( "ad-a2.bin",    0x40000, 0x20000, CRC(6a94c1b9) SHA1(55174acbac54236e5fc1b80d120cd6da9fe5524c) )
-	ROM_LOAD( "ad-a3.bin",    0x60000, 0x20000, CRC(6637c349) SHA1(27cb7c89ab73292b43f8ae3c0d803a01ef3d3936) )
+	ROM_LOAD( "ad-a0.ic21", 0x00000, 0x20000, CRC(ce134b47) SHA1(841358cc222c81b8a91edc262f355310d50b4dbb) )  /* tiles #1 */
+	ROM_LOAD( "ad-a1.ic22", 0x20000, 0x20000, CRC(097fd853) SHA1(8e08f4f4a747c899bb8e21b347635e26af9edc2d) )
+	ROM_LOAD( "ad-a2.ic20", 0x40000, 0x20000, CRC(6a94c1b9) SHA1(55174acbac54236e5fc1b80d120cd6da9fe5524c) )
+	ROM_LOAD( "ad-a3.ic23", 0x60000, 0x20000, CRC(6637c349) SHA1(27cb7c89ab73292b43f8ae3c0d803a01ef3d3936) )
 
 	ROM_REGION( 0x080000, "gfx3", 0 )
-	ROM_LOAD( "ad-b0.bin",    0x00000, 0x20000, CRC(ce134b47) SHA1(841358cc222c81b8a91edc262f355310d50b4dbb) )  /* tiles #2 */
-	ROM_LOAD( "ad-b1.bin",    0x20000, 0x20000, CRC(097fd853) SHA1(8e08f4f4a747c899bb8e21b347635e26af9edc2d) )
-	ROM_LOAD( "ad-b2.bin",    0x40000, 0x20000, CRC(6a94c1b9) SHA1(55174acbac54236e5fc1b80d120cd6da9fe5524c) )
-	ROM_LOAD( "ad-b3.bin",    0x60000, 0x20000, CRC(6637c349) SHA1(27cb7c89ab73292b43f8ae3c0d803a01ef3d3936) )
+	ROM_LOAD( "ad-b0.ic26", 0x00000, 0x20000, CRC(ce134b47) SHA1(841358cc222c81b8a91edc262f355310d50b4dbb) )  /* tiles #2 */
+	ROM_LOAD( "ad-b1.ic27", 0x20000, 0x20000, CRC(097fd853) SHA1(8e08f4f4a747c899bb8e21b347635e26af9edc2d) )
+	ROM_LOAD( "ad-b2.ic25", 0x40000, 0x20000, CRC(6a94c1b9) SHA1(55174acbac54236e5fc1b80d120cd6da9fe5524c) )
+	ROM_LOAD( "ad-b3.ic24", 0x60000, 0x20000, CRC(6637c349) SHA1(27cb7c89ab73292b43f8ae3c0d803a01ef3d3936) )
 
-	ROM_REGION( 0x20000, "samples", 0 ) /* samples */
-	ROM_LOAD( "ad-v0.bin",    0x00000, 0x20000, CRC(339f474d) SHA1(a81bb52598a0e31b2ed6a538755237c5d14d1844) )
+	ROM_REGION( 0x20000, "samples", 0 )
+	ROM_LOAD( "ad-v0.ic44", 0x00000, 0x20000, CRC(339f474d) SHA1(a81bb52598a0e31b2ed6a538755237c5d14d1844) )
+
+	ROM_REGION( 0x104, "pals", 0 )
+	ROM_LOAD( "ad-c-3f.ic13", 0x000, 0x104, NO_DUMP ) // unknown type of PAL
 ROM_END
+
 
 ROM_START( gallop )
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "cc-c-h0.bin",  0x00001, 0x20000, CRC(2217dcd0) SHA1(9485b6c3eec99e720439e69dcbe0e55798bbff1c) )
-	ROM_LOAD16_BYTE( "cc-c-l0.bin",  0x00000, 0x20000, CRC(ff39d7fb) SHA1(fad95f76050fce04464268b5edff6622b2cb798f) )
-	ROM_LOAD16_BYTE( "cc-c-h3.bin",  0x40001, 0x20000, CRC(9b2bbab9) SHA1(255d4dda55be667f5f1f4324e9e66111738e79b3) )
+	ROM_LOAD16_BYTE( "cc-c-h0.ic40", 0x00001, 0x20000, CRC(2217dcd0) SHA1(9485b6c3eec99e720439e69dcbe0e55798bbff1c) )
+	ROM_LOAD16_BYTE( "cc-c-l0.ic37", 0x00000, 0x20000, CRC(ff39d7fb) SHA1(fad95f76050fce04464268b5edff6622b2cb798f) )
+	ROM_LOAD16_BYTE( "cc-c-h3.ic43", 0x40001, 0x20000, CRC(9b2bbab9) SHA1(255d4dda55be667f5f1f4324e9e66111738e79b3) )
 	ROM_RELOAD(                      0xc0001, 0x20000 )
-	ROM_LOAD16_BYTE( "cc-c-l3.bin",  0x40000, 0x20000, CRC(acd3278e) SHA1(83d7ddfbdb4bc9548a179b728351a21b3b0ac134) )
+	ROM_LOAD16_BYTE( "cc-c-l3.ic34", 0x40000, 0x20000, CRC(acd3278e) SHA1(83d7ddfbdb4bc9548a179b728351a21b3b0ac134) )
 	ROM_RELOAD(                      0xc0000, 0x20000 )
 
-	ROM_REGION( 0x10000, "mcu", 0 )
-	ROM_LOAD( "gallop_i8751.mcu",  0x00000, 0x10000, NO_DUMP ) // read protected (only used for sample triggering, not supplying code / warning screens)
+	ROM_REGION( 0x10000, "mcu", 0 )  /* i8751 microcontroller */
+	ROM_LOAD( "cc_c-pr-.ic1", 0x00000, 0x10000, NO_DUMP ) // read protected (only used for sample triggering, not supplying code / warning screens)
 
 	ROM_REGION( 0x080000, "sprites", 0 )
-	ROM_LOAD( "cc-c-00.bin",  0x00000, 0x20000, CRC(9d99deaa) SHA1(acf16bea0f482306107d2a305c568406b6c21e9a) )  /* sprites */
-	ROM_LOAD( "cc-c-10.bin",  0x20000, 0x20000, CRC(7eb083ed) SHA1(31fa7d532fd46e861c3d19d5b08661653f685a49) )
-	ROM_LOAD( "cc-c-20.bin",  0x40000, 0x20000, CRC(9421489e) SHA1(e43d042bf8b4ebed93558d74ec479ec60a01ca5c) )
-	ROM_LOAD( "cc-c-30.bin",  0x60000, 0x20000, CRC(920ec735) SHA1(2d0949b43dddce7317c45910d6e4868ddf010806) )
+	ROM_LOAD( "cc-c-00.ic53", 0x00000, 0x20000, CRC(9d99deaa) SHA1(acf16bea0f482306107d2a305c568406b6c21e9a) )  /* sprites */
+	ROM_LOAD( "cc-c-10.ic51", 0x20000, 0x20000, CRC(7eb083ed) SHA1(31fa7d532fd46e861c3d19d5b08661653f685a49) )
+	ROM_LOAD( "cc-c-20.ic49", 0x40000, 0x20000, CRC(9421489e) SHA1(e43d042bf8b4ebed93558d74ec479ec60a01ca5c) )
+	ROM_LOAD( "cc-c-30.ic47", 0x60000, 0x20000, CRC(920ec735) SHA1(2d0949b43dddce7317c45910d6e4868ddf010806) )
 
 	ROM_REGION( 0x040000, "gfx2", 0 )
-	ROM_LOAD( "cc-b-a0.bin",  0x00000, 0x10000, CRC(a33472bd) SHA1(962047fe3dd1fb996285ecef615a8ebdb529adef) )  /* tiles #1 */
-	ROM_LOAD( "cc-b-a1.bin",  0x10000, 0x10000, CRC(118b1f2d) SHA1(7413ccc67a8aa9dae156e6ee122b1ca5beeb9a76) )
-	ROM_LOAD( "cc-b-a2.bin",  0x20000, 0x10000, CRC(83cebf48) SHA1(12847827ecbf6b493eb9dbddd0a469729d87a451) )
-	ROM_LOAD( "cc-b-a3.bin",  0x30000, 0x10000, CRC(572903fc) SHA1(03305301bcf939e97044e746594736b1ca1d7c0a) )
+	ROM_LOAD( "cc-b-a0.ic21", 0x00000, 0x10000, CRC(a33472bd) SHA1(962047fe3dd1fb996285ecef615a8ebdb529adef) )  /* tiles #1 */
+	ROM_LOAD( "cc-b-a1.ic22", 0x10000, 0x10000, CRC(118b1f2d) SHA1(7413ccc67a8aa9dae156e6ee122b1ca5beeb9a76) )
+	ROM_LOAD( "cc-b-a2.ic20", 0x20000, 0x10000, CRC(83cebf48) SHA1(12847827ecbf6b493eb9dbddd0a469729d87a451) )
+	ROM_LOAD( "cc-b-a3.ic23", 0x30000, 0x10000, CRC(572903fc) SHA1(03305301bcf939e97044e746594736b1ca1d7c0a) )
 
 	ROM_REGION( 0x040000, "gfx3", 0 )
-	ROM_LOAD( "cc-b-b0.bin",  0x00000, 0x10000, CRC(0df5b439) SHA1(0775cf92139a111542c8b5f940da0f7f43020982) )  /* tiles #2 */
-	ROM_LOAD( "cc-b-b1.bin",  0x10000, 0x10000, CRC(010b778f) SHA1(cc5bfeb0fbe0ed2fe513458c5785ec0ce5b02f53) )
-	ROM_LOAD( "cc-b-b2.bin",  0x20000, 0x10000, CRC(bda9f6fb) SHA1(a6b655ae5bff0568c1fb56ee8a3874fc6524052c) )
-	ROM_LOAD( "cc-b-b3.bin",  0x30000, 0x10000, CRC(d361ba3f) SHA1(7348fdae03e997e05187a2726eb221edb92553df) )
+	ROM_LOAD( "cc-b-b0.ic26", 0x00000, 0x10000, CRC(0df5b439) SHA1(0775cf92139a111542c8b5f940da0f7f43020982) )  /* tiles #2 */
+	ROM_LOAD( "cc-b-b1.ic27", 0x10000, 0x10000, CRC(010b778f) SHA1(cc5bfeb0fbe0ed2fe513458c5785ec0ce5b02f53) )
+	ROM_LOAD( "cc-b-b2.ic25", 0x20000, 0x10000, CRC(bda9f6fb) SHA1(a6b655ae5bff0568c1fb56ee8a3874fc6524052c) )
+	ROM_LOAD( "cc-b-b3.ic24", 0x30000, 0x10000, CRC(d361ba3f) SHA1(7348fdae03e997e05187a2726eb221edb92553df) )
 
 	ROM_REGION( 0x20000, "samples", 0 ) /* samples */
-	ROM_LOAD( "cc-c-v0.bin",  0x00000, 0x20000, CRC(6247bade) SHA1(4bc9f86acd09908c74b1ab0e7817c4ff1cad6f0b) )
+	ROM_LOAD( "cc-c-v0.ic44", 0x00000, 0x20000, CRC(6247bade) SHA1(4bc9f86acd09908c74b1ab0e7817c4ff1cad6f0b) )
 ROM_END
-
-
 
 
 /*****************************
   M81 sets
 ******************************/
-
 
 ROM_START( xmultipl )
 	ROM_REGION( 0x100000, "maincpu", 0 )
@@ -3171,6 +3658,7 @@ ROM_START( hharry )
 	ROM_REGION( 0x20000, "samples", 0 ) /* samples */
 	ROM_LOAD( "a-v0-0.rom",   0x00000, 0x20000, CRC(faaacaff) SHA1(ea3a3920255c07aa9c0a7e0191eae257a9f7f558) )
 ROM_END
+
 
 ROM_START( dbreed )
 	ROM_REGION( 0x100000, "maincpu", 0 )
@@ -3276,6 +3764,7 @@ ROM_START( majtitlej )
 	ROM_LOAD( "mt_vo.bin",    0x00000, 0x20000, CRC(eb24bb2c) SHA1(9fca04fba0249e8213dd164eb6829e1a5acbee65) )
 ROM_END
 
+
 ROM_START( airduel )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "ad_=m82=_a-h0-d.ic52", 0x00001, 0x20000, CRC(dbecc726) SHA1(526e9fdf0ca3af3eae462524df71af8e6bfa85d0) )
@@ -3345,6 +3834,7 @@ ROM_START( rtypem82b )
 	ROM_LOAD( "mt_vo.bin",    0x00000, 0x20000, CRC(eb24bb2c) SHA1(9fca04fba0249e8213dd164eb6829e1a5acbee65) )
 ROM_END
 
+
 ROM_START( rtype2m82b )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "rt2_h0.bin",    0x00001, 0x20000, CRC(47639a78) SHA1(d7dd851fed96d46c850e5c8f24d9d1a081f6b297) )
@@ -3364,7 +3854,7 @@ ROM_START( rtype2m82b )
 	ROM_LOAD( "rt2_n3.bin",    0x60000, 0x20000, CRC(db6176fc) SHA1(1eaf72af0322490c98461aded202288e387caac1) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )
-	ROM_LOAD( "rt2_c0.bin",    0x00000, 0x40000, CRC(f5bad5f2) SHA1(dc86b93f62e8947e3551f07e393e740e5dc43f5e))  /* tiles */
+	ROM_LOAD( "rt2_c0.bin",    0x00000, 0x40000, CRC(f5bad5f2) SHA1(dc86b93f62e8947e3551f07e393e740e5dc43f5e) )  /* tiles */
 	ROM_LOAD( "rt2_c1.bin",    0x40000, 0x40000, CRC(71451778) SHA1(52ca7aa8522b988a19556313041450c767dad054) )
 	ROM_LOAD( "rt2_c2.bin",    0x80000, 0x40000, CRC(c6b0c352) SHA1(eec4fa88c27815960106881e7ccb23e62556bf1c) )
 	ROM_LOAD( "rt2_c3.bin",    0xc0000, 0x40000, CRC(6d530a32) SHA1(4e4100e5e5d88e65fb5494474d3692ecd8f44343) )
@@ -3378,6 +3868,7 @@ ROM_START( rtype2m82b )
 	ROM_REGION( 0x20000, "samples", 0 ) /* samples */
 	ROM_LOAD( "rt2_vo.bin",    0x00000, 0x20000, CRC(637172d5) SHA1(9dd0dc409306287238826bf301e2a7a12d6cd9ce) )
 ROM_END
+
 
 ROM_START( dkgensanm82 )
 	ROM_REGION( 0x100000, "maincpu", 0 )
@@ -3484,6 +3975,13 @@ ROM_START( rtype2j )
 	ROM_REGION( 0x0200, "proms", 0 ) /* located on M84-B-A */
 	ROM_LOAD( "rt2_b-4n-.bin", 0x0000, 0x0100, CRC(b460c438) SHA1(00e20cf754b6fd5138ee4d2f6ec28dff9e292fe6) )
 	ROM_LOAD( "rt2_b-4p-.bin", 0x0100, 0x0100, CRC(a4f2c4bc) SHA1(f13b0a4b52dcc6704063b676f09d83dcba170133) )
+
+	/* stuff below isn't used but loaded because it was on the board .. */
+	ROM_REGION( 0x0800, "plds", 0 )
+	ROM_LOAD( "rt2-a-2h-.5",  0x0000, 0x0104, NO_DUMP ) // TIBPAL-16L8-25
+	ROM_LOAD( "rt2-a-5l-.33", 0x0200, 0x0104, NO_DUMP ) // TIBPAL-16L8-25
+	ROM_LOAD( "rt2-a-7d-.45", 0x0400, 0x0104, CRC(53c1e087) SHA1(b214ba4e7cc3d582ee85616923f38fd4873dacb1) ) // TIBPAL-16L8-25
+	ROM_LOAD( "rt2-b-3a-.9",  0x0600, 0x0104, NO_DUMP ) // TIBPAL-16L8-25
 ROM_END
 
 ROM_START( rtype2jc )
@@ -3576,7 +4074,6 @@ ROM_START( dkgensan )
 ROM_END
 
 
-
 ROM_START( cosmccop )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "cc-d-h0b.bin", 0x00001, 0x40000, CRC(38958b01) SHA1(7d7e217742e33a1fe096adf5bbc93d63ddcfb375) )
@@ -3630,8 +4127,6 @@ ROM_START( ltswords )
 	ROM_LOAD( "ken_m14.rom",  0x00000, 0x20000, CRC(6651e9b7) SHA1(c42009f986c9a9f35732d5cd717d548536469b1c) )
 ROM_END
 
-
-
 ROM_START( kengo )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "ken_d-h0.rom", 0x00001, 0x20000, CRC(f4ddeea5) SHA1(bcf016e40886e11c171f2f50de39ac0d8cabcdd1) )
@@ -3658,13 +4153,12 @@ ROM_START( kengo )
 	ROM_LOAD( "ken_m14.rom",  0x00000, 0x20000, CRC(6651e9b7) SHA1(c42009f986c9a9f35732d5cd717d548536469b1c) )
 ROM_END
 
-
 ROM_START( kengoa )
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "ken-d-h0-.ic55", 0x00001, 0x20000, CRC(ed3da88c) SHA1(536824eb3347eade2d3aad927e83eae51ee852b3) )
-	ROM_RELOAD(                      0xc0001, 0x20000 )
-	ROM_LOAD16_BYTE( "ken-d-l0-.ic61", 0x00000, 0x20000, CRC(92c57d8e) SHA1(eb078a7b261e13cfb0a920b5115beee917b8d89c))
-	ROM_RELOAD(                      0xc0000, 0x20000 )
+	ROM_LOAD16_BYTE( "ken-d-h0-.ic55", 0x00001, 0x20000, CRC(ed3da88c) SHA1(536824eb3347eade2d3aad927e83eae51ee852b3) ) // shows 'for use in Japan' message, kengo set above doesn't
+	ROM_RELOAD(                        0xc0001, 0x20000 )
+	ROM_LOAD16_BYTE( "ken-d-l0-.ic61", 0x00000, 0x20000, CRC(92c57d8e) SHA1(eb078a7b261e13cfb0a920b5115beee917b8d89c) )
+	ROM_RELOAD(                        0xc0000, 0x20000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "ken_d-sp.rom", 0x00000, 0x10000, CRC(233ca1cf) SHA1(4ebb6162773bd586a10016ccd77998a9b880f474) )
@@ -3784,40 +4278,42 @@ ROM_END
 // despite having Japanese version MCU roms for several of them.  See notes next to the sets
 
 /* M72 */
-
 GAME( 1987, rtype,       0,        rtype,        rtype,        m72_state, empty_init,      ROT0,   "Irem", "R-Type (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1987, rtypej,      rtype,    rtype,        rtype,        m72_state, empty_init,      ROT0,   "Irem", "R-Type (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1987, rtypejp,     rtype,    rtype,        rtypep,       m72_state, empty_init,      ROT0,   "Irem", "R-Type (Japan prototype)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1987, rtypeu,      rtype,    rtype,        rtype,        m72_state, empty_init,      ROT0,   "Irem (Nintendo of America license)", "R-Type (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1987, rtypeb,      rtype,    rtype,        rtype,        m72_state, empty_init,      ROT0,   "bootleg", "R-Type (World bootleg)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1987, bchopper,    0,        m72,          bchopper,     m72_state, init_bchopper,   ROT0,   "Irem", "Battle Chopper", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, mrheli,      bchopper, m72_8751,     bchopper,     m72_state, init_m72_8751,   ROT0,   "Irem", "Mr. HELI no Daibouken (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, bchopper,    0,        m72,          bchopper,     m72_state, init_bchopper,   ROT0,   "Irem", "Battle Chopper (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, mrheli,      bchopper, mrheli,       bchopper,     m72_state, init_m72_8751,   ROT0,   "Irem", "Mr. HELI no Daibouken (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, nspirit,     0,        m72,          nspirit,      m72_state, init_nspirit,    ROT0,   "Irem", "Ninja Spirit", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )                 // doesn't wait / check for japan warning string.. fails rom check if used with japanese mcu rom (World version?)
-GAME( 1988, nspiritj,    nspirit,  m72_8751,     nspirit,      m72_state, init_m72_8751,   ROT0,   "Irem", "Saigo no Nindou (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )      // waits for japan warning screen, works with our mcu dump, corrupt warning screen due to priority / mixing errors (Japan Version)
+GAME( 1988, nspirit,     0,        m72,          nspirit,      m72_state, init_nspirit,    ROT0,   "Irem", "Ninja Spirit (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // doesn't wait / check for japan warning string.. fails rom check if used with japanese mcu rom (World version?)
+GAME( 1988, nspiritj,    nspirit,  nspiritj,     nspirit,      m72_state, init_m72_8751,   ROT0,   "Irem", "Saigo no Nindou (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, imgfight,    0,        m72,          imgfight,     m72_state, init_imgfight,   ROT270, "Irem", "Image Fight (World, revision A)", MACHINE_SUPPORTS_SAVE )             // doesn't wait / check for japan warning string.. fails rom check if used with japanese mcu rom (World version?)
-GAME( 1988, imgfightj,   imgfight, m72_8751,     imgfight,     m72_state, init_m72_8751,   ROT270, "Irem", "Image Fight (Japan)", MACHINE_SUPPORTS_SAVE )                         // waits for japan warning screen, works with our mcu dump, can't actually see warning screen due to priority / mixing errors, check tilemap viewer (Japan Version)
+GAME( 1988, imgfight,    0,        m72,          imgfight,     m72_state, init_imgfight,   ROT270, "Irem", "Image Fight (World)", MACHINE_SUPPORTS_SAVE ) // doesn't wait / check for japan warning string.. fails rom check if used with japanese mcu rom (World version?)
+GAME( 1988, imgfightj,   imgfight, imgfightj,    imgfight,     m72_state, init_m72_8751,   ROT270, "Irem", "Image Fight (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, imgfightb,   imgfight, imgfightb,    imgfight,     m72_state, init_m72_8751,   ROT270, "Irem", "Image Fight (Japan, bootleg)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // uses an 80c31 MCU, which isn't hooked up correctly yet. Gives 'RAM NG 7' error
 
-GAME( 1989, loht,        0,        m72,          loht,         m72_state, init_loht,       ROT0,   "Irem", "Legend of Hero Tonma", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )         // fails rom check if used with Japan MCU rom (World version?)
-GAME( 1989, lohtj,       loht,     m72_8751,     loht,         m72_state, init_m72_8751,   ROT0,   "Irem", "Legend of Hero Tonma (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // waits for japan warning screen, works with our mcu dump (Japan Version)
+GAME( 1989, loht,        0,        m72_8751,     loht,         m72_state, init_m72_8751,   ROT0,   "Irem", "Legend of Hero Tonma (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, lohtj,       loht,     m72_8751,     loht,         m72_state, init_m72_8751,   ROT0,   "Irem", "Legend of Hero Tonma (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1989, lohtb2,      loht,     m72_8751,     loht,         m72_state, init_m72_8751,   ROT0,   "bootleg", "Legend of Hero Tonma (Japan, bootleg with i8751)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // works like above, mcu code is the same as the real code, probably just an alt revision on a bootleg board
+GAME( 1997, lohtb3,      loht,     m72_8751,     loht,         m72_state, init_m72_8751,   ROT0,   "bootleg", "Legend of Hero Tonma (World, bootleg with i8751)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, xmultiplm72, xmultipl, m72_xmultipl, xmultipl,     m72_state, init_m72_8751,   ROT0,   "Irem", "X Multiply (Japan, M72)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, xmultiplm72, xmultipl, m72_xmultipl, xmultipl,     m72_state, init_m72_8751,   ROT0,   "Irem", "X Multiply (Japan, M72 PCB version)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, dbreedm72,   dbreed,   m72_dbreed,   dbreed,       m72_state, init_dbreedm72,  ROT0,   "Irem", "Dragon Breed (M72 PCB version)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // probably Japan version
+GAME( 1989, dbreedm72,   dbreed,   m72_dbreedw,  dbreed,       m72_state, init_dbreedm72,  ROT0,   "Irem", "Dragon Breed (World, M72 PCB version)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // fails rom check as "ROM NG  1  2" if used with japanese mcu rom (World version?)
+GAME( 1989, dbreedm72j,  dbreed,   m72_dbreed,   dbreed,       m72_state, init_m72_8751,   ROT0,   "Irem", "Dragon Breed (Japan, M72 PCB version)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, gallop,      cosmccop, m72,          gallop,       m72_state, init_gallop,     ROT0,   "Irem", "Gallop - Armed Police Unit (Japan, M72)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, gallop,      cosmccop, m72,          gallop,       m72_state, init_gallop,     ROT0,   "Irem", "Gallop - Armed Police Unit (Japan, M72 PCB version)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, airduelm72,  airduel,  m72,          airduel,      m72_state, init_airduelm72, ROT270, "Irem", "Air Duel (Japan, M72)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, airduelm72,  airduel,  m72_airduel,  airduel,      m72_state, init_m72_8751,   ROT270, "Irem", "Air Duel (Japan, M72 PCB version)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, dkgensanm72, hharry,   m72,          hharry,       m72_state, init_dkgenm72,   ROT0,   "Irem", "Daiku no Gensan (Japan, M72)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, dkgensanm72, hharry,   m72,          hharry,       m72_state, init_dkgenm72,   ROT0,   "Irem", "Daiku no Gensan (Japan, M72 PCB version)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
 /* M81 */
-GAME( 1989, xmultipl,    0,        m81_xmultipl, m81_xmultipl, m72_state, empty_init,      ROT0,   "Irem", "X Multiply (World, M81)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, dbreed,      0,        m81_dbreed,   m81_dbreed,   m72_state, empty_init,      ROT0,   "Irem", "Dragon Breed (M81 PCB version)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, hharry,      0,        m81_hharry,   m81_hharry,   m72_state, empty_init,      ROT0,   "Irem", "Hammerin' Harry (World, M81)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, xmultipl,    0,        m81_xmultipl, m81_xmultipl, m72_state, empty_init,      ROT0,   "Irem", "X Multiply (World, M81 PCB version)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dbreed,      0,        m81_dbreed,   m81_dbreed,   m72_state, empty_init,      ROT0,   "Irem", "Dragon Breed (World, M81 PCB version)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hharry,      0,        m81_hharry,   m81_hharry,   m72_state, empty_init,      ROT0,   "Irem", "Hammerin' Harry (World, M81 PCB version)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
 /* M82 */
 GAME( 1990, majtitle,    0,        m82,          rtype2,       m72_state, empty_init,      ROT0,   "Irem", "Major Title (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // M82-A-A + M82-B-A
@@ -3832,11 +4328,10 @@ GAME( 2009, rtypem82b,   rtype,    m82,          rtype,        m72_state, empty_
 GAME( 1997, rtype2m82b,  rtype2,   m82,          rtype2,       m72_state, empty_init,      ROT0,   "bootleg", "R-Type II (Japan, bootleg Major Title conversion, M82)", MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // made in 1997 by Chris Hardy
 
 /* M84 */
+GAME( 1990, hharryu,     hharry,   hharryu,      hharry,       m72_state, empty_init,      ROT0,   "Irem America", "Hammerin' Harry (US, M84 PCB version)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, dkgensan,    hharry,   hharryu,      hharry,       m72_state, empty_init,      ROT0,   "Irem", "Daiku no Gensan (Japan, M84 PCB version)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, hharryu,     hharry,   hharryu,      hharry,       m72_state, empty_init,      ROT0,   "Irem America", "Hammerin' Harry (US, M84)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, dkgensan,    hharry,   hharryu,      hharry,       m72_state, empty_init,      ROT0,   "Irem", "Daiku no Gensan (Japan, M84)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-
-GAME( 1989, rtype2,      0,        rtype2,       rtype2,       m72_state, empty_init,      ROT0,   "Irem", "R-Type II", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, rtype2,      0,        rtype2,       rtype2,       m72_state, empty_init,      ROT0,   "Irem", "R-Type II (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1989, rtype2j,     rtype2,   rtype2,       rtype2,       m72_state, empty_init,      ROT0,   "Irem", "R-Type II (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1989, rtype2jc,    rtype2,   rtype2,       rtype2,       m72_state, empty_init,      ROT0,   "Irem", "R-Type II (Japan, revision C)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
@@ -3847,10 +4342,10 @@ GAME( 1991, kengo,       ltswords, kengo,        kengo,        m72_state, empty_
 GAME( 1991, kengoa,      ltswords, kengo,        kengo,        m72_state, empty_init,      ROT0,   "Irem", "Ken-Go (set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // has 'for use in Japan' message, above set doesn't
 
 /* M85 */
-
 GAME( 1990, poundfor,    0,        poundfor,     poundfor,     m72_state, empty_init,      ROT270, "Irem", "Pound for Pound (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )      // M85-A-B / M85-B
 GAME( 1990, poundforj,   poundfor, poundfor,     poundfor,     m72_state, empty_init,      ROT270, "Irem", "Pound for Pound (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )      // ^
 GAME( 1990, poundforu,   poundfor, poundfor,     poundfor,     m72_state, empty_init,      ROT270, "Irem America", "Pound for Pound (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // ^
 
 /* bootlegs, unique hw */
-GAME( 1989, lohtb,       loht,     m72,          loht,         m72_state, empty_init,      ROT0,   "bootleg", "Legend of Hero Tonma (unprotected bootleg)", MACHINE_NOT_WORKING| MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, lohtb,       loht,     lohtb,        loht,         m72_state, empty_init,      ROT0,   "bootleg", "Legend of Hero Tonma (unprotected bootleg)", MACHINE_NOT_WORKING| MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, loht_ms,     loht,     lohtb,        loht,         m72_state, empty_init,      ROT0,   "bootleg (Gaelco / Ervisa)", "Legend of Hero Tonma (Gaelco bootleg, Modular System)", MACHINE_NOT_WORKING| MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

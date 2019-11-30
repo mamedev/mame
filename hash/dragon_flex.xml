@@ -19,7 +19,7 @@
 		<publisher>Compusense</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Chatplus v1.0.2 (1985)(Compusense Ltd)[!][FLEX].vdk" size="184332" crc="19ccacf0" sha1="5ada16ed7ffedb779fee6217c429a5d0eab607e8" offset="0" />
+				<rom name="Chatplus v1.0.2 (1985)(Compusense Ltd)[!][FLEX].vdk" size="184332" crc="19ccacf0" sha1="5ada16ed7ffedb779fee6217c429a5d0eab607e8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -30,7 +30,7 @@
 		<publisher>Compusense</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89612">
-				<rom name="DBASIC (1984)(Compusense Ltd)[!][a][FLEX].vdk" size="89612" crc="8d0c7af0" sha1="8804954ab2a5ff0694f1f5d85d660ea1c5fd325c" offset="0" />
+				<rom name="DBASIC (1984)(Compusense Ltd)[!][a][FLEX].vdk" size="89612" crc="8d0c7af0" sha1="8804954ab2a5ff0694f1f5d85d660ea1c5fd325c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -41,7 +41,7 @@
 		<publisher>Compusense</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89612">
-				<rom name="DBASIC (1984)(Compusense Ltd)[!][FLEX].vdk" size="89612" crc="9e442c96" sha1="59e219fe8fc419acb607e09376a0ffcabc803b01" offset="0" />
+				<rom name="DBASIC (1984)(Compusense Ltd)[!][FLEX].vdk" size="89612" crc="9e442c96" sha1="59e219fe8fc419acb607e09376a0ffcabc803b01"/>
 			</dataarea>
 		</part>
 	</software>
@@ -52,7 +52,7 @@
 		<publisher>Compusense</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184343">
-				<rom name="Compusense - Flex - DBASIC v1.0.vdk" size="184343" crc="6d45b2a2" sha1="5f3bf42dad7a4d06dac0f106f4e57d124eb130d6" offset="0" />
+				<rom name="Compusense - Flex - DBASIC v1.0.vdk" size="184343" crc="6d45b2a2" sha1="5f3bf42dad7a4d06dac0f106f4e57d124eb130d6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -63,7 +63,7 @@
 		<publisher>Compusense</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Diagnostics (198x)(Compusense Ltd)[!][FLEX].vdk" size="184332" crc="a7dc4a6d" sha1="3805b18f612ca0556555d5318fe71f9edd2fdd2c" offset="0" />
+				<rom name="Diagnostics (198x)(Compusense Ltd)[!][FLEX].vdk" size="184332" crc="a7dc4a6d" sha1="3805b18f612ca0556555d5318fe71f9edd2fdd2c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -74,7 +74,7 @@
 		<publisher>Compusense</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184343">
-				<rom name="Compusense - Flex - Dragon Bargain Pack 2.vdk" size="184343" crc="b0fa9ade" sha1="f427cfc7fe8e6af6695c245a27dcc73c4bfaed1d" offset="0" />
+				<rom name="Compusense - Flex - Dragon Bargain Pack 2.vdk" size="184343" crc="b0fa9ade" sha1="f427cfc7fe8e6af6695c245a27dcc73c4bfaed1d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -85,7 +85,7 @@
 		<publisher>Compusense</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="DragonPlus Updates (1985)(Compusense Ltd)[!][FLEX].vdk" size="184332" crc="43b47717" sha1="89791522e0eb633c61021d16a463b32f7dccd1a5" offset="0" />
+				<rom name="DragonPlus Updates (1985)(Compusense Ltd)[!][FLEX].vdk" size="184332" crc="43b47717" sha1="89791522e0eb633c61021d16a463b32f7dccd1a5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -96,7 +96,18 @@
 		<publisher>Compusense</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184345">
-				<rom name="Compusense - Flex - Dynacalc.vdk" size="184345" crc="9ddcb3cd" sha1="c0b187571f7e01ba43a8a0d8a1f42afa736f1791" offset="0" />
+				<rom name="Dynacalc (198x)(Compusense Ltd)[!][FLEX].vdk" size="184345" crc="9ddcb3cd" sha1="c0b187571f7e01ba43a8a0d8a1f42afa736f1791"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dynafast">
+		<description>DynaFast v1.5.0</description>
+		<year>1984</year>
+		<publisher>Compusense</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102412">
+				<rom name="Dynafast v1.5 (1984)(Compusense Ltd)[!][FLEX].vdk" size="102412" crc="6f57191a" sha1="4b86a6a7128efe98eb3b99fa66adb7b2d44b2358"/>
 			</dataarea>
 		</part>
 	</software>
@@ -107,7 +118,7 @@
 		<publisher>Compusense</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Editor &amp; Assembler (1984)(Compusense Ltd)[!][FLEX].vdk" size="184332" crc="fbd982fc" sha1="0d61de42dac45f2177691483f2246d8613562611" offset="0" />
+				<rom name="Editor &amp; Assembler (1984)(Compusense Ltd)[!][FLEX].vdk" size="184332" crc="fbd982fc" sha1="0d61de42dac45f2177691483f2246d8613562611"/>
 			</dataarea>
 		</part>
 	</software>
@@ -118,7 +129,7 @@
 		<publisher>Compusense</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Editor &amp; Assembler (1985)(Compusense Ltd)[!][FLEX][DPLUS].vdk" size="184332" crc="2401fb97" sha1="ac068e6b33f46c50a06a48f16dff2d5c7a2cb8cb" offset="0" />
+				<rom name="Editor &amp; Assembler (1985)(Compusense Ltd)[!][FLEX][DPLUS].vdk" size="184332" crc="2401fb97" sha1="ac068e6b33f46c50a06a48f16dff2d5c7a2cb8cb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -129,7 +140,7 @@
 		<publisher>Compusense</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Extended Basic (198x)(Compusense Ltd)[!][FLEX].vdk" size="184332" crc="c18a8f61" sha1="24b5d8add1bf1159d7687956c95967085ecfe597" offset="0" />
+				<rom name="Extended Basic (198x)(Compusense Ltd)[!][FLEX].vdk" size="184332" crc="c18a8f61" sha1="24b5d8add1bf1159d7687956c95967085ecfe597"/>
 			</dataarea>
 		</part>
 	</software>
@@ -140,7 +151,7 @@
 		<publisher>Compusense</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Compusense - Flex - Pascal.vdk" size="184332" crc="ef6ff3b9" sha1="f211bc7e74ecce4822a8f78a1d517efe8a211362" offset="0" />
+				<rom name="Compusense - Flex - Pascal.vdk" size="184332" crc="ef6ff3b9" sha1="f211bc7e74ecce4822a8f78a1d517efe8a211362"/>
 			</dataarea>
 		</part>
 	</software>
@@ -151,7 +162,7 @@
 		<publisher>Compusense</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184343">
-				<rom name="Compusense - Flex - RMS.vdk" size="184343" crc="ddbf10b8" sha1="cb5fce70af4625df820a52df4989564728d292d3" offset="0" />
+				<rom name="Compusense - Flex - RMS.vdk" size="184343" crc="ddbf10b8" sha1="cb5fce70af4625df820a52df4989564728d292d3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -162,7 +173,7 @@
 		<publisher>Compusense</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="SP-Edit (1985)(Compusense Ltd)[!][FLEX].vdk" size="184332" crc="f33017a8" sha1="ec48253caaa782e259c2b9055bc726b3f96f429c" offset="0" />
+				<rom name="SP-Edit (1985)(Compusense Ltd)[!][FLEX].vdk" size="184332" crc="f33017a8" sha1="ec48253caaa782e259c2b9055bc726b3f96f429c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -173,7 +184,7 @@
 		<publisher>Compusense</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="SP-Edit (1985)(Compusense Ltd)[!][FLEX][DPLUS].vdk" size="184332" crc="6e225972" sha1="744205c3603d2c043861b11e73d1b8a80abc35be" offset="0" />
+				<rom name="SP-Edit (1985)(Compusense Ltd)[!][FLEX][DPLUS].vdk" size="184332" crc="6e225972" sha1="744205c3603d2c043861b11e73d1b8a80abc35be"/>
 			</dataarea>
 		</part>
 	</software>
@@ -184,7 +195,7 @@
 		<publisher>Compusense</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Compusense - Flex - SPEdit v1.0.8.vdk" size="184332" crc="087807c8" sha1="fadcc929925f9b492e62c8b87c665b8cd179dba6" offset="0" />
+				<rom name="Compusense - Flex - SPEdit v1.0.8.vdk" size="184332" crc="087807c8" sha1="fadcc929925f9b492e62c8b87c665b8cd179dba6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -195,7 +206,7 @@
 		<publisher>Compusense</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Super Sleuth Disassembler (198x)(Compusense Ltd)[!][FLEX].vdk" size="184332" crc="75e73de8" sha1="e5498f4a8eee30bd1cfd94fed4edb3519f5ed334" offset="0" />
+				<rom name="Super Sleuth Disassembler (198x)(Compusense Ltd)[!][FLEX].vdk" size="184332" crc="75e73de8" sha1="e5498f4a8eee30bd1cfd94fed4edb3519f5ed334"/>
 			</dataarea>
 		</part>
 	</software>
@@ -206,7 +217,7 @@
 		<publisher>Compusense</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Compusense - Flex - System v1.2.0.vdk" size="184332" crc="ab8603ba" sha1="3410b3d1373b1a11e6fe2a7878dac47209380179" offset="0" />
+				<rom name="Compusense - Flex - System v1.2.0.vdk" size="184332" crc="ab8603ba" sha1="3410b3d1373b1a11e6fe2a7878dac47209380179"/>
 			</dataarea>
 		</part>
 	</software>
@@ -217,7 +228,7 @@
 		<publisher>Compusense</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184336">
-				<rom name="Compusense - Flex - System v1.3.1.vdk" size="184336" crc="2ecb2f2b" sha1="eeae2edf20697a2f919cf9a22d87c2c623d5d859" offset="0" />
+				<rom name="Compusense - Flex - System v1.3.1.vdk" size="184336" crc="2ecb2f2b" sha1="eeae2edf20697a2f919cf9a22d87c2c623d5d859"/>
 			</dataarea>
 		</part>
 	</software>
@@ -228,7 +239,7 @@
 		<publisher>Compusense</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184338">
-				<rom name="Compusense - Flex - System v1.3.2 plus Crunch Cobol v1.1.vdk" size="184338" crc="47574ec3" sha1="8f1f829632442e9e56046de345a09028c80afdee" offset="0" />
+				<rom name="Compusense - Flex - System v1.3.2 plus Crunch Cobol v1.1.vdk" size="184338" crc="47574ec3" sha1="8f1f829632442e9e56046de345a09028c80afdee"/>
 			</dataarea>
 		</part>
 	</software>
@@ -239,7 +250,7 @@
 		<publisher>Compusense</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184336">
-				<rom name="Compusense - Flex - System v1.3.2.vdk" size="184336" crc="b1660797" sha1="c812587dd4b5718d73f4b798f797c47c7f042d44" offset="0" />
+				<rom name="Compusense - Flex - System v1.3.2.vdk" size="184336" crc="b1660797" sha1="c812587dd4b5718d73f4b798f797c47c7f042d44"/>
 			</dataarea>
 		</part>
 	</software>
@@ -250,7 +261,7 @@
 		<publisher>Compusense</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184339">
-				<rom name="Compusense - Flex - System v2.0.0 plus Crunch Cobol v1.1 - DBASIC v1.5 - DragonPlus Only.vdk" size="184339" crc="116eb4ab" sha1="363fb5c10f33a7d14a48e1aca53a9fc898403cbc" offset="0" />
+				<rom name="Compusense - Flex - System v2.0.0 plus Crunch Cobol v1.1 - DBASIC v1.5 - DragonPlus Only.vdk" size="184339" crc="116eb4ab" sha1="363fb5c10f33a7d14a48e1aca53a9fc898403cbc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -261,7 +272,7 @@
 		<publisher>Compusense</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184347">
-				<rom name="Compusense - Flex - DragonPlus Update - Flex System v2.0.0 - DBASIC v1.7.vdk" size="184347" crc="d925a559" sha1="3b88f299e01cf6979921048d3ec6dfdab354f9a4" offset="0" />
+				<rom name="Compusense - Flex - DragonPlus Update - Flex System v2.0.0 - DBASIC v1.7.vdk" size="184347" crc="d925a559" sha1="3b88f299e01cf6979921048d3ec6dfdab354f9a4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -272,7 +283,7 @@
 		<publisher>Compusense</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Compusense - Flex - Various (Debug v1.5 - DynaFast 1.5.0 etc).vdk" size="184332" crc="66367a4c" sha1="d5fc033232c3d09cb56d70cd1dca60c4d47d6bd1" offset="0" />
+				<rom name="Compusense - Flex - Various (Debug v1.5 - DynaFast 1.5.0 etc).vdk" size="184332" crc="66367a4c" sha1="d5fc033232c3d09cb56d70cd1dca60c4d47d6bd1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -283,7 +294,7 @@
 		<publisher>Compusense</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Text Processing System (198x)(Compusense Ltd)[!][FLEX].vdk" size="184332" crc="567ec37b" sha1="e88197c2961696eb2efc95e6fc1cd24ec3cc1e02" offset="0" />
+				<rom name="Text Processing System (198x)(Compusense Ltd)[!][FLEX].vdk" size="184332" crc="567ec37b" sha1="e88197c2961696eb2efc95e6fc1cd24ec3cc1e02"/>
 			</dataarea>
 		</part>
 	</software>
@@ -294,7 +305,7 @@
 		<publisher>Compusense</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184332">
-				<rom name="Utilities (198x)(Compusense Ltd)[!][a][FLEX].vdk" size="184332" crc="87a482da" sha1="f910800793020845f26f10aa46fdcc22ea75d686" offset="0" />
+				<rom name="Utilities (198x)(Compusense Ltd)[!][a][FLEX].vdk" size="184332" crc="87a482da" sha1="f910800793020845f26f10aa46fdcc22ea75d686"/>
 			</dataarea>
 		</part>
 	</software>
@@ -305,7 +316,7 @@
 		<publisher>Compusense</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="89612">
-				<rom name="Utilities (198x)(Compusense Ltd)[!][FLEX].vdk" size="89612" crc="f36b61da" sha1="ed84f92d53b123e939a6f40c3eceb2a00019c3ef" offset="0" />
+				<rom name="Utilities (198x)(Compusense Ltd)[!][FLEX].vdk" size="89612" crc="f36b61da" sha1="ed84f92d53b123e939a6f40c3eceb2a00019c3ef"/>
 			</dataarea>
 		</part>
 	</software>

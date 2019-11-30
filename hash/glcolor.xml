@@ -11,7 +11,7 @@
 
 		<part name="rom" interface="genius_cart">
 			<dataarea name="rom" size="0x40000">
-				<rom name="27-5581-00" size="0x40000" crc="5288ce4b" sha1="1b0ed6df8e589a48579508b2df4bf1475d08aedb" offset="0" />
+				<rom name="27-5581-00" size="0x40000" crc="5288ce4b" sha1="1b0ed6df8e589a48579508b2df4bf1475d08aedb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -25,7 +25,7 @@
 
 		<part name="rom" interface="genius_cart">
 			<dataarea name="rom" size="0x40000">
-				<rom name="27-5502-00" size="0x40000" crc="8ccf640b" sha1="0f327ad08f79c00dbd1865084f55f205d8da27de" offset="0" />
+				<rom name="27-5502-00" size="0x40000" crc="8ccf640b" sha1="0f327ad08f79c00dbd1865084f55f205d8da27de"/>
 			</dataarea>
 		</part>
 	</software>
@@ -39,7 +39,7 @@
 
 		<part name="rom" interface="genius_cart">
 			<dataarea name="rom" size="0x40000">
-				<rom name="27-5500-00" size="0x40000" crc="7f4c1f2d" sha1="f275dc590927137d51576aae398bcb395d79f6c3" offset="0" />
+				<rom name="27-5500-00" size="0x40000" crc="7f4c1f2d" sha1="f275dc590927137d51576aae398bcb395d79f6c3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -53,7 +53,7 @@
 
 		<part name="rom" interface="genius_cart">
 			<dataarea name="rom" size="0x40000">
-				<rom name="27-5498-00" size="0x40000" crc="8d811939" sha1="3b1aacfbebc84598daaae1d06c103ee3e1bd6db6" offset="0" />
+				<rom name="27-5498-00" size="0x40000" crc="8d811939" sha1="3b1aacfbebc84598daaae1d06c103ee3e1bd6db6"/>
 			</dataarea>
 		</part>
 	</software>

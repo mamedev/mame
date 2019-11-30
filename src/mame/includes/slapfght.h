@@ -15,6 +15,7 @@
 #include "machine/taito68705interface.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class slapfght_state : public driver_device
 {
@@ -34,9 +35,10 @@ public:
 		m_fixcolorram(*this, "fixcolorram")
 	{ }
 
-	void tigerhb2(machine_config &config);
-	void tigerhb1(machine_config &config);
 	void tigerh(machine_config &config);
+	void tigerhb1(machine_config &config);
+	void tigerhb2(machine_config &config);
+	void tigerhb4(machine_config &config);
 	void getstarb2(machine_config &config);
 	void slapfighb2(machine_config &config);
 	void getstarb1(machine_config &config);

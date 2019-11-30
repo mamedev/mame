@@ -52,24 +52,24 @@ void segas18_state::memory_mapper(sega_315_5195_mapper_device &mapper, uint8_t i
 	switch (index)
 	{
 		case 7:
-			mapper.map_as_handler(0x00000, 0x04000, 0xffc000, read16_delegate(FUNC(segas18_state::misc_io_r), this), write16_delegate(FUNC(segas18_state::misc_io_w), this));
+			mapper.map_as_handler(0x00000, 0x04000, 0xffc000, read16_delegate(*this, FUNC(segas18_state::misc_io_r)), write16_delegate(*this, FUNC(segas18_state::misc_io_w)));
 			break;
 
 		case 6:
-			mapper.map_as_ram(0x00000, 0x01000, 0xfff000, "paletteram", write16_delegate(FUNC(segas18_state::paletteram_w), this));
+			mapper.map_as_ram(0x00000, 0x01000, 0xfff000, "paletteram", write16_delegate(*this, FUNC(segas18_state::paletteram_w)));
 			break;
 
 		case 5:
-			mapper.map_as_ram(0x00000, 0x10000, 0xfe0000, "tileram", write16_delegate(FUNC(segas18_state::tileram_w), this));
-			mapper.map_as_ram(0x10000, 0x01000, 0xfef000, "textram", write16_delegate(FUNC(segas18_state::textram_w), this));
+			mapper.map_as_ram(0x00000, 0x10000, 0xfe0000, "tileram", write16_delegate(*this, FUNC(segas18_state::tileram_w)));
+			mapper.map_as_ram(0x10000, 0x01000, 0xfef000, "textram", write16_delegate(*this, FUNC(segas18_state::textram_w)));
 			break;
 
 		case 4:
-			mapper.map_as_ram(0x00000, 0x00800, 0xfff800, "sprites", write16_delegate());
+			mapper.map_as_ram(0x00000, 0x00800, 0xfff800, "sprites", write16_delegate(*this));
 			break;
 
 		case 3:
-			mapper.map_as_ram(0x00000, 0x04000, 0xffc000, "workram", write16_delegate());
+			mapper.map_as_ram(0x00000, 0x04000, 0xffc000, "workram", write16_delegate(*this));
 			break;
 
 		case 2:
@@ -78,7 +78,7 @@ void segas18_state::memory_mapper(sega_315_5195_mapper_device &mapper, uint8_t i
 				case ROM_BOARD_171_SHADOW:  break;  // ???
 				case ROM_BOARD_837_7525:
 				case ROM_BOARD_171_5874:
-				case ROM_BOARD_171_5987:    mapper.map_as_handler(0x00000, 0x00010, 0xfffff0, read16_delegate(FUNC(segas18_state::genesis_vdp_r), this), write16_delegate(FUNC(segas18_state::genesis_vdp_w), this)); break;
+				case ROM_BOARD_171_5987:    mapper.map_as_handler(0x00000, 0x00010, 0xfffff0, read16_delegate(*this, FUNC(segas18_state::genesis_vdp_r)), write16_delegate(*this, FUNC(segas18_state::genesis_vdp_w))); break;
 				default:                    assert(false);
 			}
 			break;
@@ -86,14 +86,14 @@ void segas18_state::memory_mapper(sega_315_5195_mapper_device &mapper, uint8_t i
 		case 1:
 			switch (m_romboard)
 			{
-				case ROM_BOARD_171_SHADOW:  mapper.map_as_handler(0x00000, 0x00010, 0xfffff0, read16_delegate(FUNC(segas18_state::genesis_vdp_r), this), write16_delegate(FUNC(segas18_state::genesis_vdp_w), this)); break;
-				case ROM_BOARD_171_5874:    mapper.map_as_rom(0x00000, 0x80000, 0xf80000, "rom1base", "decrypted_rom1base", 0x80000, write16_delegate()); break;
+				case ROM_BOARD_171_SHADOW:  mapper.map_as_handler(0x00000, 0x00010, 0xfffff0, read16_delegate(*this, FUNC(segas18_state::genesis_vdp_r)), write16_delegate(*this, FUNC(segas18_state::genesis_vdp_w))); break;
+				case ROM_BOARD_171_5874:    mapper.map_as_rom(0x00000, 0x80000, 0xf80000, "rom1base", "decrypted_rom1base", 0x80000, write16_delegate(*this)); break;
 				case ROM_BOARD_171_5987:    if (romsize <= 0x100000)
-												mapper.map_as_rom(0x00000, 0x80000, 0xf80000, "rom1base", "decrypted_rom1base", 0x80000, write16_delegate(FUNC(segas18_state::rom_5987_bank_w), this));
+												mapper.map_as_rom(0x00000, 0x80000, 0xf80000, "rom1base", "decrypted_rom1base", 0x80000, write16_delegate(*this, FUNC(segas18_state::rom_5987_bank_w)));
 											else
-												mapper.map_as_rom(0x00000,0x100000, 0xf00000, "rom1base", "decrypted_rom1base",0x100000, write16_delegate(FUNC(segas18_state::rom_5987_bank_w), this));
+												mapper.map_as_rom(0x00000,0x100000, 0xf00000, "rom1base", "decrypted_rom1base",0x100000, write16_delegate(*this, FUNC(segas18_state::rom_5987_bank_w)));
 											break;
-				case ROM_BOARD_837_7525:    mapper.map_as_rom(0x00000, 0x80000, 0xf80000, "rom1base", "decrypted_rom1base", 0x80000, write16_delegate(FUNC(segas18_state::rom_837_7525_bank_w), this));
+				case ROM_BOARD_837_7525:    mapper.map_as_rom(0x00000, 0x80000, 0xf80000, "rom1base", "decrypted_rom1base", 0x80000, write16_delegate(*this, FUNC(segas18_state::rom_837_7525_bank_w)));
 				break;
 
 				default:                    assert(false);
@@ -104,12 +104,12 @@ void segas18_state::memory_mapper(sega_315_5195_mapper_device &mapper, uint8_t i
 			switch (m_romboard)
 			{
 				case ROM_BOARD_171_SHADOW:
-				case ROM_BOARD_171_5874:    mapper.map_as_rom(0x00000, 0x80000, 0xf80000, "rom0base", "decrypted_rom0base", 0x00000, write16_delegate()); break;
+				case ROM_BOARD_171_5874:    mapper.map_as_rom(0x00000, 0x80000, 0xf80000, "rom0base", "decrypted_rom0base", 0x00000, write16_delegate(*this)); break;
 				case ROM_BOARD_837_7525:
 				case ROM_BOARD_171_5987:    if (romsize <= 0x100000)
-												mapper.map_as_rom(0x00000, 0x80000, 0xf80000, "rom0base", "decrypted_rom0base", 0x00000, write16_delegate());
+												mapper.map_as_rom(0x00000, 0x80000, 0xf80000, "rom0base", "decrypted_rom0base", 0x00000, write16_delegate(*this));
 											else
-												mapper.map_as_rom(0x00000,0x100000, 0xf00000, "rom0base", "decrypted_rom0base", 0x00000, write16_delegate());
+												mapper.map_as_rom(0x00000,0x100000, 0xf00000, "rom0base", "decrypted_rom0base", 0x00000, write16_delegate(*this));
 											break;
 				default:                    assert(false);
 			}
@@ -211,7 +211,7 @@ READ16_MEMBER( segas18_state::misc_io_r )
 		// I/O chip
 		case 0x0000/2:
 		case 0x1000/2:
-			return m_io->read(space, offset) | (open_bus_r(space, 0, mem_mask) & 0xff00);
+			return m_io->read(space, offset) | (m_mapper->open_bus_r() & 0xff00);
 
 		// video control latch
 		case 0x2000/2:
@@ -224,7 +224,7 @@ READ16_MEMBER( segas18_state::misc_io_r )
 	if (!m_custom_io_r.isnull())
 		return m_custom_io_r(space, offset, mem_mask);
 	logerror("%06X:misc_io_r - unknown read access to address %04X\n", m_maincpu->pc(), offset * 2);
-	return open_bus_r(space, 0, mem_mask);
+	return m_mapper->open_bus_r();
 }
 
 WRITE16_MEMBER( segas18_state::misc_io_w )
@@ -356,7 +356,7 @@ READ16_MEMBER( segas18_state::ddcrew_custom_io_r )
 		case 0x3024/2:
 			return ioport("EXSERVICE")->read();
 	}
-	return open_bus_r(space, 0, mem_mask);
+	return m_mapper->open_bus_r();
 }
 
 
@@ -380,7 +380,7 @@ READ16_MEMBER( segas18_state::lghost_custom_io_r )
 			m_lghost_value <<= 1;
 			return result;
 	}
-	return open_bus_r(space, 0, mem_mask);
+	return m_mapper->open_bus_r();
 }
 
 WRITE16_MEMBER( segas18_state::lghost_custom_io_w )
@@ -584,7 +584,7 @@ READ16_MEMBER( segas18_state::wwally_custom_io_r )
 	if (offset >= 0x3000/2 && offset < 0x3018/2)
 		return m_upd4701[(offset & 0x0018/2) >> 2]->read_xy(space, offset & 0x0006/2);
 
-	return open_bus_r(space, 0, mem_mask);
+	return m_mapper->open_bus_r();
 }
 
 
@@ -1307,23 +1307,22 @@ WRITE_LINE_MEMBER(segas18_state::vdp_lv4irqline_callback_s18)
  *
  *************************************/
 
-MACHINE_CONFIG_START(segas18_state::system18)
-
+void segas18_state::system18(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", M68000, 10000000)
-	MCFG_DEVICE_PROGRAM_MAP(system18_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas18_state, irq4_line_hold)
+	M68000(config, m_maincpu, 10000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas18_state::system18_map);
+	m_maincpu->set_vblank_int("screen", FUNC(segas18_state::irq4_line_hold));
 
-	MCFG_DEVICE_ADD("soundcpu", Z80, 8000000)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_IO_MAP(sound_portmap)
+	Z80(config, m_soundcpu, 8000000);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &segas18_state::sound_map);
+	m_soundcpu->set_addrmap(AS_IO, &segas18_state::sound_portmap);
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("mapper", SEGA_315_5195_MEM_MAPPER, 10000000)
-	MCFG_SEGA_315_5195_CPU("maincpu")
-	MCFG_SEGA_315_5195_MAPPER_HANDLER(segas18_state, memory_mapper)
-	MCFG_SEGA_315_5195_PBF_CALLBACK(INPUTLINE("soundcpu", INPUT_LINE_NMI))
+	SEGA_315_5195_MEM_MAPPER(config, m_mapper, 10000000, m_maincpu);
+	m_mapper->set_mapper(FUNC(segas18_state::memory_mapper));
+	m_mapper->pbf().set_inputline(m_soundcpu, INPUT_LINE_NMI);
 
 	SEGA_315_5296(config, m_io, 16000000);
 	m_io->in_pa_callback().set_ioport("P1");
@@ -1337,57 +1336,57 @@ MACHINE_CONFIG_START(segas18_state::system18)
 	m_io->out_cnt1_callback().set(m_segaic16vid, FUNC(segaic16_video_device::set_display_enable));
 	m_io->out_cnt2_callback().set(FUNC(segas18_state::set_vdp_enable));
 
-	MCFG_DEVICE_ADD("gen_vdp", SEGA315_5313, 15000000, "maincpu") // ??? Frequency is a complete guess
-	MCFG_SEGA315_5313_IS_PAL(false)
-	MCFG_SEGA315_5313_SND_IRQ_CALLBACK(WRITELINE(*this, segas18_state, vdp_sndirqline_callback_s18));
-	MCFG_SEGA315_5313_LV6_IRQ_CALLBACK(WRITELINE(*this, segas18_state, vdp_lv6irqline_callback_s18));
-	MCFG_SEGA315_5313_LV4_IRQ_CALLBACK(WRITELINE(*this, segas18_state, vdp_lv4irqline_callback_s18));
-	MCFG_SEGA315_5313_ALT_TIMING(1);
-	MCFG_SEGA315_5313_PAL_WRITE_BASE(0x2000);
-	MCFG_SEGA315_5313_PALETTE("palette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.0)
+	SEGA315_5313(config, m_vdp, 15000000, m_maincpu); // ??? Frequency is a complete guess
+	m_vdp->set_is_pal(false);
+	m_vdp->snd_irq().set(FUNC(segas18_state::vdp_sndirqline_callback_s18));
+	m_vdp->lv6_irq().set(FUNC(segas18_state::vdp_lv6irqline_callback_s18));
+	m_vdp->lv4_irq().set(FUNC(segas18_state::vdp_lv4irqline_callback_s18));
+	m_vdp->set_alt_timing(1);
+	m_vdp->set_pal_write_base(0x1000);
+	m_vdp->set_ext_palette(m_palette);
+	m_vdp->add_route(ALL_OUTPUTS, "mono", 0.0);
 
-	MCFG_TIMER_DEVICE_ADD_SCANLINE("scantimer", "gen_vdp", sega315_5313_device, megadriv_scanline_timer_callback_alt_timing, "screen", 0, 1)
+	TIMER(config, "scantimer").configure_scanline("gen_vdp", FUNC(sega315_5313_device::megadriv_scanline_timer_callback_alt_timing), "screen", 0, 1);
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57.23) // verified on pcb
-	MCFG_SCREEN_SIZE(342,262)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(segas18_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(57.23); // verified on pcb
+	m_screen->set_size(342,262);
+	m_screen->set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
+	m_screen->set_screen_update(FUNC(segas18_state::screen_update));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_segas18)
-	MCFG_PALETTE_ADD("palette", 2048*3+2048 + 64*3)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_segas18);
+	PALETTE(config, m_palette).set_entries(2048*2 + 64*3);
 
-	MCFG_DEVICE_ADD("sprites", SEGA_SYS16B_SPRITES, 0)
-	MCFG_DEVICE_ADD("segaic16vid", SEGAIC16VID, 0, "gfxdecode")
+	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
+	SEGAIC16VID(config, m_segaic16vid, 0, m_gfxdecode);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ym1", YM3438, 8000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-	MCFG_YM2612_IRQ_HANDLER(INPUTLINE("soundcpu", INPUT_LINE_IRQ0))
+	ym3438_device &ym1(YM3438(config, "ym1", 8000000));
+	ym1.add_route(ALL_OUTPUTS, "mono", 0.40);
+	ym1.irq_handler().set_inputline("soundcpu", INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD("ym2", YM3438, 8000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	ym3438_device &ym2(YM3438(config, "ym2", 8000000));
+	ym2.add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	MCFG_DEVICE_ADD("rfsnd", RF5C68, 10000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADDRESS_MAP(0, pcm_map)
-MACHINE_CONFIG_END
+	rf5c68_device &rfsnd(RF5C68(config, "rfsnd", 10000000));
+	rfsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
+	rfsnd.set_addrmap(0, &segas18_state::pcm_map);
+}
 
-
-MACHINE_CONFIG_START(segas18_state::system18_fd1094)
+void segas18_state::system18_fd1094(machine_config &config)
+{
 	system18(config);
 
 	// basic machine hardware
-	MCFG_DEVICE_REPLACE("maincpu", FD1094, 10000000)
-	MCFG_DEVICE_PROGRAM_MAP(system18_map)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas18_state, irq4_line_hold)
-MACHINE_CONFIG_END
+	FD1094(config.replace(), m_maincpu, 10000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas18_state::system18_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &segas18_state::decrypted_opcodes_map);
+	m_maincpu->set_vblank_int("screen", FUNC(segas18_state::irq4_line_hold));
+}
 
 void segas18_state::lghost_fd1094(machine_config &config)
 {
@@ -1405,65 +1404,65 @@ void segas18_state::lghost(machine_config &config)
 	m_io->out_pc_callback().set(FUNC(segas18_state::lghost_gun_recoil_w));
 }
 
-MACHINE_CONFIG_START(segas18_state::wwally_fd1094)
+void segas18_state::wwally_fd1094(machine_config &config)
+{
 	system18_fd1094(config);
-	MCFG_DEVICE_ADD("upd1", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("TRACKX1")
-	MCFG_UPD4701_PORTY("TRACKY1")
+	UPD4701A(config, m_upd4701[0]);
+	m_upd4701[0]->set_portx_tag("TRACKX1");
+	m_upd4701[0]->set_porty_tag("TRACKY1");
 
-	MCFG_DEVICE_ADD("upd2", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("TRACKX2")
-	MCFG_UPD4701_PORTY("TRACKY2")
+	UPD4701A(config, m_upd4701[1]);
+	m_upd4701[1]->set_portx_tag("TRACKX2");
+	m_upd4701[1]->set_porty_tag("TRACKY2");
 
-	MCFG_DEVICE_ADD("upd3", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("TRACKX3")
-	MCFG_UPD4701_PORTY("TRACKY3")
-MACHINE_CONFIG_END
+	UPD4701A(config, m_upd4701[2]);
+	m_upd4701[2]->set_portx_tag("TRACKX3");
+	m_upd4701[2]->set_porty_tag("TRACKY3");
+}
 
-MACHINE_CONFIG_START(segas18_state::wwally)
+void segas18_state::wwally(machine_config &config)
+{
 	system18(config);
-	MCFG_DEVICE_ADD("upd1", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("TRACKX1")
-	MCFG_UPD4701_PORTY("TRACKY1")
+	UPD4701A(config, m_upd4701[0]);
+	m_upd4701[0]->set_portx_tag("TRACKX1");
+	m_upd4701[0]->set_porty_tag("TRACKY1");
 
-	MCFG_DEVICE_ADD("upd2", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("TRACKX2")
-	MCFG_UPD4701_PORTY("TRACKY2")
+	UPD4701A(config, m_upd4701[1]);
+	m_upd4701[1]->set_portx_tag("TRACKX2");
+	m_upd4701[1]->set_porty_tag("TRACKY2");
 
-	MCFG_DEVICE_ADD("upd3", UPD4701A, 0)
-	MCFG_UPD4701_PORTX("TRACKX3")
-	MCFG_UPD4701_PORTY("TRACKY3")
-MACHINE_CONFIG_END
+	UPD4701A(config, m_upd4701[2]);
+	m_upd4701[2]->set_portx_tag("TRACKX3");
+	m_upd4701[2]->set_porty_tag("TRACKY3");
+}
 
-MACHINE_CONFIG_START(segas18_state::system18_i8751)
+void segas18_state::system18_i8751(machine_config &config)
+{
 	system18(config);
 
 	// basic machine hardware
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_VBLANK_INT_REMOVE()
+	m_maincpu->remove_vblank_int();
 
-	MCFG_DEVICE_MODIFY("mapper")
-	MCFG_SEGA_315_5195_MCU_INT_CALLBACK(INPUTLINE("mcu", INPUT_LINE_IRQ1))
+	m_mapper->mcu_int().set_inputline(m_mcu, INPUT_LINE_IRQ1);
 
-	MCFG_DEVICE_ADD("mcu", I8751, 8000000)
-	MCFG_DEVICE_IO_MAP(mcu_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas18_state, irq0_line_hold)
-MACHINE_CONFIG_END
+	I8751(config, m_mcu, 8000000);
+	m_mcu->set_addrmap(AS_IO, &segas18_state::mcu_io_map);
+	m_mcu->set_vblank_int("screen", FUNC(segas18_state::irq0_line_hold));
+}
 
-MACHINE_CONFIG_START(segas18_state::system18_fd1094_i8751)
+void segas18_state::system18_fd1094_i8751(machine_config &config)
+{
 	system18_fd1094(config);
 
 	// basic machine hardware
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_VBLANK_INT_REMOVE()
+	m_maincpu->remove_vblank_int();
 
-	MCFG_DEVICE_MODIFY("mapper")
-	MCFG_SEGA_315_5195_MCU_INT_CALLBACK(INPUTLINE("mcu", INPUT_LINE_IRQ1))
+	m_mapper->mcu_int().set_inputline(m_mcu, INPUT_LINE_IRQ1);
 
-	MCFG_DEVICE_ADD("mcu", I8751, 8000000)
-	MCFG_DEVICE_IO_MAP(mcu_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas18_state, irq0_line_hold)
-MACHINE_CONFIG_END
+	I8751(config, m_mcu, 8000000);
+	m_mcu->set_addrmap(AS_IO, &segas18_state::mcu_io_map);
+	m_mcu->set_vblank_int("screen", FUNC(segas18_state::irq0_line_hold));
+}
 
 
 
@@ -1504,7 +1503,7 @@ ROM_START( astorm )
 	ROM_LOAD16_BYTE( "epr-13086.bin", 0x180000, 0x40000, CRC(8c9a71c4) SHA1(40b774765ac888792aad46b6351a24b7ef40d2dc) )
 
 	ROM_REGION( 0x200000, "soundcpu", ROMREGION_ERASEFF ) // sound CPU
-	ROM_LOAD( "epr-13083a.bin", 0x000000, 0x20000, CRC(e7528e06) SHA1(1f4e618692c20aeb316d578c5ded12440eb072ab) ) // Also known to come with EPR-13083B rom instead of EPR-13083A (like astormj)
+	ROM_LOAD( "epr-13083a.bin", 0x000000, 0x20000, CRC(e7528e06) SHA1(1f4e618692c20aeb316d578c5ded12440eb072ab) ) // Also known to come with EPR-13083B ROM instead of EPR-13083A (like astormj)
 	ROM_LOAD( "epr-13076.bin",  0x080000, 0x40000, CRC(94e6c76e) SHA1(f99e58a9bf372c41af211bd9b9ea3ac5b924c6ed) )
 	ROM_LOAD( "epr-13077.bin",  0x100000, 0x40000, CRC(e2ec0d8d) SHA1(225b0d223b7282cba7710300a877fb4a2c6dbabb) )
 	ROM_LOAD( "epr-13078.bin",  0x180000, 0x40000, CRC(15684dc5) SHA1(595051006de24f791dae937584e502ff2fa31d9c) )
@@ -1514,7 +1513,9 @@ ROM_END
     Alien Storm (3 players World version), Sega System 18
     CPU: FD1094 (317-0148)
     ROM Board: 171-5873B
-    Game numbers: 833-7379-02 (main pcb: 834-7381-02, rom pcb: 834-7380-02)
+        main pcb: 834-7381-02
+    Game numbers: 833-7379-02
+         ROM pcb: 834-7380-02
 */
 ROM_START( astorm3 )
 	ROM_REGION( 0x080000, "maincpu", 0 ) // 68000 code
@@ -1540,7 +1541,7 @@ ROM_START( astorm3 )
 	ROM_LOAD16_BYTE( "epr-13086.bin", 0x180000, 0x40000, CRC(8c9a71c4) SHA1(40b774765ac888792aad46b6351a24b7ef40d2dc) )
 
 	ROM_REGION( 0x200000, "soundcpu", ROMREGION_ERASEFF ) // sound CPU
-	ROM_LOAD( "epr-13083.bin", 0x000000, 0x20000, CRC(5df3af20) SHA1(e49105fcfd5bf37d14bd760f6adca5ce2412883d) ) // Also known to come with EPR-13083A rom instead of EPR-13083
+	ROM_LOAD( "epr-13083.bin", 0x000000, 0x20000, CRC(5df3af20) SHA1(e49105fcfd5bf37d14bd760f6adca5ce2412883d) ) // Also known to come with EPR-13083A ROM instead of EPR-13083
 	ROM_LOAD( "epr-13076.bin", 0x080000, 0x40000, CRC(94e6c76e) SHA1(f99e58a9bf372c41af211bd9b9ea3ac5b924c6ed) )
 	ROM_LOAD( "epr-13077.bin", 0x100000, 0x40000, CRC(e2ec0d8d) SHA1(225b0d223b7282cba7710300a877fb4a2c6dbabb) )
 	ROM_LOAD( "epr-13078.bin", 0x180000, 0x40000, CRC(15684dc5) SHA1(595051006de24f791dae937584e502ff2fa31d9c) )
@@ -1639,6 +1640,9 @@ ROM_END
     Alien Storm, Sega System 18
     CPU: FD1094 (317-0146)
     ROM Board: 171-5873B
+        main pcb: 837-7381
+    Game numbers: 833-7379 ALIENSTORM
+         ROM pcb: 834-7380
 */
 ROM_START( astormj )
 	ROM_REGION( 0x080000, "maincpu", 0 ) // 68000 code
@@ -1752,7 +1756,7 @@ ROM_END
     ROM Board: 171-5873B
 
     game No. 833-7916-01 CLUTCH HITTER
-    rom  No. 834-7917-01
+    ROM  No. 834-7917-01
 */
 ROM_START( cltchitr )
 	ROM_REGION( 0x100000, "maincpu", 0 ) // 68000 code
@@ -1836,7 +1840,7 @@ ROM_START( cltchitrj )
 	ROM_LOAD16_BYTE( "mpr-13788.a11", 0x200000, 0x80000, CRC(0106fea6) SHA1(e16e2a469ecbbc704021dee6264db30aa0898368) )
 	ROM_LOAD16_BYTE( "mpr-13781.c12", 0x400001, 0x80000, CRC(f33b13af) SHA1(d3eb64dcf12d532454bf3cd6c86528c0f11ee316) )
 	ROM_LOAD16_BYTE( "mpr-13789.a12", 0x400000, 0x80000, CRC(09ba8835) SHA1(72e83dd1793a7f4b2b881e71f262493e3d4992b3) )
-	// extra gfx roms??*/
+	// extra gfx ROMs??*/
 	ROM_LOAD16_BYTE( "epr-13782.c13", 0x600001, 0x40000, CRC(73790852) SHA1(891345cb8ce4b04bd293ee9bac9b1b9940d6bcb2) )
 	ROM_LOAD16_BYTE( "epr-13790.a13", 0x600000, 0x40000, CRC(23849101) SHA1(1aeb0fefb6688dfd841bd7d0b17ffdfce69f1dd9) )
 
@@ -1866,7 +1870,7 @@ ROM_START( cltchitrjd )
 	ROM_LOAD16_BYTE( "mpr-13788.a11", 0x200000, 0x80000, CRC(0106fea6) SHA1(e16e2a469ecbbc704021dee6264db30aa0898368) )
 	ROM_LOAD16_BYTE( "mpr-13781.c12", 0x400001, 0x80000, CRC(f33b13af) SHA1(d3eb64dcf12d532454bf3cd6c86528c0f11ee316) )
 	ROM_LOAD16_BYTE( "mpr-13789.a12", 0x400000, 0x80000, CRC(09ba8835) SHA1(72e83dd1793a7f4b2b881e71f262493e3d4992b3) )
-	// extra gfx roms??*/
+	// extra gfx ROMs??*/
 	ROM_LOAD16_BYTE( "epr-13782.c13", 0x600001, 0x40000, CRC(73790852) SHA1(891345cb8ce4b04bd293ee9bac9b1b9940d6bcb2) )
 	ROM_LOAD16_BYTE( "epr-13790.a13", 0x600000, 0x40000, CRC(23849101) SHA1(1aeb0fefb6688dfd841bd7d0b17ffdfce69f1dd9) )
 
@@ -2083,7 +2087,7 @@ ROM_END
     D.D. Crew, Sega System 18
     CPU: FD1094 (317-0187)
     PCB Board: 171-5873-02B (833-8165-05)
-    Rom Board : 171-5987A (834-8166-05)
+    ROM Board : 171-5987A (834-8166-05)
 */
 ROM_START( ddcrew1 )
 	ROM_REGION( 0x100000, "maincpu", 0 ) // 68000 code
@@ -2289,7 +2293,7 @@ ROM_END
 
     game No. 833-8830-02
     pcb  No. 837-8832-02 (171-5873-02b)
-    rom  No. 834-8831-02 (171-5987a)
+    ROM  No. 834-8831-02 (171-5987a)
     CPU Hiatchi FD1094 317-0196
 */
 ROM_START( desertbr )
@@ -2359,7 +2363,7 @@ ROM_END
 
     game No. 833-8830?
     pcb  No. 837-8832? (171-5873B)
-    rom  No. 834-8831 (171-5987A)
+    ROM  No. 834-8831 (171-5987A)
     CPU Hiatchi FD1094 317-0194
 */
 ROM_START( desertbrj )
@@ -2540,7 +2544,7 @@ ROM_END
     A/D BD NO. 837-7536
 
 A PCB was found with a Game BD: 833-7627-01-T GHOST HUNTERS
-While the DATA matched the set below (lghostu), all roms were hand labeled and dated as follows:
+While the DATA matched the set below (lghostu), all ROMs were hand labeled and dated as follows:
 
 ROM0 E * A3AB @ A4
 ROM0 O * B21C @ A6
@@ -2567,7 +2571,7 @@ Sound 1 10/22 @ C6
 Sound 2 10/22 @ C5
 Sound 3 10/22 @ C4
 
-suggesting the original name for the game was Ghost Hunters and the roms dated 11/20-14 & 11/19-14
+suggesting the original name for the game was Ghost Hunters and the ROMs dated 11/20-14 & 11/19-14
 contain the data for name change to Laser Ghost
 */
 ROM_START( lghostu )
@@ -2679,6 +2683,9 @@ ROM_END
     Moonwalker, Sega System 18
     CPU: FD1094 (317-0159)
     ROM Board: 171-5873B
+   Main board: 837-7530-02
+      Game BD: 833-7528-02 MOONWALKER
+    ROM Board: 834-7529-02
 */
 ROM_START( mwalk )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code - custom cpu 317-0159
@@ -2748,6 +2755,9 @@ ROM_END
     Moonwalker, Sega System 18
     CPU: FD1094 (317-0158)
     ROM Board: 171-5873B
+   Main board: 837-7530-01
+      Game BD: 833-7528-01 MOONWALKER
+    ROM Board: 834-7529-01
 */
 ROM_START( mwalku )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code - custom cpu 317-0158
@@ -2814,8 +2824,11 @@ ROM_END
 
 /**************************************************************************************************************************
     Moonwalker, Sega System 18
-    CPU: FD1094 (317-0157, version uses i8751(315-5437) known to be exist)
+    CPU: FD1094 (317-0157)
     ROM Board: 171-5873B
+   Main board: 837-7530
+      Game BD: 833-7528 MOONWALKER
+    ROM Board: 834-7529
 */
 ROM_START( mwalkj )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code - custom cpu 317-0157
@@ -2847,8 +2860,7 @@ ROM_START( mwalkj )
 	ROM_LOAD( "mpr-13249.b6", 0x180000, 0x40000, CRC(623edc5d) SHA1(c32d9f818d40f311877fbe6532d9e95b6045c3c4) )
 
 	ROM_REGION( 0x10000, "mcu", 0 ) // protection MCU
-	// not verified if mcu is the same as the other sets..
-	ROM_LOAD( "315-5437.ic4", 0x00000, 0x1000, BAD_DUMP CRC(4bf63bc1) SHA1(2766ab30b466b079febb30c488adad9ea56813f7) )
+	ROM_LOAD( "315-5437.ic4", 0x00000, 0x1000, CRC(4bf63bc1) SHA1(2766ab30b466b079febb30c488adad9ea56813f7) )
 ROM_END
 
 ROM_START( mwalkjd )
@@ -2920,7 +2932,7 @@ ROM_END
 
     game No. 833-7246-03
     pcb  No. 837-7248-01
-    rom  No. 834-7247-02
+    ROM  No. 834-7247-02
 */
 ROM_START( shdancer )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
@@ -2984,7 +2996,7 @@ ROM_END
 
     game No. 833-7246-01
     pcb  No. 837-7248
-    rom  No. 834-7247-01
+    ROM  No. 834-7247-01
 */
 ROM_START( shdancer1 )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
@@ -3018,9 +3030,12 @@ ROM_END
     Wally wo Sagase! (Where's Wally?), Sega System 18
     CPU: FD1094 317-0197B
     ROM Board: 171-5873B
+   Main board: 837-8777-01
+      Game BD: 833-8775-01 WALLY
+    ROM Board: 834-8776-01
 */
 ROM_START( wwallyj )
-	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code - custom CPU 317-0197 (?)
+	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code - custom CPU 317-0197B
 	ROM_LOAD16_BYTE( "epr-14730b.a4", 0x000000, 0x40000, CRC(e72bc17a) SHA1(ac3b7d86571a6f510c202735134c1bc4809aa26e) )
 	ROM_LOAD16_BYTE( "epr-14731b.a6", 0x000001, 0x40000, CRC(6e3235b9) SHA1(11d5628644e8301550c36c93e5f137c67c11e735) )
 
@@ -3079,7 +3094,7 @@ ROM_END
     ROM Board: 171-5873B
 */
 ROM_START( wwallyja )
-	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code - custom CPU 317-0197a
+	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code - custom CPU 317-0197A
 	ROM_LOAD16_BYTE( "epr-14730a.a4", 0x000000, 0x40000, CRC(daa7880e) SHA1(9ea83e04c3e07d84afa67097c28b3951c9db8d00) )
 	ROM_LOAD16_BYTE( "epr-14731a.a6", 0x000001, 0x40000, CRC(5e36353b) SHA1(488c54bbef3c8a129785465887bff3b301e11387) )
 
@@ -3169,21 +3184,21 @@ void segas18_state::init_hamaway()
 void segas18_state::init_ddcrew()
 {
 	init_generic_5987();
-	m_custom_io_r = read16_delegate(FUNC(segas18_state::ddcrew_custom_io_r), this);
+	m_custom_io_r = read16_delegate(*this, FUNC(segas18_state::ddcrew_custom_io_r));
 }
 
 void segas18_state::init_lghost()
 {
 	init_generic_5987();
-	m_custom_io_r = read16_delegate(FUNC(segas18_state::lghost_custom_io_r), this);
-	m_custom_io_w = write16_delegate(FUNC(segas18_state::lghost_custom_io_w), this);
+	m_custom_io_r = read16_delegate(*this, FUNC(segas18_state::lghost_custom_io_r));
+	m_custom_io_w = write16_delegate(*this, FUNC(segas18_state::lghost_custom_io_w));
 }
 
 void segas18_state::init_wwally()
 {
 	init_generic_5987();
-	m_custom_io_r = read16_delegate(FUNC(segas18_state::wwally_custom_io_r), this);
-	m_custom_io_w = write16_delegate(FUNC(segas18_state::wwally_custom_io_w), this);
+	m_custom_io_r = read16_delegate(*this, FUNC(segas18_state::wwally_custom_io_r));
+	m_custom_io_w = write16_delegate(*this, FUNC(segas18_state::wwally_custom_io_w));
 }
 
 
@@ -3230,7 +3245,7 @@ GAME( 1989, shdancer,  0,        system18,             shdancer, segas18_state, 
 GAME( 1989, shdancerj, shdancer, system18,             shdancer, segas18_state, init_generic_shad, ROT0,   "Sega",          "Shadow Dancer (Japan)", 0 )
 GAME( 1989, shdancer1, shdancer, system18,             shdancer, segas18_state, init_generic_shad, ROT0,   "Sega",          "Shadow Dancer (US)", 0 )
 
-GAME( 1992, wwallyj,   0,        wwally_fd1094,        wwally,   segas18_state, init_wwally,       ROT0,   "Sega",          "Wally wo Sagase! (rev B, Japan) (FD1094 317-0197B)", 0 ) // the roms do contain an english logo so maybe there is a world / us set too
+GAME( 1992, wwallyj,   0,        wwally_fd1094,        wwally,   segas18_state, init_wwally,       ROT0,   "Sega",          "Wally wo Sagase! (rev B, Japan) (FD1094 317-0197B)", 0 ) // the ROMs do contain an english logo so maybe there is a world / us set too
 GAME( 1992, wwallyja,  wwallyj,  wwally_fd1094,        wwally,   segas18_state, init_wwally,       ROT0,   "Sega",          "Wally wo Sagase! (rev A, Japan) (FD1094 317-0197A)", 0 )
 
 // decrypted bootleg sets
@@ -3257,8 +3272,8 @@ GAME( 1991, ddcrewj2d,  ddcrew,   system18,      ddcrew2p, segas18_state, init_d
 GAME( 1990, lghostd,    lghost,   lghost,        lghost,   segas18_state, init_lghost,       ROT0,   "bootleg",          "Laser Ghost (World) (bootleg of FD1094 317-0166 set)", 0 )
 GAME( 1990, lghostud,   lghost,   lghost,        lghost,   segas18_state, init_lghost,       ROT0,   "bootleg",          "Laser Ghost (US) (bootleg of FD1094 317-0165 set)", 0 )
 
-GAME( 1990, mwalkd,     mwalk,    system18_i8751,mwalk,    segas18_state, init_generic_5874, ROT0,   "bootleg",          "Michael Jackson's Moonwalker (World) (bootleg of FD1094/8751 317-0159)", 0 )
-GAME( 1990, mwalkud,    mwalk,    system18_i8751,mwalka,   segas18_state, init_generic_5874, ROT0,   "bootleg",          "Michael Jackson's Moonwalker (US) (bootleg of FD1094/8751 317-0158)", 0 )
+GAME( 1990, mwalkd,     mwalk,    system18_i8751,mwalk,    segas18_state, init_generic_5874, ROT0,   "bootleg",          "Michael Jackson's Moonwalker (World) (bootleg of FD1094/8751 317-0159 set)", 0 )
+GAME( 1990, mwalkud,    mwalk,    system18_i8751,mwalka,   segas18_state, init_generic_5874, ROT0,   "bootleg",          "Michael Jackson's Moonwalker (US) (bootleg of FD1094/8751 317-0158 set)", 0 )
 GAME( 1990, mwalkjd,    mwalk,    system18_i8751,mwalk,    segas18_state, init_generic_5874, ROT0,   "bootleg",          "Michael Jackson's Moonwalker (Japan) (bootleg of FD1094/8751 317-0157 set)", 0 )
 
 GAME( 1992, wwallyjd,   wwallyj,  wwally,        wwally,   segas18_state, init_wwally,       ROT0,   "bootleg",          "Wally wo Sagase! (rev B, Japan) (bootleg of FD1094 317-0197B set)", 0 )

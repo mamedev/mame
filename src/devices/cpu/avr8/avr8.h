@@ -44,30 +44,6 @@
 
 
 //**************************************************************************
-//  FUSE BITS CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_CPU_AVR8_LFUSE(byte) \
-	((avr8_device*) device)->set_low_fuses(byte);
-
-#define MCFG_CPU_AVR8_HFUSE(byte) \
-	((avr8_device*) device)->set_high_fuses(byte);
-
-#define MCFG_CPU_AVR8_EFUSE(byte) \
-	((avr8_device*) device)->set_extended_fuses(byte);
-
-#define MCFG_CPU_AVR8_LOCK(byte) \
-	((avr8_device*) device)->set_lock_bits(byte);
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_CPU_AVR8_EEPROM(_tag) \
-	downcast<avr8_device &>(*device).set_eeprom_tag(_tag);
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -113,9 +89,9 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override;
-	virtual uint32_t execute_max_cycles() const override;
-	virtual uint32_t execute_input_lines() const override;
+	virtual uint32_t execute_min_cycles() const noexcept override;
+	virtual uint32_t execute_max_cycles() const noexcept override;
+	virtual uint32_t execute_input_lines() const noexcept override;
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 

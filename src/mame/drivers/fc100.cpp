@@ -43,7 +43,6 @@ TODO:
 #include "machine/i8251.h"
 #include "machine/timer.h"
 #include "sound/ay8910.h"
-#include "sound/wave.h"
 #include "video/mc6847.h"
 
 #include "emupal.h"
@@ -80,9 +79,8 @@ private:
 	DECLARE_WRITE8_MEMBER(port43_w);
 	DECLARE_WRITE8_MEMBER(port60_w);
 	DECLARE_WRITE8_MEMBER(port70_w);
-	DECLARE_WRITE_LINE_MEMBER(txdata_callback);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_c);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_p);
+	TIMER_DEVICE_CALLBACK_MEMBER(kansas_w);
+	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_k);
 
 	MC6847_GET_CHARROM_MEMBER(get_char_rom)
@@ -105,7 +103,7 @@ private:
 	uint8_t m_intext;
 	uint8_t m_inv;
 	uint8_t m_cass_data[4];
-	bool m_cass_state;
+	bool m_cassbit;
 	bool m_cassold;
 	uint8_t m_key_pressed;
 	bool m_banksw_unlocked;
@@ -126,7 +124,7 @@ void fc100_state::fc100_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x5fff).rom().region("roms", 0);
-	//AM_RANGE(0x6000, 0x6fff)      // mapped by the cartslot
+	//map(0x6000, 0x6fff)      // mapped by the cartslot
 	map(0x7800, 0x7fff).bankr("bankr").bankw("bankw"); // Banked RAM/ROM
 	map(0x8000, 0xbfff).ram(); // expansion ram pack - if omitted you get a 'Pages?' prompt at boot
 	map(0xc000, 0xffff).ram().share("videoram");
@@ -137,7 +135,7 @@ void fc100_state::fc100_io(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	map(0x00, 0x0F).r(FUNC(fc100_state::port00_r));
-	// AM_RANGE(0x10, 0x10) AM_WRITE(port10_w)  // vdg, unknown effects
+	// map(0x10, 0x10).w(FUNC(fc100_state::port10_w));  // vdg, unknown effects
 	map(0x21, 0x21).w("psg", FUNC(ay8910_device::data_w));
 	map(0x22, 0x22).r("psg", FUNC(ay8910_device::data_r));
 	map(0x23, 0x23).w("psg", FUNC(ay8910_device::address_w));
@@ -423,28 +421,23 @@ WRITE8_MEMBER( fc100_state::port33_w )
 		m_cass->change_state(CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 }
 
-WRITE_LINE_MEMBER( fc100_state::txdata_callback )
-{
-	m_cass_state = state;
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER( fc100_state::timer_c )
+TIMER_DEVICE_CALLBACK_MEMBER( fc100_state::kansas_w )
 {
 	m_cass_data[3]++;
 
-	if (m_cass_state != m_cassold)
+	if (m_cassbit != m_cassold)
 	{
 		m_cass_data[3] = 0;
-		m_cassold = m_cass_state;
+		m_cassold = m_cassbit;
 	}
 
-	if (m_cass_state)
+	if (m_cassbit)
 		m_cass->output(BIT(m_cass_data[3], 0) ? -1.0 : +1.0); // 2400Hz
 	else
 		m_cass->output(BIT(m_cass_data[3], 1) ? -1.0 : +1.0); // 1200Hz
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( fc100_state::timer_p)
+TIMER_DEVICE_CALLBACK_MEMBER( fc100_state::kansas_r)
 {
 	/* cassette - turn 1200/2400Hz to a bit */
 	m_cass_data[1]++;
@@ -472,7 +465,7 @@ void fc100_state::machine_start()
 	m_inv = 0;
 
 	if (m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x6000, 0x6fff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x6000, 0x6fff, read8sm_delegate(*m_cart, FUNC(generic_slot_device::read_rom)));
 
 	save_item(NAME(m_ag));
 	save_item(NAME(m_gm2));
@@ -487,11 +480,12 @@ void fc100_state::machine_start()
 void fc100_state::machine_reset()
 {
 	m_cass_data[0] = m_cass_data[1] = m_cass_data[2] = m_cass_data[3] = 0;
-	m_cass_state = 0;
+	m_cassbit = 0;
 	m_cassold = 0;
 	m_key_pressed = 0;
 	membank("bankr")->set_entry(0);
 	membank("bankw")->set_entry(0);
+	m_uart->write_cts(0);
 }
 
 WRITE8_MEMBER( fc100_state::port60_w )
@@ -515,56 +509,61 @@ void fc100_state::init_fc100()
 	membank("bankr")->configure_entry(1, &ram[0]);
 }
 
-MACHINE_CONFIG_START(fc100_state::fc100)
+void fc100_state::fc100(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(7'159'090)/2)
-	MCFG_DEVICE_PROGRAM_MAP(fc100_mem)
-	MCFG_DEVICE_IO_MAP(fc100_io)
+	Z80(config, m_maincpu, XTAL(7'159'090)/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &fc100_state::fc100_mem);
+	m_maincpu->set_addrmap(AS_IO, &fc100_state::fc100_io);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("vdg", M5C6847P1, XTAL(7'159'090)/3)  // Clock not verified
-	MCFG_MC6847_INPUT_CALLBACK(READ8(*this, fc100_state, mc6847_videoram_r))
-	MCFG_MC6847_CHARROM_CALLBACK(fc100_state, get_char_rom)
-	MCFG_MC6847_FIXED_MODE(m5c6847p1_device::MODE_INTEXT)
+	M5C6847P1(config, m_vdg, XTAL(7'159'090)/3);  // Clock not verified
+	m_vdg->set_screen("screen");
+	m_vdg->input_callback().set(FUNC(fc100_state::mc6847_videoram_r));
+	m_vdg->set_get_char_rom(FUNC(fc100_state::get_char_rom));
+	m_vdg->set_get_fixed_mode(m5c6847p1_device::MODE_INTEXT);
 	// other lines not connected
 
-	MCFG_SCREEN_MC6847_NTSC_ADD("screen", "vdg")
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "f4palette", gfx_fc100)
-	MCFG_PALETTE_ADD_MONOCHROME("f4palette")
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	GFXDECODE(config, "gfxdecode", "f4palette", gfx_fc100);
+	PALETTE(config, "f4palette", palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
-	MCFG_DEVICE_ADD("psg", AY8910, XTAL(7'159'090)/3/2)  /* AY-3-8910 - clock not verified */
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("JOY0"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("JOY1"))
-	//MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, fc100_state, ay_port_a_w))
-	//MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, fc100_state, ay_port_b_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.50)
+	ay8910_device &psg(AY8910(config, "psg", XTAL(7'159'090)/3/2));  /* AY-3-8910 - clock not verified */
+	psg.port_a_read_callback().set_ioport("JOY0");
+	psg.port_b_read_callback().set_ioport("JOY1");
+	//psg.port_a_write_callback().set(FUNC(fc100_state::ay_port_a_w));
+	//psg.port_b_write_callback().set(FUNC(fc100_state::ay_port_b_w));
+	psg.add_route(ALL_OUTPUTS, "mono", 1.50);
 
 	/* Devices */
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_FORMATS(fc100_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
+	CASSETTE(config, m_cass);
+	m_cass->set_formats(fc100_cassette_formats);
+	m_cass->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	I8251(config, m_uart, 0);
-	m_uart->txd_handler().set(FUNC(fc100_state::txdata_callback));
+	m_uart->txd_handler().set([this] (bool state) { m_cassbit = state; });
 	clock_device &uart_clock(CLOCK(config, "uart_clock", XTAL(4'915'200)/16/16)); // gives 19200
 	uart_clock.signal_handler().set(m_uart, FUNC(i8251_device::write_txc));
 	uart_clock.signal_handler().append(m_uart, FUNC(i8251_device::write_rxc));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_c", fc100_state, timer_c, attotime::from_hz(4800)) // cass write
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_p", fc100_state, timer_p, attotime::from_hz(40000)) // cass read
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_k", fc100_state, timer_k, attotime::from_hz(300)) // keyb scan
+	TIMER(config, "kansas_w").configure_periodic(FUNC(fc100_state::kansas_w), attotime::from_hz(4800)); // cass write
+	TIMER(config, "kansas_r").configure_periodic(FUNC(fc100_state::kansas_r), attotime::from_hz(40000)); // cass read
+	TIMER(config, "timer_k").configure_periodic(FUNC(fc100_state::timer_k), attotime::from_hz(300)); // keyb scan
 
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "fc100_cart")
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "fc100_cart");
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit4))
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE("cent_status_in", input_buffer_device, write_bit5))
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
-	MCFG_DEVICE_ADD("cent_status_in", INPUT_BUFFER, 0)
-MACHINE_CONFIG_END
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->ack_handler().set("cent_status_in", FUNC(input_buffer_device::write_bit4));
+	m_centronics->busy_handler().set("cent_status_in", FUNC(input_buffer_device::write_bit5));
+
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
+
+	INPUT_BUFFER(config, "cent_status_in");
+}
 
 /* ROM definition */
 ROM_START( fc100 )

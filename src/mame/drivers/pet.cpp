@@ -167,6 +167,7 @@ ROM sockets:  UA3   2K or 4K character
 #include "machine/6522via.h"
 #include "machine/6821pia.h"
 #include "machine/cbm_snqk.h"
+#include "machine/input_merger.h"
 #include "machine/pla.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
@@ -216,12 +217,6 @@ public:
 		m_sync(0),
 		m_graphic(0),
 		m_blanktv(0),
-		m_via_irq(CLEAR_LINE),
-		m_pia1a_irq(CLEAR_LINE),
-		m_pia1b_irq(CLEAR_LINE),
-		m_pia2a_irq(CLEAR_LINE),
-		m_pia2b_irq(CLEAR_LINE),
-		m_exp_irq(CLEAR_LINE),
 		m_user_diag(1)
 	{ }
 
@@ -249,22 +244,16 @@ public:
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
-	DECLARE_WRITE_LINE_MEMBER( via_irq_w );
 	DECLARE_WRITE8_MEMBER( via_pa_w );
 	DECLARE_READ8_MEMBER( via_pb_r );
 	DECLARE_WRITE8_MEMBER( via_pb_w );
 	DECLARE_WRITE_LINE_MEMBER( via_ca2_w );
 	DECLARE_WRITE_LINE_MEMBER( via_cb2_w );
 
-	DECLARE_WRITE_LINE_MEMBER( pia1_irqa_w );
-	DECLARE_WRITE_LINE_MEMBER( pia1_irqb_w );
 	DECLARE_READ8_MEMBER( pia1_pa_r );
 	DECLARE_READ8_MEMBER( pia1_pb_r );
 	DECLARE_WRITE8_MEMBER( pia1_pa_w );
 	DECLARE_WRITE_LINE_MEMBER( pia1_ca2_w );
-
-	DECLARE_WRITE_LINE_MEMBER( pia2_irqa_w );
-	DECLARE_WRITE_LINE_MEMBER( pia2_irqb_w );
 
 	DECLARE_WRITE_LINE_MEMBER( user_diag_w );
 
@@ -273,7 +262,7 @@ public:
 
 	TIMER_CALLBACK_MEMBER( sync_tick );
 
-	DECLARE_QUICKLOAD_LOAD_MEMBER( cbm_pet );
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_pet);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -313,8 +302,6 @@ protected:
 	DECLARE_MACHINE_START( pet2001 );
 	DECLARE_MACHINE_RESET( pet );
 
-
-	void check_interrupts();
 	void update_speaker();
 
 	enum
@@ -352,13 +339,6 @@ protected:
 
 	uint8_t m_via_pa;
 
-	// interrupt state
-	int m_via_irq;
-	int m_pia1a_irq;
-	int m_pia1b_irq;
-	int m_pia2a_irq;
-	int m_pia2b_irq;
-	int m_exp_irq;
 	int m_user_diag;
 };
 
@@ -484,7 +464,7 @@ static void cbm_pet_quick_sethiaddress( address_space &space, uint16_t hiaddress
 	space.write_byte(0x2b, hiaddress >> 8);
 }
 
-QUICKLOAD_LOAD_MEMBER( pet_state, cbm_pet )
+QUICKLOAD_LOAD_MEMBER(pet_state::quickload_pet)
 {
 	return general_cbm_loadsnap(image, file_type, quickload_size, m_maincpu->space(AS_PROGRAM), 0, cbm_pet_quick_sethiaddress);
 }
@@ -494,19 +474,6 @@ QUICKLOAD_LOAD_MEMBER( pet_state, cbm_pet )
 //**************************************************************************
 //  INTERRUPTS
 //**************************************************************************
-
-//-------------------------------------------------
-//  check_interrupts -
-//-------------------------------------------------
-
-void pet_state::check_interrupts()
-{
-	int irq = m_via_irq || m_pia1a_irq || m_pia1b_irq || m_pia2a_irq || m_pia2b_irq || m_exp_irq;
-
-	m_maincpu->set_input_line(M6502_IRQ_LINE, irq);
-	m_exp->irq_w(irq);
-}
-
 
 //-------------------------------------------------
 //  update_speaker -
@@ -530,10 +497,10 @@ void pet_state::update_speaker()
 READ8_MEMBER( pet_state::read )
 {
 	int sel = offset >> 12;
-	int norom = m_exp->norom_r(space, offset, sel);
+	int norom = m_exp->norom_r(offset, sel);
 	uint8_t data = 0;
 
-	data = m_exp->read(space, offset, data, sel);
+	data = m_exp->read(offset, data, sel);
 
 	switch (sel)
 	{
@@ -555,7 +522,7 @@ READ8_MEMBER( pet_state::read )
 		if (norom)
 		{
 			if (m_cart_9000 && m_cart_9000->exists())
-				data = m_cart_9000->read_rom(space, offset & 0xfff);
+				data = m_cart_9000->read_rom(offset & 0xfff);
 			else
 				data = m_rom->base()[offset - 0x9000];
 		}
@@ -565,7 +532,7 @@ READ8_MEMBER( pet_state::read )
 		if (norom)
 		{
 			if (m_cart_a000 && m_cart_a000->exists())
-				data = m_cart_a000->read_rom(space, offset & 0xfff);
+				data = m_cart_a000->read_rom(offset & 0xfff);
 			else
 				data = m_rom->base()[offset - 0x9000];
 		}
@@ -575,7 +542,7 @@ READ8_MEMBER( pet_state::read )
 		if (norom)
 		{
 			if (m_cart_b000 && m_cart_b000->exists())
-				data = m_cart_b000->read_rom(space, offset & 0xfff);
+				data = m_cart_b000->read_rom(offset & 0xfff);
 			else
 				data = m_rom->base()[offset - 0x9000];
 		}
@@ -595,11 +562,11 @@ READ8_MEMBER( pet_state::read )
 
 			if (BIT(offset, 4))
 			{
-				data &= m_pia1->read(space, offset & 0x03);
+				data &= m_pia1->read(offset & 0x03);
 			}
 			if (BIT(offset, 5))
 			{
-				data &= m_pia2->read(space, offset & 0x03);
+				data &= m_pia2->read(offset & 0x03);
 			}
 			if (BIT(offset, 6))
 			{
@@ -607,7 +574,7 @@ READ8_MEMBER( pet_state::read )
 			}
 			if (m_crtc && BIT(offset, 7) && BIT(offset, 0))
 			{
-				data &= m_crtc->register_r(space, 0);
+				data &= m_crtc->register_r();
 			}
 		}
 		else if (norom)
@@ -629,7 +596,7 @@ WRITE8_MEMBER( pet_state::write )
 {
 	int sel = offset >> 12;
 
-	m_exp->write(space, offset, data, sel);
+	m_exp->write(offset, data, sel);
 
 	switch (sel)
 	{
@@ -652,11 +619,11 @@ WRITE8_MEMBER( pet_state::write )
 		{
 			if (BIT(offset, 4))
 			{
-				m_pia1->write(space, offset & 0x03, data);
+				m_pia1->write(offset & 0x03, data);
 			}
 			if (BIT(offset, 5))
 			{
-				m_pia2->write(space, offset & 0x03, data);
+				m_pia2->write(offset & 0x03, data);
 			}
 			if (BIT(offset, 6))
 			{
@@ -666,11 +633,11 @@ WRITE8_MEMBER( pet_state::write )
 			{
 				if (BIT(offset, 0))
 				{
-					m_crtc->register_w(space, 0, data);
+					m_crtc->register_w(data);
 				}
 				else
 				{
-					m_crtc->address_w(space, 0, data);
+					m_crtc->address_w(data);
 				}
 			}
 		}
@@ -758,7 +725,7 @@ void cbm8296_state::read_pla2_eprom(offs_t offset, int phi2, int brw, int casena
 
 READ8_MEMBER( cbm8296_state::read )
 {
-	int norom = m_exp->norom_r(space, offset, offset >> 12) && !BIT(m_cr, 7);
+	int norom = m_exp->norom_r(offset, offset >> 12) && !BIT(m_cr, 7);
 	int phi2 = 1, brw = 1, noscreen = 1, noio = BIT(m_cr, 6);
 	int ramsela = BIT(m_via_pa, 0), ramsel9 = BIT(m_via_pa, 1), ramon = BIT(m_via_pa, 2);
 	int cswff = 1, cs9 = 1, csa = 1, csio = 1, cse = 1, cskb = 1, fa12 = 1, fa15 = 1, casena1 = 1, casena2 = 1, endra = 1;
@@ -788,14 +755,14 @@ READ8_MEMBER( cbm8296_state::read )
 	if (!cs9)
 	{
 		if (m_cart_9000 && m_cart_9000->exists())
-			data = m_cart_9000->read_rom(space, offset & 0xfff);
+			data = m_cart_9000->read_rom(offset & 0xfff);
 		else
 			data = m_rom->base()[offset & 0xfff];
 	}
 	if (!csa)
 	{
 		if (m_cart_a000 && m_cart_a000->exists())
-			data = m_cart_a000->read_rom(space, offset & 0xfff);
+			data = m_cart_a000->read_rom(offset & 0xfff);
 		else
 			data = m_rom->base()[0x1000 | (offset & 0xfff)];
 	}
@@ -813,11 +780,11 @@ READ8_MEMBER( cbm8296_state::read )
 
 		if (BIT(offset, 4))
 		{
-			data &= m_pia1->read(space, offset & 0x03);
+			data &= m_pia1->read(offset & 0x03);
 		}
 		if (BIT(offset, 5))
 		{
-			data &= m_pia2->read(space, offset & 0x03);
+			data &= m_pia2->read(offset & 0x03);
 		}
 		if (BIT(offset, 6))
 		{
@@ -825,7 +792,7 @@ READ8_MEMBER( cbm8296_state::read )
 		}
 		if (BIT(offset, 7) && BIT(offset, 0))
 		{
-			data &= m_crtc->register_r(space, 0);
+			data &= m_crtc->register_r();
 		}
 	}
 
@@ -839,7 +806,7 @@ READ8_MEMBER( cbm8296_state::read )
 
 WRITE8_MEMBER( cbm8296_state::write )
 {
-	int norom = m_exp->norom_r(space, offset, offset >> 12) && !BIT(m_cr, 7);
+	int norom = m_exp->norom_r(offset, offset >> 12) && !BIT(m_cr, 7);
 	int phi2 = 1, brw = 0, noscreen = 1, noio = BIT(m_cr, 6);
 	int ramsela = BIT(m_via_pa, 0), ramsel9 = BIT(m_via_pa, 1), ramon = BIT(m_via_pa, 2);
 	int cswff = 1, cs9 = 1, csa = 1, csio = 1, cse = 1, cskb = 1, fa12 = 1, fa15 = 1, casena1 = 1, casena2 = 1, endra = 1;
@@ -868,11 +835,11 @@ WRITE8_MEMBER( cbm8296_state::write )
 	{
 		if (BIT(offset, 4))
 		{
-			m_pia1->write(space, offset & 0x03, data);
+			m_pia1->write(offset & 0x03, data);
 		}
 		if (BIT(offset, 5))
 		{
-			m_pia2->write(space, offset & 0x03, data);
+			m_pia2->write(offset & 0x03, data);
 		}
 		if (BIT(offset, 6))
 		{
@@ -882,11 +849,11 @@ WRITE8_MEMBER( cbm8296_state::write )
 		{
 			if (BIT(offset, 0))
 			{
-				m_crtc->register_w(space, 0, data);
+				m_crtc->register_w(data);
 			}
 			else
 			{
-				m_crtc->address_w(space, 0, data);
+				m_crtc->address_w(data);
 			}
 		}
 	}
@@ -1154,13 +1121,6 @@ INPUT_PORTS_END
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
-WRITE_LINE_MEMBER( pet_state::via_irq_w )
-{
-	m_via_irq = state;
-
-	check_interrupts();
-}
-
 WRITE8_MEMBER( pet_state::via_pa_w )
 {
 	m_user->write_c((data>>0)&1);
@@ -1245,20 +1205,6 @@ WRITE_LINE_MEMBER( pet_state::via_cb2_w )
 	m_user->write_m(state);
 }
 
-
-WRITE_LINE_MEMBER( pet_state::pia1_irqa_w )
-{
-	m_pia1a_irq = state;
-
-	check_interrupts();
-}
-
-WRITE_LINE_MEMBER( pet_state::pia1_irqb_w )
-{
-	m_pia1b_irq = state;
-
-	check_interrupts();
-}
 
 READ8_MEMBER( pet_state::pia1_pa_r )
 {
@@ -1369,20 +1315,6 @@ WRITE_LINE_MEMBER( pet_state::pia1_ca2_w )
 	m_blanktv = state;
 }
 
-
-WRITE_LINE_MEMBER( pet_state::pia2_irqa_w )
-{
-	m_pia2a_irq = state;
-
-	check_interrupts();
-}
-
-WRITE_LINE_MEMBER( pet_state::pia2_irqb_w )
-{
-	m_pia2b_irq = state;
-
-	check_interrupts();
-}
 
 WRITE_LINE_MEMBER( pet_state::user_diag_w )
 {
@@ -1611,12 +1543,6 @@ MACHINE_START_MEMBER( pet_state, pet )
 	save_item(NAME(m_sync));
 	save_item(NAME(m_graphic));
 	save_item(NAME(m_blanktv));
-	save_item(NAME(m_via_irq));
-	save_item(NAME(m_pia1a_irq));
-	save_item(NAME(m_pia1b_irq));
-	save_item(NAME(m_pia2a_irq));
-	save_item(NAME(m_pia2b_irq));
-	save_item(NAME(m_exp_irq));
 	save_item(NAME(m_user_diag));
 }
 
@@ -1731,8 +1657,11 @@ void pet_state::_32k(machine_config &config)
 
 void pet_state::base_pet_devices(machine_config &config, const char *default_drive)
 {
-	PALETTE(config, m_palette, 2);
-	m_palette->set_init("palette", FUNC(palette_device::palette_init_monochrome));
+	input_merger_device &mainirq(INPUT_MERGER_ANY_HIGH(config, "mainirq")); // open collector
+	mainirq.output_handler().set_inputline(m_maincpu, m6502_device::IRQ_LINE);
+	mainirq.output_handler().append(m_exp, FUNC(pet_expansion_slot_device::irq_w));
+
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	VIA6522(config, m_via, XTAL(16'000'000)/16);
 	m_via->readpb_handler().set(FUNC(pet_state::via_pb_r));
@@ -1740,7 +1669,7 @@ void pet_state::base_pet_devices(machine_config &config, const char *default_dri
 	m_via->writepb_handler().set(FUNC(pet_state::via_pb_w));
 	m_via->ca2_handler().set(FUNC(pet_state::via_ca2_w));
 	m_via->cb2_handler().set(FUNC(pet_state::via_cb2_w));
-	m_via->irq_handler().set(FUNC(pet_state::via_irq_w));
+	m_via->irq_handler().set("mainirq", FUNC(input_merger_device::in_w<0>));
 
 	PIA6821(config, m_pia1, 0);
 	m_pia1->readpa_handler().set(FUNC(pet_state::pia1_pa_r));
@@ -1749,16 +1678,16 @@ void pet_state::base_pet_devices(machine_config &config, const char *default_dri
 	m_pia1->writepa_handler().set(FUNC(pet_state::pia1_pa_w));
 	m_pia1->ca2_handler().set(FUNC(pet_state::pia1_ca2_w));
 	m_pia1->cb2_handler().set(PET_DATASSETTE_PORT_TAG, FUNC(pet_datassette_port_device::motor_w));
-	m_pia1->irqa_handler().set(FUNC(pet_state::pia1_irqa_w));
-	m_pia1->irqb_handler().set(FUNC(pet_state::pia1_irqb_w));
+	m_pia1->irqa_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
+	m_pia1->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<2>));
 
 	PIA6821(config, m_pia2, 0);
 	m_pia2->readpa_handler().set(IEEE488_TAG, FUNC(ieee488_device::dio_r));
 	m_pia2->writepb_handler().set(IEEE488_TAG, FUNC(ieee488_device::host_dio_w));
 	m_pia2->ca2_handler().set(IEEE488_TAG, FUNC(ieee488_device::host_ndac_w));
 	m_pia2->cb2_handler().set(IEEE488_TAG, FUNC(ieee488_device::host_dav_w));
-	m_pia2->irqa_handler().set(FUNC(pet_state::pia2_irqa_w));
-	m_pia2->irqb_handler().set(FUNC(pet_state::pia2_irqb_w));
+	m_pia2->irqa_handler().set("mainirq", FUNC(input_merger_device::in_w<3>));
+	m_pia2->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<4>));
 
 	ieee488_slot_device::add_cbm_defaults(config, default_drive);
 	IEEE488(config, m_ieee, 0);
@@ -1784,14 +1713,14 @@ void pet_state::base_pet_devices(machine_config &config, const char *default_dri
 	m_user->pl_handler().set(m_via, FUNC(via6522_device::write_pa7));
 	m_user->pm_handler().set(m_via, FUNC(via6522_device::write_cb2));
 
-	quickload_image_device &quickload(QUICKLOAD(config, "quickload", 0));
-	quickload.set_handler(snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(pet_state, cbm_pet), this), "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS);
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload", "p00,prg", CBM_QUICKLOAD_DELAY));
+	quickload.set_load_callback(FUNC(pet_state::quickload_pet));
 	quickload.set_interface("cbm_quik");
 
-	SOFTWARE_LIST(config, "cass_list").set_type("pet_cass", SOFTWARE_LIST_ORIGINAL_SYSTEM);
-	SOFTWARE_LIST(config, "flop_list").set_type("pet_flop", SOFTWARE_LIST_ORIGINAL_SYSTEM);
-	SOFTWARE_LIST(config, "hdd_list").set_type("pet_hdd", SOFTWARE_LIST_ORIGINAL_SYSTEM);
-	SOFTWARE_LIST(config, "quik_list").set_type("pet_quik", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "cass_list").set_original("pet_cass");
+	SOFTWARE_LIST(config, "flop_list").set_original("pet_flop");
+	SOFTWARE_LIST(config, "hdd_list").set_original("pet_hdd");
+	SOFTWARE_LIST(config, "quik_list").set_original("pet_quik");
 }
 
 void pet_state::pet(machine_config &config)
@@ -1804,7 +1733,6 @@ void pet_state::pet(machine_config &config)
 	// basic machine hardware
 	M6502(config, m_maincpu, XTAL(8'000'000)/8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pet_state::pet2001_mem);
-	m_maincpu->disable_cache(); // address decoding is 100% dynamic, no RAM/ROM banks
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -1840,7 +1768,7 @@ void pet_state::pet2001n(machine_config &config, bool with_b000)
 	if (with_b000)
 		GENERIC_CARTSLOT(config, "cart_b000", generic_linear_slot, "pet_b000_rom", "bin,rom");
 
-	SOFTWARE_LIST(config, "rom_list").set_type("pet_rom", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "rom_list").set_original("pet_rom");
 }
 
 
@@ -1967,8 +1895,8 @@ void pet2001b_state::pet4032f(machine_config &config)
 	m_crtc->set_screen(SCREEN_TAG);
 	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(8);
-	m_crtc->set_begin_update_callback(FUNC(pet_state::pet_begin_update), this);
-	m_crtc->set_update_row_callback(FUNC(pet_state::pet40_update_row), this);
+	m_crtc->set_begin_update_callback(FUNC(pet_state::pet_begin_update));
+	m_crtc->set_update_row_callback(FUNC(pet_state::pet40_update_row));
 	m_crtc->out_vsync_callback().set(M6520_1_TAG, FUNC(pia6821_device::cb1_w));
 
 	// sound hardware
@@ -2023,8 +1951,8 @@ void pet_state::cbm4032f(machine_config &config)
 	m_crtc->set_screen(SCREEN_TAG);
 	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(8);
-	m_crtc->set_begin_update_callback(FUNC(pet_state::pet_begin_update), this);
-	m_crtc->set_update_row_callback(FUNC(pet_state::pet40_update_row), this);
+	m_crtc->set_begin_update_callback(FUNC(pet_state::pet_begin_update));
+	m_crtc->set_update_row_callback(FUNC(pet_state::pet40_update_row));
 	m_crtc->out_vsync_callback().set(M6520_1_TAG, FUNC(pia6821_device::cb1_w));
 
 	// sound hardware
@@ -2074,7 +2002,6 @@ void pet80_state::pet80(machine_config &config)
 	// basic machine hardware
 	M6502(config, m_maincpu, XTAL(16'000'000)/16);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pet_state::pet2001_mem);
-	m_maincpu->disable_cache(); // address decoding is 100% dynamic, no RAM/ROM banks
 
 	// video hardware
 	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
@@ -2089,8 +2016,8 @@ void pet80_state::pet80(machine_config &config)
 	m_crtc->set_screen(SCREEN_TAG);
 	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(2*8);
-	m_crtc->set_begin_update_callback(FUNC(pet_state::pet_begin_update), this);
-	m_crtc->set_update_row_callback(FUNC(pet80_state::pet80_update_row), this);
+	m_crtc->set_begin_update_callback(FUNC(pet_state::pet_begin_update));
+	m_crtc->set_update_row_callback(FUNC(pet80_state::pet80_update_row));
 	m_crtc->out_vsync_callback().set(M6520_1_TAG, FUNC(pia6821_device::cb1_w));
 
 	// sound hardware
@@ -2103,7 +2030,7 @@ void pet80_state::pet80(machine_config &config)
 	GENERIC_CARTSLOT(config, "cart_a000", generic_linear_slot, "pet_a000_rom", "bin,rom");
 
 	// software lists
-	SOFTWARE_LIST(config, "rom_list").set_type("pet_rom", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "rom_list").set_original("pet_rom");
 }
 
 void pet80_state::pet8032(machine_config &config)
@@ -2116,7 +2043,7 @@ void superpet_state::superpet(machine_config &config)
 {
 	pet8032(config);
 	m_exp->set_default_option("superpet");
-	SOFTWARE_LIST(config, "flop_list2").set_type("superpet_flop", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "flop_list2").set_original("superpet_flop");
 }
 
 void cbm8096_state::cbm8096(machine_config &config)
@@ -2127,7 +2054,7 @@ void cbm8096_state::cbm8096(machine_config &config)
 	RAM(config, m_ram);
 	m_ram->set_default_size("96K");
 
-	SOFTWARE_LIST(config, "flop_list2").set_type("cbm8096_flop", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "flop_list2").set_original("cbm8096_flop");
 }
 
 void cbm8296_state::cbm8296(machine_config &config)
@@ -2144,7 +2071,7 @@ void cbm8296_state::cbm8296(machine_config &config)
 	m_crtc->set_clock(XTAL(16'000'000)/16);
 	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(2*8);
-	m_crtc->set_update_row_callback(FUNC(pet80_state::cbm8296_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(pet80_state::cbm8296_update_row));
 	m_crtc->out_vsync_callback().set(M6520_1_TAG, FUNC(pia6821_device::cb1_w));
 
 	subdevice<ieee488_slot_device>("ieee8")->set_default_option("c8250");
@@ -2152,7 +2079,7 @@ void cbm8296_state::cbm8296(machine_config &config)
 	RAM(config, m_ram);
 	m_ram->set_default_size("128K");
 
-	SOFTWARE_LIST(config, "flop_list2").set_type("cbm8296_flop", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "flop_list2").set_original("cbm8296_flop");
 }
 
 void cbm8296_state::cbm8296d(machine_config &config)

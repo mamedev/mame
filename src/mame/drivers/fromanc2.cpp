@@ -37,8 +37,8 @@
 
 WRITE16_MEMBER(fromanc2_state::sndcmd_w)
 {
-	m_soundlatch->write(space, offset, (data >> 8) & 0xff);   // 1P (LEFT)
-	m_soundlatch2->write(space, offset, data & 0xff);         // 2P (RIGHT)
+	m_soundlatch->write((data >> 8) & 0xff);   // 1P (LEFT)
+	m_soundlatch2->write(data & 0xff);         // 2P (RIGHT)
 
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	m_sndcpu_nmi_flag = 0;
@@ -67,17 +67,17 @@ READ16_MEMBER(fromanc2_state::keymatrix_r)
 	return ret;
 }
 
-CUSTOM_INPUT_MEMBER(fromanc2_state::subcpu_int_r)
+READ_LINE_MEMBER(fromanc2_state::subcpu_int_r)
 {
 	return m_subcpu_int_flag & 0x01;
 }
 
-CUSTOM_INPUT_MEMBER(fromanc2_state::sndcpu_nmi_r)
+READ_LINE_MEMBER(fromanc2_state::sndcpu_nmi_r)
 {
 	return m_sndcpu_nmi_flag & 0x01;
 }
 
-CUSTOM_INPUT_MEMBER(fromanc2_state::subcpu_nmi_r)
+READ_LINE_MEMBER(fromanc2_state::subcpu_nmi_r)
 {
 	return m_subcpu_nmi_flag & 0x01;
 }
@@ -304,9 +304,9 @@ static INPUT_PORTS_START( fromanc2 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN4 )
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, fromanc2_state,subcpu_int_r, nullptr) // SUBCPU INT FLAG
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, fromanc2_state,sndcpu_nmi_r, nullptr) // SNDCPU NMI FLAG
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, fromanc2_state,subcpu_nmi_r, nullptr) // SUBCPU NMI FLAG
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(fromanc2_state, subcpu_int_r) // SUBCPU INT FLAG
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(fromanc2_state, sndcpu_nmi_r) // SNDCPU NMI FLAG
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(fromanc2_state, subcpu_nmi_r) // SUBCPU NMI FLAG
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME( "Service Mode (1P)" ) PORT_CODE(KEYCODE_F2) // TEST (1P)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME( "Service Mode (2P)" ) PORT_CODE(KEYCODE_F2) // TEST (2P)
@@ -405,7 +405,7 @@ static INPUT_PORTS_START( fromanc4 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_COIN4 )
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, fromanc2_state,sndcpu_nmi_r, nullptr) // SNDCPU NMI FLAG
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(fromanc2_state, sndcpu_nmi_r) // SNDCPU NMI FLAG
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -501,186 +501,180 @@ void fromanc2_state::machine_reset()
 	m_datalatch_2l = 0;
 }
 
-MACHINE_CONFIG_START(fromanc2_state::fromanc2)
-
+void fromanc2_state::fromanc2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000,32000000/2)      /* 16.00 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(fromanc2_main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", fromanc2_state, irq1_line_hold)
+	M68000(config, m_maincpu, 32000000/2);      /* 16.00 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &fromanc2_state::fromanc2_main_map);
+	m_maincpu->set_vblank_int("lscreen", FUNC(fromanc2_state::irq1_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80,32000000/4)        /* 8.00 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(fromanc2_sound_map)
-	MCFG_DEVICE_IO_MAP(fromanc2_sound_io_map)
+	Z80(config, m_audiocpu, 32000000/4);        /* 8.00 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &fromanc2_state::fromanc2_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &fromanc2_state::fromanc2_sound_io_map);
 
-	MCFG_DEVICE_ADD("sub", Z80,32000000/4)     /* 8.00 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(fromanc2_sub_map)
-	MCFG_DEVICE_IO_MAP(fromanc2_sub_io_map)
+	Z80(config, m_subcpu, 32000000/4);     /* 8.00 MHz */
+	m_subcpu->set_addrmap(AS_PROGRAM, &fromanc2_state::fromanc2_sub_map);
+	m_subcpu->set_addrmap(AS_IO, &fromanc2_state::fromanc2_sub_io_map);
 
 	MCFG_MACHINE_START_OVERRIDE(fromanc2_state,fromanc2)
 
-	EEPROM_93C46_16BIT(config, "eeprom");
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "lpalette", gfx_fromanc2)
+	GFXDECODE(config, m_gfxdecode, m_lpalette, gfx_fromanc2);
 
-	MCFG_PALETTE_ADD("lpalette", 2048)
-	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
-	MCFG_PALETTE_ADD("rpalette", 2048)
-	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
+	PALETTE(config, m_lpalette).set_format(palette_device::GRBx_555, 2048);
+	PALETTE(config, m_rpalette).set_format(palette_device::GRBx_555, 2048);
 
 	config.set_default_layout(layout_dualhsxs);
 
-	MCFG_SCREEN_ADD("lscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 512)
-	MCFG_SCREEN_VISIBLE_AREA(0, 352-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(fromanc2_state, screen_update_left)
-	MCFG_SCREEN_PALETTE("lpalette")
+	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
+	lscreen.set_refresh_hz(60);
+	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	lscreen.set_size(512, 512);
+	lscreen.set_visarea(0, 352-1, 0, 240-1);
+	lscreen.set_screen_update(FUNC(fromanc2_state::screen_update_left));
+	lscreen.set_palette(m_lpalette);
 
-	MCFG_SCREEN_ADD("rscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 512)
-	MCFG_SCREEN_VISIBLE_AREA(0, 352-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(fromanc2_state, screen_update_right)
-	MCFG_SCREEN_PALETTE("rpalette")
+	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
+	rscreen.set_refresh_hz(60);
+	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	rscreen.set_size(512, 512);
+	rscreen.set_visarea(0, 352-1, 0, 240-1);
+	rscreen.set_screen_update(FUNC(fromanc2_state::screen_update_right));
+	rscreen.set_palette(m_rpalette);
 
 	MCFG_VIDEO_START_OVERRIDE(fromanc2_state,fromanc2)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, m_soundlatch2);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2610, 8000000)
-	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.50)
-	MCFG_SOUND_ROUTE(1, "mono", 0.75)
-	MCFG_SOUND_ROUTE(2, "mono", 0.75)
-MACHINE_CONFIG_END
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", 8000000));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.add_route(0, "mono", 0.50);
+	ymsnd.add_route(1, "mono", 0.75);
+	ymsnd.add_route(2, "mono", 0.75);
+}
 
-MACHINE_CONFIG_START(fromanc2_state::fromancr)
-
+void fromanc2_state::fromancr(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000,32000000/2)      /* 16.00 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(fromancr_main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", fromanc2_state, irq1_line_hold)
+	M68000(config, m_maincpu, 32000000/2);      /* 16.00 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &fromanc2_state::fromancr_main_map);
+	m_maincpu->set_vblank_int("lscreen", FUNC(fromanc2_state::irq1_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80,32000000/4)        /* 8.00 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(fromanc2_sound_map)
-	MCFG_DEVICE_IO_MAP(fromanc2_sound_io_map)
+	Z80(config, m_audiocpu, 32000000/4);        /* 8.00 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &fromanc2_state::fromanc2_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &fromanc2_state::fromanc2_sound_io_map);
 
-	MCFG_DEVICE_ADD("sub", Z80,32000000/4)     /* 8.00 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(fromanc2_sub_map)
-	MCFG_DEVICE_IO_MAP(fromanc2_sub_io_map)
+	Z80(config, m_subcpu, 32000000/4);     /* 8.00 MHz */
+	m_subcpu->set_addrmap(AS_PROGRAM, &fromanc2_state::fromanc2_sub_map);
+	m_subcpu->set_addrmap(AS_IO, &fromanc2_state::fromanc2_sub_io_map);
 
 	MCFG_MACHINE_START_OVERRIDE(fromanc2_state,fromanc2)
 
-	EEPROM_93C46_16BIT(config, "eeprom");
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "lpalette", gfx_fromancr)
+	GFXDECODE(config, m_gfxdecode, m_lpalette, gfx_fromancr);
 
-	MCFG_PALETTE_ADD("lpalette", 2048)
-	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
-	MCFG_PALETTE_ADD("rpalette", 2048)
-	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
+	PALETTE(config, m_lpalette).set_format(palette_device::xGRB_555, 2048);
+	PALETTE(config, m_rpalette).set_format(palette_device::xGRB_555, 2048);
 
 	config.set_default_layout(layout_dualhsxs);
 
-	MCFG_SCREEN_ADD("lscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 512)
-	MCFG_SCREEN_VISIBLE_AREA(0, 352-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(fromanc2_state, screen_update_left)
-	MCFG_SCREEN_PALETTE("lpalette")
+	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
+	lscreen.set_refresh_hz(60);
+	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	lscreen.set_size(512, 512);
+	lscreen.set_visarea(0, 352-1, 0, 240-1);
+	lscreen.set_screen_update(FUNC(fromanc2_state::screen_update_left));
+	lscreen.set_palette(m_lpalette);
 
-	MCFG_SCREEN_ADD("rscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 512)
-	MCFG_SCREEN_VISIBLE_AREA(0, 352-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(fromanc2_state, screen_update_right)
-	MCFG_SCREEN_PALETTE("rpalette")
+	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
+	rscreen.set_refresh_hz(60);
+	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	rscreen.set_size(512, 512);
+	rscreen.set_visarea(0, 352-1, 0, 240-1);
+	rscreen.set_screen_update(FUNC(fromanc2_state::screen_update_right));
+	rscreen.set_palette(m_rpalette);
 
 	MCFG_VIDEO_START_OVERRIDE(fromanc2_state,fromancr)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, m_soundlatch2);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2610, 8000000)
-	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.50)
-	MCFG_SOUND_ROUTE(1, "mono", 0.75)
-	MCFG_SOUND_ROUTE(2, "mono", 0.75)
-MACHINE_CONFIG_END
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", 8000000));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.add_route(0, "mono", 0.50);
+	ymsnd.add_route(1, "mono", 0.75);
+	ymsnd.add_route(2, "mono", 0.75);
+}
 
-MACHINE_CONFIG_START(fromanc2_state::fromanc4)
-
+void fromanc2_state::fromanc4(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000)/2)      /* 16.00 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(fromanc4_main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", fromanc2_state, irq1_line_hold)
+	M68000(config, m_maincpu, XTAL(32'000'000)/2);      /* 16.00 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &fromanc2_state::fromanc4_main_map);
+	m_maincpu->set_vblank_int("lscreen", FUNC(fromanc2_state::irq1_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(32'000'000)/4)        /* 8.00 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(fromanc2_sound_map)
-	MCFG_DEVICE_IO_MAP(fromanc2_sound_io_map)
+	Z80(config, m_audiocpu, XTAL(32'000'000)/4);        /* 8.00 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &fromanc2_state::fromanc2_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &fromanc2_state::fromanc2_sound_io_map);
 
 	MCFG_MACHINE_START_OVERRIDE(fromanc2_state,fromanc4)
 
-	EEPROM_93C46_16BIT(config, "eeprom");
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
-	MCFG_DEVICE_ADD("uart", NS16550, 2000000) // actual type is TL16C550CFN; clock unknown
-	MCFG_INS8250_OUT_INT_CB(INPUTLINE("maincpu", M68K_IRQ_2))
-	//MCFG_INS8250_OUT_TX_CB(WRITELINE("link", rs232_port_device, write_txd))
-	//MCFG_INS8250_OUT_RTS_CB(WRITELINE("link", rs232_port_device, write_rts))
+	NS16550(config, m_uart, 2000000); // actual type is TL16C550CFN; clock unknown
+	m_uart->out_int_callback().set_inputline("maincpu", M68K_IRQ_2);
+	//m_uart->out_tx_callback().set("link", FUNC(rs232_port_device::write_txd));
+	//m_uart->out_rts_callback().set("link", FUNC(rs232_port_device::write_rts));
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "lpalette", gfx_fromancr)
+	GFXDECODE(config, m_gfxdecode, m_lpalette, gfx_fromancr);
 
-	MCFG_PALETTE_ADD("lpalette", 2048)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_PALETTE_ADD("rpalette", 2048)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	PALETTE(config, m_lpalette).set_format(palette_device::xRGB_555, 2048);
+	PALETTE(config, m_rpalette).set_format(palette_device::xRGB_555, 2048);
 
 	config.set_default_layout(layout_dualhsxs);
 
-	MCFG_SCREEN_ADD("lscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 512)
-	MCFG_SCREEN_VISIBLE_AREA(0, 352-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(fromanc2_state, screen_update_left)
-	MCFG_SCREEN_PALETTE("lpalette")
+	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
+	lscreen.set_refresh_hz(60);
+	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	lscreen.set_size(512, 512);
+	lscreen.set_visarea(0, 352-1, 0, 240-1);
+	lscreen.set_screen_update(FUNC(fromanc2_state::screen_update_left));
+	lscreen.set_palette(m_lpalette);
 
-	MCFG_SCREEN_ADD("rscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 512)
-	MCFG_SCREEN_VISIBLE_AREA(0, 352-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(fromanc2_state, screen_update_right)
-	MCFG_SCREEN_PALETTE("rpalette")
+	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
+	rscreen.set_refresh_hz(60);
+	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	rscreen.set_size(512, 512);
+	rscreen.set_visarea(0, 352-1, 0, 240-1);
+	rscreen.set_screen_update(FUNC(fromanc2_state::screen_update_right));
+	rscreen.set_palette(m_rpalette);
 
 	MCFG_VIDEO_START_OVERRIDE(fromanc2_state,fromanc4)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, m_soundlatch2);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2610, 8000000)
-	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.50)
-	MCFG_SOUND_ROUTE(1, "mono", 0.75)
-	MCFG_SOUND_ROUTE(2, "mono", 0.75)
-MACHINE_CONFIG_END
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", 8000000));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.add_route(0, "mono", 0.50);
+	ymsnd.add_route(1, "mono", 0.75);
+	ymsnd.add_route(2, "mono", 0.75);
+}
 
 
 /*************************************

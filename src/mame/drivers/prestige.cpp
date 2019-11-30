@@ -109,14 +109,15 @@ public:
 	{ }
 
 	void prestige_base(machine_config &config);
-	void princ(machine_config &config);
 	void gl6000sl(machine_config &config);
-	void gjmovie(machine_config &config);
 	void snotec(machine_config &config);
 	void glmcolor(machine_config &config);
 	void glcolor(machine_config &config);
 	void prestige(machine_config &config);
 	void gl7007sl(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -146,12 +147,11 @@ private:
 		uint8_t   split_pos;
 	} m_lcdc;
 
-	virtual void machine_start() override;
+	memory_region *m_cart_rom;
+
 	uint32_t screen_update(int bpp, screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_1bpp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_2bpp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	memory_region *m_cart_rom;
 
 	DECLARE_READ8_MEMBER( bankswitch_r );
 	DECLARE_WRITE8_MEMBER( bankswitch_w );
@@ -160,8 +160,8 @@ private:
 	DECLARE_READ8_MEMBER( mouse_r );
 	DECLARE_WRITE8_MEMBER( mouse_w );
 	DECLARE_WRITE8_MEMBER( lcdc_w );
-	DECLARE_PALETTE_INIT(prestige);
-	DECLARE_PALETTE_INIT(glcolor);
+	void prestige_palette(palette_device &palette) const;
+	void glcolor_palette(palette_device &palette) const;
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer);
 	IRQ_CALLBACK_MEMBER(prestige_int_ack);
 
@@ -679,18 +679,18 @@ void prestige_state::machine_start()
 	m_vram = ram;
 }
 
-PALETTE_INIT_MEMBER(prestige_state, prestige)
+void prestige_state::prestige_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(39, 108, 51));
-	palette.set_pen_color(1, rgb_t(16, 37, 84));
+	palette.set_pen_color(1, rgb_t(16,  37, 84));
 }
 
-PALETTE_INIT_MEMBER(prestige_state, glcolor)
+void prestige_state::glcolor_palette(palette_device &palette) const
 {
-	palette.set_pen_color(0, rgb_t(0x3f,0xbf,0x3f));
-	palette.set_pen_color(1, rgb_t(0xff,0x3f,0x5f));
-	palette.set_pen_color(2, rgb_t(0x1f,0x1f,0x3f));
-	palette.set_pen_color(3, rgb_t(0xff,0xdf,0x1f));
+	palette.set_pen_color(0, rgb_t(0x3f, 0xbf, 0x3f));
+	palette.set_pen_color(1, rgb_t(0xff, 0x3f, 0x5f));
+	palette.set_pen_color(2, rgb_t(0x1f, 0x1f, 0x3f));
+	palette.set_pen_color(3, rgb_t(0xff, 0xdf, 0x1f));
 }
 
 uint32_t prestige_state::screen_update(int bpp, screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -741,99 +741,95 @@ TIMER_DEVICE_CALLBACK_MEMBER(prestige_state::irq_timer)
 	m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
-MACHINE_CONFIG_START(prestige_state::prestige_base)
+void prestige_state::prestige_base(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(8'000'000))  // Z84C008
-	MCFG_DEVICE_PROGRAM_MAP(prestige_mem)
-	MCFG_DEVICE_IO_MAP(prestige_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(prestige_state,prestige_int_ack)
+	Z80(config, m_maincpu, XTAL(8'000'000));  // Z84C008
+	m_maincpu->set_addrmap(AS_PROGRAM, &prestige_state::prestige_mem);
+	m_maincpu->set_addrmap(AS_IO, &prestige_state::prestige_io);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(prestige_state::prestige_int_ack));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer", prestige_state, irq_timer, attotime::from_hz(200))
+	TIMER(config, "irq_timer").configure_periodic(FUNC(prestige_state::irq_timer), attotime::from_hz(200));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(prestige_state, screen_update_1bpp)
-	MCFG_SCREEN_SIZE( 240, 100 )
-	MCFG_SCREEN_VISIBLE_AREA( 0, 240-1, 0, 100-1 )
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update(FUNC(prestige_state::screen_update_1bpp));
+	screen.set_size(240, 100);
+	screen.set_visarea(0, 240-1, 0, 100-1);
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(prestige_state, prestige)
+	PALETTE(config, "palette", FUNC(prestige_state::prestige_palette), 2);
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "genius_cart")
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "genius_cart");
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("32K").set_extra_options("64K");
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(prestige_state::glcolor)
+void prestige_state::glcolor(machine_config &config)
+{
 	prestige_base(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(glcolor_io)
+
+	m_maincpu->set_addrmap(AS_IO, &prestige_state::glcolor_io);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(prestige_state, screen_update_2bpp)
-	MCFG_SCREEN_SIZE( 160, 80 )
-	MCFG_SCREEN_VISIBLE_AREA( 0, 160-1, 0, 80-1 )
+	screen_device &screen(*subdevice<screen_device>("screen"));
+	screen.set_screen_update(FUNC(prestige_state::screen_update_2bpp));
+	screen.set_size(160, 80);
+	screen.set_visarea(0, 160-1, 0, 80-1);
 
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(4)
-	MCFG_PALETTE_INIT_OWNER(prestige_state, glcolor)
+	subdevice<palette_device>("palette")->set_entries(4).set_init(FUNC(prestige_state::glcolor_palette));
 
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "glcolor")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("snotec_cart", "snotec")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cart_list").set_original("glcolor");
+	SOFTWARE_LIST(config, "snotec_cart").set_compatible("snotec");
+}
 
-MACHINE_CONFIG_START(prestige_state::glmcolor)
+void prestige_state::glmcolor(machine_config &config)
+{
 	glcolor(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(prestige_io)
-MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(prestige_state::snotec)
+	m_maincpu->set_addrmap(AS_IO, &prestige_state::prestige_io);
+}
+
+void prestige_state::snotec(machine_config &config)
+{
 	glcolor(config);
-	MCFG_SOFTWARE_LIST_REMOVE("cart_list")
-	MCFG_SOFTWARE_LIST_REMOVE("snotec_cart")
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "snotec")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("glcolor_cart", "glcolor")
-MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(prestige_state::prestige)
-	prestige_base(config);
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("gl6000sl_cart", "gl6000sl")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("misterx_cart", "misterx")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("gl2000_cart", "gl2000")
-MACHINE_CONFIG_END
+	config.device_remove("snotec_cart");
+	SOFTWARE_LIST(config.replace(), "cart_list").set_original("snotec");
+	SOFTWARE_LIST(config, "glcolor_cart").set_compatible("glcolor");
+}
 
-MACHINE_CONFIG_START(prestige_state::gl6000sl)
+void prestige_state::prestige(machine_config &config)
+{
 	prestige_base(config);
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "gl6000sl")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("misterx_cart", "misterx")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("gl2000_cart", "gl2000")
-MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(prestige_state::gl7007sl)
-	prestige_base(config);
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("gl6000sl_cart", "gl6000sl")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("gl2000_cart", "gl2000")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("misterx_cart", "misterx")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "gl6000sl_cart").set_compatible("gl6000sl");
+	SOFTWARE_LIST(config, "misterx_cart").set_compatible("misterx");
+	SOFTWARE_LIST(config, "gl2000_cart").set_compatible("gl2000");
+}
 
-MACHINE_CONFIG_START(prestige_state::gjmovie)
+void prestige_state::gl6000sl(machine_config &config)
+{
 	prestige_base(config);
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "gjmovie")
-MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(prestige_state::princ)
+	SOFTWARE_LIST(config, "cart_list").set_original("gl6000sl");
+	SOFTWARE_LIST(config, "misterx_cart").set_compatible("misterx");
+	SOFTWARE_LIST(config, "gl2000_cart").set_compatible("gl2000");
+}
+
+void prestige_state::gl7007sl(machine_config &config)
+{
 	prestige_base(config);
-	MCFG_DEVICE_REMOVE("cartslot")
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "princ_cart")
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "princ")
-MACHINE_CONFIG_END
+
+	SOFTWARE_LIST(config, "gl6000sl_cart").set_compatible("gl6000sl");
+	SOFTWARE_LIST(config, "gl2000_cart").set_compatible("gl2000");
+	SOFTWARE_LIST(config, "misterx_cart").set_compatible("misterx");
+}
+
 
 /* ROM definition */
 ROM_START( gl6000sl )
@@ -886,55 +882,15 @@ ROM_START( glmcolor )
 	ROM_LOAD( "27-5673-00.u6", 0x00000, 0x100000, CRC(c4245392) SHA1(bb651aaf11b75f4155c0a0106de9394018110cc7) )
 ROM_END
 
-ROM_START( gj4000 )
+ROM_START( gmmc )
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD( "27-05886-000-000.u4", 0x000000, 0x40000, CRC(5f6db95b) SHA1(fe683154e33a82ea38696096616d11e850e0c7a3))
+	ROM_LOAD( "27-5889-00.bin", 0x080000, 0x080000, CRC(5e2c6359) SHA1(cc01c7bd5c87224b63dd1044db5a36a5cb7824f1) BAD_DUMP ) // very likely underdumped
+	ROM_RELOAD( 0x060000, 0x020000 )
+	ROM_CONTINUE( 0x040000, 0x020000 )
+	ROM_CONTINUE( 0x020000, 0x020000 )
+	ROM_CONTINUE( 0x000000, 0x020000 )
 ROM_END
 
-ROM_START( gj5000 )
-	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD( "27-6019-01.u2", 0x000000, 0x80000, CRC(946e5b7d) SHA1(80963d6ad80d49e54c8996bfc77ac135c4935be5))
-ROM_END
-
-ROM_START( gjmovie )
-	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD( "lh532hlk.bin", 0x000000, 0x40000, CRC(2e64c296) SHA1(604034f902e20851cb9af60964031a508ceef83e))
-ROM_END
-
-ROM_START( gjrstar )
-	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD( "27-5740-00.u1", 0x000000, 0x40000, CRC(ff3dc3bb) SHA1(bc16dfc1e12b0008456c700c431c8df6263b671f))
-ROM_END
-
-ROM_START( gjrstar2 )
-	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD( "27-5740-00.u1", 0x000000, 0x40000, CRC(ff3dc3bb) SHA1(bc16dfc1e12b0008456c700c431c8df6263b671f))     // identical to 'Genius Junior Redstar'
-ROM_END
-
-ROM_START( gjrstar3 )
-	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD( "54-06056-000-000.u3", 0x000000, 0x040000, CRC(72522179) SHA1(ede9491713ad018012cf925a519bcafe126f1ad3))
-ROM_END
-
-ROM_START( gl6600cx )
-	ROM_REGION( 0x200000, "maincpu", 0 )
-	ROM_LOAD( "54-06400-00.u1", 0x000000, 0x200000, CRC(b05cd075) SHA1(b1d9eb02ca56350eb9e89518db89c0a2a845ebd8))
-ROM_END
-
-ROM_START( gkidabc )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD("27-5730-00.bin", 0x00000, 0x20000, CRC(64664708) SHA1(74212c2dec1caa41dbc933b50f857904a8ac623b))
-ROM_END
-
-ROM_START( cars2lap )
-	ROM_REGION( 0x200000, "maincpu", 0 )
-	ROM_LOAD("n25s16.u6", 0x00000, 0x200000, CRC(ec1ba96e) SHA1(51b8844ae77adf20f74f268d380d268c9ce19785))
-ROM_END
-
-ROM_START( princ )
-	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD("29f800t.u4", 0x00000, 0x100000, CRC(30b6b864) SHA1(7ada3af85dd8dd3f95ca8965ad8e642c26445293))
-ROM_END
 
 
 /* Driver */
@@ -950,23 +906,4 @@ COMP( 1998, snotecu,  0,       0,      snotec,   glcolor,  prestige_state, empty
 COMP( 1998, gl7007sl, 0,       0,      gl7007sl, prestige, prestige_state, empty_init, "VTech",  "Genius Leader 7007SL (Germany)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 1998, prestige, 0,       0,      prestige, prestige, prestige_state, empty_init, "VTech",  "PreComputer Prestige Elite",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 1999, gwnf,     0,       0,      prestige, prestige, prestige_state, empty_init, "VTech",  "Genius Winner Notebook Fun (Germany)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-
-
-// these systems need to be moved into a separate driver
-COMP( 1996, gj4000,   0,       0,      prestige, prestige, prestige_state, empty_init, "VTech",  "Genius Junior 4000 (Germany)",         MACHINE_IS_SKELETON )
-COMP( 1996, gkidabc,  0,       0,      prestige, prestige, prestige_state, empty_init, "VTech",  "Genius KID ABC Fan (Germany)",         MACHINE_IS_SKELETON )
-COMP( 1993, gjmovie,  0,       0,      gjmovie,  prestige, prestige_state, empty_init, "VTech",  "Genius Junior Movie (Germany)",        MACHINE_IS_SKELETON )
-COMP( 1996, gjrstar,  0,       0,      prestige, prestige, prestige_state, empty_init, "VTech",  "Genius Junior Redstar(Germany)",       MACHINE_IS_SKELETON )
-COMP( 1996, gjrstar2, gjrstar, 0,      prestige, prestige, prestige_state, empty_init, "VTech",  "Genius Junior Redstar 2 (Germany)",    MACHINE_IS_SKELETON )
-COMP( 1998, gjrstar3, 0,       0,      prestige, prestige, prestige_state, empty_init, "VTech",  "Genius Junior Redstar 3 (Germany)",    MACHINE_IS_SKELETON )
-COMP( 1998, gj5000,   0,       0,      prestige, prestige, prestige_state, empty_init, "VTech",  "Genius Junior 5000 (Germany)",         MACHINE_IS_SKELETON )
-COMP( 2012, cars2lap, 0,       0,      prestige, prestige, prestige_state, empty_init, "VTech",  "CARS 2 Laptop (Germany)",              MACHINE_IS_SKELETON )
-
-
-// gl6600cx use a NSC1028 system-on-a-chip designed by National Semiconductor specifically for VTech
-// http://web.archive.org/web/19991127134657/http://www.national.com/news/item/0,1735,425,00.html
-COMP( 1999, gl6600cx, 0,       0,      prestige, prestige, prestige_state, empty_init, "VTech",  "Genius Leader 6600CX (Germany)",       MACHINE_IS_SKELETON )
-
-// TODO: move into a separate driver
-// Prin-C use a Fujitsu MB90611A MCU (F2MC-16L)
-COMP( ????, princ,    0,       0,      princ,    prestige, prestige_state, empty_init, "Tomy",   "Prin-C",                               MACHINE_IS_SKELETON )
+COMP( 19??, gmmc,     0,       0,      prestige, prestige, prestige_state, empty_init, "VTech",  "Genius Master Mega Color (Germany)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

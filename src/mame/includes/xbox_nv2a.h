@@ -14,13 +14,13 @@
 #include <mutex>
 
 class vertex_program_disassembler {
-	static const char *srctypes[];
-	static const char *scaops[];
-	static const int scapar2[];
-	static const char *vecops[];
-	static const int vecpar2[];
-	static const char *vecouts[];
-	static const char compchar[];
+	static char const *const srctypes[];
+	static char const *const scaops[];
+	static int const scapar2[];
+	static char const *const vecops[];
+	static int const vecpar2[];
+	static char const *const vecouts[];
+	static char const compchar[];
 	int o[6];
 	int state;
 
@@ -503,6 +503,7 @@ public:
 	void debug_grab_texture(int type, const char *filename);
 	void debug_grab_vertex_program_slot(int slot, uint32_t *instruction);
 	void start(address_space *cpu_space);
+	void set_ram_base(void *base);
 	void savestate_items();
 	void compute_supersample_factors(float &horizontal, float &vertical);
 	void compute_limits_rendertarget(uint32_t chanel, uint32_t subchannel);

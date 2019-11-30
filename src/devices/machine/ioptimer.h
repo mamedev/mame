@@ -14,15 +14,12 @@
 
 #pragma once
 
-#define MCFG_IOP_TIMER_IRQ_CALLBACK(_write) \
-	downcast<iop_timer_device &>(*device).set_int_cb(DEVCB_##_write);
-
 class iop_timer_device : public device_t
 {
 public:
 	iop_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_int_cb(Object &&cb) { return m_int_cb.set_callback(std::forward<Object>(cb)); }
+	auto irq() { return m_int_cb.bind(); }
 
 	DECLARE_READ32_MEMBER(read);
 	DECLARE_WRITE32_MEMBER(write);

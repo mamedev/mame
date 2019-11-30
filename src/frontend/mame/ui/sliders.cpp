@@ -115,15 +115,25 @@ void menu_sliders::handle()
 			// if we got here via up or page up, select the previous item
 			if (menu_event->iptkey == IPT_UI_UP || menu_event->iptkey == IPT_UI_PAGE_UP)
 			{
-				selected = (selected + item.size() - 1) % item.size();
-				validate_selection(-1);
+				if (is_first_selected())
+					select_last_item();
+				else
+				{
+					set_selected_index(selected_index() - 1);
+					validate_selection(-1);
+				}
 			}
 
 			// otherwise select the next item
 			else if (menu_event->iptkey == IPT_UI_DOWN || menu_event->iptkey == IPT_UI_PAGE_DOWN)
 			{
-				selected = (selected + 1) % item.size();
-				validate_selection(1);
+				if (is_last_selected())
+					select_first_item();
+				else
+				{
+					set_selected_index(selected_index() + 1);
+					validate_selection(1);
+				}
 			}
 		}
 	}
@@ -146,13 +156,19 @@ void menu_sliders::populate(float &customtop, float &custombottom)
 		if (item.type == menu_item_type::SLIDER)
 		{
 			slider_state* slider = reinterpret_cast<slider_state *>(item.ref);
-			int32_t curval = slider->update(machine(), slider->arg, slider->id, &tempstring, SLIDER_NOCHANGE);
-			uint32_t flags = 0;
-			if (curval > slider->minval)
-				flags |= FLAG_LEFT_ARROW;
-			if (curval < slider->maxval)
-				flags |= FLAG_RIGHT_ARROW;
-			item_append(slider->description, tempstring, flags, (void *)slider, menu_item_type::SLIDER);
+			bool display(true);
+			if (slider->id >= SLIDER_ID_ADJUSTER && slider->id <= SLIDER_ID_ADJUSTER_LAST)
+				display = reinterpret_cast<ioport_field *>(slider->arg)->enabled();
+			if (display)
+			{
+				int32_t curval = slider->update(machine(), slider->arg, slider->id, &tempstring, SLIDER_NOCHANGE);
+				uint32_t flags = 0;
+				if (curval > slider->minval)
+					flags |= FLAG_LEFT_ARROW;
+				if (curval < slider->maxval)
+					flags |= FLAG_RIGHT_ARROW;
+				item_append(slider->description, tempstring, flags, (void *)slider, menu_item_type::SLIDER);
+			}
 		}
 		else
 		{
@@ -183,7 +199,7 @@ void menu_sliders::populate(float &customtop, float &custombottom)
 		}
 	}
 
-	custombottom = 2.0f * ui().get_line_height() + 2.0f * UI_BOX_TB_BORDER;
+	custombottom = 2.0f * ui().get_line_height() + 2.0f * ui().box_tb_border();
 }
 
 //-------------------------------------------------
@@ -214,23 +230,24 @@ void menu_sliders::custom_render(void *selectedref, float top, float bottom, flo
 		tempstring.insert(0, " ").insert(0, curslider->description);
 
 		// move us to the bottom of the screen, and expand to full width
-		y2 = 1.0f - UI_BOX_TB_BORDER;
+		const float lr_border = ui().box_lr_border() * machine().render().ui_aspect(&container());
+		y2 = 1.0f - ui().box_tb_border();
 		y1 = y2 - bottom;
-		x1 = UI_BOX_LR_BORDER;
-		x2 = 1.0f - UI_BOX_LR_BORDER;
+		x1 = lr_border;
+		x2 = 1.0f - lr_border;
 
 		// draw extra menu area
-		ui().draw_outlined_box(container(), x1, y1, x2, y2, UI_BACKGROUND_COLOR);
-		y1 += UI_BOX_TB_BORDER;
+		ui().draw_outlined_box(container(), x1, y1, x2, y2, ui().colors().background_color());
+		y1 += ui().box_tb_border();
 
 		// determine the text height
-		ui().draw_text_full(container(), tempstring.c_str(), 0, 0, x2 - x1 - 2.0f * UI_BOX_LR_BORDER,
+		ui().draw_text_full(container(), tempstring.c_str(), 0, 0, x2 - x1 - 2.0f * lr_border,
 					ui::text_layout::CENTER, ui::text_layout::TRUNCATE, mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), nullptr, &text_height);
 
 		// draw the thermometer
-		bar_left = x1 + UI_BOX_LR_BORDER;
+		bar_left = x1 + lr_border;
 		bar_area_top = y1;
-		bar_width = x2 - x1 - 2.0f * UI_BOX_LR_BORDER;
+		bar_width = x2 - x1 - 2.0f * lr_border;
 		bar_area_height = line_height;
 
 		// compute positions
@@ -240,19 +257,19 @@ void menu_sliders::custom_render(void *selectedref, float top, float bottom, flo
 		current_x = bar_left + bar_width * percentage;
 
 		// fill in the percentage
-		container().add_rect(bar_left, bar_top, current_x, bar_bottom, UI_SLIDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+		container().add_rect(bar_left, bar_top, current_x, bar_bottom, ui().colors().slider_color(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
 		// draw the top and bottom lines
-		container().add_line(bar_left, bar_top, bar_left + bar_width, bar_top, UI_LINE_WIDTH, UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-		container().add_line(bar_left, bar_bottom, bar_left + bar_width, bar_bottom, UI_LINE_WIDTH, UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+		container().add_line(bar_left, bar_top, bar_left + bar_width, bar_top, UI_LINE_WIDTH, ui().colors().border_color(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+		container().add_line(bar_left, bar_bottom, bar_left + bar_width, bar_bottom, UI_LINE_WIDTH, ui().colors().border_color(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
 		// draw default marker
-		container().add_line(default_x, bar_area_top, default_x, bar_top, UI_LINE_WIDTH, UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-		container().add_line(default_x, bar_bottom, default_x, bar_area_top + bar_area_height, UI_LINE_WIDTH, UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+		container().add_line(default_x, bar_area_top, default_x, bar_top, UI_LINE_WIDTH, ui().colors().border_color(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+		container().add_line(default_x, bar_bottom, default_x, bar_area_top + bar_area_height, UI_LINE_WIDTH, ui().colors().border_color(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
 		// draw the actual text
-		ui().draw_text_full(container(), tempstring.c_str(), x1 + UI_BOX_LR_BORDER, y1 + line_height, x2 - x1 - 2.0f * UI_BOX_LR_BORDER,
-					ui::text_layout::CENTER, ui::text_layout::WORD, mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, &text_height);
+		ui().draw_text_full(container(), tempstring.c_str(), x1 + lr_border, y1 + line_height, x2 - x1 - 2.0f * lr_border,
+					ui::text_layout::CENTER, ui::text_layout::WORD, mame_ui_manager::NORMAL, ui().colors().text_color(), ui().colors().text_bg_color(), nullptr, &text_height);
 	}
 }
 

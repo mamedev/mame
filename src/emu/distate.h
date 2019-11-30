@@ -64,6 +64,7 @@ public:
 	int index() const { return m_index; }
 	void *dataptr() const { return entry_baseptr(); }
 	u64 datamask() const { return m_datamask; }
+	u8 datasize() const { return m_datasize; }
 	const char *symbol() const { return m_symbol.c_str(); }
 	bool visible() const { return ((m_flags & DSF_NOSHOW) == 0); }
 	bool writeable() const { return ((m_flags & DSF_READONLY) == 0); }
@@ -250,6 +251,9 @@ public:
 	void set_state_string(int index, const char *string);
 	void set_pc(offs_t pc) { set_state_int(STATE_GENPC, pc); }
 
+	// find the entry for a given index
+	const device_state_entry *state_find_entry(int index) const;
+
 	// deliberately ambiguous functions; if you have the state interface
 	// just use it directly
 	device_state_interface &state() { return *this; }
@@ -292,9 +296,6 @@ protected:
 
 	// internal operation overrides
 	virtual void interface_post_start() override;
-
-	// find the entry for a given index
-	const device_state_entry *state_find_entry(int index) const;
 
 	// constants
 	static constexpr int FAST_STATE_MIN = -4;                           // range for fast state

@@ -342,7 +342,7 @@ void vk100_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 		execute_vg(ptr, param);
 		break;
 	default:
-		assert_always(false, "Unknown id in vk100_state::device_timer");
+		throw emu_fatalerror("Unknown id in vk100_state::device_timer");
 	}
 }
 
@@ -747,22 +747,20 @@ void vk100_state::vk100_io(address_map &map)
 	map(0x47, 0x47).mirror(0x98).w(FUNC(vk100_state::vgPMUL));   //LD PMUL (pattern multiplier)
 	map(0x60, 0x63).mirror(0x80).w(FUNC(vk100_state::vgREG));     //LD DU, DVM, DIR, WOPS (register file)
 	map(0x64, 0x67).mirror(0x80).w(FUNC(vk100_state::vgEX));    //EX MOV, DOT, VEC, ER
-	map(0x68, 0x68).mirror(0x83).w(FUNC(vk100_state::KBDW));   //KBDW (probably AM_MIRROR(0x03))
-	map(0x6C, 0x6C).mirror(0x83).w(COM5016T_TAG, FUNC(com8116_device::stt_str_w));   //LD BAUD (baud rate clock divider setting for i8251 tx and rx clocks) (probably AM_MIRROR(0x03))
-	map(0x70, 0x70).mirror(0x82).w(m_uart, FUNC(i8251_device::data_w)); //LD COMD (i8251 data reg)
-	map(0x71, 0x71).mirror(0x82).w(m_uart, FUNC(i8251_device::control_w)); //LD COM (i8251 control reg)
-	//AM_RANGE (0x74, 0x74) AM_MIRROR(0x83) AM_WRITE(unknown_74)
-	//AM_RANGE (0x78, 0x78) AM_MIRROR(0x83) AM_WRITE(kbdw)   //KBDW ?(mirror?)
-	//AM_RANGE (0x7C, 0x7C) AM_MIRROR(0x83) AM_WRITE(unknown_7C)
+	map(0x68, 0x68).mirror(0x83).w(FUNC(vk100_state::KBDW));   //KBDW (probably mirror(0x03))
+	map(0x6C, 0x6C).mirror(0x83).w(COM5016T_TAG, FUNC(com8116_device::stt_str_w));   //LD BAUD (baud rate clock divider setting for i8251 tx and rx clocks) (probably mirror(0x03))
+	map(0x70, 0x71).mirror(0x82).w(m_uart, FUNC(i8251_device::write)); //LD COMD
+	//map(0x74, 0x74).mirror(0x83).w(FUNC(vk100_state::unknown_74));
+	//map(0x78, 0x78).mirror(0x83).w(FUNC(vk100_state::kbdw));   //KBDW ?(mirror?)
+	//map(0x7C, 0x7C).mirror(0x83).w(FUNC(vk100_state::unknown_7C));
 	map(0x40, 0x47).mirror(0x80).r(FUNC(vk100_state::SYSTAT_A)); // SYSTAT A (state machine done and last 4 bits of vram, as well as dipswitches)
 	map(0x48, 0x48).mirror(0x87/*0x80*/).r(FUNC(vk100_state::SYSTAT_B)); // SYSTAT B (uart stuff)
-	map(0x50, 0x50).mirror(0x86).r(m_uart, FUNC(i8251_device::data_r)); // UART O
-	map(0x51, 0x51).mirror(0x86).r(m_uart, FUNC(i8251_device::status_r)); // UAR
-	//AM_RANGE (0x58, 0x58) AM_MIRROR(0x87) AM_READ(unknown_58)
-	//AM_RANGE (0x60, 0x60) AM_MIRROR(0x87) AM_READ(unknown_60)
-	//AM_RANGE (0x68, 0x68) AM_MIRROR(0x87) AM_READ(unknown_68) // NOT USED
-	//AM_RANGE (0x70, 0x70) AM_MIRROR(0x87) AM_READ(unknown_70)
-	//AM_RANGE (0x78, 0x7f) AM_MIRROR(0x87) AM_READ(unknown_78)
+	map(0x50, 0x51).mirror(0x86).r(m_uart, FUNC(i8251_device::read)); // UART O
+	//map(0x58, 0x58).mirror(0x87).r(FUNC(vk100_state::unknown_58));
+	//map(0x60, 0x60).mirror(0x87).r(FUNC(vk100_state::unknown_60));
+	//map(0x68, 0x68).mirror(0x87).r(FUNC(vk100_state::unknown_68)); // NOT USED
+	//map(0x70, 0x70).mirror(0x87).r(FUNC(vk100_state::unknown_70));
+	//map(0x78, 0x7f).mirror(0x87).r(FUNC(vk100_state::unknown_78));
 }
 
 /* Input ports */
@@ -1033,21 +1031,23 @@ MC6845_UPDATE_ROW( vk100_state::crtc_update_row )
 }
 
 
-MACHINE_CONFIG_START(vk100_state::vk100)
+void vk100_state::vk100(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8085A, XTAL(5'068'800))
-	MCFG_DEVICE_PROGRAM_MAP(vk100_mem)
-	MCFG_DEVICE_IO_MAP(vk100_io)
+	I8085A(config, m_maincpu, XTAL(5'068'800));
+	m_maincpu->set_addrmap(AS_PROGRAM, &vk100_state::vk100_mem);
+	m_maincpu->set_addrmap(AS_IO, &vk100_state::vk100_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(45'619'200)/3, 882, 0, 720, 370, 0, 350 ) // fake screen timings for startup until 6845 sets real ones
-	MCFG_SCREEN_UPDATE_DEVICE( "crtc", mc6845_device, screen_update )
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(45'619'200)/3, 882, 0, 720, 370, 0, 350 ); // fake screen timings for startup until 6845 sets real ones
+	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
-	H46505(config, m_crtc, 45.6192_MHz_XTAL/3/12);
+	MC6845(config, m_crtc, 45.6192_MHz_XTAL/3/12); // unknown variant
+	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(12);
-	m_crtc->set_update_row_callback(FUNC(vk100_state::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(vk100_state::crtc_update_row));
 	m_crtc->out_vsync_callback().set(FUNC(vk100_state::crtc_vsync));
 
 	/* i8251 uart */
@@ -1070,7 +1070,7 @@ MACHINE_CONFIG_START(vk100_state::vk100)
 
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_speaker, 116).add_route(ALL_OUTPUTS, "mono", 0.25); // 116 hz (page 172 of TM), but duty cycle is wrong here!
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 /* according to http://www.computer.museum.uq.edu.au/pdf/EK-VK100-TM-001%20VK100%20Technical%20Manual.pdf

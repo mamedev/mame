@@ -53,19 +53,20 @@ UPD7220_DISPLAY_PIXELS_MEMBER( isa8_number_9_rev_device::hgdc_display_pixels )
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(isa8_number_9_rev_device::device_add_mconfig)
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_SIZE(512, 448)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 448-1)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_UPDATE_DRIVER(isa8_number_9_rev_device, screen_update)
-	MCFG_PALETTE_ADD("palette", 4096)
+void isa8_number_9_rev_device::device_add_mconfig(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_size(512, 448);
+	screen.set_visarea(0, 512-1, 0, 448-1);
+	screen.set_refresh_hz(60);
+	screen.set_screen_update(FUNC(isa8_number_9_rev_device::screen_update));
+	PALETTE(config, m_palette).set_entries(4096);
 
-	MCFG_DEVICE_ADD("upd7220", UPD7220, XTAL(4'433'619)/2) // unknown clock
-	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_map)
-	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(isa8_number_9_rev_device, hgdc_display_pixels)
-	MCFG_VIDEO_SET_SCREEN("screen")
-MACHINE_CONFIG_END
+	UPD7220(config, m_upd7220, XTAL(4'433'619)/2); // unknown clock
+	m_upd7220->set_addrmap(0, &isa8_number_9_rev_device::upd7220_map);
+	m_upd7220->set_display_pixels(FUNC(isa8_number_9_rev_device::hgdc_display_pixels));
+	m_upd7220->set_screen("screen");
+}
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -93,13 +94,13 @@ void isa8_number_9_rev_device::device_start()
 {
 	set_isa_device();
 
-	m_isa->install_memory(0xc0000, 0xc0001, read8_delegate(FUNC(upd7220_device::read), (upd7220_device *)m_upd7220), write8_delegate(FUNC(upd7220_device::write), (upd7220_device *)m_upd7220));
-	m_isa->install_memory(0xc0100, 0xc03ff, read8_delegate(FUNC(isa8_number_9_rev_device::pal8_r), this), write8_delegate(FUNC(isa8_number_9_rev_device::pal8_w), this));
-	m_isa->install_memory(0xc0400, 0xc0401, read8_delegate(FUNC(isa8_number_9_rev_device::bank_r), this), write8_delegate(FUNC(isa8_number_9_rev_device::bank_w), this));
-	m_isa->install_memory(0xc0500, 0xc06ff, read8_delegate(FUNC(isa8_number_9_rev_device::overlay_r), this), write8_delegate(FUNC(isa8_number_9_rev_device::overlay_w), this));
-	m_isa->install_memory(0xc0700, 0xc070f, read8_delegate(FUNC(isa8_number_9_rev_device::ctrl_r), this), write8_delegate(FUNC(isa8_number_9_rev_device::ctrl_w), this));
-	m_isa->install_memory(0xc1000, 0xc3fff, read8_delegate(FUNC(isa8_number_9_rev_device::pal12_r), this), write8_delegate(FUNC(isa8_number_9_rev_device::pal12_w), this));
-	m_isa->install_memory(0xa0000, 0xaffff, read8_delegate(FUNC(isa8_number_9_rev_device::read8), this), write8_delegate(FUNC(isa8_number_9_rev_device::write8), this));
+	m_isa->install_memory(0xc0000, 0xc0001, read8sm_delegate(*m_upd7220, FUNC(upd7220_device::read)), write8sm_delegate(*m_upd7220, FUNC(upd7220_device::write)));
+	m_isa->install_memory(0xc0100, 0xc03ff, read8_delegate(*this, FUNC(isa8_number_9_rev_device::pal8_r)), write8_delegate(*this, FUNC(isa8_number_9_rev_device::pal8_w)));
+	m_isa->install_memory(0xc0400, 0xc0401, read8_delegate(*this, FUNC(isa8_number_9_rev_device::bank_r)), write8_delegate(*this, FUNC(isa8_number_9_rev_device::bank_w)));
+	m_isa->install_memory(0xc0500, 0xc06ff, read8_delegate(*this, FUNC(isa8_number_9_rev_device::overlay_r)), write8_delegate(*this, FUNC(isa8_number_9_rev_device::overlay_w)));
+	m_isa->install_memory(0xc0700, 0xc070f, read8_delegate(*this, FUNC(isa8_number_9_rev_device::ctrl_r)), write8_delegate(*this, FUNC(isa8_number_9_rev_device::ctrl_w)));
+	m_isa->install_memory(0xc1000, 0xc3fff, read8_delegate(*this, FUNC(isa8_number_9_rev_device::pal12_r)), write8_delegate(*this, FUNC(isa8_number_9_rev_device::pal12_w)));
+	m_isa->install_memory(0xa0000, 0xaffff, read8_delegate(*this, FUNC(isa8_number_9_rev_device::read8)), write8_delegate(*this, FUNC(isa8_number_9_rev_device::write8)));
 }
 
 //-------------------------------------------------

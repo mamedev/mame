@@ -11,7 +11,7 @@
 
 /*
   The 054321 is a sound communication latch/volume manager chip, that
-  is integrated into the 054544 and 05489A hybrid chips.  The hybrid
+  is integrated into the 054544 and 054986A hybrid chips.  The hybrid
   chips also include the DACs, capacitors, etc needed for the audio
   output.
 
@@ -43,69 +43,51 @@ void k054321_device::main_map(address_map &map)
 	map(0x2, 0x2).w(FUNC(k054321_device::volume_reset_w));
 	map(0x3, 0x3).w(FUNC(k054321_device::volume_up_w));
 	map(0x4, 0x4).w(FUNC(k054321_device::dummy_w));
-	map(0x6, 0x6).w(FUNC(k054321_device::main1_w));
-	map(0x7, 0x7).w(FUNC(k054321_device::main2_w));
+	map(0x6, 0x6).w(m_soundlatch[0], FUNC(generic_latch_8_device::write));
+	map(0x7, 0x7).w(m_soundlatch[1], FUNC(generic_latch_8_device::write));
 	map(0x8, 0x8).r(FUNC(k054321_device::busy_r));
-	map(0xa, 0xa).r(FUNC(k054321_device::sound1_r));
+	map(0xa, 0xa).r(m_soundlatch[2], FUNC(generic_latch_8_device::read));
 }
 
 void k054321_device::sound_map(address_map &map)
 {
-	map(0x0, 0x0).w(FUNC(k054321_device::sound1_w));
-	map(0x2, 0x2).r(FUNC(k054321_device::main1_r));
-	map(0x3, 0x3).r(FUNC(k054321_device::main2_r));
+	map(0x0, 0x0).w(m_soundlatch[2], FUNC(generic_latch_8_device::write));
+	map(0x2, 0x2).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));
+	map(0x3, 0x3).r(m_soundlatch[1], FUNC(generic_latch_8_device::read));
 }
 
-k054321_device::k054321_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, K054321, tag, owner, clock),
-	  m_left(*this, finder_base::DUMMY_TAG),
-	  m_right(*this, finder_base::DUMMY_TAG)
+k054321_device::k054321_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, K054321, tag, owner, clock),
+	m_left(*this, finder_base::DUMMY_TAG),
+	m_right(*this, finder_base::DUMMY_TAG),
+	m_soundlatch(*this, "soundlatch%u", 0)
 {
-}
-
-void k054321_device::set_gain_devices(const char *_left, const char *_right)
-{
-	m_left.set_tag(_left);
-	m_right.set_tag(_right);
 }
 
 void k054321_device::device_start()
 {
-	save_item(NAME(m_main1));
-	save_item(NAME(m_main2));
-	save_item(NAME(m_sound1));
+	// make sure that device_sound_interface is configured
+	if (!m_left->inputs() && !m_right->inputs())
+		throw device_missing_dependencies();
+
+	// remember initial input gains
+	m_left_gains = std::make_unique<float[]>(m_left->inputs());
+	m_right_gains = std::make_unique<float[]>(m_right->inputs());
+
+	for (int i = 0; i < m_left->inputs(); i++)
+		m_left_gains[i] = m_left->input_gain(i);
+	for (int i = 0; i < m_right->inputs(); i++)
+		m_right_gains[i] = m_right->input_gain(i);
+
+	// register for savestates
 	save_item(NAME(m_volume));
 	save_item(NAME(m_active));
 }
 
-READ8_MEMBER( k054321_device::main1_r)
+void k054321_device::device_add_mconfig(machine_config &config)
 {
-	return m_main1;
-}
-
-WRITE8_MEMBER(k054321_device::main1_w)
-{
-	m_main1 = data;
-}
-
-READ8_MEMBER( k054321_device::main2_r)
-{
-	return m_main2;
-}
-
-WRITE8_MEMBER(k054321_device::main2_w)
-{
-	m_main2 = data;
-}
-
-READ8_MEMBER( k054321_device::sound1_r)
-{
-	return m_sound1;
-}
-
-WRITE8_MEMBER(k054321_device::sound1_w)
-{
-	m_sound1 = data;
+	for (int i = 0; i < 3; i++)
+		GENERIC_LATCH_8(config, m_soundlatch[i]);
 }
 
 WRITE8_MEMBER(k054321_device::volume_reset_w)
@@ -116,8 +98,12 @@ WRITE8_MEMBER(k054321_device::volume_reset_w)
 
 WRITE8_MEMBER(k054321_device::volume_up_w)
 {
-	m_volume ++;
-	propagate_volume();
+	// assume that max volume is 64
+	if (data && m_volume < 64)
+	{
+		m_volume++;
+		propagate_volume();
+	}
 }
 
 READ8_MEMBER(k054321_device::busy_r)
@@ -140,6 +126,9 @@ WRITE8_MEMBER(k054321_device::dummy_w)
 void k054321_device::propagate_volume()
 {
 	double vol = pow(2, (m_volume - 40)/10.0);
-	m_left->set_input_gain(0, m_active & 2 ? vol : 0.0);
-	m_right->set_input_gain(0, m_active & 1 ? vol : 0.0);
+
+	for (int i = 0; i < m_left->inputs(); i++)
+		m_left->set_input_gain(i, m_active & 2 ? vol * m_left_gains[i] : 0.0);
+	for (int i = 0; i < m_right->inputs(); i++)
+		m_right->set_input_gain(i, m_active & 1 ? vol * m_right_gains[i] : 0.0);
 }

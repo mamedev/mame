@@ -10,6 +10,9 @@
  Dam Dam Boy (ダムダム　ボーイ)
  (c) 1995 Konami
 
+ Buttobi Striker
+ (c) 1994 Konami
+
  Driver by R. Belmont
 
 Rundown of PCB:
@@ -22,6 +25,7 @@ Konami Custom chips:
 054157 (tilemaps)
 
  Shuriken Boy
+ Fuusen Pentai
 
 Konami Custom chips:
 K052109 (tilemaps)
@@ -37,6 +41,7 @@ K051649 (sound)
 #include "sound/ymz280b.h"
 #include "sound/okim6295.h"
 #include "sound/k051649.h"
+#include "sound/upd7759.h"
 #include "video/k054156_k054157_k056832.h"
 #include "video/k052109.h"
 #include "video/konami_helper.h"
@@ -54,15 +59,17 @@ public:
 		m_k052109(*this, "k052109"),
 		m_palette(*this, "palette"),
 		m_ymz(*this, "ymz"),
-		m_oki(*this, "oki")
+		m_oki(*this, "oki"),
+		m_upd7759(*this, "upd7759")
 	{ }
 
 	void shuriboy(machine_config &config);
 	void ddboy(machine_config &config);
 	void tsukande(machine_config &config);
+	void fuusenpn(machine_config &config);
 
 private:
-	DECLARE_PALETTE_INIT(konmedal);
+	void konmedal_palette(palette_device &palette) const;
 	DECLARE_MACHINE_START(shuriboy);
 
 	DECLARE_READ8_MEMBER(vram_r);
@@ -77,17 +84,16 @@ private:
 
 	uint32_t screen_update_konmedal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_shuriboy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_fuusenpn(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 	INTERRUPT_GEN_MEMBER(konmedal_interrupt);
 	K056832_CB_MEMBER(tile_callback);
 
 	K052109_CB_MEMBER(shuriboy_tile_callback);
+	K052109_CB_MEMBER(fuusenpn_tile_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 	DECLARE_WRITE8_MEMBER(shuri_bank_w);
-	DECLARE_READ8_MEMBER(shuri_video_r);
-	DECLARE_WRITE8_MEMBER(shuri_video_w);
 	DECLARE_WRITE8_MEMBER(shuri_control_w);
-	DECLARE_WRITE8_MEMBER(shuri_vrom_addr_w);
-	DECLARE_WRITE8_MEMBER(shuri_vrom_bank_w);
 	DECLARE_READ8_MEMBER(shuri_irq_r);
 	DECLARE_WRITE8_MEMBER(shuri_irq_w);
 
@@ -105,6 +111,7 @@ private:
 	required_device<palette_device> m_palette;
 	optional_device<ymz280b_device> m_ymz;
 	optional_device<okim6295_device> m_oki;
+	optional_device<upd7759_device> m_upd7759;
 
 	u8 m_control, m_control2, m_shuri_irq;
 	u32 m_vrom_base;
@@ -122,16 +129,16 @@ READ8_MEMBER(konmedal_state::vram_r)
 	{
 		if (offset & 1)
 		{
-			return m_k056832->ram_code_hi_r(space, offset>>1);
+			return m_k056832->ram_code_hi_r(offset>>1);
 		}
 		else
 		{
-			return m_k056832->ram_code_lo_r(space, offset>>1);
+			return m_k056832->ram_code_lo_r(offset>>1);
 		}
 	}
 	else if (m_control == 0)    // ROM readback
 	{
-		return m_k056832->konmedal_rom_r(space, offset);
+		return m_k056832->konmedal_rom_r(offset);
 	}
 
 	return 0;
@@ -144,11 +151,11 @@ WRITE8_MEMBER(konmedal_state::vram_w)
 
 	if (offset & 1)
 	{
-		m_k056832->ram_code_hi_w(space, offset>>1, data);
+		m_k056832->ram_code_hi_w(offset>>1, data);
 		return;
 	}
 
-	m_k056832->ram_code_lo_w(space, offset>>1, data);
+	m_k056832->ram_code_lo_w(offset>>1, data);
 }
 
 READ8_MEMBER(konmedal_state::magic_r)
@@ -177,7 +184,6 @@ void konmedal_state::video_start()
 
 uint32_t konmedal_state::screen_update_konmedal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-//  bitmap.fill(m_back_colorbase, cliprect);
 	bitmap.fill(0, cliprect);
 	screen.priority().fill(0, cliprect);
 
@@ -192,25 +198,37 @@ uint32_t konmedal_state::screen_update_shuriboy(screen_device &screen, bitmap_in
 	bitmap.fill(0, cliprect);
 	screen.priority().fill(0, cliprect);
 
-	m_k052109->tilemap_draw(screen, bitmap, cliprect, 0, 0, 1);
+	m_k052109->tilemap_update();
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, 2, 0, 1);
 	m_k052109->tilemap_draw(screen, bitmap, cliprect, 1, 0, 2);
-	m_k052109->tilemap_draw(screen, bitmap, cliprect, 2, 0, 4);
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, 0, 0, 4);
 
 	return 0;
 }
 
-PALETTE_INIT_MEMBER(konmedal_state, konmedal)
+uint32_t konmedal_state::screen_update_fuusenpn(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int i;
-	uint8_t *PROM = memregion("proms")->base();
+	bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 
-	for (i = 0; i < 256; i++)
+	m_k052109->tilemap_update();
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, 0, 0, 4);
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, 1, 0, 2);
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, 2, 0, 1);
+
+	return 0;
+}
+void konmedal_state::konmedal_palette(palette_device &palette) const
+{
+	uint8_t const *const PROM = memregion("proms")->base();
+
+	for (int i = 0; i < 256; i++)
 	{
 		// this is extremely wrong, see the color test screen
 		palette.set_pen_color(i,
-			PROM[i]<<4,
-			PROM[0x100+i]<<4,
-			PROM[0x200+i]<<4);
+				(PROM[i]) << 4,
+				(PROM[0x100 + i]) << 4,
+				(PROM[0x200 + i]) << 4);
 	}
 }
 
@@ -274,16 +292,16 @@ void konmedal_state::shuriboy_main(address_map &map)
 	map(0x8801, 0x8801).portr("IN1");
 	map(0x8802, 0x8802).portr("DSW1");
 	map(0x8803, 0x8803).portr("DSW2");
+	map(0x8900, 0x8900).nopw();
 	map(0x8b00, 0x8b00).nopw();    // watchdog?
 	map(0x8c00, 0x8c00).w(FUNC(konmedal_state::shuri_bank_w));
+	map(0x8d00, 0x8d00).w(m_upd7759, FUNC(upd7759_device::port_w));
+	map(0x9000, 0x9000).nopw();     // writes alternating 00 and 3F
 	map(0x9800, 0x98ff).m("k051649", FUNC(k051649_device::scc_map));
 	map(0xa000, 0xbfff).bankr("bank1");
-	map(0xc000, 0xdbff).rw(m_k052109, FUNC(k052109_device::read), FUNC(k052109_device::write));
+	map(0xc000, 0xffff).rw(m_k052109, FUNC(k052109_device::read), FUNC(k052109_device::write));
 	map(0xdd00, 0xdd00).rw(FUNC(konmedal_state::shuri_irq_r), FUNC(konmedal_state::shuri_irq_w));
 	map(0xdd80, 0xdd80).w(FUNC(konmedal_state::shuri_control_w));
-	map(0xde00, 0xde00).w(FUNC(konmedal_state::shuri_vrom_addr_w));
-	map(0xdf00, 0xdf00).w(FUNC(konmedal_state::shuri_vrom_bank_w));
-	map(0xe000, 0xffff).rw(FUNC(konmedal_state::shuri_video_r), FUNC(konmedal_state::shuri_video_w));
 }
 
 static INPUT_PORTS_START( konmedal )
@@ -381,74 +399,70 @@ void konmedal_state::machine_reset()
 	m_control = m_control2 = m_shuri_irq = 0;
 }
 
-MACHINE_CONFIG_START(konmedal_state::tsukande)
+void konmedal_state::tsukande(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(14'318'181)/2) // z84c0008pec 8mhz part, 14.31818Mhz xtal verified on PCB, divisor unknown
-	MCFG_DEVICE_PROGRAM_MAP(medal_main)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", konmedal_state, konmedal_interrupt)
+	Z80(config, m_maincpu, XTAL(14'318'181)/2); // z84c0008pec 8mhz part, 14.31818Mhz xtal verified on PCB, divisor unknown
+	m_maincpu->set_addrmap(AS_PROGRAM, &konmedal_state::medal_main);
+	m_maincpu->set_vblank_int("screen", FUNC(konmedal_state::konmedal_interrupt));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59.62)  /* verified on pcb */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(80, 400-1, 16, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(konmedal_state, screen_update_konmedal)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(59.62);  /* verified on pcb */
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(80, 400-1, 16, 240-1);
+	screen.set_screen_update(FUNC(konmedal_state::screen_update_konmedal));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 8192)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_PALETTE_INIT_OWNER(konmedal_state, konmedal)
+	PALETTE(config, m_palette, FUNC(konmedal_state::konmedal_palette)).set_format(palette_device::xRGB_444, 256);
+	//m_palette->enable_shadows();
 
-	MCFG_DEVICE_ADD("k056832", K056832, 0)
-	MCFG_K056832_CB(konmedal_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4, 1, 0)
-	MCFG_K056832_PALETTE("palette")
+	K056832(config, m_k056832, 0);
+	m_k056832->set_tile_callback(FUNC(konmedal_state::tile_callback));
+	m_k056832->set_config(K056832_BPP_4, 1, 0);
+	m_k056832->set_palette(m_palette);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymz", YMZ280B, XTAL(16'934'400)) // 16.9344MHz xtal verified on PCB
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	YMZ280B(config, m_ymz, XTAL(16'934'400)); // 16.9344MHz xtal verified on PCB
+	m_ymz->add_route(0, "lspeaker", 1.0);
+	m_ymz->add_route(1, "rspeaker", 1.0);
+}
 
-MACHINE_CONFIG_START(konmedal_state::ddboy)
+void konmedal_state::ddboy(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(14'318'181)/2) // z84c0008pec 8mhz part, 14.31818Mhz xtal verified on PCB, divisor unknown
-	MCFG_DEVICE_PROGRAM_MAP(ddboy_main)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", konmedal_state, konmedal_interrupt)
+	Z80(config, m_maincpu, XTAL(14'318'181)/2); // z84c0008pec 8mhz part, 14.31818Mhz xtal verified on PCB, divisor unknown
+	m_maincpu->set_addrmap(AS_PROGRAM, &konmedal_state::ddboy_main);
+	m_maincpu->set_vblank_int("screen", FUNC(konmedal_state::konmedal_interrupt));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59.62)  /* verified on pcb */
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(80, 400-1, 16, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(konmedal_state, screen_update_konmedal)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(59.62);  /* verified on pcb */
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(80, 400-1, 16, 240-1);
+	screen.set_screen_update(FUNC(konmedal_state::screen_update_konmedal));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 8192)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_PALETTE_INIT_OWNER(konmedal_state, konmedal)
+	PALETTE(config, m_palette, FUNC(konmedal_state::konmedal_palette)).set_format(palette_device::xRGB_444, 256);
+	//m_palette->enable_shadows();
 
-	MCFG_DEVICE_ADD("k056832", K056832, 0)
-	MCFG_K056832_CB(konmedal_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4, 1, 0)
-	MCFG_K056832_PALETTE("palette")
+	K056832(config, m_k056832, 0);
+	m_k056832->set_tile_callback(FUNC(konmedal_state::tile_callback));
+	m_k056832->set_config(K056832_BPP_4, 1, 0);
+	m_k056832->set_palette(m_palette);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(14'318'181)/14, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(0, "mono", 1.0)
-	MCFG_SOUND_ROUTE(1, "mono", 1.0)
+	OKIM6295(config, m_oki, XTAL(14'318'181)/14, okim6295_device::PIN7_HIGH);
+	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_K051649_ADD("k051649", XTAL(14'318'181)/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
-MACHINE_CONFIG_END
+	K051649(config, "k051649", XTAL(14'318'181)/8).add_route(ALL_OUTPUTS, "mono", 0.45);
+}
 
 /*
 Shuriken Boy
@@ -465,28 +479,27 @@ Dips: 2 x 8 dips bank
 
 K052109_CB_MEMBER(konmedal_state::shuriboy_tile_callback)
 {
-	*code |= ((*color & 0x03) << 8) | (*color & 0x40);
+	*code |= ((*color & 0xc) << 6) | (bank << 10);
+	if (*color & 0x2) *code |= 0x1000;
+	*flags = (*color & 0x1) ? TILE_FLIPX : 0;
+	u8 col = *color;
+	*color = (col >> 4);
+	if (layer > 0) *color |= 8;
+}
+
+K052109_CB_MEMBER(konmedal_state::fuusenpn_tile_callback)
+{
+	*code |= ((*color & 0xc) << 6) | (bank << 10);
+	if (*color & 0x2) *code |= 0x1000;
+	*flags = (*color & 0x1) ? TILE_FLIPX : 0;
+	u8 col = *color;
+	*color = (col >> 4);
+	*color |= 8;
 }
 
 WRITE8_MEMBER(konmedal_state::shuri_bank_w)
 {
 	membank("bank1")->set_entry(data&0x3);
-}
-
-READ8_MEMBER(konmedal_state::shuri_video_r)
-{
-	if (!(m_control & 0x10))
-	{
-		return m_k052109->read(space, offset+0x2000);
-	}
-
-	uint8_t *ROM = memregion("k052109")->base();
-	return ROM[offset + m_vrom_base];
-}
-
-WRITE8_MEMBER(konmedal_state::shuri_video_w)
-{
-	m_k052109->write(space, offset+0x2000, data);
 }
 
 READ8_MEMBER(konmedal_state::shuri_irq_r)
@@ -527,61 +540,65 @@ TIMER_DEVICE_CALLBACK_MEMBER(konmedal_state::scanline)
 WRITE8_MEMBER(konmedal_state::shuri_control_w)
 {
 	m_control = data;
+	m_k052109->set_rmrd_line((m_control & 0x10) ? ASSERT_LINE : CLEAR_LINE);
+	m_k052109->write(offset+0x1d80, data);
 }
 
-WRITE8_MEMBER(konmedal_state::shuri_vrom_addr_w)
+void konmedal_state::shuriboy(machine_config &config)
 {
-	m_vrom_base &= ~0xf000;
-	m_vrom_base |= (data << 12);
-}
-
-WRITE8_MEMBER(konmedal_state::shuri_vrom_bank_w)
-{
-	m_vrom_base &= ~0xf0000;
-	data &= 0xc0;
-	m_vrom_base |= (data << 10);
-}
-
-MACHINE_CONFIG_START(konmedal_state::shuriboy)
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(24'000'000) / 3) // divisor unknown
-	MCFG_DEVICE_PROGRAM_MAP(shuriboy_main)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", konmedal_state, scanline, "screen", 0, 1)
+	Z80(config, m_maincpu, XTAL(24'000'000) / 3); // divisor unknown
+	m_maincpu->set_addrmap(AS_PROGRAM, &konmedal_state::shuriboy_main);
+	TIMER(config, "scantimer").configure_scanline(FUNC(konmedal_state::scanline), "screen", 0, 1);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER) // everything not verified, just a placeholder
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(30))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(80, 400-1, 16, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(konmedal_state, screen_update_shuriboy)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // everything not verified, just a placeholder
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(30));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(96, 416-1, 16, 240-1);
+	screen.set_screen_update(FUNC(konmedal_state::screen_update_shuriboy));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 8192) // not verified
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_ENABLE_HILIGHTS()
+	PALETTE(config, m_palette, FUNC(konmedal_state::konmedal_palette)).set_format(palette_device::xRGB_444, 256); // not verified
+//  m_palette->enable_shadows();
+//  m_palette->enable_hilights();
 
-	MCFG_DEVICE_ADD("k052109", K052109, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K052109_CB(konmedal_state, shuriboy_tile_callback)
+	K052109(config, m_k052109, 0);
+	m_k052109->set_palette(m_palette);
+	m_k052109->set_screen(nullptr);
+	m_k052109->set_tile_callback(FUNC(konmedal_state::shuriboy_tile_callback));
 
 	MCFG_MACHINE_START_OVERRIDE(konmedal_state, shuriboy)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_K051649_ADD("k051649", XTAL(24'000'000) / 12) // divisor unknown
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
+	K051649(config, "k051649", XTAL(24'000'000) / 12).add_route(ALL_OUTPUTS, "mono", 0.45); // divisor unknown
 
-	// upd7759c
-MACHINE_CONFIG_END
+	UPD7759(config, m_upd7759);
+}
+
+void konmedal_state::fuusenpn(machine_config &config)
+{
+	shuriboy(config);
+
+	screen_device &screen(SCREEN(config.replace(), "screen", SCREEN_TYPE_RASTER)); // everything not verified, just a placeholder
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(30));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(96, 416-1, 16, 240-1);
+	screen.set_screen_update(FUNC(konmedal_state::screen_update_fuusenpn));
+	screen.set_palette(m_palette);
+
+	m_k052109->set_tile_callback(FUNC(konmedal_state::fuusenpn_tile_callback));
+}
 
 ROM_START( tsukande )
 	ROM_REGION( 0x20000, "maincpu", 0 ) /* main program */
 	ROM_LOAD( "441-d02.4g",   0x000000, 0x020000, CRC(6ed17227) SHA1(4e3f5219cbf6f42c60df38a99f3009fe49f78fc1) )
 
-	ROM_REGION( 0x80000, "gfx1", 0 )   /* tilemaps */
+	ROM_REGION( 0x80000, "k056832", 0 )   /* tilemaps */
 	ROM_LOAD32_BYTE( "441-a03.4l",   0x000002, 0x020000, CRC(8adf3304) SHA1(1c8312c76cd626978ff5b3896fb5a5b34be72988) )
 	ROM_LOAD32_BYTE( "441-a04.4m",   0x000003, 0x020000, CRC(038e0c67) SHA1(2b8640bfad7026a2d86fb6498aff4d7a9cb0b700) )
 	ROM_LOAD32_BYTE( "441-a05.4p",   0x000000, 0x020000, CRC(937c4740) SHA1(155c869b9321d62df115435d7c855f9be4278e45) )
@@ -606,7 +623,7 @@ ROM_START( ddboy )
 	ROM_REGION( 0x20000, "maincpu", 0 ) /* main program */
 	ROM_LOAD( "342_c02.27c010.4d", 0x000000, 0x020000, CRC(dc33af9f) SHA1(db22f3b28e3aba69f70fd2581c77755373b582d0) )
 
-	ROM_REGION( 0x80000, "gfx1", 0 )   /* tilemaps */
+	ROM_REGION( 0x80000, "k056832", 0 )   /* tilemaps */
 	ROM_LOAD32_BYTE( "342_a03.27c010.4f", 0x000002, 0x020000, CRC(424f80dd) SHA1(fb7648960ce0951aebcf5cf4465a9acb3ab49cd8) )
 	ROM_LOAD32_BYTE( "342_a04.27c010.4g", 0x000003, 0x020000, CRC(a4d4e15e) SHA1(809afab3f2adc58ca5d18e2413b40a6f33bd0cfa) )
 	ROM_LOAD32_BYTE( "342_a05.27c010.4h", 0x000000, 0x020000, CRC(e7e50901) SHA1(5e01377a3ad8ccb2a2b56610e8225b9b6bf15122) )
@@ -631,7 +648,7 @@ ROM_START( ddboya )
 	ROM_REGION( 0x20000, "maincpu", 0 ) /* main program */
 	ROM_LOAD( "342-f02-4g-=p=.bin", 0x000000, 0x020000, CRC(563dfd4f) SHA1(a50544735a9d6f448b969b9fd84e6cdca303d7a0) )
 
-	ROM_REGION( 0x80000, "gfx1", 0 )   /* tilemaps */
+	ROM_REGION( 0x80000, "k056832", 0 )   /* tilemaps */
 	ROM_LOAD32_BYTE( "342_a03.27c010.4f", 0x000002, 0x020000, CRC(424f80dd) SHA1(fb7648960ce0951aebcf5cf4465a9acb3ab49cd8) )
 	ROM_LOAD32_BYTE( "342_a04.27c010.4g", 0x000003, 0x020000, CRC(a4d4e15e) SHA1(809afab3f2adc58ca5d18e2413b40a6f33bd0cfa) )
 	ROM_LOAD32_BYTE( "342_a05.27c010.4h", 0x000000, 0x020000, CRC(e7e50901) SHA1(5e01377a3ad8ccb2a2b56610e8225b9b6bf15122) )
@@ -652,6 +669,31 @@ ROM_START( ddboya )
 	ROM_LOAD( "342_a10.82s129.14g", 0x000300, 0x000100, CRC(1fa443f9) SHA1(84b0a36a4e49bf75bda1871bf52090ee5a75cd03) )
 ROM_END
 
+ROM_START( buttobi )
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* main program */
+
+	ROM_LOAD( "440-b02-4d.bin", 0x000000, 0x020000, CRC(428fc60e) SHA1(b980ee0bce0cd30b4c070b7c32ba37ac1b92fa9f) )
+	ROM_REGION( 0x80000, "k056832", 0 )   /* tilemaps */
+	ROM_LOAD32_BYTE( "440-a03-4f.bin", 0x000002, 0x020000, CRC(04917807) SHA1(e10796e4d2dcf126db6ac03749fcd2532a4ef846) )
+	ROM_LOAD32_BYTE( "440-a04-4g.bin", 0x000003, 0x020000, CRC(0396c6d9) SHA1(1d6b8f997b69828d09930a45724c5f0799ac988a) )
+	ROM_LOAD32_BYTE( "440-a05-4h.bin", 0x000000, 0x020000, CRC(11d3ec99) SHA1(4bc267fa58ba1dd83e1d43b0e981b9e65d688042) )
+	ROM_LOAD32_BYTE( "440-a06-4j.bin", 0x000001, 0x020000, CRC(f915c517) SHA1(26128fcdf9947efd7959deddb52575088fa492d4) )
+
+	// temporarily borrowed from tsukande while the PROMs get dumped from this PCB
+	ROM_REGION( 0x400, "proms", 0 )
+	// R (440a07.13f)
+	ROM_LOAD( "441a07.20k",   0x000000, 0x000100, BAD_DUMP CRC(7d0c53c2) SHA1(f357e0cb3d53374208ad1670e70be03b399a4c02) )
+	// G (440a08.14f)
+	ROM_LOAD( "441a08.21k",   0x000100, 0x000100, BAD_DUMP CRC(e2c3e853) SHA1(36a3008dde714ade53b9a01ac9d94c6cc655c293) )
+	// B (440a09.15f)
+	ROM_LOAD( "441a09.23k",   0x000200, 0x000100, BAD_DUMP CRC(3daca33a) SHA1(38644f574beaa593f3348b49eabea9e03d722013) )
+	// P(riority?) (440a10.14g)
+	ROM_LOAD( "441a10.21m",   0x000300, 0x000100, BAD_DUMP CRC(063722ff) SHA1(7ba43acfdccb02e7913dc000c4f9c57c54b1315f) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "440-a01-8b.bin", 0x000000, 0x040000, CRC(955b1bd5) SHA1(1e8130a3634972d742ba4ad103e1738e44a4e28c) )
+ROM_END
+
 ROM_START( shuriboy )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* main program */
 	ROM_LOAD( "gs-341-b01.13g", 0x000000, 0x010000, CRC(3c0f36b6) SHA1(1d3838f45969228a8b2054cd5baf8892db68b644) )
@@ -664,10 +706,37 @@ ROM_START( shuriboy )
 
 	ROM_REGION( 0x200000, "upd", 0 )
 	ROM_LOAD( "341-a02.13c", 0x000000, 0x020000, CRC(e1f5c8f1) SHA1(323a078720e09a7326e82cb623b6c90e2674e800) )
+
+	ROM_REGION( 0x400, "proms", 0 ) // am27s21apc
+	ROM_LOAD( "342_a07.2d", 0x000000, 0x000100, CRC(1260128d) SHA1(c49ee917aa38d87edaccbed7acf6e1076f23a0fd) )
+	ROM_LOAD( "342_a08.3d", 0x000100, 0x000100, CRC(a5a504b5) SHA1(e4da0bc4c4b44dc0e3355497d99d80219b9178c0) )
+	ROM_LOAD( "342_a09.4d", 0x000200, 0x000100, CRC(09141cc7) SHA1(2b32af236caa159fe6e9c0021bfc31b8cdfdbe70) )
+	ROM_LOAD( "341_a10.3e", 0x000300, 0x000100, CRC(01335046) SHA1(63a2826c3883cde8e23f78e27f8d766f15799d1a) )
 ROM_END
 
+ROM_START( fuusenpn )
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* main program */
+	ROM_LOAD( "241-d01-13g.bin", 0x000000, 0x010000, CRC(e9fee0f8) SHA1(2619b94284649243a84e84b166815ba1c7658814) )
+
+	ROM_REGION( 0x40000, "k052109", 0 )   /* tilemaps */
+	ROM_LOAD32_BYTE( "241-a03-2h.bin", 0x000000, 0x010000, CRC(b8bd7bfa) SHA1(883f3591d87275416f917f9c302b807aac5845a4) )
+	ROM_LOAD32_BYTE( "241-a04-4h.bin", 0x000001, 0x010000, CRC(04ffa2a3) SHA1(a1b0615dc8326c296fadb5c45f94f2ea3d670556) )
+	ROM_LOAD32_BYTE( "241-a05-5h.bin", 0x000002, 0x010000, CRC(8c4ad5fa) SHA1(987f24d0566d6b815070b74dada331a4f739f601) )
+	ROM_LOAD32_BYTE( "241-a06-7h.bin", 0x000003, 0x010000, CRC(e650e4c4) SHA1(ac1f03b89f4a17b2583e3a81bd474eda01d41be0) )
+
+	ROM_REGION( 0x200000, "upd", 0 )
+	ROM_LOAD( "241-a02-13c.bin", 0x000000, 0x020000, CRC(f2c39c7b) SHA1(ec420a1fbd6e83fe1ff5c9c8f7169b755d0cc494) )
+
+	ROM_REGION( 0x400, "proms", ROMREGION_ERASE00 ) // am27s21apc
+	ROM_LOAD( "241a07.bin",   0x000000, 0x000100, CRC(b246f88e) SHA1(e16aae373b41bc11d4828e1cc2cc267552b0397c) )
+	ROM_LOAD( "241a08.bin",   0x000100, 0x000100, CRC(e84cbf2a) SHA1(a0e99df97ca268c16625a02b6e6427aadcca1b5b) )
+	ROM_LOAD( "241a09.bin",   0x000200, 0x000100, CRC(79bd3e49) SHA1(ff94856d11acfba364f2d05ca955c10fbc02e265) )
+	ROM_LOAD( "241a10.bin",   0x000300, 0x000100, CRC(f7e3d8ee) SHA1(89c505873c884f9e1ec0cb113a3557d3f67943b9) )
+ROM_END
+GAME( 1994, buttobi,  0,     ddboy,    konmedal, konmedal_state, empty_init, ROT0, "Konami", "Buttobi Striker", MACHINE_NOT_WORKING)
 GAME( 1995, tsukande, 0,     tsukande, konmedal, konmedal_state, empty_init, ROT0, "Konami", "Tsukande Toru Chicchi", MACHINE_NOT_WORKING)
 GAME( 1995, ddboy,    0,     ddboy,    konmedal, konmedal_state, empty_init, ROT0, "Konami", "Dam Dam Boy (on dedicated PCB)", MACHINE_NOT_WORKING)
 GAME( 1995, ddboya,   ddboy, ddboy,    konmedal, konmedal_state, empty_init, ROT0, "Konami", "Dam Dam Boy (on Tsukande Toru Chicchi PCB)", MACHINE_NOT_WORKING)
 GAME( 1993, shuriboy, 0,     shuriboy, konmedal, konmedal_state, empty_init, ROT0, "Konami", "Shuriken Boy", MACHINE_NOT_WORKING)
+GAME( 1993, fuusenpn, 0,     fuusenpn, konmedal, konmedal_state, empty_init, ROT0, "Konami", "Fuusen Pentai", MACHINE_NOT_WORKING)
 

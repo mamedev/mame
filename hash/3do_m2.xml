@@ -22,6 +22,26 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		</part>
 	</software>
 
+	<!-- http://redump.org/disc/58242/ -->
+	<software name="olds" supported="no">
+		<description>Oldsmobile (USA)</description>
+		<year>199?</year>
+		<publisher>GM</publisher>
+		<info name="ring_code" value="1601-CD-0030"/>
+		<part name="cdrom1" interface="3do_m2_cdrom">
+			<feature name="part_id" value="1 of 2"/>
+			<diskarea name="cdrom">
+				<disk name="oldsmobile (disc 1)" status="nodump" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="3do_m2_cdrom">
+			<feature name="part_id" value="2 of 2"/>
+			<diskarea name="cdrom">
+				<disk name="oldsmobile (disc 2)" sha1="b1f5ad85818ca628c5d7e41d7dd321e69934cf2a" />
+			</diskarea>
+		</part>
+	</software>
+
 <!-- Aftermarket release -->
 
 	<software name="shootr2d" supported="no">

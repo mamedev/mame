@@ -47,41 +47,6 @@
 #pragma once
 
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_EXPANSION_ADD(_tag, _cpu_tag) \
-	MCFG_DEVICE_ADD(_tag, APRICOT_EXPANSION_BUS, 0) \
-	downcast<apricot_expansion_bus_device &>(*device).set_cpu_tag(this, _cpu_tag);
-
-#define MCFG_EXPANSION_IOP_ADD(_tag) \
-	downcast<apricot_expansion_bus_device &>(*device).set_iop_tag(this, _tag);
-
-#define MCFG_EXPANSION_SLOT_ADD(_tag, _slot_intf, _def_slot) \
-	MCFG_DEVICE_ADD(_tag, APRICOT_EXPANSION_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
-
-#define MCFG_EXPANSION_DMA1_HANDLER(_devcb) \
-	downcast<apricot_expansion_bus_device &>(*device).set_dma1_handler(DEVCB_##_devcb);
-
-#define MCFG_EXPANSION_DMA2_HANDLER(_devcb) \
-	downcast<apricot_expansion_bus_device &>(*device).set_dma2_handler(DEVCB_##_devcb);
-
-#define MCFG_EXPANSION_EXT1_HANDLER(_devcb) \
-	downcast<apricot_expansion_bus_device &>(*device).set_ext1_handler(DEVCB_##_devcb);
-
-#define MCFG_EXPANSION_EXT2_HANDLER(_devcb) \
-	downcast<apricot_expansion_bus_device &>(*device).set_ext2_handler(DEVCB_##_devcb);
-
-#define MCFG_EXPANSION_INT2_HANDLER(_devcb) \
-	downcast<apricot_expansion_bus_device &>(*device).set_int2_handler(DEVCB_##_devcb);
-
-#define MCFG_EXPANSION_INT3_HANDLER(_devcb) \
-	downcast<apricot_expansion_bus_device &>(*device).set_int3_handler(DEVCB_##_devcb);
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -92,10 +57,19 @@ class device_apricot_expansion_card_interface;
 
 // ======================> apricot_expansion_slot_device
 
-class apricot_expansion_slot_device : public device_t, public device_slot_interface
+class apricot_expansion_slot_device : public device_t, public device_single_card_slot_interface<device_apricot_expansion_card_interface>
 {
 public:
 	// construction/destruction
+	template <typename T>
+	apricot_expansion_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
+		: apricot_expansion_slot_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
 	apricot_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
@@ -118,16 +92,17 @@ public:
 	apricot_expansion_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~apricot_expansion_bus_device();
 
-	template <class Object> devcb_base &set_dma1_handler(Object &&cb) { return m_dma1_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_dma2_handler(Object &&cb) { return m_dma2_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_ext1_handler(Object &&cb) { return m_ext1_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_ext2_handler(Object &&cb) { return m_ext2_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_int2_handler(Object &&cb) { return m_int2_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_int3_handler(Object &&cb) { return m_int3_handler.set_callback(std::forward<Object>(cb)); }
+	template <typename T> void set_program_space(T &&tag, int spacenum) { m_program.set_tag(std::forward<T>(tag), spacenum); }
+	template <typename T> void set_io_space(T &&tag, int spacenum) { m_io.set_tag(std::forward<T>(tag), spacenum); }
+	template <typename T> void set_program_iop_space(T &&tag, int spacenum) { m_program_iop.set_tag(std::forward<T>(tag), spacenum); }
+	template <typename T> void set_io_iop_space(T &&tag, int spacenum) { m_io_iop.set_tag(std::forward<T>(tag), spacenum); }
 
-	// inline configuration
-	void set_cpu_tag(device_t *owner, const char *tag) { m_cpu_tag = tag; }
-	void set_iop_tag(device_t *owner, const char *tag) { m_iop_tag = tag; }
+	auto dma1() { return m_dma1_handler.bind(); }
+	auto dma2() { return m_dma2_handler.bind(); }
+	auto ext1() { return m_ext1_handler.bind(); }
+	auto ext2() { return m_ext2_handler.bind(); }
+	auto int2() { return m_int2_handler.bind(); }
+	auto int3() { return m_int3_handler.bind(); }
 
 	void add_card(device_apricot_expansion_card_interface *card);
 
@@ -141,19 +116,26 @@ public:
 
 	void install_ram(offs_t addrstart, offs_t addrend, void *baseptr);
 
+	template<typename T> void install_io_device(offs_t addrstart, offs_t addrend, T &device, void (T::*map)(class address_map &map), uint64_t unitmask = ~u64(0))
+	{
+		m_io->install_device(addrstart, addrend, device, map, unitmask);
+
+		if (m_io_iop)
+			m_io_iop->install_device(addrstart, addrend, device, map, unitmask);
+	}
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 private:
 	simple_list<device_apricot_expansion_card_interface> m_dev;
 
 	// address spaces we have access to
-	address_space *m_program;
-	address_space *m_io;
-	address_space *m_program_iop;
-	address_space *m_io_iop;
+	required_address_space m_program;
+	required_address_space m_io;
+	optional_address_space m_program_iop;
+	optional_address_space m_io_iop;
 
 	devcb_write_line m_dma1_handler;
 	devcb_write_line m_dma2_handler;
@@ -161,10 +143,6 @@ private:
 	devcb_write_line m_ext2_handler;
 	devcb_write_line m_int2_handler;
 	devcb_write_line m_int3_handler;
-
-	// configuration
-	const char *m_cpu_tag;
-	const char *m_iop_tag;
 };
 
 // device type definition
@@ -173,7 +151,7 @@ DECLARE_DEVICE_TYPE(APRICOT_EXPANSION_BUS, apricot_expansion_bus_device)
 
 // ======================> device_apricot_expansion_card_interface
 
-class device_apricot_expansion_card_interface : public device_slot_card_interface
+class device_apricot_expansion_card_interface : public device_interface
 {
 	template <class ElementType> friend class simple_list;
 

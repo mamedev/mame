@@ -105,14 +105,15 @@ GFXDECODE_END
 
 
 k051316_device::k051316_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, K051316, tag, owner, clock),
-		device_gfx_interface(mconfig, *this, gfxinfo),
-		m_zoom_rom(*this, DEVICE_SELF),
-		m_dx(0),
-		m_dy(0),
-		m_wrap(0),
-		m_pixels_per_byte(2), // 4bpp layout is default
-		m_layermask(0)
+	: device_t(mconfig, K051316, tag, owner, clock)
+	, device_gfx_interface(mconfig, *this, gfxinfo)
+	, m_zoom_rom(*this, DEVICE_SELF)
+	, m_dx(0)
+	, m_dy(0)
+	, m_wrap(0)
+	, m_pixels_per_byte(2) // 4bpp layout is default
+	, m_layermask(0)
+	, m_k051316_cb(*this)
 {
 }
 
@@ -152,10 +153,13 @@ void k051316_device::device_start()
 	if (!palette().device().started())
 		throw device_missing_dependencies();
 
+	// bind callbacks
+	m_k051316_cb.resolve();
+
 	decode_gfx();
 	gfx(0)->set_colors(palette().entries() / gfx(0)->depth());
 
-	m_tmap = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(k051316_device::get_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tmap = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(k051316_device::get_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 	m_ram.resize(0x800);
 	memset(&m_ram[0], 0, 0x800);
 
@@ -166,9 +170,6 @@ void k051316_device::device_start()
 	}
 	else
 		m_tmap->set_transparent_pen(0);
-
-	// bind callbacks
-	m_k051316_cb.bind_relative_to(*owner());
 
 	save_item(NAME(m_ram));
 	save_item(NAME(m_ctrlram));
@@ -189,19 +190,19 @@ void k051316_device::device_reset()
     DEVICE HANDLERS
 *****************************************************************************/
 
-READ8_MEMBER( k051316_device::read )
+u8 k051316_device::read(offs_t offset)
 {
 	return m_ram[offset];
 }
 
-WRITE8_MEMBER( k051316_device::write )
+void k051316_device::write(offs_t offset, u8 data)
 {
 	m_ram[offset] = data;
 	m_tmap->mark_tile_dirty(offset & 0x3ff);
 }
 
 
-READ8_MEMBER( k051316_device::rom_r )
+u8 k051316_device::rom_r(offs_t offset)
 {
 	assert (m_zoom_rom.found());
 
@@ -222,7 +223,7 @@ READ8_MEMBER( k051316_device::rom_r )
 	}
 }
 
-WRITE8_MEMBER( k051316_device::ctrl_w )
+void k051316_device::ctrl_w(offs_t offset, u8 data)
 {
 	m_ctrlram[offset] = data;
 	//if (offset >= 0x0c) logerror("%s: write %02x to 051316 reg %x\n", machine().describe_context(), data, offset);

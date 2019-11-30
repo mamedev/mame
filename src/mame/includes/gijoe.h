@@ -5,6 +5,10 @@
     GI Joe
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_GIJOE_H
+#define MAME_INCLUDES_GIJOE_H
+
+#pragma once
 
 #include "sound/k054539.h"
 #include "video/k053251.h"
@@ -17,8 +21,8 @@
 class gijoe_state : public driver_device
 {
 public:
-	gijoe_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	gijoe_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
 		m_workram(*this, "workram"),
 		m_maincpu(*this, "maincpu"),
@@ -28,7 +32,8 @@ public:
 		m_k053246(*this, "k053246"),
 		m_k053251(*this, "k053251"),
 		m_palette(*this, "palette"),
-		m_k054321(*this, "k054321") { }
+		m_k054321(*this, "k054321")
+	{ }
 
 	void gijoe(machine_config &config);
 
@@ -74,3 +79,5 @@ private:
 	void gijoe_map(address_map &map);
 	void sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_GIJOE_H

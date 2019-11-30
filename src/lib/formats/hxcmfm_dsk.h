@@ -7,9 +7,10 @@
     HxC Floppy Emulator disk images
 
 *********************************************************************/
+#ifndef MAME_FORMATS_HXCMFM_DSK_H
+#define MAME_FORMATS_HXCMFM_DSK_H
 
-#ifndef HXCMFM_DSK_H
-#define HXCMFM_DSK_H
+#pragma once
 
 #include "flopimg.h"
 
@@ -30,4 +31,4 @@ public:
 
 extern const floppy_format_type FLOPPY_MFM_FORMAT;
 
-#endif /* HXCMFM_DSK_H */
+#endif // MAME_FORMATS_HXCMFM_DSK_H

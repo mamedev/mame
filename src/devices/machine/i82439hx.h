@@ -47,6 +47,7 @@ private:
 	uint8_t drt, drat, smram, errcmd, errsts, errsyn;
 	int smiact_n;
 
+	virtual DECLARE_READ8_MEMBER(header_type_r) override;
 	DECLARE_READ8_MEMBER (pcon_r);
 	DECLARE_WRITE8_MEMBER(pcon_w);
 	DECLARE_READ8_MEMBER (cc_r);

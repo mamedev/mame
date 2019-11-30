@@ -38,7 +38,7 @@ IC22 (1F4*2 bytes starting @ 0x0c0000, code at 0x0000069E) \ Tested as 0x3e8 (10
 IC23 (1F4*2 bytes starting @ 0x0c0001, code at 0x000006AA) / Cleared at 0x00000440 as 0x4000 bytes.
 IC24 (1F4*2 bytes starting @ 0x100001, code at 0x000006B8) > Shared RAM
 
-The shared ram is tested and cleared almost the same as the other RAM,
+The shared RAM is tested and cleared almost the same as the other RAM,
 and is mapped into the master at E0000. Only every odd byte is used.
 
 The first 0x10 bytes are used heavily as registers
@@ -178,6 +178,7 @@ lev 7 : 0x7c : 0000 07e0 - input device clear?
 #include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class cybertnk_state : public driver_device
@@ -198,8 +199,17 @@ public:
 		m_traverse_io(*this, "TRAVERSE"),
 		m_elevate_io(*this, "ELEVATE"),
 		m_accel_io(*this, "ACCEL"),
-		m_handle_io(*this, "HANDLE")  { }
+		m_handle_io(*this, "HANDLE")
+	{ }
 
+	void init_cybertnk();
+
+	void cybertnk(machine_config &config);
+
+protected:
+	virtual void video_start() override;
+
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -228,15 +238,12 @@ public:
 	DECLARE_READ8_MEMBER(mux_r);
 	DECLARE_WRITE8_MEMBER(irq_ack_w);
 	DECLARE_WRITE8_MEMBER(cnt_w);
-	void init_cybertnk();
 	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
-	virtual void video_start() override;
 	void draw_road(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int screen_shift, int pri);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int screen_shift);
 	uint32_t update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int screen_shift);
 	uint32_t screen_update_cybertnk_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cybertnk_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void cybertnk(machine_config &config);
 	void master_mem(address_map &map);
 	void slave_mem(address_map &map);
 	void sound_mem(address_map &map);
@@ -268,13 +275,13 @@ TILE_GET_INFO_MEMBER(cybertnk_state::get_tile_info)
 
 void cybertnk_state::video_start()
 {
-	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cybertnk_state::get_tile_info<0>),this),TILEMAP_SCAN_ROWS,8,8,128,32);
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cybertnk_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 8,8,128,32);
 	m_tilemap[0]->set_transparent_pen(0);
 
-	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cybertnk_state::get_tile_info<1>),this),TILEMAP_SCAN_ROWS,8,8,128,32);
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cybertnk_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 8,8,128,32);
 	m_tilemap[1]->set_transparent_pen(0);
 
-	m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cybertnk_state::get_tile_info<2>),this),TILEMAP_SCAN_ROWS,8,8,128,32);
+	m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cybertnk_state::get_tile_info<2>)), TILEMAP_SCAN_ROWS, 8,8,128,32);
 	m_tilemap[2]->set_transparent_pen(0);
 }
 
@@ -507,7 +514,7 @@ WRITE8_MEMBER( cybertnk_state::sound_cmd_w )
 	}
 	else if (offset == 1)
 	{
-		m_soundlatch->write(space, offset, data & 0xff);
+		m_soundlatch->write(data & 0xff);
 	}
 }
 
@@ -813,57 +820,55 @@ GFXDECODE_END
 */
 
 
-MACHINE_CONFIG_START(cybertnk_state::cybertnk)
-	MCFG_DEVICE_ADD("maincpu", M68000,XTAL(20'000'000)/2)
-	MCFG_DEVICE_PROGRAM_MAP(master_mem)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", cybertnk_state,  irq1_line_assert)
+void cybertnk_state::cybertnk(machine_config &config)
+{
+	M68000(config, m_maincpu, XTAL(20'000'000)/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cybertnk_state::master_mem);
+	m_maincpu->set_vblank_int("lscreen", FUNC(cybertnk_state::irq1_line_assert));
 
-	MCFG_DEVICE_ADD("slave", M68000,XTAL(20'000'000)/2)
-	MCFG_DEVICE_PROGRAM_MAP(slave_mem)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("lscreen", cybertnk_state,  irq3_line_hold)
+	m68000_device &slave(M68000(config, "slave", XTAL(20'000'000)/2));
+	slave.set_addrmap(AS_PROGRAM, &cybertnk_state::slave_mem);
+	slave.set_vblank_int("lscreen", FUNC(cybertnk_state::irq3_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80,XTAL(3'579'545))
-	MCFG_DEVICE_PROGRAM_MAP(sound_mem)
+	Z80(config, m_audiocpu, XTAL(3'579'545));
+	m_audiocpu->set_addrmap(AS_PROGRAM, &cybertnk_state::sound_mem);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60000))//arbitrary value,needed to get the communication to work
+	config.set_maximum_quantum(attotime::from_hz(60000)); //arbitrary value, needed to get the communication to work
 
 	/* video hardware */
 	config.set_default_layout(layout_dualhsxs);
 
-	MCFG_SCREEN_ADD("lscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cybertnk_state, screen_update_cybertnk_left)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
+	lscreen.set_refresh_hz(60);
+	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	lscreen.set_size(32*8, 32*8);
+	lscreen.set_visarea(0*8, 32*8-1, 0*8, 28*8-1);
+	lscreen.set_screen_update(FUNC(cybertnk_state::screen_update_cybertnk_left));
+	lscreen.set_palette(m_palette);
 
-	MCFG_SCREEN_ADD("rscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cybertnk_state, screen_update_cybertnk_right)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
+	rscreen.set_refresh_hz(60);
+	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	rscreen.set_size(32*8, 32*8);
+	rscreen.set_visarea(0*8, 32*8-1, 0*8, 28*8-1);
+	rscreen.set_screen_update(FUNC(cybertnk_state::screen_update_cybertnk_right));
+	rscreen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cybertnk)
-	MCFG_PALETTE_ADD("palette", 0x4000)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cybertnk);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x4000);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(HOLDLINE("audiocpu", 0))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0, HOLD_LINE);
 
-	// Splited output per chip
-	MCFG_DEVICE_ADD("ym1", Y8950, XTAL(3'579'545))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	// Split output per chip
+	Y8950(config, "ym1", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("ym2", Y8950, XTAL(3'579'545))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	Y8950(config, "ym2", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+}
 
 /***************************************************************************
 

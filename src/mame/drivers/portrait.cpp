@@ -254,38 +254,35 @@ static GFXDECODE_START( gfx_portrait )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(portrait_state::portrait)
-	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)     /* 4 MHz ? */
-	MCFG_DEVICE_PROGRAM_MAP(portrait_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", portrait_state,  irq0_line_hold)
+void portrait_state::portrait(machine_config &config)
+{
+	Z80(config, m_maincpu, 4000000);     /* 4 MHz ? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &portrait_state::portrait_map);
+	m_maincpu->set_vblank_int("screen", FUNC(portrait_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", I8039, 3120000)  /* ? */
-	MCFG_DEVICE_PROGRAM_MAP(portrait_sound_map)
-
+	i8039_device &audiocpu(I8039(config, "audiocpu", 3120000));  /* ? */
+	audiocpu.set_addrmap(AS_PROGRAM, &portrait_state::portrait_sound_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 64*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 54*8-1, 0*8, 40*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(portrait_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 64*8);
+	screen.set_visarea(0*8, 54*8-1, 0*8, 40*8-1);
+	screen.set_screen_update(FUNC(portrait_state::screen_update));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_portrait)
-	MCFG_PALETTE_ADD("palette", 0x800)
-	MCFG_PALETTE_INDIRECT_ENTRIES(0x40)
-	MCFG_PALETTE_INIT_OWNER(portrait_state, portrait)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_portrait);
+	PALETTE(config, m_palette, FUNC(portrait_state::portrait_palette), 0x800, 0x40);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("tms", TMS5200, 640000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	TMS5200(config, m_tms, 640000).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 ROM_START( portrait )

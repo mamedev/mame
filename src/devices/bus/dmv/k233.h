@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco
+// thanks-to:rfka01
 #ifndef MAME_BUS_DMV_K233_H
 #define MAME_BUS_DMV_K233_H
 
@@ -27,7 +28,7 @@ protected:
 	virtual void device_reset() override;
 
 	// dmvcart_interface overrides
-	virtual void io_write(address_space &space, int ifsel, offs_t offset, uint8_t data) override;
+	virtual void io_write(int ifsel, offs_t offset, uint8_t data) override;
 	virtual bool read(offs_t offset, uint8_t &data) override;
 	virtual bool write(offs_t offset, uint8_t data) override;
 

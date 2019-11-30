@@ -432,22 +432,23 @@ lle_device_base::lle_device_base(machine_config const &mconfig, device_type type
 	, m_leds(*this, "led_%u", 0U)
 {
 }
-MACHINE_CONFIG_START(lle_device_base::device_add_mconfig)
-	MCFG_DEVICE_ADD("mcu", I8049, 11_MHz_XTAL)
-	MCFG_DEVICE_ADDRESS_MAP(AS_IO, io_map)
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, lle_device_base, t0_r))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, lle_device_base, t1_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, lle_device_base, p1_w))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, lle_device_base, p2_w))
-	MCFG_MCS48_PORT_BUS_IN_CB(READ8(*this, lle_device_base, bus_r))
-	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(*this, lle_device_base, bus_w))
+
+void lle_device_base::device_add_mconfig(machine_config &config)
+{
+	I8049(config, m_mcu, 11_MHz_XTAL);
+	m_mcu->set_addrmap(AS_IO, &lle_device_base::io_map);
+	m_mcu->t0_in_cb().set(FUNC(lle_device_base::t0_r));
+	m_mcu->t1_in_cb().set(FUNC(lle_device_base::t1_r));
+	m_mcu->p1_out_cb().set(FUNC(lle_device_base::p1_w));
+	m_mcu->p2_out_cb().set(FUNC(lle_device_base::p2_w));
+	m_mcu->bus_in_cb().set(FUNC(lle_device_base::bus_r));
+	m_mcu->bus_out_cb().set(FUNC(lle_device_base::bus_w));
 
 	ADDRESS_MAP_BANK(config, m_ext).set_map(&lle_device_base::ext_map).set_options(ENDIANNESS_NATIVE, 8, 12, 0x100);
 
 	SPEAKER(config, "keyboard").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "keyboard", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker, 0).add_route(ALL_OUTPUTS, "keyboard", 0.25);
+}
 
 void lle_device_base::device_start()
 {
@@ -464,7 +465,7 @@ void lle_device_base::device_start()
 
 void lle_device_base::device_reset()
 {
-	m_txd = 0;
+	m_txd = 1;
 }
 
 void lle_device_base::io_map(address_map &map)
@@ -479,16 +480,16 @@ void lle_device_base::ext_map(address_map &map)
 	// not clear what these addresses correspond to, possibly
 	// used in manufacturer testing?
 	if (VERBOSE & LOG_GENERAL)
-		map(0x7fe, 0x7ff).lw8("write",
-			[this](address_space &space, offs_t offset, u8 data, u8 mem_mask)
-			{
-				LOG("write offset 0x%03f data 0x%02x (%s)\n", offset, data, machine().describe_context());
-			});
+		map(0x7fe, 0x7ff).lw8(
+				[this] (offs_t offset, u8 data, u8 mem_mask)
+				{
+					LOG("write offset 0x%03f data 0x%02x (%s)\n", offset, data, machine().describe_context());
+				}, "write");
 }
 
 READ_LINE_MEMBER(lle_device_base::t0_r)
 {
-	if ((VERBOSE & LOG_RXTX) && (m_mcu->pc() == 0x8e) && m_txd == 0)
+	if ((VERBOSE & LOG_RXTX) && (m_mcu->pc() == 0x8e) && m_txd)
 	{
 		auto const suppressor(machine().disable_side_effects());
 
@@ -498,7 +499,7 @@ READ_LINE_MEMBER(lle_device_base::t0_r)
 		LOGMASKED(LOG_RXTX, "received byte 0x%02x\n", input);
 	}
 
-	return m_txd;
+	return !m_txd;
 }
 
 READ_LINE_MEMBER(lle_device_base::t1_r)
@@ -560,7 +561,7 @@ WRITE8_MEMBER(lle_device_base::p2_w)
 		m_count++;
 
 	// serial transmit
-	output_rxd(BIT(data, 5) ? CLEAR_LINE : ASSERT_LINE);
+	output_rxd(!BIT(data, 5));
 
 	// BIT(data, 4)?
 	if (!BIT(m_p2, 4) && BIT(data, 4))

@@ -68,7 +68,7 @@ WRITE8_MEMBER(poolshrk_state::watchdog_w)
 {
 	if ((offset & 3) == 3)
 	{
-		m_watchdog->reset_w(space, 0, 0);
+		m_watchdog->watchdog_reset();
 	}
 }
 
@@ -86,7 +86,7 @@ READ8_MEMBER(poolshrk_state::input_r)
 
 	if ((offset & 3) == 3)
 	{
-		m_watchdog->reset_r(space, 0);
+		m_watchdog->watchdog_reset();
 	}
 
 	return val;
@@ -207,42 +207,40 @@ static GFXDECODE_START( gfx_poolshrk )
 GFXDECODE_END
 
 
-PALETTE_INIT_MEMBER(poolshrk_state, poolshrk)
+void poolshrk_state::poolshrk_palette(palette_device &palette) const
 {
-	palette.set_pen_color(0,rgb_t(0x7F, 0x7F, 0x7F));
-	palette.set_pen_color(1,rgb_t(0xFF, 0xFF, 0xFF));
-	palette.set_pen_color(2,rgb_t(0x7F, 0x7F, 0x7F));
-	palette.set_pen_color(3,rgb_t(0x00, 0x00, 0x00));
+	palette.set_pen_color(0, rgb_t(0x7f, 0x7f, 0x7f));
+	palette.set_pen_color(1, rgb_t(0xff, 0xff, 0xff));
+	palette.set_pen_color(2, rgb_t(0x7f, 0x7f, 0x7f));
+	palette.set_pen_color(3, rgb_t(0x00, 0x00, 0x00));
 }
 
 
-MACHINE_CONFIG_START(poolshrk_state::poolshrk)
-
+void poolshrk_state::poolshrk(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6800, 11055000 / 8) /* ? */
-	MCFG_DEVICE_PROGRAM_MAP(poolshrk_cpu_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", poolshrk_state,  irq0_line_assert)
+	M6800(config, m_maincpu, 11055000 / 8); /* ? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &poolshrk_state::poolshrk_cpu_map);
+	m_maincpu->set_vblank_int("screen", FUNC(poolshrk_state::irq0_line_assert));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(1, 255, 24, 255)
-	MCFG_SCREEN_UPDATE_DRIVER(poolshrk_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_size(256, 256);
+	screen.set_visarea(1, 255, 24, 255);
+	screen.set_screen_update(FUNC(poolshrk_state::screen_update));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_poolshrk)
-	MCFG_PALETTE_ADD("palette", 4)
-	MCFG_PALETTE_INIT_OWNER(poolshrk_state, poolshrk)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_poolshrk);
+	PALETTE(config, m_palette, FUNC(poolshrk_state::poolshrk_palette), 4);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE, poolshrk_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	DISCRETE(config, m_discrete, poolshrk_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 ROM_START( poolshrk )

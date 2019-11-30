@@ -16,6 +16,10 @@ The following basic program can be useful for identifying scancodes:
 #include "emu.h"
 #include "pc_kbdc.h"
 
+#define LOG_SIGNALS         (1U<<1)
+#define VERBOSE ( LOG_GENERAL )
+
+#include "logmacro.h"
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -32,7 +36,7 @@ DEFINE_DEVICE_TYPE(PC_KBDC_SLOT, pc_kbdc_slot_device, "pc_kbdc_slot", "PC keyboa
 //-------------------------------------------------
 pc_kbdc_slot_device::pc_kbdc_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, PC_KBDC_SLOT, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_pc_kbd_interface>(mconfig, *this),
 	m_kbdc_device(nullptr)
 {
 }
@@ -44,12 +48,9 @@ pc_kbdc_slot_device::pc_kbdc_slot_device(const machine_config &mconfig, const ch
 
 void pc_kbdc_slot_device::device_start()
 {
-	device_pc_kbd_interface *pc_kbd = dynamic_cast<device_pc_kbd_interface *>(get_card_device());
-
+	device_pc_kbd_interface *const pc_kbd = get_card_device();
 	if (pc_kbd)
-	{
 		pc_kbd->set_pc_kbdc(m_kbdc_device);
-	}
 }
 
 
@@ -71,11 +72,11 @@ pc_kbdc_device::pc_kbdc_device(const machine_config &mconfig, const char *tag, d
 	m_data_state(-1), m_mb_clock_state(0), m_mb_data_state(0),
 	m_kb_clock_state(1),
 	m_kb_data_state(1),
-	m_keyboard( nullptr )
+	m_keyboard(nullptr)
 {
 }
 
-void pc_kbdc_device::set_keyboard( device_pc_kbd_interface *keyboard )
+void pc_kbdc_device::set_keyboard(device_pc_kbd_interface *keyboard)
 {
 	m_keyboard = keyboard;
 }
@@ -84,19 +85,22 @@ void pc_kbdc_device::set_keyboard( device_pc_kbd_interface *keyboard )
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
-void pc_kbdc_device::device_start()
+void pc_kbdc_device::device_resolve_objects()
 {
-	// resolve callbacks
 	m_out_clock_cb.resolve_safe();
 	m_out_data_cb.resolve_safe();
 }
 
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-void pc_kbdc_device::device_reset()
+void pc_kbdc_device::device_start()
 {
+	save_item(NAME(m_clock_state));
+	save_item(NAME(m_data_state));
+
+	save_item(NAME(m_mb_clock_state));
+	save_item(NAME(m_mb_data_state));
+	save_item(NAME(m_kb_clock_state));
+	save_item(NAME(m_kb_data_state));
+
 	m_clock_state = -1;     /* initial state of calculated clock line */
 	m_data_state = -1;      /* initial state of calculated data line */
 
@@ -108,73 +112,70 @@ void pc_kbdc_device::device_reset()
 }
 
 
-void pc_kbdc_device::update_clock_state()
+void pc_kbdc_device::update_clock_state(bool fromkb)
 {
 	int new_clock_state = m_mb_clock_state & m_kb_clock_state;
 
-	if ( new_clock_state != m_clock_state )
+	if (new_clock_state != m_clock_state)
 	{
 		// We first set our state to prevent possible endless loops
 		m_clock_state = new_clock_state;
-
+		LOGMASKED(LOG_SIGNALS, "%s Clock: %d\n", fromkb? "<-" : "->", m_clock_state);
 		// Send state to keyboard interface logic on mainboard
-		m_out_clock_cb( m_clock_state );
+		m_out_clock_cb(m_clock_state);
 
 		// Send state to keyboard
-		if ( m_keyboard )
-		{
-			m_keyboard->clock_write( m_clock_state );
-		}
+		if (m_keyboard)
+			m_keyboard->clock_write(m_clock_state);
 	}
 }
 
 
-void pc_kbdc_device::update_data_state()
+void pc_kbdc_device::update_data_state(bool fromkb)
 {
 	int new_data_state = m_mb_data_state & m_kb_data_state;
 
-	if ( new_data_state != m_data_state )
+	if (new_data_state != m_data_state)
 	{
 		// We first set our state to prevent possible endless loops
 		m_data_state = new_data_state;
+		LOGMASKED(LOG_SIGNALS, "%s Data:  %d\n", fromkb? "<-" : "->", m_data_state);
 
 		// Send state to keyboard interface logic on mainboard
-		m_out_data_cb( m_data_state );
+		m_out_data_cb(m_data_state);
 
 		// Send state to keyboard
-		if ( m_keyboard )
-		{
-			m_keyboard->data_write( m_data_state );
-		}
+		if (m_keyboard)
+			m_keyboard->data_write(m_data_state);
 	}
 }
 
 
-WRITE_LINE_MEMBER( pc_kbdc_device::clock_write_from_mb )
+WRITE_LINE_MEMBER(pc_kbdc_device::clock_write_from_mb)
 {
 	m_mb_clock_state = state;
-	update_clock_state();
+	update_clock_state(false);
 }
 
 
-WRITE_LINE_MEMBER( pc_kbdc_device::data_write_from_mb )
+WRITE_LINE_MEMBER(pc_kbdc_device::data_write_from_mb)
 {
 	m_mb_data_state = state;
-	update_data_state();
+	update_data_state(false);
 }
 
 
-WRITE_LINE_MEMBER( pc_kbdc_device::clock_write_from_kb )
+WRITE_LINE_MEMBER(pc_kbdc_device::clock_write_from_kb)
 {
 	m_kb_clock_state = state;
-	update_clock_state();
+	update_clock_state(true);
 }
 
 
-WRITE_LINE_MEMBER( pc_kbdc_device::data_write_from_kb )
+WRITE_LINE_MEMBER(pc_kbdc_device::data_write_from_kb)
 {
 	m_kb_data_state = state;
-	update_data_state();
+	update_data_state(true);
 }
 
 
@@ -187,7 +188,7 @@ WRITE_LINE_MEMBER( pc_kbdc_device::data_write_from_kb )
 //-------------------------------------------------
 
 device_pc_kbd_interface::device_pc_kbd_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device)
+	: device_interface(device, "pckbd")
 	, m_pc_kbdc(nullptr)
 	, m_pc_kbdc_tag(nullptr)
 {
@@ -203,20 +204,18 @@ device_pc_kbd_interface::~device_pc_kbd_interface()
 }
 
 
-WRITE_LINE_MEMBER( device_pc_kbd_interface::clock_write )
+WRITE_LINE_MEMBER(device_pc_kbd_interface::clock_write)
 {
 }
 
 
-WRITE_LINE_MEMBER( device_pc_kbd_interface::data_write )
+WRITE_LINE_MEMBER(device_pc_kbd_interface::data_write)
 {
 }
 
 
 void device_pc_kbd_interface::set_pc_kbdc_device()
 {
-	if ( m_pc_kbdc )
-	{
-		m_pc_kbdc->set_keyboard( this );
-	}
+	if (m_pc_kbdc)
+		m_pc_kbdc->set_keyboard(this);
 }

@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Stefan Jokisch
+#ifndef MAME_INCLUDES_SSPEEDR_H
+#define MAME_INCLUDES_SSPEEDR_H
+
+#pragma once
 
 #include "emupal.h"
 
@@ -12,7 +16,7 @@ public:
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
 		, m_digits(*this, "digit%u", 0U)
-		{ }
+	{ }
 
 	void sspeedr(machine_config &config);
 
@@ -34,7 +38,7 @@ private:
 	DECLARE_WRITE8_MEMBER(sspeedr_track_horz_2_w);
 	DECLARE_WRITE8_MEMBER(sspeedr_track_vert_w);
 	DECLARE_WRITE8_MEMBER(sspeedr_track_ice_w);
-	DECLARE_PALETTE_INIT(sspeedr);
+	void sspeedr_palette(palette_device &palette) const;
 	uint32_t screen_update_sspeedr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_sspeedr);
 	void sspeedr_io_map(address_map &map);
@@ -62,3 +66,5 @@ private:
 	required_device<palette_device> m_palette;
 	output_finder<26> m_digits;
 };
+
+#endif // MAME_INCLUDES_SSPEEDR_H

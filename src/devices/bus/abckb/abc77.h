@@ -61,7 +61,7 @@ private:
 	inline void serial_clock();
 	inline void key_down(int state);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<i8035_device> m_maincpu;
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<discrete_sound_device> m_discrete;
 	required_ioport_array<12> m_x;

@@ -84,9 +84,9 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override;
-	virtual uint32_t execute_max_cycles() const override;
-	virtual uint32_t execute_input_lines() const override;
+	virtual uint32_t execute_min_cycles() const noexcept override;
+	virtual uint32_t execute_max_cycles() const noexcept override;
+	virtual uint32_t execute_input_lines() const noexcept override;
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -107,11 +107,6 @@ protected:
 	void tick_timers(int cycles);
 	void update_port_mode(uint8_t index, uint8_t changed);
 	void set_port_output_bit(uint8_t index, uint8_t bit, uint8_t state);
-
-	DECLARE_READ8_MEMBER(program_rombank_r);
-	DECLARE_READ8_MEMBER(data_rombank_r);
-	DECLARE_WRITE8_MEMBER(rambank_w);
-	DECLARE_READ8_MEMBER(rambank_r);
 
 	DECLARE_WRITE8_MEMBER(regs_w);
 	DECLARE_READ8_MEMBER(regs_r);
@@ -136,47 +131,47 @@ protected:
 
 	enum
 	{
-		PROGRAM_ROM_START		= 0x40,
-		REGS_START				= 0x80,
-		REG_X 					= 0x80,
-		REG_Y 					= 0x81,
-		REG_V 					= 0x82,
-		REG_W 					= 0x83,
-		DATA_RAM_START 			= 0x84,
-		REG_PORTA_DATA			= 0xc0,
-		REG_PORTB_DATA			= 0xc1,
-		REG_PORTC_DATA			= 0xc2,
-		REG_PORTD_DATA			= 0xc3,
-		REG_PORTA_DIR			= 0xc4,
-		REG_PORTB_DIR			= 0xc5,
-		REG_PORTC_DIR			= 0xc6,
-		REG_PORTD_DIR			= 0xc7,
-		REG_INT_OPTION			= 0xc8,
-		REG_DATA_ROM_WINDOW		= 0xc9,
-		REG_ROM_BANK_SELECT		= 0xca,
-		REG_RAM_BANK_SELECT		= 0xcb,
-		REG_PORTA_OPTION		= 0xcc,
-		REG_PORTB_OPTION		= 0xcd,
-		REG_PORTC_OPTION		= 0xce,
-		REG_PORTD_OPTION		= 0xcf,
-		REG_AD_DATA				= 0xd0,
-		REG_AD_CONTROL			= 0xd1,
-		REG_TIMER_PRESCALE		= 0xd2,
-		REG_TIMER_COUNT			= 0xd3,
-		REG_TIMER_CONTROL		= 0xd4,
-		REG_UART_DATA			= 0xd6,
-		REG_UART_CONTROL		= 0xd7,
-		REG_WATCHDOG			= 0xd8,
-		REG_INT_POLARITY		= 0xda,
-		REG_SPI_INT_DISABLE		= 0xdc,
-		REG_SPI_DATA			= 0xdd,
-		REG_ARTIMER_MODE		= 0xe5,
-		REG_ARTIMER_ARCS0		= 0xe6,
-		REG_ARTIMER_ARCS1		= 0xe7,
-		REG_ARTIMER_RELOAD		= 0xe9,
-		REG_ARTIMER_COMPARE		= 0xea,
-		REG_ARTIMER_LOAD		= 0xeb,
-		REG_A					= 0xff
+		PROGRAM_ROM_START       = 0x40,
+		REGS_START              = 0x80,
+		REG_X                   = 0x80,
+		REG_Y                   = 0x81,
+		REG_V                   = 0x82,
+		REG_W                   = 0x83,
+		DATA_RAM_START          = 0x84,
+		REG_PORTA_DATA          = 0xc0,
+		REG_PORTB_DATA          = 0xc1,
+		REG_PORTC_DATA          = 0xc2,
+		REG_PORTD_DATA          = 0xc3,
+		REG_PORTA_DIR           = 0xc4,
+		REG_PORTB_DIR           = 0xc5,
+		REG_PORTC_DIR           = 0xc6,
+		REG_PORTD_DIR           = 0xc7,
+		REG_INT_OPTION          = 0xc8,
+		REG_DATA_ROM_WINDOW     = 0xc9,
+		REG_ROM_BANK_SELECT     = 0xca,
+		REG_RAM_BANK_SELECT     = 0xcb,
+		REG_PORTA_OPTION        = 0xcc,
+		REG_PORTB_OPTION        = 0xcd,
+		REG_PORTC_OPTION        = 0xce,
+		REG_PORTD_OPTION        = 0xcf,
+		REG_AD_DATA             = 0xd0,
+		REG_AD_CONTROL          = 0xd1,
+		REG_TIMER_PRESCALE      = 0xd2,
+		REG_TIMER_COUNT         = 0xd3,
+		REG_TIMER_CONTROL       = 0xd4,
+		REG_UART_DATA           = 0xd6,
+		REG_UART_CONTROL        = 0xd7,
+		REG_WATCHDOG            = 0xd8,
+		REG_INT_POLARITY        = 0xda,
+		REG_SPI_INT_DISABLE     = 0xdc,
+		REG_SPI_DATA            = 0xdd,
+		REG_ARTIMER_MODE        = 0xe5,
+		REG_ARTIMER_ARCS0       = 0xe6,
+		REG_ARTIMER_ARCS1       = 0xe7,
+		REG_ARTIMER_RELOAD      = 0xe9,
+		REG_ARTIMER_COMPARE     = 0xea,
+		REG_ARTIMER_LOAD        = 0xeb,
+		REG_A                   = 0xff
 	};
 
 	enum
@@ -198,8 +193,8 @@ protected:
 
 	enum
 	{
-		FLAG_C	= 0x01,
-		FLAG_Z	= 0x02
+		FLAG_C  = 0x01,
+		FLAG_Z  = 0x02
 	};
 
 	enum
@@ -244,9 +239,9 @@ protected:
 	address_space *m_data;
 
 	// FIXME: memory banks do not currently work with internal maps.
-	//required_memory_bank m_rambank;
-	//required_memory_bank m_program_rombank;
-	//required_memory_bank m_data_rombank;
+	required_memory_bank m_rambank;
+	required_memory_bank m_program_rombank;
+	required_memory_bank m_data_rombank;
 	required_memory_region m_rom;
 };
 

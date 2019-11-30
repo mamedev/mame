@@ -1,15 +1,14 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * nld_fourterm.h
- *
- */
 
 #ifndef NLD_FOURTERM_H_
 #define NLD_FOURTERM_H_
 
+///
+/// \file nld_fourterm.h
+///
 
-#include "../nl_setup.h"
+#include "netlist/nl_setup.h"
 
 // ----------------------------------------------------------------------------------------
 // Macros
@@ -27,4 +26,4 @@
 #define LVCCS(name)                                                           \
 		NET_REGISTER_DEV(LVCCS, name)
 
-#endif /* NLD_FOURTERM_H_ */
+#endif // NLD_FOURTERM_H_

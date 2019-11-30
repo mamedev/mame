@@ -184,7 +184,7 @@ INTERRUPT_GEN_MEMBER(mexico86_state::kikikai_interrupt)
 	if (m_mcu_running)
 		mcu_simulate();
 
-	device.execute().set_input_line_vector(0, m_protection_ram[0]);
+	device.execute().set_input_line_vector(0, m_protection_ram[0]); // Z80
 	device.execute().set_input_line(0, HOLD_LINE);
 }
 
@@ -312,7 +312,7 @@ WRITE8_MEMBER(mexico86_state::mexico86_68705_port_b_w)
 
 	if (BIT(mem_mask, 5) && BIT(data, 5) && !BIT(m_port_b_out, 5))
 	{
-		m_maincpu->set_input_line_vector(0, m_protection_ram[0]);
+		m_maincpu->set_input_line_vector(0, m_protection_ram[0]); // Z80
 		m_maincpu->set_input_line(0, HOLD_LINE); // HOLD_LINE works better in Z80 interrupt mode 1.
 		m_mcu->set_input_line(M68705_IRQ_LINE, CLEAR_LINE);
 	}

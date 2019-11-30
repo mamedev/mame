@@ -15,6 +15,7 @@
 #include "machine/timer.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 
 
@@ -24,29 +25,30 @@ class segas32_state : public device_t
 public:
 	segas32_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void init_alien3(void);
+	void init_alien3();
 	void init_arescue(int m_hasdsp);
-	void init_arabfgt(void);
-	void init_brival(void);
-	void init_darkedge(void);
-	void init_dbzvrvs(void);
-	void init_f1en(void);
-	void init_f1lap(void);
-	void init_ga2(void);
-	void init_harddunk(void);
-	void init_holo(void);
-	void init_jpark(void);
-	void init_orunners(void);
-	void init_radm(void);
-	void init_radr(void);
-	void init_scross(void);
-	void init_slipstrm(void);
-	void init_sonic(void);
-	void init_sonicp(void);
-	void init_spidman(void);
-	void init_svf(void);
-	void init_jleague(void);
-	void init_titlef(void);
+	void init_arabfgt();
+	void init_brival();
+	void init_darkedge();
+	void init_dbzvrvs();
+	void init_f1en();
+	void init_f1lap();
+	void init_f1lapt();
+	void init_ga2();
+	void init_harddunk();
+	void init_holo();
+	void init_jpark();
+	void init_orunners();
+	void init_radm();
+	void init_radr();
+	void init_scross();
+	void init_slipstrm();
+	void init_sonic();
+	void init_sonicp();
+	void init_spidman();
+	void init_svf();
+	void init_jleague();
+	void init_titlef();
 
 	cpu_device* maincpu() { return m_maincpu; }
 
@@ -62,19 +64,18 @@ public:
 	DECLARE_WRITE8_MEMBER(misc_output_1_w);
 	DECLARE_WRITE8_MEMBER(sw2_output_0_w);
 	DECLARE_WRITE8_MEMBER(sw2_output_1_w);
-	DECLARE_WRITE_LINE_MEMBER(display_enable_0_w);
-	DECLARE_WRITE_LINE_MEMBER(display_enable_1_w);
+	template<int Which> DECLARE_WRITE_LINE_MEMBER(display_enable_w);
 	DECLARE_WRITE8_MEMBER(tilebank_external_w);
 
 protected:
-	segas32_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	segas32_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_multi32);
 
 	typedef void (segas32_state::*sys32_output_callback)(int which, uint16_t data);
 
 	struct layer_info
 	{
-		bitmap_ind16 *bitmap;
-		uint8_t* transparent;
+		bitmap_ind16 *bitmap = nullptr;
+		uint8_t* transparent = nullptr;
 	};
 
 	struct extents_list
@@ -86,10 +87,10 @@ protected:
 
 	struct cache_entry
 	{
-		struct cache_entry *    next;
-		tilemap_t *             tmap;
-		uint8_t                   page;
-		uint8_t                   bank;
+		struct cache_entry *    next = nullptr;
+		tilemap_t *             tmap = nullptr;
+		uint8_t                   page = 0;
+		uint8_t                   bank = 0;
 	};
 
 	DECLARE_WRITE16_MEMBER(sonic_level_load_protection);
@@ -102,24 +103,16 @@ protected:
 	DECLARE_WRITE16_MEMBER(jleague_protection_w);
 	DECLARE_READ16_MEMBER(arescue_dsp_r);
 	DECLARE_WRITE16_MEMBER(arescue_dsp_w);
-	DECLARE_READ16_MEMBER(system32_paletteram_r);
-	DECLARE_WRITE16_MEMBER(system32_paletteram_w);
-	DECLARE_READ32_MEMBER(multi32_paletteram_0_r);
-	DECLARE_WRITE32_MEMBER(multi32_paletteram_0_w);
-	DECLARE_READ32_MEMBER(multi32_paletteram_1_r);
-	DECLARE_WRITE32_MEMBER(multi32_paletteram_1_w);
-	DECLARE_READ16_MEMBER(system32_videoram_r);
-	DECLARE_WRITE16_MEMBER(system32_videoram_w);
+	template<int Which> DECLARE_READ16_MEMBER(paletteram_r);
+	template<int Which> DECLARE_WRITE16_MEMBER(paletteram_w);
+	DECLARE_READ16_MEMBER(videoram_r);
+	DECLARE_WRITE16_MEMBER(videoram_w);
 	DECLARE_READ8_MEMBER(sprite_control_r);
 	DECLARE_WRITE8_MEMBER(sprite_control_w);
-	DECLARE_READ16_MEMBER(system32_spriteram_r);
-	DECLARE_WRITE16_MEMBER(system32_spriteram_w);
-	DECLARE_READ32_MEMBER(multi32_spriteram_r);
-	DECLARE_WRITE32_MEMBER(multi32_spriteram_w);
-	DECLARE_READ16_MEMBER(system32_mixer_r);
-	DECLARE_WRITE16_MEMBER(system32_mixer_w);
-	DECLARE_WRITE32_MEMBER(multi32_mixer_0_w);
-	DECLARE_WRITE32_MEMBER(multi32_mixer_1_w);
+	DECLARE_READ16_MEMBER(spriteram_r);
+	DECLARE_WRITE16_MEMBER(spriteram_w);
+	template<int Which> DECLARE_READ16_MEMBER(mixer_r);
+	template<int Which> DECLARE_WRITE16_MEMBER(mixer_w);
 	DECLARE_READ8_MEMBER(int_control_r);
 	DECLARE_WRITE8_MEMBER(int_control_w);
 
@@ -142,13 +135,10 @@ protected:
 	TIMER_CALLBACK_MEMBER(end_of_vblank_int);
 	TIMER_CALLBACK_MEMBER(update_sprites);
 
-	void common_start(int multi32);
 	void system32_set_vblank(int state);
 	inline uint16_t xBBBBBGGGGGRRRRR_to_xBGRBBBBGGGGRRRR(uint16_t value);
 	inline uint16_t xBGRBBBBGGGGRRRR_to_xBBBBBGGGGGRRRRR(uint16_t value);
 	inline void update_color(int offset, uint16_t data);
-	inline uint16_t common_paletteram_r(address_space &space, int which, offs_t offset);
-	void common_paletteram_w(address_space &space, int which, offs_t offset, uint16_t data, uint16_t mem_mask);
 	tilemap_t *find_cache_entry(int page, int bank);
 	inline void get_tilemaps(int bgnum, tilemap_t **tilemaps);
 	uint8_t update_tilemaps(screen_device &screen, const rectangle &cliprect);
@@ -218,9 +208,10 @@ protected:
 
 	required_shared_ptr<uint8_t> m_z80_shared_ram;
 	optional_shared_ptr<uint16_t> m_system32_workram;
-	required_shared_ptr<uint16_t> m_system32_videoram;
-	required_shared_ptr<uint16_t> m_system32_spriteram;
-	optional_shared_ptr_array<uint16_t, 2> m_system32_paletteram;
+	required_shared_ptr<uint16_t> m_videoram;
+	required_shared_ptr<uint16_t> m_spriteram;
+	optional_shared_ptr<uint8_t> m_soundram;
+	optional_shared_ptr_array<uint16_t, 2> m_paletteram;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
@@ -239,6 +230,8 @@ protected:
 	optional_memory_bank m_multipcm_bank_hi;
 	optional_memory_bank m_multipcm_bank_lo;
 
+	const bool m_is_multi32;
+
 	uint8_t m_v60_irq_control[0x10];
 	timer_device *m_v60_irq_timer[2];
 	uint8_t m_sound_irq_control[4];
@@ -252,7 +245,6 @@ protected:
 	uint16_t m_system32_displayenable[2];
 	uint16_t m_system32_tilebank_external;
 	uint16_t m_arescue_dsp_io[6];
-	uint8_t m_is_multi32;
 	struct cache_entry *m_cache_head;
 	struct layer_info m_layer_data[11];
 	uint16_t m_mixer_control[2][0x40];
@@ -273,10 +265,6 @@ class segas32_regular_state : public segas32_state
 {
 public:
 	segas32_regular_state(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-//  virtual void device_start() override;
-//  virtual void device_reset() override;
 };
 
 class segas32_analog_state : public segas32_state
@@ -288,8 +276,6 @@ protected:
 	segas32_analog_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_add_mconfig(machine_config &config) override;
-//  virtual void device_start() override;
-//  virtual void device_reset() override;
 };
 
 class segas32_trackball_state : public segas32_state
@@ -300,7 +286,6 @@ public:
 	void system32_trackball_map(address_map &map);
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
 };
 
 class segas32_4player_state : public segas32_state
@@ -312,8 +297,6 @@ protected:
 	segas32_4player_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_add_mconfig(machine_config &config) override;
-//  virtual void device_start() override;
-//  virtual void device_reset() override;
 };
 
 class segas32_v25_state : public segas32_4player_state
@@ -327,7 +310,6 @@ public:
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
-//  virtual void device_reset() override;
 
 private:
 	void decrypt_protrom();
@@ -340,8 +322,6 @@ public:
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-//  virtual void device_reset() override;
 };
 
 class segas32_cd_state : public segas32_state
@@ -358,7 +338,6 @@ public:
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
-//  virtual void device_reset() override;
 
 private:
 	output_finder<16> m_lamps;
@@ -373,8 +352,6 @@ protected:
 	sega_multi32_state(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-//  virtual void device_reset() override;
 };
 
 class sega_multi32_analog_state : public sega_multi32_state
@@ -390,7 +367,6 @@ public:
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
-//  virtual void device_reset() override;
 
 private:
 	optional_ioport_array<8> m_analog_ports;
@@ -404,8 +380,6 @@ public:
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-//  virtual void device_reset() override;
 };
 
 DECLARE_DEVICE_TYPE(SEGA_S32_PCB, segas32_state)

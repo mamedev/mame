@@ -89,7 +89,7 @@ void vtech_joystick_interface_device::device_start()
 
 void vtech_joystick_interface_device::device_reset()
 {
-	io_space().install_read_handler(0x20, 0x2f, read8_delegate(FUNC(vtech_joystick_interface_device::joystick_r), this));
+	io_space().install_read_handler(0x20, 0x2f, read8_delegate(*this, FUNC(vtech_joystick_interface_device::joystick_r)));
 }
 
 

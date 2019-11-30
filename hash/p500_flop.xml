@@ -9,7 +9,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="p500-burnin.d80" size="533248" crc="e49b3b21" sha1="5255fc8faa361c6ee67b86b09b1f98a4f162ba87" offset="0" />
+				<rom name="p500-burnin.d80" size="533248" crc="e49b3b21" sha1="5255fc8faa361c6ee67b86b09b1f98a4f162ba87"/>
 			</dataarea>
 		</part>
 	</software>
@@ -21,7 +21,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="p500demos.d80" size="533248" crc="676451dd" sha1="4d66ec01c46030ad671bea6b44bcf4c8fe563ea2" offset="0" />
+				<rom name="p500demos.d80" size="533248" crc="676451dd" sha1="4d66ec01c46030ad671bea6b44bcf4c8fe563ea2"/>
 			</dataarea>
 		</part>
 	</software>

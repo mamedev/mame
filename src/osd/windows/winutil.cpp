@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 //============================================================
 //
-//  winutil.c - Win32 OSD core utility functions
+//  winutil.cpp - Win32 OSD core utility functions
 //
 //============================================================
 

@@ -25,7 +25,8 @@ DEFINE_DEVICE_TYPE(EINSTEIN_SPECULATOR, einstein_speculator_device, "einstein_sp
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(einstein_speculator_device::device_add_mconfig)
+void einstein_speculator_device::device_add_mconfig(machine_config &config)
+{
 	TTL74123(config, m_ic5a, 0);
 	m_ic5a->set_connection_type(TTL74123_NOT_GROUNDED_NO_DIODE);
 	m_ic5a->set_resistor_value(RES_K(47));
@@ -48,11 +49,11 @@ MACHINE_CONFIG_START(einstein_speculator_device::device_add_mconfig)
 	WAVE(config, "wave", m_cassette).add_route(ALL_OUTPUTS, "mono", 0.25);
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_CASSETTE_ADD(m_cassette)
-	MCFG_CASSETTE_FORMATS(tzx_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
-	MCFG_CASSETTE_INTERFACE("spectrum_cass")
-MACHINE_CONFIG_END
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(tzx_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	m_cassette->set_interface("spectrum_cass");
+}
 
 
 //**************************************************************************
@@ -96,18 +97,18 @@ void einstein_speculator_device::device_reset()
 {
 	// ram: range 0x1f, 0x3f, 0x5f, 0x7f, 0x9f, 0xbf, 0xdf, 0xff
 	io_space().install_readwrite_handler(0x1f, 0x1f, 0, 0, 0xffe0,
-		read8_delegate(FUNC(einstein_speculator_device::ram_r), this),
-		write8_delegate(FUNC(einstein_speculator_device::ram_w), this));
+			read8_delegate(*this, FUNC(einstein_speculator_device::ram_r)),
+			write8_delegate(*this, FUNC(einstein_speculator_device::ram_w)));
 
 	// ram: range 0x60 - 0xff
 	io_space().install_readwrite_handler(0x60, 0x60, 0, 0, 0xff9f,
-		read8_delegate(FUNC(einstein_speculator_device::ram_r), this),
-		write8_delegate(FUNC(einstein_speculator_device::ram_w), this));
+			read8_delegate(*this, FUNC(einstein_speculator_device::ram_r)),
+			write8_delegate(*this, FUNC(einstein_speculator_device::ram_w)));
 
 	// tape read/nmi write register: range 0xff
 	io_space().install_readwrite_handler(0xff, 0xff, 0, 0, 0xff00,
-		read8_delegate(FUNC(einstein_speculator_device::tape_r), this),
-		write8_delegate(FUNC(einstein_speculator_device::nmi_w), this));
+			read8_delegate(*this, FUNC(einstein_speculator_device::tape_r)),
+			write8_delegate(*this, FUNC(einstein_speculator_device::nmi_w)));
 }
 
 

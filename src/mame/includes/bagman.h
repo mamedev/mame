@@ -9,6 +9,7 @@
 #include "machine/74259.h"
 #include "sound/tms5110.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class bagman_state : public driver_device
 {
@@ -22,11 +23,9 @@ public:
 		m_tmsprom(*this, "tmsprom"),
 		m_tmslatch(*this, "tmslatch"),
 		m_videoram(*this, "videoram"),
-		m_colorram(*this, "colorram"),
-		m_spriteram(*this, "spriteram")
+		m_colorram(*this, "colorram")
 	{ }
 
-	void bagman_base(machine_config &config);
 	void botanic(machine_config &config);
 	void sbagman(machine_config &config);
 	void bagman(machine_config &config);
@@ -56,13 +55,14 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(bagman);
+	void bagman_palette(palette_device &palette) const;
 
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void update_pal();
+	void bagman_base(machine_config &config);
 	void main_map(address_map &map);
 	void main_portmap(address_map &map);
 	void pickin_map(address_map &map);
@@ -77,7 +77,6 @@ private:
 
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
-	required_shared_ptr<uint8_t> m_spriteram;
 
 	bool m_irq_mask;
 	bool m_video_enable;

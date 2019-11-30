@@ -253,7 +253,7 @@ void nes_ss88006_device::pcb_reset()
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_jf11_device::write_m)
+void nes_jf11_device::write_m(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("jf11 write_m, offset: %04x, data: %02x\n", offset, data));
 	chr8(data, CHRROM);
@@ -274,7 +274,7 @@ WRITE8_MEMBER(nes_jf11_device::write_m)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_jf13_device::write_m)
+void nes_jf13_device::write_m(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("jf13 write_m, offset: %04x, data: %02x\n", offset, data));
 
@@ -301,7 +301,7 @@ WRITE8_MEMBER(nes_jf13_device::write_m)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_jf16_device::write_h)
+void nes_jf16_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("jf16 write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -330,7 +330,7 @@ WRITE8_MEMBER(nes_jf16_device::write_h)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_jf17_device::write_h)
+void nes_jf17_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("jf17 write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -345,7 +345,7 @@ WRITE8_MEMBER(nes_jf17_device::write_h)
 	m_latch = data;
 }
 
-WRITE8_MEMBER(nes_jf17_adpcm_device::write_h)
+void nes_jf17_adpcm_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("jf17 + ADPCM write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -379,7 +379,7 @@ WRITE8_MEMBER(nes_jf17_adpcm_device::write_h)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_jf19_device::write_h)
+void nes_jf19_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("jf19 write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -392,7 +392,7 @@ WRITE8_MEMBER(nes_jf19_device::write_h)
 		chr8(data & 0x0f, CHRROM);
 }
 
-WRITE8_MEMBER(nes_jf19_adpcm_device::write_h)
+void nes_jf19_adpcm_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("jf19 + ADPCM write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -474,7 +474,7 @@ void nes_ss88006_device::device_timer(emu_timer &timer, device_timer_id id, int 
 	}
 }
 
-WRITE8_MEMBER(nes_ss88006_device::ss88006_write)
+void nes_ss88006_device::ss88006_write(offs_t offset, uint8_t data)
 {
 	uint8_t bank;
 	LOG_MMC(("ss88006 write_h, offset: %04x, data: %02x\n", offset, data));
@@ -564,7 +564,7 @@ WRITE8_MEMBER(nes_ss88006_device::ss88006_write)
 // bits2-bits6 are sample number, bit1 is setup/enable/disable
 // program first write sample # + bit1 set to 'init' the sample
 // then it writes sample # + bit1 clear to 'start' the sample
-void nes_ss88006_adpcm_device::ss88006_adpcm_write(address_space &space, offs_t offset, uint8_t data, samples_device *dev)
+void nes_ss88006_adpcm_device::ss88006_adpcm_write(offs_t offset, uint8_t data, samples_device &dev)
 {
 	LOG_MMC(("ss88006 write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -575,13 +575,13 @@ void nes_ss88006_adpcm_device::ss88006_adpcm_write(address_space &space, offs_t 
 			{
 //              printf("sample write: data: %02x\n", data);
 				if ((m_latch & 2) && !(data & 2))
-					dev->start((data >> 2) & 0x1f, (data >> 2) & 0x1f);
+					dev.start((data >> 2) & 0x1f, (data >> 2) & 0x1f);
 			}
 			m_latch = data;
 			break;
 
 		default:
-			ss88006_write(space, offset, data);
+			ss88006_write(offset, data);
 			break;
 	}
 }
@@ -771,79 +771,79 @@ static const char *const jf33_sample_names[] =
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(nes_jf13_device::device_add_mconfig)
-
+void nes_jf13_device::device_add_mconfig(machine_config &config)
+{
 	// additional sound hardware
 	SPEAKER(config, "addon").front_center();
 
-	MCFG_DEVICE_ADD("samples", SAMPLES, 0)
-	MCFG_SAMPLES_CHANNELS(16)
-	MCFG_SAMPLES_NAMES(jf13_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 0.50)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(16);
+	m_samples->set_samples_names(jf13_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "addon", 0.50);
+}
 
-MACHINE_CONFIG_START(nes_jf17_adpcm_device::device_add_mconfig)
-
+void nes_jf17_adpcm_device::device_add_mconfig(machine_config &config)
+{
 	// additional sound hardware
 	SPEAKER(config, "addon").front_center();
 
-	MCFG_DEVICE_ADD("samples", SAMPLES, 0)
-	MCFG_SAMPLES_CHANNELS(20)
-	MCFG_SAMPLES_NAMES(jf17_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 0.50)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(20);
+	m_samples->set_samples_names(jf17_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "addon", 0.50);
+}
 
-MACHINE_CONFIG_START(nes_jf19_adpcm_device::device_add_mconfig)
-
+void nes_jf19_adpcm_device::device_add_mconfig(machine_config &config)
+{
 	// additional sound hardware
 	SPEAKER(config, "addon").front_center();
 
-	MCFG_DEVICE_ADD("samples", SAMPLES, 0)
-	MCFG_SAMPLES_CHANNELS(20)
-	MCFG_SAMPLES_NAMES(jf19_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 0.50)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(20);
+	m_samples->set_samples_names(jf19_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "addon", 0.50);
+}
 
-MACHINE_CONFIG_START(nes_jf23_device::device_add_mconfig)
-
+void nes_jf23_device::device_add_mconfig(machine_config &config)
+{
 	// additional sound hardware
 	SPEAKER(config, "addon").front_center();
 
-	MCFG_DEVICE_ADD("samples", SAMPLES, 0)
-	MCFG_SAMPLES_CHANNELS(20)
-	MCFG_SAMPLES_NAMES(jf23_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 0.50)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(20);
+	m_samples->set_samples_names(jf23_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "addon", 0.50);
+}
 
-MACHINE_CONFIG_START(nes_jf24_device::device_add_mconfig)
-
+void nes_jf24_device::device_add_mconfig(machine_config &config)
+{
 	// additional sound hardware
 	SPEAKER(config, "addon").front_center();
 
-	MCFG_DEVICE_ADD("samples", SAMPLES, 0)
-	MCFG_SAMPLES_CHANNELS(6)
-	MCFG_SAMPLES_NAMES(jf24_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 0.50)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(6);
+	m_samples->set_samples_names(jf24_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "addon", 0.50);
+}
 
-MACHINE_CONFIG_START(nes_jf29_device::device_add_mconfig)
-
+void nes_jf29_device::device_add_mconfig(machine_config &config)
+{
 	// additional sound hardware
 	SPEAKER(config, "addon").front_center();
 
-	MCFG_DEVICE_ADD("samples", SAMPLES, 0)
-	MCFG_SAMPLES_CHANNELS(20)
-	MCFG_SAMPLES_NAMES(jf29_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 0.50)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(20);
+	m_samples->set_samples_names(jf29_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "addon", 0.50);
+}
 
-MACHINE_CONFIG_START(nes_jf33_device::device_add_mconfig)
-
+void nes_jf33_device::device_add_mconfig(machine_config &config)
+{
 	// additional sound hardware
 	SPEAKER(config, "addon").front_center();
 
-	MCFG_DEVICE_ADD("samples", SAMPLES, 0)
-	MCFG_SAMPLES_CHANNELS(20)
-	MCFG_SAMPLES_NAMES(jf33_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 0.50)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(20);
+	m_samples->set_samples_names(jf33_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "addon", 0.50);
+}

@@ -17,6 +17,7 @@
 #include "sound/ay8910.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class centiped_state : public driver_device
 {
@@ -125,7 +126,7 @@ private:
 	DECLARE_MACHINE_RESET(magworm);
 	DECLARE_VIDEO_START(milliped);
 	DECLARE_VIDEO_START(warlords);
-	DECLARE_PALETTE_INIT(warlords);
+	void warlords_palette(palette_device &palette) const;
 	uint32_t screen_update_centiped(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_bullsdrt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_milliped(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

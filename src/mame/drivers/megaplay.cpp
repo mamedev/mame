@@ -41,7 +41,6 @@ this reason.
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/cxd1095.h"
-#include "sound/sn76496.h"
 
 #include "includes/megadriv.h"
 
@@ -104,7 +103,6 @@ private:
 	uint32_t m_bios_bank_addr;
 
 	uint32_t m_bios_width;  // determines the way the game info ROM is read
-	uint8_t m_bios_ctrl[6];
 	uint8_t m_bios_6600;
 	uint8_t m_bios_6403;
 	uint8_t m_bios_6404;
@@ -473,7 +471,7 @@ READ8_MEMBER(mplay_state::bank_r)
 		}
 		else
 		{
-			return memregion("maincpu")->base()[fulladdress ^ 1];
+			return memregion("maincpu")->as_u8(BYTE_XOR_BE(fulladdress));
 		}
 	}
 	else if (fulladdress >= 0xa10000 && fulladdress <= 0xa1001f) // IO access
@@ -607,17 +605,16 @@ void mplay_state::megaplay_bios_map(address_map &map)
 
 READ8_MEMBER(mplay_state::vdp1_count_r)
 {
-	address_space &prg = m_bioscpu->space(AS_PROGRAM);
 	if (offset & 0x01)
-		return m_vdp1->hcount_read(prg, offset);
+		return m_vdp1->hcount_read();
 	else
-		return m_vdp1->vcount_read(prg, offset);
+		return m_vdp1->vcount_read();
 }
 
 void mplay_state::megaplay_bios_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x7f, 0x7f).w("sn2", FUNC(sn76496_device::command_w));
+	map(0x7f, 0x7f).w(m_vdp1, FUNC(sega315_5124_device::psg_w));
 
 	map(0x40, 0x41).mirror(0x3e).r(FUNC(mplay_state::vdp1_count_r));
 	map(0x80, 0x80).mirror(0x3e).rw(m_vdp1, FUNC(sega315_5124_device::data_read), FUNC(sega315_5124_device::data_write));
@@ -632,23 +629,28 @@ uint32_t mplay_state::screen_update_megplay(screen_device &screen, bitmap_rgb32 
 	//m_vdp1->screen_update(screen, bitmap, cliprect);
 
 	// TODO : the overlay (256 pixels wide) is actually stretched over the 320 resolution genesis output, reference is https://youtu.be/Oir1Wp6yOq0.
-	// if it's meant to be stretched we'll have to multiply the entire outut x4 for the Genesis VDP and x5 for the SMS VDP to get a common 1280 pixel wide image
+	// if it's meant to be stretched we'll have to multiply the entire output x4 for the Genesis VDP and x5 for the SMS VDP to get a common 1280 pixel wide image
 
 	// overlay, only drawn for pixels != 0
+	const u32 width = sega315_5124_device::WIDTH - (sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH);
 	for (int y = 0; y < 224; y++)
 	{
 		uint32_t* lineptr = &bitmap.pix32(y);
-		uint32_t* srcptr =  &m_vdp1->get_bitmap().pix32(y + sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT);
+		uint32_t* srcptr =  &m_vdp1->get_bitmap().pix32(y + sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT, sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH);
+		uint8_t* y1ptr = &m_vdp1->get_y1_bitmap().pix8(y + sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT, sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH);
 
-		for (int x = 0; x < sega315_5124_device::WIDTH; x++)
+		for (int srcx = 0, xx = 0, dstx = 0; srcx < width; dstx++)
 		{
-			uint32_t src = srcptr[x] & 0xffffff;
+			uint32_t src = srcptr[srcx] & 0xffffff;
 
-			if (src)
+			if (y1ptr[srcx])
 			{
-				if (x>=16)
-					lineptr[x-16] = src;
-
+				lineptr[dstx] = src;
+			}
+			if (++xx >= 5)
+			{
+				srcx++;
+				xx = 0;
 			}
 		}
 	}
@@ -664,26 +666,27 @@ MACHINE_RESET_MEMBER(mplay_state,megaplay)
 	MACHINE_RESET_CALL_MEMBER(megadriv);
 }
 
-MACHINE_CONFIG_START(mplay_state::megaplay)
+void mplay_state::megaplay(machine_config &config)
+{
 	/* basic machine hardware */
 	md_ntsc(config);
 
 	/* The Megaplay has an extra BIOS cpu which drives an SMS VDP
 	   which includes an SN76496 for sound */
-	MCFG_DEVICE_ADD("mtbios", Z80, MASTER_CLOCK / 15) /* ?? */
-	MCFG_DEVICE_PROGRAM_MAP(megaplay_bios_map)
-	MCFG_DEVICE_IO_MAP(megaplay_bios_io_map)
+	Z80(config, m_bioscpu, MASTER_CLOCK / 15); /* ?? */
+	m_bioscpu->set_addrmap(AS_PROGRAM, &mplay_state::megaplay_bios_map);
+	m_bioscpu->set_addrmap(AS_IO, &mplay_state::megaplay_bios_io_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
-	cxd1095_device &io1(CXD1095(config, "io1", 0));
+	cxd1095_device &io1(CXD1095(config, "io1"));
 	io1.in_porta_cb().set_ioport("DSW0");
 	io1.in_portb_cb().set_ioport("DSW1");
 	io1.out_portd_cb().set(FUNC(mplay_state::bios_banksel_w));
 	io1.in_porte_cb().set(FUNC(mplay_state::bios_6204_r));
 	io1.out_porte_cb().set(FUNC(mplay_state::bios_width_w));
 
-	cxd1095_device &io2(CXD1095(config, "io2", 0));
+	cxd1095_device &io2(CXD1095(config, "io2"));
 	io2.in_porta_cb().set_ioport("TEST");
 	io2.in_portb_cb().set_ioport("COIN");
 	io2.in_portc_cb().set(FUNC(mplay_state::bios_6402_r));
@@ -692,23 +695,23 @@ MACHINE_CONFIG_START(mplay_state::megaplay)
 	io2.in_porte_cb().set(FUNC(mplay_state::bios_6404_r));
 	io2.out_porte_cb().set(FUNC(mplay_state::bios_6404_w));
 
-	MCFG_DEVICE_ADD("sn2", SN76496, MASTER_CLOCK/15)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) /* 3.58 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25) /* 3.58 MHz */
+	m_vdp->set_lcm_scaling(true);
 
 	/* New update functions to handle the extra layer */
-	MCFG_SCREEN_MODIFY("megadriv")
-	MCFG_SCREEN_RAW_PARAMS(XTAL(10'738'635)/2, \
-			sega315_5124_device::WIDTH, sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH, sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 256, \
-			sega315_5124_device::HEIGHT_NTSC, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT + 224)
-	MCFG_SCREEN_UPDATE_DRIVER(mplay_state, screen_update_megplay)
+	subdevice<screen_device>("megadriv")->set_raw((XTAL(10'738'635) * 5)/2,
+			sega315_5124_device::WIDTH * 5, (sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH) * 5, (sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 256) * 5,
+			sega315_5124_device::HEIGHT_NTSC, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT + 224);
+	subdevice<screen_device>("megadriv")->set_screen_update(FUNC(mplay_state::screen_update_megplay));
 
 	// Megaplay has an additional SMS VDP as an overlay
-	MCFG_DEVICE_ADD("vdp1", SEGA315_5246, 0)
-	MCFG_SEGA315_5246_SET_SCREEN("megadriv")
-	MCFG_SEGA315_5246_IS_PAL(false)
-	MCFG_SEGA315_5246_INT_CB(INPUTLINE("mtbios", 0))
-MACHINE_CONFIG_END
+	SEGA315_5246(config, m_vdp1, MASTER_CLOCK / 5); /* ?? */
+	m_vdp1->set_screen("megadriv");
+	m_vdp1->set_hcounter_divide(5);
+	m_vdp1->set_is_pal(false);
+	m_vdp1->n_int().set_inputline(m_bioscpu, 0);
+	m_vdp1->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
+	m_vdp1->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
+}
 
 
 /* MegaPlay Games - Modified Genesis games */
@@ -932,17 +935,17 @@ void mplay_state::init_megaplay()
 	m_ic37_ram = std::make_unique<uint8_t[]>(0x10000);
 
 	init_megadrij();
-	m_megadrive_io_read_data_port_ptr = read8_delegate(FUNC(md_base_state::megadrive_io_read_data_port_3button),this);
-	m_megadrive_io_write_data_port_ptr = write16_delegate(FUNC(md_base_state::megadrive_io_write_data_port_3button),this);
+	m_megadrive_io_read_data_port_ptr = read8_delegate(*this, FUNC(md_base_state::megadrive_io_read_data_port_3button));
+	m_megadrive_io_write_data_port_ptr = write16_delegate(*this, FUNC(md_base_state::megadrive_io_write_data_port_3button));
 
 	// for now ...
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa10000, 0xa1001f, read16_delegate(FUNC(mplay_state::mp_io_read),this), write16_delegate(FUNC(mplay_state::mp_io_write),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa10000, 0xa1001f, read16_delegate(*this, FUNC(mplay_state::mp_io_read)), write16_delegate(*this, FUNC(mplay_state::mp_io_write)));
 
 	// megaplay has ram shared with the bios cpu here
 	m_z80snd->space(AS_PROGRAM).install_ram(0x2000, 0x3fff, &m_ic36_ram[0]);
 
 	// instead of a RAM mirror the 68k sees the extra ram of the 2nd z80 too
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa02000, 0xa03fff, read16_delegate(FUNC(mplay_state::extra_ram_r),this), write16_delegate(FUNC(mplay_state::extra_ram_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa02000, 0xa03fff, read16_delegate(*this, FUNC(mplay_state::extra_ram_r)), write16_delegate(*this, FUNC(mplay_state::extra_ram_w)));
 }
 
 /*
@@ -990,11 +993,3 @@ didn't have original Sega part numbers it's probably a converted TWC cart
 /* 11 */ GAME( 1993, mp_mazin, megaplay, megaplay, mp_mazin, mplay_state, init_megaplay, ROT0, "Sega",                  "Mazin Wars / Mazin Saga (Mega Play)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 /* ?? */ GAME( 1993, mp_col3,  megaplay, megaplay, megaplay, mplay_state, init_megaplay, ROT0, "Sega",                  "Columns III (Mega Play)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-
-
-/* Not confirmed to exist:
-
-system16.com lists 'Streets of Rage' but this seems unlikely, there are no gaps in
-the numbering prior to 'Streets of Rage 2'
-
-*/

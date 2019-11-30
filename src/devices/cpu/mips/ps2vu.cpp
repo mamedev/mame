@@ -68,9 +68,10 @@ sonyvu1_device::sonyvu1_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-MACHINE_CONFIG_START(sonyvu1_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(m_vif, SONYPS2_VIF1, 294912000/2, m_gs, DEVICE_SELF)
-MACHINE_CONFIG_END
+void sonyvu1_device::device_add_mconfig(machine_config &config)
+{
+	SONYPS2_VIF1(config, m_vif, 294912000/2, m_gs, DEVICE_SELF);
+}
 
 ps2_vif1_device* sonyvu1_device::interface()
 {

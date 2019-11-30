@@ -7,9 +7,10 @@
     DMK disk images
 
 *********************************************************************/
+#ifndef MAME_FORMATS_DMK_DSK_H
+#define MAME_FORMATS_DMK_DSK_H
 
-#ifndef DMK_DSK_H
-#define DMK_DSK_H
+#pragma once
 
 #include "flopimg.h"
 
@@ -32,4 +33,4 @@ public:
 
 extern const floppy_format_type FLOPPY_DMK_FORMAT;
 
-#endif /* DMK_DSK_H */
+#endif // MAME_FORMATS_DMK_DSK_H

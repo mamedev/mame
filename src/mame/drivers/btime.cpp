@@ -1277,215 +1277,198 @@ MACHINE_RESET_MEMBER(btime_state,mmonkey)
 	m_protection_ret = 0;
 }
 
-MACHINE_CONFIG_START(btime_state::btime)
-
+void btime_state::btime(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", DECO_CPU7, HCLK2)   /* seletable between H2/H4 via jumper */
-	MCFG_DEVICE_PROGRAM_MAP(btime_map)
+	DECO_CPU7(config, m_maincpu, HCLK2);   /* selectable between H2/H4 via jumper */
+	m_maincpu->set_addrmap(AS_PROGRAM, &btime_state::btime_map);
 
-	MCFG_DEVICE_ADD("audiocpu", M6502, HCLK1/3/2)
-	MCFG_DEVICE_PROGRAM_MAP(audio_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("8vck", btime_state, audio_nmi_gen, "screen", 0, 8)
+	M6502(config, m_audiocpu, HCLK1/3/2);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &btime_state::audio_map);
+	TIMER(config, "8vck").configure_scanline(FUNC(btime_state::audio_nmi_gen), "screen", 0, 8);
 
-	MCFG_INPUT_MERGER_ALL_HIGH("audionmi")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	INPUT_MERGER_ALL_HIGH(config, "audionmi").output_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(HCLK, 384, 8, 248, 272, 8, 248)
-	MCFG_SCREEN_UPDATE_DRIVER(btime_state, screen_update_btime)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(HCLK, 384, 8, 248, 272, 8, 248);
+	m_screen->set_screen_update(FUNC(btime_state::screen_update_btime));
+	m_screen->set_palette(m_palette);
 
 	MCFG_MACHINE_START_OVERRIDE(btime_state,btime)
 	MCFG_MACHINE_RESET_OVERRIDE(btime_state,btime)
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_btime)
-
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_INIT_OWNER(btime_state,btime)
-	MCFG_PALETTE_FORMAT(BBGGGRRR_inverted)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_btime);
+	PALETTE(config, m_palette, FUNC(btime_state::btime_palette)).set_format(palette_device::BGR_233_inverted, 16);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
-	MCFG_DEVICE_ADD("ay1", AY8910, HCLK2)
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_DISCRETE_OUTPUT)
-	MCFG_AY8910_RES_LOADS(RES_K(5), RES_K(5), RES_K(5))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, btime_state, ay_audio_nmi_enable_w))
-	MCFG_SOUND_ROUTE(0, "discrete", 1.0, 0)
-	MCFG_SOUND_ROUTE(1, "discrete", 1.0, 1)
-	MCFG_SOUND_ROUTE(2, "discrete", 1.0, 2)
+	ay8910_device &ay1(AY8910(config, "ay1", HCLK2));
+	ay1.set_flags(AY8910_DISCRETE_OUTPUT);
+	ay1.set_resistors_load(RES_K(5), RES_K(5), RES_K(5));
+	ay1.port_a_write_callback().set(FUNC(btime_state::ay_audio_nmi_enable_w));
+	ay1.add_route(0, "discrete", 1.0, 0);
+	ay1.add_route(1, "discrete", 1.0, 1);
+	ay1.add_route(2, "discrete", 1.0, 2);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, HCLK2)
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_DISCRETE_OUTPUT)
-	MCFG_AY8910_RES_LOADS(RES_K(1), RES_K(5), RES_K(5))
-	MCFG_SOUND_ROUTE(0, "discrete", 1.0, 3)
-	MCFG_SOUND_ROUTE(1, "discrete", 1.0, 4)
-	MCFG_SOUND_ROUTE(2, "discrete", 1.0, 5)
+	ay8910_device &ay2(AY8910(config, "ay2", HCLK2));
+	ay2.set_flags(AY8910_DISCRETE_OUTPUT);
+	ay2.set_resistors_load(RES_K(1), RES_K(5), RES_K(5));
+	ay2.add_route(0, "discrete", 1.0, 3);
+	ay2.add_route(1, "discrete", 1.0, 4);
+	ay2.add_route(2, "discrete", 1.0, 5);
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE, btime_sound_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	DISCRETE(config, "discrete", btime_sound_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
-MACHINE_CONFIG_START(btime_state::cookrace)
+void btime_state::cookrace(machine_config &config)
+{
 	btime(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_REPLACE("maincpu", DECO_C10707, HCLK2)
-	MCFG_DEVICE_PROGRAM_MAP(cookrace_map)
+	DECO_C10707(config.replace(), m_maincpu, HCLK2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &btime_state::cookrace_map);
 
-	MCFG_DEVICE_MODIFY("audiocpu")
-	MCFG_DEVICE_PROGRAM_MAP(audio_map)
+	m_audiocpu->set_addrmap(AS_PROGRAM, &btime_state::audio_map);
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_cookrace)
-
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(btime_state, screen_update_cookrace)
-MACHINE_CONFIG_END
+	m_gfxdecode->set_info(gfx_cookrace);
+	m_screen->set_screen_update(FUNC(btime_state::screen_update_cookrace));
+}
 
 
-MACHINE_CONFIG_START(btime_state::lnc)
+void btime_state::lnc(machine_config &config)
+{
 	btime(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_REPLACE("maincpu", DECO_C10707, HCLK2)
-	MCFG_DEVICE_PROGRAM_MAP(lnc_map)
+	DECO_C10707(config.replace(), m_maincpu, HCLK2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &btime_state::lnc_map);
 
 	MCFG_MACHINE_RESET_OVERRIDE(btime_state,lnc)
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_lnc)
+	m_gfxdecode->set_info(gfx_lnc);
 
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(8)
-	MCFG_PALETTE_INIT_OWNER(btime_state,lnc)
+	m_palette->set_entries(8);
+	m_palette->set_init(FUNC(btime_state::lnc_palette));
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(btime_state, screen_update_lnc)
-MACHINE_CONFIG_END
+	m_screen->set_screen_update(FUNC(btime_state::screen_update_lnc));
+}
 
 
-MACHINE_CONFIG_START(btime_state::wtennis)
+void btime_state::wtennis(machine_config &config)
+{
 	lnc(config);
 
-	/* basic machine hardware */
-
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(btime_state, screen_update_eggs)
-MACHINE_CONFIG_END
+	m_screen->set_screen_update(FUNC(btime_state::screen_update_eggs));
+}
 
 
-MACHINE_CONFIG_START(btime_state::mmonkey)
+void btime_state::mmonkey(machine_config &config)
+{
 	wtennis(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(mmonkey_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &btime_state::mmonkey_map);
 
 	MCFG_MACHINE_START_OVERRIDE(btime_state,mmonkey)
 	MCFG_MACHINE_RESET_OVERRIDE(btime_state,mmonkey)
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(btime_state::bnj)
+void btime_state::bnj(machine_config &config)
+{
 	btime(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_REPLACE("maincpu", DECO_C10707, HCLK4)
-	MCFG_DEVICE_CLOCK(HCLK4)
-	MCFG_DEVICE_PROGRAM_MAP(bnj_map)
+	DECO_C10707(config.replace(), m_maincpu, HCLK4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &btime_state::bnj_map);
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_bnj)
+	m_gfxdecode->set_info(gfx_bnj);
 
 	MCFG_VIDEO_START_OVERRIDE(btime_state,bnj)
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(btime_state, screen_update_bnj)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1) // 256 * 240, confirmed
-MACHINE_CONFIG_END
+	m_screen->set_screen_update(FUNC(btime_state::screen_update_bnj));
+	m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1); // 256 * 240, confirmed
+}
 
 
-MACHINE_CONFIG_START(btime_state::sdtennis)
+void btime_state::sdtennis(machine_config &config)
+{
 	bnj(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_REPLACE("audiocpu", DECO_C10707, HCLK1/3/2)
-	MCFG_DEVICE_PROGRAM_MAP(audio_map)
-MACHINE_CONFIG_END
+	DECO_C10707(config.replace(), m_audiocpu, HCLK1/3/2);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &btime_state::audio_map);
+}
 
 
-MACHINE_CONFIG_START(btime_state::zoar)
+void btime_state::zoar(machine_config &config)
+{
 	btime(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(zoar_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &btime_state::zoar_map);
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_zoar)
+	m_gfxdecode->set_info(gfx_zoar);
 
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(64)
+	m_palette->set_entries(64);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(btime_state, screen_update_zoar)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1) // 256 * 240, confirmed
+	m_screen->set_screen_update(FUNC(btime_state::screen_update_zoar));
+	m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1); // 256 * 240, confirmed
 
 	/* sound hardware */
-	MCFG_DEVICE_REPLACE("ay1", AY8910, HCLK1)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_DISCRETE_OUTPUT)
-	MCFG_AY8910_RES_LOADS(RES_K(5), RES_K(5), RES_K(5))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, btime_state, ay_audio_nmi_enable_w))
+	ay8910_device &ay1(AY8910(config.replace(), "ay1", HCLK1));
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.23);
+	ay1.set_flags(AY8910_DISCRETE_OUTPUT);
+	ay1.set_resistors_load(RES_K(5), RES_K(5), RES_K(5));
+	ay1.port_a_write_callback().set(FUNC(btime_state::ay_audio_nmi_enable_w));
 
-	MCFG_DEVICE_REPLACE("ay2", AY8910, HCLK1)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
-MACHINE_CONFIG_END
+	ay8910_device &ay2(AY8910(config.replace(), "ay2", HCLK1));
+	ay2.add_route(ALL_OUTPUTS, "mono", 0.23);
+}
 
 
-MACHINE_CONFIG_START(btime_state::disco)
+void btime_state::disco(machine_config &config)
+{
 	btime(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(HCLK4)
-	MCFG_DEVICE_PROGRAM_MAP(disco_map)
+	m_maincpu->set_clock(HCLK4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &btime_state::disco_map);
 
-	MCFG_DEVICE_MODIFY("audiocpu")
-	MCFG_DEVICE_PROGRAM_MAP(disco_audio_map)
+	m_audiocpu->set_addrmap(AS_PROGRAM, &btime_state::disco_audio_map);
 
-	MCFG_DEVICE_MODIFY("soundlatch")
-	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
+	m_soundlatch->set_separate_acknowledge(true);
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_disco)
-
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(32)
+	m_gfxdecode->set_info(gfx_disco);
+	m_palette->set_entries(32);
 
 	MCFG_VIDEO_START_OVERRIDE(btime_state,disco)
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(btime_state, screen_update_disco)
-MACHINE_CONFIG_END
+	m_screen->set_screen_update(FUNC(btime_state::screen_update_disco));
+}
 
 
-MACHINE_CONFIG_START(btime_state::tisland)
+void btime_state::tisland(machine_config &config)
+{
 	btime(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(tisland_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &btime_state::tisland_map);
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_zoar)
-MACHINE_CONFIG_END
+	m_gfxdecode->set_info(gfx_zoar);
+}
 
 
 /***************************************************************************
@@ -2019,7 +2002,7 @@ void btime_state::init_tisland()
 	   unmapped area that causes the game to fail in several circumstances.On the Cassette
 	   version the RLA (33) is in reality a BIT (24),so I'm guessing that there's something
 	   wrong going on in the encryption scheme.
-	   
+
 	   There are other locations with similar problems. These ROMs have NOT yet been
 	   confirmed on multiple PCBs, so this could still be a bad dump.
 	   */
@@ -2059,7 +2042,7 @@ void btime_state::init_protennb()
 
 void btime_state::init_wtennis()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc15f, 0xc15f, read8_delegate(FUNC(btime_state::wtennis_reset_hack_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc15f, 0xc15f, read8_delegate(*this, FUNC(btime_state::wtennis_reset_hack_r)));
 
 	m_audiocpu->space(AS_PROGRAM).install_read_bank(0x0200, 0x0fff, "bank10");
 	membank("bank10")->set_base(memregion("audiocpu")->base() + 0xe200);

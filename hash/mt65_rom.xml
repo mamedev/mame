@@ -1,0 +1,218 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="mt65_rom" description="Microtan 65 ROM images">
+
+	<software name="assem">
+		<description>2-Pass Assembler v1.2</description>
+		<year>1981</year>
+		<publisher>Tansoft</publisher>
+		<info name="usage" value="GC000" />
+		<part name="rom1" interface="rom_c000">
+			<dataarea name="rom" size="4096">
+				<rom name="assem12.rom" size="4096" crc="5d0cf5ec" sha1="8832964eb647b5bf3fe954e52218ed27cf885667"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="basic">
+		<description>Microsoft BASIC</description>
+		<year>1980</year>
+		<publisher>Tangerine</publisher>
+		<info name="usage" value="GE2ED" />
+		<part name="rom1" interface="rom_c000">
+			<dataarea name="rom" size="4096">
+				<rom name="basl.rom" size="4096" crc="3e09d384" sha1="15a98941a672ff16242cc73f1dcf1d81fccd8910"/>
+			</dataarea>
+		</part>
+		<part name="rom2" interface="rom_d000">
+			<dataarea name="rom" size="4096">
+				<rom name="basm.rom" size="4096" crc="75105113" sha1="c6fea4d65b7c52f43aa1589cace9467349a0f290"/>
+			</dataarea>
+		</part>
+		<part name="rom3" interface="rom_e000">
+			<dataarea name="rom" size="2048">
+				<rom name="bash.rom" size="2048" crc="ee6e8412" sha1="7e1bca84bab79d94a4ab8554d23e2bc28ccd0384"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="basicmp" cloneof="basic">
+		<description>Microsoft BASIC (Mousepacket Colour VDU)</description>
+		<year>1982</year>
+		<publisher>Tangerine/Mousepacket Designs</publisher>
+		<info name="usage" value="GE2ED" />
+		<part name="rom1" interface="rom_c000">
+			<dataarea name="rom" size="4096">
+				<rom name="basl.rom" size="4096" crc="3e09d384" sha1="15a98941a672ff16242cc73f1dcf1d81fccd8910"/>
+			</dataarea>
+		</part>
+		<part name="rom2" interface="rom_d000">
+			<dataarea name="rom" size="4096">
+				<rom name="basm.rom" size="4096" crc="75105113" sha1="c6fea4d65b7c52f43aa1589cace9467349a0f290"/>
+			</dataarea>
+		</part>
+		<part name="rom3" interface="rom_e000">
+			<dataarea name="rom" size="2048">
+				<rom name="bash_c.rom" size="2048" crc="c15c5c14" sha1="e1d4a5e49788ffa6b5512ad76cf7c6e786eb235a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dasm" supported="partial">
+		<description>DASM</description>
+		<year>1984</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="GC000 (Video 80/82 card)" />
+		<part name="rom1" interface="rom_c000">
+			<dataarea name="rom" size="4096">
+				<rom name="dasm_1.rom" size="4096" crc="4bf1392a" sha1="f712365589e73fcb8d655002be0cc4cfdd14d1a0"/>
+			</dataarea>
+		</part>
+		<part name="rom2" interface="rom_d000">
+			<dataarea name="rom" size="4096">
+				<rom name="dasm_2.rom" size="4096" crc="46f964a8" sha1="947eac680778fbda7b5179a1e3b0385a520aeb65"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dvword" supported="no">
+		<description>DVWord</description>
+		<year>1985</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="GC000 (Video 80/82 card)" />
+		<part name="rom1" interface="rom_c000">
+			<dataarea name="rom" size="4096">
+				<rom name="dvword_1.rom" size="4096" crc="3cd063a6" sha1="2edfb7dd0bf0688fa862c08bf3b8fec10fc1f69c"/>
+			</dataarea>
+		</part>
+		<part name="rom2" interface="rom_d000">
+			<dataarea name="rom" size="4096">
+				<rom name="dvword_2.rom" size="4096" crc="ecaae249" sha1="0cbc18f374f9b049848c317f790aed37bbd4379f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="e2prog" supported="no">
+		<description>EPROM Programmer</description>
+		<year>1982</year>
+		<publisher>Microtanic Software</publisher>
+		<info name="usage" value="GE800" />
+		<part name="rom1" interface="rom_e800">
+			<dataarea name="rom" size="2048">
+				<rom name="e2prog.rom" size="2048" crc="326462d0" sha1="5d62b18f06db64d118ccf5295c2c191f323fbe16"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fforth">
+		<description>Fig-FORTH 1.2</description>
+		<year>1982</year>
+		<publisher>Microtanic Software</publisher>
+		<info name="usage" value="GC000" />
+		<part name="rom1" interface="rom_c000">
+			<dataarea name="rom" size="4096">
+				<rom name="fforth12_1.rom" size="4096" crc="18c8e389" sha1="3201c90d8183e49b8ca683dcc383278b31683297"/>
+			</dataarea>
+		</part>
+		<part name="rom2" interface="rom_d000">
+			<dataarea name="rom" size="4096">
+				<rom name="fforth12_2.rom" size="4096" crc="b1869543" sha1="b82900f40de52beb5a4ea12abb8eaaf55665cf01"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hrgtkt">
+		<description>HRG Toolkit</description>
+		<year>1982</year>
+		<publisher>Microtanic Software</publisher>
+		<info name="usage" value="Requires HRG card" />
+		<part name="rom1" interface="rom_e800">
+			<dataarea name="rom" size="2048">
+				<rom name="hrgtkt.rom" size="2048" crc="592c13de" sha1="544c2a3d58f07dfaa90f022f059129d6b8b659d6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pgmtkt">
+		<description>PGM Toolkit</description>
+		<year>1982</year>
+		<publisher>Tangerine Users Group</publisher>
+		<info name="usage" value="Requires PGM card" />
+		<part name="rom1" interface="rom_e800">
+			<dataarea name="rom" size="2048">
+				<rom name="pgmtkt.rom" size="2048" crc="340f6ddd" sha1="93d205ffb07a339f801b9aa9469e069de321c41c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spaceinv">
+		<description>Space Invasion</description>
+		<year>1980</year>
+		<publisher>Electronics Today International</publisher>
+		<info name="usage" value="GE800" />
+		<part name="rom1" interface="rom_e800">
+			<dataarea name="rom" size="2048">
+				<rom name="spaceinv.rom" size="2048" crc="3e235077" sha1="ae7d2788125d01a3c5d57ab0d992bd708abd6ade"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="toolkit">
+		<description>Toolkit</description>
+		<year>1981</year>
+		<publisher>Microtanic Software</publisher>
+		<part name="rom1" interface="rom_e800">
+			<dataarea name="rom" size="2048">
+				<rom name="toolkit.rom" size="2048" crc="bd87fd34" sha1="f41895df4a733dddfaf1c89ecff5040addcab804"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vdutkt">
+		<description>Video 80/82 Toolkit</description>
+		<year>1982</year>
+		<publisher>Tangerine Users Group</publisher>
+		<info name="usage" value="Requires Video 80/82 card" />
+		<part name="rom1" interface="rom_e800">
+			<dataarea name="rom" size="2048">
+				<rom name="vdutkt.rom" size="2048" crc="068cbb9e" sha1="38d99c23966b69440c8498c342a1486741f4d817"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xbug">
+		<description>XBug 5.2</description>
+		<year>1980</year>
+		<publisher>Tangerine</publisher>
+		<part name="rom" interface="rom_f000">
+			<dataarea name="snap" size="2048">
+				<rom name="xbug.rom" size="2048" crc="4a875dda" sha1="9f2626e09e7604ae6e8aa55c4f3a8ace3667348b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xbug15t" cloneof="xbug" supported="no">
+		<description>XBug 5.2 (patched tape for 1.5MHz)</description>
+		<year>1984</year>
+		<publisher>Microtan Owners User Group</publisher>
+		<!-- Documented in TANDOC Issue 1 - Page 5 -->
+		<part name="rom" interface="rom_f000">
+			<dataarea name="snap" size="2048">
+				<rom name="xbug_1.5mhz.rom" size="2048" crc="9fd233ee" sha1="7b0be2d0402229ec80b062f7a0bed793686bcbf9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xbug53" cloneof="xbug">
+		<description>XBug 5.3</description>
+		<year>1980</year>
+		<publisher>Tangerine</publisher>
+		<part name="rom" interface="rom_f000">
+			<dataarea name="snap" size="2048">
+				<rom name="xbug53.rom" size="2048" crc="28dc4646" sha1="968d60428a63ddf8d8656b8bef2c456ec8e86622"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

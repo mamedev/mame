@@ -10,6 +10,7 @@
 #include "video/vsystem_gga.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class rpunch_state : public driver_device
 {
@@ -37,6 +38,10 @@ public:
 	void init_svolley();
 
 	DECLARE_CUSTOM_INPUT_MEMBER(hi_bits_r);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -72,8 +77,6 @@ private:
 	DECLARE_WRITE8_MEMBER(upd_data_w);
 	TILE_GET_INFO_MEMBER(get_bg0_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	DECLARE_VIDEO_START(rpunch);
 	DECLARE_VIDEO_START(svolley);

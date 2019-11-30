@@ -57,6 +57,7 @@ public:
 		, m_palette(*this, "palette")
 		, m_tiles(*this, "tile")
 		, m_digits(*this, "digit%u", 0U)
+		, m_outs(*this, "out%u", 0U)
 	{
 	}
 
@@ -103,8 +104,8 @@ public:
 
 private:
 	// Machine
-	DECLARE_MACHINE_START(model1);
-	DECLARE_MACHINE_RESET(model1);
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	DECLARE_READ8_MEMBER(io_r);
 	DECLARE_WRITE8_MEMBER(io_w);
@@ -158,14 +159,14 @@ private:
 	u32 m_copro_isqrt_base;
 	u32 m_copro_atan_base[4];
 	u32 m_copro_data_base;
-	u32 m_copro_ram_adr;
+	u32 m_copro_ram_adr[4];
 
 	uint16_t m_r360_state;
 	DECLARE_READ8_MEMBER(r360_r);
 	DECLARE_WRITE8_MEMBER(r360_w);
 
 	// Rendering
-	DECLARE_VIDEO_START(model1);
+	virtual void video_start() override;
 	DECLARE_READ16_MEMBER(model1_listctl_r);
 	DECLARE_WRITE16_MEMBER(model1_listctl_w);
 
@@ -389,11 +390,11 @@ private:
 	};
 
 	std::unique_ptr<view_t> m_view;
-	point_t *m_pointdb;
+	std::unique_ptr<point_t[]> m_pointdb;
 	point_t *m_pointpt;
-	quad_t      *m_quaddb;
+	std::unique_ptr<quad_t[]> m_quaddb;
 	quad_t      *m_quadpt;
-	quad_t      **m_quadind;
+	std::unique_ptr<quad_t *[]> m_quadind;
 	offs_t      m_pushpc;
 	u32 m_copro_hle_active_list_pos, m_copro_hle_active_list_length;
 	typedef void (model1_state::*tgp_func)();
@@ -505,16 +506,16 @@ private:
 
 	// I/O related
 	output_finder<2> m_digits;
+	output_finder<8> m_outs;
 	DECLARE_READ8_MEMBER(dpram_r);
+	DECLARE_WRITE8_MEMBER(gen_outputs_w);
 	DECLARE_WRITE8_MEMBER(vf_outputs_w);
 	DECLARE_WRITE8_MEMBER(vr_outputs_w);
 	DECLARE_WRITE8_MEMBER(swa_outputs_w);
 	DECLARE_WRITE8_MEMBER(wingwar_outputs_w);
 	DECLARE_WRITE8_MEMBER(wingwar360_outputs_w);
 	DECLARE_WRITE8_MEMBER(netmerc_outputs_w);
+	DECLARE_WRITE8_MEMBER(drive_board_w);
 };
-
-
-/*----------- defined in machine/model1.c -----------*/
 
 #endif // MAME_INCLUDES_MODEL1_H

@@ -118,12 +118,13 @@ DEFINE_DEVICE_TYPE(M3COMM, m3comm_device, "m3comm", "Model 3 Communication Board
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(m3comm_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(M68K_TAG, M68000, 10000000) // random
-	MCFG_DEVICE_PROGRAM_MAP(m3comm_mem)
+void m3comm_device::device_add_mconfig(machine_config &config)
+{
+	M68000(config, m_commcpu, 10000000); // random
+	m_commcpu->set_addrmap(AS_PROGRAM, &m3comm_device::m3comm_mem);
 
 	RAM(config, RAM_TAG).set_default_size("128K");
-MACHINE_CONFIG_END
+}
 
 //**************************************************************************
 //  LIVE DEVICE

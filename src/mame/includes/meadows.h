@@ -5,11 +5,17 @@
     Meadows S2650 hardware
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_MEADOWS_H
+#define MAME_INCLUDES_MEADOWS_H
+
+#pragma once
+
 #include "cpu/s2650/s2650.h"
 #include "sound/dac.h"
 #include "sound/samples.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class meadows_state : public driver_device
 {
@@ -85,3 +91,5 @@ private:
 	void minferno_data_map(address_map &map);
 	void minferno_main_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_MEADOWS_H

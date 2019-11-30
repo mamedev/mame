@@ -24,19 +24,26 @@
 #include "emupal.h"
 #include "speaker.h"
 
-#define MASTER_CLOCK_NTSC 53693175
+#define OSC1_CLOCK 53693175 // same as NTSC genesis / mega drive master clock
 
 class calcune_state : public driver_device
 {
 public:
 	calcune_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		vdp_state(0),
 		m_maincpu(*this, "maincpu"),
-		m_vdp(*this, "gen_vdp"),
-		m_vdp2(*this, "gen_vdp2"),
-		m_palette(*this, "palette")
+		m_vdp(*this, "gen_vdp%u", 1U)
 	{ }
+
+	void init_calcune();
+
+	void calcune(machine_config &config);
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device_array<sega315_5313_device, 2> m_vdp;
+
+	int m_vdp_state;
 
 	WRITE_LINE_MEMBER(vdp_sndirqline_callback_genesis_z80);
 	WRITE_LINE_MEMBER(vdp_lv6irqline_callback_genesis_68k);
@@ -47,23 +54,13 @@ public:
 
 	IRQ_CALLBACK_MEMBER(genesis_int_callback);
 
-	void init_calcune();
-
 	DECLARE_READ16_MEMBER(cal_700000_r);
 	DECLARE_WRITE16_MEMBER(cal_770000_w);
 	DECLARE_READ16_MEMBER(cal_vdp_r);
 	DECLARE_WRITE16_MEMBER(cal_vdp_w);
 
 	uint32_t screen_update_calcune(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void calcune(machine_config &config);
 	void calcune_map(address_map &map);
-private:
-	int vdp_state;
-
-	required_device<cpu_device> m_maincpu;
-	required_device<sega315_5313_device> m_vdp;
-	required_device<sega315_5313_device> m_vdp2;
-	required_device<palette_device> m_palette;
 };
 
 
@@ -99,29 +96,23 @@ INPUT_PORTS_END
 
 READ16_MEMBER(calcune_state::cal_700000_r)
 {
-	vdp_state = 0;
+	m_vdp_state = 0;
 	return 0;
 }
 
 WRITE16_MEMBER(calcune_state::cal_770000_w)
 {
-	vdp_state = data;
+	m_vdp_state = data;
 }
 
 READ16_MEMBER(calcune_state::cal_vdp_r)
 {
-	if (!vdp_state)
-		return m_vdp->vdp_r(space, offset, mem_mask);
-	else
-		return m_vdp2->vdp_r(space, offset, mem_mask);
+	return m_vdp[m_vdp_state ? 1 : 0]->vdp_r(offset, mem_mask);
 }
 
 WRITE16_MEMBER(calcune_state::cal_vdp_w)
 {
-	if (!vdp_state)
-		m_vdp->vdp_w(space, offset, data, mem_mask);
-	else
-		m_vdp2->vdp_w(space, offset, data, mem_mask);
+	m_vdp[m_vdp_state ? 1 : 0]->vdp_w(offset, data, mem_mask);
 }
 
 void calcune_state::calcune_map(address_map &map)
@@ -132,7 +123,7 @@ void calcune_state::calcune_map(address_map &map)
 
 	map(0x710000, 0x710001).portr("710000");
 	map(0x720000, 0x720001).portr("720000");
-//  AM_RANGE(0x730000, 0x730001) possible Z80 control?
+//  map(0x730000, 0x730001) possible Z80 control?
 	map(0x760000, 0x760003).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write)).umask16(0xff00);
 
 	map(0x770000, 0x770001).w(FUNC(calcune_state::cal_770000_w));
@@ -147,48 +138,55 @@ void calcune_state::calcune_map(address_map &map)
 
 uint32_t calcune_state::screen_update_calcune(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	const pen_t *paldata = m_palette->pens();
+	const pen_t *paldata = m_vdp[0]->gfx_palette()->pens();
+	const pen_t *paldata_s = m_vdp[0]->gfx_palette_shadow()->pens();
+	const pen_t *paldata_h = m_vdp[0]->gfx_palette_hilight()->pens();
+	const pen_t *paldata2 = m_vdp[1]->gfx_palette()->pens();
+	const pen_t *paldata2_s = m_vdp[1]->gfx_palette_shadow()->pens();
+	const pen_t *paldata2_h = m_vdp[1]->gfx_palette_hilight()->pens();
 
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
+		const unsigned palette_per_scanline = 64 * y;
+
 		uint32_t *dst = &bitmap.pix32(y);
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			int pix;
 
-			pix = m_vdp2->m_render_line_raw[x] & 0x3f;
+			pix = m_vdp[1]->m_render_line_raw[x] & 0x3f;
 
 			switch (pix & 0xc0)
 			{
 			case 0x00:
-				dst[x] = paldata[pix + 0x0000 + 0xc0];
+				dst[x] = paldata2[pix + palette_per_scanline];
 				break;
 			case 0x40:
 			case 0x80:
-				dst[x] = paldata[pix + 0x0040 + 0xc0];
+				dst[x] = paldata2_s[pix + palette_per_scanline];
 				break;
 			case 0xc0:
-				dst[x] = paldata[pix + 0x0080 + 0xc0];
+				dst[x] = paldata2_h[pix + palette_per_scanline];
 				break;
 
 			}
 
-			if (m_vdp->m_render_line_raw[x] & 0x100)
+			if (m_vdp[0]->m_render_line_raw[x] & 0x100)
 			{
-				pix = m_vdp->m_render_line_raw[x] & 0x3f;
+				pix = m_vdp[0]->m_render_line_raw[x] & 0x3f;
 				if (pix & 0xf)
 				{
 					switch (pix & 0xc0)
 					{
 					case 0x00:
-						dst[x] = paldata[pix + 0x0000];
+						dst[x] = paldata[pix + palette_per_scanline];
 						break;
 					case 0x40:
 					case 0x80:
-						dst[x] = paldata[pix + 0x0040];
+						dst[x] = paldata_s[pix + palette_per_scanline];
 						break;
 					case 0xc0:
-						dst[x] = paldata[pix + 0x0080];
+						dst[x] = paldata_h[pix + palette_per_scanline];
 						break;
 					}
 				}
@@ -201,8 +199,8 @@ uint32_t calcune_state::screen_update_calcune(screen_device &screen, bitmap_rgb3
 
 MACHINE_RESET_MEMBER(calcune_state,calcune)
 {
-	m_vdp->device_reset_old();
-	m_vdp2->device_reset_old();
+	m_vdp[0]->device_reset_old();
+	m_vdp[1]->device_reset_old();
 }
 
 
@@ -210,12 +208,12 @@ IRQ_CALLBACK_MEMBER(calcune_state::genesis_int_callback)
 {
 	if (irqline==4)
 	{
-		m_vdp->vdp_clear_irq4_pending();
+		m_vdp[0]->vdp_clear_irq4_pending();
 	}
 
 	if (irqline==6)
 	{
-		m_vdp->vdp_clear_irq6_pending();
+		m_vdp[0]->vdp_clear_irq6_pending();
 	}
 
 	return (0x60+irqline*4)/4; // vector address
@@ -245,55 +243,52 @@ WRITE_LINE_MEMBER(calcune_state::vdp_lv4irqline_callback_genesis_68k)
 
 MACHINE_START_MEMBER(calcune_state,calcune)
 {
-	m_vdp->stop_timers();
-	m_vdp2->stop_timers();
+	m_vdp[0]->stop_timers();
+	m_vdp[1]->stop_timers();
+	m_vdp_state = 0;
+	save_item(NAME(m_vdp_state));
 }
 
-MACHINE_CONFIG_START(calcune_state::calcune)
-	MCFG_DEVICE_ADD("maincpu", M68000, MASTER_CLOCK_NTSC / 7) /* 7.67 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(calcune_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(calcune_state,genesis_int_callback)
+void calcune_state::calcune(machine_config &config)
+{
+	M68000(config, m_maincpu, OSC1_CLOCK / 7); /* 7.67 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &calcune_state::calcune_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(calcune_state::genesis_int_callback));
 
-	MCFG_DEVICE_ADD("z80", Z80, MASTER_CLOCK_NTSC / 15) /* 3.58 MHz */
-	MCFG_DEVICE_DISABLE() /* no code is ever uploaded for the Z80, so it's unused here even if it is present on the PCB */
+	Z80(config, "z80", OSC1_CLOCK / 15).set_disable(); /* 3.58 MHz, no code is ever uploaded for the Z80, so it's unused here even if it is present on the PCB */
 
 	MCFG_MACHINE_START_OVERRIDE(calcune_state,calcune)
 	MCFG_MACHINE_RESET_OVERRIDE(calcune_state,calcune)
 
-	MCFG_SCREEN_ADD("megadriv", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)) // Vblank handled manually.
-	MCFG_SCREEN_SIZE(64*8, 620)
-	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(calcune_state, screen_update_calcune)
+	screen_device &screen(SCREEN(config, "megadriv", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(double(OSC1_CLOCK) / 10.0 / 262.0 / 342.0); // same as SMS?
+//  screen.set_refresh_hz(double(OSC1_CLOCK) / 8.0 / 262.0 / 427.0); // or 427 Htotal?
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0)); // Vblank handled manually.
+	screen.set_size(64*8, 620);
+	screen.set_visarea(0, 40*8-1, 0, 28*8-1);
+	screen.set_screen_update(FUNC(calcune_state::screen_update_calcune));
 
-	MCFG_DEVICE_ADD("gen_vdp", SEGA315_5313, MASTER_CLOCK_NTSC, "maincpu")
-	MCFG_SEGA315_5313_IS_PAL(false)
-	MCFG_SEGA315_5313_SND_IRQ_CALLBACK(WRITELINE(*this, calcune_state, vdp_sndirqline_callback_genesis_z80));
-	MCFG_SEGA315_5313_LV6_IRQ_CALLBACK(WRITELINE(*this, calcune_state, vdp_lv6irqline_callback_genesis_68k));
-	MCFG_SEGA315_5313_LV4_IRQ_CALLBACK(WRITELINE(*this, calcune_state, vdp_lv4irqline_callback_genesis_68k));
-	MCFG_SEGA315_5313_ALT_TIMING(1);
-	MCFG_SEGA315_5313_PAL_WRITE_BASE(0x0000);
-	MCFG_SEGA315_5313_PALETTE("palette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25)
+	SEGA315_5313(config, m_vdp[0], OSC1_CLOCK, m_maincpu);
+	m_vdp[0]->set_is_pal(false);
+	m_vdp[0]->snd_irq().set(FUNC(calcune_state::vdp_sndirqline_callback_genesis_z80));
+	m_vdp[0]->lv6_irq().set(FUNC(calcune_state::vdp_lv6irqline_callback_genesis_68k));
+	m_vdp[0]->lv4_irq().set(FUNC(calcune_state::vdp_lv4irqline_callback_genesis_68k));
+	m_vdp[0]->set_alt_timing(1);
+	m_vdp[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
+	m_vdp[0]->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
 
-	MCFG_DEVICE_ADD("gen_vdp2", SEGA315_5313, MASTER_CLOCK_NTSC, "maincpu")
-	MCFG_SEGA315_5313_IS_PAL(false)
+	SEGA315_5313(config, m_vdp[1], OSC1_CLOCK, m_maincpu);
+	m_vdp[1]->set_is_pal(false);
 //  are these not hooked up or should they OR with the other lines?
-//  MCFG_SEGA315_5313_SND_IRQ_CALLBACK(WRITELINE(*this, calcune_state, vdp_sndirqline_callback_genesis_z80));
-//  MCFG_SEGA315_5313_LV6_IRQ_CALLBACK(WRITELINE(*this, calcune_state, vdp_lv6irqline_callback_genesis_68k));
-//  MCFG_SEGA315_5313_LV4_IRQ_CALLBACK(WRITELINE(*this, calcune_state, vdp_lv4irqline_callback_genesis_68k));
-	MCFG_SEGA315_5313_ALT_TIMING(1);
-	MCFG_SEGA315_5313_PAL_WRITE_BASE(0x0c0);
-	MCFG_SEGA315_5313_PALETTE("palette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25)
+//  m_vdp[1]->snd_irq().set(FUNC(calcune_state::vdp_sndirqline_callback_genesis_z80));
+//  m_vdp[1]->lv6_irq().set(FUNC(calcune_state::vdp_lv6irqline_callback_genesis_68k));
+//  m_vdp[1]->lv4_irq().set(FUNC(calcune_state::vdp_lv4irqline_callback_genesis_68k));
+	m_vdp[1]->set_alt_timing(1);
+	m_vdp[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
+	m_vdp[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
 
-	MCFG_TIMER_DEVICE_ADD_SCANLINE("scantimer", "gen_vdp", sega315_5313_device, megadriv_scanline_timer_callback_alt_timing, "megadriv", 0, 1)
-	MCFG_TIMER_DEVICE_ADD_SCANLINE("scantimer2", "gen_vdp2", sega315_5313_device, megadriv_scanline_timer_callback_alt_timing, "megadriv", 0, 1)
-
-	MCFG_PALETTE_ADD("palette", 0xc0*2)
+	TIMER(config, "scantimer").configure_scanline(m_vdp[0], FUNC(sega315_5313_device::megadriv_scanline_timer_callback_alt_timing), "megadriv", 0, 1);
+	TIMER(config, "scantimer2").configure_scanline(m_vdp[1], FUNC(sega315_5313_device::megadriv_scanline_timer_callback_alt_timing), "megadriv", 0, 1);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -301,22 +296,22 @@ MACHINE_CONFIG_START(calcune_state::calcune)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymz", YMZ280B, XTAL(16'934'400))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	ymz280b_device &ymz(YMZ280B(config, "ymz", XTAL(16'934'400)));
+	ymz.add_route(0, "lspeaker", 1.0);
+	ymz.add_route(1, "rspeaker", 1.0);
+}
 
 void calcune_state::init_calcune()
 {
-	m_vdp->set_use_cram(1);
-	m_vdp->set_vdp_pal(false);
-	m_vdp->set_framerate(60);
-	m_vdp->set_total_scanlines(262);
+	m_vdp[0]->set_use_cram(1);
+	m_vdp[0]->set_vdp_pal(false);
+	m_vdp[0]->set_framerate(60);
+	m_vdp[0]->set_total_scanlines(262);
 
-	m_vdp2->set_use_cram(1);
-	m_vdp2->set_vdp_pal(false);
-	m_vdp2->set_framerate(60);
-	m_vdp2->set_total_scanlines(262);
+	m_vdp[1]->set_use_cram(1);
+	m_vdp[1]->set_vdp_pal(false);
+	m_vdp[1]->set_framerate(60);
+	m_vdp[1]->set_total_scanlines(262);
 }
 
 ROM_START( calcune )

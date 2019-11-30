@@ -1,9 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Roberto Fresca, Vas Crabb
+#ifndef MAME_INCLUDES_GOLDSTAR_H
+#define MAME_INCLUDES_GOLDSTAR_H
+
+#pragma once
 
 #include "machine/ds2401.h"
+#include "machine/i8255.h"
 #include "machine/ticket.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 
 class goldstar_state : public driver_device
@@ -21,7 +27,9 @@ public:
 		m_reel1_scroll(*this, "reel1_scroll"),
 		m_reel2_scroll(*this, "reel2_scroll"),
 		m_reel3_scroll(*this, "reel3_scroll"),
+		m_decrypted_opcodes(*this, "decrypted_opcodes"),
 		m_maincpu(*this, "maincpu"),
+		m_ppi(*this, "ppi8255_%u", 0U),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_lamps(*this, "lamp%u", 0U)
@@ -41,20 +49,29 @@ public:
 	DECLARE_WRITE8_MEMBER(goldstar_fa00_w);
 	DECLARE_WRITE8_MEMBER(ay8910_outputa_w);
 	DECLARE_WRITE8_MEMBER(ay8910_outputb_w);
+	void init_chryangl();
 	void init_goldstar();
+	void init_jkrmast();
+	void init_pkrmast();
 	void init_cmast91();
 	void init_wcherry();
 	void init_super9();
+	void init_ladylinrb();
+	void init_ladylinrc();
+	void init_ladylinrd();
+	void init_ladylinre();
 	DECLARE_VIDEO_START(goldstar);
-	DECLARE_PALETTE_INIT(cm);
+	void cm_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(cherrym);
-	DECLARE_PALETTE_INIT(cmast91);
-	DECLARE_PALETTE_INIT(lucky8);
-	uint32_t screen_update_goldstar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_cmast91(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void cmast91_palette(palette_device &palette) const;
+	void lucky8_palette(palette_device &palette) const;
+	uint32_t screen_update_goldstar(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_cmast91(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void ladylinr(machine_config &config);
+	void ladylinrb(machine_config &config);
 	void wcherry(machine_config &config);
+	void crazybon(machine_config &config);
 	void pkrmast(machine_config &config);
 	void moonlght(machine_config &config);
 	void kkotnoli(machine_config &config);
@@ -67,12 +84,15 @@ public:
 	void feverch_portmap(address_map &map);
 	void cm_map(address_map &map);
 	void cmast91_portmap(address_map &map);
+	void crazybon_portmap(address_map &map);
 	void flaming7_map(address_map &map);
 	void goldstar_map(address_map &map);
 	void goldstar_readport(address_map &map);
 	void kkotnoli_map(address_map &map);
 	void ladylinr_map(address_map &map);
 	void lucky8_map(address_map &map);
+	void common_decrypted_opcodes_map(address_map &map);
+	void super972_decrypted_opcodes_map(address_map &map);
 	void mbstar_map(address_map &map);
 	void megaline_portmap(address_map &map);
 	void ncb3_readwriteport(address_map &map);
@@ -107,6 +127,8 @@ protected:
 	optional_shared_ptr<uint8_t> m_reel2_scroll;
 	optional_shared_ptr<uint8_t> m_reel3_scroll;
 
+	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
+
 	tilemap_t *m_reel1_tilemap;
 	tilemap_t *m_reel2_tilemap;
 	tilemap_t *m_reel3_tilemap;
@@ -120,6 +142,7 @@ protected:
 	uint8_t m_cm_girl_scroll;
 
 	required_device<cpu_device> m_maincpu;
+	optional_device_array<i8255_device, 3> m_ppi;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	output_finder<16> m_lamps;
@@ -158,8 +181,9 @@ public:
 	void init_rp96sub();
 	void init_tcl();
 	void init_super7();
+	void init_chthree();
 
-	uint32_t screen_update_amcoe1a(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_amcoe1a(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void cm(machine_config &config);
 	void cmasterc(machine_config &config);
@@ -167,30 +191,15 @@ public:
 	void nfm(machine_config &config);
 	void amcoe2(machine_config &config);
 	void amcoe1(machine_config &config);
+	void chryangl(machine_config &config);
 	void amcoe1_portmap(address_map &map);
 	void amcoe2_portmap(address_map &map);
 	void cm_portmap(address_map &map);
+	void chryangl_decrypted_opcodes_map(address_map &map);
+
 protected:
 	// installed by various driver init handlers to get stuff to work
-	READ8_MEMBER(fixedval09_r) { return 0x09; }
-	READ8_MEMBER(fixedval38_r) { return 0x38; }
-	READ8_MEMBER(fixedval48_r) { return 0x48; }
-	READ8_MEMBER(fixedval58_r) { return 0x58; }
-	READ8_MEMBER(fixedval68_r) { return 0x68; }
-	READ8_MEMBER(fixedval74_r) { return 0x74; }
-	READ8_MEMBER(fixedval80_r) { return 0x80; }
-	READ8_MEMBER(fixedval82_r) { return 0x82; }
-	READ8_MEMBER(fixedval84_r) { return 0x84; }
-	READ8_MEMBER(fixedval90_r) { return 0x90; }
-	READ8_MEMBER(fixedval96_r) { return 0x96; }
-	READ8_MEMBER(fixedvala8_r) { return 0xa8; }
-	READ8_MEMBER(fixedvalaa_r) { return 0xaa; }
-	READ8_MEMBER(fixedvalb2_r) { return 0xb2; }
-	READ8_MEMBER(fixedvalb4_r) { return 0xb4; }
-	READ8_MEMBER(fixedvalbe_r) { return 0xbe; }
-	READ8_MEMBER(fixedvalc7_r) { return 0xc7; }
-	READ8_MEMBER(fixedvalea_r) { return 0xea; }
-	READ8_MEMBER(fixedvale4_r) { return 0xe4; }
+	template <uint8_t V> READ8_MEMBER(fixedval_r) { return V; }
 };
 
 
@@ -211,22 +220,29 @@ public:
 	DECLARE_WRITE8_MEMBER(system_outputc_w);
 
 	void init_lucky8a();
+	void init_lucky8f();
 	void init_magoddsc();
 	void init_flaming7();
 	void init_flam7_tw();
+	void init_luckylad();
+	void init_super972();
+	void init_wcat3();
 
 	DECLARE_VIDEO_START(bingowng);
 	DECLARE_VIDEO_START(magical);
-	DECLARE_PALETTE_INIT(magodds);
-	uint32_t screen_update_bingowng(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_magical(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_mbstar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void magodds_palette(palette_device &palette) const;
+	uint32_t screen_update_bingowng(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_magical(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_mbstar(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE_LINE_MEMBER(masked_irq);
 
 	void bingowng(machine_config &config);
 	void flaming7(machine_config &config);
 	void lucky8(machine_config &config);
+	void lucky8f(machine_config &config);
+	void lucky8k(machine_config &config);
+	void super972(machine_config &config);
 	void wcat3(machine_config &config);
 	void magodds(machine_config &config);
 	void flam7_w4(machine_config &config);
@@ -234,6 +250,7 @@ public:
 	void mbstar(machine_config &config);
 	void flam7_tw(machine_config &config);
 	void magodds_map(address_map &map);
+
 protected:
 	TILE_GET_INFO_MEMBER(get_magical_fg_tile_info);
 
@@ -262,15 +279,19 @@ public:
 	void init_chry10();
 
 	void cherrys(machine_config &config);
+	void chryangla(machine_config &config);
 	void chrygld(machine_config &config);
 	void cb3c(machine_config &config);
 	void cb3e(machine_config &config);
 	void ncb3(machine_config &config);
 	void cm97(machine_config &config);
 	void ncb3_map(address_map &map);
+	void chryangla_map(address_map &map);
+	void chryangla_decrypted_opcodes_map(address_map &map);
+
 protected:
-	void do_blockswaps(uint8_t* ROM);
-	void dump_to_file(uint8_t* ROM);
+	void do_blockswaps(uint8_t *rom);
+	void dump_to_file(uint8_t *rom);
 
 	uint8_t cb3_decrypt(uint8_t cipherText, uint16_t address);
 	uint8_t chry10_decrypt(uint8_t cipherText);
@@ -300,7 +321,7 @@ public:
 	DECLARE_WRITE8_MEMBER(reel3_attrram_w);
 
 	DECLARE_VIDEO_START(sangho);
-	uint32_t screen_update_sangho(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_sangho(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void star100(machine_config &config);
 	void star100_map(address_map &map);
@@ -346,7 +367,7 @@ public:
 	void init_unkch4();
 
 	DECLARE_VIDEO_START(unkch);
-	uint32_t screen_update_unkch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_unkch(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 
@@ -374,3 +395,5 @@ private:
 
 	optional_device<ticket_dispenser_device> m_ticket_dispenser;
 };
+
+#endif // MAME_INCLUDES_GOLDSTAR_H

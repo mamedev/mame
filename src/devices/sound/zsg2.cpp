@@ -6,47 +6,47 @@
     Written by Olivier Galibert
     MAME conversion by R. Belmont
     Working emulation by The Talentuous Hands Of The Popularious hap
-	Properly working emulation by superctr
+    Properly working emulation by superctr
     ---------------------------------------------------------
 
-	Register map:
-	000-5fe : Channel specific registers
-	          (high)   (low)
-	   +000 : xxxxxxxx -------- : Start address (low)
-	   +000 : -------- xxxxxxxx :   Unknown register (usually cleared)
-	   +002 : xxxxxxxx -------- : Address page
-	        : -------- xxxxxxxx : Start address (high)
-	   +004 : -------- -------- :   Unknown register (usually cleared)
-	   +006 : -----x-- -------- :   Unknown bit, always set
-	   +008 : xxxxxxxx xxxxxxxx : Frequency
-	   +00a : xxxxxxxx -------- : DSP ch 3 (right) output gain
-	        : -------- xxxxxxxx : Loop address (low)
-	   +00c : xxxxxxxx xxxxxxxx : End address
-	   +00e : xxxxxxxx -------- : DSP ch 2 (Left) output gain
-	        : -------- xxxxxxxx : Loop address (high)
-	   +010 : xxxxxxxx xxxxxxxx : Initial filter time constant
-	   +012 : xxxxxxxx xxxxxxxx : Current filter time constant
-	   +014 : xxxxxxxx xxxxxxxx : Initial volume
-	   +016 : xxxxxxxx xxxxxxxx : Current volume
-	   +018 : xxxxxxxx xxxxxxxx : Target filter time constant
-	   +01a : xxxxxxxx -------- : DSP ch 1 (chorus) output gain
-	        : -------- xxxxxxxx : Filter ramping speed
-	   +01c : xxxxxxxx xxxxxxxx : Target volume
-	   +01e : xxxxxxxx -------- : DSP ch 0 (reverb) output gain
-	        : -------- xxxxxxxx : Filter ramping speed
-	600-604 : Key on flags (each bit corresponds to a channel)
-	608-60c : Key off flags (each bit corresponds to a channel)
-	618     : Unknown register (usually 0x5cbc is written)
-	61a     : Unknown register (usually 0x5cbc is written)
-	620     : Unknown register (usually 0x0128 is written)
-	628     : Unknown register (usually 0x0066 is written)
-	630     : Unknown register (usually 0x0001 is written)
-	638     : ROM readback address low
-	63a     : ROM readback address high
-	63c     : ROM readback word low
-	63e     : ROM readback word high
+    Register map:
+    000-5fe : Channel specific registers (48 channels)
+              (high)   (low)
+       +000 : xxxxxxxx -------- : Start address (low)
+       +000 : -------- xxxxxxxx :   Unknown register (usually cleared)
+       +002 : xxxxxxxx -------- : Address page
+            : -------- xxxxxxxx : Start address (high)
+       +004 : -------- -------- :   Unknown register (usually cleared)
+       +006 : -----x-- -------- :   Unknown bit, always set
+       +008 : xxxxxxxx xxxxxxxx : Frequency
+       +00a : xxxxxxxx -------- : DSP ch 3 (right) output gain
+            : -------- xxxxxxxx : Loop address (low)
+       +00c : xxxxxxxx xxxxxxxx : End address
+       +00e : xxxxxxxx -------- : DSP ch 2 (Left) output gain
+            : -------- xxxxxxxx : Loop address (high)
+       +010 : xxxxxxxx xxxxxxxx : Initial filter time constant
+       +012 : xxxxxxxx xxxxxxxx : Current filter time constant
+       +014 : xxxxxxxx xxxxxxxx : Initial volume
+       +016 : xxxxxxxx xxxxxxxx : Current volume?
+       +018 : xxxxxxxx xxxxxxxx : Target filter time constant
+       +01a : xxxxxxxx -------- : DSP ch 1 (chorus) output gain
+            : -------- xxxxxxxx : Filter ramping speed
+       +01c : xxxxxxxx xxxxxxxx : Target volume
+       +01e : xxxxxxxx -------- : DSP ch 0 (reverb) output gain
+            : -------- xxxxxxxx : Filter ramping speed
+    600-604 : Key on flags (each bit corresponds to a channel)
+    608-60c : Key off flags (each bit corresponds to a channel)
+    618     : Unknown register (usually 0x5cbc is written)
+    61a     : Unknown register (usually 0x5cbc is written)
+    620     : Unknown register (usually 0x0128 is written)
+    628     : Unknown register (usually 0x0066 is written)
+    630     : Unknown register (usually 0x0001 is written)
+    638     : ROM readback address low
+    63a     : ROM readback address high
+    63c     : ROM readback word low
+    63e     : ROM readback word high
 
-	---------------------------------------------------------
+    ---------------------------------------------------------
 
     Additional notes on the sample format, reverse-engineered
     by Olivier Galibert and David Haywood:
@@ -85,7 +85,7 @@
 
 TODO:
 - Filter and ramping behavior might not be perfect.
-- sometimes clicking / popping noises
+- clicking / popping noises in gdarius, raystorm: maybe the sample ROMs are bad dumps?
 - memory reads out of range sometimes
 
 */
@@ -309,10 +309,11 @@ void zsg2_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 						elem.status &= ~STATUS_ACTIVE;
 						continue;
 					}
-
-					if(elem.cur_pos == elem.start_pos)
-						elem.emphasis_filter_state = EMPHASIS_INITIAL_BIAS;
 				}
+
+				if(elem.cur_pos == elem.start_pos)
+					elem.emphasis_filter_state = EMPHASIS_INITIAL_BIAS;
+
 				elem.step_ptr &= 0xffff;
 				filter_samples(&elem);
 			}
@@ -553,15 +554,15 @@ void zsg2_device::control_w(int reg, uint16_t data)
 			break;
 		}
 
-//		case 0x0c: //These registers are sometimes written to by the CPU. Unknown purpose.
-//			break;
-//		case 0x0d:
-//			break;
-//		case 0x10:
-//			break;
+//      case 0x0c: //These registers are sometimes written to by the CPU. Unknown purpose.
+//          break;
+//      case 0x0d:
+//          break;
+//      case 0x10:
+//          break;
 
-//		case 0x18:
-//			break;
+//      case 0x18:
+//          break;
 
 		case 0x1c:
 			// rom readback address low (low 2 bits always 0)

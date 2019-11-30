@@ -41,12 +41,13 @@ DEFINE_DEVICE_TYPE(NUBUS_APPLEENET, nubus_appleenet_device, "nb_aenet", "Apple N
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(nubus_mac8390_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(MAC8390_839X, DP8390D, 0)
-	MCFG_DP8390D_IRQ_CB(WRITELINE(*this, nubus_mac8390_device, dp_irq_w))
-	MCFG_DP8390D_MEM_READ_CB(READ8(*this, nubus_mac8390_device, dp_mem_read))
-	MCFG_DP8390D_MEM_WRITE_CB(WRITE8(*this, nubus_mac8390_device, dp_mem_write))
-MACHINE_CONFIG_END
+void nubus_mac8390_device::device_add_mconfig(machine_config &config)
+{
+	DP8390D(config, m_dp83902, 0);
+	m_dp83902->irq_callback().set(FUNC(nubus_mac8390_device::dp_irq_w));
+	m_dp83902->mem_read_callback().set(FUNC(nubus_mac8390_device::dp_mem_read));
+	m_dp83902->mem_write_callback().set(FUNC(nubus_mac8390_device::dp_mem_write));
+}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -110,10 +111,10 @@ void nubus_mac8390_device::device_start()
 
 	// TODO: move 24-bit mirroring down into nubus.c
 	uint32_t ofs_24bit = slotno()<<20;
-	nubus().install_device(slotspace+0xd0000, slotspace+0xdffff, read8_delegate(FUNC(nubus_mac8390_device::asntm3b_ram_r), this), write8_delegate(FUNC(nubus_mac8390_device::asntm3b_ram_w), this));
-	nubus().install_device(slotspace+0xe0000, slotspace+0xe003f, read32_delegate(FUNC(nubus_mac8390_device::en_r), this), write32_delegate(FUNC(nubus_mac8390_device::en_w), this));
-	nubus().install_device(slotspace+0xd0000+ofs_24bit, slotspace+0xdffff+ofs_24bit, read8_delegate(FUNC(nubus_mac8390_device::asntm3b_ram_r), this), write8_delegate(FUNC(nubus_mac8390_device::asntm3b_ram_w), this));
-	nubus().install_device(slotspace+0xe0000+ofs_24bit, slotspace+0xe003f+ofs_24bit, read32_delegate(FUNC(nubus_mac8390_device::en_r), this), write32_delegate(FUNC(nubus_mac8390_device::en_w), this));
+	nubus().install_device(slotspace+0xd0000, slotspace+0xdffff, read8_delegate(*this, FUNC(nubus_mac8390_device::asntm3b_ram_r)), write8_delegate(*this, FUNC(nubus_mac8390_device::asntm3b_ram_w)));
+	nubus().install_device(slotspace+0xe0000, slotspace+0xe003f, read32_delegate(*this, FUNC(nubus_mac8390_device::en_r)), write32_delegate(*this, FUNC(nubus_mac8390_device::en_w)));
+	nubus().install_device(slotspace+0xd0000+ofs_24bit, slotspace+0xdffff+ofs_24bit, read8_delegate(*this, FUNC(nubus_mac8390_device::asntm3b_ram_r)), write8_delegate(*this, FUNC(nubus_mac8390_device::asntm3b_ram_w)));
+	nubus().install_device(slotspace+0xe0000+ofs_24bit, slotspace+0xe003f+ofs_24bit, read32_delegate(*this, FUNC(nubus_mac8390_device::en_r)), write32_delegate(*this, FUNC(nubus_mac8390_device::en_w)));
 }
 
 //-------------------------------------------------

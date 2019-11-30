@@ -12,6 +12,6 @@
 #include "h8hd.h"
 #include "cpu/h8/h8hd.hxx"
 
-h8h_disassembler::h8h_disassembler() : h8_disassembler(disasm_entries)
+h8h_disassembler::h8h_disassembler() : h8_disassembler(disasm_entries, true)
 {
 }

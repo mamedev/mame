@@ -34,7 +34,7 @@ public:
 	void vcs80(machine_config &config);
 
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<z80pio_device> m_pio;
 	required_ioport m_y0;
 	required_ioport m_y1;
@@ -49,16 +49,16 @@ private:
 	DECLARE_READ8_MEMBER( pio_pa_r );
 	DECLARE_WRITE8_MEMBER( pio_pb_w );
 
-	DECLARE_READ8_MEMBER( mem_r )
+	uint8_t mem_r(offs_t offset)
 	{
 		m_pio->port_b_write((!BIT(offset, 0)) << 7);
-		return m_bdmem->read8(space, offset);
+		return m_bdmem->read8(offset);
 	}
 
-	DECLARE_WRITE8_MEMBER( mem_w )
+	void mem_w(offs_t offset, uint8_t data)
 	{
 		m_pio->port_b_write((!BIT(offset, 0)) << 7);
-		m_bdmem->write8(space, offset, data);
+		m_bdmem->write8(offset, data);
 	}
 
 	DECLARE_READ8_MEMBER( io_r )

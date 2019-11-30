@@ -14,7 +14,6 @@
 DEFINE_DEVICE_TYPE_NS(HP_IPC_HLE_KEYBOARD, bus::hp_hil, hle_hp_ipc_device, "hp_ipc_hle_kbd", "HP Integral Keyboard (HLE)")
 DEFINE_DEVICE_TYPE_NS(HP_ITF_HLE_KEYBOARD, bus::hp_hil, hle_hp_itf_device, "hp_itf_hle_kbd", "HP ITF Keyboard")
 
-
 namespace bus { namespace hp_hil {
 
 namespace {
@@ -27,7 +26,7 @@ namespace {
 // ID codes: A0h..BFh (HP-HIL reference, p. B-4) + (IPC Service Manual, p. 10-2)
 INPUT_PORTS_START( ipc_id )
 	PORT_START("COL0")
-	PORT_DIPNAME( 0xff, 0xb7, "Layout" )
+	PORT_DIPNAME( 0xff, 0xbf, "Layout" )
 	PORT_DIPSETTING( 0xBF, "US" )
 	PORT_DIPSETTING( 0xAF, "German" )
 	PORT_DIPSETTING( 0xB7, "UK" )
@@ -56,8 +55,8 @@ INPUT_PORTS_START( ipc_basic )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F2")           PORT_CODE(KEYCODE_F2)         PORT_CHAR(UCHAR_MAMEKEY(F2))
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F1")           PORT_CODE(KEYCODE_F1)         PORT_CHAR(UCHAR_MAMEKEY(F1))
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("KP 8")         PORT_CODE(KEYCODE_8_PAD)      PORT_CHAR(UCHAR_MAMEKEY(8_PAD))
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Stop")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Print/Enter")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Stop")         PORT_CODE(KEYCODE_SLASH_PAD)  PORT_CHAR(UCHAR_MAMEKEY(SLASH_PAD))
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Print/Enter")  PORT_CODE(KEYCODE_ENTER_PAD)  PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD))
 
 	// keycodes a0..af
 	PORT_START("COL2")
@@ -67,16 +66,16 @@ INPUT_PORTS_START( ipc_basic )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F7")           PORT_CODE(KEYCODE_F7)         PORT_CHAR(UCHAR_MAMEKEY(F7))
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F8")           PORT_CODE(KEYCODE_F8)         PORT_CHAR(UCHAR_MAMEKEY(F8))
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("KP 9")         PORT_CODE(KEYCODE_9_PAD)      PORT_CHAR(UCHAR_MAMEKEY(9_PAD))
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Clear Line")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Clear Display")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Clear Line")   PORT_CODE(KEYCODE_DEL)        PORT_CHAR(UCHAR_MAMEKEY(DEL))
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Clear Display") PORT_CODE(KEYCODE_END)       PORT_CHAR(UCHAR_MAMEKEY(END))
 
 	// keycodes b0..bf
 	PORT_START("COL3")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_8)          PORT_CHAR('8') PORT_CHAR('*')
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_9)          PORT_CHAR('9') PORT_CHAR('(')
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_0)          PORT_CHAR('0') PORT_CHAR(')')
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_EQUALS)     PORT_CHAR('=') PORT_CHAR('+')
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_SLASH)      PORT_CHAR('/') PORT_CHAR('?')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_MINUS)      PORT_CHAR('-') PORT_CHAR('_')
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_EQUALS)     PORT_CHAR('=') PORT_CHAR('+')
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Backspace")    PORT_CODE(KEYCODE_BACKSPACE)  PORT_CHAR(8)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED   )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED   )
@@ -88,7 +87,7 @@ INPUT_PORTS_START( ipc_basic )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_P)          PORT_CHAR('p') PORT_CHAR('P') PORT_CHAR(0x10) PORT_CHAR(0x10)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR('[') PORT_CHAR('{')
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']') PORT_CHAR('}')
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("< >")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_BACKSLASH)  PORT_CHAR('\\') PORT_CHAR('|')
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED   )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED   )
 
@@ -97,8 +96,8 @@ INPUT_PORTS_START( ipc_basic )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_J)          PORT_CHAR('j') PORT_CHAR('J') PORT_CHAR(0x0a) PORT_CHAR(0x0a)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_K)          PORT_CHAR('k') PORT_CHAR('K') PORT_CHAR(0x0b) PORT_CHAR(0x0b)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_L)          PORT_CHAR('l') PORT_CHAR('L') PORT_CHAR(0x0c) PORT_CHAR(0x0c)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR('\'') PORT_CHAR('"')
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_BACKSLASH)  PORT_CHAR('\\') PORT_CHAR('|')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_COLON)      PORT_CHAR(';') PORT_CHAR(':')
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR('\'') PORT_CHAR('"')
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Return")       PORT_CODE(KEYCODE_ENTER)      PORT_CHAR(13)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Home")         PORT_CODE(KEYCODE_HOME)       PORT_CHAR(UCHAR_MAMEKEY(HOME))
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED   )
@@ -108,7 +107,7 @@ INPUT_PORTS_START( ipc_basic )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_M)          PORT_CHAR('m') PORT_CHAR('M') PORT_CHAR(0x0d) PORT_CHAR(0x0d)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_COMMA)      PORT_CHAR(',') PORT_CHAR('<')
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_STOP)       PORT_CHAR('.') PORT_CHAR('>')
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_MINUS)      PORT_CHAR('-') PORT_CHAR('_')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_SLASH)      PORT_CHAR('/') PORT_CHAR('?')
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED   )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Select")       PORT_CODE(KEYCODE_PLUS_PAD)   PORT_CHAR(UCHAR_MAMEKEY(PLUS_PAD))
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED   )
@@ -134,7 +133,7 @@ INPUT_PORTS_START( ipc_basic )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("R Shift")      PORT_CODE(KEYCODE_RSHIFT)     PORT_CHAR(UCHAR_MAMEKEY(RSHIFT))
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("L Shift")      PORT_CODE(KEYCODE_LSHIFT)     PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Control")      PORT_CODE(KEYCODE_LCONTROL)   PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Break/Reset")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Break/Reset")  PORT_CODE(KEYCODE_PAUSE)      PORT_CHAR(UCHAR_MAMEKEY(PAUSE))
 
 	// keycodes 10..1f
 	PORT_START("COL9")
@@ -219,6 +218,7 @@ INPUT_PORTS_START( hle_hp_ipc_device )
 	PORT_INCLUDE( ipc_id )
 INPUT_PORTS_END
 
+
 INPUT_PORTS_START( itf_id )
 	PORT_START("COL0")
 	PORT_DIPNAME( 0xff, 0xdf, "Layout" )
@@ -250,7 +250,7 @@ INPUT_PORTS_START( itf_basic )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F2")           PORT_CODE(KEYCODE_F2)         PORT_CHAR(UCHAR_MAMEKEY(F2))
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F1")           PORT_CODE(KEYCODE_F1)         PORT_CHAR(UCHAR_MAMEKEY(F1))
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED   )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Stop")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Stop")         PORT_CODE(KEYCODE_RWIN)       PORT_CHAR(UCHAR_MAMEKEY(RWIN))
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Print/Enter")
 
 	// keycodes a0..af
@@ -283,8 +283,8 @@ INPUT_PORTS_START( itf_basic )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR('[') PORT_CHAR('{')
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']') PORT_CHAR('}')
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_BACKSLASH)  PORT_CHAR('\\') PORT_CHAR('|')
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Insert Char")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Delete Char")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Insert Char")  PORT_CODE(KEYCODE_INSERT)     PORT_CHAR(UCHAR_MAMEKEY(INSERT))
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Delete Char")  PORT_CODE(KEYCODE_DEL)        PORT_CHAR(UCHAR_MAMEKEY(DEL))
 
 	// keycodes d0..df
 	PORT_START("COL5")
@@ -295,7 +295,7 @@ INPUT_PORTS_START( itf_basic )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR('\'') PORT_CHAR('"')
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Return")       PORT_CODE(KEYCODE_ENTER)      PORT_CHAR(13)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Home")         PORT_CODE(KEYCODE_HOME)       PORT_CHAR(UCHAR_MAMEKEY(HOME))
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Prev")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Prev")         PORT_CODE(KEYCODE_PGUP)       PORT_CHAR(UCHAR_MAMEKEY(PGUP))
 
 	// keycodes e0..ef
 	PORT_START("COL6")
@@ -306,7 +306,7 @@ INPUT_PORTS_START( itf_basic )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED   )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Select")       PORT_CODE(KEYCODE_PLUS_PAD)   PORT_CHAR(UCHAR_MAMEKEY(PLUS_PAD))
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED   )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Next")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Next")         PORT_CODE(KEYCODE_PGDN)       PORT_CHAR(UCHAR_MAMEKEY(PGDN))
 
 	// keycodes f0..ff
 	PORT_START("COL7")
@@ -369,7 +369,7 @@ INPUT_PORTS_START( itf_basic )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F10")          PORT_CODE(KEYCODE_F10)        PORT_CHAR(UCHAR_MAMEKEY(F10))
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED   )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F11")          PORT_CODE(KEYCODE_F11)        PORT_CHAR(UCHAR_MAMEKEY(F11))
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_STOP)       PORT_CHAR('.')
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F9")           PORT_CODE(KEYCODE_F9)         PORT_CHAR(UCHAR_MAMEKEY(F9))
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Tab")          PORT_CODE(KEYCODE_TAB_PAD)    PORT_CHAR(9)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F12")          PORT_CODE(KEYCODE_F12)        PORT_CHAR(UCHAR_MAMEKEY(F12))
@@ -408,191 +408,24 @@ INPUT_PORTS_START( itf_basic )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_TILDE)      PORT_CHAR('`') PORT_CHAR('~')
 INPUT_PORTS_END
 
-
-
 INPUT_PORTS_START( hle_hp_itf_device )
 	PORT_INCLUDE( itf_basic )
 	PORT_INCLUDE( itf_id )
 INPUT_PORTS_END
 
-
 } // anonymous namespace
 
-
-/***************************************************************************
-    BASE HLE KEYBOARD DEVICE
-***************************************************************************/
-
-/*--------------------------------------------------
-    hle_device_base::hle_device_base
-    designated device constructor
---------------------------------------------------*/
-
-hle_device_base::hle_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock)
-	, device_hp_hil_interface(mconfig, *this)
-	, device_matrix_keyboard_interface(mconfig, *this, "COL1", "COL2", "COL3", "COL4", "COL5", "COL6", "COL7", "COL8", "COL9", "COL10", "COL11", "COL12", "COL13", "COL14", "COL15")
-{ }
-
-
-/*--------------------------------------------------
-    hle_device_base::~hle_device_base
-    destructor
---------------------------------------------------*/
-
-hle_device_base::~hle_device_base()
-{ }
-
-
-/*--------------------------------------------------
-    hle_device_base::device_start
-    perform expensive initialisations, allocate
-    resources, register for save state
---------------------------------------------------*/
-
-void hle_device_base::device_start()
+void hle_hp_ipc_device::transmit_byte(uint8_t byte)
 {
-	set_hp_hil_mlc_device();
-
-	m_powerup = true;
-	m_passthru = false;
-}
-
-
-/*--------------------------------------------------
-    hle_device_base::device_reset
-    perform startup tasks, also used for host
-    requested reset
---------------------------------------------------*/
-
-void hle_device_base::device_reset()
-{
-	m_fifo.clear();
-
-	// kick the base
-	reset_key_state();
-	start_processing(attotime::from_hz(1'200));
-}
-
-// '
-bool hle_device_base::hil_write(uint16_t *pdata)
-{
-	int frames = 0;
-	uint8_t addr = (*pdata >> 8) & 7;
-	uint8_t data = *pdata & 0xff;
-	bool command = BIT(*pdata, 11);
-
-	LOG("rx from mlc %04X (%s addr %d, data %02X)\n", *pdata,
-		command ? "command" : "data", addr, data);
-	if (!command)
-		goto out;
-
-	if (addr != 0 && addr != m_device_id)
-		goto out;
-
-	switch (data)
-	{
-	case HPHIL_IFC:
-		m_powerup = false;
-		break;
-
-	case HPHIL_EPT:
-		m_passthru = true;
-		break;
-
-	case HPHIL_ELB:
-		m_passthru = false;
-		break;
-
-	case 0x09:
-	case 0x0a:
-	case 0x0b:
-	case 0x0c:
-	case 0x0d:
-	case 0x0e:
-	case 0x0f:
-		m_device_id = data - 8;
-		m_device_id16 = (data - 8) << 8;
-		*pdata &= ~7;
-		*pdata += (data - 7);
-		break;
-
-	case HPHIL_POL:
-		if (!m_fifo.empty())
-		{
-
-			frames = 1;
-			m_hp_hil_mlc->hil_write(m_device_id16 | 0x40);  // Keycode Set 1, no coordinate data
-			while (!m_fifo.empty())
-			{
-				m_hp_hil_mlc->hil_write(m_device_id16 | m_fifo.dequeue());
-				frames++;
-			}
-		}
-		m_hp_hil_mlc->hil_write(HPMLC_W1_C | (addr << 8) | HPHIL_POL | (frames));
-		*pdata &= ~7;
-		*pdata += frames;
-		return true;
-
-	case HPHIL_DSR:
-		m_device_id = m_device_id16 = 0;
-		m_powerup = true;
-		break;
-
-	case HPHIL_IDD:
-		m_hp_hil_mlc->hil_write(0x0100 | ioport("COL0")->read());
-		m_hp_hil_mlc->hil_write(m_device_id16 | 0);
-		break;
-
-	case HPHIL_DHR:
-		m_powerup = true;
-		m_passthru = false;
-		device_reset();
-		return true;
-		break;
-
-	default:
-		LOG("command %02X unknown\n", data);
-		break;
-	}
-out:
-	if (!m_passthru) {
-		m_hp_hil_mlc->hil_write(*pdata);
-		return false;
-	}
-	return true;
-}
-
-void hle_device_base::transmit_byte(uint8_t byte)
-{
-	if (!m_fifo.full()) {
+	if (!m_fifo.full())
 		m_fifo.enqueue(byte);
-	}
-//  else
-//      printf("queuing fail (fifo full)\n");
 }
 
-/*--------------------------------------------------
-    hle_device_base::key_make
-    handle a key being pressed
---------------------------------------------------*/
-
-void hle_device_base::key_make(uint8_t row, uint8_t column)
+void hle_hp_itf_device::transmit_byte(uint8_t byte)
 {
-	transmit_byte((((row + 1) ^ 8) << 4) + (column << 1));
+	if (!m_fifo.full())
+		m_fifo.enqueue(byte);
 }
-
-
-/*--------------------------------------------------
-    hle_device_base::key_break
-    handle a key being released
---------------------------------------------------*/
-
-void hle_device_base::key_break(uint8_t row, uint8_t column)
-{
-	transmit_byte((((row + 1) ^ 8) << 4) + (column << 1) + 1);
-}
-
 
 /***************************************************************************
     HP INTEGRAL HLE KEYBOARD DEVICE
@@ -605,8 +438,63 @@ void hle_device_base::key_break(uint8_t row, uint8_t column)
 
 hle_hp_ipc_device::hle_hp_ipc_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
 	: hle_device_base(mconfig, HP_IPC_HLE_KEYBOARD, tag, owner, clock)
+	, device_matrix_keyboard_interface(mconfig, *this, "COL1", "COL2", "COL3", "COL4", "COL5", "COL6", "COL7", "COL8", "COL9", "COL10", "COL11", "COL12", "COL13", "COL14", "COL15")
 { }
 
+void hle_hp_ipc_device::device_reset()
+{
+	m_fifo.clear();
+	reset_key_state();
+	start_processing(attotime::from_hz(1'200));
+}
+
+void hle_hp_ipc_device::hil_idd()
+{
+	m_hp_hil_mlc->hil_write(0x0100 |  ioport("COL0")->read());
+	m_hp_hil_mlc->hil_write(m_device_id16 | 0);
+}
+
+void hle_hp_ipc_device::key_make(uint8_t row, uint8_t column)
+{
+	transmit_byte((((row + 1) ^ 8) << 4) + (column << 1));
+}
+
+
+void hle_hp_ipc_device::key_break(uint8_t row, uint8_t column)
+{
+	transmit_byte((((row + 1) ^ 8) << 4) + (column << 1) + 1);
+}
+
+int hle_hp_ipc_device::hil_poll()
+{
+	int frames = 1;
+	if (m_fifo.empty())
+		return frames;
+
+	m_hp_hil_mlc->hil_write(m_device_id16 | 0x40);  // Keycode Set 1, no coordinate data
+	while (!m_fifo.empty())
+	{
+		m_hp_hil_mlc->hil_write(m_device_id16 | m_fifo.dequeue());
+		frames++;
+	}
+	return frames;
+}
+
+int hle_hp_itf_device::hil_poll()
+{
+	int frames = 0;
+	if (m_fifo.empty())
+		return frames;
+	LOG("KBD HAVE DATA\n");
+	frames++;
+	m_hp_hil_mlc->hil_write(m_device_id16 | 0x40);  // Keycode Set 1, no coordinate data
+	while (!m_fifo.empty())
+	{
+		m_hp_hil_mlc->hil_write(m_device_id16 | m_fifo.dequeue());
+		frames++;
+	}
+	return frames;
+}
 
 /*--------------------------------------------------
     hle_hp_ipc_device::device_input_ports
@@ -629,8 +517,28 @@ ioport_constructor hle_hp_ipc_device::device_input_ports() const
 
 hle_hp_itf_device::hle_hp_itf_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
 	: hle_device_base(mconfig, HP_ITF_HLE_KEYBOARD, tag, owner, clock)
+	, device_matrix_keyboard_interface(mconfig, *this, "COL1", "COL2", "COL3", "COL4", "COL5", "COL6", "COL7", "COL8", "COL9", "COL10", "COL11", "COL12", "COL13", "COL14", "COL15")
 { }
 
+void hle_hp_itf_device::device_reset()
+{
+	m_fifo.clear();
+	reset_key_state();
+	start_processing(attotime::from_hz(1'200));
+}
+
+void hle_hp_itf_device::key_make(uint8_t row, uint8_t column)
+{
+	LOG("make\n");
+	transmit_byte((((row + 1) ^ 8) << 4) + (column << 1));
+}
+
+
+void hle_hp_itf_device::key_break(uint8_t row, uint8_t column)
+{
+	LOG("break\n");
+	transmit_byte((((row + 1) ^ 8) << 4) + (column << 1) + 1);
+}
 
 /*--------------------------------------------------
     hle_hp_itf_device::device_input_ports
@@ -642,5 +550,11 @@ ioport_constructor hle_hp_itf_device::device_input_ports() const
 	return INPUT_PORTS_NAME(hle_hp_itf_device);
 }
 
+
+void hle_hp_itf_device::hil_idd()
+{
+	m_hp_hil_mlc->hil_write(m_device_id16 |  ioport("COL0")->read());
+	m_hp_hil_mlc->hil_write(m_device_id16 | 0x04);
+}
 
 } } // namespace bus::hp_hil

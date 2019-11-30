@@ -30,12 +30,12 @@ private:
 	std::string signed_11bit_x8(uint16_t val);
 	std::string signed_15bit(uint16_t val);
 
-	static const char * DEST_STR[16];
-	static const char * DEST_COMMA_STR[16];
-	static const char * BC_STR[16];
-	static const char * BC_COMMA_STR[16];
-	static const char * VFREG[32];
-	static const char * VIREG[32];
+	static char const *const DEST_STR[16];
+	static char const *const DEST_COMMA_STR[16];
+	static char const *const BC_STR[16];
+	static char const *const BC_COMMA_STR[16];
+	static char const *const VFREG[32];
+	static char const *const VIREG[32];
 };
 
 #endif // MAME_CPU_MIPS_VUDASM_H

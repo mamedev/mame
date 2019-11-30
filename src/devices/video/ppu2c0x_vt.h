@@ -16,24 +16,6 @@
 
 #include "video/ppu2c0x.h"
 
-#define MCFG_PPU_VT03_ADD(_tag)   \
-	MCFG_PPU2C0X_ADD(_tag, PPU_VT03)
-
-#define MCFG_PPU_VT03_READ_BG_CB(_devcb) \
-	downcast<ppu_vt03_device &>(*device).set_read_bg_callback(DEVCB_##_devcb);
-
-#define MCFG_PPU_VT03_READ_SP_CB(_devcb) \
-	downcast<ppu_vt03_device &>(*device).set_read_sp_callback(DEVCB_##_devcb);
-
-#define MCFG_PPU_VT03_MODIFY MCFG_DEVICE_MODIFY
-
-#define MCFG_PPU_VT03_SET_PAL_MODE(pmode) \
-	downcast<ppu_vt03_device &>(*device).set_palette_mode(pmode);
-
-#define MCFG_PPU_VT03_SET_DESCRAMBLE(dsc) \
-	downcast<ppu_vt03_device &>(*device).set_201x_descramble(dsc);
-
-
 enum vtxx_pal_mode {
 	PAL_MODE_VT0x,
 	PAL_MODE_NEW_RGB,
@@ -44,12 +26,13 @@ enum vtxx_pal_mode {
 class ppu_vt03_device : public ppu2c0x_device {
 public:
 	ppu_vt03_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ppu_vt03_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_read_bg_callback(Object &&cb) { return m_read_bg.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_read_sp_callback(Object &&cb) { return m_read_sp.set_callback(std::forward<Object>(cb)); }
+	auto read_bg() { return m_read_bg.bind(); }
+	auto read_sp() { return m_read_sp.bind(); }
 
 	void set_palette_mode(vtxx_pal_mode pmode) { m_pal_mode = pmode; }
-	void set_201x_descramble(const uint8_t descramble[6]) { for (int i = 0; i < 6; i++) m_2012_2017_descramble[i] = descramble[i]; }
+	void set_201x_descramble(uint8_t reg0, uint8_t reg1, uint8_t reg2, uint8_t reg3, uint8_t reg4, uint8_t reg5);
 
 	virtual DECLARE_READ8_MEMBER(read) override;
 	virtual DECLARE_WRITE8_MEMBER(write) override;
@@ -79,6 +62,13 @@ public:
 	uint8_t get_m_read_bg4_bg3();
 	uint8_t get_speva2_speva0();
 
+	bool get_is_pal() { return m_is_pal; }
+	bool get_is_50hz() { return m_is_50hz; }
+
+protected:
+	bool m_is_pal;
+	bool m_is_50hz;
+
 private:
 	devcb_read8 m_read_bg;
 	devcb_read8 m_read_sp;
@@ -102,6 +92,12 @@ private:
 	void set_new_pen(int i);
 };
 
+class ppu_vt03pal_device : public ppu_vt03_device {
+public:
+	ppu_vt03pal_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+};
+
 DECLARE_DEVICE_TYPE(PPU_VT03,    ppu_vt03_device)
+DECLARE_DEVICE_TYPE(PPU_VT03PAL,    ppu_vt03pal_device)
 
 #endif // MAME_VIDEO_PPU_VT03_H

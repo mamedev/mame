@@ -90,6 +90,7 @@ void a2bus_echoplus_device::device_add_mconfig(machine_config &config)
 
 	SPEAKER(config, "echosp").front_center();
 	TMS5220(config, m_tms, 640000);
+	// echo+ has a TSP5220C soldered down on it
 	m_tms->add_route(ALL_OUTPUTS, "echosp", 1.0);
 }
 
@@ -237,7 +238,7 @@ WRITE8_MEMBER( a2bus_ayboard_device::via1_out_b )
 {
 	if (!BIT(data, 2))
 	{
-		m_ay1->reset_w(space, 0, 0);
+		m_ay1->reset_w();
 	}
 	else
 	{
@@ -247,15 +248,15 @@ WRITE8_MEMBER( a2bus_ayboard_device::via1_out_b )
 				break;
 
 			case 1: // BDIR=0, BC1=1 (read PSG)
-				m_porta1 = m_ay1->read_data();
+				m_porta1 = m_ay1->data_r();
 				break;
 
 			case 2: // BDIR=1, BC1=0 (write PSG)
-				m_ay1->write_data(m_porta1);
+				m_ay1->data_w(m_porta1);
 				break;
 
 			case 3: // BDIR=1, BC1=1 (latch)
-				m_ay1->write_address(m_porta1);
+				m_ay1->address_w(m_porta1);
 				break;
 		}
 	}
@@ -265,10 +266,10 @@ WRITE8_MEMBER( a2bus_phasor_device::via1_out_b )
 {
 	if (!(data & 4))
 	{
-		m_ay1->reset_w(space, 0, 0);
+		m_ay1->reset_w();
 		if (m_native)
 		{
-			m_ay2->reset_w(space, 0, 0);
+			m_ay2->reset_w();
 		}
 	}
 	else
@@ -288,23 +289,23 @@ WRITE8_MEMBER( a2bus_phasor_device::via1_out_b )
 
 			case 1: // BDIR=0, BC1=1 (read PSG)
 				if (BIT(chip_sel, 0))
-					m_porta1 = m_ay1->read_data();
+					m_porta1 = m_ay1->data_r();
 				if (BIT(chip_sel, 1))
-					m_porta1 = m_ay2->read_data();
+					m_porta1 = m_ay2->data_r();
 				break;
 
 			case 2: // BDIR=1, BC1=0 (write PSG)
 				if (BIT(chip_sel, 0))
-					m_ay1->write_data(m_porta1);
+					m_ay1->data_w(m_porta1);
 				if (BIT(chip_sel, 1))
-					m_ay2->write_data(m_porta1);
+					m_ay2->data_w(m_porta1);
 				break;
 
 			case 3: // BDIR=1, BC1=1 (latch)
 				if (BIT(chip_sel, 0))
-					m_ay1->write_address(m_porta1);
+					m_ay1->address_w(m_porta1);
 				if (BIT(chip_sel, 1))
-					m_ay2->write_address(m_porta1);
+					m_ay2->address_w(m_porta1);
 				break;
 		}
 	}
@@ -319,7 +320,7 @@ WRITE8_MEMBER( a2bus_ayboard_device::via2_out_b )
 {
 	if (!BIT(data, 2))
 	{
-		m_ay2->reset_w(space, 0, 0);
+		m_ay2->reset_w();
 	}
 	else
 	{
@@ -329,15 +330,15 @@ WRITE8_MEMBER( a2bus_ayboard_device::via2_out_b )
 				break;
 
 			case 1: // BDIR=0, BC1=1 (read PSG)
-				m_porta2 = m_ay2->read_data();
+				m_porta2 = m_ay2->data_r();
 				break;
 
 			case 2: // BDIR=1, BC1=0 (write PSG)
-				m_ay2->write_data(m_porta2);
+				m_ay2->data_w(m_porta2);
 				break;
 
 			case 3: // BDIR=1, BC1=1 (latch)
-				m_ay2->write_data(m_porta2);
+				m_ay2->address_w(m_porta2);
 				break;
 		}
 	}
@@ -349,12 +350,12 @@ WRITE8_MEMBER( a2bus_phasor_device::via2_out_b )
 	{
 		if (m_native)
 		{
-			m_ay3->reset_w(space, 0, 0);
-			m_ay4->reset_w(space, 0, 0);
+			m_ay3->reset_w();
+			m_ay4->reset_w();
 		}
 		else
 		{
-			m_ay2->reset_w(space, 0, 0);
+			m_ay2->reset_w();
 		}
 	}
 	else
@@ -374,23 +375,23 @@ WRITE8_MEMBER( a2bus_phasor_device::via2_out_b )
 
 			case 1: // BDIR=0, BC1=1 (read PSG)
 				if (BIT(chip_sel, 0))
-					m_porta2 = m_ay3->read_data();
+					m_porta2 = m_ay3->data_r();
 				if (BIT(chip_sel, 1))
-					m_porta2 = m_ay4->read_data();
+					m_porta2 = m_ay4->data_r();
 				break;
 
 			case 2: // BDIR=1, BC1=0 (write PSG)
 				if (BIT(chip_sel, 0))
-					m_ay3->write_data(m_porta2);
+					m_ay3->data_w(m_porta2);
 				if (BIT(chip_sel, 1))
-					m_ay4->write_data(m_porta2);
+					m_ay4->data_w(m_porta2);
 				break;
 
 			case 3: // BDIR=1, BC1=1 (latch)
 				if (BIT(chip_sel, 0))
-					m_ay3->write_address(m_porta2);
+					m_ay3->address_w(m_porta2);
 				if (BIT(chip_sel, 1))
-					m_ay4->write_address(m_porta2);
+					m_ay4->address_w(m_porta2);
 				break;
 		}
 	}
@@ -413,7 +414,7 @@ uint8_t a2bus_echoplus_device::read_c0nx(uint8_t offset)
 	switch (offset)
 	{
 		case 0:
-			return 0x1f | m_tms->read_status();
+			return 0x1f | m_tms->status_r();
 	}
 
 	return 0;
@@ -424,7 +425,7 @@ void a2bus_echoplus_device::write_c0nx(uint8_t offset, uint8_t data)
 	switch (offset)
 	{
 		case 0:
-			m_tms->write_data(data);
+			m_tms->data_w(data);
 			break;
 	}
 }

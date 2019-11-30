@@ -238,7 +238,7 @@ private:
 
 void _4roses_state::_4roses_map(address_map &map)
 {
-	map(0x0000, 0x07ff).ram(); // AM_SHARE("nvram")
+	map(0x0000, 0x07ff).ram(); // .share("nvram");
 	map(0x0c00, 0x0c00).r("ay8910", FUNC(ay8910_device::data_r));
 	map(0x0c00, 0x0c01).w("ay8910", FUNC(ay8910_device::address_data_w));
 	map(0x0e00, 0x0e00).w("crtc", FUNC(mc6845_device::address_w));
@@ -290,14 +290,14 @@ void _4roses_state::_4roses_opcodes_map(address_map &map)
 
 void rugby_state::rugby_map(address_map &map)
 {
-	map(0x0000, 0x07ff).ram(); // AM_SHARE("nvram")
+	map(0x0000, 0x07ff).ram(); // .share("nvram");
 	map(0x0c00, 0x0c00).r("ay8910", FUNC(ay8910_device::data_r));
 	map(0x0c00, 0x0c01).w("ay8910", FUNC(ay8910_device::address_data_w));
 	map(0x0e00, 0x0e00).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x0e01, 0x0e01).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x2000, 0xffff).rom().region("maincpu", 0x2000);
-	map(0x6000, 0x6fff).ram().w(FUNC(_4roses_state::funworld_videoram_w)).share("videoram");
-	map(0x7000, 0x7fff).ram().w(FUNC(_4roses_state::funworld_colorram_w)).share("colorram");
+	map(0x6000, 0x6fff).ram().w(FUNC(rugby_state::funworld_videoram_w)).share("videoram");
+	map(0x7000, 0x7fff).ram().w(FUNC(rugby_state::funworld_colorram_w)).share("colorram");
 }
 
 READ8_MEMBER(rugby_state::rugby_opcode_r)
@@ -454,48 +454,47 @@ GFXDECODE_END
 *     Machine Drivers     *
 **************************/
 
-MACHINE_CONFIG_START(_4roses_state::_4roses)
+void _4roses_state::_4roses(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M65C02, MASTER_CLOCK/8) /* 2MHz, guess */
-	MCFG_DEVICE_PROGRAM_MAP(_4roses_map)
-	MCFG_DEVICE_OPCODES_MAP(_4roses_opcodes_map)
+	M65C02(config, m_maincpu, MASTER_CLOCK/8); /* 2MHz, guess */
+	m_maincpu->set_addrmap(AS_PROGRAM, &_4roses_state::_4roses_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &_4roses_state::_4roses_opcodes_map);
 
-//	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE((124+1)*4, (30+1)*8)               /* guess. taken from funworld games */
-	MCFG_SCREEN_VISIBLE_AREA(0*4, 96*4-1, 0*8, 29*8-1)  /* guess. taken from funworld games */
-	MCFG_SCREEN_UPDATE_DRIVER(_4roses_state, screen_update_funworld)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size((124+1)*4, (30+1)*8);               /* guess. taken from funworld games */
+	screen.set_visarea(0*4, 96*4-1, 0*8, 29*8-1);  /* guess. taken from funworld games */
+	screen.set_screen_update(FUNC(_4roses_state::screen_update_funworld));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_4roses)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_4roses);
 
-	MCFG_PALETTE_ADD("palette", 0x1000)
-	MCFG_PALETTE_INIT_OWNER(_4roses_state,funworld)
-	MCFG_VIDEO_START_OVERRIDE(_4roses_state,funworld)
+	PALETTE(config, "palette", FUNC(_4roses_state::funworld_palette), 0x1000);
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK/8) /* 2MHz, guess */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(4)
-	//MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	mc6845_device &crtc(MC6845(config, "crtc", MASTER_CLOCK/8)); /* 2MHz, guess */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(4);
+	//crtc.out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay8910", AY8910, MASTER_CLOCK/8)    /* 2MHz, guess */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.5)
-MACHINE_CONFIG_END
+	AY8910(config, "ay8910", MASTER_CLOCK/8).add_route(ALL_OUTPUTS, "mono", 2.5);    /* 2MHz, guess */
+}
 
-MACHINE_CONFIG_START(rugby_state::rugby)
+void rugby_state::rugby(machine_config &config)
+{
 	_4roses(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(rugby_map)
-	MCFG_DEVICE_OPCODES_MAP(rugby_opcodes_map)
-MACHINE_CONFIG_END
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &rugby_state::rugby_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &rugby_state::rugby_opcodes_map);
+}
 
 
 /*************************

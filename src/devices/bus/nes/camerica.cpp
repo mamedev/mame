@@ -136,7 +136,7 @@ void nes_golden5_device::pcb_reset()
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_bf9093_device::write_h)
+void nes_bf9093_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("bf9093 write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -174,7 +174,7 @@ WRITE8_MEMBER(nes_bf9093_device::write_h)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_bf9096_device::write_h)
+void nes_bf9096_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("bf9096 write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -203,7 +203,7 @@ WRITE8_MEMBER(nes_bf9096_device::write_h)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_golden5_device::write_h)
+void nes_golden5_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("golden5 write_h, offset: %04x, data: %02x\n", offset, data));
 

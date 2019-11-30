@@ -1,0 +1,113 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="vtech_storio_cart" description="VTech Storio V.Reader Cartridges">
+
+	<!-- These are NAND Flash ROMs containing a FAT16 filesystem -->
+	<!-- Some cartridges (PCB 35-115600-027-402) contains no ROM, but just some bridges between edge connector pins. -->
+
+	<!--
+
+	Language:
+	********0 = US
+	********1 = Italy
+	********2 = Netherlands
+	********3 = UK
+	********4 = Germany
+	********5 = France
+	********6 = Portugal
+	********7 = Spain
+
+	Dumped | Serial          | Name
+	==============================================================================================
+	       | 80-115600(US)   | What's That Noise (it's 52-280800 on VTech catalog)
+	  NA   | 80-115622(SP)   | ¿Qué ruido es ese? (no ROM cartridge)
+	       | 80-280000(US)   | Shrek's Vacation
+	       | 80-280003(UK)   | Shrek's Holiday
+	       | 80-280100(US)   | Toy Story 3
+	       | 80-280200(US)   | Mr. Men/Little Miss
+	       | 80-280300(US)   | Disney Fairies - Tinkerbell and The Great Fairy Rescue
+	       | 80-280400(US)   | Scooby Doo! - Scooby Doo and a Mummy, Too!
+	       | 80-280403(UK)   | Scooby Doo! - Scooby Doo and a Mummy, Too!
+	  XX   | 80-280422(SP)   | Scooby Doo! - Scooby Doo y la momia
+	       | 80-280600(US)   | Olivia
+	       | 80-280700(US)   | The Little Engine That Could
+	       | 80-280900(US)   | Dora and the Three Little Pigs
+	  XX   | 80-280422(GER)  | Dora und die drei Schweinchen
+	       | 80-281000(US)   | Mickey Mouse Clubhouse
+	  XX   | 80-281004(GER)  | Micky Maus Wunderhaus
+	       | 80-281100(US)   | Disney Princess
+	       | 80-281103(UK)   | Disney Princess
+	       | 80-281200(US)   | Cars
+	       | 80-281300(US)   | Sesame Street The Happy Scientists
+	       | 80-281400(US)   | SpongeBob SquarePants Model Sponge
+	  XX   | 80-281404(GER)  | Spongebob Schwammkopf - Ein Schwamm will nach oben
+	       | 80-281500(US)   | Tangled
+	  XX   | 80-281504(GER)  | Rapunzel - Neu verföhnt
+	       | 80-281600(US)   | Chuggington - Babysitter Brewster
+	       | 80-281700(US)   | Penguins of Madagascar - The Helmet
+	       | 80-281800(US)   | Kung Fu Panda 2
+	       | 80-281900(US)   | Cars 2
+	       | 80-282000(US)   | Winnie the Pooh
+	       | 80-282100(US)   | Super Why! - Attack of the Eraser
+	       | 80-282200(US)   | Madagascar 3
+	       | 80-282300(US)   | Dinosaur Train - T.Rex Teeth
+	       | 80-282400(US)   | Hello Kitty's Surprise
+
+	-->
+
+	<software name="scoobysp" supported="no">
+		<description>Scooby-Doo!-Scooby-Doo y la momia (Spain)</description>
+		<year>2012</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vtech_storio_cart">
+			<dataarea name="rom" size="0x4200000">
+				<rom name="80-280422 - scooby-doo-scooby-doo y la momia (SP).bin" size="0x4200000" crc="cd1ee924" sha1="83e561af5910dc547829d54c84fbef60350f4f54" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="doragr" supported="no">
+		<description>Dora und die drei Schweinchen (Germany)</description>
+		<year>2011</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vtech_storio_cart">
+			<dataarea name="rom" size="0x4200000">
+				<rom name="80-280904 - Dora und die drei Schweinchen (GER).bin" size="0x4200000" crc="34f85a56" sha1="93b27d5c2a5b9e23470a3cb48099e3aa1f36bde6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mickeychgr" supported="no">
+		<description>Micky Maus Wunderhaus (Germany)</description>
+		<year>2011</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vtech_storio_cart">
+			<dataarea name="rom" size="0x4200000">
+				<rom name="80-281004 - Micky Maus Wunderhaus (GER).bin" size="0x4200000" crc="036fc056" sha1="28f5b7c13eaceadeca5f4e8ec8b1ef2f2d85d1ba" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spongbobgr" supported="no">
+		<description>Spongebob Schwammkopf - Ein Schwamm will nach oben (Germany)</description>
+		<year>2011</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vtech_storio_cart">
+			<dataarea name="rom" size="0x4200000">
+				<rom name="80-281404 - Spongebob Schwammkopf - Ein Schwamm will nach oben (GER).bin" size="0x4200000" crc="f1a68329" sha1="95c39150ab86233575f4f32574f7077436077adf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tangledgr" supported="no">
+		<description>Rapunzel - Neu verföhnt (Germany)</description>
+		<year>20??</year>
+		<publisher>VTech</publisher>
+		<part name="cart" interface="vtech_storio_cart">
+			<dataarea name="rom" size="0x4200000">
+				<rom name="80-281504 - Rapunzel - Neu verfohnt (GER).bin" size="0x4200000" crc="70fd0039" sha1="85823b4fcbcb3ff644154c3c0f3f3bd962846e50" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

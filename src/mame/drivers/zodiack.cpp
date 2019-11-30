@@ -86,6 +86,13 @@ Notes:
       ALL ROMs 2732
       ALL PROMs MMI 6331
 
+Bounty2:
+- First 0x100 bytes of the first rom contains a screen that appears if the protection fails.
+- The PCB uses a large CPU epoxy module marked "CPU PACKII". A battery can be spotted through the epoxy.
+- If you copy the first 0x100 bytes from "bounty" then the game works.
+- Therefore, it can be surmised that the epoxy blob contains a static ram or similar with
+  the first 256 bytes of the real game's rom, for as long as the battery lasts.
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -107,22 +114,22 @@ WRITE8_MEMBER( zodiack_state::sound_nmi_enable_w )
 	m_sound_nmi_enabled = data & 1;
 }
 
-INTERRUPT_GEN_MEMBER(zodiack_state::zodiack_main_nmi_gen)
+WRITE_LINE_MEMBER(zodiack_state::vblank_main_nmi_w)
 {
-	if (m_main_nmi_enabled)
-		nmi_line_pulse(device);
+	if (state && m_main_nmi_enabled)
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 INTERRUPT_GEN_MEMBER(zodiack_state::zodiack_sound_nmi_gen)
 {
 	if (m_sound_nmi_enabled)
-		nmi_line_pulse(device);
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
 WRITE8_MEMBER( zodiack_state::master_soundlatch_w )
 {
-	m_soundlatch->write(space, offset, data);
+	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
@@ -503,7 +510,6 @@ void zodiack_state::zodiack(machine_config &config)
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(18'432'000)/6);
 	m_maincpu->set_addrmap(AS_PROGRAM, &zodiack_state::main_map);
-	m_maincpu->set_vblank_int("videopcb:screen", FUNC(zodiack_state::zodiack_main_nmi_gen));
 	m_maincpu->set_periodic_int(FUNC(zodiack_state::irq0_line_hold), attotime::from_hz(1*60)); // sound related - unknown source, timing is guessed
 
 	Z80(config, m_audiocpu, XTAL(18'432'000)/6);
@@ -513,9 +519,11 @@ void zodiack_state::zodiack(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog");
 
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER).screen_vblank().set(FUNC(zodiack_state::vblank_main_nmi_w));
+
 	orca_ovg_40c_device &videopcb(ORCA_OVG_40C(config, "videopcb", 0));
-	videopcb.set_palette("videopcb:palette");
-	
+	videopcb.set_screen("screen");
+
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 

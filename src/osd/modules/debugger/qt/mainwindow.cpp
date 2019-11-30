@@ -220,27 +220,17 @@ void MainWindow::toggleBreakpointAtCursor(bool changedTo)
 		device_debug *const cpuinfo = dasmView->source()->device()->debug();
 
 		// Find an existing breakpoint at this address
-		int32_t bpindex = -1;
-		for (device_debug::breakpoint* bp = cpuinfo->breakpoint_first();
-				bp != nullptr;
-				bp = bp->next())
-		{
-			if (address == bp->address())
-			{
-				bpindex = bp->index();
-				break;
-			}
-		}
+		const device_debug::breakpoint *bp = cpuinfo->breakpoint_find(address);
 
 		// If none exists, add a new one
 		std::string command;
-		if (bpindex == -1)
+		if (bp == nullptr)
 		{
 			command = string_format("bpset 0x%X", address);
 		}
 		else
 		{
-			command = string_format("bpclear 0x%X", bpindex);
+			command = string_format("bpclear 0x%X", bp->index());
 		}
 		m_machine->debugger().console().execute_command(command.c_str(), true);
 	}
@@ -258,9 +248,7 @@ void MainWindow::enableBreakpointAtCursor(bool changedTo)
 		device_debug *const cpuinfo = dasmView->source()->device()->debug();
 
 		// Find an existing breakpoint at this address
-		device_debug::breakpoint* bp = cpuinfo->breakpoint_first();
-		while ((bp != nullptr) && (bp->address() != address))
-			bp = bp->next();
+		const device_debug::breakpoint *bp = cpuinfo->breakpoint_find(address);
 
 		if (bp != nullptr)
 		{
@@ -418,9 +406,7 @@ void MainWindow::dasmViewUpdated()
 		device_debug *const cpuinfo = device->debug();
 
 		// Find an existing breakpoint at this address
-		device_debug::breakpoint* bp = cpuinfo->breakpoint_first();
-		while ((bp != nullptr) && (bp->address() != address))
-			bp = bp->next();
+		const device_debug::breakpoint *bp = cpuinfo->breakpoint_find(address);
 
 		if (bp != nullptr)
 		{

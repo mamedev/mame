@@ -304,17 +304,17 @@ INTERRUPT_GEN_MEMBER(sub_state::sound_irq)
 
 
 
-MACHINE_CONFIG_START(sub_state::sub)
-
+void sub_state::sub(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,MASTER_CLOCK/6)      /* ? MHz */
-	MCFG_DEVICE_PROGRAM_MAP(subm_map)
-	MCFG_DEVICE_IO_MAP(subm_io)
+	Z80(config, m_maincpu, MASTER_CLOCK/6);      /* ? MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &sub_state::subm_map);
+	m_maincpu->set_addrmap(AS_IO, &sub_state::subm_io);
 
-	MCFG_DEVICE_ADD("soundcpu", Z80,MASTER_CLOCK/6)         /* ? MHz */
-	MCFG_DEVICE_PROGRAM_MAP(subm_sound_map)
-	MCFG_DEVICE_IO_MAP(subm_sound_io)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(sub_state, sound_irq,  120) //???
+	Z80(config, m_soundcpu, MASTER_CLOCK/6);         /* ? MHz */
+	m_soundcpu->set_addrmap(AS_PROGRAM, &sub_state::subm_sound_map);
+	m_soundcpu->set_addrmap(AS_IO, &sub_state::subm_sound_io);
+	m_soundcpu->set_periodic_int(FUNC(sub_state::sound_irq), attotime::from_hz(120)); //???
 
 	ls259_device &mainlatch(LS259(config, "mainlatch"));
 	mainlatch.q_out_cb<0>().set(FUNC(sub_state::int_mask_w));
@@ -322,37 +322,33 @@ MACHINE_CONFIG_START(sub_state::sub)
 	mainlatch.q_out_cb<3>().set_nop(); // same as Q0?
 	mainlatch.q_out_cb<5>().set_nop();
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(sub_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sub_state, main_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 256-1, 16, 256-16-1);
+	screen.set_screen_update(FUNC(sub_state::screen_update));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(sub_state::main_irq));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sub)
-	MCFG_PALETTE_ADD("palette", 0x400)
-	MCFG_PALETTE_INDIRECT_ENTRIES(0x100)
-	MCFG_PALETTE_INIT_OWNER(sub_state, sub)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sub);
+	PALETTE(config, m_palette, FUNC(sub_state::sub_palette), 0x400, 0x100);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", 0))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, 0);
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	GENERIC_LATCH_8(config, "soundlatch2");
 
-	MCFG_DEVICE_ADD("ay1", AY8910, MASTER_CLOCK/6/2) /* ? Mhz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
+	AY8910(config, "ay1", MASTER_CLOCK/6/2).add_route(ALL_OUTPUTS, "mono", 0.23); /* ? Mhz */
 
-	MCFG_DEVICE_ADD("ay2", AY8910, MASTER_CLOCK/6/2) /* ? Mhz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
-MACHINE_CONFIG_END
+	AY8910(config, "ay2", MASTER_CLOCK/6/2).add_route(ALL_OUTPUTS, "mono", 0.23); /* ? Mhz */
+}
 
 
 ROM_START( sub )

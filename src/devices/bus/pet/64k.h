@@ -33,9 +33,9 @@ protected:
 	virtual void device_reset() override;
 
 	// device_pet_expansion_card_interface overrides
-	virtual int pet_norom_r(address_space &space, offs_t offset, int sel) override;
-	virtual uint8_t pet_bd_r(address_space &space, offs_t offset, uint8_t data, int &sel) override;
-	virtual void pet_bd_w(address_space &space, offs_t offset, uint8_t data, int &sel) override;
+	virtual int pet_norom_r(offs_t offset, int sel) override;
+	virtual uint8_t pet_bd_r(offs_t offset, uint8_t data, int &sel) override;
+	virtual void pet_bd_w(offs_t offset, uint8_t data, int &sel) override;
 
 private:
 	inline uint8_t read_ram(offs_t offset);

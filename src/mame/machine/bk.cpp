@@ -18,14 +18,10 @@
 TIMER_CALLBACK_MEMBER(bk_state::keyboard_callback)
 {
 	uint8_t code, i, j;
-	static const char *const keynames[] = {
-		"LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6",
-		"LINE7", "LINE8", "LINE9", "LINE10", "LINE11"
-	};
 
 	for(i = 1; i < 12; i++)
 	{
-		code =  ioport(keynames[i-1])->read();
+		code = m_io_keyboard[i]->read();
 		if (code != 0)
 		{
 			for(j = 0; j < 8; j++)
@@ -36,30 +32,21 @@ TIMER_CALLBACK_MEMBER(bk_state::keyboard_callback)
 					break;
 				}
 			}
-			if ((ioport("LINE0")->read() & 4) == 4)
+			if (BIT(m_io_keyboard[0]->read(), 2))
 			{
 				if (i==6 || i==7)
-				{
 					m_key_code -= 16;
-				}
-
-			}
-			if ((ioport("LINE0")->read() & 4) == 4)
-			{
+				else
 				if (i>=8 && i<=11)
-				{
 					m_key_code += 32;
-				}
 			}
 			m_key_pressed = 0x40;
-			if ((ioport("LINE0")->read() & 2) == 0)
-			{
+
+			if (!BIT(m_io_keyboard[0]->read(), 1))
 				m_key_irq_vector = 0x30;
-			}
 			else
-			{
 				m_key_irq_vector = 0xBC;
-			}
+
 			m_maincpu->set_input_line(0, ASSERT_LINE);
 			break;
 		}
@@ -103,15 +90,7 @@ READ16_MEMBER(bk_state::bk_vid_scrool_r)
 READ16_MEMBER(bk_state::bk_key_press_r)
 {
 	double level = m_cassette->input();
-	uint16_t cas;
-	if (level < 0)
-	{
-		cas = 0x00;
-	}
-	else
-	{
-		cas = 0x20;
-	}
+	uint16_t cas = (level < 0) ? 0 : 0x20;
 
 	return 0x8080 | m_key_pressed | cas;
 }
@@ -128,6 +107,7 @@ WRITE16_MEMBER(bk_state::bk_vid_scrool_w)
 
 WRITE16_MEMBER(bk_state::bk_key_press_w)
 {
+	m_cassette->output(BIT(data, 6) ? 1.0 : -1.0);
 }
 
 READ16_MEMBER(bk_state::bk_floppy_cmd_r)
@@ -137,26 +117,20 @@ READ16_MEMBER(bk_state::bk_floppy_cmd_r)
 
 WRITE16_MEMBER(bk_state::bk_floppy_cmd_w)
 {
-	if ((data & 1) == 1)
-	{
+	if (BIT(data, 0))
 		m_drive = 0;
-	}
-	if ((data & 2) == 2)
-	{
+
+	if (BIT(data, 1))
 		m_drive = 1;
-	}
-	if ((data & 4) == 4)
-	{
+
+	if (BIT(data, 2))
 		m_drive = 2;
-	}
-	if ((data & 8) == 8)
-	{
+
+	if (BIT(data, 3))
 		m_drive = 3;
-	}
+
 	if (data == 0)
-	{
 		m_drive = -1;
-	}
 }
 
 READ16_MEMBER(bk_state::bk_floppy_data_r)

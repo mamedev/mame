@@ -7,9 +7,9 @@
 
 #include "dc.h"
 
+#include "bus/ata/ataintf.h"
 #include "imagedev/chd_cd.h"
 #include "machine/gdrom.h"
-#include "machine/ataintf.h"
 #include "machine/intelfsh.h"
 
 class dc_cons_state : public dc_state
@@ -28,6 +28,7 @@ public:
 	void init_dc();
 	void init_dcus();
 	void init_dcjp();
+	void init_tream();
 
 	DECLARE_READ64_MEMBER(dcus_idle_skip_r);
 	DECLARE_READ64_MEMBER(dcjp_idle_skip_r);
@@ -50,6 +51,7 @@ public:
 
 	static void gdrom_config(device_t *device);
 	void dc(machine_config &config);
+	void aica_map(address_map &map);
 	void dc_audio_map(address_map &map);
 	void dc_map(address_map &map);
 	void dc_port(address_map &map);

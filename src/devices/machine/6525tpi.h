@@ -53,8 +53,8 @@ public:
 	auto out_ca_cb() { return m_out_ca_cb.bind(); }
 	auto out_cb_cb() { return m_out_cb_cb.bind(); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( i0_w );
 	DECLARE_WRITE_LINE_MEMBER( i1_w );
@@ -62,12 +62,12 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( i3_w );
 	DECLARE_WRITE_LINE_MEMBER( i4_w );
 
-	DECLARE_READ8_MEMBER( pa_r );
-	DECLARE_READ8_MEMBER( pb_r );
-	DECLARE_READ8_MEMBER( pc_r );
-	DECLARE_WRITE8_MEMBER( pa_w );
-	DECLARE_WRITE8_MEMBER( pb_w );
-	DECLARE_WRITE8_MEMBER( pc_w );
+	uint8_t pa_r();
+	uint8_t pb_r();
+	uint8_t pc_r();
+	void pa_w(uint8_t data);
+	void pb_w(uint8_t data);
+	void pc_w(uint8_t data);
 
 	WRITE_LINE_MEMBER( pb0_w ) { port_line_w(m_in_b, 0, state); }
 	WRITE_LINE_MEMBER( pb1_w ) { port_line_w(m_in_b, 1, state); }

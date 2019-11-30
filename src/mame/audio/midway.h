@@ -21,6 +21,7 @@
 #include "sound/tms5220.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
+#include "sound/hc55516.h"
 
 
 //**************************************************************************
@@ -30,7 +31,6 @@
 DECLARE_DEVICE_TYPE(MIDWAY_SSIO,               midway_ssio_device)
 DECLARE_DEVICE_TYPE(MIDWAY_SOUNDS_GOOD,        midway_sounds_good_device)
 DECLARE_DEVICE_TYPE(MIDWAY_TURBO_CHEAP_SQUEAK, midway_turbo_cheap_squeak_device)
-DECLARE_DEVICE_TYPE(MIDWAY_SQUAWK_N_TALK,      midway_squawk_n_talk_device)
 
 
 
@@ -58,8 +58,16 @@ public:
 	DECLARE_WRITE8_MEMBER(ioport_write);
 
 	// configuration
-	void set_custom_input(int which, uint8_t mask, read8_delegate handler);
-	void set_custom_output(int which, uint8_t mask, write8_delegate handler);
+	template <typename... T> void set_custom_input(int which, uint8_t mask, T &&... args)
+	{
+		m_custom_input_mask[which] = mask;
+		m_custom_input[which].set(std::forward<T>(args)...);
+	}
+	template <typename... T> void set_custom_output(int which, uint8_t mask, T &&... args)
+	{
+		m_custom_output_mask[which / 4] = mask;
+		m_custom_output[which / 4].set(std::forward<T>(args)...);
+	}
 
 	// internal communications
 	DECLARE_READ8_MEMBER(irq_clear);
@@ -67,7 +75,7 @@ public:
 	DECLARE_READ8_MEMBER(data_r);
 
 	void ssio_map(address_map &map);
-	void ssio_input_ports(address_map &map, const char *ssio) const;
+	static void ssio_input_ports(address_map &map, const char *ssio);
 
 protected:
 	// device-level overrides
@@ -102,16 +110,15 @@ private:
 
 	// I/O port overrides
 	uint8_t m_custom_input_mask[5];
-	read8_delegate m_custom_input[5];
+	read8_delegate::array<5> m_custom_input;
 	uint8_t m_custom_output_mask[2];
-	write8_delegate m_custom_output[2];
+	write8_delegate::array<2> m_custom_output;
 
 	INTERRUPT_GEN_MEMBER(clock_14024);
 	DECLARE_WRITE8_MEMBER(porta0_w);
 	DECLARE_WRITE8_MEMBER(portb0_w);
 	DECLARE_WRITE8_MEMBER(porta1_w);
 	DECLARE_WRITE8_MEMBER(portb1_w);
-
 };
 
 
@@ -189,50 +196,6 @@ private:
 	// internal communications
 	DECLARE_WRITE8_MEMBER(porta_w);
 	DECLARE_WRITE8_MEMBER(portb_w);
-	DECLARE_WRITE_LINE_MEMBER(irq_w);
-};
-
-
-// ======================> midway_squawk_n_talk_device
-
-class midway_squawk_n_talk_device : public device_t,
-									public device_mixer_interface
-{
-public:
-	// construction/destruction
-	midway_squawk_n_talk_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 3'579'545);
-
-	// read/write
-	DECLARE_WRITE8_MEMBER(write);
-	DECLARE_WRITE_LINE_MEMBER(reset_write);
-
-	// internal communications
-	DECLARE_WRITE8_MEMBER(dac_w);
-
-	void squawkntalk_alt_map(address_map &map);
-	void squawkntalk_map(address_map &map);
-protected:
-	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-
-private:
-	// devices
-	required_device<m6802_cpu_device> m_cpu;
-	required_device<pia6821_device> m_pia0;
-	required_device<pia6821_device> m_pia1;
-	optional_device<tms5200_device> m_tms5200;
-
-	// internal state
-	uint8_t m_tms_command;
-	uint8_t m_tms_strobes;
-
-	// internal communications
-	DECLARE_WRITE8_MEMBER(porta1_w);
-	DECLARE_WRITE8_MEMBER(porta2_w);
-	DECLARE_WRITE8_MEMBER(portb2_w);
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
 };
 

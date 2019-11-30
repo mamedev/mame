@@ -32,16 +32,15 @@ WRITE8_MEMBER(ksayakyu_state::ksayakyu_videoctrl_w)
 		m_tilemap->set_flip((data & 2) ? TILEMAP_FLIPX : 0);
 }
 
-PALETTE_INIT_MEMBER(ksayakyu_state, ksayakyu)
+void ksayakyu_state::ksayakyu_palette(palette_device &palette) const
 {
-	const uint8_t *prom = memregion("proms")->base();
-	int r, g, b, i;
+	uint8_t const *const prom = memregion("proms")->base();
 
-	for (i = 0; i < 0x100; i++)
+	for (int i = 0; i < 0x100; i++)
 	{
-		r = (prom[i] & 0x07) >> 0;
-		g = (prom[i] & 0x38) >> 3;
-		b = (prom[i] & 0xc0) >> 6;
+		int const r = (prom[i] >> 0) & 0x07;
+		int const g = (prom[i] >> 3) & 0x07;
+		int const b = (prom[i] >> 6) & 0x03;
 
 		palette.set_pen_color(i, pal3bit(r), pal3bit(g), pal2bit(b));
 	}
@@ -117,8 +116,8 @@ void ksayakyu_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 
 void ksayakyu_state::video_start()
 {
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ksayakyu_state::get_ksayakyu_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32 * 8);
-	m_textmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ksayakyu_state::get_text_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ksayakyu_state::get_ksayakyu_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32 * 8);
+	m_textmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ksayakyu_state::get_text_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_textmap->set_transparent_pen(0);
 }
 

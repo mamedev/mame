@@ -1,12 +1,10 @@
 // license:BSD-3-Clause
-// copyright-holders:hap, Kevin Horton
+// copyright-holders:hap
+// thanks-to:Kevin Horton, Sean Riddle
 /***************************************************************************
 
   NEC uCOM4 MCU tabletops/handhelds or other simple devices,
   most of them (emulated ones) are VFD electronic games/toys.
-  List of child drivers:
-  - tb303: Roland TB-303
-  - tr606: Roland TR-606
 
   Commonly used VFD(vacuum fluorescent display) are by NEC or Futaba.
 
@@ -35,24 +33,26 @@
  @054     uPD552C  1980, Epoch Invader From Space
 
  @031     uPD553C  1979, Bambino Superstar Football (ET-03)
- @049     uPD553C  1979, Mego Mini-Vid Break Free
+ @049     uPD553C  1979, Mego Mini-Vid: Break Free
  @055     uPD553C  1980, Bambino Space Laser Fight (ET-12)
  *073     uPD553C  1980, Sony ST-J75 FM Stereo Tuner
  @080     uPD553C  1980, Epoch Electronic Football
  *102     uPD553C  1981, Bandai Block Out
  @153     uPD553C  1981, Epoch Galaxy II
  @160     uPD553C  1982, Tomy Pac Man (TN-08)
+ *167     uPD553C  1982, Sony SL models (betamax) (have dump)
  @170     uPD553C  1982, Bandai Crazy Climber
  @192     uPD553C  1982, Tomy Scramble (TN-10)
  @202     uPD553C  1982, Epoch Astro Command
  @206     uPD553C  1982, Epoch Dracula
+ *207     uPD553C  1982, Sony SL-J30 (tape/cd deck)
  @209     uPD553C  1982, Tomy Caveman (TN-12)
  @258     uPD553C  1984, Tomy Alien Chase (TN-16)
  *296     uPD553C  1984, Epoch Computer Beam Gun Professional
 
  @511     uPD557LC 1980, Takatoku Toys Game Robot 9/Mego Fabulous Fred
  @512     uPD557LC 1980, Castle Toy Tactix
- *513     uPD557LC 1980, Castle Toy Name That Tune
+ @513     uPD557LC 1980, Castle Toy Name That Tune
 
  @060     uPD650C  1979, Mattel Computer Gin
  *085     uPD650C  1980, Roland TR-808
@@ -62,44 +62,85 @@
 
   (* means undumped unless noted, @ denotes it's in this driver)
 
-
-TODO:
-  - games that rely on the fact that faster/longer strobed elements appear brighter:
-    tactix(player 2)
-
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/hh_ucom4.h"
-
+#include "cpu/ucom4/ucom4.h"
+#include "video/pwm.h"
 #include "video/hlcd0515.h"
+#include "sound/spkrdev.h"
 #include "screen.h"
 #include "speaker.h"
 
-// internal artwork
+// internal artwork (complete)
+#include "ctntune.lh" // clickable
 #include "efball.lh"
 #include "grobot9.lh" // clickable
 #include "mcompgin.lh"
 #include "mvbfree.lh"
 #include "tactix.lh" // clickable
 
+// internal artwork (bezel overlay)
+#include "tmtennis.lh"
+
 //#include "hh_ucom4_test.lh" // common test-layout - no svg artwork(yet), use external artwork
+
+
+class hh_ucom4_state : public driver_device
+{
+public:
+	hh_ucom4_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_display(*this, "display"),
+		m_speaker(*this, "speaker"),
+		m_inputs(*this, "IN.%u", 0)
+	{ }
+
+	DECLARE_INPUT_CHANGED_MEMBER(single_interrupt_line);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	// devices
+	required_device<ucom4_cpu_device> m_maincpu;
+	optional_device<pwm_display_device> m_display;
+	optional_device<speaker_sound_device> m_speaker;
+	optional_ioport_array<6> m_inputs; // max 6
+
+	// misc common
+	u8 m_port[9];                   // MCU port A-I write data (optional)
+	u8 m_int;                       // MCU INT pin state
+	u16 m_inp_mux;                  // multiplexed inputs mask
+
+	u32 m_grid;                     // VFD current row data
+	u32 m_plate;                    // VFD current column data
+
+	u8 read_inputs(int columns);
+	void refresh_interrupts(void);
+	void set_interrupt(int state);
+
+	enum
+	{
+		PORTA = 0,
+		PORTB,
+		PORTC,
+		PORTD,
+		PORTE,
+		PORTF,
+		PORTG,
+		PORTH,
+		PORTI
+	};
+};
 
 
 // machine start/reset
 
 void hh_ucom4_state::machine_start()
 {
-	// resolve handlers
-	m_out_x.resolve();
-	m_out_a.resolve();
-	m_out_digit.resolve();
-
 	// zerofill
-	memset(m_display_state, 0, sizeof(m_display_state));
-	memset(m_display_decay, 0, sizeof(m_display_decay));
-	memset(m_display_segmask, 0, sizeof(m_display_segmask));
-
 	memset(m_port, 0, sizeof(m_port));
 	m_int = 0;
 	m_inp_mux = 0;
@@ -107,14 +148,6 @@ void hh_ucom4_state::machine_start()
 	m_plate = 0;
 
 	// register for savestates
-	save_item(NAME(m_display_maxy));
-	save_item(NAME(m_display_maxx));
-	save_item(NAME(m_display_wait));
-
-	save_item(NAME(m_display_state));
-	save_item(NAME(m_display_decay));
-	save_item(NAME(m_display_segmask));
-
 	save_item(NAME(m_port));
 	save_item(NAME(m_int));
 	save_item(NAME(m_inp_mux));
@@ -135,69 +168,6 @@ void hh_ucom4_state::machine_reset()
 
 ***************************************************************************/
 
-// The device may strobe the outputs very fast, it is unnoticeable to the user.
-// To prevent flickering here, we need to simulate a decay.
-
-void hh_ucom4_state::display_update()
-{
-	for (int y = 0; y < m_display_maxy; y++)
-	{
-		u32 active_state = 0;
-
-		for (int x = 0; x <= m_display_maxx; x++)
-		{
-			// turn on powered segments
-			if (m_display_state[y] >> x & 1)
-				m_display_decay[y][x] = m_display_wait;
-
-			// determine active state
-			u32 ds = (m_display_decay[y][x] != 0) ? 1 : 0;
-			active_state |= (ds << x);
-
-			// output to y.x, or y.a when always-on
-			if (x != m_display_maxx)
-				m_out_x[y][x] = ds;
-			else
-				m_out_a[y] = ds;
-		}
-
-		// output to digity
-		if (m_display_segmask[y] != 0)
-			m_out_digit[y] = active_state & m_display_segmask[y];
-	}
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER(hh_ucom4_state::display_decay_tick)
-{
-	// slowly turn off unpowered segments
-	for (int y = 0; y < m_display_maxy; y++)
-		for (int x = 0; x <= m_display_maxx; x++)
-			if (m_display_decay[y][x] != 0)
-				m_display_decay[y][x]--;
-
-	display_update();
-}
-
-void hh_ucom4_state::set_display_size(int maxx, int maxy)
-{
-	m_display_maxx = maxx;
-	m_display_maxy = maxy;
-}
-
-void hh_ucom4_state::display_matrix(int maxx, int maxy, u32 setx, u32 sety, bool update)
-{
-	set_display_size(maxx, maxy);
-
-	// update current state
-	u32 mask = (1 << maxx) - 1;
-	for (int y = 0; y < maxy; y++)
-		m_display_state[y] = (sety >> y & 1) ? ((setx & mask) | (1 << maxx)) : 0;
-
-	if (update)
-		display_update();
-}
-
-
 // generic input handlers
 
 u8 hh_ucom4_state::read_inputs(int columns)
@@ -207,7 +177,7 @@ u8 hh_ucom4_state::read_inputs(int columns)
 	// read selected input rows
 	for (int i = 0; i < columns; i++)
 		if (m_inp_mux >> i & 1)
-			ret |= m_inp_matrix[i]->read();
+			ret |= m_inputs[i]->read();
 
 	return ret;
 }
@@ -241,9 +211,11 @@ INPUT_CHANGED_MEMBER(hh_ucom4_state::single_interrupt_line)
 
 /***************************************************************************
 
-  Minidrivers (subclass, I/O, Inputs, Machine Config)
+  Minidrivers (subclass, I/O, Inputs, Machine Config, ROM Defs)
 
 ***************************************************************************/
+
+namespace {
 
 /***************************************************************************
 
@@ -267,11 +239,11 @@ INPUT_CHANGED_MEMBER(hh_ucom4_state::single_interrupt_line)
 class ufombs_state : public hh_ucom4_state
 {
 public:
-	ufombs_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_ucom4_state(mconfig, type, tag)
+	ufombs_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE8_MEMBER(speaker_w);
@@ -280,27 +252,27 @@ public:
 
 // handlers
 
-void ufombs_state::prepare_display()
+void ufombs_state::update_display()
 {
 	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,9,3,2,1,0,4,5,6,7,8);
 	u16 plate = bitswap<16>(m_plate,15,14,13,12,11,7,10,6,9,5,8,4,0,1,2,3);
-	display_matrix(10, 9, plate, grid);
+	m_display->matrix(grid, plate);
 }
 
 WRITE8_MEMBER(ufombs_state::grid_w)
 {
 	// F,G,H0: vfd grid
-	int shift = (offset - NEC_UCOM4_PORTF) * 4;
+	int shift = (offset - PORTF) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 WRITE8_MEMBER(ufombs_state::plate_w)
 {
 	// C,D012,I: vfd plate
-	int shift = (offset == NEC_UCOM4_PORTI) ? 8 : (offset - NEC_UCOM4_PORTC) * 4;
+	int shift = (offset == PORTI) ? 8 : (offset - PORTC) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 WRITE8_MEMBER(ufombs_state::speaker_w)
@@ -326,35 +298,45 @@ static INPUT_PORTS_START( ufombs )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static const s16 ufombs_speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
-
-MACHINE_CONFIG_START(ufombs_state::ufombs)
-
+void ufombs_state::ufombs(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NEC_D552, 400000) // approximation
-	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
-	MCFG_UCOM4_READ_B_CB(IOPORT("IN.1"))
-	MCFG_UCOM4_WRITE_C_CB(WRITE8(*this, ufombs_state, plate_w))
-	MCFG_UCOM4_WRITE_D_CB(WRITE8(*this, ufombs_state, plate_w))
-	MCFG_UCOM4_WRITE_E_CB(WRITE8(*this, ufombs_state, speaker_w))
-	MCFG_UCOM4_WRITE_F_CB(WRITE8(*this, ufombs_state, grid_w))
-	MCFG_UCOM4_WRITE_G_CB(WRITE8(*this, ufombs_state, grid_w))
-	MCFG_UCOM4_WRITE_H_CB(WRITE8(*this, ufombs_state, grid_w))
-	MCFG_UCOM4_WRITE_I_CB(WRITE8(*this, ufombs_state, plate_w))
+	NEC_D552(config, m_maincpu, 400000); // approximation
+	m_maincpu->read_a().set_ioport("IN.0");
+	m_maincpu->read_b().set_ioport("IN.1");
+	m_maincpu->write_c().set(FUNC(ufombs_state::plate_w));
+	m_maincpu->write_d().set(FUNC(ufombs_state::plate_w));
+	m_maincpu->write_e().set(FUNC(ufombs_state::speaker_w));
+	m_maincpu->write_f().set(FUNC(ufombs_state::grid_w));
+	m_maincpu->write_g().set(FUNC(ufombs_state::grid_w));
+	m_maincpu->write_h().set(FUNC(ufombs_state::grid_w));
+	m_maincpu->write_i().set(FUNC(ufombs_state::plate_w));
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(243, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 243-1, 0, 1080-1)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_refresh_hz(60);
+	screen.set_size(243, 1080);
+	screen.set_visarea_full();
+
+	PWM_DISPLAY(config, m_display).set_size(9, 10);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SPEAKER_LEVELS(4, ufombs_speaker_levels)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	static const s16 speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
+	m_speaker->set_levels(4, speaker_levels);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( ufombs )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "d552c-017", 0x0000, 0x0400, CRC(0e208cb3) SHA1(57db6566916c94325e2b67ccb94b4ea3b233487d) )
+
+	ROM_REGION( 222395, "screen", 0)
+	ROM_LOAD( "ufombs.svg", 0, 222395, CRC(ae9fb93f) SHA1(165ea78eee93c503dbd277a56c41e3c63c534e38) )
+ROM_END
 
 
 
@@ -379,11 +361,11 @@ MACHINE_CONFIG_END
 class ssfball_state : public hh_ucom4_state
 {
 public:
-	ssfball_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_ucom4_state(mconfig, type, tag)
+	ssfball_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_READ8_MEMBER(input_b_r);
@@ -392,18 +374,18 @@ public:
 
 // handlers
 
-void ssfball_state::prepare_display()
+void ssfball_state::update_display()
 {
 	u32 plate = bitswap<24>(m_plate,23,22,21,20,19,11,7,3,12,17,13,18,16,14,15,10,9,8,0,1,2,4,5,6);
-	display_matrix(16, 9, plate, m_grid);
+	m_display->matrix(m_grid, plate);
 }
 
 WRITE8_MEMBER(ssfball_state::grid_w)
 {
 	// C,D(,E3): vfd grid 0-7(,8)
-	int shift = (offset - NEC_UCOM4_PORTC) * 4;
+	int shift = (offset - PORTC) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 WRITE8_MEMBER(ssfball_state::plate_w)
@@ -411,24 +393,24 @@ WRITE8_MEMBER(ssfball_state::plate_w)
 	m_port[offset] = data;
 
 	// E,F,G,H,I(not all!): vfd plate
-	int shift = (offset - NEC_UCOM4_PORTE) * 4;
+	int shift = (offset - PORTE) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// F3,G3: input mux + speaker
-	m_inp_mux = (m_port[NEC_UCOM4_PORTF] >> 3 & 1) | (m_port[NEC_UCOM4_PORTG] >> 2 & 2);
+	m_inp_mux = (m_port[PORTF] >> 3 & 1) | (m_port[PORTG] >> 2 & 2);
 	m_speaker->level_w(m_inp_mux);
 
 	// E3: vfd grid 8
-	if (offset == NEC_UCOM4_PORTE)
+	if (offset == PORTE)
 		grid_w(space, offset, data >> 3 & 1);
 	else
-		prepare_display();
+		update_display();
 }
 
 READ8_MEMBER(ssfball_state::input_b_r)
 {
 	// B: input port 2, where B3 is multiplexed
-	return m_inp_matrix[2]->read() | read_inputs(2);
+	return m_inputs[2]->read() | read_inputs(2);
 }
 
 // config
@@ -468,39 +450,57 @@ static INPUT_PORTS_START( ssfball )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Pass")
 
 	PORT_START("FAKE") // fake port for left/right combination
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY PORT_NAME("P1 Left/Right")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY PORT_NAME("P1 Left/Right")
 INPUT_PORTS_END
 
-static const s16 ssfball_speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
-
-MACHINE_CONFIG_START(ssfball_state::ssfball)
-
+void ssfball_state::ssfball(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NEC_D553, 400000) // approximation
-	MCFG_UCOM4_READ_A_CB(IOPORT("IN.3"))
-	MCFG_UCOM4_READ_B_CB(READ8(*this, ssfball_state, input_b_r))
-	MCFG_UCOM4_WRITE_C_CB(WRITE8(*this, ssfball_state, grid_w))
-	MCFG_UCOM4_WRITE_D_CB(WRITE8(*this, ssfball_state, grid_w))
-	MCFG_UCOM4_WRITE_E_CB(WRITE8(*this, ssfball_state, plate_w))
-	MCFG_UCOM4_WRITE_F_CB(WRITE8(*this, ssfball_state, plate_w))
-	MCFG_UCOM4_WRITE_G_CB(WRITE8(*this, ssfball_state, plate_w))
-	MCFG_UCOM4_WRITE_H_CB(WRITE8(*this, ssfball_state, plate_w))
-	MCFG_UCOM4_WRITE_I_CB(WRITE8(*this, ssfball_state, plate_w))
+	NEC_D553(config, m_maincpu, 400000); // approximation
+	m_maincpu->read_a().set_ioport("IN.3");
+	m_maincpu->read_b().set(FUNC(ssfball_state::input_b_r));
+	m_maincpu->write_c().set(FUNC(ssfball_state::grid_w));
+	m_maincpu->write_d().set(FUNC(ssfball_state::grid_w));
+	m_maincpu->write_e().set(FUNC(ssfball_state::plate_w));
+	m_maincpu->write_f().set(FUNC(ssfball_state::plate_w));
+	m_maincpu->write_g().set(FUNC(ssfball_state::plate_w));
+	m_maincpu->write_h().set(FUNC(ssfball_state::plate_w));
+	m_maincpu->write_i().set(FUNC(ssfball_state::plate_w));
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1920, 482)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1920-1, 0, 482-1)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_refresh_hz(60);
+	screen.set_size(1920, 482);
+	screen.set_visarea_full();
+
+	PWM_DISPLAY(config, m_display).set_size(9, 16);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SPEAKER_LEVELS(4, ssfball_speaker_levels)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	static const s16 speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
+	m_speaker->set_levels(4, speaker_levels);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( ssfball )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "d553c-031", 0x0000, 0x0800, CRC(ff5d91d0) SHA1(9b2c0ae45f1e3535108ee5fef8a9010e00c8d5c3) )
+
+	ROM_REGION( 331352, "screen", 0)
+	ROM_LOAD( "ssfball.svg", 0, 331352, CRC(10cffb85) SHA1(c875f73a323d976088ffa1bc19f7bc865d4aac62) )
+ROM_END
+
+ROM_START( bmcfball )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "d553c-031", 0x0000, 0x0800, CRC(ff5d91d0) SHA1(9b2c0ae45f1e3535108ee5fef8a9010e00c8d5c3) )
+
+	ROM_REGION( 331352, "screen", 0)
+	ROM_LOAD( "bmcfball.svg", 0, 331352, CRC(43fbed1e) SHA1(28160e14b0879cd4dd9dab770c52c98f316ab653) )
+ROM_END
 
 
 
@@ -522,11 +522,11 @@ MACHINE_CONFIG_END
 class bmsoccer_state : public hh_ucom4_state
 {
 public:
-	bmsoccer_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_ucom4_state(mconfig, type, tag)
+	bmsoccer_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_READ8_MEMBER(input_a_r);
@@ -535,39 +535,39 @@ public:
 
 // handlers
 
-void bmsoccer_state::prepare_display()
+void bmsoccer_state::update_display()
 {
 	u32 plate = bitswap<24>(m_plate,23,22,21,20,19,11,7,3,12,17,13,18,16,14,15,8,4,0,9,5,1,10,6,2);
-	display_matrix(16, 9, plate, m_grid);
+	m_display->matrix(m_grid, plate);
 }
 
 WRITE8_MEMBER(bmsoccer_state::grid_w)
 {
 	// C01: input mux
-	if (offset == NEC_UCOM4_PORTC)
+	if (offset == PORTC)
 		m_inp_mux = data & 3;
 
 	// C,D(,E3): vfd grid
-	int shift = (offset - NEC_UCOM4_PORTC) * 4;
+	int shift = (offset - PORTC) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 WRITE8_MEMBER(bmsoccer_state::plate_w)
 {
 	// G3: speaker out
-	if (offset == NEC_UCOM4_PORTG)
+	if (offset == PORTG)
 		m_speaker->level_w(data >> 3 & 1);
 
 	// E012,F012,G012,H,I: vfd plate
-	int shift = (offset - NEC_UCOM4_PORTE) * 4;
+	int shift = (offset - PORTE) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// E3: grid 8
-	if (offset == NEC_UCOM4_PORTE)
+	if (offset == PORTE)
 		grid_w(space, offset, data >> 3 & 1);
 	else
-		prepare_display();
+		update_display();
 }
 
 READ8_MEMBER(bmsoccer_state::input_a_r)
@@ -601,32 +601,43 @@ static INPUT_PORTS_START( bmsoccer )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Shoot")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(bmsoccer_state::bmsoccer)
-
+void bmsoccer_state::bmsoccer(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NEC_D552, 400000) // approximation
-	MCFG_UCOM4_READ_A_CB(READ8(*this, bmsoccer_state, input_a_r))
-	MCFG_UCOM4_READ_B_CB(IOPORT("IN.2"))
-	MCFG_UCOM4_WRITE_C_CB(WRITE8(*this, bmsoccer_state, grid_w))
-	MCFG_UCOM4_WRITE_D_CB(WRITE8(*this, bmsoccer_state, grid_w))
-	MCFG_UCOM4_WRITE_E_CB(WRITE8(*this, bmsoccer_state, plate_w))
-	MCFG_UCOM4_WRITE_F_CB(WRITE8(*this, bmsoccer_state, plate_w))
-	MCFG_UCOM4_WRITE_G_CB(WRITE8(*this, bmsoccer_state, plate_w))
-	MCFG_UCOM4_WRITE_H_CB(WRITE8(*this, bmsoccer_state, plate_w))
-	MCFG_UCOM4_WRITE_I_CB(WRITE8(*this, bmsoccer_state, plate_w))
+	NEC_D552(config, m_maincpu, 400000); // approximation
+	m_maincpu->read_a().set(FUNC(bmsoccer_state::input_a_r));
+	m_maincpu->read_b().set_ioport("IN.2");
+	m_maincpu->write_c().set(FUNC(bmsoccer_state::grid_w));
+	m_maincpu->write_d().set(FUNC(bmsoccer_state::grid_w));
+	m_maincpu->write_e().set(FUNC(bmsoccer_state::plate_w));
+	m_maincpu->write_f().set(FUNC(bmsoccer_state::plate_w));
+	m_maincpu->write_g().set(FUNC(bmsoccer_state::plate_w));
+	m_maincpu->write_h().set(FUNC(bmsoccer_state::plate_w));
+	m_maincpu->write_i().set(FUNC(bmsoccer_state::plate_w));
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(271, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 271-1, 0, 1080-1)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_refresh_hz(60);
+	screen.set_size(271, 1080);
+	screen.set_visarea_full();
+
+	PWM_DISPLAY(config, m_display).set_size(9, 16);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( bmsoccer )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "d552c-043", 0x0000, 0x0400, CRC(10c2a4ea) SHA1(6ebca7d406e22ff7a8cd529579b55a700da487b4) )
+
+	ROM_REGION( 273796, "screen", 0)
+	ROM_LOAD( "bmsoccer.svg", 0, 273796, CRC(4c88d9f8) SHA1(b4b82f26a09f54cd0b6a9d1c1a46796fbfcb578a) )
+ROM_END
 
 
 
@@ -644,11 +655,11 @@ MACHINE_CONFIG_END
 class bmsafari_state : public hh_ucom4_state
 {
 public:
-	bmsafari_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_ucom4_state(mconfig, type, tag)
+	bmsafari_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE8_MEMBER(speaker_w);
@@ -657,32 +668,32 @@ public:
 
 // handlers
 
-void bmsafari_state::prepare_display()
+void bmsafari_state::update_display()
 {
 	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,9,0,1,2,3,4,5,6,7,8);
 	u16 plate = bitswap<16>(m_plate,15,14,13,12,11,7,10,2,9,5,8,4,0,1,6,3);
-	display_matrix(10, 9, plate, grid);
+	m_display->matrix(grid, plate);
 }
 
 WRITE8_MEMBER(bmsafari_state::grid_w)
 {
 	// C,D(,E3): vfd grid
-	int shift = (offset - NEC_UCOM4_PORTC) * 4;
+	int shift = (offset - PORTC) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 WRITE8_MEMBER(bmsafari_state::plate_w)
 {
 	// E012,H,I: vfd plate
-	int shift = (offset == NEC_UCOM4_PORTE) ? 8 : (offset - NEC_UCOM4_PORTH) * 4;
+	int shift = (offset == PORTE) ? 8 : (offset - PORTH) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
 	// E3: grid 0
-	if (offset == NEC_UCOM4_PORTE)
+	if (offset == PORTE)
 		grid_w(space, offset, data >> 3 & 1);
 	else
-		prepare_display();
+		update_display();
 }
 
 WRITE8_MEMBER(bmsafari_state::speaker_w)
@@ -708,31 +719,42 @@ static INPUT_PORTS_START( bmsafari )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(bmsafari_state::bmsafari)
-
+void bmsafari_state::bmsafari(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NEC_D552, 400000) // approximation
-	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
-	MCFG_UCOM4_READ_B_CB(IOPORT("IN.1"))
-	MCFG_UCOM4_WRITE_C_CB(WRITE8(*this, bmsafari_state, grid_w))
-	MCFG_UCOM4_WRITE_D_CB(WRITE8(*this, bmsafari_state, grid_w))
-	MCFG_UCOM4_WRITE_E_CB(WRITE8(*this, bmsafari_state, plate_w))
-	MCFG_UCOM4_WRITE_G_CB(WRITE8(*this, bmsafari_state, speaker_w))
-	MCFG_UCOM4_WRITE_H_CB(WRITE8(*this, bmsafari_state, plate_w))
-	MCFG_UCOM4_WRITE_I_CB(WRITE8(*this, bmsafari_state, plate_w))
+	NEC_D552(config, m_maincpu, 400000); // approximation
+	m_maincpu->read_a().set_ioport("IN.0");
+	m_maincpu->read_b().set_ioport("IN.1");
+	m_maincpu->write_c().set(FUNC(bmsafari_state::grid_w));
+	m_maincpu->write_d().set(FUNC(bmsafari_state::grid_w));
+	m_maincpu->write_e().set(FUNC(bmsafari_state::plate_w));
+	m_maincpu->write_g().set(FUNC(bmsafari_state::speaker_w));
+	m_maincpu->write_h().set(FUNC(bmsafari_state::plate_w));
+	m_maincpu->write_i().set(FUNC(bmsafari_state::plate_w));
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(248, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 248-1, 0, 1080-1)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_refresh_hz(60);
+	screen.set_size(248, 1080);
+	screen.set_visarea_full();
+
+	PWM_DISPLAY(config, m_display).set_size(9, 10);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( bmsafari )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "d552c-049", 0x0000, 0x0400, CRC(82fa3cbe) SHA1(019e7ec784e977eba09997fc46af253054fb222c) )
+
+	ROM_REGION( 275386, "screen", 0)
+	ROM_LOAD( "bmsafari.svg", 0, 275386, CRC(c24badbc) SHA1(b191f34155d6d4e834e7c6fe715d4bb76198ad72) )
+ROM_END
 
 
 
@@ -753,11 +775,11 @@ MACHINE_CONFIG_END
 class splasfgt_state : public hh_ucom4_state
 {
 public:
-	splasfgt_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_ucom4_state(mconfig, type, tag)
+	splasfgt_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_READ8_MEMBER(input_b_r);
@@ -766,38 +788,38 @@ public:
 
 // handlers
 
-void splasfgt_state::prepare_display()
+void splasfgt_state::update_display()
 {
 	u32 plate = bitswap<24>(m_plate,23,22,21,20,19,18,17,13,1,0,8,6,0,10,11,14,15,16,9,5,7,4,2,3);
-	display_matrix(16, 9, plate, m_grid);
+	m_display->matrix(m_grid, plate);
 }
 
 WRITE8_MEMBER(splasfgt_state::grid_w)
 {
 	// G,H,I0: vfd grid
-	int shift = (offset - NEC_UCOM4_PORTG) * 4;
+	int shift = (offset - PORTG) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
 
 	// G(grid 0-3): input mux
 	m_inp_mux = m_grid & 0xf;
 
 	// I2: vfd plate 6
-	if (offset == NEC_UCOM4_PORTI)
-		plate_w(space, 4 + NEC_UCOM4_PORTC, data >> 2 & 1);
+	if (offset == PORTI)
+		plate_w(space, 4 + PORTC, data >> 2 & 1);
 	else
-		prepare_display();
+		update_display();
 }
 
 WRITE8_MEMBER(splasfgt_state::plate_w)
 {
 	// F01: speaker out
-	if (offset == NEC_UCOM4_PORTF)
+	if (offset == PORTF)
 		m_speaker->level_w(data & 3);
 
 	// C,D,E,F23(,I2): vfd plate
-	int shift = (offset - NEC_UCOM4_PORTC) * 4;
+	int shift = (offset - PORTC) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(splasfgt_state::input_b_r)
@@ -855,35 +877,45 @@ static INPUT_PORTS_START( splasfgt )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static const s16 splasfgt_speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
-
-MACHINE_CONFIG_START(splasfgt_state::splasfgt)
-
+void splasfgt_state::splasfgt(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NEC_D553, 400000) // approximation
-	MCFG_UCOM4_READ_A_CB(IOPORT("IN.4"))
-	MCFG_UCOM4_READ_B_CB(READ8(*this, splasfgt_state, input_b_r))
-	MCFG_UCOM4_WRITE_C_CB(WRITE8(*this, splasfgt_state, plate_w))
-	MCFG_UCOM4_WRITE_D_CB(WRITE8(*this, splasfgt_state, plate_w))
-	MCFG_UCOM4_WRITE_E_CB(WRITE8(*this, splasfgt_state, plate_w))
-	MCFG_UCOM4_WRITE_F_CB(WRITE8(*this, splasfgt_state, plate_w))
-	MCFG_UCOM4_WRITE_G_CB(WRITE8(*this, splasfgt_state, grid_w))
-	MCFG_UCOM4_WRITE_H_CB(WRITE8(*this, splasfgt_state, grid_w))
-	MCFG_UCOM4_WRITE_I_CB(WRITE8(*this, splasfgt_state, grid_w))
+	NEC_D553(config, m_maincpu, 400000); // approximation
+	m_maincpu->read_a().set_ioport("IN.4");
+	m_maincpu->read_b().set(FUNC(splasfgt_state::input_b_r));
+	m_maincpu->write_c().set(FUNC(splasfgt_state::plate_w));
+	m_maincpu->write_d().set(FUNC(splasfgt_state::plate_w));
+	m_maincpu->write_e().set(FUNC(splasfgt_state::plate_w));
+	m_maincpu->write_f().set(FUNC(splasfgt_state::plate_w));
+	m_maincpu->write_g().set(FUNC(splasfgt_state::grid_w));
+	m_maincpu->write_h().set(FUNC(splasfgt_state::grid_w));
+	m_maincpu->write_i().set(FUNC(splasfgt_state::grid_w));
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1920, 476)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1920-1, 0, 476-1)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_refresh_hz(60);
+	screen.set_size(1920, 476);
+	screen.set_visarea_full();
+
+	PWM_DISPLAY(config, m_display).set_size(9, 16);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SPEAKER_LEVELS(4, splasfgt_speaker_levels)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	static const s16 speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
+	m_speaker->set_levels(4, speaker_levels);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( splasfgt )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "d553c-055", 0x0000, 0x0800, CRC(eb471fbd) SHA1(f06cfe567bf6f9ed4dcdc88acdcfad50cd370a02) )
+
+	ROM_REGION( 246609, "screen", 0)
+	ROM_LOAD( "splasfgt.svg", 0, 246609, CRC(365fae43) SHA1(344c120c2efa92ada9171047affac801a06cf303) )
+ROM_END
 
 
 
@@ -905,11 +937,11 @@ MACHINE_CONFIG_END
 class bcclimbr_state : public hh_ucom4_state
 {
 public:
-	bcclimbr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_ucom4_state(mconfig, type, tag)
+	bcclimbr_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(plate_w);
 	void bcclimbr(machine_config &config);
@@ -917,31 +949,31 @@ public:
 
 // handlers
 
-void bcclimbr_state::prepare_display()
+void bcclimbr_state::update_display()
 {
 	u8 grid = bitswap<8>(m_grid,7,6,0,1,2,3,4,5);
 	u32 plate = bitswap<24>(m_plate,23,22,21,20,16,17,18,19,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0);
-	display_matrix(20, 6, plate, grid);
+	m_display->matrix(grid, plate);
 }
 
 WRITE8_MEMBER(bcclimbr_state::grid_w)
 {
 	// I2: speaker out
-	if (offset == NEC_UCOM4_PORTI)
+	if (offset == PORTI)
 		m_speaker->level_w(data >> 2 & 1);
 
 	// H,I01: vfd grid
-	int shift = (offset - NEC_UCOM4_PORTH) * 4;
+	int shift = (offset - PORTH) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 WRITE8_MEMBER(bcclimbr_state::plate_w)
 {
 	// C,D,E,F: vfd plate
-	int shift = (offset - NEC_UCOM4_PORTC) * 4;
+	int shift = (offset - PORTC) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 // config
@@ -960,32 +992,43 @@ static INPUT_PORTS_START( bcclimbr )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_RIGHT )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(bcclimbr_state::bcclimbr)
-
+void bcclimbr_state::bcclimbr(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NEC_D553, 400_kHz_XTAL)
-	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
-	MCFG_UCOM4_READ_B_CB(IOPORT("IN.1"))
-	MCFG_UCOM4_WRITE_C_CB(WRITE8(*this, bcclimbr_state, plate_w))
-	MCFG_UCOM4_WRITE_D_CB(WRITE8(*this, bcclimbr_state, plate_w))
-	MCFG_UCOM4_WRITE_E_CB(WRITE8(*this, bcclimbr_state, plate_w))
-	MCFG_UCOM4_WRITE_F_CB(WRITE8(*this, bcclimbr_state, plate_w))
-	MCFG_UCOM4_WRITE_G_CB(WRITE8(*this, bcclimbr_state, plate_w))
-	MCFG_UCOM4_WRITE_H_CB(WRITE8(*this, bcclimbr_state, grid_w))
-	MCFG_UCOM4_WRITE_I_CB(WRITE8(*this, bcclimbr_state, grid_w))
+	NEC_D553(config, m_maincpu, 400_kHz_XTAL);
+	m_maincpu->read_a().set_ioport("IN.0");
+	m_maincpu->read_b().set_ioport("IN.1");
+	m_maincpu->write_c().set(FUNC(bcclimbr_state::plate_w));
+	m_maincpu->write_d().set(FUNC(bcclimbr_state::plate_w));
+	m_maincpu->write_e().set(FUNC(bcclimbr_state::plate_w));
+	m_maincpu->write_f().set(FUNC(bcclimbr_state::plate_w));
+	m_maincpu->write_g().set(FUNC(bcclimbr_state::plate_w));
+	m_maincpu->write_h().set(FUNC(bcclimbr_state::grid_w));
+	m_maincpu->write_i().set(FUNC(bcclimbr_state::grid_w));
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(310, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 310-1, 0, 1080-1)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_refresh_hz(60);
+	screen.set_size(310, 1080);
+	screen.set_visarea_full();
+
+	PWM_DISPLAY(config, m_display).set_size(6, 20);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( bcclimbr )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "d553c-170", 0x0000, 0x0800, CRC(fc2eabdb) SHA1(0f5cc854be7fdf105d9bd2114659d40c65f9d782) )
+
+	ROM_REGION( 219971, "screen", 0)
+	ROM_LOAD( "bcclimbr.svg", 0, 219971, CRC(9c9102f4) SHA1(6a7e02fd1467a26c734b01724e23cef9e4917805) )
+ROM_END
 
 
 
@@ -1009,8 +1052,8 @@ MACHINE_CONFIG_END
 class tactix_state : public hh_ucom4_state
 {
 public:
-	tactix_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_ucom4_state(mconfig, type, tag)
+	tactix_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(leds_w);
@@ -1026,7 +1069,7 @@ WRITE8_MEMBER(tactix_state::leds_w)
 {
 	// D,F: 4*4 led matrix
 	m_port[offset] = data;
-	display_matrix(4, 4, m_port[NEC_UCOM4_PORTD], m_port[NEC_UCOM4_PORTF]);
+	m_display->matrix(m_port[PORTF], m_port[PORTD]);
 }
 
 WRITE8_MEMBER(tactix_state::speaker_w)
@@ -1039,7 +1082,7 @@ WRITE8_MEMBER(tactix_state::input_w)
 {
 	// C,E0: input mux
 	m_port[offset] = data;
-	m_inp_mux = (m_port[NEC_UCOM4_PORTE] << 4 & 0x10) | m_port[NEC_UCOM4_PORTC];
+	m_inp_mux = (m_port[PORTE] << 4 & 0x10) | m_port[PORTC];
 }
 
 READ8_MEMBER(tactix_state::input_r)
@@ -1082,25 +1125,174 @@ static INPUT_PORTS_START( tactix )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(tactix_state::tactix)
-
+void tactix_state::tactix(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NEC_D557L, 400000) // approximation
-	MCFG_UCOM4_READ_A_CB(READ8(*this, tactix_state, input_r))
-	MCFG_UCOM4_WRITE_C_CB(WRITE8(*this, tactix_state, input_w))
-	MCFG_UCOM4_WRITE_D_CB(WRITE8(*this, tactix_state, leds_w))
-	MCFG_UCOM4_WRITE_E_CB(WRITE8(*this, tactix_state, input_w))
-	MCFG_UCOM4_WRITE_F_CB(WRITE8(*this, tactix_state, leds_w))
-	MCFG_UCOM4_WRITE_G_CB(WRITE8(*this, tactix_state, speaker_w))
+	NEC_D557L(config, m_maincpu, 200000); // approximation
+	m_maincpu->read_a().set(FUNC(tactix_state::input_r));
+	m_maincpu->write_c().set(FUNC(tactix_state::input_w));
+	m_maincpu->write_d().set(FUNC(tactix_state::leds_w));
+	m_maincpu->write_e().set(FUNC(tactix_state::input_w));
+	m_maincpu->write_f().set(FUNC(tactix_state::leds_w));
+	m_maincpu->write_g().set(FUNC(tactix_state::speaker_w));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(4, 4);
 	config.set_default_layout(layout_tactix);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( tactix )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "d557lc-512", 0x0000, 0x0800, CRC(1df738cb) SHA1(15a5de28a3c03e6894d29c56b5b424983569ccf2) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Castle Toy Name That Tune
+  * NEC uCOM-43 MCU, label D557LC 513
+  * 2 lamps, 1 7seg(+2 fake 7segs above a power-on lamp, showing "0")
+
+  This is a tabletop multiplayer game. Players are meant to place a bid,
+  and guess the song (by announcing it to everyone).
+
+***************************************************************************/
+
+class ctntune_state : public hh_ucom4_state
+{
+public:
+	ctntune_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_ucom4_state(mconfig, type, tag)
+	{ }
+
+	// start button powers unit back on
+	DECLARE_INPUT_CHANGED_MEMBER(start_button) { m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE); }
+
+	void update_display();
+	DECLARE_WRITE8_MEMBER(_7seg_w);
+	DECLARE_WRITE8_MEMBER(speaker_w);
+	DECLARE_WRITE8_MEMBER(input_w);
+	DECLARE_READ8_MEMBER(input_r);
+	void ctntune(machine_config &config);
+};
+
+// handlers
+
+void ctntune_state::update_display()
+{
+	u8 sel = m_port[PORTD] >> 3 & 1; // turn off display when power is off
+	u8 lamps = m_port[PORTD] & 3;
+	u8 digit = (m_port[PORTF] << 4 | m_port[PORTE]) & 0x7f;
+
+	m_display->matrix(sel, lamps << 7 | digit);
+}
+
+WRITE8_MEMBER(ctntune_state::_7seg_w)
+{
+	// E,F012: 7seg data, F3: N/C
+	m_port[offset] = data;
+	update_display();
+}
+
+WRITE8_MEMBER(ctntune_state::speaker_w)
+{
+	// G0: speaker out
+	m_speaker->level_w(data & 1);
+}
+
+WRITE8_MEMBER(ctntune_state::input_w)
+{
+	// D3: trigger power-off on falling edge
+	if (offset == PORTD && ~data & m_port[PORTD] & 8)
+		m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+
+	// C,D23: input mux
+	// D0,D1: yellow, red lamp
+	m_port[offset] = data;
+	m_inp_mux = (m_port[PORTD] << 2 & 0x30) | m_port[PORTC];
+	update_display();
+}
+
+READ8_MEMBER(ctntune_state::input_r)
+{
+	// A: multiplexed inputs
+	return read_inputs(6);
+}
+
+// config
+
+static INPUT_PORTS_START( ctntune )
+	PORT_START("IN.0") // C0 port A
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Button 1") // defaults to keyboard Z row
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON9 ) PORT_NAME("Button 5")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON13 ) PORT_NAME("Button 9")
+
+	PORT_START("IN.1") // C1 port A
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Button 2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON10 ) PORT_NAME("Button 6")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON14 ) PORT_NAME("Button 10")
+
+	PORT_START("IN.2") // C2 port A
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Button 3")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON11 ) PORT_NAME("Button 7")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Yellow Button")
+
+	PORT_START("IN.3") // C3 port A
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME("Button 4")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON12 ) PORT_NAME("Button 8")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Red Button")
+
+	PORT_START("IN.4") // D2 port A
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_NAME("Play Button")
+
+	PORT_START("IN.5") // D3 port A
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, ctntune_state, start_button, 0)
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+void ctntune_state::ctntune(machine_config &config)
+{
+	/* basic machine hardware */
+	NEC_D557L(config, m_maincpu, 200000); // approximation
+	m_maincpu->read_a().set(FUNC(ctntune_state::input_r));
+	m_maincpu->write_c().set(FUNC(ctntune_state::input_w));
+	m_maincpu->write_d().set(FUNC(ctntune_state::input_w));
+	m_maincpu->write_e().set(FUNC(ctntune_state::_7seg_w));
+	m_maincpu->write_f().set(FUNC(ctntune_state::_7seg_w));
+	m_maincpu->write_g().set(FUNC(ctntune_state::speaker_w));
+
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(1, 7+2);
+	m_display->set_segmask(1, 0x7f);
+	config.set_default_layout(layout_ctntune);
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( ctntune )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "d557lc-513", 0x0000, 0x0800, CRC(cd85ee23) SHA1(32b8fc8cb92fc1fd27da9148788a09d3bcd46a92) )
+ROM_END
 
 
 
@@ -1122,11 +1314,11 @@ MACHINE_CONFIG_END
 class invspace_state : public hh_ucom4_state
 {
 public:
-	invspace_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_ucom4_state(mconfig, type, tag)
+	invspace_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(plate_w);
 	void invspace(machine_config &config);
@@ -1134,31 +1326,31 @@ public:
 
 // handlers
 
-void invspace_state::prepare_display()
+void invspace_state::update_display()
 {
 	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,8,9,7,6,5,4,3,2,1,0);
 	u32 plate = bitswap<24>(m_plate,23,22,21,20,19,9,14,13,8,15,11,10,7,11,3,2,6,10,1,5,9,0,4,8);
-	display_matrix(19, 9, plate, grid);
+	m_display->matrix(grid, plate);
 }
 
 WRITE8_MEMBER(invspace_state::grid_w)
 {
 	// I0: speaker out
-	if (offset == NEC_UCOM4_PORTI)
+	if (offset == PORTI)
 		m_speaker->level_w(data & 1);
 
 	// C,D,I1: vfd grid
-	int shift = (offset == NEC_UCOM4_PORTI) ? 8 : (offset - NEC_UCOM4_PORTC) * 4;
+	int shift = (offset == PORTI) ? 8 : (offset - PORTC) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 WRITE8_MEMBER(invspace_state::plate_w)
 {
 	// E,F,G,H123: vfd plate
-	int shift = (offset - NEC_UCOM4_PORTE) * 4;
+	int shift = (offset - PORTE) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 // config
@@ -1176,32 +1368,43 @@ static INPUT_PORTS_START( invspace )
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(invspace_state::invspace)
-
+void invspace_state::invspace(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NEC_D552, 400_kHz_XTAL)
-	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
-	MCFG_UCOM4_READ_B_CB(IOPORT("IN.1"))
-	MCFG_UCOM4_WRITE_C_CB(WRITE8(*this, invspace_state, grid_w))
-	MCFG_UCOM4_WRITE_D_CB(WRITE8(*this, invspace_state, grid_w))
-	MCFG_UCOM4_WRITE_E_CB(WRITE8(*this, invspace_state, plate_w))
-	MCFG_UCOM4_WRITE_F_CB(WRITE8(*this, invspace_state, plate_w))
-	MCFG_UCOM4_WRITE_G_CB(WRITE8(*this, invspace_state, plate_w))
-	MCFG_UCOM4_WRITE_H_CB(WRITE8(*this, invspace_state, plate_w))
-	MCFG_UCOM4_WRITE_I_CB(WRITE8(*this, invspace_state, grid_w))
+	NEC_D552(config, m_maincpu, 400_kHz_XTAL);
+	m_maincpu->read_a().set_ioport("IN.0");
+	m_maincpu->read_b().set_ioport("IN.1");
+	m_maincpu->write_c().set(FUNC(invspace_state::grid_w));
+	m_maincpu->write_d().set(FUNC(invspace_state::grid_w));
+	m_maincpu->write_e().set(FUNC(invspace_state::plate_w));
+	m_maincpu->write_f().set(FUNC(invspace_state::plate_w));
+	m_maincpu->write_g().set(FUNC(invspace_state::plate_w));
+	m_maincpu->write_h().set(FUNC(invspace_state::plate_w));
+	m_maincpu->write_i().set(FUNC(invspace_state::grid_w));
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(289, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 289-1, 0, 1080-1)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_refresh_hz(60);
+	screen.set_size(289, 1080);
+	screen.set_visarea_full();
+
+	PWM_DISPLAY(config, m_display).set_size(9, 19);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( invspace )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "d552c-054", 0x0000, 0x0400, CRC(913d9c13) SHA1(f20edb5458e54d2f6d4e45e5d59efd87e05a6f3f) )
+
+	ROM_REGION( 110899, "screen", 0)
+	ROM_LOAD( "invspace.svg", 0, 110899, CRC(ae794333) SHA1(3552215389f02e4ef1d608f7dfc84f0499a78ee2) )
+ROM_END
 
 
 
@@ -1223,11 +1426,11 @@ MACHINE_CONFIG_END
 class efball_state : public hh_ucom4_state
 {
 public:
-	efball_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_ucom4_state(mconfig, type, tag)
+	efball_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(plate_w);
 	void efball(machine_config &config);
@@ -1235,30 +1438,30 @@ public:
 
 // handlers
 
-void efball_state::prepare_display()
+void efball_state::update_display()
 {
 	u16 plate = bitswap<16>(m_plate,15,14,13,12,11,4,3,0,2,1,6,10,9,5,8,7);
-	display_matrix(11, 10, plate, m_grid);
+	m_display->matrix(m_grid, plate);
 }
 
 WRITE8_MEMBER(efball_state::grid_w)
 {
 	// H2: speaker out
-	if (offset == NEC_UCOM4_PORTH)
+	if (offset == PORTH)
 		m_speaker->level_w(data >> 2 & 1);
 
 	// F,G,H01: vfd grid
-	int shift = (offset - NEC_UCOM4_PORTF) * 4;
+	int shift = (offset - PORTF) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 WRITE8_MEMBER(efball_state::plate_w)
 {
 	// D,E,I: vfd plate
-	int shift = (offset == NEC_UCOM4_PORTI) ? 8 : (offset - NEC_UCOM4_PORTD) * 4;
+	int shift = (offset == PORTI) ? 8 : (offset - PORTD) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 // config
@@ -1287,32 +1490,40 @@ static INPUT_PORTS_START( efball )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 Kick")
 
 	PORT_START("FAKE") // fake port for left/right combination
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY PORT_NAME("P1 Left/Right")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY PORT_NAME("P1 Left/Right")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(efball_state::efball)
-
+void efball_state::efball(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NEC_D553, 400_kHz_XTAL)
-	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
-	MCFG_UCOM4_READ_B_CB(IOPORT("IN.1"))
-	MCFG_UCOM4_READ_C_CB(IOPORT("IN.2"))
-	MCFG_UCOM4_WRITE_D_CB(WRITE8(*this, efball_state, plate_w))
-	MCFG_UCOM4_WRITE_E_CB(WRITE8(*this, efball_state, plate_w))
-	MCFG_UCOM4_WRITE_F_CB(WRITE8(*this, efball_state, grid_w))
-	MCFG_UCOM4_WRITE_G_CB(WRITE8(*this, efball_state, grid_w))
-	MCFG_UCOM4_WRITE_H_CB(WRITE8(*this, efball_state, grid_w))
-	MCFG_UCOM4_WRITE_I_CB(WRITE8(*this, efball_state, plate_w))
+	NEC_D553(config, m_maincpu, 400_kHz_XTAL);
+	m_maincpu->read_a().set_ioport("IN.0");
+	m_maincpu->read_b().set_ioport("IN.1");
+	m_maincpu->read_c().set_ioport("IN.2");
+	m_maincpu->write_d().set(FUNC(efball_state::plate_w));
+	m_maincpu->write_e().set(FUNC(efball_state::plate_w));
+	m_maincpu->write_f().set(FUNC(efball_state::grid_w));
+	m_maincpu->write_g().set(FUNC(efball_state::grid_w));
+	m_maincpu->write_h().set(FUNC(efball_state::grid_w));
+	m_maincpu->write_i().set(FUNC(efball_state::plate_w));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(10, 11);
 	config.set_default_layout(layout_efball);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( efball )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "d553c-080", 0x0000, 0x0800, CRC(54c1027f) SHA1(6cc98074dae9361fa8c0ed6501b6a57ad325ccbd) )
+ROM_END
 
 
 
@@ -1336,11 +1547,11 @@ MACHINE_CONFIG_END
 class galaxy2_state : public hh_ucom4_state
 {
 public:
-	galaxy2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_ucom4_state(mconfig, type, tag)
+	galaxy2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(plate_w);
 	void galaxy2b(machine_config &config);
@@ -1349,31 +1560,31 @@ public:
 
 // handlers
 
-void galaxy2_state::prepare_display()
+void galaxy2_state::update_display()
 {
 	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,0,1,2,3,4,5,6,7,8,9);
 	u16 plate = bitswap<16>(m_plate,15,3,2,6,1,5,4,0,11,10,7,12,14,13,8,9);
-	display_matrix(15, 10, plate, grid);
+	m_display->matrix(grid, plate);
 }
 
 WRITE8_MEMBER(galaxy2_state::grid_w)
 {
 	// E3: speaker out
-	if (offset == NEC_UCOM4_PORTE)
+	if (offset == PORTE)
 		m_speaker->level_w(data >> 3 & 1);
 
 	// C,D,E01: vfd grid
-	int shift = (offset - NEC_UCOM4_PORTC) * 4;
+	int shift = (offset - PORTC) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 WRITE8_MEMBER(galaxy2_state::plate_w)
 {
 	// F,G,H,I: vfd plate
-	int shift = (offset - NEC_UCOM4_PORTF) * 4;
+	int shift = (offset - PORTF) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 // config
@@ -1391,41 +1602,61 @@ static INPUT_PORTS_START( galaxy2 )
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(galaxy2_state::galaxy2)
-
+void galaxy2_state::galaxy2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NEC_D553, 400_kHz_XTAL)
-	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
-	MCFG_UCOM4_READ_B_CB(IOPORT("IN.1"))
-	MCFG_UCOM4_WRITE_C_CB(WRITE8(*this, galaxy2_state, grid_w))
-	MCFG_UCOM4_WRITE_D_CB(WRITE8(*this, galaxy2_state, grid_w))
-	MCFG_UCOM4_WRITE_E_CB(WRITE8(*this, galaxy2_state, grid_w))
-	MCFG_UCOM4_WRITE_F_CB(WRITE8(*this, galaxy2_state, plate_w))
-	MCFG_UCOM4_WRITE_G_CB(WRITE8(*this, galaxy2_state, plate_w))
-	MCFG_UCOM4_WRITE_H_CB(WRITE8(*this, galaxy2_state, plate_w))
-	MCFG_UCOM4_WRITE_I_CB(WRITE8(*this, galaxy2_state, plate_w))
+	NEC_D553(config, m_maincpu, 400_kHz_XTAL);
+	m_maincpu->read_a().set_ioport("IN.0");
+	m_maincpu->read_b().set_ioport("IN.1");
+	m_maincpu->write_c().set(FUNC(galaxy2_state::grid_w));
+	m_maincpu->write_d().set(FUNC(galaxy2_state::grid_w));
+	m_maincpu->write_e().set(FUNC(galaxy2_state::grid_w));
+	m_maincpu->write_f().set(FUNC(galaxy2_state::plate_w));
+	m_maincpu->write_g().set(FUNC(galaxy2_state::plate_w));
+	m_maincpu->write_h().set(FUNC(galaxy2_state::plate_w));
+	m_maincpu->write_i().set(FUNC(galaxy2_state::plate_w));
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(304, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 304-1, 0, 1080-1)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_refresh_hz(60);
+	screen.set_size(304, 1080);
+	screen.set_visarea_full();
+
+	PWM_DISPLAY(config, m_display).set_size(10, 15);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
-MACHINE_CONFIG_START(galaxy2_state::galaxy2b)
+void galaxy2_state::galaxy2b(machine_config &config)
+{
 	galaxy2(config);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_SIZE(306, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 306-1, 0, 1080-1)
-MACHINE_CONFIG_END
+	screen_device *screen = subdevice<screen_device>("screen");
+	screen->set_size(306, 1080);
+	screen->set_visarea_full();
+}
+
+// roms
+
+ROM_START( galaxy2 )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "d553c-153.s01", 0x0000, 0x0800, CRC(70d552b3) SHA1(72d50647701cb4bf85ea947a149a317aaec0f52c) )
+
+	ROM_REGION( 325057, "screen", 0)
+	ROM_LOAD( "galaxy2d.svg", 0, 325057, CRC(b2d27a0e) SHA1(502ec22c324903ffe8ff235b9a3b8898dce17a64) )
+ROM_END
+
+ROM_START( galaxy2b )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "d553c-153.s01", 0x0000, 0x0800, CRC(70d552b3) SHA1(72d50647701cb4bf85ea947a149a317aaec0f52c) )
+
+	ROM_REGION( 266377, "screen", 0)
+	ROM_LOAD( "galaxy2b.svg", 0, 266377, CRC(8633cebb) SHA1(6c41f5e918e1522eb55ef24270900a1b2477722b) )
+ROM_END
 
 
 
@@ -1448,11 +1679,11 @@ MACHINE_CONFIG_END
 class astrocmd_state : public hh_ucom4_state
 {
 public:
-	astrocmd_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_ucom4_state(mconfig, type, tag)
+	astrocmd_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(plate_w);
 	void astrocmd(machine_config &config);
@@ -1460,28 +1691,28 @@ public:
 
 // handlers
 
-void astrocmd_state::prepare_display()
+void astrocmd_state::update_display()
 {
 	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,9,8,4,5,6,7,0,1,2,3);
 	u32 plate = bitswap<24>(m_plate,23,22,21,20,19,3,2,12,13,14,15,16,17,18,0,1,4,8,5,9,7,11,6,10);
-	display_matrix(17, 9, plate, grid);
+	m_display->matrix(grid, plate);
 }
 
 WRITE8_MEMBER(astrocmd_state::grid_w)
 {
 	// C,D(,E3): vfd grid
-	int shift = (offset - NEC_UCOM4_PORTC) * 4;
+	int shift = (offset - PORTC) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 WRITE8_MEMBER(astrocmd_state::plate_w)
 {
 	// E01,F,G,H,I: vfd plate
-	int shift = (offset - NEC_UCOM4_PORTE) * 4;
+	int shift = (offset - PORTE) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 
-	if (offset == NEC_UCOM4_PORTE)
+	if (offset == PORTE)
 	{
 		// E2: speaker out
 		m_speaker->level_w(data >> 2 & 1);
@@ -1490,7 +1721,7 @@ WRITE8_MEMBER(astrocmd_state::plate_w)
 		grid_w(space, offset, data >> 3 & 1);
 	}
 	else
-		prepare_display();
+		update_display();
 }
 
 // config
@@ -1509,32 +1740,43 @@ static INPUT_PORTS_START( astrocmd )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(astrocmd_state::astrocmd)
-
+void astrocmd_state::astrocmd(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NEC_D553, 400_kHz_XTAL)
-	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
-	MCFG_UCOM4_READ_B_CB(IOPORT("IN.1"))
-	MCFG_UCOM4_WRITE_C_CB(WRITE8(*this, astrocmd_state, grid_w))
-	MCFG_UCOM4_WRITE_D_CB(WRITE8(*this, astrocmd_state, grid_w))
-	MCFG_UCOM4_WRITE_E_CB(WRITE8(*this, astrocmd_state, plate_w))
-	MCFG_UCOM4_WRITE_F_CB(WRITE8(*this, astrocmd_state, plate_w))
-	MCFG_UCOM4_WRITE_G_CB(WRITE8(*this, astrocmd_state, plate_w))
-	MCFG_UCOM4_WRITE_H_CB(WRITE8(*this, astrocmd_state, plate_w))
-	MCFG_UCOM4_WRITE_I_CB(WRITE8(*this, astrocmd_state, plate_w))
+	NEC_D553(config, m_maincpu, 400_kHz_XTAL);
+	m_maincpu->read_a().set_ioport("IN.0");
+	m_maincpu->read_b().set_ioport("IN.1");
+	m_maincpu->write_c().set(FUNC(astrocmd_state::grid_w));
+	m_maincpu->write_d().set(FUNC(astrocmd_state::grid_w));
+	m_maincpu->write_e().set(FUNC(astrocmd_state::plate_w));
+	m_maincpu->write_f().set(FUNC(astrocmd_state::plate_w));
+	m_maincpu->write_g().set(FUNC(astrocmd_state::plate_w));
+	m_maincpu->write_h().set(FUNC(astrocmd_state::plate_w));
+	m_maincpu->write_i().set(FUNC(astrocmd_state::plate_w));
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1920, 525)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1920-1, 0, 525-1)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_refresh_hz(60);
+	screen.set_size(1920, 525);
+	screen.set_visarea_full();
+
+	PWM_DISPLAY(config, m_display).set_size(9, 17);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( astrocmd )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "d553c-202.s01", 0x0000, 0x0800, CRC(b4b34883) SHA1(6246d561c2df1f2124575d2ca671ef85b1819edd) )
+
+	ROM_REGION( 335362, "screen", 0)
+	ROM_LOAD( "astrocmd.svg", 0, 335362, CRC(fe2cd30f) SHA1(898a3d9afc5dca6c63ae28aed2c8530716ad1c45) )
+ROM_END
 
 
 
@@ -1557,10 +1799,11 @@ MACHINE_CONFIG_END
 class edracula_state : public hh_ucom4_state
 {
 public:
-	edracula_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_ucom4_state(mconfig, type, tag)
+	edracula_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
+	void update_display();
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(plate_w);
 	void edracula(machine_config &config);
@@ -1568,24 +1811,29 @@ public:
 
 // handlers
 
+void edracula_state::update_display()
+{
+	m_display->matrix(m_grid, m_plate);
+}
+
 WRITE8_MEMBER(edracula_state::grid_w)
 {
 	// C,D: vfd grid
-	int shift = (offset - NEC_UCOM4_PORTC) * 4;
+	int shift = (offset - PORTC) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
-	display_matrix(18, 8, m_plate, m_grid);
+	update_display();
 }
 
 WRITE8_MEMBER(edracula_state::plate_w)
 {
 	// I2: speaker out
-	if (offset == NEC_UCOM4_PORTI)
+	if (offset == PORTI)
 		m_speaker->level_w(data >> 2 & 1);
 
 	// E,F,G,H,I01: vfd plate
-	int shift = (offset - NEC_UCOM4_PORTE) * 4;
+	int shift = (offset - PORTE) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	display_matrix(18, 8, m_plate, m_grid);
+	update_display();
 }
 
 // config
@@ -1604,32 +1852,43 @@ static INPUT_PORTS_START( edracula )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(edracula_state::edracula)
-
+void edracula_state::edracula(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NEC_D553, 400_kHz_XTAL)
-	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
-	MCFG_UCOM4_READ_B_CB(IOPORT("IN.1"))
-	MCFG_UCOM4_WRITE_C_CB(WRITE8(*this, edracula_state, grid_w))
-	MCFG_UCOM4_WRITE_D_CB(WRITE8(*this, edracula_state, grid_w))
-	MCFG_UCOM4_WRITE_E_CB(WRITE8(*this, edracula_state, plate_w))
-	MCFG_UCOM4_WRITE_F_CB(WRITE8(*this, edracula_state, plate_w))
-	MCFG_UCOM4_WRITE_G_CB(WRITE8(*this, edracula_state, plate_w))
-	MCFG_UCOM4_WRITE_H_CB(WRITE8(*this, edracula_state, plate_w))
-	MCFG_UCOM4_WRITE_I_CB(WRITE8(*this, edracula_state, plate_w))
+	NEC_D553(config, m_maincpu, 400_kHz_XTAL);
+	m_maincpu->read_a().set_ioport("IN.0");
+	m_maincpu->read_b().set_ioport("IN.1");
+	m_maincpu->write_c().set(FUNC(edracula_state::grid_w));
+	m_maincpu->write_d().set(FUNC(edracula_state::grid_w));
+	m_maincpu->write_e().set(FUNC(edracula_state::plate_w));
+	m_maincpu->write_f().set(FUNC(edracula_state::plate_w));
+	m_maincpu->write_g().set(FUNC(edracula_state::plate_w));
+	m_maincpu->write_h().set(FUNC(edracula_state::plate_w));
+	m_maincpu->write_i().set(FUNC(edracula_state::plate_w));
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1920, 526)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1920-1, 0, 526-1)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_refresh_hz(60);
+	screen.set_size(1920, 526);
+	screen.set_visarea_full();
+
+	PWM_DISPLAY(config, m_display).set_size(8, 18);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( edracula )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "d553c-206.s01", 0x0000, 0x0800, CRC(b524857b) SHA1(c1c89ed5dd4bb1e6e98462dc8fa5af2aa48d8ede) )
+
+	ROM_REGION( 794532, "screen", 0)
+	ROM_LOAD( "edracula.svg", 0, 794532, CRC(d20e018c) SHA1(7f70f1d373c034ec8c93e27b7e3371578ddaf61b) )
+ROM_END
 
 
 
@@ -1646,8 +1905,8 @@ MACHINE_CONFIG_END
 class mcompgin_state : public hh_ucom4_state
 {
 public:
-	mcompgin_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_ucom4_state(mconfig, type, tag),
+	mcompgin_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_ucom4_state(mconfig, type, tag),
 		m_lcd(*this, "lcd")
 	{ }
 
@@ -1663,7 +1922,7 @@ public:
 WRITE32_MEMBER(mcompgin_state::lcd_output_w)
 {
 	// uses ROW0-4, COL11-24
-	display_matrix(24, 8, data, 1 << offset);
+	m_display->matrix(1 << offset, data);
 }
 
 WRITE8_MEMBER(mcompgin_state::lcd_w)
@@ -1671,9 +1930,9 @@ WRITE8_MEMBER(mcompgin_state::lcd_w)
 	// E0: HLCD0530 _CS
 	// E1: HLCD0530 clock
 	// E2: HLCD0530 data in
-	m_lcd->write_cs(data & 1);
-	m_lcd->write_data(data >> 2 & 1);
-	m_lcd->write_clock(data >> 1 & 1);
+	m_lcd->cs_w(data & 1);
+	m_lcd->data_w(data >> 2 & 1);
+	m_lcd->clock_w(data >> 1 & 1);
 }
 
 // config
@@ -1691,22 +1950,31 @@ static INPUT_PORTS_START( mcompgin )
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(mcompgin_state::mcompgin)
-
+void mcompgin_state::mcompgin(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NEC_D650, 400_kHz_XTAL) // TDK FCR400K
-	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
-	MCFG_UCOM4_READ_B_CB(IOPORT("IN.1"))
-	MCFG_UCOM4_WRITE_E_CB(WRITE8(*this, mcompgin_state, lcd_w))
+	NEC_D650(config, m_maincpu, 400_kHz_XTAL); // TDK FCR400K
+	m_maincpu->read_a().set_ioport("IN.0");
+	m_maincpu->read_b().set_ioport("IN.1");
+	m_maincpu->write_e().set(FUNC(mcompgin_state::lcd_w));
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("lcd", HLCD0530, 500) // C=0.01uF
-	MCFG_HLCD0515_WRITE_COLS_CB(WRITE32(*this, mcompgin_state, lcd_output_w))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
+	HLCD0530(config, m_lcd, 500); // C=0.01uF
+	m_lcd->write_cols().set(FUNC(mcompgin_state::lcd_output_w));
+
+	PWM_DISPLAY(config, m_display).set_size(8, 24);
+
 	config.set_default_layout(layout_mcompgin);
 
 	/* no sound! */
-MACHINE_CONFIG_END
+}
+
+// roms
+
+ROM_START( mcompgin )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "d650c-060", 0x0000, 0x0800, CRC(985e6da6) SHA1(ea4102a10a5741f06297c5426156e4b2f0d85a68) )
+ROM_END
 
 
 
@@ -1714,7 +1982,7 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
-  Mego Mini-Vid Break Free (manufactured in Japan)
+  Mego Mini-Vid: Break Free (manufactured in Japan)
   * PCB label Mego 79 rev F
   * NEC uCOM-43 MCU, label D553C 049
   * cyan VFD display Futaba DM-4.5 91
@@ -1724,11 +1992,11 @@ MACHINE_CONFIG_END
 class mvbfree_state : public hh_ucom4_state
 {
 public:
-	mvbfree_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_ucom4_state(mconfig, type, tag)
+	mvbfree_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE8_MEMBER(speaker_w);
@@ -1737,32 +2005,32 @@ public:
 
 // handlers
 
-void mvbfree_state::prepare_display()
+void mvbfree_state::update_display()
 {
 	u16 grid = bitswap<16>(m_grid,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15);
 	u16 plate = bitswap<16>(m_plate,15,14,13,12,11,10,0,1,2,3,4,5,6,7,8,9);
-	display_matrix(10, 14, plate, grid);
+	m_display->matrix(grid, plate);
 }
 
 WRITE8_MEMBER(mvbfree_state::grid_w)
 {
 	// E23,F,G,H: vfd grid
-	int shift = (offset - NEC_UCOM4_PORTE) * 4;
+	int shift = (offset - PORTE) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
 
 	// E01: plate 0,1
-	if (offset == NEC_UCOM4_PORTE)
-		plate_w(space, 2 + NEC_UCOM4_PORTC, data & 3);
+	if (offset == PORTE)
+		plate_w(space, 2 + PORTC, data & 3);
 	else
-		prepare_display();
+		update_display();
 }
 
 WRITE8_MEMBER(mvbfree_state::plate_w)
 {
 	// C,D(,E01): vfd plate
-	int shift = (offset - NEC_UCOM4_PORTC) * 4;
+	int shift = (offset - PORTC) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 WRITE8_MEMBER(mvbfree_state::speaker_w)
@@ -1788,28 +2056,36 @@ static INPUT_PORTS_START( mvbfree )
 	PORT_CONFSETTING(    0x08, "3" )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(mvbfree_state::mvbfree)
-
+void mvbfree_state::mvbfree(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NEC_D553, 400000) // approximation
-	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
-	MCFG_UCOM4_READ_B_CB(IOPORT("IN.1"))
-	MCFG_UCOM4_WRITE_C_CB(WRITE8(*this, mvbfree_state, plate_w))
-	MCFG_UCOM4_WRITE_D_CB(WRITE8(*this, mvbfree_state, plate_w))
-	MCFG_UCOM4_WRITE_E_CB(WRITE8(*this, mvbfree_state, grid_w))
-	MCFG_UCOM4_WRITE_F_CB(WRITE8(*this, mvbfree_state, grid_w))
-	MCFG_UCOM4_WRITE_G_CB(WRITE8(*this, mvbfree_state, grid_w))
-	MCFG_UCOM4_WRITE_H_CB(WRITE8(*this, mvbfree_state, grid_w))
-	MCFG_UCOM4_WRITE_I_CB(WRITE8(*this, mvbfree_state, speaker_w))
+	NEC_D553(config, m_maincpu, 400000); // approximation
+	m_maincpu->read_a().set_ioport("IN.0");
+	m_maincpu->read_b().set_ioport("IN.1");
+	m_maincpu->write_c().set(FUNC(mvbfree_state::plate_w));
+	m_maincpu->write_d().set(FUNC(mvbfree_state::plate_w));
+	m_maincpu->write_e().set(FUNC(mvbfree_state::grid_w));
+	m_maincpu->write_f().set(FUNC(mvbfree_state::grid_w));
+	m_maincpu->write_g().set(FUNC(mvbfree_state::grid_w));
+	m_maincpu->write_h().set(FUNC(mvbfree_state::grid_w));
+	m_maincpu->write_i().set(FUNC(mvbfree_state::speaker_w));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(14, 10);
 	config.set_default_layout(layout_mvbfree);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( mvbfree )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "d553c-049", 0x0000, 0x0800, CRC(d64a8399) SHA1(97887e486fa29b1fc4a5a40cacf3c960f67aacbf) )
+ROM_END
 
 
 
@@ -1835,8 +2111,8 @@ MACHINE_CONFIG_END
 class grobot9_state : public hh_ucom4_state
 {
 public:
-	grobot9_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_ucom4_state(mconfig, type, tag)
+	grobot9_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(lamps_w);
@@ -1850,7 +2126,7 @@ public:
 
 WRITE8_MEMBER(grobot9_state::lamps_w)
 {
-	if (offset == NEC_UCOM4_PORTE)
+	if (offset == PORTE)
 	{
 		// E1: speaker out
 		m_speaker->level_w(data >> 1 & 1);
@@ -1861,7 +2137,7 @@ WRITE8_MEMBER(grobot9_state::lamps_w)
 
 	// D,F,E0: lamps
 	m_port[offset] = data;
-	display_matrix(9, 1, m_port[NEC_UCOM4_PORTD] | m_port[NEC_UCOM4_PORTF] << 4 | m_port[NEC_UCOM4_PORTE] << 8, 1);
+	m_display->matrix(1, m_port[PORTD] | m_port[PORTF] << 4 | m_port[PORTE] << 8);
 }
 
 WRITE8_MEMBER(grobot9_state::input_w)
@@ -1904,27 +2180,35 @@ static INPUT_PORTS_START( grobot9 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("Repeat")
 
 	PORT_START("IN.4") // INT
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_ucom4_state, single_interrupt_line, nullptr) PORT_NAME("Start-Pitch")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_ucom4_state, single_interrupt_line, 0) PORT_NAME("Start-Pitch")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(grobot9_state::grobot9)
-
+void grobot9_state::grobot9(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NEC_D557L, 160000) // approximation
-	MCFG_UCOM4_READ_A_CB(READ8(*this, grobot9_state, input_r))
-	MCFG_UCOM4_WRITE_C_CB(WRITE8(*this, grobot9_state, input_w))
-	MCFG_UCOM4_WRITE_D_CB(WRITE8(*this, grobot9_state, lamps_w))
-	MCFG_UCOM4_WRITE_E_CB(WRITE8(*this, grobot9_state, lamps_w))
-	MCFG_UCOM4_WRITE_F_CB(WRITE8(*this, grobot9_state, lamps_w))
+	NEC_D557L(config, m_maincpu, 160000); // approximation
+	m_maincpu->read_a().set(FUNC(grobot9_state::input_r));
+	m_maincpu->write_c().set(FUNC(grobot9_state::input_w));
+	m_maincpu->write_d().set(FUNC(grobot9_state::lamps_w));
+	m_maincpu->write_e().set(FUNC(grobot9_state::lamps_w));
+	m_maincpu->write_f().set(FUNC(grobot9_state::lamps_w));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(1, 9);
 	config.set_default_layout(layout_grobot9);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( grobot9 )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "ttgr-511", 0x0000, 0x0800, CRC(1f25b2bb) SHA1(55ae7e23f6dd46cc6e1a65839327726678410c3a) )
+ROM_END
 
 
 
@@ -1946,11 +2230,11 @@ MACHINE_CONFIG_END
 class tccombat_state : public hh_ucom4_state
 {
 public:
-	tccombat_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_ucom4_state(mconfig, type, tag)
+	tccombat_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(plate_w);
 	void tccombat(machine_config &config);
@@ -1958,31 +2242,31 @@ public:
 
 // handlers
 
-void tccombat_state::prepare_display()
+void tccombat_state::update_display()
 {
 	u16 grid = bitswap<16>(m_grid,15,14,13,12,11,10,9,8,3,2,1,0,7,6,5,4);
 	u32 plate = bitswap<24>(m_plate,23,22,21,20,11,15,3,10,14,2,9,13,1,0,12,8,15,1,5,0,3,7,2,6);
-	display_matrix(20, 9, plate, grid);
+	m_display->matrix(grid, plate);
 }
 
 WRITE8_MEMBER(tccombat_state::grid_w)
 {
 	// I1: speaker out
-	if (offset == NEC_UCOM4_PORTI)
+	if (offset == PORTI)
 		m_speaker->level_w(data >> 1 & 1);
 
 	// C,D,I0: vfd grid
-	int shift = (offset == NEC_UCOM4_PORTI) ? 8 : (offset - NEC_UCOM4_PORTC) * 4;
+	int shift = (offset == PORTI) ? 8 : (offset - PORTC) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 WRITE8_MEMBER(tccombat_state::plate_w)
 {
 	// E,F123,G,H: vfd plate
-	int shift = (offset - NEC_UCOM4_PORTE) * 4;
+	int shift = (offset - PORTE) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 // config
@@ -1997,31 +2281,42 @@ static INPUT_PORTS_START( tccombat )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(tccombat_state::tccombat)
-
+void tccombat_state::tccombat(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NEC_D552, 400000) // approximation
-	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
-	MCFG_UCOM4_WRITE_C_CB(WRITE8(*this, tccombat_state, grid_w))
-	MCFG_UCOM4_WRITE_D_CB(WRITE8(*this, tccombat_state, grid_w))
-	MCFG_UCOM4_WRITE_E_CB(WRITE8(*this, tccombat_state, plate_w))
-	MCFG_UCOM4_WRITE_F_CB(WRITE8(*this, tccombat_state, plate_w))
-	MCFG_UCOM4_WRITE_G_CB(WRITE8(*this, tccombat_state, plate_w))
-	MCFG_UCOM4_WRITE_H_CB(WRITE8(*this, tccombat_state, plate_w))
-	MCFG_UCOM4_WRITE_I_CB(WRITE8(*this, tccombat_state, grid_w))
+	NEC_D552(config, m_maincpu, 400000); // approximation
+	m_maincpu->read_a().set_ioport("IN.0");
+	m_maincpu->write_c().set(FUNC(tccombat_state::grid_w));
+	m_maincpu->write_d().set(FUNC(tccombat_state::grid_w));
+	m_maincpu->write_e().set(FUNC(tccombat_state::plate_w));
+	m_maincpu->write_f().set(FUNC(tccombat_state::plate_w));
+	m_maincpu->write_g().set(FUNC(tccombat_state::plate_w));
+	m_maincpu->write_h().set(FUNC(tccombat_state::plate_w));
+	m_maincpu->write_i().set(FUNC(tccombat_state::grid_w));
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(300, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 300-1, 0, 1080-1)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_refresh_hz(60);
+	screen.set_size(300, 1080);
+	screen.set_visarea_full();
+
+	PWM_DISPLAY(config, m_display).set_size(9, 20);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( tccombat )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "d552c-042", 0x0000, 0x0400, CRC(d7b5cfeb) SHA1(a267be8e43b7740758eb0881b655b1cc8aec43da) )
+
+	ROM_REGION( 210960, "screen", 0)
+	ROM_LOAD( "tccombat.svg", 0, 210960, CRC(03e9eba6) SHA1(d558d3063da42dc7cc02b769bca06a3732418837) )
+ROM_END
 
 
 
@@ -2045,39 +2340,59 @@ MACHINE_CONFIG_END
 class tmtennis_state : public hh_ucom4_state
 {
 public:
-	tmtennis_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_ucom4_state(mconfig, type, tag)
+	tmtennis_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
+	void update_display();
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE8_MEMBER(port_e_w);
 	DECLARE_READ8_MEMBER(input_r);
 
 	void set_clock();
-	DECLARE_INPUT_CHANGED_MEMBER(difficulty_switch);
+	DECLARE_INPUT_CHANGED_MEMBER(difficulty_switch) { set_clock(); }
 	void tmtennis(machine_config &config);
 
 protected:
 	virtual void machine_reset() override;
 };
 
+void tmtennis_state::machine_reset()
+{
+	hh_ucom4_state::machine_reset();
+	set_clock();
+}
+
 // handlers
+
+void tmtennis_state::set_clock()
+{
+	// MCU clock is from an LC circuit oscillating by default at ~360kHz,
+	// but on PRO1, the difficulty switch puts a capacitor across the LC circuit
+	// to slow it down to ~260kHz.
+	m_maincpu->set_unscaled_clock((m_inputs[1]->read() & 0x100) ? 260000 : 360000);
+}
+
+void tmtennis_state::update_display()
+{
+	m_display->matrix(m_grid, m_plate);
+}
 
 WRITE8_MEMBER(tmtennis_state::grid_w)
 {
 	// G,H,I: vfd grid
-	int shift = (offset - NEC_UCOM4_PORTG) * 4;
+	int shift = (offset - PORTG) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
-	display_matrix(12, 12, m_plate, m_grid);
+	update_display();
 }
 
 WRITE8_MEMBER(tmtennis_state::plate_w)
 {
 	// C,D,F: vfd plate
-	int shift = (offset == NEC_UCOM4_PORTF) ? 8 : (offset - NEC_UCOM4_PORTC) * 4;
+	int shift = (offset == PORTF) ? 8 : (offset - PORTC) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	display_matrix(12, 12, m_plate, m_grid);
+	update_display();
 }
 
 WRITE8_MEMBER(tmtennis_state::port_e_w)
@@ -2119,7 +2434,7 @@ static INPUT_PORTS_START( tmtennis )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_J) PORT_NAME("P1 Button 6")
 
 	PORT_START("IN.1") // E1 port A/B
-	PORT_CONFNAME( 0x101, 0x100, DEF_STR( Difficulty ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, tmtennis_state, difficulty_switch, nullptr)
+	PORT_CONFNAME( 0x101, 0x100, DEF_STR( Difficulty ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, tmtennis_state, difficulty_switch, 0)
 	PORT_CONFSETTING(     0x001, "Practice" )
 	PORT_CONFSETTING(     0x100, "Pro 1" ) // -> difficulty_switch
 	PORT_CONFSETTING(     0x000, "Pro 2" )
@@ -2134,51 +2449,44 @@ static INPUT_PORTS_START( tmtennis )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("P2 Button 6")
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER(tmtennis_state::difficulty_switch)
+void tmtennis_state::tmtennis(machine_config &config)
 {
-	set_clock();
-}
-
-void tmtennis_state::set_clock()
-{
-	// MCU clock is from an LC circuit oscillating by default at ~360kHz,
-	// but on PRO1, the difficulty switch puts a capacitor across the LC circuit
-	// to slow it down to ~260kHz.
-	m_maincpu->set_unscaled_clock((m_inp_matrix[1]->read() & 0x100) ? 260000 : 360000);
-}
-
-void tmtennis_state::machine_reset()
-{
-	hh_ucom4_state::machine_reset();
-	set_clock();
-}
-
-MACHINE_CONFIG_START(tmtennis_state::tmtennis)
-
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NEC_D552, 360000) // see set_clock
-	MCFG_UCOM4_READ_A_CB(READ8(*this, tmtennis_state, input_r))
-	MCFG_UCOM4_READ_B_CB(READ8(*this, tmtennis_state, input_r))
-	MCFG_UCOM4_WRITE_C_CB(WRITE8(*this, tmtennis_state, plate_w))
-	MCFG_UCOM4_WRITE_D_CB(WRITE8(*this, tmtennis_state, plate_w))
-	MCFG_UCOM4_WRITE_E_CB(WRITE8(*this, tmtennis_state, port_e_w))
-	MCFG_UCOM4_WRITE_F_CB(WRITE8(*this, tmtennis_state, plate_w))
-	MCFG_UCOM4_WRITE_G_CB(WRITE8(*this, tmtennis_state, grid_w))
-	MCFG_UCOM4_WRITE_H_CB(WRITE8(*this, tmtennis_state, grid_w))
-	MCFG_UCOM4_WRITE_I_CB(WRITE8(*this, tmtennis_state, grid_w))
+	NEC_D552(config, m_maincpu, 360000); // see set_clock
+	m_maincpu->read_a().set(FUNC(tmtennis_state::input_r));
+	m_maincpu->read_b().set(FUNC(tmtennis_state::input_r));
+	m_maincpu->write_c().set(FUNC(tmtennis_state::plate_w));
+	m_maincpu->write_d().set(FUNC(tmtennis_state::plate_w));
+	m_maincpu->write_e().set(FUNC(tmtennis_state::port_e_w));
+	m_maincpu->write_f().set(FUNC(tmtennis_state::plate_w));
+	m_maincpu->write_g().set(FUNC(tmtennis_state::grid_w));
+	m_maincpu->write_h().set(FUNC(tmtennis_state::grid_w));
+	m_maincpu->write_i().set(FUNC(tmtennis_state::grid_w));
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1920, 417)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1920-1, 0, 417-1)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_refresh_hz(60);
+	screen.set_size(1920, 417);
+	screen.set_visarea_full();
+
+	PWM_DISPLAY(config, m_display).set_size(12, 12);
+	config.set_default_layout(layout_tmtennis);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( tmtennis )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "d552c-048", 0x0000, 0x0400, CRC(78702003) SHA1(4d427d4dbeed901770c682338867f58c7b54eee3) )
+
+	ROM_REGION( 204490, "screen", 0)
+	ROM_LOAD( "tmtennis.svg", 0, 204490, CRC(ed0086e9) SHA1(26a5b2f0a9cd70401187146e1495aee80020658b) )
+ROM_END
 
 
 
@@ -2206,11 +2514,11 @@ MACHINE_CONFIG_END
 class tmpacman_state : public hh_ucom4_state
 {
 public:
-	tmpacman_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_ucom4_state(mconfig, type, tag)
+	tmpacman_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(plate_w);
 	void tmpacman(machine_config &config);
@@ -2218,31 +2526,31 @@ public:
 
 // handlers
 
-void tmpacman_state::prepare_display()
+void tmpacman_state::update_display()
 {
 	u8 grid = bitswap<8>(m_grid,0,1,2,3,4,5,6,7);
 	u32 plate = bitswap<24>(m_plate,23,22,21,20,19,16,17,18,11,10,9,8,0,2,3,1,4,5,6,7,12,13,14,15) | 0x100;
-	display_matrix(19, 8, plate, grid);
+	m_display->matrix(grid, plate);
 }
 
 WRITE8_MEMBER(tmpacman_state::grid_w)
 {
 	// C,D: vfd grid
-	int shift = (offset - NEC_UCOM4_PORTC) * 4;
+	int shift = (offset - PORTC) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 WRITE8_MEMBER(tmpacman_state::plate_w)
 {
 	// E1: speaker out
-	if (offset == NEC_UCOM4_PORTE)
+	if (offset == PORTE)
 		m_speaker->level_w(data >> 1 & 1);
 
 	// E023,F,G,H,I: vfd plate
-	int shift = (offset - NEC_UCOM4_PORTE) * 4;
+	int shift = (offset - PORTE) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 // config
@@ -2261,32 +2569,43 @@ static INPUT_PORTS_START( tmpacman )
 	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(tmpacman_state::tmpacman)
-
+void tmpacman_state::tmpacman(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NEC_D553, 430_kHz_XTAL)
-	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
-	MCFG_UCOM4_READ_B_CB(IOPORT("IN.1"))
-	MCFG_UCOM4_WRITE_C_CB(WRITE8(*this, tmpacman_state, grid_w))
-	MCFG_UCOM4_WRITE_D_CB(WRITE8(*this, tmpacman_state, grid_w))
-	MCFG_UCOM4_WRITE_E_CB(WRITE8(*this, tmpacman_state, plate_w))
-	MCFG_UCOM4_WRITE_F_CB(WRITE8(*this, tmpacman_state, plate_w))
-	MCFG_UCOM4_WRITE_G_CB(WRITE8(*this, tmpacman_state, plate_w))
-	MCFG_UCOM4_WRITE_H_CB(WRITE8(*this, tmpacman_state, plate_w))
-	MCFG_UCOM4_WRITE_I_CB(WRITE8(*this, tmpacman_state, plate_w))
+	NEC_D553(config, m_maincpu, 430_kHz_XTAL);
+	m_maincpu->read_a().set_ioport("IN.0");
+	m_maincpu->read_b().set_ioport("IN.1");
+	m_maincpu->write_c().set(FUNC(tmpacman_state::grid_w));
+	m_maincpu->write_d().set(FUNC(tmpacman_state::grid_w));
+	m_maincpu->write_e().set(FUNC(tmpacman_state::plate_w));
+	m_maincpu->write_f().set(FUNC(tmpacman_state::plate_w));
+	m_maincpu->write_g().set(FUNC(tmpacman_state::plate_w));
+	m_maincpu->write_h().set(FUNC(tmpacman_state::plate_w));
+	m_maincpu->write_i().set(FUNC(tmpacman_state::plate_w));
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1920, 508)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1920-1, 0, 508-1)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_refresh_hz(60);
+	screen.set_size(1920, 508);
+	screen.set_visarea_full();
+
+	PWM_DISPLAY(config, m_display).set_size(8, 19);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( tmpacman )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "d553c-160", 0x0000, 0x0800, CRC(b21a8af7) SHA1(e3122be1873ce76a4067386bf250802776f0c2f9) )
+
+	ROM_REGION( 230216, "screen", 0)
+	ROM_LOAD( "tmpacman.svg", 0, 230216, CRC(2ab5c0f1) SHA1(b2b6482b03c28515dc76fd3d6034c8b7e6bf6efc) )
+ROM_END
 
 
 
@@ -2310,11 +2629,11 @@ MACHINE_CONFIG_END
 class tmscramb_state : public hh_ucom4_state
 {
 public:
-	tmscramb_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_ucom4_state(mconfig, type, tag)
+	tmscramb_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(plate_w);
 	void tmscramb(machine_config &config);
@@ -2322,30 +2641,30 @@ public:
 
 // handlers
 
-void tmscramb_state::prepare_display()
+void tmscramb_state::update_display()
 {
 	u32 plate = bitswap<24>(m_plate,23,22,21,20,19,18,17,3,15,2,14,1,13,16,0,12,8,4,9,5,10,6,11,7) | 0x400;
-	display_matrix(17, 10, plate, m_grid);
+	m_display->matrix(m_grid, plate);
 }
 
 WRITE8_MEMBER(tmscramb_state::grid_w)
 {
 	// I2: speaker out
-	if (offset == NEC_UCOM4_PORTI)
+	if (offset == PORTI)
 		m_speaker->level_w(data >> 2 & 1);
 
 	// C,D,I01: vfd grid
-	int shift = (offset == NEC_UCOM4_PORTI) ? 8 : (offset - NEC_UCOM4_PORTC) * 4;
+	int shift = (offset == PORTI) ? 8 : (offset - PORTC) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 WRITE8_MEMBER(tmscramb_state::plate_w)
 {
 	// E,F,G,H: vfd plate
-	int shift = (offset - NEC_UCOM4_PORTE) * 4;
+	int shift = (offset - PORTE) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 // config
@@ -2363,32 +2682,43 @@ static INPUT_PORTS_START( tmscramb )
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(tmscramb_state::tmscramb)
-
+void tmscramb_state::tmscramb(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NEC_D553, 400_kHz_XTAL)
-	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
-	MCFG_UCOM4_READ_B_CB(IOPORT("IN.1"))
-	MCFG_UCOM4_WRITE_C_CB(WRITE8(*this, tmscramb_state, grid_w))
-	MCFG_UCOM4_WRITE_D_CB(WRITE8(*this, tmscramb_state, grid_w))
-	MCFG_UCOM4_WRITE_E_CB(WRITE8(*this, tmscramb_state, plate_w))
-	MCFG_UCOM4_WRITE_F_CB(WRITE8(*this, tmscramb_state, plate_w))
-	MCFG_UCOM4_WRITE_G_CB(WRITE8(*this, tmscramb_state, plate_w))
-	MCFG_UCOM4_WRITE_H_CB(WRITE8(*this, tmscramb_state, plate_w))
-	MCFG_UCOM4_WRITE_I_CB(WRITE8(*this, tmscramb_state, grid_w))
+	NEC_D553(config, m_maincpu, 400_kHz_XTAL);
+	m_maincpu->read_a().set_ioport("IN.0");
+	m_maincpu->read_b().set_ioport("IN.1");
+	m_maincpu->write_c().set(FUNC(tmscramb_state::grid_w));
+	m_maincpu->write_d().set(FUNC(tmscramb_state::grid_w));
+	m_maincpu->write_e().set(FUNC(tmscramb_state::plate_w));
+	m_maincpu->write_f().set(FUNC(tmscramb_state::plate_w));
+	m_maincpu->write_g().set(FUNC(tmscramb_state::plate_w));
+	m_maincpu->write_h().set(FUNC(tmscramb_state::plate_w));
+	m_maincpu->write_i().set(FUNC(tmscramb_state::grid_w));
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1920, 556)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1920-1, 0, 556-1)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_refresh_hz(60);
+	screen.set_size(1920, 556);
+	screen.set_visarea_full();
+
+	PWM_DISPLAY(config, m_display).set_size(10, 17);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( tmscramb )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "d553c-192", 0x0000, 0x0800, CRC(00fcc501) SHA1(a7771e934bf8268c83f38c7ec0acc668836e0939) )
+
+	ROM_REGION( 235601, "screen", 0)
+	ROM_LOAD( "tmscramb.svg", 0, 235601, CRC(9e76219a) SHA1(275273b98d378c9313dd73a3b86cc661a824b7af) )
+ROM_END
 
 
 
@@ -2411,11 +2741,11 @@ MACHINE_CONFIG_END
 class tcaveman_state : public hh_ucom4_state
 {
 public:
-	tcaveman_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_ucom4_state(mconfig, type, tag)
+	tcaveman_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
+	void update_display();
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(plate_w);
 	void tcaveman(machine_config &config);
@@ -2423,31 +2753,31 @@ public:
 
 // handlers
 
-void tcaveman_state::prepare_display()
+void tcaveman_state::update_display()
 {
 	u8 grid = bitswap<8>(m_grid,0,1,2,3,4,5,6,7);
 	u32 plate = bitswap<24>(m_plate,23,22,21,20,19,10,11,5,6,7,8,0,9,2,18,17,16,3,15,14,13,12,4,1) | 0x40;
-	display_matrix(19, 8, plate, grid);
+	m_display->matrix(grid, plate);
 }
 
 WRITE8_MEMBER(tcaveman_state::grid_w)
 {
 	// C,D: vfd grid
-	int shift = (offset - NEC_UCOM4_PORTC) * 4;
+	int shift = (offset - PORTC) * 4;
 	m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 WRITE8_MEMBER(tcaveman_state::plate_w)
 {
 	// E3: speaker out
-	if (offset == NEC_UCOM4_PORTE)
+	if (offset == PORTE)
 		m_speaker->level_w(data >> 3 & 1);
 
 	// E012,F,G,H,I: vfd plate
-	int shift = (offset - NEC_UCOM4_PORTE) * 4;
+	int shift = (offset - PORTE) * 4;
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
-	prepare_display();
+	update_display();
 }
 
 // config
@@ -2462,31 +2792,42 @@ static INPUT_PORTS_START( tcaveman )
 	PORT_CONFSETTING(    0x08, "Professional" )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(tcaveman_state::tcaveman)
-
+void tcaveman_state::tcaveman(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NEC_D553, 400_kHz_XTAL)
-	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
-	MCFG_UCOM4_WRITE_C_CB(WRITE8(*this, tcaveman_state, grid_w))
-	MCFG_UCOM4_WRITE_D_CB(WRITE8(*this, tcaveman_state, grid_w))
-	MCFG_UCOM4_WRITE_E_CB(WRITE8(*this, tcaveman_state, plate_w))
-	MCFG_UCOM4_WRITE_F_CB(WRITE8(*this, tcaveman_state, plate_w))
-	MCFG_UCOM4_WRITE_G_CB(WRITE8(*this, tcaveman_state, plate_w))
-	MCFG_UCOM4_WRITE_H_CB(WRITE8(*this, tcaveman_state, plate_w))
-	MCFG_UCOM4_WRITE_I_CB(WRITE8(*this, tcaveman_state, plate_w))
+	NEC_D553(config, m_maincpu, 400_kHz_XTAL);
+	m_maincpu->read_a().set_ioport("IN.0");
+	m_maincpu->write_c().set(FUNC(tcaveman_state::grid_w));
+	m_maincpu->write_d().set(FUNC(tcaveman_state::grid_w));
+	m_maincpu->write_e().set(FUNC(tcaveman_state::plate_w));
+	m_maincpu->write_f().set(FUNC(tcaveman_state::plate_w));
+	m_maincpu->write_g().set(FUNC(tcaveman_state::plate_w));
+	m_maincpu->write_h().set(FUNC(tcaveman_state::plate_w));
+	m_maincpu->write_i().set(FUNC(tcaveman_state::plate_w));
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(1920, 559)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1920-1, 0, 559-1)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_refresh_hz(60);
+	screen.set_size(1920, 559);
+	screen.set_visarea_full();
+
+	PWM_DISPLAY(config, m_display).set_size(8, 19);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( tcaveman )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "d553c-209", 0x0000, 0x0800, CRC(d230d4b7) SHA1(2fb12b60410f5567c5e3afab7b8f5aa855d283be) )
+
+	ROM_REGION( 306952, "screen", 0)
+	ROM_LOAD( "tcaveman.svg", 0, 306952, CRC(a0588b14) SHA1(f67edf579963fc19bc7f9d268329cbc0230712d8) )
+ROM_END
 
 
 
@@ -2510,8 +2851,8 @@ MACHINE_CONFIG_END
 class alnchase_state : public hh_ucom4_state
 {
 public:
-	alnchase_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_ucom4_state(mconfig, type, tag)
+	alnchase_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_ucom4_state(mconfig, type, tag)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(output_w);
@@ -2523,10 +2864,10 @@ public:
 
 WRITE8_MEMBER(alnchase_state::output_w)
 {
-	if (offset <= NEC_UCOM4_PORTE)
+	if (offset <= PORTE)
 	{
 		// C,D,E0: vfd grid
-		int shift = (offset - NEC_UCOM4_PORTC) * 4;
+		int shift = (offset - PORTC) * 4;
 		m_grid = (m_grid & ~(0xf << shift)) | (data << shift);
 
 		// C0(grid 0): input enable PL1
@@ -2534,18 +2875,18 @@ WRITE8_MEMBER(alnchase_state::output_w)
 		m_inp_mux = (m_grid & 1) | (m_grid >> 3 & 2);
 
 		// E1: speaker out
-		if (offset == NEC_UCOM4_PORTE)
+		if (offset == PORTE)
 			m_speaker->level_w(data >> 1 & 1);
 	}
 
-	if (offset >= NEC_UCOM4_PORTE)
+	if (offset >= PORTE)
 	{
 		// E23,F,G,H,I: vfd plate
-		int shift = (offset - NEC_UCOM4_PORTE) * 4;
+		int shift = (offset - PORTE) * 4;
 		m_plate = ((m_plate << 2 & ~(0xf << shift)) | (data << shift)) >> 2;
 	}
 
-	display_matrix(17, 9, m_plate, m_grid);
+	m_display->matrix(m_grid, m_plate);
 }
 
 READ8_MEMBER(alnchase_state::input_r)
@@ -2593,36 +2934,47 @@ static INPUT_PORTS_START( alnchase )
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(alnchase_state::alnchase)
-
+void alnchase_state::alnchase(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NEC_D553, 400_kHz_XTAL)
-	MCFG_UCOM4_READ_A_CB(READ8(*this, alnchase_state, input_r))
-	MCFG_UCOM4_READ_B_CB(IOPORT("IN.2"))
-	MCFG_UCOM4_WRITE_C_CB(WRITE8(*this, alnchase_state, output_w))
-	MCFG_UCOM4_WRITE_D_CB(WRITE8(*this, alnchase_state, output_w))
-	MCFG_UCOM4_WRITE_E_CB(WRITE8(*this, alnchase_state, output_w))
-	MCFG_UCOM4_WRITE_F_CB(WRITE8(*this, alnchase_state, output_w))
-	MCFG_UCOM4_WRITE_G_CB(WRITE8(*this, alnchase_state, output_w))
-	MCFG_UCOM4_WRITE_H_CB(WRITE8(*this, alnchase_state, output_w))
-	MCFG_UCOM4_WRITE_I_CB(WRITE8(*this, alnchase_state, output_w))
+	NEC_D553(config, m_maincpu, 400_kHz_XTAL);
+	m_maincpu->read_a().set(FUNC(alnchase_state::input_r));
+	m_maincpu->read_b().set_ioport("IN.2");
+	m_maincpu->write_c().set(FUNC(alnchase_state::output_w));
+	m_maincpu->write_d().set(FUNC(alnchase_state::output_w));
+	m_maincpu->write_e().set(FUNC(alnchase_state::output_w));
+	m_maincpu->write_f().set(FUNC(alnchase_state::output_w));
+	m_maincpu->write_g().set(FUNC(alnchase_state::output_w));
+	m_maincpu->write_h().set(FUNC(alnchase_state::output_w));
+	m_maincpu->write_i().set(FUNC(alnchase_state::output_w));
 
 	/* video hardware */
-	MCFG_SCREEN_SVG_ADD("screen", "svg")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(365, 1080)
-	MCFG_SCREEN_VISIBLE_AREA(0, 365-1, 0, 1080-1)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_refresh_hz(60);
+	screen.set_size(365, 1080);
+	screen.set_visarea_full();
+
+	PWM_DISPLAY(config, m_display).set_size(9, 17);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( alnchase )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "d553c-258", 0x0000, 0x0800, CRC(c5284ff5) SHA1(6a20aaacc9748f0e0335958f3cea482e36153704) )
+
+	ROM_REGION( 576864, "screen", 0)
+	ROM_LOAD( "alnchase.svg", 0, 576864, CRC(fe7c7078) SHA1(0d201eeaeb291ded14c0759d1d3d5b2491cf0792) )
+ROM_END
 
 
 
-
+} // anonymous namespace
 
 /***************************************************************************
 
@@ -2630,228 +2982,38 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-ROM_START( ufombs )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "d552c-017", 0x0000, 0x0400, CRC(0e208cb3) SHA1(57db6566916c94325e2b67ccb94b4ea3b233487d) )
-
-	ROM_REGION( 222395, "svg", 0)
-	ROM_LOAD( "ufombs.svg", 0, 222395, CRC(ae9fb93f) SHA1(165ea78eee93c503dbd277a56c41e3c63c534e38) )
-ROM_END
-
-
-ROM_START( ssfball )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "d553c-031", 0x0000, 0x0800, CRC(ff5d91d0) SHA1(9b2c0ae45f1e3535108ee5fef8a9010e00c8d5c3) )
-
-	ROM_REGION( 331352, "svg", 0)
-	ROM_LOAD( "ssfball.svg", 0, 331352, CRC(10cffb85) SHA1(c875f73a323d976088ffa1bc19f7bc865d4aac62) )
-ROM_END
-
-ROM_START( bmcfball )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "d553c-031", 0x0000, 0x0800, CRC(ff5d91d0) SHA1(9b2c0ae45f1e3535108ee5fef8a9010e00c8d5c3) )
-
-	ROM_REGION( 331352, "svg", 0)
-	ROM_LOAD( "bmcfball.svg", 0, 331352, CRC(43fbed1e) SHA1(28160e14b0879cd4dd9dab770c52c98f316ab653) )
-ROM_END
-
-
-ROM_START( bmsoccer )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "d552c-043", 0x0000, 0x0400, CRC(10c2a4ea) SHA1(6ebca7d406e22ff7a8cd529579b55a700da487b4) )
-
-	ROM_REGION( 273796, "svg", 0)
-	ROM_LOAD( "bmsoccer.svg", 0, 273796, CRC(4c88d9f8) SHA1(b4b82f26a09f54cd0b6a9d1c1a46796fbfcb578a) )
-ROM_END
-
-
-ROM_START( bmsafari )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "d552c-049", 0x0000, 0x0400, CRC(82fa3cbe) SHA1(019e7ec784e977eba09997fc46af253054fb222c) )
-
-	ROM_REGION( 275386, "svg", 0)
-	ROM_LOAD( "bmsafari.svg", 0, 275386, CRC(c24badbc) SHA1(b191f34155d6d4e834e7c6fe715d4bb76198ad72) )
-ROM_END
-
-
-ROM_START( splasfgt )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "d553c-055", 0x0000, 0x0800, CRC(eb471fbd) SHA1(f06cfe567bf6f9ed4dcdc88acdcfad50cd370a02) )
-
-	ROM_REGION( 246609, "svg", 0)
-	ROM_LOAD( "splasfgt.svg", 0, 246609, CRC(365fae43) SHA1(344c120c2efa92ada9171047affac801a06cf303) )
-ROM_END
-
-
-ROM_START( bcclimbr )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "d553c-170", 0x0000, 0x0800, CRC(fc2eabdb) SHA1(0f5cc854be7fdf105d9bd2114659d40c65f9d782) )
-
-	ROM_REGION( 219971, "svg", 0)
-	ROM_LOAD( "bcclimbr.svg", 0, 219971, CRC(9c9102f4) SHA1(6a7e02fd1467a26c734b01724e23cef9e4917805) )
-ROM_END
-
-
-ROM_START( tactix )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "d557lc-512", 0x0000, 0x0800, CRC(1df738cb) SHA1(15a5de28a3c03e6894d29c56b5b424983569ccf2) )
-ROM_END
-
-
-ROM_START( invspace )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "d552c-054", 0x0000, 0x0400, CRC(913d9c13) SHA1(f20edb5458e54d2f6d4e45e5d59efd87e05a6f3f) )
-
-	ROM_REGION( 110899, "svg", 0)
-	ROM_LOAD( "invspace.svg", 0, 110899, CRC(ae794333) SHA1(3552215389f02e4ef1d608f7dfc84f0499a78ee2) )
-ROM_END
-
-
-ROM_START( efball )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "d553c-080", 0x0000, 0x0800, CRC(54c1027f) SHA1(6cc98074dae9361fa8c0ed6501b6a57ad325ccbd) )
-ROM_END
-
-
-ROM_START( galaxy2 )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "d553c-153.s01", 0x0000, 0x0800, CRC(70d552b3) SHA1(72d50647701cb4bf85ea947a149a317aaec0f52c) )
-
-	ROM_REGION( 325057, "svg", 0)
-	ROM_LOAD( "galaxy2d.svg", 0, 325057, CRC(b2d27a0e) SHA1(502ec22c324903ffe8ff235b9a3b8898dce17a64) )
-ROM_END
-
-ROM_START( galaxy2b )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "d553c-153.s01", 0x0000, 0x0800, CRC(70d552b3) SHA1(72d50647701cb4bf85ea947a149a317aaec0f52c) )
-
-	ROM_REGION( 266377, "svg", 0)
-	ROM_LOAD( "galaxy2b.svg", 0, 266377, CRC(8633cebb) SHA1(6c41f5e918e1522eb55ef24270900a1b2477722b) )
-ROM_END
-
-
-ROM_START( astrocmd )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "d553c-202.s01", 0x0000, 0x0800, CRC(b4b34883) SHA1(6246d561c2df1f2124575d2ca671ef85b1819edd) )
-
-	ROM_REGION( 335362, "svg", 0)
-	ROM_LOAD( "astrocmd.svg", 0, 335362, CRC(fe2cd30f) SHA1(898a3d9afc5dca6c63ae28aed2c8530716ad1c45) )
-ROM_END
-
-
-ROM_START( edracula )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "d553c-206.s01", 0x0000, 0x0800, CRC(b524857b) SHA1(c1c89ed5dd4bb1e6e98462dc8fa5af2aa48d8ede) )
-
-	ROM_REGION( 794532, "svg", 0)
-	ROM_LOAD( "edracula.svg", 0, 794532, CRC(d20e018c) SHA1(7f70f1d373c034ec8c93e27b7e3371578ddaf61b) )
-ROM_END
-
-
-ROM_START( mcompgin )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "d650c-060", 0x0000, 0x0800, CRC(985e6da6) SHA1(ea4102a10a5741f06297c5426156e4b2f0d85a68) )
-ROM_END
-
-
-ROM_START( mvbfree )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "d553c-049", 0x0000, 0x0800, CRC(d64a8399) SHA1(97887e486fa29b1fc4a5a40cacf3c960f67aacbf) )
-ROM_END
-
-
-ROM_START( grobot9 )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "ttgr-511", 0x0000, 0x0800, CRC(1f25b2bb) SHA1(55ae7e23f6dd46cc6e1a65839327726678410c3a) )
-ROM_END
-
-
-ROM_START( tccombat )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "d552c-042", 0x0000, 0x0400, CRC(d7b5cfeb) SHA1(a267be8e43b7740758eb0881b655b1cc8aec43da) )
-
-	ROM_REGION( 210960, "svg", 0)
-	ROM_LOAD( "tccombat.svg", 0, 210960, CRC(03e9eba6) SHA1(d558d3063da42dc7cc02b769bca06a3732418837) )
-ROM_END
-
-
-ROM_START( tmtennis )
-	ROM_REGION( 0x0400, "maincpu", 0 )
-	ROM_LOAD( "d552c-048", 0x0000, 0x0400, CRC(78702003) SHA1(4d427d4dbeed901770c682338867f58c7b54eee3) )
-
-	ROM_REGION( 204490, "svg", 0)
-	ROM_LOAD( "tmtennis.svg", 0, 204490, CRC(ed0086e9) SHA1(26a5b2f0a9cd70401187146e1495aee80020658b) )
-ROM_END
-
-
-ROM_START( tmpacman )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "d553c-160", 0x0000, 0x0800, CRC(b21a8af7) SHA1(e3122be1873ce76a4067386bf250802776f0c2f9) )
-
-	ROM_REGION( 230216, "svg", 0)
-	ROM_LOAD( "tmpacman.svg", 0, 230216, CRC(2ab5c0f1) SHA1(b2b6482b03c28515dc76fd3d6034c8b7e6bf6efc) )
-ROM_END
-
-
-ROM_START( tmscramb )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "d553c-192", 0x0000, 0x0800, CRC(00fcc501) SHA1(a7771e934bf8268c83f38c7ec0acc668836e0939) )
-
-	ROM_REGION( 235601, "svg", 0)
-	ROM_LOAD( "tmscramb.svg", 0, 235601, CRC(9e76219a) SHA1(275273b98d378c9313dd73a3b86cc661a824b7af) )
-ROM_END
-
-
-ROM_START( tcaveman )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "d553c-209", 0x0000, 0x0800, CRC(d230d4b7) SHA1(2fb12b60410f5567c5e3afab7b8f5aa855d283be) )
-
-	ROM_REGION( 306952, "svg", 0)
-	ROM_LOAD( "tcaveman.svg", 0, 306952, CRC(a0588b14) SHA1(f67edf579963fc19bc7f9d268329cbc0230712d8) )
-ROM_END
-
-
-ROM_START( alnchase )
-	ROM_REGION( 0x0800, "maincpu", 0 )
-	ROM_LOAD( "d553c-258", 0x0000, 0x0800, CRC(c5284ff5) SHA1(6a20aaacc9748f0e0335958f3cea482e36153704) )
-
-	ROM_REGION( 576864, "svg", 0)
-	ROM_LOAD( "alnchase.svg", 0, 576864, CRC(fe7c7078) SHA1(0d201eeaeb291ded14c0759d1d3d5b2491cf0792) )
-ROM_END
-
-
-
-//    YEAR  NAME      PARENT   CMP MACHINE   INPUT     CLASS           INIT        COMPANY       FULLNAME                      FLAGS
-CONS( 1979, ufombs,   0,        0, ufombs,   ufombs,   ufombs_state,   empty_init, "Bambino",    "UFO Master-Blaster Station", MACHINE_SUPPORTS_SAVE )
-CONS( 1979, ssfball,  0,        0, ssfball,  ssfball,  ssfball_state,  empty_init, "Bambino",    "Superstar Football (Bambino)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, bmcfball, ssfball,  0, ssfball,  ssfball,  ssfball_state,  empty_init, "Bambino",    "Classic Football (Bambino)", MACHINE_SUPPORTS_SAVE )
-CONS( 1979, bmsoccer, 0,        0, bmsoccer, bmsoccer, bmsoccer_state, empty_init, "Bambino",    "Kick The Goal Soccer", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, bmsafari, 0,        0, bmsafari, bmsafari, bmsafari_state, empty_init, "Bambino",    "Safari (Bambino)", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, splasfgt, 0,        0, splasfgt, splasfgt, splasfgt_state, empty_init, "Bambino",    "Space Laser Fight", MACHINE_SUPPORTS_SAVE )
-
-CONS( 1982, bcclimbr, 0,        0, bcclimbr, bcclimbr, bcclimbr_state, empty_init, "Bandai",     "Crazy Climber (Bandai)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT   CMP MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
+CONS( 1979, ufombs,   0,        0, ufombs,   ufombs,   ufombs_state,   empty_init, "Bambino", "UFO Master-Blaster Station", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, ssfball,  0,        0, ssfball,  ssfball,  ssfball_state,  empty_init, "Bambino", "Superstar Football (Bambino)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, bmcfball, ssfball,  0, ssfball,  ssfball,  ssfball_state,  empty_init, "Bambino", "Classic Football (Bambino)", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, bmsoccer, 0,        0, bmsoccer, bmsoccer, bmsoccer_state, empty_init, "Bambino", "Kick The Goal Soccer", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, bmsafari, 0,        0, bmsafari, bmsafari, bmsafari_state, empty_init, "Bambino", "Safari (Bambino)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, splasfgt, 0,        0, splasfgt, splasfgt, splasfgt_state, empty_init, "Bambino", "Space Laser Fight", MACHINE_SUPPORTS_SAVE )
+
+CONS( 1982, bcclimbr, 0,        0, bcclimbr, bcclimbr, bcclimbr_state, empty_init, "Bandai", "Crazy Climber (Bandai)", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1980, tactix,   0,        0, tactix,   tactix,   tactix_state,   empty_init, "Castle Toy", "Tactix (Castle Toy)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1980, ctntune,  0,        0, ctntune,  ctntune,  ctntune_state,  empty_init, "Castle Toy", "Name That Tune (Castle Toy)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***
 
-CONS( 1980, invspace, 0,        0, invspace, invspace, invspace_state, empty_init, "Epoch",      "Invader From Space", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, efball,   0,        0, efball,   efball,   efball_state,   empty_init, "Epoch",      "Electronic Football (Epoch)", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, galaxy2,  0,        0, galaxy2,  galaxy2,  galaxy2_state,  empty_init, "Epoch",      "Galaxy II (VFD Rev. D)", MACHINE_SUPPORTS_SAVE )
-CONS( 1981, galaxy2b, galaxy2,  0, galaxy2b, galaxy2,  galaxy2_state,  empty_init, "Epoch",      "Galaxy II (VFD Rev. B)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, astrocmd, 0,        0, astrocmd, astrocmd, astrocmd_state, empty_init, "Epoch",      "Astro Command", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, edracula, 0,        0, edracula, edracula, edracula_state, empty_init, "Epoch",      "Dracula (Epoch)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, invspace, 0,        0, invspace, invspace, invspace_state, empty_init, "Epoch", "Invader From Space", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, efball,   0,        0, efball,   efball,   efball_state,   empty_init, "Epoch", "Electronic Football (Epoch)", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, galaxy2,  0,        0, galaxy2,  galaxy2,  galaxy2_state,  empty_init, "Epoch", "Galaxy II (VFD Rev. D)", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, galaxy2b, galaxy2,  0, galaxy2b, galaxy2,  galaxy2_state,  empty_init, "Epoch", "Galaxy II (VFD Rev. B)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, astrocmd, 0,        0, astrocmd, astrocmd, astrocmd_state, empty_init, "Epoch", "Astro Command", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, edracula, 0,        0, edracula, edracula, edracula_state, empty_init, "Epoch", "Dracula (Epoch)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1979, mcompgin, 0,        0, mcompgin, mcompgin, mcompgin_state, empty_init, "Mattel",     "Computer Gin", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+CONS( 1979, mcompgin, 0,        0, mcompgin, mcompgin, mcompgin_state, empty_init, "Mattel", "Computer Gin", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
-CONS( 1979, mvbfree,  0,        0, mvbfree,  mvbfree,  mvbfree_state,  empty_init, "Mego",       "Mini-Vid Break Free", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, mvbfree,  0,        0, mvbfree,  mvbfree,  mvbfree_state,  empty_init, "Mego", "Mini-Vid: Break Free", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1980, grobot9,  0,        0, grobot9,  grobot9,  grobot9_state,  empty_init, "Takatoku Toys", "Game Robot 9", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // some of the minigames: ***
 
-CONS( 1980, tccombat, 0,        0, tccombat, tccombat, tccombat_state, empty_init, "Tomy",       "Cosmic Combat", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, tmtennis, 0,        0, tmtennis, tmtennis, tmtennis_state, empty_init, "Tomy",       "Tennis (Tomy)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, tmpacman, 0,        0, tmpacman, tmpacman, tmpacman_state, empty_init, "Tomy",       "Pac Man (Tomy)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, tmscramb, 0,        0, tmscramb, tmscramb, tmscramb_state, empty_init, "Tomy",       "Scramble (Tomy)", MACHINE_SUPPORTS_SAVE )
-CONS( 1982, tcaveman, 0,        0, tcaveman, tcaveman, tcaveman_state, empty_init, "Tomy",       "Caveman (Tomy)", MACHINE_SUPPORTS_SAVE )
-CONS( 1984, alnchase, 0,        0, alnchase, alnchase, alnchase_state, empty_init, "Tomy",       "Alien Chase", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, tccombat, 0,        0, tccombat, tccombat, tccombat_state, empty_init, "Tomy", "Cosmic Combat", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, tmtennis, 0,        0, tmtennis, tmtennis, tmtennis_state, empty_init, "Tomy", "Tennis (Tomy)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, tmpacman, 0,        0, tmpacman, tmpacman, tmpacman_state, empty_init, "Tomy", "Pac Man (Tomy)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, tmscramb, 0,        0, tmscramb, tmscramb, tmscramb_state, empty_init, "Tomy", "Scramble (Tomy)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, tcaveman, 0,        0, tcaveman, tcaveman, tcaveman_state, empty_init, "Tomy", "Caveman (Tomy)", MACHINE_SUPPORTS_SAVE )
+CONS( 1984, alnchase, 0,        0, alnchase, alnchase, alnchase_state, empty_init, "Tomy", "Alien Chase", MACHINE_SUPPORTS_SAVE )
 
 // ***: As far as MAME is concerned, the game is emulated fine. But for it to be playable, it requires interaction
 // with other, unemulatable, things eg. game board/pieces, playing cards, pen & paper, etc.

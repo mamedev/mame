@@ -11,12 +11,6 @@
 #ifndef MAME_CPU_M6502_M6502_H
 #define MAME_CPU_M6502_M6502_H
 
-#define MCFG_M6502_DISABLE_CACHE() \
-	downcast<m6502_device *>(device)->disable_cache();
-
-#define MCFG_M6502_SYNC_CALLBACK(_cb) \
-	downcast<m6502_device &>(*device).set_sync_callback(DEVCB_##_cb);
-
 class m6502_device : public cpu_device {
 public:
 	enum {
@@ -29,9 +23,8 @@ public:
 	m6502_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	bool get_sync() const { return sync; }
-	void disable_cache() { cache_disabled = true; }
 
-	template<class Object> devcb_base &set_sync_callback(Object &&cb) { return sync_w.set_callback(std::forward<Object>(cb)); }
+	auto sync_cb() { return sync_w.bind(); }
 
 	devcb_write_line sync_w;
 
@@ -52,20 +45,13 @@ protected:
 		virtual void write_9(uint16_t adr, uint8_t val);
 	};
 
-	class mi_default_normal : public memory_interface {
+	class mi_default : public memory_interface {
 	public:
-		virtual ~mi_default_normal() {}
+		virtual ~mi_default() {}
 		virtual uint8_t read(uint16_t adr) override;
 		virtual uint8_t read_sync(uint16_t adr) override;
 		virtual uint8_t read_arg(uint16_t adr) override;
 		virtual void write(uint16_t adr, uint8_t val) override;
-	};
-
-	class mi_default_nd : public mi_default_normal {
-	public:
-		virtual ~mi_default_nd() {}
-		virtual uint8_t read_sync(uint16_t adr) override;
-		virtual uint8_t read_arg(uint16_t adr) override;
 	};
 
 	enum {
@@ -91,12 +77,12 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override;
-	virtual uint32_t execute_max_cycles() const override;
-	virtual uint32_t execute_input_lines() const override;
+	virtual uint32_t execute_min_cycles() const noexcept override;
+	virtual uint32_t execute_max_cycles() const noexcept override;
+	virtual uint32_t execute_input_lines() const noexcept override;
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
-	virtual bool execute_input_edge_triggered(int inputnum) const override;
+	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override;
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
@@ -128,7 +114,7 @@ protected:
 	int inst_state, inst_substate;
 	int icount, bcount, count_before_instruction_step;
 	bool nmi_state, irq_state, apu_irq_state, v_state;
-	bool irq_taken, sync, cache_disabled, inhibit_interrupts;
+	bool irq_taken, sync, inhibit_interrupts;
 
 	uint8_t read(uint16_t adr) { return mintf->read(adr); }
 	uint8_t read_9(uint16_t adr) { return mintf->read_9(adr); }

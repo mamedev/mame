@@ -50,69 +50,51 @@
 
 
 //**************************************************************************
-//  CONSTANTS
-//**************************************************************************
-
-#define ECBBUS_TAG          "ecbbus"
-
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_ECBBUS_ADD() \
-	MCFG_DEVICE_ADD(ECBBUS_TAG, ECBBUS, 0)
-#define MCFG_ECBBUS_SLOT_ADD(_num, _tag, _slot_intf, _def_slot) \
-	MCFG_DEVICE_ADD(_tag, ECBBUS_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
-	downcast<ecbbus_slot_device &>(*device).set_ecbbus_slot(ECBBUS_TAG, _num);
-
-
-#define MCFG_ECBBUS_IRQ_CALLBACK(_write) \
-	downcast<ecbbus_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
-
-#define MCFG_ECBBUS_NMI_CALLBACK(_write) \
-	downcast<ecbbus_device &>(*device).set_nmi_wr_callback(DEVCB_##_write);
-
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> ecbbus_slot_device
-
+class device_ecbbus_card_interface;
 class ecbbus_device;
 
-class ecbbus_slot_device : public device_t,
-							public device_slot_interface
+
+// ======================> ecbbus_slot_device
+
+class ecbbus_slot_device : public device_t, public device_single_card_slot_interface<device_ecbbus_card_interface>
 {
 public:
 	// construction/destruction
+	template <typename T, typename U>
+	ecbbus_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&bustag, int num, U &&opts, char const *dflt)
+		: ecbbus_slot_device(mconfig, tag, owner, 0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+		set_ecbbus_slot(std::forward<T>(bustag), num);
+	}
+
 	ecbbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
 
 	// inline configuration
-	void set_ecbbus_slot(const char *tag, int num) { m_bus_tag = tag; m_bus_num = num; }
+	template <typename T> void set_ecbbus_slot(T &&tag, int num)
+	{
+		m_bus.set_tag(std::forward<T>(tag));
+		m_bus_num = num;
+	}
 
 private:
 	// configuration
-	const char *m_bus_tag;
+	required_device<ecbbus_device> m_bus;
 	int m_bus_num;
-	ecbbus_device  *m_bus;
 };
 
 
 // device type definition
 DECLARE_DEVICE_TYPE(ECBBUS_SLOT, ecbbus_slot_device)
-
-
-// ======================> ecbbus_interface
-
-class device_ecbbus_card_interface;
 
 
 // ======================> ecbbus_device
@@ -121,12 +103,12 @@ class ecbbus_device : public device_t
 {
 public:
 	// construction/destruction
-	ecbbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ecbbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	template <class Object> devcb_base &set_irq_wr_callback(Object &&cb) { return m_write_irq.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_nmi_wr_callback(Object &&cb) { return m_write_nmi.set_callback(std::forward<Object>(cb)); }
+	auto irq_wr_callback() { return m_write_irq.bind(); }
+	auto nmi_wr_callback() { return m_write_nmi.bind(); }
 
-	void add_card(device_ecbbus_card_interface *card, int pos);
+	void add_card(device_ecbbus_card_interface &card, int pos);
 
 	DECLARE_READ8_MEMBER( mem_r );
 	DECLARE_WRITE8_MEMBER( mem_w );
@@ -158,16 +140,16 @@ DECLARE_DEVICE_TYPE(ECBBUS, ecbbus_device)
 // ======================> device_ecbbus_card_interface
 
 // class representing interface-specific live ecbbus card
-class device_ecbbus_card_interface : public device_slot_card_interface
+class device_ecbbus_card_interface : public device_interface
 {
 	friend class ecbbus_device;
 
 public:
 	// optional operation overrides
-	virtual uint8_t ecbbus_mem_r(offs_t offset) { return 0; };
-	virtual void ecbbus_mem_w(offs_t offset, uint8_t data) { };
-	virtual uint8_t ecbbus_io_r(offs_t offset) { return 0; };
-	virtual void ecbbus_io_w(offs_t offset, uint8_t data) { };
+	virtual uint8_t ecbbus_mem_r(offs_t offset) { return 0; }
+	virtual void ecbbus_mem_w(offs_t offset, uint8_t data) { }
+	virtual uint8_t ecbbus_io_r(offs_t offset) { return 0; }
+	virtual void ecbbus_io_w(offs_t offset, uint8_t data) { }
 
 protected:
 	// construction/destruction

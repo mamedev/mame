@@ -36,7 +36,7 @@ DEFINE_DEVICE_TYPE(PLUS4_EXPANSION_SLOT, plus4_expansion_slot_device, "plus4_exp
 //-------------------------------------------------
 
 device_plus4_expansion_card_interface::device_plus4_expansion_card_interface(const machine_config &mconfig, device_t &device) :
-	device_slot_card_interface(mconfig, device),
+	device_interface(device, "plus4exp"),
 	m_c1l(*this, "c1l"),
 	m_c1h(*this, "c1h"),
 	m_c2l(*this, "c2l"),
@@ -70,25 +70,14 @@ device_plus4_expansion_card_interface::~device_plus4_expansion_card_interface()
 
 plus4_expansion_slot_device::plus4_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, PLUS4_EXPANSION_SLOT, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_plus4_expansion_card_interface>(mconfig, *this),
 	device_image_interface(mconfig, *this),
 	m_write_irq(*this),
 	m_read_dma_cd(*this),
 	m_write_dma_cd(*this),
-	m_write_aec(*this), m_card(nullptr)
+	m_write_aec(*this),
+	m_card(nullptr)
 {
-}
-
-
-//-------------------------------------------------
-//  device_validity_check -
-//-------------------------------------------------
-
-void plus4_expansion_slot_device::device_validity_check(validity_checker &valid) const
-{
-	device_t *const carddev = get_card_device();
-	if (carddev && !dynamic_cast<device_plus4_expansion_card_interface *>(carddev))
-		osd_printf_error("Card device %s (%s) does not implement device_plus4_expansion_card_interface\n", carddev->tag(), carddev->name());
 }
 
 
@@ -98,10 +87,7 @@ void plus4_expansion_slot_device::device_validity_check(validity_checker &valid)
 
 void plus4_expansion_slot_device::device_start()
 {
-	device_t *const carddev = get_card_device();
-	m_card = dynamic_cast<device_plus4_expansion_card_interface *>(carddev);
-	if (carddev && !m_card)
-		fatalerror("Card device %s (%s) does not implement device_plus4_expansion_card_interface\n", carddev->tag(), carddev->name());
+	m_card = get_card_device();
 
 	// resolve callbacks
 	m_write_irq.resolve_safe();
@@ -110,21 +96,13 @@ void plus4_expansion_slot_device::device_start()
 	m_write_aec.resolve_safe();
 
 	// inherit bus clock
+	// FIXME: this should be unnecessary as slots pass DERIVED_CLOCK(1, 1) through by default
 	if (clock() == 0)
 	{
 		plus4_expansion_slot_device *root = machine().device<plus4_expansion_slot_device>(PLUS4_EXPANSION_SLOT_TAG);
 		assert(root);
 		set_unscaled_clock(root->clock());
 	}
-}
-
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void plus4_expansion_slot_device::device_reset()
-{
 }
 
 
@@ -167,11 +145,11 @@ std::string plus4_expansion_slot_device::get_default_card_software(get_default_c
 //  cd_r - cartridge data read
 //-------------------------------------------------
 
-uint8_t plus4_expansion_slot_device::cd_r(address_space &space, offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h)
+uint8_t plus4_expansion_slot_device::cd_r(offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h)
 {
 	if (m_card != nullptr)
 	{
-		data = m_card->plus4_cd_r(space, offset, data, ba, cs0, c1l, c1h, cs1, c2l, c2h);
+		data = m_card->plus4_cd_r(offset, data, ba, cs0, c1l, c1h, cs1, c2l, c2h);
 	}
 
 	return data;
@@ -182,11 +160,11 @@ uint8_t plus4_expansion_slot_device::cd_r(address_space &space, offs_t offset, u
 //  cd_w - cartridge data write
 //-------------------------------------------------
 
-void plus4_expansion_slot_device::cd_w(address_space &space, offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h)
+void plus4_expansion_slot_device::cd_w(offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h)
 {
 	if (m_card != nullptr)
 	{
-		m_card->plus4_cd_w(space, offset, data, ba, cs0, c1l, c1h, cs1, c2l, c2h);
+		m_card->plus4_cd_w(offset, data, ba, cs0, c1l, c1h, cs1, c2l, c2h);
 	}
 }
 

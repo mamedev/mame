@@ -156,21 +156,21 @@ void tranz330_state::tranz330(machine_config &config)
 			.output_handler().set_inputline(m_cpu, INPUT_LINE_IRQ0);
 
 	Z80PIO(config, m_pio, XTAL(7'159'090)/2); //*
-	m_pio->set_out_int_callback(DEVCB_WRITELINE("irq", input_merger_device, in_w<0>)); //*
-	m_pio->set_out_pa_callback(DEVCB_WRITE8(*this, tranz330_state, pio_a_w));
-	m_pio->set_in_pa_callback(DEVCB_READ8(*this, tranz330_state, card_r));
-	m_pio->set_in_pb_callback(DEVCB_READ8(*this, tranz330_state, pio_b_r));
+	m_pio->out_int_callback().set("irq", FUNC(input_merger_device::in_w<0>)); //*
+	m_pio->out_pa_callback().set(FUNC(tranz330_state::pio_a_w));
+	m_pio->in_pa_callback().set(FUNC(tranz330_state::card_r));
+	m_pio->in_pb_callback().set(FUNC(tranz330_state::pio_b_r));
 
 	Z80DART(config, m_dart, XTAL(7'159'090)/2); //*
-	m_dart->set_out_syncb_callback(DEVCB_WRITELINE(*this, tranz330_state, syncb_w));
-	m_dart->set_out_txdb_callback(DEVCB_WRITELINE(m_rs232, rs232_port_device, write_txd)); //?
-	m_dart->set_out_dtrb_callback(DEVCB_WRITELINE(m_rs232, rs232_port_device, write_dtr)); //?
-	m_dart->set_out_rtsb_callback(DEVCB_WRITELINE(m_rs232, rs232_port_device, write_rts)); //?
-	m_dart->set_out_int_callback(DEVCB_WRITELINE("irq", input_merger_device, in_w<1>));
+	m_dart->out_syncb_callback().set(FUNC(tranz330_state::syncb_w));
+	m_dart->out_txdb_callback().set(m_rs232, FUNC(rs232_port_device::write_txd)); //?
+	m_dart->out_dtrb_callback().set(m_rs232, FUNC(rs232_port_device::write_dtr)); //?
+	m_dart->out_rtsb_callback().set(m_rs232, FUNC(rs232_port_device::write_rts)); //?
+	m_dart->out_int_callback().set("irq", FUNC(input_merger_device::in_w<1>));
 
 	Z80CTC(config, m_ctc, XTAL(7'159'090)/2); //*
-	m_ctc->set_zc_callback<2>(DEVCB_WRITELINE(*this, tranz330_state, sound_w));
-	m_ctc->set_intr_callback(DEVCB_WRITELINE("irq", input_merger_device, in_w<2>));
+	m_ctc->zc_callback<2>().set(FUNC(tranz330_state::sound_w));
+	m_ctc->intr_callback().set("irq", FUNC(input_merger_device::in_w<2>));
 
 	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
 	m_rs232->rxd_handler().set(m_dart, FUNC(z80dart_device::rxb_w));

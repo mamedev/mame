@@ -4,8 +4,10 @@
 #define MAME_INCLUDES_M5_H
 
 #include "imagedev/cassette.h"
+#include "imagedev/floppy.h"
 #include "imagedev/snapquik.h"
 
+#include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "machine/ram.h"
 #include "machine/upd765.h"
@@ -61,7 +63,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(sordm5_video_interrupt_callback);
 
 protected:
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
 	//I've changed following devices to optional since we have to remove them in BRNO mod (I don't know better solution)
 	optional_device<cpu_device> m_fd5cpu;

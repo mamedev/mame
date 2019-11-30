@@ -3,13 +3,14 @@
 /***************************************************************************
 
     GROM emulation
-    See grom.c for documentation,
+    See tmc0430.cpp for documentation,
 
     Michael Zapf
 
     February 2012: Rewritten as class
 
 ***************************************************************************/
+
 #ifndef MAME_MACHINE_TMC0430_H
 #define MAME_MACHINE_TMC0430_H
 
@@ -26,8 +27,8 @@ enum
 class tmc0430_device : public device_t
 {
 public:
-	tmc0430_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *regionname, int offset, int ident)
-		: tmc0430_device(mconfig, tag, owner, 0)
+	tmc0430_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *regionname, int offset, int ident) :
+		tmc0430_device(mconfig, tag, owner, 0)
 	{
 		set_region_and_ident(regionname, offset, ident);
 	}

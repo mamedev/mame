@@ -11,6 +11,7 @@
 #pragma once
 
 #include "isa.h"
+#include "imagedev/floppy.h"
 #include "machine/busmouse.h"
 #include "machine/upd765.h"
 
@@ -39,9 +40,10 @@ protected:
 
 	virtual uint8_t dack_r(int line) override;
 	virtual void dack_w(int line, uint8_t data) override;
+	virtual void dack_line_w(int line, int state) override;
 	virtual void eop_w(int state) override;
 
-	required_device<pc_fdc_interface> fdc;
+	required_device<pc_fdc_interface> m_fdc;
 };
 
 class isa8_fdc_xt_device : public isa8_fdc_device {

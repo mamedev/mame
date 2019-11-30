@@ -442,16 +442,16 @@ INTERRUPT_GEN_MEMBER(trs80m3_state::rtc_interrupt)
 	}
 	// Also, if cpu is in wait, unlock it and trigger NMI
 	// Don't, it breaks disk loading
-//	if (m_wait)
-//	{
-//		m_wait = false;
-//		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
-//		if (BIT(m_nmi_mask, 6))
-//		{
-//			m_nmi_data |= 0x40;
-//			m_maincpu->set_input_line(INPUT_LINE_NMI, HOLD_LINE);
-//		}
-//	}
+//  if (m_wait)
+//  {
+//      m_wait = false;
+//      m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
+//      if (BIT(m_nmi_mask, 6))
+//      {
+//          m_nmi_data |= 0x40;
+//          m_maincpu->set_input_line(INPUT_LINE_NMI, HOLD_LINE);
+//      }
+//  }
 }
 
 // The floppy sector has been read. Enable CPU and NMI.
@@ -620,7 +620,7 @@ void trs80m3_state::machine_reset()
     IMPLEMENTATION
 ***************************************************************************/
 
-QUICKLOAD_LOAD_MEMBER( trs80m3_state, trs80_cmd )
+QUICKLOAD_LOAD_MEMBER(trs80m3_state::quickload_cb)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 

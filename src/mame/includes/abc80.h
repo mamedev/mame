@@ -15,8 +15,6 @@
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
 #include "machine/z80daisy.h"
-#include "imagedev/flopdrv.h"
-#include "imagedev/printer.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
 #include "machine/abc80kb.h"
@@ -24,7 +22,6 @@
 #include "machine/ram.h"
 #include "machine/z80pio.h"
 #include "sound/sn76477.h"
-#include "sound/wave.h"
 #include "emupal.h"
 
 #define ABC80_HTOTAL    384
@@ -74,7 +71,7 @@ public:
 		m_pio(*this, Z80PIO_TAG),
 		m_csg(*this, SN76477_TAG),
 		m_cassette(*this, "cassette"),
-		m_bus(*this, ABCBUS_TAG),
+		m_bus(*this, "bus"),
 		m_kb(*this, ABC80_KEYBOARD_TAG),
 		m_ram(*this, RAM_TAG),
 		m_rs232(*this, RS232_TAG),
@@ -95,7 +92,7 @@ public:
 
 	static constexpr feature_type imperfect_features() { return feature::KEYBOARD; }
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<z80pio_device> m_pio;
 	required_device<sn76477_device> m_csg;
 	required_device<cassette_image_device> m_cassette;
@@ -153,7 +150,7 @@ public:
 	void kbd_w(u8 data);
 	DECLARE_WRITE8_MEMBER( csg_w );
 
-	DECLARE_QUICKLOAD_LOAD_MEMBER( bac );
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
 	enum
 	{

@@ -15,15 +15,8 @@
 
 #pragma once
 
-
-
-#define MCFG_TMS32010_BIO_IN_CB(_devcb) \
-	downcast<tms32010_device &>(*device).set_bio_in_cb(DEVCB_##_devcb); /* BIO input  */
-
-
 #define TMS32010_INT_PENDING    0x80000000
 #define TMS32010_INT_NONE       0
-
 
 enum
 {
@@ -45,7 +38,7 @@ public:
 	tms32010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
-	template <class Object> devcb_base &set_bio_in_cb(Object &&cb) { return m_bio_in.set_callback(std::forward<Object>(cb)); }
+	auto bio() { return m_bio_in.bind(); }
 
 	void tms32010_ram(address_map &map);
 	void tms32015_ram(address_map &map);
@@ -57,13 +50,13 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override { return 1; }
-	virtual uint32_t execute_max_cycles() const override { return 3; }
-	virtual uint32_t execute_input_lines() const override { return 1; }
+	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 3; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 1; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
-	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override { return (clocks + 4 - 1) / 4; }
-	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override { return (cycles * 4); }
+	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 4 - 1) / 4; }
+	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * 4); }
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;

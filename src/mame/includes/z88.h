@@ -88,7 +88,7 @@ private:
 	void vh_render_6x8(bitmap_ind16 &bitmap, int x, int y, uint16_t pen0, uint16_t pen1, uint8_t *gfx);
 	void vh_render_line(bitmap_ind16 &bitmap, int x, int y, uint16_t pen);
 
-	DECLARE_PALETTE_INIT(z88);
+	void z88_palette(palette_device &palette) const;
 
 	void z88_io(address_map &map);
 	void z88_mem(address_map &map);

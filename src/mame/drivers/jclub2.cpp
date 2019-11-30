@@ -106,11 +106,15 @@
 #include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "sound/okim6295.h"
+#include "video/st0020.h"
 #include "emupal.h"
 #include "speaker.h"
-#include "video/st0020.h"
+#include "tilemap.h"
+
 #include "jclub2o.lh"
 #include "jclub2.lh"
+
+namespace {
 
 // Common between all hardware (jclub2o, jclub2 and darkhors)
 class common_state : public driver_device
@@ -233,6 +237,14 @@ public:
 		m_gfxdecode(*this,   "gfxdecode")
 	{ }
 
+	void init_darkhors();
+
+	void darkhors(machine_config &config);
+
+protected:
+	virtual void video_start() override;
+
+private:
 	DECLARE_WRITE32_MEMBER(input_sel_w);
 	DECLARE_READ32_MEMBER(input_r);
 	DECLARE_WRITE32_MEMBER(out1_w);
@@ -246,12 +258,8 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void init_darkhors();
-	DECLARE_VIDEO_START(darkhors);
-
-	void darkhors(machine_config &config);
 	void darkhors_map(address_map &map);
-private:
+
 	required_shared_ptr<uint32_t> m_tmapram;
 	required_shared_ptr<uint32_t> m_tmapscroll;
 	required_shared_ptr<uint32_t> m_tmapram2;
@@ -389,10 +397,12 @@ void darkhors_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	}
 }
 
-VIDEO_START_MEMBER(darkhors_state,darkhors)
+void darkhors_state::video_start()
 {
-	m_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(darkhors_state::get_tile_info_0),this), TILEMAP_SCAN_ROWS,16,16, 0x40,0x40);
-	m_tmap2= &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(darkhors_state::get_tile_info_1),this), TILEMAP_SCAN_ROWS,16,16, 0x40,0x40);
+	common_state::video_start();
+
+	m_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(darkhors_state::get_tile_info_0)), TILEMAP_SCAN_ROWS, 16,16, 0x40,0x40);
+	m_tmap2= &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(darkhors_state::get_tile_info_1)), TILEMAP_SCAN_ROWS, 16,16, 0x40,0x40);
 	m_tmap->set_transparent_pen(0);
 	m_tmap2->set_transparent_pen(0);
 
@@ -588,9 +598,9 @@ void jclub2o_state::jclub2o_map(address_map &map)
 	map(0x490000, 0x490003).w(FUNC(jclub2o_state::eeprom_s29290_w));
 
 	map(0x4a0000, 0x4a0003).w(FUNC(jclub2o_state::out2_w));
-//  AM_RANGE(0x4a0010, 0x4a0013) AM_WRITE
-//  AM_RANGE(0x4a0020, 0x4a0023) AM_WRITE
-//  AM_RANGE(0x4a0030, 0x4a0033) AM_WRITE
+//  map(0x4a0010, 0x4a0013).w(FUNC(jclub2o_map::));
+//  map(0x4a0020, 0x4a0023).w(FUNC(jclub2o_map::));
+//  map(0x4a0030, 0x4a0033).w(FUNC(jclub2o_map::));
 
 	// ST-0016
 	map(0x4b0000, 0x4b0003).rw(FUNC(jclub2o_state::cmd1_word_r), FUNC(jclub2o_state::cmd1_word_w));
@@ -609,14 +619,14 @@ void jclub2o_state::jclub2o_map(address_map &map)
 	map(0x580008, 0x58000b).portr("COIN");
 	map(0x58000c, 0x58000f).w(FUNC(jclub2o_state::input_sel1_out3_w));
 	map(0x580010, 0x580013).w(FUNC(jclub2o_state::out1_w));
-//  AM_RANGE(0x580018, 0x58001b) AM_WRITE
-//  AM_RANGE(0x58001c, 0x58001f) AM_WRITE
+//  map(0x580018, 0x58001b).w(FUNC(jclub2o_map::));
+//  map(0x58001c, 0x58001f).w(FUNC(jclub2o_map::));
 
 	map(0x580200, 0x580201).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
 
 	map(0x580401, 0x580401).rw(FUNC(jclub2o_state::console_r), FUNC(jclub2o_state::console_w));
-	map(0x580421, 0x580421).r(FUNC(jclub2o_state::console_status_r)); //AM_WRITE
-//  AM_RANGE(0x580440, 0x580443) AM_WRITE
+	map(0x580421, 0x580421).r(FUNC(jclub2o_state::console_status_r)); //.w(FUNC(jclub2o_map::));
+//  map(0x580440, 0x580443).w(FUNC(jclub2o_map::));
 
 	// ST-0020
 	map(0x600000, 0x67ffff).rw(m_st0020, FUNC(st0020_device::sprram_r), FUNC(st0020_device::sprram_w));
@@ -668,21 +678,21 @@ void jclub2o_state::st0016_mem(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("soundbank");
 	map(0xe800, 0xe8ff).ram();
-	//AM_RANGE(0xe900, 0xe9ff) // sound - internal
-	//AM_RANGE(0xec00, 0xec1f) AM_READ(st0016_character_ram_r) AM_WRITE(st0016_character_ram_w)
+	//map(0xe900, 0xe9ff) // sound - internal
+	//map(0xec00, 0xec1f).rw(FUNC(jclub2o_state::st0016_character_ram_r), FUNC(jclub2o_state::st0016_character_ram_w));
 	map(0xf000, 0xffff).ram();
 }
 
 void jclub2o_state::st0016_io(address_map &map)
 {
 	map.global_mask(0xff);
-	//AM_RANGE(0x00, 0xbf) AM_READ(st0016_vregs_r) AM_WRITE(st0016_vregs_w)
+	//map(0x00, 0xbf).rw(FUNC(jclub2o_state::st0016_vregs_r), FUNC(jclub2o_state::st0016_vregs_w));
 	map(0xc0, 0xc0).rw(FUNC(jclub2o_state::cmd1_r), FUNC(jclub2o_state::cmd1_w));
 	map(0xc1, 0xc1).rw(FUNC(jclub2o_state::cmd2_r), FUNC(jclub2o_state::cmd2_w));
 	map(0xc2, 0xc2).r(FUNC(jclub2o_state::cmd_stat_r));
 	map(0xe1, 0xe1).w(FUNC(jclub2o_state::st0016_rom_bank_w));
 	map(0xe7, 0xe7).nopw(); // watchdog?
-	//AM_RANGE(0xf0, 0xf0) AM_READ(st0016_dma_r)
+	//map(0xf0, 0xf0).r(FUNC(jclub2o_state::st0016_dma_r));
 }
 
 
@@ -727,14 +737,14 @@ void jclub2_state::jclub2_map(address_map &map)
 	map(0x580008, 0x58000b).portr("COIN");
 	map(0x58000c, 0x58000f).w(FUNC(jclub2_state::input_sel1_out3_w));
 	map(0x580010, 0x580013).w(FUNC(jclub2_state::out1_w));
-//  AM_RANGE(0x580018, 0x58001b) AM_WRITE
-//  AM_RANGE(0x58001c, 0x58001f) AM_WRITE
+//  map(0x580018, 0x58001b).w(FUNC(jclub2_map::));
+//  map(0x58001c, 0x58001f).w(FUNC(jclub2_map::));
 
 	map(0x580200, 0x580201).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
 
 	map(0x580401, 0x580401).rw(FUNC(jclub2_state::console_r), FUNC(jclub2_state::console_w));
-	map(0x580421, 0x580421).r(FUNC(jclub2_state::console_status_r)); //AM_WRITE
-//  AM_RANGE(0x580440, 0x580443) AM_WRITE
+	map(0x580421, 0x580421).r(FUNC(jclub2_state::console_status_r));  //.w(FUNC(jclub2_map::));
+//  map(0x580440, 0x580443).w(FUNC(jclub2_map::));
 
 	// ST-0032
 	map(0x800000, 0x87ffff).rw(m_st0020, FUNC(st0020_device::sprram_r), FUNC(st0020_device::sprram_w));
@@ -808,11 +818,11 @@ void darkhors_state::darkhors_map(address_map &map)
 	map(0x580004, 0x580007).portr("COIN");
 	map(0x580008, 0x58000b).r(FUNC(darkhors_state::input_r));
 	map(0x58000c, 0x58000f).w(FUNC(darkhors_state::input_sel_w));
-//  AM_RANGE(0x580010, 0x580013) AM_WRITE
-//  AM_RANGE(0x580018, 0x58001b) AM_WRITE
-//  AM_RANGE(0x58001c, 0x58001f) AM_WRITE
+//  map(0x580010, 0x580013).w(FUNC(darkhors_state::));
+//  map(0x580018, 0x58001b).w(FUNC(darkhors_state::));
+//  map(0x58001c, 0x58001f).w(FUNC(darkhors_state::));
 	map(0x580084, 0x580084).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-//  AM_RANGE(0x58008c, 0x58008f) AM_WRITE
+//  map(0x58008c, 0x58008f).w(FUNC(darkhors_state::));
 	map(0x580200, 0x580201).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
 
 	map(0x580401, 0x580401).rw(FUNC(darkhors_state::console_r), FUNC(darkhors_state::console_w));
@@ -1131,106 +1141,105 @@ TIMER_DEVICE_CALLBACK_MEMBER(common_state::scanline_irq)
 }
 
 // Older hardware (ST-0020 + ST-0016)
-MACHINE_CONFIG_START(jclub2o_state::jclub2o)
-	MCFG_DEVICE_ADD("maincpu", M68EC020, 12000000)
-	MCFG_DEVICE_PROGRAM_MAP(jclub2o_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", common_state, scanline_irq, "screen", 0, 1)
+void jclub2o_state::jclub2o(machine_config &config)
+{
+	M68EC020(config, m_maincpu, 12000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &jclub2o_state::jclub2o_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(common_state::scanline_irq), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("soundcpu",ST0016_CPU, 8000000)
-	MCFG_DEVICE_PROGRAM_MAP(st0016_mem)
-	MCFG_DEVICE_IO_MAP(st0016_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", jclub2o_state, irq0_line_hold)
+	ST0016_CPU(config, m_soundcpu, 8000000);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &jclub2o_state::st0016_mem);
+	m_soundcpu->set_addrmap(AS_IO, &jclub2o_state::st0016_io);
+	m_soundcpu->set_vblank_int("screen", FUNC(jclub2o_state::irq0_line_hold));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	EEPROM_S29290_16BIT(config, "eeprom");
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
-	MCFG_TICKET_DISPENSER_ADD("hopper1", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
-	MCFG_TICKET_DISPENSER_ADD("hopper2", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
+	TICKET_DISPENSER(config, m_hopper1, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, m_hopper2, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(0x190, 0x100+16)
-	MCFG_SCREEN_VISIBLE_AREA(0, 0x190-1, 0x10, 0x100-1)
-	MCFG_SCREEN_UPDATE_DRIVER(jclub2_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(0x190, 0x100+16);
+	screen.set_visarea(0, 0x190-1, 0x10, 0x100-1);
+	screen.set_screen_update(FUNC(jclub2_state::screen_update));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 0x10000)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x10000);
 
-	MCFG_DEVICE_ADD("st0020", ST0020_SPRITES, 0)
-	MCFG_ST0020_IS_JCLUB2(1)
-	MCFG_ST0020_SPRITES_PALETTE("palette")
+	ST0020_SPRITES(config, m_st0020, 0);
+	m_st0020->set_is_jclub2(1);
+	m_st0020->set_palette(m_palette);
 
 	// layout
 	config.set_default_layout(layout_jclub2o);
-MACHINE_CONFIG_END
+}
 
 
 // Newer hardware (ST-0032)
-MACHINE_CONFIG_START(jclub2_state::jclub2)
-	MCFG_DEVICE_ADD("maincpu", M68EC020, 12000000)
-	MCFG_DEVICE_PROGRAM_MAP(jclub2_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", common_state, scanline_irq, "screen", 0, 1)
+void jclub2_state::jclub2(machine_config &config)
+{
+	M68EC020(config, m_maincpu, 12000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &jclub2_state::jclub2_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(common_state::scanline_irq), "screen", 0, 1);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	EEPROM_93C46_8BIT(config, "eeprom");
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
-	MCFG_TICKET_DISPENSER_ADD("hopper1", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
-	MCFG_TICKET_DISPENSER_ADD("hopper2", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
+	TICKET_DISPENSER(config, m_hopper1, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, m_hopper2, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(0x190, 0x100+16)
-	MCFG_SCREEN_VISIBLE_AREA(0, 0x190-1, 8, 0x100-8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(jclub2_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(0x190, 0x100+16);
+	screen.set_visarea(0, 0x190-1, 8, 0x100-8-1);
+	screen.set_screen_update(FUNC(jclub2_state::screen_update));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 0x10000)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x10000);
 
 	// NOT an ST0020 but instead ST0032, ram format isn't compatible at least
-	MCFG_DEVICE_ADD("st0020", ST0020_SPRITES, 0)
-	MCFG_ST0020_IS_ST0032(1)
-	MCFG_ST0020_IS_JCLUB2(1) // offsets
-	MCFG_ST0020_SPRITES_PALETTE("palette")
+	ST0020_SPRITES(config, m_st0020, 0);
+	m_st0020->set_is_st0032(1);
+	m_st0020->set_is_jclub2(1); // offsets
+	m_st0020->set_palette(m_palette);
 
 	// layout
 	config.set_default_layout(layout_jclub2o);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(darkhors_state::darkhors)
-	MCFG_DEVICE_ADD("maincpu", M68EC020, 12000000) // 36MHz/3 ??
-	MCFG_DEVICE_PROGRAM_MAP(darkhors_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", common_state, scanline_irq, "screen", 0, 1)
+void darkhors_state::darkhors(machine_config &config)
+{
+	M68EC020(config, m_maincpu, 12000000); // 36MHz/3 ??
+	m_maincpu->set_addrmap(AS_PROGRAM, &darkhors_state::darkhors_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(common_state::scanline_irq), "screen", 0, 1);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	EEPROM_93C46_8BIT(config, "eeprom");
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
-	MCFG_TICKET_DISPENSER_ADD("hopper1", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
-	MCFG_TICKET_DISPENSER_ADD("hopper2", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
+	TICKET_DISPENSER(config, m_hopper1, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	TICKET_DISPENSER(config, m_hopper2, attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(0x190, 0x100+16)
-	MCFG_SCREEN_VISIBLE_AREA(0, 0x190-1, 8, 0x100-8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(darkhors_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(0x190, 0x100+16);
+	screen.set_visarea(0, 0x190-1, 8, 0x100-8-1);
+	screen.set_screen_update(FUNC(darkhors_state::screen_update));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 0x10000)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x10000);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_darkhors)
-	MCFG_VIDEO_START_OVERRIDE(darkhors_state, darkhors)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_darkhors);
 
 	// layout
 	config.set_default_layout(layout_jclub2);
@@ -1238,9 +1247,8 @@ MACHINE_CONFIG_START(darkhors_state::darkhors)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 528000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki", 528000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // clock frequency & pin 7 not verified
+}
 
 
 /***************************************************************************
@@ -1529,6 +1537,8 @@ void darkhors_state::init_darkhors()
 		memcpy(eeprom, &temp[0], len);
 	}
 }
+
+} // anonymous namespace
 
 
 // Older hardware (ST-0020 + ST-0016)

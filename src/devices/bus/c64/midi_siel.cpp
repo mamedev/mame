@@ -44,19 +44,19 @@ WRITE_LINE_MEMBER( c64_siel_midi_cartridge_device::write_acia_clock )
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(c64_siel_midi_cartridge_device::device_add_mconfig)
+void c64_siel_midi_cartridge_device::device_add_mconfig(machine_config &config)
+{
 	ACIA6850(config, m_acia, 0);
 	m_acia->txd_handler().set("mdout", FUNC(midi_port_device::write_txd));
 	m_acia->irq_handler().set(FUNC(c64_siel_midi_cartridge_device::acia_irq_w));
 
-	MCFG_MIDI_PORT_ADD("mdin", midiin_slot, "midiin")
-	MCFG_MIDI_RX_HANDLER(WRITELINE(MC6850_TAG, acia6850_device, write_rxd))
+	MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set(m_acia, FUNC(acia6850_device::write_rxd));
 
-	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
+	MIDI_PORT(config, "mdout", midiout_slot, "midiout");
 
-	MCFG_DEVICE_ADD("acia_clock", CLOCK, 31250*16)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, c64_siel_midi_cartridge_device, write_acia_clock))
-MACHINE_CONFIG_END
+	clock_device &acia_clock(CLOCK(config, "acia_clock", 31250*16));
+	acia_clock.signal_handler().set(FUNC(c64_siel_midi_cartridge_device::write_acia_clock));
+}
 
 
 
@@ -100,7 +100,7 @@ void c64_siel_midi_cartridge_device::device_reset()
 //  c64_cd_r - cartridge data read
 //-------------------------------------------------
 
-uint8_t c64_siel_midi_cartridge_device::c64_cd_r(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+uint8_t c64_siel_midi_cartridge_device::c64_cd_r(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!io1)
 	{
@@ -108,7 +108,7 @@ uint8_t c64_siel_midi_cartridge_device::c64_cd_r(address_space &space, offs_t of
 		{
 		case 6:
 		case 7:
-			data = m_acia->read(space, offset & 1);
+			data = m_acia->read(offset & 1);
 			break;
 		}
 	}
@@ -121,7 +121,7 @@ uint8_t c64_siel_midi_cartridge_device::c64_cd_r(address_space &space, offs_t of
 //  c64_cd_w - cartridge data write
 //-------------------------------------------------
 
-void c64_siel_midi_cartridge_device::c64_cd_w(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+void c64_siel_midi_cartridge_device::c64_cd_w(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!io1)
 	{
@@ -129,7 +129,7 @@ void c64_siel_midi_cartridge_device::c64_cd_w(address_space &space, offs_t offse
 		{
 		case 4:
 		case 5:
-			m_acia->write(space, offset & 1, data);
+			m_acia->write(offset & 1, data);
 			break;
 		}
 	}

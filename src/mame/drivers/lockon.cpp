@@ -6,8 +6,10 @@
 
     driver by Phil Bennett
 
-    Known bugs:
-        * None
+    TODO:
+    * Coincounters add one coin at boot, caused by ay8910 writing 00 on
+      port direction change. Likely wrong I/O emulation in ay8910 device,
+      but not trivial to fix.
 
 ***************************************************************************/
 
@@ -24,17 +26,6 @@
 
 #define V30_GND_ADDR    ((m_ctrl_reg & 0x3) << 16)
 #define V30_OBJ_ADDR    ((m_ctrl_reg & 0x18) << 13)
-
-
-/*************************************
- *
- *  Forward definitions
- *
- *************************************/
-
-
-
-
 
 /*************************************
  *
@@ -414,9 +405,9 @@ WRITE_LINE_MEMBER(lockon_state::ym2203_irq)
 
 WRITE8_MEMBER(lockon_state::ym2203_out_b)
 {
-	machine().bookkeeping().coin_counter_w(0, data & 0x80);
-	machine().bookkeeping().coin_counter_w(1, data & 0x40);
-	machine().bookkeeping().coin_counter_w(2, data & 0x20);
+	machine().bookkeeping().coin_counter_w(0, ~data & 0x80);
+	machine().bookkeeping().coin_counter_w(1, ~data & 0x40);
+	machine().bookkeeping().coin_counter_w(2, ~data & 0x20);
 
 	/* 'Lock-On' lamp */
 	m_lamp = BIT(~data, 4);
@@ -470,24 +461,23 @@ void lockon_state::machine_reset()
 	m_main_inten = 0;
 }
 
-MACHINE_CONFIG_START(lockon_state::lockon)
+void lockon_state::lockon(machine_config &config)
+{
+	V30(config, m_maincpu, 16_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &lockon_state::main_v30);
 
-	MCFG_DEVICE_ADD("maincpu", V30, 16_MHz_XTAL / 2)
-	MCFG_DEVICE_PROGRAM_MAP(main_v30)
+	V30(config, m_ground, 16_MHz_XTAL / 2);
+	m_ground->set_addrmap(AS_PROGRAM, &lockon_state::ground_v30);
 
-	MCFG_DEVICE_ADD("ground", V30, 16_MHz_XTAL / 2)
-	MCFG_DEVICE_PROGRAM_MAP(ground_v30)
+	V30(config, m_object, 16_MHz_XTAL / 2);
+	m_object->set_addrmap(AS_PROGRAM, &lockon_state::object_v30);
 
-	MCFG_DEVICE_ADD("object", V30, 16_MHz_XTAL / 2)
-	MCFG_DEVICE_PROGRAM_MAP(object_v30)
+	Z80(config, m_audiocpu, 16_MHz_XTAL / 4);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &lockon_state::sound_prg);
+	m_audiocpu->set_addrmap(AS_IO, &lockon_state::sound_io);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 16_MHz_XTAL / 4)
-	MCFG_DEVICE_PROGRAM_MAP(sound_prg)
-	MCFG_DEVICE_IO_MAP(sound_io)
-
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_ASTABLE(10000, 4700, 10000e-12) * 4096)
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+	WATCHDOG_TIMER(config, m_watchdog).set_time(PERIOD_OF_555_ASTABLE(10000, 4700, 10000e-12) * 4096);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	m58990_device &adc(M58990(config, "adc", 16_MHz_XTAL / 16));
 	adc.in_callback<0>().set_ioport("ADC_BANK");
@@ -495,32 +485,31 @@ MACHINE_CONFIG_START(lockon_state::lockon)
 	adc.in_callback<2>().set_ioport("ADC_MISSILE");
 	adc.in_callback<3>().set_ioport("ADC_HOVER");
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(lockon_state, screen_update_lockon)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, lockon_state, screen_vblank_lockon))
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
+	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
+	m_screen->set_screen_update(FUNC(lockon_state::screen_update_lockon));
+	m_screen->screen_vblank().set(FUNC(lockon_state::screen_vblank_lockon));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_lockon)
-	MCFG_PALETTE_ADD("palette", 1024 + 2048)
-	MCFG_PALETTE_INIT_OWNER(lockon_state, lockon)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lockon);
+	PALETTE(config, m_palette, FUNC(lockon_state::lockon_palette), 1024 + 2048);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, 16_MHz_XTAL / 4)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(*this, lockon_state, ym2203_irq))
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("YM2203"))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, lockon_state, ym2203_out_b))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.40)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.40)
-	MCFG_SOUND_ROUTE(1, "f2203.1l", 1.0)
-	MCFG_SOUND_ROUTE(1, "f2203.1r", 1.0)
-	MCFG_SOUND_ROUTE(2, "f2203.2l", 1.0)
-	MCFG_SOUND_ROUTE(2, "f2203.2r", 1.0)
-	MCFG_SOUND_ROUTE(3, "f2203.3l", 1.0)
-	MCFG_SOUND_ROUTE(3, "f2203.3r", 1.0)
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", 16_MHz_XTAL / 4));
+	ymsnd.irq_handler().set(FUNC(lockon_state::ym2203_irq));
+	ymsnd.port_a_read_callback().set_ioport("YM2203");
+	ymsnd.port_b_write_callback().set(FUNC(lockon_state::ym2203_out_b));
+	ymsnd.add_route(0, "lspeaker", 0.40);
+	ymsnd.add_route(0, "rspeaker", 0.40);
+	ymsnd.add_route(1, "f2203.1l", 1.0);
+	ymsnd.add_route(1, "f2203.1r", 1.0);
+	ymsnd.add_route(2, "f2203.2l", 1.0);
+	ymsnd.add_route(2, "f2203.2r", 1.0);
+	ymsnd.add_route(3, "f2203.3l", 1.0);
+	ymsnd.add_route(3, "f2203.3r", 1.0);
 
 	FILTER_VOLUME(config, "f2203.1l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	FILTER_VOLUME(config, "f2203.1r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
@@ -528,7 +517,7 @@ MACHINE_CONFIG_START(lockon_state::lockon)
 	FILTER_VOLUME(config, "f2203.2r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 	FILTER_VOLUME(config, "f2203.3l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
 	FILTER_VOLUME(config, "f2203.3r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-MACHINE_CONFIG_END
+}
 
 
 /*************************************

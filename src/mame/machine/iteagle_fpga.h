@@ -13,12 +13,6 @@
 #include "bus/rs232/rs232.h"
 #include "screen.h"
 
-#define MCFG_ITEAGLE_FPGA_INIT(_version, _seq_init) \
-	downcast<iteagle_fpga_device &>(*device).set_init_info(_version, _seq_init);
-
-#define MCFG_ITEAGLE_EEPROM_INIT(_sw_version, _hw_version) \
-	downcast<iteagle_eeprom_device &>(*device).set_info(_sw_version, _hw_version);
-
 // Functional emulation of AMD AM85C30 serial controller
 // Two channels, A & B
 class iteagle_am85c30

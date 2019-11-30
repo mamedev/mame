@@ -26,9 +26,8 @@ Example program: ("organ" from p82 of the manual)
 Pressing keys will produces different tones.
 
 
-ToDo:
+TODO:
 - VDU optional attachment (we are missing the chargen rom)
-- The original version of the bios is missing (we have version 2)
 
 *********************************************************************************************************************************/
 
@@ -39,7 +38,6 @@ ToDo:
 #include "machine/ins8154.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
-#include "sound/wave.h"
 #include "speaker.h"
 
 #include "mk14.lh"
@@ -69,7 +67,7 @@ private:
 
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
-	required_device<cpu_device> m_maincpu;
+	required_device<scmp_device> m_maincpu;
 	required_ioport_array<8> m_keyboard;
 	required_device<cassette_image_device> m_cass;
 	required_device<dac_bit_interface> m_dac;
@@ -117,8 +115,8 @@ void mk14_state::mem_map(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0x0fff);
 	map(0x000, 0x1ff).mirror(0x600).rom(); // ROM
-	map(0x800, 0x87f).mirror(0x600).rw("ic8", FUNC(ins8154_device::ins8154_r), FUNC(ins8154_device::ins8154_w)); // I/O
-	map(0x880, 0x8ff).mirror(0x600).ram(); // 128 I/O chip RAM
+	map(0x800, 0x87f).mirror(0x600).rw("ic8", FUNC(ins8154_device::read_io), FUNC(ins8154_device::write_io)); // I/O
+	map(0x880, 0x8ff).mirror(0x600).rw("ic8", FUNC(ins8154_device::read_ram), FUNC(ins8154_device::write_ram)); // 128 bytes I/O chip RAM
 	map(0x900, 0x9ff).mirror(0x400).rw(FUNC(mk14_state::keyboard_r), FUNC(mk14_state::display_w));
 	map(0xb00, 0xbff).ram(); // VDU RAM
 	map(0xf00, 0xfff).ram(); // Standard RAM
@@ -201,38 +199,50 @@ void mk14_state::machine_start()
 	m_digits.resolve();
 }
 
-MACHINE_CONFIG_START(mk14_state::mk14)
+void mk14_state::mk14(machine_config &config)
+{
 	/* basic machine hardware */
 	// IC1 1SP-8A/600 (8060) SC/MP Microprocessor
-	MCFG_DEVICE_ADD("maincpu", INS8060, XTAL(4'433'619))
-	MCFG_SCMP_CONFIG(WRITELINE(*this, mk14_state, cass_w), NOOP, READLINE(*this, mk14_state, cass_r), CONSTANT(0), READLINE(*this, mk14_state, cass_r), NOOP)
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	INS8060(config, m_maincpu, 4.433619_MHz_XTAL);
+	m_maincpu->flag_out().set(FUNC(mk14_state::cass_w));
+	m_maincpu->s_out().set_nop();
+	m_maincpu->s_in().set(FUNC(mk14_state::cass_r));
+	m_maincpu->sense_a().set_constant(0);
+	m_maincpu->sense_b().set(FUNC(mk14_state::cass_r));
+	m_maincpu->halt().set_nop();
+	m_maincpu->set_addrmap(AS_PROGRAM, &mk14_state::mem_map);
 
 	/* video hardware */
 	config.set_default_layout(layout_mk14);
 
 	// sound
 	SPEAKER(config, "speaker").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "speaker", 0.05);
-	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_DEVICE_ADD("dac8", ZN425E, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // Ferranti ZN425E
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
-	MCFG_SOUND_ROUTE(0, "dac8", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac8", -1.0, DAC_VREF_NEG_INPUT)
+	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	ZN425E(config, "dac8", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // Ferranti ZN425E
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac8", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac8", -1.0, DAC_VREF_NEG_INPUT);
 
 	/* devices */
-	MCFG_DEVICE_ADD("ic8", INS8154, 0)
-	MCFG_INS8154_OUT_A_CB(WRITE8(*this, mk14_state, port_a_w))
-	MCFG_INS8154_OUT_B_CB(WRITE8("dac8", dac_byte_interface, data_w))
+	ins8154_device &ic8(INS8154(config, "ic8"));
+	ic8.out_a().set(FUNC(mk14_state::port_a_w));
+	ic8.out_b().set("dac8", FUNC(dac_byte_interface::data_w));
 
-	MCFG_CASSETTE_ADD( "cassette" )
-MACHINE_CONFIG_END
+	CASSETTE(config, m_cass);
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	m_cass->add_route(ALL_OUTPUTS, "speaker", 0.05);
+}
 
 /* ROM definition */
 ROM_START( mk14 )
 	ROM_REGION( 0x200, "maincpu", 0 )
 	// IC2,3 74S571 512 x 4 bit ROM
-	ROM_LOAD( "scios.bin", 0x0000, 0x0200, CRC(8b667daa) SHA1(802dc637ce5391a2a6627f76f919b12a869b56ef)) // V2 bios, V1 is missing
+	ROM_DEFAULT_BIOS("v2")
+	ROM_SYSTEM_BIOS(0, "v2", "SCIOS V2")
+	ROMX_LOAD( "scios_v2.bin", 0x0000, 0x0200, CRC(8b667daa) SHA1(802dc637ce5391a2a6627f76f919b12a869b56ef), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "v1", "SCIOS V1")
+	ROMX_LOAD( "scios_v1.bin", 0x0000, 0x0200, CRC(3d2477e7) SHA1(795829a2025e24d87a413e245d72a284f872e0db), ROM_BIOS(1))
 ROM_END
 
 /* Driver */

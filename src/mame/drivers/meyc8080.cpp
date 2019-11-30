@@ -324,7 +324,7 @@ void meyc8080_state::meyc8080_map(address_map &map)
 	map(0x4000, 0x5fff).ram().share("vram0");
 	map(0x6000, 0x7fff).ram().share("vram1");
 	map(0x8000, 0x9fff).ram().share("vram2");
-//  AM_RANGE(0xa000, 0xa0ff) AM_RAM     // unknown... filled with 00's at boot time or when entering the service mode.
+//  map(0xa000, 0xa0ff).ram();     // unknown... filled with 00's at boot time or when entering the service mode.
 	map(0xcd00, 0xcdff).ram().share("nvram");
 	map(0xf000, 0xf000).portr("BSW").w(FUNC(meyc8080_state::meyc8080_dac_1_w));
 	map(0xf004, 0xf004).portr("IN1").w(FUNC(meyc8080_state::lights_1_w));
@@ -588,29 +588,29 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(meyc8080_state::meyc8080)
-
+void meyc8080_state::meyc8080(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8080, XTAL(20'000'000) / 10) // divider guessed
-	MCFG_DEVICE_PROGRAM_MAP(meyc8080_map)
+	I8080A(config, m_maincpu, XTAL(20'000'000) / 10); // divider guessed
+	m_maincpu->set_addrmap(AS_PROGRAM, &meyc8080_state::meyc8080_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 32*8-1)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_UPDATE_DRIVER(meyc8080_state, screen_update_meyc8080)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_size(256, 256);
+	screen.set_visarea(0*8, 32*8-1, 4*8, 32*8-1);
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_screen_update(FUNC(meyc8080_state::screen_update_meyc8080));
 
 	/* audio hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", DAC_2BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.66) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-
-MACHINE_CONFIG_END
+	DAC_2BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.66); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
 
 

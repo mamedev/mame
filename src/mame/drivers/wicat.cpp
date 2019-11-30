@@ -22,6 +22,7 @@ Wicat - various systems.
 #include "cpu/8x300/8x300.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z8000/z8000.h"
+#include "imagedev/floppy.h"
 #include "machine/74259.h"
 #include "machine/6522via.h"
 #include "machine/am9517a.h"
@@ -201,8 +202,8 @@ void wicat_state::video_io(address_map &map)
 
 void wicat_state::wd1000_mem(address_map &map)
 {
-	map(0x0000, 0x17ff).rom().region("wd3", 0x0000);
-	map(0x1800, 0x1fff).noprw();
+	map(0x0000, 0x0bff).rom().region("wd3", 0x0000);
+	map(0x0c00, 0x0fff).noprw();
 }
 
 void wicat_state::wd1000_io(address_map &map)
@@ -392,7 +393,7 @@ READ16_MEMBER( wicat_state::invalid_r )
 {
 	if(!machine().side_effects_disabled())
 	{
-		m_maincpu->set_buserror_details(0x300000+offset*2-2,0,m_maincpu->get_fc());
+		m_maincpu->set_buserror_details(0x300000+offset*2-2,true,m_maincpu->get_fc());
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 	}
@@ -403,7 +404,7 @@ WRITE16_MEMBER( wicat_state::invalid_w )
 {
 	if(!machine().side_effects_disabled())
 	{
-		m_maincpu->set_buserror_details(0x300000+offset*2-2,1,m_maincpu->get_fc());
+		m_maincpu->set_buserror_details(0x300000+offset*2-2,false,m_maincpu->get_fc());
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 	}
@@ -550,9 +551,9 @@ READ8_MEMBER(wicat_state::video_r)
 	switch(offset)
 	{
 	case 0x00:
-		return m_crtc->read(space,0);
+		return m_crtc->read(0);
 	case 0x02:
-		return m_crtc->read(space,1);
+		return m_crtc->read(1);
 	default:
 		return 0xff;
 	}
@@ -563,10 +564,10 @@ WRITE8_MEMBER(wicat_state::video_w)
 	switch(offset)
 	{
 	case 0x00:
-		m_crtc->write(space,0,data);
+		m_crtc->write(0,data);
 		break;
 	case 0x02:
-		m_crtc->write(space,1,data);
+		m_crtc->write(1,data);
 		break;
 	}
 }
@@ -583,37 +584,37 @@ WRITE8_MEMBER( wicat_state::vram_w )
 
 READ8_MEMBER(wicat_state::video_dma_r)
 {
-	return m_videodma->read(space,offset/2);
+	return m_videodma->read(offset/2);
 }
 
 WRITE8_MEMBER(wicat_state::video_dma_w)
 {
 	if(!(offset & 0x01))
-		m_videodma->write(space,offset/2,data);
+		m_videodma->write(offset/2,data);
 }
 
 READ8_MEMBER(wicat_state::video_uart0_r)
 {
 	uint16_t noff = offset >> 1;
-	return m_videouart0->read(space,noff);
+	return m_videouart0->read(noff);
 }
 
 WRITE8_MEMBER(wicat_state::video_uart0_w)
 {
 	uint16_t noff = offset >> 1;
-	m_videouart0->write(space,noff,data);
+	m_videouart0->write(noff,data);
 }
 
 READ8_MEMBER(wicat_state::video_uart1_r)
 {
 	uint16_t noff = offset >> 1;
-	return m_videouart1->read(space,noff);
+	return m_videouart1->read(noff);
 }
 
 WRITE8_MEMBER(wicat_state::video_uart1_w)
 {
 	uint16_t noff = offset >> 1;
-	m_videouart1->write(space,noff,data);
+	m_videouart1->write(noff,data);
 }
 
 // XD2210 64 x 4bit NOVRAM
@@ -783,7 +784,7 @@ void wicat_state::wicat(machine_config &config)
 	m_videocpu->set_addrmap(AS_PROGRAM, &wicat_state::video_mem);
 	m_videocpu->set_addrmap(AS_IO, &wicat_state::video_io);
 
-	INPUT_MERGER_ANY_HIGH(config, m_videoirq).output_handler().set_inputline(m_videocpu, INPUT_LINE_IRQ0);
+	INPUT_MERGER_ANY_HIGH(config, m_videoirq).output_handler().set_inputline(m_videocpu, z8002_device::NVI_LINE);
 
 	LS259(config, m_videoctrl);
 	m_videoctrl->q_out_cb<0>().set(FUNC(wicat_state::crtc_irq_clear_w));
@@ -798,7 +799,7 @@ void wicat_state::wicat(machine_config &config)
 	m_videodma->out_memw_callback().set(FUNC(wicat_state::vram_w));
 	m_videodma->out_iow_callback<0>().set(m_crtc, FUNC(i8275_device::dack_w));
 
-	INPUT_MERGER_ALL_HIGH(config, "dmairq").output_handler().set_inputline(m_videocpu, INPUT_LINE_NMI);
+	INPUT_MERGER_ALL_HIGH(config, "dmairq").output_handler().set_inputline(m_videocpu, z8002_device::NMI_LINE);
 
 	IM6402(config, m_videouart, 0);
 	m_videouart->set_rrc(0);
@@ -827,12 +828,11 @@ void wicat_state::wicat(machine_config &config)
 	screen.set_raw(19.6608_MHz_XTAL, 1020, 0, 800, 324, 0, 300);
 	screen.set_screen_update("video", FUNC(i8275_device::screen_update));
 
-	PALETTE(config, m_palette, 2);
-	m_palette->set_init("palette", FUNC(palette_device::palette_init_monochrome));
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	I8275(config, m_crtc, 19.6608_MHz_XTAL/10);
 	m_crtc->set_character_width(10);
-	m_crtc->set_display_callback(FUNC(wicat_state::wicat_display_pixels), this);
+	m_crtc->set_display_callback(FUNC(wicat_state::wicat_display_pixels));
 	m_crtc->drq_wr_callback().set(m_videodma, FUNC(am9517a_device::dreq0_w));
 	m_crtc->vrtc_wr_callback().set(FUNC(wicat_state::crtc_irq_w));
 	m_crtc->set_screen("screen");

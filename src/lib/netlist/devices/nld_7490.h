@@ -55,18 +55,20 @@
 #ifndef NLD_7490_H_
 #define NLD_7490_H_
 
-#include "../nl_setup.h"
+#include "netlist/nl_setup.h"
 
-#define TTL_7490(name, cA, cB, cR1, cR2, cR91, cR92)                               \
-		NET_REGISTER_DEV(TTL_7490, name)                                               \
-		NET_CONNECT(name, A, cA)                                                   \
-		NET_CONNECT(name, B, cB)                                                   \
-		NET_CONNECT(name, R1,  cR1)                                                \
-		NET_CONNECT(name, R2,  cR2)                                                \
-		NET_CONNECT(name, R91, cR91)                                               \
+#define TTL_7490(name, cA, cB, cR1, cR2, cR91, cR92)                           \
+		NET_REGISTER_DEV(TTL_7490, name)                                       \
+		NET_CONNECT(name, GND, GND)                                            \
+		NET_CONNECT(name, VCC, VCC)                                            \
+		NET_CONNECT(name, A, cA)                                               \
+		NET_CONNECT(name, B, cB)                                               \
+		NET_CONNECT(name, R1,  cR1)                                            \
+		NET_CONNECT(name, R2,  cR2)                                            \
+		NET_CONNECT(name, R91, cR91)                                           \
 		NET_CONNECT(name, R92, cR92)
 
-#define TTL_7490_DIP(name)                                                         \
+#define TTL_7490_DIP(name)                                                     \
 		NET_REGISTER_DEV(TTL_7490_DIP, name)
 
 #endif /* NLD_7490_H_ */

@@ -19,8 +19,8 @@ public:
 	nes_nanjing_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~nes_nanjing_device();
 
-	virtual DECLARE_READ8_MEMBER(read_l) override;
-	virtual DECLARE_WRITE8_MEMBER(write_l) override;
+	virtual uint8_t read_l(offs_t offset) override;
+	virtual void write_l(offs_t offset, uint8_t data) override;
 
 	virtual void hblank_irq(int scanline, int vblank, int blanked) override;
 	virtual void pcb_reset() override;

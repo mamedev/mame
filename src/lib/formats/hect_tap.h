@@ -7,12 +7,13 @@
     Format code for Micronique cassette files
 
 *********************************************************************/
+#ifndef MAME_FORMATS_HECT_TAP_H
+#define MAME_FORMATS_HECT_TAP_H
 
-#ifndef HECT_TAP_H
-#define HECT_TAP_H
+#pragma once
 
 #include "cassimg.h"
 
 CASSETTE_FORMATLIST_EXTERN(hector_cassette_formats);
 
-#endif /* HECT_TAP_H */
+#endif // MAME_FORMATS_HECT_TAP_H

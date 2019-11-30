@@ -7,14 +7,13 @@
     Cassette code for Sega SC-3000 *.bit files
 
 *********************************************************************/
+#ifndef MAME_FORMATS_SC3000_BIT_H
+#define MAME_FORMATS_SC3000_BIT_H
 
 #pragma once
-
-#ifndef __SC3000_BIT__
-#define __SC3000_BIT__
 
 #include "cassimg.h"
 
 CASSETTE_FORMATLIST_EXTERN( sc3000_cassette_formats );
 
-#endif
+#endif // MAME_FORMATS_SC3000_BIT_H

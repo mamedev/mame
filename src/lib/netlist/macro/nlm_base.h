@@ -3,6 +3,9 @@
 #ifndef NLM_BASE_H_
 #define NLM_BASE_H_
 
+/// \file nlm_base.h
+///
+
 /*
  * Provide base environment for netlist
  *
@@ -10,7 +13,7 @@
 
 #ifndef __PLIB_PREPROCESSOR__
 
-#include "../nl_setup.h"
+#include "netlist/nl_setup.h"
 
 /* ----------------------------------------------------------------------------
  *  Netlist Macros

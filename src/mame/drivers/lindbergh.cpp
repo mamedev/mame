@@ -392,8 +392,9 @@ void lindbergh_state::machine_reset()
 {
 }
 
-MACHINE_CONFIG_START(lindbergh_state::lindbergh)
-	MCFG_DEVICE_ADD("maincpu", PENTIUM4, 28000000U*5) /* Actually Celeron D at 2,8 GHz */
+void lindbergh_state::lindbergh(machine_config &config)
+{
+	PENTIUM4(config, "maincpu", 28000000U*5); /* Actually Celeron D at 2,8 GHz */
 
 	PCI_ROOT                (config, ":pci",           0);
 	I82875P_HOST            (config, ":pci:00.0",      0,                   0x103382c0, "maincpu", 512*1024*1024);
@@ -417,7 +418,7 @@ MACHINE_CONFIG_START(lindbergh_state::lindbergh)
 	SATA                    (config, ":pci:1f.2",      0, 0x808625a3, 0x02, 0x103382c0);
 	SMBUS                   (config, ":pci:1f.3",      0, 0x808625a4, 0x02, 0x103382c0);
 	AC97                    (config, ":pci:1f.5",      0, 0x808625a6, 0x02, 0x103382c0);
-MACHINE_CONFIG_END
+}
 
 #define LINDBERGH_BIOS \
 	ROM_REGION32_LE(0x100000, ":pci:1f.0", 0) /* PC bios, location 3j7 */ \

@@ -145,24 +145,6 @@ static inline void ATTR_PRINTF(2,3) GTELOG( uint32_t pc, const char *a, ...) {}
 #define CV2( n ) ( n < 3 ? m_cp2cr[ ( n << 3 ) + 6 ].sd : 0 )
 #define CV3( n ) ( n < 3 ? m_cp2cr[ ( n << 3 ) + 7 ].sd : 0 )
 
-static uint32_t gte_leadingzerocount( uint32_t lzcs )
-{
-	uint32_t lzcr = 0;
-
-	if( ( lzcs & 0x80000000 ) == 0 )
-	{
-		lzcs = ~lzcs;
-	}
-
-	while( ( lzcs & 0x80000000 ) != 0 )
-	{
-		lzcr++;
-		lzcs <<= 1;
-	}
-
-	return lzcr;
-}
-
 int32_t gte::LIM( int32_t value, int32_t max, int32_t min, uint32_t flag )
 {
 	if( value > max )
@@ -233,7 +215,7 @@ void gte::setcp2dr( uint32_t pc, int reg, uint32_t value )
 		break;
 
 	case 30:
-		LZCR = gte_leadingzerocount( value );
+		LZCR = (value & 0x80000000) == 0 ? count_leading_zeros(value) : count_leading_ones(value);
 		break;
 
 	case 31:
@@ -332,7 +314,7 @@ static inline uint32_t gte_divide( uint16_t numerator, uint16_t denominator )
 			0x00
 		};
 
-		int shift = gte_leadingzerocount( denominator ) - 16;
+		int shift = count_leading_zeros( denominator ) - 16;
 
 		int r1 = ( denominator << shift ) & 0x7fff;
 		int r2 = table[ ( ( r1 + 0x40 ) >> 7 ) ] + 0x101;

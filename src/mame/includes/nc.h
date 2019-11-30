@@ -5,9 +5,10 @@
  * includes/nc.h
  *
  ****************************************************************************/
-
 #ifndef MAME_INCLUDES_NC_H
 #define MAME_INCLUDES_NC_H
+
+#pragma once
 
 #include "bus/centronics/ctronics.h"
 #include "machine/upd765.h"     // for NC200 disk drive interface
@@ -72,14 +73,14 @@ protected:
 	DECLARE_WRITE8_MEMBER(nc_uart_control_w);
 	DECLARE_WRITE8_MEMBER(nc100_display_memory_start_w);
 
-	DECLARE_PALETTE_INIT(nc);
+	void nc_colours(palette_device &palette) const;
 	TIMER_CALLBACK_MEMBER(nc_keyboard_timer_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(dummy_timer_callback);
 	DECLARE_WRITE_LINE_MEMBER(write_uart_clock);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( nc_pcmcia_card );
-	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( nc_pcmcia_card );
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( load_pcmcia_card );
+	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( unload_pcmcia_card );
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

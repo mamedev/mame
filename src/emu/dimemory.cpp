@@ -94,15 +94,29 @@ void device_memory_interface::interface_config_complete()
 void device_memory_interface::interface_validity_check(validity_checker &valid) const
 {
 	// loop over all address spaces
-	for (int spacenum = 0; spacenum < int(m_address_config.size()); ++spacenum)
+	const int max_spaces = std::max(m_address_map.size(), m_address_config.size());
+	for (int spacenum = 0; spacenum < max_spaces; ++spacenum)
 	{
-		if (space_config(spacenum))
+		const address_space_config *config = space_config(spacenum);
+		if (config != nullptr)
 		{
+			// validate data width
+			int width = config->data_width();
+			if (width != 8 && width != 16 && width != 32 && width != 64)
+				osd_printf_error("Invalid data width %d specified for address space %d\n", width, spacenum);
+
+			// validate address shift
+			int shift = config->addr_shift();
+			if (shift < 0 && (width >> -shift) < 8)
+				osd_printf_error("Invalid shift %d specified for address space %d\n", shift, spacenum);
+
 			// construct the map
 			::address_map addrmap(const_cast<device_t &>(device()), spacenum);
 
 			// let the map check itself
 			addrmap.map_validity_check(valid, spacenum);
 		}
+		else if (spacenum < int(m_address_map.size()) && !m_address_map[spacenum].isnull())
+			osd_printf_warning("Map configured for nonexistent memory space %d\n", spacenum);
 	}
 }

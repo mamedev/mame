@@ -1,15 +1,14 @@
-// license:BSD-3-Clause
+// license:<license>
 // copyright-holders:<author_name>
 /***************************************************************************
 
-Template for skeleton drivers
+<template_header>
 
 ***************************************************************************/
 
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-//#include "sound/ay8910.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -22,17 +21,12 @@ public:
 	xxx_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_palette(*this, "palette")
 	{
 	}
 
-	// screen updates
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_PALETTE_INIT(xxx);
-
 	void xxx(machine_config &config);
 
-	void xxx_io(address_map &map);
-	void xxx_map(address_map &map);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -40,8 +34,17 @@ protected:
 
 	virtual void video_start() override;
 
+private:
+	// screen updates
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void xxx_palette(palette_device &palette) const;
+
+	void xxx_io(address_map &map);
+	void xxx_map(address_map &map);
+
 	// devices
 	required_device<cpu_device> m_maincpu;
+	required_device<palette_device> m_palette;
 };
 
 void xxx_state::video_start()
@@ -144,38 +147,30 @@ void xxx_state::machine_reset()
 }
 
 
-PALETTE_INIT_MEMBER(xxx_state, xxx)
+void xxx_state::xxx_palette(palette_device &palette) const
 {
 }
 
-MACHINE_CONFIG_START(xxx_state::xxx)
-
+void xxx_state::xxx(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80,MAIN_CLOCK/2)
-	MCFG_DEVICE_PROGRAM_MAP(xxx_map)
-	MCFG_DEVICE_IO_MAP(xxx_io)
+	Z80(config, m_maincpu, MAIN_CLOCK/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &xxx_state::xxx_map);
+	m_maincpu->set_addrmap(AS_IO, &xxx_state::xxx_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-//  MCFG_SCREEN_REFRESH_RATE(60)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_UPDATE_DRIVER(xxx_state, screen_update)
-//  MCFG_SCREEN_SIZE(32*8, 32*8)
-//  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK/2, 442, 0, 320, 264, 0, 240)          /* generic NTSC video timing at 320x240 */
-	//MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000)/2, 384, 0, 256, 264, 16, 240)  /* generic NTSC video timing at 256x224 */
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_screen_update(FUNC(xxx_state::screen_update));
+	screen.set_raw(MAIN_CLOCK/2, 442, 0, 320, 264, 0, 240);          /* generic NTSC video timing at 320x240 */
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_xxx)
-
-	MCFG_PALETTE_ADD("palette", 8)
-	MCFG_PALETTE_INIT_OWNER(xxx_state, xxx)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_xxx);
+	
+	PALETTE(config, m_palette, FUNC(xxx_state::xxx_palette), 8);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-//  MCFG_DEVICE_ADD("aysnd", AY8910, MAIN_CLOCK/4)
-//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************
@@ -184,10 +179,9 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-ROM_START( xxx )
+<rom_load>
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 	ROM_REGION( 0x10000, "gfx1", ROMREGION_ERASE00 )
-ROM_END
 
 // See src/emu/gamedrv.h for details
 // For a game:

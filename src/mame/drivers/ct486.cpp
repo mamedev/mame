@@ -110,11 +110,12 @@ void ct486_state::ct486_io(address_map &map)
 //  MACHINE DRIVERS
 //**************************************************************************
 
-MACHINE_CONFIG_START(ct486_state::ct486)
-	MCFG_DEVICE_ADD("maincpu", I486, XTAL(25'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(ct486_map)
-	MCFG_DEVICE_IO_MAP(ct486_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("cs4031", cs4031_device, int_ack_r)
+void ct486_state::ct486(machine_config &config)
+{
+	I486(config, m_maincpu, XTAL(25'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &ct486_state::ct486_map);
+	m_maincpu->set_addrmap(AS_IO, &ct486_state::ct486_io);
+	m_maincpu->set_irq_acknowledge_callback("cs4031", FUNC(cs4031_device::int_ack_r));
 
 	CS4031(config, m_cs4031, XTAL(25'000'000), "maincpu", "isa", "bios", "keybc");
 	// cpu connections
@@ -132,61 +133,63 @@ MACHINE_CONFIG_START(ct486_state::ct486)
 
 	RAM(config, RAM_TAG).set_default_size("4M").set_extra_options("1M,2M,8M,16M,32M,64M");
 
-	at_keyboard_controller_device &keybc(AT_KEYBOARD_CONTROLLER(config, "keybc", XTAL(12'000'000)));
-	keybc.system_reset_cb().set("cs4031", FUNC(cs4031_device::kbrst_w));
-	keybc.gate_a20_cb().set("cs4031", FUNC(cs4031_device::gatea20_w));
-	keybc.input_buffer_full_cb().set("cs4031", FUNC(cs4031_device::irq01_w));
-	keybc.keyboard_clock_cb().set("pc_kbdc", FUNC(pc_kbdc_device::clock_write_from_mb));
-	keybc.keyboard_data_cb().set("pc_kbdc", FUNC(pc_kbdc_device::data_write_from_mb));
-	MCFG_DEVICE_ADD("pc_kbdc", PC_KBDC, 0)
-	MCFG_PC_KBDC_OUT_CLOCK_CB(WRITELINE("keybc", at_keyboard_controller_device, keyboard_clock_w))
-	MCFG_PC_KBDC_OUT_DATA_CB(WRITELINE("keybc", at_keyboard_controller_device, keyboard_data_w))
-	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL)
+	at_kbc_device_base &keybc(AT_KEYBOARD_CONTROLLER(config, "keybc", XTAL(12'000'000)));
+	keybc.hot_res().set("cs4031", FUNC(cs4031_device::kbrst_w));
+	keybc.gate_a20().set("cs4031", FUNC(cs4031_device::gatea20_w));
+	keybc.kbd_irq().set("cs4031", FUNC(cs4031_device::irq01_w));
+	keybc.kbd_clk().set("pc_kbdc", FUNC(pc_kbdc_device::clock_write_from_mb));
+	keybc.kbd_data().set("pc_kbdc", FUNC(pc_kbdc_device::data_write_from_mb));
 
-	MCFG_DEVICE_ADD("isabus", ISA16, 0)
-	MCFG_ISA16_CPU("maincpu")
-	MCFG_ISA_BUS_IOCHCK(WRITELINE("cs4031", cs4031_device, iochck_w))
-	MCFG_ISA_OUT_IRQ2_CB(WRITELINE("cs4031", cs4031_device, irq09_w))
-	MCFG_ISA_OUT_IRQ3_CB(WRITELINE("cs4031", cs4031_device, irq03_w))
-	MCFG_ISA_OUT_IRQ4_CB(WRITELINE("cs4031", cs4031_device, irq04_w))
-	MCFG_ISA_OUT_IRQ5_CB(WRITELINE("cs4031", cs4031_device, irq05_w))
-	MCFG_ISA_OUT_IRQ6_CB(WRITELINE("cs4031", cs4031_device, irq06_w))
-	MCFG_ISA_OUT_IRQ7_CB(WRITELINE("cs4031", cs4031_device, irq07_w))
-	MCFG_ISA_OUT_IRQ10_CB(WRITELINE("cs4031", cs4031_device, irq10_w))
-	MCFG_ISA_OUT_IRQ11_CB(WRITELINE("cs4031", cs4031_device, irq11_w))
-	MCFG_ISA_OUT_IRQ12_CB(WRITELINE("cs4031", cs4031_device, irq12_w))
-	MCFG_ISA_OUT_IRQ14_CB(WRITELINE("cs4031", cs4031_device, irq14_w))
-	MCFG_ISA_OUT_IRQ15_CB(WRITELINE("cs4031", cs4031_device, irq15_w))
-	MCFG_ISA_OUT_DRQ0_CB(WRITELINE("cs4031", cs4031_device, dreq0_w))
-	MCFG_ISA_OUT_DRQ1_CB(WRITELINE("cs4031", cs4031_device, dreq1_w))
-	MCFG_ISA_OUT_DRQ2_CB(WRITELINE("cs4031", cs4031_device, dreq2_w))
-	MCFG_ISA_OUT_DRQ3_CB(WRITELINE("cs4031", cs4031_device, dreq3_w))
-	MCFG_ISA_OUT_DRQ5_CB(WRITELINE("cs4031", cs4031_device, dreq5_w))
-	MCFG_ISA_OUT_DRQ6_CB(WRITELINE("cs4031", cs4031_device, dreq6_w))
-	MCFG_ISA_OUT_DRQ7_CB(WRITELINE("cs4031", cs4031_device, dreq7_w))
-	MCFG_DEVICE_ADD("board1", ISA16_SLOT, 0, "isabus", pc_isa16_cards, "fdcsmc", true)
-	MCFG_DEVICE_ADD("board2", ISA16_SLOT, 0, "isabus", pc_isa16_cards, "comat", true)
-	MCFG_DEVICE_ADD("board3", ISA16_SLOT, 0, "isabus", pc_isa16_cards, "ide", true)
-	MCFG_DEVICE_ADD("board4", ISA16_SLOT, 0, "isabus", pc_isa16_cards, "lpt", true)
-	MCFG_DEVICE_ADD("isa1", ISA16_SLOT, 0, "isabus", pc_isa16_cards, "svga_et4k", false)
-	MCFG_DEVICE_ADD("isa2", ISA16_SLOT, 0, "isabus", pc_isa16_cards, nullptr, false)
-	MCFG_DEVICE_ADD("isa3", ISA16_SLOT, 0, "isabus", pc_isa16_cards, nullptr, false)
-	MCFG_DEVICE_ADD("isa4", ISA16_SLOT, 0, "isabus", pc_isa16_cards, nullptr, false)
-	MCFG_DEVICE_ADD("isa5", ISA16_SLOT, 0, "isabus", pc_isa16_cards, nullptr, false)
+	pc_kbdc_device &pc_kbdc(PC_KBDC(config, "pc_kbdc", 0));
+	pc_kbdc.out_clock_cb().set(keybc, FUNC(at_kbc_device_base::kbd_clk_w));
+	pc_kbdc.out_data_cb().set(keybc, FUNC(at_kbc_device_base::kbd_data_w));
+	PC_KBDC_SLOT(config, "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL).set_pc_kbdc_slot(&pc_kbdc);
+
+	ISA16(config, m_isabus, 0);
+	m_isabus->set_memspace(m_maincpu, AS_PROGRAM);
+	m_isabus->set_iospace(m_maincpu, AS_IO);
+	m_isabus->iochck_callback().set(m_cs4031, FUNC(cs4031_device::iochck_w));
+	m_isabus->irq2_callback().set(m_cs4031, FUNC(cs4031_device::irq09_w));
+	m_isabus->irq3_callback().set(m_cs4031, FUNC(cs4031_device::irq03_w));
+	m_isabus->irq4_callback().set(m_cs4031, FUNC(cs4031_device::irq04_w));
+	m_isabus->irq5_callback().set(m_cs4031, FUNC(cs4031_device::irq05_w));
+	m_isabus->irq6_callback().set(m_cs4031, FUNC(cs4031_device::irq06_w));
+	m_isabus->irq7_callback().set(m_cs4031, FUNC(cs4031_device::irq07_w));
+	m_isabus->irq10_callback().set(m_cs4031, FUNC(cs4031_device::irq10_w));
+	m_isabus->irq11_callback().set(m_cs4031, FUNC(cs4031_device::irq11_w));
+	m_isabus->irq12_callback().set(m_cs4031, FUNC(cs4031_device::irq12_w));
+	m_isabus->irq14_callback().set(m_cs4031, FUNC(cs4031_device::irq14_w));
+	m_isabus->irq15_callback().set(m_cs4031, FUNC(cs4031_device::irq15_w));
+	m_isabus->drq0_callback().set(m_cs4031, FUNC(cs4031_device::dreq0_w));
+	m_isabus->drq1_callback().set(m_cs4031, FUNC(cs4031_device::dreq1_w));
+	m_isabus->drq2_callback().set(m_cs4031, FUNC(cs4031_device::dreq2_w));
+	m_isabus->drq3_callback().set(m_cs4031, FUNC(cs4031_device::dreq3_w));
+	m_isabus->drq5_callback().set(m_cs4031, FUNC(cs4031_device::dreq5_w));
+	m_isabus->drq6_callback().set(m_cs4031, FUNC(cs4031_device::dreq6_w));
+	m_isabus->drq7_callback().set(m_cs4031, FUNC(cs4031_device::dreq7_w));
+	ISA16_SLOT(config, "board1", 0, "isabus", pc_isa16_cards, "fdcsmc", true);
+	ISA16_SLOT(config, "board2", 0, "isabus", pc_isa16_cards, "comat", true);
+	ISA16_SLOT(config, "board3", 0, "isabus", pc_isa16_cards, "ide", true);
+	ISA16_SLOT(config, "board4", 0, "isabus", pc_isa16_cards, "lpt", true);
+	ISA16_SLOT(config, "isa1", 0, "isabus", pc_isa16_cards, "svga_et4k", false);
+	ISA16_SLOT(config, "isa2", 0, "isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa3", 0, "isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa4", 0, "isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa5", 0, "isabus", pc_isa16_cards, nullptr, false);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	// video hardware
-	MCFG_PALETTE_ADD("palette", 256) // todo: really needed?
+	PALETTE(config, "palette").set_entries(256); // todo: really needed?
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("pc_disk_list","ibm5150")
-	MCFG_SOFTWARE_LIST_ADD("at_disk_list","ibm5170")
-	MCFG_SOFTWARE_LIST_ADD("at_cdrom_list","ibm5170_cdrom")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "pc_disk_list").set_original("ibm5150");
+	SOFTWARE_LIST(config, "at_disk_list").set_original("ibm5170");
+	SOFTWARE_LIST(config, "at_cdrom_list").set_original("ibm5170_cdrom");
+	SOFTWARE_LIST(config, "midi_disk_list").set_compatible("midi_flop");
+}
 
 
 //**************************************************************************

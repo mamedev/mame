@@ -201,7 +201,7 @@ void kaypro_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 
 		break;
 	default:
-		assert_always(false, "Unknown id in kaypro_state::device_timer");
+		throw emu_fatalerror("Unknown id in kaypro_state::device_timer");
 	}
 }
 
@@ -249,7 +249,7 @@ MACHINE_RESET_MEMBER( kaypro_state,kaypro )
 
 ************************************************************/
 
-QUICKLOAD_LOAD_MEMBER( kaypro_state, kaypro )
+QUICKLOAD_LOAD_MEMBER(kaypro_state::quickload_cb)
 {
 	uint8_t *RAM = memregion("rambank")->base();
 

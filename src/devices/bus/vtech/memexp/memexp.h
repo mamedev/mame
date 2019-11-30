@@ -36,25 +36,8 @@
 
 #pragma once
 
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_MEMEXP_SLOT_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, VTECH_MEMEXP_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(vtech_memexp_carts, nullptr, false)
-
-#define MCFG_MEMEXP_SLOT_INT_HANDLER(_devcb) \
-	downcast<vtech_memexp_device &>(*device).set_int_handler(DEVCB_##_devcb);
-
-#define MCFG_MEMEXP_SLOT_NMI_HANDLER(_devcb) \
-	downcast<vtech_memexp_device &>(*device).set_nmi_handler(DEVCB_##_devcb);
-
-#define MCFG_MEMEXP_SLOT_RESET_HANDLER(_devcb) \
-	downcast<vtech_memexp_device &>(*device).set_reset_handler(DEVCB_##_devcb);
-
+// include here so drivers don't need to
+#include "carts.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -62,21 +45,29 @@
 
 class device_vtech_memexp_interface;
 
-class vtech_memexp_slot_device : public device_t, public device_slot_interface
+class vtech_memexp_slot_device : public device_t, public device_single_card_slot_interface<device_vtech_memexp_interface>
 {
 	friend class device_vtech_memexp_interface;
 public:
 	// construction/destruction
+	vtech_memexp_slot_device(machine_config const &mconfig, char const *tag, device_t *owner)
+		: vtech_memexp_slot_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		option_reset();
+		vtech_memexp_carts(*this);
+		set_default_option(nullptr);
+		set_fixed(false);
+	}
 	vtech_memexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~vtech_memexp_slot_device();
 
-	void set_program_space(address_space *program);
-	void set_io_space(address_space *io);
+	template <typename T> void set_program_space(T &&tag, int spacenum) { m_program.set_tag(std::forward<T>(tag), spacenum); }
+	template <typename T> void set_io_space(T &&tag, int spacenum) { m_io.set_tag(std::forward<T>(tag), spacenum); }
 
 	// callbacks
-	template <class Object> devcb_base &set_int_handler(Object &&cb) { return m_int_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_nmi_handler(Object &&cb) { return m_nmi_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_reset_handler(Object &&cb) { return m_reset_handler.set_callback(std::forward<Object>(cb)); }
+	auto int_handler() { return m_int_handler.bind(); }
+	auto nmi_handler() { return m_nmi_handler.bind(); }
+	auto reset_handler() { return m_reset_handler.bind(); }
 
 	// called from cart device
 	DECLARE_WRITE_LINE_MEMBER( int_w ) { m_int_handler(state); }
@@ -85,13 +76,11 @@ public:
 
 protected:
 	// device-level overrides
+	virtual void device_config_complete() override;
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
-	address_space *m_program;
-	address_space *m_io;
-
-	device_vtech_memexp_interface *m_cart;
+	required_address_space m_program;
+	required_address_space m_io;
 
 private:
 	devcb_write_line m_int_handler;
@@ -100,7 +89,7 @@ private:
 };
 
 // class representing interface-specific live memexp device
-class device_vtech_memexp_interface : public device_slot_card_interface
+class device_vtech_memexp_interface : public device_interface
 {
 public:
 	// construction/destruction
@@ -116,8 +105,5 @@ protected:
 
 // device type definition
 DECLARE_DEVICE_TYPE(VTECH_MEMEXP_SLOT, vtech_memexp_slot_device)
-
-// include here so drivers don't need to
-#include "carts.h"
 
 #endif // MAME_BUS_VTECH_MEMEXP_MEMEXP_H

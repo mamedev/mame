@@ -11,7 +11,7 @@ Atari Ultra Tank video emulation
 #include "audio/sprint4.h"
 
 
-PALETTE_INIT_MEMBER(ultratnk_state, ultratnk)
+void ultratnk_state::ultratnk_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 
@@ -49,7 +49,7 @@ void ultratnk_state::video_start()
 {
 	m_screen->register_screen_bitmap(m_helper);
 
-	m_playfield = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ultratnk_state::tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_playfield = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ultratnk_state::tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 
@@ -127,10 +127,8 @@ WRITE_LINE_MEMBER(ultratnk_state::screen_vblank)
 		}
 
 		/* update sound status */
-
-		address_space &space = machine().dummy_space();
-		m_discrete->write(space, ULTRATNK_MOTOR_DATA_1, m_videoram[0x391] & 15);
-		m_discrete->write(space, ULTRATNK_MOTOR_DATA_2, m_videoram[0x393] & 15);
+		m_discrete->write(ULTRATNK_MOTOR_DATA_1, m_videoram[0x391] & 15);
+		m_discrete->write(ULTRATNK_MOTOR_DATA_2, m_videoram[0x393] & 15);
 	}
 }
 

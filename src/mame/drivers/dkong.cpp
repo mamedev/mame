@@ -454,7 +454,7 @@ WRITE8_MEMBER(dkong_state::memory_write_byte)
 WRITE_LINE_MEMBER(dkong_state::s2650_interrupt)
 {
 	if (state)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x03);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x03); // Z80
 }
 
 /*************************************
@@ -624,7 +624,7 @@ READ8_MEMBER(dkong_state::dkong_in2_r)
 {
 	// 2 board DK and all DKjr has a watchdog
 	if (m_watchdog)
-		m_watchdog->reset_w(space, 0, 0);
+		m_watchdog->watchdog_reset();
 
 	uint8_t r = ioport("IN2")->read();
 	machine().bookkeeping().coin_counter_w(offset, r >> 7);
@@ -1692,77 +1692,76 @@ WRITE_LINE_MEMBER(dkong_state::busreq_w )
 		m_dma8257->hlda_w(state);
 }
 
-MACHINE_CONFIG_START(dkong_state::dkong_base)
-
+void dkong_state::dkong_base(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, Z80, CLOCK_1H)
-	MCFG_DEVICE_PROGRAM_MAP(dkong_map)
+	Z80(config, m_maincpu, CLOCK_1H);
+	m_maincpu->set_addrmap(AS_PROGRAM, &dkong_state::dkong_map);
 
 	MCFG_MACHINE_START_OVERRIDE(dkong_state,dkong2b)
 	MCFG_MACHINE_RESET_OVERRIDE(dkong_state,dkong)
 
-	MCFG_DEVICE_ADD("dma8257", I8257, CLOCK_1H)
-	MCFG_I8257_OUT_HRQ_CB(WRITELINE(*this, dkong_state, busreq_w))
-	MCFG_I8257_IN_MEMR_CB(READ8(*this, dkong_state, memory_read_byte))
-	MCFG_I8257_OUT_MEMW_CB(WRITE8(*this, dkong_state, memory_write_byte))
-	MCFG_I8257_IN_IOR_1_CB(READ8(*this, dkong_state, p8257_ctl_r))
-	MCFG_I8257_OUT_IOW_0_CB(WRITE8(*this, dkong_state, p8257_ctl_w))
-	MCFG_I8257_REVERSE_RW_MODE(1) // why?
+	I8257(config, m_dma8257, CLOCK_1H);
+	m_dma8257->out_hrq_cb().set(FUNC(dkong_state::busreq_w));
+	m_dma8257->in_memr_cb().set(FUNC(dkong_state::memory_read_byte));
+	m_dma8257->out_memw_cb().set(FUNC(dkong_state::memory_write_byte));
+	m_dma8257->in_ior_cb<1>().set(FUNC(dkong_state::p8257_ctl_r));
+	m_dma8257->out_iow_cb<0>().set(FUNC(dkong_state::p8257_ctl_w));
+	m_dma8257->set_reverse_rw_mode(1); // why?
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(m_screen, RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(dkong_state, screen_update_dkong)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, dkong_state, vblank_irq))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
+	m_screen->set_screen_update(FUNC(dkong_state::screen_update_dkong));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(dkong_state::vblank_irq));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dkong)
-	MCFG_PALETTE_ADD("palette", DK2B_PALETTE_LENGTH)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dkong);
+	PALETTE(config, m_palette, FUNC(dkong_state::dkong2b_palette), DK2B_PALETTE_LENGTH);
 
-	MCFG_PALETTE_INIT_OWNER(dkong_state,dkong2b)
 	MCFG_VIDEO_START_OVERRIDE(dkong_state,dkong)
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(dkong_state::radarscp)
+void dkong_state::radarscp(machine_config &config)
+{
 	dkong_base(config);
 
 	/* basic machine hardware */
 	MCFG_MACHINE_START_OVERRIDE(dkong_state,radarscp)
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(RS_PALETTE_LENGTH)
-	MCFG_PALETTE_INIT_OWNER(dkong_state,radarscp)
+	m_palette->set_init(FUNC(dkong_state::radarscp_palette));
+	m_palette->set_entries(RS_PALETTE_LENGTH);
 
 	/* sound hardware */
 	radarscp_audio(config);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(dkong_state::radarscp1)
+void dkong_state::radarscp1(machine_config &config)
+{
 	dkong_base(config);
 
 	/* basic machine hardware */
 	MCFG_MACHINE_START_OVERRIDE(dkong_state,radarscp1)
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(RS_PALETTE_LENGTH)
-	MCFG_PALETTE_INIT_OWNER(dkong_state,radarscp1)
+	m_palette->set_init(FUNC(dkong_state::radarscp1_palette));
+	m_palette->set_entries(RS_PALETTE_LENGTH);
 
 	/* sound hardware */
 	radarscp1_audio(config);
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(dkong_state::dkong2b)
+void dkong_state::dkong2b(machine_config &config)
+{
 	dkong_base(config);
 
 	/* basic machine hardware */
 	MCFG_MACHINE_START_OVERRIDE(dkong_state,dkong2b)
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(DK2B_PALETTE_LENGTH)
+	m_palette->set_entries(DK2B_PALETTE_LENGTH);
 
 	/* sound hardware */
 	dkong2b_audio(config);
 
-	MCFG_WATCHDOG_ADD("watchdog")
-MACHINE_CONFIG_END
+	WATCHDOG_TIMER(config, m_watchdog);
+}
 
 void dkong_state::dk_braze(machine_config &config)
 {
@@ -1792,19 +1791,19 @@ void dkong_state::dk3_braze(machine_config &config)
 	EEPROM_93C46_8BIT(config, "eeprom");
 }
 
-MACHINE_CONFIG_START(dkong_state::dkong3)
-
+void dkong_state::dkong3(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, Z80, XTAL(8'000'000) / 2) /* verified in schematics */
-	MCFG_DEVICE_PROGRAM_MAP(dkong3_map)
-	MCFG_DEVICE_IO_MAP(dkong3_io_map)
+	Z80(config, m_maincpu, XTAL(8'000'000) / 2); /* verified in schematics */
+	m_maincpu->set_addrmap(AS_PROGRAM, &dkong_state::dkong3_map);
+	m_maincpu->set_addrmap(AS_IO, &dkong_state::dkong3_io_map);
 
 	MCFG_MACHINE_START_OVERRIDE(dkong_state, dkong3)
 
-	MCFG_DEVICE_ADD("z80dma", Z80DMA, CLOCK_1H)
-	MCFG_Z80DMA_OUT_BUSREQ_CB(INPUTLINE("maincpu", INPUT_LINE_HALT))
-	MCFG_Z80DMA_IN_MREQ_CB(READ8(*this, dkong_state, memory_read_byte))
-	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(*this, dkong_state, memory_write_byte))
+	Z80DMA(config, m_z80dma, CLOCK_1H);
+	m_z80dma->out_busreq_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
+	m_z80dma->in_mreq_callback().set(FUNC(dkong_state::memory_read_byte));
+	m_z80dma->out_mreq_callback().set(FUNC(dkong_state::memory_write_byte));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -1815,44 +1814,43 @@ MACHINE_CONFIG_START(dkong_state::dkong3)
 	m_screen->screen_vblank().append_inputline(m_dev_n2a03a, INPUT_LINE_NMI);
 	m_screen->screen_vblank().append_inputline(m_dev_n2a03b, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dkong)
-	MCFG_PALETTE_ADD("palette", DK3_PALETTE_LENGTH)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dkong);
+	PALETTE(config, m_palette, FUNC(dkong_state::dkong3_palette), DK3_PALETTE_LENGTH);
 
-	MCFG_PALETTE_INIT_OWNER(dkong_state,dkong3)
 	MCFG_VIDEO_START_OVERRIDE(dkong_state,dkong)
 
 	/* sound hardware */
 	dkong3_audio(config);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(dkong_state::dkongjr)
+void dkong_state::dkongjr(machine_config &config)
+{
 	dkong_base(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(dkongjr_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &dkong_state::dkongjr_map);
 
 	/* sound hardware */
 	dkongjr_audio(config);
 
-	MCFG_WATCHDOG_ADD("watchdog")
-MACHINE_CONFIG_END
+	WATCHDOG_TIMER(config, m_watchdog);
+}
 
-MACHINE_CONFIG_START(dkong_state::pestplce)
+void dkong_state::pestplce(machine_config &config)
+{
 	dkongjr(config);
 
 	/* video hardware */
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_INIT_OWNER(dkong_state,dkong2b)  /* wrong! */
+	m_palette->set_init(FUNC(dkong_state::dkong2b_palette)); // wrong!
 	m_screen->set_screen_update(FUNC(dkong_state::screen_update_pestplce));
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(dkong_state::dkong3b)
+void dkong_state::dkong3b(machine_config &config)
+{
 	dkongjr(config);
 
 	/* basic machine hardware */
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_INIT_OWNER(dkong_state,dkong3)
-MACHINE_CONFIG_END
+	m_palette->set_init(FUNC(dkong_state::dkong3_palette));
+}
 
 /*************************************
  *
@@ -1860,25 +1858,25 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(dkong_state::s2650)
+void dkong_state::s2650(machine_config &config)
+{
 	dkong2b(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_REPLACE(m_maincpu, S2650, CLOCK_1H / 2)    /* ??? */
-	MCFG_DEVICE_PROGRAM_MAP(s2650_map)
-	MCFG_DEVICE_IO_MAP(s2650_io_map)
-	MCFG_DEVICE_DATA_MAP(s2650_data_map)
-	MCFG_S2650_SENSE_INPUT(READLINE("screen", screen_device, vblank))
-	MCFG_S2650_FLAG_OUTPUT(WRITELINE(*this, dkong_state, s2650_fo_w))
+	s2650_device &s2650(S2650(config.replace(), m_maincpu, CLOCK_1H / 2));    /* ??? */
+	s2650.set_addrmap(AS_PROGRAM, &dkong_state::s2650_map);
+	s2650.set_addrmap(AS_IO, &dkong_state::s2650_io_map);
+	s2650.set_addrmap(AS_DATA, &dkong_state::s2650_data_map);
+	s2650.sense_handler().set("screen", FUNC(screen_device::vblank));
+	s2650.flag_handler().set(FUNC(dkong_state::s2650_fo_w));
 
 	m_screen->screen_vblank().set(FUNC(dkong_state::s2650_interrupt));
 
-	MCFG_DEVICE_MODIFY("dma8257")
-	MCFG_I8257_IN_MEMR_CB(READ8(*this, dkong_state, hb_dma_read_byte))
-	MCFG_I8257_OUT_MEMW_CB(WRITE8(*this, dkong_state, hb_dma_write_byte))
+	m_dma8257->in_memr_cb().set(FUNC(dkong_state::hb_dma_read_byte));
+	m_dma8257->out_memw_cb().set(FUNC(dkong_state::hb_dma_write_byte));
 
 	MCFG_MACHINE_START_OVERRIDE(dkong_state,s2650)
-MACHINE_CONFIG_END
+}
 
 void dkong_state::herbiedk(machine_config &config)
 {
@@ -1886,15 +1884,12 @@ void dkong_state::herbiedk(machine_config &config)
 	downcast<s2650_device &>(*m_maincpu).sense_handler().set(m_screen, FUNC(screen_device::vblank)).invert(); // ???
 }
 
-MACHINE_CONFIG_START(dkong_state::spclforc)
+void dkong_state::spclforc(machine_config &config)
+{
 	herbiedk(config);
-
-	/* basic machine hardware */
-	MCFG_DEVICE_REMOVE("soundcpu")
-
-	/* video hardware */
+	config.device_remove("soundcpu");
 	m_screen->set_screen_update(FUNC(dkong_state::screen_update_spclforc));
-MACHINE_CONFIG_END
+}
 
 /*************************************
  *
@@ -1902,35 +1897,35 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(dkong_state::strtheat)
+void dkong_state::strtheat(machine_config &config)
+{
 	dkong2b(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(epos_readport)
+	m_maincpu->set_addrmap(AS_IO, &dkong_state::epos_readport);
 
 	MCFG_MACHINE_RESET_OVERRIDE(dkong_state,strtheat)
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(dkong_state::drakton)
+void dkong_state::drakton(machine_config &config)
+{
 	dkong2b(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(epos_readport)
+	m_maincpu->set_addrmap(AS_IO, &dkong_state::epos_readport);
 
 	MCFG_MACHINE_RESET_OVERRIDE(dkong_state,drakton)
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(dkong_state::drktnjr)
+void dkong_state::drktnjr(machine_config &config)
+{
 	dkongjr(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(epos_readport)
+	m_maincpu->set_addrmap(AS_IO, &dkong_state::epos_readport);
 
 	MCFG_MACHINE_RESET_OVERRIDE(dkong_state,drakton)
-MACHINE_CONFIG_END
+}
 
 /*************************************
  *
@@ -3417,6 +3412,37 @@ ROM_START( strtheat )
 	ROM_LOAD( "82s129.2n",     0x0200, 0x0100, CRC(a515d59b) SHA1(930616c4bcd819c2a4432a6619a8c6da74f3e8c5) ) /* character color codes on a per-column basis */
 ROM_END
 
+//Differences noted: Demo Sounds DIP has no effect.
+//                   No siren sound.
+//                   Smaller crash animation.
+ROM_START( strtheata )
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64k for code + 4*16k for decrypted code */
+	ROM_LOAD( "u2",   0x0000, 0x2000, CRC(53982f41) SHA1(a2e48da383eb09220d2ef772c3e77011cfd455e5) )
+	ROM_LOAD( "u3",   0x2000, 0x2000, CRC(3162419c) SHA1(36bc923c240400ff62b82eeba3d73d45ebeabe10) )
+
+	ROM_REGION( 0x1800, "soundcpu", 0 ) /* sound */
+	ROM_LOAD( "2716.3h",   0x0000, 0x0800, CRC(4cd17174) SHA1(5ed9b5275b0779d1ca05d6e62d3ad8a682ebde37) )
+	ROM_RELOAD(            0x0800, 0x0800 )
+	ROM_FILL(              0x1000, 0x0800, 0xFF )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "2716.3n",   0x0000, 0x0800, CRC(29e57678) SHA1(cbbb980c44c7f5c45d5f0b85209658f53b7ba4a7) )
+	ROM_RELOAD(            0x0800, 0x0800 )
+	ROM_LOAD( "2716.3p",   0x1000, 0x0800, CRC(31171146) SHA1(e26b22e73b528810b566b2b9f6d81e2d7856523d) )
+	ROM_RELOAD(            0x1800, 0x0800 )
+
+	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_LOAD( "2716.7c",   0x0000, 0x0800, CRC(a8238e9c) SHA1(947bbe48ce1c705ef974e37b138929f1c846ed79) )
+	ROM_LOAD( "2716.7d",   0x0800, 0x0800, CRC(71202138) SHA1(b4edc77ed2844ef46aee4a492282e4785bdb7224) )
+	ROM_LOAD( "2716.7e",   0x1000, 0x0800, CRC(dc7785ac) SHA1(4ccb3f9f938fd1d9bd20f1601a16a2780c84588b) )
+	ROM_LOAD( "2716.7f",   0x1800, 0x0800, CRC(ede71d86) SHA1(0bce1b1d4180173537685a08055ce44b9dedc76a) )
+
+	ROM_REGION( 0x0300, "proms", 0 )
+	ROM_LOAD( "82s129.2e",     0x0000, 0x0100, CRC(1311ba28) SHA1(d9b5bc07c8943d83592833e8b1c2ff57e4accb55) ) /* palette low 4 bits (inverted) */
+	ROM_LOAD( "82s129.2f",     0x0100, 0x0100, CRC(18d90d4f) SHA1(b956fd652dcc5eb50eaec8729762d19cfd475bc7) ) /* palette high 4 bits (inverted) */
+	ROM_LOAD( "82s129.2n",     0x0200, 0x0100, CRC(a515d59b) SHA1(930616c4bcd819c2a4432a6619a8c6da74f3e8c5) ) /* character color codes on a per-column basis */
+ROM_END
+
 /*
 ------------------------------------------------
 Shooting Gallery by SEATON GROVE/ZACCARIA (1984)
@@ -3607,8 +3633,8 @@ void dkong_state::init_strtheat()
 	drakton_decrypt_rom(0x88, 0x1c000, bs[3]);
 
 	/* custom handlers supporting Joystick or Steering Wheel */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x7c00, 0x7c00, read8_delegate(FUNC(dkong_state::strtheat_inputport_0_r),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x7c80, 0x7c80, read8_delegate(FUNC(dkong_state::strtheat_inputport_1_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x7c00, 0x7c00, read8_delegate(*this, FUNC(dkong_state::strtheat_inputport_0_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x7c80, 0x7c80, read8_delegate(*this, FUNC(dkong_state::strtheat_inputport_1_r)));
 }
 
 void dkong_state::dk_braze_decrypt()
@@ -3631,8 +3657,8 @@ void dkong_state::init_dkonghs()
 	dk_braze_decrypt();
 
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.install_read_handler(0xc000, 0xc000, read8_delegate(FUNC(dkong_state::braze_eeprom_r), this));
-	space.install_write_handler(0xc000, 0xc000, write8_delegate(FUNC(dkong_state::braze_eeprom_w), this));
+	space.install_read_handler(0xc000, 0xc000, read8_delegate(*this, FUNC(dkong_state::braze_eeprom_r)));
+	space.install_write_handler(0xc000, 0xc000, write8_delegate(*this, FUNC(dkong_state::braze_eeprom_w)));
 }
 
 void dkong_state::init_dkongx()
@@ -3640,10 +3666,10 @@ void dkong_state::init_dkongx()
 	dk_braze_decrypt();
 
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.install_write_handler(0xe000, 0xe000, write8_delegate(FUNC(dkong_state::dk_braze_a15_w),this));
+	space.install_write_handler(0xe000, 0xe000, write8_delegate(*this, FUNC(dkong_state::dk_braze_a15_w)));
 
-	space.install_read_handler(0xc800, 0xc800, read8_delegate(FUNC(dkong_state::braze_eeprom_r),this));
-	space.install_write_handler(0xc800, 0xc800, write8_delegate(FUNC(dkong_state::braze_eeprom_w),this));
+	space.install_read_handler(0xc800, 0xc800, read8_delegate(*this, FUNC(dkong_state::braze_eeprom_r)));
+	space.install_write_handler(0xc800, 0xc800, write8_delegate(*this, FUNC(dkong_state::braze_eeprom_w)));
 }
 
 void dkong_state::init_dkong3hs()
@@ -3656,8 +3682,8 @@ void dkong_state::init_dkong3hs()
 	m_maincpu->space(AS_PROGRAM).install_rom(0x8000, 0xffff, m_decrypted.get() + 0x8000);
 
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.install_read_handler(0xc000, 0xc000, read8_delegate(FUNC(dkong_state::braze_eeprom_r), this));
-	space.install_write_handler(0xc000, 0xc000, write8_delegate(FUNC(dkong_state::braze_eeprom_w), this));
+	space.install_read_handler(0xc000, 0xc000, read8_delegate(*this, FUNC(dkong_state::braze_eeprom_r)));
+	space.install_write_handler(0xc000, 0xc000, write8_delegate(*this, FUNC(dkong_state::braze_eeprom_w)));
 }
 
 void dkong_state::init_dkingjr()
@@ -3729,6 +3755,7 @@ GAME( 1985, spclforc,  0,        spclforc,  spclforc, dkong_state, empty_init,  
 GAME( 1985, spcfrcii,  0,        spclforc,  spclforc, dkong_state, empty_init,    ROT270, "Senko Industries (Magic Electronics Inc. license)", "Special Forces II",                                        MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 
 /* EPOS */
-GAME( 1984, drakton,   0,        drakton,   drakton,  dkong_state, init_drakton,  ROT270, "Epos Corporation", "Drakton (DK conversion)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1984, drktnjr,   drakton,  drktnjr,   drakton,  dkong_state, init_drakton,  ROT270, "Epos Corporation", "Drakton (DKJr conversion)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, strtheat,  0,        strtheat,  strtheat, dkong_state, init_strtheat, ROT270, "Epos Corporation", "Street Heat",               MACHINE_SUPPORTS_SAVE ) // distributed by Cardinal Amusements Products (a division of Epos Corporation)
+GAME( 1984, drakton,   0,        drakton,   drakton,  dkong_state, init_drakton,  ROT270, "Epos Corporation", "Drakton (DK conversion)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1984, drktnjr,   drakton,  drktnjr,   drakton,  dkong_state, init_drakton,  ROT270, "Epos Corporation", "Drakton (DKJr conversion)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1985, strtheat,  0,        strtheat,  strtheat, dkong_state, init_strtheat, ROT270, "Epos Corporation", "Street Heat (set 1, newer?)", MACHINE_SUPPORTS_SAVE ) // distributed by Cardinal Amusements Products (a division of Epos Corporation)
+GAME( 1985, strtheata, strtheat, strtheat,  strtheat, dkong_state, init_strtheat, ROT270, "Epos Corporation", "Street Heat (set 2, older?)", MACHINE_SUPPORTS_SAVE ) // distributed by Cardinal Amusements Products (a division of Epos Corporation)

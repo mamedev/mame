@@ -53,13 +53,13 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 
 ***************************************************************************/
 
-PALETTE_DECODER_MEMBER(unico_state, unico_R6G6B6X)
+rgb_t unico_state::unico_R6G6B6X(uint32_t raw)
 {
-	int const red   = (raw >> 24) & 0xFC;
-	int const green = (raw >> 16) & 0xFC;
-	int const blue  = (raw >>  8) & 0xFC;
+	int const red   = (raw >> 24) & 0xfc;
+	int const green = (raw >> 16) & 0xfc;
+	int const blue  = (raw >>  8) & 0xfc;
 
-	return rgb_t(red, green, blue);
+	return rgb_t(red | (red >> 6), green | (green >> 6), blue | (blue >> 6));
 }
 
 /***************************************************************************
@@ -113,15 +113,15 @@ WRITE16_MEMBER(unico_state::spriteram_w)  { COMBINE_DATA(&m_spriteram[offset]); 
 void unico_state::video_start()
 {
 	m_tilemap[0] = &machine().tilemap().create(
-			*m_gfxdecode, tilemap_get_info_delegate(FUNC(unico_state::get_tile_info),this),TILEMAP_SCAN_ROWS,
+			*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(unico_state::get_tile_info)), TILEMAP_SCAN_ROWS,
 			16,16,  0x40, 0x40);
 
 	m_tilemap[1] = &machine().tilemap().create(
-			*m_gfxdecode, tilemap_get_info_delegate(FUNC(unico_state::get_tile_info),this),TILEMAP_SCAN_ROWS,
+			*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(unico_state::get_tile_info)), TILEMAP_SCAN_ROWS,
 			16,16,  0x40, 0x40);
 
 	m_tilemap[2] = &machine().tilemap().create(
-			*m_gfxdecode, tilemap_get_info_delegate(FUNC(unico_state::get_tile_info),this),TILEMAP_SCAN_ROWS,
+			*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(unico_state::get_tile_info)), TILEMAP_SCAN_ROWS,
 			16,16,  0x40, 0x40);
 
 	m_tilemap[0]->set_user_data(&m_vram[0x8000/2]);

@@ -6,7 +6,10 @@
  */
 
 #include "nld_74161.h"
-#include "../nl_base.h"
+#include "netlist/nl_base.h"
+#include "nlid_system.h"
+
+#include <array>
 
 namespace netlist
 {
@@ -31,6 +34,7 @@ namespace netlist
 		, m_last_CLK(*this, "m_last_CLK", 0)
 		, m_Q(*this, {{"QA", "QB", "QC", "QD"}})
 		, m_RCO(*this, "RCO")
+		, m_power_pins(*this)
 		{
 		}
 
@@ -53,6 +57,8 @@ namespace netlist
 
 		object_array_t<logic_output_t, 4> m_Q;
 		logic_output_t m_RCO;
+
+		nld_power_pins m_power_pins;
 	};
 
 	NETLIB_OBJECT_DERIVED(74161_dip, 74161)
@@ -66,6 +72,7 @@ namespace netlist
 			register_subalias("5", m_C);
 			register_subalias("6", m_D);
 			register_subalias("7", m_ENABLEP);
+			register_subalias("8", "GND");
 
 			register_subalias("9", m_LOADQ);
 			register_subalias("10", m_ENABLET);
@@ -74,6 +81,7 @@ namespace netlist
 			register_subalias("13", m_Q[1]);
 			register_subalias("14", m_Q[0]);
 			register_subalias("15", m_RCO);
+			register_subalias("16", "VCC");
 
 		}
 	};
@@ -85,7 +93,7 @@ namespace netlist
 	}
 
 	// FIXME: Timing
-	static constexpr netlist_time delay[4] =
+	static constexpr const std::array<netlist_time, 4> delay =
 	{
 			NLTIME_FROM_NS(40),
 			NLTIME_FROM_NS(40),
@@ -126,8 +134,8 @@ namespace netlist
 		m_RCO.push(tRippleCarryOut, NLTIME_FROM_NS(20)); //FIXME
 	}
 
-	NETLIB_DEVICE_IMPL(74161)
-	NETLIB_DEVICE_IMPL(74161_dip)
+	NETLIB_DEVICE_IMPL(74161, "TTL_74161", "+A,+B,+C,+D,+CLRQ,+LOADQ,+CLK,+ENABLEP,+ENABLET,@VCC,@GND")
+	NETLIB_DEVICE_IMPL(74161_dip, "TTL_74161_DIP", "")
 
 	} //namespace devices
 } // namespace netlist

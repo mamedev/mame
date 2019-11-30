@@ -6,6 +6,7 @@
 #define MAME_INCLUDES_NEXT_H
 
 #include "cpu/m68000/m68000.h"
+#include "imagedev/floppy.h"
 #include "machine/nscsi_bus.h"
 #include "machine/mccs1850.h"
 #include "machine/8530scc.h"
@@ -57,7 +58,7 @@ public:
 private:
 	required_device<cpu_device> maincpu;
 	required_device<mccs1850_device> rtc;
-	required_device<scc8530_t> scc;
+	required_device<scc8530_legacy_device> scc;
 	required_device<nextkbd_device> keyboard;
 	required_device<nscsi_bus_device> scsibus;
 	required_device<ncr5390_device> scsi;
@@ -170,10 +171,10 @@ private:
 		DMA_BUSEXC       = 0x10
 	};
 
-	static const char *dma_targets[0x20];
-	static const int dma_irqs[0x20];
-	static const bool dma_has_saved[0x20];
-	static const int scsi_clocks[4];
+	static char const *const dma_targets[0x20];
+	static int const dma_irqs[0x20];
+	static bool const dma_has_saved[0x20];
+	static int const scsi_clocks[4];
 
 	dma_slot dma_slots[0x20];
 	uint32_t esp;

@@ -349,7 +349,7 @@ void cv1k_state::cv1k_map(address_map &map)
 	map(0x10000000, 0x10000007).rw(FUNC(cv1k_state::flash_io_r), FUNC(cv1k_state::flash_io_w));
 	map(0x10400000, 0x10400007).w("ymz770", FUNC(ymz770_device::write));
 	map(0x10C00000, 0x10C00007).rw(FUNC(cv1k_state::serial_rtc_eeprom_r), FUNC(cv1k_state::serial_rtc_eeprom_w));
-//  AM_RANGE(0x18000000, 0x18000057) // blitter, installed on reset
+//  map(0x18000000, 0x18000057) // blitter, installed on reset
 	map(0xf0000000, 0xf0ffffff).ram(); // mem mapped cache (sh3 internal?)
 }
 
@@ -360,7 +360,7 @@ void cv1k_state::cv1k_d_map(address_map &map)
 	map(0x10000000, 0x10000007).rw(FUNC(cv1k_state::flash_io_r), FUNC(cv1k_state::flash_io_w));
 	map(0x10400000, 0x10400007).w("ymz770", FUNC(ymz770_device::write));
 	map(0x10C00000, 0x10C00007).rw(FUNC(cv1k_state::serial_rtc_eeprom_r), FUNC(cv1k_state::serial_rtc_eeprom_w));
-//  AM_RANGE(0x18000000, 0x18000057) // blitter, installed on reset
+//  map(0x18000000, 0x18000057) // blitter, installed on reset
 	map(0xf0000000, 0xf0ffffff).ram(); // mem mapped cache (sh3 internal?)
 }
 
@@ -451,75 +451,73 @@ INPUT_PORTS_END
 void cv1k_state::machine_reset()
 {
 	m_blitter->set_rambase (reinterpret_cast<uint16_t *>(m_ram.target()));
-	m_blitter->set_cpu_device (m_maincpu);
 	m_blitter->set_is_unsafe(machine().root_device().ioport(":BLITCFG")->read());
 	m_blitter->install_handlers( 0x18000000, 0x18000057 );
 	m_blitter->reset();
 }
 
-MACHINE_CONFIG_START(cv1k_state::cv1k)
-
+void cv1k_state::cv1k(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", SH3BE, 12.8_MHz_XTAL*8) // 102.4MHz
-	MCFG_SH4_MD0(0)  // none of this is verified
-	MCFG_SH4_MD1(0)  // (the sh3 is different to the sh4 anyway, should be changed)
-	MCFG_SH4_MD2(0)
-	MCFG_SH4_MD3(0)
-	MCFG_SH4_MD4(0)
-	MCFG_SH4_MD5(1)
-	MCFG_SH4_MD6(0)
-	MCFG_SH4_MD7(1)
-	MCFG_SH4_MD8(0)
-	MCFG_SH4_CLOCK(12.8_MHz_XTAL*8) // 102.4MHz
-	MCFG_DEVICE_PROGRAM_MAP(cv1k_map)
-	MCFG_DEVICE_IO_MAP(cv1k_port)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cv1k_state, irq2_line_hold)
+	SH3BE(config, m_maincpu, 12.8_MHz_XTAL*8); // 102.4MHz
+	m_maincpu->set_md(0, 0);  // none of this is verified
+	m_maincpu->set_md(1, 0);  // (the sh3 is different to the sh4 anyway, should be changed)
+	m_maincpu->set_md(2, 0);
+	m_maincpu->set_md(3, 0);
+	m_maincpu->set_md(4, 0);
+	m_maincpu->set_md(5, 1);
+	m_maincpu->set_md(6, 0);
+	m_maincpu->set_md(7, 1);
+	m_maincpu->set_md(8, 0);
+	m_maincpu->set_sh4_clock(12.8_MHz_XTAL*8); // 102.4MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &cv1k_state::cv1k_map);
+	m_maincpu->set_addrmap(AS_IO, &cv1k_state::cv1k_port);
+	m_maincpu->set_vblank_int("screen", FUNC(cv1k_state::irq2_line_hold)); // irq2 actually asserted at V-sync pulse, not at V-blank
 
-	MCFG_RTC9701_ADD("eeprom")
-	MCFG_SERFLASH_ADD("game")
+	RTC9701(config, m_eeprom);
+	SERFLASH(config, m_serflash, 0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(0x200, 0x200)
-	MCFG_SCREEN_VISIBLE_AREA(0, 0x140-1, 0, 0xf0-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cv1k_state, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(0x200, 0x200);
+	screen.set_visarea(0, 0x140-1, 0, 0xf0-1);
+	screen.set_screen_update(FUNC(cv1k_state::screen_update));
 
-	MCFG_PALETTE_ADD("palette", 0x10000)
+	PALETTE(config, "palette").set_entries(0x10000);
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("ymz770", YMZ770, 16.384_MHz_XTAL)
-	MCFG_SOUND_ROUTE(1, "mono", 1.0) // only Right output used, Left is not connected
+	YMZ770(config, "ymz770", 16.384_MHz_XTAL).add_route(1, "mono", 1.0); // only Right output used, Left is not connected
 
-	MCFG_EPIC12_ADD("blitter")
-	MCFG_EPIC12_SET_MAINRAMSIZE(0x800000)
-MACHINE_CONFIG_END
+	EPIC12(config, m_blitter, 0);
+	m_blitter->set_cpu(m_maincpu);
+	m_blitter->port_r_callback().set_ioport("DSW");
+	m_blitter->set_mainramsize(0x800000);
+}
 
-MACHINE_CONFIG_START(cv1k_state::cv1k_d)
+void cv1k_state::cv1k_d(machine_config &config)
+{
 	cv1k(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_REMOVE("maincpu")
+	SH3BE(config.replace(), m_maincpu, 12.8_MHz_XTAL*8); // 102.4MHz
+	m_maincpu->set_md(0, 0);  // none of this is verified
+	m_maincpu->set_md(1, 0);  // (the sh3 is different to the sh4 anyway, should be changed)
+	m_maincpu->set_md(2, 0);
+	m_maincpu->set_md(3, 0);
+	m_maincpu->set_md(4, 0);
+	m_maincpu->set_md(5, 1);
+	m_maincpu->set_md(6, 0);
+	m_maincpu->set_md(7, 1);
+	m_maincpu->set_md(8, 0);
+	m_maincpu->set_sh4_clock(12.8_MHz_XTAL*8); // 102.4MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &cv1k_state::cv1k_d_map);
+	m_maincpu->set_addrmap(AS_IO, &cv1k_state::cv1k_port);
+	m_maincpu->set_vblank_int("screen", FUNC(cv1k_state::irq2_line_hold));
 
-	MCFG_DEVICE_ADD("maincpu", SH3BE, 12.8_MHz_XTAL*8) // 102.4MHz
-	MCFG_SH4_MD0(0)  // none of this is verified
-	MCFG_SH4_MD1(0)  // (the sh3 is different to the sh4 anyway, should be changed)
-	MCFG_SH4_MD2(0)
-	MCFG_SH4_MD3(0)
-	MCFG_SH4_MD4(0)
-	MCFG_SH4_MD5(1)
-	MCFG_SH4_MD6(0)
-	MCFG_SH4_MD7(1)
-	MCFG_SH4_MD8(0)
-	MCFG_SH4_CLOCK(12.8_MHz_XTAL*8) // 102.4MHz
-	MCFG_DEVICE_PROGRAM_MAP(cv1k_d_map)
-	MCFG_DEVICE_IO_MAP(cv1k_port)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cv1k_state, irq2_line_hold)
-
-	MCFG_DEVICE_MODIFY("blitter")
-	MCFG_EPIC12_SET_MAINRAMSIZE(0x1000000)
-MACHINE_CONFIG_END
+	m_blitter->set_mainramsize(0x1000000);
+}
 
 
 
@@ -902,7 +900,7 @@ void cv1k_state::install_speedups(uint32_t idleramoff, uint32_t idlepc, bool is_
 
 	m_maincpu->sh2drc_add_pcflush(idlepc+2);
 
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000000+m_idleramoffs, 0xc000000+m_idleramoffs+7, read64_delegate(FUNC(cv1k_state::speedup_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000000+m_idleramoffs, 0xc000000+m_idleramoffs+7, read64_delegate(*this, FUNC(cv1k_state::speedup_r)));
 
 	m_maincpu->sh2drc_add_fastram(0x00000000, 0x003fffff, true,  m_rombase);
 

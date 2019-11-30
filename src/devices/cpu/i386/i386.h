@@ -24,13 +24,6 @@
 // mingw has this defined for 32-bit compiles
 #undef i386
 
-
-#define MCFG_I386_SMIACT(_devcb) \
-	downcast<i386_device &>(*device).set_smiact(DEVCB_##_devcb);
-
-#define MCFG_I486_FERR_HANDLER(_devcb) \
-	downcast<i386_device &>(*device).set_ferr(DEVCB_##_devcb);
-
 #define X86_NUM_CPUS        4
 
 class i386_device : public cpu_device, public device_vtlb_interface, public i386_disassembler::config
@@ -40,13 +33,14 @@ public:
 	i386_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
-	template <class Object> devcb_base &set_smiact(Object &&cb) { return m_smiact.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_ferr(Object &&cb) { return m_ferr_handler.set_callback(std::forward<Object>(cb)); }
+	auto smiact() { return m_smiact.bind(); }
+	auto ferr() { return m_ferr_handler.bind(); }
 
 	uint64_t debug_segbase(symbol_table &table, int params, const uint64_t *param);
 	uint64_t debug_seglimit(symbol_table &table, int params, const uint64_t *param);
 	uint64_t debug_segofftovirt(symbol_table &table, int params, const uint64_t *param);
 	uint64_t debug_virttophys(symbol_table &table, int params, const uint64_t *param);
+	uint64_t debug_cacheflush(symbol_table &table, int params, const uint64_t *param);
 
 protected:
 	i386_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_data_width, int program_addr_width, int io_data_width);
@@ -57,10 +51,10 @@ protected:
 	virtual void device_debug_setup() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override { return 1; }
-	virtual uint32_t execute_max_cycles() const override { return 40; }
-	virtual uint32_t execute_input_lines() const override { return 32; }
-	virtual bool execute_input_edge_triggered(int inputnum) const override { return inputnum == INPUT_LINE_NMI; }
+	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 40; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 32; }
+	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum == INPUT_LINE_NMI; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -76,6 +70,29 @@ protected:
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 	virtual int get_mode() const override;
+
+	// cpu-specific system management mode routines
+	virtual void enter_smm();
+	virtual void leave_smm();
+
+	// routines for opcodes whose operation can vary between cpu models
+	// default implementations usually just log an error message
+	virtual void opcode_cpuid();
+	virtual uint64_t opcode_rdmsr(bool &valid_msr);
+	virtual void opcode_wrmsr(uint64_t data, bool &valid_msr);
+	virtual void opcode_invd() { cache_invalidate(); }
+	virtual void opcode_wbinvd() { cache_writeback(); cache_invalidate(); }
+
+	// routines for the cache
+	// default implementation assumes there is no cache
+	virtual void cache_writeback() {}
+	virtual void cache_invalidate() {}
+	virtual void cache_clean() {}
+
+	// routine to access memory
+	virtual u8 mem_pr8(offs_t address) { return macache32->read_byte(address); }
+	virtual u16 mem_pr16(offs_t address) { return macache32->read_word(address); }
+	virtual u32 mem_pr32(offs_t address) { return macache32->read_dword(address); }
 
 	address_space_config m_program_config;
 	address_space_config m_io_config;
@@ -250,12 +267,20 @@ protected:
 
 	uint8_t m_CPL;  // current privilege level
 
+	bool m_auto_clear_RF;
 	uint8_t m_performed_intersegment_jump;
 	uint8_t m_delayed_interrupt_enable;
 
 	uint32_t m_cr[5];       // Control registers
 	uint32_t m_dr[8];       // Debug registers
 	uint32_t m_tr[8];       // Test registers
+
+	memory_passthrough_handler* m_dr_breakpoints[4];
+	int m_notifier;
+
+	//386 Debug Register change handlers.
+	inline void dri_changed();
+	inline void dr7_changed(uint32_t old_val, uint32_t new_val);
 
 	I386_SYS_TABLE m_gdtr;    // Global Descriptor Table Register
 	I386_SYS_TABLE m_idtr;    // Interrupt Descriptor Table Register
@@ -281,11 +306,10 @@ protected:
 
 	uint8_t m_irq_state;
 	address_space *m_program;
-	std::function<u8 (offs_t)> m_pr8;
-	std::function<u16 (offs_t)> m_pr16;
-	std::function<u32 (offs_t)> m_pr32;
 	address_space *m_io;
 	uint32_t m_a20_mask;
+	memory_access_cache<1, 0, ENDIANNESS_LITTLE> *macache16;
+	memory_access_cache<2, 0, ENDIANNESS_LITTLE> *macache32;
 
 	int m_cpuid_max_input_value_eax; // Highest CPUID standard function available
 	uint32_t m_cpuid_id0, m_cpuid_id1, m_cpuid_id2;
@@ -367,27 +391,32 @@ protected:
 	void register_state_i386();
 	void register_state_i386_x87();
 	void register_state_i386_x87_xmm();
-	inline uint32_t i386_translate(int segment, uint32_t ip, int rwn);
+	uint32_t i386_translate(int segment, uint32_t ip, int rwn);
 	inline vtlb_entry get_permissions(uint32_t pte, int wp);
 	bool i386_translate_address(int intention, offs_t *address, vtlb_entry *entry);
-	inline bool translate_address(int pl, int type, uint32_t *address, uint32_t *error);
-	inline void CHANGE_PC(uint32_t pc);
+	bool translate_address(int pl, int type, uint32_t *address, uint32_t *error);
+	void CHANGE_PC(uint32_t pc);
 	inline void NEAR_BRANCH(int32_t offs);
 	inline uint8_t FETCH();
 	inline uint16_t FETCH16();
 	inline uint32_t FETCH32();
-	inline uint8_t READ8(uint32_t ea);
-	inline uint16_t READ16(uint32_t ea);
-	inline uint32_t READ32(uint32_t ea);
-	inline uint64_t READ64(uint32_t ea);
-	inline uint8_t READ8PL0(uint32_t ea);
-	inline uint16_t READ16PL0(uint32_t ea);
-	inline uint32_t READ32PL0(uint32_t ea);
+	inline uint8_t READ8(uint32_t ea) { return READ8PL(ea, m_CPL); }
+	inline uint16_t READ16(uint32_t ea) { return READ16PL(ea, m_CPL); }
+	inline uint32_t READ32(uint32_t ea) { return READ32PL(ea, m_CPL); }
+	inline uint64_t READ64(uint32_t ea) { return READ64PL(ea, m_CPL); }
+	virtual uint8_t READ8PL(uint32_t ea, uint8_t privilege);
+	virtual uint16_t READ16PL(uint32_t ea, uint8_t privilege);
+	virtual uint32_t READ32PL(uint32_t ea, uint8_t privilege);
+	virtual uint64_t READ64PL(uint32_t ea, uint8_t privilege);
 	inline void WRITE_TEST(uint32_t ea);
-	inline void WRITE8(uint32_t ea, uint8_t value);
-	inline void WRITE16(uint32_t ea, uint16_t value);
-	inline void WRITE32(uint32_t ea, uint32_t value);
-	inline void WRITE64(uint32_t ea, uint64_t value);
+	inline void WRITE8(uint32_t ea, uint8_t value) { WRITE8PL(ea, m_CPL, value); }
+	inline void WRITE16(uint32_t ea, uint16_t value) { WRITE16PL(ea, m_CPL, value); }
+	inline void WRITE32(uint32_t ea, uint32_t value) { WRITE32PL(ea, m_CPL, value); }
+	inline void WRITE64(uint32_t ea, uint64_t value) { WRITE64PL(ea, m_CPL, value); }
+	virtual void WRITE8PL(uint32_t ea, uint8_t privilege, uint8_t value);
+	virtual void WRITE16PL(uint32_t ea, uint8_t privilege, uint16_t value);
+	virtual void WRITE32PL(uint32_t ea, uint8_t privilege, uint32_t value);
+	virtual void WRITE64PL(uint32_t ea, uint8_t privilege, uint64_t value);
 	inline uint8_t OR8(uint8_t dst, uint8_t src);
 	inline uint16_t OR16(uint16_t dst, uint16_t src);
 	inline uint32_t OR32(uint32_t dst, uint32_t src);
@@ -421,18 +450,10 @@ protected:
 	inline void check_ioperm(offs_t port, uint8_t mask);
 	inline uint8_t READPORT8(offs_t port);
 	inline void WRITEPORT8(offs_t port, uint8_t value);
-	inline uint16_t READPORT16(offs_t port);
-	inline void WRITEPORT16(offs_t port, uint16_t value);
-	inline uint32_t READPORT32(offs_t port);
-	inline void WRITEPORT32(offs_t port, uint32_t value);
-	uint64_t pentium_msr_read(uint32_t offset,uint8_t *valid_msr);
-	void pentium_msr_write(uint32_t offset, uint64_t data, uint8_t *valid_msr);
-	uint64_t p6_msr_read(uint32_t offset,uint8_t *valid_msr);
-	void p6_msr_write(uint32_t offset, uint64_t data, uint8_t *valid_msr);
-	uint64_t piv_msr_read(uint32_t offset,uint8_t *valid_msr);
-	void piv_msr_write(uint32_t offset, uint64_t data, uint8_t *valid_msr);
-	inline uint64_t MSR_READ(uint32_t offset,uint8_t *valid_msr);
-	inline void MSR_WRITE(uint32_t offset, uint64_t data, uint8_t *valid_msr);
+	virtual uint16_t READPORT16(offs_t port);
+	virtual void WRITEPORT16(offs_t port, uint16_t value);
+	virtual uint32_t READPORT32(offs_t port);
+	virtual void WRITEPORT32(offs_t port, uint32_t value);
 	uint32_t i386_load_protected_mode_segment(I386_SREG *seg, uint64_t *desc );
 	void i386_load_call_gate(I386_CALL_GATE *gate);
 	void i386_set_descriptor_accessed(uint16_t selector);
@@ -474,7 +495,7 @@ protected:
 	void i386_decode_four_byte38f3();
 	uint8_t read8_debug(uint32_t ea, uint8_t *data);
 	uint32_t i386_get_debug_desc(I386_SREG *seg);
-	inline void CYCLES(int x);
+	void CYCLES(int x);
 	inline void CYCLES_RM(int modrm, int r, int m);
 	uint8_t i386_shift_rotate8(uint8_t modrm, uint32_t value, uint8_t shift);
 	void i386_adc_rm8_r8();
@@ -1492,7 +1513,6 @@ protected:
 	void i386_postload();
 	void i386_common_init();
 	void build_opcode_table(uint32_t features);
-	void pentium_smi();
 	void zero_state();
 	void i386_set_a20_line(int state);
 
@@ -1504,8 +1524,23 @@ class i386sx_device : public i386_device
 public:
 	// construction/destruction
 	i386sx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-};
 
+protected:
+	virtual u8 mem_pr8(offs_t address) override { return macache16->read_byte(address); };
+	virtual u16 mem_pr16(offs_t address) override { return macache16->read_word(address); };
+	virtual u32 mem_pr32(offs_t address) override { return macache16->read_dword(address); };
+
+	virtual uint16_t READ16PL(uint32_t ea, uint8_t privilege) override;
+	virtual uint32_t READ32PL(uint32_t ea, uint8_t privilege) override;
+	virtual uint64_t READ64PL(uint32_t ea, uint8_t privilege) override;
+	virtual void WRITE16PL(uint32_t ea, uint8_t privilege, uint16_t value) override;
+	virtual void WRITE32PL(uint32_t ea, uint8_t privilege, uint32_t value) override;
+	virtual void WRITE64PL(uint32_t ea, uint8_t privilege, uint64_t value) override;
+	virtual uint16_t READPORT16(offs_t port) override;
+	virtual void WRITEPORT16(offs_t port, uint16_t value) override;
+	virtual uint32_t READPORT32(offs_t port) override;
+	virtual void WRITEPORT32(offs_t port, uint32_t value) override;
+};
 
 class i486_device : public i386_device
 {
@@ -1540,8 +1575,22 @@ public:
 protected:
 	pentium_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual bool execute_input_edge_triggered(int inputnum) const override { return inputnum == INPUT_LINE_NMI || inputnum == INPUT_LINE_SMI; }
+	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum == INPUT_LINE_NMI || inputnum == INPUT_LINE_SMI; }
 	virtual void execute_set_input(int inputnum, int state) override;
+	virtual uint64_t opcode_rdmsr(bool &valid_msr) override;
+	virtual void opcode_wrmsr(uint64_t data, bool &valid_msr) override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+};
+
+
+class pentium_mmx_device : public pentium_device
+{
+public:
+	// construction/destruction
+	pentium_mmx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 };
@@ -1566,24 +1615,16 @@ public:
 	pentium_pro_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
+	pentium_pro_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual uint64_t opcode_rdmsr(bool &valid_msr) override;
+	virtual void opcode_wrmsr(uint64_t data, bool &valid_msr) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 };
 
 
-class pentium_mmx_device : public pentium_device
-{
-public:
-	// construction/destruction
-	pentium_mmx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-};
-
-
-class pentium2_device : public pentium_device
+class pentium2_device : public pentium_pro_device
 {
 public:
 	// construction/destruction
@@ -1595,23 +1636,11 @@ protected:
 };
 
 
-class pentium3_device : public pentium_device
+class pentium3_device : public pentium_pro_device
 {
 public:
 	// construction/destruction
 	pentium3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-};
-
-
-class athlonxp_device : public pentium_device
-{
-public:
-	// construction/destruction
-	athlonxp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual void device_start() override;
@@ -1626,6 +1655,8 @@ public:
 	pentium4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
+	virtual uint64_t opcode_rdmsr(bool &valid_msr) override;
+	virtual void opcode_wrmsr(uint64_t data, bool &valid_msr) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 };
@@ -1636,12 +1667,11 @@ DECLARE_DEVICE_TYPE(I386SX,      i386sx_device)
 DECLARE_DEVICE_TYPE(I486,        i486_device)
 DECLARE_DEVICE_TYPE(I486DX4,     i486dx4_device)
 DECLARE_DEVICE_TYPE(PENTIUM,     pentium_device)
+DECLARE_DEVICE_TYPE(PENTIUM_MMX, pentium_mmx_device)
 DECLARE_DEVICE_TYPE(MEDIAGX,     mediagx_device)
 DECLARE_DEVICE_TYPE(PENTIUM_PRO, pentium_pro_device)
-DECLARE_DEVICE_TYPE(PENTIUM_MMX, pentium_mmx_device)
 DECLARE_DEVICE_TYPE(PENTIUM2,    pentium2_device)
 DECLARE_DEVICE_TYPE(PENTIUM3,    pentium3_device)
-DECLARE_DEVICE_TYPE(ATHLONXP,    athlonxp_device)
 DECLARE_DEVICE_TYPE(PENTIUM4,    pentium4_device)
 
 #endif // MAME_CPU_I386_I386_H

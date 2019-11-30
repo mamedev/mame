@@ -16,7 +16,9 @@
 
 #include <unordered_map>
 
+
 namespace ui {
+
 class menu_slot_devices : public menu
 {
 public:

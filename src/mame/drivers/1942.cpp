@@ -70,7 +70,7 @@ correctly.
 #include "screen.h"
 #include "speaker.h"
 
-#include "netlist/devices/net_lib.h"
+#include "audio/nl_1942.h"
 
 namespace {
 
@@ -87,84 +87,6 @@ constexpr XTAL AUDIO_CLOCK_1942P(MASTER_CLOCK_1942P/16);
 
 } // anonymous namespace
 
-#define NLFILT(RA, R1, C1, R2) \
-	NET_C(RA.1, V5)             \
-	NET_C(RA.2, R1.1)           \
-	NET_C(R1.2, GND)            \
-	NET_C(R1.1, C1.1)           \
-	NET_C(C1.2, R2.1)
-
-static NETLIST_START(nl_1942)
-
-	/* Standard stuff */
-
-	SOLVER(Solver, 48000)
-	ANALOG_INPUT(V5, 5)
-	PARAM(Solver.ACCURACY, 1e-6)
-	PARAM(Solver.GS_LOOPS, 6)
-	PARAM(Solver.SOR_FACTOR, 1.0)
-	//PARAM(Solver.DYNAMIC_TS, 1)
-	//PARAM(Solver.LTE, 5e-8)
-
-	/* AY 8910 internal resistors */
-
-	RES(R_AY1_1, 1000);
-	RES(R_AY1_2, 1000);
-	RES(R_AY1_3, 1000);
-	RES(R_AY2_1, 1000);
-	RES(R_AY2_2, 1000);
-	RES(R_AY2_3, 1000);
-
-	RES(R2, 220000)
-	RES(R3, 220000)
-	RES(R4, 220000)
-	RES(R5, 220000)
-	RES(R6, 220000)
-	RES(R7, 220000)
-
-	RES(R11, 10000)
-	RES(R12, 10000)
-	RES(R13, 10000)
-	RES(R14, 10000)
-	RES(R15, 10000)
-	RES(R16, 10000)
-
-	CAP(CC7, 10e-6)
-	CAP(CC8, 10e-6)
-	CAP(CC9, 10e-6)
-	CAP(CC10, 10e-6)
-	CAP(CC11, 10e-6)
-	CAP(CC12, 10e-6)
-
-	NLFILT(R_AY2_3, R13, CC7, R2)
-	NLFILT(R_AY2_2, R15, CC8, R3)
-	NLFILT(R_AY2_1, R11, CC9, R4)
-
-	NLFILT(R_AY1_3, R12, CC10, R5)
-	NLFILT(R_AY1_2, R14, CC11, R6)
-	NLFILT(R_AY1_1, R16, CC12, R7)
-
-	POT(VR, 2000)
-	NET_C(VR.3, GND)
-
-	NET_C(R2.2, VR.1)
-	NET_C(R3.2, VR.1)
-	NET_C(R4.2, VR.1)
-	NET_C(R5.2, VR.1)
-	NET_C(R6.2, VR.1)
-	NET_C(R7.2, VR.1)
-
-	CAP(CC6, 10e-6)
-	RES(R1, 100000)
-
-	NET_C(CC6.1, VR.2)
-	NET_C(CC6.2, R1.1)
-	CAP(CC3, 220e-6)
-	NET_C(R1.2, CC3.1)
-	NET_C(CC3.2, GND)
-
-NETLIST_END()
-
 WRITE8_MEMBER(_1942_state::_1942_bankswitch_w)
 {
 	membank("bank1")->set_entry(data & 0x03);
@@ -175,10 +97,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(_1942_state::_1942_scanline)
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7);   /* RST 10h - vblank */
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7);   /* Z80 - RST 10h - vblank */
 
 	if(scanline == 0) // unknown irq event, presumably vblank-in or a periodic one (writes to the soundlatch and drives freeze dip-switch)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf);   /* RST 08h */
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf);   /* Z80 - RST 08h */
 }
 
 
@@ -225,20 +147,20 @@ void _1942p_state::_1942p_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("bank1");
 
-	map(0xd000, 0xd7ff).ram().w(FUNC(_1942_state::_1942_fgvideoram_w)).share("fg_videoram");
-	map(0xd800, 0xdbff).ram().w(FUNC(_1942_state::_1942_bgvideoram_w)).share("bg_videoram");
+	map(0xd000, 0xd7ff).ram().w(FUNC(_1942p_state::_1942_fgvideoram_w)).share("fg_videoram");
+	map(0xd800, 0xdbff).ram().w(FUNC(_1942p_state::_1942_bgvideoram_w)).share("bg_videoram");
 
 	map(0xe000, 0xefff).ram();
 
 	map(0xce00, 0xcfff).ram().share("spriteram");
 
-	map(0xdc02, 0xdc03).w(FUNC(_1942_state::_1942_scroll_w));
-	map(0xc804, 0xc804).w(FUNC(_1942_state::_1942_c804_w));
-	map(0xc805, 0xc805).w(FUNC(_1942_state::_1942_palette_bank_w));
+	map(0xdc02, 0xdc03).w(FUNC(_1942p_state::_1942_scroll_w));
+	map(0xc804, 0xc804).w(FUNC(_1942p_state::_1942_c804_w));
+	map(0xc805, 0xc805).w(FUNC(_1942p_state::_1942_palette_bank_w));
 
 	map(0xf000, 0xf3ff).ram().w(FUNC(_1942p_state::_1942p_palette_w)).share("protopal");
 
-	map(0xf400, 0xf400).w(FUNC(_1942_state::_1942_bankswitch_w));
+	map(0xf400, 0xf400).w(FUNC(_1942p_state::_1942_bankswitch_w));
 	map(0xf500, 0xf500).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xf600, 0xf600).w(FUNC(_1942p_state::_1942p_f600_w));
 
@@ -563,24 +485,23 @@ void _1942_state::machine_reset()
 	m_scroll[1] = 0;
 }
 
-MACHINE_CONFIG_START(_1942_state::_1942)
-
+void _1942_state::_1942(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_CPU_CLOCK)    /* 4 MHz ??? */
-	MCFG_DEVICE_PROGRAM_MAP(_1942_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", _1942_state, _1942_scanline, "screen", 0, 1)
+	Z80(config, m_maincpu, MAIN_CPU_CLOCK);    /* 4 MHz ??? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &_1942_state::_1942_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, SOUND_CPU_CLOCK)  /* 3 MHz ??? */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(_1942_state, irq0_line_hold, 4*60)
+	TIMER(config, "scantimer").configure_scanline(FUNC(_1942_state::_1942_scanline), "screen", 0, 1);
+
+	Z80(config, m_audiocpu, SOUND_CPU_CLOCK);  /* 3 MHz ??? */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &_1942_state::sound_map);
+	m_audiocpu->set_periodic_int(FUNC(_1942_state::irq0_line_hold), attotime::from_hz(4*60));
 
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_1942)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_1942);
 
-	MCFG_PALETTE_ADD(m_palette, 64*4+4*32*8+16*16)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256)
-	MCFG_PALETTE_INIT_OWNER(_1942_state, 1942)
+	PALETTE(config, m_palette, FUNC(_1942_state::_1942_palette), 64*4+4*32*8+16*16, 256);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
@@ -595,61 +516,55 @@ MACHINE_CONFIG_START(_1942_state::_1942)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ay1", AY8910, AUDIO_CLOCK)  /* 1.5 MHz */
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_RESISTOR_OUTPUT)
-	MCFG_AY8910_RES_LOADS(10000.0, 10000.0, 10000.0)
+	ay8910_device &ay1(AY8910(config, "ay1", AUDIO_CLOCK));  /* 1.5 MHz */
+	ay1.set_flags(AY8910_RESISTOR_OUTPUT);
+	ay1.set_resistors_load(10000.0, 10000.0, 10000.0);
+	ay1.add_route(0, "snd_nl", 1.0, 0);
+	ay1.add_route(1, "snd_nl", 1.0, 1);
+	ay1.add_route(2, "snd_nl", 1.0, 2);
 
-	MCFG_SOUND_ROUTE(0, "snd_nl", 1.0, 0)
-	MCFG_SOUND_ROUTE(1, "snd_nl", 1.0, 1)
-	MCFG_SOUND_ROUTE(2, "snd_nl", 1.0, 2)
-
-	MCFG_DEVICE_ADD("ay2", AY8910, AUDIO_CLOCK)  /* 1.5 MHz */
-	MCFG_AY8910_OUTPUT_TYPE(AY8910_RESISTOR_OUTPUT)
-	MCFG_AY8910_RES_LOADS(10000.0, 10000.0, 10000.0)
-
-	MCFG_SOUND_ROUTE(0, "snd_nl", 1.0, 3)
-	MCFG_SOUND_ROUTE(1, "snd_nl", 1.0, 4)
-	MCFG_SOUND_ROUTE(2, "snd_nl", 1.0, 5)
+	ay8910_device &ay2(AY8910(config, "ay2", AUDIO_CLOCK));  /* 1.5 MHz */
+	ay2.set_flags(AY8910_RESISTOR_OUTPUT);
+	ay2.set_resistors_load(10000.0, 10000.0, 10000.0);
+	ay2.add_route(0, "snd_nl", 1.0, 3);
+	ay2.add_route(1, "snd_nl", 1.0, 4);
+	ay2.add_route(2, "snd_nl", 1.0, 5);
 
 	/* NETLIST configuration using internal AY8910 resistor values */
 
 	/* Minimize resampling between ay8910 and netlist */
-	MCFG_DEVICE_ADD("snd_nl", NETLIST_SOUND, AUDIO_CLOCK / 8 / 2)
-	MCFG_NETLIST_SETUP(nl_1942)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 5.0)
-	MCFG_NETLIST_STREAM_INPUT("snd_nl", 0, "R_AY1_1.R")
-	MCFG_NETLIST_STREAM_INPUT("snd_nl", 1, "R_AY1_2.R")
-	MCFG_NETLIST_STREAM_INPUT("snd_nl", 2, "R_AY1_3.R")
-	MCFG_NETLIST_STREAM_INPUT("snd_nl", 3, "R_AY2_1.R")
-	MCFG_NETLIST_STREAM_INPUT("snd_nl", 4, "R_AY2_2.R")
-	MCFG_NETLIST_STREAM_INPUT("snd_nl", 5, "R_AY2_3.R")
+	NETLIST_SOUND(config, "snd_nl", AUDIO_CLOCK / 8 / 2)
+		.set_source(NETLIST_NAME(1942))
+		.add_route(ALL_OUTPUTS, "mono", 5.0);
+	NETLIST_STREAM_INPUT(config, "snd_nl:cin0", 0, "R_AY1_1.R");
+	NETLIST_STREAM_INPUT(config, "snd_nl:cin1", 1, "R_AY1_2.R");
+	NETLIST_STREAM_INPUT(config, "snd_nl:cin2", 2, "R_AY1_3.R");
+	NETLIST_STREAM_INPUT(config, "snd_nl:cin3", 3, "R_AY2_1.R");
+	NETLIST_STREAM_INPUT(config, "snd_nl:cin4", 4, "R_AY2_2.R");
+	NETLIST_STREAM_INPUT(config, "snd_nl:cin5", 5, "R_AY2_3.R");
 
-	MCFG_NETLIST_STREAM_OUTPUT("snd_nl", 0, "R1.1")
-	//MCFG_NETLIST_STREAM_OUTPUT("snd_nl", 0, "VR.2")
-	MCFG_NETLIST_ANALOG_MULT_OFFSET(70000.0, 0.0)
-
-MACHINE_CONFIG_END
+	NETLIST_STREAM_OUTPUT(config, "snd_nl:cout0", 0, "R1.1").set_mult_offset(70000.0, 0.0);
+	//NETLIST_STREAM_OUTPUT(config, "snd_nl:cout0", 0, "VR.2");
+}
 
 
-MACHINE_CONFIG_START(_1942p_state::_1942p)
-
+void _1942p_state::_1942p(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_CPU_CLOCK_1942P)    /* 4 MHz - verified on PCB */
-	MCFG_DEVICE_PROGRAM_MAP(_1942p_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", _1942_state,  irq0_line_hold) // note, powerups won't move down the screen with the original '1942' logic.
+	Z80(config, m_maincpu, MAIN_CPU_CLOCK_1942P);    /* 4 MHz - verified on PCB */
+	m_maincpu->set_addrmap(AS_PROGRAM, &_1942p_state::_1942p_map);
+	m_maincpu->set_vblank_int("screen", FUNC(_1942p_state::irq0_line_hold)); // note, powerups won't move down the screen with the original '1942' logic.
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, SOUND_CPU_CLOCK_1942P)  /* 4 MHz - verified on PCB */
-	MCFG_DEVICE_PROGRAM_MAP(_1942p_sound_map)
-	MCFG_DEVICE_IO_MAP(_1942p_sound_io)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(_1942_state, irq0_line_hold, 4*60)
+	Z80(config, m_audiocpu, SOUND_CPU_CLOCK_1942P);  /* 4 MHz - verified on PCB */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &_1942p_state::_1942p_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &_1942p_state::_1942p_sound_io);
+	m_audiocpu->set_periodic_int(FUNC(_1942p_state::irq0_line_hold), attotime::from_hz(4*60));
 
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_1942p)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_1942p);
 
-	MCFG_PALETTE_ADD(m_palette, 0x500)
-	MCFG_PALETTE_INDIRECT_ENTRIES(0x400)
-	MCFG_PALETTE_INIT_OWNER(_1942p_state, 1942p)
+	PALETTE(config, m_palette, FUNC(_1942p_state::_1942p_palette), 0x500, 0x400);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
@@ -659,7 +574,6 @@ MACHINE_CONFIG_START(_1942p_state::_1942p)
 	screen.set_screen_update(FUNC(_1942p_state::screen_update));
 	screen.set_palette(m_palette);
 
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -668,7 +582,7 @@ MACHINE_CONFIG_START(_1942p_state::_1942p)
 
 	AY8910(config, "ay1", AUDIO_CLOCK_1942P).add_route(ALL_OUTPUTS, "mono", 0.25); // 1.25 MHz - verified on PCB
 	AY8910(config, "ay2", AUDIO_CLOCK_1942P).add_route(ALL_OUTPUTS, "mono", 0.25); // 1.25 MHz - verified on PCB
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************

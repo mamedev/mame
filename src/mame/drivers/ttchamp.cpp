@@ -645,32 +645,30 @@ INTERRUPT_GEN_MEMBER(ttchamp_state::irq)/* right? */
 	device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-MACHINE_CONFIG_START(ttchamp_state::ttchamp)
+void ttchamp_state::ttchamp(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", V30, 8000000)
-	MCFG_DEVICE_PROGRAM_MAP(ttchamp_map)
-	MCFG_DEVICE_IO_MAP(ttchamp_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ttchamp_state,  irq)
+	V30(config, m_maincpu, 8000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ttchamp_state::ttchamp_map);
+	m_maincpu->set_addrmap(AS_IO, &ttchamp_state::ttchamp_io);
+	m_maincpu->set_vblank_int("screen", FUNC(ttchamp_state::irq));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(1024,1024)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
-	MCFG_SCREEN_UPDATE_DRIVER(ttchamp_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_PALETTE_ADD("palette", 0x400)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(1024,1024);
+	screen.set_visarea(0, 320-1, 0, 200-1);
+	screen.set_screen_update(FUNC(ttchamp_state::screen_update));
+	screen.set_palette(m_palette);
+	PALETTE(config, m_palette).set_entries(0x400);
 
 	NVRAM(config, "backram", nvram_device::DEFAULT_ALL_0);
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 8000000/8, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki", 8000000/8, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 ROM_START( ttchamp )
 	ROM_REGION16_LE( 0x200000, "maincpu", 0 )

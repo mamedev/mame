@@ -1087,6 +1087,12 @@ void upd7810_device::MOV_TM1_A()
 	TM1 = A;
 }
 
+/* 4d e5: 0100 1101 1110 0101 (7807 only) */
+void upd7810_device::MOV_MT_A()
+{
+	MT = A;
+}
+
 /* 4d e8: 0100 1101 1110 1000 */
 void upd7810_device::MOV_ZCM_A()
 {

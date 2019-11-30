@@ -178,7 +178,7 @@ struct ioport_port_live;
 class running_machine;
 
 // declared in mconfig.h
-namespace emu { namespace detail { struct machine_config_replace; } }
+namespace emu { namespace detail { class machine_config_replace; } }
 class machine_config;
 
 // declared in natkeyboard.h

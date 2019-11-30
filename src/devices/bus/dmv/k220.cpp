@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco
+// thanks-to:rfka01
 /***************************************************************************
 
     NCR DMV K220 Diagnostic module
@@ -137,11 +138,15 @@ dmv_k220_device::dmv_k220_device(const machine_config &mconfig, const char *tag,
 
 void dmv_k220_device::device_start()
 {
-	address_space &space = machine().device<cpu_device>("maincpu")->space(AS_IO);
-	space.install_readwrite_handler(0x08, 0x0b, read8_delegate(FUNC(pit8253_device::read), &(*m_pit)), write8_delegate(FUNC(pit8253_device::write), &(*m_pit)), 0);
-	space.install_readwrite_handler(0x0c, 0x0f, read8_delegate(FUNC(i8255_device::read), &(*m_ppi)), write8_delegate(FUNC(i8255_device::write), &(*m_ppi)), 0);
+	address_space &space = iospace();
+	space.install_readwrite_handler(0x08, 0x0b, read8sm_delegate(*m_pit, FUNC(pit8253_device::read)), write8sm_delegate(*m_pit, FUNC(pit8253_device::write)), 0);
+	space.install_readwrite_handler(0x0c, 0x0f, read8sm_delegate(*m_ppi, FUNC(i8255_device::read)), write8sm_delegate(*m_ppi, FUNC(i8255_device::write)), 0);
 
 	m_digits.resolve();
+
+	// register for state saving
+	save_item(NAME(m_portc));
+	save_pointer(NAME(m_ram->base()), m_ram->bytes());
 }
 
 //-------------------------------------------------
@@ -151,6 +156,8 @@ void dmv_k220_device::device_start()
 void dmv_k220_device::device_reset()
 {
 	// active the correct layout
+	// FIXME: this is a very bad idea - you have no idea what view the user has loaded externally or from other devices,
+	// and it won't allow selected view to be saved/restored correctly
 	machine().render().first_target()->set_view(1);
 }
 
@@ -158,18 +165,19 @@ void dmv_k220_device::device_reset()
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(dmv_k220_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, dmv_k220_device, porta_w))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("SWITCH"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, dmv_k220_device, portc_w))
+void dmv_k220_device::device_add_mconfig(machine_config &config)
+{
+	I8255(config, m_ppi);
+	m_ppi->out_pa_callback().set(FUNC(dmv_k220_device::porta_w));
+	m_ppi->in_pb_callback().set_ioport("SWITCH");
+	m_ppi->out_pc_callback().set(FUNC(dmv_k220_device::portc_w));
 
-	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL(1'000'000))  // CLK1
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, dmv_k220_device, write_out0))
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, dmv_k220_device, write_out1))
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, dmv_k220_device, write_out2))
-MACHINE_CONFIG_END
+	PIT8253(config, m_pit, 0);
+	m_pit->set_clk<0>(XTAL(1'000'000));  // CLK1
+	m_pit->out_handler<0>().set(FUNC(dmv_k220_device::write_out0));
+	m_pit->out_handler<1>().set(FUNC(dmv_k220_device::write_out1));
+	m_pit->out_handler<2>().set(FUNC(dmv_k220_device::write_out2));
+}
 
 //-------------------------------------------------
 //  input_ports - device-specific input ports

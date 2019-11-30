@@ -1,7 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
+#ifndef MAME_INCLUDES_BIGSTRKB_H
+#define MAME_INCLUDES_BIGSTRKB_H
+
+#pragma once
 
 #include "emupal.h"
+#include "tilemap.h"
 
 class bigstrkb_state : public driver_device
 {
@@ -16,7 +21,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
 		m_vidreg1(*this, "vidreg1"),
-		m_vidreg2(*this, "vidreg2") { }
+		m_vidreg2(*this, "vidreg2")
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -49,3 +55,5 @@ public:
 	void bigstrkb(machine_config &config);
 	void bigstrkb_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_BIGSTRKB_H

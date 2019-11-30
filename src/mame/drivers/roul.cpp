@@ -87,22 +87,23 @@ public:
 
 	void roul(machine_config &config);
 
+protected:
+	virtual void machine_start() override { m_lamps.resolve(); }
+	virtual void video_start() override;
+
 private:
 	DECLARE_READ8_MEMBER(blitter_status_r);
 	DECLARE_WRITE8_MEMBER(blitter_cmd_w);
 	DECLARE_WRITE8_MEMBER(sound_latch_w);
 	DECLARE_WRITE8_MEMBER(ball_w);
 
-	DECLARE_PALETTE_INIT(roul);
+	void roul_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void roul_cpu_io_map(address_map &map);
 	void roul_map(address_map &map);
 	void sound_cpu_io_map(address_map &map);
 	void sound_map(address_map &map);
-
-	virtual void machine_start() override { m_lamps.resolve(); }
-	virtual void video_start() override;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
@@ -118,29 +119,29 @@ private:
 #define VIDEOBUF_SIZE 256*256
 
 
-PALETTE_INIT_MEMBER(roul_state, roul)
+void roul_state::roul_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int bit6, bit7, bit0, bit1, r, g, b;
-	int i;
-
-	for (i = 0; i < 0x20; ++i)
+	uint8_t const *const color_prom = memregion("proms")->base();
+	for (int i = 0; i < 0x20; ++i)
 	{
-		bit7 = (color_prom[0] >> 7) & 0x01;
-		bit6 = (color_prom[0] >> 6) & 0x01;
+		int bit0, bit1;
 
-		bit0 = (color_prom[0] >> 0) & 0x01;
-		bit1 = (color_prom[0] >> 1) & 0x01;
-		b = 0x0e * bit6 + 0x1f * bit7 + 0x43 * bit0 + 0x8f * bit1;
-		bit0 = (color_prom[0] >> 2) & 0x01;
-		bit1 = (color_prom[0] >> 3) & 0x01;
-		g = 0x0e * bit6 + 0x1f * bit7 + 0x43 * bit0 + 0x8f * bit1;
-		bit0 = (color_prom[0] >> 4) & 0x01;
-		bit1 = (color_prom[0] >> 5) & 0x01;
-		r = 0x0e * bit6 + 0x1f * bit7 + 0x43 * bit0 + 0x8f * bit1;
+		int const bit7 = BIT(color_prom[i], 7);
+		int const bit6 = BIT(color_prom[i], 6);
+
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		int const b = 0x0e * bit6 + 0x1f * bit7 + 0x43 * bit0 + 0x8f * bit1;
+
+		bit0 = BIT(color_prom[i], 2);
+		bit1 = BIT(color_prom[i], 3);
+		int const g = 0x0e * bit6 + 0x1f * bit7 + 0x43 * bit0 + 0x8f * bit1;
+
+		bit0 = BIT(color_prom[i], 4);
+		bit1 = BIT(color_prom[i], 5);
+		int const r = 0x0e * bit6 + 0x1f * bit7 + 0x43 * bit0 + 0x8f * bit1;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
-		color_prom++;
 	}
 }
 
@@ -199,7 +200,7 @@ WRITE8_MEMBER(roul_state::blitter_cmd_w)
 
 WRITE8_MEMBER(roul_state::sound_latch_w)
 {
-	m_soundlatch->write(space, 0, data & 0xff);
+	m_soundlatch->write(data & 0xff);
 	m_soundcpu->set_input_line(0, HOLD_LINE);
 }
 
@@ -311,39 +312,37 @@ static INPUT_PORTS_START( roul )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(roul_state::roul)
+void roul_state::roul(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)
-	MCFG_DEVICE_PROGRAM_MAP(roul_map)
-	MCFG_DEVICE_IO_MAP(roul_cpu_io_map)
+	Z80(config, m_maincpu, 4000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &roul_state::roul_map);
+	m_maincpu->set_addrmap(AS_IO, &roul_state::roul_cpu_io_map);
 
-	MCFG_DEVICE_ADD("soundcpu", Z80, 4000000)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_IO_MAP(sound_cpu_io_map)
+	Z80(config, m_soundcpu, 4000000);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &roul_state::sound_map);
+	m_soundcpu->set_addrmap(AS_IO, &roul_state::sound_cpu_io_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(roul_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);
+	screen.set_screen_update(FUNC(roul_state::screen_update));
+	screen.set_palette("palette");
+	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
-	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_PALETTE_INIT_OWNER(roul_state, roul)
+	PALETTE(config, "palette", FUNC(roul_state::roul_palette), 0x100);
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 1000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	AY8910(config, "aysnd", 1000000).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 ROM_START(roul)
 	ROM_REGION( 0x10000, "maincpu", 0 )

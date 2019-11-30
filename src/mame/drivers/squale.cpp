@@ -59,6 +59,7 @@
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
 #include "cpu/m6809/m6809.h"
+#include "imagedev/floppy.h"
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"
 #include "machine/timer.h"
@@ -123,7 +124,7 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER(pia_u75_cb2_w);
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( squale_cart );
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart_load );
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -598,7 +599,7 @@ WRITE_LINE_MEMBER( squale_state::pia_u72_cb2_w )
 	#endif
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( squale_state, squale_cart )
+DEVICE_IMAGE_LOAD_MEMBER( squale_state::cart_load )
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
@@ -780,10 +781,11 @@ void squale_state::machine_reset()
 {
 }
 
-MACHINE_CONFIG_START(squale_state::squale)
+void squale_state::squale(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809, CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(squale_mem)
+	MC6809(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &squale_state::squale_mem);
 
 	/* Cartridge pia */
 	PIA6821(config, m_pia_u72, 0);
@@ -804,42 +806,43 @@ MACHINE_CONFIG_START(squale_state::squale)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("ay8910", AY8910, AY_CLOCK)
+	AY8910(config, m_ay8910, AY_CLOCK);
 	// TODO : Add port I/O handler
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, squale_state, ay_porta_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, squale_state, ay_portb_r))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, squale_state, ay_porta_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, squale_state, ay_portb_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	m_ay8910->port_a_read_callback().set(FUNC(squale_state::ay_porta_r));
+	m_ay8910->port_b_read_callback().set(FUNC(squale_state::ay_portb_r));
+	m_ay8910->port_a_write_callback().set(FUNC(squale_state::ay_porta_w));
+	m_ay8910->port_b_write_callback().set(FUNC(squale_state::ay_portb_w));
+	m_ay8910->add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MCFG_DEVICE_ADD ("ef6850", ACIA6850, 0)
+	ACIA6850(config, m_acia, 0);
 
 	/* screen */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_UPDATE_DEVICE("ef9365", ef9365_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_screen_update("ef9365", FUNC(ef9365_device::screen_update));
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 256-1, 0, 256-1);
 
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
-	MCFG_PALETTE_ADD("palette", 16)
+	PALETTE(config, "palette").set_entries(16);
 
-	MCFG_DEVICE_ADD("ef9365", EF9365, VIDEO_CLOCK)
-	MCFG_EF936X_PALETTE("palette")
-	MCFG_EF936X_BITPLANES_CNT(4);
-	MCFG_EF936X_DISPLAYMODE(DISPLAY_MODE_256x256);
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("squale_sl", squale_state, squale_scanline, "screen", 0, 10)
+	EF9365(config, m_ef9365, VIDEO_CLOCK);
+	m_ef9365->set_palette_tag("palette");
+	m_ef9365->set_nb_bitplanes(4);
+	m_ef9365->set_display_mode(ef9365_device::DISPLAY_MODE_256x256);
+	m_ef9365->irq_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
+
+	TIMER(config, "squale_sl").configure_scanline(FUNC(squale_state::squale_scanline), "screen", 0, 10);
 
 	/* Floppy */
-	MCFG_DEVICE_ADD("wd1770", WD1770, 8_MHz_XTAL)
-	MCFG_FLOPPY_DRIVE_ADD("wd1770:0", squale_floppies, "525qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("wd1770:1", squale_floppies, "525qd", floppy_image_device::default_floppy_formats)
-	MCFG_SOFTWARE_LIST_ADD("flop525_list", "squale")
+	WD1770(config, m_fdc, 8_MHz_XTAL);
+	FLOPPY_CONNECTOR(config, "wd1770:0", squale_floppies, "525qd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "wd1770:1", squale_floppies, "525qd", floppy_image_device::default_floppy_formats);
+	SOFTWARE_LIST(config, "flop525_list").set_original("squale");
 
 	/* Cartridge slot */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_linear_slot, "squale_cart")
-	MCFG_GENERIC_LOAD(squale_state, squale_cart)
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "squale_cart")
-MACHINE_CONFIG_END
+	GENERIC_CARTSLOT(config, "cartslot", generic_linear_slot, "squale_cart").set_device_load(FUNC(squale_state::cart_load));
+	SOFTWARE_LIST(config, "cart_list").set_original("squale_cart");
+}
 
 /* ROM definition */
 ROM_START( squale )

@@ -21,13 +21,13 @@
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1032864">
-				<rom name="(sps1997)championshipmanager2-includingseason96-97updates_disk1.ipf" size="1032864" crc="7cdee4d5" sha1="54eb1f2644f304ff1897caf79f6237c4d9687fbf" offset="0"/>
+				<rom name="(sps1997)championshipmanager2-includingseason96-97updates_disk1.ipf" size="1032864" crc="7cdee4d5" sha1="54eb1f2644f304ff1897caf79f6237c4d9687fbf"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1045332">
-				<rom name="(sps1997)championshipmanager2-includingseason96-97updates_disk2.ipf" size="1045332" crc="3d7db3f7" sha1="8d253509eacee637c293dc058b4612f6be620ce7" offset="0"/>
+				<rom name="(sps1997)championshipmanager2-includingseason96-97updates_disk2.ipf" size="1045332" crc="3d7db3f7" sha1="8d253509eacee637c293dc058b4612f6be620ce7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -43,19 +43,19 @@
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk AGA" />
 			<dataarea name="flop" size="1049180">
-				<rom name="(sps242)coala_datadiskaga.ipf" size="1049180" crc="4eea11cb" sha1="ba37c92d89901e1244790597362c992118fc940c" offset="0"/>
+				<rom name="(sps242)coala_datadiskaga.ipf" size="1049180" crc="4eea11cb" sha1="ba37c92d89901e1244790597362c992118fc940c"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk ECS" />
 			<dataarea name="flop" size="1049180">
-				<rom name="(sps242)coala_datadiskecs.ipf" size="1049180" crc="6db4cc54" sha1="6506666c04371255b52e45fe35a547b4177d9973" offset="0"/>
+				<rom name="(sps242)coala_datadiskecs.ipf" size="1049180" crc="6db4cc54" sha1="6506666c04371255b52e45fe35a547b4177d9973"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Program Disk" />
 			<dataarea name="flop" size="1049180">
-				<rom name="(sps242)coala_programdisk.ipf" size="1049180" crc="60ec0f35" sha1="226951589bef83a368d9961f70d83fbc4d674d35" offset="0"/>
+				<rom name="(sps242)coala_programdisk.ipf" size="1049180" crc="60ec0f35" sha1="226951589bef83a368d9961f70d83fbc4d674d35"/>
 			</dataarea>
 		</part>
 	</software>
@@ -71,19 +71,19 @@
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps1820)epic_disk1.ipf" size="1049612" crc="3d4a26cc" sha1="10cedcd97acf3b8b41fb0a4260422e224f72334e" offset="0"/>
+				<rom name="(sps1820)epic_disk1.ipf" size="1049612" crc="3d4a26cc" sha1="10cedcd97acf3b8b41fb0a4260422e224f72334e"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps1820)epic_disk2.ipf" size="1049612" crc="08091a6c" sha1="e49084dd2f986a025bc06f2a5d6316d2fc412a4d" offset="0"/>
+				<rom name="(sps1820)epic_disk2.ipf" size="1049612" crc="08091a6c" sha1="e49084dd2f986a025bc06f2a5d6316d2fc412a4d"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 3" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps1820)epic_disk3.ipf" size="1049612" crc="d5ede3e8" sha1="c9b31341667c17b6beb45b6b4080e4e58b3f6b31" offset="0"/>
+				<rom name="(sps1820)epic_disk3.ipf" size="1049612" crc="d5ede3e8" sha1="c9b31341667c17b6beb45b6b4080e4e58b3f6b31"/>
 			</dataarea>
 		</part>
 	</software>
@@ -98,7 +98,7 @@
 		<info name="usage" value="Requires ECS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049180">
-				<rom name="(sps2061)f1worldchampionshipedition.ipf" size="1049180" crc="7265c995" sha1="1b89b3e019f8be8f94ec9f2afa0e90ea8f9c8d20" offset="0"/>
+				<rom name="(sps2061)f1worldchampionshipedition.ipf" size="1049180" crc="7265c995" sha1="1b89b3e019f8be8f94ec9f2afa0e90ea8f9c8d20"/>
 			</dataarea>
 		</part>
 	</software>
@@ -114,25 +114,25 @@
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps943)fatman-thecapedconsumer_disk1of4.ipf" size="1049612" crc="14e65eec" sha1="3bcd8b001831893f64378683bbf7d97a78217d30" offset="0"/>
+				<rom name="(sps943)fatman-thecapedconsumer_disk1of4.ipf" size="1049612" crc="14e65eec" sha1="3bcd8b001831893f64378683bbf7d97a78217d30"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps943)fatman-thecapedconsumer_disk2of4.ipf" size="1049612" crc="24ebed6b" sha1="6fbf4707a7682c69db74dc3264ad9341f22c3dcd" offset="0"/>
+				<rom name="(sps943)fatman-thecapedconsumer_disk2of4.ipf" size="1049612" crc="24ebed6b" sha1="6fbf4707a7682c69db74dc3264ad9341f22c3dcd"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 3" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps943)fatman-thecapedconsumer_disk3of4.ipf" size="1049612" crc="dec57b17" sha1="52ad5b8316277bb99418ba5dc60b3c0128837b18" offset="0"/>
+				<rom name="(sps943)fatman-thecapedconsumer_disk3of4.ipf" size="1049612" crc="dec57b17" sha1="52ad5b8316277bb99418ba5dc60b3c0128837b18"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 4" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps943)fatman-thecapedconsumer_disk4of4.ipf" size="1049612" crc="a6c55279" sha1="8ec142eb14f4667aa80e7fdc16a503cf756175ce" offset="0"/>
+				<rom name="(sps943)fatman-thecapedconsumer_disk4of4.ipf" size="1049612" crc="a6c55279" sha1="8ec142eb14f4667aa80e7fdc16a503cf756175ce"/>
 			</dataarea>
 		</part>
 	</software>
@@ -148,13 +148,13 @@
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Data Disk" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps1330)gloomdeluxe_datadisk.ipf" size="1049612" crc="fb9287b6" sha1="6410c550ab20e9adf09d364d52323ba4b00a70d3" offset="0"/>
+				<rom name="(sps1330)gloomdeluxe_datadisk.ipf" size="1049612" crc="fb9287b6" sha1="6410c550ab20e9adf09d364d52323ba4b00a70d3"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Program Disk" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps1330)gloomdeluxe_programdisk.ipf" size="1049612" crc="bff6d892" sha1="4310358ed992038523b4cbbb29f4ef811ba4954e" offset="0"/>
+				<rom name="(sps1330)gloomdeluxe_programdisk.ipf" size="1049612" crc="bff6d892" sha1="4310358ed992038523b4cbbb29f4ef811ba4954e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -170,43 +170,43 @@
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps1569)historyline1914-1918_disk1.ipf" size="1049612" crc="a599bf6e" sha1="9163fcca99e9c249f4e125c6edcba50ee4144724" offset="0"/>
+				<rom name="(sps1569)historyline1914-1918_disk1.ipf" size="1049612" crc="a599bf6e" sha1="9163fcca99e9c249f4e125c6edcba50ee4144724"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps1569)historyline1914-1918_disk2.ipf" size="1049612" crc="38f1caf3" sha1="6e3f8dce16935a7d843e030d190fca682e0bf6f5" offset="0"/>
+				<rom name="(sps1569)historyline1914-1918_disk2.ipf" size="1049612" crc="38f1caf3" sha1="6e3f8dce16935a7d843e030d190fca682e0bf6f5"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 3" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps1569)historyline1914-1918_disk3.ipf" size="1049612" crc="9e59e655" sha1="e7462ccbe2392d60f9e8c1187a2b98245f104b68" offset="0"/>
+				<rom name="(sps1569)historyline1914-1918_disk3.ipf" size="1049612" crc="9e59e655" sha1="e7462ccbe2392d60f9e8c1187a2b98245f104b68"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 4" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps1569)historyline1914-1918_disk4.ipf" size="1049612" crc="1f7cbcda" sha1="77523b93aa33f79641b180674c521b620e83602c" offset="0"/>
+				<rom name="(sps1569)historyline1914-1918_disk4.ipf" size="1049612" crc="1f7cbcda" sha1="77523b93aa33f79641b180674c521b620e83602c"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 5" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps1569)historyline1914-1918_disk5.ipf" size="1049612" crc="467bfb2c" sha1="e90beedb0d8fb7affb87464dc78faed597e62319" offset="0"/>
+				<rom name="(sps1569)historyline1914-1918_disk5.ipf" size="1049612" crc="467bfb2c" sha1="e90beedb0d8fb7affb87464dc78faed597e62319"/>
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 6" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps1569)historyline1914-1918_disk6.ipf" size="1049612" crc="68f082a4" sha1="82425a6f0cae40144b94fb4f539ef7cd2992c041" offset="0"/>
+				<rom name="(sps1569)historyline1914-1918_disk6.ipf" size="1049612" crc="68f082a4" sha1="82425a6f0cae40144b94fb4f539ef7cd2992c041"/>
 			</dataarea>
 		</part>
 		<part name="flop7" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 7" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps1569)historyline1914-1918_disk7.ipf" size="1049612" crc="d0e0a83e" sha1="c4197b068b1ba36e2acb1e5c8ee10edfc97c5776" offset="0"/>
+				<rom name="(sps1569)historyline1914-1918_disk7.ipf" size="1049612" crc="d0e0a83e" sha1="c4197b068b1ba36e2acb1e5c8ee10edfc97c5776"/>
 			</dataarea>
 		</part>
 	</software>
@@ -222,43 +222,43 @@
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049180">
-				<rom name="(sps2700)historyline1914-1918_disk1.ipf" size="1049180" crc="b6daafef" sha1="483659aa12f2f4c0dba1d7b0a09dbd8b7805e30c" offset="0"/>
+				<rom name="(sps2700)historyline1914-1918_disk1.ipf" size="1049180" crc="b6daafef" sha1="483659aa12f2f4c0dba1d7b0a09dbd8b7805e30c"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1049180">
-				<rom name="(sps2700)historyline1914-1918_disk2.ipf" size="1049180" crc="a68d076f" sha1="884f47c990f16fd8fbd7eb70093b1a0b3246c2cd" offset="0"/>
+				<rom name="(sps2700)historyline1914-1918_disk2.ipf" size="1049180" crc="a68d076f" sha1="884f47c990f16fd8fbd7eb70093b1a0b3246c2cd"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 3" />
 			<dataarea name="flop" size="1049180">
-				<rom name="(sps2700)historyline1914-1918_disk3.ipf" size="1049180" crc="ae3b24fa" sha1="4a74c65b8d23c997743ed5f77f606f9e2a2e31fd" offset="0"/>
+				<rom name="(sps2700)historyline1914-1918_disk3.ipf" size="1049180" crc="ae3b24fa" sha1="4a74c65b8d23c997743ed5f77f606f9e2a2e31fd"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 4" />
 			<dataarea name="flop" size="1049180">
-				<rom name="(sps2700)historyline1914-1918_disk4.ipf" size="1049180" crc="4dc1b22d" sha1="2696d68310084907ec6f456b78f7999765f175c9" offset="0"/>
+				<rom name="(sps2700)historyline1914-1918_disk4.ipf" size="1049180" crc="4dc1b22d" sha1="2696d68310084907ec6f456b78f7999765f175c9"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 5" />
 			<dataarea name="flop" size="1049180">
-				<rom name="(sps2700)historyline1914-1918_disk5.ipf" size="1049180" crc="0e77b504" sha1="d678ab560f5f6c7ac48c241b2ba1c69e49559429" offset="0"/>
+				<rom name="(sps2700)historyline1914-1918_disk5.ipf" size="1049180" crc="0e77b504" sha1="d678ab560f5f6c7ac48c241b2ba1c69e49559429"/>
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 6" />
 			<dataarea name="flop" size="1049180">
-				<rom name="(sps2700)historyline1914-1918_disk6.ipf" size="1049180" crc="10921a12" sha1="3f36b5e7fc70ace5374d38527b838ba7bfa27779" offset="0"/>
+				<rom name="(sps2700)historyline1914-1918_disk6.ipf" size="1049180" crc="10921a12" sha1="3f36b5e7fc70ace5374d38527b838ba7bfa27779"/>
 			</dataarea>
 		</part>
 		<part name="flop7" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 7" />
 			<dataarea name="flop" size="1049180">
-				<rom name="(sps2700)historyline1914-1918_disk7.ipf" size="1049180" crc="0e47eec9" sha1="969555c1b2c4ea2b7f57f189913e2a78843fce87" offset="0"/>
+				<rom name="(sps2700)historyline1914-1918_disk7.ipf" size="1049180" crc="0e47eec9" sha1="969555c1b2c4ea2b7f57f189913e2a78843fce87"/>
 			</dataarea>
 		</part>
 	</software>
@@ -274,43 +274,43 @@
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps336)historyline1914-1918_disk1.ipf" size="1049612" crc="fc9e175c" sha1="4318b9148de7c3d2ceb110d6f525157a19f795d7" offset="0"/>
+				<rom name="(sps336)historyline1914-1918_disk1.ipf" size="1049612" crc="fc9e175c" sha1="4318b9148de7c3d2ceb110d6f525157a19f795d7"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps336)historyline1914-1918_disk2.ipf" size="1049612" crc="6564104c" sha1="5eeae5f04e40c13b8628d3b38bbe5e0c9e4a4bc2" offset="0"/>
+				<rom name="(sps336)historyline1914-1918_disk2.ipf" size="1049612" crc="6564104c" sha1="5eeae5f04e40c13b8628d3b38bbe5e0c9e4a4bc2"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 3" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps336)historyline1914-1918_disk3.ipf" size="1049612" crc="41720da0" sha1="800cc7c6e1b1abf923d96e6aff718505a756dca0" offset="0"/>
+				<rom name="(sps336)historyline1914-1918_disk3.ipf" size="1049612" crc="41720da0" sha1="800cc7c6e1b1abf923d96e6aff718505a756dca0"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 4" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps336)historyline1914-1918_disk4.ipf" size="1049612" crc="683c1c27" sha1="0784e50b86c416d72f8e5e5d4740b55a4f443a27" offset="0"/>
+				<rom name="(sps336)historyline1914-1918_disk4.ipf" size="1049612" crc="683c1c27" sha1="0784e50b86c416d72f8e5e5d4740b55a4f443a27"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 5" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps336)historyline1914-1918_disk5.ipf" size="1049612" crc="c5c47721" sha1="82c92f0059e0355465c00f9141cb1d488c0cd97b" offset="0"/>
+				<rom name="(sps336)historyline1914-1918_disk5.ipf" size="1049612" crc="c5c47721" sha1="82c92f0059e0355465c00f9141cb1d488c0cd97b"/>
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 6" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps336)historyline1914-1918_disk6.ipf" size="1049612" crc="414582f9" sha1="e437d22706a8adbc676a23b2e2130d3eb0b6b758" offset="0"/>
+				<rom name="(sps336)historyline1914-1918_disk6.ipf" size="1049612" crc="414582f9" sha1="e437d22706a8adbc676a23b2e2130d3eb0b6b758"/>
 			</dataarea>
 		</part>
 		<part name="flop7" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 7" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps336)historyline1914-1918_disk7.ipf" size="1049612" crc="4a7bfbd9" sha1="dc3b57eeeafa84e99fe7bfe77f375434a29872de" offset="0"/>
+				<rom name="(sps336)historyline1914-1918_disk7.ipf" size="1049612" crc="4a7bfbd9" sha1="dc3b57eeeafa84e99fe7bfe77f375434a29872de"/>
 			</dataarea>
 		</part>
 	</software>
@@ -326,31 +326,31 @@
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1049180">
-				<rom name="(sps2749)ishar3-thesevengatesofinfinity_diska.ipf" size="1049180" crc="a6e18ad1" sha1="2e7cc1e4f5e450bfa5ab7d207f530c48d04b7cbd" offset="0"/>
+				<rom name="(sps2749)ishar3-thesevengatesofinfinity_diska.ipf" size="1049180" crc="a6e18ad1" sha1="2e7cc1e4f5e450bfa5ab7d207f530c48d04b7cbd"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1049180">
-				<rom name="(sps2749)ishar3-thesevengatesofinfinity_diskb.ipf" size="1049180" crc="9c840f46" sha1="aaf6a62944c746b54ef2ec970c047cc7402368b4" offset="0"/>
+				<rom name="(sps2749)ishar3-thesevengatesofinfinity_diskb.ipf" size="1049180" crc="9c840f46" sha1="aaf6a62944c746b54ef2ec970c047cc7402368b4"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size="1049180">
-				<rom name="(sps2749)ishar3-thesevengatesofinfinity_diskc.ipf" size="1049180" crc="52839d05" sha1="a8c6901fed617281249aab00b42d2ed7bed3e665" offset="0"/>
+				<rom name="(sps2749)ishar3-thesevengatesofinfinity_diskc.ipf" size="1049180" crc="52839d05" sha1="a8c6901fed617281249aab00b42d2ed7bed3e665"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<feature name="part_id" value="Disk D" />
 			<dataarea name="flop" size="1049180">
-				<rom name="(sps2749)ishar3-thesevengatesofinfinity_diskd.ipf" size="1049180" crc="40efa4eb" sha1="ef8f25027266504fb52379752a4f4190da5550c8" offset="0"/>
+				<rom name="(sps2749)ishar3-thesevengatesofinfinity_diskd.ipf" size="1049180" crc="40efa4eb" sha1="ef8f25027266504fb52379752a4f4190da5550c8"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
 			<feature name="part_id" value="Disk E" />
 			<dataarea name="flop" size="1049180">
-				<rom name="(sps2749)ishar3-thesevengatesofinfinity_diske.ipf" size="1049180" crc="17e14050" sha1="de62d5ff3f00cc2082205f3604a7d842f242cf5e" offset="0"/>
+				<rom name="(sps2749)ishar3-thesevengatesofinfinity_diske.ipf" size="1049180" crc="17e14050" sha1="de62d5ff3f00cc2082205f3604a7d842f242cf5e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -366,37 +366,37 @@
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1049180">
-				<rom name="(sps2664)ishar3-thesevengatesofinfinity_diska.ipf" size="1049180" crc="c050464e" sha1="4d4b21bbef7eb183ba32a1e9a02880e3fca7505c" offset="0"/>
+				<rom name="(sps2664)ishar3-thesevengatesofinfinity_diska.ipf" size="1049180" crc="c050464e" sha1="4d4b21bbef7eb183ba32a1e9a02880e3fca7505c"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1049180">
-				<rom name="(sps2664)ishar3-thesevengatesofinfinity_diskb.ipf" size="1049180" crc="52c182c2" sha1="3dacb6f5d27b08b893f1e3bd227265fcad3984be" offset="0"/>
+				<rom name="(sps2664)ishar3-thesevengatesofinfinity_diskb.ipf" size="1049180" crc="52c182c2" sha1="3dacb6f5d27b08b893f1e3bd227265fcad3984be"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size="1049180">
-				<rom name="(sps2664)ishar3-thesevengatesofinfinity_diskc.ipf" size="1049180" crc="3bab1d53" sha1="59d4555df75ad2952ec5c99619f944a8be478965" offset="0"/>
+				<rom name="(sps2664)ishar3-thesevengatesofinfinity_diskc.ipf" size="1049180" crc="3bab1d53" sha1="59d4555df75ad2952ec5c99619f944a8be478965"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<feature name="part_id" value="Disk D" />
 			<dataarea name="flop" size="1049180">
-				<rom name="(sps2664)ishar3-thesevengatesofinfinity_diskd.ipf" size="1049180" crc="d52d5bc5" sha1="ee452e30f5e5cda5b8d7df2f53be8544413556a6" offset="0"/>
+				<rom name="(sps2664)ishar3-thesevengatesofinfinity_diskd.ipf" size="1049180" crc="d52d5bc5" sha1="ee452e30f5e5cda5b8d7df2f53be8544413556a6"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
 			<feature name="part_id" value="Disk E" />
 			<dataarea name="flop" size="1049180">
-				<rom name="(sps2664)ishar3-thesevengatesofinfinity_diske.ipf" size="1049180" crc="c3e5e16a" sha1="f1c4ecda3299fb350c1366765bc5a5a9dd2fdd9b" offset="0"/>
+				<rom name="(sps2664)ishar3-thesevengatesofinfinity_diske.ipf" size="1049180" crc="c3e5e16a" sha1="f1c4ecda3299fb350c1366765bc5a5a9dd2fdd9b"/>
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_3_5">
 			<feature name="part_id" value="Equipe Speciale" />
 			<dataarea name="flop" size="1049180">
-				<rom name="(sps2664)ishar3-thesevengatesofinfinity_equipespeciale.ipf" size="1049180" crc="7b23caa7" sha1="5cefd297814bdbc4abb5e06a77bd0d5f00610771" offset="0"/>
+				<rom name="(sps2664)ishar3-thesevengatesofinfinity_equipespeciale.ipf" size="1049180" crc="7b23caa7" sha1="5cefd297814bdbc4abb5e06a77bd0d5f00610771"/>
 			</dataarea>
 		</part>
 	</software>
@@ -412,13 +412,13 @@
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Data Disk" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps1851)manchesterunited-thedouble_datadisk.ipf" size="1049612" crc="32055500" sha1="1bb97b89ce7e2f4b27c44986be65a45c19bfea70" offset="0"/>
+				<rom name="(sps1851)manchesterunited-thedouble_datadisk.ipf" size="1049612" crc="32055500" sha1="1bb97b89ce7e2f4b27c44986be65a45c19bfea70"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Program Disk" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps1851)manchesterunited-thedouble_programdisk.ipf" size="1049612" crc="ee64a3cd" sha1="12aa705ba33b1b2db23e430c560705752eb60b49" offset="0"/>
+				<rom name="(sps1851)manchesterunited-thedouble_programdisk.ipf" size="1049612" crc="ee64a3cd" sha1="12aa705ba33b1b2db23e430c560705752eb60b49"/>
 			</dataarea>
 		</part>
 	</software>
@@ -435,31 +435,31 @@
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps558)produzent,der_disk1.ipf" size="1049612" crc="cd6690f5" sha1="f91fb302abf3484ac9d044933e9c3297dbd7427a" offset="0"/>
+				<rom name="(sps558)produzent,der_disk1.ipf" size="1049612" crc="cd6690f5" sha1="f91fb302abf3484ac9d044933e9c3297dbd7427a"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps558)produzent,der_disk2.ipf" size="1049612" crc="fefd2190" sha1="c5cc0ae0bb46ff7e71a80833621b42b987dfee39" offset="0"/>
+				<rom name="(sps558)produzent,der_disk2.ipf" size="1049612" crc="fefd2190" sha1="c5cc0ae0bb46ff7e71a80833621b42b987dfee39"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 3" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps558)produzent,der_disk3.ipf" size="1049612" crc="0d914900" sha1="e4e57fa35c337b7f6068fc5fc322eb9534a1a2aa" offset="0"/>
+				<rom name="(sps558)produzent,der_disk3.ipf" size="1049612" crc="0d914900" sha1="e4e57fa35c337b7f6068fc5fc322eb9534a1a2aa"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 4" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps558)produzent,der_disk4.ipf" size="1049612" crc="05579db3" sha1="588c06dcafeb5d3723bb1bccb1216b0007d1a835" offset="0"/>
+				<rom name="(sps558)produzent,der_disk4.ipf" size="1049612" crc="05579db3" sha1="588c06dcafeb5d3723bb1bccb1216b0007d1a835"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 5" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps558)produzent,der_disk5.ipf" size="1049612" crc="77d18677" sha1="504cc0acd63dc1bc80e8f6a07be3eb7217fde50c" offset="0"/>
+				<rom name="(sps558)produzent,der_disk5.ipf" size="1049612" crc="77d18677" sha1="504cc0acd63dc1bc80e8f6a07be3eb7217fde50c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -475,25 +475,25 @@
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps2357)rallychampionships_disk1.ipf" size="1049612" crc="83ddbff7" sha1="3c9812989e7562a6c99f45e920922197a283da13" offset="0"/>
+				<rom name="(sps2357)rallychampionships_disk1.ipf" size="1049612" crc="83ddbff7" sha1="3c9812989e7562a6c99f45e920922197a283da13"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps2357)rallychampionships_disk2.ipf" size="1049612" crc="79350cce" sha1="b86c86c9877d8ba518c8e68c8be5a682e07452be" offset="0"/>
+				<rom name="(sps2357)rallychampionships_disk2.ipf" size="1049612" crc="79350cce" sha1="b86c86c9877d8ba518c8e68c8be5a682e07452be"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 3" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps2357)rallychampionships_disk3.ipf" size="1049612" crc="db410fd8" sha1="57b049df49ba9dd14757fa1f1aa0f087b6a002ad" offset="0"/>
+				<rom name="(sps2357)rallychampionships_disk3.ipf" size="1049612" crc="db410fd8" sha1="57b049df49ba9dd14757fa1f1aa0f087b6a002ad"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 4" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps2357)rallychampionships_disk4.ipf" size="1049612" crc="14282c9a" sha1="1f24a0291038cbe50087193a6def348f2f2b6da0" offset="0"/>
+				<rom name="(sps2357)rallychampionships_disk4.ipf" size="1049612" crc="14282c9a" sha1="1f24a0291038cbe50087193a6def348f2f2b6da0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -509,37 +509,37 @@
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps569)reunion_disk1.ipf" size="1049612" crc="1744c014" sha1="bc41d2592854c864556d1bd8bba892003abae202" offset="0"/>
+				<rom name="(sps569)reunion_disk1.ipf" size="1049612" crc="1744c014" sha1="bc41d2592854c864556d1bd8bba892003abae202"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps569)reunion_disk2.ipf" size="1049612" crc="96b49ab9" sha1="035fe6a4353eaddb2e9f73fbe65e44e814af27aa" offset="0"/>
+				<rom name="(sps569)reunion_disk2.ipf" size="1049612" crc="96b49ab9" sha1="035fe6a4353eaddb2e9f73fbe65e44e814af27aa"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 3" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps569)reunion_disk3.ipf" size="1049612" crc="caf5a44b" sha1="88505a7ce593043cdd12f611750389f9c4bbc7f7" offset="0"/>
+				<rom name="(sps569)reunion_disk3.ipf" size="1049612" crc="caf5a44b" sha1="88505a7ce593043cdd12f611750389f9c4bbc7f7"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 4" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps569)reunion_disk4.ipf" size="1049612" crc="73ddb39d" sha1="bc84ceb391f1f70fd56d2fbe7988dce00c3896ad" offset="0"/>
+				<rom name="(sps569)reunion_disk4.ipf" size="1049612" crc="73ddb39d" sha1="bc84ceb391f1f70fd56d2fbe7988dce00c3896ad"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 5" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps569)reunion_disk5.ipf" size="1049612" crc="0577609d" sha1="4ced88302024ca4e36c90fc901e4264f72057550" offset="0"/>
+				<rom name="(sps569)reunion_disk5.ipf" size="1049612" crc="0577609d" sha1="4ced88302024ca4e36c90fc901e4264f72057550"/>
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_3_5">
 			<feature name="part_id" value="Main Disk" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps569)reunion_maindisk.ipf" size="1049612" crc="7d25a6b8" sha1="45e0f1ec6a12bde7fe5f43bc11366e9c7c74b3fc" offset="0"/>
+				<rom name="(sps569)reunion_maindisk.ipf" size="1049612" crc="7d25a6b8" sha1="45e0f1ec6a12bde7fe5f43bc11366e9c7c74b3fc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -555,61 +555,61 @@
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1039595">
-				<rom name="(sps1365)riseoftherobots_disk1.ipf" size="1039595" crc="56556c3e" sha1="b0bf42034e08260f6dc54723bb4f14c00dcd5db9" offset="0"/>
+				<rom name="(sps1365)riseoftherobots_disk1.ipf" size="1039595" crc="56556c3e" sha1="b0bf42034e08260f6dc54723bb4f14c00dcd5db9"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1039532">
-				<rom name="(sps1365)riseoftherobots_disk2.ipf" size="1039532" crc="26054d65" sha1="1a64ed6bfd2c8641f0def3b8196de92e33efe8de" offset="0"/>
+				<rom name="(sps1365)riseoftherobots_disk2.ipf" size="1039532" crc="26054d65" sha1="1a64ed6bfd2c8641f0def3b8196de92e33efe8de"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 3" />
 			<dataarea name="flop" size="1039532">
-				<rom name="(sps1365)riseoftherobots_disk3.ipf" size="1039532" crc="5cccac61" sha1="2d6659bb019b6f2234aae772d50fd56fea738e2b" offset="0"/>
+				<rom name="(sps1365)riseoftherobots_disk3.ipf" size="1039532" crc="5cccac61" sha1="2d6659bb019b6f2234aae772d50fd56fea738e2b"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 4" />
 			<dataarea name="flop" size="1039532">
-				<rom name="(sps1365)riseoftherobots_disk4.ipf" size="1039532" crc="c553e14c" sha1="4668525fa4dd1ddcd60e5c0a0912f3a5c26cdf6c" offset="0"/>
+				<rom name="(sps1365)riseoftherobots_disk4.ipf" size="1039532" crc="c553e14c" sha1="4668525fa4dd1ddcd60e5c0a0912f3a5c26cdf6c"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 5" />
 			<dataarea name="flop" size="1039532">
-				<rom name="(sps1365)riseoftherobots_disk5.ipf" size="1039532" crc="9c4d6b6e" sha1="3f2a719694728707eba7e5d31241c1fe1b780952" offset="0"/>
+				<rom name="(sps1365)riseoftherobots_disk5.ipf" size="1039532" crc="9c4d6b6e" sha1="3f2a719694728707eba7e5d31241c1fe1b780952"/>
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 6" />
 			<dataarea name="flop" size="1039532">
-				<rom name="(sps1365)riseoftherobots_disk6.ipf" size="1039532" crc="606a61b3" sha1="796d787d3a17bc3abf1c49d61a51e71a9764de7e" offset="0"/>
+				<rom name="(sps1365)riseoftherobots_disk6.ipf" size="1039532" crc="606a61b3" sha1="796d787d3a17bc3abf1c49d61a51e71a9764de7e"/>
 			</dataarea>
 		</part>
 		<part name="flop7" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 7" />
 			<dataarea name="flop" size="1039532">
-				<rom name="(sps1365)riseoftherobots_disk7.ipf" size="1039532" crc="30fb154a" sha1="2b30bdd5433b468f90ac6eda0f8ceaeb86452a9a" offset="0"/>
+				<rom name="(sps1365)riseoftherobots_disk7.ipf" size="1039532" crc="30fb154a" sha1="2b30bdd5433b468f90ac6eda0f8ceaeb86452a9a"/>
 			</dataarea>
 		</part>
 		<part name="flop8" interface="floppy_3_5">
 			<feature name="part_id" value="Install" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps1365)riseoftherobots_install.ipf" size="1049612" crc="0d0b311b" sha1="fab4a1bfa8e736bb358bf2309caf3259f618dc9c" offset="0"/>
+				<rom name="(sps1365)riseoftherobots_install.ipf" size="1049612" crc="0d0b311b" sha1="fab4a1bfa8e736bb358bf2309caf3259f618dc9c"/>
 			</dataarea>
 		</part>
 		<part name="flop9" interface="floppy_3_5">
 			<feature name="part_id" value="Intro A" />
 			<dataarea name="flop" size="1039595">
-				<rom name="(sps1365)riseoftherobots_introa.ipf" size="1039595" crc="6598f2c0" sha1="601cb8cd627afd0b9c8654fb3bcc1a9c73285b07" offset="0"/>
+				<rom name="(sps1365)riseoftherobots_introa.ipf" size="1039595" crc="6598f2c0" sha1="601cb8cd627afd0b9c8654fb3bcc1a9c73285b07"/>
 			</dataarea>
 		</part>
 		<part name="flop10" interface="floppy_3_5">
 			<feature name="part_id" value="Intro B" />
 			<dataarea name="flop" size="1039532">
-				<rom name="(sps1365)riseoftherobots_introb.ipf" size="1039532" crc="9b310978" sha1="d0c4c2cafcda9ef2912a33ed250461bd053c869c" offset="0"/>
+				<rom name="(sps1365)riseoftherobots_introb.ipf" size="1039532" crc="9b310978" sha1="d0c4c2cafcda9ef2912a33ed250461bd053c869c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -626,19 +626,19 @@
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049304">
-				<rom name="(sps1336)sillyputty_disk1.ipf" size="1049304" crc="6869d0ef" sha1="845b938d187842ffeca3102b143bdffb563079ad" offset="0"/>
+				<rom name="(sps1336)sillyputty_disk1.ipf" size="1049304" crc="6869d0ef" sha1="845b938d187842ffeca3102b143bdffb563079ad"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps1336)sillyputty_disk2.ipf" size="1049612" crc="e60c0230" sha1="3259b731f89e09dfc9936eab7fee848709a8acf9" offset="0"/>
+				<rom name="(sps1336)sillyputty_disk2.ipf" size="1049612" crc="e60c0230" sha1="3259b731f89e09dfc9936eab7fee848709a8acf9"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 3" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps1336)sillyputty_disk3.ipf" size="1049612" crc="4b0c446b" sha1="af1d4fe4b4962a7460e8ad3da9fd79087f5f2ad1" offset="0"/>
+				<rom name="(sps1336)sillyputty_disk3.ipf" size="1049612" crc="4b0c446b" sha1="af1d4fe4b4962a7460e8ad3da9fd79087f5f2ad1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -654,13 +654,13 @@
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps2534)snapperazzi_1.ipf" size="1049612" crc="038a8567" sha1="90ca00edd7e6d4c1774a765cdf0002e056056bdd" offset="0"/>
+				<rom name="(sps2534)snapperazzi_1.ipf" size="1049612" crc="038a8567" sha1="90ca00edd7e6d4c1774a765cdf0002e056056bdd"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps2534)snapperazzi_2.ipf" size="1049612" crc="9bb2c414" sha1="516ed04a3e4a3ca05c3355804bdfcacead0a6249" offset="0"/>
+				<rom name="(sps2534)snapperazzi_2.ipf" size="1049612" crc="9bb2c414" sha1="516ed04a3e4a3ca05c3355804bdfcacead0a6249"/>
 			</dataarea>
 		</part>
 	</software>
@@ -676,13 +676,13 @@
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps1841)trivialpursuit-thelanguagelaboratoryedition&amp;amigatext_disk1.ipf" size="1049612" crc="30ee61a3" sha1="ccd7fd093c646109d9341bc0202e6ad9feb48c93" offset="0"/>
+				<rom name="(sps1841)trivialpursuit-thelanguagelaboratoryedition&amp;amigatext_disk1.ipf" size="1049612" crc="30ee61a3" sha1="ccd7fd093c646109d9341bc0202e6ad9feb48c93"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps1841)trivialpursuit-thelanguagelaboratoryedition&amp;amigatext_disk2.ipf" size="1049612" crc="ee551227" sha1="7795b90ab4d7e8ebe9354f2347055b1dfa0d2cf7" offset="0"/>
+				<rom name="(sps1841)trivialpursuit-thelanguagelaboratoryedition&amp;amigatext_disk2.ipf" size="1049612" crc="ee551227" sha1="7795b90ab4d7e8ebe9354f2347055b1dfa0d2cf7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -698,19 +698,19 @@
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049180">
-				<rom name="(sps156)turbotrax_disk1-3.ipf" size="1049180" crc="3c3f3217" sha1="0d656c72e0808200d96d435051a4d306d5e88ba2" offset="0"/>
+				<rom name="(sps156)turbotrax_disk1-3.ipf" size="1049180" crc="3c3f3217" sha1="0d656c72e0808200d96d435051a4d306d5e88ba2"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1049180">
-				<rom name="(sps156)turbotrax_disk2-3.ipf" size="1049180" crc="e4328532" sha1="b452b8fc0cc2699dea0dc7ca0ba07bd65fb7b04a" offset="0"/>
+				<rom name="(sps156)turbotrax_disk2-3.ipf" size="1049180" crc="e4328532" sha1="b452b8fc0cc2699dea0dc7ca0ba07bd65fb7b04a"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 3" />
 			<dataarea name="flop" size="1049180">
-				<rom name="(sps156)turbotrax_disk3-3.ipf" size="1049180" crc="bb29288c" sha1="0983b3a4238c565b95e8f1bd9717a15b621370d4" offset="0"/>
+				<rom name="(sps156)turbotrax_disk3-3.ipf" size="1049180" crc="bb29288c" sha1="0983b3a4238c565b95e8f1bd9717a15b621370d4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -726,13 +726,13 @@
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps409)whizz_disk1.ipf" size="1049612" crc="97020337" sha1="93b766bd65a91abf21768240a817788c9c133fcd" offset="0"/>
+				<rom name="(sps409)whizz_disk1.ipf" size="1049612" crc="97020337" sha1="93b766bd65a91abf21768240a817788c9c133fcd"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps409)whizz_disk2.ipf" size="1049612" crc="9e0dc06a" sha1="ba0281aba439b9ffd5b3e9581068eaee5726a34c" offset="0"/>
+				<rom name="(sps409)whizz_disk2.ipf" size="1049612" crc="9e0dc06a" sha1="ba0281aba439b9ffd5b3e9581068eaee5726a34c"/>
 			</dataarea>
 		</part>
 	</software>

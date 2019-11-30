@@ -217,7 +217,7 @@ READ8_MEMBER(chexx_state::input_r)
 void chexx_state::mem(address_map &map)
 {
 	map(0x0000, 0x007f).ram().mirror(0x100); // 6810 - 128 x 8 static RAM
-	map(0x4000, 0x400f).rw(m_via, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x4000, 0x400f).m(m_via, FUNC(via6522_device::map));
 	map(0x8000, 0x8000).r(FUNC(chexx_state::input_r));
 	map(0xf800, 0xffff).rom().region("maincpu", 0);
 }
@@ -244,7 +244,7 @@ WRITE8_MEMBER(chexx_state::lamp_w)
 void faceoffh_state::mem(address_map &map)
 {
 	map(0x0000, 0x007f).ram().mirror(0x100); // M58725P - 2KB
-	map(0x4000, 0x400f).rw(m_via, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x4000, 0x400f).m(m_via, FUNC(via6522_device::map));
 	map(0x8000, 0x8000).r(FUNC(faceoffh_state::input_r));
 	map(0xa000, 0xa001).w(FUNC(faceoffh_state::ay_w));
 	map(0xc000, 0xc000).w(FUNC(faceoffh_state::lamp_w));
@@ -261,12 +261,12 @@ WRITE8_MEMBER(faceoffh_state::ay_w)
 
 	if (m_ay_cmd == 0x00 && data == 0x03)
 	{
-		m_aysnd->address_w(space, offset, m_ay_data, mem_mask);
+		m_aysnd->address_w(m_ay_data);
 //      logerror("%s: AY addr = %02X\n", machine().describe_context(), m_ay_data);
 	}
 	else if (m_ay_cmd == 0x00 && data == 0x02)
 	{
-		m_aysnd->data_w(space, offset, m_ay_data, mem_mask);
+		m_aysnd->data_w(m_ay_data);
 //      logerror("%s: AY data = %02X\n", machine().describe_context(), m_ay_data);
 	}
 	m_ay_cmd = data;

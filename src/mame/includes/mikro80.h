@@ -9,6 +9,8 @@
 #ifndef MAME_INCLUDES_MIKRO80_H
 #define MAME_INCLUDES_MIKRO80_H
 
+#pragma once
+
 #include "machine/i8255.h"
 #include "imagedev/cassette.h"
 #include "sound/dac.h"
@@ -21,8 +23,8 @@ public:
 		TIMER_RESET
 	};
 
-	mikro80_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	mikro80_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_cursor_ram(*this, "cursor_ram"),
 		m_video_ram(*this, "video_ram"),
 		m_ppi8255(*this, "ppi8255"),
@@ -40,7 +42,8 @@ public:
 		m_io_line7(*this, "LINE7"),
 		m_io_line8(*this, "LINE8") ,
 		m_dac(*this, "dac"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu")
+	{ }
 
 	void kristall(machine_config &config);
 	void radio99(machine_config &config);

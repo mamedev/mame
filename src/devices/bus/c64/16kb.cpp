@@ -22,13 +22,12 @@ DEFINE_DEVICE_TYPE(C64_16KB, c64_16kb_cartridge_device, "c64_16kb", "C64 16KB EP
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(c64_16kb_cartridge_device::device_add_mconfig)
-	MCFG_GENERIC_CARTSLOT_ADD("roml", generic_linear_slot, nullptr)
-	MCFG_GENERIC_EXTENSIONS("rom,bin,80")
+void c64_16kb_cartridge_device::device_add_mconfig(machine_config &config)
+{
+	GENERIC_CARTSLOT(config, m_low, generic_linear_slot, nullptr, "rom,bin,80");
 
-	MCFG_GENERIC_CARTSLOT_ADD("romh", generic_linear_slot, nullptr)
-	MCFG_GENERIC_EXTENSIONS("rom,bin,a0,e0")
-MACHINE_CONFIG_END
+	GENERIC_CARTSLOT(config, m_high, generic_linear_slot, nullptr, "rom,bin,a0,e0");
+}
 
 
 //-------------------------------------------------
@@ -99,15 +98,15 @@ void c64_16kb_cartridge_device::device_reset()
 //  c64_cd_r - cartridge data read
 //-------------------------------------------------
 
-uint8_t c64_16kb_cartridge_device::c64_cd_r(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+uint8_t c64_16kb_cartridge_device::c64_cd_r(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!roml)
 	{
-		data = m_low->read_rom(space, offset & 0x1fff);
+		data = m_low->read_rom(offset & 0x1fff);
 	}
 	else if (!romh)
 	{
-		data = m_high->read_rom(space, offset & 0x1fff);
+		data = m_high->read_rom(offset & 0x1fff);
 	}
 
 	return data;

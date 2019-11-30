@@ -5,12 +5,13 @@
  *   Sharp X1 TAP image format
  *
  */
+#ifndef MAME_FORMATS_X1_TAP_H
+#define MAME_FORMATS_X1_TAP_H
 
-#ifndef X1_TAP_H_
-#define X1_TAP_H_
+#pragma once
 
 #include "cassimg.h"
 
 CASSETTE_FORMATLIST_EXTERN( x1_cassette_formats );
 
-#endif /*X1_TAP_H_*/
+#endif // MAME_FORMATS_X1_TAP_H

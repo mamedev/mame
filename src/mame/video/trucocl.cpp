@@ -38,13 +38,12 @@ Daughterboard: Custom made, plugged in the 2 roms and Z80 mainboard sockets.
 #include "includes/trucocl.h"
 
 
-PALETTE_INIT_MEMBER(trucocl_state, trucocl)
+void trucocl_state::trucocl_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
+	uint8_t const *const color_prom = memregion("proms")->base();
 
-	for (i = 0;i < 32;i++)
-		palette.set_pen_color(i,pal4bit(color_prom[i] >> 0),pal4bit(color_prom[i+32] >> 0),pal4bit(color_prom[i+32] >> 4));
+	for (int i = 0; i < 32; i++)
+		palette.set_pen_color(i, pal4bit(color_prom[i] >> 0), pal4bit(color_prom[i + 32] >> 0), pal4bit(color_prom[i + 32] >> 4));
 }
 
 WRITE8_MEMBER(trucocl_state::trucocl_videoram_w)
@@ -75,7 +74,7 @@ TILE_GET_INFO_MEMBER(trucocl_state::get_bg_tile_info)
 
 void trucocl_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(trucocl_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 32, 32 );
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(trucocl_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS,  8, 8, 32, 32 );
 }
 
 uint32_t trucocl_state::screen_update_trucocl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

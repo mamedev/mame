@@ -210,39 +210,38 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(victory_state::victory)
-
+void victory_state::victory(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, VICTORY_MAIN_CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_IO_MAP(main_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", victory_state,  vblank_interrupt)
+	Z80(config, m_maincpu, VICTORY_MAIN_CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &victory_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &victory_state::main_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(victory_state::vblank_interrupt));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// PIO interrupts are disconnected
-	MCFG_DEVICE_ADD("pio1", Z80PIO, VICTORY_MAIN_CPU_CLOCK) // at K8
-	MCFG_Z80PIO_IN_PA_CB(IOPORT("DIAL"))
-	MCFG_Z80PIO_IN_PB_CB(IOPORT("COIN"))
+	z80pio_device& pio1(Z80PIO(config, "pio1", VICTORY_MAIN_CPU_CLOCK)); // at K8
+	pio1.in_pa_callback().set_ioport("DIAL");
+	pio1.in_pb_callback().set_ioport("COIN");
 
-	MCFG_DEVICE_ADD("pio2", Z80PIO, VICTORY_MAIN_CPU_CLOCK) // at L8
-	MCFG_Z80PIO_IN_PA_CB(IOPORT("BUTTONS"))
-	MCFG_Z80PIO_IN_PB_CB(IOPORT("UNUSED"))
+	z80pio_device& pio2(Z80PIO(config, "pio2", VICTORY_MAIN_CPU_CLOCK)); // at L8
+	pio2.in_pa_callback().set_ioport("BUTTONS");
+	pio2.in_pb_callback().set_ioport("UNUSED");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK | VIDEO_ALWAYS_UPDATE)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK | VIDEO_ALWAYS_UPDATE);
 	/* using the standard Exidy video parameters for now, needs to be confirmed */
-	MCFG_SCREEN_RAW_PARAMS(VICTORY_PIXEL_CLOCK, VICTORY_HTOTAL, VICTORY_HBEND, VICTORY_HBSTART, VICTORY_VTOTAL, VICTORY_VBEND, VICTORY_VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(victory_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	m_screen->set_raw(VICTORY_PIXEL_CLOCK, VICTORY_HTOTAL, VICTORY_HBEND, VICTORY_HBSTART, VICTORY_VTOTAL, VICTORY_VBEND, VICTORY_VBSTART);
+	m_screen->set_screen_update(FUNC(victory_state::screen_update));
+	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 64)
-
+	PALETTE(config, m_palette).set_entries(64);
 
 	/* audio hardware */
-	MCFG_DEVICE_ADD("soundbd", EXIDY_VICTORY, 0)
-MACHINE_CONFIG_END
+	EXIDY_VICTORY(config, "soundbd", 0);
+}
 
 
 

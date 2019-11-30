@@ -23,7 +23,7 @@
 DEFINE_DEVICE_TYPE(BBC_BEEBSPCH, bbc_beebspch_device, "bbc_beebspch", "Beeb Speech Synthesiser")
 
 ROM_START(beebspch)
-	ROM_REGION(0x4000, "rom", 0)
+	ROM_REGION(0x4000, "exp_rom", 0)
 	ROM_LOAD("watford_speech.rom", 0x0000, 0x2000, CRC(731642a8) SHA1(1bd31345af6043f394bc9d8e65180c93b2356905))
 	ROM_RELOAD(0x2000, 0x2000)
 
@@ -65,7 +65,6 @@ void bbc_beebspch_device::device_add_mconfig(machine_config &config)
 bbc_beebspch_device::bbc_beebspch_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, BBC_BEEBSPCH, tag, owner, clock)
 	, device_bbc_userport_interface(mconfig, *this)
-	, m_rom(*this, "rom")
 	, m_nsp(*this, "sp0256")
 {
 }
@@ -79,20 +78,11 @@ void bbc_beebspch_device::device_start()
 {
 }
 
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void bbc_beebspch_device::device_reset()
-{
-	machine().root_device().membank("bank4")->configure_entry(13, memregion("rom")->base());
-}
-
 //**************************************************************************
 //  IMPLEMENTATION
 //**************************************************************************
 
-WRITE8_MEMBER(bbc_beebspch_device::pb_w)
+void bbc_beebspch_device::pb_w(uint8_t data)
 {
 	switch (data & 0xc0)
 	{
@@ -107,7 +97,7 @@ WRITE8_MEMBER(bbc_beebspch_device::pb_w)
 	}
 
 	// allophone
-	m_nsp->ald_w(space, 0, data & 0x3f);
+	m_nsp->ald_w(data & 0x3f);
 }
 
 WRITE_LINE_MEMBER(bbc_beebspch_device::cb1_w)

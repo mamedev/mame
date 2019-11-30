@@ -19,10 +19,11 @@ isa8_lpt_device::isa8_lpt_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-MACHINE_CONFIG_START(isa8_lpt_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("lpt", PC_LPT, 0)
-	MCFG_PC_LPT_IRQ_HANDLER(WRITELINE(*this, isa8_lpt_device, pc_cpu_line))
-MACHINE_CONFIG_END
+void isa8_lpt_device::device_add_mconfig(machine_config &config)
+{
+	pc_lpt_device &lpt(PC_LPT(config, "lpt"));
+	lpt.irq_handler().set(FUNC(isa8_lpt_device::pc_cpu_line));
+}
 
 static INPUT_PORTS_START( lpt_dsw )
 	PORT_START("DSW")
@@ -44,14 +45,11 @@ void isa8_lpt_device::device_start()
 void isa8_lpt_device::device_reset()
 {
 	m_is_primary = (ioport("DSW")->read() & 1) ? false : true;
+	pc_lpt_device &lpt(*subdevice<pc_lpt_device>("lpt"));
 	if (m_is_primary)
-	{
-		m_isa->install_device(0x0378, 0x037b, read8_delegate(FUNC(pc_lpt_device::read), subdevice<pc_lpt_device>("lpt")), write8_delegate(FUNC(pc_lpt_device::write), subdevice<pc_lpt_device>("lpt")));
-	}
+		m_isa->install_device(0x0378, 0x037b, read8_delegate(lpt, FUNC(pc_lpt_device::read)), write8_delegate(lpt, FUNC(pc_lpt_device::write)));
 	else
-	{
-		m_isa->install_device(0x0278, 0x027b, read8_delegate(FUNC(pc_lpt_device::read), subdevice<pc_lpt_device>("lpt")), write8_delegate(FUNC(pc_lpt_device::write), subdevice<pc_lpt_device>("lpt")));
-	}
+		m_isa->install_device(0x0278, 0x027b, read8_delegate(lpt, FUNC(pc_lpt_device::read)), write8_delegate(lpt, FUNC(pc_lpt_device::write)));
 }
 
 WRITE_LINE_MEMBER(isa8_lpt_device::pc_cpu_line)

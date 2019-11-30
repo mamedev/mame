@@ -63,8 +63,9 @@ class dambustr_state : public galaxold_state
 {
 public:
 	dambustr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: galaxold_state(mconfig, type, tag),
-		m_custom(*this, "cust") { }
+		: galaxold_state(mconfig, type, tag)
+		, m_custom(*this, "cust")
+	{ }
 
 	void dambustr(machine_config &config);
 
@@ -260,39 +261,39 @@ void dambustr_state::init_dambustr()
 
 
 
-MACHINE_CONFIG_START(dambustr_state::dambustr)
+void dambustr_state::dambustr(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 18432000/6)    /* 3.072 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(dambustr_map)
+	Z80(config, m_maincpu, 18432000/6);    /* 3.072 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &dambustr_state::dambustr_map);
 
 	MCFG_MACHINE_RESET_OVERRIDE(dambustr_state,galaxold)
 
 	TTL7474(config, "7474_9m_1", 0).output_cb().set(FUNC(dambustr_state::galaxold_7474_9m_1_callback));
 	TTL7474(config, "7474_9m_2", 0).comp_output_cb().set(FUNC(dambustr_state::galaxold_7474_9m_2_q_callback));
 
-	MCFG_TIMER_DRIVER_ADD("int_timer", dambustr_state, galaxold_interrupt_timer)
+	TIMER(config, "int_timer").configure_generic(FUNC(dambustr_state::galaxold_interrupt_timer));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(16000.0/132/2)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(dambustr_state, screen_update_dambustr)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(16000.0/132/2);
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(dambustr_state::screen_update_dambustr));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dambustr)
-	MCFG_PALETTE_ADD("palette", 32+2+64+8)      /* 32 for the characters, 2 for the bullets, 64 for the stars, 8 for the background */
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dambustr);
+	PALETTE(config, m_palette, FUNC(dambustr_state::dambustr_palette), 32+2+64+8); // 32 for the characters, 2 for the bullets, 64 for the stars, 8 for the background
 
-	MCFG_PALETTE_INIT_OWNER(dambustr_state,dambustr)
 	MCFG_VIDEO_START_OVERRIDE(dambustr_state,dambustr)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
 	galaxian_audio(config);
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( dambustr )

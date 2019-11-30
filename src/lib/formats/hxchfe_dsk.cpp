@@ -101,6 +101,8 @@
 
 #include "hxchfe_dsk.h"
 
+#define HFE_FORMAT_HEADER   "HXCPICFE"
+
 #define HEADER_LENGTH 512
 #define TRACK_TABLE_LENGTH 1024
 
@@ -177,8 +179,18 @@ bool hfe_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 
 	if (drivecyl < m_cylinders)
 	{
-		osd_printf_error("hxchfe: Floppy disk has too many tracks for this drive (floppy tracks=%d, drive tracks=%d).\n", m_cylinders, drivecyl);
-		return false;
+		if (m_cylinders - drivecyl > DUMP_THRESHOLD)
+		{
+			osd_printf_error("hxchfe: Floppy disk has too many tracks for this drive (floppy tracks=%d, drive tracks=%d).\n", m_cylinders, drivecyl);
+			return false;
+		}
+		else
+		{
+			// Some dumps has a few excess tracks to be safe,
+			// lets be nice and just skip those tracks
+			osd_printf_warning("hxchfe: Floppy disk has a slight excess of tracks for this drive that will be discarded (floppy tracks=%d, drive tracks=%d).\n", m_cylinders, drivecyl);
+			m_cylinders = drivecyl;
+		}
 	}
 
 	if (m_cylinders <= drivecyl/2)

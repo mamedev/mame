@@ -229,7 +229,7 @@ READ8_MEMBER(a78_rom_device::read_40xx)
 READ8_MEMBER(a78_rom_pokey_device::read_40xx)
 {
 	if (offset < 0x4000)
-		return m_pokey->read(space, offset & 0x0f);
+		return m_pokey->read(offset & 0x0f);
 
 	if (offset + 0x4000 < m_base_rom)
 		return 0xff;
@@ -240,16 +240,16 @@ READ8_MEMBER(a78_rom_pokey_device::read_40xx)
 WRITE8_MEMBER(a78_rom_pokey_device::write_40xx)
 {
 	if (offset < 0x4000)
-		m_pokey->write(space, offset & 0x0f, data);
+		m_pokey->write(offset & 0x0f, data);
 }
 
 // TO DO: do we need a PAL variant?!?
-MACHINE_CONFIG_START(a78_rom_pokey_device::device_add_mconfig)
+void a78_rom_pokey_device::device_add_mconfig(machine_config &config)
+{
 	SPEAKER(config, "addon").front_center();
 
-	MCFG_DEVICE_ADD("pokey", POKEY, XTAL(14'318'181)/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 1.00)
-MACHINE_CONFIG_END
+	POKEY(config, m_pokey, XTAL(14'318'181)/8).add_route(ALL_OUTPUTS, "addon", 1.00);
+}
 
 /*-------------------------------------------------
 
@@ -327,7 +327,7 @@ WRITE8_MEMBER(a78_rom_sg_device::write_40xx)
 READ8_MEMBER(a78_rom_sg_pokey_device::read_40xx)
 {
 	if (offset < 0x4000)
-		return m_pokey->read(space, offset & 0x0f);
+		return m_pokey->read(offset & 0x0f);
 	else if (offset < 0x8000)
 		return m_rom[(offset & 0x3fff) + (m_bank * 0x4000)];
 	else
@@ -337,17 +337,17 @@ READ8_MEMBER(a78_rom_sg_pokey_device::read_40xx)
 WRITE8_MEMBER(a78_rom_sg_pokey_device::write_40xx)
 {
 	if (offset < 0x4000)
-		m_pokey->write(space, offset & 0x0f, data);
+		m_pokey->write(offset & 0x0f, data);
 	else if (offset < 0x8000)
 		m_bank = data & m_bank_mask;
 }
 
-MACHINE_CONFIG_START(a78_rom_sg_pokey_device::device_add_mconfig)
+void a78_rom_sg_pokey_device::device_add_mconfig(machine_config &config)
+{
 	SPEAKER(config, "addon").front_center();
 
-	MCFG_DEVICE_ADD("pokey", POKEY, XTAL(14'318'181)/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 1.00)
-MACHINE_CONFIG_END
+	POKEY(config, m_pokey, XTAL(14'318'181)/8).add_route(ALL_OUTPUTS, "addon", 1.00);
+}
 
 
 /*-------------------------------------------------
@@ -497,34 +497,33 @@ WRITE8_MEMBER(a78_rom_act_device::write_40xx)
 
 // Machine configs for PCB variants with a POKEY at $0450
 
-MACHINE_CONFIG_START(a78_rom_p450_device::device_add_mconfig)
+void a78_rom_p450_device::device_add_mconfig(machine_config &config)
+{
 	SPEAKER(config, "pokey_450").front_center();
 
-	MCFG_DEVICE_ADD("pokey450", POKEY, XTAL(14'318'181)/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "pokey_450", 1.00)
-MACHINE_CONFIG_END
+	POKEY(config, m_pokey450, XTAL(14'318'181)/8).add_route(ALL_OUTPUTS, "pokey_450", 1.00);
+}
 
-MACHINE_CONFIG_START(a78_rom_p450_pokey_device::device_add_mconfig)
+void a78_rom_p450_pokey_device::device_add_mconfig(machine_config &config)
+{
 	SPEAKER(config, "addon").front_center();
 
-	MCFG_DEVICE_ADD("pokey", POKEY, XTAL(14'318'181)/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 1.00)
+	POKEY(config, m_pokey, XTAL(14'318'181)/8).add_route(ALL_OUTPUTS, "addon", 1.00);
 
-	MCFG_DEVICE_ADD("pokey450", POKEY, XTAL(14'318'181)/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 1.00)
-MACHINE_CONFIG_END
+	POKEY(config, m_pokey450, XTAL(14'318'181)/8).add_route(ALL_OUTPUTS, "addon", 1.00);
+}
 
 
-MACHINE_CONFIG_START(a78_rom_p450_sg_ram_device::device_add_mconfig)
+void a78_rom_p450_sg_ram_device::device_add_mconfig(machine_config &config)
+{
 	SPEAKER(config, "pokey_450").front_center();
 
-	MCFG_DEVICE_ADD("pokey450", POKEY, XTAL(14'318'181)/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "pokey_450", 1.00)
-MACHINE_CONFIG_END
+	POKEY(config, m_pokey450, XTAL(14'318'181)/8).add_route(ALL_OUTPUTS, "pokey_450", 1.00);
+}
 
-MACHINE_CONFIG_START(a78_rom_p450_sg9_device::device_add_mconfig)
+void a78_rom_p450_sg9_device::device_add_mconfig(machine_config &config)
+{
 	SPEAKER(config, "pokey_450").front_center();
 
-	MCFG_DEVICE_ADD("pokey450", POKEY, XTAL(14'318'181)/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "pokey_450", 1.00)
-MACHINE_CONFIG_END
+	POKEY(config, m_pokey450, XTAL(14'318'181)/8).add_route(ALL_OUTPUTS, "pokey_450", 1.00);
+}

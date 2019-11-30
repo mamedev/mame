@@ -20,6 +20,7 @@ midiout_port_device::midiout_port_device(const machine_config &mconfig, const ch
 {
 }
 
-MACHINE_CONFIG_START(midiout_port_device::device_add_mconfig)
-	MCFG_MIDIOUT_ADD("midioutimg")
-MACHINE_CONFIG_END
+void midiout_port_device::device_add_mconfig(machine_config &config)
+{
+	MIDIOUT(config, m_midiout, 0);
+}

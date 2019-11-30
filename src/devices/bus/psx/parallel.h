@@ -7,14 +7,6 @@
 #pragma once
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_PSX_PARALLEL_SLOT_ADD(_tag, _slot_intf, _def_slot) \
-	MCFG_DEVICE_ADD(_tag, PSX_PARALLEL_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -22,35 +14,39 @@
 
 class psx_parallel_interface;
 
-class psx_parallel_slot_device : public device_t, public device_slot_interface
+class psx_parallel_slot_device : public device_t, public device_single_card_slot_interface<psx_parallel_interface>
 {
 public:
 	// construction/destruction
+	template <typename T>
+	psx_parallel_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
+		: psx_parallel_slot_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
 	psx_parallel_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~psx_parallel_slot_device();
 
 	DECLARE_READ16_MEMBER(exp_r);
 	DECLARE_WRITE16_MEMBER(exp_w);
 
-	const bool hascard() const
-	{
-		return bool(m_card);
-	};
+	bool hascard() const { return bool(m_card); }
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
-
-	psx_parallel_interface *m_card;
 
 private:
+	psx_parallel_interface *m_card;
 };
 
 
 // ======================> psx_parallel_interface
 
-class psx_parallel_interface : public device_slot_card_interface
+class psx_parallel_interface : public device_interface
 {
 public:
 	// construction/destruction

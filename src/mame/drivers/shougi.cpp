@@ -106,7 +106,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(nmi_enable_w);
 	DECLARE_READ8_MEMBER(semaphore_r);
 
-	DECLARE_PALETTE_INIT(shougi);
+	void shougi_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_nmi);
@@ -162,7 +162,7 @@ void shougi_state::machine_start()
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(shougi_state, shougi)
+void shougi_state::shougi_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances_b[2]  = { 470, 220 };
@@ -176,24 +176,24 @@ PALETTE_INIT_MEMBER(shougi_state, shougi)
 
 	for (int i = 0; i < palette.entries(); i++)
 	{
-		int bit0,bit1,bit2,r,g,b;
+		int bit0,bit1,bit2;
 
 		/* red component */
 		bit0 = (color_prom[i] >> 0) & 0x01;
 		bit1 = (color_prom[i] >> 1) & 0x01;
 		bit2 = (color_prom[i] >> 2) & 0x01;
-		r = combine_3_weights(weights_r, bit0, bit1, bit2);
+		int const r = combine_weights(weights_r, bit0, bit1, bit2);
 
 		/* green component */
 		bit0 = (color_prom[i] >> 3) & 0x01;
 		bit1 = (color_prom[i] >> 4) & 0x01;
 		bit2 = (color_prom[i] >> 5) & 0x01;
-		g = combine_3_weights(weights_g, bit0, bit1, bit2);
+		int const g = combine_weights(weights_g, bit0, bit1, bit2);
 
 		/* blue component */
 		bit0 = (color_prom[i] >> 6) & 0x01;
 		bit1 = (color_prom[i] >> 7) & 0x01;
-		b = combine_2_weights(weights_b, bit0, bit1);
+		int const b = combine_weights(weights_b, bit0, bit1);
 
 		palette.set_pen_color(i,rgb_t(r,g,b));
 	}
@@ -370,50 +370,47 @@ INTERRUPT_GEN_MEMBER(shougi_state::vblank_nmi)
 }
 
 
-MACHINE_CONFIG_START(shougi_state::shougi)
-
+void shougi_state::shougi(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(10'000'000)/4)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", shougi_state, vblank_nmi)
+	Z80(config, m_maincpu, XTAL(10'000'000)/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &shougi_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(shougi_state::vblank_nmi));
 
-	MCFG_DEVICE_ADD("sub", Z80, XTAL(10'000'000)/4)
-	MCFG_DEVICE_PROGRAM_MAP(sub_map)
-	MCFG_DEVICE_IO_MAP(readport_sub)
+	Z80(config, m_subcpu, XTAL(10'000'000)/4);
+	m_subcpu->set_addrmap(AS_PROGRAM, &shougi_state::sub_map);
+	m_subcpu->set_addrmap(AS_IO, &shougi_state::readport_sub);
 
-	MCFG_DEVICE_ADD("alpha_8201", ALPHA_8201, XTAL(10'000'000)/4/8)
+	ALPHA_8201(config, m_alpha_8201, XTAL(10'000'000)/4/8);
 
 	ls259_device &mainlatch(LS259(config, "mainlatch"));
 	mainlatch.q_out_cb<0>().set_nop(); // 0: sharedram = sub, 1: sharedram = main (TODO!)
 	mainlatch.q_out_cb<1>().set(FUNC(shougi_state::nmi_enable_w));
 	mainlatch.q_out_cb<2>().set_nop(); // ?
-	mainlatch.q_out_cb<3>().set("alpha_8201", FUNC(alpha_8201_device::mcu_start_w)); // start/halt ALPHA-8201
-	mainlatch.q_out_cb<4>().set("alpha_8201", FUNC(alpha_8201_device::bus_dir_w)).invert(); // ALPHA-8201 shared RAM bus direction: 0: mcu, 1: maincpu
+	mainlatch.q_out_cb<3>().set(m_alpha_8201, FUNC(alpha_8201_device::mcu_start_w)); // start/halt ALPHA-8201
+	mainlatch.q_out_cb<4>().set(m_alpha_8201, FUNC(alpha_8201_device::bus_dir_w)).invert(); // ALPHA-8201 shared RAM bus direction: 0: mcu, 1: maincpu
 	mainlatch.q_out_cb<7>().set_nop(); // nothing? connected to +5v via resistor
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.set_perfect_quantum(m_maincpu);
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 0x10) // assuming it's the same as champbas
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 0x10); // assuming it's the same as champbas
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 255)
-	MCFG_SCREEN_UPDATE_DRIVER(shougi_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 255, 0, 255);
+	screen.set_screen_update(FUNC(shougi_state::screen_update));
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 32)
-	MCFG_PALETTE_INIT_OWNER(shougi_state, shougi)
+	PALETTE(config, "palette", FUNC(shougi_state::shougi_palette), 32);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, XTAL(10'000'000)/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_CONFIG_END
+	AY8910(config, "aysnd", XTAL(10'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.30);
+}
 
 
 

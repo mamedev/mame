@@ -14,8 +14,8 @@ class generic_ram_plain_device : public device_t, public device_generic_cart_int
 {
 public:
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_ram) override;
-	virtual DECLARE_WRITE8_MEMBER(write_ram) override;
+	virtual uint8_t read_ram(offs_t offset) override;
+	virtual void write_ram(offs_t offset, uint8_t data) override;
 
 protected:
 	// construction/destruction
@@ -35,8 +35,8 @@ class generic_ram_linear_device : public device_t, public device_generic_cart_in
 {
 public:
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_ram) override;
-	virtual DECLARE_WRITE8_MEMBER(write_ram) override;
+	virtual uint8_t read_ram(offs_t offset) override;
+	virtual void write_ram(offs_t offset, uint8_t data) override;
 
 protected:
 	// construction/destruction

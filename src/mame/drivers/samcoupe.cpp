@@ -65,7 +65,7 @@ void samcoupe_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		sam_video_update_callback(ptr, param);
 		break;
 	default:
-		assert_always(false, "Unknown id in samcoupe_state::device_timer");
+		throw emu_fatalerror("Unknown id in samcoupe_state::device_timer");
 	}
 }
 
@@ -235,6 +235,10 @@ READ8_MEMBER(samcoupe_state::samcoupe_keyboard_r)
 
 	/* bit 7, external memory */
 	data |= 1 << 7;
+	
+	/* joysticks */
+	if (!BIT(offset, 12)) data &= m_joy1->read() | (0xff ^ 0x1f);
+	if (!BIT(offset, 11)) data &= m_joy2->read() | (0xff ^ 0x1f);
 
 	return data;
 }
@@ -291,10 +295,10 @@ WRITE8_MEMBER(samcoupe_state::samcoupe_lpt2_strobe_w)
 
 void samcoupe_state::samcoupe_mem(address_map &map)
 {
-	map(0x0000, 0x3fff).ram().rw(FUNC(samcoupe_state::sam_bank1_r), FUNC(samcoupe_state::sam_bank1_w)); // AM_RAMBANK("bank1")
-	map(0x4000, 0x7fff).ram().rw(FUNC(samcoupe_state::sam_bank2_r), FUNC(samcoupe_state::sam_bank2_w)); // AM_RAMBANK("bank2")
-	map(0x8000, 0xbfff).ram().rw(FUNC(samcoupe_state::sam_bank3_r), FUNC(samcoupe_state::sam_bank3_w)); // AM_RAMBANK("bank3")
-	map(0xc000, 0xffff).ram().rw(FUNC(samcoupe_state::sam_bank4_r), FUNC(samcoupe_state::sam_bank4_w)); // AM_RAMBANK("bank4")
+	map(0x0000, 0x3fff).ram().rw(FUNC(samcoupe_state::sam_bank1_r), FUNC(samcoupe_state::sam_bank1_w)); // .bankrw("bank1");
+	map(0x4000, 0x7fff).ram().rw(FUNC(samcoupe_state::sam_bank2_r), FUNC(samcoupe_state::sam_bank2_w)); // .bankrw("bank2");
+	map(0x8000, 0xbfff).ram().rw(FUNC(samcoupe_state::sam_bank3_r), FUNC(samcoupe_state::sam_bank3_w)); // .bankrw("bank3");
+	map(0xc000, 0xffff).ram().rw(FUNC(samcoupe_state::sam_bank4_r), FUNC(samcoupe_state::sam_bank4_w)); // .bankrw("bank4");
 }
 
 void samcoupe_state::samcoupe_io(address_map &map)
@@ -458,6 +462,24 @@ static INPUT_PORTS_START( samcoupe )
 	PORT_CONFNAME(0x01, 0x00, "Real Time Clock")
 	PORT_CONFSETTING(   0x00, DEF_STR(None))
 	PORT_CONFSETTING(   0x01, "SAMBUS")
+
+	/* Sam Coupe has single 9-pin ATARI-compatible connector but supports 2 joysticks via a splitter,
+	   this works by using a different ground for each stick (pin 8: stick 1 gnd, pin 9: stick 2 gnd.)
+	   Joysticks overlay number keys 6-0 for the stick 1 and 1-5 for stick 2 (same scheme as ZX Spectrum) */
+
+	PORT_START("joy_1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1)        PORT_PLAYER(1)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_8WAY PORT_PLAYER(1)
+
+	PORT_START("joy_2")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1)        PORT_PLAYER(2)
 INPUT_PORTS_END
 
 
@@ -472,22 +494,16 @@ INPUT_PORTS_END
          nothing   G+4     R+4     B+4    ALL+1    G+2     R+2     B+2
 
 */
-PALETTE_INIT_MEMBER(samcoupe_state, samcoupe)
+void samcoupe_state::samcoupe_palette(palette_device &palette) const
 {
 	for (int i = 0; i < 128; i++)
 	{
-		uint8_t b = BIT(i, 0) * 2 + BIT(i, 4) * 4 + BIT(i, 3);
-		uint8_t r = BIT(i, 1) * 2 + BIT(i, 5) * 4 + BIT(i, 3);
-		uint8_t g = BIT(i, 2) * 2 + BIT(i, 6) * 4 + BIT(i, 3);
+		uint8_t const b = bitswap<3>(i, 4, 0, 3);
+		uint8_t const r = bitswap<3>(i, 5, 1, 3);
+		uint8_t const g = bitswap<3>(i, 6, 2, 3);
 
-		r <<= 5;
-		g <<= 5;
-		b <<= 5;
-
-		palette.set_pen_color(i, rgb_t(r, g, b));
+		palette.set_pen_color(i, pal3bit(r), pal3bit(g), pal3bit(b));
 	}
-
-	palette.palette()->normalize_range(0, 127);
 }
 
 
@@ -504,59 +520,58 @@ static void samcoupe_floppies(device_slot_interface &device)
 	device.option_add("35dd", FLOPPY_35_DD);
 }
 
-
-MACHINE_CONFIG_START(samcoupe_state::samcoupe)
+void samcoupe_state::samcoupe(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, SAMCOUPE_XTAL_X1 / 4) /* 6 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(samcoupe_mem)
-	MCFG_DEVICE_IO_MAP(samcoupe_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", samcoupe_state,  samcoupe_frame_interrupt)
-
+	Z80(config, m_maincpu, SAMCOUPE_XTAL_X1 / 4); /* 6 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &samcoupe_state::samcoupe_mem);
+	m_maincpu->set_addrmap(AS_IO, &samcoupe_state::samcoupe_io);
+	m_maincpu->set_vblank_int("screen", FUNC(samcoupe_state::samcoupe_frame_interrupt));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(SAMCOUPE_XTAL_X1/2, SAM_TOTAL_WIDTH, 0, SAM_BORDER_LEFT + SAM_SCREEN_WIDTH + SAM_BORDER_RIGHT, SAM_TOTAL_HEIGHT, 0, SAM_BORDER_TOP + SAM_SCREEN_HEIGHT + SAM_BORDER_BOTTOM)
-	MCFG_SCREEN_UPDATE_DRIVER(samcoupe_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(SAMCOUPE_XTAL_X1/2, SAM_TOTAL_WIDTH,  0, SAM_BORDER_LEFT + SAM_SCREEN_WIDTH + SAM_BORDER_RIGHT,
+										  SAM_TOTAL_HEIGHT, 0, SAM_BORDER_TOP + SAM_SCREEN_HEIGHT + SAM_BORDER_BOTTOM);
+	m_screen->set_screen_update(FUNC(samcoupe_state::screen_update));
+	m_screen->set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 128)
-	MCFG_PALETTE_INIT_OWNER(samcoupe_state, samcoupe)
+	PALETTE(config, "palette", FUNC(samcoupe_state::samcoupe_palette), 128);
 
 	/* devices */
-	MCFG_DEVICE_ADD(m_lpt1, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, samcoupe_state, write_lpt1_busy))
+	CENTRONICS(config, m_lpt1, centronics_devices, "printer");
+	m_lpt1->busy_handler().set(FUNC(samcoupe_state::write_lpt1_busy));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("lpt1_data_out", "lpt1")
+	output_latch_device &lpt1_data_out(OUTPUT_LATCH(config, "lpt1_data_out"));
+	m_lpt1->set_output_latch(lpt1_data_out);
 
-	MCFG_DEVICE_ADD(m_lpt2, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, samcoupe_state, write_lpt2_busy))
+	CENTRONICS(config, m_lpt2, centronics_devices, "printer");
+	m_lpt2->busy_handler().set(FUNC(samcoupe_state::write_lpt2_busy));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("lpt2_data_out", "lpt2")
+	output_latch_device &lpt2_data_out(OUTPUT_LATCH(config, "lpt2_data_out"));
+	m_lpt2->set_output_latch(lpt2_data_out);
 
-	MCFG_DEVICE_ADD("sambus_clock", MSM6242, 32.768_kHz_XTAL)
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_FORMATS(tzx_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
-	MCFG_CASSETTE_INTERFACE("samcoupe_cass")
-
-	MCFG_SOFTWARE_LIST_ADD("cass_list","samcoupe_cass")
-
-	MCFG_DEVICE_ADD("wd1772", WD1772, SAMCOUPE_XTAL_X1/3)
-	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", samcoupe_floppies, "35dd", samcoupe_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("wd1772:1", samcoupe_floppies, "35dd", samcoupe_state::floppy_formats)
-	MCFG_SOFTWARE_LIST_ADD("flop_list","samcoupe_flop")
+	MSM6242(config, m_rtc, 32.768_kHz_XTAL);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_SAA1099_ADD("saa1099", SAMCOUPE_XTAL_X1/3) /* 8 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
+	SAA1099(config, "saa1099", SAMCOUPE_XTAL_X1/3).add_route(ALL_OUTPUTS, "mono", 0.50); /* 8 MHz */
 
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(tzx_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cassette->set_interface("samcoupe_cass");
+	SOFTWARE_LIST(config, "cass_list").set_original("samcoupe_cass");
+
+	WD1772(config, m_fdc, SAMCOUPE_XTAL_X1/3);
+	FLOPPY_CONNECTOR(config, "wd1772:0", samcoupe_floppies, "35dd", samcoupe_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "wd1772:1", samcoupe_floppies, "35dd", samcoupe_state::floppy_formats);
+	SOFTWARE_LIST(config, "flop_list").set_original("samcoupe_flop");
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("512K").set_extra_options("256K,1280K,1536K,2304K,2560K,3328K,3584K,4352K,4608K");
-MACHINE_CONFIG_END
+}
 
 
 /***************************************************************************

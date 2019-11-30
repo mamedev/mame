@@ -7,27 +7,17 @@
     Commodore C64 cartridge images
 
 *********************************************************************/
+#ifndef MAME_FORMATS_CBM_CRT_H
+#define MAME_FORMATS_CBM_CRT_H
 
 #pragma once
 
-#ifndef __CBM_CRT__
-#define __CBM_CRT__
-
 #include "formats/imageutl.h"
-
 
 
 //**************************************************************************
 //  MACROS/CONSTANTS
 //**************************************************************************
-
-#define CRT_SIGNATURE       "C64 CARTRIDGE   "
-
-#define CRT_HEADER_LENGTH   0x40
-#define CRT_CHIP_LENGTH     0x10
-
-#define UNSUPPORTED         "standard"
-
 
 // C64 cartridge types
 enum
@@ -139,5 +129,4 @@ std::string cbm_crt_get_card(util::core_file &file);
 bool cbm_crt_read_header(util::core_file &file, size_t *roml_size, size_t *romh_size, int *exrom, int *game);
 bool cbm_crt_read_data(util::core_file &file, uint8_t *roml, uint8_t *romh);
 
-
-#endif
+#endif // MAME_FORMATS_CBM_CRT_H

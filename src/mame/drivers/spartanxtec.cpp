@@ -28,6 +28,7 @@ probably an original bug?
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class spartanxtec_state : public driver_device
@@ -54,7 +55,7 @@ private:
 	virtual void video_start() override;
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_spartanxtec(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_PALETTE_INIT(spartanxtec);
+	void spartanxtec_palette(palette_device &palette) const;
 
 	DECLARE_WRITE8_MEMBER(kungfum_tileram_w);
 	TILE_GET_INFO_MEMBER(get_kungfum_bg_tile_info);
@@ -112,7 +113,7 @@ TILE_GET_INFO_MEMBER(spartanxtec_state::get_kungfum_bg_tile_info)
 
 void spartanxtec_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(spartanxtec_state::get_kungfum_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(spartanxtec_state::get_kungfum_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_bg_tilemap->set_scroll_rows(32);
 }
 
@@ -343,95 +344,90 @@ void spartanxtec_state::machine_reset()
 {
 }
 
-PALETTE_INIT_MEMBER(spartanxtec_state, spartanxtec)
+void spartanxtec_state::spartanxtec_palette(palette_device &palette) const
 {
-	// todo, proper weights for this bootleg PCB
-	const uint8_t *color_prom = memregion("cprom")->base();
+	// TODO proper weights for this bootleg PCB
+	uint8_t const *const color_prom = memregion("cprom")->base();
 	for (int i = 0; i < 0x200; i++)
 	{
-		int r, g, b;
+		int const b = pal4bit(color_prom[i + 0x000] & 0x0f);
+		int const g = pal4bit(color_prom[i + 0x200] & 0x0f);
+		int const r = pal4bit(color_prom[i + 0x400] & 0x0f);
 
-		b = (color_prom[i+0x000]&0x0f)<<4;
-		g = (color_prom[i+0x200]&0x0f)<<4;
-		r = (color_prom[i+0x400]&0x0f)<<4;
-
-		palette.set_pen_color(i, rgb_t(r,g,b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
 
 
-MACHINE_CONFIG_START(spartanxtec_state::spartanxtec)
-
+void spartanxtec_state::spartanxtec(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,4000000)         /* ? MHz */
-	MCFG_DEVICE_PROGRAM_MAP(spartanxtec_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", spartanxtec_state,  irq0_line_assert)
+	Z80(config, m_maincpu, 4000000);         /* ? MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &spartanxtec_state::spartanxtec_map);
+	m_maincpu->set_vblank_int("screen", FUNC(spartanxtec_state::irq0_line_assert));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80,4000000)
-	MCFG_DEVICE_PROGRAM_MAP(spartanxtec_sound_map)
-	MCFG_DEVICE_IO_MAP(spartanxtec_sound_io)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(spartanxtec_state, irq0_line_assert, 1000) // controls speed of music
-//  MCFG_DEVICE_VBLANK_INT_DRIVER("screen", spartanxtec_state,  irq0_line_hold)
+	Z80(config, m_audiocpu, 4000000);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &spartanxtec_state::spartanxtec_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &spartanxtec_state::spartanxtec_sound_io);
+	m_audiocpu->set_periodic_int(FUNC(spartanxtec_state::irq0_line_assert), attotime::from_hz(1000)); // controls speed of music
+//  m_audiocpu->set_vblank_int("screen", FUNC(spartanxtec_state::irq0_line_hold));
 
 	/* video hardware */
 	// todo, proper screen timings for this bootleg PCB - as visible area is less it's probably ~60hz, not 55
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1790))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1-16)
-	MCFG_SCREEN_UPDATE_DRIVER(spartanxtec_state, screen_update_spartanxtec)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(1790));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1-16);
+	screen.set_screen_update(FUNC(spartanxtec_state::screen_update_spartanxtec));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 0x200)
-	MCFG_PALETTE_INIT_OWNER(spartanxtec_state,spartanxtec)
+	PALETTE(config, m_palette, FUNC(spartanxtec_state::spartanxtec_palette), 0x200);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_news)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_news);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ay1", AY8912, 1000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_DEVICE_ADD("ay2", AY8912, 1000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_DEVICE_ADD("ay3", AY8912, 1000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8912(config, "ay1", 1000000).add_route(ALL_OUTPUTS, "mono", 0.25);
 
-MACHINE_CONFIG_END
+	AY8912(config, "ay2", 1000000).add_route(ALL_OUTPUTS, "mono", 0.25);
+
+	AY8912(config, "ay3", 1000000).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
 ROM_START( spartanxtec )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "1.bin", 0x00000, 0x04000, CRC(d5d6cddf) SHA1(baaec83be455bf2267d51ea2a2c1fcda22f27bd5) )
-	ROM_LOAD( "2.bin", 0x04000, 0x04000, CRC(2803bb72) SHA1(d0f93c61f3f08fb866e2a4617a7824e72f61c97f) )
+	ROM_LOAD( "1.ic13", 0x00000, 0x04000, CRC(d5d6cddf) SHA1(baaec83be455bf2267d51ea2a2c1fcda22f27bd5) )
+	ROM_LOAD( "2.ic14", 0x04000, 0x04000, CRC(2803bb72) SHA1(d0f93c61f3f08fb866e2a4617a7824e72f61c97f) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "3.bin", 0x00000, 0x01000, CRC(9a18af94) SHA1(1644295aa0c837dced5934360e41d77e0a93ccd1) )
+	ROM_LOAD( "3.ic8", 0x00000, 0x01000, CRC(9a18af94) SHA1(1644295aa0c837dced5934360e41d77e0a93ccd1) )
 
 	ROM_REGION( 0x6000, "gfx1", ROMREGION_INVERT )
-	ROM_LOAD( "5.bin", 0x00000, 0x0800, CRC(8a3d2978) SHA1(e50ba8d63e894c6a555d92c3144682be68f111b0))
+	ROM_LOAD( "5.ic26", 0x00000, 0x0800, CRC(8a3d2978) SHA1(e50ba8d63e894c6a555d92c3144682be68f111b0))
 	ROM_CONTINUE(0x1000, 0x0800)
 	ROM_CONTINUE(0x0800, 0x0800)
 	ROM_CONTINUE(0x1800, 0x0800)
-	ROM_LOAD( "6.bin", 0x02000, 0x0800, CRC(b1570b6b) SHA1(380a692309690e6ff6b57fda657192fff95167e0) )
+	ROM_LOAD( "6.ic27", 0x02000, 0x0800, CRC(b1570b6b) SHA1(380a692309690e6ff6b57fda657192fff95167e0) )
 	ROM_CONTINUE(0x3000, 0x0800)
 	ROM_CONTINUE(0x2800, 0x0800)
 	ROM_CONTINUE(0x3800, 0x0800)
-	ROM_LOAD( "4.bin", 0x04000, 0x0800, CRC(b55672ef) SHA1(7bd556a76e130be1262aa7db09df84c6463ce9ef) )
+	ROM_LOAD( "4.ic25", 0x04000, 0x0800, CRC(b55672ef) SHA1(7bd556a76e130be1262aa7db09df84c6463ce9ef) )
 	ROM_CONTINUE(0x5000, 0x0800)
 	ROM_CONTINUE(0x4800, 0x0800)
 	ROM_CONTINUE(0x5800, 0x0800)
 
 	ROM_REGION( 0x18000, "gfx2", ROMREGION_INVERT )
-	ROM_LOAD( "7.bin", 0x00000, 0x08000, CRC(aa897e30) SHA1(90b3b316800be106d3baa6783ca894703f369d4e) )
-	ROM_LOAD( "8.bin", 0x08000, 0x08000, CRC(98a1803b) SHA1(3edfc45c289f850b07a0231ce0b792cbec6fb245) )
-	ROM_LOAD( "9.bin", 0x10000, 0x08000, CRC(e3bf0d73) SHA1(4562422c07399e240081792b96b9018d1e7dd97b) )
+	ROM_LOAD( "7.bin",  0x00000, 0x08000, CRC(aa897e30) SHA1(90b3b316800be106d3baa6783ca894703f369d4e) )
+	ROM_LOAD( "8.bin",  0x08000, 0x08000, CRC(98a1803b) SHA1(3edfc45c289f850b07a0231ce0b792cbec6fb245) )
+	ROM_LOAD( "9.ic43", 0x10000, 0x08000, CRC(e3bf0d73) SHA1(4562422c07399e240081792b96b9018d1e7dd97b) )
 
 	ROM_REGION( 0x600, "cprom", 0 )
 	// first half of all of these is empty
@@ -445,6 +441,11 @@ ROM_START( spartanxtec )
 	ROM_REGION( 0x18000, "unkprom", 0 ) // just linear increasing value
 	ROM_LOAD( "1_tbp24s10_82s129.bin", 0x0000, 0x0100, CRC(b6135ee0) SHA1(248a978987cff86c2bbad10ef332f63a6abd5bee) )
 	ROM_LOAD( "2_tbp24s10_82s129.bin", 0x0000, 0x0100, CRC(b6135ee0) SHA1(248a978987cff86c2bbad10ef332f63a6abd5bee) )
+
+	ROM_REGION( 0x00228, "plds", 0 )
+	ROM_LOAD( "pal16r8acn.ic12", 0x0000, 0x0114, NO_DUMP )
+	ROM_LOAD( "pal16r6acn.ic33", 0x0114, 0x0114, NO_DUMP )
+
 ROM_END
 
 

@@ -80,7 +80,7 @@ void nes_ggenie_device::pcb_reset()
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_ggenie_device::write_h)
+void nes_ggenie_device::write_h(offs_t offset, uint8_t data)
 {
 //  LOG_MMC(("axrom write_h, offset: %04x, data: %02x\n", offset, data));
 	if (!m_gg_bypass)
@@ -150,22 +150,22 @@ WRITE8_MEMBER(nes_ggenie_device::write_h)
 		}
 	}
 	else
-		m_ggslot->write_h(space, offset, data, mem_mask);
+		m_ggslot->write_h(offset, data);
 }
 
-WRITE8_MEMBER(nes_ggenie_device::write_m)
+void nes_ggenie_device::write_m(offs_t offset, uint8_t data)
 {
 	if (m_gg_bypass && m_ggslot)
-		m_ggslot->write_m(space, offset, data, mem_mask);
+		m_ggslot->write_m(offset, data);
 }
 
-WRITE8_MEMBER(nes_ggenie_device::write_l)
+void nes_ggenie_device::write_l(offs_t offset, uint8_t data)
 {
 	if (m_gg_bypass && m_ggslot)
-		m_ggslot->write_l(space, offset, data, mem_mask);
+		m_ggslot->write_l(offset, data);
 }
 
-READ8_MEMBER(nes_ggenie_device::read_h)
+uint8_t nes_ggenie_device::read_h(offs_t offset)
 {
 	if (m_gg_bypass && m_ggslot->m_cart)
 	{
@@ -186,29 +186,29 @@ READ8_MEMBER(nes_ggenie_device::read_h)
 	return hi_access_rom(offset);
 }
 
-READ8_MEMBER(nes_ggenie_device::read_m)
+uint8_t nes_ggenie_device::read_m(offs_t offset)
 {
 	if (m_gg_bypass && m_ggslot->m_cart)
-		return  m_ggslot->m_cart->read_m(space, offset, mem_mask);
+		return m_ggslot->m_cart->read_m(offset);
 
 	return 0xff;
 }
 
-READ8_MEMBER(nes_ggenie_device::read_l)
+uint8_t nes_ggenie_device::read_l(offs_t offset)
 {
 	if (m_gg_bypass && m_ggslot->m_cart)
-		return  m_ggslot->m_cart->read_l(space, offset, mem_mask);
+		return m_ggslot->m_cart->read_l(offset);
 
 	return 0xff;
 }
 
-WRITE8_MEMBER(nes_ggenie_device::chr_w)
+void nes_ggenie_device::chr_w(offs_t offset, uint8_t data)
 {
 	int bank = offset >> 10;
 
 	if (m_gg_bypass && m_ggslot->m_cart)
 	{
-		m_ggslot->m_cart->chr_w(space, offset, data, mem_mask);
+		m_ggslot->m_cart->chr_w(offset, data);
 		return;
 	}
 
@@ -216,24 +216,24 @@ WRITE8_MEMBER(nes_ggenie_device::chr_w)
 		m_chr_access[bank][offset & 0x3ff] = data;
 }
 
-READ8_MEMBER(nes_ggenie_device::chr_r)
+uint8_t nes_ggenie_device::chr_r(offs_t offset)
 {
 	int bank = offset >> 10;
 
 	if (m_gg_bypass && m_ggslot->m_cart)
-		return  m_ggslot->m_cart->chr_r(space, offset, mem_mask);
+		return  m_ggslot->m_cart->chr_r(offset);
 
 	return m_chr_access[bank][offset & 0x3ff];
 }
 
 
-WRITE8_MEMBER(nes_ggenie_device::nt_w)
+void nes_ggenie_device::nt_w(offs_t offset, uint8_t data)
 {
 	int page = ((offset & 0xc00) >> 10);
 
 	if (m_gg_bypass && m_ggslot->m_cart)
 	{
-		m_ggslot->m_cart->nt_w(space, offset, data, mem_mask);
+		m_ggslot->m_cart->nt_w(offset, data);
 		return;
 	}
 
@@ -243,12 +243,12 @@ WRITE8_MEMBER(nes_ggenie_device::nt_w)
 	m_nt_access[page][offset & 0x3ff] = data;
 }
 
-READ8_MEMBER(nes_ggenie_device::nt_r)
+uint8_t nes_ggenie_device::nt_r(offs_t offset)
 {
 	int page = ((offset & 0xc00) >> 10);
 
 	if (m_gg_bypass && m_ggslot->m_cart)
-		return  m_ggslot->m_cart->nt_r(space, offset, mem_mask);
+		return m_ggslot->m_cart->nt_r(offset);
 
 	return m_nt_access[page][offset & 0x3ff];
 }

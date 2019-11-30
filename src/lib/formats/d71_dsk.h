@@ -7,13 +7,15 @@
     Commodore 1571 sector disk image format
 
 *********************************************************************/
+#ifndef MAME_FORMATS_D71_DSK_H
+#define MAME_FORMATS_D71_DSK_H
 
-#ifndef D71_DSK_H_
-#define D71_DSK_H_
+#pragma once
 
 #include "d64_dsk.h"
 
-class d71_format : public d64_format {
+class d71_format : public d64_format
+{
 public:
 	d71_format();
 
@@ -27,6 +29,4 @@ protected:
 
 extern const floppy_format_type FLOPPY_D71_FORMAT;
 
-
-
-#endif
+#endif // MAME_FORMATS_D71_DSK_H

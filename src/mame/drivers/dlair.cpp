@@ -69,8 +69,8 @@ public:
 	{
 	}
 
-	DECLARE_CUSTOM_INPUT_MEMBER(laserdisc_status_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(laserdisc_command_r);
+	DECLARE_READ_LINE_MEMBER(laserdisc_status_r);
+	DECLARE_READ_LINE_MEMBER(laserdisc_command_r);
 	void init_fixed();
 	void init_variable();
 
@@ -106,7 +106,7 @@ private:
 		return CLEAR_LINE;
 	}
 
-	uint8_t laserdisc_status_r()
+	uint8_t laserdisc_status_strobe_r()
 	{
 		if (m_ldv1000 != nullptr) return m_ldv1000->status_strobe_r();
 		return CLEAR_LINE;
@@ -127,21 +127,21 @@ private:
 	DECLARE_WRITE8_MEMBER(laserdisc_w);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(dleuro);
-	uint32_t screen_update_dleuro(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void dleuro_palette(palette_device &palette) const;
+	uint32_t screen_update_dleuro(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(write_speaker);
 
 	void dleuro_io_map(address_map &map);
 	void dleuro_map(address_map &map);
 	void dlus_map(address_map &map);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	optional_device<speaker_sound_device> m_speaker;
 	optional_device<gfxdecode_device> m_gfxdecode;
 	optional_device<palette_device> m_palette;
 	optional_device<pioneer_ldv1000_device> m_ldv1000;
 	optional_device<pioneer_pr7820_device> m_pr7820;
-	optional_device<phillips_22vp932_device> m_22vp932;
+	optional_device<philips_22vp932_device> m_22vp932;
 	optional_shared_ptr<uint8_t> m_videoram;
 	output_finder<16> m_digits;
 
@@ -203,11 +203,9 @@ static const z80_daisy_config dleuro_daisy_chain[] =
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(dlair_state,dleuro)
+void dlair_state::dleuro_palette(palette_device &palette) const
 {
-	int i;
-
-	for (i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 	{
 		palette.set_pen_color(2 * i + 0, rgb_t(0, 0, 0));
 		palette.set_pen_color(2 * i + 1, pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
@@ -222,19 +220,18 @@ PALETTE_INIT_MEMBER(dlair_state,dleuro)
  *
  *************************************/
 
-uint32_t dlair_state::screen_update_dleuro(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dlair_state::screen_update_dleuro(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint8_t *videoram = m_videoram;
-	int x, y;
-
-	/* redraw the overlay */
-	for (y = 0; y < 32; y++)
-		for (x = 0; x < 32; x++)
+	// redraw the overlay
+	for (int y = 0; y < 32; y++)
+	{
+		for (int x = 0; x < 32; x++)
 		{
-			uint8_t *base = &videoram[y * 64 + x * 2 + 1];
+			uint8_t const *const base = &m_videoram[y * 64 + x * 2 + 1];
 			// TODO: opaque?
-			m_gfxdecode->gfx(0)->opaque(bitmap,cliprect, base[0], base[1], 0, 0, 10 * x, 16 * y);
+			m_gfxdecode->gfx(0)->opaque(bitmap, cliprect, base[0], base[1], 0, 0, 10 * x, 16 * y);
 		}
+	}
 
 	return 0;
 }
@@ -346,13 +343,13 @@ WRITE8_MEMBER(dlair_state::led_den2_w)
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(dlair_state::laserdisc_status_r)
+READ_LINE_MEMBER(dlair_state::laserdisc_status_r)
 {
-	return laserdisc_status_r();
+	return laserdisc_status_strobe_r();
 }
 
 
-CUSTOM_INPUT_MEMBER(dlair_state::laserdisc_command_r)
+READ_LINE_MEMBER(dlair_state::laserdisc_command_r)
 {
 	return (laserdisc_ready_r() == ASSERT_LINE) ? 0 : 1;
 }
@@ -566,8 +563,8 @@ static INPUT_PORTS_START( dlair )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, dlair_state,laserdisc_status_r, nullptr)     /* status strobe */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, dlair_state,laserdisc_command_r, nullptr)    /* command strobe */
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(dlair_state, laserdisc_status_r)     /* status strobe */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(dlair_state, laserdisc_command_r)    /* command strobe */
 INPUT_PORTS_END
 
 
@@ -598,8 +595,8 @@ static INPUT_PORTS_START( dleuro )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* probably unused */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, dlair_state,laserdisc_status_r, nullptr)     /* status strobe */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, dlair_state,laserdisc_command_r, nullptr)    /* command strobe */
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(dlair_state, laserdisc_status_r)     /* status strobe */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(dlair_state, laserdisc_command_r)    /* command strobe */
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("A:1")
@@ -729,85 +726,81 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(dlair_state::dlair_base)
-
+void dlair_state::dlair_base(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK_US/4)
-	MCFG_DEVICE_PROGRAM_MAP(dlus_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(dlair_state, irq0_line_hold,  (double)MASTER_CLOCK_US/8/16/16/16/16)
+	Z80(config, m_maincpu, MASTER_CLOCK_US/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &dlair_state::dlus_map);
+	m_maincpu->set_periodic_int(FUNC(dlair_state::irq0_line_hold),  attotime::from_hz((double)MASTER_CLOCK_US/8/16/16/16/16));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, MASTER_CLOCK_US/8)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.33)
-MACHINE_CONFIG_END
+	ay8910_device &aysnd(AY8910(config, "aysnd", MASTER_CLOCK_US/8));
+	aysnd.port_a_read_callback().set_ioport("DSW1");
+	aysnd.port_b_read_callback().set_ioport("DSW2");
+	aysnd.add_route(ALL_OUTPUTS, "rspeaker", 0.33);
+}
 
 
-MACHINE_CONFIG_START(dlair_state::dlair_pr7820)
+void dlair_state::dlair_pr7820(machine_config &config)
+{
 	dlair_base(config);
-	MCFG_LASERDISC_PR7820_ADD("ld_pr7820")
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "ld_pr7820")
-MACHINE_CONFIG_END
+	PIONEER_PR7820(config, m_pr7820, 0);
+	m_pr7820->add_route(0, "lspeaker", 1.0);
+	m_pr7820->add_route(1, "rspeaker", 1.0);
+	m_pr7820->add_ntsc_screen(config, "screen");
+}
 
 
-MACHINE_CONFIG_START(dlair_state::dlair_ldv1000)
+void dlair_state::dlair_ldv1000(machine_config &config)
+{
 	dlair_base(config);
-	MCFG_LASERDISC_LDV1000_ADD("ld_ldv1000")
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "ld_ldv1000")
-MACHINE_CONFIG_END
+	PIONEER_LDV1000(config, m_ldv1000, 0);
+	m_ldv1000->add_route(0, "lspeaker", 1.0);
+	m_ldv1000->add_route(1, "rspeaker", 1.0);
+	m_ldv1000->add_ntsc_screen(config, "screen");
+}
 
 
-MACHINE_CONFIG_START(dlair_state::dleuro)
-
+void dlair_state::dleuro(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK_EURO/4)
-	MCFG_Z80_DAISY_CHAIN(dleuro_daisy_chain)
-	MCFG_DEVICE_PROGRAM_MAP(dleuro_map)
-	MCFG_DEVICE_IO_MAP(dleuro_io_map)
+	Z80(config, m_maincpu, MASTER_CLOCK_EURO/4);
+	m_maincpu->set_daisy_config(dleuro_daisy_chain);
+	m_maincpu->set_addrmap(AS_PROGRAM, &dlair_state::dleuro_map);
+	m_maincpu->set_addrmap(AS_IO, &dlair_state::dleuro_io_map);
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, MASTER_CLOCK_EURO/4 /* same as "maincpu" */)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, dlair_state, write_speaker))
+	z80ctc_device& ctc(Z80CTC(config, "ctc", MASTER_CLOCK_EURO/4 /* same as "maincpu" */));
+	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	ctc.zc_callback<0>().set(FUNC(dlair_state::write_speaker));
 
 	z80sio_device& sio(Z80SIO(config, "sio", MASTER_CLOCK_EURO/4 /* same as "maincpu" */));
 	sio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	// TODO: hook up tx and rx callbacks
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz(MASTER_CLOCK_EURO/(16*16*16*16*16*8)))
+	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_hz(MASTER_CLOCK_EURO/(16*16*16*16*16*8)));
 
-	MCFG_LASERDISC_22VP932_ADD("ld_22vp932")
-	MCFG_LASERDISC_OVERLAY_DRIVER(256, 256, dlair_state, screen_update_dleuro)
-	MCFG_LASERDISC_OVERLAY_PALETTE("palette")
+	PHILIPS_22VP932(config, m_22vp932, 0);
+	m_22vp932->set_overlay(256, 256, FUNC(dlair_state::screen_update_dleuro));
+	m_22vp932->add_route(0, "lspeaker", 1.0);
+	m_22vp932->add_route(1, "rspeaker", 1.0);
 
 	/* video hardware */
-	MCFG_LASERDISC_SCREEN_ADD_PAL("screen", "ld_22vp932")
+	m_22vp932->add_pal_screen(config, "screen");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dlair)
-	MCFG_PALETTE_ADD("palette", 16)
-
-	MCFG_PALETTE_INIT_OWNER(dlair_state,dleuro)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dlair);
+	PALETTE(config, m_palette, FUNC(dlair_state::dleuro_palette), 16);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.33)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.33)
-
-	MCFG_DEVICE_MODIFY("ld_22vp932")
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "lspeaker", 0.33);
+	m_speaker->add_route(ALL_OUTPUTS, "rspeaker", 0.33);
+}
 
 
 

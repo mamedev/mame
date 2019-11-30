@@ -468,13 +468,13 @@ cassette_image::error cassette_get_samples(cassette_image *cassette, int channel
 			case 2:
 				word = interpolate16(sum);
 				if (waveform_flags & CASSETTE_WAVEFORM_ENDIAN_FLIP)
-					word = flipendian_int16(word);
+					word = swapendian_int16(word);
 				*((int16_t *) dest_ptr) = word;
 				break;
 			case 4:
 				dword = sum;
 				if (waveform_flags & CASSETTE_WAVEFORM_ENDIAN_FLIP)
-					dword = flipendian_int32(dword);
+					dword = swapendian_int32(dword);
 				*((int32_t *) dest_ptr) = dword;
 				break;
 		}
@@ -539,13 +539,13 @@ cassette_image::error cassette_put_samples(cassette_image *cassette, int channel
 		case 2:
 			word = *((int16_t *) source_ptr);
 			if (waveform_flags & CASSETTE_WAVEFORM_ENDIAN_FLIP)
-				word = flipendian_int16(word);
+				word = swapendian_int16(word);
 			dest_value = extrapolate16(word);
 			break;
 		case 4:
 			dword = *((int32_t *) source_ptr);
 			if (waveform_flags & CASSETTE_WAVEFORM_ENDIAN_FLIP)
-				dword = flipendian_int32(dword);
+				dword = swapendian_int32(dword);
 			dest_value = dword;
 			break;
 		default:
@@ -725,7 +725,7 @@ cassette_image::error cassette_put_modulated_data(cassette_image *cassette, int 
 		b = *(data_bytes++);
 		for (i = 0; i < 8; i++)
 		{
-			pulse_frequency = (b & (1 << i)) ? modulation->one_frequency_cannonical : modulation->zero_frequency_cannonical;
+			pulse_frequency = (b & (1 << i)) ? modulation->one_frequency_canonical : modulation->zero_frequency_canonical;
 			pulse_period = 1 / pulse_frequency;
 			err = cassette_put_samples(cassette, 0, time_index, pulse_period, wave_bytes_length, 1, wave_bytes, CASSETTE_WAVEFORM_8BIT);
 			if (err != cassette_image::error::SUCCESS)
@@ -836,7 +836,7 @@ cassette_image::error cassette_put_modulated_data_bit(cassette_image *cassette, 
 
 	wave_bytes = choose_wave(modulation, &wave_bytes_length);
 
-	pulse_frequency = (data) ? modulation->one_frequency_cannonical : modulation->zero_frequency_cannonical;
+	pulse_frequency = (data) ? modulation->one_frequency_canonical : modulation->zero_frequency_canonical;
 	pulse_period = 1 / pulse_frequency;
 	err = cassette_put_samples(cassette, 0, time_index, pulse_period, wave_bytes_length, 1, wave_bytes, CASSETTE_WAVEFORM_8BIT);
 	if (err != cassette_image::error::SUCCESS)

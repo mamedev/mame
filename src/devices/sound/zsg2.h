@@ -9,15 +9,6 @@
 
 #pragma once
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_ZSG2_EXT_READ_HANDLER(_devcb) \
-	downcast<zsg2_device &>(*device).set_ext_read_handler(DEVCB_##_devcb);
-
-
 // ======================> zsg2_device
 
 class zsg2_device : public device_t,
@@ -27,7 +18,7 @@ public:
 	zsg2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
-	template <class Object> devcb_base &set_ext_read_handler(Object &&cb) { return m_ext_read_handler.set_callback(std::forward<Object>(cb)); }
+	auto ext_read() { return m_ext_read_handler.bind(); }
 
 	DECLARE_READ16_MEMBER(read);
 	DECLARE_WRITE16_MEMBER(write);

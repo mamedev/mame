@@ -19,7 +19,7 @@ MZ-821 Sharp BASIC Trainer (Germany):   Account Manager: Einnahmen/Ausgaben-Verw
 		<publisher>Dynamic Soft Program / Alco%.Soft</publisher>
 		<part name="cass" interface="mz_cass">
 			<dataarea name="cass" size="38784">
-				<rom name="abu simbel.mzf" size="38784" crc="b439197c" sha1="d63605b437f6468f4c5cf03cf3f7b2c0557faac2" offset="0" />
+				<rom name="abu simbel.mzf" size="38784" crc="b439197c" sha1="d63605b437f6468f4c5cf03cf3f7b2c0557faac2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -30,7 +30,7 @@ MZ-821 Sharp BASIC Trainer (Germany):   Account Manager: Einnahmen/Ausgaben-Verw
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="mz_cass">
 			<dataarea name="cass" size="6786">
-				<rom name="break out-800.mzf" size="6786" crc="bc569aa0" sha1="2dac626d921e7be058c8db0bc17e6594213ec72d" offset="0" />
+				<rom name="break out-800.mzf" size="6786" crc="bc569aa0" sha1="2dac626d921e7be058c8db0bc17e6594213ec72d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -42,7 +42,7 @@ MZ-821 Sharp BASIC Trainer (Germany):   Account Manager: Einnahmen/Ausgaben-Verw
 		<info name="release" value="198708xx"/>
 		<part name="cass" interface="mz_cass">
 			<dataarea name="cass" size="15793">
-				<rom name="cyrus is chess.mzf" size="15793" crc="54a2d5f8" sha1="8320c396430b6f73d9dc769dbbfec42314c2fa76" offset="0" />
+				<rom name="cyrus is chess.mzf" size="15793" crc="54a2d5f8" sha1="8320c396430b6f73d9dc769dbbfec42314c2fa76"/>
 			</dataarea>
 		</part>
 	</software>
@@ -53,7 +53,7 @@ MZ-821 Sharp BASIC Trainer (Germany):   Account Manager: Einnahmen/Ausgaben-Verw
 		<publisher>Proton Software</publisher>
 		<part name="cass" interface="mz_cass">
 			<dataarea name="cass" size="48256">
-				<rom name="g.p.s. program.mzf" size="48256" crc="16bba2ba" sha1="7b4394bc88a1f0d37ddcb0951addfdca7f683b90" offset="0" />
+				<rom name="g.p.s. program.mzf" size="48256" crc="16bba2ba" sha1="7b4394bc88a1f0d37ddcb0951addfdca7f683b90"/>
 			</dataarea>
 		</part>
 	</software>
@@ -64,7 +64,7 @@ MZ-821 Sharp BASIC Trainer (Germany):   Account Manager: Einnahmen/Ausgaben-Verw
 		<publisher>Vortex Software/Ladinek Software</publisher>
 		<part name="cass" interface="mz_cass">
 			<dataarea name="cass" size="32934">
-				<rom name="highway.mzf" size="32934" crc="1a874748" sha1="e3d1efce5b5be6161d9c10de5f76a8403a852cab" offset="0" />
+				<rom name="highway.mzf" size="32934" crc="1a874748" sha1="e3d1efce5b5be6161d9c10de5f76a8403a852cab"/>
 			</dataarea>
 		</part>
 	</software>
@@ -75,7 +75,7 @@ MZ-821 Sharp BASIC Trainer (Germany):   Account Manager: Einnahmen/Ausgaben-Verw
 		<publisher>Pilsoft</publisher>
 		<part name="cass" interface="mz_cass">
 			<dataarea name="cass" size="20096">
-				<rom name="jamesv1.0c.mzf" size="20096" crc="c1d09b07" sha1="eac93ed135bf1e66a8a3c8b5f5a0c6c86d73d3a6" offset="0" />
+				<rom name="jamesv1.0c.mzf" size="20096" crc="c1d09b07" sha1="eac93ed135bf1e66a8a3c8b5f5a0c6c86d73d3a6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -88,13 +88,13 @@ MZ-821 Sharp BASIC Trainer (Germany):   Account Manager: Einnahmen/Ausgaben-Verw
 <!--
         <part name="cass1" interface="mz_cass">
             <dataarea name="cass" size="16585">
-                <rom name="mucmac700.mzf" size="16585" crc="5a49451e" sha1="b4d3f23019df154e1a7bf5db32388dabf5f43c66" offset="0" />
+                <rom name="mucmac700.mzf" size="16585" crc="5a49451e" sha1="b4d3f23019df154e1a7bf5db32388dabf5f43c66"/>
             </dataarea>
         </part>
 -->
 		<part name="cass1" interface="mz_cass">
 			<dataarea name="cass" size="20896">
-				<rom name="mucmac8oo.mzf" size="20896" crc="fab9b721" sha1="524e8855ae1dd36f013c4050924d0540f920d90d" offset="0" />
+				<rom name="mucmac8oo.mzf" size="20896" crc="fab9b721" sha1="524e8855ae1dd36f013c4050924d0540f920d90d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -105,12 +105,12 @@ MZ-821 Sharp BASIC Trainer (Germany):   Account Manager: Einnahmen/Ausgaben-Verw
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="mz_cass">
 			<dataarea name="cass" size="17505">
-				<rom name="opening 800.mzf" size="17505" crc="2c32b173" sha1="588499857c136e0a8000afc8bfc04d5673359e8b" offset="0" />
+				<rom name="opening 800.mzf" size="17505" crc="2c32b173" sha1="588499857c136e0a8000afc8bfc04d5673359e8b"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="mz_cass">
 			<dataarea name="cass" size="2176">
-				<rom name="opening data.mzf" size="2176" crc="d0f0f533" sha1="afd08932f01dc6880b22906707d412c2145f33cf" offset="0" />
+				<rom name="opening data.mzf" size="2176" crc="d0f0f533" sha1="afd08932f01dc6880b22906707d412c2145f33cf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -121,7 +121,7 @@ MZ-821 Sharp BASIC Trainer (Germany):   Account Manager: Einnahmen/Ausgaben-Verw
 		<publisher>Namco/HAL Laboratory</publisher>
 		<part name="cass" interface="mz_cass">
 			<dataarea name="cass" size="11856">
-				<rom name="pcgrally.mzf" size="11856" crc="cbdc2558" sha1="711aea4d33feab497c2f6888489fc31d504719e2" offset="0" />
+				<rom name="pcgrally.mzf" size="11856" crc="cbdc2558" sha1="711aea4d33feab497c2f6888489fc31d504719e2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -132,7 +132,7 @@ MZ-821 Sharp BASIC Trainer (Germany):   Account Manager: Einnahmen/Ausgaben-Verw
 		<publisher>Hewson</publisher>
 		<part name="cass" interface="mz_cass">
 			<dataarea name="cass" size="44672">
-				<rom name="uridium.mzf" size="44672" crc="1664e09b" sha1="780bff6accaac67982e5580b59b72b26d58df130" offset="0" />
+				<rom name="uridium.mzf" size="44672" crc="1664e09b" sha1="780bff6accaac67982e5580b59b72b26d58df130"/>
 			</dataarea>
 		</part>
 	</software>
@@ -143,7 +143,7 @@ MZ-821 Sharp BASIC Trainer (Germany):   Account Manager: Einnahmen/Ausgaben-Verw
 		<publisher>MiKrSoft</publisher>
 		<part name="cass" interface="mz_cass">
 			<dataarea name="cass" size="37904">
-				<rom name="exploding fist.mzf" size="37904" crc="14171ece" sha1="8a3567095f13b607c770e18c4e0f44e2cd4dcfec" offset="0" />
+				<rom name="exploding fist.mzf" size="37904" crc="14171ece" sha1="8a3567095f13b607c770e18c4e0f44e2cd4dcfec"/>
 			</dataarea>
 		</part>
 	</software>
@@ -156,13 +156,13 @@ MZ-821 Sharp BASIC Trainer (Germany):   Account Manager: Einnahmen/Ausgaben-Verw
 		<publisher>dB-SOFT</publisher>
 		<part name="cass1" interface="mz_cass">
 			<dataarea name="cass" size="18896">
-				<rom name="egg.bas.mzf" size="18896" crc="bd2da937" sha1="40d9683591824f369f705015e4188e4eaa2c16f6" offset="0" />
+				<rom name="egg.bas.mzf" size="18896" crc="bd2da937" sha1="40d9683591824f369f705015e4188e4eaa2c16f6"/>
 			</dataarea>
 		</part>
 <!-- This came in the same zip. What is it? -->
 		<part name="cass2" interface="mz_cass">
 			<dataarea name="cass" size="959">
-				<rom name="egg.obj.mzf" size="959" crc="eb6d293d" sha1="1a4a1e1841b921d9a01fdf2cc54c26bd3291c776" offset="0" />
+				<rom name="egg.obj.mzf" size="959" crc="eb6d293d" sha1="1a4a1e1841b921d9a01fdf2cc54c26bd3291c776"/>
 			</dataarea>
 		</part>
 	</software>
@@ -173,7 +173,7 @@ MZ-821 Sharp BASIC Trainer (Germany):   Account Manager: Einnahmen/Ausgaben-Verw
 		<publisher>BBG Software</publisher>
 		<part name="cass" interface="mz_cass">
 			<dataarea name="cass" size="4907">
-				<rom name="adressdata.mzf" size="4907" crc="0c6693c7" sha1="ff107695629a2e21ba75339062508a80273ecd67" offset="0" />
+				<rom name="adressdata.mzf" size="4907" crc="0c6693c7" sha1="ff107695629a2e21ba75339062508a80273ecd67"/>
 			</dataarea>
 		</part>
 	</software>

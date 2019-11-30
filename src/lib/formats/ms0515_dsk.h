@@ -7,13 +7,13 @@
     ms0515 format
 
 *********************************************************************/
-
-#ifndef MS0515_DSK_H_
-#define MS0515_DSK_H_
+#ifndef MAME_FORMATS_MS0515_DSK_H
+#define MAME_FORMATS_MS0515_DSK_H
 
 #include "wd177x_dsk.h"
 
-class ms0515_format : public wd177x_format {
+class ms0515_format : public wd177x_format
+{
 public:
 	ms0515_format();
 
@@ -27,4 +27,4 @@ private:
 
 extern const floppy_format_type FLOPPY_MS0515_FORMAT;
 
-#endif
+#endif // MAME_FORMATS_MS0515_DSK_H

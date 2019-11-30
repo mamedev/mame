@@ -16,7 +16,6 @@
 #include "machine/i8255.h"
 #include "imagedev/cassette.h"
 #include "sound/spkrdev.h"
-#include "sound/wave.h"
 #include "machine/ram.h"
 
 #include "screen.h"
@@ -360,48 +359,48 @@ uint32_t pk8000_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return video_update(screen, bitmap, cliprect, m_ram->pointer());
 }
 
-MACHINE_CONFIG_START(pk8000_state::pk8000)
+void pk8000_state::pk8000(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",I8080, 1780000)
-	MCFG_DEVICE_PROGRAM_MAP(pk8000_mem)
-	MCFG_DEVICE_IO_MAP(pk8000_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pk8000_state,  interrupt)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(pk8000_state, irq_callback)
+	I8080(config, m_maincpu, 1780000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pk8000_state::pk8000_mem);
+	m_maincpu->set_addrmap(AS_IO, &pk8000_state::pk8000_io);
+	m_maincpu->set_vblank_int("screen", FUNC(pk8000_state::interrupt));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(pk8000_state::irq_callback));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(256+32, 192+32)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256+32-1, 0, 192+32-1)
-	MCFG_SCREEN_UPDATE_DRIVER(pk8000_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(256+32, 192+32);
+	screen.set_visarea(0, 256+32-1, 0, 192+32-1);
+	screen.set_screen_update(FUNC(pk8000_state::screen_update));
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_INIT_OWNER(pk8000_base_state, pk8000)
+	PALETTE(config, "palette", FUNC(pk8000_state::pk8000_palette), 16);
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pk8000_state, _80_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, pk8000_state, _80_portb_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pk8000_state, _80_portc_w))
+	i8255_device &ppi1(I8255(config, "ppi8255_1"));
+	ppi1.out_pa_callback().set(FUNC(pk8000_state::_80_porta_w));
+	ppi1.in_pb_callback().set(FUNC(pk8000_state::_80_portb_r));
+	ppi1.out_pc_callback().set(FUNC(pk8000_state::_80_portc_w));
 
-	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, pk8000_base_state, _84_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, pk8000_base_state, _84_porta_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, pk8000_base_state, _84_portc_w))
+	i8255_device &ppi2(I8255(config, "ppi8255_2"));
+	ppi2.in_pa_callback().set(FUNC(pk8000_base_state::_84_porta_r));
+	ppi2.out_pa_callback().set(FUNC(pk8000_base_state::_84_porta_w));
+	ppi2.out_pc_callback().set(FUNC(pk8000_base_state::_84_portc_w));
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(fmsx_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(fmsx_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_PLAY);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K");
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( vesta )

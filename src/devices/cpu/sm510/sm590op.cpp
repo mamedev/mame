@@ -8,6 +8,7 @@
 
 
 // internal helpers
+
 void sm590_device::do_branch(u8 pu, u8 pm, u8 pl)
 {
 	// set new PC(Pu/Pm/Pl)

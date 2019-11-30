@@ -558,17 +558,17 @@ READ8_MEMBER( pc1640_state::io_r )
 	offs_t addr = offset & 0x3ff;
 	bool decoded = false;
 
-	if      (                 addr <= 0x00f) { data = m_dmac->read(space, offset & 0x0f); decoded = true; }
-	else if (addr >= 0x020 && addr <= 0x021) { data = m_pic->read(space, offset & 0x01); decoded = true; }
-	else if (addr >= 0x040 && addr <= 0x043) { data = m_pit->read(space, offset & 0x03); decoded = true; }
+	if      (                 addr <= 0x00f) { data = m_dmac->read(offset & 0x0f); decoded = true; }
+	else if (addr >= 0x020 && addr <= 0x021) { data = m_pic->read(offset & 0x01); decoded = true; }
+	else if (addr >= 0x040 && addr <= 0x043) { data = m_pit->read(offset & 0x03); decoded = true; }
 	else if (addr >= 0x060 && addr <= 0x06f) { data = system_r(space, offset & 0x0f); decoded = true; }
-	else if (addr >= 0x070 && addr <= 0x073) { data = m_rtc->read(space, offset & 0x01); decoded = true; }
+	else if (addr >= 0x070 && addr <= 0x073) { data = m_rtc->read(offset & 0x01); decoded = true; }
 	else if (addr >= 0x078 && addr <= 0x07f) { data = mouse_r(space, offset & 0x07); decoded = true; }
 	else if (addr >= 0x378 && addr <= 0x37b) { data = printer_r(space, offset & 0x03); decoded = true; }
 	else if (addr >= 0x3b0 && addr <= 0x3df) { decoded = true; }
-	else if (addr >= 0x3f4 && addr <= 0x3f4) { data = m_fdc->fdc->msr_r(space, offset & 0x01); decoded = true; }
-	else if (addr >= 0x3f5 && addr <= 0x3f5) { data = m_fdc->fdc->fifo_r(space, offset & 0x01); decoded = true; }
-	else if (addr >= 0x3f8 && addr <= 0x3ff) { data = m_uart->ins8250_r(space, offset & 0x07); decoded = true; }
+	else if (addr >= 0x3f4 && addr <= 0x3f4) { data = m_fdc->fdc->msr_r(); decoded = true; }
+	else if (addr >= 0x3f5 && addr <= 0x3f5) { data = m_fdc->fdc->fifo_r(); decoded = true; }
+	else if (addr >= 0x3f8 && addr <= 0x3ff) { data = m_uart->ins8250_r(offset & 0x07); decoded = true; }
 
 	if (decoded)
 	{
@@ -625,7 +625,7 @@ void pc1512_state::pc1512_io(address_map &map)
 	// schematic calls for a stock 8086 and the I/O and data lines are multiplexed onto the same bus,
 	// plus address lines 20-10 are towards the middle of a standard ISA slot. If it turns out that this
 	// is not in fact accurate to hardware, please add this back in.
-	// ADDRESS_MAP_GLOBAL_MASK(0x3ff)
+	// map.global_mask(0x3ff);
 	map(0x000, 0x00f).rw(m_dmac, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
 	map(0x020, 0x021).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x040, 0x043).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
@@ -1152,14 +1152,15 @@ void pc1640_state::machine_start()
 //**************************************************************************
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( pc1512 )
+//  machine_config( pc1512 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(pc1512_state::pc1512)
-	MCFG_DEVICE_ADD(I8086_TAG, I8086, 24_MHz_XTAL / 3)
-	MCFG_DEVICE_PROGRAM_MAP(pc1512_mem)
-	MCFG_DEVICE_IO_MAP(pc1512_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE(I8259A2_TAG, pic8259_device, inta_cb)
+void pc1512_state::pc1512(machine_config &config)
+{
+	I8086(config, m_maincpu, 24_MHz_XTAL / 3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc1512_state::pc1512_mem);
+	m_maincpu->set_addrmap(AS_IO, &pc1512_state::pc1512_io);
+	m_maincpu->set_irq_acknowledge_callback(I8259A2_TAG, FUNC(pic8259_device::inta_cb));
 
 	// video
 	pc1512_video(config);
@@ -1169,15 +1170,15 @@ MACHINE_CONFIG_START(pc1512_state::pc1512)
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	// devices
-	MCFG_DEVICE_ADD(PC1512_KEYBOARD_TAG, PC1512_KEYBOARD, 0)
-	MCFG_PC1512_KEYBOARD_CLOCK_CALLBACK(WRITELINE(*this, pc1512_state, kbclk_w))
-	MCFG_PC1512_KEYBOARD_DATA_CALLBACK(WRITELINE(*this, pc1512_state, kbdata_w))
+	PC1512_KEYBOARD(config, m_kb, 0);
+	m_kb->clock_wr_callback().set(FUNC(pc1512_state::kbclk_w));
+	m_kb->data_wr_callback().set(FUNC(pc1512_state::kbdata_w));
 
-	MCFG_PC1512_MOUSE_PORT_ADD(PC1512_MOUSE_PORT_TAG, pc1512_mouse_port_devices, "mouse")
-	MCFG_PC1512_MOUSE_PORT_X_CB(WRITE8(*this, pc1512_state, mouse_x_w))
-	MCFG_PC1512_MOUSE_PORT_Y_CB(WRITE8(*this, pc1512_state, mouse_y_w))
-	MCFG_PC1512_MOUSE_PORT_M1_CB(WRITELINE(PC1512_KEYBOARD_TAG, pc1512_keyboard_device, m1_w))
-	MCFG_PC1512_MOUSE_PORT_M2_CB(WRITELINE(PC1512_KEYBOARD_TAG, pc1512_keyboard_device, m2_w))
+	pc1512_mouse_port_device &mouse(PC1512_MOUSE_PORT(config, "mous", pc1512_mouse_port_devices, "mouse"));
+	mouse.x_wr_callback().set(FUNC(pc1512_base_state::mouse_x_w));
+	mouse.y_wr_callback().set(FUNC(pc1512_base_state::mouse_y_w));
+	mouse.m1_wr_callback().set(m_kb, FUNC(pc1512_keyboard_device::m1_w));
+	mouse.m2_wr_callback().set(m_kb, FUNC(pc1512_keyboard_device::m2_w));
 
 	AM9517A(config, m_dmac, 24_MHz_XTAL / 6);
 	m_dmac->out_hreq_callback().set(FUNC(pc1512_state::hrq_w));
@@ -1196,119 +1197,123 @@ MACHINE_CONFIG_START(pc1512_state::pc1512)
 	m_dmac->out_dack_callback<2>().set(FUNC(pc1512_state::dack2_w));
 	m_dmac->out_dack_callback<3>().set(FUNC(pc1512_state::dack3_w));
 
-	PIC8259(config, m_pic, 0);
+	PIC8259(config, m_pic);
 	m_pic->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD(I8253_TAG, PIT8253, 0)
-	MCFG_PIT8253_CLK0(28.636363_MHz_XTAL / 24)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(I8259A2_TAG, pic8259_device, ir0_w))
-	MCFG_PIT8253_CLK1(28.636363_MHz_XTAL / 24)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, pc1512_state, pit1_w))
-	MCFG_PIT8253_CLK2(28.636363_MHz_XTAL / 24)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, pc1512_state, pit2_w))
+	PIT8253(config, m_pit);
+	m_pit->set_clk<0>(28.636363_MHz_XTAL / 24);
+	m_pit->out_handler<0>().set(m_pic, FUNC(pic8259_device::ir0_w));
+	m_pit->set_clk<1>(28.636363_MHz_XTAL / 24);
+	m_pit->out_handler<1>().set(FUNC(pc1512_state::pit1_w));
+	m_pit->set_clk<2>(28.636363_MHz_XTAL / 24);
+	m_pit->out_handler<2>().set(FUNC(pc1512_state::pit2_w));
 
-	MCFG_DEVICE_ADD(MC146818_TAG, MC146818, 32.768_kHz_XTAL)
-	MCFG_MC146818_IRQ_HANDLER(WRITELINE(I8259A2_TAG, pic8259_device, ir2_w))
+	MC146818(config, m_rtc, 32.768_kHz_XTAL);
+	m_rtc->irq().set(m_pic, FUNC(pic8259_device::ir2_w));
 
-	MCFG_PC_FDC_XT_ADD(PC_FDC_XT_TAG)
-	MCFG_PC_FDC_INTRQ_CALLBACK(WRITELINE(*this, pc1512_state, fdc_int_w))
-	MCFG_PC_FDC_DRQ_CALLBACK(WRITELINE(*this, pc1512_state, fdc_drq_w))
-	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":0", pc1512_floppies, "525dd", pc1512_base_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":1", pc1512_floppies, nullptr,    pc1512_base_state::floppy_formats)
+	PC_FDC_XT(config, m_fdc, 0);
+	m_fdc->intrq_wr_callback().set(FUNC(pc1512_state::fdc_int_w));
+	m_fdc->drq_wr_callback().set(FUNC(pc1512_state::fdc_drq_w));
+	FLOPPY_CONNECTOR(config, PC_FDC_XT_TAG ":0", pc1512_floppies, "525dd", pc1512_base_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, PC_FDC_XT_TAG ":1", pc1512_floppies, nullptr, pc1512_base_state::floppy_formats);
 
-	MCFG_DEVICE_ADD(INS8250_TAG, INS8250, 1.8432_MHz_XTAL)
-	MCFG_INS8250_OUT_TX_CB(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
-	MCFG_INS8250_OUT_DTR_CB(WRITELINE(RS232_TAG, rs232_port_device, write_dtr))
-	MCFG_INS8250_OUT_RTS_CB(WRITELINE(RS232_TAG, rs232_port_device, write_rts))
-	MCFG_INS8250_OUT_INT_CB(WRITELINE(I8259A2_TAG, pic8259_device, ir4_w))
+	INS8250(config, m_uart, 1.8432_MHz_XTAL);
+	m_uart->out_tx_callback().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
+	m_uart->out_dtr_callback().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
+	m_uart->out_rts_callback().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
+	m_uart->out_int_callback().set(m_pic, FUNC(pic8259_device::ir4_w));
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, pc1512_state, write_centronics_ack))
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, pc1512_state, write_centronics_busy))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, pc1512_state, write_centronics_perror))
-	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(*this, pc1512_state, write_centronics_select))
-	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, pc1512_state, write_centronics_fault))
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->ack_handler().set(FUNC(pc1512_state::write_centronics_ack));
+	m_centronics->busy_handler().set(FUNC(pc1512_state::write_centronics_busy));
+	m_centronics->perror_handler().set(FUNC(pc1512_state::write_centronics_perror));
+	m_centronics->select_handler().set(FUNC(pc1512_state::write_centronics_select));
+	m_centronics->fault_handler().set(FUNC(pc1512_state::write_centronics_fault));
 
-	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(INS8250_TAG, ins8250_uart_device, rx_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(INS8250_TAG, ins8250_uart_device, dcd_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(INS8250_TAG, ins8250_uart_device, dsr_w))
-	MCFG_RS232_RI_HANDLER(WRITELINE(INS8250_TAG, ins8250_uart_device, ri_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(INS8250_TAG, ins8250_uart_device, cts_w))
+	OUTPUT_LATCH(config, m_cent_data_out);
+	m_centronics->set_output_latch(*m_cent_data_out);
+
+	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(m_uart, FUNC(ins8250_uart_device::rx_w));
+	rs232.dcd_handler().set(m_uart, FUNC(ins8250_uart_device::dcd_w));
+	rs232.dsr_handler().set(m_uart, FUNC(ins8250_uart_device::dsr_w));
+	rs232.ri_handler().set(m_uart, FUNC(ins8250_uart_device::ri_w));
+	rs232.cts_handler().set(m_uart, FUNC(ins8250_uart_device::cts_w));
 
 	// ISA8 bus
-	MCFG_DEVICE_ADD(ISA_BUS_TAG, ISA8, 0)
-	MCFG_ISA8_CPU(I8086_TAG)
-	MCFG_ISA_OUT_IRQ2_CB(WRITELINE(I8259A2_TAG, pic8259_device, ir2_w))
-	MCFG_ISA_OUT_IRQ3_CB(WRITELINE(I8259A2_TAG, pic8259_device, ir3_w))
-	MCFG_ISA_OUT_IRQ4_CB(WRITELINE(I8259A2_TAG, pic8259_device, ir4_w))
-	MCFG_ISA_OUT_IRQ5_CB(WRITELINE(I8259A2_TAG, pic8259_device, ir5_w))
-	MCFG_ISA_OUT_IRQ6_CB(WRITELINE(I8259A2_TAG, pic8259_device, ir6_w))
-	MCFG_ISA_OUT_IRQ7_CB(WRITELINE(I8259A2_TAG, pic8259_device, ir7_w))
-	MCFG_ISA_OUT_DRQ1_CB(WRITELINE(I8237A5_TAG, am9517a_device, dreq1_w))
-	MCFG_ISA_OUT_DRQ2_CB(WRITELINE(I8237A5_TAG, am9517a_device, dreq2_w))
-	MCFG_ISA_OUT_DRQ3_CB(WRITELINE(I8237A5_TAG, am9517a_device, dreq3_w))
-	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false) // FIXME: determine ISA clock
-	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false)
-	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false)
+	isa8_device &isa(ISA8(config, ISA_BUS_TAG, 0));
+	isa.set_memspace(m_maincpu, AS_PROGRAM);
+	isa.set_iospace(m_maincpu, AS_IO);
+	isa.irq2_callback().set(m_pic, FUNC(pic8259_device::ir2_w));
+	isa.irq3_callback().set(m_pic, FUNC(pic8259_device::ir3_w));
+	isa.irq4_callback().set(m_pic, FUNC(pic8259_device::ir4_w));
+	isa.irq5_callback().set(m_pic, FUNC(pic8259_device::ir5_w));
+	isa.irq6_callback().set(m_pic, FUNC(pic8259_device::ir6_w));
+	isa.irq7_callback().set(m_pic, FUNC(pic8259_device::ir7_w));
+	isa.drq1_callback().set(I8237A5_TAG, FUNC(am9517a_device::dreq1_w));
+	isa.drq2_callback().set(I8237A5_TAG, FUNC(am9517a_device::dreq2_w));
+	isa.drq3_callback().set(I8237A5_TAG, FUNC(am9517a_device::dreq3_w));
+	ISA8_SLOT(config, "isa1", 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false); // FIXME: determine ISA clock
+	ISA8_SLOT(config, "isa2", 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa3", 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false);
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("512K").set_extra_options("544K,576K,608K,640K");
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "pc1512_flop")
-	MCFG_SOFTWARE_LIST_ADD("hdd_list", "pc1512_hdd")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "flop_list").set_original("pc1512_flop");
+	SOFTWARE_LIST(config, "hdd_list").set_original("pc1512_hdd");
+}
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( pc1512dd )
+//  machine_config( pc1512dd )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(pc1512_state::pc1512dd)
+void pc1512_state::pc1512dd(machine_config &config)
+{
 	pc1512(config);
-	MCFG_DEVICE_MODIFY(PC_FDC_XT_TAG ":1")
-	MCFG_SLOT_DEFAULT_OPTION("525dd")
-MACHINE_CONFIG_END
+	subdevice<floppy_connector>(PC_FDC_XT_TAG ":1")->set_default_option("525dd");
+}
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( pc1512hd )
+//  machine_config( pc1512hd )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(pc1512_state::pc1512hd)
+void pc1512_state::pc1512hd(machine_config &config)
+{
 	pc1512(config);
-	MCFG_DEVICE_MODIFY("isa1")
-	//MCFG_SLOT_DEFAULT_OPTION("wdxt_gen")
-	MCFG_SLOT_DEFAULT_OPTION("hdc")
-MACHINE_CONFIG_END
+	//subdevice<isa8_slot_device>("isa1")->set_default_option("wdxt_gen");
+	subdevice<isa8_slot_device>("isa1")->set_default_option("hdc");
+}
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( pc1640 )
+//  machine_config( pc1640 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(pc1640_state::pc1640)
-	MCFG_DEVICE_ADD(I8086_TAG, I8086, 24_MHz_XTAL / 3)
-	MCFG_DEVICE_PROGRAM_MAP(pc1640_mem)
-	MCFG_DEVICE_IO_MAP(pc1640_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE(I8259A2_TAG, pic8259_device, inta_cb)
+void pc1640_state::pc1640(machine_config &config)
+{
+	I8086(config, m_maincpu, 24_MHz_XTAL / 3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc1640_state::pc1640_mem);
+	m_maincpu->set_addrmap(AS_IO, &pc1640_state::pc1640_io);
+	m_maincpu->set_irq_acknowledge_callback(I8259A2_TAG, FUNC(pic8259_device::inta_cb));
 
 	// sound
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	// devices
-	MCFG_DEVICE_ADD(PC1512_KEYBOARD_TAG, PC1512_KEYBOARD, 0)
-	MCFG_PC1512_KEYBOARD_CLOCK_CALLBACK(WRITELINE(*this, pc1512_base_state, kbclk_w))
-	MCFG_PC1512_KEYBOARD_DATA_CALLBACK(WRITELINE(*this, pc1512_base_state, kbdata_w))
+	PC1512_KEYBOARD(config, m_kb, 0);
+	m_kb->clock_wr_callback().set(FUNC(pc1512_base_state::kbclk_w));
+	m_kb->data_wr_callback().set(FUNC(pc1512_base_state::kbdata_w));
 
-	MCFG_PC1512_MOUSE_PORT_ADD(PC1512_MOUSE_PORT_TAG, pc1512_mouse_port_devices, "mouse")
-	MCFG_PC1512_MOUSE_PORT_X_CB(WRITE8(*this, pc1512_base_state, mouse_x_w))
-	MCFG_PC1512_MOUSE_PORT_Y_CB(WRITE8(*this, pc1512_base_state, mouse_y_w))
-	MCFG_PC1512_MOUSE_PORT_M1_CB(WRITELINE(PC1512_KEYBOARD_TAG, pc1512_keyboard_device, m1_w))
-	MCFG_PC1512_MOUSE_PORT_M2_CB(WRITELINE(PC1512_KEYBOARD_TAG, pc1512_keyboard_device, m2_w))
+	pc1512_mouse_port_device &mouse(PC1512_MOUSE_PORT(config, "mous", pc1512_mouse_port_devices, "mouse"));
+	mouse.x_wr_callback().set(FUNC(pc1512_base_state::mouse_x_w));
+	mouse.y_wr_callback().set(FUNC(pc1512_base_state::mouse_y_w));
+	mouse.m1_wr_callback().set(m_kb, FUNC(pc1512_keyboard_device::m1_w));
+	mouse.m2_wr_callback().set(m_kb, FUNC(pc1512_keyboard_device::m2_w));
 
 	AM9517A(config, m_dmac, 24_MHz_XTAL / 6);
 	m_dmac->out_hreq_callback().set(FUNC(pc1640_state::hrq_w));
@@ -1330,92 +1335,95 @@ MACHINE_CONFIG_START(pc1640_state::pc1640)
 	PIC8259(config, m_pic, 0);
 	m_pic->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD(I8253_TAG, PIT8253, 0)
-	MCFG_PIT8253_CLK0(28.636363_MHz_XTAL / 24)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(I8259A2_TAG, pic8259_device, ir0_w))
-	MCFG_PIT8253_CLK1(28.636363_MHz_XTAL / 24)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, pc1512_base_state, pit1_w))
-	MCFG_PIT8253_CLK2(28.636363_MHz_XTAL / 24)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, pc1512_base_state, pit2_w))
+	PIT8253(config, m_pit, 0);
+	m_pit->set_clk<0>(28.636363_MHz_XTAL / 24);
+	m_pit->out_handler<0>().set(m_pic, FUNC(pic8259_device::ir0_w));
+	m_pit->set_clk<1>(28.636363_MHz_XTAL / 24);
+	m_pit->out_handler<1>().set(FUNC(pc1512_base_state::pit1_w));
+	m_pit->set_clk<2>(28.636363_MHz_XTAL / 24);
+	m_pit->out_handler<2>().set(FUNC(pc1512_base_state::pit2_w));
 
-	MCFG_DEVICE_ADD(MC146818_TAG, MC146818, 32.768_kHz_XTAL)
-	MCFG_MC146818_IRQ_HANDLER(WRITELINE(I8259A2_TAG, pic8259_device, ir2_w))
+	MC146818(config, m_rtc, 32.768_kHz_XTAL);
+	m_rtc->irq().set(m_pic, FUNC(pic8259_device::ir2_w));
 
-	MCFG_PC_FDC_XT_ADD(PC_FDC_XT_TAG)
-	MCFG_PC_FDC_INTRQ_CALLBACK(WRITELINE(*this, pc1512_base_state, fdc_int_w))
-	MCFG_PC_FDC_DRQ_CALLBACK(WRITELINE(*this, pc1512_base_state, fdc_drq_w))
-	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":0", pc1512_floppies, "525dd", pc1512_base_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(PC_FDC_XT_TAG ":1", pc1512_floppies, nullptr,    pc1512_base_state::floppy_formats)
+	PC_FDC_XT(config, m_fdc, 0);
+	m_fdc->intrq_wr_callback().set(FUNC(pc1512_base_state::fdc_int_w));
+	m_fdc->drq_wr_callback().set(FUNC(pc1512_base_state::fdc_drq_w));
+	FLOPPY_CONNECTOR(config, PC_FDC_XT_TAG ":0", pc1512_floppies, "525dd", pc1512_base_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, PC_FDC_XT_TAG ":1", pc1512_floppies, nullptr, pc1512_base_state::floppy_formats);
 
-	MCFG_DEVICE_ADD(INS8250_TAG, INS8250, 1.8432_MHz_XTAL)
-	MCFG_INS8250_OUT_TX_CB(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
-	MCFG_INS8250_OUT_DTR_CB(WRITELINE(RS232_TAG, rs232_port_device, write_dtr))
-	MCFG_INS8250_OUT_RTS_CB(WRITELINE(RS232_TAG, rs232_port_device, write_rts))
-	MCFG_INS8250_OUT_INT_CB(WRITELINE(I8259A2_TAG, pic8259_device, ir4_w))
+	INS8250(config, m_uart, 1.8432_MHz_XTAL);
+	m_uart->out_tx_callback().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
+	m_uart->out_dtr_callback().set(RS232_TAG, FUNC(rs232_port_device::write_dtr));
+	m_uart->out_rts_callback().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
+	m_uart->out_int_callback().set(m_pic, FUNC(pic8259_device::ir4_w));
 
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(*this, pc1512_base_state, write_centronics_ack))
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, pc1512_base_state, write_centronics_busy))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, pc1512_base_state, write_centronics_perror))
-	MCFG_CENTRONICS_SELECT_HANDLER(WRITELINE(*this, pc1512_base_state, write_centronics_select))
-	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, pc1512_base_state, write_centronics_fault))
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->ack_handler().set(FUNC(pc1512_state::write_centronics_ack));
+	m_centronics->busy_handler().set(FUNC(pc1512_state::write_centronics_busy));
+	m_centronics->perror_handler().set(FUNC(pc1512_state::write_centronics_perror));
+	m_centronics->select_handler().set(FUNC(pc1512_state::write_centronics_select));
+	m_centronics->fault_handler().set(FUNC(pc1512_state::write_centronics_fault));
 
-	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(INS8250_TAG, ins8250_uart_device, rx_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(INS8250_TAG, ins8250_uart_device, dcd_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(INS8250_TAG, ins8250_uart_device, dsr_w))
-	MCFG_RS232_RI_HANDLER(WRITELINE(INS8250_TAG, ins8250_uart_device, ri_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(INS8250_TAG, ins8250_uart_device, cts_w))
+	OUTPUT_LATCH(config, m_cent_data_out);
+	m_centronics->set_output_latch(*m_cent_data_out);
+
+	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(m_uart, FUNC(ins8250_uart_device::rx_w));
+	rs232.dcd_handler().set(m_uart, FUNC(ins8250_uart_device::dcd_w));
+	rs232.dsr_handler().set(m_uart, FUNC(ins8250_uart_device::dsr_w));
+	rs232.ri_handler().set(m_uart, FUNC(ins8250_uart_device::ri_w));
+	rs232.cts_handler().set(m_uart, FUNC(ins8250_uart_device::cts_w));
 
 	// ISA8 bus
-	MCFG_DEVICE_ADD(ISA_BUS_TAG, ISA8, 0)
-	MCFG_ISA8_CPU(I8086_TAG)
-	MCFG_ISA_OUT_IRQ2_CB(WRITELINE(I8259A2_TAG, pic8259_device, ir2_w))
-	MCFG_ISA_OUT_IRQ3_CB(WRITELINE(I8259A2_TAG, pic8259_device, ir3_w))
-	MCFG_ISA_OUT_IRQ4_CB(WRITELINE(I8259A2_TAG, pic8259_device, ir4_w))
-	MCFG_ISA_OUT_IRQ5_CB(WRITELINE(I8259A2_TAG, pic8259_device, ir5_w))
-	MCFG_ISA_OUT_IRQ6_CB(WRITELINE(I8259A2_TAG, pic8259_device, ir6_w))
-	MCFG_ISA_OUT_IRQ7_CB(WRITELINE(I8259A2_TAG, pic8259_device, ir7_w))
-	MCFG_ISA_OUT_DRQ1_CB(WRITELINE(I8237A5_TAG, am9517a_device, dreq1_w))
-	MCFG_ISA_OUT_DRQ2_CB(WRITELINE(I8237A5_TAG, am9517a_device, dreq2_w))
-	MCFG_ISA_OUT_DRQ3_CB(WRITELINE(I8237A5_TAG, am9517a_device, dreq3_w))
-	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false) // FIXME: determine ISA bus clock
-	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false)
-	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false)
-	MCFG_DEVICE_ADD("isa4", ISA8_SLOT, 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false)
-	MCFG_DEVICE_ADD("isa5", ISA8_SLOT, 0, ISA_BUS_TAG, pc1640_isa8_cards, "iga", false)
+	isa8_device &isa(ISA8(config, ISA_BUS_TAG, 0));
+	isa.set_memspace(m_maincpu, AS_PROGRAM);
+	isa.set_iospace(m_maincpu, AS_IO);
+	isa.irq2_callback().set(m_pic, FUNC(pic8259_device::ir2_w));
+	isa.irq3_callback().set(m_pic, FUNC(pic8259_device::ir3_w));
+	isa.irq4_callback().set(m_pic, FUNC(pic8259_device::ir4_w));
+	isa.irq5_callback().set(m_pic, FUNC(pic8259_device::ir5_w));
+	isa.irq6_callback().set(m_pic, FUNC(pic8259_device::ir6_w));
+	isa.irq7_callback().set(m_pic, FUNC(pic8259_device::ir7_w));
+	isa.drq1_callback().set(I8237A5_TAG, FUNC(am9517a_device::dreq1_w));
+	isa.drq2_callback().set(I8237A5_TAG, FUNC(am9517a_device::dreq2_w));
+	isa.drq3_callback().set(I8237A5_TAG, FUNC(am9517a_device::dreq3_w));
+	ISA8_SLOT(config, "isa1", 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false); // FIXME: determine ISA bus clock
+	ISA8_SLOT(config, "isa2", 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa3", 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa4", 0, ISA_BUS_TAG, pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa5", 0, ISA_BUS_TAG, pc1640_isa8_cards, "iga", false);
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("640K");
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "pc1640_flop")
-	MCFG_SOFTWARE_LIST_ADD("hdd_list", "pc1640_hdd")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "flop_list").set_original("pc1640_flop");
+	SOFTWARE_LIST(config, "hdd_list").set_original("pc1640_hdd");
+}
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( pc1640dd )
+//  machine_config( pc1640dd )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(pc1640_state::pc1640dd)
+void pc1640_state::pc1640dd(machine_config &config)
+{
 	pc1640(config);
-	MCFG_DEVICE_MODIFY(PC_FDC_XT_TAG ":1")
-	MCFG_SLOT_DEFAULT_OPTION("525dd")
-MACHINE_CONFIG_END
+	subdevice<floppy_connector>(PC_FDC_XT_TAG ":1")->set_default_option("525dd");
+}
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( pc1640hd )
+//  machine_config( pc1640hd )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(pc1640_state::pc1640hd)
+void pc1640_state::pc1640hd(machine_config &config)
+{
 	pc1640(config);
-	MCFG_DEVICE_MODIFY("isa1")
-	//MCFG_SLOT_DEFAULT_OPTION("wdxt_gen")
-	MCFG_SLOT_DEFAULT_OPTION("hdc")
-MACHINE_CONFIG_END
+	//subdevice<isa8_slot_device>("isa1")->set_default_option("wdxt_gen");
+	subdevice<isa8_slot_device>("isa1")->set_default_option("hdc");
+}
 
 
 

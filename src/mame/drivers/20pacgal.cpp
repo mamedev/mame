@@ -102,7 +102,7 @@ Graphics: CY37256P160-83AC x 2 (Ultra37000 CPLD family - 160 pin TQFP, 256 Macro
  *************************************/
 
 #define MASTER_CLOCK        (XTAL(73'728'000))
-#define MAIN_CPU_CLOCK      (MASTER_CLOCK / 4)  /* divider is either 3 or 4 */
+#define MAIN_CPU_CLOCK      (MASTER_CLOCK / 2)
 #define NAMCO_AUDIO_CLOCK   (MASTER_CLOCK / 4 /  6 / 32)
 
 
@@ -250,11 +250,11 @@ void _25pacman_state::_25pacman_io_map(address_map &map)
 	map(0x80, 0x80).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x81, 0x81).w(FUNC(_25pacman_state::timer_pulse_w));        /* ??? pulsed by the timer irq */
 	map(0x82, 0x82).w(FUNC(_25pacman_state::irqack_w));
-//  AM_RANGE(0x84, 0x84) AM_NOP /* ?? */
+//  map(0x84, 0x84).noprw(); /* ?? */
 	map(0x85, 0x86).writeonly().share("stars_seed");    /* stars: rng seed (lo/hi) */
 	map(0x87, 0x87).r(FUNC(_25pacman_state::_25pacman_io_87_r)); // not eeprom on this
 	map(0x87, 0x87).nopw();
-//  AM_RANGE(0x88, 0x88) AM_WRITE(ram_bank_select_w)
+//  map(0x88, 0x88).w(FUNC(_25pacman_state::ram_bank_select_w));
 	map(0x89, 0x89).w("dac", FUNC(dac_byte_interface::data_w));
 	map(0x8a, 0x8a).writeonly().share("stars_ctrl");    /* stars: bits 3-4 = active set; bit 5 = enable */
 	map(0x8b, 0x8b).writeonly().share("flip");
@@ -397,16 +397,16 @@ WRITE_LINE_MEMBER(_20pacgal_state::vblank_irq)
 		m_maincpu->set_input_line(0, HOLD_LINE); // TODO: assert breaks the inputs in 25pacman test mode
 }
 
-MACHINE_CONFIG_START(_20pacgal_state::_20pacgal)
-
+void _20pacgal_state::_20pacgal(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z180, MAIN_CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(_20pacgal_map)
-	MCFG_DEVICE_IO_MAP(_20pacgal_io_map)
+	Z8S180(config, m_maincpu, MAIN_CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &_20pacgal_state::_20pacgal_map);
+	m_maincpu->set_addrmap(AS_IO, &_20pacgal_state::_20pacgal_io_map);
 
-	EEPROM_93C46_8BIT(config, "eeprom");
+	EEPROM_93C46_8BIT(config, m_eeprom);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	_20pacgal_video(config);
@@ -414,26 +414,26 @@ MACHINE_CONFIG_START(_20pacgal_state::_20pacgal)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_DEVICE_ADD("namco", NAMCO_CUS30, NAMCO_AUDIO_CLOCK)
-	MCFG_NAMCO_AUDIO_VOICES(3)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+	namco_cus30_device &namco(NAMCO_CUS30(config, "namco", NAMCO_AUDIO_CLOCK));
+	namco.set_voices(3);
+	namco.add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
-
-MACHINE_CONFIG_START(_25pacman_state::_25pacman)
+void _25pacman_state::_25pacman(machine_config &config)
+{
 	_20pacgal(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(_25pacman_map)
-	MCFG_DEVICE_IO_MAP(_25pacman_io_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &_25pacman_state::_25pacman_map);
+	m_maincpu->set_addrmap(AS_IO, &_25pacman_state::_25pacman_io_map);
 
-	MCFG_AMD_29LV200T_ADD("flash")
-MACHINE_CONFIG_END
+	AMD_29LV200T(config, "flash");
+}
 
 
 

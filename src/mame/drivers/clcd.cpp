@@ -89,7 +89,7 @@ public:
 		m_nvram->set_base(ram()->pointer(), ram()->size());
 	}
 
-	DECLARE_PALETTE_INIT(clcd)
+	void clcd_palette(palette_device &palette) const
 	{
 		palette.set_pen_color(0, rgb_t(36,72,36));
 		palette.set_pen_color(1, rgb_t(2,4,2));
@@ -543,8 +543,8 @@ void clcd_state::clcd_mem(address_map &map)
 	map(0x4000, 0x7fff).rw(m_bankdev[1], FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
 	map(0x8000, 0xbfff).rw(m_bankdev[2], FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
 	map(0xc000, 0xf7ff).rw(m_bankdev[3], FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
-	map(0xf800, 0xf80f).mirror(0x70).rw(m_via0, FUNC(via6522_device::read), FUNC(via6522_device::write));
-	map(0xf880, 0xf88f).mirror(0x70).rw("via1", FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0xf800, 0xf80f).mirror(0x70).m(m_via0, FUNC(via6522_device::map));
+	map(0xf880, 0xf88f).mirror(0x70).m("via1", FUNC(via6522_device::map));
 	map(0xf980, 0xf983).mirror(0x7c).rw(m_acia, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 	map(0xfa00, 0xffff).rom().region("maincpu", 0x1fa00);
 	map(0xfa00, 0xfa00).mirror(0x7f).w(FUNC(clcd_state::mmu_mode_kern_w));
@@ -657,10 +657,11 @@ static INPUT_PORTS_START( clcd )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // clears screen and goes into infinite loop
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(clcd_state::clcd)
+void clcd_state::clcd(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M65C02, 2000000)
-	MCFG_DEVICE_PROGRAM_MAP(clcd_mem)
+	M65C02(config, m_maincpu, 2000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &clcd_state::clcd_mem);
 
 	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline("maincpu", m65c02_device::IRQ_LINE);
 
@@ -684,11 +685,11 @@ MACHINE_CONFIG_START(clcd_state::clcd)
 	m_acia->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 	m_acia->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("acia", mos6551_device, write_rxd))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("acia", mos6551_device, write_dcd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("acia", mos6551_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("via1", via6522_device, write_pb4))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(m_acia, FUNC(mos6551_device::write_rxd));
+	rs232.dcd_handler().set(m_acia, FUNC(mos6551_device::write_dcd));
+	rs232.dsr_handler().set(m_acia, FUNC(mos6551_device::write_dsr));
+	rs232.cts_handler().set("via1", FUNC(via6522_device::write_pb4));
 
 	CENTRONICS(config, m_centronics, centronics_devices, nullptr);
 	m_centronics->busy_handler().set("via1", FUNC(via6522_device::write_pb6)).invert();
@@ -712,25 +713,23 @@ MACHINE_CONFIG_START(clcd_state::clcd)
 	m_rtc->set_default_24h(true);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(80)
-	MCFG_SCREEN_UPDATE_DRIVER(clcd_state, screen_update)
-	MCFG_SCREEN_SIZE(480, 128)
-	MCFG_SCREEN_VISIBLE_AREA(0, 480-1, 0, 128-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(80);
+	screen.set_screen_update(FUNC(clcd_state::screen_update));
+	screen.set_size(480, 128);
+	screen.set_visarea_full();
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(clcd_state, clcd)
+	PALETTE(config, "palette", FUNC(clcd_state::clcd_palette), 2);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	RAM(config, "ram").set_default_size("128K").set_extra_options("32K,64K").set_default_value(0);
 
 	NVRAM(config, "nvram").set_custom_handler(FUNC(clcd_state::nvram_init));
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( clcd )

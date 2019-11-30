@@ -111,33 +111,6 @@ enum
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_PSX_DMA_CHANNEL_READ( cputag, channel, handler ) \
-	psxcpu_device::getcpu( *this, cputag )->subdevice<psxdma_device>("dma")->install_read_handler( channel, handler );
-
-#define MCFG_PSX_DMA_CHANNEL_WRITE( cputag, channel, handler ) \
-	psxcpu_device::getcpu( *this, cputag )->subdevice<psxdma_device>("dma")->install_write_handler( channel, handler );
-
-#define MCFG_PSX_GPU_READ_HANDLER(_devcb) \
-	downcast<psxcpu_device &>(*device).set_gpu_read_handler(DEVCB_##_devcb);
-#define MCFG_PSX_GPU_WRITE_HANDLER(_devcb) \
-	downcast<psxcpu_device &>(*device).set_gpu_write_handler(DEVCB_##_devcb);
-
-#define MCFG_PSX_SPU_READ_HANDLER(_devcb) \
-	downcast<psxcpu_device &>(*device).set_spu_read_handler(DEVCB_##_devcb);
-#define MCFG_PSX_SPU_WRITE_HANDLER(_devcb) \
-	downcast<psxcpu_device &>(*device).set_spu_write_handler(DEVCB_##_devcb);
-
-#define MCFG_PSX_CD_READ_HANDLER(_devcb) \
-	downcast<psxcpu_device &>(*device).set_cd_read_handler(DEVCB_##_devcb);
-#define MCFG_PSX_CD_WRITE_HANDLER(_devcb) \
-	downcast<psxcpu_device &>(*device).set_cd_write_handler(DEVCB_##_devcb);
-#define MCFG_PSX_DISABLE_ROM_BERR \
-	downcast<psxcpu_device *>(device)->set_disable_rom_berr(true);
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -147,12 +120,12 @@ class psxcpu_device : public cpu_device, psxcpu_disassembler::config
 {
 public:
 	// configuration helpers
-	template <class Object> devcb_base &set_gpu_read_handler(Object &&cb) { return m_gpu_read_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_gpu_write_handler(Object &&cb) { return m_gpu_write_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_spu_read_handler(Object &&cb) { return m_spu_read_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_spu_write_handler(Object &&cb) { return m_spu_write_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_cd_read_handler(Object &&cb) { return m_cd_read_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_cd_write_handler(Object &&cb) { return m_cd_write_handler.set_callback(std::forward<Object>(cb)); }
+	auto gpu_read() { return m_gpu_read_handler.bind(); }
+	auto gpu_write() { return m_gpu_write_handler.bind(); }
+	auto spu_read() { return m_spu_read_handler.bind(); }
+	auto spu_write() { return m_spu_write_handler.bind(); }
+	auto cd_read() { return m_cd_read_handler.bind(); }
+	auto cd_write() { return m_cd_write_handler.bind(); }
 
 	// public interfaces
 	DECLARE_WRITE32_MEMBER( berr_w );
@@ -204,11 +177,11 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override { return 1; }
-	virtual uint32_t execute_max_cycles() const override { return 40; }
-	virtual uint32_t execute_input_lines() const override { return 6; }
-	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override { return ( clocks + 3 ) / 4; }
-	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override { return cycles * 4; }
+	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 40; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 6; }
+	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return ( clocks + 3 ) / 4; }
+	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return cycles * 4; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 

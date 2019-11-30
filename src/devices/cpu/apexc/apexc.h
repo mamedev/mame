@@ -6,12 +6,6 @@
 
 #pragma once
 
-#define MCFG_APEXC_TAPE_READ_CB(_devcb) \
-	downcast<apexc_cpu_device &>(*device).set_tape_read_cb(DEVCB_##_devcb);
-
-#define MCFG_APEXC_TAPE_PUNCH_CB(_devcb) \
-	downcast<apexc_cpu_device &>(*device).set_tape_punch_cb(DEVCB_##_devcb);
-
 enum
 {
 	APEXC_CR =1,    /* control register */
@@ -29,8 +23,8 @@ public:
 	apexc_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	template<class Object> devcb_base &set_tape_read_cb(Object &&object) { return m_tape_read_cb.set_callback(std::forward<Object>(object)); }
-	template<class Object> devcb_base &set_tape_punch_cb(Object &&object) { return m_tape_punch_cb.set_callback(std::forward<Object>(object)); }
+	auto tape_read() { return m_tape_read_cb.bind(); }
+	auto tape_punch() { return m_tape_punch_cb.bind(); }
 
 protected:
 	// device-level overrides
@@ -38,9 +32,9 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override { return 2; }
-	virtual uint32_t execute_max_cycles() const override { return 75; }
-	virtual uint32_t execute_input_lines() const override { return 0; }
+	virtual uint32_t execute_min_cycles() const noexcept override { return 2; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 75; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 0; }
 	virtual void execute_run() override;
 
 	// device_memory_interface overrides

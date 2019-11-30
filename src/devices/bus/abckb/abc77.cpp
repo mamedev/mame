@@ -129,25 +129,24 @@ DISCRETE_SOUND_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(abc77_device::device_add_mconfig)
+void abc77_device::device_add_mconfig(machine_config &config)
+{
 	// keyboard cpu
-	MCFG_DEVICE_ADD(I8035_TAG, I8035, XTAL(4'608'000))
-	MCFG_DEVICE_PROGRAM_MAP(abc77_map)
-	MCFG_DEVICE_IO_MAP(abc77_io)
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, abc77_device, p1_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, abc77_device, p2_w))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, abc77_device, t1_r))
-	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE(*this, abc77_device, prog_w))
+	I8035(config, m_maincpu, XTAL(4'608'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &abc77_device::abc77_map);
+	m_maincpu->set_addrmap(AS_IO, &abc77_device::abc77_io);
+	m_maincpu->p1_in_cb().set(FUNC(abc77_device::p1_r));
+	m_maincpu->p2_out_cb().set(FUNC(abc77_device::p2_w));
+	m_maincpu->t1_in_cb().set(FUNC(abc77_device::t1_r));
+	m_maincpu->prog_out_cb().set(FUNC(abc77_device::prog_w));
 
 	// watchdog
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz(XTAL(4'608'000)/3/5/4096))
+	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_hz(XTAL(4'608'000)/3/5/4096));
 
 	// discrete sound
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD(DISCRETE_TAG, DISCRETE, abc77_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_CONFIG_END
+	DISCRETE(config, m_discrete, abc77_discrete).add_route(ALL_OUTPUTS, "mono", 0.80);
+}
 
 
 //-------------------------------------------------
@@ -306,7 +305,7 @@ INPUT_PORTS_START( abc55 )
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("SW1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Keyboard Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, abc77_device, keyboard_reset, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Keyboard Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, abc77_device, keyboard_reset, 0)
 INPUT_PORTS_END
 
 
@@ -565,7 +564,7 @@ WRITE8_MEMBER( abc77_device::p2_w )
 	}
 
 	// beep
-	m_discrete->write(space, NODE_01, BIT(data, 4));
+	m_discrete->write(NODE_01, BIT(data, 4));
 
 	// transmit data
 	serial_output(BIT(data, 5));

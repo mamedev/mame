@@ -5,25 +5,31 @@
     Galivan - Cosmo Police
 
 ***************************************************************************/
+#ifndef MAME_INCLUDES_GALIVAN_H
+#define MAME_INCLUDES_GALIVAN_H
+
+#pragma once
 
 #include "machine/nb1412m2.h"
 #include "machine/nb1414m4.h"
 #include "machine/gen_latch.h"
 #include "video/bufsprite.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class galivan_state : public driver_device
 {
 public:
-	galivan_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	galivan_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
-		m_maincpu(*this, "maincpu"),
 		m_nb1414m4(*this, "nb1414m4"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch") { }
+		m_soundlatch(*this, "soundlatch")
+	{ }
 
 	void galivan(machine_config &config);
 	void ninjemak(machine_config &config);
@@ -33,6 +39,8 @@ public:
 
 protected:
 	void io_map(address_map &map);
+
+	required_device<cpu_device> m_maincpu;
 
 private:
 	/* memory pointers */
@@ -45,7 +53,6 @@ private:
 	uint16_t       m_scrollx;
 	uint16_t       m_scrolly;
 	uint8_t       m_galivan_scrollx[2],m_galivan_scrolly[2];
-	uint8_t       m_write_layers;
 	uint8_t       m_layers;
 	uint8_t       m_ninjemak_dispdisable;
 
@@ -69,7 +76,8 @@ private:
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 	TILE_GET_INFO_MEMBER(ninjemak_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(ninjemak_get_tx_tile_info);
-	DECLARE_PALETTE_INIT(galivan);
+	void galivan_palette(palette_device &palette) const;
+	void ninjemak_palette(palette_device &palette) const;
 	DECLARE_MACHINE_START(galivan);
 	DECLARE_MACHINE_RESET(galivan);
 	DECLARE_VIDEO_START(galivan);
@@ -79,7 +87,7 @@ private:
 	uint32_t screen_update_galivan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_ninjemak(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	required_device<cpu_device> m_maincpu;
+
 	optional_device<nb1414m4_device> m_nb1414m4;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -95,10 +103,11 @@ private:
 class dangarj_state : public galivan_state
 {
 public:
-	dangarj_state(const machine_config &mconfig, device_type type, const char *tag)
-		: galivan_state(mconfig, type, tag),
+	dangarj_state(const machine_config &mconfig, device_type type, const char *tag) :
+		galivan_state(mconfig, type, tag),
 		m_prot(*this, "prot_chip")
-		{}
+	{ }
+
 	void dangarj(machine_config &config);
 
 private:
@@ -106,3 +115,5 @@ private:
 
 	void dangarj_io_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_GALIVAN_H

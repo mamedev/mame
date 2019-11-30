@@ -16,7 +16,7 @@ NOTE: This setting only take effect when added to the **ctrlr** config file.
 
 The "device" attribute specifies the id of the device to match. It may also be a substring of the id. To see the list of available devices, enable verbose output and available devices will then be listed to the console at startup (more on this below).
 
-The "controller" attribute specifies the MAME controller ID. It is made up of a controller class (i.e. "JOYCODE", "GUNCODE", "MOUSECODE") and controller index. For example: "JOYCODE_1".
+The "controller" attribute specifies the MAME controller ID. It is made up of a controller class (i.e. ``JOYCODE``, ``GUNCODE``, ``MOUSECODE``) and controller index. For example: ``JOYCODE_1``.
 
 Example
 -------
@@ -36,11 +36,11 @@ Here's an example:
 |                       </newseq>
 |                   </port>
 |                   ...
-|
+
 
 In the above example, we have four device mappings specified:
 
-The first two mapdevice entries map player 1 and 2 lightguns to Gun 1 and Gun 2, respectively. We use a substring of the full raw device names to match each devices. Note that, since this is XML, we needed to escape the '&' using '&amp;'.
+The first two mapdevice entries map player 1 and 2 lightguns to Gun 1 and Gun 2, respectively. We use a substring of the full raw device names to match each devices. Note that, since this is XML, we needed to escape the ``&`` using ``&amp;``.
 
 The last two mapdevices entries map player 1 and player 2 gamepad controllers to Joy 1 and Joy 2, respectively. In this case, these are XInput devices.
 

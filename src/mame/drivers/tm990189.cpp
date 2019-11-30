@@ -112,9 +112,9 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(usr9901_led1_w);
 	DECLARE_WRITE_LINE_MEMBER(usr9901_led2_w);
 	DECLARE_WRITE_LINE_MEMBER(usr9901_led3_w);
-	DECLARE_WRITE8_MEMBER(usr9901_interrupt_callback);
+	DECLARE_WRITE_LINE_MEMBER(usr9901_interrupt_callback);
 
-	DECLARE_WRITE8_MEMBER(sys9901_interrupt_callback);
+	DECLARE_WRITE_LINE_MEMBER(sys9901_interrupt_callback);
 	DECLARE_READ8_MEMBER(sys9901_r);
 	DECLARE_WRITE_LINE_MEMBER(sys9901_digitsel0_w);
 	DECLARE_WRITE_LINE_MEMBER(sys9901_digitsel1_w);
@@ -282,13 +282,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(tm990189_state::display_callback)
     tms9901 code
 */
 
-WRITE8_MEMBER( tm990189_state::usr9901_interrupt_callback )
+WRITE_LINE_MEMBER( tm990189_state::usr9901_interrupt_callback )
 {
 	// Triggered by internal timer (set by ROM to 1.6 ms cycle) on level 3
 	// or by keyboard interrupt (level 6)
 	if (!m_load_state)
 	{
-		m_tms9980a->set_input_line(offset & 7, ASSERT_LINE);
+		m_tms9980a->set_input_line(m_tms9901_usr->get_int_level() & 7, ASSERT_LINE);
 	}
 }
 
@@ -320,30 +320,50 @@ WRITE_LINE_MEMBER( tm990189_state::usr9901_led3_w )
 	led_set(3, state);
 }
 
-WRITE8_MEMBER( tm990189_state::sys9901_interrupt_callback )
+WRITE_LINE_MEMBER( tm990189_state::sys9901_interrupt_callback )
 {
 	// TODO: Check this
-	m_tms9901_usr->set_single_int(5, (data!=0)? ASSERT_LINE:CLEAR_LINE);
+	m_tms9901_usr->set_int_line(5, state);
 }
 
 READ8_MEMBER( tm990189_state::sys9901_r )
 {
-	uint8_t data = 0;
-	if (offset == tms9901_device::CB_INT7)
+	// |-|Cass|K|K|K|K|K|C|
+	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8" };
+
+	offset &= 0x0F;
+	switch (offset)
 	{
-		static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8" };
+		case tms9901_device::INT1:
+		case tms9901_device::INT2:
+		case tms9901_device::INT3:
+		case tms9901_device::INT4:
+		case tms9901_device::INT5:
+			if (m_digitsel < 9)
+				return BIT(ioport(keynames[m_digitsel])->read(), offset-tms9901_device::INT1);
+			else return 0;
 
-		/* keyboard read */
-		if (m_digitsel < 9)
-			data |= ioport(keynames[m_digitsel])->read() << 1;
-
-		/* tape input */
-		if (m_cass->input() > 0.0)
-			data |= 0x40;
+		case tms9901_device::INT6:
+			return (m_cass->input() > 0);
+		default:
+			return 0;
 	}
-
-	return data;
 }
+
+/*
+      uint8_t data = 0;
+      if (offset == tms9901_device::CB_INT7)
+      {
+              static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8" };
+              // keyboard read
+              if (m_digitsel < 9)
+                    data |= ioport(keynames[m_digitsel])->read() << 1;
+              // tape input
+              if (m_cass->input() > 0.0)
+                      data |= 0x40;
+      }
+      return data;
+*/
 
 void tm990189_state::digitsel(int offset, bool state)
 {
@@ -456,16 +476,14 @@ public:
 	tm990_189_rs232_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// image-level overrides
-	virtual iodevice_t image_type() const override { return IO_SERIAL; }
+	virtual iodevice_t image_type() const noexcept override { return IO_SERIAL; }
 
-	virtual bool is_readable()  const override { return 1; }
-	virtual bool is_writeable() const override { return 1; }
-	virtual bool is_creatable() const override { return 1; }
-	virtual bool must_be_loaded() const override { return 0; }
-	virtual bool is_reset_on_load() const override { return 0; }
-	virtual const char *file_extensions() const override { return ""; }
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual bool is_readable()  const noexcept override { return true; }
+	virtual bool is_writeable() const noexcept override { return true; }
+	virtual bool is_creatable() const noexcept override { return true; }
+	virtual bool must_be_loaded() const noexcept override { return false; }
+	virtual bool is_reset_on_load() const noexcept override { return false; }
+	virtual const char *file_extensions() const noexcept override { return ""; }
 
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
@@ -473,6 +491,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	required_device<tms9902_device> m_tms9902;
 };
@@ -812,18 +831,15 @@ void tm990189_state::tm990_189_v_memmap(address_map &map)
 
 void tm990189_state::tm990_189_cru_map(address_map &map)
 {
-	map(0x0000, 0x003f).r(m_tms9901_usr, FUNC(tms9901_device::read));      /* user I/O tms9901 */
-	map(0x0040, 0x006f).r(m_tms9901_sys, FUNC(tms9901_device::read));      /* system I/O tms9901 */
-	map(0x0080, 0x00cf).r(m_tms9902, FUNC(tms9902_device::cruread));     /* optional tms9902 */
-
-	map(0x0000, 0x01ff).w(m_tms9901_usr, FUNC(tms9901_device::write));    /* user I/O tms9901 */
-	map(0x0200, 0x03ff).w(m_tms9901_sys, FUNC(tms9901_device::write));    /* system I/O tms9901 */
-	map(0x0400, 0x05ff).w(m_tms9902, FUNC(tms9902_device::cruwrite));   /* optional tms9902 */
+	map(0x0000, 0x03ff).rw(m_tms9901_usr, FUNC(tms9901_device::read), FUNC(tms9901_device::write));    /* user I/O tms9901 */
+	map(0x0400, 0x07ff).rw(m_tms9901_sys, FUNC(tms9901_device::read), FUNC(tms9901_device::write));    /* system I/O tms9901 */
+	map(0x0800, 0x0bff).rw(m_tms9902, FUNC(tms9902_device::cruread), FUNC(tms9902_device::cruwrite));   /* optional tms9902 */
 }
 
-MACHINE_CONFIG_START(tm990189_state::tm990_189)
+void tm990189_state::tm990_189(machine_config &config)
+{
 	/* basic machine hardware */
-	TMS9980A(config, m_tms9980a, 2000000);
+	TMS9980A(config, m_tms9980a, 8_MHz_XTAL); // clock divided by 4 internally
 	m_tms9980a->set_addrmap(AS_PROGRAM, &tm990189_state::tm990_189_memmap);
 	m_tms9980a->set_addrmap(AS_IO, &tm990189_state::tm990_189_cru_map);
 	m_tms9980a->extop_cb().set(FUNC(tm990189_state::external_operation));
@@ -841,14 +857,14 @@ MACHINE_CONFIG_START(tm990189_state::tm990_189)
 	/* Devices */
 	CASSETTE(config, "cassette", 0).add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	TMS9901(config, m_tms9901_usr, 2000000);
+	TMS9901(config, m_tms9901_usr, 8_MHz_XTAL / 4);
 	m_tms9901_usr->p_out_cb(0).set(FUNC(tm990189_state::usr9901_led0_w));
 	m_tms9901_usr->p_out_cb(1).set(FUNC(tm990189_state::usr9901_led1_w));
 	m_tms9901_usr->p_out_cb(2).set(FUNC(tm990189_state::usr9901_led2_w));
 	m_tms9901_usr->p_out_cb(3).set(FUNC(tm990189_state::usr9901_led3_w));
-	m_tms9901_usr->intlevel_cb().set(FUNC(tm990189_state::usr9901_interrupt_callback));
+	m_tms9901_usr->intreq_cb().set(FUNC(tm990189_state::usr9901_interrupt_callback));
 
-	TMS9901(config, m_tms9901_sys, 2000000);
+	TMS9901(config, m_tms9901_sys, 8_MHz_XTAL / 4);
 	m_tms9901_sys->read_cb().set(FUNC(tm990189_state::sys9901_r));
 	m_tms9901_sys->p_out_cb(0).set(FUNC(tm990189_state::sys9901_digitsel0_w));
 	m_tms9901_sys->p_out_cb(1).set(FUNC(tm990189_state::sys9901_digitsel1_w));
@@ -866,20 +882,23 @@ MACHINE_CONFIG_START(tm990189_state::tm990_189)
 	m_tms9901_sys->p_out_cb(13).set(FUNC(tm990189_state::sys9901_shiftlight_w));
 	m_tms9901_sys->p_out_cb(14).set(FUNC(tm990189_state::sys9901_spkrdrive_w));
 	m_tms9901_sys->p_out_cb(15).set(FUNC(tm990189_state::sys9901_tapewdata_w));
-	m_tms9901_sys->intlevel_cb().set(FUNC(tm990189_state::sys9901_interrupt_callback));
+	m_tms9901_sys->intreq_cb().set(FUNC(tm990189_state::sys9901_interrupt_callback));
 
-	TMS9902(config, m_tms9902, 2000000).xmit_cb().set(FUNC(tm990189_state::xmit_callback)); // called when a character is transmitted
+	TMS9902(config, m_tms9902, 8_MHz_XTAL / 4);
+	m_tms9902->xmit_cb().set(FUNC(tm990189_state::xmit_callback)); // called when a character is transmitted
 	TM990_189_RS232(config, "rs232", 0, m_tms9902);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_timer", tm990189_state, display_callback, attotime::from_hz(30))
+	timer_device &display_timer(TIMER(config, "display_timer"));
+	display_timer.configure_periodic(FUNC(tm990189_state::display_callback), attotime::from_hz(30));
 	// Need to delay the timer, or it will spoil the initial LOAD
 	// TODO: Fix this, probably inside CPU
-	MCFG_TIMER_START_DELAY(attotime::from_msec(150))
-MACHINE_CONFIG_END
+	display_timer.set_start_delay(attotime::from_msec(150));
+}
 
-MACHINE_CONFIG_START(tm990189_state::tm990_189_v)
+void tm990189_state::tm990_189_v(machine_config &config)
+{
 	/* basic machine hardware */
-	TMS9980A(config, m_tms9980a, 2000000);
+	TMS9980A(config, m_tms9980a, 8_MHz_XTAL);
 	m_tms9980a->set_addrmap(AS_PROGRAM, &tm990189_state::tm990_189_v_memmap);
 	m_tms9980a->set_addrmap(AS_IO, &tm990189_state::tm990_189_cru_map);
 	m_tms9980a->extop_cb().set(FUNC(tm990189_state::external_operation));
@@ -902,14 +921,14 @@ MACHINE_CONFIG_START(tm990189_state::tm990_189_v)
 	/* Devices */
 	CASSETTE(config, "cassette", 0).add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	TMS9901(config, m_tms9901_usr, 2000000);
+	TMS9901(config, m_tms9901_usr, 8_MHz_XTAL / 4);
 	m_tms9901_usr->p_out_cb(0).set(FUNC(tm990189_state::usr9901_led0_w));
 	m_tms9901_usr->p_out_cb(1).set(FUNC(tm990189_state::usr9901_led1_w));
 	m_tms9901_usr->p_out_cb(2).set(FUNC(tm990189_state::usr9901_led2_w));
 	m_tms9901_usr->p_out_cb(3).set(FUNC(tm990189_state::usr9901_led3_w));
-	m_tms9901_usr->intlevel_cb().set(FUNC(tm990189_state::usr9901_interrupt_callback));
+	m_tms9901_usr->intreq_cb().set(FUNC(tm990189_state::usr9901_interrupt_callback));
 
-	TMS9901(config, m_tms9901_sys, 2000000);
+	TMS9901(config, m_tms9901_sys, 8_MHz_XTAL / 4);
 	m_tms9901_sys->read_cb().set(FUNC(tm990189_state::sys9901_r));
 	m_tms9901_sys->p_out_cb(0).set(FUNC(tm990189_state::sys9901_digitsel0_w));
 	m_tms9901_sys->p_out_cb(1).set(FUNC(tm990189_state::sys9901_digitsel1_w));
@@ -927,14 +946,16 @@ MACHINE_CONFIG_START(tm990189_state::tm990_189_v)
 	m_tms9901_sys->p_out_cb(13).set(FUNC(tm990189_state::sys9901_shiftlight_w));
 	m_tms9901_sys->p_out_cb(14).set(FUNC(tm990189_state::sys9901_spkrdrive_w));
 	m_tms9901_sys->p_out_cb(15).set(FUNC(tm990189_state::sys9901_tapewdata_w));
-	m_tms9901_sys->intlevel_cb().set(FUNC(tm990189_state::sys9901_interrupt_callback));
+	m_tms9901_sys->intreq_cb().set(FUNC(tm990189_state::sys9901_interrupt_callback));
 
-	TMS9902(config, m_tms9902, 2000000).xmit_cb().set(FUNC(tm990189_state::xmit_callback)); // called when a character is transmitted;
+	TMS9902(config, m_tms9902, 8_MHz_XTAL / 4);
+	m_tms9902->xmit_cb().set(FUNC(tm990189_state::xmit_callback)); // called when a character is transmitted;
 	TM990_189_RS232(config, "rs232", 0, m_tms9902);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_timer", tm990189_state, display_callback, attotime::from_hz(30))
-	MCFG_TIMER_START_DELAY(attotime::from_msec(150))
-MACHINE_CONFIG_END
+	timer_device &display_timer(TIMER(config, "display_timer"));
+	display_timer.configure_periodic(FUNC(tm990189_state::display_callback), attotime::from_hz(30));
+	display_timer.set_start_delay(attotime::from_msec(150));
+}
 
 
 /*

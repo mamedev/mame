@@ -8,6 +8,14 @@ local ninja = premake.ninja
 local cpp   = premake.ninja.cpp
 local p     = premake
 
+local function wrap_ninja_cmd(c)
+	if os.is("windows") then
+		return 'cmd /c "' .. c .. '"'
+	else
+		return c
+	end
+end
+
 -- generate project + config build file
 	function ninja.generate_cpp(prj)
 		local pxy = ninja.get_proxy("prj", prj)
@@ -36,7 +44,7 @@ local p     = premake
 
 		local flags = {
 			defines   = ninja.list(tool.getdefines(cfg.defines)),
-			includes  = ninja.list(table.join(tool.getincludedirs(cfg.includedirs), tool.getquoteincludedirs(cfg.userincludedirs))),
+			includes  = ninja.list(table.join(tool.getincludedirs(cfg.includedirs), tool.getquoteincludedirs(cfg.userincludedirs), tool.getsystemincludedirs(cfg.systemincludedirs))),
 			cppflags  = ninja.list(tool.getcppflags(cfg)),
 			asmflags  = ninja.list(table.join(tool.getcflags(cfg), cfg.buildoptions, cfg.buildoptions_asm)),
 			cflags    = ninja.list(table.join(tool.getcflags(cfg), cfg.buildoptions, cfg.buildoptions_c)),
@@ -48,35 +56,67 @@ local p     = premake
 
 		_p("# core rules for " .. cfg.name)
 		_p("rule cc")
-		_p("  command = " .. tool.cc .. " $defines $includes $flags -MMD -MF $out.d -c -o $out $in")
+		_p("  command     = " .. wrap_ninja_cmd(tool.cc .. " $defines $includes $flags -MMD -MF $out.d -c -o $out $in"))
 		_p("  description = cc $out")
-		_p("  depfile = $out.d")
-		_p("  deps = gcc")
+		_p("  depfile     = $out.d")
+		_p("  deps        = gcc")
 		_p("")
 		_p("rule cxx")
-		_p("  command = " .. tool.cxx .. " $defines $includes $flags -MMD -MF $out.d -c -o $out $in")
+		_p("  command     = " .. wrap_ninja_cmd(tool.cxx .. " $defines $includes $flags -MMD -MF $out.d -c -o $out $in"))
 		_p("  description = cxx $out")
-		_p("  depfile = $out.d")
-		_p("  deps = gcc")
+		_p("  depfile     = $out.d")
+		_p("  deps        = gcc")
 		_p("")
 		_p("rule ar")
-		_p("  command = " .. tool.ar .. " $flags $out $in $libs " .. (os.is("MacOSX") and " 2>&1 > /dev/null | sed -e '/.o) has no symbols$$/d'" or ""))
-		_p("  description = ar $out")
+		_p("  command         = " .. wrap_ninja_cmd(tool.ar .. " $flags $out @$out.rsp " .. (os.is("MacOSX") and " 2>&1 > /dev/null | sed -e '/.o) has no symbols$$/d'" or "")))
+		_p("  description     = ar $out")
+		_p("  rspfile         = $out.rsp")
+		_p("  rspfile_content = $in $libs")
 		_p("")
 
 		local link = iif(cfg.language == "C", tool.cc, tool.cxx)
 		_p("rule link")
-		_p("  command = " .. link .. " -o $out @$out.rsp $all_ldflags $libs")
-		_p("  rspfile = $out.rsp")
-  		_p("  rspfile_content = $all_outputfiles")
-		_p("  description = link $out")
+		local startgroup = ''
+		local endgroup = ''
+		if (cfg.flags.LinkSupportCircularDependencies) then
+			startgroup = '-Wl,--start-group'
+			endgroup = '-Wl,--end-group'
+		end
+		_p("  command         = " .. wrap_ninja_cmd("$pre_link " .. link .. " -o $out @$out.rsp $all_ldflags $post_build"))
+		_p("  description     = link $out")
+		_p("  rspfile         = $out.rsp")
+  		_p("  rspfile_content = $all_outputfiles " .. string.format("%s $libs %s", startgroup, endgroup))
 		_p("")
+
+		_p("rule exec")
+		_p("  command     = " .. wrap_ninja_cmd("$command"))
+		_p("  description = Run $type commands")
+		_p("")
+
+		if #cfg.prebuildcommands > 0 then
+			_p("build __prebuildcommands_" .. premake.esc(prj.name) .. ": exec")
+			_p(1, "command = " .. wrap_ninja_cmd("echo Running pre-build commands && " .. table.implode(cfg.prebuildcommands, "", "", " && ")))
+			_p(1, "type    = pre-build")
+			_p("")
+		end
+
+		cfg.pchheader_full = cfg.pchheader
+		for _, incdir in ipairs(cfg.includedirs) do
+			-- convert this back to an absolute path for os.isfile()
+			local abspath = path.getabsolute(path.join(cfg.project.location, cfg.shortname, incdir))
+
+			local testname = path.join(abspath, cfg.pchheader_full)
+			if os.isfile(testname) then
+				cfg.pchheader_full = path.getrelative(cfg.location, testname)
+				break
+			end
+		end
 
 		cpp.custombuildtask(prj, cfg)
 
 		cpp.dependencyRules(prj, cfg)
 
-		cpp.file_rules(cfg, flags)
+		cpp.file_rules(prj, cfg, flags)
 
 		local objfiles = {}
 
@@ -97,6 +137,8 @@ local p     = premake
 		local seen_commands = {}
 		local command_by_name = {}
 		local command_files = {}
+
+		local prebuildsuffix = #cfg.prebuildcommands > 0 and "||__prebuildcommands_" .. premake.esc(prj.name) or ""
 
 		for _, custombuildtask in ipairs(prj.custombuildtask or {}) do
 			for _, buildtask in ipairs(custombuildtask or {}) do
@@ -156,7 +198,7 @@ local p     = premake
 		_p("# custom build rules")
 		for command, details in pairs(seen_commands) do
 			_p("rule " .. details.name)
-			_p(1, "command = " .. command)
+			_p(1, "command = " .. wrap_ninja_cmd(command))
 		end
 
 		for cmd_index, cmdsets in ipairs(command_files) do
@@ -167,7 +209,7 @@ local p     = premake
 				for i, dep in ipairs(cmdset[3]) do
 					deps = deps .. path.getrelative(cfg.location, dep) .. ' '
 				end
-				_p("build " .. file_out .. ': ' .. cmdset[4] .. ' ' .. file_in .. ' | ' .. deps)
+				_p("build " .. file_out .. ': ' .. cmdset[4] .. ' ' .. file_in .. ' | ' .. deps .. prebuildsuffix)
 				_p("")
 			end
 		end
@@ -175,6 +217,8 @@ local p     = premake
 
 	function cpp.dependencyRules(prj, cfg)
 		local extra_deps = {}
+		local order_deps = {}
+		local extra_flags = {}
 
 		for _, dependency in ipairs(prj.dependency or {}) do
 			for _, dep in ipairs(dependency or {}) do
@@ -191,38 +235,90 @@ local p     = premake
 			end
 		end
 
+		local pchfilename = cfg.pchheader_full and cpp.pchname(cfg, cfg.pchheader_full) or ''
+		for _, file in ipairs(cfg.files) do
+			local objfilename = file == cfg.pchheader and cpp.pchname(cfg, file) or cpp.objectname(cfg, file)
+			if path.issourcefile(file) or file == cfg.pchheader then
+				if #cfg.prebuildcommands > 0 then
+					if order_deps[objfilename] == nil then
+						order_deps[objfilename] = {}
+					end
+					table.insert(order_deps[objfilename], '__prebuildcommands_' .. premake.esc(prj.name))
+				end
+			end
+			if path.issourcefile(file) then
+				if cfg.pchheader_full and not cfg.flags.NoPCH then
+					local nopch = table.icontains(prj.nopch, file)
+					if not nopch then
+						local suffix = path.isobjcfile(file) and '_objc' or ''
+						if extra_deps[objfilename] == nil then
+							extra_deps[objfilename] = {}
+						end
+						table.insert(extra_deps[objfilename], pchfilename .. suffix .. ".gch")
+
+						if extra_flags[objfilename] == nil then
+							extra_flags[objfilename] = {}
+						end
+						table.insert(extra_flags[objfilename], '-include ' .. pchfilename .. suffix)
+					end
+				end
+			end
+		end
+
 		-- store prepared deps for file_rules() phase
 		cfg.extra_deps = extra_deps
+		cfg.order_deps = order_deps
+		cfg.extra_flags = extra_flags
 	end
 
 	function cpp.objectname(cfg, file)
 		return path.join(cfg.objectsdir, path.trimdots(path.removeext(file)) .. ".o")
 	end
 
-	function cpp.file_rules(cfg, flags)
+	function cpp.pchname(cfg, file)
+		return path.join(cfg.objectsdir, path.trimdots(file))
+	end
+
+	function cpp.file_rules(prj,cfg, flags)
 		_p("# build files")
 
 		for _, file in ipairs(cfg.files) do
 			_p("# FILE: " .. file)
-			if path.issourcefile(file) then
+			if cfg.pchheader_full == file then
+				local pchfilename = cpp.pchname(cfg, file)
+				local extra_deps = #cfg.extra_deps and '| ' .. table.concat(cfg.extra_deps[pchfilename] or {}, ' ') or ''
+				local order_deps = #cfg.order_deps and '|| ' .. table.concat(cfg.order_deps[pchfilename] or {}, ' ') or ''
+				local extra_flags = #cfg.extra_flags and ' ' .. table.concat(cfg.extra_flags[pchfilename] or {}, ' ') or ''
+				_p("build " .. pchfilename .. ".gch : cxx " .. file .. extra_deps .. order_deps)
+				_p(1, "flags    = " .. flags['cxxflags'] .. extra_flags .. iif(prj.language == "C", "-x c-header", "-x c++-header"))
+				_p(1, "includes = " .. flags.includes)
+				_p(1, "defines  = " .. flags.defines)
+
+				_p("build " .. pchfilename .. "_objc.gch : cxx " .. file .. extra_deps .. order_deps)
+				_p(1, "flags    = " .. flags['objcflags'] .. extra_flags .. iif(prj.language == "C", "-x objective-c-header", "-x objective-c++-header"))
+				_p(1, "includes = " .. flags.includes)
+				_p(1, "defines  = " .. flags.defines)
+			elseif path.issourcefile(file) then
 				local objfilename = cpp.objectname(cfg, file)
 				local extra_deps = #cfg.extra_deps and '| ' .. table.concat(cfg.extra_deps[objfilename] or {}, ' ') or ''
+				local order_deps = #cfg.order_deps and '|| ' .. table.concat(cfg.order_deps[objfilename] or {}, ' ') or ''
+				local extra_flags = #cfg.extra_flags and ' ' .. table.concat(cfg.extra_flags[objfilename] or {}, ' ') or ''
 
 				local cflags = "cflags"
 				if path.isobjcfile(file) then
-					_p("build " .. objfilename .. ": cxx " .. file .. extra_deps)
+					_p("build " .. objfilename .. ": cxx " .. file .. extra_deps .. order_deps)
 					cflags = "objcflags"
 				elseif path.isasmfile(file) then
-					_p("build " .. objfilename .. ": cc " .. file .. extra_deps)
+					_p("build " .. objfilename .. ": cc " .. file .. extra_deps .. order_deps)
 					cflags = "asmflags"
 				elseif path.iscfile(file) and not cfg.options.ForceCPP then
-					_p("build " .. objfilename .. ": cc " .. file .. extra_deps)
+					_p("build " .. objfilename .. ": cc " .. file .. extra_deps .. order_deps)
 				else
-					_p("build " .. objfilename .. ": cxx " .. file .. extra_deps)
+					_p("build " .. objfilename .. ": cxx " .. file .. extra_deps .. order_deps)
 					cflags = "cxxflags"
 				end
 
-				_p(1, "flags    = " .. flags[cflags])
+				_p(1, "flags    = " .. flags[cflags] .. extra_flags)
 				_p(1, "includes = " .. flags.includes)
 				_p(1, "defines  = " .. flags.defines)
 			elseif path.isresourcefile(file) then
@@ -238,26 +334,34 @@ local p     = premake
 		local lddeps      = ninja.list(premake.getlinks(cfg, "siblings", "fullpath"))
 		local libs        = lddeps .. " " .. ninja.list(tool.getlinkflags(cfg))
 
+		local prebuildsuffix = #cfg.prebuildcommands > 0 and "||__prebuildcommands" or ""
+
 		local function writevars()
-			_p(1, "all_ldflags = " .. all_ldflags)
-			_p(1, "libs        = " .. libs)
+			_p(1, "all_ldflags     = " .. all_ldflags)
+			_p(1, "libs            = " .. libs)
 			_p(1, "all_outputfiles = " .. table.concat(objfiles, " "))
+			if #cfg.prelinkcommands > 0 then
+				_p(1, 'pre_link        = echo Running pre-link commands && ' .. table.implode(cfg.prelinkcommands, "", "", " && ") .. " && ")
+			end
+			if #cfg.postbuildcommands > 0 then
+				_p(1, 'post_build      = && echo Running post-build commands && ' .. table.implode(cfg.postbuildcommands, "", "", " && "))
+			end
 		end
 
 		if cfg.kind == "StaticLib" then
 			local ar_flags = ninja.list(tool.getarchiveflags(cfg, cfg, false))
 			_p("# link static lib")
-			_p("build " .. cfg:getoutputfilename() .. ": ar " .. table.concat(objfiles, " ") .. " | " .. lddeps)
+			_p("build " .. cfg:getoutputfilename() .. ": ar " .. table.concat(objfiles, " ") .. " | " .. lddeps .. prebuildsuffix)
 			_p(1, "flags = " .. ninja.list(tool.getarchiveflags(cfg, cfg, false)))
 			_p(1, "all_outputfiles = " .. table.concat(objfiles, " "))
-		elseif cfg.kind == "SharedLib" then
+		elseif cfg.kind == "SharedLib" or cfg.kind == "Bundle" then
 			local output = cfg:getoutputfilename()
 			_p("# link shared lib")
-			_p("build " .. output .. ": link " .. table.concat(objfiles, " ") .. " | " .. libs)
+			_p("build " .. output .. ": link " .. table.concat(objfiles, " ") .. " | " .. lddeps .. prebuildsuffix)
 			writevars()
 		elseif (cfg.kind == "ConsoleApp") or (cfg.kind == "WindowedApp") then
 			_p("# link executable")
-			_p("build " .. cfg:getoutputfilename() .. ": link " .. table.concat(objfiles, " ") .. " | " .. lddeps)
+			_p("build " .. cfg:getoutputfilename() .. ": link " .. table.concat(objfiles, " ") .. " | " .. lddeps .. prebuildsuffix)
 			writevars()
 		else
 			p.error("ninja action doesn't support this kind of target " .. cfg.kind)

@@ -15,6 +15,7 @@
 
 #include "expat.h"
 
+#include <cstring>
 #include <regex>
 
 
@@ -34,8 +35,8 @@ static std::regex s_potenial_softlist_regex("\\w+(\\:\\w+)*");
 //  feature_list_item - constructor
 //-------------------------------------------------
 
-feature_list_item::feature_list_item(const std::string &name, const std::string &value)
-	: m_next(nullptr),
+feature_list_item::feature_list_item(const std::string &name, const std::string &value) :
+	m_next(nullptr),
 	m_name(name),
 	m_value(value)
 {
@@ -46,8 +47,8 @@ feature_list_item::feature_list_item(const std::string &name, const std::string 
 //  feature_list_item - constructor
 //-------------------------------------------------
 
-feature_list_item::feature_list_item(std::string &&name, std::string &&value)
-	: m_next(nullptr),
+feature_list_item::feature_list_item(std::string &&name, std::string &&value) :
+	m_next(nullptr),
 	m_name(std::move(name)),
 	m_value(std::move(value))
 {
@@ -62,11 +63,11 @@ feature_list_item::feature_list_item(std::string &&name, std::string &&value)
 //  software_part - constructor
 //-------------------------------------------------
 
-software_part::software_part(software_info &info, std::string &&name, std::string &&interface)
-	: m_next(nullptr),
-		m_info(info),
-		m_name(std::move(name)),
-		m_interface(std::move(interface))
+software_part::software_part(software_info &info, std::string &&name, std::string &&interface) :
+	m_next(nullptr),
+	m_info(info),
+	m_name(std::move(name)),
+	m_interface(std::move(interface))
 {
 }
 
@@ -76,13 +77,13 @@ software_part::software_part(software_info &info, std::string &&name, std::strin
 //  feature, if specified
 //-------------------------------------------------
 
-const char *software_part::feature(const std::string &feature_name) const
+const char *software_part::feature(const std::string &feature_name) const noexcept
 {
 	// scan the feature list for an entry matching feature_name and return the value
 	auto iter = std::find_if(
-		m_featurelist.begin(),
-		m_featurelist.end(),
-		[&feature_name](const feature_list_item &feature) { return feature.name() == feature_name; });
+			m_featurelist.begin(),
+			m_featurelist.end(),
+			[&feature_name] (const feature_list_item &feature) { return feature.name() == feature_name; });
 
 	return iter != m_featurelist.end()
 		? iter->value().c_str()
@@ -95,18 +96,25 @@ const char *software_part::feature(const std::string &feature_name) const
 //  an interface in the provided list
 //-------------------------------------------------
 
-bool software_part::matches_interface(const char *interface_list) const
+bool software_part::matches_interface(const char *interface_list) const noexcept
 {
 	// if we have no interface, then we match by default
 	if (m_interface.empty())
 		return true;
 
-	// copy the comma-delimited interface list and ensure it ends with a final comma
-	std::string interfaces = std::string(interface_list).append(",");
-
-	// then add a comma to the end of our interface and return true if we find it in the list string
-	std::string our_interface = std::string(m_interface).append(",");
-	return (interfaces.find(our_interface) != -1);
+	// find our interface at the beginning of the list or immediately following a comma
+	while (true)
+	{
+		char const *const found(std::strstr(interface_list, m_interface.c_str()));
+		if (!found)
+			return false;
+		if (((found == interface_list) || (',' == found[-1])) && ((',' == found[m_interface.size()]) || !found[m_interface.size()]))
+			return true;
+		interface_list = std::strchr(interface_list, ',');
+		if (!interface_list)
+			return false;
+		++interface_list;
+	}
 }
 
 
@@ -118,10 +126,10 @@ bool software_part::matches_interface(const char *interface_list) const
 //  software_info - constructor
 //-------------------------------------------------
 
-software_info::software_info(std::string &&name, std::string &&parent, const std::string &supported)
-	: m_supported(SOFTWARE_SUPPORTED_YES),
-		m_shortname(std::move(name)),
-		m_parentname(std::move(parent))
+software_info::software_info(std::string &&name, std::string &&parent, const std::string &supported) :
+	m_supported(SOFTWARE_SUPPORTED_YES),
+	m_shortname(std::move(name)),
+	m_parentname(std::move(parent))
 {
 	// handle the supported flag if provided
 	if (supported == "partial")
@@ -184,17 +192,17 @@ bool software_info::has_multiple_parts(const char *interface) const
 //  softlist_parser - constructor
 //-------------------------------------------------
 
-softlist_parser::softlist_parser(util::core_file &file, const std::string &filename, std::string &description, std::list<software_info> &infolist, std::ostringstream &errors)
-		: m_file(file),
-		m_filename(filename),
-		m_infolist(infolist),
-		m_errors(errors),
-		m_done(false),
-		m_description(description),
-		m_data_accum_expected(false),
-		m_current_info(nullptr),
-		m_current_part(nullptr),
-		m_pos(POS_ROOT)
+softlist_parser::softlist_parser(util::core_file &file, const std::string &filename, std::string &description, std::list<software_info> &infolist, std::ostringstream &errors) :
+	m_file(file),
+	m_filename(filename),
+	m_infolist(infolist),
+	m_errors(errors),
+	m_done(false),
+	m_description(description),
+	m_data_accum_expected(false),
+	m_current_info(nullptr),
+	m_current_part(nullptr),
+	m_pos(POS_ROOT)
 {
 	// create the parser
 	m_parser = XML_ParserCreate_MM(nullptr, nullptr, nullptr);
@@ -475,7 +483,7 @@ void softlist_parser::parse_root_start(const char *tagname, const char **attribu
 	// <softwarelist name='' description=''>
 	if (strcmp(tagname, "softwarelist") == 0)
 	{
-		static const char *attrnames[] = { "name", "description" };
+		static char const *const attrnames[] = { "name", "description" };
 		const auto attrvalues = parse_attributes(attributes, attrnames);
 
 		if (!attrvalues[1].empty())
@@ -496,7 +504,7 @@ void softlist_parser::parse_main_start(const char *tagname, const char **attribu
 	// <software name='' cloneof='' supported=''>
 	if (strcmp(tagname, "software") == 0)
 	{
-		static const char *attrnames[] = { "name", "cloneof", "supported" };
+		static char const *const attrnames[] = { "name", "cloneof", "supported" };
 		auto attrvalues = parse_attributes(attributes, attrnames);
 
 		if (!attrvalues[0].empty())
@@ -563,7 +571,7 @@ void softlist_parser::parse_soft_start(const char *tagname, const char **attribu
 	// <part name='' interface=''>
 	else if (strcmp(tagname, "part" ) == 0)
 	{
-		static const char *attrnames[] = { "name", "interface" };
+		static char const *const attrnames[] = { "name", "interface" };
 		auto attrvalues = parse_attributes(attributes, attrnames);
 
 		if (!attrvalues[0].empty() && !attrvalues[1].empty())
@@ -596,7 +604,7 @@ void softlist_parser::parse_part_start(const char *tagname, const char **attribu
 	// <dataarea name='' size=''>
 	if (strcmp(tagname, "dataarea") == 0)
 	{
-		static const char *attrnames[] = { "name", "size", "width", "endianness" };
+		static char const *const attrnames[] = { "name", "size", "width", "endianness" };
 		auto attrvalues = parse_attributes(attributes, attrnames);
 
 		if (!attrvalues[0].empty() && !attrvalues[1].empty())
@@ -638,7 +646,7 @@ void softlist_parser::parse_part_start(const char *tagname, const char **attribu
 	// <diskarea name=''>
 	else if (strcmp(tagname, "diskarea") == 0)
 	{
-		static const char *attrnames[] = { "name" };
+		static char const *const attrnames[] = { "name" };
 		auto attrvalues = parse_attributes(attributes, attrnames);
 
 		if (!attrvalues[0].empty())
@@ -683,7 +691,7 @@ void softlist_parser::parse_data_start(const char *tagname, const char **attribu
 	// <rom name='' size='' crc='' sha1='' offset='' value='' status='' loadflag=''>
 	if (strcmp(tagname, "rom") == 0)
 	{
-		static const char *attrnames[] = { "name", "size", "crc", "sha1", "offset", "value", "status", "loadflag" };
+		static char const *const attrnames[] = { "name", "size", "crc", "sha1", "offset", "value", "status", "loadflag" };
 		auto attrvalues = parse_attributes(attributes, attrnames);
 
 		std::string &name = attrvalues[0];
@@ -694,10 +702,10 @@ void softlist_parser::parse_data_start(const char *tagname, const char **attribu
 		std::string &value = attrvalues[5];
 		const std::string &status = attrvalues[6];
 		const std::string &loadflag = attrvalues[7];
-		if (!sizestr.empty() && !offsetstr.empty())
+		if (!sizestr.empty())
 		{
 			u32 length = strtol(sizestr.c_str(), nullptr, 0);
-			u32 offset = strtol(offsetstr.c_str(), nullptr, 0);
+			u32 offset = offsetstr.empty() ? 0 : strtol(offsetstr.c_str(), nullptr, 0);
 
 			if (loadflag == "reload")
 				add_rom_entry("", "", offset, length, ROMENTRYTYPE_RELOAD | ROM_INHERITFLAGS);
@@ -707,6 +715,8 @@ void softlist_parser::parse_data_start(const char *tagname, const char **attribu
 				add_rom_entry("", "", offset, length, ROMENTRYTYPE_CONTINUE | ROM_INHERITFLAGS);
 			else if (loadflag == "fill")
 				add_rom_entry("", std::move(value), offset, length, ROMENTRYTYPE_FILL);
+			else if (loadflag == "ignore")
+				add_rom_entry("", "", 0, length, ROMENTRYTYPE_IGNORE | ROM_INHERITFLAGS);
 			else if (!name.empty())
 			{
 				bool baddump = (status == "baddump");
@@ -745,11 +755,6 @@ void softlist_parser::parse_data_start(const char *tagname, const char **attribu
 			else
 				parse_error("Rom name missing");
 		}
-		else if (!sizestr.empty() && !loadflag.empty() && loadflag == "ignore")
-		{
-			u32 length = strtol(sizestr.c_str(), nullptr, 0);
-			add_rom_entry("", "", 0, length, ROMENTRYTYPE_IGNORE | ROM_INHERITFLAGS);
-		}
 		else
 			parse_error("Incomplete rom definition");
 	}
@@ -757,7 +762,7 @@ void softlist_parser::parse_data_start(const char *tagname, const char **attribu
 	// <rom name='' sha1='' status='' writeable=''>
 	else if (strcmp(tagname, "disk") == 0)
 	{
-		static const char *attrnames[] = { "name", "sha1", "status", "writeable" };
+		static char const *const attrnames[] = { "name", "sha1", "status", "writeable" };
 		auto attrvalues = parse_attributes(attributes, attrnames);
 
 		std::string &name = attrvalues[0];

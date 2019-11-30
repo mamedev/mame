@@ -55,17 +55,23 @@ DEFINE_DEVICE_TYPE(A2BUS_ECHOII, a2bus_echoii_device, "a2echoii", "Street Electr
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(a2bus_echoii_device::device_add_mconfig)
+void a2bus_echoii_device::device_add_mconfig(machine_config &config)
+{
 	SPEAKER(config, "echoii").front_center();
-	MCFG_DEVICE_ADD(TMS_TAG, TMS5220, 640000) // Note the Echo II card has an R/C circuit (and sometimes a 'FREQ' potentiometer) to control the tms5220[c]'s clock frequency; 640khz is the nominal '8khz' value according to the TMS5220 datasheet.
-	// The EchoIIb card however has a 74LS92 which divides the apple2's Q3 ((14.318/7)MHz asymmetrical) clock by 6 to produce a 681.809khz/2 clock, which doesn't actually make sense, since the tms5220, unless it has a mask option (mentioned on the datasheet) to use a ceramic resonator instead of an r/c circuit, needs a clock at twice that speed. Could it be that the EchoIIb uses tsp5220C chips with a special mask option?
+	tms5220_device &tms(TMS5220(config, TMS_TAG, 640000));
+	// Note the Echo II card has an R/C circuit (and sometimes a 'FREQ' potentiometer) to control the tms5220[c]'s clock frequency; 640khz is
+	//   the nominal '8khz' value according to the TMS5220 datasheet.
+	// The EchoIIb card however has a 74LS92 which divides the apple2's Q3 ((14.318/7)MHz asymmetrical) clock by 6 to produce a 681.809khz/2
+	//   clock, which doesn't actually make sense, since the tms5220, unless it has a mask option (mentioned on the datasheet) to use a ceramic
+	//   resonator instead of an r/c circuit, needs a clock at twice that speed. Could it be that the EchoIIb uses tsp5220C chips with a special
+	//   mask option?
 	// Some Old EchoII cards shipped with TMS5200(really?), some with TMS5220. Many (most?) were retrofitted with a TMS5220 or TMS5220C later.
 	// The later VSM-socket-less EchoII shipped with a TMS5220.
 	// The EchoIIb and later cards shipped with a TMS5220C
-	//MCFG_TMS52XX_IRQ_HANDLER(WRITELINE(*this, a2bus_echoii_device, tms_irq_callback))
-	MCFG_TMS52XX_READYQ_HANDLER(WRITELINE(*this, a2bus_echoii_device, tms_readyq_callback))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "echoii", 1.0)
-MACHINE_CONFIG_END
+	//tms.irq_cb().set(FUNC(a2bus_echoii_device::tms_irq_callback));
+	tms.ready_cb().set(FUNC(a2bus_echoii_device::tms_readyq_callback));
+	tms.add_route(ALL_OUTPUTS, "echoii", 1.0);
+}
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -133,7 +139,7 @@ uint8_t a2bus_echoii_device::read_c0nx(uint8_t offset)
 	// upon the falling edge of /DEVREAD, the active part of the read...
 	if (m_readlatch_flag == false) // /RS was low, so we need to return a value from the tms5220
 	{
-		retval = 0x1f | m_tms->status_r(machine().dummy_space(), 0, 0xff);
+		retval = 0x1f | m_tms->status_r();
 		LOGMASKED(LOG_READ,"Returning status of speech chip, which is %02x\n", retval);
 	}
 	else
@@ -157,7 +163,7 @@ void a2bus_echoii_device::write_c0nx(uint8_t offset, uint8_t data)
 
 	m_writelatch_flag = false; // /DEVWRITE clears the latch on its falling edge
 	m_tms->wsq_w(m_writelatch_flag);
-	m_tms->data_w(machine().dummy_space(), 0, m_writelatch_data);
+	m_tms->data_w(m_writelatch_data);
 }
 
 bool a2bus_echoii_device::take_c800()

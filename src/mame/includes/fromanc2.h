@@ -1,10 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:Takahiro Nogi, Uki
+#ifndef MAME_INCLUDES_FROMANC2_H
+#define MAME_INCLUDES_FROMANC2_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "machine/eepromser.h"
 #include "machine/ins8250.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class fromanc2_state : public driver_device
 {
@@ -20,7 +25,8 @@ public:
 		m_rpalette(*this, "rpalette"),
 		m_soundlatch(*this, "soundlatch"),
 		m_soundlatch2(*this, "soundlatch2"),
-		m_uart(*this, "uart") { }
+		m_uart(*this, "uart")
+	{ }
 
 	void fromanc2(machine_config &config);
 	void fromancr(machine_config &config);
@@ -29,9 +35,9 @@ public:
 	void init_fromanc4();
 	void init_fromanc2();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(subcpu_int_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(sndcpu_nmi_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(subcpu_nmi_r);
+	DECLARE_READ_LINE_MEMBER(subcpu_int_r);
+	DECLARE_READ_LINE_MEMBER(sndcpu_nmi_r);
+	DECLARE_READ_LINE_MEMBER(subcpu_nmi_r);
 
 private:
 	/* memory pointers */
@@ -122,3 +128,5 @@ private:
 	void fromanc4_main_map(address_map &map);
 	void fromancr_main_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_FROMANC2_H

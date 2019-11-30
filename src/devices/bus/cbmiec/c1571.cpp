@@ -44,9 +44,9 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(C1570,      c1570_device,      "c1570",    "C1570 Disk Drive")
-DEFINE_DEVICE_TYPE(C1571,      c1571_device,      "c1571",    "C1571 Disk Drive")
-DEFINE_DEVICE_TYPE(C1571CR,    c1571cr_device,    "c1571cr",  "C1571CR Disk Drive")
+DEFINE_DEVICE_TYPE(C1570,      c1570_device,      "c1570",    "Commodore 1570 Disk Drive")
+DEFINE_DEVICE_TYPE(C1571,      c1571_device,      "c1571",    "Commodore 1571 Disk Drive")
+DEFINE_DEVICE_TYPE(C1571CR,    c1571cr_device,    "c1571cr",  "Commodore 1571CR Disk Drive")
 DEFINE_DEVICE_TYPE(MINI_CHIEF, mini_chief_device, "minichif", "ICT Mini Chief Disk Drive")
 
 
@@ -147,7 +147,7 @@ const tiny_rom_entry *mini_chief_device::device_rom_region() const
 void c1571_device::c1571_mem(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
-	map(0x1800, 0x180f).mirror(0x03f0).rw(M6522_0_TAG, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x1800, 0x180f).mirror(0x03f0).m(M6522_0_TAG, FUNC(via6522_device::map));
 	map(0x1c00, 0x1c0f).mirror(0x03f0).rw(FUNC(c1571_device::via1_r), FUNC(c1571_device::via1_w));
 	map(0x2000, 0x2003).mirror(0x1ffc).rw(WD1770_TAG, FUNC(wd1770_device::read), FUNC(wd1770_device::write));
 	map(0x4000, 0x400f).mirror(0x3ff0).rw(M6526_TAG, FUNC(mos6526_device::read), FUNC(mos6526_device::write));
@@ -162,7 +162,7 @@ void c1571_device::c1571_mem(address_map &map)
 void mini_chief_device::mini_chief_mem(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
-	map(0x1800, 0x180f).mirror(0x03f0).rw(M6522_0_TAG, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x1800, 0x180f).mirror(0x03f0).m(M6522_0_TAG, FUNC(via6522_device::map));
 	map(0x1c00, 0x1c0f).mirror(0x03f0).rw(FUNC(mini_chief_device::via1_r), FUNC(mini_chief_device::via1_w));
 	map(0x2000, 0x2003).mirror(0x1ffc).rw(WD1770_TAG, FUNC(wd1770_device::read), FUNC(wd1770_device::write));
 	map(0x4000, 0x400f).mirror(0xff0).rw(M6526_TAG, FUNC(mos6526_device::read), FUNC(mos6526_device::write));
@@ -598,7 +598,7 @@ void c1571_device::add_base_mconfig(machine_config &config)
 {
 	M6502(config, m_maincpu, 16_MHz_XTAL / 16);
 	m_maincpu->set_addrmap(AS_PROGRAM, &c1571_device::c1571_mem);
-	config.m_perfect_cpu_quantum = subtag(M6502_TAG);
+	//config.set_perfect_quantum(m_maincpu); FIXME: not safe in a slot device - add barriers
 
 	VIA6522(config, m_via0, 16_MHz_XTAL / 16);
 	m_via0->readpa_handler().set(FUNC(c1571_device::via0_pa_r));
@@ -660,7 +660,7 @@ void c1571cr_device::device_add_mconfig(machine_config &config)
 	m_via0->writepa_handler().set(FUNC(c1571cr_device::via0_pa_w));
 	m_via0->writepb_handler().set(FUNC(c1571cr_device::via0_pb_w));
 
-	//MCFG_MOS5710_ADD(M5710_TAG, 16_MHz_XTAL / 16, 0)
+	//MOS5710(config, M5710_TAG, 16_MHz_XTAL / 16);
 }
 
 
@@ -672,7 +672,8 @@ void mini_chief_device::device_add_mconfig(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &mini_chief_device::mini_chief_mem);
 
 	isa8_device &isa8(ISA8(config, ISA_BUS_TAG, 0));
-	isa8.set_cputag(m_maincpu);
+	isa8.set_memspace(m_maincpu, AS_PROGRAM);
+	isa8.set_iospace(m_maincpu, AS_PROGRAM);
 	ISA8_SLOT(config, "isa1", 0, ISA_BUS_TAG, mini_chief_isa8_cards, "wd1002a_wx1", false);
 }
 

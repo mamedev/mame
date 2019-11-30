@@ -8,6 +8,7 @@
 #include "bus/ecbbus/ecbbus.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/z80daisy.h"
 #include "machine/prof80mmu.h"
 #include "machine/74259.h"
@@ -39,7 +40,7 @@ public:
 		, m_fdc(*this, UPD765_TAG)
 		, m_ram(*this, RAM_TAG)
 		, m_floppy(*this, UPD765_TAG":%u", 0U)
-		, m_ecb(*this, ECBBUS_TAG)
+		, m_ecb(*this, "ecbbus")
 		, m_rs232a(*this, "rs232a")
 		, m_rs232b(*this, "rs232b")
 		, m_flra(*this, "z44")

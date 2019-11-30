@@ -81,11 +81,9 @@ void pci9050_device::device_start()
 	save_item(NAME(m_erombrd));
 	save_item(NAME(m_intcsr));
 	save_item(NAME(m_cntrl));
-	machine().save().register_postload(save_prepost_delegate(FUNC(pci9050_device::postload), this));
-
 }
 
-void pci9050_device::postload(void)
+void pci9050_device::device_post_load()
 {
 	remap_rom();
 	for (int id = 0; id < 4; id++)

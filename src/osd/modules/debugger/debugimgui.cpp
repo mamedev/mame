@@ -173,7 +173,7 @@ private:
 	void refresh_typelist();
 	void update_cpu_view(device_t* device);
 	static bool get_view_source(void* data, int idx, const char** out_text);
-	static int history_set(ImGuiTextEditCallbackData* data);
+	static int history_set(ImGuiInputTextCallbackData* data);
 
 	running_machine* m_machine;
 	int32_t            m_mouse_x;
@@ -262,7 +262,7 @@ static inline void map_attr_to_fg_bg(unsigned char attr, rgb_t *fg, rgb_t *bg)
 bool debug_imgui::get_view_source(void* data, int idx, const char** out_text)
 {
 	debug_view* vw = static_cast<debug_view*>(data);
-	*out_text = vw->source_list().find(idx)->name();
+	*out_text = vw->source(idx)->name();
 	return true;
 }
 
@@ -531,7 +531,7 @@ void debug_imgui::handle_console(running_machine* machine)
 	}
 }
 
-int debug_imgui::history_set(ImGuiTextEditCallbackData* data)
+int debug_imgui::history_set(ImGuiInputTextCallbackData* data)
 {
 	if(view_main_console->console_history.size() == 0)
 		return 0;
@@ -754,13 +754,9 @@ void debug_imgui::add_log(int id)
 
 void debug_imgui::draw_disasm(debug_area* view_ptr, bool* opened)
 {
-	const debug_view_source* src;
-
 	ImGui::SetNextWindowSize(ImVec2(view_ptr->width,view_ptr->height + ImGui::GetTextLineHeight()),ImGuiCond_Once);
 	if(ImGui::Begin(view_ptr->title.c_str(),opened,ImGuiWindowFlags_MenuBar))
 	{
-		int idx;
-		bool done = false;
 		bool exp_change = false;
 
 		view_ptr->is_collapsed = false;
@@ -788,7 +784,7 @@ void debug_imgui::draw_disasm(debug_area* view_ptr, bool* opened)
 		ImGuiInputTextFlags flags = ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AutoSelectAll;
 		if(m_running)
 			flags |= ImGuiInputTextFlags_ReadOnly;
-		ImGui::Combo("##cpu",&view_ptr->src_sel,get_view_source,view_ptr->view,view_ptr->view->source_list().count());
+		ImGui::Combo("##cpu",&view_ptr->src_sel,get_view_source,view_ptr->view,view_ptr->view->source_count());
 		ImGui::SameLine();
 		ImGui::PushItemWidth(-1.0f);
 		if(ImGui::InputText("##addr",view_ptr->console_input,512,flags))
@@ -800,17 +796,15 @@ void debug_imgui::draw_disasm(debug_area* view_ptr, bool* opened)
 		ImGui::Separator();
 
 		// disassembly portion
-		src = view_ptr->view->first_source();
-		idx = 0;
-		while (!done)
+		unsigned idx = 0;
+		const debug_view_source* src = view_ptr->view->source(idx);
+		do
 		{
 			if(view_ptr->src_sel == idx)
 				view_ptr->view->set_source(*src);
-			idx++;
-			src = src->next();
-			if(src == nullptr)
-				done = true;
+			src = view_ptr->view->source(++idx);
 		}
+		while (src);
 
 		ImGui::BeginChild("##disasm_output", ImVec2(ImGui::GetWindowWidth() - 16,ImGui::GetWindowHeight() - ImGui::GetTextLineHeight() - ImGui::GetCursorPosY()));  // account for title bar and widgets already drawn
 		draw_view(view_ptr,exp_change);
@@ -841,13 +835,9 @@ void debug_imgui::add_disasm(int id)
 
 void debug_imgui::draw_memory(debug_area* view_ptr, bool* opened)
 {
-	const debug_view_source* src;
-
 	ImGui::SetNextWindowSize(ImVec2(view_ptr->width,view_ptr->height + ImGui::GetTextLineHeight()),ImGuiCond_Once);
 	if(ImGui::Begin(view_ptr->title.c_str(),opened,ImGuiWindowFlags_MenuBar))
 	{
-		int idx;
-		bool done = false;
 		bool exp_change = false;
 
 		view_ptr->is_collapsed = false;
@@ -906,22 +896,20 @@ void debug_imgui::draw_memory(debug_area* view_ptr, bool* opened)
 		ImGui::PopItemWidth();
 		ImGui::SameLine();
 		ImGui::PushItemWidth(-1.0f);
-		ImGui::Combo("##region",&view_ptr->src_sel,get_view_source,view_ptr->view,view_ptr->view->source_list().count());
+		ImGui::Combo("##region",&view_ptr->src_sel,get_view_source,view_ptr->view,view_ptr->view->source_count());
 		ImGui::PopItemWidth();
 		ImGui::Separator();
 
 		// memory editor portion
-		src = view_ptr->view->first_source();
-		idx = 0;
-		while (!done)
+		unsigned idx = 0;
+		const debug_view_source* src = view_ptr->view->source(idx);
+		do
 		{
 			if(view_ptr->src_sel == idx)
 				view_ptr->view->set_source(*src);
-			idx++;
-			src = src->next();
-			if(src == nullptr)
-				done = true;
+			src = view_ptr->view->source(++idx);
 		}
+		while (src);
 
 		ImGui::BeginChild("##memory_output", ImVec2(ImGui::GetWindowWidth() - 16,ImGui::GetWindowHeight() - ImGui::GetTextLineHeight() - ImGui::GetCursorPosY()));  // account for title bar and widgets already drawn
 		draw_view(view_ptr,exp_change);
@@ -1341,7 +1329,7 @@ void debug_imgui::draw_console()
 		ImGui::PushItemWidth(-1.0f);
 		if(ImGui::InputText("##console_input",view_main_console->console_input,512,flags,history_set))
 			view_main_console->exec_cmd = true;
-		if ((ImGui::IsRootWindowOrAnyChildFocused() && !ImGui::IsAnyItemActive() && !ImGui::IsMouseClicked(0)))
+		if ((ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) && !ImGui::IsAnyItemActive() && !ImGui::IsMouseClicked(0)))
 			ImGui::SetKeyboardFocusHere(-1); // Auto focus previous widget
 		if(m_mount_open)
 		{

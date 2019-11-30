@@ -9,7 +9,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
-				<rom name="1551-demo.d64" size="174848" crc="bf6da2a0" sha1="67b694cf6551991d6b87f7bdc03f8f58aa55dbce" offset="0" />
+				<rom name="1551-demo.d64" size="174848" crc="bf6da2a0" sha1="67b694cf6551991d6b87f7bdc03f8f58aa55dbce"/>
 			</dataarea>
 		</part>
 	</software>
@@ -20,7 +20,7 @@
 		<publisher>Cascade</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
-				<rom name="ace[cascade_1985](plus4).g64" size="333744" crc="ecaab593" sha1="40d0edd9ced2a7e40b39dce13176615985267bc4" offset="0" />
+				<rom name="ace[cascade_1985](plus4).g64" size="333744" crc="ecaab593" sha1="40d0edd9ced2a7e40b39dce13176615985267bc4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -31,7 +31,7 @@
 		<publisher>Commodore</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
-				<rom name="typing_professor[cbm_1984](plus4).g64" size="333744" crc="cbd6750a" sha1="f6963a92d9ebaa1125a0203c16e1293fe3d38852" offset="0" />
+				<rom name="typing_professor[cbm_1984](plus4).g64" size="333744" crc="cbd6750a" sha1="f6963a92d9ebaa1125a0203c16e1293fe3d38852"/>
 			</dataarea>
 		</part>
 	</software>
@@ -42,7 +42,7 @@
 		<publisher>Commodore</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
-				<rom name="zork_ii[infocom_1984](r48)(plus4).g64" size="333744" crc="053bfe1a" sha1="b55d2be8ca179d758fad8871bba55e3b84a9f5ee" offset="0" />
+				<rom name="zork_ii[infocom_1984](r48)(plus4).g64" size="333744" crc="053bfe1a" sha1="b55d2be8ca179d758fad8871bba55e3b84a9f5ee"/>
 			</dataarea>
 		</part>
 	</software>

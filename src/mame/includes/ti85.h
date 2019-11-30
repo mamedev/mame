@@ -62,10 +62,7 @@ public:
 		, m_link_port(*this, "linkport")
 		, m_nvram(*this, "nvram")
 		, m_flash(*this, "flash")
-		, m_membank1(*this, "membank1")
-		, m_membank2(*this, "membank2")
-		, m_membank3(*this, "membank3")
-		, m_membank4(*this, "membank4")
+		, m_membank(*this, "membank%u", 0U)
 	{
 	}
 
@@ -87,10 +84,7 @@ private:
 	optional_device<ti8x_link_port_device> m_link_port;
 	optional_shared_ptr<uint8_t> m_nvram;
 	optional_device<intelfsh8_device> m_flash;
-	optional_device<address_map_bank_device> m_membank1;
-	optional_device<address_map_bank_device> m_membank2;
-	optional_device<address_map_bank_device> m_membank3;
-	optional_device<address_map_bank_device> m_membank4;
+	optional_device_array<address_map_bank_device, 4> m_membank;
 
 	ti85_model m_model;
 
@@ -185,10 +179,10 @@ private:
 	DECLARE_READ8_MEMBER(ti84pse_port_0056_r);
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(ti85);
+	void ti85_palette(palette_device &palette);
 	DECLARE_MACHINE_RESET(ti85);
 	DECLARE_MACHINE_RESET(ti83p);
-	DECLARE_PALETTE_INIT(ti82);
+	void ti82_palette(palette_device &palette) const;
 	DECLARE_MACHINE_START(ti86);
 	DECLARE_MACHINE_START(ti83p);
 	DECLARE_MACHINE_START(ti83pse);
@@ -226,8 +220,8 @@ private:
 	DECLARE_WRITE8_MEMBER(ti83pse_ctimer3_loop_w);
 	DECLARE_READ8_MEMBER(ti83pse_ctimer3_count_r);
 	DECLARE_WRITE8_MEMBER(ti83pse_ctimer3_count_w);
-	DECLARE_READ8_MEMBER(ti83p_membank2_r);
-	DECLARE_READ8_MEMBER(ti83p_membank3_r);
+	uint8_t ti83p_membank2_r(offs_t offset);
+	uint8_t ti83p_membank3_r(offs_t offset);
 
 	void ti8x_update_bank(address_space &space, uint8_t bank, uint8_t *base, uint8_t page, bool is_ram);
 	void update_ti85_memory();
@@ -237,7 +231,7 @@ private:
 	void ti8x_snapshot_setup_registers(uint8_t *data);
 	void ti85_setup_snapshot(uint8_t *data);
 	void ti86_setup_snapshot(uint8_t *data);
-	DECLARE_SNAPSHOT_LOAD_MEMBER(ti8x);
+	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
 
 	ti83pse_timer m_ctimer[3];
 

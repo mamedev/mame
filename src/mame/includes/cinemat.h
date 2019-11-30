@@ -69,7 +69,6 @@ public:
 	rgb_t m_vector_color;
 	int16_t m_lastx;
 	int16_t m_lasty;
-	uint8_t m_last_control;
 	DECLARE_READ8_MEMBER(inputs_r);
 	DECLARE_READ8_MEMBER(switches_r);
 	DECLARE_READ8_MEMBER(coin_input_r);
@@ -201,6 +200,8 @@ public:
 	using cinemat_state::cinemat_state;
 
 	void solarq(machine_config &config);
+
+	void init_solarq();
 
 protected:
 	virtual DECLARE_WRITE_LINE_MEMBER(vector_control_w) override;

@@ -13,7 +13,6 @@
 
 #include "emu.h"
 #include "includes/vertigo.h"
-#include "includes/exidy440.h"
 #include "audio/exidy440.h"
 #include "speaker.h"
 
@@ -106,12 +105,12 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(vertigo_state::vertigo)
-
+void vertigo_state::vertigo(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 24_MHz_XTAL / 3)
-	MCFG_DEVICE_PROGRAM_MAP(vertigo_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(vertigo_state, vertigo_interrupt, 60)
+	M68000(config, m_maincpu, 24_MHz_XTAL / 3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &vertigo_state::vertigo_map);
+	m_maincpu->set_periodic_int(FUNC(vertigo_state::vertigo_interrupt), attotime::from_hz(60));
 
 	ADC0808(config, m_adc, 24_MHz_XTAL / 30); // E clock from 68000
 	m_adc->eoc_ff_callback().set(FUNC(vertigo_state::adc_eoc_w));
@@ -123,33 +122,33 @@ MACHINE_CONFIG_START(vertigo_state::vertigo)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("440audio", EXIDY440, EXIDY440_MC3418_CLOCK)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	EXIDY440(config, m_custom, EXIDY440_MC3418_CLOCK);
+	m_custom->add_route(0, "lspeaker", 1.0);
+	m_custom->add_route(1, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("pit", PIT8254, 0)
-	MCFG_PIT8253_CLK0(24_MHz_XTAL / 100)
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(*this, vertigo_state, v_irq4_w))
-	MCFG_PIT8253_CLK1(24_MHz_XTAL / 100)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(*this, vertigo_state, v_irq3_w))
-	MCFG_PIT8253_CLK2(24_MHz_XTAL / 100)
+	pit8254_device &pit(PIT8254(config, "pit", 0));
+	pit.set_clk<0>(24_MHz_XTAL / 100);
+	pit.out_handler<0>().set(FUNC(vertigo_state::v_irq4_w));
+	pit.set_clk<1>(24_MHz_XTAL / 100);
+	pit.out_handler<1>().set(FUNC(vertigo_state::v_irq3_w));
+	pit.set_clk<2>(24_MHz_XTAL / 100);
 
 	TTL74148(config, m_ttl74148, 0);
 	m_ttl74148->out_cb().set(FUNC(vertigo_state::update_irq));
 
 	/* motor controller */
-	MCFG_DEVICE_ADD("motorcpu", M68705P3, 24_MHz_XTAL / 6)
+	M68705P3(config, "motorcpu", 24_MHz_XTAL / 6);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_VECTOR_ADD("vector")
-	MCFG_SCREEN_ADD("screen", VECTOR)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(400, 300)
-	MCFG_SCREEN_VISIBLE_AREA(0, 510, 0, 400)
-	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
-MACHINE_CONFIG_END
+	VECTOR(config, m_vector, 0);
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_VECTOR));
+	screen.set_refresh_hz(60);
+	screen.set_size(400, 300);
+	screen.set_visarea(0, 510, 0, 400);
+	screen.set_screen_update("vector", FUNC(vector_device::screen_update));
+}
 
 
 /*************************************

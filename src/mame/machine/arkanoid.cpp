@@ -25,9 +25,9 @@ CUSTOM_INPUT_MEMBER(arkanoid_state::arkanoid_semaphore_input_r)
 			((CLEAR_LINE != m_mcuintf->mcu_semaphore_r()) ? 0x00 : 0x02);
 }
 
-CUSTOM_INPUT_MEMBER(arkanoid_state::arkanoid_input_mux)
+uint8_t arkanoid_state::input_mux_r()
 {
-	return m_muxports[(0 == m_paddle_select) ? 0 : 1]->read();
+	return m_muxports[(0 == m_paddle_select) ? 0 : 1].read_safe(0xff);
 }
 
 /*
@@ -486,7 +486,7 @@ READ8_MEMBER(arkanoid_state::arkanoid_bootleg_d008_r)
 {
 	uint8_t arkanoid_bootleg_d008_bit[8];
 	uint8_t arkanoid_bootleg_d008_val;
-	uint8_t arkanoid_paddle_value = ioport("MUX")->read();
+	uint8_t arkanoid_paddle_value = input_mux_r();
 	int b;
 
 	arkanoid_bootleg_d008_bit[4] = arkanoid_bootleg_d008_bit[6] = arkanoid_bootleg_d008_bit[7] = 0;  /* untested bits */

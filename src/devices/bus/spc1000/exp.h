@@ -7,7 +7,7 @@
 
 // ======================> device_spc1000_card_interface
 
-class device_spc1000_card_interface : public device_slot_card_interface
+class device_spc1000_card_interface : public device_interface
 {
 public:
 	// construction/destruction
@@ -24,10 +24,19 @@ protected:
 
 // ======================> spc1000_exp_device
 
-class spc1000_exp_device : public device_t, public device_slot_interface
+class spc1000_exp_device : public device_t, public device_single_card_slot_interface<device_spc1000_card_interface>
 {
 public:
 	// construction/destruction
+	template <typename T>
+	spc1000_exp_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts)
+		: spc1000_exp_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		opts(*this);
+		set_default_option(nullptr);
+		set_fixed(false);
+	}
+
 	spc1000_exp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~spc1000_exp_device();
 

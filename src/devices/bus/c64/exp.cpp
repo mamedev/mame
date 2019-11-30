@@ -27,13 +27,14 @@ DEFINE_DEVICE_TYPE(C64_EXPANSION_SLOT, c64_expansion_slot_device, "c64_expansion
 //  device_c64_expansion_card_interface - constructor
 //-------------------------------------------------
 
-device_c64_expansion_card_interface::device_c64_expansion_card_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device),
-		m_roml(*this, "roml"),
-		m_romh(*this, "romh"),
-		m_nvram(*this, "nvram"),
-		m_game(1),
-		m_exrom(1)
+device_c64_expansion_card_interface::device_c64_expansion_card_interface(const machine_config &mconfig, device_t &device) :
+	device_interface(device, "c64exp"),
+	m_roml(*this, "roml"),
+	m_romh(*this, "romh"),
+	m_romx(*this, "romx"),
+	m_nvram(*this, "nvram"),
+	m_game(1),
+	m_exrom(1)
 {
 	m_slot = dynamic_cast<c64_expansion_slot_device *>(device.owner());
 }
@@ -58,28 +59,16 @@ device_c64_expansion_card_interface::~device_c64_expansion_card_interface()
 //-------------------------------------------------
 
 c64_expansion_slot_device::c64_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, C64_EXPANSION_SLOT, tag, owner, clock),
-		device_slot_interface(mconfig, *this),
-		device_image_interface(mconfig, *this),
-		m_read_dma_cd(*this),
-		m_write_dma_cd(*this),
-		m_write_irq(*this),
-		m_write_nmi(*this),
-		m_write_dma(*this),
-		m_write_reset(*this), m_card(nullptr), m_hiram(0)
+	device_t(mconfig, C64_EXPANSION_SLOT, tag, owner, clock),
+	device_single_card_slot_interface<device_c64_expansion_card_interface>(mconfig, *this),
+	device_image_interface(mconfig, *this),
+	m_read_dma_cd(*this),
+	m_write_dma_cd(*this),
+	m_write_irq(*this),
+	m_write_nmi(*this),
+	m_write_dma(*this),
+	m_write_reset(*this), m_card(nullptr), m_hiram(0)
 {
-}
-
-
-//-------------------------------------------------
-//  device_validity_check -
-//-------------------------------------------------
-
-void c64_expansion_slot_device::device_validity_check(validity_checker &valid) const
-{
-	device_t *const carddev = get_card_device();
-	if (carddev && !dynamic_cast<device_c64_expansion_card_interface *>(carddev))
-		osd_printf_error("Card device %s (%s) does not implement device_c64_expansion_card_interface\n", carddev->tag(), carddev->name());
 }
 
 
@@ -89,10 +78,7 @@ void c64_expansion_slot_device::device_validity_check(validity_checker &valid) c
 
 void c64_expansion_slot_device::device_start()
 {
-	device_t *const carddev = get_card_device();
-	m_card = dynamic_cast<device_c64_expansion_card_interface *>(carddev);
-	if (carddev && !m_card)
-		fatalerror("Card device %s (%s) does not implement device_c64_expansion_card_interface\n", carddev->tag(), carddev->name());
+	m_card = get_card_device();
 
 	// resolve callbacks
 	m_read_dma_cd.resolve_safe(0);
@@ -193,6 +179,7 @@ image_init_result c64_expansion_slot_device::call_load()
 				// Commodore 64/128 cartridge
 				load_software_region("roml", m_card->m_roml);
 				load_software_region("romh", m_card->m_romh);
+				load_software_region("romx", m_card->m_romx);
 				load_software_region("nvram", m_card->m_nvram);
 
 				if (get_feature("exrom") != nullptr) m_card->m_exrom = atol(get_feature("exrom"));
@@ -225,11 +212,11 @@ std::string c64_expansion_slot_device::get_default_card_software(get_default_car
 //  cd_r - cartridge data read
 //-------------------------------------------------
 
-uint8_t c64_expansion_slot_device::cd_r(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+uint8_t c64_expansion_slot_device::cd_r(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (m_card != nullptr)
 	{
-		data = m_card->c64_cd_r(space, offset, data, sphi2, ba, roml, romh, io1, io2);
+		data = m_card->c64_cd_r(offset, data, sphi2, ba, roml, romh, io1, io2);
 	}
 
 	return data;
@@ -240,11 +227,11 @@ uint8_t c64_expansion_slot_device::cd_r(address_space &space, offs_t offset, uin
 //  cd_w - cartridge data write
 //-------------------------------------------------
 
-void c64_expansion_slot_device::cd_w(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+void c64_expansion_slot_device::cd_w(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (m_card != nullptr)
 	{
-		m_card->c64_cd_w(space, offset, data, sphi2, ba, roml, romh, io1, io2);
+		m_card->c64_cd_w(offset, data, sphi2, ba, roml, romh, io1, io2);
 	}
 }
 
@@ -253,11 +240,12 @@ void c64_expansion_slot_device::cd_w(address_space &space, offs_t offset, uint8_
 //  game_r - GAME read
 //-------------------------------------------------
 
-int c64_expansion_slot_device::game_r(offs_t offset, int sphi2, int ba, int rw, int hiram)
+int c64_expansion_slot_device::game_r(offs_t offset, int sphi2, int ba, int rw, int loram, int hiram)
 {
 	int state = 1;
 
 	m_hiram = hiram;
+	m_loram = loram;
 
 	if (m_card != nullptr)
 	{
@@ -272,11 +260,12 @@ int c64_expansion_slot_device::game_r(offs_t offset, int sphi2, int ba, int rw, 
 //  exrom_r - EXROM read
 //-------------------------------------------------
 
-int c64_expansion_slot_device::exrom_r(offs_t offset, int sphi2, int ba, int rw, int hiram)
+int c64_expansion_slot_device::exrom_r(offs_t offset, int sphi2, int ba, int rw, int loram, int hiram)
 {
 	int state = 1;
 
 	m_hiram = hiram;
+	m_loram = loram;
 
 	if (m_card != nullptr)
 	{
@@ -304,6 +293,8 @@ void c64_expansion_slot_device::set_passthrough()
 
 // slot devices
 #include "16kb.h"
+#include "buscard.h"
+#include "buscard2.h"
 #include "c128_comal80.h"
 #include "c128_partner.h"
 #include "comal80.h"
@@ -393,6 +384,8 @@ void c64_expansion_cards(device_slot_interface &device)
 	device.option_add("supercpu", C64_SUPERCPU);
 	device.option_add("swiftlink", C64_SWIFTLINK);
 	device.option_add("turbo232", C64_TURBO232);
+	device.option_add("buscard", C64_BUSCARD);
+	device.option_add("buscard2", C64_BUSCARD2);
 
 	// the following need ROMs from the software list
 	device.option_add_internal("standard", C64_STD);

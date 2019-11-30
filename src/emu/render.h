@@ -215,51 +215,10 @@ struct render_texinfo
 	u32                 width;              // width of the image
 	u32                 height;             // height of the image
 	u32                 seqid;              // sequence ID
-	u64                 osddata;            // aux data to pass to osd
+	u64                 unique_id;          // unique identifier to pass to osd
+	u64                 old_id;             // previously allocated id, if applicable
 	const rgb_t *       palette;            // palette for PALETTE16 textures, bcg lookup table for RGB32/YUY16
-};
-
-
-// ======================> render_screen_list
-
-// a render_screen_list is a list of screen_devices
-class render_screen_list
-{
-	// screen list item
-	class item
-	{
-		friend class simple_list<item>;
-		friend class render_screen_list;
-
-	public:
-		// construction/destruction
-		item(screen_device &screen) : m_screen(screen) { }
-
-		// state
-		item *              m_next = nullptr;   // next screen in list
-		screen_device &     m_screen;           // reference to screen device
-	};
-
-public:
-	// getters
-	int count() const { return m_list.count(); }
-
-	// operations
-	void add(screen_device &screen) { m_list.append(*global_alloc(item(screen))); }
-	void reset() { m_list.reset(); }
-
-	// query
-	int contains(screen_device &screen) const
-	{
-		int count = 0;
-		for (item *curitem = m_list.first(); curitem; curitem = curitem->m_next)
-			if (&curitem->m_screen == &screen) count++;
-		return count;
-	}
-
-private:
-	// internal state
-	simple_list<item> m_list;
+	u32                 palette_length;
 };
 
 
@@ -269,14 +228,9 @@ private:
 class render_layer_config
 {
 private:
-	static constexpr u8 ENABLE_BACKDROP          = 0x01; // enable backdrop layers
-	static constexpr u8 ENABLE_OVERLAY           = 0x02; // enable overlay layers
-	static constexpr u8 ENABLE_BEZEL             = 0x04; // enable bezel layers
-	static constexpr u8 ENABLE_CPANEL            = 0x08; // enable cpanel layers
-	static constexpr u8 ENABLE_MARQUEE           = 0x10; // enable marquee layers
-	static constexpr u8 ZOOM_TO_SCREEN           = 0x20; // zoom to screen area by default
-	static constexpr u8 ENABLE_SCREEN_OVERLAY    = 0x40; // enable screen overlays
-	static constexpr u8 DEFAULT = ENABLE_BACKDROP | ENABLE_OVERLAY | ENABLE_BEZEL | ENABLE_CPANEL | ENABLE_MARQUEE | ENABLE_SCREEN_OVERLAY;
+	static constexpr u8 ZOOM_TO_SCREEN           = 0x01; // zoom to screen area by default
+	static constexpr u8 ENABLE_SCREEN_OVERLAY    = 0x02; // enable screen overlays
+	static constexpr u8 DEFAULT = ENABLE_SCREEN_OVERLAY;
 
 	u8               m_state = DEFAULT;
 
@@ -293,19 +247,9 @@ public:
 	bool operator==(const render_layer_config &rhs) const { return m_state == rhs.m_state; }
 	bool operator!=(const render_layer_config &rhs) const { return m_state != rhs.m_state; }
 
-	constexpr bool backdrops_enabled() const        { return (m_state & ENABLE_BACKDROP) != 0; }
-	constexpr bool overlays_enabled() const         { return (m_state & ENABLE_OVERLAY) != 0; }
-	constexpr bool bezels_enabled() const           { return (m_state & ENABLE_BEZEL) != 0; }
-	constexpr bool cpanels_enabled() const          { return (m_state & ENABLE_CPANEL) != 0; }
-	constexpr bool marquees_enabled() const         { return (m_state & ENABLE_MARQUEE) != 0; }
 	constexpr bool screen_overlay_enabled() const   { return (m_state & ENABLE_SCREEN_OVERLAY) != 0; }
 	constexpr bool zoom_to_screen() const           { return (m_state & ZOOM_TO_SCREEN) != 0; }
 
-	render_layer_config &set_backdrops_enabled(bool enable)         { return set_flag(ENABLE_BACKDROP, enable); }
-	render_layer_config &set_overlays_enabled(bool enable)          { return set_flag(ENABLE_OVERLAY, enable); }
-	render_layer_config &set_bezels_enabled(bool enable)            { return set_flag(ENABLE_BEZEL, enable); }
-	render_layer_config &set_cpanels_enabled(bool enable)           { return set_flag(ENABLE_CPANEL, enable); }
-	render_layer_config &set_marquees_enabled(bool enable)          { return set_flag(ENABLE_MARQUEE, enable); }
 	render_layer_config &set_screen_overlay_enabled(bool enable)    { return set_flag(ENABLE_SCREEN_OVERLAY, enable); }
 	render_layer_config &set_zoom_to_screen(bool zoom)              { return set_flag(ZOOM_TO_SCREEN, zoom); }
 };
@@ -441,8 +385,8 @@ public:
 	// configure the texture bitmap
 	void set_bitmap(bitmap_t &bitmap, const rectangle &sbounds, texture_format format);
 
-	// set any necessary aux data
-	void set_osd_data(u64 data) { m_osddata = data; }
+	// set a unique identifier
+	void set_id(u64 id) { m_old_id = m_id; m_id = id; }
 
 	// generic high-quality bitmap scaler
 	static void hq_scale(bitmap_argb32 &dest, bitmap_argb32 &source, const rectangle &sbounds, void *param);
@@ -450,7 +394,7 @@ public:
 private:
 	// internal helpers
 	void get_scaled(u32 dwidth, u32 dheight, render_texinfo &texinfo, render_primitive_list &primlist, u32 flags = 0);
-	const rgb_t *get_adjusted_palette(render_container &container);
+	const rgb_t *get_adjusted_palette(render_container &container, u32 &out_length);
 
 	static const int MAX_TEXTURE_SCALES = 16;
 
@@ -467,7 +411,8 @@ private:
 	bitmap_t *          m_bitmap;                   // pointer to the original bitmap
 	rectangle           m_sbounds;                  // source bounds within the bitmap
 	texture_format      m_format;                   // format of the texture data
-	u64                 m_osddata;                  // aux data to pass to osd
+	u64                 m_id;                       // unique id to pass to osd
+	u64                 m_old_id;                   // previous id, if applicable
 
 	// scaling state (ARGB32 only)
 	texture_scaler_func m_scaler;                   // scaling callback
@@ -540,7 +485,7 @@ public:
 	bool has_brightness_contrast_gamma_changes() const { return (m_user.m_brightness != 1.0f || m_user.m_contrast != 1.0f || m_user.m_gamma != 1.0f); }
 	u8 apply_brightness_contrast_gamma(u8 value);
 	float apply_brightness_contrast_gamma_fp(float value);
-	const rgb_t *bcg_lookup_table(int texformat, palette_t *palette = nullptr);
+	const rgb_t *bcg_lookup_table(int texformat, u32 &out_length, palette_t *palette = nullptr);
 
 private:
 	// an item describes a high level primitive that is added to a container
@@ -596,25 +541,6 @@ private:
 	std::vector<rgb_t>      m_bcglookup;            // copy of screen palette with bcg adjustment
 	rgb_t                   m_bcglookup256[0x400];  // lookup table for brightness/contrast/gamma
 };
-
-
-
-//**************************************************************************
-//  CONSTANTS
-//**************************************************************************
-
-enum item_layer
-{
-	ITEM_LAYER_FIRST = 0,
-	ITEM_LAYER_BACKDROP = ITEM_LAYER_FIRST,
-	ITEM_LAYER_SCREEN,
-	ITEM_LAYER_OVERLAY,
-	ITEM_LAYER_BEZEL,
-	ITEM_LAYER_CPANEL,
-	ITEM_LAYER_MARQUEE,
-	ITEM_LAYER_MAX
-};
-DECLARE_ENUM_INCDEC_OPERATORS(item_layer)
 
 
 
@@ -781,6 +707,7 @@ private:
 			util::xml::data_node const &parentnode,
 			group_map &groupmap,
 			std::vector<layout_group const *> &seen,
+			bool empty,
 			bool repeat,
 			bool init);
 
@@ -801,6 +728,7 @@ public:
 	using environment = emu::render::detail::layout_environment;
 	using element_map = std::unordered_map<std::string, layout_element>;
 	using group_map = std::unordered_map<std::string, layout_group>;
+	using render_screen_list = std::list<std::reference_wrapper<screen_device>>;
 
 	/// \brief A single backdrop/screen/overlay/bezel/cpanel/marquee item
 	///
@@ -831,9 +759,10 @@ public:
 		screen_device *screen() { return m_screen; }
 		const render_bounds &bounds() const { return m_bounds; }
 		const render_color &color() const { return m_color; }
+		int blend_mode() const { return m_blend_mode; }
 		int orientation() const { return m_orientation; }
 		render_container *screen_container(running_machine &machine) const;
-		bool has_input() const { return !m_input_tag.empty(); }
+		bool has_input() const { return bool(m_input_port); }
 		ioport_port *input_tag_and_mask(ioport_value &mask) const { mask = m_input_mask; return m_input_port; };
 
 		// fetch state based on configured source
@@ -842,19 +771,31 @@ public:
 		// resolve tags, if any
 		void resolve_tags();
 
+		// setters
+		void set_blend_mode(int mode) { m_blend_mode = mode; }
+
 	private:
+		static layout_element *find_element(environment &env, util::xml::data_node const &itemnode, element_map &elemmap);
+		static render_bounds make_bounds(environment &env, util::xml::data_node const &itemnode, layout_group::transform const &trans);
+		static std::string make_input_tag(environment &env, util::xml::data_node const &itemnode);
+		static int get_blend_mode(environment &env, util::xml::data_node const &itemnode);
+
 		// internal state
-		layout_element *    m_element;          // pointer to the associated element (non-screens only)
-		output_finder<>     m_output;           // associated output
-		bool const          m_have_output;      // whether we actually have an output
-		std::string         m_input_tag;        // input tag of this item
-		ioport_port *       m_input_port;       // input port of this item
-		ioport_value        m_input_mask;       // input mask of this item
-		screen_device *     m_screen;           // pointer to screen
-		int                 m_orientation;      // orientation of this item
-		render_bounds       m_bounds;           // bounds of the item
-		render_bounds       m_rawbounds;        // raw (original) bounds of the item
-		render_color        m_color;            // color of the item
+		layout_element *const   m_element;          // pointer to the associated element (non-screens only)
+		output_finder<>         m_output;           // associated output
+		bool const              m_have_output;      // whether we actually have an output
+		std::string const       m_input_tag;        // input tag of this item
+		ioport_port *           m_input_port;       // input port of this item
+		ioport_field const *    m_input_field;      // input port field of this item
+		ioport_value const      m_input_mask;       // input mask of this item
+		u8                      m_input_shift;      // input mask rightshift for raw (trailing 0s)
+		bool const              m_input_raw;        // get raw data from input port
+		screen_device *         m_screen;           // pointer to screen
+		int                     m_orientation;      // orientation of this item
+		render_bounds           m_bounds;           // bounds of the item
+		render_bounds const     m_rawbounds;        // raw (original) bounds of the item
+		render_color            m_color;            // color of the item
+		int                     m_blend_mode;       // blending mode to use when drawing
 	};
 	using item_list = std::list<item>;
 
@@ -867,16 +808,17 @@ public:
 	~layout_view();
 
 	// getters
-	item_list &items(item_layer layer);
+	item_list &items() { return m_items; }
 	const std::string &name() const { return m_name; }
 	const render_bounds &bounds() const { return m_bounds; }
 	const render_bounds &screen_bounds() const { return m_scrbounds; }
 	const render_screen_list &screens() const { return m_screens; }
-	bool layer_enabled(item_layer layer) const { return m_layenabled[layer]; }
+	size_t screen_count() const { return m_screens.size(); }
+	bool has_screen(screen_device &screen) const;
 
 	//
-	bool has_art() const { return !m_backdrop_list.empty() || !m_overlay_list.empty() || !m_bezel_list.empty() || !m_cpanel_list.empty() || !m_marquee_list.empty(); }
-	float effective_aspect(render_layer_config config) const { return (config.zoom_to_screen() && m_screens.count() != 0) ? m_scraspect : m_aspect; }
+	bool has_art() const { return m_has_art; }
+	float effective_aspect(render_layer_config config) const { return (config.zoom_to_screen() && !m_screens.empty()) ? m_scraspect : m_aspect; }
 
 	// operations
 	void recompute(render_layer_config layerconfig);
@@ -885,8 +827,11 @@ public:
 	void resolve_tags();
 
 private:
+	struct layer_lists;
+
 	// add items, recursing for groups
 	void add_items(
+			layer_lists &layers,
 			environment &env,
 			util::xml::data_node const &parentnode,
 			element_map &elemmap,
@@ -908,13 +853,8 @@ private:
 	render_bounds       m_bounds;           // computed bounds of the view
 	render_bounds       m_scrbounds;        // computed bounds of the screens within the view
 	render_bounds       m_expbounds;        // explicit bounds of the view
-	bool                m_layenabled[ITEM_LAYER_MAX]; // is this layer enabled?
-	item_list           m_backdrop_list;    // list of backdrop items
-	item_list           m_screen_list;      // list of screen items
-	item_list           m_overlay_list;     // list of overlay items
-	item_list           m_bezel_list;       // list of bezel items
-	item_list           m_cpanel_list;      // list of marquee items
-	item_list           m_marquee_list;     // list of marquee items
+	item_list           m_items;            // list of layout items
+	bool                m_has_art;          // true if the layout contains non-screen elements
 };
 
 
@@ -997,20 +937,10 @@ public:
 	void set_scale_mode(int scale_mode) { m_scale_mode = scale_mode; }
 
 	// layer config getters
-	bool backdrops_enabled() const { return m_layerconfig.backdrops_enabled(); }
-	bool overlays_enabled() const { return m_layerconfig.overlays_enabled(); }
-	bool bezels_enabled() const { return m_layerconfig.bezels_enabled(); }
-	bool cpanels_enabled() const { return m_layerconfig.cpanels_enabled(); }
-	bool marquees_enabled() const { return m_layerconfig.marquees_enabled(); }
 	bool screen_overlay_enabled() const { return m_layerconfig.screen_overlay_enabled(); }
 	bool zoom_to_screen() const { return m_layerconfig.zoom_to_screen(); }
 
 	// layer config setters
-	void set_backdrops_enabled(bool enable) { m_layerconfig.set_backdrops_enabled(enable); update_layer_config(); }
-	void set_overlays_enabled(bool enable) { m_layerconfig.set_overlays_enabled(enable); update_layer_config(); }
-	void set_bezels_enabled(bool enable) { m_layerconfig.set_bezels_enabled(enable); update_layer_config(); }
-	void set_cpanels_enabled(bool enable) { m_layerconfig.set_cpanels_enabled(enable); update_layer_config(); }
-	void set_marquees_enabled(bool enable) { m_layerconfig.set_marquees_enabled(enable); update_layer_config(); }
 	void set_screen_overlay_enabled(bool enable) { m_layerconfig.set_screen_overlay_enabled(enable); update_layer_config(); }
 	void set_zoom_to_screen(bool zoom) { m_layerconfig.set_zoom_to_screen(zoom); update_layer_config(); }
 
@@ -1019,7 +949,6 @@ public:
 
 	// view information
 	const char *view_name(int viewindex);
-	const render_screen_list &view_screens(int viewindex);
 
 	// bounds computations
 	void compute_visible_area(s32 target_width, s32 target_height, float target_pixel_aspect, int target_orientation, s32 &visible_width, s32 &visible_height);
@@ -1109,8 +1038,6 @@ private:
 	s32                     m_clear_extents[MAX_CLEAR_EXTENTS]; // array of clear extents
 	bool                    m_transform_container;      // determines whether the screen container is transformed by the core renderer,
 														// otherwise the respective render API will handle the transformation (scale, offset)
-
-	static render_screen_list s_empty_screen_list;
 };
 
 
@@ -1181,6 +1108,7 @@ private:
 
 	// texture lists
 	u32                             m_live_textures;    // number of live textures
+	u64                             m_texture_id;       // rolling texture ID counter
 	fixed_allocator<render_texture> m_texture_allocator;// texture allocator
 
 	// containers for the UI and for screens

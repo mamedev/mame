@@ -23,6 +23,7 @@ Magic Sticks:
 #include "sound/okim6295.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class powerbal_state : public playmark_state
@@ -551,13 +552,13 @@ void powerbal_state::draw_sprites_powerbal(bitmap_ind16 &bitmap, const rectangle
 				code,
 				color,
 				flipx,0,
-				sx + m_xoffset,sy + m_yoffset,0);
+				sx + m_xoffset,sy + m_yoffset,m_sprtranspen);
 	}
 }
 
 VIDEO_START_MEMBER(powerbal_state,powerbal)
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(powerbal_state::powerbal_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(powerbal_state::powerbal_get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	m_xoffset = -20;
 
@@ -566,10 +567,11 @@ VIDEO_START_MEMBER(powerbal_state,powerbal)
 
 VIDEO_START_MEMBER(powerbal_state,atombjt)
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(powerbal_state::powerbal_get_bg_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(powerbal_state::powerbal_get_bg_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 64, 32);
 
 	m_xoffset = 32;
 	m_yoffset = 8;
+	m_sprtranspen = 0xf;
 
 	m_bg_tilemap->set_scrollx(0, -64);
 }
@@ -625,45 +627,44 @@ MACHINE_RESET_MEMBER(powerbal_state,powerbal)
 	configure_oki_banks();
 }
 
-MACHINE_CONFIG_START(powerbal_state::powerbal)
-
+void powerbal_state::powerbal(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(powerbal_main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", powerbal_state, irq2_line_hold)
+	M68000(config, m_maincpu, 12000000);   /* 12 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &powerbal_state::powerbal_main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(powerbal_state::irq2_line_hold));
 
 	MCFG_MACHINE_START_OVERRIDE(powerbal_state,powerbal)
 	MCFG_MACHINE_RESET_OVERRIDE(powerbal_state,powerbal)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(61)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(128*8, 64*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(powerbal_state, screen_update_powerbal)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(61);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(128*8, 64*8);
+	screen.set_visarea(0*8, 40*8-1, 0*8, 30*8-1);
+	screen.set_screen_update(FUNC(powerbal_state::screen_update_powerbal));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_powerbal)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_powerbal);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 512);
 
 	MCFG_VIDEO_START_OVERRIDE(powerbal_state,powerbal)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, 1000000, okim6295_device::PIN7_HIGH);
+	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_oki->set_addrmap(0, &powerbal_state::oki_map);
+}
 
-MACHINE_CONFIG_START(powerbal_state::magicstk)
-
+void powerbal_state::magicstk(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(magicstk_main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", powerbal_state, irq2_line_hold)
+	M68000(config, m_maincpu, 12000000);   /* 12 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &powerbal_state::magicstk_main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(powerbal_state::irq2_line_hold));
 
 	EEPROM_93C46_16BIT(config, "eeprom").default_value(0);
 
@@ -671,42 +672,39 @@ MACHINE_CONFIG_START(powerbal_state::magicstk)
 	MCFG_MACHINE_RESET_OVERRIDE(powerbal_state,powerbal)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(61)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(128*8, 64*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(powerbal_state, screen_update_powerbal)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(61);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(128*8, 64*8);
+	screen.set_visarea(0*8, 40*8-1, 0*8, 30*8-1);
+	screen.set_screen_update(FUNC(powerbal_state::screen_update_powerbal));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_powerbal)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBRGBx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_powerbal);
+	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 512);
 
 	MCFG_VIDEO_START_OVERRIDE(powerbal_state,powerbal)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1000000, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, 1000000, okim6295_device::PIN7_HIGH);
+	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_oki->set_addrmap(0, &powerbal_state::oki_map);
+}
 
-MACHINE_CONFIG_START(powerbal_state::atombjt)
-
+void powerbal_state::atombjt(machine_config &config)
+{
 	powerbal(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(atombjt_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", powerbal_state,  irq6_line_hold)
+	m_maincpu->set_addrmap(AS_PROGRAM, &powerbal_state::atombjt_map);
+	m_maincpu->set_vblank_int("screen", FUNC(powerbal_state::irq6_line_hold));
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_SIZE(512, 256) \
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1) \
+	subdevice<screen_device>("screen")->set_size(512, 256);
+	subdevice<screen_device>("screen")->set_visarea(0*8, 48*8-1, 2*8, 30*8-1);
 
 	MCFG_VIDEO_START_OVERRIDE(powerbal_state,atombjt)
-MACHINE_CONFIG_END
+}
 
 /*
 Power Balls

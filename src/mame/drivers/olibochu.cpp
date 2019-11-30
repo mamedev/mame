@@ -61,12 +61,13 @@ $7004 writes, related to $7000 reads
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 class olibochu_state : public driver_device
 {
 public:
-	olibochu_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	olibochu_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_spriteram(*this, "spriteram"),
@@ -74,9 +75,15 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch") { }
+		m_soundlatch(*this, "soundlatch")
+	{ }
 
 	void olibochu(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 private:
 	/* memory pointers */
@@ -95,16 +102,13 @@ private:
 	tilemap_t  *m_bg_tilemap;
 
 	/* misc */
-	int m_cmd;
+	uint16_t m_cmd;
 	DECLARE_WRITE8_MEMBER(olibochu_videoram_w);
 	DECLARE_WRITE8_MEMBER(olibochu_colorram_w);
 	DECLARE_WRITE8_MEMBER(olibochu_flipscreen_w);
 	DECLARE_WRITE8_MEMBER(sound_command_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(olibochu);
+	void olibochu_palette(palette_device &palette) const;
 	uint32_t screen_update_olibochu(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(olibochu_scanline);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
@@ -114,39 +118,32 @@ private:
 
 
 
-PALETTE_INIT_MEMBER(olibochu_state, olibochu)
+void olibochu_state::olibochu_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
+	uint8_t const *const color_prom = memregion("proms")->base();
 
-	for (i = 0; i < palette.entries(); i++)
+	for (int i = 0; i < palette.entries(); i++)
 	{
-		uint8_t pen;
-		int bit0, bit1, bit2, r, g, b;
+		int bit0, bit1, bit2;
 
-		if (i < 0x100)
-			/* characters */
-			pen = (color_prom[0x020 + (i - 0x000)] & 0x0f) | 0x10;
-		else
-			/* sprites */
-			pen = (color_prom[0x120 + (i - 0x100)] & 0x0f) | 0x00;
+		uint8_t const pen = (color_prom[0x20 + i] & 0x0f) | ((i < 0x100) ? 0x10 : 0x00);
 
-		/* red component */
+		// red component
 		bit0 = BIT(color_prom[pen], 0);
 		bit1 = BIT(color_prom[pen], 1);
 		bit2 = BIT(color_prom[pen], 2);
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		/* green component */
+		// green component
 		bit0 = BIT(color_prom[pen], 3);
 		bit1 = BIT(color_prom[pen], 4);
 		bit2 = BIT(color_prom[pen], 5);
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		/* blue component */
+		// blue component
 		bit0 = BIT(color_prom[pen], 6);
 		bit1 = BIT(color_prom[pen], 7);
-		b = 0x4f * bit0 + 0xa8 * bit1;
+		int const b = 0x4f * bit0 + 0xa8 * bit1;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -187,25 +184,21 @@ TILE_GET_INFO_MEMBER(olibochu_state::get_bg_tile_info)
 
 void olibochu_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(olibochu_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(olibochu_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 void olibochu_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	uint8_t *spriteram = m_spriteram;
-	uint8_t *spriteram_2 = m_spriteram2;
-	int offs;
-
 	/* 16x16 sprites */
-	for (offs = 0; offs < m_spriteram.bytes(); offs += 4)
+	for (int offs = 0; offs < m_spriteram.bytes(); offs += 4)
 	{
-		int attr = spriteram[offs + 1];
-		int code = spriteram[offs];
+		int attr = m_spriteram[offs + 1];
+		int code = m_spriteram[offs];
 		int color = attr & 0x3f;
 		int flipx = attr & 0x40;
 		int flipy = attr & 0x80;
-		int sx = spriteram[offs + 3];
-		int sy = ((spriteram[offs + 2] + 8) & 0xff) - 8;
+		int sx = m_spriteram[offs + 3];
+		int sy = ((m_spriteram[offs + 2] + 8) & 0xff) - 8;
 
 		if (flip_screen())
 		{
@@ -215,23 +208,23 @@ void olibochu_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			flipy = !flipy;
 		}
 
-
-			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
-			code, color,
-			flipx, flipy,
-			sx, sy, 0);
+		m_gfxdecode->gfx(1)->transpen(
+				bitmap, cliprect,
+				code, color,
+				flipx, flipy,
+				sx, sy, 0);
 	}
 
 	/* 8x8 sprites */
-	for (offs = 0; offs < m_spriteram2.bytes(); offs += 4)
+	for (int offs = 0; offs < m_spriteram2.bytes(); offs += 4)
 	{
-		int attr = spriteram_2[offs + 1];
-		int code = spriteram_2[offs];
+		int attr = m_spriteram2[offs + 1];
+		int code = m_spriteram2[offs];
 		int color = attr & 0x3f;
 		int flipx = attr & 0x40;
 		int flipy = attr & 0x80;
-		int sx = spriteram_2[offs + 3];
-		int sy = spriteram_2[offs + 2];
+		int sx = m_spriteram2[offs + 3];
+		int sy = m_spriteram2[offs + 2];
 
 		if (flip_screen())
 		{
@@ -241,11 +234,11 @@ void olibochu_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 			flipy = !flipy;
 		}
 
-
-			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
-			code, color,
-			flipx, flipy,
-			sx, sy, 0);
+		m_gfxdecode->gfx(0)->transpen(
+				bitmap, cliprect,
+				code, color,
+				flipx, flipy,
+				sx, sy, 0);
 	}
 }
 
@@ -259,17 +252,14 @@ uint32_t olibochu_state::screen_update_olibochu(screen_device &screen, bitmap_in
 
 WRITE8_MEMBER(olibochu_state::sound_command_w)
 {
-	int c;
-
 	if (offset == 0)
-		m_cmd = (m_cmd & 0x00ff) | (data << 8);
+		m_cmd = (m_cmd & 0x00ff) | (uint16_t(data) << 8);
 	else
-		m_cmd = (m_cmd & 0xff00) | data;
+		m_cmd = (m_cmd & 0xff00) | uint16_t(data);
 
-	for (c = 15; c >= 0; c--)
-		if (m_cmd & (1 << c)) break;
-
-	if (c >= 0) m_soundlatch->write(space, 0, 15 - c);
+	unsigned c = count_leading_zeros(uint32_t(m_cmd)) - 16;
+	if (c < 16)
+		m_soundlatch->write(c);
 }
 
 
@@ -288,9 +278,11 @@ void olibochu_state::olibochu_map(address_map &map)
 	map(0xa005, 0xa005).portr("DSW2");
 	map(0xa800, 0xa801).w(FUNC(olibochu_state::sound_command_w));
 	map(0xa802, 0xa802).w(FUNC(olibochu_state::olibochu_flipscreen_w));    /* bit 6 = enable sound? */
-	map(0xf000, 0xffff).ram();
+	map(0xf000, 0xf3ff).ram();
 	map(0xf400, 0xf41f).ram().share("spriteram");
+	map(0xf420, 0xf43f).ram();
 	map(0xf440, 0xf47f).ram().share("spriteram2");
+	map(0xf480, 0xffff).ram();
 }
 
 void olibochu_state::olibochu_sound_map(address_map &map)
@@ -459,47 +451,44 @@ TIMER_DEVICE_CALLBACK_MEMBER(olibochu_state::olibochu_scanline)
 	int scanline = param;
 
 	if(scanline == 248) // vblank-out irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7);   /* RST 10h - vblank */
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7);   /* Z80 - RST 10h - vblank */
 
 	if(scanline == 0) // sprite buffer irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf);   /* RST 08h */
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf);   /* Z80 - RST 08h */
 }
 
-MACHINE_CONFIG_START(olibochu_state::olibochu)
-
+void olibochu_state::olibochu(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)   /* 4 MHz ?? */
-	MCFG_DEVICE_PROGRAM_MAP(olibochu_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", olibochu_state, olibochu_scanline, "screen", 0, 1)
+	Z80(config, m_maincpu, 4000000);   /* 4 MHz ?? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &olibochu_state::olibochu_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(olibochu_state::olibochu_scanline), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)  /* 4 MHz ?? */
-	MCFG_DEVICE_PROGRAM_MAP(olibochu_sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(olibochu_state, irq0_line_hold, 60) //???
+	z80_device &audiocpu(Z80(config, "audiocpu", 4000000));  /* 4 MHz ?? */
+	audiocpu.set_addrmap(AS_PROGRAM, &olibochu_state::olibochu_sound_map);
+	audiocpu.set_periodic_int(FUNC(olibochu_state::irq0_line_hold), attotime::from_hz(60)); //???
 
-//  MCFG_QUANTUM_PERFECT_CPU("maincpu")
-
+	//config.set_perfect_quantum(m_maincpu);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(olibochu_state, screen_update_olibochu)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(olibochu_state::screen_update_olibochu));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_olibochu)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_INIT_OWNER(olibochu_state, olibochu)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_olibochu);
+	PALETTE(config, m_palette, FUNC(olibochu_state::olibochu_palette), 512);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 2000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	AY8910(config, "aysnd", 2'000'000).add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
 
@@ -539,9 +528,9 @@ ROM_START( olibochu )
 	ROM_LOAD( "12.2a",        0x3000, 0x1000, CRC(d8f0c157) SHA1(a7b0c873e016c3b3252c2c9b6400b0fd3d650b2f) )
 
 	ROM_REGION( 0x0220, "proms", 0 )
-	ROM_LOAD( "c-1",          0x0000, 0x0020, CRC(e488e831) SHA1(6264741f7091c614093ae1ea4f6ead3d0cef83d3) )    /* palette */
-	ROM_LOAD( "c-2",          0x0020, 0x0100, CRC(698a3ba0) SHA1(3c1a6cb881ef74647c651462a27d812234408e45) )    /* sprite lookup table */
-	ROM_LOAD( "c-3",          0x0120, 0x0100, CRC(efc4e408) SHA1(f0796426cf324791853aa2ae6d0c3d1f8108d5c2) )    /* char lookup table */
+	ROM_LOAD( "c-1",          0x0000, 0x0020, CRC(e488e831) SHA1(6264741f7091c614093ae1ea4f6ead3d0cef83d3) )    // palette
+	ROM_LOAD( "c-2",          0x0020, 0x0100, CRC(698a3ba0) SHA1(3c1a6cb881ef74647c651462a27d812234408e45) )    // sprite lookup table
+	ROM_LOAD( "c-3",          0x0120, 0x0100, CRC(efc4e408) SHA1(f0796426cf324791853aa2ae6d0c3d1f8108d5c2) )    // char lookup table
 ROM_END
 
 

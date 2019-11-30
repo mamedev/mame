@@ -54,7 +54,6 @@ Due to no input checking, misuse of commands can crash the system.
 #include "machine/z80pio.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
-#include "sound/wave.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -79,7 +78,7 @@ private:
 	DECLARE_READ8_MEMBER(port_b_r);
 	DECLARE_WRITE8_MEMBER(port_b_w);
 	DECLARE_READ8_MEMBER(k7659_port_b_r);
-	DECLARE_SNAPSHOT_LOAD_MEMBER(z1013);
+	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
 	uint32_t screen_update_z1013(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void z1013_io(address_map &map);
@@ -307,7 +306,7 @@ READ8_MEMBER( z1013_state::k7659_port_b_r )
 	return 0xff;
 }
 
-SNAPSHOT_LOAD_MEMBER( z1013_state, z1013 )
+SNAPSHOT_LOAD_MEMBER(z1013_state::snapshot_cb)
 {
 /* header layout
 0000,0001 - load address
@@ -371,45 +370,48 @@ static GFXDECODE_START( gfx_z1013 )
 GFXDECODE_END
 
 /* Machine driver */
-MACHINE_CONFIG_START(z1013_state::z1013)
+void z1013_state::z1013(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(1'000'000) )
-	MCFG_DEVICE_PROGRAM_MAP(z1013_mem)
-	MCFG_DEVICE_IO_MAP(z1013_io)
+	Z80(config, m_maincpu, XTAL(1'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &z1013_state::z1013_mem);
+	m_maincpu->set_addrmap(AS_IO, &z1013_state::z1013_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(z1013_state, screen_update_z1013)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0, 32*8-1, 0, 32*8-1);
+	screen.set_screen_update(FUNC(z1013_state::screen_update_z1013));
+	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_z1013)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	GFXDECODE(config, "gfxdecode", "palette", gfx_z1013);
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* devices */
-	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL(1'000'000))
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, z1013_state, port_b_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, z1013_state, port_b_w))
+	z80pio_device& pio(Z80PIO(config, "z80pio", XTAL(1'000'000)));
+	pio.in_pb_callback().set(FUNC(z1013_state::port_b_r));
+	pio.out_pb_callback().set(FUNC(z1013_state::port_b_w));
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
+	CASSETTE(config, m_cass);
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 
-	MCFG_SNAPSHOT_ADD("snapshot", z1013_state, z1013, "z80", 0)
-MACHINE_CONFIG_END
+	SNAPSHOT(config, "snapshot", "z80").set_load_callback(FUNC(z1013_state::snapshot_cb));
+}
 
-MACHINE_CONFIG_START(z1013_state::z1013k76)
+void z1013_state::z1013k76(machine_config &config)
+{
 	z1013(config);
-	MCFG_DEVICE_REMOVE("z80pio")
-	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL(1'000'000))
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, z1013_state, k7659_port_b_r))
-MACHINE_CONFIG_END
+
+	z80pio_device &pio(*subdevice<z80pio_device>("z80pio"));
+	pio.in_pb_callback().set(FUNC(z1013_state::k7659_port_b_r));
+	pio.out_pb_callback().set_nop();
+}
 
 /* ROM definition */
 ROM_START( z1013 )

@@ -135,7 +135,7 @@ WRITE8_MEMBER( s11c_state::bgbank_w )
 //  popmessage("BG bank set to %02x (%i)",data,bank);
 }
 */
-MACHINE_RESET_MEMBER( s11c_state, s11c )
+void s11c_state::machine_reset()
 {
 //  membank("bgbank")->set_entry(0);
 	// reset the CPUs again, so that the CPUs are starting with the right vectors (otherwise sound may die on reset)
@@ -153,11 +153,11 @@ void s11c_state::init_s11c()
 	timer->adjust(attotime::from_ticks(S11_IRQ_CYCLES,E_CLOCK),1);
 }
 
-MACHINE_CONFIG_START(s11c_state::s11c)
+void s11c_state::s11c(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6808, XTAL(4'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(s11c_main_map)
-	MCFG_MACHINE_RESET_OVERRIDE(s11c_state, s11c)
+	M6808(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &s11c_state::s11c_main_map);
 
 	/* Video */
 	config.set_default_layout(layout_s11c);
@@ -217,10 +217,10 @@ MACHINE_CONFIG_START(s11c_state::s11c)
 
 	/* Add the background music card */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("bgm", S11C_BG)
-	MCFG_S11C_BG_ROM_REGION(":bgcpu")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-MACHINE_CONFIG_END
+	S11C_BG(config, m_bg);
+	m_bg->set_romregion("bgcpu");
+	m_bg->add_route(ALL_OUTPUTS, "speaker", 1.0);
+}
 
 /*--------------------
 / Bugs Bunny Birthday Ball 11/90
@@ -260,7 +260,7 @@ ROM_END
 
 ROM_START(diner_l3)
 	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("u26-la3.rom", 0x4000, 0x4000, CRC(8b6aa22e) SHA1(6b802a85fc2babf5a183fb434df11597363c1c9d))
+	ROM_LOAD("dinr_u26.l2", 0x4000, 0x4000, CRC(8b6aa22e) SHA1(6b802a85fc2babf5a183fb434df11597363c1c9d))
 	ROM_LOAD("u27-la3.rom", 0x8000, 0x8000, CRC(4171451a) SHA1(818e330245691d9ef3181b885c9342880f89d912))
 	ROM_REGION(0x50000, "bgcpu", ROMREGION_ERASEFF)
 	ROM_LOAD("dinr_u4.l1", 0x10000, 0x10000, CRC(3bd28368) SHA1(41eec2f5f863039deaabfae8aece4b1cf15e4b78))
@@ -270,8 +270,18 @@ ROM_END
 
 ROM_START(diner_l2)
 	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("u26-la3.rom", 0x4000, 0x4000, CRC(8b6aa22e) SHA1(6b802a85fc2babf5a183fb434df11597363c1c9d))
+	ROM_LOAD("dinr_u26.l2", 0x4000, 0x4000, CRC(8b6aa22e) SHA1(6b802a85fc2babf5a183fb434df11597363c1c9d))
 	ROM_LOAD("dinr_u27.lu2", 0x8000, 0x8000, CRC(ea72f6aa) SHA1(58df02e8353dd9be2ecfbcdc78fc54981dd001e1))
+	ROM_REGION(0x50000, "bgcpu", ROMREGION_ERASEFF)
+	ROM_LOAD("dinr_u4.l1", 0x10000, 0x10000, CRC(3bd28368) SHA1(41eec2f5f863039deaabfae8aece4b1cf15e4b78))
+	ROM_LOAD("dinr_u19.l1", 0x20000, 0x10000, CRC(278b9a30) SHA1(41e59adb8b6c08caee46c3dd73256480b4041619))
+	ROM_LOAD("dinr_u20.l1", 0x30000, 0x10000, CRC(511fb260) SHA1(e6e25b464c5c38f3c0492436f1e8aa2be33dd278))
+ROM_END
+
+ROM_START(diner_f2)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("dinr_u26.l2", 0x4000, 0x4000, CRC(8b6aa22e) SHA1(6b802a85fc2babf5a183fb434df11597363c1c9d))
+	ROM_LOAD("dinr_u27.lf2", 0x8000, 0x8000, CRC(343af291) SHA1(ecf30dd828537cd68dc6c9f97256a38c820b9afc))
 	ROM_REGION(0x50000, "bgcpu", ROMREGION_ERASEFF)
 	ROM_LOAD("dinr_u4.l1", 0x10000, 0x10000, CRC(3bd28368) SHA1(41eec2f5f863039deaabfae8aece4b1cf15e4b78))
 	ROM_LOAD("dinr_u19.l1", 0x20000, 0x10000, CRC(278b9a30) SHA1(41e59adb8b6c08caee46c3dd73256480b4041619))
@@ -288,10 +298,30 @@ ROM_START(diner_l1)
 	ROM_LOAD("dinr_u20.l1", 0x30000, 0x10000, CRC(511fb260) SHA1(e6e25b464c5c38f3c0492436f1e8aa2be33dd278))
 ROM_END
 
+ROM_START(diner_p0)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("dinr_u26.pa0", 0x4000, 0x4000, CRC(dbf5de09) SHA1(55ca30bdf6e6e482f3ce5891b866103492fa3754))
+	ROM_LOAD("dinr_u27.pa0", 0x8000, 0x8000, CRC(9875d16e) SHA1(fbbab61cc9e8e3f7a1bf1428ad50ad3c13f0f120))
+	ROM_REGION(0x50000, "bgcpu", ROMREGION_ERASEFF)
+	ROM_LOAD("dinr_u4.l1", 0x10000, 0x10000, CRC(3bd28368) SHA1(41eec2f5f863039deaabfae8aece4b1cf15e4b78))
+	ROM_LOAD("dinr_u19.l1", 0x20000, 0x10000, CRC(278b9a30) SHA1(41e59adb8b6c08caee46c3dd73256480b4041619))
+	ROM_LOAD("dinr_u20.l1", 0x30000, 0x10000, CRC(511fb260) SHA1(e6e25b464c5c38f3c0492436f1e8aa2be33dd278))
+ROM_END
+
 /*--------------------
 / Dr. Dude 11/90
 /--------------------*/
 ROM_START(dd_l2)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("dude_u26.lu1", 0x4000, 0x4000, CRC(6f6a6e22) SHA1(2d8a1b472eb06a9f7aeea4b2f9a82f83eb4ee08a))
+	ROM_LOAD("dude_u27.lu1", 0x8000, 0x8000, CRC(43c2d4f3) SHA1(d61d855fa06394bdc1142e21624bdaac1ee9ca20))
+	ROM_REGION(0x50000, "bgcpu", ROMREGION_ERASEFF)
+	ROM_LOAD("dude_u4.l1", 0x10000, 0x10000, CRC(3eeef714) SHA1(74dcc83958cb62819e0ac36ca83001694faafec7))
+	ROM_LOAD("dude_u19.l1", 0x20000, 0x10000, CRC(dc7b985b) SHA1(f672d1f1fe1d1d887113ea6ccd745a78f7760526))
+	ROM_LOAD("dude_u20.l1", 0x30000, 0x10000, CRC(a83d53dd) SHA1(92a81069c42c7760888201fb0787fa7ddfbf1658))
+ROM_END
+
+ROM_START(dd_lu1)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("dude_u26.l2", 0x4000, 0x4000, CRC(d1e19fc2) SHA1(800329b5fd563fcd27add14da4522082c01eb86e))
 	ROM_LOAD("dude_u27.l2", 0x8000, 0x8000, CRC(654b5d4c) SHA1(e73834dbb35cf78eab68a5966e4049640e16dddf))
@@ -579,11 +609,14 @@ ROM_END
 
 GAME(1990,  bbnny_l2,   0,          s11c,   s11c, s11c_state, init_s11c, ROT0,   "Bally",                "Bugs Bunny Birthday Ball (L-2)",               MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1990,  bbnny_lu,   bbnny_l2,   s11c,   s11c, s11c_state, init_s11c, ROT0,   "Bally",                "Bugs Bunny Birthday Ball (LU-2) European",     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  diner_l4,   0,          s11c,   s11c, s11c_state, init_s11c, ROT0,   "Williams",             "Diner (L-4)",                                  MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  diner_l3,   diner_l4,   s11c,   s11c, s11c_state, init_s11c, ROT0,   "Williams",             "Diner (L-3)",                                  MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  diner_l2,   diner_l4,   s11c,   s11c, s11c_state, init_s11c, ROT0,   "Williams",             "Diner (L-2)",                                  MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  diner_l1,   diner_l4,   s11c,   s11c, s11c_state, init_s11c, ROT0,   "Williams",             "Diner (L-1) Europe",                           MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  diner_l4,   0,          s11c,   s11c, s11c_state, init_s11c, ROT0,   "Williams",             "Diner (LA-4)",                                 MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  diner_l3,   diner_l4,   s11c,   s11c, s11c_state, init_s11c, ROT0,   "Williams",             "Diner (LA-3)",                                 MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  diner_l2,   diner_l4,   s11c,   s11c, s11c_state, init_s11c, ROT0,   "Williams",             "Diner (LU-2) Europe",                          MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  diner_f2,   diner_l4,   s11c,   s11c, s11c_state, init_s11c, ROT0,   "Williams",             "Diner (LF-2) French",                          MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  diner_l1,   diner_l4,   s11c,   s11c, s11c_state, init_s11c, ROT0,   "Williams",             "Diner (LU-1) Europe",                          MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  diner_p0,   diner_l4,   s11c,   s11c, s11c_state, init_s11c, ROT0,   "Williams",             "Diner (PA-0 prototype)",                       MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1990,  dd_l2,      0,          s11c,   s11c, s11c_state, init_s11c, ROT0,   "Bally",                "Dr. Dude (LA-2)",                              MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  dd_lu1,     dd_l2,      s11c,   s11c, s11c_state, init_s11c, ROT0,   "Bally",                "Dr. Dude (LU-1) Europe",                       MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1990,  dd_p6,      dd_l2,      s11c,   s11c, s11c_state, init_s11c, ROT0,   "Bally",                "Dr. Dude (PA-6)",                              MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1990,  pool_l7,    0,          s11c,   s11c, s11c_state, init_s11c, ROT0,   "Bally",                "Pool Sharks (LA-7)",                           MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1990,  pool_l6,    pool_l7,    s11c,   s11c, s11c_state, init_s11c, ROT0,   "Bally",                "Pool Sharks (LA-6)",                           MACHINE_IS_SKELETON_MECHANICAL)

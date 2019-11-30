@@ -13,20 +13,23 @@
 #include "osdepend.h"
 #include "modules/lib/osdobj_common.h"
 
+#include <iostream>
+
+
 const options_entry osd_options::s_option_entries[] =
 {
 	{ nullptr,                               nullptr,           OPTION_HEADER,    "OSD KEYBOARD MAPPING OPTIONS" },
-#ifdef SDLMAME_MACOSX
-	{ OSDOPTION_UIMODEKEY,                   "DEL",             OPTION_STRING,    "Key to toggle keyboard mode" },
+#if defined(SDLMAME_MACOSX) || defined(OSD_MAC)
+	{ OSDOPTION_UIMODEKEY,                   "DEL",             OPTION_STRING,    "key to enable/disable MAME controls when emulated system has keyboard inputs" },
 #else
-	{ OSDOPTION_UIMODEKEY,                   "SCRLOCK",         OPTION_STRING,    "Key to toggle keyboard mode" },
+	{ OSDOPTION_UIMODEKEY,                   "SCRLOCK",         OPTION_STRING,    "key to enable/disable MAME controls when emulated system has keyboard inputs" },
 #endif  // SDLMAME_MACOSX
 
 	{ nullptr,                                nullptr,          OPTION_HEADER,    "OSD FONT OPTIONS" },
-	{ OSD_FONT_PROVIDER,                      OSDOPTVAL_AUTO,   OPTION_STRING,    "provider for ui font: " },
+	{ OSD_FONT_PROVIDER,                      OSDOPTVAL_AUTO,   OPTION_STRING,    "provider for UI font: " },
 
 	{ nullptr,                                nullptr,          OPTION_HEADER,    "OSD OUTPUT OPTIONS" },
-	{ OSD_OUTPUT_PROVIDER,                    OSDOPTVAL_AUTO,   OPTION_STRING,    "provider for output: " },
+	{ OSD_OUTPUT_PROVIDER,                    OSDOPTVAL_AUTO,   OPTION_STRING,    "provider for output notifications: " },
 
 	{ nullptr,                                nullptr,          OPTION_HEADER,    "OSD INPUT OPTIONS" },
 	{ OSD_KEYBOARDINPUT_PROVIDER,             OSDOPTVAL_AUTO,   OPTION_STRING,    "provider for keyboard input: " },
@@ -40,8 +43,9 @@ const options_entry osd_options::s_option_entries[] =
 
 	{ nullptr,                                nullptr,          OPTION_HEADER,    "OSD DEBUGGING OPTIONS" },
 	{ OSDOPTION_DEBUGGER,                     OSDOPTVAL_AUTO,   OPTION_STRING,    "debugger used: " },
-	{ OSDOPTION_DEBUGGER_FONT ";dfont",       OSDOPTVAL_AUTO,   OPTION_STRING,    "specifies the font to use for debugging" },
-	{ OSDOPTION_DEBUGGER_FONT_SIZE ";dfontsize", "0",           OPTION_FLOAT,     "specifies the font size to use for debugging" },
+	{ OSDOPTION_DEBUGGER_PORT,                "23946",          OPTION_INTEGER,   "port to use for gdbstub debugger" },
+	{ OSDOPTION_DEBUGGER_FONT ";dfont",       OSDOPTVAL_AUTO,   OPTION_STRING,    "font to use for debugger views" },
+	{ OSDOPTION_DEBUGGER_FONT_SIZE ";dfontsize", "0",           OPTION_FLOAT,     "font size to use for debugger views" },
 	{ OSDOPTION_WATCHDOG ";wdog",             "0",              OPTION_INTEGER,   "force the program to terminate if no updates within specified number of seconds" },
 
 	{ nullptr,                                nullptr,          OPTION_HEADER,    "OSD PERFORMANCE OPTIONS" },
@@ -51,12 +55,12 @@ const options_entry osd_options::s_option_entries[] =
 	{ nullptr,                                nullptr,          OPTION_HEADER,    "OSD VIDEO OPTIONS" },
 // OS X can be trusted to have working hardware OpenGL, so default to it on for the best user experience
 	{ OSDOPTION_VIDEO,                        OSDOPTVAL_AUTO,   OPTION_STRING,    "video output method: " },
-	{ OSDOPTION_NUMSCREENS "(1-4)",           "1",              OPTION_INTEGER,   "number of screens to create; usually, you want just one" },
+	{ OSDOPTION_NUMSCREENS "(1-4)",           "1",              OPTION_INTEGER,   "number of output screens/windows to create; usually, you want just one" },
 	{ OSDOPTION_WINDOW ";w",                  "0",              OPTION_BOOLEAN,   "enable window mode; otherwise, full screen mode is assumed" },
-	{ OSDOPTION_MAXIMIZE ";max",              "1",              OPTION_BOOLEAN,   "default to maximized windows; otherwise, windows will be minimized" },
-	{ OSDOPTION_WAITVSYNC ";vs",              "0",              OPTION_BOOLEAN,   "enable waiting for the start of VBLANK before flipping screens; reduces tearing effects" },
+	{ OSDOPTION_MAXIMIZE ";max",              "1",              OPTION_BOOLEAN,   "default to maximized windows" },
+	{ OSDOPTION_WAITVSYNC ";vs",              "0",              OPTION_BOOLEAN,   "enable waiting for the start of VBLANK before flipping screens (reduces tearing effects)" },
 	{ OSDOPTION_SYNCREFRESH ";srf",           "0",              OPTION_BOOLEAN,   "enable using the start of VBLANK for throttling instead of the game time" },
-	{ OSD_MONITOR_PROVIDER,                   OSDOPTVAL_AUTO,   OPTION_STRING,    "monitor discovery method" },
+	{ OSD_MONITOR_PROVIDER,                   OSDOPTVAL_AUTO,   OPTION_STRING,    "monitor discovery method: " },
 
 	// per-window options
 	{ nullptr,                                nullptr,          OPTION_HEADER,    "OSD PER-WINDOW VIDEO OPTIONS" },
@@ -90,16 +94,16 @@ const options_entry osd_options::s_option_entries[] =
 	{ OSDOPTION_SWITCHRES,                    "0",              OPTION_BOOLEAN,   "enable resolution switching" },
 
 	{ nullptr,                                nullptr,          OPTION_HEADER,    "OSD ACCELERATED VIDEO OPTIONS" },
-	{ OSDOPTION_FILTER ";glfilter;flt",       "1",              OPTION_BOOLEAN,   "enable bilinear filtering on screen output" },
-	{ OSDOPTION_PRESCALE "(1-3)",             "1",              OPTION_INTEGER,   "scale screen rendering by this amount in software" },
+	{ OSDOPTION_FILTER ";glfilter;flt",       "1",              OPTION_BOOLEAN,   "use bilinear filtering when scaling emulated video" },
+	{ OSDOPTION_PRESCALE "(1-3)",             "1",              OPTION_INTEGER,   "scale emulated video by this factor before applying filters/shaders" },
 
 #if USE_OPENGL
 	{ nullptr,                                nullptr,          OPTION_HEADER,    "OpenGL-SPECIFIC OPTIONS" },
-	{ OSDOPTION_GL_FORCEPOW2TEXTURE,          "0",              OPTION_BOOLEAN,   "force power of two textures  (default no)" },
+	{ OSDOPTION_GL_FORCEPOW2TEXTURE,          "0",              OPTION_BOOLEAN,   "force power-of-two texture sizes (default no)" },
 	{ OSDOPTION_GL_NOTEXTURERECT,             "0",              OPTION_BOOLEAN,   "don't use OpenGL GL_ARB_texture_rectangle (default on)" },
-	{ OSDOPTION_GL_VBO,                       "1",              OPTION_BOOLEAN,   "enable OpenGL VBO,  if available (default on)" },
-	{ OSDOPTION_GL_PBO,                       "1",              OPTION_BOOLEAN,   "enable OpenGL PBO,  if available (default on)" },
-	{ OSDOPTION_GL_GLSL,                      "0",              OPTION_BOOLEAN,   "enable OpenGL GLSL, if available (default off)" },
+	{ OSDOPTION_GL_VBO,                       "1",              OPTION_BOOLEAN,   "enable OpenGL VBO if available (default on)" },
+	{ OSDOPTION_GL_PBO,                       "1",              OPTION_BOOLEAN,   "enable OpenGL PBO if available (default on)" },
+	{ OSDOPTION_GL_GLSL,                      "0",              OPTION_BOOLEAN,   "enable OpenGL GLSL if available (default off)" },
 	{ OSDOPTION_GLSL_FILTER,                  "1",              OPTION_STRING,    "enable OpenGL GLSL filtering instead of FF filtering 0-plain, 1-bilinear (default), 2-bicubic" },
 	{ OSDOPTION_SHADER_MAME "0",              OSDOPTVAL_NONE,   OPTION_STRING,    "custom OpenGL GLSL shader set mame bitmap 0" },
 	{ OSDOPTION_SHADER_MAME "1",              OSDOPTVAL_NONE,   OPTION_STRING,    "custom OpenGL GLSL shader set mame bitmap 1" },
@@ -136,7 +140,7 @@ const options_entry osd_options::s_option_entries[] =
 
 #ifdef SDLMAME_MACOSX
 	{ nullptr,                                nullptr,          OPTION_HEADER,    "CoreAudio-SPECIFIC OPTIONS" },
-	{ OSDOPTION_AUDIO_OUTPUT,                 OSDOPTVAL_AUTO,   OPTION_STRING,    "Audio output device" },
+	{ OSDOPTION_AUDIO_OUTPUT,                 OSDOPTVAL_AUTO,   OPTION_STRING,    "audio output device" },
 	{ OSDOPTION_AUDIO_EFFECT "0",             OSDOPTVAL_NONE,   OPTION_STRING,    "AudioUnit effect 0" },
 	{ OSDOPTION_AUDIO_EFFECT "1",             OSDOPTVAL_NONE,   OPTION_STRING,    "AudioUnit effect 1" },
 	{ OSDOPTION_AUDIO_EFFECT "2",             OSDOPTVAL_NONE,   OPTION_STRING,    "AudioUnit effect 2" },
@@ -155,6 +159,7 @@ const options_entry osd_options::s_option_entries[] =
 	{ OSDOPTION_BGFX_DEBUG,                   "0",               OPTION_BOOLEAN, "enable BGFX debugging statistics" },
 	{ OSDOPTION_BGFX_SCREEN_CHAINS,           "default",         OPTION_STRING, "comma-delimited list of screen chain JSON names, colon-delimited per-window" },
 	{ OSDOPTION_BGFX_SHADOW_MASK,             "slot-mask.png",   OPTION_STRING, "shadow mask texture name" },
+	{ OSDOPTION_BGFX_LUT,                     "",                OPTION_STRING, "LUT texture name" },
 	{ OSDOPTION_BGFX_AVI_NAME,                OSDOPTVAL_AUTO,    OPTION_STRING, "filename for BGFX output logging" },
 
 		// End of list
@@ -162,7 +167,7 @@ const options_entry osd_options::s_option_entries[] =
 };
 
 osd_options::osd_options()
-: emu_options()
+	: emu_options()
 {
 	add_entries(osd_options::s_option_entries);
 }
@@ -175,20 +180,20 @@ std::list<std::shared_ptr<osd_window>> osd_common_t::s_window_list;
 //-------------------------------------------------
 
 osd_common_t::osd_common_t(osd_options &options)
-	: osd_output(), m_machine(nullptr),
-		m_options(options),
-		m_print_verbose(false),
-		m_font_module(nullptr),
-		m_sound(nullptr),
-		m_debugger(nullptr),
-		m_midi(nullptr),
-		m_keyboard_input(nullptr),
-		m_mouse_input(nullptr),
-		m_lightgun_input(nullptr),
-		m_joystick_input(nullptr),
-		m_output(nullptr),
-		m_monitor_module(nullptr),
-		m_watchdog(nullptr)
+	: osd_output(), m_machine(nullptr)
+	, m_options(options)
+	, m_print_verbose(false)
+	, m_font_module(nullptr)
+	, m_sound(nullptr)
+	, m_debugger(nullptr)
+	, m_midi(nullptr)
+	, m_keyboard_input(nullptr)
+	, m_mouse_input(nullptr)
+	, m_lightgun_input(nullptr)
+	, m_joystick_input(nullptr)
+	, m_output(nullptr)
+	, m_monitor_module(nullptr)
+	, m_watchdog(nullptr)
 {
 	osd_output::push(this);
 }
@@ -213,8 +218,8 @@ void osd_common_t::register_options()
 	REGISTER_MODULE(m_mod_man, FONT_SDL);
 	REGISTER_MODULE(m_mod_man, FONT_NONE);
 
-	REGISTER_MODULE(m_mod_man, SOUND_XAUDIO2);
 	REGISTER_MODULE(m_mod_man, SOUND_DSOUND);
+	REGISTER_MODULE(m_mod_man, SOUND_XAUDIO2);
 	REGISTER_MODULE(m_mod_man, SOUND_COREAUDIO);
 	REGISTER_MODULE(m_mod_man, SOUND_JS);
 	REGISTER_MODULE(m_mod_man, SOUND_SDL);
@@ -226,6 +231,7 @@ void osd_common_t::register_options()
 	REGISTER_MODULE(m_mod_man, MONITOR_SDL);
 	REGISTER_MODULE(m_mod_man, MONITOR_WIN32);
 	REGISTER_MODULE(m_mod_man, MONITOR_DXGI);
+	REGISTER_MODULE(m_mod_man, MONITOR_MAC);
 
 #ifdef SDLMAME_MACOSX
 	REGISTER_MODULE(m_mod_man, DEBUG_OSX);
@@ -234,6 +240,7 @@ void osd_common_t::register_options()
 	REGISTER_MODULE(m_mod_man, DEBUG_WINDOWS);
 	REGISTER_MODULE(m_mod_man, DEBUG_QT);
 	REGISTER_MODULE(m_mod_man, DEBUG_IMGUI);
+	REGISTER_MODULE(m_mod_man, DEBUG_GDBSTUB);
 	REGISTER_MODULE(m_mod_man, DEBUG_NONE);
 #endif
 
@@ -377,28 +384,28 @@ void osd_common_t::update_option(const std::string &key, std::vector<const char 
 //-------------------------------------------------
 //  output_callback  - callback for osd_printf_...
 //-------------------------------------------------
-void osd_common_t::output_callback(osd_output_channel channel, const char *msg, va_list args)
+void osd_common_t::output_callback(osd_output_channel channel, const util::format_argument_pack<std::ostream> &args)
 {
 	switch (channel)
 	{
-		case OSD_OUTPUT_CHANNEL_ERROR:
-		case OSD_OUTPUT_CHANNEL_WARNING:
-			vfprintf(stderr, msg, args);
-			break;
-		case OSD_OUTPUT_CHANNEL_INFO:
-		case OSD_OUTPUT_CHANNEL_LOG:
-			vfprintf(stdout, msg, args);
-			break;
-		case OSD_OUTPUT_CHANNEL_VERBOSE:
-			if (verbose()) vfprintf(stdout, msg, args);
-			break;
-		case OSD_OUTPUT_CHANNEL_DEBUG:
+	case OSD_OUTPUT_CHANNEL_ERROR:
+	case OSD_OUTPUT_CHANNEL_WARNING:
+		util::stream_format(std::cerr, args);
+		break;
+	case OSD_OUTPUT_CHANNEL_INFO:
+	case OSD_OUTPUT_CHANNEL_LOG:
+		util::stream_format(std::cout, args);
+		break;
+	case OSD_OUTPUT_CHANNEL_VERBOSE:
+		if (verbose()) util::stream_format(std::cout, args);
+		break;
+	case OSD_OUTPUT_CHANNEL_DEBUG:
 #ifdef MAME_DEBUG
-			vfprintf(stdout, msg, args);
+		util::stream_format(std::cout, args);
 #endif
-			break;
-		default:
-			break;
+		break;
+	default:
+		break;
 	}
 }
 
@@ -408,7 +415,6 @@ void osd_common_t::output_callback(osd_output_channel channel, const char *msg, 
 
 void osd_common_t::init(running_machine &machine)
 {
-	//
 	// This function is responsible for initializing the OSD-specific
 	// video and input functionality, and registering that functionality
 	// with the MAME core.
@@ -436,7 +442,6 @@ void osd_common_t::init(running_machine &machine)
 	//
 	// Audio initialization may eventually move into here as well,
 	// instead of relying on independent callbacks from each system.
-	//
 
 	m_machine = &machine;
 
@@ -559,7 +564,7 @@ void osd_common_t::set_mastervolume(int attenuation)
 //  additions/modifications to the input list
 //-------------------------------------------------
 
-void osd_common_t::customize_input_type_list(simple_list<input_type_entry> &typelist)
+void osd_common_t::customize_input_type_list(std::vector<input_type_entry> &typelist)
 {
 	//
 	// inptport.c defines some general purpose defaults for key and joystick bindings.

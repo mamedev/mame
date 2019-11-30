@@ -9,17 +9,17 @@
 #include "emu.h"
 #include "iskr1030.h"
 
-#define VERBOSE_DBG 1       /* general debug messages */
 
-#define DBG_LOG(N,M,A) \
-	do { \
-	if(VERBOSE_DBG>=N) \
-		{ \
-			logerror("%11.6f at %s: ",machine().time().as_double(),machine().describe_context()); \
-			logerror A; \
-		} \
-	} while (0)
+//#define LOG_GENERAL (1U <<  0) //defined in logmacro.h already
+#define LOG_KEYBOARD  (1U <<  1)
+#define LOG_DEBUG     (1U <<  2)
 
+//#define VERBOSE (LOG_DEBUG)
+//#define LOG_OUTPUT_FUNC printf
+#include "logmacro.h"
+
+#define LOGKBD(...) LOGMASKED(LOG_KEYBOARD, __VA_ARGS__)
+#define LOGDBG(...) LOGMASKED(LOG_DEBUG, __VA_ARGS__)
 
 
 //**************************************************************************
@@ -27,7 +27,6 @@
 //**************************************************************************
 
 #define I8048_TAG       "i8048"
-
 
 
 //**************************************************************************
@@ -71,14 +70,15 @@ void iskr_1030_keyboard_device::iskr_1030_keyboard_io(address_map &map)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(iskr_1030_keyboard_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(I8048_TAG, I8048, XTAL(5'000'000))
-	MCFG_DEVICE_IO_MAP(iskr_1030_keyboard_io)
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, iskr_1030_keyboard_device, p1_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, iskr_1030_keyboard_device, p1_w))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, iskr_1030_keyboard_device, p2_w))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, iskr_1030_keyboard_device, t1_r))
-MACHINE_CONFIG_END
+void iskr_1030_keyboard_device::device_add_mconfig(machine_config &config)
+{
+	I8048(config, m_maincpu, XTAL(5'000'000));
+	m_maincpu->set_addrmap(AS_IO, &iskr_1030_keyboard_device::iskr_1030_keyboard_io);
+	m_maincpu->p1_in_cb().set(FUNC(iskr_1030_keyboard_device::p1_r));
+	m_maincpu->p1_out_cb().set(FUNC(iskr_1030_keyboard_device::p1_w));
+	m_maincpu->p2_out_cb().set(FUNC(iskr_1030_keyboard_device::p2_w));
+	m_maincpu->t1_in_cb().set(FUNC(iskr_1030_keyboard_device::t1_r));
+}
 
 
 //-------------------------------------------------
@@ -319,7 +319,7 @@ void iskr_1030_keyboard_device::device_reset()
 
 WRITE_LINE_MEMBER( iskr_1030_keyboard_device::clock_write )
 {
-	DBG_LOG(1,0,( "%s: clock write %d\n", tag(), state));
+	LOG("clock write %d\n", state);
 	m_maincpu->set_input_line(MCS48_INPUT_IRQ, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
@@ -330,7 +330,7 @@ WRITE_LINE_MEMBER( iskr_1030_keyboard_device::clock_write )
 
 WRITE_LINE_MEMBER( iskr_1030_keyboard_device::data_write )
 {
-	DBG_LOG(1,0,( "%s: data write %d\n", tag(), state));
+	LOG("data write %d\n", state);
 }
 
 
@@ -344,12 +344,12 @@ READ_LINE_MEMBER( iskr_1030_keyboard_device::t1_r )
 	uint8_t bias = m_p1 & 15;
 
 	if (!BIT(m_p1, 7)) {
-		DBG_LOG(2,0,( "%s: t1_r (l) %d\n", tag(), data));
+		LOGDBG("t1_r (l) %d\n", data);
 		return data;
 	}
 
 	if (bias) {
-		DBG_LOG(2,0,( "%s: t1_r (b) %d\n", tag(), bias));
+		LOGDBG("t1_r (b) %d\n", bias);
 		return 1;
 	}
 
@@ -383,7 +383,7 @@ READ_LINE_MEMBER( iskr_1030_keyboard_device::t1_r )
 	}
 	data = BIT(data, m_bus&3);
 
-	DBG_LOG(2,0,( "%s: t1_r (k r%d c%d) %d\n", tag(), m_bus&3, m_bus>>2, data));
+	LOGDBG("t1_r (k r%d c%d) %d\n", m_bus&3, m_bus>>2, data);
 	return data;
 }
 
@@ -394,7 +394,7 @@ READ_LINE_MEMBER( iskr_1030_keyboard_device::t1_r )
 
 WRITE8_MEMBER( iskr_1030_keyboard_device::ram_w )
 {
-	DBG_LOG(2,0,( "%s: ram_w[%02x] <- %02x\n", tag(), offset, data));
+	LOGDBG("ram_w[%02x] <- %02x\n", offset, data);
 
 	m_bus = offset;
 	m_ram[offset] = data;
@@ -407,7 +407,7 @@ WRITE8_MEMBER( iskr_1030_keyboard_device::ram_w )
 
 READ8_MEMBER( iskr_1030_keyboard_device::ram_r )
 {
-	DBG_LOG(2,0,( "%s: ram_r[%02x] = %02x\n", tag(), offset, m_ram[offset]));
+	LOGDBG("ram_r[%02x] = %02x\n", offset, m_ram[offset]);
 
 	return m_ram[offset];
 }
@@ -434,7 +434,7 @@ READ8_MEMBER( iskr_1030_keyboard_device::p1_r )
 
 	uint8_t data = 0;
 
-	DBG_LOG(1,0,( "%s: p1_r %02x\n", tag(), data));
+	LOG("p1_r %02x\n", data);
 
 	return data;
 }
@@ -458,7 +458,7 @@ WRITE8_MEMBER( iskr_1030_keyboard_device::p2_w )
 	    6       LED NLK
 	    7       LED CLK
 	*/
-	DBG_LOG(1,0,( "%s: p2_w %02x\n", tag(), data));
+	LOG("p2_w %02x\n", data);
 
 	m_p2 = data;
 }
@@ -485,7 +485,7 @@ WRITE8_MEMBER( iskr_1030_keyboard_device::p1_w )
 
 	m_p1 = data;
 
-	DBG_LOG(1,0,( "%s: p1_w %02x (c %d d %d bias %d)\n", tag(), data, BIT(data, 4), BIT(data, 5), data&15));
+	LOG("p1_w %02x (c %d d %d bias %d)\n", data, BIT(data, 4), BIT(data, 5), data&15);
 
 	m_pc_kbdc->data_write_from_kb(BIT(data, 5));
 	m_pc_kbdc->clock_write_from_kb(BIT(data, 4));

@@ -108,6 +108,7 @@ private:
 	void execute_go_interrupt(int ref, const std::vector<std::string> &params);
 	void execute_go_exception(int ref, const std::vector<std::string> &params);
 	void execute_go_time(int ref, const std::vector<std::string> &params);
+	void execute_go_privilege(int ref, const std::vector<std::string> &params);
 	void execute_focus(int ref, const std::vector<std::string> &params);
 	void execute_ignore(int ref, const std::vector<std::string> &params);
 	void execute_observe(int ref, const std::vector<std::string> &params);

@@ -51,14 +51,14 @@ public:
 	auto eoc_ff_callback() { return m_eoc_ff_cb.bind(); }
 	template <std::size_t Bit> auto in_callback() { return m_in_cb[Bit].bind(); }
 
-	DECLARE_READ8_MEMBER(data_r);
-	DECLARE_WRITE8_MEMBER(address_w);
+	u8 data_r();
+	void address_w(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(start_w);
 	DECLARE_READ_LINE_MEMBER(eoc_r);
 
 	// common hookups
-	DECLARE_WRITE8_MEMBER(address_offset_start_w); // start and ale connected, address to the address bus
-	DECLARE_WRITE8_MEMBER(address_data_start_w); // start and ale connected, address to the data bus
+	void address_offset_start_w(offs_t offset, u8 data); // start and ale connected, address to the address bus
+	void address_data_start_w(u8 data); // start and ale connected, address to the data bus
 
 protected:
 	adc0808_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

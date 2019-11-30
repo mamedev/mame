@@ -56,8 +56,8 @@ void vis_audio_device::device_start()
 {
 	set_isa_device();
 	m_isa->set_dma_channel(7, this, false);
-	m_isa->install_device(0x0220, 0x022f, read8_delegate(FUNC(vis_audio_device::pcm_r), this), write8_delegate(FUNC(vis_audio_device::pcm_w), this));
-	m_isa->install_device(0x0388, 0x038b, read8_delegate(FUNC(ymf262_device::read), subdevice<ymf262_device>("ymf262")), write8_delegate(FUNC(ymf262_device::write), subdevice<ymf262_device>("ymf262")));
+	m_isa->install_device(0x0220, 0x022f, read8_delegate(*this, FUNC(vis_audio_device::pcm_r)), write8_delegate(*this, FUNC(vis_audio_device::pcm_w)));
+	m_isa->install_device(0x0388, 0x038b, read8sm_delegate(*subdevice<ymf262_device>("ymf262"), FUNC(ymf262_device::read)), write8sm_delegate(*subdevice<ymf262_device>("ymf262"), FUNC(ymf262_device::write)));
 	m_pcm = timer_alloc();
 	m_pcm->adjust(attotime::never);
 }
@@ -143,7 +143,6 @@ void vis_audio_device::device_add_mconfig(machine_config &config)
 	m_rdac->add_route(ALL_OUTPUTS, "rspeaker", 1.0); // sanyo lc7883k
 
 	voltage_regulator_device &vreg(VOLTAGE_REGULATOR(config, "vref"));
-	vreg.set_output(5.0);
 	vreg.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT);
 	vreg.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT);
 	vreg.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
@@ -224,7 +223,7 @@ WRITE8_MEMBER(vis_audio_device::pcm_w)
 		m_samples = 0;
 		m_sample_byte = 0;
 		m_isa->drq7_w(ASSERT_LINE);
-		attotime rate = attotime::from_ticks((double)(1 << ((m_mode >> 5) & 3)), 44100.0); // TODO : Unknown clock
+		attotime rate = attotime::from_ticks(1 << ((m_mode >> 5) & 3), 44100); // TODO : Unknown clock
 		m_pcm->adjust(rate, 0, rate);
 	}
 	else if(!(m_mode & 0x10))
@@ -387,8 +386,8 @@ void vis_vga_device::vga_vh_yuv8(bitmap_rgb32 &bitmap, const rectangle &cliprect
 void vis_vga_device::device_start()
 {
 	set_isa_device();
-	m_isa->install_device(0x03b0, 0x03df, read8_delegate(FUNC(vis_vga_device::vga_r), this), write8_delegate(FUNC(vis_vga_device::vga_w), this));
-	m_isa->install_memory(0x0a0000, 0x0bffff, read8_delegate(FUNC(vis_vga_device::visvgamem_r), this), write8_delegate(FUNC(vis_vga_device::visvgamem_w), this));
+	m_isa->install_device(0x03b0, 0x03df, read8_delegate(*this, FUNC(vis_vga_device::vga_r)), write8_delegate(*this, FUNC(vis_vga_device::vga_w)));
+	m_isa->install_memory(0x0a0000, 0x0bffff, read8_delegate(*this, FUNC(vis_vga_device::visvgamem_r)), write8_delegate(*this, FUNC(vis_vga_device::visvgamem_w)));
 	svga_device::device_start();
 	vga.svga_intf.seq_regcount = 0x2d;
 	save_pointer(m_crtc_regs,"VIS CRTC",0x32);
@@ -918,7 +917,7 @@ void vis_state::vis(machine_config &config)
 	config.device_remove("mb:pc_kbdc");
 
 	kbdc8042_device &kbdc(KBDC8042(config, "kbdc"));
-	kbdc.set_keyboard_type(kbdc8042_device::KBDC8042_AT386);
+	kbdc.set_keyboard_type(kbdc8042_device::KBDC8042_STANDARD);
 	kbdc.system_reset_callback().set_inputline("maincpu", INPUT_LINE_RESET);
 	kbdc.gate_a20_callback().set_inputline("maincpu", INPUT_LINE_A20);
 	kbdc.input_buffer_full_callback().set("mb:pic8259_master", FUNC(pic8259_device::ir1_w));
@@ -930,7 +929,7 @@ void vis_state::vis(machine_config &config)
 }
 
 ROM_START(vis)
-	ROM_REGION(0x100000,"bios", 0)
+	ROM_REGION16_LE(0x100000,"bios", 0)
 	ROM_LOAD( "p513bk0b.bin", 0x00000, 0x80000, CRC(364e3f74) SHA1(04260ef1e65e482c9c49d25ace40e22487d6aab9))
 	ROM_LOAD( "p513bk1b.bin", 0x80000, 0x80000, CRC(e18239c4) SHA1(a0262109e10a07a11eca43371be9978fff060bc5))
 ROM_END

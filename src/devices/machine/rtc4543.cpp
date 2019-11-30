@@ -25,7 +25,7 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-const char *rtc4543_device::s_reg_names[7] =
+char const *const rtc4543_device::s_reg_names[7] =
 {
 	"second",
 	"minute",
@@ -57,7 +57,7 @@ rtc4543_device::rtc4543_device(const machine_config &mconfig, const char *tag, d
 rtc4543_device::rtc4543_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_rtc_interface(mconfig, *this)
-	, data_cb(*this)
+	, m_data_cb(*this)
 	, m_ce(0), m_clk(0), m_wr(0), m_data(0), m_curbit(0)
 	, m_clock_timer(nullptr)
 {
@@ -70,7 +70,7 @@ rtc4543_device::rtc4543_device(const machine_config &mconfig, device_type type, 
 
 void rtc4543_device::device_start()
 {
-	data_cb.resolve_safe();
+	m_data_cb.resolve_safe();
 
 	// allocate timers
 	m_clock_timer = timer_alloc();
@@ -116,7 +116,7 @@ void rtc4543_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 void rtc4543_device::rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second)
 {
-	static const int weekday[7] = { 7, 1, 2, 3, 4, 5, 6 };
+	static int const weekday[7] = { 7, 1, 2, 3, 4, 5, 6 };
 
 	m_regs[0] = convert_to_bcd(second);                     // seconds (BCD, 0-59) in bits 0-6, bit 7 = battery low
 	m_regs[1] = convert_to_bcd(minute);                     // minutes (BCD, 0-59)
@@ -279,7 +279,7 @@ void rtc4543_device::load_bit(int reg)
 
 	// shift data bit
 	m_data = (m_regs[reg] >> bit) & 1;
-	data_cb(m_data);
+	m_data_cb(m_data);
 }
 
 

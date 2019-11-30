@@ -189,9 +189,13 @@ READ16_MEMBER(pci_device::command_r)
 
 WRITE16_MEMBER(pci_device::command_w)
 {
+	uint16_t old = command;
+
 	mem_mask &= command_mask;
 	COMBINE_DATA(&command);
 	logerror("command = %04x\n", command);
+	if ((old ^ command) & 3)
+		remap_cb();
 }
 
 READ16_MEMBER(pci_device::status_r)
@@ -300,8 +304,15 @@ void pci_device::map_device(uint64_t memory_window_start, uint64_t memory_window
 {
 	for(int i=0; i<bank_count; i++) {
 		bank_info &bi = bank_infos[i];
-		if(uint32_t(bi.adr) == 0xffffffff)
+		if(uint32_t(bi.adr) >= 0xfffffffc)
 			continue;
+		if (bi.flags & M_IO) {
+			if (~command & 1)
+				continue;
+		} else {
+			if (~command & 2)
+				continue;
+		}
 		if(!bi.size || (bi.flags & M_DISABLED))
 			continue;
 
@@ -317,12 +328,12 @@ void pci_device::map_device(uint64_t memory_window_start, uint64_t memory_window
 		}
 		uint64_t end = start + bi.size-1;
 		switch(i) {
-		case 0: space->install_readwrite_handler(start, end, read32_delegate(FUNC(pci_device::unmapped0_r), this), write32_delegate(FUNC(pci_device::unmapped0_w), this)); break;
-		case 1: space->install_readwrite_handler(start, end, read32_delegate(FUNC(pci_device::unmapped1_r), this), write32_delegate(FUNC(pci_device::unmapped1_w), this)); break;
-		case 2: space->install_readwrite_handler(start, end, read32_delegate(FUNC(pci_device::unmapped2_r), this), write32_delegate(FUNC(pci_device::unmapped2_w), this)); break;
-		case 3: space->install_readwrite_handler(start, end, read32_delegate(FUNC(pci_device::unmapped3_r), this), write32_delegate(FUNC(pci_device::unmapped3_w), this)); break;
-		case 4: space->install_readwrite_handler(start, end, read32_delegate(FUNC(pci_device::unmapped4_r), this), write32_delegate(FUNC(pci_device::unmapped4_w), this)); break;
-		case 5: space->install_readwrite_handler(start, end, read32_delegate(FUNC(pci_device::unmapped5_r), this), write32_delegate(FUNC(pci_device::unmapped5_w), this)); break;
+		case 0: space->install_readwrite_handler(start, end, read32_delegate(*this, FUNC(pci_device::unmapped0_r)), write32_delegate(*this, FUNC(pci_device::unmapped0_w))); break;
+		case 1: space->install_readwrite_handler(start, end, read32_delegate(*this, FUNC(pci_device::unmapped1_r)), write32_delegate(*this, FUNC(pci_device::unmapped1_w))); break;
+		case 2: space->install_readwrite_handler(start, end, read32_delegate(*this, FUNC(pci_device::unmapped2_r)), write32_delegate(*this, FUNC(pci_device::unmapped2_w))); break;
+		case 3: space->install_readwrite_handler(start, end, read32_delegate(*this, FUNC(pci_device::unmapped3_r)), write32_delegate(*this, FUNC(pci_device::unmapped3_w))); break;
+		case 4: space->install_readwrite_handler(start, end, read32_delegate(*this, FUNC(pci_device::unmapped4_r)), write32_delegate(*this, FUNC(pci_device::unmapped4_w))); break;
+		case 5: space->install_readwrite_handler(start, end, read32_delegate(*this, FUNC(pci_device::unmapped5_r)), write32_delegate(*this, FUNC(pci_device::unmapped5_w))); break;
 		}
 
 		space->install_device_delegate(start, end, *bi.device, bi.map);
@@ -361,6 +372,7 @@ void pci_device::skip_map_regs(int count)
 void pci_device::add_map(uint64_t size, int flags, const address_map_constructor &map, device_t *relative_to)
 {
 	assert(bank_count < 6);
+	assert((size & 3) == 0);
 	int bid = bank_count++;
 	bank_infos[bid].map = map;
 	bank_infos[bid].device = relative_to ? relative_to : this;

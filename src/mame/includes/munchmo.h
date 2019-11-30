@@ -5,6 +5,10 @@
     Munch Mobile
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_MUNCHMO_H
+#define MAME_INCLUDES_MUNCHMO_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "machine/74259.h"
@@ -34,10 +38,11 @@ public:
 
 	void mnchmobl(machine_config &config);
 
-private:
+protected:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
+private:
 	DECLARE_WRITE_LINE_MEMBER(nmi_enable_w);
 	DECLARE_WRITE8_MEMBER(nmi_ack_w);
 	DECLARE_WRITE8_MEMBER(sound_nmi_ack_w);
@@ -49,7 +54,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(palette_bank_1_w);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 
-	DECLARE_PALETTE_INIT(munchmo);
+	void munchmo_palette(palette_device &palette) const;
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 
 	IRQ_CALLBACK_MEMBER(generic_irq_ack);
@@ -87,3 +92,5 @@ private:
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device_array<ay8910_device, 2> m_ay8910;
 };
+
+#endif // MAME_INCLUDES_MUNCHMO_H

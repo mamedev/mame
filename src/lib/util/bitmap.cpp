@@ -41,6 +41,42 @@ inline void bitmap_t::compute_base(int xslop, int yslop)
 }
 
 
+//-------------------------------------------------
+//  valid_format - return true if the bitmap format
+//  is valid and agrees with the BPP
+//-------------------------------------------------
+
+inline bool bitmap_t::valid_format() const
+{
+	switch (m_format)
+	{
+	// invalid format
+	case BITMAP_FORMAT_INVALID:
+		return false;
+
+	// 8bpp formats
+	case BITMAP_FORMAT_IND8:
+		return m_bpp == 8;
+
+	// 16bpp formats
+	case BITMAP_FORMAT_IND16:
+	case BITMAP_FORMAT_YUY16:
+		return m_bpp == 16;
+
+	// 32bpp formats
+	case BITMAP_FORMAT_IND32:
+	case BITMAP_FORMAT_RGB32:
+	case BITMAP_FORMAT_ARGB32:
+		return m_bpp == 32;
+
+	// 64bpp formats
+	case BITMAP_FORMAT_IND64:
+		return m_bpp == 64;
+	}
+
+	return false;
+}
+
 
 //**************************************************************************
 //  BITMAP ALLOCATION/CONFIGURATION
@@ -84,6 +120,8 @@ bitmap_t::bitmap_t(bitmap_format format, uint8_t bpp, int width, int height, int
 	, m_bpp(bpp)
 	, m_palette(nullptr)
 {
+	assert(valid_format());
+
 	// allocate intializes all other fields
 	allocate(width, height, xslop, yslop);
 }
@@ -113,6 +151,7 @@ bitmap_t::bitmap_t(bitmap_format format, uint8_t bpp, void *base, int width, int
 	, m_palette(nullptr)
 	, m_cliprect(0, width - 1, 0, height - 1)
 {
+	assert(valid_format());
 }
 
 /**

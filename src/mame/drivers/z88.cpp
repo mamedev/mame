@@ -107,16 +107,16 @@ UPD65031_MEMORY_UPDATE(z88_state::bankswitch_update)
 			switch (bank)
 			{
 				case 0:
-					m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0000, 0x3fff, read8_delegate(FUNC(z88_state::bank0_cart_r), this), write8_delegate(FUNC(z88_state::bank0_cart_w), this));
+					m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0000, 0x3fff, read8_delegate(*this, FUNC(z88_state::bank0_cart_r)), write8_delegate(*this, FUNC(z88_state::bank0_cart_w)));
 					break;
 				case 1:
-					m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x4000, 0x7fff, read8_delegate(FUNC(z88_state::bank1_cart_r), this), write8_delegate(FUNC(z88_state::bank1_cart_w), this));
+					m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x4000, 0x7fff, read8_delegate(*this, FUNC(z88_state::bank1_cart_r)), write8_delegate(*this, FUNC(z88_state::bank1_cart_w)));
 					break;
 				case 2:
-					m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x8000, 0xbfff, read8_delegate(FUNC(z88_state::bank2_cart_r), this), write8_delegate(FUNC(z88_state::bank2_cart_w), this));
+					m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x8000, 0xbfff, read8_delegate(*this, FUNC(z88_state::bank2_cart_r)), write8_delegate(*this, FUNC(z88_state::bank2_cart_w)));
 					break;
 				case 3:
-					m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc000, 0xffff, read8_delegate(FUNC(z88_state::bank3_cart_r), this), write8_delegate(FUNC(z88_state::bank3_cart_w), this));
+					m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc000, 0xffff, read8_delegate(*this, FUNC(z88_state::bank3_cart_r)), write8_delegate(*this, FUNC(z88_state::bank3_cart_w)));
 					break;
 			}
 
@@ -596,31 +596,31 @@ static void z88_cart(device_slot_interface &device)
 	device.option_add("1024kflash", Z88_1024K_FLASH);   // 1024KB Flash cart
 }
 
-MACHINE_CONFIG_START(z88_state::z88)
+void z88_state::z88(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(9'830'400)/3);  // divided by 3 through the uPD65031
 	m_maincpu->set_addrmap(AS_PROGRAM, &z88_state::z88_mem);
 	m_maincpu->set_addrmap(AS_IO, &z88_state::z88_io);
 
 	/* video hardware */
-	device = &SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
 	m_screen->set_refresh_hz(50);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(Z88_SCREEN_WIDTH, Z88_SCREEN_HEIGHT);
 	m_screen->set_visarea(0, (Z88_SCREEN_WIDTH - 1), 0, (Z88_SCREEN_HEIGHT - 1));
 	m_screen->set_palette(m_palette);
-	MCFG_SCREEN_UPDATE_DEVICE("blink", upd65031_device, screen_update)
+	m_screen->set_screen_update("blink", FUNC(upd65031_device::screen_update));
 
-	device = &PALETTE(config, m_palette, Z88_NUM_COLOURS);
-	MCFG_PALETTE_INIT_OWNER(z88_state, z88)
+	PALETTE(config, m_palette, FUNC(z88_state::z88_palette), Z88_NUM_COLOURS);
 
-	device = &UPD65031(config, m_blink, XTAL(9'830'400));
+	UPD65031(config, m_blink, XTAL(9'830'400));
 	m_blink->kb_rd_callback().set(FUNC(z88_state::kb_r));
 	m_blink->int_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_blink->nmi_wr_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	m_blink->spkr_wr_callback().set("speaker", FUNC(speaker_sound_device::level_w));
-	MCFG_UPD65031_SCR_UPDATE_CB(z88_state, lcd_update)
-	MCFG_UPD65031_MEM_UPDATE_CB(z88_state, bankswitch_update)
+	m_blink->set_screen_update_callback(FUNC(z88_state::lcd_update));
+	m_blink->set_memory_update_callback(FUNC(z88_state::bankswitch_update));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -630,21 +630,18 @@ MACHINE_CONFIG_START(z88_state::z88)
 	RAM(config, RAM_TAG).set_default_size("128K").set_extra_options("32K,64K,256K,512K");
 
 	/* cartridges */
-	device = &Z88CART_SLOT(config, m_carts[1]);
-	MCFG_DEVICE_SLOT_INTERFACE(z88_cart, nullptr, false)
-	MCFG_Z88CART_SLOT_OUT_FLP_CB(WRITELINE("blink", upd65031_device, flp_w))
+	Z88CART_SLOT(config, m_carts[1], z88_cart, nullptr);
+	m_carts[1]->out_flp_callback().set(m_blink, FUNC(upd65031_device::flp_w));
 
-	device = &Z88CART_SLOT(config, m_carts[2]);
-	MCFG_DEVICE_SLOT_INTERFACE(z88_cart, nullptr, false)
-	MCFG_Z88CART_SLOT_OUT_FLP_CB(WRITELINE("blink", upd65031_device, flp_w))
+	Z88CART_SLOT(config, m_carts[2], z88_cart, nullptr);
+	m_carts[2]->out_flp_callback().set(m_blink, FUNC(upd65031_device::flp_w));
 
-	device = &Z88CART_SLOT(config, m_carts[3]);
-	MCFG_DEVICE_SLOT_INTERFACE(z88_cart, nullptr, false)
-	MCFG_Z88CART_SLOT_OUT_FLP_CB(WRITELINE("blink", upd65031_device, flp_w))
+	Z88CART_SLOT(config, m_carts[3], z88_cart, nullptr);
+	m_carts[3]->out_flp_callback().set(m_blink, FUNC(upd65031_device::flp_w));
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "z88_cart")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cart_list").set_original("z88_cart");
+}
 
 
 /***************************************************************************

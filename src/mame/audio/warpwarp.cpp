@@ -2,7 +2,7 @@
 // copyright-holders:Juergen Buchmueller
 /****************************************************************************
  *
- * warpwarp.c
+ * warpwarp.cpp
  *
  * sound driver
  * juergen buchmueller <pullmoll@t-online.de>, jan 2000
@@ -75,22 +75,22 @@ void warpwarp_sound_device::device_timer(emu_timer &timer, device_timer_id id, i
 {
 	switch (id)
 	{
-		case TIMER_SOUND_VOLUME_DECAY:
-			if (--m_sound_volume < 0)
-				m_sound_volume = 0;
-			break;
+	case TIMER_SOUND_VOLUME_DECAY:
+		if (--m_sound_volume < 0)
+			m_sound_volume = 0;
+		break;
 
-		case TIMER_MUSIC_VOLUME_DECAY:
-			if (--m_music_volume < 0)
-				m_music_volume = 0;
-			break;
+	case TIMER_MUSIC_VOLUME_DECAY:
+		if (--m_music_volume < 0)
+			m_music_volume = 0;
+		break;
 
-		default:
-			assert_always(false, "Unknown id in warpwarp_sound_device::device_timer");
+	default:
+		throw emu_fatalerror("Unknown id in warpwarp_sound_device::device_timer");
 	}
 }
 
-WRITE8_MEMBER( warpwarp_sound_device::sound_w )
+void warpwarp_sound_device::sound_w(u8 data)
 {
 	m_channel->update();
 	m_sound_latch = data & 0x0f;
@@ -127,13 +127,13 @@ WRITE8_MEMBER( warpwarp_sound_device::sound_w )
 	}
 }
 
-WRITE8_MEMBER( warpwarp_sound_device::music1_w )
+void warpwarp_sound_device::music1_w(u8 data)
 {
 	m_channel->update();
 	m_music1_latch = data & 0x3f;
 }
 
-WRITE8_MEMBER( warpwarp_sound_device::music2_w )
+void warpwarp_sound_device::music2_w(u8 data)
 {
 	m_channel->update();
 	m_music2_latch = data & 0x3f;

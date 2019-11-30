@@ -202,7 +202,7 @@ void qubide_device::device_reset()
 //  read -
 //-------------------------------------------------
 
-uint8_t qubide_device::read(address_space &space, offs_t offset, uint8_t data)
+uint8_t qubide_device::read(offs_t offset, uint8_t data)
 {
 	if ((offset & 0xfc000) == m_base)
 	{
@@ -247,7 +247,7 @@ uint8_t qubide_device::read(address_space &space, offs_t offset, uint8_t data)
 //  write -
 //-------------------------------------------------
 
-void qubide_device::write(address_space &space, offs_t offset, uint8_t data)
+void qubide_device::write(offs_t offset, uint8_t data)
 {
 	if ((offset & 0xfc000) == m_base)
 	{

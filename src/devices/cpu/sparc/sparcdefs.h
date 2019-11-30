@@ -9,8 +9,8 @@
 
 #pragma once
 
-#ifndef __MB86901_DEFS_H__
-#define __MB86901_DEFS_H__
+#ifndef CPU_SPARC_SPARC_DEFS_H
+#define CPU_SPARC_SPARC_DEFS_H
 
 #define PSR_CWP_MASK        0x0000001f
 #define PSR_ET_SHIFT        5
@@ -29,9 +29,13 @@
 #define PSR_RES_MASK        0x000fc000
 #define PSR_ICC_MASK        0x00f00000
 #define PSR_N_MASK          0x00800000
+#define PSR_N_SHIFT         23
 #define PSR_Z_MASK          0x00400000
+#define PSR_Z_SHIFT         22
 #define PSR_V_MASK          0x00200000
+#define PSR_V_SHIFT         21
 #define PSR_C_MASK          0x00100000
+#define PSR_C_SHIFT         20
 #define PSR_VER_SHIFT       24
 #define PSR_VER_MASK        0x0f000000
 #define PSR_VER             0
@@ -41,25 +45,25 @@
 #define PSR_ZERO_MASK       (PSR_IMPL_MASK | PSR_VER_MASK | PSR_RES_MASK)
 
 #define ICC_N_SET           (m_psr & PSR_N_MASK)
-#define ICC_N               (ICC_N_SET ? 1 : 0)
+#define ICC_N               (ICC_N_SET >> PSR_N_SHIFT)
 #define ICC_N_CLEAR         (!ICC_N_SET)
 #define SET_ICC_N_FLAG      do { m_psr |= PSR_N_MASK; } while(0)
 #define CLEAR_ICC_N_FLAG    do { m_psr &= ~PSR_N_MASK; } while(0)
 
 #define ICC_Z_SET           (m_psr & PSR_Z_MASK)
-#define ICC_Z               (ICC_Z_SET ? 1 : 0)
+#define ICC_Z               (ICC_Z_SET >> PSR_Z_SHIFT)
 #define ICC_Z_CLEAR         (!ICC_Z_SET)
 #define SET_ICC_Z_FLAG      do { m_psr |= PSR_Z_MASK; } while(0)
 #define CLEAR_ICC_Z_FLAG    do { m_psr &= ~PSR_Z_MASK; } while(0)
 
 #define ICC_V_SET           (m_psr & PSR_V_MASK)
-#define ICC_V               (ICC_V_SET ? 1 : 0)
+#define ICC_V               (ICC_V_SET >> PSR_V_SHIFT)
 #define ICC_V_CLEAR         (!ICC_V_SET)
 #define SET_ICC_V_FLAG      do { m_psr |= PSR_V_MASK; } while(0)
 #define CLEAR_ICC_V_FLAG    do { m_psr &= ~PSR_V_MASK; } while(0)
 
 #define ICC_C_SET           (m_psr & PSR_C_MASK)
-#define ICC_C               (ICC_C_SET ? 1 : 0)
+#define ICC_C               (ICC_C_SET >> PSR_C_SHIFT)
 #define ICC_C_CLEAR         (!ICC_C_SET)
 #define SET_ICC_C_FLAG      do { m_psr |= PSR_C_MASK; } while(0)
 #define CLEAR_ICC_C_FLAG    do { m_psr &= ~PSR_C_MASK; } while(0)
@@ -81,7 +85,9 @@
 #define WIM                 m_wim
 #define TBR                 m_tbr
 
-#define OP      (op >> 30) // gangnam style
+#define OP_NS   (op & 0xc0000000)
+
+#define OP      (op >> 30)
 #define OP2     ((op >> 22) & 7)
 #define OP3     ((op >> 19) & 63)
 #define OPF     ((op >> 5) & 0x1ff)
@@ -103,26 +109,30 @@
 #define SHCNT32 (op & 31)
 #define SHCNT64 (op & 63)
 #define IAMODE  (op & 0x7)
-#define USEIMM  ((op >> 13) & 1)
-#define USEEXT  ((op >> 12) & 1)
+#define USEIMM  (op & (1 << 13))
+#define USEEXT  (op & (1 << 12))
 
 
 #define COND    ((op >> 25) & 15)
 #define RCOND   ((op >> 10) & 7)
 #define MOVCOND ((op >> 14) & 15)
-#define PRED    ((op >> 19) & 1)
-#define ANNUL   ((op >> 29) & 1)
+#define PRED    (op & (1 << 19))
+#define ANNUL   (op & (1 << 29))
 #define BRCC    ((op >> 20) & 3)
 #define MOVCC   (((op >> 11) & 3) | ((op >> 16) & 4))
 #define OPFCC   ((op >> 11) & 7)
 #define TCCCC   ((op >> 11) & 3)
-#define ASI     ((op >> 5) & 255)
+#define ASI     (uint8_t)(op >> 5)
 #define MMASK   (op & 15)
 #define CMASK   ((op >> 4) & 7)
 
 #define RD      ((op >> 25) & 31)
+#define RD_D    ((op >> 25) & 30)
+#define RDBITS  (op & 0x3e000000)
 #define RS1     ((op >> 14) & 31)
+#define RS1_D   ((op >> 14) & 30)
 #define RS2     (op & 31)
+#define RS2_D   (op & 30)
 
 #define FREG(x) m_fpr[(x)]
 #define FDREG   m_fpr[RD]
@@ -148,10 +158,15 @@
 #define UPDATE_PC   true
 #define PC_UPDATED  false
 
-#define OP_TYPE0    0
-#define OP_CALL     1
-#define OP_ALU      2
-#define OP_LDST     3
+#define OP_TYPE0    u32(0)
+#define OP_CALL     u32(1)
+#define OP_ALU      u32(2)
+#define OP_LDST     u32(3)
+
+#define OP_TYPE0_NS (OP_TYPE0 << 30)
+#define OP_CALL_NS  (OP_CALL << 30)
+#define OP_ALU_NS   (OP_ALU << 30)
+#define OP_LDST_NS  (OP_LDST << 30)
 
 #define OP2_UNIMP   0
 #define OP2_BICC    2
@@ -208,6 +223,7 @@
 #define OP3_JMPL    56
 #define OP3_RETT    57
 #define OP3_TICC    58
+#define OP3_IFLUSH  59
 #define OP3_SAVE    60
 #define OP3_RESTORE 61
 
@@ -373,4 +389,96 @@
 #define SDIV    (OP3 == OP3_SDIV)
 #define SDIVCC  (OP3 == OP3_SDIVCC)
 
-#endif // __MB86901_DEFS_H__
+#define FSR_CEXC_MASK       0x0000001f
+#define FSR_CEXC_NXC        0x00000001
+#define FSR_CEXC_DZC        0x00000002
+#define FSR_CEXC_UFC        0x00000004
+#define FSR_CEXC_OFC        0x00000008
+#define FSR_CEXC_NVC        0x00000010
+
+#define FSR_AEXC_SHIFT      5
+#define FSR_AEXC_MASK       0x000003e0
+#define FSR_AEXC_NXA        0x00000020
+#define FSR_AEXC_DZA        0x00000040
+#define FSR_AEXC_UFA        0x00000080
+#define FSR_AEXC_OFA        0x00000100
+#define FSR_AEXC_NVA        0x00000200
+
+#define FSR_FCC_SHIFT       10
+#define FSR_FCC_MASK        0x00000c00
+#define FSR_FCC_EQ          0x00000000
+#define FSR_FCC_LT          0x00000400
+#define FSR_FCC_GT          0x00000800
+#define FSR_FCC_UO          0x00000c00
+
+#define FSR_QNE             0x00002000
+
+#define FSR_FTT_MASK        0x0001c000
+#define FSR_FTT_NONE        0x00000000
+#define FSR_FTT_IEEE        0x00004000
+#define FSR_FTT_UNFIN       0x00008000
+#define FSR_FTT_UNIMP       0x0000c000
+#define FSR_FTT_SEQ         0x00010000
+
+#define FSR_VER             0x00020000
+
+#define FSR_NS              0x00400000
+
+#define FSR_TEM_SHIFT       23
+#define FSR_TEM_MASK        0x0f800000
+#define FSR_TEM_NXM         0x00800000
+#define FSR_TEM_DZM         0x01000000
+#define FSR_TEM_UFM         0x02000000
+#define FSR_TEM_OFM         0x04000000
+#define FSR_TEM_NVM         0x08000000
+
+#define FSR_RD_SHIFT        30
+#define FSR_RD_MASK         0xc0000000
+#define FSR_RD_NEAR         0x00000000
+#define FSR_RD_ZERO         0x40000000
+#define FSR_RD_UP           0x80000000
+#define FSR_RD_DOWN         0xc0000000
+
+#define FSR_RESV_MASK       0x30301000
+
+// FPop1
+#define FPOP_FMOVS          0x001
+#define FPOP_FNEGS          0x005
+#define FPOP_FABSS          0x009
+#define FPOP_FSQRTS         0x029
+#define FPOP_FSQRTD         0x02a
+#define FPOP_FSQRTX         0x02b
+#define FPOP_FADDS          0x041
+#define FPOP_FADDD          0x042
+#define FPOP_FADDX          0x043
+#define FPOP_FSUBS          0x045
+#define FPOP_FSUBD          0x046
+#define FPOP_FSUBX          0x047
+#define FPOP_FMULS          0x049
+#define FPOP_FMULD          0x04a
+#define FPOP_FMULX          0x04b
+#define FPOP_FDIVS          0x04d
+#define FPOP_FDIVD          0x04e
+#define FPOP_FDIVX          0x04f
+#define FPOP_FITOS          0x0c4
+#define FPOP_FDTOS          0x0c6
+#define FPOP_FXTOS          0x0c7
+#define FPOP_FITOD          0x0c8
+#define FPOP_FSTOD          0x0c9
+#define FPOP_FXTOD          0x0cb
+#define FPOP_FITOX          0x0cc
+#define FPOP_FSTOX          0x0cd
+#define FPOP_FDTOX          0x0ce
+#define FPOP_FSTOI          0x0d1
+#define FPOP_FDTOI          0x0d2
+#define FPOP_FXTOI          0x0d3
+
+// FPop2
+#define FPOP_FCMPS          0x051
+#define FPOP_FCMPD          0x052
+#define FPOP_FCMPX          0x053
+#define FPOP_FCMPES         0x055
+#define FPOP_FCMPED         0x056
+#define FPOP_FCMPEX         0x057
+
+#endif // CPU_SPARC_SPARC_DEFS_H

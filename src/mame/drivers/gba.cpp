@@ -553,50 +553,50 @@ READ32_MEMBER(gba_state::gba_io_r)
 	switch( offset + 0x60/4 )
 	{
 		case 0x0060/4:
-			retval = m_gbsound->sound_r(space, 0) | m_gbsound->sound_r(space, 1)<<16 | m_gbsound->sound_r(space, 2)<<24;
+			retval = m_gbsound->sound_r(0) | m_gbsound->sound_r(1)<<16 | m_gbsound->sound_r(2)<<24;
 			break;
 		case 0x0064/4:
-			retval = m_gbsound->sound_r(space, 3) | m_gbsound->sound_r(space, 4)<<8;
+			retval = m_gbsound->sound_r(3) | m_gbsound->sound_r(4)<<8;
 			break;
 		case 0x0068/4:
-			retval = m_gbsound->sound_r(space, 6) | m_gbsound->sound_r(space, 7)<<8;
+			retval = m_gbsound->sound_r(6) | m_gbsound->sound_r(7)<<8;
 			break;
 		case 0x006c/4:
-			retval = m_gbsound->sound_r(space, 8) | m_gbsound->sound_r(space, 9)<<8;
+			retval = m_gbsound->sound_r(8) | m_gbsound->sound_r(9)<<8;
 			break;
 		case 0x0070/4:
-			retval = m_gbsound->sound_r(space, 0xa) | m_gbsound->sound_r(space, 0xb)<<16 | m_gbsound->sound_r(space, 0xc)<<24;
+			retval = m_gbsound->sound_r(0xa) | m_gbsound->sound_r(0xb)<<16 | m_gbsound->sound_r(0xc)<<24;
 			break;
 		case 0x0074/4:
-			retval = m_gbsound->sound_r(space, 0xd) | m_gbsound->sound_r(space, 0xe)<<8;
+			retval = m_gbsound->sound_r(0xd) | m_gbsound->sound_r(0xe)<<8;
 			break;
 		case 0x0078/4:
-			retval = m_gbsound->sound_r(space, 0x10) | m_gbsound->sound_r(space, 0x11)<<8;
+			retval = m_gbsound->sound_r(0x10) | m_gbsound->sound_r(0x11)<<8;
 			break;
 		case 0x007c/4:
-			retval = m_gbsound->sound_r(space, 0x12) | m_gbsound->sound_r(space, 0x13)<<8;
+			retval = m_gbsound->sound_r(0x12) | m_gbsound->sound_r(0x13)<<8;
 			break;
 		case 0x0080/4:
-			retval = m_gbsound->sound_r(space, 0x14) | m_gbsound->sound_r(space, 0x15)<<8;
+			retval = m_gbsound->sound_r(0x14) | m_gbsound->sound_r(0x15)<<8;
 			if( ACCESSING_BITS_16_31 )
 			{
 				retval |= SOUNDCNT_H << 16;
 			}
 			break;
 		case 0x0084/4:
-			retval = m_gbsound->sound_r(space, 0x16);
+			retval = m_gbsound->sound_r(0x16);
 			break;
 		case 0x0090/4:
-			retval = m_gbsound->wave_r(space, 0) | m_gbsound->wave_r(space, 1)<<8 | m_gbsound->wave_r(space, 2)<<16 | m_gbsound->wave_r(space, 3)<<24;
+			retval = m_gbsound->wave_r(0) | m_gbsound->wave_r(1)<<8 | m_gbsound->wave_r(2)<<16 | m_gbsound->wave_r(3)<<24;
 			break;
 		case 0x0094/4:
-			retval = m_gbsound->wave_r(space, 4) | m_gbsound->wave_r(space, 5)<<8 | m_gbsound->wave_r(space, 6)<<16 | m_gbsound->wave_r(space, 7)<<24;
+			retval = m_gbsound->wave_r(4) | m_gbsound->wave_r(5)<<8 | m_gbsound->wave_r(6)<<16 | m_gbsound->wave_r(7)<<24;
 			break;
 		case 0x0098/4:
-			retval = m_gbsound->wave_r(space, 8) | m_gbsound->wave_r(space, 9)<<8 | m_gbsound->wave_r(space, 10)<<16 | m_gbsound->wave_r(space, 11)<<24;
+			retval = m_gbsound->wave_r(8) | m_gbsound->wave_r(9)<<8 | m_gbsound->wave_r(10)<<16 | m_gbsound->wave_r(11)<<24;
 			break;
 		case 0x009c/4:
-			retval = m_gbsound->wave_r(space, 12) | m_gbsound->wave_r(space, 13)<<8 | m_gbsound->wave_r(space, 14)<<16 | m_gbsound->wave_r(space, 15)<<24;
+			retval = m_gbsound->wave_r(12) | m_gbsound->wave_r(13)<<8 | m_gbsound->wave_r(14)<<16 | m_gbsound->wave_r(15)<<24;
 			break;
 		case 0x00a0/4:
 		case 0x00a4/4:
@@ -766,99 +766,99 @@ WRITE32_MEMBER(gba_state::gba_io_w)
 		case 0x0060/4:
 			if( ACCESSING_BITS_0_7 )   // SOUNDCNTL
 			{
-				m_gbsound->sound_w(space, 0, data);
+				m_gbsound->sound_w(0, data);
 			}
 			if( ACCESSING_BITS_16_23 )
 			{
-				m_gbsound->sound_w(space, 1, data>>16);  // SOUND1CNT_H
+				m_gbsound->sound_w(1, data>>16);  // SOUND1CNT_H
 			}
 			if( ACCESSING_BITS_24_31 )
 			{
-				m_gbsound->sound_w(space, 2, data>>24);
+				m_gbsound->sound_w(2, data>>24);
 			}
 			break;
 		case 0x0064/4:
 			if( ACCESSING_BITS_0_7 )   // SOUNDCNTL
 			{
-				m_gbsound->sound_w(space, 3, data);
+				m_gbsound->sound_w(3, data);
 			}
 			if( ACCESSING_BITS_8_15 )
 			{
-				m_gbsound->sound_w(space, 4, data>>8);   // SOUND1CNT_H
+				m_gbsound->sound_w(4, data>>8);   // SOUND1CNT_H
 			}
 			break;
 		case 0x0068/4:
 			if( ACCESSING_BITS_0_7 )
 			{
-				m_gbsound->sound_w(space, 6, data);
+				m_gbsound->sound_w(6, data);
 			}
 			if( ACCESSING_BITS_8_15 )
 			{
-				m_gbsound->sound_w(space, 7, data>>8);
+				m_gbsound->sound_w(7, data>>8);
 			}
 			break;
 		case 0x006c/4:
 			if( ACCESSING_BITS_0_7 )
 			{
-				m_gbsound->sound_w(space, 8, data);
+				m_gbsound->sound_w(8, data);
 			}
 			if( ACCESSING_BITS_8_15 )
 			{
-				m_gbsound->sound_w(space, 9, data>>8);
+				m_gbsound->sound_w(9, data>>8);
 			}
 			break;
 		case 0x0070/4:  //SND3CNTL and H
 			if( ACCESSING_BITS_0_7 )   // SOUNDCNTL
 			{
-				m_gbsound->sound_w(space, 0xa, data);
+				m_gbsound->sound_w(0xa, data);
 			}
 			if( ACCESSING_BITS_16_23 )
 			{
-				m_gbsound->sound_w(space, 0xb, data>>16);    // SOUND1CNT_H
+				m_gbsound->sound_w(0xb, data>>16);    // SOUND1CNT_H
 			}
 			if( ACCESSING_BITS_24_31 )
 			{
-				m_gbsound->sound_w(space, 0xc, data>>24);
+				m_gbsound->sound_w(0xc, data>>24);
 			}
 			break;
 		case 0x0074/4:
 			if( ACCESSING_BITS_0_7 )
 			{
-				m_gbsound->sound_w(space, 0xd, data);
+				m_gbsound->sound_w(0xd, data);
 			}
 			if( ACCESSING_BITS_8_15 )
 			{
-				m_gbsound->sound_w(space, 0xe, data>>8);
+				m_gbsound->sound_w(0xe, data>>8);
 			}
 			break;
 		case 0x0078/4:
 			if( ACCESSING_BITS_0_7 )
 			{
-				m_gbsound->sound_w(space, 0x10, data);
+				m_gbsound->sound_w(0x10, data);
 			}
 			if( ACCESSING_BITS_8_15 )
 			{
-				m_gbsound->sound_w(space, 0x11, data>>8);
+				m_gbsound->sound_w(0x11, data>>8);
 			}
 			break;
 		case 0x007c/4:
 			if( ACCESSING_BITS_0_7 )
 			{
-				m_gbsound->sound_w(space, 0x12, data);
+				m_gbsound->sound_w(0x12, data);
 			}
 			if( ACCESSING_BITS_8_15 )
 			{
-				m_gbsound->sound_w(space, 0x13, data>>8);
+				m_gbsound->sound_w(0x13, data>>8);
 			}
 			break;
 		case 0x0080/4:
 			if( ACCESSING_BITS_0_7 )
 			{
-				m_gbsound->sound_w(space, 0x14, data);
+				m_gbsound->sound_w(0x14, data);
 			}
 			if( ACCESSING_BITS_8_15 )
 			{
-				m_gbsound->sound_w(space, 0x15, data>>8);
+				m_gbsound->sound_w(0x15, data>>8);
 			}
 
 			if (ACCESSING_BITS_16_31)
@@ -885,7 +885,7 @@ WRITE32_MEMBER(gba_state::gba_io_w)
 		case 0x0084/4:
 			if( ACCESSING_BITS_0_7 )
 			{
-				m_gbsound->sound_w(space, 0x16, data);
+				m_gbsound->sound_w(0x16, data);
 				if ((data & 0x80) && !(soundcnt_x & 0x80))
 				{
 					m_fifo_a_ptr = m_fifo_a_in = 17;
@@ -900,73 +900,73 @@ WRITE32_MEMBER(gba_state::gba_io_w)
 		case 0x0090/4:
 			if( ACCESSING_BITS_0_7 )
 			{
-				m_gbsound->wave_w(space, 0, data);
+				m_gbsound->wave_w(0, data);
 			}
 			if( ACCESSING_BITS_8_15 )
 			{
-				m_gbsound->wave_w(space, 1, data>>8);
+				m_gbsound->wave_w(1, data>>8);
 			}
 			if( ACCESSING_BITS_16_23 )
 			{
-				m_gbsound->wave_w(space, 2, data>>16);
+				m_gbsound->wave_w(2, data>>16);
 			}
 			if( ACCESSING_BITS_24_31 )
 			{
-				m_gbsound->wave_w(space, 3, data>>24);
+				m_gbsound->wave_w(3, data>>24);
 			}
 			break;
 		case 0x0094/4:
 			if( ACCESSING_BITS_0_7 )
 			{
-				m_gbsound->wave_w(space, 4, data);
+				m_gbsound->wave_w(4, data);
 			}
 			if( ACCESSING_BITS_8_15 )
 			{
-				m_gbsound->wave_w(space, 5, data>>8);
+				m_gbsound->wave_w(5, data>>8);
 			}
 			if( ACCESSING_BITS_16_23 )
 			{
-				m_gbsound->wave_w(space, 6, data>>16);
+				m_gbsound->wave_w(6, data>>16);
 			}
 			if( ACCESSING_BITS_24_31 )
 			{
-				m_gbsound->wave_w(space, 7, data>>24);
+				m_gbsound->wave_w(7, data>>24);
 			}
 			break;
 		case 0x0098/4:
 			if( ACCESSING_BITS_0_7 )
 			{
-				m_gbsound->wave_w(space, 8, data);
+				m_gbsound->wave_w(8, data);
 			}
 			if( ACCESSING_BITS_8_15 )
 			{
-				m_gbsound->wave_w(space, 9, data>>8);
+				m_gbsound->wave_w(9, data>>8);
 			}
 			if( ACCESSING_BITS_16_23 )
 			{
-				m_gbsound->wave_w(space, 0xa, data>>16);
+				m_gbsound->wave_w(0xa, data>>16);
 			}
 			if( ACCESSING_BITS_24_31 )
 			{
-				m_gbsound->wave_w(space, 0xb, data>>24);
+				m_gbsound->wave_w(0xb, data>>24);
 			}
 			break;
 		case 0x009c/4:
 			if( ACCESSING_BITS_0_7 )
 			{
-				m_gbsound->wave_w(space, 0xc, data);
+				m_gbsound->wave_w(0xc, data);
 			}
 			if( ACCESSING_BITS_8_15 )
 			{
-				m_gbsound->wave_w(space, 0xd, data>>8);
+				m_gbsound->wave_w(0xd, data>>8);
 			}
 			if( ACCESSING_BITS_16_23 )
 			{
-				m_gbsound->wave_w(space, 0xe, data>>16);
+				m_gbsound->wave_w(0xe, data>>16);
 			}
 			if( ACCESSING_BITS_24_31 )
 			{
-				m_gbsound->wave_w(space, 0xf, data>>24);
+				m_gbsound->wave_w(0xf, data>>24);
 			}
 			break;
 		case 0x00a0/4:
@@ -1250,7 +1250,7 @@ void gba_state::gba_map(address_map &map)
 	map(0x06000000, 0x06017fff).mirror(0x00fe0000).rw("lcd", FUNC(gba_lcd_device::gba_vram_r), FUNC(gba_lcd_device::gba_vram_w));  // VRAM
 	map(0x06018000, 0x0601ffff).mirror(0x00fe0000).rw("lcd", FUNC(gba_lcd_device::gba_vram_r), FUNC(gba_lcd_device::gba_vram_w));  // VRAM
 	map(0x07000000, 0x070003ff).mirror(0x00fffc00).rw("lcd", FUNC(gba_lcd_device::gba_oam_r), FUNC(gba_lcd_device::gba_oam_w));    // OAM
-	//AM_RANGE(0x08000000, 0x0cffffff)  // cart ROM + mirrors, mapped here at machine_start if a cart is present
+	//map(0x08000000, 0x0cffffff)  // cart ROM + mirrors, mapped here at machine_start if a cart is present
 	map(0x10000000, 0xffffffff).r(FUNC(gba_state::gba_10000000_r)); // for "Justice League Chronicles" (game bug)
 }
 
@@ -1344,8 +1344,8 @@ void gba_state::machine_start()
 		membank("rom2")->set_base(cart_rom->base());
 		membank("rom3")->set_base(cart_rom->base());
 
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x80000c4, 0x80000cb, read32_delegate(FUNC(gba_cart_slot_device::read_gpio),(gba_cart_slot_device*)m_cart));
-		m_maincpu->space(AS_PROGRAM).install_write_handler(0x80000c4, 0x80000cb, write32_delegate(FUNC(gba_cart_slot_device::write_gpio),(gba_cart_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x80000c4, 0x80000cb, read32_delegate(*m_cart, FUNC(gba_cart_slot_device::read_gpio)));
+		m_maincpu->space(AS_PROGRAM).install_write_handler(0x80000c4, 0x80000cb, write32_delegate(*m_cart, FUNC(gba_cart_slot_device::write_gpio)));
 
 		// add nvram to save state
 		m_cart->save_nvram();
@@ -1353,40 +1353,40 @@ void gba_state::machine_start()
 		// install the cart NVRAM handlers if necessary
 		if (m_cart->get_type() == GBA_SRAM || m_cart->get_type() == GBA_DRILLDOZ || m_cart->get_type() == GBA_WARIOTWS)
 		{
-			m_maincpu->space(AS_PROGRAM).install_read_handler(0xe000000, 0xe00ffff, read32_delegate(FUNC(gba_cart_slot_device::read_ram),(gba_cart_slot_device*)m_cart));
-			m_maincpu->space(AS_PROGRAM).install_write_handler(0xe000000, 0xe00ffff, write32_delegate(FUNC(gba_cart_slot_device::write_ram),(gba_cart_slot_device*)m_cart));
-			m_maincpu->space(AS_PROGRAM).install_read_handler(0xe010000, 0xe01ffff, read32_delegate(FUNC(gba_cart_slot_device::read_ram),(gba_cart_slot_device*)m_cart));
-			m_maincpu->space(AS_PROGRAM).install_write_handler(0xe010000, 0xe01ffff, write32_delegate(FUNC(gba_cart_slot_device::write_ram),(gba_cart_slot_device*)m_cart));
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0xe000000, 0xe00ffff, read32_delegate(*m_cart, FUNC(gba_cart_slot_device::read_ram)));
+			m_maincpu->space(AS_PROGRAM).install_write_handler(0xe000000, 0xe00ffff, write32_delegate(*m_cart, FUNC(gba_cart_slot_device::write_ram)));
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0xe010000, 0xe01ffff, read32_delegate(*m_cart, FUNC(gba_cart_slot_device::read_ram)));
+			m_maincpu->space(AS_PROGRAM).install_write_handler(0xe010000, 0xe01ffff, write32_delegate(*m_cart, FUNC(gba_cart_slot_device::write_ram)));
 		}
 		if (m_cart->get_type() == GBA_EEPROM || m_cart->get_type() == GBA_EEPROM4 || m_cart->get_type() == GBA_EEPROM64 || m_cart->get_type() == GBA_BOKTAI)
 		{
 			// for games larger than 16MB the actual range is smaller but read_ram/write_ram handles that!
-			m_maincpu->space(AS_PROGRAM).install_read_handler(0xd000000, 0xdffffff, read32_delegate(FUNC(gba_cart_slot_device::read_ram),(gba_cart_slot_device*)m_cart));
-			m_maincpu->space(AS_PROGRAM).install_write_handler(0xd000000, 0xdffffff, write32_delegate(FUNC(gba_cart_slot_device::write_ram),(gba_cart_slot_device*)m_cart));
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0xd000000, 0xdffffff, read32_delegate(*m_cart, FUNC(gba_cart_slot_device::read_ram)));
+			m_maincpu->space(AS_PROGRAM).install_write_handler(0xd000000, 0xdffffff, write32_delegate(*m_cart, FUNC(gba_cart_slot_device::write_ram)));
 		}
 		if (m_cart->get_type() == GBA_YOSHIUG)
 		{
 			// EEPROM
-			m_maincpu->space(AS_PROGRAM).install_read_handler(0xd000000, 0xdffffff, read32_delegate(FUNC(gba_cart_slot_device::read_ram),(gba_cart_slot_device*)m_cart));
-			m_maincpu->space(AS_PROGRAM).install_write_handler(0xd000000, 0xdffffff, write32_delegate(FUNC(gba_cart_slot_device::write_ram),(gba_cart_slot_device*)m_cart));
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0xd000000, 0xdffffff, read32_delegate(*m_cart, FUNC(gba_cart_slot_device::read_ram)));
+			m_maincpu->space(AS_PROGRAM).install_write_handler(0xd000000, 0xdffffff, write32_delegate(*m_cart, FUNC(gba_cart_slot_device::write_ram)));
 			// Tilt Sensor
-			m_maincpu->space(AS_PROGRAM).install_read_handler(0xe008000, 0xe0085ff, read32_delegate(FUNC(gba_cart_slot_device::read_tilt),(gba_cart_slot_device*)m_cart));
-			m_maincpu->space(AS_PROGRAM).install_write_handler(0xe008000, 0xe0085ff, write32_delegate(FUNC(gba_cart_slot_device::write_tilt),(gba_cart_slot_device*)m_cart));
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0xe008000, 0xe0085ff, read32_delegate(*m_cart, FUNC(gba_cart_slot_device::read_tilt)));
+			m_maincpu->space(AS_PROGRAM).install_write_handler(0xe008000, 0xe0085ff, write32_delegate(*m_cart, FUNC(gba_cart_slot_device::write_tilt)));
 		}
 		// merge the two flash and mask accesses in read_ram?!?
 		if (m_cart->get_type() == GBA_FLASH || m_cart->get_type() == GBA_FLASH512 || m_cart->get_type() == GBA_FLASH_RTC)
 		{
-			m_maincpu->space(AS_PROGRAM).install_read_handler(0xe000000, 0xe00ffff, read32_delegate(FUNC(gba_cart_slot_device::read_ram),(gba_cart_slot_device*)m_cart));
-			m_maincpu->space(AS_PROGRAM).install_write_handler(0xe000000, 0xe00ffff, write32_delegate(FUNC(gba_cart_slot_device::write_ram),(gba_cart_slot_device*)m_cart));
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0xe000000, 0xe00ffff, read32_delegate(*m_cart, FUNC(gba_cart_slot_device::read_ram)));
+			m_maincpu->space(AS_PROGRAM).install_write_handler(0xe000000, 0xe00ffff, write32_delegate(*m_cart, FUNC(gba_cart_slot_device::write_ram)));
 		}
 		if (m_cart->get_type() == GBA_FLASH1M || m_cart->get_type() == GBA_FLASH1M_RTC)
 		{
-			m_maincpu->space(AS_PROGRAM).install_read_handler(0xe000000, 0xe01ffff, read32_delegate(FUNC(gba_cart_slot_device::read_ram),(gba_cart_slot_device*)m_cart));
-			m_maincpu->space(AS_PROGRAM).install_write_handler(0xe000000, 0xe01ffff, write32_delegate(FUNC(gba_cart_slot_device::write_ram),(gba_cart_slot_device*)m_cart));
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0xe000000, 0xe01ffff, read32_delegate(*m_cart, FUNC(gba_cart_slot_device::read_ram)));
+			m_maincpu->space(AS_PROGRAM).install_write_handler(0xe000000, 0xe01ffff, write32_delegate(*m_cart, FUNC(gba_cart_slot_device::write_ram)));
 		}
 		if (m_cart->get_type() == GBA_3DMATRIX)
 		{
-			m_maincpu->space(AS_PROGRAM).install_write_handler(0x08800000, 0x088001ff, write32_delegate(FUNC(gba_cart_slot_device::write_mapper),(gba_cart_slot_device*)m_cart));
+			m_maincpu->space(AS_PROGRAM).install_write_handler(0x08800000, 0x088001ff, write32_delegate(*m_cart, FUNC(gba_cart_slot_device::write_mapper)));
 			memory_region *cart_romhlp = memregion(region_tag.assign(m_cart->tag()).append(GBAHELP_ROM_REGION_TAG).c_str());
 			membank("rom1")->set_base(cart_romhlp->base());
 		}
@@ -1430,37 +1430,37 @@ static void gba_cart(device_slot_interface &device)
 }
 
 
-MACHINE_CONFIG_START(gba_state::gbadv)
+void gba_state::gbadv(machine_config &config)
+{
+	ARM7(config, m_maincpu, XTAL(16'777'216));
+	m_maincpu->set_addrmap(AS_PROGRAM, &gba_state::gba_map);
 
-	MCFG_DEVICE_ADD("maincpu", ARM7, XTAL(16'777'216))
-	MCFG_DEVICE_PROGRAM_MAP(gba_map)
-
-	MCFG_GBA_LCD_ADD("lcd")
-	MCFG_GBA_LCD_INT_HBLANK(WRITELINE(*this, gba_state, int_hblank_callback))
-	MCFG_GBA_LCD_INT_VBLANK(WRITELINE(*this, gba_state, int_vblank_callback))
-	MCFG_GBA_LCD_INT_VCOUNT(WRITELINE(*this, gba_state, int_vcount_callback))
-	MCFG_GBA_LCD_DMA_HBLANK(WRITELINE(*this, gba_state, dma_hblank_callback))
-	MCFG_GBA_LCD_DMA_VBLANK(WRITELINE(*this, gba_state, dma_vblank_callback))
+	gba_lcd_device &lcd(GBA_LCD(config, "lcd", 0));
+	lcd.int_hblank_callback().set(FUNC(gba_state::int_hblank_callback));
+	lcd.int_vblank_callback().set(FUNC(gba_state::int_vblank_callback));
+	lcd.int_vcount_callback().set(FUNC(gba_state::int_vcount_callback));
+	lcd.dma_hblank_callback().set(FUNC(gba_state::dma_hblank_callback));
+	lcd.dma_vblank_callback().set(FUNC(gba_state::dma_vblank_callback));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("custom", CGB04_APU, XTAL(16'777'216)/4)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.5)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.5)
+	CGB04_APU(config, m_gbsound, XTAL(16'777'216)/4);
+	m_gbsound->add_route(0, "lspeaker", 0.5);
+	m_gbsound->add_route(1, "rspeaker", 0.5);
 
-	MCFG_DEVICE_ADD("ldaca", DAC_8BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) // unknown DAC
-	MCFG_DEVICE_ADD("rdaca", DAC_8BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // unknown DAC
-	MCFG_DEVICE_ADD("ldacb", DAC_8BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) // unknown DAC
-	MCFG_DEVICE_ADD("rdacb", DAC_8BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "ldaca", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldaca", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "rdaca", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdaca", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "ldacb", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldacb", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "rdacb", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdacb", -1.0, DAC_VREF_NEG_INPUT)
+	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, m_ldaca, 0).add_route(ALL_OUTPUTS, "lspeaker", 0.5); // unknown DAC
+	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, m_rdaca, 0).add_route(ALL_OUTPUTS, "rspeaker", 0.5); // unknown DAC
+	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, m_ldacb, 0).add_route(ALL_OUTPUTS, "lspeaker", 0.5); // unknown DAC
+	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, m_rdacb, 0).add_route(ALL_OUTPUTS, "rspeaker", 0.5); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.add_route(0, "ldaca", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "ldaca", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "rdaca", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "rdaca", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "ldacb", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "ldacb", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "rdacb", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "rdacb", -1.0, DAC_VREF_NEG_INPUT);
 
-	MCFG_GBA_CARTRIDGE_ADD("cartslot", gba_cart, nullptr)
-	MCFG_SOFTWARE_LIST_ADD("cart_list","gba")
-MACHINE_CONFIG_END
+	GBA_CART_SLOT(config, m_cart, gba_cart, nullptr);
+	SOFTWARE_LIST(config, "cart_list").set_original("gba");
+}
 
 
 ROM_START( gba )

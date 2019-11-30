@@ -51,11 +51,11 @@ namespace
 };
 
 
-MACHINE_CONFIG_START(coco_pak_gmc_device::device_add_mconfig)
+void coco_pak_gmc_device::device_add_mconfig(machine_config &config)
+{
 	SPEAKER(config, "gmc_speaker").front_center();
-	MCFG_DEVICE_ADD(SN76489AN_TAG, SN76489A, 4_MHz_XTAL)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "gmc_speaker", 1.0)
-MACHINE_CONFIG_END
+	SN76489A(config, m_psg, 4_MHz_XTAL).add_route(ALL_OUTPUTS, "gmc_speaker", 1.0);
+}
 
 
 //**************************************************************************

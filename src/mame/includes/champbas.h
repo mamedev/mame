@@ -15,6 +15,7 @@
 #include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 
 class champbas_state : public driver_device
@@ -35,7 +36,7 @@ public:
 	{
 	}
 
-	DECLARE_CUSTOM_INPUT_MEMBER(watchdog_bit2);
+	DECLARE_READ_LINE_MEMBER(watchdog_bit2);
 
 	void init_champbas();
 
@@ -55,14 +56,14 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(mcu_start_w);
 	DECLARE_READ8_MEMBER(champbja_protection_r);
 
-	INTERRUPT_GEN_MEMBER(vblank_irq);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 
 	DECLARE_WRITE8_MEMBER(tilemap_w);
 	DECLARE_WRITE_LINE_MEMBER(gfxbank_w);
 	DECLARE_WRITE_LINE_MEMBER(palette_bank_w);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 
-	DECLARE_PALETTE_INIT(champbas);
+	void champbas_palette(palette_device &palette) const;
 	TILE_GET_INFO_MEMBER(champbas_get_bg_tile_info);
 
 	uint32_t screen_update_champbas(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -70,7 +71,6 @@ protected:
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	virtual void machine_reset() override;
 
 	void champbas_map(address_map &map);
 	void champbasj_map(address_map &map);
@@ -118,7 +118,7 @@ public:
 protected:
 	TIMER_DEVICE_CALLBACK_MEMBER(exctsccr_sound_irq);
 
-	DECLARE_PALETTE_INIT(exctsccr);
+	void exctsccr_palette(palette_device &palette) const;
 	TILE_GET_INFO_MEMBER(exctsccr_get_bg_tile_info);
 
 	uint32_t screen_update_exctsccr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

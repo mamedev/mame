@@ -13,6 +13,7 @@
 
 #include "cpu/powerpc/ppc.h"
 
+#include "imagedev/floppy.h"
 #include "machine/53c810.h"
 #include "machine/am9517a.h"
 #include "machine/idectrl.h"

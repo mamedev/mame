@@ -15,18 +15,25 @@
 
 #include "imagedev/flopdrv.h"
 
-#define MCFG_MC6843_IRQ_CALLBACK(_write) \
-	downcast<mc6843_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
 
 class mc6843_device : public device_t
 {
 public:
 	mc6843_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_irq_wr_callback(Object &&cb) { return m_write_irq.set_callback(std::forward<Object>(cb)); }
+	template<int Id, typename T> void set_floppy_drive(T &&tag) { m_floppy[Id].set_tag(std::forward<T>(tag)); }
+	template<typename T, typename U, typename V, typename W> void set_floppy_drives(T &&tag0, U &&tag1, V &&tag2, W &&tag3)
+	{
+		m_floppy[0].set_tag(std::forward<T>(tag0));
+		m_floppy[1].set_tag(std::forward<U>(tag1));
+		m_floppy[2].set_tag(std::forward<V>(tag2));
+		m_floppy[3].set_tag(std::forward<W>(tag3));
+	}
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	auto irq() { return m_write_irq.bind(); }
+
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 	void set_drive(int drive);
 	void set_side(int side);
@@ -43,6 +50,8 @@ private:
 	{
 		TIMER_CONT
 	};
+
+	optional_device_array<legacy_floppy_image_device, 4> m_floppy;
 
 	devcb_write_line m_write_irq;
 
@@ -70,7 +79,6 @@ private:
 	/* trigger delayed actions (bottom halves) */
 	emu_timer* m_timer_cont;
 
-	legacy_floppy_image_device* floppy_image(uint8_t drive);
 	legacy_floppy_image_device* floppy_image();
 	void status_update();
 	void cmd_end();

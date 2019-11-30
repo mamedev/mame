@@ -136,7 +136,7 @@ READ8_MEMBER(lviv_state::io_r)
 		{
 		case 0:
 		case 1:
-			return m_ppi[switch_val]->read(space, offset & 3);
+			return m_ppi[switch_val]->read(offset & 3);
 
 		case 2:
 		case 3:
@@ -173,7 +173,7 @@ WRITE8_MEMBER(lviv_state::io_w)
 		{
 		case 0:
 		case 1:
-			m_ppi[switch_val]->write(space, offset & 3, data);
+			m_ppi[switch_val]->write(offset & 3, data);
 			break;
 
 		case 2:
@@ -287,7 +287,7 @@ image_verify_result lviv_state::verify_snapshot(uint8_t * data, uint32_t size)
 	return image_verify_result::PASS;
 }
 
-SNAPSHOT_LOAD_MEMBER(lviv_state, lviv)
+SNAPSHOT_LOAD_MEMBER(lviv_state::snapshot_cb)
 {
 	std::vector<uint8_t> snapshot_data(LVIV_SNAPSHOT_SIZE);
 

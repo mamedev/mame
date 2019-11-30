@@ -82,8 +82,8 @@ READ16_MEMBER(psx_gamebooster_device::exp_r)
 		offset -= 0x20000;
 		uint16_t retval = 0;;
 
-		if (mem_mask & 0xff00) retval |= (m_cartslot->read_rom(space, (offset*2)+1))<<8;
-		if (mem_mask & 0x00ff) retval |= m_cartslot->read_rom(space, (offset*2)+0);
+		if (mem_mask & 0xff00) retval |= (m_cartslot->read_rom((offset*2)+1))<<8;
+		if (mem_mask & 0x00ff) retval |= m_cartslot->read_rom((offset*2)+0);
 
 		return retval;
 	}
@@ -107,8 +107,8 @@ WRITE16_MEMBER(psx_gamebooster_device::exp_w)
 		offset -= 0x20000;
 		logerror("%s: psx_gamebooster_device::exp_w %04x %04x\n", machine().describe_context(), offset*2, data);
 
-		if (mem_mask & 0xff00) m_cartslot->write_bank(space, (offset*2)+1, data>>8);
-		if (mem_mask & 0x00ff) m_cartslot->write_bank(space, (offset*2)+0, data); // send this 2nd or it erases the bank with the above
+		if (mem_mask & 0xff00) m_cartslot->write_bank((offset*2)+1, data>>8);
+		if (mem_mask & 0x00ff) m_cartslot->write_bank((offset*2)+0, data); // send this 2nd or it erases the bank with the above
 
 	}
 	else
@@ -150,10 +150,11 @@ static void gb_cart(device_slot_interface &device)
 //  device.option_add_internal("rom_unk01",   GB_ROM_UNK01);
 }
 
-MACHINE_CONFIG_START(psx_gamebooster_device::device_add_mconfig)
+void psx_gamebooster_device::device_add_mconfig(machine_config &config)
+{
 	/* cartslot */
-	MCFG_GB_CARTRIDGE_ADD("gbslot", gb_cart, nullptr)
+	GB_CART_SLOT(config, m_cartslot, gb_cart, nullptr);
 
-	MCFG_SOFTWARE_LIST_ADD("cart_list","gameboy")
-	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("gbc_list","gbcolor")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cart_list").set_original("gameboy");
+	SOFTWARE_LIST(config, "gbc_list").set_compatible("gbcolor");
+}

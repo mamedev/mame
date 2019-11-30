@@ -21,6 +21,7 @@
 
 
 namespace ui {
+
 /***************************************************************************
 TYPE DEFINITIONS
 ***************************************************************************/
@@ -34,8 +35,17 @@ public:
 	render_texture *hilight_main_texture() { return m_hilight_main_texture.get(); }
 	render_texture *arrow_texture() { return m_arrow_texture.get(); }
 
+	class texture_destroyer
+	{
+	public:
+		texture_destroyer(render_manager &manager) : m_manager(manager) { }
+		void operator()(render_texture *texture) const { m_manager.get().texture_free(texture); }
+	private:
+		std::reference_wrapper<render_manager> m_manager;
+	};
+
 	using bitmap_ptr = std::unique_ptr<bitmap_argb32>;
-	using texture_ptr = std::unique_ptr<render_texture, std::function<void(render_texture *)> >;
+	using texture_ptr = std::unique_ptr<render_texture, texture_destroyer>;
 
 private:
 	static void render_triangle(bitmap_argb32 &dest, bitmap_argb32 &source, const rectangle &sbounds, void *param);

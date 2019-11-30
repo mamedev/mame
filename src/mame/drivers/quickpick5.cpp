@@ -33,12 +33,13 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 class quickpick5_state : public driver_device
 {
 public:
-	quickpick5_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	quickpick5_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette"),
 		m_k053245(*this, "k053245"),
@@ -65,10 +66,10 @@ private:
 	WRITE_LINE_MEMBER(nmi_ack_w) { m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE); }
 
 	// A0 is inverted to match the Z80's endianness.  Typical Konami.
-	READ8_MEMBER(k244_r) { return m_k053245->k053244_r(space, offset^1);  }
-	WRITE8_MEMBER(k244_w) { m_k053245->k053244_w(space, offset^1, data); }
-	READ8_MEMBER(k245_r) { return m_k053245->k053245_r(space, offset^1);  }
-	WRITE8_MEMBER(k245_w) { m_k053245->k053245_w(space, offset^1, data); }
+	READ8_MEMBER(k244_r) { return m_k053245->k053244_r(offset^1);  }
+	WRITE8_MEMBER(k244_w) { m_k053245->k053244_w(offset^1, data); }
+	READ8_MEMBER(k245_r) { return m_k053245->k053245_r(offset^1);  }
+	WRITE8_MEMBER(k245_w) { m_k053245->k053245_w(offset^1, data); }
 
 	WRITE8_MEMBER(control_w)
 	{
@@ -119,11 +120,11 @@ READ8_MEMBER(quickpick5_state::vram_r)
 		offset |= 0x800;
 		if ((offset >= 0x800) && (offset <= 0x880))
 		{
-			return m_k051649->k051649_waveform_r(space, offset & 0x7f);
+			return m_k051649->k051649_waveform_r(offset & 0x7f);
 		}
 		else if ((offset >= 0x8e0) && (offset <= 0x8ff))
 		{
-			return m_k051649->k051649_test_r(space, offset-0x8e0);
+			return m_k051649->k051649_test_r();
 		}
 	}
 
@@ -143,26 +144,26 @@ WRITE8_MEMBER(quickpick5_state::vram_w)
 		offset |= 0x800;
 		if ((offset >= 0x800) && (offset < 0x880))
 		{
-			m_k051649->k051649_waveform_w(space, offset-0x800, data);
+			m_k051649->k051649_waveform_w(offset-0x800, data);
 			return;
 		}
 		else if (offset < 0x88a)
 		{
-			m_k051649->k051649_frequency_w(space, offset-0x880, data);
+			m_k051649->k051649_frequency_w(offset-0x880, data);
 			return;
 		}
 		else if (offset < 0x88f)
 		{
-			m_k051649->k051649_volume_w(space, offset-0x88a, data);
+			m_k051649->k051649_volume_w(offset-0x88a, data);
 			return;
 		}
 		else if (offset < 0x890)
 		{
-			m_k051649->k051649_keyonoff_w(space, 0, data);
+			m_k051649->k051649_keyonoff_w(data);
 			return;
 		}
 
-		m_k051649->k051649_test_w(space, offset-0x8e0, data);
+		m_k051649->k051649_test_w(data);
 		return;
 	}
 
@@ -196,7 +197,7 @@ void quickpick5_state::video_start()
 	m_gfxdecode->set_gfx(gfx_index, std::make_unique<gfx_element>(m_palette, charlayout, memregion("ttl")->base(), 0, m_palette->entries() / 16, 0));
 	m_ttl_gfx_index = gfx_index;
 
-	m_ttl_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(quickpick5_state::ttl_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_ttl_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(quickpick5_state::ttl_get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_ttl_tilemap->set_transparent_pen(0);
 	m_ttl_tilemap->set_scrollx(80);
 	m_ttl_tilemap->set_scrolly(28);
@@ -400,48 +401,48 @@ void quickpick5_state::machine_reset()
 {
 }
 
-MACHINE_CONFIG_START(quickpick5_state::quickpick5)
+void quickpick5_state::quickpick5(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(32'000'000)/4) // z84c0008pec 8mhz part, 32Mhz xtal verified on PCB, divisor unknown
-	MCFG_DEVICE_PROGRAM_MAP(quickpick5_main)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", quickpick5_state, scanline, "screen", 0, 1)
+	Z80(config, m_maincpu, XTAL(32'000'000)/4); // z84c0008pec 8mhz part, 32Mhz xtal verified on PCB, divisor unknown
+	m_maincpu->set_addrmap(AS_PROGRAM, &quickpick5_state::quickpick5_main);
+	TIMER(config, "scantimer").configure_scanline(FUNC(quickpick5_state::scanline), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("k053252", K053252, XTAL(32'000'000)/4) /* K053252, xtal verified, divider not verified */
-	MCFG_K053252_INT1_ACK_CB(WRITELINE(*this, quickpick5_state, vbl_ack_w))
-	MCFG_K053252_INT2_ACK_CB(WRITELINE(*this, quickpick5_state, nmi_ack_w))
-	MCFG_K053252_INT_TIME_CB(WRITE8(*this, quickpick5_state, ccu_int_time_w))
+	K053252(config, m_k053252, XTAL(32'000'000)/4); /* K053252, xtal verified, divider not verified */
+	m_k053252->int1_ack().set(FUNC(quickpick5_state::vbl_ack_w));
+	m_k053252->int2_ack().set(FUNC(quickpick5_state::nmi_ack_w));
+	m_k053252->int_time().set(FUNC(quickpick5_state::ccu_int_time_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59.62)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(20))
-	MCFG_SCREEN_SIZE(64*8, 33*8)
-	MCFG_SCREEN_VISIBLE_AREA(88, 456-1, 28, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(quickpick5_state, screen_update_quickpick5)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(59.62);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(20));
+	screen.set_size(64*8, 33*8);
+	screen.set_visarea(88, 456-1, 28, 256-1);
+	screen.set_screen_update(FUNC(quickpick5_state::screen_update_quickpick5));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
+	m_palette->enable_shadows();
 
-	MCFG_DEVICE_ADD("k053245", K053245, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K05324X_OFFSETS(-(44+80), 20)
-	MCFG_K05324X_CB(quickpick5_state, sprite_callback)
+	K053245(config, m_k053245, 0);
+	m_k053245->set_palette(m_palette);
+	m_k053245->set_offsets(-(44+80), 20);
+	m_k053245->set_sprite_callback(FUNC(quickpick5_state::sprite_callback));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfxdecode_device::empty)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfxdecode_device::empty);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_K051649_ADD("k051649", XTAL(32'000'000)/18)  // xtal is verified, divider is not
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
+	K051649(config, m_k051649, XTAL(32'000'000)/18);  // xtal is verified, divider is not
+	m_k051649->add_route(ALL_OUTPUTS, "mono", 0.45);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(32'000'000)/18, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(0, "mono", 1.0)
-	MCFG_SOUND_ROUTE(1, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, XTAL(32'000'000)/18, okim6295_device::PIN7_HIGH);
+	m_oki->add_route(0, "mono", 1.0);
+	m_oki->add_route(1, "mono", 1.0);
+}
 
 ROM_START( quickp5 )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* main program */

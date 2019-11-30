@@ -11,6 +11,7 @@
 #include "emu.h"
 
 #include "ui/pluginopt.h"
+#include "ui/utils.h"
 
 #include "mame.h"
 #include "luaengine.h"
@@ -95,6 +96,12 @@ void menu_plugin_opt::handle()
 				break;
 			case IPT_UI_CLEAR:
 				key = "clear";
+				break;
+			case IPT_UI_CANCEL:
+				key = "cancel";
+				break;
+			case IPT_SPECIAL:
+				key = std::to_string((u32)menu_event->unichar);
 				break;
 			default:
 				return;

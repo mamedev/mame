@@ -142,9 +142,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(beathead_state::scanline_callback)
 
 void beathead_state::machine_reset()
 {
-	/* reset the common subsystems */
-	atarigen_state::machine_reset();
-
 	/* the code is temporarily mapped at 0 at startup */
 	/* just copying the first 0x40 bytes is sufficient */
 	memcpy(m_ram_base, m_rom_base, 0x40);
@@ -336,38 +333,38 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(beathead_state::beathead)
-
+void beathead_state::beathead(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", ASAP, ATARI_CLOCK_14MHz)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	ASAP(config, m_maincpu, ATARI_CLOCK_14MHz);
+	m_maincpu->set_addrmap(AS_PROGRAM, &beathead_state::main_map);
 
 	EEPROM_2804(config, "eeprom").lock_after_write(true);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
-	MCFG_TIMER_DRIVER_ADD(m_scan_timer, beathead_state, scanline_callback)
+	TIMER(config, m_scan_timer).configure_generic(FUNC(beathead_state::scanline_callback));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_UPDATE_DRIVER(beathead_state, screen_update)
-	MCFG_SCREEN_SIZE(42*8, 262)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 42*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_screen_update(FUNC(beathead_state::screen_update));
+	m_screen->set_size(42*8, 262);
+	m_screen->set_visarea(0*8, 42*8-1, 0*8, 30*8-1);
+	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 32768)
-	MCFG_PALETTE_FORMAT(IRRRRRGGGGGBBBBB)
-	MCFG_PALETTE_MEMBITS(16)
+	PALETTE(config, m_palette);
+	m_palette->set_format(palette_device::IRGB_1555, 32768);
+	m_palette->set_membits(16);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_ATARI_JSA_III_ADD("jsa", NOOP)
-	MCFG_ATARI_JSA_TEST_PORT("IN2", 6)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	ATARI_JSA_III(config, m_jsa, 0);
+	m_jsa->test_read_cb().set_ioport("IN2").bit(6);
+	m_jsa->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 

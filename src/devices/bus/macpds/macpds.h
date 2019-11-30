@@ -14,30 +14,13 @@
 #pragma once
 
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_MACPDS_SLOT_REMOVE(_tag)    \
-	MCFG_DEVICE_REMOVE(_tag)
-
-#define MCFG_MACPDS_ONBOARD_ADD(_nbtag, _tag, _dev_type, _def_inp) \
-	MCFG_DEVICE_ADD(_tag, _dev_type, 0) \
-	MCFG_DEVICE_INPUT_DEFAULTS(_def_inp) \
-	downcast<device_macpds_card_interface &>(*device).set_macpds_tag(_nbtag, _tag);
-
-#define MCFG_MACPDS_BUS_REMOVE(_tag) \
-	MCFG_DEVICE_REMOVE(_tag)
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
 class macpds_device;
 
-class macpds_slot_device : public device_t,
-							public device_slot_interface
+class macpds_slot_device : public device_t, public device_slot_interface
 {
 public:
 	// construction/destruction
@@ -116,7 +99,7 @@ DECLARE_DEVICE_TYPE(MACPDS, macpds_device)
 // ======================> device_macpds_card_interface
 
 // class representing interface-specific live macpds card
-class device_macpds_card_interface : public device_slot_card_interface
+class device_macpds_card_interface : public device_interface
 {
 	friend class macpds_device;
 	template <class ElememtType> friend class simple_list;

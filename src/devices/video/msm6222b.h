@@ -15,11 +15,6 @@
 
 #pragma once
 
-#define MCFG_MSM6222B_ADD( _tag ) \
-	MCFG_DEVICE_ADD( _tag, MSM6222B, 0 )
-
-#define MCFG_MSM6222B_01_ADD( _tag ) \
-	MCFG_DEVICE_ADD( _tag, MSM6222B_01, 0 )
 
 class msm6222b_device : public device_t {
 public:

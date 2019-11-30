@@ -49,17 +49,16 @@
 #include "softlist.h"
 
 
-#define VERBOSE_DBG 1       /* general debug messages */
+//#define LOG_GENERAL (1U <<  0) //defined in logmacro.h already
+#define LOG_KEYBOARD  (1U <<  1)
+#define LOG_DEBUG     (1U <<  2)
 
-#define DBG_LOG(N,M,A) \
-	do { \
-	if(VERBOSE_DBG>=N) \
-		{ \
-			if( M ) \
-				logerror("%11.6f at %s: %-10s",machine().time().as_double(),machine().describe_context(),(char*)M ); \
-			logerror A; \
-		} \
-	} while (0)
+//#define VERBOSE (LOG_DEBUG)
+//#define LOG_OUTPUT_FUNC printf
+#include "logmacro.h"
+
+#define LOGKBD(...) LOGMASKED(LOG_KEYBOARD, __VA_ARGS__)
+#define LOGDBG(...) LOGMASKED(LOG_DEBUG, __VA_ARGS__)
 
 
 class tosh1000_state : public driver_device
@@ -119,7 +118,7 @@ MACHINE_RESET_MEMBER(tosh1000_state, tosh1000)
 
 WRITE8_MEMBER(tosh1000_state::romdos_bank_w)
 {
-	DBG_LOG(2,"ROM-DOS", ("<- %02x (%s, accessing bank %d)\n", data, BIT(data, 7)?"enable":"disable", data&7));
+	LOGDBG("ROM-DOS <- %02x (%s, accessing bank %d)\n", data, BIT(data, 7)?"enable":"disable", data&7);
 
 	if (BIT(data, 7))
 	{
@@ -133,14 +132,14 @@ WRITE8_MEMBER(tosh1000_state::romdos_bank_w)
 
 WRITE8_MEMBER(tosh1000_state::bram_w)
 {
-	DBG_LOG(2, "BRAM", ("%02x <- %02x\n", 0xc0 + offset, data));
+	LOGDBG("BRAM %02x <- %02x\n", 0xc0 + offset, data);
 
 	switch (offset)
 	{
 	case 1:
 		if (m_bram_latch)
 		{
-			DBG_LOG(1, "Backup RAM", ("%02x <- %02x\n", m_bram_offset % 160, data));
+			LOG("Backup RAM %02x <- %02x\n", m_bram_offset % 160, data);
 			m_bram->write(m_bram_offset % 160, data);
 			m_bram_offset++;
 		}
@@ -188,7 +187,7 @@ READ8_MEMBER(tosh1000_state::bram_r)
 		if (m_bram_state == READ_DATA)
 		{
 			data = m_bram->read(m_bram_offset % 160);
-			DBG_LOG(1, "BRAM", ("@ %02x == %02x\n", m_bram_offset % 160, data));
+			LOG("BRAM @ %02x == %02x\n", m_bram_offset % 160, data);
 			m_bram_offset++;
 		}
 		break;
@@ -212,7 +211,7 @@ READ8_MEMBER(tosh1000_state::bram_r)
 		break;
 	}
 
-	DBG_LOG(2, "BRAM", ("%02x == %02x\n", 0xc0 + offset, data));
+	LOGDBG("BRAM %02x == %02x\n", 0xc0 + offset, data);
 
 	return data;
 }
@@ -251,49 +250,52 @@ void tosh1000_state::cfg_fdc_35(device_t *device)
 {
 	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_default_option("35dd");
 	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_fixed(true);
-	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:1")).set_default_option("");
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:1")).set_default_option(nullptr);
 }
 
-MACHINE_CONFIG_START(tosh1000_state::tosh1000)
-	MCFG_DEVICE_ADD("maincpu", I8088, XTAL(5'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(tosh1000_map)
-	MCFG_DEVICE_IO_MAP(tosh1000_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
+void tosh1000_state::tosh1000(machine_config &config)
+{
+	I8088(config, m_maincpu, XTAL(5'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &tosh1000_state::tosh1000_map);
+	m_maincpu->set_addrmap(AS_IO, &tosh1000_state::tosh1000_io);
+	m_maincpu->set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
 	ADDRESS_MAP_BANK(config, "bankdev").set_map(&tosh1000_state::tosh1000_romdos).set_options(ENDIANNESS_LITTLE, 8, 20, 0x10000);
 
 	MCFG_MACHINE_RESET_OVERRIDE(tosh1000_state, tosh1000)
 
-	MCFG_IBM5160_MOTHERBOARD_ADD("mb", "maincpu")
+	ibm5160_mb_device &mb(IBM5160_MOTHERBOARD(config, "mb", 0));
+	mb.set_cputag(m_maincpu);
+	mb.int_callback().set_inputline(m_maincpu, 0);
+	mb.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("rtc", TC8521, XTAL(32'768))
+	TC8521(config, "rtc", XTAL(32'768));
 
 	// FIXME: determine ISA bus clock
-	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "cga", false)
-	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "fdc_xt", false)
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc_xt", cfg_fdc_35)
-	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "lpt", false)
-	MCFG_DEVICE_ADD("isa4", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "com", false)
-	MCFG_DEVICE_ADD("isa5", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
-	MCFG_DEVICE_ADD("isa6", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, nullptr, false)
+	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, "cga", false);
+	ISA8_SLOT(config, "isa2", 0, "mb:isa", pc_isa8_cards, "fdc_xt", false).set_option_machine_config("fdc_xt", cfg_fdc_35);
+	ISA8_SLOT(config, "isa3", 0, "mb:isa", pc_isa8_cards, "lpt", false);
+	ISA8_SLOT(config, "isa4", 0, "mb:isa", pc_isa8_cards, "com", false);
+	ISA8_SLOT(config, "isa5", 0, "mb:isa", pc_isa8_cards, nullptr, false);
+	ISA8_SLOT(config, "isa6", 0, "mb:isa", pc_isa8_cards, nullptr, false);
 
-//  MCFG_SOFTWARE_LIST_ADD("flop_list","tosh1000")
+//  SOFTWARE_LIST(config, "flop_list").set_original("tosh1000");
 
 	// uses a 80C50 instead of 8042 for KBDC
-	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270)
+	PC_KBDC_SLOT(config, "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270).set_pc_kbdc_slot(subdevice("mb:pc_kbdc"));
 
 	RAM(config, RAM_TAG).set_default_size("512K");
 
-	MCFG_TOSH1000_BRAM_ADD("bram")
-MACHINE_CONFIG_END
+	TOSH1000_BRAM(config, m_bram, 0);
+}
 
 
 ROM_START( tosh1000 )
-	ROM_REGION16_LE(0x8000, "bios", 0)
+	ROM_REGION(0x8000, "bios", 0)
 	ROM_SYSTEM_BIOS(0, "v410", "V4.10")
 	ROMX_LOAD( "026f.27c256.ic25", 0x0000, 0x8000, CRC(a854939f) SHA1(0ff532f295a40716f53949a2fd64d02bf76d575a), ROM_BIOS(0))
 
-	ROM_REGION16_LE(0x80000, "romdos", 0)
+	ROM_REGION(0x80000, "romdos", 0)
 	ROM_LOAD("tc534000p__b004.dos.ic26", 0x0000, 0x80000, CRC(716027f6) SHA1(563e3a7e1961d4cda216169bd1ecc66925a101aa))
 
 	/* XXX IBM 1501981(CGA) and 1501985(MDA) Character rom */

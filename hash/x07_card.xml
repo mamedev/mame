@@ -18,7 +18,7 @@ Undumped cards:
 		<part name="card" interface="x07_card">
 			<feature name="card_type" value="xp140" />
 			<dataarea name="rom" size="0x2000">
-				<rom name="xp140.rom" size="0x2000" crc="4b26a9b4" sha1="5704519cf44a49bb3ab6638b439103e6a37f1eb4" offset="0" />
+				<rom name="xp140.rom" size="0x2000" crc="4b26a9b4" sha1="5704519cf44a49bb3ab6638b439103e6a37f1eb4"/>
 			</dataarea>
 		</part>
 	</software>

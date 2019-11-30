@@ -97,9 +97,14 @@ protected:
 class bt45x_mono_device_base : public bt45x_device_base
 {
 public:
-	// helpers instead of a device_palette_interface
-	u8 palette_lookup(u8 index) const { return m_color_ram[index & m_read_mask]; }
-	u8 overlay_lookup(u8 index) const { return m_color_ram[m_palette_colors + index]; }
+	// helper instead of device_palette_interface
+	u8 lookup(u8 pixel, u8 overlay = 0) const
+	{
+		if (overlay & 3)
+			return m_color_ram[m_palette_colors + (overlay & (m_command & (CR1|CR0)))];
+		else
+			return (m_command & CR6) ? m_color_ram[pixel & m_read_mask] : m_color_ram[m_palette_colors + 0];
+	}
 
 protected:
 	bt45x_mono_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const u32 palette_colors, const u32 overlay_colors);
@@ -169,6 +174,15 @@ class bt458_device : public bt45x_rgb_device_base
 {
 public:
 	bt458_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	bt458_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+};
+
+class bt467_device : public bt458_device
+{
+public:
+	bt467_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 DECLARE_DEVICE_TYPE(BT451, bt451_device)
@@ -177,5 +191,6 @@ DECLARE_DEVICE_TYPE(BT454, bt454_device)
 DECLARE_DEVICE_TYPE(BT455, bt455_device)
 DECLARE_DEVICE_TYPE(BT457, bt457_device)
 DECLARE_DEVICE_TYPE(BT458, bt458_device)
+DECLARE_DEVICE_TYPE(BT467, bt467_device)
 
 #endif // MAME_VIDEO_BT45X_H

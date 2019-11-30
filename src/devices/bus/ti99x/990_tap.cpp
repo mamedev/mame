@@ -257,7 +257,7 @@ void tap_990_device::cmd_read_binary_forward()
 		/* DMA */
 		for (i=0; i<bytes_read; i+=2)
 		{
-			machine().device("maincpu")->memory().space(AS_PROGRAM).write_word(dma_address, (((int) buffer[i]) << 8) | buffer[i+1]);
+			m_memory_space->write_word(dma_address, (((int) buffer[i]) << 8) | buffer[i+1]);
 			dma_address = (dma_address + 2) & 0x1ffffe;
 		}
 
@@ -895,20 +895,22 @@ public:
 	ti990_tape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// image-level overrides
-	virtual iodevice_t image_type() const override { return IO_MAGTAPE; }
+	virtual iodevice_t image_type() const noexcept override { return IO_MAGTAPE; }
 
-	virtual bool is_readable()  const override { return 1; }
-	virtual bool is_writeable() const override { return 1; }
-	virtual bool is_creatable() const override { return 1; }
-	virtual bool must_be_loaded() const override { return 0; }
-	virtual bool is_reset_on_load() const override { return 0; }
-	virtual const char *file_extensions() const override { return "tap"; }
+	virtual bool is_readable()  const noexcept override { return true; }
+	virtual bool is_writeable() const noexcept override { return true; }
+	virtual bool is_creatable() const noexcept override { return true; }
+	virtual bool must_be_loaded() const noexcept override { return false; }
+	virtual bool is_reset_on_load() const noexcept override { return false; }
+	virtual const char *file_extensions() const noexcept override { return "tap"; }
 
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+
 private:
 	int tape_get_id();
 };
@@ -956,14 +958,13 @@ void ti990_tape_image_device::call_unload()
 	tpc->set_tape(tape_get_id(), this, false, false, true);
 }
 
-#define MCFG_TI990_TAPE_ADD(_tag)   \
-	MCFG_DEVICE_ADD((_tag),  TI990_TAPE, 0)
-
 
 DEFINE_DEVICE_TYPE(TI990_TAPE_CTRL, tap_990_device, "ti990_tap", "Generic TI-900 Tape Controller")
 
 tap_990_device::tap_990_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TI990_TAPE_CTRL, tag, owner, clock), m_int_line(*this)
+	: device_t(mconfig, TI990_TAPE_CTRL, tag, owner, clock)
+	, m_memory_space(*this, finder_base::DUMMY_TAG, -1)
+	, m_int_line(*this)
 {
 }
 
@@ -987,9 +988,10 @@ void tap_990_device::device_start()
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(tap_990_device::device_add_mconfig)
-	MCFG_TI990_TAPE_ADD("tape0")
-	MCFG_TI990_TAPE_ADD("tape1")
-	MCFG_TI990_TAPE_ADD("tape2")
-	MCFG_TI990_TAPE_ADD("tape3")
-MACHINE_CONFIG_END
+void tap_990_device::device_add_mconfig(machine_config &config)
+{
+	TI990_TAPE(config, "tape0", 0);
+	TI990_TAPE(config, "tape1", 0);
+	TI990_TAPE(config, "tape2", 0);
+	TI990_TAPE(config, "tape3", 0);
+}

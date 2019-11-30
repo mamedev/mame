@@ -44,6 +44,7 @@ Z nothing
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/ay31015.h"
+#include "machine/clock.h"
 #include "bus/rs232/rs232.h"
 
 
@@ -169,30 +170,31 @@ void hpz80unk_state::hpz80unk(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &hpz80unk_state::hpz80unk_mem);
 	m_maincpu->set_addrmap(AS_IO, &hpz80unk_state::hpz80unk_io);
 
-	/* video hardware */
 	AY51013(config, m_uart[0]); // COM2502
-	m_uart[0]->set_tx_clock(153600);
-	m_uart[0]->set_rx_clock(153600);
 	m_uart[0]->read_si_callback().set("rs232a", FUNC(rs232_port_device::rxd_r));
 	m_uart[0]->write_so_callback().set("rs232a", FUNC(rs232_port_device::write_txd));
 	m_uart[0]->set_auto_rdav(true);
 	RS232_PORT(config, "rs232a", default_rs232_devices, "terminal");
 
 	AY51013(config, m_uart[1]); // COM2502
-	m_uart[1]->set_tx_clock(153600);
-	m_uart[1]->set_rx_clock(153600);
 	m_uart[1]->read_si_callback().set("rs232b", FUNC(rs232_port_device::rxd_r));
 	m_uart[1]->write_so_callback().set("rs232b", FUNC(rs232_port_device::write_txd));
 	m_uart[1]->set_auto_rdav(true);
 	RS232_PORT(config, "rs232b", default_rs232_devices, nullptr);
 
 	AY51013(config, m_uart[2]); // COM2502
-	m_uart[2]->set_tx_clock(153600);
-	m_uart[2]->set_rx_clock(153600);
 	m_uart[2]->read_si_callback().set("rs232c", FUNC(rs232_port_device::rxd_r));
 	m_uart[2]->write_so_callback().set("rs232c", FUNC(rs232_port_device::write_txd));
 	m_uart[2]->set_auto_rdav(true);
 	RS232_PORT(config, "rs232c", default_rs232_devices, nullptr);
+
+	clock_device &uart_clock(CLOCK(config, "uart_clock", 153600));
+	uart_clock.signal_handler().set(m_uart[0], FUNC(ay51013_device::write_tcp));
+	uart_clock.signal_handler().append(m_uart[0], FUNC(ay51013_device::write_rcp));
+	uart_clock.signal_handler().append(m_uart[1], FUNC(ay51013_device::write_tcp));
+	uart_clock.signal_handler().append(m_uart[1], FUNC(ay51013_device::write_rcp));
+	uart_clock.signal_handler().append(m_uart[2], FUNC(ay51013_device::write_tcp));
+	uart_clock.signal_handler().append(m_uart[2], FUNC(ay51013_device::write_rcp));
 }
 
 /* ROM definition */

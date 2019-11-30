@@ -7,9 +7,8 @@
     Format code for Jupiter Ace cassette files
 
 *********************************************************************/
-
-#ifndef ACE_TAP_H
-#define ACE_TAP_H
+#ifndef MAME_FORMATS_ACE_TAP_H
+#define MAME_FORMATS_ACE_TAP_H
 
 #include "cassimg.h"
 
@@ -29,4 +28,4 @@ struct ace_tape_t
 
 CASSETTE_FORMATLIST_EXTERN(ace_cassette_formats);
 
-#endif /* ACE_TAP_H */
+#endif // MAME_FORMATS_ACE_TAP_H
