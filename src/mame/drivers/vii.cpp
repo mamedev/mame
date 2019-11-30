@@ -2548,8 +2548,6 @@ void wireless60_state::machine_start()
 	
 	m_w60_p1_ctrl_mask = 0x0400;
 	m_w60_p2_ctrl_mask = 0x0800;
-
-	switch_bank(0);
 }
 
 void zone40_state::machine_start()
