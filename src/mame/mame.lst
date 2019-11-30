@@ -21916,7 +21916,8 @@ realbroda                       // (c) 1995 Merit
 spitboss                        // (c) 1988 Merit
 
 @source:meritum.cpp
-meritum                         //
+meritum1                        //
+meritum2                        //
 meritum_net                     //
 
 @source:mermaid.cpp
