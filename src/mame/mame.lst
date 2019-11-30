@@ -2662,6 +2662,8 @@ abah4                           // Abit AH4(T) motherboard (486)
 abpi4                           // Abit PI4(T) motherboard (486)
 so4saw2                         // SOYO SY-4SAW2 motherboard (486)
 nat48pv                         // NAT48PV-1.00 VL motherboard (486)
+olyport40                       // AEG Olympia Olyport 40-21
+micral45                        // Bull Micral 45 (286)
 
 @source:atari_s1.cpp
 aavenger                        //
@@ -9365,6 +9367,7 @@ buster                          // (c) 1987 Marian Electronics Ltd.
 @source:bw12.cpp
 bw12                            //
 bw14                            //
+bw14d                           // Bondwell Portable Computer Model 14 (German keyboard)
 
 @source:bw2.cpp
 bw2                             //
@@ -31908,6 +31911,7 @@ eaglepc2                        // Eagle PC-2
 mpx16                           // Ciarcia's Circuit Cellar Micromint MPX-16
 hstrtpls                        // Vendex HeadStart Plus
 nms9100                         // Philips NMS 9100 series
+to16							// Thomson TO16
 
 @source:pc100.cpp
 pc100                           //

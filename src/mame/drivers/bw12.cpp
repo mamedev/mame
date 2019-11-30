@@ -665,8 +665,17 @@ ROM_END
 
 #define rom_bw14 rom_bw12
 
+ROM_START( bw14d )
+	ROM_REGION( 0x10000, Z80_TAG, 0 )
+	ROM_LOAD( "bw14boot.ic41", 0x0000, 0x1000, CRC(782fe341) SHA1(eefe5ad6b1ef77a1caf0af743b74de5fa1c4c19d) )
+
+	ROM_REGION(0x1000, "chargen", 0)
+	ROM_LOAD( "gcrd.bin",  0x0000, 0x1000, CRC(638f3e1d) SHA1(5a0b2f47c66fe8db6f58d348ac29074a4db51258) )
+ROM_END
+
 /* System Drivers */
 
 /*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY             FULLNAME       FLAGS */
 COMP( 1984, bw12, 0,      0,      bw12,    bw12,  bw12_state, empty_init, "Bondwell Holding", "Bondwell 12", MACHINE_SUPPORTS_SAVE )
 COMP( 1984, bw14, bw12,   0,      bw14,    bw12,  bw12_state, empty_init, "Bondwell Holding", "Bondwell 14", MACHINE_SUPPORTS_SAVE )
+COMP( 1984, bw14d, 0,     0,      bw14,    bw12,  bw12_state, empty_init, "Bondwell Holding", "Bondwell Portable Computer Model 14 (German keyboard)", MACHINE_SUPPORTS_SAVE )
