@@ -3586,7 +3586,9 @@ ROM_END
 // PCB marked 'Zone 100 110728 V2.1'
 ROM_START( lx_jg7415 )
 	ROM_REGION( 0x10000000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "rom.bin", 0x0000, 0x10000000, BAD_DUMP CRC(59442e00) SHA1(7e91cf6b19c37f9b4fa4dc21e241c6634d6a6f95) ) // reads not 100% consistent, TODO: check if bad reads are un used areas
+	// reads of some unused areas were not 100% consistent, but this seems intentional, the game has a ROM twice the size it needs and is wired up in such a way that those bad areas are unused by the game
+	// if adding a clone make sure to check if there are actual differences in the used areas
+	ROM_LOAD16_WORD_SWAP( "rom.bin", 0x0000, 0x10000000, CRC(59442e00) SHA1(7e91cf6b19c37f9b4fa4dc21e241c6634d6a6f95) )
 ROM_END
 
 
@@ -3771,7 +3773,7 @@ void wireless60_state::init_lx_jg7415()
 	uint8_t blocks[32] = {
 		// these parts of the ROM contain the code that gets selected		
 		0x00, 0x01, 0x06, 0x07, 0x08, 0x09, 0x0e, 0x0f,   0x10, 0x11, 0x16, 0x17, 0x18, 0x19, 0x1e, 0x1f,
-		// these parts of the ROM contain code / data but go unused? (is it garbage / leftover data, or intentionally avoided areas due to failing flash being wired up to avoid bad areas?)
+		// these parts of the ROM contain code / data but go unused, this seems intentional, some of these areas don't read consistently so likely this double size ROM was used knowing that some areas were bad and could be avoided
 		0x02, 0x03, 0x04, 0x05, 0x0a, 0x0b, 0x0c, 0x0d,   0x12, 0x13, 0x14, 0x15, 0x1a, 0x1b, 0x1c, 0x1d
 	};
 
