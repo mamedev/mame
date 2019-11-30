@@ -55,9 +55,12 @@ private:
 void lexibook_jg7425_state::machine_start()
 {
 	// I think this code should be running from RAM at least, probably some kind of bootstrap / internal ROM to copy it? (hyperscan.cpp indicates that SoC can have internal ROM at least)
+	
+	// first 0x20 bytes are probably pointers, code starts at 0x20 and is offset, maps at 0x500000
+	
 	for (int i = 0; i < 0x80000 / 4; i++)
 	{
-		m_mainram[i] = m_romregion[i];
+		m_mainram[i+(0x500000/4) - (0x20/4)] = m_romregion[i];
 	}
 }
 
