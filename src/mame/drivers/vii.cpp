@@ -2534,7 +2534,9 @@ void spg2xx_game_state::machine_start()
 
 void spg2xx_game_state::machine_reset()
 {
-	m_current_bank = 0;
+	m_current_bank = -1;
+	switch_bank(0);
+	m_maincpu->reset();
 }
 
 
