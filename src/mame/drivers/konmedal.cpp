@@ -10,6 +10,9 @@
  Dam Dam Boy (ダムダム　ボーイ)
  (c) 1995 Konami
 
+ Buttobi Striker
+ (c) 1994 Konami
+
  Driver by R. Belmont
 
 Rundown of PCB:
@@ -666,6 +669,31 @@ ROM_START( ddboya )
 	ROM_LOAD( "342_a10.82s129.14g", 0x000300, 0x000100, CRC(1fa443f9) SHA1(84b0a36a4e49bf75bda1871bf52090ee5a75cd03) )
 ROM_END
 
+ROM_START( buttobi )
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* main program */
+
+	ROM_LOAD( "440-b02-4d.bin", 0x000000, 0x020000, CRC(428fc60e) SHA1(b980ee0bce0cd30b4c070b7c32ba37ac1b92fa9f) )
+	ROM_REGION( 0x80000, "k056832", 0 )   /* tilemaps */
+	ROM_LOAD32_BYTE( "440-a03-4f.bin", 0x000002, 0x020000, CRC(04917807) SHA1(e10796e4d2dcf126db6ac03749fcd2532a4ef846) )
+	ROM_LOAD32_BYTE( "440-a04-4g.bin", 0x000003, 0x020000, CRC(0396c6d9) SHA1(1d6b8f997b69828d09930a45724c5f0799ac988a) )
+	ROM_LOAD32_BYTE( "440-a05-4h.bin", 0x000000, 0x020000, CRC(11d3ec99) SHA1(4bc267fa58ba1dd83e1d43b0e981b9e65d688042) )
+	ROM_LOAD32_BYTE( "440-a06-4j.bin", 0x000001, 0x020000, CRC(f915c517) SHA1(26128fcdf9947efd7959deddb52575088fa492d4) )
+
+	// temporarily borrowed from tsukande while the PROMs get dumped from this PCB
+	ROM_REGION( 0x400, "proms", 0 )
+	// R (440a07.13f)
+	ROM_LOAD( "441a07.20k",   0x000000, 0x000100, BAD_DUMP CRC(7d0c53c2) SHA1(f357e0cb3d53374208ad1670e70be03b399a4c02) )
+	// G (440a08.14f)
+	ROM_LOAD( "441a08.21k",   0x000100, 0x000100, BAD_DUMP CRC(e2c3e853) SHA1(36a3008dde714ade53b9a01ac9d94c6cc655c293) )
+	// B (440a09.15f)
+	ROM_LOAD( "441a09.23k",   0x000200, 0x000100, BAD_DUMP CRC(3daca33a) SHA1(38644f574beaa593f3348b49eabea9e03d722013) )
+	// P(riority?) (440a10.14g)
+	ROM_LOAD( "441a10.21m",   0x000300, 0x000100, BAD_DUMP CRC(063722ff) SHA1(7ba43acfdccb02e7913dc000c4f9c57c54b1315f) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "440-a01-8b.bin", 0x000000, 0x040000, CRC(955b1bd5) SHA1(1e8130a3634972d742ba4ad103e1738e44a4e28c) )
+ROM_END
+
 ROM_START( shuriboy )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* main program */
 	ROM_LOAD( "gs-341-b01.13g", 0x000000, 0x010000, CRC(3c0f36b6) SHA1(1d3838f45969228a8b2054cd5baf8892db68b644) )
@@ -705,6 +733,7 @@ ROM_START( fuusenpn )
 	ROM_LOAD( "241a09.bin",   0x000200, 0x000100, CRC(79bd3e49) SHA1(ff94856d11acfba364f2d05ca955c10fbc02e265) )
 	ROM_LOAD( "241a10.bin",   0x000300, 0x000100, CRC(f7e3d8ee) SHA1(89c505873c884f9e1ec0cb113a3557d3f67943b9) )
 ROM_END
+GAME( 1994, buttobi,  0,     ddboy,    konmedal, konmedal_state, empty_init, ROT0, "Konami", "Buttobi Striker", MACHINE_NOT_WORKING)
 GAME( 1995, tsukande, 0,     tsukande, konmedal, konmedal_state, empty_init, ROT0, "Konami", "Tsukande Toru Chicchi", MACHINE_NOT_WORKING)
 GAME( 1995, ddboy,    0,     ddboy,    konmedal, konmedal_state, empty_init, ROT0, "Konami", "Dam Dam Boy (on dedicated PCB)", MACHINE_NOT_WORKING)
 GAME( 1995, ddboya,   ddboy, ddboy,    konmedal, konmedal_state, empty_init, ROT0, "Konami", "Dam Dam Boy (on Tsukande Toru Chicchi PCB)", MACHINE_NOT_WORKING)
