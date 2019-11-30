@@ -12,6 +12,9 @@ compressed with "chdman createhd -i 4GBSD.img -o lexibook_jg7425_4gbsd.chd" (is 
 
 TODO:
 identify CPU type and if there's any kind of additional internal boot ROM
+There are SP_Tonemaker strings in ROM, suggesting SunPlus, but it doesn't look like unSP code, maybe S+Core like Hyperscan
+(but then it doesn't have valid code at 0, maybe Internal ROM? or different boot location? - check if there is actually any S+Core code in here!)
+
 (only noteworthy features of PCB are ROM + RAM + Cpu Glob)
 
 */
