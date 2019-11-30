@@ -3754,6 +3754,7 @@ files {
 	MAME_DIR .. "src/mame/machine/xavix2002_io.h",
 	MAME_DIR .. "src/mame/drivers/xavix2.cpp",
 	MAME_DIR .. "src/mame/drivers/titan_soc.cpp",
+	MAME_DIR .. "src/mame/drivers/lexibook_jg7425.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "ultimachine")
