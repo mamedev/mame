@@ -33729,6 +33729,9 @@ sol20                           //
 @source:pturn.cpp
 pturn                           // (c) 1984 Jaleco
 
+@source:pubtimed.cpp
+pubtimed                        //
+
 @source:puckpkmn.cpp
 jzth                            //
 puckpkmn                        // (c) 2000 Genie
