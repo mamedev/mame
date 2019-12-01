@@ -1616,13 +1616,13 @@ void dp8344_device::store_result()
 	case 0x5000:
 		m_source_data |= (m_latched_instr & 0x0ff0) >> 4;
 		set_nz(m_source_data);
-		write_register(m_latched_instr & 0x000f, m_source_data + ((m_latched_instr & 0x0ff0) >> 4));
+		write_register(m_latched_instr & 0x000f, m_source_data);
 		break;
 
 	case 0x6000:
 		m_source_data ^= (m_latched_instr & 0x0ff0) >> 4;
 		set_nz(m_source_data);
-		write_register(m_latched_instr & 0x000f, m_source_data + ((m_latched_instr & 0x0ff0) >> 4));
+		write_register(m_latched_instr & 0x000f, m_source_data);
 		break;
 
 	case 0x7000:
