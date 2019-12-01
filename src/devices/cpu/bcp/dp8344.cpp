@@ -1494,8 +1494,14 @@ dp8344_device::inst_state dp8344_device::decode_instruction()
 	else if ((m_latched_instr & 0xff00) == 0xaf00)
 	{
 		// RET or RETF
-		if (BIT(m_latched_instr, 7) || get_flag(m_latched_instr & 0x0007) == BIT(m_latched_instr, 3))
-			return TX_RET;
+		if (BIT(m_latched_instr, 7))
+		{
+			address_stack_pop((m_latched_instr & 0x0060) >> 5, BIT(m_latched_instr, 4));
+			instruction_wait();
+			return T2_NEXT;
+		}
+		else if (get_flag(m_latched_instr & 0x0007) == BIT(m_latched_instr, 3))
+			return TX_RETF;
 		else
 		{
 			instruction_wait();
@@ -1832,7 +1838,7 @@ void dp8344_device::execute_run()
 			m_inst_state = T2_NEXT;
 			break;
 
-		case TX_RET:
+		case TX_RETF:
 			address_stack_pop((m_latched_instr & 0x0060) >> 5, BIT(m_latched_instr, 4));
 			instruction_wait();
 			m_inst_state = T2_NEXT;
