@@ -48,6 +48,8 @@ void telex1192_state::inst_map(address_map &map)
 
 void telex1192_state::data_map(address_map &map)
 {
+	map.unmap_value_high();
+	map(0x0000, 0x7fff).ram();
 	map(0xa000, 0xa7ff).ram().share("nvram");
 }
 
