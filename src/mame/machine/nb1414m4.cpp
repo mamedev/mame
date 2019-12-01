@@ -46,7 +46,9 @@ nb1414m4_device::nb1414m4_device(const machine_config &mconfig, const char *tag,
 
 void nb1414m4_device::device_start()
 {
+	m_frame_count = 0;
 	m_in_game = false;
+	save_item(NAME(m_frame_count));
 	save_item(NAME(m_in_game));
 }
 
@@ -56,6 +58,7 @@ void nb1414m4_device::device_start()
 
 void nb1414m4_device::device_reset()
 {
+	m_frame_count = 0;
 	m_in_game = false;
 }
 
@@ -98,7 +101,8 @@ void nb1414m4_device::insert_coin_msg(uint8_t *vram)
 		return;
 
 	int credit_count = (vram[0xf] & 0xff);
-	uint8_t fl_cond = screen().frame_number() & 0x10; /* for insert coin "flickering" */
+	uint8_t fl_cond = (m_frame_count & 0x10) == 0; /* for insert coin "flickering" */
+	m_frame_count++;
 	uint16_t dst;
 
 	if(credit_count == 0)
@@ -118,7 +122,7 @@ void nb1414m4_device::insert_coin_msg(uint8_t *vram)
 void nb1414m4_device::credit_msg(uint8_t *vram)
 {
 	int credit_count = (vram[0xf] & 0xff);
-	uint8_t fl_cond = screen().frame_number() & 0x10; /* for insert coin "flickering" */
+	uint8_t fl_cond = (m_frame_count & 0x10) == 0; /* for insert coin "flickering" */
 	uint16_t dst;
 
 	dst = ((m_data[0x023]<<8)|(m_data[0x024]&0xff)) & 0x3fff;
