@@ -2896,6 +2896,14 @@ ROM_START( hot304 )
 	ROM_LOAD( "386-hot-304.bin", 0x10000, 0x10000, CRC(cd4ad4ec) SHA1(50f1b7a15096fff7442d575a47728ba4709b2f39))
 ROM_END
 
+// Arche Technologies Inc. KMA-300G-25 - Chipset: OPTi 82C381, 82C382, UMC206L - CPU: i386-25, FPU: socket provided - RAM: SIMM30x8, Cache: 8x5C6408-35
+// ISA8: 1, ISA16: 6, ISA16/Memory: 1 - OSC: 50.000MHz, 14.31818 MHz
+// BIOS-String: EOPG-3700-040990-K0
+ROM_START( kma300g )
+	ROM_REGION32_LE(0x20000, "bios", 0)
+	ROM_LOAD( "bios.bin", 0x10000, 0x10000, CRC(3149a4a4) SHA1(6a027ed94568a89a800360119da0c568a2a29e19))
+ROM_END
+
 
 // ***** 386sx motherboards using the OPTi 82C291 chipset
 
@@ -2969,6 +2977,11 @@ ROM_START( opti495slc )
 	// 2: BIOS-String: - Same board exists with an OPTi495XLC chip, possibly from A-Trend
 	ROM_SYSTEM_BIOS(2, "op495slc03", "OP495SLC #3") // no display
 	ROMX_LOAD( "486dlc-unknown.bin", 0x10000, 0x10000, CRC(2799e876) SHA1(ce7b421ecb27d915585c1a98bebb17cc5c2463e7), ROM_BIOS(2))
+	// 3: 364 Ver. 1.1 - Chipset: OPTi 82C495SLC, F82C206Q - CPU: AMD AM386DX-40 - RAM: 8xSIMM30, Cache: 5x14pin
+	// ISA8: 1, ISA16: 5 - BIOS: AMI 386C BIOS 1684393 - Keyboard-BIOS: AMI 386C BIOS KEYBOARD 1684393
+	// BIOS-String: 40-040A-001107-00101111-111192-OP495SLC-0 / OPTI-495SLC BIOS VER 2.1
+	ROM_SYSTEM_BIOS(3, "op495slc04", "OP495SLC #4")
+	ROMX_LOAD( "386c_mobo-364-v1.1.bin", 0x10000, 0x10000, CRC(826ec2d1) SHA1(cc13e385c6614eb654ee0669f67df51f1e1fa585), ROM_BIOS(3))
 ROM_END
 
 
@@ -3352,12 +3365,20 @@ ROM_END
 //  80486 motherboard
 //**************************************************************************
 
+// Abit 486 EISA-AE4 - Chipset: SiS 85C406, 85C411, three other SiS chips unreadable - CPU: 486, FPU socket provided - RAM: 8xSIMM30, Cache: 8x28pin
+// ISA16: 2, EISA: 6 - BIOS: Award EISA486/CU - Keyboard-BIOS: NEC KB-BIOS VER:400 JU-JET 1989 -  OSC: 50.000MHz, 14.31818MHz
+// Award Modular BIOS v4.20 / AE4 EISA SYSTEM BIOS
+ROM_START( abae4 )
+	ROM_REGION32_LE(0x20000, "bios", 0)
+	ROM_LOAD( "ae4.bin", 0x10000, 0x10000, CRC(d9cbc3c6) SHA1(eeeaef7fd188598d477897f0248c99940cd1a5d7))
+ROM_END
+
 // FIC 486 KVD - Chipset: VIA VT82C485 - CPU: 486, solder pad for 486sx present - RAM: 8xSIMM30, Cache: 4xIS61C256A-20N+1xCY7C185-20PC, 4 empty sockets (28pin)
 // ISA16: 5, ISA16/VL: 2 - BIOS: AMI 486DX ISA BIOS AA7211137 - Keyboard-BIOS: MEGA-KB-H-WP
 // BIOS-String: X0-0100-001121-00101111-021993-VIA-0
 ROM_START( fic486kvd )
 	ROM_REGION32_LE(0x20000, "bios", 0)
-	ROM_LOAD( "486kvd_aa72111137.bin", 0x10000, 0x10000, CRC(A1F1810F) SHA1(405AFBF1635C6B41343AABFEEB3CF4CDC947A5BA))
+	ROM_LOAD( "486kvd_aa72111137.bin", 0x10000, 0x10000, CRC(a1f1810f) SHA1(405afbf1635c6b41343aabfeeb3cf4cdc947a5ba))
 ROM_END
 
 // Eagle EAGLEN486 GC10A - Chipset: NEC ADC006, LGS Prime 3B 9543 - CPU: Socket 3 - RAM: 2xSIMM72, Cache: fake (not connected, marked write back)
@@ -3894,6 +3915,13 @@ ROM_END
 
 // ***** 486 motherboards using the UMC UM8498F, UM8496F chipset
 
+// Aquarius MD-4DUVC VER:2.1 - CPU: Socket 3/Overdrive - Chipset: UMC UM8496F, UM8498F - RAM: 2xSIMM72, 4xSIMM30, Cache: 9xW2457AX-15, sockets are 32pin
+// ISA16: 4, ISA16/VL: 3 - BIOS: 28/32pin - BIOS-String: 01/12/94--2C4X6H01-00 / Release 01/04/95
+ROM_START( md4duvc ) // "Memory test fail"
+	ROM_REGION32_LE(0x20000, "bios", 0)
+	ROM_LOAD( "md-4duvc.dmg", 0x10000, 0x10000, CRC(40d208bb) SHA1(c879599d2635c093fce420d1e7081631d27c621a))
+ROM_END
+
 // PC-Chips M912 - Chipset: UM8498F, UM8496F - CPU: 486 - BIOS: AMI - ISA16: 4, ISA16/VL: 3
 ROM_START( pccm912 ) // no display
 	ROM_REGION32_LE( 0x20000, "bios", 0)
@@ -4332,6 +4360,7 @@ COMP( 199?, sisrabb,   ibm5170, 0,       at386,     0,     at_state,     init_at
 COMP( 1991, fu340,     ibm5170, 0,       at386,     0,     at_state,     init_at,        "Abit",        "FU340", MACHINE_NOT_WORKING )
 COMP( 199?, alacou,    ibm5170, 0,       at386,     0,     at_state,     init_at,        "Alaris",      "Cougar", MACHINE_NOT_WORKING )
 COMP( 199?, amibaby,   ibm5170, 0,       at386,     0,     at_state,     init_at,        "AMI",         "Mark V Baby Screamer", MACHINE_NOT_WORKING )
+COMP( 199?, kma300g,   ibm5170, 0,       at386,     0,     at_state,     init_at,        "Arche Technologies Inc.", "KMA-300G-25", MACHINE_NOT_WORKING )
 COMP( 199?, isa386u30, ibm5170, 0,       at386,     0,     at_state,     init_at,        "Asus",        "ISA-386U30 REV.2.2", MACHINE_NOT_WORKING )
 COMP( 1989, isa386c,   ibm5170, 0,       at386,     0,     at_state,     init_at,        "Asus",        "ISA-386C", MACHINE_NOT_WORKING )
 COMP( 199?, tam25p2,   ibm5170, 0,       at386,     0,     at_state,     init_at,        "AUVA", "TAM/25-P2 M31720P", MACHINE_NOT_WORKING )
@@ -4364,12 +4393,14 @@ COMP( 199?, op82c392,  ibm5170, 0,       at486,     0,     at_state,     init_at
 COMP( 199?, sis85c471, ibm5170, 0,       at486,     0,     at_state,     init_at,        "<unknown>", "486 motherboards using the SiS 85C471/85C407 chipset", MACHINE_NOT_WORKING )
 COMP( 199?, um8886,    ibm5170, 0,       at486,     0,     at_state,     init_at,        "<unknown>", "486 motherboards using the UMC UM8886/UM8881 chipset", MACHINE_NOT_WORKING )
 COMP( 199?, um8498f,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "<unknown>", "486 motherboards using the UMC UM8498F, UM8496F chipset", MACHINE_NOT_WORKING )
+COMP( 199?, abae4,     ibm5170, 0,       at486,     0,     at_state,     init_at,        "Abit", "486 EISA-AE4", MACHINE_NOT_WORKING )
 COMP( 199?, abah4,     ibm5170, 0,       at486,     0,     at_state,     init_at,        "Abit", "AB-AH4", MACHINE_NOT_WORKING )
 COMP( 199?, abpb4,     ibm5170, 0,       at486,     0,     at_state,     init_at,        "Abit", "AB-PB4", MACHINE_NOT_WORKING )
 COMP( 199?, abpi4,     ibm5170, 0,       at486,     0,     at_state,     init_at,        "Abit", "AB-PI4", MACHINE_NOT_WORKING )
 COMP( 199?, abpw4,     ibm5170, 0,       at486,     0,     at_state,     init_at,        "Abit", "AB-PW4", MACHINE_NOT_WORKING )
 COMP( 199?, alator2,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "Alaris",      "Tornado 2", MACHINE_NOT_WORKING )
 COMP( 199?, mb4d33,    ibm5170, 0,       at486,     0,     at_state,     init_at,        "Aquarius System (ASI)", "MB-4D33/50NR", MACHINE_NOT_WORKING )
+COMP( 199?, md4duvc,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "Aquarius System (ASI)", "MD-4DUVC", MACHINE_NOT_WORKING )
 COMP( 199?, as496,     ibm5170, 0,       at486,     0,     at_state,     init_at,        "Arstoria",    "AS496", MACHINE_NOT_WORKING )
 COMP( 199?, a486sv2,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "Asus",        "ISA-486SV2", MACHINE_NOT_WORKING )
 COMP( 1994, a486ap4,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "Asus",        "PVI-486AP4", MACHINE_NOT_WORKING )

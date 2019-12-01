@@ -2660,6 +2660,7 @@ wpc250                          // Wang PC-250/16 (286)
 suntac303                       // motherboards using the Suntac ST62C303 chipset
 abah4                           // Abit AH4(T) motherboard (486)
 abpi4                           // Abit PI4(T) motherboard (486)
+abae4                           // Abit 486 EISA-AE4 motherboard (486)
 so4saw2                         // SOYO SY-4SAW2 motherboard (486)
 nat48pv                         // NAT48PV-1.00 VL motherboard (486)
 olyport40                       // AEG Olympia Olyport 40-21
@@ -2667,6 +2668,9 @@ micral45                        // Bull Micral 45 (286)
 epsax                           // Epson PC AX
 epsax2e                         // Epson PC AX2e
 epsax3                          // Epson PC AX3
+md4duvc							// Aquarius MD-4DUVC motherboard (486)
+kma300g							// Arche Technologies Inc. KMA-300G-25
+
 
 @source:atari_s1.cpp
 aavenger                        //
@@ -2905,6 +2909,7 @@ at586                           // 19?? AT 586
 at586x3                         // 19?? AT 586
 m55hipl                         // 19?? Micronics M55HI-Plus
 ficvt503                        // 1997 FIC VT-503
+ecssi5pi						// Elitegroup SI5PI AIO
 
 @source:atronic.cpp
 3wishrd                         // Three Wishes Red
