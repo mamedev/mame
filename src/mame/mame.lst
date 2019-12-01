@@ -2668,8 +2668,10 @@ micral45                        // Bull Micral 45 (286)
 epsax                           // Epson PC AX
 epsax2e                         // Epson PC AX2e
 epsax3                          // Epson PC AX3
-md4duvc							// Aquarius MD-4DUVC motherboard (486)
-kma300g							// Arche Technologies Inc. KMA-300G-25
+md4duvc                         // Aquarius MD-4DUVC motherboard (486)
+kma300g                         // Arche Technologies Inc. KMA-300G-25
+asc486slc                       // Computechnik ASC486SLC slot CPU (386sx)
+um8810paio                      // Elitegroup UM8810 PAIO motherboard (486)
 
 
 @source:atari_s1.cpp
@@ -2909,7 +2911,7 @@ at586                           // 19?? AT 586
 at586x3                         // 19?? AT 586
 m55hipl                         // 19?? Micronics M55HI-Plus
 ficvt503                        // 1997 FIC VT-503
-ecssi5pi						// Elitegroup SI5PI AIO
+ecssi5pi                        // Elitegroup SI5PI AIO
 
 @source:atronic.cpp
 3wishrd                         // Three Wishes Red
@@ -31897,7 +31899,7 @@ kyoxt                           // Kyocera XT
 laser_turbo_xt                  // 1988 VTech Laser Turbo XT
 laser_xt3                       // 1989 VTech Laser XT/3
 mbc16                           // Sanyo MBC-16
-spc400d							// Sanyo SPC-400D
+spc400d                         // Sanyo SPC-400D
 mpc1600                         // Columbia Data Products MPC 1600
 mc1702                          //
 mk88                            //
@@ -31920,7 +31922,7 @@ eaglepc2                        // Eagle PC-2
 mpx16                           // Ciarcia's Circuit Cellar Micromint MPX-16
 hstrtpls                        // Vendex HeadStart Plus
 nms9100                         // Philips NMS 9100 series
-to16							// Thomson TO16
+to16                            // Thomson TO16
 
 @source:pc100.cpp
 pc100                           //
