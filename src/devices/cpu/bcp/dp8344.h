@@ -82,9 +82,18 @@ protected:
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
 
+	// device_state_interface overrides
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
+
 private:
+	enum inst_state : u8 {
+		T1_DECODE, T1_START, T1_SKIP, T1_LJMP, T1_LCALL,
+		TX_READ, TX_WRITE,
+		TX1_JRMK, TX1_JMP, TX2_JMP, TX_CALL, TX_RET,
+		T2_NEXT, T2_STORE, T2_READ, T2_WRITE, T2_ABSOLUTE
+	};
+
 	// internal functions
-	bool get_flag(unsigned f) const;
 	void set_receiver_interrupt(bool state);
 	void set_transmitter_interrupt(bool state);
 	void set_line_turn_around_interrupt(bool state);
@@ -94,9 +103,17 @@ private:
 	void set_condition_code(u8 data);
 	void set_interrupt_control(u8 data);
 	void set_auxiliary_control(u8 data);
+	bool interrupt_active() const;
+	u8 get_interrupt_vector() const;
+	bool get_flag(unsigned f) const;
+	void set_nz(u8 result);
+	void set_carry(bool state);
+	static u8 rotate_right(u8 data, u8 b);
+	u8 add_nzcv(u8 s1, u8 s2, bool carry_in);
+	u8 sub_nzcv(u8 s1, u8 s2, bool carry_in);
 	u16 get_timer_count();
 	void address_stack_push();
-	void address_stack_pop(u8 grf);
+	void address_stack_pop(u8 g, bool rf);
 	void set_stack_pointer(u8 data);
 	void data_stack_push(u8 data);
 	u8 data_stack_pop();
@@ -114,6 +131,13 @@ private:
 	u8 read_register(unsigned reg);
 	u8 read_accumulator() const;
 	void write_register(unsigned reg, u8 data);
+	void prefetch_instruction();
+	void latch_address(bool rw);
+	void instruction_wait();
+	inst_state decode_instruction();
+	void store_result();
+	void data_write();
+	void data_read();
 
 	// address spaces
 	const address_space_config m_inst_config;
@@ -130,8 +154,13 @@ private:
 
 	// execution state
 	u16 m_pc;
+	u16 m_ppc;
 	s32 m_icount;
 	bool m_nmi_pending;
+	inst_state m_inst_state;
+	u8 m_wait_states;
+	u8 m_source_data;
+	u16 m_data_address;
 
 	// control registers
 	u8 m_ccr;
@@ -152,7 +181,7 @@ private:
 	u8 m_gp_alt[4];
 
 	// index registers
-	PAIR16 m_ir[4];
+	u16 m_ir[4];
 
 	// timer registers
 	u16 m_tr;
