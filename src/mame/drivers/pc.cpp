@@ -1413,6 +1413,15 @@ ROM_START( to16 )
 	ROM_LOAD("to16_103.bin", 0x8000, 0x8000, CRC(a2d55e16) SHA1(fcc61bbfe49164c4b79c368fb782d1ecc17e0a42))
 ROM_END
 
+/********************************************************** Sanyo SPC-400D ***
+ROM BIOS Version 1.18
+*****************************************************************************/
+
+ROM_START( spc400d )
+	ROM_REGION(0x10000, "bios", 0)
+	ROM_LOAD("fb896.u6", 0xc000, 0x4000, CRC(a6f3ad8c) SHA1(1ee012f9a1757eb68150fedc9db16ff356722f72))
+ROM_END
+
 /***************************************************************************
 
   Game driver(s)
@@ -1454,6 +1463,7 @@ COMP( 198?, nms9100,        ibm5150, 0,      pccga,          pccga,    pc_state,
 COMP( 1989, ssam88s,        ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Samsung",                         "Samtron 88S",           MACHINE_NOT_WORKING )
 COMP( 1988, sx16,           ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Sanyo",                           "SX-16",                 MACHINE_NOT_WORKING )
 COMP( 198?, mbc16,          ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Sanyo",                           "MBC-16",                MACHINE_NOT_WORKING )
+COMP( 198?, spc400d,        ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Sanyo",                           "SPC-400D",              MACHINE_NOT_WORKING )
 COMP( 1992, iskr3104,       ibm5150, 0,      iskr3104,       pccga,    pc_state, empty_init,    "Schetmash",                       "Iskra 3104",            MACHINE_NOT_WORKING )
 COMP( 1985, sicpc1605,      ibm5150, 0,      siemens,        pccga,    pc_state, empty_init,    "Siemens",                         "Sicomp PC16-05",        MACHINE_NOT_WORKING )
 COMP( 1985, pc7000,         ibm5150, 0,      eagle1600,      pccga,    pc_state, empty_init,    "Sharp",                           "PC-7000",               MACHINE_NOT_WORKING )
