@@ -1653,7 +1653,8 @@ void dp8344_device::store_result()
 
 		case 0x900:
 			set_carry(BIT(m_source_data, (m_latched_instr & 0x00e0) >> 5));
-			m_source_data <<= 8 - ((m_latched_instr & 0x00e0) >> 5);
+			if ((m_latched_instr & 0x00e0) != 0)
+				m_source_data <<= 8 - ((m_latched_instr & 0x00e0) >> 5);
 			set_nz(m_source_data);
 			write_register(m_latched_instr & 0x001f, m_source_data);
 			break;
