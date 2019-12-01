@@ -14543,6 +14543,7 @@ glasskr                         // (c) 1994 - Ref 931021 shows 1994 version, Ani
 bs9009cx                        // 1999 BrainStation 9009 CXL (Germany)
 gl6600cx                        // 1999 Genius Leader 6600 CX (Germany)
 gl8008cx                        // 1999 Genius Leader 8008 CX (Germany)
+gtbmcx                          // 2000 Genius Tabletop Black Magic CX (Germany)
 
 @source:globalfr.cpp
 gl_coc                          // Carry On Clubbin' (Global)
