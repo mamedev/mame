@@ -186,7 +186,7 @@ private:
 	DECLARE_WRITE8_MEMBER(trace_timer_w);
 	DECLARE_READ8_MEMBER(trace_timer_r);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<m6802_cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_memory_bank m_ram_bank;
 	required_device<input_merger_device> m_mainirq;
@@ -970,6 +970,7 @@ DEVICE_INPUT_DEFAULTS_END
 void mekd3_state::mekd3(machine_config &config)
 {
 	M6802(config, m_maincpu, XTAL_MEKD3);        // 894.8 kHz clock
+	m_maincpu->set_ram_enable(false);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mekd3_state::mekd3_mem);
 
 	RAM(config, m_ram).set_default_size("256K").set_default_value(0);

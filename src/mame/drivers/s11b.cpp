@@ -313,6 +313,7 @@ void s11b_state::s11b(machine_config &config)
 
 	/* Add the soundcard */
 	M6802(config, m_audiocpu, XTAL(4'000'000));
+	m_audiocpu->set_ram_enable(false);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &s11b_state::s11b_audio_map);
 
 	SPEAKER(config, "speaker").front_center();

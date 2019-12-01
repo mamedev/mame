@@ -31,7 +31,6 @@ private:
 
 void pubtimed_state::mem_map(address_map &map)
 {
-	map(0x0000, 0x007f).ram();
 	map(0x0800, 0x080f).ram(); // LCD segment driver?
 	map(0x0820, 0x083f).ram(); // LCD segment driver?
 	map(0x4000, 0x4000).portr("UNKNOWN");

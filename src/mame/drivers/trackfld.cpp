@@ -1032,7 +1032,6 @@ void trackfld_state::yieartf(machine_config &config)
 
 void trackfld_state::hyprolyb_adpcm_map(address_map &map)
 {
-	map(0x0000, 0x007f).ram();
 	map(0x1000, 0x1000).r("hyprolyb_adpcm", FUNC(hyprolyb_adpcm_device::data_r));
 	map(0x1001, 0x1001).r("hyprolyb_adpcm", FUNC(hyprolyb_adpcm_device::ready_r));
 	map(0x1002, 0x1002).w("hyprolyb_adpcm", FUNC(hyprolyb_adpcm_device::msm_data_w));

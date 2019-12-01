@@ -876,7 +876,6 @@ void _8080bw_state::invrvnge_io_map(address_map &map)
 
 void _8080bw_state::invrvnge_sound_map(address_map &map)
 {
-	map(0x0000, 0x007f).ram(); // inside CPU
 	map(0xa001, 0xa001).r("psg",FUNC(ay8910_device::data_r));
 	map(0xa002, 0xa003).w("psg",FUNC(ay8910_device::data_address_w));
 	map(0xc000, 0xc7ff).mirror(0x1800).rom();

@@ -368,12 +368,19 @@ class m6802_cpu_device : public m6800_cpu_device
 public:
 	m6802_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	void set_ram_enable(bool re) { assert(!configured()); m_ram_enable = re; }
+
 protected:
 	m6802_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const m6800_cpu_device::op_func *insn, const uint8_t *cycles);
 
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 4 - 1) / 4; }
 	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * 4); }
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+
+	bool m_ram_enable;
+
+private:
+	void ram_map(address_map &map);
 };
 
 
@@ -384,6 +391,7 @@ public:
 
 protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+	virtual void device_validity_check(validity_checker &valid) const override;
 };
 
 
