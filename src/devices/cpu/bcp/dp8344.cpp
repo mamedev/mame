@@ -1207,6 +1207,7 @@ void dp8344_device::write_register(unsigned reg, u8 data)
 			logerror("Transceiver Status Register is read-only\n");
 		else
 			m_gp_main[1] = data;
+		break;
 
 	case 6: // GP2 (main) or Transceiver Command Register (alternate)
 		if (m_bb)
