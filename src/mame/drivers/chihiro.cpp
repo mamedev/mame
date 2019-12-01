@@ -2189,8 +2189,8 @@ ROM_START( ghostsqo )
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdx-0012", 0, SHA1(ad5d08cc3b8cfd0890feb152670b429c28659512) )
 
-	ROM_REGION( 0x50, "pic", ROMREGION_ERASE)
-	ROM_LOAD("317-0398-com.data", 0x00, 0x50, CRC(8c5391a2) SHA1(e64cadeb30c94c3cd4002630cd79cc76c7bde2ed) )
+	ROM_REGION( 0x4010, "pic", ROMREGION_ERASE)
+	ROM_LOAD("317-0398-com.pic", 0x00, 0x4010, CRC(0b9dfe4b) SHA1(eaa6663cfc49a7bda0ee60844f9d710c99a2b48a) )
 ROM_END
 
 /*
@@ -2203,9 +2203,8 @@ Product Number    GDX-0012A
 Version           V2.000
 Release Date      20041209
 Manufacturer ID
-BHU.BIN
-970efe79ce32ab4a
-PIC
+
+PIC16C621A-20/P
 253-5508-0398
 317-0398-COM
 */
@@ -2215,8 +2214,8 @@ ROM_START( ghostsqu )
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdx-0012a", 0, SHA1(d14adac9cdfd8095362fa9600c50bf038d4e5a99) )
 
-	ROM_REGION( 0x50, "pic", ROMREGION_ERASE)
-	ROM_LOAD("317-0398-com.data", 0x00, 0x50, CRC(8c5391a2) SHA1(e64cadeb30c94c3cd4002630cd79cc76c7bde2ed) )
+	ROM_REGION( 0x4010, "pic", ROMREGION_ERASE)
+	ROM_LOAD("317-0398-com.pic", 0x00, 0x4010, CRC(0b9dfe4b) SHA1(eaa6663cfc49a7bda0ee60844f9d710c99a2b48a) )
 ROM_END
 
 ROM_START( gundamos )

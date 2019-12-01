@@ -144,7 +144,7 @@ private:
 	uint8_t m_digit;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	required_device<cpu_device> m_maincpu;
+	required_device<m6802_cpu_device> m_maincpu;
 	required_device<pia6821_device> m_kpd_pia;
 	required_device<pia6821_device> m_user_pia;
 	required_device<pwm_display_device> m_display;
@@ -458,6 +458,7 @@ DEVICE_INPUT_DEFAULTS_END
 void mekd5_state::mekd5(machine_config &config)
 {
 	M6802(config, m_maincpu, XTAL_MEKD5);        /* 894.8 kHz clock */
+	m_maincpu->set_ram_enable(false);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mekd5_state::mekd5_mem);
 
 	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, M6802_IRQ_LINE);

@@ -55,7 +55,6 @@ void barni_state::subcpu_map(address_map &map)
 
 void barni_state::audiocpu_map(address_map &map)
 {
-	map(0x0000, 0x007f).ram();
 	map(0xc000, 0xffff).rom();
 }
 

@@ -14543,6 +14543,7 @@ glasskr                         // (c) 1994 - Ref 931021 shows 1994 version, Ani
 bs9009cx                        // 1999 BrainStation 9009 CXL (Germany)
 gl6600cx                        // 1999 Genius Leader 6600 CX (Germany)
 gl8008cx                        // 1999 Genius Leader 8008 CX (Germany)
+gtbmcx                          // 2000 Genius Tabletop Black Magic CX (Germany)
 
 @source:globalfr.cpp
 gl_coc                          // Carry On Clubbin' (Global)
@@ -18847,6 +18848,9 @@ franticf                        // (c) 1996 The Game Room
 lethalj                         // (c) 1996 The Game Room
 ripribit                        // (c) 1997 LAI Games
 ripribita                       // (c) 1997 LAI Games
+
+@source:lexibook_jg7425.cpp
+lx_jg7425
 
 @source:lft.cpp
 lft1230                         //
@@ -33725,6 +33729,9 @@ sol20                           //
 @source:pturn.cpp
 pturn                           // (c) 1984 Jaleco
 
+@source:pubtimed.cpp
+pubtimed                        //
+
 @source:puckpkmn.cpp
 jzth                            //
 puckpkmn                        // (c) 2000 Genie
@@ -39594,6 +39601,7 @@ vii                             // KenSingTon / Jungle Soft / Siatronics Vii
 wirels60                        // Wireless 60
 zone40                          // Zone 40
 zone60                          // Zone 60
+lx_jg7415                       //
 rad_skat                        //
 rad_skatp                       //
 rad_sktv                        //

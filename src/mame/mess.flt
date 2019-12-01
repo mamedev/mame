@@ -371,6 +371,7 @@ ibmpcjr.cpp
 icatel.cpp
 icebox.cpp
 ie15.cpp
+lx_jg7425.cpp
 if800.cpp
 ikt5a.cpp
 imds2.cpp
@@ -436,6 +437,7 @@ leapfrog_leappad.cpp
 leapster.cpp
 learnwin.cpp
 lee1214.cpp
+lexibook_jg7425.cpp
 lft.cpp
 lg-dvd.cpp
 lilith.cpp

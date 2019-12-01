@@ -276,6 +276,7 @@ void tdv2324_state::tdv2324(machine_config &config)
 	m_subcpu->set_addrmap(AS_IO, &tdv2324_state::tdv2324_sub_io);
 
 	M6802(config, m_fdccpu, 8000000/2); // ???
+	m_fdccpu->set_ram_enable(false);
 	m_fdccpu->set_addrmap(AS_PROGRAM, &tdv2324_state::tdv2324_fdc_mem);
 
 	// video hardware

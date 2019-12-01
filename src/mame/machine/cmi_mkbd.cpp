@@ -305,7 +305,6 @@ WRITE_LINE_MEMBER( cmi_music_keyboard_device::kbd_cts_w )
 void cmi_music_keyboard_device::muskeys_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x007f).ram();
 	map(0x0080, 0x0083).rw(m_cmi10_pia_u21, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x0090, 0x0093).rw(m_cmi10_pia_u20, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x00a0, 0x00a1).rw(m_acia_kbd, FUNC(acia6850_device::read), FUNC(acia6850_device::write));

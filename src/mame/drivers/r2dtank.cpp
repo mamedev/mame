@@ -348,7 +348,6 @@ void r2dtank_state::r2dtank_main_map(address_map &map)
 
 void r2dtank_state::r2dtank_audio_map(address_map &map)
 {
-	map(0x0000, 0x007f).ram();     /* internal RAM */
 	map(0xd000, 0xd003).rw("pia_audio", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0xf000, 0xf000).rw(FUNC(r2dtank_state::audio_command_r), FUNC(r2dtank_state::audio_answer_w));
 	map(0xf800, 0xffff).rom();

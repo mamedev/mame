@@ -242,7 +242,6 @@ void by35_state::by35_map(address_map &map)
 void by35_state::nuovo_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram().share("nvram");
-//  map(0x0000, 0x007f).ram();     // Schematics infer that the M6802 internal RAM is disabled.
 	map(0x0088, 0x008b).rw(m_pia_u10, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x0090, 0x0093).rw(m_pia_u11, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x1000, 0xffff).rom();
@@ -1502,8 +1501,9 @@ void by35_state::nuovo(machine_config &config)
 {
 	by35(config);
 
-	M6802(config.replace(), m_maincpu, 2000000); // ? MHz ?  Large crystal next to CPU, schematics don't indicate speed.
-	m_maincpu->set_addrmap(AS_PROGRAM, &by35_state::nuovo_map);
+	m6802_cpu_device &maincpu(M6802(config.replace(), m_maincpu, 2000000)); // ? MHz ?  Large crystal next to CPU, schematics don't indicate speed.
+	maincpu.set_addrmap(AS_PROGRAM, &by35_state::nuovo_map);
+	maincpu.set_ram_enable(false); // Schematics imply that the M6802 internal RAM is disabled.
 }
 
 void by35_state::as2888(machine_config &config)
