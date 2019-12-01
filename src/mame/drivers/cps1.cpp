@@ -1497,6 +1497,64 @@ static INPUT_PORTS_START( ffight )
 	PORT_DIPSETTING(    0x00, DEF_STR( Test ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( ffightae )
+	PORT_INCLUDE( cps1_3players )
+	
+	PORT_START("DSWA")
+	CPS1_COINAGE_1( "SW(A)" )
+	PORT_DIPNAME( 0x40, 0x40, "2 Coins to Start, 1 to Continue" )   PORT_DIPLOCATION("SW(A):7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW(A):8" )
+
+	PORT_START("DSWB")
+	PORT_DIPNAME( 0x07, 0x04, "Difficulty Level 1" )                PORT_DIPLOCATION("SW(B):1,2,3")
+	PORT_DIPSETTING(    0x07, DEF_STR( Easiest ) )      // "01"
+	PORT_DIPSETTING(    0x06, DEF_STR( Easier ) )       // "02"
+	PORT_DIPSETTING(    0x05, DEF_STR( Easy ) )         // "03"
+	PORT_DIPSETTING(    0x04, DEF_STR( Normal ) )       // "04"
+	PORT_DIPSETTING(    0x03, DEF_STR( Medium ) )       // "05"
+	PORT_DIPSETTING(    0x02, DEF_STR( Hard ) )         // "06"
+	PORT_DIPSETTING(    0x01, DEF_STR( Harder ) )       // "07"
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )      // "08"
+	PORT_DIPNAME( 0x18, 0x10, "Difficulty Level 2" )                PORT_DIPLOCATION("SW(B):4,5")
+	PORT_DIPSETTING(    0x18, DEF_STR( Easy ) )         // "01"
+	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )       // "02"
+	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )         // "03"
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )      // "04"
+	PORT_DIPNAME( 0x60, 0x60, DEF_STR( Bonus_Life ) )               PORT_DIPLOCATION("SW(B):6,7")
+	PORT_DIPSETTING(    0x60, "100k" )
+	PORT_DIPSETTING(    0x40, "200k" )
+	PORT_DIPSETTING(    0x20, "100k and every 200k" )
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW(B):8" )
+
+	PORT_START("DSWC")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )                    PORT_DIPLOCATION("SW(C):1,2")
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x03, "2" )
+	PORT_DIPSETTING(    0x02, "3" )
+	PORT_DIPSETTING(    0x01, "4" )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Free_Play ) )                PORT_DIPLOCATION("SW(C):3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Freeze" )                            PORT_DIPLOCATION("SW(C):4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Flip_Screen ) )              PORT_DIPLOCATION("SW(C):5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) )              PORT_DIPLOCATION("SW(C):6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Allow_Continue ) )           PORT_DIPLOCATION("SW(C):7")
+	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x80, 0x80, "Game Mode")                          PORT_DIPLOCATION("SW(C):8")
+	PORT_DIPSETTING(    0x80, "Game" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Test ) )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( 1941 )
 	PORT_INCLUDE( cps1_2b )
 
@@ -5500,6 +5558,37 @@ ROM_START( ffightjh )
 
 	ROM_REGION( 0x0200, "cboardplds", 0 )
 	ROM_LOAD( "ioc1.ic1",     0x0000, 0x0104, CRC(a399772d) SHA1(55471189db573dd61e3087d12c55564291672c77) )
+ROM_END
+
+ROM_START( ffightae )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
+	ROM_LOAD16_WORD_SWAP( "ff-23m.8h", 0x00000, 0x80000, CRC(86DEF74F) SHA1(5206cc13bfe40fb4f9c3677629aee89099623ee6) )
+	ROM_LOAD16_WORD_SWAP( "ff-22m.7h", 0x80000, 0x80000, CRC(CBDD8689) SHA1(a75918ee837dfccdd4fd02b716928a2de2003103) )
+
+	ROM_REGION( 0x200000, "gfx", 0 )
+	ROM_LOAD64_WORD( "ff-5m.7a", 0x000000, 0x80000, CRC(91A909BD) SHA1(09621cb33a9c26798b1bba186dceb02e5f126e1a) )
+	ROM_LOAD64_WORD( "ff-7m.9a", 0x000002, 0x80000, CRC(89F8B4CD) SHA1(c169c445686d3c79eae2dc42460b8194c491ccb0) )
+	ROM_LOAD64_WORD( "ff-1m.3a", 0x000004, 0x80000, CRC(D5469303) SHA1(0c1e33a87eb3ef79e6a5ba80753eb495284e666c) )
+	ROM_LOAD64_WORD( "ff-3m.5a", 0x000006, 0x80000, CRC(0C6302BF) SHA1(03ee13a67a8a3b92fac462623ace752d77b9e9f1) )
+
+	ROM_REGION( 0x18000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "ff_09.12b", 0x00000, 0x08000, CRC(b8367eb5) SHA1(ec3db29fdd6200e9a8f4f8073a7e34aef731354f) )
+	ROM_CONTINUE(          0x10000, 0x08000 )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "ff_18.11c", 0x00000, 0x20000, CRC(375c66e7) SHA1(36189e23209ce4ae5d9cbabd1574540d0591e7b3) )
+	ROM_LOAD( "ff_19.12c", 0x20000, 0x20000, CRC(1ef137f9) SHA1(974b5e72aa28b87ebfa7438efbdfeda769dedf5e) )
+
+	ROM_REGION( 0x0200, "aboardplds", 0 )
+	ROM_LOAD( "buf1",         0x0000, 0x0117, CRC(eb122de7) SHA1(b26b5bfe258e3e184f069719f9fd008d6b8f6b9b) )
+	ROM_LOAD( "ioa1",         0x0000, 0x0117, CRC(59c7ee3b) SHA1(fbb887c5b4f5cb8df77cec710eaac2985bc482a6) )
+	ROM_LOAD( "prg1",         0x0000, 0x0117, CRC(f1129744) SHA1(a5300f301c1a08a7da768f0773fa0fe3f683b237) )
+	ROM_LOAD( "rom1",         0x0000, 0x0117, CRC(41dc73b9) SHA1(7d4c9f1693c821fbf84e32dd6ef62ddf14967845) )
+	ROM_LOAD( "sou1",         0x0000, 0x0117, CRC(84f4b2fe) SHA1(dcc9e86cc36316fe42eace02d6df75d08bc8bb6d) )
+
+	ROM_REGION( 0x0200, "bboardplds", 0 )
+	ROM_LOAD( "s224b.1a",     0x0000, 0x0117, CRC(cdc4413e) SHA1(c74c60f8f4eb125ffb6414aefba270676d9b8a2d) )
+	ROM_LOAD( "iob1.11e",     0x0000, 0x0117, CRC(3abc0700) SHA1(973043aa46ec6d5d1db20dc9d5937005a0f9f6ae) )
 ROM_END
 
 /* B-Board 89624B-3 */
@@ -13502,6 +13591,7 @@ GAME( 1989, ffightj2,    ffight,   cps1_10MHz, ffight,   cps_state, init_cps1,  
 GAME( 1989, ffightj3,    ffight,   cps1_10MHz, ffight,   cps_state, init_cps1,     ROT0,   "Capcom", "Final Fight (Japan 900405)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, ffightj4,    ffight,   cps1_10MHz, ffight,   cps_state, init_cps1,     ROT0,   "Capcom", "Final Fight (Japan 900613)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, ffightjh,    ffight,   cps1_10MHz, ffight,   cps_state, init_cps1,     ROT0,   "bootleg", "Street Smart / Final Fight (Japan, hack)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, ffightae,    0,        cps1_12MHz, ffightae, cps_state, init_cps1,     ROT0,   "bootleg", "Final Fight 30th Anniversary Edition", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, 1941,        0,        cps1_10MHz, 1941,     cps_state, init_cps1,     ROT270, "Capcom", "1941: Counter Attack (World 900227)", MACHINE_SUPPORTS_SAVE )   // "ETC"
 GAME( 1990, 1941r1,      1941,     cps1_10MHz, 1941,     cps_state, init_cps1,     ROT270, "Capcom", "1941: Counter Attack (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, 1941u,       1941,     cps1_10MHz, 1941,     cps_state, init_cps1,     ROT270, "Capcom", "1941: Counter Attack (USA 900227)", MACHINE_SUPPORTS_SAVE )
