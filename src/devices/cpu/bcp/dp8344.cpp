@@ -672,7 +672,7 @@ void dp8344_device::address_stack_pop(u8 g, bool rf)
 
 	// Optionally restore, set or clear GIE
 	if (BIT(g, 1))
-		set_gie(BIT(g, 0));
+		set_gie(!BIT(g, 0));
 	else if (BIT(g, 0))
 		set_gie(BIT(m_as[m_asp], 22));
 
@@ -1487,7 +1487,7 @@ dp8344_device::inst_state dp8344_device::decode_instruction()
 		m_ba = BIT(m_latched_instr, 4);
 		m_bb = BIT(m_latched_instr, 3);
 		if (BIT(m_latched_instr, 6))
-			set_gie(BIT(m_latched_instr, 5));
+			set_gie(!BIT(m_latched_instr, 5));
 		instruction_wait();
 		return T2_NEXT;
 	}
