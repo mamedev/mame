@@ -46,6 +46,8 @@ nb1414m4_device::nb1414m4_device(const machine_config &mconfig, const char *tag,
 
 void nb1414m4_device::device_start()
 {
+	m_in_game = false;
+	save_item(NAME(m_in_game));
 }
 
 //-------------------------------------------------
@@ -54,6 +56,7 @@ void nb1414m4_device::device_start()
 
 void nb1414m4_device::device_reset()
 {
+	m_in_game = false;
 }
 
 /*****************************************************************************
@@ -91,6 +94,9 @@ void nb1414m4_device::fill(uint16_t dst, uint8_t tile, uint8_t pal, uint8_t *vra
 
 void nb1414m4_device::insert_coin_msg(uint8_t *vram)
 {
+	if (m_in_game)
+		return;
+
 	int credit_count = (vram[0xf] & 0xff);
 	uint8_t fl_cond = screen().frame_number() & 0x10; /* for insert coin "flickering" */
 	uint16_t dst;
@@ -122,6 +128,9 @@ void nb1414m4_device::credit_msg(uint8_t *vram)
 	dst++; // m_data is 0x5e, needs to be 0x5f ...
 	vram[dst+0x000] = (credit_count + 0x30); /* credit num */
 	vram[dst+0x400] = (m_data[0x48]);
+
+	if (m_in_game)
+		return;
 
 	if(credit_count == 1) /* ONE PLAYER ONLY */
 	{
@@ -168,15 +177,16 @@ void nb1414m4_device::kozure_score_msg(uint16_t dst, uint8_t src_base, uint8_t *
 void nb1414m4_device::_0200(uint16_t mcu_cmd, uint8_t *vram)
 {
 	uint16_t dst;
+	m_in_game = mcu_cmd & 0x80;
 
 	dst = (m_data[0x330+((mcu_cmd & 0xf)*2)]<<8)|(m_data[0x331+((mcu_cmd & 0xf)*2)]&0xff);
 
 	dst &= 0x3fff;
 
 	if(dst & 0x7ff) // fill
-		fill(0x0000,m_data[dst & 0x3fff],m_data[dst+1],vram);
+		fill(0x0000,m_data[dst],m_data[dst+1],vram);
 	else // src -> dst
-		dma(dst & 0x3fff,0x0000,0x400,1,vram);
+		dma(dst,0x0000,0x400,1,vram);
 }
 
 /*
@@ -271,24 +281,23 @@ void nb1414m4_device::_0e00(uint16_t mcu_cmd, uint8_t *vram)
 	dst = ((m_data[0xdf]<<8)|(m_data[0xe0]&0xff)) & 0x3fff;
 	dma(0x00e1,dst,8,1,vram); /* hi-score */
 
-	if(mcu_cmd & 0x04)
+	dst = ((m_data[0xfb]<<8)|(m_data[0xfc]&0xff)) & 0x3fff;
+	dma(0x00fd,dst,8,!(mcu_cmd & 1),vram); /* 1p-msg */
+	dst = ((m_data[0x10d]<<8)|(m_data[0x10e]&0xff)) & 0x3fff;
+	kozure_score_msg(dst,0,vram); /* 1p score */
+
+	if(mcu_cmd & 0x80)
 	{
-		dst = ((m_data[0xfb]<<8)|(m_data[0xfc]&0xff)) & 0x3fff;
-		dma(0x00fd,dst,8,!(mcu_cmd & 1),vram); /* 1p-msg */
-		dst = ((m_data[0x10d]<<8)|(m_data[0x10e]&0xff)) & 0x3fff;
-		kozure_score_msg(dst,0,vram); /* 1p score */
-		if(mcu_cmd & 0x80)
-		{
-			dst = ((m_data[0x117]<<8)|(m_data[0x118]&0xff)) & 0x3fff;
-			dma(0x0119,dst,8,!(mcu_cmd & 2),vram); /* 2p-msg */
-			dst = ((m_data[0x129]<<8)|(m_data[0x12a]&0xff)) & 0x3fff;
-			kozure_score_msg(dst,1,vram); /* 2p score */
-		}
+		dst = ((m_data[0x117]<<8)|(m_data[0x118]&0xff)) & 0x3fff;
+		dma(0x0119,dst,8,!(mcu_cmd & 2),vram); /* 2p-msg */
+		dst = ((m_data[0x129]<<8)|(m_data[0x12a]&0xff)) & 0x3fff;
+		kozure_score_msg(dst,1,vram); /* 2p score */
 	}
-	else
+
+	if((mcu_cmd & 0x04) == 0)
 	{
 		dst = ((m_data[0x133]<<8)|(m_data[0x134]&0xff)) & 0x3fff;
-		dma(0x0135,dst,0x10,!(mcu_cmd & 1),vram); /* game over */
+		dma(0x0135,dst,0x10,1,vram); /* game over */
 		insert_coin_msg(vram);
 		if((mcu_cmd & 0x18) == 0) // TODO: either one of these two disables credit display
 			credit_msg(vram);
