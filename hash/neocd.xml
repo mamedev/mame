@@ -426,6 +426,7 @@
 	</software>
 
 	<!-- Hangs during loading due to erasing vectors -->
+	<!-- TODO: user reports indicate this is a bad dump (also hangs in FBA) and CHDs made from other sources play fine in MAME -->
 	<software name="doubledr" supported="no">
 		<description>Double Dragon (Jpn, USA)</description>
 		<year>1995</year>
