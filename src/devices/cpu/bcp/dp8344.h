@@ -41,7 +41,7 @@ public:
 		BCP_IW, BCP_IX, BCP_IY, BCP_IZ,
 		BCP_IWLO, BCP_IXLO, BCP_IYLO, BCP_IZLO,
 		BCP_IWHI, BCP_IXHI, BCP_IYHI, BCP_IZHI,
-		BCP_TR,
+		BCP_TR, BCP_COUNT,
 		BCP_ASP, BCP_DSP
 	};
 
@@ -112,7 +112,7 @@ private:
 	static u8 rotate_right(u8 data, u8 b);
 	u8 add_nzcv(u8 s1, u8 s2, bool carry_in);
 	u8 sub_nzcv(u8 s1, u8 s2, bool carry_in);
-	u16 get_timer_count();
+	void timer_count();
 	void address_stack_push();
 	void address_stack_pop(u8 g, bool rf);
 	void set_stack_pointer(u8 data);
@@ -187,6 +187,8 @@ private:
 
 	// timer registers
 	u16 m_tr;
+	u8 m_tclk;
+	u16 m_tcount;
 
 	// internal stacks
 	u32 m_as[12];

@@ -95,6 +95,8 @@ dp8344_device::dp8344_device(const machine_config &mconfig, device_type type, co
 	, m_gp_alt{0, 0, 0, 0}
 	, m_ir{0, 0, 0, 0}
 	, m_tr(0)
+	, m_tclk(0)
+	, m_tcount(0)
 	, m_as{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 	, m_ds{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 	, m_asp(0)
@@ -214,6 +216,7 @@ void dp8344_device::device_start()
 	for (int i = 8; i < 16; i++)
 		state_add(BCP_GP8 + i - 8, string_format("GP%d", i).c_str(), m_gp_main[i]);
 	state_add(BCP_TR, "TR", m_tr);
+	state_add(BCP_COUNT, "COUNT", m_tcount);
 	state_add(BCP_ASP, "ASP", m_asp).mask(0xf);
 	state_add(BCP_DSP, "DSP", m_dsp).mask(0xf);
 
@@ -237,6 +240,8 @@ void dp8344_device::device_start()
 	save_item(NAME(m_gp_alt));
 	save_item(NAME(m_ir));
 	save_item(NAME(m_tr));
+	save_item(NAME(m_tclk));
+	save_item(NAME(m_tcount));
 	save_item(NAME(m_asp));
 	save_item(NAME(m_dsp));
 	save_item(NAME(m_as)); // 12-word Address Stack
@@ -483,7 +488,7 @@ void dp8344_device::set_auxiliary_control(u8 data)
 	else if (BIT(data, 7) && !BIT(m_acr, 7))
 	{
 		unsigned prescale = (BIT(m_dcr, 7) ? 2 : 1) * (BIT(data, 5) ? 2 : 16);
-		logerror("%04X: Timer Start (TO Period = %.2f kHz)\n",
+		logerror("%04X: Timer Start (TO Period = %.3f kHz)\n",
 			m_ppc,
 			clocks_to_attotime(prescale * (m_tr == 0 ? 65536 : m_tr)).as_khz());
 	}
@@ -491,6 +496,7 @@ void dp8344_device::set_auxiliary_control(u8 data)
 	if (BIT(data, 6))
 	{
 		logerror("%04X: Timer Load (TR = %d)\n", m_ppc, m_tr);
+		m_tcount = m_tr;
 
 		// TODO: only cleared when load pulse finishes
 		data &= 0xbf;
@@ -510,12 +516,12 @@ void dp8344_device::set_device_control(u8 data)
 	if ((data & 0xe0) != (m_dcr & 0xe0))
 	{
 		if ((data & 0x60) == 0x60)
-			logerror("%04X: CPU Clock = OCLK%s (%.3f MHz); Transceiver Clock = X-TCLK\n",
+			logerror("%04X: CPU Clock = OCLK%s (%.4f MHz); Transceiver Clock = X-TCLK\n",
 				m_ppc,
 				BIT(data, 7) ? "/2" : "",
 				clocks_to_attotime(BIT(data, 7) ? 2 : 1).as_mhz());
 		else
-			logerror("%04X: CPU Clock = OCLK%s (%.3f MHz); Transceiver Clock = OCLK%s (%.3f MHz)\n",
+			logerror("%04X: CPU Clock = OCLK%s (%.4f MHz); Transceiver Clock = OCLK%s (%.4f MHz)\n",
 				m_ppc,
 				BIT(data, 7) ? "/2" : "",
 				clocks_to_attotime(BIT(data, 7) ? 2 : 1).as_mhz(),
@@ -701,14 +707,19 @@ void dp8344_device::state_string_export(const device_state_entry &entry, std::st
 //**************************************************************************
 
 //-------------------------------------------------
-//  get_timer_count - return current count status
-//  of the timer
+//  timer_count - count down on timer
 //-------------------------------------------------
 
-u16 dp8344_device::get_timer_count()
+void dp8344_device::timer_count()
 {
-	// TODO
-	return 0;
+	// Count down to zero
+	if (--m_tcount == 0)
+	{
+		set_timer_interrupt(true);
+
+		// Count automatically reloads
+		m_tcount = m_tr;
+	}
 }
 
 
@@ -1220,10 +1231,10 @@ u8 dp8344_device::read_register(unsigned reg)
 		return m_gp_main[15];
 
 	case 28: // TRL count status
-		return get_timer_count() & 0x00ff;
+		return m_tcount & 0x00ff;
 
 	case 29: // TRH count status
-		return get_timer_count() >> 8;
+		return (m_tcount & 0xff00) >> 8;
 
 	case 30: // Internal Stack Pointer
 		return (m_asp << 4) | m_dsp;
@@ -1996,6 +2007,13 @@ void dp8344_device::execute_run()
 				prefetch_instruction();
 			}
 			break;
+		}
+
+		// If the timer is started, run it
+		if (BIT(m_acr, 7))
+		{
+			if ((m_tclk++ & (BIT(m_acr, 5) ? 1 : 15)) == 0)
+				timer_count();
 		}
 
 		m_icount--;
