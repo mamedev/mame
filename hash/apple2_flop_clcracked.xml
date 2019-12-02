@@ -28592,7 +28592,7 @@
 	</software>
 
 	<software name="simlineq">
-		<description>Simultaneous Linear Functions (cleanly cracked)</description>
+		<description>Simultaneous Linear Equations (cleanly cracked)</description>
 		<year>1984</year>
 		<publisher>Microcomputer Workshops</publisher>
 		<info name="release" value="2017-04-18"/>
@@ -35657,6 +35657,26 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="the railroad works (clean crack).do" size="143360" crc="779b1050" sha1="9be6c43573692aa3042439fc27f34b622ea963f4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="boyjesus">
+		<description>The Boy Jesus (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Educational Publishing Concepts</publisher>
+		<info name="release" value="2019-11-23"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the boy jesus (4am crack) side a.dsk" size="143360" crc="88c20d44" sha1="17d9afc0952ea153a502768a1316fe33d5bc699c"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the boy jesus (4am crack) side b.dsk" size="143360" crc="7b549ae0" sha1="d75c8e9301b81b50ec101906016e72692ae83674"/>
 			</dataarea>
 		</part>
 	</software>
