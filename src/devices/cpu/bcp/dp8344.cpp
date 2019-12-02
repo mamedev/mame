@@ -1823,6 +1823,7 @@ void dp8344_device::execute_run()
 			break;
 
 		case T1_LCALL:
+			m_pc++;
 			address_stack_push();
 			m_pc = m_latched_instr;
 			instruction_wait();
