@@ -69,6 +69,7 @@ void is48x_state::bcp_inst_map(address_map &map)
 void is48x_state::bcp_data_map(address_map &map)
 {
 	map(0x0000, 0x7fff).ram(); // W24257S-70LL
+	map(0xc000, 0xffff).ram();
 }
 
 static INPUT_PORTS_START(is482)
