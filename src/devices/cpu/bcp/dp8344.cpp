@@ -476,10 +476,60 @@ void dp8344_device::set_auxiliary_control(u8 data)
 
 	// Clearing Timer StarT disables the timer and its interrupt
 	if (!BIT(data, 7) && BIT(m_acr, 7))
+	{
+		logerror("%04X: Timer Stop\n", m_ppc);
 		set_timer_interrupt(false);
+	}
+	else if (BIT(data, 7) && !BIT(m_acr, 7))
+	{
+		unsigned prescale = (BIT(m_dcr, 7) ? 2 : 1) * (BIT(data, 5) ? 2 : 16);
+		logerror("%04X: Timer Start (TO Period = %.2f kHz)\n",
+			m_ppc,
+			clocks_to_attotime(prescale * (m_tr == 0 ? 65536 : m_tr)).as_khz());
+	}
 
-	// Bit 3 is reserved
+	if (BIT(data, 6))
+	{
+		logerror("%04X: Timer Load (TR = %d)\n", m_ppc, m_tr);
+
+		// TODO: only cleared when load pulse finishes
+		data &= 0xbf;
+	}
+
+	// Bit 3 is reserved (TODO: DP8344B uses this to extend read cycles)
 	m_acr = data & 0xf7;
+}
+
+
+//-------------------------------------------------
+//  set_device_control - write to DCR
+//-------------------------------------------------
+
+void dp8344_device::set_device_control(u8 data)
+{
+	if ((data & 0xe0) != (m_dcr & 0xe0))
+	{
+		if ((data & 0x60) == 0x60)
+			logerror("%04X: CPU Clock = OCLK%s (%.3f MHz); Transceiver Clock = X-TCLK\n",
+				m_ppc,
+				BIT(data, 7) ? "/2" : "",
+				clocks_to_attotime(BIT(data, 7) ? 2 : 1).as_mhz());
+		else
+			logerror("%04X: CPU Clock = OCLK%s (%.3f MHz); Transceiver Clock = OCLK%s (%.3f MHz)\n",
+				m_ppc,
+				BIT(data, 7) ? "/2" : "",
+				clocks_to_attotime(BIT(data, 7) ? 2 : 1).as_mhz(),
+				BIT(data, 6) ? "/4" : BIT(data, 5) ? "/2" : "",
+				clocks_to_attotime(BIT(data, 6) ? 4 : BIT(data, 5) ? 2 : 1).as_mhz());
+	}
+
+	if ((data & 0x1f) != (m_dcr & 0x1f))
+		logerror("%04X: Wait States = %d (Instruction Memory), %d (Data Memory)\n",
+			m_ppc,
+			(data & 0x18) >> 3,
+			data & 0x07);
+
+	m_dcr = data;
 }
 
 
@@ -953,6 +1003,23 @@ u8 dp8344_device::get_error_code()
 
 
 //-------------------------------------------------
+//  set_transceiver_command - write to TCR
+//-------------------------------------------------
+
+void dp8344_device::set_transceiver_command(u8 data)
+{
+	if ((data & 0xb0) != (m_tcr & 0xb0))
+		logerror("%04X: Receiver Selected as %s with %d Quiesces; TX-ACT %sAdvanced\n",
+			m_ppc,
+			BIT(data, 5) ? "ALG" : "DATA-IN",
+			BIT(data, 7) ? 3 : 2,
+			BIT(data, 4) ? "" : "Not ");
+
+	m_tcr = data;
+}
+
+
+//-------------------------------------------------
 //  set_transceiver_mode - write to TMR
 //-------------------------------------------------
 
@@ -969,35 +1036,35 @@ void dp8344_device::set_transceiver_mode(u8 data)
 	switch (data & 0x07)
 	{
 	case 0:
-		logerror("Protocol Select: IBM 3270\n");
+		logerror("%04X: Protocol Select: IBM 3270\n", m_ppc);
 		break;
 
 	case 1:
-		logerror("Protocol Select: IBM 3299 Multiplexer\n");
+		logerror("%04X: Protocol Select: IBM 3299 Multiplexer\n", m_ppc);
 		break;
 
 	case 2:
-		logerror("Protocol Select: IBM 3299 Controller\n");
+		logerror("%04X: Protocol Select: IBM 3299 Controller\n", m_ppc);
 		break;
 
 	case 3:
-		logerror("Protocol Select: IBM 3299 Repeater\n");
+		logerror("%04X: Protocol Select: IBM 3299 Repeater\n", m_ppc);
 		break;
 
 	case 4:
-		logerror("Protocol Select: IBM 5250\n");
+		logerror("%04X: Protocol Select: IBM 5250\n", m_ppc);
 		break;
 
 	case 5:
-		logerror("Protocol Select: IBM 5250 Promiscuous\n");
+		logerror("%04X: Protocol Select: IBM 5250 Promiscuous\n", m_ppc);
 		break;
 
 	case 6:
-		logerror("Protocol Select: 8-bit\n");
+		logerror("%04X: Protocol Select: 8-bit\n", m_ppc);
 		break;
 
 	case 7:
-		logerror("Protocol Select: 8-bit Promiscuous\n");
+		logerror("%04X: Protocol Select: 8-bit Promiscuous\n", m_ppc);
 		break;
 	}
 
@@ -1192,7 +1259,7 @@ void dp8344_device::write_register(unsigned reg, u8 data)
 	{
 	case 0: // Condition Code Register (main) or Device Control Register (alternate)
 		if (m_ba)
-			m_dcr = data;
+			set_device_control(data);
 		else
 			set_condition_code(data);
 		break;
@@ -1234,7 +1301,7 @@ void dp8344_device::write_register(unsigned reg, u8 data)
 
 	case 6: // GP2 (main) or Transceiver Command Register (alternate)
 		if (m_bb)
-			m_tcr = data;
+			set_transceiver_command(data);
 		else
 			m_gp_main[2] = data;
 		break;

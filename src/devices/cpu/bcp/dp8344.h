@@ -103,6 +103,7 @@ private:
 	void set_condition_code(u8 data);
 	void set_interrupt_control(u8 data);
 	void set_auxiliary_control(u8 data);
+	void set_device_control(u8 data);
 	bool interrupt_active() const;
 	u8 get_interrupt_vector() const;
 	bool get_flag(unsigned f) const;
@@ -126,6 +127,7 @@ private:
 	u8 receive_fifo_pop();
 	void set_receiver_error(u8 code);
 	u8 get_error_code();
+	void set_transceiver_command(u8 data);
 	void set_transceiver_mode(u8 data);
 	void clear_network_command_flag(u8 data);
 	u8 read_register(unsigned reg);
