@@ -844,13 +844,13 @@ void bnstars_state::bnstars_sound_map(address_map &map)
 void bnstars_state::bnstars(machine_config &config)
 {
 	/* basic machine hardware */
-	V70(config, m_maincpu, 20000000); // 20MHz
+	V70(config, m_maincpu, 40_MHz_XTAL/2); // 20MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &bnstars_state::bnstars_map);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(ms32_state::irq_callback));
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(bnstars_state::ms32_interrupt), "lscreen", 0, 1);
 
-	Z80(config, m_audiocpu, 4000000); // Unverified; it's possibly higher than 4MHz
+	Z80(config, m_audiocpu, 8_MHz_XTAL); // presented on sound PCB
 	m_audiocpu->set_addrmap(AS_PROGRAM, &bnstars_state::bnstars_sound_map);
 
 	config.set_maximum_quantum(attotime::from_hz(60000));
@@ -891,13 +891,13 @@ void bnstars_state::bnstars(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	ymf271_device &ymf1(YMF271(config, "ymf1", 16934400));
+	ymf271_device &ymf1(YMF271(config, "ymf1", 16_9344_MHz_XTAL));
 	ymf1.add_route(0, "lspeaker", 1.0);
 	ymf1.add_route(1, "rspeaker", 1.0);
 //  ymf1.add_route(2, "lspeaker", 1.0); Output 2/3 not used?
 //  ymf1.add_route(3, "rspeaker", 1.0);
 
-	ymf271_device &ymf2(YMF271(config, "ymf2", 16934400));
+	ymf271_device &ymf2(YMF271(config, "ymf2", 16_9344_MHz_XTAL));
 	ymf2.add_route(0, "lspeaker", 1.0);
 	ymf2.add_route(1, "rspeaker", 1.0);
 //  ymf2.add_route(2, "lspeaker", 1.0); Output 2/3 not used?
