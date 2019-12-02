@@ -357,12 +357,8 @@ void sun4_mmu_base_device::system_w(const uint32_t offset, const uint32_t data, 
 			LOGMASKED(LOG_BUSERROR, "write bus error %08x = %08x & %08x\n", offset << 2, data, mem_mask);
 			if (masked_offset == 0)
 				m_buserr[0] = (data & 0x000000ff) | 0x00008000;
-			else if (masked_offset == 1)
-				m_buserr[1] = data;
-			else if (masked_offset == 2)
-				m_buserr[2] = data & 0x000000b0;
-			else if (masked_offset == 3)
-				m_buserr[3] = (data & 0x3fffffff) | ((data & 0x20000000) << 1) | ((data & 0x20000000) << 2);
+			else
+				m_buserr[masked_offset] = data;
 			return;
 		}
 
@@ -373,7 +369,7 @@ void sun4_mmu_base_device::system_w(const uint32_t offset, const uint32_t data, 
 
 		case 9: // cache data
 			LOGMASKED(LOG_CACHE_DATA, "write cache data %08x = %08x & %08x\n", offset << 2, data, mem_mask);
-			m_cachedata[offset & m_cache_mask] = data | (1 << 19);
+			m_cachedata[offset & m_cache_mask] = data;
 			return;
 
 		case 0xf:   // UART bypass
@@ -484,6 +480,7 @@ uint32_t sun4_mmu_base_device::insn_data_r(const uint32_t offset, const uint32_t
 	// supervisor program fetches in boot state are special
 	if (MODE == SUPER_INSN && m_fetch_bootrom)
 	{
+		m_cpu->eat_cycles(50);
 		return m_rom_ptr[offset & 0x1ffff];
 	}
 

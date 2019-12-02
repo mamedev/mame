@@ -147,7 +147,7 @@ protected:
 	uint32_t m_cache_context;
 	uint8_t m_system_enable;
 	bool m_fetch_bootrom;
-	uint32_t m_buserr[4];
+	uint32_t m_buserr[16];
 
 	// Pre-computed data for optimization purposes
 	std::unique_ptr<std::unique_ptr<uint32_t[]>[]> m_segmap_masked;
