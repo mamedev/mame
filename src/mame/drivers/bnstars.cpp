@@ -850,7 +850,7 @@ void bnstars_state::bnstars(machine_config &config)
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(bnstars_state::ms32_interrupt), "lscreen", 0, 1);
 
-	Z80(config, m_audiocpu, 8_MHz_XTAL); // presented on sound PCB
+	Z80(config, m_audiocpu, 8_MHz_XTAL); // presented on sound PCB, Verified
 	m_audiocpu->set_addrmap(AS_PROGRAM, &bnstars_state::bnstars_sound_map);
 
 	config.set_maximum_quantum(attotime::from_hz(60000));
