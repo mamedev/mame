@@ -47,7 +47,9 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(DP8344, dp8344_device, "dp8344", "DP8344 BCP")
+// device type definitions
+DEFINE_DEVICE_TYPE(DP8344A, dp8344a_device, "dp8344a", "DP8344A BCP")
+DEFINE_DEVICE_TYPE(DP8344B, dp8344b_device, "dp8344b", "DP8344B BCP")
 
 
 //**************************************************************************
@@ -60,8 +62,8 @@ ALLOW_SAVE_TYPE(dp8344_device::inst_state);
 //  dp8344_device - constructor
 //-------------------------------------------------
 
-dp8344_device::dp8344_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: cpu_device(mconfig, DP8344, tag, owner, clock)
+dp8344_device::dp8344_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_inst_config("instruction", ENDIANNESS_LITTLE, 16, 16, -1)
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, 16, 0)
 	, m_inst_space(nullptr)
@@ -109,6 +111,27 @@ dp8344_device::dp8344_device(const machine_config &mconfig, const char *tag, dev
 	, m_rfifo_head(0)
 	, m_tfifo_head(0)
 {
+}
+
+
+//-------------------------------------------------
+//  dp8344a_device - constructor
+//-------------------------------------------------
+
+dp8344a_device::dp8344a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: dp8344_device(mconfig, DP8344A, tag, owner, clock)
+{
+}
+
+
+//-------------------------------------------------
+//  dp8344b_device - constructor
+//-------------------------------------------------
+
+dp8344b_device::dp8344b_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: dp8344_device(mconfig, DP8344B, tag, owner, clock)
+{
+	// TODO: emulate differences between DP8344A and DP8344B
 }
 
 

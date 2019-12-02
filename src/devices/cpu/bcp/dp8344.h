@@ -45,9 +45,6 @@ public:
 		BCP_ASP, BCP_DSP
 	};
 
-	// construction/destruction
-	dp8344_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-
 	// callback configuration
 	auto birq_out_cb() { return m_birq_out_cb.bind(); }
 	auto data_out_cb() { return m_data_out_cb.bind(); }
@@ -64,6 +61,9 @@ public:
 	void remote_write(offs_t offset, u8 data);
 
 protected:
+	// construction/destruction
+	dp8344_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
 	// device-specific overrides
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
@@ -212,7 +212,26 @@ private:
 	u8 m_tfifo_head;
 };
 
-// device type declaration
-DECLARE_DEVICE_TYPE(DP8344, dp8344_device)
+// ======================> dp8344a_device
+
+class dp8344a_device : public dp8344_device
+{
+public:
+	// device type constructor
+	dp8344a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
+// ======================> dp8344b_device
+
+class dp8344b_device : public dp8344_device
+{
+public:
+	// device type constructor
+	dp8344b_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
+// device type declarations
+DECLARE_DEVICE_TYPE(DP8344A, dp8344a_device)
+DECLARE_DEVICE_TYPE(DP8344B, dp8344b_device)
 
 #endif // MAME_CPU_BCP_DP8344_H

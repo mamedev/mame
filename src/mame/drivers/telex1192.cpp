@@ -60,7 +60,7 @@ INPUT_PORTS_END
 
 void telex1192_state::telex1192(machine_config &config)
 {
-	DP8344(config, m_bcp, 18.8696_MHz_XTAL);
+	DP8344A(config, m_bcp, 18.8696_MHz_XTAL);
 	m_bcp->set_addrmap(AS_PROGRAM, &telex1192_state::inst_map);
 	m_bcp->set_addrmap(AS_DATA, &telex1192_state::data_map);
 
