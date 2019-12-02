@@ -82,8 +82,8 @@
 
         Some time in 2004 I.T. introduced a new bowling game called Silver Strike Bowling on a full
         blown PC system known as "Nighthawk System Box" (AKA The Nighthawk Chassis) to replace it's
-        aging World Class Bowling game.  Other known games on this platform include Golden Tee Live!
-        and Target Toss Pro: Bags
+        aging World Class Bowling game.  Other known games on this platform include Golden Tee Live!,
+        Power Putt Golf (Mini-Golf) and Target Toss Pro: Lawn Darts / Bags
 
     Trivia: For the Golden Tee series, the second generation was called GT2.  The third gen was known
             as GT3 but also included Golden Tee '97 through 2K and Classic.  The fourth gen on the
@@ -2845,7 +2845,7 @@ ROM_START( drivedge )
 	ROM_LOAD( "vidnet_v1.0_u7.u7", 0x08000, 0x08000, CRC(dea8b9de) SHA1(46ba3a549522d7e6a32792814a04fd34839c7e55) ) /* Labeled as "VIDNET V1.0 (U7)" */
 
 	ROM_REGION( 0xa00000, "gfx1", 0 ) /* ROM board P/N 1049 REV1 */
-	ROM_LOAD32_BYTE( "grom0_itde_gv1.2.grom0",   0x000000, 0x80000, CRC(7fe5b01b) SHA1(b31e48971253d77e2277434b1b1590cbbea2209f) ) /* These 8 labeled as GV1.6 */
+	ROM_LOAD32_BYTE( "grom0_itde_gv1.2.grom0",   0x000000, 0x80000, CRC(7fe5b01b) SHA1(b31e48971253d77e2277434b1b1590cbbea2209f) ) /* These 8 labeled as GV1.2 */
 	ROM_LOAD32_BYTE( "grom5_itde_gv1.2.grom5",   0x000001, 0x80000, CRC(5ea6dbc2) SHA1(c2de55ec6a527d0555504070a7ecb43b8aa797ea) )
 	ROM_LOAD32_BYTE( "grom10_itde_gv1.2.grom10", 0x000002, 0x80000, CRC(76be06cd) SHA1(b533a07853b531e318c5a85139a74ca3edb9089f) )
 	ROM_LOAD32_BYTE( "grom15_itde_gv1.2.grom15", 0x000003, 0x80000, CRC(119bf46b) SHA1(67f5434581d5f0042c7acd36d2c64ffe69efaa76) )
@@ -2853,11 +2853,11 @@ ROM_START( drivedge )
 	ROM_LOAD32_BYTE( "grom6_itde_gv1.2.grom6",   0x200001, 0x80000, CRC(2cb76b9a) SHA1(0db32cb572121c8a751dcce55b94adc48f9be738) )
 	ROM_LOAD32_BYTE( "grom11_itde_gv1.2.grom11", 0x200002, 0x80000, CRC(5d29018c) SHA1(11f346afedfac4f7b0d5d4995dd38ec2d7fc7777) )
 	ROM_LOAD32_BYTE( "grom16_itde_gv1.2.grom16", 0x200003, 0x80000, CRC(476940fb) SHA1(00dab9aeb0d5cc23e4f78f15cb976ddcafa63b42) )
-	ROM_LOAD32_BYTE( "grom2_itde_dv1.2.grom2",   0x400000, 0x80000, CRC(5ccc4c62) SHA1(fc49bba2208a1157fe0948fcadac79c597f382c4) ) /* These 4 labeled as DV1.6 */
+	ROM_LOAD32_BYTE( "grom2_itde_dv1.2.grom2",   0x400000, 0x80000, CRC(5ccc4c62) SHA1(fc49bba2208a1157fe0948fcadac79c597f382c4) ) /* These 4 labeled as DV1.2 */
 	ROM_LOAD32_BYTE( "grom7_itde_dv1.2.grom7",   0x400001, 0x80000, CRC(45367070) SHA1(c7cf074f95cf287c4caf70d2286608c50ad01044) )
 	ROM_LOAD32_BYTE( "grom12_itde_dv1.2.grom12", 0x400002, 0x80000, CRC(b978ef5a) SHA1(d1fce9c7966b8324ce1a4a99d92cd69ec32f5c47) )
 	ROM_LOAD32_BYTE( "grom17_itde_dv1.2.grom17", 0x400003, 0x80000, CRC(eff8abac) SHA1(83da116368fae05a0c3c12ea72656681912a1175) )
-	ROM_LOAD32_BYTE( "grom3_itde_mv1.2.grom3",   0x600000, 0x20000, CRC(9cd252c9) SHA1(7db6bdeeb2967154cd104ac2e20761cb99046d70) ) /* These 4 labeled as MV1.6 */
+	ROM_LOAD32_BYTE( "grom3_itde_mv1.2.grom3",   0x600000, 0x20000, CRC(9cd252c9) SHA1(7db6bdeeb2967154cd104ac2e20761cb99046d70) ) /* These 4 labeled as MV1.2 */
 	ROM_LOAD32_BYTE( "grom8_itde_mv1.2.grom8",   0x600001, 0x20000, CRC(43f10ca4) SHA1(9eb0e2fd1adc25b334f86582be8e5960de0caba7) )
 	ROM_LOAD32_BYTE( "grom13_itde_mv1.2.grom13", 0x600002, 0x20000, CRC(431d131e) SHA1(efe5a4aa65fde1f094adc6e701db8be94a4b625c) )
 	ROM_LOAD32_BYTE( "grom18_itde_mv1.2.grom18", 0x600003, 0x20000, CRC(b09e0d9c) SHA1(b14ff39b028c0070ccca601c21542896168bd0b7) )
