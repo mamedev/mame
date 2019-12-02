@@ -275,7 +275,7 @@ void dp8344_device::device_reset()
 	// Reset Condition Code Register
 	m_ccr &= 0x10;
 
-	// Reset Interrupt Control Register
+	// Reset Interrupt Control Register (all interrupts masked out)
 	m_icr = 0xff;
 
 	// Reset Auxiliary Control Register and timer interrupt
@@ -488,9 +488,9 @@ void dp8344_device::set_auxiliary_control(u8 data)
 	else if (BIT(data, 7) && !BIT(m_acr, 7))
 	{
 		unsigned prescale = (BIT(m_dcr, 7) ? 2 : 1) * (BIT(data, 5) ? 2 : 16);
-		logerror("%04X: Timer Start (TO Period = %.3f kHz)\n",
+		logerror("%04X: Timer Start (TO Period = %d Hz)\n",
 			m_ppc,
-			clocks_to_attotime(prescale * (m_tr == 0 ? 65536 : m_tr)).as_khz());
+			int(clocks_to_attotime(prescale * (m_tr == 0 ? 65536 : m_tr)).as_hz()));
 	}
 
 	if (BIT(data, 6))
@@ -546,8 +546,8 @@ void dp8344_device::set_device_control(u8 data)
 
 bool dp8344_device::interrupt_active() const
 {
-	// TODO
-	return false;
+	// TODO: non-timer interrupts
+	return !BIT(m_icr, 4) && BIT(m_ccr, 7);
 }
 
 
@@ -558,8 +558,8 @@ bool dp8344_device::interrupt_active() const
 
 u8 dp8344_device::get_interrupt_vector() const
 {
-	// TODO
-	return 0;
+	// TODO: non-timer interrupts
+	return 0x14;
 }
 
 
