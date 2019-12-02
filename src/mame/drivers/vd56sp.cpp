@@ -22,17 +22,16 @@ public:
 	void vd56sp(machine_config &mconfig);
 
 private:
-	void mem_map(address_map &map);
+	void exp_map(address_map &map);
 
 	required_device<r65c19_device> m_maincpu;
 };
 
 
-void vd56sp_state::mem_map(address_map &map)
+void vd56sp_state::exp_map(address_map &map)
 {
-	map(0x0040, 0x03ff).ram();
-	map(0x0800, 0x1fff).rom().region("firmware", 0x20800);
-	map(0x8000, 0xffff).rom().region("firmware", 0x28000);
+	map(0x0e0000, 0x0fffff).rom().region("firmware", 0x20000);
+	map(0x1f8000, 0x1fffff).ram();
 }
 
 
@@ -41,8 +40,8 @@ INPUT_PORTS_END
 
 void vd56sp_state::vd56sp(machine_config &config)
 {
-	R65C19(config, m_maincpu, 8'000'000); // FIXME: actually L2800-38 (XTAL not readable)
-	m_maincpu->set_addrmap(AS_PROGRAM, &vd56sp_state::mem_map);
+	L2800(config, m_maincpu, 8'000'000); // L28L2800-38 (XTAL not readable)
+	m_maincpu->set_addrmap(AS_DATA, &vd56sp_state::exp_map);
 
 	// Modem IC: Conexant R6764-61
 }
