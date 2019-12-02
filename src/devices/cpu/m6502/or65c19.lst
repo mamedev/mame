@@ -1,5 +1,19 @@
 # license:BSD-3-Clause
 # copyright-holders:Olivier Galibert, AJR
+adc_ipx
+	TMP2 = read_pc();
+	TMP = read(TMP2);
+	TMP = set_h(TMP, read((TMP2+1) & 0xff));
+	if(page_changing(TMP, X)) {
+		read(set_l(TMP, TMP+X));
+	}
+	do_adc(read(TMP+X));
+	if(P & F_D) {
+		read_pc_noinc();
+		set_nz(A);
+	}
+	prefetch();
+
 add_imm
 	TMP = read_pc();
 	do_add(TMP);
@@ -28,6 +42,17 @@ add_zpx
 		read_pc_noinc();
 		set_nz(A);
 	}
+	prefetch();
+
+and_ipx
+	TMP2 = read_pc();
+	TMP = read(TMP2);
+	TMP = set_h(TMP, read((TMP2+1) & 0xff));
+	if(page_changing(TMP, X)) {
+		read(set_l(TMP, TMP+X));
+	}
+	A &= read(TMP+X);
+	set_nz(A);
 	prefetch();
 
 asr_acc
@@ -104,6 +129,27 @@ clw_imp
 	m_w = 0;
 	prefetch();
 
+cmp_ipx
+	TMP2 = read_pc();
+	TMP = read(TMP2);
+	TMP = set_h(TMP, read((TMP2+1) & 0xff));
+	if(page_changing(TMP, X)) {
+		read(set_l(TMP, TMP+X));
+	}
+	do_cmp(A, read(TMP+X));
+	prefetch();
+
+eor_ipx
+	TMP2 = read_pc();
+	TMP = read(TMP2);
+	TMP = set_h(TMP, read((TMP2+1) & 0xff));
+	if(page_changing(TMP, X)) {
+		read(set_l(TMP, TMP+X));
+	}
+	A ^= read(TMP+X);
+	set_nz(A);
+	prefetch();
+
 exc_zpx
 	TMP = read_pc();
 	read(TMP);
@@ -175,6 +221,17 @@ lan_imp
 	m_i++;
 	prefetch();
 
+lda_ipx
+	TMP2 = read_pc();
+	TMP = read(TMP2);
+	TMP = set_h(TMP, read((TMP2+1) & 0xff));
+	if(page_changing(TMP, X)) {
+		read(set_l(TMP, TMP+X));
+	}
+	A = read(TMP+X);
+	set_nz(A);
+	prefetch();
+
 lii_imp
 	read_pc_noinc();
 	TMP = read(m_i);
@@ -214,6 +271,17 @@ nxt_imp
 	PC = read(m_i);
 	PC = set_h(PC, read(m_i+1));
 	m_i += 2;
+	prefetch();
+
+ora_ipx
+	TMP2 = read_pc();
+	TMP = read(TMP2);
+	TMP = set_h(TMP, read((TMP2+1) & 0xff));
+	if(page_changing(TMP, X)) {
+		read(set_l(TMP, TMP+X));
+	}
+	A |= read(TMP+X);
+	set_nz(A);
 	prefetch();
 
 phi_imp
@@ -316,6 +384,28 @@ sba_ima
 	read(TMP);
 	TMP2 |= A;
 	write(TMP, TMP2);
+	prefetch();
+
+sbc_ipx
+	TMP2 = read_pc();
+	TMP = read(TMP2);
+	TMP = set_h(TMP, read((TMP2+1) & 0xff));
+	if(page_changing(TMP, X)) {
+		read(set_l(TMP, TMP+X));
+	}
+	do_sbc(read(TMP+X));
+	if(P & F_D) {
+		read_pc_noinc();
+		set_nz(A);
+	}
+	prefetch();
+
+sta_ipx
+	TMP2 = read_pc();
+	TMP = read(TMP2);
+	TMP = set_h(TMP, read((TMP2+1) & 0xff));
+	read(set_l(TMP, TMP+X));
+	write(TMP+X, A);
 	prefetch();
 
 sti_imz

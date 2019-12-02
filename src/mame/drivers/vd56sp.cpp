@@ -31,7 +31,8 @@ private:
 void vd56sp_state::exp_map(address_map &map)
 {
 	map(0x0e0000, 0x0fffff).rom().region("firmware", 0x20000);
-	map(0x1f8000, 0x1fffff).ram();
+	map(0x160000, 0x16ffff).mirror(0x10000).ram();
+	map(0x1e0000, 0x1effff).mirror(0x10000).ram();
 }
 
 

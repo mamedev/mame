@@ -274,17 +274,14 @@ void c39_device::expansion_w(offs_t offset, u8 data)
 		intf.es4_write(offset + 0x0600, data);
 }
 
-void c39_device::internal_map(address_map &map)
+void l2800_device::internal_map(address_map &map)
 {
 	// TODO: most registers still unimplemented
-	map(0x0005, 0x0005).rw(FUNC(c39_device::pbs_r), FUNC(c39_device::pbs_w));
-	map(0x000b, 0x000b).rw(FUNC(c39_device::cir_r), FUNC(c39_device::cir_w));
-	map(0x0018, 0x001f).rw(FUNC(c39_device::bsr_r), FUNC(c39_device::bsr_w));
-	map(0x0040, 0x007f).rw(FUNC(c39_device::page1_seg_r), FUNC(c39_device::page1_seg_w));
-	map(0x0080, 0x00ff).ram();
-	map(0x0100, 0x01ff).ram().share("page1");
-	map(0x0200, 0x047f).ram();
-	map(0x0600, 0xffff).rw(FUNC(c39_device::expansion_r), FUNC(c39_device::expansion_w));
+	map(0x0005, 0x0005).rw(FUNC(l2800_device::pbs_r), FUNC(l2800_device::pbs_w));
+	map(0x000b, 0x000b).rw(FUNC(l2800_device::cir_r), FUNC(l2800_device::cir_w));
+	map(0x0018, 0x001f).rw(FUNC(l2800_device::bsr_r), FUNC(l2800_device::bsr_w));
+	map(0x0040, 0x05fd).ram(); // Page 0 has 192 dedicated bytes here
+	map(0x0600, 0xffff).rw(FUNC(l2800_device::expansion_r), FUNC(l2800_device::expansion_w));
 }
 
 #include "cpu/m6502/r65c19.hxx"

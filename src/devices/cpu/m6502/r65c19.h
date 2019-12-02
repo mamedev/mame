@@ -45,14 +45,18 @@ private:
 
 #define O(o) void o ## _full(); void o ## _partial()
 
+	O(adc_ipx);
 	O(add_imm);
 	O(add_zpg);
 	O(add_zpx);
+	O(and_ipx);
 	O(asr_acc);
 	O(bar_amr);
 	O(bas_amr);
 	O(brk_r_imp);
 	O(clw_imp);
+	O(cmp_ipx);
+	O(eor_ipx);
 	O(exc_zpx);
 	O(ini_imp);
 	O(jpi_ind);
@@ -62,11 +66,13 @@ private:
 	O(lab_acc);
 	O(lai_imp);
 	O(lan_imp);
+	O(lda_ipx);
 	O(lii_imp);
 	O(mpa_imp);
 	O(mpy_imp);
 	O(neg_acc);
 	O(nxt_imp);
+	O(ora_ipx);
 	O(phi_imp);
 	O(phw_imp);
 	O(pia_imp);
@@ -78,6 +84,8 @@ private:
 	O(rnd_imp);
 	O(rts_r_imp);
 	O(sba_ima);
+	O(sbc_ipx);
+	O(sta_ipx);
 	O(sti_imz);
 	O(taw_imp);
 	O(tip_imp);
@@ -110,8 +118,6 @@ protected:
 	u8 expansion_r(offs_t offset);
 	void expansion_w(offs_t offset, u8 data);
 
-	void internal_map(address_map &map);
-
 private:
 	class mi_banked : public memory_interface {
 	public:
@@ -142,6 +148,9 @@ class l2800_device : public c39_device
 {
 public:
 	l2800_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+private:
+	void internal_map(address_map &map);
 };
 
 DECLARE_DEVICE_TYPE(R65C19, r65c19_device)
