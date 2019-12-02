@@ -2672,6 +2672,10 @@ md4duvc                         // Aquarius MD-4DUVC motherboard (486)
 kma300g                         // Arche Technologies Inc. KMA-300G-25
 asc486slc                       // Computechnik ASC486SLC slot CPU (386sx)
 um8810paio                      // Elitegroup UM8810 PAIO motherboard (486)
+pci48af                         // TMC Research Corporation PCI48AF motherboard (486)
+ft486f55                        // Freetech 486FT55 motherboard (486)
+ga486am                         // Gigabyte GA486AM/S motherboard (486)
+jwj446a                         // Jetway J-446A motherboard (486)
 
 
 @source:atari_s1.cpp
