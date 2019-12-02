@@ -891,13 +891,13 @@ void bnstars_state::bnstars(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	ymf271_device &ymf1(YMF271(config, "ymf1", 16_9344_MHz_XTAL));
+	ymf271_device &ymf1(YMF271(config, "ymf1", 16.9344_MHz_XTAL));
 	ymf1.add_route(0, "lspeaker", 1.0);
 	ymf1.add_route(1, "rspeaker", 1.0);
 //  ymf1.add_route(2, "lspeaker", 1.0); Output 2/3 not used?
 //  ymf1.add_route(3, "rspeaker", 1.0);
 
-	ymf271_device &ymf2(YMF271(config, "ymf2", 16_9344_MHz_XTAL));
+	ymf271_device &ymf2(YMF271(config, "ymf2", 16.9344_MHz_XTAL));
 	ymf2.add_route(0, "lspeaker", 1.0);
 	ymf2.add_route(1, "rspeaker", 1.0);
 //  ymf2.add_route(2, "lspeaker", 1.0); Output 2/3 not used?
