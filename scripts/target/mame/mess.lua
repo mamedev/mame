@@ -1132,6 +1132,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"fairlight",
 		"fidelity",
 		"force",
+		"francedr",
 		"fujitsu",
 		"funtech",
 		"galaxy",
@@ -1207,6 +1208,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"osborne",
 		"osi",
 		"palm",
+		"parker",
 		"pc",
 		"pdp1",
 		"pel",
@@ -2273,6 +2275,11 @@ files {
 	MAME_DIR .. "src/mame/drivers/force68k.cpp",
 }
 
+createMESSProjects(_target, _subtarget, "francedr")
+files {
+	MAME_DIR .. "src/mame/drivers/regence.cpp",
+}
+
 createMESSProjects(_target, _subtarget, "fujitsu")
 files {
 	MAME_DIR .. "src/mame/drivers/fmtowns.cpp",
@@ -2976,6 +2983,12 @@ files {
 	MAME_DIR .. "src/mame/drivers/palm.cpp",
 	MAME_DIR .. "src/mame/drivers/palm_dbg.hxx",
 	MAME_DIR .. "src/mame/drivers/palmz22.cpp",
+}
+
+createMESSProjects(_target, _subtarget, "parker")
+files {
+	MAME_DIR .. "src/mame/drivers/talkingbb.cpp",
+	MAME_DIR .. "src/mame/drivers/talkingfb.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "pitronic")
@@ -4185,8 +4198,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/sys9002.cpp",
 	MAME_DIR .. "src/mame/drivers/systec.cpp",
 	MAME_DIR .. "src/mame/drivers/systel1.cpp",
-	MAME_DIR .. "src/mame/drivers/talkingbb.cpp",
-	MAME_DIR .. "src/mame/drivers/talkingfb.cpp",
 	MAME_DIR .. "src/mame/drivers/tavernie.cpp",
 	MAME_DIR .. "src/mame/drivers/tecnbras.cpp",
 	MAME_DIR .. "src/mame/drivers/teleray10.cpp",

@@ -709,6 +709,7 @@ rc759.cpp
 rcm32p.cpp
 rd100.cpp
 rd110.cpp
+regence.cpp
 replicator.cpp
 rex6000.cpp
 riscpc.cpp

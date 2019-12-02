@@ -34075,6 +34075,9 @@ zerohour                        // 8011 (c) Universal
 zerohoura                       // 8011 (c) Universal
 zerohouri                       //
 
+@source:regence.cpp
+regence
+
 @source:relief.cpp
 relief                          // 136093           (c) 1992
 relief2                         // 136093           (c) 1992
