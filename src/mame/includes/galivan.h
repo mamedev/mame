@@ -55,7 +55,6 @@ private:
 	uint8_t        m_galivan_scrollx[2],m_galivan_scrolly[2];
 	uint8_t        m_layers;
 	uint8_t        m_ninjemak_dispdisable;
-	uint16_t       m_ninjemak_prevmessage;
 
 	uint8_t        m_shift_scroll; //youmab
 	uint32_t       m_shift_val;

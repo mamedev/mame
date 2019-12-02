@@ -108,11 +108,7 @@ void dangarj_state::dangarj_io_map(address_map &map)
 
 WRITE8_MEMBER(galivan_state::blit_trigger_w)
 {
-	uint16_t message = (m_videoram[0] << 8) | (m_videoram[1] & 0xff);
-	// For avoid corrupt of the continue screen, consecutived screen clear command (0x2XX) is ignored.
-	if ((message & 0xff00) != 0x200 || message != m_ninjemak_prevmessage)
-		m_nb1414m4->exec(message, m_videoram, m_scrollx, m_scrolly, m_tx_tilemap);
-	m_ninjemak_prevmessage = message;
+	m_nb1414m4->exec((m_videoram[0] << 8) | (m_videoram[1] & 0xff), m_videoram, m_scrollx, m_scrolly, m_tx_tilemap);
 }
 
 void galivan_state::ninjemak_io_map(address_map &map)
@@ -416,7 +412,6 @@ MACHINE_START_MEMBER(galivan_state,ninjemak)
 	save_item(NAME(m_scrollx));
 	save_item(NAME(m_scrolly));
 	save_item(NAME(m_ninjemak_dispdisable));
-	save_item(NAME(m_ninjemak_prevmessage));
 }
 
 MACHINE_RESET_MEMBER(galivan_state,galivan)
@@ -435,7 +430,6 @@ MACHINE_RESET_MEMBER(galivan_state,ninjemak)
 	m_scrollx = 0;
 	m_scrolly = 0;
 	m_ninjemak_dispdisable = 0;
-	m_ninjemak_prevmessage = 0xffff;
 }
 
 void galivan_state::galivan(machine_config &config)
