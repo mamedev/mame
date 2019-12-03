@@ -158,7 +158,7 @@ void ms32_sprite_device::opaque(bitmap_ind16 &dest, const rectangle &cliprect,
 		u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, u32 tx, u32 ty, u32 srcwidth, u32 srcheight)
 {
 	// non-clip case
-	if (tx == 0 && ty == 0 && srcwidth == 0xff && srcheight == 0xff)
+	if (tx == 0 && ty == 0 && srcwidth == 0x100 && srcheight == 0x100)
 		gfx(0)->opaque(dest, cliprect, code, color, flipx, flipy, destx, desty);
 
 	color = gfx(0)->colorbase() + gfx(0)->granularity() * (color % gfx(0)->colors());
@@ -169,7 +169,8 @@ void ms32_sprite_device::opaque(bitmap_ind16 &dest, const rectangle &cliprect,
 void ms32_sprite_device::opaque(bitmap_rgb32 &dest, const rectangle &cliprect,
 		u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty, u32 tx, u32 ty, u32 srcwidth, u32 srcheight)
 {
-	if (tx == 0 && ty == 0 && srcwidth == 0xff && srcheight == 0xff)
+	// non-clip case
+	if (tx == 0 && ty == 0 && srcwidth == 0x100 && srcheight == 0x100)
 		gfx(0)->opaque(dest, cliprect, code, color, flipx, flipy, destx, desty);
 
 	const pen_t *paldata = palette().pens() + gfx(0)->colorbase() + gfx(0)->granularity() * (color % gfx(0)->colors());
@@ -187,7 +188,7 @@ void ms32_sprite_device::transpen(bitmap_ind16 &dest, const rectangle &cliprect,
 		u32 trans_pen)
 {
 	// non-clip case
-	if (tx == 0 && ty == 0 && srcwidth == 0xff && srcheight == 0xff)
+	if (tx == 0 && ty == 0 && srcwidth == 0x100 && srcheight == 0x100)
 		gfx(0)->transpen(dest, cliprect, code, color, flipx, flipy, destx, desty, trans_pen);
 
 	// special case invalid pens to opaque
@@ -218,7 +219,7 @@ void ms32_sprite_device::transpen(bitmap_rgb32 &dest, const rectangle &cliprect,
 		u32 trans_pen)
 {
 	// non-clip case
-	if (tx == 0 && ty == 0 && srcwidth == 0xff && srcheight == 0xff)
+	if (tx == 0 && ty == 0 && srcwidth == 0x100 && srcheight == 0x100)
 		gfx(0)->transpen(dest, cliprect, code, color, flipx, flipy, destx, desty, trans_pen);
 
 	// special case invalid pens to opaque
@@ -256,7 +257,7 @@ void ms32_sprite_device::transpen_raw(bitmap_ind16 &dest, const rectangle &clipr
 		u32 trans_pen)
 {
 	// non-clip case
-	if (tx == 0 && ty == 0 && srcwidth == 0xff && srcheight == 0xff)
+	if (tx == 0 && ty == 0 && srcwidth == 0x100 && srcheight == 0x100)
 		gfx(0)->transpen_raw(dest, cliprect, code, color, flipx, flipy, destx, desty, trans_pen);
 
 	// early out if completely transparent
@@ -273,7 +274,7 @@ void ms32_sprite_device::transpen_raw(bitmap_rgb32 &dest, const rectangle &clipr
 		u32 trans_pen)
 {
 	// non-clip case
-	if (tx == 0 && ty == 0 && srcwidth == 0xff && srcheight == 0xff)
+	if (tx == 0 && ty == 0 && srcwidth == 0x100 && srcheight == 0x100)
 		gfx(0)->transpen_raw(dest, cliprect, code, color, flipx, flipy, destx, desty, trans_pen);
 
 	// early out if completely transparent
@@ -446,7 +447,7 @@ void ms32_sprite_device::prio_opaque(bitmap_ind16 &dest, const rectangle &clipre
 		bitmap_ind8 &priority, u32 pmask)
 {
 	// non-clip case
-	if (tx == 0 && ty == 0 && srcwidth == 0xff && srcheight == 0xff)
+	if (tx == 0 && ty == 0 && srcwidth == 0x100 && srcheight == 0x100)
 		gfx(0)->prio_opaque(dest, cliprect, code, color, flipx, flipy, destx, desty, priority, pmask);
 
 	// high bit of the mask is implicitly on
@@ -463,7 +464,7 @@ void ms32_sprite_device::prio_opaque(bitmap_rgb32 &dest, const rectangle &clipre
 		bitmap_ind8 &priority, u32 pmask)
 {
 	// non-clip case
-	if (tx == 0 && ty == 0 && srcwidth == 0xff && srcheight == 0xff)
+	if (tx == 0 && ty == 0 && srcwidth == 0x100 && srcheight == 0x100)
 		gfx(0)->prio_opaque(dest, cliprect, code, color, flipx, flipy, destx, desty, priority, pmask);
 
 	// high bit of the mask is implicitly on
@@ -487,7 +488,7 @@ void ms32_sprite_device::prio_transpen(bitmap_ind16 &dest, const rectangle &clip
 		bitmap_ind8 &priority, u32 pmask, u32 trans_pen)
 {
 	// non-clip case
-	if (tx == 0 && ty == 0 && srcwidth == 0xff && srcheight == 0xff)
+	if (tx == 0 && ty == 0 && srcwidth == 0x100 && srcheight == 0x100)
 		gfx(0)->prio_transpen(dest, cliprect, code, color, flipx, flipy, destx, desty, priority, pmask, trans_pen);
 
 	// special case invalid pens to opaque
@@ -521,7 +522,7 @@ void ms32_sprite_device::prio_transpen(bitmap_rgb32 &dest, const rectangle &clip
 		bitmap_ind8 &priority, u32 pmask, u32 trans_pen)
 {
 	// non-clip case
-	if (tx == 0 && ty == 0 && srcwidth == 0xff && srcheight == 0xff)
+	if (tx == 0 && ty == 0 && srcwidth == 0x100 && srcheight == 0x100)
 		gfx(0)->prio_transpen(dest, cliprect, code, color, flipx, flipy, destx, desty, priority, pmask, trans_pen);
 
 	// special case invalid pens to opaque
@@ -561,7 +562,7 @@ void ms32_sprite_device::prio_transpen_raw(bitmap_ind16 &dest, const rectangle &
 		bitmap_ind8 &priority, u32 pmask, u32 trans_pen)
 {
 	// non-clip case
-	if (tx == 0 && ty == 0 && srcwidth == 0xff && srcheight == 0xff)
+	if (tx == 0 && ty == 0 && srcwidth == 0x100 && srcheight == 0x100)
 		gfx(0)->prio_transpen_raw(dest, cliprect, code, color, flipx, flipy, destx, desty, priority, pmask, trans_pen);
 
 	// early out if completely transparent
@@ -581,7 +582,7 @@ void ms32_sprite_device::prio_transpen_raw(bitmap_rgb32 &dest, const rectangle &
 		bitmap_ind8 &priority, u32 pmask, u32 trans_pen)
 {
 	// non-clip case
-	if (tx == 0 && ty == 0 && srcwidth == 0xff && srcheight == 0xff)
+	if (tx == 0 && ty == 0 && srcwidth == 0x100 && srcheight == 0x100)
 		gfx(0)->prio_transpen_raw(dest, cliprect, code, color, flipx, flipy, destx, desty, priority, pmask, trans_pen);
 
 	// early out if completely transparent
