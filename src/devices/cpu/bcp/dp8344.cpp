@@ -305,6 +305,8 @@ void dp8344_device::device_reset()
 	// Reset Remote Interface Configuration Register
 	m_ric = m_auto_start ? 0x03 : 0x01;
 	m_hib = false;
+	if (!m_auto_start)
+		suspend(SUSPEND_REASON_HALT, true);
 
 	// Reset execution state
 	m_nmi_pending = false;
@@ -799,11 +801,10 @@ void dp8344_device::data_stack_push(u8 data)
 
 u8 dp8344_device::data_stack_pop()
 {
+	// TBD: do test instructions (BIT, CMP, JRMK, etc.) suppress side effects as with RTR and ECR?
 	m_dsp = (m_dsp - 1) & 0xf;
 	return m_ds[m_dsp];
 }
-
-
 
 
 //**************************************************************************
@@ -943,16 +944,20 @@ void dp8344_device::receive_fifo_push(u8 data)
 //  receive_fifo_pop - read from RTR
 //-------------------------------------------------
 
-u8 dp8344_device::receive_fifo_pop()
+u8 dp8344_device::receive_fifo_pop(bool test)
 {
-	// Clear Receive FIFO Full, DEME, Auto-Response and Poll/Acknowledge bits in NCF
-	m_ncf &= 0xb0;
+	if (!test)
+	{
+		// Clear Receive FIFO Full, DEME, Auto-Response and Poll/Acknowledge bits in NCF
+		m_ncf &= 0xb0;
 
-	// Clear Data Available flag in TSR
-	m_tsr &= 0xf7;
-	if ((m_icr & 0xc0) == 0xc0)
-		set_receiver_interrupt(false);
+		// Clear Data Available flag in TSR
+		m_tsr &= 0xf7;
+		if ((m_icr & 0xc0) == 0xc0)
+			set_receiver_interrupt(false);
+	}
 
+	// TODO
 	return 0;
 }
 
@@ -984,29 +989,32 @@ void dp8344_device::set_receiver_error(u8 code)
 //  get_error_code - read from ECR
 //-------------------------------------------------
 
-u8 dp8344_device::get_error_code()
+u8 dp8344_device::get_error_code(bool test)
 {
 	u8 code = m_ecr;
 
-	// Clear Error Code Register and Receiver Error flag in NCF
-	m_ecr = 0x00;
-	m_ncf &= 0xdf;
-
-	// Update interrupt status if RE interrupt selected
-	switch (m_icr & 0xc0)
+	if (!test)
 	{
-	case 0x00:
-		// Interrupt on RFF
-		set_receiver_interrupt(BIT(m_ncf, 6));
-		break;
+		// Clear Error Code Register and Receiver Error flag in NCF
+		m_ecr = 0x00;
+		m_ncf &= 0xdf;
 
-	case 0x40:
-		// Interrupt on DAV
-		set_receiver_interrupt(BIT(m_tsr, 3));
-		break;
+		// Update interrupt status if RE interrupt selected
+		switch (m_icr & 0xc0)
+		{
+		case 0x00:
+			// Interrupt on RFF
+			set_receiver_interrupt(BIT(m_ncf, 6));
+			break;
 
-	default:
-		break;
+		case 0x40:
+			// Interrupt on DAV
+			set_receiver_interrupt(BIT(m_tsr, 3));
+			break;
+
+		default:
+			break;
+		}
 	}
 
 	return code;
@@ -1106,7 +1114,7 @@ void dp8344_device::clear_network_command_flag(u8 data)
 //  read_register - read from source register
 //-------------------------------------------------
 
-u8 dp8344_device::read_register(unsigned reg)
+u8 dp8344_device::read_register(unsigned reg, bool test)
 {
 	switch (reg)
 	{
@@ -1136,7 +1144,7 @@ u8 dp8344_device::read_register(unsigned reg)
 
 	case 4: // GP0 (main) or Receive/Transmit Register and/or Error Code Register (alternate)
 		if (m_bb)
-			return BIT(m_tcr, 6) ? get_error_code() : receive_fifo_pop();
+			return BIT(m_tcr, 6) ? get_error_code(test) : receive_fifo_pop(test);
 		else
 			return m_gp_main[0];
 
@@ -1522,7 +1530,7 @@ dp8344_device::inst_state dp8344_device::decode_instruction()
 {
 	if (m_latched_instr < 0x8000)
 	{
-		m_source_data = read_register(m_latched_instr & 0x000f);
+		m_source_data = read_register(m_latched_instr & 0x000f, (m_latched_instr & 0x7000) == 0x3000);
 		if ((m_latched_instr & 0xf000) == 0x1000)
 		{
 			// MOVE to indexed data memory
@@ -1538,7 +1546,7 @@ dp8344_device::inst_state dp8344_device::decode_instruction()
 	else if ((m_latched_instr & 0xf800) == 0x8000)
 	{
 		// JRMK
-		m_source_data = read_register(m_latched_instr & 0x001f);
+		m_source_data = read_register(m_latched_instr & 0x001f, true);
 		return TX1_JRMK;
 	}
 	else if ((m_latched_instr & 0xfc00) == 0x8800)
@@ -1551,7 +1559,7 @@ dp8344_device::inst_state dp8344_device::decode_instruction()
 	else if ((m_latched_instr & 0xfc00) == 0x8c00)
 	{
 		// LJMP or LCALL, conditional
-		m_source_data = read_register(m_latched_instr & 0x001f);
+		m_source_data = read_register(m_latched_instr & 0x001f, true);
 		instruction_wait();
 		return T2_ABSOLUTE;
 	}
@@ -1564,7 +1572,7 @@ dp8344_device::inst_state dp8344_device::decode_instruction()
 	else if ((m_latched_instr >= 0xa000 && m_latched_instr < 0xae00) || (m_latched_instr & 0xfc00) == 0xc000)
 	{
 		if ((m_latched_instr & 0xfe00) != 0xc000)
-			m_source_data = read_register(m_latched_instr & 0x001f);
+			m_source_data = read_register(m_latched_instr & 0x001f, false);
 		switch (m_latched_instr & 0x0180)
 		{
 		case 0x0000:
@@ -1619,7 +1627,7 @@ dp8344_device::inst_state dp8344_device::decode_instruction()
 	{
 		// MOVE to or from accumulator-indexed data memory
 		if (BIT(m_latched_instr, 7))
-			m_source_data = read_register(m_latched_instr & 0x001f);
+			m_source_data = read_register(m_latched_instr & 0x001f, false);
 		m_data_address = m_ir[(m_latched_instr & 0x0060) >> 5] + read_accumulator();
 		return BIT(m_latched_instr, 7) ? TX_WRITE : TX_READ;
 	}
@@ -1645,7 +1653,7 @@ dp8344_device::inst_state dp8344_device::decode_instruction()
 	else if ((m_latched_instr & 0xff80) == 0xcd80)
 	{
 		// JMP, register-based
-		m_source_data = read_register(m_latched_instr & 0x001f);
+		m_source_data = read_register(m_latched_instr & 0x001f, true);
 		return TX1_JMP;
 	}
 	else if ((m_latched_instr & 0xff00) == 0xce00)
@@ -1678,7 +1686,7 @@ dp8344_device::inst_state dp8344_device::decode_instruction()
 	}
 	else
 	{
-		m_source_data = read_register(m_latched_instr & 0x001f);
+		m_source_data = read_register(m_latched_instr & 0x001f, false);
 		instruction_wait();
 		return T2_STORE;
 	}

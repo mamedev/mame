@@ -124,13 +124,13 @@ private:
 	void transmitter_idle();
 	void receiver_active();
 	void receive_fifo_push(u8 data);
-	u8 receive_fifo_pop();
+	u8 receive_fifo_pop(bool test);
 	void set_receiver_error(u8 code);
-	u8 get_error_code();
+	u8 get_error_code(bool test);
 	void set_transceiver_command(u8 data);
 	void set_transceiver_mode(u8 data);
 	void clear_network_command_flag(u8 data);
-	u8 read_register(unsigned reg);
+	u8 read_register(unsigned reg, bool test);
 	u8 read_accumulator() const;
 	void write_register(unsigned reg, u8 data);
 	void prefetch_instruction();

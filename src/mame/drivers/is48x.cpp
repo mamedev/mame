@@ -82,6 +82,7 @@ void is48x_state::is482(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &is48x_state::io_map);
 
 	DP8344B(config, m_bcp, 18.867_MHz_XTAL); // DP8344BV
+	m_bcp->set_auto_start(false);
 	m_bcp->set_addrmap(AS_PROGRAM, &is48x_state::bcp_inst_map);
 	m_bcp->set_addrmap(AS_DATA, &is48x_state::bcp_data_map);
 
