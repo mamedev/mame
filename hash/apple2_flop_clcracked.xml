@@ -35681,4 +35681,18 @@
 		</part>
 	</software>
 
+	<software name="amzthgr0">
+		<description>In Search of the Most Amazing Thing (First Revision) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Spinnaker Software</publisher>
+		<info name="release" value="2019-11-30"/>
+		<!-- This is the first release.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="in search of the most amazing thing r0 (4am crack).dsk" size="143360" crc="5045cc20" sha1="f2cbef99f1144124957e03b3db1f882997669c34"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
