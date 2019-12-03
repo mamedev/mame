@@ -537,6 +537,7 @@ INPUT_PORTS_END
 void e100_state::e100(machine_config &config)
 {
 	M6802(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_ram_enable(false);
 	m_maincpu->set_addrmap(AS_PROGRAM, &e100_state::e100_map);
 
 	/* Devices */

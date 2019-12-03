@@ -348,13 +348,27 @@ m6802_cpu_device::m6802_cpu_device(const machine_config &mconfig, const char *ta
 }
 
 m6802_cpu_device::m6802_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const op_func *insn, const uint8_t *cycles)
-	: m6800_cpu_device(mconfig, type, tag, owner, clock, insn, cycles, address_map_constructor())
+	: m6800_cpu_device(mconfig, type, tag, owner, clock, insn, cycles, address_map_constructor(FUNC(m6802_cpu_device::ram_map), this))
+	, m_ram_enable(true)
 {
+}
+
+void m6802_cpu_device::ram_map(address_map &map)
+{
+	if (m_ram_enable)
+		map(0x0000, 0x007f).ram();
 }
 
 m6808_cpu_device::m6808_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: m6802_cpu_device(mconfig, M6808, tag, owner, clock, m6800_insn, cycles_6800)
 {
+	set_ram_enable(false);
+}
+
+void m6808_cpu_device::device_validity_check(validity_checker &valid) const
+{
+	if (m_ram_enable)
+		osd_printf_error("MC6808 should not have internal RAM enabled\n");
 }
 
 nsc8105_cpu_device::nsc8105_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

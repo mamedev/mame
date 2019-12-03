@@ -31,7 +31,6 @@ DEFINE_DEVICE_TYPE(ZACCARIA_1B11142, zac1b11142_audio_device, "zac1b11142", "Zac
 void zac1b111xx_melody_base::zac1b111xx_melody_base_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x007f).ram(); // 6802 internal RAM
 	map(0x400c, 0x400f).mirror(0x1ff0).rw("melodypia", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 }
 
@@ -132,7 +131,6 @@ void zac1b11142_audio_device::zac1b11142_melody_map(address_map &map)
 void zac1b11142_audio_device::zac1b11142_audio_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x007f).ram(); // 6802 internal RAM
 	map(0x0090, 0x0093).mirror(0x8f6c).rw("pia_1i", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x1000, 0x1000).mirror(0x83ff).w("dac", FUNC(dac_byte_interface::data_w));
 	map(0x1400, 0x1400).mirror(0xc3ff).w(FUNC(zac1b11142_audio_device::melody_command_w));

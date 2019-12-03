@@ -103,7 +103,6 @@ private:
 void hankin_state::hankin_map(address_map &map)
 {
 	map.global_mask(0x1fff);
-	map(0x0000, 0x007f).ram(); // internal to the cpu
 	map(0x0088, 0x008b).rw(m_ic11, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x0090, 0x0093).rw(m_ic10, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x0200, 0x02ff).ram().share("nvram"); // 5101L 4-bit static ram
@@ -113,7 +112,6 @@ void hankin_state::hankin_map(address_map &map)
 void hankin_state::hankin_sub_map(address_map &map)
 {
 	map.global_mask(0x1fff);
-	map(0x0000, 0x007f).ram(); // internal to the cpu
 	map(0x0080, 0x0083).rw(m_ic2, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x1000, 0x17ff).rom().mirror(0x800).region("audiocpu", 0);
 }

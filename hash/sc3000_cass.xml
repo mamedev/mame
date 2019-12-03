@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<softwarelist name="sc3000_cass" description="SEGA Computer 3000 cassettes">
+<softwarelist name="sc3000_cass" description="Sega Computer 3000 cassettes">
 
 	<software name="bastow">
 		<description>The Secret of Bastow Manor</description>

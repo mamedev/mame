@@ -428,10 +428,10 @@ static INPUT_PORTS_START( crgolf )
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
 	PORT_DIPNAME( 0x06, 0x04, "Half-Round Play" ) PORT_DIPLOCATION("SW:1,4")
-	PORT_DIPSETTING(    0x00, "4 Coins" )
-	PORT_DIPSETTING(    0x02, "5 Coins" )
-	PORT_DIPSETTING(    0x04, "6 Coins" )
-	PORT_DIPSETTING(    0x06, "10 Coins" )
+	PORT_DIPSETTING(    0x00, "4 Credits" )
+	PORT_DIPSETTING(    0x02, "5 Credits" )
+	PORT_DIPSETTING(    0x04, "6 Credits" )
+	PORT_DIPSETTING(    0x06, "10 Credits" )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW:3")
 	PORT_DIPSETTING(    0x08, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
@@ -457,6 +457,27 @@ static INPUT_PORTS_START( crgolf )
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(70) PORT_KEYDELTA(16) PORT_REVERSE PORT_COCKTAIL
 INPUT_PORTS_END
 
+
+static INPUT_PORTS_START(crgolfa)
+	PORT_INCLUDE(crgolf)
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x20, 0x20, "Price To Start" ) PORT_DIPLOCATION( "SW:5" )
+	PORT_DIPSETTING( 0x20, "2 Credits" )
+	PORT_DIPSETTING( 0x00, "1 Credit" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START(crgolfb)
+	PORT_INCLUDE(crgolf)
+
+	PORT_MODIFY("DSW")
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x00, "SW:5" )
+	PORT_DIPNAME( 0x06, 0x04, "Half-Round Play" ) PORT_DIPLOCATION( "SW:1,4" )
+	PORT_DIPSETTING( 0x00, "5 Credits" )
+	PORT_DIPSETTING( 0x02, "8 Credits" )
+	PORT_DIPSETTING( 0x04, "10 Credits" )
+	PORT_DIPSETTING( 0x06, "15 Credits" )
+INPUT_PORTS_END
 
 
 /*************************************
@@ -768,11 +789,11 @@ void crgolf_state::init_crgolfhi()
  *
  *************************************/
 
-GAME( 1984, crgolf,   0,      crgolf,   crgolf, crgolf_state, empty_init,    ROT0, "Nasco Japan", "Crowns Golf (834-5419-04)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, crgolfa,  crgolf, crgolf,   crgolf, crgolf_state, empty_init,    ROT0, "Nasco Japan", "Crowns Golf (834-5419-03)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, crgolfb,  crgolf, crgolf,   crgolf, crgolf_state, empty_init,    ROT0, "Nasco Japan", "Crowns Golf (set 3)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1984, crgolfc,  crgolf, crgolf,   crgolf, crgolf_state, empty_init,    ROT0, "Nasco Japan", "Champion Golf",             MACHINE_SUPPORTS_SAVE )
-GAME( 1984, crgolfbt, crgolf, crgolf,   crgolf, crgolf_state, empty_init,    ROT0, "bootleg",     "Champion Golf (bootleg)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1985, crgolfhi, 0,      crgolfhi, crgolf, crgolf_state, init_crgolfhi, ROT0, "Nasco Japan", "Crowns Golf in Hawaii",     MACHINE_SUPPORTS_SAVE )
+GAME( 1984, crgolf,   0,      crgolf,   crgolf,  crgolf_state, empty_init,    ROT0, "Nasco Japan", "Crowns Golf (834-5419-04)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, crgolfa,  crgolf, crgolf,   crgolfa, crgolf_state, empty_init,    ROT0, "Nasco Japan", "Crowns Golf (834-5419-03)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, crgolfb,  crgolf, crgolf,   crgolfb, crgolf_state, empty_init,    ROT0, "Nasco Japan", "Crowns Golf (set 3)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1984, crgolfc,  crgolf, crgolf,   crgolfb, crgolf_state, empty_init,    ROT0, "Nasco Japan", "Champion Golf",             MACHINE_SUPPORTS_SAVE )
+GAME( 1984, crgolfbt, crgolf, crgolf,   crgolfb, crgolf_state, empty_init,    ROT0, "bootleg",     "Champion Golf (bootleg)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1985, crgolfhi, 0,      crgolfhi, crgolfa, crgolf_state, init_crgolfhi, ROT0, "Nasco Japan", "Crowns Golf in Hawaii",     MACHINE_SUPPORTS_SAVE )
 
-GAME( 1985, mastrglf, 0,      mastrglf, crgolf, crgolf_state, empty_init,    ROT0, "Nasco",       "Master's Golf",             MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1985, mastrglf, 0,      mastrglf, crgolf,  crgolf_state, empty_init,    ROT0, "Nasco",       "Master's Golf",             MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )

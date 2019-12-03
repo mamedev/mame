@@ -2,7 +2,7 @@
 // copyright-holders:David Haywood
 
 /*
-    Big Karnak (Modular System)
+    Big Karnak (Modular System) (checksum 1BD1EFB)
 
     this appears to be a different revision than the gaelco.cpp version, so could be original code, or
     based off one that is otherwise undumped.

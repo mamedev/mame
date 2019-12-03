@@ -46,6 +46,7 @@ protected:
 		DASM_imm,    /* immediate */
 		DASM_imp,    /* implicit */
 		DASM_ind,    /* indirect (jmp) */
+		DASM_ipx,    /* zero page post indexed (r65c19) */
 		DASM_isy,    /* zero page pre indexed sp and post indexed Y (65ce02) */
 		DASM_iw2,    /* immediate word (65ce02) */
 		DASM_iw3,    /* augment (65ce02) */

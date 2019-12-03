@@ -255,17 +255,17 @@ CP SYSTEM III
 |                                                             |  |       | |
 |                               |--------|   |-|              |  |       | |
 |                               |CAPCOM  |   | |   |-------|  |  |       | |
-|        TD62064                |DL-2929 |   | |   |CAPCOM |  |  |       | |
+|        TD62064   **ADM202     |DL-2929 |   | |   |CAPCOM |  |  |       | |
 |                               |IOU     |   | |   |DL-3429|  |  |       | |
-|        TD62064                |--------|   | |   |GLL1   |  S  S       | |
+|        TD62064   **ADM202     |--------|   | |   |GLL1   |  S  S       | |
 |--|                            *HA16103FPJ  | |   |-------|  I  I       |-|
    |                                         | |CN5           M  M        |
    |                                         | |   |-------|  M  M        |
   |-|                        93C46           | |   |CAPCOM |  2  1        |
   | |      PS2501                            | |   |DL-2829|  |  | |-----||
-  | |CN1                                     | |   |CCU    |  |  | |AMD  ||
+  | |CN1                         **62256     | |   |CCU    |  |  | |AMD  ||
   | |      PS2501                            | |   |-------|  |  | |33C93||
-  |-|                                        |-|              |  | |-----||
+  |-|             **CN3       **BT1          |-|              |  | |-----||
    |   SW1                                         HM514260   |  |        |
    |----------------------------------------------------------------------|
 Notes:
@@ -303,6 +303,12 @@ Notes:
                    surface mounted TSOP48 FlashROMs
       SIMM 3-7   - 72-Pin SIMM Connector, holds double sided SIMMs containing 8x Fujitsu 29F016A
                    surface mounted TSOP48 FlashROMs
+
+** Populated at small number of 95682A-2 boards only:
+      62256      - 32k x8 SRAM (SOP28)
+      ADM202     - 2-channel RS-232 line driver/receiver
+      CN3        - 8-pin connector
+      BT1        - Battery
 
                    SIMM Layout -
                           |----------------------------------------------------|
@@ -528,11 +534,11 @@ Hardware registers info
         AE      ---- ---- ---- ---0 Palette DMA Lenght high bit
                 ---- ---- ---- --1- Palette DMA Start
 
-        All CRTC-related values is last clock/line of given area, i.e. actual sizes is +1 to value.
+        CRTC-related H/V values is last clock/line of given area, i.e. actual numbers is +1 to value, actual V Total is +2 to register value.
 
     (*) H Total value is same for all 15KHz modes, uses fixed clock (not affected by pixel clock modifier) -
-        42.954545MHz/6 (similar to SSV) /(454+1) = 15734.25Hz /(262+1) = 59.826Hz
-        unused 24KHz 512x384 mode uses H Total 293 V Total 424 (42.954545MHz/6 /(293+1) = 24350.62Hz /(424+1) = 57.29Hz)
+        42.954545MHz/6 (similar to SSV) /(454+1) = 15734.25Hz /(262+2) = 59.59Hz
+        unused 24KHz 512x384 mode uses H Total 293 V Total 424 (42.954545MHz/6 /(293+1) = 24350.62Hz /(424+2) = 57.16Hz)
 
 
         'SS' foreground tilemap layer generator (presumable located in 'SSU' chip) registers (write only?)
@@ -1692,7 +1698,7 @@ READ16_MEMBER(cps3_state::dma_status_r)
 
 READ16_MEMBER(cps3_state::dev_dipsw_r)
 {
-	// not present on retail motherboards but games read this
+	// presumably these data came from serial interface populated on early boards
 	// inverted words from 5000a00-5000a0f area ANDed with inverted words from 5000a10-5000a1f. perhaps one return DIPSW in 8 high bits, while other in 8 low bits.
 	//  warzard will crash before booting if some of bits is not 0
 	return 0xffff;
@@ -2506,7 +2512,7 @@ void cps3_state::cps3(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(42'954'545)/5, (454+1)*6/5, 0, 384, 262+1, 0, 224); // H Total counter uses XTAL/6 clock
+	screen.set_raw(XTAL(42'954'545)/5, (454+1)*6/5, 0, 384, 262+2, 0, 224); // H Total counter uses XTAL/6 clock
 	screen.set_screen_update(FUNC(cps3_state::screen_update));
 	screen.screen_vblank().set(FUNC(cps3_state::vbl_interrupt));
 /*
@@ -2514,8 +2520,8 @@ void cps3_state::cps3(machine_config &config)
         Video DAC = 8.602MHz (384 wide mode) ~ 42.9545MHz / 5
                     10.73MHZ (496 wide mode) ~ 42.9545MHz / 4
         H = 15.73315kHz
-        V = 59.8Hz
-        H/V ~ 263 lines
+        V = 59.59Hz
+        H/V ~ 264 lines
 */
 
 	TIMER(config, m_dma_timer).configure_generic(FUNC(cps3_state::dma_interrupt));

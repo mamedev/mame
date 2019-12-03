@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "cpu/m6800/m6800.h"
 #include "sound/msm5205.h"
 #include "emupal.h"
 #include "screen.h"
@@ -117,7 +118,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	required_device<cpu_device> m_slave;
-	required_device<cpu_device> m_mcu;
+	required_device<m6802_cpu_device> m_mcu;
 	optional_device<msm5205_device> m_msm;
 	required_device<screen_device> m_screen;
 

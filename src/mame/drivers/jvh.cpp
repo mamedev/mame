@@ -104,7 +104,6 @@ void jvh_state::movmastr_io(address_map &map)
 
 void jvh_state::jvh_sub_map(address_map &map)
 {
-	map(0x0000, 0x007f).ram();
 	map(0x0080, 0x008f).m("via", FUNC(via6522_device::map));
 	map(0xc000, 0xdfff).mirror(0x2000).rom();
 }

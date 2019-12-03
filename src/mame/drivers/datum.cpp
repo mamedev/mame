@@ -95,13 +95,11 @@ private:
 void datum_state::datum_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map.global_mask(0x7fff); // A15 not used
-	map(0x0000, 0x007f).ram(); // inside CPU
-	map(0x1000, 0x13ff).mirror(0x0c00).ram(); // main ram 2x 2114
-	map(0x4000, 0x4001).mirror(0x0ffe).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
-	map(0x5000, 0x5003).mirror(0x0ffc).rw(m_pia2, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x6000, 0x6003).mirror(0x0ffc).rw(m_pia1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x7000, 0x77ff).mirror(0x0800).rom().region("roms", 0);
+	map(0x1000, 0x13ff).mirror(0x8c00).ram(); // main ram 2x 2114
+	map(0x4000, 0x4001).mirror(0x8ffe).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
+	map(0x5000, 0x5003).mirror(0x8ffc).rw(m_pia2, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x6000, 0x6003).mirror(0x8ffc).rw(m_pia1, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x7000, 0x77ff).mirror(0x8800).rom().region("roms", 0);
 }
 
 

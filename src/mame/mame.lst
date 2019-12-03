@@ -2660,8 +2660,23 @@ wpc250                          // Wang PC-250/16 (286)
 suntac303                       // motherboards using the Suntac ST62C303 chipset
 abah4                           // Abit AH4(T) motherboard (486)
 abpi4                           // Abit PI4(T) motherboard (486)
+abae4                           // Abit 486 EISA-AE4 motherboard (486)
 so4saw2                         // SOYO SY-4SAW2 motherboard (486)
 nat48pv                         // NAT48PV-1.00 VL motherboard (486)
+olyport40                       // AEG Olympia Olyport 40-21
+micral45                        // Bull Micral 45 (286)
+epsax                           // Epson PC AX
+epsax2e                         // Epson PC AX2e
+epsax3                          // Epson PC AX3
+md4duvc                         // Aquarius MD-4DUVC motherboard (486)
+kma300g                         // Arche Technologies Inc. KMA-300G-25
+asc486slc                       // Computechnik ASC486SLC slot CPU (386sx)
+um8810paio                      // Elitegroup UM8810 PAIO motherboard (486)
+pci48af                         // TMC Research Corporation PCI48AF motherboard (486)
+ft486f55                        // Freetech 486FT55 motherboard (486)
+ga486am                         // Gigabyte GA486AM/S motherboard (486)
+jwj446a                         // Jetway J-446A motherboard (486)
+
 
 @source:atari_s1.cpp
 aavenger                        //
@@ -2877,6 +2892,7 @@ atetrisb                        // (bootleg)
 atetrisb2                       // (bootleg)
 atetrisb3                       // (bootleg)
 atetb3482                       // (bootleg, with UM3482)
+atetrisbp                       //
 atetrisc                        // 136066           (c) 1989
 atetrisc2                       // 136066           (c) 1989
 
@@ -2900,6 +2916,7 @@ at586                           // 19?? AT 586
 at586x3                         // 19?? AT 586
 m55hipl                         // 19?? Micronics M55HI-Plus
 ficvt503                        // 1997 FIC VT-503
+ecssi5pi                        // Elitegroup SI5PI AIO
 
 @source:atronic.cpp
 3wishrd                         // Three Wishes Red
@@ -9365,6 +9382,7 @@ buster                          // (c) 1987 Marian Electronics Ltd.
 @source:bw12.cpp
 bw12                            //
 bw14                            //
+bw14d                           // Bondwell Portable Computer Model 14 (German keyboard)
 
 @source:bw2.cpp
 bw2                             //
@@ -11694,7 +11712,8 @@ ghostb                          // (c) 1987 Data East USA (US)
 ghostb2a                        // (c) 1987 Data East USA (US)
 ghostb3                         // (c) 1987 Data East USA (US)
 ghostb3a                        // (c) 1987 Data East USA (US)
-gondo                           // (c) 1987 Data East USA (US)
+gondo                           // (c) 1987 Data East Corporation (World)
+gondou                          // (c) 1987 Data East USA (US)
 lastmisn                        // (c) 1986 Data East Corporation (World)
 lastmisnj                       // (c) 1986 Data East Corporation (Japan)
 lastmisnu5                      // (c) 1986 Data East USA (US)
@@ -14540,6 +14559,7 @@ glasskr                         // (c) 1994 - Ref 931021 shows 1994 version, Ani
 bs9009cx                        // 1999 BrainStation 9009 CXL (Germany)
 gl6600cx                        // 1999 Genius Leader 6600 CX (Germany)
 gl8008cx                        // 1999 Genius Leader 8008 CX (Germany)
+gtbmcx                          // 2000 Genius Tabletop Black Magic CX (Germany)
 
 @source:globalfr.cpp
 gl_coc                          // Carry On Clubbin' (Global)
@@ -18441,6 +18461,7 @@ whiterus                        // White Russia
 konin                           //
 
 @source:konmedal.cpp
+buttobi
 ddboy
 ddboya
 shuriboy
@@ -18843,6 +18864,9 @@ franticf                        // (c) 1996 The Game Room
 lethalj                         // (c) 1996 The Game Room
 ripribit                        // (c) 1997 LAI Games
 ripribita                       // (c) 1997 LAI Games
+
+@source:lexibook_jg7425.cpp
+lx_jg7425
 
 @source:lft.cpp
 lft1230                         //
@@ -21916,7 +21940,8 @@ realbroda                       // (c) 1995 Merit
 spitboss                        // (c) 1988 Merit
 
 @source:meritum.cpp
-meritum                         //
+meritum1                        //
+meritum2                        //
 meritum_net                     //
 
 @source:mermaid.cpp
@@ -31129,7 +31154,6 @@ zdog
 @source:vt1682.cpp
 ii8in1
 ii32in1
-zone40                          // Zone 40
 
 @source:newbrain.cpp
 newbrain                        //
@@ -31886,6 +31910,7 @@ kyoxt                           // Kyocera XT
 laser_turbo_xt                  // 1988 VTech Laser Turbo XT
 laser_xt3                       // 1989 VTech Laser XT/3
 mbc16                           // Sanyo MBC-16
+spc400d                         // Sanyo SPC-400D
 mpc1600                         // Columbia Data Products MPC 1600
 mc1702                          //
 mk88                            //
@@ -31908,6 +31933,7 @@ eaglepc2                        // Eagle PC-2
 mpx16                           // Ciarcia's Circuit Cellar Micromint MPX-16
 hstrtpls                        // Vendex HeadStart Plus
 nms9100                         // Philips NMS 9100 series
+to16                            // Thomson TO16
 
 @source:pc100.cpp
 pc100                           //
@@ -33720,6 +33746,9 @@ sol20                           //
 @source:pturn.cpp
 pturn                           // (c) 1984 Jaleco
 
+@source:pubtimed.cpp
+pubtimed                        //
+
 @source:puckpkmn.cpp
 jzth                            //
 puckpkmn                        // (c) 2000 Genie
@@ -34062,6 +34091,9 @@ redclashs                       // (c) Suntronics
 zerohour                        // 8011 (c) Universal
 zerohoura                       // 8011 (c) Universal
 zerohouri                       //
+
+@source:regence.cpp
+regence
 
 @source:relief.cpp
 relief                          // 136093           (c) 1992
@@ -39587,7 +39619,9 @@ jak_sbfc                        //
 lexizeus                        // Lexibook
 vii                             // KenSingTon / Jungle Soft / Siatronics Vii
 wirels60                        // Wireless 60
+zone40                          // Zone 40
 zone60                          // Zone 60
+lx_jg7415                       //
 rad_skat                        //
 rad_skatp                       //
 rad_sktv                        //

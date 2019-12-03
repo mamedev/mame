@@ -406,7 +406,6 @@ void jangou_state::jngolady_cpu1_io(address_map &map)
 
 void jangou_state::nsc_map(address_map &map)
 {
-	map(0x0000, 0x007f).ram(); //internal ram for irq etc.
 	map(0x8000, 0x8000).nopw(); //write-only,irq related?
 	map(0x9000, 0x9000).rw(FUNC(jangou_state::slave_com_r), FUNC(jangou_state::slave_com_w));
 	map(0xc000, 0xc7ff).ram().share("share1");

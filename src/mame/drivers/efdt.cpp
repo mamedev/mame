@@ -362,7 +362,6 @@ void efdt_state::efdt_map(address_map &map)
 
 void efdt_state::efdt_snd_map(address_map &map)
 {
-	map(0x0000, 0x007f).ram();
 	map(0x6000, 0x6000).nopw();
 	map(0x7000, 0x7000).nopw();
 	map(0x8000, 0x83ff).ram();
