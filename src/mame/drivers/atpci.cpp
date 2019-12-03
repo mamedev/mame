@@ -195,6 +195,19 @@ ROM_START( at586 )
 	ROMX_LOAD("asus_txp4.bin",   0x20000, 0x20000, CRC(a1321bb1) SHA1(92e5f14d8505119f85b148a63510617ac12bcdf3), ROM_BIOS(4))
 ROM_END
 
+// Elitegroup SI5PI AIO Rev. 1.1 - Chipset: SiS 85C501, 85C502, 85C502, FDC37C666GT, UM82C865F, PCI0640B - CPU: Socket 4 - RAM: 4xSIMM72, Cache: 18x32pin
+// BIOS: Award 32pin - Keyboard-BIOS: AMIKEY-2 - ISA16: 4, PCI: 4 - On board: 2xISA, 2xser, Floppy, par
+ROM_START( ecssi5pi )
+	ROM_REGION32_LE(0x40000, "isa", 0)
+	// BIOS-String: 11/17/94-SiS-501-503-2A5IAE11-00 / SI5PI AIO 11/18/94
+	ROM_SYSTEM_BIOS(0, "111894", "11/18/94")
+	ROMX_LOAD("si5piaio11_isa_pci_bios_013908435.bin", 0x20000, 0x20000, CRC(c39aa47c) SHA1(6b31bdc5441c5f7a29d0ceb8989ccfed92c49900), ROM_BIOS(0))
+	// BIOS-String: 12/02/94-SiS-501-503-2A5IAE11-00 / SI5PI AIO 12/02/94
+	ROM_SYSTEM_BIOS(1, "120294", "12/02/94")
+	ROMX_LOAD("si5piaio.bin", 0x20000, 0x20000, CRC(9dfb8510) SHA1(b86cc1930dc78db3c4c9d1ed13ec60b2333db7d1), ROM_BIOS(1))
+ROM_END
+
+
 ROM_START(at586x3)
 	ROM_REGION32_LE(0x40000, "isa", 0)
 	ROM_SYSTEM_BIOS(0, "5hx29", "5HX29")
@@ -246,3 +259,4 @@ COMP( 1990, at586,    ibm5170, 0,       at586,    0,        at586_state, empty_i
 COMP( 1990, at586x3,  ibm5170, 0,       at586x3,  0,        at586_state, empty_init, "<generic>", "PC/AT 586 (PIIX3)", MACHINE_NOT_WORKING )
 COMP( 1997, ficvt503, ibm5170, 0,       at586,    0,        at586_state, empty_init, "FIC",       "VT-503",            MACHINE_NOT_WORKING )
 COMP( 1990, m55hipl,  ibm5170, 0,       at586m55, at586m55, at586_state, empty_init, "Micronics", "M55Hi-Plus",        MACHINE_NOT_WORKING )
+COMP( 199?, ecssi5pi, ibm5170, 0,       at586,    0,        at586_state, empty_init, "Elitegroup","SI5PI AIO",         MACHINE_NOT_WORKING )
