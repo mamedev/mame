@@ -135,18 +135,18 @@
 #endif //
 
 #if BX_CPU_PPC
-// _LITTLE_ENDIAN exists on ppc64le.
-#	if _LITTLE_ENDIAN
-#		undef  BX_CPU_ENDIAN_LITTLE
-#		define BX_CPU_ENDIAN_LITTLE 1
-#	else
+// __BIG_ENDIAN__ is gcc predefined macro
+#	if defined(__BIG_ENDIAN__)
 #		undef  BX_CPU_ENDIAN_BIG
 #		define BX_CPU_ENDIAN_BIG 1
+#	else
+#		undef  BX_CPU_ENDIAN_LITTLE
+#		define BX_CPU_ENDIAN_LITTLE 1
 #	endif
 #else
 #	undef  BX_CPU_ENDIAN_LITTLE
 #	define BX_CPU_ENDIAN_LITTLE 1
-#endif // BX_PLATFORM_
+#endif // BX_CPU_PPC
 
 // http://sourceforge.net/apps/mediawiki/predef/index.php?title=Operating_Systems
 #if defined(_DURANGO) || defined(_XBOX_ONE)
