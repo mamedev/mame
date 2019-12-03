@@ -176,7 +176,7 @@ void nb1414m4_device::kozure_score_msg(uint16_t dst, uint8_t src_base, uint8_t *
 		vram[i+dst+0x0400] = m_data[0x10f+(src_base*0x1c)+i];
 	}
 
-	vram[6+dst+0x0000] = 0x30;
+	vram[6+dst+0x0000] = vram[5+dst+0x0000] == 0x20 ? 0x20 : 0x30;
 	vram[6+dst+0x0400] = m_data[0x10f+(src_base*0x1c)+6];
 	vram[7+dst+0x0000] = 0x30;
 	vram[7+dst+0x0400] = m_data[0x10f+(src_base*0x1c)+7];
