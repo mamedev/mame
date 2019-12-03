@@ -62,7 +62,7 @@ void nb1414m4_device::device_start()
 
 void nb1414m4_device::device_reset()
 {
-	m_flickering_cycle = 0;
+	m_flickering_cycle = 1;
 	m_in_game = false;
 }
 
@@ -104,9 +104,10 @@ void nb1414m4_device::insert_coin_msg(uint8_t *vram)
 	if (m_in_game)
 		return;
 
+	m_flickering_cycle++;
+
 	int credit_count = (vram[0xf] & 0xff);
 	uint8_t fl_cond = (m_flickering_cycle & 0x10) == 0; /* for insert coin "flickering" */
-	m_flickering_cycle++;
 	uint16_t dst;
 
 	if(credit_count == 0)
