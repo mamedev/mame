@@ -790,6 +790,7 @@ void bnstars_state::bnstars_sound_map(address_map &map)
 void bnstars_state::bnstars(machine_config &config)
 {
 	/* basic machine hardware */
+
 	V70(config, m_maincpu, XTAL(40'000'000)/2); // 20MHz (40MHz / 2)
 	m_maincpu->set_addrmap(AS_PROGRAM, &bnstars_state::bnstars_map);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(ms32_state::irq_callback));

@@ -46,7 +46,7 @@ function datfile.open(file, vertag, fixupcb)
 
 	if not fh and dbver then
 		-- data in database but missing file, just use what we have
-		return read, dbver
+		return readret(file), dbver
 	elseif not fh then
 		return nil
 	elseif not dbver then
@@ -77,7 +77,7 @@ function datfile.open(file, vertag, fixupcb)
 	end
 	if ver == dbver then
 		fh:close()
-		return read, dbver
+		return readret(file), dbver
 	end
 
 	if dbver then
