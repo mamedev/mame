@@ -455,7 +455,7 @@ void mitchell_state::pkladiesbl_io_map(address_map &map) // TODO: check everythi
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).portr("IN0").w(FUNC(mitchell_state::pang_gfxctrl_w));   /* Palette bank, layer enable, coin counters, more */
-	map(0x01, 0x01).portr("IN1").w("ymsnd", FUNC(ym2413_device::register_port_w));
+	map(0x01, 0x01).portr("IN1").w("ymsnd", FUNC(ym2413_device::register_port_w)); // TODO: hold buttons are here, multiplexed but not in the same way as the original
 	map(0x02, 0x02).portr("IN2").w(FUNC(mitchell_state::pang_bankswitch_w));    /* Code bank register */
 	map(0x03, 0x03).portr("DSW0");
 	map(0x04, 0x04).portr("DSW1");
@@ -733,7 +733,7 @@ static INPUT_PORTS_START( pkladies )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( pkladiesbl ) // TODO: where are the hold buttons?
+static INPUT_PORTS_START( pkladiesbl )
 	PORT_START("SYS0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* USED - handled in port5_r */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1686,8 +1686,7 @@ ROM_END
 
 ROM_START( pkladiesbl )
 	ROM_REGION( 0x50000*2, "maincpu", 0 )
-	// you would expect one half of this to be decrypted code, and the other half to be decrypted data
-	// however, only parts of it are??
+	// only 1.ic112 is encrypted (only opcodes). Encryption scheme seems to involve XORs and bitswaps, based on addresses. 
 	ROM_LOAD( "1.ic112", 0x50000, 0x08000, CRC(ca4cfaf9) SHA1(97ad3c526e4494f347db45c986ba23aff07e6321) )
 	ROM_CONTINUE(0x00000,0x08000)
 	ROM_LOAD( "2.ic126", 0x60000, 0x10000, CRC(5c73e9b6) SHA1(5fbfb4c79e2df8e1edd3f29ac63f9961dd3724b1) )
