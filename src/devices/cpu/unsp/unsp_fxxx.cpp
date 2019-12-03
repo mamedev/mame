@@ -289,27 +289,14 @@ void unsp_12_device::execute_fxxx_101_group(uint16_t op)
 	{
 		uint16_t r4 = m_core->m_r[REG_R4];
 
-		// this could be optimized, but logic is correct for use cases seen
 		if (r4 & 0x8000)
 		{
 			// r2 undefined (code will check for this and avoid calculations
 		}
-		else if (r4 & 0x4000) { m_core->m_r[REG_R2] = 0x0000; }
-		else if (r4 & 0x2000) { m_core->m_r[REG_R2] = 0x0001; }
-		else if (r4 & 0x1000) { m_core->m_r[REG_R2] = 0x0002; }
-		else if (r4 & 0x0800) { m_core->m_r[REG_R2] = 0x0003; }
-		else if (r4 & 0x0400) { m_core->m_r[REG_R2] = 0x0004; }
-		else if (r4 & 0x0200) { m_core->m_r[REG_R2] = 0x0005; }
-		else if (r4 & 0x0100) { m_core->m_r[REG_R2] = 0x0006; }
-		else if (r4 & 0x0080) { m_core->m_r[REG_R2] = 0x0007; }
-		else if (r4 & 0x0040) { m_core->m_r[REG_R2] = 0x0008; }
-		else if (r4 & 0x0020) { m_core->m_r[REG_R2] = 0x0009; }
-		else if (r4 & 0x0010) { m_core->m_r[REG_R2] = 0x000a; }
-		else if (r4 & 0x0008) { m_core->m_r[REG_R2] = 0x000b; }
-		else if (r4 & 0x0004) { m_core->m_r[REG_R2] = 0x000c; }
-		else if (r4 & 0x0002) { m_core->m_r[REG_R2] = 0x000d; }
-		else if (r4 & 0x0001) { m_core->m_r[REG_R2] = 0x000e; }
-		else { m_core->m_r[REG_R2] = 0x000f; }
+		else
+		{
+			m_core->m_r[REG_R2] = count_leading_zeros(r4) - 17; // -17 because count_leading_zeros works with 32-bit values
+		}
 		
 		return;
 	}
