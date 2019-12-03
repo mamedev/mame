@@ -108,7 +108,7 @@ void dangarj_state::dangarj_io_map(address_map &map)
 
 WRITE8_MEMBER(galivan_state::blit_trigger_w)
 {
-	m_nb1414m4->exec((m_videoram[0] << 8) | (m_videoram[1] & 0xff), m_videoram, m_scrollx, m_scrolly, m_tx_tilemap);
+	m_nb1414m4->exec((m_videoram[0] << 8) | (m_videoram[1] & 0xff),m_videoram,m_scrollx,m_scrolly,m_tx_tilemap);
 }
 
 void galivan_state::ninjemak_io_map(address_map &map)
