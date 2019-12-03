@@ -8979,4 +8979,98 @@
 		</part>
 	</software>
 
+	<software name="dinodayp">
+		<description>Dinosaur Days Plus!</description>
+		<year>1988</year>
+		<publisher>Pelican Software</publisher>
+		<info name="release" value="2019-11-30"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side A - Program"/>
+			<dataarea name="flop" size="242157">
+				<rom name="dinosaur days plus disk 1a - program.woz" size="242157" crc="f728b2e8" sha1="2b424a4b6d9b7dd55b3ea57ef25cda030185ca09"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side B - Program"/>
+			<dataarea name="flop" size="242157">
+				<rom name="dinosaur days plus disk 1b - program.woz" size="242157" crc="13f62316" sha1="5625f28455880a93f83f4a777605133f88a9dab2"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side A - Graphics database"/>
+			<dataarea name="flop" size="242166">
+				<rom name="dinosaur days plus disk 2a - graphics database.woz" size="242166" crc="31eb42c4" sha1="e154aec0d97913b9cede4b4e0a7c42b89db50f88"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side B - Graphics database"/>
+			<dataarea name="flop" size="242166">
+				<rom name="dinosaur days plus disk 2b - graphics database.woz" size="242166" crc="317fd228" sha1="cf19f2fb9a8bdd393465508eea23da8945e15319"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nysiwit">
+		<description>Now You See It, Now You Don't - Was it there? Was it missing?</description>
+		<year>1987</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2019-11-30"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="241348">
+				<rom name="now you see it, now you don't - was it there - was it missing.woz" size="241348" crc="a7e51505" sha1="9aacdba6d7067cb8062336a177d7721203715dc9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eaglnest">
+		<description>Into The Eagle's Nest</description>
+		<year>1986</year>
+		<publisher>Mindscape</publisher>
+		<info name="release" value="2019-12-02"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="241445">
+				<rom name="into the eagle's nest.woz" size="241445" crc="65eb8066" sha1="0555eb4c26b06ad98f520ad205f15b13d033242d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ecosim2">
+		<description>Ecology Simulations II</description>
+		<year>1979</year>
+		<publisher>Creative Computing Software</publisher>
+		<info name="release" value="2019-12-02"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234788">
+				<rom name="ecology simulations ii.woz" size="234788" crc="e5ea95d8" sha1="97614fa13e1f42e3e1385f29206dc785898a6703"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thrilogy">
+		<description>Thrilogy</description>
+		<year>1980</year>
+		<publisher>On-Line Systems</publisher>
+		<info name="release" value="2019-12-02"/>
+		<sharedfeat name="compatibility" value="A2"/>
+		<!-- It requires a 48K Apple ][ and Integer BASIC in ROM. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234787">
+				<rom name="thrilogy.woz" size="234787" crc="ea5dabec" sha1="96eacd29aac4e1c4f7fb7cd36ad62e5f8b360909"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
