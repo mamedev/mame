@@ -151,6 +151,40 @@ void gcm394_base_video_device::decodegfx(const char* tag)
 		m_gfxdecode->set_gfx(m_maxgfxelement, std::make_unique<gfx_element>(m_palette, obj_layout, gfxregion, 0, 0x40 * 0x10, 0));
 		m_maxgfxelement++;
 	}
+
+	if (1)
+	{
+		gfx_layout obj_layout =
+		{
+			32,32,
+			0,
+			8,
+			{ STEP8(0,1) },
+			{ STEP32(0,8) },
+			{ STEP32(0,8 * 32) },
+			32 * 32 * 8
+		};
+		obj_layout.total = gfxregionsize / (32 * 32 * 8 / 8);
+		m_gfxdecode->set_gfx(m_maxgfxelement, std::make_unique<gfx_element>(m_palette, obj_layout, gfxregion, 0, 0x10, 0));
+		m_maxgfxelement++;
+	}
+
+	if (1)
+	{
+		gfx_layout obj_layout =
+		{
+			32,32,
+			0,
+			6,
+			{ 0,1,2,3,4,5 },
+			{ STEP32(0,6) },
+			{ STEP32(0,6 * 32) },
+			32 * 32 * 6
+		};
+		obj_layout.total = gfxregionsize / (32 * 32 * 6 / 8);
+		m_gfxdecode->set_gfx(m_maxgfxelement, std::make_unique<gfx_element>(m_palette, obj_layout, gfxregion, 0, 0x40, 0));
+		m_maxgfxelement++;
+	}
 }
 
 void gcm394_base_video_device::device_start()
