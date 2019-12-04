@@ -45,8 +45,8 @@ spg2xx_io_device::spg2xx_io_device(const machine_config &mconfig, device_type ty
 	, m_portb_in(*this)
 	, m_portc_in(*this)
 	, m_adc_in{{*this}, {*this}}
-	, m_eeprom_w(*this)
-	, m_eeprom_r(*this)
+	, m_i2c_w(*this)
+	, m_i2c_r(*this)
 	, m_uart_tx(*this)
 	, m_chip_sel(*this)
 	, m_cpu(*this, finder_base::DUMMY_TAG)
@@ -81,8 +81,8 @@ void spg2xx_io_device::device_start()
 	m_portc_in.resolve_safe(0);
 	m_adc_in[0].resolve_safe(0x0fff);
 	m_adc_in[1].resolve_safe(0x0fff);
-	m_eeprom_w.resolve_safe();
-	m_eeprom_r.resolve_safe(0);
+	m_i2c_w.resolve_safe();
+	m_i2c_r.resolve_safe(0);
 	m_uart_tx.resolve_safe();
 	m_chip_sel.resolve_safe();
 	m_pal_read_cb.resolve_safe(0);
@@ -1325,9 +1325,9 @@ void spg2xx_io_device::do_i2c()
 	const uint16_t addr = ((m_io_regs[0x5b] & 0x06) << 7) | (uint8_t)m_io_regs[0x5c];
 
 	if (m_io_regs[0x58] & 0x40) // Serial EEPROM read
-		m_io_regs[0x5e] = m_eeprom_r(addr);
+		m_io_regs[0x5e] = m_i2c_r(addr);
 	else
-		m_eeprom_w(addr, m_io_regs[0x5d]);
+		m_i2c_w(addr, m_io_regs[0x5d]);
 
 	m_io_regs[0x59] |= 1;
 }

@@ -40,26 +40,10 @@ gcm394_video_device::gcm394_video_device(const machine_config &mconfig, const ch
 {
 }
 
-void gcm394_base_video_device::device_start()
+void gcm394_base_video_device::decodegfx(const char* tag)
 {
-	for (uint8_t i = 0; i < 32; i++)
-	{
-		m_rgb5_to_rgb8[i] = (i << 3) | (i >> 2);
-	}
-	for (uint16_t i = 0; i < 0x8000; i++)
-	{
-		m_rgb555_to_rgb888[i] = (m_rgb5_to_rgb8[(i >> 10) & 0x1f] << 16) |
-								(m_rgb5_to_rgb8[(i >>  5) & 0x1f] <<  8) |
-								(m_rgb5_to_rgb8[(i >>  0) & 0x1f] <<  0);
-	}
-
-	m_video_irq_cb.resolve();
-
-
-	m_gfxregion = memregion(":maincpu")->base();
-	m_gfxregionsize = memregion(":maincpu")->bytes();
-
-	int gfxelement = 0;
+	uint8_t* gfxregion = memregion(tag)->base();
+	int gfxregionsize = memregion(tag)->bytes();
 
 	if (1)
 	{
@@ -73,9 +57,9 @@ void gcm394_base_video_device::device_start()
 			{ STEP16(0,4 * 16) },
 			16 * 16 * 4
 		};
-		obj_layout.total = m_gfxregionsize / (16 * 16 * 4 / 8);
-		m_gfxdecode->set_gfx(gfxelement, std::make_unique<gfx_element>(m_palette, obj_layout, m_gfxregion, 0, 0x10 * 0x10, 0));
-		gfxelement++;
+		obj_layout.total = gfxregionsize / (16 * 16 * 4 / 8);
+		m_gfxdecode->set_gfx(m_maxgfxelement, std::make_unique<gfx_element>(m_palette, obj_layout, gfxregion, 0, 0x10 * 0x10, 0));
+		m_maxgfxelement++;
 	}
 
 	if (1)
@@ -90,9 +74,9 @@ void gcm394_base_video_device::device_start()
 			{ STEP16(0,4 * 32) },
 			16 * 32 * 4
 		};
-		obj_layout.total = m_gfxregionsize / (16 * 32 * 4 / 8);
-		m_gfxdecode->set_gfx(gfxelement, std::make_unique<gfx_element>(m_palette, obj_layout, m_gfxregion, 0, 0x10 * 0x10, 0));
-		gfxelement++;
+		obj_layout.total = gfxregionsize / (16 * 32 * 4 / 8);
+		m_gfxdecode->set_gfx(m_maxgfxelement, std::make_unique<gfx_element>(m_palette, obj_layout, gfxregion, 0, 0x10 * 0x10, 0));
+		m_maxgfxelement++;
 	}
 
 	if (1)
@@ -107,9 +91,9 @@ void gcm394_base_video_device::device_start()
 			{ STEP32(0,4 * 16) },
 			32 * 16 * 4
 		};
-		obj_layout.total = m_gfxregionsize / (32 * 16 * 4 / 8);
-		m_gfxdecode->set_gfx(gfxelement, std::make_unique<gfx_element>(m_palette, obj_layout, m_gfxregion, 0, 0x10 * 0x10, 0));
-		gfxelement++;
+		obj_layout.total = gfxregionsize / (32 * 16 * 4 / 8);
+		m_gfxdecode->set_gfx(m_maxgfxelement, std::make_unique<gfx_element>(m_palette, obj_layout, gfxregion, 0, 0x10 * 0x10, 0));
+		m_maxgfxelement++;
 	}
 
 	if (1)
@@ -124,9 +108,9 @@ void gcm394_base_video_device::device_start()
 			{ STEP32(0,4 * 32) },
 			32 * 32 * 4
 		};
-		obj_layout.total = m_gfxregionsize / (32 * 32 * 4 / 8);
-		m_gfxdecode->set_gfx(gfxelement, std::make_unique<gfx_element>(m_palette, obj_layout, m_gfxregion, 0, 0x10 * 0x10, 0));
-		gfxelement++;
+		obj_layout.total = gfxregionsize / (32 * 32 * 4 / 8);
+		m_gfxdecode->set_gfx(m_maxgfxelement, std::make_unique<gfx_element>(m_palette, obj_layout, gfxregion, 0, 0x10 * 0x10, 0));
+		m_maxgfxelement++;
 	}
 
 	if (1)
@@ -141,9 +125,9 @@ void gcm394_base_video_device::device_start()
 			{ STEP16(0,2 * 8) },
 			8 * 16 * 2
 		};
-		obj_layout.total = m_gfxregionsize / (8 * 16 * 2 / 8);
-		m_gfxdecode->set_gfx(gfxelement, std::make_unique<gfx_element>(m_palette, obj_layout, m_gfxregion, 0, 0x40 * 0x10, 0));
-		gfxelement++;
+		obj_layout.total = gfxregionsize / (8 * 16 * 2 / 8);
+		m_gfxdecode->set_gfx(m_maxgfxelement, std::make_unique<gfx_element>(m_palette, obj_layout, gfxregion, 0, 0x40 * 0x10, 0));
+		m_maxgfxelement++;
 	}
 
 	if (1)
@@ -163,10 +147,65 @@ void gcm394_base_video_device::device_start()
 			texlayout_xoffset,
 			texlayout_yoffset
 		};
-		obj_layout.total = m_gfxregionsize / (16 * 32 * 2 / 8);
-		m_gfxdecode->set_gfx(gfxelement, std::make_unique<gfx_element>(m_palette, obj_layout, m_gfxregion, 0, 0x40 * 0x10, 0));
-		gfxelement++;
+		obj_layout.total = gfxregionsize / (16 * 32 * 2 / 8);
+		m_gfxdecode->set_gfx(m_maxgfxelement, std::make_unique<gfx_element>(m_palette, obj_layout, gfxregion, 0, 0x40 * 0x10, 0));
+		m_maxgfxelement++;
 	}
+
+	if (1)
+	{
+		gfx_layout obj_layout =
+		{
+			32,32,
+			0,
+			8,
+			{ STEP8(0,1) },
+			{ STEP32(0,8) },
+			{ STEP32(0,8 * 32) },
+			32 * 32 * 8
+		};
+		obj_layout.total = gfxregionsize / (32 * 32 * 8 / 8);
+		m_gfxdecode->set_gfx(m_maxgfxelement, std::make_unique<gfx_element>(m_palette, obj_layout, gfxregion, 0, 0x10, 0));
+		m_maxgfxelement++;
+	}
+
+	if (1)
+	{
+		gfx_layout obj_layout =
+		{
+			32,32,
+			0,
+			6,
+			{ 0,1,2,3,4,5 },
+			{ STEP32(0,6) },
+			{ STEP32(0,6 * 32) },
+			32 * 32 * 6
+		};
+		obj_layout.total = gfxregionsize / (32 * 32 * 6 / 8);
+		m_gfxdecode->set_gfx(m_maxgfxelement, std::make_unique<gfx_element>(m_palette, obj_layout, gfxregion, 0, 0x40, 0));
+		m_maxgfxelement++;
+	}
+}
+
+void gcm394_base_video_device::device_start()
+{
+	for (uint8_t i = 0; i < 32; i++)
+	{
+		m_rgb5_to_rgb8[i] = (i << 3) | (i >> 2);
+	}
+	for (uint16_t i = 0; i < 0x8000; i++)
+	{
+		m_rgb555_to_rgb888[i] = (m_rgb5_to_rgb8[(i >> 10) & 0x1f] << 16) |
+								(m_rgb5_to_rgb8[(i >>  5) & 0x1f] <<  8) |
+								(m_rgb5_to_rgb8[(i >>  0) & 0x1f] <<  0);
+	}
+
+	m_video_irq_cb.resolve();
+
+	m_maxgfxelement = 0;
+
+	decodegfx(":maincpu");
+
 	save_item(NAME(m_spriteextra));
 	m_space_read_cb.resolve_safe(0);
 }
@@ -192,7 +231,7 @@ void gcm394_base_video_device::device_reset()
 	m_7063 = 0x0000;
 
 	m_702a = 0x0000;
-	m_7030 = 0x0000;
+	m_7030_brightness = 0x0000;
 	m_703c = 0x0000;
 
 
@@ -212,6 +251,13 @@ void gcm394_base_video_device::device_reset()
 	m_videodma_source = 0x0000;
 
 	m_video_irq_status = 0x0000;
+
+	m_unk_vid0_gfxbase_lsb = 0;
+	m_unk_vid0_gfxbase_msb = 0;
+	m_unk_vid1_gfxbase_lsb = 0;
+	m_unk_vid1_gfxbase_msb = 0;
+	m_unk_vid2_gfxbase_lsb = 0;
+	m_unk_vid2_gfxbase_msb = 0;
 
 }
 
@@ -233,9 +279,8 @@ void gcm394_base_video_device::draw(const rectangle &cliprect, uint32_t line, ui
 
 	uint32_t words_per_tile = 8; // seems to be correct for sprites regardless of size / bpp
 
-	uint32_t m = bitmap_addr + words_per_tile * tile + bits_per_row * (line ^ yflipmask);
+	uint32_t m = (bitmap_addr - 0x20000) + (words_per_tile * tile + bits_per_row * (line ^ yflipmask));
 
-	m += (0x300000 / 2);
 
 	uint32_t bits = 0;
 	uint32_t nbits = 0;
@@ -245,10 +290,10 @@ void gcm394_base_video_device::draw(const rectangle &cliprect, uint32_t line, ui
 	if (yy >= 0x01c0)
 		yy -= 0x0200;
 
-	if (yy > 240 || yy < 0)
+	if (yy > cliprect.max_y || yy < 0)
 		return;
 
-	int y_index = yy * 320;
+	int y_index = yy * m_screen->width();
 
 	for (int32_t x = FlipX ? (w - 1) : 0; FlipX ? x >= 0 : x < w; FlipX ? x-- : x++)
 	{
@@ -299,7 +344,7 @@ void gcm394_base_video_device::draw(const rectangle &cliprect, uint32_t line, ui
 		if (xx >= 0x01c0)
 			xx -= 0x0200;
 
-		if (xx >= 0 && xx < 320)
+		if (xx >= 0 && xx <= cliprect.max_x)
 		{
 			int pix_index = xx + y_index;
 
@@ -438,7 +483,7 @@ void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t sca
 
 void gcm394_base_video_device::draw_sprite(const rectangle &cliprect, uint32_t scanline, int priority, uint32_t base_addr)
 {
-	uint32_t bitmap_addr = 0;// 0x40 * m_video_regs[0x22];
+	uint32_t bitmap_addr = (m_unk_vid1_gfxbase_msb << 16) | m_unk_vid1_gfxbase_lsb; // or unk_vid2 / 0
 	uint32_t tile = m_spriteram[base_addr + 0];
 	int16_t x = m_spriteram[base_addr + 1];
 	int16_t y = m_spriteram[base_addr + 2];
@@ -516,10 +561,10 @@ void gcm394_base_video_device::draw_sprites(const rectangle &cliprect, uint32_t 
 
 uint32_t gcm394_base_video_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	memset(&m_screenbuf[320 * cliprect.min_y], 0, 4 * 320 * ((cliprect.max_y - cliprect.min_y) + 1));
+	memset(&m_screenbuf[m_screen->width() * cliprect.min_y], 0, 4 *  m_screen->width() * ((cliprect.max_y - cliprect.min_y) + 1));
 
-	const uint32_t page0_addr = 0x40 * (m_page0_addr | (m_page0_addr_msb<<16));
-	const uint32_t page1_addr = 0x40 * (m_page1_addr | (m_page1_addr_msb<<16));
+	const uint32_t page0_addr = (m_page0_addr_lsb | (m_page0_addr_msb<<16));
+	const uint32_t page1_addr = (m_page1_addr_lsb | (m_page1_addr_msb<<16));
 	uint16_t* page0_regs = m_tmap0_regs;
 	uint16_t* page1_regs = m_tmap1_regs;
 
@@ -539,7 +584,7 @@ uint32_t gcm394_base_video_device::screen_update(screen_device &screen, bitmap_r
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		uint32_t *dest = &bitmap.pix32(y, cliprect.min_x);
-		uint32_t *src = &m_screenbuf[cliprect.min_x + 320 * y];
+		uint32_t *src = &m_screenbuf[cliprect.min_x + m_screen->width() * y];
 		memcpy(dest, src, sizeof(uint32_t) * ((cliprect.max_x - cliprect.min_x) + 1));
 	}
 
@@ -552,34 +597,34 @@ void gcm394_base_video_device::write_tmap_regs(int tmap, uint16_t* regs, int off
 	switch (offset)
 	{
 	case 0x0: // Page X scroll
-		LOGMASKED(LOG_GCM394_TMAP, "write_tmap_regs: Page %d X Scroll = %04x\n", tmap, data & 0x01ff);
+		LOGMASKED(LOG_GCM394_TMAP, "%s: write_tmap_regs: Page %d X Scroll = %04x\n", machine().describe_context(), tmap, data & 0x01ff);
 		regs[offset] = data & 0x01ff;
 		break;
 
 	case 0x1: // Page Y scroll
-		LOGMASKED(LOG_GCM394_TMAP, "write_tmap_regs: Page %d Y Scroll = %04x\n", tmap, data & 0x00ff);
+		LOGMASKED(LOG_GCM394_TMAP, "%s: write_tmap_regs: Page %d Y Scroll = %04x\n",  machine().describe_context(), tmap, data & 0x00ff);
 		regs[offset] = data & 0x00ff;
 		break;
 
 	case 0x2: // Page Attributes
-		LOGMASKED(LOG_GCM394_TMAP, "write_tmap_regs: Page %d Attributes = %04x (Depth:%d, Palette:%d, VSize:%d, HSize:%d, FlipY:%d, FlipX:%d, BPP:%d)\n", tmap, data
+		LOGMASKED(LOG_GCM394_TMAP, "%s: write_tmap_regs: Page %d Attributes = %04x (Depth:%d, Palette:%d, VSize:%d, HSize:%d, FlipY:%d, FlipX:%d, BPP:%d)\n",  machine().describe_context(), tmap, data
 			, (data >> 12) & 3, (data >> 8) & 15, 8 << ((data >> 6) & 3), 8 << ((data >> 4) & 3), BIT(data, 3), BIT(data, 2), 2 * ((data & 3) + 1));
 		regs[offset] = data;
 		break;
 
 	case 0x3: // Page Control
-		LOGMASKED(LOG_GCM394_TMAP, "write_tmap_regs: Page %d Control = %04x (Blend:%d, HiColor:%d, RowScroll:%d, Enable:%d, Wallpaper:%d, RegSet:%d, Bitmap:%d)\n", tmap, data
+		LOGMASKED(LOG_GCM394_TMAP, "%s: write_tmap_regs: Page %d Control = %04x (Blend:%d, HiColor:%d, RowScroll:%d, Enable:%d, Wallpaper:%d, RegSet:%d, Bitmap:%d)\n",  machine().describe_context(), tmap, data
 			, BIT(data, 8), BIT(data, 7), BIT(data, 4), BIT(data, 3), BIT(data, 2), BIT(data, 1), BIT(data, 0));
 		regs[offset] = data;
 		break;
 
 	case 0x4: // Page Tile Address
-		LOGMASKED(LOG_GCM394_TMAP, "write_tmap_regs: Page %d Tile Address = %04x\n", tmap, data & 0x1fff);
+		LOGMASKED(LOG_GCM394_TMAP, "%s: write_tmap_regs: Page %d Tile Address = %04x\n",  machine().describe_context(), tmap, data & 0x1fff);
 		regs[offset] = data;
 		break;
 
 	case 0x5: // Page Attribute write_tmap_regs
-		LOGMASKED(LOG_GCM394_TMAP, "write_tmap_regs: Page %d Attribute Address = %04x\n", tmap, data & 0x1fff);
+		LOGMASKED(LOG_GCM394_TMAP, "%s: write_tmap_regs: Page %d Attribute Address = %04x\n",  machine().describe_context(), tmap, data & 0x1fff);
 		regs[offset] = data;
 		break;
 	}
@@ -598,13 +643,15 @@ WRITE16_MEMBER(gcm394_base_video_device::tmap0_regs_w)
 WRITE16_MEMBER(gcm394_base_video_device::tmap0_tilebase_lsb_w)
 {
 	LOGMASKED(LOG_GCM394_TMAP, "%s:gcm394_base_video_device::tmap0_tilebase_lsb_w %04x\n", machine().describe_context(), data);
-	m_page0_addr = data;
+	m_page0_addr_lsb = data;
+	LOGMASKED(LOG_GCM394_TMAP, "	(tmap0 tilegfxbase is now %04x%04x)\n", m_page0_addr_msb, m_page0_addr_lsb);
 }
 
 WRITE16_MEMBER(gcm394_base_video_device::tmap0_tilebase_msb_w)
 {
 	LOGMASKED(LOG_GCM394_TMAP, "%s:gcm394_base_video_device::tmap0_tilebase_msb_w %04x\n", machine().describe_context(), data);
 	m_page0_addr_msb = data;
+	LOGMASKED(LOG_GCM394_TMAP, "	(tmap0 tilegfxbase is now %04x%04x)\n", m_page0_addr_msb, m_page0_addr_lsb);
 }
 
 // **************************************** TILEMAP 1 *************************************************
@@ -620,71 +667,109 @@ WRITE16_MEMBER(gcm394_base_video_device::tmap1_regs_w)
 WRITE16_MEMBER(gcm394_base_video_device::tmap1_tilebase_lsb_w)
 {
 	LOGMASKED(LOG_GCM394_TMAP, "%s:gcm394_base_video_device::tmap1_tilebase_lsb_w %04x\n", machine().describe_context(), data);
-	m_page1_addr = data;
+	m_page1_addr_lsb = data;
+	LOGMASKED(LOG_GCM394_TMAP, "	(tmap1 tilegfxbase is now %04x%04x)\n", m_page1_addr_msb, m_page1_addr_lsb);
 }
 
 WRITE16_MEMBER(gcm394_base_video_device::tmap1_tilebase_msb_w)
 {
 	LOGMASKED(LOG_GCM394_TMAP, "%s:gcm394_base_video_device::tmap1_tilebase_msb_w %04x\n", machine().describe_context(), data);
 	m_page1_addr_msb = data;
+	LOGMASKED(LOG_GCM394_TMAP, "	(tmap1 tilegfxbase is now %04x%04x)\n", m_page1_addr_msb, m_page1_addr_lsb);
 }
 
-// **************************************** unknown video device 0 (another tilemap? sprite layer?) *************************************************
+// **************************************** unknown video device handler for below  *************************************************
 
-WRITE16_MEMBER(gcm394_base_video_device::unknown_video_device0_regs_w)
+// offsets 0,1,4,5,6,7 used in main IRQ code
+// offsets 2,3 only cleared on startup
+void gcm394_base_video_device::unk_vid_regs_w(int which, int offset, uint16_t data)
 {
-	// offsets 0,1,4,5,6,7 used in main IRQ code
-	// offsets 2,3 only cleared on startup
+	switch (offset)
+	{
+	case 0x0:
+		LOGMASKED(LOG_GCM394_VIDEO, "unk_vid_regs_w (unk chip %d) %01x %04x (X scroll?)\n", machine().describe_context(), which, offset, data); // masked with 0x3ff in code like x-scroll for tilemaps
+		break;
 
-	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::unknown_video_device0_regs_w %01x %04x\n", machine().describe_context(), offset, data);
-}
+	case 0x1:
+		LOGMASKED(LOG_GCM394_VIDEO, "unk_vid_regs_w (unk chip %d) %01x %04x (y scroll?)\n", machine().describe_context(), which, offset, data); // masked with 0x3ff in code like x-scroll for tilemaps
+		break;
 
-WRITE16_MEMBER(gcm394_base_video_device::unknown_video_device0_unk0_w)
-{
-	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::unknown_video_device0_unk0_w %04x\n", machine().describe_context(), data);
-}
+	case 0x02: // startup?
+	case 0x03: // startup?
 
-WRITE16_MEMBER(gcm394_base_video_device::unknown_video_device0_unk1_w)
-{
-	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::unknown_video_device0_unk1_w %04x\n", machine().describe_context(), data);
+	case 0x04:
+	case 0x05:
+	case 0x06:
+	case 0x07:
+		LOGMASKED(LOG_GCM394_VIDEO, "unk_vid_regs_w (unk chip %d) %01x %04x\n", machine().describe_context(), which, offset, data);
+		break;
+
+	}
 }
 
 // **************************************** unknown video device 1 (another tilemap? sprite layer?) *************************************************
 
-WRITE16_MEMBER(gcm394_base_video_device::unknown_video_device1_regs_w)
+WRITE16_MEMBER(gcm394_base_video_device::unk_vid1_regs_w)
 {
-	// offsets 0,1,4,5,6,7 used in main IRQ code
-	// offsets 2,3 only cleared on startup
-
-	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::unknown_video_device1_regs_w %01x %04x\n", machine().describe_context(), offset, data);
+	unk_vid_regs_w(0, offset, data);
 }
 
-WRITE16_MEMBER(gcm394_base_video_device::unknown_video_device1_unk0_w)
+WRITE16_MEMBER(gcm394_base_video_device::unk_vid1_gfxbase_lsb_w)
 {
-	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::unknown_video_device1_unk0_w %04x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::unk_vid1_gfxbase_lsb_w %04x\n", machine().describe_context(), data);
+	m_unk_vid1_gfxbase_lsb = data;
+	LOGMASKED(LOG_GCM394_TMAP, "	(unk_vid1 tilegfxbase is now %04x%04x)\n", m_unk_vid1_gfxbase_msb, m_unk_vid1_gfxbase_lsb);
 }
 
-WRITE16_MEMBER(gcm394_base_video_device::unknown_video_device1_unk1_w)
+WRITE16_MEMBER(gcm394_base_video_device::unk_vid1_gfxbase_msb_w)
 {
-	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::unknown_video_device1_unk1_w %04x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::unk_vid1_gfxbase_msb_w %04x\n", machine().describe_context(), data);
+	m_unk_vid1_gfxbase_msb = data;
+	LOGMASKED(LOG_GCM394_TMAP, "	(unk_vid1 tilegfxbase is now %04x%04x)\n", m_unk_vid1_gfxbase_msb, m_unk_vid1_gfxbase_lsb);
 }
 
-// **************************************** unknown video device 2 (sprite control?) *************************************************
+// **************************************** unknown video device 2 (another tilemap? sprite layer?) *************************************************
 
-WRITE16_MEMBER(gcm394_base_video_device::unknown_video_device2_unk0_w)
+WRITE16_MEMBER(gcm394_base_video_device::unk_vid2_regs_w)
 {
-	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::unknown_video_device2_unk0_w %04x\n", machine().describe_context(), data);
+	unk_vid_regs_w(1, offset, data);
 }
 
-WRITE16_MEMBER(gcm394_base_video_device::unknown_video_device2_unk1_w)
+WRITE16_MEMBER(gcm394_base_video_device::unk_vid2_gfxbase_lsb_w)
 {
-	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::unknown_video_device2_unk1_w %04x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::unk_vid2_gfxbase_lsb_w %04x\n", machine().describe_context(), data);
+	m_unk_vid2_gfxbase_lsb = data;
+	LOGMASKED(LOG_GCM394_TMAP, "	(unk_vid2 tilegfxbase is now %04x%04x)\n", m_unk_vid2_gfxbase_msb, m_unk_vid2_gfxbase_lsb);
 }
 
-WRITE16_MEMBER(gcm394_base_video_device::unknown_video_device2_unk2_w)
+WRITE16_MEMBER(gcm394_base_video_device::unk_vid2_gfxbase_msb_w)
 {
-	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::unknown_video_device2_unk2_w %04x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::unk_vid2_gfxbase_msb_w %04x\n", machine().describe_context(), data);
+	m_unk_vid2_gfxbase_msb = data;
+	LOGMASKED(LOG_GCM394_TMAP, "	(unk_vid2 tilegfxbase is now %04x%04x)\n", m_unk_vid2_gfxbase_msb, m_unk_vid2_gfxbase_lsb);
 }
+
+// **************************************** unknown video device 0 (sprite control?) *************************************************
+
+WRITE16_MEMBER(gcm394_base_video_device::unk_vid0_gfxbase_lsb_w)
+{
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::unk_vid0_gfxbase_lsb_w %04x\n", machine().describe_context(), data);
+	m_unk_vid0_gfxbase_lsb = data;
+	LOGMASKED(LOG_GCM394_TMAP, "	(unk_vid0 tilegfxbase is now %04x%04x)\n", m_unk_vid0_gfxbase_msb, m_unk_vid0_gfxbase_lsb);
+}
+
+WRITE16_MEMBER(gcm394_base_video_device::unk_vid0_gfxbase_msb_w)
+{
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::unk_vid0_gfxbase_msb_w %04x\n", machine().describe_context(), data);
+	m_unk_vid0_gfxbase_msb = data;
+	LOGMASKED(LOG_GCM394_TMAP, "	(unk_vid0 tilegfxbase is now %04x%04x)\n", m_unk_vid0_gfxbase_msb, m_unk_vid0_gfxbase_lsb);
+}
+
+WRITE16_MEMBER(gcm394_base_video_device::unk_vid0_extra_w)
+{
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::unk_vid0_extra_w %04x\n", machine().describe_context(), data);
+}
+
 
 // **************************************** video DMA device *************************************************
 
@@ -798,14 +883,32 @@ WRITE16_MEMBER(gcm394_base_video_device::video_7063_w)
 WRITE16_MEMBER(gcm394_base_video_device::video_702a_w) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_702a_w %04x\n", machine().describe_context(), data); m_702a = data; }
 
 // read in IRQ
-READ16_MEMBER(gcm394_base_video_device::video_7030_r)
+READ16_MEMBER(gcm394_base_video_device::video_7030_brightness_r)
 {
-	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7030_r\n", machine().describe_context());
-	return 0x0000; /* wrlshunt ends up doing an explicit jump to 0000 shortly after boot if you just return the value written here, what is it? do we want to be returning non-zero to continue, with the problem being elsewhere, or is this the problem? */ 
+	/* wrlshunt ends up doing an explicit jump to 0000 shortly after boot if you just return the value written here, however I think that is correct code flow and something else is wrong
+	   as this simply looks like some kind of brightness register - there is code to decrease it from 0xff to 0x00 by 0x5 increments (waiting for it to hit 0x05) and code to do the reverse
+	   either way it really looks like the data written should be read back.
+	*/
+	uint16_t retdat = m_7030_brightness;
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7030_brightness_r (returning %04x)\n", machine().describe_context(), retdat);
+	return retdat;
 }
 
-WRITE16_MEMBER(gcm394_base_video_device::video_7030_w) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7030_w %04x\n", machine().describe_context(), data); m_7030 = data; }
+WRITE16_MEMBER(gcm394_base_video_device::video_7030_brightness_w)
+{
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7030_brightness_w %04x\n", machine().describe_context(), data);
+	m_7030_brightness = data;
+}
+
 WRITE16_MEMBER(gcm394_base_video_device::video_703c_w) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_703c_w %04x\n", machine().describe_context(), data); m_703c = data; }
+
+READ16_MEMBER(gcm394_base_video_device::video_7051_r)
+{
+	/* related to what ends up crashing wrlshunt? */
+	uint16_t retdat = 0x03ff;
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7051_r (returning %04x)\n", machine().describe_context(), retdat);
+	return retdat;
+}
 
 WRITE16_MEMBER(gcm394_base_video_device::video_7080_w) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7080_w %04x\n", machine().describe_context(), data); m_7080 = data; }
 WRITE16_MEMBER(gcm394_base_video_device::video_7081_w) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7081_w %04x\n", machine().describe_context(), data); m_7081 = data; }
@@ -821,7 +924,7 @@ READ16_MEMBER(gcm394_base_video_device::video_7083_r) { LOGMASKED(LOG_GCM394_VID
 
 WRITE16_MEMBER(gcm394_base_video_device::palette_w)
 {
-	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::palette_w %04x : %04x (value of 0x703a is %04x)\n", machine().describe_context().c_str(), offset, data, m_703a);
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::palette_w %04x : %04x (value of 0x703a is %04x)\n", machine().describe_context(), offset, data, m_703a);
 
 	if (m_703a & 0xfff0)
 	{

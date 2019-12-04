@@ -152,7 +152,6 @@
 
 #include "cpu/unsp/unsp.h"
 #include "machine/i2cmem.h"
-#include "machine/nvram.h"
 #include "machine/eepromser.h"
 #include "machine/spg2xx.h"
 
@@ -179,7 +178,6 @@ public:
 		, m_io_p2(*this, "P2")
 		, m_io_p3(*this, "P3")
 		, m_i2cmem(*this, "i2cmem")
-		, m_nvram(*this, "nvram")
 	{ }
 
 	void spg2xx_base(machine_config &config);
@@ -204,8 +202,8 @@ protected:
 
 	void switch_bank(uint32_t bank);
 
-	DECLARE_WRITE8_MEMBER(eeprom_w);
-	DECLARE_READ8_MEMBER(eeprom_r);
+	DECLARE_WRITE8_MEMBER(i2c_w);
+	DECLARE_READ8_MEMBER(i2c_r);
 
 	DECLARE_READ16_MEMBER(jakks_porta_r);
 
@@ -229,15 +227,12 @@ protected:
 
 	uint32_t m_current_bank;
 
-	std::unique_ptr<uint8_t[]> m_serial_eeprom;
-
 	uint16_t m_walle_portc_data;
 
 	required_ioport m_io_p1;
 	optional_ioport m_io_p2;
 	optional_ioport m_io_p3;
 	optional_device<i2cmem_device> m_i2cmem;
-	optional_device<nvram_device> m_nvram;
 };
 
 class wireless60_state : public spg2xx_game_state
@@ -634,14 +629,15 @@ void spg2xx_game_state::switch_bank(uint32_t bank)
 	}
 }
 
-WRITE8_MEMBER(spg2xx_game_state::eeprom_w)
+WRITE8_MEMBER(spg2xx_game_state::i2c_w)
 {
-	m_serial_eeprom[offset & 0x3ff] = data;
+    logerror("%s: i2c_w %05x %04x\n", machine().describe_context(), offset, data);
 }
 
-READ8_MEMBER(spg2xx_game_state::eeprom_r)
+READ8_MEMBER(spg2xx_game_state::i2c_r)
 {
-	return m_serial_eeprom[offset & 0x3ff];
+    logerror("%s: i2c_r %04x\n", machine().describe_context(), offset);
+	return 0x0000;
 }
 
 WRITE16_MEMBER(wireless60_state::wireless60_porta_w)
@@ -2521,13 +2517,6 @@ void spg2xx_game_state::machine_start()
 		m_bank->set_entry(0);
 	}
 
-	if (m_serial_eeprom)
-	{
-		m_serial_eeprom = std::make_unique<uint8_t[]>(0x400);
-		if (m_nvram)
-			m_nvram->set_base(&m_serial_eeprom[0], 0x400);
-	}
-
 	save_item(NAME(m_current_bank));
 	save_item(NAME(m_walle_portc_data));
 }
@@ -2654,10 +2643,8 @@ void vii_state::vii(machine_config &config)
 	spg2xx_base(config);
 
 	m_maincpu->portb_out().set(FUNC(vii_state::vii_portb_w));
-	m_maincpu->eeprom_w().set(FUNC(vii_state::eeprom_w));
-	m_maincpu->eeprom_r().set(FUNC(vii_state::eeprom_r));
-
-	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_1);
+	m_maincpu->i2c_w().set(FUNC(vii_state::i2c_w));
+	m_maincpu->i2c_r().set(FUNC(vii_state::i2c_r));
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "vii_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
@@ -2718,10 +2705,8 @@ void icanpian_state::icanpian(machine_config &config)
 WRITE8_MEMBER(tvgogo_state::tvg_i2c_w)
 {
 	// unsure what is mapped here (Camera?) but it expects to be able to read back the same byte it writes before it boots.
-	// (offset certainly isn't eeprom address as the generic spg2xx_game_state::eeprom_r / eeprom_r code expects)
 	m_i2cunk = data;
 	logerror("%s: tvg_i2c_w %04x %02x\n", machine().describe_context(), offset, data);
-	m_serial_eeprom[offset & 0x3ff] = data;
 }
 
 READ8_MEMBER(tvgogo_state::tvg_i2c_r)
@@ -2748,8 +2733,8 @@ void tvgogo_state::tvgogo(machine_config &config)
 	m_cart->set_device_load(FUNC(tvgogo_state::cart_load_tvgogo));
 	m_cart->set_must_be_loaded(true);
 
-	m_maincpu->eeprom_w().set(FUNC(tvgogo_state::tvg_i2c_w));
-	m_maincpu->eeprom_r().set(FUNC(tvgogo_state::tvg_i2c_r));
+	m_maincpu->i2c_w().set(FUNC(tvgogo_state::tvg_i2c_w));
+	m_maincpu->i2c_r().set(FUNC(tvgogo_state::tvg_i2c_r));
 
 	SOFTWARE_LIST(config, "tvgogo_cart").set_original("tvgogo");
 }
@@ -2972,10 +2957,8 @@ void spg2xx_game_state::rad_skat(machine_config &config)
 	m_maincpu->porta_in().set_ioport("P1");
 	m_maincpu->portb_in().set_ioport("P2");
 	m_maincpu->portc_in().set_ioport("P3");
-	m_maincpu->eeprom_w().set(FUNC(spg2xx_game_state::eeprom_w));
-	m_maincpu->eeprom_r().set(FUNC(spg2xx_game_state::eeprom_r));
-
-	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_1);
+	m_maincpu->i2c_w().set(FUNC(spg2xx_game_state::i2c_w));
+	m_maincpu->i2c_r().set(FUNC(spg2xx_game_state::i2c_r));
 }
 
 void dreamlif_state::dreamlif(machine_config &config)
@@ -3011,10 +2994,8 @@ void spg2xx_game_state::rad_sktv(machine_config &config)
 	m_maincpu->porta_in().set(FUNC(spg2xx_game_state::rad_porta_r));
 	m_maincpu->portb_in().set(FUNC(spg2xx_game_state::rad_portb_r));
 	m_maincpu->portc_in().set(FUNC(spg2xx_game_state::rad_portc_r));
-	m_maincpu->eeprom_w().set(FUNC(spg2xx_game_state::eeprom_w));
-	m_maincpu->eeprom_r().set(FUNC(spg2xx_game_state::eeprom_r));
-
-	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_1);
+	m_maincpu->i2c_w().set(FUNC(spg2xx_game_state::i2c_w));
+	m_maincpu->i2c_r().set(FUNC(spg2xx_game_state::i2c_r));
 }
 
 void spg2xx_game_state::rad_crik(machine_config &config)
@@ -3027,10 +3008,8 @@ void spg2xx_game_state::rad_crik(machine_config &config)
 	m_maincpu->porta_in().set_ioport("P1");
 	m_maincpu->portb_in().set_ioport("P2");
 	m_maincpu->portc_in().set_ioport("P3");
-	m_maincpu->eeprom_w().set(FUNC(spg2xx_game_state::eeprom_w));
-	m_maincpu->eeprom_r().set(FUNC(spg2xx_game_state::eeprom_r));
-
-	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_1);
+	m_maincpu->i2c_w().set(FUNC(spg2xx_game_state::i2c_w));
+	m_maincpu->i2c_r().set(FUNC(spg2xx_game_state::i2c_r));
 }
 
 void pvmil_state::pvmil(machine_config &config)
@@ -3051,8 +3030,6 @@ void pvmil_state::pvmil(machine_config &config)
 	m_maincpu->portb_out().set(FUNC(pvmil_state::pvmil_portb_w));
 	m_maincpu->portc_out().set(FUNC(pvmil_state::pvmil_portc_w));
 
-//  NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_1);
-
 	config.set_default_layout(layout_pvmil);
 }
 
@@ -3070,8 +3047,6 @@ void spg2xx_game_state::taikeegr(machine_config &config)
 	m_maincpu->porta_in().set_ioport("P1");
 //  m_maincpu->portb_in().set_ioport("P2");
 //  m_maincpu->portc_in().set_ioport("P3");
-
-	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_1);
 }
 
 void sentx6p_state::machine_start()
