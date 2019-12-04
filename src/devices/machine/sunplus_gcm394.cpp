@@ -343,6 +343,8 @@ void sunplus_gcm394_base_device::internal_map(address_map &map)
 
 	map(0x007042, 0x007042).w(m_spg_video, FUNC(gcm394_base_video_device::unk_vid0_extra_w)); // maybe sprites?  written as 7022, 702d and 7042 group
 
+	map(0x007051, 0x007051).r(m_spg_video, FUNC(gcm394_base_video_device::video_7051_r)); // wrlshunt checks this
+
 	map(0x007062, 0x007062).rw(m_spg_video, FUNC(gcm394_base_video_device::video_7062_r), FUNC(gcm394_base_video_device::video_7062_w));
 	map(0x007063, 0x007063).rw(m_spg_video, FUNC(gcm394_base_video_device::video_7063_r), FUNC(gcm394_base_video_device::video_7063_w));
 

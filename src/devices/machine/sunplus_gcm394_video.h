@@ -89,6 +89,8 @@ public:
 	DECLARE_READ16_MEMBER(palette_r);
 	DECLARE_WRITE16_MEMBER(palette_w);
 
+	DECLARE_READ16_MEMBER(video_7051_r);
+
 	auto write_video_irq_callback() { return m_video_irq_cb.bind(); };
 
 	virtual void device_add_mconfig(machine_config& config) override;
