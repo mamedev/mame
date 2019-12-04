@@ -198,6 +198,7 @@ void namco_de_pcbstack_device::device_add_mconfig(machine_config &config)
 	m_c355spr->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate());
 	m_c355spr->set_palxor(0xf); // reverse mapping
 	m_c355spr->set_color_base(0x1000);
+	m_c355spr->set_external_prifill(true);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -218,6 +219,8 @@ uint32_t namco_de_pcbstack_device::screen_update(screen_device &screen, bitmap_i
 	int pivot = 3;
 	int pri;
 	bitmap.fill(0xff, cliprect );
+	screen.priority().fill(0, cliprect);
+	m_c355spr->get_sprites(); // TODO : buffered?
 
 	m_c355spr->draw(screen, bitmap, cliprect, 2 );
 	m_c355spr->draw(screen, bitmap, cliprect, 14 );   //driver's eyes

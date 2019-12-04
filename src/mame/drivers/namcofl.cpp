@@ -541,7 +541,6 @@ void namcofl_state::namcofl(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(48.384_MHz_XTAL/8, 384, 0, 288, 264, 0, 224); // same as namconb1.cpp?
 	m_screen->set_screen_update(FUNC(namcofl_state::screen_update));
-	m_screen->screen_vblank().set(m_c355spr, FUNC(namco_c355spr_device::vblank));
 	m_screen->set_palette(m_c116);
 
 	NAMCO_C169ROZ(config, m_c169roz, 0);

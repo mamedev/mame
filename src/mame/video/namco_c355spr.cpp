@@ -25,6 +25,7 @@ namco_c355spr_device::namco_c355spr_device(const machine_config &mconfig, const 
 	device_video_interface(mconfig, *this),
 	m_palxor(0),
 	m_buffer(0),
+	m_external_prifill(false),
 	m_gfx_region(*this, DEVICE_SELF),
 	m_colbase(0)
 {
@@ -193,6 +194,9 @@ void namco_c355spr_device::zdrawgfxzoom(
 
 void namco_c355spr_device::device_start()
 {
+	if (m_buffer > 0)
+		screen().register_vblank_callback(vblank_state_delegate(&namco_c355spr_device::vblank, this));
+
 	gfx_layout obj_layout =
 	{
 		16,16,
@@ -452,9 +456,12 @@ void namco_c355spr_device::draw_sprites(screen_device &screen, BitmapClass &bitm
 //  int offs = spriteram16[0x18000/2]; /* end-of-sprite-list */
 	if (pri == 0)
 	{
-		screen.priority().fill(0, cliprect);
-		if (m_buffer == 0) // not buffered sprites
-			get_sprites();
+		if (!m_external_prifill)
+		{
+			screen.priority().fill(0, cliprect);
+			if (m_buffer == 0) // not buffered sprites
+				get_sprites();
+		}
 	}
 
 	for (int no = 0; no < 2; no++)
@@ -514,9 +521,9 @@ u16 namco_c355spr_device::spriteram_r(offs_t offset)
 	return m_spriteram[0][offset];
 }
 
-WRITE_LINE_MEMBER(namco_c355spr_device::vblank)
+void namco_c355spr_device::vblank(screen_device &screen, bool vblank_state)
 {
-	if (state)
+	if (vblank_state)
 	{
 		if (m_buffer > 0)
 			get_sprites();
