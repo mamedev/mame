@@ -37424,6 +37424,9 @@ tvlinkp                         //
 @source:svmu.cpp
 svmu                            // 1998 Sega Visual Memory Unit
 
+@source:sweetland.cpp
+sweetlnd                        //
+
 @source:swtpc.cpp
 swtpc                           // MPA2 MPS Swtbug rom - FLEX
 swtpcm                          // MPA2 MPC Mikbug rom
@@ -39346,6 +39349,9 @@ wivernwg                        // (c) 2001 Semicom
 wyvernwg                        // (c) 2001 Semicom / Game Vision
 wyvernwga                       // (c) 2001 Semicom / Game Vision
 yorijori                        // (c)
+
+@source:vanguardmk1.cpp
+vngrdmk1                        //
 
 @source:vaportra.cpp
 kuhga                           // MAA (c) 1989 Data East Corporation (Japan)

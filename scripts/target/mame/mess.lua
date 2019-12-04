@@ -4217,6 +4217,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/tti.cpp",
 	MAME_DIR .. "src/mame/drivers/unistar.cpp",
 	MAME_DIR .. "src/mame/drivers/v6809.cpp",
+	MAME_DIR .. "src/mame/drivers/vanguardmk1.cpp",
 	MAME_DIR .. "src/mame/drivers/vd56sp.cpp",
 	MAME_DIR .. "src/mame/drivers/vector4.cpp",
 	MAME_DIR .. "src/mame/drivers/vectrix.cpp",

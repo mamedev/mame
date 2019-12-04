@@ -2901,6 +2901,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/skykid.cpp",
 	MAME_DIR .. "src/mame/includes/skykid.h",
 	MAME_DIR .. "src/mame/video/skykid.cpp",
+	MAME_DIR .. "src/mame/drivers/sweetland.cpp",
 	MAME_DIR .. "src/mame/drivers/tankbatt.cpp",
 	MAME_DIR .. "src/mame/includes/tankbatt.h",
 	MAME_DIR .. "src/mame/video/tankbatt.cpp",
