@@ -91,9 +91,6 @@ public:
 
 	auto write_video_irq_callback() { return m_video_irq_cb.bind(); };
 
-	uint8_t* m_gfxregion;
-	uint32_t m_gfxregionsize;
-
 	virtual void device_add_mconfig(machine_config& config) override;
 
 protected:
@@ -210,6 +207,10 @@ protected:
 	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
 	devcb_read16 m_space_read_cb;
+
+	int m_maxgfxelement;
+	void decodegfx(const char* tag);
+
 };
 
 class gcm394_video_device : public gcm394_base_video_device

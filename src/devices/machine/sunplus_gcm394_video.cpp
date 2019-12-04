@@ -40,26 +40,10 @@ gcm394_video_device::gcm394_video_device(const machine_config &mconfig, const ch
 {
 }
 
-void gcm394_base_video_device::device_start()
+void gcm394_base_video_device::decodegfx(const char* tag)
 {
-	for (uint8_t i = 0; i < 32; i++)
-	{
-		m_rgb5_to_rgb8[i] = (i << 3) | (i >> 2);
-	}
-	for (uint16_t i = 0; i < 0x8000; i++)
-	{
-		m_rgb555_to_rgb888[i] = (m_rgb5_to_rgb8[(i >> 10) & 0x1f] << 16) |
-								(m_rgb5_to_rgb8[(i >>  5) & 0x1f] <<  8) |
-								(m_rgb5_to_rgb8[(i >>  0) & 0x1f] <<  0);
-	}
-
-	m_video_irq_cb.resolve();
-
-
-	m_gfxregion = memregion(":maincpu")->base();
-	m_gfxregionsize = memregion(":maincpu")->bytes();
-
-	int gfxelement = 0;
+	uint8_t* gfxregion = memregion(tag)->base();
+	int gfxregionsize = memregion(tag)->bytes();
 
 	if (1)
 	{
@@ -73,9 +57,9 @@ void gcm394_base_video_device::device_start()
 			{ STEP16(0,4 * 16) },
 			16 * 16 * 4
 		};
-		obj_layout.total = m_gfxregionsize / (16 * 16 * 4 / 8);
-		m_gfxdecode->set_gfx(gfxelement, std::make_unique<gfx_element>(m_palette, obj_layout, m_gfxregion, 0, 0x10 * 0x10, 0));
-		gfxelement++;
+		obj_layout.total = gfxregionsize / (16 * 16 * 4 / 8);
+		m_gfxdecode->set_gfx(m_maxgfxelement, std::make_unique<gfx_element>(m_palette, obj_layout, gfxregion, 0, 0x10 * 0x10, 0));
+		m_maxgfxelement++;
 	}
 
 	if (1)
@@ -90,9 +74,9 @@ void gcm394_base_video_device::device_start()
 			{ STEP16(0,4 * 32) },
 			16 * 32 * 4
 		};
-		obj_layout.total = m_gfxregionsize / (16 * 32 * 4 / 8);
-		m_gfxdecode->set_gfx(gfxelement, std::make_unique<gfx_element>(m_palette, obj_layout, m_gfxregion, 0, 0x10 * 0x10, 0));
-		gfxelement++;
+		obj_layout.total = gfxregionsize / (16 * 32 * 4 / 8);
+		m_gfxdecode->set_gfx(m_maxgfxelement, std::make_unique<gfx_element>(m_palette, obj_layout, gfxregion, 0, 0x10 * 0x10, 0));
+		m_maxgfxelement++;
 	}
 
 	if (1)
@@ -107,9 +91,9 @@ void gcm394_base_video_device::device_start()
 			{ STEP32(0,4 * 16) },
 			32 * 16 * 4
 		};
-		obj_layout.total = m_gfxregionsize / (32 * 16 * 4 / 8);
-		m_gfxdecode->set_gfx(gfxelement, std::make_unique<gfx_element>(m_palette, obj_layout, m_gfxregion, 0, 0x10 * 0x10, 0));
-		gfxelement++;
+		obj_layout.total = gfxregionsize / (32 * 16 * 4 / 8);
+		m_gfxdecode->set_gfx(m_maxgfxelement, std::make_unique<gfx_element>(m_palette, obj_layout, gfxregion, 0, 0x10 * 0x10, 0));
+		m_maxgfxelement++;
 	}
 
 	if (1)
@@ -124,9 +108,9 @@ void gcm394_base_video_device::device_start()
 			{ STEP32(0,4 * 32) },
 			32 * 32 * 4
 		};
-		obj_layout.total = m_gfxregionsize / (32 * 32 * 4 / 8);
-		m_gfxdecode->set_gfx(gfxelement, std::make_unique<gfx_element>(m_palette, obj_layout, m_gfxregion, 0, 0x10 * 0x10, 0));
-		gfxelement++;
+		obj_layout.total = gfxregionsize / (32 * 32 * 4 / 8);
+		m_gfxdecode->set_gfx(m_maxgfxelement, std::make_unique<gfx_element>(m_palette, obj_layout, gfxregion, 0, 0x10 * 0x10, 0));
+		m_maxgfxelement++;
 	}
 
 	if (1)
@@ -141,9 +125,9 @@ void gcm394_base_video_device::device_start()
 			{ STEP16(0,2 * 8) },
 			8 * 16 * 2
 		};
-		obj_layout.total = m_gfxregionsize / (8 * 16 * 2 / 8);
-		m_gfxdecode->set_gfx(gfxelement, std::make_unique<gfx_element>(m_palette, obj_layout, m_gfxregion, 0, 0x40 * 0x10, 0));
-		gfxelement++;
+		obj_layout.total = gfxregionsize / (8 * 16 * 2 / 8);
+		m_gfxdecode->set_gfx(m_maxgfxelement, std::make_unique<gfx_element>(m_palette, obj_layout, gfxregion, 0, 0x40 * 0x10, 0));
+		m_maxgfxelement++;
 	}
 
 	if (1)
@@ -163,10 +147,31 @@ void gcm394_base_video_device::device_start()
 			texlayout_xoffset,
 			texlayout_yoffset
 		};
-		obj_layout.total = m_gfxregionsize / (16 * 32 * 2 / 8);
-		m_gfxdecode->set_gfx(gfxelement, std::make_unique<gfx_element>(m_palette, obj_layout, m_gfxregion, 0, 0x40 * 0x10, 0));
-		gfxelement++;
+		obj_layout.total = gfxregionsize / (16 * 32 * 2 / 8);
+		m_gfxdecode->set_gfx(m_maxgfxelement, std::make_unique<gfx_element>(m_palette, obj_layout, gfxregion, 0, 0x40 * 0x10, 0));
+		m_maxgfxelement++;
 	}
+}
+
+void gcm394_base_video_device::device_start()
+{
+	for (uint8_t i = 0; i < 32; i++)
+	{
+		m_rgb5_to_rgb8[i] = (i << 3) | (i >> 2);
+	}
+	for (uint16_t i = 0; i < 0x8000; i++)
+	{
+		m_rgb555_to_rgb888[i] = (m_rgb5_to_rgb8[(i >> 10) & 0x1f] << 16) |
+								(m_rgb5_to_rgb8[(i >>  5) & 0x1f] <<  8) |
+								(m_rgb5_to_rgb8[(i >>  0) & 0x1f] <<  0);
+	}
+
+	m_video_irq_cb.resolve();
+
+	m_maxgfxelement = 0;
+
+	decodegfx(":maincpu");
+
 	save_item(NAME(m_spriteextra));
 	m_space_read_cb.resolve_safe(0);
 }
