@@ -83,7 +83,7 @@ void nb1414m4_device::dma(uint16_t src, uint16_t dst, uint16_t size, uint8_t con
 
 		vram[i+dst+0x000] = (condition) ? (m_data[i+(0)+src] & 0xff) : 0x20;
 
-		vram[i+dst+0x400] = m_data[i+(size)+src] & 0xff;
+		vram[i+dst+0x400] = (condition) ? (m_data[i+(size)+src] & 0xff) : 0xff;
 	}
 }
 
