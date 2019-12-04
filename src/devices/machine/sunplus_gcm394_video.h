@@ -65,8 +65,8 @@ public:
 	DECLARE_WRITE16_MEMBER(video_7063_w);
 
 	DECLARE_WRITE16_MEMBER(video_702a_w);
-	DECLARE_READ16_MEMBER(video_7030_r);
-	DECLARE_WRITE16_MEMBER(video_7030_w);
+	DECLARE_READ16_MEMBER(video_7030_brightness_r);
+	DECLARE_WRITE16_MEMBER(video_7030_brightness_w);
 	DECLARE_WRITE16_MEMBER(video_703c_w);
 
 	DECLARE_READ16_MEMBER(video_707c_r);
@@ -177,7 +177,7 @@ protected:
 	uint16_t m_7063;
 
 	uint16_t m_702a;
-	uint16_t m_7030;
+	uint16_t m_7030_brightness;
 	uint16_t m_703c;
 
 
@@ -198,6 +198,7 @@ protected:
 	uint16_t m_unk_vid2_gfxbase_lsb;
 	uint16_t m_unk_vid2_gfxbase_msb;
 
+	void unk_vid_regs_w(int which, int offset, uint16_t data);
 
 	uint16_t m_video_irq_status;
 

@@ -163,18 +163,47 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7835_w) { LOGMASKED(LOG_GCM39
 
 // IO here?
 
-READ16_MEMBER(sunplus_gcm394_base_device::ioport_a_r) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::ioport_a_r\n", machine().describe_context()); return m_porta_in();  }
-WRITE16_MEMBER(sunplus_gcm394_base_device::ioport_a_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::ioport_a_w %04x\n", machine().describe_context(), data); m_porta_out(data); }
-
-READ16_MEMBER(sunplus_gcm394_base_device::unkarea_7861_r) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7861_r\n", machine().describe_context()); return 0xffff;// m_7861;
+READ16_MEMBER(sunplus_gcm394_base_device::ioport_a_r)
+{
+	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::ioport_a_r\n", machine().describe_context());
+	return m_porta_in();
 }
 
-READ16_MEMBER(sunplus_gcm394_base_device::unkarea_7862_r) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7862_r\n", machine().describe_context()); return 0xffff;// m_7862;
+WRITE16_MEMBER(sunplus_gcm394_base_device::ioport_a_w)
+{
+	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::ioport_a_w %04x\n", machine().describe_context(), data);
+	m_porta_out(data);
 }
-WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7862_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7862_w %04x\n", machine().describe_context(), data); m_7862 = data; }
-READ16_MEMBER(sunplus_gcm394_base_device::unkarea_7863_r) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7863_r\n", machine().describe_context()); return 0xffff;// m_7863;
+
+READ16_MEMBER(sunplus_gcm394_base_device::unkarea_7861_r)
+{
+	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7861_r\n", machine().describe_context());
+	return 0x0000;// 0xffff;// m_7861;
 }
-WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7863_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7863_w %04x\n", machine().describe_context(), data); m_7863 = data; }
+
+READ16_MEMBER(sunplus_gcm394_base_device::unkarea_7862_r)
+{
+	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7862_r\n", machine().describe_context());
+	return 0x0000;// m_7862;
+}
+
+WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7862_w)
+{
+	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7862_w %04x\n", machine().describe_context(), data);
+	m_7862 = data;
+}
+
+READ16_MEMBER(sunplus_gcm394_base_device::unkarea_7863_r)
+{
+	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7863_r\n", machine().describe_context());
+	return 0x0000; //0xffff;// m_7863;
+}
+
+WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7863_w)
+{
+	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7863_w %04x\n", machine().describe_context(), data);
+	m_7863 = data;
+}
 
 // similar read/write pattern to above, 2nd group?
 
@@ -308,7 +337,7 @@ void sunplus_gcm394_base_device::internal_map(address_map &map)
 	map(0x00702e, 0x00702e).w(m_spg_video, FUNC(gcm394_base_video_device::unk_vid1_gfxbase_msb_w)); // written with other unknown_video_device0 regs
 	map(0x00702f, 0x00702f).w(m_spg_video, FUNC(gcm394_base_video_device::unk_vid2_gfxbase_msb_w)); // written with other unknown_video_device1 regs
 
-	map(0x007030, 0x007030).rw(m_spg_video, FUNC(gcm394_base_video_device::video_7030_r), FUNC(gcm394_base_video_device::video_7030_w));
+	map(0x007030, 0x007030).rw(m_spg_video, FUNC(gcm394_base_video_device::video_7030_brightness_r), FUNC(gcm394_base_video_device::video_7030_brightness_w));
 	map(0x00703a, 0x00703a).rw(m_spg_video, FUNC(gcm394_base_video_device::video_703a_r), FUNC(gcm394_base_video_device::video_703a_w));
 	map(0x00703c, 0x00703c).w(m_spg_video, FUNC(gcm394_base_video_device::video_703c_w));
 

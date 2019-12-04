@@ -197,7 +197,7 @@ void gcm394_base_video_device::device_reset()
 	m_7063 = 0x0000;
 
 	m_702a = 0x0000;
-	m_7030 = 0x0000;
+	m_7030_brightness = 0x0000;
 	m_703c = 0x0000;
 
 
@@ -644,14 +644,40 @@ WRITE16_MEMBER(gcm394_base_video_device::tmap1_tilebase_msb_w)
 	LOGMASKED(LOG_GCM394_TMAP, "	(tmap1 tilegfxbase is now %04x%04x)\n", m_page1_addr_msb, m_page1_addr_lsb);
 }
 
+// **************************************** unknown video device handler for below  *************************************************
+
+// offsets 0,1,4,5,6,7 used in main IRQ code
+// offsets 2,3 only cleared on startup
+void gcm394_base_video_device::unk_vid_regs_w(int which, int offset, uint16_t data)
+{
+	switch (offset)
+	{
+	case 0x0:
+		LOGMASKED(LOG_GCM394_VIDEO, "unk_vid_regs_w (unk chip %d) %01x %04x (X scroll?)\n", machine().describe_context(), which, offset, data); // masked with 0x3ff in code like x-scroll for tilemaps
+		break;
+
+	case 0x1:
+		LOGMASKED(LOG_GCM394_VIDEO, "unk_vid_regs_w (unk chip %d) %01x %04x (y scroll?)\n", machine().describe_context(), which, offset, data); // masked with 0x3ff in code like x-scroll for tilemaps
+		break;
+
+	case 0x02: // startup?
+	case 0x03: // startup?
+
+	case 0x04:
+	case 0x05:
+	case 0x06:
+	case 0x07:
+		LOGMASKED(LOG_GCM394_VIDEO, "unk_vid_regs_w (unk chip %d) %01x %04x\n", machine().describe_context(), which, offset, data);
+		break;
+
+	}
+}
+
 // **************************************** unknown video device 1 (another tilemap? sprite layer?) *************************************************
 
 WRITE16_MEMBER(gcm394_base_video_device::unk_vid1_regs_w)
 {
-	// offsets 0,1,4,5,6,7 used in main IRQ code
-	// offsets 2,3 only cleared on startup
-
-	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::unk_vid1_regs_w %01x %04x\n", machine().describe_context(), offset, data);
+	unk_vid_regs_w(0, offset, data);
 }
 
 WRITE16_MEMBER(gcm394_base_video_device::unk_vid1_gfxbase_lsb_w)
@@ -672,10 +698,7 @@ WRITE16_MEMBER(gcm394_base_video_device::unk_vid1_gfxbase_msb_w)
 
 WRITE16_MEMBER(gcm394_base_video_device::unk_vid2_regs_w)
 {
-	// offsets 0,1,4,5,6,7 used in main IRQ code
-	// offsets 2,3 only cleared on startup
-
-	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::unk_vid2_regs_w %01x %04x\n", machine().describe_context(), offset, data);
+	unk_vid_regs_w(1, offset, data);
 }
 
 WRITE16_MEMBER(gcm394_base_video_device::unk_vid2_gfxbase_lsb_w)
@@ -826,13 +849,23 @@ WRITE16_MEMBER(gcm394_base_video_device::video_7063_w)
 WRITE16_MEMBER(gcm394_base_video_device::video_702a_w) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_702a_w %04x\n", machine().describe_context(), data); m_702a = data; }
 
 // read in IRQ
-READ16_MEMBER(gcm394_base_video_device::video_7030_r)
+READ16_MEMBER(gcm394_base_video_device::video_7030_brightness_r)
 {
-	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7030_r\n", machine().describe_context());
-	return 0x0000; /* wrlshunt ends up doing an explicit jump to 0000 shortly after boot if you just return the value written here, what is it? do we want to be returning non-zero to continue, with the problem being elsewhere, or is this the problem? */ 
+	/* wrlshunt ends up doing an explicit jump to 0000 shortly after boot if you just return the value written here, however I think that is correct code flow and something else is wrong
+	   as this simply looks like some kind of brightness register - there is code to decrease it from 0xff to 0x00 by 0x5 increments (waiting for it to hit 0x05) and code to do the reverse
+	   either way it really looks like the data written should be read back.
+	*/
+	uint16_t retdat = m_7030_brightness;
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7030_brightness_r (returning %04x)\n", machine().describe_context(), retdat);
+	return retdat;
 }
 
-WRITE16_MEMBER(gcm394_base_video_device::video_7030_w) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7030_w %04x\n", machine().describe_context(), data); m_7030 = data; }
+WRITE16_MEMBER(gcm394_base_video_device::video_7030_brightness_w)
+{
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7030_brightness_w %04x\n", machine().describe_context(), data);
+	m_7030_brightness = data;
+}
+
 WRITE16_MEMBER(gcm394_base_video_device::video_703c_w) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_703c_w %04x\n", machine().describe_context(), data); m_703c = data; }
 
 WRITE16_MEMBER(gcm394_base_video_device::video_7080_w) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7080_w %04x\n", machine().describe_context(), data); m_7080 = data; }
