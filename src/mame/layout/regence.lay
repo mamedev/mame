@@ -90,15 +90,18 @@
 	<element name="text_p5"><image file="chess/wq.png"/></element>
 	<element name="text_p6"><image file="chess/wk.png"/></element>
 
-	<element name="text_r1"><text string="WHITE"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_r2"><text string="BLACK"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_r3"><text string="CHECK"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_r4"><text string="SET UP"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_r5"><text string="TAKE BACK"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_r6"><text string="NEW GAME"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_r7"><text string="MOVE/HALT"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_r8"><text string="LEVEL"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_r9"><text string="SOUND"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_r1"><text string="BLANC"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_r2"><text string="NOIR"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_r3"><text string="ECHEC"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_r4a"><text string="CHANGEMENT"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_r4b"><text string="DE POSITION"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_r5a"><text string="RETOUR EN"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_r5b"><text string="ARRIERE"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_r6a"><text string="NOUVELLE"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_r6b"><text string="PARTIE"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_r7"><text string="MARCHE/ARRET"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_r8"><text string="NIVEAU"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_r9"><text string="SON"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 
 
 <!-- sb board -->
@@ -395,7 +398,7 @@
 <!-- build screen -->
 
 	<view name="Internal Layout">
-		<bounds left="-13" right="102" top="-1.5" bottom="87.5" />
+		<bounds left="-13" right="103" top="-1.5" bottom="87.5" />
 
 		<bezel element="cblack"><bounds x="-1" y="-1.5" width="89" height="89" /></bezel>
 		<bezel element="cwhite"><bounds x="3" y="2.5" width="81" height="81" /></bezel>
@@ -445,25 +448,28 @@
 		<bezel name="8.3" element="led2"><bounds x="89.25" y="17.25" width="1.5" height="1.5" /></bezel>
 		<bezel name="8.0" element="led2"><bounds x="89.25" y="21.25" width="1.5" height="1.5" /></bezel>
 
-		<bezel element="text_r1"><bounds x="91.5" y="9" width="10" height="2" /></bezel>
-		<bezel element="text_r2"><bounds x="91.5" y="13" width="10" height="2" /></bezel>
-		<bezel element="text_r3"><bounds x="91.5" y="17" width="10" height="2" /></bezel>
-		<bezel element="text_r4"><bounds x="91.5" y="25" width="10" height="2" /></bezel>
-		<bezel element="text_r5"><bounds x="91.5" y="29" width="10" height="2" /></bezel>
-		<bezel element="text_r6"><bounds x="91.5" y="33" width="10" height="2" /></bezel>
+		<bezel element="text_r1"><bounds x="91.5" y="9.1" width="11.5" height="1.8" /></bezel>
+		<bezel element="text_r2"><bounds x="91.5" y="13.1" width="11.5" height="1.8" /></bezel>
+		<bezel element="text_r3"><bounds x="91.5" y="17.1" width="11.5" height="1.8" /></bezel>
+		<bezel element="text_r4a"><bounds x="91.5" y="24.2" width="11.5" height="1.8" /></bezel>
+		<bezel element="text_r4b"><bounds x="91.5" y="25.8" width="11.5" height="1.8" /></bezel>
+		<bezel element="text_r5a"><bounds x="91.5" y="28.2" width="11.5" height="1.8" /></bezel>
+		<bezel element="text_r5b"><bounds x="91.5" y="29.8" width="11.5" height="1.8" /></bezel>
+		<bezel element="text_r6a"><bounds x="91.5" y="32.2" width="11.5" height="1.8" /></bezel>
+		<bezel element="text_r6b"><bounds x="91.5" y="33.8" width="11.5" height="1.8" /></bezel>
 
-		<bezel element="text_r1"><bounds x="91.5" y="61" width="10" height="2" /></bezel>
-		<bezel element="text_r2"><bounds x="91.5" y="65" width="10" height="2" /></bezel>
-		<bezel element="text_r7"><bounds x="91.5" y="69" width="10" height="2" /></bezel>
-		<bezel element="text_r8"><bounds x="91.5" y="73" width="10" height="2" /></bezel>
-		<bezel element="text_r9"><bounds x="91.5" y="77" width="10" height="2" /></bezel>
+		<bezel element="text_r1"><bounds x="91.5" y="61.1" width="11.5" height="1.8" /></bezel>
+		<bezel element="text_r2"><bounds x="91.5" y="65.1" width="11.5" height="1.8" /></bezel>
+		<bezel element="text_r7"><bounds x="91.5" y="69.1" width="11.5" height="1.8" /></bezel>
+		<bezel element="text_r8"><bounds x="91.5" y="73.1" width="11.5" height="1.8" /></bezel>
+		<bezel element="text_r9"><bounds x="91.5" y="77.1" width="11.5" height="1.8" /></bezel>
 
-		<bezel element="text_p6"><bounds x="94.5" y="36" width="3.3" height="3.3" /><color alpha="0.82" /></bezel>
-		<bezel element="text_p5"><bounds x="94.5" y="40" width="3.3" height="3.3" /><color alpha="0.82" /></bezel>
-		<bezel element="text_p4"><bounds x="94.5" y="44" width="3.3" height="3.3" /><color alpha="0.82" /></bezel>
-		<bezel element="text_p3"><bounds x="94.5" y="48" width="3.3" height="3.3" /><color alpha="0.82" /></bezel>
-		<bezel element="text_p2"><bounds x="94.5" y="52" width="3.3" height="3.3" /><color alpha="0.82" /></bezel>
-		<bezel element="text_p1"><bounds x="94.5" y="56" width="3.3" height="3.3" /><color alpha="0.82" /></bezel>
+		<bezel element="text_p6"><bounds x="95.4" y="36" width="3.3" height="3.3" /><color alpha="0.82" /></bezel>
+		<bezel element="text_p5"><bounds x="95.4" y="40" width="3.3" height="3.3" /><color alpha="0.82" /></bezel>
+		<bezel element="text_p4"><bounds x="95.4" y="44" width="3.3" height="3.3" /><color alpha="0.82" /></bezel>
+		<bezel element="text_p3"><bounds x="95.4" y="48" width="3.3" height="3.3" /><color alpha="0.82" /></bezel>
+		<bezel element="text_p2"><bounds x="95.4" y="52" width="3.3" height="3.3" /><color alpha="0.82" /></bezel>
+		<bezel element="text_p1"><bounds x="95.4" y="56" width="3.3" height="3.3" /><color alpha="0.82" /></bezel>
 
 	</view>
 </mamelayout>

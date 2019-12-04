@@ -3,21 +3,21 @@
 /******************************************************************************
 
 La Régence, French chess computer by "France Double R". German distribution
-by Sandy Electronic, who sub-titled it the TSB 4 (Turniersensorbrett).
+by Sandy Electronic, who sub-titled it TSB 4 (Turniersensorbrett).
 
 The chess engine is Richard Lang's Cyrus.
 
 Hardware notes:
 - PCB label: FRANCE DOUBLE R, MADE IN FRANCE
 - Sharp LH0080A Z80A @ 4 MHz (8MHz XTAL)
-- 2KB RAM (MSM5128-15RS), 3*4KB ROM
+- 3*4KB ROM, sockets support up to 48KB ROM
+- 2KB RAM (MSM5128-15RS), 3 sockets, only middle one used
 - TTL, piezo, 8*8+4 LEDs, magnetic sensors
 
 TODO:
 - verify irq source/frequency, probably a 555 ic, current approximation is from
   comparing led blink rate with a video recording
 - ARC0/ARC2 rom labels might be the wrong way around
-- French button labels(right side panel) aren't fully known
 
 ******************************************************************************/
 
@@ -151,9 +151,9 @@ void regence_state::main_map(address_map &map)
 
 static INPUT_PORTS_START( regence )
 	PORT_START("IN.0")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("Set Up") // Changement de Position / Veränderung
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("Take Back") // Retour en Arriere / Zug Zurück
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_NAME("New Game") // Nouvelle Partie / Neues Spiel (press after setup)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("Changement de Position (Set Up)") // Veränderung
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("Retour en Arrière (Take Back)") // Zug Zurück
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_NAME("Nouvelle Partie (New Game)") // Neues Spiel (press after setup)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("King")
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("Queen")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Rook")
@@ -161,11 +161,11 @@ static INPUT_PORTS_START( regence )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("IN.1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_O) PORT_NAME("Sound") // ? / Ton
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_NAME("Level") // ? / Stufe
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_M) PORT_CODE(KEYCODE_H) PORT_NAME("Move / Halt") // Jeu Auto/Arrêter? / Zug-Halt
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_B) PORT_NAME("Black") // Noir / Schwarz
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W) PORT_NAME("White") // Blanc / Weiss
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_O) PORT_NAME("Son (Sound)") // Ton
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_NAME("Niveau (Level)") // Stufe
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_M) PORT_CODE(KEYCODE_H) PORT_NAME("Marche/Arret (Move/Halt)") // Zug-Halt
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_B) PORT_NAME("Noir (Black)") // Schwarz
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W) PORT_NAME("Blanc (White)") // Weiss
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Pawn")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Knight")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
