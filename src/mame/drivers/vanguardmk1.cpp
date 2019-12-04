@@ -23,7 +23,7 @@ private:
 
 void vanguardmk1_state::mcu_map(address_map &map)
 {
-	map(0x0000, 0x07ff).rom().region("mcu", 0);
+	map(0xf800, 0xffff).rom().region("mcu", 0);
 }
 
 
