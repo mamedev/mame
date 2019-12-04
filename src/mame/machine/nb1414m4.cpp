@@ -62,7 +62,9 @@ void nb1414m4_device::device_start()
 
 void nb1414m4_device::device_reset()
 {
-	m_flickering_cycle = 1;
+	m_previous_0200_command = 0xffff;
+	m_previous_0200_command_frame = 0;
+	m_flickering_cycle = 0;
 	m_in_game = false;
 }
 
