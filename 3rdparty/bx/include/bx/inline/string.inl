@@ -226,6 +226,12 @@ namespace bx
 	}
 
 	template<bx::AllocatorI** AllocatorT>
+	inline void StringT<AllocatorT>::append(const char* _ptr, const char* _term)
+	{
+		append(StringView(_ptr, _term) );
+	}
+
+	template<bx::AllocatorI** AllocatorT>
 	inline void StringT<AllocatorT>::clear()
 	{
 		if (0 != m_len)
@@ -234,6 +240,12 @@ namespace bx
 
 			StringView::clear();
 		}
+	}
+
+	template<bx::AllocatorI** AllocatorT>
+	inline const char* StringT<AllocatorT>::getCPtr() const
+	{
+		return getPtr();
 	}
 
 	inline StringView strSubstr(const StringView& _str, int32_t _start, int32_t _len)
