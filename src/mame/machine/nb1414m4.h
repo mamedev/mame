@@ -30,7 +30,7 @@ private:
 	void _0e00(uint16_t mcu_cmd, uint8_t *vram);
 
 	required_region_ptr<uint8_t> m_data;
-
+	bool m_in_game;
 };
 
 DECLARE_DEVICE_TYPE(NB1414M4, nb1414m4_device)
