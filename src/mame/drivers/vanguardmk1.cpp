@@ -43,4 +43,4 @@ ROM_START(vngrdmk1)
 ROM_END
 
 
-GAME( 2004?, vngrdmk1, 0, vanguardmk1, vanguardmk1, vanguardmk1_state, empty_init, ROT0, "EOD Performance Inc.", "Vanguard MK1", MACHINE_IS_SKELETON_MECHANICAL )
+SYST( 2004?, vngrdmk1, 0, 0, vanguardmk1, vanguardmk1, vanguardmk1_state, empty_init, "EOD Performance Inc.", "Vanguard MK1", MACHINE_IS_SKELETON_MECHANICAL )
