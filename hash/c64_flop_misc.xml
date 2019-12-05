@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<softwarelist name="c64_flop" description="Commodore 64 diskettes">
+<softwarelist name="c64_flop_misc" description="Commodore 64 5.25 miscellaneous disks">
 
 	<!-- Games -->
 
