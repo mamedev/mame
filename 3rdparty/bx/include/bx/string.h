@@ -129,7 +129,14 @@ namespace bx
 		void append(const StringView& _str);
 
 		///
+		void append(const char* _ptr, const char* _term);
+
+		///
 		void clear();
+
+		/// Returns zero-terminated C string pointer.
+		///
+		const char* getCPtr() const;
 	};
 
 	/// Retruns true if character is part of space set.
