@@ -352,7 +352,7 @@ void offtwall_state::offtwall(machine_config &config)
 
 	ATARI_VAD(config, m_vad, 0, "screen");
 	m_vad->scanline_int_cb().set_inputline(m_maincpu, M68K_IRQ_4);
-	TILEMAP(config, "vad:playfield", "gfxdecode", 2, 8, 8, TILEMAP_SCAN_COLS, 64, 64).set_info_callback(DEVICE_SELF_OWNER, FUNC(offtwall_state::get_playfield_tile_info));
+	TILEMAP(config, "vad:playfield", "gfxdecode", 2, 8, 8, TILEMAP_SCAN_COLS, 64, 64).set_info_callback(FUNC(offtwall_state::get_playfield_tile_info));
 	ATARI_MOTION_OBJECTS(config, "vad:mob", 0, "screen", offtwall_state::s_mob_config).set_gfxdecode("gfxdecode");
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

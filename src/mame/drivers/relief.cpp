@@ -271,8 +271,8 @@ void relief_state::relief(machine_config &config)
 
 	ATARI_VAD(config, m_vad, 0, m_screen);
 	m_vad->scanline_int_cb().set_inputline(m_maincpu, M68K_IRQ_4);
-	TILEMAP(config, "vad:playfield", m_gfxdecode, 2, 8, 8, TILEMAP_SCAN_COLS, 64, 64).set_info_callback(DEVICE_SELF_OWNER, FUNC(relief_state::get_playfield_tile_info));
-	TILEMAP(config, "vad:playfield2", m_gfxdecode, 2, 8, 8, TILEMAP_SCAN_COLS, 64, 64, 0).set_info_callback(DEVICE_SELF_OWNER, FUNC(relief_state::get_playfield2_tile_info));
+	TILEMAP(config, "vad:playfield", m_gfxdecode, 2, 8, 8, TILEMAP_SCAN_COLS, 64, 64).set_info_callback(FUNC(relief_state::get_playfield_tile_info));
+	TILEMAP(config, "vad:playfield2", m_gfxdecode, 2, 8, 8, TILEMAP_SCAN_COLS, 64, 64, 0).set_info_callback(FUNC(relief_state::get_playfield2_tile_info));
 	ATARI_MOTION_OBJECTS(config, "vad:mob", 0, m_screen, relief_state::s_mob_config).set_gfxdecode(m_gfxdecode);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
