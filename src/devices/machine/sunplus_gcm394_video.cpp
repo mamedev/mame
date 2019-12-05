@@ -230,7 +230,7 @@ void gcm394_base_video_device::device_reset()
 
 
 	m_707f = 0x0000;
-	m_703a = 0x0000;
+	m_703a_palettebank = 0x0000;
 	m_7062 = 0x0000;
 	m_7063 = 0x0000;
 
@@ -826,19 +826,44 @@ WRITE16_MEMBER(gcm394_base_video_device::video_dma_unk_w)
 	m_707e_videodma_bank = data;
 }
 
-
 READ16_MEMBER(gcm394_base_video_device::video_707c_r)
 { 
 	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_707c_r\n", machine().describe_context());
 	return 0x8000;
 }
 
+/* 707f is VERY important, lots of rendering codepaths in the code depend on the value it returns.
 
-READ16_MEMBER(gcm394_base_video_device::video_707f_r) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_707f_r\n", machine().describe_context()); return m_707f; }
-WRITE16_MEMBER(gcm394_base_video_device::video_707f_w) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_707f_w %04x\n", machine().describe_context(), data); m_707f = data; }
+   all operations in the code based on 707f are bit based, usually read register, set / clear a bit
+   and then write register, or read register and test an individual bit.
 
-READ16_MEMBER(gcm394_base_video_device::video_703a_r) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_703a_r\n", machine().describe_context()); return m_703a; } // something to do with palette access, maybe bank?
-WRITE16_MEMBER(gcm394_base_video_device::video_703a_w) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_703a_w %04x\n", machine().describe_context(), data); m_703a = data; }
+   our current codeflow means that bits are only ever set, not cleared.
+
+   are the bits triggers? acks? enables? status flags?
+*/
+
+READ16_MEMBER(gcm394_base_video_device::video_707f_r)
+{
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_707f_r\n", machine().describe_context());
+	return m_707f;
+}
+WRITE16_MEMBER(gcm394_base_video_device::video_707f_w)
+{
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_707f_w %04x\n", machine().describe_context(), data);
+	m_707f = data;
+}
+
+READ16_MEMBER(gcm394_base_video_device::video_703a_palettebank_r)
+{
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_703a_palettebank_r\n", machine().describe_context());
+	return m_703a_palettebank;
+}
+
+WRITE16_MEMBER(gcm394_base_video_device::video_703a_palettebank_w)
+{
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_703a_palettebank_w %04x\n", machine().describe_context(), data);
+	m_703a_palettebank = data;
+}
 
 READ16_MEMBER(gcm394_base_video_device::video_7062_r) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7062_r\n", machine().describe_context()); return m_7062; }
 WRITE16_MEMBER(gcm394_base_video_device::video_7062_w) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7062_w %04x\n", machine().describe_context(), data); m_7062 = data; }
@@ -946,15 +971,15 @@ READ16_MEMBER(gcm394_base_video_device::spriteram_r)
 
 WRITE16_MEMBER(gcm394_base_video_device::palette_w)
 {
-	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::palette_w %04x : %04x (value of 0x703a is %04x)\n", machine().describe_context(), offset, data, m_703a);
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::palette_w %04x : %04x (value of 0x703a is %04x)\n", machine().describe_context(), offset, data, m_703a_palettebank);
 
-	if (m_703a & 0xfff0)
+	if (m_703a_palettebank & 0xfff0)
 	{
-		fatalerror("palette writes with m_703a %04x\n", m_703a);
+		fatalerror("palette writes with m_703a_palettebank %04x\n", m_703a_palettebank);
 	}
 	else
 	{
-		offset |= (m_703a & 0x000f) << 8;
+		offset |= (m_703a_palettebank & 0x000f) << 8;
 
 		m_paletteram[offset] = data;
 
@@ -969,13 +994,13 @@ WRITE16_MEMBER(gcm394_base_video_device::palette_w)
 
 READ16_MEMBER(gcm394_base_video_device::palette_r)
 {
-	if (m_703a & 0xfff0)
+	if (m_703a_palettebank & 0xfff0)
 	{
-		fatalerror("palette read with m_703a %04x\n", m_703a);
+		fatalerror("palette read with m_703a_palettebank %04x\n", m_703a_palettebank);
 	}
 	else
 	{
-		offset |= (m_703a & 0x000f) << 8;
+		offset |= (m_703a_palettebank & 0x000f) << 8;
 		return m_paletteram[offset];
 	}
 }

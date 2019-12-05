@@ -56,8 +56,8 @@ public:
 	DECLARE_WRITE16_MEMBER(video_dma_size_w);
 	DECLARE_WRITE16_MEMBER(video_dma_unk_w);
 
-	DECLARE_READ16_MEMBER(video_703a_r);
-	DECLARE_WRITE16_MEMBER(video_703a_w);
+	DECLARE_READ16_MEMBER(video_703a_palettebank_r);
+	DECLARE_WRITE16_MEMBER(video_703a_palettebank_w);
 
 	DECLARE_READ16_MEMBER(video_7062_r);
 	DECLARE_WRITE16_MEMBER(video_7062_w);
@@ -177,7 +177,7 @@ protected:
 	uint16_t m_tmap1_regs[0x6];
 
 	uint16_t m_707f;
-	uint16_t m_703a;
+	uint16_t m_703a_palettebank;
 	uint16_t m_7062;
 	uint16_t m_7063;
 

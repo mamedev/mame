@@ -338,7 +338,7 @@ void sunplus_gcm394_base_device::internal_map(address_map &map)
 	map(0x00702f, 0x00702f).w(m_spg_video, FUNC(gcm394_base_video_device::unk_vid2_gfxbase_msb_w)); // written with other unknown_video_device1 regs
 
 	map(0x007030, 0x007030).rw(m_spg_video, FUNC(gcm394_base_video_device::video_7030_brightness_r), FUNC(gcm394_base_video_device::video_7030_brightness_w));
-	map(0x00703a, 0x00703a).rw(m_spg_video, FUNC(gcm394_base_video_device::video_703a_r), FUNC(gcm394_base_video_device::video_703a_w));
+	map(0x00703a, 0x00703a).rw(m_spg_video, FUNC(gcm394_base_video_device::video_703a_palettebank_r), FUNC(gcm394_base_video_device::video_703a_palettebank_w));
 	map(0x00703c, 0x00703c).w(m_spg_video, FUNC(gcm394_base_video_device::video_703c_w));
 
 	map(0x007042, 0x007042).rw(m_spg_video, FUNC(gcm394_base_video_device::unk_vid0_extra_r), FUNC(gcm394_base_video_device::unk_vid0_extra_w)); // maybe sprites?  written as 7022, 702d and 7042 group
