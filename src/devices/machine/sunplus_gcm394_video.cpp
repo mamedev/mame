@@ -234,7 +234,7 @@ void gcm394_base_video_device::device_reset()
 	m_7030_brightness = 0x0000;
 	m_703c = 0x0000;
 	
-	m_7042 = data;
+	m_7042 = 0x0000;
 
 	m_7080 = 0x0000;
 	m_7081 = 0x0000;
@@ -770,7 +770,7 @@ READ16_MEMBER(gcm394_base_video_device::unk_vid0_extra_r)
 {
 	uint16_t retdata = m_7042;
 	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::unk_vid0_extra_r (returning: %04x)\n", machine().describe_context(), retdata);
-	return retdat;
+	return retdata;
 }
 
 WRITE16_MEMBER(gcm394_base_video_device::unk_vid0_extra_w)
