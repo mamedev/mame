@@ -177,7 +177,10 @@ void nb1414m4_device::kozure_score_msg(uint16_t dst, uint8_t src_base, uint8_t *
 void nb1414m4_device::_0200(uint16_t mcu_cmd, uint8_t *vram)
 {
 	uint16_t dst;
-	m_in_game = mcu_cmd & 0x80;
+
+	// In any game, this bit is set when now playing.
+	// If it is set, "INSERT COIN" etc. are not displayed.
+	m_in_game = (mcu_cmd & 0x80) != 0;
 
 	dst = (m_data[0x330+((mcu_cmd & 0xf)*2)]<<8)|(m_data[0x331+((mcu_cmd & 0xf)*2)]&0xff);
 
