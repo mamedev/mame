@@ -6,6 +6,8 @@
 CXG Chess 2001, also sold by Hanimex as HCG 1900 and by CGL as Computachess Champion.
 CXG Chess 3000 is assumed to be on similar hardware as this.
 
+The chess engine is by Richard Lang, based on Cyrus.
+
 Hardware notes:
 - Zilog Z8400APS @ 4 MHz (8MHz XTAL)
 - 2KB RAM HM6116, 16KB ROM D27128D

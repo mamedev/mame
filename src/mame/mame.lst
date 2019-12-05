@@ -11270,7 +11270,10 @@ wallst                          // (c) 1982 Century
 cwheel                          // (c) 19?? Gamebar
 
 @source:cxg_ch2001.cpp
-ch2001                          //
+ch2001
+
+@source:cxg_dominator.cpp
+sdtor
 
 @source:cxhumax.cpp
 hxhdci2k                        //
