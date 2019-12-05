@@ -27,7 +27,6 @@ gcm394_base_video_device::gcm394_base_video_device(const machine_config &mconfig
 	, m_cpu(*this, finder_base::DUMMY_TAG)
 	, m_screen(*this, finder_base::DUMMY_TAG)
 //  , m_scrollram(*this, "scrollram")
-	, m_spriteram(*this, "^spriteram")
 	, m_video_irq_cb(*this)
 	, m_palette(*this, "palette")
 	, m_gfxdecode(*this, "gfxdecode")
@@ -207,6 +206,8 @@ void gcm394_base_video_device::device_start()
 	decodegfx(":maincpu");
 
 	save_item(NAME(m_spriteextra));
+	save_item(NAME(m_spriteram));
+
 	m_space_read_cb.resolve_safe(0);
 }
 
@@ -218,8 +219,11 @@ void gcm394_base_video_device::device_reset()
 		m_tmap1_regs[i] = 0x0000;
 	}
 
-	for (int i=0;i<0x100;i++)
+	for (int i = 0; i < 0x400; i++)
+	{
 		m_spriteextra[i] = 0x0000;
+		m_spriteram[i] = 0x0000;
+	}
 
 	for (int i=0;i<0x100;i++)
 		m_paletteram[i] = machine().rand()&0x7fff;
@@ -246,7 +250,7 @@ void gcm394_base_video_device::device_reset()
 	m_7087 = 0x0000;
 	m_7088 = 0x0000;
 
-	m_videodma_bank = 0x0000;
+	m_707e_videodma_bank = 0x0000;
 	m_videodma_size = 0x0000;
 	m_videodma_dest = 0x0000;
 	m_videodma_source = 0x0000;
@@ -805,51 +809,21 @@ WRITE16_MEMBER(gcm394_base_video_device::video_dma_size_w)
 	LOGMASKED(LOG_GCM394_VIDEO_DMA, "%s:gcm394_base_video_device::video_dma_size_w %04x\n", machine().describe_context(), data);
 	m_videodma_size = data;
 
-	LOGMASKED(LOG_GCM394_VIDEO_DMA, "%s: doing sprite / video DMA source %04x dest %04x size %04x value of 707e (bank) %04x value of 707f %04x\n", machine().describe_context(), m_videodma_source, m_videodma_dest, m_videodma_size, m_videodma_bank, m_707f );
+	LOGMASKED(LOG_GCM394_VIDEO_DMA, "%s: doing sprite / video DMA source %04x dest %04x size %04x value of 707e (bank) %04x value of 707f %04x\n", machine().describe_context(), m_videodma_source, m_videodma_dest, m_videodma_size, m_707e_videodma_bank, m_707f );
 
-
-	if (m_videodma_dest == 0x7400)
+	for (int i = 0; i <= m_videodma_size; i++)
 	{
-		if (m_videodma_bank == 0x0001) // transfers an additional word for each sprite with this bit set
-		{
-			m_videodma_size &= 0xff;
-
-			for (int i = 0; i <= m_videodma_size; i++)
-			{
-				uint16_t dat = space.read_word(m_videodma_source+i);
-				m_spriteextra[i] = dat;
-			}
-
-		}
-		else if (m_videodma_bank == 0x0000)
-		{
-			m_videodma_size &= 0x3ff;
-
-			for (int i = 0; i <= m_videodma_size; i++)
-			{
-				uint16_t dat = space.read_word(m_videodma_source+i);
-				m_spriteram[i] = dat;
-			}
-
-		}
-		else
-		{
-			logerror("unhandled: m_videodma_bank is %04x\n", m_videodma_bank);
-		}
-	}
-	else
-	{
-		logerror("unhandled: m_videodma_dest is %04x\n", m_videodma_dest);
+		uint16_t dat = space.read_word(m_videodma_source+i);
+		space.write_word(m_videodma_dest + i, dat);
 	}
 
 	m_videodma_size = 0x0000;
-
 }
 
 WRITE16_MEMBER(gcm394_base_video_device::video_dma_unk_w)
 {
 	LOGMASKED(LOG_GCM394_VIDEO_DMA, "%s:gcm394_base_video_device::video_dma_unk_w %04x\n", machine().describe_context(), data);
-	m_videodma_bank = data;
+	m_707e_videodma_bank = data;
 }
 
 
@@ -930,6 +904,45 @@ WRITE16_MEMBER(gcm394_base_video_device::video_7087_w) { LOGMASKED(LOG_GCM394_VI
 WRITE16_MEMBER(gcm394_base_video_device::video_7088_w) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7088_w %04x\n", machine().describe_context(), data); m_7088 = data; }
 
 READ16_MEMBER(gcm394_base_video_device::video_7083_r) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7083_r\n", machine().describe_context()); return m_7083; }
+
+WRITE16_MEMBER(gcm394_base_video_device::spriteram_w)
+{
+	// transfers an additional word for each sprite with this bit set (smartfp) or an entire extra bank (wrlshunt)
+	// wrlshunt instead seems to base if it writes the extra data based on 707f so maybe this is more complex than banking
+	
+	// however for 707e only 0/1 is written, and it also gets written before system DMA, so despite being in the video DMA
+	// region seems to operate separate from that.
+
+	if (m_707e_videodma_bank == 0x0000)
+	{
+		m_spriteram[offset] = data;
+	}
+	else if (m_707e_videodma_bank == 0x0001)
+	{
+		m_spriteextra[offset] = data;
+	}
+	else
+	{
+		LOGMASKED(LOG_GCM394_VIDEO, "%s: spriteram_w %04x %04x unknown bank %04x\n", machine().describe_context(), offset, data, m_707e_videodma_bank);
+	}
+}
+
+READ16_MEMBER(gcm394_base_video_device::spriteram_r)
+{
+	if (m_707e_videodma_bank == 0x0000)
+	{
+		return m_spriteram[offset];
+	}
+	else if (m_707e_videodma_bank == 0x0001)
+	{
+		return m_spriteextra[offset];
+	}
+	else
+	{
+		LOGMASKED(LOG_GCM394_VIDEO, "%s: spriteram_r %04x unknown bank %04x\n", machine().describe_context(), offset,  m_707e_videodma_bank);
+		return 0x0000;
+	}
+}
 
 WRITE16_MEMBER(gcm394_base_video_device::palette_w)
 {

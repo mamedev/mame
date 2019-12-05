@@ -378,7 +378,7 @@ void sunplus_gcm394_base_device::internal_map(address_map &map)
 
 	map(0x007300, 0x0073ff).rw(m_spg_video, FUNC(gcm394_base_video_device::palette_r), FUNC(gcm394_base_video_device::palette_w));
 
-	map(0x007400, 0x0077ff).ram().share("spriteram");
+	map(0x007400, 0x0077ff).rw(m_spg_video, FUNC(gcm394_base_video_device::spriteram_r), FUNC(gcm394_base_video_device::spriteram_w));
 
 	// ######################################################################################################################################################################################
 	// 78xx region = io + other?

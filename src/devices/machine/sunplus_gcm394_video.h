@@ -90,6 +90,9 @@ public:
 	DECLARE_READ16_MEMBER(palette_r);
 	DECLARE_WRITE16_MEMBER(palette_w);
 
+	DECLARE_WRITE16_MEMBER(spriteram_w);
+	DECLARE_READ16_MEMBER(spriteram_r);
+
 	DECLARE_READ16_MEMBER(video_7051_r);
 
 	auto write_video_irq_callback() { return m_video_irq_cb.bind(); };
@@ -154,7 +157,6 @@ protected:
 	required_device<unsp_device> m_cpu;
 	required_device<screen_device> m_screen;
 //  required_shared_ptr<uint16_t> m_scrollram;
-	required_shared_ptr<uint16_t> m_spriteram;
 
 	uint16_t m_page0_addr_lsb;
 	uint16_t m_page0_addr_msb;
@@ -162,7 +164,7 @@ protected:
 	uint16_t m_page1_addr_lsb;
 	uint16_t m_page1_addr_msb;
 
-	uint16_t m_videodma_bank;
+	uint16_t m_707e_videodma_bank;
 	uint16_t m_videodma_size;
 	uint16_t m_videodma_dest;
 	uint16_t m_videodma_source;
@@ -206,7 +208,8 @@ protected:
 
 	uint16_t m_video_irq_status;
 
-	uint16_t m_spriteextra[0x100];
+	uint16_t m_spriteram[0x400];
+	uint16_t m_spriteextra[0x400];
 	uint16_t m_paletteram[0x100*0x10];
 
 	required_device<palette_device> m_palette;
