@@ -25,7 +25,7 @@ public:
 	void spriteram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 position_r(offs_t offset);
 	void position_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	void vblank(screen_device &screen, bool vblank_state);
+	DECLARE_WRITE_LINE_MEMBER(vblank);
 
 	typedef delegate<int (int)> c355_obj_code2tile_delegate;
 	void set_tile_callback(c355_obj_code2tile_delegate cb)

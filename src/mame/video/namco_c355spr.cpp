@@ -194,9 +194,6 @@ void namco_c355spr_device::zdrawgfxzoom(
 
 void namco_c355spr_device::device_start()
 {
-	if (m_buffer > 0)
-		screen().register_vblank_callback(vblank_state_delegate(&namco_c355spr_device::vblank, this));
-
 	gfx_layout obj_layout =
 	{
 		16,16,
@@ -521,9 +518,9 @@ u16 namco_c355spr_device::spriteram_r(offs_t offset)
 	return m_spriteram[0][offset];
 }
 
-void namco_c355spr_device::vblank(screen_device &screen, bool vblank_state)
+WRITE_LINE_MEMBER(namco_c355spr_device::vblank)
 {
-	if (vblank_state)
+	if (state)
 	{
 		if (m_buffer > 0)
 			get_sprites();
