@@ -47,6 +47,7 @@ public:
 
 	DECLARE_WRITE16_MEMBER(unk_vid0_gfxbase_lsb_w);
 	DECLARE_WRITE16_MEMBER(unk_vid0_gfxbase_msb_w);
+	DECLARE_READ16_MEMBER(unk_vid0_extra_r);
 	DECLARE_WRITE16_MEMBER(unk_vid0_extra_w);
 
 	DECLARE_WRITE16_MEMBER(video_dma_source_w);
@@ -182,6 +183,7 @@ protected:
 	uint16_t m_7030_brightness;
 	uint16_t m_703c;
 
+	uint16_t m_7042;
 
 	uint16_t m_7080;
 	uint16_t m_7081;

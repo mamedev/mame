@@ -341,7 +341,7 @@ void sunplus_gcm394_base_device::internal_map(address_map &map)
 	map(0x00703a, 0x00703a).rw(m_spg_video, FUNC(gcm394_base_video_device::video_703a_r), FUNC(gcm394_base_video_device::video_703a_w));
 	map(0x00703c, 0x00703c).w(m_spg_video, FUNC(gcm394_base_video_device::video_703c_w));
 
-	map(0x007042, 0x007042).w(m_spg_video, FUNC(gcm394_base_video_device::unk_vid0_extra_w)); // maybe sprites?  written as 7022, 702d and 7042 group
+	map(0x007042, 0x007042).rw(m_spg_video, FUNC(gcm394_base_video_device::unk_vid0_extra_r), FUNC(gcm394_base_video_device::unk_vid0_extra_w)); // maybe sprites?  written as 7022, 702d and 7042 group
 
 	map(0x007051, 0x007051).r(m_spg_video, FUNC(gcm394_base_video_device::video_7051_r)); // wrlshunt checks this
 
@@ -352,9 +352,10 @@ void sunplus_gcm394_base_device::internal_map(address_map &map)
 	map(0x007070, 0x007070).w(m_spg_video, FUNC(gcm394_base_video_device::video_dma_source_w));                                                      // video dma, not system dma? (sets pointers to ram buffers)
 	map(0x007071, 0x007071).w(m_spg_video, FUNC(gcm394_base_video_device::video_dma_dest_w));                                                        // sets pointers to 7300, 7400 ram areas below
 	map(0x007072, 0x007072).rw(m_spg_video, FUNC(gcm394_base_video_device::video_dma_size_r), FUNC(gcm394_base_video_device::video_dma_size_w));     //
-	map(0x00707e, 0x00707e).w(m_spg_video, FUNC(gcm394_base_video_device::video_dma_unk_w));                                                         // written around same time as DMA, seems to select alt sprite bank
 
 	map(0x00707c, 0x00707c).r(m_spg_video, FUNC(gcm394_base_video_device::video_707c_r)); // wrlshunt polls this waiting for 0x8000, is this some kind of manual port based data upload?
+
+	map(0x00707e, 0x00707e).w(m_spg_video, FUNC(gcm394_base_video_device::video_dma_unk_w));                                                         // written around same time as DMA, seems to select alt sprite bank
 	map(0x00707f, 0x00707f).rw(m_spg_video, FUNC(gcm394_base_video_device::video_707f_r), FUNC(gcm394_base_video_device::video_707f_w));
 
 	// another set of registers for something?

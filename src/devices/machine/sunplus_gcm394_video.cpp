@@ -233,7 +233,8 @@ void gcm394_base_video_device::device_reset()
 	m_702a = 0x0000;
 	m_7030_brightness = 0x0000;
 	m_703c = 0x0000;
-
+	
+	m_7042 = data;
 
 	m_7080 = 0x0000;
 	m_7081 = 0x0000;
@@ -687,11 +688,11 @@ void gcm394_base_video_device::unk_vid_regs_w(int which, int offset, uint16_t da
 	switch (offset)
 	{
 	case 0x0:
-		LOGMASKED(LOG_GCM394_VIDEO, "unk_vid_regs_w (unk chip %d) %01x %04x (X scroll?)\n", machine().describe_context(), which, offset, data); // masked with 0x3ff in code like x-scroll for tilemaps
+		LOGMASKED(LOG_GCM394_VIDEO, "%s: unk_vid_regs_w (unk chip %d) (offset %01x) (data %04x) (X scroll?)\n", machine().describe_context(), which, offset, data); // masked with 0x3ff in code like x-scroll for tilemaps
 		break;
 
 	case 0x1:
-		LOGMASKED(LOG_GCM394_VIDEO, "unk_vid_regs_w (unk chip %d) %01x %04x (y scroll?)\n", machine().describe_context(), which, offset, data); // masked with 0x3ff in code like x-scroll for tilemaps
+		LOGMASKED(LOG_GCM394_VIDEO, "%s: unk_vid_regs_w (unk chip %d) (offset %01x) (data %04x) (y scroll?)\n", machine().describe_context(), which, offset, data); // masked with 0x3ff in code like x-scroll for tilemaps
 		break;
 
 	case 0x02: // startup?
@@ -701,7 +702,7 @@ void gcm394_base_video_device::unk_vid_regs_w(int which, int offset, uint16_t da
 	case 0x05:
 	case 0x06:
 	case 0x07:
-		LOGMASKED(LOG_GCM394_VIDEO, "unk_vid_regs_w (unk chip %d) %01x %04x\n", machine().describe_context(), which, offset, data);
+		LOGMASKED(LOG_GCM394_VIDEO, "%s: unk_vid_regs_w (unk chip %d) (offset %01x) (data %04x\n", machine().describe_context(), which, offset, data);
 		break;
 
 	}
@@ -765,9 +766,17 @@ WRITE16_MEMBER(gcm394_base_video_device::unk_vid0_gfxbase_msb_w)
 	LOGMASKED(LOG_GCM394_TMAP, "	(unk_vid0 tilegfxbase is now %04x%04x)\n", m_unk_vid0_gfxbase_msb, m_unk_vid0_gfxbase_lsb);
 }
 
+READ16_MEMBER(gcm394_base_video_device::unk_vid0_extra_r)
+{
+	uint16_t retdata = m_7042;
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::unk_vid0_extra_r (returning: %04x)\n", machine().describe_context(), retdata);
+	return retdat;
+}
+
 WRITE16_MEMBER(gcm394_base_video_device::unk_vid0_extra_w)
 {
 	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::unk_vid0_extra_w %04x\n", machine().describe_context(), data);
+	m_7042 = data;
 }
 
 
@@ -796,7 +805,7 @@ WRITE16_MEMBER(gcm394_base_video_device::video_dma_size_w)
 	LOGMASKED(LOG_GCM394_VIDEO_DMA, "%s:gcm394_base_video_device::video_dma_size_w %04x\n", machine().describe_context(), data);
 	m_videodma_size = data;
 
-	LOGMASKED(LOG_GCM394_VIDEO_DMA, "%s: doing sprite / video DMA source %04x dest %04x size %04x bank %04x\n", machine().describe_context(), m_videodma_source, m_videodma_dest, m_videodma_size, m_videodma_bank );
+	LOGMASKED(LOG_GCM394_VIDEO_DMA, "%s: doing sprite / video DMA source %04x dest %04x size %04x value of 707e (bank) %04x value of 707f %04x\n", machine().describe_context(), m_videodma_source, m_videodma_dest, m_videodma_size, m_videodma_bank, m_707f );
 
 
 	if (m_videodma_dest == 0x7400)
