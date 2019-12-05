@@ -33,7 +33,6 @@ private:
 	uint16_t m_previous_0200_command;
 	uint64_t m_previous_0200_command_frame;
 	uint16_t m_flickering_cycle;
-	bool m_in_game;
 };
 
 DECLARE_DEVICE_TYPE(NB1414M4, nb1414m4_device)
