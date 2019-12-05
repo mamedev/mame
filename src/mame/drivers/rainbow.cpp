@@ -3405,18 +3405,13 @@ ROM_START(rainbow100a)
 	// Technical Manual Addendum f.100A and 100B (Dec.84) lists 15 localizations / part numbers
 
 	ROM_REGION(0x1000, "chargen", 0) // [E98] 2732 (4 K) EPROM
-	ROM_LOAD("23-020e3-00.bin", 0x0000, 0x1000, CRC(1685e452) SHA1(bc299ff1cb74afcededf1a7beb9001188fdcf02f)) // from Rainbow 100B, undumped
+	ROM_LOAD("23-020e3-00.bin", 0x0000, 0x1000, CRC(1685e452) SHA1(bc299ff1cb74afcededf1a7beb9001188fdcf02f)) // from Rainbow 100B, Rainbow 100A version undumped
 
 	// Z80 ARBITRATION PROM
 	ROM_REGION(0x100, "prom", 0)
 	ROM_LOAD("23-090b1.mmi6308-ij.e11", 0x0000, 0x0100, CRC(cac3a7e3) SHA1(2d0468cda36fa287f705364c56dbf62f548d2e4c) ) // MMI 6308-IJ; Silkscreen stamp: "LM8413 // 090B1"; 256x8 Open Collector prom @E11, same prom is @E13 on 100-B
 ROM_END
 
-
-void rainbow_modelb_state::machine_start()
-{
-	rainbow_base_state::machine_start();
-}
 
 //----------------------------------------------------------------------------------------
 // ROM definition for 100-B (system module 70-19974-02, PSU H7842-D)
