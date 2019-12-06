@@ -287,7 +287,7 @@ void gcm394_base_video_device::draw(const rectangle &cliprect, uint32_t line, ui
 
 	uint32_t words_per_tile = 8; // seems to be correct for sprites regardless of size / bpp
 
-	uint32_t m = (bitmap_addr - 0x20000) + (words_per_tile * tile + bits_per_row * (line ^ yflipmask));
+	uint32_t m = (bitmap_addr) + (words_per_tile * tile + bits_per_row * (line ^ yflipmask));
 
 
 	uint32_t bits = 0;

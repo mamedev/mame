@@ -662,8 +662,11 @@ WRITE_LINE_MEMBER(sunplus_gcm394_base_device::videoirq_w)
 
 uint16_t sunplus_gcm394_base_device::read_space(uint32_t offset)
 {
-	uint16_t b = m_gfxregion[(offset * 2) & (m_gfxregionsize - 1)] | (m_gfxregion[(offset * 2 + 1) & (m_gfxregionsize - 1)] << 8);
-	return b;
+//	uint16_t b = m_gfxregion[(offset * 2) & (m_gfxregionsize - 1)] | (m_gfxregion[(offset * 2 + 1) & (m_gfxregionsize - 1)] << 8);
+//	return b;
+	address_space& mem = this->space(AS_PROGRAM);
+	uint16_t retdata = mem.read_word(offset);
+	return retdata;
 }
 
 
