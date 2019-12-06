@@ -12,6 +12,7 @@
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
 #include "video/mc6845.h"
+#include "emupal.h"
 #include "screen.h"
 
 class sigma21_state : public driver_device
@@ -53,6 +54,21 @@ static INPUT_PORTS_START(sigma21)
 INPUT_PORTS_END
 
 
+static const gfx_layout gfx_layout =
+{
+	8, 8,
+	RGN_FRAC(1,2),
+	2,
+	{ 0, RGN_FRAC(1,2) },
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8,
+};
+
+static GFXDECODE_START(gfx_sigma21)
+	GFXDECODE_ENTRY("gfx", 0, gfx_layout, 0, 1)
+GFXDECODE_END
+
 void sigma21_state::sigma21(machine_config &config)
 {
 	MC6809(config, m_maincpu, 5600000); // exact type and clock unknown
@@ -69,9 +85,14 @@ void sigma21_state::sigma21(machine_config &config)
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
 	crtc.set_update_row_callback(FUNC(sigma21_state::update_row));
+
+	GFXDECODE(config, "gfxdecode", "palette", gfx_sigma21);
+	PALETTE(config, "palette", palette_device::RGB_3BIT);
 }
 
 
+// 21 (TWENTY-ONE)
+// (C)197? SIGMA
 ROM_START(sigma21)
 	ROM_REGION(0x1800, "program", 0)
 	ROM_LOAD("21_108-.i35", 0x0000, 0x0800, CRC(06fde41e) SHA1(b2088c38b4455102bbe2edf6137d066a69bfd05d))
