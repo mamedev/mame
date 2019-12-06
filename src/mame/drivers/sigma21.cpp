@@ -28,6 +28,7 @@ public:
 
 private:
 	MC6845_UPDATE_ROW(update_row);
+	void sigma21_palette(palette_device &palette);
 
 	void mem_map(address_map &map);
 
@@ -37,6 +38,14 @@ private:
 
 MC6845_UPDATE_ROW(sigma21_state::update_row)
 {
+}
+
+void sigma21_state::sigma21_palette(palette_device &palette)
+{
+	palette.set_pen_color(0, rgb_t::black());
+	palette.set_pen_color(1, rgb_t::white());
+	palette.set_pen_color(2, rgb_t(0x00, 0x00, 0x55));
+	palette.set_pen_color(3, rgb_t(0xff, 0x00, 0x00));
 }
 
 
@@ -87,7 +96,7 @@ void sigma21_state::sigma21(machine_config &config)
 	crtc.set_update_row_callback(FUNC(sigma21_state::update_row));
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_sigma21);
-	PALETTE(config, "palette", palette_device::RGB_3BIT);
+	PALETTE(config, "palette", FUNC(sigma21_state::sigma21_palette), 4);
 }
 
 
