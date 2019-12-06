@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
-<softwarelist name="apple2_flop_clcracked" description="Apple II cleanly cracked 5.25 disks">
+<softwarelist name="apple2_flop_clcracked" description="Apple II cleanly cracked 5.25&quot; disks">
 
 	<!-- Several sets are missing disks. As of July 21st, 2019 we don't have
 	complete dumps for the following sets:
