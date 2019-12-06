@@ -2,7 +2,7 @@
 // copyright-holders:AJR
 /****************************************************************************
 
-    Skeleton driver for "21" game by Sigma.
+    Skeleton driver for "21" game by Sigma (possibly "Fortune 21").
 
     No real progress is to be expected until the program ROMs are redumped.
 
@@ -96,8 +96,8 @@ void sigma21_state::sigma21(machine_config &config)
 ROM_START(sigma21)
 	ROM_REGION(0x1800, "program", 0)
 	ROM_LOAD("21_108-.i35", 0x0000, 0x0800, CRC(06fde41e) SHA1(b2088c38b4455102bbe2edf6137d066a69bfd05d))
-	ROM_LOAD("21_108-.i36", 0x0800, 0x0800, CRC(6bfce933) SHA1(038f5b6a3b09506f9dc32933fb1dd284124a09aa) BAD_DUMP) // FIXED BITS (xxx1xxxx)
-	ROM_LOAD("21_108-.i37", 0x1000, 0x0800, CRC(79fb8f3e) SHA1(6245da1b26633a02cbbf19b23213096533840041) BAD_DUMP) // FIXED BITS (11xxxxxx)
+	ROM_LOAD("21_108-.i36", 0x0800, 0x0800, BAD_DUMP CRC(6bfce933) SHA1(038f5b6a3b09506f9dc32933fb1dd284124a09aa)) // FIXED BITS (xxx1xxxx)
+	ROM_LOAD("21_108-.i37", 0x1000, 0x0800, BAD_DUMP CRC(79fb8f3e) SHA1(6245da1b26633a02cbbf19b23213096533840041)) // FIXED BITS (11xxxxxx)
 	ROM_FILL(0x17ff, 1, 0x00) // make at least the reset vector logical
 
 	ROM_REGION(0x1000, "gfx", 0)
