@@ -36173,6 +36173,9 @@ sidepckt                        // (c) 1986 Data East Corporation
 sidepcktb                       // bootleg
 sidepcktj                       // (c) 1986 Data East Corporation
 
+@source:sigma21.cpp
+sigma21                         //
+
 @source:sigmab52.cpp
 jwildb52                        // (c) 199? Sigma
 jwildb52a                       // (c) 199? Sigma

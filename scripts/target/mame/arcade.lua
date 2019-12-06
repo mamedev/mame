@@ -2667,6 +2667,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/merit3xx.cpp",
 	MAME_DIR .. "src/mame/drivers/meritm.cpp",
 	MAME_DIR .. "src/mame/drivers/mtouchxl.cpp",
+	MAME_DIR .. "src/mame/drivers/pubtimed.cpp",
 	MAME_DIR .. "src/mame/machine/at.h",
 	MAME_DIR .. "src/mame/machine/at.cpp",
 }
@@ -3695,6 +3696,7 @@ createMAMEProjects(_target, _subtarget, "sigma")
 files {
 	MAME_DIR .. "src/mame/drivers/nyny.cpp",
 	MAME_DIR .. "src/mame/drivers/r2dtank.cpp",
+	MAME_DIR .. "src/mame/drivers/sigma21.cpp",
 	MAME_DIR .. "src/mame/drivers/sigmab52.cpp",
 	MAME_DIR .. "src/mame/drivers/sigmab98.cpp",
 	MAME_DIR .. "src/mame/drivers/spiders.cpp",
@@ -4895,7 +4897,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/potgoldu.cpp",
 	MAME_DIR .. "src/mame/drivers/proconn.cpp",
 	MAME_DIR .. "src/mame/drivers/pse.cpp",
-	MAME_DIR .. "src/mame/drivers/pubtimed.cpp",
 	MAME_DIR .. "src/mame/drivers/quizo.cpp",
 	MAME_DIR .. "src/mame/drivers/quizpun2.cpp",
 	MAME_DIR .. "src/mame/drivers/rbmk.cpp",
