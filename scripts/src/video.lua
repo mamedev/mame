@@ -545,6 +545,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/lc7582.h,VIDEOS["LC7582"] = true
+--------------------------------------------------
+
+if (VIDEOS["LC7582"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/lc7582.cpp",
+		MAME_DIR .. "src/devices/video/lc7582.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/m50458.h,VIDEOS["M50458"] = true
 --------------------------------------------------
 
