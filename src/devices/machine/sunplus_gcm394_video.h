@@ -62,8 +62,8 @@ public:
 	DECLARE_READ16_MEMBER(video_7062_r);
 	DECLARE_WRITE16_MEMBER(video_7062_w);
 
-	DECLARE_READ16_MEMBER(video_7063_r);
-	DECLARE_WRITE16_MEMBER(video_7063_w);
+	DECLARE_READ16_MEMBER(video_7063_videoirq_source_r);
+	DECLARE_WRITE16_MEMBER(video_7063_videoirq_source_ack_w);
 
 	DECLARE_WRITE16_MEMBER(video_702a_w);
 	DECLARE_READ16_MEMBER(video_7030_brightness_r);

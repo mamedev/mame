@@ -892,16 +892,16 @@ WRITE16_MEMBER(gcm394_base_video_device::video_703a_palettebank_w)
 READ16_MEMBER(gcm394_base_video_device::video_7062_r) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7062_r\n", machine().describe_context()); return m_7062; }
 WRITE16_MEMBER(gcm394_base_video_device::video_7062_w) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7062_w %04x\n", machine().describe_context(), data); m_7062 = data; }
 
-READ16_MEMBER(gcm394_base_video_device::video_7063_r)
+READ16_MEMBER(gcm394_base_video_device::video_7063_videoirq_source_r)
 { 
-	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7063_r\n", machine().describe_context());
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7063_videoirq_source_r\n", machine().describe_context());
 	return machine().rand();
 }
 
 
-WRITE16_MEMBER(gcm394_base_video_device::video_7063_w)
+WRITE16_MEMBER(gcm394_base_video_device::video_7063_videoirq_source_ack_w)
 {
-	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7063_w %04x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7063_videoirq_source_ack_w %04x\n", machine().describe_context(), data);
 	m_7063 = data;
 
 	// ack or enable? happens near start of the IRQ

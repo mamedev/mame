@@ -163,15 +163,15 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7835_w) { LOGMASKED(LOG_GCM39
 
 // IO here?
 
-READ16_MEMBER(sunplus_gcm394_base_device::ioport_a_r)
+READ16_MEMBER(sunplus_gcm394_base_device::ioarea_7860_porta_r)
 {
-	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::ioport_a_r\n", machine().describe_context());
+	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::ioarea_7860_porta_r\n", machine().describe_context());
 	return m_porta_in();
 }
 
-WRITE16_MEMBER(sunplus_gcm394_base_device::ioport_a_w)
+WRITE16_MEMBER(sunplus_gcm394_base_device::ioarea_7860_porta_w)
 {
-	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::ioport_a_w %04x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::ioarea_7860_porta_w %04x\n", machine().describe_context(), data);
 	m_porta_out(data);
 }
 
@@ -207,8 +207,17 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7863_w)
 
 // similar read/write pattern to above, 2nd group?
 
-READ16_MEMBER(sunplus_gcm394_base_device::unkarea_7870_r) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7870_r\n", machine().describe_context()); return m_portb_in(); }
-WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7870_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7870_w %04x\n", machine().describe_context(), data); m_7870 = data; }
+READ16_MEMBER(sunplus_gcm394_base_device::ioarea_7870_portb_r)
+{
+	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::ioarea_7870_portb_r\n", machine().describe_context());
+	return m_portb_in();
+}
+
+WRITE16_MEMBER(sunplus_gcm394_base_device::ioarea_7870_portb_w)
+{
+	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::ioarea_7870_portb_w %04x\n", machine().describe_context(), data);
+	m_7870 = data;
+}
 
 READ16_MEMBER(sunplus_gcm394_base_device::unkarea_7871_r) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7871_r\n", machine().describe_context()); return 0xffff;// m_7871;
 }
@@ -346,7 +355,7 @@ void sunplus_gcm394_base_device::internal_map(address_map &map)
 	map(0x007051, 0x007051).r(m_spg_video, FUNC(gcm394_base_video_device::video_7051_r)); // wrlshunt checks this
 
 	map(0x007062, 0x007062).rw(m_spg_video, FUNC(gcm394_base_video_device::video_7062_r), FUNC(gcm394_base_video_device::video_7062_w));
-	map(0x007063, 0x007063).rw(m_spg_video, FUNC(gcm394_base_video_device::video_7063_r), FUNC(gcm394_base_video_device::video_7063_w));
+	map(0x007063, 0x007063).rw(m_spg_video, FUNC(gcm394_base_video_device::video_7063_videoirq_source_r), FUNC(gcm394_base_video_device::video_7063_videoirq_source_ack_w));
 
 	// note, 70 / 71 / 72 are the same offsets used for DMA as in spg2xx video device
 	map(0x007070, 0x007070).w(m_spg_video, FUNC(gcm394_base_video_device::video_dma_source_w));                                                      // video dma, not system dma? (sets pointers to ram buffers)
@@ -408,7 +417,7 @@ void sunplus_gcm394_base_device::internal_map(address_map &map)
 
 	map(0x007835, 0x007835).w(FUNC(sunplus_gcm394_base_device::unkarea_7835_w));
 
-	map(0x007860, 0x007860).rw(FUNC(sunplus_gcm394_base_device::ioport_a_r), FUNC(sunplus_gcm394_base_device::ioport_a_w));
+	map(0x007860, 0x007860).rw(FUNC(sunplus_gcm394_base_device::ioarea_7860_porta_r), FUNC(sunplus_gcm394_base_device::ioarea_7860_porta_w));
 
 	map(0x007861, 0x007861).r(FUNC(sunplus_gcm394_base_device::unkarea_7861_r));
 	map(0x007862, 0x007862).rw(FUNC(sunplus_gcm394_base_device::unkarea_7862_r), FUNC(sunplus_gcm394_base_device::unkarea_7862_w));
@@ -416,7 +425,7 @@ void sunplus_gcm394_base_device::internal_map(address_map &map)
 
 	map(0x007868, 0x007868).r(FUNC(sunplus_gcm394_base_device::unkarea_7868_r)); // on startup
 
-	map(0x007870, 0x007870).rw(FUNC(sunplus_gcm394_base_device::unkarea_7870_r) ,FUNC(sunplus_gcm394_base_device::unkarea_7870_w));
+	map(0x007870, 0x007870).rw(FUNC(sunplus_gcm394_base_device::ioarea_7870_portb_r) ,FUNC(sunplus_gcm394_base_device::ioarea_7870_portb_w));
 
 	map(0x007871, 0x007871).r(FUNC(sunplus_gcm394_base_device::unkarea_7871_r));
 	map(0x007872, 0x007872).rw(FUNC(sunplus_gcm394_base_device::unkarea_7872_r), FUNC(sunplus_gcm394_base_device::unkarea_7872_w));
@@ -580,6 +589,9 @@ IRQ_CALLBACK_MEMBER(sunplus_gcm394_base_device::irq_vector_cb)
 	if (irqline == UNSP_IRQ6_LINE)
 		set_state_unsynced(UNSP_IRQ6_LINE, CLEAR_LINE);
 
+	if (irqline == UNSP_IRQ4_LINE)
+		set_state_unsynced(UNSP_IRQ4_LINE, CLEAR_LINE);
+
 	return 0;
 }
 
@@ -598,6 +610,7 @@ void sunplus_gcm394_base_device::checkirq6()
    reads 78a1, checks bit 0400
    if it IS set, just increases value in RAM at 1a2e  (no ack)
    if it ISN'T set, then read/write 78b2 (ack something?) then increase value in RAM  at 1a2e
+   (smartfp doesn't touch these addresses? but instead reads/writes 7935, alt ack?)
 
    wrlshunt also has an IRQ4
    it always reads/writes 78c0 before executing payload (ack?)
@@ -605,6 +618,16 @@ void sunplus_gcm394_base_device::checkirq6()
 
    wrlshunt also has FIQ
    no ack mechanism, for sound timer maybe (as it appears to be on spg110)
+
+
+   ----
+
+   IRQ5 is video IRQ
+   in both games writing 0x0001 to 7063 seems to be an ack mechanism
+   wrlshunt also checks bit 0x0040 of 7863 and will ack that too with alt code paths
+
+   7863 is therefore some kind of 'video irq source' ?
+
 */
 
 
@@ -616,6 +639,8 @@ void sunplus_gcm394_base_device::device_timer(emu_timer &timer, device_timer_id 
 	{
 		m_7935 |= 0x0100;
 		set_state_unsynced(UNSP_IRQ6_LINE, ASSERT_LINE);
+		//set_state_unsynced(UNSP_IRQ4_LINE, ASSERT_LINE);
+
 	//	checkirq6();
 		break;
 	}
