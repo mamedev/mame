@@ -304,6 +304,11 @@ int as99127f_device::execute_command(int command, int rw, int data)
 void as99127f_device::device_start()
 {
 	memset(buffer, 0, sizeof(buffer));
+	// used to read voltages by bios, measured in mV
+	buffer[0x20] = 0x70; // multiplied by 0x10
+	buffer[0x2] = 0x7e; // multiplied by 0x10
+	buffer[0x23] = 0x96; // multiplied by 0x540 then divided by 0x32
+	buffer[0x24] = 0x9e; // multiplied by 0x260 then divided by 0xa
 }
 
 DEFINE_DEVICE_TYPE(AS99127F_SENSOR2, as99127f_sensor2_device, "as99127f_sensor2", "Asus AS99127F temperature sensor 2")
