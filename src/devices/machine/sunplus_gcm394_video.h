@@ -45,10 +45,10 @@ public:
 	DECLARE_WRITE16_MEMBER(unk_vid2_gfxbase_lsb_w);
 	DECLARE_WRITE16_MEMBER(unk_vid2_gfxbase_msb_w);
 
-	DECLARE_WRITE16_MEMBER(unk_vid0_gfxbase_lsb_w);
-	DECLARE_WRITE16_MEMBER(unk_vid0_gfxbase_msb_w);
-	DECLARE_READ16_MEMBER(unk_vid0_extra_r);
-	DECLARE_WRITE16_MEMBER(unk_vid0_extra_w);
+	DECLARE_WRITE16_MEMBER(sprite_7022_gfxbase_lsb_w);
+	DECLARE_WRITE16_MEMBER(sprite_702d_gfxbase_msb_w);
+	DECLARE_READ16_MEMBER(sprite_7042_extra_r);
+	DECLARE_WRITE16_MEMBER(sprite_7042_extra_w);
 
 	DECLARE_WRITE16_MEMBER(video_dma_source_w);
 	DECLARE_WRITE16_MEMBER(video_dma_dest_w);

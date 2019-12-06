@@ -41,9 +41,12 @@ gcm394_video_device::gcm394_video_device(const machine_config &mconfig, const ch
 
 void gcm394_base_video_device::decodegfx(const char* tag)
 {
+	if (!memregion(tag))
+		return;
+
 	uint8_t* gfxregion = memregion(tag)->base();
 	int gfxregionsize = memregion(tag)->bytes();
-
+	
 	if (1)
 	{
 		gfx_layout obj_layout =
@@ -150,7 +153,7 @@ void gcm394_base_video_device::decodegfx(const char* tag)
 		m_gfxdecode->set_gfx(m_maxgfxelement, std::make_unique<gfx_element>(m_palette, obj_layout, gfxregion, 0, 0x40 * 0x10, 0));
 		m_maxgfxelement++;
 	}
-
+	
 	if (1)
 	{
 		gfx_layout obj_layout =
@@ -712,7 +715,7 @@ void gcm394_base_video_device::unk_vid_regs_w(int which, int offset, uint16_t da
 	}
 }
 
-// **************************************** unknown video device 1 (another tilemap? sprite layer?) *************************************************
+// **************************************** unknown video device 1 (another tilemap? roz? line? zooming sprite layer?) *************************************************
 
 WRITE16_MEMBER(gcm394_base_video_device::unk_vid1_regs_w)
 {
@@ -733,7 +736,7 @@ WRITE16_MEMBER(gcm394_base_video_device::unk_vid1_gfxbase_msb_w)
 	LOGMASKED(LOG_GCM394_TMAP, "	(unk_vid1 tilegfxbase is now %04x%04x)\n", m_unk_vid1_gfxbase_msb, m_unk_vid1_gfxbase_lsb);
 }
 
-// **************************************** unknown video device 2 (another tilemap? sprite layer?) *************************************************
+// **************************************** unknown video device 2 (another tilemap? roz? lines? zooming sprite layer?) *************************************************
 
 WRITE16_MEMBER(gcm394_base_video_device::unk_vid2_regs_w)
 {
@@ -754,32 +757,34 @@ WRITE16_MEMBER(gcm394_base_video_device::unk_vid2_gfxbase_msb_w)
 	LOGMASKED(LOG_GCM394_TMAP, "	(unk_vid2 tilegfxbase is now %04x%04x)\n", m_unk_vid2_gfxbase_msb, m_unk_vid2_gfxbase_lsb);
 }
 
-// **************************************** unknown video device 0 (sprite control?) *************************************************
+// **************************************** sprite control registers *************************************************
 
-WRITE16_MEMBER(gcm394_base_video_device::unk_vid0_gfxbase_lsb_w)
+// set to 001264c0 in wrlshunt, which point at the menu selectors (game names, arrows etc.)
+
+WRITE16_MEMBER(gcm394_base_video_device::sprite_7022_gfxbase_lsb_w)
 {
-	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::unk_vid0_gfxbase_lsb_w %04x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::sprite_7022_gfxbase_lsb_w %04x\n", machine().describe_context(), data);
 	m_unk_vid0_gfxbase_lsb = data;
 	LOGMASKED(LOG_GCM394_TMAP, "	(unk_vid0 tilegfxbase is now %04x%04x)\n", m_unk_vid0_gfxbase_msb, m_unk_vid0_gfxbase_lsb);
 }
 
-WRITE16_MEMBER(gcm394_base_video_device::unk_vid0_gfxbase_msb_w)
+WRITE16_MEMBER(gcm394_base_video_device::sprite_702d_gfxbase_msb_w)
 {
-	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::unk_vid0_gfxbase_msb_w %04x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::sprite_702d_gfxbase_msb_w %04x\n", machine().describe_context(), data);
 	m_unk_vid0_gfxbase_msb = data;
 	LOGMASKED(LOG_GCM394_TMAP, "	(unk_vid0 tilegfxbase is now %04x%04x)\n", m_unk_vid0_gfxbase_msb, m_unk_vid0_gfxbase_lsb);
 }
 
-READ16_MEMBER(gcm394_base_video_device::unk_vid0_extra_r)
+READ16_MEMBER(gcm394_base_video_device::sprite_7042_extra_r)
 {
 	uint16_t retdata = m_7042;
-	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::unk_vid0_extra_r (returning: %04x)\n", machine().describe_context(), retdata);
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::sprite_7042_extra_r (returning: %04x)\n", machine().describe_context(), retdata);
 	return retdata;
 }
 
-WRITE16_MEMBER(gcm394_base_video_device::unk_vid0_extra_w)
+WRITE16_MEMBER(gcm394_base_video_device::sprite_7042_extra_w)
 {
-	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::unk_vid0_extra_w %04x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::sprite_7042_extra_w %04x\n", machine().describe_context(), data);
 	m_7042 = data;
 }
 
