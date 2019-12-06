@@ -145,7 +145,7 @@ protected:
 	};
 
 	template<blend_enable_t Blend, rowscroll_enable_t RowScroll, flipx_t FlipX>
-	void draw(const rectangle &cliprect, uint32_t line, uint32_t xoff, uint32_t yoff, uint32_t bitmap_addr, uint32_t tile, int32_t h, int32_t w, uint8_t bpp, uint32_t yflipmask, uint32_t palette_offset);
+	void draw(const rectangle &cliprect, uint32_t line, uint32_t xoff, uint32_t yoff, uint32_t bitmap_addr, uint32_t tile, int32_t h, int32_t w, uint8_t bpp, uint32_t yflipmask, uint32_t palette_offset, int addressing_mode);
 	void draw_page(const rectangle &cliprect, uint32_t scanline, int priority, uint32_t bitmap_addr, uint16_t *regs);
 	void draw_sprites(const rectangle& cliprect, uint32_t scanline, int priority);
 	void draw_sprite(const rectangle& cliprect, uint32_t scanline, int priority, uint32_t base_addr);

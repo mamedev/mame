@@ -274,7 +274,7 @@ void gcm394_base_video_device::device_reset()
 *************************/
 
 template<gcm394_base_video_device::blend_enable_t Blend, gcm394_base_video_device::rowscroll_enable_t RowScroll, gcm394_base_video_device::flipx_t FlipX>
-void gcm394_base_video_device::draw(const rectangle &cliprect, uint32_t line, uint32_t xoff, uint32_t yoff, uint32_t bitmap_addr, uint32_t tile, int32_t h, int32_t w, uint8_t bpp, uint32_t yflipmask, uint32_t palette_offset)
+void gcm394_base_video_device::draw(const rectangle &cliprect, uint32_t line, uint32_t xoff, uint32_t yoff, uint32_t bitmap_addr, uint32_t tile, int32_t h, int32_t w, uint8_t bpp, uint32_t yflipmask, uint32_t palette_offset, int addressing_mode)
 {
 	uint32_t nc_bpp = ((bpp) + 1) << 1;
 
@@ -283,9 +283,16 @@ void gcm394_base_video_device::draw(const rectangle &cliprect, uint32_t line, ui
 	//palette_offset <<= nc_bpp;
 
 	uint32_t bits_per_row = nc_bpp * w / 16;
-	//uint32_t words_per_tile = bits_per_row * h;
-
-	uint32_t words_per_tile = 8; // seems to be correct for sprites regardless of size / bpp
+	uint32_t words_per_tile;
+	
+	if (addressing_mode == 1)
+	{
+		words_per_tile = bits_per_row * h;
+	}
+	else
+	{
+		words_per_tile = 8; // seems to be correct for sprites regardless of size / bpp on smartfp
+	}
 
 	uint32_t m = (bitmap_addr) + (words_per_tile * tile + bits_per_row * (line ^ yflipmask));
 
@@ -456,16 +463,16 @@ void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t sca
 			if (row_scroll)
 			{
 				if (flip_x)
-					draw<BlendOn, RowScrollOn, FlipXOn>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset);
+					draw<BlendOn, RowScrollOn, FlipXOn>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset, 0);
 				else
-					draw<BlendOn, RowScrollOn, FlipXOff>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset);
+					draw<BlendOn, RowScrollOn, FlipXOff>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset, 0);
 			}
 			else
 			{
 				if (flip_x)
-					draw<BlendOn, RowScrollOff, FlipXOn>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset);
+					draw<BlendOn, RowScrollOff, FlipXOn>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset, 0);
 				else
-					draw<BlendOn, RowScrollOff, FlipXOff>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset);
+					draw<BlendOn, RowScrollOff, FlipXOff>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset, 0);
 			}
 		}
 		else
@@ -473,16 +480,16 @@ void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t sca
 			if (row_scroll)
 			{
 				if (flip_x)
-					draw<BlendOff, RowScrollOn, FlipXOn>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset);
+					draw<BlendOff, RowScrollOn, FlipXOn>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset, 0);
 				else
-					draw<BlendOff, RowScrollOn, FlipXOff>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset);
+					draw<BlendOff, RowScrollOn, FlipXOff>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset, 0);
 			}
 			else
 			{
 				if (flip_x)
-					draw<BlendOff, RowScrollOff, FlipXOn>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset);
+					draw<BlendOff, RowScrollOff, FlipXOn>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset, 0);
 				else
-					draw<BlendOff, RowScrollOff, FlipXOff>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset);
+					draw<BlendOff, RowScrollOff, FlipXOff>(cliprect, tile_scanline, xx, yy, bitmap_addr, tile, tile_h, tile_w, bpp, yflipmask, palette_offset, 0);
 			}
 		}
 	}
@@ -502,6 +509,15 @@ void gcm394_base_video_device::draw_sprite(const rectangle &cliprect, uint32_t s
 	{
 		return;
 	}
+
+	int addressing_mode = 0;
+
+	// m_7042_sprite is f7 on smartfp
+	//                  01 on wrlshunt
+	// this is not enough to conclude anything
+
+	if (m_7042_sprite == 0x01)
+		addressing_mode = 1;
 
 	tile |= m_spriteextra[base_addr / 4] << 16;
 
@@ -535,7 +551,15 @@ void gcm394_base_video_device::draw_sprite(const rectangle &cliprect, uint32_t s
 	}
 
 	bool blend = (attr & 0x4000);
-	bool flip_x = (attr & TILE_X_FLIP);
+	
+	bool flip_x = false;
+
+	// different attribute use?
+	if (addressing_mode == 0)
+	{
+		flip_x = (attr & TILE_X_FLIP);
+	}
+
 	const uint8_t bpp = attr & 0x0003;
 	const uint32_t yflipmask = attr & TILE_Y_FLIP ? h - 1 : 0;
 	uint32_t palette_offset = (attr & 0x0f00) >> 4;
@@ -546,16 +570,16 @@ void gcm394_base_video_device::draw_sprite(const rectangle &cliprect, uint32_t s
 	if (blend)
 	{
 		if (flip_x)
-			draw<BlendOn, RowScrollOff, FlipXOn>(cliprect, tile_line, x, y, bitmap_addr, tile, h, w, bpp, yflipmask, palette_offset);
+			draw<BlendOn, RowScrollOff, FlipXOn>(cliprect, tile_line, x, y, bitmap_addr, tile, h, w, bpp, yflipmask, palette_offset, addressing_mode);
 		else
-			draw<BlendOn, RowScrollOff, FlipXOff>(cliprect, tile_line, x, y, bitmap_addr, tile, h, w, bpp, yflipmask, palette_offset);
+			draw<BlendOn, RowScrollOff, FlipXOff>(cliprect, tile_line, x, y, bitmap_addr, tile, h, w, bpp, yflipmask, palette_offset, addressing_mode);
 	}
 	else
 	{
 		if (flip_x)
-			draw<BlendOff, RowScrollOff, FlipXOn>(cliprect, tile_line, x, y, bitmap_addr, tile, h, w, bpp, yflipmask, palette_offset);
+			draw<BlendOff, RowScrollOff, FlipXOn>(cliprect, tile_line, x, y, bitmap_addr, tile, h, w, bpp, yflipmask, palette_offset, addressing_mode);
 		else
-			draw<BlendOff, RowScrollOff, FlipXOff>(cliprect, tile_line, x, y, bitmap_addr, tile, h, w, bpp, yflipmask, palette_offset);
+			draw<BlendOff, RowScrollOff, FlipXOff>(cliprect, tile_line, x, y, bitmap_addr, tile, h, w, bpp, yflipmask, palette_offset, addressing_mode);
 	}
 }
 
