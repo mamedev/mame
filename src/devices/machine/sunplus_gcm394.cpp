@@ -594,6 +594,20 @@ void sunplus_gcm394_base_device::checkirq6()
 */
 }
 
+/* the IRQ6 interrupt on Wrlshunt
+   reads 78a1, checks bit 0400
+   if it IS set, just increases value in RAM at 1a2e  (no ack)
+   if it ISN'T set, then read/write 78b2 (ack something?) then increase value in RAM  at 1a2e
+
+   wrlshunt also has an IRQ4
+   it always reads/writes 78c0 before executing payload (ack?)
+   payload is a lot of manipulation of values in RAM, no registers touched
+
+   wrlshunt also has FIQ
+   no ack mechanism, for sound timer maybe (as it appears to be on spg110)
+*/
+
+
 void sunplus_gcm394_base_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
