@@ -43,12 +43,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(inh_w) { m_blank = bool(state); refresh_output(); }
 
 protected:
-	lc7582_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
-
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_post_load() override { refresh_output(); }
 
+private:
 	void refresh_output();
 
 	int m_data = 0;

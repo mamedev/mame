@@ -22,16 +22,11 @@ DEFINE_DEVICE_TYPE(LC7582, lc7582_device, "lc7582", "Sanyo LC7582 LCD Driver")
 //  constructor
 //-------------------------------------------------
 
-lc7582_device::lc7582_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
-	device_t(mconfig, type, tag, owner, clock),
+lc7582_device::lc7582_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, LC7582, tag, owner, clock),
 	m_latch{0, 0},
 	m_write_segs(*this)
 { }
-
-lc7582_device::lc7582_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	lc7582_device(mconfig, LC7582, tag, owner, clock)
-{ }
-
 
 
 //-------------------------------------------------
