@@ -612,24 +612,24 @@ void gcm394_base_video_device::write_tmap_regs(int tmap, uint16_t* regs, int off
 		break;
 
 	case 0x2: // Page Attributes
-		LOGMASKED(LOG_GCM394_TMAP, "%s: write_tmap_regs: Page %d Attributes = %04x (Depth:%d, Palette:%d, VSize:%d, HSize:%d, FlipY:%d, FlipX:%d, BPP:%d)\n",  machine().describe_context(), tmap, data
-			, (data >> 12) & 3, (data >> 8) & 15, 8 << ((data >> 6) & 3), 8 << ((data >> 4) & 3), BIT(data, 3), BIT(data, 2), 2 * ((data & 3) + 1));
+		LOGMASKED(LOG_GCM394_TMAP, "%s: write_tmap_regs: Page %d Attributes = %04x (unk %01x: Depth:%d, Palette:%d, VSize:%d, HSize:%d, FlipY:%d, FlipX:%d, BPP:%d)\n",  machine().describe_context(), tmap, data,
+			(data & 0xc000) >> 14, (data >> 12) & 3, (data >> 8) & 15, 8 << ((data >> 6) & 3), 8 << ((data >> 4) & 3), BIT(data, 3), BIT(data, 2), 2 * ((data & 3) + 1));
 		regs[offset] = data;
 		break;
 
 	case 0x3: // Page Control
-		LOGMASKED(LOG_GCM394_TMAP, "%s: write_tmap_regs: Page %d Control = %04x (Blend:%d, HiColor:%d, RowScroll:%d, Enable:%d, Wallpaper:%d, RegSet:%d, Bitmap:%d)\n",  machine().describe_context(), tmap, data
-			, BIT(data, 8), BIT(data, 7), BIT(data, 4), BIT(data, 3), BIT(data, 2), BIT(data, 1), BIT(data, 0));
+		LOGMASKED(LOG_GCM394_TMAP, "%s: write_tmap_regs: Page %d Control = %04x (unk:%02x Blend:%d, HiColor:%d, unk:%d, unk%d, RowScroll:%d, Enable:%d, Wallpaper:%d, RegSet:%d, Bitmap:%d)\n",  machine().describe_context(), tmap, data,
+			(data & 0xfe00) >> 9, BIT(data, 8), BIT(data, 7), BIT(data, 6), BIT(data, 5), BIT(data, 4), BIT(data, 3), BIT(data, 2), BIT(data, 1), BIT(data, 0));
 		regs[offset] = data;
 		break;
 
 	case 0x4: // Page Tile Address
-		LOGMASKED(LOG_GCM394_TMAP, "%s: write_tmap_regs: Page %d Tile Address = %04x\n",  machine().describe_context(), tmap, data & 0x1fff);
+		LOGMASKED(LOG_GCM394_TMAP, "%s: write_tmap_regs: Page %d Tile Address = %04x\n",  machine().describe_context(), tmap, data);
 		regs[offset] = data;
 		break;
 
 	case 0x5: // Page Attribute write_tmap_regs
-		LOGMASKED(LOG_GCM394_TMAP, "%s: write_tmap_regs: Page %d Attribute Address = %04x\n",  machine().describe_context(), tmap, data & 0x1fff);
+		LOGMASKED(LOG_GCM394_TMAP, "%s: write_tmap_regs: Page %d Attribute Address = %04x\n",  machine().describe_context(), tmap, data);
 		regs[offset] = data;
 		break;
 	}
