@@ -185,7 +185,7 @@ protected:
 	uint16_t m_7030_brightness;
 	uint16_t m_703c;
 
-	uint16_t m_7042;
+	uint16_t m_7042_sprite;
 
 	uint16_t m_7080;
 	uint16_t m_7081;
@@ -197,8 +197,8 @@ protected:
 	uint16_t m_7087;
 	uint16_t m_7088;
 
-	uint16_t m_unk_vid0_gfxbase_lsb;
-	uint16_t m_unk_vid0_gfxbase_msb;
+	uint16_t m_sprite_7022_gfxbase_lsb;
+	uint16_t m_sprite_702d_gfxbase_msb;
 	uint16_t m_unk_vid1_gfxbase_lsb;
 	uint16_t m_unk_vid1_gfxbase_msb;
 	uint16_t m_unk_vid2_gfxbase_lsb;

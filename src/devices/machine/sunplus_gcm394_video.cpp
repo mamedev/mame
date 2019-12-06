@@ -241,7 +241,7 @@ void gcm394_base_video_device::device_reset()
 	m_7030_brightness = 0x0000;
 	m_703c = 0x0000;
 	
-	m_7042 = 0x0000;
+	m_7042_sprite = 0x0000;
 
 	m_7080 = 0x0000;
 	m_7081 = 0x0000;
@@ -260,8 +260,8 @@ void gcm394_base_video_device::device_reset()
 
 	m_video_irq_status = 0x0000;
 
-	m_unk_vid0_gfxbase_lsb = 0;
-	m_unk_vid0_gfxbase_msb = 0;
+	m_sprite_7022_gfxbase_lsb = 0;
+	m_sprite_702d_gfxbase_msb = 0;
 	m_unk_vid1_gfxbase_lsb = 0;
 	m_unk_vid1_gfxbase_msb = 0;
 	m_unk_vid2_gfxbase_lsb = 0;
@@ -491,7 +491,7 @@ void gcm394_base_video_device::draw_page(const rectangle &cliprect, uint32_t sca
 
 void gcm394_base_video_device::draw_sprite(const rectangle &cliprect, uint32_t scanline, int priority, uint32_t base_addr)
 {
-	uint32_t bitmap_addr = (m_unk_vid1_gfxbase_msb << 16) | m_unk_vid1_gfxbase_lsb; // or unk_vid2 / 0
+	uint32_t bitmap_addr = (m_sprite_702d_gfxbase_msb << 16) | m_sprite_7022_gfxbase_lsb; 
 	uint32_t tile = m_spriteram[base_addr + 0];
 	int16_t x = m_spriteram[base_addr + 1];
 	int16_t y = m_spriteram[base_addr + 2];
@@ -764,20 +764,20 @@ WRITE16_MEMBER(gcm394_base_video_device::unk_vid2_gfxbase_msb_w)
 WRITE16_MEMBER(gcm394_base_video_device::sprite_7022_gfxbase_lsb_w)
 {
 	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::sprite_7022_gfxbase_lsb_w %04x\n", machine().describe_context(), data);
-	m_unk_vid0_gfxbase_lsb = data;
-	LOGMASKED(LOG_GCM394_TMAP, "	(unk_vid0 tilegfxbase is now %04x%04x)\n", m_unk_vid0_gfxbase_msb, m_unk_vid0_gfxbase_lsb);
+	m_sprite_7022_gfxbase_lsb = data;
+	LOGMASKED(LOG_GCM394_TMAP, "	(sprite tilebase is now %04x%04x)\n", m_sprite_702d_gfxbase_msb, m_sprite_7022_gfxbase_lsb);
 }
 
 WRITE16_MEMBER(gcm394_base_video_device::sprite_702d_gfxbase_msb_w)
 {
 	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::sprite_702d_gfxbase_msb_w %04x\n", machine().describe_context(), data);
-	m_unk_vid0_gfxbase_msb = data;
-	LOGMASKED(LOG_GCM394_TMAP, "	(unk_vid0 tilegfxbase is now %04x%04x)\n", m_unk_vid0_gfxbase_msb, m_unk_vid0_gfxbase_lsb);
+	m_sprite_702d_gfxbase_msb = data;
+	LOGMASKED(LOG_GCM394_TMAP, "	(sprite tilebase tilegfxbase is now %04x%04x)\n", m_sprite_702d_gfxbase_msb, m_sprite_7022_gfxbase_lsb);
 }
 
 READ16_MEMBER(gcm394_base_video_device::sprite_7042_extra_r)
 {
-	uint16_t retdata = m_7042;
+	uint16_t retdata = m_7042_sprite;
 	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::sprite_7042_extra_r (returning: %04x)\n", machine().describe_context(), retdata);
 	return retdata;
 }
@@ -785,7 +785,7 @@ READ16_MEMBER(gcm394_base_video_device::sprite_7042_extra_r)
 WRITE16_MEMBER(gcm394_base_video_device::sprite_7042_extra_w)
 {
 	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::sprite_7042_extra_w %04x\n", machine().describe_context(), data);
-	m_7042 = data;
+	m_7042_sprite = data;
 }
 
 
