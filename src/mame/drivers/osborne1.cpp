@@ -109,6 +109,13 @@ void osborne1_state::osborne1_mem(address_map &map)
 	map(0xF000, 0xFFFF).bankr(m_bank_fxxx).w(FUNC(osborne1_state::videoram_w));
 }
 
+void osborne1sp_state::osborne1sp_mem(address_map &map)
+{
+	osborne1_mem(map);
+
+	map(0x2000, 0x3FFF).rw(FUNC(osborne1sp_state::bank_2xxx_3xxx_r), FUNC(osborne1sp_state::bank_2xxx_3xxx_w));
+}
+
 
 void osborne1_state::osborne1_op(address_map &map)
 {
@@ -228,15 +235,12 @@ static INPUT_PORTS_START( osborne1 )
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("CNF")
-	PORT_BIT(0xF8, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_CONFNAME(0x06, 0x00, "Serial Speed")
+	PORT_BIT(0xFC, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_CONFNAME(0x03, 0x00, "Serial Speed")
 	PORT_CONFSETTING(0x00, "300/1200")
-	PORT_CONFSETTING(0x02, "600/2400")
-	PORT_CONFSETTING(0x04, "1200/4800")
-	PORT_CONFSETTING(0x06, "2400/9600")
-	PORT_CONFNAME(0x01, 0x00, "Video Output")
-	PORT_CONFSETTING(0x00, "Standard")
-	PORT_CONFSETTING(0x01, "SCREEN-PAC")
+	PORT_CONFSETTING(0x01, "600/2400")
+	PORT_CONFSETTING(0x02, "1200/4800")
+	PORT_CONFSETTING(0x03, "2400/9600")
 INPUT_PORTS_END
 
 INPUT_PORTS_START( osborne1nv )
@@ -283,7 +287,7 @@ static GFXDECODE_START( gfx_osborne1 )
 GFXDECODE_END
 
 
-void osborne1_state::osborne1(machine_config &config)
+void osborne1_state::osborne1_base(machine_config &config)
 {
 	Z80(config, m_maincpu, MAIN_CLOCK/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &osborne1_state::osborne1_mem);
@@ -292,9 +296,6 @@ void osborne1_state::osborne1(machine_config &config)
 	m_maincpu->irqack_cb().set(FUNC(osborne1_state::irqack_w));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER, rgb_t::green());
-	m_screen->set_screen_update(FUNC(osborne1_state::screen_update));
-	m_screen->set_raw(MAIN_CLOCK, 1024, 0, 104*8, 260, 0, 24*10);
-	m_screen->set_palette("palette");
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_osborne1);
 	PALETTE(config, "palette", palette_device::MONOCHROME_HIGHLIGHT);
@@ -343,15 +344,41 @@ void osborne1_state::osborne1(machine_config &config)
 	SOFTWARE_LIST(config, "flop_list").set_original("osborne1");
 }
 
+void osborne1_state::osborne1(machine_config &config)
+{
+	osborne1_base(config);
+
+	m_screen->set_screen_update(FUNC(osborne1_state::screen_update));
+	m_screen->set_raw(MAIN_CLOCK / 2, 512, 0, 52 * 8, 260, 0, 24 * 10);
+	m_screen->screen_vblank().set(m_pia1, FUNC(pia6821_device::ca1_w));
+	m_screen->set_palette("palette");
+	m_screen->set_video_attributes(VIDEO_UPDATE_SCANLINE | VIDEO_ALWAYS_UPDATE);
+}
+
+void osborne1sp_state::osborne1sp(machine_config &config)
+{
+	osborne1_base(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &osborne1sp_state::osborne1sp_mem);
+
+	m_screen->set_screen_update(FUNC(osborne1sp_state::screen_update));
+	m_screen->set_raw(MAIN_CLOCK, 1024, 0, 104 * 8, 260, 0, 24 * 10);
+	m_screen->screen_vblank().set(m_pia1, FUNC(pia6821_device::ca1_w));
+	m_screen->set_palette("palette");
+	m_screen->set_video_attributes(VIDEO_UPDATE_SCANLINE | VIDEO_ALWAYS_UPDATE);
+}
+
 void osborne1nv_state::osborne1nv(machine_config &config)
 {
-	osborne1(config);
+	osborne1_base(config);
+
 	m_maincpu->set_addrmap(AS_IO, &osborne1nv_state::osborne1nv_io);
 
-	m_screen->set_no_palette();
 	m_screen->set_screen_update("crtc", FUNC(mc6845_device::screen_update));
+	m_screen->set_raw(12.288_MHz_XTAL, (96 + 1) * 8, 0, 80 * 8, ((25 + 1) * 10) + 4, 0, 24 * 10);
+	m_screen->screen_vblank().set(m_pia1, FUNC(pia6821_device::ca1_w)); // FIXME: AFAICT the PIA gets this from the (vestigial) onboard video circuitry
 
-	sy6545_1_device &crtc(SY6545_1(config, "crtc", XTAL(12'288'000)/8));
+	sy6545_1_device &crtc(SY6545_1(config, "crtc", 12.288_MHz_XTAL / 8));
 	crtc.set_screen(m_screen);
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
@@ -389,6 +416,8 @@ ROM_START( osborne1 )
 	ROMX_LOAD( "7a3007-00.ud15", 0x0000, 0x800, CRC(6c1eab0d) SHA1(b04459d377a70abc9155a5486003cb795342c801), ROM_BIOS(6) )
 ROM_END
 
+#define rom_osborne1sp rom_osborne1
+
 ROM_START( osborne1nv )
 	ROM_REGION(0x1000, "maincpu", 0)
 	ROM_LOAD( "monrom-rev1.51-12.ud11", 0x0000, 0x1000, CRC(298da402) SHA1(7fedd070936ccfe98f96d6e0ac71689666da79cb) )
@@ -400,6 +429,7 @@ ROM_START( osborne1nv )
 	ROM_LOAD( "character_generator_6-29-84.14", 0x0000, 0x800, CRC(6c1eab0d) SHA1(b04459d377a70abc9155a5486003cb795342c801) )
 ROM_END
 
-//    YEAR  NAME        PARENT    COMPAT  MACHINE     INPUT       CLASS             INIT           COMPANY          FULLNAME                   FLAGS
-COMP( 1981, osborne1,   0,        0,      osborne1,   osborne1,   osborne1_state,   init_osborne1, "Osborne",       "Osborne-1",               MACHINE_SUPPORTS_SAVE )
-COMP( 1984, osborne1nv, osborne1, 0,      osborne1nv, osborne1nv, osborne1nv_state, init_osborne1, "Osborne/Nuevo", "Osborne-1 (Nuevo Video)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME        PARENT    COMPAT  MACHINE     INPUT       CLASS             INIT        COMPANY          FULLNAME                     FLAGS
+COMP( 1981, osborne1,   0,        0,      osborne1,   osborne1,   osborne1_state,   empty_init, "Osborne",       "Osborne-1",                 MACHINE_SUPPORTS_SAVE )
+COMP( 1983, osborne1sp, osborne1, 0,      osborne1sp, osborne1,   osborne1sp_state, empty_init, "Osborne",       "Osborne-1 with SCREEN-PAC", MACHINE_SUPPORTS_SAVE )
+COMP( 1984, osborne1nv, osborne1, 0,      osborne1nv, osborne1nv, osborne1nv_state, empty_init, "Osborne/Nuevo", "Osborne-1 (Nuevo Video)",   MACHINE_SUPPORTS_SAVE )
