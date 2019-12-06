@@ -464,15 +464,15 @@ uint32_t osborne1sp_state::screen_update(screen_device &screen, bitmap_ind16 &bi
 
 TIMER_CALLBACK_MEMBER(osborne1_state::video_callback)
 {
-	int const y = m_screen->vpos();
-	uint8_t const ra = y % 10;
-	uint8_t const port_b = m_pia1->b_output();
+	int const y(m_screen->vpos());
+	uint8_t const ra(y % 10);
 
 	// The beeper is gated so it's active four out of every ten scanlines
 	m_beep_state = (ra & 0x04) ? 1 : 0;
-	m_speaker->level_w((BIT(port_b, 5) && m_beep_state) ? 1 : 0);
+	m_speaker->level_w((m_beep_state && BIT(m_pia1->b_output(), 5)) ? 1 : 0);
 
-	m_video_timer->adjust(m_screen->time_until_pos(y + 1, 0));
+	int const next((10 * (y / 10)) + ((ra < 4) ? 4 : (ra < 8) ? 8 : 14));
+	m_video_timer->adjust(m_screen->time_until_pos((m_screen->height() > next) ? next : 0, 0));
 }
 
 TIMER_CALLBACK_MEMBER(osborne1_state::acia_rxc_txc_callback)
