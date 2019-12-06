@@ -52,8 +52,8 @@ public:
 
 	DECLARE_WRITE16_MEMBER(video_dma_source_w);
 	DECLARE_WRITE16_MEMBER(video_dma_dest_w);
-	DECLARE_READ16_MEMBER(video_dma_size_r);
-	DECLARE_WRITE16_MEMBER(video_dma_size_w);
+	DECLARE_READ16_MEMBER(video_dma_size_busy_r);
+	DECLARE_WRITE16_MEMBER(video_dma_size_trigger_w);
 	DECLARE_WRITE16_MEMBER(video_dma_unk_w);
 
 	DECLARE_READ16_MEMBER(video_703a_palettebank_r);

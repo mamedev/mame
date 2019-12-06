@@ -798,15 +798,15 @@ WRITE16_MEMBER(gcm394_base_video_device::video_dma_dest_w)
 	m_videodma_dest = data;
 }
 
-READ16_MEMBER(gcm394_base_video_device::video_dma_size_r)
+READ16_MEMBER(gcm394_base_video_device::video_dma_size_busy_r)
 {
-	LOGMASKED(LOG_GCM394_VIDEO_DMA, "%s:gcm394_base_video_device::video_dma_size_r\n", machine().describe_context());
+	LOGMASKED(LOG_GCM394_VIDEO_DMA, "%s:gcm394_base_video_device::video_dma_size_busy_r\n", machine().describe_context());
 	return 0x0000;
 }
 
-WRITE16_MEMBER(gcm394_base_video_device::video_dma_size_w)
+WRITE16_MEMBER(gcm394_base_video_device::video_dma_size_trigger_w)
 {
-	LOGMASKED(LOG_GCM394_VIDEO_DMA, "%s:gcm394_base_video_device::video_dma_size_w %04x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_GCM394_VIDEO_DMA, "%s:gcm394_base_video_device::video_dma_size_trigger_w %04x\n", machine().describe_context(), data);
 	m_videodma_size = data;
 
 	LOGMASKED(LOG_GCM394_VIDEO_DMA, "%s: doing sprite / video DMA source %04x dest %04x size %04x value of 707e (bank) %04x value of 707f %04x\n", machine().describe_context(), m_videodma_source, m_videodma_dest, m_videodma_size, m_707e_videodma_bank, m_707f );
@@ -840,16 +840,40 @@ READ16_MEMBER(gcm394_base_video_device::video_707c_r)
    our current codeflow means that bits are only ever set, not cleared.
 
    are the bits triggers? acks? enables? status flags?
+
+   in wrlshunt this ends up being set to  02f9   ---- --x- xxxx x--x
+   and in smartfp it ends up being set to 0065   ---- ---- -xx- -x-x
+
+   is this because wrlshunt uses more layers?
 */
 
 READ16_MEMBER(gcm394_base_video_device::video_707f_r)
 {
-	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_707f_r\n", machine().describe_context());
-	return m_707f;
+	uint16_t retdata = m_707f;
+	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_707f_r (returning %04x)\n", machine().describe_context(), retdata);
+	return retdata;
 }
 WRITE16_MEMBER(gcm394_base_video_device::video_707f_w)
 {
 	LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_707f_w %04x\n", machine().describe_context(), data);
+
+	for (int i = 0; i < 16; i++)
+	{
+		uint16_t mask = 1 << i;
+
+		if ((m_707f & mask) != (data & mask))
+		{
+			if (data & mask)
+			{
+				LOGMASKED(LOG_GCM394_VIDEO, "	bit %04x Low -> High\n", mask);
+			}
+			else
+			{
+				LOGMASKED(LOG_GCM394_VIDEO, "	bit %04x High -> Low\n", mask);
+			}
+		}
+	}
+
 	m_707f = data;
 }
 
