@@ -124,10 +124,12 @@ void nb1414m4_device::credit_msg(uint8_t *vram)
 	dst = ((m_data[0x023]<<8)|(m_data[0x024]&0xff)) & 0x3fff;
 	dma(0x0025,dst,0x10,1,vram); /* credit */
 
-	dst = ((m_data[0x045]<<8)|(m_data[0x046]&0xff)) & 0x3fff;
-	dst++; // m_data is 0x5e, needs to be 0x5f ...
-	vram[dst+0x000] = (credit_count + 0x30); /* credit num */
-	vram[dst+0x400] = (m_data[0x48]);
+	/* credit num */
+	dst = ((m_data[0x045] << 8) | (m_data[0x046] & 0xff)) & 0x3fff;
+	vram[dst + 0x000] = (credit_count & 0xf0) ? (((credit_count & 0xf0) >> 4) + 0x30) : 0x20;
+	vram[dst + 0x400] = (m_data[0x48]);
+	vram[dst + 0x001] = ((credit_count & 0x0f) + 0x30);
+	vram[dst + 0x401] = (m_data[0x48]);
 
 	if (m_in_game)
 		return;
