@@ -876,6 +876,22 @@ READ16_MEMBER(gcm394_base_video_device::video_707c_r)
    is this because wrlshunt uses more layers?
 */
 
+/*  wrlshunt BG Tilemap location note
+
+   background tilemap appears to be at 24ad30 - 24af87 (byte address) in RAM  == 125698 - 1257c3 (word address)
+   there are pointers to this
+   (2879-287a) = 98 56 12 00 (00125698) (main background tilemap data is at this address)
+   (287b-287c) = 30 5e 12 00 (00125e30) (address for other layer tilemap)
+   where do we get these copied to registers or used as a source to copy from?
+   does it depend on 707f behavior?
+
+   if you return rand() on 707f reads sometimes you see
+   [:maincpu] pc:053775: r4 = r4 lsr r3  (5698 0009) : [:maincpu] result 002b
+
+   (bg tile addressing is also done by tile #, like the sprites, not fixed step like smartfp)
+
+*/
+
 READ16_MEMBER(gcm394_base_video_device::video_707f_r)
 {
 	uint16_t retdata = m_707f;
