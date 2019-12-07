@@ -793,7 +793,7 @@ void victor9k_state::victor9k(machine_config &config)
 
 	RAM(config, m_ram).set_default_size("128K");
 
-	SOFTWARE_LIST(config, "flop_list").set_type("victor9k_flop", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "flop_list").set_original("victor9k_flop");
 }
 
 
