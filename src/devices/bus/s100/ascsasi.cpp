@@ -124,20 +124,24 @@ WRITE_LINE_MEMBER(asc_sasi_device::req_w)
 
 void asc_sasi_device::sasi_sel_pulse()
 {
+	m_sasi->ctrl_w(7, nscsi_device::S_SEL, nscsi_device::S_SEL);
 	m_sel_off_timer->adjust(s_pulse_width);
 }
 
 void asc_sasi_device::sasi_rst_pulse()
 {
+	m_sasi->ctrl_w(7, nscsi_device::S_RST, nscsi_device::S_RST);
 	m_rst_off_timer->adjust(s_pulse_width);
 }
 
 TIMER_CALLBACK_MEMBER(asc_sasi_device::sel_off)
 {
+	m_sasi->ctrl_w(7, 0, nscsi_device::S_SEL);
 }
 
 TIMER_CALLBACK_MEMBER(asc_sasi_device::rst_off)
 {
+	m_sasi->ctrl_w(7, 0, nscsi_device::S_RST);
 }
 
 u8 asc_sasi_device::s100_smemr_r(offs_t offset)
