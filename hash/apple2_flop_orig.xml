@@ -9073,4 +9073,151 @@
 		</part>
 	</software>
 
+	<software name="spcquest">
+		<description>Space Quest: The Sarien Encounter</description>
+		<year>1987</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="release" value="2019-12-03"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 128K Apple //e or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side A"/>
+			<dataarea name="flop" size="234865">
+				<rom name="space quest disk 1a.woz" size="234865" crc="81c67f99" sha1="09b7a3f594deeab5aeea1ad35f6fca4b65d08eca"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side B"/>
+			<dataarea name="flop" size="234865">
+				<rom name="space quest disk 1b.woz" size="234865" crc="76b0499f" sha1="2924d85702b43ed05610961d2c6f0a96b9f59c2b"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side A"/>
+			<dataarea name="flop" size="234865">
+				<rom name="space quest disk 2a.woz" size="234865" crc="3fcb9942" sha1="d4d9ba684109086c82d8ab2d6112337f523bb046"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side B"/>
+			<dataarea name="flop" size="234865">
+				<rom name="space quest disk 2b.woz" size="234865" crc="2ff225c1" sha1="437b75a0781da96e477093d61e98fed88edb8554"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 Side A"/>
+			<dataarea name="flop" size="234865">
+				<rom name="space quest disk 3a.woz" size="234865" crc="2c1f654c" sha1="4621fa85bb2c82d103d66225382a4d78bfd44a97"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 Side B"/>
+			<dataarea name="flop" size="234865">
+				<rom name="space quest disk 3b.woz" size="234865" crc="303bc684" sha1="13f7e97ac1b9de79ae0d5c2034cfb0689be40f09"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4 Side A"/>
+			<dataarea name="flop" size="234865">
+				<rom name="space quest disk 4a.woz" size="234865" crc="ccfdac78" sha1="a414e236d18a223fa63594db1483c9dec988c850"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4 Side B"/>
+			<dataarea name="flop" size="234865">
+				<rom name="space quest disk 4b.woz" size="234865" crc="f4ccb762" sha1="1455fed9e6b87a65ec0ffcbc48527bd94d4f99dd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="portal">
+		<description>Portal</description>
+		<year>1986</year>
+		<publisher>Activision</publisher>
+		<info name="release" value="2019-12-03"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side A"/>
+			<dataarea name="flop" size="234764">
+				<rom name="portal disk 1a.woz" size="234764" crc="9124938e" sha1="df84aaa83a87789c20281817de4e16daf44b044f"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side B"/>
+			<dataarea name="flop" size="234764">
+				<rom name="portal disk 1b.woz" size="234764" crc="82efa13a" sha1="89de2ddf48c5dd34682b8bf95895d0de2d013b94"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side A"/>
+			<dataarea name="flop" size="234764">
+				<rom name="portal disk 2a.woz" size="234764" crc="3076a666" sha1="3dae926019a047e099036dfef0f63aacf5c2b488"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side B"/>
+			<dataarea name="flop" size="234764">
+				<rom name="portal disk 2b.woz" size="234764" crc="30be5252" sha1="687f63418cfd15737517e0b033c15388c346d09a"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 Side A"/>
+			<dataarea name="flop" size="234764">
+				<rom name="portal disk 3a.woz" size="234764" crc="a77fa6ec" sha1="4dd8558cda08138dac43e6dba5bef7c66c88eb73"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 Side B"/>
+			<dataarea name="flop" size="234764">
+				<rom name="portal disk 3b.woz" size="234764" crc="09cc654c" sha1="2788586879264aba90bb53b5d27f097044595cdb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eostatn">
+		<description>Earth Orbit Stations</description>
+		<year>1987</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="release" value="2019-12-05"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Game disk"/>
+			<dataarea name="flop" size="228132">
+				<rom name="earth orbit stations disk 1 game disk.woz" size="228132" crc="3b1205cd" sha1="5ef6c82a865c0745878c99961a28b97e8f276d00"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side A - Archive disk"/>
+			<dataarea name="flop" size="234791">
+				<rom name="earth orbit stations disk 2a archive disk.woz" size="234791" crc="c86b1340" sha1="3cdbac14d51c7a89353243ce57101f89b582a665"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side B - Mission disk"/>
+			<dataarea name="flop" size="234791">
+				<rom name="earth orbit stations disk 2b mission disk.woz" size="234791" crc="0d01aa81" sha1="81f03a9308daa27cc8e7a5d0651cdbe36ad4c16a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="advent">
+		<description>Adventure</description>
+		<year>1980</year>
+		<publisher>Apple Computer</publisher>
+		<info name="release" value="2019-12-06"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234786">
+				<rom name="adventure (apple).woz" size="234786" crc="c6af7c16" sha1="65cdf99121bc72e053f0314b4b46ce6e70324c36"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
