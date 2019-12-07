@@ -17,9 +17,6 @@ The chess engine is by Frans Morsch, older versions (before 2.05) were buggy.
 Hold Pawn + Knight buttons at boot for test mode, it will tell the version number.
 This engine was also used in the newer Mephisto Modena.
 
-TODO:
-- artwork
-
 ******************************************************************************/
 
 #include "emu.h"
@@ -33,7 +30,7 @@ TODO:
 #include "speaker.h"
 
 // internal artwork
-//#include "cxg_dominator.lh" // clickable
+#include "cxg_dominator.lh" // clickable
 
 
 namespace {
@@ -189,7 +186,7 @@ static INPUT_PORTS_START( dominator )
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H) PORT_NAME("Hint")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("Replay")
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL) PORT_NAME("Library/Clear")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_CODE(KEYCODE_C) PORT_NAME("Color/Sound")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_CODE(KEYCODE_C) PORT_NAME("Sound/Colour")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("Enter Position")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_NAME("New Game")
 INPUT_PORTS_END
@@ -220,7 +217,7 @@ void dominator_state::dominator(machine_config &config)
 	m_lcd->write_segs().set(FUNC(dominator_state::lcd_s_w));
 
 	PWM_DISPLAY(config, m_display).set_size(8+1, 8);
-	//config.set_default_layout(layout_cxg_dominator);
+	config.set_default_layout(layout_cxg_dominator);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -248,4 +245,4 @@ ROM_END
 ******************************************************************************/
 
 /*    YEAR  NAME   PARENT  COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS */
-CONS( 1989, sdtor, 0,      0,      dominator, dominator, dominator_state, empty_init, "CXG", "Sphinx Dominator (v2.05)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NOT_WORKING )
+CONS( 1989, sdtor, 0,      0,      dominator, dominator, dominator_state, empty_init, "CXG", "Sphinx Dominator (v2.05)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
