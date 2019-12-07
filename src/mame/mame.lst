@@ -11270,7 +11270,10 @@ wallst                          // (c) 1982 Century
 cwheel                          // (c) 19?? Gamebar
 
 @source:cxg_ch2001.cpp
-ch2001                          //
+ch2001
+
+@source:cxg_dominator.cpp
+sdtor
 
 @source:cxhumax.cpp
 hxhdci2k                        //
@@ -12925,6 +12928,7 @@ multchmpa                       // (c) 1998 (World)
 multchmpk                       // (c) 1998 (Korea)
 swatpolc                        // (c) 2001 ESD
 tangtang                        // (c) 2000 ESD
+fantstry                        // (c) 2002 Z Soft
 
 @source:esh.cpp
 esh                             // (c) 1984 Funai / Gakken
@@ -30491,6 +30495,10 @@ shorseps                        // 2003.12.02 Star Horse Progress (sound & backu
 shorsepb                        // 2000.??    Star Horse Progress (backup data)
 shorsepl                        // 2003.12.02 Star Horse Progress (live, Rev A)
 shorsepr                        // 2009.07.27 Star Horse Progress Returns (satellite)
+shorseprl                       // 2009.?? Star Horse Progress Returns (live and voice)
+shorseprs                       // 2009.?? Star Horse Progress Returns (sound)
+shorseprvl                      // 2009.?? Star Horse Progress Returns (main screen left)
+shorseprvr                      // 2009.?? Star Horse Progress Returns (main screen right)
 starseek                        // 2001.07 Dokidoki Idol Star Seeker
 suchie3                         // 1999.09 Idol Janshi Su-Chi-Pi 3
 sushibar                        // 2003 Sushi Bar
@@ -31613,6 +31621,7 @@ osbexec                         // 1982 Osborne Executive
 @source:osborne1.cpp
 osborne1                        // 1981 Osborne-1
 osborne1nv                      // 1984 Osborne-1 (Nuevo Video)
+osborne1sp                      // 1983 Osborne-1 with SCREEN-PAC
 
 @source:osi.cpp
 c1p                             //
@@ -33471,6 +33480,7 @@ gl7007sl                        // Genius Leader 7007SL (Germany)
 glcolor                         // Genius Leader Color (Germany)
 glmcolor                        // Genius Leader Magic Color (Germany)
 glscolor                        // Genius Leader Super Color (Germany)
+pcscolor                        // PC Super Color (Spain)
 gmmc                            // Genius Master Mega Color (Germany)
 gwnf                            // Genius Winner Notebook Fun (Germany)
 prestige                        // PreComputer Prestige Elite
@@ -36167,6 +36177,9 @@ whizz                           // (c) 1989 Philko (NOT A CAPCOM GAME but runs o
 sidepckt                        // (c) 1986 Data East Corporation
 sidepcktb                       // bootleg
 sidepcktj                       // (c) 1986 Data East Corporation
+
+@source:sigma21.cpp
+sigma21                         //
 
 @source:sigmab52.cpp
 jwildb52                        // (c) 199? Sigma

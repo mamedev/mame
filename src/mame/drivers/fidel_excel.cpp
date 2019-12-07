@@ -12,6 +12,7 @@ TODO:
   The problem goes away if RAM stays powered-on, but PCB has no indication of NVRAM.
 - granits chessboard buttons seem too sensitive (detects input on falling edge if held too long)
 - granits has a module slot, is it usable?
+- granits overlock + dynamic /2 cpu divider? (like SC12) instead of static /2 divider
 
 *******************************************************************************
 

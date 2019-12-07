@@ -745,7 +745,7 @@ READ8_MEMBER(apple2_state::inh_r)
 
 WRITE8_MEMBER(apple2_state::inh_w)
 {
-	if ((m_cnxx_slot != -1) && (m_slotdevice[m_cnxx_slot] != nullptr))
+	if ((m_inh_slot != -1) && (m_slotdevice[m_inh_slot] != nullptr))
 	{
 		m_slotdevice[m_inh_slot]->write_inh_rom(offset + 0xd000, data);
 	}

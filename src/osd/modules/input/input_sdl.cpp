@@ -657,7 +657,8 @@ public:
 
 		case SDL_JOYBUTTONDOWN:
 		case SDL_JOYBUTTONUP:
-			joystick.buttons[sdlevent.jbutton.button] = (sdlevent.jbutton.state == SDL_PRESSED) ? 0x80 : 0;
+			if (sdlevent.jbutton.button < MAX_BUTTONS)
+				joystick.buttons[sdlevent.jbutton.button] = (sdlevent.jbutton.state == SDL_PRESSED) ? 0x80 : 0;
 			break;
 		}
 	}
@@ -1070,7 +1071,9 @@ public:
 			}
 
 			// loop over all buttons
-			for (int button = 0; button < SDL_JoystickNumButtons(joy); button++)
+			if (SDL_JoystickNumButtons(joy) > MAX_BUTTONS)
+				osd_printf_verbose("Joystick:   ...  Has %d buttons which exceeds supported %d buttons\n", SDL_JoystickNumButtons(joy), MAX_BUTTONS);
+			for (int button = 0; (button < MAX_BUTTONS) && (button < SDL_JoystickNumButtons(joy)); button++)
 			{
 				input_item_id itemid;
 

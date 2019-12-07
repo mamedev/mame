@@ -1191,7 +1191,7 @@ void HC11OP(brclr_indx)()
 	CYCLES(7);
 }
 
-/* BRCLR INDX       0x18, 0x1F */
+/* BRCLR INDY       0x18, 0x1F */
 void HC11OP(brclr_indy)()
 {
 	uint8_t offset = FETCH();
@@ -1202,7 +1202,7 @@ void HC11OP(brclr_indy)()
 
 	if ((i & mask) == 0)
 	{
-		SET_PC(m_ppc + rel + 4);
+		SET_PC(m_ppc + rel + 5);
 	}
 
 	CYCLES(8);
@@ -1216,7 +1216,7 @@ void HC11OP(brset_dir)()
 	int8_t rel = FETCH();
 	uint8_t i = READ8(d);
 
-	if(i & mask)
+	if ((~i & mask) == 0)
 	{
 		SET_PC(m_ppc + rel + 4);
 	}
@@ -1253,7 +1253,7 @@ void HC11OP(brset_indy)()
 
 	if ((~i & mask) == 0)
 	{
-		SET_PC(m_ppc + rel + 4);
+		SET_PC(m_ppc + rel + 5);
 	}
 
 	CYCLES(8);
