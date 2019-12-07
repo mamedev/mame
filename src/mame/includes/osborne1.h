@@ -47,7 +47,7 @@ public:
 		m_ieee(*this, IEEE488_TAG),
 		m_floppy0(*this, "mb8877:0"),
 		m_floppy1(*this, "mb8877:1"),
-		m_keyb_row(*this, "ROW%u", 0),
+		m_keyb_row(*this, { "ROW0", "ROW1", "ROW3", "ROW4", "ROW5", "ROW2", "ROW6", "ROW7" }),
 		m_btn_reset(*this, "RESET"),
 		m_cnf(*this, "CNF"),
 		m_region_maincpu(*this, "maincpu"),
@@ -76,7 +76,6 @@ protected:
 	void osborne1_mem(address_map &map);
 	void osborne1_op(address_map &map);
 	void osborne1_io(address_map &map);
-	void osborne1nv_io(address_map &map);
 
 	DECLARE_WRITE8_MEMBER(bank_0xxx_w);
 	DECLARE_WRITE8_MEMBER(bank_1xxx_w);
@@ -212,6 +211,8 @@ public:
 	void osborne1nv(machine_config &config);
 
 private:
+	void osborne1nv_io(address_map &map);
+
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update_addr_changed);
 

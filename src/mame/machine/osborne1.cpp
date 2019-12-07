@@ -40,14 +40,11 @@ READ8_MEMBER( osborne1_state::bank_2xxx_3xxx_r )
 		data &= m_pia0->read(offset & 0x03);
 	if ((offset & 0xA00) == 0x200) // Keyboard
 	{
-		if (offset & 0x01) data &= m_keyb_row[0]->read();
-		if (offset & 0x02) data &= m_keyb_row[1]->read();
-		if (offset & 0x04) data &= m_keyb_row[3]->read();
-		if (offset & 0x08) data &= m_keyb_row[4]->read();
-		if (offset & 0x10) data &= m_keyb_row[5]->read();
-		if (offset & 0x20) data &= m_keyb_row[2]->read();
-		if (offset & 0x40) data &= m_keyb_row[6]->read();
-		if (offset & 0x80) data &= m_keyb_row[7]->read();
+		for (unsigned b = 0; 8 > b; ++b)
+		{
+			if (BIT(offset, b))
+				data &= m_keyb_row[b]->read();
+		}
 	}
 	if ((offset & 0xA00) == 0xA00) // Serial
 	{
@@ -397,14 +394,12 @@ inline void osborne1_state::draw_rows(uint16_t col, bitmap_ind16 &bitmap, const 
 			uint8_t const gfx(((chr & 0x80) && (ra == 9)) ? 0xFF : m_p_chargen[(ra << 7) | (chr & 0x7F)]);
 
 			// Display a scanline of a character
-			for (unsigned i = 0; Scale > i; ++i) *p++ = BIT(gfx, 7) ? clr : 0;
-			for (unsigned i = 0; Scale > i; ++i) *p++ = BIT(gfx, 6) ? clr : 0;
-			for (unsigned i = 0; Scale > i; ++i) *p++ = BIT(gfx, 5) ? clr : 0;
-			for (unsigned i = 0; Scale > i; ++i) *p++ = BIT(gfx, 4) ? clr : 0;
-			for (unsigned i = 0; Scale > i; ++i) *p++ = BIT(gfx, 3) ? clr : 0;
-			for (unsigned i = 0; Scale > i; ++i) *p++ = BIT(gfx, 2) ? clr : 0;
-			for (unsigned i = 0; Scale > i; ++i) *p++ = BIT(gfx, 1) ? clr : 0;
-			for (unsigned i = 0; Scale > i; ++i) *p++ = BIT(gfx, 0) ? clr : 0;
+			for (unsigned b = 0; 8 > b; ++b)
+			{
+				uint16_t const pixel(BIT(gfx, 7 - b) ? clr : 0);
+				for (unsigned i = 0; Scale > i; ++i)
+					*p++ = pixel;
+			}
 		}
 	}
 }
