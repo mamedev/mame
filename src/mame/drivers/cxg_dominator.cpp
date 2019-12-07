@@ -245,4 +245,4 @@ ROM_END
 ******************************************************************************/
 
 /*    YEAR  NAME   PARENT  COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS */
-CONS( 1989, sdtor, 0,      0,      dominator, dominator, dominator_state, empty_init, "CXG", "Sphinx Dominator (v2.05)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1989, sdtor, 0,      0,      dominator, dominator, dominator_state, empty_init, "CXG Systems / Newcrest Technology", "Sphinx Dominator (v2.05)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
