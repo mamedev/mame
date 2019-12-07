@@ -714,6 +714,9 @@ WRITE16_MEMBER(gcm394_base_video_device::tmap1_tilebase_msb_w)
 
 // offsets 0,1,4,5,6,7 used in main IRQ code
 // offsets 2,3 only cleared on startup
+
+// Based on code analysis this seems to be the same as the regular tilemap regs, except for the addition of regs 2,3 which shift the remaining ones along.
+// As the hardware appears to support ROZ these are probably 2 extra tile layers, with the 2 additional words being the ROZ parameters?
 void gcm394_base_video_device::unk_vid_regs_w(int which, int offset, uint16_t data)
 {
 	switch (offset)
@@ -721,7 +724,6 @@ void gcm394_base_video_device::unk_vid_regs_w(int which, int offset, uint16_t da
 	case 0x0:
 		LOGMASKED(LOG_GCM394_VIDEO, "%s: unk_vid_regs_w (unk chip %d) (offset %01x) (data %04x) (X scroll?)\n", machine().describe_context(), which, offset, data); // masked with 0x3ff in code like x-scroll for tilemaps
 		break;
-
 	case 0x1:
 		LOGMASKED(LOG_GCM394_VIDEO, "%s: unk_vid_regs_w (unk chip %d) (offset %01x) (data %04x) (y scroll?)\n", machine().describe_context(), which, offset, data); // masked with 0x3ff in code like x-scroll for tilemaps
 		break;
