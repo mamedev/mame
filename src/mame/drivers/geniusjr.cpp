@@ -90,7 +90,7 @@ Undumped VTech laptops possibly on similar hardware:
 
   1x Unknown CPU inside an epoxy blob (more than 100 connections) @ U? (covered with the blob).
   1x VTech LH532HJT mask ROM (originary from Sharp) also silkscreened '9811D' @ U3.
-  1x Texas Instruments 84C91HT (CSM10150AN) speech synth with 8-bit microprocessor @ U2.
+  1x Texas Instruments TSP50C10 (CSM10150AN) speech synth with 8-bit microprocessor @ U2.
   1x SN74HC00N @ U5.
   1x SN74HC244N @ U4.
 
