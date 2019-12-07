@@ -725,15 +725,17 @@ void gcm394_base_video_device::unk_vid_regs_w(int which, int offset, uint16_t da
 	case 0x1:
 		LOGMASKED(LOG_GCM394_VIDEO, "%s: unk_vid_regs_w (unk chip %d) (offset %01x) (data %04x) (y scroll?)\n", machine().describe_context(), which, offset, data); // masked with 0x3ff in code like x-scroll for tilemaps
 		break;
+	
+	case 0x05: // seems to be similar / the same as Page Control for tilemaps (written with same basic code, but for these layers)
+		LOGMASKED(LOG_GCM394_VIDEO, "%s: unk_vid_regs_w (unk chip %d) (offset %01x) (data %04x) (Page Control?)\n", machine().describe_context(), which, offset, data); 
+		break;
 
 	case 0x02: // startup?
 	case 0x03: // startup?
-
 	case 0x04:
-	case 0x05:
 	case 0x06:
 	case 0x07:
-		LOGMASKED(LOG_GCM394_VIDEO, "%s: unk_vid_regs_w (unk chip %d) (offset %01x) (data %04x\n", machine().describe_context(), which, offset, data);
+		LOGMASKED(LOG_GCM394_VIDEO, "%s: unk_vid_regs_w (unk chip %d) (offset %01x) (data %04x)\n", machine().describe_context(), which, offset, data);
 		break;
 
 	}
@@ -987,6 +989,7 @@ READ16_MEMBER(gcm394_base_video_device::video_7051_r)
 	return retdat;
 }
 
+// this block get set once, in a single function, could be important
 WRITE16_MEMBER(gcm394_base_video_device::video_7080_w) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7080_w %04x\n", machine().describe_context(), data); m_7080 = data; }
 WRITE16_MEMBER(gcm394_base_video_device::video_7081_w) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7081_w %04x\n", machine().describe_context(), data); m_7081 = data; }
 WRITE16_MEMBER(gcm394_base_video_device::video_7082_w) { LOGMASKED(LOG_GCM394_VIDEO, "%s:gcm394_base_video_device::video_7082_w %04x\n", machine().describe_context(), data); m_7082 = data; }

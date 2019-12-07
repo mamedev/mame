@@ -136,8 +136,19 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7803_w) { LOGMASKED(LOG_GCM39
 
 WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7807_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7807_w %04x\n", machine().describe_context(), data); m_7807 = data; }
 
-READ16_MEMBER(sunplus_gcm394_base_device::unkarea_7810_r) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7810_r\n", machine().describe_context()); return m_7810; }
-WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7810_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7810_w %04x\n", machine().describe_context(), data); m_7810 = data; }
+
+// this gets stored / modified / restored before certain memory accesses (in practical terms it just seems to flip from 0/1) maybe it changes the memory mapping (as 7820 seems to)
+READ16_MEMBER(sunplus_gcm394_base_device::unkarea_7810_r)
+{
+	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7810_r\n", machine().describe_context());
+	return m_7810;
+}
+
+WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7810_w)
+{
+	printf( "%s:sunplus_gcm394_base_device::unkarea_7810_w %04x\n", machine().describe_context().c_str(), data);
+	m_7810 = data;
+}
 
 
 WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7816_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7816_w %04x\n", machine().describe_context(), data); m_7816 = data; }
@@ -154,10 +165,11 @@ WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7821_w)
 {
 	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7821_w %04x\n", machine().describe_context(), data); m_7821 = data;
 }
-
+// these seem to be related to the above but don't change after startup.  maybe it's how different devices see memory?
 WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7822_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7822_w %04x\n", machine().describe_context(), data); m_7822 = data; }
 WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7823_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7823_w %04x\n", machine().describe_context(), data); m_7823 = data; }
 WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7824_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7824_w %04x\n", machine().describe_context(), data); m_7824 = data; }
+
 
 WRITE16_MEMBER(sunplus_gcm394_base_device::unkarea_7835_w) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7835_w %04x\n", machine().describe_context(), data); m_7835 = data; }
 
@@ -339,7 +351,7 @@ void sunplus_gcm394_base_device::internal_map(address_map &map)
 	map(0x007023, 0x007023).w(m_spg_video, FUNC(gcm394_base_video_device::unk_vid1_gfxbase_lsb_w));    // written with other unknown_video_device1 regs (roz layer or line layer?)
 	map(0x007024, 0x007024).w(m_spg_video, FUNC(gcm394_base_video_device::unk_vid2_gfxbase_lsb_w));    // written with other unknown_video_device2 regs (roz layer or line layer?)
 
-	map(0x00702a, 0x00702a).w(m_spg_video, FUNC(gcm394_base_video_device::video_702a_w));
+	map(0x00702a, 0x00702a).w(m_spg_video, FUNC(gcm394_base_video_device::video_702a_w)); // blend level control
 
 	// tilebase MSBs
 	map(0x00702b, 0x00702b).w(m_spg_video, FUNC(gcm394_base_video_device::tmap0_tilebase_msb_w));      // written with other tmap0 regs
@@ -350,11 +362,11 @@ void sunplus_gcm394_base_device::internal_map(address_map &map)
 
 	map(0x007030, 0x007030).rw(m_spg_video, FUNC(gcm394_base_video_device::video_7030_brightness_r), FUNC(gcm394_base_video_device::video_7030_brightness_w));
 	map(0x00703a, 0x00703a).rw(m_spg_video, FUNC(gcm394_base_video_device::video_703a_palettebank_r), FUNC(gcm394_base_video_device::video_703a_palettebank_w));
-	map(0x00703c, 0x00703c).w(m_spg_video, FUNC(gcm394_base_video_device::video_703c_w));
+	map(0x00703c, 0x00703c).w(m_spg_video, FUNC(gcm394_base_video_device::video_703c_w)); // TV Control 1
 
 	map(0x007042, 0x007042).rw(m_spg_video, FUNC(gcm394_base_video_device::sprite_7042_extra_r), FUNC(gcm394_base_video_device::sprite_7042_extra_w)); // maybe sprites,  written as 7022, 702d and 7042 group
 
-	map(0x007051, 0x007051).r(m_spg_video, FUNC(gcm394_base_video_device::video_7051_r)); // wrlshunt checks this
+	map(0x007051, 0x007051).r(m_spg_video, FUNC(gcm394_base_video_device::video_7051_r)); // wrlshunt checks this (doesn't exist on older SPG?)
 
 	map(0x007062, 0x007062).rw(m_spg_video, FUNC(gcm394_base_video_device::video_7062_r), FUNC(gcm394_base_video_device::video_7062_w));
 	map(0x007063, 0x007063).rw(m_spg_video, FUNC(gcm394_base_video_device::video_7063_videoirq_source_r), FUNC(gcm394_base_video_device::video_7063_videoirq_source_ack_w));
@@ -364,6 +376,7 @@ void sunplus_gcm394_base_device::internal_map(address_map &map)
 	map(0x007071, 0x007071).w(m_spg_video, FUNC(gcm394_base_video_device::video_dma_dest_w));                                                        // sets pointers to 7300, 7400 ram areas below
 	map(0x007072, 0x007072).rw(m_spg_video, FUNC(gcm394_base_video_device::video_dma_size_busy_r), FUNC(gcm394_base_video_device::video_dma_size_trigger_w));     //
 
+	// these don't exist on older SPG
 	map(0x00707c, 0x00707c).r(m_spg_video, FUNC(gcm394_base_video_device::video_707c_r)); // wrlshunt polls this waiting for 0x8000, is this some kind of manual port based data upload?
 
 	map(0x00707e, 0x00707e).w(m_spg_video, FUNC(gcm394_base_video_device::video_dma_unk_w));                                                         // written around same time as DMA, seems to select alt sprite bank
