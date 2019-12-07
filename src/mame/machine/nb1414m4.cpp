@@ -127,7 +127,7 @@ void nb1414m4_device::credit_msg(uint8_t *vram)
 	/* credit num */
 	dst = ((m_data[0x045]<<8)|(m_data[0x046]&0xff)) & 0x3fff;
 	vram[dst+0x000] = (credit_count & 0xf0) ? (((credit_count & 0xf0)>>4) + 0x30) : 0x20;
-	vram[dst+0x400] = (m_data[0x48]);
+	vram[dst+0x400] = (m_data[0x47]);
 	vram[dst+0x001] = ((credit_count & 0x0f) + 0x30);
 	vram[dst+0x401] = (m_data[0x48]);
 
