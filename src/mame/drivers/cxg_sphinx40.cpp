@@ -19,7 +19,6 @@ TODO:
 - unmapped read from 0x200000, looks like expansion ROM
 - verify XTAL and irq source/frequency
 - identify buttons
-- lcd
 
 Hardware notes:
 
@@ -52,6 +51,7 @@ LCD module
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "video/pwm.h"
+#include "video/hd61603.h"
 #include "speaker.h"
 
 // internal artwork
@@ -67,10 +67,11 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_pia(*this, "pia"),
+		m_lcd(*this, "lcd"),
 		m_display(*this, "display"),
 		m_board(*this, "board"),
-		m_dac(*this, "dac"),
-		m_inputs(*this, "IN.%u", 0)
+		m_inputs(*this, "IN.%u", 0),
+		m_digits(*this, "digit%u", 0U)
 	{ }
 
 	// machine drivers
@@ -83,24 +84,27 @@ private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia;
+	required_device<hd61603_device> m_lcd;
 	required_device<pwm_display_device> m_display;
 	required_device<sensorboard_device> m_board;
-	required_device<dac_bit_interface> m_dac;
 	required_ioport_array<4> m_inputs;
+	output_finder<8> m_digits;
 
 	// address maps
 	void main_map(address_map &map);
 	void nvram_map(address_map &map);
 
 	// I/O handlers
-	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_WRITE8_MEMBER(input_w);
-	DECLARE_WRITE8_MEMBER(lcd_w);
+	DECLARE_WRITE64_MEMBER(lcd_seg_w);
 
 	void update_display();
 	DECLARE_WRITE8_MEMBER(cb_mux_w);
 	DECLARE_WRITE8_MEMBER(cb_leds_w);
 	DECLARE_READ8_MEMBER(cb_r);
+
+	DECLARE_READ8_MEMBER(input_r);
+	DECLARE_WRITE8_MEMBER(input_w);
+	DECLARE_WRITE8_MEMBER(lcd_w);
 
 	u8 m_cb_mux = 0;
 	u8 m_led_data = 0;
@@ -109,6 +113,8 @@ private:
 
 void sphinx40_state::machine_start()
 {
+	m_digits.resolve();
+
 	// register for savestates
 	save_item(NAME(m_cb_mux));
 	save_item(NAME(m_led_data));
@@ -120,6 +126,18 @@ void sphinx40_state::machine_start()
 /******************************************************************************
     I/O
 ******************************************************************************/
+
+// HD61603 LCD
+
+WRITE64_MEMBER(sphinx40_state::lcd_seg_w)
+{
+	for (int i = 0; i < 8; i++)
+	{
+		m_digits[i] = data & 0xff;
+		data >>= 8;
+	}
+}
+
 
 // 6821 PIA
 
@@ -178,7 +196,7 @@ READ8_MEMBER(sphinx40_state::input_r)
 WRITE8_MEMBER(sphinx40_state::lcd_w)
 {
 	// d0-d3: HD61603 data
-	//printf("%X ",data);
+	m_lcd->data_w(data & 0xf);
 }
 
 
@@ -271,7 +289,7 @@ void sphinx40_state::sphinx40(machine_config &config)
 	PIA6821(config, m_pia, 0);
 	m_pia->writepa_handler().set(FUNC(sphinx40_state::cb_mux_w));
 	m_pia->writepb_handler().set(FUNC(sphinx40_state::cb_leds_w));
-	m_pia->cb2_handler().set(m_dac, FUNC(dac_bit_interface::write));
+	m_pia->cb2_handler().set("dac", FUNC(dac_bit_interface::write));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	ADDRESS_MAP_BANK(config, "nvram_map").set_map(&sphinx40_state::nvram_map).set_options(ENDIANNESS_BIG, 8, 11);
@@ -281,13 +299,15 @@ void sphinx40_state::sphinx40(machine_config &config)
 	m_board->set_delay(attotime::from_msec(150));
 
 	/* video hardware */
+	HD61603(config, m_lcd, 0);
+	m_lcd->write_segs().set(FUNC(sphinx40_state::lcd_seg_w));
 
 	PWM_DISPLAY(config, m_display).set_size(8, 8);
 	config.set_default_layout(layout_cxg_sphinx40);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
+	DAC_1BIT(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.25);
 	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 

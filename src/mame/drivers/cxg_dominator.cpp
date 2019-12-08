@@ -89,7 +89,7 @@ void dominator_state::machine_start()
     I/O
 ******************************************************************************/
 
-// LCD
+// LC7582 LCD
 
 WRITE64_MEMBER(dominator_state::lcd_s_w)
 {

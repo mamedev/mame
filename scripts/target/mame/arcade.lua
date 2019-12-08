@@ -310,6 +310,7 @@ VIDEOS["FIXFREQ"] = true
 --VIDEOS["HD44102"] = true
 --VIDEOS["HD44352"] = true
 VIDEOS["HD44780"] = true
+--VIDEOS["HD61603"] = true
 VIDEOS["HD61830"] = true
 VIDEOS["HD63484"] = true
 --VIDEOS["HD66421"] = true
