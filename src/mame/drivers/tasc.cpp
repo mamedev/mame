@@ -246,7 +246,7 @@ void tasc_state::tasc(machine_config &config)
 		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_SKIP(2) | ROM_BIOS(bios))
 
 ROM_START( tascr30 )
-	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_REGION32_LE( 0x40000, "maincpu", 0 )
 	ROM_DEFAULT_BIOS("v25")
 	ROM_SYSTEM_BIOS( 0, "v21", "System V0.31, Gideon 2.1" ) // 3-May-93, 3-Feb-93 (prototype, later released in 2012)
 	ROM_SYSTEM_BIOS( 1, "v22", "System V0.31, The King 2.20" ) // 3-May-93, 23-Apr-93

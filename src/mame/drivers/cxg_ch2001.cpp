@@ -8,7 +8,7 @@ CXG Chess 3000 is assumed to be on similar hardware as this.
 
 The chess engine is by Richard Lang, based on Cyrus.
 
-CXG Systems S.A. and Newcrest Technology Ltd. involved the same people, with
+CXG Systems S.A. and Newcrest Technology Ltd. are related companies, with
 Eric White at the steering wheel. Newcrest(1984-1991) is probably a rename of
 "White & Allcock"(1981-1984).
 

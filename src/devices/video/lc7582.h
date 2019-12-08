@@ -15,16 +15,18 @@
 
 quick pinout reference (64-pin QFP)
 
-1-54: S1-S53 segment outputs, pin 24 N/C, pins 45-54 also used with AD/DSP
-55: OSC
-56: Vdd
-57: _INH
-58: Vlcd
-59: Vss
-60: CE   \
-61: CLK  | serial input
-62: DATA /
-63,64: COM1/COM2 outputs
+pin     desc
+------------------------------
+1-54  = S1-S53 segment outputs, pin 24 N/C, pins 45-54 also used with AD/DSP
+55    = OSC
+56    = Vdd
+57    = _INH
+58    = Vlcd
+59    = Vss
+60    = CE   \
+61    = CLK  | serial input
+62    = DATA /
+63,64 = COM1/COM2 outputs
 
 */
 

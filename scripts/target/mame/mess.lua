@@ -2000,6 +2000,7 @@ createMESSProjects(_target, _subtarget, "cxg")
 files {
 	MAME_DIR .. "src/mame/drivers/cxg_ch2001.cpp",
 	MAME_DIR .. "src/mame/drivers/cxg_dominator.cpp",
+	MAME_DIR .. "src/mame/drivers/cxg_sphinx40.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "cybiko")

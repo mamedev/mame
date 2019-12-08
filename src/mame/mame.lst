@@ -11275,6 +11275,9 @@ ch2001
 @source:cxg_dominator.cpp
 sdtor
 
+@source:cxg_sphinx40.cpp
+sphinx40
+
 @source:cxhumax.cpp
 hxhdci2k                        //
 
