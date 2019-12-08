@@ -53,6 +53,7 @@ Mighty Guy board layout:
                      YM3526
 
 ***************************************************************************/
+
 #include "emu.h"
 #include "includes/cop01.h"
 

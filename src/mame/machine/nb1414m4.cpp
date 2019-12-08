@@ -6,9 +6,14 @@ Nichibutsu 1414M4 device emulation
 
 Written by Angelo Salese, based on researches by Tomasz Slanina with Legion
 
-This is some fancy MCU / blitter that copies text strings in various Nihon Bussan games;
+This is some fancy blitter DMA or MCU or even a discrete structure that copies text strings to a 8-bit text layer in 
+various Nihon Bussan games;
 
 TODO:
+- Identify what exactly this "device" is; 
+- The overlying text layer should actually be a base device for this (and used where not applicable like galivan, 
+  armedf and bigfightr);
+- Command triggering condition not understood (and diverges between galivan.cpp and armedf.cpp);
 - where is the condition that makes "insert coin" text to properly blink?
 - first byte meaning is completely unknown;
 - Ninja Emaki triggers unknown commands 0x8000 & 0xff20;
@@ -20,9 +25,6 @@ Notes:
   10-- ---- ---- ---- single string transfer
   11-- ---- ---- ---- src -> dst copy, if destination != 0 fixed src, otherwise do a src -> dst
   --xx xxxx xxxx xxxx destination offset in the VRAM tilemap
-
-- I'm sure that this is a shared device, that shares everything. All of the known differences are due of not
-  understood features of the chip (some bytes in the ROM etc.)
 
 ********************************************************************************************************************/
 
@@ -307,6 +309,17 @@ void nb1414m4_device::_0e00(uint16_t mcu_cmd, uint8_t *vram)
 		if((mcu_cmd & 0x18) == 0) // TODO: either one of these two disables credit display
 			credit_msg(vram);
 	}
+}
+
+/*****************************************************************************
+    DEVICE SETTERS
+*****************************************************************************/
+
+void nb1414m4_device::vblank_trigger()
+{
+	// TODO: use this for frame number synchronization instead of screen().frame_number()
+	//  real HW references definitely syncs insert coin blinking after POST so whatever is the host actually 
+	//  have an interest over vblank signal.
 }
 
 void nb1414m4_device::exec(uint16_t mcu_cmd, uint8_t *vram, uint16_t &scrollx, uint16_t &scrolly, tilemap_t *tilemap)

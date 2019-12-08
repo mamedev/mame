@@ -193,7 +193,8 @@ TILE_GET_INFO_MEMBER(galivan_state::ninjemak_get_bg_tile_info)
 TILE_GET_INFO_MEMBER(galivan_state::ninjemak_get_tx_tile_info)
 {
 	uint16_t index = tile_index;
-	if (index < 0x12) /* don't draw the NB1414M4 params! TODO: could be a better fix */
+	// TODO: skip drawing the NB1414M4 params, how the HW actually handles this?
+	if (index < 0x12)
 		index = 0x12;
 		
 	int attr = m_videoram[index + 0x400];
